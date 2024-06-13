@@ -63,15 +63,27 @@ typedef struct ttf_font_desc {
     int ascent;
     int descent;
 
+    lv_font_kerning_t kerning;
+
+    int cache_size;
+    int kernpair_cache_size;
+
     lv_cache_t * glyph_cache;
     lv_cache_t * draw_data_cache;
+    lv_cache_t * kernpair_cache;
 } ttf_font_desc_t;
 
 typedef struct _tiny_ttf_glyph_cache_data_t {
     uint32_t unicode;
-
+    int adv_w;
     lv_font_glyph_dsc_t glyph_dsc;
 } tiny_ttf_glyph_cache_data_t;
+
+typedef struct _tiny_ttf_kernpair_cache_data_t {
+    uint32_t g1;
+    uint32_t g2;
+    int k;
+} tiny_ttf_kernpair_cache_data_t;
 
 typedef struct _lv_tiny_ttf_cache_data_t {
     uint32_t glyph_index;
@@ -86,8 +98,8 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
 static const void * ttf_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 static void ttf_release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc);
 static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size_t data_size,
-                                      int32_t font_size,
-                                      size_t cache_size);
+                                      int32_t font_size, bool kerning,
+                                      size_t cache_size, size_t kernpair_cache_size );
 
 static bool tiny_ttf_glyph_cache_create_cb(tiny_ttf_glyph_cache_data_t * node, void * user_data);
 static void tiny_ttf_glyph_cache_free_cb(tiny_ttf_glyph_cache_data_t * node, void * user_data);
@@ -98,6 +110,13 @@ static bool tiny_ttf_draw_data_cache_create_cb(tiny_ttf_cache_data_t * node, voi
 static void tiny_ttf_draw_data_cache_free_cb(tiny_ttf_cache_data_t * node, void * user_data);
 static lv_cache_compare_res_t tiny_ttf_draw_data_cache_compare_cb(const tiny_ttf_cache_data_t * lhs,
                                                                   const tiny_ttf_cache_data_t * rhs);
+
+static bool tiny_ttf_kernpair_cache_create_cb(tiny_ttf_kernpair_cache_data_t * node, void * user_data);
+static void tiny_ttf_kernpair_cache_free_cb(tiny_ttf_kernpair_cache_data_t * node, void * user_data);
+static lv_cache_compare_res_t tiny_ttf_kernpair_cache_compare_cb(const tiny_ttf_kernpair_cache_data_t * lhs,
+                                                              const tiny_ttf_kernpair_cache_data_t * rhs);
+
+static void lv_tiny_ttf_cache_create(ttf_font_desc_t * dsc );
 /**********************
  *  GLOBAL VARIABLES
  **********************/
@@ -126,6 +145,22 @@ void lv_tiny_ttf_set_size(lv_font_t * font, int32_t font_size)
     stbtt_GetFontVMetrics(&dsc->info, &dsc->ascent, &dsc->descent, &line_gap);
     font->line_height = (int32_t)(dsc->scale * (dsc->ascent - dsc->descent + line_gap));
     font->base_line = (int32_t)(dsc->scale * (line_gap - dsc->descent));
+
+    // size change means cache needs to be invalidated.
+
+    if ( dsc->glyph_cache )
+    {
+        lv_cache_destroy(dsc->glyph_cache, NULL);
+        dsc->glyph_cache = NULL;
+    }
+
+    if ( dsc->draw_data_cache )
+    {
+        lv_cache_destroy(dsc->draw_data_cache, NULL);
+        dsc->draw_data_cache = NULL;
+    }
+    
+    lv_tiny_ttf_cache_create(dsc);
 }
 
 void lv_tiny_ttf_destroy(lv_font_t * font)
@@ -141,6 +176,8 @@ void lv_tiny_ttf_destroy(lv_font_t * font)
 #endif
         lv_cache_destroy(ttf->glyph_cache, NULL);
         lv_cache_destroy(ttf->draw_data_cache, NULL);
+        if ( ttf->kernpair_cache )
+            lv_cache_destroy(ttf->kernpair_cache, NULL);
         lv_free(ttf);
         font->dsc = NULL;
     }
@@ -215,16 +252,52 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     tiny_ttf_glyph_cache_data_t * data = lv_cache_entry_get_data(entry);
     *dsc_out = data->glyph_dsc;
 
-    uint32_t g1 = data->glyph_dsc.gid.index;
-    int g2 = 0;
-    if(unicode_letter_next != 0) {
-        g2 = stbtt_FindGlyphIndex(&dsc->info, (int)unicode_letter_next);
+    /*Kerning correction*/
+    if ( font->kerning == LV_FONT_KERNING_NORMAL && unicode_letter_next != 0) // check if we need to do any kerning calculations
+    {
+        uint32_t g1 = data->glyph_dsc.gid.index;
+
+        int g2 = 0;
+        search_key.unicode = unicode_letter_next; // reuse search key
+        lv_cache_entry_t * entry_next = lv_cache_acquire_or_create(dsc->glyph_cache, &search_key, (void *)dsc);
+
+        if(entry_next == NULL)
+            g2 = stbtt_FindGlyphIndex(&dsc->info, (int)unicode_letter_next);
+        else
+        {
+            tiny_ttf_glyph_cache_data_t * data_next = lv_cache_entry_get_data(entry_next);
+            g2 = data_next->glyph_dsc.gid.index;
+        }
+
+        if ( g2 )
+        {
+            tiny_ttf_kernpair_cache_data_t kernpair_search_key = {
+                .g1 = g1,
+                .g2 = g2,
+            };
+
+            int k;
+
+            lv_cache_entry_t * kernpair = lv_cache_acquire_or_create(dsc->glyph_cache, &kernpair_search_key, (void *)dsc);
+
+            if(kernpair == NULL) {
+                k = stbtt_GetGlyphKernAdvance(&dsc->info, data->glyph_dsc.gid.index, g2);
+            } else
+            {
+                tiny_ttf_kernpair_cache_data_t * kernpair_data = lv_cache_entry_get_data(kernpair);
+                k = kernpair_data->k;
+            }
+            
+            static volatile kout;
+            if ( k != 0 )
+            {
+                kout = k;
+            }
+            dsc_out->adv_w = (uint16_t)floor((((float)data->adv_w + (float)k) * dsc->scale) +
+                            0.5f); /*Horizontal space required by the glyph in [px]*/
+        }
     }
 
-    /*Kerning correction*/
-    int k = stbtt_GetGlyphKernAdvance(&dsc->info, g1, g2);
-    dsc_out->adv_w = (uint16_t)floor((((float)dsc_out->adv_w + (float)k) * dsc->scale) +
-                                     0.5f); /*Horizontal space required by the glyph in [px]*/
     dsc_out->entry = NULL;
 
     lv_cache_release(dsc->glyph_cache, entry, NULL);
@@ -266,8 +339,40 @@ static void ttf_release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g
     g_dsc->entry = NULL;
 }
 
+static void lv_tiny_ttf_cache_create(ttf_font_desc_t * dsc )
+{
+    /*Init cache*/
+    dsc->glyph_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(tiny_ttf_glyph_cache_data_t), dsc->cache_size,
+    (lv_cache_ops_t) {
+        .compare_cb = (lv_cache_compare_cb_t)tiny_ttf_glyph_cache_compare_cb,
+        .create_cb = (lv_cache_create_cb_t)tiny_ttf_glyph_cache_create_cb,
+        .free_cb = (lv_cache_free_cb_t)tiny_ttf_glyph_cache_free_cb
+    });
+    lv_cache_set_name(dsc->glyph_cache, "TINY_TTF_GLYPH");
+
+    dsc->draw_data_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(tiny_ttf_cache_data_t), dsc->cache_size,
+    (lv_cache_ops_t) {
+        .compare_cb = (lv_cache_compare_cb_t)tiny_ttf_draw_data_cache_compare_cb,
+        .create_cb = (lv_cache_create_cb_t)tiny_ttf_draw_data_cache_create_cb,
+        .free_cb = (lv_cache_free_cb_t)tiny_ttf_draw_data_cache_free_cb,
+    });
+    lv_cache_set_name(dsc->draw_data_cache, "TINY_TTF_DRAW_DATA");
+
+    // this does not need to be destroyed on resize, kerning data does not change.
+    if ( dsc->kernpair_cache == NULL && dsc->kerning == LV_FONT_KERNING_NORMAL )
+    {
+        // this doesn't seem to need to be big to have effect, and size appears to not have a big effect, due to the number of possible combinations
+        dsc->kernpair_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(tiny_ttf_kernpair_cache_data_t), dsc->kernpair_cache_size, 
+        (lv_cache_ops_t) {
+            .compare_cb = (lv_cache_compare_cb_t)tiny_ttf_kernpair_cache_compare_cb,
+            .create_cb = (lv_cache_create_cb_t)tiny_ttf_kernpair_cache_create_cb,
+            .free_cb = (lv_cache_free_cb_t)tiny_ttf_kernpair_cache_free_cb
+        });
+    }
+}
+
 static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size_t data_size, int32_t font_size,
-                                      size_t cache_size)
+                                      bool kerning, size_t cache_size, size_t kernpair_cache_size )
 {
     LV_UNUSED(data_size);
     if((path == NULL && data == NULL) || 0 >= font_size) {
@@ -307,22 +412,8 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
     }
 #endif
 
-    /*Init cache*/
-    dsc->glyph_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(tiny_ttf_glyph_cache_data_t), cache_size,
-    (lv_cache_ops_t) {
-        .compare_cb = (lv_cache_compare_cb_t)tiny_ttf_glyph_cache_compare_cb,
-        .create_cb = (lv_cache_create_cb_t)tiny_ttf_glyph_cache_create_cb,
-        .free_cb = (lv_cache_free_cb_t)tiny_ttf_glyph_cache_free_cb
-    });
-    lv_cache_set_name(dsc->glyph_cache, "TINY_TTF_GLYPH");
-
-    dsc->draw_data_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(tiny_ttf_cache_data_t), cache_size,
-    (lv_cache_ops_t) {
-        .compare_cb = (lv_cache_compare_cb_t)tiny_ttf_draw_data_cache_compare_cb,
-        .create_cb = (lv_cache_create_cb_t)tiny_ttf_draw_data_cache_create_cb,
-        .free_cb = (lv_cache_free_cb_t)tiny_ttf_draw_data_cache_free_cb,
-    });
-    lv_cache_set_name(dsc->draw_data_cache, "TINY_TTF_DRAW_DATA");
+    dsc->cache_size = cache_size;
+    dsc->kernpair_cache_size = kernpair_cache_size;
 
     lv_font_t * out_font = lv_malloc_zeroed(sizeof(lv_font_t));
     if(out_font == NULL) {
@@ -330,6 +421,16 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
         LV_LOG_ERROR("tiny_ttf: out of memory");
         return NULL;
     }
+
+    // check if font  has kerning tables to use, else disable kerning automatically.
+    if (dsc->info.kern == 0 && dsc->info.gpos == 0)
+    {
+        kerning = LV_FONT_KERNING_NONE; // disable kerning if font has no tables.
+    }
+
+    dsc->kerning = kerning;
+    out_font->kerning = kerning;
+
     out_font->get_glyph_dsc = ttf_get_glyph_dsc_cb;
     out_font->get_glyph_bitmap = ttf_get_glyph_bitmap_cb;
     out_font->release_glyph = ttf_release_glyph_cb;
@@ -338,22 +439,22 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
     return out_font;
 }
 #if LV_TINY_TTF_FILE_SUPPORT != 0
-lv_font_t * lv_tiny_ttf_create_file_ex(const char * path, int32_t font_size, size_t cache_size)
+lv_font_t * lv_tiny_ttf_create_file_ex(const char * path, int32_t font_size, lv_font_kerning_t kerning, size_t cache_size)
 {
-    return lv_tiny_ttf_create(path, NULL, 0, font_size, cache_size);
+    return lv_tiny_ttf_create(path, NULL, 0, font_size, kerning, cache_size, LV_TINY_TTF_CACHE_KERNPAIR_CNT);
 }
 lv_font_t * lv_tiny_ttf_create_file(const char * path, int32_t font_size)
 {
-    return lv_tiny_ttf_create(path, NULL, 0, font_size, LV_TINY_TTF_CACHE_GLYPH_CNT);
+    return lv_tiny_ttf_create(path, NULL, 0, font_size, LV_FONT_KERNING_NORMAL, LV_TINY_TTF_CACHE_GLYPH_CNT, LV_TINY_TTF_CACHE_KERNPAIR_CNT);
 }
 #endif
-lv_font_t * lv_tiny_ttf_create_data_ex(const void * data, size_t data_size, int32_t font_size, size_t cache_size)
+lv_font_t * lv_tiny_ttf_create_data_ex(const void * data, size_t data_size, int32_t font_size, lv_font_kerning_t kerning, size_t cache_size)
 {
-    return lv_tiny_ttf_create(NULL, data, data_size, font_size, cache_size);
+    return lv_tiny_ttf_create(NULL, data, data_size, font_size, kerning, cache_size, LV_TINY_TTF_CACHE_KERNPAIR_CNT);
 }
 lv_font_t * lv_tiny_ttf_create_data(const void * data, size_t data_size, int32_t font_size)
 {
-    return lv_tiny_ttf_create(NULL, data, data_size, font_size, LV_TINY_TTF_CACHE_GLYPH_CNT);
+    return lv_tiny_ttf_create(NULL, data, data_size, font_size, LV_FONT_KERNING_NORMAL, LV_TINY_TTF_CACHE_GLYPH_CNT, LV_TINY_TTF_CACHE_KERNPAIR_CNT);
 }
 
 /*-----------------
@@ -378,7 +479,18 @@ static bool tiny_ttf_glyph_cache_create_cb(tiny_ttf_glyph_cache_data_t * node, v
 
     int advw, lsb;
     stbtt_GetGlyphHMetrics(&dsc->info, g1, &advw, &lsb);
-    dsc_out->adv_w = (uint16_t)advw; /*Horizontal space required by the glyph in [px]*/
+    if ( dsc->kerning != LV_FONT_KERNING_NORMAL ) // calculate default advance
+    {
+        volatile int k = stbtt_GetGlyphKernAdvance(&dsc->info, g1, 0);
+        dsc_out->adv_w = (uint16_t)floor((((float)advw + (float)k) * dsc->scale) +
+                        0.5f); /*Horizontal space required by the glyph in [px]*/
+    } else
+    {
+        dsc_out->adv_w = (uint16_t)floor(((float)advw * dsc->scale) +
+                            0.5f); /*Horizontal space required by the glyph in [px]*/;
+    }
+    // precalculate no kerning value
+    node->adv_w = advw;
     dsc_out->box_w = (x2 - x1 + 1);         /*width of the bitmap in [px]*/
     dsc_out->box_h = (y2 - y1 + 1);         /*height of the bitmap in [px]*/
     dsc_out->ofs_x = x1;                    /*X offset of the bitmap in [pf]*/
@@ -458,4 +570,29 @@ static lv_cache_compare_res_t tiny_ttf_draw_data_cache_compare_cb(const tiny_ttf
     return 0;
 }
 
-#endif // LV_USE_TINY_TTF != 0
+static bool tiny_ttf_kernpair_cache_create_cb(tiny_ttf_kernpair_cache_data_t * node, void * user_data)
+{
+    ttf_font_desc_t * dsc = (ttf_font_desc_t *)user_data;
+    node->k = stbtt_GetGlyphKernAdvance(&dsc->info, node->g1, node->g2);
+    return true;
+}
+
+static void tiny_ttf_kernpair_cache_free_cb(tiny_ttf_kernpair_cache_data_t * node, void * user_data)
+{
+    LV_UNUSED(node);
+    LV_UNUSED(user_data);
+}
+
+static lv_cache_compare_res_t tiny_ttf_kernpair_cache_compare_cb(const tiny_ttf_kernpair_cache_data_t * lhs,
+                                                              const tiny_ttf_kernpair_cache_data_t * rhs)
+{
+    if(lhs->g1 != rhs->g1) {
+        return lhs->g1 > rhs->g1 ? 1 : -1;
+    }
+
+    if(lhs->g2 != rhs->g2) {
+        return lhs->g2 > rhs->g2 ? 1 : -1;
+    }
+}
+
+#endif

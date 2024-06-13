@@ -2604,6 +2604,13 @@
             #define LV_TINY_TTF_CACHE_GLYPH_CNT 256
         #endif
     #endif
+    #ifndef LV_TINY_TTF_CACHE_KERNPAIR_CNT
+        #ifdef CONFIG_LV_TINY_TTF_CACHE_KERNPAIR_CNT
+            #define LV_TINY_TTF_CACHE_KERNPAIR_CNT CONFIG_LV_TINY_TTF_CACHE_KERNPAIR_CNT
+        #else
+            #define LV_TINY_TTF_CACHE_KERNPAIR_CNT 16
+        #endif
+    #endif
 #endif
 
 /*Rlottie library*/
