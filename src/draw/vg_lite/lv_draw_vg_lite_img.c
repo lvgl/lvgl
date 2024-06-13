@@ -120,20 +120,32 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         LV_PROFILER_END_TAG("vg_lite_blit_rect");
     }
     else {
-        int32_t width = lv_area_get_width(coords);
-        int32_t height = lv_area_get_height(coords);
-        float radius = dsc->clip_radius;
+        lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
+
         if(dsc->clip_radius) {
+            int32_t width = lv_area_get_width(coords);
+            int32_t height = lv_area_get_height(coords);
             float r_short = LV_MIN(width, height) / 2.0f;
-            radius = LV_MIN(radius, r_short);
+            float radius = LV_MIN(dsc->clip_radius, r_short);
+
+            /**
+             * When clip_radius is enabled, the clipping edges
+             * are aligned with the image edges
+             */
+            lv_vg_lite_path_append_rect(
+                path,
+                coords->x1, coords->y1,
+                width, height,
+                radius, radius);
+        }
+        else {
+            lv_vg_lite_path_append_rect(
+                path,
+                clip_area.x1, clip_area.y1,
+                lv_area_get_width(&clip_area), lv_area_get_height(&clip_area),
+                0, 0);
         }
 
-        lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
-        lv_vg_lite_path_append_rect(
-            path,
-            coords->x1, coords->y1,
-            width, height,
-            radius, radius);
         lv_vg_lite_path_set_bonding_box_area(path, &clip_area);
         lv_vg_lite_path_end(path);
 
