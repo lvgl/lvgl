@@ -286,6 +286,11 @@ void lv_draw_dispatch_request(void)
 #endif
 }
 
+uint32_t lv_draw_get_unit_count(void)
+{
+    return _draw_info.unit_cnt;
+}
+
 lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id)
 {
     LV_PROFILER_BEGIN;
