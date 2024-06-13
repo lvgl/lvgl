@@ -160,7 +160,7 @@ are rendered directly in the frame buffer so they cannot be
 rotated later. Therefore in direct mode only the whole frame buffer can be rotated.
 The same is true for :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_FULL`.
 
-In the case of :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_PARTIAL`the small rendered areas
+In the case of :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_PARTIAL` the small rendered areas
 can be rotated on their own before flushing to the frame buffer.
 
 Color format
@@ -246,7 +246,7 @@ Force refreshing
 ----------------
 
 Normally the invalidated areas (marked for redraw) are rendered in :cpp:func:`lv_timer_handler` in every
-:cpp:macro:`LV_DEF_REFR_PERIOD`milliseconds. However, by using :cpp:func:`lv_refr_now(display)` you can ask LVGL to
+:c:macro:`LV_DEF_REFR_PERIOD` milliseconds. However, by using :cpp:func:`lv_refr_now(display)` you can ask LVGL to
 redraw the invalid areas immediately. The refreshing will happen in :cpp:func:`lv_refr_now` which might take
 longer time.
 
