@@ -47,6 +47,9 @@
 /*********************
  *      DEFINES
  *********************/
+#if LV_FS_MEMFS_LETTER == '\0'
+    #error "LV_FS_MEMFS_LETTER must be an upper case ASCII letter"
+#endif
 
 /**********************
  *      TYPEDEFS

@@ -17,6 +17,10 @@
 /*********************
  *      DEFINES
  *********************/
+#if LV_FS_WIN32_LETTER == '\0'
+    #error "LV_FS_WIN32_LETTER must be an upper case ASCII letter"
+#endif
+
 #define MAX_PATH_LEN 256
 
 /**********************

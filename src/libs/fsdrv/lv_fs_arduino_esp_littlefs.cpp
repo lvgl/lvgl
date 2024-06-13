@@ -4,6 +4,10 @@
 #include "../../core/lv_global.h"
 #include "LittleFS.h"
 
+#if LV_FS_ARDUINO_ESP_LITTLEFS_LETTER == '\0'
+    #error "LV_FS_ARDUINO_ESP_LITTLEFS_LETTER must be an upper case ASCII letter"
+#endif
+
 typedef struct ArduinoEspLittleFile {
     File file;
 } ArduinoEspLittleFile;
@@ -178,4 +182,11 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
     return (int32_t)(*pos_p) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
 
+#else /*LV_USE_FS_ARDUINO_ESP_LITTLEFS == 0*/
+
+#if defined(LV_FS_ARDUINO_ESP_LITTLEFS_LETTER) && LV_FS_ARDUINO_ESP_LITTLEFS_LETTER != '\0'
+    #warning "LV_USE_FS_ARDUINO_ESP_LITTLEFS is not enabled but LV_FS_ARDUINO_ESP_LITTLEFS_LETTER is set"
 #endif
+
+#endif /*LV_USE_FS_ARDUINO_ESP_LITTLEFS*/
+

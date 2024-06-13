@@ -4,6 +4,10 @@
 #include "lfs.h"
 #include "../../core/lv_global.h"
 
+#if LV_FS_LITTLEFS_LETTER == '\0'
+    #error "LV_FS_LITTLEFS_LETTER must be an upper case ASCII letter"
+#endif
+
 typedef struct LittleFile {
     lfs_file_t file;
 } LittleFile;
