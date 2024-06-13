@@ -28,6 +28,7 @@ extern "C" {
  *********************/
 
 /**********************
+    volatile bool wait_for_finish;
  * GLOBAL PROTOTYPES
  **********************/
 

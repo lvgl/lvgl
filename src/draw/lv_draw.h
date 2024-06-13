@@ -64,6 +64,13 @@ typedef enum {
 } lv_draw_task_state_t;
 
 struct lv_layer_t  {
+     *
+     * @param draw_unit
+     * @return
+     */
+    int32_t (*wait_for_finish_cb)(lv_draw_unit_t * draw_unit);
+
+    /**
 
     /** Target draw buffer of the layer*/
     lv_draw_buf_t * draw_buf;
@@ -166,6 +173,12 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer);
  * It's blocking if `LV_USE_OS == 0` else it yields
  */
 void lv_draw_dispatch_wait_for_request(void);
+
+/**
+ * Wait for draw finish in case of asynchronous task execution.
+ * If `LV_USE_OS == 0` it just return.
+ */
+void lv_draw_wait_for_finish(void);
 
 /**
  * When a draw unit finished a draw task it needs to request dispatching
