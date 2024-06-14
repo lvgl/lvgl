@@ -78,6 +78,7 @@ void * lv_draw_create_unit(size_t size)
 
     new_unit->next = _draw_info.unit_head;
     _draw_info.unit_head = new_unit;
+    _draw_info.unit_cnt++;
 
     return new_unit;
 }
@@ -289,7 +290,7 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
 {
     LV_PROFILER_BEGIN;
     /*If the first task is screen sized, there cannot be independent areas*/
-    if(layer->draw_task_head) {
+    if(_draw_info.unit_cnt > 1 && layer->draw_task_head) {
         int32_t hor_res = lv_display_get_horizontal_resolution(lv_refr_get_disp_refreshing());
         int32_t ver_res = lv_display_get_vertical_resolution(lv_refr_get_disp_refreshing());
         lv_draw_task_t * t = layer->draw_task_head;
@@ -430,6 +431,9 @@ static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check)
 {
     LV_PROFILER_BEGIN;
     lv_draw_task_t * t = layer->draw_task_head;
+
+    if(_draw_info.unit_cnt <= 1)
+        return true;
 
     /*If t_check is outside of the older tasks then it's independent*/
     while(t && t != t_check) {
