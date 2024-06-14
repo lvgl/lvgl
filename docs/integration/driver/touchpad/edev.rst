@@ -5,8 +5,8 @@ Linux Edev Driver
 Overview
 --------
 
-The Linux event device (edev) is a hardware-independent API that gives user space software
-access to input events from, for example, a mouse or touchscreen. It is exposed via the Linux device file system interface. 
+The Linux event device (edev) is a hardware-independent API that gives access to input events from, 
+for example, a mouse or touchscreen. It is exposed via the Linux device file system interface. 
 
 Prerequisites
 -------------
@@ -33,7 +33,7 @@ Then link this to the LVGL display with ``lv_indev_set_display``.
 	lv_indev_t *touch = lv_evdev_create(LV_INDEV_TYPE_POINTER, "/dev/input/event0");
 	lv_indev_set_display(touch, disp);
 
-```disp``` is already created - if using the Linux framebuffer this could be:
+Ensure that an ``lv_display_t`` object is already created for ``disp``. An example for this is shown below, using the Linux framebuffer driver. 
 
 .. code:: c
 
@@ -44,9 +44,13 @@ Then link this to the LVGL display with ``lv_indev_set_display``.
 Locating your input device
 --------------------------
 
-You can use evtest to find which input device you need.   
-Try   
+If you can't determine your input device, first run   
+```$cat /proc/bus/input/devices```
 
-``evtest /dev/input/event0``
+This should show input devices and there will be entries with the word 'event' which give a clue as to the device to use eg. 'event1' would be ``/dev/input/event1``.  
 
-and each ``event`` input in turn until you get output.   
+You can use ``evtest`` to show data from that event source to see if it is actually the one you want.
+
+Try:   
+
+``evtest /dev/input/event1`` replacing ``eventX`` with your event device from above.   
