@@ -85,8 +85,8 @@ enum lw_object_type {
 
 struct lw_input {
     struct {
-        lw_coord_t x;
-        lw_coord_t y;
+        int x;
+        int y;
         lv_indev_state_t left_button;
         lv_indev_state_t right_button;
         lv_indev_state_t wheel_button;
@@ -99,8 +99,8 @@ struct lw_input {
     } keyboard;
 
     struct {
-        lw_coord_t x;
-        lw_coord_t y;
+        int x;
+        int y;
         lv_indev_state_t state;
     } touch;
 };
@@ -148,7 +148,7 @@ struct lw_application {
     struct xdg_wm_base* xdg_wm;
 #endif
 
-#ifdef LV_WAYLAND_CLIENT_SIDE_DECORATIONS
+#if LV_WAYLAND_CLIENT_SIDE_DECORATIONS
     bool opt_disable_decorations;
 #endif
 
@@ -228,7 +228,7 @@ static struct lw_surface_object* create_surface_obj(struct lw_application* app,
     enum lw_object_type type,
     struct lw_surface_object* parent);
 
-#ifdef LV_WAYLAND_TICK_GET
+#if LV_WAYLAND_TICK_GET
 static uint32_t tick_get_cb(void)
 {
     struct timespec t;
@@ -407,7 +407,6 @@ static void fill_decoration_color(lv_color32_t* buf, lv_color32_t color, uint32_
         buf++;
         px_num--;
     }
-
 }
 
 static bool create_wl_decoration(lw_window_t* window,
@@ -1482,7 +1481,7 @@ static void cache_apply_areas(lw_window_t* window, void* dest, void* src, smm_bu
 {
     unsigned long offset;
     unsigned char start;
-    lw_coord_t y;
+    int y;
     lv_area_t* dmg;
     lv_area_t* next_dmg;
     smm_buffer_t* next_buf = smm_next_buffer(src_buf);
@@ -1881,14 +1880,14 @@ static void flush_lv_cb(lv_display_t* display, const lv_area_t* area, uint8_t* p
     int32_t y;
     void* buf_base;
     struct wl_buffer* wl_buf;
-    lw_coord_t src_width = lv_area_get_width(area);
-    lw_coord_t src_height = lv_area_get_height(area);
+    int src_width = lv_area_get_width(area);
+    int src_height = lv_area_get_height(area);
     lw_window_t* window = lv_display_get_user_data(display);
     smm_buffer_t* buf = window->body->pending_buffer;
     struct wl_callback* cb;
 
-    const lw_coord_t hres = (lv_display_get_rotation(display) == 0) ? lv_display_get_horizontal_resolution(display) : lv_display_get_vertical_resolution(display);
-    const lw_coord_t vres = (lv_display_get_rotation(display) == 0) ? lv_display_get_vertical_resolution(display) : lv_display_get_horizontal_resolution(display);
+    const int hres = (lv_display_get_rotation(display) == 0) ? lv_display_get_horizontal_resolution(display) : lv_display_get_vertical_resolution(display);
+    const int vres = (lv_display_get_rotation(display) == 0) ? lv_display_get_vertical_resolution(display) : lv_display_get_horizontal_resolution(display);
 
     /* If window has been / is being closed, or is not visible, skip flush */
     if (window->closed || window->shall_close) {
@@ -2391,7 +2390,7 @@ uint32_t lv_wayland_timer_handler(void)
  * @param close_cb function to be called when the window gets closed by the user (optional)
  * @return new display backed by a Wayland window, or NULL on error
  */
-lv_display_t* lv_create_wayland_window(lw_coord_t hor_res, lw_coord_t ver_res, char* title,
+lv_display_t* lv_create_wayland_window(int hor_res, int ver_res, char* title,
     lv_window_close_cb_t close_cb)
 {
 
@@ -2443,7 +2442,7 @@ lv_display_t* lv_create_wayland_window(lw_coord_t hor_res, lw_coord_t ver_res, c
 
 bool lv_wayland_init(void)
 {
-#ifdef LV_WAYLAND_TICK_GET
+#if LV_WAYLAND_TICK_GET
     lv_tick_set_cb(tick_get_cb);
 #endif
 
@@ -2491,7 +2490,7 @@ bool lv_wayland_init(void)
 
     smm_init(&evs, &application);
 
-#ifdef LV_WAYLAND_CLIENT_SIDE_DECORATIONS
+#if LV_WAYLAND_CLIENT_SIDE_DECORATIONS
     const char* env_disable_decorations = getenv("LV_WAYLAND_DISABLE_WINDOWDECORATION");
     application.opt_disable_decorations = ((env_disable_decorations != NULL) &&
         (env_disable_decorations[0] != '0'));

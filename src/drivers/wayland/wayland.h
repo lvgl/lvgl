@@ -28,7 +28,6 @@ extern "C" {
  **********************/
 
 typedef bool (*lv_window_close_cb_t)(lv_display_t * disp);
-typedef int32_t lw_coord_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -37,7 +36,7 @@ bool lv_wayland_init(void);
 void lv_wayland_deinit(void);
 uint32_t lv_wayland_timer_handler(void);
 int lv_get_wayland_fd(void);
-lv_display_t * lv_create_wayland_window(lw_coord_t hor_res, lw_coord_t ver_res, char *title,
+lv_display_t * lv_create_wayland_window(int hor_res, int ver_res, char *title,
                                      lv_window_close_cb_t close_cb);
 bool lv_close_wayland_window(lv_display_t * disp);
 void lv_set_wayland_window_fullscreen(lv_display_t * disp, bool fullscreen);
