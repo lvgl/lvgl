@@ -11,12 +11,12 @@ for example, a mouse or touchscreen. It is exposed via the Linux device file sys
 Prerequisites
 -------------
 
-Your system has an input device configured (usually under ``/dev/input/event0``).
+Your system has an input device configured (usually under ``/dev/input/`` such as ``/dev/input/event0``).
 
 Configuring the driver
 ----------------------
 
-Enable the Linux LVGL edev driver support in lv_conf.h.    
+Enable the Linux LVGL edev driver support in ``lv_conf.h``.    
 
 .. code:: c
 
@@ -45,12 +45,13 @@ Locating your input device
 --------------------------
 
 If you can't determine your input device, first run   
+
 ```$cat /proc/bus/input/devices```
 
-This should show input devices and there will be entries with the word 'event' which give a clue as to the device to use eg. 'event1' would be ``/dev/input/event1``.  
+This should show input devices and there will be entries with the word ``event`` which give a clue as to the device to use eg. ``event1`` would be ``/dev/input/event1``.  
 
 You can use ``evtest`` to show data from that event source to see if it is actually the one you want.
 
 Try:   
 
-``evtest /dev/input/event1`` replacing ``eventX`` with your event device from above.   
+``$evtest /dev/input/event1`` replacing ``eventX`` with your event device from above.   
