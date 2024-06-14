@@ -2944,6 +2944,55 @@
 /*==================
  * DEVICES
  *==================*/
+#ifndef LV_USE_WAYLAND
+    #ifdef CONFIG_LV_USE_WAYLAND
+        #define LV_USE_WAYLAND CONFIG_LV_USE_WAYLAND
+    #else
+        #  define LV_USE_WAYLAND       0
+    #endif
+#endif
+
+#if LV_USE_WAYLAND
+
+#ifndef LV_WAYLAND_TICK_GET
+    #ifdef CONFIG_LV_WAYLAND_TICK_GET
+        #define LV_WAYLAND_TICK_GET CONFIG_LV_WAYLAND_TICK_GET
+    #else
+        #define LV_WAYLAND_TICK_GET 0
+    #endif
+#endif
+
+/* Support for client-side decorations */
+#  ifndef LV_WAYLAND_CLIENT_SIDE_DECORATIONS
+#ifndef LV_WAYLAND_CLIENT_SIDE_DECORATIONS
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_WAYLAND_CLIENT_SIDE_DECORATIONS
+            #define LV_WAYLAND_CLIENT_SIDE_DECORATIONS CONFIG_LV_WAYLAND_CLIENT_SIDE_DECORATIONS
+        #else
+            #define LV_WAYLAND_CLIENT_SIDE_DECORATIONS 0
+        #endif
+    #else
+        #    define LV_WAYLAND_CLIENT_SIDE_DECORATIONS 1
+    #endif
+#endif
+#  endif
+
+/* Support for xdg-shell protocol */
+#  ifndef LV_WAYLAND_XDG_SHELL
+#ifndef LV_WAYLAND_XDG_SHELL
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_WAYLAND_XDG_SHELL
+            #define LV_WAYLAND_XDG_SHELL CONFIG_LV_WAYLAND_XDG_SHELL
+        #else
+            #define LV_WAYLAND_XDG_SHELL 0
+        #endif
+    #else
+        #    define LV_WAYLAND_XDG_SHELL 1
+    #endif
+#endif
+#  endif
+
+#endif
 
 /*Use SDL to open window on PC and handle mouse and keyboard*/
 #ifndef LV_USE_SDL
