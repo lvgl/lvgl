@@ -28,7 +28,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
-
+typedef unsigned char uint8_t;
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -58,7 +58,7 @@ static void scale_find_section_tick_idx(lv_obj_t * obj);
 static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const uint32_t tick_idx,
                                                           const bool is_major_tick, const int32_t major_tick_width, const int32_t minor_tick_width);
 static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, const bool is_major_tick,
-                                                             lv_draw_label_dsc_t * label_dsc, lv_draw_line_dsc_t * major_tick_dsc, lv_draw_line_dsc_t * minor_tick_dsc,
+                                                             lv_draw_line_dsc_t * major_tick_dsc, lv_draw_line_dsc_t * minor_tick_dsc,
                                                              const int32_t tick_value, const uint8_t tick_idx, lv_point_t * tick_point_a);
 static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
                                           const uint16_t major_tick_idx);
@@ -813,7 +813,7 @@ static void scale_calculate_main_compensation(lv_obj_t * obj)
         /* Store the first and last section tick vertical/horizontal position */
         if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
            || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
-            scale_store_section_line_tick_width_compensation(obj, is_major_tick, &label_dsc, &major_tick_dsc, &minor_tick_dsc,
+            scale_store_section_line_tick_width_compensation(obj, is_major_tick, &major_tick_dsc, &minor_tick_dsc,
                                                              tick_value, tick_idx, &tick_point_a);
         }
         else {
@@ -1512,7 +1512,6 @@ static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * 
  *
  * @param obj       pointer to a scale object
  * @param is_major_tick Indicates if tick is major or not
- * @param label_dsc pointer to the label descriptor
  * @param major_tick_dsc pointer to the major_tick_dsc
  * @param minor_tick_dsc pointer to the minor_tick_dsc
  * @param tick_value Current tick value, used to know if tick_idx belongs to a section or not
@@ -1520,7 +1519,7 @@ static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * 
  * @param tick_point_a Pointer to tick point a
  */
 static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, const bool is_major_tick,
-                                                             lv_draw_label_dsc_t * label_dsc, lv_draw_line_dsc_t * major_tick_dsc, lv_draw_line_dsc_t * minor_tick_dsc,
+                                                             lv_draw_line_dsc_t * major_tick_dsc, lv_draw_line_dsc_t * minor_tick_dsc,
                                                              const int32_t tick_value, const uint8_t tick_idx, lv_point_t * tick_point_a)
 {
     lv_scale_t * scale = (lv_scale_t *) obj;
@@ -1529,7 +1528,6 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
     _LV_LL_READ_BACK(&scale->section_ll, section) {
         if(section->minor_range <= tick_value && section->major_range >= tick_value) {
             if(is_major_tick) {
-                scale_set_indicator_label_properties(obj, label_dsc, section->indicator_style);
                 scale_set_line_properties(obj, major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
             }
             else {
