@@ -10,7 +10,7 @@ Following shell are supported:
 > xdg_shell requires an extra build step; see section _Generate protocols_ below.
 
 
-Basic client-side window decorations (simple title bar, minimize and close buttons)
+Basic client-side window decorations (simple title bar, minimize, maximize and close buttons)
 are supported, while integration with desktop environments is not.
 
 
@@ -78,15 +78,15 @@ In "Project properties > C/C++ Build > Settings" set the followings:
 2. Enable the Wayland driver in `lv_conf.h` with `LV_USE_WAYLAND 1` and
    configure its features below, enabling at least support for one shell.
 3. `LV_COLOR_DEPTH` should be set either to `32` in `lv_conf.h`;(ensure LV_MEM_SIZE enough)
-4. After `lv_init()` call `lw_wayland_init()`.
-5. Add a display (or more than one) using `lw_create_window(...)`,
+4. After `lv_init()` call `lv_wayland_init()`.
+5. Add a display (or more than one) using `lv_create_wayland_window(...)`,
    possibly with a close callback to track the status of each display:
 ```c
   #define H_RES (800)
   #define V_RES (480)
 
   /* Create a display */
-  lv_disp_t * disp = lw_create_window(H_RES, V_RES, "Window Title", close_cb);
+  lv_disp_t * disp = lv_create_wayland_window(H_RES, V_RES, "Window Title", close_cb);
 ```
   As part of the above call, the Wayland driver will register four input devices
   for each display:
@@ -95,16 +95,16 @@ In "Project properties > C/C++ Build > Settings" set the followings:
   - a POINTER connected to Wayland pointer events
   - a ENCODER connected to Wayland pointer axis events
   Handles for input devices of each display can be get using respectively
-  `lw_get_lv_indev_keyboard()`, `lw_get_lv_indev_touchscreen()`,
-  `lw_get_lv_indev_pointer()` and `lw_get_lv_indev_pointeraxis()`, using
+  `lv_get_wayland_indev_keyboard()`, `lv_get_wayland_indev_touchscreen()`,
+  `lv_get_wayland_indev_pointer()` and `lv_get_wayland_indev_pointeraxis()`, using
   `disp` as argument.
 5. After `lv_deinit()` (if used), or in any case during de-initialization, call
-  `lw_wayland_deinit()`.
+  `lv_wayland_deinit()`.
 
 ### Fullscreen mode
 
 In order to set one window as fullscreen or restore it as a normal one,
-call the `lw_set_window_fullscreen()` function respectively with `true`
+call the `lv_set_wayland_window_fullscreen()` function respectively with `true`
 or `false` as `fullscreen` argument.
 
 ### Disable window client-side decoration at runtime
@@ -115,7 +115,7 @@ environment variable to `1`.
 
 ### Event-driven timer handler
 
-call `lw_timer_handler()`
+call `lv_wayland_timer_handler()`
 in your timer loop (in place of `lv_timer_handler()`).
 
 You can now sleep/wait until the next timer/event is ready, e.g.:
@@ -129,7 +129,7 @@ You can now sleep/wait until the next timer/event is ready, e.g.:
     uint32_t time_till_next;
     int sleep;
 
-    pfd.fd = lw_get_wayland_fd();
+    pfd.fd = lv_get_wayland_fd();
     pfd.events = POLLIN;
 
     while (true) {
@@ -137,7 +137,7 @@ You can now sleep/wait until the next timer/event is ready, e.g.:
 
         if ((poll(&pfd, 1, sleep_time) < 0) && (errno == EINTR)) continue;
 
-        time_till_next = lw_timer_handler();
+        time_till_next = lv_wayland_timer_handler();
         /* Wait for something interesting to happen */
         if (time_till_next == LV_NO_TIMER_READY) {
             sleep_time = -1;

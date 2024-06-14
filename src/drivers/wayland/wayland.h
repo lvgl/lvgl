@@ -13,7 +13,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lvgl.h"
+
+#include "../../display/lv_display.h"
+#include "../../indev/lv_indev.h"
+
 #if LV_USE_WAYLAND
 
 /*********************
@@ -24,24 +27,26 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef bool (*lv_wayland_display_close_f_t)(lv_display_t * disp);
+typedef bool (*lv_window_close_cb_t)(lv_display_t * disp);
+typedef int32_t lw_coord_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-bool lw_wayland_init(void);
-void lw_wayland_deinit(void);
-int lw_get_wayland_fd(void);
-lv_disp_t * lw_create_window(lv_coord_t hor_res, lv_coord_t ver_res, char *title,
-                                     lv_wayland_display_close_f_t close_cb);
-void lw_close_window(lv_display_t * disp);
-void lw_set_window_fullscreen(lv_display_t * disp, bool fullscreen);
-lv_indev_t * lw_get_lv_pointer(lv_display_t * disp);
-lv_indev_t * lw_get_lv_pointeraxis(lv_display_t * disp);
-lv_indev_t * lw_get_lv_keyboard(lv_display_t * disp);
-lv_indev_t * lw_get_lv_touchscreen(lv_display_t * disp);
-uint32_t lw_timer_handler(void);
-bool lw_window_is_open(lv_display_t *disp);
+bool lv_wayland_init(void);
+void lv_wayland_deinit(void);
+uint32_t lv_wayland_timer_handler(void);
+int lv_get_wayland_fd(void);
+lv_display_t * lv_create_wayland_window(lw_coord_t hor_res, lw_coord_t ver_res, char *title,
+                                     lv_window_close_cb_t close_cb);
+bool lv_close_wayland_window(lv_display_t * disp);
+void lv_set_wayland_window_fullscreen(lv_display_t * disp, bool fullscreen);
+lv_indev_t * lv_get_wayland_pointer(lv_display_t * disp);
+lv_indev_t * lv_get_wayland_pointeraxis(lv_display_t * disp);
+lv_indev_t * lv_get_wayland_keyboard(lv_display_t * disp);
+lv_indev_t * lv_get_wayland_touchscreen(lv_display_t * disp);
+
+bool lv_is_window_open(lv_display_t *disp);
 
 /**********************
  *      MACROS

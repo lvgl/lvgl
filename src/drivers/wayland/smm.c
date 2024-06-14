@@ -94,7 +94,7 @@ struct { \
 struct smm_pool {
    struct smm_pool_properties props;
    LLHEAD(smm_buffer) allocd;
-   void *map;
+   void* map;
    size_t map_size;
    bool map_outdated;
 };
@@ -117,56 +117,49 @@ struct smm_group {
    LLLINK(smm_group) link;
 };
 
-static size_t calc_buffer_size(struct smm_buffer *buf);
-static void purge_history(struct smm_buffer *buf);
-static struct smm_buffer *get_from_pool(struct smm_group *grp);
-static void return_to_pool(struct smm_buffer *buf);
-static struct smm_pool *alloc_pool(void);
-static void free_pool(struct smm_pool *pool);
-static struct smm_buffer *alloc_buffer(struct smm_buffer *last, size_t offset);
-static void free_buffer(struct smm_buffer *buf);
+static size_t calc_buffer_size(struct smm_buffer* buf);
+static void purge_history(struct smm_buffer* buf);
+static struct smm_buffer* get_from_pool(struct smm_group* grp);
+static void return_to_pool(struct smm_buffer* buf);
+static struct smm_pool* alloc_pool(void);
+static void free_pool(struct smm_pool* pool);
+static struct smm_buffer* alloc_buffer(struct smm_buffer* last, size_t offset);
+static void free_buffer(struct smm_buffer* buf);
 
 static struct {
    unsigned long page_sz;
    struct smm_events cbs;
-   struct smm_pool *active;
+   struct smm_pool* active;
    LLHEAD(smm_group) groups;
    struct {
       size_t active_used;
    } statistics;
 } smm_instance;
 
-
-void smm_init(struct smm_events *evs)
+void smm_init(struct smm_events* evs, void* ctx)
 {
    memcpy(&smm_instance.cbs, evs, sizeof(struct smm_events));
    srand((unsigned int)clock());
    smm_instance.page_sz = (unsigned long)sysconf(_SC_PAGESIZE);
    LL_INIT(&smm_instance.groups);
-}
 
+   smm_instance.cbs.ctx = ctx;
+}
 
 void smm_deinit(void)
 {
-   struct smm_group *grp;
+   struct smm_group* grp;
 
    /* Destroy all buffer groups */
    while (!LL_IS_EMPTY(&smm_instance.groups)) {
       LL_DEQUEUE(grp, &smm_instance.groups, link);
-      smm_destroy(grp);
+      smm_destroy_group(grp);
    }
 }
 
-
-void smm_setctx(void *ctx)
+smm_group_t* smm_create_group(void)
 {
-   smm_instance.cbs.ctx = ctx;
-}
-
-
-smm_group_t *smm_create(void)
-{
-   struct smm_group *grp;
+   struct smm_group* grp;
 
    /* Allocate and intialize a new buffer group */
    grp = malloc(sizeof(struct smm_group));
@@ -184,11 +177,10 @@ smm_group_t *smm_create(void)
    return grp;
 }
 
-
-void smm_resize(smm_group_t *grp, size_t sz)
+void smm_resize_group(smm_group_t* grp, size_t sz)
 {
-   struct smm_buffer *buf;
-   struct smm_group *rgrp = grp;
+   struct smm_buffer* buf;
+   struct smm_group* rgrp = grp;
 
    /* Round allocation size up to a sysconf(_SC_PAGE_SIZE) boundary */
    rgrp->size = ROUND_UP(sz, smm_instance.page_sz);
@@ -200,17 +192,17 @@ void smm_resize(smm_group_t *grp, size_t sz)
    }
 
    /* Mark all buffers in use to be freed to pool when possible */
-   LL_FOREACH(buf, &rgrp->inuse, use) {
+   LL_FOREACH(buf, &rgrp->inuse, use)
+   {
       buf->group_resized = true;
       purge_history(buf);
    }
 }
 
-
-void smm_destroy(smm_group_t *grp)
+void smm_destroy_group(smm_group_t* grp)
 {
-   struct smm_buffer *buf;
-   struct smm_group *dgrp = grp;
+   struct smm_buffer* buf;
+   struct smm_group* dgrp = grp;
 
    /* Return unused buffers */
    while (!LL_IS_EMPTY(&dgrp->unused)) {
@@ -232,16 +224,17 @@ void smm_destroy(smm_group_t *grp)
 }
 
 
-smm_buffer_t *smm_acquire(smm_group_t *grp)
+smm_buffer_t* smm_acquire_buffer(smm_group_t* grp)
 {
-   struct smm_buffer *buf;
-   struct smm_group *agrp = grp;
+   struct smm_buffer* buf;
+   struct smm_group* agrp = grp;
 
    if (LL_IS_EMPTY(&agrp->unused)) {
       /* No unused buffer available, so get a new one from pool */
       buf = get_from_pool(agrp);
-   } else {
-      /* Otherwise, reuse an unused buffer */
+   }
+   else {
+   /* Otherwise, reuse an unused buffer */
       LL_DEQUEUE(buf, &agrp->unused, use);
    }
 
@@ -252,7 +245,7 @@ smm_buffer_t *smm_acquire(smm_group_t *grp)
       /* Emit 'init buffer' event */
       if (smm_instance.cbs.init_buffer != NULL) {
          if (smm_instance.cbs.init_buffer(smm_instance.cbs.ctx, &buf->props)) {
-            smm_release(buf);
+            smm_release_buffer(buf);
             buf = NULL;
          }
       }
@@ -269,12 +262,11 @@ smm_buffer_t *smm_acquire(smm_group_t *grp)
    return buf;
 }
 
-
-void *smm_map(smm_buffer_t *buf)
+void* smm_map(smm_buffer_t* buf)
 {
-   struct smm_buffer *mbuf = buf;
-   struct smm_pool *pool = mbuf->props.pool;
-   void *map = pool->map;
+   struct smm_buffer* mbuf = buf;
+   struct smm_pool* pool = mbuf->props.pool;
+   void* map = pool->map;
 
    if (pool->map_outdated) {
       /* Update mapping to current pool size */
@@ -283,16 +275,17 @@ void *smm_map(smm_buffer_t *buf)
       }
 
       map = mmap(NULL,
-                 pool->props.size,
-                 PROT_READ | PROT_WRITE,
-                 MAP_SHARED,
-                 pool->props.fd,
-                 0);
+         pool->props.size,
+         PROT_READ | PROT_WRITE,
+         MAP_SHARED,
+         pool->props.fd,
+         0);
 
       if (map == MAP_FAILED) {
          map = NULL;
          pool->map = NULL;
-      } else {
+      }
+      else {
          pool->map = map;
          pool->map_size = pool->props.size;
          pool->map_outdated = false;
@@ -301,17 +294,16 @@ void *smm_map(smm_buffer_t *buf)
 
    /* Calculate buffer mapping (from offset in pool) */
    if (map != NULL) {
-      map = (((char *)map) + mbuf->props.offset);
+      map = (((char*)map) + mbuf->props.offset);
    }
 
    return map;
 }
 
-
-void smm_release(smm_buffer_t *buf)
+void smm_release_buffer(smm_buffer_t* buf)
 {
-   struct smm_buffer *rbuf = buf;
-   struct smm_group *grp = rbuf->props.group;
+   struct smm_buffer* rbuf = buf;
+   struct smm_group* grp = rbuf->props.group;
 
    /* Remove from in-use queue */
    LL_REMOVE(&grp->inuse, rbuf, use);
@@ -322,35 +314,35 @@ void smm_release(smm_buffer_t *buf)
        */
       rbuf->group_resized = false;
       return_to_pool(rbuf);
-   } else {
-      /* Move to unused queue */
+   }
+   else {
+   /* Move to unused queue */
       LL_ENQUEUE(&grp->unused, rbuf, use);
 
       /* Try to limit total number of buffers to preferred number */
       while ((grp->num_buffers > PREFER_NUM_BUFFERS) &&
-             (!LL_IS_EMPTY(&grp->unused))) {
+         (!LL_IS_EMPTY(&grp->unused))) {
          LL_DEQUEUE(rbuf, &grp->unused, use);
          return_to_pool(rbuf);
       }
    }
 }
 
-
-smm_buffer_t *smm_latest(smm_group_t *grp)
+smm_buffer_t* smm_latest_buffer(smm_group_t* grp)
 {
-   struct smm_group *lgrp = grp;
+   struct smm_group* lgrp = grp;
 
    return LL_LAST(&lgrp->history);
 }
 
-
-smm_buffer_t *smm_next(smm_buffer_t *buf)
+smm_buffer_t* smm_next_buffer(smm_buffer_t* buf)
 {
-   struct smm_buffer *ibuf;
-   struct smm_buffer *nbuf = buf;
-   struct smm_group *grp = nbuf->props.group;
+   struct smm_buffer* ibuf;
+   struct smm_buffer* nbuf = buf;
+   struct smm_group* grp = nbuf->props.group;
 
-   LL_FOREACH(ibuf, &grp->history, age) {
+   LL_FOREACH(ibuf, &grp->history, age)
+   {
       if (ibuf == nbuf) {
          ibuf = LL_NEXT(ibuf, age);
          break;
@@ -360,13 +352,14 @@ smm_buffer_t *smm_next(smm_buffer_t *buf)
    return ibuf;
 }
 
-void purge_history(struct smm_buffer *buf)
+static void purge_history(struct smm_buffer* buf)
 {
-   struct smm_buffer *ibuf;
-   struct smm_group *grp = buf->props.group;
+   struct smm_buffer* ibuf;
+   struct smm_group* grp = buf->props.group;
 
    /* Remove from history (and any older) */
-   LL_FOREACH(ibuf, &grp->history, age) {
+   LL_FOREACH(ibuf, &grp->history, age)
+   {
       if (ibuf == buf) {
          do {
             LL_DEQUEUE(ibuf, &grp->history, age);
@@ -376,28 +369,27 @@ void purge_history(struct smm_buffer *buf)
    }
 }
 
-
-size_t calc_buffer_size(struct smm_buffer *buf)
+static size_t calc_buffer_size(struct smm_buffer* buf)
 {
    size_t buf_sz;
-   struct smm_pool *buf_pool = buf->props.pool;
+   struct smm_pool* buf_pool = buf->props.pool;
 
    if (buf == LL_LAST(&buf_pool->allocd)) {
       buf_sz = (buf_pool->props.size - buf->props.offset);
-   } else {
+   }
+   else {
       buf_sz = (LL_NEXT(buf, pool)->props.offset - buf->props.offset);
    }
 
    return buf_sz;
 }
 
-
-struct smm_buffer *get_from_pool(struct smm_group *grp)
+static struct smm_buffer* get_from_pool(struct smm_group* grp)
 {
    int ret;
    size_t buf_sz;
-   struct smm_buffer *buf;
-   struct smm_buffer *last = NULL;
+   struct smm_buffer* buf;
+   struct smm_buffer* last = NULL;
 
    /* TODO: Determine when to allocate a new active pool (i.e. memory shrink) */
 
@@ -409,21 +401,25 @@ struct smm_buffer *get_from_pool(struct smm_group *grp)
 
    if (smm_instance.active == NULL) {
       buf = NULL;
-   } else {
-      /* Search for a free buffer large enough for allocation */
-      LL_FOREACH(buf, &smm_instance.active->allocd, pool) {
+   }
+   else {
+   /* Search for a free buffer large enough for allocation */
+      LL_FOREACH(buf, &smm_instance.active->allocd, pool)
+      {
          last = buf;
          if (buf->props.group == NULL) {
             buf_sz = calc_buffer_size(buf);
             if (buf_sz == grp->size) {
                break;
-            } else if (buf_sz > grp->size) {
+            }
+            else if (buf_sz > grp->size) {
                if ((buf != LL_LAST(&smm_instance.active->allocd)) &&
-                   (LL_NEXT(buf, pool)->props.group == NULL)) {
-                  /* Pull back next buffer to use unallocated size */
+                  (LL_NEXT(buf, pool)->props.group == NULL)) {
+                 /* Pull back next buffer to use unallocated size */
                   LL_NEXT(buf, pool)->props.offset -= (buf_sz - grp->size);
-               } else {
-                  /* Allocate another buffer to hold unallocated size */
+               }
+               else {
+               /* Allocate another buffer to hold unallocated size */
                   alloc_buffer(buf, buf->props.offset + grp->size);
                }
 
@@ -435,15 +431,17 @@ struct smm_buffer *get_from_pool(struct smm_group *grp)
       if (buf == NULL) {
          /* No buffer found to meet allocation size, expand pool */
          if ((last != NULL) &&
-             (last->props.group == NULL)) {
-            /* Use last free buffer */
+            (last->props.group == NULL)) {
+           /* Use last free buffer */
             buf_sz = (grp->size - buf_sz);
-         } else {
-            /* Allocate new buffer */
+         }
+         else {
+         /* Allocate new buffer */
             buf_sz = grp->size;
             if (last == NULL) {
                buf = alloc_buffer(NULL, 0);
-            } else {
+            }
+            else {
                buf = alloc_buffer(last, smm_instance.active->props.size);
             }
             last = buf;
@@ -452,13 +450,14 @@ struct smm_buffer *get_from_pool(struct smm_group *grp)
          if (last != NULL) {
             /* Expand pool backing memory */
             ret = ftruncate(smm_instance.active->props.fd,
-                            smm_instance.active->props.size + buf_sz);
+               smm_instance.active->props.size + buf_sz);
             if (ret) {
                if (buf != NULL) {
                   free_buffer(buf);
                   buf = NULL;
                }
-            } else {
+            }
+            else {
                smm_instance.active->props.size += buf_sz;
                smm_instance.active->map_outdated = true;
                buf = last;
@@ -466,18 +465,19 @@ struct smm_buffer *get_from_pool(struct smm_group *grp)
                if (!(smm_instance.active->props.size - buf_sz)) {
                   /* Emit 'new pool' event */
                   if ((smm_instance.cbs.new_pool != NULL) &&
-                      (smm_instance.cbs.new_pool(smm_instance.cbs.ctx,
-                                                &smm_instance.active->props))) {
+                     (smm_instance.cbs.new_pool(smm_instance.cbs.ctx,
+                        &smm_instance.active->props))) {
                      free_buffer(buf);
                      free_pool(smm_instance.active);
                      smm_instance.active = NULL;
                      buf = NULL;
                   }
-               } else {
-                  /* Emit 'expand pool' event */
+               }
+               else {
+               /* Emit 'expand pool' event */
                   if (smm_instance.cbs.expand_pool != NULL) {
                      smm_instance.cbs.expand_pool(smm_instance.cbs.ctx,
-                                                  &smm_instance.active->props);
+                        &smm_instance.active->props);
                   }
                }
             }
@@ -487,13 +487,13 @@ struct smm_buffer *get_from_pool(struct smm_group *grp)
 
    if (buf != NULL) {
       /* Set buffer group */
-      memcpy((void *)&buf->props.group, &grp, sizeof(struct smm_group *));
+      memcpy((void*)&buf->props.group, &grp, sizeof(struct smm_group*));
 
       /* Emit 'new buffer' event */
       if (smm_instance.cbs.new_buffer != NULL) {
          if (smm_instance.cbs.new_buffer(smm_instance.cbs.ctx, &buf->props)) {
             grp = NULL;
-            memcpy((void *)&buf->props.group, &grp, sizeof(struct smm_group *));
+            memcpy((void*)&buf->props.group, &grp, sizeof(struct smm_group*));
             buf = NULL;
          }
       }
@@ -508,11 +508,10 @@ struct smm_buffer *get_from_pool(struct smm_group *grp)
    return buf;
 }
 
-
-void return_to_pool(struct smm_buffer *buf)
+static void return_to_pool(struct smm_buffer* buf)
 {
-   struct smm_group *grp = buf->props.group;
-   struct smm_pool *pool = buf->props.pool;
+   struct smm_group* grp = buf->props.group;
+   struct smm_pool* pool = buf->props.pool;
 
    /* Emit 'free buffer' event */
    if (smm_instance.cbs.free_buffer != NULL) {
@@ -525,7 +524,7 @@ void return_to_pool(struct smm_buffer *buf)
    /* Buffer is no longer part of group */
    grp->num_buffers--;
    grp = NULL;
-   memcpy((void *)&buf->props.group, &grp, sizeof(struct smm_group *));
+   memcpy((void*)&buf->props.group, &grp, sizeof(struct smm_group*));
 
    /* Update active pool usage statistic */
    if (smm_instance.active == pool) {
@@ -534,11 +533,11 @@ void return_to_pool(struct smm_buffer *buf)
 
    /* Coalesce with ungrouped buffers beside this one */
    if ((buf != LL_LAST(&pool->allocd)) &&
-       (LL_NEXT(buf, pool)->props.group == NULL)) {
+      (LL_NEXT(buf, pool)->props.group == NULL)) {
       free_buffer(LL_NEXT(buf, pool));
    }
    if ((buf != LL_FIRST(&pool->allocd)) &&
-       (LL_PREV(buf, pool)->props.group == NULL)) {
+      (LL_PREV(buf, pool)->props.group == NULL)) {
       buf = LL_PREV(buf, pool);
       pool = buf->props.pool;
       free_buffer(LL_NEXT(buf, pool));
@@ -546,7 +545,7 @@ void return_to_pool(struct smm_buffer *buf)
 
    /* Free buffer (and pool), if only remaining buffer in pool */
    if ((buf == LL_FIRST(&pool->allocd)) &&
-       (buf == LL_LAST(&pool->allocd))) {
+      (buf == LL_LAST(&pool->allocd))) {
       free_buffer(buf);
 
       /* Emit 'free pool' event */
@@ -561,10 +560,9 @@ void return_to_pool(struct smm_buffer *buf)
    }
 }
 
-
-struct smm_pool *alloc_pool(void)
+static struct smm_pool* alloc_pool(void)
 {
-   struct smm_pool *pool;
+   struct smm_pool* pool;
    char name[] = ("/" SMM_FD_NAME "-XXXXX");
    unsigned char attempts = 0;
    bool opened = false;
@@ -575,8 +573,8 @@ struct smm_pool *alloc_pool(void)
          /* A randomized pool name should help reduce collisions */
          sprintf(name + sizeof(SMM_FD_NAME) + 1, "%05X", rand() & 0xFFFF);
          pool->props.fd = shm_open(name,
-                                   O_RDWR | O_CREAT | O_EXCL,
-                                   S_IRUSR | S_IWUSR);
+            O_RDWR | O_CREAT | O_EXCL,
+            S_IRUSR | S_IWUSR);
          if (pool->props.fd >= 0) {
             shm_unlink(name);
             pool->props.size = 0;
@@ -586,7 +584,8 @@ struct smm_pool *alloc_pool(void)
             LL_INIT(&pool->allocd);
             opened = true;
             break;
-         } else {
+         }
+         else {
             if (errno != EEXIST) {
                break;
             }
@@ -603,8 +602,7 @@ struct smm_pool *alloc_pool(void)
    return pool;
 }
 
-
-void free_pool(struct smm_pool *pool)
+static void free_pool(struct smm_pool* pool)
 {
    if (pool->map != NULL) {
       munmap(pool->map, pool->map_size);
@@ -614,10 +612,9 @@ void free_pool(struct smm_pool *pool)
    free(pool);
 }
 
-
-struct smm_buffer *alloc_buffer(struct smm_buffer *last, size_t offset)
+static struct smm_buffer* alloc_buffer(struct smm_buffer* last, size_t offset)
 {
-   struct smm_buffer *buf;
+   struct smm_buffer* buf;
    struct smm_buffer_properties initial_props = {
       {NULL},
       NULL,
@@ -633,7 +630,8 @@ struct smm_buffer *alloc_buffer(struct smm_buffer *last, size_t offset)
 
       if (last == NULL) {
          LL_ENQUEUE(&smm_instance.active->allocd, buf, pool);
-      } else {
+      }
+      else {
          LL_INSERT_AFTER(&smm_instance.active->allocd, last, buf, pool);
       }
    }
@@ -641,10 +639,9 @@ struct smm_buffer *alloc_buffer(struct smm_buffer *last, size_t offset)
    return buf;
 }
 
-
-void free_buffer(struct smm_buffer *buf)
+static void free_buffer(struct smm_buffer* buf)
 {
-   struct smm_pool *buf_pool = buf->props.pool;
+   struct smm_pool* buf_pool = buf->props.pool;
 
    /* Remove from pool */
    LL_REMOVE(&buf_pool->allocd, buf, pool);

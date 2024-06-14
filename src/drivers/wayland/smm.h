@@ -17,7 +17,7 @@
 #define SMM_GROUP_PROPERTIES(g) ((const struct smm_group_properties *)(g))
 #define SMM_TAG(o, n, v) \
    do { \
-      void **smm_tag = (void **)((char *)o + (n * sizeof(void *))); \
+      void **smm_tag = (void **)((char *)(o) + ((n) * sizeof(void *))); \
       *smm_tag = (v); \
    } while(0)
 
@@ -52,16 +52,15 @@ struct smm_group_properties {
    void *tag[SMM_GROUP_TAGS];
 };
 
-void smm_init(struct smm_events *evs);
-void smm_setctx(void *ctx);
+void smm_init(struct smm_events *evs, void* ctx);
 void smm_deinit(void);
-smm_group_t *smm_create(void);
-void smm_resize(smm_group_t *grp, size_t sz);
-void smm_destroy(smm_group_t *grp);
-smm_buffer_t *smm_acquire(smm_group_t *grp);
+smm_group_t *smm_create_group(void);
+void smm_resize_group(smm_group_t *grp, size_t sz);
+void smm_destroy_group(smm_group_t *grp);
+smm_buffer_t *smm_acquire_buffer(smm_group_t *grp);
 void *smm_map(smm_buffer_t *buf);
-void smm_release(smm_buffer_t *buf);
-smm_buffer_t *smm_latest(smm_group_t *grp);
-smm_buffer_t *smm_next(smm_buffer_t *buf);
+void smm_release_buffer(smm_buffer_t *buf);
+smm_buffer_t *smm_latest_buffer(smm_group_t *grp);
+smm_buffer_t *smm_next_buffer(smm_buffer_t *buf);
 
 #endif
