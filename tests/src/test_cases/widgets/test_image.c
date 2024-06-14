@@ -4,6 +4,7 @@
 #include "unity/unity.h"
 
 LV_IMAGE_DECLARE(test_img_lvgl_logo_png);
+LV_IMAGE_DECLARE(test_arc_bg);
 
 void setUp(void)
 {
@@ -359,6 +360,19 @@ void test_image_ignore_transformation_settings_when_tiled(void)
     TEST_ASSERT_EQUAL_INT(0, lv_image_get_rotation(img));
     TEST_ASSERT_EQUAL_INT(LV_SCALE_NONE, lv_image_get_scale_x(img));
     TEST_ASSERT_EQUAL_INT(LV_SCALE_NONE, lv_image_get_scale_y(img));
+}
+
+void test_image_clip_radius(void)
+{
+    lv_obj_t * img = lv_img_create(lv_screen_active());
+    lv_image_set_src(img, &test_arc_bg);
+    lv_obj_center(img);
+
+    lv_obj_set_style_radius(img, 10, 0);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_clip_radius_10.png");
+
+    lv_obj_set_style_radius(img, LV_RADIUS_CIRCLE, 0);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_clip_radius_circle.png");
 }
 
 #endif

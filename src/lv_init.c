@@ -24,6 +24,8 @@
 #include "draw/lv_draw.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs.h"
+#include "osal/lv_os_private.h"
+
 #if LV_USE_DRAW_VGLITE
     #include "draw/nxp/vglite/lv_draw_vglite.h"
 #endif
@@ -159,6 +161,8 @@ void lv_init(void)
     lv_profiler_builtin_config_init(&profiler_config);
     lv_profiler_builtin_init(&profiler_config);
 #endif
+
+    lv_os_init();
 
     _lv_timer_core_init();
 
@@ -407,7 +411,7 @@ void lv_deinit(void)
     lv_profiler_builtin_uninit();
 #endif
 
-#if LV_USE_OBJ_ID_BUILTIN
+#if LV_USE_OBJ_ID && LV_USE_OBJ_ID_BUILTIN
     lv_objid_builtin_destroy();
 #endif
 

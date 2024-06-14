@@ -11,5 +11,6 @@ sphinxcontrib-jsmath
 sphinxcontrib-qthelp
 sphinxcontrib-serializinghtml
 sphinxcontrib-mermaid
+sphinx-design
 sphinx-rtd-dark-mode
 typing-extensions

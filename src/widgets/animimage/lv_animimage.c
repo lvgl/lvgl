@@ -36,7 +36,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void index_change(lv_obj_t * obj, int32_t index);
+static void index_change(lv_obj_t * obj, int32_t idx);
 static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
 /**********************
@@ -72,7 +72,7 @@ void lv_animimg_set_src(lv_obj_t * obj, const void * dsc[], size_t num)
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     animimg->dsc = dsc;
     animimg->pic_count = num;
-    lv_anim_set_values(&animimg->anim, 0, (int32_t)num - 1);
+    lv_anim_set_values(&animimg->anim, 0, (int32_t)num);
 }
 
 void lv_animimg_start(lv_obj_t * obj)
@@ -156,12 +156,16 @@ static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_anim_set_repeat_count(&animimg->anim, LV_ANIM_REPEAT_INFINITE);
 }
 
-static void index_change(lv_obj_t * obj, int32_t index)
+static void index_change(lv_obj_t * obj, int32_t idx)
 {
-    int32_t idx;
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
 
-    idx = index % animimg->pic_count;
+    if(animimg->dsc == NULL) {
+        LV_LOG_WARN("dsc is null");
+        return;
+    }
+
+    if(idx >= animimg->pic_count) idx =  animimg->pic_count - 1;
 
     lv_image_set_src(obj, animimg->dsc[idx]);
 }

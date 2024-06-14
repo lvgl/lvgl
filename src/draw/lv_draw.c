@@ -179,7 +179,7 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
     while(t) {
         lv_draw_task_t * t_next = t->next;
         if(t->state == LV_DRAW_TASK_STATE_READY) {
-            if(t_prev) t_prev->next = t->next;      /*Remove by it by assigning the next task to the previous*/
+            if(t_prev) t_prev->next = t->next;      /*Remove it by assigning the next task to the previous*/
             else layer->draw_task_head = t_next;    /*If it was the head, set the next as head*/
 
             /*If it was layer drawing free the layer too*/
@@ -301,7 +301,7 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
     while(t) {
         /*Find a queued and independent task*/
         if(t->state == LV_DRAW_TASK_STATE_QUEUED &&
-           (t->preferred_draw_unit_id == LV_DRAW_UNIT_ID_ANY || t->preferred_draw_unit_id == draw_unit_id) &&
+           (t->preferred_draw_unit_id == LV_DRAW_UNIT_NONE || t->preferred_draw_unit_id == draw_unit_id) &&
            is_independent(layer, t)) {
             LV_PROFILER_END;
             return t;

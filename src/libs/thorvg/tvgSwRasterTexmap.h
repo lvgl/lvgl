@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - 2023 the ThorVG project. All rights reserved.
+ * Copyright (c) 2021 - 2024 the ThorVG project. All rights reserved.
 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -531,8 +531,8 @@ static void _rasterPolygonImageSegment(SwSurface* surface, const SwImage* image,
                     vv = (int) v;
                     if (vv >= sh) continue;
 
-                    ar = (int)(255 * (1 - modff(u, &iptr)));
-                    ab = (int)(255 * (1 - modff(v, &iptr)));
+                    ar = (int)(255.0f * (1.0f - modff(u, &iptr)));
+                    ab = (int)(255.0f * (1.0f - modff(v, &iptr)));
                     iru = uu + 1;
                     irv = vv + 1;
 
@@ -579,8 +579,8 @@ static void _rasterPolygonImageSegment(SwSurface* surface, const SwImage* image,
                     uu = (int) u;
                     vv = (int) v;
 
-                    ar = (int)(255 * (1 - modff(u, &iptr)));
-                    ab = (int)(255 * (1 - modff(v, &iptr)));
+                    ar = (int)(255.0f * (1.0f - modff(u, &iptr)));
+                    ab = (int)(255.0f * (1.0f - modff(v, &iptr)));
                     iru = uu + 1;
                     irv = vv + 1;
 
@@ -1111,8 +1111,7 @@ static bool _rasterTexmapPolygon(SwSurface* surface, const SwImage* image, const
 
     float ys = FLT_MAX, ye = -1.0f;
     for (int i = 0; i < 4; i++) {
-        mathMultiply(&vertices[i].pt, transform);
-
+        if (transform) mathMultiply(&vertices[i].pt, transform);
         if (vertices[i].pt.y < ys) ys = vertices[i].pt.y;
         if (vertices[i].pt.y > ye) ye = vertices[i].pt.y;
     }

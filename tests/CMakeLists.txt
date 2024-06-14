@@ -57,9 +57,16 @@ include(CTest)
 
 set(LVGL_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
+set(SANITIZE_AND_COVERAGE_OPTIONS
+    -fsanitize=address
+    -fsanitize=leak
+    -fsanitize=undefined
+    --coverage
+)
 
 set(LVGL_TEST_OPTIONS_VG_LITE
     -DLV_TEST_OPTION=6
+    -Wno-dangling-pointer # workaround for thorvg dangling-pointer warning
 )
 
 set(LVGL_TEST_OPTIONS_MINIMAL_MONOCHROME
@@ -86,15 +93,14 @@ set(LVGL_TEST_OPTIONS_TEST_SYSHEAP
     -DLV_TEST_OPTION=5
     -DLVGL_CI_USING_SYS_HEAP
     -Wno-unused-but-set-variable # unused variables are common in the dual-heap arrangement
+    ${SANITIZE_AND_COVERAGE_OPTIONS}
 )
 
 set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
     -DLV_TEST_OPTION=5
+    -DLV_USE_OBJ_PROPERTY=1      # add obj property test and disable pedantic
     -DLVGL_CI_USING_DEF_HEAP
-    -fsanitize=address
-    -fsanitize=leak
-    -fsanitize=undefined
-    --coverage
+    ${SANITIZE_AND_COVERAGE_OPTIONS}
 )
 
 if (OPTIONS_VG_LITE)
@@ -108,13 +114,13 @@ elseif (OPTIONS_24BIT)
 elseif (OPTIONS_FULL_32BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_FULL_32BIT})
 elseif (OPTIONS_TEST_SYSHEAP)
-    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP} -fsanitize=address -fsanitize=leak -fsanitize=undefined --coverage)
-    filter_compiler_options (C TEST_LIBS --coverage -fsanitize=address -fsanitize=leak -fsanitize=undefined)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
+    filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_DEFHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_DEFHEAP})
-    filter_compiler_options (C TEST_LIBS --coverage -fsanitize=address -fsanitize=leak -fsanitize=undefined)
+    filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_MEMORYCHECK)
@@ -123,14 +129,35 @@ elseif (OPTIONS_TEST_MEMORYCHECK)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
+elseif (OPTIONS_TEST_VG_LITE)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_VG_LITE} -DLVGL_CI_USING_SYS_HEAP ${SANITIZE_AND_COVERAGE_OPTIONS})
+    filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
+    set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
+    set (ENABLE_TESTS ON)
+    add_definitions(-DREF_IMGS_PATH="ref_imgs_vg_lite/")
+
+    # In 32-bit systems, the output of ThorVG's anti-aliasing algorithm has a slight deviation.
+    if ($ENV{NON_AMD64_BUILD})
+        # Set a tolerance value for the VG-Lite tests.
+        add_definitions(-DREF_IMG_TOLERANCE=9)
+    endif()
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
 
-
 if ($ENV{NON_AMD64_BUILD})
     set(BUILD_TARGET_DEF -DNON_AMD64_BUILD)
     message("Non AMD64 target is specified")
+
+    # Ensure 32-bit build
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -m32")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -m32")
+endif()
+
+if ($ENV{NON_AMD64_BUILD})
+    set(CMAKE_LIBRARY_PATH "/usr/lib/i386-linux-gnu" CACHE PATH "search 32bit lib path firstly")
 endif()
 
 # Options lvgl and examples are compiled with.
@@ -184,6 +211,12 @@ list(APPEND COMPILE_OPTIONS
     ${BUILD_OPTIONS}
     ${BUILD_TARGET_DEF}
 )
+
+# LV_USE_OBJ_PROPERTY is enabled in option OPTIONS_TEST_DEFHEAP
+# It relies on C11 anonymous struct/union support, thus disable warnings.
+if(OPTIONS_TEST_DEFHEAP)
+    list(REMOVE_ITEM COMPILE_OPTIONS -pedantic-errors -Wpedantic)
+endif()
 
 filter_compiler_options(C LVGL_C_COMPILE_OPTIONS ${COMPILE_OPTIONS})
 
@@ -267,6 +300,7 @@ add_library(test_common
         src/test_assets/test_imagebutton_mid.c
         src/test_assets/test_imagebutton_right.c
         src/test_assets/test_music_button_play.c
+        src/test_assets/test_lottie_approve.c
         unity/unity_support.c
         unity/unity.c
         ${TEST_IMAGES_SRC}
@@ -298,7 +332,21 @@ include_directories(${FREETYPE_INCLUDE_DIRS})
 
 # libinput is required for the libinput device driver test case
 find_package(Libinput OPTIONAL_COMPONENTS)
-include_directories(${LIBINPUT_INCLUDE_DIRS})
+if ($ENV{NON_AMD64_BUILD})
+    include_directories(${LIBINPUT_INCLUDE_DIRS})
+endif()
+
+# OpenGL ES is required for its driver
+if (NOT $ENV{NON_AMD64_BUILD})
+    find_package(OpenGL REQUIRED)
+    find_package(GLEW REQUIRED)
+    find_package(glfw3 REQUIRED)
+
+    # Include directories
+    include_directories(${OPENGL_INCLUDE_DIR})
+    include_directories(${GLEW_INCLUDE_DIRS})
+    include_directories(${GLFW_INCLUDE_DIRS})
+endif()
 
 if (NOT LIBINPUT_FOUND)
     message("libinput not found, defaulting to 0")
@@ -387,6 +435,13 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             m
             pthread
             ${TEST_LIBS})
+
+	if (NOT $ENV{NON_AMD64_BUILD})
+	    target_link_libraries(${test_name} PRIVATE
+    	        ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
+	endif()
+
+
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 

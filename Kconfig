@@ -199,6 +199,46 @@ menu "LVGL configuration"
 		help
 			Required to draw anything on the screen.
 
+		config LV_DRAW_SW_SUPPORT_RGB565
+			bool "Enable support for RGB565 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_RGB565A8
+			bool "Enable support for RGB565A8 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_RGB888
+			bool "Enable support for RGB888 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_XRGB8888
+			bool "Enable support for XRGB8888 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_ARGB8888
+			bool "Enable support for ARGB8888 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_L8
+			bool "Enable support for L8 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_AL88
+			bool "Enable support for AL88 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_A8
+			bool "Enable support for A8 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+				
 		config LV_DRAW_SW_DRAW_UNIT_CNT
 			int "Number of draw units"
 			default 1
@@ -228,6 +268,14 @@ menu "LVGL configuration"
 			help
 				0: use a simple renderer capable of drawing only simple rectangles with gradient, images, texts, and straight lines only,
 				1: use a complex renderer capable of drawing rounded corners, shadow, skew lines, and arcs too.
+
+		config LV_USE_DRAW_SW_COMPLEX_GRADIENTS
+			bool "Enable drawing complex gradients in software"
+			default n
+			depends on LV_USE_DRAW_SW
+			help
+				0: do not enable complex gradients
+				1: enable complex gradients (linear at an angle, radial or conical)
 
 		config LV_DRAW_SW_SHADOW_CACHE_SIZE
 			int "Allow buffering some shadow calculation"
@@ -564,9 +612,15 @@ menu "LVGL configuration"
 				bool "Add id field to obj"
 				default n
 
+			config LV_OBJ_ID_AUTO_ASSIGN
+				bool "Automatically assign an ID when obj is created"
+				default y
+				depends on LV_USE_OBJ_ID
+
 			config LV_USE_OBJ_ID_BUILTIN
 				bool "Use builtin method to deal with obj ID"
 				default n
+				depends on LV_USE_OBJ_ID
 
 			config LV_USE_OBJ_PROPERTY
 				bool "Use obj property set/get API"
@@ -943,6 +997,12 @@ menu "LVGL configuration"
 		config LV_USE_LIST
 			bool "List"
 			default y if !LV_CONF_MINIMAL
+		config LV_USE_LOTTIE
+			bool "Lottie"
+			default n
+			depends on LV_USE_VECTOR_GRAPHIC && (LV_USE_THORVG_INTERNAL || LV_USE_THORVG_EXTERNAL)
+			help
+				Enable Lottie animations. Requires LV_USE_VECTOR_GRAPHIC and LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL.
 		config LV_USE_MENU
 			bool "Menu"
 			default y if !LV_CONF_MINIMAL
@@ -1176,7 +1236,7 @@ menu "LVGL configuration"
 
 		config LV_USE_RLOTTIE
 			bool "Lottie library"
-	
+
 		config LV_USE_THORVG
 			bool "ThorVG library"
 			choice
@@ -1631,6 +1691,15 @@ menu "LVGL configuration"
 
 		config LV_USE_WINDOWS
 			bool "Use LVGL Windows backend"
+			default n
+
+		config LV_USE_OPENGLES
+			bool "Use GLFW and OpenGL to open window on PC and handle mouse and keyboard"
+			default n
+
+		config LV_USE_OPENGLES_DEBUG
+			bool "Enable debug mode for OpenGL"
+			depends on LV_USE_OPENGLES
 			default n
 	endmenu
 

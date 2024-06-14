@@ -118,6 +118,7 @@ void lv_vg_lite_buffer_init(
     const void * ptr,
     int32_t width,
     int32_t height,
+    uint32_t stride,
     vg_lite_buffer_format_t format,
     bool tiled);
 
@@ -157,8 +158,6 @@ bool lv_vg_lite_support_blend_normal(void);
 bool lv_vg_lite_16px_align(void);
 
 void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult);
-
-void lv_vg_lite_matrix_flip_y(vg_lite_matrix_t * matrix);
 
 bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix);
 

@@ -48,6 +48,7 @@
 #define LV_LABEL_TEXT_SELECTION     1
 
 #define LV_USE_CALENDAR_CHINESE 1
+#define LV_USE_LOTTIE 1
 
 #define LV_USE_FLEX 1
 #define LV_USE_GRID 1
@@ -108,8 +109,8 @@
 #define LV_USE_DEMO_VECTOR_GRAPHIC  1
 
 #define LV_USE_OBJ_ID           1
+#define LV_OBJ_ID_AUTO_ASSIGN    1
 #define LV_USE_OBJ_ID_BUILTIN   1
-#define LV_USE_OBJ_PROPERTY     0
 
 #define LV_CACHE_DEF_SIZE       (10 * 1024 * 1024)
 
@@ -134,6 +135,12 @@
     #define LV_LIBINPUT_XKB     1
 #endif
 
+#if !defined(NON_AMD64_BUILD) && !defined(_MSC_VER) && !defined(_WIN32)
+    #define LV_USE_OPENGLES 1
+#endif
+
 #define LV_USE_FREETYPE 1
 #define LV_FREETYPE_USE_LVGL_PORT 0
 #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 10
+
+#define LV_USE_DRAW_SW_COMPLEX_GRADIENTS    1

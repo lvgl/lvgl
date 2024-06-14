@@ -316,7 +316,7 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
 
     int ret = closedir(dir_p);
     if(ret < 0) {
-        LV_LOG_WARN("Could not close directory: %p, errno: %d", dir_p, errno);
+        LV_LOG_WARN("Could not close directory: errno: %d", errno);
         return LV_FS_RES_FS_ERR;
     }
 

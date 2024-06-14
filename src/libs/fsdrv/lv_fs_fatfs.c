@@ -294,4 +294,4 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
     #warning "LV_USE_FS_FATFS is not enabled but LV_FS_FATFS_LETTER is set"
 #endif
 
-#endif /*LV_USE_FS_POSIX*/
+#endif /*LV_USE_FS_FATFS*/

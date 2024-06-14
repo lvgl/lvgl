@@ -65,6 +65,9 @@ typedef struct _lv_draw_image_dsc_t {
      *  2. Tiled images, where the target draw area is larger than the image to be tiled.
      */
     lv_area_t image_area;
+
+    int32_t clip_radius;
+
     const lv_image_dsc_t * bitmap_mask_src;
 } lv_draw_image_dsc_t;
 

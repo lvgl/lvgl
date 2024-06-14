@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 #if LV_USE_TEXTAREA == 0
-#error "lv_textare is required. Enable it in lv_conf.h (LV_USE_TEXTAREA  1) "
+#error "lv_textarea is required. Enable it in lv_conf.h (LV_USE_TEXTAREA  1) "
 #endif
 
 /*********************
