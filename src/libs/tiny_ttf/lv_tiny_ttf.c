@@ -288,11 +288,6 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
                 k = kernpair_data->k;
             }
             
-            static volatile kout;
-            if ( k != 0 )
-            {
-                kout = k;
-            }
             dsc_out->adv_w = (uint16_t)floor((((float)data->adv_w + (float)k) * dsc->scale) +
                             0.5f); /*Horizontal space required by the glyph in [px]*/
         }
