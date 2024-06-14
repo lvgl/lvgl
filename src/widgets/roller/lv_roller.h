@@ -107,7 +107,7 @@ uint32_t lv_roller_get_selected(const lv_obj_t * obj);
 
 /**
  * Get the current selected option as a string.
- * @param obj       pointer to ddlist object
+ * @param obj       pointer to roller object
  * @param buf       pointer to an array to store the string
  * @param buf_size  size of `buf` in bytes. 0: to ignore it.
  */

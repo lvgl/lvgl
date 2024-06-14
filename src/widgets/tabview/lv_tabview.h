@@ -93,7 +93,7 @@ uint32_t lv_tabview_get_tab_count(lv_obj_t * obj);
 /**
  * Get the current tab's index
  * @param obj       pointer to a tabview widget
- * @return          the zero based indoex of the current tab
+ * @return          the zero based index of the current tab
  */
 uint32_t lv_tabview_get_tab_active(lv_obj_t * obj);
 
@@ -107,7 +107,7 @@ lv_obj_t * lv_tabview_get_content(lv_obj_t * obj);
 /**
  * Get the tab bar where the buttons are created
  * @param obj       pointer to a tabview widget
- * @return          the tabbar
+ * @return          the tab bar
  */
 lv_obj_t * lv_tabview_get_tab_bar(lv_obj_t * obj);
 
