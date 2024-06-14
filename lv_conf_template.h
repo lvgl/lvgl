@@ -909,7 +909,7 @@
 
 #if LV_USE_WAYLAND
 
-#define LV_DISP_DEF_REFR_PERIOD  LV_DEF_REFR_PERIOD
+#define LV_WAYLAND_TICK_GET 0
 
 /* Support for client-side decorations */
 #  ifndef LV_WAYLAND_CLIENT_SIDE_DECORATIONS
