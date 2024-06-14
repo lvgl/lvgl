@@ -170,17 +170,17 @@ void lv_draw_wait_for_finish(void)
 void lv_draw_dispatch(void)
 {
     LV_PROFILER_BEGIN;
-    bool render_running = false;
+    bool task_dispatched = false;
     lv_display_t * disp = lv_display_get_next(NULL);
     while(disp) {
         lv_layer_t * layer = disp->layer_head;
         while(layer) {
             /* If there are no tasks in the layer, skip it */
             if(layer->draw_task_head && lv_draw_dispatch_layer(disp, layer))
-                render_running = true;
+                task_dispatched = true;
             layer = layer->next;
         }
-        if(!render_running) {
+        if(!task_dispatched) {
             lv_draw_wait_for_finish();
             lv_draw_dispatch_request();
         }
@@ -246,7 +246,7 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
         t = t_next;
     }
 
-    bool render_running = false;
+    bool task_dispatched = false;
 
     /*This layer is ready, enable blending its buffer*/
     if(layer->parent && layer->all_tasks_added && layer->draw_task_head == NULL) {
@@ -271,13 +271,13 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
         lv_draw_unit_t * u = _draw_info.unit_head;
         while(u) {
             int32_t taken_cnt = u->dispatch_cb(u, layer);
-            if(taken_cnt != LV_DRAW_UNIT_IDLE) render_running = true;
+            if(taken_cnt != LV_DRAW_UNIT_IDLE) task_dispatched = true;
             u = u->next;
         }
     }
 
     LV_PROFILER_END;
-    return render_running;
+    return task_dispatched;
 }
 
 void lv_draw_dispatch_wait_for_request(void)
