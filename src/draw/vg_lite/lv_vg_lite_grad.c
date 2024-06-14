@@ -61,7 +61,6 @@ static lv_cache_compare_res_t grad_compare_cb(const grad_item_t * lhs, const gra
 static grad_type_t lv_grad_style_to_type(lv_vector_gradient_style_t style);
 static void grad_point_to_matrix(vg_lite_matrix_t * grad_matrix, float x1, float y1, float x2, float y2);
 static vg_lite_gradient_spreadmode_t lv_spread_to_vg(lv_vector_gradient_spread_t spread);
-static bool check_radial_grad_is_supported(vg_lite_gradient_spreadmode_t spread);
 
 /**********************
  *  STATIC VARIABLES
@@ -120,7 +119,22 @@ bool lv_vg_lite_draw_grad(
 
     /* check radial gradient is supported */
     if(grad->style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
-        if(!check_radial_grad_is_supported(lv_spread_to_vg(grad->spread))) {
+        if(!vg_lite_query_feature(gcFEATURE_BIT_VG_RADIAL_GRADIENT)) {
+            LV_LOG_INFO("radial gradient is not supported");
+            return false;
+        }
+
+        /* check if the radius is valid */
+        if(grad->cr <= 0) {
+            LV_LOG_INFO("radius: %f is not valid", grad->cr);
+            return false;
+        }
+    }
+
+    /* check spread mode is supported */
+    if(grad->spread == LV_VECTOR_GRADIENT_SPREAD_REPEAT || grad->spread == LV_VECTOR_GRADIENT_SPREAD_REFLECT) {
+        if(!vg_lite_query_feature(gcFEATURE_BIT_VG_IM_REPEAT_REFLECT)) {
+            LV_LOG_INFO("repeat/reflect spread(%d) is not supported", grad->spread);
             return false;
         }
     }
@@ -230,9 +244,29 @@ bool lv_vg_lite_draw_grad_helper(
     lv_memzero(&grad, sizeof(grad));
 
     grad.style = LV_VECTOR_GRADIENT_STYLE_LINEAR;
-    grad.spread = LV_VECTOR_GRADIENT_SPREAD_PAD;
     grad.stops_count = grad_dsc->stops_count;
     lv_memcpy(grad.stops, grad_dsc->stops, sizeof(lv_gradient_stop_t) * grad_dsc->stops_count);
+
+    /*convert to spread mode*/
+#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
+    switch(grad_dsc->extend) {
+        case LV_GRAD_EXTEND_PAD:
+            grad.spread = LV_VECTOR_GRADIENT_SPREAD_PAD;
+            break;
+        case LV_GRAD_EXTEND_REPEAT:
+            grad.spread = LV_VECTOR_GRADIENT_SPREAD_REPEAT;
+            break;
+        case LV_GRAD_EXTEND_REFLECT:
+            grad.spread = LV_VECTOR_GRADIENT_SPREAD_REFLECT;
+            break;
+        default:
+            LV_LOG_WARN("Unsupported gradient extend mode: %d", grad_dsc->extend);
+            grad.spread = LV_VECTOR_GRADIENT_SPREAD_PAD;
+            break;
+    }
+#else
+    grad.spread = LV_VECTOR_GRADIENT_SPREAD_PAD;
+#endif
 
     switch(grad_dsc->dir) {
         case LV_GRAD_DIR_VER:
@@ -248,6 +282,32 @@ bool lv_vg_lite_draw_grad_helper(
             grad.x2 = area->x2 + 1;
             grad.y2 = area->y1;
             break;
+
+#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
+        case LV_GRAD_DIR_LINEAR: {
+                int32_t w = lv_area_get_width(area);
+                int32_t h = lv_area_get_height(area);
+
+                grad.x1 = lv_pct_to_px(grad_dsc->params.linear.start.x, w) + area->x1;
+                grad.y1 = lv_pct_to_px(grad_dsc->params.linear.start.y, h) + area->y1;
+                grad.x2 = lv_pct_to_px(grad_dsc->params.linear.end.x, w) + area->x1;
+                grad.y2 = lv_pct_to_px(grad_dsc->params.linear.end.y, h) + area->y1;
+            }
+            break;
+
+        case LV_GRAD_DIR_RADIAL: {
+                grad.style = LV_VECTOR_GRADIENT_STYLE_RADIAL;
+                int32_t w = lv_area_get_width(area);
+                int32_t h = lv_area_get_height(area);
+
+                grad.cx = lv_pct_to_px(grad_dsc->params.radial.focal.x, w) + area->x1;
+                grad.cy = lv_pct_to_px(grad_dsc->params.radial.focal.y, h) + area->y1;
+                int32_t end_extent_x = lv_pct_to_px(grad_dsc->params.radial.end_extent.x, w) + area->x1;
+                int32_t end_extent_y = lv_pct_to_px(grad_dsc->params.radial.end_extent.y, h) + area->y1;
+                grad.cr = LV_MAX(end_extent_x - grad.cx, end_extent_y - grad.cy);
+            }
+            break;
+#endif
 
         default:
             LV_LOG_WARN("Unsupported gradient direction: %d", grad_dsc->dir);
@@ -512,23 +572,6 @@ static vg_lite_gradient_spreadmode_t lv_spread_to_vg(lv_vector_gradient_spread_t
     }
 
     return VG_LITE_GRADIENT_SPREAD_FILL;
-}
-
-static bool check_radial_grad_is_supported(vg_lite_gradient_spreadmode_t spread)
-{
-    if(!vg_lite_query_feature(gcFEATURE_BIT_VG_RADIAL_GRADIENT)) {
-        LV_LOG_INFO("radial gradient is not supported");
-        return false;
-    }
-
-    if(spread == VG_LITE_GRADIENT_SPREAD_REPEAT || spread == VG_LITE_GRADIENT_SPREAD_REFLECT) {
-        if(!vg_lite_query_feature(gcFEATURE_BIT_VG_IM_REPEAT_REFLECT)) {
-            LV_LOG_INFO("repeat/reflect spread(%d) is not supported", spread);
-            return false;
-        }
-    }
-
-    return true;
 }
 
 static bool grad_create_cb(grad_item_t * item, void * user_data)

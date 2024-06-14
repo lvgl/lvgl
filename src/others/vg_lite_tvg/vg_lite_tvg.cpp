@@ -463,10 +463,13 @@ extern "C" {
         vg_lite_uint32_t stride = VG_LITE_ALIGN((buffer->width * mul / div), align);
 
         buffer->stride = stride;
+
+        /* Size must be multiple of align, See: https://en.cppreference.com/w/c/memory/aligned_alloc */
+        size_t size = VG_LITE_ALIGN(buffer->height * stride, LV_VG_LITE_THORVG_BUF_ADDR_ALIGN);
 #ifndef _WIN32
-        buffer->memory = aligned_alloc(LV_VG_LITE_THORVG_BUF_ADDR_ALIGN, stride * buffer->height);
+        buffer->memory = aligned_alloc(LV_VG_LITE_THORVG_BUF_ADDR_ALIGN, size);
 #else
-        buffer->memory = _aligned_malloc(stride * buffer->height, LV_VG_LITE_THORVG_BUF_ADDR_ALIGN);
+        buffer->memory = _aligned_malloc(size, LV_VG_LITE_THORVG_BUF_ADDR_ALIGN);
 #endif
         LV_ASSERT(buffer->memory);
         buffer->address = (vg_lite_uint32_t)(uintptr_t)buffer->memory;
