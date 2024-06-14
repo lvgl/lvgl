@@ -267,6 +267,7 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
         {
             tiny_ttf_glyph_cache_data_t * data_next = lv_cache_entry_get_data(entry_next);
             g2 = data_next->glyph_dsc.gid.index;
+            lv_cache_release(dsc->glyph_cache, entry_next, NULL);
         }
 
         if ( g2 )
@@ -286,6 +287,7 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
             {
                 tiny_ttf_kernpair_cache_data_t * kernpair_data = lv_cache_entry_get_data(kernpair);
                 k = kernpair_data->k;
+                lv_cache_release(dsc->kernpair_cache, kernpair, NULL);
             }
 
             dsc_out->adv_w = (uint16_t)floor((((float)data->adv_w + (float)k) * dsc->scale) +
@@ -587,6 +589,8 @@ static lv_cache_compare_res_t tiny_ttf_kernpair_cache_compare_cb(const tiny_ttf_
     if(lhs->g2 != rhs->g2) {
         return lhs->g2 > rhs->g2 ? 1 : -1;
     }
+
+    return 0;
 }
 
 #endif
