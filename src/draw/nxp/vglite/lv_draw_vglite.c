@@ -452,7 +452,7 @@ static inline void _vglite_queue_task(lv_draw_task_t * task_act)
 static inline void _vglite_signal_task_ready(lv_draw_task_t * task_act)
 {
     if(vglite_cmd_buf_is_flushed()) {
-        int end = (_head < _tail) ? _tail : _tail + VGLITE_TASK_BUF_SIZE;
+        int end = (_head <= _tail) ? _tail : _tail + VGLITE_TASK_BUF_SIZE;
 
         for(int i = _head; i < end; i++) {
             /* Previous flushed tasks are ready now. */
