@@ -108,6 +108,7 @@ typedef struct {
     void * user_data;
 } lv_draw_dsc_base_t;
 
+    uint32_t unit_cnt;
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
