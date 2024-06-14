@@ -159,7 +159,7 @@ void lv_tiny_ttf_set_size(lv_font_t * font, int32_t font_size)
         lv_cache_destroy(dsc->draw_data_cache, NULL);
         dsc->draw_data_cache = NULL;
     }
-    
+
     lv_tiny_ttf_cache_create(dsc);
 }
 
@@ -278,16 +278,16 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
 
             int k;
 
-            lv_cache_entry_t * kernpair = lv_cache_acquire_or_create(dsc->glyph_cache, &kernpair_search_key, (void *)dsc);
+            lv_cache_entry_t * kernpair = lv_cache_acquire_or_create(dsc->kernpair_cache, &kernpair_search_key, (void *)dsc);
 
             if(kernpair == NULL) {
-                k = stbtt_GetGlyphKernAdvance(&dsc->info, data->glyph_dsc.gid.index, g2);
+                k = stbtt_GetGlyphKernAdvance(&dsc->info, g1, g2);
             } else
             {
                 tiny_ttf_kernpair_cache_data_t * kernpair_data = lv_cache_entry_get_data(kernpair);
                 k = kernpair_data->k;
             }
-            
+
             dsc_out->adv_w = (uint16_t)floor((((float)data->adv_w + (float)k) * dsc->scale) +
                             0.5f); /*Horizontal space required by the glyph in [px]*/
         }
@@ -356,8 +356,7 @@ static void lv_tiny_ttf_cache_create(ttf_font_desc_t * dsc )
     // this does not need to be destroyed on resize, kerning data does not change.
     if ( dsc->kernpair_cache == NULL && dsc->kerning == LV_FONT_KERNING_NORMAL )
     {
-        // this doesn't seem to need to be big to have effect, and size appears to not have a big effect, due to the number of possible combinations
-        dsc->kernpair_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(tiny_ttf_kernpair_cache_data_t), dsc->kernpair_cache_size, 
+        dsc->kernpair_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(tiny_ttf_kernpair_cache_data_t), dsc->kernpair_cache_size,
         (lv_cache_ops_t) {
             .compare_cb = (lv_cache_compare_cb_t)tiny_ttf_kernpair_cache_compare_cb,
             .create_cb = (lv_cache_create_cb_t)tiny_ttf_kernpair_cache_create_cb,
@@ -418,7 +417,7 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
     }
 
     // check if font  has kerning tables to use, else disable kerning automatically.
-    if (dsc->info.kern == 0 && dsc->info.gpos == 0)
+    if (stbtt_KernTableCheck(&dsc->info) == 0)
     {
         kerning = LV_FONT_KERNING_NONE; // disable kerning if font has no tables.
     }
