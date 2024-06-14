@@ -28,7 +28,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef unsigned char uint8_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -677,7 +677,11 @@ static void scale_calculate_main_compensation(lv_obj_t * obj)
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
 
-    if(scale->total_tick_count <= 1) return;
+    const uint32_t total_tick_count = scale->total_tick_count;
+
+    if(total_tick_count <= 1) return;
+    /* Not supported in round modes */
+    if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) return;
 
     /* Major tick style */
     lv_draw_line_dsc_t major_tick_dsc;
@@ -689,19 +693,11 @@ static void scale_calculate_main_compensation(lv_obj_t * obj)
     lv_draw_line_dsc_init(&minor_tick_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
 
-    /* Main line style */
-    lv_draw_line_dsc_t main_line_dsc;
-    lv_draw_line_dsc_init(&main_line_dsc);
-    lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &main_line_dsc);
-
-    const uint32_t total_tick_count = scale->total_tick_count;
     uint32_t tick_idx = 0;
     uint32_t major_tick_idx = 0;
-
     for(tick_idx = 0; tick_idx < total_tick_count; tick_idx++) {
-        /* A major tick is the one which has a label in it */
-        bool is_major_tick = false;
-        if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
+
+        const bool is_major_tick = tick_idx % scale->major_tick_every == 0;
         if(is_major_tick) major_tick_idx++;
 
         const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count - 1, scale->range_min, scale->range_max);
@@ -732,18 +728,9 @@ static void scale_calculate_main_compensation(lv_obj_t * obj)
 
         /* Store initial and last tick widths to be used in the main line drawing */
         scale_store_main_line_tick_width_compensation(obj, tick_idx, is_major_tick, major_tick_dsc.width, minor_tick_dsc.width);
-
         /* Store the first and last section tick vertical/horizontal position */
-        if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
-           || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
-            scale_store_section_line_tick_width_compensation(obj, is_major_tick, &major_tick_dsc, &minor_tick_dsc,
-                                                             tick_value, tick_idx, &tick_point_a);
-        }
-        else {
-            /* Not supported */
-        }
-
-
+        scale_store_section_line_tick_width_compensation(obj, is_major_tick, &major_tick_dsc, &minor_tick_dsc,
+                                                         tick_value, tick_idx, &tick_point_a);
     }
 }
 
