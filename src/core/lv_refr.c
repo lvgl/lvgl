@@ -908,14 +908,8 @@ static void refr_obj_matrix(lv_layer_t * layer, lv_obj_t * obj)
         .y = lv_obj_get_style_transform_pivot_y(obj, 0)
     };
 
-    if(LV_COORD_IS_PCT(pivot.x)) {
-        pivot.x = (LV_COORD_GET_PCT(pivot.x) * lv_area_get_width(&obj->coords)) / 100;
-    }
-    if(LV_COORD_IS_PCT(pivot.y)) {
-        pivot.y = (LV_COORD_GET_PCT(pivot.y) * lv_area_get_height(&obj->coords)) / 100;
-    }
-    pivot.x = obj->coords.x1 + pivot.x;
-    pivot.y = obj->coords.y1 + pivot.y;
+    pivot.x = obj->coords.x1 + lv_pct_to_px(pivot.x, lv_area_get_width(&obj->coords));
+    pivot.y = obj->coords.y1 + lv_pct_to_px(pivot.y, lv_area_get_height(&obj->coords));
 
     int32_t rotation = lv_obj_get_style_transform_rotation(obj, 0);
     int32_t scale_x = lv_obj_get_style_transform_scale_x(obj, 0);
