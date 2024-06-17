@@ -1,0 +1,3 @@
+[parent/]Function Name [(Optionnal_Info)] | Max execution time
+prof_lv_bezier3 (success) | .001 
+prof_lv_area_intersect (fail) | .001

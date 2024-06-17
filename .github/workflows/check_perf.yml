@@ -1,0 +1,54 @@
+
+name: SO3-LVGL Performance check
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  run_perf_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: 'lvgl'  
+
+      - name: SO3-LVGL building the Docker image
+        run: |
+          wget https://raw.githubusercontent.com/smartobjectoriented/so3/40-expand-and-document-lvgl-perf-tests/Dockerfile.lvgl
+          docker build . -f Dockerfile.lvgl -t so3/virt64 --platform linux/amd64 --build-arg SO3_BRANCH=40-expand-and-document-lvgl-perf-tests
+
+      - name: SO3-LVL Running containerized performance check app
+        run: docker run --privileged -v $PWD:/host -v /dev:/dev so3/virt64 
+        
+      - name: Store performance data as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance_data
+          path: perf_check*.txt 
+
+      - name: Find previous successful run
+        id: prev_success_run
+        run: |
+          wget ${{ github.api_url }}/repos/${{ github.repository }}/actions/workflows/52959381/runs
+          echo "ID=$(python3 lvgl/scripts/last_success_run_id.py runs)" >> "$GITHUB_OUTPUT"
+
+      - name: Retrieve previous successful run performance data
+        if: ${{ steps.prev_success_run.outputs.ID != 0 }}
+        uses: actions/download-artifact@v4
+        with:
+          name: performance_data
+          path: prev_performance_data
+          run-id: ${{ steps.prev_success_run.outputs.ID }}
+        continue-on-error: true
+      
+      - name: Performance report generation
+        id: perf_report
+        run: |
+          python3 lvgl/scripts/perf_report.py perf_check*.txt lvgl/tests/perf/func_thresholds.txt prev_performance_data/perf_check*.txt | tee perf_report.txt
+          python_return=${PIPESTATUS[0]}
+          echo "Python script returned $python_return"
+          exit $python_return
+
+      - name: Store performance report as artifact
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance_report
+          path: perf_report.txt

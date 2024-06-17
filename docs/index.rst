@@ -27,6 +27,7 @@ Welcome to the documentation of LVGL!
     libs/index
     others/index
     API/index
+    cicd/index
     CONTRIBUTING
     CODING_STYLE
     CHANGELOG
