@@ -75,7 +75,7 @@ static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
  */
 static int32_t _vglite_delete(lv_draw_unit_t * draw_unit);
 
-#if LV_USE_OS
+#if LV_USE_VGLITE_DRAW_THREAD
     static void _vglite_render_thread_cb(void * ptr);
 #endif
 
@@ -120,7 +120,7 @@ void lv_draw_vglite_init(void)
 #endif
     draw_vglite_unit->base_unit.delete_cb = _vglite_delete;
 
-#if LV_USE_OS
+#if LV_USE_VGLITE_DRAW_THREAD
     lv_thread_init(&draw_vglite_unit->thread, LV_THREAD_PRIO_HIGH, _vglite_render_thread_cb, 2 * 1024, draw_vglite_unit);
 #endif
 }
@@ -321,7 +321,7 @@ static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     draw_vglite_unit->base_unit.clip_area = &t->clip_area;
     draw_vglite_unit->task_act = t;
 
-#if LV_USE_OS
+#if LV_USE_VGLITE_DRAW_THREAD
     /* Let the render thread work. */
     if(draw_vglite_unit->inited)
         lv_thread_sync_signal(&draw_vglite_unit->sync);
@@ -351,7 +351,7 @@ static int32_t _vglite_wait_for_finish(lv_draw_unit_t * draw_unit)
 
 static int32_t _vglite_delete(lv_draw_unit_t * draw_unit)
 {
-#if LV_USE_OS
+#if LV_USE_VGLITE_DRAW_THREAD
     lv_draw_vglite_unit_t * draw_vglite_unit = (lv_draw_vglite_unit_t *) draw_unit;
 
     LV_LOG_INFO("Cancel VGLite draw thread.");
@@ -530,7 +530,7 @@ static inline void _vglite_signal_flushed_task_ready(void)
 }
 #endif
 
-#if LV_USE_OS
+#if LV_USE_VGLITE_DRAW_THREAD
 static void _vglite_render_thread_cb(void * ptr)
 {
     lv_draw_vglite_unit_t * u = ptr;

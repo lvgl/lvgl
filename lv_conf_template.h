@@ -191,8 +191,13 @@
     #define LV_USE_VGLITE_BLIT_SPLIT 0
 
     #if LV_USE_OS
-        /* Enable VGLite draw async. Queue multiple tasks and flash them once to the GPU. */
-        #define LV_USE_VGLITE_DRAW_ASYNC 1
+        /* Use additional draw thread for VG-Lite processing.*/
+        #define LV_USE_VGLITE_DRAW_THREAD 1
+
+        #if LV_USE_VGLITE_DRAW_THREAD
+            /* Enable VGLite draw async. Queue multiple tasks and flash them once to the GPU. */
+            #define LV_USE_VGLITE_DRAW_ASYNC 1
+        #endif
     #endif
 
     /* Enable VGLite asserts. */
