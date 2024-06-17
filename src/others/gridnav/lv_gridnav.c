@@ -229,7 +229,9 @@ static void gridnav_event_cb(lv_event_t * e)
 
         if(guess && guess != dsc->focused_obj) {
             lv_obj_remove_state(dsc->focused_obj, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
+            lv_obj_send_event(dsc->focused_obj, LV_EVENT_DEFOCUSED, lv_indev_active());
             lv_obj_add_state(guess, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
+            lv_obj_send_event(guess, LV_EVENT_FOCUSED, lv_indev_active());
             lv_obj_scroll_to_view(guess, LV_ANIM_ON);
             dsc->focused_obj = guess;
         }
