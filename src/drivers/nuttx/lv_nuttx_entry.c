@@ -264,7 +264,7 @@ static void lv_nuttx_uv_loop(lv_nuttx_result_t * result)
 
     uv_loop_init(&loop);
 
-    lv_memset(&uv_info, 0, sizeof(uv_info));
+    lv_memzero(&uv_info, sizeof(uv_info));
     uv_info.loop = &loop;
     uv_info.disp = result->disp;
     uv_info.indev = result->indev;
