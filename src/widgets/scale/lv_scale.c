@@ -809,45 +809,44 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
 
         lv_scale_section_t * section;
         _LV_LL_READ_BACK(&scale->section_ll, section) {
-            lv_draw_line_dsc_t main_line_section_dsc;
-            lv_draw_line_dsc_init(&main_line_section_dsc);
-            lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &main_line_section_dsc);
+            lv_draw_line_dsc_t section_line_dsc;
+            lv_draw_line_dsc_init(&section_line_dsc);
+            lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &section_line_dsc);
 
             /* Calculate the points of the section line */
-            lv_point_t main_point_a;
-            lv_point_t main_point_b;
+            lv_point_t section_point_a;
+            lv_point_t section_point_b;
+
+            const int32_t first_tick_width_halved = (int32_t)(section->first_tick_in_section_width / 2U);
+            const int32_t last_tick_width_halved = (int32_t)(section->last_tick_in_section_width / 2U);
 
             /* Calculate the position of the section based on the ticks (first and last) index */
             if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
                 /* Calculate position of the first tick in the section */
-                main_point_a.x = main_line_point_a.x;
-                int32_t tmp = (int32_t)(section->first_tick_in_section_width / 2U);
-                main_point_a.y = section->first_tick_in_section.y + tmp;
+                section_point_a.x = main_line_point_a.x;
+                section_point_a.y = section->first_tick_in_section.y + first_tick_width_halved;
 
                 /* Calculate position of the last tick in the section */
-                main_point_b.x = main_line_point_a.x;
-                tmp = (int32_t)(section->last_tick_in_section_width / 2U);
-                main_point_b.y = section->last_tick_in_section.y - tmp;
+                section_point_b.x = main_line_point_a.x;
+                section_point_b.y = section->last_tick_in_section.y - last_tick_width_halved;
             }
             else {
                 /* Calculate position of the first tick in the section */
-                int32_t tmp = (int32_t)(section->first_tick_in_section_width / 2U);
-                main_point_a.x = section->first_tick_in_section.x - tmp;
-                main_point_a.y = main_line_point_a.y;
+                section_point_a.x = section->first_tick_in_section.x - first_tick_width_halved;
+                section_point_a.y = main_line_point_a.y;
 
                 /* Calculate position of the last tick in the section */
-                tmp = (int32_t)(section->last_tick_in_section_width / 2U);
-                main_point_b.x = section->last_tick_in_section.x + tmp;
-                main_point_b.y = main_line_point_a.y;
+                section_point_b.x = section->last_tick_in_section.x + last_tick_width_halved;
+                section_point_b.y = main_line_point_a.y;
             }
 
-            scale_set_line_properties(obj, &main_line_section_dsc, section->main_style, LV_PART_MAIN);
+            scale_set_line_properties(obj, &section_line_dsc, section->main_style, LV_PART_MAIN);
 
-            main_line_section_dsc.p1.x = main_point_a.x;
-            main_line_section_dsc.p1.y = main_point_a.y;
-            main_line_section_dsc.p2.x = main_point_b.x;
-            main_line_section_dsc.p2.y = main_point_b.y;
-            lv_draw_line(layer, &main_line_section_dsc);
+            section_line_dsc.p1.x = section_point_a.x;
+            section_line_dsc.p1.y = section_point_a.y;
+            section_line_dsc.p2.x = section_point_b.x;
+            section_line_dsc.p2.y = section_point_b.y;
+            lv_draw_line(layer, &section_line_dsc);
         }
     }
     else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
