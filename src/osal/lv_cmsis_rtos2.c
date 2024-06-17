@@ -172,6 +172,11 @@ lv_result_t lv_thread_sync_signal(lv_thread_sync_t * sync)
     return LV_RESULT_OK;
 }
 
+lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * sync)
+{
+    return lv_thread_sync_signal(sync);
+}
+
 lv_result_t lv_thread_sync_delete(lv_thread_sync_t * sync)
 {
     osStatus_t status = osEventFlagsDelete(*sync);
