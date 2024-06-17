@@ -54,7 +54,7 @@ static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
  */
 static int32_t _pxp_delete(lv_draw_unit_t * draw_unit);
 
-#if LV_USE_OS
+#if LV_USE_PXP_DRAW_THREAD
     static void _pxp_render_thread_cb(void * ptr);
 #endif
 
@@ -91,7 +91,7 @@ void lv_draw_pxp_init(void)
 
     lv_pxp_init();
 
-#if LV_USE_OS
+#if LV_USE_PXP_DRAW_THREAD
     lv_thread_init(&draw_pxp_unit->thread, LV_THREAD_PRIO_HIGH, _pxp_render_thread_cb, 2 * 1024, draw_pxp_unit);
 #endif
 }
@@ -330,7 +330,7 @@ static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     draw_pxp_unit->base_unit.clip_area = &t->clip_area;
     draw_pxp_unit->task_act = t;
 
-#if LV_USE_OS
+#if LV_USE_PXP_DRAW_THREAD
     /* Let the render thread work. */
     if(draw_pxp_unit->inited)
         lv_thread_sync_signal(&draw_pxp_unit->sync);
@@ -349,7 +349,7 @@ static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
 static int32_t _pxp_delete(lv_draw_unit_t * draw_unit)
 {
-#if LV_USE_OS
+#if LV_USE_PXP_DRAW_THREAD
     lv_draw_pxp_unit_t * draw_pxp_unit = (lv_draw_pxp_unit_t *) draw_unit;
 
     LV_LOG_INFO("Cancel PXP draw thread.");
@@ -445,7 +445,7 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
 #endif
 }
 
-#if LV_USE_OS
+#if LV_USE_PXP_DRAW_THREAD
 static void _pxp_render_thread_cb(void * ptr)
 {
     lv_draw_pxp_unit_t * u = ptr;
