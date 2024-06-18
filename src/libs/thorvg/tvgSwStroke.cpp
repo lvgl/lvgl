@@ -665,7 +665,7 @@ static void _beginSubPath(SwStroke& stroke, const SwPoint& to, bool closed)
     /* Determine if we need to check whether the border radius is greater
        than the radius of curvature of a curve, to handle this case specially.
        This is only required if bevel joins or butt caps may be created because
-       round & miter joins and round & square caps cover the nagative sector
+       round & miter joins and round & square caps cover the negative sector
        created with wide strokes. */
     if ((stroke.join != StrokeJoin::Round) || (!stroke.closedSubPath && stroke.cap == StrokeCap::Butt))
         stroke.handleWideStrokes = true;
