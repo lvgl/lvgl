@@ -2018,7 +2018,7 @@ private:
         case IterativeParsingObjectInitialState:
         case IterativeParsingArrayInitialState:
         {
-            // Push the state(Element or MemeberValue) if we are nested in another array or value of member.
+            // Push the state(Element or MemberValue) if we are nested in another array or value of member.
             // In this way we can get the correct state on ObjectFinish or ArrayFinish by frame pop.
             IterativeParsingState n = src;
             if (src == IterativeParsingArrayInitialState || src == IterativeParsingElementDelimiterState)
