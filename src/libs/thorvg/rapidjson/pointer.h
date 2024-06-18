@@ -173,7 +173,7 @@ public:
     //! Assignment operator.
     GenericPointer& operator=(const GenericPointer& rhs) {
         if (this != &rhs) {
-            // Do not delete ownAllcator
+            // Do not delete ownAllocator
             if (nameBuffer_)
                 Allocator::Free(tokens_);
 
