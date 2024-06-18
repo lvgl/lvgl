@@ -121,7 +121,7 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
         rlottie->animation = lottie_animation_from_file(create_info.path);
     }
     if(rlottie->animation == NULL) {
-        LV_LOG_WARN("The aniamtion can't be opened");
+        LV_LOG_WARN("The animation can't be opened");
         return;
     }
 

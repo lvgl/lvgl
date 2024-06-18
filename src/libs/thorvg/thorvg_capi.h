@@ -2277,7 +2277,7 @@ TVG_API Tvg_Animation* tvg_animation_new(void);
 * \brief Specifies the current frame in the animation.
 *
 * \param[in] animation A Tvg_Animation pointer to the animation object.
-* \param[in] no The index of the animation frame to be displayed. The index should be less than the tvg_animatio_total_frame().
+* \param[in] no The index of the animation frame to be displayed. The index should be less than the tvg_animation_total_frame().
 *
 * \return Tvg_Result enumeration.
 * \retval TVG_RESULT_SUCCESS Succeed.
