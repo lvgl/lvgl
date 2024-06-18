@@ -95,7 +95,7 @@ Fixes
 - **fix(x11): fix assert on delete** `5799 <https://github.com/lvgl/lvgl/pull/5799>`__
 - **fix(demo_music): fix the previous button in the music demo is not clickable** `5808 <https://github.com/lvgl/lvgl/pull/5808>`__
 - **fix(draw): fix non antialiased rgb565a8 transformation** `5782 <https://github.com/lvgl/lvgl/pull/5782>`__
-- **fix(freetpye): fix the problem of incomplete font drawing when setting with italic** `5807 <https://github.com/lvgl/lvgl/pull/5807>`__
+- **fix(freetype): fix the problem of incomplete font drawing when setting with italic** `5807 <https://github.com/lvgl/lvgl/pull/5807>`__
 - **fix(fsdrv): add missing lv_fs_littlefs_init function declaration** `5778 <https://github.com/lvgl/lvgl/pull/5778>`__
 - **fix(vg_lite):fix bug for wrong rendering in vertical or horizontal dir** `5789 <https://github.com/lvgl/lvgl/pull/5789>`__
 - **fix(env): added *.cpp glob in ESP configuration** `5761 <https://github.com/lvgl/lvgl/pull/5761>`__
