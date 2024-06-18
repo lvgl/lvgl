@@ -906,7 +906,7 @@ LottieImage* LottieParser::parseImage(const char* data, const char* subPath, boo
     //Used for Image Asset
     auto image = new LottieImage;
 
-    //embeded image resource. should start with "data:"
+    //embedded image resource. should start with "data:"
     //header look like "data:image/png;base64," so need to skip till ','.
     if (embedded && !strncmp(data, "data:", 5)) {
         //figure out the mimetype
