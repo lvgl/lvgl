@@ -76,7 +76,7 @@ extern "C" {
   metadata includes block's compressed size, and maximum bound of decompressed size.
   Each application is free to encode and pass such metadata in whichever way it wants.
 
-  lz4.h only handle blocks, it can not generate Frames.
+  lz4.h only handle blocks, it cannot generate Frames.
 
   Blocks are different from Frames (doc/lz4_Frame_format.md).
   Frames bundle both blocks and metadata in a specified manner.

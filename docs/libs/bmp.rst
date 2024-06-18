@@ -38,7 +38,7 @@ Limitations
    Use GIMP to save the image in the required format. Both RGB888 and
    ARGB888 works with :c:macro:`LV_COLOR_DEPTH` ``32``
 -  Palette is not supported.
--  Because not the whole image is read in can not be zoomed or rotated.
+-  Because not the whole image is read in cannot be zoomed or rotated.
 
 .. _bmp_example:
 

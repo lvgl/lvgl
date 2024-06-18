@@ -249,7 +249,7 @@ Styles can be built as ``const`` too to save RAM:
    LV_STYLE_CONST_INIT(style1, style1_props);
 
 Later ``const`` style can be used like any other style but (obviously)
-new properties can not be added.
+new properties cannot be added.
 
 .. _styles_add_remove:
 
@@ -457,7 +457,7 @@ configured by the following properties in ``lv_conf.h``:
 - :cpp:enumerator:`LV_LAYER_SIMPLE_BUF_SIZE`: [bytes] the optimal target buffer size. LVGL will try to allocate this size of memory.
 - :cpp:enumerator:`LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE`: [bytes] used if :cpp:enumerator:`LV_LAYER_SIMPLE_BUF_SIZE` couldn't be allocated.
 
-If transformation properties were also used the layer can not be
+If transformation properties were also used the layer cannot be
 rendered in chunks, but one larger memory needs to be allocated. The
 required memory depends on the angle, zoom and pivot parameters, and the
 size of the area to redraw, but it's never larger than the size of the

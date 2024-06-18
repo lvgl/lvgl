@@ -212,7 +212,7 @@ uint32_t lv_label_get_text_selection_end(const lv_obj_t * obj);
  *====================*/
 
 /**
- * Insert a text to a label. The label text can not be static.
+ * Insert a text to a label. The label text cannot be static.
  * @param obj       pointer to a label object
  * @param pos       character index to insert. Expressed in character index and not byte index.
  *                  0: before first char. LV_LABEL_POS_LAST: after last char.
@@ -221,7 +221,7 @@ uint32_t lv_label_get_text_selection_end(const lv_obj_t * obj);
 void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt);
 
 /**
- * Delete characters from a label. The label text can not be static.
+ * Delete characters from a label. The label text cannot be static.
  * @param obj       pointer to a label object
  * @param pos       character index from where to cut. Expressed in character index and not byte index.
  *                  0: start in from of the first character

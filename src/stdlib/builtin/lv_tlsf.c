@@ -586,8 +586,8 @@ static void remove_free_block(control_t * control, block_header_t * block, int f
 {
     block_header_t * prev = block->prev_free;
     block_header_t * next = block->next_free;
-    tlsf_assert(prev && "prev_free field can not be null");
-    tlsf_assert(next && "next_free field can not be null");
+    tlsf_assert(prev && "prev_free field cannot be null");
+    tlsf_assert(next && "next_free field cannot be null");
     next->prev_free = prev;
     prev->next_free = next;
 
