@@ -327,7 +327,7 @@ bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f);
  * Check if a given flag or any of the flags are set on an object.
  * @param obj   pointer to an object
  * @param f     the flag(s) to check (OR-ed values can be used)
- * @return      true: at lest one flag flag is set; false: none of the flags are set
+ * @return      true: at lest one flag is set; false: none of the flags are set
  */
 bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f);
 
