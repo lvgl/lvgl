@@ -13,7 +13,7 @@ Arm-2D accelerates LVGL9 with two modes: **Synchronous Mode** and
 - When Arm-2D backed 2D-GPUs are available, for example, **DMAC-350 based 2D
   GPUs**, it is recommend to use **Asynchronous Mode** to accelerate LVGL.
 
-Arm-2D is an open-source project on Github. For more, please refer to:
+Arm-2D is an open-source project on GitHub. For more, please refer to:
 https://github.com/ARM-software/Arm-2D.
 
 How to Use
