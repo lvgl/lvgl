@@ -271,7 +271,7 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
 
 /**
  * Tell how many draw task are waiting to be drawn on the area of `t_check`.
- * It can be used to determine if a GPU shall combine many draw tasks in to one or not.
+ * It can be used to determine if a GPU shall combine many draw tasks into one or not.
  * If a lot of tasks are waiting for the current ones it makes sense to draw them one-by-one
  * to not block the dependent tasks' rendering
  * @param t_check   the task whose dependent tasks shall be counted
