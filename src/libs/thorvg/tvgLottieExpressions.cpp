@@ -888,7 +888,7 @@ static jerry_value_t _isClosed(const jerry_call_info_t* info, const jerry_value_
 
 static void _buildPath(jerry_value_t context, LottieExpression* exp)
 {
-    //Trick for fast buliding path.
+    //Trick for fast building path.
     auto points = jerry_function_external(_uniformPath);
     jerry_object_set_native_ptr(points, nullptr, exp->property);
     jerry_object_set_sz(context, "points", points);
