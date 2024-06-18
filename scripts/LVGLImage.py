@@ -308,7 +308,7 @@ def write_c_array_file(
         stride: int,
         cf: ColorFormat,
         filename: str,
-        premulitplied: bool,
+        premultiplied: bool,
         compress: CompressMethod,
         data: bytes):
     varname = path.basename(filename).split('.')[0]
@@ -318,7 +318,7 @@ def write_c_array_file(
     flags = "0"
     if compress is not CompressMethod.NONE:
         flags += " | LV_IMAGE_FLAGS_COMPRESSED"
-    if premulitplied:
+    if premultiplied:
         flags += " | LV_IMAGE_FLAGS_PREMULTIPLIED"
 
     macro = "LV_ATTRIBUTE_" + varname.upper()
@@ -495,7 +495,7 @@ class LVGLImage:
                  h: int = 0,
                  data: bytes = b'') -> None:
         self.stride = 0  # default no valid stride value
-        self.premulitplied = False
+        self.premultiplied = False
         self.set_data(cf, w, h, data)
 
     def __repr__(self) -> str:
@@ -575,8 +575,8 @@ class LVGLImage:
         """
         Pre-multiply image RGB data with alpha, set corresponding image header flags
         """
-        if self.premulitplied:
-            raise ParameterError("Image already pre-mulitplied")
+        if self.premultiplied:
+            raise ParameterError("Image already pre-multiplied")
 
         if not self.cf.has_alpha:
             raise ParameterError(f"Image has no alpha channel: {self.cf.name}")
@@ -660,7 +660,7 @@ class LVGLImage:
         else:
             raise ParameterError(f"Not supported yet: {self.cf.name}")
 
-        self.premulitplied = True
+        self.premultiplied = True
 
     @property
     def data_len(self) -> int:
@@ -753,7 +753,7 @@ class LVGLImage:
             bin = bytearray()
             flags = 0
             flags |= 0x08 if compress != CompressMethod.NONE else 0
-            flags |= 0x01 if self.premulitplied else 0
+            flags |= 0x01 if self.premultiplied else 0
 
             header = LVGLImageHeader(self.cf,
                                      self.w,
@@ -779,7 +779,7 @@ class LVGLImage:
         else:
             data = self.data
         write_c_array_file(self.w, self.h, self.stride, self.cf, filename,
-                           self.premulitplied,
+                           self.premultiplied,
                            compress, data)
 
     def to_png(self, filename: str):
