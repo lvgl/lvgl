@@ -80,7 +80,7 @@
     && defined (__GNUC_PATCHLEVEL__)
 
 #if defined (__SNC__)
-/* SNC for Playstation 3. */
+/* SNC for PlayStation 3. */
 
 tlsf_decl int tlsf_ffs(unsigned int word)
 {
