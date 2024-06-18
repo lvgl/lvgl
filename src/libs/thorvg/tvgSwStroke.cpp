@@ -718,7 +718,7 @@ static void _endSubPath(SwStroke& stroke)
         _addCap(stroke, stroke.subPathAngle + SW_ANGLE_PI, 0);
 
         /* now end the right subpath accordingly. The left one is rewind
-           and deosn't need further processing */
+           and doesn't need further processing */
         _borderClose(right, false);
     }
 }
