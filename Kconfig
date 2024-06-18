@@ -1199,7 +1199,7 @@ menu "LVGL configuration"
 			bool "GIF decoder library"
 
 		config LV_GIF_CACHE_DECODE_DATA
-			bool "Use extra 16KB RAM to cache decoded data to accerlate"
+			bool "Use extra 16KB RAM to cache decoded data to accelerate"
 			depends on LV_USE_GIF
 
 		config LV_BIN_DECODER_RAM_LOAD
