@@ -316,7 +316,7 @@ static int huffext(     /* >=0: decoded data, <0: error code */
             dc--;       /* Decrement number of available bytes */
             if(flg) {       /* In flag sequence? */
                 flg = 0;    /* Exit flag sequence */
-                if(*dp != 0) return 0 - (int)JDR_FMT1;  /* Err: unexpected flag is detected (may be collapted data) */
+                if(*dp != 0) return 0 - (int)JDR_FMT1;  /* Err: unexpected flag is detected (may be corrupted data) */
                 *dp = 0xFF;             /* The flag is a data 0xFF */
             }
             else {
@@ -426,7 +426,7 @@ static int huffext(     /* >=0: decoded data, <0: error code */
     }
 #endif
 
-    return 0 - (int)JDR_FMT1;   /* Err: code not found (may be collapted data) */
+    return 0 - (int)JDR_FMT1;   /* Err: code not found (may be corrupted data) */
 }
 
 
@@ -462,7 +462,7 @@ static int bitext(  /* >=0: extracted data, <0: error code */
             dc--;               /* Decrement number of available bytes */
             if(flg) {           /* In flag sequence? */
                 flg = 0;        /* Exit flag sequence */
-                if(*dp != 0) return 0 - (int)JDR_FMT1;  /* Err: unexpected flag is detected (may be collapted data) */
+                if(*dp != 0) return 0 - (int)JDR_FMT1;  /* Err: unexpected flag is detected (may be corrupted data) */
                 *dp = 0xFF;     /* The flag is a data 0xFF */
             }
             else {
@@ -563,7 +563,7 @@ JRESULT jd_restart(
 
     /* Check the marker */
     if((d & 0xFFD8) != 0xFFD0 || (d & 7) != (rstn & 7)) {
-        return JDR_FMT1;    /* Err: expected RSTn marker is not detected (may be collapted data) */
+        return JDR_FMT1;    /* Err: expected RSTn marker is not detected (may be corrupted data) */
     }
 
 #else
@@ -591,7 +591,7 @@ JRESULT jd_restart(
 
     /* Check the marker */
     if((marker & 0xFFD8) != 0xFFD0 || (marker & 7) != (rstn & 7)) {
-        return JDR_FMT1;    /* Err: expected RSTn marker was not detected (may be collapted data) */
+        return JDR_FMT1;    /* Err: expected RSTn marker was not detected (may be corrupted data) */
     }
 
     jd->dbit = 0;           /* Discard stuff bits */
