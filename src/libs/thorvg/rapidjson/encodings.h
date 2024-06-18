@@ -452,7 +452,7 @@ struct UTF32 {
     }
 };
 
-//! UTF-32 little endian enocoding.
+//! UTF-32 little endian encoding.
 template<typename CharType = unsigned>
 struct UTF32LE : UTF32<CharType> {
     template <typename InputByteStream>
