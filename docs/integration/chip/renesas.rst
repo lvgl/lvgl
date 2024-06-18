@@ -25,7 +25,7 @@ GLCDC
 -----
 
 GLCDC is a multi-stage graphics output peripheral available in several Renesas MCUs.
-It is able to drive LCD panles via a highly configurable RGB interface.
+It is able to drive LCD panels via a highly configurable RGB interface.
 
 More info can be found at the :ref:`dirver's page<renesas_glcdc>`.
 
