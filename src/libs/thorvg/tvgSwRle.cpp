@@ -325,7 +325,7 @@ static void _genSpan(SwRleData* rle, const SwSpan* spans, uint32_t count)
 }
 
 
-static void _horizLine(RleWorker& rw, SwCoord x, SwCoord y, SwCoord area, SwCoord acount)
+static void _horizLine(RleWorker& rw, SwCoord x, SwCoord y, SwCoord area, SwCoord aCount)
 {
     x += rw.cellMin.x;
     y += rw.cellMin.y;
@@ -368,11 +368,11 @@ static void _horizLine(RleWorker& rw, SwCoord x, SwCoord y, SwCoord area, SwCoor
 
             //Clip x range
             SwCoord xOver = 0;
-            if (x + acount >= rw.cellMax.x) xOver -= (x + acount - rw.cellMax.x);
+            if (x + aCount >= rw.cellMax.x) xOver -= (x + aCount - rw.cellMax.x);
             if (x < rw.cellMin.x) xOver -= (rw.cellMin.x - x);
 
-            //span->len += (acount + xOver) - 1;
-            span->len += (acount + xOver);
+            //span->len += (aCount + xOver) - 1;
+            span->len += (aCount + xOver);
             return;
         }
 
@@ -387,19 +387,19 @@ static void _horizLine(RleWorker& rw, SwCoord x, SwCoord y, SwCoord area, SwCoor
 
         //Clip x range
         SwCoord xOver = 0;
-        if (x + acount >= rw.cellMax.x) xOver -= (x + acount - rw.cellMax.x);
+        if (x + aCount >= rw.cellMax.x) xOver -= (x + aCount - rw.cellMax.x);
         if (x < rw.cellMin.x) {
             xOver -= (rw.cellMin.x - x);
             x = rw.cellMin.x;
         }
 
         //Nothing to draw
-        if (acount + xOver <= 0) return;
+        if (aCount + xOver <= 0) return;
 
         //add a span to the current list
         span->x = x;
         span->y = y;
-        span->len = (acount + xOver);
+        span->len = (aCount + xOver);
         span->coverage = coverage;
         ++rw.spansCnt;
         rw.ySpan = y;
