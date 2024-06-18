@@ -90,7 +90,7 @@ void lv_vg_lite_dump_info(void)
 
     vg_lite_uint32_t mem_avail = 0;
     vg_lite_get_mem_size(&mem_avail);
-    LV_LOG_USER("Memory Avaliable: %" LV_PRId32 " Bytes", (uint32_t)mem_avail);
+    LV_LOG_USER("Memory Available: %" LV_PRId32 " Bytes", (uint32_t)mem_avail);
 }
 
 const char * lv_vg_lite_error_string(vg_lite_error_t error)
