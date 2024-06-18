@@ -665,7 +665,7 @@ static bool _toColor(const char* str, uint8_t* r, uint8_t* g, uint8_t* b, char**
     unsigned char tr, tg, tb;
 
     if (len == 4 && str[0] == '#') {
-        //Case for "#456" should be interprete as "#445566"
+        //Case for "#456" should be interpreted as "#445566"
         if (isxdigit(str[1]) && isxdigit(str[2]) && isxdigit(str[3])) {
             char tmp[3] = { '\0', '\0', '\0' };
             tmp[0] = str[1];
