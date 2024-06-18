@@ -51,7 +51,7 @@ The following code demonstrates using the diver in :cpp:enumerator:`LV_DISPLAY_R
 
 To use the driver in :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_PARTIAL` mode, an extra buffer must be allocated,
 desireably in the fastest available memory region.
-Buffer swapping can be activated by passing a second buffer of same size insted of the :cpp:expr:`NULL` argument.
+Buffer swapping can be activated by passing a second buffer of same size instead of the :cpp:expr:`NULL` argument.
 
 .. code:: c
 
