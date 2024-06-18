@@ -772,7 +772,7 @@ static SwSpan* _intersectSpansRegion(const SwRleData *clip, const SwRleData *tar
     auto clipEnd = clip->spans + clip->size;
 
     while (spans < end && clipSpans < clipEnd) {
-        //align y cooridnates.
+        //align y coordinates.
         if (clipSpans->y > spans->y) {
             ++spans;
             continue;
