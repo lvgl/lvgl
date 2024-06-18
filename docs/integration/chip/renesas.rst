@@ -106,7 +106,7 @@ Get started with the Renesas ecosystem
    - Double click on ``configuration.xml``. This will activate the `Configuration Window`.
 
       Renesas' Flexible Software Package (FSP) incudes BSP and HAL layer support extended with multiple RTOS variants and other middleware stacks.
-      The components will be available via code generation, incuding the entry point of *"main.c"*.
+      The components will be available via code generation, including the entry point of *"main.c"*.
 
       Press ``Generate Project Content`` in the top right corner.
 
@@ -167,7 +167,7 @@ Get started with the Renesas ecosystem
    - Double click on ``RX72N_EnVision_LVGL.scfg``. This will activate the `Configuration Window`.
 
       Renesas' Smart Configurator (SMC) incudes BSP and HAL layer support extended with multiple RTOS variants and other middleware stacks.
-      The components will be available via code generation, incuding the entry point of the application.
+      The components will be available via code generation, including the entry point of the application.
 
       Press ``Generate Code`` in the top right corner.
 
