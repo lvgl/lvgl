@@ -99,7 +99,7 @@ Get started with the Renesas ecosystem
 
       Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
 
-   - Open e² studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Exsisting projects into workspace``
+   - Open e² studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Existing projects into workspace``
 
    - Browse the cloned folder and press ``Finish``.
 
@@ -160,7 +160,7 @@ Get started with the Renesas ecosystem
 
       Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
 
-   - Open e² studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Exsisting projects into workspace``
+   - Open e² studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Existing projects into workspace``
 
    - Select the cloned folder and press ``Finish``.
 
