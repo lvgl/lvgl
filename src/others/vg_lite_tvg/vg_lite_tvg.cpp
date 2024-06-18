@@ -1072,7 +1072,7 @@ extern "C" {
             /* Clamp color. */
             ClampColor(COLOR_FROM_RAMP(src_ramp), COLOR_FROM_RAMP(trg_ramp), 0);
 
-            /* First stop greater then zero? */
+            /* First stop greater than zero? */
             if((trg_count == 0) && (src_ramp->stop > 0.0f)) {
                 /* Force the first stop to 0.0f. */
                 trg_ramp->stop = 0.0f;
@@ -1340,7 +1340,7 @@ Empty_sequence_handler:
             /* Clamp color. */
             ClampColor(COLOR_FROM_RAMP(srcRamp), COLOR_FROM_RAMP(trgRamp), 0);
 
-            /* First stop greater then zero? */
+            /* First stop greater than zero? */
             if((trgCount == 0) && (srcRamp->stop > 0.0f)) {
                 /* Force the first stop to 0.0f. */
                 trgRamp->stop = 0.0f;
