@@ -62,7 +62,7 @@ Build with Command line
 -----------------------
 
 You can also build your project using the command line.
-Run the follwoing commands
+Run the following commands
 
 - cmake --preset windows-base
 - cmake --build --preset windows-base_dbg
