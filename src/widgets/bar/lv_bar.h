@@ -98,7 +98,7 @@ void lv_bar_set_start_value(lv_obj_t * obj, int32_t start_value, lv_anim_enable_
  * @param obj       pointer to the bar object
  * @param min       minimum value
  * @param max       maximum value
- * @note If min is greater than max, the drawing direction becomes to the oppsite direction.
+ * @note If min is greater than max, the drawing direction becomes to the opposite direction.
  */
 void lv_bar_set_range(lv_obj_t * obj, int32_t min, int32_t max);
 

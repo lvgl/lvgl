@@ -262,7 +262,7 @@ void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t alig
  * @param scale_x       horizontal zoom, 256 means 100%
  * @param scale_y       vertical zoom, 256 means 100%
  * @param pivot         pointer to the pivot point of the transformation
- * @param zoom_first    true: zoom first and rotate after that; else: opssoite order
+ * @param zoom_first    true: zoom first and rotate after that; else: opposite order
  */
 void lv_point_transform(lv_point_t * point, int32_t angle, int32_t scale_x, int32_t scale_y, const lv_point_t * pivot,
                         bool zoom_first);
@@ -275,7 +275,7 @@ void lv_point_transform(lv_point_t * point, int32_t angle, int32_t scale_x, int3
  * @param scale_x       horizontal zoom, 256 means 100%
  * @param scale_y       vertical zoom, 256 means 100%
  * @param pivot         pointer to the pivot point of the transformation
- * @param zoom_first    true: zoom first and rotate after that; else: opssoite order
+ * @param zoom_first    true: zoom first and rotate after that; else: opposite order
  */
 void lv_point_array_transform(lv_point_t * points, size_t count, int32_t angle, int32_t scale_x, int32_t scale_y,
                               const lv_point_t * pivot,
