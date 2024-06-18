@@ -1023,7 +1023,7 @@ JRESULT jd_prepare(
                 if(rc) return rc;
                 break;
 
-            case 0xDB:  /* DQT - Define Quaitizer Tables */
+            case 0xDB:  /* DQT - Define Quantizer Tables */
                 if(len > JD_SZBUF) return JDR_MEM2;
                 if(jd->infunc(jd, seg, len) != len) return JDR_INP;     /* Load segment data */
 
