@@ -247,7 +247,7 @@ static const void * ttf_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw
     lv_cache_entry_t * entry = lv_cache_acquire_or_create(tiny_ttf_cache, &search_key, (void *)font->dsc);
 
     if(entry == NULL) {
-        LV_LOG_ERROR("cache not allocated\n");
+        LV_LOG_ERROR("cache not allocated");
         return NULL;
     }
 
@@ -272,12 +272,12 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
     LV_UNUSED(data_size);
     LV_UNUSED(cache_size);
     if((path == NULL && data == NULL) || 0 >= font_size) {
-        LV_LOG_ERROR("tiny_ttf: invalid argument\n");
+        LV_LOG_ERROR("tiny_ttf: invalid argument");
         return NULL;
     }
     ttf_font_desc_t * dsc = lv_malloc_zeroed(sizeof(ttf_font_desc_t));
     if(dsc == NULL) {
-        LV_LOG_ERROR("tiny_ttf: out of memory\n");
+        LV_LOG_ERROR("tiny_ttf: out of memory");
         return NULL;
     }
 #if LV_TINY_TTF_FILE_SUPPORT != 0
@@ -295,7 +295,7 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
     }
     if(0 == stbtt_InitFont(&dsc->info, &dsc->stream, stbtt_GetFontOffsetForIndex(&dsc->stream, 0))) {
         lv_free(dsc);
-        LV_LOG_ERROR("tiny_ttf: init failed\n");
+        LV_LOG_ERROR("tiny_ttf: init failed");
         return NULL;
     }
 
@@ -303,7 +303,7 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
     dsc->stream = (const uint8_t *)data;
     if(0 == stbtt_InitFont(&dsc->info, dsc->stream, stbtt_GetFontOffsetForIndex(dsc->stream, 0))) {
         lv_free(dsc);
-        LV_LOG_ERROR("tiny_ttf: init failed\n");
+        LV_LOG_ERROR("tiny_ttf: init failed");
         return NULL;
     }
 #endif
@@ -311,7 +311,7 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
     lv_font_t * out_font = lv_malloc_zeroed(sizeof(lv_font_t));
     if(out_font == NULL) {
         lv_free(dsc);
-        LV_LOG_ERROR("tiny_ttf: out of memory\n");
+        LV_LOG_ERROR("tiny_ttf: out of memory");
         return NULL;
     }
     out_font->get_glyph_dsc = ttf_get_glyph_dsc_cb;
@@ -362,7 +362,7 @@ static bool tiny_ttf_cache_create_cb(tiny_ttf_cache_data_t * node, void * user_d
     h = y2 - y1 + 1;
     lv_draw_buf_t * draw_buf = lv_draw_buf_create_user(font_draw_buf_handlers, w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
     if(NULL == draw_buf) {
-        LV_LOG_ERROR("tiny_ttf: out of memory\n");
+        LV_LOG_ERROR("tiny_ttf: out of memory");
         return false;
     }
 

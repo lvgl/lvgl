@@ -1,9 +1,9 @@
-=============================
+============================
 ST7796 LCD Controller driver
-=============================
+============================
 
 Overview
--------------
+--------
 
 The `ST7796S <https://www.buydisplay.com/download/ic/ST7796S.pdf>`__ is a single-chip controller/driver for 262K-color, graphic type TFT-LCD. It consists of 960
 source lines and 480 gate lines driving circuits. The ST7796S is capable of connecting directly to an external

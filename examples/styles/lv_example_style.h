@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_example_style.h
  *
  */
@@ -40,6 +40,9 @@ void lv_example_style_12(void);
 void lv_example_style_13(void);
 void lv_example_style_14(void);
 void lv_example_style_15(void);
+void lv_example_style_16(void);
+void lv_example_style_17(void);
+void lv_example_style_18(void);
 
 /**********************
  *      MACROS

@@ -1060,6 +1060,12 @@ static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t *
     };
 
     lv_display_send_event(disp, LV_EVENT_FLUSH_START, &offset_area);
+
+    /*For backward compatibility support LV_COLOR_16_SWAP (from v8)*/
+#if defined(LV_COLOR_16_SWAP) && LV_COLOR_16_SWAP
+    lv_draw_sw_rgb565_swap(px_map, lv_area_get_size(&offset_area));
+#endif
+
     disp->flush_cb(disp, &offset_area, px_map);
     lv_display_send_event(disp, LV_EVENT_FLUSH_FINISH, &offset_area);
 

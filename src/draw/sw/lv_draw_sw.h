@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_draw_sw.h
  *
  */
@@ -72,7 +72,7 @@ void lv_draw_sw_deinit(void);
  * @param dsc           the draw descriptor
  * @param coords        the coordinates of the rectangle
  */
-void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
 
 /**
  * Draw border with SW render.

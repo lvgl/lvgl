@@ -27,6 +27,7 @@ extern "C" {
 #include "../misc/lv_log.h"
 #include "../misc/lv_style.h"
 #include "../misc/lv_timer.h"
+#include "../osal/lv_os.h"
 #include "../others/sysmon/lv_sysmon.h"
 #include "../stdlib/builtin/lv_tlsf.h"
 
@@ -193,10 +194,6 @@ typedef struct _lv_global_t {
     lv_style_t fe_list_button_style;
 #endif
 
-#if LV_USE_PERF_MONITOR
-    lv_sysmon_backend_data_t sysmon_perf;
-#endif
-
 #if LV_USE_MEM_MONITOR
     lv_sysmon_backend_data_t sysmon_mem;
 #endif
@@ -212,6 +209,10 @@ typedef struct _lv_global_t {
 
 #if LV_USE_NUTTX
     struct _lv_nuttx_ctx_t * nuttx_ctx;
+#endif
+
+#if LV_USE_OS != LV_OS_NONE
+    lv_mutex_t lv_general_mutex;
 #endif
 
     void * user_data;

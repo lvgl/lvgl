@@ -451,6 +451,8 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     scale->custom_label_cnt = 0U;
     scale->txt_src = NULL;
 
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+
     LV_TRACE_OBJ_CREATE("finished");
 }
 

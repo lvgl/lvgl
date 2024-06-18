@@ -203,6 +203,12 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     LV_UNUSED(draw_unit);
 
+    /* Return if target buffer format is not supported. */
+    const lv_draw_dsc_base_t * base_dsc = task->draw_dsc;
+    if(!lv_vg_lite_is_dest_cf_supported(base_dsc->layer->color_format)) {
+        return -1;
+    }
+
     switch(task->type) {
         case LV_DRAW_TASK_TYPE_LABEL:
         case LV_DRAW_TASK_TYPE_FILL:

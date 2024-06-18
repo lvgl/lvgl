@@ -67,6 +67,7 @@ struct _lv_freetype_cache_node_t {
     uint32_t ref_size;                  /**< Reference size for calculating outline glyph's real size.*/
 
     FT_Face face;
+    lv_mutex_t face_lock;
 
     /*glyph cache*/
     lv_cache_t * glyph_cache;

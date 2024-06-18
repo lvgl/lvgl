@@ -399,7 +399,9 @@ static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * 
     src_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
 
     /* Pattern matrix */
-    vg_lite_matrix_t * vgmatrix = vglite_get_matrix();
+    vg_lite_matrix_t vgmatrix;
+    vg_lite_identity(&vgmatrix);
+    vg_lite_translate((vg_lite_float_t)dsc->image_area.x1, (vg_lite_float_t)dsc->image_area.y1, &vgmatrix);
 
     /* Blend mode */
     vg_lite_blend_t vgblend = vglite_get_blend_mode(dsc->blend_mode);
@@ -412,7 +414,7 @@ static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * 
 
     /* Draw Pattern */
     VGLITE_CHECK_ERROR(vg_lite_draw_pattern(dst_vgbuf, &path, VG_LITE_FILL_NON_ZERO, &path_matrix,
-                                            src_vgbuf, vgmatrix, vgblend, VG_LITE_PATTERN_REPEAT,
+                                            src_vgbuf, &vgmatrix, vgblend, VG_LITE_PATTERN_REPEAT,
                                             0, vgcol, filter));
 }
 

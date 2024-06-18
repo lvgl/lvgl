@@ -330,7 +330,104 @@
     #endif
 #endif
 #if LV_USE_DRAW_SW == 1
-    /* Set the number of draw unit.
+
+	/*
+	 * Selectively disable color format support in order to reduce code size.
+	 * NOTE: some features use certain color formats internally, e.g.
+	 * - gradients use RGB888
+	 * - bitmaps with transparency may use ARGB8888
+	 */
+
+	#ifndef LV_DRAW_SW_SUPPORT_RGB565
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565
+	            #define LV_DRAW_SW_SUPPORT_RGB565 CONFIG_LV_DRAW_SW_SUPPORT_RGB565
+	        #else
+	            #define LV_DRAW_SW_SUPPORT_RGB565 0
+	        #endif
+	    #else
+	        #define LV_DRAW_SW_SUPPORT_RGB565		1
+	    #endif
+	#endif
+	#ifndef LV_DRAW_SW_SUPPORT_RGB565A8
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB565A8
+	            #define LV_DRAW_SW_SUPPORT_RGB565A8 CONFIG_LV_DRAW_SW_SUPPORT_RGB565A8
+	        #else
+	            #define LV_DRAW_SW_SUPPORT_RGB565A8 0
+	        #endif
+	    #else
+	        #define LV_DRAW_SW_SUPPORT_RGB565A8		1
+	    #endif
+	#endif
+	#ifndef LV_DRAW_SW_SUPPORT_RGB888
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_RGB888
+	            #define LV_DRAW_SW_SUPPORT_RGB888 CONFIG_LV_DRAW_SW_SUPPORT_RGB888
+	        #else
+	            #define LV_DRAW_SW_SUPPORT_RGB888 0
+	        #endif
+	    #else
+	        #define LV_DRAW_SW_SUPPORT_RGB888		1
+	    #endif
+	#endif
+	#ifndef LV_DRAW_SW_SUPPORT_XRGB8888
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_XRGB8888
+	            #define LV_DRAW_SW_SUPPORT_XRGB8888 CONFIG_LV_DRAW_SW_SUPPORT_XRGB8888
+	        #else
+	            #define LV_DRAW_SW_SUPPORT_XRGB8888 0
+	        #endif
+	    #else
+	        #define LV_DRAW_SW_SUPPORT_XRGB8888		1
+	    #endif
+	#endif
+	#ifndef LV_DRAW_SW_SUPPORT_ARGB8888
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_ARGB8888
+	            #define LV_DRAW_SW_SUPPORT_ARGB8888 CONFIG_LV_DRAW_SW_SUPPORT_ARGB8888
+	        #else
+	            #define LV_DRAW_SW_SUPPORT_ARGB8888 0
+	        #endif
+	    #else
+	        #define LV_DRAW_SW_SUPPORT_ARGB8888		1
+	    #endif
+	#endif
+	#ifndef LV_DRAW_SW_SUPPORT_L8
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_L8
+	            #define LV_DRAW_SW_SUPPORT_L8 CONFIG_LV_DRAW_SW_SUPPORT_L8
+	        #else
+	            #define LV_DRAW_SW_SUPPORT_L8 0
+	        #endif
+	    #else
+	        #define LV_DRAW_SW_SUPPORT_L8			1
+	    #endif
+	#endif
+	#ifndef LV_DRAW_SW_SUPPORT_AL88
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_AL88
+	            #define LV_DRAW_SW_SUPPORT_AL88 CONFIG_LV_DRAW_SW_SUPPORT_AL88
+	        #else
+	            #define LV_DRAW_SW_SUPPORT_AL88 0
+	        #endif
+	    #else
+	        #define LV_DRAW_SW_SUPPORT_AL88			1
+	    #endif
+	#endif
+	#ifndef LV_DRAW_SW_SUPPORT_A8
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_A8
+	            #define LV_DRAW_SW_SUPPORT_A8 CONFIG_LV_DRAW_SW_SUPPORT_A8
+	        #else
+	            #define LV_DRAW_SW_SUPPORT_A8 0
+	        #endif
+	    #else
+	        #define LV_DRAW_SW_SUPPORT_A8			1
+	    #endif
+	#endif
+
+	/* Set the number of draw unit.
      * > 1 requires an operating system enabled in `LV_USE_OS`
      * > 1 means multiply threads will render the screen in parallel */
     #ifndef LV_DRAW_SW_DRAW_UNIT_CNT
@@ -417,6 +514,15 @@
             #else
                 #define  LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
             #endif
+        #endif
+    #endif
+
+    /* Enable drawing complex gradients in software: linear at an angle, radial or conical */
+    #ifndef LV_USE_DRAW_SW_COMPLEX_GRADIENTS
+        #ifdef CONFIG_LV_USE_DRAW_SW_COMPLEX_GRADIENTS
+            #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS CONFIG_LV_USE_DRAW_SW_COMPLEX_GRADIENTS
+        #else
+            #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS    0
         #endif
     #endif
 #endif
@@ -936,12 +1042,30 @@
     #endif
 #endif
 
-/* Use lvgl builtin method for obj ID */
-#ifndef LV_USE_OBJ_ID_BUILTIN
-    #ifdef CONFIG_LV_USE_OBJ_ID_BUILTIN
-        #define LV_USE_OBJ_ID_BUILTIN CONFIG_LV_USE_OBJ_ID_BUILTIN
+/* Automatically assign an ID when obj is created */
+#ifndef LV_OBJ_ID_AUTO_ASSIGN
+    #ifdef CONFIG_LV_OBJ_ID_AUTO_ASSIGN
+        #define LV_OBJ_ID_AUTO_ASSIGN CONFIG_LV_OBJ_ID_AUTO_ASSIGN
     #else
-        #define LV_USE_OBJ_ID_BUILTIN   0
+        #define LV_OBJ_ID_AUTO_ASSIGN   LV_USE_OBJ_ID
+    #endif
+#endif
+
+/*Use the builtin obj ID handler functions:
+* - lv_obj_assign_id:       Called when a widget is created. Use a separate counter for each widget class as an ID.
+* - lv_obj_id_compare:      Compare the ID to decide if it matches with a requested value.
+* - lv_obj_stringify_id:    Return e.g. "button3"
+* - lv_obj_free_id:         Does nothing, as there is no memory allocation  for the ID.
+* When disabled these functions needs to be implemented by the user.*/
+#ifndef LV_USE_OBJ_ID_BUILTIN
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_OBJ_ID_BUILTIN
+            #define LV_USE_OBJ_ID_BUILTIN CONFIG_LV_USE_OBJ_ID_BUILTIN
+        #else
+            #define LV_USE_OBJ_ID_BUILTIN 0
+        #endif
+    #else
+        #define LV_USE_OBJ_ID_BUILTIN   1
     #endif
 #endif
 
@@ -1796,6 +1920,14 @@
         #endif
     #else
         #define LV_USE_LIST       1
+    #endif
+#endif
+
+#ifndef LV_USE_LOTTIE
+    #ifdef CONFIG_LV_USE_LOTTIE
+        #define LV_USE_LOTTIE CONFIG_LV_USE_LOTTIE
+    #else
+        #define LV_USE_LOTTIE     0  /*Requires: lv_canvas, thorvg */
     #endif
 #endif
 
@@ -3156,12 +3288,43 @@
     #endif
 #endif
 
+/*Driver for Renesas GLCD*/
+#ifndef LV_USE_RENESAS_GLCDC
+    #ifdef CONFIG_LV_USE_RENESAS_GLCDC
+        #define LV_USE_RENESAS_GLCDC CONFIG_LV_USE_RENESAS_GLCDC
+    #else
+        #define LV_USE_RENESAS_GLCDC    0
+    #endif
+#endif
+
 /* LVGL Windows backend */
 #ifndef LV_USE_WINDOWS
     #ifdef CONFIG_LV_USE_WINDOWS
         #define LV_USE_WINDOWS CONFIG_LV_USE_WINDOWS
     #else
         #define LV_USE_WINDOWS    0
+    #endif
+#endif
+
+/* Use OpenGL to open window on PC and handle mouse and keyboard */
+#ifndef LV_USE_OPENGLES
+    #ifdef CONFIG_LV_USE_OPENGLES
+        #define LV_USE_OPENGLES CONFIG_LV_USE_OPENGLES
+    #else
+        #define LV_USE_OPENGLES   0
+    #endif
+#endif
+#if LV_USE_OPENGLES
+    #ifndef LV_USE_OPENGLES_DEBUG
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_OPENGLES_DEBUG
+                #define LV_USE_OPENGLES_DEBUG CONFIG_LV_USE_OPENGLES_DEBUG
+            #else
+                #define LV_USE_OPENGLES_DEBUG 0
+            #endif
+        #else
+            #define LV_USE_OPENGLES_DEBUG        1    /* Enable or disable debug for opengles */
+        #endif
     #endif
 #endif
 
@@ -3321,6 +3484,7 @@
         #define LV_USE_DEMO_VECTOR_GRAPHIC  0
     #endif
 #endif
+
 
 
 /*----------------------------------

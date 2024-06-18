@@ -368,12 +368,14 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
     }
 
     node->face = face;
+    lv_mutex_init(&node->face_lock);
 
     return true;
 }
 static void cache_node_cache_free_cb(lv_freetype_cache_node_t * node, void * user_data)
 {
     FT_Done_Face(node->face);
+    lv_mutex_delete(&node->face_lock);
 
     if(node->glyph_cache) {
         lv_cache_destroy(node->glyph_cache, user_data);

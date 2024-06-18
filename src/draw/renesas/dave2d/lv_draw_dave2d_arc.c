@@ -40,9 +40,7 @@ void lv_draw_dave2d_arc(lv_draw_dave2d_unit_t * u, const lv_draw_arc_dsc_t * dsc
 #if LV_USE_OS
     lv_result_t  status;
     status = lv_mutex_lock(u->pd2Mutex);
-    if(LV_RESULT_OK != status) {
-        __BKPT(0);
-    }
+    LV_ASSERT(LV_RESULT_OK == status);
 #endif
 
 #if D2_RENDER_EACH_OPERATION
@@ -60,9 +58,7 @@ void lv_draw_dave2d_arc(lv_draw_dave2d_unit_t * u, const lv_draw_arc_dsc_t * dsc
 
     result = d2_cliprect(u->d2_handle, (d2_border)clipped_area.x1, (d2_border)clipped_area.y1, (d2_border)clipped_area.x2,
                          (d2_border)clipped_area.y2);
-    if(D2_OK != result) {
-        __BKPT(0);
-    }
+    LV_ASSERT(D2_OK == result);
 
     if(360 <= LV_ABS(dsc->start_angle - dsc->end_angle)) {
         d2_rendercircle(u->d2_handle,
@@ -145,9 +141,7 @@ void lv_draw_dave2d_arc(lv_draw_dave2d_unit_t * u, const lv_draw_arc_dsc_t * dsc
                                     (d2_s32)(sin_end << 1),
                                     -(d2_s32)(cos_end << 1),
                                     flags);
-            if(D2_OK != result) {
-                __BKPT(0);
-            }
+            LV_ASSERT(D2_OK == result);
 
             if(dsc->rounded) {
                 lv_point_t start_coord;
@@ -185,9 +179,7 @@ void lv_draw_dave2d_arc(lv_draw_dave2d_unit_t * u, const lv_draw_arc_dsc_t * dsc
 
 #if LV_USE_OS
     status = lv_mutex_unlock(u->pd2Mutex);
-    if(LV_RESULT_OK != status) {
-        __BKPT(0);
-    }
+    LV_ASSERT(LV_RESULT_OK == status);
 #endif
 }
 

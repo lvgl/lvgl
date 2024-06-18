@@ -62,6 +62,7 @@ extern "C" {
 #include "src/widgets/led/lv_led.h"
 #include "src/widgets/line/lv_line.h"
 #include "src/widgets/list/lv_list.h"
+#include "src/widgets/lottie/lv_lottie.h"
 #include "src/widgets/menu/lv_menu.h"
 #include "src/widgets/msgbox/lv_msgbox.h"
 #include "src/widgets/roller/lv_roller.h"

@@ -94,6 +94,30 @@ void test_obj_property_set_get_should_match(void)
 #endif
 }
 
+void test_obj_property_style_selector(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    /* Style property with default selector(0) should work */
+    prop.id = LV_STYLE_X;
+    prop.num = 0xaabb;  /* `num` shares same memory with `prop.style.value.num` */
+    /* selector is initialed to zero when prop is defined. */
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_UINT32(0xaabb, lv_obj_get_style_x(obj, 0));
+    TEST_ASSERT_EQUAL_UINT32(0xaabb, lv_obj_get_style_property(obj, LV_STYLE_X, 0).num);
+
+    lv_style_selector_t selector = LV_PART_MAIN | LV_STATE_PRESSED;
+    prop.id = LV_STYLE_X;
+    prop.num = 0x1122;
+    prop.selector = selector;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_UINT32(0x1122, lv_obj_get_style_x(obj, selector));
+    TEST_ASSERT_EQUAL_UINT32(0x1122, lv_obj_get_style_property(obj, LV_STYLE_X, selector).num);
+#endif
+}
+
 void test_obj_property_flag(void)
 {
 #if LV_USE_OBJ_PROPERTY

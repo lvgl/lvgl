@@ -1,5 +1,5 @@
 /**
- * @file lv_linux_fb_dev_h
+ * @file lv_tft_espi.h
  *
  */
 

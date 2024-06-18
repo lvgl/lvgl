@@ -27,7 +27,8 @@ If you would rather try LVGL on your own project follow these steps:
 
 -  `Download <https://github.com/lvgl/lvgl/archive/master.zip>`__ or
    clone the library from GitHub with ``git clone https://github.com/lvgl/lvgl.git``.
--  Copy the ``lvgl`` folder into your project.
+-  Copy the ``lvgl`` folder into your project. If you wish you can add only ``lvgl/lvgl.h``, ``lvgl/lv_version.h``, and ``lvgl/src``
+   for LVGL itself, and ``lvgl/examples`` and ``lvgl/demos`` for the examples and demos respectively.
 -  Copy ``lvgl/lv_conf_template.h`` as ``lv_conf.h`` next to the
    ``lvgl`` folder, change the first ``#if 0`` to ``1`` to enable the
    file's content and set the :c:macro:`LV_COLOR_DEPTH` defines.
@@ -43,9 +44,10 @@ If you would rather try LVGL on your own project follow these steps:
 
    lv_display_t *display = lv_display_create(MY_DISP_HOR_RES, MY_DISP_VER_RES);
 
--  Create a draw buffer: LVGL will render the graphics here first, and
-   send the rendered image to the display. The buffer size can be set
-   freely but 1/10 screen size is a good starting point.
+-  Create a draw buffer: LVGL supports multiple buffering methods. Here you
+   can see how to set up partial buffering
+   (that is render the screen and the changed areas in a smaller buffer).
+   The buffer size can be set freely but 1/10 screen size is a good starting point.
 
 .. code:: c
 
@@ -79,11 +81,9 @@ If you would rather try LVGL on your own project follow these steps:
 
 .. code:: c
 
-   static lv_indev_t indev_drv;           /*Descriptor of a input device driver*/
-   lv_indev_drv_init(&indev_drv);             /*Basic initialization*/
-   indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
-   indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
-   lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
+   lv_indev_t * indev = lv_indev_create();           /*Create an input device*/
+   lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);  /*Touch pad is a pointer-like device*/
+   lv_ondev_set_read_cb(indev, my_touchpad_read);    /*Set your driver function*/
 
    void my_touchpad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
    {

@@ -12,3 +12,4 @@ Display
     st7735
     st7789
     st7796
+    renesas_glcdc

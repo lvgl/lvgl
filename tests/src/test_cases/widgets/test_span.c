@@ -309,4 +309,51 @@ void test_spangroup_newlines(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_06.png");
 }
 
+#if LV_USE_FREETYPE && __WORDSIZE == 64
+
+void test_spangroup_chinese_break_line(void)
+{
+    lv_font_t * font = lv_freetype_font_create("src/test_files/fonts/noto/NotoSansSC-Regular.ttf",
+                                               LV_FREETYPE_FONT_RENDER_MODE_BITMAP, 24, LV_FREETYPE_FONT_STYLE_NORMAL);
+
+    if(!font) {
+        LV_LOG_ERROR("freetype font create failed.");
+        TEST_FAIL();
+    }
+
+    active_screen = lv_screen_active();
+    spangroup = lv_spangroup_create(active_screen);
+    lv_obj_set_size(spangroup, LV_PCT(100), LV_PCT(100));
+    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
+
+    lv_obj_set_style_text_font(spangroup, font, 0);
+    lv_obj_set_style_border_width(spangroup, 2, 0);
+    lv_obj_set_width(spangroup, 250);
+
+    lv_span_t * span1 = lv_spangroup_new_span(spangroup);
+    lv_span_set_text(span1, "八百标兵奔北坡");
+    lv_span_t * span2 = lv_spangroup_new_span(spangroup);
+    lv_span_set_text(span2, "炮兵并排北边跑");
+    lv_style_set_text_color(&span2->style, lv_palette_main(LV_PALETTE_RED));
+    lv_span_t * span3 = lv_spangroup_new_span(spangroup);
+    lv_span_set_text(span3, "中英文测试。The quick brown fox jumps over a lazy dog. ");
+    lv_style_set_text_color(&span3->style, lv_palette_main(LV_PALETTE_BLUE));
+    lv_span_t * span4 = lv_spangroup_new_span(spangroup);
+    lv_span_set_text(span4, "abcdefghijklmn中英文测试");
+    lv_style_set_text_color(&span4->style, lv_palette_main(LV_PALETTE_GREEN));
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_07.png");
+
+    lv_obj_set_style_text_font(spangroup, LV_FONT_DEFAULT, 0);
+    lv_freetype_font_delete(font);
+}
+
+#else
+
+void test_spangroup_chinese_break_line(void)
+{
+}
+
+#endif
+
 #endif

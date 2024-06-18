@@ -182,7 +182,7 @@ typedef struct _lv_sysmon_perf_info_t lv_sysmon_perf_info_t;
 #define LV_FORMAT_ATTRIBUTE(fmtstr, vararg)
 #elif defined(__GNUC__) && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 4) || __GNUC__ > 4)
 #define LV_FORMAT_ATTRIBUTE(fmtstr, vararg) __attribute__((format(gnu_printf, fmtstr, vararg)))
-#elif (defined(__clang__) || defined(__GNUC__) || defined(__GNUG__))
+#elif (defined(__clang__) || defined(__GNUC__) || defined(__GNUG__) || defined(__IAR_SYSTEMS_ICC__))
 #define LV_FORMAT_ATTRIBUTE(fmtstr, vararg) __attribute__((format(printf, fmtstr, vararg)))
 #else
 #define LV_FORMAT_ATTRIBUTE(fmtstr, vararg)

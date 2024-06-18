@@ -379,7 +379,7 @@ void * lv_draw_buf_goto_xy(const lv_draw_buf_t * buf, uint32_t x, uint32_t y)
 
     if(x == 0) return data;
 
-    return data + x * lv_color_format_get_size(buf->header.cf);
+    return data + x * lv_color_format_get_bpp(buf->header.cf) / 8;
 }
 
 lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride)
@@ -392,6 +392,10 @@ lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride)
     const lv_image_header_t * header = &src->header;
     uint32_t w = header->w;
     uint32_t h = header->h;
+
+    if(!lv_draw_buf_has_flag(src, LV_IMAGE_FLAGS_MODIFIABLE)) {
+        return LV_RESULT_INVALID;
+    }
 
     /*Use global stride*/
     if(stride == 0) stride = lv_draw_buf_width_to_stride(w, header->cf);
@@ -529,8 +533,8 @@ void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32
         return;
     }
 
-    uint8_t * buf = (uint8_t *)draw_buf->data;
-    lv_memcpy(&buf[index * sizeof(color)], &color, sizeof(color));
+    lv_color32_t * palette = (lv_color32_t *)draw_buf->data;
+    palette[index] = color;
 }
 
 /**********************

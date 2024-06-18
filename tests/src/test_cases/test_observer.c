@@ -95,26 +95,26 @@ void test_observer_string(void)
 
     /*Clip long text*/
     lv_subject_copy_string(&subject, "text to be clipped to 32 chars.this should be clipped");
-    TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars", lv_subject_get_string(&subject));
+    TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars.", lv_subject_get_string(&subject));
     TEST_ASSERT_EQUAL_STRING("how are you?", lv_subject_get_previous_string(&subject));
 
     /*Check if the previous string is clipped correctly*/
     lv_subject_copy_string(&subject, "a");
     TEST_ASSERT_EQUAL_STRING("a", lv_subject_get_string(&subject));
-    TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars", lv_subject_get_previous_string(&subject));
+    TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars.", lv_subject_get_previous_string(&subject));
 
     /*Ignore incorrect types*/
     lv_subject_set_pointer(&subject, NULL);
     TEST_ASSERT_EQUAL_STRING("a", lv_subject_get_string(&subject));
-    TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars", lv_subject_get_previous_string(&subject));
+    TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars.", lv_subject_get_previous_string(&subject));
 
     lv_subject_set_color(&subject, lv_color_black());
     TEST_ASSERT_EQUAL_STRING("a", lv_subject_get_string(&subject));
-    TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars", lv_subject_get_previous_string(&subject));
+    TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars.", lv_subject_get_previous_string(&subject));
 
     lv_subject_set_int(&subject, 10);
     TEST_ASSERT_EQUAL_STRING("a", lv_subject_get_string(&subject));
-    TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars", lv_subject_get_previous_string(&subject));
+    TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars.", lv_subject_get_previous_string(&subject));
 }
 
 void test_observer_pointer(void)

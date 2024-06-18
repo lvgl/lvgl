@@ -20,9 +20,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
 #if LV_USE_OS
     lv_result_t  status;
     status = lv_mutex_lock(u->pd2Mutex);
-    if(LV_RESULT_OK != status) {
-        __BKPT(0);
-    }
+    LV_ASSERT(LV_RESULT_OK == status);
 #endif
 
     lv_area_copy(&coordinates, coords);
@@ -63,7 +61,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
 
             if(a1 < a2) {
                 /* TODO */
-                __BKPT(0);
+                LV_ASSERT(0);
                 y0 = 0.0f;//silence the compiler warning
                 y3 = 0.0f;
 
@@ -81,7 +79,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
         }
         else if(LV_GRAD_DIR_HOR == dsc->grad.dir) {
             /* TODO */
-            __BKPT(0);
+            LV_ASSERT(0);
 
             float x1;
             float x2;
@@ -99,7 +97,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
 
             if(a1 < a2) {
                 /* TODO */
-                __BKPT(0);
+                LV_ASSERT(0);
                 x0 = 0.0f;//silence the compiler warning
                 x3 = 0.0f;
 
@@ -153,9 +151,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
                                      (d2_point) D2_FIX4(arc_centre.y),
                                      (d2_width) D2_FIX4(radius),
                                      (d2_width) D2_FIX4(0));
-            if(D2_OK != result) {
-                __BKPT(0);
-            }
+            LV_ASSERT(D2_OK == result);
         }
         else {
 
@@ -185,9 +181,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
                                         (d2_s32)  D2_FIX16((int16_t) -1),//( 270 Degrees
                                         (d2_s32) D2_FIX16(0),
                                         flags);
-                if(D2_OK != result) {
-                    __BKPT(0);
-                }
+                LV_ASSERT(D2_OK == result);
             }
 
             arc_centre.x = coordinates.x2 - radius;
@@ -212,9 +206,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
                                         (d2_s32)  D2_FIX16(0),// 0 degrees
                                         (d2_s32) D2_FIX16(-1),
                                         flags);
-                if(D2_OK != result) {
-                    __BKPT(0);
-                }
+                LV_ASSERT(D2_OK == result);
             }
 
             arc_centre.x = coordinates.x2 - radius;
@@ -239,9 +231,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
                                         (d2_s32)  D2_FIX16(1),// 90 degrees
                                         (d2_s32) D2_FIX16(0),
                                         flags);
-                if(D2_OK != result) {
-                    __BKPT(0);
-                }
+                LV_ASSERT(D2_OK == result);
             }
 
             arc_centre.x = coordinates.x1 + radius;
@@ -266,9 +256,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
                                         (d2_s32)  D2_FIX16(0), //180 degrees
                                         (d2_s32) D2_FIX16(1),
                                         flags);
-                if(D2_OK != result) {
-                    __BKPT(0);
-                }
+                LV_ASSERT(D2_OK == result);
             }
 
             /* reset the clip rectangle */
@@ -280,27 +268,21 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
                                   (d2_width)D2_FIX4(coordinates.y1),
                                   (d2_width)D2_FIX4(lv_area_get_width(&coordinates) - (2 * radius)),
                                   (d2_width)D2_FIX4(lv_area_get_height(&coordinates)));
-            if(D2_OK != result) {
-                __BKPT(0);
-            }
+            LV_ASSERT(D2_OK == result);
 
             result = d2_renderbox(u->d2_handle,
                                   (d2_width)D2_FIX4(coordinates.x1),
                                   (d2_width)D2_FIX4(coordinates.y1 + radius),
                                   (d2_width)D2_FIX4(radius),
                                   (d2_width)D2_FIX4(lv_area_get_height(&coordinates) - (2 * radius)));
-            if(D2_OK != result) {
-                __BKPT(0);
-            }
+            LV_ASSERT(D2_OK == result);
 
             result = d2_renderbox(u->d2_handle,
                                   (d2_width)D2_FIX4(coordinates.x2 - radius),
                                   (d2_width)D2_FIX4(coordinates.y1 + radius),
                                   (d2_width)D2_FIX4(radius),
                                   (d2_width)D2_FIX4(lv_area_get_height(&coordinates) - (2 * radius)));
-            if(D2_OK != result) {
-                __BKPT(0);
-            }
+            LV_ASSERT(D2_OK == result);
         }
     }
 
@@ -319,9 +301,7 @@ void lv_draw_dave2d_fill(lv_draw_dave2d_unit_t * u, const lv_draw_fill_dsc_t * d
 
 #if LV_USE_OS
     status = lv_mutex_unlock(u->pd2Mutex);
-    if(LV_RESULT_OK != status) {
-        __BKPT(0);
-    }
+    LV_ASSERT(LV_RESULT_OK == status);
 #endif
 }
 

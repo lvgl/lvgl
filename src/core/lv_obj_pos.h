@@ -256,14 +256,14 @@ int32_t lv_obj_get_y(const lv_obj_t * obj);
 int32_t lv_obj_get_y2(const lv_obj_t * obj);
 
 /**
- * Get the actually set x coordinate of object, i.e. the offset form the set alignment
+ * Get the actually set x coordinate of object, i.e. the offset from the set alignment
  * @param obj       pointer to an object
  * @return          the set x coordinate
  */
 int32_t lv_obj_get_x_aligned(const lv_obj_t * obj);
 
 /**
- * Get the actually set y coordinate of object, i.e. the offset form the set alignment
+ * Get the actually set y coordinate of object, i.e. the offset from the set alignment
  * @param obj       pointer to an object
  * @return          the set y coordinate
  */

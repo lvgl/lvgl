@@ -33,8 +33,15 @@
 /*********************
  *      DEFINES
  *********************/
-//#define REF_IMGS_PATH "lvgl/tests/lv_test_ref_imgs/"
+
+#ifndef REF_IMGS_PATH
 #define REF_IMGS_PATH "ref_imgs/"
+#endif
+
+#ifndef REF_IMG_TOLERANCE
+#define REF_IMG_TOLERANCE 0
+#endif
+
 #define ERR_FILE_NOT_FOUND  -1
 #define ERR_PNG             -2
 
@@ -55,7 +62,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool screenhot_compare(const char * fn_ref, const char * mode, uint8_t tolerance);
+static bool screenshot_compare(const char * fn_ref, const char * mode, uint8_t tolerance);
 static int read_png_file(png_image_t * p, const char * file_name);
 static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name);
 static void png_release(png_image_t * p);
@@ -81,7 +88,7 @@ bool lv_test_assert_image_eq(const char * fn_ref)
     lv_obj_t * scr = lv_screen_active();
     lv_obj_invalidate(scr);
 
-    pass = screenhot_compare(fn_ref, "full refresh", 0);
+    pass = screenshot_compare(fn_ref, "full refresh", REF_IMG_TOLERANCE);
     if(!pass) return false;
 
     //Software has minor rounding errors when not the whole image is updated
@@ -100,7 +107,7 @@ bool lv_test_assert_image_eq(const char * fn_ref)
     //        lv_obj_invalidate_area(scr, &a);
     //    }
     //
-    //    pass = screenhot_compare(fn_ref, "vertical stripes", 32);
+    //    pass = screenshot_compare(fn_ref, "vertical stripes", 32);
     //    if(!pass) return false;
     //
     //
@@ -117,7 +124,7 @@ bool lv_test_assert_image_eq(const char * fn_ref)
     //        lv_obj_invalidate_area(scr, &a);
     //    }
     //
-    //    pass = screenhot_compare(fn_ref, "horizontal stripes", 32);
+    //    pass = screenshot_compare(fn_ref, "horizontal stripes", 32);
     //    if(!pass) return false;
 
     return true;
@@ -134,7 +141,7 @@ static uint8_t screen_buf_xrgb8888[800 * 480 * 4];
  * @param mode          arbitrary string to tell more about the compare
  * @return  true: test passed; false: test failed
  */
-static bool screenhot_compare(const char * fn_ref, const char * mode, uint8_t tolerance)
+static bool screenshot_compare(const char * fn_ref, const char * mode, uint8_t tolerance)
 {
 
     char fn_ref_full[256];
@@ -174,9 +181,9 @@ static bool screenhot_compare(const char * fn_ref, const char * mode, uint8_t to
             ptr_ref = &(row[x * 3]);
             ptr_act = screen_buf_tmp;
 
-            if(LV_ABS((int32_t) ptr_act[0] - ptr_ref[0]) > tolerance ||
-               LV_ABS((int32_t) ptr_act[1] - ptr_ref[1]) > tolerance ||
-               LV_ABS((int32_t) ptr_act[2] - ptr_ref[2]) > tolerance) {
+            if(LV_ABS((int32_t) ptr_act[0] - (int32_t) ptr_ref[0]) > tolerance ||
+               LV_ABS((int32_t) ptr_act[1] - (int32_t) ptr_ref[1]) > tolerance ||
+               LV_ABS((int32_t) ptr_act[2] - (int32_t) ptr_ref[2]) > tolerance) {
                 uint32_t act_px = (ptr_act[2] << 16) + (ptr_act[1] << 8) + (ptr_act[0] << 0);
                 uint32_t ref_px = 0;
                 memcpy(&ref_px, ptr_ref, 3);
@@ -185,8 +192,9 @@ static bool screenhot_compare(const char * fn_ref, const char * mode, uint8_t to
                             "  - Mode: %s\n"
                             "  - At x:%d, y:%d.\n"
                             "  - Expected: %X\n"
-                            "  - Actual:   %X",
-                            fn_ref_full, mode,  x, y, ref_px, act_px);
+                            "  - Actual:   %X\n"
+                            "  - Tolerance: %d",
+                            fn_ref_full, mode,  x, y, ref_px, act_px, tolerance);
                 fflush(stderr);
                 err = true;
                 break;
@@ -198,7 +206,7 @@ static bool screenhot_compare(const char * fn_ref, const char * mode, uint8_t to
 
     if(err) {
         char fn_ref_no_ext[128];
-        strcpy(fn_ref_no_ext, fn_ref);
+        lv_strlcpy(fn_ref_no_ext, fn_ref, sizeof(fn_ref_no_ext));
         fn_ref_no_ext[strlen(fn_ref_no_ext) - 4] = '\0';
 
         char fn_err_full[256];

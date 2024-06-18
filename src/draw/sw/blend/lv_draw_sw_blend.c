@@ -7,11 +7,21 @@
  *      INCLUDES
  *********************/
 #include "../lv_draw_sw.h"
-#include "lv_draw_sw_blend_to_l8.h"
-#include "lv_draw_sw_blend_to_al88.h"
-#include "lv_draw_sw_blend_to_rgb565.h"
-#include "lv_draw_sw_blend_to_argb8888.h"
-#include "lv_draw_sw_blend_to_rgb888.h"
+#if LV_DRAW_SW_SUPPORT_L8
+    #include "lv_draw_sw_blend_to_l8.h"
+#endif
+#if LV_DRAW_SW_SUPPORT_AL88
+    #include "lv_draw_sw_blend_to_al88.h"
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB565
+    #include "lv_draw_sw_blend_to_rgb565.h"
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888
+    #include "lv_draw_sw_blend_to_argb8888.h"
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB888
+    #include "lv_draw_sw_blend_to_rgb888.h"
+#endif
 
 #if LV_USE_DRAW_SW
 
@@ -76,21 +86,31 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
             case LV_COLOR_FORMAT_RGB565:
                 lv_draw_sw_blend_color_to_rgb565(&fill_dsc);
                 break;
+#if LV_DRAW_SW_SUPPORT_ARGB8888
             case LV_COLOR_FORMAT_ARGB8888:
                 lv_draw_sw_blend_color_to_argb8888(&fill_dsc);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB888
             case LV_COLOR_FORMAT_RGB888:
                 lv_draw_sw_blend_color_to_rgb888(&fill_dsc, 3);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_XRGB8888
             case LV_COLOR_FORMAT_XRGB8888:
                 lv_draw_sw_blend_color_to_rgb888(&fill_dsc, 4);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_L8
             case LV_COLOR_FORMAT_L8:
                 lv_draw_sw_blend_color_to_l8(&fill_dsc);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_AL88
             case LV_COLOR_FORMAT_AL88:
                 lv_draw_sw_blend_color_to_al88(&fill_dsc);
                 break;
+#endif
             default:
                 break;
         }
@@ -137,25 +157,37 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
                                                     blend_area.y1 - layer->buf_area.y1);
 
         switch(layer->color_format) {
+#if LV_DRAW_SW_SUPPORT_RGB565
             case LV_COLOR_FORMAT_RGB565:
             case LV_COLOR_FORMAT_RGB565A8:
                 lv_draw_sw_blend_image_to_rgb565(&image_dsc);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888
             case LV_COLOR_FORMAT_ARGB8888:
                 lv_draw_sw_blend_image_to_argb8888(&image_dsc);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB888
             case LV_COLOR_FORMAT_RGB888:
                 lv_draw_sw_blend_image_to_rgb888(&image_dsc, 3);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_XRGB8888
             case LV_COLOR_FORMAT_XRGB8888:
                 lv_draw_sw_blend_image_to_rgb888(&image_dsc, 4);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_L8
             case LV_COLOR_FORMAT_L8:
                 lv_draw_sw_blend_image_to_l8(&image_dsc);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_AL88
             case LV_COLOR_FORMAT_AL88:
                 lv_draw_sw_blend_image_to_al88(&image_dsc);
                 break;
+#endif
             default:
                 break;
         }
