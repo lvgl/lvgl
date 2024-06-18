@@ -185,7 +185,7 @@ static void glcdc_init(void)
     lv_memzero(fb_background, sizeof(fb_background));
 
 #ifdef _RENESAS_RA_
-    /* Initalize GLCDC driver */
+    /* Initialize GLCDC driver */
     uint8_t * p_fb = &fb_background[1][0];
     fsp_err_t err;
 
