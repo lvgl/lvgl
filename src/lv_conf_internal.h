@@ -3052,7 +3052,7 @@
                 #define LV_X11_DOUBLE_BUFFER 0
             #endif
         #else
-            #define LV_X11_DOUBLE_BUFFER       1  /*Use double buffers for endering*/
+            #define LV_X11_DOUBLE_BUFFER       1  /*Use double buffers for rendering*/
         #endif
     #endif
     /*select only 1 of the following render modes (LV_X11_RENDER_MODE_PARTIAL preferred!)*/
