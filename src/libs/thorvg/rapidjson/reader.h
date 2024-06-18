@@ -1002,7 +1002,7 @@ private:
 //!@endcond
 
         for (;;) {
-            // Scan and copy string before "\\\"" or < 0x20. This is an optional optimzation.
+            // Scan and copy string before "\\\"" or < 0x20. This is an optional optimization.
             if (!(parseFlags & kParseValidateEncodingFlag))
                 ScanCopyUnescapedString(is, os);
 
