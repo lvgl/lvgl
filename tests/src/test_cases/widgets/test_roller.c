@@ -235,12 +235,12 @@ void test_roller_with_overlay_and_bubble_events_enabled(void)
 //
 //void test_roller_release_handler_pointer_indev(void)
 //{
-//    /* Clic in the widget */
+//    /* Click in the widget */
 //    lv_test_mouse_click_at(roller_mouse->coords.x1 + 5, roller_mouse->coords.y1 + 5);
 //    /* Check which is the selected option */
 //    TEST_ASSERT_EQUAL(0, lv_roller_get_selected(roller_mouse));
 //
-//    /* Clic further down the roller */
+//    /* Click further down the roller */
 //    lv_test_mouse_click_at(roller_mouse->coords.x1 + 5, roller_mouse->coords.y1 + 100);
 //    /* Check which is the selected option */
 //    TEST_ASSERT_NOT_EQUAL(0, lv_roller_get_selected(roller_mouse));
