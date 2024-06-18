@@ -135,7 +135,7 @@ if(CONFIG_LV_USE_DEMO_WIDGETS)
     PATTERN "*.h")
 endif()
 
-
+set(LV_CONF_BUILD_DISABLE_EXAMPLES ON)
 configure_file("${LVGL_ROOT_DIR}/lvgl.pc.in" lvgl.pc @ONLY)
 configure_file("${LVGL_ROOT_DIR}/lv_version.h.in" lv_version.h @ONLY)
 
