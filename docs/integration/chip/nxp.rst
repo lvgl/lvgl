@@ -351,7 +351,7 @@ Supported draw tasks are available in "src/draw/nxp/pxp/lv_draw_vglite.c":
             break;
     }
 
-All the below opration can be done in addition with optional opacity.
+All the below operation can be done in addition with optional opacity.
 - Fill area with color (w/ radius or gradient).
 - Blit source image (any format from `_vglite_src_cf_supported()`) over
   destination (any format from `_vglite_dest_cf_supported()`).
