@@ -76,8 +76,8 @@ void lv_delay_ms(uint32_t ms);
 void lv_tick_set_cb(lv_tick_get_cb_t cb);
 
 /**
- * Set a custom callback for 'lv_dalay_ms'
- * @param cb        call this callback in 'lv_dalay_ms'
+ * Set a custom callback for 'lv_delay_ms'
+ * @param cb        call this callback in 'lv_delay_ms'
  */
 void lv_delay_set_cb(lv_delay_cb_t cb);
 
