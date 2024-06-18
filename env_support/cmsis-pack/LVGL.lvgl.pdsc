@@ -1814,7 +1814,7 @@
 
               <RTE_Components_h>
 
-/*! \brief enable demo:bencharmk */
+/*! \brief enable demo:benchmark */
 #define LV_USE_DEMO_BENCHMARK           1
               </RTE_Components_h>
 
