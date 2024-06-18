@@ -520,7 +520,7 @@ struct LottieGroup : LottieObject
     Scene* scene = nullptr;               //tvg render data
     Array<LottieObject*> children;
 
-    bool reqFragment = false;   //requirment to fragment the render context
+    bool reqFragment = false;   //requirement to fragment the render context
     bool buildDone = false;     //completed in building the composition.
     bool allowMerge = true;     //if this group is consisted of simple (transformed) shapes.
     bool trimpath = false;      //this group has a trimpath.
