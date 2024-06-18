@@ -1332,7 +1332,7 @@ static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const 
     const bool is_last_tick = scale->total_tick_count == tick_idx;
     const int32_t tick_width = is_major_tick ? major_tick_width : minor_tick_width;
 
-    /* Exit early if tick_idx is not the first nor last tick on the main line */
+    /* Exit early if tick_idx is neither the first nor last tick on the main line */
     if(((!is_last_tick) && (!is_first_tick))
        /* Exit early if scale mode is round. It doesn't support main line compensation */
        || ((LV_SCALE_MODE_ROUND_INNER == scale->mode) || (LV_SCALE_MODE_ROUND_OUTER == scale->mode))) {
