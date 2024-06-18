@@ -278,7 +278,7 @@ struct _LodePNGDecompressSettings {
 
     /*Maximum decompressed size, beyond this the decoder may (and is encouraged to) stop decoding,
     return an error, output a data size > max_output_size and all the data up to that point. This is
-    not hard limit nor a guarantee, but can prevent excessive memory usage. This setting is
+    neither a hard limit nor a guarantee, but can prevent excessive memory usage. This setting is
     ignored by the PNG decoder, but is used by the deflate/zlib decoder and can be used by custom ones.
     Set to 0 to impose no limit (the default).*/
     size_t max_output_size;
