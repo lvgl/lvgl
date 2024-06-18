@@ -205,7 +205,7 @@ Property set functions looks like this:
 
    static lv_style_t style_btn_red;
    lv_style_init(&style_btn_red);
-   lv_style_set_bg_color(&style_btn_red, lv_plaette_main(LV_PALETTE_RED));
+   lv_style_set_bg_color(&style_btn_red, lv_palette_main(LV_PALETTE_RED));
    lv_style_set_bg_opa(&style_btn_red, LV_OPA_COVER);
 
 To remove a property use:
