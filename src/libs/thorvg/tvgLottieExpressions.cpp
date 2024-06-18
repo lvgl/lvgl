@@ -872,7 +872,7 @@ static jerry_value_t _uniformPath(const jerry_call_info_t* info, const jerry_val
     auto pathset = static_cast<LottiePathSet*>(jerry_object_get_native_ptr(info->function, nullptr));
 
     /* TODO: ThorVG prebuilds the path data for performance.
-       It acutally need to constructs the Array<Point> for points, inTangents, outTangents and then return here... */
+       It actually need to constructs the Array<Point> for points, inTangents, outTangents and then return here... */
     auto obj = jerry_object();
     jerry_object_set_native_ptr(obj, nullptr, pathset);
     return obj;
