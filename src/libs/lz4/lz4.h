@@ -592,7 +592,7 @@ LZ4LIB_STATIC_API int LZ4_compress_fast_extState_fastReset (void* state, const c
  *  Alternatively, the provided dictionaryStream may be NULL,
  *  in which case any existing dictionary stream is unset.
  *
- *  If a dictionary is provided, it replaces any pre-existing stream history.
+ *  If a dictionary is provided, it replaces any preexisting stream history.
  *  The dictionary contents are the only history that can be referenced and
  *  logically immediately precede the data compressed in the first subsequent
  *  compression call.
