@@ -60,7 +60,7 @@ LVGL のシステム要件は、RAM 32KB、Flash
 
 **UIエディタ**\  SquareLine Studio
 は、LVGL用のプロフェッショナル＆リーズナブルなドラッグ＆ドロップ型のUIエディターです。
-Windows、Linux、MacOS
+Windows、Linux、macOS
 で動作し、ウェブサイトへの登録なしで試すことができます。
 
 **サービス**\  LVGL LLC
