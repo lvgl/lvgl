@@ -18,7 +18,7 @@ import config_builder
 import add_translation
 
 # due to the modifications that take place to the documentation files
-# when the documentaation builds it is better to copy the source files to a
+# when the documentation builds it is better to copy the source files to a
 # temporary folder and modify the copies. Not setting it up this way makes it
 # a real headache when making alterations that need to be committed as the
 # alterations trigger the files as changed.
