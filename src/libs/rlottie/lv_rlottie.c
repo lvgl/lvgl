@@ -131,18 +131,18 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
     rlottie->scanline_width = create_info.width * LV_ARGB32 / 8;
 
-    size_t allocaled_buf_size = (create_info.width * create_info.height * LV_ARGB32 / 8);
-    rlottie->allocated_buf = lv_malloc(allocaled_buf_size);
+    size_t allocated_buf_size = (create_info.width * create_info.height * LV_ARGB32 / 8);
+    rlottie->allocated_buf = lv_malloc(allocated_buf_size);
     if(rlottie->allocated_buf != NULL) {
-        rlottie->allocated_buffer_size = allocaled_buf_size;
-        memset(rlottie->allocated_buf, 0, allocaled_buf_size);
+        rlottie->allocated_buffer_size = allocated_buf_size;
+        memset(rlottie->allocated_buf, 0, allocated_buf_size);
     }
 
     rlottie->imgdsc.header.cf = LV_COLOR_FORMAT_ARGB8888;
     rlottie->imgdsc.header.h = create_info.height;
     rlottie->imgdsc.header.w = create_info.width;
     rlottie->imgdsc.data = (void *)rlottie->allocated_buf;
-    rlottie->imgdsc.data_size = allocaled_buf_size;
+    rlottie->imgdsc.data_size = allocated_buf_size;
 
     lv_image_set_src(obj, &rlottie->imgdsc);
 
