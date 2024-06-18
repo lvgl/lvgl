@@ -133,7 +133,7 @@ Some aspects of the scrolling animations in long modes
 :cpp:enumerator:`LV_LABEL_LONG_SCROLL` and :cpp:enumerator:`LV_LABEL_LONG_SCROLL_CIRCULAR` can be
 customized by setting the animation property of a style, using
 :cpp:func:`lv_style_set_anim`.
-It will be treated as a template which will be used to create the scroll animatins.
+It will be treated as a template which will be used to create the scroll animations.
 
 .. _lv_label_symbols:
 
