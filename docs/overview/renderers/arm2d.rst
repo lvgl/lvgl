@@ -47,7 +47,7 @@ LVGL (sometimes worse) for regular Cortex-M processors.
 -  The target processors support
    `Helium <https://developer.arm.com/documentation/102102/0103/?lang=en>`__.
 -  The device vendor provides an arm-2d compliant driver for their
-   propriotory 2D accelerators and/or ACI(Arm Customized Instruction).
+   proprietary 2D accelerators and/or ACI(Arm Customized Instruction).
 -  The target device contains
    `DMAC-350 <https://community.arm.com/arm-community-blogs/b/internet-of-things-blog/posts/arm-corelink-dma-350-next-generation-direct-memory-access-for-endpoint-ai>`__
 
