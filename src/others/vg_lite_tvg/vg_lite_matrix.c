@@ -129,7 +129,7 @@ vg_lite_error_t vg_lite_rotate(vg_lite_float_t degrees, vg_lite_matrix_t * matri
     /* Convert degrees into radians. */
     vg_lite_float_t angle = (degrees / 180.0f) * 3.141592654f;
 
-    /* Compuet cosine and sine values. */
+    /* Compute cosine and sine values. */
     vg_lite_float_t cos_angle = cosf(angle);
     vg_lite_float_t sin_angle = sinf(angle);
 
