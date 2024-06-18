@@ -120,7 +120,7 @@ Fixes
 - **fix(vg_lite): fix the loss of display accuracy of rounded rectangles** `5714 <https://github.com/lvgl/lvgl/pull/5714>`__
 - **fix(test): check compiler flag should not contain '_'** `5706 <https://github.com/lvgl/lvgl/pull/5706>`__
 - **fix(imagebutton): fix the example** `5719 <https://github.com/lvgl/lvgl/pull/5719>`__
-- **fix(drm): eliminate use of non-existent lv_api_map.h and enable smoke tests** `5694 <https://github.com/lvgl/lvgl/pull/5694>`__
+- **fix(drm): eliminate use of nonexistent lv_api_map.h and enable smoke tests** `5694 <https://github.com/lvgl/lvgl/pull/5694>`__
 - **fix(test): enable -Wpedantic** `5676 <https://github.com/lvgl/lvgl/pull/5676>`__
 - **fix(pxp): fix issues in pxp cache management callback** `5685 <https://github.com/lvgl/lvgl/pull/5685>`__
 - **fix(windows): improve graphic performance via using high resolution tick count and timer delay implementation** `5711 <https://github.com/lvgl/lvgl/pull/5711>`__
