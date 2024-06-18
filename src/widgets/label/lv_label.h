@@ -224,7 +224,7 @@ void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt);
  * Delete characters from a label. The label text cannot be static.
  * @param obj       pointer to a label object
  * @param pos       character index from where to cut. Expressed in character index and not byte index.
- *                  0: start in from of the first character
+ *                  0: start in front of the first character
  * @param cnt       number of characters to cut
  */
 void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt);
