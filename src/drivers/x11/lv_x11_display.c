@@ -160,7 +160,7 @@ static void x11_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
 }
 
 /**
- * event callbed by lvgl display if resolution has been changed (@ref lv_display_set_resolution has been called)
+ * event called by lvgl display if resolution has been changed (@ref lv_display_set_resolution has been called)
  * @param[in] e  event data, containing lv_display_t object
  */
 static void x11_resolution_evt_cb(lv_event_t * e)
@@ -189,7 +189,7 @@ static void x11_resolution_evt_cb(lv_event_t * e)
 }
 
 /**
- * event callbed by lvgl display if display has been closed (@ref lv_display_delete has been called)
+ * event called by lvgl display if display has been closed (@ref lv_display_delete has been called)
  * @param[in] e  event data, containing lv_display_t object
  */
 static void x11_disp_delete_evt_cb(lv_event_t * e)
