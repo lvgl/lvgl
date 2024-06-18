@@ -255,7 +255,7 @@ Fill* LottieGradient::fill(float frameNo, LottieExpressions* exps)
     auto s = start(frameNo, exps);
     auto e = end(frameNo, exps);
 
-    //Linear Graident
+    //Linear Gradient
     if (id == 1) {
         fill = LinearGradient::gen().release();
         static_cast<LinearGradient*>(fill)->linear(s.x, s.y, e.x, e.y);
