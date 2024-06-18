@@ -349,11 +349,11 @@ static void _horizLine(RleWorker& rw, SwCoord x, SwCoord y, SwCoord area, SwCoor
 
     //span has ushort coordinates. check limit overflow
     if (x >= SHRT_MAX) {
-        TVGERR("SW_ENGINE", "X-coordiante overflow!");
+        TVGERR("SW_ENGINE", "X-coordinate overflow!");
         x = SHRT_MAX;
     }
     if (y >= SHRT_MAX) {
-        TVGERR("SW_ENGINE", "Y Coordiante overflow!");
+        TVGERR("SW_ENGINE", "Y Coordinate overflow!");
         y = SHRT_MAX;
     }
 
