@@ -103,7 +103,7 @@ Guide <https://docs-lvgl-io.translate.goog/master/porting/project.html?_x_tr_sl=
 `マルチディスプレイ <https://docs-lvgl-io.translate.goog/master/overview/display.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 対応。
 
-**Binding と Build をサポート** - `Micropython
+**Binding と Build をサポート** - `MicroPython
 Binding <https://blog-lvgl-io.translate.goog/2019-02-20/micropython-bindings?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 が LVGL API を公開。 -
 カスタムビルドシステムは使用せず、プロジェクトの他のファイルをビルドするときに、LVGLをビルド可能。

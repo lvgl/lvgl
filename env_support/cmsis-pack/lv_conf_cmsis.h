@@ -377,7 +377,7 @@
 #define LV_ATTRIBUTE_FAST_MEM
 
 /*Export integer constant to binding. This macro is used with constants in the form of LV_<CONST> that
- *should also appear on LVGL binding API such as Micropython.*/
+ *should also appear on LVGL binding API such as MicroPython.*/
 #define LV_EXPORT_CONST_INT(int_value) struct _silence_gcc_warning /*The default value just prevents GCC warning*/
 
 /*Prefix all global extern data with this*/

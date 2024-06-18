@@ -1,5 +1,5 @@
 """
-The test script will only run the one test on microptyhon. It is not a
+The test script will only run the one test on micropython. It is not a
 framework that can be used for other tests. This has a reduced code footprint.
 entrypoint API is almost the same as the framework.
 

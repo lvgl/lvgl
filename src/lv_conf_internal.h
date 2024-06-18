@@ -1232,7 +1232,7 @@
 #endif
 
 /*Export integer constant to binding. This macro is used with constants in the form of LV_<CONST> that
- *should also appear on LVGL binding API such as Micropython.*/
+ *should also appear on LVGL binding API such as MicroPython.*/
 #ifndef LV_EXPORT_CONST_INT
     #ifdef CONFIG_LV_EXPORT_CONST_INT
         #define LV_EXPORT_CONST_INT CONFIG_LV_EXPORT_CONST_INT

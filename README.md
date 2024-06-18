@@ -60,7 +60,7 @@ Our team is ready to help you with graphics design, UI implementation and consul
   - [Multiple display](https://docs.lvgl.io/master/overview/disp.html#multiple-display-support) support.
 
 **Binding and Build Support**
-  - [Micropython Binding](https://blog.lvgl.io/2019-02-20/micropython-bindings) exposes LVGL API
+  - [MicroPython Binding](https://blog.lvgl.io/2019-02-20/micropython-bindings) exposes LVGL API
   - [PikaScript Binding](https://blog.lvgl.io/2022-08-24/pikascript-and-lvgl) python on MCU lighter and easier.
   - No custom build system is used. You can build LVGL as you build the other files of your project.
   - Support for Make and [CMake](https://docs.lvgl.io/master/get-started/platforms/cmake.html) is included out of the box.

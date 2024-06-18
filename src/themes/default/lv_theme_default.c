@@ -640,7 +640,7 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
                                    const lv_font_t * font)
 {
     /*This trick is required only to avoid the garbage collection of
-     *styles' data if LVGL is used in a binding (e.g. Micropython)
+     *styles' data if LVGL is used in a binding (e.g. MicroPython)
      *In a general case styles could be in a simple `static lv_style_t my_style...` variables*/
 
     if(!lv_theme_default_is_inited()) {

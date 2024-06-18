@@ -94,7 +94,7 @@ RAM 和 128 KB Flash、C 编译器、帧缓冲区和至少 1/10 屏幕大小的�
 
 **绑定和构建支持**
 
--  `Microython 绑定 <https://blog.lvgl.io/2019-02-20/micropython-bindings>`__
+-  `MicroPython 绑定 <https://blog.lvgl.io/2019-02-20/micropython-bindings>`__
    公开 LVGL的API
 -  `PikaScript 绑定 <https://blog.lvgl.io/2022-08-24/pikascript-and-lvgl>`__
    在 MCU 上的更轻更简单的 Python 版本
