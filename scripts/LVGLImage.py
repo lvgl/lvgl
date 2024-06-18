@@ -571,7 +571,7 @@ class LVGLImage:
         self.stride = stride
         self.data = bytearray(b''.join(data_out))
 
-    def premulitply(self):
+    def premultiply(self):
         """
         Pre-multiply image RGB data with alpha, set corresponding image header flags
         """
@@ -1233,7 +1233,7 @@ class PNGConverter:
                 img = LVGLImage().from_png(f, self.cf, background=self.background)
                 img.adjust_stride(align=self.align)
                 if self.premultiply:
-                    img.premulitply()
+                    img.premultiply()
                 output.append((f, img))
                 if self.ofmt == OutputFormat.BIN_FILE:
                     img.to_bin(self._replace_ext(f, ".bin"),
@@ -1338,7 +1338,7 @@ def test():
                                cf=ColorFormat.ARGB8565,
                                background=0xFF_FF_00)
     img.adjust_stride(align=16)
-    img.premulitply()
+    img.premultiply()
     img.to_bin("output/cogwheel.ARGB8565.bin")
     img.to_c_array("output/cogwheel-abc.c")  # file name is used as c var name
     img.to_png("output/cogwheel.ARGB8565.png.png")  # convert back to png
