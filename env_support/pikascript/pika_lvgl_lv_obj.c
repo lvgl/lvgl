@@ -50,7 +50,7 @@ void pika_lvgl_lv_obj_add_state(PikaObj* self, int state) {
     lv_obj_add_state(lv_obj, state);
 }
 
-PikaObj* eventLisener_getHandler(PikaObj* self, uintptr_t event_id) {
+PikaObj* eventListener_getHandler(PikaObj* self, uintptr_t event_id) {
     Args buffs = {0};
     char* event_name =
         strsFormat(&buffs, PIKA_SPRINTF_BUFF_SIZE, "%d", event_id);
@@ -63,13 +63,13 @@ PikaObj* eventLisener_getHandler(PikaObj* self, uintptr_t event_id) {
 static void __pika_event_cb(lv_event_t* e) {
     lv_obj_t* target = lv_event_get_target(e);
     PikaObj* event_handler =
-        eventLisener_getHandler(pika_lv_event_listener_g, (uintptr_t)target);
+        eventListener_getHandler(pika_lv_event_listener_g, (uintptr_t)target);
     PikaObj* evt = obj_getObj(event_handler, "_event_evt");
     obj_setPtr(evt, "lv_event", e);
     obj_run(event_handler, "_event_cb(_event_evt)");
 }
 
-void eventLicener_registerEvent(PikaObj* self,
+void eventListener_registerEvent(PikaObj* self,
                               uintptr_t event_id,
                               PikaObj* event_handler) {
     Args buffs = {0};
@@ -90,7 +90,7 @@ void pika_lvgl_lv_obj_add_event_cb(PikaObj* self,
     obj_setArg(self, "_event_cb", event_cb);
     obj_setPtr(self, "_event_user_data", user_data);
     obj_newDirectObj(self, "_event_evt", New_pika_lvgl_lv_event);
-    eventLicener_registerEvent(pika_lv_event_listener_g, (uintptr_t)lv_obj, self);
+    eventListener_registerEvent(pika_lv_event_listener_g, (uintptr_t)lv_obj, self);
 }
 
 void pika_lvgl_lv_obj_add_style(PikaObj *self, PikaObj* style, int selector){
