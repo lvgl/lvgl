@@ -807,7 +807,7 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
             }
         }
 
-        /*Call the post draw draw function of the parents of the to object*/
+        /*Call the post draw function of the parents of the to object*/
         lv_obj_send_event(parent, LV_EVENT_DRAW_POST_BEGIN, (void *)layer);
         lv_obj_send_event(parent, LV_EVENT_DRAW_POST, (void *)layer);
         lv_obj_send_event(parent, LV_EVENT_DRAW_POST_END, (void *)layer);
