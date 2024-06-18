@@ -215,13 +215,13 @@ bool _lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, int32_t
 /**
  * Check if two area has common parts
  * @param a1_p pointer to an area.
- * @param a2_p pointer to an other area
+ * @param a2_p pointer to another area
  * @return false: a1_p and a2_p has no common parts
  */
 bool _lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p);
 
 /**
- * Check if an area is fully on an other
+ * Check if an area is fully on another
  * @param ain_p pointer to an area which could be in 'aholder_p'
  * @param aholder_p pointer to an area which could involve 'ain_p'
  * @param radius radius of `aholder_p` (e.g. for rounded rectangle)
@@ -230,7 +230,7 @@ bool _lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p);
 bool _lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, int32_t radius);
 
 /**
- * Check if an area is fully out of an other
+ * Check if an area is fully out of another
  * @param aout_p pointer to an area which could be in 'aholder_p'
  * @param aholder_p pointer to an area which could involve 'ain_p'
  * @param radius radius of `aholder_p` (e.g. for rounded rectangle)
@@ -246,7 +246,7 @@ bool _lv_area_is_out(const lv_area_t * aout_p, const lv_area_t * aholder_p, int3
 bool _lv_area_is_equal(const lv_area_t * a, const lv_area_t * b);
 
 /**
- * Align an area to an other
+ * Align an area to another
  * @param base an area where the other will be aligned
  * @param to_align the area to align
  * @param align `LV_ALIGN_...`

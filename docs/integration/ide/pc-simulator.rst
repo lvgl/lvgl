@@ -43,7 +43,7 @@ Built-in drivers
 LVGL comes with several `built-in drivers <https://docs.lvgl.io/master/integration/driver/index.html>`__.
 
 Even if a simulator project comes with e.g. SDL, you can easily replace it by enabling
-an other driver in ``lv_conf.h`` and calling its ``create`` function.
+another driver in ``lv_conf.h`` and calling its ``create`` function.
 
 For example to use the Linux frame buffer device instead of SDL just enable ``LV_USE_LINUX_FBDEV``
 and call

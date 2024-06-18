@@ -191,7 +191,7 @@ public:
         return *this;
     }
 
-    //! Swap the content of this pointer with an other.
+    //! Swap the content of this pointer with another.
     /*!
         \param other The pointer to swap with.
         \note Constant complexity.

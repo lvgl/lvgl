@@ -910,7 +910,7 @@ menu "LVGL configuration"
 			bool "Enable Arabic/Persian processing"
 			help
 				In these languages characters should be replaced with
-				an other form based on their position in the text.
+				another form based on their position in the text.
 	endmenu
 
 	menu "Widget Usage"

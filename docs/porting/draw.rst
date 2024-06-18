@@ -44,7 +44,7 @@ Dispatching
 While collecting draw tasks LVGL frequently tries to dispatch the collected draw tasks to the draw units.
 This handles via the ``dispatch_cb`` of the draw units.
 
-If a draw unit is busy with an other draw task, it just returns. However, it is available it can take a draw task.
+If a draw unit is busy with another draw task, it just returns. However, it is available it can take a draw task.
 
 :cpp:expr:`lv_draw_get_next_available_task(layer, previous_task, draw_unit_id)` is a useful helper function which
 returns an available draw task. "Available draw task" means that, all the draw tasks which should be drawn under a draw task

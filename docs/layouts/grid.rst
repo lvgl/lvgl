@@ -120,7 +120,7 @@ This way even if a wrapper item is used on the grid and can be made "transparent
 
 Limitations:
 
-- The sub grid is resolved only in one level depth. That is a grid can have a sub grid children, but a sub grid can't have an other sub grid.
+- The sub grid is resolved only in one level depth. That is a grid can have a sub grid children, but a sub grid can't have another sub grid.
 - ``LV_GRID_CONTENT`` tracks on the are not handled in the sub grid, only in the its own grid.
 
 The sub grid feature works the same as in CSS. For further reference see `this description <https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout/Subgrid>`__.

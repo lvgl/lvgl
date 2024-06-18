@@ -218,7 +218,7 @@ uint32_t lv_draw_buf_width_to_stride_user(const lv_draw_buf_handlers_t * handler
 void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a);
 
 /**
- * Copy an area from a buffer to an other
+ * Copy an area from a buffer to another
  * @param dest      pointer to the destination draw buffer
  * @param dest_area the area to copy from the destination buffer, if NULL, use the whole buffer
  * @param src       pointer to the source draw buffer
