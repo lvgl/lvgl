@@ -922,7 +922,7 @@ public:
         if (RAPIDJSON_LIKELY(this != &rhs)) {
             // Can't destroy "this" before assigning "rhs", otherwise "rhs"
             // could be used after free if it's an sub-Value of "this",
-            // hence the temporary danse.
+            // hence the temporary dance.
             GenericValue temp;
             temp.RawAssign(rhs);
             this->~GenericValue();
