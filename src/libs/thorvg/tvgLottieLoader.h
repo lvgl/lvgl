@@ -70,7 +70,7 @@ public:
     //Marker Supports
     uint32_t markersCnt();
     const char* markers(uint32_t index);
-    bool segment(const char* marker, float& beign, float& end);
+    bool segment(const char* marker, float& begin, float& end);
 
 private:
     bool header();
