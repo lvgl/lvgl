@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # ****************************************************************************
-# IMPOTRANT: If you are getting a lexer error for an example you need to check
+# IMPORTANT: If you are getting a lexer error for an example you need to check
 #            for extra lines at the end of the file. Only a single empty line
 #            is allowed!!! Ask me how long it took me to figure this out
 # ****************************************************************************
