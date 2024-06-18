@@ -1281,7 +1281,7 @@ typedef unsigned int        vg_lite_color_t;
 
     /* Setup 3x3 gaussian blur weight values to filter image pixels.
      *
-     *  Paramters w0, w1, w2 define a 3x3 gaussian blur weight matrix as below
+     *  Parameters w0, w1, w2 define a 3x3 gaussian blur weight matrix as below
      *
      *                  |  w2   w1   w2 |
      *                  |  w1   w0   w1 |
