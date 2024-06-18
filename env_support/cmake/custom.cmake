@@ -61,7 +61,7 @@ if(LV_CONF_BUILD_THORVG_INTERNAL)
     add_library(lvgl::thorvg ALIAS lvgl_thorvg)
     target_include_directories(lvgl_thorvg SYSTEM PUBLIC ${LVGL_ROOT_DIR}/src/libs/thorvg)
     target_link_libraries(lvgl_thorvg PUBLIC lvgl)
-    target_compile_definitions(lvgl_thorvg PUBLIC LV_USE_THORVG_INTERNAL=1 LV_USE_THORVG_EXTERNAL=0)
+    target_compile_definitions(lvgl_thorvg PUBLIC LV_USE_VECTOR_GRAPHIC=1 LV_USE_THORVG_INTERNAL=1 LV_USE_THORVG_EXTERNAL=0)
 endif()
 
 if(NOT MSVC)
