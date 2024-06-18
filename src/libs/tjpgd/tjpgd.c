@@ -892,7 +892,7 @@ JRESULT jd_mcu_output(
 
     /* Squeeze up pixel table if a part of MCU is to be truncated */
     mx >>= jd->scale;
-    if(rx < mx) {   /* Is the MCU spans rigit edge? */
+    if(rx < mx) {   /* Is the MCU spans right edge? */
         uint8_t * s, * d;
         unsigned int xi, yi;
 
