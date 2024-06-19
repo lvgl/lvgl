@@ -198,7 +198,7 @@ Fixes
 - **fix(lvgl.mk): fix vg_lite_tvg.cpp not compiling** `5435 <https://github.com/lvgl/lvgl/pull/5435>`__
 - **fix(ci): use the dev branch of PlatformIO** `5432 <https://github.com/lvgl/lvgl/pull/5432>`__
 - **fix(vector) : add path bounding and matrix transform functions.** `5389 <https://github.com/lvgl/lvgl/pull/5389>`__
-- **fix(warning): fix shadown variable warning** `47750f1 <https://github.com/lvgl/lvgl/commit/47750f1b866e5ea0617035fd208c727878bebc44>`__
+- **fix(warning): fix shadow variable warning** `47750f1 <https://github.com/lvgl/lvgl/commit/47750f1b866e5ea0617035fd208c727878bebc44>`__
 - **fix(thorvg): link lvgl_thorvgl with lvgl** `9b09182 <https://github.com/lvgl/lvgl/commit/9b09182fc76032ef0bc8a2d930fa1cf4fd081431>`__
 - **fix(warning): error: no newline at end of file** `9a6a194 <https://github.com/lvgl/lvgl/commit/9a6a194680db9ea12f59e94eab6e812cb28d504f>`__
 - **fix(color): treat RGB565A8 bpp same as RGB565** `52426ec <https://github.com/lvgl/lvgl/commit/52426ec1919274e282889129f00e00a9a2a9ce60>`__
