@@ -23,5 +23,5 @@ The music player demo shows what kind of modern, smartphone-like user interfaces
 	
 ## Using spectrum.py
 - install `librosa` with `pip3 install librosa`	
-- run `python sectrum.py my_file.mp3`
+- run `python spectrum.py my_file.mp3`
 - see the result in `spectrum.h`
