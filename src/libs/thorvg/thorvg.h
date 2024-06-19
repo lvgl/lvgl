@@ -255,7 +255,7 @@ struct Vertex
 
 
 /**
- * @brief A data structure representing a triange in a texture mesh
+ * @brief A data structure representing a triangle in a texture mesh
  *
  * @param vertex The three vertices that make up the polygon
  *
