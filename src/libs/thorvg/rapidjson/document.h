@@ -856,7 +856,7 @@ public:
     /*!
         \param a An array obtained by \c GetArray().
         \note \c Array is always pass-by-value.
-        \note the source array is moved into this value and the sourec array becomes empty.
+        \note the source array is moved into this value and the source array becomes empty.
     */
     GenericValue(Array a) RAPIDJSON_NOEXCEPT : data_(a.value_.data_) {
         a.value_.data_ = Data();
@@ -867,7 +867,7 @@ public:
     /*!
         \param o An object obtained by \c GetObject().
         \note \c Object is always pass-by-value.
-        \note the source object is moved into this value and the sourec object becomes empty.
+        \note the source object is moved into this value and the source object becomes empty.
     */
     GenericValue(Object o) RAPIDJSON_NOEXCEPT : data_(o.value_.data_) {
         o.value_.data_ = Data();

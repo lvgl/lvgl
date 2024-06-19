@@ -311,7 +311,7 @@ public:
     virtual void StartMissingDependentProperties() = 0;
     virtual void AddMissingDependentProperty(const SValue& targetName) = 0;
     virtual void EndMissingDependentProperties(const SValue& sourceName) = 0;
-    virtual void AddDependencySchemaError(const SValue& souceName, ISchemaValidator* subvalidator) = 0;
+    virtual void AddDependencySchemaError(const SValue& sourceName, ISchemaValidator* subvalidator) = 0;
     virtual bool EndDependencyErrors() = 0;
 
     virtual void DisallowedValue(const ValidateErrorCode code) = 0;
