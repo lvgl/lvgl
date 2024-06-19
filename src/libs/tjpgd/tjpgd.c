@@ -1083,7 +1083,7 @@ JRESULT jd_prepare(
             case 0xCE:  /* SOF14 */
             case 0xCF:  /* SOF15 */
             case 0xD9:  /* EOI */
-                return JDR_FMT3;    /* Unsuppoted JPEG standard (may be progressive JPEG) */
+                return JDR_FMT3;    /* Unsupported JPEG standard (may be progressive JPEG) */
 
             default:    /* Unknown segment (comment, exif or etc..) */
                 /* Skip segment data (null pointer specifies to remove data from the stream) */

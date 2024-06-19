@@ -398,7 +398,7 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
             return VG_LITE_NV12;
 
         default:
-            LV_LOG_ERROR("unsupport color format: %d", cf);
+            LV_LOG_ERROR("unsupported color format: %d", cf);
             break;
     }
 
@@ -489,7 +489,7 @@ void lv_vg_lite_buffer_format_bytes(
             *mul = 3;
             break;
         default:
-            LV_LOG_ERROR("unsupport color format: 0x%" PRIx32, (uint32_t)format);
+            LV_LOG_ERROR("unsupported color format: 0x%" PRIx32, (uint32_t)format);
             LV_ASSERT(false);
             break;
     }
