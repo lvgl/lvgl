@@ -1949,7 +1949,7 @@ bool rasterConvertCS(Surface* surface, ColorSpace to)
     ScopedLock lock(surface->key);
     if (surface->cs == to) return true;
 
-    //TOOD: Support SIMD accelerations
+    //TODO: Support SIMD accelerations
     auto from = surface->cs;
 
     if (((from == ColorSpace::ABGR8888) || (from == ColorSpace::ABGR8888S)) && ((to == ColorSpace::ARGB8888) || (to == ColorSpace::ARGB8888S))) {
