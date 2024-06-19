@@ -274,7 +274,7 @@ int32_t lv_anim_path_overshoot(const lv_anim_t * a)
 int32_t lv_anim_path_bounce(const lv_anim_t * a)
 {
     /*Calculate the current step*/
-    int32_t t = lv_map(a->act_time, 0, a->duration, 0, 1024);
+    int32_t t = lv_map(a->act_time, 0, a->duration, 0, LV_BEZIER_VAL_MAX);
     int32_t diff = (a->end_value - a->start_value);
 
     /*3 bounces has 5 parts: 3 down and 2 up. One part is t / 5 long*/
