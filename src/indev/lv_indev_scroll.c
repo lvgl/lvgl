@@ -487,6 +487,11 @@ static void init_scroll_limits(lv_indev_t * indev)
         }
     }
 
+    /*`find_snap_point_x/y()` return LV_COORD_MAX is not snap point was found,
+     *but x1/y1 should be small. */
+    if(indev->pointer.scroll_area.x1 == LV_COORD_MAX) indev->pointer.scroll_area.x1 = LV_COORD_MIN;
+    if(indev->pointer.scroll_area.y1 == LV_COORD_MAX) indev->pointer.scroll_area.y1 = LV_COORD_MIN;
+
     /*Allow scrolling on the edges. It will be reverted to the edge due to snapping anyway*/
     if(indev->pointer.scroll_area.x1 == 0) indev->pointer.scroll_area.x1 = LV_COORD_MIN;
     if(indev->pointer.scroll_area.x2 == 0) indev->pointer.scroll_area.x2 = LV_COORD_MAX;
@@ -679,7 +684,7 @@ static int32_t elastic_diff(lv_obj_t * scroll_obj, int32_t diff, int32_t scroll_
                         break;
                 }
                 int32_t d;
-                d = find_snap_point_x(scroll_obj, x, LV_COORD_MAX, 0);
+                d = find_snap_point_x(scroll_obj, x + 1, LV_COORD_MAX, 0);
                 if(d == LV_COORD_MAX) no_more_end_snap = true;
                 d = find_snap_point_x(scroll_obj, LV_COORD_MIN, x, 0);
                 if(d == LV_COORD_MAX) no_more_start_snap = true;
