@@ -862,7 +862,7 @@ bool strokeParseOutline(SwStroke* stroke, const SwOutline& outline)
             ++pt;
             ++types;
 
-            //emit a signel line_to
+            //emit a single line_to
             if (types[0] == SW_CURVE_TYPE_POINT) {
                 _lineTo(*stroke, *pt);
             //types cubic
