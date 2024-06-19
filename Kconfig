@@ -1393,7 +1393,7 @@ menu "LVGL configuration"
 			depends on LV_USE_IME_PINYIN
 			default y
 			help
-				If you do not use the default thesaurus, be sure to use lv_ime_pinyin after setting the thesauruss
+				If you do not use the default thesaurus, be sure to use lv_ime_pinyin after setting the thesaurus
 		config LV_IME_PINYIN_CAND_TEXT_NUM
 			int "Maximum number of candidate panels"
 			depends on LV_USE_IME_PINYIN
