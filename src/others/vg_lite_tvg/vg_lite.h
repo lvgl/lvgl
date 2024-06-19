@@ -926,7 +926,7 @@ typedef unsigned int        vg_lite_color_t;
     /* Colorkey definition */
     typedef struct vg_lite_color_key
     {
-        vg_lite_uint8_t enable;                 /*! The color key is effective only when "enable" is ture, */
+        vg_lite_uint8_t enable;                 /*! The color key is effective only when "enable" is true, */
         vg_lite_uint8_t low_r;                  /*! The R channel of low_rgb. */
         vg_lite_uint8_t low_g;                  /*! The G channel of low_rgb. */
         vg_lite_uint8_t low_b;                  /*! The B channel of low_rgb. */
