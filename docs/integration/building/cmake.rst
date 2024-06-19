@@ -46,7 +46,7 @@ When hitting the generate button, CMake will create solution files (for VS) or N
 The following targets are available.
 
 - lvgl (the actual library, required)
-- lvgl_thorvg (an vector grafics extension, optional)
+- lvgl_thorvg (an vector graphics extension, optional)
 - lvgl_examples (example usages, optional)
 - lvgl_demos (some demos, optional)
 
