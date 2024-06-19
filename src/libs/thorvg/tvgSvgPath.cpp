@@ -193,7 +193,7 @@ void _pathAppendArcTo(Array<PathCommand>* cmds, Array<Point>* pts, Point* cur, P
     cx += (sx + x) / 2.0f;
     cy += (sy + y) / 2.0f;
 
-    //Sstep 4 (F6.5.4)
+    //Step 4 (F6.5.4)
     //We dont' use arccos (as per w3c doc), see
     //http://www.euclideanspace.com/maths/algebra/vectors/angleBetween/index.htm
     //Note: atan2 (0.0, 1.0) == 0.0
