@@ -40,7 +40,7 @@ struct ExpContent
 };
 
 
-//reserved expressions speicifiers
+//reserved expressions specifiers
 static const char* EXP_NAME = "name";
 static const char* EXP_CONTENT = "content";
 static const char* EXP_WIDTH = "width";
