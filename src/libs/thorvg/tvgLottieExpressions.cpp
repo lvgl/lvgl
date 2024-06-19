@@ -851,7 +851,7 @@ static jerry_value_t _key(const jerry_call_info_t* info, const jerry_value_t arg
 
 static jerry_value_t _createPath(const jerry_call_info_t* info, const jerry_value_t args[], const jerry_length_t argsCnt)
 {
-    //TODO: arg1: points, arg2: inTagents, arg3: outTangents, arg4: isClosed
+    //TODO: arg1: points, arg2: inTangents, arg3: outTangents, arg4: isClosed
     auto arg1 = jerry_value_to_object(args[0]);
     auto pathset = jerry_object_get_native_ptr(arg1, nullptr);
     if (!pathset) {
