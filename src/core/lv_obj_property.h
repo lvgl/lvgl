@@ -27,16 +27,23 @@ extern "C" {
 #define LV_PROPERTY_TYPE_INT            1   /*int32_t type*/
 #define LV_PROPERTY_TYPE_PRECISE        2   /*lv_value_precise_t, int32_t or float depending on LV_USE_FLOAT*/
 #define LV_PROPERTY_TYPE_COLOR          3   /*ARGB8888 type*/
-#define LV_PROPERTY_TYPE_POINTER        4   /*void * pointer*/
-#define LV_PROPERTY_TYPE_IMGSRC         5   /*Special pointer for image*/
+#define LV_PROPERTY_TYPE_POINT          4   /*lv_point_t */
+#define LV_PROPERTY_TYPE_POINTER        5   /*void * pointer*/
+#define LV_PROPERTY_TYPE_IMGSRC         6   /*Special pointer for image*/
+#define LV_PROPERTY_TYPE_TEXT           7   /*Special pointer of char* */
+#define LV_PROPERTY_TYPE_OBJ            8   /*Special pointer of lv_obj_t* */
+#define LV_PROPERTY_TYPE_DISPLAY        9   /*Special pointer of lv_display_t* */
+#define LV_PROPERTY_TYPE_FONT           10  /*Special pointer of lv_font_t* */
 
-#define LV_PROPERTY_ID(clz, name, type, index)    LV_PROPERTY_## clz ##_##name = (LV_PROPERTY_## clz ##_START + (index)) | ((type) << 28)
+#define LV_PROPERTY_TYPE_SHIFT          28
+#define LV_PROPERTY_ID(clz, name, type, index)    LV_PROPERTY_## clz ##_##name = (LV_PROPERTY_## clz ##_START + (index)) | ((type) << LV_PROPERTY_TYPE_SHIFT)
 
-#define LV_PROPERTY_ID_TYPE(id) ((id) >> 28)
+#define LV_PROPERTY_ID_TYPE(id) ((id) >> LV_PROPERTY_TYPE_SHIFT)
 #define LV_PROPERTY_ID_INDEX(id) ((id) & 0xfffffff)
 
 /*Set properties from an array of lv_property_t*/
 #define LV_OBJ_SET_PROPERTY_ARRAY(obj, array) lv_obj_set_properties(obj, array, sizeof(array)/sizeof(array[0]))
+
 
 /**********************
  *      TYPEDEFS
@@ -48,9 +55,10 @@ extern "C" {
 enum {
     LV_PROPERTY_ID_INVALID      = 0,
 
-    /*ID 0 to 0xff are style ID, check lv_style_prop_t*/
-    LV_PROPERTY_ID_START        = 0x100, /*ID little than 0xff is style ID*/
+    /*ID 0x01 to 0xff are style ID, check lv_style_prop_t*/
+    LV_PROPERTY_STYLE_START     = 0x01,
 
+    LV_PROPERTY_ID_START        = 0x100, /*ID little than 0xff is style ID*/
     /*Define the property ID for every widget here. */
     LV_PROPERTY_OBJ_START       = 0x100, /* lv_obj.c */
     LV_PROPERTY_IMAGE_START     = 0x200, /* lv_image.c */
@@ -62,7 +70,10 @@ enum {
     LV_PROPERTY_ID_ANY          = 0x7ffffffe,
 };
 
-typedef uint32_t lv_prop_id_t;
+struct _lv_property_name_t {
+    const char * name;
+    lv_prop_id_t id;
+};
 
 typedef struct {
     lv_prop_id_t id;
@@ -71,6 +82,7 @@ typedef struct {
         const void * ptr;           /**< Constant pointers  (font, cone text, etc)*/
         lv_color_t color;           /**< Colors*/
         lv_value_precise_t precise; /**< float or int for precise value*/
+        lv_point_t point;           /**< Point*/
         struct {
             /**
              * Note that place struct member `style` at first place is intended.
@@ -101,8 +113,8 @@ typedef struct {
 typedef struct {
     lv_prop_id_t id;
 
-    void * setter;
-    void * getter;
+    void * setter;      /**< Callback used to set property. */
+    void * getter;      /**< Callback used to get property. */
 } lv_property_ops_t;
 
 /**********************
@@ -153,9 +165,20 @@ lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id);
  */
 lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, uint32_t selector);
 
+/**
+ * Get the property ID by name. Requires to enable `LV_USE_OBJ_PROPERTY_NAME`.
+ * @param obj       pointer to an object that has specified property or base class has.
+ * @param name      property name
+ * @return          property ID found or `LV_PROPERTY_ID_INVALID` if not found.
+ */
+lv_prop_id_t lv_obj_property_get_id(const lv_obj_t * obj, const char * name);
+
 /**********************
  *      MACROS
  **********************/
+
+#include "../widgets/property/lv_obj_property_names.h"
+#include "../widgets/property/lv_style_properties.h"
 
 #endif /*LV_USE_OBJ_PROPERTY*/
 

@@ -148,6 +148,13 @@ typedef struct _lv_font_t lv_font_t;
 struct _lv_image_decoder_t;
 typedef struct _lv_image_decoder_t lv_image_decoder_t;
 
+typedef uint32_t lv_prop_id_t;
+
+#if LV_USE_OBJ_PROPERTY
+struct _lv_property_name_t;
+typedef struct _lv_property_name_t lv_property_name_t;
+#endif
+
 #if LV_USE_SYSMON
 
 struct _lv_sysmon_backend_data_t;

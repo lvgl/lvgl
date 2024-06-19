@@ -14,6 +14,7 @@
 #include <nuttx/tls.h>
 #include <nuttx/clock.h>
 #include <syslog.h>
+#include <pthread.h>
 #include "lv_nuttx_cache.h"
 #include "lv_nuttx_image_cache.h"
 #include "lv_nuttx_profiler.h"
@@ -23,7 +24,15 @@
 /*********************
  *      DEFINES
  *********************/
+
 #define nuttx_ctx_p (LV_GLOBAL_DEFAULT()->nuttx_ctx)
+
+
+#if (LV_USE_FREETYPE || LV_USE_THORVG)
+    #define LV_NUTTX_MIN_STACK_SIZE (32 * 1024)
+#else
+    #define LV_NUTTX_MIN_STACK_SIZE (8 * 1024)
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -37,6 +46,7 @@ static uint32_t millis(void);
 #if LV_USE_LOG
     static void syslog_print(lv_log_level_t level, const char * buf);
 #endif
+static void check_stack_size(void);
 
 #ifdef CONFIG_LV_USE_NUTTX_LIBUV
     static void lv_nuttx_uv_loop(lv_nuttx_result_t * result);
@@ -106,6 +116,8 @@ void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
     lv_log_register_print_cb(syslog_print);
 #endif
     lv_tick_set_cb(millis);
+
+    check_stack_size();
 
     lv_nuttx_cache_init();
 
@@ -277,6 +289,18 @@ static void lv_nuttx_uv_loop(lv_nuttx_result_t * result)
     lv_nuttx_uv_deinit(&data);
 }
 #endif
+
+static void check_stack_size(void)
+{
+    pthread_t tid = pthread_self();
+    ssize_t stack_size = pthread_get_stacksize_np(tid);
+    LV_LOG_USER("tid: %d, Stack size : %zd", (int)tid, stack_size);
+
+    if(stack_size < LV_NUTTX_MIN_STACK_SIZE) {
+        LV_LOG_ERROR("Stack size is too small. Please increase it to %d bytes or more.",
+                     LV_NUTTX_MIN_STACK_SIZE);
+    }
+}
 
 #endif /*LV_USE_NUTTX*/
 
