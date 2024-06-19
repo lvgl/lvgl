@@ -40,7 +40,7 @@ print("\tRES = " + str(width) + " x " + str(height) + '\n')
 
 lenbuf = []
 block_size = JPEG_SPLIT_HEIGHT;
-spilts = math.ceil(height/block_size)
+splits = math.ceil(height/block_size)
 
 c_code = '''//LVGL SJPG C ARRAY\n#include "lvgl/lvgl.h"\n\nconst uint8_t ''' + OUTPUT_FILE_NAME + '''_map[] = {\n'''
 
@@ -49,7 +49,7 @@ sjpeg = bytearray()
 
 
 row_remaining = height;
-for i in range(spilts):
+for i in range(splits):
     if row_remaining < block_size:
         crop = im.crop((0, i*block_size, width, row_remaining + i*block_size))
     else:
@@ -61,7 +61,7 @@ for i in range(spilts):
 
 
 
-for i in range(spilts):
+for i in range(splits):
     f = open(str(i)+".jpg", "rb")
     a = f.read()
     f.close()
@@ -83,7 +83,7 @@ header = header + width.to_bytes(2, byteorder='little');
 header = header + height.to_bytes(2, byteorder='little');
 
 #NUMBER OF ITEMS 2 BYTES
-header = header + spilts.to_bytes(2, byteorder='little');
+header = header + splits.to_bytes(2, byteorder='little');
 
 #NUMBER OF ITEMS 2 BYTES
 header = header + int(JPEG_SPLIT_HEIGHT).to_bytes(2, byteorder='little');
