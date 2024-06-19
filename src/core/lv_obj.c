@@ -84,6 +84,12 @@ const lv_obj_class_t lv_obj_class = {
     .prop_index_end = LV_PROPERTY_OBJ_END,
     .properties = properties,
     .properties_count = sizeof(properties) / sizeof(properties[0]),
+
+#if LV_USE_OBJ_PROPERTY_NAME
+    .property_names = lv_obj_property_names,
+    .names_count = sizeof(lv_obj_property_names) / sizeof(lv_property_name_t),
+#endif
+
 #endif
 };
 
