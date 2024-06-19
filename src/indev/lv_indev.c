@@ -134,7 +134,7 @@ lv_indev_t * lv_indev_create(void)
     indev->long_press_repeat_time  = LV_INDEV_DEF_LONG_PRESS_REP_TIME;
     indev->gesture_limit        = LV_INDEV_DEF_GESTURE_LIMIT;
     indev->gesture_min_velocity = LV_INDEV_DEF_GESTURE_MIN_VELOCITY;
-    indev->rotary_sensitvity  = LV_INDEV_DEF_ROTARY_SENSITIVITY;
+    indev->rotary_sensitivity  = LV_INDEV_DEF_ROTARY_SENSITIVITY;
     return indev;
 }
 
@@ -1373,7 +1373,7 @@ static void indev_proc_pointer_diff(lv_indev_t * indev)
     bool editable = lv_obj_is_editable(obj);
 
     if(editable) {
-        uint32_t indev_sensitivity = indev->rotary_sensitvity;
+        uint32_t indev_sensitivity = indev->rotary_sensitivity;
         uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity(indev_obj_act, 0);
         int32_t diff = (int32_t)((int32_t)indev->pointer.diff * indev_sensitivity * obj_sensitivity + 32768) >> 16;
         send_event(LV_EVENT_ROTARY, &diff);
@@ -1385,7 +1385,7 @@ static void indev_proc_pointer_diff(lv_indev_t * indev)
         indev->pointer.act_obj = obj;
         lv_obj_t * scroll_obj = lv_indev_find_scroll_obj(indev);
         if(scroll_obj == NULL) return;
-        uint32_t indev_sensitivity = indev->rotary_sensitvity;
+        uint32_t indev_sensitivity = indev->rotary_sensitivity;
         uint32_t obj_sensitivity = lv_obj_get_style_rotary_sensitivity(scroll_obj, 0);
         int32_t diff = (int32_t)((int32_t)indev->pointer.diff * indev_sensitivity * obj_sensitivity + 32768) >> 16;
 

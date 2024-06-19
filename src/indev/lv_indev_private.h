@@ -70,7 +70,7 @@ struct _lv_indev_t {
     uint16_t long_press_repeat_time;
 
     /**< Rotary diff count will be multiplied by this value and divided by 256*/
-    int32_t rotary_sensitvity;
+    int32_t rotary_sensitivity;
 
     struct {
         /*Pointer and button data*/

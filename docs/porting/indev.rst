@@ -75,7 +75,7 @@ To get the steps in an event callback use :cpp:func:`int32_t diff = lv_event_get
 
 The rotary sensitivity can be adjusted on 2 levels:
 
-1. In the input device by the `indev->rotary_sensitvity` element (1/256 unit)
+1. In the input device by the `indev->rotary_sensitivity` element (1/256 unit)
 2. By the `rotary_sensitivity` style property in the widget (1/256 unit)
 
 The final diff is calculated like this:
