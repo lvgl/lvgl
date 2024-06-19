@@ -413,9 +413,9 @@ void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
         lv_event_dsc_t * event_dsc = lv_array_at(&obj->spec_attr->event_list, i);
         if(event_dsc->cb == unsubscribe_on_delete_cb) {
             lv_observer_t * observer = event_dsc->user_data;
-            lv_observer_remove(observer);
             if(subject == NULL || subject == observer->subject) {
                 lv_observer_remove(observer);
+                lv_obj_remove_event(obj, i);
             }
         }
     }
