@@ -570,16 +570,31 @@
     #endif
 
     #if LV_USE_OS
-        /* Enable VGLite draw async. Queue multiple tasks and flash them once to the GPU. */
-        #ifndef LV_USE_VGLITE_DRAW_ASYNC
-            #ifdef LV_KCONFIG_PRESENT
-                #ifdef CONFIG_LV_USE_VGLITE_DRAW_ASYNC
-                    #define LV_USE_VGLITE_DRAW_ASYNC CONFIG_LV_USE_VGLITE_DRAW_ASYNC
+        /* Use additional draw thread for VG-Lite processing.*/
+        #ifndef LV_USE_VGLITE_DRAW_THREAD
+            #ifdef _LV_KCONFIG_PRESENT
+                #ifdef CONFIG_LV_USE_VGLITE_DRAW_THREAD
+                    #define LV_USE_VGLITE_DRAW_THREAD CONFIG_LV_USE_VGLITE_DRAW_THREAD
                 #else
-                    #define LV_USE_VGLITE_DRAW_ASYNC 0
+                    #define LV_USE_VGLITE_DRAW_THREAD 0
                 #endif
             #else
-                #define LV_USE_VGLITE_DRAW_ASYNC 1
+                #define LV_USE_VGLITE_DRAW_THREAD 1
+            #endif
+        #endif
+
+        #if LV_USE_VGLITE_DRAW_THREAD
+            /* Enable VGLite draw async. Queue multiple tasks and flash them once to the GPU. */
+            #ifndef LV_USE_VGLITE_DRAW_ASYNC
+                #ifdef LV_KCONFIG_PRESENT
+                    #ifdef CONFIG_LV_USE_VGLITE_DRAW_ASYNC
+                        #define LV_USE_VGLITE_DRAW_ASYNC CONFIG_LV_USE_VGLITE_DRAW_ASYNC
+                    #else
+                        #define LV_USE_VGLITE_DRAW_ASYNC 0
+                    #endif
+                #else
+                    #define LV_USE_VGLITE_DRAW_ASYNC 1
+                #endif
             #endif
         #endif
     #endif
@@ -604,6 +619,21 @@
 #endif
 
 #if LV_USE_DRAW_PXP
+    #if LV_USE_OS
+        /* Use additional draw thread for PXP processing.*/
+        #ifndef LV_USE_PXP_DRAW_THREAD
+            #ifdef _LV_KCONFIG_PRESENT
+                #ifdef CONFIG_LV_USE_PXP_DRAW_THREAD
+                    #define LV_USE_PXP_DRAW_THREAD CONFIG_LV_USE_PXP_DRAW_THREAD
+                #else
+                    #define LV_USE_PXP_DRAW_THREAD 0
+                #endif
+            #else
+                #define LV_USE_PXP_DRAW_THREAD 1
+            #endif
+        #endif
+    #endif
+
     /* Enable PXP asserts. */
     #ifndef LV_USE_PXP_ASSERT
         #ifdef CONFIG_LV_USE_PXP_ASSERT
