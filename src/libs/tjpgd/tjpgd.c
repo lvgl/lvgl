@@ -940,7 +940,7 @@ JRESULT jd_mcu_output(
 
 JRESULT jd_prepare(
     JDEC * jd,              /* Blank decompressor object */
-    size_t (*infunc)(JDEC *, uint8_t *, size_t), /* JPEG strem input function */
+    size_t (*infunc)(JDEC *, uint8_t *, size_t), /* JPEG stream input function */
     void * pool,            /* Working buffer for the decompression session */
     size_t sz_pool,         /* Size of working buffer */
     void * dev              /* I/O device identifier for the session */
