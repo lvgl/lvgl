@@ -224,15 +224,10 @@
  * but does not guarantee the same rendering quality as the software. */
 #define LV_VG_LITE_USE_BOX_SHADOW 0
 
-/* VG-Lite linear gradient image maximum cache number.
+/* VG-Lite gradient maximum cache number.
  * NOTE: The memory usage of a single gradient image is 4K bytes.
  */
-#define LV_VG_LITE_LINEAR_GRAD_CACHE_CNT 32
-
-/* VG-Lite radial gradient image maximum cache size.
- * NOTE: The memory usage of a single gradient image is radial grad radius * 4 bytes.
- */
-#define LV_VG_LITE_RADIAL_GRAD_CACHE_CNT 32
+#define LV_VG_LITE_GRAD_CACHE_CNT 32
 
 #endif
 
@@ -381,6 +376,9 @@
 
     /*Enable YUV color format support*/
     #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
+
+    /*Enable Linear gradient extension support*/
+    #define LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT 0
 
     /*Enable 16 pixels alignment*/
     #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 1

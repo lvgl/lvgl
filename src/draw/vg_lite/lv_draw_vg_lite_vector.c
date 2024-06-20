@@ -203,48 +203,18 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
             }
             break;
         case LV_VECTOR_DRAW_STYLE_GRADIENT: {
-                /* draw gradient */
-                lv_vector_gradient_style_t style = dsc->fill_dsc.gradient.style;
+                vg_lite_matrix_t grad_matrix;
+                lv_matrix_to_vg(&grad_matrix, &dsc->fill_dsc.matrix);
 
-                if(style == LV_VECTOR_GRADIENT_STYLE_LINEAR) {
-                    vg_lite_matrix_t grad_matrix, fill_matrix;
-                    lv_area_t grad_area;
-                    lv_area_set(&grad_area, (int32_t)min_x, (int32_t)min_y, (int32_t)max_x, (int32_t)max_y);
-                    lv_vg_lite_grad_area_to_matrix(&grad_matrix, &grad_area, LV_GRAD_DIR_HOR);
-
-                    lv_matrix_to_vg(&fill_matrix, &dsc->fill_dsc.matrix);
-                    lv_vg_lite_matrix_multiply(&grad_matrix, &matrix);
-                    lv_vg_lite_matrix_multiply(&grad_matrix, &fill_matrix);
-
-                    lv_vg_lite_draw_linear_grad(
-                        u,
-                        &u->target_buffer,
-                        vg_path,
-                        &dsc->fill_dsc.gradient.grad,
-                        &grad_matrix,
-                        &matrix,
-                        fill,
-                        blend);
-                }
-                else if(style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
-                    vg_lite_matrix_t grad_matrix;
-                    lv_matrix_to_vg(&grad_matrix, &dsc->fill_dsc.matrix);
-
-                    /* add min_x, min_y to gradient center */
-                    lv_vector_gradient_t new_grad = dsc->fill_dsc.gradient;
-                    new_grad.cx += min_x;
-                    new_grad.cy += min_y;
-
-                    lv_vg_lite_draw_radial_grad(
-                        u,
-                        &u->target_buffer,
-                        vg_path,
-                        &new_grad,
-                        &grad_matrix,
-                        &matrix,
-                        fill,
-                        blend);
-                }
+                lv_vg_lite_draw_grad(
+                    u,
+                    &u->target_buffer,
+                    vg_path,
+                    &dsc->fill_dsc.gradient,
+                    &grad_matrix,
+                    &matrix,
+                    fill,
+                    blend);
             }
             break;
         default:

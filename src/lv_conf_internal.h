@@ -657,25 +657,14 @@
     #endif
 #endif
 
-/* VG-Lite linear gradient image maximum cache number.
+/* VG-Lite gradient maximum cache number.
  * NOTE: The memory usage of a single gradient image is 4K bytes.
  */
-#ifndef LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
-    #ifdef CONFIG_LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
-        #define LV_VG_LITE_LINEAR_GRAD_CACHE_CNT CONFIG_LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
+#ifndef LV_VG_LITE_GRAD_CACHE_CNT
+    #ifdef CONFIG_LV_VG_LITE_GRAD_CACHE_CNT
+        #define LV_VG_LITE_GRAD_CACHE_CNT CONFIG_LV_VG_LITE_GRAD_CACHE_CNT
     #else
-        #define LV_VG_LITE_LINEAR_GRAD_CACHE_CNT 32
-    #endif
-#endif
-
-/* VG-Lite radial gradient image maximum cache size.
- * NOTE: The memory usage of a single gradient image is radial grad radius * 4 bytes.
- */
-#ifndef LV_VG_LITE_RADIAL_GRAD_CACHE_CNT
-    #ifdef CONFIG_LV_VG_LITE_RADIAL_GRAD_CACHE_CNT
-        #define LV_VG_LITE_RADIAL_GRAD_CACHE_CNT CONFIG_LV_VG_LITE_RADIAL_GRAD_CACHE_CNT
-    #else
-        #define LV_VG_LITE_RADIAL_GRAD_CACHE_CNT 32
+        #define LV_VG_LITE_GRAD_CACHE_CNT 32
     #endif
 #endif
 
@@ -1118,6 +1107,15 @@
             #define LV_VG_LITE_THORVG_YUV_SUPPORT CONFIG_LV_VG_LITE_THORVG_YUV_SUPPORT
         #else
             #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
+        #endif
+    #endif
+
+    /*Enable Linear gradient extension support*/
+    #ifndef LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+        #ifdef CONFIG_LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+            #define LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT CONFIG_LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+        #else
+            #define LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT 0
         #endif
     #endif
 

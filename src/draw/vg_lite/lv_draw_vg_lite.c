@@ -72,7 +72,9 @@ void lv_draw_vg_lite_init(void)
     unit->base_unit.delete_cb = draw_delete;
 
     lv_vg_lite_image_dsc_init(unit);
-    lv_vg_lite_grad_init(unit, LV_VG_LITE_LINEAR_GRAD_CACHE_CNT, LV_VG_LITE_RADIAL_GRAD_CACHE_CNT);
+#if LV_USE_VECTOR_GRAPHIC
+    lv_vg_lite_grad_init(unit, LV_VG_LITE_GRAD_CACHE_CNT);
+#endif
     lv_vg_lite_path_init(unit);
     lv_vg_lite_decoder_init();
 }
@@ -250,7 +252,9 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit)
     lv_draw_vg_lite_unit_t * unit = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     lv_vg_lite_image_dsc_deinit(unit);
+#if LV_USE_VECTOR_GRAPHIC
     lv_vg_lite_grad_deinit(unit);
+#endif
     lv_vg_lite_path_deinit(unit);
     lv_vg_lite_decoder_deinit();
     return 1;

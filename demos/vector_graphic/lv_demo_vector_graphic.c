@@ -58,25 +58,23 @@ static void draw_gradient(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
     lv_vector_path_quad_to(path, &pts[1], &pts[2]);
     lv_vector_path_close(path);
 
-    lv_grad_dsc_t grad;
-    grad.dir = LV_GRAD_DIR_HOR;
-    grad.stops_count = 2;
-    grad.stops[0].color = lv_color_hex(0xff0000);
-    grad.stops[0].opa = LV_OPA_COVER;
-    grad.stops[0].frac = 0;
-    grad.stops[1].color = lv_color_hex(0x00ff00);
-    grad.stops[1].opa = LV_OPA_COVER;
-    grad.stops[1].frac = 255;
-    // grad.stops[2].color = lv_color_hex(0x0000ff);
-    // grad.stops[2].opa = LV_OPA_COVER;
-    // grad.stops[2].frac = 255;
+    lv_gradient_stop_t stops[2];
+    lv_memzero(stops, sizeof(stops));
+    stops[0].color = lv_color_hex(0xff0000);
+    stops[0].opa = LV_OPA_COVER;
+    stops[0].frac = 0;
+    stops[1].color = lv_color_hex(0x00ff00);
+    stops[1].opa = LV_OPA_COVER;
+    stops[1].frac = 255;
 
     lv_matrix_t mt;
     lv_matrix_identity(&mt);
     lv_matrix_rotate(&mt, 30);
     lv_vector_dsc_set_fill_transform(ctx, &mt);
 
-    lv_vector_dsc_set_fill_linear_gradient(ctx, &grad, LV_VECTOR_GRADIENT_SPREAD_PAD);
+    lv_vector_dsc_set_fill_linear_gradient(ctx, 200, 200, 400, 400);
+    lv_vector_dsc_set_fill_gradient_color_stops(ctx, stops, 2);
+    lv_vector_dsc_set_fill_gradient_spread(ctx, LV_VECTOR_GRADIENT_SPREAD_PAD);
     lv_vector_dsc_add_path(ctx, path); // draw a path
 }
 
@@ -92,20 +90,18 @@ static void draw_radial_gradient(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
     lv_vector_path_line_to(path, &pts[3]);
     lv_vector_path_close(path);
 
-    lv_grad_dsc_t grad;
-    grad.dir = LV_GRAD_DIR_HOR;
-    grad.stops_count = 2;
-    grad.stops[0].color = lv_color_hex(0xff0000);
-    grad.stops[0].opa = LV_OPA_COVER;
-    grad.stops[0].frac = 0;
-    grad.stops[1].color = lv_color_hex(0x0000ff);
-    grad.stops[1].opa = LV_OPA_COVER;
-    grad.stops[1].frac = 255;
-    // grad.stops[2].color = lv_color_hex(0x0000ff);
-    // grad.stops[2].opa = LV_OPA_COVER;
-    // grad.stops[2].frac = 255;
+    lv_gradient_stop_t stops[2];
+    lv_memzero(stops, sizeof(stops));
+    stops[0].color = lv_color_hex(0xff0000);
+    stops[0].opa = LV_OPA_COVER;
+    stops[0].frac = 0;
+    stops[1].color = lv_color_hex(0x0000ff);
+    stops[1].opa = LV_OPA_COVER;
+    stops[1].frac = 255;
 
-    lv_vector_dsc_set_fill_radial_gradient(ctx, &grad, 50, 50, 20, LV_VECTOR_GRADIENT_SPREAD_REFLECT);
+    lv_vector_dsc_set_fill_radial_gradient(ctx, 450, 100, 20);
+    lv_vector_dsc_set_fill_gradient_color_stops(ctx, stops, 2);
+    lv_vector_dsc_set_fill_gradient_spread(ctx, LV_VECTOR_GRADIENT_SPREAD_REFLECT);
     lv_vector_dsc_add_path(ctx, path); // draw a path
 }
 
