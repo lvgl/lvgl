@@ -683,7 +683,7 @@ void lv_vector_dsc_set_fill_gradient_color_stops(lv_vector_dsc_t * dsc, const lv
                                                  uint16_t count)
 {
     if(count > LV_GRADIENT_MAX_STOPS) {
-        LV_LOG_WARN("Too many gradient stops. Truncating to %d", LV_GRADIENT_MAX_STOPS);
+        LV_LOG_WARN("Gradient stops limited: %d, max: %d", count, LV_GRADIENT_MAX_STOPS);
         count = LV_GRADIENT_MAX_STOPS;
     }
 
@@ -786,7 +786,7 @@ void lv_vector_dsc_set_stroke_gradient_color_stops(lv_vector_dsc_t * dsc, const 
                                                    uint16_t count)
 {
     if(count > LV_GRADIENT_MAX_STOPS) {
-        LV_LOG_WARN("Too many gradient stops. Truncating to %d", LV_GRADIENT_MAX_STOPS);
+        LV_LOG_WARN("Gradient stops limited: %d, max: %d", count, LV_GRADIENT_MAX_STOPS);
         count = LV_GRADIENT_MAX_STOPS;
     }
 
