@@ -56,7 +56,7 @@ private:
     LottieInterpolator* getInterpolator(const char* key, Point& in, Point& out);
     uint8_t getDirection();
 
-    void getInperpolatorPoint(Point& pt);
+    void getInterpolatorPoint(Point& pt);
     void getPathSet(LottiePathSet& path);
     void getLayerSize(float& val);
     void getValue(TextDocument& doc);

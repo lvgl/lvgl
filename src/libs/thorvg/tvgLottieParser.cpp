@@ -350,7 +350,7 @@ void LottieParser::getValue(RGB24& color)
 }
 
 
-void LottieParser::getInperpolatorPoint(Point& pt)
+void LottieParser::getInterpolatorPoint(Point& pt)
 {
     enterObject();
     while (auto key = nextObjectKey()) {
@@ -432,9 +432,9 @@ void LottieParser::parseKeyFrame(T& prop)
     while (auto key = nextObjectKey()) {
         if (KEY_AS("i")) {
             interpolator = true;
-            getInperpolatorPoint(inTangent);
+            getInterpolatorPoint(inTangent);
         } else if (KEY_AS("o")) {
-            getInperpolatorPoint(outTangent);
+            getInterpolatorPoint(outTangent);
         } else if (KEY_AS("n")) {
             if (peekType() == kStringType) {
                 interpolatorKey = getString();
