@@ -18,7 +18,7 @@ extern "C" {
 
 #if LV_USE_MATRIX
 
-#include <stdbool.h>
+#include "lv_types.h"
 #include "lv_area.h"
 
 /*********************

@@ -15,7 +15,6 @@
 #include "lv_math.h"
 
 #include <math.h>
-#include <stdbool.h>
 
 /*********************
  *      DEFINES
