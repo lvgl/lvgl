@@ -1016,7 +1016,7 @@ void LottieParser::parseMarkers()
     }
 }
 
-void LottieParser::parseChars(Array<LottieGlyph*>& glyphes)
+void LottieParser::parseChars(Array<LottieGlyph*>& glyphs)
 {
     enterArray();
     while (nextArrayValue()) {
@@ -1038,7 +1038,7 @@ void LottieParser::parseChars(Array<LottieGlyph*>& glyphes)
             } else skip(key);
         }
         glyph->prepare();
-        glyphes.push(glyph);
+        glyphs.push(glyph);
     }
 }
 
@@ -1287,11 +1287,11 @@ LottieLayer* LottieParser::parseLayers()
 }
 
 
-void LottieParser::postProcess(Array<LottieGlyph*>& glyphes)
+void LottieParser::postProcess(Array<LottieGlyph*>& glyphs)
 {
     //aggregate font characters
-    for (uint32_t g = 0; g < glyphes.count; ++g) {
-        auto glyph = glyphes[g];
+    for (uint32_t g = 0; g < glyphs.count; ++g) {
+        auto glyph = glyphs[g];
         for (uint32_t i = 0; i < comp->fonts.count; ++i) {
             auto& font = comp->fonts[i];
             if (!strcmp(font->family, glyph->family) && !strcmp(font->style, glyph->style)) {
@@ -1370,7 +1370,7 @@ bool LottieParser::parse()
     comp = new LottieComposition;
     if (!comp) return false;
 
-    Array<LottieGlyph*> glyphes;
+    Array<LottieGlyph*> glyphs;
 
     while (auto key = nextObjectKey()) {
         if (KEY_AS("v")) comp->version = getStringCopy();
@@ -1383,7 +1383,7 @@ bool LottieParser::parse()
         else if (KEY_AS("assets")) parseAssets();
         else if (KEY_AS("layers")) comp->root = parseLayers();
         else if (KEY_AS("fonts")) parseFonts();
-        else if (KEY_AS("chars")) parseChars(glyphes);
+        else if (KEY_AS("chars")) parseChars(glyphs);
         else if (KEY_AS("markers")) parseMarkers();
         else skip(key);
     }
@@ -1396,7 +1396,7 @@ bool LottieParser::parse()
     comp->root->inFrame = comp->startFrame;
     comp->root->outFrame = comp->endFrame;
 
-    postProcess(glyphes);
+    postProcess(glyphs);
 
     return true;
 }
