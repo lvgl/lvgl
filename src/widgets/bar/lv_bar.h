@@ -122,10 +122,10 @@ void lv_bar_set_mode(lv_obj_t * obj, lv_bar_mode_t mode);
 
 /**
  * Set the orientation of bar.
- * @param obj       pointer to bar object
- * @param orient    bar orientation from ::lv_bar_orientation_t
+ * @param obj           pointer to bar object
+ * @param orientation   bar orientation from `lv_bar_orientation_t`
  */
-void lv_bar_set_orientation(lv_obj_t * obj, lv_bar_orientation_t orient);
+void lv_bar_set_orientation(lv_obj_t * obj, lv_bar_orientation_t orientation);
 
 /*=====================
  * Getter functions
