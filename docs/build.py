@@ -16,6 +16,7 @@ import shutil
 import tempfile
 import config_builder
 import add_translation
+from docbuilder_utils import spawn
 
 # due to the modifications that take place to the documentation files
 # when the documentaation builds it is better to copy the source files to a
@@ -70,10 +71,11 @@ def cmd(s):
     print("")
     print(s)
     print("-------------------------------------")
-    r = os.system(s)
-    if r != 0:
+
+    result = os.system(s)
+    if result != 0:
         print("Exit build due to previous error")
-        exit(-1)
+        sys.exit(result)
 
 
 # Get the current branch name
@@ -140,7 +142,7 @@ print("Add translation")
 add_translation.exec(temp_directory)
 
 print("Running doxygen")
-cmd('cd "{0}" && doxygen Doxyfile'.format(temp_directory))
+cmd('cd "{temp_directory}" && doxygen Doxyfile'.format(temp_directory=temp_directory))
 
 print('Reading Doxygen output')
 
