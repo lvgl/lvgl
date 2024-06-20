@@ -962,7 +962,6 @@ static void refr_obj_matrix(lv_layer_t * layer, lv_obj_t * obj)
     layer->matrix = ori_matrix;
     /* restore clip area */
     layer->_clip_area = clip_area_ori;
-
 }
 
 #endif /* LV_DRAW_TRANSFORM_USE_MATRIX */

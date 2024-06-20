@@ -204,7 +204,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
             break;
         case LV_VECTOR_DRAW_STYLE_GRADIENT: {
                 vg_lite_matrix_t grad_matrix;
-                lv_matrix_to_vg(&grad_matrix, &dsc->fill_dsc.matrix);
+                lv_vg_lite_matrix(&grad_matrix, &dsc->fill_dsc.matrix);
 
                 lv_vg_lite_draw_grad(
                     u,
