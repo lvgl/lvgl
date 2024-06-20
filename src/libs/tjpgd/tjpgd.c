@@ -534,7 +534,7 @@ static int bitext(  /* >=0: extracted data, <0: error code */
 
 JRESULT jd_restart(
     JDEC * jd,      /* Pointer to the decompressor object */
-    uint16_t rstn   /* Expected restert sequence number */
+    uint16_t rstn   /* Expected restart sequence number */
 )
 {
     unsigned int i;
