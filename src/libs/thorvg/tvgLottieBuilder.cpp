@@ -419,7 +419,7 @@ static void _repeat(LottieGroup* parent, unique_ptr<Shape> path, RenderContext* 
         shape->transform(pm ? mathMultiply(&m, pm) : m);
 
         if (ctx->roundness > 1.0f && P(shape)->rs.stroke) {
-            TVGERR("LOTTIE", "FIXME: Path roundesss should be applied properly!");
+            TVGERR("LOTTIE", "FIXME: Path roundness should be applied properly!");
             P(shape)->rs.stroke->join = StrokeJoin::Round;
         }
 
