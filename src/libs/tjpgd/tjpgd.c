@@ -1044,7 +1044,7 @@ JRESULT jd_prepare(
                     if(b != 0x00 && b != 0x11) return JDR_FMT3;     /* Err: Different table number for DC/AC element */
                     n = i ? 1 : 0;                          /* Component class */
                     if(!jd->huffbits[n][0] || !jd->huffbits[n][1]) {    /* Check huffman table for this component */
-                        return JDR_FMT1;                    /* Err: Nnot loaded */
+                        return JDR_FMT1;                    /* Err: Not loaded */
                     }
                     if(!jd->qttbl[jd->qtid[i]]) {           /* Check dequantizer table for this component */
                         return JDR_FMT1;                    /* Err: Not loaded */
