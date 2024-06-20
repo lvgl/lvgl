@@ -144,7 +144,7 @@ Get started with the Renesas ecosystem
       The compiler must be activated in e² studio:
 
       - Go to go to ``Help`` -> ``Add Renesas Toolchains``
-      - Presss the ``Add... `` button
+      - Press the ``Add... `` button
       - Browse the installation folder of the toolchain
 
       |
