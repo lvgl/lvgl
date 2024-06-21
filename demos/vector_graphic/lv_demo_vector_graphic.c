@@ -291,7 +291,15 @@ void lv_demo_vector_graphic_buffered(void)
  **********************/
 #else
 
-void lv_demo_vector_graphic(void)
+void lv_demo_vector_graphic_not_buffered(void)
+{
+    /*fallback for online examples*/
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "Vector graphics is not enabled");
+    lv_obj_center(label);
+}
+
+void lv_demo_vector_graphic_buffered(void)
 {
     /*fallback for online examples*/
     lv_obj_t * label = lv_label_create(lv_screen_active());
