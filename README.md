@@ -57,14 +57,14 @@ Our team is ready to help you with graphics design, UI implementation and consul
   - Word wrapping, kerning, text scrolling, sub-pixel rendering, Pinyin-IME Chinese input, Emojis in texts.
   - Rendering engine supporting animations, anti-aliasing, opacity, smooth scrolling, shadows, image transformation, etc  
   - Supports Mouse, Touchpad, Keypad, Keyboard, External buttons, Encoder [Input devices](https://docs.lvgl.io/master/porting/indev.html).
-  - [Multiple display](https://docs.lvgl.io/master/overview/disp.html#multiple-display-support) support.
+  - [Multiple display](https://docs.lvgl.io/master/overview/display.html#multiple-display-support) support.
 
 **Binding and Build Support**
   - [Micropython Binding](https://blog.lvgl.io/2019-02-20/micropython-bindings) exposes LVGL API
   - [PikaScript Binding](https://blog.lvgl.io/2022-08-24/pikascript-and-lvgl) python on MCU lighter and easier.
   - No custom build system is used. You can build LVGL as you build the other files of your project.
-  - Support for Make and [CMake](https://docs.lvgl.io/master/get-started/platforms/cmake.html) is included out of the box.
-  - [Develop on PC](https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html) and use the same UI code on embedded hardware.
+  - Support for Make and [CMake](https://docs.lvgl.io/master/integration/building/cmake.html) is included out of the box.
+  - [Develop on PC](https://docs.lvgl.io/master/integration/ide/pc-simulator.html) and use the same UI code on embedded hardware.
   - Convert the C UI code to HTML file with our [Emscripten port](https://github.com/lvgl/lv_web_emscripten).
 
 **Docs, Tools, and Services**
