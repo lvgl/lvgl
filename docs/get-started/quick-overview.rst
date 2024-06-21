@@ -33,11 +33,11 @@ If you would rather try LVGL on your own project follow these steps:
    ``lvgl`` folder, change the first ``#if 0`` to ``1`` to enable the
    file's content and set the :c:macro:`LV_COLOR_DEPTH` defines.
 -  Include ``lvgl/lvgl.h`` in files where you need to use LVGL related functions.
+-  Call :cpp:func:`lv_init`
 -  Call :cpp:expr:`lv_tick_inc(x)` every ``x`` milliseconds in a Timer or Task
    (``x`` should be between 1 and 10). It is required for the internal
    timing of LVGL. Alternatively, register a ``tick_get_cb`` with
    :cpp:func:`lv_tick_set_cb` so that LVGL can retrieve the current time directly.
--  Call :cpp:func:`lv_init`
 -  Create a display.
 
 .. code:: c
