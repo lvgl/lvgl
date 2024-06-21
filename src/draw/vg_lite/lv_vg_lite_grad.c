@@ -403,7 +403,7 @@ static bool linear_grad_create(grad_item_t * item)
 
     /* Gradient setup */
     if(item->lv.stops_count > VLC_MAX_GRADIENT_STOPS) {
-        LV_LOG_WARN("Too many gradient stops, max is %d", VLC_MAX_GRADIENT_STOPS);
+        LV_LOG_WARN("Gradient stops limited: %d, max: %d", item->lv.stops_count, VLC_MAX_GRADIENT_STOPS);
         item->lv.stops_count = VLC_MAX_GRADIENT_STOPS;
     }
 
@@ -432,7 +432,7 @@ static bool linear_ext_grad_create(grad_item_t * item)
     LV_PROFILER_BEGIN;
 
     if(item->lv.stops_count > VLC_MAX_COLOR_RAMP_STOPS) {
-        LV_LOG_WARN("Too many gradient stops, max is %d", VLC_MAX_COLOR_RAMP_STOPS);
+        LV_LOG_WARN("Gradient stops limited: %d, max: %d", item->lv.stops_count, VLC_MAX_GRADIENT_STOPS);
         item->lv.stops_count = VLC_MAX_COLOR_RAMP_STOPS;
     }
 
@@ -484,7 +484,7 @@ static bool radial_grad_create(grad_item_t * item)
     LV_PROFILER_BEGIN;
 
     if(item->lv.stops_count > VLC_MAX_COLOR_RAMP_STOPS) {
-        LV_LOG_WARN("Too many gradient stops, max is %d", VLC_MAX_COLOR_RAMP_STOPS);
+        LV_LOG_WARN("Gradient stops limited: %d, max: %d", item->lv.stops_count, VLC_MAX_GRADIENT_STOPS);
         item->lv.stops_count = VLC_MAX_COLOR_RAMP_STOPS;
     }
 

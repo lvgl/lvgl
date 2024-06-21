@@ -425,7 +425,7 @@ void lv_vector_dsc_set_fill_gradient_spread(lv_vector_dsc_t * dsc, lv_vector_gra
  * Set fill gradient color stops for descriptor
  * @param dsc              pointer to a vector graphic descriptor
  * @param stops            an array of `lv_gradient_stop_t` variables
- * @param count            the number of stops in the array
+ * @param count            the number of stops in the array, range: 0..LV_GRADIENT_MAX_STOPS
  */
 void lv_vector_dsc_set_fill_gradient_color_stops(lv_vector_dsc_t * dsc, const lv_gradient_stop_t * stops,
                                                  uint16_t count);
