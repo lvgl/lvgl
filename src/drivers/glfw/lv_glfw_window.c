@@ -1,5 +1,5 @@
 /**
- * @file lv_glfw_window.c
+ * @file lv_opengles_window.c
  *
  */
 
@@ -58,16 +58,26 @@ static void window_event_handler(lv_timer_t * t);
 static void release_disp_cb(lv_event_t * e);
 static void res_chg_event_cb(lv_event_t * e);
 static uint32_t lv_glfw_tick_count_callback(void);
+static lv_display_t * _lv_glfw_get_disp_from_window(GLFWwindow * window);
+static void glfw_error_cb(int error, const char * description);
+static int lv_glfw_init(void);
+static int lv_glew_init(void);
+static void lv_glfw_window_config(GLFWwindow * window);
+static void window_close_callback(GLFWwindow * window);
+static void key_callback(GLFWwindow * window, int key, int scancode, int action, int mods);
+static void mouse_button_callback(GLFWwindow * window, int button, int action, int mods);
+static void mouse_move_cllback(GLFWwindow * window, double xpos, double ypos);
+static void framebuffer_size_callback(GLFWwindow * window, int width, int height);
 
 /***********************
  *   GLOBAL PROTOTYPES
  ***********************/
-static bool inited = false;
-bool deiniting = false;
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+static bool inited = false;
+static GLFWwindow * window_closed = NULL;
 static lv_timer_t * update_handler_timer;
 static lv_timer_t * event_handler_timer;
 
@@ -79,7 +89,7 @@ static lv_timer_t * event_handler_timer;
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res)
+static void lv_glfw_timer_init()
 {
     if(!inited) {
         update_handler_timer = lv_timer_create(window_update_handler, 5, NULL);
@@ -89,10 +99,35 @@ lv_display_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res)
 
         inited = true;
     }
+}
+
+static void lv_glfw_window_config(GLFWwindow * window)
+{
+    glfwMakeContextCurrent(window);
+
+    glfwSwapInterval(1);
+
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetCursorPosCallback(window, mouse_move_cllback);
+
+    glfwSetKeyCallback(window, key_callback);
+
+    glfwSetWindowCloseCallback(window, window_close_callback);
+}
+
+lv_display_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res)
+{
+    if(lv_glfw_init() != 0) {
+        return NULL;
+    }
 
     lv_glfw_window_t * dsc = lv_malloc_zeroed(sizeof(lv_glfw_window_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
+
+    dsc->zoom = 1;
 
     lv_display_t * disp = lv_display_create(hor_res, ver_res);
     if(disp == NULL) {
@@ -100,8 +135,20 @@ lv_display_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res)
         return NULL;
     }
 
-    lv_display_add_event_cb(disp, release_disp_cb, LV_EVENT_DELETE, disp);
+    lv_glfw_timer_init();
 
+    /* Create window with graphics context */
+    dsc->window = glfwCreateWindow(hor_res * dsc->zoom, ver_res * dsc->zoom, "LVGL Simulator", NULL, NULL);
+    if(dsc->window == NULL) {
+        LV_LOG_ERROR("glfwCreateWindow fail.\n");
+        return NULL;
+    }
+
+    lv_glfw_window_config(dsc->window);
+
+    lv_glew_init();
+
+    lv_display_add_event_cb(disp, release_disp_cb, LV_EVENT_DELETE, disp);
     lv_display_set_driver_data(disp, dsc);
 
     int ret = window_create(disp);
@@ -126,18 +173,72 @@ lv_display_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_glfw_window_quit(lv_display_t * disp)
+static int lv_glfw_init(void)
 {
-    lv_glfw_window_t * dsc = lv_display_get_driver_data(disp);
-    if(inited) {
-        lv_timer_delete(update_handler_timer);
-        update_handler_timer = NULL;
-
-        glfwDestroyWindow(dsc->window);
-        glfwTerminate();
-
-        inited = false;
+    static bool glfw_inited = false;
+    if(glfw_inited) {
+        return 0;
     }
+
+    glfwSetErrorCallback(glfw_error_cb);
+
+    int ret = glfwInit();
+    if(ret == 0) {
+        LV_LOG_ERROR("glfwInit fail.\n");
+        return 1;
+    }
+
+    glfw_inited = true;
+    return 0;
+}
+
+static int lv_glew_init(void)
+{
+    static bool glew_inited = false;
+    if(glew_inited) {
+        return 0;
+    }
+
+    GLenum ret = glewInit();
+    if(ret != GLEW_OK) {
+        LV_LOG_ERROR("glewInit fail: %d.\n", ret);
+        return ret;
+    }
+
+    LV_LOG_INFO("GL version: %s\n", glGetString(GL_VERSION));
+    LV_LOG_INFO("GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+    glew_inited = true;
+
+    return 0;
+}
+
+static void lv_glfw_window_quit()
+{
+    int working_window = 0;
+    lv_display_t * disp = lv_display_get_next(NULL);
+    while(disp) {
+        lv_glfw_window_t * dsc = lv_display_get_driver_data(disp);
+        if(dsc != NULL) {
+            working_window++;
+        }
+
+        disp = lv_display_get_next(disp);
+    }
+
+    if(working_window > 0) {
+        return;
+    }
+
+    lv_timer_delete(update_handler_timer);
+    update_handler_timer = NULL;
+
+    glfwTerminate();
+
+    lv_deinit();
+
+    inited = false;
+    exit(0);
 }
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
@@ -158,21 +259,27 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 static void window_event_handler(lv_timer_t * t)
 {
     LV_UNUSED(t);
-    if(deiniting == false) {
+    if(window_closed == NULL) {
         return;
     }
 
-    lv_display_t * disp = lv_display_get_default();
-    if(disp == NULL) {
-        return;
-    }
-    lv_glfw_window_t * dsc = lv_display_get_driver_data(disp);
-    if(dsc == NULL) {
-        return;
+    lv_display_t * disp = lv_display_get_next(NULL);
+    while(disp) {
+        lv_glfw_window_t * dsc = lv_display_get_driver_data(disp);
+        if(dsc == NULL) {
+            disp = lv_display_get_next(disp);
+            continue;
+        }
+        if(dsc->window == window_closed) {
+            glfwSetWindowShouldClose(dsc->window, GLFW_TRUE);
+            lv_display_send_event(disp, LV_EVENT_DELETE, NULL);
+            break;
+        }
+
+        disp = lv_display_get_next(disp);
     }
 
-    glfwSetWindowShouldClose(dsc->window, GLFW_TRUE);
-    lv_display_send_event(disp, LV_EVENT_DELETE, NULL);
+    window_closed = NULL;
 }
 
 /**
@@ -181,22 +288,26 @@ static void window_event_handler(lv_timer_t * t)
 static void window_update_handler(lv_timer_t * t)
 {
     LV_UNUSED(t);
-    lv_display_t * disp = lv_display_get_default();
-    if(disp == NULL) {
-        return;
-    }
-    lv_glfw_window_t * dsc = lv_display_get_driver_data(disp);
-    if(dsc == NULL) {
-        return;
-    }
+    lv_display_t * disp = lv_display_get_next(NULL);
+    while(disp) {
+        lv_glfw_window_t * dsc = lv_display_get_driver_data(disp);
+        if(dsc == NULL) {
+            disp = lv_display_get_next(disp);
+            continue;
+        }
 
-    if(!glfwWindowShouldClose(dsc->window)) {
-        lv_opengles_update(dsc->fb1, disp->hor_res, disp->ver_res);
+        glfwMakeContextCurrent(dsc->window);
 
-        /* Swap front and back buffers */
-        glfwSwapBuffers(dsc->window);
+        if(!glfwWindowShouldClose(dsc->window)) {
+            lv_opengles_update(dsc->fb1, disp->hor_res, disp->ver_res);
 
-        glfwPollEvents();
+            /* Swap front and back buffers */
+            glfwSwapBuffers(dsc->window);
+
+            glfwPollEvents();
+        }
+
+        disp = lv_display_get_next(disp);
     }
 }
 
@@ -205,28 +316,43 @@ static void glfw_error_cb(int error, const char * description)
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
+static lv_display_t * _lv_glfw_get_disp_from_window(GLFWwindow * window)
+{
+    if(window == NULL) return NULL;
+
+    lv_display_t * disp = lv_display_get_next(NULL);
+    while(disp) {
+        lv_glfw_window_t * dsc = lv_display_get_driver_data(disp);
+        if(dsc != NULL && dsc->window == window) {
+            return disp;
+        }
+        disp = lv_display_get_next(disp);
+    }
+    return NULL;
+}
+
 static void window_close_callback(GLFWwindow * window)
 {
-    LV_UNUSED(window);
-    deiniting = true;
+    window_closed = window;
 }
 
 static void key_callback(GLFWwindow * window, int key, int scancode, int action, int mods)
 {
-    LV_UNUSED(window);
     LV_UNUSED(scancode);
     LV_UNUSED(mods);
     if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        deiniting = true;
+        window_closed = window;
     }
 }
 
 static void mouse_button_callback(GLFWwindow * window, int button, int action, int mods)
 {
-    LV_UNUSED(window);
     LV_UNUSED(mods);
     if(button == GLFW_MOUSE_BUTTON_LEFT) {
-        lv_display_t * disp = lv_display_get_default();
+        lv_display_t * disp = _lv_glfw_get_disp_from_window(window);
+        if(disp == NULL) {
+            return;
+        }
         if(action == GLFW_PRESS) {
             lv_glfw_mouse_btn_handler(disp, 1);
         }
@@ -238,16 +364,16 @@ static void mouse_button_callback(GLFWwindow * window, int button, int action, i
 
 static void mouse_move_cllback(GLFWwindow * window, double xpos, double ypos)
 {
-    LV_UNUSED(window);
-    lv_display_t * disp = lv_display_get_default();
+    lv_display_t * disp = _lv_glfw_get_disp_from_window(window);
+    if(disp == NULL) {
+        return;
+    }
     lv_glfw_mouse_move_handler(disp, (int)xpos, (int)ypos);
 }
 
 static void framebuffer_size_callback(GLFWwindow * window, int width, int height)
 {
-    LV_UNUSED(window);
-    glViewport(0, 0, width, height);
-    lv_display_t * disp = lv_display_get_default();
+    lv_display_t * disp = _lv_glfw_get_disp_from_window(window);
     if(disp == NULL) {
         return;
     }
@@ -274,46 +400,9 @@ static void texture_resize(lv_display_t * disp)
 static int window_create(lv_display_t * disp)
 {
     lv_glfw_window_t * dsc = lv_display_get_driver_data(disp);
-    dsc->zoom = 1;
-
-    glfwSetErrorCallback(glfw_error_cb);
-    if(!glfwInit()) {
-        LV_LOG_ERROR("glfwInit fail.\n");
-        return 1;
-    }
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
     int32_t hor_res = disp->hor_res;
     int32_t ver_res = disp->ver_res;
-
-    /* Create window with graphics context */
-    dsc->window = glfwCreateWindow(hor_res * dsc->zoom, ver_res * dsc->zoom, "LVGL Simulator", NULL, NULL);
-    if(dsc->window == NULL) {
-        LV_LOG_ERROR("glfwCreateWindow fail.\n");
-        return 2;
-    }
-
-    glfwMakeContextCurrent(dsc->window);
-    if(glewInit() != GLEW_OK) {
-        LV_LOG_ERROR("glewInit fail.\n");
-        return 3;
-    }
-
-    LV_LOG_INFO("GL version: %s\n", glGetString(GL_VERSION));
-    LV_LOG_INFO("GLSL version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
-
-    glfwSwapInterval(1);
-
-    glfwSetFramebufferSizeCallback(dsc->window, framebuffer_size_callback);
-
-    glfwSetMouseButtonCallback(dsc->window, mouse_button_callback);
-    glfwSetCursorPosCallback(dsc->window, mouse_move_cllback);
-
-    glfwSetKeyCallback(dsc->window, key_callback);
-
-    glfwSetWindowCloseCallback(dsc->window, window_close_callback);
 
     texture_resize(disp);
 
@@ -344,8 +433,11 @@ static void release_disp_cb(lv_event_t * e)
 {
     lv_display_t * disp = (lv_display_t *) lv_event_get_user_data(e);
     lv_glfw_window_t * dsc = lv_display_get_driver_data(disp);
+    if(dsc == NULL) {
+        return;
+    }
 
-    lv_glfw_window_quit(disp);
+    glfwDestroyWindow(dsc->window);
 
     if(dsc->fb1) {
         free(dsc->fb1);
@@ -364,10 +456,10 @@ static void release_disp_cb(lv_event_t * e)
         dsc->buf2 = NULL;
     }
 
-    lv_deinit();
     lv_free(dsc);
+    lv_display_set_driver_data(disp, NULL);
 
-    exit(0);
+    lv_glfw_window_quit();
 }
 
 static uint32_t lv_glfw_tick_count_callback(void)

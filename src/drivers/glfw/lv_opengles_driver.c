@@ -175,6 +175,7 @@ void lv_opengles_deinit(void)
 
 void lv_opengles_update(uint8_t * frame_buffer, int32_t hor, int32_t ver)
 {
+    glViewport(0, 0, hor, ver);
     lv_opengles_render_clear();
     lv_opengles_texture_update(frame_buffer, hor, ver);
 
