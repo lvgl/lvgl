@@ -54,9 +54,6 @@ void lv_draw_vg_lite_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_sh
     shadow_area.y1 = core_area.y1 - dsc->width / 2 - 1;
     shadow_area.y2 = core_area.y2 + dsc->width / 2 + 1;
 
-    lv_opa_t opa = dsc->opa;
-    if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
-
     /*Get clipped draw area which is the real draw area.
      *It is always the same or inside `shadow_area`*/
     lv_area_t draw_area;
