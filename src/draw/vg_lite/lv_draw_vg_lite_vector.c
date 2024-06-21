@@ -73,10 +73,10 @@ void lv_draw_vg_lite_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_tas
 static vg_lite_color_t lv_color32_to_vg(lv_color32_t color, lv_opa_t opa)
 {
     uint8_t a = LV_OPA_MIX2(color.alpha, opa);
-    if(a < LV_OPA_MAX) {
-        color.red = LV_UDIV255(color.red * opa);
-        color.green = LV_UDIV255(color.green * opa);
-        color.blue = LV_UDIV255(color.blue * opa);
+    if(a < LV_OPA_COVER) {
+        color.red = LV_UDIV255(color.red * a);
+        color.green = LV_UDIV255(color.green * a);
+        color.blue = LV_UDIV255(color.blue * a);
     }
     return (uint32_t)a << 24 | (uint32_t)color.blue << 16 | (uint32_t)color.green << 8 | color.red;
 }

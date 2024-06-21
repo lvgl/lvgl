@@ -713,7 +713,7 @@ uint32_t lv_vg_lite_get_palette_size(vg_lite_buffer_format_t format)
 
 vg_lite_color_t lv_vg_lite_color(lv_color_t color, lv_opa_t opa, bool pre_mul)
 {
-    if(pre_mul && opa < LV_OPA_MAX) {
+    if(pre_mul && opa < LV_OPA_COVER) {
         color.red = LV_UDIV255(color.red * opa);
         color.green = LV_UDIV255(color.green * opa);
         color.blue = LV_UDIV255(color.blue * opa);
