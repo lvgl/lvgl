@@ -265,12 +265,12 @@ static void event_cb(lv_event_t * e)
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_demo_vector_graphic_buffered(void)
+void lv_demo_vector_graphic_not_buffered(void)
 {
     lv_obj_add_event_cb(lv_screen_active(), event_cb, LV_EVENT_DRAW_MAIN, NULL);
 }
 
-void lv_demo_vector_graphic_not_buffered(void)
+void lv_demo_vector_graphic_buffered(void)
 {
     lv_draw_buf_t * draw_buf = lv_draw_buf_create(WIDTH, HEIGHT, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
     lv_draw_buf_clear(draw_buf, NULL);
