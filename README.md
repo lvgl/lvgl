@@ -8,7 +8,7 @@
 <br>
 
 <p align="center">
-  <img src="https://lvgl.io/github-assets/logo-colored.png" max-width="300px">
+  <img src="https://lvgl.io/github-assets/logo-colored.png" style="max-width=300px">
 </p>
 
   <h1 align="center">Light and Versatile Graphics Library</h1>
