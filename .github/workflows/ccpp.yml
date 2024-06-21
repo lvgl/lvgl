@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         # A valid option parameter to the cmake file.
@@ -23,6 +23,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
     - name: Building ${{ matrix.build_option }}
@@ -60,7 +64,7 @@ jobs:
         CC: cl
 
   test-native:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
      matrix:
        # A valid option parameter to the cmake file.
@@ -71,6 +75,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
     - name: Fix kernel mmap rnd bits
@@ -82,7 +90,7 @@ jobs:
       if: matrix.build_config == '32bit build'
       run: echo "NON_AMD64_BUILD=1" >> $GITHUB_ENV
     - name: Run tests
-      run: python tests/main.py --report --update-image test
+      run: python tests/main.py test
     - name: Archive screenshot errors
       if: failure()
       uses: actions/upload-artifact@v4
@@ -91,9 +99,3 @@ jobs:
         path: |
              tests/ref_imgs*/**/*_err.png
              test_screenshot_error.h
-#    - name: Upload coverage to Codecov
-#      uses: codecov/codecov-action@v4
-#      if: github.event_name == 'push' && github.repository == 'lvgl/lvgl'
-#      with:
-#        fail_ci_if_error: true
-#        verbose: true
