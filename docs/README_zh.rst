@@ -1,7 +1,7 @@
 .. raw:: html
 
    <p align="left">
-     <a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/assets/images/sponsor.png" height="32px"></a>
+     <a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/github-assets/sponsor.png" height="32px"></a>
    </p>
 
    <p align="right">
@@ -15,7 +15,7 @@
 .. raw:: html
 
    <p align="center">
-     <img src="https://lvgl.io/assets/images/logo_lvgl.png">
+     <img src="https://lvgl.io/github-assets/logo-colored.png" max-width="300px">
    </p>
 
 .. raw:: html
@@ -30,9 +30,9 @@
 .. raw:: html
 
    <div align="center">
-     <img src="https://github.com/kisvegabor/test/raw/master/smartwatch_demo.gif">
+     <img src="https://lvgl.io/github-assets/smartwatch-demo.gif">
      &nbsp;
-     <img border="1px" src="https://lvgl.io/assets/images/lvgl_widgets_demo.gif">
+     <img border="1px" src="https://lvgl.io/github-assets/widgets-demo.gif">
    </div>
    <br>
    <p align="center">
@@ -49,16 +49,16 @@
 📒 概况与总览
 -------------
 
-**成熟且知名**\ 
+**成熟且知名**\
 
 LVGL 是最流行的免费开源嵌入式图形库，可以为任何 MCU、MPU 和显示类型创建漂亮的 UI。它得到了行业领先供应商和项目的支持，如 Arm、STM32、NXP、Espressif、Nuvoton、Arduino、RT-Thread、Zephyr、NuttX、Adafruit 等。
 
-**功能丰富**\ 
+**功能丰富**\
 
 它拥有创建现代美观 GUI 的所有功能：30 多个内置控件、强大的样式系统、Web 启发的布局管理器和支持多种语言的排版系统。要将 LVGL 集成到您的平台中，您只需要至少 32 KB
 RAM 和 128 KB Flash、C 编译器、帧缓冲区和至少 1/10 屏幕大小的渲染缓冲区。
 
-**服务**\ 
+**服务**\
 
 我们的团队随时准备为您提供图形设计、UI 实现和咨询服务。如果您在开发下一个 GUI 项目时需要一些支持，请与我们联系。
 
@@ -116,23 +116,23 @@ RAM 和 128 KB Flash、C 编译器、帧缓冲区和至少 1/10 屏幕大小的�
 
 如果 LVGL 为您节省了大量时间和金钱，或者您只是在使用它时玩得很开心，请考虑\ `支持它的开发 <https://github.com/sponsors/lvgl>`__\ 。
 
-**我们如何使用捐赠？**\ 
+**我们如何使用捐赠？**\
 
 我们的目标是为 LVGL 做得最多的人提供经济补偿。这意味着不仅维护人员，而且任何实现伟大功能的人都应该从累积的资金中获得报酬。我们用捐款来支付服务器和相关服务等运营成本。
 
-**如何捐赠？**\  
+**如何捐赠？**\
 
 我们使用 \ `GitHub Sponsors <https://github.com/sponsors/lvgl>`__\ ，您可以轻松发送一次性或定期捐款。您还可以以透明的方式查看我们的所有费用。
 
-**如何从您的贡献中获取报酬？**\ 
+**如何从您的贡献中获取报酬？**\
 
 如果有人实施或修复了一个标记为\ `赞助 <https://github.com/lvgl/lvgl/labels/Sponsored>`__\ 的问题，他或她将获得该工作的报酬。我们估计问题所需的时间、复杂性和重要性，并据此设定价格。直接评论一个赞助的问题，说“嗨，我想处理它。这就是我计划修复/实施它的方式…”。当维护人员批准并合并工作时，就认为它已经准备好了。之后，您可以在 \ `opencollective.com <https://opencollective.com/lvgl>`__\  上提交并支付费用，几天后您将收到付款。
 
-**支持 LVGL 的组织**\ 
+**支持 LVGL 的组织**\
 
 |Sponsors of LVGL|
 
-**支持 LVGL 的个人**\  
+**支持 LVGL 的个人**\
 
 |Backers of LVGL|
 

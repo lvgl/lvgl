@@ -1,7 +1,7 @@
 .. raw:: html
 
    <p align="left">
-     <a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/assets/images/sponsor.png" height="32px"></a>
+     <a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/github-assets//sponsor.png" height="32px"></a>
    </p>
 
    <p align="right">
@@ -52,7 +52,7 @@ Interface)を実現できます。 ARM, STM32, NXP, Espressif, Nuvoton, Arduino,
 RT-Thread, Zephyr, NuttX,
 Adafruitなど、業界をリードするベンダーやプロジェクトによりサポートされています。
 
-**機能豊富**\ 
+**機能豊富**\
 モダンで美しいGUIを作成するための機能をすべて備えています。
 30以上の組み込みウィジェット、強力なスタイルシステム、WEB由来のレイアウトマネージャ、多くの言語をサポートする文字グラフィックシステムなどです。
 LVGL のシステム要件は、RAM 32KB、Flash
