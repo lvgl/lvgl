@@ -16,7 +16,6 @@ import shutil
 import tempfile
 import config_builder
 import add_translation
-from docbuilder_utils import spawn
 
 # due to the modifications that take place to the documentation files
 # when the documentaation builds it is better to copy the source files to a
