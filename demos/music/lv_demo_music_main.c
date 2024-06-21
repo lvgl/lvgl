@@ -156,7 +156,6 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
     /*Create the content of the music player*/
     lv_obj_t * cont = create_cont(parent);
 
-
     create_wave_images(cont);
     lv_obj_t * title_box = create_title_box(cont);
     lv_obj_t * icon_box = create_icon_box(cont);
@@ -295,7 +294,7 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
     lv_obj_move_foreground(logo);
     lv_obj_align_to(logo, spectrum_obj, LV_ALIGN_CENTER, 0, 0);
 
-#if LV_DEMO_MUSIC_SQUARE != 0 && LV_DEMO_MUSIC_ROUND != 0
+#if LV_DEMO_MUSIC_SQUARE == 0 && LV_DEMO_MUSIC_ROUND == 0
     lv_obj_t * title = lv_label_create(lv_screen_active());
     lv_label_set_text(title, "LVGL Demo\nMusic player");
     lv_obj_set_style_text_align(title, LV_TEXT_ALIGN_CENTER, 0);
