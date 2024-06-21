@@ -15,7 +15,7 @@ concurrency:
 jobs:
   build-ubuntu:
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -31,6 +31,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
     - name: Building ${{ matrix.build_option }}
@@ -74,10 +78,14 @@ jobs:
         CC: ${{ matrix.compiler }}
 
   build-esp32s3:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     name: Build ESP IDF ESP32S3
     container: espressif/idf:v5.3.1
     steps:
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
     - name: Clone LVGL as a Component
       uses: actions/checkout@v4
       with:
@@ -90,7 +98,7 @@ jobs:
       run: . /opt/esp/idf/export.sh && idf.py build
 
   test-native:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
      matrix:
        # A valid option parameter to the cmake file.
@@ -101,6 +109,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
     - name: Fix kernel mmap rnd bits
