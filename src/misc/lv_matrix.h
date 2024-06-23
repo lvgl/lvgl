@@ -21,9 +21,14 @@ extern "C" {
 #include "lv_types.h"
 #include "lv_area.h"
 
+
 /*********************
  *      DEFINES
  *********************/
+
+#if !LV_USE_FLOAT
+#error "LV_USE_FLOAT is required for lv_matrix"
+#endif
 
 /**********************
  *      TYPEDEFS

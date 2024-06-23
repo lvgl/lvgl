@@ -1293,7 +1293,8 @@
     #endif
 #endif
 
-/*Enable matrix support*/
+/*Enable matrix support
+ *Requires `LV_USE_FLOAT = 1`*/
 #ifndef LV_USE_MATRIX
     #ifdef CONFIG_LV_USE_MATRIX
         #define LV_USE_MATRIX CONFIG_LV_USE_MATRIX

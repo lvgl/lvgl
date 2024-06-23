@@ -440,7 +440,8 @@
 /* Use `float` as `lv_value_precise_t` */
 #define LV_USE_FLOAT            0
 
-/*Enable matrix support*/
+/*Enable matrix support
+ *Requires `LV_USE_FLOAT = 1`*/
 #define LV_USE_MATRIX           0
 
 /*==================

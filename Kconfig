@@ -705,6 +705,7 @@ menu "LVGL configuration"
 		config LV_USE_MATRIX
 			bool "Enable matrix support"
 			default n
+			depends LV_USE_FLOAT
 	endmenu
 
 	menu "Font Usage"
