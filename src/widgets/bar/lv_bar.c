@@ -164,6 +164,15 @@ void lv_bar_set_mode(lv_obj_t * obj, lv_bar_mode_t mode)
     lv_obj_invalidate(obj);
 }
 
+void lv_bar_set_orientation(lv_obj_t * obj, lv_bar_orientation_t orientation)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_bar_t * bar = (lv_bar_t *)obj;
+
+    bar->orientation = orientation;
+    lv_obj_invalidate(obj);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -209,6 +218,14 @@ lv_bar_mode_t lv_bar_get_mode(lv_obj_t * obj)
     return bar->mode;
 }
 
+lv_bar_orientation_t lv_bar_get_orientation(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_bar_t * bar = (lv_bar_t *)obj;
+
+    return bar->orientation;
+}
+
 bool lv_bar_is_symmetrical(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -237,6 +254,7 @@ static void lv_bar_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     bar->indic_area.y1 = 0;
     bar->indic_area.y2 = 0;
     bar->mode = LV_BAR_MODE_NORMAL;
+    bar->orientation = LV_BAR_ORIENTATION_AUTO;
     bar->val_reversed = false;
 
     lv_bar_init_anim(obj, &bar->cur_value_anim);
@@ -280,7 +298,20 @@ static void draw_indic(lv_event_t * e)
         range = 1;
     }
 
-    bool hor = barw >= barh;
+    bool hor = false;
+    switch(bar->orientation) {
+        case LV_BAR_ORIENTATION_HORIZONTAL:
+            hor = true;
+            break;
+        case LV_BAR_ORIENTATION_VERTICAL:
+            hor = false;
+            break;
+        case LV_BAR_ORIENTATION_AUTO:
+        default:
+            hor = (barw >= barh);
+            break;
+    }
+
     bool sym = lv_bar_is_symmetrical(obj);
 
     /*Calculate the indicator area*/
@@ -304,7 +335,6 @@ static void draw_indic(lv_event_t * e)
         bar->indic_area.x1 = obj->coords.x1 + (barw / 2) - (LV_BAR_SIZE_MIN / 2);
         bar->indic_area.x2 = bar->indic_area.x1 + LV_BAR_SIZE_MIN;
     }
-
     int32_t indic_max_w = lv_area_get_width(&bar->indic_area);
     int32_t indic_max_h = lv_area_get_height(&bar->indic_area);
 
