@@ -440,6 +440,8 @@ void lv_obj_update_snap(lv_obj_t * obj, lv_anim_enable_t anim_en)
     lv_obj_update_layout(obj);
     lv_point_t p;
     lv_indev_scroll_get_snap_dist(obj, &p);
+    if(p.x == LV_COORD_MAX || p.x == LV_COORD_MIN) p.x = 0;
+    if(p.y == LV_COORD_MAX || p.y == LV_COORD_MIN) p.y = 0;
     lv_obj_scroll_by(obj, p.x, p.y, anim_en);
 }
 
