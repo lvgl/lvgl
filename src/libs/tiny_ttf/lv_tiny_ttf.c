@@ -220,6 +220,8 @@ static void ttf_cb_stream_seek(ttf_cb_stream_t * stream, size_t position)
 }
 #endif
 
+int directkernlookups;
+
 static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                  uint32_t unicode_letter_next)
 {
@@ -282,6 +284,7 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
             lv_cache_entry_t * kernpair = lv_cache_acquire_or_create(dsc->kernpair_cache, &kernpair_search_key, (void *)dsc);
 
             if(kernpair == NULL) {
+                directkernlookups++;
                 k = stbtt_GetGlyphKernAdvance(&dsc->info, g1, g2);
             } else
             {
@@ -444,6 +447,12 @@ lv_font_t * lv_tiny_ttf_create_file(const char * path, int32_t font_size)
     return lv_tiny_ttf_create(path, NULL, 0, font_size, LV_FONT_KERNING_NORMAL, LV_TINY_TTF_CACHE_GLYPH_CNT, LV_TINY_TTF_CACHE_KERNPAIR_CNT);
 }
 #endif
+/* create a font from the specified data pointer with the specified line height and the specified cache size.*/
+lv_font_t * lv_tiny_ttf_create_data_ex2(const void * data, size_t data_size, int32_t font_size, lv_font_kerning_t kerning, size_t glyphcache_size, size_t kerncache_size);
+{
+    return lv_tiny_ttf_create(NULL, data, data_size, font_size, kerning, glyphcache_size, kerncache_size);
+}
+
 lv_font_t * lv_tiny_ttf_create_data_ex(const void * data, size_t data_size, int32_t font_size, lv_font_kerning_t kerning, size_t cache_size)
 {
     return lv_tiny_ttf_create(NULL, data, data_size, font_size, kerning, cache_size, LV_TINY_TTF_CACHE_KERNPAIR_CNT);
@@ -477,7 +486,7 @@ static bool tiny_ttf_glyph_cache_create_cb(tiny_ttf_glyph_cache_data_t * node, v
     stbtt_GetGlyphHMetrics(&dsc->info, g1, &advw, &lsb);
     if ( dsc->kerning != LV_FONT_KERNING_NORMAL ) // calculate default advance
     {
-        volatile int k = stbtt_GetGlyphKernAdvance(&dsc->info, g1, 0);
+        int k = stbtt_GetGlyphKernAdvance(&dsc->info, g1, 0);
         dsc_out->adv_w = (uint16_t)floor((((float)advw + (float)k) * dsc->scale) +
                         0.5f); /*Horizontal space required by the glyph in [px]*/
     } else
@@ -516,7 +525,6 @@ static lv_cache_compare_res_t tiny_ttf_glyph_cache_compare_cb(const tiny_ttf_gly
 
 static bool tiny_ttf_draw_data_cache_create_cb(tiny_ttf_cache_data_t * node, void * user_data)
 {
-
     ttf_font_desc_t * dsc = (ttf_font_desc_t *)user_data;
 
     const stbtt_fontinfo * info = (const stbtt_fontinfo *)&dsc->info;
@@ -566,8 +574,11 @@ static lv_cache_compare_res_t tiny_ttf_draw_data_cache_compare_cb(const tiny_ttf
     return 0;
 }
 
+int kerncachecalls;
+
 static bool tiny_ttf_kernpair_cache_create_cb(tiny_ttf_kernpair_cache_data_t * node, void * user_data)
 {
+    kerncachecalls++;
     ttf_font_desc_t * dsc = (ttf_font_desc_t *)user_data;
     node->k = stbtt_GetGlyphKernAdvance(&dsc->info, node->g1, node->g2);
     return true;
