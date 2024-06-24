@@ -448,7 +448,7 @@ lv_font_t * lv_tiny_ttf_create_file(const char * path, int32_t font_size)
 }
 #endif
 /* create a font from the specified data pointer with the specified line height and the specified cache size.*/
-lv_font_t * lv_tiny_ttf_create_data_ex2(const void * data, size_t data_size, int32_t font_size, lv_font_kerning_t kerning, size_t glyphcache_size, size_t kerncache_size);
+lv_font_t * lv_tiny_ttf_create_data_ex2(const void * data, size_t data_size, int32_t font_size, lv_font_kerning_t kerning, size_t glyphcache_size, size_t kerncache_size)
 {
     return lv_tiny_ttf_create(NULL, data, data_size, font_size, kerning, glyphcache_size, kerncache_size);
 }
