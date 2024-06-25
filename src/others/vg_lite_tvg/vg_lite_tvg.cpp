@@ -2300,6 +2300,36 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
     else {
         /* if target format is not supported by VG, use internal buffer */
         tvg_target_buffer = ctx->get_temp_target_buffer(target->width, target->height);
+
+        /**
+         * Synchronize framebuffer data to thorvg's independent canvas buffer
+         * to avoid software rendering content being overwritten
+         */
+        vg_lite_buffer_t tvg_target;
+        memset(&tvg_target, 0, sizeof(tvg_target));
+        tvg_target.memory = tvg_target_buffer;
+        tvg_target.format = VG_LITE_BGRA8888;
+        tvg_target.width = target->width;
+        tvg_target.height = target->height;
+        tvg_target.stride = target->width * sizeof(vg_color32_t);
+
+        switch(target->format) {
+            case VG_LITE_BGR565:
+                conv_bgr565_to_bgra8888.convert(&tvg_target, target);
+                break;
+
+            case VG_LITE_BGRA5658:
+                conv_bgra5658_to_bgra8888.convert(&tvg_target, target);
+                break;
+
+            case VG_LITE_BGR888:
+                conv_bgr888_to_bgra8888.convert(&tvg_target, target);
+                break;
+
+            default:
+                /* unsupported format */
+                return Result::NonSupport;
+        }
     }
 
     Result res = ctx->canvas->target(
