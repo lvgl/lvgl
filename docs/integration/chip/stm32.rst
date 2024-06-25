@@ -36,8 +36,11 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
 
    //Frame buffers
    /*Static or global buffer(s). The second buffer is optional*/
-   static lv_color_t buf_1[BUFF_SIZE]; //TODO: Chose a buffer size. DISPLAY_WIDTH * 10 is one suggestion.
-   static lv_color_t buf_2[BUFF_SIZE];
+   //TODO: Adjust color format and choose buffer size. DISPLAY_WIDTH * 10 is one suggestion.
+   #define BYTE_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /*will be 2 for RGB565 */
+   #define BUFF_SIZE (DISPLAY_WIDTH * 10 * BYTE_PER_PIXEL)
+   static uint8_t buf_1[BUFF_SIZE];
+   static uint8_t buf_2[BUFF_SIZE];
 
 - In your ``main()`` function, after initialising your CPU,
   peripherals, and LCD panel, call :cpp:func:`lv_init` to initialise LVGL.
@@ -149,8 +152,11 @@ variables:
 
    //Frame buffers
    /*Static or global buffer(s). The second buffer is optional*/
-   static lv_color_t buf_1[BUFF_SIZE]; //TODO: Declare your own BUFF_SIZE appropriate to your system.
-   static lv_color_t buf_2[BUFF_SIZE];
+   #define BYTE_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /*will be 2 for RGB565 */
+   //TODO: Declare your own BUFF_SIZE appropriate to your system.
+   #define BUFF_SIZE (DISPLAY_WIDTH * 10 * BYTE_PER_PIXEL)
+   static uint8_t buf_1[BUFF_SIZE];
+   static uint8_t buf_2[BUFF_SIZE];
 
 - In your ``main`` function, after your peripherals (SPI, GPIOs, LCD
   etc) have been initialised, initialise LVGL using :cpp:func:`lv_init`,
@@ -163,6 +169,7 @@ variables:
    lv_init();
    lv_display_t *display = lv_display_create(WIDTH, HEIGHT); /*Create the display*/
    lv_display_set_flush_cb(display, my_flush_cb);        /*Set a flush callback to draw to the display*/
+   lv_display_set_buffers(disp, buf_1, buf_2, sizeof(buf_1), LV_DISPLAY_RENDER_MODE_PARTIAL); /*Set an initialized buffer*/
 
    // Register the touch controller with LVGL - Not included here for brevity.
 
