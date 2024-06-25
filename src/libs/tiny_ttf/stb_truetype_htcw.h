@@ -2857,18 +2857,17 @@ static stbtt_int32 stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fontinfo * info, i
     return 0;
 }
 
-STBTT_DEF int  stbtt_KernTableCheck(const stbtt_fontinfo * info)
+STBTT_DEF int stbtt_KernTableCheck(const stbtt_fontinfo * info)
 {
-    if(info->gpos)
-    {
+    if(info->gpos) {
         stbtt_uint16 lookupListOffset;
         stbtt_uint32 lookupList;
         stbtt_uint16 lookupCount;
-    #ifdef STBTT_STREAM_TYPE
+#ifdef STBTT_STREAM_TYPE
         STBTT_STREAM_TYPE data = info->data;
-    #else
+#else
         const stbtt_uint8 * data = info->data;
-    #endif
+#endif
         stbtt_int32 i, sti;
 
         if(!info->gpos) return 0;
@@ -2895,8 +2894,7 @@ STBTT_DEF int  stbtt_KernTableCheck(const stbtt_fontinfo * info)
         }
         return 0;
     }
-    else if(info->kern)
-    {
+    else if(info->kern) {
         return 1;
     }
     return 0;
