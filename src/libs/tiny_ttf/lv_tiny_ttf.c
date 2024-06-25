@@ -397,7 +397,7 @@ lv_font_t * lv_tiny_ttf_create_file(const char * path, int32_t font_size)
 }
 #endif
 
-lv_font_t * lv_tiny_ttf_create_data_ex(const void * data, size_t data_size, int32_t font_size, 
+lv_font_t * lv_tiny_ttf_create_data_ex(const void * data, size_t data_size, int32_t font_size,
                                        lv_font_kerning_t kerning, size_t cache_size)
 {
     return lv_tiny_ttf_create(NULL, data, data_size, font_size, kerning, cache_size);
@@ -433,7 +433,8 @@ static bool tiny_ttf_glyph_cache_create_cb(tiny_ttf_glyph_cache_data_t * node, v
         int k = stbtt_GetGlyphKernAdvance(&dsc->info, g1, 0);
         dsc_out->adv_w = (uint16_t)floor((((float)advw + (float)k) * dsc->scale) +
                                          0.5f); /*Horizontal space required by the glyph in [px]*/
-    } else {
+    }
+    else {
         dsc_out->adv_w = (uint16_t)floor(((float)advw * dsc->scale) +
                                          0.5f); /*Horizontal space required by the glyph in [px]*/;
     }
