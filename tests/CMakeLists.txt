@@ -440,11 +440,19 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
         ${test_case_fname}
         ${test_runner_fname}
     )
+
+    #set link libraries (keep link order untouched)
+    set(TEST_LVGL_LINK_LIBS test_common)
+    if(CONFIG_LV_BUILD_DEMOS)
+      list(APPEND TEST_LVGL_LINK_LIBS lvgl_demos)
+    endif()
+    list(APPEND TEST_LVGL_LINK_LIBS lvgl)
+    if(LV_CONF_BUILD_THORVG_INTERNAL)
+      list(APPEND TEST_LVGL_LINK_LIBS lvgl_thorvg)
+    endif()
+
     target_link_libraries(${test_name} PRIVATE
-            test_common
-            lvgl_demos
-            lvgl
-            lvgl_thorvg
+            ${TEST_LVGL_LINK_LIBS}
             ${PNG_LIBRARIES}
             ${FREETYPE_LIBRARIES}
             ${LIBDRM_LIBRARIES}
