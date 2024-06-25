@@ -16,6 +16,7 @@ void setUp(void)
 
 void tearDown(void)
 {
+    lv_obj_clean(g_active_screen);
 }
 
 void test_bar_should_have_valid_default_attributes(void)
@@ -397,6 +398,53 @@ void test_bar_render_corner(void)
     render_test_screen_create(true, LV_GRAD_DIR_NONE, "widgets/bar_corner_4.png");
     render_test_screen_create(true, LV_GRAD_DIR_HOR, "widgets/bar_corner_5.png");
     render_test_screen_create(true, LV_GRAD_DIR_VER, "widgets/bar_corner_6.png");
+}
+
+
+static lv_obj_t * bar_create_orientation(lv_bar_orientation_t orientation, int32_t w, int32_t h)
+{
+    lv_obj_t * bar = lv_bar_create(g_active_screen);
+    lv_bar_set_orientation(bar, orientation);
+    lv_obj_set_size(bar, w, h);
+    lv_bar_set_value(bar, 30, LV_ANIM_OFF);
+
+    return bar;
+
+}
+
+void test_bar_orientation(void)
+{
+    lv_obj_clean(g_active_screen);
+
+    lv_obj_set_flex_flow(g_active_screen, LV_FLEX_FLOW_ROW_WRAP);
+
+    lv_obj_t * label;
+
+    label = lv_label_create(g_active_screen);
+    lv_label_set_text(label, "Auto");
+    lv_obj_set_width(label, lv_pct(100));
+
+    bar_create_orientation(LV_BAR_ORIENTATION_AUTO, 100, 20);
+    bar_create_orientation(LV_BAR_ORIENTATION_AUTO, 20, 100);
+    bar_create_orientation(LV_BAR_ORIENTATION_AUTO, 100, 100);
+
+    label = lv_label_create(g_active_screen);
+    lv_label_set_text(label, "Vertical");
+    lv_obj_set_width(label, lv_pct(100));
+
+    bar_create_orientation(LV_BAR_ORIENTATION_VERTICAL, 100, 20);
+    bar_create_orientation(LV_BAR_ORIENTATION_VERTICAL, 20, 100);
+    bar_create_orientation(LV_BAR_ORIENTATION_VERTICAL, 100, 100);
+
+    label = lv_label_create(g_active_screen);
+    lv_label_set_text(label, "Horizontal");
+    lv_obj_set_width(label, lv_pct(100));
+
+    bar_create_orientation(LV_BAR_ORIENTATION_HORIZONTAL, 100, 20);
+    bar_create_orientation(LV_BAR_ORIENTATION_HORIZONTAL, 20, 100);
+    bar_create_orientation(LV_BAR_ORIENTATION_HORIZONTAL, 100, 100);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/bar_2.png");
 }
 
 #endif

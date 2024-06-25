@@ -79,6 +79,10 @@ void lv_lottie_set_buffer(lv_obj_t * obj, int32_t w, int32_t h, void * buf)
     lv_canvas_set_buffer(obj, buf, w, h, LV_COLOR_FORMAT_ARGB8888);
     tvg_picture_set_size(lottie->tvg_paint, w, h);
 
+    /* Rendered output images are premultiplied */
+    lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
+    lv_draw_buf_set_flag(draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
+
     /*Force updating when the buffer changes*/
     float f_current;
     tvg_animation_get_frame(lottie->tvg_anim, &f_current);
@@ -98,6 +102,9 @@ void lv_lottie_set_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_buf)
     tvg_canvas_push(lottie->tvg_canvas, lottie->tvg_paint);
     lv_canvas_set_draw_buf(obj, draw_buf);
     tvg_picture_set_size(lottie->tvg_paint, draw_buf->header.w, draw_buf->header.h);
+
+    /* Rendered output images are premultiplied */
+    lv_draw_buf_set_flag(draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED);
 
     /*Force updating when the buffer changes*/
     float f_current;

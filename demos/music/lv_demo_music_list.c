@@ -142,7 +142,7 @@ lv_obj_t * _lv_demo_music_list_create(lv_obj_t * parent)
         add_list_button(list,  track_id);
     }
 
-#if LV_DEMO_MUSIC_SQUARE || LV_DEMO_MUSIC_ROUND
+#if LV_DEMO_MUSIC_ROUND
     lv_obj_set_scroll_snap_y(list, LV_SCROLL_SNAP_CENTER);
 #endif
 
@@ -219,6 +219,7 @@ static lv_obj_t * add_list_button(lv_obj_t * parent, uint32_t track_id)
     LV_IMAGE_DECLARE(img_lv_demo_music_list_border);
     lv_obj_t * border = lv_image_create(btn);
     lv_image_set_src(border, &img_lv_demo_music_list_border);
+    lv_image_set_inner_align(border, LV_IMAGE_ALIGN_TILE);
     lv_obj_set_width(border, lv_pct(120));
     lv_obj_align(border, LV_ALIGN_BOTTOM_MID, 0, 0);
     lv_obj_add_flag(border, LV_OBJ_FLAG_IGNORE_LAYOUT);

@@ -25,11 +25,13 @@
 #if LV_DEMO_MUSIC_LARGE
     #define BAR_COLOR1_STOP     160
     #define BAR_COLOR2_STOP     200
+    #define BAR_REST_RADIUS     165
 #else
     #define BAR_COLOR1_STOP     80
     #define BAR_COLOR2_STOP     100
+    #define BAR_REST_RADIUS     82
 #endif
-#define BAR_COLOR3_STOP     (2 * LV_HOR_RES / 3)
+#define BAR_COLOR3_STOP     (LV_MAX(LV_HOR_RES, LV_VER_RES) / 3)
 #define BAR_CNT             20
 #define DEG_STEP            (180/BAR_CNT)
 #define BAND_CNT            4
@@ -51,7 +53,7 @@ static lv_obj_t * create_ctrl_box(lv_obj_t * parent);
 static lv_obj_t * create_handle(lv_obj_t * parent);
 
 static void spectrum_anim_cb(void * a, int32_t v);
-static void start_anim_cb(void * a, int32_t v);
+static void start_anim_cb(void * var, int32_t v);
 static void del_counter_timer_cb(lv_event_t * e);
 static void spectrum_draw_event_cb(lv_event_t * e);
 static lv_obj_t * album_image_create(lv_obj_t * parent);
@@ -81,7 +83,6 @@ static lv_obj_t * slider_obj;
 static uint32_t spectrum_i = 0;
 static uint32_t spectrum_i_pause = 0;
 static uint32_t bar_ofs = 0;
-static uint32_t spectrum_lane_ofs_start = 0;
 static uint32_t bar_rot = 0;
 static uint32_t time_act;
 static lv_timer_t  * stop_start_anim_timer;
@@ -187,10 +188,10 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
     lv_obj_set_grid_dsc_array(cont, grid_cols, grid_rows);
     lv_obj_set_style_grid_row_align(cont, LV_GRID_ALIGN_SPACE_BETWEEN, 0);
     lv_obj_set_grid_cell(spectrum_obj, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
-    lv_obj_set_grid_cell(title_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_ALIGN_CENTER, 2, 1);
-    lv_obj_set_grid_cell(icon_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_ALIGN_CENTER, 4, 1);
-    lv_obj_set_grid_cell(ctrl_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_ALIGN_CENTER, 6, 1);
-    lv_obj_set_grid_cell(handle_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_ALIGN_CENTER, 8, 1);
+    lv_obj_set_grid_cell(title_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_CENTER, 2, 1);
+    lv_obj_set_grid_cell(icon_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_CENTER, 4, 1);
+    lv_obj_set_grid_cell(ctrl_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_CENTER, 6, 1);
+    lv_obj_set_grid_cell(handle_box, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_CENTER, 8, 1);
 #elif LV_DEMO_MUSIC_LANDSCAPE == 0
     static const int32_t grid_cols[] = {LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
     static const int32_t grid_rows[] = {LV_DEMO_MUSIC_HANDLE_SIZE,     /*Spacing*/
@@ -254,17 +255,18 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
 
     start_anim = true;
 
-    stop_start_anim_timer = lv_timer_create(stop_start_anim, INTRO_TIME + 6000, NULL);
+    stop_start_anim_timer = lv_timer_create(stop_start_anim, INTRO_TIME + 3000, NULL);
     lv_timer_set_repeat_count(stop_start_anim_timer, 1);
 
     lv_anim_init(&a);
 
     uint32_t i;
     lv_anim_set_exec_cb(&a, start_anim_cb);
+    lv_anim_set_values(&a, LV_MAX(LV_HOR_RES, LV_VER_RES) / 2, 0);
+    lv_anim_set_path_cb(&a, lv_anim_path_bounce);
     for(i = 0; i < BAR_CNT; i++) {
-        lv_anim_set_values(&a, LV_HOR_RES, 5);
-        lv_anim_set_delay(&a, INTRO_TIME - 200 + rnd_array[i] % 200);
-        lv_anim_set_duration(&a, 2500 + rnd_array[i] % 500);
+        lv_anim_set_delay(&a, INTRO_TIME - 200 + (rnd_array[i] % 200));
+        lv_anim_set_duration(&a, 2500 + (rnd_array[i] % 500));
         lv_anim_set_var(&a, &start_anim_values[i]);
         lv_anim_start(&a);
     }
@@ -290,15 +292,18 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
     lv_obj_t * logo = lv_image_create(lv_screen_active());
     lv_image_set_src(logo, &img_lv_demo_music_logo);
     lv_obj_move_foreground(logo);
+    lv_obj_align_to(logo, spectrum_obj, LV_ALIGN_CENTER, 0, 0);
 
+#if LV_DEMO_MUSIC_SQUARE == 0 && LV_DEMO_MUSIC_ROUND == 0
     lv_obj_t * title = lv_label_create(lv_screen_active());
     lv_label_set_text(title, "LVGL Demo\nMusic player");
     lv_obj_set_style_text_align(title, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_style_text_font(title, font_large, 0);
     lv_obj_set_style_text_line_space(title, 8, 0);
     lv_obj_fade_out(title, 500, INTRO_TIME);
-    lv_obj_align_to(logo, spectrum_obj, LV_ALIGN_CENTER, 0, 0);
     lv_obj_align_to(title, logo, LV_ALIGN_OUT_LEFT_MID, -20, 0);
+#endif
+
 
     lv_anim_set_path_cb(&a, lv_anim_path_ease_in);
     lv_anim_set_var(&a, logo);
@@ -448,12 +453,14 @@ static void create_wave_images(lv_obj_t * parent)
     LV_IMAGE_DECLARE(img_lv_demo_music_wave_bottom);
     lv_obj_t * wave_top = lv_image_create(parent);
     lv_image_set_src(wave_top, &img_lv_demo_music_wave_top);
+    lv_image_set_inner_align(wave_top, LV_IMAGE_ALIGN_TILE);
     lv_obj_set_width(wave_top, LV_HOR_RES);
     lv_obj_align(wave_top, LV_ALIGN_TOP_MID, 0, 0);
     lv_obj_add_flag(wave_top, LV_OBJ_FLAG_IGNORE_LAYOUT);
 
     lv_obj_t * wave_bottom = lv_image_create(parent);
     lv_image_set_src(wave_bottom, &img_lv_demo_music_wave_bottom);
+    lv_image_set_inner_align(wave_bottom, LV_IMAGE_ALIGN_TILE);
     lv_obj_set_width(wave_bottom, LV_HOR_RES);
     lv_obj_align(wave_bottom, LV_ALIGN_BOTTOM_MID, 0, 0);
     lv_obj_add_flag(wave_bottom, LV_OBJ_FLAG_IGNORE_LAYOUT);
@@ -557,6 +564,7 @@ static lv_obj_t * create_ctrl_box(lv_obj_t * parent)
     lv_obj_t * cont = lv_obj_create(parent);
     lv_obj_remove_style_all(cont);
     lv_obj_set_height(cont, LV_SIZE_CONTENT);
+    lv_obj_remove_flag(cont, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 #if LV_DEMO_MUSIC_LARGE
     lv_obj_set_style_pad_bottom(cont, 17, 0);
 #else
@@ -608,6 +616,7 @@ static lv_obj_t * create_ctrl_box(lv_obj_t * parent)
     slider_obj = lv_slider_create(cont);
     lv_obj_set_style_anim_duration(slider_obj, 100, 0);
     lv_obj_add_flag(slider_obj, LV_OBJ_FLAG_CLICKABLE); /*No input from the slider*/
+    lv_obj_remove_flag(slider_obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 
 #if LV_DEMO_MUSIC_LARGE == 0
     lv_obj_set_height(slider_obj, 3);
@@ -802,14 +811,9 @@ static void spectrum_draw_event_cb(lv_event_t * e)
         uint16_t r[64];
         uint32_t i;
 
-        int32_t min_a = 5;
-#if LV_DEMO_MUSIC_LARGE == 0
-        int32_t r_in = 1;
-#else
-        int32_t r_in = 160;
-#endif
-        r_in = (r_in * lv_image_get_scale(album_image_obj)) >> 8;
-        for(i = 0; i < BAR_CNT; i++) r[i] = r_in + min_a + 77;
+        for(i = 0; i < BAR_CNT; i++) {
+            r[i] = BAR_REST_RADIUS;
+        }
 
         uint32_t s;
         for(s = 0; s < 4; s++) {
@@ -842,7 +846,7 @@ static void spectrum_draw_event_cb(lv_event_t * e)
         }
 
         const int32_t amax = 20;
-        int32_t animv = spectrum_i - spectrum_lane_ofs_start;
+        int32_t animv = spectrum_i - 0;
         if(animv > amax) animv = amax;
         for(i = 0; i < BAR_CNT; i++) {
             uint32_t deg_space = 1;
@@ -850,11 +854,12 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             uint32_t j = (i + bar_rot + rnd_array[bar_ofs % 10]) % BAR_CNT;
             uint32_t k = (i + bar_rot + rnd_array[(bar_ofs + 1) % 10]) % BAR_CNT;
 
-            uint32_t v = (r[k] * animv + r[j] * (amax - animv)) / amax;
+            uint32_t v;
             if(start_anim) {
-                v = r_in + start_anim_values[i];
-                deg_space = v >> 7;
-                if(deg_space < 1) deg_space = 1;
+                v = BAR_REST_RADIUS + start_anim_values[i];
+            }
+            else {
+                v = (r[k] * animv + r[j] * (amax - animv)) / amax;
             }
 
             if(v < BAR_COLOR1_STOP) draw_dsc.bg_color = BAR_COLOR1;
@@ -876,10 +881,9 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             draw_dsc.p[1].x = center.x + x2_out;
             draw_dsc.p[1].y = center.y + get_sin(di, v);
 
-            int32_t x2_in = get_cos(di, r_in);
+            int32_t x2_in = get_cos(di, 0);
             draw_dsc.p[2].x = center.x + x2_in;
-            draw_dsc.p[2].y = center.y + get_sin(di, r_in);
-
+            draw_dsc.p[2].y = center.y + get_sin(di, 0);
             lv_draw_triangle(layer, &draw_dsc);
 
             draw_dsc.p[0].x = center.x - x1_out;
@@ -915,7 +919,6 @@ static void spectrum_anim_cb(void * a, int32_t v)
             last_bass = spectrum_i;
             if(bass_cnt >= 2) {
                 bass_cnt = 0;
-                spectrum_lane_ofs_start = spectrum_i;
                 bar_ofs++;
             }
         }
@@ -925,9 +928,9 @@ static void spectrum_anim_cb(void * a, int32_t v)
     lv_image_set_scale(album_image_obj, LV_SCALE_NONE + spectrum[spectrum_i][0]);
 }
 
-static void start_anim_cb(void * a, int32_t v)
+static void start_anim_cb(void * var, int32_t v)
 {
-    int32_t * av = a;
+    int32_t * av = var;
     *av = v;
     lv_obj_invalidate(spectrum_obj);
 }

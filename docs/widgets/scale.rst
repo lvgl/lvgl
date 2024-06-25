@@ -33,6 +33,19 @@ Set ranges
 
 The minor and major range (values of each tick) are configured with :cpp:expr:`lv_scale_set_range(scale, minor_range, major_range)`.
 
+Tick drawing order
+------------------
+You can set the drawing of the ticks on top of the main line with :cpp:expr:`lv_scale_set_draw_ticks_on_top(scale, true)`. The default
+drawing order is below the main line.
+
+This is a scale with the ticks being drawn below of the main line (default):
+
+.. image:: /misc/scale_ticks_below.png
+
+This is an scale with the ticks being drawn at the top of the main line:
+
+.. image:: /misc/scale_ticks_on_top.png
+
 Configure ticks
 ---------------
 

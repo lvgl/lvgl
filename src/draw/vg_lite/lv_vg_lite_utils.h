@@ -159,8 +159,6 @@ bool lv_vg_lite_16px_align(void);
 
 void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_t * mult);
 
-void lv_vg_lite_matrix_flip_y(vg_lite_matrix_t * matrix);
-
 bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix);
 
 lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * matrix, const lv_point_precise_t * point);

@@ -537,6 +537,9 @@ static void obj_delete_core(lv_obj_t * obj)
             if(indev->pointer.last_pressed == obj) {
                 indev->pointer.last_pressed = NULL;
             }
+            if(indev->pointer.last_hovered == obj) {
+                indev->pointer.last_hovered = NULL;
+            }
         }
 
         if(indev->group == group && obj == lv_indev_get_active_obj()) {

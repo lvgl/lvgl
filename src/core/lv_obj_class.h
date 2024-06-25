@@ -61,6 +61,12 @@ struct _lv_obj_class_t {
     uint32_t prop_index_end;
     const lv_property_ops_t * properties;
     uint32_t properties_count;
+
+#if LV_USE_OBJ_PROPERTY_NAME
+    /* An array of property ID and name */
+    const lv_property_name_t * property_names;
+    uint32_t names_count;
+#endif
 #endif
 
     void * user_data;

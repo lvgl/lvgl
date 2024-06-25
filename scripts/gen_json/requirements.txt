@@ -1,0 +1,16 @@
+pycparser>=2.22
+pyMSVC>=0.5.3; platform_system == "Windows"
+Sphinx
+breathe
+imagesize
+importlib-metadata
+sphinx-rtd-theme
+sphinx-sitemap
+sphinxcontrib-applehelp
+sphinxcontrib-devhelp
+sphinxcontrib-htmlhelp
+sphinxcontrib-jsmath
+sphinxcontrib-qthelp
+sphinxcontrib-serializinghtml
+sphinx-rtd-dark-mode
+typing-extensions

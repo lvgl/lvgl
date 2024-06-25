@@ -43,11 +43,8 @@ struct _lv_draw_vg_lite_unit_t {
 
     struct _lv_vg_lite_pending_t * image_dsc_pending;
 
-    lv_cache_t * linear_grad_cache;
-    struct _lv_vg_lite_pending_t * linear_grad_pending;
-
-    lv_cache_t * radial_grad_cache;
-    struct _lv_vg_lite_pending_t * radial_grad_pending;
+    lv_cache_t * grad_cache;
+    struct _lv_vg_lite_pending_t * grad_pending;
 
     uint16_t flush_count;
     vg_lite_buffer_t target_buffer;

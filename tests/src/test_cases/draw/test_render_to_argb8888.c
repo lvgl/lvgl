@@ -15,7 +15,7 @@ void tearDown(void)
     lv_display_set_color_format(NULL, LV_COLOR_FORMAT_XRGB8888);
 }
 
-void test_render_to_rgb565(void)
+void test_render_to_argb8888(void)
 {
     lv_display_set_color_format(NULL, LV_COLOR_FORMAT_ARGB8888);
 

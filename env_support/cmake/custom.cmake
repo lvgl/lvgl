@@ -96,9 +96,15 @@ if(CONFIG_LV_USE_DEMO_WIDGETS)
     target_compile_definitions(lvgl_demos PUBLIC LV_USE_DEMO_WIDGETS=1)
 endif()
 
-# Lbrary and headers can be installed to system using make install
-file(GLOB LVGL_PUBLIC_HEADERS "${CMAKE_SOURCE_DIR}/lv_conf.h"
-     "${CMAKE_SOURCE_DIR}/lvgl.h")
+# Library and headers can be installed to system using make install
+file(GLOB LVGL_PUBLIC_HEADERS
+    "${LVGL_ROOT_DIR}/lvgl.h"
+    "${LVGL_ROOT_DIR}/lv_version.h")
+
+if(NOT LV_CONF_SKIP)
+	list(APPEND LVGL_PUBLIC_HEADERS
+		"${CMAKE_SOURCE_DIR}/lv_conf.h")
+endif()
 
 if("${LIB_INSTALL_DIR}" STREQUAL "")
   set(LIB_INSTALL_DIR "lib")
@@ -116,6 +122,12 @@ install(
   DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
   FILES_MATCHING
   PATTERN "*.h")
+
+# Install headers from the LVGL_PUBLIC_HEADERS variable
+install(
+  FILES ${LVGL_PUBLIC_HEADERS}
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
+)
 
 # install example headers
 if(CONFIG_LV_BUILD_EXAMPLES)

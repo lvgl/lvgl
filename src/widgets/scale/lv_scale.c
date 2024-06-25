@@ -39,6 +39,9 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event);
 
 static void scale_draw_main(lv_obj_t * obj, lv_event_t * event);
 static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event);
+static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_dsc_t * label_dsc,
+                             const uint32_t major_tick_idx, const int32_t tick_value, lv_point_t * tick_point_b, const uint32_t tick_idx);
+static void scale_calculate_main_compensation(lv_obj_t * obj);
 
 static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, int32_t * arc_r);
 static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool is_major_tick,
@@ -55,7 +58,7 @@ static void scale_find_section_tick_idx(lv_obj_t * obj);
 static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const uint32_t tick_idx,
                                                           const bool is_major_tick, const int32_t major_tick_width, const int32_t minor_tick_width);
 static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, const bool is_major_tick,
-                                                             lv_draw_label_dsc_t * label_dsc, lv_draw_line_dsc_t * major_tick_dsc, lv_draw_line_dsc_t * minor_tick_dsc,
+                                                             lv_draw_line_dsc_t * major_tick_dsc, lv_draw_line_dsc_t * minor_tick_dsc,
                                                              const int32_t tick_value, const uint8_t tick_idx, lv_point_t * tick_point_a);
 static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
                                           const uint16_t major_tick_idx);
@@ -307,6 +310,16 @@ void lv_scale_set_post_draw(lv_obj_t * obj, bool en)
     lv_obj_invalidate(obj);
 }
 
+void lv_scale_set_draw_ticks_on_top(lv_obj_t * obj, bool en)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_scale_t * scale = (lv_scale_t *)obj;
+
+    scale->draw_ticks_on_top = en;
+
+    lv_obj_invalidate(obj);
+}
+
 lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -434,8 +447,11 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     scale->last_tick_width = 0U;
     scale->first_tick_width = 0U;
     scale->post_draw = false;
+    scale->draw_ticks_on_top = false;
     scale->custom_label_cnt = 0U;
     scale->txt_src = NULL;
+
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -473,15 +489,31 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
     if(event_code == LV_EVENT_DRAW_MAIN) {
         if(scale->post_draw == false) {
             scale_find_section_tick_idx(obj);
-            scale_draw_indicator(obj, event);
-            scale_draw_main(obj, event);
+            scale_calculate_main_compensation(obj);
+
+            if(scale->draw_ticks_on_top) {
+                scale_draw_main(obj, event);
+                scale_draw_indicator(obj, event);
+            }
+            else {
+                scale_draw_indicator(obj, event);
+                scale_draw_main(obj, event);
+            }
         }
     }
     if(event_code == LV_EVENT_DRAW_POST) {
         if(scale->post_draw == true) {
             scale_find_section_tick_idx(obj);
-            scale_draw_indicator(obj, event);
-            scale_draw_main(obj, event);
+            scale_calculate_main_compensation(obj);
+
+            if(scale->draw_ticks_on_top) {
+                scale_draw_main(obj, event);
+                scale_draw_indicator(obj, event);
+            }
+            else {
+                scale_draw_indicator(obj, event);
+                scale_draw_main(obj, event);
+            }
         }
     }
     else if(event_code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
@@ -509,6 +541,9 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     lv_draw_line_dsc_t major_tick_dsc;
     lv_draw_line_dsc_init(&major_tick_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
+    if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
+        major_tick_dsc.raw_end = 0;
+    }
 
     /* Configure line draw descriptor for the minor tick drawing */
     lv_draw_line_dsc_t minor_tick_dsc;
@@ -520,86 +555,85 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     lv_draw_line_dsc_init(&main_line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &main_line_dsc);
 
-    const int32_t major_len = lv_obj_get_style_length(obj, LV_PART_INDICATOR);
+    const uint32_t total_tick_count = scale->total_tick_count;
+    uint32_t tick_idx = 0;
+    uint32_t major_tick_idx = 0;
+    for(tick_idx = 0; tick_idx < total_tick_count; tick_idx++) {
+        /* A major tick is the one which has a label in it */
+        bool is_major_tick = false;
+        if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
+        if(is_major_tick) major_tick_idx++;
+
+        const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count - 1, scale->range_min, scale->range_max);
+
+        /* Overwrite label and tick properties if tick value is within section range */
+        lv_scale_section_t * section;
+        _LV_LL_READ_BACK(&scale->section_ll, section) {
+            if(section->minor_range <= tick_value && section->major_range >= tick_value) {
+                if(is_major_tick) {
+                    scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
+                    scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
+                }
+                else {
+                    scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
+                }
+                break;
+            }
+            else {
+                /* Tick is not in section, get the proper styles */
+                lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
+                lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
+                lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
+            }
+        }
+
+        /* The tick is represented by a line. We need two points to draw it */
+        lv_point_t tick_point_a;
+        lv_point_t tick_point_b;
+        scale_get_tick_points(obj, tick_idx, is_major_tick, &tick_point_a, &tick_point_b);
+
+        /* Setup a label if they're enabled and we're drawing a major tick */
+        if(scale->label_enabled && is_major_tick) {
+            scale_draw_label(obj, event, &label_dsc, major_tick_idx, tick_value, &tick_point_b, tick_idx);
+        }
+
+        if(is_major_tick) {
+            major_tick_dsc.p1 = lv_point_to_precise(&tick_point_a);
+            major_tick_dsc.p2 = lv_point_to_precise(&tick_point_b);
+            lv_draw_line(layer, &major_tick_dsc);
+        }
+        else {
+            minor_tick_dsc.p1 = lv_point_to_precise(&tick_point_a);
+            minor_tick_dsc.p2 = lv_point_to_precise(&tick_point_b);
+            lv_draw_line(layer, &minor_tick_dsc);
+        }
+    }
+}
+
+static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_dsc_t * label_dsc,
+                             const uint32_t major_tick_idx, const int32_t tick_value, lv_point_t * tick_point_b,
+                             const uint32_t tick_idx)
+{
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    lv_layer_t * layer = lv_event_get_layer(event);
+
+    /* Label text setup */
+    char text_buffer[LV_SCALE_LABEL_TXT_LEN] = {0};
+    lv_area_t label_coords;
+
+    /* Check if the custom text array has element for this major tick index */
+    if(scale->txt_src) {
+        scale_build_custom_label_text(obj, label_dsc, major_tick_idx);
+    }
+    else { /* Add label with mapped values */
+        lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
+        label_dsc->text = text_buffer;
+        label_dsc->text_local = 1;
+    }
 
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
        || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
-
-        uint32_t total_tick_count = scale->total_tick_count;
-        uint32_t tick_idx = 0;
-        uint32_t major_tick_idx = 0;
-        for(tick_idx = 0; tick_idx < total_tick_count; tick_idx++) {
-            /* A major tick is the one which has a label in it */
-            bool is_major_tick = false;
-            if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
-            if(is_major_tick) major_tick_idx++;
-
-            const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count - 1, scale->range_min, scale->range_max);
-
-            /* Overwrite label and tick properties if tick value is within section range */
-            lv_scale_section_t * section;
-            _LV_LL_READ_BACK(&scale->section_ll, section) {
-                if(section->minor_range <= tick_value && section->major_range >= tick_value) {
-                    if(is_major_tick) {
-                        scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
-                        scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
-                    }
-                    else {
-                        scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
-                    }
-                    break;
-                }
-                else {
-                    /* Tick is not in section, get the proper styles */
-                    lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
-                    lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
-                    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
-                }
-            }
-
-            /* The tick is represented by a line. We need two points to draw it */
-            lv_point_t tick_point_a;
-            lv_point_t tick_point_b;
-            scale_get_tick_points(obj, tick_idx, is_major_tick, &tick_point_a, &tick_point_b);
-
-            /* Setup a label if they're enabled and we're drawing a major tick */
-            if(scale->label_enabled && is_major_tick) {
-                /* Label text setup */
-                char text_buffer[LV_SCALE_LABEL_TXT_LEN] = {0};
-                lv_area_t label_coords;
-
-                /* Check if the custom text array has element for this major tick index */
-                if(scale->txt_src) {
-                    scale_build_custom_label_text(obj, &label_dsc, major_tick_idx);
-                }
-                else { /* Add label with mapped values */
-                    lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
-                    label_dsc.text = text_buffer;
-                    label_dsc.text_local = 1;
-                }
-
-                scale_get_label_coords(obj, &label_dsc, &tick_point_b, &label_coords);
-                lv_draw_label(layer, &label_dsc, &label_coords);
-            }
-
-            /* Store initial and last tick widths to be used in the main line drawing */
-            scale_store_main_line_tick_width_compensation(obj, tick_idx, is_major_tick, major_tick_dsc.width, minor_tick_dsc.width);
-
-            /* Store the first and last section tick vertical/horizontal position */
-            scale_store_section_line_tick_width_compensation(obj, is_major_tick, &label_dsc, &major_tick_dsc, &minor_tick_dsc,
-                                                             tick_value, tick_idx, &tick_point_a);
-
-            if(is_major_tick) {
-                major_tick_dsc.p1 = lv_point_to_precise(&tick_point_a);
-                major_tick_dsc.p2 = lv_point_to_precise(&tick_point_b);
-                lv_draw_line(layer, &major_tick_dsc);
-            }
-            else {
-                minor_tick_dsc.p1 = lv_point_to_precise(&tick_point_a);
-                minor_tick_dsc.p2 = lv_point_to_precise(&tick_point_b);
-                lv_draw_line(layer, &minor_tick_dsc);
-            }
-        }
+        scale_get_label_coords(obj, label_dsc, tick_point_b, &label_coords);
     }
     else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
         lv_area_t scale_area;
@@ -611,100 +645,95 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         center_point.x = scale_area.x1 + radius_edge;
         center_point.y = scale_area.y1 + radius_edge;
 
-        /* Major tick */
-        major_tick_dsc.raw_end = 0;
-
+        const int32_t major_len = lv_obj_get_style_length(obj, LV_PART_INDICATOR);
         uint32_t label_gap = LV_SCALE_DEFAULT_LABEL_GAP; /* TODO: Add to style properties */
-        uint32_t tick_idx = 0;
-        uint32_t major_tick_idx = 0;
-        for(tick_idx = 0; tick_idx < scale->total_tick_count; tick_idx++) {
-            /* A major tick is the one which has a label in it */
-            bool is_major_tick = false;
-            if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
-            if(is_major_tick) major_tick_idx++;
 
-            const int32_t tick_value = lv_map(tick_idx, 0U, scale->total_tick_count - 1, scale->range_min, scale->range_max);
+        /* Also take into consideration the letter space of the style */
+        int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1);
+        angle_upscale += scale->rotation * 10U;
 
-            /* Overwrite label and tick properties if tick value is within section range */
-            lv_scale_section_t * section;
-            _LV_LL_READ_BACK(&scale->section_ll, section) {
-                if(section->minor_range <= tick_value && section->major_range >= tick_value) {
-                    if(is_major_tick) {
-                        scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
-                        scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
-                    }
-                    else {
-                        scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
-                    }
-                    break;
+        uint32_t radius_text = 0;
+        if(LV_SCALE_MODE_ROUND_INNER == scale->mode) {
+            radius_text = (radius_edge - major_len) - (label_gap + label_dsc->letter_space);
+        }
+        else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode) {
+            radius_text = (radius_edge + major_len) + (label_gap + label_dsc->letter_space);
+        }
+        else { /* Nothing to do */ }
+
+        lv_point_t point;
+        point.x = center_point.x + radius_text;
+        point.y = center_point.y;
+        lv_point_transform(&point, angle_upscale, LV_SCALE_NONE, LV_SCALE_NONE, &center_point, false);
+        scale_get_label_coords(obj, label_dsc, &point, &label_coords);
+    }
+    /* Invalid mode */
+    else {
+        return;
+    }
+
+    lv_draw_label(layer, label_dsc, &label_coords);
+}
+
+static void scale_calculate_main_compensation(lv_obj_t * obj)
+{
+    lv_scale_t * scale = (lv_scale_t *)obj;
+
+    const uint32_t total_tick_count = scale->total_tick_count;
+
+    if(total_tick_count <= 1) return;
+    /* Not supported in round modes */
+    if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) return;
+
+    /* Major tick style */
+    lv_draw_line_dsc_t major_tick_dsc;
+    lv_draw_line_dsc_init(&major_tick_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
+
+    /* Configure line draw descriptor for the minor tick drawing */
+    lv_draw_line_dsc_t minor_tick_dsc;
+    lv_draw_line_dsc_init(&minor_tick_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
+
+    uint32_t tick_idx = 0;
+    uint32_t major_tick_idx = 0;
+    for(tick_idx = 0; tick_idx < total_tick_count; tick_idx++) {
+
+        const bool is_major_tick = tick_idx % scale->major_tick_every == 0;
+        if(is_major_tick) major_tick_idx++;
+
+        const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count - 1, scale->range_min, scale->range_max);
+
+        /* Overwrite label and tick properties if tick value is within section range */
+        lv_scale_section_t * section;
+        _LV_LL_READ_BACK(&scale->section_ll, section) {
+            if(section->minor_range <= tick_value && section->major_range >= tick_value) {
+                if(is_major_tick) {
+                    scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
                 }
                 else {
-                    /* Tick is not in section, get the proper styles */
-                    lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
-                    lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
-                    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
+                    scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
                 }
-            }
-
-            /* The tick is represented by a line. We need two points to draw it */
-            lv_point_t tick_point_a;
-            lv_point_t tick_point_b;
-            scale_get_tick_points(obj, tick_idx, is_major_tick, &tick_point_a, &tick_point_b);
-
-            /* Setup a label if they're enabled and we're drawing a major tick */
-            if(scale->label_enabled && is_major_tick) {
-                /* Label text setup */
-                char text_buffer[LV_SCALE_LABEL_TXT_LEN] = {0};
-                lv_area_t label_coords;
-
-                /* Check if the custom text array has element for this major tick index */
-                if(scale->txt_src) {
-                    scale_build_custom_label_text(obj, &label_dsc, major_tick_idx);
-                }
-                else { /* Add label with mapped values */
-                    lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
-                    label_dsc.text = text_buffer;
-                    label_dsc.text_local = 1;
-                }
-
-                /* Also take into consideration the letter space of the style */
-                int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1);
-                angle_upscale += scale->rotation * 10U;
-
-                uint32_t radius_text = 0;
-                if(LV_SCALE_MODE_ROUND_INNER == scale->mode) {
-                    radius_text = (radius_edge - major_len) - (label_gap + label_dsc.letter_space);
-                }
-                else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode) {
-                    radius_text = (radius_edge + major_len) + (label_gap + label_dsc.letter_space);
-                }
-                else { /* Nothing to do */ }
-
-                lv_point_t point;
-                point.x = center_point.x + radius_text;
-                point.y = center_point.y;
-                lv_point_transform(&point, angle_upscale, LV_SCALE_NONE, LV_SCALE_NONE, &center_point, false);
-                scale_get_label_coords(obj, &label_dsc, &point, &label_coords);
-
-                lv_draw_label(layer, &label_dsc, &label_coords);
-            }
-
-            /* Store initial and last tick widths to be used in the main line drawing */
-            scale_store_main_line_tick_width_compensation(obj, tick_idx, is_major_tick, major_tick_dsc.width, minor_tick_dsc.width);
-
-            if(is_major_tick) {
-                major_tick_dsc.p1 = lv_point_to_precise(&tick_point_a);
-                major_tick_dsc.p2 = lv_point_to_precise(&tick_point_b);
-                lv_draw_line(layer, &major_tick_dsc);
+                break;
             }
             else {
-                minor_tick_dsc.p1 = lv_point_to_precise(&tick_point_a);
-                minor_tick_dsc.p2 = lv_point_to_precise(&tick_point_b);
-                lv_draw_line(layer, &minor_tick_dsc);
+                /* Tick is not in section, get the proper styles */
+                lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
+                lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
             }
         }
+
+        /* The tick is represented by a line. We need two points to draw it */
+        lv_point_t tick_point_a;
+        lv_point_t tick_point_b;
+        scale_get_tick_points(obj, tick_idx, is_major_tick, &tick_point_a, &tick_point_b);
+
+        /* Store initial and last tick widths to be used in the main line drawing */
+        scale_store_main_line_tick_width_compensation(obj, tick_idx, is_major_tick, major_tick_dsc.width, minor_tick_dsc.width);
+        /* Store the first and last section tick vertical/horizontal position */
+        scale_store_section_line_tick_width_compensation(obj, is_major_tick, &major_tick_dsc, &minor_tick_dsc,
+                                                         tick_value, tick_idx, &tick_point_a);
     }
-    else { /* Nothing to do */ }
 }
 
 static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
@@ -782,45 +811,44 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
 
         lv_scale_section_t * section;
         _LV_LL_READ_BACK(&scale->section_ll, section) {
-            lv_draw_line_dsc_t main_line_section_dsc;
-            lv_draw_line_dsc_init(&main_line_section_dsc);
-            lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &main_line_section_dsc);
+            lv_draw_line_dsc_t section_line_dsc;
+            lv_draw_line_dsc_init(&section_line_dsc);
+            lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &section_line_dsc);
 
             /* Calculate the points of the section line */
-            lv_point_t main_point_a;
-            lv_point_t main_point_b;
+            lv_point_t section_point_a;
+            lv_point_t section_point_b;
+
+            const int32_t first_tick_width_halved = (int32_t)(section->first_tick_in_section_width / 2U);
+            const int32_t last_tick_width_halved = (int32_t)(section->last_tick_in_section_width / 2U);
 
             /* Calculate the position of the section based on the ticks (first and last) index */
             if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
                 /* Calculate position of the first tick in the section */
-                main_point_a.x = main_line_point_a.x;
-                int32_t tmp = (int32_t)(section->first_tick_in_section_width / 2U);
-                main_point_a.y = section->first_tick_in_section.y + tmp;
+                section_point_a.x = main_line_point_a.x;
+                section_point_a.y = section->first_tick_in_section.y + first_tick_width_halved;
 
                 /* Calculate position of the last tick in the section */
-                main_point_b.x = main_line_point_a.x;
-                tmp = (int32_t)(section->last_tick_in_section_width / 2U);
-                main_point_b.y = section->last_tick_in_section.y - tmp;
+                section_point_b.x = main_line_point_a.x;
+                section_point_b.y = section->last_tick_in_section.y - last_tick_width_halved;
             }
             else {
                 /* Calculate position of the first tick in the section */
-                int32_t tmp = (int32_t)(section->first_tick_in_section_width / 2U);
-                main_point_a.x = section->first_tick_in_section.x - tmp;
-                main_point_a.y = main_line_point_a.y;
+                section_point_a.x = section->first_tick_in_section.x - first_tick_width_halved;
+                section_point_a.y = main_line_point_a.y;
 
                 /* Calculate position of the last tick in the section */
-                tmp = (int32_t)(section->last_tick_in_section_width / 2U);
-                main_point_b.x = section->last_tick_in_section.x + tmp;
-                main_point_b.y = main_line_point_a.y;
+                section_point_b.x = section->last_tick_in_section.x + last_tick_width_halved;
+                section_point_b.y = main_line_point_a.y;
             }
 
-            scale_set_line_properties(obj, &main_line_section_dsc, section->main_style, LV_PART_MAIN);
+            scale_set_line_properties(obj, &section_line_dsc, section->main_style, LV_PART_MAIN);
 
-            main_line_section_dsc.p1.x = main_point_a.x;
-            main_line_section_dsc.p1.y = main_point_a.y;
-            main_line_section_dsc.p2.x = main_point_b.x;
-            main_line_section_dsc.p2.y = main_point_b.y;
-            lv_draw_line(layer, &main_line_section_dsc);
+            section_line_dsc.p1.x = section_point_a.x;
+            section_line_dsc.p1.y = section_point_a.y;
+            section_line_dsc.p2.x = section_point_b.x;
+            section_line_dsc.p2.y = section_point_b.y;
+            lv_draw_line(layer, &section_line_dsc);
         }
     }
     else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
@@ -1395,7 +1423,6 @@ static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * 
  *
  * @param obj       pointer to a scale object
  * @param is_major_tick Indicates if tick is major or not
- * @param label_dsc pointer to the label descriptor
  * @param major_tick_dsc pointer to the major_tick_dsc
  * @param minor_tick_dsc pointer to the minor_tick_dsc
  * @param tick_value Current tick value, used to know if tick_idx belongs to a section or not
@@ -1403,7 +1430,7 @@ static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * 
  * @param tick_point_a Pointer to tick point a
  */
 static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, const bool is_major_tick,
-                                                             lv_draw_label_dsc_t * label_dsc, lv_draw_line_dsc_t * major_tick_dsc, lv_draw_line_dsc_t * minor_tick_dsc,
+                                                             lv_draw_line_dsc_t * major_tick_dsc, lv_draw_line_dsc_t * minor_tick_dsc,
                                                              const int32_t tick_value, const uint8_t tick_idx, lv_point_t * tick_point_a)
 {
     lv_scale_t * scale = (lv_scale_t *) obj;
@@ -1412,7 +1439,6 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
     _LV_LL_READ_BACK(&scale->section_ll, section) {
         if(section->minor_range <= tick_value && section->major_range >= tick_value) {
             if(is_major_tick) {
-                scale_set_indicator_label_properties(obj, label_dsc, section->indicator_style);
                 scale_set_line_properties(obj, major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
             }
             else {

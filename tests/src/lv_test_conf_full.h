@@ -109,6 +109,7 @@
 #define LV_USE_DEMO_VECTOR_GRAPHIC  1
 
 #define LV_USE_OBJ_ID           1
+#define LV_OBJ_ID_AUTO_ASSIGN    1
 #define LV_USE_OBJ_ID_BUILTIN   1
 
 #define LV_CACHE_DEF_SIZE       (10 * 1024 * 1024)
@@ -134,8 +135,10 @@
     #define LV_LIBINPUT_XKB     1
 #endif
 
-#if !defined(NON_AMD64_BUILD) && !defined(_MSC_VER) && !defined(_WIN32)
-    #define LV_USE_OPENGLES 1
+#ifndef LV_USE_OPENGLES
+    #if !defined(NON_AMD64_BUILD) && !defined(_MSC_VER) && !defined(_WIN32)
+        #define LV_USE_OPENGLES 1
+    #endif
 #endif
 
 #define LV_USE_FREETYPE 1

@@ -55,7 +55,7 @@ static const lv_property_ops_t properties[] = {
     {
         .id = LV_PROPERTY_IMAGE_PIVOT,
         .setter = _lv_image_set_pivot,
-        .getter = lv_image_get_pivot,
+        .getter = _lv_image_get_pivot,
     },
     {
         .id = LV_PROPERTY_IMAGE_SCALE,
@@ -107,6 +107,12 @@ const lv_obj_class_t lv_image_class = {
     .prop_index_end = LV_PROPERTY_IMAGE_END,
     .properties = properties,
     .properties_count = sizeof(properties) / sizeof(properties[0]),
+
+#if LV_USE_OBJ_PROPERTY_NAME
+    .property_names = lv_image_property_names,
+    .names_count = sizeof(lv_image_property_names) / sizeof(lv_property_name_t),
+#endif
+
 #endif
 };
 
@@ -749,6 +755,9 @@ static void draw_image(lv_event_t * e)
                         obj->coords.y1,
                         obj->coords.x1 + img->w - 1,
                         obj->coords.y1 + img->h - 1);
+
+            draw_dsc.clip_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+
             lv_area_t coords;
             if(img->align < _LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
                 lv_area_align(&obj->coords, &draw_dsc.image_area, img->align, img->offset.x, img->offset.y);
