@@ -3362,8 +3362,8 @@
 
 /*Show some widget. It might be required to increase `LV_MEM_SIZE` */
 #ifndef LV_USE_DEMO_WIDGETS
-    #ifdef CONFIG_LV_BUILD_DEMOS
-        #define LV_USE_DEMO_WIDGETS CONFIG_LV_BUILD_DEMOS
+    #ifdef CONFIG_LV_USE_DEMO_WIDGETS
+        #define LV_USE_DEMO_WIDGETS CONFIG_LV_USE_DEMO_WIDGETS
     #else
         #define LV_USE_DEMO_WIDGETS 0
     #endif
