@@ -137,6 +137,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
         vg_lite_matrix_t result;
         if(!lv_vg_lite_matrix_inverse(&result, &matrix)) {
             LV_LOG_ERROR("no inverse matrix");
+            lv_vg_lite_path_drop(u, lv_vg_path);
             LV_PROFILER_END;
             return;
         }
