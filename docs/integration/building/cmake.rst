@@ -79,7 +79,7 @@ However you can also set them using the cmake command line or as cache variables
     Skip the configuration step. This is useful if you want to use the default configuration.
   - LV_CONF_PATH (default: (not set))
     Path to an optional user defined configuration file. (Obviously you cannot mix it with LV_CONF_SKIP)
-  - CONFIG_LV_USE_DEMO_WIDGETS (default: true)
+  - CONFIG_LV_BUILD_DEMOS (default: true)
     Enable the demo widgets, automatically sets the proper define LV_USE_DEMO_WIDGETS=1
   - CONFIG_LV_BUILD_EXAMPLES (default: true)
     Build the examples, automatically sets the proper define LV_BUILD_EXAMPLES=1

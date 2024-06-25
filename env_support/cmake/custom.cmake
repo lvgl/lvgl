@@ -83,11 +83,14 @@ if(CONFIG_LV_BUILD_EXAMPLES)
 endif()
 
 if(LV_CONF_BUILD_DISABLE_DEMOS)
-  message(FATAL_ERROR "LV_CONF_BUILD_DISABLE_DEMOS is deprecated, use CONFIG_LV_USE_DEMO_WIDGETS instead")
+  message(FATAL_ERROR "LV_CONF_BUILD_DISABLE_DEMOS is deprecated, use CONFIG_LV_BUILD_DEMOS instead")
 endif()
 
 # Build LVGL demos library
-if(CONFIG_LV_USE_DEMO_WIDGETS)
+if(CONFIG_LV_BUILD_DEMOS)
+    if(NOT CONFIG_LV_BUILD_EXAMPLES)
+      message(FATAL_ERROR "CONFIG_LV_BUILD_DEMOS requires CONFIG_LV_BUILD_EXAMPLES to be enabled")
+    endif()
     add_library(lvgl_demos ${DEMO_SOURCES})
     add_library(lvgl::demos ALIAS lvgl_demos)
 
@@ -139,7 +142,7 @@ if(CONFIG_LV_BUILD_EXAMPLES)
 endif()
 
 # install demo headers
-if(CONFIG_LV_USE_DEMO_WIDGETS)
+if(CONFIG_LV_BUILD_DEMOS)
   install(
     DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/demos"
     DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
@@ -195,7 +198,7 @@ if(LV_CONF_BUILD_THORVG_INTERNAL)
 endif()
 
 # Install library demos
-if(CONFIG_LV_USE_DEMO_WIDGETS)
+if(CONFIG_LV_BUILD_DEMOS)
   set_target_properties(
     lvgl_demos
     PROPERTIES OUTPUT_NAME lvgl_demos

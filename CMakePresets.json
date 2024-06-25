@@ -6,7 +6,7 @@
       "hidden": true,
       "cacheVariables": {
         "LV_CONF_SKIP": true,
-        "CONFIG_LV_USE_DEMO_WIDGETS": true,
+        "CONFIG_LV_BUILD_DEMOS": true,
         "CONFIG_LV_BUILD_EXAMPLES": true
       }
     },
