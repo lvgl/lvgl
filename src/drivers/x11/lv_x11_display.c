@@ -175,8 +175,8 @@ static void x11_resolution_evt_cb(lv_event_t * e)
     if(LV_X11_RENDER_MODE != LV_DISPLAY_RENDER_MODE_PARTIAL) {
         /* update lvgl full-screen display draw buffers for new display size */
         int sz_buffers = (hor_res * ver_res * (LV_COLOR_DEPTH + 7) / 8);
-        xd->buffer[0] = lv_realloc(xd->buffer[0], sz_buffers);
-        xd->buffer[1] = (LV_X11_DOUBLE_BUFFER ?  lv_realloc(xd->buffer[1], sz_buffers) : NULL);
+        xd->buffer[0] = realloc(xd->buffer[0], sz_buffers);
+        xd->buffer[1] = (LV_X11_DOUBLE_BUFFER ?  realloc(xd->buffer[1], sz_buffers) : NULL);
         lv_display_set_buffers(disp, xd->buffer[0], xd->buffer[1], sz_buffers, LV_X11_RENDER_MODE);
     }
 
