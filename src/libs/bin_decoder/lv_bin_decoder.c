@@ -420,7 +420,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
                 lv_draw_buf_destroy(decoder_data->decoded_partial);
                 decoder_data->decoded_partial = NULL;
             }
-            decoded = lv_draw_buf_create_user(image_cache_draw_buf_handlers, w_px, 1, cf_decoded, LV_STRIDE_AUTO);
+            decoded = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, w_px, 1, cf_decoded, LV_STRIDE_AUTO);
             if(decoded == NULL) return LV_RESULT_INVALID;
             decoder_data->decoded_partial = decoded; /*Free on decoder close*/
         }
@@ -590,8 +590,8 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
         decoder_data->palette = (void *)palette; /*Need to free when decoder closes*/
 
 #if LV_BIN_DECODER_RAM_LOAD
-        draw_buf_indexed = lv_draw_buf_create_user(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h, cf,
-                                                   dsc->header.stride);
+        draw_buf_indexed = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h, cf,
+                                                 dsc->header.stride);
         if(draw_buf_indexed == NULL) {
             LV_LOG_ERROR("Draw buffer alloc failed");
             goto exit_with_buf;
@@ -629,9 +629,9 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
 
 #if LV_BIN_DECODER_RAM_LOAD
     /*Convert to ARGB8888, since sw renderer cannot render it directly even it's in RAM*/
-    lv_draw_buf_t * decoded = lv_draw_buf_create_user(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h,
-                                                      LV_COLOR_FORMAT_ARGB8888,
-                                                      0);
+    lv_draw_buf_t * decoded = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h,
+                                                    LV_COLOR_FORMAT_ARGB8888,
+                                                    0);
     if(decoded == NULL) {
         LV_LOG_ERROR("No memory for indexed image");
         goto exit_with_buf;
@@ -722,8 +722,8 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         lv_color_format_t cf = dsc->header.cf;
         lv_fs_file_t * f = decoder_data->f;
-        lv_draw_buf_t * decoded = lv_draw_buf_create_user(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h, cf,
-                                                          dsc->header.stride);
+        lv_draw_buf_t * decoded = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h, cf,
+                                                        dsc->header.stride);
         if(decoded == NULL) {
             LV_LOG_ERROR("Draw buffer alloc failed");
             return LV_RESULT_INVALID;
@@ -780,8 +780,8 @@ static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc
         len += (dsc->header.stride / 2) * dsc->header.h; /*A8 mask*/
     }
 
-    lv_draw_buf_t * decoded = lv_draw_buf_create_user(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h, cf,
-                                                      dsc->header.stride);
+    lv_draw_buf_t * decoded = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h, cf,
+                                                    dsc->header.stride);
     if(decoded == NULL) {
         LV_LOG_ERROR("No memory for rgb file read");
         return LV_RESULT_INVALID;
@@ -833,8 +833,8 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
     lv_draw_buf_t * decoded;
     uint32_t file_len = (uint32_t)dsc->header.stride * dsc->header.h;
 
-    decoded = lv_draw_buf_create_user(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h, LV_COLOR_FORMAT_A8,
-                                      buf_stride);
+    decoded = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h, LV_COLOR_FORMAT_A8,
+                                    buf_stride);
     if(decoded == NULL) {
         LV_LOG_ERROR("Out of memory");
         return LV_RESULT_INVALID;
@@ -1089,9 +1089,9 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
     LV_UNUSED(input_len);
     LV_UNUSED(out_len);
 
-    lv_draw_buf_t * decompressed = lv_draw_buf_create_user(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h,
-                                                           dsc->header.cf,
-                                                           dsc->header.stride);
+    lv_draw_buf_t * decompressed = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, dsc->header.w, dsc->header.h,
+                                                         dsc->header.cf,
+                                                         dsc->header.stride);
     if(decompressed == NULL) {
         LV_LOG_WARN("No memory for decompressed image, input: %" LV_PRIu32 ", output: %" LV_PRIu32, input_len, out_len);
         return LV_RESULT_INVALID;

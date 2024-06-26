@@ -209,7 +209,7 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
                 decoded = NULL;
                 dsc->decoded = NULL;
             }
-            decoded = lv_draw_buf_create_user(image_cache_draw_buf_handlers, w_px, 1, dsc->header.cf, LV_STRIDE_AUTO);
+            decoded = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, w_px, 1, dsc->header.cf, LV_STRIDE_AUTO);
             if(decoded == NULL) return LV_RESULT_INVALID;
         }
         else {

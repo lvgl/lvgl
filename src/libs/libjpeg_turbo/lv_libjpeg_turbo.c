@@ -368,8 +368,8 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
              ((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
     uint32_t buf_width = (image_angle % 180) ? cinfo.output_height : cinfo.output_width;
     uint32_t buf_height = (image_angle % 180) ? cinfo.output_width : cinfo.output_height;
-    decoded = lv_draw_buf_create_user(image_cache_draw_buf_handlers, buf_width, buf_height, LV_COLOR_FORMAT_RGB888,
-                                      LV_STRIDE_AUTO);
+    decoded = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, buf_width, buf_height, LV_COLOR_FORMAT_RGB888,
+                                    LV_STRIDE_AUTO);
     if(decoded != NULL) {
         uint32_t line_index = 0;
         /* while (scan lines remain to be read) */

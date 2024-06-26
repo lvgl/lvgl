@@ -422,7 +422,7 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
 
                 uint32_t h = g.box_h;
                 if(h * g.box_w < 64) h *= 2; /*Alloc a slightly larger buffer*/
-                draw_buf = lv_draw_buf_create_user(font_draw_buf_handlers, g.box_w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
+                draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, g.box_w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
                 LV_ASSERT_MALLOC(draw_buf);
                 draw_buf->header.h = g.box_h;
                 dsc->_draw_buf = draw_buf;

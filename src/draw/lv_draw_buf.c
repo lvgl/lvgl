@@ -85,11 +85,11 @@ lv_draw_buf_handlers_t * lv_draw_buf_get_handlers(void)
 
 uint32_t lv_draw_buf_width_to_stride(uint32_t w, lv_color_format_t color_format)
 {
-    return lv_draw_buf_width_to_stride_user(&default_handlers, w, color_format);
+    return lv_draw_buf_width_to_stride_ex(&default_handlers, w, color_format);
 }
 
-uint32_t lv_draw_buf_width_to_stride_user(const lv_draw_buf_handlers_t * handlers, uint32_t w,
-                                          lv_color_format_t color_format)
+uint32_t lv_draw_buf_width_to_stride_ex(const lv_draw_buf_handlers_t * handlers, uint32_t w,
+                                        lv_color_format_t color_format)
 {
     if(handlers->width_to_stride_cb) return handlers->width_to_stride_cb(w, color_format);
     else return 0;
@@ -97,10 +97,10 @@ uint32_t lv_draw_buf_width_to_stride_user(const lv_draw_buf_handlers_t * handler
 
 void * lv_draw_buf_align(void * data, lv_color_format_t color_format)
 {
-    return lv_draw_buf_align_user(&default_handlers, data, color_format);
+    return lv_draw_buf_align_ex(&default_handlers, data, color_format);
 }
 
-void * lv_draw_buf_align_user(const lv_draw_buf_handlers_t * handlers, void * data, lv_color_format_t color_format)
+void * lv_draw_buf_align_ex(const lv_draw_buf_handlers_t * handlers, void * data, lv_color_format_t color_format)
 {
     if(handlers->align_pointer_cb) return handlers->align_pointer_cb(data, color_format);
     else return NULL;
@@ -267,11 +267,11 @@ lv_result_t lv_draw_buf_init(lv_draw_buf_t * draw_buf, uint32_t w, uint32_t h, l
 
 lv_draw_buf_t * lv_draw_buf_create(uint32_t w, uint32_t h, lv_color_format_t cf, uint32_t stride)
 {
-    return lv_draw_buf_create_user(&default_handlers, w, h, cf, stride);
+    return lv_draw_buf_create_ex(&default_handlers, w, h, cf, stride);
 }
 
-lv_draw_buf_t * lv_draw_buf_create_user(const lv_draw_buf_handlers_t * handlers, uint32_t w, uint32_t h,
-                                        lv_color_format_t cf, uint32_t stride)
+lv_draw_buf_t * lv_draw_buf_create_ex(const lv_draw_buf_handlers_t * handlers, uint32_t w, uint32_t h,
+                                      lv_color_format_t cf, uint32_t stride)
 {
     lv_draw_buf_t * draw_buf = lv_malloc_zeroed(sizeof(lv_draw_buf_t));
     LV_ASSERT_MALLOC(draw_buf);
@@ -304,13 +304,13 @@ lv_draw_buf_t * lv_draw_buf_create_user(const lv_draw_buf_handlers_t * handlers,
 
 lv_draw_buf_t * lv_draw_buf_dup(const lv_draw_buf_t * draw_buf)
 {
-    return lv_draw_buf_dup_user(&default_handlers, draw_buf);
+    return lv_draw_buf_dup_ex(&default_handlers, draw_buf);
 }
 
-lv_draw_buf_t * lv_draw_buf_dup_user(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf)
+lv_draw_buf_t * lv_draw_buf_dup_ex(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf)
 {
     const lv_image_header_t * header = &draw_buf->header;
-    lv_draw_buf_t * new_buf = lv_draw_buf_create_user(handlers, header->w, header->h, header->cf, header->stride);
+    lv_draw_buf_t * new_buf = lv_draw_buf_create_ex(handlers, header->w, header->h, header->cf, header->stride);
     if(new_buf == NULL) return NULL;
 
     new_buf->header.flags = draw_buf->header.flags;
