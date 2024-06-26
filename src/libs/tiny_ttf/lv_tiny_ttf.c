@@ -538,7 +538,7 @@ static void tiny_ttf_draw_data_cache_free_cb(tiny_ttf_cache_data_t * node, void 
 {
     LV_UNUSED(user_data);
 
-    lv_draw_buf_destroy_user(font_draw_buf_handlers, node->draw_buf);
+    lv_draw_buf_destroy(node->draw_buf);
 }
 
 static lv_cache_compare_res_t tiny_ttf_draw_data_cache_compare_cb(const tiny_ttf_cache_data_t * lhs,

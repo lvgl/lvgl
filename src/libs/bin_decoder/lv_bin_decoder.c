@@ -294,7 +294,14 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             }
             else {
                 decoded = &decoder_data->c_array;
-                lv_draw_buf_from_image(decoded, image);
+                if(image->header.stride == 0) {
+                    /*If image doesn't have stride, treat it as lvgl v8 legacy image format*/
+                    lv_image_dsc_t tmp = *image;
+                    tmp.header.stride = (tmp.header.w * lv_color_format_get_bpp(cf) + 7) >> 3;
+                    lv_draw_buf_from_image(decoded, &tmp);
+                }
+                else
+                    lv_draw_buf_from_image(decoded, image);
             }
 
             dsc->decoded = decoded;
@@ -361,7 +368,7 @@ void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 
     decoder_data_t * decoder_data = dsc->user_data;
     if(decoder_data && decoder_data->decoded_partial) {
-        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoder_data->decoded_partial);
+        lv_draw_buf_destroy(decoder_data->decoded_partial);
         decoder_data->decoded_partial = NULL;
     }
 
@@ -410,7 +417,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         decoded = lv_draw_buf_reshape(decoder_data->decoded_partial, cf_decoded, w_px, 1, LV_STRIDE_AUTO);
         if(decoded == NULL) {
             if(decoder_data->decoded_partial != NULL) {
-                lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoder_data->decoded_partial);
+                lv_draw_buf_destroy(decoder_data->decoded_partial);
                 decoder_data->decoded_partial = NULL;
             }
             decoded = lv_draw_buf_create_user(image_cache_draw_buf_handlers, w_px, 1, cf_decoded, LV_STRIDE_AUTO);
@@ -537,8 +544,8 @@ static void free_decoder_data(lv_image_decoder_dsc_t * dsc)
         lv_free(decoder_data->f);
     }
 
-    if(decoder_data->decoded) lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoder_data->decoded);
-    if(decoder_data->decompressed) lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoder_data->decompressed);
+    if(decoder_data->decoded) lv_draw_buf_destroy(decoder_data->decoded);
+    if(decoder_data->decompressed) lv_draw_buf_destroy(decoder_data->decompressed);
     lv_free(decoder_data->palette);
     lv_free(decoder_data);
     dsc->user_data = NULL;
@@ -645,7 +652,7 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
     decoder_data->decoded = decoded; /*Free when decoder closes*/
     if(dsc->src_type == LV_IMAGE_SRC_FILE && !is_compressed) {
         decoder_data->palette = (void *)palette; /*Free decoder data on close*/
-        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, draw_buf_indexed);
+        lv_draw_buf_destroy(draw_buf_indexed);
     }
 
     return LV_RESULT_OK;
@@ -655,7 +662,7 @@ exit_with_buf:
         decoder_data->palette = NULL;
     }
 
-    if(draw_buf_indexed) lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, draw_buf_indexed);
+    if(draw_buf_indexed) lv_draw_buf_destroy(draw_buf_indexed);
     return LV_RESULT_INVALID;
 #else
     LV_UNUSED(stride);
@@ -727,7 +734,7 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
         res = fs_read_file_at(f, sizeof(lv_image_header_t), data, palette_len, &rn);
         if(res != LV_FS_RES_OK || rn != palette_len) {
             LV_LOG_WARN("Read palette failed: %d", res);
-            lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
+            lv_draw_buf_destroy(decoded);
             return LV_RESULT_INVALID;
         }
 
@@ -735,7 +742,7 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
         if(lv_fs_seek(f, 0, LV_FS_SEEK_END) != LV_FS_RES_OK ||
            lv_fs_tell(f, &data_len) != LV_FS_RES_OK) {
             LV_LOG_WARN("Failed to get file to size");
-            lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
+            lv_draw_buf_destroy(decoded);
             return LV_RESULT_INVALID;
         }
 
@@ -745,7 +752,7 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
         res = fs_read_file_at(f, data_offset, data, data_len, &rn);
         if(res != LV_FS_RES_OK || rn != data_len) {
             LV_LOG_WARN("Read indexed image failed: %d", res);
-            lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
+            lv_draw_buf_destroy(decoded);
             return LV_RESULT_INVALID;
         }
 
@@ -786,7 +793,7 @@ static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc
     res = fs_read_file_at(f, sizeof(lv_image_header_t), img_data, len, &rn);
     if(res != LV_FS_RES_OK || rn != len) {
         LV_LOG_WARN("Read rgb file failed: %d", res);
-        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
+        lv_draw_buf_destroy(decoded);
         return LV_RESULT_INVALID;
     }
 
@@ -843,7 +850,7 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
         res = fs_read_file_at(decoder_data->f, sizeof(lv_image_header_t), img_data, file_len, &rn);
         if(res != LV_FS_RES_OK || rn != file_len) {
             LV_LOG_WARN("Read header failed: %d", res);
-            lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
+            lv_draw_buf_destroy(decoded);
             return LV_RESULT_INVALID;
         }
     }
@@ -1092,7 +1099,7 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
 
     if(out_len > decompressed->data_size) {
         LV_LOG_ERROR("Decompressed size mismatch: %" LV_PRIu32 " > %" LV_PRIu32, out_len, decompressed->data_size);
-        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decompressed);
+        lv_draw_buf_destroy(decompressed);
         return LV_RESULT_INVALID;
     }
 
@@ -1112,12 +1119,12 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
         len = lv_rle_decompress(input, input_len, output, out_len, pixel_byte);
         if(len != compressed->decompressed_size) {
             LV_LOG_WARN("Decompress failed: %" LV_PRIu32 ", got: %" LV_PRIu32, out_len, len);
-            lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decompressed);
+            lv_draw_buf_destroy(decompressed);
             return LV_RESULT_INVALID;
         }
 #else
         LV_LOG_WARN("RLE decompress is not enabled");
-        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decompressed);
+        lv_draw_buf_destroy(decompressed);
         return LV_RESULT_INVALID;
 #endif
     }
@@ -1129,19 +1136,19 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
         len = LZ4_decompress_safe(input, output, input_len, out_len);
         if(len < 0 || (uint32_t)len != compressed->decompressed_size) {
             LV_LOG_WARN("Decompress failed: %" LV_PRId32 ", got: %" LV_PRId32, out_len, len);
-            lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decompressed);
+            lv_draw_buf_destroy(decompressed);
             return LV_RESULT_INVALID;
         }
 #else
         LV_LOG_WARN("LZ4 decompress is not enabled");
-        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decompressed);
+        lv_draw_buf_destroy(decompressed);
         return LV_RESULT_INVALID;
 #endif
     }
     else {
         LV_UNUSED(img_data);
         LV_LOG_WARN("Unknown compression method: %d", compressed->method);
-        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decompressed);
+        lv_draw_buf_destroy(decompressed);
         return LV_RESULT_INVALID;
     }
 

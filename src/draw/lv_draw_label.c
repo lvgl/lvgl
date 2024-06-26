@@ -369,7 +369,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
         if(pos.y > draw_unit->clip_area->y2) break;
     }
 
-    if(draw_letter_dsc._draw_buf) lv_draw_buf_destroy_user(font_draw_buf_handlers, draw_letter_dsc._draw_buf);
+    if(draw_letter_dsc._draw_buf) lv_draw_buf_destroy(draw_letter_dsc._draw_buf);
 
     LV_ASSERT_MEM_INTEGRITY();
 }
@@ -418,7 +418,7 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
             /*Only check draw buf for bitmap glyph*/
             draw_buf = lv_draw_buf_reshape(dsc->_draw_buf, 0, g.box_w, g.box_h, LV_STRIDE_AUTO);
             if(draw_buf == NULL) {
-                if(dsc->_draw_buf) lv_draw_buf_destroy_user(font_draw_buf_handlers, dsc->_draw_buf);
+                if(dsc->_draw_buf) lv_draw_buf_destroy(dsc->_draw_buf);
 
                 uint32_t h = g.box_h;
                 if(h * g.box_w < 64) h *= 2; /*Alloc a slightly larger buffer*/

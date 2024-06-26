@@ -171,7 +171,7 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
 static void freetype_image_free_cb(lv_freetype_image_cache_data_t * data, void * user_data)
 {
     LV_UNUSED(user_data);
-    lv_draw_buf_destroy_user(font_draw_buf_handlers, data->draw_buf);
+    lv_draw_buf_destroy(data->draw_buf);
 }
 static lv_cache_compare_res_t freetype_image_compare_cb(const lv_freetype_image_cache_data_t * lhs,
                                                         const lv_freetype_image_cache_data_t * rhs)

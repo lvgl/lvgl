@@ -13,6 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../misc/lv_types.h"
 #include "../misc/lv_area.h"
 #include "../misc/lv_color.h"
 #include "../stdlib/lv_string.h"
@@ -25,17 +26,6 @@ extern "C" {
 /** Use this value to let LVGL calculate stride automatically */
 #define LV_STRIDE_AUTO 0
 LV_EXPORT_CONST_INT(LV_STRIDE_AUTO);
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-typedef struct {
-    lv_image_header_t header;
-    uint32_t data_size;     /**< Total buf size in bytes */
-    uint8_t * data;
-    void * unaligned_data;  /**< Unaligned address of `data`, used internally by lvgl */
-} lv_draw_buf_t;
 
 /**
  * Stride alignment for draw buffers.
@@ -81,6 +71,10 @@ typedef struct {
         lv_draw_buf_set_flag(&name, LV_IMAGE_FLAGS_MODIFIABLE); \
     } while(0)
 
+/**********************
+ *      TYPEDEFS
+ **********************/
+
 typedef void * (*lv_draw_buf_malloc_cb)(size_t size, lv_color_format_t color_format);
 
 typedef void (*lv_draw_buf_free_cb)(void * draw_buf);
@@ -90,6 +84,14 @@ typedef void * (*lv_draw_buf_align_cb)(void * buf, lv_color_format_t color_forma
 typedef void (*lv_draw_buf_cache_operation_cb)(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
 
 typedef uint32_t (*lv_draw_buf_width_to_stride_cb)(uint32_t w, lv_color_format_t color_format);
+
+struct lv_draw_buf_t {
+    lv_image_header_t header;
+    uint32_t data_size;     /*Total buf size in bytes*/
+    uint8_t * data;
+    void * unaligned_data;  /*Unaligned address of `data`, used internally by lvgl*/
+    const lv_draw_buf_handlers_t * handlers; /* draw buffer alloc/free ops. */
+};
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -137,7 +139,8 @@ lv_draw_buf_handlers_t * lv_draw_buf_get_handlers(void);
 void * lv_draw_buf_align(void * buf, lv_color_format_t color_format);
 
 /**
- * Align the address of a buffer. The buffer needs to be large enough for the real data after alignment
+ * Align the address of a buffer with custom draw buffer handlers.
+ * The buffer needs to be large enough for the real data after alignment
  * @param handlers      the draw buffer handlers
  * @param buf           the data to align
  * @param color_format  the color format of the buffer
@@ -154,30 +157,12 @@ void * lv_draw_buf_align_user(const lv_draw_buf_handlers_t * handlers, void * bu
 void lv_draw_buf_invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
 
 /**
- * Invalidate the cache of the buffer using the user-defined callback
- * @param handlers     the draw buffer handlers
- * @param draw_buf     the draw buffer needs to be invalidated
- * @param area         the area to invalidate in the buffer,
- */
-void lv_draw_buf_invalidate_cache_user(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf,
-                                       const lv_area_t * area);
-
-/**
  * Flush the cache of the buffer
  * @param draw_buf     the draw buffer needs to be flushed
  * @param area         the area to flush in the buffer,
  *                     use NULL to flush the whole draw buffer address range
  */
 void lv_draw_buf_flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
-
-/**
- * Flush the cache of the buffer using the user-defined callback
- * @param handlers     the draw buffer handlers
- * @param draw_buf     the draw buffer needs to be flushed
- * @param area         the area to flush in the buffer,
- */
-void lv_draw_buf_flush_cache_user(const lv_draw_buf_handlers_t * handlers, const lv_draw_buf_t * draw_buf,
-                                  const lv_area_t * area);
 
 /**
  * Calculate the stride in bytes based on a width and color format
@@ -295,16 +280,7 @@ lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t 
  *
  * @param buf       the draw buffer to destroy
  */
-void lv_draw_buf_destroy(lv_draw_buf_t * buf);
-
-/**
- * Destroy a draw buf by free the actual buffer if it's marked as LV_IMAGE_FLAGS_ALLOCATED in header.
- * Then free the lv_draw_buf_t struct.
- *
- * @param handlers  the draw buffer handlers
- * @param buf       the draw buffer to destroy
- */
-void lv_draw_buf_destroy_user(const lv_draw_buf_handlers_t * handlers, lv_draw_buf_t * buf);
+void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf);
 
 /**
  * Return pointer to the buffer at the given coordinates

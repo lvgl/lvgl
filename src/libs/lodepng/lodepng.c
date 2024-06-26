@@ -5840,13 +5840,13 @@ unsigned lodepng_decode(unsigned char ** out, unsigned * w, unsigned * h,
                                             &state->info_raw, &state->info_png.color, *w, *h);
 
             if (state->error) {
-                lv_draw_buf_destroy_user(image_cache_draw_buf_handlers,new_buf);
+                lv_draw_buf_destroy(new_buf);
                 new_buf = NULL;
             }
         }
 
         *out = (unsigned char*)new_buf;
-        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers,old_buf);
+        lv_draw_buf_destroy(old_buf);
     }
     return state->error;
 }
