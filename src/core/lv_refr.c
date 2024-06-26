@@ -964,6 +964,29 @@ static void refr_obj_matrix(lv_layer_t * layer, lv_obj_t * obj)
     layer->_clip_area = clip_area_ori;
 }
 
+static bool refr_check_obj_clip_overflow(lv_layer_t * layer, lv_obj_t * obj)
+{
+    if(lv_obj_get_style_transform_rotation(obj, 0) == 0) {
+        return false;
+    }
+
+    /*Truncate the area to the object*/
+    lv_area_t obj_coords;
+    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    lv_area_copy(&obj_coords, &obj->coords);
+    lv_area_increase(&obj_coords, ext_size, ext_size);
+
+    lv_obj_get_transformed_area(obj, &obj_coords, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
+
+    lv_area_t clip_coords_for_obj;
+    if(!_lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, &obj_coords)) {
+        return false;
+    }
+
+    bool has_clip = lv_memcmp(&clip_coords_for_obj, &obj_coords, sizeof(lv_area_t)) != 0;
+    return has_clip;
+}
+
 #endif /* LV_DRAW_TRANSFORM_USE_MATRIX */
 
 static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
@@ -975,7 +998,7 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     /*If the layer opa is full then use the matrix transform*/
-    if(opa >= LV_OPA_MAX) {
+    if(opa >= LV_OPA_MAX && !refr_check_obj_clip_overflow(layer, obj)) {
         refr_obj_matrix(layer, obj);
         return;
     }
