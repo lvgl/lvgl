@@ -206,7 +206,7 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         lv_draw_buf_t * reshaped = lv_draw_buf_reshape(decoded, dsc->header.cf, w_px, 1, LV_STRIDE_AUTO);
         if(reshaped == NULL) {
             if(decoded != NULL) {
-                lv_draw_buf_destroy(decoded);
+                lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
                 decoded = NULL;
                 dsc->decoded = NULL;
             }
@@ -247,7 +247,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
     bmp_dsc_t * b = dsc->user_data;
     lv_fs_close(&b->f);
     lv_free(dsc->user_data);
-    if(dsc->decoded) lv_draw_buf_destroy((void *)dsc->decoded);
+    if(dsc->decoded) lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, (void *)dsc->decoded);
 
 }
 
