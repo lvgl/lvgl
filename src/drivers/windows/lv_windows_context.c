@@ -471,16 +471,20 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
                     return -1;
                 }
 
+                lv_lock();
+
                 lv_windows_window_context_t * context =
                     (lv_windows_window_context_t *)(HeapAlloc(
                                                         GetProcessHeap(),
                                                         HEAP_ZERO_MEMORY,
                                                         sizeof(lv_windows_window_context_t)));
                 if(!context) {
+                    lv_unlock();
                     return -1;
                 }
 
                 if(!SetPropW(hWnd, L"LVGL.Window.Context", (HANDLE)(context))) {
+                    lv_unlock();
                     return -1;
                 }
 
@@ -500,6 +504,7 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
 
                 context->display_device_object = lv_display_create(0, 0);
                 if(!context->display_device_object) {
+                    lv_unlock();
                     return -1;
                 }
                 RECT request_content_size;
@@ -530,6 +535,8 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
                             context->display_device_object);
                 }
 
+                lv_unlock();
+
                 lv_windows_register_touch_window(hWnd, 0);
 
                 lv_windows_enable_child_window_dpi_message(hWnd);
@@ -538,6 +545,7 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
             }
         case WM_SIZE: {
                 if(wParam != SIZE_MINIMIZED) {
+                    lv_lock();
                     lv_windows_window_context_t * context = (lv_windows_window_context_t *)(
                                                                 lv_windows_get_window_context(hWnd));
                     if(context) {
@@ -591,10 +599,12 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
                                 SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOMOVE);
                         }
                     }
+                    lv_unlock();
                 }
                 break;
             }
         case WM_DPICHANGED: {
+                lv_lock();
                 lv_windows_window_context_t * context = (lv_windows_window_context_t *)(
                                                             lv_windows_get_window_context(hWnd));
                 if(context) {
@@ -617,6 +627,7 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
                         suggested_rect->bottom,
                         SWP_NOZORDER | SWP_NOACTIVATE);
                 }
+                lv_unlock();
 
                 break;
             }
@@ -624,6 +635,7 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
                 return TRUE;
             }
         case WM_DESTROY: {
+                lv_lock();
                 lv_windows_window_context_t * context = (lv_windows_window_context_t *)(
                                                             RemovePropW(hWnd, L"LVGL.Window.Context"));
                 if(context) {
@@ -637,12 +649,14 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
 
                     HeapFree(GetProcessHeap(), 0, context);
                 }
+                lv_unlock();
 
                 PostQuitMessage(0);
 
                 break;
             }
         default: {
+                lv_lock();
                 lv_windows_window_context_t * context = (lv_windows_window_context_t *)(
                                                             lv_windows_get_window_context(hWnd));
                 if(context) {
@@ -654,6 +668,7 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
                            wParam,
                            lParam,
                            &lResult)) {
+                        lv_unlock();
                         return lResult;
                     }
                     else if(context->keypad.indev &&
@@ -663,6 +678,7 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
                                 wParam,
                                 lParam,
                                 &lResult)) {
+                        lv_unlock();
                         return lResult;
                     }
                     else if(context->encoder.indev &&
@@ -672,9 +688,11 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
                                 wParam,
                                 lParam,
                                 &lResult)) {
+                        lv_unlock();
                         return lResult;
                     }
                 }
+                lv_unlock();
 
                 return DefWindowProcW(hWnd, uMsg, wParam, lParam);
             }

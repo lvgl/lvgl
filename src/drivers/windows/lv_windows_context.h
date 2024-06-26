@@ -19,6 +19,10 @@ extern "C" {
 
 #if LV_USE_WINDOWS
 
+#if LV_USE_OS != LV_OS_WINDOWS
+#error [lv_windows] LV_OS_WINDOWS is required. Enable it in lv_conf.h (LV_USE_OS LV_OS_WINDOWS)
+#endif
+
 #include <windows.h>
 
 /*********************
@@ -41,7 +45,6 @@ typedef struct _lv_windows_keypad_queue_item_t {
 } lv_windows_keypad_queue_item_t;
 
 typedef struct _lv_windows_keypad_context_t {
-    CRITICAL_SECTION mutex;
     lv_ll_t queue;
     uint16_t utf16_high_surrogate;
     uint16_t utf16_low_surrogate;

@@ -88,7 +88,10 @@ lv_display_t * lv_windows_create_display(
 
 HWND lv_windows_get_display_window_handle(lv_display_t * display)
 {
-    return (HWND)lv_display_get_driver_data(display);
+    lv_lock();
+    void * display_window_handle = lv_display_get_driver_data(display);
+    lv_unlock();
+    return (HWND)display_window_handle;
 }
 
 int32_t lv_windows_zoom_to_logical(int32_t physical, int32_t zoom_level)
@@ -143,13 +146,16 @@ static unsigned int __stdcall lv_windows_display_thread_entrypoint(
         return 0;
     }
 
+    lv_lock();
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 window_handle);
     if(!context) {
+        lv_unlock();
         return 0;
     }
 
     data->display = context->display_device_object;
+    lv_unlock();
 
     ShowWindow(window_handle, SW_SHOW);
     UpdateWindow(window_handle);

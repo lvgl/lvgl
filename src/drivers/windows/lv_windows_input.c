@@ -68,7 +68,10 @@ static void lv_windows_release_encoder_device_event_callback(lv_event_t * e);
 
 HWND lv_windows_get_indev_window_handle(lv_indev_t * indev)
 {
-    return lv_windows_get_display_window_handle(lv_indev_get_display(indev));
+    lv_lock();
+    lv_display_t * display = lv_indev_get_display(indev);
+    lv_unlock();
+    return lv_windows_get_display_window_handle(display);
 }
 
 lv_indev_t * lv_windows_acquire_pointer_indev(lv_display_t * display)
@@ -78,9 +81,11 @@ lv_indev_t * lv_windows_acquire_pointer_indev(lv_display_t * display)
         return NULL;
     }
 
+    lv_lock();
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 window_handle);
     if(!context) {
+        lv_unlock();
         return NULL;
     }
 
@@ -111,7 +116,10 @@ lv_indev_t * lv_windows_acquire_pointer_indev(lv_display_t * display)
         }
     }
 
-    return context->pointer.indev;
+    lv_indev_t * indev = context->pointer.indev;
+    lv_unlock();
+
+    return indev;
 }
 
 lv_indev_t * lv_windows_acquire_keypad_indev(lv_display_t * display)
@@ -121,14 +129,15 @@ lv_indev_t * lv_windows_acquire_keypad_indev(lv_display_t * display)
         return NULL;
     }
 
+    lv_lock();
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 window_handle);
     if(!context) {
+        lv_unlock();
         return NULL;
     }
 
     if(!context->keypad.indev) {
-        InitializeCriticalSection(&context->keypad.mutex);
         _lv_ll_init(
             &context->keypad.queue,
             sizeof(lv_windows_keypad_queue_item_t));
@@ -157,7 +166,10 @@ lv_indev_t * lv_windows_acquire_keypad_indev(lv_display_t * display)
         }
     }
 
-    return context->keypad.indev;
+    lv_indev_t * indev = context->keypad.indev;
+    lv_unlock();
+
+    return indev;
 }
 
 lv_indev_t * lv_windows_acquire_encoder_indev(lv_display_t * display)
@@ -167,9 +179,11 @@ lv_indev_t * lv_windows_acquire_encoder_indev(lv_display_t * display)
         return NULL;
     }
 
+    lv_lock();
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 window_handle);
     if(!context) {
+        lv_unlock();
         return NULL;
     }
 
@@ -199,7 +213,10 @@ lv_indev_t * lv_windows_acquire_encoder_indev(lv_display_t * display)
         }
     }
 
-    return context->encoder.indev;
+    lv_indev_t * indev = context->encoder.indev;
+    lv_unlock();
+
+    return indev;
 }
 
 /**********************
@@ -210,6 +227,7 @@ static void lv_windows_pointer_driver_read_callback(
     lv_indev_t * indev,
     lv_indev_data_t * data)
 {
+    /* lv_lock is held by lv_timer_handler */
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 lv_windows_get_indev_window_handle(indev));
     if(!context) {
@@ -232,6 +250,7 @@ static void lv_windows_release_pointer_device_event_callback(lv_event_t * e)
         return;
     }
 
+    /* lv_lock is held by lv_timer_handler */
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 window_handle);
     if(!context) {
@@ -295,6 +314,7 @@ bool lv_windows_pointer_device_window_message_handler(
 {
     switch(uMsg) {
         case WM_MOUSEMOVE: {
+                lv_lock();
                 lv_windows_window_context_t * context = (lv_windows_window_context_t *)(
                                                             lv_windows_get_window_context(hWnd));
                 if(context) {
@@ -330,11 +350,13 @@ bool lv_windows_pointer_device_window_message_handler(
                         context->pointer.point.y = ver_res - 1;
                     }
                 }
+                lv_unlock();
 
                 break;
             }
         case WM_LBUTTONDOWN:
         case WM_LBUTTONUP: {
+                lv_lock();
                 lv_windows_window_context_t * context = (lv_windows_window_context_t *)(
                                                             lv_windows_get_window_context(hWnd));
                 if(context) {
@@ -343,10 +365,12 @@ bool lv_windows_pointer_device_window_message_handler(
                                                  ? LV_INDEV_STATE_PRESSED
                                                  : LV_INDEV_STATE_RELEASED);
                 }
+                lv_unlock();
 
                 break;
             }
         case WM_TOUCH: {
+                lv_lock();
                 lv_windows_window_context_t * context = (lv_windows_window_context_t *)(
                                                             lv_windows_get_window_context(hWnd));
                 if(context) {
@@ -398,6 +422,7 @@ bool lv_windows_pointer_device_window_message_handler(
 
                     lv_windows_close_touch_input_handle(touch_input_handle);
                 }
+                lv_unlock();
 
                 break;
             }
@@ -415,13 +440,12 @@ static void lv_windows_keypad_driver_read_callback(
     lv_indev_t * indev,
     lv_indev_data_t * data)
 {
+    /* lv_lock is held by lv_timer_handler */
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 lv_windows_get_indev_window_handle(indev));
     if(!context) {
         return;
     }
-
-    EnterCriticalSection(&context->keypad.mutex);
 
     lv_windows_keypad_queue_item_t * current = (lv_windows_keypad_queue_item_t *)(
                                                    _lv_ll_get_head(&context->keypad.queue));
@@ -434,8 +458,6 @@ static void lv_windows_keypad_driver_read_callback(
 
         data->continue_reading = true;
     }
-
-    LeaveCriticalSection(&context->keypad.mutex);
 }
 
 static void lv_windows_release_keypad_device_event_callback(lv_event_t * e)
@@ -450,13 +472,13 @@ static void lv_windows_release_keypad_device_event_callback(lv_event_t * e)
         return;
     }
 
+    /* lv_lock is held by lv_timer_handler */
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 window_handle);
     if(!context) {
         return;
     }
 
-    DeleteCriticalSection(&context->keypad.mutex);
     _lv_ll_clear(&context->keypad.queue);
     context->keypad.utf16_high_surrogate = 0;
     context->keypad.utf16_low_surrogate = 0;
@@ -568,11 +590,10 @@ bool lv_windows_keypad_device_window_message_handler(
     switch(uMsg) {
         case WM_KEYDOWN:
         case WM_KEYUP: {
+                lv_lock();
                 lv_windows_window_context_t * context = (lv_windows_window_context_t *)(
                                                             lv_windows_get_window_context(hWnd));
                 if(context) {
-                    EnterCriticalSection(&context->keypad.mutex);
-
                     bool skip_translation = false;
                     uint32_t translated_key = 0;
 
@@ -627,18 +648,16 @@ bool lv_windows_keypad_device_window_message_handler(
                              ? LV_INDEV_STATE_RELEASED
                              : LV_INDEV_STATE_PRESSED));
                     }
-
-                    LeaveCriticalSection(&context->keypad.mutex);
                 }
+                lv_unlock();
 
                 break;
             }
         case WM_CHAR: {
+                lv_lock();
                 lv_windows_window_context_t * context = (lv_windows_window_context_t *)(
                                                             lv_windows_get_window_context(hWnd));
                 if(context) {
-                    EnterCriticalSection(&context->keypad.mutex);
-
                     uint16_t raw_code_point = (uint16_t)(wParam);
 
                     if(raw_code_point >= 0x20 && raw_code_point != 0x7F) {
@@ -677,9 +696,8 @@ bool lv_windows_keypad_device_window_message_handler(
                             lvgl_code_point,
                             LV_INDEV_STATE_RELEASED);
                     }
-
-                    LeaveCriticalSection(&context->keypad.mutex);
                 }
+                lv_unlock();
 
                 break;
             }
@@ -702,6 +720,8 @@ bool lv_windows_keypad_device_window_message_handler(
         case WM_IME_STARTCOMPOSITION: {
                 HIMC imm_context_handle = lv_windows_imm_get_context(hWnd);
                 if(imm_context_handle) {
+                    lv_lock();
+
                     lv_obj_t * textarea_object = NULL;
                     lv_obj_t * focused_object = lv_group_get_focused(
                                                     lv_group_get_default());
@@ -738,6 +758,8 @@ bool lv_windows_keypad_device_window_message_handler(
                     lv_windows_imm_release_context(
                         hWnd,
                         imm_context_handle);
+
+                    lv_unlock();
                 }
 
                 *plResult = DefWindowProcW(hWnd, uMsg, wParam, wParam);
@@ -757,6 +779,7 @@ static void lv_windows_encoder_driver_read_callback(
     lv_indev_t * indev,
     lv_indev_data_t * data)
 {
+    /* lv_lock is held by lv_timer_handler */
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 lv_windows_get_indev_window_handle(indev));
     if(!context) {
@@ -780,6 +803,7 @@ static void lv_windows_release_encoder_device_event_callback(lv_event_t * e)
         return;
     }
 
+    /* lv_lock is held by lv_timer_handler */
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 window_handle);
     if(!context) {
@@ -804,6 +828,7 @@ bool lv_windows_encoder_device_window_message_handler(
     switch(uMsg) {
         case WM_MBUTTONDOWN:
         case WM_MBUTTONUP: {
+                lv_lock();
                 lv_windows_window_context_t * context = (lv_windows_window_context_t *)(
                                                             lv_windows_get_window_context(hWnd));
                 if(context) {
@@ -812,16 +837,19 @@ bool lv_windows_encoder_device_window_message_handler(
                                                  ? LV_INDEV_STATE_PRESSED
                                                  : LV_INDEV_STATE_RELEASED);
                 }
+                lv_unlock();
 
                 break;
             }
         case WM_MOUSEWHEEL: {
+                lv_lock();
                 lv_windows_window_context_t * context = (lv_windows_window_context_t *)(
                                                             lv_windows_get_window_context(hWnd));
                 if(context) {
                     context->encoder.enc_diff =
                         -(GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA);
                 }
+                lv_unlock();
 
                 break;
             }

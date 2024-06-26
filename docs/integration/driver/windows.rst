@@ -97,7 +97,9 @@ Usage
             return -1;
         }
 
+        lv_lock();
         lv_demo_widgets();
+        lv_unlock();
 
         while (1)
         {
