@@ -1088,6 +1088,12 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
         return LV_RESULT_INVALID;
     }
 
+    if(out_len > decompressed->data_size) {
+        LV_LOG_ERROR("Decompressed size mismatch: %" LV_PRIu32 " > %" LV_PRIu32, out_len, decompressed->data_size);
+        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decompressed);
+        return LV_RESULT_INVALID;
+    }
+
     img_data = decompressed->data;
 
     if(compressed->method == LV_IMAGE_COMPRESS_RLE) {
