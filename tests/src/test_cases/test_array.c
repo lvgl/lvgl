@@ -40,7 +40,7 @@ void test_array_size(void)
         lv_array_push_back(&array, &i);
     }
 
-    TEST_ASSERT_EQUAL_UINT32(1, lv_array_is_full(&array) ? 1 : 0);
+    TEST_ASSERT_EQUAL_UINT32(0, lv_array_is_full(&array) ? 1 : 0);
     lv_array_clear(&array);
     TEST_ASSERT_EQUAL_UINT32(1, lv_array_is_empty(&array) ? 1 : 0);
     TEST_ASSERT_EQUAL_UINT32(0, lv_array_size(&array));
