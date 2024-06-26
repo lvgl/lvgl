@@ -222,6 +222,7 @@ static inline int sdl_render_mode(void)
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
 #if LV_USE_DRAW_SDL == 0
+    lv_area_t rotated_area;
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     lv_color_format_t cf = lv_display_get_color_format(disp);
 
@@ -258,7 +259,9 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 
             px_map = dsc->rotated_buf;
 
-            lv_display_rotate_area(disp, (lv_area_t *)area);
+            rotated_area = *area;
+            lv_display_rotate_area(disp, &rotated_area);
+            area = &rotated_area;
         }
 
         uint32_t px_map_stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), cf);
