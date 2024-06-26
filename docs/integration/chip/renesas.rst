@@ -6,7 +6,7 @@ Renesas
 
 `Renesas <https://renesas.com/>`__ is an official partner of LVGL.
 Therefore, LVGL contains built-in support for `Dave2D <https://www.renesas.com/document/mas/tes-dave2d-driver-documentation>`__ (the GPU of Renesas)
-and LVGL also hosts ready-to-use Renesas projects.
+and we also maintain ready-to-use Renesas projects.
 
 Dave2D
 ------
@@ -25,9 +25,9 @@ GLCDC
 -----
 
 GLCDC is a multi-stage graphics output peripheral available in several Renesas MCUs.
-It is able to drive LCD panles via a higly configurable RGB interface.
+It is able to drive LCD panels via a highly configurable RGB interface.
 
-More info can be found at the :ref:`dirver's page<renesas_glcdc>`.
+More info can be found at the :ref:`driver's page<renesas_glcdc>`.
 
 Supported boards
 ----------------
@@ -66,13 +66,19 @@ Supported boards
          | 4.3”
          | 480x272
          | Parallel RGB565
-   * - `Certification <https://lvgl.io/certificate>`__ video
+   * - `Board <https://lvgl.io/boards>`__ video
      - .. raw:: html
 
-           <iframe width="320" height="180" src="https://www.youtube.com/embed/LHPIqBV_MGA?si=mtW3g-av56bCdR4k" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+           <iframe width="320" height="180" src="https://www.youtube.com/embed/WkJPB8wto_U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-     - Coming soon
-     - Coming soon
+     - .. raw:: html
+
+           <iframe width="320" height="180" src="https://www.youtube.com/embed/0kar4Ee3Qic" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+     - .. raw:: html
+
+           <iframe width="320" height="180" src="https://www.youtube.com/embed/__56v8DsfH0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
    * - Links
      - `Demo repository for EK-RA8D1 <https://github.com/lvgl/lv_port_renesas_ek-ra8d1>`__
      - `Demo repository for EK-RA6M3G <https://github.com/lvgl/lv_port_renesas_ek-ra6m3g>`__
@@ -99,14 +105,14 @@ Get started with the Renesas ecosystem
 
       Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
 
-   - Open e² studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Exsisting projects into workspace``
+   - Open e² studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Existing projects into workspace``
 
    - Browse the cloned folder and press ``Finish``.
 
    - Double click on ``configuration.xml``. This will activate the `Configuration Window`.
 
       Renesas' Flexible Software Package (FSP) incudes BSP and HAL layer support extended with multiple RTOS variants and other middleware stacks.
-      The components will be available via code generation, incuding the entry point of *"main.c"*.
+      The components will be available via code generation, including the entry point of *"main.c"*.
 
       Press ``Generate Project Content`` in the top right corner.
 
@@ -144,7 +150,7 @@ Get started with the Renesas ecosystem
       The compiler must be activated in e² studio:
 
       - Go to go to ``Help`` -> ``Add Renesas Toolchains``
-      - Presss the ``Add... `` button
+      - Press the ``Add... `` button
       - Browse the installation folder of the toolchain
 
       |
@@ -160,14 +166,14 @@ Get started with the Renesas ecosystem
 
       Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
 
-   - Open e² studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Exsisting projects into workspace``
+   - Open e² studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Existing projects into workspace``
 
    - Select the cloned folder and press ``Finish``.
 
    - Double click on ``RX72N_EnVision_LVGL.scfg``. This will activate the `Configuration Window`.
 
       Renesas' Smart Configurator (SMC) incudes BSP and HAL layer support extended with multiple RTOS variants and other middleware stacks.
-      The components will be available via code generation, incuding the entry point of the application.
+      The components will be available via code generation, including the entry point of the application.
 
       Press ``Generate Code`` in the top right corner.
 
