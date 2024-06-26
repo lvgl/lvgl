@@ -284,6 +284,7 @@ static void flush_partial(lv_display_t * display, const lv_area_t * area, uint8_
 {
     uint16_t * img = (uint16_t *)px_map;
 
+    lv_area_t rotated_area;
     lv_color_format_t cf = lv_display_get_color_format(display);
     lv_display_rotation_t rotation = lv_display_get_rotation(display);
 
@@ -305,7 +306,10 @@ static void flush_partial(lv_display_t * display, const lv_area_t * area, uint8_
             lv_draw_sw_rotate(img, rotation_buffer, w, h, w_stride, h_stride, rotation, cf);
 
         img = rotation_buffer;
-        lv_display_rotate_area(display, (lv_area_t *)area);
+
+        rotated_area = *area;
+        lv_display_rotate_area(display, &rotated_area);
+        area = &rotated_area;
     }
 
     int32_t w = lv_area_get_width(area);
