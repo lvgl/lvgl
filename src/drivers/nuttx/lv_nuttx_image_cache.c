@@ -30,7 +30,8 @@ typedef struct {
     uint8_t * mem;
     uint32_t mem_size;
 
-    char name[sizeof(HEAP_NAME) + 10];
+    char name[sizeof(HEAP_NAME) + 10]; /**< UINT8_MAX is a maximum of 3 bits long in decimal notation,
+                                            and with the [] on both sides, 10 bytes must be enough */
 
     struct mm_heap_s * heap;
     uint32_t heap_size;
