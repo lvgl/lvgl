@@ -32,6 +32,8 @@ typedef struct {
     uint8_t * mem;
     uint32_t mem_size;
 
+    char name[sizeof(HEAP_NAME) + 10]; /**< +10 characters to store task pid. */
+
     struct mm_heap_s * heap;
     uint32_t heap_size;
 
@@ -106,8 +108,10 @@ static bool defer_init(void)
         return false;
     }
 
+    lv_snprintf(ctx->name, sizeof(ctx->name), HEAP_NAME "[%-4" LV_PRIu32 "]", (uint32_t)gettid());
+
     ctx->heap = mm_initialize(
-                    HEAP_NAME,
+                    ctx->name,
                     ctx->mem,
                     ctx->mem_size
                 );
