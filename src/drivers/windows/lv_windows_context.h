@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_windows_context.h
  *
  */
@@ -24,6 +24,14 @@ extern "C" {
 #endif
 
 #include <windows.h>
+
+#ifndef CREATE_WAITABLE_TIMER_MANUAL_RESET
+#define CREATE_WAITABLE_TIMER_MANUAL_RESET  0x00000001
+#endif
+
+#ifndef CREATE_WAITABLE_TIMER_HIGH_RESOLUTION
+#define CREATE_WAITABLE_TIMER_HIGH_RESOLUTION 0x00000002
+#endif
 
 /*********************
  *      DEFINES

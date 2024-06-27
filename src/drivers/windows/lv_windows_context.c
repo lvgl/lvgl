@@ -36,6 +36,13 @@ static void lv_windows_delay_callback(uint32_t ms);
 static void lv_windows_check_display_existence_timer_callback(
     lv_timer_t * timer);
 
+static bool lv_windows_window_message_callback_nolock(
+    HWND hWnd,
+    UINT uMsg,
+    WPARAM wParam,
+    LPARAM lParam,
+    LRESULT * plResult);
+
 static LRESULT CALLBACK lv_windows_window_message_callback(
     HWND   hWnd,
     UINT   uMsg,
@@ -452,15 +459,13 @@ static BOOL lv_windows_enable_child_window_dpi_message(
     return function(WindowHandle, TRUE);
 }
 
-static LRESULT CALLBACK lv_windows_window_message_callback(
+static bool lv_windows_window_message_callback_nolock(
     HWND hWnd,
     UINT uMsg,
     WPARAM wParam,
-    LPARAM lParam)
+    LPARAM lParam,
+    LRESULT * plResult)
 {
-    LRESULT lResult = 0;
-
-    lv_lock();
     switch(uMsg) {
         case WM_CREATE: {
                 // Note: Return -1 directly because WM_DESTROY message will be sent
@@ -471,8 +476,7 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
                     (lv_windows_create_display_data_t *)(
                         ((LPCREATESTRUCTW)(lParam))->lpCreateParams);
                 if(!data) {
-                    lResult = -1;
-                    break;
+                    return -1;
                 }
 
                 lv_windows_window_context_t * context =
@@ -481,13 +485,11 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
                                                         HEAP_ZERO_MEMORY,
                                                         sizeof(lv_windows_window_context_t)));
                 if(!context) {
-                    lResult = -1;
-                    break;
+                    return -1;
                 }
 
                 if(!SetPropW(hWnd, L"LVGL.Window.Context", (HANDLE)(context))) {
-                    lResult = -1;
-                    break;
+                    return -1;
                 }
 
                 context->window_dpi = lv_windows_get_dpi_for_window(hWnd);
@@ -506,8 +508,7 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
 
                 context->display_device_object = lv_display_create(0, 0);
                 if(!context->display_device_object) {
-                    lResult = -1;
-                    break;
+                    return -1;
                 }
                 RECT request_content_size;
                 GetWindowRect(hWnd, &request_content_size);
@@ -628,8 +629,7 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
                 break;
             }
         case WM_ERASEBKGND: {
-                lResult = TRUE;
-                break;
+                return TRUE;
             }
         case WM_DESTROY: {
                 lv_windows_window_context_t * context = (lv_windows_window_context_t *)(
@@ -660,8 +660,9 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
                            uMsg,
                            wParam,
                            lParam,
-                           &lResult)) {
-                        break;
+                           plResult)) {
+                        // Handled
+                        return true;
                     }
                     else if(context->keypad.indev &&
                             lv_windows_keypad_device_window_message_handler(
@@ -669,8 +670,9 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
                                 uMsg,
                                 wParam,
                                 lParam,
-                                &lResult)) {
-                        break;
+                                plResult)) {
+                        // Handled
+                        return true;
                     }
                     else if(context->encoder.indev &&
                             lv_windows_encoder_device_window_message_handler(
@@ -678,17 +680,41 @@ static LRESULT CALLBACK lv_windows_window_message_callback(
                                 uMsg,
                                 wParam,
                                 lParam,
-                                &lResult)) {
-                        break;
+                                plResult)) {
+                        // Handled
+                        return true;
                     }
                 }
 
-                lResult = DefWindowProcW(hWnd, uMsg, wParam, lParam);
+                // Not Handled
+                return false;
             }
     }
+
+    // Handled
+    *plResult = 0;
+    return true;
+}
+
+static LRESULT CALLBACK lv_windows_window_message_callback(
+    HWND hWnd,
+    UINT uMsg,
+    WPARAM wParam,
+    LPARAM lParam)
+{
+    lv_lock();
+
+    LRESULT lResult = 0;
+    bool Handled = lv_windows_window_message_callback_nolock(
+                       hWnd,
+                       uMsg,
+                       wParam,
+                       lParam,
+                       &lResult);
+
     lv_unlock();
 
-    return lResult;
+    return Handled ? lResult : DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 
 #endif // LV_USE_WINDOWS

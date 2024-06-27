@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_windows_input.c
  *
  */
@@ -68,10 +68,7 @@ static void lv_windows_release_encoder_device_event_callback(lv_event_t * e);
 
 HWND lv_windows_get_indev_window_handle(lv_indev_t * indev)
 {
-    lv_lock();
-    lv_display_t * display = lv_indev_get_display(indev);
-    lv_unlock();
-    return lv_windows_get_display_window_handle(display);
+    return lv_windows_get_display_window_handle(lv_indev_get_display(indev));
 }
 
 lv_indev_t * lv_windows_acquire_pointer_indev(lv_display_t * display)
@@ -81,11 +78,9 @@ lv_indev_t * lv_windows_acquire_pointer_indev(lv_display_t * display)
         return NULL;
     }
 
-    lv_lock();
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 window_handle);
     if(!context) {
-        lv_unlock();
         return NULL;
     }
 
@@ -116,10 +111,7 @@ lv_indev_t * lv_windows_acquire_pointer_indev(lv_display_t * display)
         }
     }
 
-    lv_indev_t * indev = context->pointer.indev;
-    lv_unlock();
-
-    return indev;
+    return context->pointer.indev;
 }
 
 lv_indev_t * lv_windows_acquire_keypad_indev(lv_display_t * display)
@@ -129,11 +121,9 @@ lv_indev_t * lv_windows_acquire_keypad_indev(lv_display_t * display)
         return NULL;
     }
 
-    lv_lock();
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 window_handle);
     if(!context) {
-        lv_unlock();
         return NULL;
     }
 
@@ -166,10 +156,7 @@ lv_indev_t * lv_windows_acquire_keypad_indev(lv_display_t * display)
         }
     }
 
-    lv_indev_t * indev = context->keypad.indev;
-    lv_unlock();
-
-    return indev;
+    return context->keypad.indev;
 }
 
 lv_indev_t * lv_windows_acquire_encoder_indev(lv_display_t * display)
@@ -179,11 +166,9 @@ lv_indev_t * lv_windows_acquire_encoder_indev(lv_display_t * display)
         return NULL;
     }
 
-    lv_lock();
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 window_handle);
     if(!context) {
-        lv_unlock();
         return NULL;
     }
 
@@ -213,10 +198,7 @@ lv_indev_t * lv_windows_acquire_encoder_indev(lv_display_t * display)
         }
     }
 
-    lv_indev_t * indev = context->encoder.indev;
-    lv_unlock();
-
-    return indev;
+    return context->encoder.indev;
 }
 
 /**********************
@@ -227,7 +209,6 @@ static void lv_windows_pointer_driver_read_callback(
     lv_indev_t * indev,
     lv_indev_data_t * data)
 {
-    /* lv_lock is held by lv_timer_handler */
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 lv_windows_get_indev_window_handle(indev));
     if(!context) {
@@ -250,7 +231,6 @@ static void lv_windows_release_pointer_device_event_callback(lv_event_t * e)
         return;
     }
 
-    /* lv_lock is held by lv_timer_handler */
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 window_handle);
     if(!context) {
@@ -312,9 +292,6 @@ bool lv_windows_pointer_device_window_message_handler(
     LPARAM lParam,
     LRESULT * plResult)
 {
-    bool handled = true;
-
-    lv_lock();
     switch(uMsg) {
         case WM_MOUSEMOVE: {
                 lv_windows_window_context_t * context = (lv_windows_window_context_t *)(
@@ -424,21 +401,19 @@ bool lv_windows_pointer_device_window_message_handler(
                 break;
             }
         default:
-            handled = false;
+            // Not Handled
+            return false;
     }
-    lv_unlock();
 
-    if(handled) {
-        *plResult = 0;
-    }
-    return handled;
+    // Handled
+    *plResult = 0;
+    return true;
 }
 
 static void lv_windows_keypad_driver_read_callback(
     lv_indev_t * indev,
     lv_indev_data_t * data)
 {
-    /* lv_lock is held by lv_timer_handler */
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 lv_windows_get_indev_window_handle(indev));
     if(!context) {
@@ -470,7 +445,6 @@ static void lv_windows_release_keypad_device_event_callback(lv_event_t * e)
         return;
     }
 
-    /* lv_lock is held by lv_timer_handler */
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 window_handle);
     if(!context) {
@@ -584,9 +558,7 @@ bool lv_windows_keypad_device_window_message_handler(
     LRESULT * plResult)
 {
     LV_UNUSED(lParam);
-    bool handled = true;
 
-    lv_lock();
     switch(uMsg) {
         case WM_KEYDOWN:
         case WM_KEYUP: {
@@ -758,21 +730,19 @@ bool lv_windows_keypad_device_window_message_handler(
                 break;
             }
         default:
-            handled = false;
+            // Not Handled
+            return false;
     }
-    lv_unlock();
 
-    if(handled) {
-        *plResult = 0;
-    }
-    return handled;
+    // Handled
+    *plResult = 0;
+    return true;
 }
 
 static void lv_windows_encoder_driver_read_callback(
     lv_indev_t * indev,
     lv_indev_data_t * data)
 {
-    /* lv_lock is held by lv_timer_handler */
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 lv_windows_get_indev_window_handle(indev));
     if(!context) {
@@ -796,7 +766,6 @@ static void lv_windows_release_encoder_device_event_callback(lv_event_t * e)
         return;
     }
 
-    /* lv_lock is held by lv_timer_handler */
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 window_handle);
     if(!context) {
@@ -817,9 +786,7 @@ bool lv_windows_encoder_device_window_message_handler(
     LRESULT * plResult)
 {
     LV_UNUSED(lParam);
-    bool handled = true;
 
-    lv_lock();
     switch(uMsg) {
         case WM_MBUTTONDOWN:
         case WM_MBUTTONUP: {
@@ -845,14 +812,13 @@ bool lv_windows_encoder_device_window_message_handler(
                 break;
             }
         default:
-            handled = false;
+            // Not Handled
+            return false;
     }
-    lv_unlock();
 
-    if(handled) {
-        *plResult = 0;
-    }
-    return handled;
+    // Handled
+    *plResult = 0;
+    return true;
 }
 
 #endif // LV_USE_WINDOWS
