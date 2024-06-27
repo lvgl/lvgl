@@ -252,8 +252,8 @@ static void profile_create(lv_obj_t * parent)
 
     LV_IMAGE_DECLARE(img_demo_widgets_avatar);
     lv_obj_t * avatar = lv_image_create(panel1);
-    lv_image_set_src(avatar, &img_demo_widgets_avatar);
-    //    lv_image_set_src(avatar, "A:lvgl/demos/widgets/assets/avatar.png")
+    //    lv_image_set_src(avatar, &img_demo_widgets_avatar);
+    lv_image_set_src(avatar, "A:lvgl/demos/widgets/assets/avatar.png");
 
     lv_obj_t * name = lv_label_create(panel1);
     lv_label_set_text(name, "Elena Smith");
