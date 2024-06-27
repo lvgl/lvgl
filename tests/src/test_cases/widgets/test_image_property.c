@@ -17,10 +17,12 @@ void test_image_property(void)
 
     lv_point_t point = {0xaa, 0x55};
     prop.id = LV_PROPERTY_IMAGE_PIVOT;
-    prop.ptr = &point;
+    prop.point = point;
     lv_obj_set_property(obj, &prop);
-    TEST_ASSERT_TRUE(LV_PROPERTY_ID_TYPE(prop.id) == LV_PROPERTY_TYPE_POINTER);
-    TEST_ASSERT_TRUE(prop.ptr == &point);
+    prop = lv_obj_get_property(obj, LV_PROPERTY_IMAGE_PIVOT);
+    TEST_ASSERT_TRUE(LV_PROPERTY_ID_TYPE(prop.id) == LV_PROPERTY_TYPE_POINT);
+    TEST_ASSERT_TRUE(prop.point.x == point.x);
+    TEST_ASSERT_TRUE(prop.point.y == point.y);
 
     static const lv_prop_id_t int_ids[] = {
         LV_PROPERTY_IMAGE_OFFSET_X,

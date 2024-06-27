@@ -55,7 +55,7 @@ static const lv_property_ops_t properties[] = {
     {
         .id = LV_PROPERTY_IMAGE_PIVOT,
         .setter = _lv_image_set_pivot,
-        .getter = lv_image_get_pivot,
+        .getter = _lv_image_get_pivot,
     },
     {
         .id = LV_PROPERTY_IMAGE_SCALE,
@@ -107,6 +107,12 @@ const lv_obj_class_t lv_image_class = {
     .prop_index_end = LV_PROPERTY_IMAGE_END,
     .properties = properties,
     .properties_count = sizeof(properties) / sizeof(properties[0]),
+
+#if LV_USE_OBJ_PROPERTY_NAME
+    .property_names = lv_image_property_names,
+    .names_count = sizeof(lv_image_property_names) / sizeof(lv_property_name_t),
+#endif
+
 #endif
 };
 

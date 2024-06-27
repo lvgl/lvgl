@@ -192,7 +192,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         lv_cache_entry_t * entry = lv_image_decoder_add_to_cache(decoder, &search_key, decoded, NULL);
 
         if(entry == NULL) {
-            lv_draw_buf_destroy(decoded);
+            lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
             return LV_RESULT_INVALID;
         }
         dsc->cache_entry = entry;
@@ -209,7 +209,8 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 {
     LV_UNUSED(decoder); /*Unused*/
 
-    if(dsc->args.no_cache || !lv_image_cache_is_enabled()) lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
+    if(dsc->args.no_cache ||
+       !lv_image_cache_is_enabled()) lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, (lv_draw_buf_t *)dsc->decoded);
 }
 
 static uint8_t * read_file(const char * filename, uint32_t * size)
@@ -311,7 +312,7 @@ static lv_draw_buf_t * decode_jpeg_file(const char * filename)
         LV_LOG_WARN("decoding error");
 
         if(decoded) {
-            lv_draw_buf_destroy(decoded);
+            lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
         }
 
         /* If we get here, the JPEG code has signaled an error.

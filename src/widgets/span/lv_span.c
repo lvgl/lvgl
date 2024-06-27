@@ -479,7 +479,11 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
 
             /* break word deal width */
             if(isfill && next_ofs > 0 && snippet_cnt > 0) {
-                if(max_w < use_width) {
+                int32_t drawn_width = use_width;
+                if(_lv_ll_get_next(&spans->child_ll, cur_span) == NULL) {
+                    drawn_width -= snippet.letter_space;
+                }
+                if(max_w < drawn_width) {
                     break;
                 }
 
@@ -502,7 +506,7 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
                 max_line_h = snippet.line_h;
             }
             snippet_cnt ++;
-            max_w = max_w - use_width - snippet.letter_space;
+            max_w = max_w - use_width;
             if(isfill  || max_w <= 0) {
                 break;
             }
@@ -871,9 +875,13 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
 
             if(isfill) {
                 if(next_ofs > 0 && lv_get_snippet_count() > 0) {
+                    int32_t drawn_width = use_width;
+                    if(_lv_ll_get_next(&spans->child_ll, cur_span) == NULL) {
+                        drawn_width -= snippet.letter_space;
+                    }
                     /* To prevent infinite loops, the lv_text_get_next_line() may return incomplete words, */
                     /* This phenomenon should be avoided when lv_get_snippet_count() > 0 */
-                    if(max_w < use_width) {
+                    if(max_w < drawn_width) {
                         break;
                     }
                     uint32_t tmp_ofs = next_ofs;
@@ -898,7 +906,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
             }
 
             lv_snippet_push(&snippet);
-            max_w = max_w - use_width - snippet.letter_space;
+            max_w = max_w - use_width;
             if(isfill || max_w <= 0) {
                 break;
             }
@@ -946,7 +954,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
             uint32_t i;
             for(i = 0; i < item_cnt; i++) {
                 lv_snippet_t * pinfo = lv_get_snippet(i);
-                txts_w = txts_w + pinfo->txt_w + pinfo->letter_space;
+                txts_w = txts_w + pinfo->txt_w;
             }
             txts_w -= lv_get_snippet(item_cnt - 1)->letter_space;
             align_ofs = max_width > txts_w ? max_width - txts_w : 0;

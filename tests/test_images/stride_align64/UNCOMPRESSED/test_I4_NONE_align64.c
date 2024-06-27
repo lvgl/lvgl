@@ -12,12 +12,12 @@
 #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_IMG_DUST
-#define LV_ATTRIBUTE_IMG_DUST
+#ifndef LV_ATTRIBUTE_TEST_I4_NONE_ALIGN64
+#define LV_ATTRIBUTE_TEST_I4_NONE_ALIGN64
 #endif
 
 static const
-LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_DUST
+LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_TEST_I4_NONE_ALIGN64
 uint8_t test_I4_NONE_align64_map[] = {
 
     0x4c,0x70,0x47,0x00,0x00,0x00,0x00,0xfc,0xff,0x00,0x00,0xfc,0x00,0xff,0xf0,0xfc,
@@ -88,14 +88,14 @@ uint8_t test_I4_NONE_align64_map[] = {
 
 };
 
-const lv_img_dsc_t test_I4_NONE_align64 = {
+const lv_image_dsc_t test_I4_NONE_align64 = {
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_I4,
   .header.flags = 0,
   .header.w = 71,
   .header.h = 60,
   .header.stride = 48,
-  .data_size = 2944,
+  .data_size = sizeof(test_I4_NONE_align64_map),
   .data = test_I4_NONE_align64_map,
 };
 

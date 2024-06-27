@@ -393,19 +393,14 @@ menu "LVGL configuration"
 				which usually improves performance,
 				but does not guarantee the same rendering quality as the software.
 
-		config LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
-			int "VG-Lite linear gradient image maximum cache number."
+		config LV_VG_LITE_GRAD_CACHE_CNT
+			int "VG-Lite gradient maximum cache number."
 			default 32
 			depends on LV_USE_DRAW_VG_LITE
 			help
-				The memory usage of a single gradient image is 4K bytes.
-
-		config LV_VG_LITE_RADIAL_GRAD_CACHE_CNT
-			int "VG-Lite radial gradient image maximum cache number."
-			default 32
-			depends on LV_USE_DRAW_VG_LITE
-			help
-				The memory usage of a single gradient image is radial grad radius * 4 bytes.
+				The memory usage of a single gradient:
+					linear: 4K bytes.
+					radial: radius * 4K bytes.
 
 		config LV_USE_VECTOR_GRAPHIC
 			bool "Use Vector Graphic APIs"
@@ -626,6 +621,14 @@ menu "LVGL configuration"
 				bool "Use obj property set/get API"
 				default n
 
+			config LV_USE_OBJ_PROPERTY_NAME
+				bool "Use name to access property"
+				default n
+				depends on LV_USE_OBJ_PROPERTY
+				help
+					Add a name table to every widget class, so the property can be accessed by name.
+					Note, the const table will increase flash usage.
+
 			config LV_USE_VG_LITE_THORVG
 				bool "VG-Lite Simulator"
 				default n
@@ -642,6 +645,11 @@ menu "LVGL configuration"
 
 			config LV_VG_LITE_THORVG_YUV_SUPPORT
 				bool "Enable YUV color format support"
+				default n
+				depends on LV_USE_VG_LITE_THORVG
+
+			config LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+				bool "Enable linear gradient extension support"
 				default n
 				depends on LV_USE_VG_LITE_THORVG
 

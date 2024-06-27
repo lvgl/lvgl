@@ -12,12 +12,12 @@
 #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_IMG_DUST
-#define LV_ATTRIBUTE_IMG_DUST
+#ifndef LV_ATTRIBUTE_TEST_RGB565A8_LZ4_ALIGN64
+#define LV_ATTRIBUTE_TEST_RGB565A8_LZ4_ALIGN64
 #endif
 
 static const
-LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_DUST
+LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_TEST_RGB565A8_LZ4_ALIGN64
 uint8_t test_RGB565A8_LZ4_align64_map[] = {
 
     0x02,0x00,0x00,0x00,0xfd,0x07,0x00,0x00,0xa0,0x32,0x00,0x00,0x2f,0xe0,0x07,0x02,
@@ -152,14 +152,14 @@ uint8_t test_RGB565A8_LZ4_align64_map[] = {
 
 };
 
-const lv_img_dsc_t test_RGB565A8_LZ4_align64 = {
+const lv_image_dsc_t test_RGB565A8_LZ4_align64 = {
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.cf = LV_COLOR_FORMAT_RGB565A8,
   .header.flags = 0 | LV_IMAGE_FLAGS_COMPRESSED,
   .header.w = 71,
   .header.h = 60,
   .header.stride = 144,
-  .data_size = 2057,
+  .data_size = sizeof(test_RGB565A8_LZ4_align64_map),
   .data = test_RGB565A8_LZ4_align64_map,
 };
 

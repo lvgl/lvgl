@@ -713,7 +713,7 @@ uint32_t lv_vg_lite_get_palette_size(vg_lite_buffer_format_t format)
 
 vg_lite_color_t lv_vg_lite_color(lv_color_t color, lv_opa_t opa, bool pre_mul)
 {
-    if(pre_mul && opa < LV_OPA_MAX) {
+    if(pre_mul && opa < LV_OPA_COVER) {
         color.red = LV_UDIV255(color.red * opa);
         color.green = LV_UDIV255(color.green * opa);
         color.blue = LV_UDIV255(color.blue * opa);
@@ -1030,7 +1030,6 @@ lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * ma
 
 void lv_vg_lite_set_scissor_area(const lv_area_t * area)
 {
-    LV_VG_LITE_CHECK_ERROR(vg_lite_enable_scissor());
     LV_VG_LITE_CHECK_ERROR(vg_lite_set_scissor(
                                area->x1,
                                area->y1,
@@ -1040,7 +1039,12 @@ void lv_vg_lite_set_scissor_area(const lv_area_t * area)
 
 void lv_vg_lite_disable_scissor(void)
 {
-    LV_VG_LITE_CHECK_ERROR(vg_lite_disable_scissor());
+    /* Restore full screen scissor */
+    LV_VG_LITE_CHECK_ERROR(vg_lite_set_scissor(
+                               0,
+                               0,
+                               LV_HOR_RES,
+                               LV_VER_RES));
 }
 
 void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
@@ -1079,10 +1083,8 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
 
     /* Clear all gradient caches reference */
-    lv_vg_lite_pending_remove_all(u->linear_grad_pending);
-
-    if(u->radial_grad_pending) {
-        lv_vg_lite_pending_remove_all(u->radial_grad_pending);
+    if(u->grad_pending) {
+        lv_vg_lite_pending_remove_all(u->grad_pending);
     }
 
     /* Clear image decoder dsc reference */

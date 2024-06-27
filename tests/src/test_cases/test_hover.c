@@ -81,14 +81,16 @@ void test_hover_basic(void)
 
 void test_hover_delete(void)
 {
-    lv_obj_t * button = lv_button_create(lv_screen_active());
-    lv_obj_set_size(button, 200, 100);
+    for(int i = 0; i < 4; i++) {
+        lv_obj_t * btn = lv_button_create(lv_screen_active());
+        lv_obj_set_size(btn, 200, 100);
 
-    lv_test_indev_wait(50);
-    lv_test_mouse_move_to(50, 50);
-    lv_test_indev_wait(50);
-    lv_obj_delete(button);  /*No crash while deleting the hovered button*/
-    lv_test_indev_wait(50);
+        lv_test_mouse_move_to(i * 10, 50);
+        lv_test_indev_wait(50);
+
+        lv_obj_delete(btn);  /*No crash while deleting the hovered button*/
+        lv_test_indev_wait(50);
+    }
 }
 
 

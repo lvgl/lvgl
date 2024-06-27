@@ -16,7 +16,7 @@ extern "C" {
 
 #include "../../lvgl.h"
 
-#if LV_USE_DRAW_VG_LITE
+#if LV_USE_DRAW_VG_LITE && LV_USE_VECTOR_GRAPHIC
 
 #include "lv_vg_lite_utils.h"
 
@@ -32,28 +32,11 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_vg_lite_grad_init(
-    struct _lv_draw_vg_lite_unit_t * u,
-    uint32_t linear_grad_cache_cnt,
-    uint32_t radial_grad_cache_cnt);
+void lv_vg_lite_grad_init(struct _lv_draw_vg_lite_unit_t * u, uint32_t cache_cnt);
 
 void lv_vg_lite_grad_deinit(struct _lv_draw_vg_lite_unit_t * u);
 
-void lv_vg_lite_grad_area_to_matrix(vg_lite_matrix_t * grad_matrix, const lv_area_t * area, lv_grad_dir_t dir);
-
-void lv_vg_lite_draw_linear_grad(
-    struct _lv_draw_vg_lite_unit_t * u,
-    vg_lite_buffer_t * buffer,
-    vg_lite_path_t * path,
-    const lv_grad_dsc_t * grad,
-    const vg_lite_matrix_t * grad_matrix,
-    const vg_lite_matrix_t * matrix,
-    vg_lite_fill_t fill,
-    vg_lite_blend_t blend);
-
-#if LV_USE_VECTOR_GRAPHIC
-
-void lv_vg_lite_draw_radial_grad(
+bool lv_vg_lite_draw_grad(
     struct _lv_draw_vg_lite_unit_t * u,
     vg_lite_buffer_t * buffer,
     vg_lite_path_t * path,
@@ -63,13 +46,21 @@ void lv_vg_lite_draw_radial_grad(
     vg_lite_fill_t fill,
     vg_lite_blend_t blend);
 
-#endif /* LV_USE_VECTOR_GRAPHIC */
+bool lv_vg_lite_draw_grad_helper(
+    struct _lv_draw_vg_lite_unit_t * u,
+    vg_lite_buffer_t * buffer,
+    vg_lite_path_t * path,
+    const lv_area_t * area,
+    const lv_grad_dsc_t * grad_dsc,
+    const vg_lite_matrix_t * matrix,
+    vg_lite_fill_t fill,
+    vg_lite_blend_t blend);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif /*LV_USE_DRAW_VG_LITE*/
+#endif /*LV_USE_DRAW_VG_LITE && LV_USE_VECTOR_GRAPHIC*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

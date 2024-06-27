@@ -629,6 +629,7 @@ static void style_init(my_theme_t * theme)
     lv_style_set_line_width(&theme->styles.scale, LV_DPX(2));
     lv_style_set_arc_color(&theme->styles.scale, theme->color_text);
     lv_style_set_arc_width(&theme->styles.scale, LV_DPX(2));
+    lv_style_set_length(&theme->styles.scale, LV_DPX(6));
 #endif
 }
 
