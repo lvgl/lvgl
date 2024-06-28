@@ -52,7 +52,7 @@ The JSON data is broken apart into a couple of main categories.
   - forward_decls
   - macros
 
-Those categories are the element names undert the root of the JSON data.
+Those categories are the element names under the root of the JSON data.
 The value for each category is an array of JSON elements. There is a bit of
 nesting with the elements in the arrays and I have created "json_types" that
 will allow you to identify exactly what you are dealing with.
