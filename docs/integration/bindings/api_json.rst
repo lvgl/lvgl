@@ -10,7 +10,7 @@ reading the format for just about every programming language out there.
 The script in order to run does have some requirements.
 
   - Python >= 3.10
-  - Pycparser >= 2.21: Python Library for reading the preprocessor ouotput from the C compiler
+  - Pycparser >= 2.21: Python Library for reading the preprocessor output from the C compiler
   - PyMSVC >= 0.4.0: Python library is using MSVC Compiler
   - C compiler, gcc for Linux, clang for OSX and MSVC for Windows
   - Doxygen: used to read the docstrings from the header files.
