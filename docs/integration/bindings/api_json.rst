@@ -91,7 +91,7 @@ The different "json_types" are as follows:
 
 
   - ``"forward_decl"``: Describes a forward declaration.There are structures in
-    LVGL that are considered to be private and that is what these desccribe.
+    LVGL that are considered to be private and that is what these describe.
 
     Available JSON fields:
       - ``"name"``: The name of the formard declaration.
