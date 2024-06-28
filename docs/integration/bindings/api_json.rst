@@ -130,7 +130,7 @@ The different "json_types" are as follows:
       - ``"name"``: will always be "ellipsis".
 
 
-  - ``"primitive_type"``: This is a base type. There or no other types beneith this.
+  - ``"primitive_type"``: This is a base type. There or no other types beneath this.
     This tells you that the type is a basic or primitive C type.
     IE: struct, union, int, unsigned int, etc...
 
@@ -163,7 +163,7 @@ The different "json_types" are as follows:
       - ``"value"``: the enumeration member/item's value
 
 
-  - ``"lvgl_type"``: This is a base type. There or no other types beneith this.
+  - ``"lvgl_type"``: This is a base type. There or no other types beneath this.
     This tells you that the type is an LVGL data type.
 
     Available JSON fields:
@@ -220,7 +220,7 @@ The different "json_types" are as follows:
 
 
   - ``"stdlib_type"``: This is a base type, meaning that there are no more
-    type levels beneith this. This tells us that the type is from the C stdlib.
+    type levels beneath this. This tells us that the type is from the C stdlib.
 
     Available JSON fields:
       - ``"name"``: The name of the type.
