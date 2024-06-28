@@ -352,7 +352,7 @@ if __name__ == '__main__':
         help=(
             "path to a custom header file. When using this to supply a custom"
             "header file you MUST insure that any LVGL includes are done so "
-            "they are relitive to the LVGL repository root folder.\n\n"
+            "they are relative to the LVGL repository root folder.\n\n"
             '#include "src/lvgl_private.h"\n\n'
             "If you have includes to header files that are not LVGL then you "
             "will need to add the include locations for those header files "
