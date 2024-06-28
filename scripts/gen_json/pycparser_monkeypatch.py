@@ -633,9 +633,9 @@ class FileAST(c_ast.FileAST):
                     forward_struct_decls[item.type.name] = [item]
                 else:
                     if item.type.name in forward_struct_decls:
-                        decs = forward_struct_decls[item.type.name]
-                        if len(decs) == 2:
-                            decl, td = decs
+                        decls = forward_struct_decls[item.type.name]
+                        if len(decls) == 2:
+                            decl, td = decls
 
                             if FILTER_PRIVATE:
                                 if (
