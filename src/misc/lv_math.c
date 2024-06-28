@@ -226,7 +226,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask)
 // Alternative Integer Square Root function
 // Contributors include Arne Steinarson for the basic approximation idea,
 // Dann Corbit and Mathew Hendry for the first cut at the algorithm,
-// Lawrence Kirby for the rearrangement, improvments and range optimization
+// Lawrence Kirby for the rearrangement, improvements and range optimization
 // and Paul Hsieh for the round-then-adjust idea.
 */
 int32_t LV_ATTRIBUTE_FAST_MEM lv_sqrt32(uint32_t x)

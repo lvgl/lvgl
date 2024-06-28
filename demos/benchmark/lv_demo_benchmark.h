@@ -45,7 +45,7 @@ extern "C" {
  *   but simply the time difference between the start and end of the rendering is measured
  *
  * - Flush time: It's the sum of
- *     - the time spent in the `fluch_cb` and
+ *     - the time spent in the `flush_cb` and
  *     - the time spent with waiting for flush ready.
  */
 void lv_demo_benchmark(void);

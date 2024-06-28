@@ -23,7 +23,7 @@
 #define RAD_TO_DEG 57.295779513082320876798154814105f
 
 #define MATH_RADIANS(deg) ((deg) * DEG_TO_RAD)
-#define MATH_DEGRESS(rad) ((rad) * RAD_TO_DEG)
+#define MATH_DEGREES(rad) ((rad) * RAD_TO_DEG)
 
 /*********************
 *      DEFINES

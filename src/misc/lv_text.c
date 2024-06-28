@@ -180,8 +180,8 @@ static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
     uint32_t letter = 0;      /*Letter at i*/
     uint32_t letter_next = 0; /*Letter at i_next*/
     int32_t letter_w;
-    int32_t cur_w = 0;  /*Pixel Width of transversed string*/
-    uint32_t word_len = 0;   /*Number of characters in the transversed word*/
+    int32_t cur_w = 0;  /*Pixel Width of traversed string*/
+    uint32_t word_len = 0;   /*Number of characters in the traversed word*/
     uint32_t break_index = NO_BREAK_FOUND; /*only used for "long" words*/
     uint32_t break_letter_count = 0; /*Number of characters up to the long word break point*/
 

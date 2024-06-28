@@ -912,7 +912,7 @@ STBTT_DEF unsigned char * stbtt_GetCodepointBitmap(const stbtt_fontinfo * info, 
 
 STBTT_DEF unsigned char * stbtt_GetCodepointBitmapSubpixel(const stbtt_fontinfo * info, float scale_x, float scale_y,
                                                            float shift_x, float shift_y, int codepoint, int * width, int * height, int * xoff, int * yoff);
-// the same as stbtt_GetCodepoitnBitmap, but you can specify a subpixel
+// the same as stbtt_GetCodepointBitmap, but you can specify a subpixel
 // shift for the character
 
 STBTT_DEF void stbtt_MakeCodepointBitmap(const stbtt_fontinfo * info, unsigned char * output, int out_w, int out_h,

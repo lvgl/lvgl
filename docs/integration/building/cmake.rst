@@ -9,8 +9,8 @@ Overview
 This project uses CMakePresets to ensure an easy build.  Find out more on Cmake Presets here:
 https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html
 
-Prerequsites
-------------
+Prerequisites
+-------------
 You need to install
 
 - CMake
@@ -46,7 +46,7 @@ When hitting the generate button, CMake will create solution files (for VS) or N
 The following targets are available.
 
 - lvgl (the actual library, required)
-- lvgl_thorvg (an vector grafics extension, optional)
+- lvgl_thorvg (an vector graphics extension, optional)
 - lvgl_examples (example usages, optional)
 - lvgl_demos (some demos, optional)
 
@@ -62,7 +62,7 @@ Build with Command line
 -----------------------
 
 You can also build your project using the command line.
-Run the follwoing commands
+Run the following commands
 
 - cmake --preset windows-base
 - cmake --build --preset windows-base_dbg

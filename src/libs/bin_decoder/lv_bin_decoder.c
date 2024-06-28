@@ -422,7 +422,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     else {
         decoded_area->y1++;
         decoded_area->y2++;
-        decoded = decoder_data->decoded_partial; /*Already alloced*/
+        decoded = decoder_data->decoded_partial; /*Already allocated*/
     }
 
     img_data = decoded->data; /*Get the buffer to operate on*/

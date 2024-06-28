@@ -20,7 +20,7 @@ extern "C" {
  *********************/
 
 /** Magic number for lvgl image, 9 means lvgl version 9
- *  It must not be a valid ASCII character nor larger than 0x80. See `lv_image_src_get_type`.
+ *  It must be neither a valid ASCII character nor larger than 0x80. See `lv_image_src_get_type`.
  */
 #define LV_IMAGE_HEADER_MAGIC (0x19)
 LV_EXPORT_CONST_INT(LV_IMAGE_HEADER_MAGIC);

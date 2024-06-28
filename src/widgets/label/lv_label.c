@@ -575,7 +575,7 @@ void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt)
 
     lv_label_t * label = (lv_label_t *)obj;
 
-    /*Can not append to static text*/
+    /*Cannot append to static text*/
     if(label->static_txt != 0) return;
 
     lv_obj_invalidate(obj);
@@ -601,7 +601,7 @@ void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_label_t * label = (lv_label_t *)obj;
 
-    /*Can not append to static text*/
+    /*Cannot append to static text*/
     if(label->static_txt) return;
 
     lv_obj_invalidate(obj);

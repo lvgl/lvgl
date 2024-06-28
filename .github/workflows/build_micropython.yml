@@ -1,4 +1,4 @@
-name: Micropython CI
+name: MicroPython CI
 
 on:
   push:

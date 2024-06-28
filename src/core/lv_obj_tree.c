@@ -212,7 +212,7 @@ void lv_obj_move_to_index(lv_obj_t * obj, int32_t index)
     }
 
     const uint32_t parent_child_count = lv_obj_get_child_count(parent);
-    /* old_index only can be 0 or greater, this point can not be reached if the parent is not null */
+    /* old_index only can be 0 or greater, this point cannot be reached if the parent is not null */
     const int32_t old_index = lv_obj_get_index(obj);
     LV_ASSERT(0 <= old_index);
 

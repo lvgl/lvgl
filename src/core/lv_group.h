@@ -122,7 +122,7 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj);
 /**
  * Swap 2 object in a group. The object must be in the same group
  * @param obj1  pointer to an object
- * @param obj2  pointer to an other object
+ * @param obj2  pointer to another object
  */
 void lv_group_swap_obj(lv_obj_t * obj1, lv_obj_t * obj2);
 

@@ -40,7 +40,7 @@ extern "C" {
 #define MATH_SQRTF(x) sqrtf(x)
 
 #define MATH_RADIANS(deg) ((deg) * DEG_TO_RAD)
-#define MATH_DEGRESS(rad) ((rad) * RAD_TO_DEG)
+#define MATH_DEGREES(rad) ((rad) * RAD_TO_DEG)
 
 /**********************
  *      TYPEDEFS

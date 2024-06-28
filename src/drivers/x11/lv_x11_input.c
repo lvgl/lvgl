@@ -33,7 +33,7 @@ typedef struct _x11_inp_data {
     lv_indev_t * mousewheel;     /**< encoder input device object */
     lv_timer_t * timer;          /**< timer object for @ref x11_event_handler */
     /* user input related information */
-    char         kb_buffer[32];   /**< keyboard buffer for X keyboard inpputs */
+    char         kb_buffer[32];   /**< keyboard buffer for X keyboard inputs */
     lv_point_t   mouse_pos;       /**< current reported mouse position */
     bool         left_mouse_btn;  /**< current state of left mouse button */
     bool         right_mouse_btn; /**< current state of right mouse button */
@@ -180,7 +180,7 @@ static void x11_inp_event_handler(lv_timer_t * t)
 }
 
 /**
- * event callbed by lvgl display if display has been closed (@ref lv_display_delete has been called)
+ * event called by lvgl display if display has been closed (@ref lv_display_delete has been called)
  * @param[in] e  event data, containing lv_display_t object
  */
 static void x11_inp_delete_evt_cb(lv_event_t * e)

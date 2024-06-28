@@ -278,7 +278,7 @@ struct _LodePNGDecompressSettings {
 
     /*Maximum decompressed size, beyond this the decoder may (and is encouraged to) stop decoding,
     return an error, output a data size > max_output_size and all the data up to that point. This is
-    not hard limit nor a guarantee, but can prevent excessive memory usage. This setting is
+    neither a hard limit nor a guarantee, but can prevent excessive memory usage. This setting is
     ignored by the PNG decoder, but is used by the deflate/zlib decoder and can be used by custom ones.
     Set to 0 to impose no limit (the default).*/
     size_t max_output_size;
@@ -1187,7 +1187,7 @@ The following features are supported by the decoder:
 *) encoding of PNGs, from any raw image to 24- or 32-bit color, or the same color type as the raw image
 *) Adam7 interlace and deinterlace for any color type
 *) loading the image from harddisk or decoding it from a buffer from other sources than harddisk
-*) support for alpha channels, including RGBA color modelete,translucent palettes and color keying
+*) support for alpha channels, including RGBA color model,translucent palettes and color keying
 *) zlib decompression (inflate)
 *) zlib compression (deflate)
 *) CRC32 and ADLER32 checksums

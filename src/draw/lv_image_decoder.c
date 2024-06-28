@@ -270,7 +270,7 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
         else {
             decoded = lv_draw_buf_dup_user(image_cache_draw_buf_handlers, decoded);
             if(decoded == NULL) {
-                LV_LOG_ERROR("No memory for premulitplying.");
+                LV_LOG_ERROR("No memory for premultiplying.");
                 return NULL;
             }
 

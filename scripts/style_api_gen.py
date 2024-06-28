@@ -421,7 +421,7 @@ props = [
 
 {'name': 'FLEX_GROW',
  'style_type': 'num',   'var_type': 'uint8_t', 'default':'`LV_FLEX_ALIGN_ROW`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Defines how mayn space to take proprtionally the free space of the object's trach"},
+ 'dsc': "Defines how much space to take proportionally from the free space of the object's track"},
 
 
 

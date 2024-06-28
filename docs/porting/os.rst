@@ -27,7 +27,7 @@ LVGL has a built-in mutex which can be used with:
 - :cpp:func:`lv_unlock()`
 
 These functions are called internally in :cpp:func:`lv_timer_handler`
-and the users need to call them only from their own therads.
+and the users need to call them only from their own threads.
 
 To enable ``lv_lock/lv_unlock`` ``LV_USE_OS`` needs to be set to other
 than ``LV_OS_NONE``.

@@ -185,14 +185,14 @@ void _lv_text_ap_proc(const char * txt, char * txt_out)
             continue;
         }
 
-        uint8_t conjunction_to_previuse = (i == 0 ||
+        uint8_t conjunction_to_previous = (i == 0 ||
                                            idx_previous == LV_UNDEF_ARABIC_PERSIAN_CHARS) ? 0 : ap_chars_map[idx_previous].ap_chars_conjunction.conj_to_next;
         uint8_t conjunction_to_next = ((i == txt_length - 1) ||
                                        idx_next == LV_UNDEF_ARABIC_PERSIAN_CHARS) ? 0 : ap_chars_map[idx_next].ap_chars_conjunction.conj_to_previous;
 
         uint32_t lam_alef = lv_text_lam_alef(index_current, idx_next);
         if(lam_alef) {
-            if(conjunction_to_previuse) {
+            if(conjunction_to_previous) {
                 lam_alef ++;
             }
             ch_fin[j] = lam_alef;
@@ -202,11 +202,11 @@ void _lv_text_ap_proc(const char * txt, char * txt_out)
             continue;
         }
 
-        if(conjunction_to_previuse && conjunction_to_next)
+        if(conjunction_to_previous && conjunction_to_next)
             ch_fin[j] = ap_chars_map[index_current].char_end_form + ap_chars_map[index_current].char_middle_form_offset;
-        else if(!conjunction_to_previuse && conjunction_to_next)
+        else if(!conjunction_to_previous && conjunction_to_next)
             ch_fin[j] = ap_chars_map[index_current].char_end_form + ap_chars_map[index_current].char_beginning_form_offset;
-        else if(conjunction_to_previuse && !conjunction_to_next)
+        else if(conjunction_to_previous && !conjunction_to_next)
             ch_fin[j] = ap_chars_map[index_current].char_end_form;
         else
             ch_fin[j] = ap_chars_map[index_current].char_end_form + ap_chars_map[index_current].char_isolated_form_offset;

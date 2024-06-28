@@ -270,7 +270,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
 
         if(decoder_res == LV_RESULT_OK) lv_image_decoder_close(&mask_decoder_dsc);
     }
-    /* check whether it is possible to accelerate the operation in synchronouse mode */
+    /* check whether it is possible to accelerate the operation in synchronous mode */
     else if(LV_RESULT_INVALID == LV_DRAW_SW_IMAGE(transformed,      /* whether require transform */
                                                   cf,               /* image format */
                                                   src_buf,          /* image buffer */

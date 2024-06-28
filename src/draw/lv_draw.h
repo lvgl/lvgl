@@ -231,7 +231,7 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords);
  * It will send an event about the new draw task to the widget
  * and assign it to a draw unit.
  * @param layer     pointer to a layer
- * @param t         poinr to a draw task
+ * @param t         pointer to a draw task
  */
 void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t);
 
@@ -271,7 +271,7 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
 
 /**
  * Tell how many draw task are waiting to be drawn on the area of `t_check`.
- * It can be used to determine if a GPU shall combine many draw tasks in to one or not.
+ * It can be used to determine if a GPU shall combine many draw tasks into one or not.
  * If a lot of tasks are waiting for the current ones it makes sense to draw them one-by-one
  * to not block the dependent tasks' rendering
  * @param t_check   the task whose dependent tasks shall be counted

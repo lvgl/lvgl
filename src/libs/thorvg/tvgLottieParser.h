@@ -56,7 +56,7 @@ private:
     LottieInterpolator* getInterpolator(const char* key, Point& in, Point& out);
     uint8_t getDirection();
 
-    void getInperpolatorPoint(Point& pt);
+    void getInterpolatorPoint(Point& pt);
     void getPathSet(LottiePathSet& path);
     void getLayerSize(float& val);
     void getValue(TextDocument& doc);
@@ -107,9 +107,9 @@ private:
     void parseTextRange(LottieText* text);
     void parseAssets();
     void parseFonts();
-    void parseChars(Array<LottieGlyph*>& glyphes);
+    void parseChars(Array<LottieGlyph*>& glyphs);
     void parseMarkers();
-    void postProcess(Array<LottieGlyph*>& glyphes);
+    void postProcess(Array<LottieGlyph*>& glyphs);
 
     //Current parsing context
     struct Context {

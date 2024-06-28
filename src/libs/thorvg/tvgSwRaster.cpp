@@ -868,11 +868,11 @@ static bool _rasterCompositeDirectMaskedRleImage(SwSurface* surface, const SwIma
 {
     auto span = image->rle->spans;
     auto cbuffer = surface->compositor->image.buf8;
-    auto ctride = surface->compositor->image.stride;
+    auto cstride = surface->compositor->image.stride;
 
     for (uint32_t i = 0; i < image->rle->size; ++i, ++span) {
         auto src = image->buf8 + (span->y + image->oy) * image->stride + (span->x + image->ox);
-        auto cmp = &cbuffer[span->y * ctride + span->x];
+        auto cmp = &cbuffer[span->y * cstride + span->x];
         auto alpha = MULTIPLY(span->coverage, opacity);
         if (alpha == 255) {
             for (uint32_t x = 0; x < span->len; ++x, ++src, ++cmp) {
@@ -893,11 +893,11 @@ static bool _rasterDirectDirectMaskedRleImage(SwSurface* surface, const SwImage*
 {
     auto span = image->rle->spans;
     auto cbuffer = surface->compositor->image.buf8;
-    auto ctride = surface->compositor->image.stride;
+    auto cstride = surface->compositor->image.stride;
 
     for (uint32_t i = 0; i < image->rle->size; ++i, ++span) {
         auto src = image->buf8 + (span->y + image->oy) * image->stride + (span->x + image->ox);
-        auto cmp = &cbuffer[span->y * ctride + span->x];
+        auto cmp = &cbuffer[span->y * cstride + span->x];
         auto dst = &surface->buf8[span->y * surface->stride + span->x];
         auto alpha = MULTIPLY(span->coverage, opacity);
         if (alpha == 255) {
@@ -1949,7 +1949,7 @@ bool rasterConvertCS(Surface* surface, ColorSpace to)
     ScopedLock lock(surface->key);
     if (surface->cs == to) return true;
 
-    //TOOD: Support SIMD accelerations
+    //TODO: Support SIMD accelerations
     auto from = surface->cs;
 
     if (((from == ColorSpace::ABGR8888) || (from == ColorSpace::ABGR8888S)) && ((to == ColorSpace::ARGB8888) || (to == ColorSpace::ARGB8888S))) {

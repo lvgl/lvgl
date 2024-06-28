@@ -234,7 +234,7 @@ If you have multiple displays call :cpp:expr:`lv_display_set_default(disp1)` to
 select the display to refresh before :cpp:expr:`_lv_display_refr_timer(NULL)`.
 
 
-.. note:: that :cpp:func:`lv_timer_handler` and :cpp:func:`_lv_display_refr_timer` can not  run at the same time.
+.. note:: that :cpp:func:`lv_timer_handler` and :cpp:func:`_lv_display_refr_timer` cannot  run at the same time.
 
 
 If the performance monitor is enabled, the value of :c:macro:`LV_DEF_REFR_PERIOD` needs to be set to be

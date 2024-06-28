@@ -148,7 +148,7 @@ static unique_ptr<RadialGradient> _applyRadialGradientProperty(SvgStyleGradient*
     if (isTransform) finalTransform = *g->transform;
 
     if (g->userSpace) {
-        //The radius scalling is done according to the Units section:
+        //The radius scaling is done according to the Units section:
         //https://www.w3.org/TR/2015/WD-SVG2-20150915/coords.html
         g->radial->cx = g->radial->cx * vBox.w;
         g->radial->cy = g->radial->cy * vBox.h;

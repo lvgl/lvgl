@@ -7,11 +7,11 @@ Overview
 
 From the `Wikipedia <https://en.wikipedia.org/wiki/MIPI_Alliance>`__:
 
-	`MIPI Allience <https://www.mipi.org/>`__ is a global business alliance that develops technical specifications
+	`MIPI Alliance <https://www.mipi.org/>`__ is a global business alliance that develops technical specifications
 	for the mobile ecosystem, particularly smart phones but including mobile-influenced industries. MIPI was founded in 2003 by Arm, Intel, Nokia, Samsung,
 	STMicroelectronics and Texas Instruments.
 
-MIPI Allience published a series of specifications related to display devices, including DBI (Display Bus Interface), DSI (Display Serial Interface) and DCS
+MIPI Alliance published a series of specifications related to display devices, including DBI (Display Bus Interface), DSI (Display Serial Interface) and DCS
 (Display Command Set). Usually when one talks about a MIPI-compatible display, one thinks of a device with a DSI serial interface. However, the Display Bus Interface specification
 includes a number of other, legacy interfaces, like SPI serial, or i8080-compatible parallel interface, which are often used to interface LCD displays to lower-end microcontrollers.
 Furthermore, the DCS specification contains a standard command set, which is supported by a large number of legacy TFT LCD controllers, including the popular Sitronix

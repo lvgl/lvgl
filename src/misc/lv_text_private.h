@@ -45,7 +45,7 @@ uint32_t lv_text_get_next_line(const char * txt, const lv_font_t * font, int32_t
                                int32_t max_width, int32_t * used_width, lv_text_flag_t flag);
 
 /**
- * Insert a string into an other
+ * Insert a string into another
  * @param txt_buf the original text (must be big enough for the result text and NULL terminated)
  * @param pos position to insert (0: before the original text, 1: after the first char etc.)
  * @param ins_txt text to insert, must be '\0' terminated

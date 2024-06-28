@@ -807,7 +807,7 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
             }
         }
 
-        /*Call the post draw draw function of the parents of the to object*/
+        /*Call the post draw function of the parents of the to object*/
         lv_obj_send_event(parent, LV_EVENT_DRAW_POST_BEGIN, (void *)layer);
         lv_obj_send_event(parent, LV_EVENT_DRAW_POST, (void *)layer);
         lv_obj_send_event(parent, LV_EVENT_DRAW_POST_END, (void *)layer);
@@ -896,7 +896,7 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
         lv_result_t res = layer_get_area(layer, obj, layer_type, &layer_area_full, &obj_draw_size);
         if(res != LV_RESULT_OK) return;
 
-        /*Simple layers can be subdivied into smaller layers*/
+        /*Simple layers can be subdivided into smaller layers*/
         uint32_t max_rgb_row_height = lv_area_get_height(&layer_area_full);
         uint32_t max_argb_row_height = lv_area_get_height(&layer_area_full);
         if(layer_type == LV_LAYER_TYPE_SIMPLE) {

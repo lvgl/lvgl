@@ -1002,7 +1002,7 @@ private:
 //!@endcond
 
         for (;;) {
-            // Scan and copy string before "\\\"" or < 0x20. This is an optional optimzation.
+            // Scan and copy string before "\\\"" or < 0x20. This is an optional optimization.
             if (!(parseFlags & kParseValidateEncodingFlag))
                 ScanCopyUnescapedString(is, os);
 
@@ -2018,7 +2018,7 @@ private:
         case IterativeParsingObjectInitialState:
         case IterativeParsingArrayInitialState:
         {
-            // Push the state(Element or MemeberValue) if we are nested in another array or value of member.
+            // Push the state(Element or MemberValue) if we are nested in another array or value of member.
             // In this way we can get the correct state on ObjectFinish or ArrayFinish by frame pop.
             IterativeParsingState n = src;
             if (src == IterativeParsingArrayInitialState || src == IterativeParsingElementDelimiterState)

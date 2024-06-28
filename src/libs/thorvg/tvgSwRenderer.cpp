@@ -232,7 +232,7 @@ struct SwSceneTask : SwTask
 
     void run(unsigned tid) override
     {
-        //TODO: Skip the run if the scene hans't changed.
+        //TODO: Skip the run if the scene hasn't changed.
         if (!sceneRle) sceneRle = static_cast<SwRleData*>(calloc(1, sizeof(SwRleData)));
         else rleReset(sceneRle);
 

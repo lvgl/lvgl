@@ -180,17 +180,17 @@ void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc
 void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px);
 
 /**
- * Rotate a buffer into an other buffer
+ * Rotate a buffer into another buffer
  * @param src           the source buffer
  * @param dest          the destination buffer
  * @param src_width     source width in pixels
  * @param src_height    source height in pixels
- * @param src_sride     source stride in bytes (number of bytes in a row)
+ * @param src_stride     source stride in bytes (number of bytes in a row)
  * @param dest_stride   destination stride in bytes (number of bytes in a row)
  * @param rotation      LV_DISPLAY_ROTATION_0/90/180/270
  * @param color_format  LV_COLOR_FORMAT_RGB565/RGB888/XRGB8888/ARGB8888
  */
-void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t src_height, int32_t src_sride,
+void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t src_height, int32_t src_stride,
                        int32_t dest_stride, lv_display_rotation_t rotation, lv_color_format_t color_format);
 
 /***********************

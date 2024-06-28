@@ -113,7 +113,7 @@ lv_draw_image_dsc_t * lv_draw_task_get_image_dsc(lv_draw_task_t * task);
 void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
 /**
- * Create a draw task to blend a layer to an other layer
+ * Create a draw task to blend a layer to another layer
  * @param layer         pointer to a layer
  * @param dsc           pointer to an initialized draw descriptor
  * @param coords        the coordinates of the layer.

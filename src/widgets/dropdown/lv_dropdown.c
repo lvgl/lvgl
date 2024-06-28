@@ -729,7 +729,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_dropdown_close(obj);
         }
         else if(c == LV_KEY_ENTER) {
-            /* Handle the ENTER key only if it was send by an other object.
+            /* Handle the ENTER key only if it was send by another object.
              * Do no process it if ENTER is sent by the dropdown because it's handled in LV_EVENT_RELEASED */
             lv_obj_t * indev_obj = lv_indev_get_active_obj();
             if(indev_obj != obj) {

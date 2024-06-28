@@ -187,7 +187,7 @@ void lv_display_delete(lv_display_t * disp)
     disp->act_scr = NULL;
 
     while(disp->screen_cnt != 0) {
-        /*Delete the screenst*/
+        /*Delete the screens*/
         lv_obj_delete(disp->screens[0]);
     }
 

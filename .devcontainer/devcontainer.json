@@ -12,7 +12,7 @@
     "vscode": {
       // Add the IDs of extensions you want installed when the container is created.
       "extensions": [
-        //"searking.preview-vscode"
+        //"searKing.preview-vscode"
         "analytic-signal.preview-html"
       ]
     }

@@ -488,13 +488,13 @@ static inline uint8_t rle_next(void)
         ret = get_bits(rle->in, rle->rdp, rle->bpp);
         if(rle->rdp != 0 && rle->prev_v == ret) {
             rle->count = 0;
-            rle->state = RLE_STATE_REPEATE;
+            rle->state = RLE_STATE_REPEATED;
         }
 
         rle->prev_v = ret;
         rle->rdp += rle->bpp;
     }
-    else if(rle->state == RLE_STATE_REPEATE) {
+    else if(rle->state == RLE_STATE_REPEATED) {
         v = get_bits(rle->in, rle->rdp, 1);
         rle->count++;
         rle->rdp += 1;

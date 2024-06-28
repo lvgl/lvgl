@@ -1938,7 +1938,7 @@ static unsigned deflateDynamic(LodePNGBitWriter * writer, Hash * hash,
     size_t datasize = dataend - datapos;
 
     /*
-    If we could call "bitlen_cl" the the code length code lengths ("clcl"), that is the bit lengths of codes to represent
+    If we could call "bitlen_cl" the code length code lengths ("clcl"), that is the bit lengths of codes to represent
     tree_cl in CLCL_ORDER, then due to the huffman compression of huffman tree representations ("two levels"), there are
     some analogies:
     bitlen_lld is to tree_cl what data is to tree_ll and tree_d.

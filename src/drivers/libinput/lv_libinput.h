@@ -116,7 +116,7 @@ size_t lv_libinput_find_devs(lv_libinput_capability capabilities, char ** found,
 lv_indev_t * lv_libinput_create(lv_indev_type_t indev_type, const char * dev_path);
 
 /**
- * Delete a libinput input devic
+ * Delete a libinput input device
  * @param indev pointer to input device
  */
 void lv_libinput_delete(lv_indev_t * indev);

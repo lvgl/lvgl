@@ -40,7 +40,7 @@ struct ExpContent
 };
 
 
-//reserved expressions speicifiers
+//reserved expressions specifiers
 static const char* EXP_NAME = "name";
 static const char* EXP_CONTENT = "content";
 static const char* EXP_WIDTH = "width";
@@ -851,7 +851,7 @@ static jerry_value_t _key(const jerry_call_info_t* info, const jerry_value_t arg
 
 static jerry_value_t _createPath(const jerry_call_info_t* info, const jerry_value_t args[], const jerry_length_t argsCnt)
 {
-    //TODO: arg1: points, arg2: inTagents, arg3: outTangents, arg4: isClosed
+    //TODO: arg1: points, arg2: inTangents, arg3: outTangents, arg4: isClosed
     auto arg1 = jerry_value_to_object(args[0]);
     auto pathset = jerry_object_get_native_ptr(arg1, nullptr);
     if (!pathset) {
@@ -872,7 +872,7 @@ static jerry_value_t _uniformPath(const jerry_call_info_t* info, const jerry_val
     auto pathset = static_cast<LottiePathSet*>(jerry_object_get_native_ptr(info->function, nullptr));
 
     /* TODO: ThorVG prebuilds the path data for performance.
-       It acutally need to constructs the Array<Point> for points, inTangents, outTangents and then return here... */
+       It actually need to constructs the Array<Point> for points, inTangents, outTangents and then return here... */
     auto obj = jerry_object();
     jerry_object_set_native_ptr(obj, nullptr, pathset);
     return obj;
@@ -888,7 +888,7 @@ static jerry_value_t _isClosed(const jerry_call_info_t* info, const jerry_value_
 
 static void _buildPath(jerry_value_t context, LottieExpression* exp)
 {
-    //Trick for fast buliding path.
+    //Trick for fast building path.
     auto points = jerry_function_external(_uniformPath);
     jerry_object_set_native_ptr(points, nullptr, exp->property);
     jerry_object_set_sz(context, "points", points);
@@ -1224,7 +1224,7 @@ jerry_value_t LottieExpressions::evaluate(float frameNo, LottieExpression* exp)
     auto eval = jerry_eval((jerry_char_t *) exp->code, strlen(exp->code), JERRY_PARSE_NO_OPTS);
 
     if (jerry_value_is_exception(eval) || jerry_value_is_undefined(eval)) {
-        exp->enabled = false;  // The feature is experimental, it will be forcely turned off if it's incompatible.
+        exp->enabled = false;  // The feature is experimental, it will be forcefully turned off if it's incompatible.
         return jerry_undefined();
     }
 

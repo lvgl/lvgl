@@ -345,7 +345,7 @@ Examples
 
 .. _quick-overview_micropython:
 
-Micropython
+MicroPython
 -----------
 
 Learn more about :ref:`micropython`.

@@ -362,7 +362,7 @@ lv_obj_t * lv_display_get_layer_sys(lv_display_t * disp);
 
 /**
  * Return the bottom layer. The bottom layer is the same on all screen and it is under the normal screen layer.
- * It's visible only if the the screen is transparent.
+ * It's visible only if the screen is transparent.
  * @param disp      pointer to display (NULL to use the default screen)
  * @return          pointer to the bottom layer object
  */
