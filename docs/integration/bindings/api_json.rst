@@ -108,7 +108,7 @@ The different "json_types" are as follows:
       - ``"name"``: The name of the function pointer.
       - ``"type"``: This contains the return type information for the function pointer.
       - ``"docstring"``: you should know what this is.
-      - ``"args"``: array of ``"arg"`` objects. This describes the fuction arguments/parameters.
+      - ``"args"``: array of ``"arg"`` objects. This describes the function arguments/parameters.
       - ``"quals"``: array of qualifiers, IE "const"
 
 
@@ -216,7 +216,7 @@ The different "json_types" are as follows:
       - ``"name"``: The name of the function.
       - ``"type"``: This contains the type information for the return value.
       - ``"docstring"``: you should know what this is.
-      - ``"args"``: array of ``"arg"`` json types. This describes the fuction arguments/parameters.
+      - ``"args"``: array of ``"arg"`` json types. This describes the function arguments/parameters.
 
 
   - ``"stdlib_type"``: This is a base type, meaning that there are no more
