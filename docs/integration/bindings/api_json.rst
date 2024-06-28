@@ -94,7 +94,7 @@ The different "json_types" are as follows:
     LVGL that are considered to be private and that is what these describe.
 
     Available JSON fields:
-      - ``"name"``: The name of the formard declaration.
+      - ``"name"``: The name of the forward declaration.
       - ``"type"``: This contains the type information for the field. Check the
         ``"json_type"`` to know what type you are dealing with.
       - ``"docstring"``: you should know what this is.
