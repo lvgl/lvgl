@@ -314,8 +314,8 @@ def create_ui():
 
     test_img_lvgl_logo_jpg = lv.image_dsc_t(
         dict(
-            header=dict(cf=lv.COLOR_FORMAT.RAW_ALPHA, w=105, h=33),
-            data_size=1947,
+            header=dict(cf=lv.COLOR_FORMAT.RAW_ALPHA, w=105, h=40),
+            data_size=2864,
             data=test_img_lvgl_logo_jpg_data
             )
         )
@@ -427,8 +427,8 @@ def draw_to_canvas(canvas):
 
     test_img_lvgl_logo_png = lv.image_dsc_t(
         dict(
-            header=dict(cf=lv.COLOR_FORMAT.RAW_ALPHA, w=105, h=33),
-            data_size=1873,
+            header=dict(cf=lv.COLOR_FORMAT.RAW_ALPHA, w=105, h=40),
+            data_size=6878,
             data=test_img_lvgl_logo_png_data
             )
         )
