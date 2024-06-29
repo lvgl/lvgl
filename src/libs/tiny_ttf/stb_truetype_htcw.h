@@ -2867,8 +2867,8 @@ STBTT_DEF int stbtt_KernTableCheck(const stbtt_fontinfo * info)
         STBTT_STREAM_TYPE data = info->data;
 #else
         const stbtt_uint8 * data = info->data;
-#endif
-        stbtt_int32 i, sti;
+    #endif
+        stbtt_int32 i;
 
         if(!info->gpos) return 0;
 
@@ -2884,8 +2884,6 @@ STBTT_DEF int stbtt_KernTableCheck(const stbtt_fontinfo * info)
             stbtt_uint32 lookupTable = lookupList + lookupOffset;
 
             stbtt_uint16 lookupType = ttUSHORT(data, lookupTable);
-            stbtt_uint16 subTableCount = ttUSHORT(data, lookupTable + 4);
-            stbtt_uint32 subTableOffsets = lookupTable + 6;
 
             if(lookupType != 2)  // Pair Adjustment Positioning Subtable
                 continue;
