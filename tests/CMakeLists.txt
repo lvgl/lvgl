@@ -198,7 +198,6 @@ if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
         -Werror=float-conversion
         -Werror=strict-aliasing
         -Wno-double-promotion
-        -Wno-unused-but-set-parameter
         -Wno-unreachable-code
     )
 else()
