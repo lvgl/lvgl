@@ -2867,7 +2867,7 @@ STBTT_DEF int stbtt_KernTableCheck(const stbtt_fontinfo * info)
         STBTT_STREAM_TYPE data = info->data;
 #else
         const stbtt_uint8 * data = info->data;
-    #endif
+#endif
         stbtt_int32 i;
 
         if(!info->gpos) return 0;
