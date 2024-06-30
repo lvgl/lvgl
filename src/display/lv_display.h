@@ -261,7 +261,6 @@ void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t re
  */
 uint32_t lv_display_get_render_state(lv_display_t * disp);
 
-
 /**
  * Set the flush callback which will be called to copy the rendered image to the display.
  * @param disp      pointer to a display
