@@ -443,7 +443,7 @@ void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t re
     disp->render_mode = render_mode;
 }
 
-uint32_t lv_display_get_render_state(lv_display_t * disp);
+uint32_t lv_display_get_render_state(lv_display_t * disp)
 {
     return disp->rendering_in_progress;
 }
