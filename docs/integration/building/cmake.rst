@@ -69,3 +69,19 @@ Run the following commands
 - ctest --preset windows-base_dbg
 
 
+Available options
+-----------------
+
+You can set the following options using cmake. It is reccomended to set these options directly within the CMakePresets.json file.
+However you can also set them using the cmake command line or as cache variables. Checkout the CMake Docs for more information.
+
+  - LV_CONF_SKIP (default: true)
+    Skip the configuration step. This is useful if you want to use the default configuration.
+  - LV_CONF_PATH (default: (not set))
+    Path to an optional user defined configuration file. (Obviously you cannot mix it with LV_CONF_SKIP)
+  - CONFIG_LV_BUILD_DEMOS (default: true)
+    Enable the demo widgets, automatically sets the proper define LV_USE_DEMO_WIDGETS=1
+  - CONFIG_LV_BUILD_EXAMPLES (default: true)
+    Build the examples, automatically sets the proper define LV_BUILD_EXAMPLES=1
+  - LV_CONF_BUILD_THORVG_INTERNAL (default: true)
+    Build the thorvg extension, automatically sets the proper define LV_USE_THORVG_INTERNAL=1

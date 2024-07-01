@@ -18,7 +18,7 @@ else()
     set_source_files_properties(${EXAMPLE_SOURCES} COMPILE_FLAGS "-Wno-unused-variable -Wno-format")
   endif()
 
-  if(CONFIG_LV_USE_DEMO_WIDGETS)
+  if(CONFIG_LV_BUILD_DEMOS)
     file(GLOB_RECURSE DEMO_WIDGETS_SOURCES ${LVGL_ROOT_DIR}/demos/widgets/*.c)
     list(APPEND DEMO_SOURCES ${DEMO_WIDGETS_SOURCES})
   endif()
@@ -63,6 +63,14 @@ else()
 endif()
 
 target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_CONF_INCLUDE_SIMPLE")
+
+if(CONFIG_LV_BUILD_DEMOS)
+  target_compile_definitions(${COMPONENT_LIB} PUBLIC LV_USE_DEMO_WIDGETS=1)
+endif()
+
+if(CONFIG_LV_BUILD_EXAMPLES)
+  target_compile_definitions(${COMPONENT_LIB} PUBLIC LV_BUILD_EXAMPLES=1)
+endif()
 
 if(CONFIG_LV_ATTRIBUTE_FAST_MEM_USE_IRAM)
   target_compile_definitions(${COMPONENT_LIB}

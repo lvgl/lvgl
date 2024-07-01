@@ -5,7 +5,9 @@
       "name": "_base",
       "hidden": true,
       "cacheVariables": {
-        "LV_CONF_SKIP": true
+        "LV_CONF_SKIP": true,
+        "CONFIG_LV_BUILD_DEMOS": true,
+        "CONFIG_LV_BUILD_EXAMPLES": true
       }
     },
     {
