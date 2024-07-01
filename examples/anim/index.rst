@@ -10,6 +10,11 @@ Playback animation
 .. lv_example:: anim/lv_example_anim_2
   :language: c
 
+Pause, resume, seek
+------------------
+.. lv_example:: anim/lv_example_anim_4
+  :language: c
+
 Animation timeline
 ------------------
 .. lv_example:: anim/lv_example_anim_timeline_1

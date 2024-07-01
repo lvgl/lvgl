@@ -18,80 +18,107 @@ This prototype is compatible with the majority of the property *set*
 functions in LVGL. For example :cpp:expr:`lv_obj_set_x(obj, value)` or
 :cpp:expr:`lv_obj_set_width(obj, value)`
 
+This signature promotes a pattern with one layer of abstraction,
+where the "var" parameter is not directly pointing to the memory location we want to change,
+but rather to the object who's member we are interested in.
+
 .. _animations_create:
 
 Create an animation
 *******************
 
-To create an animation an :cpp:type:`lv_anim_t` variable has to be initialized
-and configured with ``lv_anim_set_...()`` functions.
+To create an animation, call :cpp:func:`lv_anim_create` which returns an :cpp:type:`lv_anim_t *` pointer,
+then configure it with ``lv_anim_set_...()`` functions, finally call :cpp:func:`lv_anim_trigger` to start the animation.
+
+.. note::
+   When the animation finishes, the pointer returned by :cpp:func:`lv_anim_create` is de-allocated internally,
+   making it a dangling pointer. Make sure to use the ``deleted_cb`` mechanism if you intend to use the pointer.
+
 
 .. code:: c
 
 
-   /* INITIALIZE AN ANIMATION
+   /* CREATE AN ANIMATION
     *-----------------------*/
 
-   lv_anim_t a;
-   lv_anim_init(&a);
+   lv_anim_t * a = lv_anim_create();
 
    /* MANDATORY SETTINGS
     *------------------*/
 
    /*Set the "animator" function*/
-   lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_obj_set_x);
+   lv_anim_set_exec_cb(a, (lv_anim_exec_xcb_t) lv_obj_set_x);
 
    /*Set target of the animation*/
-   lv_anim_set_var(&a, obj);
+   lv_anim_set_var(a, obj);
 
    /*Length of the animation [ms]*/
-   lv_anim_set_duration(&a, duration);
+   lv_anim_set_duration(a, duration);
 
    /*Set start and end values. E.g. 0, 150*/
-   lv_anim_set_values(&a, start, end);
+   lv_anim_set_values(a, start, end);
 
    /* OPTIONAL SETTINGS
     *------------------*/
 
    /*Time to wait before starting the animation [ms]*/
-   lv_anim_set_delay(&a, delay);
+   lv_anim_set_delay(a, delay);
 
    /*Set path (curve). Default is linear*/
-   lv_anim_set_path_cb(&a, lv_anim_path_ease_in);
+   lv_anim_set_path_cb(a, lv_anim_path_ease_in);
 
    /*Set a callback to indicate when the animation is completed.*/
-   lv_anim_set_completed_cb(&a, completed_cb);
+   lv_anim_set_completed_cb(a, completed_cb);
 
    /*Set a callback to indicate when the animation is deleted (idle).*/
-   lv_anim_set_deleted_cb(&a, deleted_cb);
+   lv_anim_set_deleted_cb(a, deleted_cb);
 
    /*Set a callback to indicate when the animation is started (after delay).*/
-   lv_anim_set_start_cb(&a, start_cb);
+   lv_anim_set_start_cb(a, start_cb);
 
    /*When ready, play the animation backward with this duration. Default is 0 (disabled) [ms]*/
-   lv_anim_set_playback_duration(&a, time);
+   lv_anim_set_playback_duration(a, time);
 
    /*Delay before playback. Default is 0 (disabled) [ms]*/
-   lv_anim_set_playback_delay(&a, delay);
+   lv_anim_set_playback_delay(a, delay);
 
    /*Number of repetitions. Default is 1. LV_ANIM_REPEAT_INFINITE for infinite repetition*/
-   lv_anim_set_repeat_count(&a, cnt);
+   lv_anim_set_repeat_count(a, cnt);
 
    /*Delay before repeat. Default is 0 (disabled) [ms]*/
-   lv_anim_set_repeat_delay(&a, delay);
+   lv_anim_set_repeat_delay(a, delay);
 
    /*true (default): apply the start value immediately, false: apply start value after delay when the anim. really starts. */
-   lv_anim_set_early_apply(&a, true/false);
+   lv_anim_set_early_apply(a, true/false);
 
    /* START THE ANIMATION
     *------------------*/
-   lv_anim_start(&a);                             /*Start the animation*/
+   lv_anim_trigger(a);                             /*Start the animation*/
 
-You can apply multiple different animations on the same variable at the
+   /* PLAYBACK CONTROL
+    *------------------*/
+
+   /*Pause the animation */
+   lv_anim_pause(a);
+
+   /*Resume the animation */
+   lv_anim_resume(a);
+
+   /*Pause / resume the animation */
+   lv_anim_toggle_running(a);
+
+   /*Set the progress of the animation manually (aka seek). */
+   lv_anim_set_current_time(a, current_time);
+
+You can apply multiple different animations on the same variable (object) at the
 same time. For example, animate the x and y coordinates with
 :cpp:func:`lv_obj_set_x` and :cpp:func:`lv_obj_set_y`. However, only one animation can
-exist with a given variable and function pair and :cpp:func:`lv_anim_start`
+exist with a given variable and function pair and triggering the animation
 will remove any existing animations for such a pair.
+
+.. note::
+   Memory management of animations has changed in LVGL v9.2, at the introduction of :cpp:expr:`lv_anim_create()`.
+   The old :cpp:func:`lv_anim_create` and :cpp:func:`lv_anim_start` API are still available, but not recommended to use.
 
 .. _animations_path:
 
@@ -156,6 +183,11 @@ will override the value of ``delay``.
 
 Finally, call :cpp:expr:`lv_anim_timeline_start(at)` to start the animation
 timeline.
+
+.. note::
+   Timeline creates an internal copy of the :cpp:type:`lv_anim_t`
+   therefore it's no longer needed after calling :cpp:func:`lv_anim_timeline_add`.
+   If you are using :cpp:fu-nc:`lv_anim_create`, you should free the pointer manually.
 
 It supports forward and backward playback of the entire animation group,
 using :cpp:expr:`lv_anim_timeline_set_reverse(at, reverse)`.
