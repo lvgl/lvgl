@@ -55,6 +55,9 @@ static int fbdev_get_pinfo(int fd, struct fb_planeinfo_s * pinfo);
 static int fbdev_init_mem2(lv_nuttx_fb_t * dsc);
 static void display_refr_timer_cb(lv_timer_t * tmr);
 static void display_release_cb(lv_event_t * e);
+#if defined(CONFIG_FB_UPDATE)
+    static void fbdev_join_inv_areas(lv_display_t * disp, lv_area_t * final_inv_area);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -169,6 +172,34 @@ errout:
  *   STATIC FUNCTIONS
  **********************/
 
+#if defined(CONFIG_FB_UPDATE)
+static void fbdev_join_inv_areas(lv_display_t * disp, lv_area_t * final_inv_area)
+{
+    uint16_t inv_index;
+
+    bool area_joined = false;
+
+    for(inv_index = 0; inv_index < disp->inv_p; inv_index++) {
+        if(disp->inv_area_joined[inv_index] == 0) {
+            const lv_area_t * area_p = &disp->inv_areas[inv_index];
+
+            /* Join to final_area */
+
+            if(!area_joined) {
+                /* copy first area */
+                lv_area_copy(final_inv_area, area_p);
+                area_joined = true;
+            }
+            else {
+                _lv_area_join(final_inv_area,
+                              final_inv_area,
+                              area_p);
+            }
+        }
+    }
+}
+#endif
+
 static void display_refr_timer_cb(lv_timer_t * tmr)
 {
     lv_display_t * disp = lv_timer_get_user_data(tmr);
@@ -213,11 +244,16 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     int yoffset = disp->buf_act == disp->buf_1 ?
                   0 : dsc->mem2_yoffset;
 
+    /* Join the areas to update */
+    lv_area_t final_inv_area;
+    lv_memzero(&final_inv_area, sizeof(final_inv_area));
+    fbdev_join_inv_areas(disp, &final_inv_area);
+
     struct fb_area_s fb_area;
-    fb_area.x = area->x1;
-    fb_area.y = area->y1 + yoffset;
-    fb_area.w = lv_area_get_width(area);
-    fb_area.h = lv_area_get_height(area);
+    fb_area.x = final_inv_area.x1;
+    fb_area.y = final_inv_area.y1 + yoffset;
+    fb_area.w = lv_area_get_width(&final_inv_area);
+    fb_area.h = lv_area_get_height(&final_inv_area);
     if(ioctl(dsc->fd, FBIO_UPDATE, (unsigned long)((uintptr_t)&fb_area)) < 0) {
         LV_LOG_ERROR("ioctl(FBIO_UPDATE) failed: %d", errno);
     }
