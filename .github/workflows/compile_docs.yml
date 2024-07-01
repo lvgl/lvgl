@@ -10,7 +10,7 @@ env:
 jobs:
   build-and-deploy:
     if: github.repository == 'lvgl/lvgl'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     concurrency: docs-build-and-deploy
     steps:
       - name: Checkout

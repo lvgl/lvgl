@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         # A valid option parameter to the cmake file.
@@ -22,6 +22,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
     - name: Building ${{ matrix.build_option }}
@@ -58,30 +62,25 @@ jobs:
       env:
         CC: cl
 
-  test-native:
-    runs-on: ubuntu-22.04
-    strategy:
-     matrix:
-       # A valid option parameter to the cmake file.
-       # See BUILD_OPTIONS in tests/CMakeLists.txt.
-       build_config: ['64bit build',
-                      '32bit build']
-    name: Run tests with ${{ matrix.build_config }}
+  Run-tests-with-64bit-build:
+    runs-on: ubuntu-24.04
+    name: Run tests with 64bit build
     steps:
     - uses: actions/checkout@v4
     - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
     - name: Fix kernel mmap rnd bits
-      # Asan in llvm 14 provided in ubuntu 22.04 is incompatible with
+      # Asan in llvm 14 provided in ubuntu 24.04 is incompatible with
       # high-entropy ASLR in much newer kernels that GitHub runners are
       # using leading to random crashes: https://reviews.llvm.org/D148280
       run: sudo sysctl vm.mmap_rnd_bits=28
-    - name: Set environment variables for 32-bit build
-      if: matrix.build_config == '32bit build'
-      run: echo "NON_AMD64_BUILD=1" >> $GITHUB_ENV
     - name: Run tests
-      run: python tests/main.py --report --update-image test
+      run: python tests/main.py test
     - name: Archive screenshot errors
       if: failure()
       uses: actions/upload-artifact@v4
@@ -90,9 +89,33 @@ jobs:
         path: |
              tests/ref_imgs*/**/*_err.png
              test_screenshot_error.h
-#    - name: Upload coverage to Codecov
-#      uses: codecov/codecov-action@v4
-#      if: github.event_name == 'push' && github.repository == 'lvgl/lvgl'
-#      with:
-#        fail_ci_if_error: true
-#        verbose: true
+
+  Run-tests-with-32bit-build:
+    runs-on: ubuntu-22.04
+    name: Run tests with 32bit build
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+    - name: Install prerequisites
+      run: scripts/install-prerequisites.sh
+    - name: Fix kernel mmap rnd bits
+      # Asan in llvm 14 provided in ubuntu 22.04 is incompatible with
+      # high-entropy ASLR in much newer kernels that GitHub runners are
+      # using leading to random crashes: https://reviews.llvm.org/D148280
+      run: sudo sysctl vm.mmap_rnd_bits=28
+    - name: Set environment variables for 32-bit build
+      run: echo "NON_AMD64_BUILD=1" >> $GITHUB_ENV
+    - name: Run tests
+      run: python tests/main.py test
+    - name: Archive screenshot errors
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: screenshot-errors-amd64
+        path: |
+             tests/ref_imgs*/**/*_err.png
+             test_screenshot_error.h
