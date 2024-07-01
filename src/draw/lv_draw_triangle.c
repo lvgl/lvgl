@@ -46,6 +46,7 @@ void lv_draw_triangle_dsc_init(lv_draw_triangle_dsc_t * dsc)
     dsc->bg_grad.stops[1].frac = 0xFF;
     dsc->bg_grad.stops_count = 2;
     dsc->bg_opa = LV_OPA_COVER;
+    dsc->base.dsc_size = sizeof(lv_draw_triangle_dsc_t);
     LV_PROFILER_END;
 }
 
