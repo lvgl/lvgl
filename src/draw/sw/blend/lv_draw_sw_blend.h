@@ -53,6 +53,7 @@ typedef struct {
     int32_t mask_stride;
     lv_color_t color;
     lv_opa_t opa;
+    lv_area_t relative_area;
 } _lv_draw_sw_blend_fill_dsc_t;
 
 typedef struct {

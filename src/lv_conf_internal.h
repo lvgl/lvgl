@@ -426,6 +426,17 @@
 	        #define LV_DRAW_SW_SUPPORT_A8			1
 	    #endif
 	#endif
+	#ifndef LV_DRAW_SW_SUPPORT_I1
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_DRAW_SW_SUPPORT_I1
+	            #define LV_DRAW_SW_SUPPORT_I1 CONFIG_LV_DRAW_SW_SUPPORT_I1
+	        #else
+	            #define LV_DRAW_SW_SUPPORT_I1 0
+	        #endif
+	    #else
+	        #define LV_DRAW_SW_SUPPORT_I1			1
+	    #endif
+	#endif
 
 	/* Set the number of draw unit.
      * > 1 requires an operating system enabled in `LV_USE_OS`

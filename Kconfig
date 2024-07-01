@@ -238,6 +238,11 @@ menu "LVGL configuration"
 			bool "Enable support for A8 color format"
 			default y
 			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_I1
+			bool "Enable support for I1 color format"
+			default y
+			depends on LV_USE_DRAW_SW
 				
 		config LV_DRAW_SW_DRAW_UNIT_CNT
 			int "Number of draw units"
