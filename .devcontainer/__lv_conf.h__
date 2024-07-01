@@ -288,13 +288,13 @@
 #define LV_OBJ_STYLE_CACHE      1
 
 /* Add `id` field to `lv_obj_t` */
-#define LV_USE_OBJ_ID           0
+#define LV_USE_OBJ_ID           1
 
 /* Automatically assign an ID when obj is created */
 #define LV_OBJ_ID_AUTO_ASSIGN   1
 
 /* Use lvgl builtin method for obj ID */
-#define LV_USE_OBJ_ID_BUILTIN   0
+#define LV_USE_OBJ_ID_BUILTIN   1
 
 /*Use obj property set/get API*/
 #define LV_USE_OBJ_PROPERTY 0
