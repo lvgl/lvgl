@@ -10,7 +10,7 @@ reading the format for just about every programming language out there.
 The script in order to run does have some requirements.
 
   - Python >= 3.10
-  - Pycparser >= 2.21: Python Library for reading the preprocessor ouotput from the C compiler
+  - Pycparser >= 2.21: Python Library for reading the preprocessor output from the C compiler
   - PyMSVC >= 0.4.0: Python library is using MSVC Compiler
   - C compiler, gcc for Linux, clang for OSX and MSVC for Windows
   - Doxygen: used to read the docstrings from the header files.
@@ -52,8 +52,8 @@ The JSON data is broken apart into a couple of main categories.
   - forward_decls
   - macros
 
-Those categories are the element names undert the root of the JSON data.
-The value for each categry is an array of JSON elements. There is a bit of
+Those categories are the element names under the root of the JSON data.
+The value for each category is an array of JSON elements. There is a bit of
 nesting with the elements in the arrays and I have created "json_types" that
 will allow you to identify exactly what you are dealing with.
 
@@ -91,10 +91,10 @@ The different "json_types" are as follows:
 
 
   - ``"forward_decl"``: Describes a forward declaration.There are structures in
-    LVGL that are considered to be private and that is what these desccribe.
+    LVGL that are considered to be private and that is what these describe.
 
     Available JSON fields:
-      - ``"name"``: The name of the formard declaration.
+      - ``"name"``: The name of the forward declaration.
       - ``"type"``: This contains the type information for the field. Check the
         ``"json_type"`` to know what type you are dealing with.
       - ``"docstring"``: you should know what this is.
@@ -108,7 +108,7 @@ The different "json_types" are as follows:
       - ``"name"``: The name of the function pointer.
       - ``"type"``: This contains the return type information for the function pointer.
       - ``"docstring"``: you should know what this is.
-      - ``"args"``: array of ``"arg"`` objects. This describes the fuction arguments/parameters.
+      - ``"args"``: array of ``"arg"`` objects. This describes the function arguments/parameters.
       - ``"quals"``: array of qualifiers, IE "const"
 
 
@@ -130,7 +130,7 @@ The different "json_types" are as follows:
       - ``"name"``: will always be "ellipsis".
 
 
-  - ``"primitive_type"``: This is a base type. There or no other types beneith this.
+  - ``"primitive_type"``: This is a base type. There or no other types beneath this.
     This tells you that the type is a basic or primitive C type.
     IE: struct, union, int, unsigned int, etc...
 
@@ -163,7 +163,7 @@ The different "json_types" are as follows:
       - ``"value"``: the enumeration member/item's value
 
 
-  - ``"lvgl_type"``: This is a base type. There or no other types beneith this.
+  - ``"lvgl_type"``: This is a base type. There or no other types beneath this.
     This tells you that the type is an LVGL data type.
 
     Available JSON fields:
@@ -216,11 +216,11 @@ The different "json_types" are as follows:
       - ``"name"``: The name of the function.
       - ``"type"``: This contains the type information for the return value.
       - ``"docstring"``: you should know what this is.
-      - ``"args"``: array of ``"arg"`` json types. This describes the fuction arguments/parameters.
+      - ``"args"``: array of ``"arg"`` json types. This describes the function arguments/parameters.
 
 
   - ``"stdlib_type"``: This is a base type, meaning that there are no more
-    type levels beneith this. This tells us that the type is from the C stdlib.
+    type levels beneath this. This tells us that the type is from the C stdlib.
 
     Available JSON fields:
       - ``"name"``: The name of the type.

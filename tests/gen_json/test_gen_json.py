@@ -1,4 +1,4 @@
-# Basic test to see if the API jeson generator is able to run without any errors
+# Basic test to see if the API json generator is able to run without any errors
 # This test doesn't not check to make sure the output is correct. It is for the
 # sole purpose of making sure it completes.
 
