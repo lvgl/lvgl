@@ -255,6 +255,13 @@ void lv_display_set_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf1, lv_d
 void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t render_mode);
 
 /**
+ * Get display render state
+ * @param disp              pointer to a display
+ * @return                  state of rendering_in_progress
+ */
+uint32_t lv_display_get_render_state(lv_display_t * disp);
+
+/**
  * Set the flush callback which will be called to copy the rendered image to the display.
  * @param disp      pointer to a display
  * @param flush_cb  the flush callback (`px_map` contains the rendered image as raw pixel map and it should be copied to `area` on the display)

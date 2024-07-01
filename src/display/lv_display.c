@@ -443,6 +443,11 @@ void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t re
     disp->render_mode = render_mode;
 }
 
+uint32_t lv_display_get_render_state(lv_display_t * disp)
+{
+    return disp->rendering_in_progress;
+}
+
 void lv_display_set_flush_cb(lv_display_t * disp, lv_display_flush_cb_t flush_cb)
 {
     if(disp == NULL) disp = lv_display_get_default();
