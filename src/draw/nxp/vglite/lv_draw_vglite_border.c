@@ -142,36 +142,40 @@ static void _vglite_draw_border(const lv_area_t * coords, const lv_area_t * clip
 
     uint32_t num_rect = 0;
     vg_lite_rectangle_t rect[MAX_NUM_RECTANGLES];
+    int32_t rect_width = coords->x2 - coords->x1;
+    int32_t rect_height = coords->y2 - coords->y1;
+    int32_t shortest_side = LV_MIN(rect_width, rect_height);
+    int32_t final_radius = LV_MIN(radius, shortest_side / 2);
 
     if(border_side & LV_BORDER_SIDE_TOP) {
         rect[num_rect].x = coords->x1 - ceil(line_width / 2.0f);
         rect[num_rect].y = coords->y1 - ceil(line_width / 2.0f);
         rect[num_rect].width = coords->x2 - coords->x1 + line_width;
-        rect[num_rect].height = line_width;
+        rect[num_rect].height = final_radius + ceil(line_width / 2.0f);
         num_rect++;
     }
 
     if(border_side & LV_BORDER_SIDE_LEFT) {
         rect[num_rect].x = coords->x1 - ceil(line_width / 2.0f);
         rect[num_rect].y = coords->y1 - ceil(line_width / 2.0f);
-        rect[num_rect].width = line_width;
-        rect[num_rect].height = coords->y2 - coords->y1 + line_width;
+        rect[num_rect].width = final_radius + ceil(line_width / 2.0f);
+        rect[num_rect].height = coords->y2 - coords->y1 + line_width + 1;
         num_rect++;
     }
 
     if(border_side & LV_BORDER_SIDE_RIGHT) {
-        rect[num_rect].x = coords->x2 - ceil(line_width / 2.0f);
+        rect[num_rect].x = coords->x2 - final_radius + 1;
         rect[num_rect].y = coords->y1 - ceil(line_width / 2.0f);
-        rect[num_rect].width = line_width;
-        rect[num_rect].height = coords->y2 - coords->y1 + line_width;
+        rect[num_rect].width = final_radius + ceil(line_width / 2.0f);
+        rect[num_rect].height = coords->y2 - coords->y1 + line_width + 1;
         num_rect++;
     }
 
     if(border_side & LV_BORDER_SIDE_BOTTOM) {
         rect[num_rect].x = coords->x1 - ceil(line_width / 2.0f);
-        rect[num_rect].y = coords->y2 - ceil(line_width / 2.0f);
+        rect[num_rect].y = coords->y2 - final_radius + 1;
         rect[num_rect].width = coords->x2 - coords->x1 + line_width;
-        rect[num_rect].height = line_width;
+        rect[num_rect].height = final_radius + ceil(line_width / 2.0f);
         num_rect++;
     }
 
