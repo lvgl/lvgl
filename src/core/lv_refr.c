@@ -254,6 +254,17 @@ void _lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     if(!disp) return;
     if(!lv_display_is_invalidation_enabled(disp)) return;
 
+    /**
+     * There are two reasons for this issue:
+     *  1.LVGL API is being used across threads, such as modifying widget properties in another thread
+     *    or within an interrupt handler during the main thread rendering process.
+     *  2.User-customized widget modify widget properties/styles again within the DRAW event.
+     *
+     * Therefore, ensure that LVGL is used in a single-threaded manner, or refer to
+     * documentation: https://docs.lvgl.io/master/porting/os.html for proper locking mechanisms.
+     * Additionally, ensure that only drawing-related tasks are performed within the DRAW event,
+     * and move widget property/style modifications to other events.
+     */
     LV_ASSERT_MSG(!disp->rendering_in_progress, "Invalidate area is not allowed during rendering.");
 
     /*Clear the invalidate buffer if the parameter is NULL*/
