@@ -47,6 +47,40 @@
   #define UNITY_FUNCTION_ATTR(a)    /* ignore */
 #endif
 
+#ifndef UNITY_NORETURN
+  #if defined(__cplusplus)
+    #if __cplusplus >= 201103L
+      #define UNITY_NORETURN [[ noreturn ]]
+    #endif
+  #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+    #if defined(_WIN32) && defined(_MSC_VER)
+      /* We are using MSVC compiler on Windows platform. */
+      /* Not all Windows SDKs supports <stdnoreturn.h>, but compiler can support C11: */
+      /* https://devblogs.microsoft.com/cppblog/c11-and-c17-standard-support-arriving-in-msvc/ */
+      /* Not sure, that Mingw compilers has Windows SDK headers at all. */
+      #include <sdkddkver.h>
+    #endif
+
+    /* Using Windows SDK predefined macro for detecting supported SDK with MSVC compiler. */
+    /* Mingw GCC should work without that fixes. */
+    /* Based on: */
+    /* https://docs.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt?view=msvc-170 */
+    /* NTDDI_WIN10_FE is equal to Windows 10 SDK 2104 */
+    #if defined(_MSC_VER) && ((!defined(NTDDI_WIN10_FE)) || WDK_NTDDI_VERSION < NTDDI_WIN10_FE)
+      /* Based on tests and: */
+      /* https://docs.microsoft.com/en-us/cpp/c-language/noreturn?view=msvc-170 */
+      /* https://en.cppreference.com/w/c/language/_Noreturn */
+      #define UNITY_NORETURN _Noreturn
+    #else /* Using newer Windows SDK or not MSVC compiler */
+      #include <stdnoreturn.h>
+      #define UNITY_NORETURN noreturn
+    #endif
+  #endif
+#endif
+#ifndef UNITY_NORETURN
+  #define UNITY_NORETURN UNITY_FUNCTION_ATTR(__noreturn__)
+#endif
+
 /*-------------------------------------------------------
  * Guess Widths If Not Specified
  *-------------------------------------------------------*/
@@ -181,6 +215,8 @@
   #define UNITY_INTERNAL_PTR UNITY_PTR_ATTRIBUTE const void*
 #endif
 
+/* optionally define UNITY_COMPARE_PTRS_ON_ZERO_ARRAY */
+
 /*-------------------------------------------------------
  * Float Support
  *-------------------------------------------------------*/
@@ -206,16 +242,25 @@
 #endif
 typedef UNITY_FLOAT_TYPE UNITY_FLOAT;
 
-/* isinf & isnan macros should be provided by math.h */
-#ifndef isinf
-/* The value of Inf - Inf is NaN */
-#define isinf(n) (isnan((n) - (n)) && !isnan(n))
-#endif
-
+/* isnan macro should be provided by math.h. Override if not macro */
+#ifndef UNITY_IS_NAN
 #ifndef isnan
 /* NaN is the only floating point value that does NOT equal itself.
  * Therefore if n != n, then it is NaN. */
-#define isnan(n) ((n != n) ? 1 : 0)
+#define UNITY_IS_NAN(n) ((n != n) ? 1 : 0)
+#else
+#define UNITY_IS_NAN(n) isnan(n)
+#endif
+#endif
+
+/* isinf macro should be provided by math.h. Override if not macro */
+#ifndef UNITY_IS_INF
+#ifndef isinf
+/* The value of Inf - Inf is NaN */
+#define UNITY_IS_INF(n) (UNITY_IS_NAN((n) - (n)) && !UNITY_IS_NAN(n))
+#else
+#define UNITY_IS_INF(n) isinf(n)
+#endif
 #endif
 
 #endif
@@ -274,10 +319,10 @@ typedef UNITY_FLOAT_TYPE UNITY_FLOAT;
   #ifdef UNITY_USE_FLUSH_STDOUT
     /* We want to use the stdout flush utility */
     #include <stdio.h>
-    #define UNITY_OUTPUT_FLUSH() (void)fflush(stdout)
+    #define UNITY_OUTPUT_FLUSH()    (void)fflush(stdout)
   #else
     /* We've specified nothing, therefore flush should just be ignored */
-    #define UNITY_OUTPUT_FLUSH()
+    #define UNITY_OUTPUT_FLUSH()    (void)0
   #endif
 #else
   /* If defined as something else, make sure we declare it here so it's ready for use */
@@ -289,11 +334,11 @@ typedef UNITY_FLOAT_TYPE UNITY_FLOAT;
 #ifndef UNITY_OUTPUT_FLUSH
 #define UNITY_FLUSH_CALL()
 #else
-#define UNITY_FLUSH_CALL() UNITY_OUTPUT_FLUSH()
+#define UNITY_FLUSH_CALL()  UNITY_OUTPUT_FLUSH()
 #endif
 
 #ifndef UNITY_PRINT_EOL
-#define UNITY_PRINT_EOL()    UNITY_OUTPUT_CHAR('\n')
+#define UNITY_PRINT_EOL()   UNITY_OUTPUT_CHAR('\n')
 #endif
 
 #ifndef UNITY_OUTPUT_START
@@ -352,19 +397,19 @@ typedef UNITY_FLOAT_TYPE UNITY_FLOAT;
 #endif
 
 #ifndef UNITY_EXEC_TIME_START
-#define UNITY_EXEC_TIME_START() do{}while(0)
+#define UNITY_EXEC_TIME_START() do { /* nothing*/ } while (0)
 #endif
 
 #ifndef UNITY_EXEC_TIME_STOP
-#define UNITY_EXEC_TIME_STOP() do{}while(0)
+#define UNITY_EXEC_TIME_STOP()  do { /* nothing*/ } while (0)
 #endif
 
 #ifndef UNITY_TIME_TYPE
-#define UNITY_TIME_TYPE UNITY_UINT
+#define UNITY_TIME_TYPE         UNITY_UINT
 #endif
 
 #ifndef UNITY_PRINT_EXEC_TIME
-#define UNITY_PRINT_EXEC_TIME() do{}while(0)
+#define UNITY_PRINT_EXEC_TIME() do { /* nothing*/ } while (0)
 #endif
 
 /*-------------------------------------------------------
@@ -503,9 +548,9 @@ void UnityDefaultTestRun(UnityTestFunction Func, const char* FuncName, const int
 #define UNITY_SET_DETAIL(d1)
 #define UNITY_SET_DETAILS(d1,d2)
 #else
-#define UNITY_CLR_DETAILS()      { Unity.CurrentDetail1 = 0;   Unity.CurrentDetail2 = 0;  }
-#define UNITY_SET_DETAIL(d1)     { Unity.CurrentDetail1 = (d1);  Unity.CurrentDetail2 = 0;  }
-#define UNITY_SET_DETAILS(d1,d2) { Unity.CurrentDetail1 = (d1);  Unity.CurrentDetail2 = (d2); }
+#define UNITY_CLR_DETAILS()         do { Unity.CurrentDetail1 = 0;     Unity.CurrentDetail2 = 0;    } while (0)
+#define UNITY_SET_DETAIL(d1)        do { Unity.CurrentDetail1 = (d1);  Unity.CurrentDetail2 = 0;    } while (0)
+#define UNITY_SET_DETAILS(d1,d2)    do { Unity.CurrentDetail1 = (d1);  Unity.CurrentDetail2 = (d2); } while (0)
 
 #ifndef UNITY_DETAIL1_NAME
 #define UNITY_DETAIL1_NAME "Function"
@@ -619,8 +664,8 @@ void UnityAssertNumbersArrayWithin(const UNITY_UINT delta,
                                    const UNITY_FLAGS_T flags);
 
 #ifndef UNITY_EXCLUDE_SETJMP_H
-void UnityFail(const char* message, const UNITY_LINE_TYPE line) UNITY_FUNCTION_ATTR(noreturn);
-void UnityIgnore(const char* message, const UNITY_LINE_TYPE line) UNITY_FUNCTION_ATTR(noreturn);
+UNITY_NORETURN void UnityFail(const char* message, const UNITY_LINE_TYPE line);
+UNITY_NORETURN void UnityIgnore(const char* message, const UNITY_LINE_TYPE line);
 #else
 void UnityFail(const char* message, const UNITY_LINE_TYPE line);
 void UnityIgnore(const char* message, const UNITY_LINE_TYPE line);
@@ -635,12 +680,25 @@ void UnityAssertFloatsWithin(const UNITY_FLOAT delta,
                              const char* msg,
                              const UNITY_LINE_TYPE lineNumber);
 
-void UnityAssertEqualFloatArray(UNITY_PTR_ATTRIBUTE const UNITY_FLOAT* expected,
-                                UNITY_PTR_ATTRIBUTE const UNITY_FLOAT* actual,
-                                const UNITY_UINT32 num_elements,
+void UnityAssertFloatsNotWithin(const UNITY_FLOAT delta,
+                                const UNITY_FLOAT expected,
+                                const UNITY_FLOAT actual,
                                 const char* msg,
-                                const UNITY_LINE_TYPE lineNumber,
-                                const UNITY_FLAGS_T flags);
+                                const UNITY_LINE_TYPE lineNumber);
+
+void UnityAssertGreaterOrLessFloat(const UNITY_FLOAT threshold,
+                                   const UNITY_FLOAT actual,
+                                   const UNITY_COMPARISON_T compare,
+                                   const char* msg,
+                                   const UNITY_LINE_TYPE linenumber);
+
+void UnityAssertWithinFloatArray(const UNITY_FLOAT delta,
+                                 UNITY_PTR_ATTRIBUTE const UNITY_FLOAT* expected,
+                                 UNITY_PTR_ATTRIBUTE const UNITY_FLOAT* actual,
+                                 const UNITY_UINT32 num_elements,
+                                 const char* msg,
+                                 const UNITY_LINE_TYPE lineNumber,
+                                 const UNITY_FLAGS_T flags);
 
 void UnityAssertFloatSpecial(const UNITY_FLOAT actual,
                              const char* msg,
@@ -655,12 +713,25 @@ void UnityAssertDoublesWithin(const UNITY_DOUBLE delta,
                               const char* msg,
                               const UNITY_LINE_TYPE lineNumber);
 
-void UnityAssertEqualDoubleArray(UNITY_PTR_ATTRIBUTE const UNITY_DOUBLE* expected,
-                                 UNITY_PTR_ATTRIBUTE const UNITY_DOUBLE* actual,
-                                 const UNITY_UINT32 num_elements,
+void UnityAssertDoublesNotWithin(const UNITY_DOUBLE delta,
+                                 const UNITY_DOUBLE expected,
+                                 const UNITY_DOUBLE actual,
                                  const char* msg,
-                                 const UNITY_LINE_TYPE lineNumber,
-                                 const UNITY_FLAGS_T flags);
+                                 const UNITY_LINE_TYPE lineNumber);
+
+void UnityAssertGreaterOrLessDouble(const UNITY_DOUBLE threshold,
+                                    const UNITY_DOUBLE actual,
+                                    const UNITY_COMPARISON_T compare,
+                                    const char* msg,
+                                    const UNITY_LINE_TYPE linenumber);
+
+void UnityAssertWithinDoubleArray(const UNITY_DOUBLE delta,
+                                  UNITY_PTR_ATTRIBUTE const UNITY_DOUBLE* expected,
+                                  UNITY_PTR_ATTRIBUTE const UNITY_DOUBLE* actual,
+                                  const UNITY_UINT32 num_elements,
+                                  const char* msg,
+                                  const UNITY_LINE_TYPE lineNumber,
+                                  const UNITY_FLAGS_T flags);
 
 void UnityAssertDoubleSpecial(const UNITY_DOUBLE actual,
                               const char* msg,
@@ -698,25 +769,56 @@ extern const char UnityStrErrShorthand[];
  * Test Running Macros
  *-------------------------------------------------------*/
 
+#ifdef UNITY_TEST_PROTECT
+#define TEST_PROTECT() UNITY_TEST_PROTECT()
+#else
 #ifndef UNITY_EXCLUDE_SETJMP_H
 #define TEST_PROTECT() (setjmp(Unity.AbortFrame) == 0)
-#define TEST_ABORT() longjmp(Unity.AbortFrame, 1)
 #else
 #define TEST_PROTECT() 1
+#endif
+#endif
+
+#ifdef UNITY_TEST_ABORT
+#define TEST_ABORT() UNITY_TEST_ABORT()
+#else
+#ifndef UNITY_EXCLUDE_SETJMP_H
+#define TEST_ABORT() longjmp(Unity.AbortFrame, 1)
+#else
 #define TEST_ABORT() return
+#endif
+#endif
+
+/* Automatically enable variadic macros support, if it not enabled before */
+#ifndef UNITY_SUPPORT_VARIADIC_MACROS
+  #ifdef __STDC_VERSION__
+    #if __STDC_VERSION__ >= 199901L
+      #define UNITY_SUPPORT_VARIADIC_MACROS
+    #endif
+  #endif
 #endif
 
 /* This tricky series of macros gives us an optional line argument to treat it as RUN_TEST(func, num=__LINE__) */
 #ifndef RUN_TEST
-#ifdef __STDC_VERSION__
-#if __STDC_VERSION__ >= 199901L
-#define UNITY_SUPPORT_VARIADIC_MACROS
-#endif
-#endif
 #ifdef UNITY_SUPPORT_VARIADIC_MACROS
 #define RUN_TEST(...) RUN_TEST_AT_LINE(__VA_ARGS__, __LINE__, throwaway)
 #define RUN_TEST_AT_LINE(func, line, ...) UnityDefaultTestRun(func, #func, line)
 #endif
+#endif
+
+/* Enable default macros for masking param tests test cases */
+#ifdef UNITY_SUPPORT_TEST_CASES
+  #ifdef UNITY_SUPPORT_VARIADIC_MACROS
+    #if !defined(TEST_CASE) && !defined(UNITY_EXCLUDE_TEST_CASE)
+      #define TEST_CASE(...)
+    #endif
+    #if !defined(TEST_RANGE) && !defined(UNITY_EXCLUDE_TEST_RANGE)
+      #define TEST_RANGE(...)
+    #endif
+    #if !defined(TEST_MATRIX) && !defined(UNITY_EXCLUDE_TEST_MATRIX)
+      #define TEST_MATRIX(...)
+    #endif
+  #endif
 #endif
 
 /* If we can't do the tricky version, we'll just have to require them to always include the line number */
@@ -773,7 +875,7 @@ int UnityTestMatches(void);
  * Test Asserts
  *-------------------------------------------------------*/
 
-#define UNITY_TEST_ASSERT(condition, line, message)                                              do {if (condition) {} else {UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), (message));}} while(0)
+#define UNITY_TEST_ASSERT(condition, line, message)                                              do { if (condition) { /* nothing*/ } else { UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), (message)); } } while (0)
 #define UNITY_TEST_ASSERT_NULL(pointer, line, message)                                           UNITY_TEST_ASSERT(((pointer) == NULL),  (UNITY_LINE_TYPE)(line), (message))
 #define UNITY_TEST_ASSERT_NOT_NULL(pointer, line, message)                                       UNITY_TEST_ASSERT(((pointer) != NULL),  (UNITY_LINE_TYPE)(line), (message))
 #define UNITY_TEST_ASSERT_EMPTY(pointer, line, message)                                          UNITY_TEST_ASSERT(((pointer[0]) == 0),  (UNITY_LINE_TYPE)(line), (message))
@@ -876,7 +978,7 @@ int UnityTestMatches(void);
 #define UNITY_TEST_ASSERT_INT16_ARRAY_WITHIN(delta, expected, actual, num_elements, line, message)   UnityAssertNumbersArrayWithin((UNITY_UINT16)(delta), (UNITY_INTERNAL_PTR)(expected), (UNITY_INTERNAL_PTR)(actual), ((UNITY_UINT32)(num_elements)), (message), (UNITY_LINE_TYPE)(line), UNITY_DISPLAY_STYLE_INT16, UNITY_ARRAY_TO_ARRAY)
 #define UNITY_TEST_ASSERT_INT32_ARRAY_WITHIN(delta, expected, actual, num_elements, line, message)   UnityAssertNumbersArrayWithin((UNITY_UINT32)(delta), (UNITY_INTERNAL_PTR)(expected), (UNITY_INTERNAL_PTR)(actual), ((UNITY_UINT32)(num_elements)), (message), (UNITY_LINE_TYPE)(line), UNITY_DISPLAY_STYLE_INT32, UNITY_ARRAY_TO_ARRAY)
 #define UNITY_TEST_ASSERT_UINT_ARRAY_WITHIN(delta, expected, actual, num_elements, line, message)    UnityAssertNumbersArrayWithin(              (delta), (UNITY_INTERNAL_PTR)(expected), (UNITY_INTERNAL_PTR)(actual), ((UNITY_UINT32)(num_elements)), (message), (UNITY_LINE_TYPE)(line), UNITY_DISPLAY_STYLE_UINT, UNITY_ARRAY_TO_ARRAY)
-#define UNITY_TEST_ASSERT_UINT8_ARRAY_WITHIN(delta, expected, actual, num_elements, line, message)  UnityAssertNumbersArrayWithin( (UNITY_UINT16)(delta), (UNITY_INTERNAL_PTR)(expected), (UNITY_INTERNAL_PTR)(actual), ((UNITY_UINT32)(num_elements)), (message), (UNITY_LINE_TYPE)(line), UNITY_DISPLAY_STYLE_UINT8, UNITY_ARRAY_TO_ARRAY)
+#define UNITY_TEST_ASSERT_UINT8_ARRAY_WITHIN(delta, expected, actual, num_elements, line, message)   UnityAssertNumbersArrayWithin((UNITY_UINT8 )(delta), (UNITY_INTERNAL_PTR)(expected), (UNITY_INTERNAL_PTR)(actual), ((UNITY_UINT32)(num_elements)), (message), (UNITY_LINE_TYPE)(line), UNITY_DISPLAY_STYLE_UINT8, UNITY_ARRAY_TO_ARRAY)
 #define UNITY_TEST_ASSERT_UINT16_ARRAY_WITHIN(delta, expected, actual, num_elements, line, message)  UnityAssertNumbersArrayWithin((UNITY_UINT16)(delta), (UNITY_INTERNAL_PTR)(expected), (UNITY_INTERNAL_PTR)(actual), ((UNITY_UINT32)(num_elements)), (message), (UNITY_LINE_TYPE)(line), UNITY_DISPLAY_STYLE_UINT16, UNITY_ARRAY_TO_ARRAY)
 #define UNITY_TEST_ASSERT_UINT32_ARRAY_WITHIN(delta, expected, actual, num_elements, line, message)  UnityAssertNumbersArrayWithin((UNITY_UINT32)(delta), (UNITY_INTERNAL_PTR)(expected), (UNITY_INTERNAL_PTR)(actual), ((UNITY_UINT32)(num_elements)), (message), (UNITY_LINE_TYPE)(line), UNITY_DISPLAY_STYLE_UINT32, UNITY_ARRAY_TO_ARRAY)
 #define UNITY_TEST_ASSERT_HEX8_ARRAY_WITHIN(delta, expected, actual, num_elements, line, message)    UnityAssertNumbersArrayWithin((UNITY_UINT8 )(delta), (UNITY_INTERNAL_PTR)(expected), (UNITY_INTERNAL_PTR)(actual), ((UNITY_UINT32)(num_elements)), (message), (UNITY_LINE_TYPE)(line), UNITY_DISPLAY_STYLE_HEX8, UNITY_ARRAY_TO_ARRAY)
@@ -982,9 +1084,16 @@ int UnityTestMatches(void);
 
 #ifdef UNITY_EXCLUDE_FLOAT
 #define UNITY_TEST_ASSERT_FLOAT_WITHIN(delta, expected, actual, line, message)                   UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrFloat)
+#define UNITY_TEST_ASSERT_FLOAT_NOT_WITHIN(delta, expected, actual, line, message)               UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrFloat)
 #define UNITY_TEST_ASSERT_EQUAL_FLOAT(expected, actual, line, message)                           UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrFloat)
+#define UNITY_TEST_ASSERT_NOT_EQUAL_FLOAT(expected, actual, line, message)                       UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrFloat)
+#define UNITY_TEST_ASSERT_FLOAT_ARRAY_WITHIN(delta, expected, actual, num_elements, line, message)  UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrFloat)
 #define UNITY_TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected, actual, num_elements, line, message)       UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrFloat)
 #define UNITY_TEST_ASSERT_EACH_EQUAL_FLOAT(expected, actual, num_elements, line, message)        UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrFloat)
+#define UNITY_TEST_ASSERT_GREATER_THAN_FLOAT(threshold, actual, line, message)                   UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrFloat)
+#define UNITY_TEST_ASSERT_GREATER_OR_EQUAL_FLOAT(threshold, actual, line, message)               UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrFloat)
+#define UNITY_TEST_ASSERT_LESS_THAN_FLOAT(threshold, actual, line, message)                      UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrFloat)
+#define UNITY_TEST_ASSERT_LESS_OR_EQUAL_FLOAT(threshold, actual, line, message)                  UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrFloat)
 #define UNITY_TEST_ASSERT_FLOAT_IS_INF(actual, line, message)                                    UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrFloat)
 #define UNITY_TEST_ASSERT_FLOAT_IS_NEG_INF(actual, line, message)                                UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrFloat)
 #define UNITY_TEST_ASSERT_FLOAT_IS_NAN(actual, line, message)                                    UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrFloat)
@@ -995,9 +1104,16 @@ int UnityTestMatches(void);
 #define UNITY_TEST_ASSERT_FLOAT_IS_NOT_DETERMINATE(actual, line, message)                        UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrFloat)
 #else
 #define UNITY_TEST_ASSERT_FLOAT_WITHIN(delta, expected, actual, line, message)                   UnityAssertFloatsWithin((UNITY_FLOAT)(delta), (UNITY_FLOAT)(expected), (UNITY_FLOAT)(actual), (message), (UNITY_LINE_TYPE)(line))
+#define UNITY_TEST_ASSERT_FLOAT_NOT_WITHIN(delta, expected, actual, line, message)               UnityAssertFloatsNotWithin((UNITY_FLOAT)(delta), (UNITY_FLOAT)(expected), (UNITY_FLOAT)(actual), (message), (UNITY_LINE_TYPE)(line))
 #define UNITY_TEST_ASSERT_EQUAL_FLOAT(expected, actual, line, message)                           UNITY_TEST_ASSERT_FLOAT_WITHIN((UNITY_FLOAT)(expected) * (UNITY_FLOAT)UNITY_FLOAT_PRECISION, (UNITY_FLOAT)(expected), (UNITY_FLOAT)(actual), (UNITY_LINE_TYPE)(line), (message))
-#define UNITY_TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected, actual, num_elements, line, message)       UnityAssertEqualFloatArray((UNITY_FLOAT*)(expected), (UNITY_FLOAT*)(actual), (UNITY_UINT32)(num_elements), (message), (UNITY_LINE_TYPE)(line), UNITY_ARRAY_TO_ARRAY)
-#define UNITY_TEST_ASSERT_EACH_EQUAL_FLOAT(expected, actual, num_elements, line, message)        UnityAssertEqualFloatArray(UnityFloatToPtr(expected), (UNITY_FLOAT*)(actual), (UNITY_UINT32)(num_elements), (message), (UNITY_LINE_TYPE)(line), UNITY_ARRAY_TO_VAL)
+#define UNITY_TEST_ASSERT_NOT_EQUAL_FLOAT(expected, actual, line, message)                       UNITY_TEST_ASSERT_FLOAT_NOT_WITHIN((UNITY_FLOAT)(expected) * (UNITY_FLOAT)UNITY_FLOAT_PRECISION, (UNITY_FLOAT)(expected), (UNITY_FLOAT)(actual), (UNITY_LINE_TYPE)(line), (message))
+#define UNITY_TEST_ASSERT_FLOAT_ARRAY_WITHIN(delta, expected, actual, num_elements, line, message)  UnityAssertWithinFloatArray((UNITY_FLOAT)(delta), (const UNITY_FLOAT*)(expected), (const UNITY_FLOAT*)(actual), (UNITY_UINT32)(num_elements), (message), (UNITY_LINE_TYPE)(line), UNITY_ARRAY_TO_ARRAY)
+#define UNITY_TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected, actual, num_elements, line, message)       UnityAssertWithinFloatArray((UNITY_FLOAT)0, (const UNITY_FLOAT*)(expected), (const UNITY_FLOAT*)(actual), (UNITY_UINT32)(num_elements), (message), (UNITY_LINE_TYPE)(line), UNITY_ARRAY_TO_ARRAY)
+#define UNITY_TEST_ASSERT_EACH_EQUAL_FLOAT(expected, actual, num_elements, line, message)        UnityAssertWithinFloatArray((UNITY_FLOAT)0, UnityFloatToPtr(expected), (const UNITY_FLOAT*)(actual), (UNITY_UINT32)(num_elements), (message), (UNITY_LINE_TYPE)(line), UNITY_ARRAY_TO_VAL)
+#define UNITY_TEST_ASSERT_GREATER_THAN_FLOAT(threshold, actual, line, message)                   UnityAssertGreaterOrLessFloat((UNITY_FLOAT)(threshold), (UNITY_FLOAT)(actual), UNITY_GREATER_THAN, (message), (UNITY_LINE_TYPE)(line))
+#define UNITY_TEST_ASSERT_GREATER_OR_EQUAL_FLOAT(threshold, actual, line, message)               UnityAssertGreaterOrLessFloat((UNITY_FLOAT)(threshold), (UNITY_FLOAT)(actual), UNITY_GREATER_OR_EQUAL, (message), (UNITY_LINE_TYPE)(line))
+#define UNITY_TEST_ASSERT_LESS_THAN_FLOAT(threshold, actual, line, message)                      UnityAssertGreaterOrLessFloat((UNITY_FLOAT)(threshold), (UNITY_FLOAT)(actual), UNITY_SMALLER_THAN, (message), (UNITY_LINE_TYPE)(line))
+#define UNITY_TEST_ASSERT_LESS_OR_EQUAL_FLOAT(threshold, actual, line, message)                  UnityAssertGreaterOrLessFloat((UNITY_FLOAT)(threshold), (UNITY_FLOAT)(actual), UNITY_SMALLER_OR_EQUAL, (message), (UNITY_LINE_TYPE)(line))
 #define UNITY_TEST_ASSERT_FLOAT_IS_INF(actual, line, message)                                    UnityAssertFloatSpecial((UNITY_FLOAT)(actual), (message), (UNITY_LINE_TYPE)(line), UNITY_FLOAT_IS_INF)
 #define UNITY_TEST_ASSERT_FLOAT_IS_NEG_INF(actual, line, message)                                UnityAssertFloatSpecial((UNITY_FLOAT)(actual), (message), (UNITY_LINE_TYPE)(line), UNITY_FLOAT_IS_NEG_INF)
 #define UNITY_TEST_ASSERT_FLOAT_IS_NAN(actual, line, message)                                    UnityAssertFloatSpecial((UNITY_FLOAT)(actual), (message), (UNITY_LINE_TYPE)(line), UNITY_FLOAT_IS_NAN)
@@ -1010,9 +1126,16 @@ int UnityTestMatches(void);
 
 #ifdef UNITY_EXCLUDE_DOUBLE
 #define UNITY_TEST_ASSERT_DOUBLE_WITHIN(delta, expected, actual, line, message)                  UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrDouble)
+#define UNITY_TEST_ASSERT_DOUBLE_NOT_WITHIN(delta, expected, actual, line, message)              UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrDouble)
 #define UNITY_TEST_ASSERT_EQUAL_DOUBLE(expected, actual, line, message)                          UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrDouble)
+#define UNITY_TEST_ASSERT_NOT_EQUAL_DOUBLE(expected, actual, line, message)                      UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrDouble)
+#define UNITY_TEST_ASSERT_DOUBLE_ARRAY_WITHIN(delta, expected, actual, num_elements, line, message) UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrDouble)
 #define UNITY_TEST_ASSERT_EQUAL_DOUBLE_ARRAY(expected, actual, num_elements, line, message)      UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrDouble)
 #define UNITY_TEST_ASSERT_EACH_EQUAL_DOUBLE(expected, actual, num_elements, line, message)       UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrDouble)
+#define UNITY_TEST_ASSERT_GREATER_THAN_DOUBLE(threshold, actual, line, message)                  UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrDouble)
+#define UNITY_TEST_ASSERT_GREATER_OR_EQUAL_DOUBLE(threshold, actual, line, message)              UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrDouble)
+#define UNITY_TEST_ASSERT_LESS_THAN_DOUBLE(threshold, actual, line, message)                     UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrDouble)
+#define UNITY_TEST_ASSERT_LESS_OR_EQUAL_DOUBLE(threshold, actual, line, message)                 UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrDouble)
 #define UNITY_TEST_ASSERT_DOUBLE_IS_INF(actual, line, message)                                   UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrDouble)
 #define UNITY_TEST_ASSERT_DOUBLE_IS_NEG_INF(actual, line, message)                               UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrDouble)
 #define UNITY_TEST_ASSERT_DOUBLE_IS_NAN(actual, line, message)                                   UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrDouble)
@@ -1023,9 +1146,16 @@ int UnityTestMatches(void);
 #define UNITY_TEST_ASSERT_DOUBLE_IS_NOT_DETERMINATE(actual, line, message)                       UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), UnityStrErrDouble)
 #else
 #define UNITY_TEST_ASSERT_DOUBLE_WITHIN(delta, expected, actual, line, message)                  UnityAssertDoublesWithin((UNITY_DOUBLE)(delta), (UNITY_DOUBLE)(expected), (UNITY_DOUBLE)(actual), (message), (UNITY_LINE_TYPE)(line))
+#define UNITY_TEST_ASSERT_DOUBLE_NOT_WITHIN(delta, expected, actual, line, message)              UnityAssertDoublesNotWithin((UNITY_DOUBLE)(delta), (UNITY_DOUBLE)(expected), (UNITY_DOUBLE)(actual), (message), (UNITY_LINE_TYPE)(line))
 #define UNITY_TEST_ASSERT_EQUAL_DOUBLE(expected, actual, line, message)                          UNITY_TEST_ASSERT_DOUBLE_WITHIN((UNITY_DOUBLE)(expected) * (UNITY_DOUBLE)UNITY_DOUBLE_PRECISION, (UNITY_DOUBLE)(expected), (UNITY_DOUBLE)(actual), (UNITY_LINE_TYPE)(line), (message))
-#define UNITY_TEST_ASSERT_EQUAL_DOUBLE_ARRAY(expected, actual, num_elements, line, message)      UnityAssertEqualDoubleArray((UNITY_DOUBLE*)(expected), (UNITY_DOUBLE*)(actual), (UNITY_UINT32)(num_elements), (message), (UNITY_LINE_TYPE)(line), UNITY_ARRAY_TO_ARRAY)
-#define UNITY_TEST_ASSERT_EACH_EQUAL_DOUBLE(expected, actual, num_elements, line, message)       UnityAssertEqualDoubleArray(UnityDoubleToPtr(expected), (UNITY_DOUBLE*)(actual), (UNITY_UINT32)(num_elements), (message), (UNITY_LINE_TYPE)(line), UNITY_ARRAY_TO_VAL)
+#define UNITY_TEST_ASSERT_NOT_EQUAL_DOUBLE(expected, actual, line, message)                      UNITY_TEST_ASSERT_DOUBLE_NOT_WITHIN((UNITY_DOUBLE)(expected) * (UNITY_DOUBLE)UNITY_DOUBLE_PRECISION, (UNITY_DOUBLE)(expected), (UNITY_DOUBLE)(actual), (UNITY_LINE_TYPE)(line), (message))
+#define UNITY_TEST_ASSERT_DOUBLE_ARRAY_WITHIN(delta, expected, actual, num_elements, line, message) UnityAssertWithinDoubleArray((UNITY_DOUBLE)(delta), (const UNITY_DOUBLE*)(expected), (const UNITY_DOUBLE*)(actual), (UNITY_UINT32)(num_elements), (message), (UNITY_LINE_TYPE)(line), UNITY_ARRAY_TO_ARRAY)
+#define UNITY_TEST_ASSERT_EQUAL_DOUBLE_ARRAY(expected, actual, num_elements, line, message)      UnityAssertWithinDoubleArray((UNITY_DOUBLE)0, (const UNITY_DOUBLE*)(expected), (const UNITY_DOUBLE*)(actual), (UNITY_UINT32)(num_elements), (message), (UNITY_LINE_TYPE)(line), UNITY_ARRAY_TO_ARRAY)
+#define UNITY_TEST_ASSERT_EACH_EQUAL_DOUBLE(expected, actual, num_elements, line, message)       UnityAssertWithinDoubleArray((UNITY_DOUBLE)0, UnityDoubleToPtr(expected), (const UNITY_DOUBLE*)(actual), (UNITY_UINT32)(num_elements), (message), (UNITY_LINE_TYPE)(line), UNITY_ARRAY_TO_VAL)
+#define UNITY_TEST_ASSERT_GREATER_THAN_DOUBLE(threshold, actual, line, message)                  UnityAssertGreaterOrLessDouble((UNITY_DOUBLE)(threshold), (UNITY_DOUBLE)(actual), UNITY_GREATER_THAN, (message), (UNITY_LINE_TYPE)(line))
+#define UNITY_TEST_ASSERT_GREATER_OR_EQUAL_DOUBLE(threshold, actual, line, message)              UnityAssertGreaterOrLessDouble((UNITY_DOUBLE)(threshold), (UNITY_DOUBLE)(actual), UNITY_GREATER_OR_EQUAL, (message), (UNITY_LINE_TYPE)(line))
+#define UNITY_TEST_ASSERT_LESS_THAN_DOUBLE(threshold, actual, line, message)                     UnityAssertGreaterOrLessDouble((UNITY_DOUBLE)(threshold), (UNITY_DOUBLE)(actual), UNITY_SMALLER_THAN, (message), (UNITY_LINE_TYPE)(line))
+#define UNITY_TEST_ASSERT_LESS_OR_EQUAL_DOUBLE(threshold, actual, line, message)                 UnityAssertGreaterOrLessDouble((UNITY_DOUBLE)(threshold), (UNITY_DOUBLE)(actual), UNITY_SMALLER_OR_EQUAL, (message), (UNITY_LINE_TYPE)(line))
 #define UNITY_TEST_ASSERT_DOUBLE_IS_INF(actual, line, message)                                   UnityAssertDoubleSpecial((UNITY_DOUBLE)(actual), (message), (UNITY_LINE_TYPE)(line), UNITY_FLOAT_IS_INF)
 #define UNITY_TEST_ASSERT_DOUBLE_IS_NEG_INF(actual, line, message)                               UnityAssertDoubleSpecial((UNITY_DOUBLE)(actual), (message), (UNITY_LINE_TYPE)(line), UNITY_FLOAT_IS_NEG_INF)
 #define UNITY_TEST_ASSERT_DOUBLE_IS_NAN(actual, line, message)                                   UnityAssertDoubleSpecial((UNITY_DOUBLE)(actual), (message), (UNITY_LINE_TYPE)(line), UNITY_FLOAT_IS_NAN)

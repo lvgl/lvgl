@@ -14,7 +14,7 @@ static void run_test(UnityTestFunction func, const char* name, UNITY_LINE_TYPE l
     if (TEST_PROTECT())
     {
 <% if @options[:plugins].include?(:cexception) %>
-        CEXCEPTION_T e;
+        volatile CEXCEPTION_T e;
         Try {
             <%= @options[:setup_name] %>();
             func();
