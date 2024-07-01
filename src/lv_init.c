@@ -21,6 +21,7 @@
 #include "libs/libjpeg_turbo/lv_libjpeg_turbo.h"
 #include "libs/lodepng/lv_lodepng.h"
 #include "libs/libpng/lv_libpng.h"
+#include "libs/jpegdec/lv_jpegdec.h"
 #include "draw/lv_draw.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs.h"
@@ -285,6 +286,10 @@ void lv_init(void)
     lv_fs_arduino_sd_init();
 #endif
 
+#if LV_USE_JPEGDEC
+    lv_jpegdec_init();
+#endif
+
 #if LV_USE_LODEPNG
     lv_lodepng_init();
 #endif
@@ -363,6 +368,10 @@ void lv_deinit(void)
 
 #if LV_USE_THEME_DEFAULT
     lv_theme_default_deinit();
+#endif
+
+#if LV_USE_JPEGDEC
+    lv_jpegdec_deinit();
 #endif
 
 #if LV_USE_THEME_SIMPLE

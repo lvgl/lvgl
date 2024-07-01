@@ -2475,6 +2475,15 @@
     #endif
 #endif
 
+/* JPEGDEC decoder library*/
+#ifndef LV_USE_JPEGDEC
+    #ifdef CONFIG_LV_USE_JPEGDEC
+        #define LV_USE_JPEGDEC CONFIG_LV_USE_JPEGDEC
+    #else
+        #define LV_USE_JPEGDEC 0
+    #endif
+#endif
+
 /* JPG + split JPG decoder library.
  * Split JPG is a custom format optimized for embedded systems. */
 #ifndef LV_USE_TJPGD
