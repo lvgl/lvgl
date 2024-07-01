@@ -696,11 +696,9 @@ static void scale_calculate_main_compensation(lv_obj_t * obj)
     lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
 
     uint32_t tick_idx = 0;
-    uint32_t major_tick_idx = 0;
     for(tick_idx = 0; tick_idx < total_tick_count; tick_idx++) {
 
         const bool is_major_tick = tick_idx % scale->major_tick_every == 0;
-        if(is_major_tick) major_tick_idx++;
 
         const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count - 1, scale->range_min, scale->range_max);
 
