@@ -150,8 +150,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area_p,
 
 static lv_display_t * lcd_init(int fd, int hor_res, int ver_res)
 {
-    lv_color_t * draw_buf = NULL;
-    lv_color_t * draw_buf_2 = NULL;
+    uint8_t * draw_buf = NULL;
+    uint8_t * draw_buf_2 = NULL;
     lv_nuttx_lcd_t * lcd = lv_malloc_zeroed(sizeof(lv_nuttx_lcd_t));
     LV_ASSERT_MALLOC(lcd);
     if(lcd == NULL) {

@@ -30,14 +30,7 @@ A minimal example using STM32CubeIDE, and HAL. \* When setting up
 select **System Core** -> **SYS** and ensure that **Timebase Source** is
 set to **SysTick**. \* Configure any other peripherals (including the
 LCD panel), and initialise them in *main.c*. \* ``#include "lvgl.h"`` in
-the *main.c* file. \* Create some frame buffer(s) as global variables:
-
-.. code:: c
-
-   //Frame buffers
-   /*Static or global buffer(s). The second buffer is optional*/
-   static lv_color_t buf_1[BUFF_SIZE]; //TODO: Chose a buffer size. DISPLAY_WIDTH * 10 is one suggestion.
-   static lv_color_t buf_2[BUFF_SIZE];
+the *main.c* file. \*
 
 - In your ``main()`` function, after initialising your CPU,
   peripherals, and LCD panel, call :cpp:func:`lv_init` to initialise LVGL.
@@ -47,12 +40,31 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
 
 .. code:: c
 
+   //Frame buffers
+   uint8_t * buf_1 = NULL;
+   uint8_t * buf_2 = NULL;
+
    //Initialise LVGL UI library
    lv_init();
 
    lv_display_t * disp = lv_display_create(WIDTH, HEIGHT); /*Basic initialization with horizontal and vertical resolution in pixels*/
    lv_display_set_flush_cb(disp, my_flush_cb); /*Set a flush callback to draw to the display*/
-   lv_display_set_buffers(disp, buf_1, buf_2, sizeof(buf_1), LV_DISPLAY_RENDER_MODE_PARTIAL); /*Set an initialized buffer*/
+
+   //Allocate frame buffers (DISPLAY_WIDTH * 10 is one suggestion).
+   uint32_t buf_size = DISPLAY_WIDTH * 10 * lv_color_format_get_size(lv_display_get_color_format(display));
+   buf_1 = lv_malloc(buf_size); 
+   if(buf_1 == NULL) {
+       LV_LOG_ERROR("display draw buffer malloc failed");
+       return;
+   }
+
+   buf_2 = lv_malloc(buf_size);
+   if(buf_2 == NULL) {
+       LV_LOG_ERROR("display draw buffer malloc failed");
+       lv_free(buf_1);
+       return;
+   }
+   lv_display_set_buffers(disp, buf_1, buf_2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL); /*Set an initialized buffer*/
 
 - Create some dummy objects to test the output:
 
@@ -145,13 +157,6 @@ that we have not used Mutexes in this example, however LVGL is* **NOT**
 \* ``#include "lvgl.h"`` \* Create your frame buffer(s) as global
 variables:
 
-.. code:: c
-
-   //Frame buffers
-   /*Static or global buffer(s). The second buffer is optional*/
-   static lv_color_t buf_1[BUFF_SIZE]; //TODO: Declare your own BUFF_SIZE appropriate to your system.
-   static lv_color_t buf_2[BUFF_SIZE];
-
 - In your ``main`` function, after your peripherals (SPI, GPIOs, LCD
   etc) have been initialised, initialise LVGL using :cpp:func:`lv_init`,
   create a new display driver using :cpp:func:`lv_display_create`, and
@@ -159,10 +164,29 @@ variables:
 
 .. code:: c
 
+   /*Frame buffers. The second buffer is optional*/
+   uint8_t * buf_1 = NULL;
+   uint8_t * buf_2 = NULL;
+   
    //Initialise LVGL UI library
    lv_init();
    lv_display_t *display = lv_display_create(WIDTH, HEIGHT); /*Create the display*/
    lv_display_set_flush_cb(display, my_flush_cb);        /*Set a flush callback to draw to the display*/
+   //TODO: Set your own buf_size appropriate to your system.
+   uint32_t buf_size = WIDTH * 10 * lv_color_format_get_size(lv_display_get_color_format(display));
+   buf_1 = lv_malloc(buf_size); 
+   if(buf_1 == NULL) {
+       LV_LOG_ERROR("display draw buffer malloc failed");
+       return;
+   }
+
+   buf_2 = lv_malloc(buf_size);
+   if(buf_2 == NULL) {
+       LV_LOG_ERROR("display draw buffer malloc failed");
+       lv_free(buf_1);
+       return;
+   }
+   lv_display_set_buffers(disp, buf_1, buf_2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL); /*Set an initialized buffer*/
 
    // Register the touch controller with LVGL - Not included here for brevity.
 

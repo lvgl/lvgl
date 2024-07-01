@@ -63,22 +63,60 @@ void lv_port_disp_init(void)
 
     /* Example 1
      * One buffer for partial rendering*/
-    static lv_color_t buf_1_1[MY_DISP_HOR_RES * 10];                          /*A buffer for 10 rows*/
-    lv_display_set_buffers(disp, buf_1_1, NULL, sizeof(buf_1_1), LV_DISPLAY_RENDER_MODE_PARTIAL);
+    uint8_t * buf_1_1 = NULL;
+    uint32_t buf_size = MY_DISP_HOR_RES * 10 * lv_color_format_get_size(lv_display_get_color_format(disp));
+
+    buf_1_1 = lv_malloc(buf_size);                                            /*A buffer for 10 rows*/
+    if(buf_1_1 == NULL) {
+        LV_LOG_ERROR("display draw buffer malloc failed");
+        return;
+    }
+
+    lv_display_set_buffers(disp, buf_1_1, NULL, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     /* Example 2
      * Two buffers for partial rendering
      * In flush_cb DMA or similar hardware should be used to update the display in the background.*/
-    static lv_color_t buf_2_1[MY_DISP_HOR_RES * 10];
-    static lv_color_t buf_2_2[MY_DISP_HOR_RES * 10];
-    lv_display_set_buffers(disp, buf_2_1, buf_2_2, sizeof(buf_2_1), LV_DISPLAY_RENDER_MODE_PARTIAL);
+    uint8_t * buf_2_1 = NULL;
+    uint8_t * buf_2_2 = NULL;
+    uint32_t buf_size = MY_DISP_HOR_RES * 10 * lv_color_format_get_size(lv_display_get_color_format(disp));
+
+    buf_2_1 = lv_malloc(buf_size);
+    if(buf_2_1 == NULL) {
+        LV_LOG_ERROR("display draw buffer malloc failed");
+        return;
+    }
+
+    buf_2_2 = lv_malloc(buf_size);
+    if(buf_2_2 == NULL) {
+        LV_LOG_ERROR("display draw buffer malloc failed");
+        lv_free(buf_2_1);
+        return;
+    }
+
+    lv_display_set_buffers(disp, buf_2_1, buf_2_2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     /* Example 3
      * Two buffers screen sized buffer for double buffering.
      * Both LV_DISPLAY_RENDER_MODE_DIRECT and LV_DISPLAY_RENDER_MODE_FULL works, see their comments*/
-    static lv_color_t buf_3_1[MY_DISP_HOR_RES * MY_DISP_VER_RES];
-    static lv_color_t buf_3_2[MY_DISP_HOR_RES * MY_DISP_VER_RES];
-    lv_display_set_buffers(disp, buf_3_1, buf_3_2, sizeof(buf_3_1), LV_DISPLAY_RENDER_MODE_DIRECT);
+    uint8_t * buf_3_1 = NULL;
+    uint8_t * buf_3_2 = NULL;
+    uint32_t buf_size = MY_DISP_HOR_RES * MY_DISP_VER_RES * lv_color_format_get_size(lv_display_get_color_format(disp));
+
+    buf_3_1 = lv_malloc(buf_size);
+    if(buf_3_1 == NULL) {
+        LV_LOG_ERROR("display draw buffer malloc failed");
+        return;
+    }
+
+    buf_3_2 = lv_malloc(buf_size);
+    if(buf_3_2 == NULL) {
+        LV_LOG_ERROR("display draw buffer malloc failed");
+        lv_free(buf_3_1);
+        return;
+    }
+
+    lv_display_set_buffers(disp, buf_3_1, buf_3_2, buf_size, LV_DISPLAY_RENDER_MODE_DIRECT);
 
 }
 

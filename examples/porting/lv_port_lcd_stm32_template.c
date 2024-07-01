@@ -71,8 +71,8 @@ void lv_port_display_init(void)
     lv_display_set_rotation(lcd_disp, LV_DISPLAY_ROTATION_270);     /* set landscape orientation */
 
     /* Example: two dynamically allocated buffers for partial rendering */
-    lv_color_t * buf1 = NULL;
-    lv_color_t * buf2 = NULL;
+    uint8_t * buf1 = NULL;
+    uint8_t * buf2 = NULL;
 
     uint32_t buf_size = MY_DISP_HOR_RES * MY_DISP_VER_RES / 10 * lv_color_format_get_size(lv_display_get_color_format(
                                                                                               lcd_disp));
