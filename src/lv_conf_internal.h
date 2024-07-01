@@ -293,6 +293,18 @@
     #endif
 #endif
 
+/*Using matrix for transformations.
+ *Requirements:
+    `LV_USE_MATRIX = 1`.
+    The rendering engine needs to support 3x3 matrix transformations.*/
+#ifndef LV_DRAW_TRANSFORM_USE_MATRIX
+    #ifdef CONFIG_LV_DRAW_TRANSFORM_USE_MATRIX
+        #define LV_DRAW_TRANSFORM_USE_MATRIX CONFIG_LV_DRAW_TRANSFORM_USE_MATRIX
+    #else
+        #define LV_DRAW_TRANSFORM_USE_MATRIX            0
+    #endif
+#endif
+
 /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
  * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
  * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
@@ -1267,6 +1279,16 @@
         #define LV_USE_FLOAT CONFIG_LV_USE_FLOAT
     #else
         #define LV_USE_FLOAT            0
+    #endif
+#endif
+
+/*Enable matrix support
+ *Requires `LV_USE_FLOAT = 1`*/
+#ifndef LV_USE_MATRIX
+    #ifdef CONFIG_LV_USE_MATRIX
+        #define LV_USE_MATRIX CONFIG_LV_USE_MATRIX
+    #else
+        #define LV_USE_MATRIX           0
     #endif
 #endif
 
@@ -2608,7 +2630,8 @@
     #endif
 #endif
 
-/*Enable Vector Graphic APIs*/
+/*Enable Vector Graphic APIs
+ *Requires `LV_USE_MATRIX = 1`*/
 #ifndef LV_USE_VECTOR_GRAPHIC
     #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC
         #define LV_USE_VECTOR_GRAPHIC CONFIG_LV_USE_VECTOR_GRAPHIC

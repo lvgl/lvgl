@@ -114,6 +114,12 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
     vg_lite_identity(&u->global_matrix);
     vg_lite_translate(-layer->buf_area.x1, -layer->buf_area.y1, &u->global_matrix);
 
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    vg_lite_matrix_t layer_matrix;
+    lv_vg_lite_matrix(&layer_matrix, &t->matrix);
+    lv_vg_lite_matrix_multiply(&u->global_matrix, &layer_matrix);
+#endif
+
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_LABEL:
             lv_draw_vg_lite_label(draw_unit, t->draw_dsc, &t->area);

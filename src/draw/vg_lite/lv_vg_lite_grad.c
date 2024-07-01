@@ -153,9 +153,9 @@ bool lv_vg_lite_draw_grad(
                 vg_lite_linear_gradient_t * linear_grad = &grad_item->vg.linear;
                 vg_lite_matrix_t * grad_mat_p = vg_lite_get_grad_matrix(linear_grad);
                 LV_ASSERT_NULL(grad_mat_p);
-
-                grad_point_to_matrix(grad_mat_p, grad->x1, grad->y1, grad->x2, grad->y2);
+                vg_lite_identity(grad_mat_p);
                 lv_vg_lite_matrix_multiply(grad_mat_p, grad_matrix);
+                grad_point_to_matrix(grad_mat_p, grad->x1, grad->y1, grad->x2, grad->y2);
 
                 LV_VG_LITE_ASSERT_SRC_BUFFER(&linear_grad->image);
 
@@ -314,10 +314,7 @@ bool lv_vg_lite_draw_grad_helper(
             return false;
     }
 
-    vg_lite_matrix_t grad_matrix;
-    vg_lite_identity(&grad_matrix);
-
-    return lv_vg_lite_draw_grad(u, buffer, path, &grad, &grad_matrix, matrix, fill, blend);
+    return lv_vg_lite_draw_grad(u, buffer, path, &grad, matrix, matrix, fill, blend);
 }
 
 /**********************
@@ -548,7 +545,6 @@ static grad_type_t lv_grad_style_to_type(lv_vector_gradient_style_t style)
 
 static void grad_point_to_matrix(vg_lite_matrix_t * grad_matrix, float x1, float y1, float x2, float y2)
 {
-    vg_lite_identity(grad_matrix);
     vg_lite_translate(x1, y1, grad_matrix);
 
     float angle = atan2f(y2 - y1, x2 - x1) * 180.0f / (float)M_PI;

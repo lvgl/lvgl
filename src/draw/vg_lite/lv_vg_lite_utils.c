@@ -689,6 +689,15 @@ void lv_vg_lite_rect(vg_lite_rectangle_t * rect, const lv_area_t * area)
     rect->height = lv_area_get_height(area);
 }
 
+#if LV_USE_MATRIX
+
+void lv_vg_lite_matrix(vg_lite_matrix_t * dest, const lv_matrix_t * src)
+{
+    lv_memcpy(dest, src, sizeof(lv_matrix_t));
+}
+
+#endif
+
 uint32_t lv_vg_lite_get_palette_size(vg_lite_buffer_format_t format)
 {
     uint32_t size = 0;

@@ -31,7 +31,6 @@
  **********************/
 
 static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc);
-static void lv_matrix_to_vg(vg_lite_matrix_t * desy, const lv_matrix_t * src);
 static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src);
 static void lv_path_opa_to_vg(lv_vg_lite_path_t * dest, const lv_vector_draw_dsc_t * dsc);
 static void lv_stroke_to_vg(lv_vg_lite_path_t * dest, const lv_vector_stroke_dsc_t * dsc);
@@ -105,7 +104,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
 
     /* transform matrix */
     vg_lite_matrix_t matrix;
-    lv_matrix_to_vg(&matrix, &dsc->matrix);
+    lv_vg_lite_matrix(&matrix, &dsc->matrix);
     LV_VG_LITE_ASSERT_MATRIX(&matrix);
 
     /* convert path */
@@ -178,7 +177,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                     lv_matrix_multiply(&m, &dsc->fill_dsc.matrix);
 
                     vg_lite_matrix_t pattern_matrix;
-                    lv_matrix_to_vg(&pattern_matrix, &m);
+                    lv_vg_lite_matrix(&pattern_matrix, &m);
 
                     vg_lite_color_t recolor = lv_vg_lite_color(dsc->fill_dsc.img_dsc.recolor, dsc->fill_dsc.img_dsc.recolor_opa, true);
 
@@ -205,7 +204,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
             break;
         case LV_VECTOR_DRAW_STYLE_GRADIENT: {
                 vg_lite_matrix_t grad_matrix;
-                lv_matrix_to_vg(&grad_matrix, &dsc->fill_dsc.matrix);
+                lv_vg_lite_matrix(&grad_matrix, &dsc->fill_dsc.matrix);
 
                 lv_vg_lite_draw_grad(
                     u,
@@ -235,11 +234,6 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     }
 
     LV_PROFILER_END;
-}
-
-static void lv_matrix_to_vg(vg_lite_matrix_t * dest, const lv_matrix_t * src)
-{
-    lv_memcpy(dest, src, sizeof(lv_matrix_t));
 }
 
 static vg_lite_quality_t lv_quality_to_vg(lv_vector_path_quality_t quality)

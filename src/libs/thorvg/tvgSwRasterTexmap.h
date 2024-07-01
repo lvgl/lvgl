@@ -836,11 +836,13 @@ static AASpans* _AASpans(float ymin, float ymax, const SwImage* image, const SwB
     //Initialize X range
     auto height = yEnd - yStart;
 
-    aaSpans->lines = static_cast<AALine*>(calloc(height, sizeof(AALine)));
+    aaSpans->lines = static_cast<AALine*>(malloc(height * sizeof(AALine)));
 
     for (int32_t i = 0; i < height; i++) {
         aaSpans->lines[i].x[0] = INT32_MAX;
-        aaSpans->lines[i].x[1] = INT32_MIN;
+        aaSpans->lines[i].x[1] = 0;
+        aaSpans->lines[i].length[0] = 0;
+        aaSpans->lines[i].length[1] = 0;
     }
     return aaSpans;
 }

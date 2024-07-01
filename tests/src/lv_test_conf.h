@@ -104,10 +104,6 @@ typedef void * lv_user_data_t;
 #define  LV_DPI_DEF         130
 #endif
 
-#if defined(LVGL_CI_USING_SYS_HEAP)
-#undef LV_USE_FLOAT
-#endif
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
