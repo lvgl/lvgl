@@ -150,6 +150,9 @@ typedef struct _lv_image_decoder_t lv_image_decoder_t;
 
 typedef uint32_t lv_prop_id_t;
 
+struct _lv_draw_buf_t;
+typedef struct _lv_draw_buf_t lv_draw_buf_t;
+
 #if LV_USE_OBJ_PROPERTY
 struct _lv_property_name_t;
 typedef struct _lv_property_name_t lv_property_name_t;

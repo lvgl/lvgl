@@ -360,7 +360,7 @@ static bool tiny_ttf_cache_create_cb(tiny_ttf_cache_data_t * node, void * user_d
     int w, h;
     w = x2 - x1 + 1;
     h = y2 - y1 + 1;
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create_user(font_draw_buf_handlers, w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
     if(NULL == draw_buf) {
         LV_LOG_ERROR("tiny_ttf: out of memory");
         return false;
@@ -379,7 +379,7 @@ static void tiny_ttf_cache_free_cb(tiny_ttf_cache_data_t * node, void * user_dat
 {
     LV_UNUSED(user_data);
 
-    lv_draw_buf_destroy_user(font_draw_buf_handlers, node->draw_buf);
+    lv_draw_buf_destroy(node->draw_buf);
 }
 
 static lv_cache_compare_res_t tiny_ttf_cache_compare_cb(const tiny_ttf_cache_data_t * lhs,
