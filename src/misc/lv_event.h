@@ -45,6 +45,9 @@ typedef enum {
     LV_EVENT_PRESSING,            /**< The object is being pressed (called continuously while pressing)*/
     LV_EVENT_PRESS_LOST,          /**< The object is still being pressed but slid cursor/finger off of the object */
     LV_EVENT_SHORT_CLICKED,       /**< The object was pressed for a short period of time, then released it. Not called if scrolled.*/
+    LV_EVENT_SINGLE_CLICKED,      /**< Called for the first short click within a small distance and short time*/
+    LV_EVENT_DOUBLE_CLICKED,      /**< Called for the second short click within small distance and short time*/
+    LV_EVENT_TRIPLE_CLICKED,      /**< Called for the third short click within small distance and short time*/
     LV_EVENT_LONG_PRESSED,        /**< Object has been pressed for at least `long_press_time`.  Not called if scrolled.*/
     LV_EVENT_LONG_PRESSED_REPEAT, /**< Called after `long_press_time` in every `long_press_repeat_time` ms.  Not called if scrolled.*/
     LV_EVENT_CLICKED,             /**< Called on release if not scrolled (regardless to long press)*/

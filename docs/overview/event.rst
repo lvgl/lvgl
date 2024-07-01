@@ -109,10 +109,13 @@ Input device events
 -  :cpp:enumerator:`LV_EVENT_PRESSED`: The object has been pressed
 -  :cpp:enumerator:`LV_EVENT_PRESSING`: The object is being pressed (called continuously while pressing)
 -  :cpp:enumerator:`LV_EVENT_PRESS_LOST`: The object is still being pressed but slid cursor/finger off of the object
--  :cpp:enumerator:`LV_EVENT_SHORT_CLICKED`: The object was pressed for a short period of time, then released it. Not called if scrolled.
+-  :cpp:enumerator:`LV_EVENT_SHORT_CLICKED`: The object was pressed for a short period of time, and then released without scrolling.
+-  :cpp:enumerator:`LV_EVENT_SINGLE_CLICKED`: The object was pressed for a short period of time, and then released without scrolling, for the first time in a click streak. A click streak refers to multiple short clicks within a short period of time and a small distance.
+-  :cpp:enumerator:`LV_EVENT_DOUBLE_CLICKED`: The object was pressed for a short period of time, and then released without scrolling, for the second time in a click streak.
+-  :cpp:enumerator:`LV_EVENT_TRIPLE_CLICKED`: The object was pressed for a short period of time, and then released without scrolling, for the third time in a click streak.
 -  :cpp:enumerator:`LV_EVENT_LONG_PRESSED`: Object has been pressed for at least `long_press_time`.  Not called if scrolled.
 -  :cpp:enumerator:`LV_EVENT_LONG_PRESSED_REPEAT`: Called after `long_press_time` in every `long_press_repeat_time` ms.  Not called if scrolled.
--  :cpp:enumerator:`LV_EVENT_CLICKED`: Called on release if not scrolled (regardless to long press)
+-  :cpp:enumerator:`LV_EVENT_CLICKED`: Called on release if not scrolled (regardless of long press)
 -  :cpp:enumerator:`LV_EVENT_RELEASED`: Called in every cases when the object has been released
 -  :cpp:enumerator:`LV_EVENT_SCROLL_BEGIN`: Scrolling begins. The event parameter is a pointer to the animation of the scroll. Can be modified
 -  :cpp:enumerator:`LV_EVENT_SCROLL_THROW_BEGIN`: 
