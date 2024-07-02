@@ -265,11 +265,20 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
 void lv_observer_remove(lv_observer_t * observer);
 
 /**
- * Remove all observers from their subject related to an object
+ * Remove all observers of an object from a subject
  * @param observer      pointer to an observer
  * @param obj           pointer to an object
+ * @note This functions can be used e.g. when a subject is deleted
  */
 void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj);
+
+/**
+ * Remove the observers of an object from a subject or all subjects
+ * @param obj       the object whose observers should be removed
+ * @param subject   the subject to remove the object from, or `NULL` to remove from all subjects
+ * @note This function can be used e.g. when an object's subject(s) needs to be replaced by other subject(s)
+ */
+void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject);
 
 /**
  * Get the target of an observer

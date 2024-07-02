@@ -356,6 +356,7 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
     return observer;
 }
 
+
 void lv_observer_remove(lv_observer_t * observer)
 {
     LV_ASSERT_NULL(observer);
@@ -400,6 +401,23 @@ void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj)
             lv_observer_remove(observer);
         }
         observer = observer_next;
+    }
+}
+
+
+void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
+{
+    int32_t i;
+    int32_t event_cnt = (int32_t)(obj->spec_attr ? lv_array_size(&obj->spec_attr->event_list) : 0);
+    for(i = event_cnt - 1; i >= 0; i--) {
+        lv_event_dsc_t * event_dsc = lv_array_at(&obj->spec_attr->event_list, i);
+        if(event_dsc->cb == unsubscribe_on_delete_cb) {
+            lv_observer_t * observer = event_dsc->user_data;
+            if(subject == NULL || subject == observer->subject) {
+                lv_observer_remove(observer);
+                lv_obj_remove_event(obj, i);
+            }
+        }
     }
 }
 
