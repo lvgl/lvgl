@@ -49,6 +49,8 @@ void lv_sdl_window_set_title(lv_display_t * disp, const char * title);
 
 void * lv_sdl_window_get_renderer(lv_display_t * disp);
 
+void lv_sdl_window_set_position(lv_display_t * disp, uint32_t x, uint32_t y);
+
 void lv_sdl_quit();
 
 /**********************
