@@ -316,10 +316,6 @@ void lv_init(void)
     lv_freetype_init(LV_FREETYPE_CACHE_FT_GLYPH_CNT);
 #endif
 
-#if LV_USE_TINY_TTF
-    lv_tiny_ttf_init();
-#endif
-
     lv_initialized = true;
 
     LV_LOG_TRACE("finished");
@@ -355,10 +351,6 @@ void lv_deinit(void)
 
 #if LV_USE_FREETYPE
     lv_freetype_uninit();
-#endif
-
-#if LV_USE_TINY_TTF
-    lv_tiny_ttf_deinit();
 #endif
 
 #if LV_USE_THEME_DEFAULT
