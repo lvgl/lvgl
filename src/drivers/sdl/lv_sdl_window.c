@@ -200,6 +200,12 @@ void * lv_sdl_window_get_renderer(lv_display_t * disp)
     return dsc->renderer;
 }
 
+void lv_sdl_window_set_position(lv_display_t * disp, uint32_t x, uint32_t y)
+{
+    lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    SDL_SetWindowPosition(dsc->window, x, y);
+}
+
 void lv_sdl_quit()
 {
     if(inited) {
