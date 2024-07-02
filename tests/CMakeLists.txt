@@ -387,6 +387,7 @@ endif()
 if(WIN32)
     add_definitions(-DLV_USE_LINUX_FBDEV=0)
     add_definitions(-DLV_USE_WINDOWS=1)
+    add_definitions(-DLV_USE_OS=LV_OS_WINDOWS)
 endif()
 
 # disable test targets for build only tests

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_windows_input.c
  *
  */
@@ -128,7 +128,6 @@ lv_indev_t * lv_windows_acquire_keypad_indev(lv_display_t * display)
     }
 
     if(!context->keypad.indev) {
-        InitializeCriticalSection(&context->keypad.mutex);
         _lv_ll_init(
             &context->keypad.queue,
             sizeof(lv_windows_keypad_queue_item_t));
@@ -421,8 +420,6 @@ static void lv_windows_keypad_driver_read_callback(
         return;
     }
 
-    EnterCriticalSection(&context->keypad.mutex);
-
     lv_windows_keypad_queue_item_t * current = (lv_windows_keypad_queue_item_t *)(
                                                    _lv_ll_get_head(&context->keypad.queue));
     if(current) {
@@ -434,8 +431,6 @@ static void lv_windows_keypad_driver_read_callback(
 
         data->continue_reading = true;
     }
-
-    LeaveCriticalSection(&context->keypad.mutex);
 }
 
 static void lv_windows_release_keypad_device_event_callback(lv_event_t * e)
@@ -456,7 +451,6 @@ static void lv_windows_release_keypad_device_event_callback(lv_event_t * e)
         return;
     }
 
-    DeleteCriticalSection(&context->keypad.mutex);
     _lv_ll_clear(&context->keypad.queue);
     context->keypad.utf16_high_surrogate = 0;
     context->keypad.utf16_low_surrogate = 0;
@@ -571,8 +565,6 @@ bool lv_windows_keypad_device_window_message_handler(
                 lv_windows_window_context_t * context = (lv_windows_window_context_t *)(
                                                             lv_windows_get_window_context(hWnd));
                 if(context) {
-                    EnterCriticalSection(&context->keypad.mutex);
-
                     bool skip_translation = false;
                     uint32_t translated_key = 0;
 
@@ -627,8 +619,6 @@ bool lv_windows_keypad_device_window_message_handler(
                              ? LV_INDEV_STATE_RELEASED
                              : LV_INDEV_STATE_PRESSED));
                     }
-
-                    LeaveCriticalSection(&context->keypad.mutex);
                 }
 
                 break;
@@ -637,8 +627,6 @@ bool lv_windows_keypad_device_window_message_handler(
                 lv_windows_window_context_t * context = (lv_windows_window_context_t *)(
                                                             lv_windows_get_window_context(hWnd));
                 if(context) {
-                    EnterCriticalSection(&context->keypad.mutex);
-
                     uint16_t raw_code_point = (uint16_t)(wParam);
 
                     if(raw_code_point >= 0x20 && raw_code_point != 0x7F) {
@@ -677,8 +665,6 @@ bool lv_windows_keypad_device_window_message_handler(
                             lvgl_code_point,
                             LV_INDEV_STATE_RELEASED);
                     }
-
-                    LeaveCriticalSection(&context->keypad.mutex);
                 }
 
                 break;
