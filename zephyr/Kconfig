@@ -1,0 +1,3 @@
+if LVGL
+rsource "../Kconfig"
+endif
