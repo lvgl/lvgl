@@ -27,7 +27,18 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_demo_vector_graphic(void);
+
+/**
+ * Draw many vector based shapes and paths to canvas.
+ * It requires a large amount of RAM for the buffer of the canvas
+ */
+void lv_demo_vector_graphic_buffered(void);
+
+/**
+ * Draw many vector based shapes and paths to canvas directly to the screen.
+ * It's slower as the graphics needs to rendered on each rendering cycle.
+ */
+void lv_demo_vector_graphic_not_buffered(void);
 
 /**********************
  *      MACROS
