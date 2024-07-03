@@ -156,6 +156,9 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
     uint32_t stride = draw_buf->header.stride;
     uint8_t * dest = src;
 
+    /* Temporarily disable invalidation to improve the efficiency of lv_canvas_set_px */
+    lv_display_enable_invalidation(lv_obj_get_display(obj), false);
+
     for(int32_t x = 0; x < barcode_w; x++) {
         lv_color_t color = lv_color_hex(out_buf[x] ? 0 : 1);
 
@@ -185,6 +188,9 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
             dest += stride;
         }
     }
+
+    lv_display_enable_invalidation(lv_obj_get_display(obj), true);
+    lv_obj_invalidate(obj);
 
     res = LV_RESULT_OK;
 
