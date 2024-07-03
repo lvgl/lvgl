@@ -37,13 +37,12 @@ void test_barcode_normal(void)
     TEST_ASSERT_EQUAL(lv_barcode_get_scale(barcode), scale);
 
     lv_barcode_set_direction(barcode, LV_DIR_HOR);
+    lv_obj_set_height(barcode, 50);
     lv_result_t res = lv_barcode_update(barcode, "https://lvgl.io");
     TEST_ASSERT_EQUAL(res, LV_RESULT_OK);
 
     lv_image_dsc_t * image_dsc = lv_canvas_get_image(barcode);
     TEST_ASSERT_NOT_NULL(image_dsc);
-
-    lv_obj_set_size(barcode, image_dsc->header.w, 50);
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_1.png");
 
     lv_barcode_set_direction(barcode, LV_DIR_VER);
