@@ -59,32 +59,39 @@ lv_obj_t * lv_gif_create(lv_obj_t * parent)
 void lv_gif_set_src(lv_obj_t * obj, const void * src)
 {
     lv_gif_t * gifobj = (lv_gif_t *) obj;
+    gd_GIF * gif = gifobj->gif;
 
     /*Close previous gif if any*/
-    if(gifobj->gif) {
+    if(gif != NULL) {
         lv_image_cache_drop(lv_image_get_src(obj));
 
-        gd_close_gif(gifobj->gif);
+        gd_close_gif(gif);
         gifobj->gif = NULL;
         gifobj->imgdsc.data = NULL;
     }
 
     if(lv_image_src_get_type(src) == LV_IMAGE_SRC_VARIABLE) {
         const lv_image_dsc_t * img_dsc = src;
-        gifobj->gif = gd_open_gif_data(img_dsc->data);
+        gif = gd_open_gif_data(img_dsc->data);
     }
     else if(lv_image_src_get_type(src) == LV_IMAGE_SRC_FILE) {
-        gifobj->gif = gd_open_gif_file(src);
+        gif = gd_open_gif_file(src);
     }
-    if(gifobj->gif == NULL) {
+    if(gif == NULL) {
         LV_LOG_WARN("Couldn't load the source");
         return;
     }
 
-    gifobj->imgdsc.data = gifobj->gif->canvas;
+    gifobj->gif = gif;
+    gifobj->imgdsc.data = gif->canvas;
+    gifobj->imgdsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+    gifobj->imgdsc.header.flags = LV_IMAGE_FLAGS_MODIFIABLE;
     gifobj->imgdsc.header.cf = LV_COLOR_FORMAT_ARGB8888;
-    gifobj->imgdsc.header.h = gifobj->gif->height;
-    gifobj->imgdsc.header.w = gifobj->gif->width;
+    gifobj->imgdsc.header.h = gif->height;
+    gifobj->imgdsc.header.w = gif->width;
+    gifobj->imgdsc.header.stride = gif->width * 4;
+    gifobj->imgdsc.data_size = gif->width * gif->height * 4;
+
     gifobj->last_call = lv_tick_get();
 
     lv_image_set_src(obj, &gifobj->imgdsc);
