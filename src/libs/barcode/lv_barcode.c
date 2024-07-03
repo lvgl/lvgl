@@ -152,7 +152,7 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
     lv_canvas_set_palette(obj, 1, lv_color_to_32(barcode->light_color, 0xff));
 
     lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
-    uint8_t * src = draw_buf->data + LV_COLOR_INDEXED_PALETTE_SIZE(draw_buf->header.cf) * sizeof(lv_color32_t);
+    uint8_t * src = lv_draw_buf_goto_xy(draw_buf, 0, 0);
     uint32_t stride = draw_buf->header.stride;
     uint8_t * dest = src;
 
