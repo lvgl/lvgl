@@ -381,7 +381,7 @@ static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * 
     /* Path to draw */
     int32_t path_data[RECT_PATH_DATA_MAX_SIZE];
     uint32_t path_data_size;
-    vglite_create_rect_path_data(path_data, &path_data_size, 0, coords);
+    vglite_create_rect_path_data(path_data, &path_data_size, dsc->clip_radius, coords);
     vg_lite_quality_t path_quality = VG_LITE_MEDIUM;
 
     vg_lite_path_t path;
