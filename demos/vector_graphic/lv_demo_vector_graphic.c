@@ -251,8 +251,8 @@ static void event_cb(lv_event_t * e)
     lv_layer_t * layer = lv_event_get_layer(e);
 
     draw_vector(layer);
-
 }
+
 /**********************
  *  STATIC VARIABLES
  **********************/
