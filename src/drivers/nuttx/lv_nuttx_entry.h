@@ -88,7 +88,7 @@ void lv_nuttx_deinit_custom(lv_nuttx_result_t * result);
 /**
  * Call `lv_timer_handler()` (LVGL's super loop) in an endless loop.
  * If LV_USE_NUTTX_LIBUV is enabled an UV timer will be created,
- * else  will be called in a loop with some sleep.
+ * else `lv_timer_handler()` will be called in a loop with some sleep.
  * @param result pointer to a variable initialized by `lv_nuttx_init()` or `lv_nuttx_init_custom()`
  */
 void lv_nuttx_run(lv_nuttx_result_t * result);
