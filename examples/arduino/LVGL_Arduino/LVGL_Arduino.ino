@@ -123,7 +123,7 @@ void setup()
 
      lv_example_btn_1();
 
-     * Or try out a demo. Don't forget to enable the demos in lv_conf.h. E.g. LV_USE_DEMOS_WIDGETS
+     * Or try out a demo. Don't forget to enable the demos in lv_conf.h. E.g. LV_USE_DEMO_WIDGETS
      * -------------------------------------------------------------------------------------------
 
      lv_demo_widgets();
