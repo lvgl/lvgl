@@ -28,6 +28,7 @@
 static void lv_barcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static bool lv_barcode_change_buf_size(lv_obj_t * obj, int32_t w, int32_t h);
+static void lv_barcode_clear(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -100,6 +101,7 @@ void lv_barcode_set_tiled(lv_obj_t * obj, bool tiled)
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
     barcode->tiled = tiled;
+    lv_image_set_inner_align(obj, tiled ? LV_IMAGE_ALIGN_TILE : LV_IMAGE_ALIGN_DEFAULT);
 }
 
 lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
@@ -112,6 +114,7 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
 
     if(data == NULL || lv_strlen(data) == 0) {
         LV_LOG_WARN("data is empty");
+        lv_barcode_clear(obj);
         return LV_RESULT_INVALID;
     }
 
@@ -122,6 +125,7 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
     LV_ASSERT_MALLOC(out_buf);
     if(!out_buf) {
         LV_LOG_ERROR("malloc failed for out_buf");
+        lv_barcode_clear(obj);
         return LV_RESULT_INVALID;
     }
 
@@ -145,19 +149,19 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
     }
 
     if(!lv_barcode_change_buf_size(obj, buf_w, buf_h)) {
+        lv_barcode_clear(obj);
         goto failed;
     }
+
+    /* Temporarily disable invalidation to improve the efficiency of lv_canvas_set_px */
+    lv_display_enable_invalidation(lv_obj_get_display(obj), false);
 
     lv_canvas_set_palette(obj, 0, lv_color_to_32(barcode->dark_color, 0xff));
     lv_canvas_set_palette(obj, 1, lv_color_to_32(barcode->light_color, 0xff));
 
     lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
-    uint8_t * src = lv_draw_buf_goto_xy(draw_buf, 0, 0);
     uint32_t stride = draw_buf->header.stride;
-    uint8_t * dest = src;
-
-    /* Temporarily disable invalidation to improve the efficiency of lv_canvas_set_px */
-    lv_display_enable_invalidation(lv_obj_get_display(obj), false);
+    uint8_t * dest = lv_draw_buf_goto_xy(draw_buf, 0, 0);
 
     for(int32_t x = 0; x < barcode_w; x++) {
         lv_color_t color = lv_color_hex(out_buf[x] ? 0 : 1);
@@ -182,6 +186,7 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
     if(!barcode->tiled && barcode->direction == LV_DIR_HOR && buf_h > 1) {
         /* Skip the first row */
         int32_t h = buf_h - 1;
+        uint8_t * src = lv_draw_buf_goto_xy(draw_buf, 0, 0);
         dest = src + stride;
         while(h--) {
             lv_memcpy(dest, src, stride);
@@ -236,7 +241,6 @@ static void lv_barcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     barcode->light_color = lv_color_white();
     barcode->scale = 1;
     barcode->direction = LV_DIR_HOR;
-    lv_image_set_inner_align(obj, LV_IMAGE_ALIGN_TILE);
 }
 
 static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
@@ -254,7 +258,10 @@ static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 static bool lv_barcode_change_buf_size(lv_obj_t * obj, int32_t w, int32_t h)
 {
     LV_ASSERT_NULL(obj);
-    LV_ASSERT(w > 0);
+    if(w <= 0 || h <= 0) {
+        LV_LOG_WARN("invalid size: %" LV_PRId32 " x %" LV_PRId32, w, h);
+        return false;
+    }
 
     lv_draw_buf_t * old_buf = lv_canvas_get_draw_buf(obj);
     lv_draw_buf_t * new_buf = lv_draw_buf_create(w, h, LV_COLOR_FORMAT_I1, LV_STRIDE_AUTO);
@@ -268,6 +275,18 @@ static bool lv_barcode_change_buf_size(lv_obj_t * obj, int32_t w, int32_t h)
 
     if(old_buf != NULL) lv_draw_buf_destroy(old_buf);
     return true;
+}
+
+static void lv_barcode_clear(lv_obj_t * obj)
+{
+    lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
+    if(!draw_buf) {
+        return;
+    }
+
+    lv_draw_buf_clear(draw_buf, NULL);
+    lv_image_cache_drop(draw_buf);
+    lv_obj_invalidate(obj);
 }
 
 #endif /*LV_USE_BARCODE*/
