@@ -332,7 +332,7 @@ void test_observer_label_text_normal(void)
     TEST_ASSERT_EQUAL_STRING("world", lv_label_get_text(obj));
 
     /*Remove the label from the subject*/
-    lv_subject_remove_all_obj(&subject_string, obj);
+    lv_obj_remove_from_subject(obj, &subject_string);
     lv_subject_copy_string(&subject_string, "nothing");
     TEST_ASSERT_EQUAL_STRING("world", lv_label_get_text(obj));
 
@@ -346,7 +346,7 @@ void test_observer_label_text_normal(void)
     TEST_ASSERT_EQUAL_STRING("WORLD", lv_label_get_text(obj));
 
     /*Remove the label from the subject*/
-    lv_subject_remove_all_obj(&subject_pointer, obj);
+    lv_obj_remove_from_subject(obj, &subject_pointer);
     lv_subject_copy_string(&subject_pointer, "NOTHING");
     TEST_ASSERT_EQUAL_STRING("WORLD", lv_label_get_text(obj));
 }
@@ -373,7 +373,7 @@ void test_observer_label_text_formatted(void)
     TEST_ASSERT_EQUAL_STRING("value: -20", lv_label_get_text(obj));
 
     /*Remove the label from the subject*/
-    lv_subject_remove_all_obj(&subject_int, obj);
+    lv_obj_remove_from_subject(obj, &subject_int);
     lv_subject_set_int(&subject_int, 100);
     TEST_ASSERT_EQUAL_STRING("value: -20", lv_label_get_text(obj));
 
@@ -388,7 +388,7 @@ void test_observer_label_text_formatted(void)
     TEST_ASSERT_EQUAL_STRING("text: world", lv_label_get_text(obj));
 
     /*Remove the label from the subject*/
-    lv_subject_remove_all_obj(&subject_string, obj);
+    lv_obj_remove_from_subject(obj, &subject_string);
     lv_subject_copy_string(&subject_string, "nothing");
     TEST_ASSERT_EQUAL_STRING("text: world", lv_label_get_text(obj));
 
@@ -402,7 +402,7 @@ void test_observer_label_text_formatted(void)
     TEST_ASSERT_EQUAL_STRING("pointer: WORLD", lv_label_get_text(obj));
 
     /*Remove the label from the subject*/
-    lv_subject_remove_all_obj(&subject_pointer, obj);
+    lv_obj_remove_from_subject(obj, &subject_pointer);
     lv_subject_copy_string(&subject_pointer, "NOTHING");
     TEST_ASSERT_EQUAL_STRING("pointer: WORLD", lv_label_get_text(obj));
 }
