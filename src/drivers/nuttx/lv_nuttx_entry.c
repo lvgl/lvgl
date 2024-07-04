@@ -27,7 +27,6 @@
 
 #define nuttx_ctx_p (LV_GLOBAL_DEFAULT()->nuttx_ctx)
 
-
 #if (LV_USE_FREETYPE || LV_USE_THORVG)
     #define LV_NUTTX_MIN_STACK_SIZE (32 * 1024)
 #else
