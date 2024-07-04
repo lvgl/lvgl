@@ -240,7 +240,6 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         }
         decoded->data = jd->workbuf;
         decoded->header = dsc->header;
-        decoded->header.stride = mx * 3;
     }
 
     decoded_area->x1 += mx;
@@ -253,8 +252,12 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         decoded_area->y2 += my;
     }
 
-    decoded->header.w = mx;
-    decoded->header.h = my;
+    if(decoded_area->x2 >= jd->width) decoded_area->x2 = jd->width - 1;
+    if(decoded_area->y2 >= jd->height) decoded_area->y2 = jd->height - 1;
+
+    decoded->header.w = lv_area_get_width(decoded_area);
+    decoded->header.h = lv_area_get_height(decoded_area);
+    decoded->header.stride = decoded->header.w * 3;
     decoded->data_size = decoded->header.stride * decoded->header.h;
 
     /* Process restart interval if enabled */
