@@ -205,6 +205,8 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
     lv_display_enable_invalidation(lv_obj_get_display(obj), true);
     lv_obj_invalidate(obj);
 
+    lv_free(out_buf);
+
     return LV_RESULT_OK;
 }
 
