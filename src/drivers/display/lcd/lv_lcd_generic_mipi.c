@@ -295,7 +295,7 @@ static void set_rotation(lv_lcd_generic_mipi_driver_t * drv, lv_display_rotation
             break;
         case LV_DISPLAY_ROTATION_90:
             set_swap_xy(drv, !drv->swap_xy);
-            set_mirror(drv, !drv->mirror_x, drv->mirror_y);
+            set_mirror(drv, drv->mirror_x, !drv->mirror_y);
             break;
         case LV_DISPLAY_ROTATION_180:
             set_swap_xy(drv, drv->swap_xy);
@@ -303,7 +303,7 @@ static void set_rotation(lv_lcd_generic_mipi_driver_t * drv, lv_display_rotation
             break;
         case LV_DISPLAY_ROTATION_270:
             set_swap_xy(drv, !drv->swap_xy);
-            set_mirror(drv, drv->mirror_x, !drv->mirror_y);
+            set_mirror(drv, !drv->mirror_x, drv->mirror_y);
             break;
     }
     send_cmd(drv, LV_LCD_CMD_SET_ADDRESS_MODE, (uint8_t[]) {
