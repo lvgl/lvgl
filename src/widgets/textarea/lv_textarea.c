@@ -72,6 +72,7 @@ const lv_obj_class_t lv_textarea_class = {
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .width_def = LV_DPI_DEF * 2,
     .height_def = LV_DPI_DEF,
+    .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .instance_size = sizeof(lv_textarea_t),
     .base_class = &lv_obj_class,
     .name = "textarea",
