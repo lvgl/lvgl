@@ -90,7 +90,7 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
 static const void * ttf_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 static void ttf_release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc);
 static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size_t data_size,
-                                      int32_t font_size, bool kerning,
+                                      int32_t font_size, lv_font_kerning_t kerning,
                                       size_t cache_size);
 
 static bool tiny_ttf_glyph_cache_create_cb(tiny_ttf_glyph_cache_data_t * node, void * user_data);
@@ -133,7 +133,7 @@ void lv_tiny_ttf_set_size(lv_font_t * font, int32_t font_size)
     font->line_height = (int32_t)(dsc->scale * (dsc->ascent - dsc->descent + line_gap));
     font->base_line = (int32_t)(dsc->scale * (line_gap - dsc->descent));
 
-    // size change means cache needs to be invalidated.
+    /* size change means cache needs to be invalidated. */
 
     if(dsc->glyph_cache) {
         lv_cache_destroy(dsc->glyph_cache, NULL);
