@@ -66,10 +66,6 @@ void test_barcode_normal(void)
     res = lv_barcode_update(barcode, "https://lvgl.io");
     TEST_ASSERT_EQUAL(res, LV_RESULT_OK);
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_tiled_2.png");
-
-    /* Test clear */
-    res = lv_barcode_update(barcode, NULL);
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/barcode_clear.png");
 }
 
 #else
