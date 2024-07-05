@@ -584,6 +584,52 @@
     #endif
 #endif
 
+/*Use TSi's aka (Think Silicon) NemaGFX */
+#ifndef LV_USE_NEMA_GFX
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_NEMA_GFX
+            #define LV_USE_NEMA_GFX CONFIG_LV_USE_NEMA_GFX
+        #else
+            #define LV_USE_NEMA_GFX 0
+        #endif
+    #else
+        #define LV_USE_NEMA_GFX 1
+    #endif
+#endif
+
+#if LV_USE_NEMA_GFX
+    /*Enable Vector Graphics Operations. Available only if NemaVG library is present*/
+    #ifndef LV_USE_NEMA_VG
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_NEMA_VG
+                #define LV_USE_NEMA_VG CONFIG_LV_USE_NEMA_VG
+            #else
+                #define LV_USE_NEMA_VG 0
+            #endif
+        #else
+            #define LV_USE_NEMA_VG 1
+        #endif
+    #endif
+
+    #if LV_USE_NEMA_VG == 1
+        /*Define application's resolution used for VG related buffer allocation */
+        #ifndef LV_NEMA_GFX_RESX
+            #ifdef CONFIG_LV_NEMA_GFX_RESX
+                #define LV_NEMA_GFX_RESX CONFIG_LV_NEMA_GFX_RESX
+            #else
+                #define LV_NEMA_GFX_RESX 800
+            #endif
+        #endif
+        #ifndef LV_NEMA_GFX_RESY
+            #ifdef CONFIG_LV_NEMA_GFX_RESY
+                #define LV_NEMA_GFX_RESY CONFIG_LV_NEMA_GFX_RESY
+            #else
+                #define LV_NEMA_GFX_RESY 600
+            #endif
+        #endif
+    #endif
+#endif
+
 /** Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
 #ifndef LV_USE_DRAW_VGLITE
     #ifdef CONFIG_LV_USE_DRAW_VGLITE

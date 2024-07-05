@@ -207,6 +207,20 @@
     #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS    0
 #endif
 
+/*Use TSi's aka (Think Silicon) NemaGFX */
+#define LV_USE_NEMA_GFX 1
+
+#if LV_USE_NEMA_GFX
+    /*Enable Vector Graphics Operations. Available only if NemaVG library is present*/
+    #define LV_USE_NEMA_VG 1
+
+    #if LV_USE_NEMA_VG == 1
+        /*Define application's resolution used for VG related buffer allocation */
+        #define LV_NEMA_GFX_RESX 800
+        #define LV_NEMA_GFX_RESY 600
+    #endif
+#endif
+
 /** Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
 #define LV_USE_DRAW_VGLITE 0
 
