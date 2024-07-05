@@ -62,6 +62,12 @@ typedef uint8_t lv_opa_t;
 #define LV_OPA_MIN 2    /*Opacities below this will be transparent*/
 #define LV_OPA_MAX 253  /*Opacities above this will fully cover*/
 
+/**
+ * Get the pixel size of a color format in bits, bpp
+ * @param cf        a color format (`LV_COLOR_FORMAT_...`)
+ * @return          the pixel size in bits
+ * @sa              lv_color_format_get_bpp
+ */
 #define LV_COLOR_FORMAT_GET_BPP(cf) (       \
                                             (cf) == LV_COLOR_FORMAT_I1 ? 1 :        \
                                             (cf) == LV_COLOR_FORMAT_A1 ? 1 :        \
@@ -207,8 +213,9 @@ typedef uint8_t lv_color_format_t;
 
 /**
  * Get the pixel size of a color format in bits, bpp
- * @param src_cf    a color format (`LV_COLOR_FORMAT_...`)
+ * @param cf        a color format (`LV_COLOR_FORMAT_...`)
  * @return          the pixel size in bits
+ * @sa              LV_COLOR_FORMAT_GET_BPP
  */
 uint8_t lv_color_format_get_bpp(lv_color_format_t cf);
 
