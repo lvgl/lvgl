@@ -126,11 +126,11 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     /* Flush the D-Cache if enabled and the image was successfully opened */
     if(dsc->args.flush_cache && res == LV_RESULT_OK && dsc->decoded != NULL) {
         lv_draw_buf_flush_cache(dsc->decoded, NULL);
-        LV_LOG_INFO("Flushed D-cache: src %p (%s) (W%" LV_PRIu32 " x H%" LV_PRIu32 ", data: %p cf: %d)",
+        LV_LOG_INFO("Flushed D-cache: src %p (%s) (W%d x H%d, data: %p cf: %d)",
                     src,
                     dsc->src_type == LV_IMAGE_SRC_FILE ? (const char *)src : "c-array",
-                    (uint32_t)dsc->decoded->header.w,
-                    (uint32_t)dsc->decoded->header.h,
+                    dsc->decoded->header.w,
+                    dsc->decoded->header.h,
                     (void *)dsc->decoded->data,
                     dsc->decoded->header.cf);
     }
