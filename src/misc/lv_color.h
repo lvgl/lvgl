@@ -88,6 +88,14 @@ typedef uint8_t lv_opa_t;
                                             0                                       \
                                     )
 
+/**
+ * Get the pixel size of a color format in bytes
+ * @param cf        a color format (`LV_COLOR_FORMAT_...`)
+ * @return          the pixel size in bytes
+ * @sa              lv_color_format_get_size
+ */
+#define LV_COLOR_FORMAT_GET_SIZE(cf) ((LV_COLOR_FORMAT_GET_BPP(cf) + 7) >> 3)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -221,8 +229,9 @@ uint8_t lv_color_format_get_bpp(lv_color_format_t cf);
 
 /**
  * Get the pixel size of a color format in bytes
- * @param src_cf    a color format (`LV_COLOR_FORMAT_...`)
+ * @param cf        a color format (`LV_COLOR_FORMAT_...`)
  * @return          the pixel size in bytes
+ * @sa              LV_COLOR_FORMAT_GET_SIZE
  */
 static inline uint8_t lv_color_format_get_size(lv_color_format_t cf)
 {
