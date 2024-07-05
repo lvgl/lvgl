@@ -321,7 +321,7 @@ static void lv_tiny_ttf_cache_create(ttf_font_desc_t * dsc)
 }
 
 static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size_t data_size, int32_t font_size,
-                                      bool kerning, size_t cache_size)
+                                      lv_font_kerning_t kerning, size_t cache_size)
 {
     LV_UNUSED(data_size);
     if((path == NULL && data == NULL) || 0 >= font_size) {
