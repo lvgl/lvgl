@@ -109,9 +109,6 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(data);
 
-    lv_result_t res = LV_RESULT_INVALID;
-    lv_barcode_t * barcode = (lv_barcode_t *)obj;
-
     if(data == NULL || lv_strlen(data) == 0) {
         LV_LOG_WARN("data is empty");
         lv_barcode_clear(obj);
@@ -130,8 +127,9 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
     }
 
     int32_t barcode_w = (int32_t) code128_encode_gs1(data, out_buf, len);
-    LV_LOG_INFO("barcode width = %d", (int)barcode_w);
+    LV_LOG_INFO("barcode width = %" LV_PRId32, barcode_w);
 
+    lv_barcode_t * barcode = (lv_barcode_t *)obj;
     LV_ASSERT(barcode->scale > 0);
     uint16_t scale = barcode->scale;
 
@@ -150,33 +148,42 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
 
     if(!lv_barcode_change_buf_size(obj, buf_w, buf_h)) {
         lv_barcode_clear(obj);
-        goto failed;
+        lv_free(out_buf);
+        return LV_RESULT_INVALID;
     }
 
     /* Temporarily disable invalidation to improve the efficiency of lv_canvas_set_px */
     lv_display_enable_invalidation(lv_obj_get_display(obj), false);
 
-    lv_canvas_set_palette(obj, 0, lv_color_to_32(barcode->dark_color, 0xff));
-    lv_canvas_set_palette(obj, 1, lv_color_to_32(barcode->light_color, 0xff));
-
     lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
     uint32_t stride = draw_buf->header.stride;
-    uint8_t * dest = lv_draw_buf_goto_xy(draw_buf, 0, 0);
+    const lv_color_t color = lv_color_hex(1);
+
+    /* Clear the canvas */
+    lv_draw_buf_clear(draw_buf, NULL);
+
+    /* Set the palette */
+    lv_canvas_set_palette(obj, 0, lv_color_to_32(barcode->light_color, LV_OPA_COVER));
+    lv_canvas_set_palette(obj, 1, lv_color_to_32(barcode->dark_color, LV_OPA_COVER));
 
     for(int32_t x = 0; x < barcode_w; x++) {
-        lv_color_t color = lv_color_hex(out_buf[x] ? 0 : 1);
+        /*skip empty data*/
+        if(out_buf[x] == 0) {
+            continue;
+        }
 
         for(uint16_t i = 0; i < scale; i++) {
+            int32_t offset = x * scale + i;
             if(barcode->direction == LV_DIR_HOR) {
-                lv_canvas_set_px(obj, x * scale + i, 0, color, LV_OPA_COVER);
+                lv_canvas_set_px(obj, offset, 0, color, LV_OPA_COVER);
             }
-            else {
+            else { /*LV_DIR_VER*/
                 if(barcode->tiled) {
-                    lv_canvas_set_px(obj, 0, x * scale + i, color, LV_OPA_COVER);
+                    lv_canvas_set_px(obj, 0, offset, color, LV_OPA_COVER);
                 }
                 else {
-                    lv_memset(dest, lv_color_to_int(color) ? 0xFF : 0x00, stride);
-                    dest += stride;
+                    uint8_t * dest = lv_draw_buf_goto_xy(draw_buf, 0, offset);
+                    lv_memset(dest, 0xFF, stride);
                 }
             }
         }
@@ -186,22 +193,19 @@ lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
     if(!barcode->tiled && barcode->direction == LV_DIR_HOR && buf_h > 1) {
         /* Skip the first row */
         int32_t h = buf_h - 1;
-        uint8_t * src = lv_draw_buf_goto_xy(draw_buf, 0, 0);
-        dest = src + stride;
+        const uint8_t * src = lv_draw_buf_goto_xy(draw_buf, 0, 0);
+        uint8_t * dest = lv_draw_buf_goto_xy(draw_buf, 0, 1);
         while(h--) {
             lv_memcpy(dest, src, stride);
             dest += stride;
         }
     }
 
+    /* invalidate the canvas to refresh it */
     lv_display_enable_invalidation(lv_obj_get_display(obj), true);
     lv_obj_invalidate(obj);
 
-    res = LV_RESULT_OK;
-
-failed:
-    lv_free(out_buf);
-    return res;
+    return LV_RESULT_OK;
 }
 
 lv_color_t lv_barcode_get_dark_color(lv_obj_t * obj)
@@ -271,7 +275,7 @@ static bool lv_barcode_change_buf_size(lv_obj_t * obj, int32_t w, int32_t h)
     }
 
     lv_canvas_set_draw_buf(obj, new_buf);
-    LV_LOG_INFO("set canvas buffer: %p, width = %d", (void *)new_buf, (int)w);
+    LV_LOG_INFO("set canvas buffer: %p, width = %" LV_PRId32, (void *)new_buf, w);
 
     if(old_buf != NULL) lv_draw_buf_destroy(old_buf);
     return true;
