@@ -24,6 +24,10 @@
 #include "draw/lv_draw.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs.h"
+
+#if LV_USE_NEMA_GFX
+    #include "draw/nema_gfx/lv_draw_nema_gfx.h"
+#endif
 #if LV_USE_DRAW_VGLITE
     #include "draw/nxp/vglite/lv_draw_vglite.h"
 #endif
@@ -166,6 +170,10 @@ void lv_init(void)
     _lv_group_init();
 
     lv_draw_init();
+
+#if LV_USE_NEMA_GFX
+    lv_draw_nema_gfx_init();
+#endif
 
 #if LV_USE_DRAW_SW
     lv_draw_sw_init();

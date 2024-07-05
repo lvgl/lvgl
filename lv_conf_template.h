@@ -119,7 +119,7 @@
 
     /* Enable native helium assembly to be compiled */
     #define LV_USE_NATIVE_HELIUM_ASM    0
-    
+
     /* 0: use a simple renderer capable of drawing only simple rectangles with gradient, images, texts, and straight lines only
      * 1: use a complex renderer capable of drawing rounded corners, shadow, skew lines, and arcs too */
     #define LV_DRAW_SW_COMPLEX          1
@@ -141,6 +141,20 @@
 
     #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
         #define  LV_DRAW_SW_ASM_CUSTOM_INCLUDE ""
+    #endif
+#endif
+
+/*Use TSi's aka (Think Silicon) NemaGFX */
+#define LV_USE_NEMA_GFX 1
+
+#if LV_USE_NEMA_GFX
+    /*Enable Vector Graphics Operations. Available only if NemaVG library is present*/
+    #define LV_USE_NEMA_VG 1
+
+    #if LV_USE_NEMA_VG == 1
+        /*Define application's resolution used for VG related buffer allocation */
+        #define LV_NEMA_GFX_RESX 800
+        #define LV_NEMA_GFX_RESY 600
     #endif
 #endif
 
