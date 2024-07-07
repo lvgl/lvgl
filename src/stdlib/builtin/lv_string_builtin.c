@@ -262,13 +262,18 @@ char * lv_strncat(char * dst, const char * src, size_t src_len)
     return tmp;
 }
 
-char * lv_strchr(const char * str, int c)
+char * lv_strchr(const char * s, int c)
 {
-    for(; *str != 0; ++str) {
-        if(*str == c) {
-            return str;
+    for(; ; s++) {
+        if(*s == c) {
+            return (char *)s;
+        }
+
+        if(*s == '\0') {
+            break;
         }
     }
+
     return NULL;
 }
 

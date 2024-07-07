@@ -154,7 +154,7 @@ static void lv_font_recycle_close(lv_font_manager_recycle_t * manager, lv_font_r
     LV_ASSERT_NULL(recycle);
 
     LV_LOG_INFO("font: %s(%d) close", recycle->ft_info.name, recycle->ft_info.size);
-    lv_freetype_font_del(recycle->font);
+    lv_freetype_font_delete(recycle->font);
 
     _lv_ll_remove(&manager->recycle_ll, recycle);
     lv_free(recycle);
