@@ -14,13 +14,12 @@
 #include "lv_font_manager_recycle.h"
 #include "lv_font_manager_utils.h"
 #include "../../lvgl.h"
-#include <string.h>
 
 /*********************
  *      DEFINES
  *********************/
 
-#define IS_FONT_FAMILY_NAME(name) (strchr((name), ',') != NULL)
+#define IS_FONT_FAMILY_NAME(name) (lv_strchr((name), ',') != NULL)
 #define IS_FONT_HAS_FALLBACK(font) ((font)->fallback != NULL)
 
 /**********************
@@ -151,7 +150,7 @@ bool lv_font_manager_remove_path(lv_font_manager_t * manager, const char * name)
 {
     lv_font_path_t * font_path;
     _LV_LL_READ(&manager->path_ll, font_path) {
-        if(strcmp(name, font_path->name) == 0) {
+        if(lv_strcmp(name, font_path->name) == 0) {
             break;
         }
     }
@@ -177,15 +176,16 @@ bool lv_font_manager_remove_path(lv_font_manager_t * manager, const char * name)
     return true;
 }
 
-lv_font_t * lv_font_manager_create_font(lv_font_manager_t * manager, const char * name, uint16_t render_mode, uint32_t size, uint16_t style)
+lv_font_t * lv_font_manager_create_font(lv_font_manager_t * manager, const char * font_family, uint16_t render_mode,
+                                        uint32_t size, uint16_t style)
 {
 
     LV_ASSERT_NULL(manager);
-    LV_ASSERT_NULL(name);
+    LV_ASSERT_NULL(font_family);
 
     lv_freetype_info_t ft_info;
     lv_memzero(&ft_info, sizeof(ft_info));
-    ft_info.name = name;
+    ft_info.name = font_family;
     ft_info.render_mode = render_mode;
     ft_info.size = size;
     ft_info.style = style;
@@ -214,10 +214,10 @@ void lv_font_manager_delete_font(lv_font_manager_t * manager, lv_font_t * font)
 
     if(IS_FONT_HAS_FALLBACK(font)) {
         lv_font_manager_delete_font_family(manager, font);
+        return;
     }
-    else {
-        lv_font_manager_delete_font_single(manager, font);
-    }
+
+    lv_font_manager_delete_font_single(manager, font);
 }
 
 /**********************
@@ -403,7 +403,7 @@ static const char * lv_font_manager_get_path(lv_font_manager_t * manager, const 
 {
     lv_font_path_t * font_path;
     _LV_LL_READ(&manager->path_ll, font_path) {
-        if(strcmp(name, font_path->name) == 0) {
+        if(lv_strcmp(name, font_path->name) == 0) {
             return font_path->path;
         }
     }

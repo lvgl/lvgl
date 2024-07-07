@@ -76,10 +76,14 @@ bool lv_font_manager_remove_path(lv_font_manager_t * manager, const char * name)
 /**
  * Create font.
  * @param manager pointer to main font manager.
- * @param ft_info font info.
+ * @param font_family font family name.
+ * @param render_mode font render mode, see lv_freetype_font_render_mode_t.
+ * @param size font size.
+ * @param style font style, see lv_freetype_font_style_t.
  * @return point to the created font
  */
-lv_font_t * lv_font_manager_create_font(lv_font_manager_t * manager, const char * name, uint16_t render_mode, uint32_t size, uint16_t style);
+lv_font_t * lv_font_manager_create_font(lv_font_manager_t * manager, const char * font_family, uint16_t render_mode,
+                                        uint32_t size, uint16_t style);
 
 /**
  * Delete font.
