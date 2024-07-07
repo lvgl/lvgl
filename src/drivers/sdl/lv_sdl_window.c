@@ -16,7 +16,9 @@
 #include "../../lv_init.h"
 
 /* for aligned_alloc */
-#define __USE_ISOC11
+#ifndef __USE_ISOC11
+    #define __USE_ISOC11
+#endif
 #include <stdlib.h>
 
 #define SDL_MAIN_HANDLED /*To fix SDL's "undefined reference to WinMain" issue*/
