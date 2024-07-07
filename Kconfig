@@ -1423,6 +1423,15 @@ menu "LVGL configuration"
 			default y
 			help
 				This can save some memory, but not much. After the quick access bar is created, it can be hidden by clicking the button at the top left corner of the browsing area, which is very useful for small screen devices.
+	
+		config LV_USE_FONT_MANAGER
+			bool "Enable freetype font manager"
+			depends on LV_USE_FREETYPE
+			default n			
+		config LV_FONT_MANAGER_NAME_MAX_LEN
+			int "Font manager name max length"
+			depends on LV_USE_FONT_MANAGER
+			default 32
 	endmenu
 
 	menu "Devices"
