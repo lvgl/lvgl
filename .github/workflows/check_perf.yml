@@ -26,7 +26,7 @@ jobs:
       - name: Find previous successful run
         id: prev_success_run
         run: |
-          wget ${{ github.api_url }}/repos/${{ github.repository }}/actions/workflows/52959381/runs
+          wget ${{ github.api_url }}/repos/${{ github.repository }}/actions/workflows/53635437/runs
           echo "ID=$(python3 lvgl/scripts/last_success_run_id.py runs)" >> "$GITHUB_OUTPUT"
 
       - name: Retrieve previous successful run performance data
