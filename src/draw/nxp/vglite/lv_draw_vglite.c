@@ -30,7 +30,7 @@
 #define DRAW_UNIT_ID_VGLITE 2
 
 #if LV_USE_VGLITE_DRAW_ASYNC
-    #define VGLITE_TASK_BUF_SIZE 10
+    #define VGLITE_TASK_BUF_SIZE 100
 #endif
 
 /**********************
