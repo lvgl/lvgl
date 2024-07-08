@@ -106,12 +106,14 @@ d2_u32 lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(lv_color_format_t colour_format)
             d2_lvgl_mode = d2_mode_rgb565;
             break;
         case(LV_COLOR_FORMAT_RGB888):
-            d2_lvgl_mode = d2_mode_argb8888; //?
+            LV_ASSERT(0); //LV_COLOR_FORMAT_RGB888 is 3 byte format, not supported by GLCDC or D2D
             break;
         case(LV_COLOR_FORMAT_ARGB8888):
             d2_lvgl_mode = d2_mode_argb8888;
             break;
-
+        case(LV_COLOR_FORMAT_XRGB8888):
+            d2_lvgl_mode = d2_mode_argb8888;
+            break;
         default:
             LV_ASSERT(0);
             break;
