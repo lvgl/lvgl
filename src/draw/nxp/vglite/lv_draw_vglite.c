@@ -212,8 +212,6 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
             return 1;
 
         case LV_DRAW_TASK_TYPE_BORDER: {
-                const lv_draw_border_dsc_t * draw_dsc = (lv_draw_border_dsc_t *) t->draw_dsc;
-
                 if(t->preference_score > 90) {
                     t->preference_score = 90;
                     t->preferred_draw_unit_id = DRAW_UNIT_ID_VGLITE;
