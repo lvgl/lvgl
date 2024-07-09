@@ -240,7 +240,6 @@ static void draw_vector(lv_layer_t * layer)
 
 static void delete_event_cb(lv_event_t * e)
 {
-    LV_UNUSED(e);
     lv_obj_t * obj = lv_event_get_target(e);
     lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
     lv_draw_buf_destroy(draw_buf);
