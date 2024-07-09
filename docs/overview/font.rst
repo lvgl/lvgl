@@ -353,7 +353,7 @@ Convert BDF to TTF
 
 BDF are bitmap fonts where fonts are not described in outlines but in pixels. BDF files can be used but
 they must be converted into the TTF format via mkttf. This tool uses potrace to generate outlines from
-the bitmap information. The bitmap itself will be embedded into the TTF as well. lv_font_convert uses
+the bitmap information. The bitmap itself will be embedded into the TTF as well. `lv_font_conv <https://github.com/lvgl/lv_font_conv/>`__ uses
 the embedded bitmap but it also needs the outlines. One could think you can use a fake MS Bitmap
 only sfnt (ttf) (TTF without outlines) created by fontforge but this will not work.
 
