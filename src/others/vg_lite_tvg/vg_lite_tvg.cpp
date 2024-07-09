@@ -858,6 +858,8 @@ extern "C" {
             return VG_LITE_INVALID_ARGUMENT;
         }
 
+        lv_memzero(path, sizeof(vg_lite_path_t));
+
         path->format = data_format;
         path->quality = quality;
         path->bounding_box[0] = min_x;
@@ -2152,10 +2154,19 @@ static uint8_t vlc_op_arg_len(uint8_t vlc_op)
 
 static Result shape_set_stroke(std::unique_ptr<Shape> & shape, const vg_lite_path_t * path)
 {
-    /* if path is not a stroke, return */
-    if(path->path_type == VG_LITE_DRAW_ZERO
-       || path->path_type == VG_LITE_DRAW_FILL_PATH) {
-        return Result::Success;
+    switch(path->path_type) {
+        case VG_LITE_DRAW_ZERO:
+        case VG_LITE_DRAW_FILL_PATH:
+            /* if path is not a stroke, return */
+            return Result::Success;
+
+        case VG_LITE_DRAW_STROKE_PATH:
+        case VG_LITE_DRAW_FILL_STROKE_PATH:
+            break;
+
+        default:
+            LV_LOG_ERROR("unknown path type: %d", path->path_type);
+            return Result::InvalidArguments;
     }
 
     LV_ASSERT_NULL(path->stroke);
