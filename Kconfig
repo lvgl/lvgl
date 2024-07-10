@@ -380,7 +380,7 @@ menu "LVGL configuration"
 		config LV_USE_DRAW_VG_LITE
 			bool "Use VG-Lite GPU"
 			default n
-			depends on LV_USE_MATRIX
+			select LV_USE_MATRIX
 
 		config LV_VG_LITE_USE_GPU_INIT
 			bool "Enable VG-Lite custom external 'gpu_init()' function"
@@ -419,7 +419,7 @@ menu "LVGL configuration"
 		config LV_USE_VECTOR_GRAPHIC
 			bool "Use Vector Graphic APIs"
 			default n
-			depends on LV_USE_MATRIX
+			select LV_USE_MATRIX
 			help
 				Enable drawing support vector graphic APIs.
 	endmenu
@@ -705,7 +705,7 @@ menu "LVGL configuration"
 		config LV_USE_MATRIX
 			bool "Enable matrix support"
 			default n
-			depends on LV_USE_FLOAT
+			select LV_USE_FLOAT
 	endmenu
 
 	menu "Font Usage"
