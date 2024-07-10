@@ -37,7 +37,7 @@ typedef struct _lv_font_manager_t lv_font_manager_t;
 
 /**
  * Create main font manager.
- * @param recycle_cache_size size of the recycle cache.
+ * @param recycle_cache_size number of fonts that were recently deleted from the cache.
  * @return pointer to main font manager.
  */
 lv_font_manager_t * lv_font_manager_create(uint32_t recycle_cache_size);
