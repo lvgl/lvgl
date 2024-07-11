@@ -368,28 +368,20 @@
 
 /*Use TSi's aka (Think Silicon) NemaGFX */
 #ifndef LV_USE_NEMA_GFX
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_NEMA_GFX
-            #define LV_USE_NEMA_GFX CONFIG_LV_USE_NEMA_GFX
-        #else
-            #define LV_USE_NEMA_GFX 0
-        #endif
+    #ifdef CONFIG_LV_USE_NEMA_GFX
+        #define LV_USE_NEMA_GFX CONFIG_LV_USE_NEMA_GFX
     #else
-        #define LV_USE_NEMA_GFX 1
+        #define LV_USE_NEMA_GFX 0
     #endif
 #endif
 
 #if LV_USE_NEMA_GFX
     /*Enable Vector Graphics Operations. Available only if NemaVG library is present*/
     #ifndef LV_USE_NEMA_VG
-        #ifdef _LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_USE_NEMA_VG
-                #define LV_USE_NEMA_VG CONFIG_LV_USE_NEMA_VG
-            #else
-                #define LV_USE_NEMA_VG 0
-            #endif
+        #ifdef CONFIG_LV_USE_NEMA_VG
+            #define LV_USE_NEMA_VG CONFIG_LV_USE_NEMA_VG
         #else
-            #define LV_USE_NEMA_VG 1
+            #define LV_USE_NEMA_VG 0
         #endif
     #endif
 
