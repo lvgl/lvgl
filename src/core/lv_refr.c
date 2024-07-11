@@ -590,7 +590,7 @@ static void layer_reshape_draw_buf(lv_layer_t * layer)
                               lv_area_get_width(&layer->buf_area),
                               lv_area_get_height(&layer->buf_area),
                               0);
-    (void)ret; /* Unused if LV_USE_ASSERT_NULL is disabled */
+    LV_UNUSED(ret);
     LV_ASSERT_NULL(ret);
 }
 
