@@ -584,13 +584,14 @@ static void refr_invalid_areas(void)
  */
 static void layer_reshape_draw_buf(lv_layer_t * layer)
 {
-    LV_ASSERT(lv_draw_buf_reshape(
-                  layer->draw_buf,
-                  layer->color_format,
-                  lv_area_get_width(&layer->buf_area),
-                  lv_area_get_height(&layer->buf_area),
-                  0)
-              != NULL);
+    lv_draw_buf_t * ret = lv_draw_buf_reshape(
+                              layer->draw_buf,
+                              layer->color_format,
+                              lv_area_get_width(&layer->buf_area),
+                              lv_area_get_height(&layer->buf_area),
+                              0);
+    LV_UNUSED(ret);
+    LV_ASSERT_NULL(ret);
 }
 
 /**
