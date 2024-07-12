@@ -407,6 +407,11 @@ menu "LVGL configuration"
 					linear: 4K bytes.
 					radial: radius * 4K bytes.
 
+		config LV_VG_LITE_STROKE_CACHE_CNT
+			int "VG-Lite stroke maximum cache number."
+			default 32
+			depends on LV_USE_DRAW_VG_LITE
+
 		config LV_USE_VECTOR_GRAPHIC
 			bool "Use Vector Graphic APIs"
 			default n

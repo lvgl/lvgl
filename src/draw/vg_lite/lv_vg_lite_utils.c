@@ -899,10 +899,26 @@ bool lv_vg_lite_path_check(const vg_lite_path_t * path)
         return false;
     }
 
-    uint8_t end_op_code = VLC_GET_OP_CODE(end - fmt_len);
-    if(end_op_code != VLC_OP_END) {
-        LV_LOG_ERROR("%d (%s) -> is NOT VLC_OP_END", end_op_code, lv_vg_lite_vlc_op_string(end_op_code));
-        return false;
+    switch(path->path_type) {
+        case VG_LITE_DRAW_ZERO:
+        case VG_LITE_DRAW_FILL_PATH:
+        case VG_LITE_DRAW_FILL_STROKE_PATH: {
+                /* Check end op code */
+                uint8_t end_op_code = VLC_GET_OP_CODE(end - fmt_len);
+                if(end_op_code != VLC_OP_END) {
+                    LV_LOG_ERROR("%d (%s) -> is NOT VLC_OP_END", end_op_code, lv_vg_lite_vlc_op_string(end_op_code));
+                    return false;
+                }
+            }
+            break;
+
+        case VG_LITE_DRAW_STROKE_PATH:
+            /* No need to check stroke path end */
+            break;
+
+        default:
+            LV_LOG_ERROR("path type(%d) is invalid", (int)path->path_type);
+            return false;
     }
 
     return true;
