@@ -1012,6 +1012,12 @@
     #define LV_USE_OPENGLES_DEBUG        1    /* Enable or disable debug for opengles */
 #endif
 
+/* QNX Screen display and input drivers */
+#define LV_USE_QNX              0
+#if LV_USE_QNX
+    #define LV_QNX_BUF_COUNT        1    /*1 or 2*/
+#endif
+
 /*==================
 * EXAMPLES
 *==================*/
