@@ -41,6 +41,13 @@ typedef enum {
     LV_SPAN_MODE_LAST       /**< Fence member */
 } lv_span_mode_t;
 
+/** Coords of a span */
+typedef struct _lv_span_coords_t {
+    lv_area_t heading;
+    lv_area_t middle;
+    lv_area_t trailing;
+} lv_span_coords_t;
+
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_spangroup_class;
 
 /**********************
@@ -213,6 +220,29 @@ uint32_t lv_spangroup_get_expand_width(lv_obj_t * obj, uint32_t max_width);
 
  */
 int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width);
+
+/**
+ * Get the span's coords in the spangroup.
+ * @note Before calling this function, please make sure that the layout of span group has been updated.
+ * +--------+
+ * |Heading +--->------------------+
+ * |  Pos   |   |     Heading      |
+ * +--------+---+------------------+
+ * |                               |
+ * |                               |
+ * |                               |
+ * |            Middle   +--------+|
+ * |                     |Trailing||
+ * |                   +-|  Pos   ||
+ * |                   | +--------+|
+ * +-------------------v-----------+
+ * |     Trailing      |
+ * +-------------------+
+ * @param obj       pointer to a spangroup object.
+ * @param span      pointer to a span.
+ * @return the span's coords in the spangroup.
+ */
+lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, lv_span_t * span);
 
 /*=====================
  * Other functions

@@ -462,6 +462,9 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
         while(1) {
             /* switch to the next span when current is end */
             if(cur_txt[cur_txt_ofs] == '\0') {
+                cur_span->trailing_pos = txt_pos;
+                cur_span->trailing_height = max_line_h;
+
                 cur_span = lv_ll_get_next(&spans->child_ll, cur_span);
                 if(cur_span == NULL) break;
                 cur_txt = cur_span->txt;
@@ -484,6 +487,8 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
             int32_t use_width = 0;
             bool isfill = lv_text_get_snippet(&cur_txt[cur_txt_ofs], snippet.font, snippet.letter_space,
                                               max_w, txt_flag, &use_width, &next_ofs);
+            if(isfill == false) txt_pos.x += use_width;
+            else txt_pos.x = 0;
 
             /* break word deal width */
             if(isfill && next_ofs > 0 && snippet_cnt > 0) {
@@ -521,7 +526,6 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
         }
 
         /* next line init */
-        txt_pos.x = 0;
         txt_pos.y += max_line_h;
         max_w = max_width;
         line_cnt += 1;
@@ -532,6 +536,55 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
     txt_pos.y -= line_space;
 
     return txt_pos.y;
+}
+
+lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, lv_span_t * span)
+{
+    /* find previous span */
+    lv_spangroup_t * spangroup = (lv_spangroup_t *)obj;
+    lv_ll_t * spans = &spangroup->child_ll;
+    int32_t width = lv_obj_get_content_width(obj);
+
+    lv_span_coords_t coords = { 0 };
+
+    if(obj == NULL || span == NULL || lv_ll_get_head(spans) == NULL) return coords;
+
+    lv_span_t * prev_span = NULL;
+    lv_span_t * curr_span;
+    LV_LL_READ(spans, curr_span) {
+        if(curr_span == span) {
+            break;
+        }
+        prev_span = curr_span;
+    }
+
+    if(curr_span == NULL) return coords;
+
+    /* first line */
+    if(prev_span == NULL) {
+        lv_area_set(&coords.heading, 0, 0, width, curr_span->trailing_pos.y);
+        lv_area_set(&coords.middle, coords.heading.x1, coords.heading.y2, curr_span->trailing_pos.x,
+                    coords.heading.y2 + curr_span->trailing_height);
+        lv_area_set(&coords.trailing, 0, 0, 0, 0);
+
+        return coords;
+    }
+
+    /* common case */
+    lv_point_t pre_trailing_pos = prev_span->trailing_pos;
+    int32_t pre_trailing_height = prev_span->trailing_height;
+
+    lv_area_set(&coords.heading,
+                pre_trailing_pos.x, pre_trailing_pos.y,
+                width, pre_trailing_pos.y + pre_trailing_height);
+    lv_area_set(&coords.middle,
+                0, coords.heading.y2,
+                width, curr_span->trailing_pos.y);
+    lv_area_set(&coords.trailing,
+                coords.middle.x1, coords.middle.y2,
+                curr_span->trailing_pos.x, curr_span->trailing_pos.y + curr_span->trailing_height);
+
+    return coords;
 }
 
 /**********************
