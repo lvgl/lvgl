@@ -314,6 +314,15 @@ static bool init_display_from_window(lv_display_t * disp)
 
 static void release_disp_cb(lv_event_t * e)
 {
+    lv_display_t * disp = (lv_display_t *) lv_event_get_user_data(e);
+    lv_qnx_window_t * dsc = lv_display_get_driver_data(disp);
+
+    if(dsc->window != NULL) {
+        screen_destroy_window(dsc->window);
+    }
+
+    lv_free(dsc);
+    lv_display_set_driver_data(disp, NULL);
 }
 
 static void get_pointer(lv_indev_t * indev_drv, lv_indev_data_t * data)
