@@ -143,8 +143,9 @@ int lv_qnx_event_loop(lv_display_t * disp)
     }
 
     for(;;) {
-        /*Wait for an event, timing out after 10ms*/
-        if(screen_get_event(context, event, 10000000L) != 0) {
+        /*Wait for an event, timing out after 16ms if animations are running*/
+        uint64_t timeout = lv_anim_count_running() > 0  ? 16000000UL : -1UL;
+        if(screen_get_event(context, event, timeout) != 0) {
             perror("screen_get_event");
             return EXIT_FAILURE;
         }
