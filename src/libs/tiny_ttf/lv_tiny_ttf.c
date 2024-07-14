@@ -47,7 +47,6 @@ static void ttf_cb_stream_seek(ttf_cb_stream_t * stream, size_t position);
 #include "stb_rect_pack.h"
 #include "stb_truetype_htcw.h"
 
-#define tiny_ttf_cache LV_GLOBAL_DEFAULT()->tiny_ttf_cache
 /**********************
  *      TYPEDEFS
  **********************/
