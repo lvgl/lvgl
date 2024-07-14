@@ -3357,6 +3357,28 @@
     #endif
 #endif
 
+/* QNX Screen display and input drivers */
+#ifndef LV_USE_QNX
+    #ifdef CONFIG_LV_USE_QNX
+        #define LV_USE_QNX CONFIG_LV_USE_QNX
+    #else
+        #define LV_USE_QNX              0
+    #endif
+#endif
+#if LV_USE_QNX
+    #ifndef LV_QNX_BUF_COUNT
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_QNX_BUF_COUNT
+                #define LV_QNX_BUF_COUNT CONFIG_LV_QNX_BUF_COUNT
+            #else
+                #define LV_QNX_BUF_COUNT 0
+            #endif
+        #else
+            #define LV_QNX_BUF_COUNT        1    /*1 or 2*/
+        #endif
+    #endif
+#endif
+
 /*==================
 * EXAMPLES
 *==================*/
