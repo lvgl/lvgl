@@ -237,11 +237,11 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
 
     /*Kerning correction*/
     if(font->kerning == LV_FONT_KERNING_NORMAL &&
-       unicode_letter_next != 0) { // check if we need to do any kerning calculations
+       unicode_letter_next != 0) { /* check if we need to do any kerning calculations */
         uint32_t g1 = data->glyph_dsc.gid.index;
 
         int g2 = 0;
-        search_key.unicode = unicode_letter_next; // reuse search key
+        search_key.unicode = unicode_letter_next; /* reuse search key */
         lv_cache_entry_t * entry_next = lv_cache_acquire_or_create(dsc->glyph_cache, &search_key, (void *)dsc);
 
         if(entry_next == NULL)
@@ -370,9 +370,9 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
         return NULL;
     }
 
-    // check if font  has kerning tables to use, else disable kerning automatically.
+    /* check if font  has kerning tables to use, else disable kerning automatically. */
     if(stbtt_KernTableCheck(&dsc->info) == 0) {
-        kerning = LV_FONT_KERNING_NONE; // disable kerning if font has no tables.
+        kerning = LV_FONT_KERNING_NONE; /* disable kerning if font has no tables. */
     }
 
     dsc->kerning = kerning;
@@ -429,7 +429,7 @@ static bool tiny_ttf_glyph_cache_create_cb(tiny_ttf_glyph_cache_data_t * node, v
 
     int advw, lsb;
     stbtt_GetGlyphHMetrics(&dsc->info, g1, &advw, &lsb);
-    if(dsc->kerning != LV_FONT_KERNING_NORMAL) {    // calculate default advance
+    if(dsc->kerning != LV_FONT_KERNING_NORMAL) { /* calculate default advance */
         int k = stbtt_GetGlyphKernAdvance(&dsc->info, g1, 0);
         dsc_out->adv_w = (uint16_t)floor((((float)advw + (float)k) * dsc->scale) +
                                          0.5f); /*Horizontal space required by the glyph in [px]*/
@@ -438,7 +438,7 @@ static bool tiny_ttf_glyph_cache_create_cb(tiny_ttf_glyph_cache_data_t * node, v
         dsc_out->adv_w = (uint16_t)floor(((float)advw * dsc->scale) +
                                          0.5f); /*Horizontal space required by the glyph in [px]*/;
     }
-    // precalculate no kerning value
+    /* precalculate no kerning value */
     node->adv_w = advw;
     dsc_out->box_w = (x2 - x1 + 1);         /*width of the bitmap in [px]*/
     dsc_out->box_h = (y2 - y1 + 1);         /*height of the bitmap in [px]*/
