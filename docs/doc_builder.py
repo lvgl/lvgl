@@ -1,9 +1,11 @@
 import os
+import shutil
 import sys
 from xml.etree import ElementTree as ET
 
 base_path = ''
 xml_path = ''
+error_path = ''
 
 EMIT_WARNINGS = True
 DOXYGEN_OUTPUT = True
@@ -12,10 +14,12 @@ MISSING_FUNC = 'MissingFunctionDoc'
 MISSING_FUNC_ARG = 'MissingFunctionArgDoc'
 MISSING_FUNC_RETURN = 'MissingFunctionReturnDoc'
 MISSING_FUNC_ARG_MISMATCH = 'FunctionArgMissing'
+MISSING_FUNC_ARG_NAME = 'MissingFunctionArgName'
 MISSING_STRUCT = 'MissingStructureDoc'
 MISSING_STRUCT_FIELD = 'MissingStructureFieldDoc'
 MISSING_UNION = 'MissingUnionDoc'
 MISSING_UNION_FIELD = 'MissingUnionFieldDoc'
+MISSING_ENUM_NAME = 'MissingEnumName'
 MISSING_ENUM = 'MissingEnumDoc'
 MISSING_ENUM_ITEM = 'MissingEnumItemDoc'
 MISSING_TYPEDEF = 'MissingTypedefDoc'
@@ -23,14 +27,34 @@ MISSING_VARIABLE = 'MissingVariableDoc'
 MISSING_MACRO = 'MissingMacroDoc'
 
 
+last_error_file = None
+
 def warn(warning_type, *args):
     if EMIT_WARNINGS:
+        global last_error_file
+
+        if last_error_file is None and warning_type is not None:
+            output_path = os.path.join(error_path, warning_type + '.log')
+            if not os.path.exists(output_path):
+                open(output_path, 'w').close()
+
+            last_error_file = open(output_path, 'a')
+
         args = ' '.join(str(arg) for arg in args)
 
         if warning_type is None:
             output = f'\033[31;1m    {args}\033[0m\n'
+            if last_error_file:
+                if args:
+                    last_error_file.write(f'    {args}\n')
+                else:
+                    last_error_file.write(f'\n')
+                    last_error_file.close()
+                    last_error_file = None
         else:
             output = f'\033[31;1m{warning_type}: {args}\033[0m\n'
+            if last_error_file:
+                last_error_file.write(f'{warning_type}: {args}\n')
 
         sys.stdout.write(output)
         sys.stdout.flush()
@@ -558,6 +582,11 @@ class FUNCTION(object):
                 warn(None)
             else:
                 for arg in self.args:
+                    if not arg.name:
+                        warn(MISSING_FUNC_ARG_NAME, self.name)
+                        warn(None, 'FILE:', self.file_name)
+                        warn(None, 'LINE:', self.line_no)
+                        warn(None)
                     if not arg.description:
                         warn(MISSING_FUNC_ARG, self.name)
                         warn(None, 'ARG:', arg.name)
@@ -738,6 +767,12 @@ class ENUM(object):
                             self.members.append(ev)
 
                         ev.description = item_description
+
+            if not self.name:
+                warn(MISSING_ENUM_NAME)
+                warn(None, 'FILE:', self.file_name)
+                warn(None, 'LINE:', self.line_no)
+                warn(None)
 
             if not self.description:
                 warn(MISSING_ENUM, self.name)
@@ -1289,11 +1324,19 @@ def run(project_path, temp_directory, *doc_paths):
     global xml_path
     global lvgl_src_path
     global api_path
+    global error_path
 
     base_path = temp_directory
     xml_path = os.path.join(base_path, 'xml')
     api_path = os.path.join(base_path, 'API')
     lvgl_src_path = os.path.join(project_path, 'src')
+    error_path = os.path.join(project_path, 'MISSING-DOCSTRINGS')
+
+    if EMIT_WARNINGS:
+        if os.path.exists(error_path):
+            shutil.rmtree(error_path)
+
+        os.mkdir(error_path)
 
     if not os.path.exists(api_path):
         os.makedirs(api_path)

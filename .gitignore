@@ -30,3 +30,4 @@ tests/report/
 *.bak
 tests/test_images/
 .vs/
+/MISSING-DOCSTRINGS/
