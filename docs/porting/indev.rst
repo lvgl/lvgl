@@ -68,7 +68,7 @@ the last clicked widget will be either scrolled or it's value will be incremente
 
 As this behavior is tightly related to the last clicked widget, the crown support is
 an extension of the pointer input device.  Just set ``data->diff`` to the number of
-turned steps and LVGL will automatically send :cpp:enum:`LV_EVENT_ROTARY` or scroll the widget based on the
+turned steps and LVGL will automatically send :cpp:enumerator:`LV_EVENT_ROTARY` or scroll the widget based on the
 ``editable`` flag in the widget's class. Non-editable widgets are scrolled and for editable widgets the event is sent.
 
 To get the steps in an event callback use :cpp:func:`int32_t diff = lv_event_get_rotary_diff(e)`
