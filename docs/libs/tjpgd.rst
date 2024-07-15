@@ -43,7 +43,7 @@ Converter
 ---------
 
 Converting JPEG to C array
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  Use lvgl online tool https://lvgl.io/tools/imageconverter
 -  Color format = RAW, output format = C Array
