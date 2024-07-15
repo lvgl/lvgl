@@ -183,7 +183,7 @@ It's very important that draw buffer(s) should be large enough for any
 selected color format.
 
 
-Swap Endianness
+Swap endianness
 ---------------
 
 In case of RGB565 color format it might be required to swap the 2 bytes
