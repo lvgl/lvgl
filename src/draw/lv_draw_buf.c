@@ -163,13 +163,13 @@ void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
     }
     else {
         lv_area_t a_clipped = *a;
+        if(a_clipped.x2 < 0) return;
+        if(a_clipped.y2 < 0) return;
         if(a_clipped.x1 < 0) a_clipped.x1 = 0;
         if(a_clipped.y1 < 0) a_clipped.y1 = 0;
-        if(a_clipped.x2 < 0) a_clipped.x2 = 0;
-        if(a_clipped.y2 < 0) a_clipped.y2 = 0;
 
-        if(lv_area_get_width(&a_clipped) < 0) return;
-        if(lv_area_get_height(&a_clipped) < 0) return;
+        if(lv_area_get_width(&a_clipped) <= 0) return;
+        if(lv_area_get_height(&a_clipped) <= 0) return;
 
         uint8_t px_size = lv_color_format_get_size(header->cf);
         uint8_t * bufc = lv_draw_buf_goto_xy(draw_buf, a_clipped.x1, a_clipped.y1);
