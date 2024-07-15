@@ -152,7 +152,7 @@ added to groups.
      else data->state = LV_INDEV_STATE_RELEASED;
    }
 
-Using Buttons with Encoder Logic
+Using buttons with Encoder logic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In addition to standard encoder behavior, you can also utilize its logic
