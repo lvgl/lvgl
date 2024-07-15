@@ -71,7 +71,7 @@ an extension of the pointer input device.  Just set ``data->diff`` to the number
 turned steps and LVGL will automatically send :cpp:enumerator:`LV_EVENT_ROTARY` or scroll the widget based on the
 ``editable`` flag in the widget's class. Non-editable widgets are scrolled and for editable widgets the event is sent.
 
-To get the steps in an event callback use :cpp:func:`int32_t diff = lv_event_get_rotary_diff(e)`
+To get the steps in an event callback use :cpp:func:`lv_event_get_rotary_diff`
 
 The rotary sensitivity can be adjusted on 2 levels:
 

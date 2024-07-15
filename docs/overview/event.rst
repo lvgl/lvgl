@@ -129,8 +129,8 @@ Input device events
 Drawing events
 --------------
 
--  :cpp:enumerator:`LV_EVENT_COVER_CHECK`: Check if the object fully covers an area. The event parameter is :cpp:type:`lv_cover_check_info_t *`.
--  :cpp:enumerator:`LV_EVENT_REFR_EXT_DRAW_SIZE`: Get the required extra draw area around the object (e.g. for shadow). The event parameter is :cpp:type:`int32_t *` to store the size.
+-  :cpp:enumerator:`LV_EVENT_COVER_CHECK`: Check if the object fully covers an area. The event parameter is :cpp:type:`lv_cover_check_info_t` ``*``.
+-  :cpp:enumerator:`LV_EVENT_REFR_EXT_DRAW_SIZE`: Get the required extra draw area around the object (e.g. for shadow). The event parameter is :cpp:type:`int32_t` ``*`` to store the size.
 -  :cpp:enumerator:`LV_EVENT_DRAW_MAIN_BEGIN`: Starting the main drawing phase
 -  :cpp:enumerator:`LV_EVENT_DRAW_MAIN`: Perform the main drawing
 -  :cpp:enumerator:`LV_EVENT_DRAW_MAIN_END`: Finishing the main drawing phase
@@ -143,7 +143,7 @@ Special events
 --------------
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED`: The object's value has changed (i.e. slider moved)
--  :cpp:enumerator:`LV_EVENT_INSERT`: A text is inserted to the object. The event data is `char *` being inserted.
+-  :cpp:enumerator:`LV_EVENT_INSERT`: A text is inserted to the object. The event data is :cpp:type:`char` ``*`` being inserted.
 -  :cpp:enumerator:`LV_EVENT_REFRESH`: Notify the object to refresh something on it (for the user)
 -  :cpp:enumerator:`LV_EVENT_READY`: A process has finished
 -  :cpp:enumerator:`LV_EVENT_CANCEL`: A process has been cancelled
