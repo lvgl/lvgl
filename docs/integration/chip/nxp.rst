@@ -39,7 +39,7 @@ Basic configuration:
 - Select NXP PXP engine in "lv_conf.h": Set :c:macro:`LV_USE_DRAW_PXP` to `1`.
 - Enable PXP asserts in "lv_conf.h": Set :c:macro: `LV_USE_PXP_ASSERT` to `1`.
   There are few PXP assertions that can stop the program execution in case the
-  c:macro: `LV_ASSERT_HANDLER` is set to `while(1);` (Halt by default). Else,
+  c:macro:`LV_ASSERT_HANDLER` is set to `while(1);` (Halt by default). Else,
   there will be logged just an error message via `LV_LOG_ERROR`.
 - If :c:macro:`SDK_OS_FREE_RTOS` symbol is defined, FreeRTOS implementation
   will be used, otherwise bare metal code will be included.
@@ -159,7 +159,7 @@ Project setup:
    - "src/draw/nxp/pxp/lv_draw_buf_pxp.c": draw buffer callbacks
    - "src/draw/nxp/pxp/lv_draw_pxp_fill.c": fill area
    - "src/draw/nxp/pxp/lv_draw_pxp_img.c": blit image (w/ optional recolor or
-   transformation)
+     transformation)
    - "src/draw/nxp/pxp/lv_draw_pxp_layer.c": layer blending
    - "src/draw/nxp/pxp/lv_draw_pxp.c": draw unit initialization
    - "src/draw/nxp/pxp/lv_pxp_cfg.c": init, deinit, run/wait PXP device
@@ -181,11 +181,11 @@ PXP default configuration:
   bare metal is provided in lv_pxp_osa.c.
 
    - :cpp:func:`pxp_interrupt_init()`: Initialize PXP interrupt (HW setup,
-   OS setup)
+     OS setup)
    - :cpp:func:`pxp_interrupt_deinit()`: Deinitialize PXP interrupt (HW setup,
-   OS setup)
+     OS setup)
    - :cpp:func:`pxp_run()`: Start PXP job. Use OS-specific mechanism to block
-   drawing thread.
+     drawing thread.
    - :cpp:func:`pxp_wait()`: Wait for PXP completion.
 
 VGLite accelerator
