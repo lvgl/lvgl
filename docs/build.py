@@ -217,10 +217,10 @@ def get_version():
     d = d.split('#define LVGL_VERSION_MINOR', 1)[-1]
     minor, d = d.split('\n', 1)
 
-    d = d.split('#define LVGL_VERSION_PATCH', 1)[-1]
-    patch, d = d.split('\n', 1)
+    # d = d.split('#define LVGL_VERSION_PATCH', 1)[-1]
+    # patch, d = d.split('\n', 1)
 
-    return f'{major.strip()}.{minor.strip()}.{patch.strip()}'
+    return f'{major.strip()}.{minor.strip()}'
 
 
 if sys.platform.startswith('win'):
