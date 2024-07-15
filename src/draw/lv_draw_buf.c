@@ -161,25 +161,25 @@ void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
     if(a == NULL) {
         uint8_t * buf = lv_draw_buf_goto_xy(draw_buf, 0, 0);
         lv_memzero(buf, header->h * stride);
+        return;
     }
-    else {
-        lv_area_t a_clipped = *a;
-        if(a_clipped.x2 < 0) return;
-        if(a_clipped.y2 < 0) return;
-        if(a_clipped.x1 < 0) a_clipped.x1 = 0;
-        if(a_clipped.y1 < 0) a_clipped.y1 = 0;
 
-        if(lv_area_get_width(&a_clipped) <= 0) return;
-        if(lv_area_get_height(&a_clipped) <= 0) return;
+    lv_area_t a_clipped = *a;
+    if(a_clipped.x2 < 0) return;
+    if(a_clipped.y2 < 0) return;
+    if(a_clipped.x1 < 0) a_clipped.x1 = 0;
+    if(a_clipped.y1 < 0) a_clipped.y1 = 0;
 
-        uint8_t px_size = lv_color_format_get_size(header->cf);
-        uint8_t * buf = lv_draw_buf_goto_xy(draw_buf, a_clipped.x1, a_clipped.y1);
-        uint32_t line_length = lv_area_get_width(&a_clipped) * px_size;
-        int32_t y;
-        for(y = a_clipped.y1; y <= a_clipped.y2; y++) {
-            lv_memzero(buf, line_length);
-            buf += stride;
-        }
+    if(lv_area_get_width(&a_clipped) <= 0) return;
+    if(lv_area_get_height(&a_clipped) <= 0) return;
+
+    uint8_t px_size = lv_color_format_get_size(header->cf);
+    uint8_t * buf = lv_draw_buf_goto_xy(draw_buf, a_clipped.x1, a_clipped.y1);
+    uint32_t line_length = lv_area_get_width(&a_clipped) * px_size;
+    int32_t y;
+    for(y = a_clipped.y1; y <= a_clipped.y2; y++) {
+        lv_memzero(buf, line_length);
+        buf += stride;
     }
 }
 
