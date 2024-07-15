@@ -153,7 +153,7 @@ Get started with the Renesas ecosystem
       - Press the ``Add...`` button
       - Browse the installation folder of the toolchain
 
-      |
+      <br/>
 
       .. image:: /misc/renesas/toolchains.png
          :alt: Toolchains
