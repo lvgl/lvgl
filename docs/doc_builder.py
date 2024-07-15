@@ -1134,6 +1134,9 @@ def iter_src(n, p):
 
 
 def clean_name(nme):
+    if nme is None:
+        return None
+
     if nme.startswith('_lv_'):
         nme = nme[4:]
     elif nme.startswith('lv_'):
@@ -1146,6 +1149,9 @@ def clean_name(nme):
 
 
 def is_name_match(item_name, obj_name):
+    if None in (item_name, obj_name):
+        return False
+
     u_num = item_name.count('_') + 1
 
     obj_name = obj_name.split('_')

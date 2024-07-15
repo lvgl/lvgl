@@ -208,15 +208,43 @@ else:
 
 
 def get_version():
-    _, ver = subprocess.getstatusoutput("../scripts/find_version.sh")
-    return ver
+    path = os.path.join(project_path, 'lv_version.h')
+    with open(path, 'rb') as f:
+        d = f.read().decode('utf-8')
 
-cmd('sphinx-build -b html "{src}" "{dst}" -D version="{version}" -E -j {cpu}'.format(
-    src=html_src_path,
-    dst=html_dst_path,
-    version=get_version(),
-    cpu=os.cpu_count()
-))
+    d = d.split('#define LVGL_VERSION_MAJOR', 1)[-1]
+    major, d = d.split('\n', 1)
+    d = d.split('#define LVGL_VERSION_MINOR', 1)[-1]
+    minor, d = d.split('\n', 1)
+
+    d = d.split('#define LVGL_VERSION_PATCH', 1)[-1]
+    patch, d = d.split('\n', 1)
+
+    return f'{major.strip()}.{minor.strip()}.{patch.strip()}'
+
+
+if sys.platform.startswith('win'):
+    sphinx_path = os.path.join(
+        os.path.split(sys.executable)[0],
+        'Scripts',
+        'sphinx-build.exe'
+    )
+
+    cmd(
+        f'{sphinx_path} '
+        f'-b html "{html_src_path}" "{html_dst_path}" '
+        f'-D version="{get_version()}" '
+        f'-E '
+        f'-j {os.cpu_count()}'
+    )
+else:
+    cmd(
+        f'sphinx-build '
+        f'-b html "{html_src_path}" "{html_dst_path}" '
+        f'-D version="{get_version()}" '
+        f'-E '
+        f'-j {os.cpu_count()}'
+    )
 
 if develop:
     print('temp directory:', temp_directory)
