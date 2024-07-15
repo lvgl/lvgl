@@ -355,12 +355,12 @@ Supported draw tasks are available in "src/draw/nxp/pxp/lv_draw_vglite.c":
 All the below operation can be done in addition with optional opacity.
 
 - Fill area with color (w/ radius or gradient).
-- Blit source image (any format from `_vglite_src_cf_supported()`) over
-  destination (any format from `_vglite_dest_cf_supported()`).
+- Blit source image (any format from ``_vglite_src_cf_supported()``) over
+  destination (any format from ``_vglite_dest_cf_supported()``).
 - Recolor source image.
 - Scale and rotate (any decimal degree) source image.
 - Blending layers (w/ same supported formats as blitting).
-- Draw letters (blit bitmap letters - raster font).
+- Draw letters (blit bitmap letters / raster font).
 - Draw full borders (LV_BORDER_SIDE_FULL).
 - Draw arcs (w/ rounded edges).
 - Draw lines (w/ dash or rounded edges).
