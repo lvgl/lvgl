@@ -68,6 +68,7 @@ There are four explicit ways to bring an object to the foreground:
 
 Screen-like layers
 ******************
+
 .. _layers_top_and_sys:
 
 Top and sys layers
@@ -129,7 +130,7 @@ If there is no memory for a new chunk, LVGL will try allocating layer when anoth
 
 
 Transformed layer
----------------
+-----------------
 
 When the widget is transformed a larger part of the widget needs to rendered to provide enough data for transformation. LVGL tries to render as small area of the widget as possible, but due to the nature of transformations no slicing is possible in this case.
 

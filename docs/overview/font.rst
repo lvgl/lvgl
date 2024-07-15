@@ -314,7 +314,7 @@ Example
    lv_binfont_destroy(my_font);
 
 Load a font from a memory buffer at run-time
-******************************************
+********************************************
 
 :cpp:func:`lv_binfont_create_from_buffer` can be used to load a font from a memory buffer.
 This function may be useful to load a font from an external file system, which is not

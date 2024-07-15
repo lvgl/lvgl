@@ -180,7 +180,7 @@ to other driver FS functions when the cache is enabled. i.e., ``lv_fs_read`` may
 so the driver needs to implement more callbacks when the cache is enabled.
 
 ``lv_fs_read`` :sub:`(behavior when the cache is enabled)`
--------------------------------------------------
+----------------------------------------------------------
 
 .. mermaid::
    :zoom:
@@ -227,20 +227,20 @@ so the driver needs to implement more callbacks when the cache is enabled.
                     to the destination buffer"]
 
 ``lv_fs_write`` :sub:`(behavior when the cache is enabled)`
---------------------------------------------------
+-----------------------------------------------------------
 
 The part of the cache that coincides with the written content
 will be updated to reflect the written content.
 
 ``lv_fs_seek`` :sub:`(behavior when the cache is enabled)`
--------------------------------------------------
+----------------------------------------------------------
 
 The driver's ``seek`` will not actually be called unless the ``whence``
 is ``LV_FS_SEEK_END``, in which case ``seek`` and ``tell`` will be called
 to determine where the end of the file is.
 
 ``lv_fs_tell`` :sub:`(behavior when the cache is enabled)`
--------------------------------------------------
+----------------------------------------------------------
 
 The driver's ``tell`` will not actually be called.
 
