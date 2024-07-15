@@ -349,7 +349,6 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
         t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_DAVE2D);
     }
 
-    /* Return 0 is no selection, some tasks can be supported by other units. */
     if(t == NULL) {
 #if  (0 == D2_RENDER_EACH_OPERATION)
         if(false == _lv_ll_is_empty(&_ll_Dave2D_Tasks)) {
@@ -357,13 +356,12 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
             dave2d_execute_dlist_and_flush();
         }
 #endif
-        return 0;
+        return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
     }
-
 
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(buf == NULL) {
-        return -1;
+        return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
     }
 
 #if  (0 == D2_RENDER_EACH_OPERATION)
