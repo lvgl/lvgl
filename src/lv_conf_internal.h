@@ -619,55 +619,54 @@
 #endif
 
 #if LV_USE_DRAW_VG_LITE
-/* Enable VG-Lite custom external 'gpu_init()' function */
-#ifndef LV_VG_LITE_USE_GPU_INIT
-    #ifdef CONFIG_LV_VG_LITE_USE_GPU_INIT
-        #define LV_VG_LITE_USE_GPU_INIT CONFIG_LV_VG_LITE_USE_GPU_INIT
-    #else
-        #define LV_VG_LITE_USE_GPU_INIT 0
+    /* Enable VG-Lite custom external 'gpu_init()' function */
+    #ifndef LV_VG_LITE_USE_GPU_INIT
+        #ifdef CONFIG_LV_VG_LITE_USE_GPU_INIT
+            #define LV_VG_LITE_USE_GPU_INIT CONFIG_LV_VG_LITE_USE_GPU_INIT
+        #else
+            #define LV_VG_LITE_USE_GPU_INIT 0
+        #endif
     #endif
-#endif
 
-/* Enable VG-Lite assert. */
-#ifndef LV_VG_LITE_USE_ASSERT
-    #ifdef CONFIG_LV_VG_LITE_USE_ASSERT
-        #define LV_VG_LITE_USE_ASSERT CONFIG_LV_VG_LITE_USE_ASSERT
-    #else
-        #define LV_VG_LITE_USE_ASSERT 0
+    /* Enable VG-Lite assert. */
+    #ifndef LV_VG_LITE_USE_ASSERT
+        #ifdef CONFIG_LV_VG_LITE_USE_ASSERT
+            #define LV_VG_LITE_USE_ASSERT CONFIG_LV_VG_LITE_USE_ASSERT
+        #else
+            #define LV_VG_LITE_USE_ASSERT 0
+        #endif
     #endif
-#endif
 
-/* VG-Lite flush commit trigger threshold. GPU will try to batch these many draw tasks. */
-#ifndef LV_VG_LITE_FLUSH_MAX_COUNT
-    #ifdef CONFIG_LV_VG_LITE_FLUSH_MAX_COUNT
-        #define LV_VG_LITE_FLUSH_MAX_COUNT CONFIG_LV_VG_LITE_FLUSH_MAX_COUNT
-    #else
-        #define LV_VG_LITE_FLUSH_MAX_COUNT 8
+    /* VG-Lite flush commit trigger threshold. GPU will try to batch these many draw tasks. */
+    #ifndef LV_VG_LITE_FLUSH_MAX_COUNT
+        #ifdef CONFIG_LV_VG_LITE_FLUSH_MAX_COUNT
+            #define LV_VG_LITE_FLUSH_MAX_COUNT CONFIG_LV_VG_LITE_FLUSH_MAX_COUNT
+        #else
+            #define LV_VG_LITE_FLUSH_MAX_COUNT 8
+        #endif
     #endif
-#endif
 
-/* Enable border to simulate shadow
- * NOTE: which usually improves performance,
- * but does not guarantee the same rendering quality as the software. */
-#ifndef LV_VG_LITE_USE_BOX_SHADOW
-    #ifdef CONFIG_LV_VG_LITE_USE_BOX_SHADOW
-        #define LV_VG_LITE_USE_BOX_SHADOW CONFIG_LV_VG_LITE_USE_BOX_SHADOW
-    #else
-        #define LV_VG_LITE_USE_BOX_SHADOW 0
+    /* Enable border to simulate shadow
+     * NOTE: which usually improves performance,
+     * but does not guarantee the same rendering quality as the software. */
+    #ifndef LV_VG_LITE_USE_BOX_SHADOW
+        #ifdef CONFIG_LV_VG_LITE_USE_BOX_SHADOW
+            #define LV_VG_LITE_USE_BOX_SHADOW CONFIG_LV_VG_LITE_USE_BOX_SHADOW
+        #else
+            #define LV_VG_LITE_USE_BOX_SHADOW 0
+        #endif
     #endif
-#endif
 
-/* VG-Lite gradient maximum cache number.
- * NOTE: The memory usage of a single gradient image is 4K bytes.
- */
-#ifndef LV_VG_LITE_GRAD_CACHE_CNT
-    #ifdef CONFIG_LV_VG_LITE_GRAD_CACHE_CNT
-        #define LV_VG_LITE_GRAD_CACHE_CNT CONFIG_LV_VG_LITE_GRAD_CACHE_CNT
-    #else
-        #define LV_VG_LITE_GRAD_CACHE_CNT 32
+    /* VG-Lite gradient maximum cache number.
+     * NOTE: The memory usage of a single gradient image is 4K bytes.
+     */
+    #ifndef LV_VG_LITE_GRAD_CACHE_CNT
+        #ifdef CONFIG_LV_VG_LITE_GRAD_CACHE_CNT
+            #define LV_VG_LITE_GRAD_CACHE_CNT CONFIG_LV_VG_LITE_GRAD_CACHE_CNT
+        #else
+            #define LV_VG_LITE_GRAD_CACHE_CNT 32
+        #endif
     #endif
-#endif
-
 #endif
 
 /*=======================
@@ -2504,14 +2503,14 @@
     #endif
 #endif
 #if LV_USE_GIF
-/*GIF decoder accelerate*/
-#ifndef LV_GIF_CACHE_DECODE_DATA
-    #ifdef CONFIG_LV_GIF_CACHE_DECODE_DATA
-        #define LV_GIF_CACHE_DECODE_DATA CONFIG_LV_GIF_CACHE_DECODE_DATA
-    #else
-        #define LV_GIF_CACHE_DECODE_DATA 0
+    /*GIF decoder accelerate*/
+    #ifndef LV_GIF_CACHE_DECODE_DATA
+        #ifdef CONFIG_LV_GIF_CACHE_DECODE_DATA
+            #define LV_GIF_CACHE_DECODE_DATA CONFIG_LV_GIF_CACHE_DECODE_DATA
+        #else
+            #define LV_GIF_CACHE_DECODE_DATA 0
+        #endif
     #endif
-#endif
 #endif
 
 

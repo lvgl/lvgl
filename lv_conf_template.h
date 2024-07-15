@@ -210,25 +210,24 @@
 #define LV_USE_DRAW_VG_LITE 0
 
 #if LV_USE_DRAW_VG_LITE
-/* Enable VG-Lite custom external 'gpu_init()' function */
-#define LV_VG_LITE_USE_GPU_INIT 0
+    /* Enable VG-Lite custom external 'gpu_init()' function */
+    #define LV_VG_LITE_USE_GPU_INIT 0
 
-/* Enable VG-Lite assert. */
-#define LV_VG_LITE_USE_ASSERT 0
+    /* Enable VG-Lite assert. */
+    #define LV_VG_LITE_USE_ASSERT 0
 
-/* VG-Lite flush commit trigger threshold. GPU will try to batch these many draw tasks. */
-#define LV_VG_LITE_FLUSH_MAX_COUNT 8
+    /* VG-Lite flush commit trigger threshold. GPU will try to batch these many draw tasks. */
+    #define LV_VG_LITE_FLUSH_MAX_COUNT 8
 
-/* Enable border to simulate shadow
- * NOTE: which usually improves performance,
- * but does not guarantee the same rendering quality as the software. */
-#define LV_VG_LITE_USE_BOX_SHADOW 0
+    /* Enable border to simulate shadow
+     * NOTE: which usually improves performance,
+     * but does not guarantee the same rendering quality as the software. */
+    #define LV_VG_LITE_USE_BOX_SHADOW 0
 
-/* VG-Lite gradient maximum cache number.
- * NOTE: The memory usage of a single gradient image is 4K bytes.
- */
-#define LV_VG_LITE_GRAD_CACHE_CNT 32
-
+    /* VG-Lite gradient maximum cache number.
+     * NOTE: The memory usage of a single gradient image is 4K bytes.
+     */
+    #define LV_VG_LITE_GRAD_CACHE_CNT 32
 #endif
 
 /*=======================
@@ -747,8 +746,8 @@
 /*GIF decoder library*/
 #define LV_USE_GIF 0
 #if LV_USE_GIF
-/*GIF decoder accelerate*/
-#define LV_GIF_CACHE_DECODE_DATA 0
+    /*GIF decoder accelerate*/
+    #define LV_GIF_CACHE_DECODE_DATA 0
 #endif
 
 
