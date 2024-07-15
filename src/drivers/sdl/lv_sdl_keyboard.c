@@ -33,6 +33,11 @@ static void sdl_keyboard_read(lv_indev_t * indev, lv_indev_data_t * data);
 static uint32_t keycode_to_ctrl_key(SDL_Keycode sdl_key);
 static void release_indev_cb(lv_event_t * e);
 
+/***********************
+ *   GLOBAL PROTOTYPES
+ ***********************/
+void _lv_sdl_keyboard_handler(SDL_Event * event);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
