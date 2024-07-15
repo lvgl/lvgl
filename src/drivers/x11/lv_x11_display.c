@@ -49,7 +49,7 @@ typedef struct {
     void      *     xdata;           /**< allocated data for XImage */
     /* LVGL related information */
     lv_timer_t   *  timer;           /**< timer object for @ref x11_event_handler */
-    lv_color_t   *  buffer[2];       /**< (double) lv display buffers, depending on @ref LV_X11_RENDER_MODE */
+    uint8_t    *    buffer[2];       /**< (double) lv display buffers, depending on @ref LV_X11_RENDER_MODE */
     lv_area_t       flush_area;      /**< integrated area for a display update */
     /* systemtick by thread related information */
     pthread_t       thr_tick;        /**< pthread for SysTick simulation */

@@ -33,11 +33,11 @@ If you would rather try LVGL on your own project follow these steps:
    ``lvgl`` folder, change the first ``#if 0`` to ``1`` to enable the
    file's content and set the :c:macro:`LV_COLOR_DEPTH` defines.
 -  Include ``lvgl/lvgl.h`` in files where you need to use LVGL related functions.
+-  Call :cpp:func:`lv_init`
 -  Call :cpp:expr:`lv_tick_inc(x)` every ``x`` milliseconds in a Timer or Task
    (``x`` should be between 1 and 10). It is required for the internal
    timing of LVGL. Alternatively, register a ``tick_get_cb`` with
    :cpp:func:`lv_tick_set_cb` so that LVGL can retrieve the current time directly.
--  Call :cpp:func:`lv_init`
 -  Create a display.
 
 .. code:: c
@@ -51,8 +51,10 @@ If you would rather try LVGL on your own project follow these steps:
 
 .. code:: c
 
-   static lv_color_t buf1[MY_DISP_HOR_RES * MY_DISP_VER_RES / 10];                        /*Declare a buffer for 1/10 screen size*/
-   lv_display_set_buffers(display, buf1, NULL, sizeof(buf1));  /*Initialize the display buffer.*/
+   /*Declare a buffer for 1/10 screen size*/
+   #define BYTE_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /*will be 2 for RGB565 */
+   static uint8_t buf1[MY_DISP_HOR_RES * MY_DISP_VER_RES / 10 * BYTE_PER_PIXEL];
+   lv_display_set_buffers(display, buf1, NULL, sizeof(buf1), LV_DISPLAY_RENDER_MODE_PARTIAL);  /*Initialize the display buffer.*/
 
 -  Implement and register a function which can copy the rendered image
    to an area of your display:
