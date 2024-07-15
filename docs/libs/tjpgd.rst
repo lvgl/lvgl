@@ -34,9 +34,10 @@ For example:
 
    lv_image_set_src(my_img, "S:path/to/picture.jpg");
 
-:Note: a file system driver needs to be registered to open images from
-files. Read more about :ref:`overview_file_system` or just
-enable one in ``lv_conf.h`` with ``LV_USE_FS_...`` config.
+:note: a file system driver needs to be registered to open images from
+       files. Read more about :ref:`overview_file_system` or just
+       enable one in ``lv_conf.h`` with ``LV_USE_FS_...`` config.
+
 
 Converter
 ---------
