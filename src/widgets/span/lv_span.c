@@ -570,6 +570,15 @@ lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, lv_span_t * span)
         return coords;
     }
 
+    /* start and end on the same line */
+    bool is_same_line = prev_span->trailing_pos.y == curr_span->trailing_pos.y;
+    if(is_same_line == true) {
+        lv_area_set(&coords.heading,
+                    prev_span->trailing_pos.x, prev_span->trailing_pos.y,
+                    curr_span->trailing_pos.x, curr_span->trailing_pos.y + curr_span->trailing_height);
+        return coords;
+    }
+
     /* common case */
     lv_point_t pre_trailing_pos = prev_span->trailing_pos;
     int32_t pre_trailing_height = prev_span->trailing_height;
@@ -577,6 +586,10 @@ lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, lv_span_t * span)
     lv_area_set(&coords.heading,
                 pre_trailing_pos.x, pre_trailing_pos.y,
                 width, pre_trailing_pos.y + pre_trailing_height);
+    /* When it happens to be two lines of text,
+     * the y2 of the middle area is exactly the y1 + line height of the first line of text,
+     * so the area of the middle area is empty.
+     * */
     lv_area_set(&coords.middle,
                 0, coords.heading.y2,
                 width, curr_span->trailing_pos.y);
