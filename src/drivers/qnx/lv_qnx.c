@@ -40,6 +40,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 static bool window_create(lv_display_t * disp);
 static bool init_display_from_window(lv_display_t * disp);
 static void get_pointer(lv_indev_t * indev_drv, lv_indev_data_t * data);
+static bool handle_pointer_event(screen_event_t event);
 static void release_disp_cb(lv_event_t * e);
 
 /***********************
@@ -52,6 +53,7 @@ static bool inited = false;
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_indev_t * pointer_indev;
 static int mouse_pos[2];
 static int mouse_buttons;
 
@@ -125,11 +127,20 @@ void lv_qnx_window_set_title(lv_display_t * disp, const char * title)
     screen_inject_event(NULL, event);
 }
 
-bool lv_qnx_inputs_create(lv_display_t * disp)
+bool lv_qnx_add_pointer_device(lv_display_t * disp)
 {
-    lv_indev_t * indev = lv_indev_create();
-    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
-    lv_indev_set_read_cb(indev, get_pointer);
+    if(pointer_indev != NULL) {
+        return false;
+    }
+
+    pointer_indev = lv_indev_create();
+    if(pointer_indev == NULL) {
+        return false;
+    }
+
+    lv_indev_set_type(pointer_indev, LV_INDEV_TYPE_POINTER);
+    lv_indev_set_read_cb(pointer_indev, get_pointer);
+    lv_indev_set_mode(pointer_indev, LV_INDEV_MODE_EVENT);
     return true;
 }
 
@@ -159,23 +170,12 @@ int lv_qnx_event_loop(lv_display_t * disp)
         }
 
         if(type == SCREEN_EVENT_POINTER) {
-            /*Handle a mouse pointer event*/
-            if(screen_get_event_property_iv(event,
-                                            SCREEN_PROPERTY_SOURCE_POSITION,
-                                            mouse_pos)
-               != 0) {
-                perror("screen_get_event_property_iv(SOURCE_POSITION)");
-                return EXIT_FAILURE;
-            }
-
-            if(screen_get_event_property_iv(event, SCREEN_PROPERTY_BUTTONS,
-                                            &mouse_buttons)
-               != 0) {
-                perror("screen_get_event_property_iv(BUTTONS)");
+            if(!handle_pointer_event(event)) {
                 return EXIT_FAILURE;
             }
         }
 
+        /*Calculate the next timeout*/
         lv_timer_handler();
     }
 
@@ -336,6 +336,27 @@ static void get_pointer(lv_indev_t * indev_drv, lv_indev_data_t * data)
     else {
         data->state = LV_INDEV_STATE_RELEASED;
     }
+}
+
+static bool handle_pointer_event(screen_event_t event)
+{
+    if(screen_get_event_property_iv(event,
+                                    SCREEN_PROPERTY_SOURCE_POSITION,
+                                    mouse_pos)
+       != 0) {
+        perror("screen_get_event_property_iv(SOURCE_POSITION)");
+        return false;
+    }
+
+    if(screen_get_event_property_iv(event, SCREEN_PROPERTY_BUTTONS,
+                                    &mouse_buttons)
+       != 0) {
+        perror("screen_get_event_property_iv(BUTTONS)");
+        return false;
+    }
+
+    lv_indev_read(pointer_indev);
+    return true;
 }
 
 #endif /*LV_USE_QNX*/

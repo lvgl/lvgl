@@ -36,7 +36,7 @@ extern "C" {
 
 lv_display_t * lv_qnx_window_create(int32_t hor_res, int32_t ver_res);
 void lv_qnx_window_set_title(lv_display_t * disp, const char * title);
-bool lv_qnx_inputs_create(lv_display_t * disp);
+bool lv_qnx_add_pointer_device(lv_display_t * disp);
 int lv_qnx_event_loop(lv_display_t * disp);
 void lv_qnx_quit();
 
