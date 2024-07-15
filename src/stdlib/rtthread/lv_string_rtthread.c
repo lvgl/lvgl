@@ -55,7 +55,7 @@ size_t lv_strlen(const char * str)
     return rt_strlen(str);
 }
 
-int32_t lv_memcmp(const void * p1, const void * p2, size_t len)
+int lv_memcmp(const void * p1, const void * p2, size_t len)
 {
     return rt_memcmp(p1, p2, len);
 }
@@ -81,7 +81,7 @@ char * lv_strcpy(char * dst, const char * src)
     return rt_strcpy(dst, src);
 }
 
-int32_t lv_strcmp(const char * s1, const char * s2)
+int lv_strcmp(const char * s1, const char * s2)
 {
     return rt_strcmp(s1, s2);
 }
