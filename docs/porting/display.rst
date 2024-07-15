@@ -245,7 +245,7 @@ Force refreshing
 ----------------
 
 Normally the invalidated areas (marked for redraw) are rendered in :cpp:func:`lv_timer_handler` in every
-:cpp:macro:`LV_DEF_REFR_PERIOD`milliseconds. However, by using :cpp:func:`lv_refr_now(display)` you can ask LVGL to
+:c:macro:`LV_DEF_REFR_PERIOD`milliseconds. However, by using :cpp:func:`lv_refr_now(display)` you can ask LVGL to
 redraw the invalid areas immediately. The refreshing will happen in :cpp:func:`lv_refr_now` which might take
 longer time.
 
