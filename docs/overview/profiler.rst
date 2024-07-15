@@ -218,7 +218,7 @@ Please check the completeness of the logs. If the logs are incomplete, it may be
 
 1. Serial port reception errors caused by a high baud rate. You need to reduce the baud rate.
 2. Data corruption caused by other thread logs inserted during the printing of trace logs. You need to disable the log output of other threads or refer to the configuration above to use a separate log output interface.
-3. Make sure that the string passed in by :c:macro:`LV_PROFILER_BEGIN_TAG/END_TAG` is not a local variable on the stack or a string in shared memory, because currently only the string address is recorded and the content is not copied.
+3. Make sure that the string passed in by :c:macro:`LV_PROFILER_BEGIN_TAG` or :c:macro:`LV_PROFILER_END_TAG` is not a local variable on the stack or a string in shared memory, because currently only the string address is recorded and the content is not copied.
 
 Function execution time displayed as 0s in Perfetto
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
