@@ -49,7 +49,7 @@ void lv_sdl_window_set_title(lv_display_t * disp, const char * title);
 
 void * lv_sdl_window_get_renderer(lv_display_t * disp);
 
-void lv_sdl_quit();
+void lv_sdl_quit(void);
 
 /**********************
  *      MACROS

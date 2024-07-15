@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import sys
 import os
+import platform
 from itertools import chain
 from pathlib import Path
 
@@ -23,6 +24,9 @@ build_only_options = {
     'OPTIONS_FULL_32BIT': 'Full config, 32 bit color depth',
     'OPTIONS_VG_LITE': 'VG-Lite simulator with full config, 32 bit color depth',
 }
+
+if platform.system() != 'Windows':
+    build_only_options['OPTIONS_SDL'] = 'SDL simulator with full config, 32 bit color depth'
 
 test_options = {
     'OPTIONS_TEST_SYSHEAP': 'Test config, system heap, 32 bit color depth',

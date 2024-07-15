@@ -17,7 +17,8 @@ jobs:
         build_option: ['OPTIONS_16BIT',
                        'OPTIONS_24BIT',
                        'OPTIONS_FULL_32BIT',
-                       "OPTIONS_VG_LITE"]
+                       'OPTIONS_VG_LITE',
+                       'OPTIONS_SDL']
     name: Build ${{ matrix.build_option }}
     steps:
     - uses: actions/checkout@v4
