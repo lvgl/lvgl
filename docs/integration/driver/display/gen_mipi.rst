@@ -41,7 +41,7 @@ Enable the generic MIPI LCD driver support in lv_conf.h, by cmake compiler defin
 	#define LV_USE_GENERIC_MIPI  1
 
 .. note::
-	``LV_USE_GENERIC_MIPI`` is automatically enabled when a compatible driver is enabled.
+	:c:macro:`LV_USE_GENERIC_MIPI` is automatically enabled when a compatible driver is enabled.
 
 Usage
 -----
@@ -179,7 +179,7 @@ default settings do not work for you. In particular, the generic MIPI driver acc
 	LV_LCD_FLAG_MIRROR_Y
 	LV_LCD_FLAG_BGR
 
-You can pass multiple flags by ORing them together, e.g., :c:macro:`LV_LCD_FLAG_MIRROR_X | LV_LCD_FLAG_BGR`.
+You can pass multiple flags by ORing them together, e.g., :c:macro:`LV_LCD_FLAG_MIRROR_X` ``|`` :c:macro:`LV_LCD_FLAG_BGR`.
 
 Custom command lists
 ^^^^^^^^^^^^^^^^^^^^
