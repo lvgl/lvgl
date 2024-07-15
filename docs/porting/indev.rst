@@ -153,7 +153,7 @@ added to groups.
    }
 
 Using buttons with Encoder logic
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In addition to standard encoder behavior, you can also utilize its logic
 to navigate(focus) and edit widgets using buttons. This is especially
