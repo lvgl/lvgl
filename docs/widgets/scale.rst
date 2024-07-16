@@ -56,7 +56,7 @@ Labels on major ticks can be configured with :cpp:expr:`lv_scale_set_label_show(
 set `show_label` to true if labels should be drawn, :cpp:expr:`false` to hide them.
 If instead of a numerical value in the major ticks a text is required they can be set
 with :cpp:expr:`lv_scale_set_text_src(scale, custom_labels)` using ``NULL`` as the last element,
-i.e. ``static char * custom_labels[3] = {"One", "Two", NULL}``.
+i.e. :cpp:expr:`static char * custom_labels[3] = {"One", "Two", NULL}`.
 
 <strong> NOTE: </strong> The major tick value is calculated with the :cpp:expr:`lv_map` API (when not setting the custom labels),
 this calculation takes into consideration the total tick number and the scale range, so the label drawn can present rounding errors
