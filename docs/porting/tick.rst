@@ -24,6 +24,7 @@ The ticks (milliseconds)  should be independent from any other activities of the
 For example this works, but LVGL's timing will be incorrect as the execution time of ``lv_timer_handler`` is not considered:
 
 .. code:: c
+
    // Bad idea
    lv_timer_handler();
    lv_tick_inc(5);

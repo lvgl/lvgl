@@ -20,6 +20,7 @@ Example
 -------
 
 .. code:: c
+    
     #include "lfs.h"
 
     // configuration of the filesystem is provided by this struct

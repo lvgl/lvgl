@@ -171,14 +171,14 @@ Unsubscribe from a subject
 
 .. code:: c
 
-	//`observer` is the return value of `lv_subject_add_observer*`
+    //`observer` is the return value of `lv_subject_add_observer*`
     lv_observer_remove(observer);
 
 To unsubscribe a widget from a given or all subject use:
 
 .. code:: c
 
-	lv_obj_remove_from_subject(obj, subject); //`subject` can be NULL to unsubcribe from all
+    lv_obj_remove_from_subject(obj, subject); //`subject` can be NULL to unsubcribe from all
 
 .. _observer_subject_groups:
 
@@ -200,6 +200,7 @@ To handle this you can create an array from some existing subjects and pass
 this array as a parameter when you initialize a subject with group type.
 
 .. code:: c
+
     static lv_subject_t * subject_list[3] = {&subject_1, &subject_2, &subject_3};
     lv_subject_init_group(&subject_all, subject_list, 3);  /*The last parameter is the number of elements*/
 
@@ -240,6 +241,7 @@ The above Voltage/Current measurement example looks like this in the practice:
 
         lv_label_set_text_fmt(label, "%s: %d %s", mode ? "Current" : "Voltage", value, unit);
     }
+
 
 .. _observer_widget_binding:
 
