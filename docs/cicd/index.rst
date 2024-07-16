@@ -57,7 +57,7 @@ LVGL's check_perf workflow uses the Dockerfile.lvgl found at the root of this re
 Performance data files
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The files used to report on the execution times of the profiled functions and  have the same format:
+The files used to report on the execution times of the profiled functions and have the same format:
 
 * 1 header line with no defined format (ignored by the script)
 * N lines with function data following the "[parent/]<name> [(info)] | <time>" format
@@ -71,19 +71,22 @@ Functions execution times are always identified by a parent-function pair (in ca
 Constraints and Guidelines
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-LVGL's check_perf workflow relies on a custom implementation of the *_mcount* function implemented in SO3's libc. This function is called at the start of each function found in a source file when this source file is built with GCC's "-p" (profiling) flag. The custom implementation modifies the stack to insert another function (*_mcount_exit*) as return function of the profiled function (the one that called *_mcount*). Both *_mcount* and *_mcount_exit* call a C function that timestamps their execution with the return address of the profiled function. This allows a custom script to analyse the executable file to find the function that was timestamped and calculate its execution time. This approach allows some code to be profiled automatically without the need to explicitely call timestamping functions from within the code. However it comes with a few constraints
-
-* Build as few source files as possible with the "-p" flag. As explained, GCC will insert a call to *_mcount* at the beginning of EVERY function found in a file compiled with this flag
-* Separate profiled functions from their dependencies. If a profiled function *func1* calls another function *func2*, then *func2* should be defined in a different file from *func1* and compiled without "-p" to prevent it from being profiled too. Timestamping relies on syscalls which can be slow compared to a classic execution so nesting profiled functions will result in less reliable results
+LVGL's check_perf workflow relies on GCC's "-finstrument-functions" flag that adds function calls to each function in a file. These function calls are made at the start and end of each function found in a source file when this source file is built with this flag. Both functions can be user-defined. Their current implementation timestamps their execution with the return address of the profiled function. This allows a custom script to analyse the executable file to find the function that was timestamped and calculate its execution time. This approach allows some code to be profiled automatically without the need to explicitely call timestamping functions from within the code
 
 The best way to profile some code is to create a new test application with 2 kinds of files: 
-* Setup: Those files define functions that prepare the resources necessary for the execution of the profiled functions. For example, if a profiled function needs to provide a configuration structure to one of its dependencies, the structure can be initialised and configured in it and then passed to the profiling function to be given to the function that requires it. Those files are compiled normally
-* Profiling: Those files contain functions whose entry and exit time will be timestamped. They use the functions that should be profiled with the parameters given to them by the Setup functions. Those files are compiled using the "-p flag"
-* The main of the application should be in a Setup file but may also be in a Profiling file if one wants to calculate the overall execution time. Please note however that whatever time is reported also measures the execution time of all the timestamping functions calls
-* It is recommended to call the profiled functions from the main function as it allows the profiling data analyzer to lookup way less code to find the names of the profiled functions. This can be the difference between waiting for some seconds and waiting for minutes
+* Setup: Those files define functions that prepare the resources necessary for the execution of the profiled functions. For example, if a profiled function needs to provide a configuration structure to one of its dependencies, the structure can be initialised and configured in it and then passed to the profiling function to be given to the function that requires it. One of those files must implement the functions that will be used by the compiler to instrument the profiled functions (See functions in file *tests/perf/instr_func.c* for prototype). Those files are compiled normally
+* Profiling: Those files contain functions whose entry and exit time will be timestamped. Those functions use the functions that you want to profile with the parameters provided by the Setup functions. EVERY function implemented in these files (and ONLY those) will be instrumented and profiled. Those files are compiled using the "-finstrument-functions" flag
+
+Some Quality-of-life recommendations:
+* As much as possible, refrain from calling profiled functions inside other profiled functions (or making profiling functions recursive). This decreases reliability in the execution time calculation for the parent function. Instrumentation functions use system calls which are typically quite a bit slower than regular code execution
+* The main of the application should be in a Setup file but may also be in a Profiling file if one wants to calculate the overall execution time. Please note however that whatever time is reported also includes the execution time of all the timestamping functions calls of the profiling functions (see recommendation above)
 
 Known Limitations
 ^^^^^^^^^^^^^^^^^^
 
-* The current _mcount implementation is done in aarch64 assembly and is thus only compatible with ARM64 platforms
-* The current _mcount implementation breaks the program if it makes use of a function with more than 7 parameters. Functions with 8 or more parameters are given some of their values through the stack in a way that is not possible to detect with our current implementation. This results in the values being shifted and replaced by the stack of _mcount_exit
+* It is required to call the profiling functions (those implemented in the Profiling files) from the main function only as it allows the profiling data analyzer to lookup way less code to find the names of the profiled functions. This can be changed if desired but comes with a massive dip in performance. Analysis may take up to several minutes instead of a few seconds
+
+Improvement ideas
+^^^^^^^^^^^^^^^^^^
+
+* Improve instrumentation functions to reduce the need for syscalls (clock_gettime, printf). This could improve the results' reliability
