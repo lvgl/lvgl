@@ -291,11 +291,15 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     lv_area_t txt_coords;
     lv_obj_get_content_coords(obj, &txt_coords);
     const int32_t max_w = lv_area_get_width(&txt_coords);
+    const int32_t max_h = lv_area_get_height(&txt_coords);
 
     int32_t y = 0;
     uint32_t line_start = 0;
     uint32_t new_line_start = 0;
     while(txt[new_line_start] != '\0') {
+        bool last_line = y + letter_height + line_space + letter_height > max_h;
+        if(last_line && label->long_mode == LV_LABEL_LONG_DOT) flag |= LV_TEXT_FLAG_BREAK_ALL;
+
         new_line_start += lv_text_get_next_line(&txt[line_start], font, letter_space, max_w, NULL, flag);
         if(byte_id < new_line_start || txt[new_line_start] == '\0')
             break; /*The line of 'index' letter begins at 'line_start'*/
@@ -370,7 +374,8 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
     const char * txt         = lv_label_get_text(obj);
     uint32_t line_start      = 0;
     uint32_t new_line_start  = 0;
-    int32_t max_w         = lv_area_get_width(&txt_coords);
+    int32_t max_w = lv_area_get_width(&txt_coords);
+    int32_t max_h = lv_area_get_height(&txt_coords);
     const lv_font_t * font   = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     const int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     const int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
@@ -381,6 +386,11 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
 
     /*Search the line of the index letter*/;
     while(txt[line_start] != '\0') {
+        /*If dots will be shown, break the last visible line anywhere,
+         *not only at word boundaries.*/
+        bool last_line = y + letter_height + line_space + letter_height > max_h;
+        if(last_line && label->long_mode == LV_LABEL_LONG_DOT) flag |= LV_TEXT_FLAG_BREAK_ALL;
+
         new_line_start += lv_text_get_next_line(&txt[line_start], font, letter_space, max_w, NULL, flag);
 
         if(pos.y <= y + letter_height) {
@@ -479,7 +489,8 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
     lv_label_t * label     = (lv_label_t *)obj;
     uint32_t line_start      = 0;
     uint32_t new_line_start  = 0;
-    const int32_t max_w         = lv_area_get_width(&txt_coords);
+    const int32_t max_w = lv_area_get_width(&txt_coords);
+    const int32_t max_h = lv_area_get_height(&txt_coords);
     const lv_font_t * font   = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     const int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     const int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
@@ -490,6 +501,9 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
     /*Search the line of the index letter*/
     int32_t y = 0;
     while(txt[line_start] != '\0') {
+        bool last_line = y + letter_height + line_space + letter_height > max_h;
+        if(last_line && label->long_mode == LV_LABEL_LONG_DOT) flag |= LV_TEXT_FLAG_BREAK_ALL;
+
         new_line_start += lv_text_get_next_line(&txt[line_start], font, letter_space, max_w, NULL, flag);
 
         if(pos->y <= y + letter_height) break; /*The line is found (stored in 'line_start')*/

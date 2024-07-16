@@ -372,13 +372,13 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_SW);
     if(t == NULL) {
         LV_PROFILER_END;
-        return -1;
+        return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
     }
 
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(buf == NULL) {
         LV_PROFILER_END;
-        return -1;
+        return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
     }
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
