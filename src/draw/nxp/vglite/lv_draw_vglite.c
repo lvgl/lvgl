@@ -254,7 +254,7 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 #if LV_USE_VGLITE_BLIT_SPLIT
                    || has_transform
 #endif
-                   || (!vglite_buf_aligned(img_dsc->data, img_dsc->header.stride, img_dsc->header.cf))
+                   || (!vglite_src_buf_aligned(img_dsc->data, img_dsc->header.stride, img_dsc->header.cf))
                   )
                     return 0;
 

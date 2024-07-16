@@ -118,7 +118,7 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
                     mask_area.x2 = mask_width - 1;
                     mask_area.y2 = mask_height - 1;
 
-                    if(!vglite_buf_aligned(mask_buf, mask_stride, LV_COLOR_FORMAT_A8)) {
+                    if(!vglite_src_buf_aligned(mask_buf, mask_stride, LV_COLOR_FORMAT_A8)) {
                         /* Draw a placeholder rectangle*/
                         lv_draw_border_dsc_t border_draw_dsc;
                         lv_draw_border_dsc_init(&border_draw_dsc);
