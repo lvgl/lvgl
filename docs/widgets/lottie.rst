@@ -50,10 +50,10 @@ The animations are rendered in ARGB8888 format, therefor the buffer's size shoul
 To keep the buffer size and the animation size consistent,
 the size of the widget (i.e. the size of the animation) is set to the dimensions of the buffer internally.
 
-The buffer can be set with either :cpp:expr:`void lv_lottie_set_buffer(lottie, w, h, buf)`
+The buffer can be set with either :cpp:expr:`lv_lottie_set_buffer(lottie, w, h, buf)`
 or :cpp:expr:`lv_lottie_set_draw_buf(lottie, draw_buf)`.
 
-When a draw buffer is used, it must be already initialized by the user with :cpp:expr:`LV_COLOR_FORMAT_ARGB8888` color format.
+When a draw buffer is used, it must be already initialized by the user with :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888` color format.
 
 Set a source
 ------------

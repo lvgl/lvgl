@@ -573,7 +573,7 @@ LVGL to cache the image again. Otherwise, there is no easy way of
 detecting that the underlying file changed and LVGL will still draw the
 old image from cache.
 
-To do this, use :cpp:expr:`lv_cache_invalidate(lv_cache_find(&my_png, LV_CACHE_SRC_TYPE_PTR, 0, 0));`.
+To do this, use :cpp:expr:`lv_cache_invalidate(lv_cache_find(&my_png, LV_CACHE_SRC_TYPE_PTR, 0, 0))`.
 
 Custom cache algorithm
 ----------------------

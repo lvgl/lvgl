@@ -50,7 +50,7 @@ currently being constructed.
 Dump obj tree
 ~~~~~~~~~~~~~
 
-Use API :cpp:expr:`lv_obj_dump_tree(lv_obj_t * obj, int depth)` to dump the object tree.
+Use API ``lv_obj_dump_tree(lv_obj_t * obj, int depth)`` to dump the object tree.
 It will walk through all children and print the object ID together with object address.
 
 This is useful to debug UI crash. From log we can rebuilt UI the moment before crash.
@@ -61,5 +61,5 @@ From the dump log we can clearly see that the obj does not exist.
 Find child by ID
 ~~~~~~~~~~~~~~~~
 
-Use API :cpp:expr:`lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, void * id);` to find a child by ID.
+Use API ``lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, void * id)`` to find a child by ID.
 It will walk through all children and return the first child with the given ID.
