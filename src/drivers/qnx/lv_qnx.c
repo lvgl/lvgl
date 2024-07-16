@@ -30,6 +30,7 @@ typedef struct {
     screen_window_t     window;
     screen_buffer_t     buffers[LV_QNX_BUF_COUNT];
     int                 bufidx;
+    bool                managed;
 } lv_qnx_window_t;
 
 typedef struct {
@@ -120,15 +121,19 @@ lv_display_t * lv_qnx_window_create(int32_t hor_res, int32_t ver_res)
 void lv_qnx_window_set_title(lv_display_t * disp, const char * title)
 {
     lv_qnx_window_t * dsc = lv_display_get_driver_data(disp);
+    if(!dsc->managed) {
+        /*Can't set title if there is no window manager*/
+        return;
+    }
+
     screen_event_t event;
     screen_create_event(&event);
 
     char title_buf[64];
-    snprintf(title_buf, sizeof(title), "Title=%s", title);
-    screen_set_event_property_iv(event, SCREEN_PROPERTY_TYPE,
-    (const int[]) {
-        SCREEN_EVENT_MANAGER
-    });
+    snprintf(title_buf, sizeof(title_buf), "Title=%s", title);
+
+    int type = SCREEN_EVENT_MANAGER;
+    screen_set_event_property_iv(event, SCREEN_PROPERTY_TYPE, &type);
     screen_set_event_property_cv(event, SCREEN_PROPERTY_USER_DATA,
                                  sizeof(title_buf), title_buf);
     screen_set_event_property_pv(event, SCREEN_PROPERTY_WINDOW,
@@ -222,6 +227,10 @@ int lv_qnx_event_loop(lv_display_t * disp)
                 return EXIT_FAILURE;
             }
         }
+        else if(type == SCREEN_EVENT_MANAGER) {
+            /*Only sub-type supported is closing the window*/
+            break;
+        }
 
         /*Calculate the next timeout*/
         lv_timer_handler();
@@ -314,6 +323,14 @@ static bool window_create(lv_display_t * disp)
                                      (void **)&dsc->buffers) != 0) {
         perror("screen_get_window_property_pv(BUFFERS)");
         return false;
+    }
+
+    /*Connect to the window manager. Can legitimately fail if one is not running*/
+    if(screen_manage_window(dsc->window, "Frame=Y") == 0) {
+        dsc->managed = true;
+    }
+    else {
+        dsc->managed = false;
     }
 
     int visible = 1;
