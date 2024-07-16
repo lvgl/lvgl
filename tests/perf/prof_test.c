@@ -1,9 +1,9 @@
 /**
  * This file contains the main function for the profiling program. It initialises the resources
- * and calls the profiling functions with those resources. Other functions and files may be used 
+ * and calls the profiling functions with those resources. Other functions and files may be used
  * to implement the desired procedures but the calling of the profiling function must be done in main.
  * This can be changed but it necessitates modifications in the script that calculates the execution
- * times and maps the addresses to the function names (found in SO3). However this hurts performance 
+ * times and maps the addresses to the function names (found in SO3). However this hurts performance
  * a lot (analysis goes from taking seconds to several minutes)
  */
 

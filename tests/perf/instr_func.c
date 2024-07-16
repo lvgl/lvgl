@@ -5,11 +5,11 @@
 
 /**
  * Entry function for function instrumentation
- * This functions will be called at the start of an instrumented function's execution 
+ * This functions will be called at the start of an instrumented function's execution
  * (see gcc's "-finstrument functions" flag) and provided with the address
  * of the instrumented function (this_fn) and the address where this function
  * was called from in the parent function (call_site)
- * 
+ *
  * Prints a message to timestamp the entry time of the instrumented function
  */
 void __cyg_profile_func_enter(void * this_fn, void * call_site)
@@ -27,7 +27,7 @@ void __cyg_profile_func_enter(void * this_fn, void * call_site)
  * (see gcc's "-finstrument functions" flag) and provided with the address
  * of the instrumented function (this_fn) and the address where this function
  * was called from in the parent function (call_site)
- * 
+ *
  * Prints a message to timestamp the exit time of the instrumented function
  */
 void __cyg_profile_func_exit(void * this_fn, void * call_site)
