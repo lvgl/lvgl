@@ -484,6 +484,22 @@ static bool handle_keyboard_event(screen_event_t event)
         case KEYCODE_BACKSPACE:
             dsc->key = LV_KEY_BACKSPACE;
             break;
+
+        case KEYCODE_HOME:
+            dsc->key = LV_KEY_HOME;
+            break;
+
+        case KEYCODE_END:
+            dsc->key = LV_KEY_END;
+            break;
+
+        case KEYCODE_DELETE:
+            dsc->key = LV_KEY_DEL;
+            break;
+
+        default:
+            /*Ignore other non-ASCII keys, including modifiers*/
+            if(dsc->key > 0xff) return true;
     }
 
     lv_indev_read(keyboard_indev);
