@@ -1,3 +1,12 @@
+/**
+ * This file contains the profiling functions. Those functions may contain simple calls to functions
+ * or more complex procedure depending on what needs to be profiled. Do not use these functions to 
+ * initialise structures or resources that you do not want to profile. Initialise them in another
+ * file and use the functions' parameters to provide the necessary resources. This file is compiled
+ * using the "-finstrument-functions" GCC flag. More than one file can be used but they all should
+ * be compiled with the flag
+ */
+
 #include <lvgl.h>
 
 uint32_t prof_lv_bezier3(uint32_t t, uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3)
