@@ -29,9 +29,10 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-void _lv_sdl_keyboard_handler(SDL_Event * event);
-void _lv_sdl_mouse_handler(SDL_Event * event);
-void _lv_sdl_mousewheel_handler(SDL_Event * event);
+void lv_sdl_keyboard_handler(SDL_Event * event);
+void lv_sdl_mouse_handler(SDL_Event * event);
+void lv_sdl_mousewheel_handler(SDL_Event * event);
+lv_display_t * lv_sdl_get_disp_from_win_id(uint32_t win_id);
 
 /**********************
  *      MACROS
