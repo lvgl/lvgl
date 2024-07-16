@@ -168,7 +168,13 @@ bool lv_anim_delete(void * var, lv_anim_exec_xcb_t exec_cb)
 
 void lv_anim_delete_all(void)
 {
-    _lv_ll_clear(anim_ll_p);
+    lv_anim_t * a = _lv_ll_get_head(anim_ll_p);
+    while(a != NULL) {
+        _lv_ll_remove(anim_ll_p, a);
+        if(a->deleted_cb != NULL) a->deleted_cb(a);
+        lv_free(a);
+        a = _lv_ll_get_head(anim_ll_p);
+    }
     anim_mark_list_change();
 }
 
