@@ -58,6 +58,14 @@ void lv_qnx_window_set_title(lv_display_t * disp, const char * title);
 bool lv_qnx_add_pointer_device(lv_display_t * disp);
 
 /**
+ * Create a keyboard input device for the display.
+ * Only one keyboard object is currently supported.
+ * @param   disp    The display object associated with the device
+ * @return  true if successful, false otherwise
+ */
+bool lv_qnx_add_keyboard_device(lv_display_t * disp);
+
+/**
  * Runs the event loop for the display.
  * The function only returns in response to a close event.
  * @param   disp    The display for the event loop
