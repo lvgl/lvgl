@@ -160,24 +160,21 @@ are rendered directly in the frame buffer so they cannot be
 rotated later. Therefore in direct mode only the whole frame buffer can be rotated.
 The same is true for :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_FULL`.
 
-In the case of :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_PARTIAL`the small rendered areas
+In the case of :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_PARTIAL` the small rendered areas
 can be rotated on their own before flushing to the frame buffer.
 
 Color format
 ------------
 
-The default color format of the display is set according to :c:macro:`LV_COLOR_DEPTH`
-(see ``lv_conf.h``)
+The default color format of the display is set according to :c:macro:`LV_COLOR_DEPTH` (see ``lv_conf.h``)
 
 - :c:macro:`LV_COLOR_DEPTH` ``32``: XRGB8888 (4 bytes/pixel)
 - :c:macro:`LV_COLOR_DEPTH` ``24``: RGB888 (3 bytes/pixel)
 - :c:macro:`LV_COLOR_DEPTH` ``16``: RGB565 (2 bytes/pixel)
 - :c:macro:`LV_COLOR_DEPTH` ``8``: L8 (1 bytes/pixel) Not supported yet
 
-The ``color_format`` can be changed with
-:cpp:expr:`lv_display_set_color_depth(display, LV_COLOR_FORMAT_...)`.
-Besides the default value :c:macro:`LV_COLOR_FORMAT_ARGB8888` can be
-used as a well.
+The ``color_format`` can be changed with ``lv_display_set_color_depth(display, LV_COLOR_FORMAT_...)`` .
+Besides the default value :c:macro:`LV_COLOR_FORMAT_ARGB8888` can be used as a well.
 
 It's very important that draw buffer(s) should be large enough for any
 selected color format.
