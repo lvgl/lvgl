@@ -14,7 +14,6 @@
 #include "../../core/lv_global.h"
 #include "../../display/lv_display_private.h"
 #include "../../lv_init.h"
-#include "lv_sdl_private.h"
 
 /* for aligned_alloc */
 #ifndef __USE_ISOC11
@@ -23,6 +22,7 @@
 #include <stdlib.h>
 
 #define SDL_MAIN_HANDLED /*To fix SDL's "undefined reference to WinMain" issue*/
+#include "lv_sdl_private.h"
 
 #if LV_USE_DRAW_SDL
     #include <SDL2/SDL_image.h>
