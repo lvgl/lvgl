@@ -13,6 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../../misc/lv_types.h"
+
 #if LV_USE_SDL
 
 #include LV_SDL_INCLUDE_PATH
