@@ -182,10 +182,6 @@ int lv_qnx_event_loop(lv_display_t * disp)
     return EXIT_SUCCESS;
 }
 
-void lv_qnx_quit()
-{
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
