@@ -30,7 +30,7 @@ as image sources.
 
 For example:
 
-.. code:: c
+.. code-block:: c
 
    lv_image_set_src(my_img, "S:path/to/picture.jpg");
 

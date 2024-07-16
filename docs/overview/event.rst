@@ -20,7 +20,7 @@ Add events to a widget
 The user can assign callback functions to an object to see its events.
 In practice, it looks like this:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * btn = lv_button_create(lv_screen_active());
    lv_obj_add_event_cb(btn, my_event_cb, LV_EVENT_CLICKED, NULL);   /*Assign an event callback*/
@@ -42,7 +42,7 @@ more detail.
 
 More events can be added to an object, like this:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_add_event_cb(obj, my_event_cb_1, LV_EVENT_CLICKED, NULL);
    lv_obj_add_event_cb(obj, my_event_cb_2, LV_EVENT_PRESSED, NULL);
@@ -51,7 +51,7 @@ More events can be added to an object, like this:
 Even the same event callback can be used on an object with different
 ``user_data``. For example:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_add_event_cb(obj, increment_on_click, LV_EVENT_CLICKED, &num1);
    lv_obj_add_event_cb(obj, increment_on_click, LV_EVENT_CLICKED, &num2);
@@ -62,7 +62,7 @@ Other objects can use the same *event callback*.
 
 In the very same way events can attached to the input devices and displays like this
 
-.. code:: c
+.. code-block:: c
 
    lv_display_add_event_cb(disp, event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
    lv_indev_add_event_cb(indev, event_cb, LV_EVENT_CLICKED, NULL);
@@ -71,7 +71,7 @@ In the very same way events can attached to the input devices and displays like 
 Remove event(s) from widgets
 ****************************
 
-.. code:: c
+.. code-block:: c
 
    uint32_t i;
    uint32_t event_cnt = lv_obj_get_event_count(obj);
@@ -198,7 +198,7 @@ To manually send events to an object, use
 For example, this can be used to manually close a message box by
 simulating a button press (although there are simpler ways to do this):
 
-.. code:: c
+.. code-block:: c
 
    /*Simulate the press of the first button (indexes start from zero)*/
    uint32_t btn_id = 0;

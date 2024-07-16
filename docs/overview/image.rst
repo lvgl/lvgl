@@ -137,7 +137,7 @@ Manually create an image
 If you are generating an image at run-time, you can craft an image
 variable to display it using LVGL. For example:
 
-.. code:: c
+.. code-block:: c
 
    uint8_t my_img_data[] = {0x00, 0x01, 0x02, ...};
 
@@ -159,7 +159,7 @@ Use images
 The simplest way to use an image in LVGL is to display it with an
 :ref:`lv_image` object:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * icon = lv_image_create(lv_screen_active(), NULL);
 
@@ -238,7 +238,7 @@ Here's an example of getting LVGL to work with PNG images.
 First, you need to create a new image decoder and set some functions to
 open/close the PNG files. It should look like this:
 
-.. code:: c
+.. code-block:: c
 
    /*Create a new decoder and register functions */
    lv_image_decoder_t * dec = lv_image_decoder_create();
@@ -397,7 +397,7 @@ the decoding session and call :cpp:func:`lv_image_decoder_open`.
 The ``color`` parameter is used only with ``LV_COLOR_FORMAT_A1/2/4/8``
 images to tell color of the image.
 
-.. code:: c
+.. code-block:: c
 
 
    lv_result_t res;
@@ -426,7 +426,7 @@ See the detailed code below:
 
 - Stride alignment and premultiply post-processing example:
 
-.. code:: c
+.. code-block:: c
 
    /* Define post-processing state */
    typedef enum {
@@ -476,7 +476,7 @@ See the detailed code below:
 
 - GPU draw unit example:
 
-.. code:: c
+.. code-block:: c
 
   void gpu_draw_image(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
   {
@@ -581,7 +581,7 @@ Custom cache algorithm
 If you want to implement your own cache algorithm, you can refer to the
 following code to replace the LVGL built-in cache manager:
 
-.. code:: c
+.. code-block:: c
 
    static lv_cache_entry_t * my_cache_add_cb(size_t size)
    {

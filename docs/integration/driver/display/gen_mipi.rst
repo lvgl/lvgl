@@ -36,7 +36,7 @@ Configuring the driver
 
 Enable the generic MIPI LCD driver support in lv_conf.h, by cmake compiler define or by KConfig
 
-.. code:: c
+.. code-block:: c
 
 	#define LV_USE_GENERIC_MIPI  1
 
@@ -48,7 +48,7 @@ Usage
 
 You need to implement two platform-dependent functions:
 
-.. code:: c
+.. code-block:: c
 
 	/* Send short command to the LCD. This function shall wait until the transaction finishes. */
 	int32_t my_lcd_send_cmd(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, const uint8_t *param, size_t param_size)
@@ -89,7 +89,7 @@ Example
 	You can find a step-by-step guide and the actual implementation of the callbacks on an STM32F746 using STM32CubeIDE and the ST HAL libraries here: :ref:`lcd_stm32_guide`
 	
 
-.. code:: c
+.. code-block:: c
 
 	#include "src/drivers/display/st7789/lv_st7789.h"
 
@@ -172,7 +172,7 @@ Create flags
 The third argument of the :cpp:func:`lv_lcd_generic_mipi_create()` function is a flag array. This can be used to configure the orientation and RGB ordering of the panel if the
 default settings do not work for you. In particular, the generic MIPI driver accepts the following flags:
 
-.. code:: c
+.. code-block:: c
 
 	LV_LCD_FLAG_NONE
 	LV_LCD_FLAG_MIRROR_X
@@ -191,7 +191,7 @@ of the panel provides some example code with recommended register settings.
 You can use the ``my_lcd_send_cmd()`` function to send an arbitrary command to the LCD controller. However, to make it easier to send a large number of parameters
 the generic MIPI driver supports sending a custom command list to the controller. The commands must be put into a 'uint8_t' array:
 
-.. code:: c
+.. code-block:: c
 
 	static const uint8_t init_cmd_list[] = {
 		<command 1>, <number of parameters>, <parameter 1>, ... <parameter N>,

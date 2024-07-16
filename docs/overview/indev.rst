@@ -23,7 +23,7 @@ Cursor
 
 Pointer input devices (like a mouse) can have a cursor.
 
-.. code:: c
+.. code-block:: c
 
    ...
    lv_indev_t * mouse_indev = lv_indev_create();
@@ -47,7 +47,7 @@ widgets send the gestures to its parent, so finally the gestures can be
 detected on the screen object in a form of an :cpp:enumerator:`LV_EVENT_GESTURE`
 event. For example:
 
-.. code:: c
+.. code-block:: c
 
    void my_event(lv_event_t * e)
    {

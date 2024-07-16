@@ -66,7 +66,7 @@ following reasons:
 ``lvgl/scripts/filetohex.py`` can be used to convert a Lottie file a hex
 array. E.g.:
 
-.. code:: shell
+.. code-block:: shell
 
    ./filetohex.py path/to/lottie.json > out.txt
 

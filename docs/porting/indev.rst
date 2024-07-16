@@ -9,7 +9,7 @@ Types of input devices
 
 To create an input device use
 
-.. code:: c
+.. code-block:: c
 
    /*Register at least one display before you register any input devices*/
    lv_indev_t * indev = lv_indev_create();
@@ -35,7 +35,7 @@ Touchpad, mouse or any pointer
 Input devices that can click points on the screen belong to this
 category.
 
-.. code:: c
+.. code-block:: c
 
    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
    ...
@@ -103,7 +103,7 @@ To use a keyboard/keypad:
 - Use ``LV_KEY_...`` to navigate among the objects in the group. See
   ``lv_core/lv_group.h`` for the available keys.
 
-.. code:: c
+.. code-block:: c
 
 
    lv_indev_set_type(indev, LV_INDEV_TYPE_KEYPAD);
@@ -139,7 +139,7 @@ In short, the Encoder input devices work like this:
 To use an *Encoder* (similarly to the *Keypads*) the objects should be
 added to groups.
 
-.. code:: c
+.. code-block:: c
 
    lv_indev_set_type(indev, LV_INDEV_TYPE_ENCODER);
 
@@ -170,7 +170,7 @@ You need to have 3 buttons available:
 If you hold the keys it will simulate an encoder advance with period
 specified in ``indev_drv.long_press_repeat_time``.
 
-.. code:: c
+.. code-block:: c
 
 
    lv_indev_set_type(indev, LV_INDEV_TYPE_ENCODER);
@@ -201,7 +201,7 @@ should look like ``const lv_point_t points_array[] = { {12,30},{60,90}, ...}``
 :important: The points_array can't go out of scope. Either declare it as a global variable
             or as a static variable inside a function.`
 
-.. code:: c
+.. code-block:: c
 
 
    lv_indev_set_type(indev, LV_INDEV_TYPE_BUTTON);
@@ -281,7 +281,7 @@ might need to read it by polling file descriptor (fd).
 
 You can do this in the following way:
 
-.. code:: c
+.. code-block:: c
 
    /*Update the input device's running mode to LV_INDEV_MODE_EVENT*/
    lv_indev_set_mode(indev, LV_INDEV_MODE_EVENT);

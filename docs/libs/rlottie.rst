@@ -24,7 +24,7 @@ To build on desktop you can follow the instructions from Rlottie's
 
 In the most basic case it looks like this:
 
-.. code:: shell
+.. code-block:: shell
 
    mkdir rlottie_workdir
    cd rlottie_workdir
@@ -59,7 +59,7 @@ Use Rlottie from file
 
 To create a Lottie animation from file use:
 
-.. code:: c
+.. code-block:: c
 
      lv_obj_t * lottie = lv_rlottie_create_from_file(parent, width, height, "path/to/lottie.json");
 
@@ -79,13 +79,13 @@ following reasons:
 ``lvgl/scripts/filetohex.py`` can be used to convert a Lottie file a hex
 array. E.g.:
 
-.. code:: shell
+.. code-block:: shell
 
    ./filetohex.py path/to/lottie.json > out.txt
 
 To create an animation from raw data:
 
-.. code:: c
+.. code-block:: c
 
    extern const uint8_t lottie_data[];
    lv_obj_t* lottie = lv_rlottie_create_from_raw(parent, width, height, (const char *)lottie_data);
@@ -107,7 +107,7 @@ LVGL provides two functions to control the animation mode:
 You'll combine your intentions when calling the first method, like in
 these examples:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * lottie = lv_rlottie_create_from_file(scr, 128, 128, "test.json");
    lv_obj_center(lottie);
@@ -190,7 +190,7 @@ IDF Setup
 Where the LVGL simulator uses the installed rlottie lib, the IDF works
 best when using rlottie as a submodule under the components directory.
 
-.. code:: shell
+.. code-block:: shell
 
    cd 'your/project/directory'
    git add submodule
@@ -224,7 +224,7 @@ Copy this CMakeLists file to
 In addition to the component CMakeLists file, you'll also need to tell
 your project level CMakeLists in your IDF project to require rlottie:
 
-.. code:: console
+.. code-block:: console
 
    REQUIRES "lvgl" "rlottie"
 
@@ -274,7 +274,7 @@ your espressif project. This is as simple as swapping
 IDF) with the appropriate :cpp:expr:`MALLOC_CAP` call - for SPIRAM usage this is
 :cpp:expr:`MALLOC_CAP_SPIRAM`.
 
-.. code:: c
+.. code-block:: c
 
    rlottie->allocated_buf = heap_caps_malloc(allocated_buf_size+1, MALLOC_CAP_SPIRAM);
 

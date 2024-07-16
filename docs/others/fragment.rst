@@ -32,7 +32,7 @@ Enable :c:macro:`LV_USE_FRAGMENT` in ``lv_conf.h``.
 Create Fragment Class
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: c
+.. code-block:: c
 
    struct sample_fragment_t {
        /* IMPORTANT: don't miss this part */
@@ -53,7 +53,7 @@ Create Fragment Class
 Use ``lv_fragment_manager``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: c
+.. code-block:: c
 
    /* Create fragment instance, and objects will be added to container */
    lv_fragment_manager_t *manager = lv_fragment_manager_create(container, NULL);
@@ -63,7 +63,7 @@ Use ``lv_fragment_manager``
 Fragment Based Navigation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: c
+.. code-block:: c
 
    /* Add one instance into manager stack. View object of current fragment will be destroyed,
     * but instances created in class constructor will be kept.

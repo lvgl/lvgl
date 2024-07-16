@@ -37,7 +37,7 @@ FLASH space.
 -  Copy the FreeType source code to your project directory.
 -  Refer to the following ``Makefile`` for configuration:
 
-.. code:: make
+.. code-block:: make
 
    # FreeType custom configuration header file
    CFLAGS += -DFT2_BUILD_LIBRARY

@@ -42,26 +42,26 @@ To setup your development environment refer to the
 After you completed the setup above you can check out all of the `provided samples <https://docs.zephyrproject.org/latest/samples/>`__ for various boards.
 You can check the list of available boards using:
 
-.. code:: shell
+.. code-block:: shell
 
    $ west boards
 
 After you chose a board you can build one of the LVGL demos for it. Here we are using the :code:`native_posix`
 board, which allows for running the application on your posix compliant host system:
 
-.. code:: shell
+.. code-block:: shell
 
    $ west build -b native_posix samples/modules/lvgl/demos
 
 To run the application on your host:
 
-.. code:: shell
+.. code-block:: shell
 
    $ west build -t run
 
 In case you chose any of the other supported boards you can flash to the device with:
 
-.. code:: shell
+.. code-block:: shell
 
     $ west flash
 
@@ -79,7 +79,7 @@ Zephyr includes a powerful shell implementation that can be enabled with the Kco
 
 The shell offers enabling/disabling of LVGL monkeys:
 
-.. code:: shell
+.. code-block:: shell
 
     # Create a new monkey with the given indev type
     uart$ lvgl monkey create [pointer|keypad|button|encoder]
@@ -90,7 +90,7 @@ The shell offers enabling/disabling of LVGL monkeys:
 This is useful for checking your application for memory leaks and other bugs.
 Speaking of memory leaks, you can also acquire stats of the memory used by LVGL
 
-.. code:: shell
+.. code-block:: shell
 
     uart$ lvgl stats memory
 
@@ -113,7 +113,7 @@ they are created at application start up before :code:`main()` is executed.
 
 Most boards or shields that have a display or display connector have the pointer input device already declared:
 
-.. code::
+.. code-block::
 
     lvgl_pointer {
         compatible = "zephyr,lvgl-pointer-input";
@@ -123,7 +123,7 @@ Most boards or shields that have a display or display connector have the pointer
 You can access the underlying lvgl :code:`lv_indev_t` for configuration.
 Example with the encoder device to assign a :code:`lv_group_t`:
 
-.. code:: c
+.. code-block:: c
 
     const struct device *lvgl_encoder = DEVICE_DT_GET(DT_COMPAT_GET_ANY_STATUS_OKAY(zephyr_lvgl_encoder_input));
 
@@ -145,7 +145,7 @@ Kconfig
 Aside from enabling the shell you can also use Kconfig to finetune
 the footprint of your application.
 
-.. code::
+.. code-block::
 
     # Size of the memory region from which lvgl memory is allocated
     CONFIG_LV_Z_MEM_POOL_SIZE=8192

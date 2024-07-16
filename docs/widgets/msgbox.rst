@@ -54,7 +54,7 @@ Get the parts
 The building blocks of the message box can be obtained using the
 following functions:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * lv_msgbox_get_title(lv_obj_t * mbox);
    lv_obj_t * lv_msgbox_get_close_btn(lv_obj_t * mbox);

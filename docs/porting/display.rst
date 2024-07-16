@@ -20,7 +20,7 @@ flush_cb
 
 An example ``flush_cb`` looks like this:
 
-.. code:: c
+.. code-block:: c
 
    void my_flush_cb(lv_display_t * display, const lv_area_t * area, void * px_map)
    {
@@ -83,7 +83,7 @@ The draw buffers can be set with
 
 Example:
 
-.. code:: c
+.. code-block:: c
 
    static uint16_t buf[LCD_HOR_RES * LCD_VER_RES / 10];
    lv_display_set_buffers(disp, buf, NULL, sizeof(buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
@@ -219,7 +219,7 @@ the TE signal.
 
 You can do this in the following way:
 
-.. code:: c
+.. code-block:: c
 
    /*Delete the original display refresh timer*/
    lv_display_delete_refr_timer(disp);

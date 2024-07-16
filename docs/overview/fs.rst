@@ -26,7 +26,7 @@ To add a driver, a :cpp:type:`lv_fs_drv_t` needs to be initialized like below.
 The :cpp:type:`lv_fs_drv_t` needs to be static, global or dynamically allocated
 and not a local variable.
 
-.. code:: c
+.. code-block:: c
 
    static lv_fs_drv_t drv;                   /*Needs to be static or global*/
    lv_fs_drv_init(&drv);                     /*Basic initialization*/
@@ -61,7 +61,7 @@ Open callback
 
 The prototype of ``open_cb`` looks like this:
 
-.. code:: c
+.. code-block:: c
 
    void * (*open_cb)(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
 
@@ -79,7 +79,7 @@ Other callbacks
 The other callbacks are quite similar. For example ``write_cb`` looks
 like this:
 
-.. code:: c
+.. code-block:: c
 
    lv_fs_res_t (*write_cb)(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw);
 
@@ -95,7 +95,7 @@ Usage example
 
 The example below shows how to read from a file:
 
-.. code:: c
+.. code-block:: c
 
    lv_fs_file_t f;
    lv_fs_res_t res;
@@ -116,7 +116,7 @@ This example shows how to read a directory's content. It's up to the
 driver how to mark directories in the result but it can be a good
 practice to insert a ``'/'`` in front of each directory name.
 
-.. code:: c
+.. code-block:: c
 
    lv_fs_dir_t dir;
    lv_fs_res_t res;

@@ -26,7 +26,7 @@ prototype.
 
 For example:
 
-.. code:: c
+.. code-block:: c
 
    void my_timer(lv_timer_t * timer)
    {
@@ -117,7 +117,7 @@ clear all asynchronous calls matching ``my_function`` and ``data_p``.
 
 For example:
 
-.. code:: c
+.. code-block:: c
 
    void my_screen_clean_up(void * scr)
    {

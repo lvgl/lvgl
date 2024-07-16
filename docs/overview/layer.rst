@@ -24,7 +24,7 @@ its children.
 
 .. image:: /misc/layers.png
 
-.. code:: c
+.. code-block:: c
 
    /*Create a screen*/
    lv_obj_t * scr = lv_obj_create(NULL, NULL);
@@ -90,7 +90,7 @@ everywhere. For example, a menu bar, a pop-up, etc. If the ``click``
 attribute is enabled, then ``layer_top`` will absorb all user clicks and
 acts as a modal.
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
 
