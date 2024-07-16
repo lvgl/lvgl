@@ -12,7 +12,7 @@
 #include "../../core/lv_group.h"
 #include "../../indev/lv_indev_private.h"
 #include "../../stdlib/lv_string.h"
-#include LV_SDL_INCLUDE_PATH
+#include "lv_sdl_private.h"
 
 /*********************
  *      DEFINES
@@ -23,11 +23,6 @@
  **********************/
 static void sdl_mousewheel_read(lv_indev_t * indev, lv_indev_data_t * data);
 static void release_indev_cb(lv_event_t * e);
-
-/***********************
- *   GLOBAL PROTOTYPES
- ***********************/
-void _lv_sdl_mousewheel_handler(SDL_Event * event);
 
 /**********************
  *  STATIC VARIABLES

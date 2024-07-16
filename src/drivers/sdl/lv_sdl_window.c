@@ -14,6 +14,7 @@
 #include "../../core/lv_global.h"
 #include "../../display/lv_display_private.h"
 #include "../../lv_init.h"
+#include "lv_sdl_private.h"
 
 /* for aligned_alloc */
 #ifndef __USE_ISOC11
@@ -22,7 +23,6 @@
 #include <stdlib.h>
 
 #define SDL_MAIN_HANDLED /*To fix SDL's "undefined reference to WinMain" issue*/
-#include LV_SDL_INCLUDE_PATH
 
 #if LV_USE_DRAW_SDL
     #include <SDL2/SDL_image.h>
@@ -71,9 +71,6 @@ static void release_disp_cb(lv_event_t * e);
  *   GLOBAL PROTOTYPES
  ***********************/
 lv_display_t * _lv_sdl_get_disp_from_win_id(uint32_t win_id);
-void _lv_sdl_mouse_handler(SDL_Event * event);
-void _lv_sdl_mousewheel_handler(SDL_Event * event);
-void _lv_sdl_keyboard_handler(SDL_Event * event);
 static void res_chg_event_cb(lv_event_t * e);
 
 static bool inited = false;
