@@ -226,10 +226,11 @@ void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px)
 
 }
 
-void lv_draw_sw_i1_invert(void * buf, uint32_t buf_size) {
+void lv_draw_sw_i1_invert(void * buf, uint32_t buf_size)
+{
     if(buf == NULL) return;
 
-    uint8_t *byte_buf = (uint8_t *)buf;
+    uint8_t * byte_buf = (uint8_t *)buf;
     for(uint32_t i = 0; i < buf_size; i++) {
         byte_buf[i] = ~byte_buf[i];
     }
