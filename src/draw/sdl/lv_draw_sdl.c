@@ -172,6 +172,9 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 
 static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
 {
+    static int32_t x = 0;
+    printf("%d\n", x++);
+
     lv_draw_task_t * task = u->task_act;
 
     lv_layer_t dest_layer;
@@ -345,8 +348,10 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
 
     cache_data->draw_dsc = lv_malloc(base_dsc->dsc_size);
     lv_memcpy((void *)cache_data->draw_dsc, base_dsc, base_dsc->dsc_size);
-    cache_data->w = texture_w;
-    cache_data->h = texture_h;
+    //    cache_data->w = texture_w;
+    //    cache_data->h = texture_h;
+    cache_data->w = lv_area_get_width(&task->area);
+    cache_data->h = lv_area_get_height(&task->area);
     cache_data->texture = texture;
 
     if(obj) {
@@ -426,13 +431,13 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
 
     SDL_SetRenderTarget(renderer, layer_get_texture(dest_layer));
 
-    lv_draw_image_dsc_t * draw_dsc = lv_draw_task_get_image_dsc(t);
-    if(draw_dsc) {
+    lv_draw_image_dsc_t * image_draw_dsc = lv_draw_task_get_image_dsc(t);
+    if(image_draw_dsc) {
         lv_area_t image_area;
         image_area.x1 = 0;
         image_area.y1 = 0;
-        image_area.x2 = draw_dsc->header.w - 1;
-        image_area.y2 = draw_dsc->header.h - 1;
+        image_area.x2 = image_draw_dsc->header.w - 1;
+        image_area.y2 = image_draw_dsc->header.h - 1;
 
         lv_area_move(&image_area, t->area.x1 - dest_layer->buf_area.x1, t->area.y1 - dest_layer->buf_area.y1);
         rect.x = image_area.x1;
@@ -441,7 +446,9 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
         rect.h = lv_area_get_height(&image_area);
 
         SDL_RenderSetClipRect(renderer, &clip_rect);
-        SDL_RenderCopy(renderer, texture, NULL, &rect);
+        //        SDL_RenderCopy(renderer, texture, NULL, &rect);
+        SDL_Point center = {image_draw_dsc->pivot.x, image_draw_dsc->pivot.y};
+        SDL_RenderCopyEx(renderer, texture, NULL, &rect, image_draw_dsc->rotation / 10, &center, SDL_FLIP_NONE);
     }
     else {
         rect.x = t->_real_area.x1 - dest_layer->buf_area.x1;
@@ -455,17 +462,15 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
 
     SDL_RenderSetClipRect(renderer, NULL);
 
+    lv_cache_release(u->texture_cache, entry_cached, u);
+
     /*Do not cache label's with local text as the text will be freed*/
     if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
         lv_draw_label_dsc_t * label_dsc = t->draw_dsc;
         if(label_dsc->text_local) {
-            //          lv_cache_entry_set_invalid(entry_cached, true);
-            printf("a\n");
+            lv_cache_drop(u->texture_cache, &data_to_find, NULL);
         }
     }
-    printf("b\n");
-    lv_cache_release(u->texture_cache, entry_cached, u);
-    printf("c\n");
 }
 
 static void execute_drawing(lv_draw_sdl_unit_t * u)
