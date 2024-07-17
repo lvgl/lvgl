@@ -22,7 +22,7 @@ An example ``flush_cb`` looks like this:
 
 .. code:: c
 
-   void my_flush_cb(lv_display_t * display, const lv_area_t * area, void * px_map)
+   void my_flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map)
    {
        /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one
         *`put_px` is just an example, it needs to be implemented by you.*/
