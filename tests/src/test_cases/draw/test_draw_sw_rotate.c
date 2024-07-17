@@ -224,4 +224,74 @@ void test_rotate270_ARGB8888(void)
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedArray, dstArray, sizeof(dstArray));
 }
 
+void test_rotate90_L8(void)
+{
+    uint8_t srcArray[3 * 2] = {
+        0x11, 0x22, 0x33,
+        0x44, 0x55, 0x66
+    };
+    uint8_t dstArray[2 * 3] = {0};
+
+    uint8_t expectedArray[2 * 3] = {
+        0x33, 0x66,
+        0x22, 0x55,
+        0x11, 0x44,
+    };
+
+    lv_draw_sw_rotate(srcArray, dstArray,
+                      3, 2,
+                      3 * sizeof(uint8_t),
+                      2 * sizeof(uint8_t),
+                      LV_DISPLAY_ROTATION_90,
+                      LV_COLOR_FORMAT_L8);
+
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedArray, dstArray, sizeof(dstArray));
+}
+
+
+void test_rotate180_L8(void)
+{
+    uint8_t srcArray[3 * 2] = {
+        0x11, 0x22, 0x33,
+        0x44, 0x55, 0x66
+    };
+    uint8_t dstArray[3 * 2] = {0};
+    uint8_t expectedArray[3 * 2] = {
+        0x66, 0x55, 0x44,
+        0x33, 0x22, 0x11,
+    };
+    lv_draw_sw_rotate(srcArray, dstArray,
+                      3, 2,
+                      3 * sizeof(uint8_t),
+                      3 * sizeof(uint8_t),
+                      LV_DISPLAY_ROTATION_180,
+                      LV_COLOR_FORMAT_L8);
+
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedArray, dstArray, sizeof(dstArray));
+}
+
+void test_rotate270_L8(void)
+{
+    uint8_t srcArray[3 * 2] = {
+        0x11, 0x22, 0x33,
+        0x44, 0x55, 0x66
+    };
+
+    uint8_t dstArray[2 * 3] = {0};
+
+    uint8_t expectedArray[2 * 3] = {
+        0x44, 0x11,
+        0x55, 0x22,
+        0x66, 0x33
+    };
+    lv_draw_sw_rotate(srcArray, dstArray,
+                      3, 2,
+                      3 * sizeof(uint8_t),
+                      2 * sizeof(uint8_t),
+                      LV_DISPLAY_ROTATION_270,
+                      LV_COLOR_FORMAT_L8);
+
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedArray, dstArray, sizeof(dstArray));
+}
+
 #endif

@@ -78,6 +78,18 @@
     #define LV_DRAW_SW_ROTATE270_RGB565(...) LV_RESULT_INVALID
 #endif
 
+#ifndef LV_DRAW_SW_ROTATE90_L8
+    #define LV_DRAW_SW_ROTATE90_L8(...) LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_ROTATE180_L8
+    #define LV_DRAW_SW_ROTATE180_L8(...) LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_ROTATE270_L8
+    #define LV_DRAW_SW_ROTATE270_L8(...) LV_RESULT_INVALID
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -124,6 +136,17 @@ static void rotate270_rgb565(const uint16_t * src, uint16_t * dst, int32_t srcWi
                              int32_t dstStride);
 #endif
 
+#if LV_DRAW_SW_SUPPORT_L8
+
+static void rotate90_l8(const uint8_t * src, uint8_t * dst, int32_t srcWidth, int32_t srcHeight,
+                        int32_t srcStride,
+                        int32_t dstStride);
+static void rotate180_l8(const uint8_t * src, uint8_t * dst, int32_t width, int32_t height, int32_t src_stride,
+                         int32_t dest_stride);
+static void rotate270_l8(const uint8_t * src, uint8_t * dst, int32_t srcWidth, int32_t srcHeight,
+                         int32_t srcStride,
+                         int32_t dstStride);
+#endif
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -231,6 +254,11 @@ void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t
 {
     if(rotation == LV_DISPLAY_ROTATION_90) {
         switch(color_format) {
+#if LV_DRAW_SW_SUPPORT_L8
+            case LV_COLOR_FORMAT_L8:
+                rotate90_l8(src, dest, src_width, src_height, src_stride, dest_stride);
+                break;
+#endif
 #if LV_DRAW_SW_SUPPORT_RGB565
             case LV_COLOR_FORMAT_RGB565:
                 rotate90_rgb565(src, dest, src_width, src_height, src_stride, dest_stride);
@@ -256,6 +284,11 @@ void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t
 
     if(rotation == LV_DISPLAY_ROTATION_180) {
         switch(color_format) {
+#if LV_DRAW_SW_SUPPORT_L8
+            case LV_COLOR_FORMAT_L8:
+                rotate180_l8(src, dest, src_width, src_height, src_stride, dest_stride);
+                break;
+#endif
 #if LV_DRAW_SW_SUPPORT_RGB565
             case LV_COLOR_FORMAT_RGB565:
                 rotate180_rgb565(src, dest, src_width, src_height, src_stride, dest_stride);
@@ -281,6 +314,11 @@ void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t
 
     if(rotation == LV_DISPLAY_ROTATION_270) {
         switch(color_format) {
+#if LV_DRAW_SW_SUPPORT_L8
+            case LV_COLOR_FORMAT_L8:
+                rotate270_l8(src, dest, src_width, src_height, src_stride, dest_stride);
+                break;
+#endif
 #if LV_DRAW_SW_SUPPORT_RGB565
             case LV_COLOR_FORMAT_RGB565:
                 rotate270_rgb565(src, dest, src_width, src_height, src_stride, dest_stride);
@@ -666,7 +704,7 @@ static void rotate270_rgb565(const uint16_t * src, uint16_t * dst, int32_t srcWi
 static void rotate180_rgb565(const uint16_t * src, uint16_t * dst, int32_t width, int32_t height, int32_t src_stride,
                              int32_t dest_stride)
 {
-    if(LV_RESULT_OK == LV_DRAW_SW_ROTATE180_RGB565(src, dst, srcWidth, srcHeight, srcStride, dstStride)) {
+    if(LV_RESULT_OK == LV_DRAW_SW_ROTATE180_RGB565(src, dst, width, height, src_stride)) {
         return ;
     }
 
@@ -698,6 +736,63 @@ static void rotate90_rgb565(const uint16_t * src, uint16_t * dst, int32_t srcWid
         int32_t srcIndex = x;
         for(int32_t y = 0; y < srcHeight; ++y) {
             dst[dstIndex * dstStride + y] = src[srcIndex];
+            srcIndex += srcStride;
+        }
+    }
+}
+
+#endif
+
+
+#if LV_DRAW_SW_SUPPORT_L8
+
+static void rotate90_l8(const uint8_t * src, uint8_t * dst, int32_t srcWidth, int32_t srcHeight,
+                        int32_t srcStride,
+                        int32_t dstStride)
+{
+    if(LV_RESULT_OK == LV_DRAW_SW_ROTATE270_L8(src, dst, srcWidth, srcHeight, srcStride, dstStride)) {
+        return ;
+    }
+
+    for(int32_t x = 0; x < srcWidth; ++x) {
+        int32_t dstIndex = (srcWidth - x - 1);
+        int32_t srcIndex = x;
+        for(int32_t y = 0; y < srcHeight; ++y) {
+            dst[dstIndex * dstStride + y] = src[srcIndex];
+            srcIndex += srcStride;
+        }
+    }
+}
+
+static void rotate180_l8(const uint8_t * src, uint8_t * dst, int32_t width, int32_t height, int32_t src_stride,
+                         int32_t dest_stride)
+{
+    if(LV_RESULT_OK == LV_DRAW_SW_ROTATE180_L8(src, dst, width, height, src_stride)) {
+        return ;
+    }
+
+    for(int32_t y = 0; y < height; ++y) {
+        int32_t dstIndex = (height - y - 1) * dest_stride;
+        int32_t srcIndex = y * src_stride;
+        for(int32_t x = 0; x < width; ++x) {
+            dst[dstIndex + width - x - 1] = src[srcIndex + x];
+        }
+    }
+}
+
+static void rotate270_l8(const uint8_t * src, uint8_t * dst, int32_t srcWidth, int32_t srcHeight,
+                         int32_t srcStride,
+                         int32_t dstStride)
+{
+    if(LV_RESULT_OK == LV_DRAW_SW_ROTATE90_L8(src, dst, srcWidth, srcHeight, srcStride, dstStride)) {
+        return ;
+    }
+
+    for(int32_t x = 0; x < srcWidth; ++x) {
+        int32_t dstIndex = x * dstStride;
+        int32_t srcIndex = x;
+        for(int32_t y = 0; y < srcHeight; ++y) {
+            dst[dstIndex + (srcHeight - y - 1)] = src[srcIndex];
             srcIndex += srcStride;
         }
     }
