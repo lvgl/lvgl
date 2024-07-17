@@ -133,6 +133,9 @@ static void rotate270_rgb565(const uint16_t * src, uint16_t * dst, int32_t srcWi
  *      MACROS
  **********************/
 
+#define LBLOCKSIZE (sizeof(long))
+#define UNALIGNED_ADDR(X)   ((uintptr_t)(X) & (LBLOCKSIZE - 1))
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -224,6 +227,36 @@ void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px)
         buf16[e] = ((buf16[e] & 0xff00) >> 8) | ((buf16[e] & 0x00ff) << 8);
     }
 
+}
+
+void lv_draw_sw_i1_invert(void * buf, uint32_t buf_size)
+{
+    if(buf == NULL) return;
+
+    uint8_t * byte_buf = (uint8_t *)buf;
+    uint32_t i;
+
+    while(UNALIGNED_ADDR(byte_buf) && buf_size > 0) {
+        *byte_buf = ~(*byte_buf);
+        byte_buf++;
+        buf_size--;
+    }
+
+    if(buf_size >= LBLOCKSIZE) {
+        uint32_t * aligned_addr = (uint32_t *)byte_buf;
+        uint32_t word_count = buf_size / 4;
+
+        for(i = 0; i < word_count; ++i) {
+            aligned_addr[i] = ~aligned_addr[i];
+        }
+
+        byte_buf = (uint8_t *)(aligned_addr + word_count);
+        buf_size = buf_size % 4;
+    }
+
+    for(i = 0; i < buf_size; ++i) {
+        byte_buf[i] = ~byte_buf[i];
+    }
 }
 
 void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t src_height, int32_t src_stride,
