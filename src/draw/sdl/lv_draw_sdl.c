@@ -9,8 +9,6 @@
 #include "../lv_draw_private.h"
 #if LV_USE_DRAW_SDL
 #include LV_SDL_INCLUDE_PATH
-#include <SDL2/SDL_image.h>
-
 #include "lv_draw_sdl.h"
 #include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
@@ -238,7 +236,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
                 rect_dsc.bg_opa = LV_OPA_0;
                 rect_dsc.radius = box_shadow_dsc->radius;
                 rect_dsc.bg_color = box_shadow_dsc->color;
-                rect_dsc.shadow_opa = LV_OPA_20;//box_shadow_dsc->opa;
+                rect_dsc.shadow_opa = box_shadow_dsc->opa;
                 rect_dsc.shadow_width = box_shadow_dsc->width;
                 rect_dsc.shadow_spread = box_shadow_dsc->spread;
                 rect_dsc.shadow_offset_x = box_shadow_dsc->ofs_x;
@@ -279,47 +277,11 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
             }
             break;
         case LV_DRAW_TASK_TYPE_IMAGE: {
-                lv_draw_image_dsc_t * image_dsc = task->draw_dsc;
-                lv_image_src_t type = lv_image_src_get_type(image_dsc->src);
-                SDL_Surface * surface = NULL;
-                if(type == LV_IMAGE_SRC_FILE) {
-                    const char * path = image_dsc->src;
-                    surface = IMG_Load(&path[2]);
-                    if(surface == NULL) {
-                        LV_LOG_ERROR("could not load image from file: %s", IMG_GetError());
-                        return false;
-                    }
-                }
-                else if(type == LV_IMAGE_SRC_VARIABLE) {
-                    lv_image_dsc_t * lvd = (lv_image_dsc_t *)image_dsc->src;
-                    surface = SDL_CreateRGBSurfaceFrom((void *)lvd->data,
-                                                       lvd->header.w, lvd->header.h,
-                                                       LV_COLOR_FORMAT_GET_BPP(lvd->header.cf),
-                                                       lvd->header.stride,
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-                                                       0x00FF0000,
-                                                       0x0000FF00,
-                                                       0x000000FF,
-                                                       0xFF000000
-#else
-                                                       0x0000FF00,
-                                                       0x00FF0000,
-                                                       0xFF000000,
-                                                       0x000000FF
-#endif
-                                                      );
-                    if(surface == NULL) {
-                        LV_LOG_ERROR("could not load image from variable");
-                        return false;
-                    }
-                }
-                else {
-                    LV_LOG_WARN("image source type unknown");
-                    return false;
-                }
-
-                SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
-                texture = SDL_CreateTextureFromSurface(renderer, surface);
+                lv_draw_image_dsc_t image_dsc;
+                lv_draw_image_dsc_init(&image_dsc);
+                lv_memcpy(&image_dsc, task->draw_dsc, sizeof(image_dsc));
+                image_dsc.base.user_data = lv_sdl_window_get_renderer(disp);
+                lv_draw_image(&dest_layer, &image_dsc, &task->area);
                 break;
             }
         default:
@@ -334,24 +296,17 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
         }
     }
 
-    if(texture == NULL) {
-        texture = SDL_CreateTexture(lv_sdl_window_get_renderer(disp), SDL_PIXELFORMAT_ARGB8888,
-                                    SDL_TEXTUREACCESS_STATIC, texture_w, texture_h);
-        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-        SDL_UpdateTexture(texture, NULL, sdl_render_buf, texture_w * 4);
-    }
-    else {
-        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-    }
+    texture = SDL_CreateTexture(lv_sdl_window_get_renderer(disp), SDL_PIXELFORMAT_ARGB8888,
+                                SDL_TEXTUREACCESS_STATIC, texture_w, texture_h);
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    SDL_UpdateTexture(texture, NULL, sdl_render_buf, texture_w * 4);
 
     lv_draw_dsc_base_t * base_dsc = task->draw_dsc;
 
     cache_data->draw_dsc = lv_malloc(base_dsc->dsc_size);
     lv_memcpy((void *)cache_data->draw_dsc, base_dsc, base_dsc->dsc_size);
-    //    cache_data->w = texture_w;
-    //    cache_data->h = texture_h;
-    cache_data->w = lv_area_get_width(&task->area);
-    cache_data->h = lv_area_get_height(&task->area);
+    cache_data->w = texture_w;
+    cache_data->h = texture_h;
     cache_data->texture = texture;
 
     if(obj) {
@@ -387,7 +342,10 @@ static void blend_texture_layer(lv_draw_sdl_unit_t * u)
     SDL_SetTextureBlendMode(src_texture, SDL_BLENDMODE_BLEND);
     SDL_SetRenderTarget(renderer, layer_get_texture(u->base_unit.target_layer));
     SDL_RenderSetClipRect(renderer, &clip_rect);
-    SDL_RenderCopy(renderer, src_texture, NULL, &rect);
+
+    SDL_Point center = {draw_dsc->pivot.x, draw_dsc->pivot.y};
+    SDL_RenderCopyEx(renderer, src_texture, NULL, &rect, draw_dsc->rotation / 10, &center, SDL_FLIP_NONE);
+
     SDL_DestroyTexture(src_texture);
     SDL_RenderSetClipRect(renderer, NULL);
 }
@@ -399,8 +357,8 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
     cache_data_t data_to_find;
     data_to_find.draw_dsc = (lv_draw_dsc_base_t *)t->draw_dsc;
 
-    data_to_find.w = lv_area_get_width(&t->area);
-    data_to_find.h = lv_area_get_height(&t->area);
+    data_to_find.w = lv_area_get_width(&t->_real_area);
+    data_to_find.h = lv_area_get_height(&t->_real_area);
     data_to_find.texture = NULL;
 
     /*user_data stores the renderer to differentiate it from SW rendered tasks.
@@ -431,34 +389,13 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
 
     SDL_SetRenderTarget(renderer, layer_get_texture(dest_layer));
 
-    lv_draw_image_dsc_t * image_draw_dsc = lv_draw_task_get_image_dsc(t);
-    if(image_draw_dsc) {
-        lv_area_t image_area;
-        image_area.x1 = 0;
-        image_area.y1 = 0;
-        image_area.x2 = image_draw_dsc->header.w - 1;
-        image_area.y2 = image_draw_dsc->header.h - 1;
+    rect.x = t->_real_area.x1 - dest_layer->buf_area.x1;
+    rect.y = t->_real_area.y1 - dest_layer->buf_area.y1;
+    rect.w = data_cached->w;
+    rect.h = data_cached->h;
 
-        lv_area_move(&image_area, t->area.x1 - dest_layer->buf_area.x1, t->area.y1 - dest_layer->buf_area.y1);
-        rect.x = image_area.x1;
-        rect.y = image_area.y1;
-        rect.w = lv_area_get_width(&image_area);
-        rect.h = lv_area_get_height(&image_area);
-
-        SDL_RenderSetClipRect(renderer, &clip_rect);
-        //        SDL_RenderCopy(renderer, texture, NULL, &rect);
-        SDL_Point center = {image_draw_dsc->pivot.x, image_draw_dsc->pivot.y};
-        SDL_RenderCopyEx(renderer, texture, NULL, &rect, image_draw_dsc->rotation / 10, &center, SDL_FLIP_NONE);
-    }
-    else {
-        rect.x = t->_real_area.x1 - dest_layer->buf_area.x1;
-        rect.y = t->_real_area.y1 - dest_layer->buf_area.y1;
-        rect.w = data_cached->w;
-        rect.h = data_cached->h;
-
-        SDL_RenderSetClipRect(renderer, &clip_rect);
-        SDL_RenderCopy(renderer, texture, NULL, &rect);
-    }
+    SDL_RenderSetClipRect(renderer, &clip_rect);
+    SDL_RenderCopy(renderer, texture, NULL, &rect);
 
     SDL_RenderSetClipRect(renderer, NULL);
 
