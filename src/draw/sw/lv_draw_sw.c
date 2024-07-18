@@ -133,10 +133,6 @@ static void rotate270_rgb565(const uint16_t * src, uint16_t * dst, int32_t srcWi
  *      MACROS
  **********************/
 
-#define _BLOCKSIZE (sizeof(int))
-#define _IS_UNALIGNED(x)   ((uintptr_t)(x) & (_BLOCKSIZE - 1))
-#define _TOO_SMALL(len) ((len) < _BLOCKSIZE)
-
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -237,13 +233,14 @@ void lv_draw_sw_i1_invert(void * buf, uint32_t buf_size)
     uint8_t * byte_buf = (uint8_t *)buf;
     uint32_t i;
 
-    while(_IS_UNALIGNED(byte_buf) && buf_size > 0) {
+    /*Make the buffer aligned*/
+    while(((uintptr_t)(byte_buf) & (sizeof(int) - 1)) && buf_size > 0) {
         *byte_buf = ~(*byte_buf);
         byte_buf++;
         buf_size--;
     }
 
-    if(!_TOO_SMALL(buf_size)) {
+    if(buf_size >= sizeof(uint32_t)) {
         uint32_t * aligned_addr = (uint32_t *)byte_buf;
         uint32_t word_count = buf_size / 4;
 
