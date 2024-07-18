@@ -163,7 +163,7 @@ static inline bool _vglite_dest_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_L8:
 #endif
         case LV_COLOR_FORMAT_RGB565:
-#if CHIPTID == 0x555
+#if CHIPID == 0x555
         case LV_COLOR_FORMAT_RGB565A8:
         case LV_COLOR_FORMAT_RGB888:
 #endif
