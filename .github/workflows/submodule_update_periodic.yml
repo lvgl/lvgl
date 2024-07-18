@@ -1,0 +1,80 @@
+name: Port repo submodule update
+
+on:
+  push:
+    tags:
+      - 'v*.*.*' # on release tags
+  schedule:
+    - cron: '0 10 1,15 * *' # at 10 o'clock on the 1st and 15th of every month 
+  workflow_dispatch: # allow manual triggering
+
+jobs:
+  update_parent_repos:
+    environment: env-submodule-update
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        parent_repo: [lv_port_pc_eclipse, lv_port_pc_vscode]
+
+    steps:
+      - uses: actions/checkout@v4
+        with: 
+          repository: ${{ vars.ORGANIZATION }}/${{ matrix.parent_repo }}
+          token: ${{ secrets.ACCESS_TOKEN }}
+          submodules: 'recursive'
+      - name: Update submodule
+        run: |
+          git fetch --all -p --tags --recurse-submodules -q
+          git submodule update --init --recursive --remote -q
+
+
+
+          BRANCH="$(git branch --show-current)"
+          SUBMODULE_PATH="$(git config --file .gitmodules --get-regexp path | grep lvgl.path | awk '{ print $2 }')"
+
+          if echo "$GITHUB_REF_NAME" | grep -Po '^v\d+\.\d+\.\d+$'; then
+            echo "Release tag detected. Mirroring $TAG on $BRANCH..."
+
+            TAG="$GITHUB_REF_NAME"
+            BRANCH="release/$(echo "$TAG" | grep -Po 'v\d+\.\d+';)"
+
+            cd "$SUBMODULE_PATH"
+            git checkout "$TAG"
+            cd -
+
+            if git rev-parse --verify "origin/$BRANCH"; then
+              git checkout "$BRANCH"
+            else
+              git checkout -b "$BRANCH"
+            fi
+          fi
+
+
+
+          CONF_D=$(find . -name lv_conf.defaults)
+
+          if [ -n "$CONF_D" ]; then
+            CONF_C=$(find . -name lv_conf.h)
+            CONF_T=$(find . -name lv_conf_template.h)
+            $SUBMODULE_PATH/scripts/generate_lv_conf.py
+          else
+            echo "Skipping config update as defaults are missing" --template "$CONF_D" --config "$CONF_C" --defaults "$CONF_D"
+          fi
+
+
+
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.email 'lvgl@lvgl.io'
+            git config user.name 'Submodule Bot'
+            git add --all
+            git commit -m "Update submodule at $GITHUB_REF_NAME"
+            git push --set-upstream origin "$BRANCH"
+          else
+            echo "Skipping commit as no changes were made."
+          fi
+
+          if [ -n "$TAG" ]; then
+            git tag -a -m "" "$TAG"
+            git push origin tag "$TAG"
+          fi
