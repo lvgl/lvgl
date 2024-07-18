@@ -228,6 +228,16 @@ uint32_t lv_anim_speed(uint32_t speed)
     return lv_anim_speed_clamped(speed, 0, 10000);
 }
 
+uint32_t lv_anim_speed_to_time(uint32_t speed, int32_t start, int32_t end)
+{
+    uint32_t d = LV_ABS(start - end);
+    uint32_t time = (d * 1000) / speed;
+
+    time = time == 0 ? 1 : time;
+
+    return time;
+}
+
 void lv_anim_refr_now(void)
 {
     anim_timer(NULL);
