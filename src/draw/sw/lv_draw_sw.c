@@ -133,9 +133,9 @@ static void rotate270_rgb565(const uint16_t * src, uint16_t * dst, int32_t srcWi
  *      MACROS
  **********************/
 
-#define LBLOCKSIZE (sizeof(long))
-#define UNALIGNED(X)   ((uintptr_t)(X) & (LBLOCKSIZE - 1))
-#define TOO_SMALL(LEN) ((LEN) < LBLOCKSIZE)
+#define _BLOCKSIZE (sizeof(int))
+#define _IS_UNALIGNED(x)   ((uintptr_t)(x) & (_BLOCKSIZE - 1))
+#define _TOO_SMALL(len) ((len) < _BLOCKSIZE)
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -237,13 +237,13 @@ void lv_draw_sw_i1_invert(void * buf, uint32_t buf_size)
     uint8_t * byte_buf = (uint8_t *)buf;
     uint32_t i;
 
-    while(UNALIGNED(byte_buf) && buf_size > 0) {
+    while(_IS_UNALIGNED(byte_buf) && buf_size > 0) {
         *byte_buf = ~(*byte_buf);
         byte_buf++;
         buf_size--;
     }
 
-    if(!TOO_SMALL(buf_size)) {
+    if(!_TOO_SMALL(buf_size)) {
         uint32_t * aligned_addr = (uint32_t *)byte_buf;
         uint32_t word_count = buf_size / 4;
 
@@ -252,7 +252,7 @@ void lv_draw_sw_i1_invert(void * buf, uint32_t buf_size)
         }
 
         byte_buf = (uint8_t *)(aligned_addr + word_count);
-        buf_size = buf_size % 4;
+        buf_size = buf_size % sizeof(uint32_t);
     }
 
     for(i = 0; i < buf_size; ++i) {
