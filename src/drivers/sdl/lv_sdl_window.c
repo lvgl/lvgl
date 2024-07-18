@@ -451,7 +451,9 @@ static void * sdl_draw_buf_realloc_aligned(void * ptr, size_t new_size)
 
 #ifndef _WIN32
     /* Size must be multiple of align, See: https://en.cppreference.com/w/c/memory/aligned_alloc */
-    return aligned_alloc(LV_DRAW_BUF_ALIGN, LV_ALIGN_UP(new_size, LV_DRAW_BUF_ALIGN));
+
+#define BUF_ALIGN (LV_DRAW_BUF_ALIGN < sizeof(void *) ? sizeof(void *) : LV_DRAW_BUF_ALIGN)
+    return aligned_alloc(BUF_ALIGN, LV_ALIGN_UP(new_size, BUF_ALIGN));
 #else
     return _aligned_malloc(LV_ALIGN_UP(new_size, LV_DRAW_BUF_ALIGN), LV_DRAW_BUF_ALIGN);
 #endif /* _WIN32 */
