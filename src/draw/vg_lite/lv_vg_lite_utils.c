@@ -275,7 +275,7 @@ void lv_vg_lite_path_dump_info(const vg_lite_path_t * path)
 
     LV_ASSERT(len > 0);
 
-    LV_LOG_USER("address: %p", path->path);
+    LV_LOG_USER("address: %p", (void *)path->path);
     LV_LOG_USER("length: %d", (int)len);
     LV_LOG_USER("bonding box: (%0.2f, %0.2f) - (%0.2f, %0.2f)",
                 path->bounding_box[0], path->bounding_box[1],
@@ -290,7 +290,7 @@ void lv_vg_lite_path_dump_info(const vg_lite_path_t * path)
     lv_vg_lite_path_for_each_data(path, path_data_print_cb, NULL);
 
     if(path->stroke) {
-        LV_LOG_USER("stroke_path: %p", path->stroke_path);
+        LV_LOG_USER("stroke_path: %p", (void *)path->stroke_path);
         LV_LOG_USER("stroke_size: %d", (int)path->stroke_size);
         LV_LOG_USER("stroke_color: 0x%X", (int)path->stroke_color);
         lv_vg_lite_stroke_dump_info(path->stroke);
@@ -300,7 +300,7 @@ void lv_vg_lite_path_dump_info(const vg_lite_path_t * path)
 void lv_vg_lite_stroke_dump_info(const vg_lite_stroke_t * stroke)
 {
     LV_ASSERT(stroke != NULL);
-    LV_LOG_USER("stroke: %p", stroke);
+    LV_LOG_USER("stroke: %p", (void *)stroke);
 
     /* Stroke parameters */
     LV_LOG_USER("cap_style: 0x%X", (int)stroke->cap_style);
@@ -308,7 +308,7 @@ void lv_vg_lite_stroke_dump_info(const vg_lite_stroke_t * stroke)
     LV_LOG_USER("line_width: %f", stroke->line_width);
     LV_LOG_USER("miter_limit: %f", stroke->miter_limit);
 
-    LV_LOG_USER("dash_pattern: %p", stroke->dash_pattern);
+    LV_LOG_USER("dash_pattern: %p", (void *)stroke->dash_pattern);
     LV_LOG_USER("pattern_count: %d", (int)stroke->pattern_count);
     if(stroke->dash_pattern) {
         for(int i = 0; i < (int)stroke->pattern_count; i++) {
@@ -328,38 +328,38 @@ void lv_vg_lite_stroke_dump_info(const vg_lite_stroke_t * stroke)
     LV_LOG_USER("miter_square: %f", stroke->miter_square);
 
     /* Temp storage of stroke subPath. */
-    LV_LOG_USER("path_points: %p", stroke->path_points);
-    LV_LOG_USER("path_end: %p", stroke->path_end);
+    LV_LOG_USER("path_points: %p", (void *)stroke->path_points);
+    LV_LOG_USER("path_end: %p", (void *)stroke->path_end);
     LV_LOG_USER("point_count: %d", (int)stroke->point_count);
 
-    LV_LOG_USER("left_point: %p", stroke->left_point);
-    LV_LOG_USER("right_point: %p", stroke->right_point);
-    LV_LOG_USER("stroke_points: %p", stroke->stroke_points);
-    LV_LOG_USER("stroke_end: %p", stroke->stroke_end);
+    LV_LOG_USER("left_point: %p", (void *)stroke->left_point);
+    LV_LOG_USER("right_point: %p", (void *)stroke->right_point);
+    LV_LOG_USER("stroke_points: %p", (void *)stroke->stroke_points);
+    LV_LOG_USER("stroke_end: %p", (void *)stroke->stroke_end);
     LV_LOG_USER("stroke_count: %d", (int)stroke->stroke_count);
 
     /* Divide stroke path according to move or move_rel for avoiding implicit closure. */
-    LV_LOG_USER("path_list_divide: %p", stroke->path_list_divide);
+    LV_LOG_USER("path_list_divide: %p", (void *)stroke->path_list_divide);
 
     /* pointer to current divided path data. */
-    LV_LOG_USER("cur_list: %p", stroke->cur_list);
+    LV_LOG_USER("cur_list: %p", (void *)stroke->cur_list);
 
     /* Flag that add end_path in driver. */
     LV_LOG_USER("add_end: %d", (int)stroke->add_end);
     LV_LOG_USER("dash_reset: %d", (int)stroke->dash_reset);
 
     /* Sub path list. */
-    LV_LOG_USER("stroke_paths: %p", stroke->stroke_paths);
+    LV_LOG_USER("stroke_paths: %p", (void *)stroke->stroke_paths);
 
     /* Last sub path. */
-    LV_LOG_USER("last_stroke: %p", stroke->last_stroke);
+    LV_LOG_USER("last_stroke: %p", (void *)stroke->last_stroke);
 
     /* Swing area handling. */
     LV_LOG_USER("swing_handling: %d", (int)stroke->swing_handling);
     LV_LOG_USER("swing_deltax: %f", stroke->swing_deltax);
     LV_LOG_USER("swing_deltay: %f", stroke->swing_deltay);
-    LV_LOG_USER("swing_start: %p", stroke->swing_start);
-    LV_LOG_USER("swing_stroke: %p", stroke->swing_stroke);
+    LV_LOG_USER("swing_start: %p", (void *)stroke->swing_start);
+    LV_LOG_USER("swing_stroke: %p", (void *)stroke->swing_stroke);
     LV_LOG_USER("swing_length: %f", stroke->swing_length);
     LV_LOG_USER("swing_centlen: %f", stroke->swing_centlen);
     LV_LOG_USER("swing_count: %d", (int)stroke->swing_count);
