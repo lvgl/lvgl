@@ -12,7 +12,7 @@
 #include "../../indev/lv_indev.h"
 #include "../../core/lv_group.h"
 #include "../../stdlib/lv_string.h"
-#include LV_SDL_INCLUDE_PATH
+#include "lv_sdl_private.h"
 
 /*********************
  *      DEFINES
@@ -99,7 +99,7 @@ static void release_indev_cb(lv_event_t * e)
     }
 }
 
-void _lv_sdl_keyboard_handler(SDL_Event * event)
+void lv_sdl_keyboard_handler(SDL_Event * event)
 {
     uint32_t win_id = UINT32_MAX;
     switch(event->type) {
@@ -113,7 +113,7 @@ void _lv_sdl_keyboard_handler(SDL_Event * event)
             return;
     }
 
-    lv_display_t * disp = _lv_sdl_get_disp_from_win_id(win_id);
+    lv_display_t * disp = lv_sdl_get_disp_from_win_id(win_id);
 
 
     /*Find a suitable indev*/
