@@ -32,7 +32,6 @@ LV_EXPORT_CONST_INT(LV_BUTTONMATRIX_BUTTON_NONE);
 /** Type to store button control bits (disabled, hidden etc.)
  * The first 3 bits are used to store the width*/
 typedef enum {
-    LV_BUTTONMATRIX_WIDTH            = 0x000F, /**< Reserved to store the size units*/
     LV_BUTTONMATRIX_CTRL_HIDDEN       = 0x0010, /**< Button hidden*/
     LV_BUTTONMATRIX_CTRL_NO_REPEAT    = 0x0020, /**< Do not repeat press this button.*/
     LV_BUTTONMATRIX_CTRL_DISABLED     = 0x0040, /**< Disable this button.*/
