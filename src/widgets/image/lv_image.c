@@ -34,8 +34,10 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_image(lv_event_t * e);
 static void scale_update(lv_obj_t * obj, int32_t scale_x, int32_t scale_y);
 static void update_align(lv_obj_t * obj);
-static void lv_image_set_pivot_helper(lv_obj_t * obj, lv_point_t * pivot);
-static lv_point_t lv_image_get_pivot_helper(lv_obj_t * obj);
+#if LV_USE_OBJ_PROPERTY
+    static void lv_image_set_pivot_helper(lv_obj_t * obj, lv_point_t * pivot);
+    static lv_point_t lv_image_get_pivot_helper(lv_obj_t * obj);
+#endif
 
 #if LV_USE_OBJ_PROPERTY
 static const lv_property_ops_t properties[] = {
@@ -859,6 +861,7 @@ static void update_align(lv_obj_t * obj)
     }
 }
 
+#if LV_USE_OBJ_PROPERTY
 static void lv_image_set_pivot_helper(lv_obj_t * obj, lv_point_t * pivot)
 {
     lv_image_set_pivot(obj, pivot->x, pivot->y);
@@ -870,5 +873,6 @@ static lv_point_t lv_image_get_pivot_helper(lv_obj_t * obj)
     lv_image_get_pivot(obj, &pivot);
     return pivot;
 }
+#endif
 
 #endif
