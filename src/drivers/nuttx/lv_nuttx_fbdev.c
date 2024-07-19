@@ -192,8 +192,8 @@ static void fbdev_join_inv_areas(lv_display_t * disp, lv_area_t * final_inv_area
             }
             else {
                 lv_area_join(final_inv_area,
-                              final_inv_area,
-                              area_p);
+                             final_inv_area,
+                             area_p);
             }
         }
     }

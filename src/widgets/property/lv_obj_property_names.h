@@ -12,6 +12,6 @@
 
     extern const lv_property_name_t lv_image_property_names[11];
     extern const lv_property_name_t lv_obj_property_names[48];
-    extern const lv_property_name_t lv_style_property_names[111];
+    extern const lv_property_name_t lv_style_property_names[112];
 #endif
 #endif
