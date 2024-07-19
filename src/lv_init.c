@@ -196,12 +196,12 @@ void lv_init(void)
 
     lv_draw_init();
 
-#if LV_USE_NEMA_GFX
-    lv_draw_nema_gfx_init();
-#endif
-
 #if LV_USE_DRAW_SW
     lv_draw_sw_init();
+#endif
+
+#if LV_USE_NEMA_GFX
+    lv_draw_nema_gfx_init();
 #endif
 
 #if LV_USE_DRAW_VGLITE

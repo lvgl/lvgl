@@ -81,7 +81,6 @@ void lv_draw_nema_gfx_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_
  **********************/
 static inline uint8_t _bpp_nema_gfx_format(lv_draw_glyph_dsc_t * glyph_draw_dsc)
 {
-
     uint32_t format = glyph_draw_dsc->g->format ;
 
     switch(format) {

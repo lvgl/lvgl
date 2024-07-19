@@ -74,6 +74,7 @@ uintptr_t NEMA_VIRT2PHYS(void * addr);
 #define LV_NEMA_GFX_FORMAT_MULTIPLIER 4
 #else
 /*Can't use GPU with other formats*/
+#error Selected Color Depth Not Supported
 #endif
 
 /**********************

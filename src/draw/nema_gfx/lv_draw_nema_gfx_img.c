@@ -1,35 +1,28 @@
-/* TSI 2023.gen */
-// -----------------------------------------------------------------------------
-// Copyright (c) 2008-23 Think Silicon Single Member PC
-// Think Silicon Single Member PC Confidential Proprietary
-// -----------------------------------------------------------------------------
-//     All Rights reserved - Unpublished -rights reserved under
-//         the Copyright laws of the European Union
-//
-//  This file includes the Confidential information of Think Silicon Single
-//  Member PC The receiver of this Confidential Information shall not disclose
-//  it to any third party and shall protect its confidentiality by using the
-//  same degree of care, but not less then a reasonable degree of care, as the
-//  receiver uses to protect receiver's own Confidential Information. The entire
-//  notice must be reproduced on all authorized copies and copies may only be
-//  made to the extent permitted by a licensing agreement from Think Silicon
-//  Single Member PC.
-//
-//  The software/data is provided 'as is', without warranty of any kind,
-//  expressed or implied, including but not limited to the warranties of
-//  merchantability, fitness for a particular purpose and noninfringement. In no
-//  event shall Think Silicon Single Member PC be liable for any claim, damages
-//  or other liability, whether in an action of contract, tort or otherwise,
-//  arising from, out of or in connection with the software.
-//
-//  For further information please contact:
-//
-//                    Think Silicon Single Member PC
-//                    http://www.think-silicon.com
-//                    Patras Science Park
-//                    Rion Achaias 26504
-//                    Greece
-// -----------------------------------------------------------------------------
+/**
+ * MIT License
+ *
+ * -----------------------------------------------------------------------------
+ * Copyright (c) 2008-24 Think Silicon Single Member PC
+ * -----------------------------------------------------------------------------
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice (including the next paragraph)
+ * shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
 
 /**
  * @file lv_draw_nema_gfx_fill.c
@@ -174,7 +167,7 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
 
     lv_color_format_t src_cf = img_dsc->header.cf;
 
-    //Image contains Alpha
+    /*Image contains Alpha*/
     if(src_cf == LV_COLOR_FORMAT_ARGB8888 || src_cf == LV_COLOR_FORMAT_XRGB8888) {
         blending_mode |= NEMA_BLOP_SRC_PREMULT;
     }
@@ -187,7 +180,7 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
                       lv_area_get_width(&(layer->buf_area))*LV_NEMA_GFX_FORMAT_MULTIPLIER);
 
     nema_bind_src_tex((uintptr_t)(src_buf), tex_w, tex_h, color_format, -1,
-                      (dsc->antialias == true) ? NEMA_FILTER_BL : NEMA_FILTER_PS);
+                      dsc->antialias ? NEMA_FILTER_BL : NEMA_FILTER_PS);
 
     if(recolor) {
         lv_color32_t col32 = lv_color_to_32(dsc->recolor, LV_OPA_MIX2(dsc->recolor_opa, dsc->opa));

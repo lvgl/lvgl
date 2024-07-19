@@ -603,7 +603,7 @@
         #endif
     #endif
 
-    #if LV_USE_NEMA_VG == 1
+    #if LV_USE_NEMA_VG
         /*Define application's resolution used for VG related buffer allocation */
         #ifndef LV_NEMA_GFX_RESX
             #ifdef CONFIG_LV_NEMA_GFX_RESX
