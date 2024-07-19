@@ -336,6 +336,7 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
     LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb565);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_argb8888);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_l8);
+    LV_IMAGE_DECLARE(img_render_lvgl_logo_i1);
 
     const void * srcs[] = {
         &img_render_lvgl_logo_argb8888,
@@ -343,6 +344,7 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
         &img_render_lvgl_logo_rgb888,
         &img_render_lvgl_logo_rgb565,
         &img_render_lvgl_logo_l8,
+        &img_render_lvgl_logo_i1,
     };
 
     const void * names[] = {
@@ -351,6 +353,7 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
         "RGB\n888",
         "RGB\n565",
         "L8",
+        "I1",
     };
 
     uint32_t stopAt = startAt + LV_MIN(sizeof(srcs) / sizeof(void *) - startAt, 4);
