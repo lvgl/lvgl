@@ -492,7 +492,7 @@ def obj_style_get(p):
   if 'filtered' in p and p['filtered']:
     print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"_filtered(const lv_obj_t * obj, lv_part_t part)")
     print("{")
-    print("    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + "));")
+    print("    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + "));")
     print("    return " + cast + "v." + p['style_type'] + ";")
     print("}")
     print("")
