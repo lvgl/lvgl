@@ -143,8 +143,8 @@ void lv_draw_nema_gfx_border(lv_draw_unit_t * draw_unit, const lv_draw_border_ds
             nema_fill_rect_f(x, y, w, h, bg_color);
         }
 
-        //Draw small corner rectangles
-        //Top Left
+        /*Draw small corner rectangles
+        Top Left*/
         if(dsc->side & LV_BORDER_SIDE_TOP || dsc->side & LV_BORDER_SIDE_LEFT) {
             float x = rect_coords.x1;
             float y = rect_coords.y1;
@@ -161,7 +161,7 @@ void lv_draw_nema_gfx_border(lv_draw_unit_t * draw_unit, const lv_draw_border_ds
             nema_fill_rect_f(x, y, w, h, bg_color);
         }
 
-        //Top Right
+        /*Top Right*/
         if(dsc->side & LV_BORDER_SIDE_TOP || dsc->side & LV_BORDER_SIDE_RIGHT) {
             float x = rect_coords.x1 + border_width - width;
             float y = rect_coords.y1;
@@ -178,7 +178,7 @@ void lv_draw_nema_gfx_border(lv_draw_unit_t * draw_unit, const lv_draw_border_ds
             nema_fill_rect_f(x, y, w, h, bg_color);
         }
 
-        //Bottom Right
+        /*Bottom Right*/
         if(dsc->side & LV_BORDER_SIDE_BOTTOM || dsc->side & LV_BORDER_SIDE_RIGHT) {
             float x = rect_coords.x1 + border_width - width;
             float y = rect_coords.y1 + border_height - width;
@@ -195,7 +195,7 @@ void lv_draw_nema_gfx_border(lv_draw_unit_t * draw_unit, const lv_draw_border_ds
             nema_fill_rect_f(x, y, w, h, bg_color);
         }
 
-        //Bottom Left
+        /*Bottom Left*/
         if(dsc->side & LV_BORDER_SIDE_BOTTOM || dsc->side & LV_BORDER_SIDE_LEFT) {
             float x = rect_coords.x1;
             float y = rect_coords.y1 + border_height - width;

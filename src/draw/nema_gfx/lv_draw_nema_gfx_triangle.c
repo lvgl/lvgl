@@ -86,7 +86,7 @@ void lv_draw_nema_gfx_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangl
         nema_enable_aa(1, 1, 1, 0);
         nema_fill_triangle(dsc->p[0].x, dsc->p[0].y, dsc->p[1].x, dsc->p[1].y, dsc->p[2].x, dsc->p[2].y, bg_color);
     }
-#if LV_USE_NEMA_VG == 1
+#if LV_USE_NEMA_VG
     else {
 
         nema_vg_path_clear(draw_nema_gfx_unit->path);

@@ -93,7 +93,7 @@ void lv_draw_nema_gfx_init(void)
     lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = lv_draw_create_unit(sizeof(lv_draw_nema_gfx_unit_t));
     /*Initiallize NemaGFX*/
     nema_init();
-#if LV_USE_NEMA_VG == 1
+#if LV_USE_NEMA_VG
     /*Initiallize NemaVG */
     nema_vg_init(LV_NEMA_GFX_RESX, LV_NEMA_GFX_RESY);
     /* Allocate VG Buffers*/
@@ -137,7 +137,17 @@ static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * ta
                 }
                 return 1;
             }
-#if LV_USE_NEMA_VG != 1
+#if LV_USE_NEMA_VG
+        case LV_DRAW_TASK_TYPE_TRIANGLE:
+        case LV_DRAW_TASK_TYPE_ARC:
+        case LV_DRAW_TASK_TYPE_FILL: {
+                if(task->preference_score > 80) {
+                    task->preference_score = 80;
+                    task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
+                }
+                return 1;
+            }
+#else
         case LV_DRAW_TASK_TYPE_FILL: {
                 lv_draw_fill_dsc_t * draw_fill_dsc = (lv_draw_fill_dsc_t *) task->draw_dsc;
                 if((draw_fill_dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE)) {
@@ -160,20 +170,8 @@ static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * ta
                 }
                 break;
             }
-#else
-        case LV_DRAW_TASK_TYPE_TRIANGLE:
-        case LV_DRAW_TASK_TYPE_ARC:
-        case LV_DRAW_TASK_TYPE_FILL: {
-                if(task->preference_score > 80) {
-                    task->preference_score = 80;
-                    task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
-                }
-                return 1;
-            }
 #endif
         case LV_DRAW_TASK_TYPE_IMAGE: {
-                //Check for unsupported Blending modes
-                //And CF
                 lv_draw_image_dsc_t * draw_image_dsc = (lv_draw_image_dsc_t *) task->draw_dsc;
                 if(draw_image_dsc->blend_mode == LV_BLEND_MODE_NORMAL || draw_image_dsc->blend_mode == LV_BLEND_MODE_ADDITIVE) {
                     if(task->preference_score > 80) {
@@ -185,7 +183,6 @@ static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * ta
                 break;
             }
         case LV_DRAW_TASK_TYPE_LABEL: {
-                //TODO: Check for Compressed Fonts
                 lv_draw_label_dsc_t * draw_label_dsc = (lv_draw_label_dsc_t *) task->draw_dsc;
                 lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)(draw_label_dsc->font->dsc);
                 if(fdsc->bitmap_format != LV_FONT_FMT_TXT_COMPRESSED) {
@@ -297,7 +294,7 @@ static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u)
         case LV_DRAW_TASK_TYPE_LINE:
             lv_draw_nema_gfx_line(draw_unit, t->draw_dsc);
             break;
-#if LV_USE_NEMA_VG == 1
+#if LV_USE_NEMA_VG
         case LV_DRAW_TASK_TYPE_ARC:
             lv_draw_nema_gfx_arc(draw_unit, t->draw_dsc, &t->area);
             break;
@@ -312,7 +309,7 @@ static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u)
 
 static int32_t nema_gfx_delete(lv_draw_unit_t * draw_unit)
 {
-#if LV_USE_NEMA_VG == 1
+#if LV_USE_NEMA_VG
     /*Free VG Buffers*/
     lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *) draw_unit;
     nema_vg_paint_destroy(draw_nema_gfx_unit->paint);
@@ -333,7 +330,7 @@ static int32_t nema_gfx_delete(lv_draw_unit_t * draw_unit)
     return res;
 #endif
 
-#if LV_USE_NEMA_VG != 1 && LV_USE_OS == 0
+#if LV_USE_NEMA_VG == 0 && LV_USE_OS == LV_OS_NONE
     LV_UNUSED(draw_unit);
 #endif
     return 0;

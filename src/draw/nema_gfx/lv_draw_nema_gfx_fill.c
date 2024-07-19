@@ -88,7 +88,7 @@ void lv_draw_nema_gfx_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t 
         else
             nema_fill_rect(rel_coords.x1, rel_coords.y1, coords_bg_w, coords_bg_h, bg_color);
     }
-#if LV_USE_NEMA_VG == 1
+#if LV_USE_NEMA_VG
     else {
 
         nema_vg_paint_clear(draw_nema_gfx_unit->paint);

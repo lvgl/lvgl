@@ -59,7 +59,7 @@ typedef struct {
 #endif
     uint32_t idx;
     nema_cmdlist_t cl;
-#if LV_USE_NEMA_VG == 1
+#if LV_USE_NEMA_VG
     NEMA_VG_PAINT_HANDLE paint;
     NEMA_VG_GRAD_HANDLE gradient;
     NEMA_VG_PATH_HANDLE path;
