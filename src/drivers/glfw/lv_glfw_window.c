@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <memory.h>
 #include "../../core/lv_refr.h"
 #include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
@@ -62,16 +61,14 @@ static lv_display_t * _lv_glfw_get_disp_from_window(GLFWwindow * window);
 static void glfw_error_cb(int error, const char * description);
 static int lv_glfw_init(void);
 static int lv_glew_init(void);
+static void lv_glfw_timer_init();
 static void lv_glfw_window_config(GLFWwindow * window);
+static void lv_glfw_window_quit();
 static void window_close_callback(GLFWwindow * window);
 static void key_callback(GLFWwindow * window, int key, int scancode, int action, int mods);
 static void mouse_button_callback(GLFWwindow * window, int button, int action, int mods);
 static void mouse_move_callback(GLFWwindow * window, double xpos, double ypos);
 static void framebuffer_size_callback(GLFWwindow * window, int width, int height);
-
-/***********************
- *   GLOBAL PROTOTYPES
- ***********************/
 
 /**********************
  *  STATIC VARIABLES
@@ -88,34 +85,6 @@ static lv_timer_t * event_handler_timer;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-static void lv_glfw_timer_init()
-{
-    if(!inited) {
-        update_handler_timer = lv_timer_create(window_update_handler, 5, NULL);
-        event_handler_timer = lv_timer_create(window_event_handler, 5, NULL);
-
-        lv_tick_set_cb(lv_glfw_tick_count_callback);
-
-        inited = true;
-    }
-}
-
-static void lv_glfw_window_config(GLFWwindow * window)
-{
-    glfwMakeContextCurrent(window);
-
-    glfwSwapInterval(1);
-
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
-    glfwSetCursorPosCallback(window, mouse_move_callback);
-
-    glfwSetKeyCallback(window, key_callback);
-
-    glfwSetWindowCloseCallback(window, window_close_callback);
-}
 
 lv_display_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res)
 {
@@ -211,6 +180,34 @@ static int lv_glew_init(void)
     glew_inited = true;
 
     return 0;
+}
+
+static void lv_glfw_timer_init()
+{
+    if(!inited) {
+        update_handler_timer = lv_timer_create(window_update_handler, 5, NULL);
+        event_handler_timer = lv_timer_create(window_event_handler, 5, NULL);
+
+        lv_tick_set_cb(lv_glfw_tick_count_callback);
+
+        inited = true;
+    }
+}
+
+static void lv_glfw_window_config(GLFWwindow * window)
+{
+    glfwMakeContextCurrent(window);
+
+    glfwSwapInterval(1);
+
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetCursorPosCallback(window, mouse_move_callback);
+
+    glfwSetKeyCallback(window, key_callback);
+
+    glfwSetWindowCloseCallback(window, window_close_callback);
 }
 
 static void lv_glfw_window_quit()
