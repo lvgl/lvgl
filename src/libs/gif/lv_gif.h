@@ -29,6 +29,10 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/**********************
+ *      TYPEDEFS
+ **********************/
+
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_gif_class;
 
 /**********************

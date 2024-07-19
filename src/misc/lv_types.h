@@ -331,6 +331,13 @@ typedef uint32_t lv_prop_id_t;
 typedef struct lv_property_name_t lv_property_name_t;
 #endif
 
+typedef uint32_t lv_prop_id_t;
+
+#if LV_USE_OBJ_PROPERTY
+struct _lv_property_name_t;
+typedef struct _lv_property_name_t lv_property_name_t;
+#endif
+
 #if LV_USE_SYSMON
 
 typedef struct lv_sysmon_backend_data_t lv_sysmon_backend_data_t;

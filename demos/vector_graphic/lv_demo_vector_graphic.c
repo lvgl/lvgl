@@ -245,6 +245,13 @@ static void delete_event_cb(lv_event_t * e)
     lv_draw_buf_destroy(draw_buf);
 }
 
+static void event_cb(lv_event_t * e)
+{
+    lv_layer_t * layer = lv_event_get_layer(e);
+
+    draw_vector(layer);
+}
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -257,7 +264,12 @@ static void delete_event_cb(lv_event_t * e)
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_demo_vector_graphic(void)
+void lv_demo_vector_graphic_not_buffered(void)
+{
+    lv_obj_add_event_cb(lv_screen_active(), event_cb, LV_EVENT_DRAW_MAIN, NULL);
+}
+
+void lv_demo_vector_graphic_buffered(void)
 {
     lv_draw_buf_t * draw_buf = lv_draw_buf_create(WIDTH, HEIGHT, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
     lv_draw_buf_clear(draw_buf, NULL);
@@ -278,7 +290,15 @@ void lv_demo_vector_graphic(void)
  **********************/
 #else
 
-void lv_demo_vector_graphic(void)
+void lv_demo_vector_graphic_not_buffered(void)
+{
+    /*fallback for online examples*/
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "Vector graphics is not enabled");
+    lv_obj_center(label);
+}
+
+void lv_demo_vector_graphic_buffered(void)
 {
     /*fallback for online examples*/
     lv_obj_t * label = lv_label_create(lv_screen_active());

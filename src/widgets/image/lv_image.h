@@ -246,6 +246,16 @@ int32_t lv_image_get_rotation(lv_obj_t * obj);
 void lv_image_get_pivot(lv_obj_t * obj, lv_point_t * pivot);
 
 /**
+ * Get pivot to return lv_point_t directly
+ */
+static inline lv_point_t _lv_image_get_pivot(lv_obj_t * obj)
+{
+    lv_point_t pivot;
+    lv_image_get_pivot(obj, &pivot);
+    return pivot;
+}
+
+/**
  * Get the zoom factor of the image.
  * @param obj       pointer to an image object
  * @return          zoom factor (256: no zoom)

@@ -11,8 +11,8 @@
 
 #include "../../core/lv_group.h"
 #include "../../stdlib/lv_string.h"
+#include "lv_sdl_private.h"
 
-#include LV_SDL_INCLUDE_PATH
 /*********************
  *      DEFINES
  *********************/

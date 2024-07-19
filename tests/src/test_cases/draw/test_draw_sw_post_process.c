@@ -225,4 +225,27 @@ void test_rotate270_ARGB8888(void)
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expectedArray, dstArray, sizeof(dstArray));
 }
 
+
+
+void test_invert(void)
+{
+    uint8_t expected_buf[10] = {0xff, 0xfe, 0xfd, 0xfc, 0xfb, 0xfa, 0xf9, 0xf8, 0xf7, 0xf6};
+
+    /*Aligned start and aligned end*/
+    uint8_t buf1[10] =         {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09};
+    lv_draw_sw_i1_invert(buf1, 8);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(expected_buf, buf1, 8);
+
+    /*Unaligned start and unaligned end*/
+    uint8_t buf2[10] =         {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09};
+    lv_draw_sw_i1_invert(&buf2[3], 6);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(&expected_buf[3], &buf2[3], 6);
+
+    /*Small buffer*/
+    uint8_t buf3[10] =         {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09};
+    lv_draw_sw_i1_invert(&buf3[3], 2);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(&expected_buf[3], &buf3[3], 2);
+}
+
+
 #endif

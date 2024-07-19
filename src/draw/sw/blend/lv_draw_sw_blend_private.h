@@ -55,6 +55,7 @@ struct lv_draw_sw_blend_fill_dsc_t {
     int32_t mask_stride;
     lv_color_t color;
     lv_opa_t opa;
+    lv_area_t relative_area;
 };
 
 struct lv_draw_sw_blend_image_dsc_t {
@@ -69,6 +70,8 @@ struct lv_draw_sw_blend_image_dsc_t {
     lv_color_format_t src_color_format;
     lv_opa_t opa;
     lv_blend_mode_t blend_mode;
+    lv_area_t relative_area;    /**< The blend area relative to the layer's buffer area. */
+    lv_area_t src_area;             /**< The original src area. */
 };
 
 
