@@ -91,6 +91,8 @@ const char * lv_vg_lite_vlc_op_string(uint8_t vlc_op);
 
 void lv_vg_lite_path_dump_info(const vg_lite_path_t * path);
 
+void lv_vg_lite_stroke_dump_info(const vg_lite_stroke_t * stroke);
+
 void lv_vg_lite_buffer_dump_info(const vg_lite_buffer_t * buffer);
 
 void lv_vg_lite_matrix_dump_info(const vg_lite_matrix_t * matrix);
