@@ -113,6 +113,10 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     lv_vg_lite_path_t * lv_vg_path = lv_vg_lite_path_get(u, VG_LITE_FP32);
     lv_path_to_vg(lv_vg_path, path);
 
+    /* get path bounds */
+    float min_x, min_y, max_x, max_y;
+    lv_vg_lite_path_get_bonding_box(lv_vg_path, &min_x, &min_y, &max_x, &max_y);
+
     /* convert path type */
     vg_lite_path_type_t path_type = lv_path_opa_to_path_type(dsc);
 
@@ -136,34 +140,38 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
        || path_type == VG_LITE_DRAW_FILL_STROKE_PATH) {
         lv_cache_entry_t * stroke_cache_entey = lv_vg_lite_stroke_get(u, lv_vg_path, &dsc->stroke_dsc);
 
-        /* drop original path */
-        lv_vg_lite_path_drop(u, lv_vg_path);
-
-        if(stroke_cache_entey) {
-            lv_vg_lite_path_t * stroke_path = lv_vg_lite_stroke_get_path(stroke_cache_entey);
-            vg_lite_path_t * vg_path = lv_vg_lite_path_get_path(stroke_path);
-
-            /* set stroke path type */
-            LV_VG_LITE_CHECK_ERROR(vg_lite_set_path_type(vg_path, path_type));
-
-            /* set stroke color */
-            vg_path->stroke_color = lv_color32_to_vg(dsc->stroke_dsc.color, dsc->stroke_dsc.opa);
-
-            /* change path to stroke path */
-            LV_LOG_TRACE("change path to stroke path: %p -> %p", (void *)lv_vg_path, (void *)stroke_path);
-            lv_vg_path = stroke_path;
-            path_drop_func = (path_drop_func_t)lv_vg_lite_stroke_drop;
-            path_drop_data = stroke_cache_entey;
-        }
-        else {
+        if(!stroke_cache_entey) {
             LV_LOG_ERROR("convert stroke failed");
+
+            /* drop original path */
+            lv_vg_lite_path_drop(u, lv_vg_path);
             return;
         }
-    }
 
-    /* get path bounds */
-    float min_x, min_y, max_x, max_y;
-    lv_vg_lite_path_get_bonding_box(lv_vg_path, &min_x, &min_y, &max_x, &max_y);
+        lv_vg_lite_path_t * ori_path = lv_vg_path;
+        const vg_lite_path_t * ori_vg_path = lv_vg_lite_path_get_path(ori_path);
+
+        lv_vg_lite_path_t * stroke_path = lv_vg_lite_stroke_get_path(stroke_cache_entey);
+        vg_lite_path_t * vg_path = lv_vg_lite_path_get_path(stroke_path);
+
+        /* set stroke path type */
+        LV_VG_LITE_CHECK_ERROR(vg_lite_set_path_type(vg_path, path_type));
+
+        /* set stroke color */
+        vg_path->stroke_color = lv_color32_to_vg(dsc->stroke_dsc.color, dsc->stroke_dsc.opa);
+
+        /* sync bounding box */
+        lv_memcpy(vg_path->bounding_box, ori_vg_path->bounding_box, sizeof(ori_vg_path->bounding_box));
+
+        /* change path to stroke path */
+        LV_LOG_TRACE("change path to stroke path: %p -> %p", (void *)lv_vg_path, (void *)stroke_path);
+        lv_vg_path = stroke_path;
+        path_drop_func = (path_drop_func_t)lv_vg_lite_stroke_drop;
+        path_drop_data = stroke_cache_entey;
+
+        /* drop original path */
+        lv_vg_lite_path_drop(u, ori_path);
+    }
 
     vg_lite_path_t * vg_path = lv_vg_lite_path_get_path(lv_vg_path);
     LV_VG_LITE_ASSERT_PATH(vg_path);
