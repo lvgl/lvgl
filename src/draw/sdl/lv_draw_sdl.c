@@ -6,13 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_draw.h"
+#include "../lv_draw_private.h"
 #if LV_USE_DRAW_SDL
 #include LV_SDL_INCLUDE_PATH
 #include <SDL2/SDL_image.h>
 
 #include "lv_draw_sdl.h"
-#include "../../core/lv_refr.h"
+#include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
 #include "../../stdlib/lv_string.h"
 #include "../../drivers/sdl/lv_sdl_window.h"

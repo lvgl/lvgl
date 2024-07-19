@@ -65,8 +65,6 @@ static void window_update(lv_display_t * disp);
     static void * sdl_draw_buf_realloc_aligned(void * ptr, size_t new_size);
     static void sdl_draw_buf_free(void * ptr);
 #endif
-static void * sdl_draw_buf_realloc_aligned(void * ptr, size_t new_size);
-static void sdl_draw_buf_free(void * ptr);
 static void sdl_event_handler(lv_timer_t * t);
 static void release_disp_cb(lv_event_t * e);
 static void res_chg_event_cb(lv_event_t * e);
@@ -459,31 +457,6 @@ static void sdl_draw_buf_free(void * ptr)
 #endif /* _WIN32 */
 }
 #endif
-
-static void * sdl_draw_buf_realloc_aligned(void * ptr, size_t new_size)
-{
-    if(ptr) {
-        sdl_draw_buf_free(ptr);
-    }
-
-    /* No need copy for drawing buffer */
-
-#ifndef _WIN32
-    /* Size must be multiple of align, See: https://en.cppreference.com/w/c/memory/aligned_alloc */
-    return aligned_alloc(LV_DRAW_BUF_ALIGN, LV_ALIGN_UP(new_size, LV_DRAW_BUF_ALIGN));
-#else
-    return _aligned_malloc(LV_ALIGN_UP(new_size, LV_DRAW_BUF_ALIGN), LV_DRAW_BUF_ALIGN);
-#endif /* _WIN32 */
-}
-
-static void sdl_draw_buf_free(void * ptr)
-{
-#ifndef _WIN32
-    free(ptr);
-#else
-    _aligned_free(ptr);
-#endif /* _WIN32 */
-}
 
 static void res_chg_event_cb(lv_event_t * e)
 {
