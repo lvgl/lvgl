@@ -319,11 +319,11 @@ static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_PXP);
 
     if(t == NULL || t->preferred_draw_unit_id != DRAW_UNIT_ID_PXP)
-        return -1;
+        return LV_DRAW_UNIT_IDLE;
 
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(buf == NULL)
-        return -1;
+        return LV_DRAW_UNIT_IDLE;
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_pxp_unit->base_unit.target_layer = layer;

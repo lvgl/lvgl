@@ -11,7 +11,7 @@ void lv_example_tjpgd_1(void)
     wp = lv_image_create(lv_screen_active());
     /* Assuming a File system is attached to letter 'A'
      * E.g. set LV_USE_FS_STDIO 'A' in lv_conf.h */
-    lv_image_set_src(wp, "A:lvgl/examples/libs/tjpgd/img_lvgl_logo.jpg");
+    lv_image_set_src(wp, "A:test_img_lvgl_logo.jpg");
     lv_obj_center(wp);
 }
 

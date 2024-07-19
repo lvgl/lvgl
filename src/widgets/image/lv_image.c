@@ -34,6 +34,8 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_image(lv_event_t * e);
 static void scale_update(lv_obj_t * obj, int32_t scale_x, int32_t scale_y);
 static void update_align(lv_obj_t * obj);
+static void lv_image_set_pivot_helper(lv_obj_t * obj, lv_point_t * pivot);
+static lv_point_t lv_image_get_pivot_helper(lv_obj_t * obj);
 
 #if LV_USE_OBJ_PROPERTY
 static const lv_property_ops_t properties[] = {
@@ -60,7 +62,7 @@ static const lv_property_ops_t properties[] = {
     {
         .id = LV_PROPERTY_IMAGE_PIVOT,
         .setter = lv_image_set_pivot_helper,
-        .getter = lv_image_get_pivot,
+        .getter = lv_image_get_pivot_helper,
     },
     {
         .id = LV_PROPERTY_IMAGE_SCALE,
@@ -112,6 +114,12 @@ const lv_obj_class_t lv_image_class = {
     .prop_index_end = LV_PROPERTY_IMAGE_END,
     .properties = properties,
     .properties_count = sizeof(properties) / sizeof(properties[0]),
+
+#if LV_USE_OBJ_PROPERTY_NAME
+    .property_names = lv_image_property_names,
+    .names_count = sizeof(lv_image_property_names) / sizeof(lv_property_name_t),
+#endif
+
 #endif
 };
 
@@ -552,11 +560,6 @@ const lv_image_dsc_t * lv_image_get_bitmap_map_src(lv_obj_t * obj)
     return img->bitmap_mask_src;
 }
 
-void lv_image_set_pivot_helper(lv_obj_t * obj, lv_point_t * pivot)
-{
-    lv_image_set_pivot(obj, pivot->x, pivot->y);
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -759,6 +762,9 @@ static void draw_image(lv_event_t * e)
                         obj->coords.y1,
                         obj->coords.x1 + img->w - 1,
                         obj->coords.y1 + img->h - 1);
+
+            draw_dsc.clip_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+
             lv_area_t coords;
             if(img->align < LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
                 lv_area_align(&obj->coords, &draw_dsc.image_area, img->align, img->offset.x, img->offset.y);
@@ -852,4 +858,17 @@ static void update_align(lv_obj_t * obj)
 
     }
 }
+
+static void lv_image_set_pivot_helper(lv_obj_t * obj, lv_point_t * pivot)
+{
+    lv_image_set_pivot(obj, pivot->x, pivot->y);
+}
+
+static lv_point_t lv_image_get_pivot_helper(lv_obj_t * obj)
+{
+    lv_point_t pivot;
+    lv_image_get_pivot(obj, &pivot);
+    return pivot;
+}
+
 #endif

@@ -75,7 +75,7 @@ To get the steps in an event callback use :cpp:func:`int32_t diff = lv_event_get
 
 The rotary sensitivity can be adjusted on 2 levels:
 
-1. In the input device by the `indev->rotary_sensitvity` element (1/256 unit)
+1. In the input device by the `indev->rotary_sensitivity` element (1/256 unit)
 2. By the `rotary_sensitivity` style property in the widget (1/256 unit)
 
 The final diff is calculated like this:
@@ -289,7 +289,7 @@ You can do this in the following way:
    /*Call this anywhere you want to read the input device*/
    lv_indev_read(indev);
 
-.. note:: that :cpp:func:`lv_indev_read`, :cpp:func:`lv_timer_handler` and :cpp:func:`_lv_display_refr_timer` can not run at the same time.
+.. note:: that :cpp:func:`lv_indev_read`, :cpp:func:`lv_timer_handler` and :cpp:func:`_lv_display_refr_timer` cannot run at the same time.
 
 .. note:: For devices in event-driven mode, `data->continue_reading` is ignored.
 

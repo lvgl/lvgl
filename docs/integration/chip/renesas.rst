@@ -6,7 +6,7 @@ Renesas
 
 `Renesas <https://renesas.com/>`__ is an official partner of LVGL.
 Therefore, LVGL contains built-in support for `Dave2D <https://www.renesas.com/document/mas/tes-dave2d-driver-documentation>`__ (the GPU of Renesas)
-and LVGL also hosts ready-to-use Renesas projects.
+and we also maintain ready-to-use Renesas projects.
 
 Dave2D
 ------
@@ -25,70 +25,170 @@ GLCDC
 -----
 
 GLCDC is a multi-stage graphics output peripheral available in several Renesas MCUs.
-It is able to drive LCD panles via a higly configurable RGB interface.
+It is able to drive LCD panels via a highly configurable RGB interface.
 
-More info can be found at the :ref:`dirver's page<renesas_glcdc>`.
+More info can be found at the :ref:`driver's page<renesas_glcdc>`.
 
-Certified boards
+Supported boards
 ----------------
 
-LVGL has `certified <https://lvgl.io/certificate>`__ one Renesas board so far (more will come soon).
+.. list-table::
+   :widths: 10 30 30 30
 
-.. raw:: html
+   * - 
+     - **EK-RA8D1**
+     - **EK-RA6M3G**
+     - **RX72N Envision Kit**
+   * - CPU
+     - 480MHz, Arm Cortex-M85 core
+     - 120MHz, Arm Cortex-M4 core
+     - 240MHz, Renesas RXv3 core
+   * - Memory
+     - 
+         | 1MB internal, 64MB external SDRAM
+         | 2MB internal, 64MB External Octo-SPI Flash
+     - 
+         | 640kB internal SRAM
+         | 2MB internal, 32MB external QSPI Flash
+     - 
+         | 1MB internal SRAM
+         | 4MB internal, 32MB external QSPI Flash
+   * - Display
+     - 
+         | 4.5”
+         | 480x854
+         | 2-lane MIPI
+     - 
+         | 4.3”
+         | 480x272
+         | Parallel RGB565
+     - 
+         | 4.3”
+         | 480x272
+         | Parallel RGB565
+   * - `Board <https://lvgl.io/boards>`__ video
+     - .. raw:: html
 
-  <iframe width="560" height="315" src="https://www.youtube.com/embed/LHPIqBV_MGA?si=mtW3g-av56bCdR4k" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+           <iframe width="320" height="180" src="https://www.youtube.com/embed/WkJPB8wto_U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+     - .. raw:: html
+
+           <iframe width="320" height="180" src="https://www.youtube.com/embed/0kar4Ee3Qic" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+     - .. raw:: html
+
+           <iframe width="320" height="180" src="https://www.youtube.com/embed/__56v8DsfH0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+   * - Links
+     - `Demo repository for EK-RA8D1 <https://github.com/lvgl/lv_port_renesas_ek-ra8d1>`__
+     - `Demo repository for EK-RA6M3G <https://github.com/lvgl/lv_port_renesas_ek-ra6m3g>`__
+     - `Demo repository for RX72N Envision Kit <https://github.com/lvgl/lv_port_renesas_rx72n-envision-kit>`__
 
 Get started with the Renesas ecosystem
 --------------------------------------
 
-The official IDE of Renesas is called `e² studio <https://www.renesas.com/us/en/software-tool/e-studio?gad_source=1&gclid=CjwKCAjw5ImwBhBtEiwAFHDZx2V3lumaenbyJnc5Ctrclr_lEQM3G22iZgB-4F92OVLCI7xmzp1YQRoCcRgQAvD_BwE>`__. As it's Eclipse-based, it runs on Windows, Linux, and Mac as well.
+.. |img_debug_btn| image:: /misc/renesas/debug_btn.png
+   :alt: Debug button
 
-To get started, just download and install e² studio.
+.. dropdown:: RA Family
 
-JLink is used for debugging, it can be downloaded [here](https://www.segger.com/downloads/jlink/)
+   - The official IDE of Renesas is called e² studio. As it's Eclipse-based, it runs on Windows, Linux, and Mac as well. The RA family requires the latest version with FSP 5.3. It can be downloaded `here <https://www.renesas.com/us/en/software-tool/flexible-software-package-fsp>`__.
 
-Getting started with LVGL
--------------------------
+   - JLink is used for debugging, it can be downloaded `here <https://www.segger.com/downloads/jlink/>`__.
 
-LVGL provides a ready-to-use project for the `EK-RA8D1 <https://www.renesas.com/us/en/products/microcontrollers-microprocessors/ra-cortex-m-mcus/ek-ra8d1-evaluation-kit-ra8d1-mcu-group>`__ development board. Its main features from the HMI's point of view are:
 
-- 480MHz, Arm Cortex®-M85 core
-- 2MB Code Flash, 1MB SRAM
-- MIPI DSI & Parallel Graphics Expansion Ports
-- 4.5 Inch backlit TFT display, 16.7M display colors
-- 480x854 pixels resolution
+   - Clone the ready-to-use repository for your selected board:
 
-**Setting up the project**
+      .. code-block:: shell
 
-- First, clone the ready-to-use `lv_port_renesas_ek-ra8d1 <https://github.com/lvgl/lv_port_renesas_ek-ra8d1.git>`__ repository:
+         git clone https://github.com/lvgl/lv_port_renesas_ek-ra8d1.git --recurse-submodules
 
-   .. code-block:: shell
+      Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
 
-      git clone https://github.com/lvgl/lv_port_renesas_ek-ra8d1.git --recurse-submodules
+   - Open e² studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Existing projects into workspace``
 
-- Open e² studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Exsisting projects into workspace``
+   - Browse the cloned folder and press ``Finish``.
 
-   .. image:: /misc/renesas/import.png
-      :alt: Importing the project
-  
-  
-- Browse the cloned folder and press ``Finish``
+   - Double click on ``configuration.xml``. This will activate the `Configuration Window`.
 
-- Double click on ``configuration.xml``. This will activate the configuration window.
+      Renesas' Flexible Software Package (FSP) incudes BSP and HAL layer support extended with multiple RTOS variants and other middleware stacks.
+      The components will be available via code generation, including the entry point of *"main.c"*.
 
-  Renesas' Flexible Software Package (FSP) incudes BSP and HAL layer support extended with multiple RTOS variants and other middleware stacks.
-  The components will be available via code generation, incuding the entry point of *"main.c"*.
+      Press ``Generate Project Content`` in the top right corner.
 
-  Press ``Generate Project Content`` in the top right corner.
+      .. image:: /misc/renesas/generate.png
+         :alt: Code generation with FSP
 
-   .. image:: /misc/renesas/generate.png
-      :alt: Code generation with FSP
+   - Build the project by pressing ``Ctrl`` + ``Alt`` + ``B``
 
-- Build the project by pressing ``Ctrl`` + ``Alt`` + ``B``
+   - Click the Debug button (|img_debug_btn|). If prompted with `Debug Configurations`, on the `Debugger` tab select the ``J-Link ARM`` as `Debug hardware` and the proper IC as `Target Device`:
 
-- Click the Debug button. When prompted select the `J-Link ARM` Debugger and the `R7FA8D1BH` MCU.
+      - ``R7FA8D1BH`` for EK-RA8D1
 
-Note that on the ``SW1`` DIP switch (middle of the board) 7 should be ON, all others are OFF.
+         .. image:: /misc/renesas/debug_ra8.png
+            :alt: Debugger parameters for RA8
+
+      - ``R7FA6M3AH`` for EK-RA6M3G
+
+         .. image:: /misc/renesas/debug_ra6.png
+            :alt: Debugger parameters for RA6
+
+   .. note::
+      On EK-RA8D1 boards, the ``SW1`` DIP switch (middle of the board) 7 should be ON, all others are OFF.
+
+.. dropdown:: RX Family
+
+   - The official IDE of Renesas is called e² studio. As it's Eclipse-based, it runs on Windows, Linux, and Mac as well. It can be downloaded `here <https://www.renesas.com/us/en/software-tool/e-studio>`__.
+
+   - Download and install the required driver for the debugger
+
+       - for Windows: `64 bit here <https://www.renesas.com/us/en/document/uid/usb-driver-renesas-mcu-tools-v27700-64-bit-version-windows-os?r=488806>`__ and `32 bit here <https://www.renesas.com/us/en/document/uid/usb-driver-renesas-mcu-toolse2e2-liteie850ie850apg-fp5-v27700for-32-bit-version-windows-os?r=488806>`__
+       - for Linux: `here <https://www.renesas.com/us/en/document/swo/e2-emulator-e2-emulator-lite-linux-driver?r=488806>`__
+
+   - RX72 requires an external compiler for the RXv3 core. A free and open-source version is available `here <https://llvm-gcc-renesas.com/rx-download-toolchains/>`__ after a registration.
+
+      The compiler must be activated in e² studio:
+
+      - Go to go to ``Help`` -> ``Add Renesas Toolchains``
+      - Press the ``Add... `` button
+      - Browse the installation folder of the toolchain
+
+      |
+
+      .. image:: /misc/renesas/toolchains.png
+         :alt: Toolchains
+
+   - Clone the ready-to-use `lv_port_renesas_rx72n-envision-kit <https://github.com/lvgl/lv_port_renesas_rx72n-envision-kit.git>`__ repository:
+
+      .. code-block:: shell
+
+         git clone https://github.com/lvgl/lv_port_renesas_rx72n-envision-kit.git --recurse-submodules
+
+      Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
+
+   - Open e² studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Existing projects into workspace``
+
+   - Select the cloned folder and press ``Finish``.
+
+   - Double click on ``RX72N_EnVision_LVGL.scfg``. This will activate the `Configuration Window`.
+
+      Renesas' Smart Configurator (SMC) incudes BSP and HAL layer support extended with multiple RTOS variants and other middleware stacks.
+      The components will be available via code generation, including the entry point of the application.
+
+      Press ``Generate Code`` in the top right corner.
+
+      .. image:: /misc/renesas/generate_smc.png
+         :alt: Code generation with SMC
+
+   - Build the project by pressing ``Ctrl`` + ``Alt`` + ``B``
+
+   - Click the Debug button (|img_debug_btn|). If prompted with `Debug Configurations`, on the `Debugger` tab select the ``E2 Lite`` as `Debug hardware` and ``R5F572NN`` as `Target Device`:
+
+      .. image:: /misc/renesas/debug_rx72.png
+         :alt: Debugger parameters for RX72
+
+   .. note::
+      Make sure that both channels of ``SW1`` DIP switch (next to ``ECN1``) are OFF.
 
 Modify the project
 ------------------
@@ -96,24 +196,24 @@ Modify the project
 Open a demo
 ~~~~~~~~~~~
 
-In `LVGL_thread_entry <https://github.com/lvgl/lv_port_renesas_ek-ra8d1/blob/master/src/LVGL_thread_entry.c>`__, the demos are automatically enabled based on the settings in `lv_conf.h <https://github.com/lvgl/lv_port_renesas_ek-ra8d1/blob/master/src/lv_conf.h>`__.
+The entry point of the main task is contained in ``src/LVGL_thread_entry.c`` in all 3 projects.
 
-You can disable all demos (or just comment them out) and call some ``lv_example_...()`` functions, or add your custom code.
+You can disable the LVGL demos (or just comment them out) and call some ``lv_example_...()`` functions, or add your custom code.
 
 Configuration
 ~~~~~~~~~~~~~
 
-``lv_conf.h`` contains the most important settings for LVGL. Namely:
+``src/lv_conf.h`` contains the most important settings for LVGL. Namely:
 
 - ``LV_COLOR_DEPTH`` to set LVGL's default color depth
 - ``LV_MEM_SIZE to`` set the maximum RAM available for LVGL
 - ``LV_USE_DAVE2D`` to enable the GPU
 
 
-``configuration.xml`` contains the settings for the board and the MCU. By opening this file, all the hardware and software components can be customized in a visual way.
+Hardware and software components can be modified in a visual way using the `Configuration Window`.
 
 
 Support
 -------
 
-In case of an problems or questions open an issue in the `lv_port_renesas_ek-ra8d1 <https://github.com/lvgl/lv_port_renesas_ek-ra8d1/issues>`__ repository.
+In case of any problems or questions open an issue in the corresponding repository.

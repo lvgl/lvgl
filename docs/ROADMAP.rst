@@ -133,7 +133,7 @@ Drawing and rendering
 - |uncheck| Multiple shadow/border
 - |uncheck| Perspective
 - |uncheck| Text shadow
-- |uncheck| Innter shadow
+- |uncheck| Inner shadow
 - |uncheck| ARGB image stroke/grow on the alpha map
 - |uncheck| Real time blur
 

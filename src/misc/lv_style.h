@@ -314,15 +314,12 @@ enum {
     LV_STYLE_BITMAP_MASK_SRC        = 115,
     LV_STYLE_ROTARY_SENSITIVITY     = 116,
 
-#if LV_USE_FLEX
     LV_STYLE_FLEX_FLOW              = 125,
     LV_STYLE_FLEX_MAIN_PLACE        = 126,
     LV_STYLE_FLEX_CROSS_PLACE       = 127,
     LV_STYLE_FLEX_TRACK_PLACE       = 128,
     LV_STYLE_FLEX_GROW              = 129,
-#endif
 
-#if LV_USE_GRID
     LV_STYLE_GRID_COLUMN_ALIGN      = 130,
     LV_STYLE_GRID_ROW_ALIGN         = 131,
     LV_STYLE_GRID_ROW_DSC_ARRAY     = 132,
@@ -333,7 +330,6 @@ enum {
     LV_STYLE_GRID_CELL_ROW_POS      = 137,
     LV_STYLE_GRID_CELL_ROW_SPAN     = 138,
     LV_STYLE_GRID_CELL_Y_ALIGN      = 139,
-#endif
 
     LV_STYLE_LAST_BUILT_IN_PROP     = 140,
 

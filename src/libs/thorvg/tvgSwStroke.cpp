@@ -665,7 +665,7 @@ static void _beginSubPath(SwStroke& stroke, const SwPoint& to, bool closed)
     /* Determine if we need to check whether the border radius is greater
        than the radius of curvature of a curve, to handle this case specially.
        This is only required if bevel joins or butt caps may be created because
-       round & miter joins and round & square caps cover the nagative sector
+       round & miter joins and round & square caps cover the negative sector
        created with wide strokes. */
     if ((stroke.join != StrokeJoin::Round) || (!stroke.closedSubPath && stroke.cap == StrokeCap::Butt))
         stroke.handleWideStrokes = true;
@@ -718,7 +718,7 @@ static void _endSubPath(SwStroke& stroke)
         _addCap(stroke, stroke.subPathAngle + SW_ANGLE_PI, 0);
 
         /* now end the right subpath accordingly. The left one is rewind
-           and deosn't need further processing */
+           and doesn't need further processing */
         _borderClose(right, false);
     }
 }
@@ -862,7 +862,7 @@ bool strokeParseOutline(SwStroke* stroke, const SwOutline& outline)
             ++pt;
             ++types;
 
-            //emit a signel line_to
+            //emit a single line_to
             if (types[0] == SW_CURVE_TYPE_POINT) {
                 _lineTo(*stroke, *pt);
             //types cubic

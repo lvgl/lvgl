@@ -856,7 +856,7 @@ public:
     /*!
         \param a An array obtained by \c GetArray().
         \note \c Array is always pass-by-value.
-        \note the source array is moved into this value and the sourec array becomes empty.
+        \note the source array is moved into this value and the source array becomes empty.
     */
     GenericValue(Array a) RAPIDJSON_NOEXCEPT : data_(a.value_.data_) {
         a.value_.data_ = Data();
@@ -867,7 +867,7 @@ public:
     /*!
         \param o An object obtained by \c GetObject().
         \note \c Object is always pass-by-value.
-        \note the source object is moved into this value and the sourec object becomes empty.
+        \note the source object is moved into this value and the source object becomes empty.
     */
     GenericValue(Object o) RAPIDJSON_NOEXCEPT : data_(o.value_.data_) {
         o.value_.data_ = Data();
@@ -922,7 +922,7 @@ public:
         if (RAPIDJSON_LIKELY(this != &rhs)) {
             // Can't destroy "this" before assigning "rhs", otherwise "rhs"
             // could be used after free if it's an sub-Value of "this",
-            // hence the temporary danse.
+            // hence the temporary dance.
             GenericValue temp;
             temp.RawAssign(rhs);
             this->~GenericValue();
@@ -1820,7 +1820,7 @@ public:
     uint64_t GetUint64() const  { RAPIDJSON_ASSERT(data_.f.flags & kUint64Flag); return data_.n.u64; }
 
     //! Get the value as double type.
-    /*! \note If the value is 64-bit integer type, it may lose precision. Use \c IsLosslessDouble() to check whether the converison is lossless.
+    /*! \note If the value is 64-bit integer type, it may lose precision. Use \c IsLosslessDouble() to check whether the conversion is lossless.
     */
     double GetDouble() const {
         RAPIDJSON_ASSERT(IsNumber());
@@ -1832,7 +1832,7 @@ public:
     }
 
     //! Get the value as float type.
-    /*! \note If the value is 64-bit integer type, it may lose precision. Use \c IsLosslessFloat() to check whether the converison is lossless.
+    /*! \note If the value is 64-bit integer type, it may lose precision. Use \c IsLosslessFloat() to check whether the conversion is lossless.
     */
     float GetFloat() const {
         return static_cast<float>(GetDouble());

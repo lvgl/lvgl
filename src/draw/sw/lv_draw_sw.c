@@ -29,6 +29,10 @@
     #include LV_DRAW_SW_ASM_CUSTOM_INCLUDE
 #endif
 
+#if LV_DRAW_SW_DRAW_UNIT_CNT > 1 && LV_USE_OS == LV_OS_NONE
+    #error "OS support is required when more than one SW rendering units are enabled"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -91,6 +95,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit);
 
+#if LV_DRAW_SW_SUPPORT_ARGB8888
 static void rotate90_argb8888(const uint32_t * src, uint32_t * dst, int32_t srcWidth, int32_t srcHeight,
                               int32_t srcStride,
                               int32_t dstStride);
@@ -99,12 +104,16 @@ static void rotate180_argb8888(const uint32_t * src, uint32_t * dst, int32_t wid
 static void rotate270_argb8888(const uint32_t * src, uint32_t * dst, int32_t srcWidth, int32_t srcHeight,
                                int32_t srcStride,
                                int32_t dstStride);
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB888
 static void rotate90_rgb888(const uint8_t * src, uint8_t * dst, int32_t srcWidth, int32_t srcHeight, int32_t srcStride,
                             int32_t dstStride);
 static void rotate180_rgb888(const uint8_t * src, uint8_t * dst, int32_t width, int32_t height, int32_t src_stride,
                              int32_t dest_stride);
 static void rotate270_rgb888(const uint8_t * src, uint8_t * dst, int32_t width, int32_t height, int32_t srcStride,
                              int32_t dstStride);
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB565
 static void rotate90_rgb565(const uint16_t * src, uint16_t * dst, int32_t srcWidth, int32_t srcHeight,
                             int32_t srcStride,
                             int32_t dstStride);
@@ -113,6 +122,7 @@ static void rotate180_rgb565(const uint16_t * src, uint16_t * dst, int32_t width
 static void rotate270_rgb565(const uint16_t * src, uint16_t * dst, int32_t srcWidth, int32_t srcHeight,
                              int32_t srcStride,
                              int32_t dstStride);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -216,21 +226,27 @@ void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px)
 
 }
 
-void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t src_height, int32_t src_sride,
+void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t src_height, int32_t src_stride,
                        int32_t dest_stride, lv_display_rotation_t rotation, lv_color_format_t color_format)
 {
     if(rotation == LV_DISPLAY_ROTATION_90) {
         switch(color_format) {
+#if LV_DRAW_SW_SUPPORT_RGB565
             case LV_COLOR_FORMAT_RGB565:
-                rotate90_rgb565(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate90_rgb565(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB888
             case LV_COLOR_FORMAT_RGB888:
-                rotate90_rgb888(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate90_rgb888(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888 || LV_DRAW_SW_SUPPORT_XRGB8888
             case LV_COLOR_FORMAT_XRGB8888:
             case LV_COLOR_FORMAT_ARGB8888:
-                rotate90_argb8888(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate90_argb8888(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
+#endif
             default:
                 break;
         }
@@ -240,16 +256,22 @@ void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t
 
     if(rotation == LV_DISPLAY_ROTATION_180) {
         switch(color_format) {
+#if LV_DRAW_SW_SUPPORT_RGB565
             case LV_COLOR_FORMAT_RGB565:
-                rotate180_rgb565(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate180_rgb565(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB888
             case LV_COLOR_FORMAT_RGB888:
-                rotate180_rgb888(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate180_rgb888(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888 || LV_DRAW_SW_SUPPORT_XRGB8888
             case LV_COLOR_FORMAT_XRGB8888:
             case LV_COLOR_FORMAT_ARGB8888:
-                rotate180_argb8888(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate180_argb8888(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
+#endif
             default:
                 break;
         }
@@ -259,16 +281,22 @@ void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t
 
     if(rotation == LV_DISPLAY_ROTATION_270) {
         switch(color_format) {
+#if LV_DRAW_SW_SUPPORT_RGB565
             case LV_COLOR_FORMAT_RGB565:
-                rotate270_rgb565(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate270_rgb565(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB888
             case LV_COLOR_FORMAT_RGB888:
-                rotate270_rgb888(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate270_rgb888(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888 || LV_DRAW_SW_SUPPORT_XRGB8888
             case LV_COLOR_FORMAT_XRGB8888:
             case LV_COLOR_FORMAT_ARGB8888:
-                rotate270_argb8888(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate270_argb8888(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
+#endif
             default:
                 break;
         }
@@ -344,13 +372,13 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_SW);
     if(t == NULL) {
         LV_PROFILER_END;
-        return -1;
+        return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
     }
 
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(buf == NULL) {
         LV_PROFILER_END;
-        return -1;
+        return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
     }
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
@@ -489,6 +517,8 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
     LV_PROFILER_END;
 }
 
+#if LV_DRAW_SW_SUPPORT_ARGB8888
+
 static void rotate270_argb8888(const uint32_t * src, uint32_t * dst, int32_t srcWidth, int32_t srcHeight,
                                int32_t srcStride,
                                int32_t dstStride)
@@ -550,6 +580,10 @@ static void rotate90_argb8888(const uint32_t * src, uint32_t * dst, int32_t srcW
     }
 }
 
+#endif
+
+#if LV_DRAW_SW_SUPPORT_RGB888
+
 static void rotate270_rgb888(const uint8_t * src, uint8_t * dst, int32_t srcWidth, int32_t srcHeight, int32_t srcStride,
                              int32_t dstStride)
 {
@@ -603,6 +637,10 @@ static void rotate90_rgb888(const uint8_t * src, uint8_t * dst, int32_t width, i
         }
     }
 }
+
+#endif
+
+#if LV_DRAW_SW_SUPPORT_RGB565
 
 static void rotate270_rgb565(const uint16_t * src, uint16_t * dst, int32_t srcWidth, int32_t srcHeight,
                              int32_t srcStride,
@@ -664,5 +702,7 @@ static void rotate90_rgb565(const uint16_t * src, uint16_t * dst, int32_t srcWid
         }
     }
 }
+
+#endif
 
 #endif /*LV_USE_DRAW_SW*/

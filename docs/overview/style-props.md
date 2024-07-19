@@ -931,7 +931,7 @@ Defines how to align the tracks of the flow
 </ul>
 
 ### flex_grow
-Defines how mayn space to take proprtionally the free space of the object's trach
+Defines how much space to take proportionally from the free space of the object's track
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_FLEX_ALIGN_ROW`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>

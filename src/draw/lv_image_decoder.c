@@ -124,9 +124,9 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
     lv_result_t res = dsc->decoder->open_cb(dsc->decoder, dsc);
 
     /* Flush the D-Cache if enabled and the image was successfully opened */
-    if(dsc->args.flush_cache && res == LV_RESULT_OK) {
+    if(dsc->args.flush_cache && res == LV_RESULT_OK && dsc->decoded != NULL) {
         lv_draw_buf_flush_cache(dsc->decoded, NULL);
-        LV_LOG_INFO("Flushed D-cache: src %p (%s) (W%" LV_PRId32 " x H%" LV_PRId32 ", data: %p cf: %d)",
+        LV_LOG_INFO("Flushed D-cache: src %p (%s) (W%d x H%d, data: %p cf: %d)",
                     src,
                     dsc->src_type == LV_IMAGE_SRC_FILE ? (const char *)src : "c-array",
                     dsc->decoded->header.w,
@@ -270,7 +270,7 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
         else {
             decoded = lv_draw_buf_dup_user(image_cache_draw_buf_handlers, decoded);
             if(decoded == NULL) {
-                LV_LOG_ERROR("No memory for premulitplying.");
+                LV_LOG_ERROR("No memory for premultiplying.");
                 return NULL;
             }
 
@@ -297,8 +297,8 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
         if(img_dsc->data == NULL) return NULL;
     }
 
-    if(src_type == LV_IMAGE_SRC_FILE) LV_LOG_INFO("Try to find decoder for %s", (const char *)src);
-    else LV_LOG_INFO("Try to find decoder for %p", src);
+    if(src_type == LV_IMAGE_SRC_FILE) LV_LOG_TRACE("Try to find decoder for %s", (const char *)src);
+    else LV_LOG_TRACE("Try to find decoder for %p", src);
 
     lv_image_decoder_t * decoder;
     bool is_header_cache_enabled = lv_image_header_cache_is_enabled();
@@ -316,7 +316,7 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
             decoder = cached_data->decoder;
             lv_cache_release(img_header_cache_p, entry, NULL);
 
-            LV_LOG_INFO("Found decoder %s in header cache", decoder->name);
+            LV_LOG_TRACE("Found decoder %s in header cache", decoder->name);
             return decoder;
         }
     }
@@ -328,7 +328,7 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
         if(decoder->info_cb && decoder->open_cb) {
             lv_result_t res = decoder->info_cb(decoder, src, header);
 
-            if(decoder_prev) LV_LOG_INFO("Can't open image with decoder %s. Trying next decoder.", decoder_prev->name);
+            if(decoder_prev) LV_LOG_TRACE("Can't open image with decoder %s. Trying next decoder.", decoder_prev->name);
 
             if(res == LV_RESULT_OK) {
                 if(header->stride == 0) {
@@ -342,8 +342,8 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
         }
     }
 
-    if(decoder == NULL) LV_LOG_INFO("No decoder found");
-    else LV_LOG_INFO("Found decoder %s", decoder->name);
+    if(decoder == NULL) LV_LOG_TRACE("No decoder found");
+    else LV_LOG_TRACE("Found decoder %s", decoder->name);
 
     if(is_header_cache_enabled && src_type == LV_IMAGE_SRC_FILE && decoder) {
         lv_cache_entry_t * entry;

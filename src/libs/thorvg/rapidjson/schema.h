@@ -264,7 +264,7 @@ public:
     virtual void DestroySchemaValidator(ISchemaValidator* validator) = 0;
     virtual void* CreateHasher() = 0;
     virtual uint64_t GetHashCode(void* hasher) = 0;
-    virtual void DestroryHasher(void* hasher) = 0;
+    virtual void DestroyHasher(void* hasher) = 0;
     virtual void* MallocState(size_t size) = 0;
     virtual void FreeState(void* p) = 0;
 };
@@ -311,7 +311,7 @@ public:
     virtual void StartMissingDependentProperties() = 0;
     virtual void AddMissingDependentProperty(const SValue& targetName) = 0;
     virtual void EndMissingDependentProperties(const SValue& sourceName) = 0;
-    virtual void AddDependencySchemaError(const SValue& souceName, ISchemaValidator* subvalidator) = 0;
+    virtual void AddDependencySchemaError(const SValue& sourceName, ISchemaValidator* subvalidator) = 0;
     virtual bool EndDependencyErrors() = 0;
 
     virtual void DisallowedValue(const ValidateErrorCode code) = 0;
@@ -468,7 +468,7 @@ struct SchemaValidationContext {
 
     ~SchemaValidationContext() {
         if (hasher)
-            factory.DestroryHasher(hasher);
+            factory.DestroyHasher(hasher);
         if (validators) {
             for (SizeType i = 0; i < validatorCount; i++) {
                 if (validators[i]) {
@@ -2920,7 +2920,7 @@ public:
         return static_cast<HasherType*>(hasher)->GetHashCode();
     }
 
-    virtual void DestroryHasher(void* hasher) {
+    virtual void DestroyHasher(void* hasher) {
         HasherType* h = static_cast<HasherType*>(hasher);
         h->~HasherType();
         StateAllocator::Free(h);

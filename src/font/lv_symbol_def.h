@@ -27,7 +27,7 @@ extern "C" {
       62018, 62019, 62020, 62087, 62099, 62189, 62212, 62810, 63426, 63650
 */
 
-/* These symbols can be prefined in the lv_conf.h file.
+/* These symbols can be predefined in the lv_conf.h file.
  * If they are not predefined, they will use the following values
  */
 

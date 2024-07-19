@@ -11,6 +11,8 @@
 #if LV_USE_OBSERVER
 
 #include "../../lvgl.h"
+#include "../../core/lv_obj_private.h"
+#include "../../misc/lv_event_private.h"
 
 /*********************
  *      DEFINES
@@ -356,6 +358,7 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
     return observer;
 }
 
+
 void lv_observer_remove(lv_observer_t * observer)
 {
     LV_ASSERT_NULL(observer);
@@ -370,36 +373,19 @@ void lv_observer_remove(lv_observer_t * observer)
     lv_free(observer);
 }
 
-void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj)
+void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
 {
-    LV_ASSERT_NULL(subject);
-    if(subject->type == LV_SUBJECT_TYPE_INVALID) {
-        LV_LOG_WARN("Subject not initialized yet");
-        return;
-    }
-
-    while(lv_obj_remove_event_cb(obj, unsubscribe_on_delete_cb));
-    while(lv_obj_remove_event_cb(obj, obj_value_changed_event_cb));
-
-#if LV_USE_ARC
-    while(lv_obj_remove_event_cb(obj, arc_value_changed_event_cb));
-#endif /*LV_USE_ARC*/
-
-#if LV_USE_ROLLER
-    while(lv_obj_remove_event_cb(obj, roller_value_changed_event_cb));
-#endif /*LV_USE_ROLLER*/
-
-#if LV_USE_DROPDOWN
-    while(lv_obj_remove_event_cb(obj, dropdown_value_changed_event_cb));
-#endif /*LV_USE_DROPDOWN*/
-
-    lv_observer_t * observer = lv_ll_get_head(&subject->subs_ll);
-    while(observer) {
-        lv_observer_t * observer_next = lv_ll_get_next(&subject->subs_ll, observer);
-        if(observer->target == obj) {
-            lv_observer_remove(observer);
+    int32_t i;
+    int32_t event_cnt = (int32_t)(obj->spec_attr ? lv_array_size(&obj->spec_attr->event_list) : 0);
+    for(i = event_cnt - 1; i >= 0; i--) {
+        lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, i);
+        if(event_dsc->cb == unsubscribe_on_delete_cb) {
+            lv_observer_t * observer = event_dsc->user_data;
+            if(subject == NULL || subject == observer->subject) {
+                lv_observer_remove(observer);
+                lv_obj_remove_event(obj, i);
+            }
         }
-        observer = observer_next;
     }
 }
 

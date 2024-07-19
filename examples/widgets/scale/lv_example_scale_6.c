@@ -49,7 +49,7 @@ static void timer_cb(lv_timer_t * timer)
 }
 
 /**
- * A round scale with multiple needles, resembing a clock
+ * A round scale with multiple needles, resembling a clock
  */
 void lv_example_scale_6(void)
 {

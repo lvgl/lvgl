@@ -161,21 +161,23 @@ void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
     uint32_t stride = header->stride;
 
     if(a == NULL) {
-        lv_memzero(draw_buf->data, header->h * stride);
+        /*Need skip the palette if exists*/
+        uint8_t * bufc = lv_draw_buf_goto_xy(draw_buf, 0, 0);
+        lv_memzero(bufc, header->h * stride);
+        return;
     }
-    else {
-        uint8_t * bufc;
-        uint32_t line_length;
-        int32_t start_y, end_y;
-        uint8_t px_size = lv_color_format_get_size(header->cf);
-        bufc = lv_draw_buf_goto_xy(draw_buf, a->x1, a->y1);
-        line_length = lv_area_get_width(a) * px_size;
-        start_y = a->y1;
-        end_y = a->y2;
-        for(; start_y <= end_y; start_y++) {
-            lv_memzero(bufc, line_length);
-            bufc += stride;
-        }
+
+    uint8_t * bufc;
+    uint32_t line_length;
+    int32_t start_y, end_y;
+    uint8_t px_size = lv_color_format_get_size(header->cf);
+    bufc = lv_draw_buf_goto_xy(draw_buf, a->x1, a->y1);
+    line_length = lv_area_get_width(a) * px_size;
+    start_y = a->y1;
+    end_y = a->y2;
+    for(; start_y <= end_y; start_y++) {
+        lv_memzero(bufc, line_length);
+        bufc += stride;
     }
 }
 
@@ -392,6 +394,10 @@ lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride)
     const lv_image_header_t * header = &src->header;
     uint32_t w = header->w;
     uint32_t h = header->h;
+
+    if(!lv_draw_buf_has_flag(src, LV_IMAGE_FLAGS_MODIFIABLE)) {
+        return LV_RESULT_INVALID;
+    }
 
     /*Use global stride*/
     if(stride == 0) stride = lv_draw_buf_width_to_stride(w, header->cf);

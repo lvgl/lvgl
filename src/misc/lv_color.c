@@ -327,6 +327,15 @@ lv_color_t lv_color_black(void)
 
 void lv_color_premultiply(lv_color32_t * c)
 {
+    if(c->alpha == LV_OPA_COVER) {
+        return;
+    }
+
+    if(c->alpha == LV_OPA_TRANSP) {
+        lv_memzero(c, sizeof(lv_color32_t));
+        return;
+    }
+
     c->red = LV_OPA_MIX2(c->red, c->alpha);
     c->green = LV_OPA_MIX2(c->green, c->alpha);
     c->blue = LV_OPA_MIX2(c->blue, c->alpha);
@@ -334,6 +343,15 @@ void lv_color_premultiply(lv_color32_t * c)
 
 void lv_color16_premultiply(lv_color16_t * c, lv_opa_t a)
 {
+    if(a == LV_OPA_COVER) {
+        return;
+    }
+
+    if(a == LV_OPA_TRANSP) {
+        lv_memzero(c, sizeof(lv_color16_t));
+        return;
+    }
+
     c->red = LV_OPA_MIX2(c->red, a);
     c->green = LV_OPA_MIX2(c->green, a);
     c->blue = LV_OPA_MIX2(c->blue, a);

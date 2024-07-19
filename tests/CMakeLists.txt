@@ -57,9 +57,16 @@ include(CTest)
 
 set(LVGL_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
+set(SANITIZE_AND_COVERAGE_OPTIONS
+    -fsanitize=address
+    -fsanitize=leak
+    -fsanitize=undefined
+    --coverage
+)
 
 set(LVGL_TEST_OPTIONS_VG_LITE
     -DLV_TEST_OPTION=6
+    -Wno-dangling-pointer # workaround for thorvg dangling-pointer warning
 )
 
 set(LVGL_TEST_OPTIONS_MINIMAL_MONOCHROME
@@ -86,16 +93,15 @@ set(LVGL_TEST_OPTIONS_TEST_SYSHEAP
     -DLV_TEST_OPTION=5
     -DLVGL_CI_USING_SYS_HEAP
     -Wno-unused-but-set-variable # unused variables are common in the dual-heap arrangement
+    ${SANITIZE_AND_COVERAGE_OPTIONS}
 )
 
 set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
     -DLV_TEST_OPTION=5
     -DLV_USE_OBJ_PROPERTY=1      # add obj property test and disable pedantic
+    -DLV_USE_OBJ_PROPERTY_NAME=1
     -DLVGL_CI_USING_DEF_HEAP
-    -fsanitize=address
-    -fsanitize=leak
-    -fsanitize=undefined
-    --coverage
+    ${SANITIZE_AND_COVERAGE_OPTIONS}
 )
 
 if (OPTIONS_VG_LITE)
@@ -109,13 +115,13 @@ elseif (OPTIONS_24BIT)
 elseif (OPTIONS_FULL_32BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_FULL_32BIT})
 elseif (OPTIONS_TEST_SYSHEAP)
-    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP} -fsanitize=address -fsanitize=leak -fsanitize=undefined --coverage)
-    filter_compiler_options (C TEST_LIBS --coverage -fsanitize=address -fsanitize=leak -fsanitize=undefined)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
+    filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_DEFHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_DEFHEAP})
-    filter_compiler_options (C TEST_LIBS --coverage -fsanitize=address -fsanitize=leak -fsanitize=undefined)
+    filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_MEMORYCHECK)
@@ -124,6 +130,18 @@ elseif (OPTIONS_TEST_MEMORYCHECK)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
+elseif (OPTIONS_TEST_VG_LITE)
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_VG_LITE} -DLVGL_CI_USING_SYS_HEAP ${SANITIZE_AND_COVERAGE_OPTIONS})
+    filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
+    set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
+    set (ENABLE_TESTS ON)
+    add_definitions(-DREF_IMGS_PATH="ref_imgs_vg_lite/")
+
+    # In 32-bit systems, the output of ThorVG's anti-aliasing algorithm has a slight deviation.
+    if ($ENV{NON_AMD64_BUILD})
+        # Set a tolerance value for the VG-Lite tests.
+        add_definitions(-DREF_IMG_TOLERANCE=9)
+    endif()
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
@@ -180,7 +198,6 @@ if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
         -Werror=float-conversion
         -Werror=strict-aliasing
         -Wno-double-promotion
-        -Wno-unused-but-set-parameter
         -Wno-unreachable-code
     )
 else()
@@ -319,6 +336,27 @@ if ($ENV{NON_AMD64_BUILD})
     include_directories(${LIBINPUT_INCLUDE_DIRS})
 endif()
 
+# OpenGL ES is required for its driver
+if ($ENV{NON_AMD64_BUILD})
+    message("Disable OpenGL, GLEW or glfw3 for non-amd64 build")
+    add_definitions(-DLV_USE_OPENGLES=0)
+else()
+    find_package(OpenGL)
+    find_package(GLEW)
+    find_package(glfw3)
+
+    if(OpenGL_FOUND AND GLEW_FOUND AND glfw3_FOUND)
+        # Include directories
+        include_directories(${OPENGL_INCLUDE_DIR})
+        include_directories(${GLEW_INCLUDE_DIRS})
+        include_directories(${GLFW_INCLUDE_DIRS})
+        message("Enable LV_USE_OPENGLES")
+    else()
+        message("OpenGL, GLEW or glfw3 not found, defaulting to 0")
+        add_definitions(-DLV_USE_OPENGLES=0)
+    endif()
+endif()
+
 if (NOT LIBINPUT_FOUND)
     message("libinput not found, defaulting to 0")
     add_definitions(-DLV_USE_LIBINPUT=0)
@@ -349,6 +387,7 @@ endif()
 if(WIN32)
     add_definitions(-DLV_USE_LINUX_FBDEV=0)
     add_definitions(-DLV_USE_WINDOWS=1)
+    add_definitions(-DLV_USE_OS=LV_OS_WINDOWS)
 endif()
 
 # disable test targets for build only tests
@@ -406,6 +445,12 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             m
             pthread
             ${TEST_LIBS})
+
+	if (NOT $ENV{NON_AMD64_BUILD})
+	    target_link_libraries(${test_name} PRIVATE
+    	        ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
+	endif()
+
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 

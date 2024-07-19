@@ -114,7 +114,7 @@ void lv_example_obj_2(void);
 
 void lv_example_roller_1(void);
 void lv_example_roller_2(void);
-//void lv_example_roller_3(void);
+void lv_example_roller_3(void);
 
 void lv_example_scale_1(void);
 void lv_example_scale_2(void);

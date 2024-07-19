@@ -70,6 +70,13 @@ void lv_barcode_set_scale(lv_obj_t * obj, uint16_t scale);
 void lv_barcode_set_direction(lv_obj_t * obj, lv_dir_t direction);
 
 /**
+ * Set the tiled mode of a barcode object
+ * @param obj pointer to barcode object
+ * @param tiled true: tiled mode, false: normal mode (default)
+ */
+void lv_barcode_set_tiled(lv_obj_t * obj, bool tiled);
+
+/**
  * Set the data of a barcode object
  * @param obj pointer to barcode object
  * @param data data to display

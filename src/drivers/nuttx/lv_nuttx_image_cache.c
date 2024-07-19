@@ -24,12 +24,16 @@
 #define img_cache_p         (LV_GLOBAL_DEFAULT()->img_cache)
 #define img_header_cache_p  (LV_GLOBAL_DEFAULT()->img_header_cache)
 #define ctx                 (*(lv_nuttx_ctx_image_cache_t **)&LV_GLOBAL_DEFAULT()->nuttx_ctx->image_cache)
+#define image_cache_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers)
+
 /**********************
  *      TYPEDEFS
  **********************/
 typedef struct {
     uint8_t * mem;
     uint32_t mem_size;
+
+    char name[sizeof(HEAP_NAME) + 10]; /**< +10 characters to store task pid. */
 
     struct mm_heap_s * heap;
     uint32_t heap_size;
@@ -57,7 +61,7 @@ static void free_cb(void * draw_buf);
 
 void lv_nuttx_image_cache_init(void)
 {
-    lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
+    lv_draw_buf_handlers_t * handlers = image_cache_draw_buf_handlers;
     handlers->buf_malloc_cb = malloc_cb;
     handlers->buf_free_cb = free_cb;
 
@@ -105,8 +109,10 @@ static bool defer_init(void)
         return false;
     }
 
+    lv_snprintf(ctx->name, sizeof(ctx->name), HEAP_NAME "[%-4" LV_PRIu32 "]", (uint32_t)gettid());
+
     ctx->heap = mm_initialize(
-                    HEAP_NAME,
+                    ctx->name,
                     ctx->mem,
                     ctx->mem_size
                 );

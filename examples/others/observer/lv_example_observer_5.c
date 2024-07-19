@@ -146,7 +146,7 @@ static void download_timer_cb(lv_timer_t * t)
 }
 
 /**
- * Emulate connection and FW dowlading by timers
+ * Emulate connection and FW downloading by timers
  */
 static void fw_upload_manager_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {

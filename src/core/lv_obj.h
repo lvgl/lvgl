@@ -276,7 +276,7 @@ bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f);
  * Check if a given flag or any of the flags are set on an object.
  * @param obj   pointer to an object
  * @param f     the flag(s) to check (OR-ed values can be used)
- * @return      true: at lest one flag flag is set; false: none of the flags are set
+ * @return      true: at least one flag is set; false: none of the flags are set
  */
 bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f);
 
@@ -351,11 +351,38 @@ const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj);
 bool lv_obj_is_valid(const lv_obj_t * obj);
 
 #if LV_USE_OBJ_ID
+/**
+ * Set an id for an object.
+ * @param obj   pointer to an object
+ * @param id    the id of the object
+ */
+void lv_obj_set_id(lv_obj_t * obj, void * id);
 
 /**
- * Assign an id to an object if not previously assigned
- * Set `LV_USE_OBJ_ID_BUILTIN` to 1 to use builtin method to generate object ID.
- * Otherwise, these functions including `lv_obj_[assign|free|stringify]_id` should be implemented externally.
+ * Get the id of an object.
+ * @param obj   pointer to an object
+ * @return      the id of the object
+ */
+void * lv_obj_get_id(const lv_obj_t * obj);
+
+/**
+ * Get the child object by its id.
+ * It will check children and grandchildren recursively.
+ * Function `lv_obj_id_compare` is used to matched obj id with given id.
+ *
+ * @param obj       pointer to an object
+ * @param id        the id of the child object
+ * @return          pointer to the child object or NULL if not found
+ */
+lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, void * id);
+
+/**
+ * Assign id to object if not previously assigned.
+ * This function gets called automatically when LV_OBJ_ID_AUTO_ASSIGN is enabled.
+ *
+ * Set `LV_USE_OBJ_ID_BUILTIN` to use the builtin method to generate object ID.
+ * Otherwise, these functions including `lv_obj_[assign|free|stringify]_id` and
+ * `lv_obj_id_compare`should be implemented externally.
  *
  * @param class_p   the class this obj belongs to. Note obj->class_p is the class currently being constructed.
  * @param obj   pointer to an object
@@ -363,10 +390,23 @@ bool lv_obj_is_valid(const lv_obj_t * obj);
 void lv_obj_assign_id(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
 /**
- * Free resources allocated by `lv_obj_assign_id`
+ * Free resources allocated by `lv_obj_assign_id`.
+ * This function gets called automatically when object is deleted.
  * @param obj   pointer to an object
  */
 void lv_obj_free_id(lv_obj_t * obj);
+
+/**
+ * Compare two obj id, return 0 if they are equal.
+ *
+ * Set `LV_USE_OBJ_ID_BUILTIN` to use the builtin method for compare.
+ * Otherwise, it must be implemented externally.
+ *
+ * @param id1: the first id
+ * @param id2: the second id
+ * @return     0 if they are equal, non-zero otherwise.
+ */
+int lv_obj_id_compare(void * id1, void * id2);
 
 /**
  * Format an object's id into a string.
@@ -381,7 +421,6 @@ const char * lv_obj_stringify_id(lv_obj_t * obj, char * buf, uint32_t len);
  * Free resources used by builtin ID generator.
  */
 void lv_objid_builtin_destroy(void);
-
 #endif
 
 #endif /*LV_USE_OBJ_ID*/

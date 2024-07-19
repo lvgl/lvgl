@@ -108,7 +108,7 @@ struct Scene::Impl
     {
         if ((needComp = needComposition(opacity))) {
             /* Overriding opacity value. If this scene is half-translucent,
-               It must do intermeidate composition with that opacity value. */
+               It must do intermediate composition with that opacity value. */
             this->opacity = opacity;
             opacity = 255;
         }

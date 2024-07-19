@@ -163,6 +163,13 @@ void lv_scale_set_text_src(lv_obj_t * obj, const char * txt_src[]);
 void lv_scale_set_post_draw(lv_obj_t * obj, bool en);
 
 /**
+ * Draw the scale ticks on top of all parts
+ * @param obj       pointer to a scale object
+ * @param en        true: enable draw ticks on top of all parts
+ */
+void lv_scale_set_draw_ticks_on_top(lv_obj_t * obj, bool en);
+
+/**
  * Add a section to the given scale
  * @param obj       pointer to a scale object
  * @return          pointer to the new section

@@ -255,7 +255,7 @@ struct Vertex
 
 
 /**
- * @brief A data structure representing a triange in a texture mesh
+ * @brief A data structure representing a triangle in a texture mesh
  *
  * @param vertex The three vertices that make up the polygon
  *
@@ -2010,7 +2010,7 @@ public:
  * It's useful when you need to save the composed scene or image from a paint object and recreate it later.
  *
  * The file format is decided by the extension name(i.e. "*.tvg") while the supported formats depend on the TVG packaging environment.
- * If it doesn't support the file format, the save() method returns the @c Result::NonSuppport result.
+ * If it doesn't support the file format, the save() method returns the @c Result::NonSupport result.
  *
  * Once you export a paint to the file successfully, you can recreate it using the Picture class.
  *

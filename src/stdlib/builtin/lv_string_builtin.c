@@ -171,7 +171,7 @@ void * LV_ATTRIBUTE_FAST_MEM lv_memmove(void * dst, const void * src, size_t len
     return dst;
 }
 
-int32_t lv_memcmp(const void * p1, const void * p2, size_t len)
+int lv_memcmp(const void * p1, const void * p2, size_t len)
 {
     const char * s1 = (const char *) p1;
     const char * s2 = (const char *) p2;
@@ -223,7 +223,7 @@ char * lv_strcpy(char * dst, const char * src)
     return tmp;
 }
 
-int32_t lv_strcmp(const char * s1, const char * s2)
+int lv_strcmp(const char * s1, const char * s2)
 {
     while(*s1 && (*s1 == *s2)) {
         s1++;

@@ -46,7 +46,7 @@ void lv_example_gridnav_3(void)
     label = lv_label_create(btn);
     lv_label_set_text(label, "Button 2");
 
-    /*Create an other container with long text to show how LV_GRIDNAV_CTRL_SCROLL_FIRST works*/
+    /*Create another container with long text to show how LV_GRIDNAV_CTRL_SCROLL_FIRST works*/
     lv_obj_t * cont_sub1 = lv_obj_create(cont_main);
     lv_obj_set_size(cont_sub1, lv_pct(100), 100);
 
@@ -65,7 +65,7 @@ void lv_example_gridnav_3(void)
                       "Hello world!\n"
                       "Hello world!");
 
-    /*Create a third container that can be focused with ENTER and contains an other grid nav*/
+    /*Create a third container that can be focused with ENTER and contains another grid nav*/
     lv_obj_t * cont_sub2 = lv_obj_create(cont_main);
     lv_gridnav_add(cont_sub2, LV_GRIDNAV_CTRL_ROLLOVER);
     /*Only the container needs to be in a group*/

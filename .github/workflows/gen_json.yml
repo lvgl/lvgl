@@ -1,0 +1,28 @@
+name: Test API JSON generator
+on:
+  push:
+  pull_request:
+
+jobs:
+  test_api_json:
+    if: github.repository == 'lvgl/lvgl'
+    runs-on: ubuntu-22.04
+    name: Test API JSON
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Doxygen and Latex dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install doxygen texlive-xetex texlive-binaries texlive-lang-english latexmk fonts-freefont-otf
+
+      - name: Install requirements
+        run: pip install -r scripts/gen_json/requirements.txt
+
+      - name: Run test
+        run: python3 tests/gen_json/test_gen_json.py

@@ -213,7 +213,7 @@ void lv_obj_move_to_index(lv_obj_t * obj, int32_t index)
     }
 
     const uint32_t parent_child_count = lv_obj_get_child_count(parent);
-    /* old_index only can be 0 or greater, this point can not be reached if the parent is not null */
+    /* old_index only can be 0 or greater, this point cannot be reached if the parent is not null */
     const int32_t old_index = lv_obj_get_index(obj);
     LV_ASSERT(0 <= old_index);
 
@@ -393,7 +393,7 @@ lv_obj_t * lv_obj_get_sibling_by_type(const lv_obj_t * obj, int32_t idx, const l
     int32_t sibling_idx = (int32_t)lv_obj_get_index_by_type(obj, class_p) + idx;
     if(sibling_idx < 0) return NULL;
 
-    return lv_obj_get_child(parent, sibling_idx);
+    return lv_obj_get_child_by_type(parent, sibling_idx, class_p);
 }
 
 uint32_t lv_obj_get_child_count(const lv_obj_t * obj)
@@ -537,6 +537,9 @@ static void obj_delete_core(lv_obj_t * obj)
             }
             if(indev->pointer.last_pressed == obj) {
                 indev->pointer.last_pressed = NULL;
+            }
+            if(indev->pointer.last_hovered == obj) {
+                indev->pointer.last_hovered = NULL;
             }
         }
 

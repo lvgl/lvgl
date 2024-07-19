@@ -44,7 +44,7 @@ For integration with CMake take a look this section of the
 Other platforms and tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The `Get started </integartion/index>`__ section contains many platform
+The `Get started </integration/index>`__ section contains many platform
 specific descriptions e.g. for ESP32, Arduino, NXP, RT-Thread, NuttX,
 etc.
 

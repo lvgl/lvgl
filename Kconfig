@@ -199,6 +199,46 @@ menu "LVGL configuration"
 		help
 			Required to draw anything on the screen.
 
+		config LV_DRAW_SW_SUPPORT_RGB565
+			bool "Enable support for RGB565 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_RGB565A8
+			bool "Enable support for RGB565A8 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_RGB888
+			bool "Enable support for RGB888 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_XRGB8888
+			bool "Enable support for XRGB8888 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_ARGB8888
+			bool "Enable support for ARGB8888 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_L8
+			bool "Enable support for L8 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_AL88
+			bool "Enable support for AL88 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_SUPPORT_A8
+			bool "Enable support for A8 color format"
+			default y
+			depends on LV_USE_DRAW_SW
+				
 		config LV_DRAW_SW_DRAW_UNIT_CNT
 			int "Number of draw units"
 			default 1
@@ -353,19 +393,14 @@ menu "LVGL configuration"
 				which usually improves performance,
 				but does not guarantee the same rendering quality as the software.
 
-		config LV_VG_LITE_LINEAR_GRAD_CACHE_CNT
-			int "VG-Lite linear gradient image maximum cache number."
+		config LV_VG_LITE_GRAD_CACHE_CNT
+			int "VG-Lite gradient maximum cache number."
 			default 32
 			depends on LV_USE_DRAW_VG_LITE
 			help
-				The memory usage of a single gradient image is 4K bytes.
-
-		config LV_VG_LITE_RADIAL_GRAD_CACHE_CNT
-			int "VG-Lite radial gradient image maximum cache number."
-			default 32
-			depends on LV_USE_DRAW_VG_LITE
-			help
-				The memory usage of a single gradient image is radial grad radius * 4 bytes.
+				The memory usage of a single gradient:
+					linear: 4K bytes.
+					radial: radius * 4K bytes.
 
 		config LV_USE_VECTOR_GRAPHIC
 			bool "Use Vector Graphic APIs"
@@ -572,13 +607,27 @@ menu "LVGL configuration"
 				bool "Add id field to obj"
 				default n
 
+			config LV_OBJ_ID_AUTO_ASSIGN
+				bool "Automatically assign an ID when obj is created"
+				default y
+				depends on LV_USE_OBJ_ID
+
 			config LV_USE_OBJ_ID_BUILTIN
 				bool "Use builtin method to deal with obj ID"
 				default n
+				depends on LV_USE_OBJ_ID
 
 			config LV_USE_OBJ_PROPERTY
 				bool "Use obj property set/get API"
 				default n
+
+			config LV_USE_OBJ_PROPERTY_NAME
+				bool "Use name to access property"
+				default n
+				depends on LV_USE_OBJ_PROPERTY
+				help
+					Add a name table to every widget class, so the property can be accessed by name.
+					Note, the const table will increase flash usage.
 
 			config LV_USE_VG_LITE_THORVG
 				bool "VG-Lite Simulator"
@@ -596,6 +645,11 @@ menu "LVGL configuration"
 
 			config LV_VG_LITE_THORVG_YUV_SUPPORT
 				bool "Enable YUV color format support"
+				default n
+				depends on LV_USE_VG_LITE_THORVG
+
+			config LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+				bool "Enable linear gradient extension support"
 				default n
 				depends on LV_USE_VG_LITE_THORVG
 
@@ -817,7 +871,7 @@ menu "LVGL configuration"
 
 		config LV_TXT_BREAK_CHARS
 			string "Can break (wrap) texts on these chars"
-			default " ,.;:-_)]}"
+			default " ,.;:-_)}"
 
 		config LV_TXT_LINE_BREAK_LONG_LEN
 			int "Line break long length"
@@ -864,7 +918,7 @@ menu "LVGL configuration"
 			bool "Enable Arabic/Persian processing"
 			help
 				In these languages characters should be replaced with
-				an other form based on their position in the text.
+				another form based on their position in the text.
 	endmenu
 
 	menu "Widget Usage"
@@ -1153,7 +1207,7 @@ menu "LVGL configuration"
 			bool "GIF decoder library"
 
 		config LV_GIF_CACHE_DECODE_DATA
-			bool "Use extra 16KB RAM to cache decoded data to accerlate"
+			bool "Use extra 16KB RAM to cache decoded data to accelerate"
 			depends on LV_USE_GIF
 
 		config LV_BIN_DECODER_RAM_LOAD
@@ -1186,6 +1240,10 @@ menu "LVGL configuration"
 		config LV_TINY_TTF_FILE_SUPPORT
 			bool "Enable loading Tiny TTF data from files"
 			default n
+			depends on LV_USE_TINY_TTF
+		config LV_TINY_TTF_CACHE_GLYPH_CNT
+			bool "Tiny ttf cache entries count"
+			default 256
 			depends on LV_USE_TINY_TTF
 
 		config LV_USE_RLOTTIE
@@ -1347,7 +1405,7 @@ menu "LVGL configuration"
 			depends on LV_USE_IME_PINYIN
 			default y
 			help
-				If you do not use the default thesaurus, be sure to use lv_ime_pinyin after setting the thesauruss
+				If you do not use the default thesaurus, be sure to use lv_ime_pinyin after setting the thesaurus
 		config LV_IME_PINYIN_CAND_TEXT_NUM
 			int "Maximum number of candidate panels"
 			depends on LV_USE_IME_PINYIN
@@ -1645,6 +1703,16 @@ menu "LVGL configuration"
 
 		config LV_USE_WINDOWS
 			bool "Use LVGL Windows backend"
+			depends on LV_OS_WINDOWS
+			default n
+
+		config LV_USE_OPENGLES
+			bool "Use GLFW and OpenGL to open window on PC and handle mouse and keyboard"
+			default n
+
+		config LV_USE_OPENGLES_DEBUG
+			bool "Enable debug mode for OpenGL"
+			depends on LV_USE_OPENGLES
 			default n
 	endmenu
 

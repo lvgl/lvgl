@@ -35,7 +35,7 @@ struct lv_gif_t {
     lv_image_t img;
     gd_GIF * gif;
     lv_timer_t * timer;
-    lv_draw_buf_t imgdsc;
+    lv_image_dsc_t imgdsc;
     uint32_t last_call;
 };
 

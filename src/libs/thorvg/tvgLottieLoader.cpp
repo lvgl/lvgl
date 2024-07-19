@@ -298,13 +298,13 @@ bool LottieLoader::override(const char* slot)
 
         if (idx < 1) success = false;
         free(temp);
-        rebuild = overriden = success;
+        rebuild = overridden = success;
     //reset slots
-    } else if (overriden) {
+    } else if (overridden) {
         for (auto s = comp->slots.begin(); s < comp->slots.end(); ++s) {
             (*s)->reset();
         }
-        overriden = false;
+        overridden = false;
         rebuild = true;
     }
     return success;

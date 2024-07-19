@@ -35,9 +35,9 @@ typedef struct {
  **********************/
 static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter);
 static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t gid_right);
-static int32_t unicode_list_compare(const void * ref, const void * element);
-static int32_t kern_pair_8_compare(const void * ref, const void * element);
-static int32_t kern_pair_16_compare(const void * ref, const void * element);
+static int unicode_list_compare(const void * ref, const void * element);
+static int kern_pair_8_compare(const void * ref, const void * element);
+static int kern_pair_16_compare(const void * ref, const void * element);
 
 #if LV_USE_FONT_COMPRESSED
     static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, uint8_t bpp, bool prefilter);
@@ -319,25 +319,24 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
     return value;
 }
 
-static int32_t kern_pair_8_compare(const void * ref, const void * element)
+static int kern_pair_8_compare(const void * ref, const void * element)
 {
     const kern_pair_ref_t * ref8_p = ref;
     const uint8_t * element8_p = element;
 
     /*If the MSB is different it will matter. If not return the diff. of the LSB*/
-    if(ref8_p->gid_left != element8_p[0]) return (int32_t) ref8_p->gid_left - element8_p[0];
-    else return (int32_t) ref8_p->gid_right - element8_p[1];
-
+    if(ref8_p->gid_left != element8_p[0]) return ref8_p->gid_left - element8_p[0];
+    else return ref8_p->gid_right - element8_p[1];
 }
 
-static int32_t kern_pair_16_compare(const void * ref, const void * element)
+static int kern_pair_16_compare(const void * ref, const void * element)
 {
     const kern_pair_ref_t * ref16_p = ref;
     const uint16_t * element16_p = element;
 
     /*If the MSB is different it will matter. If not return the diff. of the LSB*/
-    if(ref16_p->gid_left != element16_p[0]) return (int32_t) ref16_p->gid_left - element16_p[0];
-    else return (int32_t) ref16_p->gid_right - element16_p[1];
+    if(ref16_p->gid_left != element16_p[0]) return ref16_p->gid_left - element16_p[0];
+    else return ref16_p->gid_right - element16_p[1];
 }
 
 #if LV_USE_FONT_COMPRESSED
@@ -488,13 +487,13 @@ static inline uint8_t rle_next(void)
         ret = get_bits(rle->in, rle->rdp, rle->bpp);
         if(rle->rdp != 0 && rle->prev_v == ret) {
             rle->count = 0;
-            rle->state = RLE_STATE_REPEATE;
+            rle->state = RLE_STATE_REPEATED;
         }
 
         rle->prev_v = ret;
         rle->rdp += rle->bpp;
     }
-    else if(rle->state == RLE_STATE_REPEATE) {
+    else if(rle->state == RLE_STATE_REPEATED) {
         v = get_bits(rle->in, rle->rdp, 1);
         rle->count++;
         rle->rdp += 1;
@@ -550,7 +549,7 @@ static inline uint8_t rle_next(void)
  *  @retval > 0   Reference is greater than element.
  *
  */
-static int32_t unicode_list_compare(const void * ref, const void * element)
+static int unicode_list_compare(const void * ref, const void * element)
 {
-    return ((int32_t)(*(uint16_t *)ref)) - ((int32_t)(*(uint16_t *)element));
+    return (*(uint16_t *)ref) - (*(uint16_t *)element);
 }

@@ -143,7 +143,7 @@ lv_result_t lv_array_push_back(lv_array_t * array, const void * element)
 
     if(array->size == array->capacity) {
         /*array is full*/
-        lv_array_resize(array, array->capacity + 1);
+        lv_array_resize(array, array->capacity + LV_ARRAY_DEFAULT_CAPACITY);
     }
 
     uint8_t * data = array->data + array->size * array->element_size;

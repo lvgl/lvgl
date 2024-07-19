@@ -260,6 +260,17 @@ void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     if(!disp) return;
     if(!lv_display_is_invalidation_enabled(disp)) return;
 
+    /**
+     * There are two reasons for this issue:
+     *  1.LVGL API is being used across threads, such as modifying widget properties in another thread
+     *    or within an interrupt handler during the main thread rendering process.
+     *  2.User-customized widget modify widget properties/styles again within the DRAW event.
+     *
+     * Therefore, ensure that LVGL is used in a single-threaded manner, or refer to
+     * documentation: https://docs.lvgl.io/master/porting/os.html for proper locking mechanisms.
+     * Additionally, ensure that only drawing-related tasks are performed within the DRAW event,
+     * and move widget property/style modifications to other events.
+     */
     LV_ASSERT_MSG(!disp->rendering_in_progress, "Invalidate area is not allowed during rendering.");
 
     /*Clear the invalidate buffer if the parameter is NULL*/
@@ -579,13 +590,14 @@ static void refr_invalid_areas(void)
  */
 static void layer_reshape_draw_buf(lv_layer_t * layer)
 {
-    LV_ASSERT(lv_draw_buf_reshape(
-                  layer->draw_buf,
-                  layer->color_format,
-                  lv_area_get_width(&layer->buf_area),
-                  lv_area_get_height(&layer->buf_area),
-                  0)
-              != NULL);
+    lv_draw_buf_t * ret = lv_draw_buf_reshape(
+                              layer->draw_buf,
+                              layer->color_format,
+                              lv_area_get_width(&layer->buf_area),
+                              lv_area_get_height(&layer->buf_area),
+                              0);
+    LV_UNUSED(ret);
+    LV_ASSERT_NULL(ret);
 }
 
 /**
@@ -813,7 +825,7 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
             }
         }
 
-        /*Call the post draw draw function of the parents of the to object*/
+        /*Call the post draw function of the parents of the to object*/
         lv_obj_send_event(parent, LV_EVENT_DRAW_POST_BEGIN, (void *)layer);
         lv_obj_send_event(parent, LV_EVENT_DRAW_POST, (void *)layer);
         lv_obj_send_event(parent, LV_EVENT_DRAW_POST_END, (void *)layer);
@@ -902,7 +914,7 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
         lv_result_t res = layer_get_area(layer, obj, layer_type, &layer_area_full, &obj_draw_size);
         if(res != LV_RESULT_OK) return;
 
-        /*Simple layers can be subdivied into smaller layers*/
+        /*Simple layers can be subdivided into smaller layers*/
         uint32_t max_rgb_row_height = lv_area_get_height(&layer_area_full);
         uint32_t max_argb_row_height = lv_area_get_height(&layer_area_full);
         if(layer_type == LV_LAYER_TYPE_SIMPLE) {

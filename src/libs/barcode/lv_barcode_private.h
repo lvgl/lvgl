@@ -34,6 +34,7 @@ struct lv_barcode_t {
     lv_color_t light_color;
     uint16_t scale;
     lv_dir_t direction;
+    bool tiled;
 };
 
 

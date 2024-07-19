@@ -45,6 +45,7 @@ struct lv_bar_t {
     lv_bar_anim_t cur_value_anim;
     lv_bar_anim_t start_value_anim;
     lv_bar_mode_t mode : 2;     /**< Type of bar*/
+    lv_bar_orientation_t orientation : 2;  /**< Orientation of bar*/
 };
 
 

@@ -295,7 +295,7 @@ static SwOutline* _genDashOutline(const RenderShape* rshape, const Matrix* trans
         }
 
         trimmed = true;
-    //just a dasy style.
+    //just a dash style.
     } else {
         if (dash.cnt == 0) return nullptr;
     }

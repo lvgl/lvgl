@@ -233,4 +233,41 @@ void test_obj_property_state(void)
 #endif
 }
 
+void test_obj_property_type_point(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_image_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    prop.id = LV_PROPERTY_IMAGE_PIVOT;
+    prop.point.x = 0x1234;
+    prop.point.y = 0x5678;
+
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    lv_property_t prop_get = lv_obj_get_property(obj, LV_PROPERTY_IMAGE_PIVOT);
+    TEST_ASSERT_EQUAL_UINT16(0x1234, prop_get.point.x);
+    TEST_ASSERT_EQUAL_UINT16(0x5678, prop_get.point.y);
+#endif
+}
+
+void test_obj_property_name(void)
+{
+#if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+
+    /*Style name*/
+    TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_STYLE_X, lv_obj_property_get_id(obj, "x"));
+    TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_STYLE_BG_MAIN_STOP, lv_obj_property_get_id(obj, "bg_main_stop"));
+
+    /*Widget property*/
+    obj = lv_image_create(lv_screen_active());
+    TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_IMAGE_ANTIALIAS, lv_obj_property_get_id(obj, "antialias"));
+    /*Base class property*/
+    TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_OBJ_PARENT, lv_obj_property_get_id(obj, "parent"));
+
+    /*OBJ flags*/
+    TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_OBJ_FLAG_CLICKABLE, lv_obj_property_get_id(obj, "flag_clickable"));
+#endif
+}
+
 #endif

@@ -99,15 +99,15 @@
     </release>
     <release date="2022-11-28" version="1.0.11" url="https://github.com/lvgl/lvgl/raw/f433ed62248cafd915848ff4d0720f97fb0fc7fd/env_support/cmsis-pack/LVGL.lvgl.1.0.11.pack">
       - LVGL 9.0.0-dev
-      - Montyly update for November
+      - Monthly update for November
     </release>
     <release date="2022-10-31" version="1.0.10" url="https://github.com/lvgl/lvgl/raw/0738d1ac36387c1ad5b6bf6f478bc315817bc34e/env_support/cmsis-pack/LVGL.lvgl.1.0.10.pack">
       - LVGL 9.0.0-dev
-      - Montyly update for October
+      - Monthly update for October
     </release>
     <release date="2022-09-16" version="1.0.9" url="https://github.com/lvgl/lvgl/raw/df7d5859f4f4886cb0320f2af1898c350e0ecd2a/env_support/cmsis-pack/LVGL.lvgl.1.0.9.pack">
       - LVGL 9.0.0-dev
-      - Montyly update for September
+      - Monthly update for September
       - Introduce a new component: File Explorer
       - Add support for TTF (Tiny TTF)
       - Add GPU Support for GD32F450-IPA
@@ -115,7 +115,7 @@
     <release date="2022-08-30" version="1.0.8" url="https://github.com/lvgl/lvgl/raw/eb2e296d23b009aca7daf0e9be062d05b4b0048a/env_support/cmsis-pack/LVGL.lvgl.1.0.8.pack">
       - LVGL 9.0.0-dev
       - Add the binding for pikascript (an ultra-light-weight python VM)
-      - Montyly update for August
+      - Monthly update for August
     </release>
     <release date="2022-07-29" version="1.0.7" url="https://github.com/lvgl/lvgl/raw/b454a66e0be85976385c81cf9c9025f272a66f5d/env_support/cmsis-pack/LVGL.lvgl.1.0.7.pack">
       - LVGL 9.0.0-dev
@@ -171,7 +171,7 @@
     <!-- keywords for indexing -->
     <keyword>Cortex-M</keyword>
     <keyword>SysTick</keyword>
-    <keyword>Performance Analaysis</keyword>
+    <keyword>Performance Analysis</keyword>
   </keywords>
 
     <conditions>
@@ -1814,7 +1814,7 @@
 
               <RTE_Components_h>
 
-/*! \brief enable demo:bencharmk */
+/*! \brief enable demo:benchmark */
 #define LV_USE_DEMO_BENCHMARK           1
               </RTE_Components_h>
 

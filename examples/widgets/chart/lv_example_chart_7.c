@@ -12,7 +12,7 @@ static void draw_event_cb(lv_event_t * e)
         uint32_t cnt = lv_chart_get_point_count(obj);
 
         /*Make older value more transparent*/
-        rect_draw_dsc->bg_opa = (LV_OPA_COVER *  base_dsc->id2) / (cnt - 1);
+        rect_draw_dsc->bg_opa = (LV_OPA_COVER * base_dsc->id2) / (cnt - 1);
 
         /*Make smaller values blue, higher values red*/
         int32_t * x_array = lv_chart_get_x_array(obj, ser);

@@ -152,7 +152,7 @@ void lv_area_increase(lv_area_t * area, int32_t w_extra, int32_t h_extra);
 void lv_area_move(lv_area_t * area, int32_t x_ofs, int32_t y_ofs);
 
 /**
- * Align an area to an other
+ * Align an area to another
  * @param base an area where the other will be aligned
  * @param to_align the area to align
  * @param align `LV_ALIGN_...`
@@ -168,7 +168,7 @@ void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t alig
  * @param scale_x       horizontal zoom, 256 means 100%
  * @param scale_y       vertical zoom, 256 means 100%
  * @param pivot         pointer to the pivot point of the transformation
- * @param zoom_first    true: zoom first and rotate after that; else: opssoite order
+ * @param zoom_first    true: zoom first and rotate after that; else: opposite order
  */
 void lv_point_transform(lv_point_t * point, int32_t angle, int32_t scale_x, int32_t scale_y, const lv_point_t * pivot,
                         bool zoom_first);
@@ -181,7 +181,7 @@ void lv_point_transform(lv_point_t * point, int32_t angle, int32_t scale_x, int3
  * @param scale_x       horizontal zoom, 256 means 100%
  * @param scale_y       vertical zoom, 256 means 100%
  * @param pivot         pointer to the pivot point of the transformation
- * @param zoom_first    true: zoom first and rotate after that; else: opssoite order
+ * @param zoom_first    true: zoom first and rotate after that; else: opposite order
  */
 void lv_point_array_transform(lv_point_t * points, size_t count, int32_t angle, int32_t scale_x, int32_t scale_y,
                               const lv_point_t * pivot,

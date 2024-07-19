@@ -53,6 +53,7 @@ struct lv_scale_t {
     uint32_t major_tick_every   : 15;
     uint32_t label_enabled      : 1;
     uint32_t post_draw          : 1;
+    uint32_t draw_ticks_on_top  : 1;
     /* Round scale */
     uint32_t angle_range;
     int32_t rotation;

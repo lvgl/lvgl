@@ -18,7 +18,10 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_ARRAY_DEFAULT_CAPACITY 8
+
+#ifndef LV_ARRAY_DEFAULT_CAPACITY
+#define LV_ARRAY_DEFAULT_CAPACITY  4
+#endif
 
 /**********************
  *      TYPEDEFS

@@ -469,7 +469,7 @@ static stbrp__findresult stbrp__skyline_pack_rectangle(stbrp_context * context, 
 
     // insert the new node into the right starting point, and
     // let 'cur' point to the remaining nodes needing to be
-    // stiched back in
+    // stitched back in
 
     cur = *res.prev_link;
     if(cur->x < res.x) {

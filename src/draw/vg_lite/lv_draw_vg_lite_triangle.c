@@ -77,17 +77,19 @@ void lv_draw_vg_lite_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle
     LV_VG_LITE_ASSERT_MATRIX(&matrix);
 
     if(dsc->bg_grad.dir != LV_GRAD_DIR_NONE) {
-        vg_lite_matrix_t grad_matrix;
-        lv_vg_lite_grad_area_to_matrix(&grad_matrix, &tri_area, dsc->bg_grad.dir);
-        lv_vg_lite_draw_linear_grad(
+#if LV_USE_VECTOR_GRAPHIC
+        lv_vg_lite_draw_grad_helper(
             u,
             &u->target_buffer,
             vg_lite_path,
+            &tri_area,
             &dsc->bg_grad,
-            &grad_matrix,
             &matrix,
             VG_LITE_FILL_EVEN_ODD,
             VG_LITE_BLEND_SRC_OVER);
+#else
+        LV_LOG_WARN("Gradient fill is not supported without VECTOR_GRAPHIC");
+#endif
     }
     else { /* normal fill */
         vg_lite_color_t color = lv_vg_lite_color(dsc->bg_color, dsc->bg_opa, true);

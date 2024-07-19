@@ -831,7 +831,7 @@ static void pinyin_page_proc(lv_obj_t * obj, uint16_t dir)
     uint16_t offset = pinyin_ime->py_page * (3 * LV_IME_PINYIN_CAND_TEXT_NUM);
     for(uint8_t i = 0; (i < pinyin_ime->cand_num && i < LV_IME_PINYIN_CAND_TEXT_NUM); i++) {
         if((remainder > 0) && (pinyin_ime->py_page == page_num)) {
-            if(i > remainder)
+            if(i >= remainder)
                 break;
         }
         for(uint8_t j = 0; j < 3; j++) {

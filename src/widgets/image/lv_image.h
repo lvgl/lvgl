@@ -61,7 +61,7 @@ enum {
     LV_PROPERTY_ID(IMAGE, OFFSET_X,   LV_PROPERTY_TYPE_INT,       1),
     LV_PROPERTY_ID(IMAGE, OFFSET_Y,   LV_PROPERTY_TYPE_INT,       2),
     LV_PROPERTY_ID(IMAGE, ROTATION,   LV_PROPERTY_TYPE_INT,       3),
-    LV_PROPERTY_ID(IMAGE, PIVOT,      LV_PROPERTY_TYPE_POINTER,   4),
+    LV_PROPERTY_ID(IMAGE, PIVOT,      LV_PROPERTY_TYPE_POINT,     4),
     LV_PROPERTY_ID(IMAGE, SCALE,      LV_PROPERTY_TYPE_INT,       5),
     LV_PROPERTY_ID(IMAGE, SCALE_X,    LV_PROPERTY_TYPE_INT,       6),
     LV_PROPERTY_ID(IMAGE, SCALE_Y,    LV_PROPERTY_TYPE_INT,       7),
@@ -132,11 +132,6 @@ void lv_image_set_rotation(lv_obj_t * obj, int32_t angle);
  * @param y         rotation center y of the image
  */
 void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y);
-
-/**
- * Set pivot similar to get_pivot
- */
-void lv_image_set_pivot_helper(lv_obj_t * obj, lv_point_t * pivot);
 
 /**
  * Set the zoom factor of the image.

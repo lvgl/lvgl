@@ -163,6 +163,7 @@ const char * lv_vg_lite_feature_string(vg_lite_feature_t feature)
             FEATURE_ENUM_TO_STRING(YUV_TILED_INPUT);
             FEATURE_ENUM_TO_STRING(AYUV_INPUT);
             FEATURE_ENUM_TO_STRING(16PIXELS_ALIGN);
+            FEATURE_ENUM_TO_STRING(DEC_COMPRESS_2_0);
         default:
             break;
     }
@@ -501,7 +502,7 @@ uint32_t lv_vg_lite_width_to_stride(uint32_t w, vg_lite_buffer_format_t color_fo
 
     uint32_t mul, div, align;
     lv_vg_lite_buffer_format_bytes(color_format, &mul, &div, &align);
-    return LV_VG_LITE_ALIGN((w * mul / div), align);
+    return LV_VG_LITE_ALIGN(((w * mul + div - 1) / div), align);
 }
 
 uint32_t lv_vg_lite_width_align(uint32_t w)
@@ -713,7 +714,7 @@ uint32_t lv_vg_lite_get_palette_size(vg_lite_buffer_format_t format)
 
 vg_lite_color_t lv_vg_lite_color(lv_color_t color, lv_opa_t opa, bool pre_mul)
 {
-    if(pre_mul && opa < LV_OPA_MAX) {
+    if(pre_mul && opa < LV_OPA_COVER) {
         color.red = LV_UDIV255(color.red * opa);
         color.green = LV_UDIV255(color.green * opa);
         color.blue = LV_UDIV255(color.blue * opa);
@@ -964,11 +965,6 @@ void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_
     lv_memcpy(matrix, &temp, sizeof(temp));
 }
 
-void lv_vg_lite_matrix_flip_y(vg_lite_matrix_t * matrix)
-{
-    matrix->m[1][1] = -matrix->m[1][1];
-}
-
 bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix)
 {
     vg_lite_float_t det00, det01, det02;
@@ -1035,7 +1031,6 @@ lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * ma
 
 void lv_vg_lite_set_scissor_area(const lv_area_t * area)
 {
-    LV_VG_LITE_CHECK_ERROR(vg_lite_enable_scissor());
     LV_VG_LITE_CHECK_ERROR(vg_lite_set_scissor(
                                area->x1,
                                area->y1,
@@ -1045,7 +1040,12 @@ void lv_vg_lite_set_scissor_area(const lv_area_t * area)
 
 void lv_vg_lite_disable_scissor(void)
 {
-    LV_VG_LITE_CHECK_ERROR(vg_lite_disable_scissor());
+    /* Restore full screen scissor */
+    LV_VG_LITE_CHECK_ERROR(vg_lite_set_scissor(
+                               0,
+                               0,
+                               LV_HOR_RES,
+                               LV_VER_RES));
 }
 
 void lv_vg_lite_flush(struct lv_draw_vg_lite_unit_t * u)
@@ -1084,10 +1084,8 @@ void lv_vg_lite_finish(struct lv_draw_vg_lite_unit_t * u)
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
 
     /* Clear all gradient caches reference */
-    lv_vg_lite_pending_remove_all(u->linear_grad_pending);
-
-    if(u->radial_grad_pending) {
-        lv_vg_lite_pending_remove_all(u->radial_grad_pending);
+    if(u->grad_pending) {
+        lv_vg_lite_pending_remove_all(u->grad_pending);
     }
 
     /* Clear image decoder dsc reference */

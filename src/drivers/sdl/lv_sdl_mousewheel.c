@@ -116,7 +116,7 @@ void lv_sdl_mousewheel_handler(SDL_Event * event)
     switch(event->type) {
         case SDL_MOUSEWHEEL:
 #ifdef __EMSCRIPTEN__
-            /*Escripten scales it wrong*/
+            /*Emscripten scales it wrong*/
             if(event->wheel.y < 0) dsc->diff++;
             if(event->wheel.y > 0) dsc->diff--;
 #else

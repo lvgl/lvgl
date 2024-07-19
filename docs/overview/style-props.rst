@@ -1456,7 +1456,7 @@ Defines how to align the tracks of the flow
 flex_grow
 ~~~~~~~~~
 
-Defines how mayn space to take proprtionally the free space of the object's trach
+Defines how much space to take proportionally from the free space of the object's track
 
 .. raw:: html
 

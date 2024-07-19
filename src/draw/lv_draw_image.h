@@ -55,6 +55,9 @@ typedef struct lv_draw_image_dsc_t {
      *  2. Tiled images, where the target draw area is larger than the image to be tiled.
      */
     lv_area_t image_area;
+
+    int32_t clip_radius;
+
     const lv_image_dsc_t * bitmap_mask_src;
 } lv_draw_image_dsc_t;
 
@@ -100,7 +103,7 @@ lv_draw_image_dsc_t * lv_draw_task_get_image_dsc(lv_draw_task_t * task);
 void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
 /**
- * Create a draw task to blend a layer to an other layer
+ * Create a draw task to blend a layer to another layer
  * @param layer         pointer to a layer
  * @param dsc           pointer to an initialized draw descriptor
  * @param coords        the coordinates of the layer.

@@ -16,7 +16,7 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
-#include <sys/time.h>
+#include <time.h>
 
 #if LV_LINUX_FBDEV_BSD
     #include <sys/fcntl.h>
@@ -96,11 +96,7 @@ static uint32_t tick_get_cb(void);
 
 lv_display_t * lv_linux_fbdev_create(void)
 {
-    static bool inited = false;
-    if(!inited) {
-        lv_tick_set_cb(tick_get_cb);
-        inited = true;
-    }
+    lv_tick_set_cb(tick_get_cb);
 
     lv_linux_fb_t * dsc = lv_malloc_zeroed(sizeof(lv_linux_fb_t));
     LV_ASSERT_MALLOC(dsc);
@@ -268,6 +264,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     lv_color_format_t cf = lv_display_get_color_format(disp);
     uint32_t px_size = lv_color_format_get_size(cf);
 
+    lv_area_t rotated_area;
     lv_display_rotation_t rotation = lv_display_get_rotation(disp);
 
     /* Not all framebuffer kernel drivers support hardware rotation, so we need to handle it in software here */
@@ -299,7 +296,10 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         color_p = dsc->rotated_buf;
 
         /* Rotate the area */
-        lv_display_rotate_area(disp, (lv_area_t *)area);
+        rotated_area = *area;
+        lv_display_rotate_area(disp, &rotated_area);
+        area = &rotated_area;
+
         if(rotation != LV_DISPLAY_ROTATION_180) {
             w = lv_area_get_width(area);
             h = lv_area_get_height(area);
@@ -350,10 +350,9 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 
 static uint32_t tick_get_cb(void)
 {
-    struct timeval tv_now;
-    gettimeofday(&tv_now, NULL);
-    uint64_t time_ms;
-    time_ms = (tv_now.tv_sec * 1000000 + tv_now.tv_usec) / 1000;
+    struct timespec t;
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    uint64_t time_ms = t.tv_sec * 1000 + (t.tv_nsec / 1000000);
     return time_ms;
 }
 

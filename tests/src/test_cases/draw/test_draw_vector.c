@@ -48,20 +48,21 @@ static void draw_shapes(lv_layer_t * layer)
     lv_vector_dsc_identity(ctx);
     lv_vector_dsc_translate(ctx, 0, 150);
 
-    lv_grad_dsc_t grad;
-    grad.dir = LV_GRAD_DIR_HOR;
-    grad.stops_count = 2;
-    grad.stops[0].color = lv_color_hex(0xffffff);
-    grad.stops[0].opa = LV_OPA_COVER;
-    grad.stops[0].frac = 0;
-    grad.stops[1].color = lv_color_hex(0x000000);
-    grad.stops[1].opa = LV_OPA_COVER;
-    grad.stops[1].frac = 255;
+    lv_gradient_stop_t stops[2];
+    lv_memzero(stops, sizeof(stops));
+    stops[0].color = lv_color_hex(0xffffff);
+    stops[0].opa = LV_OPA_COVER;
+    stops[0].frac = 0;
+    stops[1].color = lv_color_hex(0x000000);
+    stops[1].opa = LV_OPA_COVER;
+    stops[1].frac = 255;
 
     lv_matrix_t mt;
     lv_matrix_identity(&mt);
     lv_vector_dsc_set_fill_transform(ctx, &mt);
-    lv_vector_dsc_set_fill_radial_gradient(ctx, &grad, 50, 50, 50, LV_VECTOR_GRADIENT_SPREAD_PAD);
+    lv_vector_dsc_set_fill_radial_gradient(ctx, 100, 100, 50);
+    lv_vector_dsc_set_fill_gradient_color_stops(ctx, stops, 2);
+    lv_vector_dsc_set_fill_gradient_spread(ctx, LV_VECTOR_GRADIENT_SPREAD_PAD);
     lv_vector_dsc_add_path(ctx, path);
 
     lv_vector_dsc_identity(ctx);
@@ -209,15 +210,14 @@ static void draw_lines(lv_layer_t * layer)
     lv_vector_path_clear(path);
     lv_vector_path_append_rect(path, &rect1, 0, 0);
 
-    lv_grad_dsc_t grad;
-    grad.dir = LV_GRAD_DIR_HOR;
-    grad.stops_count = 2;
-    grad.stops[0].color = lv_color_hex(0xff0000);
-    grad.stops[0].opa = LV_OPA_COVER;
-    grad.stops[0].frac = 0;
-    grad.stops[1].color = lv_color_hex(0x00ff00);
-    grad.stops[1].opa = LV_OPA_COVER;
-    grad.stops[1].frac = 255;
+    lv_gradient_stop_t stops[2];
+    lv_memzero(stops, sizeof(stops));
+    stops[0].color = lv_color_hex(0xff0000);
+    stops[0].opa = LV_OPA_COVER;
+    stops[0].frac = 0;
+    stops[1].color = lv_color_hex(0x00ff00);
+    stops[1].opa = LV_OPA_COVER;
+    stops[1].frac = 255;
 
     lv_matrix_t mt;
     lv_matrix_identity(&mt);
@@ -225,7 +225,9 @@ static void draw_lines(lv_layer_t * layer)
     lv_matrix_translate(&mt, 20, 20);
     lv_vector_dsc_set_stroke_transform(ctx, &mt);
     lv_vector_dsc_set_stroke_join(ctx, LV_VECTOR_STROKE_JOIN_MITER);
-    lv_vector_dsc_set_stroke_linear_gradient(ctx, &grad, LV_VECTOR_GRADIENT_SPREAD_REFLECT);
+    lv_vector_dsc_set_stroke_linear_gradient(ctx, 250, 300, 350, 300);
+    lv_vector_dsc_set_stroke_gradient_color_stops(ctx, stops, 2);
+    lv_vector_dsc_set_stroke_gradient_spread(ctx, LV_VECTOR_GRADIENT_SPREAD_REFLECT);
     lv_vector_dsc_add_path(ctx, path); // draw a path
 
     lv_draw_vector(ctx);
@@ -237,8 +239,7 @@ static void canvas_draw(const char * name, void (*draw_cb)(lv_layer_t *))
 {
     LV_UNUSED(name);
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
-    uint32_t stride = 640 * 4 + 128; /*Test non-default stride*/
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create(640, 480, LV_COLOR_FORMAT_ARGB8888, stride);
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create(640, 480, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
     TEST_ASSERT_NOT_NULL(draw_buf);
     lv_canvas_set_draw_buf(canvas, draw_buf);
 

@@ -33,8 +33,8 @@ Usage
 Add a tile
 ----------
 
-:cpp:expr:`lv_tileview_add_tile(tileview, row_id, col_id, dir)` creates a new
-tile on the ``row_id``\ th row and ``col_id``\ th column. ``dir`` can be
+:cpp:expr:`lv_tileview_add_tile(tileview, col_id, row_id, dir)` creates a new
+tile on the ``col_id``\ th column and ``row_id``\ th row. ``dir`` can be
 ``LV_DIR_LEFT/RIGHT/TOP/BOTTOM/HOR/VER/ALL`` or OR-ed values to enable
 moving to the adjacent tiles into the given direction by swiping.
 

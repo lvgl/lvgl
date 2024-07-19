@@ -583,7 +583,7 @@ static constexpr struct
 };
 
 
-static bool _hslToRgb(float hue, float satuation, float brightness, uint8_t* red, uint8_t* green, uint8_t* blue)
+static bool _hslToRgb(float hue, float saturation, float brightness, uint8_t* red, uint8_t* green, uint8_t* blue)
 {
     if (!red || !green || !blue) return false;
 
@@ -591,12 +591,12 @@ static bool _hslToRgb(float hue, float satuation, float brightness, uint8_t* red
     float _red = 0, _green = 0, _blue = 0;
     uint32_t i = 0;
 
-    if (mathZero(satuation))  _red = _green = _blue = brightness;
+    if (mathZero(saturation))  _red = _green = _blue = brightness;
     else {
         if (mathEqual(hue, 360.0)) hue = 0.0f;
         hue /= 60.0f;
 
-        v = (brightness <= 0.5f) ? (brightness * (1.0f + satuation)) : (brightness + satuation - (brightness * satuation));
+        v = (brightness <= 0.5f) ? (brightness * (1.0f + saturation)) : (brightness + saturation - (brightness * saturation));
         p = brightness + brightness - v;
 
         if (!mathZero(v)) sv = (v - p) / v;
@@ -665,7 +665,7 @@ static bool _toColor(const char* str, uint8_t* r, uint8_t* g, uint8_t* b, char**
     unsigned char tr, tg, tb;
 
     if (len == 4 && str[0] == '#') {
-        //Case for "#456" should be interprete as "#445566"
+        //Case for "#456" should be interpreted as "#445566"
         if (isxdigit(str[1]) && isxdigit(str[2]) && isxdigit(str[3])) {
             char tmp[3] = { '\0', '\0', '\0' };
             tmp[0] = str[1];
@@ -713,7 +713,7 @@ static bool _toColor(const char* str, uint8_t* r, uint8_t* g, uint8_t* b, char**
         return true;
     } else if (len >= 10 && (str[0] == 'h' || str[0] == 'H') && (str[1] == 's' || str[1] == 'S') && (str[2] == 'l' || str[2] == 'L') && str[3] == '(' && str[len - 1] == ')') {
         float th, ts, tb;
-        const char *content, *hue, *satuation, *brightness;
+        const char *content, *hue, *saturation, *brightness;
         content = str + 4;
         content = _skipSpace(content, nullptr);
         if (_parseNumber(&content, &hue, &th) && hue) {
@@ -721,12 +721,12 @@ static bool _toColor(const char* str, uint8_t* r, uint8_t* g, uint8_t* b, char**
             hue = _skipSpace(hue, nullptr);
             hue = (char*)_skipComma(hue);
             hue = _skipSpace(hue, nullptr);
-            if (_parseNumber(&hue, &satuation, &ts) && satuation && *satuation == '%') {
+            if (_parseNumber(&hue, &saturation, &ts) && saturation && *saturation == '%') {
                 ts /= 100.0f;
-                satuation = _skipSpace(satuation + 1, nullptr);
-                satuation = (char*)_skipComma(satuation);
-                satuation = _skipSpace(satuation, nullptr);
-                if (_parseNumber(&satuation, &brightness, &tb) && brightness && *brightness == '%') {
+                saturation = _skipSpace(saturation + 1, nullptr);
+                saturation = (char*)_skipComma(saturation);
+                saturation = _skipSpace(saturation, nullptr);
+                if (_parseNumber(&saturation, &brightness, &tb) && brightness && *brightness == '%') {
                     tb /= 100.0f;
                     brightness = _skipSpace(brightness + 1, nullptr);
                     if (brightness && brightness[0] == ')' && brightness[1] == '\0') {
@@ -3257,7 +3257,7 @@ static void _svgLoaderParserXmlOpen(SvgLoaderData* loader, const char* content, 
             else parent = loader->doc;
             if (!strcmp(tagName, "style")) {
                 // TODO: For now only the first style node is saved. After the css id selector
-                // is introduced this if condition shouldin't be necessary any more
+                // is introduced this if condition shouldn't be necessary any more
                 if (!loader->cssStyle) {
                     node = method(loader, nullptr, attrs, attrsLength, simpleXmlParseAttributes);
                     loader->cssStyle = node;

@@ -32,16 +32,9 @@ file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp ${LVGL_R
 add_library(lvgl ${SOURCES})
 add_library(lvgl::lvgl ALIAS lvgl)
 
-if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
-  target_compile_definitions(
-    lvgl PUBLIC $<$<BOOL:${LV_LVGL_H_INCLUDE_SIMPLE}>:LV_LVGL_H_INCLUDE_SIMPLE>
-                $<$<BOOL:${LV_CONF_INCLUDE_SIMPLE}>:LV_CONF_INCLUDE_SIMPLE>
-                $<$<COMPILE_LANGUAGE:ASM>:__ASSEMBLY__>)
-else()
-  target_compile_definitions(
-    lvgl PUBLIC $<$<BOOL:${LV_LVGL_H_INCLUDE_SIMPLE}>:LV_LVGL_H_INCLUDE_SIMPLE>
-                $<$<BOOL:${LV_CONF_INCLUDE_SIMPLE}>:LV_CONF_INCLUDE_SIMPLE>)
-endif()
+target_compile_definitions(
+  lvgl PUBLIC $<$<BOOL:${LV_LVGL_H_INCLUDE_SIMPLE}>:LV_LVGL_H_INCLUDE_SIMPLE>
+              $<$<BOOL:${LV_CONF_INCLUDE_SIMPLE}>:LV_CONF_INCLUDE_SIMPLE>)
 
 # Add definition of LV_CONF_PATH only if needed
 if(LV_CONF_PATH)
@@ -86,9 +79,15 @@ if(NOT LV_CONF_BUILD_DISABLE_DEMOS)
     target_link_libraries(lvgl_demos PUBLIC lvgl)
 endif()
 
-# Lbrary and headers can be installed to system using make install
-file(GLOB LVGL_PUBLIC_HEADERS "${CMAKE_SOURCE_DIR}/lv_conf.h"
-     "${CMAKE_SOURCE_DIR}/lvgl.h")
+# Library and headers can be installed to system using make install
+file(GLOB LVGL_PUBLIC_HEADERS
+    "${LVGL_ROOT_DIR}/lvgl.h"
+    "${LVGL_ROOT_DIR}/lv_version.h")
+
+if(NOT LV_CONF_SKIP)
+	list(APPEND LVGL_PUBLIC_HEADERS
+		"${CMAKE_SOURCE_DIR}/lv_conf.h")
+endif()
 
 if("${LIB_INSTALL_DIR}" STREQUAL "")
   set(LIB_INSTALL_DIR "lib")
@@ -106,6 +105,12 @@ install(
   DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
   FILES_MATCHING
   PATTERN "*.h")
+
+# Install headers from the LVGL_PUBLIC_HEADERS variable
+install(
+  FILES ${LVGL_PUBLIC_HEADERS}
+  DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
+)
 
 # install example headers
 if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
