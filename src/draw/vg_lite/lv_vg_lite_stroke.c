@@ -66,7 +66,7 @@ void lv_vg_lite_stroke_init(struct _lv_draw_vg_lite_unit_t * unit, uint32_t cach
     };
 
     unit->stroke_cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(stroke_item_t), cache_cnt, ops);
-    lv_cache_set_name(unit->grad_cache, "VG_STROKE");
+    lv_cache_set_name(unit->stroke_cache, "VG_STROKE");
 }
 
 void lv_vg_lite_stroke_deinit(struct _lv_draw_vg_lite_unit_t * unit)
@@ -133,24 +133,15 @@ lv_cache_entry_t * lv_vg_lite_stroke_get(struct _lv_draw_vg_lite_unit_t * unit,
     search_key.path = path;
 
     lv_cache_entry_t * cache_node_entry = lv_cache_acquire(unit->stroke_cache, &search_key, &search_key);
-    if(cache_node_entry == NULL) {
-        cache_node_entry = lv_cache_acquire_or_create(unit->stroke_cache, &search_key, &search_key);
-        if(cache_node_entry == NULL) {
-            LV_LOG_ERROR("stroke cache creating failed");
-            return NULL;
-        }
+    if(cache_node_entry) {
+        return cache_node_entry;
     }
 
-    stroke_item_t * stroke_item = lv_cache_entry_get_data(cache_node_entry);
-    const vg_lite_path_t * src_vg_path = lv_vg_lite_path_get_path(path);
-    vg_lite_path_t * dest_vg_path = lv_vg_lite_path_get_path(stroke_item->path);
-
-    /* check path length */
-    LV_ASSERT(src_vg_path->path_length == dest_vg_path->path_length);
-
-    /* copy path data */
-    dest_vg_path->quality = src_vg_path->quality;
-    lv_memcpy(dest_vg_path->path, src_vg_path->path, src_vg_path->path_length);
+    cache_node_entry = lv_cache_acquire_or_create(unit->stroke_cache, &search_key, &search_key);
+    if(cache_node_entry == NULL) {
+        LV_LOG_ERROR("stroke cache creating failed");
+        return NULL;
+    }
 
     return cache_node_entry;
 }
@@ -218,9 +209,16 @@ static bool stroke_create_cb(stroke_item_t * item, void * user_data)
             0)
     );
 
+    const vg_lite_pointer * ori_path = vg_path->path;
+    const vg_lite_uint32_t ori_path_length = vg_path->path_length;
+
     LV_PROFILER_BEGIN_TAG("vg_lite_update_stroke");
     LV_VG_LITE_CHECK_ERROR(vg_lite_update_stroke(vg_path));
     LV_PROFILER_END_TAG("vg_lite_update_stroke");
+
+    /* check if path is changed */
+    LV_ASSERT_MSG(vg_path->path_length == ori_path_length, "vg_path->path_length should not change");
+    LV_ASSERT_MSG(vg_path->path == ori_path, "vg_path->path should not change");
 
     return true;
 }
@@ -235,7 +233,7 @@ static void stroke_free_cb(stroke_item_t * item, void * user_data)
     lv_memzero(item, sizeof(stroke_item_t));
 }
 
-static lv_cache_compare_res_t path_op_code_compare(const vg_lite_path_t * lhs, const vg_lite_path_t * rhs)
+static lv_cache_compare_res_t path_compare(const vg_lite_path_t * lhs, const vg_lite_path_t * rhs)
 {
     LV_VG_LITE_ASSERT_PATH(lhs);
     LV_VG_LITE_ASSERT_PATH(rhs);
@@ -247,25 +245,9 @@ static lv_cache_compare_res_t path_op_code_compare(const vg_lite_path_t * lhs, c
         return lhs->path_length > rhs->path_length ? 1 : -1;
     }
 
-    const uint8_t * lhs_cur = lhs->path;
-    const uint8_t * lhs_end = lhs_cur + lhs->path_length;
-
-    const uint8_t * rhs_cur = rhs->path;
-
-    while(lhs_cur < lhs_end) {
-        /* get op code */
-        uint8_t lhs_op_code = VLC_GET_OP_CODE(lhs_cur);
-        uint8_t rhs_op_code = VLC_GET_OP_CODE(rhs_cur);
-
-        /* compare op code */
-        if(lhs_op_code != rhs_op_code) {
-            return lhs_op_code > rhs_op_code ? 1 : -1;
-        }
-
-        /* skip op code and arguments */
-        uint8_t skip_size = sizeof(uint32_t) + lv_vg_lite_vlc_op_arg_len(lhs_op_code) * sizeof(float);
-        lhs_cur += skip_size;
-        rhs_cur += skip_size;
+    int cmp_res = lv_memcmp(lhs->path, rhs->path, lhs->path_length);
+    if(cmp_res != 0) {
+        return cmp_res > 0 ? 1 : -1;
     }
 
     return 0;
@@ -273,7 +255,7 @@ static lv_cache_compare_res_t path_op_code_compare(const vg_lite_path_t * lhs, c
 
 static lv_cache_compare_res_t stroke_compare_cb(const stroke_item_t * lhs, const stroke_item_t * rhs)
 {
-    if(!math_equal(lhs->width, rhs->width)) {
+    if(lhs->width != lhs->width) {
         return lhs->width > lhs->width ? 1 : -1;
     }
 
@@ -304,14 +286,13 @@ static lv_cache_compare_res_t stroke_compare_cb(const stroke_item_t * lhs, const
         const float * rhs_dash_pattern = lv_array_front(&rhs->dash_pattern);
 
         /* compare dash pattern */
-        for(uint32_t i = 0; i < lhs_dash_pattern_size; i++) {
-            if(!math_equal(lhs_dash_pattern[i], rhs_dash_pattern[i])) {
-                return lhs_dash_pattern[i] > rhs_dash_pattern[i] ? 1 : -1;
-            }
+        int cmp_res = lv_memcmp(lhs_dash_pattern, rhs_dash_pattern, lhs_dash_pattern_size * sizeof(float));
+        if(cmp_res != 0) {
+            return cmp_res > 0 ? 1 : -1;
         }
     }
 
-    return path_op_code_compare(lv_vg_lite_path_get_path(lhs->path), lv_vg_lite_path_get_path(rhs->path));
+    return path_compare(lv_vg_lite_path_get_path(lhs->path), lv_vg_lite_path_get_path(rhs->path));
 }
 
 #endif /*LV_USE_DRAW_VG_LITE && LV_USE_VECTOR_GRAPHIC*/
