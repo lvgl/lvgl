@@ -95,7 +95,7 @@ void setup()
     lv_display_t * disp;
 #if LV_USE_TFT_ESPI
     /*TFT_eSPI can be enabled lv_conf.h to initialize the display in a simple way*/
-    disp = lv_tft_espi_create(TFT_HOR_RES, TFT_VER_RES, draw_buf, sizeof(draw_buf));
+    disp = lv_tft_espi_create(TFT_HOR_RES, TFT_VER_RES, draw_buf, sizeof(draw_buf), 0);
     lv_display_set_rotation(disp, TFT_ROTATION);
 
 #else
