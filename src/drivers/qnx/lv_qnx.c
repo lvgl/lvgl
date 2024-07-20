@@ -234,9 +234,10 @@ int lv_qnx_event_loop(lv_display_t * disp)
 
         /*Calculate the next timeout*/
         uint32_t timeout_ms = lv_timer_handler();
-        if (timeout_ms == LV_NO_TIMER_READY) {
+        if(timeout_ms == LV_NO_TIMER_READY) {
             timeout_ns = -1ULL;
-        } else {
+        }
+        else {
             timeout_ns = (uint64_t)timeout_ms * 1000000UL;
         }
     }
