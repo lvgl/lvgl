@@ -196,29 +196,40 @@ static bool stroke_create_cb(stroke_item_t * item, void * user_data)
     /* update parameters */
     vg_lite_path_t * vg_path = lv_vg_lite_path_get_path(item->path);
     LV_VG_LITE_CHECK_ERROR(vg_lite_set_path_type(vg_path, VG_LITE_DRAW_STROKE_PATH));
-    LV_VG_LITE_CHECK_ERROR(
-        vg_lite_set_stroke(
-            vg_path,
-            lv_stroke_cap_to_vg(item->cap),
-            lv_stroke_join_to_vg(item->join),
-            item->width,
-            item->miter_limit,
-            lv_array_front(&item->dash_pattern),
-            size,
-            item->width / 2,
-            0)
-    );
+
+    vg_lite_error_t error = vg_lite_set_stroke(
+                                vg_path,
+                                lv_stroke_cap_to_vg(item->cap),
+                                lv_stroke_join_to_vg(item->join),
+                                item->width,
+                                item->miter_limit,
+                                lv_array_front(&item->dash_pattern),
+                                size,
+                                item->width / 2,
+                                0);
+
+    if(error != VG_LITE_SUCCESS) {
+        LV_LOG_ERROR("vg_lite_set_stroke failed: %d(%s)", (int)error, lv_vg_lite_error_string(error));
+        stroke_free_cb(item, NULL);
+        return false;
+    }
 
     const vg_lite_pointer * ori_path = vg_path->path;
     const vg_lite_uint32_t ori_path_length = vg_path->path_length;
 
     LV_PROFILER_BEGIN_TAG("vg_lite_update_stroke");
-    LV_VG_LITE_CHECK_ERROR(vg_lite_update_stroke(vg_path));
+    error = vg_lite_update_stroke(vg_path);
     LV_PROFILER_END_TAG("vg_lite_update_stroke");
 
     /* check if path is changed */
     LV_ASSERT_MSG(vg_path->path_length == ori_path_length, "vg_path->path_length should not change");
     LV_ASSERT_MSG(vg_path->path == ori_path, "vg_path->path should not change");
+
+    if(error != VG_LITE_SUCCESS) {
+        LV_LOG_ERROR("vg_lite_update_stroke failed: %d(%s)", (int)error, lv_vg_lite_error_string(error));
+        stroke_free_cb(item, NULL);
+        return false;
+    }
 
     return true;
 }
