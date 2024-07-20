@@ -201,10 +201,10 @@ int lv_qnx_event_loop(lv_display_t * disp)
         return EXIT_FAILURE;
     }
 
+    uint64_t timeout_ns = 0;
     for(;;) {
         /*Wait for an event, timing out after 16ms if animations are running*/
-        uint64_t timeout = lv_anim_count_running() > 0  ? 16000000UL : -1UL;
-        if(screen_get_event(context, event, timeout) != 0) {
+        if(screen_get_event(context, event, timeout_ns) != 0) {
             perror("screen_get_event");
             return EXIT_FAILURE;
         }
@@ -233,7 +233,12 @@ int lv_qnx_event_loop(lv_display_t * disp)
         }
 
         /*Calculate the next timeout*/
-        lv_timer_handler();
+        uint32_t timeout_ms = lv_timer_handler();
+        if (timeout_ms == LV_NO_TIMER_READY) {
+            timeout_ns = -1ULL;
+        } else {
+            timeout_ns = (uint64_t)timeout_ms * 1000000UL;
+        }
     }
 
     return EXIT_SUCCESS;
