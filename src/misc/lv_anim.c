@@ -39,6 +39,7 @@ static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
 static uint32_t convert_speed_to_time(uint32_t speed, int32_t start, int32_t end);
 static void resolve_time(lv_anim_t * a);
 static bool remove_concurrent_anims(lv_anim_t * a_current);
+static void remove_anim(void * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -149,9 +150,7 @@ bool lv_anim_delete(void * var, lv_anim_exec_xcb_t exec_cb)
     while(a != NULL) {
         bool del = false;
         if((a->var == var || var == NULL) && (a->exec_cb == exec_cb || exec_cb == NULL)) {
-            _lv_ll_remove(anim_ll_p, a);
-            if(a->deleted_cb != NULL) a->deleted_cb(a);
-            lv_free(a);
+            remove_anim(a);
             anim_mark_list_change(); /*Read by `anim_timer`. It need to know if a delete occurred in
                                        the linked list*/
             del_any = true;
@@ -168,7 +167,7 @@ bool lv_anim_delete(void * var, lv_anim_exec_xcb_t exec_cb)
 
 void lv_anim_delete_all(void)
 {
-    _lv_ll_clear(anim_ll_p);
+    _lv_ll_clear_custom(anim_ll_p, remove_anim);
     anim_mark_list_change();
 }
 
@@ -550,4 +549,12 @@ static bool remove_concurrent_anims(lv_anim_t * a_current)
     }
 
     return del_any;
+}
+
+static void remove_anim(void * a)
+{
+    lv_anim_t * anim = a;
+    _lv_ll_remove(anim_ll_p, a);
+    if(anim->deleted_cb != NULL) anim->deleted_cb(anim);
+    lv_free(a);
 }
