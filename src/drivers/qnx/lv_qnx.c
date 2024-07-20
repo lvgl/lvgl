@@ -46,7 +46,6 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static inline int qnx_render_mode(void);
 static uint32_t get_ticks(void);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
 static bool window_create(lv_display_t * disp);
@@ -56,6 +55,7 @@ static void get_key(lv_indev_t * indev, lv_indev_data_t * data);
 static bool handle_pointer_event(screen_event_t event);
 static bool handle_keyboard_event(screen_event_t event);
 static void release_disp_cb(lv_event_t * e);
+static void refresh_cb(lv_timer_t * timer);
 
 /***********************
  *   GLOBAL PROTOTYPES
@@ -114,6 +114,11 @@ lv_display_t * lv_qnx_window_create(int32_t hor_res, int32_t ver_res)
         lv_free(dsc);
         return NULL;
     }
+
+    /*Replace the default refresh timer handler, so that we can run it on
+     *demand instead of constantly.*/
+    lv_timer_t * refr_timer = lv_display_get_refr_timer(disp);
+    lv_timer_set_cb(refr_timer, refresh_cb);
 
     return disp;
 }
@@ -194,6 +199,8 @@ bool lv_qnx_add_keyboard_device(lv_display_t * disp)
 
 int lv_qnx_event_loop(lv_display_t * disp)
 {
+    lv_refr_now(disp);
+
     /*Run the event loop*/
     screen_event_t  event;
     if(screen_create_event(&event) != 0) {
@@ -248,11 +255,6 @@ int lv_qnx_event_loop(lv_display_t * disp)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static inline int qnx_render_mode(void)
-{
-    return LV_DISPLAY_RENDER_MODE_DIRECT;
-}
 
 static uint32_t
 get_ticks(void)
@@ -376,7 +378,7 @@ static bool init_display_from_window(lv_display_t * disp)
     }
 #endif
 
-    lv_display_set_buffers(disp, ptr1, ptr2, bufsize, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_buffers(disp, ptr1, ptr2, bufsize, LV_DISPLAY_RENDER_MODE_FULL);
     return true;
 }
 
@@ -510,6 +512,15 @@ static bool handle_keyboard_event(screen_event_t event)
 
     lv_indev_read(keyboard_indev);
     return true;
+}
+
+static void refresh_cb(lv_timer_t * timer)
+{
+    /*Refresh the window on timeout, but disable the timer. Any callback can
+     *re-enable it.*/
+    lv_display_t * disp = timer->user_data;
+    lv_refr_now(disp);
+    lv_timer_pause(timer);
 }
 
 #endif /*LV_USE_QNX*/
