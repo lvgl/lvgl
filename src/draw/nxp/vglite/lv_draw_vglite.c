@@ -342,6 +342,8 @@ static int32_t _vglite_wait_for_finish(lv_draw_unit_t * draw_unit)
 
     if(draw_vglite_unit->inited)
         lv_thread_sync_signal(&draw_vglite_unit->sync);
+
+    return 1;
 }
 #endif
 
@@ -362,7 +364,7 @@ static int32_t _vglite_delete(lv_draw_unit_t * draw_unit)
 #else
     LV_UNUSED(draw_unit);
 
-    return 0;
+    return 1;
 #endif
 }
 
