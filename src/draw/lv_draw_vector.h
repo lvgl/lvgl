@@ -82,7 +82,7 @@ enum _lv_vector_gradient_style_t {
 };
 
 
-#if DOXYGEN
+#ifdef DOXYGEN
 typedef _lv_vector_fill_t lv_vector_fill_t;
 typedef _lv_vector_stroke_cap_t lv_vector_stroke_cap_t;
 typedef _lv_vector_stroke_join_t lv_vector_stroke_join_t;

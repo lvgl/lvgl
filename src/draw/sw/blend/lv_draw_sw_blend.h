@@ -23,7 +23,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#ifndef DOXYGEN
+#ifdef DOXYGEN
 #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565(dsc)                                                   LV_RESULT_INVALID
 #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_OPA(dsc)                                          LV_RESULT_INVALID
 #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_MASK(dsc)                                         LV_RESULT_INVALID
