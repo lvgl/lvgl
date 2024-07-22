@@ -27,6 +27,7 @@ extern "C" {
  *      DEFINES
  *********************/
 #define LV_DRAW_UNIT_NONE  0
+#define LV_DRAW_UNIT_IDLE  -1   /*The draw unit is idle, new dispatching might be requested to try again*/
 
 /**********************
  *      TYPEDEFS

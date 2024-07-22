@@ -538,6 +538,15 @@ uint32_t lv_anim_speed(uint32_t speed);
 uint32_t lv_anim_speed_clamped(uint32_t speed, uint32_t min_time, uint32_t max_time);
 
 /**
+ * Calculate the time of an animation based on its speed, start and end values.
+ * @param speed         the speed of the animation
+ * @param start         the start value
+ * @param end           the end value
+ * @return              the time of the animation in milliseconds
+ */
+uint32_t lv_anim_speed_to_time(uint32_t speed, int32_t start, int32_t end);
+
+/**
  * Manually refresh the state of the animations.
  * Useful to make the animations running in a blocking process where
  * `lv_timer_handler` can't run for a while.

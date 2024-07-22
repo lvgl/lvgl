@@ -22,7 +22,9 @@
 #if LV_DRAW_SW_SUPPORT_RGB888
     #include "lv_draw_sw_blend_to_rgb888.h"
 #endif
-
+#if LV_DRAW_SW_SUPPORT_I1
+    #include "lv_draw_sw_blend_to_i1.h"
+#endif
 #if LV_USE_DRAW_SW
 
 /*********************
@@ -73,9 +75,11 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
         else if(blend_dsc->mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) fill_dsc.mask_buf = NULL;
         else fill_dsc.mask_buf = blend_dsc->mask_buf;
 
+
+        fill_dsc.relative_area  = blend_area;
+        lv_area_move(&fill_dsc.relative_area, -layer->buf_area.x1, -layer->buf_area.y1);
         fill_dsc.dest_buf = lv_draw_layer_go_to_xy(layer, blend_area.x1 - layer->buf_area.x1,
                                                    blend_area.y1 - layer->buf_area.y1);
-
         if(fill_dsc.mask_buf) {
             fill_dsc.mask_stride = blend_dsc->mask_stride == 0  ? lv_area_get_width(blend_dsc->mask_area) : blend_dsc->mask_stride;
             fill_dsc.mask_buf += fill_dsc.mask_stride * (blend_area.y1 - blend_dsc->mask_area->y1) +
@@ -113,6 +117,11 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
                 lv_draw_sw_blend_color_to_al88(&fill_dsc);
                 break;
 #endif
+#if LV_DRAW_SW_SUPPORT_I1
+            case LV_COLOR_FORMAT_I1:
+                lv_draw_sw_blend_color_to_i1(&fill_dsc);
+                break;
+#endif
             default:
                 break;
         }
@@ -139,10 +148,11 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
         image_dsc.src_color_format = blend_dsc->src_color_format;
 
         const uint8_t * src_buf = blend_dsc->src_buf;
-        uint32_t src_px_size = lv_color_format_get_size(blend_dsc->src_color_format);
+        uint32_t src_px_size = lv_color_format_get_bpp(blend_dsc->src_color_format);
         src_buf += image_dsc.src_stride * (blend_area.y1 - blend_dsc->src_area->y1);
-        src_buf += (blend_area.x1 - blend_dsc->src_area->x1) * src_px_size;
+        src_buf += ((blend_area.x1 - blend_dsc->src_area->x1) * src_px_size) >> 3;
         image_dsc.src_buf = src_buf;
+
 
         if(blend_dsc->mask_buf == NULL) image_dsc.mask_buf = NULL;
         else if(blend_dsc->mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) image_dsc.mask_buf = NULL;
@@ -154,6 +164,12 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
             image_dsc.mask_buf += image_dsc.mask_stride * (blend_area.y1 - blend_dsc->mask_area->y1) +
                                   (blend_area.x1 - blend_dsc->mask_area->x1);
         }
+
+        image_dsc.relative_area  = blend_area;
+        lv_area_move(&image_dsc.relative_area, -layer->buf_area.x1, -layer->buf_area.y1);
+
+        image_dsc.src_area  = *blend_dsc->src_area;
+        lv_area_move(&image_dsc.src_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
         image_dsc.dest_buf = lv_draw_layer_go_to_xy(layer, blend_area.x1 - layer->buf_area.x1,
                                                     blend_area.y1 - layer->buf_area.y1);
@@ -188,6 +204,11 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
 #if LV_DRAW_SW_SUPPORT_AL88
             case LV_COLOR_FORMAT_AL88:
                 lv_draw_sw_blend_image_to_al88(&image_dsc);
+                break;
+#endif
+#if LV_DRAW_SW_SUPPORT_I1
+            case LV_COLOR_FORMAT_I1:
+                lv_draw_sw_blend_image_to_i1(&image_dsc);
                 break;
 #endif
             default:

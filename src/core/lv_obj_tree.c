@@ -392,7 +392,7 @@ lv_obj_t * lv_obj_get_sibling_by_type(const lv_obj_t * obj, int32_t idx, const l
     int32_t sibling_idx = (int32_t)lv_obj_get_index_by_type(obj, class_p) + idx;
     if(sibling_idx < 0) return NULL;
 
-    return lv_obj_get_child(parent, sibling_idx);
+    return lv_obj_get_child_by_type(parent, sibling_idx, class_p);
 }
 
 uint32_t lv_obj_get_child_count(const lv_obj_t * obj)

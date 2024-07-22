@@ -142,13 +142,13 @@ lv_prop_id_t lv_obj_property_get_id(const lv_obj_t * obj, const char * name)
             continue;
         }
 
-        found = _lv_utils_bsearch(name, names, clz->names_count, sizeof(lv_property_name_t), property_name_compare);
+        found = lv_utils_bsearch(name, names, clz->names_count, sizeof(lv_property_name_t), property_name_compare);
         if(found) return found->id;
     }
 
     /*Check style property*/
-    found = _lv_utils_bsearch(name, lv_style_property_names, sizeof(lv_style_property_names) / sizeof(lv_property_name_t),
-                              sizeof(lv_property_name_t), property_name_compare);
+    found = lv_utils_bsearch(name, lv_style_property_names, sizeof(lv_style_property_names) / sizeof(lv_property_name_t),
+                             sizeof(lv_property_name_t), property_name_compare);
     if(found) return found->id;
 #else
     LV_UNUSED(obj);
@@ -254,7 +254,7 @@ static lv_result_t obj_property(lv_obj_t * obj, lv_prop_id_t id, lv_property_t *
     return LV_RESULT_INVALID;
 }
 
-static int32_t property_name_compare(const void * ref, const void * element)
+static int property_name_compare(const void * ref, const void * element)
 {
     const lv_property_name_t * prop = element;
     return lv_strcmp(ref, prop->name);

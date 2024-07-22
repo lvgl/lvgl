@@ -236,8 +236,8 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * data)
                     }
                 }
                 else if(type == LV_IMAGE_SRC_VARIABLE) {
-                    lv_image_dsc_t * lvd = image_dsc->src;
-                    surface = SDL_CreateRGBSurfaceFrom(lvd->data,
+                    lv_image_dsc_t * lvd = (lv_image_dsc_t *)image_dsc->src;
+                    surface = SDL_CreateRGBSurfaceFrom((void *)lvd->data,
                                                        lvd->header.w, lvd->header.h,
                                                        LV_COLOR_FORMAT_GET_BPP(lvd->header.cf),
                                                        lvd->header.stride,

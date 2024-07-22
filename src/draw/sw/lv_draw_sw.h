@@ -181,6 +181,16 @@ void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc
 void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px);
 
 /**
+ * Invert a draw buffer in the I1 color format.
+ * Conventionally, a bit is set to 1 during blending if the luminance is greater than 127.
+ * Depending on the display controller used, you might want to have different behavior.
+ * The inversion will be performed in place.
+ * @param buf          pointer to the buffer to be inverted
+ * @param buf_size     size of the buffer in bytes
+ */
+void lv_draw_sw_i1_invert(void * buf, uint32_t buf_size);
+
+/**
  * Rotate a buffer into another buffer
  * @param src           the source buffer
  * @param dest          the destination buffer

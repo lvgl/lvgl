@@ -85,7 +85,7 @@ Example
 *******
 
 .. note:: You can find a step-by-step guide and the actual implementation of the callbacks on an STM32F746 using STM32CubeIDE and the ST HAL libraries here: :ref:`lcd_stm32_guide`
-    
+
 
 .. code-block:: c
 
@@ -136,8 +136,8 @@ Example
         lv_display_set_rotation(my_disp, LV_DISPLAY_ROTATION_90);
 
         /* Configure draw buffers, etc. */
-        lv_color_t * buf1 = NULL;
-        lv_color_t * buf2 = NULL;
+        uint8_t * buf1 = NULL;
+        uint8_t * buf2 = NULL;
 
         uint32_t buf_size = LCD_H_RES * LCD_BUF_LINES * lv_color_format_get_size(lv_display_get_color_format(my_disp));
 

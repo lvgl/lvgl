@@ -50,7 +50,7 @@ void * LV_ATTRIBUTE_FAST_MEM lv_memmove(void * dst, const void * src, size_t len
     return memmove(dst, src, len);
 }
 
-int32_t lv_memcmp(const void * p1, const void * p2, size_t len)
+int lv_memcmp(const void * p1, const void * p2, size_t len)
 {
     return memcmp(p1, p2, len);
 }
@@ -81,7 +81,7 @@ char * lv_strcpy(char * dst, const char * src)
     return strcpy(dst, src);
 }
 
-int32_t lv_strcmp(const char * s1, const char * s2)
+int lv_strcmp(const char * s1, const char * s2)
 {
     return strcmp(s1, s2);
 }
