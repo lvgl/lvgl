@@ -1,8 +1,8 @@
 .. _animations:
 
-==========
+**********
 Animations
-==========
+**********
 
 You can automatically change the value of a variable between a start and
 an end value using animations. Animation will happen by periodically
@@ -14,78 +14,80 @@ The *animator* functions have the following prototype:
 
    void func(void * var, lv_anim_var_t value);
 
+
 This prototype is compatible with the majority of the property *set*
 functions in LVGL. For example :cpp:expr:`lv_obj_set_x(obj, value)` or
 :cpp:expr:`lv_obj_set_width(obj, value)`
 
+
 .. _animations_create:
 
 Create an animation
-*******************
+^^^^^^^^^^^^^^^^^^^
 
 To create an animation an :cpp:type:`lv_anim_t` variable has to be initialized
 and configured with ``lv_anim_set_...()`` functions.
 
 .. code-block:: c
 
+    /* INITIALIZE AN ANIMATION
+     *-----------------------*/
 
-   /* INITIALIZE AN ANIMATION
-    *-----------------------*/
+    lv_anim_t a;
+    lv_anim_init(&a);
 
-   lv_anim_t a;
-   lv_anim_init(&a);
+    /* MANDATORY SETTINGS
+     *------------------*/
 
-   /* MANDATORY SETTINGS
-    *------------------*/
+    /*Set the "animator" function*/
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_obj_set_x);
 
-   /*Set the "animator" function*/
-   lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_obj_set_x);
+    /*Set target of the animation*/
+    lv_anim_set_var(&a, obj);
 
-   /*Set target of the animation*/
-   lv_anim_set_var(&a, obj);
+    /*Length of the animation [ms]*/
+    lv_anim_set_duration(&a, duration);
 
-   /*Length of the animation [ms]*/
-   lv_anim_set_duration(&a, duration);
+    /*Set start and end values. E.g. 0, 150*/
+    lv_anim_set_values(&a, start, end);
 
-   /*Set start and end values. E.g. 0, 150*/
-   lv_anim_set_values(&a, start, end);
+    /* OPTIONAL SETTINGS
+     *------------------*/
 
-   /* OPTIONAL SETTINGS
-    *------------------*/
+    /*Time to wait before starting the animation [ms]*/
+    lv_anim_set_delay(&a, delay);
 
-   /*Time to wait before starting the animation [ms]*/
-   lv_anim_set_delay(&a, delay);
+    /*Set path (curve). Default is linear*/
+    lv_anim_set_path_cb(&a, lv_anim_path_ease_in);
 
-   /*Set path (curve). Default is linear*/
-   lv_anim_set_path_cb(&a, lv_anim_path_ease_in);
+    /*Set a callback to indicate when the animation is completed.*/
+    lv_anim_set_completed_cb(&a, completed_cb);
 
-   /*Set a callback to indicate when the animation is completed.*/
-   lv_anim_set_completed_cb(&a, completed_cb);
+    /*Set a callback to indicate when the animation is deleted (idle).*/
+    lv_anim_set_deleted_cb(&a, deleted_cb);
 
-   /*Set a callback to indicate when the animation is deleted (idle).*/
-   lv_anim_set_deleted_cb(&a, deleted_cb);
+    /*Set a callback to indicate when the animation is started (after delay).*/
+    lv_anim_set_start_cb(&a, start_cb);
 
-   /*Set a callback to indicate when the animation is started (after delay).*/
-   lv_anim_set_start_cb(&a, start_cb);
+    /*When ready, play the animation backward with this duration. Default is 0 (disabled) [ms]*/
+    lv_anim_set_playback_duration(&a, time);
 
-   /*When ready, play the animation backward with this duration. Default is 0 (disabled) [ms]*/
-   lv_anim_set_playback_duration(&a, time);
+    /*Delay before playback. Default is 0 (disabled) [ms]*/
+    lv_anim_set_playback_delay(&a, delay);
 
-   /*Delay before playback. Default is 0 (disabled) [ms]*/
-   lv_anim_set_playback_delay(&a, delay);
+    /*Number of repetitions. Default is 1. LV_ANIM_REPEAT_INFINITE for infinite repetition*/
+    lv_anim_set_repeat_count(&a, cnt);
 
-   /*Number of repetitions. Default is 1. LV_ANIM_REPEAT_INFINITE for infinite repetition*/
-   lv_anim_set_repeat_count(&a, cnt);
+    /*Delay before repeat. Default is 0 (disabled) [ms]*/
+    lv_anim_set_repeat_delay(&a, delay);
 
-   /*Delay before repeat. Default is 0 (disabled) [ms]*/
-   lv_anim_set_repeat_delay(&a, delay);
+    /*true (default): apply the start value immediately, false: apply start value after delay when the anim. really starts. */
+    lv_anim_set_early_apply(&a, true/false);
 
-   /*true (default): apply the start value immediately, false: apply start value after delay when the anim. really starts. */
-   lv_anim_set_early_apply(&a, true/false);
+    /* START THE ANIMATION
+     *------------------*/
+    lv_anim_start(&a);                             /*Start the animation*/
 
-   /* START THE ANIMATION
-    *------------------*/
-   lv_anim_start(&a);                             /*Start the animation*/
 
 You can apply multiple different animations on the same variable at the
 same time. For example, animate the x and y coordinates with
@@ -93,10 +95,11 @@ same time. For example, animate the x and y coordinates with
 exist with a given variable and function pair and :cpp:func:`lv_anim_start`
 will remove any existing animations for such a pair.
 
+
 .. _animations_path:
 
 Animation path
-**************
+^^^^^^^^^^^^^^
 
 You can control the path of an animation. The most simple case is
 linear, meaning the current value between *start* and *end* is changed
@@ -104,19 +107,19 @@ with fixed steps. A *path* is a function which calculates the next value
 to set based on the current state of the animation. Currently, there are
 the following built-in path functions:
 
--  :cpp:func:`lv_anim_path_linear`: linear animation
--  :cpp:func:`lv_anim_path_step`: change in one step at the end
--  :cpp:func:`lv_anim_path_ease_in`: slow at the beginning
--  :cpp:func:`lv_anim_path_ease_out`: slow at the end
--  :cpp:func:`lv_anim_path_ease_in_out`: slow at the beginning and end
--  :cpp:func:`lv_anim_path_overshoot`: overshoot the end value
--  :cpp:func:`lv_anim_path_bounce`: bounce back a little from the end value (like
-   hitting a wall)
+- :cpp:func:`lv_anim_path_linear`: linear animation
+- :cpp:func:`lv_anim_path_step`: change in one step at the end
+- :cpp:func:`lv_anim_path_ease_in`: slow at the beginning
+- :cpp:func:`lv_anim_path_ease_out`: slow at the end
+- :cpp:func:`lv_anim_path_ease_in_out`: slow at the beginning and end
+- :cpp:func:`lv_anim_path_overshoot`: overshoot the end value
+- :cpp:func:`lv_anim_path_bounce`: bounce back a little from the end value (like hitting a wall)
+
 
 .. _animations_speed_vs_time:
 
 Speed vs time
-*************
+^^^^^^^^^^^^^
 
 By default, you set the animation time directly. But in some cases,
 setting the animation speed is more practical.
@@ -128,18 +131,20 @@ For example, :cpp:expr:`lv_anim_speed_to_time(20, 0, 100)` will yield 5000
 milliseconds. For example, in the case of :cpp:func:`lv_obj_set_x` *unit* is
 pixels so *20* means *20 px/sec* speed.
 
+
 .. _animations_delete:
 
 Delete animations
-*****************
+^^^^^^^^^^^^^^^^^
 
 You can delete an animation with :cpp:expr:`lv_anim_delete(var, func)` if you
 provide the animated variable and its animator function.
 
+
 .. _animations_timeline:
 
 Timeline
-********
+^^^^^^^^
 
 A timeline is a collection of multiple animations which makes it easy to
 create complex composite animations.
@@ -180,14 +185,16 @@ anim timeline before deleting the object. Otherwise, the program may crash or be
 
 .. image:: /misc/anim-timeline.png
 
+
 .. _animations_example:
 
 Examples
-********
+--------
 
-.. include:: ../examples/anim/index.rst
+.. include:: ../../examples/anim/index.rst
+
 
 .. _animations_api:
 
 API
-***
+---

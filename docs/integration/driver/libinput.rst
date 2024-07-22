@@ -1,12 +1,14 @@
-===============
+
 Libinput Driver
-===============
+^^^^^^^^^^^^^^^
+
 
 Overview
 --------
 
 Libinput is an input stack for processes that need to provide events from commonly used input devices. That includes mice, keyboards, touchpads,
 touchscreens and graphics tablets. Libinput handles device-specific quirks and provides an easy-to-use API to receive events from devices.
+
 
 Prerequisites
 -------------
@@ -34,6 +36,7 @@ If your device doesn't show up, you may have to configure udev and the appropria
 Additionally, if you want full keyboard support, including letters and modifiers, you'll need the development version of libxkbcommon
 installed (usually ``libxkbcommon-dev``).
 
+
 Configuring the driver
 ----------------------
 
@@ -52,6 +55,7 @@ Full keyboard support needs to be enabled separately.
     
 To find the right key map values, you may use the ``setxkbmap -query`` command.
 
+
 Usage
 -----
 
@@ -62,7 +66,8 @@ To set up an input device via the libinput driver, all you need to do is call ``
 
     lv_indev_t *indev = lv_libinput_create(LV_INDEV_TYPE_POINTER, "/dev/input/event5");
 
-Note that touchscreens are treated as (absolute) pointer devices by the libinput driver and require ``LV_INDEV_TYPE_POINTER``.
+
+:note: touchscreens are treated as (absolute) pointer devices by the libinput driver and require ``LV_INDEV_TYPE_POINTER``.
 
 Depending on your system, the device node paths might not be stable across reboots. If this is the case, you can use ``lv_libinput_find_dev``
 to find the first device that has a specific capability.
@@ -70,6 +75,7 @@ to find the first device that has a specific capability.
 .. code-block:: c
 
     char *path = lv_libinput_find_dev(LV_LIBINPUT_CAPABILITY_TOUCH, true);
+
 
 The second argument controls whether or not all devices are rescanned. If you have many devices connected this can get quite slow.
 Therefore, you should only specify ``true`` on the first call when calling this method multiple times in a row. If you want to find

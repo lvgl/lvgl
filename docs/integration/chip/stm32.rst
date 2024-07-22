@@ -1,6 +1,6 @@
-=====
+
 STM32
-=====
+^^^^^
 
 LVGL Can be added to `STM32CubeIDE <https://www.st.com/en/development-tools/stm32cubeide.html>`__
 in a similar fashion to any other Eclipse-based IDE.

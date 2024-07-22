@@ -1,15 +1,16 @@
 .. _display:
 
-========
+********
 Displays
-========
+********
 
 :important: The basic concept of a *display* in LVGL is explained in the :ref:`porting` section. So before reading further, please read that section first.
+
 
 .. _display_multi_display_support:
 
 Multiple display support
-************************
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 In LVGL you can have multiple displays, each with their own driver,
 widgets and color depth.
@@ -27,10 +28,11 @@ Why would you want multi-display support? Here are some examples:
 - Have some smaller and simple displays in a large instrument or technology.
 - Have two large TFT displays: one for a customer and one for the shop assistant.
 
+
 .. _display_one_display:
 
 Using only one display
-----------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
 Using more displays can be useful but in most cases it's not required.
 Therefore, the whole concept of multi-display handling is completely
@@ -44,12 +46,14 @@ on the most recently created (default) display. If you pass ``NULL`` as
 usually be used. E.g. :cpp:expr:`lv_display_trigger_activity(NULL)` will trigger a
 user activity on the default display. (See below in :ref:`Inactivity <display_inactivity>`).
 
+
 Mirror display
 --------------
 
 To mirror the image of a display to another display, you don't need to
 use multi-display support. Just transfer the buffer received in
 ``flush_cb`` to the other display too.
+
 
 Split image
 -----------
@@ -60,20 +64,21 @@ large display's resolution. 2. In ``flush_cb``, truncate and modify the
 ``area`` parameter for each display. 3. Send the buffer's content to
 each real display with the truncated area.
 
+
 .. _display_screens:
 
 Screens
-*******
+^^^^^^^
 
 Every display has its own set of :ref:`screens <objects_screens>` and the
 objects on each screen.
 
 Be sure not to confuse displays and screens:
 
--  **Displays** are the physical hardware drawing the pixels.
--  **Screens** are the high-level root objects associated with a
-   particular display. One display can have multiple screens associated
-   with it, but not vice versa.
+- **Displays** are the physical hardware drawing the pixels.
+- **Screens** are the high-level root objects associated with a
+  particular display. One display can have multiple screens associated
+  with it, but not vice versa.
 
 Screens can be considered the highest level containers which have no
 parent. A screen's size is always equal to its display and their origin
@@ -97,6 +102,7 @@ screen can be loaded with animations too. Read more
 
 Screens can be deleted with :cpp:expr:`lv_obj_delete(scr)`, but ensure that you do
 not delete the currently loaded screen.
+
 
 Transparent screens
 -------------------
@@ -126,10 +132,12 @@ UIs:
 - Set a color format with alpha channel. E.g.
   :cpp:expr:`lv_display_set_color_format(disp, LV_COLOR_FORMAT_ARGB8888)`
 
+
 .. _display_features:
 
 Features of displays
-********************
+^^^^^^^^^^^^^^^^^^^^
+
 
 .. _display_inactivity:
 
@@ -146,6 +154,7 @@ the default display**).
 You can manually trigger an activity using
 :cpp:expr:`lv_display_trigger_activity(disp)`. If ``disp`` is ``NULL``, the default
 screen will be used (**and not all displays**).
+
 
 Background
 ----------
@@ -169,7 +178,8 @@ The opacity of the background color or image can be adjusted with
 The ``disp`` parameter of these functions can be ``NULL`` to select the
 default display.
 
+
 .. _display_api:
 
 API
-***
+^^^

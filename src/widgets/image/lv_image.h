@@ -83,7 +83,7 @@ typedef uint8_t lv_image_align_t;
 #endif /*DOXYGEN*/
 
 #if LV_USE_OBJ_PROPERTY
-enum {
+enum _lv_image_property_t{
     LV_PROPERTY_ID(IMAGE, SRC,        LV_PROPERTY_TYPE_IMGSRC,    0),
     LV_PROPERTY_ID(IMAGE, OFFSET_X,   LV_PROPERTY_TYPE_INT,       1),
     LV_PROPERTY_ID(IMAGE, OFFSET_Y,   LV_PROPERTY_TYPE_INT,       2),

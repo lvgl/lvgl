@@ -21,6 +21,13 @@ extern "C" {
 
 #include "../misc/lv_types.h"
 
+
+#ifdef DOXYGEN
+typedef struct { }lv_thread_t;
+typedef struct { }lv_mutex_t;
+typedef struct { }lv_thread_sync_t;
+#endif /*DOXYGEN*/
+
 #if LV_USE_OS == LV_OS_NONE
 #include "lv_os_none.h"
 #elif LV_USE_OS == LV_OS_PTHREAD

@@ -32,18 +32,22 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-enum {
+enum _lv_draw_sw_mask_res_t{
     LV_DRAW_SW_MASK_RES_TRANSP,
     LV_DRAW_SW_MASK_RES_FULL_COVER,
     LV_DRAW_SW_MASK_RES_CHANGED,
     LV_DRAW_SW_MASK_RES_UNKNOWN
 };
 
+#ifdef DOXYGEN
+typedef _lv_draw_sw_mask_res_t lv_draw_sw_mask_res_t;
+#else
 typedef uint8_t lv_draw_sw_mask_res_t;
+#endif /*DOXYGEN*/
 
 #if LV_DRAW_SW_COMPLEX
 
-enum {
+enum _lv_draw_sw_mask_type_t{
     LV_DRAW_SW_MASK_TYPE_LINE,
     LV_DRAW_SW_MASK_TYPE_ANGLE,
     LV_DRAW_SW_MASK_TYPE_RADIUS,
@@ -51,14 +55,22 @@ enum {
     LV_DRAW_SW_MASK_TYPE_MAP,
 };
 
-typedef uint8_t lv_draw_sw_mask_type_t;
 
-enum {
+enum _lv_draw_sw_mask_line_side_t {
     LV_DRAW_SW_MASK_LINE_SIDE_LEFT = 0,
     LV_DRAW_SW_MASK_LINE_SIDE_RIGHT,
     LV_DRAW_SW_MASK_LINE_SIDE_TOP,
     LV_DRAW_SW_MASK_LINE_SIDE_BOTTOM,
 };
+
+#ifdef DOXYGEN
+typedef _lv_draw_sw_mask_type_t lv_draw_sw_mask_type_t;
+typedef _lv_draw_sw_mask_line_side_t lv_draw_sw_mask_line_side_t;
+#else
+typedef uint8_t lv_draw_sw_mask_type_t;
+typedef uint8_t lv_draw_sw_mask_line_side_t;
+#endif /*DOXYGEN*/
+
 
 /**
  * A common callback type for every mask type.
@@ -67,8 +79,6 @@ enum {
 typedef lv_draw_sw_mask_res_t (*lv_draw_sw_mask_xcb_t)(lv_opa_t * mask_buf, int32_t abs_x, int32_t abs_y,
                                                        int32_t len,
                                                        void * p);
-
-typedef uint8_t lv_draw_sw_mask_line_side_t;
 
 typedef struct {
     lv_draw_sw_mask_xcb_t cb;
@@ -241,13 +251,13 @@ void lv_draw_sw_mask_line_points_init(lv_draw_sw_mask_line_param_t * param, int3
  *Initialize a line mask from a point and an angle.
  * @param param pointer to a `lv_draw_mask_param_t` to initialize
  * @param px X coordinate of a point of the line
- * @param py X coordinate of a point of the line
+ * @param py Y coordinate of a point of the line
  * @param angle right 0 deg, bottom: 90
- * @param side and element of `lv_draw_mask_line_side_t` to describe which side to keep.
+ * @param side an element of `lv_draw_mask_line_side_t` to describe which side to keep.
  * With `LV_DRAW_MASK_LINE_SIDE_LEFT/RIGHT` and horizontal line all pixels are kept
  * With `LV_DRAW_MASK_LINE_SIDE_TOP/BOTTOM` and vertical line all pixels are kept
  */
-void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, int32_t p1x, int32_t py, int16_t angle,
+void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, int32_t px, int32_t py, int16_t angle,
                                      lv_draw_sw_mask_line_side_t side);
 
 /**

@@ -1,8 +1,8 @@
 .. _renesas:
 
-=======
+
 Renesas
-=======
+^^^^^^^
 
 `Renesas <https://renesas.com/>`__ is an official partner of LVGL. Therefore, LVGL contains built-in support for
 `Dave2D <https://www.renesas.com/document/mas/tes-dave2d-driver-documentation>`__ (the GPU of Renesas) and we also maintain
@@ -198,7 +198,7 @@ Modify the project
 
 
 Open a demo
-~~~~~~~~~~~
+***********
 
 The entry point of the main task is contained in ``src/LVGL_thread_entry.c`` in all 3 projects.
 
@@ -206,7 +206,7 @@ You can disable the LVGL demos (or just comment them out) and call some ``lv_exa
 
 
 Configuration
-~~~~~~~~~~~~~
+*************
 
 ``src/lv_conf.h`` contains the most important settings for LVGL. Namely:
 

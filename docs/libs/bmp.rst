@@ -1,8 +1,8 @@
 .. _bmp:
 
-===========
+***********
 BMP decoder
-===========
+***********
 
 This extension allows the use of BMP images in LVGL. 
 
@@ -19,14 +19,16 @@ sources. For example:
 
    lv_image_set_src(my_img, "S:path/to/picture.bmp");
 
+
 Note that, a file system driver needs to registered to open images from
 files. Read more about it :ref:`overview_file_system` or just
 enable one in ``lv_conf.h`` with ``LV_USE_FS_...``
 
+
 .. _bmp_limitations:
 
 Limitations
------------
+^^^^^^^^^^^
 
 -  Only BMP files are supported and BMP images as C array
    (:c:struct:`lv_image_dsc_t`) are not. It's because there is no practical
@@ -40,15 +42,16 @@ Limitations
 -  Palette is not supported.
 -  Because not the whole image is read in cannot be zoomed or rotated.
 
+
 .. _bmp_example:
 
 Example
--------
+^^^^^^^
 
-.. include:: ../examples/libs/bmp/index.rst
+.. include:: ../../examples/libs/bmp/index.rst
+
 
 .. _bmp_api:
 
 API
----
-
+^^^

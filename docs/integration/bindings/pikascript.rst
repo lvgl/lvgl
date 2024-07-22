@@ -1,5 +1,5 @@
 PikaScript
-==========
+^^^^^^^^^^
 
 
 What is PikaScript ?
@@ -21,9 +21,6 @@ or global tables manually. On the other hand, all C modules have sophisticated s
 of your arguments .
 
 
---------------
-
-
 Why PikaScript + LVGL ?
 -----------------------
 
@@ -40,7 +37,7 @@ Here are some examples of lvgl that PikaScript can already run, they are mainly 
 
 
 LV_ARC
-~~~~~~
+******
 
 .. code-block:: python
 
@@ -57,7 +54,7 @@ LV_ARC
 
 
 LV_BAR
-~~~~~~
+******
 
 .. code-block:: python
 
@@ -73,7 +70,7 @@ LV_BAR
 
 
 LV_BTN
-~~~~~~
+******
 
 .. code-block:: python
 
@@ -103,7 +100,7 @@ LV_BTN
 
 
 LV_CHECKBOX
-~~~~~~~~~~~
+***********
 
 .. code-block:: python
 
@@ -127,9 +124,6 @@ LV_CHECKBOX
     cb.align(lv.ALIGN.TOP_LEFT, 0 ,90)
     print('mem used max: %0.2f kB' % (mem.getMax()))
     print('mem used now: %0.2f kB' % (mem.getNow()))
-
-
---------------
 
 
 How does it work?
@@ -187,9 +181,6 @@ The precompiler is written in Rust, runs on windows and linux, and is completely
 
 In addition to binding C modules, the precompiler compiles Python scripts to bytecode in the PC, reducing the
 size of the script and increasing its speed.
-
-
---------------
 
 
 How can I use it?

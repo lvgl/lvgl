@@ -1,8 +1,8 @@
 .. _fonts:
 
-=====
+*****
 Fonts
-=====
+*****
 
 In LVGL fonts are collections of bitmaps and other information required
 to render images of individual letters (glyph). A font is stored in a
@@ -11,7 +11,8 @@ For example:
 
 .. code-block:: c
 
-   lv_style_set_text_font(&my_style, &lv_font_montserrat_28);  /*Set a larger font*/
+    lv_style_set_text_font(&my_style, &lv_font_montserrat_28);  /*Set a larger font*/
+
 
 Fonts have a **format** property. It describes how the glyph draw data is stored.
 It has *2* categories: `Legacy simple format` and `Advanced format`.
@@ -26,8 +27,9 @@ The *format* property also affects the amount of memory needed to store a
 font. For example, *format = LV_FONT_GLYPH_FORMAT_A4* makes a font nearly four times larger
 compared to *format = LV_FONT_GLYPH_FORMAT_A1*.
 
+
 Unicode support
-***************
+^^^^^^^^^^^^^^^
 
 LVGL supports **UTF-8** encoded Unicode characters. Your editor needs to
 be configured to save your code/text as UTF-8 (usually this the default)
@@ -38,16 +40,19 @@ To test it try
 
 .. code-block:: c
 
-   lv_obj_t * label1 = lv_label_create(lv_screen_active(), NULL);
-   lv_label_set_text(label1, LV_SYMBOL_OK);
+    lv_obj_t * label1 = lv_label_create(lv_screen_active(), NULL);
+    lv_label_set_text(label1, LV_SYMBOL_OK);
+
 
 If all works well, a ✓ character should be displayed.
 
+
 Built-in fonts
-**************
+^^^^^^^^^^^^^^
 
 There are several built-in fonts in different sizes, which can be
 enabled in ``lv_conf.h`` with *LV_FONT\_…* defines. 
+
 
 Normal fonts
 ------------
@@ -75,14 +80,15 @@ bullet symbol (U+2022) and the built-in symbols (see below).
 - :c:macro:`LV_FONT_MONTSERRAT_46`: 46 px font
 - :c:macro:`LV_FONT_MONTSERRAT_48`: 48 px font
 
+
 Special fonts
 -------------
 
--  :c:macro:`LV_FONT_MONTSERRAT_28_COMPRESSED`: Same as normal 28 px font but stored as a :ref:`fonts_compressed` with 3 bpp
--  :c:macro:`LV_FONT_DEJAVU_16_PERSIAN_HEBREW`: 16 px font with normal range + Hebrew, Arabic, Persian letters and all their forms
--  :c:macro:`LV_FONT_SIMSUN_16_CJK`: 16 px font with normal range plus 1000 of the most common CJK radicals
--  :c:macro:`LV_FONT_UNSCII_8`: 8 px pixel perfect font with only ASCII characters
--  :c:macro:`LV_FONT_UNSCII_16`: 16 px pixel perfect font with only ASCII characters
+- :c:macro:`LV_FONT_MONTSERRAT_28_COMPRESSED`: Same as normal 28 px font but stored as a :ref:`fonts_compressed` with 3 bpp
+- :c:macro:`LV_FONT_DEJAVU_16_PERSIAN_HEBREW`: 16 px font with normal range + Hebrew, Arabic, Persian letters and all their forms
+- :c:macro:`LV_FONT_SIMSUN_16_CJK`: 16 px font with normal range plus 1000 of the most common CJK radicals
+- :c:macro:`LV_FONT_UNSCII_8`: 8 px pixel perfect font with only ASCII characters
+- :c:macro:`LV_FONT_UNSCII_16`: 16 px pixel perfect font with only ASCII characters
 
 The built-in fonts are **global variables** with names like
 :cpp:var:`lv_font_montserrat_16` for a 16 px height font. To use them in a
@@ -103,22 +109,25 @@ The symbols can be used singly as:
 
 .. code-block:: c
 
-   lv_label_set_text(my_label, LV_SYMBOL_OK);
+    lv_label_set_text(my_label, LV_SYMBOL_OK);
+
 
 Or together with strings (compile time string concatenation):
 
 .. code-block:: c
 
-   lv_label_set_text(my_label, LV_SYMBOL_OK "Apply");
+    lv_label_set_text(my_label, LV_SYMBOL_OK "Apply");
+
 
 Or more symbols together:
 
 .. code-block:: c
 
-   lv_label_set_text(my_label, LV_SYMBOL_OK LV_SYMBOL_WIFI LV_SYMBOL_PLAY);
+    lv_label_set_text(my_label, LV_SYMBOL_OK LV_SYMBOL_WIFI LV_SYMBOL_PLAY);
+
 
 Special features
-****************
+^^^^^^^^^^^^^^^^
 
 Bidirectional support
 ---------------------
@@ -162,6 +171,7 @@ This list summarizes the effect of RTL base direction on objects:
 - ``lv_dropdown``: Aligns options to the right
 - The texts in ``lv_table``, ``lv_buttonmatrix``, ``lv_keyboard``, ``lv_tabview``, ``lv_dropdown``, ``lv_roller`` are "BiDi processed" to be displayed correctly
 
+
 Arabic and Persian support
 --------------------------
 
@@ -178,6 +188,7 @@ However, there are some limitations:
 - Only displaying text is supported (e.g. on labels), text inputs (e.g. text area) don't support this feature.
 - Static text (i.e. const) is not processed. E.g. texts set by :cpp:func:`lv_label_set_text` will be "Arabic processed" but :cpp:func:`lv_label_set_text_static` won't.
 - Text get functions (e.g. :cpp:func:`lv_label_get_text`) will return the processed text.
+
 
 Subpixel rendering
 ------------------
@@ -202,6 +213,7 @@ match with the library settings. By default, LVGL assumes ``RGB`` order,
 however this can be swapped by setting :c:macro:`LV_SUBPX_BGR`  ``1`` in
 *lv_conf.h*.
 
+
 .. _fonts_compressed:
 
 Compressed fonts
@@ -221,6 +233,7 @@ because
 - they can be compressed better
 - and probably they are used less frequently then the medium-sized fonts, so the performance cost is smaller.
 
+
 Kerning
 -------
 
@@ -235,10 +248,11 @@ characters.
 
 To configure kerning at runtime, use :cpp:func:`lv_font_set_kerning`.
 
+
 .. _add_font:
 
 Add a new font
-**************
+^^^^^^^^^^^^^^
 
 There are several ways to add a new font to your project:
 
@@ -259,8 +273,9 @@ To declare a font in a file, use :cpp:expr:`LV_FONT_DECLARE(my_font_name)`.
 To make fonts globally available (like the built-in fonts), add them to
 :c:macro:`LV_FONT_CUSTOM_DECLARE` in *lv_conf.h*.
 
+
 Add new symbols
-***************
+^^^^^^^^^^^^^^^
 
 The built-in symbols are created from the `FontAwesome <https://fontawesome.com/>`__ font.
 
@@ -290,8 +305,9 @@ The built-in symbols are created from the `FontAwesome <https://fontawesome.com/
        symbol in the font defined in ``style.text.font`` properties. To use the
        symbol you may need to change it. Eg ``style.text.font = my_font_name``
 
+
 Load a font at run-time
-***********************
+^^^^^^^^^^^^^^^^^^^^^^^
 
 :cpp:func:`lv_binfont_create` can be used to load a font from a file. The font needs
 to have a special binary format. (Not TTF or WOFF). Use
@@ -305,16 +321,17 @@ Example
 
 .. code-block:: c
 
-   lv_font_t *my_font = lv_binfont_create("X:/path/to/my_font.bin");
-   if(my_font == NULL) return;
+    lv_font_t *my_font = lv_binfont_create("X:/path/to/my_font.bin");
+    if(my_font == NULL) return;
 
-   /*Use the font*/
+    /*Use the font*/
 
-   /*Free the font if not required anymore*/
-   lv_binfont_destroy(my_font);
+    /*Free the font if not required anymore*/
+    lv_binfont_destroy(my_font);
+
 
 Load a font from a memory buffer at run-time
-********************************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 :cpp:func:`lv_binfont_create_from_buffer` can be used to load a font from a memory buffer.
 This function may be useful to load a font from an external file system, which is not
@@ -327,23 +344,24 @@ Example
 
 .. code-block:: c
 
-   lv_font_t *my_font;
-   uint8_t *buf;
-   uint32_t bufsize;
+    lv_font_t *my_font;
+    uint8_t *buf;
+    uint32_t bufsize;
 
-   /*Read font file into the buffer from the external file system*/
-   ...
+    /*Read font file into the buffer from the external file system*/
+    ...
 
-   /*Load font from the buffer*/
-   my_font = lv_binfont_create_from_buffer((void *)buf, buf));
-   if(my_font == NULL) return;
-   /*Use the font*/
+    /*Load font from the buffer*/
+    my_font = lv_binfont_create_from_buffer((void *)buf, buf));
+    if(my_font == NULL) return;
+    /*Use the font*/
 
-   /*Free the font if not required anymore*/
-   lv_binfont_destroy(my_font);
+    /*Free the font if not required anymore*/
+    lv_binfont_destroy(my_font);
+
 
 Add a new font engine
-*********************
+^^^^^^^^^^^^^^^^^^^^^
 
 LVGL's font interface is designed to be very flexible but, even so, you
 can add your own font engine in place of LVGL's internal one. For
@@ -358,52 +376,52 @@ To do this, a custom :cpp:type:`lv_font_t` variable needs to be created:
 
 .. code-block:: c
 
-   /*Describe the properties of a font*/
-   lv_font_t my_font;
-   my_font.get_glyph_dsc = my_get_glyph_dsc_cb;        /*Set a callback to get info about glyphs*/
-   my_font.get_glyph_bitmap = my_get_glyph_bitmap_cb;  /*Set a callback to get bitmap of a glyph*/
-   my_font.line_height = height;                       /*The real line height where any text fits*/
-   my_font.base_line = base_line;                      /*Base line measured from the top of line_height*/
-   my_font.dsc = something_required;                   /*Store any implementation specific data here*/
-   my_font.user_data = user_data;                      /*Optionally some extra user data*/
+    /*Describe the properties of a font*/
+    lv_font_t my_font;
+    my_font.get_glyph_dsc = my_get_glyph_dsc_cb;        /*Set a callback to get info about glyphs*/
+    my_font.get_glyph_bitmap = my_get_glyph_bitmap_cb;  /*Set a callback to get bitmap of a glyph*/
+    my_font.line_height = height;                       /*The real line height where any text fits*/
+    my_font.base_line = base_line;                      /*Base line measured from the top of line_height*/
+    my_font.dsc = something_required;                   /*Store any implementation specific data here*/
+    my_font.user_data = user_data;                      /*Optionally some extra user data*/
 
-   ...
+    ...
 
-   /* Get info about glyph of `unicode_letter` in `font` font.
-    * Store the result in `dsc_out`.
-    * The next letter (`unicode_letter_next`) might be used to calculate the width required by this glyph (kerning)
-    */
-   bool my_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter, uint32_t unicode_letter_next)
-   {
-       /*Your code here*/
+    /* Get info about glyph of `unicode_letter` in `font` font.
+     * Store the result in `dsc_out`.
+     * The next letter (`unicode_letter_next`) might be used to calculate the width required by this glyph (kerning)
+     */
+    bool my_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter, uint32_t unicode_letter_next)
+    {
+        /*Your code here*/
 
-       /* Store the result.
-        * For example ...
-        */
-       dsc_out->adv_w = 12;        /*Horizontal space required by the glyph in [px]*/
-       dsc_out->box_h = 8;         /*Height of the bitmap in [px]*/
-       dsc_out->box_w = 6;         /*Width of the bitmap in [px]*/
-       dsc_out->ofs_x = 0;         /*X offset of the bitmap in [pf]*/
-       dsc_out->ofs_y = 3;         /*Y offset of the bitmap measured from the as line*/
-       dsc_out->format= LV_FONT_GLYPH_FORMAT_A2;
+        /* Store the result.
+         * For example ...
+         */
+        dsc_out->adv_w = 12;        /*Horizontal space required by the glyph in [px]*/
+        dsc_out->box_h = 8;         /*Height of the bitmap in [px]*/
+        dsc_out->box_w = 6;         /*Width of the bitmap in [px]*/
+        dsc_out->ofs_x = 0;         /*X offset of the bitmap in [pf]*/
+        dsc_out->ofs_y = 3;         /*Y offset of the bitmap measured from the as line*/
+        dsc_out->format= LV_FONT_GLYPH_FORMAT_A2;
 
-       return true;                /*true: glyph found; false: glyph was not found*/
-   }
+        return true;                /*true: glyph found; false: glyph was not found*/
+    }
 
+    /* Get the bitmap of `unicode_letter` from `font`. */
+    const uint8_t * my_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_letter)
+    {
+        /* Your code here */
 
-   /* Get the bitmap of `unicode_letter` from `font`. */
-   const uint8_t * my_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_letter)
-   {
-       /* Your code here */
+        /* The bitmap should be a continuous bitstream where
+         * each pixel is represented by `bpp` bits */
 
-       /* The bitmap should be a continuous bitstream where
-        * each pixel is represented by `bpp` bits */
+        return bitmap;    /*Or NULL if not found*/
+    }
 
-       return bitmap;    /*Or NULL if not found*/
-   }
 
 Use font fallback
-*****************
+^^^^^^^^^^^^^^^^^
 
 You can specify ``fallback`` in :cpp:type:`lv_font_t` to provide fallback to the
 font. When the font fails to find glyph to a letter, it will try to let
@@ -413,14 +431,15 @@ font from ``fallback`` to handle.
 
 .. code-block:: c
 
-   /* Roboto font doesn't have support for CJK glyphs */
-   lv_font_t *roboto = my_font_load_function();
-   /* Droid Sans Fallback has more glyphs but its typeface doesn't look good as Roboto */
-   lv_font_t *droid_sans_fallback = my_font_load_function();
-   /* So now we can display Roboto for supported characters while having wider characters set support */
-   roboto->fallback = droid_sans_fallback;
+    /* Roboto font doesn't have support for CJK glyphs */
+    lv_font_t *roboto = my_font_load_function();
+    /* Droid Sans Fallback has more glyphs but its typeface doesn't look good as Roboto */
+    lv_font_t *droid_sans_fallback = my_font_load_function();
+    /* So now we can display Roboto for supported characters while having wider characters set support */
+    roboto->fallback = droid_sans_fallback;
+
 
 .. _fonts_api:
 
 API
-***
+^^^

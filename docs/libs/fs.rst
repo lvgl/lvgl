@@ -1,8 +1,8 @@
 .. _libs_filesystem:
 
-======================
+**********************
 File System Interfaces
-======================
+**********************
 
 LVGL has a :ref:`overview_file_system` module
 to provide an abstraction layer for various file system drivers.
@@ -21,10 +21,11 @@ LVG has built in support for:
 You still need to provide the drivers and libraries, this extension
 provides only the bridge between FATFS, STDIO, POSIX, WIN32 and LVGL.
 
+
 .. _libs_filesystem_usage:
 
 Usage
-*****
+^^^^^
 
 In ``lv_conf.h`` enable ``LV_USE_FS_...`` and assign an upper cased
 letter to ``LV_FS_..._LETTER`` (e.g. ``'S'``). After that you can access
@@ -44,19 +45,19 @@ the file name:
 
 .. code-block:: c
 
-  lv_fs_path_ex_t mempath;
-  lv_fs_file_t file;
-  uint8_t *buffer;
-  uint32_t size;
+    lv_fs_path_ex_t mempath;
+    lv_fs_file_t file;
+    uint8_t *buffer;
+    uint32_t size;
 
-  /*Initialize buffer*/
-  ...
+    /*Initialize buffer*/
+    ...
 
-  lv_fs_make_path_from_buffer(&mempath, LV_FS_MEMFS_LETTER, (void*)buffer, size);
-  lv_fs_res_t res = lv_fs_open(&file, (const char *)&mempath, LV_FS_MODE_RD);
+    lv_fs_make_path_from_buffer(&mempath, LV_FS_MEMFS_LETTER, (void*)buffer, size);
+    lv_fs_res_t res = lv_fs_open(&file, (const char *)&mempath, LV_FS_MODE_RD);
+
 
 .. _libs_filesystem_api:
 
 API
-***
-
+^^^

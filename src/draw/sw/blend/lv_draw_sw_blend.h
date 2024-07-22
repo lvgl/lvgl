@@ -23,6 +23,40 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#ifndef DOXYGEN
+#define LV_DRAW_SW_COLOR_BLEND_TO_RGB565(dsc)                                                   LV_RESULT_INVALID
+#define LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_OPA(dsc)                                          LV_RESULT_INVALID
+#define LV_DRAW_SW_COLOR_BLEND_TO_RGB565_WITH_MASK(dsc)                                         LV_RESULT_INVALID
+#define LV_DRAW_SW_COLOR_BLEND_TO_RGB565_MIX_MASK_OPA(dsc)                                      LV_RESULT_INVALID
+#define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565(dsc)                                           LV_RESULT_INVALID
+#define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_WITH_OPA(dsc)                                  LV_RESULT_INVALID
+#define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_WITH_MASK(dsc)                                 LV_RESULT_INVALID
+#define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA(dsc)                              LV_RESULT_INVALID
+#define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565(dsc, src_px_size)                              LV_RESULT_INVALID
+#define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_WITH_OPA(dsc, src_px_size)                     LV_RESULT_INVALID
+#define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_WITH_MASK(dsc, src_px_size)                    LV_RESULT_INVALID
+#define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA(dsc, src_px_size)                 LV_RESULT_INVALID
+#define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565(dsc)                                         LV_RESULT_INVALID
+#define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_OPA(dsc)                                LV_RESULT_INVALID
+#define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_WITH_MASK(dsc)                               LV_RESULT_INVALID
+#define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB565_MIX_MASK_OPA(dsc)                            LV_RESULT_INVALID
+#define LV_DRAW_SW_COLOR_BLEND_TO_RGB888(dsc, dst_px_size)                                      LV_RESULT_INVALID
+#define LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_OPA(dsc, dst_px_size)                             LV_RESULT_INVALID
+#define LV_DRAW_SW_COLOR_BLEND_TO_RGB888_WITH_MASK(dsc, dst_px_size)                            LV_RESULT_INVALID
+#define LV_DRAW_SW_COLOR_BLEND_TO_RGB888_MIX_MASK_OPA(dsc, dst_px_size)                         LV_RESULT_INVALID
+#define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888(dsc, dst_px_size)                              LV_RESULT_INVALID
+#define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_WITH_OPA(dsc, dst_px_size)                     LV_RESULT_INVALID
+#define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_WITH_MASK(dsc, dst_px_size)                    LV_RESULT_INVALID
+#define LV_DRAW_SW_RGB565_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA(dsc, dst_px_size)                 LV_RESULT_INVALID
+#define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888(dsc, dst_px_size, src_px_size)                 LV_RESULT_INVALID
+#define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_WITH_OPA(dsc, dst_px_size, src_px_size)        LV_RESULT_INVALID
+#define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_WITH_MASK(dsc, dst_px_size, src_px_size)       LV_RESULT_INVALID
+#define LV_DRAW_SW_RGB888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA(dsc, dst_px_size, src_px_size)    LV_RESULT_INVALID
+#define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888(dsc, dst_px_size)                            LV_RESULT_INVALID
+#define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_WITH_OPA(dsc, dst_px_size)                   LV_RESULT_INVALID
+#define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_WITH_MASK(dsc, dst_px_size)                  LV_RESULT_INVALID
+#define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA(dsc, dst_px_size)               LV_RESULT_INVALID
+#endif /* DOXYGEN */
 
 /**********************
  *      TYPEDEFS

@@ -1,8 +1,7 @@
 .. _micropython:
 
-===========
 MicroPython
-===========
+^^^^^^^^^^^
 
 
 What is MicroPython?
@@ -13,7 +12,7 @@ code and run it even on a bare metal architecture with limited resources.
 
 
 Highlights of MicroPython
-~~~~~~~~~~~~~~~~~~~~~~~~~
+*************************
 
 - **Compact**: Fits and runs within just 256k of code space and 16k of RAM. No OS is needed, although you
   can also run it with an OS, if you want.
@@ -32,9 +31,6 @@ Highlights of MicroPython
   for accessing low-level hardware (I/O pins, ADC, UART, SPI, I2C, RTC, Timers etc.)
 
 
---------------
-
-
 Why MicroPython + LVGL?
 -----------------------
 
@@ -45,7 +41,7 @@ LVGL is implemented in C and its APIs are in C.
 
 
 Here are some advantages of using LVGL in MicroPython:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+******************************************************
 
 - Develop GUI in Python, a very popular high level language. Use paradigms such as Object-Oriented Programming.
 - Usually, GUI development requires multiple iterations to get things right. With C, each iteration consists of
@@ -55,7 +51,7 @@ Here are some advantages of using LVGL in MicroPython:
 
 
 MicroPython + LVGL could be used for:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*************************************
 
 - Fast prototyping GUI.
 - Shortening the cycle of changing and fine-tuning the GUI.
@@ -68,9 +64,6 @@ MicroPython + LVGL could be used for:
 - Creating tools to work with LVGL at a higher level (e.g. drag-and-drop designer).
 
 
---------------
-
-
 So what does it look like?
 --------------------------
 
@@ -80,7 +73,7 @@ Let's dive right into an example!
 
 
 A simple example
-~~~~~~~~~~~~~~~~
+****************
 
 .. code-block:: python
 
@@ -102,7 +95,7 @@ How can I use it?
 
 
 Online Simulator
-~~~~~~~~~~~~~~~~
+****************
 
 If you want to experiment with LVGL + MicroPython without downloading anything, you can use our online
 simulator! It's a fully functional LVGL + MicroPython that runs entirely in the browser and allows you to
@@ -114,7 +107,7 @@ Many `LVGL examples <https://docs.lvgl.io/master/examples.html>`__ are available
 
 
 PC Simulator
-~~~~~~~~~~~~
+************
 
 MicroPython is ported to many platforms. One notable port is "unix", which allows you to build and run MicroPython
 (+LVGL) on a Linux machine. (On a Windows machine you might need Virtual Box or WSL or MinGW or Cygwin etc.)
@@ -123,7 +116,7 @@ MicroPython is ported to many platforms. One notable port is "unix", which allow
 
 
 Embedded Platforms
-~~~~~~~~~~~~~~~~~~
+******************
 
 In the end, the goal is to run it all on an embedded platform. Both MicroPython and LVGL can be used on many embedded
 architectures. `lv_micropython <https://github.com/lvgl/lv_micropython>`__ is a fork of MicroPython+LVGL and currently
@@ -184,7 +177,7 @@ The MicroPython Binding is auto generated!
 
 
 LVGL C API Coding Conventions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*****************************
 
 For a summary of coding conventions to follow see the :ref:`coding-style`.
 
@@ -192,7 +185,7 @@ For a summary of coding conventions to follow see the :ref:`coding-style`.
 .. _memory_management:
 
 Memory Management
-~~~~~~~~~~~~~~~~~
+*****************
 
 - When LVGL runs in MicroPython, all dynamic memory allocations (:cpp:func:`lv_malloc`) are handled by MicroPython's memory
   manager which is `garbage-collected <https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)>`__ (GC).
@@ -208,14 +201,14 @@ Such pointers need to be defined in a special way to make them reachable by GC
 
 
 Identify The Problem
-^^^^^^^^^^^^^^^^^^^^
+--------------------
 
 Problem happens when an allocated memory's pointer (return value of :cpp:func:`lv_malloc`) is stored only in either **global**,
 **static global** or **static local** pointer variable and not as part of a previously allocated ``struct`` or other variable.
 
 
 Solve The Problem
-^^^^^^^^^^^^^^^^^
+-----------------
 
 - Replace the global/static local var with :cpp:expr:`(LV_GLOBAL_DEFAULT()->_var)`
 - Include ``lv_global.h`` on files that use ``LV_GLOBAL_DEFAULT``
@@ -223,11 +216,11 @@ Solve The Problem
 
 
 Example
-^^^^^^^
+-------
 
 
 More Information
-^^^^^^^^^^^^^^^^
+----------------
 
 - `In the README <https://github.com/lvgl/lv_binding_micropython#memory-management>`__
 - `In the Blog <https://blog.lvgl.io/2019-02-20/micropython-bindings#i-need-to-allocate-a-littlevgl-struct-such-as-style-color-etc-how-can-i-do-that-how-do-i-allocatedeallocate-memory-for-it>`__
@@ -236,7 +229,7 @@ More Information
 .. _callbacks:
 
 Callbacks
-~~~~~~~~~
+---------
 
 In C a callback is just a function pointer. But in MicroPython we need to register a *MicroPython callable object* for each
 callback. Therefore in the MicroPython binding we need to register both a function pointer and a MicroPython object for every callback.
@@ -281,7 +274,7 @@ In practice it's also possible to mix these options, for example provide a struc
 
 
 Examples
-^^^^^^^^
+--------
 
 - :cpp:type:`lv_anim_t` contains ``user_data`` field. :cpp:func:`lv_anim_set_path_cb` registers `path_cb` callback.
   Both ``lv_anim_set_path_cb`` and :cpp:type:`lv_anim_path_cb_t` receive :cpp:type:`lv_anim_t` as their first argument
@@ -294,7 +287,7 @@ Examples
 .. _more-information-1:
 
 More Information
-^^^^^^^^^^^^^^^^
+----------------
 
 - In the `Blog <https://blog.lvgl.io/2019-08-05/micropython-pure-display-driver#using-callbacks>`__
   and in the `README <https://github.com/lvgl/lv_binding_micropython#callbacks>`__

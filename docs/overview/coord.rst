@@ -1,11 +1,11 @@
 .. _coord:
 
-=============================
+*****************************
 Positions, sizes, and layouts
-=============================
+*****************************
 
 Overview
-********
+^^^^^^^^
 
 Similarly to many other parts of LVGL, the concept of setting the
 coordinates was inspired by CSS. LVGL has by no means a complete
@@ -24,21 +24,19 @@ In short this means:
 .. _coord_unites:
 
 Units
------
+^^^^^
 
--  pixel: Simply a position in pixels. An integer always means pixels.
-   E.g. :cpp:expr:`lv_obj_set_x(btn, 10)`
--  percentage: The percentage of the size of the object or its parent
-   (depending on the property). :cpp:expr:`lv_pct(value)` converts a value to
-   percentage. E.g. :cpp:expr:`lv_obj_set_width(btn, lv_pct(50))`
--  :c:macro:`LV_SIZE_CONTENT`: Special value to set the width/height of an
-   object to involve all the children. It's similar to ``auto`` in CSS.
-   E.g. :cpp:expr:`lv_obj_set_width(btn, LV_SIZE_CONTENT)`.
+- pixel: Simply a position in pixels. An integer always means pixels. E.g. :cpp:expr:`lv_obj_set_x(btn, 10)`
+- percentage: The percentage of the size of the object or its parent (depending on the property).
+  :cpp:expr:`lv_pct(value)` converts a value to percentage. E.g. :cpp:expr:`lv_obj_set_width(btn, lv_pct(50))`
+- :c:macro:`LV_SIZE_CONTENT`: Special value to set the width/height of an object to involve all the children.
+  It's similar to ``auto`` in CSS. E.g. :cpp:expr:`lv_obj_set_width(btn, LV_SIZE_CONTENT)`.
+
 
 .. _coord_boxing_model:
 
 Boxing model
-------------
+^^^^^^^^^^^^
 
 LVGL follows CSS's `border-box <https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing>`__
 model. An object's "box" is built from the following parts:
@@ -57,10 +55,11 @@ keeps a "padding margin" when placing an object's children.
 
 The outline is drawn outside the bounding box.
 
+
 .. _coord_notes:
 
 Important notes
----------------
+^^^^^^^^^^^^^^^
 
 This section describes special cases in which LVGL's behavior might be
 unexpected.
@@ -68,7 +67,7 @@ unexpected.
 .. _coord_postponed_coordinate_calculation:
 
 Postponed coordinate calculation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------
 
 LVGL doesn't recalculate all the coordinate changes immediately. This is
 done to improve performance. Instead, the objects are marked as "dirty"
@@ -82,6 +81,7 @@ the coordinates. To do this call :cpp:func:`lv_obj_update_layout`.
 The size and position might depend on the parent or layout. Therefore
 :cpp:func:`lv_obj_update_layout` recalculates the coordinates of all objects on
 the screen of ``obj``.
+
 
 .. _coord_removing styles:
 
@@ -100,13 +100,15 @@ implementation. If the style(s) of an object are removed by
 
 .. code-block:: c
 
-   lv_obj_remove_style_all(obj)
+    lv_obj_remove_style_all(obj)
+
 
 or
 
 .. code-block:: c
 
-   lv_obj_remove_style(obj, NULL, LV_PART_MAIN);
+    lv_obj_remove_style(obj, NULL, LV_PART_MAIN);
+
 
 the earlier set coordinates will be removed as well.
 
@@ -114,22 +116,23 @@ For example:
 
 .. code-block:: c
 
-   /*The size of obj1 will be set back to the default in the end*/
-   lv_obj_set_size(obj1, 200, 100);  /*Now obj1 has 200;100 size*/
-   lv_obj_remove_style_all(obj1);    /*It removes the set sizes*/
+    /*The size of obj1 will be set back to the default in the end*/
+    lv_obj_set_size(obj1, 200, 100);  /*Now obj1 has 200;100 size*/
+    lv_obj_remove_style_all(obj1);    /*It removes the set sizes*/
 
+    /*obj2 will have 200;100 size in the end */
+    lv_obj_remove_style_all(obj2);
+    lv_obj_set_size(obj2, 200, 100);
 
-   /*obj2 will have 200;100 size in the end */
-   lv_obj_remove_style_all(obj2);
-   lv_obj_set_size(obj2, 200, 100);
 
 .. _coord_position:
 
 Position
-********
+--------
+
 
 Simple way
-----------
+^^^^^^^^^^
 
 To simply set the x and y coordinates of an object use:
 
@@ -138,6 +141,7 @@ To simply set the x and y coordinates of an object use:
    lv_obj_set_x(obj, 10);        //Separate...
    lv_obj_set_y(obj, 20);
    lv_obj_set_pos(obj, 10, 20);    //Or in one function
+
 
 By default, the x and y coordinates are measured from the top left
 corner of the parent's content area. For example if the parent has five
@@ -148,10 +152,11 @@ Percentage values are calculated from the parent's content area size.
 
 .. code-block:: c
 
-   lv_obj_set_x(btn, lv_pct(10)); //x = 10 % of parent content area width
+    lv_obj_set_x(btn, lv_pct(10)); //x = 10 % of parent content area width
+
 
 Align
------
+^^^^^
 
 In some cases it's convenient to change the origin of the positioning
 from the default top left. If the origin is changed e.g. to
@@ -160,13 +165,15 @@ corner. To change the origin use:
 
 .. code-block:: c
 
-   lv_obj_set_align(obj, align);
+    lv_obj_set_align(obj, align);
+
 
 To change the alignment and set new coordinates:
 
 .. code-block:: c
 
-   lv_obj_align(obj, align, x, y);
+    lv_obj_align(obj, align, x, y);
+
 
 The following alignment options can be used:
 
@@ -185,10 +192,11 @@ therefore a dedicated function exists:
 
 .. code-block:: c
 
-   lv_obj_center(obj);
+    lv_obj_center(obj);
 
-   //Has the same effect
-   lv_obj_align(obj, LV_ALIGN_CENTER, 0, 0);
+    //Has the same effect
+    lv_obj_align(obj, LV_ALIGN_CENTER, 0, 0);
+
 
 If the parent's size changes, the set alignment and position of the
 children is updated automatically.
@@ -198,39 +206,42 @@ it's also possible to align an object to an arbitrary reference object.
 
 .. code-block:: c
 
-   lv_obj_align_to(obj_to_align, reference_obj, align, x, y);
+    lv_obj_align_to(obj_to_align, reference_obj, align, x, y);
+
 
 Besides the alignments options above, the following can be used to align
 an object outside the reference object:
 
--  :cpp:enumerator:`LV_ALIGN_OUT_TOP_LEFT`
--  :cpp:enumerator:`LV_ALIGN_OUT_TOP_MID`
--  :cpp:enumerator:`LV_ALIGN_OUT_TOP_RIGHT`
--  :cpp:enumerator:`LV_ALIGN_OUT_BOTTOM_LEFT`
--  :cpp:enumerator:`LV_ALIGN_OUT_BOTTOM_MID`
--  :cpp:enumerator:`LV_ALIGN_OUT_BOTTOM_RIGHT`
--  :cpp:enumerator:`LV_ALIGN_OUT_LEFT_TOP`
--  :cpp:enumerator:`LV_ALIGN_OUT_LEFT_MID`
--  :cpp:enumerator:`LV_ALIGN_OUT_LEFT_BOTTOM`
--  :cpp:enumerator:`LV_ALIGN_OUT_RIGHT_TOP`
--  :cpp:enumerator:`LV_ALIGN_OUT_RIGHT_MID`
--  :cpp:enumerator:`LV_ALIGN_OUT_RIGHT_BOTTOM`
+- :cpp:enumerator:`LV_ALIGN_OUT_TOP_LEFT`
+- :cpp:enumerator:`LV_ALIGN_OUT_TOP_MID`
+- :cpp:enumerator:`LV_ALIGN_OUT_TOP_RIGHT`
+- :cpp:enumerator:`LV_ALIGN_OUT_BOTTOM_LEFT`
+- :cpp:enumerator:`LV_ALIGN_OUT_BOTTOM_MID`
+- :cpp:enumerator:`LV_ALIGN_OUT_BOTTOM_RIGHT`
+- :cpp:enumerator:`LV_ALIGN_OUT_LEFT_TOP`
+- :cpp:enumerator:`LV_ALIGN_OUT_LEFT_MID`
+- :cpp:enumerator:`LV_ALIGN_OUT_LEFT_BOTTOM`
+- :cpp:enumerator:`LV_ALIGN_OUT_RIGHT_TOP`
+- :cpp:enumerator:`LV_ALIGN_OUT_RIGHT_MID`
+- :cpp:enumerator:`LV_ALIGN_OUT_RIGHT_BOTTOM`
 
-For example to align a label above a button and center the label
-horizontally:
+For example to align a label above a button and center the label horizontally:
 
 .. code-block:: c
 
-   lv_obj_align_to(label, btn, LV_ALIGN_OUT_TOP_MID, 0, -10);
+    lv_obj_align_to(label, btn, LV_ALIGN_OUT_TOP_MID, 0, -10);
 
-Note that, unlike with :cpp:func:`lv_obj_align`, :cpp:func:`lv_obj_align_to` cannot
-realign the object if its coordinates or the reference object's
-coordinates change.
+
+:note: unlike with :cpp:func:`lv_obj_align`, :cpp:func:`lv_obj_align_to` cannot
+       realign the object if its coordinates or the reference object's
+       coordinates change.
+
 
 .. _coord_size:
 
 Size
-****
+^^^^
+
 
 Sizing the Simple way
 ---------------------
@@ -239,16 +250,18 @@ The width and the height of an object can be set easily as well:
 
 .. code-block:: c
 
-   lv_obj_set_width(obj, 200);       //Separate...
-   lv_obj_set_height(obj, 100);
-   lv_obj_set_size(obj, 200, 100);     //Or in one function
+    lv_obj_set_width(obj, 200);       //Separate...
+    lv_obj_set_height(obj, 100);
+    lv_obj_set_size(obj, 200, 100);     //Or in one function
+
 
 Percentage values are calculated based on the parent's content area
 size. For example to set the object's height to the screen height:
 
 .. code-block:: c
 
-   lv_obj_set_height(obj, lv_pct(100));
+    lv_obj_set_height(obj, lv_pct(100));
+
 
 The size settings support a special value: :c:macro:`LV_SIZE_CONTENT`. It means
 the object's size in the respective direction will be set to the size of
@@ -265,23 +278,25 @@ bounding box will be enlarged with the addition of padding.
 
 .. code-block:: c
 
-   lv_obj_set_content_width(obj, 50); //The actual width: padding left + 50 + padding right
-   lv_obj_set_content_height(obj, 30); //The actual width: padding top + 30 + padding bottom
+    lv_obj_set_content_width(obj, 50); //The actual width: padding left + 50 + padding right
+    lv_obj_set_content_height(obj, 30); //The actual width: padding top + 30 + padding bottom
+
 
 The size of the bounding box and the content area can be retrieved with
 the following functions:
 
 .. code-block:: c
 
-   int32_t w = lv_obj_get_width(obj);
-   int32_t h = lv_obj_get_height(obj);
-   int32_t content_w = lv_obj_get_content_width(obj);
-   int32_t content_h = lv_obj_get_content_height(obj);
+    int32_t w = lv_obj_get_width(obj);
+    int32_t h = lv_obj_get_height(obj);
+    int32_t content_w = lv_obj_get_content_width(obj);
+    int32_t content_h = lv_obj_get_content_height(obj);
+
 
 .. _coord_using_styles:
 
 Using styles
-************
+^^^^^^^^^^^^
 
 Under the hood the position, size and alignment properties are style
 properties. The above described "simple functions" hide the style
@@ -305,22 +320,24 @@ Here are some examples to set an object's size using a style:
 
 .. code-block:: c
 
-   static lv_style_t style;
-   lv_style_init(&style);
-   lv_style_set_width(&style, 100);
+    static lv_style_t style;
+    lv_style_init(&style);
+    lv_style_set_width(&style, 100);
 
-   lv_obj_t * btn = lv_button_create(lv_screen_active());
-   lv_obj_add_style(btn, &style, LV_PART_MAIN);
+    lv_obj_t * btn = lv_button_create(lv_screen_active());
+    lv_obj_add_style(btn, &style, LV_PART_MAIN);
+
 
 As you will see below there are some other great features of size and
 position setting. However, to keep the LVGL API lean, only the most
 common coordinate setting features have a "simple" version and the more
 complex features can be used via styles.
 
+
 .. _coord_translation:
 
 Translation
-***********
+-----------
 
 Let's say the there are 3 buttons next to each other. Their position is
 set as described above. Now you want to move a button up a little when
@@ -331,22 +348,23 @@ state:
 
 .. code-block:: c
 
-   static lv_style_t style_normal;
-   lv_style_init(&style_normal);
-   lv_style_set_y(&style_normal, 100);
+    static lv_style_t style_normal;
+    lv_style_init(&style_normal);
+    lv_style_set_y(&style_normal, 100);
 
-   static lv_style_t style_pressed;
-   lv_style_init(&style_pressed);
-   lv_style_set_y(&style_pressed, 80);
+    static lv_style_t style_pressed;
+    lv_style_init(&style_pressed);
+    lv_style_set_y(&style_pressed, 80);
 
-   lv_obj_add_style(btn1, &style_normal, LV_STATE_DEFAULT);
-   lv_obj_add_style(btn1, &style_pressed, LV_STATE_PRESSED);
+    lv_obj_add_style(btn1, &style_normal, LV_STATE_DEFAULT);
+    lv_obj_add_style(btn1, &style_pressed, LV_STATE_PRESSED);
 
-   lv_obj_add_style(btn2, &style_normal, LV_STATE_DEFAULT);
-   lv_obj_add_style(btn2, &style_pressed, LV_STATE_PRESSED);
+    lv_obj_add_style(btn2, &style_normal, LV_STATE_DEFAULT);
+    lv_obj_add_style(btn2, &style_pressed, LV_STATE_PRESSED);
 
-   lv_obj_add_style(btn3, &style_normal, LV_STATE_DEFAULT);
-   lv_obj_add_style(btn3, &style_pressed, LV_STATE_PRESSED);
+    lv_obj_add_style(btn3, &style_normal, LV_STATE_DEFAULT);
+    lv_obj_add_style(btn3, &style_pressed, LV_STATE_PRESSED);
+
 
 This works, but it's not really flexible because the pressed coordinate
 is hard-coded. If the buttons are not at y=100, ``style_pressed`` won't
@@ -354,22 +372,23 @@ work as expected. Translations can be used to solve this:
 
 .. code-block:: c
 
-   static lv_style_t style_normal;
-   lv_style_init(&style_normal);
-   lv_style_set_y(&style_normal, 100);
+    static lv_style_t style_normal;
+    lv_style_init(&style_normal);
+    lv_style_set_y(&style_normal, 100);
 
-   static lv_style_t style_pressed;
-   lv_style_init(&style_pressed);
-   lv_style_set_translate_y(&style_pressed, -20);
+    static lv_style_t style_pressed;
+    lv_style_init(&style_pressed);
+    lv_style_set_translate_y(&style_pressed, -20);
 
-   lv_obj_add_style(btn1, &style_normal, LV_STATE_DEFAULT);
-   lv_obj_add_style(btn1, &style_pressed, LV_STATE_PRESSED);
+    lv_obj_add_style(btn1, &style_normal, LV_STATE_DEFAULT);
+    lv_obj_add_style(btn1, &style_pressed, LV_STATE_PRESSED);
 
-   lv_obj_add_style(btn2, &style_normal, LV_STATE_DEFAULT);
-   lv_obj_add_style(btn2, &style_pressed, LV_STATE_PRESSED);
+    lv_obj_add_style(btn2, &style_normal, LV_STATE_DEFAULT);
+    lv_obj_add_style(btn2, &style_pressed, LV_STATE_PRESSED);
 
-   lv_obj_add_style(btn3, &style_normal, LV_STATE_DEFAULT);
-   lv_obj_add_style(btn3, &style_pressed, LV_STATE_PRESSED);
+    lv_obj_add_style(btn3, &style_normal, LV_STATE_DEFAULT);
+    lv_obj_add_style(btn3, &style_pressed, LV_STATE_PRESSED);
+
 
 Translation is applied from the current position of the object.
 
@@ -388,7 +407,7 @@ change.
 .. _coord_transformation:
 
 Transformation
-**************
+--------------
 
 Similarly to position, an object's size can be changed relative to the
 current size as well. The transformed width and height are added on both
@@ -404,12 +423,13 @@ This code enlarges a button when it's pressed:
 
 .. code-block:: c
 
-   static lv_style_t style_pressed;
-   lv_style_init(&style_pressed);
-   lv_style_set_transform_width(&style_pressed, 10);
-   lv_style_set_transform_height(&style_pressed, 10);
+    static lv_style_t style_pressed;
+    lv_style_init(&style_pressed);
+    lv_style_set_transform_width(&style_pressed, 10);
+    lv_style_set_transform_height(&style_pressed, 10);
 
-   lv_obj_add_style(btn, &style_pressed, LV_STATE_PRESSED);
+    lv_obj_add_style(btn, &style_pressed, LV_STATE_PRESSED);
+
 
 .. _coord_min_max_size:
 
@@ -424,29 +444,31 @@ especially useful if the size is set by percentage or
 
 .. code-block:: c
 
-   static lv_style_t style_max_height;
-   lv_style_init(&style_max_height);
-   lv_style_set_y(&style_max_height, 200);
+    static lv_style_t style_max_height;
+    lv_style_init(&style_max_height);
+    lv_style_set_y(&style_max_height, 200);
 
-   lv_obj_set_height(obj, lv_pct(100));
-   lv_obj_add_style(obj, &style_max_height, LV_STATE_DEFAULT); //Limit the  height to 200 px
+    lv_obj_set_height(obj, lv_pct(100));
+    lv_obj_add_style(obj, &style_max_height, LV_STATE_DEFAULT); //Limit the  height to 200 px
+
 
 Percentage values can be used as well which are relative to the size of
 the parent's content area.
 
 .. code-block:: c
 
-   static lv_style_t style_max_height;
-   lv_style_init(&style_max_height);
-   lv_style_set_y(&style_max_height, lv_pct(50));
+    static lv_style_t style_max_height;
+    lv_style_init(&style_max_height);
+    lv_style_set_y(&style_max_height, lv_pct(50));
 
-   lv_obj_set_height(obj, lv_pct(100));
-   lv_obj_add_style(obj, &style_max_height, LV_STATE_DEFAULT); //Limit the height to half parent height
+    lv_obj_set_height(obj, lv_pct(100));
+    lv_obj_add_style(obj, &style_max_height, LV_STATE_DEFAULT); //Limit the height to half parent height
+
 
 .. _coord_layout:
 
 Layout
-******
+^^^^^^
 
 Layout Overview
 ---------------
@@ -463,6 +485,7 @@ There is only one function that is the same for every layout:
 For further settings of the parent and children see the documentation of
 the given layout.
 
+
 Built-in layout
 ---------------
 
@@ -473,6 +496,7 @@ LVGL comes with two very powerful layouts:
 
 Both are heavily inspired by the CSS layouts with the same name.
 Layouts are described in detail in their own section of documentation.
+
 
 Flags
 -----
@@ -486,6 +510,7 @@ behave with layouts:
 
 These flags can be added/removed with :cpp:expr:`lv_obj_add_flag(obj, FLAG)` and :cpp:expr:`lv_obj_remove_flag(obj, FLAG)`
 
+
 Adding new layouts
 ------------------
 
@@ -493,44 +518,47 @@ LVGL can be freely extended by a custom layout like this:
 
 .. code-block:: c
 
-   uint32_t MY_LAYOUT;
+    uint32_t MY_LAYOUT;
 
-   ...
+    ...
 
-   MY_LAYOUT = lv_layout_register(my_layout_update, &user_data);
+    MY_LAYOUT = lv_layout_register(my_layout_update, &user_data);
 
-   ...
+    ...
 
-   void my_layout_update(lv_obj_t * obj, void * user_data)
-   {
-       /*Will be called automatically if it's required to reposition/resize the children of "obj" */
-   }
+    void my_layout_update(lv_obj_t * obj, void * user_data)
+    {
+        /*Will be called automatically if it's required to reposition/resize the children of "obj" */
+    }
+
 
 Custom style properties can be added which can be retrieved and used in
 the update callback. For example:
 
 .. code-block:: c
 
-   uint32_t MY_PROP;
-   ...
+    uint32_t MY_PROP;
+    ...
 
-   LV_STYLE_MY_PROP = lv_style_register_prop();
+    LV_STYLE_MY_PROP = lv_style_register_prop();
 
-   ...
-   static inline void lv_style_set_my_prop(lv_style_t * style, uint32_t value)
-   {
-       lv_style_value_t v = {
-           .num = (int32_t)value
-       };
-       lv_style_set_prop(style, LV_STYLE_MY_PROP, v);
-   }
+    ...
+    static inline void lv_style_set_my_prop(lv_style_t * style, uint32_t value)
+    {
+        lv_style_value_t v = {
+            .num = (int32_t)value
+        };
+        lv_style_set_prop(style, LV_STYLE_MY_PROP, v);
+    }
+
 
 .. _coord_example:
 
 Examples
-********
+^^^^^^^^
+
 
 .. _coord_api:
 
 API
-***
+^^^

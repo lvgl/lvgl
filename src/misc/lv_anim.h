@@ -314,7 +314,7 @@ static inline void lv_anim_set_deleted_cb(lv_anim_t * a, lv_anim_deleted_cb_t de
 /**
  * Make the animation to play back to when the forward direction is ready
  * @param a         pointer to an initialized `lv_anim_t` variable
- * @param time      the duration of the playback animation in milliseconds. 0: disable playback
+ * @param duration  the duration of the playback animation in milliseconds. 0: disable playback
  */
 static inline void lv_anim_set_playback_duration(lv_anim_t * a, uint32_t duration)
 {
@@ -385,7 +385,8 @@ static inline void lv_anim_set_user_data(lv_anim_t * a, void * user_data)
  * @param a         pointer to an initialized `lv_anim_t` variable
  * @param x1        first control point
  * @param y1
- * @param y1        second control point
+ * @param x2        second control point
+ * @param y2
  */
 static inline void lv_anim_set_bezier3_param(lv_anim_t * a, int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 {

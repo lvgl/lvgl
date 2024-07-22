@@ -1,16 +1,17 @@
 .. _snapshot:
 
-========
+********
 Snapshot
-========
+********
 
 Snapshot provides API to take snapshot image for LVGL object together
 with its children. The image will look exactly like the object on display.
 
+
 .. _snapshot_usage:
 
 Usage
------
+^^^^^
 
 Simply call API :cpp:func:`lv_snapshot_take` to generate the image descriptor
 which can be set as image object src using :cpp:func:`lv_image_set_src`.
@@ -22,8 +23,9 @@ Note, only following color formats are supported for now:
 - :cpp:enumerator:`LV_COLOR_FORMAT_XRGB8888`
 - :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888`
 
+
 Free the Image
-~~~~~~~~~~~~~~
+--------------
 
 The memory :cpp:func:`lv_snapshot_take` uses are dynamically allocated using
 :cpp:func:`lv_draw_buf_create`. Use API :cpp:func:`lv_draw_buf_destroy` to free the memory it
@@ -48,8 +50,9 @@ Below code snippet explains usage of this API.
        lv_image_set_src(img_snapshot, snapshot);
    }
 
+
 Use Existing Buffer
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 If the snapshot needs update now and then, or simply caller provides memory, use API
 ``lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, lv_draw_buf_t * draw_buf);``
@@ -63,15 +66,16 @@ happen when object size changes. It's recommended to use API
 :cpp:func:`lv_snapshot_reshape_draw_buf` to prepare the buffer firstly and if it
 fails, destroy the existing draw buffer and call `lv_snapshot_take` directly.
 
+
 .. _snapshot_example:
 
 Example
--------
+^^^^^^^
 
-.. include:: ../examples/others/snapshot/index.rst
+.. include:: ../../examples/others/snapshot/index.rst
+
 
 .. _snapshot_api:
 
 API
----
-
+^^^

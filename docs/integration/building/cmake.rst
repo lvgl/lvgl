@@ -1,12 +1,11 @@
 .. _build_cmake:
 
-=====
 cmake
-=====
+^^^^^
 
 
 Overview
-********
+--------
 
 This project uses CMakePresets to ensure an easy build.
 Find out more on Cmake Presets here: https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html

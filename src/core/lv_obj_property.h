@@ -52,7 +52,7 @@ extern "C" {
 /**
  * Group of predefined widget ID start value.
  */
-enum {
+enum _lv_widget_property_t {
     LV_PROPERTY_ID_INVALID      = 0,
 
     /*ID 0x01 to 0xff are style ID, check lv_style_prop_t*/
@@ -77,13 +77,21 @@ struct _lv_property_name_t {
 
 typedef struct {
     lv_prop_id_t id;
+#ifdef DOXYGEN
+    union _anonymous_union {
+#else
     union {
+#endif /*DOXYGEN*/
         int32_t num;                /**< Number integer number (opacity, enums, booleans or "normal" numbers)*/
         const void * ptr;           /**< Constant pointers  (font, cone text, etc)*/
         lv_color_t color;           /**< Colors*/
         lv_value_precise_t precise; /**< float or int for precise value*/
         lv_point_t point;           /**< Point*/
+#ifdef DOXYGEN
+        struct _anonymous_struct {
+#else
         struct {
+#endif /*DOXYGEN*/
             /**
              * Note that place struct member `style` at first place is intended.
              * `style` shares same memory with `num`, `ptr`, `color`.

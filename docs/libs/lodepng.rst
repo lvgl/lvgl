@@ -1,8 +1,8 @@
 .. _lodepng:
 
-===============
+***************
 LodePNG decoder
-===============
+***************
 
 Allow the use of PNG images in LVGL.
 
@@ -22,8 +22,9 @@ The decoded image is stored in RGBA pixel format.
 
 As it might take significant time to decode PNG images LVGL's :ref:`overview_image_caching` feature can be useful.
 
+
 Compress PNG files
-------------------
+^^^^^^^^^^^^^^^^^^
 
 PNG file format supports True color (24/32 bit), and 8-bit palette colors.
 Usually cliparts, drawings, icons and simple graphics are stored in PNG format, 
@@ -35,17 +36,16 @@ to compress images.
 One option is to use a free online PNG compressor site, 
 for example Compress PNG: https://compresspng.com/
 
+
 .. _lodepng_example:
 
 Example
--------
+^^^^^^^
 
-.. include:: ../examples/libs/lodepng/index.rst
+.. include:: ../../examples/libs/lodepng/index.rst
+
 
 .. _lodepng_api:
 
 API
----
-
-:ref:`lodepng`
-
+^^^

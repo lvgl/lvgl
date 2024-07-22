@@ -1,6 +1,6 @@
-=============================
+
 Espressif (ESP32 chip series)
-=============================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 LVGL can be used and configured as a standard `ESP-IDF <https://github.com/espressif/esp-idf>`__ component.
 
@@ -23,14 +23,14 @@ Using LVGL in your ESP-IDF project
 
 
 Prerequisites
-~~~~~~~~~~~~~
+*************
 
 -  ESP-IDF v4.1 and above
 -  ESP evaluation board with a display
 
 
 Obtaining LVGL
-~~~~~~~~~~~~~~
+**************
 
 - **Option 1:** git submodule
 
@@ -61,7 +61,7 @@ Obtaining LVGL
 
 
 Configuration
-~~~~~~~~~~~~~
+*************
 
 When you are ready to configure LVGL, launch the configuration menu with ``idf.py menuconfig`` in your project root
 directory, go to ``Component config`` and then ``LVGL configuration``.

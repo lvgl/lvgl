@@ -1,19 +1,21 @@
 .. _overview_image:
 
-======
+******
 Images
-======
+******
 
 An image can be a file or a variable which stores the bitmap itself and
 some metadata.
 
+
 Store images
-************
+^^^^^^^^^^^^
 
 You can store images in two places
 
 - as a variable in internal memory (RAM or ROM)
 - as a file
+
 
 .. _overview_image_variables:
 
@@ -30,11 +32,13 @@ Images stored internally in a variable are composed mainly of an
   - *h*: height in pixels (<= 2048)
   - *always zero*: 3 bits which need to be always zero
   - *reserved*: reserved for future use
+
 - **data**: pointer to an array where the image itself is stored
 - **data_size**: length of ``data`` in bytes
 
 These are usually stored within a project as C files. They are linked
 into the resulting executable like any other constant data.
+
 
 .. _overview_image_files:
 
@@ -54,10 +58,11 @@ must be read into RAM before being drawn. As a result, they are not as
 resource-friendly as images linked at compile time. However, they are
 easier to replace without needing to rebuild the main program.
 
+
 .. _overview_image_color_formats:
 
 Color formats
-*************
+^^^^^^^^^^^^^
 
 Various built-in color formats are supported:
 
@@ -93,13 +98,15 @@ needs to be used to decode the image.
 - :cpp:enumerator:`LV_COLOR_FORMAT_RAW`: Indicates a basic raw image (e.g. a PNG or JPG image).
 - :cpp:enumerator:`LV_COLOR_FORMAT_RAW_ALPHA`: Indicates that an image has alpha and an alpha byte is added for every pixel.
 
+
 Add and use images
-******************
+^^^^^^^^^^^^^^^^^^
 
 You can add images to LVGL in two ways:
 
 - using the online converter
 - manually create images
+
 
 Online converter
 ----------------
@@ -131,6 +138,7 @@ want:
 - RGB565 Swap for 16-bit color depth (two bytes are swapped)
 - RGB888 for 32-bit color depth
 
+
 Manually create an image
 ------------------------
 
@@ -153,6 +161,7 @@ variable to display it using LVGL. For example:
 Another (possibly simpler) option to create and display an image at
 run-time is to use the :ref:`Canvas <lv_canvas>` object.
 
+
 Use images
 ----------
 
@@ -173,10 +182,11 @@ If the image was converted with the online converter, you should use
 :cpp:expr:`LV_IMAGE_DECLARE(my_icon_dsc)` to declare the image in the file where
 you want to use it.
 
+
 .. _overview_image_decoder:
 
 Image decoder
-*************
+^^^^^^^^^^^^^
 
 As you can see in the :ref:`overview_image_color_formats` section, LVGL
 supports several built-in image formats. In many cases, these will be
@@ -240,135 +250,135 @@ open/close the PNG files. It should look like this:
 
 .. code-block:: c
 
-   /*Create a new decoder and register functions */
-   lv_image_decoder_t * dec = lv_image_decoder_create();
-   lv_image_decoder_set_info_cb(dec, decoder_info);
-   lv_image_decoder_set_open_cb(dec, decoder_open);
-   lv_image_decoder_set_get_area_cb(dec, decoder_get_area);
-   lv_image_decoder_set_close_cb(dec, decoder_close);
+    /*Create a new decoder and register functions */
+    lv_image_decoder_t * dec = lv_image_decoder_create();
+    lv_image_decoder_set_info_cb(dec, decoder_info);
+    lv_image_decoder_set_open_cb(dec, decoder_open);
+    lv_image_decoder_set_get_area_cb(dec, decoder_get_area);
+    lv_image_decoder_set_close_cb(dec, decoder_close);
 
-
-   /**
-    * Get info about a PNG image
-    * @param decoder   pointer to the decoder where this function belongs
-    * @param src       can be file name or pointer to a C array
-    * @param header    image information is set in header parameter
-    * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info
-    */
-   static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
-   {
-     /*Check whether the type `src` is known by the decoder*/
-     if(is_png(src) == false) return LV_RESULT_INVALID;
-
-     /* Read the PNG header and find `width` and `height` */
-     ...
-
-     header->cf = LV_COLOR_FORMAT_ARGB8888;
-     header->w = width;
-     header->h = height;
-   }
-
-   /**
-    * Open a PNG image and decode it into dsc.decoded
-    * @param decoder   pointer to the decoder where this function belongs
-    * @param dsc       image descriptor
-    * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
-    */
-   static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
-   {
-     (void) decoder; /*Unused*/
-
-     /*Check whether the type `src` is known by the decoder*/
-     if(is_png(dsc->src) == false) return LV_RESULT_INVALID;
-
-     /*Decode and store the image. If `dsc->decoded` is `NULL`, the `decoder_get_area` function will be called to get the image data line-by-line*/
-     dsc->decoded = my_png_decoder(dsc->src);
-
-     /*Change the color format if decoded image format is different than original format. For PNG it's usually decoded to ARGB8888 format*/
-     dsc->decoded.header.cf = LV_COLOR_FORMAT_...
-
-     /*Call a binary image decoder function if required. It's not required if `my_png_decoder` opened the image in true color format.*/
-     lv_result_t res = lv_bin_decoder_open(decoder, dsc);
-
-     return res;
-   }
-
-   /**
-    * Decode an area of image
-    * @param decoder      pointer to the decoder where this function belongs
-    * @param dsc          image decoder descriptor
-    * @param full_area    input parameter. the full area to decode after enough subsequent calls
-    * @param decoded_area input+output parameter. set the values to `LV_COORD_MIN` for the first call and to reset decoding.
-    *                     the decoded area is stored here after each call.
-    * @return             LV_RESULT_OK: ok; LV_RESULT_INVALID: failed or there is nothing left to decode
-    */
-   static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                    const lv_area_t * full_area, lv_area_t * decoded_area)
-   {
-     /**
-     * If `dsc->decoded` is always set in `decoder_open` then `decoder_get_area` does not need to be implemented.
-     * If `dsc->decoded` is only sometimes set or never set in `decoder_open` then `decoder_get_area` is used to
-     * incrementally decode the image by calling it repeatedly until it returns `LV_RESULT_INVALID`.
-     * In the example below the image is decoded line-by-line but the decoded area can have any shape and size
-     * depending on the requirements and capabilities of the image decoder.
+    /**
+     * Get info about a PNG image
+     * @param decoder   pointer to the decoder where this function belongs
+     * @param src       can be file name or pointer to a C array
+     * @param header    image information is set in header parameter
+     * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info
      */
+    static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+    {
+        /*Check whether the type `src` is known by the decoder*/
+        if(is_png(src) == false) return LV_RESULT_INVALID;
 
-     my_decoder_data_t * my_decoder_data = dsc->user_data;
+        /* Read the PNG header and find `width` and `height` */
+        ...
 
-     /* if `decoded_area` has a field set to `LV_COORD_MIN` then reset decoding */
-     if(decoded_area->y1 == LV_COORD_MIN) {
-       decoded_area->x1 = full_area->x1;
-       decoded_area->x2 = full_area->x2;
-       decoded_area->y1 = full_area->y1;
-       decoded_area->y2 = decoded_area->y1; /* decode line-by-line, starting with the first line */
+        header->cf = LV_COLOR_FORMAT_ARGB8888;
+        header->w = width;
+        header->h = height;
+    }
 
-       /* create a draw buf the size of one line */
-       bool reshape_success = NULL != lv_draw_buf_reshape(my_decoder_data->partial,
+    /**
+     * Open a PNG image and decode it into dsc.decoded
+     * @param decoder   pointer to the decoder where this function belongs
+     * @param dsc       image descriptor
+     * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
+     */
+    static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+    {
+        (void) decoder; /*Unused*/
+
+        /*Check whether the type `src` is known by the decoder*/
+        if(is_png(dsc->src) == false) return LV_RESULT_INVALID;
+
+        /*Decode and store the image. If `dsc->decoded` is `NULL`, the `decoder_get_area` function will be called to get the image data line-by-line*/
+        dsc->decoded = my_png_decoder(dsc->src);
+
+        /*Change the color format if decoded image format is different than original format. For PNG it's usually decoded to ARGB8888 format*/
+        dsc->decoded.header.cf = LV_COLOR_FORMAT_...
+
+        /*Call a binary image decoder function if required. It's not required if `my_png_decoder` opened the image in true color format.*/
+        lv_result_t res = lv_bin_decoder_open(decoder, dsc);
+
+        return res;
+    }
+
+    /**
+     * Decode an area of image
+     * @param decoder      pointer to the decoder where this function belongs
+     * @param dsc          image decoder descriptor
+     * @param full_area    input parameter. the full area to decode after enough subsequent calls
+     * @param decoded_area input+output parameter. set the values to `LV_COORD_MIN` for the first call and to reset decoding.
+     *                     the decoded area is stored here after each call.
+     * @return             LV_RESULT_OK: ok; LV_RESULT_INVALID: failed or there is nothing left to decode
+     */
+    static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                    const lv_area_t * full_area, lv_area_t * decoded_area)
+    {
+        /**
+         * If `dsc->decoded` is always set in `decoder_open` then `decoder_get_area` does not need to be implemented.
+         * If `dsc->decoded` is only sometimes set or never set in `decoder_open` then `decoder_get_area` is used to
+         * incrementally decode the image by calling it repeatedly until it returns `LV_RESULT_INVALID`.
+         * In the example below the image is decoded line-by-line but the decoded area can have any shape and size
+         * depending on the requirements and capabilities of the image decoder.
+         */
+
+        my_decoder_data_t * my_decoder_data = dsc->user_data;
+
+        /* if `decoded_area` has a field set to `LV_COORD_MIN` then reset decoding */
+        if(decoded_area->y1 == LV_COORD_MIN) {
+            decoded_area->x1 = full_area->x1;
+            decoded_area->x2 = full_area->x2;
+            decoded_area->y1 = full_area->y1;
+            decoded_area->y2 = decoded_area->y1; /* decode line-by-line, starting with the first line */
+
+            /* create a draw buf the size of one line */
+            bool reshape_success = NULL != lv_draw_buf_reshape(my_decoder_data->partial,
                                                           dsc->decoded.header.cf,
                                                           lv_area_get_width(full_area),
                                                           1,
                                                           LV_STRIDE_AUTO);
-       if(!reshape_success) {
-         lv_draw_buf_destroy(my_decoder_data->partial);
-         my_decoder_data->partial = lv_draw_buf_create(lv_area_get_width(full_area),
+            if(!reshape_success) {
+                lv_draw_buf_destroy(my_decoder_data->partial);
+                my_decoder_data->partial = lv_draw_buf_create(lv_area_get_width(full_area),
                                                        1,
                                                        dsc->decoded.header.cf,
                                                        LV_STRIDE_AUTO);
 
-         my_png_decode_line_reset(full_area);
-       }
-     }
-     /* otherwise decoding is already in progress. decode the next line */
-     else {
-       /* all lines have already been decoded. indicate completion by returning `LV_RESULT_INVALID` */
-       if (decoded_area->y1 >= full_area->y2) return LV_RESULT_INVALID;
-       decoded_area->y1++;
-       decoded_area->y2++;
-     }
+                my_png_decode_line_reset(full_area);
+            }
+        }
+        /* otherwise decoding is already in progress. decode the next line */
+        else {
+            /* all lines have already been decoded. indicate completion by returning `LV_RESULT_INVALID` */
+            if (decoded_area->y1 >= full_area->y2) return LV_RESULT_INVALID;
+            decoded_area->y1++;
+            decoded_area->y2++;
+        }
 
-     my_png_decode_line(my_decoder_data->partial);
+        my_png_decode_line(my_decoder_data->partial);
 
-     return LV_RESULT_OK;
-   }
+        return LV_RESULT_OK;
+    }
 
-   /**
-    * Close PNG image and free data
-    * @param decoder   pointer to the decoder where this function belongs
-    * @param dsc       image decoder descriptor
-    * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
-    */
-   static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
-   {
-     /*Free all allocated data*/
-     my_png_cleanup();
+    /**
+     * Close PNG image and free data
+     * @param decoder   pointer to the decoder where this function belongs
+     * @param dsc       image decoder descriptor
+     * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
+     */
+    static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+    {
+        /*Free all allocated data*/
+        my_png_cleanup();
 
-     my_decoder_data_t * my_decoder_data = dsc->user_data;
-     lv_draw_buf_destroy(my_decoder_data->partial);
+        my_decoder_data_t * my_decoder_data = dsc->user_data;
+        lv_draw_buf_destroy(my_decoder_data->partial);
 
-     /*Call the built-in close function if the built-in open/get_area was used*/
-     lv_bin_decoder_close(decoder, dsc);
+        /*Call the built-in close function if the built-in open/get_area was used*/
+        lv_bin_decoder_close(decoder, dsc);
 
-   }
+    }
+
 
 So in summary:
 
@@ -399,16 +409,15 @@ images to tell color of the image.
 
 .. code-block:: c
 
+    lv_result_t res;
+    lv_image_decoder_dsc_t dsc;
+    lv_image_decoder_args_t args = { 0 }; /*Custom decoder behavior via args*/
+    res = lv_image_decoder_open(&dsc, &my_img_dsc, &args);
 
-   lv_result_t res;
-   lv_image_decoder_dsc_t dsc;
-   lv_image_decoder_args_t args = { 0 }; /*Custom decoder behavior via args*/
-   res = lv_image_decoder_open(&dsc, &my_img_dsc, &args);
-
-   if(res == LV_RESULT_OK) {
-     /*Do something with `dsc->decoded`. You can copy out the decoded image by `lv_draw_buf_dup(dsc.decoded)`*/
-     lv_image_decoder_close(&dsc);
-   }
+    if(res == LV_RESULT_OK) {
+        /*Do something with `dsc->decoded`. You can copy out the decoded image by `lv_draw_buf_dup(dsc.decoded)`*/
+        lv_image_decoder_close(&dsc);
+    }
 
 
 Image post-processing
@@ -428,78 +437,80 @@ See the detailed code below:
 
 .. code-block:: c
 
-   /* Define post-processing state */
-   typedef enum {
-     IMAGE_PROCESS_STATE_NONE = 0,
-     IMAGE_PROCESS_STATE_STRIDE_ALIGNED = 1 << 0,
-     IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA = 1 << 1,
-   } image_process_state_t;
+    /* Define post-processing state */
+    typedef enum {
+        IMAGE_PROCESS_STATE_NONE = 0,
+        IMAGE_PROCESS_STATE_STRIDE_ALIGNED = 1 << 0,
+        IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA = 1 << 1,
+    } image_process_state_t;
 
-   lv_result_t my_image_post_process(lv_image_decoder_dsc_t * dsc)
-   {
-     lv_color_format_t color_format = dsc->header.cf;
-     lv_result_t res = LV_RESULT_OK;
+    lv_result_t my_image_post_process(lv_image_decoder_dsc_t * dsc)
+    {
+        lv_color_format_t color_format = dsc->header.cf;
+        lv_result_t res = LV_RESULT_OK;
 
-     if(color_format == LV_COLOR_FORMAT_ARGB8888) {
-       lv_cache_lock();
-       lv_cache_entry_t * entry = dsc->cache_entry;
+        if(color_format == LV_COLOR_FORMAT_ARGB8888) {
+            lv_cache_lock();
+            lv_cache_entry_t * entry = dsc->cache_entry;
 
-       if(!(entry->process_state & IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA)) {
-         lv_draw_buf_premultiply(dsc->decoded);
-         LV_LOG_USER("premultiplied alpha OK");
+            if(!(entry->process_state & IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA)) {
+                lv_draw_buf_premultiply(dsc->decoded);
+                LV_LOG_USER("premultiplied alpha OK");
 
-         entry->process_state |= IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA;
-       }
+                entry->process_state |= IMAGE_PROCESS_STATE_PREMULTIPLIED_ALPHA;
+            }
 
-       if(!(entry->process_state & IMAGE_PROCESS_STATE_STRIDE_ALIGNED)) {
-          uint32_t stride_expect = lv_draw_buf_width_to_stride(decoded->header.w, decoded->header.cf);
-          if(decoded->header.stride != stride_expect) {
-              LV_LOG_WARN("Stride mismatch");
-              lv_draw_buf_t * aligned = lv_draw_buf_adjust_stride(decoded, stride_expect);
-              if(aligned == NULL) {
-                  LV_LOG_ERROR("No memory for Stride adjust.");
-                  return NULL;
-              }
+            if(!(entry->process_state & IMAGE_PROCESS_STATE_STRIDE_ALIGNED)) {
+                uint32_t stride_expect = lv_draw_buf_width_to_stride(decoded->header.w, decoded->header.cf);
+                if(decoded->header.stride != stride_expect) {
+                    LV_LOG_WARN("Stride mismatch");
+                    lv_draw_buf_t * aligned = lv_draw_buf_adjust_stride(decoded, stride_expect);
+                    if(aligned == NULL) {
+                        LV_LOG_ERROR("No memory for Stride adjust.");
+                        return NULL;
+                    }
 
-              decoded = aligned;
-          }
+                    decoded = aligned;
+                }
 
-          entry->process_state |= IMAGE_PROCESS_STATE_STRIDE_ALIGNED;
-       }
+                entry->process_state |= IMAGE_PROCESS_STATE_STRIDE_ALIGNED;
+            }
 
-   alloc_failed:
-       lv_cache_unlock();
-     }
+            alloc_failed:
+                lv_cache_unlock();
+        }
 
-     return res;
-   }
+        return res;
+    }
+
 
 - GPU draw unit example:
 
 .. code-block:: c
 
-  void gpu_draw_image(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
-  {
-    ...
-    lv_image_decoder_dsc_t decoder_dsc;
-    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, NULL);
-    if(res != LV_RESULT_OK) {
-      LV_LOG_ERROR("Failed to open image");
-      return;
+    void gpu_draw_image(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
+    {
+        ...
+        lv_image_decoder_dsc_t decoder_dsc;
+        lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, NULL);
+        if(res != LV_RESULT_OK) {
+            LV_LOG_ERROR("Failed to open image");
+            return;
+        }
+
+        res = my_image_post_process(&decoder_dsc);
+        if(res != LV_RESULT_OK) {
+            LV_LOG_ERROR("Failed to post-process image");
+            return;
+        }
+        ...
     }
 
-    res = my_image_post_process(&decoder_dsc);
-    if(res != LV_RESULT_OK) {
-      LV_LOG_ERROR("Failed to post-process image");
-      return;
-    }
-    ...
-  }
 
 .. _overview_image_caching:
 
 Image caching
-*************
+^^^^^^^^^^^^^
 
 Sometimes it takes a lot of time to open an image. Continuously decoding
 a PNG/JPEG image or loading images from a slow external memory would be
@@ -516,6 +527,7 @@ be beneficial for your platform or not. Image caching may not be worth
 it if you have a deeply embedded target which decodes small images from
 a relatively fast storage medium.
 
+
 Cache size
 ----------
 
@@ -526,6 +538,7 @@ no image is cached.
 The size of cache can be changed at run-time with
 :cpp:expr:`lv_cache_set_max_size(size_t size)`,
 and get with :cpp:expr:`lv_cache_get_max_size()`.
+
 
 Value of images
 ---------------
@@ -553,6 +566,7 @@ to make it more alive.
 If there is no more space in the cache, the entry with *usage_count == 0*
 and lowest life value will be dropped.
 
+
 Memory usage
 ------------
 
@@ -562,6 +576,7 @@ open.
 
 Therefore, it's the user's responsibility to be sure there is enough RAM
 to cache even the largest images at the same time.
+
 
 Clean the cache
 ---------------
@@ -575,6 +590,7 @@ old image from cache.
 
 To do this, use :cpp:expr:`lv_cache_invalidate(lv_cache_find(&my_png, LV_CACHE_SRC_TYPE_PTR, 0, 0))`.
 
+
 Custom cache algorithm
 ----------------------
 
@@ -583,60 +599,61 @@ following code to replace the LVGL built-in cache manager:
 
 .. code-block:: c
 
-   static lv_cache_entry_t * my_cache_add_cb(size_t size)
-   {
-     ...
-   }
+    static lv_cache_entry_t * my_cache_add_cb(size_t size)
+    {
+        ...
+    }
 
-   static lv_cache_entry_t * my_cache_find_cb(const void * src, lv_cache_src_type_t src_type, uint32_t param1, uint32_t param2)
-   {
-     ...
-   }
+    static lv_cache_entry_t * my_cache_find_cb(const void * src, lv_cache_src_type_t src_type, uint32_t param1, uint32_t param2)
+    {
+        ...
+    }
 
-   static void my_cache_invalidate_cb(lv_cache_entry_t * entry)
-   {
-     ...
-   }
+    static void my_cache_invalidate_cb(lv_cache_entry_t * entry)
+    {
+        ...
+    }
 
-   static const void * my_cache_get_data_cb(lv_cache_entry_t * entry)
-   {
-     ...
-   }
+    static const void * my_cache_get_data_cb(lv_cache_entry_t * entry)
+    {
+        ...
+    }
 
-   static void my_cache_release_cb(lv_cache_entry_t * entry)
-   {
-     ...
-   }
+    static void my_cache_release_cb(lv_cache_entry_t * entry)
+    {
+        ...
+    }
 
-   static void my_cache_set_max_size_cb(size_t new_size)
-   {
-     ...
-   }
+    static void my_cache_set_max_size_cb(size_t new_size)
+    {
+        ...
+    }
 
-   static void my_cache_empty_cb(void)
-   {
-     ...
-   }
+    static void my_cache_empty_cb(void)
+    {
+        ...
+    }
 
-   void my_cache_init(void)
-   {
-    /*Initialize new cache manager.*/
-    lv_cache_manager_t my_manager;
-    my_manager.add_cb = my_cache_add_cb;
-    my_manager.find_cb = my_cache_find_cb;
-    my_manager.invalidate_cb = my_cache_invalidate_cb;
-    my_manager.get_data_cb = my_cache_get_data_cb;
-    my_manager.release_cb = my_cache_release_cb;
-    my_manager.set_max_size_cb = my_cache_set_max_size_cb;
-    my_manager.empty_cb = my_cache_empty_cb;
+    void my_cache_init(void)
+    {
+        /*Initialize new cache manager.*/
+        lv_cache_manager_t my_manager;
+        my_manager.add_cb = my_cache_add_cb;
+        my_manager.find_cb = my_cache_find_cb;
+        my_manager.invalidate_cb = my_cache_invalidate_cb;
+        my_manager.get_data_cb = my_cache_get_data_cb;
+        my_manager.release_cb = my_cache_release_cb;
+        my_manager.set_max_size_cb = my_cache_set_max_size_cb;
+        my_manager.empty_cb = my_cache_empty_cb;
 
-    /*Replace existing cache manager with the new one.*/
-    lv_cache_lock();
-    lv_cache_set_manager(&my_manager);
-    lv_cache_unlock();
-   }
+        /*Replace existing cache manager with the new one.*/
+        lv_cache_lock();
+        lv_cache_set_manager(&my_manager);
+        lv_cache_unlock();
+    }
+
 
 .. _overview_image_api:
 
 API
-***
+^^^

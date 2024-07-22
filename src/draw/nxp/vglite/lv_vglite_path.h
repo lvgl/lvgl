@@ -70,10 +70,10 @@ extern "C" {
 /**
  * Generates path data for rectangle drawing.
  *
- * @param[in/out] path The path data to initialize
- * @param[in/out] path_size The resulting size of the created path data
- * @param[in] dsc The style descriptor for the rectangle to be drawn
- * @param[in] coords The coordinates of the rectangle to be drawn
+ * @param path_data       The path data to initialize [in/out]
+ * @param path_data_size  The resulting size of the created path data [in/out]
+ * @param radius          Radius
+ * @param coords          The coordinates of the rectangle to be drawn
  *
  */
 void vglite_create_rect_path_data(int32_t * path_data, uint32_t * path_data_size,

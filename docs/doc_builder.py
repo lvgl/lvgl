@@ -27,37 +27,32 @@ MISSING_VARIABLE = 'MissingVariableDoc'
 MISSING_MACRO = 'MissingMacroDoc'
 
 
+from io import StringIO
+
+logging_streams = {}
+
 last_error_file = None
+
 
 def warn(warning_type, *args):
     if EMIT_WARNINGS:
         global last_error_file
 
         if last_error_file is None and warning_type is not None:
-            output_path = os.path.join(error_path, warning_type + '.log')
-            if not os.path.exists(output_path):
-                open(output_path, 'w').close()
-
-            last_error_file = open(output_path, 'a')
+            last_error_file = logging_streams[warning_type]
 
         args = ' '.join(str(arg) for arg in args)
 
         if warning_type is None:
-            output = f'\033[31;1m    {args}\033[0m\n'
             if last_error_file:
                 if args:
                     last_error_file.write(f'    {args}\n')
                 else:
                     last_error_file.write(f'\n')
-                    last_error_file.close()
                     last_error_file = None
-        else:
-            output = f'\033[31;1m{warning_type}: {args}\033[0m\n'
-            if last_error_file:
-                last_error_file.write(f'{warning_type}: {args}\n')
 
-        sys.stdout.write(output)
-        sys.stdout.flush()
+        elif last_error_file is not None:
+            last_error_file.write(f'{warning_type}: {args}\n')
 
 
 def build_docstring(element):
@@ -104,21 +99,6 @@ def load_xml(fle):
 
     with open(fle, 'rb') as f:
         d = f.read().decode('utf-8')
-
-    # This code is to correct a bug in Doxygen. That bug incorrectly parses
-    # a typedef and it causes an error to occur building the docs. The Error
-    # doesn't stop the documentation from being generated, I just don't want
-    # to see the ugly red output.
-    #
-    # if 'typedef void() lv_lru_free_t(void *v)' in d:
-    #     d = d.replace(
-    #         '<type>void()</type>\n        '
-    #         '<definition>typedef void() lv_lru_free_t(void *v)</definition>',
-    #         '<type>void</type>\n        '
-    #         '<definition>typedef void(lv_lru_free_t)(void *v)</definition>'
-    #     )
-    #     with open(fle, 'wb') as f:
-    #         f.write(d.encode('utf-8'))
 
     return ET.fromstring(d)
 
@@ -454,7 +434,6 @@ class GROUP(object):
         return self.template.format(name=self.name)
 
 
-
 class FUNCTION(object):
     template = '''\
 .. doxygenfunction:: {name}
@@ -727,7 +706,7 @@ class ENUM(object):
                 break
             else:
                 return
-                # raise RuntimeError(f'not able to locate enum {name} ({refid})')
+                # raise RuntimeError(f'not able to locate enum {name} ({refid})')  # NOQA
 
             for element in memberdef:
                 if element.tag == 'location':
@@ -1103,11 +1082,23 @@ def iter_src(n, p):
         if 'private' in file:
             continue
 
+        if 'thorvg' in src_path and 'thorvg_capi' not in file:
+            continue
+
+        if 'libs' in src_path and not file.startswith('lv_'):
+            continue
+
+        if src_path.endswith('osal') and file != 'lv_os.h':
+            continue
+
         if os.path.isdir(os.path.join(src_path, file)):
             folders.append((file, os.path.join(p, file)))
             continue
 
         if not file.endswith('.h'):
+            continue
+
+        if file.startswith('_'):
             continue
 
         if not os.path.exists(out_path):
@@ -1131,7 +1122,7 @@ def iter_src(n, p):
         html_files[name] = html_file
 
         with open(rst_file, 'w') as f:
-            f.write('.. _{0}:'.format(name))
+            f.write('.. _{0}_h:'.format(name))
             f.write('\n\n')
             f.write('=' * len(file))
             f.write('\n')
@@ -1325,6 +1316,7 @@ def run(project_path, temp_directory, *doc_paths):
     global lvgl_src_path
     global api_path
     global error_path
+    global logging_streams
 
     base_path = temp_directory
     xml_path = os.path.join(base_path, 'xml')
@@ -1333,10 +1325,23 @@ def run(project_path, temp_directory, *doc_paths):
     error_path = os.path.join(project_path, 'MISSING-DOCSTRINGS')
 
     if EMIT_WARNINGS:
-        if os.path.exists(error_path):
-            shutil.rmtree(error_path)
-
-        os.mkdir(error_path)
+        logging_streams = {
+            MISSING_FUNC: StringIO(),
+            MISSING_FUNC_ARG: StringIO(),
+            MISSING_FUNC_RETURN: StringIO(),
+            MISSING_FUNC_ARG_MISMATCH: StringIO(),
+            MISSING_FUNC_ARG_NAME: StringIO(),
+            MISSING_STRUCT: StringIO(),
+            MISSING_STRUCT_FIELD: StringIO(),
+            MISSING_UNION: StringIO(),
+            MISSING_UNION_FIELD: StringIO(),
+            MISSING_ENUM_NAME: StringIO(),
+            MISSING_ENUM: StringIO(),
+            MISSING_ENUM_ITEM: StringIO(),
+            MISSING_TYPEDEF: StringIO(),
+            MISSING_VARIABLE: StringIO(),
+            MISSING_MACRO: StringIO()
+        }
 
     if not os.path.exists(api_path):
         os.makedirs(api_path)
@@ -1380,7 +1385,7 @@ def run(project_path, temp_directory, *doc_paths):
 
             if html_includes:
                 html_includes = list(
-                    ':ref:`{0}`\n'.format(inc)
+                    ':ref:`{0}_h`\n'.format(inc)
                     for inc, _ in html_includes
                 )
 
@@ -1400,3 +1405,62 @@ def run(project_path, temp_directory, *doc_paths):
 
                 with open(path, 'wb') as f:
                     f.write(data.encode('utf-8'))
+
+    if EMIT_WARNINGS:
+        fail = False
+        if os.path.exists(error_path):
+            error_files = os.listdir(error_path)
+
+            for key, stream in logging_streams.items():
+                filename = key + '.log'
+                if not stream.tell():
+                    if filename in error_files:
+                        os.remove(os.path.join(error_path, filename))
+                else:
+                    stream.seek(0)
+                    new_data = [
+                        (key + line).strip()
+                        for line in stream.read().split(key)
+                    ]
+
+                    if filename in error_files:
+                        with open(os.path.join(error_path, filename), 'r') as fle:
+                            old_data = [
+                                (key + line).strip()
+                                for line in fle.read().split(key)
+                            ]
+
+                        for item in old_data[:]:
+                            if item in new_data:
+                                new_data.remove(item)
+                            else:
+                                old_data.remove(item)
+
+                        if not new_data and old_data:
+                            with open(os.path.join(error_path, filename), 'w') as fle:
+                                for item in old_data:
+                                    fle.write(item + '\n\n')
+
+                        elif not new_data and not old_data:
+                            os.remove(os.path.join(error_path, filename))
+
+                    if new_data:
+                        fail = True
+                        for item in new_data:
+                            print(f'\033[31;1m{item.strip()}\033[0m\n')
+
+        else:
+            os.mkdir(error_path)
+            for key, stream in logging_streams.items():
+                if not stream.tell():
+                    continue
+
+                filename = key + '.log'
+                stream.seek(0)
+                with open(os.path.join(error_path, filename), 'w') as fle:
+                    fle.write(stream.read())
+
+        if fail:
+            raise RuntimeError('New items added that are undocumented')
+
+

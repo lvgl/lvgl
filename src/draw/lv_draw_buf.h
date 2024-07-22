@@ -124,6 +124,7 @@ void lv_draw_buf_init_with_default_handlers(lv_draw_buf_handlers_t * handlers);
  * @param buf_free_cb       the callback to free memory of the buffer
  * @param align_pointer_cb  the callback to align the buffer
  * @param invalidate_cache_cb the callback to invalidate the cache of the buffer
+ * @param flush_cache_cb    callback
  * @param width_to_stride_cb the callback to calculate the stride based on the width and color format
  */
 void lv_draw_buf_init_handlers(lv_draw_buf_handlers_t * handlers,

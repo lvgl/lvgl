@@ -83,8 +83,8 @@ static inline lv_color32_t lv_color_mix32(lv_color32_t fg, lv_color32_t bg)
 
 /**
  * Get the brightness of a color
- * @param color a color
- * @return the brightness [0..255]
+ * @param c   a color
+ * @return    the brightness [0..255]
  */
 static inline uint8_t lv_color_brightness(lv_color_t c)
 {

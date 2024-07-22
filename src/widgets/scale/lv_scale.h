@@ -44,7 +44,7 @@ LV_EXPORT_CONST_INT(LV_SCALE_LABEL_ENABLED_DEFAULT);
 /**
  * Scale mode
  */
-enum {
+enum _lv_scale_mode_t {
     LV_SCALE_MODE_HORIZONTAL_TOP    = 0x00U,
     LV_SCALE_MODE_HORIZONTAL_BOTTOM = 0x01U,
     LV_SCALE_MODE_VERTICAL_LEFT     = 0x02U,
@@ -53,7 +53,12 @@ enum {
     LV_SCALE_MODE_ROUND_OUTER      = 0x10U,
     _LV_SCALE_MODE_LAST
 };
+
+#ifdef DOXYGEN
+typedef _lv_scale_mode_t lv_scale_mode_t;
+#else
 typedef uint32_t lv_scale_mode_t;
+#endif /*DOXYGEN*/
 
 typedef struct {
     lv_style_t * main_style;

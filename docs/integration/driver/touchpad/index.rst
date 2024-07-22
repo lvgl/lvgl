@@ -1,6 +1,6 @@
-========
+
 Touchpad
-========
+^^^^^^^^
 
 .. toctree::
     :maxdepth: 2

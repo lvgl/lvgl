@@ -30,10 +30,10 @@ typedef enum {
     LV_RB_COLOR_BLACK
 } lv_rb_color_t;
 
-typedef struct lv_rb_node_t {
-    struct lv_rb_node_t * parent;
-    struct lv_rb_node_t * left;
-    struct lv_rb_node_t * right;
+typedef struct _lv_rb_node_t {
+    struct _lv_rb_node_t * parent;
+    struct _lv_rb_node_t * left;
+    struct _lv_rb_node_t * right;
     lv_rb_color_t color;
     void * data;
 } lv_rb_node_t;

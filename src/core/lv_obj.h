@@ -128,7 +128,7 @@ typedef enum {
 } _lv_obj_flag_t;
 
 #if LV_USE_OBJ_PROPERTY
-enum {
+enum _lv_obj_property_t {
     /*OBJ flag properties */
     LV_PROPERTY_ID(OBJ, FLAG_START,                 LV_PROPERTY_TYPE_INT,       0),
     LV_PROPERTY_ID(OBJ, FLAG_HIDDEN,                LV_PROPERTY_TYPE_INT,       0),

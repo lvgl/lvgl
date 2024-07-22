@@ -108,7 +108,8 @@ void lv_freetype_font_delete(lv_font_t * font);
 /**
  * Register a callback function to generate outlines for FreeType fonts.
  *
- * @param cb The callback function to be registered.
+ * @param event_cb The callback function to be registered.
+ * @param filter ???
  * @param user_data User data to be passed to the callback function.
  * @return The ID of the registered callback function, or a negative value on failure.
  */

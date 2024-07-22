@@ -1,8 +1,8 @@
 .. _quick-overview:
 
-==============
+**************
 Quick overview
-==============
+**************
 
 Here you can learn the most important things about LVGL. You should read
 this first to get a general impression and read the detailed
@@ -11,7 +11,7 @@ after that.
 
 
 Get started in a simulator
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Instead of porting LVGL to embedded hardware straight away, it's highly
 recommended to get started in a simulator first.
@@ -23,7 +23,7 @@ experience with LVGL immediately.
 
 
 Add LVGL into your project
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you would rather try LVGL on your own project follow these steps:
 
@@ -106,12 +106,13 @@ For a more detailed guide go to the :ref:`porting` section.
 
 
 Learn the basics
-----------------
+^^^^^^^^^^^^^^^^
+
 
 .. _quick-overview_widgets:
 
 Widgets
-~~~~~~~
+-------
 
 The graphical elements like Buttons, Labels, Sliders, Charts etc. are called objects or widgets.
 Go to :ref:`widgets` to see the full list of available widgets.
@@ -163,7 +164,7 @@ To see the full API visit the documentation of the widgets or the related header
 .. _quick-overview_events:
 
 Events
-~~~~~~
+******
 
 Events are used to inform the user that something has happened with an object. You can assign one or more
 callbacks to an object which will be called if the object is clicked, released, dragged, being deleted, etc.
@@ -205,7 +206,7 @@ To learn all features of the events go to the :ref:`events` section.
 .. _quick-overview_parts:
 
 Parts
-~~~~~
+*****
 
 Widgets might be built from one or more *parts*. For example, a button has only one part called :cpp:enumerator:`LV_PART_MAIN`.
 However, a :ref:`lv_slider` has :cpp:enumerator:`LV_PART_MAIN`, :cpp:enumerator:`LV_PART_INDICATOR` and :cpp:enumerator:`LV_PART_KNOB`.
@@ -218,7 +219,7 @@ Read the widgets' documentation to learn which parts each uses.
 .. _quick-overview_states:
 
 States
-~~~~~~
+******
 
 LVGL objects can be in a combination of the following states:
 
@@ -250,7 +251,7 @@ To manually add or remove states use:
 .. _quick-overview_styles:
 
 Styles
-~~~~~~
+******
 
 A style instance contains properties such as background color, border width, font, etc. that describe the
 appearance of objects.
@@ -329,7 +330,7 @@ To learn all the features of styles see the :ref:`styles` section.
 .. _quick-overview_themes:
 
 Themes
-~~~~~~
+******
 
 Themes are the default styles for objects. Styles from a theme are applied automatically when objects are created.
 
@@ -339,7 +340,7 @@ The theme for your application is a compile time configuration set in ``lv_conf.
 .. _quick-overview_examples:
 
 Examples
---------
+^^^^^^^^
 
 .. include:: ../examples/get_started/index.rst
 
@@ -347,7 +348,7 @@ Examples
 .. _quick-overview_micropython:
 
 MicroPython
------------
+^^^^^^^^^^^
 
 Learn more about :ref:`micropython`.
 
@@ -364,3 +365,4 @@ Learn more about :ref:`micropython`.
     label = lv.label(btn)
     label.set_text('Hello World!')
     lv.screen_load(scr)
+

@@ -280,7 +280,7 @@ extern "C" {
  * The following list is generated using
  * cat src/font/lv_symbol_def.h | sed -E -n 's/^#define\s+LV_(SYMBOL_\w+).*".*$/    _LV_STR_\1,/p'
  */
-enum {
+enum _lv_str_symbol_t {
     _LV_STR_SYMBOL_BULLET,
     _LV_STR_SYMBOL_AUDIO,
     _LV_STR_SYMBOL_VIDEO,

@@ -207,15 +207,15 @@ typedef uint8_t lv_color_format_t;
 
 /**
  * Get the pixel size of a color format in bits, bpp
- * @param src_cf    a color format (`LV_COLOR_FORMAT_...`)
- * @return          the pixel size in bits
+ * @param cf    a color format (`LV_COLOR_FORMAT_...`)
+ * @return      the pixel size in bits
  */
 uint8_t lv_color_format_get_bpp(lv_color_format_t cf);
 
 /**
  * Get the pixel size of a color format in bytes
- * @param src_cf    a color format (`LV_COLOR_FORMAT_...`)
- * @return          the pixel size in bytes
+ * @param cf    a color format (`LV_COLOR_FORMAT_...`)
+ * @return      the pixel size in bytes
  */
 static inline uint8_t lv_color_format_get_size(lv_color_format_t cf)
 {
@@ -467,8 +467,8 @@ static inline void lv_color16_premultiply(lv_color16_t * c, lv_opa_t a)
 
 /**
  * Get the luminance of a color: luminance = 0.3 R + 0.59 G + 0.11 B
- * @param color a color
- * @return the brightness [0..255]
+ * @param c    a color
+ * @return     the brightness [0..255]
  */
 static inline uint8_t lv_color_luminance(lv_color_t c)
 {
@@ -477,8 +477,8 @@ static inline uint8_t lv_color_luminance(lv_color_t c)
 
 /**
  * Get the luminance of a color16: luminance = 0.3 R + 0.59 G + 0.11 B
- * @param color a color
- * @return the brightness [0..255]
+ * @param c   a color
+ * @return    the brightness [0..255]
  */
 static inline uint8_t lv_color16_luminance(const lv_color16_t c)
 {
@@ -487,8 +487,8 @@ static inline uint8_t lv_color16_luminance(const lv_color16_t c)
 
 /**
  * Get the luminance of a color24: luminance = 0.3 R + 0.59 G + 0.11 B
- * @param color a color
- * @return the brightness [0..255]
+ * @param c   a color
+ * @return    the brightness [0..255]
  */
 static inline uint8_t lv_color24_luminance(const uint8_t * c)
 {
@@ -497,8 +497,8 @@ static inline uint8_t lv_color24_luminance(const uint8_t * c)
 
 /**
  * Get the luminance of a color32: luminance = 0.3 R + 0.59 G + 0.11 B
- * @param color a color
- * @return the brightness [0..255]
+ * @param c   a color
+ * @return    the brightness [0..255]
  */
 static inline uint8_t lv_color32_luminance(lv_color32_t c)
 {

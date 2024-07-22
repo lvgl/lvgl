@@ -1,8 +1,8 @@
 .. _layers:
 
-======
+******
 Layers
-======
+******
 
 In LVGL "layers" can be interpreted in various ways:
 
@@ -10,10 +10,11 @@ In LVGL "layers" can be interpreted in various ways:
 2. Permanent screen-sized layers can be also used
 3. For some draw operations LVGL renders a widget and all its children into a buffer (a.k.a. layer) first
 
+
 .. _layers_creation:
 
 Order of creation
-*****************
+^^^^^^^^^^^^^^^^^
 
 By default, LVGL draws new objects on top of old objects.
 
@@ -26,27 +27,28 @@ its children.
 
 .. code-block:: c
 
-   /*Create a screen*/
-   lv_obj_t * scr = lv_obj_create(NULL, NULL);
-   lv_screen_load(scr);          /*Load the screen*/
+    /*Create a screen*/
+    lv_obj_t * scr = lv_obj_create(NULL, NULL);
+    lv_screen_load(scr);          /*Load the screen*/
 
-   /*Create 2 buttons*/
-   lv_obj_t * btn1 = lv_button_create(scr, NULL);     /*Create a button on the screen*/
-   lv_button_set_fit(btn1, true, true);               /*Enable automatically setting the size according to content*/
-   lv_obj_set_pos(btn1, 60, 40);                      /*Set the position of the button*/
+    /*Create 2 buttons*/
+    lv_obj_t * btn1 = lv_button_create(scr, NULL);     /*Create a button on the screen*/
+    lv_button_set_fit(btn1, true, true);               /*Enable automatically setting the size according to content*/
+    lv_obj_set_pos(btn1, 60, 40);                      /*Set the position of the button*/
 
-   lv_obj_t * btn2 = lv_button_create(scr, btn1);     /*Copy the first button*/
-   lv_obj_set_pos(btn2, 180, 80);                     /*Set the position of the button*/
+    lv_obj_t * btn2 = lv_button_create(scr, btn1);     /*Copy the first button*/
+    lv_obj_set_pos(btn2, 180, 80);                     /*Set the position of the button*/
 
-   /*Add labels to the buttons*/
-   lv_obj_t * label1 = lv_label_create(btn1, NULL);   /*Create a label on the first button*/
-   lv_label_set_text(label1, "Button 1");             /*Set the text of the label*/
+    /*Add labels to the buttons*/
+    lv_obj_t * label1 = lv_label_create(btn1, NULL);   /*Create a label on the first button*/
+    lv_label_set_text(label1, "Button 1");             /*Set the text of the label*/
 
-   lv_obj_t * label2 = lv_label_create(btn2, NULL);   /*Create a label on the second button*/
-   lv_label_set_text(label2, "Button 2");             /*Set the text of the label*/
+    lv_obj_t * label2 = lv_label_create(btn2, NULL);   /*Create a label on the second button*/
+    lv_label_set_text(label2, "Button 2");             /*Set the text of the label*/
 
-   /*Delete the second label*/
-   lv_obj_delete(label2);
+    /*Delete the second label*/
+    lv_obj_delete(label2);
+
 
 .. _layers_order:
 
@@ -66,8 +68,10 @@ There are four explicit ways to bring an object to the foreground:
 - Use :cpp:expr:`lv_obj_swap(obj1, obj2)` to swap the relative layer position of two objects.
 - When :cpp:expr:`lv_obj_set_parent(obj, new_parent)` is used, ``obj`` will be on the foreground of the ``new_parent``.
 
+
 Screen-like layers
-******************
+^^^^^^^^^^^^^^^^^^
+
 
 .. _layers_top_and_sys:
 
@@ -92,11 +96,13 @@ acts as a modal.
 
 .. code-block:: c
 
-   lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
+
 
 The ``layer_sys`` is also used for similar purposes in LVGL. For
 example, it places the mouse cursor above all layers to be sure it's
 always visible.
+
 
 .. _layers_bottom:
 
@@ -109,10 +115,12 @@ background opacity is < 255.
 
 The get the bottom layer use :cpp:func:`lv_layer_bottom`.
 
+
 Draw layers
-***********
+^^^^^^^^^^^
 
 Some style properties make LVGL to allocate a buffer and render a widget and its children there first. Later that layer will be merged to the screen or its parent layer after applying some transformations or other modifications.
+
 
 Simple layer
 ------------
@@ -143,12 +151,14 @@ The following style properties trigger the creation of a "Transform layer":
 - ``transform_skew_y``
 - ``transform_rotate``
 
+
 Clip corner
 -----------
 
 The ``clip_corner`` style property also makes LVGL to create a 2 layers with radius height for the top and bottom part of the widget.
 
+
 .. _layers_api:
 
 API
-***
+^^^

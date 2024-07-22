@@ -1,6 +1,6 @@
-==========
+
 JavaScript
-==========
+^^^^^^^^^^
 
 With `lv_binding_js <https://github.com/lvgl/lv_binding_js>`__ you can write lvgl with JavaScript.
 
@@ -49,7 +49,7 @@ but include notes on the necessary libraries, compile flags, etc.
 
 
 lvgljs
-~~~~~~
+******
 
 - `ubuntu build Notes for sdl simulator <https://github.com/lvgl/lv_binding_js/blob/master/doc/build/build-ubuntu-arm.md>`__
 - `macos x86 build Notes for sdl simulator <https://github.com/lvgl/lv_binding_js/blob/master/doc/build/build-macos-x86-simulator.md>`__
@@ -57,7 +57,7 @@ lvgljs
 
 
 JS Bundle
-~~~~~~~~~
+*********
 
 - `JS Bundle build Notes <https://github.com/lvgl/lv_binding_js/blob/master/doc/build/js-bundle.md>`__
 

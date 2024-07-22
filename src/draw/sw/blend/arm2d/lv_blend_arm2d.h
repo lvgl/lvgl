@@ -18,7 +18,10 @@ extern "C" {
 
 #if LV_USE_DRAW_ARM2D_SYNC
 
+#ifndef DOXYGEN
 #define __ARM_2D_IMPL__
+#endif /*DOXYGEN*/
+
 #include "arm_2d.h"
 #include "__arm_2d_impl.h"
 
@@ -32,7 +35,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-
+#ifndef DOXYGEN
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB565
 #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565(dsc) \
     _lv_color_blend_to_rgb565_arm2d(dsc)
@@ -192,7 +195,7 @@ extern "C" {
 #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_RGB888_MIX_MASK_OPA(dsc, dst_px_size)  \
     _lv_argb8888_blend_normal_to_rgb888_mix_mask_opa_arm2d(dsc, dst_px_size)
 #endif
-
+#endif /* DOXYGEN */
 /**********************
  *      TYPEDEFS
  **********************/

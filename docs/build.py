@@ -124,6 +124,24 @@ config_builder.run()
 shutil.copytree('.', temp_directory, dirs_exist_ok=True)
 shutil.copytree(examples_path, os.path.join(temp_directory, 'examples'))
 
+
+def iter_rst_files(p):
+    for file in os.listdir(p):
+        file = os.path.join(p, file)
+        if os.path.isdir(file):
+            iter_rst_files(file)
+        elif file.endswith('.rst'):
+            with open(file, 'rb') as fle:
+                dta = fle.read().decode('utf-8')
+
+            if '../../examples' in dta:
+                dta = dta.replace('../../examples', '../examples')
+                with open(file, 'wb') as fle:
+                    fle.write(dta.encode('utf-8'))
+
+
+iter_rst_files(temp_directory)
+
 with open(os.path.join(temp_directory, 'Doxyfile'), 'rb') as f:
     data = f.read().decode('utf-8')
 
@@ -141,7 +159,7 @@ print("Add translation")
 add_translation.exec(temp_directory)
 
 print("Running doxygen")
-cmd('cd "{temp_directory}" && doxygen Doxyfile'.format(temp_directory=temp_directory))
+cmd(f'cd "{temp_directory}" && doxygen Doxyfile')
 
 print('Reading Doxygen output')
 
@@ -177,7 +195,6 @@ if 'PDF version: :download:`LVGL.pdf <LVGL.pdf>`' in index_data:
 if skip_latex:
     print("skipping latex build as requested")
 else:
-
     # Silly workaround to include the more or less correct
     # PDF download link in the PDF
     # cmd("cp -f " + lang +"/latex/LVGL.pdf LVGL.pdf | true")

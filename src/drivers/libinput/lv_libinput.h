@@ -99,7 +99,7 @@ char * lv_libinput_find_dev(lv_libinput_capability capabilities, bool force_resc
 /**
  * Find connected input devices with specific capabilities
  * @param capabilities required device capabilities
- * @param devices pre-allocated array to store the found device node paths (e.g. /dev/input/event0). The pointers are
+ * @param found pre-allocated array to store the found device node paths (e.g. /dev/input/event0). The pointers are
  *                safe to use until the next forceful device search.
  * @param count maximum number of devices to find (the devices array should be at least this long)
  * @param force_rescan erase the device cache (if any) and rescan the file system for available devices
@@ -109,7 +109,7 @@ size_t lv_libinput_find_devs(lv_libinput_capability capabilities, char ** found,
 
 /**
  * Create a new libinput input device
- * @param type LV_INDEV_TYPE_POINTER or LV_INDEV_TYPE_KEYPAD
+ * @param indev_type LV_INDEV_TYPE_POINTER or LV_INDEV_TYPE_KEYPAD
  * @param dev_path device path, e.g. /dev/input/event0
  * @return pointer to input device or NULL if opening failed
  */

@@ -1,6 +1,6 @@
-===
+
 NXP
-===
+^^^
 
 NXP has integrated LVGL into the MCUXpresso SDK packages for several of our microcontrollers as an optional software
 component, allowing easy evaluation and migration into your product design. LVGL is a free and open-source embedded
@@ -29,11 +29,11 @@ simultaneously (in LVGL multithreading mode).
 
 
 PXP accelerator
-~~~~~~~~~~~~~~~
+***************
 
 
 Basic configuration:
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
 - Select NXP PXP engine in "lv_conf.h": Set :c:macro:`LV_USE_DRAW_PXP` to `1`.
 - Enable PXP asserts in "lv_conf.h": Set :c:macro: `LV_USE_PXP_ASSERT` to `1`. There are few PXP assertions that can stop
@@ -44,7 +44,7 @@ Basic configuration:
 
 
 Basic initialization:
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
 
 PXP draw initialization is done automatically in :cpp:func:`lv_init()` once the PXP is enabled, no user code is required:
 
@@ -88,7 +88,7 @@ and will pass the task to the PXP draw unit for processing.
 
 
 Features supported:
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 
 Several drawing features in LVGL can be offloaded to the PXP engine. The CPU is available for other operations while the PXP
 is running. RTOS is required to block the LVGL drawing thread and switch to another task or suspend the CPU for power savings.
@@ -130,7 +130,7 @@ Additional, the screen rotation can be handled by the PXP:
 
 
 Known limitations:
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
 
 - PXP can only rotate at 90x angles.
 - Rotation is not supported for images unaligned to blocks of 16x16 pixels. PXP is set to process 16x16 blocks
@@ -144,7 +144,7 @@ Known limitations:
 
 
 Project setup:
-^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~
 
 - Add PXP related source files (and corresponding headers if available) to project:
 
@@ -164,7 +164,7 @@ Project setup:
 
 
 PXP default configuration:
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Implementation depends on multiple OS-specific functions. The struct :cpp:struct:`pxp_cfg_t` with callback pointers
   is used as a parameter for the :cpp:func:`lv_pxp_init()` function. Default implementation for FreeRTOS and bare metal
@@ -177,7 +177,7 @@ PXP default configuration:
 
 
 VGLite accelerator
-~~~~~~~~~~~~~~~~~~
+------------------
 
 Extra drawing features in LVGL can be handled by the VGLite engine. The CPU is available for other operations
 while the VGLite is running. An RTOS is required to block the LVGL drawing thread and switch to another task
@@ -185,7 +185,7 @@ or suspend the CPU for power savings.
 
 
 Basic configuration:
-^^^^^^^^^^^^^^^^^^^^
+********************
 
 - Select NXP VGLite engine in "lv_conf.h": Set :c:macro:`LV_USE_DRAW_VGLITE` to `1`. :c:macro:`SDK_OS_FREE_RTOS`
   symbol needs to be defined so that FreeRTOS driver osal implementation will be enabled.
@@ -195,7 +195,7 @@ Basic configuration:
 
 
 Basic initialization:
-^^^^^^^^^^^^^^^^^^^^^
+*********************
 
 Initialize VGLite GPU before calling :cpp:func:`lv_init()` by specifying the width/height of tessellation window.
 The default values for tesselation width and height, and command buffer size are in the SDK file "vglite_support.h".
@@ -266,7 +266,7 @@ and will pass the task to the VGLite draw unit for processing.
 
 
 Advanced configuration:
-^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
 
 - Enable VGLite blit split in "lv_conf.h": Set :c:macro:`LV_USE_VGLITE_BLIT_SPLIT` to `1`.
   Enabling the blit split workaround will mitigate any quality degradation issue on screen's dimension > 352 pixels.
@@ -286,7 +286,7 @@ Advanced configuration:
 
 
 Features supported:
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 Several drawing features in LVGL can be offloaded to the VGLite engine. The CPU is available for other operations while
 the GPU is running. RTOS is required to block the LVGL drawing thread and switch to another task or suspend the CPU for
@@ -341,7 +341,7 @@ All the below operation can be done in addition with optional opacity.
 
 
 Known limitations:
-^^^^^^^^^^^^^^^^^^
+******************
 
 - Source image alignment: The byte alignment requirement for a pixel depends on the specific pixel format. Both buffer
   address and buffer stride must be aligned. As general rule, the alignment is set to 16 pixels. This makes the buffer
@@ -351,7 +351,7 @@ Known limitations:
 
 
 Project setup:
-^^^^^^^^^^^^^^
+--------------
 
 - Add VGLite related source files (and corresponding headers if available) to project:
 

@@ -1,5 +1,5 @@
 Output API as JSON data
-=======================
+^^^^^^^^^^^^^^^^^^^^^^^
 
 We have written a script that will read the header files in LVGL and outputs a more friendly JSON format for the API.
 This is done so that bindings that generate code automatically will have an easy way to collect the needed information

@@ -38,6 +38,7 @@ to deploy the LVGL. You don't have to define the macro
 :c:macro:`LV_USE_DRAW_ARM2D_SYNC` manually, instead the lv_conf_cmsis.h will
 check the environment and set the :c:macro:`LV_USE_DRAW_ARM2D_SYNC` accordingly.
 
+
 Design Considerations
 *********************
 
@@ -56,6 +57,7 @@ LVGL (sometimes worse) for regular Cortex-M processors.
 -  The target device contains
    `DMAC-350 <https://community.arm.com/arm-community-blogs/b/internet-of-things-blog/posts/arm-corelink-dma-350-next-generation-direct-memory-access-for-endpoint-ai>`__
 
+
 Examples
 ********
 
@@ -64,5 +66,3 @@ Examples
 
 API
 ***
-
-:ref:`lv_gpu_arm2d`

@@ -28,7 +28,7 @@ extern "C" {
 
 /**
  * Loads a `lv_font_t` object from a binary font file
- * @param path          path where the font file is located
+ * @param font_name     path where the font file is located
  * @return              pointer to font where to load
  */
 lv_font_t * lv_binfont_create(const char * font_name);

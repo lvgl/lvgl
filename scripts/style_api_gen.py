@@ -519,14 +519,14 @@ def style_set_c(p):
   print("    lv_style_set_prop(style, LV_STYLE_" + p['name'] +", v);")
   print("}")
   print("")
-  print("const lv_style_prop_t _lv_style_const_prop_id_" + p['name'] + " = LV_STYLE_" + p['name'] + ";")
+  print("LV_ATTRIBUTE_EXTERN_DATA const lv_style_prop_t _lv_style_const_prop_id_" + p['name'] + " = LV_STYLE_" + p['name'] + ";")
 
 
 def style_set_h(p):
   if 'section' in p: return
 
   print("void lv_style_set_" + p['name'].lower() +"(lv_style_t * style, "+ p['var_type'] +" value);")
-  print("LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_" + p['name'] + ";")
+  print("extern const lv_style_prop_t _lv_style_const_prop_id_" + p['name'] + ";")
 
 
 def local_style_set_c(p):
@@ -563,7 +563,7 @@ def docs(p):
   if "section" in p:
     print("")
     print(p['section'])
-    print("-" * len(p['section']))
+    print("^" * len(p['section']))
     print("")
     print(p['dsc'])
     return
@@ -586,8 +586,9 @@ def docs(p):
   dsc = p['dsc']
 
   print("")
+  print("")
   print(p["name"].lower())
-  print("~" * len(p["name"].lower()))
+  print("-" * len(p["name"].lower()))
   print("")
   print(dsc)
 
@@ -718,10 +719,11 @@ print('''\
 print('#endif /* LV_STYLE_GEN_H */')
 
 sys.stdout = open(base_dir + '/../docs/overview/style-props.rst', 'w')
-
-print('================')
+print('.. _style_properties:')
+print()
+print('****************')
 print('Style properties')
-print('================')
+print('****************')
 
 for p in props:
   docs(p)

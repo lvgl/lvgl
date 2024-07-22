@@ -1,13 +1,14 @@
 .. _observer:
 
-========
+********
 Observer
-========
+********
+
 
 .. _observer_overview:
 
 Overview
-********
+^^^^^^^^
 
 The ``lv_observer`` module implements a standard `Observer pattern <https://en.wikipedia.org/wiki/Observer_pattern>`__.
 
@@ -73,7 +74,8 @@ A typical use case looks like this:
 .. _observer_subject:
 
 Subject
-*******
+^^^^^^^
+
 
 Subject initialization
 ----------------------
@@ -100,6 +102,7 @@ The following functions can be used to set a subject's value:
 - **Pointer**  ``void lv_subject_set_pointer(lv_subject_t * subject, void * ptr)``
 - **Color** ``void lv_subject_set_color(lv_subject_t * subject, lv_color_t color)``
 
+
 Get subject's value
 -------------------
 
@@ -123,10 +126,12 @@ The following functions can be used to get a subject's previous value:
 - **Pointer** ``const void * lv_subject_get_previous_pointer(lv_subject_t * subject)``
 - **Color** ``lv_color_t lv_subject_get_previous_color(lv_subject_t * subject)``
 
+
 .. _observer_observer:
 
 Observer
-********
+^^^^^^^^
+
 
 Subscribe to a subject
 ----------------------
@@ -165,7 +170,6 @@ In more generic case any pointer can be saved a target:
     lv_observer_t * observer = lv_subject_add_observer_with_target(&some_subject, some_observer_cb, some_pointer, user_data);
 
 
-
 Unsubscribe from a subject
 --------------------------
 
@@ -174,16 +178,18 @@ Unsubscribe from a subject
     //`observer` is the return value of `lv_subject_add_observer*`
     lv_observer_remove(observer);
 
+
 To unsubscribe a widget from a given or all subject use:
 
 .. code-block:: c
 
     lv_obj_remove_from_subject(obj, subject); //`subject` can be NULL to unsubcribe from all
 
+
 .. _observer_subject_groups:
 
 Subject groups
-**************
+--------------
 
 There are cases when a subject changes and the value of some other subjects are also required by the observer.
 As a practical example imagine an instrument which measures either voltage or current.
@@ -203,6 +209,7 @@ this array as a parameter when you initialize a subject with group type.
 
     static lv_subject_t * subject_list[3] = {&subject_1, &subject_2, &subject_3};
     lv_subject_init_group(&subject_all, subject_list, 3);  /*The last parameter is the number of elements*/
+
 
 You can add observers to subject groups in the regular way.
 The trick is that when any element of the group is notified the subject group will be notified too.
@@ -246,7 +253,8 @@ The above Voltage/Current measurement example looks like this in the practice:
 .. _observer_widget_binding:
 
 Widget binding
-**************
+^^^^^^^^^^^^^^
+
 
 Base object
 -----------
@@ -257,11 +265,13 @@ Set an object flag if an integer subject's value is equal to a reference value, 
 
     observer = lv_obj_bind_flag_if_eq(obj, &subject, LV_OBJ_FLAG_*, ref_value);
 
+
 Set an object flag if an integer subject's value is not equal to a reference value, clear the flag otherwise
 
 .. code-block:: c
 
     observer = lv_obj_bind_flag_if_not_eq(obj, &subject, LV_OBJ_FLAG_*, ref_value);
+
 
 Set an object state if an integer subject's value is equal to a reference value, clear the flag otherwise
 
@@ -269,17 +279,20 @@ Set an object state if an integer subject's value is equal to a reference value,
 
     observer = lv_obj_bind_state_if_eq(obj, &subject, LV_STATE_*, ref_value);
 
+
 Set an object state if an integer subject's value is not equal to a reference value, clear the flag otherwise
 
 .. code-block:: c
 
     observer = lv_obj_bind_state_if_not_eq(obj, &subject, LV_STATE_*, ref_value);
 
+
 Set an integer subject to 1 when an object is checked and set it 0 when unchecked.
 
 .. code-block:: c
 
     observer = lv_obj_bind_checked(obj, &subject);
+
 
 Label
 -----
@@ -302,6 +315,7 @@ Bind an integer subject to an arc's value.
 
     observer = lv_arc_bind_value(obj, &subject);
 
+
 Slider
 ------
 
@@ -310,6 +324,7 @@ Bind an integer subject to a slider's value
 .. code-block:: c
 
     observer = lv_slider_bind_value(obj, &subject);
+
 
 Roller
 ------
@@ -323,20 +338,23 @@ Bind an integer subject to a roller's value
 
 Drop-down
 ---------
+
 Bind an integer subject to a drop-down's value
 
 .. code-block:: c
 
     observer = lv_dropdown_bind_value(obj, &subject);
 
+
 .. _observer_example:
 
 Example
-*******
+^^^^^^^
 
-.. include:: ../examples/others/observer/index.rst
+.. include:: ../../examples/others/observer/index.rst
+
 
 .. _observer_api:
 
 API
-***
+^^^
