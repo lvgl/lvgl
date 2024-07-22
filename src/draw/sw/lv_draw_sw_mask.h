@@ -32,7 +32,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-enum _lv_draw_sw_mask_res_t{
+enum _lv_draw_sw_mask_res_t {
     LV_DRAW_SW_MASK_RES_TRANSP,
     LV_DRAW_SW_MASK_RES_FULL_COVER,
     LV_DRAW_SW_MASK_RES_CHANGED,
@@ -47,7 +47,7 @@ typedef uint8_t lv_draw_sw_mask_res_t;
 
 #if LV_DRAW_SW_COMPLEX
 
-enum _lv_draw_sw_mask_type_t{
+enum _lv_draw_sw_mask_type_t {
     LV_DRAW_SW_MASK_TYPE_LINE,
     LV_DRAW_SW_MASK_TYPE_ANGLE,
     LV_DRAW_SW_MASK_TYPE_RADIUS,
