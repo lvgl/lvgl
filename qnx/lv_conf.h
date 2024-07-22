@@ -1014,7 +1014,7 @@
 /* QNX Screen display and input drivers */
 #define LV_USE_QNX              1
 #if LV_USE_QNX
-    #define LV_QNX_BUF_COUNT        1    /*1 or 2*/
+    #define LV_QNX_BUF_COUNT        2    /*1 or 2*/
 #endif
 
 /*==================
