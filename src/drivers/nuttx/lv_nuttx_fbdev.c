@@ -41,8 +41,7 @@ typedef struct {
     void * mem2;
     uint32_t mem2_yoffset;
 
-    lv_draw_buf_t buf1;
-    lv_draw_buf_t buf2;
+    uint8_t *     fbp;
 } lv_nuttx_fb_t;
 
 /**********************
@@ -118,33 +117,41 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
         goto errout;
     }
 
-    dsc->mem = mmap(NULL, dsc->pinfo.fblen, PROT_READ | PROT_WRITE,
+    dsc->fbp = mmap(NULL, dsc->pinfo.fblen, PROT_READ | PROT_WRITE,
                     MAP_SHARED | MAP_FILE, dsc->fd, 0);
-    if(dsc->mem == MAP_FAILED) {
+    if(dsc->fbp == MAP_FAILED) {
         LV_LOG_ERROR("ioctl(FBIOGET_PLANEINFO) failed: %d", errno);
         ret = -errno;
         goto errout;
     }
 
-    uint32_t w = dsc->vinfo.xres;
     uint32_t h = dsc->vinfo.yres;
     uint32_t stride = dsc->pinfo.stride;
     uint32_t data_size = h * stride;
-    lv_draw_buf_init(&dsc->buf1, w, h, LV_COLOR_FORMAT_NATIVE, stride, dsc->mem, data_size);
+    uint8_t * buf1 = NULL;
+    uint8_t * buf2 = NULL;
+
+    buf1 = lv_malloc(data_size);
+    if(buf1 == NULL) {
+        LV_LOG_ERROR("display draw buffer malloc failed");
+        goto errout;
+    }
 
     /* double buffer mode */
 
     bool double_buffer = dsc->pinfo.yres_virtual == (dsc->vinfo.yres * 2);
     if(double_buffer) {
+        buf2 = lv_malloc(data_size);
+        if(buf2 == NULL) {
+            LV_LOG_ERROR("display draw buffer malloc failed");
+            goto errout;
+        }
         if((ret = fbdev_init_mem2(dsc)) < 0) {
             goto errout;
         }
-
-        lv_draw_buf_init(&dsc->buf2, w, h, LV_COLOR_FORMAT_NATIVE, stride, dsc->mem2, data_size);
     }
 
-    lv_display_set_draw_buffers(disp, &dsc->buf1, double_buffer ? &dsc->buf2 : NULL);
-    lv_display_set_render_mode(disp, LV_DISP_RENDER_MODE_DIRECT);
+    lv_display_set_buffers(disp, buf1, buf2, data_size, LV_DISP_RENDER_MODE_DIRECT);
     lv_display_set_resolution(disp, dsc->vinfo.xres, dsc->vinfo.yres);
     lv_timer_set_cb(disp->refr_timer, display_refr_timer_cb);
 
@@ -187,14 +194,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 {
     lv_nuttx_fb_t * dsc = lv_display_get_driver_data(disp);
 
-    /* Skip the non-last flush */
-
-    if(!lv_display_flush_is_last(disp)) {
-        lv_display_flush_ready(disp);
-        return;
-    }
-
-    if(dsc->mem == NULL ||
+    if(dsc->fbp == NULL ||
        area->x2 < 0 || area->y2 < 0 ||
        area->x1 > (int32_t)dsc->vinfo.xres - 1 || area->y1 > (int32_t)dsc->vinfo.yres - 1) {
         lv_display_flush_ready(disp);
@@ -207,14 +207,26 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
                   0 : dsc->mem2_yoffset;
 
     struct fb_area_s fb_area;
-    fb_area.x = area->x1;
-    fb_area.y = area->y1 + yoffset;
-    fb_area.w = lv_area_get_width(area);
-    fb_area.h = lv_area_get_height(area);
+    fb_area.x = final_inv_area.x1;
+    fb_area.y = final_inv_area.y1 + yoffset;
+    fb_area.w = lv_area_get_width(&final_inv_area);
+    fb_area.h = lv_area_get_height(&final_inv_area);
     if(ioctl(dsc->fd, FBIO_UPDATE, (unsigned long)((uintptr_t)&fb_area)) < 0) {
         LV_LOG_ERROR("ioctl(FBIO_UPDATE) failed: %d", errno);
     }
 #endif
+
+    int32_t w = lv_area_get_width(area);
+    uint32_t px_size = lv_color_format_get_size(lv_display_get_color_format(disp));
+    uint32_t color_pos = (area->x1 + dsc->pinfo.xoffset) * px_size + area->y1 * dsc->pinfo.stride;
+    uint32_t fb_pos = color_pos + dsc->pinfo.yoffset * dsc->pinfo.stride;
+    int32_t y;
+
+    for(y = area->y1; y <= area->y2; y++) {
+        lv_memcpy(&dsc->fbp[fb_pos], &color_p[color_pos], w * px_size);
+        fb_pos += dsc->pinfo.stride;
+        color_pos += dsc->pinfo.stride;
+    }
 
     /* double framebuffer */
 
