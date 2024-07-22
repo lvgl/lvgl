@@ -19,9 +19,7 @@
 #include "lv_vglite_buf.h"
 #include "lv_vglite_utils.h"
 
-#if LV_USE_PARALLEL_DRAW_DEBUG
-    #include "../../../core/lv_global.h"
-#endif
+#include "../../../core/lv_global.h"
 
 /*********************
  *      DEFINES
@@ -85,9 +83,7 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u);
  *  STATIC VARIABLES
  **********************/
 
-#if LV_USE_PARALLEL_DRAW_DEBUG
-    #define _draw_info LV_GLOBAL_DEFAULT()->draw_info
-#endif
+#define _draw_info LV_GLOBAL_DEFAULT()->draw_info
 
 #if LV_USE_VGLITE_DRAW_ASYNC
     /*
@@ -392,8 +388,8 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
     if(!lv_area_intersect(&draw_area, &draw_area, &clip_area))
         return; /*Fully clipped, nothing to do*/
 
-    /* Invalidate the drawing area */
-    lv_draw_buf_invalidate_cache(draw_buf, &draw_area);
+    if(_draw_info.unit_cnt > 1)
+        lv_draw_buf_invalidate_cache(draw_buf, &draw_area);
 
     /* Set scissor area, excluding the split blit case */
 #if LV_USE_VGLITE_BLIT_SPLIT
