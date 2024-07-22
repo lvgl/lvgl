@@ -90,7 +90,7 @@ void lv_vg_lite_dump_info(void)
 
     vg_lite_uint32_t mem_avail = 0;
     vg_lite_get_mem_size(&mem_avail);
-    LV_LOG_USER("Memory Avaliable: %" LV_PRId32 " Bytes", (uint32_t)mem_avail);
+    LV_LOG_USER("Memory Available: %" LV_PRId32 " Bytes", (uint32_t)mem_avail);
 }
 
 const char * lv_vg_lite_error_string(vg_lite_error_t error)
@@ -162,6 +162,7 @@ const char * lv_vg_lite_feature_string(vg_lite_feature_t feature)
             FEATURE_ENUM_TO_STRING(YUV_TILED_INPUT);
             FEATURE_ENUM_TO_STRING(AYUV_INPUT);
             FEATURE_ENUM_TO_STRING(16PIXELS_ALIGN);
+            FEATURE_ENUM_TO_STRING(DEC_COMPRESS_2_0);
         default:
             break;
     }
@@ -397,7 +398,7 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
             return VG_LITE_NV12;
 
         default:
-            LV_LOG_ERROR("unsupport color format: %d", cf);
+            LV_LOG_ERROR("unsupported color format: %d", cf);
             break;
     }
 
@@ -488,7 +489,7 @@ void lv_vg_lite_buffer_format_bytes(
             *mul = 3;
             break;
         default:
-            LV_LOG_ERROR("unsupport color format: 0x%" PRIx32, (uint32_t)format);
+            LV_LOG_ERROR("unsupported color format: 0x%" PRIx32, (uint32_t)format);
             LV_ASSERT(false);
             break;
     }
@@ -500,7 +501,7 @@ uint32_t lv_vg_lite_width_to_stride(uint32_t w, vg_lite_buffer_format_t color_fo
 
     uint32_t mul, div, align;
     lv_vg_lite_buffer_format_bytes(color_format, &mul, &div, &align);
-    return LV_VG_LITE_ALIGN((w * mul / div), align);
+    return LV_VG_LITE_ALIGN(((w * mul + div - 1) / div), align);
 }
 
 uint32_t lv_vg_lite_width_align(uint32_t w)
@@ -517,6 +518,7 @@ void lv_vg_lite_buffer_init(
     const void * ptr,
     int32_t width,
     int32_t height,
+    uint32_t stride,
     vg_lite_buffer_format_t format,
     bool tiled)
 {
@@ -539,8 +541,13 @@ void lv_vg_lite_buffer_init(
     buffer->transparency_mode = VG_LITE_IMAGE_OPAQUE;
     buffer->width = width;
     buffer->height = height;
-    lv_vg_lite_buffer_format_bytes(buffer->format, &mul, &div, &align);
-    buffer->stride = LV_VG_LITE_ALIGN((buffer->width * mul / div), align);
+    if(stride == LV_STRIDE_AUTO) {
+        lv_vg_lite_buffer_format_bytes(buffer->format, &mul, &div, &align);
+        buffer->stride = LV_VG_LITE_ALIGN((buffer->width * mul / div), align);
+    }
+    else {
+        buffer->stride = stride;
+    }
 
     if(format == VG_LITE_NV12) {
         lv_yuv_buf_t * frame_p = (lv_yuv_buf_t *)ptr;
@@ -567,6 +574,7 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
     const uint8_t * ptr = draw_buf->data;
     int32_t width = draw_buf->header.w;
     int32_t height = draw_buf->header.h;
+    uint32_t stride = draw_buf->header.stride;
     vg_lite_buffer_format_t format = lv_vg_lite_vg_fmt(draw_buf->header.cf);
 
     if(LV_COLOR_FORMAT_IS_INDEXED(draw_buf->header.cf)) {
@@ -578,7 +586,7 @@ void lv_vg_lite_buffer_from_draw_buf(vg_lite_buffer_t * buffer, const lv_draw_bu
 
     width = lv_vg_lite_width_align(width);
 
-    lv_vg_lite_buffer_init(buffer, ptr, width, height, format, false);
+    lv_vg_lite_buffer_init(buffer, ptr, width, height, stride, format, false);
 
     /* Alpha image need to be multiplied by color */
     if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(draw_buf->header.cf)) {
@@ -629,6 +637,7 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
     args.stride_align = true;
     args.use_indexed = true;
     args.no_cache = no_cache;
+    args.flush_cache = true;
 
     lv_result_t res = lv_image_decoder_open(decoder_dsc, src, &args);
     if(res != LV_RESULT_OK) {
@@ -704,7 +713,7 @@ uint32_t lv_vg_lite_get_palette_size(vg_lite_buffer_format_t format)
 
 vg_lite_color_t lv_vg_lite_color(lv_color_t color, lv_opa_t opa, bool pre_mul)
 {
-    if(pre_mul && opa < LV_OPA_MAX) {
+    if(pre_mul && opa < LV_OPA_COVER) {
         color.red = LV_UDIV255(color.red * opa);
         color.green = LV_UDIV255(color.green * opa);
         color.blue = LV_UDIV255(color.blue * opa);
@@ -955,11 +964,6 @@ void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_
     lv_memcpy(matrix, &temp, sizeof(temp));
 }
 
-void lv_vg_lite_matrix_flip_y(vg_lite_matrix_t * matrix)
-{
-    matrix->m[1][1] = -matrix->m[1][1];
-}
-
 bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix)
 {
     vg_lite_float_t det00, det01, det02;
@@ -1026,7 +1030,6 @@ lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * ma
 
 void lv_vg_lite_set_scissor_area(const lv_area_t * area)
 {
-    LV_VG_LITE_CHECK_ERROR(vg_lite_enable_scissor());
     LV_VG_LITE_CHECK_ERROR(vg_lite_set_scissor(
                                area->x1,
                                area->y1,
@@ -1036,7 +1039,12 @@ void lv_vg_lite_set_scissor_area(const lv_area_t * area)
 
 void lv_vg_lite_disable_scissor(void)
 {
-    LV_VG_LITE_CHECK_ERROR(vg_lite_disable_scissor());
+    /* Restore full screen scissor */
+    LV_VG_LITE_CHECK_ERROR(vg_lite_set_scissor(
+                               0,
+                               0,
+                               LV_HOR_RES,
+                               LV_VER_RES));
 }
 
 void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
@@ -1075,10 +1083,8 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
 
     /* Clear all gradient caches reference */
-    lv_vg_lite_pending_remove_all(u->linear_grad_pending);
-
-    if(u->radial_grad_pending) {
-        lv_vg_lite_pending_remove_all(u->radial_grad_pending);
+    if(u->grad_pending) {
+        lv_vg_lite_pending_remove_all(u->grad_pending);
     }
 
     /* Clear image decoder dsc reference */

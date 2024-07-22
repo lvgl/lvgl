@@ -264,4 +264,52 @@ void test_table_should_reduce_cells_with_more_than_one_row(void)
     }
 }
 
+void test_table_should_set_selected_cell(void)
+{
+    lv_table_set_row_count(table, 2);
+    lv_table_set_column_count(table, 2);
+
+    lv_table_set_selected_cell(table, 1, 1);
+
+    uint32_t selected_row = 0;
+    uint32_t selected_column = 0;
+
+    lv_table_get_selected_cell(table, &selected_row, &selected_column);
+
+    TEST_ASSERT_EQUAL_UINT32(1, selected_row);
+    TEST_ASSERT_EQUAL_UINT32(1, selected_column);
+}
+
+void test_table_cell_select_should_not_exceed_table_bounds(void)
+{
+    lv_table_set_row_count(table, 2);
+    lv_table_set_column_count(table, 2);
+
+    lv_table_set_selected_cell(table, 2, 2);
+
+    uint32_t selected_row = 0;
+    uint32_t selected_column = 0;
+
+    lv_table_get_selected_cell(table, &selected_row, &selected_column);
+
+    TEST_ASSERT_EQUAL_UINT32(1, selected_row);
+    TEST_ASSERT_EQUAL_UINT32(1, selected_column);
+}
+
+void test_table_cell_select_should_not_allow_set_on_table_with_no_rows(void)
+{
+    lv_table_set_row_count(table, 0);
+    lv_table_set_column_count(table, 5);
+
+    lv_table_set_selected_cell(table, 4, 4);
+
+    uint32_t selected_row = 0;
+    uint32_t selected_column = 0;
+
+    lv_table_get_selected_cell(table, &selected_row, &selected_column);
+
+    TEST_ASSERT_EQUAL_UINT32(0, selected_row);
+    TEST_ASSERT_EQUAL_UINT32(0, selected_column);
+}
+
 #endif

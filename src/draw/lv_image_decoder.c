@@ -19,6 +19,7 @@
 #define img_decoder_ll_p &(LV_GLOBAL_DEFAULT()->img_decoder_ll)
 #define img_cache_p (LV_GLOBAL_DEFAULT()->img_cache)
 #define img_header_cache_p (LV_GLOBAL_DEFAULT()->img_header_cache)
+#define image_cache_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers)
 
 /**********************
  *      TYPEDEFS
@@ -112,6 +113,7 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
         .premultiply = false,
         .no_cache = false,
         .use_indexed = false,
+        .flush_cache = false,
     };
 
     /*
@@ -120,6 +122,18 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
      * If decoder open succeed, add the image to cache if enabled.
      * */
     lv_result_t res = dsc->decoder->open_cb(dsc->decoder, dsc);
+
+    /* Flush the D-Cache if enabled and the image was successfully opened */
+    if(dsc->args.flush_cache && res == LV_RESULT_OK && dsc->decoded != NULL) {
+        lv_draw_buf_flush_cache(dsc->decoded, NULL);
+        LV_LOG_INFO("Flushed D-cache: src %p (%s) (W%d x H%d, data: %p cf: %d)",
+                    src,
+                    dsc->src_type == LV_IMAGE_SRC_FILE ? (const char *)src : "c-array",
+                    dsc->decoded->header.w,
+                    dsc->decoded->header.h,
+                    (void *)dsc->decoded->data,
+                    dsc->decoded->header.cf);
+    }
 
     return res;
 }
@@ -137,6 +151,11 @@ void lv_image_decoder_close(lv_image_decoder_dsc_t * dsc)
 {
     if(dsc->decoder) {
         if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
+
+        if(lv_image_cache_is_enabled() && dsc->cache && dsc->cache_entry) {
+            /*Decoded data is in cache, release it from cache's callback*/
+            lv_cache_release(dsc->cache, dsc->cache_entry, NULL);
+        }
     }
 }
 
@@ -224,7 +243,8 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
             LV_LOG_TRACE("Stride mismatch");
             lv_result_t res = lv_draw_buf_adjust_stride(decoded, stride_expect);
             if(res != LV_RESULT_OK) {
-                lv_draw_buf_t * aligned = lv_draw_buf_create(decoded->header.w, decoded->header.h, decoded->header.cf, stride_expect);
+                lv_draw_buf_t * aligned = lv_draw_buf_create_user(image_cache_draw_buf_handlers, decoded->header.w, decoded->header.h,
+                                                                  decoded->header.cf, stride_expect);
                 if(aligned == NULL) {
                     LV_LOG_ERROR("No memory for Stride adjust.");
                     return NULL;
@@ -248,9 +268,9 @@ lv_draw_buf_t * lv_image_decoder_post_process(lv_image_decoder_dsc_t * dsc, lv_d
             lv_draw_buf_premultiply(decoded);
         }
         else {
-            decoded = lv_draw_buf_dup(decoded);
+            decoded = lv_draw_buf_dup_user(image_cache_draw_buf_handlers, decoded);
             if(decoded == NULL) {
-                LV_LOG_ERROR("No memory for premulitplying.");
+                LV_LOG_ERROR("No memory for premultiplying.");
                 return NULL;
             }
 
@@ -277,8 +297,8 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
         if(img_dsc->data == NULL) return NULL;
     }
 
-    if(src_type == LV_IMAGE_SRC_FILE) LV_LOG_INFO("Try to find decoder for %s", (const char *)src);
-    else LV_LOG_INFO("Try to find decoder for %p", src);
+    if(src_type == LV_IMAGE_SRC_FILE) LV_LOG_TRACE("Try to find decoder for %s", (const char *)src);
+    else LV_LOG_TRACE("Try to find decoder for %p", src);
 
     lv_image_decoder_t * decoder;
     bool is_header_cache_enabled = lv_image_header_cache_is_enabled();
@@ -296,7 +316,7 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
             decoder = cached_data->decoder;
             lv_cache_release(img_header_cache_p, entry, NULL);
 
-            LV_LOG_INFO("Found decoder %s in header cache", decoder->name);
+            LV_LOG_TRACE("Found decoder %s in header cache", decoder->name);
             return decoder;
         }
     }
@@ -308,7 +328,7 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
         if(decoder->info_cb && decoder->open_cb) {
             lv_result_t res = decoder->info_cb(decoder, src, header);
 
-            if(decoder_prev) LV_LOG_INFO("Can't open image with decoder %s. Trying next decoder.", decoder_prev->name);
+            if(decoder_prev) LV_LOG_TRACE("Can't open image with decoder %s. Trying next decoder.", decoder_prev->name);
 
             if(res == LV_RESULT_OK) {
                 if(header->stride == 0) {
@@ -322,8 +342,8 @@ static lv_image_decoder_t * image_decoder_get_info(const void * src, lv_image_he
         }
     }
 
-    if(decoder == NULL) LV_LOG_INFO("No decoder found");
-    else LV_LOG_INFO("Found decoder %s", decoder->name);
+    if(decoder == NULL) LV_LOG_TRACE("No decoder found");
+    else LV_LOG_TRACE("Found decoder %s", decoder->name);
 
     if(is_header_cache_enabled && src_type == LV_IMAGE_SRC_FILE && decoder) {
         lv_cache_entry_t * entry;

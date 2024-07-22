@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - 2023 the ThorVG project. All rights reserved.
+ * Copyright (c) 2020 - 2024 the ThorVG project. All rights reserved.
 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -260,15 +260,15 @@ static uint32_t _interpUpScaler(const uint32_t *img, TVG_UNUSED uint32_t stride,
     auto ry2 = ry + 1;
     if (ry2 >= h) ry2 = h - 1;
 
-    auto dx = static_cast<size_t>((sx - rx) * 255.0f);
-    auto dy = static_cast<size_t>((sy - ry) * 255.0f);
+    auto dx = (sx > 0.0f) ? static_cast<uint8_t>((sx - rx) * 255.0f) : 0;
+    auto dy = (sy > 0.0f) ? static_cast<uint8_t>((sy - ry) * 255.0f) : 0;
 
     auto c1 = img[rx + ry * w];
     auto c2 = img[rx2 + ry * w];
-    auto c3 = img[rx2 + ry2 * w];
-    auto c4 = img[rx + ry2 * w];
+    auto c3 = img[rx + ry2 * w];
+    auto c4 = img[rx2 + ry2 * w];
 
-    return INTERPOLATE(INTERPOLATE(c3, c4, dx), INTERPOLATE(c2, c1, dx), dy);
+    return INTERPOLATE(INTERPOLATE(c4, c3, dx), INTERPOLATE(c2, c1, dx), dy);
 }
 
 
@@ -284,20 +284,22 @@ static uint32_t _interpDownScaler(const uint32_t *img, uint32_t stride, uint32_t
     int32_t maxx = (int32_t)sx + n;
     if (maxx >= (int32_t)w) maxx = w;
 
+    int32_t inc = (n / 2) + 1;
+    n = 0;
+
     auto src = img + minx + miny * stride;
 
-    for (auto y = miny; y < maxy; ++y) {
+    for (auto y = miny; y < maxy; y += inc) {
         auto p = src;
-        for (auto x = minx; x < maxx; ++x, ++p) {
-            c[0] += *p >> 24;
-            c[1] += (*p >> 16) & 0xff;
-            c[2] += (*p >> 8) & 0xff;
-            c[3] += *p & 0xff;
+        for (auto x = minx; x < maxx; x += inc, p += inc) {
+            c[0] += A(*p);
+            c[1] += C1(*p);
+            c[2] += C2(*p);
+            c[3] += C3(*p);
+            ++n;
         }
-        src += stride;
+        src += (stride * inc);
     }
-
-    n = (maxy - miny) * (maxx - minx);
 
     c[0] /= n;
     c[1] /= n;
@@ -375,7 +377,7 @@ static bool _rasterMattedRect(SwSurface* surface, const SwBBox& region, uint8_t 
     auto alpha = surface->alpha(surface->compositor->method);
 
     TVGLOG("SW_ENGINE", "Matted(%d) Rect [Region: %lu %lu %u %u]", (int)surface->compositor->method, region.min.x, region.min.y, w, h);
-
+    
     //32bits channels
     if (surface->channelSize == sizeof(uint32_t)) {
         auto color = surface->join(r, g, b, a);
@@ -672,10 +674,10 @@ static bool _rasterRle(SwSurface* surface, SwRleData* rle, uint8_t r, uint8_t g,
 /************************************************************************/
 
 #define SCALED_IMAGE_RANGE_Y(y) \
-    auto sy = (y) * itransform->e22 + itransform->e23; \
-    auto my = (int32_t)round(sy); \
-    if (my < 0 || (uint32_t)sy >= image->h) continue; \
+    auto sy = (y) * itransform->e22 + itransform->e23 - 0.49f; \
+    if (sy <= -0.5f || (uint32_t)(sy + 0.5f) >= image->h) continue; \
     if (scaleMethod == _interpDownScaler) { \
+        auto my = (int32_t)round(sy); \
         miny = my - (int32_t)sampleSize; \
         if (miny < 0) miny = 0; \
         maxy = my + (int32_t)sampleSize; \
@@ -683,8 +685,8 @@ static bool _rasterRle(SwSurface* surface, SwRleData* rle, uint8_t r, uint8_t g,
     }
 
 #define SCALED_IMAGE_RANGE_X \
-    auto sx = x * itransform->e11 + itransform->e13; \
-    if ((int32_t)round(sx) < 0 || (uint32_t) sx >= image->w) continue;
+    auto sx = (x) * itransform->e11 + itransform->e13 - 0.49f; \
+    if (sx <= -0.5f || (uint32_t)(sx + 0.5f) >= image->w) continue; \
 
 
 #if 0 //Enable it when GRAYSCALE image is supported
@@ -717,7 +719,7 @@ static bool _rasterDirectScaledMaskedRleImage(SwSurface* surface, const SwImage*
     auto span = image->rle->spans;
     int32_t miny = 0, maxy = 0;
 
-    for (uint32_t i = 0; i < image->rle->size; ++i, ++span) {
+    for (uint32_t i = 0; i < image->rle->size; ++i, ++span) {        
         SCALED_IMAGE_RANGE_Y(span->y)
         auto cmp = &surface->compositor->image.buf8[span->y * surface->compositor->image.stride + span->x];
         auto dst = &surface->buf8[span->y * surface->stride + span->x];
@@ -866,11 +868,11 @@ static bool _rasterCompositeDirectMaskedRleImage(SwSurface* surface, const SwIma
 {
     auto span = image->rle->spans;
     auto cbuffer = surface->compositor->image.buf8;
-    auto ctride = surface->compositor->image.stride;
+    auto cstride = surface->compositor->image.stride;
 
     for (uint32_t i = 0; i < image->rle->size; ++i, ++span) {
         auto src = image->buf8 + (span->y + image->oy) * image->stride + (span->x + image->ox);
-        auto cmp = &cbuffer[span->y * ctride + span->x];
+        auto cmp = &cbuffer[span->y * cstride + span->x];
         auto alpha = MULTIPLY(span->coverage, opacity);
         if (alpha == 255) {
             for (uint32_t x = 0; x < span->len; ++x, ++src, ++cmp) {
@@ -891,11 +893,11 @@ static bool _rasterDirectDirectMaskedRleImage(SwSurface* surface, const SwImage*
 {
     auto span = image->rle->spans;
     auto cbuffer = surface->compositor->image.buf8;
-    auto ctride = surface->compositor->image.stride;
+    auto cstride = surface->compositor->image.stride;
 
     for (uint32_t i = 0; i < image->rle->size; ++i, ++span) {
         auto src = image->buf8 + (span->y + image->oy) * image->stride + (span->x + image->ox);
-        auto cmp = &cbuffer[span->y * ctride + span->x];
+        auto cmp = &cbuffer[span->y * cstride + span->x];
         auto dst = &surface->buf8[span->y * surface->stride + span->x];
         auto alpha = MULTIPLY(span->coverage, opacity);
         if (alpha == 255) {
@@ -1554,7 +1556,7 @@ static bool _rasterSolidGradientRect(SwSurface* surface, const SwBBox& region, c
 
 static bool _rasterLinearGradientRect(SwSurface* surface, const SwBBox& region, const SwFill* fill)
 {
-    if (fill->linear.len < FLT_EPSILON) return false;
+    if (fill->linear.len < FLOAT_EPSILON) return false;
 
     if (_compositing(surface)) {
         if (_matting(surface)) return _rasterGradientMattedRect<FillLinear>(surface, region, fill);
@@ -1717,7 +1719,7 @@ static bool _rasterSolidGradientRle(SwSurface* surface, const SwRleData* rle, co
 
 static bool _rasterLinearGradientRle(SwSurface* surface, const SwRleData* rle, const SwFill* fill)
 {
-    if (!rle || fill->linear.len < FLT_EPSILON) return false;
+    if (!rle) return false;
 
     if (_compositing(surface)) {
         if (_matting(surface)) return _rasterGradientMattedRle<FillLinear>(surface, rle, fill);
@@ -1756,8 +1758,13 @@ static bool _rasterRadialGradientRle(SwSurface* surface, const SwRleData* rle, c
 
 void rasterGrayscale8(uint8_t *dst, uint8_t val, uint32_t offset, int32_t len)
 {
-    //OPTIMIZE_ME: Support SIMD
+#if defined(THORVG_AVX_VECTOR_SUPPORT)
+    avxRasterGrayscale8(dst, val, offset, len);
+#elif defined(THORVG_NEON_VECTOR_SUPPORT)
+    neonRasterGrayscale8(dst, val, offset, len);
+#else
     cRasterPixels(dst, val, offset, len);
+#endif
 }
 
 
@@ -1858,7 +1865,9 @@ void rasterUnpremultiply(Surface* surface)
 
 void rasterPremultiply(Surface* surface)
 {
-    if (surface->channelSize != sizeof(uint32_t)) return;
+    ScopedLock lock(surface->key);
+    if (surface->premultiplied || (surface->channelSize != sizeof(uint32_t))) return;
+    surface->premultiplied = true;
 
     TVGLOG("SW_ENGINE", "Premultiply [Size: %d x %d]", surface->w, surface->h);
 
@@ -1872,7 +1881,6 @@ void rasterPremultiply(Surface* surface)
             *dst = (c & 0xff000000) + ((((c >> 8) & 0xff) * a) & 0xff00) + ((((c & 0x00ff00ff) * a) >> 8) & 0x00ff00ff);
         }
     }
-    surface->premultiplied = true;
 }
 
 
@@ -1928,8 +1936,8 @@ bool rasterStroke(SwSurface* surface, SwShape* shape, uint8_t r, uint8_t g, uint
 
 bool rasterImage(SwSurface* surface, SwImage* image, const RenderMesh* mesh, const Matrix* transform, const SwBBox& bbox, uint8_t opacity)
 {
-    //Verify Boundary
-    if (bbox.max.x < 0 || bbox.max.y < 0 || bbox.min.x >= static_cast<SwCoord>(surface->w) || bbox.min.y >= static_cast<SwCoord>(surface->h)) return false;
+    //Outside of the viewport, skip the rendering
+    if (bbox.max.x < 0 || bbox.max.y < 0 || bbox.min.x >= static_cast<SwCoord>(surface->w) || bbox.min.y >= static_cast<SwCoord>(surface->h)) return true;
 
     if (mesh && mesh->triangleCnt > 0) return _rasterTexmapPolygonMesh(surface, image, mesh, transform, &bbox, opacity);
     else return _rasterImage(surface, image, transform, bbox, opacity);
@@ -1938,7 +1946,10 @@ bool rasterImage(SwSurface* surface, SwImage* image, const RenderMesh* mesh, con
 
 bool rasterConvertCS(Surface* surface, ColorSpace to)
 {
-    //TOOD: Support SIMD accelerations
+    ScopedLock lock(surface->key);
+    if (surface->cs == to) return true;
+
+    //TODO: Support SIMD accelerations
     auto from = surface->cs;
 
     if (((from == ColorSpace::ABGR8888) || (from == ColorSpace::ABGR8888S)) && ((to == ColorSpace::ARGB8888) || (to == ColorSpace::ARGB8888S))) {
@@ -1949,7 +1960,6 @@ bool rasterConvertCS(Surface* surface, ColorSpace to)
         surface->cs = to;
         return cRasterARGBtoABGR(surface);
     }
-
     return false;
 }
 

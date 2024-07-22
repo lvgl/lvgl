@@ -1,5 +1,5 @@
 """
-The test script will only run the one test on microptyhon. It is not a
+The test script will only run the one test on micropython. It is not a
 framework that can be used for other tests. This has a reduced code footprint.
 entrypoint API is almost the same as the framework.
 
@@ -16,7 +16,7 @@ python3 -m pip install pillow
 Example command line to run the test. I suggest doing this from the root of the
 binding directory. It is just a simple location to do it from.
 
-Paths that are passed in MUST be relitive to the current working directory.
+Paths that are passed in MUST be relative to the current working directory.
 python3 lib/lv_bindings/lvgl/tests/micropy_test/__init__.py --artifact-path=lib/lv_bindings/lvgl/tests/micropy_test/artifacts --mpy-path=ports/unix/build-standard/micropython
 
 """
@@ -35,6 +35,15 @@ from PIL import Image as Image
 DEBUG = 0
 
 debug_log = None
+
+saved_test_data = []
+
+
+def format_error_data(data):
+    output = ''
+    for line in data.split('\n'):
+        output += f'\033[31;1m{line}\033[0m\n'
+    return output
 
 
 def log(*args):
@@ -109,23 +118,34 @@ class MicroPython_Test(unittest.TestCase):
                 logged = True
                 log('--->', micropy_data)
 
-            if micropy_data.endswith(b'\nERROR END\n'):
+            if b'\nERROR END\n' in micropy_data:
                 error_data = micropy_data.split(b'\nERROR START\n')[-1].split(b'\nERROR END\n')[0]
                 micropy_data = b''
-                log('---> ERROR: ', error_data)
+                try:
+                    log('---> ERROR: ', error_data.decode('utf-8'))
+                except UnicodeDecodeError:
+                    log('---> ERROR: ', error_data)
+
                 logged = True
                 break
 
         if not logged:
             log('--->', micropy_data)
 
+        if b'\nERROR END\n' in micropy_data:
+            error_data = micropy_data.split(b'\nERROR START\n')[-1].split(b'\nERROR END\n')[0]
+            micropy_data = b''
+            try:
+                log('---> ERROR: ', error_data.decode('utf-8'))
+            except UnicodeDecodeError:
+                log('---> ERROR: ', error_data)
+
         if cls.exit_event.is_set():
             log('--EXIT EVENT SET')
 
-        if micropy_data:
-            return micropy_data.replace(marker, b''), error_data
+        saved_test_data.append((micropy_data, error_data))
 
-        return micropy_data, error_data
+        return micropy_data.replace(marker, b''), error_data
 
     @classmethod
     def setUpClass(cls):
@@ -311,6 +331,21 @@ class MicroPython_Test(unittest.TestCase):
                     item for sublist in byte_data
                     for item in sublist
                 ])))
+
+        except binascii.Error:
+            error = []
+            for line, err in saved_test_data:
+                if err:
+                    try:
+                        error.append(err.decode('utf-8'))
+                    except UnicodeDecodeError:
+                        error.append(str(err))
+
+            error = '\n'.join(error)
+            if error:
+                self.fail(format_error_data(error))
+            else:
+                self.fail(b'\n'.join(test_data.result))
 
         except:  # NOQA
             import traceback

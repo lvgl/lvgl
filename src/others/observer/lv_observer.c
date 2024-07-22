@@ -116,8 +116,8 @@ int32_t lv_subject_get_previous_int(lv_subject_t * subject)
 void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value)
 {
     lv_memzero(subject, sizeof(lv_subject_t));
-    lv_strncpy(buf, value, size);
-    if(prev_buf) lv_strncpy(prev_buf, value, size);
+    lv_strlcpy(buf, value, size);
+    if(prev_buf) lv_strlcpy(prev_buf, value, size);
 
     subject->type = LV_SUBJECT_TYPE_STRING;
     subject->size = size;
@@ -136,10 +136,10 @@ void lv_subject_copy_string(lv_subject_t * subject, const char * buf)
 
     if(subject->size < 1) return;
     if(subject->prev_value.pointer) {
-        lv_strncpy((char *)subject->prev_value.pointer, subject->value.pointer, subject->size - 1);
+        lv_strlcpy((char *)subject->prev_value.pointer, subject->value.pointer, subject->size);
     }
 
-    lv_strncpy((char *)subject->value.pointer, buf, subject->size - 1);
+    lv_strlcpy((char *)subject->value.pointer, buf, subject->size);
 
     lv_subject_notify(subject);
 
@@ -262,6 +262,24 @@ void lv_subject_init_group(lv_subject_t * subject, lv_subject_t * list[], uint32
     }
 }
 
+void lv_subject_deinit(lv_subject_t * subject)
+{
+    lv_observer_t * observer = _lv_ll_get_head(&subject->subs_ll);
+    while(observer) {
+        lv_observer_t * observer_next = _lv_ll_get_next(&subject->subs_ll, observer);
+
+        if(observer->for_obj) {
+            lv_obj_remove_event_cb(observer->target, unsubscribe_on_delete_cb);
+            lv_obj_remove_event_cb_with_user_data(observer->target, NULL, subject);
+        }
+
+        lv_observer_remove(observer);
+        observer = observer_next;
+    }
+
+    _lv_ll_clear(&subject->subs_ll);
+}
+
 lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t index)
 {
     if(subject->type != LV_SUBJECT_TYPE_GROUP) {
@@ -277,6 +295,9 @@ lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t inde
 lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t cb, void * user_data)
 {
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, cb, NULL, user_data);
+    if(observer == NULL) return NULL;
+
+    observer->for_obj = 0;
     return observer;
 }
 
@@ -298,6 +319,7 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
     observer->cb = cb;
     observer->user_data = user_data;
     observer->target = obj;
+    observer->for_obj = 1;
     /* subscribe to delete event of the object */
     if(obj != NULL) {
         lv_obj_add_event_cb(obj, unsubscribe_on_delete_cb, LV_EVENT_DELETE, observer);
@@ -334,6 +356,7 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
     return observer;
 }
 
+
 void lv_observer_remove(lv_observer_t * observer)
 {
     LV_ASSERT_NULL(observer);
@@ -348,36 +371,19 @@ void lv_observer_remove(lv_observer_t * observer)
     lv_free(observer);
 }
 
-void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj)
+void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
 {
-    LV_ASSERT_NULL(subject);
-    if(subject->type == LV_SUBJECT_TYPE_INVALID) {
-        LV_LOG_WARN("Subject not initialized yet");
-        return;
-    }
-
-    while(lv_obj_remove_event_cb(obj, unsubscribe_on_delete_cb));
-    while(lv_obj_remove_event_cb(obj, obj_value_changed_event_cb));
-
-#if LV_USE_ARC
-    while(lv_obj_remove_event_cb(obj, arc_value_changed_event_cb));
-#endif /*LV_USE_ARC*/
-
-#if LV_USE_ROLLER
-    while(lv_obj_remove_event_cb(obj, roller_value_changed_event_cb));
-#endif /*LV_USE_ROLLER*/
-
-#if LV_USE_DROPDOWN
-    while(lv_obj_remove_event_cb(obj, dropdown_value_changed_event_cb));
-#endif /*LV_USE_DROPDOWN*/
-
-    lv_observer_t * observer = _lv_ll_get_head(&subject->subs_ll);
-    while(observer) {
-        lv_observer_t * observer_next = _lv_ll_get_next(&subject->subs_ll, observer);
-        if(observer->target == obj) {
-            lv_observer_remove(observer);
+    int32_t i;
+    int32_t event_cnt = (int32_t)(obj->spec_attr ? lv_array_size(&obj->spec_attr->event_list) : 0);
+    for(i = event_cnt - 1; i >= 0; i--) {
+        lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, i);
+        if(event_dsc->cb == unsubscribe_on_delete_cb) {
+            lv_observer_t * observer = event_dsc->user_data;
+            if(subject == NULL || subject == observer->subject) {
+                lv_observer_remove(observer);
+                lv_obj_remove_event(obj, i);
+            }
         }
-        observer = observer_next;
     }
 }
 

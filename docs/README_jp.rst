@@ -1,7 +1,7 @@
 .. raw:: html
 
    <p align="left">
-     <a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/assets/images/sponsor.png" height="32px"></a>
+     <a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/github-assets//sponsor.png" height="32px"></a>
    </p>
 
    <p align="right">
@@ -12,19 +12,13 @@
 
    </p>
 
- 
-
 .. raw:: html
 
    <p align="center">
 
- 
-
 .. raw:: html
 
    </p>
-
- 
 
 .. raw:: html
 
@@ -35,11 +29,6 @@ Light and Versatile Graphics Library
 .. raw:: html
 
    </h1>
-
- 
-
-
-      
 
 .. raw:: html
 
@@ -54,7 +43,7 @@ Website \| Docs \| Forum :gb: \| Demos \| Services \| SquareLine Studio
 
 :ledger:
 Overview
------------------
+--------
 
 **実績**\  LVGL
 は、フリー＆オープンソースの組み込み用グラフィックスライブラリです。
@@ -63,7 +52,7 @@ Interface)を実現できます。 ARM, STM32, NXP, Espressif, Nuvoton, Arduino,
 RT-Thread, Zephyr, NuttX,
 Adafruitなど、業界をリードするベンダーやプロジェクトによりサポートされています。
 
-**機能豊富**\ 
+**機能豊富**\
 モダンで美しいGUIを作成するための機能をすべて備えています。
 30以上の組み込みウィジェット、強力なスタイルシステム、WEB由来のレイアウトマネージャ、多くの言語をサポートする文字グラフィックシステムなどです。
 LVGL のシステム要件は、RAM 32KB、Flash
@@ -71,7 +60,7 @@ LVGL のシステム要件は、RAM 32KB、Flash
 
 **UIエディタ**\  SquareLine Studio
 は、LVGL用のプロフェッショナル＆リーズナブルなドラッグ＆ドロップ型のUIエディターです。
-Windows、Linux、MacOS
+Windows、Linux、macOS
 で動作し、ウェブサイトへの登録なしで試すことができます。
 
 **サービス**\  LVGL LLC
@@ -114,7 +103,7 @@ Guide <https://docs-lvgl-io.translate.goog/master/porting/project.html?_x_tr_sl=
 `マルチディスプレイ <https://docs-lvgl-io.translate.goog/master/overview/display.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 対応。
 
-**Binding と Build をサポート** - `Micropython
+**Binding と Build をサポート** - `MicroPython
 Binding <https://blog-lvgl-io.translate.goog/2019-02-20/micropython-bindings?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 が LVGL API を公開。 -
 カスタムビルドシステムは使用せず、プロジェクトの他のファイルをビルドするときに、LVGLをビルド可能。

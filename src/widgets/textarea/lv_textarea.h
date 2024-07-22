@@ -181,7 +181,7 @@ void lv_textarea_set_accepted_chars(lv_obj_t * obj, const char * list);
 void lv_textarea_set_max_length(lv_obj_t * obj, uint32_t num);
 
 /**
- * In `LV_EVENT_INSERT` the text which planned to be inserted can be replaced by an other text.
+ * In `LV_EVENT_INSERT` the text which planned to be inserted can be replaced by another text.
  * It can be used to add automatic formatting to the text area.
  * @param obj       pointer to a text area object
  * @param txt       pointer to a new string to insert. If `""` no text will be added.

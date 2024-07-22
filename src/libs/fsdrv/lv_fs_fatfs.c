@@ -16,6 +16,10 @@
  *      DEFINES
  *********************/
 
+#ifdef ESP_PLATFORM
+    #define DIR FF_DIR  /* ESP IDF typedefs `DIR` as `FF_DIR` in its version of ff.h. Use `FF_DIR` in LVGL too */
+#endif
+
 #if LV_FS_FATFS_LETTER == '\0'
     #error "LV_FS_FATFS_LETTER must be an upper case ASCII letter"
 #endif
@@ -248,6 +252,8 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint32_t fn_len)
 {
     LV_UNUSED(drv);
+    if(fn_len == 0) return LV_FS_RES_INV_PARAM;
+
     FRESULT res;
     FILINFO fno;
     fn[0] = '\0';
@@ -261,7 +267,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint3
         if(fno.fattrib & AM_DIR) {
             lv_snprintf(fn, fn_len, "/%s", fno.fname);
         }
-        else lv_strncpy(fn, fno.fname, fn_len);
+        else lv_strlcpy(fn, fno.fname, fn_len);
 
     } while(lv_strcmp(fn, "/.") == 0 || lv_strcmp(fn, "/..") == 0);
 
@@ -288,4 +294,4 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
     #warning "LV_USE_FS_FATFS is not enabled but LV_FS_FATFS_LETTER is set"
 #endif
 
-#endif /*LV_USE_FS_POSIX*/
+#endif /*LV_USE_FS_FATFS*/

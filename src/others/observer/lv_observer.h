@@ -77,6 +77,7 @@ struct _lv_observer_t {
     void * user_data;                   /**< Additional parameter supplied when subscribing*/
     uint32_t auto_free_user_data : 1;   /**< Automatically free user data when the observer is removed */
     uint32_t notified : 1;              /**< Mark if this observer was already notified*/
+    uint32_t for_obj : 1;               /**< `target` is an `lv_obj_t *`*/
 };
 
 /**********************
@@ -210,6 +211,14 @@ lv_color_t lv_subject_get_previous_color(lv_subject_t * subject);
 void lv_subject_init_group(lv_subject_t * subject, lv_subject_t * list[], uint32_t list_len);
 
 /**
+ * Remove all the observers from a subject and free all allocated memories in it
+ * @param subject   pointer to the subject
+ * @note            objects added with `lv_subject_add_observer_obj` should be already deleted or
+ *                  removed manually.
+ */
+void lv_subject_deinit(lv_subject_t * subject);
+
+/**
  * Get an element from the subject group's list
  * @param subject   pointer to the subject
  * @param index     index of the element to get
@@ -256,11 +265,12 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
 void lv_observer_remove(lv_observer_t * observer);
 
 /**
- * Remove all observers from their subject related to an object
- * @param observer      pointer to an observer
- * @param obj           pointer to an object
+ * Remove the observers of an object from a subject or all subjects
+ * @param obj       the object whose observers should be removed
+ * @param subject   the subject to remove the object from, or `NULL` to remove from all subjects
+ * @note This function can be used e.g. when an object's subject(s) needs to be replaced by other subject(s)
  */
-void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj);
+void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject);
 
 /**
  * Get the target of an observer

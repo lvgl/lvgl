@@ -30,6 +30,7 @@ const lv_image_dsc_t test_image_caret_down = {
     .header.stride = 52,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = test_image_caret_down_map,
+    .data_size = sizeof(test_image_caret_down_map)
 };
 
 #endif /* LV_BUILD_TEST */

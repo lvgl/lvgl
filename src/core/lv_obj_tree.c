@@ -33,7 +33,7 @@
 static void lv_obj_delete_async_cb(void * obj);
 static void obj_delete_core(lv_obj_t * obj);
 static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb, void * user_data);
-static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, int32_t depth);
+static void dump_tree_core(lv_obj_t * obj, int32_t depth);
 static lv_obj_t * lv_obj_get_first_not_deleting_child(lv_obj_t * obj);
 
 /**********************
@@ -154,6 +154,10 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
         return;
     }
 
+    if(parent == obj->parent) {
+        return;
+    }
+
     lv_obj_invalidate(obj);
 
     lv_obj_allocate_spec_attr(parent);
@@ -208,7 +212,7 @@ void lv_obj_move_to_index(lv_obj_t * obj, int32_t index)
     }
 
     const uint32_t parent_child_count = lv_obj_get_child_count(parent);
-    /* old_index only can be 0 or greater, this point can not be reached if the parent is not null */
+    /* old_index only can be 0 or greater, this point cannot be reached if the parent is not null */
     const int32_t old_index = lv_obj_get_index(obj);
     LV_ASSERT(0 <= old_index);
 
@@ -388,7 +392,7 @@ lv_obj_t * lv_obj_get_sibling_by_type(const lv_obj_t * obj, int32_t idx, const l
     int32_t sibling_idx = (int32_t)lv_obj_get_index_by_type(obj, class_p) + idx;
     if(sibling_idx < 0) return NULL;
 
-    return lv_obj_get_child(parent, sibling_idx);
+    return lv_obj_get_child_by_type(parent, sibling_idx, class_p);
 }
 
 uint32_t lv_obj_get_child_count(const lv_obj_t * obj)
@@ -533,6 +537,9 @@ static void obj_delete_core(lv_obj_t * obj)
             if(indev->pointer.last_pressed == obj) {
                 indev->pointer.last_pressed = NULL;
             }
+            if(indev->pointer.last_hovered == obj) {
+                indev->pointer.last_hovered = NULL;
+            }
         }
 
         if(indev->group == group && obj == lv_indev_get_active_obj()) {
@@ -612,10 +619,8 @@ static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb
     return LV_OBJ_TREE_WALK_NEXT;
 }
 
-static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, int32_t depth)
+static void dump_tree_core(lv_obj_t * obj, int32_t depth)
 {
-    lv_obj_tree_walk_res_t res;
-
 #if LV_USE_LOG
     const char * id;
 
@@ -633,14 +638,8 @@ static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, int32_t depth)
 
     if(obj && obj->spec_attr && obj->spec_attr->child_cnt) {
         for(uint32_t i = 0; i < obj->spec_attr->child_cnt; i++) {
-            res = dump_tree_core(lv_obj_get_child(obj, i), depth + 1);
-            if(res == LV_OBJ_TREE_WALK_END)
-                break;
+            dump_tree_core(lv_obj_get_child(obj, i), depth + 1);
         }
-        return LV_OBJ_TREE_WALK_NEXT;
-    }
-    else {
-        return LV_OBJ_TREE_WALK_END;
     }
 }
 

@@ -1,7 +1,7 @@
 .. raw:: html
 
    <p align="left">
-     <a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/assets/images/sponsor.png" height="32px"></a>
+     <a href="https://github.com/sponsors/lvgl" target="_blank"><img align="left" src="https://lvgl.io/github-assets/sponsor.png" height="32px"></a>
    </p>
 
    <p align="right">
@@ -15,7 +15,7 @@
 .. raw:: html
 
    <p align="center">
-     <img src="https://lvgl.io/assets/images/logo_lvgl.png">
+     <img src="https://lvgl.io/github-assets/logo-colored.png" width=300px>
    </p>
 
 .. raw:: html
@@ -30,9 +30,9 @@
 .. raw:: html
 
    <div align="center">
-     <img src="https://github.com/kisvegabor/test/raw/master/smartwatch_demo.gif">
+     <img src="https://lvgl.io/github-assets/smartwatch-demo.gif">
      &nbsp;
-     <img border="1px" src="https://lvgl.io/assets/images/lvgl_widgets_demo.gif">
+     <img border="1px" src="https://lvgl.io/github-assets/widgets-demo.gif">
    </div>
    <br>
    <p align="center">
@@ -49,16 +49,16 @@
 📒 概况与总览
 -------------
 
-**成熟且知名**\ 
+**成熟且知名**\
 
 LVGL 是最流行的免费开源嵌入式图形库，可以为任何 MCU、MPU 和显示类型创建漂亮的 UI。它得到了行业领先供应商和项目的支持，如 Arm、STM32、NXP、Espressif、Nuvoton、Arduino、RT-Thread、Zephyr、NuttX、Adafruit 等。
 
-**功能丰富**\ 
+**功能丰富**\
 
 它拥有创建现代美观 GUI 的所有功能：30 多个内置控件、强大的样式系统、Web 启发的布局管理器和支持多种语言的排版系统。要将 LVGL 集成到您的平台中，您只需要至少 32 KB
 RAM 和 128 KB Flash、C 编译器、帧缓冲区和至少 1/10 屏幕大小的渲染缓冲区。
 
-**服务**\ 
+**服务**\
 
 我们的团队随时准备为您提供图形设计、UI 实现和咨询服务。如果您在开发下一个 GUI 项目时需要一些支持，请与我们联系。
 
@@ -90,17 +90,17 @@ RAM 和 128 KB Flash、C 编译器、帧缓冲区和至少 1/10 屏幕大小的�
 -  支持自动换行、字距调整、文本滚动、亚像素渲染、拼音输入法、文本表情符号。
 -  渲染引擎支持动画、抗锯齿、不透明度、平滑滚动、阴影、图形变换等。
 -  支持鼠标、触摸板、小键盘、键盘、外部按钮、编码器\ `输入设备 <https://docs.lvgl.io/master/porting/indev.html>`__\ 。
--  支持\ `多显示器 <https://docs.lvgl.io/master/overview/disp.html#multiple-display-support>`__\ 。
+-  支持\ `多显示器 <https://docs.lvgl.io/master/overview/display.html#multiple-display-support>`__\ 。
 
 **绑定和构建支持**
 
--  `Microython 绑定 <https://blog.lvgl.io/2019-02-20/micropython-bindings>`__
+-  `MicroPython 绑定 <https://blog.lvgl.io/2019-02-20/micropython-bindings>`__
    公开 LVGL的API
 -  `PikaScript 绑定 <https://blog.lvgl.io/2022-08-24/pikascript-and-lvgl>`__
    在 MCU 上的更轻更简单的 Python 版本
 -  未使用自定义生成系统。您可以在构建项目的其他文件时构建 LVGL。
--  支持开箱即用的 Make 和 \ `CMake <https://docs.lvgl.io/master/get-started/platforms/cmake.html>`__\  编译系统。
--  支持在 \ `PC 上开发 <https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html>`__\ ，并可以在嵌入式硬件上使用相同的 UI 代码。
+-  支持开箱即用的 Make 和 \ `CMake <https://docs.lvgl.io/master/integration/building/cmake.html>`__\  编译系统。
+-  支持在 \ `PC 上开发 <https://docs.lvgl.io/master/integration/ide/pc-simulator.html>`__\ ，并可以在嵌入式硬件上使用相同的 UI 代码。
 -  支持使用我们的 \ `Emscripten 移植 <https://github.com/lvgl/lv_web_emscripten>`__\  从而将 C 写的 UI 代码转换为 HTML 文件。
 
 **文档、工具和服务**
@@ -116,23 +116,23 @@ RAM 和 128 KB Flash、C 编译器、帧缓冲区和至少 1/10 屏幕大小的�
 
 如果 LVGL 为您节省了大量时间和金钱，或者您只是在使用它时玩得很开心，请考虑\ `支持它的开发 <https://github.com/sponsors/lvgl>`__\ 。
 
-**我们如何使用捐赠？**\ 
+**我们如何使用捐赠？**\
 
 我们的目标是为 LVGL 做得最多的人提供经济补偿。这意味着不仅维护人员，而且任何实现伟大功能的人都应该从累积的资金中获得报酬。我们用捐款来支付服务器和相关服务等运营成本。
 
-**如何捐赠？**\  
+**如何捐赠？**\
 
 我们使用 \ `GitHub Sponsors <https://github.com/sponsors/lvgl>`__\ ，您可以轻松发送一次性或定期捐款。您还可以以透明的方式查看我们的所有费用。
 
-**如何从您的贡献中获取报酬？**\ 
+**如何从您的贡献中获取报酬？**\
 
 如果有人实施或修复了一个标记为\ `赞助 <https://github.com/lvgl/lvgl/labels/Sponsored>`__\ 的问题，他或她将获得该工作的报酬。我们估计问题所需的时间、复杂性和重要性，并据此设定价格。直接评论一个赞助的问题，说“嗨，我想处理它。这就是我计划修复/实施它的方式…”。当维护人员批准并合并工作时，就认为它已经准备好了。之后，您可以在 \ `opencollective.com <https://opencollective.com/lvgl>`__\  上提交并支付费用，几天后您将收到付款。
 
-**支持 LVGL 的组织**\ 
+**支持 LVGL 的组织**\
 
 |Sponsors of LVGL|
 
-**支持 LVGL 的个人**\  
+**支持 LVGL 的个人**\
 
 |Backers of LVGL|
 

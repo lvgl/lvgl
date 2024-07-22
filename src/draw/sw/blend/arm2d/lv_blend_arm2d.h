@@ -453,6 +453,15 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_rgb565_arm2d(_lv_draw_sw_
     int16_t des_stride = dsc->dest_stride / sizeof(uint16_t);
     int16_t src_stride = dsc->src_stride / sizeof(uint32_t);
 
+#if ARM_2D_VERSION >= 10106ul
+
+    __arm_2d_impl_ccca8888_to_rgb565((uint32_t *)dsc->src_buf,
+                                     src_stride,
+                                     (uint16_t *)dsc->dest_buf,
+                                     des_stride,
+                                     &draw_size);
+
+#else
     uint16_t * tmp_buf = (uint16_t *)lv_malloc(dsc->dest_stride * dsc->dest_h);
     if(NULL == tmp_buf) {
         return LV_RESULT_INVALID;
@@ -474,6 +483,7 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_rgb565_arm2d(_lv_draw_sw_
                                           &draw_size);
 
     lv_free(tmp_buf);
+#endif
     return LV_RESULT_OK;
 }
 
@@ -483,10 +493,21 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_rgb565_with_opa_arm2d(_lv
     int16_t des_stride = dsc->dest_stride / sizeof(uint16_t);
     int16_t src_stride = dsc->src_stride / sizeof(uint32_t);
 
+#if ARM_2D_VERSION >= 10106ul
+    __arm_2d_impl_ccca8888_tile_copy_to_rgb565_with_opacity((uint32_t *)dsc->src_buf,
+                                                            src_stride,
+                                                            (uint16_t *)dsc->dest_buf,
+                                                            des_stride,
+                                                            &draw_size,
+                                                            dsc->opa);
+
+#else
     uint16_t * tmp_buf = (uint16_t *)lv_malloc(dsc->dest_stride * dsc->dest_h);
     if(NULL == tmp_buf) {
         return LV_RESULT_INVALID;
     }
+
+
     uint8_t * tmp_msk = (uint8_t *)lv_malloc(des_stride * dsc->dest_h);
     if(NULL == tmp_msk) {
         lv_free(tmp_buf);
@@ -522,6 +543,8 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_rgb565_with_opa_arm2d(_lv
 
     lv_free(tmp_msk);
     lv_free(tmp_buf);
+#endif
+
     return LV_RESULT_OK;
 }
 
@@ -531,6 +554,17 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_rgb565_with_mask_arm2d(_l
     int16_t des_stride = dsc->dest_stride / sizeof(uint16_t);
     int16_t src_stride = dsc->src_stride / sizeof(uint32_t);
 
+#if ARM_2D_VERSION >= 10106ul
+
+    __arm_2d_impl_ccca8888_tile_copy_to_rgb565_with_src_mask((uint32_t *)dsc->src_buf,
+                                                             src_stride,
+                                                             (uint8_t *)dsc->mask_buf,
+                                                             dsc->mask_stride,
+                                                             &draw_size,
+                                                             (uint16_t *)dsc->dest_buf,
+                                                             des_stride,
+                                                             &draw_size);
+#else
     uint16_t * tmp_buf = (uint16_t *)lv_malloc(dsc->dest_stride * dsc->dest_h);
     if(NULL == tmp_buf) {
         return LV_RESULT_INVALID;
@@ -572,6 +606,8 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_rgb565_with_mask_arm2d(_l
 
     lv_free(tmp_msk);
     lv_free(tmp_buf);
+#endif
+
     return LV_RESULT_OK;
 }
 
@@ -581,6 +617,17 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_rgb565_mix_mask_opa_arm2d
     int16_t des_stride = dsc->dest_stride / sizeof(uint16_t);
     int16_t src_stride = dsc->src_stride / sizeof(uint32_t);
 
+#if ARM_2D_VERSION >= 10106ul
+    __arm_2d_impl_ccca8888_tile_copy_to_rgb565_with_src_mask_and_opacity((uint32_t *)dsc->src_buf,
+                                                                         src_stride,
+                                                                         (uint8_t *)dsc->mask_buf,
+                                                                         dsc->mask_stride,
+                                                                         &draw_size,
+                                                                         (uint16_t *)dsc->dest_buf,
+                                                                         des_stride,
+                                                                         &draw_size,
+                                                                         dsc->opa);
+#else
     uint16_t * tmp_buf = (uint16_t *)lv_malloc(dsc->dest_stride * dsc->dest_h);
     if(NULL == tmp_buf) {
         return LV_RESULT_INVALID;
@@ -623,6 +670,7 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_rgb565_mix_mask_opa_arm2d
 
     lv_free(tmp_msk);
     lv_free(tmp_buf);
+#endif
     return LV_RESULT_OK;
 }
 
@@ -936,6 +984,13 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_rgb888_arm2d(_lv_draw_sw_
     int16_t des_stride = dsc->dest_stride / sizeof(uint32_t);
     int16_t src_stride = dsc->src_stride / sizeof(uint32_t);
 
+#if ARM_2D_VERSION >= 10106ul
+    __arm_2d_impl_ccca8888_to_cccn888((uint32_t *)dsc->src_buf,
+                                      src_stride,
+                                      (uint32_t *)dsc->dest_buf,
+                                      des_stride,
+                                      &draw_size);
+#else
     __arm_2d_impl_cccn888_src_chn_msk_copy((uint32_t *)dsc->src_buf,
                                            src_stride,
                                            (uint32_t *)((uintptr_t)(dsc->src_buf) + 3),
@@ -944,7 +999,7 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_rgb888_arm2d(_lv_draw_sw_
                                            (uint32_t *)dsc->dest_buf,
                                            des_stride,
                                            &draw_size);
-
+#endif
     return LV_RESULT_OK;
 }
 
@@ -959,6 +1014,15 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_rgb888_with_opa_arm2d(_lv
     int16_t des_stride = dsc->dest_stride / sizeof(uint32_t);
     int16_t src_stride = dsc->src_stride / sizeof(uint32_t);
 
+#if ARM_2D_VERSION >= 10106ul
+
+    __arm_2d_impl_ccca8888_tile_copy_to_cccn888_with_opacity((uint32_t *)dsc->src_buf,
+                                                             src_stride,
+                                                             (uint32_t *)dsc->dest_buf,
+                                                             des_stride,
+                                                             &draw_size,
+                                                             dsc->opa);
+#else
     uint8_t * tmp_msk = (uint8_t *)lv_malloc(des_stride * dsc->dest_h);
     if(NULL == tmp_msk) {
         return LV_RESULT_INVALID;
@@ -985,6 +1049,7 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_rgb888_with_opa_arm2d(_lv
                                        &draw_size);
 
     lv_free(tmp_msk);
+#endif
     return LV_RESULT_OK;
 }
 
@@ -1000,6 +1065,17 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_rgb888_with_mask_arm2d(_l
     int16_t des_stride = dsc->dest_stride / sizeof(uint32_t);
     int16_t src_stride = dsc->src_stride / sizeof(uint32_t);
 
+#if ARM_2D_VERSION >= 10106ul
+
+    __arm_2d_impl_ccca8888_tile_copy_to_cccn888_with_src_mask((uint32_t *)dsc->src_buf,
+                                                              src_stride,
+                                                              (uint8_t *)dsc->mask_buf,
+                                                              dsc->mask_stride,
+                                                              &draw_size,
+                                                              (uint32_t *)dsc->dest_buf,
+                                                              des_stride,
+                                                              &draw_size);
+#else
     __arm_2d_impl_cccn888_src_chn_msk_des_msk_copy((uint32_t *)dsc->src_buf,
                                                    src_stride,
                                                    (uint32_t *)((uintptr_t)(dsc->src_buf) + 3),
@@ -1011,6 +1087,7 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_rgb888_with_mask_arm2d(_l
                                                    dsc->mask_stride,
                                                    &draw_size,
                                                    &draw_size);
+#endif
 
     return LV_RESULT_OK;
 }
@@ -1026,6 +1103,18 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_rgb888_mix_mask_opa_arm2d
     int16_t des_stride = dsc->dest_stride / sizeof(uint32_t);
     int16_t src_stride = dsc->src_stride / sizeof(uint32_t);
 
+#if ARM_2D_VERSION >= 10106ul
+
+    __arm_2d_impl_ccca8888_tile_copy_to_cccn888_with_src_mask_and_opacity((uint32_t *)dsc->src_buf,
+                                                                          src_stride,
+                                                                          (uint8_t *)dsc->mask_buf,
+                                                                          dsc->mask_stride,
+                                                                          &draw_size,
+                                                                          (uint32_t *)dsc->dest_buf,
+                                                                          des_stride,
+                                                                          &draw_size,
+                                                                          dsc->opa);
+#else
     __arm_2d_impl_gray8_colour_filling_with_opacity((uint8_t *)dsc->mask_buf,
                                                     dsc->mask_stride,
                                                     &draw_size,
@@ -1043,7 +1132,7 @@ static inline lv_result_t _lv_argb8888_blend_normal_to_rgb888_mix_mask_opa_arm2d
                                                    dsc->mask_stride,
                                                    &draw_size,
                                                    &draw_size);
-
+#endif
     return LV_RESULT_OK;
 }
 

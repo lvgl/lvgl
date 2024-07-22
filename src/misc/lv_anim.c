@@ -39,6 +39,7 @@ static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
 static uint32_t convert_speed_to_time(uint32_t speed, int32_t start, int32_t end);
 static void resolve_time(lv_anim_t * a);
 static bool remove_concurrent_anims(lv_anim_t * a_current);
+static void remove_anim(void * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -133,8 +134,8 @@ uint32_t lv_anim_get_playtime(const lv_anim_t * a)
         return LV_ANIM_PLAYTIME_INFINITE;
     }
 
-    uint32_t repeate_cnt = a->repeat_cnt;
-    if(repeate_cnt < 1) repeate_cnt = 1;
+    uint32_t repeat_cnt = a->repeat_cnt;
+    if(repeat_cnt < 1) repeat_cnt = 1;
 
     uint32_t playtime = a->repeat_delay + a->duration + a->playback_delay + a->playback_duration;
     playtime = playtime * a->repeat_cnt;
@@ -149,9 +150,7 @@ bool lv_anim_delete(void * var, lv_anim_exec_xcb_t exec_cb)
     while(a != NULL) {
         bool del = false;
         if((a->var == var || var == NULL) && (a->exec_cb == exec_cb || exec_cb == NULL)) {
-            _lv_ll_remove(anim_ll_p, a);
-            if(a->deleted_cb != NULL) a->deleted_cb(a);
-            lv_free(a);
+            remove_anim(a);
             anim_mark_list_change(); /*Read by `anim_timer`. It need to know if a delete occurred in
                                        the linked list*/
             del_any = true;
@@ -168,7 +167,7 @@ bool lv_anim_delete(void * var, lv_anim_exec_xcb_t exec_cb)
 
 void lv_anim_delete_all(void)
 {
-    _lv_ll_clear(anim_ll_p);
+    _lv_ll_clear_custom(anim_ll_p, remove_anim);
     anim_mark_list_change();
 }
 
@@ -228,6 +227,16 @@ uint32_t lv_anim_speed(uint32_t speed)
     return lv_anim_speed_clamped(speed, 0, 10000);
 }
 
+uint32_t lv_anim_speed_to_time(uint32_t speed, int32_t start, int32_t end)
+{
+    uint32_t d = LV_ABS(start - end);
+    uint32_t time = (d * 1000) / speed;
+
+    time = time == 0 ? 1 : time;
+
+    return time;
+}
+
 void lv_anim_refr_now(void)
 {
     anim_timer(NULL);
@@ -282,37 +291,38 @@ int32_t lv_anim_path_bounce(const lv_anim_t * a)
     if(t < 408) {
         /*Go down*/
         t = (t * 2500) >> LV_BEZIER_VAL_SHIFT; /*[0..1024] range*/
+        t = LV_BEZIER_VAL_MAX - t;
     }
     else if(t >= 408 && t < 614) {
         /*First bounce back*/
         t -= 408;
         t    = t * 5; /*to [0..1024] range*/
-        t    = LV_BEZIER_VAL_MAX - t;
         diff = diff / 20;
     }
     else if(t >= 614 && t < 819) {
         /*Fall back*/
         t -= 614;
         t    = t * 5; /*to [0..1024] range*/
+        t    = LV_BEZIER_VAL_MAX - t;
         diff = diff / 20;
     }
     else if(t >= 819 && t < 921) {
         /*Second bounce back*/
         t -= 819;
         t    = t * 10; /*to [0..1024] range*/
-        t    = LV_BEZIER_VAL_MAX - t;
         diff = diff / 40;
     }
     else if(t >= 921 && t <= LV_BEZIER_VAL_MAX) {
         /*Fall back*/
         t -= 921;
         t    = t * 10; /*to [0..1024] range*/
+        t    = LV_BEZIER_VAL_MAX - t;
         diff = diff / 40;
     }
 
     if(t > LV_BEZIER_VAL_MAX) t = LV_BEZIER_VAL_MAX;
     if(t < 0) t = 0;
-    int32_t step = lv_bezier3(t, LV_BEZIER_VAL_MAX, 800, 500, 0);
+    int32_t step = lv_bezier3(t, 0, 500, 800, LV_BEZIER_VAL_MAX);
 
     int32_t new_value;
     new_value = step * diff;
@@ -353,9 +363,6 @@ static void anim_timer(lv_timer_t * param)
     lv_anim_t * a = _lv_ll_get_head(anim_ll_p);
 
     while(a != NULL) {
-
-        //        printf("%p, %d\n", a, a->start_value);
-
         uint32_t elaps = lv_tick_elaps(a->last_timer_run);
         a->act_time += elaps;
 
@@ -552,4 +559,12 @@ static bool remove_concurrent_anims(lv_anim_t * a_current)
     }
 
     return del_any;
+}
+
+static void remove_anim(void * a)
+{
+    lv_anim_t * anim = a;
+    _lv_ll_remove(anim_ll_p, a);
+    if(anim->deleted_cb != NULL) anim->deleted_cb(anim);
+    lv_free(a);
 }

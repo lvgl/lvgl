@@ -81,6 +81,7 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
         case LV_COLOR_FORMAT_XRGB8888:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_L8:
+        case LV_COLOR_FORMAT_I1:
             break;
         default:
             LV_LOG_WARN("Not supported color format");
@@ -121,7 +122,7 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
 
     while(layer.draw_task_head) {
         lv_draw_dispatch_wait_for_request();
-        lv_draw_dispatch_layer(NULL, &layer);
+        lv_draw_dispatch();
     }
 
     disp_new->layer_head = layer_old;

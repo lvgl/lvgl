@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - 2023 the ThorVG project. All rights reserved.
+ * Copyright (c) 2020 - 2024 the ThorVG project. All rights reserved.
 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -325,7 +325,7 @@ static void _genSpan(SwRleData* rle, const SwSpan* spans, uint32_t count)
 }
 
 
-static void _horizLine(RleWorker& rw, SwCoord x, SwCoord y, SwCoord area, SwCoord acount)
+static void _horizLine(RleWorker& rw, SwCoord x, SwCoord y, SwCoord area, SwCoord aCount)
 {
     x += rw.cellMin.x;
     y += rw.cellMin.y;
@@ -349,11 +349,11 @@ static void _horizLine(RleWorker& rw, SwCoord x, SwCoord y, SwCoord area, SwCoor
 
     //span has ushort coordinates. check limit overflow
     if (x >= SHRT_MAX) {
-        TVGERR("SW_ENGINE", "X-coordiante overflow!");
+        TVGERR("SW_ENGINE", "X-coordinate overflow!");
         x = SHRT_MAX;
     }
     if (y >= SHRT_MAX) {
-        TVGERR("SW_ENGINE", "Y Coordiante overflow!");
+        TVGERR("SW_ENGINE", "Y Coordinate overflow!");
         y = SHRT_MAX;
     }
 
@@ -368,11 +368,11 @@ static void _horizLine(RleWorker& rw, SwCoord x, SwCoord y, SwCoord area, SwCoor
 
             //Clip x range
             SwCoord xOver = 0;
-            if (x + acount >= rw.cellMax.x) xOver -= (x + acount - rw.cellMax.x);
+            if (x + aCount >= rw.cellMax.x) xOver -= (x + aCount - rw.cellMax.x);
             if (x < rw.cellMin.x) xOver -= (rw.cellMin.x - x);
 
-            //span->len += (acount + xOver) - 1;
-            span->len += (acount + xOver);
+            //span->len += (aCount + xOver) - 1;
+            span->len += (aCount + xOver);
             return;
         }
 
@@ -387,19 +387,19 @@ static void _horizLine(RleWorker& rw, SwCoord x, SwCoord y, SwCoord area, SwCoor
 
         //Clip x range
         SwCoord xOver = 0;
-        if (x + acount >= rw.cellMax.x) xOver -= (x + acount - rw.cellMax.x);
+        if (x + aCount >= rw.cellMax.x) xOver -= (x + aCount - rw.cellMax.x);
         if (x < rw.cellMin.x) {
             xOver -= (rw.cellMin.x - x);
             x = rw.cellMin.x;
         }
 
         //Nothing to draw
-        if (acount + xOver <= 0) return;
+        if (aCount + xOver <= 0) return;
 
         //add a span to the current list
         span->x = x;
         span->y = y;
-        span->len = (acount + xOver);
+        span->len = (aCount + xOver);
         span->coverage = coverage;
         ++rw.spansCnt;
         rw.ySpan = y;
@@ -716,7 +716,7 @@ static void _decomposeOutline(RleWorker& rw)
     auto outline = rw.outline;
     auto first = 0;  //index of first point in contour
 
-    for (auto cntr = outline->cntrs.data; cntr < outline->cntrs.end(); ++cntr) {
+    for (auto cntr = outline->cntrs.begin(); cntr < outline->cntrs.end(); ++cntr) {
         auto last = *cntr;
         auto limit = outline->pts.data + last;
         auto start = UPSCALE(outline->pts[first]);
@@ -772,7 +772,7 @@ static SwSpan* _intersectSpansRegion(const SwRleData *clip, const SwRleData *tar
     auto clipEnd = clip->spans + clip->size;
 
     while (spans < end && clipSpans < clipEnd) {
-        //align y cooridnates.
+        //align y coordinates.
         if (clipSpans->y > spans->y) {
             ++spans;
             continue;

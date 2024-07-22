@@ -50,7 +50,7 @@ void * LV_ATTRIBUTE_FAST_MEM lv_memmove(void * dst, const void * src, size_t len
     return memmove(dst, src, len);
 }
 
-int32_t lv_memcmp(const void * p1, const void * p2, size_t len)
+int lv_memcmp(const void * p1, const void * p2, size_t len)
 {
     return memcmp(p1, p2, len);
 }
@@ -60,14 +60,20 @@ size_t lv_strlen(const char * str)
     return strlen(str);
 }
 
+size_t lv_strlcpy(char * dst, const char * src, size_t dst_size)
+{
+    size_t src_len = strlen(src);
+    if(dst_size > 0) {
+        size_t copy_size = src_len < dst_size ? src_len : dst_size - 1;
+        memcpy(dst, src, copy_size);
+        dst[copy_size] = '\0';
+    }
+    return src_len;
+}
+
 char * lv_strncpy(char * dst, const char * src, size_t dest_size)
 {
-    if(dest_size > 0) {
-        dst[0] = '\0';
-        strncat(dst, src, dest_size - 1);
-    }
-
-    return dst;
+    return strncpy(dst, src, dest_size);
 }
 
 char * lv_strcpy(char * dst, const char * src)
@@ -75,7 +81,7 @@ char * lv_strcpy(char * dst, const char * src)
     return strcpy(dst, src);
 }
 
-int32_t lv_strcmp(const char * s1, const char * s2)
+int lv_strcmp(const char * s1, const char * s2)
 {
     return strcmp(s1, s2);
 }

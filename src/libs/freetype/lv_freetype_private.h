@@ -43,7 +43,8 @@ extern "C" {
 #define LV_ASSERT_FREETYPE_FONT_DSC(dsc)                                                   \
     do {                                                                                   \
         LV_ASSERT_NULL(dsc);                                                               \
-        LV_ASSERT_MSG(LV_FREETYPE_FONT_DSC_HAS_MAGIC_NUM(dsc), "Invalid font descriptor"); \
+        LV_ASSERT_FORMAT_MSG(LV_FREETYPE_FONT_DSC_HAS_MAGIC_NUM(dsc),                      \
+                             "Invalid font descriptor: 0x%" LV_PRIx32, (dsc)->magic_num);  \
     } while (0)
 
 #define FT_INT_TO_F26DOT6(x) ((x) << 6)
@@ -66,6 +67,7 @@ struct _lv_freetype_cache_node_t {
     uint32_t ref_size;                  /**< Reference size for calculating outline glyph's real size.*/
 
     FT_Face face;
+    lv_mutex_t face_lock;
 
     /*glyph cache*/
     lv_cache_t * glyph_cache;

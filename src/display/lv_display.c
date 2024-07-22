@@ -13,6 +13,7 @@
 #include "../stdlib/lv_string.h"
 #include "../themes/lv_theme.h"
 #include "../core/lv_global.h"
+#include "../others/sysmon/lv_sysmon.h"
 
 #if LV_USE_DRAW_SW
     #include "../draw/sw/lv_draw_sw.h"
@@ -139,6 +140,14 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
 
     lv_timer_ready(disp->refr_timer); /*Be sure the screen will be refreshed immediately on start up*/
 
+#if LV_USE_PERF_MONITOR
+    lv_sysmon_show_performance(disp);
+#endif
+
+#if LV_USE_MEM_MONITOR
+    lv_sysmon_show_memory(disp);
+#endif
+
     return disp;
 }
 
@@ -178,7 +187,7 @@ void lv_display_delete(lv_display_t * disp)
     disp->act_scr = NULL;
 
     while(disp->screen_cnt != 0) {
-        /*Delete the screenst*/
+        /*Delete the screens*/
         lv_obj_delete(disp->screens[0]);
     }
 
@@ -570,7 +579,7 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
                          bool auto_del)
 {
     lv_display_t * d = lv_obj_get_display(new_scr);
-    lv_obj_t * act_scr = lv_screen_active();
+    lv_obj_t * act_scr = d->act_scr;
 
     if(act_scr == new_scr || d->scr_to_load == new_scr) {
         return;
@@ -586,17 +595,15 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
         if(d->del_prev) {
             lv_obj_delete(act_scr);
         }
-        act_scr = lv_screen_active(); /*Active screen changed.*/
+        act_scr = d->act_scr; /*Active screen changed.*/
 
         scr_load_internal(d->scr_to_load);
     }
 
     d->scr_to_load = new_scr;
 
-    if(d->prev_scr && d->del_prev) {
-        lv_obj_delete(d->prev_scr);
-        d->prev_scr = NULL;
-    }
+    if(d->prev_scr && d->del_prev) lv_obj_delete(d->prev_scr);
+    d->prev_scr = NULL;
 
     d->draw_prev_over_act = is_out_anim(anim_type);
     d->del_prev = auto_del;
@@ -1031,7 +1038,7 @@ static void scr_load_anim_start(lv_anim_t * a)
 {
     lv_display_t * d = lv_obj_get_display(a->var);
 
-    d->prev_scr = lv_screen_active();
+    d->prev_scr = d->act_scr;
     d->act_scr = a->var;
 
     lv_obj_send_event(d->act_scr, LV_EVENT_SCREEN_LOAD_START, NULL);

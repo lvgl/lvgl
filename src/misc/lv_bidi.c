@@ -17,7 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_BIDI_BRACKLET_DEPTH   4
+#define LV_BIDI_BRACKET_DEPTH   4
 
 // Highest bit of the 16-bit pos_conv value specifies whether this pos is RTL or not
 #define GET_POS(x) ((x) & 0x7FFF)
@@ -28,12 +28,12 @@
  *      TYPEDEFS
  **********************/
 typedef struct {
-    uint32_t bracklet_pos;
+    uint32_t bracket_pos;
     lv_base_dir_t dir;
 } bracket_stack_t;
 
 typedef struct {
-    bracket_stack_t br_stack[LV_BIDI_BRACKLET_DEPTH];
+    bracket_stack_t br_stack[LV_BIDI_BRACKET_DEPTH];
     uint8_t br_stack_p;
 } lv_bidi_ctx_t;
 
@@ -64,6 +64,7 @@ static uint32_t get_txt_len(const char * txt, uint32_t max_len);
  **********************/
 static const uint8_t bracket_left[] = {"<({["};
 static const uint8_t bracket_right[] = {">)}]"};
+static const char * custom_neutrals = NULL;
 
 /**********************
  *      MACROS
@@ -281,6 +282,11 @@ void lv_bidi_calculate_align(lv_text_align_t * align, lv_base_dir_t * base_dir, 
     }
 }
 
+void lv_bidi_set_custom_neutrals_static(const char * neutrals)
+{
+    custom_neutrals = neutrals;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -364,7 +370,11 @@ static bool lv_bidi_letter_is_rtl(uint32_t letter)
 static bool lv_bidi_letter_is_neutral(uint32_t letter)
 {
     uint16_t i;
-    static const char neutrals[] = " \t\n\r.,:;'\"`!?%/\\-=()[]{}<>@#&$|";
+    const char * neutrals = " \t\n\r.,:;'\"`!?%/\\-=()[]{}<>@#&$|";
+    if(custom_neutrals) {
+        neutrals = custom_neutrals;
+    }
+
     for(i = 0; neutrals[i] != '\0'; i++) {
         if(letter == (uint32_t)neutrals[i]) return true;
     }
@@ -630,9 +640,9 @@ static lv_base_dir_t bracket_process(lv_bidi_ctx_t * ctx, const char * txt, uint
     /*The letter was an opening bracket*/
     if(bracket_left[i] != '\0') {
 
-        if(bracket_dir == LV_BASE_DIR_NEUTRAL || ctx->br_stack_p == LV_BIDI_BRACKLET_DEPTH) return LV_BASE_DIR_NEUTRAL;
+        if(bracket_dir == LV_BASE_DIR_NEUTRAL || ctx->br_stack_p == LV_BIDI_BRACKET_DEPTH) return LV_BASE_DIR_NEUTRAL;
 
-        ctx->br_stack[ctx->br_stack_p].bracklet_pos = i;
+        ctx->br_stack[ctx->br_stack_p].bracket_pos = i;
         ctx->br_stack[ctx->br_stack_p].dir = bracket_dir;
 
         ctx->br_stack_p++;
@@ -640,7 +650,7 @@ static lv_base_dir_t bracket_process(lv_bidi_ctx_t * ctx, const char * txt, uint
     }
     else if(ctx->br_stack_p > 0) {
         /*Is the letter a closing bracket of the last opening?*/
-        if(letter == bracket_right[ctx->br_stack[ctx->br_stack_p - 1].bracklet_pos]) {
+        if(letter == bracket_right[ctx->br_stack[ctx->br_stack_p - 1].bracket_pos]) {
             bracket_dir = ctx->br_stack[ctx->br_stack_p - 1].dir;
             ctx->br_stack_p--;
             return bracket_dir;

@@ -62,6 +62,7 @@ void test_switch_should_not_leak_memory_after_deletion(void)
         lv_obj_delete(switches[idx]);
     }
 
+    LV_UNUSED(initial_available_memory);
     LV_HEAP_CHECK(TEST_ASSERT_MEM_LEAK_LESS_THAN(initial_available_memory, 24));
 }
 

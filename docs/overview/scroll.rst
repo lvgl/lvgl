@@ -148,7 +148,7 @@ The scroll momentum can be enabled/disabled with the
 Elastic scroll
 --------------
 
-Normally an object can't be scrolled past the extremeties of its
+Normally an object can't be scrolled past the extremities of its
 content. That is the top side of the content can't be below the top side
 of the object.
 

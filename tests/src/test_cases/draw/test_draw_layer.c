@@ -56,7 +56,7 @@ void test_draw_layer_bitmap_mask_from_image_not_found(void)
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, 200, 200);
     lv_obj_set_style_bg_color(obj, lv_color_hex3(0xf88), 0);
-    lv_obj_set_style_bitmap_mask_src(obj, "A:not/exisiting/file", 0);
+    lv_obj_set_style_bitmap_mask_src(obj, "A:nonexistent/file", 0);
     lv_obj_center(obj);
 
     lv_obj_t * label = lv_label_create(obj);

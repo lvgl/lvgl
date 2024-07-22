@@ -29,6 +29,7 @@ extern "C" {
 #define LV_DISP_RENDER_MODE_DIRECT  LV_DISPLAY_RENDER_MODE_DIRECT
 #define LV_DISP_RENDER_MODE_FULL    LV_DISPLAY_RENDER_MODE_FULL
 
+#if LV_USE_BUTTONMATRIX
 #define LV_BTNMATRIX_BTN_NONE   LV_BUTTONMATRIX_BUTTON_NONE
 
 #define LV_BTNMATRIX_CTRL_HIDDEN       LV_BUTTONMATRIX_CTRL_HIDDEN
@@ -40,6 +41,7 @@ extern "C" {
 #define LV_BTNMATRIX_CTRL_POPOVER      LV_BUTTONMATRIX_CTRL_POPOVER
 #define LV_BTNMATRIX_CTRL_CUSTOM_1     LV_BUTTONMATRIX_CTRL_CUSTOM_1
 #define LV_BTNMATRIX_CTRL_CUSTOM_2     LV_BUTTONMATRIX_CTRL_CUSTOM_2
+#endif /* LV_USE_BUTTONMATRIX */
 
 /**********************
  *      TYPEDEFS
@@ -52,7 +54,10 @@ typedef lv_display_rotation_t       lv_disp_rotation_t;
 typedef lv_display_render_mode_t    lv_disp_render_t;
 typedef lv_anim_completed_cb_t      lv_anim_ready_cb_t;
 typedef lv_screen_load_anim_t       lv_scr_load_anim_t;
+
+#if LV_USE_BUTTONMATRIX
 typedef lv_buttonmatrix_ctrl_t      lv_btnmatrix_ctrl_t;
+#endif /* LV_USE_BUTTONMATRIX */
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -149,9 +154,12 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 
 #define lv_group_del                    lv_group_delete
 
+#if LV_USE_TEXTAREA
 #define lv_txt_get_size       lv_text_get_size
 #define lv_txt_get_width      lv_text_get_width
+#endif /* LV_USE_TEXTAREA */
 
+#if LV_USE_IMAGE
 #define lv_img_create         lv_image_create
 #define lv_img_set_src        lv_image_set_src
 #define lv_img_set_offset_x   lv_image_set_offset_x
@@ -167,13 +175,19 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_img_get_pivot      lv_image_get_pivot
 #define lv_img_get_zoom       lv_image_get_scale
 #define lv_img_get_antialias  lv_image_get_antialias
+#endif /* LV_USE_IMAGE */
 
+#if LV_USE_LIST
 #define lv_list_set_btn_text lv_list_set_button_text
 #define lv_list_get_btn_text lv_list_get_button_text
 #define lv_list_add_btn      lv_list_add_button
+#endif /* LV_USE_LIST */
 
+#if LV_USE_BUTTON
 #define lv_btn_create        lv_button_create
+#endif /* LV_USE_BUTTON */
 
+#if LV_USE_BUTTONMATRIX
 #define lv_btnmatrix_create                  lv_buttonmatrix_create
 #define lv_btnmatrix_set_map                 lv_buttonmatrix_set_map
 #define lv_btnmatrix_set_ctrl_map            lv_buttonmatrix_set_ctrl_map
@@ -189,26 +203,37 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_btnmatrix_get_btn_text            lv_buttonmatrix_get_button_text
 #define lv_btnmatrix_has_button_ctrl         lv_buttonmatrix_has_button_ctrl
 #define lv_btnmatrix_get_one_checked         lv_buttonmatrix_get_one_checked
+#endif /* LV_USE_BUTTONMATRIX */
 
+#if LV_USE_TABVIEW
 #define lv_tabview_get_tab_btns              lv_tabview_get_tab_bar
 #define lv_tabview_get_tab_act               lv_tabview_get_tab_active
 #define lv_tabview_set_act                   lv_tabview_set_active
+#endif /* LV_USE_TABVIEW */
 
+#if LV_USE_TILEVIEW
 #define lv_tileview_get_tile_act             lv_tileview_get_tile_active
 #define lv_obj_set_tile_id                   lv_tileview_set_tile_by_index
 #define lv_obj_set_tile                      lv_tileview_set_tile
+#endif /* LV_USE_TILEVIEW */
 
+#if LV_USE_ROLLER
 #define lv_roller_set_visible_row_cnt       lv_roller_set_visible_row_count
 #define lv_roller_get_option_cnt            lv_roller_get_option_count
+#endif /* LV_USE_ROLLER */
 
+#if LV_USE_TABLE
 #define lv_table_set_col_cnt                lv_table_set_column_count
 #define lv_table_set_row_cnt                lv_table_set_row_count
 #define lv_table_get_col_cnt                lv_table_get_column_count
 #define lv_table_get_row_cnt                lv_table_get_row_count
 #define lv_table_set_col_width              lv_table_set_column_width
 #define lv_table_get_col_width              lv_table_get_column_width
+#endif /* LV_USE_TABLE */
 
+#if LV_USE_DROPDOWN
 #define lv_dropdown_get_option_cnt          lv_dropdown_get_option_count
+#endif /* LV_USE_DROPDOWN */
 
 #define lv_obj_get_child_cnt                lv_obj_get_child_count
 #define lv_obj_get_disp                     lv_obj_get_display
@@ -257,6 +282,11 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_style_set_bg_img_src                  lv_style_set_bg_image_src
 #define lv_style_set_bg_img_recolor              lv_style_set_bg_image_recolor
 #define lv_style_set_bg_img_recolor_opa          lv_style_set_bg_image_recolor_opa
+
+#if LV_USE_KEYBOARD
+#define lv_keyboard_get_selected_btn             lv_keyboard_get_selected_button
+#define lv_keyboard_get_btn_text                 lv_keyboard_get_button_text
+#endif /* LV_USE_KEYBOARD */
 
 #define LV_ZOOM_NONE                        LV_SCALE_NONE
 

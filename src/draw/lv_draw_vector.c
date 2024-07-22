@@ -23,7 +23,7 @@
 #define RAD_TO_DEG 57.295779513082320876798154814105f
 
 #define MATH_RADIANS(deg) ((deg) * DEG_TO_RAD)
-#define MATH_DEGRESS(rad) ((rad) * RAD_TO_DEG)
+#define MATH_DEGREES(rad) ((rad) * RAD_TO_DEG)
 
 /*********************
 *      DEFINES
@@ -85,18 +85,7 @@ static void _multiply_matrix(lv_matrix_t * matrix, const lv_matrix_t * mul)
 
 static void _copy_draw_dsc(lv_vector_draw_dsc_t * dst, const lv_vector_draw_dsc_t * src)
 {
-    dst->fill_dsc.style = src->fill_dsc.style;
-    dst->fill_dsc.color = src->fill_dsc.color;
-    dst->fill_dsc.opa = src->fill_dsc.opa;
-    dst->fill_dsc.fill_rule = src->fill_dsc.fill_rule;
-    dst->fill_dsc.gradient.style = src->fill_dsc.gradient.style;
-    dst->fill_dsc.gradient.cx = src->fill_dsc.gradient.cx;
-    dst->fill_dsc.gradient.cy = src->fill_dsc.gradient.cy;
-    dst->fill_dsc.gradient.cr = src->fill_dsc.gradient.cr;
-    dst->fill_dsc.gradient.spread = src->fill_dsc.gradient.spread;
-    lv_memcpy(&(dst->fill_dsc.gradient.grad), &(src->fill_dsc.gradient.grad), sizeof(lv_grad_dsc_t));
-    lv_memcpy(&(dst->fill_dsc.img_dsc), &(src->fill_dsc.img_dsc), sizeof(lv_draw_image_dsc_t));
-    lv_memcpy(&(dst->fill_dsc.matrix), &(src->fill_dsc.matrix), sizeof(lv_matrix_t));
+    lv_memcpy(&(dst->fill_dsc), &(src->fill_dsc), sizeof(lv_vector_fill_dsc_t));
 
     dst->stroke_dsc.style = src->stroke_dsc.style;
     dst->stroke_dsc.color = src->stroke_dsc.color;
@@ -111,7 +100,7 @@ static void _copy_draw_dsc(lv_vector_draw_dsc_t * dst, const lv_vector_draw_dsc_
     dst->stroke_dsc.gradient.cy = src->stroke_dsc.gradient.cy;
     dst->stroke_dsc.gradient.cr = src->stroke_dsc.gradient.cr;
     dst->stroke_dsc.gradient.spread = src->fill_dsc.gradient.spread;
-    lv_memcpy(&(dst->stroke_dsc.gradient.grad), &(src->stroke_dsc.gradient.grad), sizeof(lv_grad_dsc_t));
+    lv_memcpy(&(dst->stroke_dsc.gradient), &(src->stroke_dsc.gradient), sizeof(lv_vector_gradient_t));
     lv_memcpy(&(dst->stroke_dsc.matrix), &(src->stroke_dsc.matrix), sizeof(lv_matrix_t));
 
     dst->blend_mode = src->blend_mode;
@@ -666,25 +655,40 @@ void lv_vector_dsc_set_fill_image(lv_vector_dsc_t * dsc, const lv_draw_image_dsc
     lv_memcpy(&(dsc->current_dsc.fill_dsc.img_dsc), img_dsc, sizeof(lv_draw_image_dsc_t));
 }
 
-void lv_vector_dsc_set_fill_linear_gradient(lv_vector_dsc_t * dsc, const lv_grad_dsc_t * grad,
-                                            lv_vector_gradient_spread_t spread)
+void lv_vector_dsc_set_fill_linear_gradient(lv_vector_dsc_t * dsc, float x1, float y1, float x2, float y2)
 {
     dsc->current_dsc.fill_dsc.style = LV_VECTOR_DRAW_STYLE_GRADIENT;
     dsc->current_dsc.fill_dsc.gradient.style = LV_VECTOR_GRADIENT_STYLE_LINEAR;
-    dsc->current_dsc.fill_dsc.gradient.spread = spread;
-    lv_memcpy(&(dsc->current_dsc.fill_dsc.gradient.grad), grad, sizeof(lv_grad_dsc_t));
+    dsc->current_dsc.fill_dsc.gradient.x1 = x1;
+    dsc->current_dsc.fill_dsc.gradient.y1 = y1;
+    dsc->current_dsc.fill_dsc.gradient.x2 = x2;
+    dsc->current_dsc.fill_dsc.gradient.y2 = y2;
 }
 
-void lv_vector_dsc_set_fill_radial_gradient(lv_vector_dsc_t * dsc, const lv_grad_dsc_t * grad, float cx, float cy,
-                                            float radius, lv_vector_gradient_spread_t spread)
+void lv_vector_dsc_set_fill_radial_gradient(lv_vector_dsc_t * dsc, float cx, float cy, float radius)
 {
     dsc->current_dsc.fill_dsc.style = LV_VECTOR_DRAW_STYLE_GRADIENT;
     dsc->current_dsc.fill_dsc.gradient.style = LV_VECTOR_GRADIENT_STYLE_RADIAL;
     dsc->current_dsc.fill_dsc.gradient.cx = cx;
     dsc->current_dsc.fill_dsc.gradient.cy = cy;
     dsc->current_dsc.fill_dsc.gradient.cr = radius;
+}
+
+void lv_vector_dsc_set_fill_gradient_spread(lv_vector_dsc_t * dsc, lv_vector_gradient_spread_t spread)
+{
     dsc->current_dsc.fill_dsc.gradient.spread = spread;
-    lv_memcpy(&(dsc->current_dsc.fill_dsc.gradient.grad), grad, sizeof(lv_grad_dsc_t));
+}
+
+void lv_vector_dsc_set_fill_gradient_color_stops(lv_vector_dsc_t * dsc, const lv_gradient_stop_t * stops,
+                                                 uint16_t count)
+{
+    if(count > LV_GRADIENT_MAX_STOPS) {
+        LV_LOG_WARN("Gradient stops limited: %d, max: %d", count, LV_GRADIENT_MAX_STOPS);
+        count = LV_GRADIENT_MAX_STOPS;
+    }
+
+    lv_memcpy(&(dsc->current_dsc.fill_dsc.gradient.stops), stops, sizeof(lv_gradient_stop_t) * count);
+    dsc->current_dsc.fill_dsc.gradient.stops_count = count;
 }
 
 void lv_vector_dsc_set_fill_transform(lv_vector_dsc_t * dsc, const lv_matrix_t * matrix)
@@ -754,25 +758,40 @@ void lv_vector_dsc_set_stroke_miter_limit(lv_vector_dsc_t * dsc, uint16_t miter_
     dsc->current_dsc.stroke_dsc.miter_limit = miter_limit;
 }
 
-void lv_vector_dsc_set_stroke_linear_gradient(lv_vector_dsc_t * dsc, const lv_grad_dsc_t * grad,
-                                              lv_vector_gradient_spread_t spread)
+void lv_vector_dsc_set_stroke_linear_gradient(lv_vector_dsc_t * dsc, float x1, float y1, float x2, float y2)
 {
     dsc->current_dsc.stroke_dsc.style = LV_VECTOR_DRAW_STYLE_GRADIENT;
     dsc->current_dsc.stroke_dsc.gradient.style = LV_VECTOR_GRADIENT_STYLE_LINEAR;
-    dsc->current_dsc.stroke_dsc.gradient.spread = spread;
-    lv_memcpy(&(dsc->current_dsc.stroke_dsc.gradient.grad), grad, sizeof(lv_grad_dsc_t));
+    dsc->current_dsc.stroke_dsc.gradient.x1 = x1;
+    dsc->current_dsc.stroke_dsc.gradient.y1 = y1;
+    dsc->current_dsc.stroke_dsc.gradient.x2 = x2;
+    dsc->current_dsc.stroke_dsc.gradient.y2 = y2;
 }
 
-void lv_vector_dsc_set_stroke_radial_gradient(lv_vector_dsc_t * dsc, const lv_grad_dsc_t * grad, float cx, float cy,
-                                              float radius, lv_vector_gradient_spread_t spread)
+void lv_vector_dsc_set_stroke_radial_gradient(lv_vector_dsc_t * dsc, float cx, float cy, float radius)
 {
     dsc->current_dsc.stroke_dsc.style = LV_VECTOR_DRAW_STYLE_GRADIENT;
     dsc->current_dsc.stroke_dsc.gradient.style = LV_VECTOR_GRADIENT_STYLE_RADIAL;
     dsc->current_dsc.stroke_dsc.gradient.cx = cx;
     dsc->current_dsc.stroke_dsc.gradient.cy = cy;
     dsc->current_dsc.stroke_dsc.gradient.cr = radius;
+}
+
+void lv_vector_dsc_set_stroke_gradient_spread(lv_vector_dsc_t * dsc, lv_vector_gradient_spread_t spread)
+{
     dsc->current_dsc.stroke_dsc.gradient.spread = spread;
-    lv_memcpy(&(dsc->current_dsc.stroke_dsc.gradient.grad), grad, sizeof(lv_grad_dsc_t));
+}
+
+void lv_vector_dsc_set_stroke_gradient_color_stops(lv_vector_dsc_t * dsc, const lv_gradient_stop_t * stops,
+                                                   uint16_t count)
+{
+    if(count > LV_GRADIENT_MAX_STOPS) {
+        LV_LOG_WARN("Gradient stops limited: %d, max: %d", count, LV_GRADIENT_MAX_STOPS);
+        count = LV_GRADIENT_MAX_STOPS;
+    }
+
+    lv_memcpy(&(dsc->current_dsc.stroke_dsc.gradient.stops), stops, sizeof(lv_gradient_stop_t) * count);
+    dsc->current_dsc.stroke_dsc.gradient.stops_count = count;
 }
 
 /* draw functions */

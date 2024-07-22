@@ -26,7 +26,8 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_DRAW_UNIT_ID_ANY  0
+#define LV_DRAW_UNIT_NONE  0
+#define LV_DRAW_UNIT_IDLE  -1   /*The draw unit is idle, new dispatching might be requested to try again*/
 
 /**********************
  *      TYPEDEFS
@@ -176,7 +177,7 @@ struct _lv_layer_t  {
 
 typedef struct {
     lv_obj_t * obj;
-    uint32_t part;
+    lv_part_t part;
     uint32_t id1;
     uint32_t id2;
     lv_layer_t * layer;
@@ -231,7 +232,7 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords);
  * It will send an event about the new draw task to the widget
  * and assign it to a draw unit.
  * @param layer     pointer to a layer
- * @param t         poinr to a draw task
+ * @param t         pointer to a draw task
  */
 void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t);
 
@@ -264,14 +265,14 @@ void lv_draw_dispatch_request(void);
  * Find and available draw task
  * @param layer             the draw ctx to search in
  * @param t_prev            continue searching from this task
- * @param draw_unit_id      check the task where `preferred_draw_unit_id` equals this value or `LV_DRAW_UNIT_ID_ANY`
+ * @param draw_unit_id      check the task where `preferred_draw_unit_id` equals this value or `LV_DRAW_UNIT_NONE`
  * @return                  tan available draw task or NULL if there is no any
  */
 lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id);
 
 /**
  * Tell how many draw task are waiting to be drawn on the area of `t_check`.
- * It can be used to determine if a GPU shall combine many draw tasks in to one or not.
+ * It can be used to determine if a GPU shall combine many draw tasks into one or not.
  * If a lot of tasks are waiting for the current ones it makes sense to draw them one-by-one
  * to not block the dependent tasks' rendering
  * @param t_check   the task whose dependent tasks shall be counted

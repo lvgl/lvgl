@@ -88,7 +88,7 @@ enum {
     LV_PROPERTY_ID(IMAGE, OFFSET_X,   LV_PROPERTY_TYPE_INT,       1),
     LV_PROPERTY_ID(IMAGE, OFFSET_Y,   LV_PROPERTY_TYPE_INT,       2),
     LV_PROPERTY_ID(IMAGE, ROTATION,   LV_PROPERTY_TYPE_INT,       3),
-    LV_PROPERTY_ID(IMAGE, PIVOT,      LV_PROPERTY_TYPE_POINTER,   4),
+    LV_PROPERTY_ID(IMAGE, PIVOT,      LV_PROPERTY_TYPE_POINT,     4),
     LV_PROPERTY_ID(IMAGE, SCALE,      LV_PROPERTY_TYPE_INT,       5),
     LV_PROPERTY_ID(IMAGE, SCALE_X,    LV_PROPERTY_TYPE_INT,       6),
     LV_PROPERTY_ID(IMAGE, SCALE_Y,    LV_PROPERTY_TYPE_INT,       7),
@@ -161,7 +161,7 @@ void lv_image_set_rotation(lv_obj_t * obj, int32_t angle);
 void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y);
 
 /**
- * Set pivot similar to get_pivot
+ * Set pivot to accept lv_point_t * directly
  */
 static inline void _lv_image_set_pivot(lv_obj_t * obj, lv_point_t * pivot)
 {
@@ -279,6 +279,16 @@ int32_t lv_image_get_rotation(lv_obj_t * obj);
  * @param pivot     store the rotation center here
  */
 void lv_image_get_pivot(lv_obj_t * obj, lv_point_t * pivot);
+
+/**
+ * Get pivot to return lv_point_t directly
+ */
+static inline lv_point_t _lv_image_get_pivot(lv_obj_t * obj)
+{
+    lv_point_t pivot;
+    lv_image_get_pivot(obj, &pivot);
+    return pivot;
+}
 
 /**
  * Get the zoom factor of the image.

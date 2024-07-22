@@ -37,7 +37,7 @@ static void * _buf_malloc(size_t size_bytes, lv_color_format_t cf);
 
 static void * _buf_align(void * buf, lv_color_format_t cf);
 
-static void _invalidate_cache(const void * buf, uint32_t stride, lv_color_format_t cf, const lv_area_t * area);
+static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
 
 static uint32_t _width_to_stride(uint32_t w, lv_color_format_t cf);
 
@@ -100,11 +100,11 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
         uint16_t size = stride * lv_area_get_height(area);
 
         /* Invalidate full buffer. */
-        DEMO_CleanInvalidateCacheByAddr((void *)buf, size);
+        DEMO_CleanInvalidateCacheByAddr((void *)draw_buf->data, size);
         return;
     }
 
-    const uint8_t * buf_u8 = buf;
+    const uint8_t * buf_u8 = draw_buf->data;
     /* ARM require a 32 byte aligned address. */
     uint8_t align_bytes = 32;
     uint8_t bits_per_pixel = lv_color_format_get_bpp(cf);

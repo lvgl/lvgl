@@ -37,6 +37,7 @@ fout.write(
 #define LV_OS_CMSIS_RTOS2   3
 #define LV_OS_RTTHREAD      4
 #define LV_OS_WINDOWS       5
+#define LV_OS_MQX           6
 #define LV_OS_CUSTOM        255
 
 #define LV_STDLIB_BUILTIN           0
@@ -188,6 +189,11 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_LOG_TRACE_LAYOUT     0
     #define LV_LOG_TRACE_ANIM       0
 #endif  /*LV_USE_LOG*/
+
+#if LV_USE_SYSMON == 0
+    #define LV_USE_PERF_MONITOR 0
+    #define LV_USE_MEM_MONITOR 0
+#endif /*LV_USE_SYSMON*/
 
 #ifndef LV_USE_LZ4
     #define LV_USE_LZ4  (LV_USE_LZ4_INTERNAL || LV_USE_LZ4_EXTERNAL)

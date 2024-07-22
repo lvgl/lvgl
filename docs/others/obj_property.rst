@@ -16,6 +16,8 @@ Usage
 Two APIs are provided to get/set widget properties. It can be enabled by setting
 :c:macro:`LV_USE_OBJ_PROPERTY` to `1` in ``lv_conf.h``.
 
+Set :c:macro:`LV_USE_OBJ_PROPERTY_NAME` to `1` in order to use property name instead of ID.
+
 .. code:: c
 
     typedef struct {
@@ -24,12 +26,18 @@ Two APIs are provided to get/set widget properties. It can be enabled by setting
             int32_t num;                /**< Number integer number (opacity, enums, booleans or "normal" numbers)*/
             const void * ptr;           /**< Constant pointers  (font, cone text, etc)*/
             lv_color_t color;           /**< Colors*/
-            lv_style_value_t _style;    /**< A place holder for style value which is same as property value.*/
+            lv_value_precise_t precise; /**< float or int for precise value*/
+            struct {
+                lv_style_value_t style; /**< Make sure it's the first element in struct. */
+                uint32_t selector;      /**< Style selector, lv_part_t | lv_state_t */
+            };
         };
     } lv_property_t;
 
     lv_result_t lv_obj_set_property(lv_obj_t * obj, const lv_property_t * value);
     lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id);
+
+    lv_prop_id_t lv_obj_property_get_id(const lv_obj_class_t * clz, const char * name);
 
 .. _obj_property_id:
 

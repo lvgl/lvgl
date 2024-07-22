@@ -228,6 +228,8 @@ int32_t lv_display_get_dpi(const lv_display_t * disp);
 
 /**
  * Set the buffers for a display, similarly to `lv_display_set_draw_buffers`, but accept the raw buffer pointers.
+ * For DIRECT/FULL rending modes, the buffer size must be at least
+ * `hor_res * ver_res * lv_color_format_get_size(lv_display_get_color_format(disp))`
  * @param disp              pointer to a display
  * @param buf1              first buffer
  * @param buf2              second buffer (can be `NULL`)
@@ -362,7 +364,7 @@ lv_obj_t * lv_display_get_layer_sys(lv_display_t * disp);
 
 /**
  * Return the bottom layer. The bottom layer is the same on all screen and it is under the normal screen layer.
- * It's visible only if the the screen is transparent.
+ * It's visible only if the screen is transparent.
  * @param disp      pointer to display (NULL to use the default screen)
  * @return          pointer to the bottom layer object
  */

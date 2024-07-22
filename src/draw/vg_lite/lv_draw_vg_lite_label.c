@@ -255,9 +255,6 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
     /* scale size */
     vg_lite_scale(scale, scale, &matrix);
 
-    /* Cartesian coordinates to LCD coordinates */
-    lv_vg_lite_matrix_flip_y(&matrix);
-
     /* calc inverse matrix */
     vg_lite_matrix_t result;
     if(!lv_vg_lite_matrix_inverse(&result, &matrix)) {
@@ -305,23 +302,28 @@ static void vg_lite_outline_push(const lv_freetype_outline_event_param_t * param
 
     lv_freetype_outline_type_t type = param->type;
     switch(type) {
+
+        /**
+         * Reverse the Y-axis coordinate direction to achieve
+         * the conversion from Cartesian coordinate system to LCD coordinate system
+         */
         case LV_FREETYPE_OUTLINE_END:
             lv_vg_lite_path_end(outline);
             break;
         case LV_FREETYPE_OUTLINE_MOVE_TO:
-            lv_vg_lite_path_move_to(outline, param->to.x, param->to.y);
+            lv_vg_lite_path_move_to(outline, param->to.x, -param->to.y);
             break;
         case LV_FREETYPE_OUTLINE_LINE_TO:
-            lv_vg_lite_path_line_to(outline, param->to.x, param->to.y);
+            lv_vg_lite_path_line_to(outline, param->to.x, -param->to.y);
             break;
         case LV_FREETYPE_OUTLINE_CUBIC_TO:
-            lv_vg_lite_path_cubic_to(outline, param->control1.x, param->control1.y,
-                                     param->control2.x, param->control2.y,
-                                     param->to.x, param->to.y);
+            lv_vg_lite_path_cubic_to(outline, param->control1.x, -param->control1.y,
+                                     param->control2.x, -param->control2.y,
+                                     param->to.x, -param->to.y);
             break;
         case LV_FREETYPE_OUTLINE_CONIC_TO:
-            lv_vg_lite_path_quad_to(outline, param->control1.x, param->control1.y,
-                                    param->to.x, param->to.y);
+            lv_vg_lite_path_quad_to(outline, param->control1.x, -param->control1.y,
+                                    param->to.x, -param->to.y);
             break;
         default:
             LV_LOG_ERROR("unknown point type: %d", type);

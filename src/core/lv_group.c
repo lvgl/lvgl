@@ -122,25 +122,6 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
     /*Be sure the object is removed from its current group*/
     lv_group_remove_obj(obj);
 
-    /*Do not add the object twice*/
-    lv_obj_t ** obj_i;
-    _LV_LL_READ(&group->obj_ll, obj_i) {
-        if((*obj_i) == obj) {
-            LV_LOG_INFO("the object is already added to this group");
-            return;
-        }
-    }
-
-    /*If the object is already in a group and focused then refocus it*/
-    lv_group_t * group_cur = lv_obj_get_group(obj);
-    if(group_cur) {
-        if(obj->spec_attr->group_p && *(obj->spec_attr->group_p->obj_focus) == obj) {
-            lv_group_refocus(group_cur);
-
-            LV_LOG_INFO("changing object's group");
-        }
-    }
-
     if(obj->spec_attr == NULL) lv_obj_allocate_spec_attr(obj);
     obj->spec_attr->group_p = group;
 

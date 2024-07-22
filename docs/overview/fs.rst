@@ -155,6 +155,95 @@ To use files in image widgets the following callbacks are required:
 - seek
 - tell
 
+.. _overview_file_system_cache:
+
+Optional file buffering/caching
+*******************************
+
+Files will buffer their reads if the corresponding ``LV_FS_*_CACHE_SIZE``
+config option is set to a value greater than zero. Each open file will
+buffer up to that many bytes to reduce the number of FS driver calls.
+
+Generally speaking, file buffering can be optimized for different kinds
+of access patterns. The one implemented here is optimal for reading large
+files in chunks, which is what the image decoder does.
+It has the potential to call the driver's ``read`` fewer
+times than ``lv_fs_read`` is called. In the best case where the cache size is
+\>= the size of the file, ``read`` will only be called once. This strategy is good
+for linear reading of large files but less helpful for short random reads across a file bigger than the buffer
+since data will be buffered that will be discarded after the next seek and read.
+The cache should be sufficiently large or disabled in that case. Another case where the cache should be disabled
+is if the file contents are expected to change by an external factor like with special OS files.
+
+The implementation is documented below. Note that the FS functions make calls
+to other driver FS functions when the cache is enabled. i.e., ``lv_fs_read`` may call the driver's ``seek``
+so the driver needs to implement more callbacks when the cache is enabled.
+
+``lv_fs_read`` :sub:`(behavior when the cache is enabled)`
+-------------------------------------------------
+
+.. mermaid::
+   :zoom:
+
+   %%{init: {'theme':'neutral'}}%%
+   flowchart LR
+       A["call lv_fs_read and
+          the cache is enabled"] --> B{{"is there cached data
+                                         at the file position?"}}
+       B -->|yes| C{{"does the cache have
+                      all required bytes available?"}}
+       C -->|yes| D["copy all required bytes from
+                     the cache to the destination
+                     buffer"]
+       C -->|no| F["copy the available
+                    required bytes
+                    until the end of the cache
+                    into the destination buffer"]
+             --> G["seek the real file to the end
+                    of what the cache had available"]
+             --> H{{"is the number of remaining bytes
+                     larger than the size of the whole cache?"}}
+       H -->|yes| I["read the remaining bytes
+                     from the real file to the
+                     destination buffer"]
+       H -->|no| J["eagerly read the real file
+                    to fill the whole cache
+                    or as many bytes as the
+                    read call can"]
+             --> O["copy the required bytes
+                    to the destination buffer"]
+       B -->|no| K["seek the real file to
+                    the file position"]
+             --> L{{"is the number of required
+                     bytes greater than the
+                     size of the entire cache?"}}
+       L -->|yes| M["read the real file to
+                     the destination buffer"]
+       L -->|no| N["eagerly read the real file
+                    to fill the whole cache
+                    or as many bytes as the
+                    read call can"]
+             --> P["copy the required bytes
+                    to the destination buffer"]
+
+``lv_fs_write`` :sub:`(behavior when the cache is enabled)`
+--------------------------------------------------
+
+The part of the cache that coincides with the written content
+will be updated to reflect the written content.
+
+``lv_fs_seek`` :sub:`(behavior when the cache is enabled)`
+-------------------------------------------------
+
+The driver's ``seek`` will not actually be called unless the ``whence``
+is ``LV_FS_SEEK_END``, in which case ``seek`` and ``tell`` will be called
+to determine where the end of the file is.
+
+``lv_fs_tell`` :sub:`(behavior when the cache is enabled)`
+-------------------------------------------------
+
+The driver's ``tell`` will not actually be called.
+
 .. _overview_file_system_api:
 
 API

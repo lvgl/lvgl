@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - 2023 the ThorVG project. All rights reserved.
+ * Copyright (c) 2020 - 2024 the ThorVG project. All rights reserved.
 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,8 +48,11 @@ struct SwTask : Task
     bool pushed = false;                  //Pushed into task list?
     bool disposed = false;                //Disposed task?
 
-    RenderRegion bounds() const
+    RenderRegion bounds()
     {
+        //Can we skip the synchronization?
+        done();
+
         RenderRegion region;
 
         //Range over?
@@ -63,7 +66,7 @@ struct SwTask : Task
         return region;
     }
 
-    virtual bool dispose() = 0;
+    virtual void dispose() = 0;
     virtual bool clip(SwRleData* target) = 0;
     virtual SwRleData* rle() = 0;
 
@@ -142,7 +145,9 @@ struct SwShapeTask : SwTask
             visibleFill = (alpha > 0 || rshape->fill);
             if (visibleFill || clipper) {
                 shapeReset(&shape);
-                if (!shapePrepare(&shape, rshape, transform, clipRegion, bbox, mpool, tid, clips.count > 0 ? true : false)) goto err;
+                if (!shapePrepare(&shape, rshape, transform, clipRegion, bbox, mpool, tid, clips.count > 0 ? true : false)) {
+                    visibleFill = false;
+                }
             }
         }
         //Fill
@@ -180,7 +185,7 @@ struct SwShapeTask : SwTask
         shapeDelOutline(&shape, mpool, tid);
 
         //Clip Path
-        for (auto clip = clips.data; clip < clips.end(); ++clip) {
+        for (auto clip = clips.begin(); clip < clips.end(); ++clip) {
             auto clipper = static_cast<SwTask*>(*clip);
             //Clip shape rle
             if (shape.rle && !clipper->clip(shape.rle)) goto err;
@@ -194,10 +199,9 @@ struct SwShapeTask : SwTask
         shapeDelOutline(&shape, mpool, tid);
     }
 
-    bool dispose() override
+    void dispose() override
     {
        shapeFree(&shape);
-       return true;
     }
 };
 
@@ -228,7 +232,7 @@ struct SwSceneTask : SwTask
 
     void run(unsigned tid) override
     {
-        //TODO: Skip the run if the scene hans't changed.
+        //TODO: Skip the run if the scene hasn't changed.
         if (!sceneRle) sceneRle = static_cast<SwRleData*>(calloc(1, sizeof(SwRleData)));
         else rleReset(sceneRle);
 
@@ -241,17 +245,16 @@ struct SwSceneTask : SwTask
             rleMerge(sceneRle, clipper1->rle(), clipper2->rle());
 
             //Unify the remained clippers
-            for (auto rd = scene.data + 2; rd < scene.end(); ++rd) {
+            for (auto rd = scene.begin() + 2; rd < scene.end(); ++rd) {
                 auto clipper = static_cast<SwTask*>(*rd);
                 rleMerge(sceneRle, sceneRle, clipper->rle());
             }
         }
     }
 
-    bool dispose() override
+    void dispose() override
     {
         rleFree(sceneRle);
-        return true;
     }
 };
 
@@ -279,10 +282,8 @@ struct SwImageTask : SwTask
         auto clipRegion = bbox;
 
         //Convert colorspace if it's not aligned.
-        if (source->owner) {
-            if (source->cs != surface->cs) rasterConvertCS(source, surface->cs);
-            if (!source->premultiplied) rasterPremultiply(source);
-        }
+        rasterConvertCS(source, surface->cs);
+        rasterPremultiply(source);
 
         image.data = source->data;
         image.w = source->w;
@@ -303,7 +304,7 @@ struct SwImageTask : SwTask
                 if (image.rle) {
                     //Clear current task memorypool here if the clippers would use the same memory pool
                     imageDelOutline(&image, mpool, tid);
-                    for (auto clip = clips.data; clip < clips.end(); ++clip) {
+                    for (auto clip = clips.begin(); clip < clips.end(); ++clip) {
                         auto clipper = static_cast<SwTask*>(*clip);
                         if (!clipper->clip(image.rle)) goto err;
                     }
@@ -318,10 +319,9 @@ struct SwImageTask : SwTask
         imageDelOutline(&image, mpool, tid);
     }
 
-    bool dispose() override
+    void dispose() override
     {
        imageFree(&image);
-       return true;
     }
 };
 
@@ -380,7 +380,7 @@ SwRenderer::~SwRenderer()
 
 bool SwRenderer::clear()
 {
-    for (auto task = tasks.data; task < tasks.end(); ++task) {
+    for (auto task = tasks.begin(); task < tasks.end(); ++task) {
         if ((*task)->disposed) {
             delete(*task);
         } else {
@@ -425,6 +425,8 @@ bool SwRenderer::target(pixel_t* data, uint32_t stride, uint32_t w, uint32_t h, 
 {
     if (!data || stride == 0 || w == 0 || h == 0 || w > stride) return false;
 
+    clearCompositors();
+
     if (!surface) surface = new SwSurface;
 
     surface->data = data;
@@ -434,11 +436,6 @@ bool SwRenderer::target(pixel_t* data, uint32_t stride, uint32_t w, uint32_t h, 
     surface->cs = cs;
     surface->channelSize = CHANNEL_SIZE(cs);
     surface->premultiplied = true;
-    surface->owner = true;
-
-    vport.x = vport.y = 0;
-    vport.w = surface->w;
-    vport.h = surface->h;
 
     return rasterCompositor(surface);
 }
@@ -446,18 +443,14 @@ bool SwRenderer::target(pixel_t* data, uint32_t stride, uint32_t w, uint32_t h, 
 
 bool SwRenderer::preRender()
 {
-#if LV_USE_DRAW_VG_LITE && LV_USE_VG_LITE_THORVG
     return true;
-#else
-    return rasterClear(surface, 0, 0, surface->w, surface->h);
-#endif
 }
 
 
 void SwRenderer::clearCompositors()
 {
     //Free Composite Caches
-    for (auto comp = compositors.data; comp < compositors.end(); ++comp) {
+    for (auto comp = compositors.begin(); comp < compositors.end(); ++comp) {
         free((*comp)->compositor->image.data);
         delete((*comp)->compositor);
         delete(*comp);
@@ -473,13 +466,12 @@ bool SwRenderer::postRender()
         rasterUnpremultiply(surface);
     }
 
-    for (auto task = tasks.data; task < tasks.end(); ++task) {
+    for (auto task = tasks.begin(); task < tasks.end(); ++task) {
         if ((*task)->disposed) delete(*task);
         else (*task)->pushed = false;
     }
     tasks.clear();
 
-    clearCompositors();
     return true;
 }
 
@@ -614,6 +606,12 @@ bool SwRenderer::mempool(bool shared)
 }
 
 
+const Surface* SwRenderer::mainSurface()
+{
+    return surface;
+}
+
+
 Compositor* SwRenderer::target(const RenderRegion& region, ColorSpace cs)
 {
     auto x = region.x;
@@ -631,7 +629,7 @@ Compositor* SwRenderer::target(const RenderRegion& region, ColorSpace cs)
     auto reqChannelSize = CHANNEL_SIZE(cs);
 
     //Use cached data
-    for (auto p = compositors.data; p < compositors.end(); ++p) {
+    for (auto p = compositors.begin(); p < compositors.end(); ++p) {
         if ((*p)->compositor->valid && (*p)->compositor->image.channelSize == reqChannelSize) {
             cmp = *p;
             break;
@@ -640,11 +638,8 @@ Compositor* SwRenderer::target(const RenderRegion& region, ColorSpace cs)
 
     //New Composition
     if (!cmp) {
-        cmp = new SwSurface;
-
         //Inherits attributes from main surface
-        *cmp = *surface;
-
+        cmp = new SwSurface(surface);
         cmp->compositor = new SwCompositor;
 
         //TODO: We can optimize compositor surface size from (surface->stride x surface->h) to Parameter(w x h)
@@ -710,17 +705,15 @@ ColorSpace SwRenderer::colorSpace()
 }
 
 
-bool SwRenderer::dispose(RenderData data)
+void SwRenderer::dispose(RenderData data)
 {
     auto task = static_cast<SwTask*>(data);
-    if (!task) return true;
+    if (!task) return;
     task->done();
     task->dispose();
 
     if (task->pushed) task->disposed = true;
     else delete(task);
-
-    return true;
 }
 
 
@@ -735,7 +728,7 @@ void* SwRenderer::prepareCommon(SwTask* task, const RenderTransform* transform, 
     //TODO: Failed threading them. It would be better if it's possible.
     //See: https://github.com/thorvg/thorvg/issues/1409
     //Guarantee composition targets get ready.
-    for (auto clip = clips.data; clip < clips.end(); ++clip) {
+    for (auto clip = clips.begin(); clip < clips.end(); ++clip) {
         static_cast<SwTask*>(*clip)->done();
     }
 
@@ -796,7 +789,7 @@ RenderData SwRenderer::prepare(const Array<RenderData>& scene, RenderData data, 
     //TODO: Failed threading them. It would be better if it's possible.
     //See: https://github.com/thorvg/thorvg/issues/1409
     //Guarantee composition targets get ready.
-    for (auto task = scene.data; task < scene.end(); ++task) {
+    for (auto task = scene.begin(); task < scene.end(); ++task) {
         static_cast<SwTask*>(*task)->done();
     }
     return prepareCommon(task, transform, clips, opacity, flags);

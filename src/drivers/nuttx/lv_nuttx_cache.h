@@ -28,6 +28,8 @@ extern "C" {
 
 void lv_nuttx_cache_init(void);
 
+void lv_nuttx_cache_deinit(void);
+
 /**********************
  *      MACROS
  **********************/

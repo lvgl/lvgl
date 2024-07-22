@@ -582,7 +582,7 @@ static void LV_ATTRIBUTE_FAST_MEM shadow_draw_corner_buf(const lv_area_t * coord
     lv_draw_sw_mask_radius_init(&mask_param, &sh_area, r, false);
 
 #if SHADOW_ENHANCE
-    /*Set half shadow width width because blur will be repeated*/
+    /*Set half shadow width because blur will be repeated*/
     if(sw_ori == 1) sw = 1;
     else sw = sw_ori >> 1;
 #endif /*SHADOW_ENHANCE*/

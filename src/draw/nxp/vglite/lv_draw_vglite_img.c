@@ -381,7 +381,7 @@ static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * 
     /* Path to draw */
     int32_t path_data[RECT_PATH_DATA_MAX_SIZE];
     uint32_t path_data_size;
-    vglite_create_rect_path_data(path_data, &path_data_size, 0, coords);
+    vglite_create_rect_path_data(path_data, &path_data_size, dsc->clip_radius, coords);
     vg_lite_quality_t path_quality = VG_LITE_MEDIUM;
 
     vg_lite_path_t path;
@@ -399,7 +399,9 @@ static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * 
     src_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
 
     /* Pattern matrix */
-    vg_lite_matrix_t * vgmatrix = vglite_get_matrix();
+    vg_lite_matrix_t vgmatrix;
+    vg_lite_identity(&vgmatrix);
+    vg_lite_translate((vg_lite_float_t)dsc->image_area.x1, (vg_lite_float_t)dsc->image_area.y1, &vgmatrix);
 
     /* Blend mode */
     vg_lite_blend_t vgblend = vglite_get_blend_mode(dsc->blend_mode);
@@ -407,12 +409,12 @@ static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * 
     vg_lite_color_t vgcol = _vglite_recolor(dsc);
 
     /* Filter */
-    bool has_trasform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
-    vg_lite_filter_t filter = has_trasform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
+    bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
+    vg_lite_filter_t filter = has_transform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
 
     /* Draw Pattern */
     VGLITE_CHECK_ERROR(vg_lite_draw_pattern(dst_vgbuf, &path, VG_LITE_FILL_NON_ZERO, &path_matrix,
-                                            src_vgbuf, vgmatrix, vgblend, VG_LITE_PATTERN_REPEAT,
+                                            src_vgbuf, &vgmatrix, vgblend, VG_LITE_PATTERN_REPEAT,
                                             0, vgcol, filter));
 }
 

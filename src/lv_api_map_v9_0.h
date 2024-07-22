@@ -39,6 +39,9 @@ extern "C" {
 
 #define lv_button_bind_checked           lv_obj_bind_checked
 
+#define LV_DRAW_BUF_DEFINE               LV_DRAW_BUF_DEFINE_STATIC
+
+#define _lv_utils_bsearch                lv_utils_bsearch
 /**********************
  *      MACROS
  **********************/

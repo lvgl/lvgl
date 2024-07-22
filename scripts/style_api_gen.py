@@ -421,7 +421,7 @@ props = [
 
 {'name': 'FLEX_GROW',
  'style_type': 'num',   'var_type': 'uint8_t', 'default':'`LV_FLEX_ALIGN_ROW`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Defines how mayn space to take proprtionally the free space of the object's trach"},
+ 'dsc': "Defines how much space to take proportionally from the free space of the object's track"},
 
 
 
@@ -482,7 +482,7 @@ def obj_style_get(p):
   if 'section' in p: return
 
   cast = style_get_cast(p['style_type'], p['var_type'])
-  print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"(const lv_obj_t * obj, uint32_t part)")
+  print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"(const lv_obj_t * obj, lv_part_t part)")
   print("{")
   print("    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + ");")
   print("    return " + cast + "v." + p['style_type'] + ";")
@@ -490,7 +490,7 @@ def obj_style_get(p):
   print("")
 
   if 'filtered' in p and p['filtered']:
-    print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"_filtered(const lv_obj_t * obj, uint32_t part)")
+    print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"_filtered(const lv_obj_t * obj, lv_part_t part)")
     print("{")
     print("    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + "));")
     print("    return " + cast + "v." + p['style_type'] + ";")

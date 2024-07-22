@@ -254,6 +254,17 @@ void _lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     if(!disp) return;
     if(!lv_display_is_invalidation_enabled(disp)) return;
 
+    /**
+     * There are two reasons for this issue:
+     *  1.LVGL API is being used across threads, such as modifying widget properties in another thread
+     *    or within an interrupt handler during the main thread rendering process.
+     *  2.User-customized widget modify widget properties/styles again within the DRAW event.
+     *
+     * Therefore, ensure that LVGL is used in a single-threaded manner, or refer to
+     * documentation: https://docs.lvgl.io/master/porting/os.html for proper locking mechanisms.
+     * Additionally, ensure that only drawing-related tasks are performed within the DRAW event,
+     * and move widget property/style modifications to other events.
+     */
     LV_ASSERT_MSG(!disp->rendering_in_progress, "Invalidate area is not allowed during rendering.");
 
     /*Clear the invalidate buffer if the parameter is NULL*/
@@ -331,7 +342,7 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
         /* Ensure the timer does not run again automatically.
          * This is done before refreshing in case refreshing invalidates something else.
          * However if the performance monitor is enabled keep the timer running to count the FPS.*/
-#if !(defined(LV_USE_PERF_MONITOR) && LV_USE_PERF_MONITOR)
+#if LV_USE_PERF_MONITOR
         lv_timer_pause(tmr);
 #endif
     }
@@ -378,23 +389,19 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
     /*If refresh happened ...*/
     lv_display_send_event(disp_refr, LV_EVENT_RENDER_READY, NULL);
 
-    if(!lv_display_is_double_buffered(disp_refr) ||
-       disp_refr->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT) goto refr_clean_up;
+    /*In double buffered direct mode save the updated areas.
+     *They will be used on the next call to synchronize the buffers.*/
+    if(lv_display_is_double_buffered(disp_refr) && disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
+        uint32_t i;
+        for(i = 0; i < disp_refr->inv_p; i++) {
+            if(disp_refr->inv_area_joined[i])
+                continue;
 
-    /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
-    /*We need to wait for ready here to not mess up the active screen*/
-    wait_for_flushing(disp_refr);
-
-    uint32_t i;
-    for(i = 0; i < disp_refr->inv_p; i++) {
-        if(disp_refr->inv_area_joined[i])
-            continue;
-
-        lv_area_t * sync_area = _lv_ll_ins_tail(&disp_refr->sync_areas);
-        *sync_area = disp_refr->inv_areas[i];
+            lv_area_t * sync_area = _lv_ll_ins_tail(&disp_refr->sync_areas);
+            *sync_area = disp_refr->inv_areas[i];
+        }
     }
 
-refr_clean_up:
     lv_memzero(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
     lv_memzero(disp_refr->inv_area_joined, sizeof(disp_refr->inv_area_joined));
     disp_refr->inv_p = 0;
@@ -577,13 +584,14 @@ static void refr_invalid_areas(void)
  */
 static void layer_reshape_draw_buf(lv_layer_t * layer)
 {
-    LV_ASSERT(lv_draw_buf_reshape(
-                  layer->draw_buf,
-                  layer->color_format,
-                  lv_area_get_width(&layer->buf_area),
-                  lv_area_get_height(&layer->buf_area),
-                  0)
-              != NULL);
+    lv_draw_buf_t * ret = lv_draw_buf_reshape(
+                              layer->draw_buf,
+                              layer->color_format,
+                              lv_area_get_width(&layer->buf_area),
+                              lv_area_get_height(&layer->buf_area),
+                              0);
+    LV_UNUSED(ret);
+    LV_ASSERT_NULL(ret);
 }
 
 /**
@@ -811,7 +819,7 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
             }
         }
 
-        /*Call the post draw draw function of the parents of the to object*/
+        /*Call the post draw function of the parents of the to object*/
         lv_obj_send_event(parent, LV_EVENT_DRAW_POST_BEGIN, (void *)layer);
         lv_obj_send_event(parent, LV_EVENT_DRAW_POST, (void *)layer);
         lv_obj_send_event(parent, LV_EVENT_DRAW_POST_END, (void *)layer);
@@ -900,7 +908,7 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
         lv_result_t res = layer_get_area(layer, obj, layer_type, &layer_area_full, &obj_draw_size);
         if(res != LV_RESULT_OK) return;
 
-        /*Simple layers can be subdivied into smaller layers*/
+        /*Simple layers can be subdivided into smaller layers*/
         uint32_t max_rgb_row_height = lv_area_get_height(&layer_area_full);
         uint32_t max_argb_row_height = lv_area_get_height(&layer_area_full);
         if(layer_type == LV_LAYER_TYPE_SIMPLE) {
@@ -1064,6 +1072,12 @@ static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t *
     };
 
     lv_display_send_event(disp, LV_EVENT_FLUSH_START, &offset_area);
+
+    /*For backward compatibility support LV_COLOR_16_SWAP (from v8)*/
+#if defined(LV_COLOR_16_SWAP) && LV_COLOR_16_SWAP
+    lv_draw_sw_rgb565_swap(px_map, lv_area_get_size(&offset_area));
+#endif
+
     disp->flush_cb(disp, &offset_area, px_map);
     lv_display_send_event(disp, LV_EVENT_FLUSH_FINISH, &offset_area);
 
@@ -1078,7 +1092,10 @@ static void wait_for_flushing(lv_display_t * disp)
     lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_START, NULL);
 
     if(disp->flush_wait_cb) {
-        disp->flush_wait_cb(disp);
+        if(disp->flushing) {
+            disp->flush_wait_cb(disp);
+        }
+        disp->flushing = 0;
     }
     else {
         while(disp->flushing);

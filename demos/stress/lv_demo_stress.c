@@ -32,7 +32,7 @@ static void obj_test_task_cb(lv_timer_t * tmr);
  **********************/
 static lv_obj_t * main_page;
 static lv_obj_t * ta;
-static uint32_t mem_free_start = 0;
+static size_t mem_free_start = 0;
 static int16_t g_state = -1;
 
 /**********************

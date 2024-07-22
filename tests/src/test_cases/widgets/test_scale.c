@@ -371,7 +371,7 @@ void test_scale_set_line_needle_value(void)
 
     lv_obj_t * line = lv_line_create(scale);
 
-    /* test the scale alocating the array */
+    /* test the scale allocating the array */
     lv_scale_set_line_needle_value(scale, line, 50, 35);
     TEST_ASSERT_EQUAL_UINT32(2, lv_line_get_point_count(line));
     const lv_point_precise_t * allocated_points_array = lv_line_get_points(line);

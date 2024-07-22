@@ -2,6 +2,7 @@
 * @file lv_rnd_unicodes.h
 *
 */
+#if LV_BUILD_TEST
 
 #ifndef LV_RND_UNICODES_H
 #define LV_RND_UNICODES_H
@@ -13,7 +14,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lvgl.h"
+#include "../../../../lvgl.h"
 
 /*********************
  *      DEFINES
@@ -54,3 +55,5 @@ int lv_random_utf8_chars(uint8_t * buf, int buf_len, const uint32_t * ranges, ui
 #endif
 
 #endif /*LV_RND_UNICODES_H*/
+
+#endif /*LV_BUILD_TEST*/

@@ -598,6 +598,8 @@ void test_label_max_width(void)
     lv_label_set_text(test_label1, long_text);
     lv_obj_set_width(test_label1, 600);
     lv_obj_set_style_max_width(test_label1, 200, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_label1, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(test_label1, LV_OPA_100, LV_PART_MAIN);
 
     lv_obj_t * test_label2 = lv_label_create(lv_screen_active());
     lv_label_set_text(test_label2, long_text);
@@ -605,6 +607,8 @@ void test_label_max_width(void)
     lv_obj_set_height(test_label2, 50);
     lv_obj_set_x(test_label2, 300);
     lv_obj_set_style_max_width(test_label2, 200, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_label2, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(test_label2, LV_OPA_100, LV_PART_MAIN);
     lv_label_set_long_mode(test_label2, LV_LABEL_LONG_DOT);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_max_width.png");

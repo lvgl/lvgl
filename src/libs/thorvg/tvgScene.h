@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - 2023 the ThorVG project. All rights reserved.
+ * Copyright (c) 2020 - 2024 the ThorVG project. All rights reserved.
 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,15 +23,12 @@
 #include "../../lv_conf_internal.h"
 #if LV_USE_THORVG_INTERNAL
 
-#ifndef _TVG_SCENE_IMPL_H_
-#define _TVG_SCENE_IMPL_H_
+#ifndef _TVG_SCENE_H_
+#define _TVG_SCENE_H_
 
 #include <float.h>
 #include "tvgPaint.h"
 
-/************************************************************************/
-/* Internal Class Implementation                                        */
-/************************************************************************/
 
 struct SceneIterator : Iterator
 {
@@ -65,11 +62,10 @@ struct SceneIterator : Iterator
 struct Scene::Impl
 {
     list<Paint*> paints;
-    RenderMethod* renderer = nullptr;    //keep it for explicit clear
     RenderData rd = nullptr;
     Scene* scene = nullptr;
     uint8_t opacity;                     //for composition
-    bool needComp;                       //composite or not
+    bool needComp = false;               //composite or not
 
     Impl(Scene* s) : scene(s)
     {
@@ -78,21 +74,12 @@ struct Scene::Impl
     ~Impl()
     {
         for (auto paint : paints) {
-            if (paint->pImpl->unref() == 0) delete(paint);
-        }
-    }
-
-    bool dispose(RenderMethod& renderer)
-    {
-        for (auto paint : paints) {
-            paint->pImpl->dispose(renderer);
+            if (P(paint)->unref() == 0) delete(paint);
         }
 
-        renderer.dispose(rd);
-        this->renderer = nullptr;
-        this->rd = nullptr;
-
-        return true;
+        if (auto renderer = PP(scene)->renderer) {
+            renderer->dispose(rd);
+        }
     }
 
     bool needComposition(uint8_t opacity)
@@ -117,24 +104,21 @@ struct Scene::Impl
         return true;
     }
 
-    RenderData update(RenderMethod &renderer, const RenderTransform* transform, Array<RenderData>& clips, uint8_t opacity, RenderUpdateFlag flag, bool clipper)
+    RenderData update(RenderMethod* renderer, const RenderTransform* transform, Array<RenderData>& clips, uint8_t opacity, RenderUpdateFlag flag, bool clipper)
     {
         if ((needComp = needComposition(opacity))) {
             /* Overriding opacity value. If this scene is half-translucent,
-               It must do intermeidate composition with that opacity value. */
+               It must do intermediate composition with that opacity value. */
             this->opacity = opacity;
             opacity = 255;
         }
 
-        this->renderer = &renderer;
-
         if (clipper) {
-            Array<RenderData> rds;
-            rds.reserve(paints.size());
+            Array<RenderData> rds(paints.size());
             for (auto paint : paints) {
                 rds.push(paint->pImpl->update(renderer, transform, clips, opacity, flag, true));
             }
-            rd = renderer.prepare(rds, rd, transform, clips, opacity, flag);
+            rd = renderer->prepare(rds, rd, transform, clips, opacity, flag);
             return rd;
         } else {
             for (auto paint : paints) {
@@ -144,25 +128,26 @@ struct Scene::Impl
         }
     }
 
-    bool render(RenderMethod& renderer)
+    bool render(RenderMethod* renderer)
     {
         Compositor* cmp = nullptr;
+        auto ret = true;
 
         if (needComp) {
-            cmp = renderer.target(bounds(renderer), renderer.colorSpace());
-            renderer.beginComposite(cmp, CompositeMethod::None, opacity);
+            cmp = renderer->target(bounds(renderer), renderer->colorSpace());
+            renderer->beginComposite(cmp, CompositeMethod::None, opacity);
         }
 
         for (auto paint : paints) {
-            if (!paint->pImpl->render(renderer)) return false;
+            ret &= paint->pImpl->render(renderer);
         }
 
-        if (cmp) renderer.endComposite(cmp);
+        if (cmp) renderer->endComposite(cmp);
 
-        return true;
+        return ret;
     }
 
-    RenderRegion bounds(RenderMethod& renderer) const
+    RenderRegion bounds(RenderMethod* renderer) const
     {
         if (paints.empty()) return {0, 0, 0, 0};
 
@@ -218,9 +203,8 @@ struct Scene::Impl
 
     Paint* duplicate()
     {
-        auto ret = Scene::gen();
-
-        auto dup = ret.get()->pImpl;
+        auto ret = Scene::gen().release();
+        auto dup = ret->pImpl;
 
         for (auto paint : paints) {
             auto cdup = paint->duplicate();
@@ -228,19 +212,15 @@ struct Scene::Impl
             dup->paints.push_back(cdup);
         }
 
-        return ret.release();
+        return ret;
     }
 
     void clear(bool free)
     {
-        auto dispose = renderer ? true : false;
-
         for (auto paint : paints) {
-            if (dispose) free &= P(paint)->dispose(*renderer);
             if (P(paint)->unref() == 0 && free) delete(paint);
         }
         paints.clear();
-        renderer = nullptr;
     }
 
     Iterator* iterator()
@@ -249,7 +229,7 @@ struct Scene::Impl
     }
 };
 
-#endif //_TVG_SCENE_IMPL_H_
+#endif //_TVG_SCENE_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
 

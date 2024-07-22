@@ -912,7 +912,7 @@ STBTT_DEF unsigned char * stbtt_GetCodepointBitmap(const stbtt_fontinfo * info, 
 
 STBTT_DEF unsigned char * stbtt_GetCodepointBitmapSubpixel(const stbtt_fontinfo * info, float scale_x, float scale_y,
                                                            float shift_x, float shift_y, int codepoint, int * width, int * height, int * xoff, int * yoff);
-// the same as stbtt_GetCodepoitnBitmap, but you can specify a subpixel
+// the same as stbtt_GetCodepointBitmap, but you can specify a subpixel
 // shift for the character
 
 STBTT_DEF void stbtt_MakeCodepointBitmap(const stbtt_fontinfo * info, unsigned char * output, int out_w, int out_h,
@@ -2854,7 +2854,47 @@ static stbtt_int32 stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fontinfo * info, i
             }
         }
     }
+    return 0;
+}
 
+STBTT_DEF int stbtt_KernTableCheck(const stbtt_fontinfo * info)
+{
+    if(info->gpos) {
+        stbtt_uint16 lookupListOffset;
+        stbtt_uint32 lookupList;
+        stbtt_uint16 lookupCount;
+#ifdef STBTT_STREAM_TYPE
+        STBTT_STREAM_TYPE data = info->data;
+#else
+        const stbtt_uint8 * data = info->data;
+#endif
+        stbtt_int32 i;
+
+        if(!info->gpos) return 0;
+
+        if(ttUSHORT(data, 0 + info->gpos) != 1) return 0;  // Major version 1
+        if(ttUSHORT(data, 2 + info->gpos) != 0) return 0;  // Minor version 0
+
+        lookupListOffset = ttUSHORT(data, 8 + info->gpos);
+        lookupList = lookupListOffset;
+        lookupCount = ttUSHORT(data, lookupList);
+
+        for(i = 0; i < lookupCount; ++i) {
+            stbtt_uint16 lookupOffset = ttUSHORT(data, lookupList + 2 + 2 * i);
+            stbtt_uint32 lookupTable = lookupList + lookupOffset;
+
+            stbtt_uint16 lookupType = ttUSHORT(data, lookupTable);
+
+            if(lookupType != 2)  // Pair Adjustment Positioning Subtable
+                continue;
+
+            return 1; // we have a usable lookup table.
+        }
+        return 0;
+    }
+    else if(info->kern) {
+        return 1;
+    }
     return 0;
 }
 

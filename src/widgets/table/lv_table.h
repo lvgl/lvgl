@@ -157,6 +157,14 @@ void lv_table_clear_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_tab
  */
 void lv_table_set_cell_user_data(lv_obj_t * obj, uint16_t row, uint16_t col, void * user_data);
 
+/**
+ * Set the selected cell
+ * @param obj       pointer to a table object
+ * @param row       id of the cell row to select
+ * @param col       id of the cell column to select
+ */
+void lv_table_set_selected_cell(lv_obj_t * obj, uint16_t row, uint16_t col);
+
 /*=====================
  * Getter functions
  *====================*/

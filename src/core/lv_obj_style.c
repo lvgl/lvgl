@@ -49,7 +49,7 @@ typedef enum {
  *  STATIC PROTOTYPES
  **********************/
 static lv_style_t * get_local_style(lv_obj_t * obj, lv_style_selector_t selector);
-static _lv_obj_style_t * get_trans_style(lv_obj_t * obj, uint32_t part);
+static _lv_obj_style_t * get_trans_style(lv_obj_t * obj, lv_part_t part);
 static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop,
                                     lv_style_value_t * v);
 static void report_style_change_core(void * style, lv_obj_t * obj);
@@ -464,7 +464,7 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t 
     lv_anim_start(&a);
 }
 
-lv_style_value_t _lv_obj_style_apply_color_filter(const lv_obj_t * obj, uint32_t part, lv_style_value_t v)
+lv_style_value_t _lv_obj_style_apply_color_filter(const lv_obj_t * obj, lv_part_t part, lv_style_value_t v)
 {
     if(obj == NULL) return v;
     const lv_color_filter_dsc_t * f = lv_obj_get_style_color_filter_dsc(obj, part);

@@ -1,7 +1,7 @@
 /*
-LodePNG version 20201017
+LodePNG version 20230410
 
-Copyright (c) 2005-2020 Lode Vandevenne
+Copyright (c) 2005-2023 Lode Vandevenne
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -31,8 +31,11 @@ Rename this file to lodepng.cpp to use it for C++, or to lodepng.c to use it for
 #include "lodepng.h"
 #if LV_USE_LODEPNG
 
+#define image_cache_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers)
+
 #ifdef LODEPNG_COMPILE_DISK
     #include <limits.h> /* LONG_MAX */
+    #include <stdio.h> /* file handling */
 #endif /* LODEPNG_COMPILE_DISK */
 
 #ifdef LODEPNG_COMPILE_ALLOCATORS
@@ -44,10 +47,10 @@ Rename this file to lodepng.cpp to use it for C++, or to lodepng.c to use it for
     #pragma warning( disable : 4996 ) /*VS does not like fopen, but fopen_s is not standard C so unusable here*/
 #endif /*_MSC_VER */
 
-const char * LODEPNG_VERSION_STRING = "20201017";
+const char * LODEPNG_VERSION_STRING = "20230410";
 
 /*
-This source file is built up in the following large parts. The code sections
+This source file is divided into the following large parts. The code sections
 with the "LODEPNG_COMPILE_" #defines divide this up further in an intermixed way.
 -Tools for C and common code for PNG and Zlib
 -C Code for Zlib (huffman, deflate, ...)
@@ -144,7 +147,6 @@ static size_t lodepng_strlen(const char * a)
 
 #define LODEPNG_MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define LODEPNG_MIN(a, b) (((a) < (b)) ? (a) : (b))
-#define LODEPNG_ABS(x) ((x) < 0 ? -(x) : (x))
 
 #if defined(LODEPNG_COMPILE_PNG) || defined(LODEPNG_COMPILE_DECODER)
 /* Safely check if adding two integers will overflow (no undefined
@@ -278,7 +280,7 @@ typedef struct ucvector {
 } ucvector;
 
 /*returns 1 if success, 0 if failure ==> nothing done*/
-static unsigned ucvector_resize(ucvector * p, size_t size)
+static unsigned ucvector_reserve(ucvector * p, size_t size)
 {
     if(size > p->allocsize) {
         size_t newsize = size + (p->allocsize >> 1u);
@@ -289,8 +291,14 @@ static unsigned ucvector_resize(ucvector * p, size_t size)
         }
         else return 0; /*error: not enough memory*/
     }
-    p->size = size;
     return 1; /*success*/
+}
+
+/*returns 1 if success, 0 if failure ==> nothing done*/
+static unsigned ucvector_resize(ucvector * p, size_t size)
+{
+    p->size = size;
+    return ucvector_reserve(p, size);
 }
 
 static ucvector ucvector_init(unsigned char * buffer, size_t size)
@@ -507,36 +515,29 @@ static unsigned LodePNGBitReader_init(LodePNGBitReader * reader, const unsigned 
 ensureBits functions:
 Ensures the reader can at least read nbits bits in one or more readBits calls,
 safely even if not enough bits are available.
-Returns 1 if there are enough bits available, 0 if not.
+The nbits parameter is unused but is given for documentation purposes, error
+checking for amount of bits must be done beforehand.
 */
 
-/*See ensureBits documentation above. This one ensures exactly 1 bit */
-/*static unsigned ensureBits1(LodePNGBitReader* reader) {
-  if(reader->bp >= reader->bitsize) return 0;
-  reader->buffer = (unsigned)reader->data[reader->bp >> 3u] >> (reader->bp & 7u);
-  return 1;
-}*/
-
 /*See ensureBits documentation above. This one ensures up to 9 bits */
-static unsigned ensureBits9(LodePNGBitReader * reader, size_t nbits)
+static LODEPNG_INLINE void ensureBits9(LodePNGBitReader * reader, size_t nbits)
 {
     size_t start = reader->bp >> 3u;
     size_t size = reader->size;
     if(start + 1u < size) {
         reader->buffer = (unsigned)reader->data[start + 0] | ((unsigned)reader->data[start + 1] << 8u);
         reader->buffer >>= (reader->bp & 7u);
-        return 1;
     }
     else {
         reader->buffer = 0;
-        if(start + 0u < size) reader->buffer |= reader->data[start + 0];
+        if(start + 0u < size) reader->buffer = reader->data[start + 0];
         reader->buffer >>= (reader->bp & 7u);
-        return reader->bp + nbits <= reader->bitsize;
     }
+    (void)nbits;
 }
 
 /*See ensureBits documentation above. This one ensures up to 17 bits */
-static unsigned ensureBits17(LodePNGBitReader * reader, size_t nbits)
+static LODEPNG_INLINE void ensureBits17(LodePNGBitReader * reader, size_t nbits)
 {
     size_t start = reader->bp >> 3u;
     size_t size = reader->size;
@@ -544,19 +545,18 @@ static unsigned ensureBits17(LodePNGBitReader * reader, size_t nbits)
         reader->buffer = (unsigned)reader->data[start + 0] | ((unsigned)reader->data[start + 1] << 8u) |
                          ((unsigned)reader->data[start + 2] << 16u);
         reader->buffer >>= (reader->bp & 7u);
-        return 1;
     }
     else {
         reader->buffer = 0;
         if(start + 0u < size) reader->buffer |= reader->data[start + 0];
         if(start + 1u < size) reader->buffer |= ((unsigned)reader->data[start + 1] << 8u);
         reader->buffer >>= (reader->bp & 7u);
-        return reader->bp + nbits <= reader->bitsize;
     }
+    (void)nbits;
 }
 
 /*See ensureBits documentation above. This one ensures up to 25 bits */
-static LODEPNG_INLINE unsigned ensureBits25(LodePNGBitReader * reader, size_t nbits)
+static LODEPNG_INLINE void ensureBits25(LodePNGBitReader * reader, size_t nbits)
 {
     size_t start = reader->bp >> 3u;
     size_t size = reader->size;
@@ -564,7 +564,6 @@ static LODEPNG_INLINE unsigned ensureBits25(LodePNGBitReader * reader, size_t nb
         reader->buffer = (unsigned)reader->data[start + 0] | ((unsigned)reader->data[start + 1] << 8u) |
                          ((unsigned)reader->data[start + 2] << 16u) | ((unsigned)reader->data[start + 3] << 24u);
         reader->buffer >>= (reader->bp & 7u);
-        return 1;
     }
     else {
         reader->buffer = 0;
@@ -572,12 +571,12 @@ static LODEPNG_INLINE unsigned ensureBits25(LodePNGBitReader * reader, size_t nb
         if(start + 1u < size) reader->buffer |= ((unsigned)reader->data[start + 1] << 8u);
         if(start + 2u < size) reader->buffer |= ((unsigned)reader->data[start + 2] << 16u);
         reader->buffer >>= (reader->bp & 7u);
-        return reader->bp + nbits <= reader->bitsize;
     }
+    (void)nbits;
 }
 
 /*See ensureBits documentation above. This one ensures up to 32 bits */
-static LODEPNG_INLINE unsigned ensureBits32(LodePNGBitReader * reader, size_t nbits)
+static LODEPNG_INLINE void ensureBits32(LodePNGBitReader * reader, size_t nbits)
 {
     size_t start = reader->bp >> 3u;
     size_t size = reader->size;
@@ -586,7 +585,6 @@ static LODEPNG_INLINE unsigned ensureBits32(LodePNGBitReader * reader, size_t nb
                          ((unsigned)reader->data[start + 2] << 16u) | ((unsigned)reader->data[start + 3] << 24u);
         reader->buffer >>= (reader->bp & 7u);
         reader->buffer |= (((unsigned)reader->data[start + 4] << 24u) << (8u - (reader->bp & 7u)));
-        return 1;
     }
     else {
         reader->buffer = 0;
@@ -595,55 +593,31 @@ static LODEPNG_INLINE unsigned ensureBits32(LodePNGBitReader * reader, size_t nb
         if(start + 2u < size) reader->buffer |= ((unsigned)reader->data[start + 2] << 16u);
         if(start + 3u < size) reader->buffer |= ((unsigned)reader->data[start + 3] << 24u);
         reader->buffer >>= (reader->bp & 7u);
-        return reader->bp + nbits <= reader->bitsize;
     }
+    (void)nbits;
 }
 
 /* Get bits without advancing the bit pointer. Must have enough bits available with ensureBits. Max nbits is 31. */
-static unsigned peekBits(LodePNGBitReader * reader, size_t nbits)
+static LODEPNG_INLINE unsigned peekBits(LodePNGBitReader * reader, size_t nbits)
 {
     /* The shift allows nbits to be only up to 31. */
     return reader->buffer & ((1u << nbits) - 1u);
 }
 
 /* Must have enough bits available with ensureBits */
-static void advanceBits(LodePNGBitReader * reader, size_t nbits)
+static LODEPNG_INLINE void advanceBits(LodePNGBitReader * reader, size_t nbits)
 {
     reader->buffer >>= nbits;
     reader->bp += nbits;
 }
 
 /* Must have enough bits available with ensureBits */
-static unsigned readBits(LodePNGBitReader * reader, size_t nbits)
+static LODEPNG_INLINE unsigned readBits(LodePNGBitReader * reader, size_t nbits)
 {
     unsigned result = peekBits(reader, nbits);
     advanceBits(reader, nbits);
     return result;
 }
-
-#if 0 /*Disable because tests fail due to unused declaration*/
-/* Public for testing only. steps and result must have numsteps values. */
-static unsigned lode_png_test_bitreader(const unsigned char * data, size_t size,
-                                        size_t numsteps, const size_t * steps, unsigned * result)
-{
-    size_t i;
-    LodePNGBitReader reader;
-    unsigned error = LodePNGBitReader_init(&reader, data, size);
-    if(error) return 0;
-    for(i = 0; i < numsteps; i++) {
-        size_t step = steps[i];
-        unsigned ok;
-        if(step > 25) ok = ensureBits32(&reader, step);
-        else if(step > 17) ok = ensureBits25(&reader, step);
-        else if(step > 9) ok = ensureBits17(&reader, step);
-        else ok = ensureBits9(&reader, step);
-        if(!ok) return 0;
-        result[i] = readBits(&reader, step);
-    }
-    return 1;
-}
-#endif
-
 #endif /*LODEPNG_COMPILE_DECODER*/
 
 static unsigned reverseBits(unsigned bits, unsigned num)
@@ -759,7 +733,7 @@ static unsigned HuffmanTree_makeTable(HuffmanTree * tree)
     size = headsize;
     for(i = 0; i < headsize; ++i) {
         unsigned l = maxlens[i];
-        if(l > FIRSTBITS) size += (1u << (l - FIRSTBITS));
+        if(l > FIRSTBITS) size += (((size_t)1) << (l - FIRSTBITS));
     }
     tree->table_len = (unsigned char *)lodepng_malloc(size * sizeof(*tree->table_len));
     tree->table_value = (unsigned short *)lodepng_malloc(size * sizeof(*tree->table_value));
@@ -777,8 +751,8 @@ static unsigned HuffmanTree_makeTable(HuffmanTree * tree)
         unsigned l = maxlens[i];
         if(l <= FIRSTBITS) continue;
         tree->table_len[i] = l;
-        tree->table_value[i] = pointer;
-        pointer += (1u << (l - FIRSTBITS));
+        tree->table_value[i] = (unsigned short)pointer;
+        pointer += (((size_t)1) << (l - FIRSTBITS));
     }
     lodepng_free(maxlens);
 
@@ -786,10 +760,11 @@ static unsigned HuffmanTree_makeTable(HuffmanTree * tree)
     numpresent = 0;
     for(i = 0; i < tree->numcodes; ++i) {
         unsigned l = tree->lengths[i];
-        unsigned symbol = tree->codes[i]; /*the huffman bit pattern. i itself is the value.*/
-        /*reverse bits, because the huffman bits are given in MSB first order but the bit reader reads LSB first*/
-        unsigned reverse = reverseBits(symbol, l);
+        unsigned symbol, reverse;
         if(l == 0) continue;
+        symbol = tree->codes[i]; /*the huffman bit pattern. i itself is the value.*/
+        /*reverse bits, because the huffman bits are given in MSB first order but the bit reader reads LSB first*/
+        reverse = reverseBits(symbol, l);
         numpresent++;
 
         if(l <= FIRSTBITS) {
@@ -801,7 +776,7 @@ static unsigned HuffmanTree_makeTable(HuffmanTree * tree)
                 unsigned index = reverse | (j << l);
                 if(tree->table_len[index] != 16) return 55; /*invalid tree: long symbol shares prefix with short symbol*/
                 tree->table_len[index] = l;
-                tree->table_value[index] = i;
+                tree->table_value[index] = (unsigned short)i;
             }
         }
         else {
@@ -819,7 +794,7 @@ static unsigned HuffmanTree_makeTable(HuffmanTree * tree)
                 unsigned reverse2 = reverse >> FIRSTBITS; /* l - FIRSTBITS bits */
                 unsigned index2 = start + (reverse2 | (j << (l - FIRSTBITS)));
                 tree->table_len[index2] = l;
-                tree->table_value[index2] = i;
+                tree->table_value[index2] = (unsigned short)i;
             }
         }
     }
@@ -1169,11 +1144,10 @@ static unsigned huffmanDecodeSymbol(LodePNGBitReader * reader, const HuffmanTree
         return value;
     }
     else {
-        unsigned index2;
         advanceBits(reader, FIRSTBITS);
-        index2 = value + peekBits(reader, l - FIRSTBITS);
-        advanceBits(reader, codetree->table_len[index2] - FIRSTBITS);
-        return codetree->table_value[index2];
+        value += peekBits(reader, l - FIRSTBITS);
+        advanceBits(reader, codetree->table_len[value] - FIRSTBITS);
+        return codetree->table_value[value];
     }
 }
 #endif /*LODEPNG_COMPILE_DECODER*/
@@ -1208,7 +1182,8 @@ static unsigned getTreeInflateDynamic(HuffmanTree * tree_ll, HuffmanTree * tree_
     unsigned * bitlen_cl = 0;
     HuffmanTree tree_cl; /*the code tree for code length codes (the huffman tree for compressed huffman trees)*/
 
-    if(!ensureBits17(reader, 14)) return 49; /*error: the bit pointer is or will go past the memory*/
+    if(reader->bitsize - reader->bp < 14) return 49; /*error: the bit pointer is or will go past the memory*/
+    ensureBits17(reader, 14);
 
     /*number of literal/length codes + 257. Unlike the spec, the value 257 is added to it here already*/
     HLIT =  readBits(reader, 5) + 257;
@@ -1338,6 +1313,11 @@ static unsigned inflateHuffmanBlock(ucvector * out, LodePNGBitReader * reader,
     unsigned error = 0;
     HuffmanTree tree_ll; /*the huffman tree for literal and length codes*/
     HuffmanTree tree_d; /*the huffman tree for distance codes*/
+    const size_t reserved_size =
+        260; /* must be at least 258 for max length, and a few extra for adding a few extra literals */
+    int done = 0;
+
+    if(!ucvector_reserve(out, out->size + reserved_size)) return 83; /*alloc fail*/
 
     HuffmanTree_init(&tree_ll);
     HuffmanTree_init(&tree_d);
@@ -1345,14 +1325,21 @@ static unsigned inflateHuffmanBlock(ucvector * out, LodePNGBitReader * reader,
     if(btype == 1) error = getTreeInflateFixed(&tree_ll, &tree_d);
     else /*if(btype == 2)*/ error = getTreeInflateDynamic(&tree_ll, &tree_d, reader);
 
-    while(!error) { /*decode all symbols until end reached, breaks at end code*/
+
+    while(!error && !done) { /*decode all symbols until end reached, breaks at end code*/
         /*code_ll is literal, length or end code*/
         unsigned code_ll;
-        ensureBits25(reader, 20); /* up to 15 for the huffman symbol, up to 5 for the length extra bits */
+        /* ensure enough bits for 2 huffman code reads (15 bits each): if the first is a literal, a second literal is read at once. This
+        appears to be slightly faster, than ensuring 20 bits here for 1 huffman symbol and the potential 5 extra bits for the length symbol.*/
+        ensureBits32(reader, 30);
         code_ll = huffmanDecodeSymbol(reader, &tree_ll);
+        if(code_ll <= 255) {
+            /*slightly faster code path if multiple literals in a row*/
+            out->data[out->size++] = (unsigned char)code_ll;
+            code_ll = huffmanDecodeSymbol(reader, &tree_ll);
+        }
         if(code_ll <= 255) { /*literal symbol*/
-            if(!ucvector_resize(out, out->size + 1)) ERROR_BREAK(83 /*alloc fail*/);
-            out->data[out->size - 1] = (unsigned char)code_ll;
+            out->data[out->size++] = (unsigned char)code_ll;
         }
         else if(code_ll >= FIRST_LENGTH_CODE_INDEX && code_ll <= LAST_LENGTH_CODE_INDEX) { /*length code*/
             unsigned code_d, distance;
@@ -1366,6 +1353,7 @@ static unsigned inflateHuffmanBlock(ucvector * out, LodePNGBitReader * reader,
             numextrabits_l = LENGTHEXTRA[code_ll - FIRST_LENGTH_CODE_INDEX];
             if(numextrabits_l != 0) {
                 /* bits already ensured above */
+                ensureBits25(reader, 5);
                 length += readBits(reader, numextrabits_l);
             }
 
@@ -1394,7 +1382,7 @@ static unsigned inflateHuffmanBlock(ucvector * out, LodePNGBitReader * reader,
             if(distance > start) ERROR_BREAK(52); /*too long backward distance*/
             backward = start - distance;
 
-            if(!ucvector_resize(out, out->size + length)) ERROR_BREAK(83 /*alloc fail*/);
+            out->size += length;
             if(distance < length) {
                 size_t forward;
                 lodepng_memcpy(out->data + start, out->data + backward, distance);
@@ -1408,10 +1396,13 @@ static unsigned inflateHuffmanBlock(ucvector * out, LodePNGBitReader * reader,
             }
         }
         else if(code_ll == 256) {
-            break; /*end code, break the loop*/
+            done = 1; /*end code, finish the loop*/
         }
         else { /*if(code_ll == INVALIDSYMBOL)*/
             ERROR_BREAK(16); /*error: tried to read disallowed huffman symbol*/
+        }
+        if(out->allocsize - out->size < reserved_size) {
+            if(!ucvector_reserve(out, out->size + reserved_size)) ERROR_BREAK(83); /*alloc fail*/
         }
         /*check if any of the ensureBits above went out of bounds*/
         if(reader->bp > reader->bitsize) {
@@ -1458,8 +1449,11 @@ static unsigned inflateNoCompression(ucvector * out, LodePNGBitReader * reader,
     /*read the literal data: LEN bytes are now stored in the out buffer*/
     if(bytepos + LEN > size) return 23; /*error: reading outside of in buffer*/
 
-    lodepng_memcpy(out->data + out->size - LEN, reader->data + bytepos, LEN);
-    bytepos += LEN;
+    /*out->data can be NULL (when LEN is zero), and arithmetics on NULL ptr is undefined*/
+    if(LEN) {
+        lodepng_memcpy(out->data + out->size - LEN, reader->data + bytepos, LEN);
+        bytepos += LEN;
+    }
 
     reader->bp = bytepos << 3u;
 
@@ -1478,7 +1472,8 @@ static unsigned lodepng_inflatev(ucvector * out,
 
     while(!BFINAL) {
         unsigned BTYPE;
-        if(!ensureBits9(&reader, 3)) return 52; /*error, bit pointer will jump past memory*/
+        if(reader.bitsize - reader.bp < 3) return 52; /*error, bit pointer will jump past memory*/
+        ensureBits9(&reader, 3);
         BFINAL = readBits(&reader, 1);
         BTYPE = readBits(&reader, 2);
 
@@ -1530,7 +1525,7 @@ static unsigned inflatev(ucvector * out, const unsigned char * in, size_t insize
 /* / Deflator (Compressor)                                                  / */
 /* ////////////////////////////////////////////////////////////////////////// */
 
-static const size_t MAX_SUPPORTED_DEFLATE_LENGTH = 258;
+static const unsigned MAX_SUPPORTED_DEFLATE_LENGTH = 258;
 
 /*search the index in the array, that has the largest value smaller than or equal to the given value,
 given array must be sorted (if no value is smaller, it returns the size of the given array)*/
@@ -1936,7 +1931,7 @@ static unsigned deflateDynamic(LodePNGBitWriter * writer, Hash * hash,
     size_t datasize = dataend - datapos;
 
     /*
-    If we could call "bitlen_cl" the the code length code lengths ("clcl"), that is the bit lengths of codes to represent
+    If we could call "bitlen_cl" the code length code lengths ("clcl"), that is the bit lengths of codes to represent
     tree_cl in CLCL_ORDER, then due to the huffman compression of huffman tree representations ("two levels"), there are
     some analogies:
     bitlen_lld is to tree_cl what data is to tree_ll and tree_d.
@@ -2433,7 +2428,7 @@ static unsigned zlib_decompress(unsigned char ** out, size_t * outsize, size_t e
                                 const unsigned char * in, size_t insize, const LodePNGDecompressSettings * settings)
 {
     if(!settings->custom_zlib) return 87; /*no custom zlib function provided */
-    LV_UNUSED(expected_size);
+    (void)expected_size;
     return settings->custom_zlib(out, outsize, in, insize, settings);
 }
 #endif /*LODEPNG_COMPILE_DECODER*/
@@ -2505,56 +2500,332 @@ const LodePNGDecompressSettings lodepng_default_decompress_settings = {0, 0, 0, 
 /* ////////////////////////////////////////////////////////////////////////// */
 
 
-#ifndef LODEPNG_NO_COMPILE_CRC
-/* CRC polynomial: 0xedb88320 */
-static unsigned lodepng_crc32_table[256] = {
-    0u, 1996959894u, 3993919788u, 2567524794u,  124634137u, 1886057615u, 3915621685u, 2657392035u,
-    249268274u, 2044508324u, 3772115230u, 2547177864u,  162941995u, 2125561021u, 3887607047u, 2428444049u,
-    498536548u, 1789927666u, 4089016648u, 2227061214u,  450548861u, 1843258603u, 4107580753u, 2211677639u,
-    325883990u, 1684777152u, 4251122042u, 2321926636u,  335633487u, 1661365465u, 4195302755u, 2366115317u,
-    997073096u, 1281953886u, 3579855332u, 2724688242u, 1006888145u, 1258607687u, 3524101629u, 2768942443u,
-    901097722u, 1119000684u, 3686517206u, 2898065728u,  853044451u, 1172266101u, 3705015759u, 2882616665u,
-    651767980u, 1373503546u, 3369554304u, 3218104598u,  565507253u, 1454621731u, 3485111705u, 3099436303u,
-    671266974u, 1594198024u, 3322730930u, 2970347812u,  795835527u, 1483230225u, 3244367275u, 3060149565u,
-    1994146192u,   31158534u, 2563907772u, 4023717930u, 1907459465u,  112637215u, 2680153253u, 3904427059u,
-    2013776290u,  251722036u, 2517215374u, 3775830040u, 2137656763u,  141376813u, 2439277719u, 3865271297u,
-    1802195444u,  476864866u, 2238001368u, 4066508878u, 1812370925u,  453092731u, 2181625025u, 4111451223u,
-    1706088902u,  314042704u, 2344532202u, 4240017532u, 1658658271u,  366619977u, 2362670323u, 4224994405u,
-    1303535960u,  984961486u, 2747007092u, 3569037538u, 1256170817u, 1037604311u, 2765210733u, 3554079995u,
-    1131014506u,  879679996u, 2909243462u, 3663771856u, 1141124467u,  855842277u, 2852801631u, 3708648649u,
-    1342533948u,  654459306u, 3188396048u, 3373015174u, 1466479909u,  544179635u, 3110523913u, 3462522015u,
-    1591671054u,  702138776u, 2966460450u, 3352799412u, 1504918807u,  783551873u, 3082640443u, 3233442989u,
-    3988292384u, 2596254646u,   62317068u, 1957810842u, 3939845945u, 2647816111u,   81470997u, 1943803523u,
-    3814918930u, 2489596804u,  225274430u, 2053790376u, 3826175755u, 2466906013u,  167816743u, 2097651377u,
-    4027552580u, 2265490386u,  503444072u, 1762050814u, 4150417245u, 2154129355u,  426522225u, 1852507879u,
-    4275313526u, 2312317920u,  282753626u, 1742555852u, 4189708143u, 2394877945u,  397917763u, 1622183637u,
-    3604390888u, 2714866558u,  953729732u, 1340076626u, 3518719985u, 2797360999u, 1068828381u, 1219638859u,
-    3624741850u, 2936675148u,  906185462u, 1090812512u, 3747672003u, 2825379669u,  829329135u, 1181335161u,
-    3412177804u, 3160834842u,  628085408u, 1382605366u, 3423369109u, 3138078467u,  570562233u, 1426400815u,
-    3317316542u, 2998733608u,  733239954u, 1555261956u, 3268935591u, 3050360625u,  752459403u, 1541320221u,
-    2607071920u, 3965973030u, 1969922972u,   40735498u, 2617837225u, 3943577151u, 1913087877u,   83908371u,
-    2512341634u, 3803740692u, 2075208622u,  213261112u, 2463272603u, 3855990285u, 2094854071u,  198958881u,
-    2262029012u, 4057260610u, 1759359992u,  534414190u, 2176718541u, 4139329115u, 1873836001u,  414664567u,
-    2282248934u, 4279200368u, 1711684554u,  285281116u, 2405801727u, 4167216745u, 1634467795u,  376229701u,
-    2685067896u, 3608007406u, 1308918612u,  956543938u, 2808555105u, 3495958263u, 1231636301u, 1047427035u,
-    2932959818u, 3654703836u, 1088359270u,  936918000u, 2847714899u, 3736837829u, 1202900863u,  817233897u,
-    3183342108u, 3401237130u, 1404277552u,  615818150u, 3134207493u, 3453421203u, 1423857449u,  601450431u,
-    3009837614u, 3294710456u, 1567103746u,  711928724u, 3020668471u, 3272380065u, 1510334235u,  755167117u
+#ifdef LODEPNG_COMPILE_CRC
+
+static const unsigned lodepng_crc32_table0[256] = {
+    0x00000000u, 0x77073096u, 0xee0e612cu, 0x990951bau, 0x076dc419u, 0x706af48fu, 0xe963a535u, 0x9e6495a3u,
+    0x0edb8832u, 0x79dcb8a4u, 0xe0d5e91eu, 0x97d2d988u, 0x09b64c2bu, 0x7eb17cbdu, 0xe7b82d07u, 0x90bf1d91u,
+    0x1db71064u, 0x6ab020f2u, 0xf3b97148u, 0x84be41deu, 0x1adad47du, 0x6ddde4ebu, 0xf4d4b551u, 0x83d385c7u,
+    0x136c9856u, 0x646ba8c0u, 0xfd62f97au, 0x8a65c9ecu, 0x14015c4fu, 0x63066cd9u, 0xfa0f3d63u, 0x8d080df5u,
+    0x3b6e20c8u, 0x4c69105eu, 0xd56041e4u, 0xa2677172u, 0x3c03e4d1u, 0x4b04d447u, 0xd20d85fdu, 0xa50ab56bu,
+    0x35b5a8fau, 0x42b2986cu, 0xdbbbc9d6u, 0xacbcf940u, 0x32d86ce3u, 0x45df5c75u, 0xdcd60dcfu, 0xabd13d59u,
+    0x26d930acu, 0x51de003au, 0xc8d75180u, 0xbfd06116u, 0x21b4f4b5u, 0x56b3c423u, 0xcfba9599u, 0xb8bda50fu,
+    0x2802b89eu, 0x5f058808u, 0xc60cd9b2u, 0xb10be924u, 0x2f6f7c87u, 0x58684c11u, 0xc1611dabu, 0xb6662d3du,
+    0x76dc4190u, 0x01db7106u, 0x98d220bcu, 0xefd5102au, 0x71b18589u, 0x06b6b51fu, 0x9fbfe4a5u, 0xe8b8d433u,
+    0x7807c9a2u, 0x0f00f934u, 0x9609a88eu, 0xe10e9818u, 0x7f6a0dbbu, 0x086d3d2du, 0x91646c97u, 0xe6635c01u,
+    0x6b6b51f4u, 0x1c6c6162u, 0x856530d8u, 0xf262004eu, 0x6c0695edu, 0x1b01a57bu, 0x8208f4c1u, 0xf50fc457u,
+    0x65b0d9c6u, 0x12b7e950u, 0x8bbeb8eau, 0xfcb9887cu, 0x62dd1ddfu, 0x15da2d49u, 0x8cd37cf3u, 0xfbd44c65u,
+    0x4db26158u, 0x3ab551ceu, 0xa3bc0074u, 0xd4bb30e2u, 0x4adfa541u, 0x3dd895d7u, 0xa4d1c46du, 0xd3d6f4fbu,
+    0x4369e96au, 0x346ed9fcu, 0xad678846u, 0xda60b8d0u, 0x44042d73u, 0x33031de5u, 0xaa0a4c5fu, 0xdd0d7cc9u,
+    0x5005713cu, 0x270241aau, 0xbe0b1010u, 0xc90c2086u, 0x5768b525u, 0x206f85b3u, 0xb966d409u, 0xce61e49fu,
+    0x5edef90eu, 0x29d9c998u, 0xb0d09822u, 0xc7d7a8b4u, 0x59b33d17u, 0x2eb40d81u, 0xb7bd5c3bu, 0xc0ba6cadu,
+    0xedb88320u, 0x9abfb3b6u, 0x03b6e20cu, 0x74b1d29au, 0xead54739u, 0x9dd277afu, 0x04db2615u, 0x73dc1683u,
+    0xe3630b12u, 0x94643b84u, 0x0d6d6a3eu, 0x7a6a5aa8u, 0xe40ecf0bu, 0x9309ff9du, 0x0a00ae27u, 0x7d079eb1u,
+    0xf00f9344u, 0x8708a3d2u, 0x1e01f268u, 0x6906c2feu, 0xf762575du, 0x806567cbu, 0x196c3671u, 0x6e6b06e7u,
+    0xfed41b76u, 0x89d32be0u, 0x10da7a5au, 0x67dd4accu, 0xf9b9df6fu, 0x8ebeeff9u, 0x17b7be43u, 0x60b08ed5u,
+    0xd6d6a3e8u, 0xa1d1937eu, 0x38d8c2c4u, 0x4fdff252u, 0xd1bb67f1u, 0xa6bc5767u, 0x3fb506ddu, 0x48b2364bu,
+    0xd80d2bdau, 0xaf0a1b4cu, 0x36034af6u, 0x41047a60u, 0xdf60efc3u, 0xa867df55u, 0x316e8eefu, 0x4669be79u,
+    0xcb61b38cu, 0xbc66831au, 0x256fd2a0u, 0x5268e236u, 0xcc0c7795u, 0xbb0b4703u, 0x220216b9u, 0x5505262fu,
+    0xc5ba3bbeu, 0xb2bd0b28u, 0x2bb45a92u, 0x5cb36a04u, 0xc2d7ffa7u, 0xb5d0cf31u, 0x2cd99e8bu, 0x5bdeae1du,
+    0x9b64c2b0u, 0xec63f226u, 0x756aa39cu, 0x026d930au, 0x9c0906a9u, 0xeb0e363fu, 0x72076785u, 0x05005713u,
+    0x95bf4a82u, 0xe2b87a14u, 0x7bb12baeu, 0x0cb61b38u, 0x92d28e9bu, 0xe5d5be0du, 0x7cdcefb7u, 0x0bdbdf21u,
+    0x86d3d2d4u, 0xf1d4e242u, 0x68ddb3f8u, 0x1fda836eu, 0x81be16cdu, 0xf6b9265bu, 0x6fb077e1u, 0x18b74777u,
+    0x88085ae6u, 0xff0f6a70u, 0x66063bcau, 0x11010b5cu, 0x8f659effu, 0xf862ae69u, 0x616bffd3u, 0x166ccf45u,
+    0xa00ae278u, 0xd70dd2eeu, 0x4e048354u, 0x3903b3c2u, 0xa7672661u, 0xd06016f7u, 0x4969474du, 0x3e6e77dbu,
+    0xaed16a4au, 0xd9d65adcu, 0x40df0b66u, 0x37d83bf0u, 0xa9bcae53u, 0xdebb9ec5u, 0x47b2cf7fu, 0x30b5ffe9u,
+    0xbdbdf21cu, 0xcabac28au, 0x53b39330u, 0x24b4a3a6u, 0xbad03605u, 0xcdd70693u, 0x54de5729u, 0x23d967bfu,
+    0xb3667a2eu, 0xc4614ab8u, 0x5d681b02u, 0x2a6f2b94u, 0xb40bbe37u, 0xc30c8ea1u, 0x5a05df1bu, 0x2d02ef8du
 };
 
-/*Return the CRC of the bytes buf[0..len-1].*/
+static const unsigned lodepng_crc32_table1[256] = {
+    0x00000000u, 0x191b3141u, 0x32366282u, 0x2b2d53c3u, 0x646cc504u, 0x7d77f445u, 0x565aa786u, 0x4f4196c7u,
+    0xc8d98a08u, 0xd1c2bb49u, 0xfaefe88au, 0xe3f4d9cbu, 0xacb54f0cu, 0xb5ae7e4du, 0x9e832d8eu, 0x87981ccfu,
+    0x4ac21251u, 0x53d92310u, 0x78f470d3u, 0x61ef4192u, 0x2eaed755u, 0x37b5e614u, 0x1c98b5d7u, 0x05838496u,
+    0x821b9859u, 0x9b00a918u, 0xb02dfadbu, 0xa936cb9au, 0xe6775d5du, 0xff6c6c1cu, 0xd4413fdfu, 0xcd5a0e9eu,
+    0x958424a2u, 0x8c9f15e3u, 0xa7b24620u, 0xbea97761u, 0xf1e8e1a6u, 0xe8f3d0e7u, 0xc3de8324u, 0xdac5b265u,
+    0x5d5daeaau, 0x44469febu, 0x6f6bcc28u, 0x7670fd69u, 0x39316baeu, 0x202a5aefu, 0x0b07092cu, 0x121c386du,
+    0xdf4636f3u, 0xc65d07b2u, 0xed705471u, 0xf46b6530u, 0xbb2af3f7u, 0xa231c2b6u, 0x891c9175u, 0x9007a034u,
+    0x179fbcfbu, 0x0e848dbau, 0x25a9de79u, 0x3cb2ef38u, 0x73f379ffu, 0x6ae848beu, 0x41c51b7du, 0x58de2a3cu,
+    0xf0794f05u, 0xe9627e44u, 0xc24f2d87u, 0xdb541cc6u, 0x94158a01u, 0x8d0ebb40u, 0xa623e883u, 0xbf38d9c2u,
+    0x38a0c50du, 0x21bbf44cu, 0x0a96a78fu, 0x138d96ceu, 0x5ccc0009u, 0x45d73148u, 0x6efa628bu, 0x77e153cau,
+    0xbabb5d54u, 0xa3a06c15u, 0x888d3fd6u, 0x91960e97u, 0xded79850u, 0xc7cca911u, 0xece1fad2u, 0xf5facb93u,
+    0x7262d75cu, 0x6b79e61du, 0x4054b5deu, 0x594f849fu, 0x160e1258u, 0x0f152319u, 0x243870dau, 0x3d23419bu,
+    0x65fd6ba7u, 0x7ce65ae6u, 0x57cb0925u, 0x4ed03864u, 0x0191aea3u, 0x188a9fe2u, 0x33a7cc21u, 0x2abcfd60u,
+    0xad24e1afu, 0xb43fd0eeu, 0x9f12832du, 0x8609b26cu, 0xc94824abu, 0xd05315eau, 0xfb7e4629u, 0xe2657768u,
+    0x2f3f79f6u, 0x362448b7u, 0x1d091b74u, 0x04122a35u, 0x4b53bcf2u, 0x52488db3u, 0x7965de70u, 0x607eef31u,
+    0xe7e6f3feu, 0xfefdc2bfu, 0xd5d0917cu, 0xcccba03du, 0x838a36fau, 0x9a9107bbu, 0xb1bc5478u, 0xa8a76539u,
+    0x3b83984bu, 0x2298a90au, 0x09b5fac9u, 0x10aecb88u, 0x5fef5d4fu, 0x46f46c0eu, 0x6dd93fcdu, 0x74c20e8cu,
+    0xf35a1243u, 0xea412302u, 0xc16c70c1u, 0xd8774180u, 0x9736d747u, 0x8e2de606u, 0xa500b5c5u, 0xbc1b8484u,
+    0x71418a1au, 0x685abb5bu, 0x4377e898u, 0x5a6cd9d9u, 0x152d4f1eu, 0x0c367e5fu, 0x271b2d9cu, 0x3e001cddu,
+    0xb9980012u, 0xa0833153u, 0x8bae6290u, 0x92b553d1u, 0xddf4c516u, 0xc4eff457u, 0xefc2a794u, 0xf6d996d5u,
+    0xae07bce9u, 0xb71c8da8u, 0x9c31de6bu, 0x852aef2au, 0xca6b79edu, 0xd37048acu, 0xf85d1b6fu, 0xe1462a2eu,
+    0x66de36e1u, 0x7fc507a0u, 0x54e85463u, 0x4df36522u, 0x02b2f3e5u, 0x1ba9c2a4u, 0x30849167u, 0x299fa026u,
+    0xe4c5aeb8u, 0xfdde9ff9u, 0xd6f3cc3au, 0xcfe8fd7bu, 0x80a96bbcu, 0x99b25afdu, 0xb29f093eu, 0xab84387fu,
+    0x2c1c24b0u, 0x350715f1u, 0x1e2a4632u, 0x07317773u, 0x4870e1b4u, 0x516bd0f5u, 0x7a468336u, 0x635db277u,
+    0xcbfad74eu, 0xd2e1e60fu, 0xf9ccb5ccu, 0xe0d7848du, 0xaf96124au, 0xb68d230bu, 0x9da070c8u, 0x84bb4189u,
+    0x03235d46u, 0x1a386c07u, 0x31153fc4u, 0x280e0e85u, 0x674f9842u, 0x7e54a903u, 0x5579fac0u, 0x4c62cb81u,
+    0x8138c51fu, 0x9823f45eu, 0xb30ea79du, 0xaa1596dcu, 0xe554001bu, 0xfc4f315au, 0xd7626299u, 0xce7953d8u,
+    0x49e14f17u, 0x50fa7e56u, 0x7bd72d95u, 0x62cc1cd4u, 0x2d8d8a13u, 0x3496bb52u, 0x1fbbe891u, 0x06a0d9d0u,
+    0x5e7ef3ecu, 0x4765c2adu, 0x6c48916eu, 0x7553a02fu, 0x3a1236e8u, 0x230907a9u, 0x0824546au, 0x113f652bu,
+    0x96a779e4u, 0x8fbc48a5u, 0xa4911b66u, 0xbd8a2a27u, 0xf2cbbce0u, 0xebd08da1u, 0xc0fdde62u, 0xd9e6ef23u,
+    0x14bce1bdu, 0x0da7d0fcu, 0x268a833fu, 0x3f91b27eu, 0x70d024b9u, 0x69cb15f8u, 0x42e6463bu, 0x5bfd777au,
+    0xdc656bb5u, 0xc57e5af4u, 0xee530937u, 0xf7483876u, 0xb809aeb1u, 0xa1129ff0u, 0x8a3fcc33u, 0x9324fd72u
+};
+
+static const unsigned lodepng_crc32_table2[256] = {
+    0x00000000u, 0x01c26a37u, 0x0384d46eu, 0x0246be59u, 0x0709a8dcu, 0x06cbc2ebu, 0x048d7cb2u, 0x054f1685u,
+    0x0e1351b8u, 0x0fd13b8fu, 0x0d9785d6u, 0x0c55efe1u, 0x091af964u, 0x08d89353u, 0x0a9e2d0au, 0x0b5c473du,
+    0x1c26a370u, 0x1de4c947u, 0x1fa2771eu, 0x1e601d29u, 0x1b2f0bacu, 0x1aed619bu, 0x18abdfc2u, 0x1969b5f5u,
+    0x1235f2c8u, 0x13f798ffu, 0x11b126a6u, 0x10734c91u, 0x153c5a14u, 0x14fe3023u, 0x16b88e7au, 0x177ae44du,
+    0x384d46e0u, 0x398f2cd7u, 0x3bc9928eu, 0x3a0bf8b9u, 0x3f44ee3cu, 0x3e86840bu, 0x3cc03a52u, 0x3d025065u,
+    0x365e1758u, 0x379c7d6fu, 0x35dac336u, 0x3418a901u, 0x3157bf84u, 0x3095d5b3u, 0x32d36beau, 0x331101ddu,
+    0x246be590u, 0x25a98fa7u, 0x27ef31feu, 0x262d5bc9u, 0x23624d4cu, 0x22a0277bu, 0x20e69922u, 0x2124f315u,
+    0x2a78b428u, 0x2bbade1fu, 0x29fc6046u, 0x283e0a71u, 0x2d711cf4u, 0x2cb376c3u, 0x2ef5c89au, 0x2f37a2adu,
+    0x709a8dc0u, 0x7158e7f7u, 0x731e59aeu, 0x72dc3399u, 0x7793251cu, 0x76514f2bu, 0x7417f172u, 0x75d59b45u,
+    0x7e89dc78u, 0x7f4bb64fu, 0x7d0d0816u, 0x7ccf6221u, 0x798074a4u, 0x78421e93u, 0x7a04a0cau, 0x7bc6cafdu,
+    0x6cbc2eb0u, 0x6d7e4487u, 0x6f38fadeu, 0x6efa90e9u, 0x6bb5866cu, 0x6a77ec5bu, 0x68315202u, 0x69f33835u,
+    0x62af7f08u, 0x636d153fu, 0x612bab66u, 0x60e9c151u, 0x65a6d7d4u, 0x6464bde3u, 0x662203bau, 0x67e0698du,
+    0x48d7cb20u, 0x4915a117u, 0x4b531f4eu, 0x4a917579u, 0x4fde63fcu, 0x4e1c09cbu, 0x4c5ab792u, 0x4d98dda5u,
+    0x46c49a98u, 0x4706f0afu, 0x45404ef6u, 0x448224c1u, 0x41cd3244u, 0x400f5873u, 0x4249e62au, 0x438b8c1du,
+    0x54f16850u, 0x55330267u, 0x5775bc3eu, 0x56b7d609u, 0x53f8c08cu, 0x523aaabbu, 0x507c14e2u, 0x51be7ed5u,
+    0x5ae239e8u, 0x5b2053dfu, 0x5966ed86u, 0x58a487b1u, 0x5deb9134u, 0x5c29fb03u, 0x5e6f455au, 0x5fad2f6du,
+    0xe1351b80u, 0xe0f771b7u, 0xe2b1cfeeu, 0xe373a5d9u, 0xe63cb35cu, 0xe7fed96bu, 0xe5b86732u, 0xe47a0d05u,
+    0xef264a38u, 0xeee4200fu, 0xeca29e56u, 0xed60f461u, 0xe82fe2e4u, 0xe9ed88d3u, 0xebab368au, 0xea695cbdu,
+    0xfd13b8f0u, 0xfcd1d2c7u, 0xfe976c9eu, 0xff5506a9u, 0xfa1a102cu, 0xfbd87a1bu, 0xf99ec442u, 0xf85cae75u,
+    0xf300e948u, 0xf2c2837fu, 0xf0843d26u, 0xf1465711u, 0xf4094194u, 0xf5cb2ba3u, 0xf78d95fau, 0xf64fffcdu,
+    0xd9785d60u, 0xd8ba3757u, 0xdafc890eu, 0xdb3ee339u, 0xde71f5bcu, 0xdfb39f8bu, 0xddf521d2u, 0xdc374be5u,
+    0xd76b0cd8u, 0xd6a966efu, 0xd4efd8b6u, 0xd52db281u, 0xd062a404u, 0xd1a0ce33u, 0xd3e6706au, 0xd2241a5du,
+    0xc55efe10u, 0xc49c9427u, 0xc6da2a7eu, 0xc7184049u, 0xc25756ccu, 0xc3953cfbu, 0xc1d382a2u, 0xc011e895u,
+    0xcb4dafa8u, 0xca8fc59fu, 0xc8c97bc6u, 0xc90b11f1u, 0xcc440774u, 0xcd866d43u, 0xcfc0d31au, 0xce02b92du,
+    0x91af9640u, 0x906dfc77u, 0x922b422eu, 0x93e92819u, 0x96a63e9cu, 0x976454abu, 0x9522eaf2u, 0x94e080c5u,
+    0x9fbcc7f8u, 0x9e7eadcfu, 0x9c381396u, 0x9dfa79a1u, 0x98b56f24u, 0x99770513u, 0x9b31bb4au, 0x9af3d17du,
+    0x8d893530u, 0x8c4b5f07u, 0x8e0de15eu, 0x8fcf8b69u, 0x8a809decu, 0x8b42f7dbu, 0x89044982u, 0x88c623b5u,
+    0x839a6488u, 0x82580ebfu, 0x801eb0e6u, 0x81dcdad1u, 0x8493cc54u, 0x8551a663u, 0x8717183au, 0x86d5720du,
+    0xa9e2d0a0u, 0xa820ba97u, 0xaa6604ceu, 0xaba46ef9u, 0xaeeb787cu, 0xaf29124bu, 0xad6fac12u, 0xacadc625u,
+    0xa7f18118u, 0xa633eb2fu, 0xa4755576u, 0xa5b73f41u, 0xa0f829c4u, 0xa13a43f3u, 0xa37cfdaau, 0xa2be979du,
+    0xb5c473d0u, 0xb40619e7u, 0xb640a7beu, 0xb782cd89u, 0xb2cddb0cu, 0xb30fb13bu, 0xb1490f62u, 0xb08b6555u,
+    0xbbd72268u, 0xba15485fu, 0xb853f606u, 0xb9919c31u, 0xbcde8ab4u, 0xbd1ce083u, 0xbf5a5edau, 0xbe9834edu
+};
+
+static const unsigned lodepng_crc32_table3[256] = {
+    0x00000000u, 0xb8bc6765u, 0xaa09c88bu, 0x12b5afeeu, 0x8f629757u, 0x37def032u, 0x256b5fdcu, 0x9dd738b9u,
+    0xc5b428efu, 0x7d084f8au, 0x6fbde064u, 0xd7018701u, 0x4ad6bfb8u, 0xf26ad8ddu, 0xe0df7733u, 0x58631056u,
+    0x5019579fu, 0xe8a530fau, 0xfa109f14u, 0x42acf871u, 0xdf7bc0c8u, 0x67c7a7adu, 0x75720843u, 0xcdce6f26u,
+    0x95ad7f70u, 0x2d111815u, 0x3fa4b7fbu, 0x8718d09eu, 0x1acfe827u, 0xa2738f42u, 0xb0c620acu, 0x087a47c9u,
+    0xa032af3eu, 0x188ec85bu, 0x0a3b67b5u, 0xb28700d0u, 0x2f503869u, 0x97ec5f0cu, 0x8559f0e2u, 0x3de59787u,
+    0x658687d1u, 0xdd3ae0b4u, 0xcf8f4f5au, 0x7733283fu, 0xeae41086u, 0x525877e3u, 0x40edd80du, 0xf851bf68u,
+    0xf02bf8a1u, 0x48979fc4u, 0x5a22302au, 0xe29e574fu, 0x7f496ff6u, 0xc7f50893u, 0xd540a77du, 0x6dfcc018u,
+    0x359fd04eu, 0x8d23b72bu, 0x9f9618c5u, 0x272a7fa0u, 0xbafd4719u, 0x0241207cu, 0x10f48f92u, 0xa848e8f7u,
+    0x9b14583du, 0x23a83f58u, 0x311d90b6u, 0x89a1f7d3u, 0x1476cf6au, 0xaccaa80fu, 0xbe7f07e1u, 0x06c36084u,
+    0x5ea070d2u, 0xe61c17b7u, 0xf4a9b859u, 0x4c15df3cu, 0xd1c2e785u, 0x697e80e0u, 0x7bcb2f0eu, 0xc377486bu,
+    0xcb0d0fa2u, 0x73b168c7u, 0x6104c729u, 0xd9b8a04cu, 0x446f98f5u, 0xfcd3ff90u, 0xee66507eu, 0x56da371bu,
+    0x0eb9274du, 0xb6054028u, 0xa4b0efc6u, 0x1c0c88a3u, 0x81dbb01au, 0x3967d77fu, 0x2bd27891u, 0x936e1ff4u,
+    0x3b26f703u, 0x839a9066u, 0x912f3f88u, 0x299358edu, 0xb4446054u, 0x0cf80731u, 0x1e4da8dfu, 0xa6f1cfbau,
+    0xfe92dfecu, 0x462eb889u, 0x549b1767u, 0xec277002u, 0x71f048bbu, 0xc94c2fdeu, 0xdbf98030u, 0x6345e755u,
+    0x6b3fa09cu, 0xd383c7f9u, 0xc1366817u, 0x798a0f72u, 0xe45d37cbu, 0x5ce150aeu, 0x4e54ff40u, 0xf6e89825u,
+    0xae8b8873u, 0x1637ef16u, 0x048240f8u, 0xbc3e279du, 0x21e91f24u, 0x99557841u, 0x8be0d7afu, 0x335cb0cau,
+    0xed59b63bu, 0x55e5d15eu, 0x47507eb0u, 0xffec19d5u, 0x623b216cu, 0xda874609u, 0xc832e9e7u, 0x708e8e82u,
+    0x28ed9ed4u, 0x9051f9b1u, 0x82e4565fu, 0x3a58313au, 0xa78f0983u, 0x1f336ee6u, 0x0d86c108u, 0xb53aa66du,
+    0xbd40e1a4u, 0x05fc86c1u, 0x1749292fu, 0xaff54e4au, 0x322276f3u, 0x8a9e1196u, 0x982bbe78u, 0x2097d91du,
+    0x78f4c94bu, 0xc048ae2eu, 0xd2fd01c0u, 0x6a4166a5u, 0xf7965e1cu, 0x4f2a3979u, 0x5d9f9697u, 0xe523f1f2u,
+    0x4d6b1905u, 0xf5d77e60u, 0xe762d18eu, 0x5fdeb6ebu, 0xc2098e52u, 0x7ab5e937u, 0x680046d9u, 0xd0bc21bcu,
+    0x88df31eau, 0x3063568fu, 0x22d6f961u, 0x9a6a9e04u, 0x07bda6bdu, 0xbf01c1d8u, 0xadb46e36u, 0x15080953u,
+    0x1d724e9au, 0xa5ce29ffu, 0xb77b8611u, 0x0fc7e174u, 0x9210d9cdu, 0x2aacbea8u, 0x38191146u, 0x80a57623u,
+    0xd8c66675u, 0x607a0110u, 0x72cfaefeu, 0xca73c99bu, 0x57a4f122u, 0xef189647u, 0xfdad39a9u, 0x45115eccu,
+    0x764dee06u, 0xcef18963u, 0xdc44268du, 0x64f841e8u, 0xf92f7951u, 0x41931e34u, 0x5326b1dau, 0xeb9ad6bfu,
+    0xb3f9c6e9u, 0x0b45a18cu, 0x19f00e62u, 0xa14c6907u, 0x3c9b51beu, 0x842736dbu, 0x96929935u, 0x2e2efe50u,
+    0x2654b999u, 0x9ee8defcu, 0x8c5d7112u, 0x34e11677u, 0xa9362eceu, 0x118a49abu, 0x033fe645u, 0xbb838120u,
+    0xe3e09176u, 0x5b5cf613u, 0x49e959fdu, 0xf1553e98u, 0x6c820621u, 0xd43e6144u, 0xc68bceaau, 0x7e37a9cfu,
+    0xd67f4138u, 0x6ec3265du, 0x7c7689b3u, 0xc4caeed6u, 0x591dd66fu, 0xe1a1b10au, 0xf3141ee4u, 0x4ba87981u,
+    0x13cb69d7u, 0xab770eb2u, 0xb9c2a15cu, 0x017ec639u, 0x9ca9fe80u, 0x241599e5u, 0x36a0360bu, 0x8e1c516eu,
+    0x866616a7u, 0x3eda71c2u, 0x2c6fde2cu, 0x94d3b949u, 0x090481f0u, 0xb1b8e695u, 0xa30d497bu, 0x1bb12e1eu,
+    0x43d23e48u, 0xfb6e592du, 0xe9dbf6c3u, 0x516791a6u, 0xccb0a91fu, 0x740cce7au, 0x66b96194u, 0xde0506f1u
+};
+
+static const unsigned lodepng_crc32_table4[256] = {
+    0x00000000u, 0x3d6029b0u, 0x7ac05360u, 0x47a07ad0u, 0xf580a6c0u, 0xc8e08f70u, 0x8f40f5a0u, 0xb220dc10u,
+    0x30704bc1u, 0x0d106271u, 0x4ab018a1u, 0x77d03111u, 0xc5f0ed01u, 0xf890c4b1u, 0xbf30be61u, 0x825097d1u,
+    0x60e09782u, 0x5d80be32u, 0x1a20c4e2u, 0x2740ed52u, 0x95603142u, 0xa80018f2u, 0xefa06222u, 0xd2c04b92u,
+    0x5090dc43u, 0x6df0f5f3u, 0x2a508f23u, 0x1730a693u, 0xa5107a83u, 0x98705333u, 0xdfd029e3u, 0xe2b00053u,
+    0xc1c12f04u, 0xfca106b4u, 0xbb017c64u, 0x866155d4u, 0x344189c4u, 0x0921a074u, 0x4e81daa4u, 0x73e1f314u,
+    0xf1b164c5u, 0xccd14d75u, 0x8b7137a5u, 0xb6111e15u, 0x0431c205u, 0x3951ebb5u, 0x7ef19165u, 0x4391b8d5u,
+    0xa121b886u, 0x9c419136u, 0xdbe1ebe6u, 0xe681c256u, 0x54a11e46u, 0x69c137f6u, 0x2e614d26u, 0x13016496u,
+    0x9151f347u, 0xac31daf7u, 0xeb91a027u, 0xd6f18997u, 0x64d15587u, 0x59b17c37u, 0x1e1106e7u, 0x23712f57u,
+    0x58f35849u, 0x659371f9u, 0x22330b29u, 0x1f532299u, 0xad73fe89u, 0x9013d739u, 0xd7b3ade9u, 0xead38459u,
+    0x68831388u, 0x55e33a38u, 0x124340e8u, 0x2f236958u, 0x9d03b548u, 0xa0639cf8u, 0xe7c3e628u, 0xdaa3cf98u,
+    0x3813cfcbu, 0x0573e67bu, 0x42d39cabu, 0x7fb3b51bu, 0xcd93690bu, 0xf0f340bbu, 0xb7533a6bu, 0x8a3313dbu,
+    0x0863840au, 0x3503adbau, 0x72a3d76au, 0x4fc3fedau, 0xfde322cau, 0xc0830b7au, 0x872371aau, 0xba43581au,
+    0x9932774du, 0xa4525efdu, 0xe3f2242du, 0xde920d9du, 0x6cb2d18du, 0x51d2f83du, 0x167282edu, 0x2b12ab5du,
+    0xa9423c8cu, 0x9422153cu, 0xd3826fecu, 0xeee2465cu, 0x5cc29a4cu, 0x61a2b3fcu, 0x2602c92cu, 0x1b62e09cu,
+    0xf9d2e0cfu, 0xc4b2c97fu, 0x8312b3afu, 0xbe729a1fu, 0x0c52460fu, 0x31326fbfu, 0x7692156fu, 0x4bf23cdfu,
+    0xc9a2ab0eu, 0xf4c282beu, 0xb362f86eu, 0x8e02d1deu, 0x3c220dceu, 0x0142247eu, 0x46e25eaeu, 0x7b82771eu,
+    0xb1e6b092u, 0x8c869922u, 0xcb26e3f2u, 0xf646ca42u, 0x44661652u, 0x79063fe2u, 0x3ea64532u, 0x03c66c82u,
+    0x8196fb53u, 0xbcf6d2e3u, 0xfb56a833u, 0xc6368183u, 0x74165d93u, 0x49767423u, 0x0ed60ef3u, 0x33b62743u,
+    0xd1062710u, 0xec660ea0u, 0xabc67470u, 0x96a65dc0u, 0x248681d0u, 0x19e6a860u, 0x5e46d2b0u, 0x6326fb00u,
+    0xe1766cd1u, 0xdc164561u, 0x9bb63fb1u, 0xa6d61601u, 0x14f6ca11u, 0x2996e3a1u, 0x6e369971u, 0x5356b0c1u,
+    0x70279f96u, 0x4d47b626u, 0x0ae7ccf6u, 0x3787e546u, 0x85a73956u, 0xb8c710e6u, 0xff676a36u, 0xc2074386u,
+    0x4057d457u, 0x7d37fde7u, 0x3a978737u, 0x07f7ae87u, 0xb5d77297u, 0x88b75b27u, 0xcf1721f7u, 0xf2770847u,
+    0x10c70814u, 0x2da721a4u, 0x6a075b74u, 0x576772c4u, 0xe547aed4u, 0xd8278764u, 0x9f87fdb4u, 0xa2e7d404u,
+    0x20b743d5u, 0x1dd76a65u, 0x5a7710b5u, 0x67173905u, 0xd537e515u, 0xe857cca5u, 0xaff7b675u, 0x92979fc5u,
+    0xe915e8dbu, 0xd475c16bu, 0x93d5bbbbu, 0xaeb5920bu, 0x1c954e1bu, 0x21f567abu, 0x66551d7bu, 0x5b3534cbu,
+    0xd965a31au, 0xe4058aaau, 0xa3a5f07au, 0x9ec5d9cau, 0x2ce505dau, 0x11852c6au, 0x562556bau, 0x6b457f0au,
+    0x89f57f59u, 0xb49556e9u, 0xf3352c39u, 0xce550589u, 0x7c75d999u, 0x4115f029u, 0x06b58af9u, 0x3bd5a349u,
+    0xb9853498u, 0x84e51d28u, 0xc34567f8u, 0xfe254e48u, 0x4c059258u, 0x7165bbe8u, 0x36c5c138u, 0x0ba5e888u,
+    0x28d4c7dfu, 0x15b4ee6fu, 0x521494bfu, 0x6f74bd0fu, 0xdd54611fu, 0xe03448afu, 0xa794327fu, 0x9af41bcfu,
+    0x18a48c1eu, 0x25c4a5aeu, 0x6264df7eu, 0x5f04f6ceu, 0xed242adeu, 0xd044036eu, 0x97e479beu, 0xaa84500eu,
+    0x4834505du, 0x755479edu, 0x32f4033du, 0x0f942a8du, 0xbdb4f69du, 0x80d4df2du, 0xc774a5fdu, 0xfa148c4du,
+    0x78441b9cu, 0x4524322cu, 0x028448fcu, 0x3fe4614cu, 0x8dc4bd5cu, 0xb0a494ecu, 0xf704ee3cu, 0xca64c78cu
+};
+
+static const unsigned lodepng_crc32_table5[256] = {
+    0x00000000u, 0xcb5cd3a5u, 0x4dc8a10bu, 0x869472aeu, 0x9b914216u, 0x50cd91b3u, 0xd659e31du, 0x1d0530b8u,
+    0xec53826du, 0x270f51c8u, 0xa19b2366u, 0x6ac7f0c3u, 0x77c2c07bu, 0xbc9e13deu, 0x3a0a6170u, 0xf156b2d5u,
+    0x03d6029bu, 0xc88ad13eu, 0x4e1ea390u, 0x85427035u, 0x9847408du, 0x531b9328u, 0xd58fe186u, 0x1ed33223u,
+    0xef8580f6u, 0x24d95353u, 0xa24d21fdu, 0x6911f258u, 0x7414c2e0u, 0xbf481145u, 0x39dc63ebu, 0xf280b04eu,
+    0x07ac0536u, 0xccf0d693u, 0x4a64a43du, 0x81387798u, 0x9c3d4720u, 0x57619485u, 0xd1f5e62bu, 0x1aa9358eu,
+    0xebff875bu, 0x20a354feu, 0xa6372650u, 0x6d6bf5f5u, 0x706ec54du, 0xbb3216e8u, 0x3da66446u, 0xf6fab7e3u,
+    0x047a07adu, 0xcf26d408u, 0x49b2a6a6u, 0x82ee7503u, 0x9feb45bbu, 0x54b7961eu, 0xd223e4b0u, 0x197f3715u,
+    0xe82985c0u, 0x23755665u, 0xa5e124cbu, 0x6ebdf76eu, 0x73b8c7d6u, 0xb8e41473u, 0x3e7066ddu, 0xf52cb578u,
+    0x0f580a6cu, 0xc404d9c9u, 0x4290ab67u, 0x89cc78c2u, 0x94c9487au, 0x5f959bdfu, 0xd901e971u, 0x125d3ad4u,
+    0xe30b8801u, 0x28575ba4u, 0xaec3290au, 0x659ffaafu, 0x789aca17u, 0xb3c619b2u, 0x35526b1cu, 0xfe0eb8b9u,
+    0x0c8e08f7u, 0xc7d2db52u, 0x4146a9fcu, 0x8a1a7a59u, 0x971f4ae1u, 0x5c439944u, 0xdad7ebeau, 0x118b384fu,
+    0xe0dd8a9au, 0x2b81593fu, 0xad152b91u, 0x6649f834u, 0x7b4cc88cu, 0xb0101b29u, 0x36846987u, 0xfdd8ba22u,
+    0x08f40f5au, 0xc3a8dcffu, 0x453cae51u, 0x8e607df4u, 0x93654d4cu, 0x58399ee9u, 0xdeadec47u, 0x15f13fe2u,
+    0xe4a78d37u, 0x2ffb5e92u, 0xa96f2c3cu, 0x6233ff99u, 0x7f36cf21u, 0xb46a1c84u, 0x32fe6e2au, 0xf9a2bd8fu,
+    0x0b220dc1u, 0xc07ede64u, 0x46eaaccau, 0x8db67f6fu, 0x90b34fd7u, 0x5bef9c72u, 0xdd7beedcu, 0x16273d79u,
+    0xe7718facu, 0x2c2d5c09u, 0xaab92ea7u, 0x61e5fd02u, 0x7ce0cdbau, 0xb7bc1e1fu, 0x31286cb1u, 0xfa74bf14u,
+    0x1eb014d8u, 0xd5ecc77du, 0x5378b5d3u, 0x98246676u, 0x852156ceu, 0x4e7d856bu, 0xc8e9f7c5u, 0x03b52460u,
+    0xf2e396b5u, 0x39bf4510u, 0xbf2b37beu, 0x7477e41bu, 0x6972d4a3u, 0xa22e0706u, 0x24ba75a8u, 0xefe6a60du,
+    0x1d661643u, 0xd63ac5e6u, 0x50aeb748u, 0x9bf264edu, 0x86f75455u, 0x4dab87f0u, 0xcb3ff55eu, 0x006326fbu,
+    0xf135942eu, 0x3a69478bu, 0xbcfd3525u, 0x77a1e680u, 0x6aa4d638u, 0xa1f8059du, 0x276c7733u, 0xec30a496u,
+    0x191c11eeu, 0xd240c24bu, 0x54d4b0e5u, 0x9f886340u, 0x828d53f8u, 0x49d1805du, 0xcf45f2f3u, 0x04192156u,
+    0xf54f9383u, 0x3e134026u, 0xb8873288u, 0x73dbe12du, 0x6eded195u, 0xa5820230u, 0x2316709eu, 0xe84aa33bu,
+    0x1aca1375u, 0xd196c0d0u, 0x5702b27eu, 0x9c5e61dbu, 0x815b5163u, 0x4a0782c6u, 0xcc93f068u, 0x07cf23cdu,
+    0xf6999118u, 0x3dc542bdu, 0xbb513013u, 0x700de3b6u, 0x6d08d30eu, 0xa65400abu, 0x20c07205u, 0xeb9ca1a0u,
+    0x11e81eb4u, 0xdab4cd11u, 0x5c20bfbfu, 0x977c6c1au, 0x8a795ca2u, 0x41258f07u, 0xc7b1fda9u, 0x0ced2e0cu,
+    0xfdbb9cd9u, 0x36e74f7cu, 0xb0733dd2u, 0x7b2fee77u, 0x662adecfu, 0xad760d6au, 0x2be27fc4u, 0xe0beac61u,
+    0x123e1c2fu, 0xd962cf8au, 0x5ff6bd24u, 0x94aa6e81u, 0x89af5e39u, 0x42f38d9cu, 0xc467ff32u, 0x0f3b2c97u,
+    0xfe6d9e42u, 0x35314de7u, 0xb3a53f49u, 0x78f9ececu, 0x65fcdc54u, 0xaea00ff1u, 0x28347d5fu, 0xe368aefau,
+    0x16441b82u, 0xdd18c827u, 0x5b8cba89u, 0x90d0692cu, 0x8dd55994u, 0x46898a31u, 0xc01df89fu, 0x0b412b3au,
+    0xfa1799efu, 0x314b4a4au, 0xb7df38e4u, 0x7c83eb41u, 0x6186dbf9u, 0xaada085cu, 0x2c4e7af2u, 0xe712a957u,
+    0x15921919u, 0xdececabcu, 0x585ab812u, 0x93066bb7u, 0x8e035b0fu, 0x455f88aau, 0xc3cbfa04u, 0x089729a1u,
+    0xf9c19b74u, 0x329d48d1u, 0xb4093a7fu, 0x7f55e9dau, 0x6250d962u, 0xa90c0ac7u, 0x2f987869u, 0xe4c4abccu
+};
+
+static const unsigned lodepng_crc32_table6[256] = {
+    0x00000000u, 0xa6770bb4u, 0x979f1129u, 0x31e81a9du, 0xf44f2413u, 0x52382fa7u, 0x63d0353au, 0xc5a73e8eu,
+    0x33ef4e67u, 0x959845d3u, 0xa4705f4eu, 0x020754fau, 0xc7a06a74u, 0x61d761c0u, 0x503f7b5du, 0xf64870e9u,
+    0x67de9cceu, 0xc1a9977au, 0xf0418de7u, 0x56368653u, 0x9391b8ddu, 0x35e6b369u, 0x040ea9f4u, 0xa279a240u,
+    0x5431d2a9u, 0xf246d91du, 0xc3aec380u, 0x65d9c834u, 0xa07ef6bau, 0x0609fd0eu, 0x37e1e793u, 0x9196ec27u,
+    0xcfbd399cu, 0x69ca3228u, 0x582228b5u, 0xfe552301u, 0x3bf21d8fu, 0x9d85163bu, 0xac6d0ca6u, 0x0a1a0712u,
+    0xfc5277fbu, 0x5a257c4fu, 0x6bcd66d2u, 0xcdba6d66u, 0x081d53e8u, 0xae6a585cu, 0x9f8242c1u, 0x39f54975u,
+    0xa863a552u, 0x0e14aee6u, 0x3ffcb47bu, 0x998bbfcfu, 0x5c2c8141u, 0xfa5b8af5u, 0xcbb39068u, 0x6dc49bdcu,
+    0x9b8ceb35u, 0x3dfbe081u, 0x0c13fa1cu, 0xaa64f1a8u, 0x6fc3cf26u, 0xc9b4c492u, 0xf85cde0fu, 0x5e2bd5bbu,
+    0x440b7579u, 0xe27c7ecdu, 0xd3946450u, 0x75e36fe4u, 0xb044516au, 0x16335adeu, 0x27db4043u, 0x81ac4bf7u,
+    0x77e43b1eu, 0xd19330aau, 0xe07b2a37u, 0x460c2183u, 0x83ab1f0du, 0x25dc14b9u, 0x14340e24u, 0xb2430590u,
+    0x23d5e9b7u, 0x85a2e203u, 0xb44af89eu, 0x123df32au, 0xd79acda4u, 0x71edc610u, 0x4005dc8du, 0xe672d739u,
+    0x103aa7d0u, 0xb64dac64u, 0x87a5b6f9u, 0x21d2bd4du, 0xe47583c3u, 0x42028877u, 0x73ea92eau, 0xd59d995eu,
+    0x8bb64ce5u, 0x2dc14751u, 0x1c295dccu, 0xba5e5678u, 0x7ff968f6u, 0xd98e6342u, 0xe86679dfu, 0x4e11726bu,
+    0xb8590282u, 0x1e2e0936u, 0x2fc613abu, 0x89b1181fu, 0x4c162691u, 0xea612d25u, 0xdb8937b8u, 0x7dfe3c0cu,
+    0xec68d02bu, 0x4a1fdb9fu, 0x7bf7c102u, 0xdd80cab6u, 0x1827f438u, 0xbe50ff8cu, 0x8fb8e511u, 0x29cfeea5u,
+    0xdf879e4cu, 0x79f095f8u, 0x48188f65u, 0xee6f84d1u, 0x2bc8ba5fu, 0x8dbfb1ebu, 0xbc57ab76u, 0x1a20a0c2u,
+    0x8816eaf2u, 0x2e61e146u, 0x1f89fbdbu, 0xb9fef06fu, 0x7c59cee1u, 0xda2ec555u, 0xebc6dfc8u, 0x4db1d47cu,
+    0xbbf9a495u, 0x1d8eaf21u, 0x2c66b5bcu, 0x8a11be08u, 0x4fb68086u, 0xe9c18b32u, 0xd82991afu, 0x7e5e9a1bu,
+    0xefc8763cu, 0x49bf7d88u, 0x78576715u, 0xde206ca1u, 0x1b87522fu, 0xbdf0599bu, 0x8c184306u, 0x2a6f48b2u,
+    0xdc27385bu, 0x7a5033efu, 0x4bb82972u, 0xedcf22c6u, 0x28681c48u, 0x8e1f17fcu, 0xbff70d61u, 0x198006d5u,
+    0x47abd36eu, 0xe1dcd8dau, 0xd034c247u, 0x7643c9f3u, 0xb3e4f77du, 0x1593fcc9u, 0x247be654u, 0x820cede0u,
+    0x74449d09u, 0xd23396bdu, 0xe3db8c20u, 0x45ac8794u, 0x800bb91au, 0x267cb2aeu, 0x1794a833u, 0xb1e3a387u,
+    0x20754fa0u, 0x86024414u, 0xb7ea5e89u, 0x119d553du, 0xd43a6bb3u, 0x724d6007u, 0x43a57a9au, 0xe5d2712eu,
+    0x139a01c7u, 0xb5ed0a73u, 0x840510eeu, 0x22721b5au, 0xe7d525d4u, 0x41a22e60u, 0x704a34fdu, 0xd63d3f49u,
+    0xcc1d9f8bu, 0x6a6a943fu, 0x5b828ea2u, 0xfdf58516u, 0x3852bb98u, 0x9e25b02cu, 0xafcdaab1u, 0x09baa105u,
+    0xfff2d1ecu, 0x5985da58u, 0x686dc0c5u, 0xce1acb71u, 0x0bbdf5ffu, 0xadcafe4bu, 0x9c22e4d6u, 0x3a55ef62u,
+    0xabc30345u, 0x0db408f1u, 0x3c5c126cu, 0x9a2b19d8u, 0x5f8c2756u, 0xf9fb2ce2u, 0xc813367fu, 0x6e643dcbu,
+    0x982c4d22u, 0x3e5b4696u, 0x0fb35c0bu, 0xa9c457bfu, 0x6c636931u, 0xca146285u, 0xfbfc7818u, 0x5d8b73acu,
+    0x03a0a617u, 0xa5d7ada3u, 0x943fb73eu, 0x3248bc8au, 0xf7ef8204u, 0x519889b0u, 0x6070932du, 0xc6079899u,
+    0x304fe870u, 0x9638e3c4u, 0xa7d0f959u, 0x01a7f2edu, 0xc400cc63u, 0x6277c7d7u, 0x539fdd4au, 0xf5e8d6feu,
+    0x647e3ad9u, 0xc209316du, 0xf3e12bf0u, 0x55962044u, 0x90311ecau, 0x3646157eu, 0x07ae0fe3u, 0xa1d90457u,
+    0x579174beu, 0xf1e67f0au, 0xc00e6597u, 0x66796e23u, 0xa3de50adu, 0x05a95b19u, 0x34414184u, 0x92364a30u
+};
+
+static const unsigned lodepng_crc32_table7[256] = {
+    0x00000000u, 0xccaa009eu, 0x4225077du, 0x8e8f07e3u, 0x844a0efau, 0x48e00e64u, 0xc66f0987u, 0x0ac50919u,
+    0xd3e51bb5u, 0x1f4f1b2bu, 0x91c01cc8u, 0x5d6a1c56u, 0x57af154fu, 0x9b0515d1u, 0x158a1232u, 0xd92012acu,
+    0x7cbb312bu, 0xb01131b5u, 0x3e9e3656u, 0xf23436c8u, 0xf8f13fd1u, 0x345b3f4fu, 0xbad438acu, 0x767e3832u,
+    0xaf5e2a9eu, 0x63f42a00u, 0xed7b2de3u, 0x21d12d7du, 0x2b142464u, 0xe7be24fau, 0x69312319u, 0xa59b2387u,
+    0xf9766256u, 0x35dc62c8u, 0xbb53652bu, 0x77f965b5u, 0x7d3c6cacu, 0xb1966c32u, 0x3f196bd1u, 0xf3b36b4fu,
+    0x2a9379e3u, 0xe639797du, 0x68b67e9eu, 0xa41c7e00u, 0xaed97719u, 0x62737787u, 0xecfc7064u, 0x205670fau,
+    0x85cd537du, 0x496753e3u, 0xc7e85400u, 0x0b42549eu, 0x01875d87u, 0xcd2d5d19u, 0x43a25afau, 0x8f085a64u,
+    0x562848c8u, 0x9a824856u, 0x140d4fb5u, 0xd8a74f2bu, 0xd2624632u, 0x1ec846acu, 0x9047414fu, 0x5ced41d1u,
+    0x299dc2edu, 0xe537c273u, 0x6bb8c590u, 0xa712c50eu, 0xadd7cc17u, 0x617dcc89u, 0xeff2cb6au, 0x2358cbf4u,
+    0xfa78d958u, 0x36d2d9c6u, 0xb85dde25u, 0x74f7debbu, 0x7e32d7a2u, 0xb298d73cu, 0x3c17d0dfu, 0xf0bdd041u,
+    0x5526f3c6u, 0x998cf358u, 0x1703f4bbu, 0xdba9f425u, 0xd16cfd3cu, 0x1dc6fda2u, 0x9349fa41u, 0x5fe3fadfu,
+    0x86c3e873u, 0x4a69e8edu, 0xc4e6ef0eu, 0x084cef90u, 0x0289e689u, 0xce23e617u, 0x40ace1f4u, 0x8c06e16au,
+    0xd0eba0bbu, 0x1c41a025u, 0x92cea7c6u, 0x5e64a758u, 0x54a1ae41u, 0x980baedfu, 0x1684a93cu, 0xda2ea9a2u,
+    0x030ebb0eu, 0xcfa4bb90u, 0x412bbc73u, 0x8d81bcedu, 0x8744b5f4u, 0x4beeb56au, 0xc561b289u, 0x09cbb217u,
+    0xac509190u, 0x60fa910eu, 0xee7596edu, 0x22df9673u, 0x281a9f6au, 0xe4b09ff4u, 0x6a3f9817u, 0xa6959889u,
+    0x7fb58a25u, 0xb31f8abbu, 0x3d908d58u, 0xf13a8dc6u, 0xfbff84dfu, 0x37558441u, 0xb9da83a2u, 0x7570833cu,
+    0x533b85dau, 0x9f918544u, 0x111e82a7u, 0xddb48239u, 0xd7718b20u, 0x1bdb8bbeu, 0x95548c5du, 0x59fe8cc3u,
+    0x80de9e6fu, 0x4c749ef1u, 0xc2fb9912u, 0x0e51998cu, 0x04949095u, 0xc83e900bu, 0x46b197e8u, 0x8a1b9776u,
+    0x2f80b4f1u, 0xe32ab46fu, 0x6da5b38cu, 0xa10fb312u, 0xabcaba0bu, 0x6760ba95u, 0xe9efbd76u, 0x2545bde8u,
+    0xfc65af44u, 0x30cfafdau, 0xbe40a839u, 0x72eaa8a7u, 0x782fa1beu, 0xb485a120u, 0x3a0aa6c3u, 0xf6a0a65du,
+    0xaa4de78cu, 0x66e7e712u, 0xe868e0f1u, 0x24c2e06fu, 0x2e07e976u, 0xe2ade9e8u, 0x6c22ee0bu, 0xa088ee95u,
+    0x79a8fc39u, 0xb502fca7u, 0x3b8dfb44u, 0xf727fbdau, 0xfde2f2c3u, 0x3148f25du, 0xbfc7f5beu, 0x736df520u,
+    0xd6f6d6a7u, 0x1a5cd639u, 0x94d3d1dau, 0x5879d144u, 0x52bcd85du, 0x9e16d8c3u, 0x1099df20u, 0xdc33dfbeu,
+    0x0513cd12u, 0xc9b9cd8cu, 0x4736ca6fu, 0x8b9ccaf1u, 0x8159c3e8u, 0x4df3c376u, 0xc37cc495u, 0x0fd6c40bu,
+    0x7aa64737u, 0xb60c47a9u, 0x3883404au, 0xf42940d4u, 0xfeec49cdu, 0x32464953u, 0xbcc94eb0u, 0x70634e2eu,
+    0xa9435c82u, 0x65e95c1cu, 0xeb665bffu, 0x27cc5b61u, 0x2d095278u, 0xe1a352e6u, 0x6f2c5505u, 0xa386559bu,
+    0x061d761cu, 0xcab77682u, 0x44387161u, 0x889271ffu, 0x825778e6u, 0x4efd7878u, 0xc0727f9bu, 0x0cd87f05u,
+    0xd5f86da9u, 0x19526d37u, 0x97dd6ad4u, 0x5b776a4au, 0x51b26353u, 0x9d1863cdu, 0x1397642eu, 0xdf3d64b0u,
+    0x83d02561u, 0x4f7a25ffu, 0xc1f5221cu, 0x0d5f2282u, 0x079a2b9bu, 0xcb302b05u, 0x45bf2ce6u, 0x89152c78u,
+    0x50353ed4u, 0x9c9f3e4au, 0x121039a9u, 0xdeba3937u, 0xd47f302eu, 0x18d530b0u, 0x965a3753u, 0x5af037cdu,
+    0xff6b144au, 0x33c114d4u, 0xbd4e1337u, 0x71e413a9u, 0x7b211ab0u, 0xb78b1a2eu, 0x39041dcdu, 0xf5ae1d53u,
+    0x2c8e0fffu, 0xe0240f61u, 0x6eab0882u, 0xa201081cu, 0xa8c40105u, 0x646e019bu, 0xeae10678u, 0x264b06e6u
+};
+
+/* Computes the cyclic redundancy check as used by PNG chunks*/
 unsigned lodepng_crc32(const unsigned char * data, size_t length)
 {
+    /*Using the Slicing by Eight algorithm*/
     unsigned r = 0xffffffffu;
-    size_t i;
-    for(i = 0; i < length; ++i) {
-        r = lodepng_crc32_table[(r ^ data[i]) & 0xffu] ^ (r >> 8u);
+    while(length >= 8) {
+        r = lodepng_crc32_table7[(data[0] ^ (r & 0xffu))] ^
+            lodepng_crc32_table6[(data[1] ^ ((r >> 8) & 0xffu))] ^
+            lodepng_crc32_table5[(data[2] ^ ((r >> 16) & 0xffu))] ^
+            lodepng_crc32_table4[(data[3] ^ ((r >> 24) & 0xffu))] ^
+            lodepng_crc32_table3[data[4]] ^
+            lodepng_crc32_table2[data[5]] ^
+            lodepng_crc32_table1[data[6]] ^
+            lodepng_crc32_table0[data[7]];
+        data += 8;
+        length -= 8;
+    }
+    while(length--) {
+        r = lodepng_crc32_table0[(r ^ *data++) & 0xffu] ^ (r >> 8);
     }
     return r ^ 0xffffffffu;
 }
-#else /* !LODEPNG_NO_COMPILE_CRC */
+#else /* LODEPNG_COMPILE_CRC */
+/*in this case, the function is only declared here, and must be defined externally
+so that it will be linked in.
+
+Example implementation that uses a much smaller lookup table for memory constrained cases:
+
+unsigned lodepng_crc32(const unsigned char* data, size_t length) {
+  unsigned r = 0xffffffffu;
+  static const unsigned table[16] = {
+    0x00000000, 0x1db71064, 0x3b6e20c8, 0x26d930ac, 0x76dc4190, 0x6b6b51f4, 0x4db26158, 0x5005713c,
+    0xedb88320, 0xf00f9344, 0xd6d6a3e8, 0xcb61b38c, 0x9b64c2b0, 0x86d3d2d4, 0xa00ae278, 0xbdbdf21c
+  };
+  while(length--) {
+    r = table[(r ^ *data) & 0xf] ^ (r >> 4);
+    r = table[(r ^ (*data >> 4)) & 0xf] ^ (r >> 4);
+    data++;
+  }
+  return r ^ 0xffffffffu;
+}
+*/
 unsigned lodepng_crc32(const unsigned char * data, size_t length);
-#endif /* !LODEPNG_NO_COMPILE_CRC */
+#endif /* LODEPNG_COMPILE_CRC */
 
 /* ////////////////////////////////////////////////////////////////////////// */
 /* / Reading and writing PNG color channel bits                             / */
@@ -2596,7 +2867,7 @@ static void setBitOfReversedStream(size_t * bitpointer, unsigned char * bitstrea
 
 unsigned lodepng_chunk_length(const unsigned char * chunk)
 {
-    return lodepng_read32bitInt(&chunk[0]);
+    return lodepng_read32bitInt(chunk);
 }
 
 void lodepng_chunk_type(char type[5], const unsigned char * chunk)
@@ -2656,7 +2927,8 @@ void lodepng_chunk_generate_crc(unsigned char * chunk)
 
 unsigned char * lodepng_chunk_next(unsigned char * chunk, unsigned char * end)
 {
-    if(chunk >= end || end - chunk < 12) return end; /*too small to contain a chunk*/
+    size_t available_size = (size_t)(end - chunk);
+    if(chunk >= end || available_size < 12) return end; /*too small to contain a chunk*/
     if(chunk[0] == 0x89 && chunk[1] == 0x50 && chunk[2] == 0x4e && chunk[3] == 0x47
        && chunk[4] == 0x0d && chunk[5] == 0x0a && chunk[6] == 0x1a && chunk[7] == 0x0a) {
         /* Is PNG magic header at start of PNG file. Jump to first actual chunk. */
@@ -2664,17 +2936,16 @@ unsigned char * lodepng_chunk_next(unsigned char * chunk, unsigned char * end)
     }
     else {
         size_t total_chunk_length;
-        unsigned char * result;
         if(lodepng_addofl(lodepng_chunk_length(chunk), 12, &total_chunk_length)) return end;
-        result = chunk + total_chunk_length;
-        if(result < chunk) return end; /*pointer overflow*/
-        return result;
+        if(total_chunk_length > available_size) return end; /*outside of range*/
+        return chunk + total_chunk_length;
     }
 }
 
 const unsigned char * lodepng_chunk_next_const(const unsigned char * chunk, const unsigned char * end)
 {
-    if(chunk >= end || end - chunk < 12) return end; /*too small to contain a chunk*/
+    size_t available_size = (size_t)(end - chunk);
+    if(chunk >= end || available_size < 12) return end; /*too small to contain a chunk*/
     if(chunk[0] == 0x89 && chunk[1] == 0x50 && chunk[2] == 0x4e && chunk[3] == 0x47
        && chunk[4] == 0x0d && chunk[5] == 0x0a && chunk[6] == 0x1a && chunk[7] == 0x0a) {
         /* Is PNG magic header at start of PNG file. Jump to first actual chunk. */
@@ -2682,11 +2953,9 @@ const unsigned char * lodepng_chunk_next_const(const unsigned char * chunk, cons
     }
     else {
         size_t total_chunk_length;
-        const unsigned char * result;
         if(lodepng_addofl(lodepng_chunk_length(chunk), 12, &total_chunk_length)) return end;
-        result = chunk + total_chunk_length;
-        if(result < chunk) return end; /*pointer overflow*/
-        return result;
+        if(total_chunk_length > available_size) return end; /*outside of range*/
+        return chunk + total_chunk_length;
     }
 }
 
@@ -2697,8 +2966,6 @@ unsigned char * lodepng_chunk_find(unsigned char * chunk, unsigned char * end, c
         if(lodepng_chunk_type_equals(chunk, type)) return chunk;
         chunk = lodepng_chunk_next(chunk, end);
     }
-
-    return 0; /*Shouldn't reach this*/
 }
 
 const unsigned char * lodepng_chunk_find_const(const unsigned char * chunk, const unsigned char * end,
@@ -2709,8 +2976,6 @@ const unsigned char * lodepng_chunk_find_const(const unsigned char * chunk, cons
         if(lodepng_chunk_type_equals(chunk, type)) return chunk;
         chunk = lodepng_chunk_next_const(chunk, end);
     }
-
-    return 0; /*Shouldn't reach this*/
 }
 
 unsigned lodepng_chunk_append(unsigned char ** out, size_t * outsize, const unsigned char * chunk)
@@ -2739,7 +3004,7 @@ the data is at chunk + 8. To finalize chunk, add the data, then use
 lodepng_chunk_generate_crc */
 static unsigned lodepng_chunk_init(unsigned char ** chunk,
                                    ucvector * out,
-                                   unsigned length, const char * type)
+                                   size_t length, const char * type)
 {
     size_t new_length = out->size;
     if(lodepng_addofl(new_length, length, &new_length)) return 77;
@@ -2748,7 +3013,7 @@ static unsigned lodepng_chunk_init(unsigned char ** chunk,
     *chunk = out->data + new_length - length - 12u;
 
     /*1: length*/
-    lodepng_set32bitInt(*chunk, length);
+    lodepng_set32bitInt(*chunk, (unsigned)length);
 
     /*2: chunk name (4 letters)*/
     lodepng_memcpy(*chunk + 4, type, 4);
@@ -2758,7 +3023,7 @@ static unsigned lodepng_chunk_init(unsigned char ** chunk,
 
 /* like lodepng_chunk_create but with custom allocsize */
 static unsigned lodepng_chunk_createv(ucvector * out,
-                                      unsigned length, const char * type, const unsigned char * data)
+                                      size_t length, const char * type, const unsigned char * data)
 {
     unsigned char * chunk;
     CERROR_TRY_RETURN(lodepng_chunk_init(&chunk, out, length, type));
@@ -2773,7 +3038,7 @@ static unsigned lodepng_chunk_createv(ucvector * out,
 }
 
 unsigned lodepng_chunk_create(unsigned char ** out, size_t * outsize,
-                              unsigned length, const char * type, const unsigned char * data)
+                              size_t length, const char * type, const unsigned char * data)
 {
     ucvector v = ucvector_init(*out, *outsize);
     unsigned error = lodepng_chunk_createv(&v, length, type, data);
@@ -3267,6 +3532,9 @@ void lodepng_info_init(LodePNGInfo * info)
     info->iccp_defined = 0;
     info->iccp_name = NULL;
     info->iccp_profile = NULL;
+
+    info->sbit_defined = 0;
+    info->sbit_r = info->sbit_g = info->sbit_b = info->sbit_a = 0;
 
     LodePNGUnknownChunks_init(info);
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
@@ -4014,7 +4282,7 @@ unsigned lodepng_compute_color_stats(LodePNGColorStats * stats,
     if(!numcolors_done) {
         for(i = 0; i < stats->numcolors; i++) {
             const unsigned char * color = &stats->palette[i * 4];
-            error = color_tree_add(&tree, color[0], color[1], color[2], color[3], i);
+            error = color_tree_add(&tree, color[0], color[1], color[2], color[3], (unsigned)i);
             if(error) goto cleanup;
         }
     }
@@ -4247,7 +4515,7 @@ static unsigned auto_choose_color(LodePNGColorMode * mode_out,
         if(mode_in->colortype == LCT_PALETTE && mode_in->palettesize >= mode_out->palettesize
            && mode_in->bitdepth == mode_out->bitdepth) {
             /*If input should have same palette colors, keep original to preserve its order and prevent conversion*/
-            lodepng_color_mode_cleanup(mode_out);
+            lodepng_color_mode_cleanup(mode_out); /*clears palette, keeps the above set colortype and bitdepth fields as-is*/
             lodepng_color_mode_copy(mode_out, mode_in);
         }
     }
@@ -4269,16 +4537,15 @@ static unsigned auto_choose_color(LodePNGColorMode * mode_out,
 
 #endif /* #ifdef LODEPNG_COMPILE_ENCODER */
 
-/*
-Paeth predictor, used by PNG filter type 4
-The parameters are of type short, but should come from unsigned chars, the shorts
-are only needed to make the paeth calculation correct.
-*/
-static unsigned char paethPredictor(short a, short b, short c)
+/*Paeth predictor, used by PNG filter type 4*/
+static unsigned char paethPredictor(unsigned char a, unsigned char b, unsigned char c)
 {
-    short pa = LODEPNG_ABS(b - c);
-    short pb = LODEPNG_ABS(a - c);
-    short pc = LODEPNG_ABS(a + b - c - c);
+    /* the subtractions of unsigned char cast it to a signed type.
+    With gcc, short is faster than int, with clang int is as fast (as of april 2023)*/
+    short pa = (b - c) < 0 ? -(b - c) : (b - c);
+    short pb = (a - c) < 0 ? -(a - c) : (a - c);
+    /* writing it out like this compiles to something faster than introducing a temp variable*/
+    short pc = (a + b - c - c) < 0 ? -(a + b - c - c) : (a + b - c - c);
     /* return input value associated with smallest of pa, pb, pc (with certain priority if equal) */
     if(pb < pa) {
         a = b;
@@ -4424,10 +4691,12 @@ static unsigned unfilterScanline(unsigned char * recon, const unsigned char * sc
         case 0:
             for(i = 0; i != length; ++i) recon[i] = scanline[i];
             break;
-        case 1:
-            for(i = 0; i != bytewidth; ++i) recon[i] = scanline[i];
-            for(i = bytewidth; i < length; ++i) recon[i] = scanline[i] + recon[i - bytewidth];
-            break;
+        case 1: {
+                size_t j = 0;
+                for(i = 0; i != bytewidth; ++i) recon[i] = scanline[i];
+                for(i = bytewidth; i != length; ++i, ++j) recon[i] = scanline[i] + recon[j];
+                break;
+            }
         case 2:
             if(precon) {
                 for(i = 0; i != length; ++i) recon[i] = scanline[i] + precon[i];
@@ -4438,70 +4707,230 @@ static unsigned unfilterScanline(unsigned char * recon, const unsigned char * sc
             break;
         case 3:
             if(precon) {
+                size_t j = 0;
                 for(i = 0; i != bytewidth; ++i) recon[i] = scanline[i] + (precon[i] >> 1u);
-                for(i = bytewidth; i < length; ++i) recon[i] = scanline[i] + ((recon[i - bytewidth] + precon[i]) >> 1u);
+                /* Unroll independent paths of this predictor. A 6x and 8x version is also possible but that adds
+                too much code. Whether this speeds up anything depends on compiler and settings. */
+                if(bytewidth >= 4) {
+                    for(; i + 3 < length; i += 4, j += 4) {
+                        unsigned char s0 = scanline[i + 0], s1 = scanline[i + 1], s2 = scanline[i + 2], s3 = scanline[i + 3];
+                        unsigned char r0 = recon[j + 0], r1 = recon[j + 1], r2 = recon[j + 2], r3 = recon[j + 3];
+                        unsigned char p0 = precon[i + 0], p1 = precon[i + 1], p2 = precon[i + 2], p3 = precon[i + 3];
+                        recon[i + 0] = s0 + ((r0 + p0) >> 1u);
+                        recon[i + 1] = s1 + ((r1 + p1) >> 1u);
+                        recon[i + 2] = s2 + ((r2 + p2) >> 1u);
+                        recon[i + 3] = s3 + ((r3 + p3) >> 1u);
+                    }
+                }
+                else if(bytewidth >= 3) {
+                    for(; i + 2 < length; i += 3, j += 3) {
+                        unsigned char s0 = scanline[i + 0], s1 = scanline[i + 1], s2 = scanline[i + 2];
+                        unsigned char r0 = recon[j + 0], r1 = recon[j + 1], r2 = recon[j + 2];
+                        unsigned char p0 = precon[i + 0], p1 = precon[i + 1], p2 = precon[i + 2];
+                        recon[i + 0] = s0 + ((r0 + p0) >> 1u);
+                        recon[i + 1] = s1 + ((r1 + p1) >> 1u);
+                        recon[i + 2] = s2 + ((r2 + p2) >> 1u);
+                    }
+                }
+                else if(bytewidth >= 2) {
+                    for(; i + 1 < length; i += 2, j += 2) {
+                        unsigned char s0 = scanline[i + 0], s1 = scanline[i + 1];
+                        unsigned char r0 = recon[j + 0], r1 = recon[j + 1];
+                        unsigned char p0 = precon[i + 0], p1 = precon[i + 1];
+                        recon[i + 0] = s0 + ((r0 + p0) >> 1u);
+                        recon[i + 1] = s1 + ((r1 + p1) >> 1u);
+                    }
+                }
+                for(; i != length; ++i, ++j) recon[i] = scanline[i] + ((recon[j] + precon[i]) >> 1u);
             }
             else {
+                size_t j = 0;
                 for(i = 0; i != bytewidth; ++i) recon[i] = scanline[i];
-                for(i = bytewidth; i < length; ++i) recon[i] = scanline[i] + (recon[i - bytewidth] >> 1u);
+                for(i = bytewidth; i != length; ++i, ++j) recon[i] = scanline[i] + (recon[j] >> 1u);
             }
             break;
         case 4:
             if(precon) {
-                for(i = 0; i != bytewidth; ++i) {
-                    recon[i] = (scanline[i] + precon[i]); /*paethPredictor(0, precon[i], 0) is always precon[i]*/
-                }
-
-                /* Unroll independent paths of the paeth predictor. A 6x and 8x version would also be possible but that
-                adds too much code. Whether this actually speeds anything up at all depends on compiler and settings. */
-                if(bytewidth >= 4) {
-                    for(; i + 3 < length; i += 4) {
-                        size_t j = i - bytewidth;
-                        unsigned char s0 = scanline[i + 0], s1 = scanline[i + 1], s2 = scanline[i + 2], s3 = scanline[i + 3];
-                        unsigned char r0 = recon[j + 0], r1 = recon[j + 1], r2 = recon[j + 2], r3 = recon[j + 3];
-                        unsigned char p0 = precon[i + 0], p1 = precon[i + 1], p2 = precon[i + 2], p3 = precon[i + 3];
-                        unsigned char q0 = precon[j + 0], q1 = precon[j + 1], q2 = precon[j + 2], q3 = precon[j + 3];
-                        recon[i + 0] = s0 + paethPredictor(r0, p0, q0);
-                        recon[i + 1] = s1 + paethPredictor(r1, p1, q1);
-                        recon[i + 2] = s2 + paethPredictor(r2, p2, q2);
-                        recon[i + 3] = s3 + paethPredictor(r3, p3, q3);
+                /* Unroll independent paths of this predictor. Whether this speeds up
+                anything depends on compiler and settings. */
+                if(bytewidth == 8) {
+                    unsigned char a0, b0 = 0, c0, d0 = 0, a1, b1 = 0, c1, d1 = 0;
+                    unsigned char a2, b2 = 0, c2, d2 = 0, a3, b3 = 0, c3, d3 = 0;
+                    unsigned char a4, b4 = 0, c4, d4 = 0, a5, b5 = 0, c5, d5 = 0;
+                    unsigned char a6, b6 = 0, c6, d6 = 0, a7, b7 = 0, c7, d7 = 0;
+                    for(i = 0; i + 7 < length; i += 8) {
+                        c0 = b0;
+                        c1 = b1;
+                        c2 = b2;
+                        c3 = b3;
+                        c4 = b4;
+                        c5 = b5;
+                        c6 = b6;
+                        c7 = b7;
+                        b0 = precon[i + 0];
+                        b1 = precon[i + 1];
+                        b2 = precon[i + 2];
+                        b3 = precon[i + 3];
+                        b4 = precon[i + 4];
+                        b5 = precon[i + 5];
+                        b6 = precon[i + 6];
+                        b7 = precon[i + 7];
+                        a0 = d0;
+                        a1 = d1;
+                        a2 = d2;
+                        a3 = d3;
+                        a4 = d4;
+                        a5 = d5;
+                        a6 = d6;
+                        a7 = d7;
+                        d0 = scanline[i + 0] + paethPredictor(a0, b0, c0);
+                        d1 = scanline[i + 1] + paethPredictor(a1, b1, c1);
+                        d2 = scanline[i + 2] + paethPredictor(a2, b2, c2);
+                        d3 = scanline[i + 3] + paethPredictor(a3, b3, c3);
+                        d4 = scanline[i + 4] + paethPredictor(a4, b4, c4);
+                        d5 = scanline[i + 5] + paethPredictor(a5, b5, c5);
+                        d6 = scanline[i + 6] + paethPredictor(a6, b6, c6);
+                        d7 = scanline[i + 7] + paethPredictor(a7, b7, c7);
+                        recon[i + 0] = d0;
+                        recon[i + 1] = d1;
+                        recon[i + 2] = d2;
+                        recon[i + 3] = d3;
+                        recon[i + 4] = d4;
+                        recon[i + 5] = d5;
+                        recon[i + 6] = d6;
+                        recon[i + 7] = d7;
                     }
                 }
-                else if(bytewidth >= 3) {
-                    for(; i + 2 < length; i += 3) {
-                        size_t j = i - bytewidth;
-                        unsigned char s0 = scanline[i + 0], s1 = scanline[i + 1], s2 = scanline[i + 2];
-                        unsigned char r0 = recon[j + 0], r1 = recon[j + 1], r2 = recon[j + 2];
-                        unsigned char p0 = precon[i + 0], p1 = precon[i + 1], p2 = precon[i + 2];
-                        unsigned char q0 = precon[j + 0], q1 = precon[j + 1], q2 = precon[j + 2];
-                        recon[i + 0] = s0 + paethPredictor(r0, p0, q0);
-                        recon[i + 1] = s1 + paethPredictor(r1, p1, q1);
-                        recon[i + 2] = s2 + paethPredictor(r2, p2, q2);
+                else if(bytewidth == 6) {
+                    unsigned char a0, b0 = 0, c0, d0 = 0, a1, b1 = 0, c1, d1 = 0;
+                    unsigned char a2, b2 = 0, c2, d2 = 0, a3, b3 = 0, c3, d3 = 0;
+                    unsigned char a4, b4 = 0, c4, d4 = 0, a5, b5 = 0, c5, d5 = 0;
+                    for(i = 0; i + 5 < length; i += 6) {
+                        c0 = b0;
+                        c1 = b1;
+                        c2 = b2;
+                        c3 = b3;
+                        c4 = b4;
+                        c5 = b5;
+                        b0 = precon[i + 0];
+                        b1 = precon[i + 1];
+                        b2 = precon[i + 2];
+                        b3 = precon[i + 3];
+                        b4 = precon[i + 4];
+                        b5 = precon[i + 5];
+                        a0 = d0;
+                        a1 = d1;
+                        a2 = d2;
+                        a3 = d3;
+                        a4 = d4;
+                        a5 = d5;
+                        d0 = scanline[i + 0] + paethPredictor(a0, b0, c0);
+                        d1 = scanline[i + 1] + paethPredictor(a1, b1, c1);
+                        d2 = scanline[i + 2] + paethPredictor(a2, b2, c2);
+                        d3 = scanline[i + 3] + paethPredictor(a3, b3, c3);
+                        d4 = scanline[i + 4] + paethPredictor(a4, b4, c4);
+                        d5 = scanline[i + 5] + paethPredictor(a5, b5, c5);
+                        recon[i + 0] = d0;
+                        recon[i + 1] = d1;
+                        recon[i + 2] = d2;
+                        recon[i + 3] = d3;
+                        recon[i + 4] = d4;
+                        recon[i + 5] = d5;
                     }
                 }
-                else if(bytewidth >= 2) {
-                    for(; i + 1 < length; i += 2) {
-                        size_t j = i - bytewidth;
-                        unsigned char s0 = scanline[i + 0], s1 = scanline[i + 1];
-                        unsigned char r0 = recon[j + 0], r1 = recon[j + 1];
-                        unsigned char p0 = precon[i + 0], p1 = precon[i + 1];
-                        unsigned char q0 = precon[j + 0], q1 = precon[j + 1];
-                        recon[i + 0] = s0 + paethPredictor(r0, p0, q0);
-                        recon[i + 1] = s1 + paethPredictor(r1, p1, q1);
+                else if(bytewidth == 4) {
+                    unsigned char a0, b0 = 0, c0, d0 = 0, a1, b1 = 0, c1, d1 = 0;
+                    unsigned char a2, b2 = 0, c2, d2 = 0, a3, b3 = 0, c3, d3 = 0;
+                    for(i = 0; i + 3 < length; i += 4) {
+                        c0 = b0;
+                        c1 = b1;
+                        c2 = b2;
+                        c3 = b3;
+                        b0 = precon[i + 0];
+                        b1 = precon[i + 1];
+                        b2 = precon[i + 2];
+                        b3 = precon[i + 3];
+                        a0 = d0;
+                        a1 = d1;
+                        a2 = d2;
+                        a3 = d3;
+                        d0 = scanline[i + 0] + paethPredictor(a0, b0, c0);
+                        d1 = scanline[i + 1] + paethPredictor(a1, b1, c1);
+                        d2 = scanline[i + 2] + paethPredictor(a2, b2, c2);
+                        d3 = scanline[i + 3] + paethPredictor(a3, b3, c3);
+                        recon[i + 0] = d0;
+                        recon[i + 1] = d1;
+                        recon[i + 2] = d2;
+                        recon[i + 3] = d3;
                     }
                 }
-
+                else if(bytewidth == 3) {
+                    unsigned char a0, b0 = 0, c0, d0 = 0;
+                    unsigned char a1, b1 = 0, c1, d1 = 0;
+                    unsigned char a2, b2 = 0, c2, d2 = 0;
+                    for(i = 0; i + 2 < length; i += 3) {
+                        c0 = b0;
+                        c1 = b1;
+                        c2 = b2;
+                        b0 = precon[i + 0];
+                        b1 = precon[i + 1];
+                        b2 = precon[i + 2];
+                        a0 = d0;
+                        a1 = d1;
+                        a2 = d2;
+                        d0 = scanline[i + 0] + paethPredictor(a0, b0, c0);
+                        d1 = scanline[i + 1] + paethPredictor(a1, b1, c1);
+                        d2 = scanline[i + 2] + paethPredictor(a2, b2, c2);
+                        recon[i + 0] = d0;
+                        recon[i + 1] = d1;
+                        recon[i + 2] = d2;
+                    }
+                }
+                else if(bytewidth == 2) {
+                    unsigned char a0, b0 = 0, c0, d0 = 0;
+                    unsigned char a1, b1 = 0, c1, d1 = 0;
+                    for(i = 0; i + 1 < length; i += 2) {
+                        c0 = b0;
+                        c1 = b1;
+                        b0 = precon[i + 0];
+                        b1 = precon[i + 1];
+                        a0 = d0;
+                        a1 = d1;
+                        d0 = scanline[i + 0] + paethPredictor(a0, b0, c0);
+                        d1 = scanline[i + 1] + paethPredictor(a1, b1, c1);
+                        recon[i + 0] = d0;
+                        recon[i + 1] = d1;
+                    }
+                }
+                else if(bytewidth == 1) {
+                    unsigned char a, b = 0, c, d = 0;
+                    for(i = 0; i != length; ++i) {
+                        c = b;
+                        b = precon[i];
+                        a = d;
+                        d = scanline[i] + paethPredictor(a, b, c);
+                        recon[i] = d;
+                    }
+                }
+                else {
+                    /* Normally not a possible case, but this would handle it correctly */
+                    for(i = 0; i != bytewidth; ++i) {
+                        recon[i] = (scanline[i] + precon[i]); /*paethPredictor(0, precon[i], 0) is always precon[i]*/
+                    }
+                }
+                /* finish any remaining bytes */
                 for(; i != length; ++i) {
                     recon[i] = (scanline[i] + paethPredictor(recon[i - bytewidth], precon[i], precon[i - bytewidth]));
                 }
             }
             else {
+                size_t j = 0;
                 for(i = 0; i != bytewidth; ++i) {
                     recon[i] = scanline[i];
                 }
-                for(i = bytewidth; i < length; ++i) {
+                for(i = bytewidth; i != length; ++i, ++j) {
                     /*paethPredictor(recon[i - bytewidth], 0, 0) is always recon[i - bytewidth]*/
-                    recon[i] = (scanline[i] + recon[i - bytewidth]);
+                    recon[i] = (scanline[i] + recon[j]);
                 }
             }
             break;
@@ -5035,9 +5464,54 @@ static unsigned readChunk_iCCP(LodePNGInfo * info, const LodePNGDecoderSettings 
                             length, &zlibsettings);
     /*error: ICC profile larger than  decoder->max_icc_size*/
     if(error && size > zlibsettings.max_output_size) error = 113;
-    info->iccp_profile_size = size;
+    info->iccp_profile_size = (unsigned)size;
     if(!error && !info->iccp_profile_size) error = 100; /*invalid ICC profile size*/
     return error;
+}
+
+/*significant bits chunk (sBIT)*/
+static unsigned readChunk_sBIT(LodePNGInfo * info, const unsigned char * data, size_t chunkLength)
+{
+    unsigned bitdepth = (info->color.colortype == LCT_PALETTE) ? 8 : info->color.bitdepth;
+    if(info->color.colortype == LCT_GREY) {
+        /*error: this chunk must be 1 bytes for grayscale image*/
+        if(chunkLength != 1) return 114;
+        if(data[0] == 0 || data[0] > bitdepth) return 115;
+        info->sbit_defined = 1;
+        info->sbit_r = info->sbit_g = info->sbit_b = data[0]; /*setting g and b is not required, but sensible*/
+    }
+    else if(info->color.colortype == LCT_RGB || info->color.colortype == LCT_PALETTE) {
+        /*error: this chunk must be 3 bytes for RGB and palette image*/
+        if(chunkLength != 3) return 114;
+        if(data[0] == 0 || data[1] == 0 || data[2] == 0) return 115;
+        if(data[0] > bitdepth || data[1] > bitdepth || data[2] > bitdepth) return 115;
+        info->sbit_defined = 1;
+        info->sbit_r = data[0];
+        info->sbit_g = data[1];
+        info->sbit_b = data[2];
+    }
+    else if(info->color.colortype == LCT_GREY_ALPHA) {
+        /*error: this chunk must be 2 byte for grayscale with alpha image*/
+        if(chunkLength != 2) return 114;
+        if(data[0] == 0 || data[1] == 0) return 115;
+        if(data[0] > bitdepth || data[1] > bitdepth) return 115;
+        info->sbit_defined = 1;
+        info->sbit_r = info->sbit_g = info->sbit_b = data[0]; /*setting g and b is not required, but sensible*/
+        info->sbit_a = data[1];
+    }
+    else if(info->color.colortype == LCT_RGBA) {
+        /*error: this chunk must be 4 bytes for grayscale image*/
+        if(chunkLength != 4) return 114;
+        if(data[0] == 0 || data[1] == 0 || data[2] == 0 || data[3] == 0) return 115;
+        if(data[0] > bitdepth || data[1] > bitdepth || data[2] > bitdepth || data[3] > bitdepth) return 115;
+        info->sbit_defined = 1;
+        info->sbit_r = data[0];
+        info->sbit_g = data[1];
+        info->sbit_b = data[2];
+        info->sbit_a = data[3];
+    }
+
+    return 0; /* OK */
 }
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 
@@ -5054,7 +5528,7 @@ unsigned lodepng_inspect_chunk(LodePNGState * state, size_t pos,
     chunkLength = lodepng_chunk_length(chunk);
     if(chunkLength > 2147483647) return 63;
     data = lodepng_chunk_data_const(chunk);
-    if(data + chunkLength + 4 > in + insize) return 30;
+    if(chunkLength + 12 > insize - pos) return 30;
 
     if(lodepng_chunk_type_equals(chunk, "PLTE")) {
         error = readChunk_PLTE(&state->info_png.color, data, chunkLength);
@@ -5092,6 +5566,9 @@ unsigned lodepng_inspect_chunk(LodePNGState * state, size_t pos,
     }
     else if(lodepng_chunk_type_equals(chunk, "iCCP")) {
         error = readChunk_iCCP(&state->info_png, &state->decoder, data, chunkLength);
+    }
+    else if(lodepng_chunk_type_equals(chunk, "sBIT")) {
+        error = readChunk_sBIT(&state->info_png, data, chunkLength);
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
     }
     else {
@@ -5112,7 +5589,7 @@ static void decodeGeneric(unsigned char ** out, unsigned * w, unsigned * h,
                           const unsigned char * in, size_t insize)
 {
     unsigned char IEND = 0;
-    const unsigned char * chunk;
+    const unsigned char * chunk; /*points to beginning of next chunk*/
     unsigned char * idat; /*the data from idat chunks, zlib compressed*/
     size_t idatsize = 0;
     unsigned char * scanlines = 0;
@@ -5148,14 +5625,15 @@ static void decodeGeneric(unsigned char ** out, unsigned * w, unsigned * h,
     while(!IEND && !state->error) {
         unsigned chunkLength;
         const unsigned char * data; /*the data in the chunk*/
+        size_t pos = (size_t)(chunk - in);
 
-        /*error: size of the in buffer too small to contain next chunk*/
-        if((size_t)((chunk - in) + 12) > insize || chunk < in) {
+        /*error: next chunk out of bounds of the in buffer*/
+        if(chunk < in || pos + 12 > insize) {
             if(state->decoder.ignore_end) break; /*other errors may still happen though*/
             CERROR_BREAK(state->error, 30);
         }
 
-        /*length of the data of the chunk, excluding the length bytes, chunk type and CRC bytes*/
+        /*length of the data of the chunk, excluding the 12 bytes for length, chunk type and CRC*/
         chunkLength = lodepng_chunk_length(chunk);
         /*error: chunk length larger than the max PNG chunk size*/
         if(chunkLength > 2147483647) {
@@ -5163,8 +5641,8 @@ static void decodeGeneric(unsigned char ** out, unsigned * w, unsigned * h,
             CERROR_BREAK(state->error, 63);
         }
 
-        if((size_t)((chunk - in) + chunkLength + 12) > insize || (chunk + chunkLength + 12) < in) {
-            CERROR_BREAK(state->error, 64); /*error: size of the in buffer too small to contain next chunk*/
+        if(pos + (size_t)chunkLength + 12 > insize || pos + (size_t)chunkLength + 12 < pos) {
+            CERROR_BREAK(state->error, 64); /*error: size of the in buffer too small to contain next chunk (or int overflow)*/
         }
 
         data = lodepng_chunk_data_const(chunk);
@@ -5251,9 +5729,13 @@ static void decodeGeneric(unsigned char ** out, unsigned * w, unsigned * h,
         else if(lodepng_chunk_type_equals(chunk, "iCCP")) {
             state->error = readChunk_iCCP(&state->info_png, &state->decoder, data, chunkLength);
             if(state->error) break;
+        }
+        else if(lodepng_chunk_type_equals(chunk, "sBIT")) {
+            state->error = readChunk_sBIT(&state->info_png, data, chunkLength);
+            if(state->error) break;
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
         }
-        else { /*it's not an implemented chunk type, so ignore it: skip over the data*/
+        else /*it's not an implemented chunk type, so ignore it: skip over the data*/ {
             /*error: unknown critical chunk (5th bit of first byte of chunk type is 0)*/
             if(!state->decoder.ignore_critical && !lodepng_chunk_ancillary(chunk)) {
                 CERROR_BREAK(state->error, 69);
@@ -5284,11 +5766,11 @@ static void decodeGeneric(unsigned char ** out, unsigned * w, unsigned * h,
         /*predict output size, to allocate exact size for output buffer to avoid more dynamic allocation.
         If the decompressed size does not match the prediction, the image must be corrupt.*/
         if(state->info_png.interlace_method == 0) {
-            size_t bpp = lodepng_get_bpp(&state->info_png.color);
+            unsigned bpp = lodepng_get_bpp(&state->info_png.color);
             expected_size = lodepng_get_raw_size_idat(*w, *h, bpp);
         }
         else {
-            size_t bpp = lodepng_get_bpp(&state->info_png.color);
+            unsigned bpp = lodepng_get_bpp(&state->info_png.color);
             /*Adam-7 interlaced: expected size is the sum of the 7 sub-images sizes*/
             expected_size = 0;
             expected_size += lodepng_get_raw_size_idat((*w + 7) >> 3, (*h + 7) >> 3, bpp);
@@ -5307,7 +5789,7 @@ static void decodeGeneric(unsigned char ** out, unsigned * w, unsigned * h,
     lodepng_free(idat);
 
     if(!state->error) {
-        lv_draw_buf_t * decoded = lv_draw_buf_create(*w, *h, LV_COLOR_FORMAT_ARGB8888, 4 * *w);
+        lv_draw_buf_t * decoded = lv_draw_buf_create_user(image_cache_draw_buf_handlers, *w, *h, LV_COLOR_FORMAT_ARGB8888, 4 * *w);
         if(decoded) {
             *out = (unsigned char*)decoded;
             outsize = decoded->data_size;
@@ -5348,7 +5830,7 @@ unsigned lodepng_decode(unsigned char ** out, unsigned * w, unsigned * h,
             return 56; /*unsupported color mode conversion*/
         }
 
-        lv_draw_buf_t * new_buf = lv_draw_buf_create(*w, *h, LV_COLOR_FORMAT_ARGB8888, 4 * *w);
+        lv_draw_buf_t * new_buf = lv_draw_buf_create_user(image_cache_draw_buf_handlers,*w, *h, LV_COLOR_FORMAT_ARGB8888, 4 * *w);
         if(new_buf == NULL) {
             state->error = 83; /*alloc fail*/
         }
@@ -5357,13 +5839,13 @@ unsigned lodepng_decode(unsigned char ** out, unsigned * w, unsigned * h,
                                             &state->info_raw, &state->info_png.color, *w, *h);
             
             if (state->error) {
-                lv_draw_buf_destroy(new_buf);
+                lv_draw_buf_destroy_user(image_cache_draw_buf_handlers,new_buf);
                 new_buf = NULL;
             }
         }
 
         *out = (unsigned char*)new_buf;
-        lv_draw_buf_destroy(old_buf);
+        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers,old_buf);
     }
     return state->error;
 }
@@ -5516,6 +5998,10 @@ static unsigned addChunk_PLTE(ucvector * out, const LodePNGColorMode * info)
 {
     unsigned char * chunk;
     size_t i, j = 8;
+
+    if(info->palettesize == 0 || info->palettesize > 256) {
+        return 68; /*invalid palette size, it is only allowed to be 1-256*/
+    }
 
     CERROR_TRY_RETURN(lodepng_chunk_init(&chunk, out, info->palettesize * 3, "PLTE"));
 
@@ -5790,6 +6276,46 @@ static unsigned addChunk_iCCP(ucvector * out, const LodePNGInfo * info, LodePNGC
     return error;
 }
 
+static unsigned addChunk_sBIT(ucvector * out, const LodePNGInfo * info)
+{
+    unsigned bitdepth = (info->color.colortype == LCT_PALETTE) ? 8 : info->color.bitdepth;
+    unsigned char * chunk = 0;
+    if(info->color.colortype == LCT_GREY) {
+        if(info->sbit_r == 0 || info->sbit_r > bitdepth) return 115;
+        CERROR_TRY_RETURN(lodepng_chunk_init(&chunk, out, 1, "sBIT"));
+        chunk[8] = info->sbit_r;
+    }
+    else if(info->color.colortype == LCT_RGB || info->color.colortype == LCT_PALETTE) {
+        if(info->sbit_r == 0 || info->sbit_g == 0 || info->sbit_b == 0) return 115;
+        if(info->sbit_r > bitdepth || info->sbit_g > bitdepth || info->sbit_b > bitdepth) return 115;
+        CERROR_TRY_RETURN(lodepng_chunk_init(&chunk, out, 3, "sBIT"));
+        chunk[8] = info->sbit_r;
+        chunk[9] = info->sbit_g;
+        chunk[10] = info->sbit_b;
+    }
+    else if(info->color.colortype == LCT_GREY_ALPHA) {
+        if(info->sbit_r == 0 || info->sbit_a == 0) return 115;
+        if(info->sbit_r > bitdepth || info->sbit_a > bitdepth) return 115;
+        CERROR_TRY_RETURN(lodepng_chunk_init(&chunk, out, 2, "sBIT"));
+        chunk[8] = info->sbit_r;
+        chunk[9] = info->sbit_a;
+    }
+    else if(info->color.colortype == LCT_RGBA) {
+        if(info->sbit_r == 0 || info->sbit_g == 0 || info->sbit_b == 0 || info->sbit_a == 0 ||
+           info->sbit_r > bitdepth || info->sbit_g > bitdepth ||
+           info->sbit_b > bitdepth || info->sbit_a > bitdepth) {
+            return 115;
+        }
+        CERROR_TRY_RETURN(lodepng_chunk_init(&chunk, out, 4, "sBIT"));
+        chunk[8] = info->sbit_r;
+        chunk[9] = info->sbit_g;
+        chunk[10] = info->sbit_b;
+        chunk[11] = info->sbit_a;
+    }
+    if(chunk) lodepng_chunk_generate_crc(chunk);
+    return 0;
+}
+
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
 
 static void filterScanline(unsigned char * out, const unsigned char * scanline, const unsigned char * prevline,
@@ -5875,7 +6401,7 @@ static size_t ilog2i(size_t i)
     l = ilog2(i);
     /* approximate i*log2(i): l is integer logarithm, ((i - (1u << l)) << 1u)
     linearly approximates the missing fractional part multiplied by i */
-    return i * l + ((i - (1u << l)) << 1u);
+    return i * l + ((i - (((size_t)1) << l)) << 1u);
 }
 
 static unsigned filter(unsigned char * out, const unsigned char * in, unsigned w, unsigned h,
@@ -6200,7 +6726,7 @@ static unsigned preProcessScanlines(unsigned char ** out, size_t * outsize, cons
         adam7 = (unsigned char *)lodepng_malloc(passstart[7]);
         if(!adam7 && passstart[7]) error = 83; /*alloc fail*/
 
-        if(!error && adam7) {
+        if(!error) {
             unsigned i;
 
             Adam7_interlace(adam7, in, w, h, bpp);
@@ -6273,8 +6799,10 @@ unsigned lodepng_encode(unsigned char ** out, size_t * outsize,
     ucvector outv = ucvector_init(NULL, 0);
     LodePNGInfo info;
     const LodePNGInfo * info_png = &state->info_png;
+    LodePNGColorMode auto_color;
 
     lodepng_info_init(&info);
+    lodepng_color_mode_init(&auto_color);
 
     /*provide some proper output values if error will happen*/
     *out = 0;
@@ -6284,6 +6812,10 @@ unsigned lodepng_encode(unsigned char ** out, size_t * outsize,
     /*check input values validity*/
     if((info_png->color.colortype == LCT_PALETTE || state->encoder.force_palette)
        && (info_png->color.palettesize == 0 || info_png->color.palettesize > 256)) {
+        /*this error is returned even if auto_convert is enabled and thus encoder could
+        generate the palette by itself: while allowing this could be possible in theory,
+        it may complicate the code or edge cases, and always requiring to give a palette
+        when setting this color type is a simpler contract*/
         state->error = 68; /*invalid palette size, it is only allowed to be 1-256*/
         goto cleanup;
     }
@@ -6304,6 +6836,7 @@ unsigned lodepng_encode(unsigned char ** out, size_t * outsize,
     lodepng_info_copy(&info, &state->info_png);
     if(state->encoder.auto_convert) {
         LodePNGColorStats stats;
+        unsigned allow_convert = 1;
         lodepng_color_stats_init(&stats);
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
         if(info_png->iccp_defined &&
@@ -6325,24 +6858,85 @@ unsigned lodepng_encode(unsigned char ** out, size_t * outsize,
             /*the background chunk's color must be taken into account as well*/
             unsigned r = 0, g = 0, b = 0;
             LodePNGColorMode mode16 = lodepng_color_mode_make(LCT_RGB, 16);
-            lodepng_convert_rgb(&r, &g, &b, info_png->background_r, info_png->background_g, info_png->background_b, &mode16,
-                                &info_png->color);
+            lodepng_convert_rgb(&r, &g, &b,
+                                info_png->background_r, info_png->background_g, info_png->background_b, &mode16, &info_png->color);
             state->error = lodepng_color_stats_add(&stats, r, g, b, 65535);
             if(state->error) goto cleanup;
         }
 #endif /* LODEPNG_COMPILE_ANCILLARY_CHUNKS */
-        state->error = auto_choose_color(&info.color, &state->info_raw, &stats);
+        state->error = auto_choose_color(&auto_color, &state->info_raw, &stats);
         if(state->error) goto cleanup;
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
-        /*also convert the background chunk*/
-        if(info_png->background_defined) {
-            if(lodepng_convert_rgb(&info.background_r, &info.background_g, &info.background_b,
-                                   info_png->background_r, info_png->background_g, info_png->background_b, &info.color, &info_png->color)) {
-                state->error = 104;
-                goto cleanup;
+        if(info_png->sbit_defined) {
+            /*if sbit is defined, due to strict requirements of which sbit values can be present for which color modes,
+            auto_convert can't be done in many cases. However, do support a few cases here.
+            TODO: more conversions may be possible, and it may also be possible to get a more appropriate color type out of
+                  auto_choose_color if knowledge about sbit is used beforehand
+            */
+            unsigned sbit_max = LODEPNG_MAX(LODEPNG_MAX(LODEPNG_MAX(info_png->sbit_r, info_png->sbit_g),
+                                                        info_png->sbit_b), info_png->sbit_a);
+            unsigned equal = (!info_png->sbit_g || info_png->sbit_g == info_png->sbit_r)
+                             && (!info_png->sbit_b || info_png->sbit_b == info_png->sbit_r)
+                             && (!info_png->sbit_a || info_png->sbit_a == info_png->sbit_r);
+            allow_convert = 0;
+            if(info.color.colortype == LCT_PALETTE &&
+               auto_color.colortype == LCT_PALETTE) {
+                /* input and output are palette, and in this case it may happen that palette data is
+                expected to be copied from info_raw into the info_png */
+                allow_convert = 1;
+            }
+            /*going from 8-bit RGB to palette (or 16-bit as long as sbit_max <= 8) is possible
+            since both are 8-bit RGB for sBIT's purposes*/
+            if(info.color.colortype == LCT_RGB &&
+               auto_color.colortype == LCT_PALETTE && sbit_max <= 8) {
+                allow_convert = 1;
+            }
+            /*going from 8-bit RGBA to palette is also ok but only if sbit_a is exactly 8*/
+            if(info.color.colortype == LCT_RGBA && auto_color.colortype == LCT_PALETTE &&
+               info_png->sbit_a == 8 && sbit_max <= 8) {
+                allow_convert = 1;
+            }
+            /*going from 16-bit RGB(A) to 8-bit RGB(A) is ok if all sbit values are <= 8*/
+            if((info.color.colortype == LCT_RGB || info.color.colortype == LCT_RGBA) && info.color.bitdepth == 16 &&
+               auto_color.colortype == info.color.colortype && auto_color.bitdepth == 8 &&
+               sbit_max <= 8) {
+                allow_convert = 1;
+            }
+            /*going to less channels is ok if all bit values are equal (all possible values in sbit,
+              as well as the chosen bitdepth of the result). Due to how auto_convert works,
+              we already know that auto_color.colortype has less than or equal amount of channels than
+              info.colortype. Palette is not used here. This conversion is not allowed if
+              info_png->sbit_r < auto_color.bitdepth, because specifically for alpha, non-presence of
+              an sbit value heavily implies that alpha's bit depth is equal to the PNG bit depth (rather
+              than the bit depths set in the r, g and b sbit values, by how the PNG specification describes
+              handling tRNS chunk case with sBIT), so be conservative here about ignoring user input.*/
+            if(info.color.colortype != LCT_PALETTE && auto_color.colortype != LCT_PALETTE &&
+               equal && info_png->sbit_r == auto_color.bitdepth) {
+                allow_convert = 1;
             }
         }
+#endif
+        if(state->encoder.force_palette) {
+            if(info.color.colortype != LCT_GREY && info.color.colortype != LCT_GREY_ALPHA &&
+               (auto_color.colortype == LCT_GREY || auto_color.colortype == LCT_GREY_ALPHA)) {
+                /*user speficially forced a PLTE palette, so cannot convert to grayscale types because
+                the PNG specification only allows writing a suggested palette in PLTE for truecolor types*/
+                allow_convert = 0;
+            }
+        }
+        if(allow_convert) {
+            lodepng_color_mode_copy(&info.color, &auto_color);
+#ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
+            /*also convert the background chunk*/
+            if(info_png->background_defined) {
+                if(lodepng_convert_rgb(&info.background_r, &info.background_g, &info.background_b,
+                                       info_png->background_r, info_png->background_g, info_png->background_b, &info.color, &info_png->color)) {
+                    state->error = 104;
+                    goto cleanup;
+                }
+            }
 #endif /* LODEPNG_COMPILE_ANCILLARY_CHUNKS */
+        }
     }
 #ifdef LODEPNG_COMPILE_ANCILLARY_CHUNKS
     if(info_png->iccp_defined) {
@@ -6412,6 +7006,10 @@ unsigned lodepng_encode(unsigned char ** out, size_t * outsize,
         }
         if(info.chrm_defined) {
             state->error = addChunk_cHRM(&outv, &info);
+            if(state->error) goto cleanup;
+        }
+        if(info_png->sbit_defined) {
+            state->error = addChunk_sBIT(&outv, &info);
             if(state->error) goto cleanup;
         }
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
@@ -6521,6 +7119,7 @@ unsigned lodepng_encode(unsigned char ** out, size_t * outsize,
 cleanup:
     lodepng_info_cleanup(&info);
     lodepng_free(data);
+    lodepng_color_mode_cleanup(&auto_color);
 
     /*instead of cleaning the vector up, give it to the output*/
     *out = outv.data;
@@ -6823,6 +7422,10 @@ const char * lodepng_error_text(unsigned code)
         unreasonable memory consumption when decoding due to impossibly large ICC profile*/
         case 113:
             return "ICC profile unreasonably large";
+        case 114:
+            return "sBIT chunk has wrong size for the color type of the image";
+        case 115:
+            return "sBIT value out of range";
     }
     return "unknown error code";
 }
@@ -6863,7 +7466,7 @@ unsigned decompress(std::vector<unsigned char> & out, const unsigned char * in, 
     size_t buffersize = 0;
     unsigned error = zlib_decompress(&buffer, &buffersize, 0, in, insize, &settings);
     if(buffer) {
-        out.insert(out.end(), &buffer[0], &buffer[buffersize]);
+        out.insert(out.end(), buffer, &buffer[buffersize]);
         lodepng_free(buffer);
     }
     return error;
@@ -6884,7 +7487,7 @@ unsigned compress(std::vector<unsigned char> & out, const unsigned char * in, si
     size_t buffersize = 0;
     unsigned error = zlib_compress(&buffer, &buffersize, in, insize, &settings);
     if(buffer) {
-        out.insert(out.end(), &buffer[0], &buffer[buffersize]);
+        out.insert(out.end(), buffer, &buffer[buffersize]);
         lodepng_free(buffer);
     }
     return error;
@@ -6935,7 +7538,7 @@ unsigned decode(std::vector<unsigned char> & out, unsigned & w, unsigned & h, co
         state.info_raw.colortype = colortype;
         state.info_raw.bitdepth = bitdepth;
         size_t buffersize = lodepng_get_raw_size(w, h, &state.info_raw);
-        out.insert(out.end(), &buffer[0], &buffer[buffersize]);
+        out.insert(out.end(), buffer, &buffer[buffersize]);
     }
     lodepng_free(buffer);
     return error;
@@ -6955,7 +7558,7 @@ unsigned decode(std::vector<unsigned char> & out, unsigned & w, unsigned & h,
     unsigned error = lodepng_decode(&buffer, &w, &h, &state, in, insize);
     if(buffer && !error) {
         size_t buffersize = lodepng_get_raw_size(w, h, &state.info_raw);
-        out.insert(out.end(), &buffer[0], &buffer[buffersize]);
+        out.insert(out.end(), buffer, &buffer[buffersize]);
     }
     lodepng_free(buffer);
     return error;
@@ -6990,7 +7593,7 @@ unsigned encode(std::vector<unsigned char> & out, const unsigned char * in, unsi
     size_t buffersize;
     unsigned error = lodepng_encode_memory(&buffer, &buffersize, in, w, h, colortype, bitdepth);
     if(buffer) {
-        out.insert(out.end(), &buffer[0], &buffer[buffersize]);
+        out.insert(out.end(), buffer, &buffer[buffersize]);
         lodepng_free(buffer);
     }
     return error;
@@ -7012,7 +7615,7 @@ unsigned encode(std::vector<unsigned char> & out,
     size_t buffersize;
     unsigned error = lodepng_encode(&buffer, &buffersize, in, w, h, &state);
     if(buffer) {
-        out.insert(out.end(), &buffer[0], &buffer[buffersize]);
+        out.insert(out.end(), buffer, &buffer[buffersize]);
         lodepng_free(buffer);
     }
     return error;

@@ -171,7 +171,7 @@ void * LV_ATTRIBUTE_FAST_MEM lv_memmove(void * dst, const void * src, size_t len
     return dst;
 }
 
-int32_t lv_memcmp(const void * p1, const void * p2, size_t len)
+int lv_memcmp(const void * p1, const void * p2, size_t len)
 {
     const char * s1 = (const char *) p1;
     const char * s2 = (const char *) p2;
@@ -191,13 +191,28 @@ size_t lv_strlen(const char * str)
     return i;
 }
 
+size_t lv_strlcpy(char * dst, const char * src, size_t dst_size)
+{
+    size_t i = 0;
+    if(dst_size > 0) {
+        for(; i < dst_size - 1 && src[i]; i++) {
+            dst[i] = src[i];
+        }
+        dst[i] = '\0';
+    }
+    while(src[i]) i++;
+    return i;
+}
+
 char * lv_strncpy(char * dst, const char * src, size_t dst_size)
 {
     size_t i;
-    for(i = 0; i < dst_size - 1 && src[i]; i++) {
+    for(i = 0; i < dst_size && src[i]; i++) {
         dst[i] = src[i];
     }
-    dst[i] = '\0';
+    for(; i < dst_size; i++) {
+        dst[i] = '\0';
+    }
     return dst;
 }
 
@@ -208,7 +223,7 @@ char * lv_strcpy(char * dst, const char * src)
     return tmp;
 }
 
-int32_t lv_strcmp(const char * s1, const char * s2)
+int lv_strcmp(const char * s1, const char * s2)
 {
     while(*s1 && (*s1 == *s2)) {
         s1++;

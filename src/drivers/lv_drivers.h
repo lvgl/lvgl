@@ -37,6 +37,9 @@ extern "C" {
 #include "windows/lv_windows_input.h"
 #include "windows/lv_windows_display.h"
 
+#include "glfw/lv_glfw_window.h"
+#include "glfw/lv_glfw_mouse.h"
+
 /*********************
  *      DEFINES
  *********************/

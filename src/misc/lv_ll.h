@@ -142,7 +142,7 @@ void lv_ll_swap(lv_ll_t * ll_p, void * n1_p, void * n2_p);
  */
 
 /**
- * Move a node before an other node in the same linked list
+ * Move a node before another node in the same linked list
  * @param ll_p pointer to a linked list
  * @param n_act pointer to node to move
  * @param n_after pointer to a node which should be after `n_act`

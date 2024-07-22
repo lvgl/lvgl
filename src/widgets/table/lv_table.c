@@ -391,6 +391,26 @@ void lv_table_set_cell_user_data(lv_obj_t * obj, uint16_t row, uint16_t col, voi
     table->cell_data[cell]->user_data = user_data;
 }
 
+void lv_table_set_selected_cell(lv_obj_t * obj, uint16_t row, uint16_t col)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_table_t * table = (lv_table_t *)obj;
+
+    if(table->col_cnt == 0 || table->row_cnt == 0) return;
+
+    if(table->col_act != col || table->row_act != row) {
+        table->col_act = (col >= table->col_cnt) ? (table->col_cnt - 1) : col;
+        table->row_act = (row >= table->row_cnt) ? (table->row_cnt - 1) : row;
+
+        lv_obj_invalidate(obj);
+
+        scroll_to_selected_cell(obj);
+
+        lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
+    }
+}
+
 /*=====================
  * Getter functions
  *====================*/

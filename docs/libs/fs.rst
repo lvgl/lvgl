@@ -34,7 +34,7 @@ The work directory can be set with ``LV_FS_..._PATH``. E.g.
 ``"/home/joe/projects/"`` The actual file/directory paths will be
 appended to it.
 
-Cached reading is also supported if ``LV_FS_..._CACHE_SIZE`` is set to
+:ref:`Cached reading <overview_file_system_cache>` is also supported if ``LV_FS_..._CACHE_SIZE`` is set to
 not ``0`` value. :cpp:func:`lv_fs_read` caches this size of data to lower the
 number of actual reads from the storage.
 

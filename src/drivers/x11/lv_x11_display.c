@@ -49,7 +49,7 @@ typedef struct {
     void      *     xdata;           /**< allocated data for XImage */
     /* LVGL related information */
     lv_timer_t   *  timer;           /**< timer object for @ref x11_event_handler */
-    lv_color_t   *  buffer[2];       /**< (double) lv display buffers, depending on @ref LV_X11_RENDER_MODE */
+    uint8_t    *    buffer[2];       /**< (double) lv display buffers, depending on @ref LV_X11_RENDER_MODE */
     lv_area_t       flush_area;      /**< integrated area for a display update */
     /* systemtick by thread related information */
     pthread_t       thr_tick;        /**< pthread for SysTick simulation */
@@ -160,7 +160,7 @@ static void x11_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
 }
 
 /**
- * event callbed by lvgl display if resolution has been changed (@ref lv_display_set_resolution has been called)
+ * event called by lvgl display if resolution has been changed (@ref lv_display_set_resolution has been called)
  * @param[in] e  event data, containing lv_display_t object
  */
 static void x11_resolution_evt_cb(lv_event_t * e)
@@ -175,8 +175,8 @@ static void x11_resolution_evt_cb(lv_event_t * e)
     if(LV_X11_RENDER_MODE != LV_DISPLAY_RENDER_MODE_PARTIAL) {
         /* update lvgl full-screen display draw buffers for new display size */
         int sz_buffers = (hor_res * ver_res * (LV_COLOR_DEPTH + 7) / 8);
-        xd->buffer[0] = lv_realloc(xd->buffer[0], sz_buffers);
-        xd->buffer[1] = (LV_X11_DOUBLE_BUFFER ?  lv_realloc(xd->buffer[1], sz_buffers) : NULL);
+        xd->buffer[0] = realloc(xd->buffer[0], sz_buffers);
+        xd->buffer[1] = (LV_X11_DOUBLE_BUFFER ?  realloc(xd->buffer[1], sz_buffers) : NULL);
         lv_display_set_buffers(disp, xd->buffer[0], xd->buffer[1], sz_buffers, LV_X11_RENDER_MODE);
     }
 
@@ -189,7 +189,7 @@ static void x11_resolution_evt_cb(lv_event_t * e)
 }
 
 /**
- * event callbed by lvgl display if display has been closed (@ref lv_display_delete has been called)
+ * event called by lvgl display if display has been closed (@ref lv_display_delete has been called)
  * @param[in] e  event data, containing lv_display_t object
  */
 static void x11_disp_delete_evt_cb(lv_event_t * e)
@@ -199,9 +199,9 @@ static void x11_disp_delete_evt_cb(lv_event_t * e)
 
     lv_timer_delete(xd->timer);
 
-    lv_free(xd->buffer[0]);
+    free(xd->buffer[0]);
     if(LV_X11_DOUBLE_BUFFER) {
-        lv_free(xd->buffer[1]);
+        free(xd->buffer[1]);
     }
 
     XDestroyImage(xd->ximage);
@@ -378,8 +378,8 @@ lv_display_t * lv_x11_window_create(char const * title, int32_t hor_res, int32_t
     if(LV_X11_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         sz_buffers /= 10;
     }
-    xd->buffer[0] = lv_malloc(sz_buffers);
-    xd->buffer[1] = (LV_X11_DOUBLE_BUFFER ? lv_malloc(sz_buffers) : NULL);
+    xd->buffer[0] = malloc(sz_buffers);
+    xd->buffer[1] = (LV_X11_DOUBLE_BUFFER ? malloc(sz_buffers) : NULL);
     lv_display_set_buffers(disp, xd->buffer[0], xd->buffer[1], sz_buffers, LV_X11_RENDER_MODE);
 
     xd->timer = lv_timer_create(x11_event_handler, 5, disp);

@@ -27,7 +27,7 @@ the object so that gridnav can process the arrow keys.
 
 To move the focus to the next widget of the group use
 :cpp:enumerator:`LV_KEY_NEXT` or :cpp:enumerator:`LV_KEY_PREV`.
-Optionally you can also use :cpp:func:`lv_group_focus_next` 
+Optionally you can also use :cpp:func:`lv_group_focus_next`
 or :cpp:func:`lv_group_focus_prev` or the ``TAB``
 key on keyboard as usual.
 
@@ -52,6 +52,13 @@ To add the gridnav feature to an object use
   object can be scrolled in that direction then it will be scrolled instead of
   going to the next/previous object. If there is no more room for scrolling the
   next/previous object will be focused normally
+- :cpp:enumerator:`LV_GRIDNAV_CTRL_HORIZONTAL_MOVE_ONLY`: Only use the left/right keys
+  for grid navigation. Up/down key events will be sent to the focused object.
+- :cpp:enumerator:`LV_GRIDNAV_CTRL_VERTICAL_MOVE_ONLY`: Only use the up/down keys
+  for grid navigation. Left/right key events will be sent to the focused object.
+
+:cpp:enumerator:`LV_GRIDNAV_CTRL_HORIZONTAL_MOVE_ONLY` and :cpp:enumerator:`LV_GRIDNAV_CTRL_VERTICAL_MOVE_ONLY`
+should not be used together.
 
 :cpp:expr:`lv_gridnav_remove(cont)` Removes gridnav from an object.
 

@@ -4,7 +4,7 @@ if(CONFIG_LVGL)
 
   target_include_directories(lvgl INTERFACE ${LVGL_ROOT_DIR})
 
-  zephyr_compile_definitions(LV_CONF_KCONFIG_EXTERNAL_INCLUDE=<autoconf.h>)
+  zephyr_compile_definitions(LV_CONF_KCONFIG_EXTERNAL_INCLUDE=<zephyr/autoconf.h>)
 
   zephyr_library()
 

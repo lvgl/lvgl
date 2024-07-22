@@ -13,6 +13,9 @@
 
 #include <lvgl.h>
 #include <rtthread.h>
+#ifdef PKG_USING_CPU_USAGE
+#include "cpu_usage.h"
+#endif /* PKG_USING_CPU_USAGE */
 
 #define DBG_TAG    "LVGL"
 #define DBG_LVL    DBG_INFO
@@ -50,6 +53,13 @@ static void lv_rt_log(const char *buf)
 }
 #endif /* LV_USE_LOG */
 
+#ifdef PKG_USING_CPU_USAGE
+uint32_t lv_timer_os_get_idle(void)
+{
+    return (100 - (uint32_t)cpu_load_average());
+}
+#endif /* PKG_USING_CPU_USAGE */
+
 static void lvgl_thread_entry(void *parameter)
 {
 #if LV_USE_LOG
@@ -61,6 +71,10 @@ static void lvgl_thread_entry(void *parameter)
     lv_user_gui_init();
 
     lv_tick_set_cb(&rt_tick_get_millisecond);
+
+#ifdef PKG_USING_CPU_USAGE
+    cpu_usage_init();
+#endif /* PKG_USING_CPU_USAGE */
 
     /* handle the tasks of LVGL */
     while(1)

@@ -125,7 +125,7 @@ The following style properties trigger the creation of a "Simple layer":
 
 In this case widget will be sliced into ``LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE`` sized chunks.
 
-If there is no memory for a new chunk, LVGL will try allocating layer when an other chunk is rendered and freed.
+If there is no memory for a new chunk, LVGL will try allocating layer when another chunk is rendered and freed.
 
 
 Transformed layer

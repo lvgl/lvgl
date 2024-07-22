@@ -45,7 +45,7 @@ d2_color  lv_draw_dave2d_lv_colour_to_d2_colour(lv_color_t color)
     /*Color depth: 8 (A8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
     switch(LV_COLOR_DEPTH) {
         case(8):
-            __BKPT(0);
+            LV_ASSERT(0);
             break;
         case(16):
             break;
@@ -113,7 +113,7 @@ d2_u32 lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(lv_color_format_t colour_format)
             break;
 
         default:
-            __BKPT(0);
+            LV_ASSERT(0);
             break;
 
     }

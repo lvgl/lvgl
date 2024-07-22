@@ -629,6 +629,7 @@ static void style_init(my_theme_t * theme)
     lv_style_set_line_width(&theme->styles.scale, LV_DPX(2));
     lv_style_set_arc_color(&theme->styles.scale, theme->color_text);
     lv_style_set_arc_width(&theme->styles.scale, LV_DPX(2));
+    lv_style_set_length(&theme->styles.scale, LV_DPX(6));
 #endif
 }
 
@@ -640,7 +641,7 @@ lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary
                                    const lv_font_t * font)
 {
     /*This trick is required only to avoid the garbage collection of
-     *styles' data if LVGL is used in a binding (e.g. Micropython)
+     *styles' data if LVGL is used in a binding (e.g. MicroPython)
      *In a general case styles could be in a simple `static lv_style_t my_style...` variables*/
 
     if(!lv_theme_default_is_inited()) {
@@ -1124,6 +1125,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_msgbox_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);
         lv_obj_add_style(obj, &theme->styles.pad_zero, 0);
+        lv_obj_add_style(obj, &theme->styles.clip_corner, 0);
         return;
     }
     else if(lv_obj_check_type(obj, &lv_msgbox_backdrop_class)) {
@@ -1139,6 +1141,12 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
         return;
     }
+    else if(lv_obj_check_type(obj, &lv_msgbox_content_class)) {
+        lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
+        lv_obj_add_style(obj, &theme->styles.scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
+        lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
+        return;
+    }
     else if(lv_obj_check_type(obj, &lv_msgbox_header_button_class) ||
             lv_obj_check_type(obj, &lv_msgbox_footer_button_class)) {
         lv_obj_add_style(obj, &theme->styles.btn, 0);
@@ -1149,11 +1157,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
         lv_obj_add_style(obj, &theme->styles.bg_color_secondary, LV_STATE_CHECKED);
         lv_obj_add_style(obj, &theme->styles.disabled, LV_STATE_DISABLED);
-        return;
-    }
-
-    if(lv_obj_check_type(parent, &lv_msgbox_class)) {
-        lv_obj_add_style(obj, &theme->styles.pad_tiny, 0);
         return;
     }
 

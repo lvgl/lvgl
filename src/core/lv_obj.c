@@ -44,6 +44,7 @@ static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer);
 static lv_result_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void update_obj_state(lv_obj_t * obj, lv_state_t new_state);
+
 #if LV_USE_OBJ_PROPERTY
     static lv_result_t lv_obj_set_any(lv_obj_t *, lv_prop_id_t, const lv_property_t *);
     static lv_result_t lv_obj_get_any(const lv_obj_t *, lv_prop_id_t, lv_property_t *);
@@ -83,6 +84,12 @@ const lv_obj_class_t lv_obj_class = {
     .prop_index_end = LV_PROPERTY_OBJ_END,
     .properties = properties,
     .properties_count = sizeof(properties) / sizeof(properties[0]),
+
+#if LV_USE_OBJ_PROPERTY_NAME
+    .property_names = lv_obj_property_names,
+    .names_count = sizeof(lv_obj_property_names) / sizeof(lv_property_name_t),
+#endif
+
 #endif
 };
 
@@ -98,6 +105,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
+    LV_ASSERT_NULL(obj);
+    if(obj == NULL) return NULL;
     lv_obj_class_init_obj(obj);
     return obj;
 }
@@ -309,6 +318,42 @@ bool lv_obj_is_valid(const lv_obj_t * obj)
     return false;
 }
 
+#if LV_USE_OBJ_ID
+void lv_obj_set_id(lv_obj_t * obj, void * id)
+{
+    LV_ASSERT_NULL(obj);
+    obj->id = id;
+}
+
+void * lv_obj_get_id(const lv_obj_t * obj)
+{
+    LV_ASSERT_NULL(obj);
+    return obj->id;
+}
+
+lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, void * id)
+{
+    if(obj == NULL) obj = lv_display_get_screen_active(NULL);
+    if(obj == NULL) return NULL;
+
+    uint32_t i;
+    uint32_t child_cnt = lv_obj_get_child_count(obj);
+    for(i = 0; i < child_cnt; i++) {
+        lv_obj_t * child = obj->spec_attr->children[i];
+        if(lv_obj_id_compare(child->id, id) == 0) return child;
+    }
+
+    /*Search children*/
+    for(i = 0; i < child_cnt; i++) {
+        lv_obj_t * child = obj->spec_attr->children[i];
+        lv_obj_t * found = lv_obj_get_child_by_id(child, id);
+        if(found != NULL) return found;
+    }
+
+    return NULL;
+}
+#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -341,7 +386,7 @@ static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     obj->flags |= LV_OBJ_FLAG_SCROLL_WITH_ARROW;
     if(parent) obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
 
-#if LV_USE_OBJ_ID
+#if LV_OBJ_ID_AUTO_ASSIGN
     lv_obj_assign_id(class_p, obj);
 #endif
 
@@ -378,7 +423,7 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
         obj->spec_attr = NULL;
     }
 
-#if LV_USE_OBJ_ID
+#if LV_OBJ_ID_AUTO_ASSIGN
     lv_obj_free_id(obj);
 #endif
 }
@@ -711,6 +756,12 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_INDEV_RESET) {
         lv_obj_remove_state(obj, LV_STATE_PRESSED);
         lv_obj_remove_state(obj, LV_STATE_SCROLLED);
+    }
+    else if(code == LV_EVENT_HOVER_OVER) {
+        lv_obj_add_state(obj, LV_STATE_HOVERED);
+    }
+    else if(code == LV_EVENT_HOVER_LEAVE) {
+        lv_obj_remove_state(obj, LV_STATE_HOVERED);
     }
 }
 

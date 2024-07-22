@@ -180,10 +180,10 @@ static Tvg_Stroke_Fill _lv_spread_to_tvg(lv_vector_gradient_spread_t sp)
 static void _setup_gradient(Tvg_Gradient * gradient, const lv_vector_gradient_t * grad,
                             const lv_matrix_t * matrix)
 {
-    const lv_grad_dsc_t * g = &grad->grad;
-    Tvg_Color_Stop * stops = (Tvg_Color_Stop *)lv_malloc(sizeof(Tvg_Color_Stop) * g->stops_count);
-    for(uint8_t i = 0; i < g->stops_count; i++) {
-        const lv_gradient_stop_t * s = &(g->stops[i]);
+    Tvg_Color_Stop * stops = (Tvg_Color_Stop *)lv_malloc(sizeof(Tvg_Color_Stop) * grad->stops_count);
+    LV_ASSERT_MALLOC(stops);
+    for(uint16_t i = 0; i < grad->stops_count; i++) {
+        const lv_gradient_stop_t * s = &(grad->stops[i]);
 
         stops[i].offset = s->frac / 255.0f;
         stops[i].r = s->color.red;
@@ -192,7 +192,7 @@ static void _setup_gradient(Tvg_Gradient * gradient, const lv_vector_gradient_t 
         stops[i].a = s->opa;
     }
 
-    tvg_gradient_set_color_stops(gradient, stops, g->stops_count);
+    tvg_gradient_set_color_stops(gradient, stops, grad->stops_count);
     tvg_gradient_set_spread(gradient, _lv_spread_to_tvg(grad->spread));
     Tvg_Matrix mtx;
     _lv_matrix_to_tvg(&mtx, matrix);
@@ -202,26 +202,16 @@ static void _setup_gradient(Tvg_Gradient * gradient, const lv_vector_gradient_t 
 
 static void _set_paint_stroke_gradient(Tvg_Paint * obj, const lv_vector_gradient_t * g, const lv_matrix_t * m)
 {
-    float x, y, w, h;
-    tvg_paint_get_bounds(obj, &x, &y, &w, &h, false);
-
     Tvg_Gradient * grad = NULL;
     if(g->style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
         grad = tvg_radial_gradient_new();
-        tvg_radial_gradient_set(grad, g->cx + x, g->cy + y, g->cr);
+        tvg_radial_gradient_set(grad, g->cx, g->cy, g->cr);
         _setup_gradient(grad, g, m);
         tvg_shape_set_stroke_radial_gradient(obj, grad);
     }
     else {
         grad = tvg_linear_gradient_new();
-
-        if(g->grad.dir == LV_GRAD_DIR_VER) {
-            tvg_linear_gradient_set(grad, x, y, x, y + h);
-        }
-        else {
-            tvg_linear_gradient_set(grad, x, y, x + w, y);
-        }
-
+        tvg_linear_gradient_set(grad, g->x1, g->y1, g->x2, g->y2);
         _setup_gradient(grad, g, m);
         tvg_shape_set_stroke_linear_gradient(obj, grad);
     }
@@ -263,26 +253,16 @@ static Tvg_Fill_Rule _lv_fill_rule_to_tvg(lv_vector_fill_t rule)
 
 static void _set_paint_fill_gradient(Tvg_Paint * obj, const lv_vector_gradient_t * g, const lv_matrix_t * m)
 {
-    float x, y, w, h;
-    tvg_paint_get_bounds(obj, &x, &y, &w, &h, false);
-
     Tvg_Gradient * grad = NULL;
     if(g->style == LV_VECTOR_GRADIENT_STYLE_RADIAL) {
         grad = tvg_radial_gradient_new();
-        tvg_radial_gradient_set(grad, g->cx + x, g->cy + y, g->cr);
+        tvg_radial_gradient_set(grad, g->cx, g->cy, g->cr);
         _setup_gradient(grad, g, m);
         tvg_shape_set_radial_gradient(obj, grad);
     }
     else {
         grad = tvg_linear_gradient_new();
-
-        if(g->grad.dir == LV_GRAD_DIR_VER) {
-            tvg_linear_gradient_set(grad, x, y, x, y + h);
-        }
-        else {
-            tvg_linear_gradient_set(grad, x, y, x + w, y);
-        }
-
+        tvg_linear_gradient_set(grad, g->x1, g->y1, g->x2, g->y2);
         _setup_gradient(grad, g, m);
         tvg_shape_set_linear_gradient(obj, grad);
     }
@@ -293,6 +273,7 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
 {
     lv_image_decoder_dsc_t decoder_dsc;
     lv_image_decoder_args_t args = { 0 };
+    args.premultiply = 1;
     lv_result_t res = lv_image_decoder_open(&decoder_dsc, p->src, &args);
     if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to open image");
@@ -447,6 +428,10 @@ void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc
     uint32_t stride = draw_buf->header.stride;
     Tvg_Canvas * canvas = tvg_swcanvas_create();
     tvg_swcanvas_set_target(canvas, buf, stride / 4, width, height, TVG_COLORSPACE_ARGB8888);
+
+    _tvg_rect rc;
+    _lv_area_to_tvg(&rc, &layer->_clip_area);
+    tvg_canvas_set_viewport(canvas, (int32_t)rc.x, (int32_t)rc.y, (int32_t)rc.w, (int32_t)rc.h);
 
     lv_ll_t * task_list = dsc->task_list;
     _lv_vector_for_each_destroy_tasks(task_list, _task_draw_cb, canvas);
