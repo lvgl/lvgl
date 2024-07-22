@@ -75,7 +75,10 @@ lv_result_t lv_array_remove(lv_array_t * array, uint32_t index)
 
     /*Shortcut*/
     if(index == array->size - 1) {
-        lv_array_resize(array, array->size - 1);
+        array->size--;
+        if(array->size <= array->capacity >> 1) {
+            lv_array_resize(array, array->size);
+        }
         return LV_RESULT_OK;
     }
 
@@ -83,7 +86,10 @@ lv_result_t lv_array_remove(lv_array_t * array, uint32_t index)
     uint8_t * remaining = start + array->element_size;
     uint32_t remaining_size = (array->size - index - 1) * array->element_size;
     lv_memmove(start, remaining, remaining_size);
-    lv_array_resize(array, array->size - 1);
+    array->size--;
+    if(array->size <= array->capacity >> 1) {
+        lv_array_resize(array, array->size);
+    }
     return LV_RESULT_OK;
 }
 
@@ -99,7 +105,10 @@ lv_result_t lv_array_erase(lv_array_t * array, uint32_t start, uint32_t end)
 
     /*Shortcut*/
     if(end == array->size) {
-        lv_array_resize(array, start);
+        array->size = start;
+        if(array->size <= array->capacity >> 1) {
+            lv_array_resize(array, array->size);
+        }
         return LV_RESULT_OK;
     }
 
@@ -107,7 +116,10 @@ lv_result_t lv_array_erase(lv_array_t * array, uint32_t start, uint32_t end)
     uint8_t * remaining = start_p + (end - start) * array->element_size;
     uint32_t remaining_size = (array->size - end) * array->element_size;
     lv_memcpy(start_p, remaining, remaining_size);
-    lv_array_resize(array, array->size - (end - start));
+    array->size -= (end - start);
+    if(array->size <= array->capacity >> 1) {
+        lv_array_resize(array, array->size);
+    }
     return LV_RESULT_OK;
 }
 
