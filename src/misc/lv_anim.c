@@ -701,7 +701,7 @@ static bool remove_concurrent_anims(lv_anim_t * a_current)
 static void remove_anim(void * a)
 {
     lv_anim_t * anim = a;
-    _lv_ll_remove(anim_ll_p, a);
+    lv_ll_remove(anim_ll_p, a);
     if(anim->deleted_cb != NULL) anim->deleted_cb(anim);
     lv_free(a);
 }
