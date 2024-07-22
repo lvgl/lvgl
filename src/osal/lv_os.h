@@ -23,9 +23,9 @@ extern "C" {
 
 
 #ifdef DOXYGEN
-typedef struct { }lv_thread_t;
-typedef struct { }lv_mutex_t;
-typedef struct { }lv_thread_sync_t;
+typedef struct { } lv_thread_t;
+typedef struct { } lv_mutex_t;
+typedef struct { } lv_thread_sync_t;
 #endif /*DOXYGEN*/
 
 #if LV_USE_OS == LV_OS_NONE
