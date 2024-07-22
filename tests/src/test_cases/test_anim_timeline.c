@@ -352,7 +352,6 @@ void test_anim_timeline_repeat(void)
 
     lv_anim_timeline_start(anim_timeline);
 
-
     TEST_ASSERT_EQUAL(3, lv_anim_timeline_get_repeat_count(anim_timeline));
 
     lv_test_wait(100);
@@ -369,9 +368,6 @@ void test_anim_timeline_repeat(void)
 
     lv_test_wait(1000);
     TEST_ASSERT_EQUAL(1000, lv_obj_get_x(obj));
-
-
-
 }
 
 void test_anim_timeline_delay(void)
@@ -398,7 +394,7 @@ void test_anim_timeline_delay(void)
 
     lv_anim_timeline_start(anim_timeline);
 
-    TEST_ASSERT_EQUAL(500, lv_anim_timeline_get_delay_count(anim_timeline));
+    TEST_ASSERT_EQUAL(500, lv_anim_timeline_get_repeat_delay(anim_timeline));
 
     lv_test_wait(100);
     TEST_ASSERT_EQUAL(100, lv_obj_get_x(obj));
@@ -419,36 +415,32 @@ void test_anim_timeline_delay(void)
 void anim1_exec_cb(void * var, int32_t v)
 {
     LV_UNUSED(var);
-    printf("[anim1] %d\n", v);
+    LV_UNUSED(v);
 }
 void anim1_start(lv_anim_t * a)
 {
     LV_UNUSED(a);
-    printf("[anim1] start\n");
     anim1_start_called++;
 }
 void anim1_completed(lv_anim_t * a)
 {
     LV_UNUSED(a);
-    printf("[anim1] completed\n");
     anim1_completed_called++;
 }
 
 void anim2_exec_cb(void * var, int32_t v)
 {
     LV_UNUSED(var);
-    printf("                    [anim2] %d\n", v);
+    LV_UNUSED(v);
 }
 void anim2_start(lv_anim_t * a)
 {
     LV_UNUSED(a);
-    printf("                    [anim2] start\n");
     anim2_start_called++;
 }
 void anim2_completed(lv_anim_t * a)
 {
     LV_UNUSED(a);
-    printf("                    [anim2] completed\n");
     anim2_completed_called++;
 }
 
