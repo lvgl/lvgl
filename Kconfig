@@ -243,7 +243,7 @@ menu "LVGL configuration"
 			bool "Enable support for I1 color format"
 			default y
 			depends on LV_USE_DRAW_SW
-				
+
 		config LV_DRAW_SW_DRAW_UNIT_CNT
 			int "Number of draw units"
 			default 1
@@ -521,6 +521,14 @@ menu "LVGL configuration"
 
 			config LV_USE_ASSERT_STYLE
 				bool "Check if the styles are properly initialized. (Very fast, recommended)"
+
+			config LV_USE_ASSERT_EVENT
+				bool "Check if the event list changed while iterating it."
+				default n
+				help
+					Enable this if you want to check if the event list changed while iterating it.
+					For example, if an event is deleted in a callback while iterating the events.
+					The send event code is called very frequent, disable it in release mode.
 
 			config LV_USE_ASSERT_MEM_INTEGRITY
 				bool "Check the integrity of `lv_mem` after critical operations. (Slow)"

@@ -73,13 +73,17 @@ lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preproces
         if(is_preprocessed != preprocess) continue;
         lv_event_code_t filter = dsc[i]->filter & ~LV_EVENT_PREPROCESS;
         if(filter == LV_EVENT_ALL || filter == e->code) {
+            lv_event_cb_t cb = dsc[i]->cb;
             e->user_data = dsc[i]->user_data;
-            dsc[i]->cb(e);
+            cb(e);
+#if LV_USE_ASSERT_EVENT
+            LV_ASSERT_FORMAT_MSG(dsc == lv_array_front(list) && size == lv_array_size(list),
+                                 "Event list altered in: %p", (void *)(lv_uintptr_t)cb);
+#endif
             if(e->stop_processing) return LV_RESULT_OK;
 
             /*Stop if the object is deleted*/
             if(e->deleted) return LV_RESULT_INVALID;
-
         }
     }
     return LV_RESULT_OK;

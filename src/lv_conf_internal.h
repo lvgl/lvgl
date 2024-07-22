@@ -896,6 +896,13 @@
         #define LV_USE_ASSERT_STYLE         0   /*Check if the styles are properly initialized. (Very fast, recommended)*/
     #endif
 #endif
+#ifndef LV_USE_ASSERT_EVENT
+    #ifdef CONFIG_LV_USE_ASSERT_EVENT
+        #define LV_USE_ASSERT_EVENT CONFIG_LV_USE_ASSERT_EVENT
+    #else
+        #define LV_USE_ASSERT_EVENT         0   /*Check if the event list changed while iterating it.*/
+    #endif
+#endif
 #ifndef LV_USE_ASSERT_MEM_INTEGRITY
     #ifdef CONFIG_LV_USE_ASSERT_MEM_INTEGRITY
         #define LV_USE_ASSERT_MEM_INTEGRITY CONFIG_LV_USE_ASSERT_MEM_INTEGRITY

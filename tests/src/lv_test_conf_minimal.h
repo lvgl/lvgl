@@ -5,6 +5,7 @@
 #define  LV_USE_ASSERT_MEM_INTEGRITY    0
 #define  LV_USE_ASSERT_OBJ              0
 #define  LV_USE_ASSERT_STYLE            0
+#define  LV_USE_ASSERT_EVENT            0
 
 #define  LV_USE_BIDI                    0
 #define  LV_USE_ARABIC_PERSIAN_CHARS    0
