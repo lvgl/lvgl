@@ -23,8 +23,8 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#ifndef DOXYGEN
 #if !defined(__ASSEMBLY__)
+#ifndef DOXYGEN
 
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB565
 #define LV_DRAW_SW_COLOR_BLEND_TO_RGB565(dsc) \
