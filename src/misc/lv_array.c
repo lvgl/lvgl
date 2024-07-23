@@ -67,6 +67,13 @@ void lv_array_copy(lv_array_t * target, const lv_array_t * source)
     target->size = source->size;
 }
 
+void lv_array_shrink(lv_array_t * array)
+{
+    if(array->size <= array->capacity / LV_ARRAY_DEFAULT_SHRINK_RATIO) {
+        lv_array_resize(array, array->size);
+    }
+}
+
 lv_result_t lv_array_remove(lv_array_t * array, uint32_t index)
 {
     if(index >= array->size) {
@@ -76,9 +83,7 @@ lv_result_t lv_array_remove(lv_array_t * array, uint32_t index)
     /*Shortcut*/
     if(index == array->size - 1) {
         array->size--;
-        if(array->size <= array->capacity >> 1) {
-            lv_array_resize(array, array->size);
-        }
+        lv_array_shrink(array);
         return LV_RESULT_OK;
     }
 
@@ -87,9 +92,7 @@ lv_result_t lv_array_remove(lv_array_t * array, uint32_t index)
     uint32_t remaining_size = (array->size - index - 1) * array->element_size;
     lv_memmove(start, remaining, remaining_size);
     array->size--;
-    if(array->size <= array->capacity >> 1) {
-        lv_array_resize(array, array->size);
-    }
+    lv_array_shrink(array);
     return LV_RESULT_OK;
 }
 
@@ -106,9 +109,7 @@ lv_result_t lv_array_erase(lv_array_t * array, uint32_t start, uint32_t end)
     /*Shortcut*/
     if(end == array->size) {
         array->size = start;
-        if(array->size <= array->capacity >> 1) {
-            lv_array_resize(array, array->size);
-        }
+        lv_array_shrink(array);
         return LV_RESULT_OK;
     }
 
@@ -117,9 +118,7 @@ lv_result_t lv_array_erase(lv_array_t * array, uint32_t start, uint32_t end)
     uint32_t remaining_size = (array->size - end) * array->element_size;
     lv_memcpy(start_p, remaining, remaining_size);
     array->size -= (end - start);
-    if(array->size <= array->capacity >> 1) {
-        lv_array_resize(array, array->size);
-    }
+    lv_array_shrink(array);
     return LV_RESULT_OK;
 }
 
