@@ -150,6 +150,10 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
             data->state = dsc->state;
             data->key = dsc->key;
             break;
+        case LV_INDEV_TYPE_BUTTON:
+            data->state = dsc->state;
+            data->btn_id = (dsc->state == LV_INDEV_STATE_PRESSED) ? 0 : 1;
+            break;
         case LV_INDEV_TYPE_POINTER:
             data->state = dsc->state;
             data->point = _evdev_process_pointer(indev, dsc->root_x, dsc->root_y);
