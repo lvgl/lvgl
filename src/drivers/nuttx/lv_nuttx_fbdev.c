@@ -139,20 +139,35 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
     uint32_t h = dsc->vinfo.yres;
     uint32_t stride = dsc->pinfo.stride;
     uint32_t data_size = h * stride;
-    lv_draw_buf_init(&dsc->buf1, w, h, color_format, stride, dsc->mem, data_size);
+    uint8_t * buf1 = NULL;
+    uint8_t * buf2 = NULL;
+
+    buf1 = malloc(data_size);
+    if(buf1 == NULL) {
+        LV_LOG_ERROR("display draw buffer malloc failed");
+        goto errout;
+    }
+
+    lv_draw_buf_init(&dsc->buf1, w, h, color_format, stride, buf1, data_size);
+
+    if(LV_NUTTX_FBDEV_BUFFER_COUNT == 2) {
+        buf2 = malloc(data_size);
+        if(buf2 == NULL) {
+            LV_LOG_ERROR("display draw buffer2 malloc failed");
+        }
+        else {
+            lv_draw_buf_init(&dsc->buf2, w, h, color_format, stride, buf2, data_size);
+        }
+    }
 
     /* double buffer mode */
 
     bool double_buffer = dsc->pinfo.yres_virtual == (dsc->vinfo.yres * 2);
     if(double_buffer) {
-        if((ret = fbdev_init_mem2(dsc)) < 0) {
-            goto errout;
-        }
-
-        lv_draw_buf_init(&dsc->buf2, w, h, color_format, stride, dsc->mem2, data_size);
+        if((ret = fbdev_init_mem2(dsc)) < 0) goto errout;
     }
 
-    lv_display_set_draw_buffers(disp, &dsc->buf1, double_buffer ? &dsc->buf2 : NULL);
+    lv_display_set_draw_buffers(disp, &dsc->buf1, buf2 == NULL ? NULL : &dsc->buf2);
     lv_display_set_color_format(disp, color_format);
     lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_resolution(disp, dsc->vinfo.xres, dsc->vinfo.yres);
@@ -225,13 +240,6 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 {
     lv_nuttx_fb_t * dsc = lv_display_get_driver_data(disp);
 
-    /* Skip the non-last flush */
-
-    if(!lv_display_flush_is_last(disp)) {
-        lv_display_flush_ready(disp);
-        return;
-    }
-
     if(dsc->mem == NULL ||
        area->x2 < 0 || area->y2 < 0 ||
        area->x1 > (int32_t)dsc->vinfo.xres - 1 || area->y1 > (int32_t)dsc->vinfo.yres - 1) {
@@ -258,6 +266,19 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         LV_LOG_ERROR("ioctl(FBIO_UPDATE) failed: %d", errno);
     }
 #endif
+
+    int32_t w = lv_area_get_width(area);
+    uint32_t px_size = lv_color_format_get_size(lv_display_get_color_format(disp));
+    uint32_t color_pos = (area->x1 + dsc->pinfo.xoffset) * px_size + area->y1 * dsc->pinfo.stride;
+    uint32_t fb_pos = color_pos + dsc->pinfo.yoffset * dsc->pinfo.stride;
+    int32_t y;
+    uint8_t * fbp = (uint8_t *)dsc->mem;
+
+    for(y = area->y1; y <= area->y2; y++) {
+        memcpy(&fbp[fb_pos], &color_p[color_pos], w * px_size);
+        fb_pos += dsc->pinfo.stride;
+        color_pos += dsc->pinfo.stride;
+    }
 
     /* double framebuffer */
 

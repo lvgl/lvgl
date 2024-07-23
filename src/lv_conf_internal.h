@@ -3186,6 +3186,7 @@
             #define LV_USE_NUTTX_LCD      0
         #endif
     #endif
+
     #if LV_USE_NUTTX_LCD
         #ifndef LV_NUTTX_LCD_BUFFER_COUNT
             #ifdef CONFIG_LV_NUTTX_LCD_BUFFER_COUNT
@@ -3199,6 +3200,25 @@
                 #define LV_NUTTX_LCD_BUFFER_SIZE CONFIG_LV_NUTTX_LCD_BUFFER_SIZE
             #else
                 #define LV_NUTTX_LCD_BUFFER_SIZE     60
+            #endif
+        #endif
+    #endif
+
+    /*Driver for /dev/fb0*/
+    #ifndef LV_USE_NUTTX_FBDEV
+        #ifdef CONFIG_LV_USE_NUTTX_FBDEV
+            #define LV_USE_NUTTX_FBDEV CONFIG_LV_USE_NUTTX_FBDEV
+        #else
+            #define LV_USE_NUTTX_FBDEV      0
+        #endif
+    #endif
+
+    #ifdef LV_USE_NUTTX_FBDEV
+        #ifndef LV_NUTTX_FBDEV_BUFFER_COUNT
+            #ifdef CONFIG_LV_NUTTX_FBDEV_BUFFER_COUNT
+                #define LV_NUTTX_FBDEV_BUFFER_COUNT CONFIG_LV_NUTTX_FBDEV_BUFFER_COUNT
+            #else
+                #define LV_NUTTX_FBDEV_BUFFER_COUNT  0
             #endif
         #endif
     #endif
