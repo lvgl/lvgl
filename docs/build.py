@@ -301,6 +301,7 @@ else:
         return remove_folder
 
     iter_temp(temp_directory)
+    os.rmdir(temp_directory)
 
 config_builder.cleanup()
 
