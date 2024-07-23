@@ -3154,6 +3154,31 @@
     #endif
 #endif
 
+/*Use Wayland to open a window and handle input on Linux or BSD desktops */
+#ifndef LV_USE_WAYLAND
+    #ifdef CONFIG_LV_USE_WAYLAND
+        #define LV_USE_WAYLAND CONFIG_LV_USE_WAYLAND
+    #else
+        #define LV_USE_WAYLAND          0
+    #endif
+#endif
+#if LV_USE_WAYLAND
+    #ifndef LV_WAYLAND_WINDOW_DECORATIONS
+        #ifdef CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
+            #define LV_WAYLAND_WINDOW_DECORATIONS CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
+        #else
+            #define LV_WAYLAND_WINDOW_DECORATIONS   0    /*Draw client side window decorations only necessary on Mutter/GNOME*/
+        #endif
+    #endif
+    #ifndef LV_WAYLAND_WL_SHELL
+        #ifdef CONFIG_LV_WAYLAND_WL_SHELL
+            #define LV_WAYLAND_WL_SHELL CONFIG_LV_WAYLAND_WL_SHELL
+        #else
+            #define LV_WAYLAND_WL_SHELL             0    /*Use the legacy wl_shell protocol instead of the default XDG shell*/
+        #endif
+    #endif
+#endif
+
 /*Driver for /dev/fb*/
 #ifndef LV_USE_LINUX_FBDEV
     #ifdef CONFIG_LV_USE_LINUX_FBDEV

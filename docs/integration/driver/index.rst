@@ -11,3 +11,4 @@ Drivers
     X11
     windows
     opengles
+    wayland
