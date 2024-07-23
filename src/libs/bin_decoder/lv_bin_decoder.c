@@ -110,11 +110,13 @@ void lv_bin_decoder_init(void)
     decoder->name = DECODER_NAME;
 }
 
-lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header)
 {
     LV_UNUSED(decoder); /*Unused*/
 
-    lv_image_src_t src_type = lv_image_src_get_type(src);
+    const void * src = dsc->src;
+    lv_image_src_t src_type = dsc->src_type;
+
     if(src_type == LV_IMAGE_SRC_VARIABLE) {
         lv_image_dsc_t * image = (lv_image_dsc_t *)src;
         lv_memcpy(header, &image->header, sizeof(lv_image_header_t));
@@ -123,31 +125,28 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, 
         /*Support only "*.bin" files*/
         if(lv_strcmp(lv_fs_get_ext(src), "bin")) return LV_RESULT_INVALID;
 
-        lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, src, LV_FS_MODE_RD);
-        if(res == LV_FS_RES_OK) {
-            uint32_t rn;
-            res = lv_fs_read(&f, header, sizeof(lv_image_header_t), &rn);
-            lv_fs_close(&f);
-            if(res != LV_FS_RES_OK || rn != sizeof(lv_image_header_t)) {
-                LV_LOG_WARN("Read file header failed: %d", res);
-                return LV_RESULT_INVALID;
-            }
+        lv_fs_res_t res;
+        uint32_t rn;
+        res = lv_fs_read(&dsc->file, header, sizeof(lv_image_header_t), &rn);
 
-            /**
-             * @todo
-             * This is a temp backward compatibility solution after adding
-             * magic in image header.
-             */
-            if(header->magic != LV_IMAGE_HEADER_MAGIC) {
-                LV_LOG_WARN("Legacy bin image detected: %s", (char *)src);
-                header->cf = header->magic;
-                header->magic = LV_IMAGE_HEADER_MAGIC;
-            }
-
-            /*File is always read to buf, thus data can be modified.*/
-            header->flags |= LV_IMAGE_FLAGS_MODIFIABLE;
+        if(res != LV_FS_RES_OK || rn != sizeof(lv_image_header_t)) {
+            LV_LOG_WARN("Read file header failed: %d", res);
+            return LV_RESULT_INVALID;
         }
+
+        /**
+         * @todo
+         * This is a temp backward compatibility solution after adding
+         * magic in image header.
+         */
+        if(header->magic != LV_IMAGE_HEADER_MAGIC) {
+            LV_LOG_WARN("Legacy bin image detected: %s", (char *)src);
+            header->cf = header->magic;
+            header->magic = LV_IMAGE_HEADER_MAGIC;
+        }
+
+        /*File is always read to buf, thus data can be modified.*/
+        header->flags |= LV_IMAGE_FLAGS_MODIFIABLE;
     }
     else if(src_type == LV_IMAGE_SRC_SYMBOL) {
         /*The size depend on the font but it is unknown here. It should be handled outside of the
