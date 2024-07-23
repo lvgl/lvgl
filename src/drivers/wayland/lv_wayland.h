@@ -48,7 +48,7 @@ void lv_wayland_deinit(void);
 int lv_wayland_get_fd(void);
 
 lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char * title,
-                                     lv_wayland_display_close_f_t close_cb);
+                                        lv_wayland_display_close_f_t close_cb);
 
 void lv_wayland_window_close(lv_display_t * disp);
 bool lv_wayland_window_is_open(lv_display_t * disp);
