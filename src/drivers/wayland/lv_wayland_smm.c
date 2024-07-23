@@ -5,9 +5,7 @@
 
 #include "lv_wayland_smm.h"
 
-#ifdef LV_CONF_INCLUDE_SIMPLE
-    #include "lv_conf.h"
-#endif
+#include "../../display/lv_display.h"
 
 #if LV_USE_WAYLAND
 
