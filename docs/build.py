@@ -150,6 +150,15 @@ data = data.replace('*#*#SRC#*#*', '"{0}"'.format(lvgl_src_path))
 
 with open(os.path.join(temp_directory, 'Doxyfile'), 'wb') as f:
     f.write(data.encode('utf-8'))
+#
+# with open(os.path.join(temp_directory, 'conf.py'), 'rb') as f:
+#     data = f.read().decode('utf-8')
+#
+# data = data.replace('#*#*LV_CONF_PATH*#*#', os.path.join(base_path, 'lv_conf.h'))
+# data = data.replace('#*#*PROJECT_PATH*#*#', project_path)
+#
+# with open(os.path.join(temp_directory, 'conf.py'), 'wb') as f:
+#     f.write(data.encode('utf-8'))
 
 
 print("Generate the list of examples")

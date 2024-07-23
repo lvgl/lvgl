@@ -249,9 +249,68 @@ texinfo_documents = [
 ]
 
 
-breathe_projects = {
-  "lvgl":"xml/",
-}
+# import glob  # NOQA
+import os  # NOQA
+
+base_path = os.path.abspath(os.path.dirname(__file__))
+
+# PROJECT_PATH = r'#*#*PROJECT_PATH*#*#'
+#
+# cwd = os.getcwd()
+# os.chdir(PROJECT_PATH)
+
+# ######## Breathe Config Options ########
+breathe_projects = {"lvgl": 'xml/'}  # os.path.join(base_path, 'breathe', 'xml')}
+breathe_default_project = ""  # default
+breathe_domain_by_extension = {"py": "py", "cs": "cs"}  # default
+breathe_domain_by_file_pattern = {}  # default
+breathe_projects_source = {}
+# {
+#     "lvgl": (
+#         PROJECT_PATH,
+#         ['lvgl.h', 'lv_version.h', 'docs/lv_conf.h'] +
+#         [os.path.relpath(item) for item in glob.glob(f'{PROJECT_PATH}/src/*/*.h', recursive=True)]  # NOQA
+#     )
+# }
+breathe_build_directory = os.path.join(base_path, 'breathe')  # default
+breathe_default_members = ()  # default
+breathe_show_define_initializer = False  # default
+breathe_show_enumvalue_initializer = False  # default
+breathe_show_include = True  # default
+breathe_implementation_filename_extensions = [".c", ".cc", ".cpp"]  # default
+breathe_doxygen_config_options = {}
+# dict(
+#     DOXYFILE_ENCODING='UTF-8',
+#     PROJECT_NAME='"LVGL"',
+#     OPTIMIZE_OUTPUT_FOR_C='YES',
+#     EXTRACT_PACKAGE='YES',
+#     EXTRACT_STATIC='YES',
+#     INTERNAL_DOCS='YES',
+#     CASE_SENSE_NAMES='YES',
+#     QUIET='YES',
+#     WARNINGS='NO',
+#     WARN_IF_UNDOCUMENTED='NO',
+#     WARN_IF_DOC_ERROR='NO',
+#     WARN_LOGFILE="",
+#     FILE_PATTERNS='*.h *.hh *.hxx *.hpp *.h++',
+#     RECURSIVE='YES',
+#     EXCLUDE_PATTERNS='*/libs/thorvg/rapidjson/* */libs/thorvg/tvg*',
+#     GENERATE_HTML='NO',
+#     GENERATE_TREEVIEW='YES',
+#     GENERATE_LATEX='NO',
+#     GENERATE_XML='YES',
+#     XML_PROGRAMLISTING='NO',
+#     MACRO_EXPANSION='YES',
+#     PREDEFINED=r'DOXYGEN LV_CONF_PATH="#*#*LV_CONF_PATH*#*#"',
+#     HAVE_DOT='NO'
+# )
+
+breathe_doxygen_aliases = {}  # default
+breathe_use_project_refids = False  # default
+breathe_order_parameters_first = False  # default
+breathe_separate_member_pages = False  # default
+# ########################################
+# os.chdir(cwd)
 
 StandaloneHTMLBuilder.supported_image_types = [
     'image/svg+xml',
