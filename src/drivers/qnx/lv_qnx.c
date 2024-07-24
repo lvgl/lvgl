@@ -83,7 +83,7 @@ lv_display_t * lv_qnx_window_create(int32_t hor_res, int32_t ver_res)
     if(!inited) {
         if(screen_create_context(&context,
                                  SCREEN_APPLICATION_CONTEXT) != 0) {
-            perror("screen_create_context");
+            LV_LOG_ERROR("screen_create_context: %s", strerror(errno));
             return NULL;
         }
 
@@ -204,7 +204,7 @@ int lv_qnx_event_loop(lv_display_t * disp)
     /*Run the event loop*/
     screen_event_t  event;
     if(screen_create_event(&event) != 0) {
-        perror("screen_create_event");
+        LV_LOG_ERROR("screen_create_event: %s", strerror(errno));
         return EXIT_FAILURE;
     }
 
@@ -212,7 +212,7 @@ int lv_qnx_event_loop(lv_display_t * disp)
     for(;;) {
         /*Wait for an event, timing out after 16ms if animations are running*/
         if(screen_get_event(context, event, timeout_ns) != 0) {
-            perror("screen_get_event");
+            LV_LOG_ERROR("screen_get_event: %s", strerror(errno));
             return EXIT_FAILURE;
         }
 
@@ -220,7 +220,7 @@ int lv_qnx_event_loop(lv_display_t * disp)
         int type;
         if(screen_get_event_property_iv(event, SCREEN_PROPERTY_TYPE, &type)
            != 0) {
-            perror("screen_get_event_property_iv(TYPE)");
+            LV_LOG_ERROR("screen_get_event_property_iv(TYPE): %s", strerror(errno));
             return EXIT_FAILURE;
         }
 
@@ -267,7 +267,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     lv_qnx_window_t * dsc = lv_display_get_driver_data(disp);
     if(screen_post_window(dsc->window, dsc->buffers[dsc->bufidx], 0, NULL, 0)
        != 0) {
-        perror("screen_post_window");
+        LV_LOG_ERROR("screen_post_window: %s", strerror(errno));
     }
 
 #if (LV_QNX_BUF_COUNT > 1)
@@ -282,7 +282,7 @@ static bool window_create(lv_display_t * disp)
     /*Create a window*/
     lv_qnx_window_t * dsc = lv_display_get_driver_data(disp);
     if(screen_create_window(&dsc->window, context) != 0) {
-        perror("screen_create_window");
+        LV_LOG_ERROR("screen_create_window: %s", strerror(errno));
         return false;
     }
 
@@ -290,45 +290,45 @@ static bool window_create(lv_display_t * disp)
     int rect[] = { 0, 0, disp->hor_res, disp->ver_res };
     if(screen_set_window_property_iv(dsc->window, SCREEN_PROPERTY_POSITION,
                                      &rect[0]) != 0) {
-        perror("screen_window_set_property_iv(POSITION)");
+        LV_LOG_ERROR("screen_window_set_property_iv(POSITION): %s", strerror(errno));
         return false;
     }
 
     if(screen_set_window_property_iv(dsc->window, SCREEN_PROPERTY_SIZE,
                                      &rect[2]) != 0) {
-        perror("screen_window_set_property_iv(SIZE)");
+        LV_LOG_ERROR("screen_window_set_property_iv(SIZE): %s", strerror(errno));
         return false;
     }
 
     if(screen_set_window_property_iv(dsc->window, SCREEN_PROPERTY_SOURCE_SIZE,
                                      &rect[2]) != 0) {
-        perror("screen_window_set_property_iv(SOURCE_SIZE)");
+        LV_LOG_ERROR("screen_window_set_property_iv(SOURCE_SIZE): %s", strerror(errno));
         return NULL;
     }
 
     int usage = SCREEN_USAGE_WRITE;
     if(screen_set_window_property_iv(dsc->window, SCREEN_PROPERTY_USAGE,
                                      &usage) != 0) {
-        perror("screen_window_set_property_iv(USAGE)");
+        LV_LOG_ERROR("screen_window_set_property_iv(USAGE): %s", strerror(errno));
         return NULL;
     }
 
     int format = SCREEN_FORMAT_RGBA8888;
     if(screen_set_window_property_iv(dsc->window, SCREEN_PROPERTY_FORMAT,
                                      &format) != 0) {
-        perror("screen_window_set_property_iv(USAGE)");
+        LV_LOG_ERROR("screen_window_set_property_iv(USAGE): %s", strerror(errno));
         return NULL;
     }
 
     /*Initialize window buffers*/
     if(screen_create_window_buffers(dsc->window, LV_QNX_BUF_COUNT) != 0) {
-        perror("screen_create_window_buffers");
+        LV_LOG_ERROR("screen_create_window_buffers: %s", strerror(errno));
         return false;
     }
 
     if(screen_get_window_property_pv(dsc->window, SCREEN_PROPERTY_BUFFERS,
                                      (void **)&dsc->buffers) != 0) {
-        perror("screen_get_window_property_pv(BUFFERS)");
+        LV_LOG_ERROR("screen_get_window_property_pv(BUFFERS): %s", strerror(errno));
         return false;
     }
 
@@ -343,7 +343,7 @@ static bool window_create(lv_display_t * disp)
     int visible = 1;
     if(screen_set_window_property_iv(dsc->window, SCREEN_PROPERTY_VISIBLE,
                                      &visible) != 0) {
-        perror("screen_set_window_property_iv(VISIBLE)");
+        LV_LOG_ERROR("screen_set_window_property_iv(VISIBLE): %s", strerror(errno));
         return false;
     }
 
@@ -357,14 +357,14 @@ static bool init_display_from_window(lv_display_t * disp)
     int bufsize;
     if(screen_get_buffer_property_iv(dsc->buffers[0], SCREEN_PROPERTY_SIZE,
                                      &bufsize) == -1) {
-        perror("screen_get_buffer_property_iv(SIZE)");
+        LV_LOG_ERROR("screen_get_buffer_property_iv(SIZE): %s", strerror(errno));
         return false;
     }
 
     void * ptr1 = NULL;
     if(screen_get_buffer_property_pv(dsc->buffers[0], SCREEN_PROPERTY_POINTER,
                                      &ptr1) == -1) {
-        perror("screen_get_buffer_property_pv(POINTER)");
+        LV_LOG_ERROR("screen_get_buffer_property_pv(POINTER): %s", strerror(errno));
         return false;
     }
 
@@ -372,7 +372,7 @@ static bool init_display_from_window(lv_display_t * disp)
 #if (LV_QNX_BUF_COUNT > 1)
     if(screen_get_buffer_property_pv(dsc->buffers[1], SCREEN_PROPERTY_POINTER,
                                      &ptr2) == -1) {
-        perror("screen_get_buffer_property_pv(POINTER)");
+        LV_LOG_ERROR("screen_get_buffer_property_pv(POINTER): %s", strerror(errno));
         return false;
     }
 #endif
@@ -417,14 +417,14 @@ static bool handle_pointer_event(screen_event_t event)
     if(screen_get_event_property_iv(event, SCREEN_PROPERTY_SOURCE_POSITION,
                                     dsc->pos)
        != 0) {
-        perror("screen_get_event_property_iv(SOURCE_POSITION)");
+        LV_LOG_ERROR("screen_get_event_property_iv(SOURCE_POSITION): %s", strerror(errno));
         return false;
     }
 
     if(screen_get_event_property_iv(event, SCREEN_PROPERTY_BUTTONS,
                                     &dsc->buttons)
        != 0) {
-        perror("screen_get_event_property_iv(BUTTONS)");
+        LV_LOG_ERROR("screen_get_event_property_iv(BUTTONS): %s", strerror(errno));
         return false;
     }
 
@@ -455,14 +455,14 @@ static bool handle_keyboard_event(screen_event_t event)
     if(screen_get_event_property_iv(event, SCREEN_PROPERTY_FLAGS,
                                     &dsc->flags)
        != 0) {
-        perror("screen_get_event_property_iv(FLAGS)");
+        LV_LOG_ERROR("screen_get_event_property_iv(FLAGS): %s", strerror(errno));
         return false;
     }
 
     if(screen_get_event_property_iv(event, SCREEN_PROPERTY_SYM,
                                     &dsc->key)
        != 0) {
-        perror("screen_get_event_property_iv(SYM)");
+        LV_LOG_ERROR("screen_get_event_property_iv(SYM): %s", strerror(errno));
         return false;
     }
 
