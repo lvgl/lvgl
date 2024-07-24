@@ -31,8 +31,8 @@ typedef struct {
     screen_buffer_t     buffers[LV_QNX_BUF_COUNT];
     int                 bufidx;
     bool                managed;
-    lv_indev_t *        pointer;
-    lv_indev_t *        keyboard;
+    lv_indev_t     *    pointer;
+    lv_indev_t     *    keyboard;
 } lv_qnx_window_t;
 
 typedef struct {
