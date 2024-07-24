@@ -11,6 +11,7 @@
 #if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
 
     extern const lv_property_name_t lv_image_property_names[11];
+    extern const lv_property_name_t lv_label_property_names[4];
     extern const lv_property_name_t lv_obj_property_names[73];
     extern const lv_property_name_t lv_style_property_names[111];
 #endif
