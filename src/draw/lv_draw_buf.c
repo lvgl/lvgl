@@ -164,12 +164,14 @@ void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
         return;
     }
 
-    lv_area_t a_clipped = *a;
-    if(a_clipped.x2 < 0) return;
-    if(a_clipped.y2 < 0) return;
-    if(a_clipped.x1 < 0) a_clipped.x1 = 0;
-    if(a_clipped.y1 < 0) a_clipped.y1 = 0;
+    lv_area_t a_draw_buf;
+    a_draw_buf.x1 = 0;
+    a_draw_buf.y1 = 0;
+    a_draw_buf.x2 = draw_buf->header.w - 1;
+    a_draw_buf.y2 = draw_buf->header.h - 1;
 
+    lv_area_t a_clipped;
+    if(!_lv_area_intersect(&a_clipped, a, &a_draw_buf)) return;
     if(lv_area_get_width(&a_clipped) <= 0) return;
     if(lv_area_get_height(&a_clipped) <= 0) return;
 
