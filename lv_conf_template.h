@@ -230,6 +230,10 @@
  */
 #define LV_VG_LITE_GRAD_CACHE_CNT 32
 
+/* VG-Lite stroke maximum cache number.
+ */
+#define LV_VG_LITE_STROKE_CACHE_CNT 32
+
 #endif
 
 /*=======================
