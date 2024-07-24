@@ -256,8 +256,7 @@ int lv_qnx_event_loop(lv_display_t * disp)
  *   STATIC FUNCTIONS
  **********************/
 
-static uint32_t
-get_ticks(void)
+static uint32_t get_ticks(void)
 {
     uint64_t const ns = clock_gettime_mon_ns();
     return (uint32_t)(ns / 1000000UL);
