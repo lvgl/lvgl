@@ -44,6 +44,10 @@
  *********************/
 #define LV_LABEL_HINT_UPDATE_TH 1024 /*Update the "hint" if the label's y coordinates have changed more then this*/
 
+/*Forward declarations*/
+void nema_set_matrix(nema_matrix3x3_t m);
+void nema_raster_rect(int x, int y, int w, int h);
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/

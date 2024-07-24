@@ -47,8 +47,6 @@ extern "C" {
 #include "nema_core.h"
 #include "nema_utils.h"
 #include "nema_error.h"
-#include "nema_programHW.h"
-#include "nema_raster.h"
 #include "nema_provisional.h"
 #include "nema_vg.h"
 
