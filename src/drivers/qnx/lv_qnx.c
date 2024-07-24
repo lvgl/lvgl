@@ -31,6 +31,8 @@ typedef struct {
     screen_buffer_t     buffers[LV_QNX_BUF_COUNT];
     int                 bufidx;
     bool                managed;
+    lv_indev_t *        pointer;
+    lv_indev_t *        keyboard;
 } lv_qnx_window_t;
 
 typedef struct {
@@ -52,8 +54,8 @@ static bool window_create(lv_display_t * disp);
 static bool init_display_from_window(lv_display_t * disp);
 static void get_pointer(lv_indev_t * indev, lv_indev_data_t * data);
 static void get_key(lv_indev_t * indev, lv_indev_data_t * data);
-static bool handle_pointer_event(screen_event_t event);
-static bool handle_keyboard_event(screen_event_t event);
+static bool handle_pointer_event(lv_display_t * disp, screen_event_t event);
+static bool handle_keyboard_event(lv_display_t * disp, screen_event_t event);
 static void release_disp_cb(lv_event_t * e);
 static void refresh_cb(lv_timer_t * timer);
 
@@ -67,8 +69,6 @@ static bool inited = false;
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_indev_t * pointer_indev;
-static lv_indev_t * keyboard_indev;
 
 /**********************
  *      MACROS
@@ -151,49 +151,53 @@ void lv_qnx_window_set_title(lv_display_t * disp, const char * title)
 
 bool lv_qnx_add_pointer_device(lv_display_t * disp)
 {
-    if(pointer_indev != NULL) {
+    lv_qnx_window_t * dsc = lv_display_get_driver_data(disp);
+    if(dsc->pointer != NULL) {
+        /*Only one pointer device per display*/
         return false;
     }
 
-    lv_qnx_pointer_t * dsc = lv_malloc_zeroed(sizeof(lv_qnx_pointer_t));
-    if(dsc == NULL) {
+    lv_qnx_pointer_t * ptr_dsc = lv_malloc_zeroed(sizeof(lv_qnx_pointer_t));
+    if(ptr_dsc == NULL) {
         return false;
     }
 
-    pointer_indev = lv_indev_create();
-    if(pointer_indev == NULL) {
-        lv_free(dsc);
+    dsc->pointer = lv_indev_create();
+    if(dsc->pointer == NULL) {
+        lv_free(ptr_dsc);
         return false;
     }
 
-    lv_indev_set_type(pointer_indev, LV_INDEV_TYPE_POINTER);
-    lv_indev_set_read_cb(pointer_indev, get_pointer);
-    lv_indev_set_driver_data(pointer_indev, dsc);
-    lv_indev_set_mode(pointer_indev, LV_INDEV_MODE_EVENT);
+    lv_indev_set_type(dsc->pointer, LV_INDEV_TYPE_POINTER);
+    lv_indev_set_read_cb(dsc->pointer, get_pointer);
+    lv_indev_set_driver_data(dsc->pointer, ptr_dsc);
+    lv_indev_set_mode(dsc->pointer, LV_INDEV_MODE_EVENT);
     return true;
 }
 
 bool lv_qnx_add_keyboard_device(lv_display_t * disp)
 {
-    if(keyboard_indev != NULL) {
+    lv_qnx_window_t * dsc = lv_display_get_driver_data(disp);
+    if(dsc->keyboard != NULL) {
+        /*Only one keyboard device per display*/
         return false;
     }
 
-    lv_qnx_keyboard_t * dsc = lv_malloc_zeroed(sizeof(lv_qnx_keyboard_t));
+    lv_qnx_keyboard_t * kbd_dsc = lv_malloc_zeroed(sizeof(lv_qnx_keyboard_t));
     if(dsc == NULL) {
         return false;
     }
 
-    keyboard_indev = lv_indev_create();
-    if(keyboard_indev == NULL) {
-        lv_free(dsc);
+    dsc->keyboard = lv_indev_create();
+    if(dsc->keyboard == NULL) {
+        lv_free(kbd_dsc);
         return false;
     }
 
-    lv_indev_set_type(keyboard_indev, LV_INDEV_TYPE_KEYPAD);
-    lv_indev_set_read_cb(keyboard_indev, get_key);
-    lv_indev_set_driver_data(keyboard_indev, dsc);
-    lv_indev_set_mode(keyboard_indev, LV_INDEV_MODE_EVENT);
+    lv_indev_set_type(dsc->keyboard, LV_INDEV_TYPE_KEYPAD);
+    lv_indev_set_read_cb(dsc->keyboard, get_key);
+    lv_indev_set_driver_data(dsc->keyboard, kbd_dsc);
+    lv_indev_set_mode(dsc->keyboard, LV_INDEV_MODE_EVENT);
     return true;
 }
 
@@ -225,12 +229,12 @@ int lv_qnx_event_loop(lv_display_t * disp)
         }
 
         if(type == SCREEN_EVENT_POINTER) {
-            if(!handle_pointer_event(event)) {
+            if(!handle_pointer_event(disp, event)) {
                 return EXIT_FAILURE;
             }
         }
         else if(type == SCREEN_EVENT_KEYBOARD) {
-            if(!handle_keyboard_event(event)) {
+            if(!handle_keyboard_event(disp, event)) {
                 return EXIT_FAILURE;
             }
         }
@@ -390,6 +394,14 @@ static void release_disp_cb(lv_event_t * e)
         screen_destroy_window(dsc->window);
     }
 
+    if(dsc->pointer != NULL) {
+        lv_free(dsc->pointer);
+    }
+
+    if(dsc->keyboard != NULL) {
+        lv_free(dsc->keyboard);
+    }
+
     lv_free(dsc);
     lv_display_set_driver_data(disp, NULL);
 }
@@ -408,27 +420,28 @@ static void get_pointer(lv_indev_t * indev, lv_indev_data_t * data)
     }
 }
 
-static bool handle_pointer_event(screen_event_t event)
+static bool handle_pointer_event(lv_display_t * disp, screen_event_t event)
 {
-    if(pointer_indev == NULL) return true;
+    lv_qnx_window_t * dsc = lv_display_get_driver_data(disp);
+    if(dsc->pointer == NULL) return true;
 
-    lv_qnx_pointer_t * dsc = lv_indev_get_driver_data(pointer_indev);
+    lv_qnx_pointer_t * ptr_dsc = lv_indev_get_driver_data(dsc->pointer);
 
     if(screen_get_event_property_iv(event, SCREEN_PROPERTY_SOURCE_POSITION,
-                                    dsc->pos)
+                                    ptr_dsc->pos)
        != 0) {
         LV_LOG_ERROR("screen_get_event_property_iv(SOURCE_POSITION): %s", strerror(errno));
         return false;
     }
 
     if(screen_get_event_property_iv(event, SCREEN_PROPERTY_BUTTONS,
-                                    &dsc->buttons)
+                                    &ptr_dsc->buttons)
        != 0) {
         LV_LOG_ERROR("screen_get_event_property_iv(BUTTONS): %s", strerror(errno));
         return false;
     }
 
-    lv_indev_read(pointer_indev);
+    lv_indev_read(dsc->pointer);
     return true;
 }
 
@@ -445,71 +458,72 @@ static void get_key(lv_indev_t * indev, lv_indev_data_t * data)
     }
 }
 
-static bool handle_keyboard_event(screen_event_t event)
+static bool handle_keyboard_event(lv_display_t * disp, screen_event_t event)
 {
-    if(keyboard_indev == NULL) return true;
+    lv_qnx_window_t * dsc = lv_display_get_driver_data(disp);
+    if(dsc->keyboard == NULL) return true;
 
-    lv_qnx_keyboard_t * dsc = lv_indev_get_driver_data(keyboard_indev);
+    lv_qnx_keyboard_t * kbd_dsc = lv_indev_get_driver_data(dsc->keyboard);
 
     /*Get event data*/
     if(screen_get_event_property_iv(event, SCREEN_PROPERTY_FLAGS,
-                                    &dsc->flags)
+                                    &kbd_dsc->flags)
        != 0) {
         LV_LOG_ERROR("screen_get_event_property_iv(FLAGS): %s", strerror(errno));
         return false;
     }
 
     if(screen_get_event_property_iv(event, SCREEN_PROPERTY_SYM,
-                                    &dsc->key)
+                                    &kbd_dsc->key)
        != 0) {
         LV_LOG_ERROR("screen_get_event_property_iv(SYM): %s", strerror(errno));
         return false;
     }
 
     /*Translate special keys*/
-    switch(dsc->key) {
+    switch(kbd_dsc->key) {
         case KEYCODE_UP:
-            dsc->key = LV_KEY_UP;
+            kbd_dsc->key = LV_KEY_UP;
             break;
 
         case KEYCODE_DOWN:
-            dsc->key = LV_KEY_DOWN;
+            kbd_dsc->key = LV_KEY_DOWN;
             break;
 
         case KEYCODE_LEFT:
-            dsc->key = LV_KEY_LEFT;
+            kbd_dsc->key = LV_KEY_LEFT;
             break;
 
         case KEYCODE_RIGHT:
-            dsc->key = LV_KEY_RIGHT;
+            kbd_dsc->key = LV_KEY_RIGHT;
             break;
 
         case KEYCODE_RETURN:
-            dsc->key = LV_KEY_ENTER;
+            kbd_dsc->key = LV_KEY_ENTER;
             break;
 
         case KEYCODE_BACKSPACE:
-            dsc->key = LV_KEY_BACKSPACE;
+            kbd_dsc->key = LV_KEY_BACKSPACE;
             break;
 
         case KEYCODE_HOME:
-            dsc->key = LV_KEY_HOME;
+            kbd_dsc->key = LV_KEY_HOME;
             break;
 
         case KEYCODE_END:
-            dsc->key = LV_KEY_END;
+            kbd_dsc->key = LV_KEY_END;
             break;
 
         case KEYCODE_DELETE:
-            dsc->key = LV_KEY_DEL;
+            kbd_dsc->key = LV_KEY_DEL;
             break;
 
         default:
             /*Ignore other non-ASCII keys, including modifiers*/
-            if(dsc->key > 0xff) return true;
+            if(kbd_dsc->key > 0xff) return true;
     }
 
-    lv_indev_read(keyboard_indev);
+    lv_indev_read(dsc->keyboard);
     return true;
 }
 
