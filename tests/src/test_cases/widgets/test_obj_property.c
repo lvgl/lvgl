@@ -255,7 +255,9 @@ void test_obj_property_name(void)
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
 
     /*Style name*/
-    TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_STYLE_X, lv_obj_property_get_id(obj, "x"));
+    /*If widget property name conflicts with style name, property name comes first.*/
+    TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_OBJ_X, lv_obj_property_get_id(obj, "x"));
+    TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_STYLE_OPA, lv_obj_property_get_id(obj, "opa"));
     TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_STYLE_BG_MAIN_STOP, lv_obj_property_get_id(obj, "bg_main_stop"));
 
     /*Widget property*/

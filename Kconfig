@@ -177,6 +177,13 @@ menu "LVGL configuration"
 		help
 			Align the start address of draw_buf addresses to this bytes.
 
+		config LV_DRAW_TRANSFORM_USE_MATRIX
+			bool "Using matrix for transformations"
+			default n
+			depends on LV_USE_MATRIX
+			help
+				Requirements: The rendering engine needs to support 3x3 matrix transformations.
+
 		config LV_DRAW_LAYER_SIMPLE_BUF_SIZE
 			int "Optimal size to buffer the widget with opacity"
 			default 24576
@@ -372,6 +379,8 @@ menu "LVGL configuration"
 
 		config LV_USE_DRAW_VG_LITE
 			bool "Use VG-Lite GPU"
+			default n
+			select LV_USE_MATRIX
 
 		config LV_VG_LITE_USE_GPU_INIT
 			bool "Enable VG-Lite custom external 'gpu_init()' function"
@@ -407,9 +416,15 @@ menu "LVGL configuration"
 					linear: 4K bytes.
 					radial: radius * 4K bytes.
 
+		config LV_VG_LITE_STROKE_CACHE_CNT
+			int "VG-Lite stroke maximum cache number."
+			default 32
+			depends on LV_USE_DRAW_VG_LITE
+
 		config LV_USE_VECTOR_GRAPHIC
 			bool "Use Vector Graphic APIs"
 			default n
+			select LV_USE_MATRIX
 			help
 				Enable drawing support vector graphic APIs.
 	endmenu
@@ -691,6 +706,11 @@ menu "LVGL configuration"
 		config LV_USE_FLOAT
 			bool "Use float as lv_value_precise_t"
 			default n
+
+		config LV_USE_MATRIX
+			bool "Enable matrix support"
+			default n
+			select LV_USE_FLOAT
 	endmenu
 
 	menu "Font Usage"
@@ -1719,6 +1739,15 @@ menu "LVGL configuration"
 			bool "Enable debug mode for OpenGL"
 			depends on LV_USE_OPENGLES
 			default n
+
+		config LV_USE_QNX
+			bool "Use a QNX Screen window as a display"
+			default n
+
+		config LV_QNX_BUF_COUNT
+			int
+			depends on LV_USE_QNX
+			default 1
 	endmenu
 
 	menu "Examples"

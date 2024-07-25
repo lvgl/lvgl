@@ -136,7 +136,7 @@ void lv_port_indev_init(void)
     /*Register a encoder input device*/
     indev_encoder = lv_indev_create();
     lv_indev_set_type(indev_encoder, LV_INDEV_TYPE_ENCODER);
-    lv_indev_set_read_cb(indev_touchpad, encoder_read);
+    lv_indev_set_read_cb(indev_encoder, encoder_read);
 
     /*Later you should create group(s) with `lv_group_t * group = lv_group_create()`,
      *add objects to the group with `lv_group_add_obj(group, obj)`

@@ -61,7 +61,7 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
 
     LV_PROFILER_BEGIN;
     lv_layer_t * layer = draw_unit->target_layer;
-    uint32_t layer_stride_byte = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
+    uint32_t layer_stride_byte = layer->draw_buf->header.stride;
 
     if(blend_dsc->src_buf == NULL) {
         _lv_draw_sw_blend_fill_dsc_t fill_dsc;

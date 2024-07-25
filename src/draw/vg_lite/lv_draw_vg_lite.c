@@ -18,6 +18,7 @@
 #include "lv_vg_lite_decoder.h"
 #include "lv_vg_lite_grad.h"
 #include "lv_vg_lite_pending.h"
+#include "lv_vg_lite_stroke.h"
 
 /*********************
  *      DEFINES
@@ -74,6 +75,7 @@ void lv_draw_vg_lite_init(void)
     lv_vg_lite_image_dsc_init(unit);
 #if LV_USE_VECTOR_GRAPHIC
     lv_vg_lite_grad_init(unit, LV_VG_LITE_GRAD_CACHE_CNT);
+    lv_vg_lite_stroke_init(unit, LV_VG_LITE_STROKE_CACHE_CNT);
 #endif
     lv_vg_lite_path_init(unit);
     lv_vg_lite_decoder_init();
@@ -113,6 +115,12 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
 
     vg_lite_identity(&u->global_matrix);
     vg_lite_translate(-layer->buf_area.x1, -layer->buf_area.y1, &u->global_matrix);
+
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    vg_lite_matrix_t layer_matrix;
+    lv_vg_lite_matrix(&layer_matrix, &t->matrix);
+    lv_vg_lite_matrix_multiply(&u->global_matrix, &layer_matrix);
+#endif
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_LABEL:
@@ -254,6 +262,7 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit)
     lv_vg_lite_image_dsc_deinit(unit);
 #if LV_USE_VECTOR_GRAPHIC
     lv_vg_lite_grad_deinit(unit);
+    lv_vg_lite_stroke_deinit(unit);
 #endif
     lv_vg_lite_path_deinit(unit);
     lv_vg_lite_decoder_deinit();

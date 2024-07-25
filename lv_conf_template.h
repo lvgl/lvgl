@@ -106,6 +106,12 @@
 /*Align the start address of draw_buf addresses to this bytes*/
 #define LV_DRAW_BUF_ALIGN                       4
 
+/*Using matrix for transformations.
+ *Requirements:
+    `LV_USE_MATRIX = 1`.
+    The rendering engine needs to support 3x3 matrix transformations.*/
+#define LV_DRAW_TRANSFORM_USE_MATRIX            0
+
 /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
  * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
  * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
@@ -229,6 +235,10 @@
  * NOTE: The memory usage of a single gradient image is 4K bytes.
  */
 #define LV_VG_LITE_GRAD_CACHE_CNT 32
+
+/* VG-Lite stroke maximum cache number.
+ */
+#define LV_VG_LITE_STROKE_CACHE_CNT 32
 
 #endif
 
@@ -433,6 +443,10 @@
 
 /* Use `float` as `lv_value_precise_t` */
 #define LV_USE_FLOAT            0
+
+/*Enable matrix support
+ *Requires `LV_USE_FLOAT = 1`*/
+#define LV_USE_MATRIX           0
 
 /*==================
  *   FONT USAGE
@@ -787,7 +801,8 @@
 /*Rlottie library*/
 #define LV_USE_RLOTTIE 0
 
-/*Enable Vector Graphic APIs*/
+/*Enable Vector Graphic APIs
+ *Requires `LV_USE_MATRIX = 1`*/
 #define LV_USE_VECTOR_GRAPHIC  0
 
 /* Enable ThorVG (vector graphics library) from the src/libs folder */
@@ -1010,6 +1025,12 @@
 #define LV_USE_OPENGLES   0
 #if LV_USE_OPENGLES
     #define LV_USE_OPENGLES_DEBUG        1    /* Enable or disable debug for opengles */
+#endif
+
+/* QNX Screen display and input drivers */
+#define LV_USE_QNX              0
+#if LV_USE_QNX
+    #define LV_QNX_BUF_COUNT        1    /*1 or 2*/
 #endif
 
 /*==================
