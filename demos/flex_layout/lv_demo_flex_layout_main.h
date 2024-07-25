@@ -27,7 +27,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct _view_t{
+typedef struct _view_t {
     lv_obj_t * root;
     lv_obj_t * obj_cur;
     lv_style_t obj_def_style;
