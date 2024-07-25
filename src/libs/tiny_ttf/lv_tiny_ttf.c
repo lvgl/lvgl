@@ -228,8 +228,7 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     lv_cache_entry_t * entry = lv_cache_acquire_or_create(dsc->glyph_cache, &search_key, (void *)dsc);
 
     if(entry == NULL) {
-        if ( !dsc->cache_size ) /* no cache, do everything directly */
-        {
+        if(!dsc->cache_size) {  /* no cache, do everything directly */
             uint32_t g1 = stbtt_FindGlyphIndex(&dsc->info, (int)unicode_letter);
             tiny_ttf_glyph_cache_create_cb(&search_key, dsc);
             *dsc_out = search_key.glyph_dsc;
@@ -237,13 +236,12 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
 
             /*Kerning correction*/
             if(font->kerning == LV_FONT_KERNING_NORMAL &&
-                unicode_letter_next != 0)
-            {
+               unicode_letter_next != 0) {
                 int g2 = stbtt_FindGlyphIndex(&dsc->info, (int)unicode_letter_next); /* not using cache, only do glyph id lookup */
                 if(g2) {
                     int k = stbtt_GetGlyphKernAdvance(&dsc->info, g1, g2);
                     dsc_out->adv_w = (uint16_t)floor((((float)adv_w + (float)k) * dsc->scale) +
-                                                    0.5f); /*Horizontal space required by the glyph in [px]*/
+                                                     0.5f); /*Horizontal space required by the glyph in [px]*/
                 }
             }
 
@@ -298,19 +296,15 @@ static const void * ttf_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv_draw
         .size = font->line_height,
     };
 
-   void * data=(void *)font->dsc;
-
     lv_cache_entry_t * entry = lv_cache_acquire_or_create(dsc->draw_data_cache, &search_key, (void *)font->dsc);
     if(entry == NULL) {
-        if ( !dsc->cache_size ) /* no cache, do everything directly */
-        {
-            if ( tiny_ttf_draw_data_cache_create_cb(&search_key, (void *)font->dsc) )
-            {
-                g_dsc->entry = (lv_cache_entry_t *)search_key.draw_buf; /* use the cache entry to store the buffer if no cache specified */
+        if(!dsc->cache_size) {  /* no cache, do everything directly */
+            if(tiny_ttf_draw_data_cache_create_cb(&search_key, (void *)font->dsc)) {
+                /* use the cache entry to store the buffer if no cache specified */
+                g_dsc->entry = (lv_cache_entry_t *)search_key.draw_buf;
                 return g_dsc->entry;
             }
-            else
-            {
+            else {
                 return NULL;
             }
         }
@@ -328,12 +322,10 @@ static void ttf_release_glyph_cb(const lv_font_t * font, lv_font_glyph_dsc_t * g
     LV_ASSERT_NULL(font);
 
     ttf_font_desc_t * dsc = (ttf_font_desc_t *)font->dsc;
-    if ( !dsc->cache_size ) /* no cache, do everything directly */
-    {
-        lv_draw_buf_destroy_user(font_draw_buf_handlers, (lv_draw_buf_t*)g_dsc->entry );
+    if(!dsc->cache_size) {  /* no cache, do everything directly */
+        lv_draw_buf_destroy_user(font_draw_buf_handlers, (lv_draw_buf_t *)g_dsc->entry);
     }
-    else
-    {
+    else {
         if(g_dsc->entry == NULL) {
             return;
         }
