@@ -12,7 +12,7 @@
  */
 
 /* clang-format off */
-#if 0 /*Set it to "1" to enable content*/
+#if 1 /*Set it to "1" to enable content*/
 
 #ifndef LV_CONF_H
 #define LV_CONF_H
@@ -27,7 +27,7 @@
  *====================*/
 
 /*Color depth: 8 (A8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
-#define LV_COLOR_DEPTH 16
+#define LV_COLOR_DEPTH 32
 
 /*=========================
    STDLIB WRAPPER SETTINGS
@@ -137,7 +137,6 @@
 	#define LV_DRAW_SW_SUPPORT_L8			1
 	#define LV_DRAW_SW_SUPPORT_AL88			1
 	#define LV_DRAW_SW_SUPPORT_A8			1
-	#define LV_DRAW_SW_SUPPORT_I1			1
 
 	/* Set the number of draw unit.
      * > 1 requires an operating system enabled in `LV_USE_OS`
@@ -230,10 +229,6 @@
  */
 #define LV_VG_LITE_GRAD_CACHE_CNT 32
 
-/* VG-Lite stroke maximum cache number.
- */
-#define LV_VG_LITE_STROKE_CACHE_CNT 32
-
 #endif
 
 /*=======================
@@ -255,11 +250,11 @@
     *LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
     *LV_LOG_LEVEL_USER        Only logs added by the user
     *LV_LOG_LEVEL_NONE        Do not log anything*/
-    #define LV_LOG_LEVEL LV_LOG_LEVEL_WARN
+    #define LV_LOG_LEVEL LV_LOG_LEVEL_INFO
 
     /*1: Print the log with 'printf';
     *0: User need to register a callback with `lv_log_register_print_cb()`*/
-    #define LV_LOG_PRINTF 0
+    #define LV_LOG_PRINTF 1
 
     /*Set callback to print the logs.
      *E.g `my_print`. The prototype should be `void my_print(lv_log_level_t level, const char * buf)`
@@ -1017,9 +1012,9 @@
 #endif
 
 /* QNX Screen display and input drivers */
-#define LV_USE_QNX              0
+#define LV_USE_QNX              1
 #if LV_USE_QNX
-    #define LV_QNX_BUF_COUNT        1    /*1 or 2*/
+    #define LV_QNX_BUF_COUNT        2    /*1 or 2*/
 #endif
 
 /*==================

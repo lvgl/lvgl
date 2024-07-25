@@ -1724,6 +1724,15 @@ menu "LVGL configuration"
 			bool "Enable debug mode for OpenGL"
 			depends on LV_USE_OPENGLES
 			default n
+
+		config LV_USE_QNX
+			bool "Use a QNX Screen window as a display"
+			default n
+
+		config LV_QNX_BUF_COUNT
+			int
+			depends on LV_USE_QNX
+			default 1
 	endmenu
 
 	menu "Examples"
