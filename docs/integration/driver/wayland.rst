@@ -189,6 +189,33 @@ Sample program using tick-less mode:
   }
 
 
+Building the wayland driver
+---------------------------
+
+An example simulator is available in this `repo <https://github.com/lvgl/lv_port_linux/>`__
+
+If there is a need to use driver with another build system. The source and header files for the XDG shell
+must be generated from the definitions for the XDG shell protocol.
+
+In the example Cmake is used to perform the operation by invoking the ``wayland-scanner`` utility
+
+To achieve this manually,
+
+Make sure the dependencies listed at the start of the article are installed.
+
+The wayland protocol is defined using XML files which are present in ``/usr/share/wayland-protocols``
+
+To generate the required files run the following commands:
+
+.. code-block:: sh
+
+   wayland-scanner client-header </usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml > wayland_xdg_shell.h
+   wayland-scanner private-code </usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml > wayland_xdg_shell.c
+
+The resulting files can then be integrated into the project, it's better to re-run ``wayland-scanner`` on
+each build to ensure that the correct versions are generated, they must match the version of the ``wayland-client``
+dynamically linked library installed on the system.
+
 Bug reports
 -----------
 
