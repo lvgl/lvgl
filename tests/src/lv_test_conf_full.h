@@ -123,6 +123,10 @@
     #define LV_USE_LINUX_FBDEV  1
 #endif
 
+#ifndef LV_USE_WAYLAND
+    #define LV_USE_WAYLAND  1
+#endif
+
 #define LV_USE_ILI9341      1
 #define LV_USE_ST7735       1
 #define LV_USE_ST7789       1

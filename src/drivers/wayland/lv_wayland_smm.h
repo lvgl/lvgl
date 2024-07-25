@@ -4,8 +4,12 @@
  */
 #ifndef LV_WAYLAND_SMM_H
 #define LV_WAYLAND_SMM_H
-#include <stddef.h>
-#include <stdbool.h>
+
+#include "../../display/lv_display.h"
+#include LV_STDDEF_INCLUDE
+#include LV_STDBOOL_INCLUDE
+
+#if LV_USE_WAYLAND
 
 #define SMM_FD_NAME  "lvgl-wayland"
 #define SMM_POOL_TAGS   (1)
@@ -64,4 +68,6 @@ void smm_release(smm_buffer_t * buf);
 smm_buffer_t * smm_latest(smm_group_t * grp);
 smm_buffer_t * smm_next(smm_buffer_t * buf);
 
-#endif
+#endif /* LV_USE_WAYLAND */
+
+#endif /* LV_WAYLAND_SMM_H */

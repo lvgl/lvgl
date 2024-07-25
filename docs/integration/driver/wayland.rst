@@ -135,7 +135,7 @@ Instead, the timer is incremented by the amount returned by the following functi
 To enable tick-less mode,
 
 #. In ``lv_conf.h`` set ``LV_TICK_CUSTOM 1``
-#. Supply the header name where the function is declared via ``LV_TICK_CUSTOM_INCLUDE`` definition.
+#. Supply the header name where the function is declared via the ``LV_TICK_CUSTOM_INCLUDE`` definition.
 #. Set the name of the function in the  ``LV_TICK_CUSTOM_SYS_TIME_EXPR`` definition
 
 
@@ -203,7 +203,7 @@ Please enable ``LV_USE_LOG`` and launch the simulator executable like so
   WAYLAND_DEBUG=1 ./path/to/simulator_executable > /tmp/debug 2>&1
 
 This will create a log file called ``debug`` in the ``/tmp`` directory, copy-paste the content of the file in the github issue.
-The log file contains LVGL logs and the wayland message.
+The log file contains LVGL logs and the wayland messages.
 
 Be sure to replicate the problem quickly otherwise the logs become too big
 
