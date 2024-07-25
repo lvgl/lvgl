@@ -194,7 +194,7 @@ the directive.
 * If you want to separate code into easier to understand sections you can do so with a single empty line. No more than ONE line.
 
 
-### bulleted lists
+### Bulleted lists
 
 -------------------------------------------------------------
 
