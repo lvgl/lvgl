@@ -377,6 +377,9 @@ void lv_canvas_init_layer(lv_obj_t * obj, lv_layer_t * layer)
     layer->color_format = header->cf;
     layer->buf_area = canvas_area;
     layer->_clip_area = canvas_area;
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    lv_matrix_identity(&layer->matrix);
+#endif
 }
 
 void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
