@@ -40,14 +40,30 @@ To install using the `requirements.txt` file use the following command.
     pip install -r requirements.txt
 
 
+The areguments that can be used with the build script are as follows
+
+* clean: this will remove the output path if it exists
+* latex: this will build the LVGL documentation PDF file
+* develop: This will stop the removal of the build folder if the default temp path is used
+* ignore-missing-warnings: Stops the files from being generated to "MISSING-DOCSTRINGS"
+* build-path={absolute path}: setting a custom temporary build path (defaults to the system temporary path)
+* output-path={absolute path}: where to output the documentation to (defaults to `out_html`)
+
+
+When using the `build-path` argument if the directory exists and `clean` is supplied the directory gets 
+deleted and then remade. If the directory exists `develop` is assumed and the folder doesn't get removed.
+If the directory doesn't exist and `develop` is supplied then the directory doesn't get removed at the 
+end of the build.
+
+
 Once you have all of the requirements installed you are ready to build them.
 To build the documentation use the following command.
 
-    python build.py skip_latex clean
+    python build.py clean
 
 You may have to use the following command if you are un a Unix like OS
 
-    python3 build.py skip_latex clean
+    python3 build.py clean
 
 The documentation will be output into the folder `out_html` in the root directory 
 for LVGL.

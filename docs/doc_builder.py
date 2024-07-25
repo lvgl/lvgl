@@ -1064,35 +1064,52 @@ html_files = {}
 
 
 def iter_src(n, p):
-    if p:
-        out_path = os.path.join(api_path, p)
+    out_dirs = []
+
+    head, tail = os.path.split(p)
+    while tail != 'lvgl':
+        out_dirs.insert(0, tail)
+        head, tail = os.path.split(head)
+
+    if out_dirs:
+        out_path = os.path.join(api_path, *out_dirs)
     else:
         out_path = api_path
 
     index_file = None
-
-    if p:
-        src_path = os.path.join(lvgl_src_path, p)
-    else:
-        src_path = lvgl_src_path
-
     folders = []
 
-    for file in os.listdir(src_path):
+    for file in os.listdir(p):
         if 'private' in file:
             continue
 
-        if 'thorvg' in src_path and 'thorvg_capi' not in file:
+        if file in (
+            'docs',
+            'examples',
+            'rt-thread',
+            'tests',
+            'lv_conf_template.h',
+            'env_support',
+            'lv_conf_internal.h'
+        ):
             continue
 
-        if 'libs' in src_path and not file.startswith('lv_'):
+        if p.endswith('src') and file == 'lvgl.h':
             continue
 
-        if src_path.endswith('osal') and file != 'lv_os.h':
+        if 'thorvg' in p and 'thorvg_capi' not in file:
             continue
 
-        if os.path.isdir(os.path.join(src_path, file)):
-            folders.append((file, os.path.join(p, file)))
+        if 'libs' in p and not file.startswith('lv_'):
+            continue
+
+        if p.endswith('osal') and file != 'lv_os.h':
+            continue
+
+        header_path = os.path.join(p, file)
+
+        if os.path.isdir(header_path):
+            folders.append((file, header_path))
             continue
 
         if not file.endswith('.h'):
@@ -1150,6 +1167,20 @@ def iter_src(n, p):
                 index_file.write('.. toctree::\n    :maxdepth: 2\n\n')
 
             index_file.write('    ' + os.path.split(folder)[-1] + '/index\n')
+
+    if n == 'API':
+        rst_file = os.path.join(out_path, 'lv_conf.rst')
+
+        with open(rst_file, 'w') as f:
+            f.write('.. _lv_conf_h:\n')
+            f.write('\n=========\nlv_conf.h\n=========\n')
+            f.write('\n\n.. doxygenfile:: lv_conf.h\n')
+            f.write('    :project: lvgl\n\n')
+
+        html_file = os.path.join(p, 'lv_conf.html')
+        html_files['lv_conf'] = html_file
+
+        index_file.write('    lv_conf\n')
 
     if index_file is not None:
         index_file.write('\n')
@@ -1346,7 +1377,7 @@ def run(project_path, temp_directory, *doc_paths):
     if not os.path.exists(api_path):
         os.makedirs(api_path)
 
-    iter_src('API', '')
+    iter_src('API', project_path)
     index = load_xml('index')
 
     for compound in index:

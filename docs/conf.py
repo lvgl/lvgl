@@ -273,7 +273,7 @@ breathe_projects_source = {}
 #     )
 # }
 breathe_build_directory = os.path.join(base_path, 'breathe')  # default
-breathe_default_members = ()  # default
+breathe_default_members = ('members', 'undoc-members')  # default
 breathe_show_define_initializer = False  # default
 breathe_show_enumvalue_initializer = False  # default
 breathe_show_include = True  # default

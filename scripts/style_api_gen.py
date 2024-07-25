@@ -718,6 +718,7 @@ print('''\
 ''')
 print('#endif /* LV_STYLE_GEN_H */')
 
+
 sys.stdout = open(base_dir + '/../docs/overview/style-props.rst', 'w')
 print('.. _style_properties:')
 print()

@@ -34,7 +34,7 @@ jobs:
           key: MISSING-DOCSTRINGS-v1
 
       - name: Build docs
-        run: docs/build.py skip_latex
+        run: docs/build.py
 
       - uses: actions/upload-artifact@v4
         with:
