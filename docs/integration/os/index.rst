@@ -10,3 +10,4 @@
     zephyr
     px5
     mqx
+    qnx
