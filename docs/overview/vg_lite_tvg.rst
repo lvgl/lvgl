@@ -11,6 +11,12 @@ It has been integrated into the CI automated compilation and testing process to 
 
 You can find the standalone version `here <https://github.com/FASTSHIFT/vg_lite_tvg/>`_.
 
+How it works
+************
+
+Sort out the APIs in the ``vg_lite.h`` header file provided by the vendor, re-implement the APIs using `ThorVG <https://github.com/thorvg/thorvg>`_, 
+and simulate the same rendering images as the real hardware on the simulator.
+
 Configuration
 *************
 
