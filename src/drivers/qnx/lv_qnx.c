@@ -64,7 +64,6 @@ static void refresh_cb(lv_timer_t * timer);
  ***********************/
 
 static screen_context_t context;
-static bool inited = false;
 
 /**********************
  *  STATIC VARIABLES
@@ -80,6 +79,8 @@ static bool inited = false;
 
 lv_display_t * lv_qnx_window_create(int32_t hor_res, int32_t ver_res)
 {
+    static bool inited = false;
+
     if(!inited) {
         if(screen_create_context(&context,
                                  SCREEN_APPLICATION_CONTEXT) != 0) {
@@ -135,7 +136,7 @@ void lv_qnx_window_set_title(lv_display_t * disp, const char * title)
     screen_create_event(&event);
 
     char title_buf[64];
-    snprintf(title_buf, sizeof(title_buf), "Title=%s", title);
+    lv_snprintf(title_buf, sizeof(title_buf), "Title=%s", title);
 
     int type = SCREEN_EVENT_MANAGER;
     screen_set_event_property_iv(event, SCREEN_PROPERTY_TYPE, &type);
@@ -158,6 +159,7 @@ bool lv_qnx_add_pointer_device(lv_display_t * disp)
     }
 
     lv_qnx_pointer_t * ptr_dsc = lv_malloc_zeroed(sizeof(lv_qnx_pointer_t));
+    LV_ASSERT_MALLOC(ptr_dsc);
     if(ptr_dsc == NULL) {
         return false;
     }
@@ -184,6 +186,7 @@ bool lv_qnx_add_keyboard_device(lv_display_t * disp)
     }
 
     lv_qnx_keyboard_t * kbd_dsc = lv_malloc_zeroed(sizeof(lv_qnx_keyboard_t));
+    LV_ASSERT_MALLOC(kbd_dsc);
     if(dsc == NULL) {
         return false;
     }
