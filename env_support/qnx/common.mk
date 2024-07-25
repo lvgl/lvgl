@@ -10,7 +10,7 @@ INSTALLDIR=
 NAME=lvgl
 USEFILE=
 
-SRC_ROOT=$(PROJECT_ROOT)/../src
+SRC_ROOT=$(PROJECT_ROOT)/../../src
 EXTRA_SRCVPATH=$(SRC_ROOT) \
 $(SRC_ROOT)/libs \
 $(SRC_ROOT)/libs/bmp \
