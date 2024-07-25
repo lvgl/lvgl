@@ -9,8 +9,6 @@ Its purpose is to simplify the debugging of VG-Lite adaptation and reduce the ti
 
 It has been integrated into the CI automated compilation and testing process to ensure that the VG-Lite rendering backend can be fully tested after each PR modification.
 
-You can find the standalone version `here <https://github.com/FASTSHIFT/vg_lite_tvg/>`_.
-
 How it works
 ************
 
