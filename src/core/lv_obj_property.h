@@ -56,15 +56,15 @@ enum {
     LV_PROPERTY_ID_INVALID      = 0,
 
     /*ID 0x01 to 0xff are style ID, check lv_style_prop_t*/
-    LV_PROPERTY_STYLE_START     = 0x01,
+    LV_PROPERTY_STYLE_START     = 0x00,
 
-    LV_PROPERTY_ID_START        = 0x100, /*ID little than 0xff is style ID*/
+    LV_PROPERTY_ID_START        = 0x0100, /*ID smaller than 0xff is style ID*/
     /*Define the property ID for every widget here. */
-    LV_PROPERTY_OBJ_START       = 0x100, /* lv_obj.c */
-    LV_PROPERTY_IMAGE_START     = 0x200, /* lv_image.c */
+    LV_PROPERTY_OBJ_START       = 0x0100, /* lv_obj.c */
+    LV_PROPERTY_IMAGE_START     = 0x0200, /* lv_image.c */
 
     /*Special ID, use it to extend ID and make sure it's unique and compile time determinant*/
-    LV_PROPERTY_ID_BUILTIN_LAST = 0x10000000,
+    LV_PROPERTY_ID_BUILTIN_LAST = 0xffff, /*ID of 0x10000 ~ 0xfffffff is reserved for user*/
 
     /*Special ID used by lvgl to intercept all setter/getter call.*/
     LV_PROPERTY_ID_ANY          = 0x7ffffffe,
