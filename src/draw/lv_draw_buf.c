@@ -154,30 +154,34 @@ void lv_draw_buf_flush_cache_user(const lv_draw_buf_handlers_t * handlers, const
 void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
 {
     LV_ASSERT_NULL(draw_buf);
-    if(a && lv_area_get_width(a) < 0) return;
-    if(a && lv_area_get_height(a) < 0) return;
 
     const lv_image_header_t * header = &draw_buf->header;
     uint32_t stride = header->stride;
 
     if(a == NULL) {
-        /*Need skip the palette if exists*/
-        uint8_t * bufc = lv_draw_buf_goto_xy(draw_buf, 0, 0);
-        lv_memzero(bufc, header->h * stride);
+        uint8_t * buf = lv_draw_buf_goto_xy(draw_buf, 0, 0);
+        lv_memzero(buf, header->h * stride);
         return;
     }
 
-    uint8_t * bufc;
-    uint32_t line_length;
-    int32_t start_y, end_y;
+    lv_area_t a_draw_buf;
+    a_draw_buf.x1 = 0;
+    a_draw_buf.y1 = 0;
+    a_draw_buf.x2 = draw_buf->header.w - 1;
+    a_draw_buf.y2 = draw_buf->header.h - 1;
+
+    lv_area_t a_clipped;
+    if(!_lv_area_intersect(&a_clipped, a, &a_draw_buf)) return;
+    if(lv_area_get_width(&a_clipped) <= 0) return;
+    if(lv_area_get_height(&a_clipped) <= 0) return;
+
     uint8_t px_size = lv_color_format_get_size(header->cf);
-    bufc = lv_draw_buf_goto_xy(draw_buf, a->x1, a->y1);
-    line_length = lv_area_get_width(a) * px_size;
-    start_y = a->y1;
-    end_y = a->y2;
-    for(; start_y <= end_y; start_y++) {
-        lv_memzero(bufc, line_length);
-        bufc += stride;
+    uint8_t * buf = lv_draw_buf_goto_xy(draw_buf, a_clipped.x1, a_clipped.y1);
+    uint32_t line_length = lv_area_get_width(&a_clipped) * px_size;
+    int32_t y;
+    for(y = a_clipped.y1; y <= a_clipped.y2; y++) {
+        lv_memzero(buf, line_length);
+        buf += stride;
     }
 }
 
