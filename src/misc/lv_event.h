@@ -107,7 +107,9 @@ typedef enum {
 
     LV_EVENT_VSYNC,
 
-    LV_EVENT_LAST,                 /** Number of default events*/
+    LV_EVENT_MARK_FREE,             /** Mark event slots as free, NOT an event*/
+
+    LV_EVENT_LAST,                  /** Number of default events*/
 
     LV_EVENT_PREPROCESS = 0x8000,   /** This is a flag that can be set with an event so it's processed
                                       before the class default event processing */

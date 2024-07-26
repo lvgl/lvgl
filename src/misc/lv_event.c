@@ -88,17 +88,33 @@ lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preproces
 lv_event_dsc_t * lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter,
                               void * user_data)
 {
+    if(lv_array_size(list) == 0) {
+        /*event list hasn't been initialized.*/
+        lv_array_init(list, 1, sizeof(lv_event_dsc_t *));
+        LV_TRACE_EVENT("Event list initialized");
+    }
+    else {
+        uint32_t size = lv_array_size(list);
+        lv_event_dsc_t ** events = lv_array_front(list);
+        for(uint32_t i = 0; i < size; i++) {
+            /*Search for a free slot*/
+            if(events[i]->filter == LV_EVENT_MARK_FREE) {
+                events[i]->cb = cb;
+                events[i]->filter = filter;
+                events[i]->user_data = user_data;
+                LV_TRACE_EVENT("Found free event slot");
+                return events[i];
+            }
+        }
+    }
+
     lv_event_dsc_t * dsc = lv_malloc(sizeof(lv_event_dsc_t));
     LV_ASSERT_NULL(dsc);
 
     dsc->cb = cb;
     dsc->filter = filter;
     dsc->user_data = user_data;
-
-    if(lv_array_size(list) == 0) {
-        /*event list hasn't been initialized.*/
-        lv_array_init(list, 1, sizeof(lv_event_dsc_t *));
-    }
+    LV_TRACE_EVENT("Add new event to list");
 
     lv_array_push_back(list, &dsc);
     return dsc;
@@ -113,12 +129,14 @@ bool lv_event_remove_dsc(lv_event_list_t * list, lv_event_dsc_t * dsc)
     lv_event_dsc_t ** events = lv_array_front(list);
     for(int i = 0; i < size; i++) {
         if(events[i] == dsc) {
-            lv_free(dsc);
-            lv_array_remove(list, i);
+            dsc->cb = NULL;
+            dsc->filter = LV_EVENT_MARK_FREE;
+            LV_TRACE_EVENT("Mark event slot as free");
             return true;
         }
     }
 
+    LV_TRACE_EVENT("Event not found in list");
     return false;
 }
 
@@ -153,8 +171,10 @@ bool lv_event_remove(lv_event_list_t * list, uint32_t index)
 {
     LV_ASSERT_NULL(list);
     lv_event_dsc_t * dsc = lv_event_get_dsc(list, index);
-    lv_free(dsc);
-    return lv_array_remove(list, index);
+    dsc->filter = LV_EVENT_MARK_FREE;
+    dsc->cb = NULL;
+    LV_TRACE_EVENT("Mark event slot as free");
+    return true;
 }
 
 void lv_event_remove_all(lv_event_list_t * list)
@@ -166,6 +186,7 @@ void lv_event_remove_all(lv_event_list_t * list)
         lv_free(dsc[i]);
     }
     lv_array_deinit(list);
+    LV_TRACE_EVENT("Event list deinitialized");
 }
 
 void * lv_event_get_current_target(lv_event_t * e)
