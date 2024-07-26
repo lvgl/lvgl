@@ -238,7 +238,6 @@ bool lv_group_get_editing(const lv_group_t * group);
 /**
  * Get whether focus next/prev will allow wrapping from first->last or last->first object.
  * @param group         pointer to group
- * @param               en true: wrapping enabled; false: wrapping disabled
  */
 bool lv_group_get_wrap(lv_group_t * group);
 

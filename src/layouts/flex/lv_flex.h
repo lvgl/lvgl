@@ -62,7 +62,6 @@ typedef enum {
 
 /**
  * Initialize a flex layout the default values
- * @param flex pointer to a flex layout descriptor
  */
 void lv_flex_init(void);
 

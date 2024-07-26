@@ -68,7 +68,7 @@ typedef void (*lv_cache_destroy_cb_t)(lv_cache_t * cache, void * user_data);
 
 /**
  * The cache get function, used by the cache class to get a cache entry by its key.
- * @return @NULL if the key is not found.
+ * @return NULL if the key is not found.
  */
 typedef lv_cache_entry_t * (*lv_cache_get_cb_t)(lv_cache_t * cache, const void * key, void * user_data);
 
@@ -102,7 +102,7 @@ typedef lv_cache_entry_t * (*lv_cache_get_victim_cb)(lv_cache_t * cache, void * 
 
 /**
  * The cache reserve condition function, used by the cache class to check if a new entry can be added to the cache without exceeding its maximum size.
- * See @lv_cache_reserve_cond_res_t for the possible results.
+ * See lv_cache_reserve_cond_res_t for the possible results.
  */
 typedef lv_cache_reserve_cond_res_t (*lv_cache_reserve_cond_cb)(lv_cache_t * cache, const void * key, size_t size,
                                                                 void * user_data);
@@ -121,15 +121,16 @@ struct _lv_cache_ops_t {
  */
 struct _lv_cache_t {
     const lv_cache_class_t * clz;     /**< The cache class. There are two built-in classes:
-                                       * @lv_cache_class_lru_rb_count for LRU-based cache with count-based eviction policy.
-                                       * @lv_cache_class_lru_rb_size for LRU-based cache with size-based eviction policy. */
+                                       * - lv_cache_class_lru_rb_count for LRU-based cache with count-based eviction policy.
+                                       * - lv_cache_class_lru_rb_size for LRU-based cache with size-based eviction policy.
+                                       */
 
     uint32_t node_size;               /**< The size of a node */
 
     uint32_t max_size;                /**< The maximum size of the cache */
     uint32_t size;                    /**< The current size of the cache */
 
-    lv_cache_ops_t ops;               /**< The cache operations struct @lv_cache_ops_t */
+    lv_cache_ops_t ops;               /**< The cache operations struct lv_cache_ops_t */
 
     lv_mutex_t lock;                  /**< The cache lock used to protect the cache in multithreading environments */
 
@@ -137,9 +138,11 @@ struct _lv_cache_t {
 };
 
 /**
- * The cache class struct for building custom cache classes, and there are two built-in classes for examples:
- * @lv_cache_class_lru_rb_count for LRU-based cache with count-based eviction policy.
- * @lv_cache_class_lru_rb_size for LRU-based cache with size-based eviction policy.
+ * The cache class struct for building custom cache classes, and there are two built-in classes.
+ *
+ * - lv_cache_class_lru_rb_count for LRU-based cache with count-based eviction policy.
+ *
+ * - lv_cache_class_lru_rb_size for LRU-based cache with size-based eviction policy.
  */
 struct _lv_cache_class_t {
     lv_cache_alloc_cb_t alloc_cb;                 /**< The allocation function for cache entries */
@@ -150,7 +153,7 @@ struct _lv_cache_class_t {
     lv_cache_add_cb_t add_cb;                     /**< The add function for cache entries */
     lv_cache_remove_cb_t remove_cb;               /**< The remove function for cache entries */
     lv_cache_drop_cb_t drop_cb;                   /**< The drop function for cache entries */
-    lv_cache_drop_all_cb_t drop_all_cb;              /**< The drop all function for cache entries */
+    lv_cache_drop_all_cb_t drop_all_cb;           /**< The drop all function for cache entries */
     lv_cache_get_victim_cb get_victim_cb;         /**< The get victim function for cache entries */
     lv_cache_reserve_cond_cb reserve_cond_cb;     /**< The reserve condition function for cache entries */
 };

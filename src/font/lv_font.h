@@ -66,7 +66,7 @@ typedef struct {
     uint16_t box_h; /**< Height of the glyph's bounding box*/
     int16_t ofs_x;  /**< x offset of the bounding box*/
     int16_t ofs_y;  /**< y offset of the bounding box*/
-    lv_font_glyph_format_t format;  /**< Font format of the glyph see @lv_font_glyph_format_t*/
+    lv_font_glyph_format_t format;  /**< Font format of the glyph see lv_font_glyph_format_t*/
     uint8_t is_placeholder: 1;      /**< Glyph is missing. But placeholder will still be displayed*/
 
     union {
@@ -133,7 +133,7 @@ struct _lv_font_t {
 
 /**
  * Return with the bitmap of a font.
- * @note You must call @lv_font_get_glyph_dsc to get @g_dsc (@lv_font_glyph_dsc_t) before you can call this function.
+ * @note You must call lv_font_get_glyph_dsc() to get `g_dsc` (lv_font_glyph_dsc_t) before you can call this function.
  * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index and the format.
  * @param draw_buf      a draw buffer that can be used to store the bitmap of the glyph, it's OK not to use it.
  * @return pointer to the glyph's data. It can be a draw buffer for bitmap fonts or an image source for imgfonts.
@@ -154,7 +154,7 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out
 
 /**
  * Release the bitmap of a font.
- * @note You must call @lv_font_get_glyph_dsc to get @g_dsc (@lv_font_glyph_dsc_t) before you can call this function.
+ * @note You must call lv_font_get_glyph_dsc() to get `g_dsc` (lv_font_glyph_dsc_t) before you can call this function.
  * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index and the format.
  */
 void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc);

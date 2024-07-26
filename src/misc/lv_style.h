@@ -29,24 +29,22 @@ extern "C" {
 
 #define LV_STYLE_SENTINEL_VALUE     0xAABBCCDD
 
-/**
+/*
  * Flags for style behavior
- *
- * The rest of the flags will have _FLAG added to their name in v9.
  */
-#define LV_STYLE_PROP_FLAG_NONE                     (0)
-#define LV_STYLE_PROP_FLAG_INHERITABLE              (1 << 0)  /*Inherited*/
-#define LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE          (1 << 1)  /*Requires ext. draw size update when changed*/
-#define LV_STYLE_PROP_FLAG_LAYOUT_UPDATE            (1 << 2)  /*Requires layout update when changed*/
-#define LV_STYLE_PROP_FLAG_PARENT_LAYOUT_UPDATE     (1 << 3)  /*Requires layout update on parent when changed*/
-#define LV_STYLE_PROP_FLAG_LAYER_UPDATE             (1 << 4)  /*Affects layer handling*/
-#define LV_STYLE_PROP_FLAG_TRANSFORM                (1 << 5)  /*Affects the object's transformation*/
-#define LV_STYLE_PROP_FLAG_ALL                      (0x3F)    /*Indicating all flags*/
+#define LV_STYLE_PROP_FLAG_NONE                     (0)       /**< No special behavior */
+#define LV_STYLE_PROP_FLAG_INHERITABLE              (1 << 0)  /**< Inherited*/
+#define LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE          (1 << 1)  /**< Requires ext. draw size update when changed*/
+#define LV_STYLE_PROP_FLAG_LAYOUT_UPDATE            (1 << 2)  /**< Requires layout update when changed*/
+#define LV_STYLE_PROP_FLAG_PARENT_LAYOUT_UPDATE     (1 << 3)  /**< Requires layout update on parent when changed*/
+#define LV_STYLE_PROP_FLAG_LAYER_UPDATE             (1 << 4)  /**< Affects layer handling*/
+#define LV_STYLE_PROP_FLAG_TRANSFORM                (1 << 5)  /**< Affects the object's transformation*/
+#define LV_STYLE_PROP_FLAG_ALL                      (0x3F)    /**< Indicating all flags*/
 
 /**
  * Other constants
  */
-#define LV_SCALE_NONE            256        /*Value for not zooming the image*/
+#define LV_SCALE_NONE            256        /**< Value for not zooming the image*/
 LV_EXPORT_CONST_INT(LV_SCALE_NONE);
 
 // *INDENT-OFF*
@@ -451,7 +449,9 @@ static inline bool lv_style_is_const(const lv_style_t * style)
 /**
  * Register a new style property for custom usage
  * @return a new property ID, or LV_STYLE_PROP_INV if there are no more available.
- * @example
+ *
+ * Example:
+ * @code
  * lv_style_prop_t MY_PROP;
  * static inline void lv_style_set_my_prop(lv_style_t * style, lv_color_t value) {
  * lv_style_value_t v = {.color = value}; lv_style_set_prop(style, MY_PROP, v); }
@@ -460,6 +460,7 @@ static inline bool lv_style_is_const(const lv_style_t * style)
  * MY_PROP = lv_style_register_prop();
  * ...
  * lv_style_set_my_prop(&style1, lv_palette_main(LV_PALETTE_RED));
+ * @endcode
  */
 lv_style_prop_t lv_style_register_prop(uint8_t flag);
 
@@ -505,10 +506,13 @@ lv_style_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop,
  * @param time      duration of the transition in [ms]
  * @param delay     delay before the transition in [ms]
  * @param user_data any custom data that will be saved in the transition animation and will be available when `path_cb` is called
- * @example
+ *
+ * Example:
+ * @code
  * const static lv_style_prop_t trans_props[] = { LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR, 0 };
  *  static lv_style_transition_dsc_t trans1;
  *  lv_style_transition_dsc_init(&trans1, trans_props, NULL, 300, 0, NULL);
+ * @endcode
  */
 void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t props[],
                                   lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay, void * user_data);

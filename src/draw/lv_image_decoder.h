@@ -67,9 +67,9 @@ typedef struct _lv_image_decoder_args_t {
 
 /**
  * Get info from an image and store in the `header`
- * @param src the image source. Can be a pointer to a C array or a file name (Use
- * `lv_image_src_get_type` to determine the type)
- * @param header store the info here
+ * @param decoder  pointer to decoder object
+ * @param dsc      pointer to decoder descriptor
+ * @param header   store the info here
  * @return LV_RESULT_OK: info written correctly; LV_RESULT_INVALID: failed
  */
 typedef lv_result_t (*lv_image_decoder_info_f_t)(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
@@ -77,8 +77,8 @@ typedef lv_result_t (*lv_image_decoder_info_f_t)(lv_image_decoder_t * decoder, l
 
 /**
  * Open an image for decoding. Prepare it as it is required to read it later
- * @param decoder pointer to the decoder the function associated with
- * @param dsc pointer to decoder descriptor. `src`, `color` are already initialized in it.
+ * @param decoder  pointer to the decoder the function associated with
+ * @param dsc      pointer to decoder descriptor. `src`, `color` are already initialized in it.
  */
 typedef lv_result_t (*lv_image_decoder_open_f_t)(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 
@@ -207,13 +207,12 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
 /**
  * Open an image.
  * Try the created image decoders one by one. Once one is able to open the image that decoder is saved in `dsc`
- * @param dsc describes a decoding session. Simply a pointer to an `lv_image_decoder_dsc_t` variable.
- * @param src the image source. Can be
+ * @param dsc   describes a decoding session. Simply a pointer to an `lv_image_decoder_dsc_t` variable.
+ * @param src   the image source. Can be
  *  1) File name: E.g. "S:folder/img1.png" (The drivers needs to registered via `lv_fs_drv_register())`)
  *  2) Variable: Pointer to an `lv_image_dsc_t` variable
  *  3) Symbol: E.g. `LV_SYMBOL_OK`
- * @param color The color of the image with `LV_COLOR_FORMAT_ALPHA_...`
- * @param args args about how the image should be opened.
+ * @param args  args about how the image should be opened.
  * @return LV_RESULT_OK: opened the image. `dsc->decoded` and `dsc->header` are set.
  *         LV_RESULT_INVALID: none of the registered image decoders were able to open the image.
  */
