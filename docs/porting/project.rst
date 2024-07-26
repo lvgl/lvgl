@@ -77,12 +77,10 @@ look like this:
 Comments in the config file explain the meaning of the options. Be sure to set at least :c:macro:`LV_COLOR_DEPTH` according to
 your display's color depth. Note that, the examples and demos explicitly need to be enabled in ``lv_conf.h``.
 
-Alternatively, ``lv_conf.h`` can be copied to another place but then you should add the :c:macro:`LV_CONF_INCLUDE_SIMPLE` define
-to your compiler options (e.g. ``-DLV_CONF_INCLUDE_SIMPLE`` for GCC compiler) and set the include path manually (e.g. ``-I../include/gui``).
-In this case LVGL will attempt to include ``lv_conf.h`` simply with ``#include "lv_conf.h"``.
-
-You can even use a different name for ``lv_conf.h``. The custom path can be set via the :c:macro:`LV_CONF_PATH` define. For example
-``-DLV_CONF_PATH="/home/joe/my_project/my_custom_conf.h"``
+You can even use a different name for ``lv_conf.h``. The custom path can
+be set via the :c:macro:`LV_CONF_PATH` define. For example
+``-DLV_CONF_PATH="/home/joe/my_project/my_custom_conf.h"``. If this define
+is set :c:macro:`LV_CONF_SKIP` is assumed to be ``0``.
 
 If :c:macro:`LV_CONF_SKIP` is defined, LVGL will not try to include ``lv_conf.h``. Instead you can pass the config defines using build
 options. For example ``"-DLV_COLOR_DEPTH=32 -DLV_USE_BUTTON=1"``. The unset options will get a default value which is the same as the content
