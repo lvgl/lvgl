@@ -35,7 +35,7 @@ architectures. To build all libraries, simply invoke `make` in this directory:
 
 .. code:: shell
 
-    # cd $(LVGL_ROOT)/qnx
+    # cd $(LVGL_ROOT)/env_support/qnx
     # make
 
 If you prefer to build for a specific architecture and variant, go to the
@@ -44,15 +44,16 @@ library for ARMv8:
 
 .. code:: shell
 
-    # cd $(LVGL_ROOT)/qnx/aarch64/so.le
+    # cd $(LVGL_ROOT)/env_support/qnx/aarch64/so.le
     # make
 
 As a general rule, if you only want to have one LVGL application in your system
 then it is better to use a static library. If you have more than one, and
 especially if they run concurrently, it is better to use the shared library.
 
-Before building the library, you may wish to edit `$(LVGL_ROOT)/qnx/lv_conf.h`,
-e.g. to enable double-buffering.
+Before building the library, you may wish to edit
+`$(LVGL_ROOT)/env_support/qnx/lv_conf.h`, e.g. to add fonts or disable
+double-buffering.
 
 Writing a LVGL Application
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -84,7 +85,7 @@ The following code shows how to create a "Hello World" application:
         lv_display_t *disp = lv_qnx_window_create(800, 480);
         lv_qnx_window_set_title(disp, "LVGL Example");
 
-        /* Add a keyboard and mouse devices. */
+        /* Add keyboard and mouse devices. */
         lv_qnx_add_keyboard_device(disp);
         lv_qnx_add_pointer_device(disp);
 
