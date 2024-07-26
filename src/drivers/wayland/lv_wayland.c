@@ -28,6 +28,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
+#include <time.h>
 
 #include <sys/mman.h>
 
@@ -254,6 +255,9 @@ static bool resize_window(struct window * window, int width, int height);
 static struct graphic_object * create_graphic_obj(struct application * app, struct window * window,
                                                   enum object_type type,
                                                   struct graphic_object * parent);
+
+static uint32_t tick_get_cb(void);
+
 
 /**
  * @brief The frame callback called when the compositor has finished rendering
@@ -2213,13 +2217,6 @@ static void _lv_wayland_handle_output(void)
     }
 }
 
-static void _lv_wayland_cycle(lv_timer_t * tmr)
-{
-    LV_UNUSED(tmr);
-    _lv_wayland_handle_input();
-    _lv_wayland_handle_output();
-}
-
 static void _lv_wayland_pointer_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
     struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
@@ -2340,13 +2337,7 @@ void lv_wayland_init(void)
 
     _lv_ll_init(&application.window_ll, sizeof(struct window));
 
-#ifndef LV_WAYLAND_TIMER_HANDLER
-    application.cycle_timer = lv_timer_create(_lv_wayland_cycle, LV_WAYLAND_CYCLE_PERIOD, NULL);
-    LV_ASSERT_MSG(application.cycle_timer, "failed to create cycle timer");
-    if(!application.cycle_timer) {
-        return;
-    }
-#endif
+    lv_tick_set_cb(tick_get_cb);
 }
 
 /**
@@ -2397,6 +2388,15 @@ void lv_wayland_deinit(void)
     wl_display_disconnect(application.display);
 
     _lv_ll_clear(&application.window_ll);
+
+}
+
+static uint32_t tick_get_cb(void)
+{
+    struct timespec t;
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    uint64_t time_ms = t.tv_sec * 1000 + (t.tv_nsec / 1000000);
+    return time_ms;
 }
 
 /**
@@ -2741,17 +2741,6 @@ uint32_t lv_wayland_timer_handler(void)
                              window->frame_counter);
             }
         }
-
-        input_timer[0] = lv_indev_get_read_timer(window->lv_indev_pointer);
-        input_timer[1] = lv_indev_get_read_timer(window->lv_indev_pointeraxis);
-        input_timer[2] = lv_indev_get_read_timer(window->lv_indev_keyboard);
-        input_timer[3] = lv_indev_get_read_timer(window->lv_indev_touch);
-
-        for(i = 0; i < 4; i++) {
-            if(input_timer[i]) {
-                lv_timer_ready(input_timer[i]);
-            }
-        }
     }
 
     /* LVGL handling */
@@ -2759,7 +2748,6 @@ uint32_t lv_wayland_timer_handler(void)
 
     /* Wayland output handling */
     _lv_wayland_handle_output();
-
 
     /* Set 'errno' if a Wayland flush is outstanding (i.e. data still needs to
      * be sent to the compositor, but the compositor pipe/connection is unable

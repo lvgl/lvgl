@@ -8,7 +8,7 @@ Overview
 | The **Wayland** `driver <https://github.com/lvgl/lvgl/tree/master/src/drivers/wayland>`__ offers support for simulating the LVGL display and keyboard/mouse inputs in a desktop window.
 | It is an alternative to **X11** or **SDL2**
 
-The main purpose for this driver is for testing/debugging the LVGL application.
+The main purpose for this driver is for testing/debugging the LVGL application, it can also be used to run applications in 'kiosk mode'
 
 Dependencies
 ------------
@@ -105,89 +105,19 @@ To programmatically maximize the window,
 use the ``lv_wayland_window_set_maximized()`` function respectively with ``true``
 or ``false`` for the ``maximized`` argument.
 
-tick-less mode
-^^^^^^^^^^^^^^
 
-The 'tick-less' mode can be used to increment LVGL's timer without calling ``lv_tick_inc`` somewhere in the run loop.
-Instead, the timer is incremented by the amount returned by the following function
-
-.. code:: c
-
-  uint32_t custom_tick_get(void)
-  {
-      static uint64_t start_ms = 0;
-      if(start_ms == 0) {
-          struct timeval tv_start;
-          gettimeofday(&tv_start, NULL);
-          start_ms = (tv_start.tv_sec * 1000000 + tv_start.tv_usec) / 1000;
-      }
-  
-      struct timeval tv_now;
-      gettimeofday(&tv_now, NULL);
-      uint64_t now_ms;
-      now_ms = (tv_now.tv_sec * 1000000 + tv_now.tv_usec) / 1000;
-  
-      uint32_t time_ms = now_ms - start_ms;
-      return time_ms;
-  }
-
-
-To enable tick-less mode,
-
-#. In ``lv_conf.h`` set ``LV_TICK_CUSTOM 1``
-#. Supply the header name where the function is declared via the ``LV_TICK_CUSTOM_INCLUDE`` definition.
-#. Set the name of the function in the  ``LV_TICK_CUSTOM_SYS_TIME_EXPR`` definition
-
-
-**Note:** The tick-less mode is currently only possible in LVGL v8
-
-Event-driven timer handler
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Custom timer handler
+^^^^^^^^^^^^^^^^^^^^
 
 Always call ``lv_wayland_timer_handler()`` in your timer loop instead of the regular ``lv_timer_handler()``.
 
 **Note:** ``lv_wayland_timer_handler()`` internally calls ``lv_timer_handler()``
 
-This allows the application to sleep/wait until the next timer/event is ready, it wakes up
-if a wayland message arrives on the socket or when the next display refresh is due
+This allows the wayland client to work on well on weston, resizing shared memory buffers during
+a commit does not work well on weston.
 
-Sample program using tick-less mode:
-
-.. code:: c
-
-  /* [After initialization and display creation] */
-  #include <limits.h>
-  #include <errno.h>
-  #include <poll.h>
-  
-  struct pollfd pfd;
-  uint32_t time_till_next;
-  int sleep;
-  
-  pfd.fd = lv_wayland_get_fd();
-  pfd.events = POLLIN;
-  
-  while (1) {
-  /* Handle any Wayland/LVGL timers/events */
-  time_till_next = lv_wayland_timer_handler();
-  
-  /* Run until the last window closes */
-  if (!lv_wayland_window_is_open(NULL)) {
-      break;
-  }
-  
-  /* Wait for something interesting to happen */
-  if (time_till_next == LV_NO_TIMER_READY) {
-      sleep = -1;
-  } else if (time_till_next > INT_MAX) {
-      sleep = INT_MAX;
-  } else {
-     sleep = time_till_next;
-  }
-  
-  while ((poll(&pfd, 1, sleep) < 0) && (errno == EINTR));
-  }
-
+Wrapping the call to ``lv_timer_hander()`` is a necessity to have more control over
+when the LVGL flush callback is called.
 
 Building the wayland driver
 ---------------------------
@@ -215,6 +145,16 @@ To generate the required files run the following commands:
 The resulting files can then be integrated into the project, it's better to re-run ``wayland-scanner`` on
 each build to ensure that the correct versions are generated, they must match the version of the ``wayland-client``
 dynamically linked library installed on the system.
+
+Changes since version 8
+-----------------------
+
+* Technically, the wayland driver allows to create multiple windows - but this feature wasn't tested in a while.
+* The event-driven timer got removed for now, it will be re-introduced and documented later on, it will allow
+  the application to sleep while it's hidden behind a window.
+* Eventually add enhanced support for XDG shell to allow the creation of desktop apps on Unix-like platforms,
+  similar to what the win32 driver does.
+
 
 Bug reports
 -----------
