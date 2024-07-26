@@ -1,10 +1,10 @@
 /**
- * @file lv_hal_tick.h
+ * @file lv_tick.h
  * Provide access to the system tick with 1 millisecond resolution
  */
 
-#ifndef LV_HAL_TICK_H
-#define LV_HAL_TICK_H
+#ifndef LV_TICK_H
+#define LV_TICK_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -89,4 +89,4 @@ void lv_delay_set_cb(lv_delay_cb_t cb);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_HAL_TICK_H*/
+#endif /*LV_TICK_H*/

@@ -1,10 +1,10 @@
 /**
- * @file lv_animimg.h
+ * @file lv_animimage.h
  *
  */
 
-#ifndef LV_ANIM_IMAGE_H
-#define LV_ANIM_IMAGE_H
+#ifndef LV_ANIMIMAGE_H
+#define LV_ANIMIMAGE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -133,4 +133,4 @@ uint32_t lv_animimg_get_repeat_count(lv_obj_t * img);
 } /* extern "C" */
 #endif
 
-#endif /*LV_ANIM_IMAGE_H*/
+#endif /*LV_ANIMIMAGE_H*/
