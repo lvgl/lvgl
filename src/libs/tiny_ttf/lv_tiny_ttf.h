@@ -31,7 +31,7 @@ extern "C" {
 
 #if LV_TINY_TTF_FILE_SUPPORT != 0
 /**
- * create a font from the specified file or path with the specified line height.
+ * Create ....
  * @param path        the path or file name of the font
  * @param font_size   the font size in pixel
  * @return a font object
