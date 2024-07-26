@@ -973,8 +973,12 @@ static void update_resolution(lv_display_t * disp)
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
     int32_t ver_res = lv_display_get_vertical_resolution(disp);
 
+    /* assume the sys layer must be existing and save as the previous coordinates*/
+    if(disp->sys_layer == NULL) return;
+
     lv_area_t prev_coords;
     lv_obj_get_coords(disp->sys_layer, &prev_coords);
+
     uint32_t i;
     for(i = 0; i < disp->screen_cnt; i++) {
         lv_area_set_width(&disp->screens[i]->coords, hor_res);
@@ -982,17 +986,23 @@ static void update_resolution(lv_display_t * disp)
         lv_obj_send_event(disp->screens[i], LV_EVENT_SIZE_CHANGED, &prev_coords);
     }
 
-    lv_area_set_width(&disp->top_layer->coords, hor_res);
-    lv_area_set_height(&disp->top_layer->coords, ver_res);
-    lv_obj_send_event(disp->top_layer, LV_EVENT_SIZE_CHANGED, &prev_coords);
+    if(disp->top_layer) {
+        lv_area_set_width(&disp->top_layer->coords, hor_res);
+        lv_area_set_height(&disp->top_layer->coords, ver_res);
+        lv_obj_send_event(disp->top_layer, LV_EVENT_SIZE_CHANGED, &prev_coords);
+    }
 
-    lv_area_set_width(&disp->sys_layer->coords, hor_res);
-    lv_area_set_height(&disp->sys_layer->coords, ver_res);
-    lv_obj_send_event(disp->sys_layer, LV_EVENT_SIZE_CHANGED, &prev_coords);
+    if(disp->sys_layer) {
+        lv_area_set_width(&disp->sys_layer->coords, hor_res);
+        lv_area_set_height(&disp->sys_layer->coords, ver_res);
+        lv_obj_send_event(disp->sys_layer, LV_EVENT_SIZE_CHANGED, &prev_coords);
+    }
 
-    lv_area_set_width(&disp->bottom_layer->coords, hor_res);
-    lv_area_set_height(&disp->bottom_layer->coords, ver_res);
-    lv_obj_send_event(disp->bottom_layer, LV_EVENT_SIZE_CHANGED, &prev_coords);
+    if(disp->bottom_layer) {
+        lv_area_set_width(&disp->bottom_layer->coords, hor_res);
+        lv_area_set_height(&disp->bottom_layer->coords, ver_res);
+        lv_obj_send_event(disp->bottom_layer, LV_EVENT_SIZE_CHANGED, &prev_coords);
+    }
 
     lv_memzero(disp->inv_areas, sizeof(disp->inv_areas));
     lv_memzero(disp->inv_area_joined, sizeof(disp->inv_area_joined));
