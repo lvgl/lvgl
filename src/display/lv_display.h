@@ -1,5 +1,5 @@
 /**
- * @file lv_disp.h
+ * @file lv_display.h
  *
  */
 
