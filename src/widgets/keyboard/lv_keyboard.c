@@ -37,6 +37,30 @@ static void lv_keyboard_update_ctrl_map(lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t properties[] = {
+    {
+        .id = LV_PROPERTY_KEYBOARD_TEXTAREA,
+        .setter = lv_keyboard_set_textarea,
+        .getter = lv_keyboard_get_textarea,
+    },
+    {
+        .id = LV_PROPERTY_KEYBOARD_MODE,
+        .setter = lv_keyboard_set_mode,
+        .getter = lv_keyboard_get_mode,
+    },
+    {
+        .id = LV_PROPERTY_KEYBOARD_POPOVERS,
+        .setter = lv_keyboard_set_popovers,
+        .getter = lv_keyboard_get_popovers,
+    },
+    {
+        .id = LV_PROPERTY_KEYBOARD_SELECTED_BUTTON,
+        .setter = lv_buttonmatrix_set_selected_button,
+        .getter = lv_keyboard_get_selected_button,
+    },
+};
+#endif
 
 const lv_obj_class_t lv_keyboard_class = {
     .constructor_cb = lv_keyboard_constructor,
@@ -46,6 +70,18 @@ const lv_obj_class_t lv_keyboard_class = {
     .editable = 1,
     .base_class = &lv_buttonmatrix_class,
     .name = "keyboard",
+#if LV_USE_OBJ_PROPERTY
+    .prop_index_start = LV_PROPERTY_KEYBOARD_START,
+    .prop_index_end = LV_PROPERTY_KEYBOARD_END,
+    .properties = properties,
+    .properties_count = sizeof(properties) / sizeof(properties[0]),
+
+#if LV_USE_OBJ_PROPERTY_NAME
+    .property_names = lv_keyboard_property_names,
+    .names_count = sizeof(lv_keyboard_property_names) / sizeof(lv_property_name_t),
+#endif
+
+#endif
 };
 
 static const char * const default_kb_map_lc[] = {"1#", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", LV_SYMBOL_BACKSPACE, "\n",
@@ -260,7 +296,7 @@ lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * obj)
     return keyboard->mode;
 }
 
-bool lv_buttonmatrix_get_popovers(const lv_obj_t * obj)
+bool lv_keyboard_get_popovers(const lv_obj_t * obj)
 {
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     return keyboard->popovers;
