@@ -15,6 +15,8 @@
 #ifndef LV_WAYLAND_H
 #define LV_WAYLAND_H
 
+#ifndef _WIN32
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -147,4 +149,5 @@ bool lv_wayland_timer_handler(void);
 } /* extern "C" */
 #endif
 
+#endif /* _WIN32 */
 #endif /* WAYLAND_H */

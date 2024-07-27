@@ -24,6 +24,7 @@ test_screenshot_error.h
 build/
 tests/build_*/
 tests/report/
+tests/wayland_protocols/
 .DS_Store
 .vscode
 .idea

@@ -5,6 +5,8 @@
 #ifndef LV_WAYLAND_SMM_H
 #define LV_WAYLAND_SMM_H
 
+#ifndef _WIN32
+
 #include "../../display/lv_display.h"
 #include LV_STDDEF_INCLUDE
 #include LV_STDBOOL_INCLUDE
@@ -69,5 +71,5 @@ smm_buffer_t * smm_latest(smm_group_t * grp);
 smm_buffer_t * smm_next(smm_buffer_t * buf);
 
 #endif /* LV_USE_WAYLAND */
-
+#endif /* _WIN32 */
 #endif /* LV_WAYLAND_SMM_H */

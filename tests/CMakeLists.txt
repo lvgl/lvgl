@@ -266,6 +266,7 @@ endif()
 set(TEST_INCLUDE_DIRS
     $<BUILD_INTERFACE:${LVGL_TEST_DIR}/src>
     $<BUILD_INTERFACE:${LVGL_TEST_DIR}/unity>
+    $<BUILD_INTERFACE:${LVGL_TEST_DIR}/wayland_protocols>
     $<BUILD_INTERFACE:${LVGL_TEST_DIR}>
 )
 
@@ -309,6 +310,7 @@ add_library(test_common
         src/test_assets/test_lottie_approve.c
         unity/unity_support.c
         unity/unity.c
+        wayland_protocols/wayland_xdg_shell.c
         ${TEST_IMAGES_SRC}
 )
 target_include_directories(test_common PUBLIC ${TEST_INCLUDE_DIRS})

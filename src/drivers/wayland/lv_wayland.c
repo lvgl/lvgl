@@ -11,6 +11,8 @@
  *
  ******************************************************************/
 
+#ifndef _WIN32
+
 /*********************
  *      INCLUDES
  *********************/
@@ -41,7 +43,7 @@
 
 
 #if !LV_WAYLAND_WL_SHELL
-    #include "protocols/wayland-xdg-shell-client-protocol.h"
+    #include "wayland_xdg_shell.h"
     #define LV_WAYLAND_XDG_SHELL 1
 #else
     #define LV_WAYLAND_XDG_SHELL 0
@@ -2773,4 +2775,6 @@ bool lv_wayland_timer_handler(void)
 
     return true;
 }
-#endif // LV_USE_WAYLAND
+
+#endif /* LV_USE_WAYLAND */
+#endif /* _WIN32 */

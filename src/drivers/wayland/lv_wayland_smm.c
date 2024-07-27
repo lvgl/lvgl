@@ -3,8 +3,9 @@
  *
  */
 
-#include "lv_wayland_smm.h"
+#ifndef _WIN32
 
+#include "lv_wayland_smm.h"
 #include "../../display/lv_display.h"
 
 #if LV_USE_WAYLAND
@@ -667,3 +668,4 @@ void free_buffer(struct smm_buffer * buf)
 }
 
 #endif /* LV_USE_WAYLAND */
+#endif /* _WIN32 */
