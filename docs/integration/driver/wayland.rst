@@ -119,6 +119,10 @@ a commit does not work well on weston.
 Wrapping the call to ``lv_timer_hander()`` is a necessity to have more control over
 when the LVGL flush callback is called.
 
+The custom timer handler returns ``false`` if the frame from previous cycle is not rendered.
+When this happens, it usually means that the application is minimized or hidden behind another window.
+Causing the driver to wait until the arrival of any message on the wayland socket, the process is in interruptible sleep.
+
 Building the wayland driver
 ---------------------------
 
@@ -146,14 +150,16 @@ The resulting files can then be integrated into the project, it's better to re-r
 each build to ensure that the correct versions are generated, they must match the version of the ``wayland-client``
 dynamically linked library installed on the system.
 
-Changes since version 8
------------------------
 
-* Technically, the wayland driver allows to create multiple windows - but this feature wasn't tested in a while.
-* The event-driven timer got removed for now, it will be re-introduced and documented later on, it will allow
-  the application to sleep while it's hidden behind a window.
+Current state and objectives
+----------------------------
+
+* Add direct rendering mode
+* Refactor the shell integrations to avoid excessive conditional compilation
+* Technically, the wayland driver allows to create multiple windows - but this feature is experimental.
 * Eventually add enhanced support for XDG shell to allow the creation of desktop apps on Unix-like platforms,
   similar to what the win32 driver does.
+* Add a support for Mesa, currently wl_shm is used and it's not the most effective technique.
 
 
 Bug reports

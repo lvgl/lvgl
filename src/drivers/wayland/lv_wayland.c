@@ -29,15 +29,14 @@
 #include <errno.h>
 #include <string.h>
 #include <time.h>
-
+#include <poll.h>
 #include <sys/mman.h>
-
 #include <linux/input.h>
 #include <linux/input-event-codes.h>
-
 #include <wayland-client.h>
 #include <wayland-cursor.h>
 #include <xkbcommon/xkbcommon.h>
+
 #include "lvgl.h"
 
 
@@ -187,6 +186,7 @@ struct application {
     lv_timer_t * cycle_timer;
 
     bool cursor_flush_pending;
+    struct pollfd wayland_pfd;
 };
 
 struct window {
@@ -2338,6 +2338,11 @@ void lv_wayland_init(void)
     _lv_ll_init(&application.window_ll, sizeof(struct window));
 
     lv_tick_set_cb(tick_get_cb);
+
+    /* Used to wait for events when the window is minimized or hidden */
+    application.wayland_pfd.fd = wl_display_get_fd(application.display);
+    application.wayland_pfd.events = POLLIN;
+
 }
 
 /**
@@ -2700,9 +2705,8 @@ lv_indev_t * lv_wayland_get_touchscreen(lv_display_t * disp)
 
 /**
  * Wayland specific timer handler (use in place of LVGL lv_timer_handler)
- * @return time until next timer expiry in milliseconds
  */
-uint32_t lv_wayland_timer_handler(void)
+bool lv_wayland_timer_handler(void)
 {
     int i;
     struct window * window;
@@ -2718,8 +2722,15 @@ uint32_t lv_wayland_timer_handler(void)
 
         if(window != NULL && window->frame_done == false
            && window->frame_counter > 0) {
-            LV_LOG_TRACE("LVGL is going too fast or window is hidden");
-            return LV_DEF_REFR_PERIOD;
+            /* The last frame was not rendered */
+            LV_LOG_TRACE("The window is hidden or minimized");
+
+            /* Simply blocks until a frame done message arrives */
+            poll(&application.wayland_pfd, 1, -1);
+
+            /* Resume lvgl on the next cycle */
+            return false;
+
         }
         else if(window != NULL && window->body->surface_configured == false) {
             /* Initial commit to trigger the configure event */
@@ -2760,6 +2771,6 @@ uint32_t lv_wayland_timer_handler(void)
         }
     }
 
-    return time_till_next;
+    return true;
 }
 #endif // LV_USE_WAYLAND

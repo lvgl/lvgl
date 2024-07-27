@@ -132,9 +132,10 @@ lv_indev_t * lv_wayland_get_touchscreen(lv_display_t * disp);
  * @brief Wrapper around lv_timer_handler
  * @note Must be called in the application run loop instead of the
  * regular lv_timer_handler provided by LVGL
- * @return time until next timer expiry in milliseconds
+ * @return true: if the cycle was completed, false if the application
+ * went to sleep because the last frame wasn't completed
  */
-uint32_t lv_wayland_timer_handler(void);
+bool lv_wayland_timer_handler(void);
 
 /**********************
  *      MACROS
