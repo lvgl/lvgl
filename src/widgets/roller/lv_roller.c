@@ -55,6 +55,26 @@ static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect);
 /**********************
  *  STATIC VARIABLES
  **********************/
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t properties[] = {
+    {
+        .id = LV_PROPERTY_ROLLER_OPTIONS,
+        .setter = NULL,
+        .getter = lv_roller_get_options,
+    },
+    {
+        .id = LV_PROPERTY_ROLLER_SELECTED,
+        .setter = NULL,
+        .getter = lv_roller_get_selected,
+    },
+    {
+        .id = LV_PROPERTY_ROLLER_VISIBLE_ROW_COUNT,
+        .setter = lv_roller_set_visible_row_count,
+        .getter = NULL,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_roller_class = {
     .constructor_cb = lv_roller_constructor,
     .event_cb = lv_roller_event,
@@ -65,6 +85,17 @@ const lv_obj_class_t lv_roller_class = {
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .base_class = &lv_obj_class,
     .name = "roller",
+#if LV_USE_OBJ_PROPERTY
+    .prop_index_start = LV_PROPERTY_ROLLER_START,
+    .prop_index_end = LV_PROPERTY_ROLLER_END,
+    .properties = properties,
+    .properties_count = sizeof(properties) / sizeof(properties[0]),
+
+#if LV_USE_OBJ_PROPERTY_NAME
+    .property_names = lv_roller_property_names,
+    .names_count = sizeof(lv_roller_property_names) / sizeof(lv_property_name_t),
+#endif
+#endif
 };
 
 const lv_obj_class_t lv_roller_label_class  = {
@@ -147,7 +178,6 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
 
     /*If the selected text has larger font the label needs some extra draw padding to draw it.*/
     lv_obj_refresh_ext_draw_size(label);
-
 }
 
 void lv_roller_set_selected(lv_obj_t * obj, uint32_t sel_opt, lv_anim_enable_t anim)
