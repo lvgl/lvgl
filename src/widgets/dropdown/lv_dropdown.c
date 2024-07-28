@@ -62,6 +62,55 @@ static lv_obj_t * get_label(const lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t properties[] = {
+    {
+        .id = LV_PROPERTY_DROPDOWN_TEXT,
+        .setter = lv_dropdown_set_text,
+        .getter = lv_dropdown_get_text,
+    },
+    {
+        .id = LV_PROPERTY_DROPDOWN_OPTIONS,
+        .setter = lv_dropdown_set_options,
+        .getter = lv_dropdown_get_options,
+    },
+    {
+        .id = LV_PROPERTY_DROPDOWN_OPTION_COUNT,
+        .setter = NULL,
+        .getter = lv_dropdown_get_option_count,
+    },
+    {
+        .id = LV_PROPERTY_DROPDOWN_SELECTED,
+        .setter = lv_dropdown_set_selected,
+        .getter = lv_dropdown_get_selected,
+    },
+    {
+        .id = LV_PROPERTY_DROPDOWN_DIR,
+        .setter = lv_dropdown_set_dir,
+        .getter = lv_dropdown_get_dir,
+    },
+    {
+        .id = LV_PROPERTY_DROPDOWN_SYMBOL,
+        .setter = lv_dropdown_set_symbol,
+        .getter = lv_dropdown_get_symbol,
+    },
+    {
+        .id = LV_PROPERTY_DROPDOWN_SELECTED_HIGHLIGHT,
+        .setter = lv_dropdown_set_selected_highlight,
+        .getter = lv_dropdown_get_selected_highlight,
+    },
+    {
+        .id = LV_PROPERTY_DROPDOWN_LIST,
+        .setter = NULL,
+        .getter = lv_dropdown_get_list,
+    },
+    {
+        .id = LV_PROPERTY_DROPDOWN_IS_OPEN,
+        .setter = NULL,
+        .getter = lv_dropdown_is_open,
+    },
+};
+#endif
 
 const lv_obj_class_t lv_dropdown_class = {
     .constructor_cb = lv_dropdown_constructor,
@@ -74,6 +123,17 @@ const lv_obj_class_t lv_dropdown_class = {
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .base_class = &lv_obj_class,
     .name = "dropdown",
+#if LV_USE_OBJ_PROPERTY
+    .prop_index_start = LV_PROPERTY_DROPDOWN_START,
+    .prop_index_end = LV_PROPERTY_DROPDOWN_END,
+    .properties = properties,
+    .properties_count = sizeof(properties) / sizeof(properties[0]),
+
+#if LV_USE_OBJ_PROPERTY_NAME
+    .property_names = lv_dropdown_property_names,
+    .names_count = sizeof(lv_dropdown_property_names) / sizeof(lv_property_name_t),
+#endif
+#endif
 };
 
 const lv_obj_class_t lv_dropdownlist_class = {
