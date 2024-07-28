@@ -214,6 +214,14 @@ bool lv_group_get_wrap(lv_group_t * group);
 uint32_t lv_group_get_obj_count(lv_group_t * group);
 
 /**
+ * Get the nth object within a group
+ * @param group         pointer to a group
+ * @param index         index of object within the group
+ * @return              pointer to the object
+ */
+lv_obj_t * lv_group_get_obj_by_index(lv_group_t * group, uint32_t index);
+
+/**
  * Get the number of groups
  * @return              number of groups
  */
@@ -221,6 +229,7 @@ uint32_t lv_group_get_count(void);
 
 /**
  * Get a group by its index
+ * @param index         index of the group
  * @return              pointer to the group
  */
 lv_group_t  * lv_group_by_index(uint32_t index);
