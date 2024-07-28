@@ -1,5 +1,5 @@
 /**
- * @file Lv_sdl_mouse.h
+ * @file lv_sdl_mouse.h
  *
  */
 

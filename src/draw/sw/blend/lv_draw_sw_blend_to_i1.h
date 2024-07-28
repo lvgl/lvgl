@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_sw_blend_i1.h
+ * @file lv_draw_sw_blend_to_i1.h
  *
  */
 

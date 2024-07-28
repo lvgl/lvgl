@@ -1,10 +1,10 @@
 /**
- * @file lv_linux_fb_dev_h
+ * @file lv_linux_fbdev.h
  *
  */
 
-#ifndef LV_LINUX_FB_DEV_H
-#define LV_LINUX_FB_DEV_H
+#ifndef LV_LINUX_FBDEV_H
+#define LV_LINUX_FBDEV_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,4 +49,4 @@ void lv_linux_fbdev_set_force_refresh(lv_display_t * disp, bool enabled);
 } /* extern "C" */
 #endif
 
-#endif /* LV_LINUX_FB_DEV_H */
+#endif /* LV_LINUX_FBDEV_H */

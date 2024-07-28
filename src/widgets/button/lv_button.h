@@ -1,5 +1,5 @@
 /**
- * @file lv_btn.h
+ * @file lv_button.h
  *
  */
 

@@ -1,5 +1,5 @@
 /**
- * @file lv_mbox.h
+ * @file lv_msgbox.h
  *
  */
 
@@ -80,7 +80,7 @@ lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon);
 /**
  * Add a text to the content area of message box. Multiply texts will be created below each other.
  * @param obj           pointer to a message box
- * @param icon          the icon of the button
+ * @param text          text to add
  * @return              the created button
  */
 lv_obj_t * lv_msgbox_add_text(lv_obj_t * obj, const char * text);
@@ -130,13 +130,13 @@ lv_obj_t * lv_msgbox_get_title(lv_obj_t * obj);
 
 /**
  * Close a message box
- * @param obj           pointer to a message box
+ * @param mbox           pointer to a message box
  */
 void lv_msgbox_close(lv_obj_t * mbox);
 
 /**
  * Close a message box in the next call of the message box
- * @param obj           pointer to a message box
+ * @param mbox           pointer to a message box
  */
 void lv_msgbox_close_async(lv_obj_t * mbox);
 

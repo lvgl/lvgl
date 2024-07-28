@@ -1,5 +1,5 @@
 /**
- * @file lv_qrcode
+ * @file lv_qrcode.h
  *
  */
 
