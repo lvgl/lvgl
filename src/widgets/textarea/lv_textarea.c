@@ -67,6 +67,86 @@ static inline bool is_valid_but_non_printable_char(const uint32_t letter);
 /**********************
  *  STATIC VARIABLES
  **********************/
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t properties[] = {
+    {
+        .id = LV_PROPERTY_TEXTAREA_TEXT,
+        .setter = lv_textarea_set_text,
+        .getter = lv_textarea_get_text,
+    },
+    {
+        .id = LV_PROPERTY_TEXTAREA_PLACEHOLDER_TEXT,
+        .setter = lv_textarea_set_placeholder_text,
+        .getter = lv_textarea_get_placeholder_text,
+    },
+    {
+        .id = LV_PROPERTY_TEXTAREA_CURSOR_POS,
+        .setter = lv_textarea_set_cursor_pos,
+        .getter = lv_textarea_get_cursor_pos,
+    },
+    {
+        .id = LV_PROPERTY_TEXTAREA_CURSOR_CLICK_POS,
+        .setter = lv_textarea_set_cursor_click_pos,
+        .getter = lv_textarea_get_cursor_click_pos,
+    },
+    {
+        .id = LV_PROPERTY_TEXTAREA_PASSWORD_MODE,
+        .setter = lv_textarea_set_password_mode,
+        .getter = lv_textarea_get_password_mode,
+    },
+    {
+        .id = LV_PROPERTY_TEXTAREA_PASSWORD_BULLET,
+        .setter = lv_textarea_set_password_bullet,
+        .getter = lv_textarea_get_password_bullet,
+    },
+    {
+        .id = LV_PROPERTY_TEXTAREA_ONE_LINE,
+        .setter = lv_textarea_set_one_line,
+        .getter = lv_textarea_get_one_line,
+    },
+    {
+        .id = LV_PROPERTY_TEXTAREA_ACCEPTED_CHARS,
+        .setter = lv_textarea_set_accepted_chars,
+        .getter = lv_textarea_get_accepted_chars,
+    },
+    {
+        .id = LV_PROPERTY_TEXTAREA_MAX_LENGTH,
+        .setter = lv_textarea_set_max_length,
+        .getter = lv_textarea_get_max_length,
+    },
+    {
+        .id = LV_PROPERTY_TEXTAREA_INSERT_REPLACE,
+        .setter = lv_textarea_set_insert_replace,
+        .getter = NULL,
+    },
+    {
+        .id = LV_PROPERTY_TEXTAREA_TEXT_SELECTION,
+        .setter = lv_textarea_set_text_selection,
+        .getter = lv_textarea_get_text_selection,
+    },
+    {
+        .id = LV_PROPERTY_TEXTAREA_PASSWORD_SHOW_TIME,
+        .setter = lv_textarea_set_password_show_time,
+        .getter = lv_textarea_get_password_show_time,
+    },
+    {
+        .id = LV_PROPERTY_TEXTAREA_LABEL,
+        .setter = NULL,
+        .getter = lv_textarea_get_label,
+    },
+    {
+        .id = LV_PROPERTY_TEXTAREA_TEXT_IS_SELECTED,
+        .setter = NULL,
+        .getter = lv_textarea_text_is_selected,
+    },
+    {
+        .id = LV_PROPERTY_TEXTAREA_CURRENT_CHAR,
+        .setter = NULL,
+        .getter = lv_textarea_get_current_char,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_textarea_class = {
     .constructor_cb = lv_textarea_constructor,
     .destructor_cb = lv_textarea_destructor,
@@ -78,6 +158,18 @@ const lv_obj_class_t lv_textarea_class = {
     .instance_size = sizeof(lv_textarea_t),
     .base_class = &lv_obj_class,
     .name = "textarea",
+#if LV_USE_OBJ_PROPERTY
+    .prop_index_start = LV_PROPERTY_TEXTAREA_START,
+    .prop_index_end = LV_PROPERTY_TEXTAREA_END,
+    .properties = properties,
+    .properties_count = sizeof(properties) / sizeof(properties[0]),
+
+#if LV_USE_OBJ_PROPERTY_NAME
+    .property_names = lv_textarea_property_names,
+    .names_count = sizeof(lv_textarea_property_names) / sizeof(lv_property_name_t),
+#endif
+
+#endif
 };
 
 static const char * ta_insert_replace;
