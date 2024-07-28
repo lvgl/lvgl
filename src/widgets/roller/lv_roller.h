@@ -38,6 +38,15 @@ typedef enum {
     LV_ROLLER_MODE_INFINITE, /**< Infinite mode (roller can be scrolled forever).*/
 } lv_roller_mode_t;
 
+#if LV_USE_OBJ_PROPERTY
+enum {
+    LV_PROPERTY_ID(ROLLER, OPTIONS,             LV_PROPERTY_TYPE_TEXT,   0),
+    LV_PROPERTY_ID(ROLLER, SELECTED,            LV_PROPERTY_TYPE_INT,    1),
+    LV_PROPERTY_ID(ROLLER, VISIBLE_ROW_COUNT,   LV_PROPERTY_TYPE_INT,    2),
+    LV_PROPERTY_ROLLER_END,
+};
+#endif
+
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_roller_class;
 
 /**********************
