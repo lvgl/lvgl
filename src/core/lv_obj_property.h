@@ -67,6 +67,7 @@ enum {
     LV_PROPERTY_KEYBOARD_START  = 0x0400, /* lv_keyboard.c */
     LV_PROPERTY_TEXTAREA_START  = 0x0500, /* lv_textarea.c */
     LV_PROPERTY_ROLLER_START    = 0x0600, /* lv_roller.c */
+    LV_PROPERTY_DROPDOWN_START  = 0x0700, /* lv_dropdown.c */
 
     /*Special ID, use it to extend ID and make sure it's unique and compile time determinant*/
     LV_PROPERTY_ID_BUILTIN_LAST = 0xffff, /*ID of 0x10000 ~ 0xfffffff is reserved for user*/
