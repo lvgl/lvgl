@@ -1,5 +1,5 @@
 /**
- * @file    lv_qnx_window.h
+ * @file    lv_qnx.h
  * @brief   LVGL driver for the QNX Screen compositing window manager
  */
 
