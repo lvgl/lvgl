@@ -54,6 +54,7 @@ os.chdir(base_path)
 clean = 0
 trans = 0
 skip_latex = False
+skip_doxy = False
 develop = False
 args = sys.argv[1:]
 
@@ -61,6 +62,9 @@ if len(args) >= 1:
     if "clean" in args:
         clean = 1
     if "skip_latex" in args:
+        skip_latex = True
+    if "html_only" in args:
+        skip_doxy = True
         skip_latex = True
     if 'develop' in args:
         develop = True
@@ -140,38 +144,42 @@ ex.exec(temp_directory)
 print("Add translation")
 add_translation.exec(temp_directory)
 
-print("Running doxygen")
-cmd('cd "{temp_directory}" && doxygen Doxyfile'.format(temp_directory=temp_directory))
 
-print('Reading Doxygen output')
+if skip_doxy:
+    print("skipping doxygen build as requested")
+else:
+    print("Running doxygen")
+    cmd('cd "{temp_directory}" && doxygen Doxyfile'.format(temp_directory=temp_directory))
 
-doc_builder.run(
-    project_path,
-    temp_directory,
-    os.path.join(temp_directory, 'layouts'),
-    os.path.join(temp_directory, 'libs'),
-    os.path.join(temp_directory, 'others'),
-    os.path.join(temp_directory, 'overview'),
-    os.path.join(temp_directory, 'overview', 'renderers'),
-    os.path.join(temp_directory, 'porting'),
-    os.path.join(temp_directory, 'widgets')
-)
+    print('Reading Doxygen output')
 
-# we make sure to remove the link to the PDF before the PDF get generated
-# doesn't make any sense to have a link to the PDF in the PDF. The link gets
-# added if there is a PDF build so the HTML build will have the link.
-index_path = os.path.join(temp_directory, 'index.rst')
-
-with open(index_path, 'rb') as f:
-    index_data = f.read().decode('utf-8')
-
-if 'PDF version: :download:`LVGL.pdf <LVGL.pdf>`' in index_data:
-    index_data = index_data.replace(
-        'PDF version: :download:`LVGL.pdf <LVGL.pdf>`\n',
-        ''
+    doc_builder.run(
+        project_path,
+        temp_directory,
+        os.path.join(temp_directory, 'layouts'),
+        os.path.join(temp_directory, 'libs'),
+        os.path.join(temp_directory, 'others'),
+        os.path.join(temp_directory, 'overview'),
+        os.path.join(temp_directory, 'overview', 'renderers'),
+        os.path.join(temp_directory, 'porting'),
+        os.path.join(temp_directory, 'widgets')
     )
-    with open(index_path, 'wb') as f:
-        f.write(index_data.encode('utf-8'))
+
+    # we make sure to remove the link to the PDF before the PDF get generated
+    # doesn't make any sense to have a link to the PDF in the PDF. The link gets
+    # added if there is a PDF build so the HTML build will have the link.
+    index_path = os.path.join(temp_directory, 'index.rst')
+
+    with open(index_path, 'rb') as f:
+        index_data = f.read().decode('utf-8')
+
+    if 'PDF version: :download:`LVGL.pdf <LVGL.pdf>`' in index_data:
+        index_data = index_data.replace(
+            'PDF version: :download:`LVGL.pdf <LVGL.pdf>`\n',
+            ''
+        )
+        with open(index_path, 'wb') as f:
+            f.write(index_data.encode('utf-8'))
 
 # BUILD PDF
 if skip_latex:

@@ -1,0 +1,36 @@
+name: Check docs
+# Check Sphinx docs for "known" syntax errors
+# 
+# "known" = Sphinx marks the HTML output of (some ?) badly formatted markup lagrange with an extra class
+# with this, we able to detect common mistakes
+# stands as temporary solution until the docs generation is cleaned up 
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify-docs:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Install requirements
+        run: pip install -r docs/requirements.txt
+
+      - name: Build docs
+        run: docs/build.py html_only
+
+      - name: Check problematic sections
+        run: |
+          ! grep -Rl 'class="problematic"' out_html || (echo "Please fix syntax errors in listed docs pages"; false)
