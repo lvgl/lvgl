@@ -414,6 +414,34 @@ static void execute_drawing(lv_draw_sdl_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
 
+    if(t->type == LV_DRAW_TASK_TYPE_FILL) {
+        lv_draw_fill_dsc_t * fill_dsc = t->draw_dsc;
+        if(fill_dsc->radius == 0 && fill_dsc->grad.dir == LV_GRAD_DIR_NONE) {
+            SDL_Rect rect;
+            lv_layer_t * layer = u->base_unit.target_layer;
+            rect.x = t->area.x1 - layer->buf_area.x1;
+            rect.y = t->area.y1 - layer->buf_area.y1;
+            rect.w = lv_area_get_width(&t->area);
+            rect.h = lv_area_get_height(&t->area);
+
+            lv_display_t * disp = _lv_refr_get_disp_refreshing();
+            SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
+            SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+            SDL_SetRenderDrawColor(renderer, fill_dsc->color.red, fill_dsc->color.green, fill_dsc->color.blue, fill_dsc->opa);
+
+            SDL_Rect clip_rect;
+            clip_rect.x = u->base_unit.clip_area->x1 - layer->buf_area.x1;
+            clip_rect.y = u->base_unit.clip_area->y1 - layer->buf_area.y1;
+            clip_rect.w = lv_area_get_width(u->base_unit.clip_area);
+            clip_rect.h = lv_area_get_height(u->base_unit.clip_area);
+
+            SDL_RenderSetClipRect(renderer, &clip_rect);
+            SDL_RenderFillRect(renderer, &rect);
+            SDL_RenderSetClipRect(renderer, NULL);
+            return;
+        }
+    }
+
     if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
         blend_texture_layer(u);
     }
