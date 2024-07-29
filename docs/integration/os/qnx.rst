@@ -26,8 +26,34 @@ Highlight of QNX
 How to run LVGL on QNX?
 -----------------------
 
-Build LVGL
-~~~~~~~~~~
+There are two ways to use LVGL in your QNX project. The first is similar to how
+LVGL is used on other systems. The second is to build LVGL as either a shared or
+a static library.
+
+Include LVGL in Your Project
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Follow the generic instructions for getting started with LVGL. After copying
+`lv_conf_template.h` to  `lv_conf.h` make the following changes to the latter:
+
+1. Enable QNX support:
+.. code::
+    #define LV_USE_QNX 1
+
+2. Set colour depth to 32:
+.. code::
+    #define LV_COLOR_DEPTH 32
+
+3. (Optional) Enable double-buffering:
+.. code::
+    #define LV_QNX_BUF_COUNT 2
+
+Build LVGL as a Library
+~~~~~~~~~~~~~~~~~~~~~~~
+
+**Note that this method is an alternative to including LVGL in your project. If
+you choose to build a library then you do not need to follow the instructions in
+the previous section.**
 
 The top-level `qnx` directory includes a recursive make file for building LVGL,
 both as a shared library and as a static library for the supported
