@@ -328,13 +328,18 @@ static void blend_texture_layer(lv_draw_sdl_unit_t * u)
     clip_rect.h = lv_area_get_height(u->base_unit.clip_area);
 
     lv_draw_task_t * t = u->task_act;
-    SDL_Rect rect;
-    rect.x = t->area.x1;
-    rect.y = t->area.y1;
-    rect.w = lv_area_get_width(&t->area);
-    rect.h = lv_area_get_height(&t->area);
-
     lv_draw_image_dsc_t * draw_dsc = t->draw_dsc;
+    SDL_Rect rect;
+    rect.w = (lv_area_get_width(&t->area) * draw_dsc->scale_x) / 256;
+    rect.h = (lv_area_get_height(&t->area) * draw_dsc->scale_y) / 256;
+
+    rect.x = -draw_dsc->pivot.x;
+    rect.y = -draw_dsc->pivot.y;
+    rect.x = (rect.x * draw_dsc->scale_x) / 256;
+    rect.y = (rect.y * draw_dsc->scale_y) / 256;
+    rect.x += t->area.x1 + draw_dsc->pivot.x;
+    rect.y += t->area.y1 + draw_dsc->pivot.y;
+
     lv_layer_t * src_layer = (lv_layer_t *)draw_dsc->src;
     SDL_Texture * src_texture = layer_get_texture(src_layer);
 
