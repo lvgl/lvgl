@@ -1,5 +1,5 @@
 /**
- * @file lv_btnmatrix.h
+ * @file lv_buttonmatrix.h
  *
  */
 
@@ -142,7 +142,6 @@ void lv_buttonmatrix_set_button_ctrl_all(lv_obj_t * obj, lv_buttonmatrix_ctrl_t 
  * Clear the attributes of all buttons of a button matrix
  * @param obj       pointer to a button matrix object
  * @param ctrl      attribute(s) to set from `lv_buttonmatrix_ctrl_t`. Values can be ORed.
- * @param en        true: set the attributes; false: clear the attributes
  */
 void lv_buttonmatrix_clear_button_ctrl_all(lv_obj_t * obj, lv_buttonmatrix_ctrl_t ctrl);
 

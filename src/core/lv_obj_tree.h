@@ -1,5 +1,5 @@
 /**
- * @file struct _lv_obj_tree.h
+ * @file lv_obj_tree.h
  *
  */
 
@@ -224,7 +224,7 @@ void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * use
  * Iterate through all children of any object and print their ID.
  * @param start_obj     start integrating from this object
  */
-void lv_obj_dump_tree(lv_obj_t * start_ob);
+void lv_obj_dump_tree(lv_obj_t * start_obj);
 
 /**********************
  *      MACROS

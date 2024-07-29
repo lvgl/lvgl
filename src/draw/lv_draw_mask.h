@@ -1,10 +1,10 @@
 /**
- * @file lv_draw_mask_rect.h
+ * @file lv_draw_mask.h
  *
  */
 
-#ifndef LV_DRAW_MASK_RECT_H
-#define LV_DRAW_MASK_RECT_H
+#ifndef LV_DRAW_MASK_H
+#define LV_DRAW_MASK_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,4 +64,4 @@ void lv_draw_mask_rect(lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_MASK_RECT_H*/
+#endif /*LV_DRAW_MASK_H*/

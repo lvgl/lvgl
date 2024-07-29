@@ -1,10 +1,10 @@
 ﻿/**
- * @file lv_draw_sw_blend_al88.h
+ * @file lv_draw_sw_blend_to_al88.h
  *
  */
 
-#ifndef LV_DRAW_SW_BLEND_AL88_H
-#define LV_DRAW_SW_BLEND_AL88_H
+#ifndef LV_DRAW_SW_BLEND_TO_AL88_H
+#define LV_DRAW_SW_BLEND_TO_AL88_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,4 +42,4 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_image_to_al88(_lv_draw_sw_blen
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_SW_BLEND_AL88_H*/
+#endif /*LV_DRAW_SW_BLEND_TO_AL88_H*/
