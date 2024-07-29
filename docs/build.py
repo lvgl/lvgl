@@ -297,18 +297,15 @@ def run():
             'latex',
             temp_directory,
             latex_output_path,
+            '--fail-on-warning',
+            '--keep-going',
             '-j',
             f'{os.cpu_count()}'
         ]
 
         print('running sphinx to build latex files...')
-        stdout.enabled = True
-        stderr.enabled = True
 
         sphinx_build(sphinx_args)
-
-        stdout.enabled = False
-        stderr.enabled = False
 
         # Generate PDF
         cmd(f'cd "{latex_output_path}" && latexmk -pdf "LVGL.tex"')
@@ -351,19 +348,15 @@ def run():
         html_dst_path,
         '-D',
         f'version="{get_version()}"',
+        '--fail-on-warning',
+        '--keep-going',
         '-E',
         '-j',
         f'{os.cpu_count()}'
     ]
 
     print('running sphinx to build html files...')
-    stdout.enabled = True
-    stderr.enabled = True
-
     sphinx_build(sphinx_args)
-
-    stdout.enabled = False
-    stderr.enabled = False
 
     if stdout.errors:
         print('\n\n'.join(stdout.errors))
