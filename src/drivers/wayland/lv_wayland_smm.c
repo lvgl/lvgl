@@ -94,6 +94,8 @@
          (entry) != NULL; \
          (entry) = LL_NEXT(entry, member))
 
+#define WAYLAND_FD_NAME "/" SMM_FD_NAME "-XXXXX"
+
 struct smm_pool {
     struct smm_pool_properties props;
     LLHEAD(smm_buffer) allocd;
@@ -579,7 +581,7 @@ void return_to_pool(struct smm_buffer * buf)
 struct smm_pool * alloc_pool(void)
 {
     struct smm_pool * pool;
-    char name[] = ("/" SMM_FD_NAME "-XXXXX");
+    char name[] = WAYLAND_FD_NAME;
     unsigned char attempts = 0;
     bool opened = false;
 
