@@ -14,6 +14,7 @@
 #include "../../core/lv_global.h"
 #include "../../display/lv_display_private.h"
 #include "../../lv_init.h"
+#include "../../draw/lv_draw_buf.h"
 
 /* for aligned_alloc */
 #ifndef __USE_ISOC11
@@ -133,12 +134,13 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
                                LV_SDL_RENDER_MODE);
     }
 #else /*/*LV_USE_DRAW_SDL == 1*/
-    uint32_t stride = lv_draw_buf_width_to_stride(disp->hor_res,
-                                                  lv_display_get_color_format(disp));
     /*It will render directly to default Texture, so the buffer is not used, so just set something*/
-    static uint8_t dummy_buf[1];
-    lv_display_set_buffers(disp, dummy_buf, NULL, stride * disp->ver_res,
-                           LV_SDL_RENDER_MODE);
+    static lv_draw_buf_t draw_buf;
+    static uint8_t dummy_buf; /*It won't be used as it will render to the SDL textures directly*/
+    lv_draw_buf_init(&draw_buf, 4096, 4096, LV_COLOR_FORMAT_ARGB8888, 4096 * 4, &dummy_buf, 4096 * 4096 * 4);
+
+    lv_display_set_draw_buffers(disp, &draw_buf, NULL);
+    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
 #endif /*LV_USE_DRAW_SDL == 0*/
     lv_display_add_event_cb(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
 
