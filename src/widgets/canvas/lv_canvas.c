@@ -385,10 +385,18 @@ void lv_canvas_init_layer(lv_obj_t * obj, lv_layer_t * layer)
 
 void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
 {
+    bool task_dispatched;
+
     if(layer->draw_task_head == NULL) return;
+
     while(layer->draw_task_head) {
         lv_draw_dispatch_wait_for_request();
-        lv_draw_dispatch_layer(lv_obj_get_display(canvas), layer);
+        task_dispatched = lv_draw_dispatch_layer(lv_obj_get_display(canvas), layer);
+
+        if(!task_dispatched) {
+            lv_draw_wait_for_finish();
+            lv_draw_dispatch_request();
+        }
     }
     lv_obj_invalidate(canvas);
 }
