@@ -309,10 +309,8 @@ add_library(test_common
         src/test_assets/test_lottie_approve.c
         unity/unity_support.c
         unity/unity.c
-        wayland_protocols/wayland_xdg_shell.c
         ${TEST_IMAGES_SRC}
 )
-include_directories("${LVGL_TEST_DIR}/wayland_protocols")
 target_include_directories(test_common PUBLIC ${TEST_INCLUDE_DIRS})
 target_compile_options(test_common PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 
@@ -328,6 +326,11 @@ if(NOT WIN32)
     # libjpeg is required for the jpeg test case
     find_package(JPEG REQUIRED)
     include_directories(${JPEG_INCLUDE_DIR})
+
+    # Wayland - add XDG shell
+    include_directories("${LVGL_TEST_DIR}/wayland_protocols")
+    target_sources(test_common PRIVATE "wayland_protocols/wayland_xdg_shell.c")
+
 endif()
 
 # libpng is required for the png test case

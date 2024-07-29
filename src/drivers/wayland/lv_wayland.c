@@ -238,7 +238,7 @@ struct window {
     bool closed;
     bool maximized;
     bool fullscreen;
-    uint64_t frame_counter;
+    uint32_t frame_counter;
     bool frame_done;
 };
 
@@ -288,7 +288,7 @@ static void graphic_obj_frame_done(void * data, struct wl_callback * cb, uint32_
     window = obj->window;
     window->frame_counter++;
 
-    LV_LOG_TRACE("frame: %ld done, new frame: %ld",
+    LV_LOG_TRACE("frame: %d done, new frame: %d",
                  window->frame_counter - 1, window->frame_counter);
 
     window->frame_done = true;
@@ -1275,7 +1275,7 @@ static void handle_wl_buffer_release(void * data, struct wl_buffer * wl_buffer)
     obj = SMM_GROUP_PROPERTIES(props->group)->tag[TAG_LOCAL];
     window = obj->window;
 
-    LV_LOG_TRACE("releasing buffer %p wl_buffer %p w:%d h:%d frame: %ld", (smm_buffer_t *)data, (void *)wl_buffer,
+    LV_LOG_TRACE("releasing buffer %p wl_buffer %p w:%d h:%d frame: %d", (smm_buffer_t *)data, (void *)wl_buffer,
                  obj->width,
                  obj->height, window->frame_counter);
     smm_release((smm_buffer_t *)data);
@@ -1944,7 +1944,7 @@ static bool resize_window(struct window * window, int width, int height)
     }
 #endif
 
-    LV_LOG_TRACE("resize window:%dx%d body:%dx%d frame: %ld rendered: %d",
+    LV_LOG_TRACE("resize window:%dx%d body:%dx%d frame: %d rendered: %d",
                  window->width, window->height,
                  window->body->width, window->body->height,
                  window->frame_counter, window->frame_done);
@@ -2197,7 +2197,7 @@ static void _lv_wayland_flush(lv_display_t * disp, const lv_area_t * area, unsig
 
         cb = wl_surface_frame(window->body->surface);
         wl_callback_add_listener(cb, &wl_surface_frame_listener, window->body);
-        LV_LOG_TRACE("last flush frame: %ld", window->frame_counter);
+        LV_LOG_TRACE("last flush frame: %d", window->frame_counter);
 
         window->flush_pending = true;
     }
@@ -2786,7 +2786,7 @@ bool lv_wayland_timer_handler(void)
 
     /* Ready input timers (to probe for any input received) */
     _LV_LL_READ(&application.window_ll, window) {
-        LV_LOG_TRACE("handle timer frame: %ld", window->frame_counter);
+        LV_LOG_TRACE("handle timer frame: %d", window->frame_counter);
 
         if(window != NULL && window->frame_done == false
            && window->frame_counter > 0) {
@@ -2816,7 +2816,7 @@ bool lv_wayland_timer_handler(void)
             }
             else {
 
-                LV_LOG_TRACE("Failed to resize window frame: %ld",
+                LV_LOG_TRACE("Failed to resize window frame: %d",
                              window->frame_counter);
             }
         }
