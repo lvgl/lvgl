@@ -1275,7 +1275,8 @@ static void handle_wl_buffer_release(void * data, struct wl_buffer * wl_buffer)
     obj = SMM_GROUP_PROPERTIES(props->group)->tag[TAG_LOCAL];
     window = obj->window;
 
-    LV_LOG_TRACE("releasing buffer %p wl_buffer %p w:%d h:%d frame: %ld", (smm_buffer_t *)data, (void *)wl_buffer, obj->width,
+    LV_LOG_TRACE("releasing buffer %p wl_buffer %p w:%d h:%d frame: %ld", (smm_buffer_t *)data, (void *)wl_buffer,
+                 obj->width,
                  obj->height, window->frame_counter);
     smm_release((smm_buffer_t *)data);
 }
@@ -1530,7 +1531,7 @@ static struct graphic_object * create_graphic_obj(struct application * app, stru
                                                   struct graphic_object * parent)
 {
     struct graphic_object * obj;
-    
+
     LV_UNUSED(parent);
 
     obj = lv_malloc(sizeof(*obj));

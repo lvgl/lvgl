@@ -45,13 +45,13 @@ typedef bool (*lv_wayland_display_close_f_t)(lv_display_t * disp);
  **********************/
 
 /**
- * @brief Initializes the wayland client
+ * Initializes the wayland client
  * @note must be called after lv_init
  */
 void lv_wayland_init(void);
 
 /**
- * @brief De-Initializes the wayland client
+ * De-Initializes the wayland client
  * @note Must be called on application exit
  */
 void lv_wayland_deinit(void);
@@ -62,7 +62,7 @@ void lv_wayland_deinit(void);
 int lv_wayland_get_fd(void);
 
 /**
- * @brief Creates a window
+ * Creates a window
  * @param hor_res The width of the window in pixels
  * @param ver_res The height of the window in pixels
  * @param title The title of the window
@@ -72,34 +72,34 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
                                         lv_wayland_display_close_f_t close_cb);
 
 /**
- * @brief Closes the window programmatically
+ * Closes the window programmatically
  * @param disp Reference to the LVGL display associated to the window
  */
 void lv_wayland_window_close(lv_display_t * disp);
 
 /**
- * @brief Closes the window programmatically
+ * Closes the window programmatically
  * @param disp Reference to the LVGL display associated to the window
  * @return true: The window is open
  */
 bool lv_wayland_window_is_open(lv_display_t * disp);
 
 /**
- * @brief Sets the fullscreen state of the window
+ * Sets the fullscreen state of the window
  * @param disp Reference to the LVGL display associated to the window
  * @param fullscreen If true the window enters fullscreen
  */
 void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen);
 
 /**
- * @brief Sets the maximized state of the window
+ * Sets the maximized state of the window
  * @param disp Reference to the LVGL display associated to the window
  * @param fullscreen If true the window is maximized
  */
 void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximize);
 
 /**
- * @brief Obtains the input device of the mouse pointer
+ * Obtains the input device of the mouse pointer
  * @note It is used to create an input group on application start
  * @param disp Reference to the LVGL display associated to the window
  * @return The input device
@@ -107,7 +107,7 @@ void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximize);
 lv_indev_t * lv_wayland_get_pointer(lv_display_t * disp);
 
 /**
- * @brief Obtains the input device of the encoder
+ * Obtains the input device of the encoder
  * @note It is used to create an input group on application start
  * @param disp Reference to the LVGL display associated to the window
  * @return The input device
@@ -115,7 +115,7 @@ lv_indev_t * lv_wayland_get_pointer(lv_display_t * disp);
 lv_indev_t * lv_wayland_get_pointeraxis(lv_display_t * disp);
 
 /**
- * @brief Obtains the input device of the keyboard
+ * Obtains the input device of the keyboard
  * @note It is used to create an input group on application start
  * @param disp Reference to the LVGL display associated to the window
  * @return The input device
@@ -123,7 +123,7 @@ lv_indev_t * lv_wayland_get_pointeraxis(lv_display_t * disp);
 lv_indev_t * lv_wayland_get_keyboard(lv_display_t * disp);
 
 /**
- * @brief Obtains the input device of the touch screen
+ * Obtains the input device of the touch screen
  * @note It is used to create an input group on application start
  * @param disp Reference to the LVGL display associated to the window
  * @return The input device
@@ -131,7 +131,7 @@ lv_indev_t * lv_wayland_get_keyboard(lv_display_t * disp);
 lv_indev_t * lv_wayland_get_touchscreen(lv_display_t * disp);
 
 /**
- * @brief Wrapper around lv_timer_handler
+ * Wrapper around lv_timer_handler
  * @note Must be called in the application run loop instead of the
  * regular lv_timer_handler provided by LVGL
  * @return true: if the cycle was completed, false if the application
