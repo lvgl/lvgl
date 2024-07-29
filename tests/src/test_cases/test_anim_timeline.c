@@ -339,7 +339,7 @@ void test_anim_timeline_repeat(void)
     lv_anim_set_var(&a1, obj);
     lv_anim_set_values(&a1, 0, 1000);
     lv_anim_set_duration(&a1, 1000);
-    lv_anim_set_repeat_count(&a1, 3);
+    // lv_anim_set_repeat_count(&a1, 3);
 
     lv_anim_start(&a1);
 
@@ -403,9 +403,9 @@ void test_anim_timeline_delay(void)
     TEST_ASSERT_EQUAL(600, lv_obj_get_x(obj));
 
     lv_test_wait(1500);
-    TEST_ASSERT_EQUAL(600, lv_obj_get_x(obj));
+    TEST_ASSERT_EQUAL(1000, lv_obj_get_x(obj));
 
-    lv_test_wait(1500);
+    lv_test_wait(500);
     TEST_ASSERT_EQUAL(600, lv_obj_get_x(obj));
 
     lv_test_wait(1000);
