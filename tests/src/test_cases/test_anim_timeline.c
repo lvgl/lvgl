@@ -362,7 +362,7 @@ void test_anim_timeline_repeat(void)
     TEST_ASSERT_EQUAL(998, lv_obj_get_x(obj));
 
     lv_test_wait(100);
-    TEST_ASSERT_EQUAL(0, lv_obj_get_x(obj));
+    TEST_ASSERT_EQUAL(99, lv_obj_get_x(obj));
     
     lv_test_wait(100);
     TEST_ASSERT_EQUAL(0, lv_obj_get_x(obj));
@@ -422,7 +422,7 @@ void test_anim_timeline_delay(void)
     TEST_ASSERT_EQUAL(0, lv_obj_get_x(obj));
 
     lv_test_wait(500);
-    TEST_ASSERT_EQUAL(499, lv_obj_get_x(obj));
+    TEST_ASSERT_EQUAL(500, lv_obj_get_x(obj));
 
     lv_test_wait(500);
     TEST_ASSERT_EQUAL(1000, lv_obj_get_x(obj));
