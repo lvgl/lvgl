@@ -762,23 +762,23 @@ void lv_obj_move_children_by(lv_obj_t * obj, int32_t x_diff, int32_t y_diff, boo
     }
 }
 
-void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, bool recursive, bool inv)
+void lv_obj_transform_point(lv_obj_t * obj, lv_point_t * p, bool recursive, bool inv)
 {
     if(obj) {
         lv_layer_type_t layer_type = _lv_obj_get_layer_type(obj);
         bool do_tranf = layer_type == LV_LAYER_TYPE_TRANSFORM;
         if(inv) {
-            if(recursive) lv_obj_transform_point(lv_obj_get_parent(obj), p, recursive, inv);
+            if(recursive && obj->parent->transform_changed) lv_obj_transform_point(lv_obj_get_parent(obj), p, recursive, inv);
             if(do_tranf) transform_point(obj, p, inv);
         }
         else {
             if(do_tranf) transform_point(obj, p, inv);
-            if(recursive) lv_obj_transform_point(lv_obj_get_parent(obj), p, recursive, inv);
+            if(recursive && obj->parent->transform_changed) lv_obj_transform_point(lv_obj_get_parent(obj), p, recursive, inv);
         }
     }
 }
 
-void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool recursive,
+void lv_obj_get_transformed_area(lv_obj_t * obj, lv_area_t * area, bool recursive,
                                  bool inv)
 {
     lv_point_t p[4] = {
@@ -853,7 +853,8 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     /*The area is not on the object*/
     if(!_lv_area_intersect(area, area, &obj_coords)) return false;
 
-    lv_obj_get_transformed_area(obj, area, true, false);
+    if( obj->transform_changed )
+        lv_obj_get_transformed_area(obj, area, true, false);
 
     /*Truncate recursively to the parents*/
     lv_obj_t * parent = lv_obj_get_parent(obj);
@@ -867,8 +868,8 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
             int32_t parent_ext_size = _lv_obj_get_ext_draw_size(parent);
             lv_area_increase(&parent_coords, parent_ext_size, parent_ext_size);
         }
-
-        lv_obj_get_transformed_area(parent, &parent_coords, true, false);
+        if( parent->transform_changed )
+            lv_obj_get_transformed_area(parent, &parent_coords, true, false);
         if(!_lv_area_intersect(area, area, &parent_coords)) return false;
 
         parent = lv_obj_get_parent(parent);

@@ -20,6 +20,8 @@
 #define style_trans_ll_p &(LV_GLOBAL_DEFAULT()->style_trans_ll)
 #define _style_custom_prop_flag_lookup_table LV_GLOBAL_DEFAULT()->style_custom_prop_flag_lookup_table
 #define STYLE_PROP_SHIFTED(prop) ((uint32_t)1 << ((prop) >> 3))
+#define INCREASE_CNT  1
+#define DECREASE_CNT -1
 
 /**********************
  *      TYPEDEFS
@@ -269,6 +271,16 @@ void lv_obj_report_style_change(lv_style_t * style)
     }
 }
 
+void refresh_children_transform_prop (lv_obj_t * obj, int8_t step )
+{
+    obj->transform_changed = (obj->transform_changed+step < 0) ? 0 : obj->transform_changed+step;
+    if(obj && obj->spec_attr && obj->spec_attr->child_cnt) {
+        for(uint32_t i = 0; i < obj->spec_attr->child_cnt; i++) {
+            refresh_children_transform_prop(lv_obj_get_child(obj, i), step);
+        }
+    }
+}
+
 void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style_prop_t prop)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -283,6 +295,9 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
     bool is_ext_draw = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE);
     bool is_inheritable = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_INHERITABLE);
     bool is_layer_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_LAYER_UPDATE);
+    bool is_transform_rotation = lv_style_prop_has_flag(prop, LV_STYLE_TRANSFORM_ROTATION);
+    bool is_transform_scale_x = lv_style_prop_has_flag(prop, LV_STYLE_TRANSFORM_SCALE_X);
+    bool is_transform_scale_y = lv_style_prop_has_flag(prop, LV_STYLE_TRANSFORM_SCALE_Y);
 
     if(is_layout_refr) {
         if(part == LV_PART_ANY ||
@@ -317,6 +332,17 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
         if(part != LV_PART_SCROLLBAR) {
             refresh_children_style(obj);
         }
+    }
+    if( part == LV_PART_MAIN && (is_transform_rotation || is_transform_scale_x || is_transform_scale_y )) {
+        int32_t angle = lv_obj_get_style_transform_rotation(obj, 0);
+        int32_t scale_x = lv_obj_get_style_transform_scale_x_safe(obj, 0);
+        int32_t scale_y = lv_obj_get_style_transform_scale_y_safe(obj, 0);
+
+        if( angle == 0 && scale_x == LV_SCALE_NONE && scale_y == LV_SCALE_NONE )
+            refresh_children_transform_prop(obj, DECREASE_CNT );
+        else
+            refresh_children_transform_prop(obj, INCREASE_CNT );
+
     }
 }
 
