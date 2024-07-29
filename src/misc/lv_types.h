@@ -166,6 +166,8 @@ typedef struct _lv_sysmon_perf_info_t lv_sysmon_perf_info_t;
 #endif /*LV_USE_PERF_MONITOR*/
 
 #endif /*LV_USE_SYSMON*/
+struct _lv_event_list_t;
+typedef struct _lv_event_list_t lv_event_list_t;
 
 #endif /*__ASSEMBLY__*/
 
