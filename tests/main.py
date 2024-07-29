@@ -124,7 +124,8 @@ def build_tests(options_name, build_type, clean):
 
     os.chdir(lvgl_test_dir)
 
-    gen_wayland_protocols(clean)
+    if platform.system() != 'Windows':
+        gen_wayland_protocols(clean)
 
     created_build_dir = False
     if not os.path.isdir(build_dir):

@@ -266,7 +266,6 @@ endif()
 set(TEST_INCLUDE_DIRS
     $<BUILD_INTERFACE:${LVGL_TEST_DIR}/src>
     $<BUILD_INTERFACE:${LVGL_TEST_DIR}/unity>
-    $<BUILD_INTERFACE:${LVGL_TEST_DIR}/wayland_protocols>
     $<BUILD_INTERFACE:${LVGL_TEST_DIR}>
 )
 
@@ -313,6 +312,7 @@ add_library(test_common
         wayland_protocols/wayland_xdg_shell.c
         ${TEST_IMAGES_SRC}
 )
+include_directories("${LVGL_TEST_DIR}/wayland_protocols")
 target_include_directories(test_common PUBLIC ${TEST_INCLUDE_DIRS})
 target_compile_options(test_common PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 

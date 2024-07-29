@@ -125,6 +125,7 @@
 
 #ifndef LV_USE_WAYLAND
     #define LV_USE_WAYLAND  1
+    #define LV_WAYLAND_WINDOW_DECORATIONS 1
 #endif
 
 #define LV_USE_ILI9341      1
