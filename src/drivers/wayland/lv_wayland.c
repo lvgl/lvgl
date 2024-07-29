@@ -11,6 +11,8 @@
  *
  ******************************************************************/
 
+typedef int dummy_t;    /* Make GCC on windows happy, avoid empty translation unit */
+
 #ifndef _WIN32
 
 /*********************
