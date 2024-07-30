@@ -18,6 +18,8 @@ extern "C" {
 #include "misc/lv_text_private.h"
 #include "misc/cache/lv_cache_entry_private.h"
 #include "misc/cache/lv_cache_private.h"
+#include "drivers/glfw/lv_glfw_mouse_private.h"
+#include "drivers/glfw/lv_glfw_window_private.h"
 
 /*********************
  *      DEFINES

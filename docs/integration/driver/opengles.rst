@@ -68,8 +68,7 @@ Custom Textures
 ---------------
 
 The OpenGL driver can draw textures from the user. A third-party library could be
-used to add content to a texture and the driver will draw the texture in the window
-with the LVGL objects.
+used to add content to a texture and the driver will draw the texture in the window.
 
 For this example, ensure ``LV_COLOR_DEPTH`` is set to ``32`` and build the examples
 so that ``img_cogwheel_argb`` is available.

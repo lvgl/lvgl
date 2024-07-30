@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_glfw_mouse.h"
 #include "lv_glfw_mouse_private.h"
 #if LV_USE_OPENGLES
 
@@ -14,6 +13,10 @@
 #include <stdbool.h>
 #include "../../core/lv_group.h"
 #include "../../stdlib/lv_string.h"
+#include "../../indev/lv_indev.h"
+#include "../../stdlib/lv_mem.h"
+#include "../../misc/lv_assert.h"
+#include "../../misc/lv_log.h"
 
 /*********************
  *      DEFINES

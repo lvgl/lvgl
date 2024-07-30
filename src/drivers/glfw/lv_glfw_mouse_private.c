@@ -6,14 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../display/lv_display.h"
-#include "../../indev/lv_indev.h"
 
 #include "lv_glfw_mouse_private.h"
 #if LV_USE_OPENGLES
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "../../display/lv_display.h"
+#include "../../indev/lv_indev.h"
 #include "../../core/lv_group.h"
 #include "../../stdlib/lv_string.h"
 

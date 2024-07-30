@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
+#include "lv_glfw_mouse.h"
 #if LV_USE_OPENGLES
 
 /*********************

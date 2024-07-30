@@ -14,10 +14,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../display/lv_display.h"
-#include "../../indev/lv_indev.h"
-
+#include "../../lv_conf_internal.h"
 #if LV_USE_OPENGLES
+
+#include "../../misc/lv_types.h"
+#include "../../display/lv_display.h"
 
 /*********************
  *      DEFINES
@@ -26,12 +27,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-typedef struct {
-    unsigned int texture_id;
-    lv_area_t area;
-    lv_display_t * disp;
-} lv_glfw_texture_t;
 
 /**********************
  * GLOBAL PROTOTYPES

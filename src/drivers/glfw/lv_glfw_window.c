@@ -6,16 +6,17 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_glfw_window.h"
-#include "lv_glfw_mouse_private.h"
+#include "lv_glfw_window_private.h"
 #if LV_USE_OPENGLES
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "lv_glfw_mouse_private.h"
 #include "../../core/lv_refr.h"
 #include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
 #include "../../display/lv_display_private.h"
+#include "../../indev/lv_indev.h"
 #include "../../lv_init.h"
 
 #include <GL/glew.h>
