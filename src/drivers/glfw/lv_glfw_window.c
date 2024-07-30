@@ -63,9 +63,9 @@ static lv_display_t * _lv_glfw_get_disp_from_window(GLFWwindow * window);
 static void glfw_error_cb(int error, const char * description);
 static int lv_glfw_init(void);
 static int lv_glew_init(void);
-static void lv_glfw_timer_init();
+static void lv_glfw_timer_init(void);
 static void lv_glfw_window_config(GLFWwindow * window);
-static void lv_glfw_window_quit();
+static void lv_glfw_window_quit(void);
 static void window_close_callback(GLFWwindow * window);
 static void key_callback(GLFWwindow * window, int key, int scancode, int action, int mods);
 static void mouse_button_callback(GLFWwindow * window, int button, int action, int mods);
@@ -224,7 +224,7 @@ static int lv_glew_init(void)
     return 0;
 }
 
-static void lv_glfw_timer_init()
+static void lv_glfw_timer_init(void)
 {
     if(!inited) {
         update_handler_timer = lv_timer_create(window_update_handler, 5, NULL);
@@ -252,7 +252,7 @@ static void lv_glfw_window_config(GLFWwindow * window)
     glfwSetWindowCloseCallback(window, window_close_callback);
 }
 
-static void lv_glfw_window_quit()
+static void lv_glfw_window_quit(void)
 {
     int working_window = 0;
     lv_display_t * disp = lv_display_get_next(NULL);
