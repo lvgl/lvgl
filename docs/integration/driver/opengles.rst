@@ -71,8 +71,8 @@ The OpenGL driver can draw textures from the user. A third-party library could b
 used to add content to a texture and the driver will draw the texture in the window
 with the LVGL objects.
 
-for this example, copy tests/src/test_assets/test_arc_bg.c to your project directory
-and ensure ``LV_COLOR_DEPTH`` is set to ``32``.
+For this example, ensure ``LV_COLOR_DEPTH`` is set to ``32`` and build the examples
+so that ``img_cogwheel_argb`` is available.
 
 .. code:: c
 
@@ -82,7 +82,7 @@ and ensure ``LV_COLOR_DEPTH`` is set to ``32``.
 
     void custom_texture_example(void)
     {
-        LV_IMAGE_DECLARE(test_arc_bg);
+        LV_IMAGE_DECLARE(img_cogwheel_argb);
 
         /* only important with multiple displays */
         lv_glfw_window_make_context_current(lv_display_get_default());
@@ -96,10 +96,10 @@ and ensure ``LV_COLOR_DEPTH`` is set to ``32``.
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         /* load and generate the texture */
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, test_arc_bg.header.w, test_arc_bg.header.h, 0, GL_BGRA, GL_UNSIGNED_BYTE, test_arc_bg.data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img_cogwheel_argb.header.w, img_cogwheel_argb.header.h, 0, GL_BGRA, GL_UNSIGNED_BYTE, img_cogwheel_argb.data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
-        lv_glfw_texture_t * tex = lv_glfw_texture_add(disp, texture, test_arc_bg.header.w, test_arc_bg.header.h);
+        lv_glfw_texture_t * tex = lv_glfw_texture_add(lv_display_get_default(), texture, img_cogwheel_argb.header.w, img_cogwheel_argb.header.h);
         lv_glfw_texture_set_x(tex, 150);
         lv_glfw_texture_set_y(tex, 100);
     }

@@ -1,5 +1,5 @@
 /**
- * @file lv_opengles_window.c
+ * @file lv_glfw_window.c
  *
  */
 
