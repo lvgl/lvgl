@@ -28,6 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void lv_opengles_enable_blending(void);
 static void lv_opengles_vertex_buffer_init(const void * data, unsigned int size);
 static void lv_opengles_vertex_buffer_deinit(void);
 static void lv_opengles_vertex_buffer_bind(void);
@@ -52,6 +53,7 @@ static void lv_opengles_shader_unbind(void);
 static int lv_opengles_shader_get_uniform_location(const char * name);
 static void lv_opengles_shader_set_uniform1i(const char * name, int value);
 static void lv_opengles_shader_set_uniformmatrix3fv(const char * name, int count, bool transpose, const float * values);
+static void lv_opengles_shader_set_uniform1f(const char * name, float value);
 static void lv_opengles_render_draw(void);
 static void lv_opengles_texture_init(void * buffer, int width, int height);
 static void lv_opengles_texture_deinit(void);
@@ -76,8 +78,8 @@ static unsigned int texture_id = 0;
 
 static unsigned int shader_id;
 
-static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform" };
-static int shader_location[] = { 0, 0, 0 };
+static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform", "u_Opa" };
+static int shader_location[] = { 0, 0, 0, 0 };
 
 static const char * vertex_shader =
     "#version 300 es\n"
@@ -106,15 +108,16 @@ static const char * fragment_shader =
     "\n"
     "uniform sampler2D u_Texture;\n"
     "uniform int u_ColorDepth;\n"
+    "uniform float u_Opa;\n"
     "\n"
     "void main()\n"
     "{\n"
     "    vec4 texColor = texture(u_Texture, v_TexCoord);\n"
     "    if (u_ColorDepth == 8) {\n"
     "        float gray = texColor.r;\n"
-    "        color = vec4(gray, gray, gray, 1.0);\n"
+    "        color = vec4(gray, gray, gray, u_Opa);\n"
     "    } else {\n"
-    "        color = texColor;\n"
+    "        color = vec4(texColor.rgb, texColor.a * u_Opa);\n"
     "    }\n"
     "};\n";
 
@@ -128,6 +131,8 @@ static const char * fragment_shader =
 
 void lv_opengles_init(uint8_t * frame_buffer, int32_t hor, int32_t ver)
 {
+    lv_opengles_enable_blending();
+
     float positions[] = {
         -1.0f,  1.0f,  0.0f, 0.0f,
         1.0f,  1.0f,  1.0f, 0.0f,
@@ -189,10 +194,12 @@ void lv_opengles_update(uint8_t * frame_buffer, int32_t hor, int32_t ver)
     lv_opengles_shader_set_uniform1i("u_ColorDepth", LV_COLOR_DEPTH);
     lv_opengles_shader_set_uniform1i("u_Texture", 0);
     lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, true, matrix);
+    lv_opengles_shader_set_uniform1f("u_Opa", 1.0f);
     lv_opengles_render_draw();
 }
 
-void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, int32_t disp_w, int32_t disp_h)
+void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
+                                int32_t disp_h)
 {
     GL_CALL(glActiveTexture(GL_TEXTURE0 + 1));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
@@ -211,12 +218,19 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
     lv_opengles_shader_set_uniform1i("u_ColorDepth", 32);
     lv_opengles_shader_set_uniform1i("u_Texture", 1);
     lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, true, matrix);
+    lv_opengles_shader_set_uniform1f("u_Opa", (float)opa / (float)LV_OPA_100);
     lv_opengles_render_draw();
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void lv_opengles_enable_blending(void)
+{
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
 
 static void lv_opengles_vertex_buffer_init(const void * data, unsigned int size)
 {
@@ -400,6 +414,11 @@ static void lv_opengles_shader_set_uniform1i(const char * name, int value)
 static void lv_opengles_shader_set_uniformmatrix3fv(const char * name, int count, bool transpose, const float * values)
 {
     GL_CALL(glUniformMatrix3fv(lv_opengles_shader_get_uniform_location(name), count, transpose, values));
+}
+
+static void lv_opengles_shader_set_uniform1f(const char * name, float value)
+{
+    GL_CALL(glUniform1f(lv_opengles_shader_get_uniform_location(name), value));
 }
 
 static void lv_opengles_render_draw()

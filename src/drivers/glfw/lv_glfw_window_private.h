@@ -31,6 +31,7 @@ extern "C" {
 struct lv_glfw_texture_t {
     unsigned int texture_id;
     lv_area_t area;
+    lv_opa_t opa;
     lv_display_t * disp;
 };
 

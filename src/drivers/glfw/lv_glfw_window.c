@@ -155,6 +155,7 @@ lv_glfw_texture_t * lv_glfw_texture_add(lv_display_t * disp, unsigned int textur
     lv_glfw_texture_t * tex = _lv_ll_ins_tail(&dsc->textures);
     tex->texture_id = texture;
     lv_area_set(&tex->area, 0, 0, w - 1, h - 1);
+    tex->opa = LV_OPA_COVER;
     tex->disp = disp;
     return tex;
 }
@@ -179,6 +180,11 @@ void lv_glfw_texture_set_x(lv_glfw_texture_t * texture, int32_t x)
 void lv_glfw_texture_set_y(lv_glfw_texture_t * texture, int32_t y)
 {
     _lv_area_set_pos(&texture->area, texture->area.x1, y);
+}
+
+void lv_glfw_texture_set_opa(lv_glfw_texture_t * texture, lv_opa_t opa)
+{
+    texture->opa = opa;
 }
 
 /**********************
@@ -343,7 +349,7 @@ static void window_update_handler(lv_timer_t * t)
 
             lv_glfw_texture_t * tex;
             _LV_LL_READ(&dsc->textures, tex) {
-                lv_opengles_render_texture(tex->texture_id, &tex->area, disp->hor_res, disp->ver_res);
+                lv_opengles_render_texture(tex->texture_id, &tex->area, tex->opa, disp->hor_res, disp->ver_res);
             }
 
             /* Swap front and back buffers */

@@ -38,6 +38,7 @@ lv_glfw_texture_t * lv_glfw_texture_add(lv_display_t * disp, unsigned int textur
 void lv_glfw_texture_remove(lv_glfw_texture_t * texture);
 void lv_glfw_texture_set_x(lv_glfw_texture_t * texture, int32_t x);
 void lv_glfw_texture_set_y(lv_glfw_texture_t * texture, int32_t y);
+void lv_glfw_texture_set_opa(lv_glfw_texture_t * texture, lv_opa_t opa);
 
 /**********************
  *      MACROS

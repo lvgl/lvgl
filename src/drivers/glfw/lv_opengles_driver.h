@@ -15,7 +15,8 @@ extern "C" {
 void lv_opengles_init(uint8_t * frame_buffer, int32_t hor, int32_t ver);
 void lv_opengles_update(uint8_t * frame_buffer, int32_t hor, int32_t ver);
 void lv_opengles_deinit(void);
-void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, int32_t disp_w, int32_t disp_h);
+void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
+                                int32_t disp_h);
 
 #endif /* LV_USE_OPENGLES */
 
