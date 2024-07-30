@@ -360,6 +360,8 @@ void test_anim_timeline_repeat(void)
     lv_test_wait(399);
     TEST_ASSERT_EQUAL(998, lv_obj_get_x(obj));
 
+    lv_refr_now(NULL);
+
     lv_test_wait(500);
     TEST_ASSERT_EQUAL(0, lv_obj_get_x(obj));
 
