@@ -345,7 +345,6 @@ void test_anim_timeline_repeat(void)
     
     lv_anim_timeline_add(anim_timeline, 0, &a1);
     lv_anim_timeline_set_repeat_count(anim_timeline, 3);
-    lv_anim_timeline_set_repeat_delay(anim_timeline, 500);
     lv_anim_timeline_start(anim_timeline);
 
     lv_refr_now(NULL);
