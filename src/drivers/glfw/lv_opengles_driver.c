@@ -51,7 +51,7 @@ static void lv_opengles_shader_bind(void);
 static void lv_opengles_shader_unbind(void);
 static int lv_opengles_shader_get_uniform_location(const char * name);
 static void lv_opengles_shader_set_uniform1i(const char * name, int value);
-static void lv_opengles_shader_set_uniform4f(const char * name, float v0, float v1, float v2, float v3);
+static void lv_opengles_shader_set_uniformmatrix3fv(const char * name, int count, bool transpose, const float * values);
 static void lv_opengles_render_draw(void);
 static void lv_opengles_texture_init(void * buffer, int width, int height);
 static void lv_opengles_texture_deinit(void);
@@ -76,7 +76,7 @@ static unsigned int texture_id = 0;
 
 static unsigned int shader_id;
 
-static const char * shader_names[] = { "u_Color", "u_Texture", "u_ColorDepth" };
+static const char * shader_names[] = { "u_Texture", "u_ColorDepth", "u_VertexTransform" };
 static int shader_location[] = { 0, 0, 0 };
 
 static const char * vertex_shader =
@@ -87,9 +87,11 @@ static const char * vertex_shader =
     "\n"
     "out vec2 v_TexCoord;\n"
     "\n"
+    "uniform mat3 u_VertexTransform;\n"
+    "\n"
     "void main()\n"
     "{\n"
-    "    gl_Position = position;\n"
+    "    gl_Position = vec4((u_VertexTransform * vec3(position.xy, 1)).xy, position.zw);\n"
     "    v_TexCoord = texCoord;\n"
     "};\n";
 
@@ -102,7 +104,6 @@ static const char * fragment_shader =
     "\n"
     "in vec2 v_TexCoord;\n"
     "\n"
-    "uniform vec4 u_Color;\n"
     "uniform sampler2D u_Texture;\n"
     "uniform int u_ColorDepth;\n"
     "\n"
@@ -149,7 +150,6 @@ void lv_opengles_init(uint8_t * frame_buffer, int32_t hor, int32_t ver)
     lv_opengles_shader_init();
     lv_opengles_shader_bind();
     lv_opengles_shader_set_uniform1i("u_ColorDepth", LV_COLOR_DEPTH);
-    lv_opengles_shader_set_uniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
 
     int slot = 0;
     lv_opengles_texture_init(frame_buffer, hor, ver);
@@ -179,9 +179,38 @@ void lv_opengles_update(uint8_t * frame_buffer, int32_t hor, int32_t ver)
     lv_opengles_render_clear();
     lv_opengles_texture_update(frame_buffer, hor, ver);
 
+    static const float matrix[9] = {
+        1.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f
+    };
+
     lv_opengles_shader_bind();
     lv_opengles_shader_set_uniform1i("u_ColorDepth", LV_COLOR_DEPTH);
-    lv_opengles_shader_set_uniform4f("u_Color", 0.0f, 0.3f, 0.8f, 1.0f);
+    lv_opengles_shader_set_uniform1i("u_Texture", 0);
+    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, true, matrix);
+    lv_opengles_render_draw();
+}
+
+void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, int32_t disp_w, int32_t disp_h)
+{
+    GL_CALL(glActiveTexture(GL_TEXTURE0 + 1));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
+
+    float hor_scale = (float)lv_area_get_width(texture_area) / (float)disp_w;
+    float ver_scale = (float)lv_area_get_height(texture_area) / (float)disp_h;
+    float hor_translate = (float)texture_area->x1 / (float)disp_w * 2.0f - (1.0f - hor_scale);
+    float ver_translate = -((float)texture_area->y1 / (float)disp_h * 2.0f - (1.0f - ver_scale));
+    float matrix[9] = {
+        hor_scale, 0.0f,      hor_translate,
+        0.0f,      ver_scale, ver_translate,
+        0.0f,      0.0f,      1.0f
+    };
+
+    lv_opengles_shader_bind();
+    lv_opengles_shader_set_uniform1i("u_ColorDepth", 32);
+    lv_opengles_shader_set_uniform1i("u_Texture", 1);
+    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, true, matrix);
     lv_opengles_render_draw();
 }
 
@@ -368,9 +397,9 @@ static void lv_opengles_shader_set_uniform1i(const char * name, int value)
     GL_CALL(glUniform1i(lv_opengles_shader_get_uniform_location(name), value));
 }
 
-static void lv_opengles_shader_set_uniform4f(const char * name, float v0, float v1, float v2, float v3)
+static void lv_opengles_shader_set_uniformmatrix3fv(const char * name, int count, bool transpose, const float * values)
 {
-    GL_CALL(glUniform4f(lv_opengles_shader_get_uniform_location(name), v0, v1, v2, v3));
+    GL_CALL(glUniformMatrix3fv(lv_opengles_shader_get_uniform_location(name), count, transpose, values));
 }
 
 static void lv_opengles_render_draw()

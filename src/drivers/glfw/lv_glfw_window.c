@@ -30,6 +30,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
+
 typedef struct {
     GLFWwindow * window;
 
@@ -40,6 +41,7 @@ typedef struct {
     uint8_t * buf2;
     uint8_t * rotated_buf;
     size_t rotated_buf_size;
+    lv_ll_t textures;
 
     uint8_t zoom;
     uint8_t ignore_size_chg;
@@ -135,7 +137,47 @@ lv_display_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res)
 
     lv_opengles_init(dsc->fb1, hor_res, ver_res);
 
+    _lv_ll_init(&dsc->textures, sizeof(lv_glfw_texture_t));
+
     return disp;
+}
+
+void lv_glfw_window_make_context_current(lv_display_t * disp)
+{
+    lv_glfw_window_t * dsc = lv_display_get_driver_data(disp);
+    glfwMakeContextCurrent(dsc->window);
+}
+
+lv_glfw_texture_t * lv_glfw_texture_add(lv_display_t * disp, unsigned int texture, int32_t w, int32_t h)
+{
+    lv_glfw_window_t * dsc = lv_display_get_driver_data(disp);
+    lv_glfw_texture_t * tex = _lv_ll_ins_tail(&dsc->textures);
+    tex->texture_id = texture;
+    lv_area_set(&tex->area, 0, 0, w - 1, h - 1);
+    tex->disp = disp;
+    return tex;
+}
+
+void lv_glfw_texture_remove(lv_glfw_texture_t * texture)
+{
+    lv_glfw_window_t * dsc = lv_display_get_driver_data(texture->disp);
+    lv_glfw_texture_t * tex;
+    _LV_LL_READ(&dsc->textures, tex) {
+        if(tex == texture) {
+            _lv_ll_remove(&dsc->textures, tex);
+            return;
+        }
+    }
+}
+
+void lv_glfw_texture_set_x(lv_glfw_texture_t * texture, int32_t x)
+{
+    _lv_area_set_pos(&texture->area, x, texture->area.y1);
+}
+
+void lv_glfw_texture_set_y(lv_glfw_texture_t * texture, int32_t y)
+{
+    _lv_area_set_pos(&texture->area, texture->area.x1, y);
 }
 
 /**********************
@@ -298,6 +340,11 @@ static void window_update_handler(lv_timer_t * t)
         if(!glfwWindowShouldClose(dsc->window)) {
             lv_opengles_update(dsc->fb1, disp->hor_res, disp->ver_res);
 
+            lv_glfw_texture_t * tex;
+            _LV_LL_READ(&dsc->textures, tex) {
+                lv_opengles_render_texture(tex->texture_id, &tex->area, disp->hor_res, disp->ver_res);
+            }
+
             /* Swap front and back buffers */
             glfwSwapBuffers(dsc->window);
 
@@ -452,6 +499,8 @@ static void release_disp_cb(lv_event_t * e)
         free(dsc->buf2);
         dsc->buf2 = NULL;
     }
+
+    _lv_ll_clear(&dsc->textures);
 
     lv_free(dsc);
     lv_display_set_driver_data(disp, NULL);

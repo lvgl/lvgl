@@ -63,3 +63,43 @@ Usage
 
         return 0;
     }
+
+Custom Textures
+---------------
+
+The OpenGL driver can draw textures from the user. A third-party library could be
+used to add content to a texture and the driver will draw the texture in the window
+with the LVGL objects.
+
+for this example, copy tests/src/test_assets/test_arc_bg.c to your project directory
+and ensure ``LV_COLOR_DEPTH`` is set to ``32``.
+
+.. code:: c
+
+    #include "lvgl/lvgl.h"
+    #include <GL/glew.h>
+    #include <GLFW/glfw3.h>
+
+    void custom_texture_example(void)
+    {
+        LV_IMAGE_DECLARE(test_arc_bg);
+
+        /* only important with multiple displays */
+        lv_glfw_window_make_context_current(lv_display_get_default());
+
+        unsigned int texture;
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        /* set the texture wrapping/filtering options (on the currently bound texture object) */
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        /* load and generate the texture */
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, test_arc_bg.header.w, test_arc_bg.header.h, 0, GL_BGRA, GL_UNSIGNED_BYTE, test_arc_bg.data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        lv_glfw_texture_t * tex = lv_glfw_texture_add(disp, texture, test_arc_bg.header.w, test_arc_bg.header.h);
+        lv_glfw_texture_set_x(tex, 150);
+        lv_glfw_texture_set_y(tex, 100);
+    }
