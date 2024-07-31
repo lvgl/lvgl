@@ -51,7 +51,7 @@ void lv_draw_vg_lite_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_re
     LV_PROFILER_BEGIN;
 
     lv_draw_sw_mask_radius_param_t param;
-    lv_draw_sw_mask_radius_init(&param, &dsc->area, dsc->radius, false);
+    lv_draw_sw_mask_radius_init(&param, &dsc->area, dsc->radius + 1, false);
 
     void * masks[2] = {0};
     masks[0] = &param;
