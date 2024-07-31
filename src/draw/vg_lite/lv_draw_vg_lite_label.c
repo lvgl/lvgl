@@ -210,7 +210,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
                                    &matrix,
                                    VG_LITE_BLEND_SRC_OVER,
                                    VG_LITE_PATTERN_COLOR,
-                                   color,
+                                   0,
                                    color,
                                    VG_LITE_FILTER_LINEAR));
         LV_PROFILER_END_TAG("vg_lite_draw_pattern");
