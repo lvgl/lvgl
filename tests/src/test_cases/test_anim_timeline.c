@@ -379,60 +379,6 @@ void test_anim_timeline_repeat(void)
     lv_test_wait(1000);
     TEST_ASSERT_EQUAL(1000, lv_obj_get_x(obj));
 
-    // lv_obj_t * obj = lv_obj_create(lv_screen_active());
-    // lv_obj_set_size(obj, 100, 100);
-    // lv_obj_set_pos(obj, 30, 40);
-
-    // lv_anim_t a1;
-    // lv_anim_init(&a1);
-    // lv_anim_set_exec_cb(&a1, (lv_anim_exec_xcb_t)lv_obj_set_x);
-    // lv_anim_set_var(&a1, obj);
-    // lv_anim_set_values(&a1, 0, 800);
-    // lv_anim_set_duration(&a1, 1000);
-
-    // anim_timeline = lv_anim_timeline_create();
-    // TEST_ASSERT_NOT_NULL(anim_timeline);
-
-    // lv_anim_timeline_add(anim_timeline, 0, &a1);
-    // lv_anim_timeline_set_repeat_count(anim_timeline, 3);
-    // lv_anim_timeline_set_repeat_delay(anim_timeline, 250);
-    // lv_anim_timeline_start(anim_timeline);
-
-    // lv_refr_now(NULL);
-
-    // TEST_ASSERT_EQUAL(3, lv_anim_timeline_get_repeat_count(anim_timeline));
-    // TEST_ASSERT_EQUAL(250, lv_anim_timeline_get_repeat_delay(anim_timeline));
-    // TEST_ASSERT_EQUAL(1000, lv_anim_timeline_get_playtime(anim_timeline));
-
-    // lv_test_wait(101);
-    // TEST_ASSERT_EQUAL(80, lv_obj_get_x(obj));
-
-    // lv_test_wait(400);
-    // TEST_ASSERT_EQUAL(400, lv_obj_get_x(obj));
-    // TEST_ASSERT_EQUAL(32833, lv_anim_timeline_get_progress(anim_timeline));
-
-    // lv_test_wait(498);
-    // TEST_ASSERT_EQUAL(798, lv_obj_get_x(obj));
-    // TEST_ASSERT_EQUAL(65469, lv_anim_timeline_get_progress(anim_timeline));
-
-    // lv_test_wait(501);
-    // TEST_ASSERT_EQUAL(0, lv_obj_get_x(obj));
-    // TEST_ASSERT_EQUAL(0, lv_anim_timeline_get_progress(anim_timeline));
-
-    // lv_test_wait(500);
-    // TEST_ASSERT_EQUAL(400, lv_obj_get_x(obj));
-
-    // lv_test_wait(499);
-    // TEST_ASSERT_EQUAL(798, lv_obj_get_x(obj));
-
-    // lv_test_wait(999);
-    // TEST_ASSERT_EQUAL(0, lv_obj_get_x(obj));
-
-    // lv_test_wait(1000);
-    // TEST_ASSERT_EQUAL(800, lv_obj_get_x(obj));
-
-    // lv_test_wait(1000);
-    // TEST_ASSERT_EQUAL(800, lv_obj_get_x(obj));
 }
 
 
