@@ -126,6 +126,19 @@ static int32_t _g2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
         return 0;
 
     switch(t->type) {
+        case LV_DRAW_TASK_TYPE_FILL: {
+                const lv_draw_fill_dsc_t * draw_dsc = (lv_draw_fill_dsc_t *) t->draw_dsc;
+
+                /* Most simple case: just a plain rectangle (no radius, no gradient). */
+                if((draw_dsc->radius != 0) || (draw_dsc->grad.dir != (lv_grad_dir_t)LV_GRAD_DIR_NONE))
+                    return 0;
+
+                if(t->preference_score > 70) {
+                    t->preference_score = 70;
+                    t->preferred_draw_unit_id = DRAW_UNIT_ID_G2D;
+                }
+                return 1;
+            }
         default:
             return 0;
     }
@@ -212,6 +225,9 @@ static void _g2d_execute_drawing(lv_draw_g2d_unit_t * u)
     lv_draw_buf_invalidate_cache(draw_buf, &draw_area);
 
     switch(t->type) {
+        case LV_DRAW_TASK_TYPE_FILL:
+            lv_draw_g2d_fill(draw_unit, t->draw_dsc, &t->area);
+            break;
         default:
             break;
     }
