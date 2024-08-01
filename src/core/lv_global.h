@@ -211,6 +211,14 @@ typedef struct _lv_global_t {
     lv_mutex_t lv_general_mutex;
 #endif
 
+#if LV_USE_OS == LV_OS_FREERTOS
+    uint32_t os_idle_time_sum;
+    uint32_t os_non_idle_time_sum;
+    uint32_t os_task_switch_timestamp;
+    bool os_idle_task_running;
+#endif
+
+
     void * user_data;
 } lv_global_t;
 

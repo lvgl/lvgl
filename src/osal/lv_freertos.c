@@ -13,7 +13,6 @@
  *      INCLUDES
  *********************/
 #include "lv_os.h"
-
 #if LV_USE_OS == LV_OS_FREERTOS
 
 #if (ESP_PLATFORM)
@@ -22,7 +21,10 @@
     #include "atomic.h"
 #endif
 
+#include "../tick/lv_tick.h"
 #include "../misc/lv_log.h"
+#include "../core/lv_global.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -31,6 +33,8 @@
 #ifndef pcTASK_NAME
     #define pcTASK_NAME "lvglDraw"
 #endif
+
+#define globals LV_GLOBAL_DEFAULT()
 
 /**********************
  *      TYPEDEFS
@@ -346,6 +350,37 @@ lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * pxCond)
 #endif
 
     return LV_RESULT_OK;
+}
+
+
+void lv_freertos_task_switch_in(const char * name)
+{
+    if(strcmp(name, "IDLE")) globals->os_idle_task_running = false;
+    else globals->os_idle_task_running = true;
+
+    globals->os_task_switch_timestamp = lv_tick_get();
+}
+
+void lv_freertos_task_switch_out(void)
+{
+    uint32_t elaps = lv_tick_elaps(globals->os_task_switch_timestamp);
+    if(globals->os_idle_task_running) globals->os_idle_time_sum += elaps;
+    else globals->os_non_idle_time_sum += elaps;
+}
+
+uint32_t lv_os_get_idle_percent(void)
+{
+    if(globals->os_non_idle_time_sum + globals->os_idle_time_sum == 0) {
+        LV_LOG_WARN("Not enough time elapsed to provide idle percentage");
+        return 0;
+    }
+
+    uint32_t pct = (globals->os_idle_time_sum * 100) / (globals->os_idle_time_sum + globals->os_non_idle_time_sum);
+
+    globals->os_non_idle_time_sum = 0;
+    globals->os_idle_time_sum = 0;
+
+    return pct;
 }
 
 /**********************
