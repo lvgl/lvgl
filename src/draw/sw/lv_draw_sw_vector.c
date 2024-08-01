@@ -53,8 +53,8 @@ static void _lv_area_to_tvg(_tvg_rect * rect, const lv_area_t * area)
 {
     rect->x = area->x1;
     rect->y = area->y1;
-    rect->w = lv_area_get_width(area);
-    rect->h = lv_area_get_height(area);
+    rect->w = lv_area_get_width(area) - 1;
+    rect->h = lv_area_get_height(area) - 1;
 }
 
 static void _lv_color_to_tvg(_tvg_color * color, const lv_color32_t * c, lv_opa_t opa)
@@ -423,14 +423,14 @@ void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc
     }
 
     void * buf = draw_buf->data;
-    int32_t width = lv_area_get_width(&layer->buf_area);
-    int32_t height = lv_area_get_height(&layer->buf_area);
+    int32_t width = lv_area_get_width(&layer->buf_area) - 1;
+    int32_t height = lv_area_get_height(&layer->buf_area) - 1;
     uint32_t stride = draw_buf->header.stride;
     Tvg_Canvas * canvas = tvg_swcanvas_create();
     tvg_swcanvas_set_target(canvas, buf, stride / 4, width, height, TVG_COLORSPACE_ARGB8888);
 
     _tvg_rect rc;
-    _lv_area_to_tvg(&rc, &layer->_clip_area);
+    _lv_area_to_tvg(&rc, draw_unit->clip_area);
     tvg_canvas_set_viewport(canvas, (int32_t)rc.x, (int32_t)rc.y, (int32_t)rc.w, (int32_t)rc.h);
 
     lv_ll_t * task_list = dsc->task_list;

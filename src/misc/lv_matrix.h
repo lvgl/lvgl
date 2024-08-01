@@ -21,7 +21,6 @@ extern "C" {
 #include "lv_types.h"
 #include "lv_area.h"
 
-
 /*********************
  *      DEFINES
  *********************/
