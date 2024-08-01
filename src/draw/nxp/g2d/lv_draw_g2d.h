@@ -43,6 +43,8 @@ void lv_draw_g2d_init(void);
 
 void lv_draw_g2d_deinit(void);
 
+void lv_draw_g2d_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
+
 /**********************
  *      MACROS
  **********************/
