@@ -56,6 +56,9 @@
         #include "draw/nxp/pxp/lv_draw_pxp.h"
     #endif
 #endif
+#if LV_USE_DRAW_G2D
+    #include "draw/nxp/g2d/lv_draw_g2d.h"
+#endif
 #if LV_USE_DRAW_DAVE2D
     #include "draw/renesas/dave2d/lv_draw_dave2d.h"
 #endif
@@ -235,6 +238,10 @@ void lv_init(void)
 #if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
     lv_draw_pxp_init();
 #endif
+#endif
+
+#if LV_USE_DRAW_G2D
+    lv_draw_g2d_init();
 #endif
 
 #if LV_USE_DRAW_DAVE2D
@@ -451,6 +458,10 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_VGLITE
     lv_draw_vglite_deinit();
+#endif
+
+#if LV_USE_DRAW_G2D
+    lv_draw_g2d_deinit();
 #endif
 
 #if LV_USE_DRAW_VG_LITE

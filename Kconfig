@@ -409,6 +409,19 @@ menu "LVGL configuration"
 		config LV_USE_PXP_ASSERT
 			bool "Enable PXP asserts"
 			depends on LV_USE_DRAW_PXP
+
+		config LV_USE_DRAW_G2D
+			bool "Use NXP's G2D on MPU platforms"
+			default n
+
+		config LV_USE_G2D_DRAW_THREAD
+			bool "Use additional draw thread for G2D processing"
+			depends on LV_USE_DRAW_G2D && LV_USE_OS > 0
+			default y
+
+		config LV_USE_G2D_ASSERT
+			bool "Enable G2D asserts"
+			depends on LV_USE_DRAW_G2D
 			default n
 
 		config LV_USE_DRAW_DAVE2D

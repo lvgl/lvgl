@@ -278,6 +278,19 @@
     #define LV_USE_PXP_ASSERT 0
 #endif
 
+/** Use NXP's G2D on MPU platforms. */
+#define LV_USE_DRAW_G2D 0
+
+#if LV_USE_DRAW_G2D
+    #if LV_USE_OS
+        /** Use additional draw thread for G2D processing.*/
+        #define LV_USE_G2D_DRAW_THREAD 1
+    #endif
+
+    /** Enable G2D asserts. */
+    #define LV_USE_G2D_ASSERT 0
+#endif
+
 /** Use Renesas Dave2D on RA  platforms. */
 #define LV_USE_DRAW_DAVE2D 0
 

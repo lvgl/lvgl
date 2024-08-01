@@ -779,6 +779,41 @@
     #endif
 #endif
 
+/** Use NXP's G2D on MPU platforms. */
+#ifndef LV_USE_DRAW_G2D
+    #ifdef CONFIG_LV_USE_DRAW_G2D
+        #define LV_USE_DRAW_G2D CONFIG_LV_USE_DRAW_G2D
+    #else
+        #define LV_USE_DRAW_G2D 0
+    #endif
+#endif
+
+#if LV_USE_DRAW_G2D
+    #if LV_USE_OS
+        /** Use additional draw thread for G2D processing.*/
+        #ifndef LV_USE_G2D_DRAW_THREAD
+            #ifdef LV_KCONFIG_PRESENT
+                #ifdef CONFIG_LV_USE_G2D_DRAW_THREAD
+                    #define LV_USE_G2D_DRAW_THREAD CONFIG_LV_USE_G2D_DRAW_THREAD
+                #else
+                    #define LV_USE_G2D_DRAW_THREAD 0
+                #endif
+            #else
+                #define LV_USE_G2D_DRAW_THREAD 1
+            #endif
+        #endif
+    #endif
+
+    /** Enable G2D asserts. */
+    #ifndef LV_USE_G2D_ASSERT
+        #ifdef CONFIG_LV_USE_G2D_ASSERT
+            #define LV_USE_G2D_ASSERT CONFIG_LV_USE_G2D_ASSERT
+        #else
+            #define LV_USE_G2D_ASSERT 0
+        #endif
+    #endif
+#endif
+
 /** Use Renesas Dave2D on RA  platforms. */
 #ifndef LV_USE_DRAW_DAVE2D
     #ifdef CONFIG_LV_USE_DRAW_DAVE2D
