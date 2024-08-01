@@ -59,6 +59,16 @@ typedef _lv_label_long_mode_t lv_label_long_mode_t;
 typedef uint8_t lv_label_long_mode_t;
 #endif /*DOXYGEN*/
 
+#if LV_USE_OBJ_PROPERTY
+enum {
+    LV_PROPERTY_ID(LABEL, TEXT,                   LV_PROPERTY_TYPE_TEXT,      0),
+    LV_PROPERTY_ID(LABEL, LONG_MODE,              LV_PROPERTY_TYPE_INT,       1),
+    LV_PROPERTY_ID(LABEL, TEXT_SELECTION_START,   LV_PROPERTY_TYPE_INT,       2),
+    LV_PROPERTY_ID(LABEL, TEXT_SELECTION_END,     LV_PROPERTY_TYPE_INT,       3),
+    LV_PROPERTY_LABEL_END,
+};
+#endif
+
 typedef struct {
     lv_obj_t obj;
     char * text;

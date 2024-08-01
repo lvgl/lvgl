@@ -271,4 +271,38 @@ void test_obj_property_name(void)
 #endif
 }
 
+void test_label_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_label_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    prop.id = LV_PROPERTY_LABEL_TEXT;
+    prop.ptr = "Hello world";
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_STRING("Hello world", lv_label_get_text(obj));
+    TEST_ASSERT_EQUAL_STRING("Hello world", lv_obj_get_property(obj, LV_PROPERTY_LABEL_TEXT).ptr);
+
+    prop.id = LV_PROPERTY_LABEL_LONG_MODE;
+    prop.num = LV_LABEL_LONG_SCROLL;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_LABEL_LONG_SCROLL, lv_label_get_long_mode(obj));
+    TEST_ASSERT_EQUAL_INT(LV_LABEL_LONG_SCROLL, lv_obj_get_property(obj, LV_PROPERTY_LABEL_LONG_MODE).num);
+
+#if LV_LABEL_TEXT_SELECTION
+    prop.id = LV_PROPERTY_LABEL_TEXT_SELECTION_START;
+    prop.num = 2;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(2, lv_label_get_text_selection_start(obj));
+    TEST_ASSERT_EQUAL_INT(2, lv_obj_get_property(obj, LV_PROPERTY_LABEL_TEXT_SELECTION_START).num);
+
+    prop.id = LV_PROPERTY_LABEL_TEXT_SELECTION_END;
+    prop.num = 5;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(5, lv_label_get_text_selection_end(obj));
+    TEST_ASSERT_EQUAL_INT(5, lv_obj_get_property(obj, LV_PROPERTY_LABEL_TEXT_SELECTION_END).num);
+#endif
+#endif
+}
+
 #endif
