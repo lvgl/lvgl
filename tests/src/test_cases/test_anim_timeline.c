@@ -338,6 +338,7 @@ void test_anim_timeline_repeat(void)
     lv_anim_set_var(&a1, obj);
     lv_anim_set_values(&a1, 0, 1000);
     lv_anim_set_duration(&a1, 1000);
+    lv_anim_set_early_apply(&a1, true);
 
     anim_timeline = lv_anim_timeline_create();
     TEST_ASSERT_NOT_NULL(anim_timeline);
