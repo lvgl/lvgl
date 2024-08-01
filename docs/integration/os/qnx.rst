@@ -139,9 +139,9 @@ above, which builds for ARMv8 with the shared library:
 
     CC=qcc -Vgcc_ntoaarch64le
 
-    LVGL_DIR=$(HOME)/src/lvgl
-    CCFLAGS=-I$(LVGL_DIR)/qnx -I$(LVGL_DIR)
-    LDFLAGS=-lscreen -llvgl -L$(LVGL_DIR)/qnx/aarch64/so.le
+    LVGL_ROOT=$(HOME)/src/lvgl
+    CCFLAGS=-I$(LVGL_ROOT)/env_support/qnx -I$(LVGL_ROOT)
+    LDFLAGS=-lscreen -llvgl -L$(LVGL_ROOT)/env_support/qnx/aarch64/so.le
 
     lvgl_example: lvgl_example.c
     	$(CC) $(CCFLAGS) -Wall -o $@ $< $(LDFLAGS)
