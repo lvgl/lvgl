@@ -18,7 +18,6 @@ jobs:
         with:
           repository: lvgl/astyle
           path: astyle
-          ref: v3.4.12
       - name: Install astyle
         run: |
           cd astyle/build/gcc/
