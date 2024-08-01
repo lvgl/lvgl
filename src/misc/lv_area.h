@@ -131,7 +131,7 @@ inline static void lv_area_copy(lv_area_t * dest, const lv_area_t * src)
  */
 static inline int32_t lv_area_get_width(const lv_area_t * area_p)
 {
-    return lv_roundf(area_p->x2 - area_p->x1) + 1;
+    return (int32_t)(area_p->x2 - area_p->x1 + 1);
 }
 
 /**
@@ -141,7 +141,7 @@ static inline int32_t lv_area_get_width(const lv_area_t * area_p)
  */
 static inline int32_t lv_area_get_height(const lv_area_t * area_p)
 {
-    return lv_roundf(area_p->y2 - area_p->y1) + 1;
+    return (int32_t)(area_p->y2 - area_p->y1 + 1);
 }
 
 /**
@@ -283,9 +283,9 @@ void lv_point_array_transform(lv_point_t * points, size_t count, int32_t angle, 
 
 static inline lv_point_t lv_point_from_precise(const lv_point_precise_t * p)
 {
-    lv_point_t point;
-    point.x = lv_roundf(p->x);
-    point.y = lv_roundf(p->y);
+    lv_point_t point = {
+        (int32_t)p->x, (int32_t)p->y
+    };
 
     return point;
 }

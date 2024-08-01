@@ -87,15 +87,6 @@ static inline int32_t lv_bezier3(int32_t t, int32_t u0, uint32_t u1, int32_t u2,
     return lv_cubic_bezier(t, 341, u1, 683, u2);
 }
 
-/**
- * Calculate the integer value closest to a floating point value.
- * @param v
- * @return the integer value
- */
-static inline int32_t lv_roundf(float v)
-{
-    return (int32_t)((v < 0.0f) ? v - 0.5f : v + 0.5f);
-}
 
 /**
  * Calculate the atan2 of a vector.
