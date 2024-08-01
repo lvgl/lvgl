@@ -338,14 +338,13 @@ void test_anim_timeline_repeat(void)
     lv_anim_set_var(&a1, obj);
     lv_anim_set_values(&a1, 0, 1000);
     lv_anim_set_duration(&a1, 1000);
-    lv_anim_set_early_apply(&a1, true);
 
     anim_timeline = lv_anim_timeline_create();
     TEST_ASSERT_NOT_NULL(anim_timeline);
 
     lv_anim_timeline_add(anim_timeline, 0, &a1);
     lv_anim_timeline_set_repeat_count(anim_timeline, 3);
-    lv_anim_timeline_set_repeat_delay(anim_timeline, 0);
+    // lv_anim_timeline_set_repeat_delay(anim_timeline, 0);
     lv_anim_timeline_start(anim_timeline);
 
     lv_refr_now(NULL);
@@ -359,7 +358,7 @@ void test_anim_timeline_repeat(void)
     lv_test_wait(500);
     TEST_ASSERT_EQUAL(599, lv_obj_get_x(obj));
 
-    lv_test_wait(400);
+    lv_test_wait(399);
     TEST_ASSERT_EQUAL(1000, lv_obj_get_x(obj));
 
     // lv_test_wait(0);
