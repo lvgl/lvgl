@@ -352,7 +352,8 @@ void test_anim_timeline_repeat(void)
 
     TEST_ASSERT_EQUAL(3, lv_anim_timeline_get_repeat_count(anim_timeline));
     TEST_ASSERT_EQUAL(0, lv_anim_timeline_get_repeat_delay(anim_timeline));
-
+    TEST_ASSERT_EQUAL(1000, lv_anim_timeline_get_playtime(anim_timeline));
+    
     lv_test_wait(101);
     TEST_ASSERT_EQUAL(80, lv_obj_get_x(obj));
 
@@ -367,13 +368,13 @@ void test_anim_timeline_repeat(void)
 
     lv_test_wait(501);
     TEST_ASSERT_EQUAL(0, lv_obj_get_x(obj));
-    TEST_ASSERT_EQUAL(32833, lv_anim_timeline_get_progress(anim_timeline));
+    TEST_ASSERT_EQUAL(0, lv_anim_timeline_get_progress(anim_timeline));
 
     lv_test_wait(500);
-    TEST_ASSERT_EQUAL(500, lv_obj_get_x(obj));
+    TEST_ASSERT_EQUAL(400, lv_obj_get_x(obj));
 
     lv_test_wait(500);
-    TEST_ASSERT_EQUAL(1000, lv_obj_get_x(obj));
+    TEST_ASSERT_EQUAL(800, lv_obj_get_x(obj));
 
     lv_test_wait(1200);
     TEST_ASSERT_EQUAL(699, lv_obj_get_x(obj));
