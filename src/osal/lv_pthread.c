@@ -69,6 +69,7 @@ lv_result_t lv_mutex_init(lv_mutex_t * mutex)
     pthread_mutexattr_init(&attr);
     pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
     int ret = pthread_mutex_init(mutex, &attr);
+    pthread_mutexattr_destroy(&attr);
 
     if(ret) {
         LV_LOG_WARN("Error: %d", ret);
