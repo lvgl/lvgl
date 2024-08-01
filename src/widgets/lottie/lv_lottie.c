@@ -219,14 +219,8 @@ static void lottie_update(lv_lottie_t * lottie, int32_t v)
 
     lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
     if(draw_buf) {
-#if LV_USE_DRAW_VG_LITE && LV_USE_VG_LITE_THORVG
-        /**
-         * Since the buffer clearing operation in the SwRenderer::preRender
-         * function is removed when the VG-Lite simulator is enabled, the canvas
-         * buffer must be manually cleared here.
-         */
         lv_draw_buf_clear(draw_buf, NULL);
-#endif
+
         /*Drop old cached image*/
         lv_image_cache_drop(lv_image_get_src(obj));
     }

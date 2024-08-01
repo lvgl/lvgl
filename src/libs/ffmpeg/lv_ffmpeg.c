@@ -69,7 +69,7 @@ struct lv_image_pixel_color_s {
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * src, lv_image_header_t * header);
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 
@@ -253,12 +253,13 @@ void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header)
 {
     LV_UNUSED(decoder);
 
     /* Get the source type */
-    lv_image_src_t src_type = lv_image_src_get_type(src);
+    const void * src = dsc->src;
+    lv_image_src_t src_type = dsc->src_type;
 
     if(src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = src;

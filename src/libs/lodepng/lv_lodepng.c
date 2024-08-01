@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * src, lv_image_header_t * header);
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt);
@@ -76,14 +76,16 @@ void lv_lodepng_deinit(void)
 /**
  * Get info about a PNG image
  * @param decoder   pointer to the decoder where this function belongs
- * @param src       can be file name or pointer to a C array
+ * @param dsc       image descriptor containing the source and type of the image and other info.
  * @param header    image information is set in header parameter
  * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info
  */
-static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header)
 {
     LV_UNUSED(decoder); /*Unused*/
-    lv_image_src_t src_type = lv_image_src_get_type(src);          /*Get the source type*/
+
+    const void * src = dsc->src;
+    lv_image_src_t src_type = dsc->src_type;          /*Get the source type*/
 
     /*If it's a PNG file...*/
     if(src_type == LV_IMAGE_SRC_FILE) {
@@ -95,15 +97,10 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
              * [24..27]: height
              */
             uint32_t size[2];
-            lv_fs_file_t f;
-            lv_fs_res_t res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
-            if(res != LV_FS_RES_OK) return LV_RESULT_INVALID;
-
-            lv_fs_seek(&f, 16, LV_FS_SEEK_SET);
-
             uint32_t rn;
-            lv_fs_read(&f, &size, 8, &rn);
-            lv_fs_close(&f);
+
+            lv_fs_seek(&dsc->file, 16, LV_FS_SEEK_SET);
+            lv_fs_read(&dsc->file, &size, 8, &rn);
 
             if(rn != 8) return LV_RESULT_INVALID;
 

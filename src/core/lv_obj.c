@@ -61,6 +61,108 @@ static const lv_property_ops_t properties[] = {
         .getter = lv_obj_get_parent,
     },
     {
+        .id = LV_PROPERTY_OBJ_X,
+        .setter = lv_obj_set_x,
+        .getter = lv_obj_get_x,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_Y,
+        .setter = lv_obj_set_y,
+        .getter = lv_obj_get_y,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_W,
+        .setter = lv_obj_set_width,
+        .getter = lv_obj_get_width,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_H,
+        .setter = lv_obj_set_height,
+        .getter = lv_obj_get_height,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_CONTENT_WIDTH,
+        .setter = lv_obj_set_content_width,
+        .getter = lv_obj_get_content_width,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_CONTENT_HEIGHT,
+        .setter = lv_obj_set_content_height,
+        .getter = lv_obj_get_content_height,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_LAYOUT,
+        .setter = lv_obj_set_layout,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_ALIGN,
+        .setter = lv_obj_set_align,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLLBAR_MODE,
+        .setter = lv_obj_set_scrollbar_mode,
+        .getter = lv_obj_get_scrollbar_mode,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_DIR,
+        .setter = lv_obj_set_scroll_dir,
+        .getter = lv_obj_get_scroll_dir,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_SNAP_X,
+        .setter = lv_obj_set_scroll_snap_x,
+        .getter = lv_obj_get_scroll_snap_x,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_SNAP_Y,
+        .setter = lv_obj_set_scroll_snap_y,
+        .getter = lv_obj_get_scroll_snap_y,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_TOP,
+        .getter = lv_obj_get_scroll_top,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_BOTTOM,
+        .getter = lv_obj_get_scroll_bottom,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_LEFT,
+        .getter = lv_obj_get_scroll_left,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_RIGHT,
+        .getter = lv_obj_get_scroll_right,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCROLL_END,
+        .getter = lv_obj_get_scroll_end,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_EXT_DRAW_SIZE,
+        .getter = _lv_obj_get_ext_draw_size,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_EVENT_COUNT,
+        .getter = lv_obj_get_event_count,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_SCREEN,
+        .getter = lv_obj_get_screen,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_DISPLAY,
+        .getter = lv_obj_get_display,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_CHILD_COUNT,
+        .getter = lv_obj_get_child_count,
+    },
+    {
+        .id = LV_PROPERTY_OBJ_INDEX,
+        .getter = lv_obj_get_index,
+    },
+    {
         .id = LV_PROPERTY_ID_ANY,
         .setter = lv_obj_set_any,
         .getter = lv_obj_get_any,

@@ -1,10 +1,10 @@
 /**
- * @file lv_draw_sw_blend_rgb888.h
+ * @file lv_draw_sw_blend_to_rgb888.h
  *
  */
 
-#ifndef LV_DRAW_SW_BLEND_RGB888_H
-#define LV_DRAW_SW_BLEND_RGB888_H
+#ifndef LV_DRAW_SW_BLEND_TO_RGB888_H
+#define LV_DRAW_SW_BLEND_TO_RGB888_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,4 +44,4 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_image_to_rgb888(_lv_draw_sw_bl
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_SW_BLEND_RGB888_H*/
+#endif /*LV_DRAW_SW_BLEND_TO_RGB888_H*/

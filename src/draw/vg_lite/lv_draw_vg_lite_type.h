@@ -46,6 +46,8 @@ struct _lv_draw_vg_lite_unit_t {
     lv_cache_t * grad_cache;
     struct _lv_vg_lite_pending_t * grad_pending;
 
+    lv_cache_t * stroke_cache;
+
     uint16_t flush_count;
     vg_lite_buffer_t target_buffer;
     vg_lite_matrix_t global_matrix;
@@ -67,4 +69,4 @@ struct _lv_draw_vg_lite_unit_t {
 } /*extern "C"*/
 #endif
 
-#endif /*LV_VG_LITE_DRAW_H*/
+#endif /*LV_DRAW_VG_LITE_TYPE_H*/

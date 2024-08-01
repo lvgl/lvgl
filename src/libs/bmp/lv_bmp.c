@@ -35,7 +35,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * src, lv_image_header_t * header);
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 
 static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
@@ -82,34 +82,31 @@ void lv_bmp_deinit(void)
 
 /**
  * Get info about a BMP image
- * @param src can be file name or pointer to a C array
+ * @param dsc image descriptor containing the source and type of the image and other info.
  * @param header store the info here
  * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info
  */
-static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header)
 {
     LV_UNUSED(decoder);
 
-    lv_image_src_t src_type = lv_image_src_get_type(src);          /*Get the source type*/
+    const void * src = dsc->src;
+    lv_image_src_t src_type = dsc->src_type;          /*Get the source type*/
 
     /*If it's a BMP file...*/
     if(src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = src;
         if(lv_strcmp(lv_fs_get_ext(fn), "bmp") == 0) {              /*Check the extension*/
             /*Save the data in the header*/
-            lv_fs_file_t f;
-            lv_fs_res_t res = lv_fs_open(&f, src, LV_FS_MODE_RD);
-            if(res != LV_FS_RES_OK) return LV_RESULT_INVALID;
             uint8_t headers[54];
 
-            lv_fs_read(&f, headers, 54, NULL);
+            lv_fs_read(&dsc->file, headers, 54, NULL);
             uint32_t w;
             uint32_t h;
             lv_memcpy(&w, headers + 18, 4);
             lv_memcpy(&h, headers + 22, 4);
             header->w = w;
             header->h = h;
-            lv_fs_close(&f);
 
             uint16_t bpp;
             lv_memcpy(&bpp, headers + 28, 2);

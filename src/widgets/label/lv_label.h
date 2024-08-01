@@ -114,7 +114,11 @@ void lv_label_set_text(lv_obj_t * obj, const char * text);
  * Set a new formatted text for a label. Memory will be allocated to store the text by the label.
  * @param obj           pointer to a label object
  * @param fmt           `printf`-like format
- * @example lv_label_set_text_fmt(label1, "%d user", user_num);
+ *
+ * Example:
+ * @code
+ * lv_label_set_text_fmt(label1, "%d user", user_num);
+ * @endcode
  */
 void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORMAT_ATTRIBUTE(2, 3);
 
