@@ -17,6 +17,7 @@
 #include "lv_vg_lite_grad.h"
 #include "lv_draw_vg_lite_type.h"
 #include <string.h>
+#include <math.h>
 
 /*********************
  *      DEFINES
@@ -1135,8 +1136,8 @@ lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * ma
 {
     lv_point_precise_t p;
     const vg_lite_float_t (*m)[3] = matrix->m;
-    p.x = (lv_value_precise_t)(point->x * m[0][0] + point->y * m[0][1] + m[0][2]);
-    p.y = (lv_value_precise_t)(point->x * m[1][0] + point->y * m[1][1] + m[1][2]);
+    p.x = (lv_value_precise_t)roundf(point->x * m[0][0] + point->y * m[0][1] + m[0][2]);
+    p.y = (lv_value_precise_t)roundf(point->x * m[1][0] + point->y * m[1][1] + m[1][2]);
     return p;
 }
 

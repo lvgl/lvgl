@@ -87,6 +87,7 @@ static inline int32_t lv_bezier3(int32_t t, int32_t u0, uint32_t u1, int32_t u2,
     return lv_cubic_bezier(t, 341, u1, 683, u2);
 }
 
+
 /**
  * Calculate the atan2 of a vector.
  * @param x
