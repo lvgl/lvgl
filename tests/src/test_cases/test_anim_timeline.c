@@ -411,8 +411,8 @@ void test_anim_timeline_delay(void)
 
     lv_refr_now(NULL);
 
-    TEST_ASSERT_EQUAL(1000, lv_anim_timeline_get_repeat_delay(anim_timeline));
-    TEST_ASSERT_EQUAL(250, lv_anim_timeline_get_playtime(anim_timeline));
+    TEST_ASSERT_EQUAL(250, lv_anim_timeline_get_repeat_delay(anim_timeline));
+    TEST_ASSERT_EQUAL(1000, lv_anim_timeline_get_playtime(anim_timeline));
 
     lv_test_wait(100);
     TEST_ASSERT_EQUAL(99, lv_obj_get_x(obj));
