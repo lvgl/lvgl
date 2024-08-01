@@ -201,6 +201,10 @@ void lv_display_delete(lv_display_t * disp)
     lv_free(disp);
 
     if(was_default) lv_display_set_default(_lv_ll_get_head(disp_ll_p));
+
+    if (disp == _lv_refr_get_disp_refreshing()) {
+        _lv_refr_set_disp_refreshing(lv_display_get_default());
+    }
 }
 
 void lv_display_set_default(lv_display_t * disp)
