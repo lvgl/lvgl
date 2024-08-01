@@ -23,6 +23,7 @@
 #include <GLFW/glfw3.h>
 
 #include "lv_opengles_driver.h"
+#include "lv_opengles_texture.h"
 
 /*********************
  *      DEFINES
@@ -149,7 +150,7 @@ void lv_glfw_window_make_context_current(lv_display_t * disp)
     glfwMakeContextCurrent(dsc->window);
 }
 
-lv_glfw_texture_t * lv_glfw_texture_add(lv_display_t * disp, unsigned int texture, int32_t w, int32_t h)
+lv_glfw_texture_t * lv_glfw_window_add_texture(lv_display_t * disp, unsigned int texture, int32_t w, int32_t h)
 {
     lv_glfw_window_t * dsc = lv_display_get_driver_data(disp);
     lv_glfw_texture_t * tex = _lv_ll_ins_tail(&dsc->textures);
@@ -336,19 +337,33 @@ static void window_update_handler(lv_timer_t * t)
     LV_UNUSED(t);
     lv_display_t * disp = lv_display_get_next(NULL);
     while(disp) {
-        lv_glfw_window_t * dsc = lv_display_get_driver_data(disp);
-        if(dsc == NULL) {
+        if(disp->flush_cb != flush_cb) {
             disp = lv_display_get_next(disp);
             continue;
         }
 
+        lv_glfw_window_t * dsc = lv_display_get_driver_data(disp);
+
         glfwMakeContextCurrent(dsc->window);
 
         if(!glfwWindowShouldClose(dsc->window)) {
+            /* render main window UI */
             lv_opengles_update(dsc->fb1, disp->hor_res, disp->ver_res);
 
+            /* render added textures */
             lv_glfw_texture_t * tex;
             _LV_LL_READ(&dsc->textures, tex) {
+                /* if the added texture is an LVGL opengles texture display, refresh it before rendering it */
+                lv_display_t * texture_disp = NULL;
+                while(NULL != (texture_disp = lv_display_get_next(texture_disp))) {
+                    unsigned int texture_disp_texture_id;
+                    if(lv_opengles_texture_get_texture_id(texture_disp, &texture_disp_texture_id)
+                       && texture_disp_texture_id == tex->texture_id) {
+                        lv_refr_now(texture_disp);
+                        break;
+                    }
+                }
+
                 lv_opengles_render_texture(tex->texture_id, &tex->area, tex->opa, disp->hor_res, disp->ver_res);
             }
 

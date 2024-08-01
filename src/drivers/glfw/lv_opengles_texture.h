@@ -1,10 +1,10 @@
 /**
- * @file lvgl_private.h
+ * @file lv_opengles_texture.h
  *
  */
 
-#ifndef LVGL_PRIVATE_H
-#define LVGL_PRIVATE_H
+#ifndef LV_OPENGLES_TEXTURE_H
+#define LV_OPENGLES_TEXTURE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,12 +13,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "display/lv_display_private.h"
-#include "indev/lv_indev_private.h"
-#include "misc/lv_text_private.h"
-#include "misc/cache/lv_cache_entry_private.h"
-#include "misc/cache/lv_cache_private.h"
-#include "drivers/glfw/lv_glfw_window_private.h"
+
+#include "../../lv_conf_internal.h"
+#if LV_USE_OPENGLES
+
+#include "../../display/lv_display.h"
 
 /*********************
  *      DEFINES
@@ -32,12 +31,17 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
+lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h);
+bool lv_opengles_texture_get_texture_id(lv_display_t * disp, unsigned int * texture_id_dst);
+
 /**********************
  *      MACROS
  **********************/
+
+#endif /* LV_USE_OPENGLES */
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LVGL_PRIVATE_H*/
+#endif /*LV_OPENGLES_TEXTURE_H*/

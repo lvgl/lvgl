@@ -6,10 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../display/lv_display.h"
-#include "lv_opengles_debug.h"
 
+#include "lv_opengles_debug.h"
 #if LV_USE_OPENGLES
+
+#include "../../misc/lv_log.h"
 
 /*********************
  *      DEFINES

@@ -98,7 +98,8 @@ so that ``img_cogwheel_argb`` is available.
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img_cogwheel_argb.header.w, img_cogwheel_argb.header.h, 0, GL_BGRA, GL_UNSIGNED_BYTE, img_cogwheel_argb.data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
-        lv_glfw_texture_t * tex = lv_glfw_texture_add(lv_display_get_default(), texture, img_cogwheel_argb.header.w, img_cogwheel_argb.header.h);
+        lv_glfw_texture_t * tex = lv_glfw_window_add_texture(lv_display_get_default(), texture, img_cogwheel_argb.header.w, img_cogwheel_argb.header.h);
         lv_glfw_texture_set_x(tex, 150);
         lv_glfw_texture_set_y(tex, 100);
+        lv_glfw_texture_set_opa(tex, LV_OPA_90);
     }
