@@ -978,14 +978,14 @@ static bool refr_check_obj_clip_overflow(lv_layer_t * layer, lv_obj_t * obj)
 
     /*Truncate the area to the object*/
     lv_area_t obj_coords;
-    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    int32_t ext_size = lv_obj_get_ext_draw_size(obj);
     lv_area_copy(&obj_coords, &obj->coords);
     lv_area_increase(&obj_coords, ext_size, ext_size);
 
     lv_obj_get_transformed_area(obj, &obj_coords, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
 
     lv_area_t clip_coords_for_obj;
-    if(!_lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, &obj_coords)) {
+    if(!lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, &obj_coords)) {
         return false;
     }
 

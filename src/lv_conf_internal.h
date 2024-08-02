@@ -3400,7 +3400,7 @@
 #endif
 #if LV_USE_QNX
     #ifndef LV_QNX_BUF_COUNT
-        #ifdef _LV_KCONFIG_PRESENT
+        #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_QNX_BUF_COUNT
                 #define LV_QNX_BUF_COUNT CONFIG_LV_QNX_BUF_COUNT
             #else

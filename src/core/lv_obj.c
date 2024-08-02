@@ -25,6 +25,7 @@
 #include "../misc/lv_types.h"
 #include "../tick/lv_tick.h"
 #include "../stdlib/lv_string.h"
+#include "lv_obj_draw_private.h"
 
 /*********************
  *      DEFINES
@@ -145,7 +146,7 @@ static const lv_property_ops_t properties[] = {
     },
     {
         .id = LV_PROPERTY_OBJ_EXT_DRAW_SIZE,
-        .getter = _lv_obj_get_ext_draw_size,
+        .getter = lv_obj_get_ext_draw_size,
     },
     {
         .id = LV_PROPERTY_OBJ_EVENT_COUNT,
