@@ -49,6 +49,11 @@ struct lv_draw_task_t {
      */
     lv_area_t clip_area;
 
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    /** Transform matrix to be applied when rendering the layer */
+    lv_matrix_t matrix;
+#endif
+
     volatile int state;              /*int instead of lv_draw_task_state_t to be sure its atomic*/
 
     void * draw_dsc;

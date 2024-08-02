@@ -435,7 +435,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
                         c_mult[1] = color.green * mix;
                         c_mult[2] = color.red * mix;
                         uint8_t * tmp_buf_2 = tmp_buf;
-                        for(i = 0; i < size * px_size; i += px_size) {
+                        for(i = 0; i < (uint32_t)(size * px_size); i += px_size) {
                             tmp_buf_2[i + 0] = (c_mult[0] + (tmp_buf_2[i + 0] * mix_inv)) >> 8;
                             tmp_buf_2[i + 1] = (c_mult[1] + (tmp_buf_2[i + 1] * mix_inv)) >> 8;
                             tmp_buf_2[i + 2] = (c_mult[2] + (tmp_buf_2[i + 2] * mix_inv)) >> 8;

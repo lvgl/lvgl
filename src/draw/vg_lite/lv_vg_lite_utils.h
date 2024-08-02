@@ -91,6 +91,8 @@ const char * lv_vg_lite_vlc_op_string(uint8_t vlc_op);
 
 void lv_vg_lite_path_dump_info(const vg_lite_path_t * path);
 
+void lv_vg_lite_stroke_dump_info(const vg_lite_stroke_t * stroke);
+
 void lv_vg_lite_buffer_dump_info(const vg_lite_buffer_t * buffer);
 
 void lv_vg_lite_matrix_dump_info(const vg_lite_matrix_t * matrix);
@@ -142,6 +144,12 @@ uint32_t lv_vg_lite_get_palette_size(vg_lite_buffer_format_t format);
 vg_lite_color_t lv_vg_lite_color(lv_color_t color, lv_opa_t opa, bool pre_mul);
 
 void lv_vg_lite_rect(vg_lite_rectangle_t * rect, const lv_area_t * area);
+
+#if LV_USE_MATRIX
+
+void lv_vg_lite_matrix(vg_lite_matrix_t * dest, const lv_matrix_t * src);
+
+#endif
 
 /* Param checker */
 

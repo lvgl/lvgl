@@ -1,10 +1,10 @@
 /**
- * @file lv_layouts.h
+ * @file lv_layout.h
  *
  */
 
-#ifndef LV_LAYOUTS_H
-#define LV_LAYOUTS_H
+#ifndef LV_LAYOUT_H
+#define LV_LAYOUT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,4 +64,4 @@ uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_LAYOUTS_H*/
+#endif /*LV_LAYOUT_H*/

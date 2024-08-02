@@ -1,5 +1,5 @@
 /**
- * @file lv_barcode.c
+ * @file lv_barcode.h
  *
  */
 

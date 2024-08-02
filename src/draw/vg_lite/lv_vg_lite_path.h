@@ -105,6 +105,8 @@ void lv_vg_lite_path_append_arc(lv_vg_lite_path_t * path,
                                 float sweep,
                                 bool pie);
 
+void lv_vg_lite_path_append_path(lv_vg_lite_path_t * dest, const lv_vg_lite_path_t * src);
+
 uint8_t lv_vg_lite_vlc_op_arg_len(uint8_t vlc_op);
 
 uint8_t lv_vg_lite_path_format_len(vg_lite_format_t format);

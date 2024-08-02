@@ -327,6 +327,7 @@ void lv_vg_lite_path_end(lv_vg_lite_path_t * path)
 {
     LV_ASSERT_NULL(path);
     lv_vg_lite_path_append_op(path, VLC_OP_END);
+    path->base.add_end = 1;
 }
 
 void lv_vg_lite_path_append_rect(
@@ -587,6 +588,15 @@ void lv_vg_lite_path_for_each_data(const vg_lite_path_t * path, lv_vg_lite_path_
 
         cb(user_data, op_code, tmp_data, arg_len);
     }
+}
+
+void lv_vg_lite_path_append_path(lv_vg_lite_path_t * dest, const lv_vg_lite_path_t * src)
+{
+    LV_ASSERT_NULL(dest);
+    LV_ASSERT_NULL(src);
+
+    LV_ASSERT(dest->base.format == dest->base.format);
+    lv_vg_lite_path_append_data(dest, src->base.path, src->base.path_length);
 }
 
 /**********************

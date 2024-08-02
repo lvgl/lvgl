@@ -1,5 +1,5 @@
 /**
- * @file lv_img.h
+ * @file lv_image.h
  *
  */
 
@@ -56,7 +56,7 @@ typedef enum {
 } lv_image_align_t;
 
 #if LV_USE_OBJ_PROPERTY
-enum {
+enum _lv_image_property_t {
     LV_PROPERTY_ID(IMAGE, SRC,        LV_PROPERTY_TYPE_IMGSRC,    0),
     LV_PROPERTY_ID(IMAGE, OFFSET_X,   LV_PROPERTY_TYPE_INT,       1),
     LV_PROPERTY_ID(IMAGE, OFFSET_Y,   LV_PROPERTY_TYPE_INT,       2),
@@ -136,39 +136,39 @@ void lv_image_set_pivot(lv_obj_t * obj, int32_t x, int32_t y);
 /**
  * Set the zoom factor of the image.
  * Note that indexed and alpha only images can't be transformed.
- * @param img       pointer to an image object
- * @param zoom      the zoom factor.
- * @example 256 or LV_ZOOM_IMAGE_NONE for no zoom
- * @example <256: scale down
- * @example >256 scale up
- * @example 128 half size
- * @example 512 double size
+ * @param obj       pointer to an image object
+ * @param zoom      the zoom factor.  Example values:
+ *                      - 256 or LV_ZOOM_IMAGE_NONE:  no zoom
+ *                      - <256:  scale down
+ *                      - >256:  scale up
+ *                      - 128:  half size
+ *                      - 512:  double size
  */
 void lv_image_set_scale(lv_obj_t * obj, uint32_t zoom);
 
 /**
  * Set the horizontal zoom factor of the image.
  * Note that indexed and alpha only images can't be transformed.
- * @param img       pointer to an image object
- * @param zoom      the zoom factor.
- * @example 256 or LV_ZOOM_IMAGE_NONE for no zoom
- * @example <256: scale down
- * @example >256 scale up
- * @example 128 half size
- * @example 512 double size
+ * @param obj       pointer to an image object
+ * @param zoom      the zoom factor.  Example values:
+ *                      - 256 or LV_ZOOM_IMAGE_NONE:  no zoom
+ *                      - <256:  scale down
+ *                      - >256:  scale up
+ *                      - 128:  half size
+ *                      - 512:  double size
  */
 void lv_image_set_scale_x(lv_obj_t * obj, uint32_t zoom);
 
 /**
  * Set the vertical zoom factor of the image.
  * Note that indexed and alpha only images can't be transformed.
- * @param img       pointer to an image object
- * @param zoom      the zoom factor.
- * @example 256 or LV_ZOOM_IMAGE_NONE for no zoom
- * @example <256: scale down
- * @example >256 scale up
- * @example 128 half size
- * @example 512 double size
+ * @param obj       pointer to an image object
+ * @param zoom      the zoom factor.  Example values:
+ *                      - 256 or LV_ZOOM_IMAGE_NONE:  no zoom
+ *                      - <256:  scale down
+ *                      - >256:  scale up
+ *                      - 128:  half size
+ *                      - 512:  double size
  */
 void lv_image_set_scale_y(lv_obj_t * obj, uint32_t zoom);
 
@@ -283,7 +283,7 @@ bool lv_image_get_antialias(lv_obj_t * obj);
 /**
  * Get the size mode of the image
  * @param obj       pointer to an image object
- * @return          element of @ref lv_image_align_t
+ * @return          element of `lv_image_align_t`
  */
 lv_image_align_t lv_image_get_inner_align(lv_obj_t * obj);
 

@@ -47,7 +47,7 @@
 #endif
 
 /*If lv_conf.h is not skipped include it*/
-#ifndef LV_CONF_SKIP
+#if !defined(LV_CONF_SKIP) || defined(LV_CONF_PATH)
     #ifdef LV_CONF_PATH                           /*If there is a path defined for lv_conf.h use it*/
         #define __LV_TO_STR_AUX(x) #x
         #define __LV_TO_STR(x) __LV_TO_STR_AUX(x)
@@ -290,6 +290,18 @@
         #define LV_DRAW_BUF_ALIGN CONFIG_LV_DRAW_BUF_ALIGN
     #else
         #define LV_DRAW_BUF_ALIGN                       4
+    #endif
+#endif
+
+/*Using matrix for transformations.
+ *Requirements:
+    `LV_USE_MATRIX = 1`.
+    The rendering engine needs to support 3x3 matrix transformations.*/
+#ifndef LV_DRAW_TRANSFORM_USE_MATRIX
+    #ifdef CONFIG_LV_DRAW_TRANSFORM_USE_MATRIX
+        #define LV_DRAW_TRANSFORM_USE_MATRIX CONFIG_LV_DRAW_TRANSFORM_USE_MATRIX
+    #else
+        #define LV_DRAW_TRANSFORM_USE_MATRIX            0
     #endif
 #endif
 
@@ -676,6 +688,16 @@
         #define LV_VG_LITE_GRAD_CACHE_CNT CONFIG_LV_VG_LITE_GRAD_CACHE_CNT
     #else
         #define LV_VG_LITE_GRAD_CACHE_CNT 32
+    #endif
+#endif
+
+/* VG-Lite stroke maximum cache number.
+ */
+#ifndef LV_VG_LITE_STROKE_CACHE_CNT
+    #ifdef CONFIG_LV_VG_LITE_STROKE_CACHE_CNT
+        #define LV_VG_LITE_STROKE_CACHE_CNT CONFIG_LV_VG_LITE_STROKE_CACHE_CNT
+    #else
+        #define LV_VG_LITE_STROKE_CACHE_CNT 32
     #endif
 #endif
 
@@ -1278,6 +1300,16 @@
         #define LV_USE_FLOAT CONFIG_LV_USE_FLOAT
     #else
         #define LV_USE_FLOAT            0
+    #endif
+#endif
+
+/*Enable matrix support
+ *Requires `LV_USE_FLOAT = 1`*/
+#ifndef LV_USE_MATRIX
+    #ifdef CONFIG_LV_USE_MATRIX
+        #define LV_USE_MATRIX CONFIG_LV_USE_MATRIX
+    #else
+        #define LV_USE_MATRIX           0
     #endif
 #endif
 
@@ -2626,7 +2658,8 @@
     #endif
 #endif
 
-/*Enable Vector Graphic APIs*/
+/*Enable Vector Graphic APIs
+ *Requires `LV_USE_MATRIX = 1`*/
 #ifndef LV_USE_VECTOR_GRAPHIC
     #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC
         #define LV_USE_VECTOR_GRAPHIC CONFIG_LV_USE_VECTOR_GRAPHIC
@@ -3353,6 +3386,28 @@
             #endif
         #else
             #define LV_USE_OPENGLES_DEBUG        1    /* Enable or disable debug for opengles */
+        #endif
+    #endif
+#endif
+
+/* QNX Screen display and input drivers */
+#ifndef LV_USE_QNX
+    #ifdef CONFIG_LV_USE_QNX
+        #define LV_USE_QNX CONFIG_LV_USE_QNX
+    #else
+        #define LV_USE_QNX              0
+    #endif
+#endif
+#if LV_USE_QNX
+    #ifndef LV_QNX_BUF_COUNT
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_QNX_BUF_COUNT
+                #define LV_QNX_BUF_COUNT CONFIG_LV_QNX_BUF_COUNT
+            #else
+                #define LV_QNX_BUF_COUNT 0
+            #endif
+        #else
+            #define LV_QNX_BUF_COUNT        1    /*1 or 2*/
         #endif
     #endif
 #endif

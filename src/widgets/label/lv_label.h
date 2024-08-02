@@ -53,6 +53,16 @@ typedef enum {
     LV_LABEL_LONG_CLIP,             /**< Keep the size and clip the text out of it*/
 } lv_label_long_mode_t;
 
+#if LV_USE_OBJ_PROPERTY
+enum {
+    LV_PROPERTY_ID(LABEL, TEXT,                   LV_PROPERTY_TYPE_TEXT,      0),
+    LV_PROPERTY_ID(LABEL, LONG_MODE,              LV_PROPERTY_TYPE_INT,       1),
+    LV_PROPERTY_ID(LABEL, TEXT_SELECTION_START,   LV_PROPERTY_TYPE_INT,       2),
+    LV_PROPERTY_ID(LABEL, TEXT_SELECTION_END,     LV_PROPERTY_TYPE_INT,       3),
+    LV_PROPERTY_LABEL_END,
+};
+#endif
+
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_label_class;
 
 /**********************
@@ -81,7 +91,11 @@ void lv_label_set_text(lv_obj_t * obj, const char * text);
  * Set a new formatted text for a label. Memory will be allocated to store the text by the label.
  * @param obj           pointer to a label object
  * @param fmt           `printf`-like format
- * @example lv_label_set_text_fmt(label1, "%d user", user_num);
+ *
+ * Example:
+ * @code
+ * lv_label_set_text_fmt(label1, "%d user", user_num);
+ * @endcode
  */
 void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORMAT_ATTRIBUTE(2, 3);
 

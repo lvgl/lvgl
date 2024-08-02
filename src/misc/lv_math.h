@@ -79,6 +79,7 @@ int32_t lv_cubic_bezier(int32_t x, int32_t x1, int32_t y1, int32_t x2, int32_t y
  */
 int32_t lv_bezier3(int32_t t, int32_t u0, uint32_t u1, int32_t u2, int32_t u3);
 
+
 /**
  * Calculate the atan2 of a vector.
  * @param x

@@ -431,11 +431,11 @@ static void style_init(my_theme_t * theme)
     lv_style_set_bg_color(&theme->styles.cb_marker, theme->color_card);
     lv_style_set_bg_opa(&theme->styles.cb_marker, LV_OPA_COVER);
     lv_style_set_radius(&theme->styles.cb_marker, RADIUS_DEFAULT / 2);
+    lv_style_set_text_font(&theme->styles.cb_marker, theme->base.font_small);
+    lv_style_set_text_color(&theme->styles.cb_marker, lv_color_white());
 
     style_init_reset(&theme->styles.cb_marker_checked);
     lv_style_set_bg_image_src(&theme->styles.cb_marker_checked, LV_SYMBOL_OK);
-    lv_style_set_text_color(&theme->styles.cb_marker_checked, lv_color_white());
-    lv_style_set_text_font(&theme->styles.cb_marker_checked, theme->base.font_small);
 #endif
 
 #if LV_USE_SWITCH
