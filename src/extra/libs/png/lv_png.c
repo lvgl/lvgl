@@ -28,6 +28,7 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
 static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
 static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
 static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
+static inline lv_color_t lv_color_make_rounding(uint8_t r, uint8_t g, uint8_t b);
 
 /**********************
  *  STATIC VARIABLES
@@ -246,7 +247,7 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt)
     lv_color_t c;
     uint32_t i;
     for(i = 0; i < px_cnt; i++) {
-        c = lv_color_make(img_argb[i].ch.blue, img_argb[i].ch.green, img_argb[i].ch.red);
+        c = lv_color_make_rounding(img_argb[i].ch.blue, img_argb[i].ch.green, img_argb[i].ch.red);
         img[i * 3 + 2] = img_argb[i].ch.alpha;
         img[i * 3 + 1] = c.full >> 8;
         img[i * 3 + 0] = c.full & 0xFF;
@@ -256,7 +257,7 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt)
     lv_color_t c;
     uint32_t i;
     for(i = 0; i < px_cnt; i++) {
-        c = lv_color_make(img_argb[i].ch.red, img_argb[i].ch.green, img_argb[i].ch.blue);
+        c = lv_color_make_rounding(img_argb[i].ch.red, img_argb[i].ch.green, img_argb[i].ch.blue);
         img[i * 2 + 1] = img_argb[i].ch.alpha;
         img[i * 2 + 0] = c.full;
     }
@@ -270,6 +271,24 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt)
         img[i * 2 + 0] = b > 128 ? 1 : 0;
     }
 #endif
+}
+
+static inline lv_color_t lv_color_make_rounding(uint8_t r, uint8_t g, uint8_t b)
+{
+#if LV_COLOR_DEPTH == 16
+    /* if the high bits are not all set and the highest low bit is set     */
+    /* then the high bits should be rounded up so add one to the high bits */
+    /* if((r & 0b11111000) != 0b11111000 && (r & 0b100)) r += 0b1000       */
+    if((r & 0xf8) != 0xf8 && (r & 0x04)) r += 0x08;
+    if((g & 0xfc) != 0xfc && (g & 0x02)) g += 0x04;
+    if((b & 0xf8) != 0xf8 && (b & 0x04)) b += 0x08;
+#elif LV_COLOR_DEPTH == 8
+    if((r & 0xe0) != 0xe0 && (r & 0x10)) r += 0x20;
+    if((g & 0xe0) != 0xe0 && (g & 0x10)) g += 0x20;
+    if((b & 0xc0) != 0xc0 && (b & 0x20)) b += 0x40;
+#endif
+
+    return lv_color_make(r, g, b);
 }
 
 #endif /*LV_USE_PNG*/
