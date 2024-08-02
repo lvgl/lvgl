@@ -213,7 +213,7 @@ static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t *
 static void _move_buf_close_to_area(void ** buf, lv_area_t * area, uint32_t stride, lv_color_format_t cf)
 {
     uint8_t ** buf_u8 = (uint8_t **)buf;
-    uint8_t align_bytes = vglite_get_alignment(cf);
+    uint8_t align_bytes = vglite_get_stride_alignment(cf);
     uint8_t bits_per_pixel = lv_color_format_get_bpp(cf);
 
     uint16_t align_pixels = align_bytes * 8 / bits_per_pixel;

@@ -134,10 +134,13 @@ static void _vglite_draw_triangle(const lv_area_t * coords, const lv_area_t * cl
 
         /* Gradient Setup */
         vg_lite_uint32_t cnt = LV_MAX(dsc->bg_grad.stops_count, LV_GRADIENT_MAX_STOPS);
+        lv_opa_t bg_opa;
+
         for(uint8_t i = 0; i < cnt; i++) {
             stops[i] = dsc->bg_grad.stops[i].frac;
+            bg_opa = LV_OPA_MIX2(dsc->bg_grad.stops[i].opa, dsc->bg_opa);
 
-            col32[i] = lv_color_to_32(dsc->bg_grad.stops[i].color, dsc->bg_grad.stops[i].opa);
+            col32[i] = lv_color_to_32(dsc->bg_grad.stops[i].color, bg_opa);
             colors[i] = vglite_get_color(col32[i], true);
         }
 
