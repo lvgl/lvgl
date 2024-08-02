@@ -781,7 +781,7 @@ static uint32_t lv_text_iso8859_1_prev(const char * txt, uint32_t * i)
 
 /**
  * Convert a character index (in an ISO8859-1 text) to byte index.
- * The iso8859-1 encoding is compatible with ASCII so the indices of characters is the same as the indices of bytes.
+ * The ISO8859-1 encoding is compatible with ASCII so the indices of characters is the same as the indices of bytes.
  * @param txt a '\0' terminated char string
  * @param utf8_id character index
  * @return byte index of the 'utf8_id'th letter
@@ -794,7 +794,7 @@ static uint32_t lv_text_iso8859_1_get_byte_id(const char * txt, uint32_t utf8_id
 
 /**
  * Convert a byte index (in an ISO8859-1 text) to character index.
- * The iso8859-1 encoding is compatible with ASCII so the indices of characters is the same as the indices of bytes.
+ * The ISO8859-1 encoding is compatible with ASCII so the indices of characters is the same as the indices of bytes.
  * @param txt a '\0' terminated char string
  * @param byte_id byte index
  * @return character index of the letter at 'byte_id'th position
@@ -807,7 +807,7 @@ static uint32_t lv_text_iso8859_1_get_char_id(const char * txt, uint32_t byte_id
 
 /**
  * Get the number of characters (and NOT bytes) in a string.
- * The iso8859-1 encoding is compatible with ASCII so the number of characters is the same as the number of bytes.
+ * The ISO8859-1 encoding is compatible with ASCII so the number of characters is the same as the number of bytes.
  * @param txt a '\0' terminated char string
  * @return number of characters
  */
