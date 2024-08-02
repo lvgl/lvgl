@@ -6,7 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lvgl.h"
+#include "../../core/lv_obj_class_private.h"
+#include "lv_qrcode_private.h"
 
 #if LV_USE_QRCODE
 

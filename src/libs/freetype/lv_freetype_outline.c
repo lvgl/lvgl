@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 
+#include "../../misc/lv_event_private.h"
 #include "../../lvgl.h"
 #include "lv_freetype_private.h"
 
@@ -22,7 +23,7 @@
  *      TYPEDEFS
  **********************/
 
-typedef struct _lv_freetype_outline_node_t {
+typedef struct lv_freetype_outline_node_t {
     FT_UInt glyph_index;
     lv_freetype_outline_t outline;
 } lv_freetype_outline_node_t;

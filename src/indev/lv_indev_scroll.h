@@ -31,13 +31,13 @@ extern "C" {
  * Handle scrolling. Called by LVGL during input device processing
  * @param indev      pointer to an input device
  */
-void _lv_indev_scroll_handler(lv_indev_t * indev);
+void lv_indev_scroll_handler(lv_indev_t * indev);
 
 /**
  * Handle throwing after scrolling. Called by LVGL during input device processing
  * @param indev      pointer to an input device
  */
-void _lv_indev_scroll_throw_handler(lv_indev_t * indev);
+void lv_indev_scroll_throw_handler(lv_indev_t * indev);
 
 /**
  * Predict where would a scroll throw end

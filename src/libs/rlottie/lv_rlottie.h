@@ -31,23 +31,6 @@ typedef enum {
     LV_RLOTTIE_CTRL_LOOP     = 8,
 } lv_rlottie_ctrl_t;
 
-/** definition in lottieanimation_capi.c */
-struct Lottie_Animation_S;
-typedef struct {
-    lv_image_t img_ext;
-    struct Lottie_Animation_S * animation;
-    lv_timer_t * task;
-    lv_image_dsc_t imgdsc;
-    size_t total_frames;
-    size_t current_frame;
-    size_t framerate;
-    uint32_t * allocated_buf;
-    size_t allocated_buffer_size;
-    size_t scanline_width;
-    lv_rlottie_ctrl_t play_ctrl;
-    size_t dest_frame;
-} lv_rlottie_t;
-
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_rlottie_class;
 
 /**********************

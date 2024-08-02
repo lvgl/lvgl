@@ -5,7 +5,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_timer.h"
+#include "lv_timer_private.h"
 #include "../core/lv_global.h"
 #include "../tick/lv_tick.h"
 #include "../stdlib/lv_mem.h"
@@ -52,9 +52,9 @@ static void lv_timer_handler_resume(void);
  *   GLOBAL FUNCTIONS
  **********************/
 
-void _lv_timer_core_init(void)
+void lv_timer_core_init(void)
 {
-    _lv_ll_init(timer_ll_p, sizeof(lv_timer_t));
+    lv_ll_init(timer_ll_p, sizeof(lv_timer_t));
 
     /*Initially enable the lv_timer handling*/
     lv_timer_enable(true);
@@ -98,11 +98,11 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
         state_p->timer_deleted             = false;
         state_p->timer_created             = false;
 
-        timer_active = _lv_ll_get_head(timer_head);
+        timer_active = lv_ll_get_head(timer_head);
         while(timer_active) {
             /*The timer might be deleted if it runs only once ('repeat_count = 1')
              *So get next element until the current is surely valid*/
-            next = _lv_ll_get_next(timer_head, timer_active);
+            next = lv_ll_get_next(timer_head, timer_active);
 
             if(lv_timer_exec(timer_active)) {
                 /*If a timer was created or deleted then this or the next item might be corrupted*/
@@ -117,7 +117,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
     } while(timer_active);
 
     uint32_t time_until_next = LV_NO_TIMER_READY;
-    next = _lv_ll_get_head(timer_head);
+    next = lv_ll_get_head(timer_head);
     while(next) {
         if(!next->paused) {
             uint32_t delay = lv_timer_time_remaining(next);
@@ -125,7 +125,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
                 time_until_next = delay;
         }
 
-        next = _lv_ll_get_next(timer_head, next); /*Find the next timer*/
+        next = lv_ll_get_next(timer_head, next); /*Find the next timer*/
     }
 
     state_p->busy_time += lv_tick_elaps(handler_start);
@@ -167,7 +167,7 @@ lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * us
 {
     lv_timer_t * new_timer = NULL;
 
-    new_timer = _lv_ll_ins_head(timer_ll_p);
+    new_timer = lv_ll_ins_head(timer_ll_p);
     LV_ASSERT_MALLOC(new_timer);
     if(new_timer == NULL) return NULL;
 
@@ -194,7 +194,7 @@ void lv_timer_set_cb(lv_timer_t * timer, lv_timer_cb_t timer_cb)
 
 void lv_timer_delete(lv_timer_t * timer)
 {
-    _lv_ll_remove(timer_ll_p, timer);
+    lv_ll_remove(timer_ll_p, timer);
     state.timer_deleted = true;
 
     lv_free(timer);
@@ -256,11 +256,11 @@ void lv_timer_enable(bool en)
     if(en) lv_timer_handler_resume();
 }
 
-void _lv_timer_core_deinit(void)
+void lv_timer_core_deinit(void)
 {
     lv_timer_enable(false);
 
-    _lv_ll_clear(timer_ll_p);
+    lv_ll_clear(timer_ll_p);
 }
 
 uint32_t lv_timer_get_idle(void)
@@ -275,8 +275,29 @@ uint32_t lv_timer_get_time_until_next(void)
 
 lv_timer_t * lv_timer_get_next(lv_timer_t * timer)
 {
-    if(timer == NULL) return _lv_ll_get_head(timer_ll_p);
-    else return _lv_ll_get_next(timer_ll_p, timer);
+    if(timer == NULL) return lv_ll_get_head(timer_ll_p);
+    else return lv_ll_get_next(timer_ll_p, timer);
+}
+
+LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler_run_in_period(uint32_t period)
+{
+    static uint32_t last_tick = 0;
+
+    if(lv_tick_elaps(last_tick) >= period) {
+        last_tick = lv_tick_get();
+        return lv_timer_handler();
+    }
+    return 1;
+}
+
+void * lv_timer_get_user_data(lv_timer_t * timer)
+{
+    return timer->user_data;
+}
+
+bool lv_timer_get_paused(lv_timer_t * timer)
+{
+    return timer->paused;
 }
 
 /**********************

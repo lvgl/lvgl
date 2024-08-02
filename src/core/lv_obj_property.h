@@ -67,11 +67,10 @@ enum {
     /*Special ID, use it to extend ID and make sure it's unique and compile time determinant*/
     LV_PROPERTY_ID_BUILTIN_LAST = 0xffff, /*ID of 0x10000 ~ 0xfffffff is reserved for user*/
 
-    /*Special ID used by lvgl to intercept all setter/getter call.*/
-    LV_PROPERTY_ID_ANY          = 0x7ffffffe,
+    LV_PROPERTY_ID_ANY          = 0x7ffffffe, /*Special ID used by lvgl to intercept all setter/getter call.*/
 };
 
-struct _lv_property_name_t {
+struct lv_property_name_t {
     const char * name;
     lv_prop_id_t id;
 };

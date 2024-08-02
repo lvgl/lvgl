@@ -1,3 +1,7 @@
+#include "../misc/lv_event_private.h"
+#include "../misc/lv_area_private.h"
+#include "../misc/lv_anim_private.h"
+#include "../core/lv_obj_draw_private.h"
 /**
  * @file lv_indev.c
  *
@@ -10,12 +14,12 @@
 #include "lv_indev_scroll.h"
 #include "../display/lv_display_private.h"
 #include "../core/lv_global.h"
-#include "../core/lv_obj.h"
+#include "../core/lv_obj_private.h"
 #include "../core/lv_group.h"
 #include "../core/lv_refr.h"
 
 #include "../tick/lv_tick.h"
-#include "../misc/lv_timer.h"
+#include "../misc/lv_timer_private.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_profiler.h"
 #include "../stdlib/lv_string.h"
@@ -113,7 +117,7 @@ lv_indev_t * lv_indev_create(void)
         LV_LOG_WARN("no display was created so far");
     }
 
-    lv_indev_t * indev = _lv_ll_ins_head(indev_ll_head);
+    lv_indev_t * indev = lv_ll_ins_head(indev_ll_head);
     LV_ASSERT_MALLOC(indev);
     if(indev == NULL) {
         return NULL;
@@ -149,7 +153,7 @@ void lv_indev_delete(lv_indev_t * indev)
     if(indev->read_timer) lv_timer_delete(indev->read_timer);
 
     /*Remove the input device from the list*/
-    _lv_ll_remove(indev_ll_head, indev);
+    lv_ll_remove(indev_ll_head, indev);
     /*Free the memory of the input device*/
     lv_free(indev);
 }
@@ -157,9 +161,9 @@ void lv_indev_delete(lv_indev_t * indev)
 lv_indev_t * lv_indev_get_next(lv_indev_t * indev)
 {
     if(indev == NULL)
-        return _lv_ll_get_head(indev_ll_head);
+        return lv_ll_get_head(indev_ll_head);
     else
-        return _lv_ll_get_next(indev_ll_head, indev);
+        return lv_ll_get_next(indev_ll_head, indev);
 }
 
 void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
@@ -534,10 +538,10 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     /*If the point is on this object check its children too*/
     lv_area_t obj_coords = obj->coords;
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
-        int32_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
+        int32_t ext_draw_size = lv_obj_get_ext_draw_size(obj);
         lv_area_increase(&obj_coords, ext_draw_size, ext_draw_size);
     }
-    if(_lv_area_is_point_on(&obj_coords, &p_trans, 0)) {
+    if(lv_area_is_point_on(&obj_coords, &p_trans, 0)) {
         int32_t i;
         uint32_t child_cnt = lv_obj_get_child_count(obj);
 
@@ -1138,7 +1142,7 @@ static void indev_proc_press(lv_indev_t * indev)
             indev->scroll_throw_anim = NULL;
         }
 
-        _lv_indev_scroll_throw_handler(indev);
+        lv_indev_scroll_throw_handler(indev);
         if(indev_reset_check(indev)) return;
     }
 
@@ -1226,7 +1230,7 @@ static void indev_proc_press(lv_indev_t * indev)
 
         if(indev_act->wait_until_release) return;
 
-        _lv_indev_scroll_handler(indev);
+        lv_indev_scroll_handler(indev);
         if(indev_reset_check(indev)) return;
         indev_gesture(indev);
         if(indev_reset_check(indev)) return;
@@ -1391,7 +1395,7 @@ static void indev_proc_pointer_diff(lv_indev_t * indev)
 
         indev->pointer.scroll_throw_vect.y = diff;
         indev->pointer.scroll_throw_vect_ori.y = diff;
-        _lv_indev_scroll_handler(indev);
+        lv_indev_scroll_handler(indev);
     }
 
 }
@@ -1647,7 +1651,7 @@ static void indev_scroll_throw_anim_cb(void * var, int32_t v)
     LV_UNUSED(v);
     lv_indev_t * indev = (lv_indev_t *)var;
 
-    _lv_indev_scroll_throw_handler(indev);
+    lv_indev_scroll_throw_handler(indev);
 
     if(indev->pointer.scroll_dir == LV_DIR_NONE || indev->pointer.scroll_obj == NULL) {
         if(indev->scroll_throw_anim) {

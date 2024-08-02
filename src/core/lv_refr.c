@@ -6,15 +6,21 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_refr.h"
+#include "../misc/lv_area_private.h"
+#include "../draw/sw/lv_draw_sw_mask_private.h"
+#include "../draw/lv_draw_mask_private.h"
+#include "lv_obj_private.h"
+#include "lv_obj_event_private.h"
+#include "lv_obj_draw_private.h"
+#include "lv_refr_private.h"
 #include "../display/lv_display.h"
 #include "../display/lv_display_private.h"
 #include "../tick/lv_tick.h"
-#include "../misc/lv_timer.h"
+#include "../misc/lv_timer_private.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_profiler.h"
 #include "../misc/lv_types.h"
-#include "../draw/lv_draw.h"
+#include "../draw/lv_draw_private.h"
 #include "../font/lv_font_fmt_txt.h"
 #include "../stdlib/lv_string.h"
 #include "lv_global.h"
@@ -66,11 +72,11 @@ static void wait_for_flushing(lv_display_t * disp);
 /**
  * Initialize the screen refresh subsystem
  */
-void _lv_refr_init(void)
+void lv_refr_init(void)
 {
 }
 
-void _lv_refr_deinit(void)
+void lv_refr_deinit(void)
 {
 }
 
@@ -79,13 +85,13 @@ void lv_refr_now(lv_display_t * disp)
     lv_anim_refr_now();
 
     if(disp) {
-        if(disp->refr_timer) _lv_display_refr_timer(disp->refr_timer);
+        if(disp->refr_timer) lv_display_refr_timer(disp->refr_timer);
     }
     else {
         lv_display_t * d;
         d = lv_display_get_next(NULL);
         while(d) {
-            if(d->refr_timer) _lv_display_refr_timer(d->refr_timer);
+            if(d->refr_timer) lv_display_refr_timer(d->refr_timer);
             d = lv_display_get_next(d);
         }
     }
@@ -99,10 +105,10 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     /*Truncate the clip area to `obj size + ext size` area*/
     lv_area_t obj_coords_ext;
     lv_obj_get_coords(obj, &obj_coords_ext);
-    int32_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
+    int32_t ext_draw_size = lv_obj_get_ext_draw_size(obj);
     lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
 
-    if(!_lv_area_intersect(&clip_coords_for_obj, &clip_area_ori, &obj_coords_ext)) return;
+    if(!lv_area_intersect(&clip_coords_for_obj, &clip_area_ori, &obj_coords_ext)) return;
     /*If the object is visible on the current clip area*/
     layer->_clip_area = clip_coords_for_obj;
 
@@ -130,7 +136,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     }
     lv_area_t clip_coords_for_children;
     bool refr_children = true;
-    if(!_lv_area_intersect(&clip_coords_for_children, &clip_area_ori, obj_coords)) {
+    if(!lv_area_intersect(&clip_coords_for_children, &clip_area_ori, obj_coords)) {
         refr_children = false;
     }
 
@@ -183,7 +189,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
 
                 lv_area_t bottom = obj->coords;
                 bottom.y1 = bottom.y2 - rout + 1;
-                if(_lv_area_intersect(&bottom, &bottom, &clip_area_ori)) {
+                if(lv_area_intersect(&bottom, &bottom, &clip_area_ori)) {
                     layer_children = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &bottom);
 
                     for(i = 0; i < child_cnt; i++) {
@@ -204,7 +210,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
 
                 lv_area_t top = obj->coords;
                 top.y2 = top.y1 + rout - 1;
-                if(_lv_area_intersect(&top, &top, &clip_area_ori)) {
+                if(lv_area_intersect(&top, &top, &clip_area_ori)) {
                     layer_children = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &top);
 
                     for(i = 0; i < child_cnt; i++) {
@@ -227,7 +233,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                 lv_area_t mid = obj->coords;
                 mid.y1 += rout;
                 mid.y2 -= rout;
-                if(_lv_area_intersect(&mid, &mid, &clip_area_ori)) {
+                if(lv_area_intersect(&mid, &mid, &clip_area_ori)) {
                     layer->_clip_area = mid;
                     for(i = 0; i < child_cnt; i++) {
                         lv_obj_t * child = obj->spec_attr->children[i];
@@ -248,7 +254,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     layer->_clip_area = clip_area_ori;
 }
 
-void _lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
+void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
 {
     if(!disp) disp = lv_display_get_default();
     if(!disp) return;
@@ -282,7 +288,7 @@ void _lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     lv_area_t com_area;
     bool suc;
 
-    suc = _lv_area_intersect(&com_area, area_p, &scr_area);
+    suc = lv_area_intersect(&com_area, area_p, &scr_area);
     if(suc == false)  return; /*Out of the screen*/
 
     /*If there were at least 1 invalid area in full refresh mode, redraw the whole screen*/
@@ -299,7 +305,7 @@ void _lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     /*Save only if this area is not in one of the saved areas*/
     uint16_t i;
     for(i = 0; i < disp->inv_p; i++) {
-        if(_lv_area_is_in(&com_area, &disp->inv_areas[i], 0) != false) return;
+        if(lv_area_is_in(&com_area, &disp->inv_areas[i], 0) != false) return;
     }
 
     /*Save the area*/
@@ -318,7 +324,7 @@ void _lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
  * Get the display which is being refreshed
  * @return the display being refreshed
  */
-lv_display_t * _lv_refr_get_disp_refreshing(void)
+lv_display_t * lv_refr_get_disp_refreshing(void)
 {
     return disp_refr;
 }
@@ -327,12 +333,12 @@ lv_display_t * _lv_refr_get_disp_refreshing(void)
  * Get the display which is being refreshed
  * @return the display being refreshed
  */
-void _lv_refr_set_disp_refreshing(lv_display_t * disp)
+void lv_refr_set_disp_refreshing(lv_display_t * disp)
 {
     disp_refr = disp;
 }
 
-void _lv_display_refr_timer(lv_timer_t * tmr)
+void lv_display_refr_timer(lv_timer_t * tmr)
 {
     LV_PROFILER_BEGIN;
     LV_TRACE_REFR("begin");
@@ -397,7 +403,7 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
             if(disp_refr->inv_area_joined[i])
                 continue;
 
-            lv_area_t * sync_area = _lv_ll_ins_tail(&disp_refr->sync_areas);
+            lv_area_t * sync_area = lv_ll_ins_tail(&disp_refr->sync_areas);
             *sync_area = disp_refr->inv_areas[i];
         }
     }
@@ -409,7 +415,7 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
 refr_finish:
 
 #if LV_DRAW_SW_COMPLEX == 1
-    _lv_draw_sw_mask_cleanup();
+    lv_draw_sw_mask_cleanup();
 #endif
 
     lv_display_send_event(disp_refr, LV_EVENT_REFR_READY, NULL);
@@ -442,11 +448,11 @@ static void lv_refr_join_area(void)
             }
 
             /*Check if the areas are on each other*/
-            if(_lv_area_is_on(&disp_refr->inv_areas[join_in], &disp_refr->inv_areas[join_from]) == false) {
+            if(lv_area_is_on(&disp_refr->inv_areas[join_in], &disp_refr->inv_areas[join_from]) == false) {
                 continue;
             }
 
-            _lv_area_join(&joined_area, &disp_refr->inv_areas[join_in], &disp_refr->inv_areas[join_from]);
+            lv_area_join(&joined_area, &disp_refr->inv_areas[join_in], &disp_refr->inv_areas[join_from]);
 
             /*Join two area only if the joined area size is smaller*/
             if(lv_area_get_size(&joined_area) < (lv_area_get_size(&disp_refr->inv_areas[join_in]) +
@@ -473,7 +479,7 @@ static void refr_sync_areas(void)
     if(!lv_display_is_double_buffered(disp_refr)) return;
 
     /*Do not sync if no sync areas*/
-    if(_lv_ll_is_empty(&disp_refr->sync_areas)) return;
+    if(lv_ll_is_empty(&disp_refr->sync_areas)) return;
 
     LV_PROFILER_BEGIN;
     /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
@@ -499,22 +505,22 @@ static void refr_sync_areas(void)
         if(disp_refr->inv_area_joined[i]) continue;
 
         /*Iterate over sync areas*/
-        sync_area = _lv_ll_get_head(&disp_refr->sync_areas);
+        sync_area = lv_ll_get_head(&disp_refr->sync_areas);
         while(sync_area != NULL) {
             /*Get next sync area*/
-            next_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area);
+            next_area = lv_ll_get_next(&disp_refr->sync_areas, sync_area);
 
             /*Remove intersect of redraw area from sync area and get remaining areas*/
-            res_c = _lv_area_diff(res, sync_area, &disp_refr->inv_areas[i]);
+            res_c = lv_area_diff(res, sync_area, &disp_refr->inv_areas[i]);
 
             /*New sub areas created after removing intersect*/
             if(res_c != -1) {
                 /*Replace old sync area with new areas*/
                 for(j = 0; j < res_c; j++) {
-                    new_area = _lv_ll_ins_prev(&disp_refr->sync_areas, sync_area);
+                    new_area = lv_ll_ins_prev(&disp_refr->sync_areas, sync_area);
                     *new_area = res[j];
                 }
-                _lv_ll_remove(&disp_refr->sync_areas, sync_area);
+                lv_ll_remove(&disp_refr->sync_areas, sync_area);
                 lv_free(sync_area);
             }
 
@@ -525,17 +531,17 @@ static void refr_sync_areas(void)
 
     lv_area_t disp_area = {0, 0, (int32_t)hor_res - 1, (int32_t)ver_res - 1};
     /*Copy sync areas (if any remaining)*/
-    for(sync_area = _lv_ll_get_head(&disp_refr->sync_areas); sync_area != NULL;
-        sync_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area)) {
+    for(sync_area = lv_ll_get_head(&disp_refr->sync_areas); sync_area != NULL;
+        sync_area = lv_ll_get_next(&disp_refr->sync_areas, sync_area)) {
         /**
          * @todo Resize SDL window will trigger crash because of sync_area is larger than disp_area
          */
-        _lv_area_intersect(sync_area, sync_area, &disp_area);
+        lv_area_intersect(sync_area, sync_area, &disp_area);
         lv_draw_buf_copy(off_screen, sync_area, on_screen, sync_area);
     }
 
     /*Clear sync areas*/
-    _lv_ll_clear(&disp_refr->sync_areas);
+    lv_ll_clear(&disp_refr->sync_areas);
     LV_PROFILER_END;
 }
 
@@ -753,9 +759,9 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 {
     lv_obj_t * found_p = NULL;
 
-    if(_lv_area_is_in(area_p, &obj->coords, 0) == false) return NULL;
+    if(lv_area_is_in(area_p, &obj->coords, 0) == false) return NULL;
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return NULL;
-    if(_lv_obj_get_layer_type(obj) != LV_LAYER_TYPE_NONE) return NULL;
+    if(lv_obj_get_layer_type(obj) != LV_LAYER_TYPE_NONE) return NULL;
 
     /*If this object is fully cover the draw area then check the children too*/
     lv_cover_check_info_t info;
@@ -840,7 +846,7 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
 static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_type_t layer_type,
                                   lv_area_t * layer_area_out, lv_area_t * obj_draw_size_out)
 {
-    int32_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
+    int32_t ext_draw_size = lv_obj_get_ext_draw_size(obj);
     lv_obj_get_coords(obj, obj_draw_size_out);
     lv_area_increase(obj_draw_size_out, ext_draw_size, ext_draw_size);
 
@@ -850,7 +856,7 @@ static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_t
         lv_area_t clip_coords_for_obj;
         lv_area_t tranf_coords = *obj_draw_size_out;
         lv_obj_get_transformed_area(obj, &tranf_coords, LV_OBJ_POINT_TRANSFORM_FLAG_NONE);
-        if(!_lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, &tranf_coords)) {
+        if(!lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, &tranf_coords)) {
             return LV_RESULT_INVALID;
         }
 
@@ -859,7 +865,7 @@ static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_t
          *in order to cover transformed area after transformation.*/
         lv_area_t inverse_clip_coords_for_obj = clip_coords_for_obj;
         lv_obj_get_transformed_area(obj, &inverse_clip_coords_for_obj, LV_OBJ_POINT_TRANSFORM_FLAG_INVERSE);
-        if(!_lv_area_intersect(&inverse_clip_coords_for_obj, &inverse_clip_coords_for_obj, obj_draw_size_out)) {
+        if(!lv_area_intersect(&inverse_clip_coords_for_obj, &inverse_clip_coords_for_obj, obj_draw_size_out)) {
             return LV_RESULT_INVALID;
         }
 
@@ -868,7 +874,7 @@ static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_t
     }
     else if(layer_type == LV_LAYER_TYPE_SIMPLE) {
         lv_area_t clip_coords_for_obj;
-        if(!_lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, obj_draw_size_out)) {
+        if(!lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, obj_draw_size_out)) {
             return LV_RESULT_INVALID;
         }
         *layer_area_out = clip_coords_for_obj;
@@ -885,7 +891,7 @@ static bool alpha_test_area_on_obj(lv_obj_t * obj, const lv_area_t * area)
 {
     /*Test for alpha by assuming there is no alpha. If it fails, fall back to rendering with alpha*/
     /*If the layer area is not fully on the object, it can't fully cover it*/
-    if(!_lv_area_is_on(area, &obj->coords)) return true;
+    if(!lv_area_is_on(area, &obj->coords)) return true;
 
     lv_cover_check_info_t info;
     info.res = LV_COVER_RES_COVER;
@@ -972,14 +978,14 @@ static bool refr_check_obj_clip_overflow(lv_layer_t * layer, lv_obj_t * obj)
 
     /*Truncate the area to the object*/
     lv_area_t obj_coords;
-    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    int32_t ext_size = lv_obj_get_ext_draw_size(obj);
     lv_area_copy(&obj_coords, &obj->coords);
     lv_area_increase(&obj_coords, ext_size, ext_size);
 
     lv_obj_get_transformed_area(obj, &obj_coords, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
 
     lv_area_t clip_coords_for_obj;
-    if(!_lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, &obj_coords)) {
+    if(!lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, &obj_coords)) {
         return false;
     }
 
@@ -1004,7 +1010,7 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
     }
 #endif /* LV_DRAW_TRANSFORM_USE_MATRIX */
 
-    lv_layer_type_t layer_type = _lv_obj_get_layer_type(obj);
+    lv_layer_type_t layer_type = lv_obj_get_layer_type(obj);
     if(layer_type == LV_LAYER_TYPE_NONE) {
         lv_obj_redraw(layer, obj);
     }

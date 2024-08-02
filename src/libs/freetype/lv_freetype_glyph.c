@@ -21,7 +21,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct _lv_freetype_glyph_cache_data_t {
+typedef struct lv_freetype_glyph_cache_data_t {
     uint32_t unicode;
     uint32_t size;
 

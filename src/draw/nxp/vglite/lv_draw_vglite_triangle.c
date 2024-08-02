@@ -76,7 +76,7 @@ void lv_draw_vglite_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_
     lv_area_move(&coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t clipped_coords;
-    if(!_lv_area_intersect(&clipped_coords, &coords, &clip_area))
+    if(!lv_area_intersect(&clipped_coords, &coords, &clip_area))
         return; /* Fully clipped, nothing to do */
 
     _vglite_draw_triangle(&coords, &clip_area, dsc);

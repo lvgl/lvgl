@@ -33,9 +33,9 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct {
+struct lv_matrix_t {
     float m[3][3];
-} lv_matrix_t;
+};
 
 /**********************
  * GLOBAL PROTOTYPES

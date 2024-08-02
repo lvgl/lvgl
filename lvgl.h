@@ -110,6 +110,7 @@ extern "C" {
 #include "src/draw/lv_draw.h"
 #include "src/draw/lv_draw_buf.h"
 #include "src/draw/lv_draw_vector.h"
+#include "src/draw/sw/lv_draw_sw.h"
 
 #include "src/themes/lv_theme.h"
 
@@ -118,7 +119,6 @@ extern "C" {
 #include "src/lv_api_map_v8.h"
 #include "src/lv_api_map_v9_0.h"
 
-#include "src/core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/

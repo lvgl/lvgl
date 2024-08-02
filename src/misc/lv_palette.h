@@ -43,7 +43,7 @@ typedef enum {
     LV_PALETTE_BROWN,
     LV_PALETTE_BLUE_GREY,
     LV_PALETTE_GREY,
-    _LV_PALETTE_LAST,
+    LV_PALETTE_LAST,
     LV_PALETTE_NONE = 0xff,
 } lv_palette_t;
 

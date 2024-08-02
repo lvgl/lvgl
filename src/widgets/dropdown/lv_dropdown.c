@@ -6,12 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../misc/lv_area_private.h"
+#include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_obj.h"
-#include "lv_dropdown.h"
+#include "lv_dropdown_private.h"
 #if LV_USE_DROPDOWN != 0
 
 #include "../../misc/lv_assert.h"
-#include "../../draw/lv_draw.h"
+#include "../../draw/lv_draw_private.h"
 #include "../../core/lv_group.h"
 #include "../../indev/lv_indev.h"
 #include "../../display/lv_display.h"
@@ -135,7 +137,7 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
     size_t len = lv_strlen(options) + 1;
 #else
-    size_t len = _lv_text_ap_calc_bytes_count(options) + 1;
+    size_t len = lv_text_ap_calc_bytes_count(options) + 1;
 #endif
 
     if(dropdown->options != NULL && dropdown->static_txt == 0) {
@@ -151,7 +153,7 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
     lv_strcpy(dropdown->options, options);
 #else
-    _lv_text_ap_proc(options, dropdown->options);
+    lv_text_ap_proc(options, dropdown->options);
 #endif
 
     /*Now the text is dynamically allocated*/
@@ -211,7 +213,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
     size_t ins_len = lv_strlen(option) + 1;
 #else
-    size_t ins_len = _lv_text_ap_calc_bytes_count(option) + 1;
+    size_t ins_len = lv_text_ap_calc_bytes_count(option) + 1;
 #endif
 
     size_t new_len = ins_len + old_len + 2; /*+2 for terminating NULL and possible \n*/
@@ -244,7 +246,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
     lv_strcpy(ins_buf, option);
 #else
-    _lv_text_ap_proc(option, ins_buf);
+    lv_text_ap_proc(option, ins_buf);
 #endif
     if(pos < dropdown->option_cnt) lv_strcat(ins_buf, "\n");
 
@@ -920,7 +922,7 @@ static void draw_list(lv_event_t * e)
      * the selected option can be drawn on only the background*/
     lv_area_t clip_area_core;
     bool has_common;
-    has_common = _lv_area_intersect(&clip_area_core, &layer->_clip_area, &dropdown->list->coords);
+    has_common = lv_area_intersect(&clip_area_core, &layer->_clip_area, &dropdown->list->coords);
     if(has_common) {
         const lv_area_t clip_area_ori = layer->_clip_area;
         layer->_clip_area = clip_area_core;
@@ -1017,7 +1019,7 @@ static void draw_box_label(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint32_t
     area_sel.x2 = list_obj->coords.x2;
     lv_area_t mask_sel;
     bool area_ok;
-    area_ok = _lv_area_intersect(&mask_sel, &layer->_clip_area, &area_sel);
+    area_ok = lv_area_intersect(&mask_sel, &layer->_clip_area, &area_sel);
     if(area_ok) {
         const lv_area_t clip_area_ori = layer->_clip_area;
         layer->_clip_area = mask_sel;

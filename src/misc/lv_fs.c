@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_fs.h"
+#include "lv_fs_private.h"
 
 #include "../misc/lv_assert.h"
 #include "../misc/lv_profiler.h"
@@ -43,14 +43,14 @@ static lv_fs_res_t lv_fs_seek_cached(lv_fs_file_t * file_p, uint32_t pos, lv_fs_
  *   GLOBAL FUNCTIONS
  **********************/
 
-void _lv_fs_init(void)
+void lv_fs_init(void)
 {
-    _lv_ll_init(fsdrv_ll_p, sizeof(lv_fs_drv_t *));
+    lv_ll_init(fsdrv_ll_p, sizeof(lv_fs_drv_t *));
 }
 
-void _lv_fs_deinit(void)
+void lv_fs_deinit(void)
 {
-    _lv_ll_clear(fsdrv_ll_p);
+    lv_ll_clear(fsdrv_ll_p);
 }
 
 bool lv_fs_is_ready(char letter)
@@ -388,7 +388,7 @@ void lv_fs_drv_register(lv_fs_drv_t * drv_p)
 {
     /*Save the new driver*/
     lv_fs_drv_t ** new_drv;
-    new_drv = _lv_ll_ins_head(fsdrv_ll_p);
+    new_drv = lv_ll_ins_head(fsdrv_ll_p);
     LV_ASSERT_MALLOC(new_drv);
     if(new_drv == NULL) return;
 
@@ -399,7 +399,7 @@ lv_fs_drv_t * lv_fs_get_drv(char letter)
 {
     lv_fs_drv_t ** drv;
 
-    _LV_LL_READ(fsdrv_ll_p, drv) {
+    LV_LL_READ(fsdrv_ll_p, drv) {
         if((*drv)->letter == letter) {
             return *drv;
         }
@@ -413,7 +413,7 @@ char * lv_fs_get_letters(char * buf)
     lv_fs_drv_t ** drv;
     uint8_t i = 0;
 
-    _LV_LL_READ(fsdrv_ll_p, drv) {
+    LV_LL_READ(fsdrv_ll_p, drv) {
         buf[i] = (*drv)->letter;
         i++;
     }

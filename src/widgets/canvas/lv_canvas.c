@@ -6,11 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_canvas.h"
+#include "../../core/lv_obj_class_private.h"
+#include "lv_canvas_private.h"
 #if LV_USE_CANVAS != 0
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_math.h"
-#include "../../draw/lv_draw.h"
+#include "../../draw/lv_draw_private.h"
 #include "../../core/lv_refr.h"
 #include "../../display/lv_display.h"
 #include "../../draw/sw/lv_draw_sw.h"
@@ -390,6 +391,11 @@ void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
         lv_draw_dispatch_layer(lv_obj_get_display(canvas), layer);
     }
     lv_obj_invalidate(canvas);
+}
+
+uint32_t lv_canvas_buf_size(int32_t w, int32_t h, uint8_t bpp, uint8_t stride)
+{
+    return (uint32_t)LV_CANVAS_BUF_SIZE(w, h, bpp, stride);
 }
 
 /**********************

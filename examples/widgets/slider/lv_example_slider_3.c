@@ -1,6 +1,9 @@
 #include "../../lv_examples.h"
 #if LV_USE_SLIDER && LV_BUILD_EXAMPLES
 
+#define MAX_VALUE 100
+#define MIN_VALUE 0
+
 static void slider_event_cb(lv_event_t * e);
 
 /**
@@ -15,6 +18,7 @@ void lv_example_slider_3(void)
     lv_obj_center(slider);
 
     lv_slider_set_mode(slider, LV_SLIDER_MODE_RANGE);
+    lv_slider_set_range(slider, MIN_VALUE, MAX_VALUE);
     lv_slider_set_value(slider, 70, LV_ANIM_OFF);
     lv_slider_set_left_value(slider, 20, LV_ANIM_OFF);
 
@@ -34,8 +38,11 @@ static void slider_event_cb(lv_event_t * e)
     else if(code == LV_EVENT_DRAW_MAIN_END) {
         if(!lv_obj_has_state(obj, LV_STATE_PRESSED)) return;
 
-        lv_slider_t * slider = (lv_slider_t *) obj;
-        const lv_area_t * indic_area = &slider->bar.indic_area;
+        lv_area_t slider_area;
+        lv_obj_get_coords(obj, &slider_area);
+        lv_area_t indic_area = slider_area;
+        lv_area_set_width(&indic_area, lv_area_get_width(&slider_area) * lv_slider_get_value(obj) / MAX_VALUE);
+        indic_area.x1 += lv_area_get_width(&slider_area) * lv_slider_get_left_value(obj) / MAX_VALUE;
         char buf[16];
         lv_snprintf(buf, sizeof(buf), "%d - %d", (int)lv_slider_get_left_value(obj), (int)lv_slider_get_value(obj));
 
@@ -47,7 +54,7 @@ static void slider_event_cb(lv_event_t * e)
         label_area.y1 = 0;
         label_area.y2 = label_size.y - 1;
 
-        lv_area_align(indic_area, &label_area, LV_ALIGN_OUT_TOP_MID, 0, -10);
+        lv_area_align(&indic_area, &label_area, LV_ALIGN_OUT_TOP_MID, 0, -10);
 
         lv_draw_label_dsc_t label_draw_dsc;
         lv_draw_label_dsc_init(&label_draw_dsc);

@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_fragment.h"
+#include "lv_fragment_private.h"
 
 #if LV_USE_FRAGMENT
 #include "../../stdlib/lv_string.h"

@@ -195,10 +195,7 @@ void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, in
  * @param obj       pointer to an object to align
  * @note            if the parent size changes `obj` needs to be aligned manually again
  */
-static inline void lv_obj_center(lv_obj_t * obj)
-{
-    lv_obj_align(obj, LV_ALIGN_CENTER, 0, 0);
-}
+void lv_obj_center(lv_obj_t * obj);
 
 /**
  * Copy the coordinates of an object to an area

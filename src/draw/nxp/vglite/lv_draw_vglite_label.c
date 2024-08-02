@@ -101,7 +101,7 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
                     lv_layer_t * layer = draw_unit->target_layer;
 
                     lv_area_t blend_area;
-                    if(!_lv_area_intersect(&blend_area, glyph_draw_dsc->letter_coords, draw_unit->clip_area))
+                    if(!lv_area_intersect(&blend_area, glyph_draw_dsc->letter_coords, draw_unit->clip_area))
                         return;
                     lv_area_move(&blend_area, -layer->buf_area.x1, -layer->buf_area.y1);
 

@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_xkb.h"
+#include "lv_xkb_private.h"
 
 #if defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB
 

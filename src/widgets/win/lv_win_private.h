@@ -1,10 +1,10 @@
 /**
-* @file _lv_cache_lru_rb.h
-*
-*/
+ * @file lv_win_private.h
+ *
+ */
 
-#ifndef LV_CACHE_LRU_RB_H
-#define LV_CACHE_LRU_RB_H
+#ifndef LV_WIN_PRIVATE_H
+#define LV_WIN_PRIVATE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,8 +13,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_cache_entry.h"
-#include "lv_cache_private.h"
+
+#include "../../core/lv_obj_private.h"
+#include "lv_win.h"
+
+#if LV_USE_WIN
 
 /*********************
  *      DEFINES
@@ -25,20 +28,25 @@ extern "C" {
  **********************/
 
 /**********************
+ *      TYPEDEFS
+ **********************/
+struct lv_win_t {
+    lv_obj_t obj;
+};
+
+
+/**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-/*************************
- *    GLOBAL VARIABLES
- *************************/
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_cache_class_t lv_cache_class_lru_rb_count;
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_cache_class_t lv_cache_class_lru_rb_size;
 /**********************
  *      MACROS
  **********************/
+
+#endif /* LV_USE_WIN */
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_CACHE_LRU_RB_H*/
+#endif /*LV_WIN_PRIVATE_H*/

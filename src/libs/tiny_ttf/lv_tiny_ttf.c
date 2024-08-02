@@ -9,6 +9,7 @@
 #include "../../lvgl.h"
 
 #if LV_USE_TINY_TTF != 0
+#include "../../core/lv_global.h"
 
 #define font_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->font_draw_buf_handlers)
 
@@ -76,7 +77,7 @@ typedef struct _tiny_ttf_glyph_cache_data_t {
     lv_font_glyph_dsc_t glyph_dsc;
 } tiny_ttf_glyph_cache_data_t;
 
-typedef struct _lv_tiny_ttf_cache_data_t {
+typedef struct lv_tiny_ttf_cache_data_t {
     uint32_t glyph_index;
     uint32_t size;
     lv_draw_buf_t * draw_buf;

@@ -7,10 +7,11 @@
  *      INCLUDES
  *********************/
 #include "../misc/lv_types.h"
-#include "lv_draw_buf.h"
+#include "lv_draw_buf_private.h"
 #include "../stdlib/lv_string.h"
 #include "../core/lv_global.h"
 #include "../misc/lv_math.h"
+#include "../misc/lv_area_private.h"
 
 /*********************
  *      DEFINES
@@ -48,7 +49,7 @@ static void draw_buf_get_full_area(const lv_draw_buf_t * draw_buf, lv_area_t * f
  *   GLOBAL FUNCTIONS
  **********************/
 
-void _lv_draw_buf_init_handlers(void)
+void lv_draw_buf_init_handlers(void)
 {
     lv_draw_buf_init_with_default_handlers(&default_handlers);
     lv_draw_buf_init_with_default_handlers(&font_draw_buf_handlers);
@@ -57,10 +58,10 @@ void _lv_draw_buf_init_handlers(void)
 
 void lv_draw_buf_init_with_default_handlers(lv_draw_buf_handlers_t * handlers)
 {
-    lv_draw_buf_init_handlers(handlers, buf_malloc, buf_free, buf_align, NULL, NULL, width_to_stride);
+    lv_draw_buf_handlers_init(handlers, buf_malloc, buf_free, buf_align, NULL, NULL, width_to_stride);
 }
 
-void lv_draw_buf_init_handlers(lv_draw_buf_handlers_t * handlers,
+void lv_draw_buf_handlers_init(lv_draw_buf_handlers_t * handlers,
                                lv_draw_buf_malloc_cb buf_malloc_cb,
                                lv_draw_buf_free_cb buf_free_cb,
                                lv_draw_buf_align_cb align_pointer_cb,
@@ -171,7 +172,7 @@ void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
     a_draw_buf.y2 = draw_buf->header.h - 1;
 
     lv_area_t a_clipped;
-    if(!_lv_area_intersect(&a_clipped, a, &a_draw_buf)) return;
+    if(!lv_area_intersect(&a_clipped, a, &a_draw_buf)) return;
     if(lv_area_get_width(&a_clipped) <= 0) return;
     if(lv_area_get_height(&a_clipped) <= 0) return;
 
@@ -541,6 +542,49 @@ void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32
 
     lv_color32_t * palette = (lv_color32_t *)draw_buf->data;
     palette[index] = color;
+}
+
+bool lv_draw_buf_has_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
+{
+    return draw_buf->header.flags & flag;
+}
+
+void lv_draw_buf_set_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
+{
+    draw_buf->header.flags |= flag;
+}
+
+void lv_draw_buf_clear_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
+{
+    draw_buf->header.flags &= ~flag;
+}
+
+void lv_draw_buf_from_image(lv_draw_buf_t * buf, const lv_image_dsc_t * img)
+{
+    lv_memcpy(buf, img, sizeof(lv_image_dsc_t));
+    buf->unaligned_data = buf->data;
+}
+
+void lv_draw_buf_to_image(const lv_draw_buf_t * buf, lv_image_dsc_t * img)
+{
+    lv_memcpy((void *)img, buf, sizeof(lv_image_dsc_t));
+}
+
+void lv_image_buf_set_palette(lv_image_dsc_t * dsc, uint8_t id, lv_color32_t c)
+{
+    LV_LOG_WARN("Deprecated API, use lv_draw_buf_set_palette instead.");
+    lv_draw_buf_set_palette((lv_draw_buf_t *)dsc, id, c);
+}
+
+void lv_image_buf_free(lv_image_dsc_t * dsc)
+{
+    LV_LOG_WARN("Deprecated API, use lv_draw_buf_destroy instead.");
+    if(dsc != NULL) {
+        if(dsc->data != NULL)
+            lv_free((void *)dsc->data);
+
+        lv_free((void *)dsc);
+    }
 }
 
 /**********************

@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "../../lvgl_private.h"
 
 #include "unity/unity.h"
 #include "lv_test_indev.h"
@@ -259,7 +260,7 @@ void test_roller_appearance(void)
 
     /* a normal and infinite roller with the same size font for the main and selected parts */
     lv_obj_set_pos(roller, 20, 20);
-    lv_roller_set_options(roller, opts, LV_PART_MAIN);
+    lv_roller_set_options(roller, opts, LV_ROLLER_MODE_NORMAL);
     lv_obj_set_pos(roller_infinite, 20, 200);
     lv_roller_set_options(roller_infinite, opts, LV_ROLLER_MODE_INFINITE);
 

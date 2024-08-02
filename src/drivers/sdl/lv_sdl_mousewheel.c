@@ -10,7 +10,6 @@
 #if LV_USE_SDL && LV_SDL_MOUSEWHEEL_MODE == LV_SDL_MOUSEWHEEL_MODE_ENCODER
 
 #include "../../core/lv_group.h"
-#include "../../indev/lv_indev_private.h"
 #include "../../stdlib/lv_string.h"
 #include "lv_sdl_private.h"
 

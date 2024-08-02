@@ -10,6 +10,8 @@
 #include "../stdlib/lv_string.h"
 #include "../misc/lv_utils.h"
 #include "lv_obj_property.h"
+#include "lv_obj_private.h"
+#include "lv_obj_class_private.h"
 
 #if LV_USE_OBJ_PROPERTY
 
