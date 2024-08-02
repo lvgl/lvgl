@@ -215,6 +215,8 @@ void lv_cache_set_name(lv_cache_t * cache, const char * name);
  */
 const char * lv_cache_get_name(lv_cache_t * cache);
 
+lv_iter_t * lv_cache_iter_create(lv_cache_t * cache);
+
 /*************************
  *    GLOBAL VARIABLES
  *************************/
