@@ -169,8 +169,6 @@ typedef struct lv_cover_check_info_t lv_cover_check_info_t;
 
 typedef struct lv_obj_spec_attr_t lv_obj_spec_attr_t;
 
-typedef struct lv_font_fmt_txt_kern_pair_t lv_font_fmt_txt_kern_pair_t;
-
 typedef struct lv_image_t lv_image_t;
 
 typedef struct lv_animimg_t lv_animimg_t;
