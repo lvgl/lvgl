@@ -7,6 +7,9 @@
  *      INCLUDES
  *********************/
 
+#include "../../misc/lv_area_private.h"
+#include "../../libs/freetype/lv_freetype_private.h"
+#include "../lv_draw_label_private.h"
 #include "lv_draw_vg_lite.h"
 
 #include "../../lvgl.h"
@@ -139,7 +142,7 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
 static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_dsc_t * dsc)
 {
     lv_area_t clip_area;
-    if(!_lv_area_intersect(&clip_area, u->base_unit.clip_area, dsc->letter_coords)) {
+    if(!lv_area_intersect(&clip_area, u->base_unit.clip_area, dsc->letter_coords)) {
         return;
     }
 
@@ -163,7 +166,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
 
     /* If clipping is not required, blit directly */
-    if(_lv_area_is_in(&image_area, u->base_unit.clip_area, false)) {
+    if(lv_area_is_in(&image_area, u->base_unit.clip_area, false)) {
         /* The image area is the coordinates relative to the image itself */
         lv_area_t src_area = image_area;
         lv_area_move(&src_area, -image_area.x1, -image_area.y1);
@@ -210,7 +213,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
                                    &matrix,
                                    VG_LITE_BLEND_SRC_OVER,
                                    VG_LITE_PATTERN_COLOR,
-                                   color,
+                                   0,
                                    color,
                                    VG_LITE_FILTER_LINEAR));
         LV_PROFILER_END_TAG("vg_lite_draw_pattern");
@@ -232,7 +235,7 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
 {
     /* get clip area */
     lv_area_t path_clip_area;
-    if(!_lv_area_intersect(&path_clip_area, u->base_unit.clip_area, dsc->letter_coords)) {
+    if(!lv_area_intersect(&path_clip_area, u->base_unit.clip_area, dsc->letter_coords)) {
         return;
     }
 

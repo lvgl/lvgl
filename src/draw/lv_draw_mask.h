@@ -23,16 +23,6 @@ extern "C" {
  *********************/
 
 /**********************
- *      TYPEDEFS
- **********************/
-typedef struct {
-    lv_draw_dsc_base_t base;
-
-    lv_area_t area;
-    int32_t radius;
-} lv_draw_mask_rect_dsc_t;
-
-/**********************
  * GLOBAL PROTOTYPES
  **********************/
 

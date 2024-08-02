@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../draw/lv_image_decoder_private.h"
 #include "../../../lvgl.h"
 #if LV_USE_LIBJPEG_TURBO
 
@@ -14,6 +15,7 @@
 #include <jpeglib.h>
 #include <jpegint.h>
 #include <setjmp.h>
+#include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES

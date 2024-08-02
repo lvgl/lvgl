@@ -12,7 +12,7 @@
 
 #include "../../stdlib/lv_string.h"
 #include "../lv_layout.h"
-#include "../../core/lv_obj.h"
+#include "../../core/lv_obj_private.h"
 #include "../../core/lv_global.h"
 /*********************
  *      DEFINES
@@ -44,7 +44,7 @@ typedef struct {
     uint32_t row_num;
     int32_t grid_w;
     int32_t grid_h;
-} _lv_grid_calc_t;
+} lv_grid_calc_t;
 
 /**********************
  *  GLOBAL PROTOTYPES
@@ -54,11 +54,11 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static void grid_update(lv_obj_t * cont, void * user_data);
-static void calc(lv_obj_t * obj, _lv_grid_calc_t * calc);
-static void calc_free(_lv_grid_calc_t * calc);
-static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c);
-static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c);
-static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t * hint);
+static void calc(lv_obj_t * obj, lv_grid_calc_t * calc);
+static void calc_free(lv_grid_calc_t * calc);
+static void calc_cols(lv_obj_t * cont, lv_grid_calc_t * c);
+static void calc_rows(lv_obj_t * cont, lv_grid_calc_t * c);
+static void item_repos(lv_obj_t * item, lv_grid_calc_t * c, item_repos_hint_t * hint);
 static int32_t grid_align(int32_t cont_size, bool auto_size, lv_grid_align_t align, int32_t gap,
                           uint32_t track_num,
                           int32_t * size_array, int32_t * pos_array, bool reverse);
@@ -175,6 +175,11 @@ void lv_obj_set_grid_cell(lv_obj_t * obj, lv_grid_align_t x_align, int32_t col_p
     lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
 }
 
+int32_t lv_grid_fr(uint8_t x)
+{
+    return LV_GRID_FR(x);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -188,7 +193,7 @@ static void grid_update(lv_obj_t * cont, void * user_data)
     //    const int32_t * row_templ = get_row_dsc(cont);
     //    if(col_templ == NULL || row_templ == NULL) return;
 
-    _lv_grid_calc_t c;
+    lv_grid_calc_t c;
     calc(cont, &c);
 
     item_repos_hint_t hint;
@@ -223,12 +228,12 @@ static void grid_update(lv_obj_t * cont, void * user_data)
  * Calculate the grid cells coordinates
  * @param cont an object that has a grid
  * @param calc store the calculated cells sizes here
- * @note `_lv_grid_calc_free(calc_out)` needs to be called when `calc_out` is not needed anymore
+ * @note `lv_grid_calc_free(calc_out)` needs to be called when `calc_out` is not needed anymore
  */
-static void calc(lv_obj_t * cont, _lv_grid_calc_t * calc_out)
+static void calc(lv_obj_t * cont, lv_grid_calc_t * calc_out)
 {
     if(lv_obj_get_child(cont, 0) == NULL) {
-        lv_memzero(calc_out, sizeof(_lv_grid_calc_t));
+        lv_memzero(calc_out, sizeof(lv_grid_calc_t));
         return;
     }
 
@@ -259,7 +264,7 @@ static void calc(lv_obj_t * cont, _lv_grid_calc_t * calc_out)
  * Free the a grid calculation's data
  * @param calc pointer to the calculated grid cell coordinates
  */
-static void calc_free(_lv_grid_calc_t * calc)
+static void calc_free(lv_grid_calc_t * calc)
 {
     lv_free(calc->x);
     lv_free(calc->y);
@@ -267,7 +272,7 @@ static void calc_free(_lv_grid_calc_t * calc)
     lv_free(calc->h);
 }
 
-static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
+static void calc_cols(lv_obj_t * cont, lv_grid_calc_t * c)
 {
 
     const int32_t * col_templ;
@@ -360,7 +365,7 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
     }
 }
 
-static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
+static void calc_rows(lv_obj_t * cont, lv_grid_calc_t * c)
 {
     const int32_t * row_templ;
     row_templ = get_row_dsc(cont);
@@ -456,7 +461,7 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
  * @param child_id_ext helper value if the ID of the child is know (order from the oldest) else -1
  * @param grid_abs helper value, the absolute position of the grid, NULL if unknown
  */
-static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t * hint)
+static void item_repos(lv_obj_t * item, lv_grid_calc_t * c, item_repos_hint_t * hint)
 {
     if(lv_obj_has_flag_any(item, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) return;
     uint32_t col_span = get_col_span(item);

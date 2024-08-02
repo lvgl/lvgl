@@ -6,10 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../draw/lv_image_decoder_private.h"
 #include "../../../lvgl.h"
 #if LV_USE_BMP
 
 #include <string.h>
+#include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES
@@ -158,7 +160,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         lv_memset(&b, 0x00, sizeof(b));
 
         lv_fs_res_t res = lv_fs_open(&b.f, dsc->src, LV_FS_MODE_RD);
-        if(res == LV_RESULT_OK) return LV_RESULT_INVALID;
+        if(res != LV_FS_RES_OK) return LV_RESULT_INVALID;
 
         uint8_t header[54];
         lv_fs_read(&b.f, header, 54, NULL);

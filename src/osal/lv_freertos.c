@@ -364,7 +364,7 @@ static void prvRunThread(void * pxArg)
 
 static void prvMutexInit(lv_mutex_t * pxMutex)
 {
-    pxMutex->xMutex = xSemaphoreCreateMutex();
+    pxMutex->xMutex = xSemaphoreCreateRecursiveMutex();
 
     /* Ensure that the FreeRTOS mutex was successfully created. */
     if(pxMutex->xMutex == NULL) {

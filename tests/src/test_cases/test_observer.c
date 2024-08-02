@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST == 1
 #include "../lvgl.h"
+#include "../../lvgl_private.h"
 
 #include "unity/unity.h"
 #include "lv_test_indev.h"
@@ -260,7 +261,7 @@ void test_observer_obj_state(void)
 
     lv_obj_bind_state_if_eq(obj, &subject, LV_STATE_CHECKED, 5);
     /*Should be applied immediately*/
-    TEST_ASSERT_EQUAL(false, lv_obj_has_flag(obj, LV_STATE_CHECKED));
+    TEST_ASSERT_EQUAL(false, lv_obj_has_state(obj, LV_STATE_CHECKED));
 
     lv_obj_bind_state_if_not_eq(obj, &subject, LV_STATE_DISABLED, 10);
     /*Should be applied immediately*/

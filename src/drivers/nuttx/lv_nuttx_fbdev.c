@@ -204,9 +204,9 @@ static void fbdev_join_inv_areas(lv_display_t * disp, lv_area_t * final_inv_area
                 area_joined = true;
             }
             else {
-                _lv_area_join(final_inv_area,
-                              final_inv_area,
-                              area_p);
+                lv_area_join(final_inv_area,
+                             final_inv_area,
+                             area_p);
             }
         }
     }
@@ -230,7 +230,7 @@ static void display_refr_timer_cb(lv_timer_t * tmr)
     }
 
     if(pfds[0].revents & POLLOUT) {
-        _lv_display_refr_timer(tmr);
+        lv_display_refr_timer(tmr);
     }
 }
 

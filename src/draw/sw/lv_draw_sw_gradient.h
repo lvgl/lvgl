@@ -36,12 +36,6 @@ extern "C" {
  **********************/
 typedef lv_color_t lv_grad_color_t;
 
-typedef struct _lv_gradient_cache_t {
-    lv_color_t   *  color_map;
-    lv_opa_t   *  opa_map;
-    uint32_t size;
-} lv_grad_t;
-
 /**********************
  *      PROTOTYPES
  **********************/

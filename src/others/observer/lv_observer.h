@@ -25,9 +25,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_observer_t;
-typedef struct _lv_observer_t lv_observer_t;
-
 typedef enum {
     LV_SUBJECT_TYPE_INVALID =   0,   /**< indicates subject not initialized yet*/
     LV_SUBJECT_TYPE_NONE =      1,   /**< a null value like None or NILt*/
@@ -66,19 +63,6 @@ typedef struct {
   * @param subject      pointer to the subject of the observer
   */
 typedef void (*lv_observer_cb_t)(lv_observer_t * observer, lv_subject_t * subject);
-
-/**
- * The observer object: a descriptor returned when subscribing LVGL widgets to subjects
- */
-struct _lv_observer_t {
-    lv_subject_t * subject;             /**< The observed value */
-    lv_observer_cb_t cb;                /**< Callback that should be called when the value changes*/
-    void * target;                      /**< A target for the observer, e.g. a widget or style*/
-    void * user_data;                   /**< Additional parameter supplied when subscribing*/
-    uint32_t auto_free_user_data : 1;   /**< Automatically free user data when the observer is removed */
-    uint32_t notified : 1;              /**< Mark if this observer was already notified*/
-    uint32_t for_obj : 1;               /**< `target` is an `lv_obj_t *`*/
-};
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -286,10 +270,14 @@ void * lv_observer_get_target(lv_observer_t * observer);
  * @param observer      pointer to an observer
  * @return              pointer to the saved object target
  */
-static inline lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer)
-{
-    return (lv_obj_t *)lv_observer_get_target(observer);
-}
+lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer);
+
+/**
+ * Get the user data of the observer.
+ * @param observer      pointer to an observer
+ * @return              void pointer to the saved user data
+*/
+void * lv_observer_get_user_data(const lv_observer_t * observer);
 
 /**
  * Notify all observers of subject

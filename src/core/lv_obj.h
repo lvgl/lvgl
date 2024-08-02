@@ -43,7 +43,7 @@ extern "C" {
  * Possible states of a widget.
  * OR-ed values are possible
  */
-enum _lv_state_t {
+enum {
     LV_STATE_DEFAULT     =  0x0000,
     LV_STATE_CHECKED     =  0x0001,
     LV_STATE_FOCUSED     =  0x0002,
@@ -68,7 +68,7 @@ enum _lv_state_t {
  * Not all parts are used by every widget
  */
 
-enum _lv_part_t {
+enum {
     LV_PART_MAIN         = 0x000000,   /**< A background like rectangle*/
     LV_PART_SCROLLBAR    = 0x010000,   /**< The scrollbar(s)*/
     LV_PART_INDICATOR    = 0x020000,   /**< Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox*/
@@ -125,7 +125,7 @@ typedef enum {
     LV_OBJ_FLAG_USER_2          = (1L << 28), /**< Custom flag, free to use by user*/
     LV_OBJ_FLAG_USER_3          = (1L << 29), /**< Custom flag, free to use by user*/
     LV_OBJ_FLAG_USER_4          = (1L << 30), /**< Custom flag, free to use by user*/
-} _lv_obj_flag_t;
+} lv_obj_flag_t;
 
 #if LV_USE_OBJ_PROPERTY
 enum {
@@ -283,10 +283,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t state, bool v);
  * @param obj   pointer to an object
  * @param user_data   pointer to the new user_data.
  */
-static inline void lv_obj_set_user_data(lv_obj_t * obj, void * user_data)
-{
-    obj->user_data = user_data;
-}
+void lv_obj_set_user_data(lv_obj_t * obj, void * user_data);
 
 /*=======================
  * Getter functions
@@ -335,10 +332,7 @@ lv_group_t * lv_obj_get_group(const lv_obj_t * obj);
  * @param obj   pointer to an object
  * @return      the pointer to the user_data of the object
  */
-static inline void * lv_obj_get_user_data(lv_obj_t * obj)
-{
-    return obj->user_data;
-}
+void * lv_obj_get_user_data(lv_obj_t * obj);
 
 /*=======================
  * Other functions

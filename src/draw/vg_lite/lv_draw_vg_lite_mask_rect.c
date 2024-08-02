@@ -7,6 +7,9 @@
  *      INCLUDES
  *********************/
 
+#include "../../misc/lv_area_private.h"
+#include "../sw/lv_draw_sw_mask_private.h"
+#include "../lv_draw_mask_private.h"
 #include "lv_draw_vg_lite.h"
 
 #if LV_USE_DRAW_VG_LITE
@@ -44,7 +47,7 @@ void lv_draw_vg_lite_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_re
     LV_UNUSED(coords);
 
     lv_area_t draw_area;
-    if(!_lv_area_intersect(&draw_area, &dsc->area, draw_unit->clip_area)) {
+    if(!lv_area_intersect(&draw_area, &dsc->area, draw_unit->clip_area)) {
         return;
     }
 

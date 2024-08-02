@@ -17,7 +17,7 @@ extern "C" {
 #include "lv_cache_private.h"
 #include "../lv_types.h"
 
-#include "_lv_cache_lru_rb.h"
+#include "lv_cache_lru_rb.h"
 
 #include "lv_image_cache.h"
 #include "lv_image_header_cache.h"

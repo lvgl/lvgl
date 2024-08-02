@@ -1,7 +1,7 @@
 #include "../../lv_conf_internal.h"
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
-#include "lv_tlsf.h"
+#include "lv_tlsf_private.h"
 #include "../../stdlib/lv_string.h"
 #include "../../misc/lv_log.h"
 #include "../../misc/lv_assert.h"
@@ -219,16 +219,16 @@ tlsf_decl int tlsf_fls_sizet(size_t size)
 */
 
 /* Public constants: may be modified. */
-enum tlsf_public {
+typedef enum {
     /* log2 of number of linear subdivisions of block sizes. Larger
     ** values require more memory in the control structure. Values of
     ** 4 or 5 are typical.
     */
     SL_INDEX_COUNT_LOG2 = 5,
-};
+} tlsf_public;
 
 /* Private constants: do not modify. */
-enum tlsf_private {
+typedef enum {
 #if defined (TLSF_64BIT)
     /* All allocation sizes and addresses are aligned to 8 bytes. */
     ALIGN_SIZE_LOG2 = 3,
@@ -265,7 +265,7 @@ enum tlsf_private {
     FL_INDEX_COUNT = (FL_INDEX_MAX - FL_INDEX_SHIFT + 1),
 
     SMALL_BLOCK_SIZE = (1 << FL_INDEX_SHIFT),
-};
+} tlsf_private;
 
 /*
 ** Cast and min/max macros.

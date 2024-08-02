@@ -25,32 +25,32 @@ void lv_example_span_1(void)
 
     lv_span_t * span = lv_spangroup_new_span(spans);
     lv_span_set_text(span, "China is a beautiful country.");
-    lv_style_set_text_color(&span->style, lv_palette_main(LV_PALETTE_RED));
-    lv_style_set_text_decor(&span->style, LV_TEXT_DECOR_UNDERLINE);
-    lv_style_set_text_opa(&span->style, LV_OPA_50);
+    lv_style_set_text_color(lv_span_get_style(span), lv_palette_main(LV_PALETTE_RED));
+    lv_style_set_text_decor(lv_span_get_style(span), LV_TEXT_DECOR_UNDERLINE);
+    lv_style_set_text_opa(lv_span_get_style(span), LV_OPA_50);
 
     span = lv_spangroup_new_span(spans);
     lv_span_set_text_static(span, "good good study, day day up.");
 #if LV_FONT_MONTSERRAT_24
-    lv_style_set_text_font(&span->style,  &lv_font_montserrat_24);
+    lv_style_set_text_font(lv_span_get_style(span),  &lv_font_montserrat_24);
 #endif
-    lv_style_set_text_color(&span->style, lv_palette_main(LV_PALETTE_GREEN));
+    lv_style_set_text_color(lv_span_get_style(span), lv_palette_main(LV_PALETTE_GREEN));
 
     span = lv_spangroup_new_span(spans);
     lv_span_set_text_static(span, "LVGL is an open-source graphics library.");
-    lv_style_set_text_color(&span->style, lv_palette_main(LV_PALETTE_BLUE));
+    lv_style_set_text_color(lv_span_get_style(span), lv_palette_main(LV_PALETTE_BLUE));
 
     span = lv_spangroup_new_span(spans);
     lv_span_set_text_static(span, "the boy no name.");
-    lv_style_set_text_color(&span->style, lv_palette_main(LV_PALETTE_GREEN));
+    lv_style_set_text_color(lv_span_get_style(span), lv_palette_main(LV_PALETTE_GREEN));
 #if LV_FONT_MONTSERRAT_20
-    lv_style_set_text_font(&span->style, &lv_font_montserrat_20);
+    lv_style_set_text_font(lv_span_get_style(span), &lv_font_montserrat_20);
 #endif
-    lv_style_set_text_decor(&span->style, LV_TEXT_DECOR_UNDERLINE);
+    lv_style_set_text_decor(lv_span_get_style(span), LV_TEXT_DECOR_UNDERLINE);
 
     span = lv_spangroup_new_span(spans);
     lv_span_set_text(span, "I have a dream that hope to come true.");
-    lv_style_set_text_decor(&span->style, LV_TEXT_DECOR_STRIKETHROUGH);
+    lv_style_set_text_decor(lv_span_get_style(span), LV_TEXT_DECOR_STRIKETHROUGH);
 
     lv_spangroup_refr_mode(spans);
 }

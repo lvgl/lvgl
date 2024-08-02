@@ -35,44 +35,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_sysmon_backend_data_t {
-    lv_subject_t subject;
-    lv_timer_t * timer;
-};
-
-#if LV_USE_PERF_MONITOR
-struct _lv_sysmon_perf_info_t {
-    struct {
-        bool inited;
-        uint32_t refr_start;
-        uint32_t refr_interval_sum;
-        uint32_t refr_elaps_sum;
-        uint32_t refr_cnt;
-        uint32_t render_start;
-        uint32_t render_elaps_sum; /*Contains the flush time too*/
-        uint32_t render_cnt;
-        uint32_t flush_in_render_start;
-        uint32_t flush_in_render_elaps_sum;
-        uint32_t flush_not_in_render_start;
-        uint32_t flush_not_in_render_elaps_sum;
-        uint32_t last_report_timestamp;
-        uint32_t render_in_progress : 1;
-    } measured;
-
-    struct {
-        uint32_t fps;
-        uint32_t cpu;
-        uint32_t refr_avg_time;
-        uint32_t render_avg_time;       /**< Pure rendering time without flush time*/
-        uint32_t flush_avg_time;        /**< Pure flushing time without rendering time*/
-        uint32_t cpu_avg_total;
-        uint32_t fps_avg_total;
-        uint32_t run_cnt;
-    } calculated;
-
-};
-#endif
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -115,16 +77,6 @@ void lv_sysmon_show_memory(lv_display_t * disp);
 void lv_sysmon_hide_memory(lv_display_t * disp);
 
 #endif /*LV_USE_MEM_MONITOR*/
-
-/**
- * Initialize built-in system monitor, such as performance and memory monitor.
- */
-void _lv_sysmon_builtin_init(void);
-
-/**
- * DeInitialize built-in system monitor, such as performance and memory monitor.
- */
-void _lv_sysmon_builtin_deinit(void);
 
 /**********************
  *      MACROS

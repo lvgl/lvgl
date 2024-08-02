@@ -16,6 +16,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <errno.h>
+#include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES

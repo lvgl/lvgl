@@ -6,7 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_textarea.h"
+#include "../label/lv_label_private.h"
+#include "../../core/lv_obj_class_private.h"
+#include "lv_textarea_private.h"
 #if LV_USE_TEXTAREA != 0
 
 #include "../../core/lv_group.h"
@@ -14,7 +16,7 @@
 #include "../../indev/lv_indev.h"
 #include "../../draw/lv_draw.h"
 #include "../../misc/lv_assert.h"
-#include "../../misc/lv_anim.h"
+#include "../../misc/lv_anim_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../misc/lv_math.h"
 #include "../../stdlib/lv_string.h"

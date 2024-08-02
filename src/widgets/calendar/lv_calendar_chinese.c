@@ -6,7 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_calendar.h"
+#include "lv_calendar_chinese_private.h"
+#include "lv_calendar_private.h"
 #if LV_USE_CALENDAR && LV_USE_CALENDAR_CHINESE
 
 /*********************

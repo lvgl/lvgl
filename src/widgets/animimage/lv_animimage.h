@@ -32,25 +32,10 @@ extern "C" {
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_animimg_class;
 
-/*Data of the animimage*/
-typedef struct {
-    lv_image_t img;
-    lv_anim_t anim;
-    /*picture sequence */
-    const void ** dsc;
-    int8_t  pic_count;
-} lv_animimg_t;
-
 /*Image parts*/
-enum _lv_animimg_part_t {
+typedef enum {
     LV_ANIM_IMAGE_PART_MAIN,
-};
-
-#ifdef DOXYGEN
-typedef _lv_animimg_part_t lv_animimg_part_t;
-#else
-typedef uint8_t lv_animimg_part_t;
-#endif
+} lv_animimg_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES

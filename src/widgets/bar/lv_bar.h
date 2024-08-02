@@ -28,48 +28,17 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-enum _lv_bar_mode_t {
+typedef enum {
     LV_BAR_MODE_NORMAL,
     LV_BAR_MODE_SYMMETRICAL,
     LV_BAR_MODE_RANGE
-};
-#ifdef DOXYGEN
-typedef _lv_bar_mode_t lv_bar_mode_t;
-#else
-typedef uint8_t lv_bar_mode_t;
-#endif /*DOXYGEN*/
+} lv_bar_mode_t;
 
-enum _lv_bar_orientation_t {
+typedef enum {
     LV_BAR_ORIENTATION_AUTO,
     LV_BAR_ORIENTATION_HORIZONTAL,
     LV_BAR_ORIENTATION_VERTICAL
-};
-#ifdef DOXYGEN
-typedef _lv_bar_orientation_t lv_bar_orientation_t;
-#else
-typedef uint8_t lv_bar_orientation_t;
-#endif /*DOXYGEN*/
-
-typedef struct {
-    lv_obj_t * bar;
-    int32_t anim_start;
-    int32_t anim_end;
-    int32_t anim_state;
-} _lv_bar_anim_t;
-
-typedef struct {
-    lv_obj_t obj;
-    int32_t cur_value;          /**< Current value of the bar*/
-    int32_t min_value;          /**< Minimum value of the bar*/
-    int32_t max_value;          /**< Maximum value of the bar*/
-    int32_t start_value;        /**< Start value of the bar*/
-    lv_area_t indic_area;       /**< Save the indicator area. Might be used by derived types*/
-    bool val_reversed;          /**< Whether value been reversed */
-    _lv_bar_anim_t cur_value_anim;
-    _lv_bar_anim_t start_value_anim;
-    lv_bar_mode_t mode : 2;     /**< Type of bar*/
-    lv_bar_orientation_t orientation : 2;  /**< Orientation of bar*/
-} lv_bar_t;
+} lv_bar_orientation_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_bar_class;
 
