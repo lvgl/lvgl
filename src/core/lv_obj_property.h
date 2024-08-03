@@ -34,6 +34,7 @@ extern "C" {
 #define LV_PROPERTY_TYPE_OBJ            8   /*Special pointer of lv_obj_t* */
 #define LV_PROPERTY_TYPE_DISPLAY        9   /*Special pointer of lv_display_t* */
 #define LV_PROPERTY_TYPE_FONT           10  /*Special pointer of lv_font_t* */
+#define LV_PROPERTY_TYPE_BOOL           11  /*int32_t type*/
 
 #define LV_PROPERTY_TYPE_SHIFT          28
 #define LV_PROPERTY_ID(clz, name, type, index)    LV_PROPERTY_## clz ##_##name = (LV_PROPERTY_## clz ##_START + (index)) | ((type) << LV_PROPERTY_TYPE_SHIFT)
@@ -79,6 +80,7 @@ typedef struct {
     lv_prop_id_t id;
     union {
         int32_t num;                /**< Number integer number (opacity, enums, booleans or "normal" numbers)*/
+        bool enable;                /**< booleans*/
         const void * ptr;           /**< Constant pointers  (font, cone text, etc)*/
         lv_color_t color;           /**< Colors*/
         lv_value_precise_t precise; /**< float or int for precise value*/
