@@ -61,7 +61,7 @@ lv_result_t lv_obj_set_property(lv_obj_t * obj, const lv_property_t * value)
     LV_ASSERT(obj && value);
 
     uint32_t index = LV_PROPERTY_ID_INDEX(value->id);
-    if(value->id == LV_PROPERTY_ID_INVALID || index >= LV_PROPERTY_ID_BUILTIN_LAST) {
+    if(value->id == LV_PROPERTY_ID_INVALID || index > LV_PROPERTY_ID_ANY) {
         LV_LOG_WARN("Invalid property id set to %p", obj);
         return LV_RESULT_INVALID;
     }
@@ -92,7 +92,7 @@ lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id)
     lv_property_t value;
 
     uint32_t index = LV_PROPERTY_ID_INDEX(id);
-    if(id == LV_PROPERTY_ID_INVALID || index >= LV_PROPERTY_ID_BUILTIN_LAST) {
+    if(id == LV_PROPERTY_ID_INVALID || index > LV_PROPERTY_ID_ANY) {
         LV_LOG_WARN("Invalid property id to get from %p", obj);
         value.id = LV_PROPERTY_ID_INVALID;
         value.num = 0;
