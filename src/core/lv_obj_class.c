@@ -133,6 +133,11 @@ void lv_obj_class_init_obj(lv_obj_t * obj)
     }
 }
 
+const lv_obj_class_t * lv_obj_get_base_class(const lv_obj_class_t * class_p)
+{
+    return class_p->base_class;
+}
+
 void lv_obj_destruct(lv_obj_t * obj)
 {
     if(obj->class_p->destructor_cb) obj->class_p->destructor_cb(obj->class_p, obj);
