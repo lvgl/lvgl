@@ -92,7 +92,7 @@ static const lv_property_ops_t properties[] = {
         .getter = lv_image_get_antialias,
     },
     {
-        .id = LV_PROPERTY_IMAGE_ALIGN,
+        .id = LV_PROPERTY_IMAGE_INNER_ALIGN,
         .setter = lv_image_set_inner_align,
         .getter = lv_image_get_inner_align,
     },
