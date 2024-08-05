@@ -65,6 +65,11 @@ lv_draw_image_dsc_t * lv_draw_task_get_image_dsc(lv_draw_task_t * task)
 
 void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
+    if(dsc->scale_x <= 0 || dsc->scale_y <= 0) {
+        /* NOT draw if scale is negative or zero */
+        return;
+    }
+
     lv_draw_task_t * t = lv_draw_add_task(layer, coords);
 
     t->draw_dsc = lv_malloc(sizeof(*dsc));
@@ -89,6 +94,11 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
         return;
     }
     if(dsc->opa <= LV_OPA_MIN) return;
+
+    if(dsc->scale_x <= 0 || dsc->scale_y <= 0) {
+        /* NOT draw if scale is negative or zero */
+        return;
+    }
 
     LV_PROFILER_BEGIN;
 
