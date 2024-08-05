@@ -33,6 +33,7 @@ extern "C" {
 
 lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h);
 bool lv_opengles_texture_get_texture_id(lv_display_t * disp, unsigned int * texture_id_dst);
+lv_display_t * lv_opengles_texture_get_from_texture_id(unsigned int texture_id);
 
 /**********************
  *      MACROS

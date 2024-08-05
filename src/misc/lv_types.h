@@ -148,6 +148,7 @@ typedef struct _lv_font_t lv_font_t;
 struct _lv_image_decoder_t;
 typedef struct _lv_image_decoder_t lv_image_decoder_t;
 
+typedef struct lv_glfw_window_t lv_glfw_window_t;
 typedef struct lv_glfw_texture_t lv_glfw_texture_t;
 
 typedef uint32_t lv_prop_id_t;

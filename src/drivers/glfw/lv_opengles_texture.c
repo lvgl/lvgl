@@ -95,6 +95,19 @@ bool lv_opengles_texture_get_texture_id(lv_display_t * disp, unsigned int * text
     return true;
 }
 
+lv_display_t * lv_opengles_texture_get_from_texture_id(unsigned int texture_id)
+{
+    lv_display_t * disp = NULL;
+    while(NULL != (disp = lv_display_get_next(disp))) {
+        unsigned int disp_texture_id;
+        if(lv_opengles_texture_get_texture_id(disp, &disp_texture_id)
+           && disp_texture_id == texture_id) {
+            return disp;
+        }
+    }
+    return NULL;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

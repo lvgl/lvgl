@@ -43,7 +43,6 @@ static void lv_opengles_index_buffer_deinit(void);
 static unsigned int lv_opengles_index_buffer_get_count(void);
 static void lv_opengles_index_buffer_bind(void);
 static void lv_opengles_index_buffer_unbind(void);
-static void lv_opengles_render_clear(void);
 static unsigned int lv_opengles_shader_compile(unsigned int type, const char * source);
 static unsigned int lv_opengles_shader_create(const char * vertexShader, const char * fragmentShader);
 static void lv_opengles_shader_init(void);
@@ -55,10 +54,6 @@ static void lv_opengles_shader_set_uniform1i(const char * name, int value);
 static void lv_opengles_shader_set_uniformmatrix3fv(const char * name, int count, bool transpose, const float * values);
 static void lv_opengles_shader_set_uniform1f(const char * name, float value);
 static void lv_opengles_render_draw(void);
-static void lv_opengles_texture_init(void * buffer, int width, int height);
-static void lv_opengles_texture_deinit(void);
-static void lv_opengles_texture_bind(unsigned int slot);
-static void lv_opengles_texture_update(void * buffer, int width, int height);
 
 /***********************
  *   GLOBAL PROTOTYPES
@@ -73,8 +68,6 @@ static unsigned int vertex_array_id = 0;
 
 static unsigned int index_buffer_id = 0;
 static unsigned int index_buffer_count = 0;
-
-static unsigned int texture_id = 0;
 
 static unsigned int shader_id;
 
@@ -129,7 +122,7 @@ static const char * fragment_shader =
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_opengles_init(uint8_t * frame_buffer, int32_t hor, int32_t ver)
+void lv_opengles_init(void)
 {
     lv_opengles_enable_blending();
 
@@ -154,15 +147,8 @@ void lv_opengles_init(uint8_t * frame_buffer, int32_t hor, int32_t ver)
 
     lv_opengles_shader_init();
     lv_opengles_shader_bind();
-    lv_opengles_shader_set_uniform1i("u_ColorDepth", LV_COLOR_DEPTH);
 
-    int slot = 0;
-    lv_opengles_texture_init(frame_buffer, hor, ver);
-    lv_opengles_texture_bind(slot);
-
-    lv_opengles_shader_set_uniform1i("u_Texture", slot);
-
-    /* unbound everything */
+    /* unbind everything */
     lv_opengles_vertex_array_unbind();
     lv_opengles_vertex_buffer_unbind();
     lv_opengles_index_buffer_unbind();
@@ -171,37 +157,16 @@ void lv_opengles_init(uint8_t * frame_buffer, int32_t hor, int32_t ver)
 
 void lv_opengles_deinit(void)
 {
-    lv_opengles_texture_deinit();
     lv_opengles_shader_deinit();
     lv_opengles_index_buffer_deinit();
     lv_opengles_vertex_buffer_deinit();
     lv_opengles_vertex_array_deinit();
 }
 
-void lv_opengles_update(uint8_t * frame_buffer, int32_t hor, int32_t ver)
-{
-    glViewport(0, 0, hor, ver);
-    lv_opengles_render_clear();
-    lv_opengles_texture_update(frame_buffer, hor, ver);
-
-    static const float matrix[9] = {
-        1.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 1.0f
-    };
-
-    lv_opengles_shader_bind();
-    lv_opengles_shader_set_uniform1i("u_ColorDepth", LV_COLOR_DEPTH);
-    lv_opengles_shader_set_uniform1i("u_Texture", 0);
-    lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, true, matrix);
-    lv_opengles_shader_set_uniform1f("u_Opa", 1.0f);
-    lv_opengles_render_draw();
-}
-
 void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
                                 int32_t disp_h)
 {
-    GL_CALL(glActiveTexture(GL_TEXTURE0 + 1));
+    GL_CALL(glActiveTexture(GL_TEXTURE0));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
 
     float hor_scale = (float)lv_area_get_width(texture_area) / (float)disp_w;
@@ -222,6 +187,16 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
     lv_opengles_render_draw();
 }
 
+void lv_opengles_render_clear(void)
+{
+    GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
+}
+
+void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
+{
+    glViewport(x, y, w, h);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -239,42 +214,42 @@ static void lv_opengles_vertex_buffer_init(const void * data, unsigned int size)
     GL_CALL(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
 }
 
-static void lv_opengles_vertex_buffer_deinit()
+static void lv_opengles_vertex_buffer_deinit(void)
 {
     GL_CALL(glDeleteBuffers(1, &vertex_buffer_id));
 }
 
-static void lv_opengles_vertex_buffer_bind()
+static void lv_opengles_vertex_buffer_bind(void)
 {
     GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id));
 }
 
-static void lv_opengles_vertex_buffer_unbind()
+static void lv_opengles_vertex_buffer_unbind(void)
 {
     GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
 }
 
-static void lv_opengles_vertex_array_init()
+static void lv_opengles_vertex_array_init(void)
 {
     GL_CALL(glGenVertexArrays(1, &vertex_array_id));
 }
 
-static void lv_opengles_vertex_array_deinit()
+static void lv_opengles_vertex_array_deinit(void)
 {
     GL_CALL(glDeleteVertexArrays(1, &vertex_array_id));
 }
 
-static void lv_opengles_vertex_array_bind()
+static void lv_opengles_vertex_array_bind(void)
 {
     GL_CALL(glBindVertexArray(vertex_array_id));
 }
 
-static void lv_opengles_vertex_array_unbind()
+static void lv_opengles_vertex_array_unbind(void)
 {
     GL_CALL(glBindVertexArray(0));
 }
 
-static void lv_opengles_vertex_array_add_buffer()
+static void lv_opengles_vertex_array_add_buffer(void)
 {
     lv_opengles_vertex_buffer_bind();
     intptr_t offset = 0;
@@ -297,29 +272,24 @@ static void lv_opengles_index_buffer_init(const unsigned int * data, unsigned in
     GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(GLuint), data, GL_STATIC_DRAW));
 }
 
-static void lv_opengles_index_buffer_deinit()
+static void lv_opengles_index_buffer_deinit(void)
 {
     GL_CALL(glDeleteBuffers(1, &index_buffer_id));
 }
 
-static unsigned int lv_opengles_index_buffer_get_count()
+static unsigned int lv_opengles_index_buffer_get_count(void)
 {
     return index_buffer_count;
 }
 
-static void lv_opengles_index_buffer_bind()
+static void lv_opengles_index_buffer_bind(void)
 {
     GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer_id));
 }
 
-static void lv_opengles_index_buffer_unbind()
+static void lv_opengles_index_buffer_unbind(void)
 {
     GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
-}
-
-static void lv_opengles_render_clear()
-{
-    GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
 }
 
 static unsigned int lv_opengles_shader_compile(unsigned int type, const char * source)
@@ -362,22 +332,22 @@ static unsigned int lv_opengles_shader_create(const char * vertexShader, const c
     return program;
 }
 
-static void lv_opengles_shader_init()
+static void lv_opengles_shader_init(void)
 {
     shader_id = lv_opengles_shader_create(vertex_shader, fragment_shader);
 }
 
-static void lv_opengles_shader_deinit()
+static void lv_opengles_shader_deinit(void)
 {
     GL_CALL(glDeleteProgram(shader_id));
 }
 
-static void lv_opengles_shader_bind()
+static void lv_opengles_shader_bind(void)
 {
     GL_CALL(glUseProgram(shader_id));
 }
 
-static void lv_opengles_shader_unbind()
+static void lv_opengles_shader_unbind(void)
 {
     GL_CALL(glUseProgram(0));
 }
@@ -421,76 +391,13 @@ static void lv_opengles_shader_set_uniform1f(const char * name, float value)
     GL_CALL(glUniform1f(lv_opengles_shader_get_uniform_location(name), value));
 }
 
-static void lv_opengles_render_draw()
+static void lv_opengles_render_draw(void)
 {
     lv_opengles_shader_bind();
     lv_opengles_vertex_array_bind();
     lv_opengles_index_buffer_bind();
     unsigned int count = lv_opengles_index_buffer_get_count();
     GL_CALL(glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, NULL));
-}
-
-static void lv_opengles_texture_init(void * buffer, int width, int height)
-{
-    if(buffer == NULL) {
-        return;
-    }
-
-    GL_CALL(glGenTextures(1, &texture_id));
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, texture_id));
-
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-
-    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-
-    /*Color depth: 8 (A8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
-#if LV_COLOR_DEPTH == 8
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, buffer));
-#elif LV_COLOR_DEPTH == 16
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, width, height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, buffer));
-#elif LV_COLOR_DEPTH == 24
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, buffer));
-#elif LV_COLOR_DEPTH == 32
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, buffer));
-#else
-#error("Unsupported color format")
-#endif
-
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
-}
-
-static void lv_opengles_texture_deinit()
-{
-    GL_CALL(glDeleteTextures(1, &texture_id));
-    texture_id = 0;
-}
-
-static void lv_opengles_texture_bind(unsigned int slot)
-{
-    GL_CALL(glActiveTexture(GL_TEXTURE0 + slot));
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, texture_id));
-}
-
-static void lv_opengles_texture_update(void * buffer, int width, int height)
-{
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, texture_id));
-
-    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-    /*Color depth: 8 (A8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
-#if LV_COLOR_DEPTH == 8
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, buffer));
-#elif LV_COLOR_DEPTH == 16
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, width, height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, buffer));
-#elif LV_COLOR_DEPTH == 24
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, buffer));
-#elif LV_COLOR_DEPTH == 32
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, buffer));
-#else
-#error("Unsupported color format")
-#endif
 }
 
 #endif /* LV_USE_OPENGLES */
