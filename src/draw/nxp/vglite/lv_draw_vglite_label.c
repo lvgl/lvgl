@@ -20,6 +20,7 @@
 #include "lv_vglite_matrix.h"
 #include "lv_vglite_utils.h"
 
+#include "../../lv_draw_label_private.h"
 #include "../../../stdlib/lv_string.h"
 
 /*********************
