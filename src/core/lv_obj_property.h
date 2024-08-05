@@ -98,14 +98,14 @@ typedef struct {
              * E.g.
              *
              * static const lv_property_t obj_pos_x = {
-             *      .id = LV_STYLE_X,
+             *      .id = LV_PROPERTY_STYLE_X,
              *      .num = 123,
              *      .selector = LV_STATE_PRESSED,
              * }
              *
              * instead of:
              * static const lv_property_t obj_pos_x = {
-             *      .id = LV_STYLE_X,
+             *      .id = LV_PROPERTY_STYLE_X,
              *      .style.num = 123, // note this line.
              *      .selector = LV_STATE_PRESSED,
              * }
@@ -171,12 +171,27 @@ lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id);
 lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, uint32_t selector);
 
 /**
- * Get the property ID by name. Requires to enable `LV_USE_OBJ_PROPERTY_NAME`.
+ * Get the property ID by name recursively to base classes. Requires to enable `LV_USE_OBJ_PROPERTY_NAME`.
  * @param obj       pointer to an object that has specified property or base class has.
  * @param name      property name
  * @return          property ID found or `LV_PROPERTY_ID_INVALID` if not found.
  */
 lv_prop_id_t lv_obj_property_get_id(const lv_obj_t * obj, const char * name);
+
+/**
+ * Get the property ID by name without check base class recursively. Requires to enable `LV_USE_OBJ_PROPERTY_NAME`.
+ * @param clz       pointer to an object class that has specified property or base class has.
+ * @param name      property name
+ * @return          property ID found or `LV_PROPERTY_ID_INVALID` if not found.
+ */
+lv_prop_id_t lv_obj_class_property_get_id(const lv_obj_class_t * clz, const char * name);
+
+/**
+ * Get the style property ID by name. Requires to enable `LV_USE_OBJ_PROPERTY_NAME`.
+ * @param name      property name
+ * @return          property ID found or `LV_PROPERTY_ID_INVALID` if not found.
+ */
+lv_prop_id_t lv_style_property_get_id(const char * name);
 
 /**********************
  *      MACROS
