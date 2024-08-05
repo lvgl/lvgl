@@ -58,6 +58,9 @@
 #if LV_USE_WINDOWS
     #include "drivers/windows/lv_windows_context.h"
 #endif
+#if LV_USE_WAYLAND
+    #include "drivers/wayland/lv_wayland.h"
+#endif
 
 /*********************
  *      DEFINES

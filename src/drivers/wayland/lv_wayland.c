@@ -1983,7 +1983,7 @@ static struct window * create_window(struct application * app, int width, int he
 {
     struct window * window;
 
-    window = _lv_ll_ins_tail(&app->window_ll);
+    window = lv_ll_ins_tail(&app->window_ll);
     LV_ASSERT_MALLOC(window);
     if(!window) {
         return NULL;
@@ -2073,7 +2073,7 @@ err_destroy_surface:
     wl_surface_destroy(window->body->surface);
 
 err_free_window:
-    _lv_ll_remove(&app->window_ll, window);
+    lv_ll_remove(&app->window_ll, window);
     lv_free(window);
     return NULL;
 }
@@ -2234,7 +2234,7 @@ static void _lv_wayland_handle_output(void)
     struct window * window;
     bool shall_flush = application.cursor_flush_pending;
 
-    _LV_LL_READ(&application.window_ll, window) {
+    LV_LL_READ(&application.window_ll, window) {
         if((window->shall_close) && (window->close_cb != NULL)) {
             window->shall_close = window->close_cb(window->lv_disp);
         }
@@ -2284,7 +2284,7 @@ static void _lv_wayland_handle_output(void)
         else {
             /* All data flushed */
             application.cursor_flush_pending = false;
-            _LV_LL_READ(&application.window_ll, window) {
+            LV_LL_READ(&application.window_ll, window) {
                 window->flush_pending = false;
             }
         }
@@ -2409,7 +2409,7 @@ void lv_wayland_init(void)
                                            (env_disable_decorations[0] != '0'));
 #endif
 
-    _lv_ll_init(&application.window_ll, sizeof(struct window));
+    lv_ll_init(&application.window_ll, sizeof(struct window));
 
     lv_tick_set_cb(tick_get_cb);
 
@@ -2426,7 +2426,7 @@ void lv_wayland_deinit(void)
 {
     struct window * window = NULL;
 
-    _LV_LL_READ(&application.window_ll, window) {
+    LV_LL_READ(&application.window_ll, window) {
         if(!window->closed) {
             destroy_window(window);
         }
@@ -2466,7 +2466,7 @@ void lv_wayland_deinit(void)
     wl_display_flush(application.display);
     wl_display_disconnect(application.display);
 
-    _lv_ll_clear(&application.window_ll);
+    lv_ll_clear(&application.window_ll);
 
 }
 
@@ -2611,7 +2611,7 @@ bool lv_wayland_window_is_open(lv_display_t * disp)
     bool open = false;
 
     if(disp == NULL) {
-        _LV_LL_READ(&application.window_ll, window) {
+        LV_LL_READ(&application.window_ll, window) {
             if(!window->closed) {
                 open = true;
                 break;
@@ -2787,7 +2787,7 @@ bool lv_wayland_timer_handler(void)
     _lv_wayland_handle_input();
 
     /* Ready input timers (to probe for any input received) */
-    _LV_LL_READ(&application.window_ll, window) {
+    LV_LL_READ(&application.window_ll, window) {
         LV_LOG_TRACE("handle timer frame: %d", window->frame_counter);
 
         if(window != NULL && window->frame_done == false
@@ -2834,7 +2834,7 @@ bool lv_wayland_timer_handler(void)
      * be sent to the compositor, but the compositor pipe/connection is unable
      * to take more data at this time).
      */
-    _LV_LL_READ(&application.window_ll, window) {
+    LV_LL_READ(&application.window_ll, window) {
         if(window->flush_pending) {
             errno = EAGAIN;
             break;
