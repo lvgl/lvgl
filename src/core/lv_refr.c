@@ -923,6 +923,11 @@ static void refr_obj_matrix(lv_layer_t * layer, lv_obj_t * obj)
     int32_t skew_x = lv_obj_get_style_transform_skew_x(obj, 0);
     int32_t skew_y = lv_obj_get_style_transform_skew_y(obj, 0);
 
+    if(scale_x <= 0 || scale_y <= 0) {
+        /* NOT draw if scale is negative or zero */
+        return;
+    }
+
     /* generate the obj matrix */
     lv_matrix_translate(&obj_matrix, pivot.x, pivot.y);
     if(rotation != 0) {

@@ -273,14 +273,14 @@ lv_text_align_t lv_obj_calculate_style_text_align(const lv_obj_t * obj, lv_part_
 
 static inline int32_t lv_obj_get_style_transform_scale_x_safe(const lv_obj_t * obj, lv_part_t part)
 {
-    int16_t zoom = lv_obj_get_style_transform_scale_x(obj, part);
-    return zoom != 0 ? zoom : 1;
+    int32_t scale = lv_obj_get_style_transform_scale_x(obj, part);
+    return scale > 0 ? scale : 1;
 }
 
 static inline int32_t lv_obj_get_style_transform_scale_y_safe(const lv_obj_t * obj, lv_part_t part)
 {
-    int16_t zoom = lv_obj_get_style_transform_scale_y(obj, part);
-    return zoom != 0 ? zoom : 1;
+    int32_t scale = lv_obj_get_style_transform_scale_y(obj, part);
+    return scale > 0 ? scale : 1;
 }
 
 /**
