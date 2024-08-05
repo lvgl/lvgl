@@ -13,6 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_demo_ebike.h"
+
+#if LV_USE_DEMO_EBIKE
 
 /*********************
  *      DEFINES
@@ -25,12 +28,28 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Initialize the home page. Called only once.
+ */
 void lv_demo_ebike_home_init(void);
+
+/**
+ * Clean up the data of the home pages
+ */
+void lv_demo_ebike_home_deinit(void);
+
+/**
+ * Create the home page
+ * @param parent    the parent of the home page
+ */
 void lv_demo_ebike_home_create(lv_obj_t * parent);
 
 /**********************
  *      MACROS
  **********************/
+
+#endif /*LV_USE_DEMO_EBIKE*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

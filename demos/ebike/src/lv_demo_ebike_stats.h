@@ -1,10 +1,10 @@
 /**
- * @file lv_demo_ebike_settings.h
+ * @file lv_demo_ebike_stats.h
  *
  */
 
-#ifndef LV_DEMO_EBIKE_SETTINGS_H
-#define LV_DEMO_EBIKE_SETTINGS_H
+#ifndef LV_DEMO_EBIKE_STATS_H
+#define LV_DEMO_EBIKE_STATS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,19 +30,29 @@ extern "C" {
  **********************/
 
 /**
- * Create the settings page
- * @param parent    the parent of the settings page
+ * Initialize the statistics page. Called only once.
  */
-void lv_demo_ebike_settings_create(lv_obj_t * parent);
+void lv_demo_ebike_stats_init(void);
+
+/**
+ * Clean up the data of the statistics page
+ */
+void lv_demo_ebike_stats_deinit(void);
+
+/**
+ * Create the statistic page
+ * @param parent    the parent of the statistics page
+ */
+void lv_demo_ebike_stats_create(lv_obj_t * parent);
+
+#endif /*LV_USE_DEMO_EBIKE*/
 
 /**********************
  *      MACROS
  **********************/
 
-#endif /*LV_USE_DEMO_EBIKE*/
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DEMO_EBIKE_SETTINGS_H*/
+#endif /*LV_DEMO_EBIKE_STATS_H*/

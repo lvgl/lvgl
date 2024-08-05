@@ -1,5 +1,5 @@
 /**
- * @file lv_demo_ebike_stat.c
+ * @file lv_demo_ebike_stats.c
  *
  */
 
@@ -7,8 +7,12 @@
  *      INCLUDES
  *********************/
 #include "lv_demo_ebike.h"
-#include "translations/lv_i18n.h"
+#if LV_USE_DEMO_EBIKE
+
 #include "../../../src/lvgl_private.h"
+#include "translations/lv_i18n.h"
+#include "lv_demo_ebike_stats.h"
+#include "lv_demo_ebike_private.h"
 
 /*********************
  *      DEFINES
@@ -28,6 +32,11 @@ typedef enum {
  **********************/
 static lv_obj_t * left_cont_create(lv_obj_t * parent);
 static lv_obj_t * right_cont_create(lv_obj_t * parent);
+
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+/*Subjects used only by the statistics page to it easier to sync widgets*/
 static lv_subject_t subject_week;
 static lv_subject_t subject_day;
 static lv_subject_t subject_avg_speed;
@@ -37,9 +46,6 @@ static lv_subject_t subject_mode;
 static lv_obj_t * left_arrow;
 static lv_obj_t * right_arrow;
 
-/**********************
- *  STATIC VARIABLES
- **********************/
 static int32_t top_speed_values[] = {46, 28, 42, 39, 41, 25, 49, 37, 35, 40, 33, 40, 31, 27, 45, 38, 41, 40, 27, 25, 30, 45, 31, 43, 41, 34, 47, 32, 30, 33};
 static int32_t avg_speed_values[] = {21, 24, 27, 29, 23, 28, 28, 22, 29, 28, 24, 26, 24, 30, 25, 25, 20, 28, 24, 27, 25, 27, 20, 29, 25, 24, 23, 26, 27, 27};
 static int32_t distance_values[] =  {87, 63, 29, 84, 27, 84, 33, 76, 77, 49, 46, 29, 67, 21, 87, 75, 40, 19, 12, 67, 66, 11, 59, 33, 51, 75, 44, 61, 53, 63};
@@ -52,7 +58,7 @@ static int32_t distance_values[] =  {87, 63, 29, 84, 27, 84, 33, 76, 77, 49, 46,
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_demo_ebike_stat_init(void)
+void lv_demo_ebike_stats_init(void)
 {
     lv_subject_init_int(&subject_mode, MODE_DISTANCE);
     lv_subject_init_int(&subject_week, 0);
@@ -62,15 +68,25 @@ void lv_demo_ebike_stat_init(void)
     lv_subject_init_int(&subject_distance, 0);
 }
 
-void lv_demo_ebike_stat_create(lv_obj_t * parent)
+void lv_demo_ebike_stats_deinit(void)
+{
+    lv_subject_deinit(&subject_mode);
+    lv_subject_deinit(&subject_week);
+    lv_subject_deinit(&subject_day);
+    lv_subject_deinit(&subject_top_speed);
+    lv_subject_deinit(&subject_avg_speed);
+    lv_subject_deinit(&subject_distance);
+}
+
+void lv_demo_ebike_stats_create(lv_obj_t * parent)
 {
     lv_obj_t * main_cont = lv_obj_create(parent);
     lv_obj_set_style_bg_opa(main_cont, 0, 0);
     lv_obj_set_size(main_cont, lv_pct(100), lv_pct(100));
-    lv_obj_set_flex_flow(main_cont, EBIKE_PORTRAIT ? LV_FLEX_FLOW_COLUMN : LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_flow(main_cont, LV_DEMO_EBIKE_PORTRAIT ? LV_FLEX_FLOW_COLUMN : LV_FLEX_FLOW_ROW);
 
     lv_obj_t * left_cont = left_cont_create(main_cont);
-#if EBIKE_PORTRAIT
+#if LV_DEMO_EBIKE_PORTRAIT
     lv_obj_set_size(left_cont, lv_pct(100), 120);
 #else
     lv_obj_set_size(left_cont, 164, lv_pct(100));
@@ -96,15 +112,25 @@ static lv_obj_t * left_cont_create(lv_obj_t * parent)
     lv_label_set_text(label, _("STATS"));
     lv_obj_set_style_text_font(label, EBIKE_FONT_MEDIUM, 0);
 
-    LV_IMAGE_DECLARE(img_ebike_stat_large);
-    lv_obj_t * img = lv_image_create(left_cont);
-    lv_image_set_src(img, &img_ebike_stat_large);
-#if EBIKE_PORTRAIT
-    lv_obj_align(img, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
+
+    lv_obj_t * stats_img;
+#if LV_USE_LOTTIE
+    extern const uint8_t lottie_ebike_stats[];
+    extern const size_t lottie_ebike_stats_size;
+    stats_img = lv_lottie_create(left_cont);
+    lv_lottie_set_src_data(stats_img, lottie_ebike_stats, lottie_ebike_stats_size);
+    lv_lottie_set_draw_buf(stats_img, lv_demo_ebike_get_lottie_draw_buf());
 #else
-    lv_obj_align(img, LV_ALIGN_BOTTOM_MID, 0, 0);
+    stat_img = lv_image_create(left_cont);
+    LV_IMAGE_DECLARE(img_ebike_stats_large);
+    lv_image_set_src(stats_img, &img_ebike_stats_large);
 #endif
 
+#if LV_DEMO_EBIKE_PORTRAIT
+    lv_obj_align(stats_img, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
+#else
+    lv_obj_align(stats_img, LV_ALIGN_BOTTOM_MID, 0, 0);
+#endif
     return left_cont;
 }
 static void tabs_click_event_cb(lv_event_t * e)
@@ -116,7 +142,7 @@ static void tabs_click_event_cb(lv_event_t * e)
 static lv_obj_t * tabs_create(lv_obj_t * parent)
 {
     lv_obj_t * btnm = lv_buttonmatrix_create(parent);
-#if EBIKE_PORTRAIT
+#if LV_DEMO_EBIKE_PORTRAIT
     lv_obj_set_size(btnm, lv_pct(100), 40);
 #else
     lv_obj_set_size(btnm, lv_pct(100), 24);
@@ -307,7 +333,7 @@ static void chart_draw_event_cb(lv_event_t * e)
 
 static void chart_refr_ext_draw(lv_event_t * e)
 {
-#if EBIKE_PORTRAIT
+#if LV_DEMO_EBIKE_PORTRAIT
     lv_event_set_ext_draw_size(e, 48);
 #else
     lv_event_set_ext_draw_size(e, 32);
@@ -544,3 +570,5 @@ static lv_obj_t * right_cont_create(lv_obj_t * parent)
 
     return right_cont;
 }
+
+#endif /*LV_USE_DEMO_EBIKE*/
