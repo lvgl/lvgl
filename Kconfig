@@ -1127,7 +1127,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_STDIO
 			bool "File system on top of stdio API"
 		config LV_FS_STDIO_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65 )"
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_STDIO
 		config LV_FS_STDIO_PATH
@@ -1141,7 +1141,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_POSIX
 			bool "File system on top of posix API"
 		config LV_FS_POSIX_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_POSIX
 		config LV_FS_POSIX_PATH
@@ -1155,7 +1155,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_WIN32
 			bool "File system on top of Win32 API"
 		config LV_FS_WIN32_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_WIN32
 		config LV_FS_WIN32_PATH
@@ -1169,7 +1169,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_FATFS
 			bool "File system on top of FatFS"
 		config LV_FS_FATFS_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_FATFS
 		config LV_FS_FATFS_CACHE_SIZE
@@ -1180,28 +1180,28 @@ menu "LVGL configuration"
 		config LV_USE_FS_MEMFS
 			bool "File system on top of memory-mapped API"
 		config LV_FS_MEMFS_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_MEMFS
 
 		config LV_USE_FS_LITTLEFS
 			bool "File system on top of littlefs API"
 		config LV_FS_LITTLEFS_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_LITTLEFS
 
 		config LV_USE_FS_ARDUINO_ESP_LITTLEFS
 			bool "File system on top of Arduino ESP littlefs API"
 		config LV_FS_ARDUINO_ESP_LITTLEFS_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_ARDUINO_ESP_LITTLEFS
 
 		config LV_USE_FS_ARDUINO_SD
 			bool "File system on top of Arduino SD API"
 		config LV_FS_ARDUINO_SD_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_ARDUINO_SD
 		config LV_FS_ARDUINO_SD_CS_PIN
