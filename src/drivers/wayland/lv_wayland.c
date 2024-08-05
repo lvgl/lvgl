@@ -7,7 +7,7 @@
  * Porting to LVGL 9.1
  * Copyright (2024) EDGEMTech Ltd. by Erik Tagirov (erik.tagirov@edgemtech.ch)
  *
- * See LICENSE.txt for details
+ * See LICENCE.txt for details
  *
  ******************************************************************/
 

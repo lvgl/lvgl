@@ -7,7 +7,7 @@
  * Porting to LVGL 9.1
  * Copyright (c) 2024 EDGEMTech Ltd.
  *
- * See LICENSE.txt for details
+ * See LICENCE.txt for details
  *
  * Author(s): EDGEMTech Ltd, Erik Tagirov (erik.tagirov@edgemtech.ch)
  *
@@ -67,6 +67,7 @@ int lv_wayland_get_fd(void);
  * @param ver_res The height of the window in pixels
  * @param title The title of the window
  * @param close_cb The callback that will be execute when the user closes the window
+ * @return The LVGL display associated to the window
  */
 lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char * title,
                                         lv_wayland_display_close_f_t close_cb);
@@ -78,7 +79,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
 void lv_wayland_window_close(lv_display_t * disp);
 
 /**
- * Closes the window programmatically
+ * Check if the window is open
  * @param disp Reference to the LVGL display associated to the window
  * @return true: The window is open
  */

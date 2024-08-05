@@ -50,7 +50,7 @@ Configuring the wayland driver
 
 .. code:: c
 
-   #define LV_WAYLAND_WL_SHELL  1 /*preferred default*/
+   #define LV_WAYLAND_WL_SHELL  1
 
 Example
 -------
@@ -65,10 +65,8 @@ Usage
 
 #. ``LV_COLOR_DEPTH`` should be set either to ``32`` or ``16`` in ``lv_conf.h``
 
-#. After ``lv_init()`` call ``lv_wayland_init()``.
 #. Add a display using ``lv_wayland_window_create()``,
    possibly with a close callback to track the status of each display:
-#. On application exit call ``lv_wayland_deinit()`` after ``lv_deinit()``
 
 .. code:: c
 
