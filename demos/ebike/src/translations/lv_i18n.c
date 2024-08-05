@@ -134,8 +134,7 @@ static lv_i18n_phrase_t zh_singulars[] = {
 
 static uint8_t zh_plural_fn(int32_t num)
 {
-
-
+    UNUSED(num);
 
     return LV_I18N_PLURAL_TYPE_OTHER;
 }
