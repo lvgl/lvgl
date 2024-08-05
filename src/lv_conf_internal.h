@@ -326,7 +326,11 @@
     #ifdef CONFIG_LV_DRAW_THREAD_STACK_SIZE
         #define LV_DRAW_THREAD_STACK_SIZE CONFIG_LV_DRAW_THREAD_STACK_SIZE
     #else
-        #define LV_DRAW_THREAD_STACK_SIZE    (8 * 1024)   /*[bytes]*/
+        #if (LV_USE_FREETYPE || LV_USE_THORVG)
+          #define LV_DRAW_THREAD_STACK_SIZE (32*1024) //needs to be larger for thorvg
+        #else
+          #define LV_DRAW_THREAD_STACK_SIZE    (8 * 1024)   /*[bytes]*/
+        #endif // (LV_USE_FREETYPE || LV_USE_THORVG)
     #endif
 #endif
 
