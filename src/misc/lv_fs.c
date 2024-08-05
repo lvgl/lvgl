@@ -17,6 +17,11 @@
 /*********************
  *      DEFINES
  *********************/
+
+#if LV_FS_DEFAULT_DRIVE_LETTER != '\0' && (LV_FS_DEFAULT_DRIVE_LETTER < 'A' || 'Z' < LV_FS_DEFAULT_DRIVE_LETTER)
+    #error "When enabled, LV_FS_DEFAULT_DRIVE_LETTER needs to be a capital ASCII letter (A-Z)"
+#endif
+
 #define fsdrv_ll_p &(LV_GLOBAL_DEFAULT()->fsdrv_ll)
 
 /**********************
@@ -505,12 +510,25 @@ static resolved_path_t lv_fs_resolve_path(const char * path)
 {
     resolved_path_t resolved;
 
+#if LV_FS_DEFAULT_DRIVE_LETTER != '\0' /*When using default drive letter, strict format (X:) is mandatory*/
+    bool has_drive_prefix = ('A' <= path[0]) && (path[0] <= 'Z') && (path[1] == ':');
+
+    if(has_drive_prefix) {
+        resolved.drive_letter = path[0];
+        resolved.real_path = path + 2;
+    }
+    else {
+        resolved.drive_letter = LV_FS_DEFAULT_DRIVE_LETTER;
+        resolved.real_path = path;
+    }
+# else /*Lean rules for backward compatibility*/
     resolved.drive_letter = path[0];
 
     path++; /*Ignore the driver letter*/
     if(*path == ':') path++;
 
     resolved.real_path = path;
+#endif
 
     return resolved;
 }

@@ -1124,6 +1124,12 @@ menu "LVGL configuration"
 	endmenu
 
 	menu "3rd Party Libraries"
+		config LV_FS_DEFAULT_DRIVE_LETTER
+			int "Default drive letter (e.g. 65 for 'A')"
+			default 0
+			help
+				Setting a default drive letter allows skipping the driver prefix in filepaths
+
 		config LV_USE_FS_STDIO
 			bool "File system on top of stdio API"
 		config LV_FS_STDIO_LETTER
