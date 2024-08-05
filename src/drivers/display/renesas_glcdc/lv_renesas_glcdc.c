@@ -36,6 +36,7 @@
 
 #include <stdbool.h>
 #include "../../../display/lv_display_private.h"
+#include "../../../draw/sw/lv_draw_sw.h"
 
 /*********************
  *      DEFINES
@@ -76,6 +77,9 @@ static glcdc_runtime_cfg_t  g_layer_change;
 display_t g_display0_cfg;
 #endif /*_RENESAS_RX_*/
 
+static void * rotation_buffer = NULL;
+static uint32_t partial_buffer_size = 0;
+
 /**********************
  *      MACROS
  **********************/
@@ -92,6 +96,7 @@ lv_display_t * lv_renesas_glcdc_direct_create(void)
 
 lv_display_t * lv_renesas_glcdc_partial_create(void * buf1, void * buf2, size_t buf_size)
 {
+    partial_buffer_size = buf_size;
     return glcdc_create(buf1, buf2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
 }
 
@@ -185,7 +190,7 @@ static void glcdc_init(void)
     lv_memzero(fb_background, sizeof(fb_background));
 
 #ifdef _RENESAS_RA_
-    /* Initalize GLCDC driver */
+    /* Initialize GLCDC driver */
     uint8_t * p_fb = &fb_background[1][0];
     fsp_err_t err;
 
@@ -277,13 +282,40 @@ static void flush_wait_direct(lv_display_t * display)
 
 static void flush_partial(lv_display_t * display, const lv_area_t * area, uint8_t * px_map)
 {
-    LV_UNUSED(display);
+    uint16_t * img = (uint16_t *)px_map;
+
+    lv_area_t rotated_area;
+    lv_color_format_t cf = lv_display_get_color_format(display);
+    lv_display_rotation_t rotation = lv_display_get_rotation(display);
+
+    if(rotation != LV_DISPLAY_ROTATION_0) {
+        int32_t w = lv_area_get_width(area);
+        int32_t h = lv_area_get_height(area);
+        uint32_t w_stride = lv_draw_buf_width_to_stride(w, cf);
+        uint32_t h_stride = lv_draw_buf_width_to_stride(h, cf);
+
+        // only allocate if rotation is actually being used
+        if(!rotation_buffer) {
+            rotation_buffer = lv_malloc(partial_buffer_size);
+            LV_ASSERT_MALLOC(rotation_buffer);
+        }
+
+        if(rotation == LV_DISPLAY_ROTATION_180)
+            lv_draw_sw_rotate(img, rotation_buffer, w, h, w_stride, w_stride, rotation, cf);
+        else /* 90 or 270 */
+            lv_draw_sw_rotate(img, rotation_buffer, w, h, w_stride, h_stride, rotation, cf);
+
+        img = rotation_buffer;
+
+        rotated_area = *area;
+        lv_display_rotate_area(display, &rotated_area);
+        area = &rotated_area;
+    }
 
     int32_t w = lv_area_get_width(area);
     int32_t h = lv_area_get_height(area);
 
     uint16_t * fb = (uint16_t *)fb_background[1];
-    uint16_t * img = (uint16_t *)px_map;
 
     fb = fb + area->y1 * DISPLAY_HSIZE_INPUT0;
     fb = fb + area->x1;

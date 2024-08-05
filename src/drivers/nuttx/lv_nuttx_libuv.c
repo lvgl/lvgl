@@ -202,7 +202,7 @@ static void lv_nuttx_uv_disp_poll_cb(uv_poll_t * handle, int status, int events)
     LV_UNUSED(status);
     LV_UNUSED(events);
     uv_poll_stop(handle);
-    _lv_display_refr_timer(NULL);
+    lv_display_refr_timer(NULL);
     fb_ctx->polling = false;
 }
 

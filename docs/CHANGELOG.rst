@@ -95,7 +95,7 @@ Fixes
 - **fix(x11): fix assert on delete** `5799 <https://github.com/lvgl/lvgl/pull/5799>`__
 - **fix(demo_music): fix the previous button in the music demo is not clickable** `5808 <https://github.com/lvgl/lvgl/pull/5808>`__
 - **fix(draw): fix non antialiased rgb565a8 transformation** `5782 <https://github.com/lvgl/lvgl/pull/5782>`__
-- **fix(freetpye): fix the problem of incomplete font drawing when setting with italic** `5807 <https://github.com/lvgl/lvgl/pull/5807>`__
+- **fix(freetype): fix the problem of incomplete font drawing when setting with italic** `5807 <https://github.com/lvgl/lvgl/pull/5807>`__
 - **fix(fsdrv): add missing lv_fs_littlefs_init function declaration** `5778 <https://github.com/lvgl/lvgl/pull/5778>`__
 - **fix(vg_lite):fix bug for wrong rendering in vertical or horizontal dir** `5789 <https://github.com/lvgl/lvgl/pull/5789>`__
 - **fix(env): added *.cpp glob in ESP configuration** `5761 <https://github.com/lvgl/lvgl/pull/5761>`__
@@ -120,7 +120,7 @@ Fixes
 - **fix(vg_lite): fix the loss of display accuracy of rounded rectangles** `5714 <https://github.com/lvgl/lvgl/pull/5714>`__
 - **fix(test): check compiler flag should not contain '_'** `5706 <https://github.com/lvgl/lvgl/pull/5706>`__
 - **fix(imagebutton): fix the example** `5719 <https://github.com/lvgl/lvgl/pull/5719>`__
-- **fix(drm): eliminate use of non-existent lv_api_map.h and enable smoke tests** `5694 <https://github.com/lvgl/lvgl/pull/5694>`__
+- **fix(drm): eliminate use of nonexistent lv_api_map.h and enable smoke tests** `5694 <https://github.com/lvgl/lvgl/pull/5694>`__
 - **fix(test): enable -Wpedantic** `5676 <https://github.com/lvgl/lvgl/pull/5676>`__
 - **fix(pxp): fix issues in pxp cache management callback** `5685 <https://github.com/lvgl/lvgl/pull/5685>`__
 - **fix(windows): improve graphic performance via using high resolution tick count and timer delay implementation** `5711 <https://github.com/lvgl/lvgl/pull/5711>`__
@@ -198,7 +198,7 @@ Fixes
 - **fix(lvgl.mk): fix vg_lite_tvg.cpp not compiling** `5435 <https://github.com/lvgl/lvgl/pull/5435>`__
 - **fix(ci): use the dev branch of PlatformIO** `5432 <https://github.com/lvgl/lvgl/pull/5432>`__
 - **fix(vector) : add path bounding and matrix transform functions.** `5389 <https://github.com/lvgl/lvgl/pull/5389>`__
-- **fix(warning): fix shadown variable warning** `47750f1 <https://github.com/lvgl/lvgl/commit/47750f1b866e5ea0617035fd208c727878bebc44>`__
+- **fix(warning): fix shadow variable warning** `47750f1 <https://github.com/lvgl/lvgl/commit/47750f1b866e5ea0617035fd208c727878bebc44>`__
 - **fix(thorvg): link lvgl_thorvgl with lvgl** `9b09182 <https://github.com/lvgl/lvgl/commit/9b09182fc76032ef0bc8a2d930fa1cf4fd081431>`__
 - **fix(warning): error: no newline at end of file** `9a6a194 <https://github.com/lvgl/lvgl/commit/9a6a194680db9ea12f59e94eab6e812cb28d504f>`__
 - **fix(color): treat RGB565A8 bpp same as RGB565** `52426ec <https://github.com/lvgl/lvgl/commit/52426ec1919274e282889129f00e00a9a2a9ce60>`__

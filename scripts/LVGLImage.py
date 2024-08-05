@@ -308,7 +308,7 @@ def write_c_array_file(
         stride: int,
         cf: ColorFormat,
         filename: str,
-        premulitplied: bool,
+        premultiplied: bool,
         compress: CompressMethod,
         data: bytes):
     varname = path.basename(filename).split('.')[0]
@@ -318,7 +318,7 @@ def write_c_array_file(
     flags = "0"
     if compress is not CompressMethod.NONE:
         flags += " | LV_IMAGE_FLAGS_COMPRESSED"
-    if premulitplied:
+    if premultiplied:
         flags += " | LV_IMAGE_FLAGS_PREMULTIPLIED"
 
     macro = "LV_ATTRIBUTE_" + varname.upper()
@@ -470,7 +470,6 @@ class LVGLCompressData:
         if self.compress == CompressMethod.RLE:
             # RLE compression performs on pixel unit, pad data to pixel unit
             pad = b'\x00' * (self.blk_size - self.raw_data_len % self.blk_size)
-            self.raw_data_len += len(pad)
             compressed = RLEImage().rle_compress(raw_data + pad, self.blk_size)
         elif self.compress == CompressMethod.LZ4:
             compressed = lz4.block.compress(raw_data, store_size=False)
@@ -495,7 +494,7 @@ class LVGLImage:
                  h: int = 0,
                  data: bytes = b'') -> None:
         self.stride = 0  # default no valid stride value
-        self.premulitplied = False
+        self.premultiplied = False
         self.set_data(cf, w, h, data)
 
     def __repr__(self) -> str:
@@ -571,12 +570,12 @@ class LVGLImage:
         self.stride = stride
         self.data = bytearray(b''.join(data_out))
 
-    def premulitply(self):
+    def premultiply(self):
         """
         Pre-multiply image RGB data with alpha, set corresponding image header flags
         """
-        if self.premulitplied:
-            raise ParameterError("Image already pre-mulitplied")
+        if self.premultiplied:
+            raise ParameterError("Image already pre-multiplied")
 
         if not self.cf.has_alpha:
             raise ParameterError(f"Image has no alpha channel: {self.cf.name}")
@@ -660,7 +659,7 @@ class LVGLImage:
         else:
             raise ParameterError(f"Not supported yet: {self.cf.name}")
 
-        self.premulitplied = True
+        self.premultiplied = True
 
     @property
     def data_len(self) -> int:
@@ -753,7 +752,7 @@ class LVGLImage:
             bin = bytearray()
             flags = 0
             flags |= 0x08 if compress != CompressMethod.NONE else 0
-            flags |= 0x01 if self.premulitplied else 0
+            flags |= 0x01 if self.premultiplied else 0
 
             header = LVGLImageHeader(self.cf,
                                      self.w,
@@ -779,7 +778,7 @@ class LVGLImage:
         else:
             data = self.data
         write_c_array_file(self.w, self.h, self.stride, self.cf, filename,
-                           self.premulitplied,
+                           self.premultiplied,
                            compress, data)
 
     def to_png(self, filename: str):
@@ -1233,7 +1232,7 @@ class PNGConverter:
                 img = LVGLImage().from_png(f, self.cf, background=self.background)
                 img.adjust_stride(align=self.align)
                 if self.premultiply:
-                    img.premulitply()
+                    img.premultiply()
                 output.append((f, img))
                 if self.ofmt == OutputFormat.BIN_FILE:
                     img.to_bin(self._replace_ext(f, ".bin"),
@@ -1338,7 +1337,7 @@ def test():
                                cf=ColorFormat.ARGB8565,
                                background=0xFF_FF_00)
     img.adjust_stride(align=16)
-    img.premulitply()
+    img.premultiply()
     img.to_bin("output/cogwheel.ARGB8565.bin")
     img.to_c_array("output/cogwheel-abc.c")  # file name is used as c var name
     img.to_png("output/cogwheel.ARGB8565.png.png")  # convert back to png

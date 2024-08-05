@@ -163,7 +163,7 @@ static inline bool _vglite_dest_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_L8:
 #endif
         case LV_COLOR_FORMAT_RGB565:
-#if CHIPTID == 0x555
+#if CHIPID == 0x555
         case LV_COLOR_FORMAT_RGB565A8:
         case LV_COLOR_FORMAT_RGB888:
 #endif
@@ -212,8 +212,6 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
             return 1;
 
         case LV_DRAW_TASK_TYPE_BORDER: {
-                const lv_draw_border_dsc_t * draw_dsc = (lv_draw_border_dsc_t *) t->draw_dsc;
-
                 if(t->preference_score > 90) {
                     t->preference_score = 90;
                     t->preferred_draw_unit_id = DRAW_UNIT_ID_VGLITE;
@@ -256,7 +254,7 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 #if LV_USE_VGLITE_BLIT_SPLIT
                    || has_transform
 #endif
-                   || (!vglite_buf_aligned(img_dsc->data, img_dsc->header.stride, img_dsc->header.cf))
+                   || (!vglite_src_buf_aligned(img_dsc->data, img_dsc->header.stride, img_dsc->header.cf))
                   )
                     return 0;
 
@@ -285,11 +283,11 @@ static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_VGLITE);
 
     if(t == NULL || t->preferred_draw_unit_id != DRAW_UNIT_ID_VGLITE)
-        return -1;
+        return LV_DRAW_UNIT_IDLE;
 
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(buf == NULL)
-        return -1;
+        return LV_DRAW_UNIT_IDLE;
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_vglite_unit->base_unit.target_layer = layer;
@@ -353,7 +351,7 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
     lv_area_copy(&draw_area, &t->area);
     lv_area_move(&draw_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
-    if(!_lv_area_intersect(&draw_area, &draw_area, &clip_area))
+    if(!lv_area_intersect(&draw_area, &draw_area, &clip_area))
         return; /*Fully clipped, nothing to do*/
 
     /* Invalidate the drawing area */
@@ -401,7 +399,7 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
     /*Layers manage it for themselves*/
     if(t->type != LV_DRAW_TASK_TYPE_LAYER) {
         lv_area_t draw_area;
-        if(!_lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area))
+        if(!lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area))
             return;
 
         int32_t idx = 0;
@@ -412,7 +410,7 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
         }
         lv_draw_rect_dsc_t rect_dsc;
         lv_draw_rect_dsc_init(&rect_dsc);
-        rect_dsc.bg_color = lv_palette_main(idx % _LV_PALETTE_LAST);
+        rect_dsc.bg_color = lv_palette_main(idx % LV_PALETTE_LAST);
         rect_dsc.border_color = rect_dsc.bg_color;
         rect_dsc.bg_opa = LV_OPA_10;
         rect_dsc.border_opa = LV_OPA_80;

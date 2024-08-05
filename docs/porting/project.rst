@@ -44,7 +44,7 @@ For integration with CMake take a look this section of the
 Other platforms and tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The `Get started </integartion/index>`__ section contains many platform
+The `Get started </integration/index>`__ section contains many platform
 specific descriptions e.g. for ESP32, Arduino, NXP, RT-Thread, NuttX,
 etc.
 
@@ -90,7 +90,8 @@ will attempt to include ``lv_conf.h`` simply with
 
 You can even use a different name for ``lv_conf.h``. The custom path can
 be set via the :c:macro:`LV_CONF_PATH` define. For example
-``-DLV_CONF_PATH="/home/joe/my_project/my_custom_conf.h"``
+``-DLV_CONF_PATH="/home/joe/my_project/my_custom_conf.h"``. If this define
+is set :c:macro:`LV_CONF_SKIP` is assumed to be ``0``.
 
 If :c:macro:`LV_CONF_SKIP` is defined, LVGL will not try to include
 ``lv_conf.h``. Instead you can pass the config defines using build

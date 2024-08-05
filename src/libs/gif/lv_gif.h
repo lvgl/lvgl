@@ -14,7 +14,13 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../lvgl.h"
+#include "../../lv_conf_internal.h"
+#include "../../misc/lv_types.h"
+#include "../../draw/lv_draw_buf.h"
+#include "../../widgets/image/lv_image.h"
+#include "../../core/lv_obj_class.h"
+#include LV_STDBOOL_INCLUDE
+#include LV_STDINT_INCLUDE
 #if LV_USE_GIF
 
 #include "gifdec.h"
@@ -26,14 +32,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-typedef struct {
-    lv_image_t img;
-    gd_GIF * gif;
-    lv_timer_t * timer;
-    lv_draw_buf_t imgdsc;
-    uint32_t last_call;
-} lv_gif_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_gif_class;
 

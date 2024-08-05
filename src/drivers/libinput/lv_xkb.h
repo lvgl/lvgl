@@ -26,15 +26,6 @@ extern "C" {
  *********************/
 
 /**********************
- *      TYPEDEFS
- **********************/
-
-typedef struct {
-    struct xkb_keymap * keymap;
-    struct xkb_state * state;
-} lv_xkb_t;
-
-/**********************
  * GLOBAL PROTOTYPES
  **********************/
 

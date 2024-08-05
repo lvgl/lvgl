@@ -125,7 +125,7 @@ Result Saver::save(std::unique_ptr<Paint> paint, const string& path, bool compre
     auto p = paint.release();
     if (!p) return Result::MemoryCorruption;
 
-    //Already on saving an other resource.
+    //Already on saving another resource.
     if (pImpl->saveModule) {
         if (P(p)->refCnt == 0) delete(p);
         return Result::InsufficientCondition;
@@ -168,7 +168,7 @@ Result Saver::save(unique_ptr<Animation> animation, const string& path, uint32_t
         return Result::InsufficientCondition;
     }
 
-    //Already on saving an other resource.
+    //Already on saving another resource.
     if (pImpl->saveModule) {
         if (remove) delete(a);
         return Result::InsufficientCondition;

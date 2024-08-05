@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_font.h"
-#include "lv_font_fmt_txt.h"
+#include "lv_font_fmt_txt_private.h"
 #include "../core/lv_global.h"
 #include "../misc/lv_assert.h"
 #include "../misc/lv_types.h"
@@ -35,9 +35,9 @@ typedef struct {
  **********************/
 static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter);
 static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t gid_right);
-static int32_t unicode_list_compare(const void * ref, const void * element);
-static int32_t kern_pair_8_compare(const void * ref, const void * element);
-static int32_t kern_pair_16_compare(const void * ref, const void * element);
+static int unicode_list_compare(const void * ref, const void * element);
+static int kern_pair_8_compare(const void * ref, const void * element);
+static int kern_pair_16_compare(const void * ref, const void * element);
 
 #if LV_USE_FONT_COMPRESSED
     static void decompress(const uint8_t * in, uint8_t * out, int32_t w, int32_t h, uint8_t bpp, bool prefilter);
@@ -236,8 +236,8 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_TINY) {
             uint16_t key = rcp;
-            uint16_t * p = _lv_utils_bsearch(&key, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
-                                             sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
+            uint16_t * p = lv_utils_bsearch(&key, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
+                                            sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
 
             if(p) {
                 lv_uintptr_t ofs = p - fdsc->cmaps[i].unicode_list;
@@ -246,8 +246,8 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_FULL) {
             uint16_t key = rcp;
-            uint16_t * p = _lv_utils_bsearch(&key, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
-                                             sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
+            uint16_t * p = lv_utils_bsearch(&key, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
+                                            sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
 
             if(p) {
                 lv_uintptr_t ofs = p - fdsc->cmaps[i].unicode_list;
@@ -277,7 +277,7 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
              *The pairs are ordered left_id first, then right_id secondly.*/
             const uint16_t * g_ids = kdsc->glyph_ids;
             kern_pair_ref_t g_id_both = {gid_left, gid_right};
-            uint16_t * kid_p = _lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 2, kern_pair_8_compare);
+            uint16_t * kid_p = lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 2, kern_pair_8_compare);
 
             /*If the `g_id_both` were found get its index from the pointer*/
             if(kid_p) {
@@ -290,7 +290,7 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
              *The pairs are ordered left_id first, then right_id secondly.*/
             const uint32_t * g_ids = kdsc->glyph_ids;
             kern_pair_ref_t g_id_both = {gid_left, gid_right};
-            uint32_t * kid_p = _lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 4, kern_pair_16_compare);
+            uint32_t * kid_p = lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 4, kern_pair_16_compare);
 
             /*If the `g_id_both` were found get its index from the pointer*/
             if(kid_p) {
@@ -319,25 +319,24 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
     return value;
 }
 
-static int32_t kern_pair_8_compare(const void * ref, const void * element)
+static int kern_pair_8_compare(const void * ref, const void * element)
 {
     const kern_pair_ref_t * ref8_p = ref;
     const uint8_t * element8_p = element;
 
     /*If the MSB is different it will matter. If not return the diff. of the LSB*/
-    if(ref8_p->gid_left != element8_p[0]) return (int32_t) ref8_p->gid_left - element8_p[0];
-    else return (int32_t) ref8_p->gid_right - element8_p[1];
-
+    if(ref8_p->gid_left != element8_p[0]) return ref8_p->gid_left - element8_p[0];
+    else return ref8_p->gid_right - element8_p[1];
 }
 
-static int32_t kern_pair_16_compare(const void * ref, const void * element)
+static int kern_pair_16_compare(const void * ref, const void * element)
 {
     const kern_pair_ref_t * ref16_p = ref;
     const uint16_t * element16_p = element;
 
     /*If the MSB is different it will matter. If not return the diff. of the LSB*/
-    if(ref16_p->gid_left != element16_p[0]) return (int32_t) ref16_p->gid_left - element16_p[0];
-    else return (int32_t) ref16_p->gid_right - element16_p[1];
+    if(ref16_p->gid_left != element16_p[0]) return ref16_p->gid_left - element16_p[0];
+    else return ref16_p->gid_right - element16_p[1];
 }
 
 #if LV_USE_FONT_COMPRESSED
@@ -488,13 +487,13 @@ static inline uint8_t rle_next(void)
         ret = get_bits(rle->in, rle->rdp, rle->bpp);
         if(rle->rdp != 0 && rle->prev_v == ret) {
             rle->count = 0;
-            rle->state = RLE_STATE_REPEATE;
+            rle->state = RLE_STATE_REPEATED;
         }
 
         rle->prev_v = ret;
         rle->rdp += rle->bpp;
     }
-    else if(rle->state == RLE_STATE_REPEATE) {
+    else if(rle->state == RLE_STATE_REPEATED) {
         v = get_bits(rle->in, rle->rdp, 1);
         rle->count++;
         rle->rdp += 1;
@@ -550,7 +549,7 @@ static inline uint8_t rle_next(void)
  *  @retval > 0   Reference is greater than element.
  *
  */
-static int32_t unicode_list_compare(const void * ref, const void * element)
+static int unicode_list_compare(const void * ref, const void * element)
 {
-    return ((int32_t)(*(uint16_t *)ref)) - ((int32_t)(*(uint16_t *)element));
+    return (*(uint16_t *)ref) - (*(uint16_t *)element);
 }

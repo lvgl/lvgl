@@ -10,9 +10,8 @@
 #if LV_USE_SDL && LV_SDL_MOUSEWHEEL_MODE == LV_SDL_MOUSEWHEEL_MODE_ENCODER
 
 #include "../../core/lv_group.h"
-#include "../../indev/lv_indev_private.h"
 #include "../../stdlib/lv_string.h"
-#include LV_SDL_INCLUDE_PATH
+#include "lv_sdl_private.h"
 
 /*********************
  *      DEFINES
@@ -84,7 +83,7 @@ static void release_indev_cb(lv_event_t * e)
     }
 }
 
-void _lv_sdl_mousewheel_handler(SDL_Event * event)
+void lv_sdl_mousewheel_handler(SDL_Event * event)
 {
     uint32_t win_id = UINT32_MAX;
     switch(event->type) {
@@ -99,7 +98,7 @@ void _lv_sdl_mousewheel_handler(SDL_Event * event)
             return;
     }
 
-    lv_display_t * disp = _lv_sdl_get_disp_from_win_id(win_id);
+    lv_display_t * disp = lv_sdl_get_disp_from_win_id(win_id);
 
     /*Find a suitable indev*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
@@ -117,7 +116,7 @@ void _lv_sdl_mousewheel_handler(SDL_Event * event)
     switch(event->type) {
         case SDL_MOUSEWHEEL:
 #ifdef __EMSCRIPTEN__
-            /*Escripten scales it wrong*/
+            /*Emscripten scales it wrong*/
             if(event->wheel.y < 0) dsc->diff++;
             if(event->wheel.y > 0) dsc->diff--;
 #else

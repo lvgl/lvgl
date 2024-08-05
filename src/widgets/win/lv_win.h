@@ -14,17 +14,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../lv_conf_internal.h"
+#include "../../core/lv_obj.h"
 #if LV_USE_WIN
 /*********************
  *      DEFINES
  *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-typedef struct {
-    lv_obj_t obj;
-} lv_win_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_win_class;
 

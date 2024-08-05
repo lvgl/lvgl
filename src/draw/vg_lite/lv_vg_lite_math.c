@@ -46,7 +46,9 @@ float math_fast_inv_sqrtf(float number)
     x2 = number * 0.5f;
     y = number;
     i = *(int32_t *)&y; /* evil floating point bit level hacking */
-    i = 0x5f3759df - (i >> 1); /* what the fuck? */
+    i = 0x5f3759df /* floating-point representation of an approximation of {\sqrt {2^{127}}}} see https://en.wikipedia.org/wiki/Fast_inverse_square_root. */
+        - (i >>
+           1);
     y = *(float *)&i;
     y = y * (threehalfs - (x2 * y * y)); /* 1st iteration */
 

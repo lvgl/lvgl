@@ -101,7 +101,7 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
                     lv_layer_t * layer = draw_unit->target_layer;
 
                     lv_area_t blend_area;
-                    if(!_lv_area_intersect(&blend_area, glyph_draw_dsc->letter_coords, draw_unit->clip_area))
+                    if(!lv_area_intersect(&blend_area, glyph_draw_dsc->letter_coords, draw_unit->clip_area))
                         return;
                     lv_area_move(&blend_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
@@ -118,7 +118,7 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
                     mask_area.x2 = mask_width - 1;
                     mask_area.y2 = mask_height - 1;
 
-                    if(!vglite_buf_aligned(mask_buf, mask_stride, LV_COLOR_FORMAT_A8)) {
+                    if(!vglite_src_buf_aligned(mask_buf, mask_stride, LV_COLOR_FORMAT_A8)) {
                         /* Draw a placeholder rectangle*/
                         lv_draw_border_dsc_t border_draw_dsc;
                         lv_draw_border_dsc_init(&border_draw_dsc);

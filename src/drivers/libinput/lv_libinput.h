@@ -39,42 +39,9 @@ typedef enum {
     LV_LIBINPUT_CAPABILITY_TOUCH    = 1U << 2
 } lv_libinput_capability;
 
-typedef struct {
-    lv_indev_state_t pressed;
-    int key_val;
-    lv_point_t point;
-} lv_libinput_event_t;
+struct libinput_device;
 
 #define LV_LIBINPUT_MAX_EVENTS 32
-
-typedef struct {
-    int fd;
-    struct pollfd fds[1];
-
-    /* The points array is implemented as a circular LIFO queue */
-    lv_libinput_event_t points[LV_LIBINPUT_MAX_EVENTS]; /* Event buffer */
-    lv_libinput_event_t slots[2]; /* Realtime state of up to 2 fingers to handle multitouch */
-
-    /* Pointer devices work a bit differently in libinput which requires us to store their last known state */
-    lv_point_t pointer_position;
-    bool pointer_button_down;
-
-    int start; /* Index of start of event queue */
-    int end; /* Index of end of queue*/
-    lv_libinput_event_t last_event; /* Report when no new events
-                                   * to keep indev state consistent
-                                   */
-    bool deinit; /* Tell worker thread to quit */
-    pthread_mutex_t event_lock;
-    pthread_t worker_thread;
-
-    struct libinput * libinput_context;
-    struct libinput_device * libinput_device;
-
-#if LV_LIBINPUT_XKB
-    lv_xkb_t xkb;
-#endif /* LV_LIBINPUT_XKB */
-} lv_libinput_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -116,7 +83,7 @@ size_t lv_libinput_find_devs(lv_libinput_capability capabilities, char ** found,
 lv_indev_t * lv_libinput_create(lv_indev_type_t indev_type, const char * dev_path);
 
 /**
- * Delete a libinput input devic
+ * Delete a libinput input device
  * @param indev pointer to input device
  */
 void lv_libinput_delete(lv_indev_t * indev);

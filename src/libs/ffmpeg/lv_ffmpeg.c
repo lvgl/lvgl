@@ -6,8 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_ffmpeg.h"
+#include "lv_ffmpeg_private.h"
 #if LV_USE_FFMPEG != 0
+#include "../../draw/lv_image_decoder_private.h"
+#include "../../core/lv_obj_class_private.h"
 
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -69,7 +71,7 @@ struct lv_image_pixel_color_s {
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * src, lv_image_header_t * header);
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 
@@ -253,12 +255,13 @@ void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header)
 {
     LV_UNUSED(decoder);
 
     /* Get the source type */
-    lv_image_src_t src_type = lv_image_src_get_type(src);
+    const void * src = dsc->src;
+    lv_image_src_t src_type = dsc->src_type;
 
     if(src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = src;
@@ -803,7 +806,7 @@ static void ffmpeg_close(struct ffmpeg_context_s * ffmpeg_ctx)
 
 static void lv_ffmpeg_player_frame_update_cb(lv_timer_t * timer)
 {
-    lv_obj_t * obj = (lv_obj_t *)timer->user_data;
+    lv_obj_t * obj = (lv_obj_t *)lv_timer_get_user_data(timer);
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
 
     if(!player->ffmpeg_ctx) {

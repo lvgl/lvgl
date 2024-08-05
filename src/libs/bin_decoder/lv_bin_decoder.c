@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../draw/lv_image_decoder_private.h"
 #include "lv_bin_decoder.h"
 #include "../../draw/lv_draw_image.h"
 #include "../../draw/lv_draw_buf.h"
@@ -38,7 +39,7 @@
  * Data format for compressed image data.
  */
 
-typedef struct _lv_image_compressed_t {
+typedef struct lv_image_compressed_t {
     uint32_t method: 4; /*Compression method, see `lv_image_compress_t`*/
     uint32_t reserved : 28;  /*Reserved to be used later*/
     uint32_t compressed_size;  /*Compressed data size in byte*/
@@ -110,11 +111,13 @@ void lv_bin_decoder_init(void)
     decoder->name = DECODER_NAME;
 }
 
-lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header)
 {
     LV_UNUSED(decoder); /*Unused*/
 
-    lv_image_src_t src_type = lv_image_src_get_type(src);
+    const void * src = dsc->src;
+    lv_image_src_t src_type = dsc->src_type;
+
     if(src_type == LV_IMAGE_SRC_VARIABLE) {
         lv_image_dsc_t * image = (lv_image_dsc_t *)src;
         lv_memcpy(header, &image->header, sizeof(lv_image_header_t));
@@ -123,31 +126,28 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, const void * src, 
         /*Support only "*.bin" files*/
         if(lv_strcmp(lv_fs_get_ext(src), "bin")) return LV_RESULT_INVALID;
 
-        lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, src, LV_FS_MODE_RD);
-        if(res == LV_FS_RES_OK) {
-            uint32_t rn;
-            res = lv_fs_read(&f, header, sizeof(lv_image_header_t), &rn);
-            lv_fs_close(&f);
-            if(res != LV_FS_RES_OK || rn != sizeof(lv_image_header_t)) {
-                LV_LOG_WARN("Read file header failed: %d", res);
-                return LV_RESULT_INVALID;
-            }
+        lv_fs_res_t res;
+        uint32_t rn;
+        res = lv_fs_read(&dsc->file, header, sizeof(lv_image_header_t), &rn);
 
-            /**
-             * @todo
-             * This is a temp backward compatibility solution after adding
-             * magic in image header.
-             */
-            if(header->magic != LV_IMAGE_HEADER_MAGIC) {
-                LV_LOG_WARN("Legacy bin image detected: %s", (char *)src);
-                header->cf = header->magic;
-                header->magic = LV_IMAGE_HEADER_MAGIC;
-            }
-
-            /*File is always read to buf, thus data can be modified.*/
-            header->flags |= LV_IMAGE_FLAGS_MODIFIABLE;
+        if(res != LV_FS_RES_OK || rn != sizeof(lv_image_header_t)) {
+            LV_LOG_WARN("Read file header failed: %d", res);
+            return LV_RESULT_INVALID;
         }
+
+        /**
+         * @todo
+         * This is a temp backward compatibility solution after adding
+         * magic in image header.
+         */
+        if(header->magic != LV_IMAGE_HEADER_MAGIC) {
+            LV_LOG_WARN("Legacy bin image detected: %s", (char *)src);
+            header->cf = header->magic;
+            header->magic = LV_IMAGE_HEADER_MAGIC;
+        }
+
+        /*File is always read to buf, thus data can be modified.*/
+        header->flags |= LV_IMAGE_FLAGS_MODIFIABLE;
     }
     else if(src_type == LV_IMAGE_SRC_SYMBOL) {
         /*The size depend on the font but it is unknown here. It should be handled outside of the
@@ -181,7 +181,8 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 {
     LV_UNUSED(decoder);
 
-    lv_fs_res_t res = LV_RESULT_INVALID;
+    lv_result_t res = LV_RESULT_INVALID;
+    lv_fs_res_t fs_res = LV_FS_RES_UNKNOWN;
     bool use_directly = false; /*If the image is already decoded and can be used directly*/
 
     /*Open the file if it's a file*/
@@ -202,9 +203,9 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             return LV_RESULT_INVALID;
         }
 
-        res = lv_fs_open(f, dsc->src, LV_FS_MODE_RD);
-        if(res != LV_FS_RES_OK) {
-            LV_LOG_WARN("Open file failed: %d", res);
+        fs_res = lv_fs_open(f, dsc->src, LV_FS_MODE_RD);
+        if(fs_res != LV_FS_RES_OK) {
+            LV_LOG_WARN("Open file failed: %d", fs_res);
             lv_free(f);
             free_decoder_data(dsc);
             return LV_RESULT_INVALID;
@@ -360,7 +361,7 @@ void lv_bin_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 
     decoder_data_t * decoder_data = dsc->user_data;
     if(decoder_data && decoder_data->decoded_partial) {
-        lv_draw_buf_destroy(decoder_data->decoded_partial);
+        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoder_data->decoded_partial);
         decoder_data->decoded_partial = NULL;
     }
 
@@ -387,7 +388,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         return LV_RESULT_INVALID;
     }
 
-    lv_result_t res = LV_RESULT_INVALID;
+    lv_fs_res_t res = LV_FS_RES_UNKNOWN;
     decoder_data_t * decoder_data = dsc->user_data;
     if(decoder_data == NULL) {
         LV_LOG_ERROR("Unexpected null decoder data");
@@ -409,7 +410,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         decoded = lv_draw_buf_reshape(decoder_data->decoded_partial, cf_decoded, w_px, 1, LV_STRIDE_AUTO);
         if(decoded == NULL) {
             if(decoder_data->decoded_partial != NULL) {
-                lv_draw_buf_destroy(decoder_data->decoded_partial);
+                lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoder_data->decoded_partial);
                 decoder_data->decoded_partial = NULL;
             }
             decoded = lv_draw_buf_create_user(image_cache_draw_buf_handlers, w_px, 1, cf_decoded, LV_STRIDE_AUTO);
@@ -422,7 +423,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     else {
         decoded_area->y1++;
         decoded_area->y2++;
-        decoded = decoder_data->decoded_partial; /*Already alloced*/
+        decoded = decoder_data->decoded_partial; /*Already allocated*/
     }
 
     img_data = decoded->data; /*Get the buffer to operate on*/
@@ -536,8 +537,8 @@ static void free_decoder_data(lv_image_decoder_dsc_t * dsc)
         lv_free(decoder_data->f);
     }
 
-    if(decoder_data->decoded) lv_draw_buf_destroy(decoder_data->decoded);
-    if(decoder_data->decompressed) lv_draw_buf_destroy(decoder_data->decompressed);
+    if(decoder_data->decoded) lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoder_data->decoded);
+    if(decoder_data->decompressed) lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoder_data->decompressed);
     lv_free(decoder_data->palette);
     lv_free(decoder_data);
     dsc->user_data = NULL;
@@ -546,7 +547,7 @@ static void free_decoder_data(lv_image_decoder_dsc_t * dsc)
 static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
-    lv_result_t res;
+    lv_fs_res_t res;
     uint32_t rn;
     decoder_data_t * decoder_data = dsc->user_data;
     lv_fs_file_t * f = decoder_data->f;
@@ -644,7 +645,7 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
     decoder_data->decoded = decoded; /*Free when decoder closes*/
     if(dsc->src_type == LV_IMAGE_SRC_FILE && !is_compressed) {
         decoder_data->palette = (void *)palette; /*Free decoder data on close*/
-        lv_draw_buf_destroy(draw_buf_indexed);
+        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, draw_buf_indexed);
     }
 
     return LV_RESULT_OK;
@@ -654,7 +655,7 @@ exit_with_buf:
         decoder_data->palette = NULL;
     }
 
-    if(draw_buf_indexed) lv_draw_buf_destroy(draw_buf_indexed);
+    if(draw_buf_indexed) lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, draw_buf_indexed);
     return LV_RESULT_INVALID;
 #else
     LV_UNUSED(stride);
@@ -676,7 +677,7 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     LV_UNUSED(decoder); /*Unused*/
 
-    lv_result_t res;
+    lv_fs_res_t res;
     uint32_t rn;
     decoder_data_t * decoder_data = dsc->user_data;
 
@@ -726,7 +727,7 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
         res = fs_read_file_at(f, sizeof(lv_image_header_t), data, palette_len, &rn);
         if(res != LV_FS_RES_OK || rn != palette_len) {
             LV_LOG_WARN("Read palette failed: %d", res);
-            lv_draw_buf_destroy(decoded);
+            lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
             return LV_RESULT_INVALID;
         }
 
@@ -734,7 +735,7 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
         if(lv_fs_seek(f, 0, LV_FS_SEEK_END) != LV_FS_RES_OK ||
            lv_fs_tell(f, &data_len) != LV_FS_RES_OK) {
             LV_LOG_WARN("Failed to get file to size");
-            lv_draw_buf_destroy(decoded);
+            lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
             return LV_RESULT_INVALID;
         }
 
@@ -744,7 +745,7 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
         res = fs_read_file_at(f, data_offset, data, data_len, &rn);
         if(res != LV_FS_RES_OK || rn != data_len) {
             LV_LOG_WARN("Read indexed image failed: %d", res);
-            lv_draw_buf_destroy(decoded);
+            lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
             return LV_RESULT_INVALID;
         }
 
@@ -762,7 +763,7 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
 static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
-    lv_result_t res;
+    lv_fs_res_t res;
     decoder_data_t * decoder_data = dsc->user_data;
     lv_fs_file_t * f = decoder_data->f;
     lv_color_format_t cf = dsc->header.cf;
@@ -785,7 +786,7 @@ static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc
     res = fs_read_file_at(f, sizeof(lv_image_header_t), img_data, len, &rn);
     if(res != LV_FS_RES_OK || rn != len) {
         LV_LOG_WARN("Read rgb file failed: %d", res);
-        lv_draw_buf_destroy(decoded);
+        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
         return LV_RESULT_INVALID;
     }
 
@@ -815,7 +816,7 @@ static inline uint8_t bit_extend(uint8_t value, uint8_t bpp)
 static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
-    lv_result_t res;
+    lv_fs_res_t res;
     uint32_t rn;
     decoder_data_t * decoder_data = dsc->user_data;
     uint8_t bpp = lv_color_format_get_bpp(dsc->header.cf);
@@ -842,7 +843,7 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
         res = fs_read_file_at(decoder_data->f, sizeof(lv_image_header_t), img_data, file_len, &rn);
         if(res != LV_FS_RES_OK || rn != file_len) {
             LV_LOG_WARN("Read header failed: %d", res);
-            lv_draw_buf_destroy(decoded);
+            lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
             return LV_RESULT_INVALID;
         }
     }
@@ -891,6 +892,7 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
     uint32_t compressed_len;
     decoder_data_t * decoder_data = get_decoder_data(dsc);
     lv_result_t res;
+    lv_fs_res_t fs_res;
     uint8_t * file_buf = NULL;
     lv_image_compressed_t * compressed = &decoder_data->compressed;
 
@@ -910,9 +912,9 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
 
         /*Read compress header*/
         len = 12;
-        res = fs_read_file_at(f, sizeof(lv_image_header_t), compressed, len, &rn);
-        if(res != LV_FS_RES_OK || rn != len) {
-            LV_LOG_WARN("Read compressed header failed: %d", res);
+        fs_res = fs_read_file_at(f, sizeof(lv_image_header_t), compressed, len, &rn);
+        if(fs_res != LV_FS_RES_OK || rn != len) {
+            LV_LOG_WARN("Read compressed header failed: %d", fs_res);
             return LV_RESULT_INVALID;
         }
 
@@ -929,9 +931,9 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
         }
 
         /*Continue to read the compressed data following compression header*/
-        res = lv_fs_read(f, file_buf, compressed_len, &rn);
-        if(res != LV_FS_RES_OK || rn != compressed_len) {
-            LV_LOG_WARN("Read compressed file failed: %d", res);
+        fs_res = lv_fs_read(f, file_buf, compressed_len, &rn);
+        if(fs_res != LV_FS_RES_OK || rn != compressed_len) {
+            LV_LOG_WARN("Read compressed file failed: %d", fs_res);
             lv_free(file_buf);
             return LV_RESULT_INVALID;
         }
@@ -1088,6 +1090,12 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
         return LV_RESULT_INVALID;
     }
 
+    if(out_len > decompressed->data_size) {
+        LV_LOG_ERROR("Decompressed size mismatch: %" LV_PRIu32 " > %" LV_PRIu32, out_len, decompressed->data_size);
+        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decompressed);
+        return LV_RESULT_INVALID;
+    }
+
     img_data = decompressed->data;
 
     if(compressed->method == LV_IMAGE_COMPRESS_RLE) {
@@ -1104,12 +1112,12 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
         len = lv_rle_decompress(input, input_len, output, out_len, pixel_byte);
         if(len != compressed->decompressed_size) {
             LV_LOG_WARN("Decompress failed: %" LV_PRIu32 ", got: %" LV_PRIu32, out_len, len);
-            lv_draw_buf_destroy(decompressed);
+            lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decompressed);
             return LV_RESULT_INVALID;
         }
 #else
         LV_LOG_WARN("RLE decompress is not enabled");
-        lv_draw_buf_destroy(decompressed);
+        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decompressed);
         return LV_RESULT_INVALID;
 #endif
     }
@@ -1121,19 +1129,19 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
         len = LZ4_decompress_safe(input, output, input_len, out_len);
         if(len < 0 || (uint32_t)len != compressed->decompressed_size) {
             LV_LOG_WARN("Decompress failed: %" LV_PRId32 ", got: %" LV_PRId32, out_len, len);
-            lv_draw_buf_destroy(decompressed);
+            lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decompressed);
             return LV_RESULT_INVALID;
         }
 #else
         LV_LOG_WARN("LZ4 decompress is not enabled");
-        lv_draw_buf_destroy(decompressed);
+        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decompressed);
         return LV_RESULT_INVALID;
 #endif
     }
     else {
         LV_UNUSED(img_data);
         LV_LOG_WARN("Unknown compression method: %d", compressed->method);
-        lv_draw_buf_destroy(decompressed);
+        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decompressed);
         return LV_RESULT_INVALID;
     }
 

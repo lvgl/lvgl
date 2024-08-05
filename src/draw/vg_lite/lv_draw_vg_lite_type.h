@@ -18,7 +18,7 @@ extern "C" {
 
 #if LV_USE_DRAW_VG_LITE
 
-#include "../lv_draw.h"
+#include "../lv_draw_private.h"
 #include "../../misc/lv_array.h"
 
 #if LV_USE_VG_LITE_THORVG
@@ -35,21 +35,23 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_vg_lite_pending_t;
+struct lv_vg_lite_pending_t;
 
-struct _lv_draw_vg_lite_unit_t {
+struct lv_draw_vg_lite_unit_t {
     lv_draw_unit_t base_unit;
     lv_draw_task_t * task_act;
 
-    struct _lv_vg_lite_pending_t * image_dsc_pending;
+    struct lv_vg_lite_pending_t * image_dsc_pending;
 
     lv_cache_t * grad_cache;
-    struct _lv_vg_lite_pending_t * grad_pending;
+    struct lv_vg_lite_pending_t * grad_pending;
+
+    lv_cache_t * stroke_cache;
 
     uint16_t flush_count;
     vg_lite_buffer_t target_buffer;
     vg_lite_matrix_t global_matrix;
-    struct _lv_vg_lite_path_t * global_path;
+    struct lv_vg_lite_path_t * global_path;
     bool path_in_use;
 };
 
@@ -67,4 +69,4 @@ struct _lv_draw_vg_lite_unit_t {
 } /*extern "C"*/
 #endif
 
-#endif /*LV_VG_LITE_DRAW_H*/
+#endif /*LV_DRAW_VG_LITE_TYPE_H*/

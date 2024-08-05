@@ -4,15 +4,15 @@
 static void draw_event_cb(lv_event_t * e)
 {
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
+    lv_draw_dsc_base_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
     if(base_dsc->part == LV_PART_INDICATOR) {
         lv_obj_t * obj = lv_event_get_target(e);
         lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
-        lv_draw_rect_dsc_t * rect_draw_dsc = draw_task->draw_dsc;
+        lv_draw_rect_dsc_t * rect_draw_dsc = lv_draw_task_get_draw_dsc(draw_task);
         uint32_t cnt = lv_chart_get_point_count(obj);
 
         /*Make older value more transparent*/
-        rect_draw_dsc->bg_opa = (LV_OPA_COVER *  base_dsc->id2) / (cnt - 1);
+        rect_draw_dsc->bg_opa = (LV_OPA_COVER * base_dsc->id2) / (cnt - 1);
 
         /*Make smaller values blue, higher values red*/
         int32_t * x_array = lv_chart_get_x_array(obj, ser);
@@ -31,8 +31,7 @@ static void draw_event_cb(lv_event_t * e)
 
 static void add_data(lv_timer_t * timer)
 {
-    LV_UNUSED(timer);
-    lv_obj_t * chart = timer->user_data;
+    lv_obj_t * chart = lv_timer_get_user_data(timer);
     lv_chart_set_next_value2(chart, lv_chart_get_series_next(chart, NULL), lv_rand(0, 200), lv_rand(0, 1000));
 }
 

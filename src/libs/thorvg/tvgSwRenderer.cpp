@@ -232,7 +232,7 @@ struct SwSceneTask : SwTask
 
     void run(unsigned tid) override
     {
-        //TODO: Skip the run if the scene hans't changed.
+        //TODO: Skip the run if the scene hasn't changed.
         if (!sceneRle) sceneRle = static_cast<SwRleData*>(calloc(1, sizeof(SwRleData)));
         else rleReset(sceneRle);
 
@@ -443,11 +443,7 @@ bool SwRenderer::target(pixel_t* data, uint32_t stride, uint32_t w, uint32_t h, 
 
 bool SwRenderer::preRender()
 {
-#if LV_USE_DRAW_VG_LITE && LV_USE_VG_LITE_THORVG
-	return true;
-#else
-    return rasterClear(surface, 0, 0, surface->w, surface->h);
-#endif
+    return true;
 }
 
 

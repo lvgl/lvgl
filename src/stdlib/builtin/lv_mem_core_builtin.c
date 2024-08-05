@@ -86,10 +86,10 @@ void lv_mem_init(void)
     state.tlsf = lv_tlsf_create_with_pool((void *)LV_MEM_ADR, LV_MEM_SIZE);
 #endif
 
-    _lv_ll_init(&state.pool_ll, sizeof(lv_pool_t));
+    lv_ll_init(&state.pool_ll, sizeof(lv_pool_t));
 
     /*Record the first pool*/
-    lv_pool_t * pool_p = _lv_ll_ins_tail(&state.pool_ll);
+    lv_pool_t * pool_p = lv_ll_ins_tail(&state.pool_ll);
     LV_ASSERT_MALLOC(pool_p);
     *pool_p = lv_tlsf_get_pool(state.tlsf);
 
@@ -100,7 +100,7 @@ void lv_mem_init(void)
 
 void lv_mem_deinit(void)
 {
-    _lv_ll_clear(&state.pool_ll);
+    lv_ll_clear(&state.pool_ll);
     lv_tlsf_destroy(state.tlsf);
 #if LV_USE_OS
     lv_mutex_delete(&state.mutex);
@@ -115,7 +115,7 @@ lv_mem_pool_t lv_mem_add_pool(void * mem, size_t bytes)
         return NULL;
     }
 
-    lv_pool_t * pool_p = _lv_ll_ins_tail(&state.pool_ll);
+    lv_pool_t * pool_p = lv_ll_ins_tail(&state.pool_ll);
     LV_ASSERT_MALLOC(pool_p);
     *pool_p = new_pool;
 
@@ -125,9 +125,9 @@ lv_mem_pool_t lv_mem_add_pool(void * mem, size_t bytes)
 void lv_mem_remove_pool(lv_mem_pool_t pool)
 {
     lv_pool_t * pool_p;
-    _LV_LL_READ(&state.pool_ll, pool_p) {
+    LV_LL_READ(&state.pool_ll, pool_p) {
         if(*pool_p == pool) {
-            _lv_ll_remove(&state.pool_ll, pool_p);
+            lv_ll_remove(&state.pool_ll, pool_p);
             lv_free(pool_p);
             lv_tlsf_remove_pool(state.tlsf, pool);
             return;
@@ -201,7 +201,7 @@ void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
     LV_TRACE_MEM("begin");
 
     lv_pool_t * pool_p;
-    _LV_LL_READ(&state.pool_ll, pool_p) {
+    LV_LL_READ(&state.pool_ll, pool_p) {
         lv_tlsf_walk_pool(*pool_p, lv_mem_walker, mon_p);
     }
 
@@ -233,7 +233,7 @@ lv_result_t lv_mem_test_core(void)
     }
 
     lv_pool_t * pool_p;
-    _LV_LL_READ(&state.pool_ll, pool_p) {
+    LV_LL_READ(&state.pool_ll, pool_p) {
         if(lv_tlsf_check_pool(*pool_p)) {
             LV_LOG_WARN("pool failed");
 #if LV_USE_OS

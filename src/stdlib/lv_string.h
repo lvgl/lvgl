@@ -1,5 +1,5 @@
 /**
- * @file lv_stringn.h
+ * @file lv_string.h
  *
  */
 
@@ -63,7 +63,7 @@ void * lv_memmove(void * dst, const void * src, size_t len);
  * @param len Number of bytes to compare
  * @return The difference between the value of the first unmatching byte.
  */
-int32_t lv_memcmp(const void * p1, const void * p2, size_t len);
+int lv_memcmp(const void * p1, const void * p2, size_t len);
 
 /**
  * Same as `memset(dst, 0x00, len)`.
@@ -117,7 +117,7 @@ char * lv_strcpy(char * dst, const char * src);
  * @param s2    pointer to the second string
  * @return      the difference between the value of the first unmatching character.
  */
-int32_t lv_strcmp(const char * s1, const char * s2);
+int lv_strcmp(const char * s1, const char * s2);
 
 /**
  * @brief Duplicate a string by allocating a new one and copying the content.

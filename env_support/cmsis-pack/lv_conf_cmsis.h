@@ -108,7 +108,7 @@
 #if LV_USE_DRAW_SW == 1
     /* Set the number of draw unit.
      * > 1 requires an operating system enabled in `LV_USE_OS`
-     * > 1 means multiply threads will render the screen in parallel */
+     * > 1 means multiple threads will render the screen in parallel */
     #define LV_DRAW_SW_DRAW_UNIT_CNT    1
 
     /* Enable native helium assembly to be compiled */
@@ -380,7 +380,7 @@
 #define LV_ATTRIBUTE_FAST_MEM
 
 /*Export integer constant to binding. This macro is used with constants in the form of LV_<CONST> that
- *should also appear on LVGL binding API such as Micropython.*/
+ *should also appear on LVGL binding API such as MicroPython.*/
 #define LV_EXPORT_CONST_INT(int_value) struct _silence_gcc_warning /*The default value just prevents GCC warning*/
 
 /*Prefix all global extern data with this*/
@@ -486,7 +486,7 @@
 #endif
 
 /*Enable Arabic/Persian processing
- *In these languages characters should be replaced with an other form based on their position in the text*/
+ *In these languages characters should be replaced with another form based on their position in the text*/
 #define LV_USE_ARABIC_PERSIAN_CHARS 0
 
 /*==================
@@ -790,7 +790,7 @@
 /*Requires: lv_keyboard*/
 #if LV_USE_IME_PINYIN
     /*1: Use default thesaurus*/
-    /*If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesauruss*/
+    /*If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesaurus*/
     #define LV_IME_PINYIN_USE_DEFAULT_DICT 1
     /*Set the maximum number of candidate panels that can be displayed*/
     /*This needs to be adjusted according to the size of the screen*/
@@ -832,7 +832,7 @@
 #define LV_USE_X11              0
 #if LV_USE_X11
     #define LV_X11_DIRECT_EXIT         1  /*Exit the application when all X11 windows have been closed*/
-    #define LV_X11_DOUBLE_BUFFER       1  /*Use double buffers for endering*/
+    #define LV_X11_DOUBLE_BUFFER       1  /*Use double buffers for rendering*/
     /*select only 1 of the following render modes (LV_X11_RENDER_MODE_PARTIAL preferred!)*/
     #define LV_X11_RENDER_MODE_PARTIAL 1  /*Partial render mode (preferred)*/
     #define LV_X11_RENDER_MODE_DIRECT  0  /*direct render mode*/

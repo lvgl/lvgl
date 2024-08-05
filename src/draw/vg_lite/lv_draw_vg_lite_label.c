@@ -7,6 +7,9 @@
  *      INCLUDES
  *********************/
 
+#include "../../misc/lv_area_private.h"
+#include "../../libs/freetype/lv_freetype_private.h"
+#include "../lv_draw_label_private.h"
 #include "lv_draw_vg_lite.h"
 
 #include "../../lvgl.h"
@@ -139,7 +142,7 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
 static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_dsc_t * dsc)
 {
     lv_area_t clip_area;
-    if(!_lv_area_intersect(&clip_area, u->base_unit.clip_area, dsc->letter_coords)) {
+    if(!lv_area_intersect(&clip_area, u->base_unit.clip_area, dsc->letter_coords)) {
         return;
     }
 
@@ -163,7 +166,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
 
     /* If clipping is not required, blit directly */
-    if(_lv_area_is_in(&image_area, u->base_unit.clip_area, false)) {
+    if(lv_area_is_in(&image_area, u->base_unit.clip_area, false)) {
         /* The image area is the coordinates relative to the image itself */
         lv_area_t src_area = image_area;
         lv_area_move(&src_area, -image_area.x1, -image_area.y1);
@@ -198,6 +201,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
         vg_lite_matrix_t path_matrix;
         vg_lite_identity(&path_matrix);
         lv_vg_lite_matrix_multiply(&path_matrix, &u->global_matrix);
+        LV_VG_LITE_ASSERT_MATRIX(&path_matrix);
 
         LV_PROFILER_BEGIN_TAG("vg_lite_draw_pattern");
         LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
@@ -209,7 +213,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
                                    &matrix,
                                    VG_LITE_BLEND_SRC_OVER,
                                    VG_LITE_PATTERN_COLOR,
-                                   color,
+                                   0,
                                    color,
                                    VG_LITE_FILTER_LINEAR));
         LV_PROFILER_END_TAG("vg_lite_draw_pattern");
@@ -231,7 +235,7 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
 {
     /* get clip area */
     lv_area_t path_clip_area;
-    if(!_lv_area_intersect(&path_clip_area, u->base_unit.clip_area, dsc->letter_coords)) {
+    if(!lv_area_intersect(&path_clip_area, u->base_unit.clip_area, dsc->letter_coords)) {
         return;
     }
 
@@ -243,16 +247,24 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
 
     lv_vg_lite_path_t * outline = (lv_vg_lite_path_t *)dsc->glyph_data;
     lv_point_t pos = {dsc->letter_coords->x1, dsc->letter_coords->y1};
+    /* scale size */
+    float scale = FT_F26DOT6_TO_PATH_SCALE(lv_freetype_outline_get_scale(dsc->g->resolved_font));
 
     /* calc convert matrix */
-    float scale = FT_F26DOT6_TO_PATH_SCALE(lv_freetype_outline_get_scale(dsc->g->resolved_font));
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
 
+    /* matrix for drawing, different from matrix for calculating the bonding box */
+    vg_lite_matrix_t draw_matrix;
+    vg_lite_identity(&draw_matrix);
+
+    lv_vg_lite_matrix_multiply(&draw_matrix, &u->global_matrix);
+
     /* convert to vg-lite coordinate */
+    vg_lite_translate(pos.x - dsc->g->ofs_x, pos.y + dsc->g->box_h + dsc->g->ofs_y, &draw_matrix);
     vg_lite_translate(pos.x - dsc->g->ofs_x, pos.y + dsc->g->box_h + dsc->g->ofs_y, &matrix);
 
-    /* scale size */
+    vg_lite_scale(scale, scale, &draw_matrix);
     vg_lite_scale(scale, scale, &matrix);
 
     /* calc inverse matrix */
@@ -272,20 +284,16 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
     /* Since the font uses Cartesian coordinates, the y coordinates need to be reversed */
     lv_vg_lite_path_set_bonding_box(outline, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
 
-    /* Move to the position relative to the first address of the buffer */
-    lv_layer_t * layer = u->base_unit.target_layer;
-    vg_lite_translate(-layer->buf_area.x1 / scale, layer->buf_area.y1 / scale, &matrix);
-
     vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(outline);
 
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
     LV_VG_LITE_ASSERT_PATH(vg_lite_path);
-    LV_VG_LITE_ASSERT_MATRIX(&matrix);
+    LV_VG_LITE_ASSERT_MATRIX(&draw_matrix);
 
     LV_PROFILER_BEGIN_TAG("vg_lite_draw");
     LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
                                &u->target_buffer, vg_lite_path, VG_LITE_FILL_NON_ZERO,
-                               &matrix, VG_LITE_BLEND_SRC_OVER, lv_vg_lite_color(dsc->color, dsc->opa, true)));
+                               &draw_matrix, VG_LITE_BLEND_SRC_OVER, lv_vg_lite_color(dsc->color, dsc->opa, true)));
     LV_PROFILER_END_TAG("vg_lite_draw");
 
     /* Flush in time to avoid accumulation of drawing commands */

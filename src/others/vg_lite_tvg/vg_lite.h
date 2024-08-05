@@ -817,7 +817,7 @@ typedef unsigned int        vg_lite_color_t;
         vg_lite_paint_type_t paintType;         /*! Get paintcolor from different paint types. */
         vg_lite_uint8_t fc_enable;              /*! enable im fastclear. */
         vg_lite_uint8_t scissor_layer;          /*! The buffer is scissor buffer. */
-        vg_lite_uint8_t premultiplied;          /*! The RGB pixel values are alpha-premultipled */
+        vg_lite_uint8_t premultiplied;          /*! The RGB pixel values are alpha-premultiplied */
     } vg_lite_buffer_t;
 
     /* Memory allocation info by kernel. */
@@ -926,14 +926,14 @@ typedef unsigned int        vg_lite_color_t;
     /* Colorkey definition */
     typedef struct vg_lite_color_key
     {
-        vg_lite_uint8_t enable;                 /*! The color key is effective only when "enable" is ture, */
-        vg_lite_uint8_t low_r;                  /*! The R chanel of low_rgb. */
-        vg_lite_uint8_t low_g;                  /*! The G chanel of low_rgb. */
-        vg_lite_uint8_t low_b;                  /*! The B chanel of low_rgb. */
+        vg_lite_uint8_t enable;                 /*! The color key is effective only when "enable" is true, */
+        vg_lite_uint8_t low_r;                  /*! The R channel of low_rgb. */
+        vg_lite_uint8_t low_g;                  /*! The G channel of low_rgb. */
+        vg_lite_uint8_t low_b;                  /*! The B channel of low_rgb. */
         vg_lite_uint8_t alpha;                  /*! The alpha channel to replace destination pixel alpha channel.*/
-        vg_lite_uint8_t hign_r;                 /*! The R chanel of hign_rgb. */
-        vg_lite_uint8_t hign_g;                 /*! The G chanel of hign_rgb. */
-        vg_lite_uint8_t hign_b;                 /*! The B chanel of hign_rgb. */
+        vg_lite_uint8_t hign_r;                 /*! The R channel of hign_rgb. */
+        vg_lite_uint8_t hign_g;                 /*! The G channel of hign_rgb. */
+        vg_lite_uint8_t hign_b;                 /*! The B channel of hign_rgb. */
     } vg_lite_color_key_t;
 
     /* Four colorkey definition.
@@ -1281,7 +1281,7 @@ typedef unsigned int        vg_lite_color_t;
 
     /* Setup 3x3 gaussian blur weight values to filter image pixels.
      *
-     *  Paramters w0, w1, w2 define a 3x3 gaussian blur weight matrix as below
+     *  Parameters w0, w1, w2 define a 3x3 gaussian blur weight matrix as below
      *
      *                  |  w2   w1   w2 |
      *                  |  w1   w0   w1 |

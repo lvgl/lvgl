@@ -223,7 +223,7 @@ horizontally:
 
    lv_obj_align_to(label, btn, LV_ALIGN_OUT_TOP_MID, 0, -10);
 
-Note that, unlike with :cpp:func:`lv_obj_align`, :cpp:func:`lv_obj_align_to` can not
+Note that, unlike with :cpp:func:`lv_obj_align`, :cpp:func:`lv_obj_align_to` cannot
 realign the object if its coordinates or the reference object's
 coordinates change.
 

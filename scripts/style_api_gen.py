@@ -421,7 +421,7 @@ props = [
 
 {'name': 'FLEX_GROW',
  'style_type': 'num',   'var_type': 'uint8_t', 'default':'`LV_FLEX_ALIGN_ROW`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Defines how mayn space to take proprtionally the free space of the object's trach"},
+ 'dsc': "Defines how much space to take proportionally from the free space of the object's track"},
 
 
 
@@ -492,7 +492,7 @@ def obj_style_get(p):
   if 'filtered' in p and p['filtered']:
     print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"_filtered(const lv_obj_t * obj, lv_part_t part)")
     print("{")
-    print("    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + "));")
+    print("    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + "));")
     print("    return " + cast + "v." + p['style_type'] + ";")
     print("}")
     print("")
@@ -518,15 +518,12 @@ def style_set_c(p):
   print("    };")
   print("    lv_style_set_prop(style, LV_STYLE_" + p['name'] +", v);")
   print("}")
-  print("")
-  print("const lv_style_prop_t _lv_style_const_prop_id_" + p['name'] + " = LV_STYLE_" + p['name'] + ";")
 
 
 def style_set_h(p):
   if 'section' in p: return
 
   print("void lv_style_set_" + p['name'].lower() +"(lv_style_t * style, "+ p['var_type'] +" value);")
-  print("LV_ATTRIBUTE_EXTERN_DATA extern const lv_style_prop_t _lv_style_const_prop_id_" + p['name'] + ";")
 
 
 def local_style_set_c(p):
@@ -555,7 +552,7 @@ def style_const_set(p):
   print("")
   print("#define LV_STYLE_CONST_" + p['name'] + "(val) \\")
   print("    { \\")
-  print("        .prop_ptr = &_lv_style_const_prop_id_" + p['name'] + ", .value = { ." + p['style_type'] +" = " + cast + "val } \\")
+  print("        .prop = LV_STYLE_" + p['name'] + ", .value = { ." + p['style_type'] +" = " + cast + "val } \\")
   print("    }")
 
 
@@ -643,6 +640,7 @@ extern "C" {
 print("#include \"../misc/lv_area.h\"")
 print("#include \"../misc/lv_style.h\"")
 print("#include \"../core/lv_obj_style.h\"")
+print("#include \"../misc/lv_types.h\"")
 print()
 
 guard = ""

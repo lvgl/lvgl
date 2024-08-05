@@ -139,6 +139,13 @@ lv_result_t lv_thread_sync_wait(lv_thread_sync_t * sync);
 lv_result_t lv_thread_sync_signal(lv_thread_sync_t * sync);
 
 /**
+ * Send a wake-up signal to a sync object from interrupt
+ * @param sync      a sync object
+ * @return          LV_RESULT_OK: success; LV_RESULT_INVALID: failure
+ */
+lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * sync);
+
+/**
  * Delete a sync object
  * @param sync      a sync object to delete
  * @return          LV_RESULT_OK: success; LV_RESULT_INVALID: failure

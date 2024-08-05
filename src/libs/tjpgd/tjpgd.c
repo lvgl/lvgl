@@ -316,7 +316,7 @@ static int huffext(     /* >=0: decoded data, <0: error code */
             dc--;       /* Decrement number of available bytes */
             if(flg) {       /* In flag sequence? */
                 flg = 0;    /* Exit flag sequence */
-                if(*dp != 0) return 0 - (int)JDR_FMT1;  /* Err: unexpected flag is detected (may be collapted data) */
+                if(*dp != 0) return 0 - (int)JDR_FMT1;  /* Err: unexpected flag is detected (may be corrupted data) */
                 *dp = 0xFF;             /* The flag is a data 0xFF */
             }
             else {
@@ -426,7 +426,7 @@ static int huffext(     /* >=0: decoded data, <0: error code */
     }
 #endif
 
-    return 0 - (int)JDR_FMT1;   /* Err: code not found (may be collapted data) */
+    return 0 - (int)JDR_FMT1;   /* Err: code not found (may be corrupted data) */
 }
 
 
@@ -462,7 +462,7 @@ static int bitext(  /* >=0: extracted data, <0: error code */
             dc--;               /* Decrement number of available bytes */
             if(flg) {           /* In flag sequence? */
                 flg = 0;        /* Exit flag sequence */
-                if(*dp != 0) return 0 - (int)JDR_FMT1;  /* Err: unexpected flag is detected (may be collapted data) */
+                if(*dp != 0) return 0 - (int)JDR_FMT1;  /* Err: unexpected flag is detected (may be corrupted data) */
                 *dp = 0xFF;     /* The flag is a data 0xFF */
             }
             else {
@@ -534,7 +534,7 @@ static int bitext(  /* >=0: extracted data, <0: error code */
 
 JRESULT jd_restart(
     JDEC * jd,      /* Pointer to the decompressor object */
-    uint16_t rstn   /* Expected restert sequence number */
+    uint16_t rstn   /* Expected restart sequence number */
 )
 {
     unsigned int i;
@@ -563,7 +563,7 @@ JRESULT jd_restart(
 
     /* Check the marker */
     if((d & 0xFFD8) != 0xFFD0 || (d & 7) != (rstn & 7)) {
-        return JDR_FMT1;    /* Err: expected RSTn marker is not detected (may be collapted data) */
+        return JDR_FMT1;    /* Err: expected RSTn marker is not detected (may be corrupted data) */
     }
 
 #else
@@ -591,7 +591,7 @@ JRESULT jd_restart(
 
     /* Check the marker */
     if((marker & 0xFFD8) != 0xFFD0 || (marker & 7) != (rstn & 7)) {
-        return JDR_FMT1;    /* Err: expected RSTn marker was not detected (may be collapted data) */
+        return JDR_FMT1;    /* Err: expected RSTn marker was not detected (may be corrupted data) */
     }
 
     jd->dbit = 0;           /* Discard stuff bits */
@@ -892,7 +892,7 @@ JRESULT jd_mcu_output(
 
     /* Squeeze up pixel table if a part of MCU is to be truncated */
     mx >>= jd->scale;
-    if(rx < mx) {   /* Is the MCU spans rigit edge? */
+    if(rx < mx) {   /* Is the MCU spans right edge? */
         uint8_t * s, * d;
         unsigned int xi, yi;
 
@@ -940,7 +940,7 @@ JRESULT jd_mcu_output(
 
 JRESULT jd_prepare(
     JDEC * jd,              /* Blank decompressor object */
-    size_t (*infunc)(JDEC *, uint8_t *, size_t), /* JPEG strem input function */
+    size_t (*infunc)(JDEC *, uint8_t *, size_t), /* JPEG stream input function */
     void * pool,            /* Working buffer for the decompression session */
     size_t sz_pool,         /* Size of working buffer */
     void * dev              /* I/O device identifier for the session */
@@ -977,7 +977,7 @@ JRESULT jd_prepare(
         marker = LDB_WORD(seg);     /* Marker */
         len = LDB_WORD(seg + 2);    /* Length field */
         if(len <= 2 || (marker >> 8) != 0xFF) return JDR_FMT1;
-        len -= 2;           /* Segent content size */
+        len -= 2;           /* Segment content size */
         ofs += 4 + len;     /* Number of bytes loaded */
 
         switch(marker & 0xFF) {
@@ -1023,7 +1023,7 @@ JRESULT jd_prepare(
                 if(rc) return rc;
                 break;
 
-            case 0xDB:  /* DQT - Define Quaitizer Tables */
+            case 0xDB:  /* DQT - Define Quantizer Tables */
                 if(len > JD_SZBUF) return JDR_MEM2;
                 if(jd->infunc(jd, seg, len) != len) return JDR_INP;     /* Load segment data */
 
@@ -1044,7 +1044,7 @@ JRESULT jd_prepare(
                     if(b != 0x00 && b != 0x11) return JDR_FMT3;     /* Err: Different table number for DC/AC element */
                     n = i ? 1 : 0;                          /* Component class */
                     if(!jd->huffbits[n][0] || !jd->huffbits[n][1]) {    /* Check huffman table for this component */
-                        return JDR_FMT1;                    /* Err: Nnot loaded */
+                        return JDR_FMT1;                    /* Err: Not loaded */
                     }
                     if(!jd->qttbl[jd->qtid[i]]) {           /* Check dequantizer table for this component */
                         return JDR_FMT1;                    /* Err: Not loaded */
@@ -1083,7 +1083,7 @@ JRESULT jd_prepare(
             case 0xCE:  /* SOF14 */
             case 0xCF:  /* SOF15 */
             case 0xD9:  /* EOI */
-                return JDR_FMT3;    /* Unsuppoted JPEG standard (may be progressive JPEG) */
+                return JDR_FMT3;    /* Unsupported JPEG standard (may be progressive JPEG) */
 
             default:    /* Unknown segment (comment, exif or etc..) */
                 /* Skip segment data (null pointer specifies to remove data from the stream) */

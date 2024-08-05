@@ -44,7 +44,7 @@ void lv_example_tiny_ttf_3(void)
 
 static void font_size_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    lv_style_t * style = observer->user_data;
+    lv_style_t * style = lv_observer_get_user_data(observer);
     lv_style_value_t v;
     lv_style_get_prop(style, LV_STYLE_TEXT_FONT, &v);
     lv_font_t * font = (lv_font_t *) v.ptr;

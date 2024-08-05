@@ -50,8 +50,9 @@ The following code demonstrates using the diver in :cpp:enumerator:`LV_DISPLAY_R
     lv_display_set_default(disp);
 
 To use the driver in :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_PARTIAL` mode, an extra buffer must be allocated,
-desireably in the fastest available memory region.
-Buffer swapping can be activated by passing a second buffer of same size insted of the :cpp:expr:`NULL` argument.
+preferably in the fastest available memory region.
+
+Buffer swapping can be activated by passing a second buffer of same size instead of the :cpp:expr:`NULL` argument.
 
 .. code:: c
 
@@ -59,3 +60,23 @@ Buffer swapping can be activated by passing a second buffer of same size insted 
 
     lv_display_t * disp = lv_renesas_glcdc_partial_create(partial_draw_buf, NULL, sizeof(partial_draw_buf));
     lv_display_set_default(disp);
+
+.. note::
+
+    Partial mode can be activated via the macro in ``src/board_init.c`` file of the demo projects.
+
+
+Screen rotation
+"""""""""""""""
+
+Software based screen rotation is supported in partial mode. It uses the common API, no extra configuration is required:
+
+.. code:: c
+
+    lv_display_set_rotation(lv_display_get_default(), LV_DISP_ROTATION_90);
+    /* OR */
+    lv_display_set_rotation(lv_display_get_default(), LV_DISP_ROTATION_180);
+    /* OR */
+    lv_display_set_rotation(lv_display_get_default(), LV_DISP_ROTATION_270);
+
+Make sure the heap is large enough, as a buffer with the same size as the partial buffer will be allocated.

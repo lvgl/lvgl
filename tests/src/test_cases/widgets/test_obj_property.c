@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "../../lvgl_private.h"
 
 #include "unity/unity.h"
 
@@ -37,25 +38,25 @@ void test_obj_property_set_get_should_match(void)
 
     /* Style property should work */
     /* int type */
-    prop.id = LV_STYLE_X;
+    prop.id = LV_PROPERTY_STYLE_X;
     prop.num = 0xaabb;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_UINT32(0xaabb, lv_obj_get_style_x(obj, 0));
-    TEST_ASSERT_EQUAL_UINT32(0xaabb, lv_obj_get_property(obj, LV_STYLE_X).num);
+    TEST_ASSERT_EQUAL_UINT32(0xaabb, lv_obj_get_property(obj, LV_PROPERTY_STYLE_X).num);
 
     /* color type */
-    prop.id = LV_STYLE_BG_COLOR;
+    prop.id = LV_PROPERTY_STYLE_BG_COLOR;
     prop.color = color;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_COLOR(color, lv_obj_get_style_bg_color(obj, LV_PART_MAIN));
-    TEST_ASSERT_EQUAL_COLOR(color, lv_obj_get_property(obj, LV_STYLE_BG_COLOR).color);
+    TEST_ASSERT_EQUAL_COLOR(color, lv_obj_get_property(obj, LV_PROPERTY_STYLE_BG_COLOR).color);
 
     /* pointer type */
-    prop.id = LV_STYLE_TEXT_FONT;
+    prop.id = LV_PROPERTY_STYLE_TEXT_FONT;
     prop.ptr = &lv_font_montserrat_26;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_PTR(&lv_font_montserrat_26, lv_obj_get_style_text_font(obj, LV_PART_MAIN));
-    TEST_ASSERT_EQUAL_PTR(&lv_font_montserrat_26, lv_obj_get_property(obj, LV_STYLE_TEXT_FONT).ptr);
+    TEST_ASSERT_EQUAL_PTR(&lv_font_montserrat_26, lv_obj_get_property(obj, LV_PROPERTY_STYLE_TEXT_FONT).ptr);
 
     /* Object flags */
     prop.id = LV_PROPERTY_OBJ_FLAG_HIDDEN ;
@@ -101,20 +102,20 @@ void test_obj_property_style_selector(void)
     lv_property_t prop = { };
 
     /* Style property with default selector(0) should work */
-    prop.id = LV_STYLE_X;
+    prop.id = LV_PROPERTY_STYLE_X;
     prop.num = 0xaabb;  /* `num` shares same memory with `prop.style.value.num` */
     /* selector is initialed to zero when prop is defined. */
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_UINT32(0xaabb, lv_obj_get_style_x(obj, 0));
-    TEST_ASSERT_EQUAL_UINT32(0xaabb, lv_obj_get_style_property(obj, LV_STYLE_X, 0).num);
+    TEST_ASSERT_EQUAL_UINT32(0xaabb, lv_obj_get_style_property(obj, LV_PROPERTY_STYLE_X, 0).num);
 
     lv_style_selector_t selector = LV_PART_MAIN | LV_STATE_PRESSED;
-    prop.id = LV_STYLE_X;
+    prop.id = LV_PROPERTY_STYLE_X;
     prop.num = 0x1122;
     prop.selector = selector;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_UINT32(0x1122, lv_obj_get_style_x(obj, selector));
-    TEST_ASSERT_EQUAL_UINT32(0x1122, lv_obj_get_style_property(obj, LV_STYLE_X, selector).num);
+    TEST_ASSERT_EQUAL_UINT32(0x1122, lv_obj_get_style_property(obj, LV_PROPERTY_STYLE_X, selector).num);
 #endif
 }
 
@@ -255,7 +256,9 @@ void test_obj_property_name(void)
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
 
     /*Style name*/
-    TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_STYLE_X, lv_obj_property_get_id(obj, "x"));
+    /*If widget property name conflicts with style name, property name comes first.*/
+    TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_OBJ_X, lv_obj_property_get_id(obj, "x"));
+    TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_STYLE_OPA, lv_obj_property_get_id(obj, "opa"));
     TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_STYLE_BG_MAIN_STOP, lv_obj_property_get_id(obj, "bg_main_stop"));
 
     /*Widget property*/
@@ -266,6 +269,40 @@ void test_obj_property_name(void)
 
     /*OBJ flags*/
     TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_OBJ_FLAG_CLICKABLE, lv_obj_property_get_id(obj, "flag_clickable"));
+#endif
+}
+
+void test_label_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_label_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    prop.id = LV_PROPERTY_LABEL_TEXT;
+    prop.ptr = "Hello world";
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_STRING("Hello world", lv_label_get_text(obj));
+    TEST_ASSERT_EQUAL_STRING("Hello world", lv_obj_get_property(obj, LV_PROPERTY_LABEL_TEXT).ptr);
+
+    prop.id = LV_PROPERTY_LABEL_LONG_MODE;
+    prop.num = LV_LABEL_LONG_SCROLL;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_LABEL_LONG_SCROLL, lv_label_get_long_mode(obj));
+    TEST_ASSERT_EQUAL_INT(LV_LABEL_LONG_SCROLL, lv_obj_get_property(obj, LV_PROPERTY_LABEL_LONG_MODE).num);
+
+#if LV_LABEL_TEXT_SELECTION
+    prop.id = LV_PROPERTY_LABEL_TEXT_SELECTION_START;
+    prop.num = 2;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(2, lv_label_get_text_selection_start(obj));
+    TEST_ASSERT_EQUAL_INT(2, lv_obj_get_property(obj, LV_PROPERTY_LABEL_TEXT_SELECTION_START).num);
+
+    prop.id = LV_PROPERTY_LABEL_TEXT_SELECTION_END;
+    prop.num = 5;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(5, lv_label_get_text_selection_end(obj));
+    TEST_ASSERT_EQUAL_INT(5, lv_obj_get_property(obj, LV_PROPERTY_LABEL_TEXT_SELECTION_END).num);
+#endif
 #endif
 }
 

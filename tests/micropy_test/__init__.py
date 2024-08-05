@@ -1,5 +1,5 @@
 """
-The test script will only run the one test on microptyhon. It is not a
+The test script will only run the one test on micropython. It is not a
 framework that can be used for other tests. This has a reduced code footprint.
 entrypoint API is almost the same as the framework.
 
@@ -16,7 +16,7 @@ python3 -m pip install pillow
 Example command line to run the test. I suggest doing this from the root of the
 binding directory. It is just a simple location to do it from.
 
-Paths that are passed in MUST be relitive to the current working directory.
+Paths that are passed in MUST be relative to the current working directory.
 python3 lib/lv_bindings/lvgl/tests/micropy_test/__init__.py --artifact-path=lib/lv_bindings/lvgl/tests/micropy_test/artifacts --mpy-path=ports/unix/build-standard/micropython
 
 """

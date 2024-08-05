@@ -66,8 +66,8 @@ struct RenderContext
     Matrix* transform = nullptr;
     float roundness = 0.0f;
     bool fragmenting = false;  //render context has been fragmented by filling
-    bool reqFragment = false;  //requirment to fragment the render context
-    bool ownPropagator = true; //this rendering context shares the propergator
+    bool reqFragment = false;  //requirement to fragment the render context
+    bool ownPropagator = true; //this rendering context shares the propagator
 
     RenderContext()
     {
@@ -419,7 +419,7 @@ static void _repeat(LottieGroup* parent, unique_ptr<Shape> path, RenderContext* 
         shape->transform(pm ? mathMultiply(&m, pm) : m);
 
         if (ctx->roundness > 1.0f && P(shape)->rs.stroke) {
-            TVGERR("LOTTIE", "FIXME: Path roundesss should be applied properly!");
+            TVGERR("LOTTIE", "FIXME: Path roundness should be applied properly!");
             P(shape)->rs.stroke->join = StrokeJoin::Round;
         }
 
@@ -1260,7 +1260,7 @@ static void _buildReference(LottieComposition* comp, LottieLayer* layer)
 }
 
 
-static void _bulidHierarchy(LottieGroup* parent, LottieLayer* child)
+static void _buildHierarchy(LottieGroup* parent, LottieLayer* child)
 {
     if (child->pid == -1) return;
 
@@ -1318,11 +1318,11 @@ static bool _buildComposition(LottieComposition* comp, LottieGroup* parent)
 
         if (child->matte.target) {
             //parenting
-            _bulidHierarchy(parent, child->matte.target);
+            _buildHierarchy(parent, child->matte.target);
             //precomp referencing
             if (child->matte.target->refId) _buildReference(comp, child->matte.target);
         }
-        _bulidHierarchy(parent, child);
+        _buildHierarchy(parent, child);
 
         //attach the necessary font data
         if (child->type == LottieLayer::Text) _attachFont(comp, child);

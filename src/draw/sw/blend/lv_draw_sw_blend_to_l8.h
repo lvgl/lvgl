@@ -1,10 +1,10 @@
 ﻿/**
- * @file lv_draw_sw_blend_l8.h
+ * @file lv_draw_sw_blend_to_l8.h
  *
  */
 
-#ifndef LV_DRAW_SW_BLEND_L8_H
-#define LV_DRAW_SW_BLEND_L8_H
+#ifndef LV_DRAW_SW_BLEND_TO_L8_H
+#define LV_DRAW_SW_BLEND_TO_L8_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,9 +28,9 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_color_to_l8(_lv_draw_sw_blend_fill_dsc_t * dsc);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_color_to_l8(lv_draw_sw_blend_fill_dsc_t * dsc);
 
-void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_image_to_l8(_lv_draw_sw_blend_image_dsc_t * dsc);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_image_to_l8(lv_draw_sw_blend_image_dsc_t * dsc);
 
 /**********************
  *      MACROS
@@ -42,4 +42,4 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_image_to_l8(_lv_draw_sw_blend_
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_SW_BLEND_L8_H*/
+#endif /*LV_DRAW_SW_BLEND_TO_L8_H*/

@@ -86,7 +86,7 @@ typedef struct _Tvg_Canvas Tvg_Canvas;
 /**
 * \brief A structure representing a graphical element.
 *
-* \warning The TvgPaint objects can not be shared between Canvases.
+* \warning The TvgPaint objects cannot be shared between Canvases.
 */
 typedef struct _Tvg_Paint Tvg_Paint;
 
@@ -2277,7 +2277,7 @@ TVG_API Tvg_Animation* tvg_animation_new(void);
 * \brief Specifies the current frame in the animation.
 *
 * \param[in] animation A Tvg_Animation pointer to the animation object.
-* \param[in] no The index of the animation frame to be displayed. The index should be less than the tvg_animatio_total_frame().
+* \param[in] no The index of the animation frame to be displayed. The index should be less than the tvg_animation_total_frame().
 *
 * \return Tvg_Result enumeration.
 * \retval TVG_RESULT_SUCCESS Succeed.
@@ -2469,7 +2469,7 @@ TVG_API Tvg_Result tvg_lottie_animation_set_marker(Tvg_Animation* animation, con
 * \brief Gets the marker count of the animation. (Experimental API)
 *
 * \param[in] animation The Tvg_Animation pointer to the Lottie animation object.
-* \param[out] cnt The count value of the merkers.
+* \param[out] cnt The count value of the markers.
 *
 * \return Tvg_Result enumeration.
 * \retval TVG_RESULT_SUCCESS Succeed.

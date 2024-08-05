@@ -44,18 +44,12 @@ typedef struct {
 } lv_font_fmt_txt_glyph_dsc_t;
 
 /** Format of font character map.*/
-enum _lv_font_fmt_txt_cmap_type_t {
+typedef enum {
     LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL,
     LV_FONT_FMT_TXT_CMAP_SPARSE_FULL,
     LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY,
     LV_FONT_FMT_TXT_CMAP_SPARSE_TINY,
-};
-
-#ifdef DOXYGEN
-typedef _lv_font_fmt_txt_cmap_type_t lv_font_fmt_txt_cmap_type_t;
-#else
-typedef uint8_t lv_font_fmt_txt_cmap_type_t;
-#endif /*DOXYGEN*/
+} lv_font_fmt_txt_cmap_type_t;
 
 /**
  * Map codepoints to a `glyph_dsc`s
@@ -190,23 +184,6 @@ typedef struct {
      */
     uint16_t bitmap_format  : 2;
 } lv_font_fmt_txt_dsc_t;
-
-#if LV_USE_FONT_COMPRESSED
-typedef enum {
-    RLE_STATE_SINGLE = 0,
-    RLE_STATE_REPEATE,
-    RLE_STATE_COUNTER,
-} lv_font_fmt_rle_state_t;
-
-typedef struct {
-    uint32_t rdp;
-    const uint8_t * in;
-    uint8_t bpp;
-    uint8_t prev_v;
-    uint8_t count;
-    lv_font_fmt_rle_state_t state;
-} lv_font_fmt_rle_t;
-#endif
 
 /**********************
  * GLOBAL PROTOTYPES

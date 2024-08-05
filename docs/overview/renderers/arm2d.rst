@@ -13,7 +13,7 @@ Arm-2D accelerates LVGL9 with two modes: **Synchronous Mode** and
 - When Arm-2D backed 2D-GPUs are available, for example, **DMAC-350 based 2D
   GPUs**, it is recommend to use **Asynchronous Mode** to accelerate LVGL.
 
-Arm-2D is an open-source project on Github. For more, please refer to:
+Arm-2D is an open-source project on GitHub. For more, please refer to:
 https://github.com/ARM-software/Arm-2D.
 
 How to Use
@@ -47,7 +47,7 @@ LVGL (sometimes worse) for regular Cortex-M processors.
 -  The target processors support
    `Helium <https://developer.arm.com/documentation/102102/0103/?lang=en>`__.
 -  The device vendor provides an arm-2d compliant driver for their
-   propriotory 2D accelerators and/or ACI(Arm Customized Instruction).
+   proprietary 2D accelerators and/or ACI(Arm Customized Instruction).
 -  The target device contains
    `DMAC-350 <https://community.arm.com/arm-community-blogs/b/internet-of-things-blog/posts/arm-corelink-dma-350-next-generation-direct-memory-access-for-endpoint-ai>`__
 

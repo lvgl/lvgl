@@ -1,5 +1,5 @@
 /**
- * @file lv_mbox.h
+ * @file lv_msgbox.h
  *
  */
 
@@ -19,7 +19,7 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_BUTTONMATRIX == 0
-#error "lv_mbox: lv_btnm is required. Enable it in lv_conf.h (LV_USE_BUTTONMATRIX  1) "
+#error "lv_mbox: lv_buttonmatrix is required. Enable it in lv_conf.h (LV_USE_BUTTONMATRIX  1) "
 #endif
 
 #if LV_USE_LABEL == 0
@@ -29,18 +29,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-typedef struct {
-    lv_obj_t obj;
-    lv_obj_t * header;
-    lv_obj_t * content;
-    lv_obj_t * footer;
-    lv_obj_t * title;
-} lv_msgbox_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_msgbox_class;
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_msgbox_header_class;
@@ -56,7 +44,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_msgbox_backdrop_class;
 
 /**
  * Create an empty message box
- * @param parent        the parent of the message box
+ * @param parent        the parent or NULL to create a modal msgbox
  * @return              the created message box
  */
 lv_obj_t * lv_msgbox_create(lv_obj_t * parent);
@@ -78,9 +66,9 @@ lv_obj_t * lv_msgbox_add_title(lv_obj_t * obj, const char * title);
 lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon);
 
 /**
- * Add a text to the content area of message box. Multiply texts will be created below each other.
+ * Add a text to the content area of message box. Multiple texts will be created below each other.
  * @param obj           pointer to a message box
- * @param icon          the icon of the button
+ * @param text          text to add
  * @return              the created button
  */
 lv_obj_t * lv_msgbox_add_text(lv_obj_t * obj, const char * text);
@@ -94,7 +82,7 @@ lv_obj_t * lv_msgbox_add_text(lv_obj_t * obj, const char * text);
 lv_obj_t * lv_msgbox_add_footer_button(lv_obj_t * obj, const char * text);
 
 /**
- * Add a close button to the message box. It also create a header.
+ * Add a close button to the message box. It also creates a header.
  * @param obj           pointer to a message box
  * @return              the created close button
  */
@@ -117,26 +105,26 @@ lv_obj_t * lv_msgbox_get_footer(lv_obj_t * obj);
 /**
  * Get the content widget
  * @param obj           pointer to a message box
- * @return              the content, or NULL if not exists
+ * @return              the content
  */
 lv_obj_t * lv_msgbox_get_content(lv_obj_t * obj);
 
 /**
  * Get the title label
  * @param obj           pointer to a message box
- * @return              the title, or NULL if not exists
+ * @return              the title, or NULL if it does not exist
  */
 lv_obj_t * lv_msgbox_get_title(lv_obj_t * obj);
 
 /**
  * Close a message box
- * @param obj           pointer to a message box
+ * @param mbox           pointer to a message box
  */
 void lv_msgbox_close(lv_obj_t * mbox);
 
 /**
  * Close a message box in the next call of the message box
- * @param obj           pointer to a message box
+ * @param mbox           pointer to a message box
  */
 void lv_msgbox_close_async(lv_obj_t * mbox);
 

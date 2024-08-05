@@ -319,11 +319,11 @@ static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_PXP);
 
     if(t == NULL || t->preferred_draw_unit_id != DRAW_UNIT_ID_PXP)
-        return -1;
+        return LV_DRAW_UNIT_IDLE;
 
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(buf == NULL)
-        return -1;
+        return LV_DRAW_UNIT_IDLE;
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_pxp_unit->base_unit.target_layer = layer;
@@ -376,7 +376,7 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
     lv_draw_buf_t * draw_buf = layer->draw_buf;
 
     lv_area_t draw_area;
-    if(!_lv_area_intersect(&draw_area, &t->area, draw_unit->clip_area))
+    if(!lv_area_intersect(&draw_area, &t->area, draw_unit->clip_area))
         return; /*Fully clipped, nothing to do*/
 
     /* Make area relative to the buffer */
@@ -403,7 +403,7 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
     /*Layers manage it for themselves*/
     if(t->type != LV_DRAW_TASK_TYPE_LAYER) {
         lv_area_t draw_area;
-        if(!_lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area))
+        if(!lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area))
             return;
 
         int32_t idx = 0;
@@ -414,7 +414,7 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
         }
         lv_draw_rect_dsc_t rect_dsc;
         lv_draw_rect_dsc_init(&rect_dsc);
-        rect_dsc.bg_color = lv_palette_main(idx % _LV_PALETTE_LAST);
+        rect_dsc.bg_color = lv_palette_main(idx % LV_PALETTE_LAST);
         rect_dsc.border_color = rect_dsc.bg_color;
         rect_dsc.bg_opa = LV_OPA_10;
         rect_dsc.border_opa = LV_OPA_80;

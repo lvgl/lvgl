@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_windows_context.h
  *
  */
@@ -19,7 +19,19 @@ extern "C" {
 
 #if LV_USE_WINDOWS
 
+#if LV_USE_OS != LV_OS_WINDOWS
+#error [lv_windows] LV_OS_WINDOWS is required. Enable it in lv_conf.h (LV_USE_OS LV_OS_WINDOWS)
+#endif
+
 #include <windows.h>
+
+#ifndef CREATE_WAITABLE_TIMER_MANUAL_RESET
+#define CREATE_WAITABLE_TIMER_MANUAL_RESET  0x00000001
+#endif
+
+#ifndef CREATE_WAITABLE_TIMER_HIGH_RESOLUTION
+#define CREATE_WAITABLE_TIMER_HIGH_RESOLUTION 0x00000002
+#endif
 
 /*********************
  *      DEFINES
@@ -29,32 +41,31 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct _lv_windows_pointer_context_t {
+typedef struct lv_windows_pointer_context_t {
     lv_indev_state_t state;
     lv_point_t point;
     lv_indev_t * indev;
 } lv_windows_pointer_context_t;
 
-typedef struct _lv_windows_keypad_queue_item_t {
+typedef struct lv_windows_keypad_queue_item_t {
     uint32_t key;
     lv_indev_state_t state;
 } lv_windows_keypad_queue_item_t;
 
-typedef struct _lv_windows_keypad_context_t {
-    CRITICAL_SECTION mutex;
+typedef struct lv_windows_keypad_context_t {
     lv_ll_t queue;
     uint16_t utf16_high_surrogate;
     uint16_t utf16_low_surrogate;
     lv_indev_t * indev;
 } lv_windows_keypad_context_t;
 
-typedef struct _lv_windows_encoder_context_t {
+typedef struct lv_windows_encoder_context_t {
     lv_indev_state_t state;
     int16_t enc_diff;
     lv_indev_t * indev;
 } lv_windows_encoder_context_t;
 
-typedef struct _lv_windows_window_context_t {
+typedef struct lv_windows_window_context_t {
     lv_display_t * display_device_object;
     lv_timer_t * display_timer_object;
 
@@ -75,7 +86,7 @@ typedef struct _lv_windows_window_context_t {
 
 } lv_windows_window_context_t;
 
-typedef struct _lv_windows_create_display_data_t {
+typedef struct lv_windows_create_display_data_t {
     const wchar_t * title;
     int32_t hor_res;
     int32_t ver_res;

@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../lv_theme_private.h"
 #include "../../../lvgl.h" /*To see all the widgets*/
 
 #if LV_USE_THEME_SIMPLE
@@ -176,7 +177,7 @@ void lv_theme_simple_deinit(void)
 lv_theme_t * lv_theme_simple_init(lv_display_t * disp)
 {
     /*This trick is required only to avoid the garbage collection of
-     *styles' data if LVGL is used in a binding (e.g. Micropython)
+     *styles' data if LVGL is used in a binding (e.g. MicroPython)
      *In a general case styles could be in simple `static lv_style_t my_style...` variables*/
     if(!lv_theme_simple_is_inited()) {
         theme_def  = lv_malloc_zeroed(sizeof(my_theme_t));

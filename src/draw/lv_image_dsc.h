@@ -20,7 +20,7 @@ extern "C" {
  *********************/
 
 /** Magic number for lvgl image, 9 means lvgl version 9
- *  It must not be a valid ASCII character nor larger than 0x80. See `lv_image_src_get_type`.
+ *  It must be neither a valid ASCII character nor larger than 0x80. See `lv_image_src_get_type`.
  */
 #define LV_IMAGE_HEADER_MAGIC (0x19)
 LV_EXPORT_CONST_INT(LV_IMAGE_HEADER_MAGIC);
@@ -29,7 +29,7 @@ LV_EXPORT_CONST_INT(LV_IMAGE_HEADER_MAGIC);
  *      TYPEDEFS
  **********************/
 
-typedef enum _lv_image_flags_t {
+typedef enum lv_image_flags_t {
     /**
      * For RGB map of the image data, mark if it's pre-multiplied with alpha.
      * For indexed image, this bit indicated palette data is pre-multiplied with alpha.

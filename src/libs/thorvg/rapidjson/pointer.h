@@ -173,7 +173,7 @@ public:
     //! Assignment operator.
     GenericPointer& operator=(const GenericPointer& rhs) {
         if (this != &rhs) {
-            // Do not delete ownAllcator
+            // Do not delete ownAllocator
             if (nameBuffer_)
                 Allocator::Free(tokens_);
 
@@ -191,7 +191,7 @@ public:
         return *this;
     }
 
-    //! Swap the content of this pointer with an other.
+    //! Swap the content of this pointer with another.
     /*!
         \param other The pointer to swap with.
         \note Constant complexity.
@@ -525,7 +525,7 @@ public:
 
         \note
         There are only 3 situations when a URI cannot be resolved:
-        1. A value in the path is not an array nor object.
+        1. A value in the path is neither an array nor object.
         2. An object value does not contain the token.
         3. A token is out of range of an array value.
 
@@ -586,7 +586,7 @@ public:
 
         \note
         There are only 3 situations when a value cannot be resolved:
-        1. A value in the path is not an array nor object.
+        1. A value in the path is neither an array nor object.
         2. An object value does not contain the token.
         3. A token is out of range of an array value.
 

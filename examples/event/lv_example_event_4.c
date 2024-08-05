@@ -7,7 +7,7 @@ static bool size_dec = false;
 
 static void timer_cb(lv_timer_t * timer)
 {
-    lv_obj_invalidate(timer->user_data);
+    lv_obj_invalidate(lv_timer_get_user_data(timer));
     if(size_dec) size--;
     else size++;
 
@@ -19,7 +19,7 @@ static void event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
+    lv_draw_dsc_base_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
     if(base_dsc->part == LV_PART_MAIN) {
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
@@ -36,7 +36,9 @@ static void event_cb(lv_event_t * e)
         a.y1 = 0;
         a.x2 = size;
         a.y2 = size;
-        lv_area_align(&obj->coords, &a, LV_ALIGN_CENTER, 0, 0);
+        lv_area_t obj_coords;
+        lv_obj_get_coords(obj, &obj_coords);
+        lv_area_align(&obj_coords, &a, LV_ALIGN_CENTER, 0, 0);
 
         lv_draw_rect(base_dsc->layer, &draw_dsc, &a);
     }

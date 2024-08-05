@@ -264,6 +264,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     lv_color_format_t cf = lv_display_get_color_format(disp);
     uint32_t px_size = lv_color_format_get_size(cf);
 
+    lv_area_t rotated_area;
     lv_display_rotation_t rotation = lv_display_get_rotation(disp);
 
     /* Not all framebuffer kernel drivers support hardware rotation, so we need to handle it in software here */
@@ -295,7 +296,10 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         color_p = dsc->rotated_buf;
 
         /* Rotate the area */
-        lv_display_rotate_area(disp, (lv_area_t *)area);
+        rotated_area = *area;
+        lv_display_rotate_area(disp, &rotated_area);
+        area = &rotated_area;
+
         if(rotation != LV_DISPLAY_ROTATION_180) {
             w = lv_area_get_width(area);
             h = lv_area_get_height(area);

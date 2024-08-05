@@ -12,6 +12,7 @@
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_math.h"
 #include "../../indev/lv_indev.h"
+#include "../../core/lv_obj_private.h"
 
 /*********************
  *      DEFINES
@@ -43,7 +44,7 @@ static void gridnav_event_cb(lv_event_t * e);
 static lv_obj_t * find_chid(lv_obj_t * obj, lv_obj_t * start_child, find_mode_t mode);
 static lv_obj_t * find_first_focusable(lv_obj_t * obj);
 static lv_obj_t * find_last_focusable(lv_obj_t * obj);
-static bool obj_is_focuable(lv_obj_t * obj);
+static bool obj_is_focusable(lv_obj_t * obj);
 static int32_t get_x_center(lv_obj_t * obj);
 static int32_t get_y_center(lv_obj_t * obj);
 
@@ -108,7 +109,7 @@ void lv_gridnav_set_focused(lv_obj_t * cont, lv_obj_t * to_focus, lv_anim_enable
         return;
     }
 
-    if(obj_is_focuable(to_focus) == false) {
+    if(obj_is_focusable(to_focus) == false) {
         LV_LOG_WARN("The object to focus is not focusable");
         return;
     }
@@ -229,7 +230,9 @@ static void gridnav_event_cb(lv_event_t * e)
 
         if(guess && guess != dsc->focused_obj) {
             lv_obj_remove_state(dsc->focused_obj, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
+            lv_obj_send_event(dsc->focused_obj, LV_EVENT_DEFOCUSED, lv_indev_active());
             lv_obj_add_state(guess, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
+            lv_obj_send_event(guess, LV_EVENT_FOCUSED, lv_indev_active());
             lv_obj_scroll_to_view(guess, LV_ANIM_ON);
             dsc->focused_obj = guess;
         }
@@ -298,7 +301,7 @@ static lv_obj_t * find_chid(lv_obj_t * obj, lv_obj_t * start_child, find_mode_t 
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
         if(child == start_child) continue;
-        if(obj_is_focuable(child) == false) continue;
+        if(obj_is_focusable(child) == false) continue;
 
         int32_t x_err = 0;
         int32_t y_err = 0;
@@ -360,7 +363,7 @@ static lv_obj_t * find_first_focusable(lv_obj_t * obj)
     uint32_t i;
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
-        if(obj_is_focuable(child)) return child;
+        if(obj_is_focusable(child)) return child;
 
     }
     return NULL;
@@ -372,12 +375,12 @@ static lv_obj_t * find_last_focusable(lv_obj_t * obj)
     int32_t i;
     for(i = child_cnt - 1; i >= 0; i--) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
-        if(obj_is_focuable(child)) return child;
+        if(obj_is_focusable(child)) return child;
     }
     return NULL;
 }
 
-static bool obj_is_focuable(lv_obj_t * obj)
+static bool obj_is_focusable(lv_obj_t * obj)
 {
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return false;
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_CLICK_FOCUSABLE)) return true;

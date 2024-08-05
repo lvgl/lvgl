@@ -43,7 +43,7 @@ extern "C" {
  * Possible states of a widget.
  * OR-ed values are possible
  */
-enum _lv_state_t {
+enum {
     LV_STATE_DEFAULT     =  0x0000,
     LV_STATE_CHECKED     =  0x0001,
     LV_STATE_FOCUSED     =  0x0002,
@@ -68,7 +68,7 @@ enum _lv_state_t {
  * Not all parts are used by every widget
  */
 
-enum _lv_part_t {
+enum {
     LV_PART_MAIN         = 0x000000,   /**< A background like rectangle*/
     LV_PART_SCROLLBAR    = 0x010000,   /**< The scrollbar(s)*/
     LV_PART_INDICATOR    = 0x020000,   /**< Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox*/
@@ -125,7 +125,7 @@ typedef enum {
     LV_OBJ_FLAG_USER_2          = (1L << 28), /**< Custom flag, free to use by user*/
     LV_OBJ_FLAG_USER_3          = (1L << 29), /**< Custom flag, free to use by user*/
     LV_OBJ_FLAG_USER_4          = (1L << 30), /**< Custom flag, free to use by user*/
-} _lv_obj_flag_t;
+} lv_obj_flag_t;
 
 #if LV_USE_OBJ_PROPERTY
 enum {
@@ -181,7 +181,32 @@ enum {
     LV_PROPERTY_ID(OBJ, STATE_END,                  LV_PROPERTY_TYPE_INT,       47),
 
     /*OBJ normal properties*/
-    LV_PROPERTY_ID(OBJ, PARENT,                     LV_PROPERTY_TYPE_POINTER,   31),
+    LV_PROPERTY_ID(OBJ, PARENT,                     LV_PROPERTY_TYPE_OBJ,       48),
+    LV_PROPERTY_ID(OBJ, X,                          LV_PROPERTY_TYPE_INT,       49),
+    LV_PROPERTY_ID(OBJ, Y,                          LV_PROPERTY_TYPE_INT,       50),
+    LV_PROPERTY_ID(OBJ, W,                          LV_PROPERTY_TYPE_INT,       51),
+    LV_PROPERTY_ID(OBJ, H,                          LV_PROPERTY_TYPE_INT,       52),
+    LV_PROPERTY_ID(OBJ, CONTENT_WIDTH,              LV_PROPERTY_TYPE_INT,       53),
+    LV_PROPERTY_ID(OBJ, CONTENT_HEIGHT,             LV_PROPERTY_TYPE_INT,       54),
+    LV_PROPERTY_ID(OBJ, LAYOUT,                     LV_PROPERTY_TYPE_INT,       55),
+    LV_PROPERTY_ID(OBJ, ALIGN,                      LV_PROPERTY_TYPE_INT,       56),
+    LV_PROPERTY_ID(OBJ, SCROLLBAR_MODE,             LV_PROPERTY_TYPE_INT,       57),
+    LV_PROPERTY_ID(OBJ, SCROLL_DIR,                 LV_PROPERTY_TYPE_INT,       58),
+    LV_PROPERTY_ID(OBJ, SCROLL_SNAP_X,              LV_PROPERTY_TYPE_INT,       59),
+    LV_PROPERTY_ID(OBJ, SCROLL_SNAP_Y,              LV_PROPERTY_TYPE_INT,       60),
+    LV_PROPERTY_ID(OBJ, SCROLL_X,                   LV_PROPERTY_TYPE_INT,       61),
+    LV_PROPERTY_ID(OBJ, SCROLL_Y,                   LV_PROPERTY_TYPE_INT,       62),
+    LV_PROPERTY_ID(OBJ, SCROLL_TOP,                 LV_PROPERTY_TYPE_INT,       63),
+    LV_PROPERTY_ID(OBJ, SCROLL_BOTTOM,              LV_PROPERTY_TYPE_INT,       64),
+    LV_PROPERTY_ID(OBJ, SCROLL_LEFT,                LV_PROPERTY_TYPE_INT,       65),
+    LV_PROPERTY_ID(OBJ, SCROLL_RIGHT,               LV_PROPERTY_TYPE_INT,       66),
+    LV_PROPERTY_ID(OBJ, SCROLL_END,                 LV_PROPERTY_TYPE_INT,       67),
+    LV_PROPERTY_ID(OBJ, EXT_DRAW_SIZE,              LV_PROPERTY_TYPE_INT,       68),
+    LV_PROPERTY_ID(OBJ, EVENT_COUNT,                LV_PROPERTY_TYPE_INT,       69),
+    LV_PROPERTY_ID(OBJ, SCREEN,                     LV_PROPERTY_TYPE_OBJ,       70),
+    LV_PROPERTY_ID(OBJ, DISPLAY,                    LV_PROPERTY_TYPE_POINTER,   71),
+    LV_PROPERTY_ID(OBJ, CHILD_COUNT,                LV_PROPERTY_TYPE_INT,       72),
+    LV_PROPERTY_ID(OBJ, INDEX,                      LV_PROPERTY_TYPE_INT,       73),
 
     LV_PROPERTY_OBJ_END,
 };
@@ -191,54 +216,6 @@ enum {
  * Make the base object's class publicly available.
  */
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_obj_class;
-
-/**
- * Special, rarely used attributes.
- * They are allocated automatically if any elements is set.
- */
-typedef struct {
-    lv_obj_t ** children;   /**< Store the pointer of the children in an array.*/
-    lv_group_t * group_p;
-    lv_event_list_t event_list;
-
-    lv_point_t scroll;              /**< The current X/Y scroll offset*/
-
-    int32_t ext_click_pad;          /**< Extra click padding in all direction*/
-    int32_t ext_draw_size;          /**< EXTend the size in every direction for drawing.*/
-
-    uint16_t child_cnt;             /**< Number of children*/
-    uint16_t scrollbar_mode : 2;    /**< How to display scrollbars, see `lv_scrollbar_mode_t`*/
-    uint16_t scroll_snap_x : 2;     /**< Where to align the snappable children horizontally, see `lv_scroll_snap_t`*/
-    uint16_t scroll_snap_y : 2;     /**< Where to align the snappable children vertically*/
-    uint16_t scroll_dir : 4;        /**< The allowed scroll direction(s), see `lv_dir_t`*/
-    uint16_t layer_type : 2;        /**< Cache the layer type here. Element of @lv_intermediate_layer_type_t */
-} _lv_obj_spec_attr_t;
-
-struct _lv_obj_t {
-    const lv_obj_class_t * class_p;
-    lv_obj_t * parent;
-    _lv_obj_spec_attr_t * spec_attr;
-    _lv_obj_style_t * styles;
-#if LV_OBJ_STYLE_CACHE
-    uint32_t style_main_prop_is_set;
-    uint32_t style_other_prop_is_set;
-#endif
-    void * user_data;
-#if LV_USE_OBJ_ID
-    void * id;
-#endif
-    lv_area_t coords;
-    lv_obj_flag_t flags;
-    lv_state_t state;
-    uint16_t layout_inv : 1;
-    uint16_t readjust_scroll_after_layout : 1;
-    uint16_t scr_layout_inv : 1;
-    uint16_t skip_trans : 1;
-    uint16_t style_cnt  : 6;
-    uint16_t h_layout   : 1;
-    uint16_t w_layout   : 1;
-    uint16_t is_deleting : 1;
-};
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -306,10 +283,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t state, bool v);
  * @param obj   pointer to an object
  * @param user_data   pointer to the new user_data.
  */
-static inline void lv_obj_set_user_data(lv_obj_t * obj, void * user_data)
-{
-    obj->user_data = user_data;
-}
+void lv_obj_set_user_data(lv_obj_t * obj, void * user_data);
 
 /*=======================
  * Getter functions
@@ -327,7 +301,7 @@ bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f);
  * Check if a given flag or any of the flags are set on an object.
  * @param obj   pointer to an object
  * @param f     the flag(s) to check (OR-ed values can be used)
- * @return      true: at lest one flag flag is set; false: none of the flags are set
+ * @return      true: at least one flag is set; false: none of the flags are set
  */
 bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f);
 
@@ -358,10 +332,7 @@ lv_group_t * lv_obj_get_group(const lv_obj_t * obj);
  * @param obj   pointer to an object
  * @return      the pointer to the user_data of the object
  */
-static inline void * lv_obj_get_user_data(lv_obj_t * obj)
-{
-    return obj->user_data;
-}
+void * lv_obj_get_user_data(lv_obj_t * obj);
 
 /*=======================
  * Other functions

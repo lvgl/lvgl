@@ -1,5 +1,5 @@
 /**
- * @file lv_nuttx_fbdev_h
+ * @file lv_nuttx_fbdev.h
  *
  */
 

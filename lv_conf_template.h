@@ -106,6 +106,12 @@
 /*Align the start address of draw_buf addresses to this bytes*/
 #define LV_DRAW_BUF_ALIGN                       4
 
+/*Using matrix for transformations.
+ *Requirements:
+    `LV_USE_MATRIX = 1`.
+    The rendering engine needs to support 3x3 matrix transformations.*/
+#define LV_DRAW_TRANSFORM_USE_MATRIX            0
+
 /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
  * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
  * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
@@ -137,10 +143,11 @@
 	#define LV_DRAW_SW_SUPPORT_L8			1
 	#define LV_DRAW_SW_SUPPORT_AL88			1
 	#define LV_DRAW_SW_SUPPORT_A8			1
+	#define LV_DRAW_SW_SUPPORT_I1			1
 
 	/* Set the number of draw unit.
      * > 1 requires an operating system enabled in `LV_USE_OS`
-     * > 1 means multiply threads will render the screen in parallel */
+     * > 1 means multiple threads will render the screen in parallel */
     #define LV_DRAW_SW_DRAW_UNIT_CNT    1
 
     /* Use Arm-2D to accelerate the sw render */
@@ -228,6 +235,10 @@
  * NOTE: The memory usage of a single gradient image is 4K bytes.
  */
 #define LV_VG_LITE_GRAD_CACHE_CNT 32
+
+/* VG-Lite stroke maximum cache number.
+ */
+#define LV_VG_LITE_STROKE_CACHE_CNT 32
 
 #endif
 
@@ -424,7 +435,7 @@
 #define LV_ATTRIBUTE_FAST_MEM
 
 /*Export integer constant to binding. This macro is used with constants in the form of LV_<CONST> that
- *should also appear on LVGL binding API such as Micropython.*/
+ *should also appear on LVGL binding API such as MicroPython.*/
 #define LV_EXPORT_CONST_INT(int_value) struct _silence_gcc_warning /*The default value just prevents GCC warning*/
 
 /*Prefix all global extern data with this*/
@@ -432,6 +443,10 @@
 
 /* Use `float` as `lv_value_precise_t` */
 #define LV_USE_FLOAT            0
+
+/*Enable matrix support
+ *Requires `LV_USE_FLOAT = 1`*/
+#define LV_USE_MATRIX           0
 
 /*==================
  *   FONT USAGE
@@ -530,7 +545,7 @@
 #endif
 
 /*Enable Arabic/Persian processing
- *In these languages characters should be replaced with an other form based on their position in the text*/
+ *In these languages characters should be replaced with another form based on their position in the text*/
 #define LV_USE_ARABIC_PERSIAN_CHARS 0
 
 /*==================
@@ -780,12 +795,14 @@
 #if LV_USE_TINY_TTF
     /* Enable loading TTF data from files */
     #define LV_TINY_TTF_FILE_SUPPORT 0
+    #define LV_TINY_TTF_CACHE_GLYPH_CNT 256
 #endif
 
 /*Rlottie library*/
 #define LV_USE_RLOTTIE 0
 
-/*Enable Vector Graphic APIs*/
+/*Enable Vector Graphic APIs
+ *Requires `LV_USE_MATRIX = 1`*/
 #define LV_USE_VECTOR_GRAPHIC  0
 
 /* Enable ThorVG (vector graphics library) from the src/libs folder */
@@ -887,7 +904,7 @@
 #define LV_USE_IME_PINYIN 0
 #if LV_USE_IME_PINYIN
     /*1: Use default thesaurus*/
-    /*If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesauruss*/
+    /*If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesaurus*/
     #define LV_IME_PINYIN_USE_DEFAULT_DICT 1
     /*Set the maximum number of candidate panels that can be displayed*/
     /*This needs to be adjusted according to the size of the screen*/
@@ -930,7 +947,7 @@
 #define LV_USE_X11              0
 #if LV_USE_X11
     #define LV_X11_DIRECT_EXIT         1  /*Exit the application when all X11 windows have been closed*/
-    #define LV_X11_DOUBLE_BUFFER       1  /*Use double buffers for endering*/
+    #define LV_X11_DOUBLE_BUFFER       1  /*Use double buffers for rendering*/
     /*select only 1 of the following render modes (LV_X11_RENDER_MODE_PARTIAL preferred!)*/
     #define LV_X11_RENDER_MODE_PARTIAL 1  /*Partial render mode (preferred)*/
     #define LV_X11_RENDER_MODE_DIRECT  0  /*direct render mode*/
@@ -1008,6 +1025,12 @@
 #define LV_USE_OPENGLES   0
 #if LV_USE_OPENGLES
     #define LV_USE_OPENGLES_DEBUG        1    /* Enable or disable debug for opengles */
+#endif
+
+/* QNX Screen display and input drivers */
+#define LV_USE_QNX              0
+#if LV_USE_QNX
+    #define LV_QNX_BUF_COUNT        1    /*1 or 2*/
 #endif
 
 /*==================

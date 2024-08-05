@@ -6,7 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_calendar.h"
+#include "../../draw/lv_draw_private.h"
+#include "../../core/lv_obj_class_private.h"
+#include "lv_calendar_private.h"
 #include "../../../lvgl.h"
 #if LV_USE_CALENDAR
 
@@ -386,7 +388,7 @@ static uint8_t get_month_length(int32_t year, int32_t month)
 {
     month--;
     if(month < 0) {
-        year--;             /*Already in the previous year (won't be less then -12 to skip a whole year)*/
+        year--;             /*Already in the previous year (won't be less than -12 to skip a whole year)*/
         month = 12 + month; /*`month` is negative, the result will be < 12*/
     }
     if(month >= 12) {

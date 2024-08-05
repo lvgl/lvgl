@@ -6,12 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../draw/lv_draw_private.h"
+#include "../../core/lv_obj_draw_private.h"
 #include "lv_snapshot.h"
 #if LV_USE_SNAPSHOT
 
 #include <stdbool.h>
 #include "../../display/lv_display.h"
-#include "../../core/lv_refr.h"
+#include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
 #include "../../stdlib/lv_string.h"
 
@@ -47,7 +49,7 @@ lv_draw_buf_t * lv_snapshot_create_draw_buf(lv_obj_t * obj, lv_color_format_t cf
     lv_obj_update_layout(obj);
     int32_t w = lv_obj_get_width(obj);
     int32_t h = lv_obj_get_height(obj);
-    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    int32_t ext_size = lv_obj_get_ext_draw_size(obj);
     w += ext_size * 2;
     h += ext_size * 2;
     if(w == 0 || h == 0) return NULL;
@@ -60,7 +62,7 @@ lv_result_t lv_snapshot_reshape_draw_buf(lv_obj_t * obj, lv_draw_buf_t * draw_bu
     lv_obj_update_layout(obj);
     int32_t w = lv_obj_get_width(obj);
     int32_t h = lv_obj_get_height(obj);
-    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    int32_t ext_size = lv_obj_get_ext_draw_size(obj);
     w += ext_size * 2;
     h += ext_size * 2;
     if(w == 0 || h == 0) return LV_RESULT_INVALID;
@@ -81,6 +83,7 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
         case LV_COLOR_FORMAT_XRGB8888:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_L8:
+        case LV_COLOR_FORMAT_I1:
             break;
         default:
             LV_LOG_WARN("Not supported color format");
@@ -96,7 +99,7 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
     lv_area_t snapshot_area;
     int32_t w = draw_buf->header.w;
     int32_t h = draw_buf->header.h;
-    int32_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    int32_t ext_size = lv_obj_get_ext_draw_size(obj);
     lv_obj_get_coords(obj, &snapshot_area);
     lv_area_increase(&snapshot_area, ext_size, ext_size);
 
@@ -110,13 +113,16 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
     layer.buf_area.y2 = snapshot_area.y1 + h - 1;
     layer.color_format = cf;
     layer._clip_area = snapshot_area;
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    lv_matrix_identity(&layer.matrix);
+#endif
 
-    lv_display_t * disp_old = _lv_refr_get_disp_refreshing();
+    lv_display_t * disp_old = lv_refr_get_disp_refreshing();
     lv_display_t * disp_new = lv_obj_get_display(obj);
     lv_layer_t * layer_old = disp_new->layer_head;
     disp_new->layer_head = &layer;
 
-    _lv_refr_set_disp_refreshing(disp_new);
+    lv_refr_set_disp_refreshing(disp_new);
     lv_obj_redraw(&layer, obj);
 
     while(layer.draw_task_head) {
@@ -125,7 +131,7 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
     }
 
     disp_new->layer_head = layer_old;
-    _lv_refr_set_disp_refreshing(disp_old);
+    lv_refr_set_disp_refreshing(disp_old);
 
     return LV_RESULT_OK;
 }
@@ -142,6 +148,26 @@ lv_draw_buf_t * lv_snapshot_take(lv_obj_t * obj, lv_color_format_t cf)
     }
 
     return draw_buf;
+}
+
+void lv_snapshot_free(lv_image_dsc_t * dsc)
+{
+    LV_LOG_WARN("Deprecated API, use lv_draw_buf_destroy directly.");
+    lv_draw_buf_destroy((lv_draw_buf_t *)dsc);
+}
+
+lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_image_dsc_t * dsc,
+                                    void * buf,
+                                    uint32_t buf_size)
+{
+    lv_draw_buf_t draw_buf;
+    LV_LOG_WARN("Deprecated API, use lv_snapshot_take_to_draw_buf instead.");
+    lv_draw_buf_init(&draw_buf, 1, 1, cf, buf_size, buf, buf_size);
+    lv_result_t res = lv_snapshot_take_to_draw_buf(obj, cf, &draw_buf);
+    if(res == LV_RESULT_OK) {
+        lv_memcpy((void *)dsc, &draw_buf, sizeof(lv_image_dsc_t));
+    }
+    return res;
 }
 
 /**********************

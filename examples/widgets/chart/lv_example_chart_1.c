@@ -16,6 +16,7 @@ void lv_example_chart_1(void)
     /*Add two data series*/
     lv_chart_series_t * ser1 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_GREEN), LV_CHART_AXIS_PRIMARY_Y);
     lv_chart_series_t * ser2 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_SECONDARY_Y);
+    int32_t * ser2_y_points = lv_chart_get_y_array(chart, ser2);
 
     uint32_t i;
     for(i = 0; i < 10; i++) {
@@ -23,7 +24,7 @@ void lv_example_chart_1(void)
         lv_chart_set_next_value(chart, ser1, lv_rand(10, 50));
 
         /*Directly set points on 'ser2'*/
-        ser2->y_points[i] = lv_rand(50, 90);
+        ser2_y_points[i] = lv_rand(50, 90);
     }
 
     lv_chart_refresh(chart); /*Required after direct set*/

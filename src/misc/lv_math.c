@@ -226,7 +226,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask)
 // Alternative Integer Square Root function
 // Contributors include Arne Steinarson for the basic approximation idea,
 // Dann Corbit and Mathew Hendry for the first cut at the algorithm,
-// Lawrence Kirby for the rearrangement, improvments and range optimization
+// Lawrence Kirby for the rearrangement, improvements and range optimization
 // and Paul Hsieh for the round-then-adjust idea.
 */
 int32_t LV_ATTRIBUTE_FAST_MEM lv_sqrt32(uint32_t x)
@@ -437,6 +437,18 @@ uint32_t lv_rand(uint32_t min, uint32_t max)
     rand_seed = x;
 
     return (rand_seed % (max - min + 1)) + min;
+}
+
+int32_t LV_ATTRIBUTE_FAST_MEM lv_trigo_cos(int16_t angle)
+{
+    return lv_trigo_sin(angle + 90);
+}
+
+int32_t lv_bezier3(int32_t t, int32_t u0, uint32_t u1, int32_t u2, int32_t u3)
+{
+    LV_UNUSED(u0);
+    LV_UNUSED(u3);
+    return lv_cubic_bezier(t, 341, u1, 683, u2);
 }
 
 /**********************

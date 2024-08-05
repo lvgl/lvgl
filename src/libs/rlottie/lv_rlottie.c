@@ -9,6 +9,8 @@
 #include "../../lvgl.h"
 #if LV_USE_RLOTTIE
 
+#include "lv_rlottie_private.h"
+#include "../../core/lv_obj_class_private.h"
 #include <rlottie_capi.h>
 #include <string.h>
 
@@ -121,7 +123,7 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
         rlottie->animation = lottie_animation_from_file(create_info.path);
     }
     if(rlottie->animation == NULL) {
-        LV_LOG_WARN("The aniamtion can't be opened");
+        LV_LOG_WARN("The animation can't be opened");
         return;
     }
 
@@ -131,18 +133,18 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
     rlottie->scanline_width = create_info.width * LV_ARGB32 / 8;
 
-    size_t allocaled_buf_size = (create_info.width * create_info.height * LV_ARGB32 / 8);
-    rlottie->allocated_buf = lv_malloc(allocaled_buf_size);
+    size_t allocated_buf_size = (create_info.width * create_info.height * LV_ARGB32 / 8);
+    rlottie->allocated_buf = lv_malloc(allocated_buf_size);
     if(rlottie->allocated_buf != NULL) {
-        rlottie->allocated_buffer_size = allocaled_buf_size;
-        memset(rlottie->allocated_buf, 0, allocaled_buf_size);
+        rlottie->allocated_buffer_size = allocated_buf_size;
+        memset(rlottie->allocated_buf, 0, allocated_buf_size);
     }
 
     rlottie->imgdsc.header.cf = LV_COLOR_FORMAT_ARGB8888;
     rlottie->imgdsc.header.h = create_info.height;
     rlottie->imgdsc.header.w = create_info.width;
     rlottie->imgdsc.data = (void *)rlottie->allocated_buf;
-    rlottie->imgdsc.data_size = allocaled_buf_size;
+    rlottie->imgdsc.data_size = allocated_buf_size;
 
     lv_image_set_src(obj, &rlottie->imgdsc);
 
@@ -187,7 +189,7 @@ static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 
 static void next_frame_task_cb(lv_timer_t * t)
 {
-    lv_obj_t * obj = t->user_data;
+    lv_obj_t * obj = lv_timer_get_user_data(t);
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
 
     if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_PAUSE) == LV_RLOTTIE_CTRL_PAUSE) {

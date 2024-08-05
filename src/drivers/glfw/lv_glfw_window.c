@@ -236,7 +236,7 @@ static void mouse_button_callback(GLFWwindow * window, int button, int action, i
     }
 }
 
-static void mouse_move_cllback(GLFWwindow * window, double xpos, double ypos)
+static void mouse_move_callback(GLFWwindow * window, double xpos, double ypos)
 {
     LV_UNUSED(window);
     lv_display_t * disp = lv_display_get_default();
@@ -309,7 +309,7 @@ static int window_create(lv_display_t * disp)
     glfwSetFramebufferSizeCallback(dsc->window, framebuffer_size_callback);
 
     glfwSetMouseButtonCallback(dsc->window, mouse_button_callback);
-    glfwSetCursorPosCallback(dsc->window, mouse_move_cllback);
+    glfwSetCursorPosCallback(dsc->window, mouse_move_callback);
 
     glfwSetKeyCallback(dsc->window, key_callback);
 

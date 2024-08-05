@@ -32,13 +32,24 @@ extern "C" {
 #include "../stdlib/builtin/lv_tlsf.h"
 
 #if LV_USE_FONT_COMPRESSED
-#include "../font/lv_font_fmt_txt.h"
+#include "../font/lv_font_fmt_txt_private.h"
 #endif
 
 #include "../tick/lv_tick.h"
 #include "../layouts/lv_layout.h"
 
 #include "../misc/lv_types.h"
+
+#include "../misc/lv_timer_private.h"
+#include "../misc/lv_anim_private.h"
+#include "../tick/lv_tick_private.h"
+#include "../draw/lv_draw_buf_private.h"
+#include "../draw/lv_draw_private.h"
+#include "../draw/sw/lv_draw_sw_private.h"
+#include "../draw/sw/lv_draw_sw_mask_private.h"
+#include "../stdlib/builtin/lv_tlsf_private.h"
+#include "../others/sysmon/lv_sysmon_private.h"
+#include "../layouts/lv_layout_private.h"
 
 /*********************
  *      DEFINES
@@ -54,18 +65,18 @@ struct _snippet_stack;
 #endif
 
 #if LV_USE_FREETYPE
-struct _lv_freetype_context_t;
+struct lv_freetype_context_t;
 #endif
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
-struct _lv_profiler_builtin_ctx_t;
+struct lv_profiler_builtin_ctx_t;
 #endif
 
 #if LV_USE_NUTTX
-struct _lv_nuttx_ctx_t;
+struct lv_nuttx_ctx_t;
 #endif
 
-typedef struct _lv_global_t {
+typedef struct lv_global_t {
     bool inited;
     bool deinit_in_progress;     /**< Can be used e.g. in the LV_EVENT_DELETE to deinit the drivers too */
 
@@ -115,7 +126,7 @@ typedef struct _lv_global_t {
     lv_draw_sw_shadow_cache_t sw_shadow_cache;
 #endif
 #if LV_DRAW_SW_COMPLEX
-    _lv_draw_sw_mask_radius_circle_dsc_arr_t sw_circle_cache;
+    lv_draw_sw_mask_radius_circle_dsc_arr_t sw_circle_cache;
 #endif
 
 #if LV_USE_LOG
@@ -171,11 +182,7 @@ typedef struct _lv_global_t {
 #endif
 
 #if LV_USE_FREETYPE
-    struct _lv_freetype_context_t * ft_context;
-#endif
-
-#if LV_USE_TINY_TTF
-    lv_cache_t * tiny_ttf_cache;
+    struct lv_freetype_context_t * ft_context;
 #endif
 
 #if LV_USE_FONT_COMPRESSED
@@ -187,7 +194,7 @@ typedef struct _lv_global_t {
 #endif
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
-    struct _lv_profiler_builtin_ctx_t * profiler_context;
+    struct lv_profiler_builtin_ctx_t * profiler_context;
 #endif
 
 #if LV_USE_FILE_EXPLORER != 0
@@ -208,7 +215,7 @@ typedef struct _lv_global_t {
 #endif
 
 #if LV_USE_NUTTX
-    struct _lv_nuttx_ctx_t * nuttx_ctx;
+    struct lv_nuttx_ctx_t * nuttx_ctx;
 #endif
 
 #if LV_USE_OS != LV_OS_NONE

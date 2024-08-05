@@ -22,8 +22,8 @@ extern "C" {
  *      DEFINES
  *********************/
 
-typedef struct _lv_vg_lite_path_t lv_vg_lite_path_t;
-typedef struct _lv_draw_vg_lite_unit_t lv_draw_vg_lite_unit_t;
+typedef struct lv_vg_lite_path_t lv_vg_lite_path_t;
+typedef struct lv_draw_vg_lite_unit_t lv_draw_vg_lite_unit_t;
 
 typedef void (*lv_vg_lite_path_iter_cb_t)(void * user_data, uint8_t op_code, const float * data, uint32_t len);
 
@@ -104,6 +104,8 @@ void lv_vg_lite_path_append_arc(lv_vg_lite_path_t * path,
                                 float start_angle,
                                 float sweep,
                                 bool pie);
+
+void lv_vg_lite_path_append_path(lv_vg_lite_path_t * dest, const lv_vg_lite_path_t * src);
 
 uint8_t lv_vg_lite_vlc_op_arg_len(uint8_t vlc_op);
 

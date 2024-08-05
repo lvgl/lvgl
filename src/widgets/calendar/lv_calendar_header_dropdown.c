@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../core/lv_obj_class_private.h"
 #include "lv_calendar_header_dropdown.h"
 #if LV_USE_CALENDAR && LV_USE_CALENDAR_HEADER_DROPDOWN
 
@@ -78,12 +79,12 @@ void lv_calendar_header_dropdown_set_year_list(lv_obj_t * parent, const char * y
     }
 
     /* Search for the year dropdown
-     * Index is 0 because in the header dropdown constructor the year dropdpwn (year_dd)
+     * Index is 0 because in the header dropdown constructor the year dropdown (year_dd)
      * is the first created child of the header */
     const int32_t year_dropdown_index = 0;
     lv_obj_t * year_dropdown = lv_obj_get_child_by_type(header, year_dropdown_index, &lv_dropdown_class);
     if(NULL == year_dropdown) {
-        /* year dropdpwn not found */
+        /* year dropdown not found */
         return;
     }
 

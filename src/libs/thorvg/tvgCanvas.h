@@ -47,7 +47,7 @@ struct Canvas::Impl
 
     ~Impl()
     {
-        //make it sure any deffered jobs
+        //make it sure any deferred jobs
         renderer->sync();
         renderer->clear();
 
@@ -66,7 +66,7 @@ struct Canvas::Impl
 
     Result push(unique_ptr<Paint> paint)
     {
-        //You can not push paints during rendering.
+        //You cannot push paints during rendering.
         if (status == Status::Drawing) return Result::InsufficientCondition;
 
         auto p = paint.release();

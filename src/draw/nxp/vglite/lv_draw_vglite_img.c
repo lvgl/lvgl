@@ -146,7 +146,7 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
     bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
     if(has_transform)
         lv_area_copy(&blend_area, &relative_coords);
-    else if(!_lv_area_intersect(&blend_area, &relative_coords, &clip_area))
+    else if(!lv_area_intersect(&blend_area, &relative_coords, &clip_area))
         return; /*Fully clipped, nothing to do*/
 
     const void * src_buf = img_dsc->data;
@@ -213,7 +213,7 @@ static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t *
 static void _move_buf_close_to_area(void ** buf, lv_area_t * area, uint32_t stride, lv_color_format_t cf)
 {
     uint8_t ** buf_u8 = (uint8_t **)buf;
-    uint8_t align_bytes = vglite_get_alignment(cf);
+    uint8_t align_bytes = vglite_get_stride_alignment(cf);
     uint8_t bits_per_pixel = lv_color_format_get_bpp(cf);
 
     uint16_t align_pixels = align_bytes * 8 / bits_per_pixel;
@@ -381,7 +381,7 @@ static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * 
     /* Path to draw */
     int32_t path_data[RECT_PATH_DATA_MAX_SIZE];
     uint32_t path_data_size;
-    vglite_create_rect_path_data(path_data, &path_data_size, 0, coords);
+    vglite_create_rect_path_data(path_data, &path_data_size, dsc->clip_radius, coords);
     vg_lite_quality_t path_quality = VG_LITE_MEDIUM;
 
     vg_lite_path_t path;
@@ -409,8 +409,8 @@ static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * 
     vg_lite_color_t vgcol = _vglite_recolor(dsc);
 
     /* Filter */
-    bool has_trasform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
-    vg_lite_filter_t filter = has_trasform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
+    bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
+    vg_lite_filter_t filter = has_transform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
 
     /* Draw Pattern */
     VGLITE_CHECK_ERROR(vg_lite_draw_pattern(dst_vgbuf, &path, VG_LITE_FILL_NON_ZERO, &path_matrix,

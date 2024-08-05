@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 
+#include "../lv_draw_vector_private.h"
 #include "lv_vg_lite_grad.h"
 
 #if LV_USE_DRAW_VG_LITE && LV_USE_VECTOR_GRAPHIC
@@ -52,7 +53,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static grad_item_t * grad_get(struct _lv_draw_vg_lite_unit_t * u, const lv_vector_gradient_t * grad);
+static grad_item_t * grad_get(struct lv_draw_vg_lite_unit_t * u, const lv_vector_gradient_t * grad);
 static void grad_cache_release_cb(void * entry, void * user_data);
 static bool grad_create_cb(grad_item_t * item, void * user_data);
 static void grad_free_cb(grad_item_t * item, void * user_data);
@@ -74,7 +75,7 @@ static vg_lite_gradient_spreadmode_t lv_spread_to_vg(lv_vector_gradient_spread_t
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_vg_lite_grad_init(struct _lv_draw_vg_lite_unit_t * u, uint32_t cache_cnt)
+void lv_vg_lite_grad_init(struct lv_draw_vg_lite_unit_t * u, uint32_t cache_cnt)
 {
     LV_ASSERT_NULL(u);
 
@@ -90,7 +91,7 @@ void lv_vg_lite_grad_init(struct _lv_draw_vg_lite_unit_t * u, uint32_t cache_cnt
     lv_vg_lite_pending_set_free_cb(u->grad_pending, grad_cache_release_cb, u->grad_cache);
 }
 
-void lv_vg_lite_grad_deinit(struct _lv_draw_vg_lite_unit_t * u)
+void lv_vg_lite_grad_deinit(struct lv_draw_vg_lite_unit_t * u)
 {
     LV_ASSERT_NULL(u);
     LV_ASSERT_NULL(u->grad_pending)
@@ -101,7 +102,7 @@ void lv_vg_lite_grad_deinit(struct _lv_draw_vg_lite_unit_t * u)
 }
 
 bool lv_vg_lite_draw_grad(
-    struct _lv_draw_vg_lite_unit_t * u,
+    struct lv_draw_vg_lite_unit_t * u,
     vg_lite_buffer_t * buffer,
     vg_lite_path_t * path,
     const lv_vector_gradient_t * grad,
@@ -153,9 +154,9 @@ bool lv_vg_lite_draw_grad(
                 vg_lite_linear_gradient_t * linear_grad = &grad_item->vg.linear;
                 vg_lite_matrix_t * grad_mat_p = vg_lite_get_grad_matrix(linear_grad);
                 LV_ASSERT_NULL(grad_mat_p);
-
-                grad_point_to_matrix(grad_mat_p, grad->x1, grad->y1, grad->x2, grad->y2);
+                vg_lite_identity(grad_mat_p);
                 lv_vg_lite_matrix_multiply(grad_mat_p, grad_matrix);
+                grad_point_to_matrix(grad_mat_p, grad->x1, grad->y1, grad->x2, grad->y2);
 
                 LV_VG_LITE_ASSERT_SRC_BUFFER(&linear_grad->image);
 
@@ -224,7 +225,7 @@ bool lv_vg_lite_draw_grad(
 }
 
 bool lv_vg_lite_draw_grad_helper(
-    struct _lv_draw_vg_lite_unit_t * u,
+    struct lv_draw_vg_lite_unit_t * u,
     vg_lite_buffer_t * buffer,
     vg_lite_path_t * path,
     const lv_area_t * area,
@@ -314,17 +315,14 @@ bool lv_vg_lite_draw_grad_helper(
             return false;
     }
 
-    vg_lite_matrix_t grad_matrix;
-    vg_lite_identity(&grad_matrix);
-
-    return lv_vg_lite_draw_grad(u, buffer, path, &grad, &grad_matrix, matrix, fill, blend);
+    return lv_vg_lite_draw_grad(u, buffer, path, &grad, matrix, matrix, fill, blend);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static grad_item_t * grad_get(struct _lv_draw_vg_lite_unit_t * u, const lv_vector_gradient_t * grad)
+static grad_item_t * grad_get(struct lv_draw_vg_lite_unit_t * u, const lv_vector_gradient_t * grad)
 {
     LV_ASSERT_NULL(u);
     LV_ASSERT_NULL(grad);
@@ -548,7 +546,6 @@ static grad_type_t lv_grad_style_to_type(lv_vector_gradient_style_t style)
 
 static void grad_point_to_matrix(vg_lite_matrix_t * grad_matrix, float x1, float y1, float x2, float y2)
 {
-    vg_lite_identity(grad_matrix);
     vg_lite_translate(x1, y1, grad_matrix);
 
     float angle = atan2f(y2 - y1, x2 - x1) * 180.0f / (float)M_PI;

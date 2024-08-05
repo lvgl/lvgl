@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "../../lvgl_private.h"
 
 #include "unity/unity.h"
 #include <string.h>
@@ -45,7 +46,7 @@ void test_read(void)
     res = lv_fs_open(&fb, "B:src/test_files/readtest.txt", LV_FS_MODE_RD);
     TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
 
-    /*Use an odd size to make sure it's not aligned with the drivier's'cache size*/
+    /*Use an odd size to make sure it's not aligned with the driver's cache size*/
     uint8_t buf[79];
     uint32_t cnt = 0;
     uint32_t br = 1;

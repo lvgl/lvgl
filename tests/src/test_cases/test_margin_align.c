@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "../../lvgl_private.h"
 
 #include "unity/unity.h"
 
@@ -33,7 +34,7 @@ void obj_set_margin(lv_obj_t * obj, int32_t left, int32_t top, int32_t right, in
     lv_obj_set_style_margin_bottom(obj, bottom, LV_PART_MAIN);
 }
 
-// takes no effect on postiton but size.
+// takes no effect on position but size.
 void test_align(void)
 {
     lv_obj_t * obj0 = active_screen;

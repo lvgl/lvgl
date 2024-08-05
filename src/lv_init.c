@@ -6,11 +6,21 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "others/sysmon/lv_sysmon_private.h"
+#include "misc/lv_timer_private.h"
+#include "misc/lv_profiler_builtin_private.h"
+#include "misc/lv_anim_private.h"
+#include "draw/lv_image_decoder_private.h"
+#include "draw/lv_draw_buf_private.h"
+#include "core/lv_refr_private.h"
+#include "core/lv_obj_style_private.h"
+#include "core/lv_group_private.h"
+#include "lv_init.h"
 #include "core/lv_global.h"
 #include "core/lv_obj.h"
 #include "display/lv_display_private.h"
 #include "indev/lv_indev_private.h"
-#include "layouts/lv_layout.h"
+#include "layouts/lv_layout_private.h"
 #include "libs/bin_decoder/lv_bin_decoder.h"
 #include "libs/bmp/lv_bmp.h"
 #include "libs/ffmpeg/lv_ffmpeg.h"
@@ -21,8 +31,12 @@
 #include "libs/libjpeg_turbo/lv_libjpeg_turbo.h"
 #include "libs/lodepng/lv_lodepng.h"
 #include "libs/libpng/lv_libpng.h"
+#include "libs/tiny_ttf/lv_tiny_ttf.h"
 #include "draw/lv_draw.h"
 #include "misc/lv_async.h"
+#include "misc/lv_fs_private.h"
+#include "widgets/span/lv_span.h"
+#include "themes/simple/lv_theme_simple.h"
 #include "misc/lv_fs.h"
 #include "osal/lv_os_private.h"
 
@@ -88,14 +102,14 @@ static inline void lv_global_init(lv_global_t * global)
 
     lv_memzero(global, sizeof(lv_global_t));
 
-    _lv_ll_init(&(global->disp_ll), sizeof(lv_display_t));
-    _lv_ll_init(&(global->indev_ll), sizeof(lv_indev_t));
+    lv_ll_init(&(global->disp_ll), sizeof(lv_display_t));
+    lv_ll_init(&(global->indev_ll), sizeof(lv_indev_t));
 
     global->memory_zero = ZERO_MEM_SENTINEL;
     global->style_refresh = true;
-    global->layout_count = _LV_LAYOUT_LAST;
-    global->style_last_custom_prop_id = (uint32_t)_LV_STYLE_LAST_BUILT_IN_PROP;
-    global->event_last_register_id = _LV_EVENT_LAST;
+    global->layout_count = LV_LAYOUT_LAST;
+    global->style_last_custom_prop_id = (uint32_t)LV_STYLE_LAST_BUILT_IN_PROP;
+    global->event_last_register_id = LV_EVENT_LAST;
     lv_rand_set_seed(0x1234ABCD);
 
 #ifdef LV_LOG_PRINT_CB
@@ -109,14 +123,14 @@ static inline void lv_global_init(lv_global_t * global)
 #endif
 }
 
-static inline void _lv_cleanup_devices(lv_global_t * global)
+static inline void lv_cleanup_devices(lv_global_t * global)
 {
     LV_ASSERT_NULL(global);
 
     if(global) {
         /* cleanup indev and display */
-        _lv_ll_clear_custom(&(global->indev_ll), (void (*)(void *)) lv_indev_delete);
-        _lv_ll_clear_custom(&(global->disp_ll), (void (*)(void *)) lv_display_delete);
+        lv_ll_clear_custom(&(global->indev_ll), (void (*)(void *)) lv_indev_delete);
+        lv_ll_clear_custom(&(global->disp_ll), (void (*)(void *)) lv_display_delete);
     }
 }
 
@@ -150,7 +164,7 @@ void lv_init(void)
 
     lv_mem_init();
 
-    _lv_draw_buf_init_handlers();
+    lv_draw_buf_init_handlers();
 
 #if LV_USE_SPAN != 0
     lv_span_stack_init();
@@ -164,15 +178,15 @@ void lv_init(void)
 
     lv_os_init();
 
-    _lv_timer_core_init();
+    lv_timer_core_init();
 
-    _lv_fs_init();
+    lv_fs_init();
 
-    _lv_layout_init();
+    lv_layout_init();
 
-    _lv_anim_core_init();
+    lv_anim_core_init();
 
-    _lv_group_init();
+    lv_group_init();
 
     lv_draw_init();
 
@@ -200,16 +214,16 @@ void lv_init(void)
     lv_windows_platform_init();
 #endif
 
-    _lv_obj_style_init();
+    lv_obj_style_init();
 
     /*Initialize the screen refresh system*/
-    _lv_refr_init();
+    lv_refr_init();
 
 #if LV_USE_SYSMON
-    _lv_sysmon_builtin_init();
+    lv_sysmon_builtin_init();
 #endif
 
-    _lv_image_decoder_init(LV_CACHE_DEF_SIZE, LV_IMAGE_HEADER_CACHE_DEF_CNT);
+    lv_image_decoder_init(LV_CACHE_DEF_SIZE, LV_IMAGE_HEADER_CACHE_DEF_CNT);
     lv_bin_decoder_init();  /*LVGL built-in binary image decoder*/
 
 #if LV_USE_DRAW_VG_LITE
@@ -316,10 +330,6 @@ void lv_init(void)
     lv_freetype_init(LV_FREETYPE_CACHE_FT_GLYPH_CNT);
 #endif
 
-#if LV_USE_TINY_TTF
-    lv_tiny_ttf_init();
-#endif
-
     lv_initialized = true;
 
     LV_LOG_TRACE("finished");
@@ -338,12 +348,12 @@ void lv_deinit(void)
     lv_deinit_in_progress = true;
 
 #if LV_USE_SYSMON
-    _lv_sysmon_builtin_deinit();
+    lv_sysmon_builtin_deinit();
 #endif
 
     lv_display_set_default(NULL);
 
-    _lv_cleanup_devices(LV_GLOBAL_DEFAULT());
+    lv_cleanup_devices(LV_GLOBAL_DEFAULT());
 
 #if LV_USE_SPAN != 0
     lv_span_stack_deinit();
@@ -355,10 +365,6 @@ void lv_deinit(void)
 
 #if LV_USE_FREETYPE
     lv_freetype_uninit();
-#endif
-
-#if LV_USE_TINY_TTF
-    lv_tiny_ttf_deinit();
 #endif
 
 #if LV_USE_THEME_DEFAULT
@@ -373,11 +379,11 @@ void lv_deinit(void)
     lv_theme_mono_deinit();
 #endif
 
-    _lv_image_decoder_deinit();
+    lv_image_decoder_deinit();
 
-    _lv_refr_deinit();
+    lv_refr_deinit();
 
-    _lv_obj_style_deinit();
+    lv_obj_style_deinit();
 
 #if LV_USE_DRAW_PXP
     lv_draw_pxp_deinit();
@@ -397,15 +403,15 @@ void lv_deinit(void)
 
     lv_draw_deinit();
 
-    _lv_group_deinit();
+    lv_group_deinit();
 
-    _lv_anim_core_deinit();
+    lv_anim_core_deinit();
 
-    _lv_layout_deinit();
+    lv_layout_deinit();
 
-    _lv_fs_deinit();
+    lv_fs_deinit();
 
-    _lv_timer_core_deinit();
+    lv_timer_core_deinit();
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
     lv_profiler_builtin_uninit();

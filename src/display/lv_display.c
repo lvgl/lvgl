@@ -6,9 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../misc/lv_event_private.h"
+#include "../misc/lv_anim_private.h"
+#include "../draw/lv_draw_private.h"
+#include "../core/lv_obj_private.h"
 #include "lv_display.h"
 #include "../misc/lv_math.h"
-#include "../core/lv_refr.h"
+#include "../core/lv_refr_private.h"
 #include "../display/lv_display_private.h"
 #include "../stdlib/lv_string.h"
 #include "../themes/lv_theme.h"
@@ -57,7 +61,7 @@ static void disp_event_cb(lv_event_t * e);
 
 lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
 {
-    lv_display_t * disp = _lv_ll_ins_head(disp_ll_p);
+    lv_display_t * disp = lv_ll_ins_head(disp_ll_p);
     LV_ASSERT_MALLOC(disp);
     if(!disp) return NULL;
 
@@ -87,13 +91,13 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->inv_en_cnt = 1;
     disp->last_activity_time = lv_tick_get();
 
-    _lv_ll_init(&disp->sync_areas, sizeof(lv_area_t));
+    lv_ll_init(&disp->sync_areas, sizeof(lv_area_t));
 
     lv_display_t * disp_def_tmp = disp_def;
     disp_def                 = disp; /*Temporarily change the default screen to create the default screens on the
                                         new display*/
     /*Create a refresh timer*/
-    disp->refr_timer = lv_timer_create(_lv_display_refr_timer, LV_DEF_REFR_PERIOD, disp);
+    disp->refr_timer = lv_timer_create(lv_display_refr_timer, LV_DEF_REFR_PERIOD, disp);
     LV_ASSERT_MALLOC(disp->refr_timer);
     if(disp->refr_timer == NULL) {
         lv_free(disp);
@@ -187,12 +191,12 @@ void lv_display_delete(lv_display_t * disp)
     disp->act_scr = NULL;
 
     while(disp->screen_cnt != 0) {
-        /*Delete the screenst*/
+        /*Delete the screens*/
         lv_obj_delete(disp->screens[0]);
     }
 
-    _lv_ll_clear(&disp->sync_areas);
-    _lv_ll_remove(disp_ll_p, disp);
+    lv_ll_clear(&disp->sync_areas);
+    lv_ll_remove(disp_ll_p, disp);
     if(disp->refr_timer) lv_timer_delete(disp->refr_timer);
 
     if(disp->layer_deinit) disp->layer_deinit(disp, disp->layer_head);
@@ -200,7 +204,7 @@ void lv_display_delete(lv_display_t * disp)
 
     lv_free(disp);
 
-    if(was_default) lv_display_set_default(_lv_ll_get_head(disp_ll_p));
+    if(was_default) lv_display_set_default(lv_ll_get_head(disp_ll_p));
 }
 
 void lv_display_set_default(lv_display_t * disp)
@@ -216,9 +220,9 @@ lv_display_t * lv_display_get_default(void)
 lv_display_t * lv_display_get_next(lv_display_t * disp)
 {
     if(disp == NULL)
-        return _lv_ll_get_head(disp_ll_p);
+        return lv_ll_get_head(disp_ll_p);
     else
-        return _lv_ll_get_next(disp_ll_p, disp);
+        return lv_ll_get_next(disp_ll_p, disp);
 }
 
 /*---------------------
@@ -570,7 +574,7 @@ lv_obj_t * lv_display_get_layer_bottom(lv_display_t * disp)
     return disp->bottom_layer;
 }
 
-void lv_screen_load(struct _lv_obj_t * scr)
+void lv_screen_load(struct lv_obj_t * scr)
 {
     lv_screen_load_anim(scr, LV_SCR_LOAD_ANIM_NONE, 0, 0, false);
 }
@@ -592,10 +596,8 @@ void lv_screen_load_anim(lv_obj_t * new_scr, lv_screen_load_anim_t anim_type, ui
         lv_obj_set_pos(d->scr_to_load, 0, 0);
         lv_obj_remove_local_style_prop(d->scr_to_load, LV_STYLE_OPA, 0);
 
-        if(d->del_prev) {
-            lv_obj_delete(act_scr);
-        }
-        act_scr = d->act_scr; /*Active screen changed.*/
+        d->prev_scr = d->act_scr;
+        act_scr = d->scr_to_load; /*Active screen changed.*/
 
         scr_load_internal(d->scr_to_load);
     }
@@ -962,6 +964,36 @@ void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area)
             area->y1 = area->y2 - w + 1;
             break;
     }
+}
+
+lv_obj_t * lv_screen_active(void)
+{
+    return lv_display_get_screen_active(lv_display_get_default());
+}
+
+lv_obj_t * lv_layer_top(void)
+{
+    return lv_display_get_layer_top(lv_display_get_default());
+}
+
+lv_obj_t * lv_layer_sys(void)
+{
+    return lv_display_get_layer_sys(lv_display_get_default());
+}
+
+lv_obj_t * lv_layer_bottom(void)
+{
+    return lv_display_get_layer_bottom(lv_display_get_default());
+}
+
+int32_t lv_dpx(int32_t n)
+{
+    return LV_DPX(n);
+}
+
+int32_t lv_display_dpx(const lv_display_t * disp, int32_t n)
+{
+    return LV_DPX_CALC(lv_display_get_dpi(disp), n);
 }
 
 /**********************

@@ -6,11 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_draw.h"
+#include "../lv_draw_private.h"
 #if LV_USE_DRAW_SW
 
 #include "../../core/lv_refr.h"
-#include "lv_draw_sw.h"
+#include "lv_draw_sw_private.h"
 #include "../../display/lv_display_private.h"
 #include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
@@ -27,6 +27,10 @@
     #include "arm2d/lv_draw_sw_helium.h"
 #elif LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_CUSTOM
     #include LV_DRAW_SW_ASM_CUSTOM_INCLUDE
+#endif
+
+#if LV_DRAW_SW_DRAW_UNIT_CNT > 1 && LV_USE_OS == LV_OS_NONE
+    #error "OS support is required when more than one SW rendering units are enabled"
 #endif
 
 /*********************
@@ -222,25 +226,56 @@ void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px)
 
 }
 
-void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t src_height, int32_t src_sride,
+void lv_draw_sw_i1_invert(void * buf, uint32_t buf_size)
+{
+    if(buf == NULL) return;
+
+    uint8_t * byte_buf = (uint8_t *)buf;
+    uint32_t i;
+
+    /*Make the buffer aligned*/
+    while(((uintptr_t)(byte_buf) & (sizeof(int) - 1)) && buf_size > 0) {
+        *byte_buf = ~(*byte_buf);
+        byte_buf++;
+        buf_size--;
+    }
+
+    if(buf_size >= sizeof(uint32_t)) {
+        uint32_t * aligned_addr = (uint32_t *)byte_buf;
+        uint32_t word_count = buf_size / 4;
+
+        for(i = 0; i < word_count; ++i) {
+            aligned_addr[i] = ~aligned_addr[i];
+        }
+
+        byte_buf = (uint8_t *)(aligned_addr + word_count);
+        buf_size = buf_size % sizeof(uint32_t);
+    }
+
+    for(i = 0; i < buf_size; ++i) {
+        byte_buf[i] = ~byte_buf[i];
+    }
+}
+
+void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t src_height, int32_t src_stride,
                        int32_t dest_stride, lv_display_rotation_t rotation, lv_color_format_t color_format)
 {
     if(rotation == LV_DISPLAY_ROTATION_90) {
         switch(color_format) {
 #if LV_DRAW_SW_SUPPORT_RGB565
             case LV_COLOR_FORMAT_RGB565:
-                rotate90_rgb565(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate90_rgb565(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
 #endif
 #if LV_DRAW_SW_SUPPORT_RGB888
             case LV_COLOR_FORMAT_RGB888:
-                rotate90_rgb888(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate90_rgb888(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
 #endif
 #if LV_DRAW_SW_SUPPORT_ARGB8888 || LV_DRAW_SW_SUPPORT_XRGB8888
             case LV_COLOR_FORMAT_XRGB8888:
             case LV_COLOR_FORMAT_ARGB8888:
-                rotate90_argb8888(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate90_argb8888(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
 #endif
             default:
@@ -254,18 +289,18 @@ void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t
         switch(color_format) {
 #if LV_DRAW_SW_SUPPORT_RGB565
             case LV_COLOR_FORMAT_RGB565:
-                rotate180_rgb565(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate180_rgb565(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
 #endif
 #if LV_DRAW_SW_SUPPORT_RGB888
             case LV_COLOR_FORMAT_RGB888:
-                rotate180_rgb888(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate180_rgb888(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
 #endif
 #if LV_DRAW_SW_SUPPORT_ARGB8888 || LV_DRAW_SW_SUPPORT_XRGB8888
             case LV_COLOR_FORMAT_XRGB8888:
             case LV_COLOR_FORMAT_ARGB8888:
-                rotate180_argb8888(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate180_argb8888(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
 #endif
             default:
@@ -279,18 +314,18 @@ void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t
         switch(color_format) {
 #if LV_DRAW_SW_SUPPORT_RGB565
             case LV_COLOR_FORMAT_RGB565:
-                rotate270_rgb565(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate270_rgb565(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
 #endif
 #if LV_DRAW_SW_SUPPORT_RGB888
             case LV_COLOR_FORMAT_RGB888:
-                rotate270_rgb888(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate270_rgb888(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
 #endif
 #if LV_DRAW_SW_SUPPORT_ARGB8888 || LV_DRAW_SW_SUPPORT_XRGB8888
             case LV_COLOR_FORMAT_XRGB8888:
             case LV_COLOR_FORMAT_ARGB8888:
-                rotate270_argb8888(src, dest, src_width, src_height, src_sride, dest_stride);
+                rotate270_argb8888(src, dest, src_width, src_height, src_stride, dest_stride);
                 break;
 #endif
             default:
@@ -368,13 +403,13 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_SW);
     if(t == NULL) {
         LV_PROFILER_END;
-        return -1;
+        return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
     }
 
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(buf == NULL) {
         LV_PROFILER_END;
-        return -1;
+        return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
     }
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
@@ -471,7 +506,7 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
     /*Layers manage it for themselves*/
     if(t->type != LV_DRAW_TASK_TYPE_LAYER) {
         lv_area_t draw_area;
-        if(!_lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area)) return;
+        if(!lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area)) return;
 
         int32_t idx = 0;
         lv_draw_unit_t * draw_unit_tmp = _draw_info.unit_head;
@@ -481,7 +516,7 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
         }
         lv_draw_rect_dsc_t rect_dsc;
         lv_draw_rect_dsc_init(&rect_dsc);
-        rect_dsc.bg_color = lv_palette_main(idx % _LV_PALETTE_LAST);
+        rect_dsc.bg_color = lv_palette_main(idx % LV_PALETTE_LAST);
         rect_dsc.border_color = rect_dsc.bg_color;
         rect_dsc.bg_opa = LV_OPA_10;
         rect_dsc.border_opa = LV_OPA_80;

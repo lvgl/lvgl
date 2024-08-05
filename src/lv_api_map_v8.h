@@ -143,8 +143,8 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_disp_trig_activity            lv_display_trigger_activity
 #define lv_disp_enable_invalidation      lv_display_enable_invalidation
 #define lv_disp_is_invalidation_enabled  lv_display_is_invalidation_enabled
-#define _lv_disp_refr_timer              _lv_display_refr_timer
-#define _lv_disp_get_refr_timer          lv_display_get_refr_timer
+#define lv_disp_refr_timer              lv_display_refr_timer
+#define lv_disp_get_refr_timer          lv_display_get_refr_timer
 
 #define lv_timer_del                    lv_timer_delete
 

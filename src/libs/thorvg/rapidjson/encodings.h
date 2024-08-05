@@ -452,7 +452,7 @@ struct UTF32 {
     }
 };
 
-//! UTF-32 little endian enocoding.
+//! UTF-32 little endian encoding.
 template<typename CharType = unsigned>
 struct UTF32LE : UTF32<CharType> {
     template <typename InputByteStream>
@@ -609,7 +609,7 @@ enum UTFType {
 };
 
 //! Dynamically select encoding according to stream's runtime-specified UTF encoding type.
-/*! \note This class can be used with AutoUTFInputtStream and AutoUTFOutputStream, which provides GetType().
+/*! \note This class can be used with AutoUTFInputStream and AutoUTFOutputStream, which provides GetType().
 */
 template<typename CharType>
 struct AutoUTF {

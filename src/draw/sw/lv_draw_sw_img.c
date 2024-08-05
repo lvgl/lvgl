@@ -6,13 +6,18 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../misc/lv_area_private.h"
+#include "blend/lv_draw_sw_blend_private.h"
+#include "../lv_image_decoder_private.h"
+#include "../lv_draw_image_private.h"
+#include "../lv_draw_private.h"
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
 #include "../../display/lv_display.h"
 #include "../../display/lv_display_private.h"
 #include "../../misc/lv_log.h"
-#include "../../core/lv_refr.h"
+#include "../../core/lv_refr_private.h"
 #include "../../stdlib/lv_mem.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_color.h"
@@ -28,7 +33,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MAX_BUF_SIZE (uint32_t) (4 * lv_display_get_horizontal_resolution(_lv_refr_get_disp_refreshing()) * lv_color_format_get_size(lv_display_get_color_format(_lv_refr_get_disp_refreshing())))
+#define MAX_BUF_SIZE (uint32_t) (4 * lv_display_get_horizontal_resolution(lv_refr_get_disp_refreshing()) * lv_color_format_get_size(lv_display_get_color_format(lv_refr_get_disp_refreshing())))
 
 #ifndef LV_DRAW_SW_IMAGE
     #define LV_DRAW_SW_IMAGE(...)   LV_RESULT_INVALID
@@ -85,8 +90,8 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
         int32_t w = lv_area_get_width(coords);
         int32_t h = lv_area_get_height(coords);
 
-        _lv_image_buf_get_transformed_area(&area_rot, w, h, draw_dsc->rotation, draw_dsc->scale_x, draw_dsc->scale_y,
-                                           &draw_dsc->pivot);
+        lv_image_buf_get_transformed_area(&area_rot, w, h, draw_dsc->rotation, draw_dsc->scale_x, draw_dsc->scale_y,
+                                          &draw_dsc->pivot);
 
         area_rot.x1 += coords->x1;
         area_rot.y1 += coords->y1;
@@ -94,7 +99,7 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
         area_rot.y2 += coords->y1;
     }
     lv_area_t draw_area;
-    if(!_lv_area_intersect(&draw_area, &area_rot, draw_unit->clip_area)) return;
+    if(!lv_area_intersect(&draw_area, &area_rot, draw_unit->clip_area)) return;
 #endif
 
 #if LV_USE_LAYER_DEBUG
@@ -123,13 +128,13 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
 
     lv_draw_fill_dsc_t fill_dsc;
     lv_draw_rect_dsc_init(&fill_dsc);
-    fill_dsc.color = lv_palette_main(idx % _LV_PALETTE_LAST);
+    fill_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
     fill_dsc.opa = LV_OPA_10;
     lv_draw_sw_fill(draw_unit, &fill_dsc, &area_rot);
 
     lv_draw_border_dsc_t border_dsc;
     lv_draw_border_dsc_init(&border_dsc);
-    border_dsc.color = lv_palette_main(idx % _LV_PALETTE_LAST);
+    border_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
     border_dsc.opa = LV_OPA_100;
     border_dsc.width = 2;
     lv_draw_sw_border(draw_unit, &border_dsc, &area_rot);
@@ -161,10 +166,10 @@ void lv_draw_sw_image(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
                       const lv_area_t * coords)
 {
     if(!draw_dsc->tile) {
-        _lv_draw_image_normal_helper(draw_unit, draw_dsc, coords, img_draw_core);
+        lv_draw_image_normal_helper(draw_unit, draw_dsc, coords, img_draw_core);
     }
     else {
-        _lv_draw_image_tiled_helper(draw_unit, draw_dsc, coords, img_draw_core);
+        lv_draw_image_tiled_helper(draw_unit, draw_dsc, coords, img_draw_core);
     }
 }
 
@@ -195,7 +200,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
 
     if(!transformed && !masked && cf == LV_COLOR_FORMAT_A8) {
         lv_area_t clipped_coords;
-        if(!_lv_area_intersect(&clipped_coords, img_coords, draw_unit->clip_area)) return;
+        if(!lv_area_intersect(&clipped_coords, img_coords, draw_unit->clip_area)) return;
 
         blend_dsc.mask_buf = (lv_opa_t *)src_buf;
         blend_dsc.mask_area = img_coords;
@@ -270,7 +275,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
 
         if(decoder_res == LV_RESULT_OK) lv_image_decoder_close(&mask_decoder_dsc);
     }
-    /* check whether it is possible to accelerate the operation in synchronouse mode */
+    /* check whether it is possible to accelerate the operation in synchronous mode */
     else if(LV_RESULT_INVALID == LV_DRAW_SW_IMAGE(transformed,      /* whether require transform */
                                                   cf,               /* image format */
                                                   src_buf,          /* image buffer */
@@ -430,7 +435,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
                         c_mult[1] = color.green * mix;
                         c_mult[2] = color.red * mix;
                         uint8_t * tmp_buf_2 = tmp_buf;
-                        for(i = 0; i < size * px_size; i += px_size) {
+                        for(i = 0; i < (uint32_t)(size * px_size); i += px_size) {
                             tmp_buf_2[i + 0] = (c_mult[0] + (tmp_buf_2[i + 0] * mix_inv)) >> 8;
                             tmp_buf_2[i + 1] = (c_mult[1] + (tmp_buf_2[i + 1] * mix_inv)) >> 8;
                             tmp_buf_2[i + 2] = (c_mult[2] + (tmp_buf_2[i + 2] * mix_inv)) >> 8;

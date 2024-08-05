@@ -79,6 +79,8 @@ Usage
             return -1;
         }
 
+        lv_lock();
+
         lv_indev_t* pointer_device = lv_windows_acquire_pointer_indev(display);
         if (!pointer_device)
         {
@@ -98,6 +100,8 @@ Usage
         }
 
         lv_demo_widgets();
+
+        lv_unlock();
 
         while (1)
         {

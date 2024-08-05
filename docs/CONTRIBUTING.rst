@@ -218,4 +218,4 @@ Use GPL licensed code
 ^^^^^^^^^^^^^^^^^^^^^
 
 The GPL license is not compatible with the MIT license. Therefore, LVGL
-can not accept GPL licensed code.
+cannot accept GPL licensed code.
