@@ -322,23 +322,14 @@
 /* The stack size of the drawing thread.
  * NOTE: If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
  */
-#if (LV_USE_FREETYPE || LV_USE_THORVG)
-  #ifndef LV_DRAW_THREAD_STACK_SIZE
-      #ifdef CONFIG_LV_DRAW_THREAD_STACK_SIZE
-          #define LV_DRAW_THREAD_STACK_SIZE CONFIG_LV_DRAW_THREAD_STACK_SIZE
-      #else
-          #define LV_DRAW_THREAD_STACK_SIZE (32*1024) //needs to be larger for thorvg
-      #endif
-  #endif
-#else
-  #ifndef LV_DRAW_THREAD_STACK_SIZE
-      #ifdef CONFIG_LV_DRAW_THREAD_STACK_SIZE
-          #define LV_DRAW_THREAD_STACK_SIZE CONFIG_LV_DRAW_THREAD_STACK_SIZE
-      #else
-          #define LV_DRAW_THREAD_STACK_SIZE    (8 * 1024)   /*[bytes]*/
-      #endif
-  #endif
-#endif // (LV_USE_FREETYPE || LV_USE_THORVG)
+#ifndef LV_DRAW_THREAD_STACK_SIZE
+    #ifdef CONFIG_LV_DRAW_THREAD_STACK_SIZE
+        #define LV_DRAW_THREAD_STACK_SIZE CONFIG_LV_DRAW_THREAD_STACK_SIZE
+    #else
+        #define LV_DRAW_THREAD_STACK_SIZE    (8 * 1024)   /*[bytes]*/
+    #endif
+#endif
+
 #ifndef LV_USE_DRAW_SW
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_DRAW_SW
