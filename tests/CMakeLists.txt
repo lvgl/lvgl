@@ -17,6 +17,9 @@ project(lvgl_tests LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_C_STANDARD 99)
 
+#porject options
+set(LV_CONF_BUILD_THORVG_INTERNAL ON)
+
 set(FLAG_CHECK_WHITELIST --coverage -fsanitize=address -Werror)
 
 include(CheckCCompilerFlag)
@@ -460,7 +463,10 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
     if(CONFIG_LV_BUILD_EXAMPLES)
       list(APPEND TEST_LINK_LIBS lvgl_examples)
     endif()
-    list(APPEND TEST_LINK_LIBS lvgl lvgl_thorvg)
+    list(APPEND TEST_LINK_LIBS lvgl)
+    if(LV_CONF_BUILD_THORVG_INTERNAL)
+      list(APPEND TEST_LINK_LIBS lvgl_thorvg)
+    endif()
 
     list(APPEND TEST_LINK_LIBS 
     ${PNG_LIBRARIES}
