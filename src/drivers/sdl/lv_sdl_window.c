@@ -357,7 +357,7 @@ static void window_create(lv_display_t * disp)
 
     int32_t hor_res = disp->hor_res;
     int32_t ver_res = disp->ver_res;
-    dsc->window = SDL_CreateWindow("LVGL Simulator",
+    dsc->window = SDL_CreateWindow(LV_SDL_WINDOW_TITLE,
                                    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                    hor_res * dsc->zoom, ver_res * dsc->zoom, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
 

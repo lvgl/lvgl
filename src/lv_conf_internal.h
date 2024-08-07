@@ -3084,6 +3084,13 @@
             #define LV_SDL_MOUSEWHEEL_MODE  LV_SDL_MOUSEWHEEL_MODE_ENCODER  /*LV_SDL_MOUSEWHEEL_MODE_ENCODER/CROWN*/
         #endif
     #endif
+    #ifndef LV_SDL_WINDOW_TITLE
+        #ifdef CONFIG_LV_SDL_WINDOW_TITLE
+            #define LV_SDL_WINDOW_TITLE CONFIG_LV_SDL_WINDOW_TITLE
+        #else
+            #define LV_SDL_WINDOW_TITLE     "LVGL Simulator"    /*Customize the SDL Window Title*/
+        #endif
+    #endif
 #endif
 
 /*Use X11 to open window on Linux desktop and handle mouse and keyboard*/
