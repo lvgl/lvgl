@@ -93,7 +93,6 @@ lv_scrollbar_mode_t lv_obj_get_scrollbar_mode(const lv_obj_t * obj);
 /**
  * Get the object in which directions can be scrolled
  * @param obj       pointer to an object
- * @param dir       the allow scroll directions. An element or OR-ed values of `lv_dir_t`
  */
 lv_dir_t lv_obj_get_scroll_dir(const lv_obj_t * obj);
 

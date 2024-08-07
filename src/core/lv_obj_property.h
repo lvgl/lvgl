@@ -157,7 +157,6 @@ lv_result_t lv_obj_set_properties(lv_obj_t * obj, const lv_property_t * value, u
  * If id is a style property, the style selector is default to 0.
  * @param obj       pointer to an object
  * @param id        ID of which property to read
- * @param value     pointer to a buffer to store the value
  * @return          return the property value read. The returned property ID is set to `LV_PROPERTY_ID_INVALID` if failed.
  */
 lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id);

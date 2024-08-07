@@ -192,12 +192,15 @@ void lv_event_stop_processing(lv_event_t * e);
  * Register a new, custom event ID.
  * It can be used the same way as e.g. `LV_EVENT_CLICKED` to send custom events
  * @return      the new event id
- * @example
+ *
+ * Example:
+ * @code
  * uint32_t LV_EVENT_MINE = 0;
  * ...
  * e = lv_event_register_id();
  * ...
  * lv_obj_send_event(obj, LV_EVENT_MINE, &some_data);
+ * @endcode
  */
 uint32_t lv_event_register_id(void);
 

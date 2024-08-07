@@ -41,8 +41,8 @@ extern "C" {
  * @param base   Pointer to first element to search
  * @param n      Number of elements
  * @param size   Size of each element
- * @param cmp    Pointer to comparison function (see #unicode_list_compare as a comparison function
- * example)
+ * @param cmp    Pointer to comparison function (see unicode_list_compare() as a comparison
+ *                   function example)
  *
  * @return a pointer to a matching item, or NULL if none exists.
  */
