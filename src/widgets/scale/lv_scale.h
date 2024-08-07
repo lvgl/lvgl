@@ -54,6 +54,8 @@ typedef enum {
     LV_SCALE_MODE_LAST
 } lv_scale_mode_t;
 
+#define LV_SCALE_LABEL_ROTATE_MATCH_TICKS  0x100000
+
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_scale_class;
 
 /**********************
