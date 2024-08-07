@@ -6,8 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../core/lv_obj_class_private.h"
 #include "lv_ime_pinyin_private.h"
+#include "../../core/lv_obj_class_private.h"
 #if LV_USE_IME_PINYIN != 0
 
 #include "../../lvgl.h"

@@ -6,12 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_roller_private.h"
 #include "../label/lv_label_private.h"
 #include "../../misc/lv_area_private.h"
 #include "../../misc/lv_anim_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "lv_roller_private.h"
 #if LV_USE_ROLLER != 0
 
 #include "../../misc/lv_assert.h"

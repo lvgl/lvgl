@@ -6,10 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_span_private.h"
 #include "../../misc/lv_area_private.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "lv_span_private.h"
 
 #if LV_USE_SPAN != 0
 

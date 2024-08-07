@@ -6,9 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_file_explorer_private.h"
 #include "../../misc/lv_fs_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "lv_file_explorer_private.h"
 #if LV_USE_FILE_EXPLORER != 0
 
 #include "../../lvgl.h"

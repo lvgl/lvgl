@@ -6,9 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_draw_vector_private.h"
 #include "../misc/lv_area_private.h"
 #include "lv_draw_private.h"
-#include "lv_draw_vector_private.h"
 
 #if LV_USE_VECTOR_GRAPHIC
 

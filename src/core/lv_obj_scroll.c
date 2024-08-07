@@ -6,8 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../misc/lv_anim_private.h"
 #include "lv_obj_scroll_private.h"
+#include "../misc/lv_anim_private.h"
 #include "lv_obj_private.h"
 #include "../indev/lv_indev.h"
 #include "../indev/lv_indev_scroll.h"
