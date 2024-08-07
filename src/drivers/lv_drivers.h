@@ -39,6 +39,7 @@ extern "C" {
 
 #include "glfw/lv_glfw_window.h"
 #include "glfw/lv_opengles_texture.h"
+#include "glfw/lv_opengles_driver.h"
 
 #include "qnx/lv_qnx.h"
 

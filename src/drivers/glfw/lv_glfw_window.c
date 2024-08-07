@@ -54,6 +54,8 @@ static void framebuffer_size_callback(GLFWwindow * window, int width, int height
 /**********************
  *  STATIC VARIABLES
  **********************/
+static bool glfw_inited;
+static bool glew_inited;
 static lv_timer_t * update_handler_timer;
 static lv_ll_t glfw_window_ll;
 
@@ -90,11 +92,7 @@ lv_glfw_window_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res, bool 
     window->hor_res = hor_res;
     window->ver_res = ver_res;
     lv_ll_init(&window->textures, sizeof(lv_glfw_texture_t));
-    window->mouse_last_point.x = 0;
-    window->mouse_last_point.y = 0;
-    window->mouse_last_state = LV_INDEV_STATE_RELEASED;
     window->use_indev = use_mouse_indev;
-    window->closing = 0;
 
     glfwSetWindowUserPointer(window->window, window);
     lv_glfw_timer_init();
@@ -124,11 +122,6 @@ void lv_glfw_window_delete(lv_glfw_window_t * window)
     }
 }
 
-void lv_glfw_window_make_context_current(lv_glfw_window_t * window)
-{
-    glfwMakeContextCurrent(window->window);
-}
-
 lv_glfw_texture_t * lv_glfw_window_add_texture(lv_glfw_window_t * window, unsigned int texture_id, int32_t w, int32_t h)
 {
     lv_glfw_texture_t * texture = lv_ll_ins_tail(&window->textures);
@@ -154,6 +147,7 @@ lv_glfw_texture_t * lv_glfw_window_add_texture(lv_glfw_window_t * window, unsign
             lv_indev_set_read_cb(indev, indev_read_cb);
             lv_indev_set_driver_data(indev, texture);
             lv_indev_set_mode(indev, LV_INDEV_MODE_EVENT);
+            lv_indev_set_display(indev, texture_disp);
         }
     }
 
@@ -184,13 +178,17 @@ void lv_glfw_texture_set_opa(lv_glfw_texture_t * texture, lv_opa_t opa)
     texture->opa = opa;
 }
 
+lv_indev_t * lv_glfw_texture_get_mouse_indev(lv_glfw_texture_t * texture)
+{
+    return texture->indev;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
 static int lv_glfw_init(void)
 {
-    static bool glfw_inited = false;
     if(glfw_inited) {
         return 0;
     }
@@ -211,7 +209,6 @@ static int lv_glfw_init(void)
 
 static int lv_glew_init(void)
 {
-    static bool glew_inited = false;
     if(glew_inited) {
         return 0;
     }
@@ -262,6 +259,7 @@ static void lv_glfw_window_quit(void)
     update_handler_timer = NULL;
 
     glfwTerminate();
+    glfw_inited = false;
 
     lv_deinit();
 
@@ -276,6 +274,7 @@ static void window_update_handler(lv_timer_t * t)
 
     glfwPollEvents();
 
+    /* delete windows that are ready to close */
     window = lv_ll_get_head(&glfw_window_ll);
     while(window) {
         lv_glfw_window_t * window_to_delete = window->closing ? window : NULL;
@@ -286,11 +285,13 @@ static void window_update_handler(lv_timer_t * t)
         }
     }
 
+    /* render each window */
     LV_LL_READ(&glfw_window_ll, window) {
         glfwMakeContextCurrent(window->window);
         lv_opengles_viewport(0, 0, window->hor_res, window->ver_res);
         lv_opengles_render_clear();
 
+        /* render each texture in the window */
         lv_glfw_texture_t * texture;
         LV_LL_READ(&window->textures, texture) {
             /* if the added texture is an LVGL opengles texture display, refresh it before rendering it */
@@ -357,6 +358,7 @@ static void proc_mouse(lv_glfw_window_t * window)
     lv_glfw_texture_t * texture;
     LV_LL_READ_BACK(&window->textures, texture) {
         if(lv_area_is_point_on(&texture->area, &window->mouse_last_point, 0)) {
+            /* adjust the mouse pointer coordinates so that they are relative to the texture */
             texture->indev_last_point.x = window->mouse_last_point.x - texture->area.x1;
             texture->indev_last_point.y = window->mouse_last_point.y - texture->area.y1;
             texture->indev_last_state = window->mouse_last_state;

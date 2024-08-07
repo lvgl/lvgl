@@ -58,6 +58,8 @@ static void lv_opengles_render_draw(void);
 /**********************
  *  STATIC VARIABLES
  **********************/
+static bool is_init;
+
 static unsigned int vertex_buffer_id = 0;
 
 static unsigned int vertex_array_id = 0;
@@ -120,6 +122,8 @@ static const char * fragment_shader =
 
 void lv_opengles_init(void)
 {
+    if(is_init) return;
+
     lv_opengles_enable_blending();
 
     float positions[] = {
@@ -149,14 +153,20 @@ void lv_opengles_init(void)
     lv_opengles_vertex_buffer_unbind();
     lv_opengles_index_buffer_unbind();
     lv_opengles_shader_unbind();
+
+    is_init = true;
 }
 
 void lv_opengles_deinit(void)
 {
+    if(!is_init) return;
+
     lv_opengles_shader_deinit();
     lv_opengles_index_buffer_deinit();
     lv_opengles_vertex_buffer_deinit();
     lv_opengles_vertex_array_deinit();
+
+    is_init = false;
 }
 
 void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
