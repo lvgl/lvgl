@@ -15,6 +15,7 @@
 #include "../../display/lv_display_private.h"
 #include "../../indev/lv_indev.h"
 #include "../../lv_init.h"
+#include "../../misc/lv_area_private.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -70,25 +71,25 @@ lv_glfw_window_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res, bool 
         return NULL;
     }
 
-    lv_glfw_window_t * window = _lv_ll_ins_tail(&glfw_window_ll);
+    lv_glfw_window_t * window = lv_ll_ins_tail(&glfw_window_ll);
     LV_ASSERT_MALLOC(window);
     if(window == NULL) return NULL;
     lv_memzero(window, sizeof(*window));
 
     /* Create window with graphics context */
-    lv_glfw_window_t * existing_window = _lv_ll_get_head(&glfw_window_ll);
+    lv_glfw_window_t * existing_window = lv_ll_get_head(&glfw_window_ll);
     window->window = glfwCreateWindow(hor_res, ver_res, "LVGL Simulator", NULL,
                                       existing_window ? existing_window->window : NULL);
     if(window->window == NULL) {
         LV_LOG_ERROR("glfwCreateWindow fail.");
-        _lv_ll_remove(&glfw_window_ll, window);
+        lv_ll_remove(&glfw_window_ll, window);
         lv_free(window);
         return NULL;
     }
 
     window->hor_res = hor_res;
     window->ver_res = ver_res;
-    _lv_ll_init(&window->textures, sizeof(lv_glfw_texture_t));
+    lv_ll_init(&window->textures, sizeof(lv_glfw_texture_t));
     window->mouse_last_point.x = 0;
     window->mouse_last_point.y = 0;
     window->mouse_last_state = LV_INDEV_STATE_RELEASED;
@@ -110,15 +111,15 @@ void lv_glfw_window_delete(lv_glfw_window_t * window)
     glfwDestroyWindow(window->window);
     if(window->use_indev) {
         lv_glfw_texture_t * texture;
-        _LV_LL_READ(&window->textures, texture) {
+        LV_LL_READ(&window->textures, texture) {
             lv_indev_delete(texture->indev);
         }
     }
-    _lv_ll_clear(&window->textures);
-    _lv_ll_remove(&glfw_window_ll, window);
+    lv_ll_clear(&window->textures);
+    lv_ll_remove(&glfw_window_ll, window);
     lv_free(window);
 
-    if(_lv_ll_is_empty(&glfw_window_ll)) {
+    if(lv_ll_is_empty(&glfw_window_ll)) {
         lv_glfw_window_quit();
     }
 }
@@ -130,7 +131,7 @@ void lv_glfw_window_make_context_current(lv_glfw_window_t * window)
 
 lv_glfw_texture_t * lv_glfw_window_add_texture(lv_glfw_window_t * window, unsigned int texture_id, int32_t w, int32_t h)
 {
-    lv_glfw_texture_t * texture = _lv_ll_ins_tail(&window->textures);
+    lv_glfw_texture_t * texture = lv_ll_ins_tail(&window->textures);
     LV_ASSERT_MALLOC(texture);
     if(texture == NULL) return NULL;
     lv_memzero(texture, sizeof(*texture));
@@ -144,7 +145,7 @@ lv_glfw_texture_t * lv_glfw_window_add_texture(lv_glfw_window_t * window, unsign
         if(texture_disp != NULL) {
             lv_indev_t * indev = lv_indev_create();
             if(indev == NULL) {
-                _lv_ll_remove(&window->textures, texture);
+                lv_ll_remove(&window->textures, texture);
                 lv_free(texture);
                 return NULL;
             }
@@ -164,18 +165,18 @@ void lv_glfw_texture_remove(lv_glfw_texture_t * texture)
     if(texture->indev != NULL) {
         lv_indev_delete(texture->indev);
     }
-    _lv_ll_remove(&texture->window->textures, texture);
+    lv_ll_remove(&texture->window->textures, texture);
     lv_free(texture);
 }
 
 void lv_glfw_texture_set_x(lv_glfw_texture_t * texture, int32_t x)
 {
-    _lv_area_set_pos(&texture->area, x, texture->area.y1);
+    lv_area_set_pos(&texture->area, x, texture->area.y1);
 }
 
 void lv_glfw_texture_set_y(lv_glfw_texture_t * texture, int32_t y)
 {
-    _lv_area_set_pos(&texture->area, texture->area.x1, y);
+    lv_area_set_pos(&texture->area, texture->area.x1, y);
 }
 
 void lv_glfw_texture_set_opa(lv_glfw_texture_t * texture, lv_opa_t opa)
@@ -202,7 +203,7 @@ static int lv_glfw_init(void)
         return 1;
     }
 
-    _lv_ll_init(&glfw_window_ll, sizeof(lv_glfw_window_t));
+    lv_ll_init(&glfw_window_ll, sizeof(lv_glfw_window_t));
 
     glfw_inited = true;
     return 0;
@@ -275,23 +276,23 @@ static void window_update_handler(lv_timer_t * t)
 
     glfwPollEvents();
 
-    window = _lv_ll_get_head(&glfw_window_ll);
+    window = lv_ll_get_head(&glfw_window_ll);
     while(window) {
         lv_glfw_window_t * window_to_delete = window->closing ? window : NULL;
-        window = _lv_ll_get_next(&glfw_window_ll, window);
+        window = lv_ll_get_next(&glfw_window_ll, window);
         if(window_to_delete) {
             glfwSetWindowShouldClose(window_to_delete->window, GLFW_TRUE);
             lv_glfw_window_delete(window_to_delete);
         }
     }
 
-    _LV_LL_READ(&glfw_window_ll, window) {
+    LV_LL_READ(&glfw_window_ll, window) {
         glfwMakeContextCurrent(window->window);
         lv_opengles_viewport(0, 0, window->hor_res, window->ver_res);
         lv_opengles_render_clear();
 
         lv_glfw_texture_t * texture;
-        _LV_LL_READ(&window->textures, texture) {
+        LV_LL_READ(&window->textures, texture) {
             /* if the added texture is an LVGL opengles texture display, refresh it before rendering it */
             lv_display_t * texture_disp = lv_opengles_texture_get_from_texture_id(texture->texture_id);
             if(texture_disp != NULL) {
@@ -354,8 +355,8 @@ static void proc_mouse(lv_glfw_window_t * window)
 {
     /* mouse activity will affect the topmost LVGL display texture */
     lv_glfw_texture_t * texture;
-    _LV_LL_READ_BACK(&window->textures, texture) {
-        if(_lv_area_is_point_on(&texture->area, &window->mouse_last_point, 0)) {
+    LV_LL_READ_BACK(&window->textures, texture) {
+        if(lv_area_is_point_on(&texture->area, &window->mouse_last_point, 0)) {
             texture->indev_last_point.x = window->mouse_last_point.x - texture->area.x1;
             texture->indev_last_point.y = window->mouse_last_point.y - texture->area.y1;
             texture->indev_last_state = window->mouse_last_state;
