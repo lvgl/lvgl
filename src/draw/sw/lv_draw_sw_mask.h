@@ -119,15 +119,15 @@ void lv_draw_sw_mask_line_points_init(lv_draw_sw_mask_line_param_t * param, int3
 
 /**
  *Initialize a line mask from a point and an angle.
- * @param param pointer to a `lv_draw_mask_param_t` to initialize
- * @param px X coordinate of a point of the line
- * @param py X coordinate of a point of the line
- * @param angle right 0 deg, bottom: 90
- * @param side and element of `lv_draw_mask_line_side_t` to describe which side to keep.
+ * @param param  pointer to a `lv_draw_mask_param_t` to initialize
+ * @param px     X coordinate of a point of the line
+ * @param py     X coordinate of a point of the line
+ * @param angle  right 0 deg, bottom: 90
+ * @param side   an element of `lv_draw_mask_line_side_t` to describe which side to keep.
  * With `LV_DRAW_MASK_LINE_SIDE_LEFT/RIGHT` and horizontal line all pixels are kept
  * With `LV_DRAW_MASK_LINE_SIDE_TOP/BOTTOM` and vertical line all pixels are kept
  */
-void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, int32_t p1x, int32_t py, int16_t angle,
+void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, int32_t px, int32_t py, int16_t angle,
                                      lv_draw_sw_mask_line_side_t side);
 
 /**

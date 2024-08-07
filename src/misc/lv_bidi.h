@@ -20,8 +20,8 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-/*Special non printable strong characters.
- *They can be inserted to texts to affect the run's direction*/
+/** Special non printable strong characters.
+ * They can be inserted to texts to affect the run's direction */
 #define LV_BIDI_LRO  "\xE2\x80\xAD" /*U+202D*/
 #define LV_BIDI_RLO  "\xE2\x80\xAE" /*U+202E*/
 

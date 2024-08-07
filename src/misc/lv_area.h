@@ -218,17 +218,17 @@ void lv_point_precise_swap(lv_point_precise_t * p1, lv_point_precise_t * p2);
 
 #define LV_COORD_SET_SPEC(x)    ((x) | LV_COORD_TYPE_SPEC)
 
-/*Max coordinate value*/
+/** Max coordinate value */
 #define LV_COORD_MAX            ((1 << LV_COORD_TYPE_SHIFT) - 1)
 #define LV_COORD_MIN            (-LV_COORD_MAX)
 
 /*Special coordinates*/
 #define LV_SIZE_CONTENT         LV_COORD_SET_SPEC(LV_COORD_MAX)
-#define LV_PCT_STORED_MAX      (LV_COORD_MAX - 1)
+#define LV_PCT_STORED_MAX       (LV_COORD_MAX - 1)
 #if LV_PCT_STORED_MAX % 2 != 0
 #error LV_PCT_STORED_MAX should be an even number
 #endif
-#define LV_PCT_POS_MAX         (LV_PCT_STORED_MAX / 2)
+#define LV_PCT_POS_MAX          (LV_PCT_STORED_MAX / 2)
 #define LV_PCT(x)               (LV_COORD_SET_SPEC(((x) < 0 ? (LV_PCT_POS_MAX - LV_MAX((x), -LV_PCT_POS_MAX)) : LV_MIN((x), LV_PCT_POS_MAX))))
 #define LV_COORD_IS_PCT(x)      ((LV_COORD_IS_SPEC(x) && LV_COORD_PLAIN(x) <= LV_PCT_STORED_MAX))
 #define LV_COORD_GET_PCT(x)     (LV_COORD_PLAIN(x) > LV_PCT_POS_MAX ? LV_PCT_POS_MAX - LV_COORD_PLAIN(x) : LV_COORD_PLAIN(x))

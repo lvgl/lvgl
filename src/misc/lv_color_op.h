@@ -61,7 +61,7 @@ lv_color32_t lv_color_mix32(lv_color32_t fg, lv_color32_t bg);
 /**
  * Get the brightness of a color
  * @param c   a color
- * @return    the brightness [0..255]
+ * @return brightness in range [0..255]
  */
 uint8_t lv_color_brightness(lv_color_t c);
 

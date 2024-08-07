@@ -31,9 +31,9 @@ struct lv_fs_file_cache_t {
     void * buffer;
 };
 
-/* Extended path object to specify the buffer for memory-mapped files */
+/** Extended path object to specify buffer for memory-mapped files */
 struct lv_fs_path_ex_t {
-    char path[4];   /* This is needed to make it compatible with a normal path */
+    char path[4];   /**<  This is needed to make it compatible with a normal path */
     const void * buffer;
     uint32_t size;
 };
