@@ -72,6 +72,12 @@ typedef void * lv_user_data_t;
 #define  LV_DPI_DEF         160
 #include "lv_test_conf_vg_lite.h"
 #include "lv_test_conf_full.h"
+#elif LV_TEST_OPTION == 7
+#define  LV_COLOR_DEPTH     32
+#define  LV_DPI_DEF         160
+#define  LV_USE_DRAW_SDL    1
+#define  LV_USE_SDL         1
+#include "lv_test_conf_full.h"
 #elif LV_TEST_OPTION == 4
 #define  LV_COLOR_DEPTH     24
 #define  LV_DPI_DEF         120
@@ -102,10 +108,6 @@ typedef void * lv_user_data_t;
 /*For screenshots*/
 #undef LV_DPI_DEF
 #define  LV_DPI_DEF         130
-#endif
-
-#if defined(LVGL_CI_USING_SYS_HEAP)
-#undef LV_USE_FLOAT
 #endif
 
 #ifdef __cplusplus

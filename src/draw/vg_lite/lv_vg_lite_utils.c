@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 
+#include "../lv_image_decoder_private.h"
 #include "lv_vg_lite_utils.h"
 
 #if LV_USE_DRAW_VG_LITE
@@ -17,6 +18,7 @@
 #include "lv_vg_lite_grad.h"
 #include "lv_draw_vg_lite_type.h"
 #include <string.h>
+#include <math.h>
 
 /*********************
  *      DEFINES
@@ -275,15 +277,102 @@ void lv_vg_lite_path_dump_info(const vg_lite_path_t * path)
 
     LV_ASSERT(len > 0);
 
-    LV_LOG_USER("address: %p", path->path);
+    LV_LOG_USER("address: %p", (void *)path->path);
     LV_LOG_USER("length: %d", (int)len);
     LV_LOG_USER("bonding box: (%0.2f, %0.2f) - (%0.2f, %0.2f)",
                 path->bounding_box[0], path->bounding_box[1],
                 path->bounding_box[2], path->bounding_box[3]);
     LV_LOG_USER("format: %d", (int)path->format);
     LV_LOG_USER("quality: %d", (int)path->quality);
+    LV_LOG_USER("path_changed: %d", (int)path->path_changed);
+    LV_LOG_USER("pdata_internal: %d", (int)path->pdata_internal);
+    LV_LOG_USER("type: %d", (int)path->path_type);
+    LV_LOG_USER("add_end: %d", (int)path->add_end);
 
     lv_vg_lite_path_for_each_data(path, path_data_print_cb, NULL);
+
+    if(path->stroke) {
+        LV_LOG_USER("stroke_path: %p", (void *)path->stroke_path);
+        LV_LOG_USER("stroke_size: %d", (int)path->stroke_size);
+        LV_LOG_USER("stroke_color: 0x%X", (int)path->stroke_color);
+        lv_vg_lite_stroke_dump_info(path->stroke);
+    }
+}
+
+void lv_vg_lite_stroke_dump_info(const vg_lite_stroke_t * stroke)
+{
+    LV_ASSERT(stroke != NULL);
+    LV_LOG_USER("stroke: %p", (void *)stroke);
+
+    /* Stroke parameters */
+    LV_LOG_USER("cap_style: 0x%X", (int)stroke->cap_style);
+    LV_LOG_USER("join_style: 0x%X", (int)stroke->join_style);
+    LV_LOG_USER("line_width: %f", stroke->line_width);
+    LV_LOG_USER("miter_limit: %f", stroke->miter_limit);
+
+    LV_LOG_USER("dash_pattern: %p", (void *)stroke->dash_pattern);
+    LV_LOG_USER("pattern_count: %d", (int)stroke->pattern_count);
+    if(stroke->dash_pattern) {
+        for(int i = 0; i < (int)stroke->pattern_count; i++) {
+            LV_LOG_USER("dash_pattern[%d]: %f", i, stroke->dash_pattern[i]);
+        }
+    }
+
+    LV_LOG_USER("dash_phase: %f", stroke->dash_phase);
+    LV_LOG_USER("dash_length: %f", stroke->dash_length);
+    LV_LOG_USER("dash_index: %d", (int)stroke->dash_index);
+    LV_LOG_USER("half_width: %f", stroke->half_width);
+
+    /* Total length of stroke dash patterns. */
+    LV_LOG_USER("pattern_length: %f", stroke->pattern_length);
+
+    /* For fast checking. */
+    LV_LOG_USER("miter_square: %f", stroke->miter_square);
+
+    /* Temp storage of stroke subPath. */
+    LV_LOG_USER("path_points: %p", (void *)stroke->path_points);
+    LV_LOG_USER("path_end: %p", (void *)stroke->path_end);
+    LV_LOG_USER("point_count: %d", (int)stroke->point_count);
+
+    LV_LOG_USER("left_point: %p", (void *)stroke->left_point);
+    LV_LOG_USER("right_point: %p", (void *)stroke->right_point);
+    LV_LOG_USER("stroke_points: %p", (void *)stroke->stroke_points);
+    LV_LOG_USER("stroke_end: %p", (void *)stroke->stroke_end);
+    LV_LOG_USER("stroke_count: %d", (int)stroke->stroke_count);
+
+    /* Divide stroke path according to move or move_rel for avoiding implicit closure. */
+    LV_LOG_USER("path_list_divide: %p", (void *)stroke->path_list_divide);
+
+    /* pointer to current divided path data. */
+    LV_LOG_USER("cur_list: %p", (void *)stroke->cur_list);
+
+    /* Flag that add end_path in driver. */
+    LV_LOG_USER("add_end: %d", (int)stroke->add_end);
+    LV_LOG_USER("dash_reset: %d", (int)stroke->dash_reset);
+
+    /* Sub path list. */
+    LV_LOG_USER("stroke_paths: %p", (void *)stroke->stroke_paths);
+
+    /* Last sub path. */
+    LV_LOG_USER("last_stroke: %p", (void *)stroke->last_stroke);
+
+    /* Swing area handling. */
+    LV_LOG_USER("swing_handling: %d", (int)stroke->swing_handling);
+    LV_LOG_USER("swing_deltax: %f", stroke->swing_deltax);
+    LV_LOG_USER("swing_deltay: %f", stroke->swing_deltay);
+    LV_LOG_USER("swing_start: %p", (void *)stroke->swing_start);
+    LV_LOG_USER("swing_stroke: %p", (void *)stroke->swing_stroke);
+    LV_LOG_USER("swing_length: %f", stroke->swing_length);
+    LV_LOG_USER("swing_centlen: %f", stroke->swing_centlen);
+    LV_LOG_USER("swing_count: %d", (int)stroke->swing_count);
+    LV_LOG_USER("need_swing: %d", (int)stroke->need_swing);
+    LV_LOG_USER("swing_ccw: %d", (int)stroke->swing_ccw);
+
+    LV_LOG_USER("stroke_length: %f", stroke->stroke_length);
+    LV_LOG_USER("stroke_size: %d", (int)stroke->stroke_size);
+
+    LV_LOG_USER("fattened: %d", (int)stroke->fattened);
+    LV_LOG_USER("closed: %d", (int)stroke->closed);
 }
 
 void lv_vg_lite_buffer_dump_info(const vg_lite_buffer_t * buffer)
@@ -669,13 +758,13 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
     return true;
 }
 
-void lv_vg_lite_image_dsc_init(struct _lv_draw_vg_lite_unit_t * unit)
+void lv_vg_lite_image_dsc_init(struct lv_draw_vg_lite_unit_t * unit)
 {
     unit->image_dsc_pending = lv_vg_lite_pending_create(sizeof(lv_image_decoder_dsc_t), 4);
     lv_vg_lite_pending_set_free_cb(unit->image_dsc_pending, image_dsc_free_cb, NULL);
 }
 
-void lv_vg_lite_image_dsc_deinit(struct _lv_draw_vg_lite_unit_t * unit)
+void lv_vg_lite_image_dsc_deinit(struct lv_draw_vg_lite_unit_t * unit)
 {
     lv_vg_lite_pending_destroy(unit->image_dsc_pending);
     unit->image_dsc_pending = NULL;
@@ -688,6 +777,15 @@ void lv_vg_lite_rect(vg_lite_rectangle_t * rect, const lv_area_t * area)
     rect->width = lv_area_get_width(area);
     rect->height = lv_area_get_height(area);
 }
+
+#if LV_USE_MATRIX
+
+void lv_vg_lite_matrix(vg_lite_matrix_t * dest, const lv_matrix_t * src)
+{
+    lv_memcpy(dest, src, sizeof(lv_matrix_t));
+}
+
+#endif
 
 uint32_t lv_vg_lite_get_palette_size(vg_lite_buffer_format_t format)
 {
@@ -899,10 +997,26 @@ bool lv_vg_lite_path_check(const vg_lite_path_t * path)
         return false;
     }
 
-    uint8_t end_op_code = VLC_GET_OP_CODE(end - fmt_len);
-    if(end_op_code != VLC_OP_END) {
-        LV_LOG_ERROR("%d (%s) -> is NOT VLC_OP_END", end_op_code, lv_vg_lite_vlc_op_string(end_op_code));
-        return false;
+    switch(path->path_type) {
+        case VG_LITE_DRAW_ZERO:
+        case VG_LITE_DRAW_FILL_PATH:
+        case VG_LITE_DRAW_FILL_STROKE_PATH: {
+                /* Check end op code */
+                uint8_t end_op_code = VLC_GET_OP_CODE(end - fmt_len);
+                if(end_op_code != VLC_OP_END) {
+                    LV_LOG_ERROR("%d (%s) -> is NOT VLC_OP_END", end_op_code, lv_vg_lite_vlc_op_string(end_op_code));
+                    return false;
+                }
+            }
+            break;
+
+        case VG_LITE_DRAW_STROKE_PATH:
+            /* No need to check stroke path end */
+            break;
+
+        default:
+            LV_LOG_ERROR("path type(%d) is invalid", (int)path->path_type);
+            return false;
     }
 
     return true;
@@ -1023,8 +1137,8 @@ lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * ma
 {
     lv_point_precise_t p;
     const vg_lite_float_t (*m)[3] = matrix->m;
-    p.x = (lv_value_precise_t)(point->x * m[0][0] + point->y * m[0][1] + m[0][2]);
-    p.y = (lv_value_precise_t)(point->x * m[1][0] + point->y * m[1][1] + m[1][2]);
+    p.x = (lv_value_precise_t)roundf(point->x * m[0][0] + point->y * m[0][1] + m[0][2]);
+    p.y = (lv_value_precise_t)roundf(point->x * m[1][0] + point->y * m[1][1] + m[1][2]);
     return p;
 }
 
@@ -1047,7 +1161,7 @@ void lv_vg_lite_disable_scissor(void)
                                LV_VER_RES));
 }
 
-void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
+void lv_vg_lite_flush(struct lv_draw_vg_lite_unit_t * u)
 {
     LV_ASSERT_NULL(u);
     LV_PROFILER_BEGIN;
@@ -1075,7 +1189,7 @@ void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
     LV_PROFILER_END;
 }
 
-void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
+void lv_vg_lite_finish(struct lv_draw_vg_lite_unit_t * u)
 {
     LV_ASSERT_NULL(u);
     LV_PROFILER_BEGIN;

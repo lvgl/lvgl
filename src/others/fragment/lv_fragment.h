@@ -25,13 +25,9 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct _lv_fragment_manager_t lv_fragment_manager_t;
+typedef struct lv_fragment_manager_t lv_fragment_manager_t;
 
-typedef struct _lv_fragment_t lv_fragment_t;
-typedef struct _lv_fragment_class_t lv_fragment_class_t;
-typedef struct _lv_fragment_managed_states_t lv_fragment_managed_states_t;
-
-struct _lv_fragment_t {
+struct lv_fragment_t {
     /**
      * Class of this fragment
      */
@@ -53,7 +49,7 @@ struct _lv_fragment_t {
 
 };
 
-struct _lv_fragment_class_t {
+struct lv_fragment_class_t {
     /**
      * Constructor function for fragment class
      * @param self Fragment instance
@@ -122,40 +118,6 @@ struct _lv_fragment_class_t {
      * *REQUIRED*: Allocation size of fragment
      */
     size_t instance_size;
-};
-
-/**
- * Fragment states
- */
-struct _lv_fragment_managed_states_t  {
-    /**
-     * Class of the fragment
-     */
-    const lv_fragment_class_t * cls;
-    /**
-     * Manager the fragment attached to
-     */
-    lv_fragment_manager_t * manager;
-    /**
-     * Container object the fragment adding view to
-     */
-    lv_obj_t * const * container;
-    /**
-     * Fragment instance
-     */
-    lv_fragment_t * instance;
-    /**
-     * true between `create_obj_cb` and `obj_deleted_cb`
-     */
-    bool obj_created;
-    /**
-     * true before `lv_fragment_delete_obj` is called. Don't touch any object if this is true
-     */
-    bool destroying_obj;
-    /**
-     * true if this fragment is in navigation stack that can be popped
-     */
-    bool in_stack;
 };
 
 /**********************

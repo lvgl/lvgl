@@ -10,7 +10,6 @@
 
 #if LV_USE_DEMO_RENDER
 
-#include "../../src/display/lv_display_private.h"
 #include "../../src/core/lv_global.h"
 
 /*********************
@@ -336,6 +335,7 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
     LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb565);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_argb8888);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_l8);
+    LV_IMAGE_DECLARE(img_render_lvgl_logo_i1);
 
     const void * srcs[] = {
         &img_render_lvgl_logo_argb8888,
@@ -343,6 +343,7 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
         &img_render_lvgl_logo_rgb888,
         &img_render_lvgl_logo_rgb565,
         &img_render_lvgl_logo_l8,
+        &img_render_lvgl_logo_i1,
     };
 
     const void * names[] = {
@@ -351,6 +352,7 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
         "RGB\n888",
         "RGB\n565",
         "L8",
+        "I1",
     };
 
     uint32_t stopAt = startAt + LV_MIN(sizeof(srcs) / sizeof(void *) - startAt, 4);
@@ -528,12 +530,14 @@ static void triangle_draw_event_cb(lv_event_t * e)
 
     lv_point_t * p_rel = lv_event_get_user_data(e);
 
-    dsc.p[0].x = p_rel[0].x + obj->coords.x1 + 8;
-    dsc.p[0].y = p_rel[0].y + obj->coords.y1 + 2;
-    dsc.p[1].x = p_rel[1].x + obj->coords.x1 + 8;
-    dsc.p[1].y = p_rel[1].y + obj->coords.y1 + 2;
-    dsc.p[2].x = p_rel[2].x + obj->coords.x1 + 8;
-    dsc.p[2].y = p_rel[2].y + obj->coords.y1 + 2;
+    lv_area_t coords;
+    lv_obj_get_coords(obj, &coords);
+    dsc.p[0].x = p_rel[0].x + coords.x1 + 8;
+    dsc.p[0].y = p_rel[0].y + coords.y1 + 2;
+    dsc.p[1].x = p_rel[1].x + coords.x1 + 8;
+    dsc.p[1].y = p_rel[1].y + coords.y1 + 2;
+    dsc.p[2].x = p_rel[2].x + coords.x1 + 8;
+    dsc.p[2].y = p_rel[2].y + coords.y1 + 2;
 
     lv_opa_t opa = lv_obj_get_style_opa(obj, 0);
     dsc.bg_grad.dir = lv_obj_get_style_bg_grad_dir(obj, 0);
@@ -1129,7 +1133,7 @@ void lv_demo_render(lv_demo_render_scene_t id, lv_opa_t opa)
 
 const char * lv_demo_render_get_scene_name(lv_demo_render_scene_t id)
 {
-    if(id > _LV_DEMO_RENDER_SCENE_NUM) return NULL;
+    if(id > LV_DEMO_RENDER_SCENE_NUM) return NULL;
     return scenes[id].name;
 }
 

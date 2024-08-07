@@ -15,40 +15,41 @@ extern "C" {
  *********************/
 #include "lv_draw.h"
 #include "../misc/lv_array.h"
+#include "../misc/lv_matrix.h"
 
 #if LV_USE_VECTOR_GRAPHIC
+
+#if !LV_USE_MATRIX
+#error "lv_draw_vector needs LV_USE_MATRIX = 1"
+#endif
 
 /**********************
  *      TYPEDEFS
  **********************/
-enum {
+typedef enum {
     LV_VECTOR_FILL_NONZERO = 0,
     LV_VECTOR_FILL_EVENODD,
-};
-typedef uint8_t lv_vector_fill_t;
+} lv_vector_fill_t;
 
-enum {
+typedef enum {
     LV_VECTOR_STROKE_CAP_BUTT = 0,
     LV_VECTOR_STROKE_CAP_SQUARE,
     LV_VECTOR_STROKE_CAP_ROUND,
-};
-typedef uint8_t lv_vector_stroke_cap_t;
+} lv_vector_stroke_cap_t;
 
-enum {
+typedef enum {
     LV_VECTOR_STROKE_JOIN_MITER = 0,
     LV_VECTOR_STROKE_JOIN_BEVEL,
     LV_VECTOR_STROKE_JOIN_ROUND,
-};
-typedef uint8_t lv_vector_stroke_join_t;
+} lv_vector_stroke_join_t;
 
-enum {
+typedef enum {
     LV_VECTOR_PATH_QUALITY_MEDIUM = 0, /* default*/
     LV_VECTOR_PATH_QUALITY_HIGH,
     LV_VECTOR_PATH_QUALITY_LOW,
-};
-typedef uint8_t lv_vector_path_quality_t;
+} lv_vector_path_quality_t;
 
-enum {
+typedef enum {
     LV_VECTOR_BLEND_SRC_OVER = 0,
     LV_VECTOR_BLEND_SRC_IN,
     LV_VECTOR_BLEND_DST_OVER,
@@ -58,157 +59,41 @@ enum {
     LV_VECTOR_BLEND_NONE,
     LV_VECTOR_BLEND_ADDITIVE,
     LV_VECTOR_BLEND_SUBTRACTIVE,
-};
-typedef uint8_t lv_vector_blend_t;
+} lv_vector_blend_t;
 
-enum {
+typedef enum {
     LV_VECTOR_PATH_OP_MOVE_TO = 0,
     LV_VECTOR_PATH_OP_LINE_TO,
     LV_VECTOR_PATH_OP_QUAD_TO,
     LV_VECTOR_PATH_OP_CUBIC_TO,
     LV_VECTOR_PATH_OP_CLOSE,
-};
-typedef uint8_t lv_vector_path_op_t;
+} lv_vector_path_op_t;
 
-enum {
+typedef enum {
     LV_VECTOR_DRAW_STYLE_SOLID = 0,
     LV_VECTOR_DRAW_STYLE_PATTERN,
     LV_VECTOR_DRAW_STYLE_GRADIENT,
-};
-typedef uint8_t lv_vector_draw_style_t;
+} lv_vector_draw_style_t;
 
-enum {
+typedef enum {
     LV_VECTOR_GRADIENT_SPREAD_PAD = 0,
     LV_VECTOR_GRADIENT_SPREAD_REPEAT,
     LV_VECTOR_GRADIENT_SPREAD_REFLECT,
-};
-typedef uint8_t lv_vector_gradient_spread_t;
+} lv_vector_gradient_spread_t;
 
-enum {
+typedef enum {
     LV_VECTOR_GRADIENT_STYLE_LINEAR = 0,
     LV_VECTOR_GRADIENT_STYLE_RADIAL,
-};
-typedef uint8_t lv_vector_gradient_style_t;
+} lv_vector_gradient_style_t;
 
-typedef struct {
+struct lv_fpoint_t {
     float x;
     float y;
-} lv_fpoint_t;
-
-typedef struct {
-    float m[3][3];
-} lv_matrix_t;
-
-typedef struct {
-    lv_vector_path_quality_t quality;
-    lv_array_t ops;
-    lv_array_t points;
-} lv_vector_path_t;
-
-typedef struct {
-    lv_vector_gradient_style_t style;
-    lv_gradient_stop_t   stops[LV_GRADIENT_MAX_STOPS];  /**< A gradient stop array */
-    uint16_t             stops_count;                   /**< The number of used stops in the array */
-    float x1;
-    float y1;
-    float x2;
-    float y2;
-    float cx;
-    float cy;
-    float cr;
-    lv_vector_gradient_spread_t spread;
-} lv_vector_gradient_t;
-
-typedef struct {
-    lv_vector_draw_style_t style;
-    lv_color32_t color;
-    lv_opa_t opa;
-    lv_vector_fill_t fill_rule;
-    lv_draw_image_dsc_t img_dsc;
-    lv_vector_gradient_t gradient;
-    lv_matrix_t matrix;
-} lv_vector_fill_dsc_t;
-
-typedef struct {
-    lv_vector_draw_style_t style;
-    lv_color32_t color;
-    lv_opa_t opa;
-    float width;
-    lv_array_t dash_pattern;
-    lv_vector_stroke_cap_t cap;
-    lv_vector_stroke_join_t join;
-    uint16_t miter_limit;
-    lv_vector_gradient_t gradient;
-    lv_matrix_t matrix;
-} lv_vector_stroke_dsc_t;
-
-typedef struct {
-    lv_vector_fill_dsc_t fill_dsc;
-    lv_vector_stroke_dsc_t stroke_dsc;
-    lv_matrix_t matrix;
-    lv_vector_blend_t blend_mode;
-    lv_area_t scissor_area;
-} lv_vector_draw_dsc_t;
-
-typedef struct {
-    lv_draw_dsc_base_t base;
-    lv_ll_t * task_list; /*draw task list.*/
-} lv_draw_vector_task_dsc_t;
-
-typedef struct {
-    lv_layer_t * layer;
-    lv_vector_draw_dsc_t current_dsc;
-    /* private data */
-    lv_draw_vector_task_dsc_t tasks;
-} lv_vector_dsc_t;
+};
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-/**
- * Set matrix to identity matrix
- * @param matrix           pointer to a matrix
- */
-void lv_matrix_identity(lv_matrix_t * matrix);
-
-/**
- * Translate the matrix to new position
- * @param matrix           pointer to a matrix
- * @param tx               the amount of translate in x direction
- * @param tx               the amount of translate in y direction
- */
-void lv_matrix_translate(lv_matrix_t * matrix, float tx, float ty);
-
-/**
- * Change the scale factor of the matrix
- * @param matrix           pointer to a matrix
- * @param scale_x          the scale factor for the X direction
- * @param scale_y          the scale factor for the Y direction
- */
-void lv_matrix_scale(lv_matrix_t * matrix, float scale_x, float scale_y);
-
-/**
- * Rotate the matrix with origin
- * @param matrix           pointer to a matrix
- * @param degree           angle to rotate
- */
-void lv_matrix_rotate(lv_matrix_t * matrix, float degree);
-
-/**
- * Change the skew factor of the matrix
- * @param matrix           pointer to a matrix
- * @param skew_x           the skew factor for x direction
- * @param skew_y           the skew factor for y direction
- */
-void lv_matrix_skew(lv_matrix_t * matrix, float skew_x, float skew_y);
-
-/**
- * Multiply two matrix and store the result to the first one
- * @param matrix           pointer to a matrix
- * @param matrix2          pointer to another matrix
- */
-void lv_matrix_multiply(lv_matrix_t * matrix, const lv_matrix_t * matrix2);
 
 /**
  * Transform the coordinates of a point using given matrix
@@ -594,8 +479,6 @@ void lv_draw_vector(lv_vector_dsc_t * dsc);
 
 /* Traverser for task list */
 typedef void (*vector_draw_task_cb)(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc);
-
-void _lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * data);
 
 #endif /* LV_USE_VECTOR_GRAPHIC */
 

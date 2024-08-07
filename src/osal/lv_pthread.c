@@ -64,7 +64,13 @@ lv_result_t lv_thread_delete(lv_thread_t * thread)
 
 lv_result_t lv_mutex_init(lv_mutex_t * mutex)
 {
-    int ret = pthread_mutex_init(mutex, NULL);
+    pthread_mutexattr_t attr;
+
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    int ret = pthread_mutex_init(mutex, &attr);
+    pthread_mutexattr_destroy(&attr);
+
     if(ret) {
         LV_LOG_WARN("Error: %d", ret);
         return LV_RESULT_INVALID;
@@ -150,6 +156,12 @@ lv_result_t lv_thread_sync_delete(lv_thread_sync_t * sync)
     pthread_mutex_destroy(&sync->mutex);
     pthread_cond_destroy(&sync->cond);
     return LV_RESULT_OK;
+}
+
+lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * sync)
+{
+    LV_UNUSED(sync);
+    return LV_RESULT_INVALID;
 }
 
 /**********************

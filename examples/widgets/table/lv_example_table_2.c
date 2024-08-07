@@ -8,9 +8,9 @@ static void draw_event_cb(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
 
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
+    lv_draw_dsc_base_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
     /*If the cells are drawn...*/
-    if(base_dsc->part == LV_PART_ITEMS && draw_task->type == LV_DRAW_TASK_TYPE_FILL) {
+    if(base_dsc->part == LV_PART_ITEMS && lv_draw_task_get_type(draw_task) == LV_DRAW_TASK_TYPE_FILL) {
         /*Draw the background*/
         bool chk = lv_table_has_cell_ctrl(obj, base_dsc->id1, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
         lv_draw_rect_dsc_t rect_dsc;
@@ -23,7 +23,9 @@ static void draw_event_cb(lv_event_t * e)
         sw_area.x2 = 40;
         sw_area.y1 = 0;
         sw_area.y2 = 24;
-        lv_area_align(&draw_task->area, &sw_area, LV_ALIGN_RIGHT_MID, -15, 0);
+        lv_area_t draw_task_area;
+        lv_draw_task_get_area(draw_task, &draw_task_area);
+        lv_area_align(&draw_task_area, &sw_area, LV_ALIGN_RIGHT_MID, -15, 0);
         lv_draw_rect(base_dsc->layer, &rect_dsc, &sw_area);
 
         /*Draw the knob*/

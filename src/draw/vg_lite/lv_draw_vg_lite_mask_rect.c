@@ -7,12 +7,16 @@
  *      INCLUDES
  *********************/
 
+#include "../../misc/lv_area_private.h"
+#include "../sw/lv_draw_sw_mask_private.h"
+#include "../lv_draw_mask_private.h"
 #include "lv_draw_vg_lite.h"
 
 #if LV_USE_DRAW_VG_LITE
 
 #include "lv_vg_lite_utils.h"
 #include "lv_draw_vg_lite_type.h"
+#include "lv_vg_lite_path.h"
 
 /*********************
  *      DEFINES
@@ -44,12 +48,17 @@ void lv_draw_vg_lite_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_re
     LV_UNUSED(coords);
 
     lv_area_t draw_area;
-    if(!_lv_area_intersect(&draw_area, &dsc->area, draw_unit->clip_area)) {
+    if(!lv_area_intersect(&draw_area, &dsc->area, draw_unit->clip_area)) {
         return;
     }
 
     LV_PROFILER_BEGIN;
 
+#if LV_USE_VG_LITE_THORVG
+    /**
+     * ThorVG does not yet support simulating the VG_LITE_BLEND_DST_IN blend mode,
+     * and uses software rendering to achieve this
+     */
     lv_draw_sw_mask_radius_param_t param;
     lv_draw_sw_mask_radius_init(&param, &dsc->area, dsc->radius, false);
 
@@ -87,6 +96,48 @@ void lv_draw_vg_lite_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_re
 
     lv_free(mask_buf);
     lv_draw_sw_mask_free_param(&param);
+#else
+    /* Using hardware rendering masks */
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
+
+    int32_t w = lv_area_get_width(&dsc->area);
+    int32_t h = lv_area_get_height(&dsc->area);
+    float r = dsc->radius;
+    if(dsc->radius) {
+        float r_short = LV_MIN(w, h) / 2.0f;
+        r = LV_MIN(r, r_short);
+    }
+
+    lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
+    lv_vg_lite_path_set_quality(path, VG_LITE_HIGH);
+    lv_vg_lite_path_set_bonding_box_area(path, &draw_area);
+
+    /* Use rounded rectangles and normal rectangles of the same size to nest the cropped area */
+    lv_vg_lite_path_append_rect(path, dsc->area.x1, dsc->area.y1, w, h, r, r);
+    lv_vg_lite_path_append_rect(path, dsc->area.x1, dsc->area.y1, w, h, 0, 0);
+    lv_vg_lite_path_end(path);
+
+    vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
+
+    vg_lite_matrix_t * matrix = &u->global_matrix;
+
+    LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
+    LV_VG_LITE_ASSERT_PATH(vg_lite_path);
+    LV_VG_LITE_ASSERT_MATRIX(matrix);
+
+    /* Use VG_LITE_BLEND_DST_IN (Sa * D) blending mode to make the corners transparent */
+    LV_PROFILER_BEGIN_TAG("vg_lite_draw");
+    LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
+                               &u->target_buffer,
+                               vg_lite_path,
+                               VG_LITE_FILL_EVEN_ODD,
+                               matrix,
+                               VG_LITE_BLEND_DST_IN,
+                               0));
+    LV_PROFILER_END_TAG("vg_lite_draw");
+
+    lv_vg_lite_path_drop(u, path);
+#endif /*LV_USE_VG_LITE_THORVG*/
 
     LV_PROFILER_END;
 }

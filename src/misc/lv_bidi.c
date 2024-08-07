@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_bidi.h"
+#include "lv_bidi_private.h"
 #include "lv_text_private.h"
 #include "lv_types.h"
 #include "../stdlib/lv_mem.h"
@@ -74,9 +74,9 @@ static const char * custom_neutrals = NULL;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void _lv_bidi_process(const char * str_in, char * str_out, lv_base_dir_t base_dir)
+void lv_bidi_process(const char * str_in, char * str_out, lv_base_dir_t base_dir)
 {
-    if(base_dir == LV_BASE_DIR_AUTO) base_dir = _lv_bidi_detect_base_dir(str_in);
+    if(base_dir == LV_BASE_DIR_AUTO) base_dir = lv_bidi_detect_base_dir(str_in);
 
     uint32_t par_start = 0;
     uint32_t par_len;
@@ -88,7 +88,7 @@ void _lv_bidi_process(const char * str_in, char * str_out, lv_base_dir_t base_di
 
     while(str_in[par_start] != '\0') {
         par_len = lv_bidi_get_next_paragraph(&str_in[par_start]);
-        _lv_bidi_process_paragraph(&str_in[par_start], &str_out[par_start], par_len, base_dir, NULL, 0);
+        lv_bidi_process_paragraph(&str_in[par_start], &str_out[par_start], par_len, base_dir, NULL, 0);
         par_start += par_len;
 
         while(str_in[par_start] == '\n' || str_in[par_start] == '\r') {
@@ -105,7 +105,7 @@ void _lv_bidi_process(const char * str_in, char * str_out, lv_base_dir_t base_di
  * @param txt the text to process
  * @return `LV_BASE_DIR_LTR` or `LV_BASE_DIR_RTL`
  */
-lv_base_dir_t _lv_bidi_detect_base_dir(const char * txt)
+lv_base_dir_t lv_bidi_detect_base_dir(const char * txt)
 {
     uint32_t i = 0;
     uint32_t letter;
@@ -122,8 +122,8 @@ lv_base_dir_t _lv_bidi_detect_base_dir(const char * txt)
     else return LV_BIDI_BASE_DIR_DEF;
 }
 
-uint16_t _lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_t len, lv_base_dir_t base_dir,
-                                  uint32_t visual_pos, bool * is_rtl)
+uint16_t lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_t len, lv_base_dir_t base_dir,
+                                 uint32_t visual_pos, bool * is_rtl)
 {
     uint32_t pos_conv_len = get_txt_len(str_in, len);
     char * buf = lv_malloc(len + 1);
@@ -137,7 +137,7 @@ uint16_t _lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_
 
     if(bidi_txt) *bidi_txt = buf;
 
-    _lv_bidi_process_paragraph(str_in, bidi_txt ? *bidi_txt : NULL, len, base_dir, pos_conv_buf, pos_conv_len);
+    lv_bidi_process_paragraph(str_in, bidi_txt ? *bidi_txt : NULL, len, base_dir, pos_conv_buf, pos_conv_len);
 
     if(is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[visual_pos]);
 
@@ -147,8 +147,8 @@ uint16_t _lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_
     return res;
 }
 
-uint16_t _lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t len, lv_base_dir_t base_dir,
-                                 uint32_t logical_pos, bool * is_rtl)
+uint16_t lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t len, lv_base_dir_t base_dir,
+                                uint32_t logical_pos, bool * is_rtl)
 {
     uint32_t pos_conv_len = get_txt_len(str_in, len);
     char * buf = lv_malloc(len + 1);
@@ -162,7 +162,7 @@ uint16_t _lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t
 
     if(bidi_txt) *bidi_txt = buf;
 
-    _lv_bidi_process_paragraph(str_in, bidi_txt ? *bidi_txt : NULL, len, base_dir, pos_conv_buf, pos_conv_len);
+    lv_bidi_process_paragraph(str_in, bidi_txt ? *bidi_txt : NULL, len, base_dir, pos_conv_buf, pos_conv_len);
 
     for(uint16_t i = 0; i < pos_conv_len; i++) {
         if(GET_POS(pos_conv_buf[i]) == logical_pos) {
@@ -179,8 +179,8 @@ uint16_t _lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t
     return (uint16_t) -1;
 }
 
-void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len, lv_base_dir_t base_dir,
-                                uint16_t * pos_conv_out, uint16_t pos_conv_len)
+void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len, lv_base_dir_t base_dir,
+                               uint16_t * pos_conv_out, uint16_t pos_conv_len)
 {
     uint32_t run_len = 0;
     lv_base_dir_t run_dir;
@@ -190,7 +190,7 @@ void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t le
     uint16_t pos_conv_rd = 0;
     uint16_t pos_conv_wr;
 
-    if(base_dir == LV_BASE_DIR_AUTO) base_dir = _lv_bidi_detect_base_dir(str_in);
+    if(base_dir == LV_BASE_DIR_AUTO) base_dir = lv_bidi_detect_base_dir(str_in);
     if(base_dir == LV_BASE_DIR_RTL) {
         wr = len;
         pos_conv_wr = pos_conv_len;
@@ -274,7 +274,7 @@ void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t le
 
 void lv_bidi_calculate_align(lv_text_align_t * align, lv_base_dir_t * base_dir, const char * txt)
 {
-    if(*base_dir == LV_BASE_DIR_AUTO) *base_dir = _lv_bidi_detect_base_dir(txt);
+    if(*base_dir == LV_BASE_DIR_AUTO) *base_dir = lv_bidi_detect_base_dir(txt);
 
     if(*align == LV_TEXT_ALIGN_AUTO) {
         if(*base_dir == LV_BASE_DIR_RTL) *align = LV_TEXT_ALIGN_RIGHT;

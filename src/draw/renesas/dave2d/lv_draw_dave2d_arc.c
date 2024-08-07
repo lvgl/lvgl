@@ -16,7 +16,7 @@ void lv_draw_dave2d_arc(lv_draw_dave2d_unit_t * u, const lv_draw_arc_dsc_t * dsc
     int32_t x;
     int32_t y;
 
-    if(!_lv_area_intersect(&clipped_area, coords, u->base_unit.clip_area)) return;
+    if(!lv_area_intersect(&clipped_area, coords, u->base_unit.clip_area)) return;
 
     x = 0 - u->base_unit.target_layer->buf_area.x1;
     y = 0 - u->base_unit.target_layer->buf_area.y1;
@@ -127,7 +127,7 @@ void lv_draw_dave2d_arc(lv_draw_dave2d_unit_t * u, const lv_draw_arc_dsc_t * dsc
             arc_area.y1 = arc_centre.y - dsc->radius;
         }
 
-        draw_arc = _lv_area_intersect(&clip_arc, &arc_area, &clipped_area);
+        draw_arc = lv_area_intersect(&clip_arc, &arc_area, &clipped_area);
 
         if(draw_arc) {
 

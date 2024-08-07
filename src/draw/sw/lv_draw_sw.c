@@ -6,11 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_draw.h"
+#include "../lv_draw_private.h"
 #if LV_USE_DRAW_SW
 
 #include "../../core/lv_refr.h"
-#include "lv_draw_sw.h"
+#include "lv_draw_sw_private.h"
 #include "../../display/lv_display_private.h"
 #include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
@@ -224,6 +224,37 @@ void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px)
         buf16[e] = ((buf16[e] & 0xff00) >> 8) | ((buf16[e] & 0x00ff) << 8);
     }
 
+}
+
+void lv_draw_sw_i1_invert(void * buf, uint32_t buf_size)
+{
+    if(buf == NULL) return;
+
+    uint8_t * byte_buf = (uint8_t *)buf;
+    uint32_t i;
+
+    /*Make the buffer aligned*/
+    while(((uintptr_t)(byte_buf) & (sizeof(int) - 1)) && buf_size > 0) {
+        *byte_buf = ~(*byte_buf);
+        byte_buf++;
+        buf_size--;
+    }
+
+    if(buf_size >= sizeof(uint32_t)) {
+        uint32_t * aligned_addr = (uint32_t *)byte_buf;
+        uint32_t word_count = buf_size / 4;
+
+        for(i = 0; i < word_count; ++i) {
+            aligned_addr[i] = ~aligned_addr[i];
+        }
+
+        byte_buf = (uint8_t *)(aligned_addr + word_count);
+        buf_size = buf_size % sizeof(uint32_t);
+    }
+
+    for(i = 0; i < buf_size; ++i) {
+        byte_buf[i] = ~byte_buf[i];
+    }
 }
 
 void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t src_height, int32_t src_stride,
@@ -475,7 +506,7 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
     /*Layers manage it for themselves*/
     if(t->type != LV_DRAW_TASK_TYPE_LAYER) {
         lv_area_t draw_area;
-        if(!_lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area)) return;
+        if(!lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area)) return;
 
         int32_t idx = 0;
         lv_draw_unit_t * draw_unit_tmp = _draw_info.unit_head;
@@ -485,7 +516,7 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
         }
         lv_draw_rect_dsc_t rect_dsc;
         lv_draw_rect_dsc_init(&rect_dsc);
-        rect_dsc.bg_color = lv_palette_main(idx % _LV_PALETTE_LAST);
+        rect_dsc.bg_color = lv_palette_main(idx % LV_PALETTE_LAST);
         rect_dsc.border_color = rect_dsc.bg_color;
         rect_dsc.bg_opa = LV_OPA_10;
         rect_dsc.border_opa = LV_OPA_80;

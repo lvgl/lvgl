@@ -258,7 +258,7 @@ static uint32_t millis(void)
 #if LV_USE_LOG
 static void syslog_print(lv_log_level_t level, const char * buf)
 {
-    static const int priority[_LV_LOG_LEVEL_NUM] = {
+    static const int priority[LV_LOG_LEVEL_NUM] = {
         LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERR, LOG_CRIT
     };
 

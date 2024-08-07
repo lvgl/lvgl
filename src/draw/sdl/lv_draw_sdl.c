@@ -6,13 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_draw.h"
+#include "../lv_draw_private.h"
 #if LV_USE_DRAW_SDL
 #include LV_SDL_INCLUDE_PATH
 #include <SDL2/SDL_image.h>
 
 #include "lv_draw_sdl.h"
-#include "../../core/lv_refr.h"
+#include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
 #include "../../stdlib/lv_string.h"
 #include "../../drivers/sdl/lv_sdl_window.h"
@@ -130,7 +130,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_SDL);
     if(t == NULL) return -1;
 
-    lv_display_t * disp = _lv_refr_get_disp_refreshing();
+    lv_display_t * disp = lv_refr_get_disp_refreshing();
     SDL_Texture * texture = layer_get_texture(layer);
     if(layer != disp->layer_head && texture == NULL) {
         void * buf = lv_draw_layer_alloc_buf(layer);
@@ -184,7 +184,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * data)
     dest_layer._clip_area = task->area;
     lv_memzero(sdl_render_buf, lv_area_get_size(&dest_layer.buf_area) * 4 + 100);
 
-    lv_display_t * disp = _lv_refr_get_disp_refreshing();
+    lv_display_t * disp = lv_refr_get_disp_refreshing();
 
     SDL_Texture * texture = NULL;
     switch(task->type) {
@@ -236,8 +236,8 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * data)
                     }
                 }
                 else if(type == LV_IMAGE_SRC_VARIABLE) {
-                    lv_image_dsc_t * lvd = image_dsc->src;
-                    surface = SDL_CreateRGBSurfaceFrom(lvd->data,
+                    lv_image_dsc_t * lvd = (lv_image_dsc_t *)image_dsc->src;
+                    surface = SDL_CreateRGBSurfaceFrom((void *)lvd->data,
                                                        lvd->header.w, lvd->header.h,
                                                        LV_COLOR_FORMAT_GET_BPP(lvd->header.cf),
                                                        lvd->header.stride,
@@ -307,7 +307,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * data)
 
 static void blend_texture_layer(lv_draw_sdl_unit_t * u)
 {
-    lv_display_t * disp = _lv_refr_get_disp_refreshing();
+    lv_display_t * disp = lv_refr_get_disp_refreshing();
     SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
 
     SDL_Rect clip_rect;
@@ -362,7 +362,7 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
 
     cache_data_t * data_cached = lv_cache_entry_get_data(entry_cached);
     SDL_Texture * texture = data_cached->texture;
-    lv_display_t * disp = _lv_refr_get_disp_refreshing();
+    lv_display_t * disp = lv_refr_get_disp_refreshing();
     SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
 
     lv_layer_t * dest_layer = u->base_unit.target_layer;

@@ -10,6 +10,8 @@
 #include "../stdlib/lv_string.h"
 #include "../misc/lv_utils.h"
 #include "lv_obj_property.h"
+#include "lv_obj_private.h"
+#include "lv_obj_class_private.h"
 
 #if LV_USE_OBJ_PROPERTY
 
@@ -22,6 +24,7 @@
  **********************/
 
 typedef void (*lv_property_set_int_t)(lv_obj_t *, int32_t);
+typedef void (*lv_property_set_bool_t)(lv_obj_t *, bool);
 typedef void (*lv_property_set_precise_t)(lv_obj_t *, lv_value_precise_t);
 typedef void (*lv_property_set_color_t)(lv_obj_t *, lv_color_t);
 typedef void (*lv_property_set_point_t)(lv_obj_t *, lv_point_t *);
@@ -29,6 +32,7 @@ typedef void (*lv_property_set_pointer_t)(lv_obj_t *, const void *);
 typedef lv_result_t (*lv_property_setter_t)(lv_obj_t *, lv_prop_id_t, const lv_property_t *);
 
 typedef int32_t (*lv_property_get_int_t)(const lv_obj_t *);
+typedef bool (*lv_property_get_bool_t)(const lv_obj_t *);
 typedef lv_value_precise_t (*lv_property_get_precise_t)(const lv_obj_t *);
 typedef lv_color_t (*lv_property_get_color_t)(const lv_obj_t *);
 typedef lv_point_t (*lv_property_get_point_t)(lv_obj_t *);
@@ -59,7 +63,7 @@ lv_result_t lv_obj_set_property(lv_obj_t * obj, const lv_property_t * value)
     LV_ASSERT(obj && value);
 
     uint32_t index = LV_PROPERTY_ID_INDEX(value->id);
-    if(value->id == LV_PROPERTY_ID_INVALID || index < LV_PROPERTY_STYLE_START || index >= LV_PROPERTY_ID_BUILTIN_LAST) {
+    if(value->id == LV_PROPERTY_ID_INVALID || index > LV_PROPERTY_ID_ANY) {
         LV_LOG_WARN("Invalid property id set to %p", obj);
         return LV_RESULT_INVALID;
     }
@@ -87,10 +91,10 @@ lv_result_t lv_obj_set_properties(lv_obj_t * obj, const lv_property_t * value, u
 lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id)
 {
     lv_result_t result;
-    lv_property_t value;
+    lv_property_t value = { 0 };
 
     uint32_t index = LV_PROPERTY_ID_INDEX(id);
-    if(id == LV_PROPERTY_ID_INVALID || index < LV_PROPERTY_STYLE_START || index >= LV_PROPERTY_ID_BUILTIN_LAST) {
+    if(id == LV_PROPERTY_ID_INVALID || index > LV_PROPERTY_ID_ANY) {
         LV_LOG_WARN("Invalid property id to get from %p", obj);
         value.id = LV_PROPERTY_ID_INVALID;
         value.num = 0;
@@ -114,8 +118,9 @@ lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id)
 lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, uint32_t selector)
 {
     lv_property_t value;
+    uint32_t index = LV_PROPERTY_ID_INDEX(id);
 
-    if(id == LV_PROPERTY_ID_INVALID || id >= LV_PROPERTY_ID_START) {
+    if(index == LV_PROPERTY_ID_INVALID || index >= LV_PROPERTY_ID_START) {
         LV_LOG_WARN("invalid style property id %d", id);
         value.id = LV_PROPERTY_ID_INVALID;
         value.num = 0;
@@ -212,6 +217,12 @@ static lv_result_t obj_property(lv_obj_t * obj, lv_prop_id_t id, lv_property_t *
                         else value->num = ((lv_property_get_int_t)(prop->getter))(obj);
                         break;
                     }
+                case LV_PROPERTY_TYPE_BOOL: {
+                        if(set)((lv_property_set_bool_t)(prop->setter))(obj, value->enable);
+                        else value->enable = ((lv_property_get_bool_t)(prop->getter))(obj);
+                        break;
+                    }
+
                 case LV_PROPERTY_TYPE_PRECISE: {
                         if(set)((lv_property_set_precise_t)(prop->setter))(obj, value->precise);
                         else value->precise = ((lv_property_get_precise_t)(prop->getter))(obj);

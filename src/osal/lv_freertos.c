@@ -318,6 +318,36 @@ lv_result_t lv_thread_sync_delete(lv_thread_sync_t * pxCond)
     return LV_RESULT_OK;
 }
 
+lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * pxCond)
+{
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+#if USE_FREERTOS_TASK_NOTIFY
+    /* Send a notification to the task waiting. */
+    vTaskNotifyGiveFromISR(pxCond->xTaskToNotify, &xHigherPriorityTaskWoken);
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+#else
+    /* If the cond is uninitialized, perform initialization. */
+    prvCheckCondInit(pxCond);
+
+    /* Enter critical section to prevent preemption. */
+    _enter_critical();
+
+    pxCond->xSyncSignal = pdTRUE;
+    BaseType_t xAnyHigherPriorityTaskWoken = pdFALSE;
+
+    /* Unblock all. */
+    for(uint32_t i = 0; i < pxCond->ulWaitingThreads; i++) {
+        xSemaphoreGiveFromISR(pxCond->xCondWaitSemaphore, &xAnyHigherPriorityTaskWoken);
+        xHigherPriorityTaskWoken |= xAnyHigherPriorityTaskWoken;
+    }
+
+    _exit_critical();
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+#endif
+
+    return LV_RESULT_OK;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -334,7 +364,7 @@ static void prvRunThread(void * pxArg)
 
 static void prvMutexInit(lv_mutex_t * pxMutex)
 {
-    pxMutex->xMutex = xSemaphoreCreateMutex();
+    pxMutex->xMutex = xSemaphoreCreateRecursiveMutex();
 
     /* Ensure that the FreeRTOS mutex was successfully created. */
     if(pxMutex->xMutex == NULL) {

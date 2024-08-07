@@ -1,5 +1,5 @@
 /**
- * @file lv_qrcode
+ * @file lv_qrcode.h
  *
  */
 
@@ -14,6 +14,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../lv_conf_internal.h"
+#include "../../misc/lv_color.h"
+#include "../../misc/lv_types.h"
+#include "../../widgets/canvas/lv_canvas.h"
+#include LV_STDBOOL_INCLUDE
+#include LV_STDINT_INCLUDE
 #if LV_USE_QRCODE
 
 /*********************
@@ -23,13 +28,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-/*Data of qrcode*/
-typedef struct {
-    lv_canvas_t canvas;
-    lv_color_t dark_color;
-    lv_color_t light_color;
-} lv_qrcode_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_qrcode_class;
 

@@ -7,7 +7,7 @@
 
 typedef struct _test_hover_t {
     /* data */
-    uint32_t id;
+    char id[32];
     uint32_t counts;
 } test_hover_t;
 
@@ -35,8 +35,8 @@ void tearDown(void)
 
 static void hovered_event_cb(lv_event_t * e)
 {
-    test_hover_t * hover = (test_hover_t *)e->user_data;
-    lv_log("Object(ID:%d) hovered %d/%d times.\n", hover->id, hover->counts, TEST_HOVER_COUNTS);
+    test_hover_t * hover = lv_event_get_user_data(e);
+    lv_log("Object(ID:%s) hovered %u/%d times.\n", hover->id, hover->counts, TEST_HOVER_COUNTS);
 }
 
 static void test_move_mouse(lv_point_t * point, uint8_t size)
@@ -61,7 +61,7 @@ void test_hover_basic(void)
     lv_obj_set_style_text_color(label, lv_color_hex(0x5be1b6), LV_PART_MAIN | LV_STATE_HOVERED);
 
     /*Set hover callback*/
-    label_hovered.id = (lv_uintptr_t)label->id;
+    lv_obj_stringify_id(label, label_hovered.id, sizeof(label_hovered.id));
     label_hovered.counts = 0;
     lv_obj_add_event_cb(label, hovered_event_cb, LV_EVENT_HOVER_OVER, &label_hovered);
 
@@ -71,7 +71,7 @@ void test_hover_basic(void)
     lv_obj_set_style_bg_opa(btn, 128, LV_PART_MAIN | LV_STATE_HOVERED);
 
     /*Set hover callback*/
-    btn_hovered.id = (lv_uintptr_t)btn->id;
+    lv_obj_stringify_id(btn, btn_hovered.id, sizeof(btn_hovered.id));
     btn_hovered.counts = 0;
     lv_obj_add_event_cb(btn, hovered_event_cb, LV_EVENT_HOVER_OVER, &btn_hovered);
 

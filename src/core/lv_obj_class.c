@@ -6,7 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_obj.h"
+#include "lv_obj_class_private.h"
+#include "lv_obj_private.h"
 #include "../themes/lv_theme.h"
 #include "../display/lv_display.h"
 #include "../display/lv_display_private.h"
@@ -102,6 +103,8 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
 
 void lv_obj_class_init_obj(lv_obj_t * obj)
 {
+    if(obj == NULL) return;
+
     lv_obj_mark_layout_as_dirty(obj);
     lv_obj_enable_style_refresh(false);
 
@@ -130,7 +133,7 @@ void lv_obj_class_init_obj(lv_obj_t * obj)
     }
 }
 
-void _lv_obj_destruct(lv_obj_t * obj)
+void lv_obj_destruct(lv_obj_t * obj)
 {
     if(obj->class_p->destructor_cb) obj->class_p->destructor_cb(obj->class_p, obj);
 
@@ -139,7 +142,7 @@ void _lv_obj_destruct(lv_obj_t * obj)
         obj->class_p = obj->class_p->base_class;
 
         /*Call the base class's destructor too*/
-        _lv_obj_destruct(obj);
+        lv_obj_destruct(obj);
     }
 }
 

@@ -1,5 +1,5 @@
 /**
- * @file lv_stringn.h
+ * @file lv_string.h
  *
  */
 

@@ -6,6 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../core/lv_obj_scroll_private.h"
+#include "../core/lv_obj_private.h"
 #include "lv_indev.h"
 #include "lv_indev_private.h"
 #include "lv_indev_scroll.h"
@@ -41,7 +43,7 @@ static int32_t elastic_diff(lv_obj_t * scroll_obj, int32_t diff, int32_t scroll_
  *   GLOBAL FUNCTIONS
  **********************/
 
-void _lv_indev_scroll_handler(lv_indev_t * indev)
+void lv_indev_scroll_handler(lv_indev_t * indev)
 {
     if(indev->pointer.vect.x == 0 && indev->pointer.vect.y == 0) {
         return;
@@ -104,13 +106,13 @@ void _lv_indev_scroll_handler(lv_indev_t * indev)
     /*Respect the scroll limit area*/
     scroll_limit_diff(indev, &diff_x, &diff_y);
 
-    _lv_obj_scroll_by_raw(scroll_obj, diff_x, diff_y);
+    lv_obj_scroll_by_raw(scroll_obj, diff_x, diff_y);
     if(indev->reset_query) return;
     indev->pointer.scroll_sum.x += diff_x;
     indev->pointer.scroll_sum.y += diff_y;
 }
 
-void _lv_indev_scroll_throw_handler(lv_indev_t * indev)
+void lv_indev_scroll_throw_handler(lv_indev_t * indev)
 {
     lv_obj_t * scroll_obj = indev->pointer.scroll_obj;
     if(scroll_obj == NULL) return;
@@ -139,7 +141,7 @@ void _lv_indev_scroll_throw_handler(lv_indev_t * indev)
             indev->pointer.scroll_throw_vect.y = elastic_diff(scroll_obj, indev->pointer.scroll_throw_vect.y, st, sb,
                                                               LV_DIR_VER);
 
-            _lv_obj_scroll_by_raw(scroll_obj, 0,  indev->pointer.scroll_throw_vect.y);
+            lv_obj_scroll_by_raw(scroll_obj, 0,  indev->pointer.scroll_throw_vect.y);
             if(indev->reset_query) return;
         }
         /*With snapping find the nearest snap point and scroll there*/
@@ -165,7 +167,7 @@ void _lv_indev_scroll_throw_handler(lv_indev_t * indev)
             indev->pointer.scroll_throw_vect.x = elastic_diff(scroll_obj, indev->pointer.scroll_throw_vect.x, sl, sr,
                                                               LV_DIR_HOR);
 
-            _lv_obj_scroll_by_raw(scroll_obj, indev->pointer.scroll_throw_vect.x, 0);
+            lv_obj_scroll_by_raw(scroll_obj, indev->pointer.scroll_throw_vect.x, 0);
             if(indev->reset_query) return;
         }
         /*With snapping find the nearest snap point and scroll there*/

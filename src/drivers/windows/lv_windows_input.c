@@ -18,10 +18,11 @@
 #include "lv_windows_display.h"
 #include "lv_windows_input_private.h"
 #include "../../misc/lv_text_private.h"
+#include "../../core/lv_obj_private.h"
 
 #include <windowsx.h>
 
-#include "../../widgets/textarea/lv_textarea.h"
+#include "../../widgets/textarea/lv_textarea_private.h"
 #include "../../widgets/keyboard/lv_keyboard.h"
 
 /*********************
@@ -128,7 +129,7 @@ lv_indev_t * lv_windows_acquire_keypad_indev(lv_display_t * display)
     }
 
     if(!context->keypad.indev) {
-        _lv_ll_init(
+        lv_ll_init(
             &context->keypad.queue,
             sizeof(lv_windows_keypad_queue_item_t));
         context->keypad.utf16_high_surrogate = 0;
@@ -421,12 +422,12 @@ static void lv_windows_keypad_driver_read_callback(
     }
 
     lv_windows_keypad_queue_item_t * current = (lv_windows_keypad_queue_item_t *)(
-                                                   _lv_ll_get_head(&context->keypad.queue));
+                                                   lv_ll_get_head(&context->keypad.queue));
     if(current) {
         data->key = current->key;
         data->state = current->state;
 
-        _lv_ll_remove(&context->keypad.queue, current);
+        lv_ll_remove(&context->keypad.queue, current);
         lv_free(current);
 
         data->continue_reading = true;
@@ -451,7 +452,7 @@ static void lv_windows_release_keypad_device_event_callback(lv_event_t * e)
         return;
     }
 
-    _lv_ll_clear(&context->keypad.queue);
+    lv_ll_clear(&context->keypad.queue);
     context->keypad.utf16_high_surrogate = 0;
     context->keypad.utf16_low_surrogate = 0;
 
@@ -464,7 +465,7 @@ static void lv_windows_push_key_to_keyboard_queue(
     lv_indev_state_t state)
 {
     lv_windows_keypad_queue_item_t * current = (lv_windows_keypad_queue_item_t *)(
-                                                   _lv_ll_ins_tail(&context->keypad.queue));
+                                                   lv_ll_ins_tail(&context->keypad.queue));
     if(current) {
         current->key = key;
         current->state = state;

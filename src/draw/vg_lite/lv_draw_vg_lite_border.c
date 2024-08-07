@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 
+#include "../../misc/lv_area_private.h"
+#include "../lv_draw_private.h"
 #include "lv_draw_vg_lite.h"
 
 #if LV_USE_DRAW_VG_LITE
@@ -45,7 +47,7 @@ void lv_draw_vg_lite_border(lv_draw_unit_t * draw_unit, const lv_draw_border_dsc
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     lv_area_t clip_area;
-    if(!_lv_area_intersect(&clip_area, coords, draw_unit->clip_area)) {
+    if(!lv_area_intersect(&clip_area, coords, draw_unit->clip_area)) {
         /*Fully clipped, nothing to do*/
         return;
     }

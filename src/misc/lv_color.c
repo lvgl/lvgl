@@ -8,7 +8,6 @@
  *********************/
 #include "lv_color.h"
 #include "lv_log.h"
-#include "../misc/lv_color.h"
 
 /*********************
  *      DEFINES
@@ -239,6 +238,143 @@ lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8)
 lv_color_hsv_t lv_color_to_hsv(lv_color_t c)
 {
     return lv_color_rgb_to_hsv(c.red, c.green, c.blue);
+}
+
+uint8_t lv_color_format_get_size(lv_color_format_t cf)
+{
+    return (lv_color_format_get_bpp(cf) + 7) >> 3;
+}
+
+uint32_t lv_color_to_int(lv_color_t c)
+{
+    uint8_t * tmp = (uint8_t *) &c;
+    return tmp[0] + (tmp[1] << 8) + (tmp[2] << 16);
+}
+
+bool lv_color_eq(lv_color_t c1, lv_color_t c2)
+{
+    return lv_color_to_int(c1) == lv_color_to_int(c2);
+}
+
+bool lv_color32_eq(lv_color32_t c1, lv_color32_t c2)
+{
+    return *((uint32_t *)&c1) == *((uint32_t *)&c2);
+}
+
+lv_color_t lv_color_hex(uint32_t c)
+{
+    lv_color_t ret;
+    ret.red = (c >> 16) & 0xff;
+    ret.green = (c >> 8) & 0xff;
+    ret.blue = (c >> 0) & 0xff;
+    return ret;
+}
+
+lv_color_t lv_color_make(uint8_t r, uint8_t g, uint8_t b)
+{
+    lv_color_t ret;
+    ret.red = r;
+    ret.green = g;
+    ret.blue = b;
+    return ret;
+}
+
+lv_color32_t lv_color32_make(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+{
+    lv_color32_t ret;
+    ret.red = r;
+    ret.green = g;
+    ret.blue = b;
+    ret.alpha = a;
+    return ret;
+}
+
+lv_color_t lv_color_hex3(uint32_t c)
+{
+    return lv_color_make((uint8_t)(((c >> 4) & 0xF0) | ((c >> 8) & 0xF)), (uint8_t)((c & 0xF0) | ((c & 0xF0) >> 4)),
+                         (uint8_t)((c & 0xF) | ((c & 0xF) << 4)));
+}
+
+uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_16_16_mix(uint16_t c1, uint16_t c2, uint8_t mix)
+{
+    if(mix == 255) return c1;
+    if(mix == 0) return c2;
+    if(c1 == c2) return c1;
+
+    uint16_t ret;
+
+    /* Source: https://stackoverflow.com/a/50012418/1999969*/
+    mix = (uint32_t)((uint32_t)mix + 4) >> 3;
+
+    /*0x7E0F81F = 0b00000111111000001111100000011111*/
+    uint32_t bg = (uint32_t)(c2 | ((uint32_t)c2 << 16)) & 0x7E0F81F;
+    uint32_t fg = (uint32_t)(c1 | ((uint32_t)c1 << 16)) & 0x7E0F81F;
+    uint32_t result = ((((fg - bg) * mix) >> 5) + bg) & 0x7E0F81F;
+    ret = (uint16_t)(result >> 16) | result;
+
+    return ret;
+}
+
+lv_color_t lv_color_white(void)
+{
+    return lv_color_make(0xff, 0xff, 0xff);
+}
+
+lv_color_t lv_color_black(void)
+{
+    return lv_color_make(0x00, 0x00, 0x00);
+}
+
+void lv_color_premultiply(lv_color32_t * c)
+{
+    if(c->alpha == LV_OPA_COVER) {
+        return;
+    }
+
+    if(c->alpha == LV_OPA_TRANSP) {
+        lv_memzero(c, sizeof(lv_color32_t));
+        return;
+    }
+
+    c->red = LV_OPA_MIX2(c->red, c->alpha);
+    c->green = LV_OPA_MIX2(c->green, c->alpha);
+    c->blue = LV_OPA_MIX2(c->blue, c->alpha);
+}
+
+void lv_color16_premultiply(lv_color16_t * c, lv_opa_t a)
+{
+    if(a == LV_OPA_COVER) {
+        return;
+    }
+
+    if(a == LV_OPA_TRANSP) {
+        lv_memzero(c, sizeof(lv_color16_t));
+        return;
+    }
+
+    c->red = LV_OPA_MIX2(c->red, a);
+    c->green = LV_OPA_MIX2(c->green, a);
+    c->blue = LV_OPA_MIX2(c->blue, a);
+}
+
+uint8_t lv_color_luminance(lv_color_t c)
+{
+    return (uint8_t)((uint16_t)(77u * c.red + 151u * c.green + 28u * c.blue) >> 8);
+}
+
+uint8_t lv_color16_luminance(const lv_color16_t c)
+{
+    return (uint8_t)((uint16_t)(635u * c.red + 613u * c.green + 231u * c.blue) >> 8);
+}
+
+uint8_t lv_color24_luminance(const uint8_t * c)
+{
+    return (uint8_t)((uint16_t)(77u * c[2] + 151u * c[1] + 28u * c[0]) >> 8);
+}
+
+uint8_t lv_color32_luminance(lv_color32_t c)
+{
+    return (uint8_t)((uint16_t)(77u * c.red + 151u * c.green + 28u * c.blue) >> 8);
 }
 
 /**********************

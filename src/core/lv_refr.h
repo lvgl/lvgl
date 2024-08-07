@@ -42,16 +42,6 @@ extern "C" {
  **********************/
 
 /**
- * Initialize the screen refresh subsystem
- */
-void _lv_refr_init(void);
-
-/**
- * Deinitialize the screen refresh subsystem
- */
-void _lv_refr_deinit(void);
-
-/**
  * Redraw the invalidated areas now.
  * Normally the redrawing is periodically executed in `lv_timer_handler` but a long blocking process
  * can prevent the call of `lv_timer_handler`. In this case if the GUI is updated in the process
@@ -66,32 +56,6 @@ void lv_refr_now(lv_display_t * disp);
  * @param obj   the start object from the redraw should start
  */
 void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj);
-
-/**
- * Invalidate an area on display to redraw it
- * @param area_p pointer to area which should be invalidated (NULL: delete the invalidated areas)
- * @param disp pointer to display where the area should be invalidated (NULL can be used if there is
- * only one display)
- */
-void _lv_inv_area(lv_display_t * disp, const lv_area_t * area_p);
-
-/**
- * Get the display which is being refreshed
- * @return the display being refreshed
- */
-lv_display_t * _lv_refr_get_disp_refreshing(void);
-
-/**
- * Set the display which is being refreshed
- * @param disp the display being refreshed
- */
-void _lv_refr_set_disp_refreshing(lv_display_t * disp);
-
-/**
- * Called periodically to handle the refreshing
- * @param timer pointer to the timer itself
- */
-void _lv_display_refr_timer(lv_timer_t * timer);
 
 /**********************
  *   STATIC FUNCTIONS

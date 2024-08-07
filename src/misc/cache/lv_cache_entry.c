@@ -19,7 +19,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
-struct _lv_cache_entry_t {
+struct lv_cache_entry_t {
     const lv_cache_t * cache;
     int32_t ref_cnt;
     uint32_t node_size;
