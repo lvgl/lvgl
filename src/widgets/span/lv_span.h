@@ -35,10 +35,10 @@ typedef enum {
 } lv_span_overflow_t;
 
 typedef enum {
-    LV_SPAN_MODE_FIXED,     /**< fixed the obj size*/
-    LV_SPAN_MODE_EXPAND,    /**< Expand the object size to the text size*/
-    LV_SPAN_MODE_BREAK,     /**< Keep width, break the too long lines and expand height*/
-    LV_SPAN_MODE_LAST      /**< Fence member*/
+    LV_SPAN_MODE_FIXED,     /**< fixed the obj size */
+    LV_SPAN_MODE_EXPAND,    /**< Expand the object size to the text size */
+    LV_SPAN_MODE_BREAK,     /**< Keep width, break the too long lines and expand height */
+    LV_SPAN_MODE_LAST       /**< Fence member */
 } lv_span_mode_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_spangroup_class;

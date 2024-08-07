@@ -27,12 +27,12 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Data of keyboard*/
+/** Data of keyboard */
 struct lv_keyboard_t {
     lv_buttonmatrix_t btnm;
-    lv_obj_t * ta;              /*Pointer to the assigned text area*/
-    lv_keyboard_mode_t mode;    /*Key map type*/
-    uint8_t popovers : 1;       /*Show button titles in popovers on press*/
+    lv_obj_t * ta;              /**< Pointer to the assigned text area */
+    lv_keyboard_mode_t mode;    /**< Key map type */
+    uint8_t popovers : 1;       /**< Show button titles in popovers on press */
 };
 
 
