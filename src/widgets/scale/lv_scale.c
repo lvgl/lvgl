@@ -661,7 +661,8 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
         const int32_t major_len = lv_obj_get_style_length(obj, LV_PART_INDICATOR);
 
         /* Also take into consideration the letter space of the style */
-        int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1) + (translate_rotation * 10U);
+        int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1) +
+                                (translate_rotation * 10U);
         angle_upscale += scale->rotation * 10U;
 
         uint32_t radius_text = 0;
@@ -685,7 +686,7 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
         return;
     }
 
-    if (label_rotation > 0) {
+    if(label_rotation > 0) {
         /*Draw the label to a new layer and draw the layer rotated*/
         lv_layer_t * layer_label = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &label_coords);
         lv_draw_label(layer_label, label_dsc, &label_coords);
