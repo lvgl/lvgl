@@ -1,3 +1,5 @@
+include("${CMAKE_CURRENT_LIST_DIR}/version.cmake")
+
 file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c ${LVGL_ROOT_DIR}/src/*.cpp)
 
 idf_build_get_property(LV_MICROPYTHON LV_MICROPYTHON)
