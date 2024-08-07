@@ -22,7 +22,7 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/*Use this value to let LVGL calculate stride automatically*/
+/** Use this value to let LVGL calculate stride automatically */
 #define LV_STRIDE_AUTO 0
 LV_EXPORT_CONST_INT(LV_STRIDE_AUTO);
 
@@ -32,9 +32,9 @@ LV_EXPORT_CONST_INT(LV_STRIDE_AUTO);
 
 typedef struct {
     lv_image_header_t header;
-    uint32_t data_size;     /*Total buf size in bytes*/
+    uint32_t data_size;     /**< Total buf size in bytes */
     uint8_t * data;
-    void * unaligned_data;  /*Unaligned address of `data`, used internally by lvgl*/
+    void * unaligned_data;  /**< Unaligned address of `data`, used internally by lvgl */
 } lv_draw_buf_t;
 
 /**
@@ -46,7 +46,7 @@ typedef struct {
 #define LV_DRAW_BUF_STRIDE(w, cf) \
     LV_ROUND_UP(((w) * LV_COLOR_FORMAT_GET_BPP(cf) + 7) / 8, LV_DRAW_BUF_STRIDE_ALIGN)
 
-/* Allocate a slightly larger buffer, so we can adjust the start address to meet alignment */
+/** Allocate a slightly larger buffer, so we can adjust the start address to meet alignment */
 #define LV_DRAW_BUF_SIZE(w, h, cf) \
     (LV_DRAW_BUF_STRIDE(w, cf) * (h) + LV_DRAW_BUF_ALIGN + \
      LV_COLOR_INDEXED_PALETTE_SIZE(cf) * sizeof(lv_color32_t))
@@ -105,12 +105,13 @@ void lv_draw_buf_init_with_default_handlers(lv_draw_buf_handlers_t * handlers);
 /**
  * Initialize the draw buffer with given handlers.
  *
- * @param handlers          the draw buffer handlers to set
- * @param buf_malloc_cb     the callback to allocate memory for the buffer
- * @param buf_free_cb       the callback to free memory of the buffer
- * @param align_pointer_cb  the callback to align the buffer
- * @param invalidate_cache_cb the callback to invalidate the cache of the buffer
- * @param width_to_stride_cb the callback to calculate the stride based on the width and color format
+ * @param handlers             the draw buffer handlers to set
+ * @param buf_malloc_cb        the callback to allocate memory for the buffer
+ * @param buf_free_cb          the callback to free memory of the buffer
+ * @param align_pointer_cb     the callback to align the buffer
+ * @param invalidate_cache_cb  the callback to invalidate the cache of the buffer
+ * @param flush_cache_cb       ???
+ * @param width_to_stride_cb   the callback to calculate the stride based on the width and color format
  */
 void lv_draw_buf_handlers_init(lv_draw_buf_handlers_t * handlers,
                                lv_draw_buf_malloc_cb buf_malloc_cb,

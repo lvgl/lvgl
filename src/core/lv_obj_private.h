@@ -29,7 +29,7 @@ extern "C" {
  * They are allocated automatically if any elements is set.
  */
 struct lv_obj_spec_attr_t {
-    lv_obj_t ** children;   /**< Store the pointer of the children in an array.*/
+    lv_obj_t ** children;           /**< Store the pointer of the children in an array.*/
     lv_group_t * group_p;
     lv_event_list_t event_list;
 
@@ -43,7 +43,7 @@ struct lv_obj_spec_attr_t {
     uint16_t scroll_snap_x : 2;     /**< Where to align the snappable children horizontally, see `lv_scroll_snap_t`*/
     uint16_t scroll_snap_y : 2;     /**< Where to align the snappable children vertically*/
     uint16_t scroll_dir : 4;        /**< The allowed scroll direction(s), see `lv_dir_t`*/
-    uint16_t layer_type : 2;        /**< Cache the layer type here. Element of @lv_intermediate_layer_type_t */
+    uint16_t layer_type : 2;        /**< Cache the layer type here. Element of lv_intermediate_layer_type_t */
 };
 
 struct lv_obj_t {

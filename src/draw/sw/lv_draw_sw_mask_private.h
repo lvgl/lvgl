@@ -26,20 +26,21 @@ extern "C" {
 
 typedef struct  {
     uint8_t * buf;
-    lv_opa_t * cir_opa;         /*Opacity of values on the circumference of an 1/4 circle*/
-    uint16_t * x_start_on_y;        /*The x coordinate of the circle for each y value*/
-    uint16_t * opa_start_on_y;      /*The index of `cir_opa` for each y value*/
-    int32_t life;               /*How many times the entry way used*/
-    uint32_t used_cnt;          /*Like a semaphore to count the referencing masks*/
-    int32_t radius;          /*The radius of the entry*/
+    lv_opa_t * cir_opa;         /**< Opacity of values on the circumference of an 1/4 circle */
+    uint16_t * x_start_on_y;    /**< The x coordinate of the circle for each y value */
+    uint16_t * opa_start_on_y;  /**< The index of `cir_opa` for each y value */
+    int32_t life;               /**< How many times the entry way used */
+    uint32_t used_cnt;          /**< Like a semaphore to count the referencing masks */
+    int32_t radius;             /**< The radius of the entry */
 } lv_draw_sw_mask_radius_circle_dsc_t;
+
 struct lv_draw_sw_mask_common_dsc_t {
     lv_draw_sw_mask_xcb_t cb;
     lv_draw_sw_mask_type_t type;
 };
 
 struct lv_draw_sw_mask_line_param_t {
-    /*The first element must be the common descriptor*/
+    /** The first element must be the common descriptor */
     lv_draw_sw_mask_common_dsc_t dsc;
 
     struct {
@@ -53,31 +54,31 @@ struct lv_draw_sw_mask_line_param_t {
         lv_draw_sw_mask_line_side_t side : 2;
     } cfg;
 
-    /*A point of the line*/
+    /** A point of the line */
     lv_point_t origo;
 
-    /*X / (1024*Y) steepness (X is 0..1023 range). What is the change of X in 1024 Y?*/
+    /** X / (1024*Y) steepness (X is 0..1023 range). What is the change of X in 1024 Y? */
     int32_t xy_steep;
 
-    /*Y / (1024*X) steepness (Y is 0..1023 range). What is the change of Y in 1024 X?*/
+    /** Y / (1024*X) steepness (Y is 0..1023 range). What is the change of Y in 1024 X? */
     int32_t yx_steep;
 
-    /*Helper which stores yx_steep for flat lines and xy_steep for steep (non flat) lines*/
+    /** Helper which stores yx_steep for flat lines and xy_steep for steep (non flat) lines */
     int32_t steep;
 
-    /*Steepness in 1 px in 0..255 range. Used only by flat lines.*/
+    /** Steepness in 1 px in 0..255 range. Used only by flat lines. */
     int32_t spx;
 
-    /*1: It's a flat line? (Near to horizontal)*/
+    /** 1: It's a flat line? (Near to horizontal) */
     uint8_t flat : 1;
 
-    /*Invert the mask. The default is: Keep the left part.
-     *It is used to select left/right/top/bottom*/
+    /** Invert the mask. The default is: Keep the left part.
+     *It is used to select left/right/top/bottom */
     uint8_t inv: 1;
 };
 
 struct lv_draw_sw_mask_angle_param_t {
-    /*The first element must be the common descriptor*/
+    /** The first element must be the common descriptor */
     lv_draw_sw_mask_common_dsc_t dsc;
 
     struct {
@@ -92,13 +93,13 @@ struct lv_draw_sw_mask_angle_param_t {
 };
 
 struct lv_draw_sw_mask_radius_param_t {
-    /*The first element must be the common descriptor*/
+    /** The first element must be the common descriptor */
     lv_draw_sw_mask_common_dsc_t dsc;
 
     struct {
         lv_area_t rect;
         int32_t radius;
-        /*Invert the mask. 0: Keep the pixels inside.*/
+        /** Invert the mask. 0: Keep the pixels inside. */
         uint8_t outer: 1;
     } cfg;
 
@@ -106,7 +107,7 @@ struct lv_draw_sw_mask_radius_param_t {
 };
 
 struct lv_draw_sw_mask_fade_param_t {
-    /*The first element must be the common descriptor*/
+    /** The first element must be the common descriptor */
     lv_draw_sw_mask_common_dsc_t dsc;
 
     struct {
@@ -120,7 +121,7 @@ struct lv_draw_sw_mask_fade_param_t {
 };
 
 struct lv_draw_sw_mask_map_param_t {
-    /*The first element must be the common descriptor*/
+    /** The first element must be the common descriptor */
     lv_draw_sw_mask_common_dsc_t dsc;
 
     struct {

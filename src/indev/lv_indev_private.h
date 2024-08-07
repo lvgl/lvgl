@@ -24,10 +24,10 @@ extern "C" {
  **********************/
 
 struct lv_indev_t {
-    /**< Input device type*/
+    /** Input device type*/
     lv_indev_type_t type;
 
-    /**< Function pointer to read input device data.*/
+    /** Function pointer to read input device data.*/
     lv_indev_read_cb_t read_cb;
 
     lv_indev_state_t state; /**< Current state of the input device.*/

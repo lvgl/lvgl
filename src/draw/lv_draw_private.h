@@ -54,7 +54,7 @@ struct lv_draw_task_t {
     lv_matrix_t matrix;
 #endif
 
-    volatile int state;              /*int instead of lv_draw_task_state_t to be sure its atomic*/
+    volatile int state;              /** int instead of lv_draw_task_state_t to be sure its atomic */
 
     void * draw_dsc;
 
