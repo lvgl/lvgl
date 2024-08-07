@@ -451,12 +451,22 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
         ${test_case_fname}
         ${test_runner_fname}
     )
-    target_link_libraries(${test_name} PRIVATE
-            test_common
-            lvgl_demos
-            lvgl
-            lvgl_thorvg
-            ${PNG_LIBRARIES}
+
+    # maintain proper link order
+    set (TEST_LINK_LIBS test_common)
+    if(CONFIG_LV_BUILD_DEMOS)
+      list(APPEND TEST_LINK_LIBS lvgl_demos)
+    endif()
+    if(CONFIG_LV_BUILD_EXAMPLES)
+      list(APPEND TEST_LINK_LIBS lvgl_examples)
+    endif()
+    list(APPEND TEST_LINK_LIBS lvgl)
+    if(LV_CONF_BUILD_THORVG_INTERNAL)
+      list(APPEND TEST_LINK_LIBS lvgl_thorvg)
+    endif()
+
+    list(APPEND TEST_LINK_LIBS 
+    ${PNG_LIBRARIES}
             ${FREETYPE_LIBRARIES}
             ${LIBDRM_LIBRARIES}
             ${LIBINPUT_LIBRARIES}
@@ -464,6 +474,9 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             m
             pthread
             ${TEST_LIBS})
+
+    target_link_libraries(${test_name} PRIVATE
+            ${TEST_LINK_LIBS})
 
     if(OPTIONS_SDL)
         target_link_libraries(${test_name} PRIVATE
