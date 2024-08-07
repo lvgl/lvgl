@@ -8,9 +8,7 @@
  *********************/
 #include "lv_glfw_window_private.h"
 #if LV_USE_OPENGLES
-#include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include "../../core/lv_refr.h"
 #include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
@@ -55,7 +53,6 @@ static void framebuffer_size_callback(GLFWwindow * window, int width, int height
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool inited = false;
 static lv_timer_t * update_handler_timer;
 static lv_ll_t glfw_window_ll;
 
@@ -79,7 +76,9 @@ lv_glfw_window_t * lv_glfw_window_create(int32_t hor_res, int32_t ver_res, bool 
     lv_memzero(window, sizeof(*window));
 
     /* Create window with graphics context */
-    window->window = glfwCreateWindow(hor_res, ver_res, "LVGL Simulator", NULL, NULL);
+    lv_glfw_window_t * existing_window = _lv_ll_get_head(&glfw_window_ll);
+    window->window = glfwCreateWindow(hor_res, ver_res, "LVGL Simulator", NULL,
+                                      existing_window ? existing_window->window : NULL);
     if(window->window == NULL) {
         LV_LOG_ERROR("glfwCreateWindow fail.");
         _lv_ll_remove(&glfw_window_ll, window);
@@ -162,6 +161,9 @@ lv_glfw_texture_t * lv_glfw_window_add_texture(lv_glfw_window_t * window, unsign
 
 void lv_glfw_texture_remove(lv_glfw_texture_t * texture)
 {
+    if(texture->indev != NULL) {
+        lv_indev_delete(texture->indev);
+    }
     _lv_ll_remove(&texture->window->textures, texture);
     lv_free(texture);
 }
@@ -229,12 +231,9 @@ static int lv_glew_init(void)
 
 static void lv_glfw_timer_init(void)
 {
-    if(!inited) {
+    if(update_handler_timer == NULL) {
         update_handler_timer = lv_timer_create(window_update_handler, LV_DEF_REFR_PERIOD, NULL);
-
         lv_tick_set_cb(lv_glfw_tick_count_callback);
-
-        inited = true;
     }
 }
 
@@ -265,7 +264,6 @@ static void lv_glfw_window_quit(void)
 
     lv_deinit();
 
-    inited = false;
     exit(0);
 }
 
@@ -347,8 +345,8 @@ static void mouse_button_callback(GLFWwindow * window, int button, int action, i
 static void mouse_move_callback(GLFWwindow * window, double xpos, double ypos)
 {
     lv_glfw_window_t * lv_window = lv_glfw_get_lv_window_from_window(window);
-    lv_window->mouse_last_point.x = xpos;
-    lv_window->mouse_last_point.y = ypos;
+    lv_window->mouse_last_point.x = (int32_t)xpos;
+    lv_window->mouse_last_point.y = (int32_t)ypos;
     proc_mouse(lv_window);
 }
 
@@ -357,7 +355,7 @@ static void proc_mouse(lv_glfw_window_t * window)
     /* mouse activity will affect the topmost LVGL display texture */
     lv_glfw_texture_t * texture;
     _LV_LL_READ_BACK(&window->textures, texture) {
-        if(texture->indev != NULL && _lv_area_is_point_on(&texture->area, &window->mouse_last_point, 0)) {
+        if(_lv_area_is_point_on(&texture->area, &window->mouse_last_point, 0)) {
             texture->indev_last_point.x = window->mouse_last_point.x - texture->area.x1;
             texture->indev_last_point.y = window->mouse_last_point.y - texture->area.y1;
             texture->indev_last_state = window->mouse_last_state;
@@ -383,7 +381,8 @@ static void framebuffer_size_callback(GLFWwindow * window, int width, int height
 
 static uint32_t lv_glfw_tick_count_callback(void)
 {
-    return glfwGetTime() * 1000.0;
+    double tick = glfwGetTime() * 1000.0;
+    return (uint32_t)tick;
 }
 
 #endif /*LV_USE_OPENGLES*/

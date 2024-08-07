@@ -85,23 +85,21 @@ lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h)
     return disp;
 }
 
-bool lv_opengles_texture_get_texture_id(lv_display_t * disp, unsigned int * texture_id_dst)
+unsigned int lv_opengles_texture_get_texture_id(lv_display_t * disp)
 {
     if(disp->flush_cb != flush_cb) {
-        return false;
+        return 0;
     }
     lv_opengles_texture_t * dsc = lv_display_get_driver_data(disp);
-    *texture_id_dst = dsc->texture_id;
-    return true;
+    return dsc->texture_id;
 }
 
 lv_display_t * lv_opengles_texture_get_from_texture_id(unsigned int texture_id)
 {
     lv_display_t * disp = NULL;
     while(NULL != (disp = lv_display_get_next(disp))) {
-        unsigned int disp_texture_id;
-        if(lv_opengles_texture_get_texture_id(disp, &disp_texture_id)
-           && disp_texture_id == texture_id) {
+        unsigned int disp_texture_id = lv_opengles_texture_get_texture_id(disp);
+        if(disp_texture_id == texture_id) {
             return disp;
         }
     }
@@ -117,29 +115,27 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     LV_UNUSED(area);
     LV_UNUSED(px_map);
 
-    if(!lv_display_flush_is_last(disp)) {
-        lv_display_flush_ready(disp);
-        return;
-    }
+    if(lv_display_flush_is_last(disp)) {
 
-    lv_opengles_texture_t * dsc = lv_display_get_driver_data(disp);
+        lv_opengles_texture_t * dsc = lv_display_get_driver_data(disp);
 
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, dsc->texture_id));
+        GL_CALL(glBindTexture(GL_TEXTURE_2D, dsc->texture_id));
 
-    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-    /*Color depth: 8 (A8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
+        GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+        /*Color depth: 8 (A8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
 #if LV_COLOR_DEPTH == 8
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, disp->hor_res, disp->ver_res, 0, GL_RED, GL_UNSIGNED_BYTE, dsc->fb1));
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, disp->hor_res, disp->ver_res, 0, GL_RED, GL_UNSIGNED_BYTE, dsc->fb1));
 #elif LV_COLOR_DEPTH == 16
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp->hor_res, disp->ver_res, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-                         dsc->fb1));
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp->hor_res, disp->ver_res, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
+                             dsc->fb1));
 #elif LV_COLOR_DEPTH == 24
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, disp->hor_res, disp->ver_res, 0, GL_BGR, GL_UNSIGNED_BYTE, dsc->fb1));
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, disp->hor_res, disp->ver_res, 0, GL_BGR, GL_UNSIGNED_BYTE, dsc->fb1));
 #elif LV_COLOR_DEPTH == 32
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp->hor_res, disp->ver_res, 0, GL_BGRA, GL_UNSIGNED_BYTE, dsc->fb1));
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp->hor_res, disp->ver_res, 0, GL_BGRA, GL_UNSIGNED_BYTE, dsc->fb1));
 #else
 #error("Unsupported color format")
 #endif
+    }
 
     lv_display_flush_ready(disp);
 }

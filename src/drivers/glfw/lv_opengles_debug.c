@@ -24,10 +24,6 @@
  *  STATIC PROTOTYPES
  **********************/
 
-/***********************
- *   GLOBAL PROTOTYPES
- ***********************/
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -49,10 +45,14 @@ bool GLLogCall(const char * function, const char * file, int line)
 {
     GLenum error;
     while((error = glGetError()) != GL_NO_ERROR) {
-        LV_LOG_ERROR("[OpenGL Error] (%d) %s %s:%d\n", error, function, file, line);
+        LV_LOG_ERROR("[OpenGL Error] (%d) %s %s:%d", error, function, file, line);
         return false;
     }
     return true;
 }
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 #endif /* LV_USE_OPENGLES */

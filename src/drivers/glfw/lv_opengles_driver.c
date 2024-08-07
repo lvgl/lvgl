@@ -10,10 +10,6 @@
 
 #if LV_USE_OPENGLES
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdint.h>
 #include "lv_opengles_debug.h"
 #include "lv_opengles_driver.h"
 
@@ -138,7 +134,7 @@ void lv_opengles_init(void)
         2, 3, 0
     };
 
-    lv_opengles_vertex_buffer_init(positions, 4 * 4 * sizeof(float));
+    lv_opengles_vertex_buffer_init(positions, sizeof(positions));
 
     lv_opengles_vertex_array_init();
     lv_opengles_vertex_array_add_buffer();
@@ -180,8 +176,8 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
     };
 
     lv_opengles_shader_bind();
-    lv_opengles_shader_set_uniform1i("u_ColorDepth", 32);
-    lv_opengles_shader_set_uniform1i("u_Texture", 1);
+    lv_opengles_shader_set_uniform1i("u_ColorDepth", LV_COLOR_DEPTH);
+    lv_opengles_shader_set_uniform1i("u_Texture", 0);
     lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, true, matrix);
     lv_opengles_shader_set_uniform1f("u_Opa", (float)opa / (float)LV_OPA_100);
     lv_opengles_render_draw();
@@ -306,8 +302,8 @@ static unsigned int lv_opengles_shader_compile(unsigned int type, const char * s
         GL_CALL(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length));
         char * message = lv_malloc_zeroed(length * sizeof(char));
         GL_CALL(glGetShaderInfoLog(id, length, &length, message));
-        LV_LOG_ERROR("Failed to compile %s shader!\n", type == GL_VERTEX_SHADER ? "vertex" : "fragment");
-        LV_LOG_ERROR("%s\n", message);
+        LV_LOG_ERROR("Failed to compile %s shader!", type == GL_VERTEX_SHADER ? "vertex" : "fragment");
+        LV_LOG_ERROR("%s", message);
         GL_CALL(glDeleteShader(id));
         return 0;
     }
@@ -356,7 +352,7 @@ static int lv_opengles_shader_get_uniform_location(const char * name)
 {
     int id = -1;
     for(size_t i = 0; i < sizeof(shader_location) / sizeof(int); i++) {
-        if(strcmp(shader_names[i], name) == 0) {
+        if(lv_strcmp(shader_names[i], name) == 0) {
             id = i;
         }
     }
@@ -370,7 +366,7 @@ static int lv_opengles_shader_get_uniform_location(const char * name)
 
     GL_CALL(int location = glGetUniformLocation(shader_id, name));
     if(location == -1)
-        LV_LOG_WARN("Warning: uniform '%s' doesn't exist!\n", name);
+        LV_LOG_WARN("Warning: uniform '%s' doesn't exist!", name);
 
     shader_location[id] = location;
     return location;
