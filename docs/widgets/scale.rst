@@ -60,9 +60,13 @@ i.e. :cpp:expr:`static char * custom_labels[3] = {"One", "Two", NULL};`.
 It's possible to have the labels automatically rotated to match the ticks (only for RADIAL scales) using
 :cpp:expr:`lv_obj_set_style_transform_rotation(scale, LV_SCALE_LABEL_ROTATE_MATCH_TICKS, LV_PART_INDICATOR);`
 Or rotated a fixed amount (on any scale type) - here for 20 degrees:
-:cpp:expr:`lv_obj_set_style_transform_rotation(scale, 200, LV_PART_INDICATOR);`
+:cpp:expr:`lv_obj_set_style_transform_rotation(scale, 20, LV_PART_INDICATOR);`
 Or both at the same time
 :cpp:expr:`lv_obj_set_style_transform_rotation(scale, LV_SCALE_LABEL_ROTATE_MATCH_TICKS + 200, LV_PART_INDICATOR);`
+Some labels of the scale might be drawn upside down (to match the tick) if the scale includes a certain angle range. 
+If you don't want this, to automatically rotate the labels to keep them upright, an additional flag can be used. 
+Labels that would be upside down are then rotated 180
+:cpp:expr:`lv_obj_set_style_transform_rotation(scale, LV_SCALE_LABEL_ROTATE_MATCH_TICKS | LV_SCALE_LABEL_ROTATE_KEEP_UPRIGHT, LV_PART_INDICATOR);`
 Labels can also be moved a fixed distance in X and Y using e.g.
 :cpp:expr:`lv_obj_set_style_translate_x(scale, 10, LV_PART_INDICATOR);`
 

@@ -55,6 +55,8 @@ typedef enum {
 } lv_scale_mode_t;
 
 #define LV_SCALE_LABEL_ROTATE_MATCH_TICKS  0x100000
+#define LV_SCALE_LABEL_ROTATE_KEEP_UPRIGHT 0x80000
+#define LV_SCALE_ROTATION_ANGLE_MASK 0x7FFFF
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_scale_class;
 
