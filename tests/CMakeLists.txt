@@ -19,6 +19,8 @@ set(CMAKE_C_STANDARD 99)
 
 #porject options
 set(LV_CONF_BUILD_THORVG_INTERNAL ON)
+set(CONFIG_LV_BUILD_DEMOS ON)
+set(CONFIG_LV_BUILD_EXAMPLES ON)
 
 set(FLAG_CHECK_WHITELIST --coverage -fsanitize=address -Werror)
 
