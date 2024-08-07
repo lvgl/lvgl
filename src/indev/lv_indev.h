@@ -195,6 +195,13 @@ void * lv_indev_get_user_data(const lv_indev_t * indev);
 void * lv_indev_get_driver_data(const lv_indev_t * indev);
 
 /**
+ * Get whether indev is moved after being clicked
+ * @param indev pointer to an input device
+ * @return true: indev is moved after being clicked; false: indev is not moved after being clicked
+ */
+bool lv_indev_get_press_moved(const lv_indev_t * indev);
+
+/**
  * Reset one or all input devices
  * @param indev pointer to an input device to reset or NULL to reset all of them
  * @param obj pointer to an object which triggers the reset.

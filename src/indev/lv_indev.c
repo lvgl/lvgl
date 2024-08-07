@@ -373,6 +373,13 @@ void * lv_indev_get_driver_data(const lv_indev_t * indev)
     return indev->driver_data;
 }
 
+bool lv_indev_get_press_moved(const lv_indev_t * indev)
+{
+    if(indev == NULL) return false;
+
+    return indev->pointer.press_moved;
+}
+
 void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
 {
     if(indev) {
@@ -1192,6 +1199,7 @@ static void indev_proc_press(lv_indev_t * indev)
             indev->pointer.gesture_sent   = 0;
             indev->pointer.gesture_sum.x  = 0;
             indev->pointer.gesture_sum.y  = 0;
+            indev->pointer.press_moved    = 0;
             indev->pointer.vect.x         = 0;
             indev->pointer.vect.y         = 0;
 
@@ -1220,6 +1228,10 @@ static void indev_proc_press(lv_indev_t * indev)
     indev->pointer.scroll_throw_vect.y = (indev->pointer.scroll_throw_vect.y + indev->pointer.vect.y) / 2;
 
     indev->pointer.scroll_throw_vect_ori = indev->pointer.scroll_throw_vect;
+
+    if(LV_ABS(indev->pointer.vect.x) > indev->scroll_limit || LV_ABS(indev->pointer.vect.y) > indev->scroll_limit) {
+        indev->pointer.press_moved = 1;
+    }
 
     if(indev_obj_act) {
         const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);

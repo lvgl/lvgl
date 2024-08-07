@@ -94,6 +94,7 @@ struct lv_indev_t {
         uint8_t scroll_dir : 4;
         uint8_t gesture_dir : 4;
         uint8_t gesture_sent : 1;
+        uint8_t press_moved : 1;
     } pointer;
     struct {
         /*Keypad data*/
