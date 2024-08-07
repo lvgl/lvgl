@@ -108,10 +108,6 @@ set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
     ${SANITIZE_AND_COVERAGE_OPTIONS}
 )
 
-set(CONFIG_LV_BUILD_EXAMPLES ON)
-set(CONFIG_LV_BUILD_DEMOS ON)
-set(LV_CONF_BUILD_THORVG_INTERNAL ON)
-
 if (OPTIONS_VG_LITE)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_VG_LITE})
 elseif (OPTIONS_SDL)
@@ -127,19 +123,23 @@ elseif (OPTIONS_FULL_32BIT)
 elseif (OPTIONS_TEST_SYSHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
     filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
+    set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_DEFHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_DEFHEAP})
     filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
+    set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_MEMORYCHECK)
     # sanitizer is disabled because valgrind uses LD_PRELOAD and the
     # sanitizer lib needs to load first
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
+    set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_VG_LITE)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_VG_LITE} -DLVGL_CI_USING_SYS_HEAP ${SANITIZE_AND_COVERAGE_OPTIONS})
     filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
+    set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
     add_definitions(-DREF_IMGS_PATH="ref_imgs_vg_lite/")
 
@@ -446,19 +446,11 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
         ${test_case_fname}
         ${test_runner_fname}
     )
-
-    #set link libraries (keep link order untouched)
-    set(TEST_LVGL_LINK_LIBS test_common)
-    if(CONFIG_LV_BUILD_DEMOS)
-      list(APPEND TEST_LVGL_LINK_LIBS lvgl_demos)
-    endif()
-    list(APPEND TEST_LVGL_LINK_LIBS lvgl)
-    if(LV_CONF_BUILD_THORVG_INTERNAL)
-      list(APPEND TEST_LVGL_LINK_LIBS lvgl_thorvg)
-    endif()
-
     target_link_libraries(${test_name} PRIVATE
-            ${TEST_LVGL_LINK_LIBS}
+            test_common
+            lvgl_demos
+            lvgl
+            lvgl_thorvg
             ${PNG_LIBRARIES}
             ${FREETYPE_LIBRARIES}
             ${LIBDRM_LIBRARIES}
