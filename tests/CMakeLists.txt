@@ -460,10 +460,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
     if(CONFIG_LV_BUILD_EXAMPLES)
       list(APPEND TEST_LINK_LIBS lvgl_examples)
     endif()
-    list(APPEND TEST_LINK_LIBS lvgl)
-    if(LV_CONF_BUILD_THORVG_INTERNAL)
-      list(APPEND TEST_LINK_LIBS lvgl_thorvg)
-    endif()
+    list(APPEND TEST_LINK_LIBS lvgl lvgl_thorvg)
 
     list(APPEND TEST_LINK_LIBS 
     ${PNG_LIBRARIES}
