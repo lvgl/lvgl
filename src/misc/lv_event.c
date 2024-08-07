@@ -27,6 +27,13 @@
  *  STATIC PROTOTYPES
  **********************/
 
+/* Traverse the list to delete the objects marked for deletion */
+static void cleanup_event_list(lv_event_list_t * list);
+
+inline static void event_mark_deleting(lv_event_list_t * list, lv_event_dsc_t * dsc);
+inline static bool event_is_marked_deleting(lv_event_dsc_t * dsc);
+inline static lv_array_t * event_array(lv_event_list_t * list);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -64,24 +71,35 @@ lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preproces
 {
     if(list == NULL) return LV_RESULT_OK;
 
+    /* Dealing with the problem of nested event deletion event */
+    bool is_traversing = list->is_traversing;
+    list->is_traversing = true;
+
     uint32_t i = 0;
-    lv_event_dsc_t ** dsc = lv_array_front(list);
-    uint32_t size = lv_array_size(list);
+    uint32_t size = lv_array_size(event_array(list));
     for(i = 0; i < size; i++) {
-        if(dsc[i]->cb == NULL) continue;
-        bool is_preprocessed = (dsc[i]->filter & LV_EVENT_PREPROCESS) != 0;
+        lv_event_dsc_t * dsc = *(lv_event_dsc_t **)lv_array_at(event_array(list), i);
+        if(dsc->cb == NULL) continue;
+        if(event_is_marked_deleting(dsc)) continue;
+        bool is_preprocessed = (dsc->filter & LV_EVENT_PREPROCESS) != 0;
         if(is_preprocessed != preprocess) continue;
-        lv_event_code_t filter = dsc[i]->filter & ~LV_EVENT_PREPROCESS;
+        lv_event_code_t filter = dsc->filter & ~LV_EVENT_PREPROCESS;
         if(filter == LV_EVENT_ALL || filter == e->code) {
-            e->user_data = dsc[i]->user_data;
-            dsc[i]->cb(e);
+            e->user_data = dsc->user_data;
+            dsc->cb(e);
             if(e->stop_processing) return LV_RESULT_OK;
 
             /*Stop if the object is deleted*/
             if(e->deleted) return LV_RESULT_INVALID;
-
         }
     }
+
+    if(is_traversing) return LV_RESULT_OK;
+
+    cleanup_event_list(list);
+
+    list->is_traversing = false;
+
     return LV_RESULT_OK;
 }
 
@@ -95,12 +113,12 @@ lv_event_dsc_t * lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event
     dsc->filter = filter;
     dsc->user_data = user_data;
 
-    if(lv_array_size(list) == 0) {
+    if(lv_array_size(event_array(list)) == 0) {
         /*event list hasn't been initialized.*/
-        lv_array_init(list, 1, sizeof(lv_event_dsc_t *));
+        lv_array_init(event_array(list), 1, sizeof(lv_event_dsc_t *));
     }
 
-    lv_array_push_back(list, &dsc);
+    lv_array_push_back(event_array(list), &dsc);
     return dsc;
 }
 
@@ -109,12 +127,12 @@ bool lv_event_remove_dsc(lv_event_list_t * list, lv_event_dsc_t * dsc)
     LV_ASSERT_NULL(list);
     LV_ASSERT_NULL(dsc);
 
-    int size = lv_array_size(list);
-    lv_event_dsc_t ** events = lv_array_front(list);
+    int size = lv_array_size(event_array(list));
+    lv_event_dsc_t ** events = lv_array_front(event_array(list));
     for(int i = 0; i < size; i++) {
         if(events[i] == dsc) {
-            lv_free(dsc);
-            lv_array_remove(list, i);
+            event_mark_deleting(list, events[i]);
+            cleanup_event_list(list);
             return true;
         }
     }
@@ -125,14 +143,14 @@ bool lv_event_remove_dsc(lv_event_list_t * list, lv_event_dsc_t * dsc)
 uint32_t lv_event_get_count(lv_event_list_t * list)
 {
     LV_ASSERT_NULL(list);
-    return lv_array_size(list);
+    return lv_array_size(event_array(list));
 }
 
 lv_event_dsc_t * lv_event_get_dsc(lv_event_list_t * list, uint32_t index)
 {
     LV_ASSERT_NULL(list);
     lv_event_dsc_t ** dsc;
-    dsc = lv_array_at(list, index);
+    dsc = lv_array_at(event_array(list), index);
     return dsc ? *dsc : NULL;
 }
 
@@ -153,19 +171,20 @@ bool lv_event_remove(lv_event_list_t * list, uint32_t index)
 {
     LV_ASSERT_NULL(list);
     lv_event_dsc_t * dsc = lv_event_get_dsc(list, index);
-    lv_free(dsc);
-    return lv_array_remove(list, index);
+    if(dsc == NULL) return false;
+    event_mark_deleting(list, dsc);
+    cleanup_event_list(list);
+    return true;
 }
 
 void lv_event_remove_all(lv_event_list_t * list)
 {
     LV_ASSERT_NULL(list);
-    int size = lv_array_size(list);
-    lv_event_dsc_t ** dsc = lv_array_front(list);
-    for(int i = 0; i < size; i++) {
-        lv_free(dsc[i]);
-    }
-    lv_array_deinit(list);
+    int size = lv_array_size(event_array(list));
+    lv_event_dsc_t ** dsc = lv_array_front(event_array(list));
+    for(int i = 0; i < size; i++)
+        event_mark_deleting(list, dsc[i]);
+    cleanup_event_list(list);
 }
 
 void * lv_event_get_current_target(lv_event_t * e)
@@ -222,3 +241,40 @@ void lv_event_mark_deleted(void * target)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void cleanup_event_list(lv_event_list_t * list)
+{
+    if(list->is_traversing) return;
+    if(list->has_marked_deleting == false) return;
+
+    uint32_t size = lv_array_size(event_array(list));
+    uint32_t kept_count = 0;
+    for(uint32_t i = 0; i < size; i++) {
+        lv_event_dsc_t ** dsc_i = lv_array_at(event_array(list), i);
+        lv_event_dsc_t ** dsc_kept = lv_array_at(event_array(list), kept_count);
+        if(event_is_marked_deleting(*dsc_i) == false) {
+            *dsc_kept = *dsc_i;
+            kept_count++;
+        }
+        else lv_free(*dsc_i);
+    }
+
+    if(kept_count == 0) lv_array_deinit(event_array(list));
+    else lv_array_resize(event_array(list), kept_count);
+
+    list->has_marked_deleting = false;
+}
+
+inline static void event_mark_deleting(lv_event_list_t * list, lv_event_dsc_t * dsc)
+{
+    list->has_marked_deleting = true;
+    dsc->filter |= LV_EVENT_MARKED_DELETING;
+}
+inline static bool event_is_marked_deleting(lv_event_dsc_t * dsc)
+{
+    return (dsc->filter & LV_EVENT_MARKED_DELETING) != 0;
+}
+inline static lv_array_t * event_array(lv_event_list_t * list)
+{
+    return &(list)->array;
+}
