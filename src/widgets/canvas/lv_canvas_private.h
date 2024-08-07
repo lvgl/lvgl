@@ -27,7 +27,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Data of canvas*/
+/** Canvas data */
 struct lv_canvas_t {
     lv_image_t img;
     lv_draw_buf_t * draw_buf;
