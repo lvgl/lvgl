@@ -43,7 +43,7 @@ uint32_t lv_cache_entry_get_size(const uint32_t node_size);
 int32_t  lv_cache_entry_get_ref(lv_cache_entry_t * entry);
 
 /**
- * Get the node size of a cache entry. Which is the same size with @lv_cache_entry_get_size's node_size parameter.
+ * Get the node size of a cache entry. Which is the same size with lv_cache_entry_get_size()'s node_size parameter.
  * @param entry        The cache entry to get the node size of.
  * @return             The node size of the cache entry.
  */

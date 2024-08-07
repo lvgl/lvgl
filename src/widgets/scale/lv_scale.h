@@ -76,7 +76,7 @@ lv_obj_t * lv_scale_create(lv_obj_t * parent);
  *====================*/
 
 /**
- * Set scale mode. See @ref lv_scale_mode_t
+ * Set scale mode. See lv_scale_mode_t
  * @param obj       pointer the scale object
  * @param mode      the new scale mode
  */
@@ -197,7 +197,7 @@ void lv_scale_section_set_style(lv_scale_section_t * section, lv_part_t part, lv
  *====================*/
 
 /**
- * Get scale mode. See @ref lv_scale_mode_t
+ * Get scale mode. See lv_scale_mode_t
  * @param obj   pointer the scale object
  * @return      Scale mode
  */
