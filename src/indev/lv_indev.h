@@ -195,9 +195,9 @@ void * lv_indev_get_user_data(const lv_indev_t * indev);
 void * lv_indev_get_driver_data(const lv_indev_t * indev);
 
 /**
- * Get whether indev is moved after being clicked
+ * Get whether indev is moved while pressed
  * @param indev pointer to an input device
- * @return true: indev is moved after being clicked; false: indev is not moved after being clicked
+ * @return true: indev is moved while pressed; false: indev is not moved while pressed
  */
 bool lv_indev_get_press_moved(const lv_indev_t * indev);
 
