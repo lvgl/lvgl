@@ -26,7 +26,7 @@ extern "C" {
 
 struct lv_theme_t {
     lv_theme_apply_cb_t apply_cb;
-    lv_theme_t * parent;   /**< Apply the current theme's style on top of this theme.*/
+    lv_theme_t * parent;            /**< Apply the current theme's style on top of this theme. */
     void * user_data;
     lv_display_t * disp;
     lv_color_t color_primary;
@@ -34,7 +34,7 @@ struct lv_theme_t {
     const lv_font_t * font_small;
     const lv_font_t * font_normal;
     const lv_font_t * font_large;
-    uint32_t flags;                 /*Any custom flag used by the theme*/
+    uint32_t flags;                 /**< Any custom flag used by the theme */
 };
 
 

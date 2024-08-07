@@ -48,22 +48,22 @@ struct lv_chart_cursor_t {
     lv_color_t color;
     lv_chart_series_t * ser;
     lv_dir_t dir;
-    uint32_t pos_set: 1; /*1: pos is set; 0: point_id is set*/
+    uint32_t pos_set: 1; /**< 1: pos is set; 0: point_id is set*/
 };
 
 struct lv_chart_t {
     lv_obj_t obj;
-    lv_ll_t series_ll;     /**< Linked list for the series (stores lv_chart_series_t)*/
-    lv_ll_t cursor_ll;     /**< Linked list for the cursors (stores lv_chart_cursor_t)*/
+    lv_ll_t series_ll;          /**< Linked list for the series (stores lv_chart_series_t)*/
+    lv_ll_t cursor_ll;          /**< Linked list for the cursors (stores lv_chart_cursor_t)*/
     int32_t ymin[2];
     int32_t ymax[2];
     int32_t xmin[2];
     int32_t xmax[2];
     int32_t pressed_point_id;
-    uint32_t hdiv_cnt;      /**< Number of horizontal division lines*/
-    uint32_t vdiv_cnt;      /**< Number of vertical division lines*/
-    uint32_t point_cnt;    /**< Point number in a data line*/
-    lv_chart_type_t type  : 3; /**< Line or column chart*/
+    uint32_t hdiv_cnt;          /**< Number of horizontal division lines*/
+    uint32_t vdiv_cnt;          /**< Number of vertical division lines*/
+    uint32_t point_cnt;         /**< Point number in a data line*/
+    lv_chart_type_t type  : 3;  /**< Line or column chart*/
     lv_chart_update_mode_t update_mode : 1;
 };
 

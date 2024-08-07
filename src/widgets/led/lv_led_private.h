@@ -26,7 +26,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Data of led*/
+/** Data of led */
 struct lv_led_t {
     lv_obj_t obj;
     lv_color_t color;
