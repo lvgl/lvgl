@@ -20,6 +20,12 @@ extern "C" {
 
 #include "../lv_draw.h"
 #include "../../draw/lv_draw_vector.h"
+#include "../../draw/lv_draw_arc.h"
+#include "../../draw/lv_draw_rect.h"
+#include "../../draw/lv_draw_image.h"
+#include "../../draw/lv_draw_label.h"
+#include "../../draw/lv_draw_line.h"
+#include "../../draw/lv_draw_triangle.h"
 
 /*********************
  *      DEFINES

@@ -17,6 +17,7 @@ extern "C" {
 #include "lv_led.h"
 
 #if LV_USE_LED
+#include "../../core/lv_obj_private.h"
 
 /*********************
  *      DEFINES
