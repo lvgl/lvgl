@@ -270,6 +270,8 @@ set(TEST_INCLUDE_DIRS
     $<BUILD_INTERFACE:${LVGL_TEST_DIR}/src>
     $<BUILD_INTERFACE:${LVGL_TEST_DIR}/unity>
     $<BUILD_INTERFACE:${LVGL_TEST_DIR}>
+    ${CMAKE_CURRENT_LIST_DIR}/../
+    
 )
 
 file(GLOB_RECURSE TEST_IMAGES_SRC ${LVGL_TEST_DIR}/test_images/*.c)
@@ -469,10 +471,10 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
                 ${SDL_IMAGE_LIBRARY})
     endif()
 
-	if (NOT $ENV{NON_AMD64_BUILD})
+	  if (NOT $ENV{NON_AMD64_BUILD})
 	    target_link_libraries(${test_name} PRIVATE
     	        ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
-	endif()
+	  endif()
 
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
