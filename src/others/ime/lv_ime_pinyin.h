@@ -32,6 +32,12 @@ typedef enum {
     LV_IME_PINYIN_MODE_K9_NUMBER,
 } lv_ime_pinyin_mode_t;
 
+/*Data of pinyin_dict*/
+typedef struct {
+    const char * const py;
+    const char * const py_mb;
+} lv_pinyin_dict_t;
+
 /*Data of 9-key input(k9) mode*/
 typedef struct {
     char py_str[7];
