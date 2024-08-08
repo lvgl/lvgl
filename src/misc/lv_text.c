@@ -714,7 +714,7 @@ static uint32_t lv_text_utf8_get_length(const char * txt)
 /**
  * Give the size of an ISO8859-1 coded character
  * @param str pointer to a character in a string
- * @return length of the UTF-8 character (1,2,3 or 4). O on invalid code
+ * @return length of the ISO8859-1 coded character, will be always 1.
  */
 static uint8_t lv_text_iso8859_1_size(const char * str)
 {
@@ -750,9 +750,9 @@ static uint32_t lv_text_iso8859_1_conv_wc(uint32_t c)
  * Decode an ISO8859-1 character from a string.
  * @param txt pointer to '\0' terminated string
  * @param i start byte index in 'txt' where to start.
- *          After call it will point to the next UTF-8 char in 'txt'.
+ *          After call it will point to the next ISO8859-1 coded char in 'txt'.
  *          NULL to use txt[0] as index
- * @return the decoded Unicode character or 0 on invalid UTF-8 code
+ * @return the decoded ISO8859-1 character.
  */
 static uint32_t lv_text_iso8859_1_next(const char * txt, uint32_t * i)
 {
@@ -766,8 +766,8 @@ static uint32_t lv_text_iso8859_1_next(const char * txt, uint32_t * i)
 /**
  * Get previous ISO8859-1 character form a string.
  * @param txt pointer to '\0' terminated string
- * @param i start byte index in 'txt' where to start. After the call it will point to the previous UTF-8 char in 'txt'.
- * @return the decoded Unicode character or 0 on invalid UTF-8 code
+ * @param i start byte index in 'txt' where to start. After the call it will point to the previous ISO8859-1 coded char in 'txt'.
+ * @return the decoded ISO8859-1 character.
  */
 static uint32_t lv_text_iso8859_1_prev(const char * txt, uint32_t * i)
 {
@@ -781,8 +781,8 @@ static uint32_t lv_text_iso8859_1_prev(const char * txt, uint32_t * i)
 
 /**
  * Convert a character index (in an ISO8859-1 text) to byte index.
- * E.g. in "AÁRT" index of 'R' is 2th char but start at byte 3 because 'Á' is 2 bytes long
- * @param txt a '\0' terminated UTF-8 string
+ * The ISO8859-1 encoding is compatible with ASCII so the indices of characters is the same as the indices of bytes.
+ * @param txt a '\0' terminated char string
  * @param utf8_id character index
  * @return byte index of the 'utf8_id'th letter
  */
@@ -794,8 +794,8 @@ static uint32_t lv_text_iso8859_1_get_byte_id(const char * txt, uint32_t utf8_id
 
 /**
  * Convert a byte index (in an ISO8859-1 text) to character index.
- * E.g. in "AÁRT" index of 'R' is 2th char but start at byte 3 because 'Á' is 2 bytes long
- * @param txt a '\0' terminated UTF-8 string
+ * The ISO8859-1 encoding is compatible with ASCII so the indices of characters is the same as the indices of bytes.
+ * @param txt a '\0' terminated char string
  * @param byte_id byte index
  * @return character index of the letter at 'byte_id'th position
  */
@@ -806,8 +806,8 @@ static uint32_t lv_text_iso8859_1_get_char_id(const char * txt, uint32_t byte_id
 }
 
 /**
- * Get the number of characters (and NOT bytes) in a string. Decode it with UTF-8 if enabled.
- * E.g.: "ÁBC" is 3 characters (but 4 bytes)
+ * Get the number of characters (and NOT bytes) in a string.
+ * The ISO8859-1 encoding is compatible with ASCII so the number of characters is the same as the number of bytes.
  * @param txt a '\0' terminated char string
  * @return number of characters
  */
