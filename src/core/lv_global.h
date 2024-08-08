@@ -31,10 +31,6 @@ extern "C" {
 #include "../others/sysmon/lv_sysmon.h"
 #include "../stdlib/builtin/lv_tlsf.h"
 
-#if LV_USE_FONT_COMPRESSED
-#include "../font/lv_font_fmt_txt_private.h"
-#endif
-
 #include "../tick/lv_tick.h"
 #include "../layouts/lv_layout.h"
 
@@ -183,10 +179,6 @@ typedef struct lv_global_t {
 
 #if LV_USE_FREETYPE
     struct lv_freetype_context_t * ft_context;
-#endif
-
-#if LV_USE_FONT_COMPRESSED
-    lv_font_fmt_rle_t font_fmt_rle;
 #endif
 
 #if LV_USE_SPAN != 0

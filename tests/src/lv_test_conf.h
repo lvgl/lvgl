@@ -21,6 +21,7 @@ extern "C" {
 #define LV_USE_STDLIB_STRING        LV_STDLIB_CLIB
 #define LV_USE_STDLIB_SPRINTF       LV_STDLIB_CLIB
 #define LV_USE_OS                   LV_OS_PTHREAD
+#define LV_DRAW_SW_DRAW_UNIT_CNT    4
 #define LV_OBJ_STYLE_CACHE          0
 #define LV_BIN_DECODER_RAM_LOAD     1   /* Run test with bin image loaded to RAM */
 #endif
