@@ -167,7 +167,6 @@ typedef struct {
             int16_t     end_angle;                      /**< End angle 0..3600 */
         } conical;
     } params;
-    void * state;
 #endif
 } lv_grad_dsc_t;
 
@@ -604,6 +603,70 @@ static inline bool lv_style_prop_has_flag(lv_style_prop_t prop, uint8_t flag)
 {
     return lv_style_prop_lookup_flags(prop) & flag;
 }
+
+/**
+ * Initialize gradient color map from a table
+ * @param grad      pointer to a gradient descriptor
+ * @param colors    color array
+ * @param fracs     position array (0..255): if NULL, then colors are distributed evenly
+ * @param opa       opacity array: if NULL, then LV_OPA_COVER is assumed
+ * @param num_stops number of gradient stops (1..LV_GRADIENT_MAX_STOPS)
+ */
+void lv_gradient_init_stops(lv_grad_dsc_t * grad, const lv_color_t colors[], const lv_opa_t opa[],
+                            const uint8_t fracs[], int num_stops);
+
+#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
+
+/**
+ * Helper function to initialize linear gradient
+ * @param dsc      gradient descriptor
+ * @param from_x   start x position: can be a coordinate or an lv_pct() value
+ *                 predefined constants LV_GRAD_LEFT, LV_GRAD_RIGHT, LV_GRAD_TOP, LV_GRAD_BOTTOM, LV_GRAD_CENTER can be used as well
+ * @param from_y   start y position
+ * @param to_x     end x position
+ * @param to_y     end y position
+ * @param extend   one of LV_GRAD_EXTEND_PAD, LV_GRAD_EXTEND_REPEAT or LV_GRAD_EXTEND_REFLECT
+ */
+void lv_grad_linear_init(lv_grad_dsc_t * dsc, int32_t from_x, int32_t from_y, int32_t to_x, int32_t to_y,
+                         lv_grad_extend_t extend);
+
+/**
+ * Helper function to initialize radial gradient
+ * @param dsc      gradient descriptor
+ * @param center_x center x position: can be a coordinate or an lv_pct() value
+ *                 predefined constants LV_GRAD_LEFT, LV_GRAD_RIGHT, LV_GRAD_TOP, LV_GRAD_BOTTOM, LV_GRAD_CENTER can be used as well
+ * @param center_y center y position
+ * @param to_x     point on the end circle x position
+ * @param to_y     point on the end circle y position
+ * @param extend   one of LV_GRAD_EXTEND_PAD, LV_GRAD_EXTEND_REPEAT or LV_GRAD_EXTEND_REFLECT
+ */
+void lv_grad_radial_init(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_y, int32_t to_x, int32_t to_y,
+                         lv_grad_extend_t extend);
+
+/**
+ * Set focal (starting) circle of a radial gradient
+ * @param dsc      gradient descriptor
+ * @param center_x center x position: can be a coordinate or an lv_pct() value
+ *                 predefined constants LV_GRAD_LEFT, LV_GRAD_RIGHT, LV_GRAD_TOP, LV_GRAD_BOTTOM, LV_GRAD_CENTER can be used as well
+ * @param center_y center y position
+ * @param radius   radius of the starting circle (NOTE: this must be a scalar number, not percentage)
+ */
+void lv_grad_radial_set_focal(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_y, int32_t radius);
+
+/**
+ * Helper function to initialize conical gradient
+ * @param dsc      gradient descriptor
+ * @param center_x center x position: can be a coordinate or an lv_pct() value
+ *                 predefined constants LV_GRAD_LEFT, LV_GRAD_RIGHT, LV_GRAD_TOP, LV_GRAD_BOTTOM, LV_GRAD_CENTER can be used as well
+ * @param center_y center y position
+ * @param start_angle   start angle in degrees
+ * @param end_angle     end angle in degrees
+ * @param extend   one of LV_GRAD_EXTEND_PAD, LV_GRAD_EXTEND_REPEAT or LV_GRAD_EXTEND_REFLECT
+ */
+void lv_grad_conical_init(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_y, int32_t start_angle,
+                          int32_t end_angle, lv_grad_extend_t extend);
+
+#endif /*LV_USE_DRAW_SW_COMPLEX_GRADIENTS*/
 
 /*************************
  *    GLOBAL VARIABLES

@@ -149,8 +149,6 @@ typedef struct lv_image_header_cache_data_t lv_image_header_cache_data_t;
 
 typedef struct lv_draw_mask_t lv_draw_mask_t;
 
-typedef struct lv_grad_t lv_grad_t;
-
 typedef struct lv_draw_label_hint_t lv_draw_label_hint_t;
 
 typedef struct lv_draw_glyph_dsc_t lv_draw_glyph_dsc_t;
