@@ -224,25 +224,34 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width);
 /**
  * Get the span's coords in the spangroup.
  * @note Before calling this function, please make sure that the layout of span group has been updated.
- * +--------+
- * |Heading +--->------------------+
- * |  Pos   |   |     Heading      |
- * +--------+---+------------------+
- * |                               |
- * |                               |
- * |                               |
- * |            Middle   +--------+|
- * |                     |Trailing||
- * |                   +-|  Pos   ||
- * |                   | +--------+|
- * +-------------------v-----------+
- * |     Trailing      |
- * +-------------------+
+ * Like calling lv_obj_update_layout() like function.
+ *     +--------+
+ *     |Heading +--->------------------+
+ *     |  Pos   |   |     Heading      |
+ *     +--------+---+------------------+
+ *     |                               |
+ *     |                               |
+ *     |                               |
+ *     |            Middle   +--------+|
+ *     |                     |Trailing||
+ *     |                   +-|  Pos   ||
+ *     |                   | +--------+|
+ *     +-------------------v-----------+
+ *     |     Trailing      |
+ *     +-------------------+
  * @param obj       pointer to a spangroup object.
  * @param span      pointer to a span.
  * @return the span's coords in the spangroup.
  */
-lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, lv_span_t * span);
+lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, const lv_span_t * span);
+
+/**
+ * Get the span object by point.
+ * @param obj
+ * @param point
+ * @return
+ */
+lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * point);
 
 /*=====================
  * Other functions

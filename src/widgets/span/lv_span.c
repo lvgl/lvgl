@@ -69,6 +69,9 @@ static void lv_snippet_push(lv_snippet_t * item);
 static lv_snippet_t * lv_get_snippet(uint32_t index);
 static int32_t convert_indent_pct(lv_obj_t * spans, int32_t width);
 
+static lv_span_coords_t make_span_coords(const lv_span_t * prev_span, const lv_span_t * curr_span, int32_t width,
+                                         lv_area_t padding);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -487,8 +490,8 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
             int32_t use_width = 0;
             bool isfill = lv_text_get_snippet(&cur_txt[cur_txt_ofs], snippet.font, snippet.letter_space,
                                               max_w, txt_flag, &use_width, &next_ofs);
-            if(isfill == false) txt_pos.x += use_width;
-            else txt_pos.x = 0;
+            if(isfill) txt_pos.x = 0;
+            else txt_pos.x += use_width;
 
             /* break word deal width */
             if(isfill && next_ofs > 0 && snippet_cnt > 0) {
@@ -538,66 +541,59 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
     return txt_pos.y;
 }
 
-lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, lv_span_t * span)
+lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, const lv_span_t * span)
 {
     /* find previous span */
-    lv_spangroup_t * spangroup = (lv_spangroup_t *)obj;
-    lv_ll_t * spans = &spangroup->child_ll;
-    int32_t width = lv_obj_get_content_width(obj);
+    const lv_spangroup_t * spangroup = (lv_spangroup_t *)obj;
+    const lv_ll_t * spans = &spangroup->child_ll;
+    const int32_t width = lv_obj_get_content_width(obj);
 
-    lv_span_coords_t coords = { 0 };
-
-    if(obj == NULL || span == NULL || lv_ll_get_head(spans) == NULL) return coords;
+    if(obj == NULL || span == NULL || lv_ll_get_head(spans) == NULL) return (lv_span_coords_t) {
+        0
+    };
 
     lv_span_t * prev_span = NULL;
     lv_span_t * curr_span;
     LV_LL_READ(spans, curr_span) {
-        if(curr_span == span) {
-            break;
-        }
+        if(curr_span == span) break;
         prev_span = curr_span;
     }
 
-    if(curr_span == NULL) return coords;
+    const uint32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    return make_span_coords(prev_span, curr_span, width, (lv_area_t) {
+        .x1 = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width,
+        .y1 = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width,
+        .x2 = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width,
+        .y2 = 0
+    });
+}
 
-    /* first line */
-    if(prev_span == NULL) {
-        lv_area_set(&coords.heading, 0, 0, width, curr_span->trailing_pos.y);
-        lv_area_set(&coords.middle, coords.heading.x1, coords.heading.y2, curr_span->trailing_pos.x,
-                    coords.heading.y2 + curr_span->trailing_height);
-        lv_area_set(&coords.trailing, 0, 0, 0, 0);
+lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * point)
+{
+    /* find previous span */
+    const lv_spangroup_t * spangroup = (lv_spangroup_t *)obj;
+    const lv_ll_t * spans = &spangroup->child_ll;
+    const int32_t width = lv_obj_get_content_width(obj);
 
-        return coords;
+    if(obj == NULL || point == NULL || lv_ll_get_head(spans) == NULL) return NULL;
+
+    const lv_span_t * prev_span = NULL;
+    lv_span_t * curr_span;
+    LV_LL_READ(spans, curr_span) {
+        lv_span_coords_t coords = make_span_coords(prev_span, curr_span, width, (lv_area_t) {
+            .x1 = lv_obj_get_style_pad_left(obj, LV_PART_MAIN),
+            .y1 = lv_obj_get_style_pad_top(obj, LV_PART_MAIN),
+            .x2 = lv_obj_get_style_pad_right(obj, LV_PART_MAIN),
+            .y2 = 0
+        });
+        if(lv_area_is_point_on(&coords.heading,  point, 0) ||
+           lv_area_is_point_on(&coords.middle,   point, 0) ||
+           lv_area_is_point_on(&coords.trailing, point, 0)) {
+            return curr_span;
+        }
+        prev_span = curr_span;
     }
-
-    /* start and end on the same line */
-    bool is_same_line = prev_span->trailing_pos.y == curr_span->trailing_pos.y;
-    if(is_same_line == true) {
-        lv_area_set(&coords.heading,
-                    prev_span->trailing_pos.x, prev_span->trailing_pos.y,
-                    curr_span->trailing_pos.x, curr_span->trailing_pos.y + curr_span->trailing_height);
-        return coords;
-    }
-
-    /* common case */
-    lv_point_t pre_trailing_pos = prev_span->trailing_pos;
-    int32_t pre_trailing_height = prev_span->trailing_height;
-
-    lv_area_set(&coords.heading,
-                pre_trailing_pos.x, pre_trailing_pos.y,
-                width, pre_trailing_pos.y + pre_trailing_height);
-    /* When it happens to be two lines of text,
-     * the y2 of the middle area is exactly the y1 + line height of the first line of text,
-     * so the area of the middle area is empty.
-     * */
-    lv_area_set(&coords.middle,
-                0, coords.heading.y2,
-                width, curr_span->trailing_pos.y);
-    lv_area_set(&coords.trailing,
-                coords.middle.x1, coords.middle.y2,
-                curr_span->trailing_pos.x, curr_span->trailing_pos.y + curr_span->trailing_height);
-
-    return coords;
+    return NULL;
 }
 
 /**********************
@@ -1150,6 +1146,53 @@ static void refresh_self_size(lv_obj_t * obj)
     spans->refresh = 1;
     lv_obj_invalidate(obj);
     lv_obj_refresh_self_size(obj);
+}
+
+static lv_span_coords_t make_span_coords(const lv_span_t * prev_span, const lv_span_t * curr_span, const int32_t width,
+                                         const lv_area_t padding)
+{
+    lv_span_coords_t coords = { 0 };
+
+    if(curr_span == NULL) return coords;
+
+    /* first line */
+    if(prev_span == NULL) {
+        lv_area_set(&coords.heading, padding.x1, padding.y1, width + padding.x1, curr_span->trailing_pos.y + padding.y1);
+        lv_area_set(&coords.middle, coords.heading.x1, coords.heading.y2, curr_span->trailing_pos.x + padding.x1,
+                    coords.heading.y2 + curr_span->trailing_height);
+        lv_area_set(&coords.trailing, 0, 0, 0, 0);
+
+        return coords;
+    }
+
+    /* start and end on the same line */
+    const bool is_same_line = prev_span->trailing_pos.y == curr_span->trailing_pos.y;
+    if(is_same_line == true) {
+        lv_area_set(&coords.heading,
+                    prev_span->trailing_pos.x + padding.x1, prev_span->trailing_pos.y + padding.y1,
+                    curr_span->trailing_pos.x + padding.x1, curr_span->trailing_pos.y + curr_span->trailing_height + padding.y1);
+        return coords;
+    }
+
+    /* common case */
+    const lv_point_t pre_trailing_pos = prev_span->trailing_pos;
+    const int32_t pre_trailing_height = prev_span->trailing_height;
+
+    lv_area_set(&coords.heading,
+                pre_trailing_pos.x + padding.x1, pre_trailing_pos.y + padding.y1,
+                width + padding.x1, pre_trailing_pos.y + pre_trailing_height + padding.y1);
+    /* When it happens to be two lines of text,
+    * the y2 of the middle area is exactly the y1 + line height of the first line of text,
+    * so the area of the middle area is empty.
+    * */
+    lv_area_set(&coords.middle,
+                padding.x1, coords.heading.y2,
+                width + padding.x1, curr_span->trailing_pos.y + padding.y1);
+    lv_area_set(&coords.trailing,
+                coords.middle.x1, coords.middle.y2,
+                curr_span->trailing_pos.x + padding.x1, curr_span->trailing_pos.y + curr_span->trailing_height + padding.y1);
+
+    return coords;
 }
 
 #endif
