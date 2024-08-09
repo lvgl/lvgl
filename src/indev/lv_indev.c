@@ -360,6 +360,11 @@ void lv_indev_set_display(lv_indev_t * indev, lv_display_t * disp)
     indev->disp = disp;
 }
 
+void lv_indev_set_long_press_time(lv_indev_t * indev, uint16_t long_press_time)
+{
+    indev->long_press_time = long_press_time;
+}
+
 void * lv_indev_get_user_data(const lv_indev_t * indev)
 {
     if(indev == NULL) return NULL;

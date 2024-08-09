@@ -146,6 +146,13 @@ void lv_indev_set_driver_data(lv_indev_t * indev, void * driver_data);
 void lv_indev_set_display(lv_indev_t * indev, struct lv_display_t * disp);
 
 /**
+ * Set long press time to the indev
+ * @param indev pointer to an input device
+ * @param time long press time in ms
+ */
+void lv_indev_set_long_press_time(lv_indev_t * indev, uint16_t long_press_time);
+
+/**
  * Get the type of an input device
  * @param indev pointer to an input device
  * @return the type of the input device from `lv_hal_indev_type_t` (`LV_INDEV_TYPE_...`)
