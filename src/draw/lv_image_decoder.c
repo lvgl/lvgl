@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_image_decoder.h"
+#include "lv_image_decoder_private.h"
 #include "../misc/lv_assert.h"
 #include "../draw/lv_draw_image.h"
 #include "../misc/lv_ll.h"
@@ -56,9 +56,9 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc);
 /**
  * Initialize the image decoder module
  */
-void _lv_image_decoder_init(uint32_t image_cache_size, uint32_t image_header_count)
+void lv_image_decoder_init(uint32_t image_cache_size, uint32_t image_header_count)
 {
-    _lv_ll_init(img_decoder_ll_p, sizeof(lv_image_decoder_t));
+    lv_ll_init(img_decoder_ll_p, sizeof(lv_image_decoder_t));
 
     /*Initialize the cache*/
     lv_image_cache_init(image_cache_size);
@@ -68,12 +68,12 @@ void _lv_image_decoder_init(uint32_t image_cache_size, uint32_t image_header_cou
 /**
  * Deinitialize the image decoder module
  */
-void _lv_image_decoder_deinit(void)
+void lv_image_decoder_deinit(void)
 {
     lv_cache_destroy(img_cache_p, NULL);
     lv_cache_destroy(img_header_cache_p, NULL);
 
-    _lv_ll_clear(img_decoder_ll_p);
+    lv_ll_clear(img_decoder_ll_p);
 }
 
 lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * header)
@@ -171,7 +171,7 @@ void lv_image_decoder_close(lv_image_decoder_dsc_t * dsc)
 lv_image_decoder_t * lv_image_decoder_create(void)
 {
     lv_image_decoder_t * decoder;
-    decoder = _lv_ll_ins_head(img_decoder_ll_p);
+    decoder = lv_ll_ins_head(img_decoder_ll_p);
     LV_ASSERT_MALLOC(decoder);
     if(decoder == NULL) return NULL;
 
@@ -182,16 +182,16 @@ lv_image_decoder_t * lv_image_decoder_create(void)
 
 void lv_image_decoder_delete(lv_image_decoder_t * decoder)
 {
-    _lv_ll_remove(img_decoder_ll_p, decoder);
+    lv_ll_remove(img_decoder_ll_p, decoder);
     lv_free(decoder);
 }
 
 lv_image_decoder_t * lv_image_decoder_get_next(lv_image_decoder_t * decoder)
 {
     if(decoder == NULL)
-        return _lv_ll_get_head(img_decoder_ll_p);
+        return lv_ll_get_head(img_decoder_ll_p);
     else
-        return _lv_ll_get_next(img_decoder_ll_p, decoder);
+        return lv_ll_get_next(img_decoder_ll_p, decoder);
 }
 
 void lv_image_decoder_set_info_cb(lv_image_decoder_t * decoder, lv_image_decoder_info_f_t info_cb)
@@ -336,7 +336,7 @@ static lv_image_decoder_t * image_decoder_get_info(lv_image_decoder_dsc_t * dsc,
 
     /*Search the decoders*/
     lv_image_decoder_t * decoder_prev = NULL;
-    _LV_LL_READ(img_decoder_ll_p, decoder) {
+    LV_LL_READ(img_decoder_ll_p, decoder) {
         /*Info and Open callbacks are required*/
         if(decoder->info_cb && decoder->open_cb) {
             lv_fs_seek(&dsc->file, 0, LV_FS_SEEK_SET);

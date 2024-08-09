@@ -1,5 +1,5 @@
 /**
- * @file lv_btn.h
+ * @file lv_button.h
  *
  */
 
@@ -21,14 +21,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-typedef struct {
-    lv_obj_t obj;
-} lv_button_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_button_class;
 

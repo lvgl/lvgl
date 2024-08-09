@@ -23,7 +23,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_indev_t {
+struct lv_indev_t {
     /**< Input device type*/
     lv_indev_type_t type;
 
@@ -91,8 +91,8 @@ struct _lv_indev_t {
         int32_t diff;
 
         /*Flags*/
-        lv_dir_t scroll_dir : 4;
-        lv_dir_t gesture_dir : 4;
+        uint8_t scroll_dir : 4;
+        uint8_t gesture_dir : 4;
         uint8_t gesture_sent : 1;
     } pointer;
     struct {

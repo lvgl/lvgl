@@ -6,6 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_win_private.h"
+#include "../../core/lv_obj_class_private.h"
 #include "../../lvgl.h"
 #if LV_USE_WIN
 

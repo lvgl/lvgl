@@ -21,19 +21,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/**********************
- *      TYPEDEFS
- **********************/
-typedef struct {
-    lv_obj_t obj;
-    lv_obj_t * tile_act;
-} lv_tileview_t;
-
-typedef struct {
-    lv_obj_t obj;
-    lv_dir_t dir;
-} lv_tileview_tile_t;
-
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_tileview_class;
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_tileview_tile_class;
 

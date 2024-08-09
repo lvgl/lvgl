@@ -6,16 +6,19 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_draw_sw_mask_private.h"
+#include "blend/lv_draw_sw_blend_private.h"
+#include "../lv_draw_private.h"
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
 #include "../../misc/lv_math.h"
 #include "../../stdlib/lv_mem.h"
-#include "../../misc/lv_area.h"
+#include "../../misc/lv_area_private.h"
 #include "../../misc/lv_color.h"
 #include "../../stdlib/lv_string.h"
-#include "../lv_draw_triangle.h"
-#include "lv_draw_sw_gradient.h"
+#include "../lv_draw_triangle_private.h"
+#include "lv_draw_sw_gradient_private.h"
 
 /*********************
  *      DEFINES
@@ -52,7 +55,7 @@ void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_
 
     bool is_common;
     lv_area_t draw_area;
-    is_common = _lv_area_intersect(&draw_area, &tri_area, draw_unit->clip_area);
+    is_common = lv_area_intersect(&draw_area, &tri_area, draw_unit->clip_area);
     if(!is_common) return;
 
     lv_point_t p[3];

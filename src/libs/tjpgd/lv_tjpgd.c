@@ -7,12 +7,13 @@
  *      INCLUDES
  *********************/
 
+#include "../../draw/lv_image_decoder_private.h"
 #include "../../../lvgl.h"
 #if LV_USE_TJPGD
 
 #include "tjpgd.h"
 #include "lv_tjpgd.h"
-#include "../../misc/lv_fs.h"
+#include "../../misc/lv_fs_private.h"
 #include <string.h>
 
 /*********************
@@ -187,7 +188,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     JDEC * jd = lv_malloc(sizeof(JDEC));
     dsc->user_data = jd;
     JRESULT rc = jd_prepare(jd, input_func, workb_temp, (size_t)TJPGD_WORKBUFF_SIZE, f);
-    if(rc) return rc;
+    if(rc) return LV_RESULT_INVALID;
 
     dsc->header.cf = LV_COLOR_FORMAT_RGB888;
     dsc->header.w = jd->width;
@@ -231,7 +232,7 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         else {
             lv_fs_seek(jd->device, 0, LV_FS_SEEK_SET);
             JRESULT rc = jd_prepare(jd, input_func, jd->pool_original, (size_t)TJPGD_WORKBUFF_SIZE, jd->device);
-            if(rc) return rc;
+            if(rc) return LV_RESULT_INVALID;
         }
         decoded->data = jd->workbuf;
         decoded->header = dsc->header;
@@ -259,17 +260,17 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     JRESULT rc;
     if(jd->nrst && jd->rst++ == jd->nrst) {
         rc = jd_restart(jd, jd->rsc++);
-        if(rc != JDR_OK) return rc;
+        if(rc != JDR_OK) return LV_RESULT_INVALID;
         jd->rst = 1;
     }
 
     /* Load an MCU (decompress huffman coded stream, dequantize and apply IDCT) */
     rc = jd_mcu_load(jd);
-    if(rc != JDR_OK) return rc;
+    if(rc != JDR_OK) return LV_RESULT_INVALID;
 
     /* Output the MCU (YCbCr to RGB, scaling and output) */
     rc = jd_mcu_output(jd, NULL, decoded_area->x1, decoded_area->y1);
-    if(rc != JDR_OK) return rc;
+    if(rc != JDR_OK) return LV_RESULT_INVALID;
 
     return LV_RESULT_OK;
 }

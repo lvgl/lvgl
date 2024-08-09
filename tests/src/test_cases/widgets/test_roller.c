@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "../../lvgl_private.h"
 
 #include "unity/unity.h"
 #include "lv_test_indev.h"
@@ -259,7 +260,7 @@ void test_roller_appearance(void)
 
     /* a normal and infinite roller with the same size font for the main and selected parts */
     lv_obj_set_pos(roller, 20, 20);
-    lv_roller_set_options(roller, opts, LV_PART_MAIN);
+    lv_roller_set_options(roller, opts, LV_ROLLER_MODE_NORMAL);
     lv_obj_set_pos(roller_infinite, 20, 200);
     lv_roller_set_options(roller_infinite, opts, LV_ROLLER_MODE_INFINITE);
 
@@ -327,6 +328,26 @@ void test_roller_appearance(void)
     }
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/roller_3.png");
+}
+
+void test_roller_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_roller_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    prop.id = LV_PROPERTY_ROLLER_OPTIONS;
+    prop.ptr = "One\nTwo\nThree";
+    lv_roller_set_options(obj, prop.ptr, LV_ROLLER_MODE_NORMAL);
+    TEST_ASSERT_EQUAL_STRING("One\nTwo\nThree", lv_roller_get_options(obj));
+    TEST_ASSERT_EQUAL_STRING("One\nTwo\nThree", lv_obj_get_property(obj, LV_PROPERTY_ROLLER_OPTIONS).ptr);
+
+    prop.id = LV_PROPERTY_ROLLER_SELECTED;
+    prop.num = 1;
+    lv_roller_set_selected(obj, 1, LV_ANIM_OFF);
+    TEST_ASSERT_EQUAL_INT(1, lv_roller_get_selected(obj));
+    TEST_ASSERT_EQUAL_INT(1, lv_obj_get_property(obj, LV_PROPERTY_ROLLER_SELECTED).num);
+#endif
 }
 
 #endif

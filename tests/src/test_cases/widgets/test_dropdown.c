@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "../../lvgl_private.h"
 
 #include "unity/unity.h"
 #include "lv_test_indev.h"
@@ -450,5 +451,60 @@ void test_dropdown_get_options_should_check_lengths(void)
     TEST_ASSERT_EQUAL_INT(3, lv_dropdown_get_option_index(dd, "Option"));
     TEST_ASSERT_EQUAL_INT(-1, lv_dropdown_get_option_index(dd, "Option "));
 }
+
+void test_dropdown_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_dropdown_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    prop.id = LV_PROPERTY_DROPDOWN_TEXT;
+    prop.ptr = "Hello";
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_STRING("Hello", lv_dropdown_get_text(obj));
+    TEST_ASSERT_EQUAL_STRING("Hello", lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_TEXT).ptr);
+
+    prop.id = LV_PROPERTY_DROPDOWN_OPTIONS;
+    prop.ptr = "Option 1\nOption 2";
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_STRING("Option 1\nOption 2", lv_dropdown_get_options(obj));
+    TEST_ASSERT_EQUAL_STRING("Option 1\nOption 2", lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_OPTIONS).ptr);
+
+    TEST_ASSERT_EQUAL(2, lv_dropdown_get_option_count(obj));
+    TEST_ASSERT_EQUAL(2, lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_OPTION_COUNT).num);
+
+    prop.id = LV_PROPERTY_DROPDOWN_SELECTED;
+    prop.num = 1;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(1, lv_dropdown_get_selected(obj));
+    TEST_ASSERT_EQUAL_INT(1, lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_SELECTED).num);
+
+    prop.id = LV_PROPERTY_DROPDOWN_DIR;
+    prop.num = LV_DIR_LEFT;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_DIR_LEFT, lv_dropdown_get_dir(obj));
+    TEST_ASSERT_EQUAL_INT(LV_DIR_LEFT, lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_DIR).num);
+
+    prop.id = LV_PROPERTY_DROPDOWN_SYMBOL;
+    prop.ptr = LV_SYMBOL_DOWN;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_STRING(LV_SYMBOL_DOWN, lv_dropdown_get_symbol(obj));
+    TEST_ASSERT_EQUAL_STRING(LV_SYMBOL_DOWN, lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_SYMBOL).ptr);
+
+    prop.id = LV_PROPERTY_DROPDOWN_SELECTED_HIGHLIGHT;
+    prop.num = true;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_TRUE(lv_dropdown_get_selected_highlight(obj));
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_SELECTED_HIGHLIGHT).num);
+
+    lv_dropdown_open(obj);
+    TEST_ASSERT_TRUE(lv_dropdown_is_open(obj));
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_IS_OPEN).enable);
+    lv_dropdown_close(obj);
+    TEST_ASSERT_FALSE(lv_dropdown_is_open(obj));
+    TEST_ASSERT_FALSE(lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_IS_OPEN).enable);
+#endif
+}
+
 
 #endif

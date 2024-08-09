@@ -6,7 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_obj.h"
+#include "../misc/lv_event_private.h"
+#include "../misc/lv_area_private.h"
+#include "lv_obj_style_private.h"
+#include "lv_obj_event_private.h"
+#include "lv_obj_class_private.h"
+#include "lv_obj_private.h"
 #include "../indev/lv_indev.h"
 #include "../indev/lv_indev_private.h"
 #include "lv_refr.h"
@@ -20,6 +25,7 @@
 #include "../misc/lv_types.h"
 #include "../tick/lv_tick.h"
 #include "../stdlib/lv_string.h"
+#include "lv_obj_draw_private.h"
 
 /*********************
  *      DEFINES
@@ -140,7 +146,7 @@ static const lv_property_ops_t properties[] = {
     },
     {
         .id = LV_PROPERTY_OBJ_EXT_DRAW_SIZE,
-        .getter = _lv_obj_get_ext_draw_size,
+        .getter = lv_obj_get_ext_draw_size,
     },
     {
         .id = LV_PROPERTY_OBJ_EVENT_COUNT,
@@ -372,7 +378,7 @@ void lv_obj_allocate_spec_attr(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     if(obj->spec_attr == NULL) {
-        obj->spec_attr = lv_malloc_zeroed(sizeof(_lv_obj_spec_attr_t));
+        obj->spec_attr = lv_malloc_zeroed(sizeof(lv_obj_spec_attr_t));
         LV_ASSERT_MALLOC(obj->spec_attr);
         if(obj->spec_attr == NULL) return;
 
@@ -456,6 +462,16 @@ lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, void * id)
 }
 #endif
 
+void lv_obj_set_user_data(lv_obj_t * obj, void * user_data)
+{
+    obj->user_data = user_data;
+}
+
+void * lv_obj_get_user_data(lv_obj_t * obj)
+{
+    return obj->user_data;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -499,7 +515,7 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
 
-    _lv_event_mark_deleted(obj);
+    lv_event_mark_deleted(obj);
 
     /*Remove all style*/
     lv_obj_enable_style_refresh(false); /*No need to refresh the style because the object will be deleted*/
@@ -550,7 +566,7 @@ static void lv_obj_draw(lv_event_t * e)
         lv_area_copy(&coords, &obj->coords);
         lv_area_increase(&coords, w, h);
 
-        if(_lv_area_is_in(info->area, &coords, r) == false) {
+        if(lv_area_is_in(info->area, &coords, r) == false) {
             info->res = LV_COVER_RES_NOT_COVER;
             return;
         }
@@ -881,9 +897,9 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
 
     lv_state_t prev_state = obj->state;
 
-    _lv_style_state_cmp_t cmp_res = _lv_obj_style_state_compare(obj, prev_state, new_state);
+    lv_style_state_cmp_t cmp_res = lv_obj_style_state_compare(obj, prev_state, new_state);
     /*If there is no difference in styles there is nothing else to do*/
-    if(cmp_res == _LV_STYLE_STATE_CMP_SAME) {
+    if(cmp_res == LV_STYLE_STATE_CMP_SAME) {
         obj->state = new_state;
         return;
     }
@@ -892,12 +908,12 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
     lv_obj_invalidate(obj);
 
     obj->state = new_state;
-    _lv_obj_update_layer_type(obj);
-    _lv_obj_style_transition_dsc_t * ts = lv_malloc_zeroed(sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
+    lv_obj_update_layer_type(obj);
+    lv_obj_style_transition_dsc_t * ts = lv_malloc_zeroed(sizeof(lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
     uint32_t tsi = 0;
     uint32_t i;
     for(i = 0; i < obj->style_cnt && tsi < STYLE_TRANSITION_MAX; i++) {
-        _lv_obj_style_t * obj_style = &obj->styles[i];
+        lv_obj_style_t * obj_style = &obj->styles[i];
         lv_state_t state_act = lv_obj_style_get_selector_state(obj->styles[i].selector);
         lv_part_t part_act = lv_obj_style_get_selector_part(obj->styles[i].selector);
         if(state_act & (~new_state)) continue; /*Skip unrelated styles*/
@@ -933,19 +949,19 @@ static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
 
     for(i = 0; i < tsi; i++) {
         lv_part_t part_act = lv_obj_style_get_selector_part(ts[i].selector);
-        _lv_obj_style_create_transition(obj, part_act, prev_state, new_state, &ts[i]);
+        lv_obj_style_create_transition(obj, part_act, prev_state, new_state, &ts[i]);
     }
 
     lv_free(ts);
 
-    if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_REDRAW) {
+    if(cmp_res == LV_STYLE_STATE_CMP_DIFF_REDRAW) {
         /*Invalidation is not enough, e.g. layer type needs to be updated too*/
         lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
     }
-    else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
+    else if(cmp_res == LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
         lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
     }
-    else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
+    else if(cmp_res == LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) {
         lv_obj_invalidate(obj);
         lv_obj_refresh_ext_draw_size(obj);
     }

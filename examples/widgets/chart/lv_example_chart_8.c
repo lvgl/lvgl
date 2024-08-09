@@ -3,7 +3,7 @@
 
 static void add_data(lv_timer_t * t)
 {
-    lv_obj_t * chart = t->user_data;
+    lv_obj_t * chart = lv_timer_get_user_data(t);
     lv_chart_series_t * ser = lv_chart_get_series_next(chart, NULL);
 
     lv_chart_set_next_value(chart, ser, lv_rand(10, 90));

@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 
+#include "../../misc/lv_event_private.h"
 #include "../../lvgl.h"
 #include "lv_freetype_private.h"
 
@@ -22,7 +23,7 @@
  *      TYPEDEFS
  **********************/
 
-typedef struct _lv_freetype_outline_node_t {
+typedef struct lv_freetype_outline_node_t {
     FT_UInt glyph_index;
     lv_freetype_outline_t outline;
 } lv_freetype_outline_node_t;
@@ -302,8 +303,11 @@ static lv_freetype_outline_t outline_create(
         return NULL;
     }
 
-    /* Load glyph */
-    error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT | FT_LOAD_NO_BITMAP);
+    /**
+     * Disable AUTOHINT(https://freetype.org/autohinting/hinter.html) to avoid display clipping
+     * caused by inconsistent glyph measurement and outline.
+     */
+    error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT | FT_LOAD_NO_BITMAP | FT_LOAD_NO_AUTOHINT);
     if(error) {
         FT_ERROR_MSG("FT_Load_Glyph", error);
         return NULL;

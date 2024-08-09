@@ -19,7 +19,7 @@ extern "C" {
 #include "lv_display.h"
 
 #if LV_USE_SYSMON
-#include "../others/sysmon/lv_sysmon.h"
+#include "../others/sysmon/lv_sysmon_private.h"
 #endif
 
 /*********************
@@ -33,7 +33,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_display_t {
+struct lv_display_t {
 
     /*---------------------
      * Resolution
@@ -139,7 +139,7 @@ struct _lv_display_t {
     lv_event_list_t event_list;
 
     uint32_t sw_rotate : 1; /**< 1: use software rotation (slower)*/
-    uint32_t rotation  : 2; /**< Element of  @lv_display_rotation_t*/
+    uint32_t rotation  : 2; /**< Element of  lv_display_rotation_t*/
 
     /**< The theme assigned to the screen*/
     lv_theme_t * theme;

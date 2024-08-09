@@ -59,6 +59,15 @@ typedef lv_screen_load_anim_t       lv_scr_load_anim_t;
 typedef lv_buttonmatrix_ctrl_t      lv_btnmatrix_ctrl_t;
 #endif /* LV_USE_BUTTONMATRIX */
 
+#if LV_USE_IMAGEBUTTON
+#define LV_IMGBTN_STATE_RELEASED         LV_IMAGEBUTTON_STATE_RELEASED
+#define LV_IMGBTN_STATE_PRESSED          LV_IMAGEBUTTON_STATE_PRESSED
+#define LV_IMGBTN_STATE_DISABLED         LV_IMAGEBUTTON_STATE_DISABLED
+#define LV_IMGBTN_STATE_CHECKED_RELEASED LV_IMAGEBUTTON_STATE_CHECKED_RELEASED
+#define LV_IMGBTN_STATE_CHECKED_PRESSED  LV_IMAGEBUTTON_STATE_CHECKED_PRESSED
+#define LV_IMGBTN_STATE_CHECKED_DISABLED LV_IMAGEBUTTON_STATE_CHECKED_DISABLED
+#endif /* LV_USE_IMAGEBUTTON */
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -143,8 +152,8 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_disp_trig_activity            lv_display_trigger_activity
 #define lv_disp_enable_invalidation      lv_display_enable_invalidation
 #define lv_disp_is_invalidation_enabled  lv_display_is_invalidation_enabled
-#define _lv_disp_refr_timer              _lv_display_refr_timer
-#define _lv_disp_get_refr_timer          lv_display_get_refr_timer
+#define lv_disp_refr_timer              lv_display_refr_timer
+#define lv_disp_get_refr_timer          lv_display_get_refr_timer
 
 #define lv_timer_del                    lv_timer_delete
 
@@ -176,6 +185,15 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_img_get_zoom       lv_image_get_scale
 #define lv_img_get_antialias  lv_image_get_antialias
 #endif /* LV_USE_IMAGE */
+
+#if LV_USE_IMAGEBUTTON
+#define lv_imgbtn_create         lv_imagebutton_create
+#define lv_imgbtn_set_src        lv_imagebutton_set_src
+#define lv_imgbtn_set_state      lv_imagebutton_set_state
+#define lv_imgbtn_get_src_left   lv_imagebutton_get_src_left
+#define lv_imgbtn_get_src_middle lv_imagebutton_get_src_middle
+#define lv_imgbtn_get_src_right  lv_imagebutton_get_src_right
+#endif /* LV_USE_IMAGEBUTTON */
 
 #if LV_USE_LIST
 #define lv_list_set_btn_text lv_list_set_button_text

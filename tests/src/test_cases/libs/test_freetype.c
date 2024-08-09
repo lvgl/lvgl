@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "../../libs/freetype/lv_freetype_private.h"
 
 #include "unity/unity.h"
 
@@ -483,7 +484,7 @@ void test_freetype_outline_rendering_test(void)
 
     uint32_t i = 0;
     lv_freetype_outline_event_param_t * param;
-    _LV_LL_READ(outline_data, param) {
+    LV_LL_READ(outline_data, param) {
 #if OPTION_GENERATE_OUTLINE_DATA
         /*FOR Generate outline data*/
 #if OPTION_GENERATE_VECTOR_OPS_STRING
@@ -517,14 +518,14 @@ static void freetype_outline_event_cb(lv_event_t * e)
     switch(code) {
         case LV_EVENT_CREATE:
             param->outline = lv_malloc_zeroed(sizeof(lv_ll_t));
-            _lv_ll_init(param->outline, sizeof(lv_freetype_outline_event_param_t));
+            lv_ll_init(param->outline, sizeof(lv_freetype_outline_event_param_t));
             break;
         case LV_EVENT_DELETE:
-            _lv_ll_clear(param->outline);
+            lv_ll_clear(param->outline);
             lv_free(param->outline);
             break;
         case LV_EVENT_INSERT: {
-                void * entry = _lv_ll_ins_tail(param->outline);
+                void * entry = lv_ll_ins_tail(param->outline);
                 lv_memcpy(entry, param, sizeof(lv_freetype_outline_event_param_t));
                 break;
             }

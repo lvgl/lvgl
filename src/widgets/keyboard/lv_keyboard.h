@@ -36,7 +36,7 @@ extern "C" {
  **********************/
 
 /** Current keyboard mode.*/
-enum _lv_keyboard_mode_t {
+typedef enum {
     LV_KEYBOARD_MODE_TEXT_LOWER,
     LV_KEYBOARD_MODE_TEXT_UPPER,
     LV_KEYBOARD_MODE_SPECIAL,
@@ -48,21 +48,17 @@ enum _lv_keyboard_mode_t {
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
     LV_KEYBOARD_MODE_TEXT_ARABIC
 #endif
+} lv_keyboard_mode_t;
+
+#if LV_USE_OBJ_PROPERTY
+enum {
+    LV_PROPERTY_ID(KEYBOARD, TEXTAREA,            LV_PROPERTY_TYPE_OBJ,   0),
+    LV_PROPERTY_ID(KEYBOARD, MODE,                LV_PROPERTY_TYPE_INT,   1),
+    LV_PROPERTY_ID(KEYBOARD, POPOVERS,            LV_PROPERTY_TYPE_INT,   2),
+    LV_PROPERTY_ID(KEYBOARD, SELECTED_BUTTON,     LV_PROPERTY_TYPE_INT,   3),
+    LV_PROPERTY_KEYBOARD_END,
 };
-
-#ifdef DOXYGEN
-typedef _lv_keyboard_mode_t lv_keyboard_mode_t;
-#else
-typedef uint8_t lv_keyboard_mode_t;
-#endif /*DOXYGEN*/
-
-/*Data of keyboard*/
-typedef struct {
-    lv_buttonmatrix_t btnm;
-    lv_obj_t * ta;              /*Pointer to the assigned text area*/
-    lv_keyboard_mode_t mode;    /*Key map type*/
-    uint8_t popovers : 1;       /*Show button titles in popovers on press*/
-} lv_keyboard_t;
+#endif
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_keyboard_class;
 
@@ -137,17 +133,14 @@ lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * kb);
  * @param obj       pointer to a Keyboard object
  * @return          true: "popovers" mode is enabled; false: disabled
  */
-bool lv_buttonmatrix_get_popovers(const lv_obj_t * obj);
+bool lv_keyboard_get_popovers(const lv_obj_t * obj);
 
 /**
  * Get the current map of a keyboard
  * @param kb        pointer to a keyboard object
  * @return          the current map
  */
-static inline const char ** lv_keyboard_get_map_array(const lv_obj_t * kb)
-{
-    return lv_buttonmatrix_get_map(kb);
-}
+const char ** lv_keyboard_get_map_array(const lv_obj_t * kb);
 
 /**
  * Get the index of the lastly "activated" button by the user (pressed, released, focused etc)
@@ -155,10 +148,7 @@ static inline const char ** lv_keyboard_get_map_array(const lv_obj_t * kb)
  * @param obj       pointer to button matrix object
  * @return          index of the last released button (LV_BUTTONMATRIX_BUTTON_NONE: if unset)
  */
-static inline uint32_t lv_keyboard_get_selected_button(const lv_obj_t * obj)
-{
-    return lv_buttonmatrix_get_selected_button(obj);
-}
+uint32_t lv_keyboard_get_selected_button(const lv_obj_t * obj);
 
 /**
  * Get the button's text
@@ -166,10 +156,7 @@ static inline uint32_t lv_keyboard_get_selected_button(const lv_obj_t * obj)
  * @param btn_id    the index a button not counting new line characters.
  * @return          text of btn_index` button
  */
-static inline const char * lv_keyboard_get_button_text(const lv_obj_t * obj, uint32_t btn_id)
-{
-    return lv_buttonmatrix_get_button_text(obj, btn_id);
-}
+const char * lv_keyboard_get_button_text(const lv_obj_t * obj, uint32_t btn_id);
 
 /*=====================
  * Other functions

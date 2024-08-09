@@ -26,8 +26,34 @@ Highlight of QNX
 How to run LVGL on QNX?
 -----------------------
 
-Build LVGL
-~~~~~~~~~~
+There are two ways to use LVGL in your QNX project. The first is similar to how
+LVGL is used on other systems. The second is to build LVGL as either a shared or
+a static library.
+
+Include LVGL in Your Project
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Follow the generic instructions for getting started with LVGL. After copying
+`lv_conf_template.h` to  `lv_conf.h` make the following changes to the latter:
+
+1. Enable QNX support:
+.. code::
+    #define LV_USE_QNX 1
+
+2. Set colour depth to 32:
+.. code::
+    #define LV_COLOR_DEPTH 32
+
+3. (Optional) Enable double-buffering:
+.. code::
+    #define LV_QNX_BUF_COUNT 2
+
+Build LVGL as a Library
+~~~~~~~~~~~~~~~~~~~~~~~
+
+**Note that this method is an alternative to including LVGL in your project. If
+you choose to build a library then you do not need to follow the instructions in
+the previous section.**
 
 The top-level `qnx` directory includes a recursive make file for building LVGL,
 both as a shared library and as a static library for the supported
@@ -35,7 +61,7 @@ architectures. To build all libraries, simply invoke `make` in this directory:
 
 .. code:: shell
 
-    # cd $(LVGL_ROOT)/qnx
+    # cd $(LVGL_ROOT)/env_support/qnx
     # make
 
 If you prefer to build for a specific architecture and variant, go to the
@@ -44,15 +70,16 @@ library for ARMv8:
 
 .. code:: shell
 
-    # cd $(LVGL_ROOT)/qnx/aarch64/so.le
+    # cd $(LVGL_ROOT)/env_support/qnx/aarch64/so.le
     # make
 
 As a general rule, if you only want to have one LVGL application in your system
 then it is better to use a static library. If you have more than one, and
 especially if they run concurrently, it is better to use the shared library.
 
-Before building the library, you may wish to edit `$(LVGL_ROOT)/qnx/lv_conf.h`,
-e.g. to enable double-buffering.
+Before building the library, you may wish to edit
+`$(LVGL_ROOT)/env_support/qnx/lv_conf.h`, e.g. to add fonts or disable
+double-buffering.
 
 Writing a LVGL Application
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -84,7 +111,7 @@ The following code shows how to create a "Hello World" application:
         lv_display_t *disp = lv_qnx_window_create(800, 480);
         lv_qnx_window_set_title(disp, "LVGL Example");
 
-        /* Add a keyboard and mouse devices. */
+        /* Add keyboard and mouse devices. */
         lv_qnx_add_keyboard_device(disp);
         lv_qnx_add_pointer_device(disp);
 
@@ -112,9 +139,9 @@ above, which builds for ARMv8 with the shared library:
 
     CC=qcc -Vgcc_ntoaarch64le
 
-    LVGL_DIR=$(HOME)/src/lvgl
-    CCFLAGS=-I$(LVGL_DIR)/qnx -I$(LVGL_DIR)
-    LDFLAGS=-lscreen -llvgl -L$(LVGL_DIR)/qnx/aarch64/so.le
+    LVGL_ROOT=$(HOME)/src/lvgl
+    CCFLAGS=-I$(LVGL_ROOT)/env_support/qnx -I$(LVGL_ROOT)
+    LDFLAGS=-lscreen -llvgl -L$(LVGL_ROOT)/env_support/qnx/aarch64/so.le
 
     lvgl_example: lvgl_example.c
     	$(CC) $(CCFLAGS) -Wall -o $@ $< $(LDFLAGS)

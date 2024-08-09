@@ -6,11 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_draw.h"
+#include "../lv_draw_private.h"
 #if LV_USE_DRAW_SW
 
 #include "../../core/lv_refr.h"
-#include "lv_draw_sw.h"
+#include "lv_draw_sw_private.h"
 #include "../../display/lv_display_private.h"
 #include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
@@ -506,7 +506,7 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
     /*Layers manage it for themselves*/
     if(t->type != LV_DRAW_TASK_TYPE_LAYER) {
         lv_area_t draw_area;
-        if(!_lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area)) return;
+        if(!lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area)) return;
 
         int32_t idx = 0;
         lv_draw_unit_t * draw_unit_tmp = _draw_info.unit_head;
@@ -516,7 +516,7 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
         }
         lv_draw_rect_dsc_t rect_dsc;
         lv_draw_rect_dsc_init(&rect_dsc);
-        rect_dsc.bg_color = lv_palette_main(idx % _LV_PALETTE_LAST);
+        rect_dsc.bg_color = lv_palette_main(idx % LV_PALETTE_LAST);
         rect_dsc.border_color = rect_dsc.bg_color;
         rect_dsc.bg_opa = LV_OPA_10;
         rect_dsc.border_opa = LV_OPA_80;
@@ -615,8 +615,8 @@ static void rotate90_argb8888(const uint32_t * src, uint32_t * dst, int32_t srcW
 
 #if LV_DRAW_SW_SUPPORT_RGB888
 
-static void rotate270_rgb888(const uint8_t * src, uint8_t * dst, int32_t srcWidth, int32_t srcHeight, int32_t srcStride,
-                             int32_t dstStride)
+static void rotate90_rgb888(const uint8_t * src, uint8_t * dst, int32_t srcWidth, int32_t srcHeight, int32_t srcStride,
+                            int32_t dstStride)
 {
     if(LV_RESULT_OK == LV_DRAW_SW_ROTATE90_RGB888(src, dst, srcWidth, srcHeight, srcStride, dstStride)) {
         return ;
@@ -651,8 +651,8 @@ static void rotate180_rgb888(const uint8_t * src, uint8_t * dst, int32_t width, 
     }
 }
 
-static void rotate90_rgb888(const uint8_t * src, uint8_t * dst, int32_t width, int32_t height, int32_t srcStride,
-                            int32_t dstStride)
+static void rotate270_rgb888(const uint8_t * src, uint8_t * dst, int32_t width, int32_t height, int32_t srcStride,
+                             int32_t dstStride)
 {
     if(LV_RESULT_OK == LV_DRAW_SW_ROTATE270_RGB888(src, dst, srcWidth, srcHeight, srcStride, dstStride)) {
         return ;

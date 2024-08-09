@@ -146,7 +146,7 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
     bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
     if(has_transform)
         lv_area_copy(&blend_area, &relative_coords);
-    else if(!_lv_area_intersect(&blend_area, &relative_coords, &clip_area))
+    else if(!lv_area_intersect(&blend_area, &relative_coords, &clip_area))
         return; /*Fully clipped, nothing to do*/
 
     const void * src_buf = img_dsc->data;
@@ -213,7 +213,7 @@ static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t *
 static void _move_buf_close_to_area(void ** buf, lv_area_t * area, uint32_t stride, lv_color_format_t cf)
 {
     uint8_t ** buf_u8 = (uint8_t **)buf;
-    uint8_t align_bytes = vglite_get_alignment(cf);
+    uint8_t align_bytes = vglite_get_stride_alignment(cf);
     uint8_t bits_per_pixel = lv_color_format_get_bpp(cf);
 
     uint16_t align_pixels = align_bytes * 8 / bits_per_pixel;

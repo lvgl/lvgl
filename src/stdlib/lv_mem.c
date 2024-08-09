@@ -5,7 +5,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_mem.h"
+#include "lv_mem_private.h"
 #include "lv_string.h"
 #include "../misc/lv_assert.h"
 #include "../misc/lv_log.h"

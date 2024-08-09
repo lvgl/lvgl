@@ -24,7 +24,7 @@ void test_render_to_i1(void)
     uint32_t opa;
     for(opa = 0; opa < 2; opa++) {
         uint32_t i;
-        for(i = 0; i < _LV_DEMO_RENDER_SCENE_NUM; i++) {
+        for(i = 0; i < LV_DEMO_RENDER_SCENE_NUM; i++) {
             lv_demo_render(i, opa_values[opa]);
 
             char buf[128];

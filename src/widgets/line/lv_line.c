@@ -6,7 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_line.h"
+#include "../../core/lv_obj_class_private.h"
+#include "lv_line_private.h"
 
 #if LV_USE_LINE != 0
 #include "../../misc/lv_assert.h"
