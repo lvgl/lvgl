@@ -257,8 +257,6 @@ typedef struct lv_observer_t lv_observer_t;
 
 typedef struct lv_monkey_config_t lv_monkey_config_t;
 
-typedef struct lv_pinyin_dict_t lv_pinyin_dict_t;
-
 typedef struct lv_ime_pinyin_t lv_ime_pinyin_t;
 
 typedef struct lv_file_explorer_t lv_file_explorer_t;
