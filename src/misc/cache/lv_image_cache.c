@@ -136,10 +136,14 @@ static void image_cache_free_cb(lv_image_cache_data_t * entry, void * user_data)
 
     /* Destroy the decoded draw buffer if necessary. */
     lv_draw_buf_t * decoded = (lv_draw_buf_t *)entry->decoded;
-    if(lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_ALLOCATED)) {
+    if(decoded && lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_ALLOCATED)) {
         lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
+        entry->decoded = NULL;
     }
 
     /*Free the duplicated file name*/
-    if(entry->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)entry->src);
+    if(entry->src_type == LV_IMAGE_SRC_FILE && entry->src) {
+        lv_free((void *)entry->src);
+        entry->src = NULL;
+    }
 }

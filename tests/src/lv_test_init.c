@@ -32,7 +32,7 @@ void lv_test_init(void)
 
 void lv_test_deinit(void)
 {
-    lv_mem_deinit();
+    lv_deinit();
 }
 
 static void hal_init(void)

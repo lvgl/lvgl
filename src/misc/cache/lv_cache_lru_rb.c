@@ -382,8 +382,8 @@ static void drop_all_cb(lv_cache_t * cache, void * user_data)
     }
 
     uint32_t used_cnt = 0;
-    lv_rb_node_t ** node;
-    LV_LL_READ(&lru->ll, node) {
+    lv_rb_node_t ** node = lv_ll_get_head(&lru->ll);
+    while(node) {
         /*free user handled data and do other clean up*/
         void * search_key = (*node)->data;
         lv_cache_entry_t * entry = lv_cache_entry_get_entry(search_key, cache->node_size);
@@ -394,13 +394,16 @@ static void drop_all_cb(lv_cache_t * cache, void * user_data)
             LV_LOG_WARN("entry (%p) is still referenced (%" LV_PRId32 ")", (void *)entry, lv_cache_entry_get_ref(entry));
             used_cnt++;
         }
+
+        lv_ll_remove(&lru->ll, node);
+        lv_free(node);
+        node = lv_ll_get_head(&lru->ll);
     }
     if(used_cnt > 0) {
         LV_LOG_WARN("%" LV_PRId32 " entries are still referenced", used_cnt);
     }
 
     lv_rb_destroy(&lru->rb);
-    lv_ll_clear(&lru->ll);
 
     cache->size = 0;
 }

@@ -172,7 +172,6 @@ void setUp(void)
 void tearDown(void)
 {
     label_delete_all(&g_ctx);
-    lv_freetype_uninit();
 
     lv_free(g_ctx.label_arr);
 }
