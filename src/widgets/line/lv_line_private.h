@@ -27,7 +27,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Data of line*/
+/** Data of line */
 struct lv_line_t {
     lv_obj_t obj;
     union {

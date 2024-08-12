@@ -32,7 +32,7 @@ extern "C" {
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_animimg_class;
 
-/*Image parts*/
+/** Image parts */
 typedef enum {
     LV_ANIM_IMAGE_PART_MAIN,
 } lv_animimg_part_t;

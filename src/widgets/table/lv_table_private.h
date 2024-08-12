@@ -26,14 +26,14 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Data of cell*/
+/** Cell data */
 struct lv_table_cell_t {
     lv_table_cell_ctrl_t ctrl;
-    void * user_data; /**< Custom user data*/
-    char txt[1]; /**< Variable length array*/
+    void * user_data; /**< Custom user data */
+    char txt[1];      /**< Variable length array */
 };
 
-/*Data of table*/
+/** Table data */
 struct lv_table_t {
     lv_obj_t obj;
     uint32_t col_cnt;
