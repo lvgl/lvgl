@@ -361,7 +361,7 @@ Example
 
 
 Use a BDF font
-^^^^^^^^^^^^^^
+**************
 
 Small displays with low resolution don't look pretty with automatically rendered fonts. A bitmap font provides
 the solution, but it's necessary to convert the bitmap font (BDF) to a TTF.
