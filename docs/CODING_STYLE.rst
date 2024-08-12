@@ -70,7 +70,7 @@ Comments
 
 Before every function have in ``.h`` files a comment like this:
 
-.. code:: c
+.. code-block:: c
 
    /**
     * Return with the screen of an object
@@ -131,7 +131,7 @@ Formatting
 
 Here is example to show bracket placing and using of white spaces:
 
-.. code:: c
+.. code-block:: c
 
    /**
     * Set a new text for a label. Memory will be allocated to store the text by the label.
@@ -173,7 +173,7 @@ Once you have ``pre-commit`` installed you will need to `set up the git
 hook scripts <https://pre-commit.com/#3-install-the-git-hook-scripts>`__
 with:
 
-.. code:: console
+.. code-block:: console
 
    pre-commit install
 
@@ -196,7 +196,7 @@ Skipping hooks
 
 If you want to skip any particular hook you can do so with:
 
-.. code:: console
+.. code-block:: console
 
    SKIP=name-of-the-hook git commit
 
@@ -206,6 +206,6 @@ Testing hooks
 It's no necessary to do a commit to test the hooks, you can test hooks
 by adding the files into the staging area and run:
 
-.. code:: console
+.. code-block:: console
 
    pre-commit run name-of-the-hook

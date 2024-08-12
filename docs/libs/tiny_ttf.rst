@@ -1,13 +1,14 @@
 .. _tiny_ttf:
 
-====================
+********************
 Tiny TTF font engine
-====================
+********************
+
 
 .. _tiny_ttf_usage:
 
 Usage
------
+^^^^^
 
 Allow using TrueType fonts in LVGL.
 
@@ -37,19 +38,15 @@ available). The cache size is indicated in number of entries. Kerning is whether
 if supported, or disable.
 
 
-
 .. _tiny_ttf_example:
 
 Example
--------
+^^^^^^^
 
-.. include:: ../examples/libs/tiny_ttf/index.rst
+.. include:: ../../examples/libs/tiny_ttf/index.rst
+
 
 .. _tiny_ttf_api:
 
 API
----
-
-:ref:`stb_rect_pack`
-
-:ref:`stb_truetype_htcw`
+^^^

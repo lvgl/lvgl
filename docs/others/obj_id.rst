@@ -1,17 +1,18 @@
 .. _obj_id:
 
-======
+******
 OBJ ID
-======
+******
 
 LVGL provides an optional field in :cpp:type:`lv_obj_t` to store the object ID.
 Object ID can be used in many cases, for example, to identify the object.
 Or we can store a program backtrace to where the object is created.
 
+
 .. _obj_id_usage:
 
 Usage
------
+^^^^^
 
 Enable this feature by setting :c:macro:`LV_USE_OBJ_ID` to `1` in ``lv_conf.h``.
 
@@ -24,14 +25,15 @@ To use the builtin ID generator, set :c:macro:`LV_USE_OBJ_ID_BUILTIN` to `1`.
 You can directly access the ID by :cpp:expr:`lv_obj_get_id(obj)` or use API :cpp:expr:`lv_obj_stringify_id(obj, buf, len)`
 to get a string representation of the ID.
 
+
 Use custom ID generator
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 Set :c:macro:`LV_USE_OBJ_ID_BUILTIN` to `0` in ``lv_conf.h``.
 
 Below APIs needed to be implemented and linked to lvgl.
 
-.. code:: c
+.. code-block:: c
 
     void lv_obj_assign_id(const lv_obj_class_t * class_p, lv_obj_t * obj);
     void lv_obj_free_id(lv_obj_t * obj);
@@ -47,10 +49,11 @@ currently being constructed.
 
 :cpp:func:`lv_obj_stringify_id` converts id to a string representation. The string is stored in ``buf``.
 
-Dump obj tree
-~~~~~~~~~~~~~
 
-Use API :cpp:expr:`lv_obj_dump_tree(lv_obj_t * obj, int depth)` to dump the object tree.
+Dump obj tree
+-------------
+
+Use API ``lv_obj_dump_tree(lv_obj_t * obj, int depth)`` to dump the object tree.
 It will walk through all children and print the object ID together with object address.
 
 This is useful to debug UI crash. From log we can rebuilt UI the moment before crash.
@@ -58,8 +61,9 @@ For example, if the obj is stored to a :cpp:expr:`timer->user_data`, but obj is 
 Timer callback will crash because of accessing wild pointer.
 From the dump log we can clearly see that the obj does not exist.
 
-Find child by ID
-~~~~~~~~~~~~~~~~
 
-Use API :cpp:expr:`lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, void * id);` to find a child by ID.
+Find child by ID
+----------------
+
+Use API ``lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, void * id)`` to find a child by ID.
 It will walk through all children and return the first child with the given ID.

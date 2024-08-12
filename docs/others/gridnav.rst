@@ -1,8 +1,8 @@
 .. _gridnav:
 
-===============
+***************
 Grid navigation
-===============
+***************
 
 Grid navigation (gridnav for short) is a feature that changes the
 currently focused child object as arrow keys are pressed.
@@ -34,10 +34,11 @@ key on keyboard as usual.
 If the container is scrollable and the focused child is out of the view,
 gridnav will automatically scroll the child into view.
 
+
 .. _gridnav_usage:
 
 Usage
------
+^^^^^
 
 To add the gridnav feature to an object use
 :cpp:expr:`lv_gridnav_add(cont, flags)`.
@@ -62,22 +63,25 @@ should not be used together.
 
 :cpp:expr:`lv_gridnav_remove(cont)` Removes gridnav from an object.
 
+
 Focusable objects
------------------
+^^^^^^^^^^^^^^^^^
 
 An object needs to be clickable or click focusable
 (:cpp:enumerator:`LV_OBJ_FLAG_CLICKABLE` or :cpp:enumerator:`LV_OBJ_FLAG_CLICK_FOCUSABLE`) and not
 hidden (:cpp:enumerator:`LV_OBJ_FLAG_HIDDEN`) to be focusable by gridnav.
 
+
 .. _gridnav_example:
 
 Example
--------
+^^^^^^^
 
-.. include:: ../examples/others/gridnav/index.rst
+.. include:: ../../examples/others/gridnav/index.rst
+
 
 .. _gridnav_api:
 
 API
----
+^^^
 

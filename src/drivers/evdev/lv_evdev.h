@@ -24,8 +24,8 @@ extern "C" {
 
 /**
  * Create evdev input device.
- * @param type LV_INDEV_TYPE_POINTER or LV_INDEV_TYPE_KEYPAD
- * @param dev_path device path, e.g., /dev/input/event0
+ * @param indev_type LV_INDEV_TYPE_POINTER or LV_INDEV_TYPE_KEYPAD
+ * @param dev_path   device path, e.g., /dev/input/event0
  * @return pointer to input device or NULL if opening failed
  */
 lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path);

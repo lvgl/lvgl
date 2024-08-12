@@ -1,8 +1,8 @@
 .. _lv_arc:
 
-============
+************
 Arc (lv_arc)
-============
+************
 
 Overview
 ********
@@ -100,7 +100,7 @@ unintended behavior.
 To make the arc non-adjustable, remove the style of the knob and make
 the object non-clickable:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
    lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);

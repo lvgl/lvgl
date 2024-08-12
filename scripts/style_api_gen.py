@@ -560,7 +560,7 @@ def docs(p):
   if "section" in p:
     print("")
     print(p['section'])
-    print("-" * len(p['section']))
+    print("^" * len(p['section']))
     print("")
     print(p['dsc'])
     return
@@ -583,8 +583,9 @@ def docs(p):
   dsc = p['dsc']
 
   print("")
+  print("")
   print(p["name"].lower())
-  print("~" * len(p["name"].lower()))
+  print("-" * len(p["name"].lower()))
   print("")
   print(dsc)
 
@@ -715,11 +716,13 @@ print('''\
 ''')
 print('#endif /* LV_STYLE_GEN_H */')
 
-sys.stdout = open(base_dir + '/../docs/overview/style-props.rst', 'w')
 
-print('================')
+sys.stdout = open(base_dir + '/../docs/overview/style-props.rst', 'w')
+print('.. _style_properties:')
+print()
+print('****************')
 print('Style properties')
-print('================')
+print('****************')
 
 for p in props:
   docs(p)

@@ -27,32 +27,32 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct {
+typedef struct _view_t {
     lv_obj_t * root;
     lv_obj_t * obj_cur;
     lv_style_t obj_def_style;
     lv_style_t obj_checked_style;
 
-    struct {
+    struct _ctrl_pad {
         lv_obj_t * cont;
 
-        struct {
+        struct _tab {
             lv_obj_t * view;
 
-            struct {
+            struct _flex {
                 lv_obj_t * tab;
                 lv_obj_t * ddlist_flow;
                 lv_obj_t * checkbox_scrl;
             } flex;
 
-            struct {
+            struct _align {
                 lv_obj_t * tab;
                 lv_obj_t * ddlist_align_main;
                 lv_obj_t * ddlist_align_cross;
                 lv_obj_t * ddlist_align_track;
             } align;
 
-            struct {
+            struct _layout {
                 lv_obj_t * tab;
                 lv_obj_t * group_width_and_height;
                 lv_obj_t * spinbox_width;
@@ -73,7 +73,7 @@ typedef struct {
             } layout;
         } tab;
 
-        struct {
+        struct _btn {
             lv_obj_t * cont;
             lv_obj_t * add;
             lv_obj_t * remove;

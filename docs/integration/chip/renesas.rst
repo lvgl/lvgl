@@ -1,12 +1,13 @@
 .. _renesas:
 
-=======
-Renesas
-=======
 
-`Renesas <https://renesas.com/>`__ is an official partner of LVGL.
-Therefore, LVGL contains built-in support for `Dave2D <https://www.renesas.com/document/mas/tes-dave2d-driver-documentation>`__ (the GPU of Renesas)
-and we also maintain ready-to-use Renesas projects.
+Renesas
+^^^^^^^
+
+`Renesas <https://renesas.com/>`__ is an official partner of LVGL. Therefore, LVGL contains built-in support for
+`Dave2D <https://www.renesas.com/document/mas/tes-dave2d-driver-documentation>`__ (the GPU of Renesas) and we also maintain
+ready-to-use Renesas projects.
+
 
 Dave2D
 ------
@@ -19,15 +20,19 @@ Dave2D is capable of accelerating most of the drawing operations of LVGL:
 - Triangle drawing
 - Line drawing
 
-As Dave2D works in the background, the CPU is free for other tasks. In practice, during rendering, Dave2D can reduce the CPU usage by half or to one-third, depending on the application.
+
+As Dave2D works in the background, the CPU is free for other tasks. In practice, during rendering, Dave2D can reduce the CPU usage by
+half or to one-third, depending on the application.
+
 
 GLCDC
 -----
 
-GLCDC is a multi-stage graphics output peripheral available in several Renesas MCUs.
-It is able to drive LCD panels via a highly configurable RGB interface.
+GLCDC is a multi-stage graphics output peripheral available in several Renesas MCUs. It is able to drive LCD panels via a highly
+configurable RGB interface.
 
 More info can be found at the :ref:`driver's page<renesas_glcdc>`.
+
 
 Supported boards
 ----------------
@@ -84,6 +89,7 @@ Supported boards
      - `Demo repository for EK-RA6M3G <https://github.com/lvgl/lv_port_renesas_ek-ra6m3g>`__
      - `Demo repository for RX72N Envision Kit <https://github.com/lvgl/lv_port_renesas_rx72n-envision-kit>`__
 
+
 Get started with the Renesas ecosystem
 --------------------------------------
 
@@ -92,24 +98,20 @@ Get started with the Renesas ecosystem
 
 .. dropdown:: RA Family
 
-   - The official IDE of Renesas is called e² studio. As it's Eclipse-based, it runs on Windows, Linux, and Mac as well. The RA family requires the latest version with FSP 5.3. It can be downloaded `here <https://www.renesas.com/us/en/software-tool/flexible-software-package-fsp>`__.
+    - The official IDE of Renesas is called e² studio. As it's Eclipse-based, it runs on Windows, Linux, and Mac as well.
+      The RA family requires the latest version with FSP 5.3. It can be downloaded `here <https://www.renesas.com/us/en/software-tool/flexible-software-package-fsp>`__.
+    - JLink is used for debugging, it can be downloaded `here <https://www.segger.com/downloads/jlink/>`__.
+    - Clone the ready-to-use repository for your selected board:
 
-   - JLink is used for debugging, it can be downloaded `here <https://www.segger.com/downloads/jlink/>`__.
+        .. code-block:: shell
+
+            git clone https://github.com/lvgl/lv_port_renesas_ek-ra8d1.git --recurse-submodules
 
 
-   - Clone the ready-to-use repository for your selected board:
-
-      .. code-block:: shell
-
-         git clone https://github.com/lvgl/lv_port_renesas_ek-ra8d1.git --recurse-submodules
-
-      Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
-
-   - Open e² studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Existing projects into workspace``
-
-   - Browse the cloned folder and press ``Finish``.
-
-   - Double click on ``configuration.xml``. This will activate the `Configuration Window`.
+        Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
+    - Open e² studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Existing projects into workspace``
+    - Browse the cloned folder and press ``Finish``.
+    - Double click on ``configuration.xml``. This will activate the `Configuration Window`.
 
       Renesas' Flexible Software Package (FSP) incudes BSP and HAL layer support extended with multiple RTOS variants and other middleware stacks.
       The components will be available via code generation, including the entry point of *"main.c"*.
@@ -119,18 +121,17 @@ Get started with the Renesas ecosystem
       .. image:: /misc/renesas/generate.png
          :alt: Code generation with FSP
 
-   - Build the project by pressing ``Ctrl`` + ``Alt`` + ``B``
-
-   - Click the Debug button (|img_debug_btn|). If prompted with `Debug Configurations`, on the `Debugger` tab select the ``J-Link ARM`` as `Debug hardware` and the proper IC as `Target Device`:
+    - Build the project by pressing ``Ctrl`` + ``Alt`` + ``B``
+    - Click the Debug button (|img_debug_btn|). If prompted with `Debug Configurations`, on the `Debugger` tab select the ``J-Link ARM`` as `Debug hardware` and the proper IC as `Target Device`:
 
       - ``R7FA8D1BH`` for EK-RA8D1
 
-         .. image:: /misc/renesas/debug_ra8.png
-            :alt: Debugger parameters for RA8
+        .. image:: /misc/renesas/debug_ra8.png
+           :alt: Debugger parameters for RA8
 
       - ``R7FA6M3AH`` for EK-RA6M3G
 
-         .. image:: /misc/renesas/debug_ra6.png
+        .. image:: /misc/renesas/debug_ra6.png
             :alt: Debugger parameters for RA6
 
    .. note::
@@ -138,39 +139,40 @@ Get started with the Renesas ecosystem
 
 .. dropdown:: RX Family
 
-   - The official IDE of Renesas is called e² studio. As it's Eclipse-based, it runs on Windows, Linux, and Mac as well. It can be downloaded `here <https://www.renesas.com/us/en/software-tool/e-studio>`__.
+    - The official IDE of Renesas is called e² studio. As it's Eclipse-based, it runs on Windows, Linux, and Mac as well.
+      It can be downloaded `here <https://www.renesas.com/us/en/software-tool/e-studio>`__.
+    - Download and install the required driver for the debugger
 
-   - Download and install the required driver for the debugger
-
-       - for Windows: `64 bit here <https://www.renesas.com/us/en/document/uid/usb-driver-renesas-mcu-tools-v27700-64-bit-version-windows-os?r=488806>`__ and `32 bit here <https://www.renesas.com/us/en/document/uid/usb-driver-renesas-mcu-toolse2e2-liteie850ie850apg-fp5-v27700for-32-bit-version-windows-os?r=488806>`__
+       - for Windows: `64 bit here <https://www.renesas.com/us/en/document/uid/usb-driver-renesas-mcu-tools-v27700-64-bit-version-windows-os?r=488806>`__
+         and `32 bit here <https://www.renesas.com/us/en/document/uid/usb-driver-renesas-mcu-toolse2e2-liteie850ie850apg-fp5-v27700for-32-bit-version-windows-os?r=488806>`__
        - for Linux: `here <https://www.renesas.com/us/en/document/swo/e2-emulator-e2-emulator-lite-linux-driver?r=488806>`__
 
-   - RX72 requires an external compiler for the RXv3 core. A free and open-source version is available `here <https://llvm-gcc-renesas.com/rx-download-toolchains/>`__ after a registration.
+    - RX72 requires an external compiler for the RXv3 core. A free and open-source version is available
+      `here <https://llvm-gcc-renesas.com/rx-download-toolchains/>`__ after a registration.
 
       The compiler must be activated in e² studio:
 
       - Go to go to ``Help`` -> ``Add Renesas Toolchains``
-      - Press the ``Add... `` button
+      - Press the ``Add...`` button
       - Browse the installation folder of the toolchain
 
-      |
+      <br/>
 
       .. image:: /misc/renesas/toolchains.png
          :alt: Toolchains
 
-   - Clone the ready-to-use `lv_port_renesas_rx72n-envision-kit <https://github.com/lvgl/lv_port_renesas_rx72n-envision-kit.git>`__ repository:
+    - Clone the ready-to-use `lv_port_renesas_rx72n-envision-kit <https://github.com/lvgl/lv_port_renesas_rx72n-envision-kit.git>`__ repository:
 
       .. code-block:: shell
 
-         git clone https://github.com/lvgl/lv_port_renesas_rx72n-envision-kit.git --recurse-submodules
+          git clone https://github.com/lvgl/lv_port_renesas_rx72n-envision-kit.git --recurse-submodules
+
 
       Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
 
-   - Open e² studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Existing projects into workspace``
-
-   - Select the cloned folder and press ``Finish``.
-
-   - Double click on ``RX72N_EnVision_LVGL.scfg``. This will activate the `Configuration Window`.
+    - Open e² studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Existing projects into workspace``
+    - Select the cloned folder and press ``Finish``.
+    - Double click on ``RX72N_EnVision_LVGL.scfg``. This will activate the `Configuration Window`.
 
       Renesas' Smart Configurator (SMC) incudes BSP and HAL layer support extended with multiple RTOS variants and other middleware stacks.
       The components will be available via code generation, including the entry point of the application.
@@ -180,34 +182,37 @@ Get started with the Renesas ecosystem
       .. image:: /misc/renesas/generate_smc.png
          :alt: Code generation with SMC
 
-   - Build the project by pressing ``Ctrl`` + ``Alt`` + ``B``
-
-   - Click the Debug button (|img_debug_btn|). If prompted with `Debug Configurations`, on the `Debugger` tab select the ``E2 Lite`` as `Debug hardware` and ``R5F572NN`` as `Target Device`:
+    - Build the project by pressing ``Ctrl`` + ``Alt`` + ``B``
+    - Click the Debug button (|img_debug_btn|). If prompted with `Debug Configurations`, on the `Debugger` tab select the ``E2 Lite``
+      as `Debug hardware` and ``R5F572NN`` as `Target Device`:
 
       .. image:: /misc/renesas/debug_rx72.png
          :alt: Debugger parameters for RX72
 
-   .. note::
-      Make sure that both channels of ``SW1`` DIP switch (next to ``ECN1``) are OFF.
+    .. note::
+       Make sure that both channels of ``SW1`` DIP switch (next to ``ECN1``) are OFF.
+
 
 Modify the project
 ------------------
 
+
 Open a demo
-~~~~~~~~~~~
+***********
 
 The entry point of the main task is contained in ``src/LVGL_thread_entry.c`` in all 3 projects.
 
 You can disable the LVGL demos (or just comment them out) and call some ``lv_example_...()`` functions, or add your custom code.
 
+
 Configuration
-~~~~~~~~~~~~~
+*************
 
 ``src/lv_conf.h`` contains the most important settings for LVGL. Namely:
 
-- ``LV_COLOR_DEPTH`` to set LVGL's default color depth
-- ``LV_MEM_SIZE to`` set the maximum RAM available for LVGL
-- ``LV_USE_DAVE2D`` to enable the GPU
+- :c:macro:`LV_COLOR_DEPTH` to set LVGL's default color depth
+- :c:macro:`LV_MEM_SIZE` to set the maximum RAM available for LVGL
+- :c:macro:`LV_USE_DAVE2D` to enable the GPU
 
 
 Hardware and software components can be modified in a visual way using the `Configuration Window`.

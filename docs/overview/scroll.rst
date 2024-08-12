@@ -1,11 +1,11 @@
 .. _scroll:
 
-======
+******
 Scroll
-======
+******
 
 Overview
-********
+^^^^^^^^
 
 In LVGL scrolling works very intuitively: if an object is outside its
 parent content area (the size without padding), the parent becomes
@@ -18,10 +18,11 @@ The object can either be scrolled horizontally or vertically in one
 stroke; diagonal scrolling is not possible.
 
 Scrollbar
----------
+^^^^^^^^^
+
 
 Mode
-^^^^
+----
 
 Scrollbars are displayed according to a configured ``mode``. The
 following ``mode``\ (s) exist:
@@ -34,36 +35,38 @@ following ``mode``\ (s) exist:
 ``lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_...)`` sets the scrollbar mode on an object.
 
 Styling
-^^^^^^^
+-------
 
 The scrollbars have their own dedicated part, called
 :cpp:enumerator:`LV_PART_SCROLLBAR`. For example a scrollbar can turn to red like
 this:
 
-.. code:: c
+.. code-block:: c
 
-   static lv_style_t style_red;
-   lv_style_init(&style_red);
-   lv_style_set_bg_color(&style_red, lv_color_red());
+    static lv_style_t style_red;
+    lv_style_init(&style_red);
+    lv_style_set_bg_color(&style_red, lv_color_red());
 
-   ...
+    ...
 
-   lv_obj_add_style(obj, &style_red, LV_PART_SCROLLBAR);
+    lv_obj_add_style(obj, &style_red, LV_PART_SCROLLBAR);
+
 
 An object goes to the :cpp:enumerator:`LV_STATE_SCROLLED` state while it's being
 scrolled. This allows adding different styles to the scrollbar or the
 object itself when scrolled. This code makes the scrollbar blue when the
 object is scrolled:
 
-.. code:: c
+.. code-block:: c
 
-   static lv_style_t style_blue;
-   lv_style_init(&style_blue);
-   lv_style_set_bg_color(&style_blue, lv_color_blue());
+    static lv_style_t style_blue;
+    lv_style_init(&style_blue);
+    lv_style_set_bg_color(&style_blue, lv_color_blue());
 
-   ...
+    ...
 
-   lv_obj_add_style(obj, &style_blue, LV_STATE_SCROLLED | LV_PART_SCROLLBAR);
+    lv_obj_add_style(obj, &style_blue, LV_STATE_SCROLLED | LV_PART_SCROLLBAR);
+
 
 If the base direction of the :cpp:enumerator:`LV_PART_SCROLLBAR` is RTL
 (:c:macro:`LV_BASE_DIR_RTL`) the vertical scrollbar will be placed on the left.
@@ -75,10 +78,11 @@ base direction.
 ``pad_left/right/top/bottom`` sets the spacing around the scrollbars and
 ``width`` sets the scrollbar's width.
 
+
 .. _scroll_events:
 
 Events
-------
+^^^^^^
 
 The following events are related to scrolling:
 
@@ -87,16 +91,19 @@ The following events are related to scrolling:
 - :cpp:enumerator:`LV_EVENT_SCROLL_END`: Scrolling ends.
 - :cpp:enumerator:`LV_EVENT_SCROLL`: Scroll happened. Triggered on every position change. Scroll events
 
+
 Basic example
-*************
+-------------
 
 TODO
 
+
 Features of scrolling
-*********************
+^^^^^^^^^^^^^^^^^^^^^
 
 Besides, managing "normal" scrolling there are many interesting and
 useful additional features.
+
 
 Scrollable
 ----------
@@ -121,6 +128,7 @@ The following values are possible for the direction:
 
 OR-ed values are also possible. E.g. :cpp:expr:`LV_DIR_TOP | LV_DIR_LEFT`.
 
+
 Scroll chain
 ------------
 
@@ -135,6 +143,7 @@ enabled/disabled with ``LV_OBJ_FLAG_SCROLL_CHAIN_HOR/VER`` flag. If
 chaining is disabled the propagation stops on the object and the
 parent(s) won't be scrolled.
 
+
 Scroll momentum
 ---------------
 
@@ -144,6 +153,7 @@ scrolling slows down smoothly.
 
 The scroll momentum can be enabled/disabled with the
 :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_MOMENTUM` flag.
+
 
 Elastic scroll
 --------------
@@ -157,6 +167,7 @@ when the user "over-scrolls" the content. The scrolling slows down, and
 the content can be scrolled inside the object. When the object is
 released the content scrolled in it will be animated back to the valid
 position.
+
 
 Snapping
 --------
@@ -182,6 +193,7 @@ Under the hood the following happens:
 3. LVGL finds the nearest scroll point
 4. LVGL scrolls to the snap point with an animation
 
+
 Scroll one
 ----------
 
@@ -191,6 +203,7 @@ and setting a scroll snap alignment different from
 :cpp:enumerator:`LV_SCROLL_SNAP_NONE`.
 
 This feature can be enabled by the :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_ONE` flag.
+
 
 Scroll on focus
 ---------------
@@ -204,8 +217,9 @@ therefore even nested scrollable objects are handled properly. The
 object will be scrolled into view even if it's on a different page of a
 tabview.
 
+
 Scroll manually
-***************
+---------------
 
 The following API functions allow manual scrolling of objects:
 
@@ -219,18 +233,19 @@ element, either to restore it later, or to display dynamically some
 elements according to the current scroll. Here is an example to see how
 to combine scroll event and store the scroll top position.
 
-.. code:: c
+.. code-block:: c
 
-   static int scroll_value = 0;
+    static int scroll_value = 0;
 
-   static void store_scroll_value_event_cb(lv_event_t* e) {
-     lv_obj_t* screen = lv_event_get_target(e);
-     scroll_value = lv_obj_get_scroll_top(screen);
-     printf("%d pixels are scrolled out on the top\n", scroll_value);
-   }
+    static void store_scroll_value_event_cb(lv_event_t* e) {
+        lv_obj_t* screen = lv_event_get_target(e);
+        scroll_value = lv_obj_get_scroll_top(screen);
+        printf("%d pixels are scrolled out on the top\n", scroll_value);
+    }
 
-   lv_obj_t* container = lv_obj_create(NULL);
-   lv_obj_add_event_cb(container, store_scroll_value_event_cb, LV_EVENT_SCROLL, NULL);
+    lv_obj_t* container = lv_obj_create(NULL);
+    lv_obj_add_event_cb(container, store_scroll_value_event_cb, LV_EVENT_SCROLL, NULL);
+
 
 Scroll coordinates can be retrieved from different axes with these
 functions:
@@ -244,7 +259,7 @@ functions:
 
 
 Self size
-*********
+^^^^^^^^^
 
 Self size is a property of an object. Normally, the user shouldn't use
 this parameter but if a custom widget is created it might be useful.
@@ -262,29 +277,30 @@ larger self size will too.
 LVGL uses the :cpp:enumerator:`LV_EVENT_GET_SELF_SIZE` event to get the self size of
 an object. Here is an example to see how to handle the event:
 
-.. code:: c
+.. code-block:: c
 
-   if(event_code == LV_EVENT_GET_SELF_SIZE) {
-       lv_point_t * p = lv_event_get_param(e);
+    if(event_code == LV_EVENT_GET_SELF_SIZE) {
+        lv_point_t * p = lv_event_get_param(e);
 
-     //If x or y < 0 then it doesn't need to be calculated now
-     if(p->x >= 0) {
-       p->x = 200; //Set or calculate the self width
-     }
+        //If x or y < 0 then it doesn't need to be calculated now
+        if(p->x >= 0) {
+            p->x = 200; //Set or calculate the self width
+        }
 
-     if(p->y >= 0) {
-       p->y = 50;  //Set or calculate the self height
-     }
-   }
+        if(p->y >= 0) {
+            p->y = 50;  //Set or calculate the self height
+        }
+    }
+
 
 .. _scroll_example:
 
 Examples
-********
+^^^^^^^^
 
-.. include:: ../examples/scroll/index.rst
+.. include:: ../../examples/scroll/index.rst
 
 .. _scroll_api:
 
 API
-***
+^^^

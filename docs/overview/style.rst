@@ -1,8 +1,8 @@
 .. _styles:
 
-======
+******
 Styles
-======
+******
 
 *Styles* are used to set the appearance of objects. Styles in lvgl are
 heavily inspired by CSS. The concept in a nutshell is as follows: - A
@@ -29,10 +29,11 @@ border width, text color and so on. It's similar to a ``class`` in CSS.
   in LVGL a property is assigned to a given state.
 - Transitions can be applied when the object changes state.
 
+
 .. _styles_states:
 
 States
-******
+^^^^^^
 
 The objects can be in the combination of the following states:
 
@@ -109,10 +110,11 @@ Some practical notes:
   Instead, for example, use the background color for pressed and checked
   states and indicate the focused state with a different border color.
 
+
 .. _styles_cascading:
 
 Cascading styles
-****************
+^^^^^^^^^^^^^^^^
 
 It's not required to set all the properties in one style. It's possible
 to add more styles to an object and have the latter added style modify
@@ -138,10 +140,11 @@ style (red). When the button is pressed the light-gray color is a better
 match because it describes the current state perfectly, so the button
 will be light-gray.
 
+
 .. _styles_inheritance:
 
 Inheritance
-***********
+^^^^^^^^^^^
 
 Some properties (typically those related to text) can be inherited from
 the parent object's styles. Inheritance is applied only if the given
@@ -152,10 +155,11 @@ property. The parents will use their own state to determine the value.
 So if a button is pressed, and the text color comes from here, the
 pressed text color will be used.
 
+
 .. _styles_parts:
 
 Parts
-*****
+^^^^^
 
 Objects can be composed of *parts* which may each have their own styles.
 
@@ -179,10 +183,11 @@ For example a :ref:`Slider <lv_slider>` has three parts:
 This means all three parts of the slider can have their own styles. See
 later how to add styles to objects and parts.
 
+
 .. _styles_initialize:
 
 Initialize styles and set/get properties
-****************************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Styles are stored in :cpp:type:`lv_style_t` variables. Style variables should be
 ``static``, global or dynamically allocated. In other words they cannot
@@ -194,35 +199,38 @@ be added or changed.
 Property set functions looks like this:
 ``lv_style_set_<property_name>(&style, <value>);`` For example:
 
-.. code:: c
+.. code-block:: c
 
-   static lv_style_t style_btn;
-   lv_style_init(&style_btn);
-   lv_style_set_bg_color(&style_btn, lv_color_hex(0x115588));
-   lv_style_set_bg_opa(&style_btn, LV_OPA_50);
-   lv_style_set_border_width(&style_btn, 2);
-   lv_style_set_border_color(&style_btn, lv_color_black());
+    static lv_style_t style_btn;
+    lv_style_init(&style_btn);
+    lv_style_set_bg_color(&style_btn, lv_color_hex(0x115588));
+    lv_style_set_bg_opa(&style_btn, LV_OPA_50);
+    lv_style_set_border_width(&style_btn, 2);
+    lv_style_set_border_color(&style_btn, lv_color_black());
 
-   static lv_style_t style_btn_red;
-   lv_style_init(&style_btn_red);
-   lv_style_set_bg_color(&style_btn_red, lv_palette_main(LV_PALETTE_RED));
-   lv_style_set_bg_opa(&style_btn_red, LV_OPA_COVER);
+    static lv_style_t style_btn_red;
+    lv_style_init(&style_btn_red);
+    lv_style_set_bg_color(&style_btn_red, lv_palette_main(LV_PALETTE_RED));
+    lv_style_set_bg_opa(&style_btn_red, LV_OPA_COVER);
+
 
 To remove a property use:
 
-.. code:: c
+.. code-block:: c
 
-   lv_style_remove_prop(&style, LV_STYLE_BG_COLOR);
+    lv_style_remove_prop(&style, LV_STYLE_BG_COLOR);
+
 
 To get a property's value from a style:
 
-.. code:: c
+.. code-block:: c
 
-   lv_style_value_t v;
-   lv_result_t res = lv_style_get_prop(&style, LV_STYLE_BG_COLOR, &v);
-   if(res == LV_RESULT_OK) {  /*Found*/
-       do_something(v.color);
-   }
+    lv_style_value_t v;
+    lv_result_t res = lv_style_get_prop(&style, LV_STYLE_BG_COLOR, &v);
+    if(res == LV_RESULT_OK) {  /*Found*/
+        do_something(v.color);
+    }
+
 
 :cpp:union:`lv_style_value_t` has 3 fields:
 
@@ -232,32 +240,36 @@ To get a property's value from a style:
 
 To reset a style (free all its data) use:
 
-.. code:: c
+.. code-block:: c
 
-   lv_style_reset(&style);
+    lv_style_reset(&style);
+
 
 Styles can be built as ``const`` too to save RAM:
 
-.. code:: c
+.. code-block:: c
 
-   const lv_style_const_prop_t style1_props[] = {
-      LV_STYLE_CONST_WIDTH(50),
-      LV_STYLE_CONST_HEIGHT(50),
-      LV_STYLE_CONST_PROPS_END
-   };
+    const lv_style_const_prop_t style1_props[] = {
+        LV_STYLE_CONST_WIDTH(50),
+        LV_STYLE_CONST_HEIGHT(50),
+        LV_STYLE_CONST_PROPS_END
+    };
 
-   LV_STYLE_CONST_INIT(style1, style1_props);
+    LV_STYLE_CONST_INIT(style1, style1_props);
+
 
 Later ``const`` style can be used like any other style but (obviously)
 new properties cannot be added.
 
+
 .. _styles_add_remove:
 
 Add and remove styles to a widget
-*********************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A style on its own is not that useful. It must be assigned to an object
 to take effect.
+
 
 Add styles
 ----------
@@ -275,10 +287,11 @@ examples:
 
 Using :cpp:func:`lv_obj_add_style`:
 
-.. code:: c
+.. code-block:: c
 
-   lv_obj_add_style(btn, &style_btn, 0);                     /*Default button style*/
-   lv_obj_add_style(btn, &btn_red, LV_STATE_PRESSED);        /*Overwrite only some colors to red when pressed*/
+    lv_obj_add_style(btn, &style_btn, 0);                     /*Default button style*/
+    lv_obj_add_style(btn, &btn_red, LV_STATE_PRESSED);        /*Overwrite only some colors to red when pressed*/
+
 
 Replace styles
 --------------
@@ -296,10 +309,11 @@ place.
 
 Using :cpp:func:`lv_obj_replace_style`:
 
-.. code:: c
+.. code-block:: c
 
-   lv_obj_add_style(btn, &style_btn, 0);                      /*Add a button style*/
-   lv_obj_replace_style(btn, &style_btn, &new_style_btn, 0);  /*Replace the button style with a different one*/
+    lv_obj_add_style(btn, &style_btn, 0);                      /*Add a button style*/
+    lv_obj_replace_style(btn, &style_btn, &new_style_btn, 0);  /*Replace the button style with a different one*/
+
 
 Remove styles
 -------------
@@ -313,6 +327,7 @@ To remove specific styles use
 ``selector`` and remove all matching styles. The ``selector`` can use
 the :cpp:enumerator:`LV_STATE_ANY` and :cpp:enumerator:`LV_PART_ANY` values to remove the style from
 any state or part.
+
 
 Report style changes
 --------------------
@@ -331,6 +346,7 @@ notified. There are 3 options to do this:
    when needed, call :cpp:expr:`lv_obj_report_style_change(&style)`. If ``style``
    is ``NULL`` all objects will be notified about a style change.
 
+
 Get a property's value on an object
 -----------------------------------
 
@@ -341,14 +357,15 @@ To get a final value of property
   These functions use the object's current state and if no better candidate exists they return a default value.
   For example:
 
-.. code:: c
+.. code-block:: c
 
-   lv_color_t color = lv_obj_get_style_bg_color(btn, LV_PART_MAIN);
+    lv_color_t color = lv_obj_get_style_bg_color(btn, LV_PART_MAIN);
+
 
 .. _styles_local:
 
 Local styles
-************
+^^^^^^^^^^^^
 
 In addition to "normal" styles, objects can also store local styles.
 This concept is similar to inline styles in CSS
@@ -365,17 +382,18 @@ Unlike in CSS, LVGL local styles can be assigned to states
 To set a local property use functions like
 ``lv_obj_set_style_<property_name>(obj, <value>, <selector>);``   For example:
 
-.. code:: c
+.. code-block:: c
 
-   lv_obj_set_style_bg_color(slider, lv_color_red(), LV_PART_INDICATOR | LV_STATE_FOCUSED);
+    lv_obj_set_style_bg_color(slider, lv_color_red(), LV_PART_INDICATOR | LV_STATE_FOCUSED);
+
 
 .. _styles_properties:
 
 Properties
-**********
+^^^^^^^^^^
 
-For the full list of style properties click
-:ref:`here <style_properties>`.
+For the full list of style properties click :ref:`here <style_properties>`.
+
 
 Typical background properties
 -----------------------------
@@ -392,10 +410,11 @@ background properties" are the ones related to:
 - Width and height transformation
 - X and Y translation
 
+
 .. _styles_transitions:
 
 Transitions
-***********
+^^^^^^^^^^^
 
 By default, when an object changes state (e.g. it's pressed) the new
 properties from the new state are set immediately. However, with
@@ -422,7 +441,7 @@ going back to default slowly.
 To describe a transition an :cpp:struct:`lv_transition_dsc_t` variable needs to be
 initialized and added to a style:
 
-.. code:: c
+.. code-block:: c
 
    /*Only its pointer is saved so must static, global or dynamically allocated */
    static const lv_style_prop_t trans_props[] = {
@@ -435,10 +454,11 @@ initialized and added to a style:
 
    lv_style_set_transition(&style1, &trans1);
 
+
 .. _styles_opacity_blend_modes_transformations:
 
 Opacity, Blend modes and Transformations
-****************************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If the ``opa``, ``blend_mode``, ``transform_angle``, or
 ``transform_zoom`` properties are set to their non-default value LVGL
@@ -470,17 +490,19 @@ if it has radius, ``bg_opa != 255``, has shadow, outline, etc.
 
 The click area of the widget is also transformed accordingly.
 
+
 .. _styles_color_filter:
 
 Color filter
-************
+^^^^^^^^^^^^
 
 TODO
+
 
 .. _styles_themes:
 
 Themes
-******
+^^^^^^
 
 Themes are a collection of styles. If there is an active theme LVGL
 applies it on every created widget. This will give a default appearance
@@ -498,18 +520,20 @@ To set a theme for a display, two steps are required:
 Theme initialization functions can have different prototypes. This
 example shows how to set the "default" theme:
 
-.. code:: c
+.. code-block:: c
 
-   lv_theme_t * th = lv_theme_default_init(display,  /*Use the DPI, size, etc from this display*/
+    lv_theme_t * th = lv_theme_default_init(display,  /*Use the DPI, size, etc from this display*/
                                            LV_COLOR_PALETTE_BLUE, LV_COLOR_PALETTE_CYAN,   /*Primary and secondary palette*/
                                            false,    /*Light or dark mode*/
                                            &lv_font_montserrat_10, &lv_font_montserrat_14, &lv_font_montserrat_18); /*Small, normal, large fonts*/
 
-   lv_display_set_theme(display, th); /*Assign the theme to the display*/
+    lv_display_set_theme(display, th); /*Assign the theme to the display*/
+
 
 The included themes are enabled in ``lv_conf.h``. If the default theme
 is enabled by :c:macro:`LV_USE_THEME_DEFAULT` LVGL automatically initializes
 and sets it when a display is created.
+
 
 Extending themes
 ----------------
@@ -524,14 +548,16 @@ E.g. default theme -> custom theme -> dark theme.
 
 There is an example for it below.
 
+
 .. _styles_example:
 
 Examples
-********
+^^^^^^^^
 
-.. include:: ../examples/styles/index.rst
+.. include:: ../../examples/styles/index.rst
+
 
 .. _styles_api:
 
 API
-***
+^^^

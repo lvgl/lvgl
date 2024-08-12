@@ -1,5 +1,6 @@
 
 import os
+import sys
 
 base_path = os.path.dirname(__file__)
 dst_config = os.path.join(base_path, 'lv_conf.h')
@@ -23,6 +24,9 @@ def run(c_path=None):
 
     for i, line in enumerate(data):
         if 'LV_USE_PROFILER' in line:
+            continue
+
+        if 'LV_USE_OS' in line:
             continue
 
         if 'LV_USE' in line or 'LV_FONT' in line and '#define' in line:

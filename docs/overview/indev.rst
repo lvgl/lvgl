@@ -1,8 +1,8 @@
 .. _indev:
 
-=============
+*************
 Input devices
-=============
+*************
 
 An input device usually means:
 
@@ -14,7 +14,8 @@ An input device usually means:
 :important: Before reading further, please read the `Porting </porting/indev>`__ section of Input devices
 
 Pointers
-********
+^^^^^^^^
+
 
 .. _indev_cursor:
 
@@ -23,19 +24,21 @@ Cursor
 
 Pointer input devices (like a mouse) can have a cursor.
 
-.. code:: c
+.. code-block:: c
 
-   ...
-   lv_indev_t * mouse_indev = lv_indev_create();
-   ...
-   LV_IMAGE_DECLARE(mouse_cursor_icon);                          /*Declare the image source.*/
-   lv_obj_t * cursor_obj = lv_image_create(lv_screen_active());      /*Create an image object for the cursor */
-   lv_image_set_src(cursor_obj, &mouse_cursor_icon);           /*Set the image source*/
-   lv_indev_set_cursor(mouse_indev, cursor_obj);               /*Connect the image  object to the driver*/
+    ...
+    lv_indev_t * mouse_indev = lv_indev_create();
+    ...
+    LV_IMAGE_DECLARE(mouse_cursor_icon);                          /*Declare the image source.*/
+    lv_obj_t * cursor_obj = lv_image_create(lv_screen_active());      /*Create an image object for the cursor */
+    lv_image_set_src(cursor_obj, &mouse_cursor_icon);           /*Set the image source*/
+    lv_indev_set_cursor(mouse_indev, cursor_obj);               /*Connect the image  object to the driver*/
 
-Note that the cursor object should have
-:cpp:expr:`lv_obj_remove_flag(cursor_obj, LV_OBJ_FLAG_CLICKABLE)`. For images,
-*clicking* is disabled by default.
+
+:note: the cursor object should have
+       :cpp:expr:`lv_obj_remove_flag(cursor_obj, LV_OBJ_FLAG_CLICKABLE)`. For images,
+       *clicking* is disabled by default.
+
 
 .. _indev_gestures:
 
@@ -47,31 +50,32 @@ widgets send the gestures to its parent, so finally the gestures can be
 detected on the screen object in a form of an :cpp:enumerator:`LV_EVENT_GESTURE`
 event. For example:
 
-.. code:: c
+.. code-block:: c
 
-   void my_event(lv_event_t * e)
-   {
-     lv_obj_t * screen = lv_event_get_current_target(e);
-     lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
-     switch(dir) {
-       case LV_DIR_LEFT:
-         ...
-         break;
-       case LV_DIR_RIGHT:
-         ...
-         break;
-       case LV_DIR_TOP:
-         ...
-         break;
-       case LV_DIR_BOTTOM:
-         ...
-         break;
-     }
-   }
+    void my_event(lv_event_t * e)
+    {
+        lv_obj_t * screen = lv_event_get_current_target(e);
+        lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
+        switch(dir) {
+            case LV_DIR_LEFT:
+                ...
+                break;
+            case LV_DIR_RIGHT:
+                ...
+                break;
+            case LV_DIR_TOP:
+                ...
+                break;
+            case LV_DIR_BOTTOM:
+                ...
+                break;
+        }
+    }
 
-   ...
+    ...
 
-   lv_obj_add_event_cb(screen1, my_event, LV_EVENT_GESTURE, NULL);
+    lv_obj_add_event_cb(screen1, my_event, LV_EVENT_GESTURE, NULL);
+
 
 To prevent passing the gesture event to the parent from an object use
 :cpp:expr:`lv_obj_remove_flag(obj, LV_OBJ_FLAG_GESTURE_BUBBLE)`.
@@ -82,14 +86,16 @@ If you did some action on a gesture you can call
 :cpp:expr:`lv_indev_wait_release(lv_indev_active())` in the event handler to
 prevent LVGL sending further input device related events.
 
+
 .. _indev_keypad_and_encoder:
 
 Keypad and encoder
-******************
+^^^^^^^^^^^^^^^^^^
 
 You can fully control the user interface without a touchpad or mouse by
 using a keypad or encoder(s). It works similar to the *TAB* key on the
 PC to select an element in an application or a web page.
+
 
 .. _indev_groups:
 
@@ -114,10 +120,11 @@ an object to the group use :cpp:expr:`lv_group_add_obj(g, obj)`.
 To associate a group with an input device use
 :cpp:expr:`lv_indev_set_group(indev, g)`.
 
+
 .. _indev_keys:
 
 Keys
-^^^^
+~~~~
 
 There are some predefined keys which have special meaning:
 
@@ -153,8 +160,9 @@ objects can be fully controlled with them.
 With an encoder you should use only :cpp:enumerator:`LV_KEY_LEFT`, :cpp:enumerator:`LV_KEY_RIGHT`,
 and :cpp:enumerator:`LV_KEY_ENTER`.
 
+
 Edit and navigate mode
-^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~
 
 Since a keypad has plenty of keys, it's easy to navigate between objects
 and edit them using the keypad. But encoders have a limited number of
@@ -174,8 +182,9 @@ which cannot be pressed (like a :ref:`Slider <lv_slider>`) leaves
 *Edit* mode upon a short click. But with objects where a short click has
 meaning (e.g. :ref:`Button <lv_button>`), a long press is required.
 
+
 Default group
-^^^^^^^^^^^^^
+~~~~~~~~~~~~~
 
 Interactive widgets - such as buttons, checkboxes, sliders, etc. - can
 be automatically added to a default group. Just create a group with
@@ -185,8 +194,9 @@ be automatically added to a default group. Just create a group with
 Don't forget to assign one or more input devices to the default group
 with :cpp:expr:`lv_indev_set_group(my_indev, g)`.
 
+
 Styling
--------
+^^^^^^^
 
 If an object is focused either by clicking it via touchpad or focused
 via an encoder or keypad it goes to the :cpp:enumerator:`LV_STATE_FOCUSED` state.
@@ -203,4 +213,4 @@ For a more detailed description read the
 .. _indev_api:
 
 API
-***
+^^^

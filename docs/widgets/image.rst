@@ -1,8 +1,9 @@
 .. _lv_image:
 
-================
+****************
 Image (lv_image)
-================
+****************
+
 
 Overview
 ********
@@ -13,6 +14,7 @@ from files. Images can display symbols (``LV_SYMBOL_...``) too.
 Using the :ref:`Image decoder interface <overview_image_decoder>` custom image formats
 can be supported as well.
 
+
 .. _lv_image_parts_and_styles:
 
 Parts and Styles
@@ -22,10 +24,12 @@ Parts and Styles
   background style properties and the image itself using the image
   style properties.
 
+
 .. _lv_image_usage:
 
 Usage
 *****
+
 
 Image source
 ------------
@@ -36,12 +40,12 @@ To provide maximum flexibility, the source of the image can be:
 - a file stored externally (e.g. on an SD card).
 - a text with :ref:`Symbols <fonts_symbols>`.
 
-To set the source of an image, use :cpp:expr:`lv_image_set_src(img, src)`.
+To set the source of an image, use :cpp:func:`lv_image_set_src`.
 
 To generate a pixel array from a PNG, JPG or BMP image, use the `Online image converter tool <https://lvgl.io/tools/imageconverter>`__
-and set the converted image with its pointer  :cpp:expr:`lv_image_set_src(img1, &converted_img_var)`
+and set the converted image with its pointer :cpp:expr:`lv_image_set_src(img1, &converted_img_var)`
 To make the variable visible in the C file, you need to declare it with
-:cpp:macro:`LV_IMAGE_DECLARE(converted_img_var)`.
+:c:macro:`LV_IMAGE_DECLARE`.
 
 To use external files, you also need to convert the image files using
 the online converter tool but now you should select the binary output
@@ -56,6 +60,7 @@ specified in the style. It enables to use of light-weight monochrome
 "letters" instead of real images. You can set symbol like
 :cpp:expr:`lv_image_set_src(img1, LV_SYMBOL_OK)`.
 
+
 Label as an image
 -----------------
 
@@ -65,6 +70,7 @@ are somewhat interchangeable, that is the images can display texts by
 using :c:macro:`LV_SYMBOL_DUMMY` as the prefix of the text. For example,
 :cpp:expr:`lv_image_set_src(img, LV_SYMBOL_DUMMY, "Some text")`.
 
+
 Transparency
 ------------
 
@@ -73,6 +79,7 @@ handling methods:
 
 -  **Alpha byte**: An alpha byte is added to every pixel that contains
    the pixel's opacity
+
 
 Palette and Alpha index
 -----------------------
@@ -85,6 +92,7 @@ supported:
 
 These options can be selected in the image converter. To learn more
 about the color formats, read the :ref:`Images <overview_image>` section.
+
 
 Recolor
 -------
@@ -99,6 +107,7 @@ the same image. This feature can be enabled in the style by setting
 
 The color to mix is set by ``img_recolor``.
 
+
 Offset
 ------
 
@@ -107,6 +116,7 @@ With :cpp:expr:`lv_image_set_offset_x(img, x_ofs)` and
 displayed image. Useful if the object size is smaller than the image
 source size. Using the offset parameter a `Texture atlas <https://en.wikipedia.org/wiki/Texture_atlas>`__
 or a "running image" effect can be created by :ref:`Animating <animations>` the x or y offset.
+
 
 Transformations
 ---------------
@@ -150,6 +160,7 @@ differences are that pure image widget transformation
 - doesn't transform the children of the image widget
 - image is transformed directly without creating an intermediate layer (buffer) to snapshot the widget
 
+
 Inner align
 -----------
 
@@ -185,6 +196,7 @@ Or to automatically scale or tile the image
 
 The alignment can be set by :cpp:func:`lv_image_set_inner_align`
 
+
 .. _lv_image_events:
 
 Events
@@ -196,6 +208,7 @@ See the events of the :ref:`Base object <lv_obj>` too.
 
 Learn more about :ref:`events`.
 
+
 .. _lv_image_keys:
 
 Keys
@@ -205,12 +218,14 @@ No *Keys* are processed by the object type.
 
 Learn more about :ref:`indev_keys`.
 
+
 .. _lv_image_example:
 
 Example
 *******
 
 .. include:: ../examples/widgets/image/index.rst
+
 
 .. _lv_image_api:
 

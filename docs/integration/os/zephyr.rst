@@ -1,6 +1,7 @@
-======
+
 Zephyr
-======
+^^^^^^
+
 
 What is Zephyr?
 ---------------
@@ -15,26 +16,22 @@ Zephyr is built with an emphasis on broad chipset support,
 security, dependability, longterm support releases and a
 growing open source ecosystem.
 
-Highlights of Zephyr
-~~~~~~~~~~~~~~~~~~~~
 
--  **Small** - Runs on microcontrollers as small as 8 kB Flash
-   and 5 kB of RAM.
--  **Scalable** - Usable for complex multicore systems.
--  **Customizable** - Out-of-the-box support for 500+ boards
-   and high portability.
--  **Secure** - Built with safety and security in mind,
-   offers Long-term support.
--  **Ecosystem** - Zephyr not only provides the RTOS kernel but
-   also developer tooling, device drivers, connectivity, logging,
-   tracing, power management and much more.
--  **Decoupling** - Leverages devicetree to describe and
-   configure the target system.
--  **Compliant** - Apps are runnable as native Linux applications,
-   which simplifies debugging and profiling.
+Highlights of Zephyr
+********************
+
+- **Small**: Runs on microcontrollers as small as 8 kB Flash and 5 kB of RAM.
+- **Scalable**: Usable for complex multicore systems.
+- **Customizable**: Out-of-the-box support for 500+ boards and high portability.
+- **Secure**: Built with safety and security in mind, offers Long-term support.
+- **Ecosystem**: Zephyr not only provides the RTOS kernel but also developer tooling, device drivers, connectivity, logging,
+  tracing, power management and much more.
+- **Decoupling**: Leverages devicetree to describe and configure the target system.
+- **Compliant**: Apps are runnable as native Linux applications, which simplifies debugging and profiling.
+
 
 How to run LVGL on Zephyr?
---------------------------
+**************************
 
 To setup your development environment refer to the
 `getting started guide <https://docs.zephyrproject.org/latest/develop/getting_started/index.html>`__.
@@ -42,34 +39,39 @@ To setup your development environment refer to the
 After you completed the setup above you can check out all of the `provided samples <https://docs.zephyrproject.org/latest/samples/>`__ for various boards.
 You can check the list of available boards using:
 
-.. code:: shell
+.. code-block:: shell
 
-   $ west boards
+    $ west boards
+
 
 After you chose a board you can build one of the LVGL demos for it. Here we are using the :code:`native_posix`
 board, which allows for running the application on your posix compliant host system:
 
-.. code:: shell
+.. code-block:: shell
 
-   $ west build -b native_posix samples/modules/lvgl/demos
+    $ west build -b native_posix samples/modules/lvgl/demos
+
 
 To run the application on your host:
 
-.. code:: shell
+.. code-block:: shell
 
-   $ west build -t run
+    $ west build -t run
+
 
 In case you chose any of the other supported boards you can flash to the device with:
 
-.. code:: shell
+.. code-block:: shell
 
     $ west flash
+
 
 If you want to build any of the other demo applications check out the samples
 `README <https://docs.zephyrproject.org/latest/samples/modules/lvgl/demos/README.html>`__.
 
+
 Leveraging Zephyr Features
---------------------------
+**************************
 
 Shell
 ~~~~~
@@ -79,7 +81,7 @@ Zephyr includes a powerful shell implementation that can be enabled with the Kco
 
 The shell offers enabling/disabling of LVGL monkeys:
 
-.. code:: shell
+.. code-block:: shell
 
     # Create a new monkey with the given indev type
     uart$ lvgl monkey create [pointer|keypad|button|encoder]
@@ -87,14 +89,17 @@ The shell offers enabling/disabling of LVGL monkeys:
     # Enable/Disable a monkey
     uart$ lvgl monkey set <index> <inactive/active>
 
+
 This is useful for checking your application for memory leaks and other bugs.
 Speaking of memory leaks, you can also acquire stats of the memory used by LVGL
 
-.. code:: shell
+.. code-block:: shell
 
     uart$ lvgl stats memory
 
+
 For more details refer to the `shell documentation <https://docs.zephyrproject.org/latest/services/shell/index.html>`__.
+
 
 Devicetree
 ~~~~~~~~~~
@@ -113,17 +118,18 @@ they are created at application start up before :code:`main()` is executed.
 
 Most boards or shields that have a display or display connector have the pointer input device already declared:
 
-.. code::
+.. code-block::
 
     lvgl_pointer {
         compatible = "zephyr,lvgl-pointer-input";
         input = <&ft5336_touch>;
     };
 
+
 You can access the underlying lvgl :code:`lv_indev_t` for configuration.
 Example with the encoder device to assign a :code:`lv_group_t`:
 
-.. code:: c
+.. code-block:: c
 
     const struct device *lvgl_encoder = DEVICE_DT_GET(DT_COMPAT_GET_ANY_STATUS_OKAY(zephyr_lvgl_encoder_input));
 
@@ -140,18 +146,19 @@ Example with the encoder device to assign a :code:`lv_group_t`:
 
 
 Kconfig
-~~~~~~~~
+-------
 
 Aside from enabling the shell you can also use Kconfig to finetune
 the footprint of your application.
 
-.. code::
+.. code-block::
 
     # Size of the memory region from which lvgl memory is allocated
     CONFIG_LV_Z_MEM_POOL_SIZE=8192
 
     # Do not include every widget/theme by default, enable them as needed.
     CONFIG_LV_CONF_MINIMAL=y
+
 
 Overlays can be used to enable/disable features for specific boards or build
 targets. For more information refer to the
@@ -161,8 +168,6 @@ targets. For more information refer to the
 Where can I find more information?
 ----------------------------------
 
--  Zephyr Documentation: `Zephyr Documentation <https://docs.zephyrproject.org/latest/index.html>`__
--  Zephyr mailing list: `Zepyhr Mailing
-   List <https://lists.zephyrproject.org/g/main>`__
--  Zephyr Discord server: `Zepyhr Discord
-   server <https://chat.zephyrproject.org/>`__
+- Zephyr Documentation: `Zephyr Documentation <https://docs.zephyrproject.org/latest/index.html>`__
+- Zephyr mailing list: `Zepyhr Mailing List <https://lists.zephyrproject.org/g/main>`__
+- Zephyr Discord server: `Zepyhr Discord server <https://chat.zephyrproject.org/>`__

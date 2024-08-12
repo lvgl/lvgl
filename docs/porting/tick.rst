@@ -1,11 +1,10 @@
 .. _tick:
 
-==============
+**************
 Tick interface
-==============
+**************
 
-LVGL needs a system tick to know the elapsed time for animations and other
-tasks.
+LVGL needs a system tick to know the elapsed time for animations and other tasks.
 
 There are two ways to provide the tick to LVGL:
 
@@ -23,11 +22,13 @@ The ticks (milliseconds)  should be independent from any other activities of the
 
 For example this works, but LVGL's timing will be incorrect as the execution time of ``lv_timer_handler`` is not considered:
 
-.. code:: c
-   // Bad idea
-   lv_timer_handler();
-   lv_tick_inc(5);
-   my_delay_ms(5);
+.. code-block:: c
+
+    // Bad idea
+    lv_timer_handler();
+    lv_tick_inc(5);
+    my_delay_ms(5);
+
 
 API
----
+^^^

@@ -1,8 +1,8 @@
 .. _rle:
 
-============
+************
 RLE Compress
-============
+************
 
 LVGL provides a custom RLE compression method. It can be used to reduce binary
 image size. The RLE compression is a lossless compression method.
@@ -11,8 +11,9 @@ The LVGL's built-in binary image decoder supports RLE compressed images.
 The decoder supports both variable and file as image sources. The original
 binary data is directly decoded to RAM
 
+
 Benefits
---------
+^^^^^^^^
 
 Based on test result from a watch project. Most of the images can be compressed
 to save more than 70% space as show in below statistic. It shows the file count
@@ -25,7 +26,7 @@ size if there's no large repetition in data.
 
 
 Theory
-------
+^^^^^^
 
 The RLE algorithm is a simple compression algorithm that is based on the fact that
 the for many pixels, the color is the same. The algorithm simply counts how many
@@ -34,7 +35,7 @@ If the coming pixels are not repeated, it stores the non-repeat count value and
 original color value. For more details, the script used to compress the image
 can be found from ``lvgl/script/LVGLImage.py``.
 
-.. code:: python
+.. code-block:: python
 
     def rle_compress(self, data: bytearray, blksize: int, threshold=16):
         index = 0
@@ -63,24 +64,25 @@ can be found from ``lvgl/script/LVGLImage.py``.
 
         return b"".join(compressed_data)
 
+
 .. _rle_usage:
 
 Usage
------
+^^^^^
 
 To use the RLE Decoder, enable it in ``lv_conf.h`` configuration file by setting :c:macro:`LV_USE_RLE` to `1`.
 The RLE image can be used same as other images.
 
-.. code:: c
+.. code-block:: c
 
-   lv_image_set_src(img, "path/to/image.rle");
+    lv_image_set_src(img, "path/to/image.rle");
+
 
 Generate RLE compressed binary images
--------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The image can be directly generated using script ``lvgl/script/LVGLImage.py``
 
+.. code-block:: bash
 
-.. code:: bash
-
-   ./script/LVGLImage.py --ofmt BIN --cf I8 --compress RLE cogwheel.png
+    ./script/LVGLImage.py --ofmt BIN --cf I8 --compress RLE cogwheel.png

@@ -1,6 +1,6 @@
-=============================
+
 Windows Display/Inputs driver
-=============================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Overview
 --------
@@ -18,19 +18,22 @@ Here are the **similarity** for simulator mode and application mode.
 
 Here are the **differences** for simulator mode and application mode.
 
+
 Simulator Mode
-^^^^^^^^^^^^^^
+**************
 
 - Designed for LVGL simulation scenario.
 - Keep the LVGL display resolution all time for trying best to simulate UI layout which will see in their production devices.
 - When Windows DPI scaling setting is changed, Windows backend will stretch the display content.
 
+
 Application Mode
-^^^^^^^^^^^^^^^^
+****************
 
 - Designed for Windows desktop application development scenario.
 - Have the Window resizing support and LVGL display resolution will be changed.
 - When Windows DPI scaling setting is changed, the LVGL display DPI value will also be changed.
+
 
 Prerequisites
 -------------
@@ -41,19 +44,21 @@ If you use Windows API shim libraries like `YY-Thunks <https://github.com/Chuyu-
 
 According to the Windows GDI API this driver used. Maybe the minimum Windows OS requirement limitation for this driver is Windows 2000 RTM.
 
+
 Configure Windows driver
 ------------------------
 
 Enable the Windows driver support in lv_conf.h, by cmake compiler define or by KConfig
 
-.. code:: c
+.. code-block:: c
 
     #define LV_USE_WINDOWS  1
+
 
 Usage
 -----
 
-.. code:: c
+.. code-block:: c
 
     #include <Windows.h>
     #include "lvgl/lvgl.h"

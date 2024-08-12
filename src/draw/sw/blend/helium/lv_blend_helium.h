@@ -36,7 +36,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-
+#ifndef DOXYGEN
 #if LV_USE_NATIVE_HELIUM_ASM
 
 #ifndef LV_DRAW_SW_COLOR_BLEND_TO_RGB565
@@ -278,7 +278,7 @@ extern "C" {
 #define LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_MIX_MASK_OPA(dsc)  \
     lv_argb8888_blend_normal_to_argb8888_mix_mask_opa_helium(dsc)
 #endif
-
+#endif /*DOXYGEN*/
 /**********************
  *      TYPEDEFS
  **********************/

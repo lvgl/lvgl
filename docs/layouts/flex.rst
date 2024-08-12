@@ -1,11 +1,12 @@
 .. _flex:
 
-====
+****
 Flex
-====
+****
+
 
 Overview
-********
+^^^^^^^^
 
 The Flexbox (or Flex for short) is a subset of `CSS Flexbox <https://css-tricks.com/snippets/css/a-guide-to-flexbox/>`__.
 
@@ -20,8 +21,9 @@ To make an object flex container call
 Note that the flex layout feature of LVGL needs to be globally enabled
 with :c:macro:`LV_USE_FLEX` in ``lv_conf.h``.
 
+
 Terms
-*****
+^^^^^
 
 -  **tracks**: the rows or columns
 -  **main direction**: row or column, the direction in which the items are
@@ -33,10 +35,12 @@ Terms
    respective to their grow value (larger value means more space)
 -  **gap**: the space between the rows and columns or the items on a track
 
+
 Simple interface
-****************
+^^^^^^^^^^^^^^^^
 
 With the following functions you can set a Flex layout on any parent.
+
 
 .. _flex_flow:
 
@@ -55,6 +59,7 @@ The possible values for ``flex_flow`` are:
 - :cpp:enumerator:`LV_FLEX_FLOW_COLUMN_REVERSE`: Place the children in a column without wrapping but in reversed order
 - :cpp:enumerator:`LV_FLEX_FLOW_ROW_WRAP_REVERSE`: Place the children in a row with wrapping but in reversed order
 - :cpp:enumerator:`LV_FLEX_FLOW_COLUMN_WRAP_REVERSE`: Place the children in a column with wrapping but in reversed order
+
 
 .. _flex_align:
 
@@ -91,6 +96,7 @@ The possible values are:
 - :cpp:enumerator:`LV_FLEX_ALIGN_SPACE_BETWEEN`: items are evenly distributed in
   the track: first item is on the start line, last item on the end line. Not applies to ``track_cross_place``.
 
+
 .. _flex_grow:
 
 Flex grow
@@ -111,6 +117,7 @@ Flex grow can be set on a child with
 :cpp:expr:`lv_obj_set_flex_grow(child, value)`. ``value`` needs to be >
 1 or 0 to disable grow on the child.
 
+
 .. _flex_style:
 
 Style interface
@@ -127,6 +134,7 @@ The following flex related style properties exist:
 -  :cpp:enumerator:`FLEX_TRACK_PLACE`
 -  :cpp:enumerator:`FLEX_GROW`
 
+
 .. _flex_padding:
 
 Internal padding
@@ -142,10 +150,12 @@ following properties can be set on the flex container style:
 These can for example be used if you don't want any padding between your
 objects: :cpp:expr:`lv_style_set_pad_column(&row_container_style,0)`
 
+
 .. _flex_other:
 
 Other features
 **************
+
 
 RTL
 ---
@@ -165,14 +175,16 @@ New track
 You can force Flex to put an item into a new line with
 :cpp:expr:`lv_obj_add_flag(child, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK)`.
 
+
 .. _flex_example:
 
 Example
-*******
+^^^^^^^
 
-.. include:: ../examples/layouts/flex/index.rst
+.. include:: ../../examples/layouts/flex/index.rst
+
 
 .. _flex_api:
 
 API
-***
+^^^

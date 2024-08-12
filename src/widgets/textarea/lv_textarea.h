@@ -56,7 +56,7 @@ enum {
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_textarea_class;
 
-enum {
+enum _lv_part_textarea_t {
     LV_PART_TEXTAREA_PLACEHOLDER = LV_PART_CUSTOM_FIRST,
 };
 

@@ -1,8 +1,8 @@
 .. _lv_msgbox:
 
-=======================
+***********************
 Message box (lv_msgbox)
-=======================
+***********************
 
 Overview
 ********
@@ -48,7 +48,7 @@ Get the parts
 The building blocks of the message box can be obtained using the
 following functions:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * lv_msgbox_get_content(lv_obj_t * obj);
    lv_obj_t * lv_msgbox_get_title(lv_obj_t * obj);
@@ -57,7 +57,7 @@ following functions:
 
 Functions that add something to the message box return the newly added object:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * lv_msgbox_add_text(lv_obj_t * obj, const char * text);
    lv_obj_t * lv_msgbox_add_title(lv_obj_t * obj, const char * title);

@@ -125,6 +125,7 @@ void lv_grad_conical_init(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_
 /**
  * Calculate constants from the given parameters that are used during rendering
  * @param dsc      gradient descriptor
+ * @param coords   ???
  */
 void lv_gradient_linear_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords);
 
@@ -148,6 +149,7 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_gradient_linear_get_line(lv_grad_dsc_t * dsc
 /**
  * Calculate constants from the given parameters that are used during rendering
  * @param dsc      gradient descriptor
+ * @param coords   ???
  */
 void lv_gradient_radial_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords);
 
@@ -171,6 +173,7 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_gradient_radial_get_line(lv_grad_dsc_t * dsc
 /**
  * Calculate constants from the given parameters that are used during rendering
  * @param dsc      gradient descriptor
+ * @param coords   ???
  */
 void lv_gradient_conical_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords);
 

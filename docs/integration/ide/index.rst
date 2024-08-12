@@ -1,6 +1,6 @@
-====
+****
 IDEs
-====
+****
 
 .. toctree::
     :maxdepth: 2

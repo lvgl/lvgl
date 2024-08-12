@@ -380,29 +380,29 @@ void lv_color16_premultiply(lv_color16_t * c, lv_opa_t a);
 
 /**
  * Get the luminance of a color: luminance = 0.3 R + 0.59 G + 0.11 B
- * @param c a color
- * @return the brightness [0..255]
+ * @param c    a color
+ * @return     the brightness [0..255]
  */
 uint8_t lv_color_luminance(lv_color_t c);
 
 /**
  * Get the luminance of a color16: luminance = 0.3 R + 0.59 G + 0.11 B
- * @param c a color
- * @return the brightness [0..255]
+ * @param c   a color
+ * @return    the brightness [0..255]
  */
 uint8_t lv_color16_luminance(const lv_color16_t c);
 
 /**
  * Get the luminance of a color24: luminance = 0.3 R + 0.59 G + 0.11 B
- * @param c a color
- * @return the brightness [0..255]
+ * @param c   a color
+ * @return    the brightness [0..255]
  */
 uint8_t lv_color24_luminance(const uint8_t * c);
 
 /**
  * Get the luminance of a color32: luminance = 0.3 R + 0.59 G + 0.11 B
- * @param c a color
- * @return the brightness [0..255]
+ * @param c   a color
+ * @return    the brightness [0..255]
  */
 uint8_t lv_color32_luminance(lv_color32_t c);
 
