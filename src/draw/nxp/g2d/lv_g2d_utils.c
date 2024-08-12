@@ -48,13 +48,13 @@ enum g2d_format g2d_get_buf_format(lv_color_format_t cf)
             color_f = G2D_RGB565;
             break;
         case LV_COLOR_FORMAT_ARGB8888:
-            color_f = G2D_ARGB8888;
+            color_f = G2D_BGRA8888;
             break;
         case LV_COLOR_FORMAT_XRGB8888:
-            color_f = G2D_XRGB8888;
+            color_f = G2D_BGRX8888;
             break;
         case LV_COLOR_FORMAT_RGB888:
-            color_f = G2D_RGB888;
+            color_f = G2D_BGR888;
             break;
         case LV_COLOR_FORMAT_NV12:
             color_f = G2D_NV12;

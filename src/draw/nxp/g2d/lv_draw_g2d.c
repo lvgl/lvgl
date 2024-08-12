@@ -116,6 +116,36 @@ static inline bool _g2d_dest_cf_supported(lv_color_format_t cf)
     return is_cf_supported;
 }
 
+static inline bool _g2d_src_cf_supported(lv_color_format_t cf)
+{
+    bool is_cf_supported = false;
+
+    switch(cf) {
+        case LV_COLOR_FORMAT_ARGB8888:
+            is_cf_supported = true;
+            break;
+        default:
+            break;
+    }
+
+    return is_cf_supported;
+}
+
+static bool _g2d_draw_img_supported(const lv_draw_image_dsc_t * draw_dsc)
+{
+    const lv_image_dsc_t * img_dsc = draw_dsc->src;
+
+    bool has_recolor = (draw_dsc->recolor_opa > LV_OPA_MIN);
+    bool has_transform = (draw_dsc->rotation != 0 || draw_dsc->scale_x != LV_SCALE_NONE ||
+                          draw_dsc->scale_y != LV_SCALE_NONE);
+
+    /* Recolor and transformation are not supported. */
+    if(has_recolor || has_transform)
+        return false;
+
+    return true;
+}
+
 static int32_t _g2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
     LV_UNUSED(u);
@@ -131,6 +161,21 @@ static int32_t _g2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 
                 /* Most simple case: just a plain rectangle (no radius, no gradient). */
                 if((draw_dsc->radius != 0) || (draw_dsc->grad.dir != (lv_grad_dir_t)LV_GRAD_DIR_NONE))
+                    return 0;
+
+                if(t->preference_score > 70) {
+                    t->preference_score = 70;
+                    t->preferred_draw_unit_id = DRAW_UNIT_ID_G2D;
+                }
+                return 1;
+            }
+        case LV_DRAW_TASK_TYPE_IMAGE: {
+                const lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
+
+                if(!_g2d_src_cf_supported(draw_dsc->header.cf))
+                    return 0;
+
+                if(!_g2d_draw_img_supported(draw_dsc))
                     return 0;
 
                 if(t->preference_score > 70) {
@@ -227,6 +272,9 @@ static void _g2d_execute_drawing(lv_draw_g2d_unit_t * u)
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
             lv_draw_g2d_fill(draw_unit, t->draw_dsc, &t->area);
+            break;
+        case LV_DRAW_TASK_TYPE_IMAGE:
+            lv_draw_g2d_img(draw_unit, t->draw_dsc, &t->area);
             break;
         default:
             break;
