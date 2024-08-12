@@ -48,7 +48,7 @@ typedef enum {
     LV_DEMO_RENDER_SCENE_RADIAL_GRADIENT,
     LV_DEMO_RENDER_SCENE_CONICAL_GRADIENT,
 #endif
-    _LV_DEMO_RENDER_SCENE_NUM,
+    LV_DEMO_RENDER_SCENE_NUM,
 } lv_demo_render_scene_t;
 
 /**********************

@@ -9,6 +9,8 @@
 #include "../../lvgl.h"
 #if LV_USE_RLOTTIE
 
+#include "lv_rlottie_private.h"
+#include "../../core/lv_obj_class_private.h"
 #include <rlottie_capi.h>
 #include <string.h>
 
@@ -187,7 +189,7 @@ static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 
 static void next_frame_task_cb(lv_timer_t * t)
 {
-    lv_obj_t * obj = t->user_data;
+    lv_obj_t * obj = lv_timer_get_user_data(t);
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
 
     if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_PAUSE) == LV_RLOTTIE_CTRL_PAUSE) {

@@ -6,16 +6,20 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_label.h"
+#include "../../misc/lv_area_private.h"
+#include "../../misc/lv_anim_private.h"
+#include "../../draw/lv_draw_label_private.h"
+#include "../../core/lv_obj_class_private.h"
+#include "lv_label_private.h"
 #if LV_USE_LABEL != 0
-#include "../../core/lv_obj.h"
+#include "../../core/lv_obj_private.h"
 #include "../../misc/lv_assert.h"
 #include "../../core/lv_group.h"
 #include "../../display/lv_display.h"
-#include "../../draw/lv_draw.h"
+#include "../../draw/lv_draw_private.h"
 #include "../../misc/lv_color.h"
 #include "../../misc/lv_math.h"
-#include "../../misc/lv_bidi.h"
+#include "../../misc/lv_bidi_private.h"
 #include "../../misc/lv_text_ap.h"
 #include "../../misc/lv_text_private.h"
 #include "../../stdlib/lv_sprintf.h"
@@ -60,6 +64,31 @@ static void calculate_x_coordinate(int32_t * x, const lv_text_align_t align, con
 /**********************
  *  STATIC VARIABLES
  **********************/
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t properties[] = {
+    {
+        .id = LV_PROPERTY_LABEL_TEXT,
+        .setter = lv_label_set_text,
+        .getter = lv_label_get_text,
+    },
+    {
+        .id = LV_PROPERTY_LABEL_LONG_MODE,
+        .setter = lv_label_set_long_mode,
+        .getter = lv_label_get_long_mode,
+    },
+    {
+        .id = LV_PROPERTY_LABEL_TEXT_SELECTION_START,
+        .setter = lv_label_set_text_selection_start,
+        .getter = lv_label_get_text_selection_start,
+    },
+    {
+        .id = LV_PROPERTY_LABEL_TEXT_SELECTION_END,
+        .setter = lv_label_set_text_selection_end,
+        .getter = lv_label_get_text_selection_end,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_label_class = {
     .constructor_cb = lv_label_constructor,
     .destructor_cb = lv_label_destructor,
@@ -69,6 +98,18 @@ const lv_obj_class_t lv_label_class = {
     .instance_size = sizeof(lv_label_t),
     .base_class = &lv_obj_class,
     .name = "label",
+#if LV_USE_OBJ_PROPERTY
+    .prop_index_start = LV_PROPERTY_LABEL_START,
+    .prop_index_end = LV_PROPERTY_LABEL_END,
+    .properties = properties,
+    .properties_count = sizeof(properties) / sizeof(properties[0]),
+
+#if LV_USE_OBJ_PROPERTY_NAME
+    .property_names = lv_label_property_names,
+    .names_count = sizeof(lv_label_property_names) / sizeof(lv_property_name_t),
+#endif
+
+#endif
 };
 
 /**********************
@@ -110,7 +151,7 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
         if(label->text == NULL) return;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-        _lv_text_ap_proc(label->text, label->text);
+        lv_text_ap_proc(label->text, label->text);
 #endif
 
     }
@@ -320,7 +361,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     uint32_t visual_byte_pos;
 #if LV_USE_BIDI
     lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
-    if(base_dir == LV_BASE_DIR_AUTO) base_dir = _lv_bidi_detect_base_dir(txt);
+    if(base_dir == LV_BASE_DIR_AUTO) base_dir = lv_bidi_detect_base_dir(txt);
 
     char * mutable_bidi_txt = NULL;
     /*Handle Bidi*/
@@ -332,8 +373,8 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
         uint32_t line_char_id = lv_text_encoded_get_char_id(&txt[line_start], byte_id - line_start);
 
         bool is_rtl;
-        uint32_t visual_char_pos = _lv_bidi_get_visual_pos(&txt[line_start], &mutable_bidi_txt, new_line_start - line_start,
-                                                           base_dir, line_char_id, &is_rtl);
+        uint32_t visual_char_pos = lv_bidi_get_visual_pos(&txt[line_start], &mutable_bidi_txt, new_line_start - line_start,
+                                                          base_dir, line_char_id, &is_rtl);
         bidi_txt = mutable_bidi_txt;
         if(is_rtl) visual_char_pos++;
 
@@ -415,7 +456,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
         bidi_txt = lv_malloc(new_line_start - line_start + 1);
         txt_len = new_line_start - line_start;
         if(new_line_start > 0 && txt[new_line_start - 1] == '\0' && txt_len > 0) txt_len--;
-        _lv_bidi_process_paragraph(txt + line_start, bidi_txt, txt_len, lv_obj_get_style_base_dir(obj, LV_PART_MAIN), NULL, 0);
+        lv_bidi_process_paragraph(txt + line_start, bidi_txt, txt_len, lv_obj_get_style_base_dir(obj, LV_PART_MAIN), NULL, 0);
     }
     else
 #endif
@@ -463,8 +504,8 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
         }
         else {
             bool is_rtl;
-            logical_pos = _lv_bidi_get_logical_pos(&txt[line_start], NULL,
-                                                   txt_len, lv_obj_get_style_base_dir(obj, LV_PART_MAIN), cid, &is_rtl);
+            logical_pos = lv_bidi_get_logical_pos(&txt[line_start], NULL,
+                                                  txt_len, lv_obj_get_style_base_dir(obj, LV_PART_MAIN), cid, &is_rtl);
             if(is_rtl) logical_pos++;
         }
         lv_free(bidi_txt);
@@ -774,7 +815,7 @@ static void draw_main(lv_event_t * e)
     }
 
     lv_area_t txt_clip;
-    bool is_common = _lv_area_intersect(&txt_clip, &txt_coords, &layer->_clip_area);
+    bool is_common = lv_area_intersect(&txt_clip, &txt_coords, &layer->_clip_area);
     if(!is_common) {
         return;
     }
@@ -897,7 +938,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 
             if(base_dir == LV_BASE_DIR_AUTO)
-                base_dir = _lv_bidi_detect_base_dir(label->text);
+                base_dir = lv_bidi_detect_base_dir(label->text);
 
             if(base_dir == LV_BASE_DIR_RTL) {
                 start = lv_area_get_width(&txt_coords) - size.x;
@@ -1004,7 +1045,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 
             if(base_dir == LV_BASE_DIR_AUTO)
-                base_dir = _lv_bidi_detect_base_dir(label->text);
+                base_dir = lv_bidi_detect_base_dir(label->text);
 
             if(base_dir == LV_BASE_DIR_RTL) {
                 start = -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
@@ -1239,7 +1280,7 @@ static size_t get_text_length(const char * text)
 {
     size_t len = 0;
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    len = _lv_text_ap_calc_bytes_count(text);
+    len = lv_text_ap_calc_bytes_count(text);
 #else
     len = lv_strlen(text) + 1;
 #endif
@@ -1250,7 +1291,7 @@ static size_t get_text_length(const char * text)
 static void copy_text_to_label(lv_label_t * label, const char * text)
 {
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    _lv_text_ap_proc(text, label->text);
+    lv_text_ap_proc(text, label->text);
 #else
     lv_strcpy(label->text, text);
 #endif

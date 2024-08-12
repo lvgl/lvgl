@@ -40,51 +40,9 @@ typedef void (*lv_timer_cb_t)(lv_timer_t *);
  */
 typedef void (*lv_timer_handler_resume_cb_t)(void * data);
 
-/**
- * Descriptor of a lv_timer
- */
-struct _lv_timer_t {
-    uint32_t period; /**< How often the timer should run*/
-    uint32_t last_run; /**< Last time the timer ran*/
-    lv_timer_cb_t timer_cb; /**< Timer function*/
-    void * user_data; /**< Custom user data*/
-    int32_t repeat_count; /**< 1: One time;  -1 : infinity;  n>0: residual times*/
-    uint32_t paused : 1;
-    uint32_t auto_delete : 1;
-};
-
-typedef struct {
-    lv_ll_t timer_ll; /*Linked list to store the lv_timers*/
-
-    bool lv_timer_run;
-    uint8_t idle_last;
-    bool timer_deleted;
-    bool timer_created;
-    uint32_t timer_time_until_next;
-
-    bool already_running;
-    uint32_t periodic_last_tick;
-    uint32_t busy_time;
-    uint32_t idle_period_start;
-    uint32_t run_cnt;
-
-    lv_timer_handler_resume_cb_t resume_cb;
-    void * resume_data;
-} lv_timer_state_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-/**
- * Init the lv_timer module
- */
-void _lv_timer_core_init(void);
-
-/**
- * Deinit the lv_timer module
- */
-void _lv_timer_core_deinit(void);
 
 //! @cond Doxygen_Suppress
 
@@ -103,16 +61,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void);
  * @param period the period for running lv_timer_handler()
  * @return the time after which it must be called again
  */
-static inline LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler_run_in_period(uint32_t period)
-{
-    static uint32_t last_tick = 0;
-
-    if(lv_tick_elaps(last_tick) >= period) {
-        last_tick = lv_tick_get();
-        return lv_timer_handler();
-    }
-    return 1;
-}
+LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler_run_in_period(uint32_t period);
 
 /**
  * Call it in the super-loop of main() or threads. It will automatically call lv_timer_handler() at the right time.
@@ -241,20 +190,14 @@ lv_timer_t * lv_timer_get_next(lv_timer_t * timer);
  * @param timer pointer to the lv_timer
  * @return pointer to the user_data
  */
-static inline void * lv_timer_get_user_data(lv_timer_t * timer)
-{
-    return timer->user_data;
-}
+void * lv_timer_get_user_data(lv_timer_t * timer);
 
 /**
  * Get the pause state of a timer
  * @param timer pointer to a lv_timer
  * @return true: timer is paused; false: timer is running
  */
-static inline bool lv_timer_get_paused(lv_timer_t * timer)
-{
-    return timer->paused;
-}
+bool lv_timer_get_paused(lv_timer_t * timer);
 
 /**********************
  *      MACROS

@@ -28,73 +28,16 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-enum _lv_menu_mode_header_t {
-    LV_MENU_HEADER_TOP_FIXED, /* Header is positioned at the top */
-    LV_MENU_HEADER_TOP_UNFIXED, /* Header is positioned at the top and can be scrolled out of view*/
-    LV_MENU_HEADER_BOTTOM_FIXED /* Header is positioned at the bottom */
-};
+typedef enum {
+    LV_MENU_HEADER_TOP_FIXED,   /**< Header is positioned at the top */
+    LV_MENU_HEADER_TOP_UNFIXED, /**< Header is positioned at the top and can be scrolled out of view*/
+    LV_MENU_HEADER_BOTTOM_FIXED /**< Header is positioned at the bottom */
+} lv_menu_mode_header_t;
 
-#ifdef DOXYGEN
-typedef _lv_menu_mode_header_t lv_menu_mode_header_t;
-#else
-typedef uint8_t lv_menu_mode_header_t;
-#endif /*DOXYGEN*/
-
-enum _lv_menu_mode_root_back_button_t {
+typedef enum {
     LV_MENU_ROOT_BACK_BUTTON_DISABLED,
     LV_MENU_ROOT_BACK_BUTTON_ENABLED
-};
-
-#ifdef DOXYGEN
-typedef _lv_menu_mode_root_back_button_t lv_menu_mode_root_back_button_t;
-#else
-typedef uint8_t lv_menu_mode_root_back_button_t;
-#endif /*DOXYGEN*/
-
-typedef struct /// @cond
-/**
- *  Tells Doxygen to ignore a duplicate declaration
- */
-    lv_menu_load_page_event_data_t
-/// @endcond
-{
-    lv_obj_t * menu;
-    lv_obj_t * page;
-} lv_menu_load_page_event_data_t ;
-
-typedef struct {
-    lv_obj_t * page;
-} lv_menu_history_t;
-
-typedef struct {
-    lv_obj_t obj;
-    lv_obj_t * storage; /* a pointer to obj that is the parent of all pages not displayed */
-    lv_obj_t * main;
-    lv_obj_t * main_page;
-    lv_obj_t * main_header;
-    lv_obj_t *
-    main_header_back_btn; /* a pointer to obj that on click triggers back btn event handler, can be same as 'main_header' */
-    lv_obj_t * main_header_title;
-    lv_obj_t * sidebar;
-    lv_obj_t * sidebar_page;
-    lv_obj_t * sidebar_header;
-    lv_obj_t *
-    sidebar_header_back_btn; /* a pointer to obj that on click triggers back btn event handler, can be same as 'sidebar_header' */
-    lv_obj_t * sidebar_header_title;
-    lv_obj_t * selected_tab;
-    lv_ll_t history_ll;
-    uint8_t cur_depth;
-    uint8_t prev_depth;
-    uint8_t sidebar_generated : 1;
-    lv_menu_mode_header_t mode_header : 2;
-    lv_menu_mode_root_back_button_t mode_root_back_btn : 1;
-} lv_menu_t;
-
-typedef struct {
-    lv_obj_t obj;
-    char  *  title;
-    bool     static_title;
-} lv_menu_page_t;
+} lv_menu_mode_root_back_button_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_menu_class;
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_menu_page_class;

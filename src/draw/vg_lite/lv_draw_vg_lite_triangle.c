@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 
+#include "../../misc/lv_area_private.h"
 #include "lv_draw_vg_lite.h"
 
 #if LV_USE_DRAW_VG_LITE
@@ -50,7 +51,7 @@ void lv_draw_vg_lite_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle
 
     bool is_common;
     lv_area_t clip_area;
-    is_common = _lv_area_intersect(&clip_area, &tri_area, draw_unit->clip_area);
+    is_common = lv_area_intersect(&clip_area, &tri_area, draw_unit->clip_area);
     if(!is_common) return;
 
     LV_PROFILER_BEGIN;

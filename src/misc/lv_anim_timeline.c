@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_anim_private.h"
 #include "lv_assert.h"
 #include "lv_anim_timeline.h"
 #include "../stdlib/lv_mem.h"
@@ -27,7 +28,7 @@ typedef struct {
 } lv_anim_timeline_dsc_t;
 
 /*Data of anim_timeline*/
-struct _lv_anim_timeline_t {
+struct lv_anim_timeline_t {
     lv_anim_timeline_dsc_t * anim_dsc;  /**< Dynamically allocated anim dsc array*/
     uint32_t anim_dsc_cnt;              /**< The length of anim dsc array*/
     uint32_t act_time;                  /**< Current time of the animation*/

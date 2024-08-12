@@ -30,23 +30,9 @@ typedef enum {
     LV_RB_COLOR_BLACK
 } lv_rb_color_t;
 
-typedef struct lv_rb_node_t {
-    struct lv_rb_node_t * parent;
-    struct lv_rb_node_t * left;
-    struct lv_rb_node_t * right;
-    lv_rb_color_t color;
-    void * data;
-} lv_rb_node_t;
-
 typedef int8_t lv_rb_compare_res_t;
 
 typedef lv_rb_compare_res_t (*lv_rb_compare_t)(const void * a, const void * b);
-
-typedef struct {
-    lv_rb_node_t * root;
-    lv_rb_compare_t compare;
-    size_t size;
-} lv_rb_t;
 
 /**********************
  * GLOBAL PROTOTYPES

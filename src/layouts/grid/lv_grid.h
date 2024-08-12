@@ -80,10 +80,7 @@ void lv_obj_set_grid_cell(lv_obj_t * obj, lv_grid_align_t column_align, int32_t 
 /**
  * Just a wrapper to `LV_GRID_FR` for bindings.
  */
-static inline int32_t lv_grid_fr(uint8_t x)
-{
-    return LV_GRID_FR(x);
-}
+int32_t lv_grid_fr(uint8_t x);
 
 /**********************
  * GLOBAL VARIABLES

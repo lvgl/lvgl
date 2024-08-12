@@ -22,9 +22,9 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define _LV_FLEX_COLUMN        (1 << 0)
-#define _LV_FLEX_WRAP       (1 << 2)
-#define _LV_FLEX_REVERSE    (1 << 3)
+#define LV_FLEX_COLUMN        (1 << 0)
+#define LV_FLEX_WRAP       (1 << 2)
+#define LV_FLEX_REVERSE    (1 << 3)
 
 /**********************
  *      TYPEDEFS
@@ -43,13 +43,13 @@ typedef enum {
 
 typedef enum {
     LV_FLEX_FLOW_ROW                 = 0x00,
-    LV_FLEX_FLOW_COLUMN              = _LV_FLEX_COLUMN,
-    LV_FLEX_FLOW_ROW_WRAP            = LV_FLEX_FLOW_ROW | _LV_FLEX_WRAP,
-    LV_FLEX_FLOW_ROW_REVERSE         = LV_FLEX_FLOW_ROW | _LV_FLEX_REVERSE,
-    LV_FLEX_FLOW_ROW_WRAP_REVERSE    = LV_FLEX_FLOW_ROW | _LV_FLEX_WRAP | _LV_FLEX_REVERSE,
-    LV_FLEX_FLOW_COLUMN_WRAP         = LV_FLEX_FLOW_COLUMN | _LV_FLEX_WRAP,
-    LV_FLEX_FLOW_COLUMN_REVERSE      = LV_FLEX_FLOW_COLUMN | _LV_FLEX_REVERSE,
-    LV_FLEX_FLOW_COLUMN_WRAP_REVERSE = LV_FLEX_FLOW_COLUMN | _LV_FLEX_WRAP | _LV_FLEX_REVERSE,
+    LV_FLEX_FLOW_COLUMN              = LV_FLEX_COLUMN,
+    LV_FLEX_FLOW_ROW_WRAP            = LV_FLEX_FLOW_ROW | LV_FLEX_WRAP,
+    LV_FLEX_FLOW_ROW_REVERSE         = LV_FLEX_FLOW_ROW | LV_FLEX_REVERSE,
+    LV_FLEX_FLOW_ROW_WRAP_REVERSE    = LV_FLEX_FLOW_ROW | LV_FLEX_WRAP | LV_FLEX_REVERSE,
+    LV_FLEX_FLOW_COLUMN_WRAP         = LV_FLEX_FLOW_COLUMN | LV_FLEX_WRAP,
+    LV_FLEX_FLOW_COLUMN_REVERSE      = LV_FLEX_FLOW_COLUMN | LV_FLEX_REVERSE,
+    LV_FLEX_FLOW_COLUMN_WRAP_REVERSE = LV_FLEX_FLOW_COLUMN | LV_FLEX_WRAP | LV_FLEX_REVERSE,
 } lv_flex_flow_t;
 
 /**********************
@@ -61,8 +61,7 @@ typedef enum {
  **********************/
 
 /**
- * Initialize a flex layout the default values
- * @param flex pointer to a flex layout descriptor
+ * Initialize a flex layout to default values
  */
 void lv_flex_init(void);
 

@@ -6,7 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_buttonmatrix.h"
+#include "../../misc/lv_area_private.h"
+#include "../../core/lv_obj_private.h"
+#include "../../core/lv_obj_class_private.h"
+#include "lv_buttonmatrix_private.h"
 #if LV_USE_BUTTONMATRIX != 0
 
 #include "../../misc/lv_assert.h"
@@ -775,9 +778,9 @@ static void draw_main(lv_event_t * e)
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
         /*Get the size of the Arabic text and process it*/
-        size_t len_ap = _lv_text_ap_calc_bytes_count(txt);
+        size_t len_ap = lv_text_ap_calc_bytes_count(txt);
         if(len_ap < sizeof(txt_ap)) {
-            _lv_text_ap_proc(txt, txt_ap);
+            lv_text_ap_proc(txt, txt_ap);
             txt = txt_ap;
         }
 #endif
@@ -950,7 +953,7 @@ static uint32_t get_button_from_point(lv_obj_t * obj, lv_point_t * p)
                                                                                     BTN_EXTRA_CLICK_AREA_MAX); /*-2 for rounding error*/
         else btn_area.y2 += obj_cords.y1 + prow;
 
-        if(_lv_area_is_point_on(&btn_area, p, 0) != false) {
+        if(lv_area_is_point_on(&btn_area, p, 0) != false) {
             break;
         }
     }

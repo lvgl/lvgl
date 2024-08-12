@@ -26,7 +26,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct _lv_vg_lite_pending_t lv_vg_lite_pending_t;
+typedef struct lv_vg_lite_pending_t lv_vg_lite_pending_t;
 
 typedef void (*lv_vg_lite_pending_free_cb_t)(void * obj, void * user_data);
 

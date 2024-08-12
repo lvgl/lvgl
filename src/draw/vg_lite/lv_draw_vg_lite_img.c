@@ -7,6 +7,10 @@
  *      INCLUDES
  *********************/
 
+#include "../../misc/lv_area_private.h"
+#include "../lv_image_decoder_private.h"
+#include "../lv_draw_image_private.h"
+#include "../lv_draw_private.h"
 #include "lv_draw_vg_lite.h"
 
 #if LV_USE_DRAW_VG_LITE
@@ -50,7 +54,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
      * so the transformed area needs to be calculated once.
      */
     lv_area_t image_tf_area;
-    _lv_image_buf_get_transformed_area(
+    lv_image_buf_get_transformed_area(
         &image_tf_area,
         lv_area_get_width(coords),
         lv_area_get_height(coords),
@@ -61,7 +65,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
     lv_area_move(&image_tf_area, coords->x1, coords->y1);
 
     lv_area_t clip_area;
-    if(!_lv_area_intersect(&clip_area, &image_tf_area, draw_unit->clip_area)) {
+    if(!lv_area_intersect(&clip_area, &image_tf_area, draw_unit->clip_area)) {
         /*Fully clipped, nothing to do*/
         return;
     }
@@ -99,7 +103,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
 
     /* If clipping is not required, blit directly */
-    if(_lv_area_is_in(&image_tf_area, draw_unit->clip_area, false) && dsc->clip_radius <= 0) {
+    if(lv_area_is_in(&image_tf_area, draw_unit->clip_area, false) && dsc->clip_radius <= 0) {
         /* The image area is the coordinates relative to the image itself */
         lv_area_t src_area = *coords;
         lv_area_move(&src_area, -coords->x1, -coords->y1);

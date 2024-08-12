@@ -31,29 +31,21 @@ extern "C" {
 #define LV_DROPDOWN_POS_LAST 0xFFFF
 LV_EXPORT_CONST_INT(LV_DROPDOWN_POS_LAST);
 
-/**********************
- *      TYPEDEFS
- **********************/
-
-typedef struct {
-    lv_obj_t obj;
-    lv_obj_t * list;                /**< The dropped down list*/
-    const char * text;              /**< Text to display on the dropdown's button*/
-    const void * symbol;            /**< Arrow or other icon when the drop-down list is closed*/
-    char * options;                 /**< Options in a '\n' separated list*/
-    uint32_t option_cnt;            /**< Number of options*/
-    uint32_t sel_opt_id;            /**< Index of the currently selected option*/
-    uint32_t sel_opt_id_orig;       /**< Store the original index on focus*/
-    uint32_t pr_opt_id;             /**< Index of the currently pressed option*/
-    lv_dir_t dir              : 4;  /**< Direction in which the list should open*/
-    uint8_t static_txt        : 1;  /**< 1: Only a pointer is saved in `options`*/
-    uint8_t selected_highlight: 1;  /**< 1: Make the selected option highlighted in the list*/
-} lv_dropdown_t;
-
-typedef struct {
-    lv_obj_t obj;
-    lv_obj_t * dropdown;
-} lv_dropdown_list_t;
+#if LV_USE_OBJ_PROPERTY
+enum {
+    LV_PROPERTY_ID(DROPDOWN, TEXT,                LV_PROPERTY_TYPE_TEXT,  0),
+    LV_PROPERTY_ID(DROPDOWN, OPTIONS,             LV_PROPERTY_TYPE_TEXT,  1),
+    LV_PROPERTY_ID(DROPDOWN, OPTION_COUNT,        LV_PROPERTY_TYPE_INT,   2),
+    LV_PROPERTY_ID(DROPDOWN, SELECTED,            LV_PROPERTY_TYPE_INT,   3),
+    // LV_PROPERTY_ID(DROPDOWN, SELECTED_STR,        LV_PROPERTY_TYPE_TEXT,  4),
+    LV_PROPERTY_ID(DROPDOWN, DIR,                 LV_PROPERTY_TYPE_INT,   5),
+    LV_PROPERTY_ID(DROPDOWN, SYMBOL,              LV_PROPERTY_TYPE_TEXT,  6),
+    LV_PROPERTY_ID(DROPDOWN, SELECTED_HIGHLIGHT,  LV_PROPERTY_TYPE_INT,   7),
+    LV_PROPERTY_ID(DROPDOWN, LIST,                LV_PROPERTY_TYPE_OBJ,   8),
+    LV_PROPERTY_ID(DROPDOWN, IS_OPEN,             LV_PROPERTY_TYPE_BOOL,  9),
+    LV_PROPERTY_DROPDOWN_END,
+};
+#endif
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_dropdown_class;
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_dropdownlist_class;

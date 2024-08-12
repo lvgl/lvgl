@@ -20,7 +20,7 @@ void lv_draw_dave2d_line(lv_draw_dave2d_unit_t * u, const lv_draw_line_dsc_t * d
     clip_line.y2 = LV_MAX(dsc->p1.y, dsc->p2.y) + dsc->width / 2;
 
     bool is_common;
-    is_common = _lv_area_intersect(&clip_line, &clip_line, u->base_unit.clip_area);
+    is_common = lv_area_intersect(&clip_line, &clip_line, u->base_unit.clip_area);
     if(!is_common) return;
 
 #if LV_USE_OS

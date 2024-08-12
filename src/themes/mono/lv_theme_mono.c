@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../lv_theme_private.h"
 #include "../../../lvgl.h"
 
 #if LV_USE_THEME_MONO

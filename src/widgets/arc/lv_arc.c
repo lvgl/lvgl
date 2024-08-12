@@ -6,7 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_arc.h"
+#include "../../misc/lv_area_private.h"
+#include "../../core/lv_obj_private.h"
+#include "../../core/lv_obj_event_private.h"
+#include "../../core/lv_obj_class_private.h"
+#include "lv_arc_private.h"
 #if LV_USE_ARC != 0
 
 #include "../../core/lv_group.h"
@@ -646,14 +650,14 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_area_t a;
         /*Invalid if clicked inside*/
         lv_area_set(&a, p.x - r, p.y - r, p.x + r, p.y + r);
-        if(_lv_area_is_point_on(&a, info->point, LV_RADIUS_CIRCLE)) {
+        if(lv_area_is_point_on(&a, info->point, LV_RADIUS_CIRCLE)) {
             info->res = false;
             return;
         }
 
         /*Valid if no clicked outside*/
         lv_area_increase(&a, w + ext_click_area * 2, w + ext_click_area * 2);
-        info->res = _lv_area_is_point_on(&a, info->point, LV_RADIUS_CIRCLE);
+        info->res = lv_area_is_point_on(&a, info->point, LV_RADIUS_CIRCLE);
     }
     else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         int32_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);

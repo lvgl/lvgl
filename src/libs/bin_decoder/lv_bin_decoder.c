@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../draw/lv_image_decoder_private.h"
 #include "lv_bin_decoder.h"
 #include "../../draw/lv_draw_image.h"
 #include "../../draw/lv_draw_buf.h"
@@ -38,7 +39,7 @@
  * Data format for compressed image data.
  */
 
-typedef struct _lv_image_compressed_t {
+typedef struct lv_image_compressed_t {
     uint32_t method: 4; /*Compression method, see `lv_image_compress_t`*/
     uint32_t reserved : 28;  /*Reserved to be used later*/
     uint32_t compressed_size;  /*Compressed data size in byte*/
@@ -180,7 +181,8 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 {
     LV_UNUSED(decoder);
 
-    lv_fs_res_t res = LV_RESULT_INVALID;
+    lv_result_t res = LV_RESULT_INVALID;
+    lv_fs_res_t fs_res = LV_FS_RES_UNKNOWN;
     bool use_directly = false; /*If the image is already decoded and can be used directly*/
 
     /*Open the file if it's a file*/
@@ -201,9 +203,9 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             return LV_RESULT_INVALID;
         }
 
-        res = lv_fs_open(f, dsc->src, LV_FS_MODE_RD);
-        if(res != LV_FS_RES_OK) {
-            LV_LOG_WARN("Open file failed: %d", res);
+        fs_res = lv_fs_open(f, dsc->src, LV_FS_MODE_RD);
+        if(fs_res != LV_FS_RES_OK) {
+            LV_LOG_WARN("Open file failed: %d", fs_res);
             lv_free(f);
             free_decoder_data(dsc);
             return LV_RESULT_INVALID;
@@ -386,7 +388,7 @@ lv_result_t lv_bin_decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         return LV_RESULT_INVALID;
     }
 
-    lv_result_t res = LV_RESULT_INVALID;
+    lv_fs_res_t res = LV_FS_RES_UNKNOWN;
     decoder_data_t * decoder_data = dsc->user_data;
     if(decoder_data == NULL) {
         LV_LOG_ERROR("Unexpected null decoder data");
@@ -545,7 +547,7 @@ static void free_decoder_data(lv_image_decoder_dsc_t * dsc)
 static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
-    lv_result_t res;
+    lv_fs_res_t res;
     uint32_t rn;
     decoder_data_t * decoder_data = dsc->user_data;
     lv_fs_file_t * f = decoder_data->f;
@@ -675,7 +677,7 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     LV_UNUSED(decoder); /*Unused*/
 
-    lv_result_t res;
+    lv_fs_res_t res;
     uint32_t rn;
     decoder_data_t * decoder_data = dsc->user_data;
 
@@ -761,7 +763,7 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
 static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
-    lv_result_t res;
+    lv_fs_res_t res;
     decoder_data_t * decoder_data = dsc->user_data;
     lv_fs_file_t * f = decoder_data->f;
     lv_color_format_t cf = dsc->header.cf;
@@ -814,7 +816,7 @@ static inline uint8_t bit_extend(uint8_t value, uint8_t bpp)
 static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
-    lv_result_t res;
+    lv_fs_res_t res;
     uint32_t rn;
     decoder_data_t * decoder_data = dsc->user_data;
     uint8_t bpp = lv_color_format_get_bpp(dsc->header.cf);
@@ -890,6 +892,7 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
     uint32_t compressed_len;
     decoder_data_t * decoder_data = get_decoder_data(dsc);
     lv_result_t res;
+    lv_fs_res_t fs_res;
     uint8_t * file_buf = NULL;
     lv_image_compressed_t * compressed = &decoder_data->compressed;
 
@@ -909,9 +912,9 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
 
         /*Read compress header*/
         len = 12;
-        res = fs_read_file_at(f, sizeof(lv_image_header_t), compressed, len, &rn);
-        if(res != LV_FS_RES_OK || rn != len) {
-            LV_LOG_WARN("Read compressed header failed: %d", res);
+        fs_res = fs_read_file_at(f, sizeof(lv_image_header_t), compressed, len, &rn);
+        if(fs_res != LV_FS_RES_OK || rn != len) {
+            LV_LOG_WARN("Read compressed header failed: %d", fs_res);
             return LV_RESULT_INVALID;
         }
 
@@ -928,9 +931,9 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
         }
 
         /*Continue to read the compressed data following compression header*/
-        res = lv_fs_read(f, file_buf, compressed_len, &rn);
-        if(res != LV_FS_RES_OK || rn != compressed_len) {
-            LV_LOG_WARN("Read compressed file failed: %d", res);
+        fs_res = lv_fs_read(f, file_buf, compressed_len, &rn);
+        if(fs_res != LV_FS_RES_OK || rn != compressed_len) {
+            LV_LOG_WARN("Read compressed file failed: %d", fs_res);
             lv_free(file_buf);
             return LV_RESULT_INVALID;
         }

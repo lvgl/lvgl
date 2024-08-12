@@ -110,4 +110,14 @@ $(SRC_ROOT)/layouts/grid \
 $(SRC_ROOT)/layouts/flex \
 $(SRC_ROOT)/osal
 
+PRE_TARGET=$(PROJECT_ROOT)/lv_conf.h
+
 include $(MKFILES_ROOT)/qtargets.mk
+
+# Generate the lv_conf.h file from the template
+$(PROJECT_ROOT)/lv_conf.h: $(PROJECT_ROOT)/../../lv_conf_template.h
+	cp $< $@
+	sed -i -e "s/#if 0/#if 1/" $@
+	sed -i -e "s/#define LV_COLOR_DEPTH 16/#define LV_COLOR_DEPTH 32/" $@
+	sed -i -e "s/#define LV_USE_QNX.*/#define LV_USE_QNX 1/" $@
+	sed -i -e "s/#define LV_QNX_BUF_COUNT.*/#define LV_QNX_BUF_COUNT 2/" $@

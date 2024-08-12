@@ -19,21 +19,21 @@ extern "C" {
 #include "lv_display.h"
 
 #if LV_USE_SYSMON
-#include "../others/sysmon/lv_sysmon.h"
+#include "../others/sysmon/lv_sysmon_private.h"
 #endif
 
 /*********************
  *      DEFINES
  *********************/
 #ifndef LV_INV_BUF_SIZE
-#define LV_INV_BUF_SIZE 32 /*Buffer size for invalid areas*/
+#define LV_INV_BUF_SIZE 32 /**< Buffer size for invalid areas */
 #endif
 
 /**********************
  *      TYPEDEFS
  **********************/
 
-struct _lv_display_t {
+struct lv_display_t {
 
     /*---------------------
      * Resolution
@@ -57,7 +57,8 @@ struct _lv_display_t {
     /** Vertical offset from the full / physical display. Set to 0 for fullscreen mode.*/
     int32_t offset_y;
 
-    uint32_t dpi;              /** DPI (dot per inch) of the display. Default value is `LV_DPI_DEF`.*/
+    /** DPI (dot per inch) of the display. Default value is `LV_DPI_DEF`.*/
+    uint32_t dpi;
 
     /*---------------------
      * Buffering
@@ -75,16 +76,18 @@ struct _lv_display_t {
     /**
      * Used to wait while flushing is ready.
      * It can do any complex logic to wait, including semaphores, mutexes, polling flags, etc.
-     * If not set `flushing` flag is used which can be cleared with `lv_display_flush_ready()`*/
+     * If not set `flushing` flag is used which can be cleared with `lv_display_flush_ready()` */
     lv_display_flush_wait_cb_t flush_wait_cb;
 
-    /*1: flushing is in progress. (It can't be a bit field because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
+    /** 1: flushing is in progress. (It can't be a bit field because when it's cleared from IRQ
+     * Read-Modify-Write issue might occur) */
     volatile int flushing;
 
-    /*1: It was the last chunk to flush. (It can't be a bit field because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
+    /** 1: It was the last chunk to flush. (It can't be a bit field because when it's cleared
+     * from IRQ Read-Modify-Write issue might occur) */
     volatile int flushing_last;
-    volatile uint32_t last_area         : 1; /*1: the last area is being rendered*/
-    volatile uint32_t last_part         : 1; /*1: the last part of the current area is being rendered*/
+    volatile uint32_t last_area         : 1; /**< 1: last area is being rendered */
+    volatile uint32_t last_part         : 1; /**< 1: last part of the current area is being rendered */
 
     lv_display_render_mode_t render_mode;
     uint32_t antialiasing : 1;       /**< 1: anti-aliasing is enabled on this display.*/
@@ -103,7 +106,7 @@ struct _lv_display_t {
     /** Double buffer sync areas (redrawn during last refresh) */
     lv_ll_t sync_areas;
 
-    lv_draw_buf_t _static_buf1; /*Used when user pass in a raw buffer as display draw buffer*/
+    lv_draw_buf_t _static_buf1; /**< Used when user pass in a raw buffer as display draw buffer */
     lv_draw_buf_t _static_buf2;
     /*---------------------
      * Layer
@@ -126,7 +129,7 @@ struct _lv_display_t {
     lv_obj_t * scr_to_load; /**< The screen prepared to load in lv_screen_load_anim*/
     uint32_t screen_cnt;
     uint8_t draw_prev_over_act  : 1;/** 1: Draw previous screen over active screen*/
-    uint8_t del_prev  : 1; /** 1: Automatically delete the previous screen when the screen load animation is ready*/
+    uint8_t del_prev  : 1;  /** 1: Automatically delete the previous screen when the screen load animation is ready*/
 
     /*---------------------
      * Others
@@ -139,10 +142,9 @@ struct _lv_display_t {
     lv_event_list_t event_list;
 
     uint32_t sw_rotate : 1; /**< 1: use software rotation (slower)*/
-    uint32_t rotation  : 2; /**< Element of  @lv_display_rotation_t*/
+    uint32_t rotation  : 2; /**< Element of  lv_display_rotation_t*/
 
-    /**< The theme assigned to the screen*/
-    lv_theme_t * theme;
+    lv_theme_t * theme;     /**< The theme assigned to the screen*/
 
     /** A timer which periodically checks the dirty areas and refreshes them*/
     lv_timer_t * refr_timer;

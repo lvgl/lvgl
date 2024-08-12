@@ -143,7 +143,7 @@ void lv_indev_set_driver_data(lv_indev_t * indev, void * driver_data);
  * @param indev pointer to an input device
  * @param disp pointer to an display
  */
-void lv_indev_set_display(lv_indev_t * indev, struct _lv_display_t * disp);
+void lv_indev_set_display(lv_indev_t * indev, struct lv_display_t * disp);
 
 /**
  * Get the type of an input device

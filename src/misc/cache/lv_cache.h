@@ -17,7 +17,7 @@ extern "C" {
 #include "lv_cache_private.h"
 #include "../lv_types.h"
 
-#include "_lv_cache_lru_rb.h"
+#include "lv_cache_lru_rb.h"
 
 #include "lv_image_cache.h"
 #include "lv_image_header_cache.h"
@@ -36,14 +36,14 @@ extern "C" {
 /**
  * Create a cache object with the given parameters.
  * @param cache_class   The class of the cache. Currently only support one two builtin classes:
- *                          @lv_cache_class_lru_rb_count for LRU-based cache with count-based eviction policy.
- *                          @lv_cache_class_lru_rb_size for LRU-based cache with size-based eviction policy.
+ *                        - lv_cache_class_lru_rb_count for LRU-based cache with count-based eviction policy.
+ *                        - lv_cache_class_lru_rb_size for LRU-based cache with size-based eviction policy.
  * @param node_size     The node size is the size of the data stored in the cache..
  * @param max_size      The max size is the maximum amount of memory or count that the cache can hold.
- *                          @lv_cache_class_lru_rb_count: max_size is the maximum count of nodes in the cache.
- *                          @lv_cache_class_lru_rb_size: max_size is the maximum size of the cache in bytes.
- * @param ops           A set of operations that can be performed on the cache. See @lv_cache_ops_t for details.
- * @return              Returns a pointer to the created cache object on success, @NULL on error.
+ *                        - lv_cache_class_lru_rb_count: max_size is the maximum count of nodes in the cache.
+ *                        - lv_cache_class_lru_rb_size: max_size is the maximum size of the cache in bytes.
+ * @param ops           A set of operations that can be performed on the cache. See lv_cache_ops_t for details.
+ * @return              Returns a pointer to the created cache object on success, `NULL` on error.
  */
 lv_cache_t * lv_cache_create(const lv_cache_class_t * cache_class,
                              size_t node_size, size_t max_size,
@@ -57,25 +57,25 @@ lv_cache_t * lv_cache_create(const lv_cache_class_t * cache_class,
 void lv_cache_destroy(lv_cache_t * cache, void * user_data);
 
 /**
- * Acquire a cache entry with the given key. If the entry is not in the cache, it will return @NULL as it is not found.
- * If the entry is found, it's priority will be changed by the cache's policy. And the @lv_entry_t::ref count will be incremented.
+ * Acquire a cache entry with the given key. If entry not in cache, it will return `NULL` (not found).
+ * If the entry is found, it's priority will be changed by the cache's policy. And the `lv_cache_entry_t::ref_cnt` will be incremented.
  * @param cache         The cache object pointer to acquire the entry.
  * @param key           The key of the entry to acquire.
  * @param user_data     A user data pointer that will be passed to the create callback.
- * @return              Returns a pointer to the acquired cache entry on success with @lv_entry_t::ref count incremented, @NULL on error.
+ * @return              Returns a pointer to the acquired cache entry on success with `lv_cache_entry_t::ref_cnt` incremented, `NULL` on error.
  */
 lv_cache_entry_t * lv_cache_acquire(lv_cache_t * cache, const void * key, void * user_data);
 
 /**
  * Acquire a cache entry with the given key. If the entry is not in the cache, it will create a new entry with the given key.
- * If the entry is found, it's priority will be changed by the cache's policy. And the @lv_entry_t::ref count will be incremented.
+ * If the entry is found, it's priority will be changed by the cache's policy. And the `lv_cache_entry_t::ref_cnt` will be incremented.
  * If you want to use this API to simplify the code, you should provide a @lv_cache_ops_t::create_cb that creates a new entry with the given key.
- * This API is a combination of @lv_cache_acquire and @lv_cache_add. The effect is the same as calling @lv_cache_acquire and @lv_cache_add separately.
+ * This API is a combination of lv_cache_acquire() and lv_cache_add(). The effect is the same as calling lv_cache_acquire() and lv_cache_add() separately.
  * And the internal impact on cache is also consistent with these two APIs.
  * @param cache         The cache object pointer to acquire the entry.
  * @param key           The key of the entry to acquire or create.
  * @param user_data     A user data pointer that will be passed to the create callback.
- * @return              Returns a pointer to the acquired or created cache entry on success with @lv_entry_t::ref count incremented, @NULL on error.
+ * @return              Returns a pointer to the acquired or created cache entry on success with `lv_cache_entry_t::ref_cnt` incremented, `NULL` on error.
  */
 lv_cache_entry_t * lv_cache_acquire_or_create(lv_cache_t * cache, const void * key, void * user_data);
 
@@ -84,12 +84,12 @@ lv_cache_entry_t * lv_cache_acquire_or_create(lv_cache_t * cache, const void * k
  * @param cache         The cache object pointer to add the entry.
  * @param key           The key of the entry to add.
  * @param user_data     A user data pointer that will be passed to the create callback.
- * @return              Returns a pointer to the added cache entry on success with @lv_entry_t::ref count incremented, @NULL on error.
+ * @return              Returns a pointer to the added cache entry on success with `lv_cache_entry_t::ref_cnt` incremented, `NULL` on error.
  */
 lv_cache_entry_t * lv_cache_add(lv_cache_t * cache, const void * key, void * user_data);
 
 /**
- * Release a cache entry. The @lv_entry_t::ref count will be decremented. If the @lv_entry_t::ref count is zero, it will issue an error.
+ * Release a cache entry. The `lv_cache_entry_t::ref_cnt` will be decremented. If the `lv_cache_entry_t::ref_cnt` is zero, it will issue an error.
  * If the entry passed to this function is the last reference to the data and the entry is marked as invalid, the cache's policy will be used to evict the entry.
  * @param cache         The cache object pointer to release the entry.
  * @param entry         The cache entry pointer to release.
@@ -110,8 +110,8 @@ void lv_cache_reserve(lv_cache_t * cache, uint32_t reserved_size, void * user_da
 /**
  * Drop a cache entry with the given key. If the entry is not in the cache, nothing will happen to it.
  * If the entry is found, it will be removed from the cache and its data will be freed when the last reference to it is released.
- * @note The data will not be freed immediately but when the last reference to it is released. But this entry will not be found by @lv_cache_acquire.
- *       If you want cache a same key again, you should use @lv_cache_add or @lv_cache_acquire_or_create.
+ * @note The data will not be freed immediately but when the last reference to it is released. But this entry will not be found by lv_cache_acquire().
+ *       If you want cache a same key again, you should use lv_cache_add() or lv_cache_acquire_or_create().
  * @param cache         The cache object pointer to drop the entry.
  * @param key           The key of the entry to drop.
  * @param user_data     A user data pointer that will be passed to the free callback.

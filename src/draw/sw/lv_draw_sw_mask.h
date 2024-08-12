@@ -23,42 +23,38 @@ extern "C" {
  *********************/
 #define LV_MASK_ID_INV  (-1)
 #if LV_DRAW_SW_COMPLEX
-# define _LV_MASK_MAX_NUM     16
+# define LV_MASK_MAX_NUM     16
 #else
-# define _LV_MASK_MAX_NUM     1
+# define LV_MASK_MAX_NUM     1
 #endif
 
 /**********************
  *      TYPEDEFS
  **********************/
 
-enum {
+typedef enum {
     LV_DRAW_SW_MASK_RES_TRANSP,
     LV_DRAW_SW_MASK_RES_FULL_COVER,
     LV_DRAW_SW_MASK_RES_CHANGED,
     LV_DRAW_SW_MASK_RES_UNKNOWN
-};
-
-typedef uint8_t lv_draw_sw_mask_res_t;
+} lv_draw_sw_mask_res_t;
 
 #if LV_DRAW_SW_COMPLEX
 
-enum {
+typedef enum {
     LV_DRAW_SW_MASK_TYPE_LINE,
     LV_DRAW_SW_MASK_TYPE_ANGLE,
     LV_DRAW_SW_MASK_TYPE_RADIUS,
     LV_DRAW_SW_MASK_TYPE_FADE,
     LV_DRAW_SW_MASK_TYPE_MAP,
-};
+} lv_draw_sw_mask_type_t;
 
-typedef uint8_t lv_draw_sw_mask_type_t;
-
-enum {
+typedef enum {
     LV_DRAW_SW_MASK_LINE_SIDE_LEFT = 0,
     LV_DRAW_SW_MASK_LINE_SIDE_RIGHT,
     LV_DRAW_SW_MASK_LINE_SIDE_TOP,
     LV_DRAW_SW_MASK_LINE_SIDE_BOTTOM,
-};
+} lv_draw_sw_mask_line_side_t;
 
 /**
  * A common callback type for every mask type.
@@ -67,116 +63,6 @@ enum {
 typedef lv_draw_sw_mask_res_t (*lv_draw_sw_mask_xcb_t)(lv_opa_t * mask_buf, int32_t abs_x, int32_t abs_y,
                                                        int32_t len,
                                                        void * p);
-
-typedef uint8_t lv_draw_sw_mask_line_side_t;
-
-typedef struct {
-    lv_draw_sw_mask_xcb_t cb;
-    lv_draw_sw_mask_type_t type;
-} _lv_draw_sw_mask_common_dsc_t;
-
-typedef struct {
-    /*The first element must be the common descriptor*/
-    _lv_draw_sw_mask_common_dsc_t dsc;
-
-    struct {
-        /*First point*/
-        lv_point_t p1;
-
-        /*Second point*/
-        lv_point_t p2;
-
-        /*Which side to keep?*/
-        lv_draw_sw_mask_line_side_t side : 2;
-    } cfg;
-
-    /*A point of the line*/
-    lv_point_t origo;
-
-    /*X / (1024*Y) steepness (X is 0..1023 range). What is the change of X in 1024 Y?*/
-    int32_t xy_steep;
-
-    /*Y / (1024*X) steepness (Y is 0..1023 range). What is the change of Y in 1024 X?*/
-    int32_t yx_steep;
-
-    /*Helper which stores yx_steep for flat lines and xy_steep for steep (non flat) lines*/
-    int32_t steep;
-
-    /*Steepness in 1 px in 0..255 range. Used only by flat lines.*/
-    int32_t spx;
-
-    /*1: It's a flat line? (Near to horizontal)*/
-    uint8_t flat : 1;
-
-    /*Invert the mask. The default is: Keep the left part.
-     *It is used to select left/right/top/bottom*/
-    uint8_t inv: 1;
-} lv_draw_sw_mask_line_param_t;
-
-typedef struct {
-    /*The first element must be the common descriptor*/
-    _lv_draw_sw_mask_common_dsc_t dsc;
-
-    struct {
-        lv_point_t vertex_p;
-        int32_t start_angle;
-        int32_t end_angle;
-    } cfg;
-
-    lv_draw_sw_mask_line_param_t start_line;
-    lv_draw_sw_mask_line_param_t end_line;
-    uint16_t delta_deg;
-} lv_draw_sw_mask_angle_param_t;
-
-typedef struct  {
-    uint8_t * buf;
-    lv_opa_t * cir_opa;         /*Opacity of values on the circumference of an 1/4 circle*/
-    uint16_t * x_start_on_y;        /*The x coordinate of the circle for each y value*/
-    uint16_t * opa_start_on_y;      /*The index of `cir_opa` for each y value*/
-    int32_t life;               /*How many times the entry way used*/
-    uint32_t used_cnt;          /*Like a semaphore to count the referencing masks*/
-    int32_t radius;          /*The radius of the entry*/
-} _lv_draw_sw_mask_radius_circle_dsc_t;
-
-typedef _lv_draw_sw_mask_radius_circle_dsc_t _lv_draw_sw_mask_radius_circle_dsc_arr_t[LV_DRAW_SW_CIRCLE_CACHE_SIZE];
-
-typedef struct {
-    /*The first element must be the common descriptor*/
-    _lv_draw_sw_mask_common_dsc_t dsc;
-
-    struct {
-        lv_area_t rect;
-        int32_t radius;
-        /*Invert the mask. 0: Keep the pixels inside.*/
-        uint8_t outer: 1;
-    } cfg;
-
-    _lv_draw_sw_mask_radius_circle_dsc_t * circle;
-} lv_draw_sw_mask_radius_param_t;
-
-typedef struct {
-    /*The first element must be the common descriptor*/
-    _lv_draw_sw_mask_common_dsc_t dsc;
-
-    struct {
-        lv_area_t coords;
-        int32_t y_top;
-        int32_t y_bottom;
-        lv_opa_t opa_top;
-        lv_opa_t opa_bottom;
-    } cfg;
-
-} lv_draw_sw_mask_fade_param_t;
-
-typedef struct _lv_draw_sw_mask_map_param_t {
-    /*The first element must be the common descriptor*/
-    _lv_draw_sw_mask_common_dsc_t dsc;
-
-    struct {
-        lv_area_t coords;
-        const lv_opa_t * map;
-    } cfg;
-} lv_draw_sw_mask_map_param_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -217,12 +103,6 @@ lv_draw_sw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_mask_apply(void * m
 void lv_draw_sw_mask_free_param(void * p);
 
 /**
- * Called by LVGL the rendering of a screen is ready to clean up
- * the temporal (cache) data of the masks
- */
-void _lv_draw_sw_mask_cleanup(void);
-
-/**
  *Initialize a line mask from two points.
  * @param param pointer to a `lv_draw_mask_param_t` to initialize
  * @param p1x X coordinate of the first point of the line
@@ -239,15 +119,15 @@ void lv_draw_sw_mask_line_points_init(lv_draw_sw_mask_line_param_t * param, int3
 
 /**
  *Initialize a line mask from a point and an angle.
- * @param param pointer to a `lv_draw_mask_param_t` to initialize
- * @param px X coordinate of a point of the line
- * @param py X coordinate of a point of the line
- * @param angle right 0 deg, bottom: 90
- * @param side and element of `lv_draw_mask_line_side_t` to describe which side to keep.
+ * @param param  pointer to a `lv_draw_mask_param_t` to initialize
+ * @param px     X coordinate of a point of the line
+ * @param py     X coordinate of a point of the line
+ * @param angle  right 0 deg, bottom: 90
+ * @param side   an element of `lv_draw_mask_line_side_t` to describe which side to keep.
  * With `LV_DRAW_MASK_LINE_SIDE_LEFT/RIGHT` and horizontal line all pixels are kept
  * With `LV_DRAW_MASK_LINE_SIDE_TOP/BOTTOM` and vertical line all pixels are kept
  */
-void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, int32_t p1x, int32_t py, int16_t angle,
+void lv_draw_sw_mask_line_angle_init(lv_draw_sw_mask_line_param_t * param, int32_t px, int32_t py, int16_t angle,
                                      lv_draw_sw_mask_line_side_t side);
 
 /**

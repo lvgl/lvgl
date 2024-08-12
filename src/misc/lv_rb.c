@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_rb.h"
+#include "lv_rb_private.h"
 #include "../stdlib/lv_string.h"
 
 /*********************

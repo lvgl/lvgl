@@ -29,24 +29,22 @@ extern "C" {
 
 #define LV_STYLE_SENTINEL_VALUE     0xAABBCCDD
 
-/**
+/*
  * Flags for style behavior
- *
- * The rest of the flags will have _FLAG added to their name in v9.
  */
-#define LV_STYLE_PROP_FLAG_NONE                     (0)
-#define LV_STYLE_PROP_FLAG_INHERITABLE              (1 << 0)  /*Inherited*/
-#define LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE          (1 << 1)  /*Requires ext. draw size update when changed*/
-#define LV_STYLE_PROP_FLAG_LAYOUT_UPDATE            (1 << 2)  /*Requires layout update when changed*/
-#define LV_STYLE_PROP_FLAG_PARENT_LAYOUT_UPDATE     (1 << 3)  /*Requires layout update on parent when changed*/
-#define LV_STYLE_PROP_FLAG_LAYER_UPDATE             (1 << 4)  /*Affects layer handling*/
-#define LV_STYLE_PROP_FLAG_TRANSFORM                (1 << 5)  /*Affects the object's transformation*/
-#define LV_STYLE_PROP_FLAG_ALL                      (0x3F)    /*Indicating all flags*/
+#define LV_STYLE_PROP_FLAG_NONE                     (0)       /**< No special behavior */
+#define LV_STYLE_PROP_FLAG_INHERITABLE              (1 << 0)  /**< Inherited */
+#define LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE          (1 << 1)  /**< Requires ext. draw size update when changed */
+#define LV_STYLE_PROP_FLAG_LAYOUT_UPDATE            (1 << 2)  /**< Requires layout update when changed */
+#define LV_STYLE_PROP_FLAG_PARENT_LAYOUT_UPDATE     (1 << 3)  /**< Requires layout update on parent when changed */
+#define LV_STYLE_PROP_FLAG_LAYER_UPDATE             (1 << 4)  /**< Affects layer handling */
+#define LV_STYLE_PROP_FLAG_TRANSFORM                (1 << 5)  /**< Affects the object's transformation */
+#define LV_STYLE_PROP_FLAG_ALL                      (0x3F)    /**< Indicating all flags */
 
-/**
+/*
  * Other constants
  */
-#define LV_SCALE_NONE            256        /*Value for not zooming the image*/
+#define LV_SCALE_NONE            256        /**< Value for not zooming the image */
 LV_EXPORT_CONST_INT(LV_SCALE_NONE);
 
 // *INDENT-OFF*
@@ -54,63 +52,51 @@ LV_EXPORT_CONST_INT(LV_SCALE_NONE);
 #define LV_STYLE_CONST_INIT(var_name, prop_array)                       \
     const lv_style_t var_name = {                                       \
         .sentinel = LV_STYLE_SENTINEL_VALUE,                            \
-        .values_and_props = (void*)prop_array,                                      \
+        .values_and_props = (void*)prop_array,                          \
         .has_group = 0xFFFFFFFF,                                        \
-        .prop_cnt = 255                                               \
+        .prop_cnt = 255                                                 \
     }
 #else
 #define LV_STYLE_CONST_INIT(var_name, prop_array)                       \
     const lv_style_t var_name = {                                       \
-        .values_and_props = prop_array,                                      \
+        .values_and_props = prop_array,                                 \
         .has_group = 0xFFFFFFFF,                                        \
-        .prop_cnt = 255,                                               \
+        .prop_cnt = 255,                                                \
     }
 #endif
 // *INDENT-ON*
 
-#define LV_STYLE_CONST_PROPS_END { .prop_ptr = NULL, .value = { .num = 0 } }
+#define LV_STYLE_CONST_PROPS_END { .prop = LV_STYLE_PROP_INV, .value = { .num = 0 } }
 
 /**********************
  *      TYPEDEFS
  **********************/
 
 /**
- * Possible options how to blend opaque drawings
+ * Possible options for blending opaque drawings
  */
-enum _lv_blend_mode_t {
+typedef enum {
     LV_BLEND_MODE_NORMAL,     /**< Simply mix according to the opacity value*/
     LV_BLEND_MODE_ADDITIVE,   /**< Add the respective color channels*/
     LV_BLEND_MODE_SUBTRACTIVE,/**< Subtract the foreground from the background*/
     LV_BLEND_MODE_MULTIPLY,   /**< Multiply the foreground and background*/
-};
-
-#ifdef DOXYGEN
-typedef _lv_blend_mode_t lv_blend_mode_t;
-#else
-typedef uint8_t lv_blend_mode_t;
-#endif /*DOXYGEN*/
+} lv_blend_mode_t;
 
 /**
  * Some options to apply decorations on texts.
  * 'OR'ed values can be used.
  */
-enum _lv_text_decor_t {
+typedef enum {
     LV_TEXT_DECOR_NONE          = 0x00,
     LV_TEXT_DECOR_UNDERLINE     = 0x01,
     LV_TEXT_DECOR_STRIKETHROUGH = 0x02,
-};
-
-#ifdef DOXYGEN
-typedef _lv_text_decor_t lv_text_decor_t;
-#else
-typedef uint8_t lv_text_decor_t;
-#endif /*DOXYGEN*/
+} lv_text_decor_t;
 
 /**
  * Selects on which sides border should be drawn
  * 'OR'ed values can be used.
  */
-enum _lv_border_side_t {
+typedef enum {
     LV_BORDER_SIDE_NONE     = 0x00,
     LV_BORDER_SIDE_BOTTOM   = 0x01,
     LV_BORDER_SIDE_TOP      = 0x02,
@@ -118,44 +104,28 @@ enum _lv_border_side_t {
     LV_BORDER_SIDE_RIGHT    = 0x08,
     LV_BORDER_SIDE_FULL     = 0x0F,
     LV_BORDER_SIDE_INTERNAL = 0x10, /**< FOR matrix-like objects (e.g. Button matrix)*/
-};
-
-#ifdef DOXYGEN
-typedef _lv_border_side_t lv_border_side_t;
-#else
-typedef uint8_t lv_border_side_t;
-#endif /*DOXYGEN*/
+} lv_border_side_t;
 
 /**
  * The direction of the gradient.
  */
-enum _lv_grad_dir_t {
+typedef enum {
     LV_GRAD_DIR_NONE,       /**< No gradient (the `grad_color` property is ignored)*/
     LV_GRAD_DIR_VER,        /**< Simple vertical (top to bottom) gradient*/
     LV_GRAD_DIR_HOR,        /**< Simple horizontal (left to right) gradient*/
     LV_GRAD_DIR_LINEAR,     /**< Linear gradient defined by start and end points. Can be at any angle.*/
     LV_GRAD_DIR_RADIAL,     /**< Radial gradient defined by start and end circles*/
     LV_GRAD_DIR_CONICAL,    /**< Conical gradient defined by center point, start and end angles*/
-};
+} lv_grad_dir_t;
 
 /**
  * Gradient behavior outside the defined range.
 */
-enum _lv_grad_extend_t {
+typedef enum {
     LV_GRAD_EXTEND_PAD,     /**< Repeat the same color*/
     LV_GRAD_EXTEND_REPEAT,  /**< Repeat the pattern*/
     LV_GRAD_EXTEND_REFLECT, /**< Repeat the pattern mirrored*/
-};
-
-#ifdef DOXYGEN
-typedef _lv_grad_dir_t lv_grad_dir_t;
-typedef _lv_grad_type_t lv_grad_type_t;
-typedef _lv_grad_extend_t lv_grad_extend_t;
-#else
-typedef uint8_t lv_grad_dir_t;
-typedef uint8_t lv_grad_type_t;
-typedef uint8_t lv_grad_extend_t;
-#endif /*DOXYGEN*/
+} lv_grad_extend_t;
 
 /** A gradient stop definition.
  *  This matches a color and a position in a virtual 0-255 scale.
@@ -172,7 +142,7 @@ typedef struct {
     uint8_t              stops_count;                   /**< The number of used stops in the array */
     lv_grad_dir_t        dir : 3;                       /**< The gradient direction.
                                                          * Any of LV_GRAD_DIR_NONE, LV_GRAD_DIR_VER, LV_GRAD_DIR_HOR,
-                                                           LV_GRAD_TYPE_LINEAR, LV_GRAD_TYPE_RADIAL, LV_GRAD_TYPE_CONICAL */
+                                                         * LV_GRAD_TYPE_LINEAR, LV_GRAD_TYPE_RADIAL, LV_GRAD_TYPE_CONICAL */
     lv_grad_extend_t     extend : 2;                    /**< Behaviour outside the defined range.
                                                          * LV_GRAD_EXTEND_NONE, LV_GRAD_EXTEND_PAD, LV_GRAD_EXTEND_REPEAT, LV_GRAD_EXTEND_REFLECT */
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
@@ -215,7 +185,7 @@ typedef union {
  *
  * Props are split into groups of 16. When adding a new prop to a group, ensure it does not overflow into the next one.
  */
-enum _lv_style_prop_t {
+enum {
     LV_STYLE_PROP_INV               = 0,
 
     /*Group 0*/
@@ -359,30 +329,18 @@ enum _lv_style_prop_t {
     LV_STYLE_GRID_CELL_ROW_SPAN     = 138,
     LV_STYLE_GRID_CELL_Y_ALIGN      = 139,
 
-    _LV_STYLE_LAST_BUILT_IN_PROP     = 140,
+    LV_STYLE_LAST_BUILT_IN_PROP     = 140,
 
-    _LV_STYLE_NUM_BUILT_IN_PROPS     = _LV_STYLE_LAST_BUILT_IN_PROP + 1,
+    LV_STYLE_NUM_BUILT_IN_PROPS     = LV_STYLE_LAST_BUILT_IN_PROP + 1,
 
     LV_STYLE_PROP_ANY                = 0xFF,
-    _LV_STYLE_PROP_CONST             = 0xFF /* magic value for const styles */
+    LV_STYLE_PROP_CONST             = 0xFF /* magic value for const styles */
 };
 
-#ifdef DOXYGEN
-typedef _lv_style_prop_t lv_style_prop_t;
-#else
-typedef uint8_t lv_style_prop_t;
-#endif /*DOXYGEN*/
-
-enum _lv_style_res_t {
+typedef enum {
     LV_STYLE_RES_NOT_FOUND,
     LV_STYLE_RES_FOUND,
-};
-
-#ifdef DOXYGEN
-typedef _lv_style_res_t lv_style_res_t;
-#else
-typedef uint8_t lv_style_res_t;
-#endif /*DOXYGEN*/
+} lv_style_res_t;
 
 /**
  * Descriptor for style transitions
@@ -390,7 +348,7 @@ typedef uint8_t lv_style_res_t;
 typedef struct {
     const lv_style_prop_t * props; /**< An array with the properties to animate.*/
     void * user_data;              /**< A custom user data that will be passed to the animation's user_data */
-    lv_anim_path_cb_t path_xcb;     /**< A path for the animation.*/
+    lv_anim_path_cb_t path_xcb;    /**< A path for the animation.*/
     uint32_t time;                 /**< Duration of the transition in [ms]*/
     uint32_t delay;                /**< Delay before the transition in [ms]*/
 } lv_style_transition_dsc_t;
@@ -399,7 +357,7 @@ typedef struct {
  * Descriptor of a constant style property.
  */
 typedef struct {
-    const lv_style_prop_t * prop_ptr;
+    lv_style_prop_t prop;
     lv_style_value_t value;
 } lv_style_const_prop_t;
 
@@ -451,7 +409,9 @@ static inline bool lv_style_is_const(const lv_style_t * style)
 /**
  * Register a new style property for custom usage
  * @return a new property ID, or LV_STYLE_PROP_INV if there are no more available.
- * @example
+ *
+ * Example:
+ * @code
  * lv_style_prop_t MY_PROP;
  * static inline void lv_style_set_my_prop(lv_style_t * style, lv_color_t value) {
  * lv_style_value_t v = {.color = value}; lv_style_set_prop(style, MY_PROP, v); }
@@ -460,6 +420,7 @@ static inline bool lv_style_is_const(const lv_style_t * style)
  * MY_PROP = lv_style_register_prop();
  * ...
  * lv_style_set_my_prop(&style1, lv_palette_main(LV_PALETTE_RED));
+ * @endcode
  */
 lv_style_prop_t lv_style_register_prop(uint8_t flag);
 
@@ -505,10 +466,13 @@ lv_style_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop,
  * @param time      duration of the transition in [ms]
  * @param delay     delay before the transition in [ms]
  * @param user_data any custom data that will be saved in the transition animation and will be available when `path_cb` is called
- * @example
+ *
+ * Example:
+ * @code
  * const static lv_style_prop_t trans_props[] = { LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR, 0 };
- *  static lv_style_transition_dsc_t trans1;
- *  lv_style_transition_dsc_init(&trans1, trans_props, NULL, 300, 0, NULL);
+ * static lv_style_transition_dsc_t trans1;
+ * lv_style_transition_dsc_init(&trans1, trans_props, NULL, 300, 0, NULL);
+ * @endcode
  */
 void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t props[],
                                   lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay, void * user_data);
@@ -536,8 +500,8 @@ static inline lv_style_res_t lv_style_get_prop_inlined(const lv_style_t * style,
     if(lv_style_is_const(style)) {
         lv_style_const_prop_t * props = (lv_style_const_prop_t *)style->values_and_props;
         uint32_t i;
-        for(i = 0; props[i].prop_ptr; i++) {
-            if(*props[i].prop_ptr == prop) {
+        for(i = 0; props[i].prop != LV_STYLE_PROP_INV; i++) {
+            if(props[i].prop == prop) {
                 *value = props[i].value;
                 return LV_STYLE_RES_FOUND;
             }
@@ -570,7 +534,7 @@ bool lv_style_is_empty(const lv_style_t * style);
  * @param prop a style property
  * @return the group [0..30] 30 means all the custom properties with index > 120
  */
-static inline uint32_t _lv_style_get_prop_group(lv_style_prop_t prop)
+static inline uint32_t lv_style_get_prop_group(lv_style_prop_t prop)
 {
     uint32_t group = prop >> 2;
     if(group > 30) group = 31;    /*The MSB marks all the custom properties*/
@@ -584,7 +548,7 @@ static inline uint32_t _lv_style_get_prop_group(lv_style_prop_t prop)
  * @param prop a style property
  * @return the flags of the property
  */
-uint8_t _lv_style_prop_lookup_flags(lv_style_prop_t prop);
+uint8_t lv_style_prop_lookup_flags(lv_style_prop_t prop);
 
 #include "lv_style_gen.h"
 
@@ -638,7 +602,7 @@ static inline void lv_style_set_transform_scale(lv_style_t * style, int32_t valu
  */
 static inline bool lv_style_prop_has_flag(lv_style_prop_t prop, uint8_t flag)
 {
-    return _lv_style_prop_lookup_flags(prop) & flag;
+    return lv_style_prop_lookup_flags(prop) & flag;
 }
 
 /*************************

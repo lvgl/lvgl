@@ -1,3 +1,5 @@
+include("${CMAKE_CURRENT_LIST_DIR}/version.cmake")
+
 file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c)
 file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
 

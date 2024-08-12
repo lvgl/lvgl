@@ -6,10 +6,14 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../misc/lv_area_private.h"
+#include "lv_draw_sw_mask_private.h"
+#include "../lv_draw_private.h"
+#include "../lv_draw_private.h"
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
-#include "blend/lv_draw_sw_blend.h"
+#include "blend/lv_draw_sw_blend_private.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_text_ap.h"
 #include "../../core/lv_refr.h"
@@ -90,7 +94,7 @@ void draw_border_complex(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
     /*Get clipped draw area which is the real draw area.
      *It is always the same or inside `coords`*/
     lv_area_t draw_area;
-    if(!_lv_area_intersect(&draw_area, outer_area, draw_unit->clip_area)) return;
+    if(!lv_area_intersect(&draw_area, outer_area, draw_unit->clip_area)) return;
     int32_t draw_area_w = lv_area_get_width(&draw_area);
 
     lv_draw_sw_blend_dsc_t blend_dsc;

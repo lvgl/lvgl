@@ -31,7 +31,7 @@ extern "C" {
 /**
  * Errors in the file system module.
  */
-enum _lv_fs_res_t {
+typedef enum {
     LV_FS_RES_OK = 0,
     LV_FS_RES_HW_ERR,     /*Low level hardware error*/
     LV_FS_RES_FS_ERR,     /*Error in the file system structure*/
@@ -45,27 +45,15 @@ enum _lv_fs_res_t {
     LV_FS_RES_OUT_OF_MEM, /*Not enough memory for an internal operation*/
     LV_FS_RES_INV_PARAM,  /*Invalid parameter among arguments*/
     LV_FS_RES_UNKNOWN,    /*Other unknown error*/
-};
-
-#ifdef DOXYGEN
-typedef _lv_fs_res_t lv_fs_res_t;
-#else
-typedef uint8_t lv_fs_res_t;
-#endif /*DOXYGEN*/
+} lv_fs_res_t;
 
 /**
  * File open mode.
  */
-enum _lv_fs_mode_t {
+typedef enum {
     LV_FS_MODE_WR = 0x01,
     LV_FS_MODE_RD = 0x02,
-};
-
-#ifdef DOXYGEN
-typedef _lv_fs_mode_t lv_fs_mode_t;
-#else
-typedef uint8_t lv_fs_mode_t;
-#endif /*DOXYGEN*/
+} lv_fs_mode_t;
 
 /**
  * Seek modes.
@@ -76,9 +64,9 @@ typedef enum {
     LV_FS_SEEK_END = 0x02,      /**< Set the position from the end of the file*/
 } lv_fs_whence_t;
 
-struct _lv_fs_drv_t;
-typedef struct _lv_fs_drv_t lv_fs_drv_t;
-struct _lv_fs_drv_t {
+struct lv_fs_drv_t;
+typedef struct lv_fs_drv_t lv_fs_drv_t;
+struct lv_fs_drv_t {
     char letter;
     uint32_t cache_size;
     bool (*ready_cb)(lv_fs_drv_t * drv);
@@ -98,43 +86,14 @@ struct _lv_fs_drv_t {
 };
 
 typedef struct {
-    uint32_t start;
-    uint32_t end;
-    uint32_t file_position;
-    void * buffer;
-} lv_fs_file_cache_t;
-
-typedef struct {
     void * file_d;
     lv_fs_drv_t * drv;
     lv_fs_file_cache_t * cache;
 } lv_fs_file_t;
 
-/* Extended path object to specify the buffer for memory-mapped files */
-typedef struct {
-    char path[4];   /* This is needed to make it compatible with a normal path */
-    const void * buffer;
-    uint32_t size;
-} lv_fs_path_ex_t;
-
-typedef struct {
-    void * dir_d;
-    lv_fs_drv_t * drv;
-} lv_fs_dir_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-/**
- * Initialize the File system interface
- */
-void _lv_fs_init(void);
-
-/**
- * Deinitialize the File system interface
- */
-void _lv_fs_deinit(void);
 
 /**
  * Initialize a file system driver with default values.
@@ -216,7 +175,7 @@ lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, u
  * Set the position of the 'cursor' (read write pointer) in a file
  * @param file_p    pointer to a lv_fs_file_t variable
  * @param pos       the new position expressed in bytes index (0: start of file)
- * @param whence    tells from where set the position. See @lv_fs_whence_t
+ * @param whence    tells from where to set position. See @lv_fs_whence_t
  * @return          LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whence);

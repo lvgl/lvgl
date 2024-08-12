@@ -439,6 +439,18 @@ uint32_t lv_rand(uint32_t min, uint32_t max)
     return (rand_seed % (max - min + 1)) + min;
 }
 
+int32_t LV_ATTRIBUTE_FAST_MEM lv_trigo_cos(int16_t angle)
+{
+    return lv_trigo_sin(angle + 90);
+}
+
+int32_t lv_bezier3(int32_t t, int32_t u0, uint32_t u1, int32_t u2, int32_t u3)
+{
+    LV_UNUSED(u0);
+    LV_UNUSED(u3);
+    return lv_cubic_bezier(t, 341, u1, 683, u2);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

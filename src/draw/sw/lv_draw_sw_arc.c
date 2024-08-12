@@ -6,6 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../misc/lv_area_private.h"
+#include "lv_draw_sw_mask_private.h"
+#include "blend/lv_draw_sw_blend_private.h"
+#include "../lv_image_decoder_private.h"
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 #if LV_DRAW_SW_COMPLEX
@@ -14,7 +18,7 @@
 #include "../../misc/lv_log.h"
 #include "../../stdlib/lv_mem.h"
 #include "../../stdlib/lv_string.h"
-#include "../lv_draw.h"
+#include "../lv_draw_private.h"
 
 static void add_circle(const lv_opa_t * circle_mask, const lv_area_t * blend_area, const lv_area_t * circle_area,
                        lv_opa_t * mask_buf,  int32_t width);
@@ -58,7 +62,7 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
 
     lv_area_t area_out = *coords;
     lv_area_t clipped_area;
-    if(!_lv_area_intersect(&clipped_area, &area_out, draw_unit->clip_area)) return;
+    if(!lv_area_intersect(&clipped_area, &area_out, draw_unit->clip_area)) return;
 
     /*Draw a full ring*/
     if(dsc->img_src == NULL &&
@@ -246,7 +250,7 @@ static void add_circle(const lv_opa_t * circle_mask, const lv_area_t * blend_are
                        lv_opa_t * mask_buf,  int32_t width)
 {
     lv_area_t circle_common_area;
-    if(_lv_area_intersect(&circle_common_area, circle_area, blend_area)) {
+    if(lv_area_intersect(&circle_common_area, circle_area, blend_area)) {
         const lv_opa_t * circle_mask_tmp = circle_mask + width * (circle_common_area.y1 - circle_area->y1);
         circle_mask_tmp += circle_common_area.x1 - circle_area->x1;
 

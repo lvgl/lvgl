@@ -6,13 +6,17 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../misc/lv_area_private.h"
+#include "lv_draw_sw_mask_private.h"
+#include "blend/lv_draw_sw_blend_private.h"
+#include "../lv_draw_private.h"
 #include "lv_draw_sw.h"
 
 #if LV_USE_DRAW_SW
 
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_types.h"
-#include "../../core/lv_refr.h"
+#include "../../core/lv_refr_private.h"
 #include "../../stdlib/lv_string.h"
 
 /*********************
@@ -57,7 +61,7 @@ void lv_draw_sw_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc)
     clip_line.y2 = (int32_t)LV_MAX(dsc->p1.y, dsc->p2.y) + dsc->width / 2;
 
     bool is_common;
-    is_common = _lv_area_intersect(&clip_line, &clip_line, draw_unit->clip_area);
+    is_common = lv_area_intersect(&clip_line, &clip_line, draw_unit->clip_area);
     if(!is_common) return;
 
     LV_PROFILER_BEGIN;
@@ -111,7 +115,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_line_hor(lv_draw_unit_t * draw_unit, cons
     blend_area.y2 = (int32_t)dsc->p1.y + w_half0;
 
     bool is_common;
-    is_common = _lv_area_intersect(&blend_area, &blend_area, draw_unit->clip_area);
+    is_common = lv_area_intersect(&blend_area, &blend_area, draw_unit->clip_area);
     if(!is_common) return;
 
     bool dashed = dsc->dash_gap && dsc->dash_width;
@@ -186,7 +190,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_line_ver(lv_draw_unit_t * draw_unit, cons
     blend_area.y2 = (int32_t)LV_MAX(dsc->p1.y, dsc->p2.y) - 1;
 
     bool is_common;
-    is_common = _lv_area_intersect(&blend_area, &blend_area, draw_unit->clip_area);
+    is_common = lv_area_intersect(&blend_area, &blend_area, draw_unit->clip_area);
     if(!is_common) return;
 
     bool dashed = dsc->dash_gap && dsc->dash_width;
@@ -289,7 +293,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_line_skew(lv_draw_unit_t * draw_unit, con
     /*Get the union of `coords` and `clip`*/
     /*`clip` is already truncated to the `draw_buf` size
      *in 'lv_refr_area' function*/
-    bool is_common = _lv_area_intersect(&blend_area, &blend_area, draw_unit->clip_area);
+    bool is_common = lv_area_intersect(&blend_area, &blend_area, draw_unit->clip_area);
     if(is_common == false) return;
 
     lv_draw_sw_mask_line_param_t mask_left_param;
@@ -339,7 +343,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_line_skew(lv_draw_unit_t * draw_unit, con
 
     /*Draw the background line by line*/
     int32_t h;
-    uint32_t hor_res = (uint32_t)lv_display_get_horizontal_resolution(_lv_refr_get_disp_refreshing());
+    uint32_t hor_res = (uint32_t)lv_display_get_horizontal_resolution(lv_refr_get_disp_refreshing());
     size_t mask_buf_size = LV_MIN(lv_area_get_size(&blend_area), hor_res);
     lv_opa_t * mask_buf = lv_malloc(mask_buf_size);
 

@@ -32,27 +32,20 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/** Roller mode.*/
-enum _lv_roller_mode_t {
-    LV_ROLLER_MODE_NORMAL, /**< Normal mode (roller ends at the end of the options).*/
-    LV_ROLLER_MODE_INFINITE, /**< Infinite mode (roller can be scrolled forever).*/
+/** Roller mode. */
+typedef enum {
+    LV_ROLLER_MODE_NORMAL,   /**< Normal mode (roller ends at the end of the options). */
+    LV_ROLLER_MODE_INFINITE, /**< Infinite mode (roller can be scrolled forever). */
+} lv_roller_mode_t;
+
+#if LV_USE_OBJ_PROPERTY
+enum {
+    LV_PROPERTY_ID(ROLLER, OPTIONS,             LV_PROPERTY_TYPE_TEXT,   0),
+    LV_PROPERTY_ID(ROLLER, SELECTED,            LV_PROPERTY_TYPE_INT,    1),
+    LV_PROPERTY_ID(ROLLER, VISIBLE_ROW_COUNT,   LV_PROPERTY_TYPE_INT,    2),
+    LV_PROPERTY_ROLLER_END,
 };
-
-#ifdef DOXYGEN
-typedef _lv_roller_mode_t lv_roller_mode_t;
-#else
-typedef uint8_t lv_roller_mode_t;
-#endif /*DOXYGEN*/
-
-typedef struct {
-    lv_obj_t obj;
-    uint32_t option_cnt;          /**< Number of options*/
-    uint32_t sel_opt_id;          /**< Index of the current option*/
-    uint32_t sel_opt_id_ori;      /**< Store the original index on focus*/
-    uint32_t inf_page_cnt;        /**< Number of extra pages added to make the roller look infinite */
-    lv_roller_mode_t mode : 1;
-    uint32_t moved : 1;
-} lv_roller_t;
+#endif
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_roller_class;
 
