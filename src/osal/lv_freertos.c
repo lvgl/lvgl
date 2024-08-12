@@ -355,7 +355,7 @@ lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * pxCond)
 
 void lv_freertos_task_switch_in(const char * name)
 {
-    if(strcmp(name, "IDLE")) globals->os_idle_task_running = false;
+    if(lv_strcmp(name, "IDLE")) globals->os_idle_task_running = false;
     else globals->os_idle_task_running = true;
 
     globals->os_task_switch_timestamp = lv_tick_get();
