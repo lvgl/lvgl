@@ -25,7 +25,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct _lv_fragment_manager_t lv_fragment_manager_t;
+typedefstruct _lv_fragment_manager_t lv_fragment_manager_t;
 
 struct _lv_fragment_t {
     /**

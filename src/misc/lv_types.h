@@ -86,7 +86,7 @@ typedef int32_t lv_value_precise_t;
  * They are defined here to avoid circular dependencies.
  */
 
-typedef struct _lv_obj_t lv_obj_t;
+typedefstruct _lv_obj_t lv_obj_t;
 
 typedef uint16_t lv_state_t;
 typedef uint32_t lv_part_t;
@@ -329,10 +329,10 @@ typedef struct _lv_property_name_t lv_property_name_t;
 
 #if LV_USE_SYSMON
 
-typedef struct _lv_sysmon_backend_data_t lv_sysmon_backend_data_t;
+typedefstruct _lv_sysmon_backend_data_t lv_sysmon_backend_data_t;
 
 #if LV_USE_PERF_MONITOR
-typedef struct _lv_sysmon_perf_info_t lv_sysmon_perf_info_t;
+typedefstruct _lv_sysmon_perf_info_t lv_sysmon_perf_info_t;
 #endif /*LV_USE_PERF_MONITOR*/
 
 #endif /*LV_USE_SYSMON*/

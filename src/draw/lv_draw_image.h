@@ -26,7 +26,7 @@ extern "C" {
  *      MACROS
  **********************/
 
-typedef struct _lv_draw_image_dsc_t {
+typedefstruct _lv_draw_image_dsc_t {
     lv_draw_dsc_base_t base;
 
     const void * src;

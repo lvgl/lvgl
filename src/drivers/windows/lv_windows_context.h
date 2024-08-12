@@ -59,7 +59,7 @@ typedef struct _lv_windows_keypad_context_t {
     lv_indev_t * indev;
 } lv_windows_keypad_context_t;
 
-typedef struct _lv_windows_encoder_context_t {
+typedefstruct _lv_windows_encoder_context_t {
     lv_indev_state_t state;
     int16_t enc_diff;
     lv_indev_t * indev;

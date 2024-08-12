@@ -37,7 +37,7 @@ typedef enum {
 
 typedef void (*lv_lru_free_cb_t)(void * v);
 
-typedef struct _lv_lru_item_t lv_lru_item_t;
+typedefstruct _lv_lru_item_t lv_lru_item_t;
 
 typedef struct _lv_lru_t {
     lv_lru_item_t ** items;
