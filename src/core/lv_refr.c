@@ -623,7 +623,7 @@ static void refr_area(const lv_area_t * area_p)
         }
         else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
             disp_refr->last_part = disp_refr->last_area;
-            layer_reshape_draw_buf(layer, LV_STRIDE_AUTO);
+            layer_reshape_draw_buf(layer, layer->draw_buf->header.stride);
             layer->_clip_area = *area_p;
             refr_area_part(layer);
         }
