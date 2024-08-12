@@ -28,7 +28,7 @@ extern "C" {
  **********************/
 
 /** Data of text area */
-struct lv_textarea_t {
+struct _lv_textarea_t {
     lv_obj_t obj;
     lv_obj_t * label;            /**< Label of the text area */
     char * placeholder_txt;      /**< Place holder label. only visible if text is an empty string */

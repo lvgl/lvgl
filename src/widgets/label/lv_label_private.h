@@ -28,7 +28,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_label_t {
+struct _lv_label_t {
     lv_obj_t obj;
     char * text;
     union {

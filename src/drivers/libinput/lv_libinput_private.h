@@ -26,13 +26,13 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_libinput_event_t {
+struct _lv_libinput_event_t {
     lv_indev_state_t pressed;
     int key_val;
     lv_point_t point;
 };
 
-struct lv_libinput_t {
+struct _lv_libinput_t {
     int fd;
     struct pollfd fds[1];
 

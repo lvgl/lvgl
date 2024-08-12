@@ -73,7 +73,7 @@ struct _lv_draw_task_t {
 
 };
 
-struct lv_draw_mask_t {
+struct _lv_draw_mask_t {
     void * user_data;
 };
 

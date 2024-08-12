@@ -28,7 +28,7 @@ extern "C" {
  **********************/
 
 /** Canvas data */
-struct lv_canvas_t {
+struct _lv_canvas_t {
     lv_image_t img;
     lv_draw_buf_t * draw_buf;
     lv_draw_buf_t static_buf;

@@ -27,14 +27,14 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_bar_anim_t {
+struct _lv_bar_anim_t {
     lv_obj_t * bar;
     int32_t anim_start;
     int32_t anim_end;
     int32_t anim_state;
 };
 
-struct lv_bar_t {
+struct _lv_bar_t {
     lv_obj_t obj;
     int32_t cur_value;          /**< Current value of the bar*/
     int32_t min_value;          /**< Minimum value of the bar*/

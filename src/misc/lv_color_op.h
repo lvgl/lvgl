@@ -26,7 +26,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_color_filter_dsc_t;
+struct _lv_color_filter_dsc_t;
 
 typedef lv_color_t (*lv_color_filter_cb_t)(conststruct _lv_color_filter_dsc_t *, lv_color_t, lv_opa_t);
 
