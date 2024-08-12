@@ -395,6 +395,12 @@ void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
     }
 }
 
+void lv_indev_stop_processing(lv_indev_t * indev)
+{
+    if(indev == NULL) return;
+    indev->stop_processing_query = 1;
+}
+
 void lv_indev_reset_long_press(lv_indev_t * indev)
 {
     indev->long_pr_sent         = 0;
@@ -1454,6 +1460,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
         indev->pointer.gesture_sum.x     = 0;
         indev->pointer.gesture_sum.y     = 0;
         indev->reset_query                     = 0;
+        indev->stop_processing_query           = 0;
         indev_obj_act                               = NULL;
     }
 }
@@ -1595,6 +1602,16 @@ static bool indev_reset_check(lv_indev_t * indev)
 }
 
 /**
+ * Checks if the stop_processing_query flag has been set. If so, do not send any events to the object
+ * @param indev pointer to an input device
+ * @return true if indev should stop processing the event.
+ */
+static bool indev_stop_processing_check(lv_indev_t * indev)
+{
+    return indev->stop_processing_query;
+}
+
+/**
  * Reset the indev and send event to active obj and scroll obj
  * @param indev pointer to an input device
  * @param obj pointer to obj
@@ -1653,15 +1670,10 @@ static lv_result_t send_event(lv_event_code_t code, void * param)
         lv_indev_send_event(indev, code, indev_obj_act);
         if(indev_reset_check(indev)) return LV_RESULT_INVALID;
 
-        /* Not send click or long pressed event if scroll is detected */
-        if(code == LV_EVENT_SHORT_CLICKED ||
-           code == LV_EVENT_CLICKED ||
-           code == LV_EVENT_LONG_PRESSED ||
-           code == LV_EVENT_LONG_PRESSED_REPEAT) {
-            if(LV_ABS(indev->pointer.scroll_sum.x >= indev->scroll_limit) ||
-               LV_ABS(indev->pointer.scroll_sum.y >= indev->scroll_limit)) {
-                return LV_RESULT_OK;
-            }
+        if(indev_stop_processing_check(indev)) {
+            /* Not send event to the object if stop processing query is set */
+            indev->stop_processing_query = 0;
+            return LV_RESULT_OK;
         }
     }
 

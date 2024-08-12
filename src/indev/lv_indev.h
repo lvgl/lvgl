@@ -209,6 +209,12 @@ bool lv_indev_get_press_moved(const lv_indev_t * indev);
 void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj);
 
 /**
+ * Stop processing input device events
+ * @param indev pointer to an input device
+ */
+void lv_indev_stop_processing(lv_indev_t * indev);
+
+/**
  * Reset the long press state of an input device
  * @param indev pointer to an input device
  */
