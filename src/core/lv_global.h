@@ -76,7 +76,7 @@ struct lv_profiler_builtin_ctx_t;
 struct lv_nuttx_ctx_t;
 #endif
 
-typedefstruct _lv_global_t {
+typedef struct _lv_global_t {
     bool inited;
     bool deinit_in_progress;     /**< Can be used e.g. in the LV_EVENT_DELETE to deinit the drivers too */
 

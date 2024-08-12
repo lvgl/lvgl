@@ -39,10 +39,10 @@ struct lv_cache_t;
 struct lv_cache_class_t;
 struct lv_cache_entry_t;
 
-typedefstruct _lv_cache_ops_t lv_cache_ops_t;
-typedefstruct _lv_cache_t lv_cache_t;
-typedefstruct _lv_cache_class_t lv_cache_class_t;
-typedefstruct _lv_cache_entry_t lv_cache_entry_t;
+typedef struct _lv_cache_ops_t lv_cache_ops_t;
+typedef struct _lv_cache_t lv_cache_t;
+typedef struct _lv_cache_class_t lv_cache_class_t;
+typedef struct _lv_cache_entry_t lv_cache_entry_t;
 
 typedef int8_t lv_cache_compare_res_t;
 typedef bool (*lv_cache_create_cb_t)(void * node, void * user_data);
@@ -163,7 +163,7 @@ struct lv_cache_class_t {
 
 struct lv_cache_slot_size_t;
 
-typedefstruct _lv_cache_slot_size_t lv_cache_slot_size_t;
+typedef struct _lv_cache_slot_size_t lv_cache_slot_size_t;
 
 /**
  * Cache entry slot struct

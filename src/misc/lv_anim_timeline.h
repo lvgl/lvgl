@@ -25,7 +25,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedefstruct _lv_anim_timeline_t lv_anim_timeline_t;
+typedef struct _lv_anim_timeline_t lv_anim_timeline_t;
 
 /**********************
 * GLOBAL PROTOTYPES
