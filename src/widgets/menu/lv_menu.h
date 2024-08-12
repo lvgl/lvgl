@@ -29,9 +29,9 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 typedef enum {
-    LV_MENU_HEADER_TOP_FIXED, /* Header is positioned at the top */
-    LV_MENU_HEADER_TOP_UNFIXED, /* Header is positioned at the top and can be scrolled out of view*/
-    LV_MENU_HEADER_BOTTOM_FIXED /* Header is positioned at the bottom */
+    LV_MENU_HEADER_TOP_FIXED,   /**< Header is positioned at the top */
+    LV_MENU_HEADER_TOP_UNFIXED, /**< Header is positioned at the top and can be scrolled out of view*/
+    LV_MENU_HEADER_BOTTOM_FIXED /**< Header is positioned at the bottom */
 } lv_menu_mode_header_t;
 
 typedef enum {

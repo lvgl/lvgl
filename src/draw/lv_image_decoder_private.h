@@ -34,11 +34,11 @@ extern "C" {
  * all field are zero or false.
  */
 struct lv_image_decoder_args_t {
-    bool stride_align;      /*Whether stride should be aligned*/
-    bool premultiply;       /*Whether image should be premultiplied or not after decoding*/
-    bool no_cache;          /*When set, decoded image won't be put to cache, and decoder open will also ignore cache.*/
-    bool use_indexed;       /*Decoded indexed image as is. Convert to ARGB8888 if false.*/
-    bool flush_cache;       /*Whether to flush the data cache after decoding*/
+    bool stride_align;      /**< Whether stride should be aligned */
+    bool premultiply;       /**< Whether image should be premultiplied or not after decoding */
+    bool no_cache;          /**< When set, decoded image won't be put to cache, and decoder open will also ignore cache. */
+    bool use_indexed;       /**< Decoded indexed image as is. Convert to ARGB8888 if false. */
+    bool flush_cache;       /**< Whether to flush the data cache after decoding */
 };
 
 struct lv_image_decoder_t {

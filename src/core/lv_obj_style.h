@@ -26,10 +26,10 @@ extern "C" {
  **********************/
 
 typedef enum {
-    LV_STYLE_STATE_CMP_SAME,           /*The style properties in the 2 states are identical*/
-    LV_STYLE_STATE_CMP_DIFF_REDRAW,    /*The differences can be shown with a simple redraw*/
-    LV_STYLE_STATE_CMP_DIFF_DRAW_PAD,  /*The differences can be shown with a simple redraw*/
-    LV_STYLE_STATE_CMP_DIFF_LAYOUT,    /*The differences can be shown with a simple redraw*/
+    LV_STYLE_STATE_CMP_SAME,           /**< The style properties in the 2 states are identical */
+    LV_STYLE_STATE_CMP_DIFF_REDRAW,    /**< The differences can be shown with a simple redraw */
+    LV_STYLE_STATE_CMP_DIFF_DRAW_PAD,  /**< The differences can be shown with a simple redraw */
+    LV_STYLE_STATE_CMP_DIFF_LAYOUT,    /**< The differences can be shown with a simple redraw */
 } lv_style_state_cmp_t;
 
 typedef uint32_t lv_style_selector_t;

@@ -28,13 +28,13 @@ extern "C" {
  **********************/
 
 struct lv_slider_t {
-    lv_bar_t bar;       /*Add the ancestor's type first*/
+    lv_bar_t bar;                 /**< Add the ancestor's type first */
     lv_area_t left_knob_area;
     lv_area_t right_knob_area;
     lv_point_t pressed_point;
-    int32_t * value_to_set; /*Which bar value to set*/
-    uint8_t dragging : 1;       /*1: the slider is being dragged*/
-    uint8_t left_knob_focus : 1; /*1: with encoder now the right knob can be adjusted*/
+    int32_t * value_to_set;       /**< Which bar value to set */
+    uint8_t dragging : 1;         /**< 1: the slider is being dragged */
+    uint8_t left_knob_focus : 1;  /**< 1: with encoder now the right knob can be adjusted */
 };
 
 

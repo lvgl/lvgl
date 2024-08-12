@@ -120,7 +120,7 @@ typedef struct {
     const void * glyph_ids;
     const int8_t * values;
     uint32_t pair_cnt   : 30;
-    uint32_t glyph_ids_size : 2;    /*0: `glyph_ids` is stored as `uint8_t`; 1: as `uint16_t`*/
+    uint32_t glyph_ids_size : 2;    /**< 0: `glyph_ids` is stored as `uint8_t`; 1: as `uint16_t` */
 } lv_font_fmt_txt_kern_pair_t;
 
 /** More complex but more optimal class based kern value storage*/
@@ -133,9 +133,9 @@ typedef struct {
           3. value = class_pair_values[(left_class-1)*right_class_cnt + (right_class-1)]
         */
 
-    const int8_t * class_pair_values;    /*left_class_cnt * right_class_cnt value*/
-    const uint8_t * left_class_mapping;   /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
-    const uint8_t * right_class_mapping;  /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
+    const int8_t * class_pair_values;     /**< left_class_cnt * right_class_cnt value */
+    const uint8_t * left_class_mapping;   /**< Map the glyph_ids to classes: index -> glyph_id -> class_id */
+    const uint8_t * right_class_mapping;  /**< Map the glyph_ids to classes: index -> glyph_id -> class_id */
     uint8_t left_class_cnt;
     uint8_t right_class_cnt;
 } lv_font_fmt_txt_kern_classes_t;
@@ -147,16 +147,16 @@ typedef enum {
     LV_FONT_FMT_TXT_COMPRESSED_NO_PREFILTER = 1,
 } lv_font_fmt_txt_bitmap_format_t;
 
-/*Describe store additional data for fonts*/
+/** Describe store for additional data for fonts */
 typedef struct {
-    /*The bitmaps of all glyphs*/
+    /** The bitmaps of all glyphs */
     const uint8_t * glyph_bitmap;
 
-    /*Describe the glyphs*/
+    /** Describe the glyphs */
     const lv_font_fmt_txt_glyph_dsc_t * glyph_dsc;
 
-    /*Map the glyphs to Unicode characters.
-     *Array of `lv_font_cmap_fmt_txt_t` variables*/
+    /** Map the glyphs to Unicode characters.
+     *Array of `lv_font_cmap_fmt_txt_t` variables */
     const lv_font_fmt_txt_cmap_t * cmaps;
 
     /**
@@ -166,19 +166,19 @@ typedef struct {
      */
     const void * kern_dsc;
 
-    /*Scale kern values in 12.4 format*/
+    /** Scale kern values in 12.4 format */
     uint16_t kern_scale;
 
-    /*Number of cmap tables*/
+    /** Number of cmap tables */
     uint16_t cmap_num       : 9;
 
-    /*Bit per pixel: 1, 2, 3, 4, 8*/
+    /** Bit per pixel: 1, 2, 3, 4, 8 */
     uint16_t bpp            : 4;
 
-    /*Type of `kern_dsc`*/
+    /** Type of `kern_dsc` */
     uint16_t kern_classes   : 1;
 
-    /*
+    /**
      * storage format of the bitmap
      * from `lv_font_fmt_txt_bitmap_format_t`
      */

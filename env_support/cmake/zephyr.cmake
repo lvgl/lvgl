@@ -1,4 +1,5 @@
 if(CONFIG_LVGL)
+  include("${CMAKE_CURRENT_LIST_DIR}/version.cmake")
 
   zephyr_include_directories(${ZEPHYR_BASE}/lib/gui/lvgl)
 

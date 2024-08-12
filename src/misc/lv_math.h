@@ -26,10 +26,10 @@ extern "C" {
 #define LV_BEZIER_VAL_MAX (1L << LV_BEZIER_VAL_SHIFT) /**< Max time in Bezier functions (not [0..1] to use integers)*/
 #define LV_BEZIER_VAL_FLOAT(f) ((int32_t)((f) * LV_BEZIER_VAL_MAX)) /**< Convert const float number cubic-bezier values to fix-point value*/
 
-/*Align up value x to align, align must be a power of two*/
+/** Align up value x to align, align must be a power of two */
 #define LV_ALIGN_UP(x, align) (((x) + ((align) - 1)) & ~((align) - 1))
 
-/*Round up value x to round, round can be any integer number*/
+/** Round up value x to round, round can be any integer number */
 #define LV_ROUND_UP(x, round) ((((x) + ((round) - 1)) / (round)) * (round))
 
 /**********************

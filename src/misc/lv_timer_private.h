@@ -28,17 +28,17 @@ extern "C" {
  * Descriptor of a lv_timer
  */
 struct lv_timer_t {
-    uint32_t period; /**< How often the timer should run*/
-    uint32_t last_run; /**< Last time the timer ran*/
-    lv_timer_cb_t timer_cb; /**< Timer function*/
-    void * user_data; /**< Custom user data*/
-    int32_t repeat_count; /**< 1: One time;  -1 : infinity;  n>0: residual times*/
+    uint32_t period;           /**< How often the timer should run */
+    uint32_t last_run;         /**< Last time the timer ran */
+    lv_timer_cb_t timer_cb;    /**< Timer function */
+    void * user_data;          /**< Custom user data */
+    int32_t repeat_count;      /**< 1: One time;  -1 : infinity;  n>0: residual times */
     uint32_t paused : 1;
     uint32_t auto_delete : 1;
 };
 
 typedef struct {
-    lv_ll_t timer_ll; /*Linked list to store the lv_timers*/
+    lv_ll_t timer_ll;          /**< Linked list to store the lv_timers */
 
     bool lv_timer_run;
     uint8_t idle_last;
