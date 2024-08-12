@@ -109,7 +109,7 @@ typedef uint8_t lv_vector_gradient_spread_t;
 typedef uint8_t lv_vector_gradient_style_t;
 #endif /*DOXYGEN*/
 
-struct lv_fpoint_t {
+struct _lv_fpoint_t {
     float x;
     float y;
 };

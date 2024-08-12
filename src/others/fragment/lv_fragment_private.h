@@ -29,7 +29,7 @@ extern "C" {
 /**
  * Fragment states
  */
-struct lv_fragment_managed_states_t  {
+struct _lv_fragment_managed_states_t  {
     /**
      * Class of the fragment
      */

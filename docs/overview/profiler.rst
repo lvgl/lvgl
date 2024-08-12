@@ -254,3 +254,4 @@ If the trace logs are not automatically printed when the buffer is not full, you
 
 1. Reduce the value of :c:macro:`LV_PROFILER_BUILTIN_BUF_SIZE` to fill the buffer more quickly and trigger automatic printing.
 2. Manually call or use a timer to call the :cpp:func:`lv_profiler_builtin_flush` function to force the log output.
+

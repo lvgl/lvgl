@@ -24,7 +24,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_draw_task_t {
+struct _lv_draw_task_t {
     lv_draw_task_t * next;
 
     lv_draw_task_type_t type;
@@ -77,7 +77,7 @@ struct lv_draw_mask_t {
     void * user_data;
 };
 
-struct lv_draw_unit_t {
+struct _lv_draw_unit_t {
     lv_draw_unit_t * next;
 
     /**

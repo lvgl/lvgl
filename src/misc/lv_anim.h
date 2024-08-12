@@ -121,7 +121,7 @@ typedef struct {
 } lv_anim_bezier3_para_t;
 
 /** Describes an animation*/
-struct lv_anim_t {
+struct _lv_anim_t {
     void * var;                               /**<Variable to animate*/
     lv_anim_exec_xcb_t exec_cb;               /**< Function to execute to animate*/
     lv_anim_custom_exec_cb_t custom_exec_cb;  /**< Function to execute to animate,
