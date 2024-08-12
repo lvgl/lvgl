@@ -6,10 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_draw_image_private.h"
 #include "../misc/lv_area_private.h"
 #include "lv_image_decoder_private.h"
 #include "lv_draw_private.h"
-#include "lv_draw_image_private.h"
 #include "../display/lv_display.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_math.h"

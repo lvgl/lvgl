@@ -1,3 +1,4 @@
+#include "lv_indev_private.h"
 #include "../misc/lv_event_private.h"
 #include "../misc/lv_area_private.h"
 #include "../misc/lv_anim_private.h"
@@ -10,7 +11,6 @@
 /*********************
  *      INCLUDES
  ********************/
-#include "lv_indev_private.h"
 #include "lv_indev_scroll.h"
 #include "../display/lv_display_private.h"
 #include "../core/lv_global.h"

@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
+#include "../../lv_conf_internal.h"
 #if LV_USE_LOTTIE
 
 #include "lv_lottie.h"
@@ -27,10 +28,10 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-#ifndef __THORVG_CAPI_H__ /*To avoid redefinition of typedef warning*/
-typedef struct _Tvg_Paint Tvg_Paint;
-typedef struct _Tvg_Canvas Tvg_Canvas;
-typedef struct _Tvg_Animation Tvg_Animation;
+#if LV_USE_THORVG_EXTERNAL
+#include <thorvg_capi.h>
+#else
+#include "../../libs/thorvg/thorvg_capi.h"
 #endif
 
 typedef struct {

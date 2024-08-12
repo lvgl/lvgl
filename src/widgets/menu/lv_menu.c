@@ -6,8 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../core/lv_obj_class_private.h"
 #include "lv_menu_private.h"
+#include "../../core/lv_obj_class_private.h"
 
 #if LV_USE_MENU
 

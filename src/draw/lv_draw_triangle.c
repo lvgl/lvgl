@@ -6,9 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
+
+#include "lv_draw_triangle_private.h"
 #include "lv_draw_private.h"
 #include "../core/lv_obj.h"
-#include "lv_draw_triangle_private.h"
 #include "../misc/lv_math.h"
 #include "../stdlib/lv_mem.h"
 #include "../stdlib/lv_string.h"
