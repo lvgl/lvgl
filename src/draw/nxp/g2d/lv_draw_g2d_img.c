@@ -1,0 +1,180 @@
+/**
+ * @file lv_draw_g2d_img.c
+ *
+ */
+
+/**
+ * Copyright 2024 NXP
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*********************
+ *      INCLUDES
+ *********************/
+
+#include "lv_draw_g2d.h"
+#include <stdlib.h>
+
+#if LV_USE_DRAW_G2D
+#include <math.h>
+#include "g2d.h"
+#include "../../../misc/lv_area_private.h"
+#include "lv_g2d_utils.h"
+
+/*********************
+ *      DEFINES
+ *********************/
+extern void * g2d_handle;
+extern struct g2d_buf * ctx_buf1;
+extern struct g2d_buf * ctx_buf2;
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
+
+/* Blit simple w/ opa and alpha channel */
+static struct g2d_surface _g2d_set_src_surf(struct g2d_buf * buf, const lv_area_t * area, int32_t stride, lv_color_format_t cf, lv_opa_t opa);
+
+static struct g2d_surface _g2d_set_dst_surf(struct g2d_buf * buf, const lv_area_t * area, int32_t stride, lv_color_format_t cf);
+
+static void _g2d_blit(struct g2d_buf * dest_buf, struct g2d_surface dst_surf, struct g2d_buf * src_buf, struct g2d_surface src_surf);
+
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+
+/**********************
+ *      MACROS
+ **********************/
+
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
+
+void lv_draw_g2d_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+{
+    if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
+        return;
+
+    lv_layer_t * layer = draw_unit->target_layer;
+    lv_draw_buf_t * draw_buf = layer->draw_buf;
+    const lv_image_dsc_t * img_dsc = dsc->src;
+
+    lv_area_t rel_coords;
+    lv_area_copy(&rel_coords, coords);
+    lv_area_move(&rel_coords, -layer->buf_area.x1, -layer->buf_area.y1);
+
+    lv_area_t clip_area;
+    lv_area_copy(&clip_area, coords);
+    lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
+
+    lv_area_t blend_area;
+    bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
+    if(has_transform)
+        lv_area_copy(&blend_area, &rel_coords);
+    else if(!lv_area_intersect(&blend_area, &rel_coords, &clip_area))
+        return; /*Fully clipped, nothing to do*/
+
+    lv_area_t src_area;
+    src_area.x1 = blend_area.x1 - (coords->x1 - layer->buf_area.x1);
+    src_area.y1 = blend_area.y1 - (coords->y1 - layer->buf_area.y1);
+    src_area.x2 = src_area.x1 + lv_area_get_width(coords) - 1;
+    src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
+
+    /* G2D takes stride in pixels. */
+    int32_t src_stride = img_dsc->header.stride / (lv_color_format_get_bpp(img_dsc->header.cf) / 8);
+    lv_color_format_t src_cf = img_dsc->header.cf;
+
+    // Workaround for source image
+    struct g2d_buf * src_buf = g2d_alloc(img_dsc->data_size, 1);
+    memcpy((int *)src_buf->buf_vaddr, img_dsc->data, img_dsc->data_size);
+
+    // Workaround for destination buffer
+    struct g2d_buf * dest_buf = (draw_buf->data == ctx_buf1->buf_vaddr) ? ctx_buf1 : ctx_buf2;
+
+    /* G2D takes stride in pixels. */
+    int32_t dest_stride = draw_buf->header.stride / (lv_color_format_get_bpp(draw_buf->header.cf) / 8);
+    lv_color_format_t dest_cf = draw_buf->header.cf;
+
+    struct g2d_surface src_surf = _g2d_set_src_surf(src_buf, &src_area, src_stride, src_cf, dsc->opa);
+    struct g2d_surface dst_surf = _g2d_set_dst_surf(dest_buf, &blend_area, dest_stride, dest_cf);
+
+    _g2d_blit(dest_buf, dst_surf, src_buf, src_surf);
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static struct g2d_surface _g2d_set_src_surf(struct g2d_buf * buf, const lv_area_t * area, int32_t stride, lv_color_format_t cf, lv_opa_t opa)
+{
+    int32_t width  = lv_area_get_width(area);
+    int32_t height = lv_area_get_height(area);
+
+    struct g2d_surface src_surf;
+
+    src_surf.format = g2d_get_buf_format(cf);
+
+    src_surf.left   = area->x1;
+    src_surf.top    = area->y1;
+    src_surf.right  = area->x1 + width;
+    src_surf.bottom = area->y1 + height;
+    src_surf.stride = stride;
+    src_surf.width  = width;
+    src_surf.height = height;
+
+    src_surf.planes[0] = buf->buf_paddr;
+    src_surf.rot = G2D_ROTATION_0;
+
+    src_surf.clrcolor = g2d_rgba_to_u32(lv_color_black());
+    src_surf.global_alpha = opa;
+    src_surf.blendfunc = G2D_ONE | G2D_PRE_MULTIPLIED_ALPHA;
+
+    return src_surf;
+}
+
+static struct g2d_surface _g2d_set_dst_surf(struct g2d_buf * buf, const lv_area_t * area, int32_t stride, lv_color_format_t cf)
+{
+    int32_t width  = lv_area_get_width(area);
+    int32_t height = lv_area_get_height(area);
+
+    struct g2d_surface dst_surf;
+
+    dst_surf.format = g2d_get_buf_format(cf);
+
+    dst_surf.left   = area->x1;
+    dst_surf.top    = area->y1;
+    dst_surf.right  = area->x1 + width;
+    dst_surf.bottom = area->y1 + height;
+    dst_surf.stride = stride;
+    dst_surf.width  = width;
+    dst_surf.height = height;
+
+    dst_surf.planes[0] = buf->buf_paddr;
+    dst_surf.rot = G2D_ROTATION_0;
+
+    dst_surf.clrcolor = g2d_rgba_to_u32(lv_color_black());
+    dst_surf.global_alpha = 0xff;
+    dst_surf.blendfunc = G2D_ONE_MINUS_SRC_ALPHA | G2D_PRE_MULTIPLIED_ALPHA;
+
+    return dst_surf;
+}
+
+static void _g2d_blit(struct g2d_buf * dest_buf, struct g2d_surface dst_surf, struct g2d_buf * src_buf, struct g2d_surface src_surf)
+{
+    g2d_cache_op(src_buf, G2D_CACHE_FLUSH);
+    g2d_cache_op(dest_buf, G2D_CACHE_FLUSH);
+
+    g2d_enable(g2d_handle, G2D_BLEND);
+    g2d_enable(g2d_handle, G2D_GLOBAL_ALPHA);
+    g2d_blit(g2d_handle, &src_surf, &dst_surf);
+    g2d_finish(g2d_handle);
+    g2d_disable(g2d_handle, G2D_GLOBAL_ALPHA);
+    g2d_disable(g2d_handle, G2D_BLEND);
+}
+#endif /*LV_USE_DRAW_G2D*/
