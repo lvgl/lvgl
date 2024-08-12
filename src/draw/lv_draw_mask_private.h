@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 
 #include "lv_draw_mask.h"
+#include "lv_draw.h"
 
 /*********************
  *      DEFINES

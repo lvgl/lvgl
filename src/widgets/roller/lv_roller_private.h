@@ -17,6 +17,7 @@ extern "C" {
 #include "lv_roller.h"
 
 #if LV_USE_ROLLER != 0
+#include "../../core/lv_obj_private.h"
 
 /*********************
  *      DEFINES

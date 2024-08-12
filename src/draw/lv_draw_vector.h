@@ -13,9 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw.h"
 #include "../misc/lv_array.h"
 #include "../misc/lv_matrix.h"
+#include "lv_draw_image.h"
 
 #if LV_USE_VECTOR_GRAPHIC
 

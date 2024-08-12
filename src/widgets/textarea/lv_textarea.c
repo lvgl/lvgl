@@ -6,9 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_textarea_private.h"
 #include "../label/lv_label_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "lv_textarea_private.h"
 #if LV_USE_TEXTAREA != 0
 
 #include "../../core/lv_group.h"

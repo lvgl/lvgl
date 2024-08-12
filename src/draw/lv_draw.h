@@ -245,17 +245,6 @@ void lv_draw_task_get_area(const lv_draw_task_t * t, lv_area_t * area);
  *      MACROS
  **********************/
 
-/**********************
- *   POST INCLUDES
- *********************/
-#include "lv_draw_rect.h"
-#include "lv_draw_label.h"
-#include "lv_draw_image.h"
-#include "lv_draw_arc.h"
-#include "lv_draw_line.h"
-#include "lv_draw_triangle.h"
-#include "lv_draw_mask.h"
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

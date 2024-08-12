@@ -6,11 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_label_private.h"
 #include "../../misc/lv_area_private.h"
 #include "../../misc/lv_anim_private.h"
 #include "../../draw/lv_draw_label_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "lv_label_private.h"
 #if LV_USE_LABEL != 0
 #include "../../core/lv_obj_private.h"
 #include "../../misc/lv_assert.h"

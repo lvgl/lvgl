@@ -6,10 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_obj_private.h"
 #include "../misc/lv_anim_private.h"
 #include "lv_obj_style_private.h"
 #include "lv_obj_class_private.h"
-#include "lv_obj_private.h"
 #include "../display/lv_display.h"
 #include "../display/lv_display_private.h"
 #include "../misc/lv_color.h"

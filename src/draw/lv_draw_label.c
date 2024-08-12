@@ -6,12 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_draw_label_private.h"
+#include "lv_draw_private.h"
 #include "../misc/lv_area_private.h"
 #include "lv_draw_vector_private.h"
 #include "lv_draw_rect_private.h"
-#include "lv_draw_private.h"
 #include "../core/lv_obj.h"
-#include "lv_draw_label_private.h"
 #include "../misc/lv_math.h"
 #include "../core/lv_obj_event.h"
 #include "../misc/lv_bidi_private.h"

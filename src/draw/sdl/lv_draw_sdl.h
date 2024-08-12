@@ -22,6 +22,12 @@ extern "C" {
 #include "../../misc/lv_color.h"
 #include "../../display/lv_display.h"
 #include "../../osal/lv_os.h"
+#include "../../draw/lv_draw_label.h"
+#include "../../draw/lv_draw_rect.h"
+#include "../../draw/lv_draw_arc.h"
+#include "../../draw/lv_draw_image.h"
+#include "../../draw/lv_draw_triangle.h"
+#include "../../draw/lv_draw_line.h"
 
 /*********************
  *      DEFINES

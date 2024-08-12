@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_draw.h"
+#include "lv_draw_rect.h"
 #include "../misc/lv_bidi.h"
 #include "../misc/lv_text.h"
 #include "../misc/lv_color.h"

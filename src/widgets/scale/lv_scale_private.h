@@ -17,6 +17,7 @@ extern "C" {
 #include "lv_scale.h"
 
 #if LV_USE_SCALE != 0
+#include "../../core/lv_obj_private.h"
 
 /*********************
  *      DEFINES
