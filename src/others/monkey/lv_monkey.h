@@ -25,9 +25,9 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct _lv_monkey_t lv_monkey_t;
+typedef struct lv_monkey_t lv_monkey_t;
 
-struct _lv_monkey_config_t {
+struct lv_monkey_config_t {
     /**< Input device type*/
     lv_indev_type_t type;
 

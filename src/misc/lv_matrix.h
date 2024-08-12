@@ -33,7 +33,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_matrix_t {
+struct lv_matrix_t {
     float m[3][3];
 };
 
