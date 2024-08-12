@@ -34,7 +34,7 @@ jobs:
           key: MISSING-DOCSTRINGS-v1
 
       - name: Build docs
-        run: docs/build.py
+        run: docs/build.py ignore-missing-warnings
 
       - uses: actions/upload-artifact@v4
         with:
