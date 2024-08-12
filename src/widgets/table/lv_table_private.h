@@ -17,6 +17,7 @@ extern "C" {
 #include "lv_table.h"
 
 #if LV_USE_TABLE != 0
+#include "../../core/lv_obj_private.h"
 
 /*********************
  *      DEFINES

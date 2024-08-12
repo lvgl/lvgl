@@ -58,10 +58,14 @@ If instead of a numerical value in the major ticks a text is required they can b
 with :cpp:expr:`lv_scale_set_text_src(scale, custom_labels)` using ``NULL`` as the last element, 
 i.e. :cpp:expr:`static char * custom_labels[3] = {"One", "Two", NULL};`.
 
+<strong> NOTE: </strong> The major tick value is calculated with the :cpp:expr:`lv_map` API (when not setting the custom labels),
+this calculation takes into consideration the total tick number and the scale range, so the label drawn can present rounding errors
+when the calculated value is a float number.
+
 The length of the ticks can be configured with the length style property on the :cpp:enumerator:`LV_PART_INDICATOR` 
 for major ticks and :cpp:enumerator:`LV_PART_ITEMS` for minor ticks, for example with local style: 
 :cpp:expr:`lv_obj_set_style_length(scale, 5, LV_PART_INDICATOR);` for major ticks 
-and :cpp:expr:`lv_obj_set_style_length(scale, 5, LV_PART_ITEMS);` for minor ticks.
+and :cpp:expr:`lv_obj_set_style_length(scale, 5, LV_PART_ITEMS);` for minor ticks. 
 
 Sections
 --------

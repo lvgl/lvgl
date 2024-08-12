@@ -6,11 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_arc_private.h"
 #include "../../misc/lv_area_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_event_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "lv_arc_private.h"
 #if LV_USE_ARC != 0
 
 #include "../../core/lv_group.h"

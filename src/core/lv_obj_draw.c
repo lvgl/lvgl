@@ -12,6 +12,7 @@
 #include "../display/lv_display.h"
 #include "../indev/lv_indev.h"
 #include "../stdlib/lv_string.h"
+#include "../draw/lv_draw_arc.h"
 
 /*********************
  *      DEFINES

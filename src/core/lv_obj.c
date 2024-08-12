@@ -6,12 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_obj_private.h"
 #include "../misc/lv_event_private.h"
 #include "../misc/lv_area_private.h"
 #include "lv_obj_style_private.h"
 #include "lv_obj_event_private.h"
 #include "lv_obj_class_private.h"
-#include "lv_obj_private.h"
 #include "../indev/lv_indev.h"
 #include "../indev/lv_indev_private.h"
 #include "lv_refr.h"

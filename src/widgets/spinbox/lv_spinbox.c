@@ -6,8 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../core/lv_obj_class_private.h"
 #include "lv_spinbox_private.h"
+#include "../../core/lv_obj_class_private.h"
 #if LV_USE_SPINBOX
 
 #include "../../misc/lv_assert.h"
