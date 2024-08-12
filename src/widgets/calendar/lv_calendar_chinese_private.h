@@ -30,7 +30,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_calendar_chinese_t {
+struct lv_calendar_chinese_t {
     lv_calendar_date_t today;
     bool leep_month;
 };

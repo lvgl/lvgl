@@ -65,15 +65,15 @@ struct _snippet_stack;
 #endif
 
 #if LV_USE_FREETYPE
-struct _lv_freetype_context_t;
+struct lv_freetype_context_t;
 #endif
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
-struct _lv_profiler_builtin_ctx_t;
+struct lv_profiler_builtin_ctx_t;
 #endif
 
 #if LV_USE_NUTTX
-struct _lv_nuttx_ctx_t;
+struct lv_nuttx_ctx_t;
 #endif
 
 typedef struct _lv_global_t {
@@ -182,7 +182,7 @@ typedef struct _lv_global_t {
 #endif
 
 #if LV_USE_FREETYPE
-    struct _lv_freetype_context_t * ft_context;
+   struct _lv_freetype_context_t * ft_context;
 #endif
 
 #if LV_USE_FONT_COMPRESSED
@@ -194,7 +194,7 @@ typedef struct _lv_global_t {
 #endif
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
-    struct _lv_profiler_builtin_ctx_t * profiler_context;
+   struct _lv_profiler_builtin_ctx_t * profiler_context;
 #endif
 
 #if LV_USE_FILE_EXPLORER != 0
@@ -215,7 +215,7 @@ typedef struct _lv_global_t {
 #endif
 
 #if LV_USE_NUTTX
-    struct _lv_nuttx_ctx_t * nuttx_ctx;
+   struct _lv_nuttx_ctx_t * nuttx_ctx;
 #endif
 
 #if LV_USE_OS != LV_OS_NONE

@@ -28,7 +28,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_draw_image_sup_t {
+struct lv_draw_image_sup_t {
     lv_color_t alpha_color;
     const lv_color32_t * palette;
     uint32_t palette_size   : 9;

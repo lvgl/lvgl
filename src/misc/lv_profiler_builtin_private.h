@@ -29,7 +29,7 @@ extern "C" {
 /**
  * @brief LVGL profiler built-in configuration structure
  */
-struct _lv_profiler_builtin_config_t {
+struct lv_profiler_builtin_config_t {
     size_t buf_size;                    /**< The size of the buffer used for profiling data */
     uint32_t tick_per_sec;              /**< The number of ticks per second */
     uint32_t (*tick_get_cb)(void);      /**< Callback function to get the current tick count */

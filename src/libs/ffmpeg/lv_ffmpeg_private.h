@@ -26,7 +26,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_ffmpeg_player_t {
+struct lv_ffmpeg_player_t {
     lv_image_t img;
     lv_timer_t * timer;
     lv_image_dsc_t imgdsc;

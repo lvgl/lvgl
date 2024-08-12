@@ -28,7 +28,7 @@ extern "C" {
  **********************/
 
 /*Data of canvas*/
-struct _lv_file_explorer_t {
+struct lv_file_explorer_t {
     lv_obj_t obj;
     lv_obj_t * cont;
     lv_obj_t * head_area;

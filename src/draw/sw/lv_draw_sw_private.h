@@ -31,7 +31,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_draw_sw_unit_t {
+struct lv_draw_sw_unit_t {
     lv_draw_unit_t base_unit;
     lv_draw_task_t * task_act;
 #if LV_USE_OS

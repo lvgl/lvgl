@@ -26,7 +26,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_grad_t {
+struct lv_grad_t {
     lv_color_t   *  color_map;
     lv_opa_t   *  opa_map;
     uint32_t size;

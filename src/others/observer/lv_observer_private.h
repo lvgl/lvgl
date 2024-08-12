@@ -29,7 +29,7 @@ extern "C" {
 /**
  * The observer object: a descriptor returned when subscribing LVGL widgets to subjects
  */
-struct _lv_observer_t {
+struct lv_observer_t {
     lv_subject_t * subject;             /**< The observed value */
     lv_observer_cb_t cb;                /**< Callback that should be called when the value changes*/
     void * target;                      /**< A target for the observer, e.g. a widget or style*/
