@@ -1007,7 +1007,7 @@
     /** Maximum length of path */
     #define LV_FILE_EXPLORER_PATH_MAX_LEN        (128)
     /** Quick access bar, 1:use, 0:do not use.
-    /*  - Requires: lv_list */
+     *  - Requires: lv_list */
     #define LV_FILE_EXPLORER_QUICK_ACCESS        1
 #endif
 

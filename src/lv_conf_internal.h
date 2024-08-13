@@ -3122,7 +3122,7 @@
         #endif
     #endif
     /** Quick access bar, 1:use, 0:do not use.
-    /*  - Requires: lv_list */
+     *  - Requires: lv_list */
     #ifndef LV_FILE_EXPLORER_QUICK_ACCESS
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_FILE_EXPLORER_QUICK_ACCESS
