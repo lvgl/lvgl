@@ -1570,7 +1570,7 @@ void indev_gesture(lv_indev_t * indev)
         lv_obj_send_event(gesture_obj, LV_EVENT_GESTURE, indev_act);
         if(indev_reset_check(indev)) return;
 
-        lv_indev_send_event(indev_act, LV_EVENT_LONG_PRESSED, gesture_obj);
+        lv_indev_send_event(indev_act, LV_EVENT_GESTURE, gesture_obj);
         if(indev_reset_check(indev_act)) return;
     }
 }
