@@ -193,8 +193,7 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
 
                 if(layer_drawn->draw_buf) {
                     int32_t h = lv_area_get_height(&layer_drawn->buf_area);
-                    int32_t w = lv_area_get_width(&layer_drawn->buf_area);
-                    uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, layer_drawn->color_format);
+                    uint32_t layer_size_byte = h * layer_drawn->draw_buf->header.stride;
 
                     _draw_info.used_memory_for_layers_kb -= get_layer_size_kb(layer_size_byte);
                     LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB\n", _draw_info.used_memory_for_layers_kb);
