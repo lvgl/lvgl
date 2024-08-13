@@ -122,7 +122,7 @@ See in [widgets](https://github.com/lvgl/lvgl/tree/master/demos/widgets) folder.
 For running this demo properly, please make sure **LV_MEM_SIZE** is at least **38KB** (and **48KB** is recommended):
 
 ```c
-#define LV_MEME_SIZE    (38ul * 1024ul)
+#define LV_MEM_SIZE    (38ul * 1024ul)
 ```
 
 
