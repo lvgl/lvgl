@@ -5251,7 +5251,7 @@ static void decodeGeneric(unsigned char ** out, unsigned * w, unsigned * h,
             if(state->error) break;
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
         }
-        else /*it's not an implemented chunk type, so ignore it: skip over the data*/ {
+        else { /*it's not an implemented chunk type, so ignore it: skip over the data*/
             /*error: unknown critical chunk (5th bit of first byte of chunk type is 0)*/
             if(!state->decoder.ignore_critical && !lodepng_chunk_ancillary(chunk)) {
                 CERROR_BREAK(state->error, 69);
