@@ -130,7 +130,7 @@ if __name__ == '__main__':
 
     targets = [
         MacroReplacer(['lv_version.h']),
-        CmakeReplacer(['env_support', 'cmake', 'custom.cmake']),
+        CmakeReplacer(['env_support', 'cmake', 'version.cmake']),
         PrefixReplacer(['lv_conf_template.h'], 'Configuration file for v'),
     ]
 
