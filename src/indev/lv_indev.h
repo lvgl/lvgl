@@ -209,7 +209,7 @@ bool lv_indev_get_press_moved(const lv_indev_t * indev);
 void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj);
 
 /**
- * Stop processing input device events
+ * Touch and key related events are sent to the input device first and to the widget after that. If this functions called in an indev event, the event won't be sent to the widget. 
  * @param indev pointer to an input device
  */
 void lv_indev_stop_processing(lv_indev_t * indev);
