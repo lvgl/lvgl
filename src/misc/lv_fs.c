@@ -524,8 +524,10 @@ static resolved_path_t lv_fs_resolve_path(const char * path)
 # else /*Lean rules for backward compatibility*/
     resolved.drive_letter = path[0];
 
-    path++; /*Ignore the driver letter*/
-    if(*path == ':') path++;
+    if(*path != '\0') {
+        path++; /*Ignore the driver letter*/
+        if(*path == ':') path++;
+    }
 
     resolved.real_path = path;
 #endif
