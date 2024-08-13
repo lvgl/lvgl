@@ -987,7 +987,7 @@
 #define LV_USE_IME_PINYIN 0
 #if LV_USE_IME_PINYIN
     /** 1: Use default thesaurus.
-    /*  @note  If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesaurus. */
+     *  @note  If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesaurus. */
     #define LV_IME_PINYIN_USE_DEFAULT_DICT 1
     /** Set maximum number of candidate panels that can be displayed.
      *  @note  This needs to be adjusted according to size of screen. */

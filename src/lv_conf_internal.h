@@ -3058,7 +3058,7 @@
 #endif
 #if LV_USE_IME_PINYIN
     /** 1: Use default thesaurus.
-    /*  @note  If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesaurus. */
+     *  @note  If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesaurus. */
     #ifndef LV_IME_PINYIN_USE_DEFAULT_DICT
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_IME_PINYIN_USE_DEFAULT_DICT
