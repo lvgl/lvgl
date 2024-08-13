@@ -654,8 +654,8 @@ static void rotate90_argb8888(const uint32_t * src, uint32_t * dst, int32_t src_
 #if LV_DRAW_SW_SUPPORT_RGB888
 
 static void rotate90_rgb888(const uint8_t * src, uint8_t * dst, int32_t src_width, int32_t src_height,
-                             int32_t src_stride,
-                             int32_t dst_stride)
+                            int32_t src_stride,
+                            int32_t dst_stride)
 {
     if(LV_RESULT_OK == LV_DRAW_SW_ROTATE90_RGB888(src, dst, src_width, src_height, src_stride, dst_stride)) {
         return ;
@@ -691,7 +691,7 @@ static void rotate180_rgb888(const uint8_t * src, uint8_t * dst, int32_t width, 
 }
 
 static void rotate270_rgb888(const uint8_t * src, uint8_t * dst, int32_t width, int32_t height, int32_t src_stride,
-                            int32_t dst_stride)
+                             int32_t dst_stride)
 {
     if(LV_RESULT_OK == LV_DRAW_SW_ROTATE270_RGB888(src, dst, src_width, src_height, src_stride, dst_stride)) {
         return ;
