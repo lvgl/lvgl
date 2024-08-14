@@ -91,7 +91,12 @@ static lv_cache_compare_res_t sdl_texture_cache_compare_cb(const cache_data_t * 
         return lhs_dsc_size > rhs_dsc_size ? 1 : -1;
     }
 
-    int cmp_res = memcmp(lhs->draw_dsc, rhs->draw_dsc, lhs->draw_dsc->dsc_size);
+    uint8_t * left_draw_dsc = lhs->draw_dsc;
+    uint8_t * right_draw_dsc = rhs->draw_dsc;
+    left_draw_dsc += sizeof(lv_draw_dsc_base_t);
+    right_draw_dsc += sizeof(lv_draw_dsc_base_t);
+
+    int cmp_res = memcmp(left_draw_dsc, right_draw_dsc, lhs->draw_dsc->dsc_size - sizeof(lv_draw_dsc_base_t));
 
     if(cmp_res != 0) {
         return cmp_res > 0 ? 1 : -1;
@@ -189,7 +194,6 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
     dest_layer.buf_area = task->_real_area;
     dest_layer._clip_area = task->_real_area;
     lv_memzero(sdl_render_buf, lv_area_get_size(&dest_layer.buf_area) * 4);
-
     lv_display_t * disp = lv_refr_get_disp_refreshing();
 
     lv_obj_t * obj = ((lv_draw_dsc_base_t *)task->draw_dsc)->obj;
@@ -350,6 +354,7 @@ static void blend_texture_layer(lv_draw_sdl_unit_t * u)
 
     SDL_Point center = {draw_dsc->pivot.x, draw_dsc->pivot.y};
     SDL_RenderCopyEx(renderer, src_texture, NULL, &rect, draw_dsc->rotation / 10, &center, SDL_FLIP_NONE);
+    //    SDL_RenderCopy(renderer, src_texture, NULL, &rect);
 
     SDL_DestroyTexture(src_texture);
     SDL_RenderSetClipRect(renderer, NULL);
@@ -371,10 +376,23 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
     void * user_data_saved = data_to_find.draw_dsc->user_data;
     data_to_find.draw_dsc->user_data = NULL;
 
+    /*img_dsc->image_area is an absolute coordinate so it's different
+     *for the same image on a different position. So make it relative before using for cache. */
+    if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
+        lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)data_to_find.draw_dsc;
+        lv_area_move(&img_dsc->image_area, -t->area.x1, -t->area.y1);
+    }
+
     lv_cache_entry_t * entry_cached = lv_cache_acquire_or_create(u->texture_cache, &data_to_find, u);
+    if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
+        lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)data_to_find.draw_dsc;
+        lv_area_move(&img_dsc->image_area, t->area.x1, t->area.y1);
+    }
+
     if(!entry_cached) {
         return;
     }
+
 
     data_to_find.draw_dsc->user_data = user_data_saved;
 
@@ -424,35 +442,29 @@ static void execute_drawing(lv_draw_sdl_unit_t * u)
         if(fill_dsc->radius == 0 && fill_dsc->grad.dir == LV_GRAD_DIR_NONE) {
             SDL_Rect rect;
             lv_layer_t * layer = u->base_unit.target_layer;
-            rect.x = t->area.x1 - layer->buf_area.x1;
-            rect.y = t->area.y1 - layer->buf_area.y1;
-            rect.w = lv_area_get_width(&t->area);
-            rect.h = lv_area_get_height(&t->area);
+            lv_area_t fill_area = t->area;
+            _lv_area_intersect(&fill_area, &fill_area, u->base_unit.clip_area);
 
+            rect.x = fill_area.x1 - layer->buf_area.x1;
+            rect.y = fill_area.y1 - layer->buf_area.y1;
+            rect.w = lv_area_get_width(&fill_area);
+            rect.h = lv_area_get_height(&fill_area);
             lv_display_t * disp = _lv_refr_get_disp_refreshing();
             SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
             SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
             SDL_SetRenderDrawColor(renderer, fill_dsc->color.red, fill_dsc->color.green, fill_dsc->color.blue, fill_dsc->opa);
-
-            SDL_Rect clip_rect;
-            clip_rect.x = u->base_unit.clip_area->x1 - layer->buf_area.x1;
-            clip_rect.y = u->base_unit.clip_area->y1 - layer->buf_area.y1;
-            clip_rect.w = lv_area_get_width(u->base_unit.clip_area);
-            clip_rect.h = lv_area_get_height(u->base_unit.clip_area);
-
-            SDL_RenderSetClipRect(renderer, &clip_rect);
-            SDL_RenderFillRect(renderer, &rect);
             SDL_RenderSetClipRect(renderer, NULL);
+            SDL_RenderFillRect(renderer, &rect);
             return;
         }
     }
 
     if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
         blend_texture_layer(u);
+        return;
     }
-    else {
-        draw_from_cached_texture(u);
-    }
+
+    draw_from_cached_texture(u);
 }
 
 static SDL_Texture * layer_get_texture(lv_layer_t * layer)
