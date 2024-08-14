@@ -15,6 +15,7 @@
 #include "../../stdlib/lv_string.h"
 #include "../../drivers/sdl/lv_sdl_window.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
+#include "../../misc/lv_area_private.h"
 
 /*********************
  *      DEFINES
@@ -91,8 +92,8 @@ static lv_cache_compare_res_t sdl_texture_cache_compare_cb(const cache_data_t * 
         return lhs_dsc_size > rhs_dsc_size ? 1 : -1;
     }
 
-    uint8_t * left_draw_dsc = lhs->draw_dsc;
-    uint8_t * right_draw_dsc = rhs->draw_dsc;
+    const uint8_t * left_draw_dsc = (const uint8_t *)lhs->draw_dsc;
+    const uint8_t * right_draw_dsc = (const uint8_t *)rhs->draw_dsc;
     left_draw_dsc += sizeof(lv_draw_dsc_base_t);
     right_draw_dsc += sizeof(lv_draw_dsc_base_t);
 
@@ -443,13 +444,13 @@ static void execute_drawing(lv_draw_sdl_unit_t * u)
             SDL_Rect rect;
             lv_layer_t * layer = u->base_unit.target_layer;
             lv_area_t fill_area = t->area;
-            _lv_area_intersect(&fill_area, &fill_area, u->base_unit.clip_area);
+            lv_area_intersect(&fill_area, &fill_area, u->base_unit.clip_area);
 
             rect.x = fill_area.x1 - layer->buf_area.x1;
             rect.y = fill_area.y1 - layer->buf_area.y1;
             rect.w = lv_area_get_width(&fill_area);
             rect.h = lv_area_get_height(&fill_area);
-            lv_display_t * disp = _lv_refr_get_disp_refreshing();
+            lv_display_t * disp = lv_refr_get_disp_refreshing();
             SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
             SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
             SDL_SetRenderDrawColor(renderer, fill_dsc->color.red, fill_dsc->color.green, fill_dsc->color.blue, fill_dsc->opa);
