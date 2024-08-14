@@ -4,7 +4,7 @@
 FreeType support
 ================
 
-Interface to FreeType library to generate font bitmaps run time.
+Interface to FreeType library to generate font bitmap at run time.
 
 Detailed introduction: https://www.freetype.org
 
@@ -89,14 +89,18 @@ software, and can be set with reference to the following values:
 They can be combined.eg:
 :cpp:expr:`LV_FREETYPE_FONT_STYLE_BOLD | LV_FREETYPE_FONT_STYLE_ITALIC`.
 
+The FreeType extension also supports colored bitmap glyphs such as emojis. Note
+that only bitmaps are supported at this time. Colored vector graphics cannot be
+rendered. An example on how to draw a colored bitmap glyph is shown below.
+
 Use the :cpp:func:`lv_freetype_font_create` function to create a font. To
 delete a font, use :cpp:func:`lv_freetype_font_delete`. For more detailed usage,
 please refer to example code.
 
 .. _freetype_example:
 
-Example
--------
+Examples
+--------
 
 .. include:: ../examples/libs/freetype/index.rst
 
