@@ -30,9 +30,10 @@
 /* Traverse the list to delete the objects marked for deletion */
 static void cleanup_event_list(lv_event_list_t * list);
 
-inline static void event_mark_deleting(lv_event_list_t * list, lv_event_dsc_t * dsc);
-inline static bool event_is_marked_deleting(lv_event_dsc_t * dsc);
-inline static lv_array_t * event_array(lv_event_list_t * list);
+static inline void event_mark_deleting(lv_event_list_t * list, lv_event_dsc_t * dsc);
+static inline bool event_is_marked_deleting(lv_event_dsc_t * dsc);
+static inline uint32_t event_array_size(lv_event_list_t * list);
+static inline lv_event_dsc_t ** event_array_at(lv_event_list_t * list, uint32_t index);
 
 /**********************
  *  STATIC VARIABLES
@@ -76,9 +77,9 @@ lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preproces
     list->is_traversing = true;
 
     uint32_t i = 0;
-    uint32_t size = lv_array_size(event_array(list));
+    uint32_t size = event_array_size(list);
     for(i = 0; i < size; i++) {
-        lv_event_dsc_t * dsc = *(lv_event_dsc_t **)lv_array_at(event_array(list), i);
+        lv_event_dsc_t * dsc = *(lv_event_dsc_t **)event_array_at(list, i);
         if(dsc->cb == NULL) continue;
         if(event_is_marked_deleting(dsc)) continue;
         bool is_preprocessed = (dsc->filter & LV_EVENT_PREPROCESS) != 0;
@@ -113,12 +114,12 @@ lv_event_dsc_t * lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event
     dsc->filter = filter;
     dsc->user_data = user_data;
 
-    if(lv_array_size(event_array(list)) == 0) {
+    if(event_array_size(list) == 0) {
         /*event list hasn't been initialized.*/
-        lv_array_init(event_array(list), 1, sizeof(lv_event_dsc_t *));
+        lv_array_init(&list->array, 1, sizeof(lv_event_dsc_t *));
     }
 
-    lv_array_push_back(event_array(list), &dsc);
+    lv_array_push_back(&list->array, &dsc);
     return dsc;
 }
 
@@ -127,9 +128,9 @@ bool lv_event_remove_dsc(lv_event_list_t * list, lv_event_dsc_t * dsc)
     LV_ASSERT_NULL(list);
     LV_ASSERT_NULL(dsc);
 
-    int size = lv_array_size(event_array(list));
-    lv_event_dsc_t ** events = lv_array_front(event_array(list));
+    int size = event_array_size(list);
     for(int i = 0; i < size; i++) {
+        lv_event_dsc_t ** events = event_array_at(list, i);
         if(events[i] == dsc) {
             event_mark_deleting(list, events[i]);
             cleanup_event_list(list);
@@ -143,14 +144,14 @@ bool lv_event_remove_dsc(lv_event_list_t * list, lv_event_dsc_t * dsc)
 uint32_t lv_event_get_count(lv_event_list_t * list)
 {
     LV_ASSERT_NULL(list);
-    return lv_array_size(event_array(list));
+    return event_array_size(list);
 }
 
 lv_event_dsc_t * lv_event_get_dsc(lv_event_list_t * list, uint32_t index)
 {
     LV_ASSERT_NULL(list);
     lv_event_dsc_t ** dsc;
-    dsc = lv_array_at(event_array(list), index);
+    dsc = event_array_at(list, index);
     return dsc ? *dsc : NULL;
 }
 
@@ -180,10 +181,9 @@ bool lv_event_remove(lv_event_list_t * list, uint32_t index)
 void lv_event_remove_all(lv_event_list_t * list)
 {
     LV_ASSERT_NULL(list);
-    int size = lv_array_size(event_array(list));
-    lv_event_dsc_t ** dsc = lv_array_front(event_array(list));
+    int size = event_array_size(list);
     for(int i = 0; i < size; i++)
-        event_mark_deleting(list, dsc[i]);
+        event_mark_deleting(list, *event_array_at(list, i));
     cleanup_event_list(list);
 }
 
@@ -247,11 +247,11 @@ static void cleanup_event_list(lv_event_list_t * list)
     if(list->is_traversing) return;
     if(list->has_marked_deleting == false) return;
 
-    uint32_t size = lv_array_size(event_array(list));
+    uint32_t size = event_array_size(list);
     uint32_t kept_count = 0;
     for(uint32_t i = 0; i < size; i++) {
-        lv_event_dsc_t ** dsc_i = lv_array_at(event_array(list), i);
-        lv_event_dsc_t ** dsc_kept = lv_array_at(event_array(list), kept_count);
+        lv_event_dsc_t ** dsc_i = event_array_at(list, i);
+        lv_event_dsc_t ** dsc_kept = event_array_at(list, kept_count);
         if(event_is_marked_deleting(*dsc_i) == false) {
             *dsc_kept = *dsc_i;
             kept_count++;
@@ -259,22 +259,26 @@ static void cleanup_event_list(lv_event_list_t * list)
         else lv_free(*dsc_i);
     }
 
-    if(kept_count == 0) lv_array_deinit(event_array(list));
-    else lv_array_resize(event_array(list), kept_count);
+    if(kept_count == 0) lv_array_deinit(&list->array);
+    else lv_array_resize(&list->array, kept_count);
 
     list->has_marked_deleting = false;
 }
 
-inline static void event_mark_deleting(lv_event_list_t * list, lv_event_dsc_t * dsc)
+static inline void event_mark_deleting(lv_event_list_t * list, lv_event_dsc_t * dsc)
 {
     list->has_marked_deleting = true;
     dsc->filter |= LV_EVENT_MARKED_DELETING;
 }
-inline static bool event_is_marked_deleting(lv_event_dsc_t * dsc)
+static inline bool event_is_marked_deleting(lv_event_dsc_t * dsc)
 {
     return (dsc->filter & LV_EVENT_MARKED_DELETING) != 0;
 }
-inline static lv_array_t * event_array(lv_event_list_t * list)
+static inline uint32_t event_array_size(lv_event_list_t * list)
 {
-    return &(list)->array;
+    return lv_array_size(&list->array);
+}
+static inline lv_event_dsc_t ** event_array_at(lv_event_list_t * list, uint32_t index)
+{
+    return (lv_event_dsc_t **)lv_array_at(&list->array, index);
 }
