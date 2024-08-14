@@ -3060,7 +3060,7 @@
         #endif
     #endif
     #ifndef LV_SDL_ACCELERATED
-        #ifdef _LV_KCONFIG_PRESENT
+        #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_SDL_ACCELERATED
                 #define LV_SDL_ACCELERATED CONFIG_LV_SDL_ACCELERATED
             #else

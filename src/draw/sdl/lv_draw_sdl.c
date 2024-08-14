@@ -97,7 +97,7 @@ static lv_cache_compare_res_t sdl_texture_cache_compare_cb(const cache_data_t * 
     left_draw_dsc += sizeof(lv_draw_dsc_base_t);
     right_draw_dsc += sizeof(lv_draw_dsc_base_t);
 
-    int cmp_res = memcmp(left_draw_dsc, right_draw_dsc, lhs->draw_dsc->dsc_size - sizeof(lv_draw_dsc_base_t));
+    int cmp_res = lv_memcmp(left_draw_dsc, right_draw_dsc, lhs->draw_dsc->dsc_size - sizeof(lv_draw_dsc_base_t));
 
     if(cmp_res != 0) {
         return cmp_res > 0 ? 1 : -1;
