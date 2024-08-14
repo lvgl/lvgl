@@ -136,7 +136,18 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
     FT_Face face = dsc->cache_node->face;
     FT_UInt glyph_index = FT_Get_Char_Index(face, data->unicode);
 
-    FT_Set_Pixel_Sizes(face, 0, dsc->size);
+    if(FT_IS_SCALABLE(face)) {
+        error = FT_Set_Pixel_Sizes(face, 0, dsc->size);
+    }
+    else {
+        LV_LOG_WARN("font is not scalable, selecting available size\n");
+        error = FT_Select_Size(face, 0);
+    }
+    if(error) {
+        FT_ERROR_MSG("FT_Set_Pixel_Sizes", error);
+        lv_mutex_unlock(&dsc->cache_node->face_lock);
+        return false;
+    }
     error = FT_Load_Glyph(face, glyph_index,  FT_LOAD_COMPUTE_METRICS | FT_LOAD_NO_BITMAP | FT_LOAD_NO_AUTOHINT);
     if(error) {
         FT_ERROR_MSG("FT_Load_Glyph", error);

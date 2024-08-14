@@ -127,7 +127,18 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
     lv_mutex_lock(&dsc->cache_node->face_lock);
 
     FT_Face face = dsc->cache_node->face;
-    FT_Set_Pixel_Sizes(face, 0, dsc->size);
+    if(FT_IS_SCALABLE(face)) {
+        error = FT_Set_Pixel_Sizes(face, 0, dsc->size);
+    }
+    else {
+        LV_LOG_WARN("font is not scalable, selecting available size\n");
+        error = FT_Select_Size(face, 0);
+    }
+    if(error) {
+        FT_ERROR_MSG("FT_Set_Pixel_Sizes", error);
+        lv_mutex_unlock(&dsc->cache_node->face_lock);
+        return false;
+    }
     error = FT_Load_Glyph(face, data->glyph_index,  FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL | FT_LOAD_NO_AUTOHINT);
     if(error) {
         FT_ERROR_MSG("FT_Load_Glyph", error);
