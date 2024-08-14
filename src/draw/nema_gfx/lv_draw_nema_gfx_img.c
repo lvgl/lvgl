@@ -47,25 +47,9 @@ static void _draw_nema_gfx_tile(lv_draw_unit_t * draw_unit, const lv_draw_image_
 
 static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
-static uint32_t skip_pallete(lv_color_format_t cf);
-
 /**********************
  *  STATIC FUNCTIONS
  **********************/
-
-static uint32_t skip_pallete(lv_color_format_t cf)
-{
-    switch(cf) {
-        case LV_COLOR_FORMAT_I1:
-            return 2;
-        case LV_COLOR_FORMAT_I2:
-            return 4;
-        case LV_COLOR_FORMAT_I4:
-            return 16;
-        case LV_COLOR_FORMAT_I8:
-            return 256;
-    }
-}
 
 static uint32_t lv_cf_to_nema(lv_color_format_t cf)
 {
