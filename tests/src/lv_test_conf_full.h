@@ -1,3 +1,6 @@
+#ifndef LV_TEST_CONF_FULL_H
+#define LV_TEST_CONF_FULL_H
+
 #define LV_MEM_SIZE                     (32 * 1024 * 1024)
 #define LV_DRAW_SW_SHADOW_CACHE_SIZE    8
 #define LV_DRAW_THREAD_STACK_SIZE    (64 * 1024) /*Increase stack size to 64KB in order to run ThorVG*/
@@ -147,3 +150,5 @@
 #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 10
 
 #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS    1
+
+#endif /* LV_TEST_CONF_FULL_H */

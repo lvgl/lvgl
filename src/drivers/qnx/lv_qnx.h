@@ -3,8 +3,8 @@
  * @brief   LVGL driver for the QNX Screen compositing window manager
  */
 
-#ifndef LV_QNX_DISP_H
-#define LV_QNX_DISP_H
+#ifndef LV_QNX_H
+#define LV_QNX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -83,4 +83,4 @@ int lv_qnx_event_loop(lv_display_t * disp);
 } /* extern "C" */
 #endif
 
-#endif /* LV_QNX_DISP_H */
+#endif /* LV_QNX_H */

@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_FONT_LOADER_H
-#define LV_FONT_LOADER_H
+#ifndef LV_BINFONT_LOADER_H
+#define LV_BINFONT_LOADER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,4 +58,4 @@ void lv_binfont_destroy(lv_font_t * font);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_FONT_LOADER_H*/
+#endif /* LV_BINFONT_LOADER_H */
