@@ -176,13 +176,13 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     lv_draw_buf_t * adjusted = lv_image_decoder_post_process(dsc, decoded);
     if(adjusted == NULL) {
-        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
+        lv_draw_buf_destroy(decoded);
         return LV_RESULT_INVALID;
     }
 
     /*The adjusted draw buffer is newly allocated.*/
     if(adjusted != decoded) {
-        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
+        lv_draw_buf_destroy(decoded);
         decoded = adjusted;
     }
 
@@ -220,7 +220,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
     LV_UNUSED(decoder);
 
     if(dsc->args.no_cache ||
-       !lv_image_cache_is_enabled()) lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, (lv_draw_buf_t *)dsc->decoded);
+       !lv_image_cache_is_enabled()) lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
 }
 
 static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_size)
