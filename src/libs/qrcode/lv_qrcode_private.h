@@ -28,7 +28,7 @@ extern "C" {
  **********************/
 
 /*Data of qrcode*/
-struct lv_qrcode_t {
+struct _lv_qrcode_t {
     lv_canvas_t canvas;
     lv_color_t dark_color;
     lv_color_t light_color;

@@ -26,9 +26,9 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_vg_lite_path_t;
+struct _lv_vg_lite_path_t;
 
-struct lv_draw_vg_lite_unit_t;
+struct _lv_draw_vg_lite_unit_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -38,13 +38,13 @@ struct lv_draw_vg_lite_unit_t;
  * Initialize the stroke module
  * @param unit pointer to the unit
  */
-void lv_vg_lite_stroke_init(struct lv_draw_vg_lite_unit_t * unit, uint32_t cache_cnt);
+void lv_vg_lite_stroke_init(struct _lv_draw_vg_lite_unit_t * unit, uint32_t cache_cnt);
 
 /**
  * Deinitialize the stroke module
  * @param unit pointer to the unit
  */
-void lv_vg_lite_stroke_deinit(struct lv_draw_vg_lite_unit_t * unit);
+void lv_vg_lite_stroke_deinit(struct _lv_draw_vg_lite_unit_t * unit);
 
 /**
  * Get the stroke cache entry
@@ -53,8 +53,8 @@ void lv_vg_lite_stroke_deinit(struct lv_draw_vg_lite_unit_t * unit);
  * @param dsc pointer to the stroke descriptor
  * @return pointer to the stroke cache entry
  */
-lv_cache_entry_t * lv_vg_lite_stroke_get(struct lv_draw_vg_lite_unit_t * unit,
-                                         struct lv_vg_lite_path_t * path,
+lv_cache_entry_t * lv_vg_lite_stroke_get(struct _lv_draw_vg_lite_unit_t * unit,
+                                         struct _lv_vg_lite_path_t * path,
                                          const lv_vector_stroke_dsc_t * dsc);
 
 /**
@@ -62,14 +62,14 @@ lv_cache_entry_t * lv_vg_lite_stroke_get(struct lv_draw_vg_lite_unit_t * unit,
  * @param cache_entry pointer to the stroke cache entry
  * @return pointer to the path
  */
-struct lv_vg_lite_path_t * lv_vg_lite_stroke_get_path(lv_cache_entry_t * cache_entry);
+struct _lv_vg_lite_path_t * lv_vg_lite_stroke_get_path(lv_cache_entry_t * cache_entry);
 
 /**
  * Drop the stroke cache entry
  * @param unit pointer to the unit
  * @param stroke pointer to the stroke
  */
-void lv_vg_lite_stroke_drop(struct lv_draw_vg_lite_unit_t * unit, lv_cache_entry_t * cache_entry);
+void lv_vg_lite_stroke_drop(struct _lv_draw_vg_lite_unit_t * unit, lv_cache_entry_t * cache_entry);
 
 /**********************
  *      MACROS

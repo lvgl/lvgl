@@ -24,13 +24,13 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_event_dsc_t {
+struct _lv_event_dsc_t {
     lv_event_cb_t cb;
     void * user_data;
     uint32_t filter;
 };
 
-struct lv_event_t {
+struct _lv_event_t {
     void * current_target;
     void * original_target;
     lv_event_code_t code;

@@ -24,14 +24,14 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_obj_style_t {
+struct _lv_obj_style_t {
     const lv_style_t * style;
     uint32_t selector : 24;
     uint32_t is_local : 1;
     uint32_t is_trans : 1;
 };
 
-struct lv_obj_style_transition_dsc_t {
+struct _lv_obj_style_transition_dsc_t {
     uint16_t time;
     uint16_t delay;
     lv_style_selector_t selector;

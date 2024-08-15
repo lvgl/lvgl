@@ -39,7 +39,7 @@
  * Data format for compressed image data.
  */
 
-typedef struct lv_image_compressed_t {
+typedef struct _lv_image_compressed_t {
     uint32_t method: 4; /*Compression method, see `lv_image_compress_t`*/
     uint32_t reserved : 28;  /*Reserved to be used later*/
     uint32_t compressed_size;  /*Compressed data size in byte*/

@@ -85,7 +85,7 @@ typedef enum {
 } lv_font_kerning_t;
 
 /** Describe the properties of a font*/
-struct lv_font_t {
+struct _lv_font_t {
     /** Get a glyph's descriptor from a font*/
     bool (*get_glyph_dsc)(const lv_font_t *, lv_font_glyph_dsc_t *, uint32_t letter, uint32_t letter_next);
 

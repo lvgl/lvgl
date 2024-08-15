@@ -24,7 +24,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_draw_buf_handlers_t {
+struct _lv_draw_buf_handlers_t {
     lv_draw_buf_malloc_cb buf_malloc_cb;
     lv_draw_buf_free_cb buf_free_cb;
     lv_draw_buf_align_cb align_pointer_cb;
