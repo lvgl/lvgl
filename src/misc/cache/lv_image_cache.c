@@ -137,7 +137,7 @@ static void image_cache_free_cb(lv_image_cache_data_t * entry, void * user_data)
     /* Destroy the decoded draw buffer if necessary. */
     lv_draw_buf_t * decoded = (lv_draw_buf_t *)entry->decoded;
     if(lv_draw_buf_has_flag(decoded, LV_IMAGE_FLAGS_ALLOCATED)) {
-        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
+        lv_draw_buf_destroy(decoded);
     }
 
     /*Free the duplicated file name*/

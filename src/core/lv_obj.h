@@ -375,6 +375,14 @@ const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj);
  */
 bool lv_obj_is_valid(const lv_obj_t * obj);
 
+/**
+ * Utility to set an object reference to NULL when it gets deleted.
+ * The reference should be in a location that will not become invalid
+ * during the object's lifetime, i.e. static or allocated.
+ * @param obj_ptr   a pointer to a pointer to an object
+ */
+void lv_obj_null_on_delete(lv_obj_t ** obj_ptr);
+
 #if LV_USE_OBJ_ID
 /**
  * Set an id for an object.

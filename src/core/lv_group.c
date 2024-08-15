@@ -377,6 +377,20 @@ uint32_t lv_group_get_obj_count(lv_group_t * group)
     return lv_ll_get_len(&group->obj_ll);
 }
 
+lv_obj_t * lv_group_get_obj_by_index(lv_group_t * group, uint32_t index)
+{
+    uint32_t len = 0;
+    lv_obj_t ** obj;
+
+    LV_LL_READ(&group->obj_ll, obj) {
+        if(len == index) {
+            return *obj;
+        }
+        len++;
+    }
+    return NULL;
+}
+
 uint32_t lv_group_get_count(void)
 {
     return lv_ll_get_len(group_ll_p);
@@ -385,11 +399,11 @@ uint32_t lv_group_get_count(void)
 lv_group_t  * lv_group_by_index(uint32_t index)
 {
     uint32_t len = 0;
-    void * node;
+    lv_group_t * group;
 
-    for(node = lv_ll_get_tail(group_ll_p); node != NULL; node = lv_ll_get_prev(group_ll_p, node)) {
+    LV_LL_READ_BACK(group_ll_p, group) {
         if(len == index) {
-            return (lv_group_t *) node;
+            return group;
         }
         len++;
     }

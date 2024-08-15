@@ -50,6 +50,7 @@ static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer);
 static lv_result_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void update_obj_state(lv_obj_t * obj, lv_state_t new_state);
+static void null_on_delete_cb(lv_event_t * e);
 
 #if LV_USE_OBJ_PROPERTY
     static lv_result_t lv_obj_set_any(lv_obj_t *, lv_prop_id_t, const lv_property_t *);
@@ -424,6 +425,11 @@ bool lv_obj_is_valid(const lv_obj_t * obj)
     }
 
     return false;
+}
+
+void lv_obj_null_on_delete(lv_obj_t ** obj_ptr)
+{
+    lv_obj_add_event_cb(*obj_ptr, null_on_delete_cb, LV_EVENT_DELETE, obj_ptr);
 }
 
 #if LV_USE_OBJ_ID
@@ -986,6 +992,12 @@ static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_fin
         }
     }
     return false;
+}
+
+static void null_on_delete_cb(lv_event_t * e)
+{
+    lv_obj_t ** obj_ptr = lv_event_get_user_data(e);
+    *obj_ptr = NULL;
 }
 
 #if LV_USE_OBJ_PROPERTY
