@@ -3,8 +3,8 @@
  * This file exists only to be compatible with Arduino's library structure
  */
 
-#ifndef LVGL_H
-#define LVGL_H
+#ifndef LVGL_SRC_H
+#define LVGL_SRC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,4 +36,4 @@ extern "C" {
 } /*extern "C"*/
 #endif
 
-#endif /*LVGL_H*/
+#endif /* LVGL_SRC_H */
