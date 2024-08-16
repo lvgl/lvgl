@@ -427,6 +427,12 @@ menu "LVGL configuration"
 			select LV_USE_MATRIX
 			help
 				Enable drawing support vector graphic APIs.
+
+		config LV_USE_DRAW_DMA2D
+			bool "Use DMA2D on the supporting STM32 platforms"
+			default n
+			help
+				Accelerate blends, fills, image decoding, etc. with STM32 DMA2D.
 	endmenu
 
 	menu "Feature Configuration"

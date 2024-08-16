@@ -55,6 +55,9 @@
 #if LV_USE_DRAW_VG_LITE
     #include "draw/vg_lite/lv_draw_vg_lite.h"
 #endif
+#if LV_USE_DRAW_DMA2D
+    #include "draw/dma2d/lv_draw_dma2d.h"
+#endif
 #if LV_USE_WINDOWS
     #include "drivers/windows/lv_windows_context.h"
 #endif
@@ -208,6 +211,10 @@ void lv_init(void)
 
 #if LV_USE_DRAW_SDL
     lv_draw_sdl_init();
+#endif
+
+#if LV_USE_DRAW_DMA2D
+    lv_draw_dma2d_init();
 #endif
 
 #if LV_USE_WINDOWS
@@ -395,6 +402,10 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_VG_LITE
     lv_draw_vg_lite_deinit();
+#endif
+
+#if LV_USE_DRAW_DMA2D
+    lv_draw_dma2d_deinit();
 #endif
 
 #if LV_USE_DRAW_SW

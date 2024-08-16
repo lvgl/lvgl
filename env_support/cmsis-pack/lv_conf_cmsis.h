@@ -196,6 +196,9 @@
 
 #endif
 
+/* Accelerate blends, fills, etc. with STM32 DMA2D */
+#define LV_USE_DRAW_DMA2D 0
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
