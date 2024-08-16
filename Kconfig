@@ -433,6 +433,15 @@ menu "LVGL configuration"
 			default n
 			help
 				Accelerate blends, fills, image decoding, etc. with STM32 DMA2D.
+
+		config LV_USE_DRAW_DMA2D_INTERRUPT
+			int "use the DMA2D transfer complete interrupt"
+			default n
+			depends on LV_USE_DRAW_DMA2D
+			help
+				if enabled, the user is required to call
+				`lv_draw_dma2d_transfer_complete_interrupt_handler`
+				upon receving the DMA2D global interrupt
 	endmenu
 
 	menu "Feature Configuration"

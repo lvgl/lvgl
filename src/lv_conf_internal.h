@@ -701,12 +701,23 @@
     #endif
 #endif
 
+#endif
+
 /* Accelerate blends, fills, etc. with STM32 DMA2D */
 #ifndef LV_USE_DRAW_DMA2D
     #ifdef CONFIG_LV_USE_DRAW_DMA2D
         #define LV_USE_DRAW_DMA2D CONFIG_LV_USE_DRAW_DMA2D
     #else
         #define LV_USE_DRAW_DMA2D 0
+    #endif
+#endif
+
+#if LV_USE_DRAW_DMA2D
+#ifndef LV_USE_DRAW_DMA2D_INTERRUPT
+    #ifdef CONFIG_LV_USE_DRAW_DMA2D_INTERRUPT
+        #define LV_USE_DRAW_DMA2D_INTERRUPT CONFIG_LV_USE_DRAW_DMA2D_INTERRUPT
+    #else
+        #define LV_USE_DRAW_DMA2D_INTERRUPT 0
     #endif
 #endif
 
