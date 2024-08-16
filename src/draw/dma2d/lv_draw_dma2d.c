@@ -65,7 +65,7 @@ typedef struct {
     uint32_t w;
     uint32_t h;
 
-    void * ouput_address;
+    void * output_address;
     uint32_t output_offset;
     lv_draw_dma2d_output_cf_t output_cf;
 
@@ -109,14 +109,16 @@ typedef struct {
 static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t delete_cb(lv_draw_unit_t * draw_unit);
-static void opaque_fill(void * first_pixel, int32_t w, int32_t h, int32_t stride, lv_color_t color, lv_color_format_t cf, lv_draw_dma2d_unit_t * u);
-static void fill(void * first_pixel, int32_t w, int32_t h, int32_t stride, lv_color_t color, lv_color_format_t cf, lv_opa_t opa, lv_draw_dma2d_unit_t * u);
+static void opaque_fill(void * first_pixel, int32_t w, int32_t h, int32_t stride, lv_color_t color,
+                        lv_color_format_t cf, lv_draw_dma2d_unit_t * u);
+static void fill(void * first_pixel, int32_t w, int32_t h, int32_t stride, lv_color_t color, lv_color_format_t cf,
+                 lv_opa_t opa, lv_draw_dma2d_unit_t * u);
 static void configure_and_start_transfer(const lv_draw_dma2d_configuration_t * conf, lv_draw_dma2d_unit_t * u);
 #if LV_USE_OS
-static void thread_cb(void * arg);
+    static void thread_cb(void * arg);
 #endif
 #if !LV_USE_DRAW_DMA2D_INTERRUPT
-static void await_transfer_completion(void);
+    static void await_transfer_completion(void);
 #endif
 static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
 static void invalidate_cache(const lv_draw_dma2d_cache_area_t * mem_area);
@@ -127,7 +129,7 @@ static void clean_cache(const lv_draw_dma2d_cache_area_t * mem_area);
  **********************/
 
 #if LV_USE_OS || LV_USE_DRAW_DMA2D_INTERRUPT
-static lv_draw_dma2d_unit_t * g_unit;
+    static lv_draw_dma2d_unit_t * g_unit;
 #endif
 
 /**********************
@@ -224,12 +226,12 @@ static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     switch(task->type) {
         case LV_DRAW_TASK_TYPE_FILL: {
                 lv_draw_fill_dsc_t * dsc = task->draw_dsc;
-                if( ! (dsc->radius == 0
-                       && dsc->grad.dir == LV_GRAD_DIR_NONE
-                       && (dsc->base.layer->color_format == LV_COLOR_FORMAT_ARGB8888
-                           || dsc->base.layer->color_format == LV_COLOR_FORMAT_XRGB8888
-                           || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB888
-                           || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB565))) {
+                if(!(dsc->radius == 0
+                     && dsc->grad.dir == LV_GRAD_DIR_NONE
+                     && (dsc->base.layer->color_format == LV_COLOR_FORMAT_ARGB8888
+                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_XRGB8888
+                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB888
+                         || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB565))) {
                     return 0;
                 }
             }
@@ -301,7 +303,8 @@ static int32_t delete_cb(lv_draw_unit_t * draw_unit)
     return 0;
 }
 
-static void opaque_fill(void * first_pixel, int32_t w, int32_t h, int32_t stride, lv_color_t color, lv_color_format_t cf, lv_draw_dma2d_unit_t * u)
+static void opaque_fill(void * first_pixel, int32_t w, int32_t h, int32_t stride, lv_color_t color,
+                        lv_color_format_t cf, lv_draw_dma2d_unit_t * u)
 {
     lv_draw_dma2d_output_cf_t output_cf;
     uint32_t cf_size;
@@ -341,7 +344,7 @@ static void opaque_fill(void * first_pixel, int32_t w, int32_t h, int32_t stride
         .w = w,
         .h = h,
 
-        .ouput_address = first_pixel,
+        .output_address = first_pixel,
         .output_offset = (stride / cf_size) - w,
         .output_cf = output_cf,
 
@@ -350,7 +353,8 @@ static void opaque_fill(void * first_pixel, int32_t w, int32_t h, int32_t stride
     configure_and_start_transfer(&conf, u);
 }
 
-static void fill(void * first_pixel, int32_t w, int32_t h, int32_t stride, lv_color_t color, lv_color_format_t cf, lv_opa_t opa, lv_draw_dma2d_unit_t * u)
+static void fill(void * first_pixel, int32_t w, int32_t h, int32_t stride, lv_color_t color, lv_color_format_t cf,
+                 lv_opa_t opa, lv_draw_dma2d_unit_t * u)
 {
     lv_draw_dma2d_output_cf_t output_cf;
     uint32_t cf_size;
@@ -390,7 +394,7 @@ static void fill(void * first_pixel, int32_t w, int32_t h, int32_t stride, lv_co
         .w = w,
         .h = h,
 
-        .ouput_address = first_pixel,
+        .output_address = first_pixel,
         .output_offset = output_offset,
         .output_cf = output_cf,
 
@@ -413,7 +417,7 @@ static void configure_and_start_transfer(const lv_draw_dma2d_configuration_t * c
     /* output */
 
     /* output memory address register */
-    DMA2D->OMAR = (uint32_t)(uintptr_t) conf->ouput_address;
+    DMA2D->OMAR = (uint32_t)(uintptr_t) conf->output_address;
     /* output offset register */
     DMA2D->OOR = conf->output_offset;
     /* output pixel format converter control register */
@@ -504,7 +508,8 @@ static void invalidate_cache(const lv_draw_dma2d_cache_area_t * mem_area)
 
     while(rows_remaining) {
         uint32_t addr = row_addr & ~(__SCB_DCACHE_LINE_SIZE - 1U);
-        uint32_t cache_lines = ((((row_addr + mem_area->width_bytes - 1) & ~(__SCB_DCACHE_LINE_SIZE - 1U)) - addr) / __SCB_DCACHE_LINE_SIZE) + 1;
+        uint32_t cache_lines = ((((row_addr + mem_area->width_bytes - 1) & ~(__SCB_DCACHE_LINE_SIZE - 1U)) - addr) /
+                                __SCB_DCACHE_LINE_SIZE) + 1;
 
         if(addr == row_end_addr) {
             addr += __SCB_DCACHE_LINE_SIZE;
@@ -538,7 +543,8 @@ static void clean_cache(const lv_draw_dma2d_cache_area_t * mem_area)
 
     while(rows_remaining) {
         uint32_t addr = row_addr & ~(__SCB_DCACHE_LINE_SIZE - 1U);
-        uint32_t cache_lines = ((((row_addr + mem_area->width_bytes - 1) & ~(__SCB_DCACHE_LINE_SIZE - 1U)) - addr) / __SCB_DCACHE_LINE_SIZE) + 1;
+        uint32_t cache_lines = ((((row_addr + mem_area->width_bytes - 1) & ~(__SCB_DCACHE_LINE_SIZE - 1U)) - addr) /
+                                __SCB_DCACHE_LINE_SIZE) + 1;
 
         if(addr == row_end_addr) {
             addr += __SCB_DCACHE_LINE_SIZE;

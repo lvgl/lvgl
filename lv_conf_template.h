@@ -247,7 +247,7 @@
 
 #if LV_USE_DRAW_DMA2D
     /* if enabled, the user is required to call `lv_draw_dma2d_transfer_complete_interrupt_handler`
-     * upon receving the DMA2D global interrupt
+     * upon receiving the DMA2D global interrupt
      */
     #define LV_USE_DRAW_DMA2D_INTERRUPT 0
 #endif

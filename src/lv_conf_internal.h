@@ -713,14 +713,16 @@
 #endif
 
 #if LV_USE_DRAW_DMA2D
-#ifndef LV_USE_DRAW_DMA2D_INTERRUPT
-    #ifdef CONFIG_LV_USE_DRAW_DMA2D_INTERRUPT
-        #define LV_USE_DRAW_DMA2D_INTERRUPT CONFIG_LV_USE_DRAW_DMA2D_INTERRUPT
-    #else
-        #define LV_USE_DRAW_DMA2D_INTERRUPT 0
+    /* if enabled, the user is required to call `lv_draw_dma2d_transfer_complete_interrupt_handler`
+     * upon receiving the DMA2D global interrupt
+     */
+    #ifndef LV_USE_DRAW_DMA2D_INTERRUPT
+        #ifdef CONFIG_LV_USE_DRAW_DMA2D_INTERRUPT
+            #define LV_USE_DRAW_DMA2D_INTERRUPT CONFIG_LV_USE_DRAW_DMA2D_INTERRUPT
+        #else
+            #define LV_USE_DRAW_DMA2D_INTERRUPT 0
+        #endif
     #endif
-#endif
-
 #endif
 
 /*=======================
