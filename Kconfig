@@ -1689,7 +1689,7 @@ menu "LVGL configuration"
 			default n
 
 		config LV_USE_LIBINPUT
-    		bool "Use libinput input driver"
+			bool "Use libinput input driver"
 			default n
 
 		config LV_LIBINPUT_BSD
