@@ -594,10 +594,9 @@
 /*==================
  * WIDGETS
  *================*/
+/* Documentation for widgets can be found here: https://docs.lvgl.io/latest/en/html/widgets/index.html . */
 
-/* Documentation of widgets can be found here: https://docs.lvgl.io/latest/en/html/widgets/index.html . */
-
-/** 1: Cause these widgets to be given default values at creation time.
+/** 1: Causes these widgets to be given default values at creation time.
  *  - lv_buttonmatrix_t:  Get default maps:  {"Btn1", "Btn2", "Btn3", "\n", "Btn4", "Btn5", ""}, else map not set.
  *  - lv_checkbox_t    :  String label set to "Check box", else set to empty string.
  *  - lv_dropdown_t    :  Options set to "Option 1", "Option 2", "Option 3", else no values are set.
@@ -606,22 +605,16 @@
  * */
 #define LV_WIDGETS_HAS_DEFAULT_VALUE  1
 
-/** Include ./src/widgets/lv_animimage* logic in compile. */
 #define LV_USE_ANIMIMG    1
 
-/** Include ./src/widgets/lv_arc* logic in compile. */
 #define LV_USE_ARC        1
 
-/** Include ./src/widgets/lv_bar* logic in compile. */
 #define LV_USE_BAR        1
 
-/** Include ./src/widgets/lv_button* logic in compile. */
 #define LV_USE_BUTTON        1
 
-/** Include ./src/widgets/lv_buttonmatrix* logic in compile. */
 #define LV_USE_BUTTONMATRIX  1
 
-/** Include ./src/widgets/lv_calendar* logic in compile. */
 #define LV_USE_CALENDAR   1
 #if LV_USE_CALENDAR
     #define LV_CALENDAR_WEEK_STARTS_MONDAY 0
@@ -637,28 +630,20 @@
     #define LV_USE_CALENDAR_CHINESE 0
 #endif  /*LV_USE_CALENDAR*/
 
-/** Include ./src/widgets/lv_canvas* logic in compile. */
 #define LV_USE_CANVAS     1
 
-/** Include ./src/widgets/lv_chart* logic in compile. */
 #define LV_USE_CHART      1
 
-/** Include ./src/widgets/lv_checkbox* logic in compile. */
 #define LV_USE_CHECKBOX   1
 
-/** Include ./src/widgets/lv_dropdown* logic in compile. */
 #define LV_USE_DROPDOWN   1   /**< Requires: lv_label */
 
-/** Include ./src/widgets/lv_image* logic in compile. */
 #define LV_USE_IMAGE      1   /**< Requires: lv_label */
 
-/** Include ./src/widgets/lv_imagebutton* logic in compile. */
 #define LV_USE_IMAGEBUTTON     1
 
-/** Include ./src/widgets/lv_keyboard* logic in compile. */
 #define LV_USE_KEYBOARD   1
 
-/** Include ./src/widgets/lv_label* logic in compile. */
 #define LV_USE_LABEL      1
 #if LV_USE_LABEL
     #define LV_LABEL_TEXT_SELECTION 1   /**< Enable selecting text of the label */
@@ -666,70 +651,53 @@
     #define LV_LABEL_WAIT_CHAR_COUNT 3  /**< The count of wait chart */
 #endif
 
-/** Include ./src/widgets/lv_led* logic in compile. */
 #define LV_USE_LED        1
 
-/** Include ./src/widgets/lv_line* logic in compile. */
 #define LV_USE_LINE       1
 
-/** Include ./src/widgets/lv_list* logic in compile. */
 #define LV_USE_LIST       1
 
-/** Include ./src/widgets/lv_lottie* logic in compile. */
 #define LV_USE_LOTTIE     0  /**< Requires: lv_canvas, thorvg */
 
-/** Include ./src/widgets/lv_menu* logic in compile. */
 #define LV_USE_MENU       1
 
-/** Include ./src/widgets/lv_msgbox* logic in compile. */
 #define LV_USE_MSGBOX     1
 
-/** Include ./src/widgets/lv_roller* logic in compile. */
 #define LV_USE_ROLLER     1   /**< Requires: lv_label */
 
-/** Include ./src/widgets/lv_scale* logic in compile. */
 #define LV_USE_SCALE      1
 
-/** Include ./src/widgets/lv_slider* logic in compile. */
 #define LV_USE_SLIDER     1   /**< Requires: lv_bar */
 
-/** Include ./src/widgets/lv_span* logic in compile. */
 #define LV_USE_SPAN       1
 #if LV_USE_SPAN
     /** A line of text can contain this maximum number of span descriptors. */
     #define LV_SPAN_SNIPPET_STACK_SIZE 64
 #endif
 
-/** Include ./src/widgets/lv_spinbox* logic in compile. */
 #define LV_USE_SPINBOX    1
 
-/** Include ./src/widgets/lv_spinner* logic in compile. */
 #define LV_USE_SPINNER    1
 
-/** Include ./src/widgets/lv_switch* logic in compile. */
 #define LV_USE_SWITCH     1
 
-/** Include ./src/widgets/lv_table* logic in compile. */
 #define LV_USE_TABLE      1
 
-/** Include ./src/widgets/lv_tabview* logic in compile. */
 #define LV_USE_TABVIEW    1
 
-/** Include ./src/widgets/lv_textarea* logic in compile. */
 #define LV_USE_TEXTAREA   1   /**< Requires: lv_label */
 #if LV_USE_TEXTAREA != 0
     #define LV_TEXTAREA_DEF_PWD_SHOW_TIME 1500    /**< [ms] */
 #endif
 
-/** Include ./src/widgets/lv_tileview* logic in compile. */
 #define LV_USE_TILEVIEW   1
 
-/** Include ./src/widgets/lv_win* logic in compile. */
 #define LV_USE_WIN        1
 
 /*==================
  * THEMES
  *==================*/
+/* Documentation for themes can be found here: https://docs.lvgl.io/master/overview/style.html#themes . */
 
 /** A simple, impressive and very complete theme */
 #define LV_USE_THEME_DEFAULT 1
@@ -753,6 +721,7 @@
 /*==================
  * LAYOUTS
  *==================*/
+/* Documentation for layouts can be found here: https://docs.lvgl.io/master/layouts/index.html . */
 
 /** A layout similar to Flexbox in CSS. */
 #define LV_USE_FLEX 1
@@ -763,6 +732,7 @@
 /*====================
  * 3RD PARTS LIBRARIES
  *====================*/
+/* Documentation for libraries can be found here: https://docs.lvgl.io/master/libs/index.html . */
 
 /* File system interfaces for common APIs */
 
@@ -912,6 +882,7 @@
 /*==================
  * OTHERS
  *==================*/
+/* Documentation for several of the below items can be found here: https://docs.lvgl.io/master/others/index.html . */
 
 /** 1: Enable API to take snapshot for object */
 #define LV_USE_SNAPSHOT 0
@@ -973,7 +944,7 @@
 /** 1: Enable grid navigation */
 #define LV_USE_GRIDNAV 0
 
-/** 1: Enable `lv_obj` fragment logic (@see  https://docs.lvgl.io/master/others/fragment.html ) */
+/** 1: Enable `lv_obj` fragment logic */
 #define LV_USE_FRAGMENT 0
 
 /** 1: Support using images as font in label or span widgets */

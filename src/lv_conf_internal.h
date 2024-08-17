@@ -1733,10 +1733,9 @@
 /*==================
  * WIDGETS
  *================*/
+/* Documentation for widgets can be found here: https://docs.lvgl.io/latest/en/html/widgets/index.html . */
 
-/* Documentation of widgets can be found here: https://docs.lvgl.io/latest/en/html/widgets/index.html . */
-
-/** 1: Cause these widgets to be given default values at creation time.
+/** 1: Causes these widgets to be given default values at creation time.
  *  - lv_buttonmatrix_t:  Get default maps:  {"Btn1", "Btn2", "Btn3", "\n", "Btn4", "Btn5", ""}, else map not set.
  *  - lv_checkbox_t    :  String label set to "Check box", else set to empty string.
  *  - lv_dropdown_t    :  Options set to "Option 1", "Option 2", "Option 3", else no values are set.
@@ -1755,7 +1754,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_animimage* logic in compile. */
 #ifndef LV_USE_ANIMIMG
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_ANIMIMG
@@ -1768,7 +1766,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_arc* logic in compile. */
 #ifndef LV_USE_ARC
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_ARC
@@ -1781,7 +1778,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_bar* logic in compile. */
 #ifndef LV_USE_BAR
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_BAR
@@ -1794,7 +1790,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_button* logic in compile. */
 #ifndef LV_USE_BUTTON
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_BUTTON
@@ -1807,7 +1802,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_buttonmatrix* logic in compile. */
 #ifndef LV_USE_BUTTONMATRIX
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_BUTTONMATRIX
@@ -1820,7 +1814,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_calendar* logic in compile. */
 #ifndef LV_USE_CALENDAR
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_CALENDAR
@@ -1896,7 +1889,6 @@
     #endif
 #endif  /*LV_USE_CALENDAR*/
 
-/** Include ./src/widgets/lv_canvas* logic in compile. */
 #ifndef LV_USE_CANVAS
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_CANVAS
@@ -1909,7 +1901,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_chart* logic in compile. */
 #ifndef LV_USE_CHART
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_CHART
@@ -1922,7 +1913,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_checkbox* logic in compile. */
 #ifndef LV_USE_CHECKBOX
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_CHECKBOX
@@ -1935,7 +1925,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_dropdown* logic in compile. */
 #ifndef LV_USE_DROPDOWN
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_DROPDOWN
@@ -1948,7 +1937,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_image* logic in compile. */
 #ifndef LV_USE_IMAGE
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_IMAGE
@@ -1961,7 +1949,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_imagebutton* logic in compile. */
 #ifndef LV_USE_IMAGEBUTTON
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_IMAGEBUTTON
@@ -1974,7 +1961,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_keyboard* logic in compile. */
 #ifndef LV_USE_KEYBOARD
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_KEYBOARD
@@ -1987,7 +1973,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_label* logic in compile. */
 #ifndef LV_USE_LABEL
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_LABEL
@@ -2031,7 +2016,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_led* logic in compile. */
 #ifndef LV_USE_LED
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_LED
@@ -2044,7 +2028,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_line* logic in compile. */
 #ifndef LV_USE_LINE
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_LINE
@@ -2057,7 +2040,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_list* logic in compile. */
 #ifndef LV_USE_LIST
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_LIST
@@ -2070,7 +2052,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_lottie* logic in compile. */
 #ifndef LV_USE_LOTTIE
     #ifdef CONFIG_LV_USE_LOTTIE
         #define LV_USE_LOTTIE CONFIG_LV_USE_LOTTIE
@@ -2079,7 +2060,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_menu* logic in compile. */
 #ifndef LV_USE_MENU
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_MENU
@@ -2092,7 +2072,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_msgbox* logic in compile. */
 #ifndef LV_USE_MSGBOX
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_MSGBOX
@@ -2105,7 +2084,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_roller* logic in compile. */
 #ifndef LV_USE_ROLLER
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_ROLLER
@@ -2118,7 +2096,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_scale* logic in compile. */
 #ifndef LV_USE_SCALE
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_SCALE
@@ -2131,7 +2108,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_slider* logic in compile. */
 #ifndef LV_USE_SLIDER
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_SLIDER
@@ -2144,7 +2120,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_span* logic in compile. */
 #ifndef LV_USE_SPAN
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_SPAN
@@ -2167,7 +2142,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_spinbox* logic in compile. */
 #ifndef LV_USE_SPINBOX
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_SPINBOX
@@ -2180,7 +2154,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_spinner* logic in compile. */
 #ifndef LV_USE_SPINNER
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_SPINNER
@@ -2193,7 +2166,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_switch* logic in compile. */
 #ifndef LV_USE_SWITCH
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_SWITCH
@@ -2206,7 +2178,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_table* logic in compile. */
 #ifndef LV_USE_TABLE
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_TABLE
@@ -2219,7 +2190,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_tabview* logic in compile. */
 #ifndef LV_USE_TABVIEW
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_TABVIEW
@@ -2232,7 +2202,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_textarea* logic in compile. */
 #ifndef LV_USE_TEXTAREA
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_TEXTAREA
@@ -2254,7 +2223,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_tileview* logic in compile. */
 #ifndef LV_USE_TILEVIEW
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_TILEVIEW
@@ -2267,7 +2235,6 @@
     #endif
 #endif
 
-/** Include ./src/widgets/lv_win* logic in compile. */
 #ifndef LV_USE_WIN
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_WIN
@@ -2283,6 +2250,7 @@
 /*==================
  * THEMES
  *==================*/
+/* Documentation for themes can be found here: https://docs.lvgl.io/master/overview/style.html#themes . */
 
 /** A simple, impressive and very complete theme */
 #ifndef LV_USE_THEME_DEFAULT
@@ -2358,6 +2326,7 @@
 /*==================
  * LAYOUTS
  *==================*/
+/* Documentation for layouts can be found here: https://docs.lvgl.io/master/layouts/index.html . */
 
 /** A layout similar to Flexbox in CSS. */
 #ifndef LV_USE_FLEX
@@ -2388,6 +2357,7 @@
 /*====================
  * 3RD PARTS LIBRARIES
  *====================*/
+/* Documentation for libraries can be found here: https://docs.lvgl.io/master/libs/index.html . */
 
 /* File system interfaces for common APIs */
 
@@ -2843,6 +2813,7 @@
 /*==================
  * OTHERS
  *==================*/
+/* Documentation for several of the below items can be found here: https://docs.lvgl.io/master/others/index.html . */
 
 /** 1: Enable API to take snapshot for object */
 #ifndef LV_USE_SNAPSHOT
@@ -3016,7 +2987,7 @@
     #endif
 #endif
 
-/** 1: Enable `lv_obj` fragment logic (@see  https://docs.lvgl.io/master/others/fragment.html ) */
+/** 1: Enable `lv_obj` fragment logic */
 #ifndef LV_USE_FRAGMENT
     #ifdef CONFIG_LV_USE_FRAGMENT
         #define LV_USE_FRAGMENT CONFIG_LV_USE_FRAGMENT
