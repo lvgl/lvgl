@@ -355,30 +355,31 @@ lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * pxCond)
 
 void lv_freertos_task_switch_in(const char * name)
 {
-    if(lv_strcmp(name, "IDLE")) globals->os_idle_task_running = false;
-    else globals->os_idle_task_running = true;
+    if(lv_strcmp(name, "IDLE")) globals->freertos_idle_task_running = false;
+    else globals->freertos_idle_task_running = true;
 
-    globals->os_task_switch_timestamp = lv_tick_get();
+    globals->freertos_task_switch_timestamp = lv_tick_get();
 }
 
 void lv_freertos_task_switch_out(void)
 {
-    uint32_t elaps = lv_tick_elaps(globals->os_task_switch_timestamp);
-    if(globals->os_idle_task_running) globals->os_idle_time_sum += elaps;
-    else globals->os_non_idle_time_sum += elaps;
+    uint32_t elaps = lv_tick_elaps(globals->freertos_task_switch_timestamp);
+    if(globals->freertos_idle_task_running) globals->freertos_idle_time_sum += elaps;
+    else globals->freertos_non_idle_time_sum += elaps;
 }
 
 uint32_t lv_os_get_idle_percent(void)
 {
-    if(globals->os_non_idle_time_sum + globals->os_idle_time_sum == 0) {
+    if(globals->freertos_non_idle_time_sum + globals->freertos_idle_time_sum == 0) {
         LV_LOG_WARN("Not enough time elapsed to provide idle percentage");
         return 0;
     }
 
-    uint32_t pct = (globals->os_idle_time_sum * 100) / (globals->os_idle_time_sum + globals->os_non_idle_time_sum);
+    uint32_t pct = (globals->freertos_idle_time_sum * 100) / (globals->freertos_idle_time_sum +
+                                                              globals->freertos_non_idle_time_sum);
 
-    globals->os_non_idle_time_sum = 0;
-    globals->os_idle_time_sum = 0;
+    globals->freertos_non_idle_time_sum = 0;
+    globals->freertos_idle_time_sum = 0;
 
     return pct;
 }

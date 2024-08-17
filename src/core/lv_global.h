@@ -212,10 +212,10 @@ typedef struct _lv_global_t {
 #endif
 
 #if LV_USE_OS == LV_OS_FREERTOS
-    uint32_t os_idle_time_sum;
-    uint32_t os_non_idle_time_sum;
-    uint32_t os_task_switch_timestamp;
-    bool os_idle_task_running;
+    uint32_t freertos_idle_time_sum;
+    uint32_t freertos_non_idle_time_sum;
+    uint32_t freertos_task_switch_timestamp;
+    bool freertos_idle_task_running;
 #endif
 
 
