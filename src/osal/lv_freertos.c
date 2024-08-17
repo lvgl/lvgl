@@ -179,8 +179,8 @@ lv_result_t lv_mutex_delete(lv_mutex_t * pxMutex)
 lv_result_t lv_thread_sync_init(lv_thread_sync_t * pxCond)
 {
 #if USE_FREERTOS_TASK_NOTIFY
-    /* Store the handle of the calling task. */
-    pxCond->xTaskToNotify = xTaskGetCurrentTaskHandle();
+    pxCond->xTaskToNotify = NULL;
+    pxCond->xSignalSent = pdFALSE;
 #else
     /* If the cond is uninitialized, perform initialization. */
     prvCheckCondInit(pxCond);
@@ -194,10 +194,21 @@ lv_result_t lv_thread_sync_wait(lv_thread_sync_t * pxCond)
     lv_result_t lvRes = LV_RESULT_OK;
 
 #if USE_FREERTOS_TASK_NOTIFY
-    LV_UNUSED(pxCond);
+    TaskHandle_t current_task_handle = xTaskGetCurrentTaskHandle();
 
-    /* Wait for other task to notify this task. */
-    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    _enter_critical();
+    BaseType_t signal_sent = pxCond->xSignalSent;
+    pxCond->xSignalSent = pdFALSE;
+    if(signal_sent == pdFALSE) {
+        /* The signal hasn't been sent yet. Tell the sender to notify this task */
+        pxCond->xTaskToNotify = current_task_handle;
+    }
+    _exit_critical();
+
+    if(signal_sent == pdFALSE) {
+        /* Wait for other task to notify this task. */
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    }
 #else
     uint32_t ulLocalWaitingThreads;
 
@@ -261,8 +272,19 @@ lv_result_t lv_thread_sync_wait(lv_thread_sync_t * pxCond)
 lv_result_t lv_thread_sync_signal(lv_thread_sync_t * pxCond)
 {
 #if USE_FREERTOS_TASK_NOTIFY
-    /* Send a notification to the task waiting. */
-    xTaskNotifyGive(pxCond->xTaskToNotify);
+    _enter_critical();
+    TaskHandle_t task_to_notify = pxCond->xTaskToNotify;
+    pxCond->xTaskToNotify = NULL;
+    if(task_to_notify == NULL) {
+        /* No task waiting to be notified. Send this signal for later */
+        pxCond->xSignalSent = pdTRUE;
+    }
+    _exit_critical();
+
+    if(task_to_notify != NULL) {
+        /* There is a task waiting. Send a notification to it */
+        xTaskNotifyGive(task_to_notify);
+    }
 #else
     /* If the cond is uninitialized, perform initialization. */
     prvCheckCondInit(pxCond);
@@ -322,9 +344,20 @@ lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * pxCond)
 {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 #if USE_FREERTOS_TASK_NOTIFY
-    /* Send a notification to the task waiting. */
-    vTaskNotifyGiveFromISR(pxCond->xTaskToNotify, &xHigherPriorityTaskWoken);
-    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    _enter_critical();
+    TaskHandle_t task_to_notify = pxCond->xTaskToNotify;
+    pxCond->xTaskToNotify = NULL;
+    if(task_to_notify == NULL) {
+        /* No task waiting to be notified. Send this signal for later */
+        pxCond->xSignalSent = pdTRUE;
+    }
+    _exit_critical();
+
+    if(task_to_notify != NULL) {
+        /* There is a task waiting. Send a notification to it */
+        vTaskNotifyGiveFromISR(task_to_notify, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    }
 #else
     /* If the cond is uninitialized, perform initialization. */
     prvCheckCondInit(pxCond);

@@ -63,6 +63,7 @@ typedef struct {
 typedef struct {
 #if USE_FREERTOS_TASK_NOTIFY
     TaskHandle_t xTaskToNotify;
+    BaseType_t xSignalSent;
 #else
     BaseType_t
     xIsInitialized;                       /**< Set to pdTRUE if this condition variable is initialized, pdFALSE otherwise. */
