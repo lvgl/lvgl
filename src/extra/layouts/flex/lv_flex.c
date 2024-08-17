@@ -293,7 +293,7 @@ static void flex_update(lv_obj_t * cont, void * user_data)
             lv_mem_buf_release(t.grow_dsc);
         }
         t.grow_dsc = NULL;
-        
+
         if(rtl && !f.row) {
             *cross_pos -= gap + track_gap;
         }
