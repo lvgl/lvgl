@@ -423,8 +423,8 @@ lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, void * id);
 void lv_obj_assign_id(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
 /**
- * Free resources allocated by `lv_obj_assign_id`.
- * This function gets called automatically when object is deleted.
+ * Free resources allocated by `lv_obj_assign_id` or `lv_obj_set_id`.
+ * This function is also called automatically when object is deleted.
  * @param obj   pointer to an object
  */
 void lv_obj_free_id(lv_obj_t * obj);

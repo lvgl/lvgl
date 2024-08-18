@@ -436,6 +436,7 @@ void lv_obj_null_on_delete(lv_obj_t ** obj_ptr)
 void lv_obj_set_id(lv_obj_t * obj, void * id)
 {
     LV_ASSERT_NULL(obj);
+    if(obj->id) lv_obj_free_id(obj);
     obj->id = id;
 }
 
