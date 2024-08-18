@@ -107,7 +107,7 @@ void lv_objid_builtin_destroy(void)
     global->objid_count = 0;
 }
 
-int lv_obj_id_compare(void * id1, void * id2)
+int lv_obj_id_compare(const void * id1, const void * id2)
 {
     return id1 == id2 ? 0 : 1;
 }

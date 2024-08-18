@@ -407,7 +407,7 @@ void * lv_obj_get_id(const lv_obj_t * obj);
  * @param id        the id of the child object
  * @return          pointer to the child object or NULL if not found
  */
-lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, void * id);
+lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, const void * id);
 
 /**
  * Assign id to object if not previously assigned.
@@ -439,7 +439,7 @@ void lv_obj_free_id(lv_obj_t * obj);
  * @param id2: the second id
  * @return     0 if they are equal, non-zero otherwise.
  */
-int lv_obj_id_compare(void * id1, void * id2);
+int lv_obj_id_compare(const void * id1, const void * id2);
 
 /**
  * Format an object's id into a string.

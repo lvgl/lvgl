@@ -446,7 +446,7 @@ void * lv_obj_get_id(const lv_obj_t * obj)
     return obj->id;
 }
 
-lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, void * id)
+lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, const void * id)
 {
     if(obj == NULL) obj = lv_display_get_screen_active(NULL);
     if(obj == NULL) return NULL;
