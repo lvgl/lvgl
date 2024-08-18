@@ -45,18 +45,6 @@ typedef bool (*lv_wayland_display_close_f_t)(lv_display_t * disp);
  **********************/
 
 /**
- * Initializes the wayland client
- * @note must be called after lv_init
- */
-void lv_wayland_init(void);
-
-/**
- * De-Initializes the wayland client
- * @note Must be called on application exit
- */
-void lv_wayland_deinit(void);
-
-/**
  * @brief Retrieves the file descriptor of the wayland socket
  */
 int lv_wayland_get_fd(void);

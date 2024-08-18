@@ -19,6 +19,7 @@ typedef int dummy_t;    /* Make GCC on windows happy, avoid empty translation un
  *      INCLUDES
  *********************/
 #include "lv_wayland.h"
+#include "lv_wayland_private.h"
 #include "lv_wayland_smm.h"
 
 #if LV_USE_WAYLAND
@@ -2821,6 +2822,12 @@ bool lv_wayland_timer_handler(void)
                 LV_LOG_TRACE("Failed to resize window frame: %d",
                              window->frame_counter);
             }
+        }
+        else if(window->shall_close == true) {
+
+            /* Destroy graphical context and execute close_cb */
+            _lv_wayland_handle_output();
+            return false;
         }
     }
 

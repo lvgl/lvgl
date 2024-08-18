@@ -60,7 +60,7 @@
 #endif
 #ifndef _WIN32
     #if LV_USE_WAYLAND
-        #include "drivers/wayland/lv_wayland.h"
+        #include "drivers/wayland/lv_wayland_private.h"
     #endif
 #endif
 
