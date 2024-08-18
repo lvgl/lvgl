@@ -568,6 +568,9 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
 
         const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count - 1, scale->range_min, scale->range_max);
 
+        label_dsc.base.id1 = tick_idx;
+        label_dsc.base.id2 = tick_value;
+
         /* Overwrite label and tick properties if tick value is within section range */
         lv_scale_section_t * section;
         LV_LL_READ_BACK(&scale->section_ll, section) {
