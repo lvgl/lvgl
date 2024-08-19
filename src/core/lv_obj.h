@@ -414,7 +414,7 @@ lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, const void * id);
  * This function gets called automatically when LV_OBJ_ID_AUTO_ASSIGN is enabled.
  *
  * Set `LV_USE_OBJ_ID_BUILTIN` to use the builtin method to generate object ID.
- * Otherwise, these functions including `lv_obj_[assign|free|stringify]_id` and
+ * Otherwise, these functions including `lv_obj_[set|assign|free|stringify]_id` and
  * `lv_obj_id_compare`should be implemented externally.
  *
  * @param class_p   the class this obj belongs to. Note obj->class_p is the class currently being constructed.

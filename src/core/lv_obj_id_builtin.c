@@ -79,6 +79,13 @@ void lv_obj_assign_id(const lv_obj_class_t * class_p, lv_obj_t * obj)
     obj->id = (void *)(lv_uintptr_t)id;
 }
 
+void lv_obj_set_id(lv_obj_t * obj, void * id)
+{
+    LV_ASSERT_NULL(obj);
+    if(obj->id) lv_obj_free_id(obj);
+    obj->id = id;
+}
+
 void lv_obj_free_id(lv_obj_t * obj)
 {
     LV_UNUSED(obj);
