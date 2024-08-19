@@ -1,7 +1,7 @@
 #include "../../lv_examples.h"
 #if LV_USE_SCALE && LV_BUILD_EXAMPLES
 
-#include "lvgl/src/lvgl_private.h" //To expose the fields of lv_draw_task_t
+#include "../../../src/lvgl_private.h" //To expose the fields of lv_draw_task_t
 
 static void draw_event_cb(lv_event_t * e)
 {
