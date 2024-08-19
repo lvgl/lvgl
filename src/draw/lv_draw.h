@@ -3,6 +3,10 @@
  *
  */
 
+/**
+ * Modified by NXP in 2024
+ */
+
 #ifndef LV_DRAW_H
 #define LV_DRAW_H
 
