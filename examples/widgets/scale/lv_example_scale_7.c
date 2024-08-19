@@ -31,16 +31,16 @@ static void draw_event_cb(lv_event_t * e)
             int32_t new_w = size.x;
             int32_t old_w = lv_area_get_width(&draw_task->area);
 
-            // Distribute the new size equally on both sides
+            /* Distribute the new size equally on both sides */
             draw_task->area.x1 -= (new_w - old_w) / 2;
-            draw_task->area.x2 += ((new_w - old_w) + 1) / 2;  // +1 for rounding
+            draw_task->area.x2 += ((new_w - old_w) + 1) / 2;  /* +1 for rounding */
 
         }
     }
 }
 
 /**
- * Customizing scale major tick labels with `LV_EVENT_DRAW_TASK_ADDED` event
+ * Customizing scale major tick label color with `LV_EVENT_DRAW_TASK_ADDED` event
  */
 void lv_example_scale_7(void)
 {
