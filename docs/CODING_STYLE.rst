@@ -67,32 +67,219 @@ Coding guide
 
 Comments
 --------
+Above every function prototype in ``.h`` files that export the public API,
+add a Doxygen-formatted comment like this:
 
-Before every function have in ``.h`` files a comment like this:
-
-.. code:: c
+.. code-block:: c
 
    /**
-    * Return with the screen of an object
-    * @param obj pointer to an object
-    * @return pointer to a screen
+    * Create and add keyboard, mouse and scroll wheel objects and connect them to x11 display.
+    *
+    * This is a convenience method handling the typical input initialisation of an X11 window:
+    * - create keyboard (lv_x11_keyboard_create)
+    * - create mouse (with scroll wheel, lv_x11_mouse_create lv_x11_mousewheel_create)
+    *
+    * @param[in]  disp       X11 display object created from lv_x11_window_create()
+    * @param[in]  mouse_img  optional image description for mouse cursor
+    *                          (NULL for no/invisible mouse cursor)
+    *
+    * @note  Any subtle points a user or maintainer would need to know.
     */
-   lv_obj_t * lv_obj_get_screen(lv_obj_t * obj);
+   void lv_x11_inputs_create(lv_display_t * disp, lv_image_dsc_t const * mouse_img);
 
-Always use ``/*Something*/`` format and NOT ``//Something``
+Separate sections within the comment with a blank line for added readability.
+
+Always use comments like this ``/* Description */`` not ``// Description``.
+
+Include a space after the ``/*`` and before the ``*/`` for added readability.
+
+If you are writing documentation for a code member (like a function, data type
+or macro), use Doxygen comments like this:  ``/** Description */``.  See
+"Doxygen Comment Specifics" section below.
 
 Write readable code to avoid descriptive comments like:
-``x++; /*Add 1 to x*/``. The code should show clearly what you are
+``x++; /* Add 1 to x */``. The code should show clearly what you are
 doing.
 
 You should write **why** have you done this:
-``x++; /*Because of closing '\0' of the string*/``
+``x++; /* Because of closing '\0' of string */``
 
 Short "code summaries" of a few lines are accepted. E.g.
-``/*Calculate the new coordinates*/``
+``/* Calculate new coordinates */``
 
 In comments use \` \` when referring to a variable. E.g.
-:literal:`/\*Update the value of \`x_act`*/`
+:literal:`/\* Update value of \`x_act\` */`
+
+When adding or modifying comments, priorities are (in order of importance):
+
+    1.  clarity (the ease with which other programmers can understand your intention),
+    2.  readability (the ease with which other programmers can read your comments),
+    3.  brevity (the quality of using few words when speaking or writing).
+
+Blank lines within comments are desirable when they improve clarity and readability.
+
+Remember, when you are writing source code, you are not just teaching the computer
+what to do, but also teaching other programmers how it works, not only users of the
+API, but also for future maintainers of your source code.  Comments add information
+about what you were thinking when the code was written, and **why** you did things
+that way -- information that cannot be conveyed by the source code alone.
+
+
+Doxygen Comment Specifics
+~~~~~~~~~~~~~~~~~~~~~~~~~
+1.  Doxygen is the first program in a data-flow chain that generates the online LVGL
+    API documentation from the files in the LVGL repository.  Doxygen detects comments
+    it should pay attention to by leading ``/**``.  It ignores comments that do not
+    have exactly two '\*'.
+
+    ``/** Description of code member immediately AFTER this comment. */``
+
+    ``/**< Description of code member immediately BEFORE this comment, e.g. struct member. */``
+
+2.  Add 2 spaces after Doxygen commands (they start with '@') for improved readability.
+
+3.  When you want to refer to a function or data type, simply name the function or
+    data type "bare" within the comment.  Use `` around variable names, but leave
+    type names and function names bare.  Append "()" after function names.  Doxygen
+    generates a hyperlink to the function's documentation.
+
+      ``@param[in]  disp     X11 display object created from lv_x11_window_create()``
+
+4.  Always include a brief description of the code member you are documenting.  For
+    documentation that appears *before* the code member, if more detail is needed,
+    include a blank line below the brief description and add the detail below it.
+    (Doxygen needs the blank line to separate the "brief description" from the
+    "additional detail", and it treats it accordingly.  The blank line also improves
+    readability in the source code.)
+
+5.  To document a function's arguments, use the ``@param`` Doxygen command and a
+    "direction" attribute (``[in]``, ``[out]``, or ``[in,out]``), followed by 2
+    spaces and the name of the argument.  (Normally the description of the argument is
+    simply a noun phrase like ``X11 display object created from lv_x11_window_create()``
+    and so it neither needs to be capitalized nor does it need a period at the end.
+    However, when whole sentences are needed in for clarity, please capitalize the
+    first letter and use appropriate punctuation between sentences for clarity.)
+
+6.  Align the beginning of each description for improved readability.  Provide 4
+    spaces after the longest argument name for visual separation (improves readability).
+    If a description of an argument continues on subsequent lines, indent the added
+    lines by an additional 2 spaces to visually distinguish these lines from the
+    beginning of a new argument description, like this:
+
+.. code-block:: c
+
+      /**
+       * Add event handler function for object \`obj\`.
+       *
+       * Used by user code to respond to event when it happens with object \`obj\`.
+       * An object can have multiple event handlers.  They are called in the same order
+       * as they were added.
+       *
+       * @param[in]  obj        pointer to object to which to add event call-back
+       * @param[in]  filter     event code (e.g. \`LV_EVENT_CLICKED\`) indicating which
+       *                            event should be called. \`LV_EVENT_ALL\` can be used
+       *                            to receive all events.
+       * @param[in]  event_cb   address of event call-back function
+       * @param[in]  user_data  custom data to be made available to call-back function
+       *                            in ``e->user_data`` field.
+       *
+       * @return  handle to event (can be used in lv_obj_remove_event_dsc()).
+       */
+      lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
+
+7.  Alternately (for an unusually long list of arguments, especially if the descriptions
+    are long), add a blank line between arguments for added readability like this:
+
+.. code-block:: c
+
+      /**
+       * Add event handler function for object \`obj\`.
+       *
+       * Used by user code to respond to event when it happens with object \`obj\`.
+       * An object can have multiple event handlers.  They are called in the same order
+       * as they were added.
+       *
+       * @param[in]  obj        pointer to object to which to add event call-back
+       *
+       * @param[in]  filter     event code (e.g. \`LV_EVENT_CLICKED\`) indicating which
+       *                            event should be called. \`LV_EVENT_ALL\` can be used
+       *                            to receive all events.
+       *
+       * @param[in]  event_cb   address of event call-back function
+       *
+       * @param[in]  user_data  custom data to be made available to call-back function
+       *                            in ``e->user_data`` field.
+       *
+       * @return  handle to event (can be used in lv_obj_remove_event_dsc()).
+       */
+      lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
+
+8.  If you include a list of example values for an argument, do so by creating an
+    unordered list using '-', like this:
+
+.. code-block:: c
+
+      /**
+       * Set color format of display.
+       *
+       * @param[in]  disp          pointer to display object
+       * @param[in]  color_format  Possible values are:
+       *                               - LV_COLOR_FORMAT_RGB565
+       *                               - LV_COLOR_FORMAT_RGB888
+       *                               - LV_COLOR_FORMAT_XRGB888
+       *                               - LV_COLOR_FORMAT_ARGB888
+       *
+       * @note  To change the endianness of rendered image in case of RGB565 format
+       *        (i.e. swap the 2 bytes) call lv_draw_sw_rgb565_swap() in the ``flush_cb``
+       *        function.
+       */
+      void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_format);
+
+9.  If a code example will be important to help other programmers better understand
+    how to use a function or data type (improving clarity), include an example using
+    the ``@code`` and ``@endcode`` Doxygen commands like this:
+
+.. code-block:: c
+
+      /**
+       * Create X11 display.
+       *
+       * The minimal initialisation for X11 display driver with keyboard/mouse support:
+       *
+       * @code
+       *     lv_display_t* disp = lv_x11_window_create("My Window Title", width, height);
+       *     lv_x11_inputs_create(disp, NULL);
+       * @endcode
+       *
+       * or with mouse cursor icon:
+       *
+       * @code
+       *     lv_image_dsc_t mouse_symbol = {...};
+       *     lv_display_t* disp = lv_x11_window_create("My Window Title", width, height);
+       *     lv_x11_inputs_create(disp, &mouse_symbol);
+       * @endcode
+       *
+       * @param[in]  title    title of created X11 window
+       * @param[in]  hor_res  horizontal resolution (width) of X11 window
+       * @param[in]  ver_res  vertical resolution (height) of X11 window
+       *
+       * @return  pointer to display object
+       */
+      lv_display_t * lv_x11_window_create(char const * title, int32_t hor_res, int32_t ver_res);
+
+10.  To refer the reader to additional information, say "See data_type_t." or
+     "See also function_name()." (without the quotation marks).  Doxygen will include
+     a hyperlink to that documentation.
+
+11.  If you create a new pair of ``.c`` and ``.h`` files (e.g. for a new driver), include
+     a Doxygen-formatted comment like this at the top of each new file:
+
+.. code-block:: c
+
+     /**
+      * @file filename.c
+      *
+      */
 
 
 API Conventions
@@ -131,10 +318,11 @@ Formatting
 
 Here is example to show bracket placing and using of white spaces:
 
-.. code:: c
+.. code-block:: c
 
    /**
     * Set a new text for a label. Memory will be allocated to store the text by the label.
+    *
     * @param label pointer to a label object
     * @param text '\0' terminated character string. NULL to refresh with the current text.
     */
@@ -173,7 +361,7 @@ Once you have ``pre-commit`` installed you will need to `set up the git
 hook scripts <https://pre-commit.com/#3-install-the-git-hook-scripts>`__
 with:
 
-.. code:: console
+.. code-block:: console
 
    pre-commit install
 
@@ -196,14 +384,14 @@ Skipping hooks
 
 If you want to skip any particular hook you can do so with:
 
-.. code:: console
+.. code-block:: console
 
    SKIP=name-of-the-hook git commit
 
 Testing hooks
 -------------
 
-It's no necessary to do a commit to test the hooks, you can test hooks
+It is not necessary to do a commit to test the hooks, you can test hooks
 by adding the files into the staging area and run:
 
 .. code:: console
