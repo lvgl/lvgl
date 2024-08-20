@@ -79,11 +79,11 @@ add a Doxygen-formatted comment like this:
     * - create keyboard (lv_x11_keyboard_create)
     * - create mouse (with scroll wheel, lv_x11_mouse_create lv_x11_mousewheel_create)
     *
-    * @param[in]  disp       X11 display object created from lv_x11_window_create()
+    * @param[in]  disp       object created by lv_x11_window_create()
     * @param[in]  mouse_img  optional image description for mouse cursor
-    *                          (NULL for no/invisible mouse cursor)
+    *                            (NULL for no/invisible mouse cursor)
     *
-    * @note  Any subtle points a user or maintainer would need to know.
+    * @note  Include any subtle points an API user or maintainer would need to know.
     */
    void lv_x11_inputs_create(lv_display_t * disp, lv_image_dsc_t const * mouse_img);
 
