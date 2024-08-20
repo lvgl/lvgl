@@ -38,5 +38,5 @@ const lv_image_dsc_t img_demo_widgets_needle = {
     .header.stride = 400,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data =  img_demo_widgets_needle_map,
+    .data_size = sizeof(img_demo_widgets_needle_map),
 };
-
