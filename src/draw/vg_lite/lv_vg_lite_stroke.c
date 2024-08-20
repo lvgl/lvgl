@@ -218,9 +218,9 @@ static bool stroke_create_cb(stroke_item_t * item, void * user_data)
     const vg_lite_pointer * ori_path = vg_path->path;
     const vg_lite_uint32_t ori_path_length = vg_path->path_length;
 
-    LV_PROFILER_BEGIN_TAG("vg_lite_update_stroke");
+    LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_update_stroke");
     error = vg_lite_update_stroke(vg_path);
-    LV_PROFILER_END_TAG("vg_lite_update_stroke");
+    LV_PROFILER_DRAW_END_TAG("vg_lite_update_stroke");
 
     /* check if path is changed */
     LV_ASSERT_MSG(vg_path->path_length == ori_path_length, "vg_path->path_length should not change");

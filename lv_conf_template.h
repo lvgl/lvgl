@@ -936,6 +936,36 @@
 
     /** Profiler end point function with custom tag */
     #define LV_PROFILER_END_TAG   LV_PROFILER_BUILTIN_END_TAG
+
+    /*Enable layout profiler*/
+    #define LV_PROFILER_LAYOUT 1
+
+    /*Enable disp refr profiler*/
+    #define LV_PROFILER_REFR 1
+
+    /*Enable draw profiler*/
+    #define LV_PROFILER_DRAW 1
+
+    /*Enable indev profiler*/
+    #define LV_PROFILER_INDEV 1
+
+    /*Enable decoder profiler*/
+    #define LV_PROFILER_DECODER 1
+
+    /*Enable font profiler*/
+    #define LV_PROFILER_FONT 1
+
+    /*Enable fs profiler*/
+    #define LV_PROFILER_FS 1
+
+    /*Enable style profiler*/
+    #define LV_PROFILER_STYLE 0
+
+    /*Enable timer profiler*/
+    #define LV_PROFILER_TIMER 1
+
+    /*Enable cache profiler*/
+    #define LV_PROFILER_CACHE 1
 #endif
 
 /** 1: Enable Monkey test */

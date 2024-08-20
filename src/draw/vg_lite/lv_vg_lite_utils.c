@@ -749,9 +749,9 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
 
     if(LV_COLOR_FORMAT_IS_INDEXED(decoded->header.cf)) {
         uint32_t palette_size = LV_COLOR_INDEXED_PALETTE_SIZE(decoded->header.cf);
-        LV_PROFILER_BEGIN_TAG("vg_lite_set_CLUT");
+        LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_set_CLUT");
         LV_VG_LITE_CHECK_ERROR(vg_lite_set_CLUT(palette_size, (vg_lite_uint32_t *)decoded->data));
-        LV_PROFILER_END_TAG("vg_lite_set_CLUT");
+        LV_PROFILER_DRAW_END_TAG("vg_lite_set_CLUT");
     }
 
     lv_vg_lite_buffer_from_draw_buf(buffer, decoded);
@@ -1172,7 +1172,7 @@ void lv_vg_lite_disable_scissor(void)
 void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
 {
     LV_ASSERT_NULL(u);
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
 
     u->flush_count++;
     u->letter_count = 0;
@@ -1180,7 +1180,7 @@ void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
 #if LV_VG_LITE_FLUSH_MAX_COUNT
     if(u->flush_count < LV_VG_LITE_FLUSH_MAX_COUNT) {
         /* Do not flush too often */
-        LV_PROFILER_END;
+        LV_PROFILER_DRAW_END;
         return;
     }
 #else
@@ -1188,20 +1188,20 @@ void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
     LV_VG_LITE_CHECK_ERROR(vg_lite_get_parameter(VG_LITE_GPU_IDLE_STATE, 1, (vg_lite_pointer)&is_gpu_idle));
     if(!is_gpu_idle) {
         /* Do not flush if GPU is busy */
-        LV_PROFILER_END;
+        LV_PROFILER_DRAW_END;
         return;
     }
 #endif
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_flush());
     u->flush_count = 0;
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
 {
     LV_ASSERT_NULL(u);
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
 
@@ -1214,7 +1214,7 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
     lv_vg_lite_pending_remove_all(u->image_dsc_pending);
     u->flush_count = 0;
     u->letter_count = 0;
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 /**********************

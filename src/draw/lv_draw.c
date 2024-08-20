@@ -89,7 +89,7 @@ void * lv_draw_create_unit(size_t size)
 
 lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     lv_draw_task_t * new_task = lv_malloc_zeroed(sizeof(lv_draw_task_t));
 
     new_task->area = *coords;
@@ -111,13 +111,13 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
         tail->next = new_task;
     }
 
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
     return new_task;
 }
 
 void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     lv_draw_dsc_base_t * base_dsc = t->draw_dsc;
     base_dsc->layer = layer;
 
@@ -156,7 +156,7 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
             u = u->next;
         }
     }
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_draw_wait_for_finish(void)
@@ -173,7 +173,7 @@ void lv_draw_wait_for_finish(void)
 
 void lv_draw_dispatch(void)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     bool task_dispatched = false;
     lv_display_t * disp = lv_display_get_next(NULL);
     while(disp) {
@@ -189,12 +189,12 @@ void lv_draw_dispatch(void)
         }
         disp = lv_display_get_next(disp);
     }
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     /*Remove the finished tasks first*/
     lv_draw_task_t * t_prev = NULL;
     lv_draw_task_t * t = layer->draw_task_head;
@@ -279,7 +279,7 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
         }
     }
 
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
     return task_dispatched;
 }
 
@@ -309,7 +309,7 @@ uint32_t lv_draw_get_unit_count(void)
 
 lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
 
     /* If there is only 1 draw unit the task can be consumed linearly as
      * they are added in the correct order. However, it can happen that
@@ -339,7 +339,7 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
             }
             t = t->next;
         }
-        LV_PROFILER_END;
+        LV_PROFILER_DRAW_END;
         return t;
     }
 
@@ -353,7 +353,7 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
         if(t->state != LV_DRAW_TASK_STATE_QUEUED &&
            t->area.x1 <= 0 && t->area.x2 >= hor_res - 1 &&
            t->area.y1 <= 0 && t->area.y2 >= ver_res - 1) {
-            LV_PROFILER_END;
+            LV_PROFILER_DRAW_END;
             return NULL;
         }
     }
@@ -364,13 +364,13 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
         if(t->state == LV_DRAW_TASK_STATE_QUEUED &&
            (t->preferred_draw_unit_id == LV_DRAW_UNIT_NONE || t->preferred_draw_unit_id == draw_unit_id) &&
            is_independent(layer, t)) {
-            LV_PROFILER_END;
+            LV_PROFILER_DRAW_END;
             return t;
         }
         t = t->next;
     }
 
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
     return NULL;
 }
 
@@ -379,7 +379,7 @@ uint32_t lv_draw_get_dependent_count(lv_draw_task_t * t_check)
     if(t_check == NULL) return 0;
     if(t_check->next == NULL) return 0;
 
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     uint32_t cnt = 0;
 
     lv_draw_task_t * t = t_check->next;
@@ -391,16 +391,20 @@ uint32_t lv_draw_get_dependent_count(lv_draw_task_t * t_check)
 
         t = t->next;
     }
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
     return cnt;
 }
 
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
 {
+    LV_PROFILER_DRAW_BEGIN;
     lv_display_t * disp = lv_refr_get_disp_refreshing();
     lv_layer_t * new_layer = lv_malloc_zeroed(sizeof(lv_layer_t));
     LV_ASSERT_MALLOC(new_layer);
-    if(new_layer == NULL) return NULL;
+    if(new_layer == NULL) {
+        LV_PROFILER_DRAW_END;
+        return NULL;
+    }
 
     new_layer->parent = parent_layer;
     new_layer->_clip_area = *area;
@@ -421,6 +425,7 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
         disp->layer_head = new_layer;
     }
 
+    LV_PROFILER_DRAW_END;
     return new_layer;
 }
 
@@ -485,7 +490,7 @@ void lv_draw_task_get_area(const lv_draw_task_t * t, lv_area_t * area)
  */
 static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     lv_draw_task_t * t = layer->draw_task_head;
 
     /*If t_check is outside of the older tasks then it's independent*/
@@ -493,13 +498,13 @@ static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check)
         if(t->state != LV_DRAW_TASK_STATE_READY) {
             lv_area_t a;
             if(lv_area_intersect(&a, &t->_real_area, &t_check->_real_area)) {
-                LV_PROFILER_END;
+                LV_PROFILER_DRAW_END;
                 return false;
             }
         }
         t = t->next;
     }
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 
     return true;
 }
