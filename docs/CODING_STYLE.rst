@@ -98,17 +98,22 @@ or macro), use Doxygen comments like this:  ``/** Description */``.  See
 "Doxygen Comment Specifics" section below.
 
 Write readable code to avoid descriptive comments like:
-``x++; /* Add 1 to x */``. The code should show clearly what you are
-doing.
 
-You should write **why** have you done this:
-``x++; /* Because of closing '\0' of string */``
+   ``x++; /* Add 1 to x */``.
+
+The code should show clearly what you are doing.
+
+You should write **why** you did it:
+
+   ``x++;  /* Point to closing '\0' of string */``
 
 Short "code summaries" of a few lines are accepted. E.g.
-``/* Calculate new coordinates */``
+
+   ``/* Calculate new coordinates */``
 
 In comments use \` \` when referring to a variable. E.g.
-:literal:`/\* Update value of \`x_act\` */`
+
+   ``/* Update value of `x_act` */``
 
 When adding or modifying comments, priorities are (in order of importance):
 
@@ -143,7 +148,7 @@ Doxygen Comment Specifics
     type names and function names bare.  Append "()" after function names.  Doxygen
     generates a hyperlink to the function's documentation.
 
-      ``@param[in]  disp     X11 display object created from lv_x11_window_create()``
+      ``@param[in]  disp     object created from lv_x11_window_create()``
 
 4.  Always include a brief description of the code member you are documenting.  For
     documentation that appears *before* the code member, if more detail is needed,
@@ -155,7 +160,7 @@ Doxygen Comment Specifics
 5.  To document a function's arguments, use the ``@param`` Doxygen command and a
     "direction" attribute (``[in]``, ``[out]``, or ``[in,out]``), followed by 2
     spaces and the name of the argument.  (Normally the description of the argument is
-    simply a noun phrase like "``X11 display object created from lv_x11_window_create()``"
+    simply a noun phrase like "``object created from lv_x11_window_create()``"
     and so it neither needs to be capitalized nor does it need a period at the end.
     However, when whole sentences are needed in for clarity, please capitalize the
     first letter and use appropriate punctuation between sentences for clarity.)
@@ -169,19 +174,19 @@ Doxygen Comment Specifics
 .. code-block:: c
 
       /**
-       * Add event handler function for object \`obj\`.
+       * Add event handler function for object `obj`.
        *
-       * Used by user code to respond to event when it happens with object \`obj\`.
+       * Used by user code to respond to event when it happens with object `obj`.
        * An object can have multiple event handlers.  They are called in the same order
        * as they were added.
        *
        * @param[in]  obj        pointer to object to which to add event call-back
-       * @param[in]  filter     event code (e.g. \`LV_EVENT_CLICKED\`) indicating which
-       *                            event should be called. \`LV_EVENT_ALL\` can be used
+       * @param[in]  filter     event code (e.g. `LV_EVENT_CLICKED`) indicating which
+       *                            event should be called. `LV_EVENT_ALL` can be used
        *                            to receive all events.
        * @param[in]  event_cb   address of event call-back function
        * @param[in]  user_data  custom data to be made available to call-back function
-       *                            in ``e->user_data`` field.
+       *                            in `e->user_data` field.
        *
        * @return  handle to event (can be used in lv_obj_remove_event_dsc()).
        */
@@ -203,7 +208,7 @@ Doxygen Comment Specifics
        *                               - LV_COLOR_FORMAT_ARGB888
        *
        * @note  To change the endianness of rendered image in case of RGB565 format
-       *        (i.e. swap the 2 bytes) call lv_draw_sw_rgb565_swap() in the ``flush_cb``
+       *        (i.e. swap the 2 bytes) call lv_draw_sw_rgb565_swap() in the `flush_cb`
        *        function.
        */
       void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_format);
@@ -245,7 +250,8 @@ Doxygen Comment Specifics
     a hyperlink to that documentation.
 
 10.  If you create a new pair of ``.c`` and ``.h`` files (e.g. for a new driver), include
-     a Doxygen-formatted comment like this at the top of each new file:
+     a Doxygen-formatted comment like this at the top of each new file.  Doxygen will
+     not parse the file without it.
 
 .. code-block:: c
 
@@ -294,22 +300,23 @@ Here is example to show bracket placing and using of white spaces:
 .. code-block:: c
 
    /**
-    * Set a new text for a label. Memory will be allocated to store the text by the label.
+    * Set new text for a label.  Memory will be allocated by label to store text.
     *
-    * @param label pointer to a label object
-    * @param text '\0' terminated character string. NULL to refresh with the current text.
+    * @param[in]  label  pointer to label object
+    * @param[in]  text   '\0' terminated character string.
+    *                        NULL to refresh with current text.
     */
    void lv_label_set_text(lv_obj_t * label, const char * text)
-   {   /*Main brackets of functions in new line*/
+   {   /* Main brackets of functions in new line */
 
-       if(label == NULL) return; /*No bracket only if the command is inline with the if statement*/
+       if(label == NULL) return; /* No bracket only if command is inline with if statement */
 
        lv_obj_inv(label);
 
        lv_label_ext_t * ext = lv_obj_get_ext(label);
 
        /*Comment before a section*/
-       if(text == ext->txt || text == NULL) {  /*Bracket of statements start inline*/
+       if(text == ext->txt || text == NULL) {  /* Bracket of statements starts on same line */
            lv_label_refr_text(label);
            return;
        }
