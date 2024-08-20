@@ -18,6 +18,10 @@
 #include "stm32h7xx_hal_dma2d.h"
 #include "stm32h7b3i_discovery_lcd.h"
 
+#if !LV_DRAW_DMA2D_ASYNC && LV_USE_DRAW_DMA2D_INTERRUPT
+    #warning LV_USE_DRAW_DMA2D_INTERRUPT is 1 but has no effect because LV_USE_OS is LV_OS_NONE
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -90,15 +94,11 @@ typedef struct {
 
 typedef struct {
     lv_draw_unit_t base_unit;
-    lv_draw_task_t * task_act;
+    lv_draw_task_t * volatile task_act;
     lv_draw_dma2d_cache_area_t writing_area;
-#if LV_USE_OS
+#if LV_DRAW_DMA2D_ASYNC
     lv_thread_t thread;
-#if LV_USE_DRAW_DMA2D_INTERRUPT
     lv_thread_sync_t interrupt_signal;
-#else
-    lv_thread_sync_t thread_begin_polling_signal;
-#endif
 #endif
 } lv_draw_dma2d_unit_t;
 
@@ -109,15 +109,15 @@ typedef struct {
 static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 static int32_t delete_cb(lv_draw_unit_t * draw_unit);
-static void opaque_fill(void * first_pixel, int32_t w, int32_t h, int32_t stride, lv_color_t color,
-                        lv_color_format_t cf, lv_draw_dma2d_unit_t * u);
-static void fill(void * first_pixel, int32_t w, int32_t h, int32_t stride, lv_color_t color, lv_color_format_t cf,
-                 lv_opa_t opa, lv_draw_dma2d_unit_t * u);
-static void configure_and_start_transfer(const lv_draw_dma2d_configuration_t * conf, lv_draw_dma2d_unit_t * u);
-#if LV_USE_OS
+static void opaque_fill(lv_draw_dma2d_unit_t * u, void * first_pixel, int32_t w, int32_t h, int32_t stride,
+                        lv_color_t color, lv_color_format_t cf);
+static void fill(lv_draw_dma2d_unit_t * u, void * first_pixel, int32_t w, int32_t h, int32_t stride, lv_color_t color,
+                 lv_color_format_t cf, lv_opa_t opa);
+static void configure_and_start_transfer(const lv_draw_dma2d_configuration_t * conf);
+#if LV_DRAW_DMA2D_ASYNC
     static void thread_cb(void * arg);
 #endif
-#if !LV_USE_DRAW_DMA2D_INTERRUPT
+#if !LV_DRAW_DMA2D_ASYNC
     static void await_transfer_completion(void);
 #endif
 static void post_transfer_tasks(lv_draw_dma2d_unit_t * u);
@@ -128,7 +128,7 @@ static void clean_cache(const lv_draw_dma2d_cache_area_t * mem_area);
  *  STATIC VARIABLES
  **********************/
 
-#if LV_USE_OS || LV_USE_DRAW_DMA2D_INTERRUPT
+#if LV_DRAW_DMA2D_ASYNC
     static lv_draw_dma2d_unit_t * g_unit;
 #endif
 
@@ -147,26 +147,11 @@ void lv_draw_dma2d_init(void)
     draw_dma2d_unit->base_unit.dispatch_cb = dispatch_cb;
     draw_dma2d_unit->base_unit.delete_cb = delete_cb;
 
-#if LV_USE_OS || LV_USE_DRAW_DMA2D_INTERRUPT
+#if LV_DRAW_DMA2D_ASYNC
     g_unit = draw_dma2d_unit;
-#endif
-
-#if LV_USE_OS
-    g_unit = draw_dma2d_unit;
-
-#if LV_USE_DRAW_DMA2D_INTERRUPT
-    lv_result_t res = lv_thread_sync_init(&draw_dma2d_unit->interrupt_signal);
-    LV_ASSERT(res == LV_RESULT_OK);
 
     res = lv_thread_init(&draw_dma2d_unit->thread, LV_THREAD_PRIO_HIGH, thread_cb, 2 * 1024, draw_dma2d_unit);
     LV_ASSERT(res == LV_RESULT_OK);
-#else
-    lv_result_t res = lv_thread_sync_init(&draw_dma2d_unit->thread_begin_polling_signal);
-    LV_ASSERT(res == LV_RESULT_OK);
-
-    res = lv_thread_init(&draw_dma2d_unit->thread, LV_THREAD_PRIO_LOW, thread_cb, 2 * 1024, draw_dma2d_unit);
-    LV_ASSERT(res == LV_RESULT_OK);
-#endif
 #endif
 
     /* enable the DMA2D clock */
@@ -187,20 +172,13 @@ void lv_draw_dma2d_deinit(void)
     /* disable the DMA2D clock */
     RCC->AHB3ENR &= ~RCC_AHB3ENR_DMA2DEN;
 
-#if LV_USE_OS
+#if LV_DRAW_DMA2D_ASYNC
     lv_result_t res = lv_thread_delete(&g_unit->thread);
     LV_ASSERT(res == LV_RESULT_OK);
 
-#if LV_USE_DRAW_DMA2D_INTERRUPT
     res = lv_thread_sync_delete(&g_unit->interrupt_signal);
     LV_ASSERT(res == LV_RESULT_OK);
-#else
-    res = lv_thread_sync_delete(&g_unit->thread_begin_polling_signal);
-    LV_ASSERT(res == LV_RESULT_OK);
-#endif
-#endif
 
-#if LV_USE_OS || LV_USE_DRAW_DMA2D_INTERRUPT
     g_unit = NULL;
 #endif
 }
@@ -208,11 +186,8 @@ void lv_draw_dma2d_deinit(void)
 #if LV_USE_DRAW_DMA2D_INTERRUPT
 void lv_draw_dma2d_transfer_complete_interrupt_handler(void)
 {
-#if LV_USE_OS
-    lv_result_t res = lv_thread_sync_signal_isr(&u->interrupt_signal);
-    LV_ASSERT(res == LV_RESULT_OK);
-#else
-    post_transfer_tasks(g_unit);
+#if LV_DRAW_DMA2D_ASYNC
+    lv_thread_sync_signal_isr(&g_unit->interrupt_signal);
 #endif
 }
 #endif
@@ -249,6 +224,18 @@ static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_dma2d_unit_t * draw_dma2d_unit = (lv_draw_dma2d_unit_t *) draw_unit;
+
+    if(draw_dma2d_unit->task_act) {
+#if LV_DRAW_DMA2D_ASYNC
+        /*Return immediately if it's busy with draw task*/
+        return 0;
+#else
+        /*Blocking wait for DMA2D completion*/
+        await_transfer_completion();
+        post_transfer_tasks(draw_dma2d_unit);
+#endif
+    }
+
     lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_DMA2D);
     if(t == NULL) {
         return LV_DRAW_UNIT_IDLE;
@@ -275,23 +262,23 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
                                              clipped_coords.y1 - layer->buf_area.y1);
 
         if(dsc->opa >= LV_OPA_MAX) {
-            opaque_fill(dest,
+            opaque_fill(draw_dma2d_unit,
+                        dest,
                         lv_area_get_width(&clipped_coords),
                         lv_area_get_height(&clipped_coords),
                         lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), dsc->base.layer->color_format),
                         dsc->color,
-                        dsc->base.layer->color_format,
-                        draw_dma2d_unit);
+                        dsc->base.layer->color_format);
         }
         else {
-            fill(dest,
+            fill(draw_dma2d_unit,
+                 dest,
                  lv_area_get_width(&clipped_coords),
                  lv_area_get_height(&clipped_coords),
                  lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), dsc->base.layer->color_format),
                  dsc->color,
                  dsc->base.layer->color_format,
-                 dsc->opa,
-                 draw_dma2d_unit);
+                 dsc->opa);
         }
     }
 
@@ -303,8 +290,8 @@ static int32_t delete_cb(lv_draw_unit_t * draw_unit)
     return 0;
 }
 
-static void opaque_fill(void * first_pixel, int32_t w, int32_t h, int32_t stride, lv_color_t color,
-                        lv_color_format_t cf, lv_draw_dma2d_unit_t * u)
+static void opaque_fill(lv_draw_dma2d_unit_t * u, void * first_pixel, int32_t w, int32_t h, int32_t stride,
+                        lv_color_t color, lv_color_format_t cf)
 {
     lv_draw_dma2d_output_cf_t output_cf;
     uint32_t cf_size;
@@ -350,11 +337,11 @@ static void opaque_fill(void * first_pixel, int32_t w, int32_t h, int32_t stride
 
         .reg_to_mem_mode_color = color_u32
     };
-    configure_and_start_transfer(&conf, u);
+    configure_and_start_transfer(&conf);
 }
 
-static void fill(void * first_pixel, int32_t w, int32_t h, int32_t stride, lv_color_t color, lv_color_format_t cf,
-                 lv_opa_t opa, lv_draw_dma2d_unit_t * u)
+static void fill(lv_draw_dma2d_unit_t * u, void * first_pixel, int32_t w, int32_t h, int32_t stride, lv_color_t color,
+                 lv_color_format_t cf, lv_opa_t opa)
 {
     lv_draw_dma2d_output_cf_t output_cf;
     uint32_t cf_size;
@@ -406,10 +393,10 @@ static void fill(void * first_pixel, int32_t w, int32_t h, int32_t stride, lv_co
         .bg_offset = output_offset,
         .bg_cf = (lv_draw_dma2d_fgbg_cf_t) output_cf
     };
-    configure_and_start_transfer(&conf, u);
+    configure_and_start_transfer(&conf);
 }
 
-static void configure_and_start_transfer(const lv_draw_dma2d_configuration_t * conf, lv_draw_dma2d_unit_t * u)
+static void configure_and_start_transfer(const lv_draw_dma2d_configuration_t * conf)
 {
     /* number of lines register */
     DMA2D->NLR = (conf->w << DMA2D_NLR_PL_Pos) | (conf->h << DMA2D_NLR_NL_Pos);
@@ -449,38 +436,27 @@ static void configure_and_start_transfer(const lv_draw_dma2d_configuration_t * c
                 | DMA2D_CR_TCIE
 #endif
                 ;
-
-#if !LV_USE_DRAW_DMA2D_INTERRUPT
-#if LV_USE_OS
-    lv_result_t res = lv_thread_sync_signal(&u->thread_begin_polling_signal);
-    LV_ASSERT(res == LV_RESULT_OK);
-#else
-    await_transfer_completion();
-    post_transfer_tasks(u);
-#endif
-#endif
 }
 
-#if LV_USE_OS
+#if LV_DRAW_DMA2D_ASYNC
 static void thread_cb(void * arg)
 {
     lv_draw_dma2d_unit_t * u = arg;
 
+    lv_thread_sync_init(&u->interrupt_signal);
+
     while(1) {
 
-#if LV_USE_DRAW_DMA2D_INTERRUPT
-        lv_thread_sync_wait(&u->interrupt_signal);
-#else
-        lv_thread_sync_wait(&u->thread_begin_polling_signal);
-        await_transfer_completion();
-#endif
+        do {
+            lv_thread_sync_wait(&u->interrupt_signal);
+        } while(u->task_act != NULL);
 
         post_transfer_tasks(u);
     }
 }
 #endif
 
-#if !LV_USE_DRAW_DMA2D_INTERRUPT
+#if !LV_DRAW_DMA2D_ASYNC
 static void await_transfer_completion(void)
 {
     while(DMA2D->CR & DMA2D_CR_START);
