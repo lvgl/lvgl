@@ -139,7 +139,7 @@ Doxygen Comment Specifics
 2.  Add 2 spaces after Doxygen commands (they start with '@') for improved readability.
 
 3.  When you want to refer to a function or data type, simply name the function or
-    data type "bare" within the comment.  Use `` around variable names, but leave
+    data type "bare" within the comment.  Use \` around variable names, but leave
     type names and function names bare.  Append "()" after function names.  Doxygen
     generates a hyperlink to the function's documentation.
 
@@ -155,15 +155,15 @@ Doxygen Comment Specifics
 5.  To document a function's arguments, use the ``@param`` Doxygen command and a
     "direction" attribute (``[in]``, ``[out]``, or ``[in,out]``), followed by 2
     spaces and the name of the argument.  (Normally the description of the argument is
-    simply a noun phrase like ``X11 display object created from lv_x11_window_create()``
+    simply a noun phrase like "``X11 display object created from lv_x11_window_create()``"
     and so it neither needs to be capitalized nor does it need a period at the end.
     However, when whole sentences are needed in for clarity, please capitalize the
     first letter and use appropriate punctuation between sentences for clarity.)
 
-6.  Align the beginning of each description for improved readability.  Provide 4
+6.  Align the beginning of each description for improved readability.  Provide 2
     spaces after the longest argument name for visual separation (improves readability).
-    If a description of an argument continues on subsequent lines, indent the added
-    lines by an additional 2 spaces to visually distinguish these lines from the
+    If a description of an argument continues on subsequent lines, indent the continuation
+    lines by an additional 4 spaces to visually distinguish these lines from the
     beginning of a new argument description, like this:
 
 .. code-block:: c
@@ -187,34 +187,7 @@ Doxygen Comment Specifics
        */
       lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
 
-7.  Alternately (for an unusually long list of arguments, especially if the descriptions
-    are long), add a blank line between arguments for added readability like this:
-
-.. code-block:: c
-
-      /**
-       * Add event handler function for object \`obj\`.
-       *
-       * Used by user code to respond to event when it happens with object \`obj\`.
-       * An object can have multiple event handlers.  They are called in the same order
-       * as they were added.
-       *
-       * @param[in]  obj        pointer to object to which to add event call-back
-       *
-       * @param[in]  filter     event code (e.g. \`LV_EVENT_CLICKED\`) indicating which
-       *                            event should be called. \`LV_EVENT_ALL\` can be used
-       *                            to receive all events.
-       *
-       * @param[in]  event_cb   address of event call-back function
-       *
-       * @param[in]  user_data  custom data to be made available to call-back function
-       *                            in ``e->user_data`` field.
-       *
-       * @return  handle to event (can be used in lv_obj_remove_event_dsc()).
-       */
-      lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
-
-8.  If you include a list of example values for an argument, do so by creating an
+7.  If you include a list of example values for an argument, do so by creating an
     unordered list using '-', like this:
 
 .. code-block:: c
@@ -235,7 +208,7 @@ Doxygen Comment Specifics
        */
       void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_format);
 
-9.  If a code example will be important to help other programmers better understand
+8.  If a code example will be important to help other programmers better understand
     how to use a function or data type (improving clarity), include an example using
     the ``@code`` and ``@endcode`` Doxygen commands like this:
 
@@ -267,19 +240,19 @@ Doxygen Comment Specifics
        */
       lv_display_t * lv_x11_window_create(char const * title, int32_t hor_res, int32_t ver_res);
 
-10.  To refer the reader to additional information, say "See data_type_t." or
-     "See also function_name()." (without the quotation marks).  Doxygen will include
-     a hyperlink to that documentation.
+9.  To refer the reader to additional information, say "See data_type_t." or
+    "See also function_name()." (without the quotation marks).  Doxygen will include
+    a hyperlink to that documentation.
 
-11.  If you create a new pair of ``.c`` and ``.h`` files (e.g. for a new driver), include
+10.  If you create a new pair of ``.c`` and ``.h`` files (e.g. for a new driver), include
      a Doxygen-formatted comment like this at the top of each new file:
 
 .. code-block:: c
 
-     /**
-      * @file filename.c
-      *
-      */
+      /**
+       * @file filename.c
+       *
+       */
 
 
 API Conventions
