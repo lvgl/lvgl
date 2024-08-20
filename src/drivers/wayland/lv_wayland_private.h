@@ -1,11 +1,12 @@
 /*******************************************************************
  *
- * lv_wayland.h - Private functions of the LVGL Wayland client
+ * @file lv_wayland_private.h - Private functions of the 
+ * LVGL Wayland client
  *
  * Based on the original file from the repository.
  *
  * Porting to LVGL 9.1
- * Copyright (c) 2024 EDGEMTech Ltd.
+ * 2024 EDGEMTech Ltd.
  *
  * See LICENCE.txt for details
  *

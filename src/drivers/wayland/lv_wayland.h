@@ -1,11 +1,11 @@
 /*******************************************************************
  *
- * lv_wayland.h - Public functions of the LVGL Wayland client
+ * @file lv_wayland.h - Public functions of the LVGL Wayland client
  *
  * Based on the original file from the repository.
  *
  * Porting to LVGL 9.1
- * Copyright (c) 2024 EDGEMTech Ltd.
+ * 2024 EDGEMTech Ltd.
  *
  * See LICENCE.txt for details
  *
@@ -45,7 +45,7 @@ typedef bool (*lv_wayland_display_close_f_t)(lv_display_t * disp);
  **********************/
 
 /**
- * @brief Retrieves the file descriptor of the wayland socket
+ * Retrieves the file descriptor of the wayland socket
  */
 int lv_wayland_get_fd(void);
 

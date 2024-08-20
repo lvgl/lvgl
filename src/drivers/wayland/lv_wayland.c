@@ -1,11 +1,11 @@
 /*******************************************************************
  *
- * lv_wayland.c - The Wayland client for LVGL applications
+ * @file lv_wayland.c - The Wayland client for LVGL applications
  *
  * Based on the original file from the repository.
  *
  * Porting to LVGL 9.1
- * Copyright (2024) EDGEMTech Ltd. by Erik Tagirov (erik.tagirov@edgemtech.ch)
+ * EDGEMTech Ltd. by Erik Tagirov (erik.tagirov@edgemtech.ch)
  *
  * See LICENCE.txt for details
  *
@@ -265,7 +265,7 @@ static uint32_t tick_get_cb(void);
 
 
 /**
- * @brief The frame callback called when the compositor has finished rendering
+ * The frame callback called when the compositor has finished rendering
  * a frame.It increments the frame counter and sets up the callback
  * for the next frame the frame counter is used to avoid needlessly
  * committing frames too fast on a slow system
@@ -308,7 +308,7 @@ static inline bool _is_digit(char ch)
 }
 
 /*
- *  @brief shm_format
+ *  shm_format
  *  @description called by the compositor to advertise the supported
  *  color formats for SHM buffers, there is a call per supported format
  */
@@ -1674,7 +1674,7 @@ err_destroy_surface:
 }
 
 /*
- * @brief fills a buffer with a color
+ * Fills a buffer with a color
  * @description Used to draw the decorations, by writing directly to the SHM buffer,
  * most wayland compositors support the ARGB8888, XRGB8888, RGB565 formats
  *
@@ -1974,7 +1974,7 @@ static bool resize_window(struct window * window, int width, int height)
     return true;
 }
 
-/* @brief Create a window
+/* Create a window
  * @description Creates the graphical context for the window body, and then create a toplevel
  * wayland surface and commit it to obtain an XDG configuration event
  * @param width the height of the window w/decorations
