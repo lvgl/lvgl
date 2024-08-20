@@ -51,7 +51,7 @@ extern "C" {
 
 typedef struct {
     void (*pvStartRoutine)(void *);       /**< Application thread function. */
-    void * xTaskArg;                      /**< Arguments for application thread function. */
+    void * pTaskArg;                      /**< Arguments for application thread function. */
     TaskHandle_t xTaskHandle;             /**< FreeRTOS task handle. */
 } lv_thread_t;
 
@@ -61,12 +61,12 @@ typedef struct {
 } lv_mutex_t;
 
 typedef struct {
+    BaseType_t
+    xIsInitialized;                       /**< Set to pdTRUE if this condition variable is initialized, pdFALSE otherwise. */
 #if USE_FREERTOS_TASK_NOTIFY
     TaskHandle_t xTaskToNotify;
     BaseType_t xSignalSent;
 #else
-    BaseType_t
-    xIsInitialized;                       /**< Set to pdTRUE if this condition variable is initialized, pdFALSE otherwise. */
     SemaphoreHandle_t xCondWaitSemaphore; /**< Threads block on this semaphore in lv_thread_sync_wait. */
     uint32_t ulWaitingThreads;            /**< The number of threads currently waiting on this condition variable. */
     SemaphoreHandle_t xSyncMutex;         /**< Threads take this mutex before accessing the condition variable. */
