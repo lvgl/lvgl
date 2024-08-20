@@ -120,7 +120,7 @@ Blank lines within comments are desirable when they improve clarity and readabil
 
 Remember, when you are writing source code, you are not just teaching the computer
 what to do, but also teaching other programmers how it works, not only users of the
-API, but also for future maintainers of your source code.  Comments add information
+API, but also future maintainers of your source code.  Comments add information
 about what you were thinking when the code was written, and **why** you did things
 that way -- information that cannot be conveyed by the source code alone.
 
