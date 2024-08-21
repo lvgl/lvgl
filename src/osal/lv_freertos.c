@@ -195,18 +195,20 @@ lv_result_t lv_thread_sync_wait(lv_thread_sync_t * pxCond)
     TaskHandle_t current_task_handle = xTaskGetCurrentTaskHandle();
 
     _enter_critical();
-    BaseType_t signal_sent = pxCond->xSignalSent;
-    pxCond->xSignalSent = pdFALSE;
+    BaseType_t signal_sent = pxCond->xSyncSignal;
+    pxCond->xSyncSignal = pdFALSE;
     if(signal_sent == pdFALSE) {
         /* The signal hasn't been sent yet. Tell the sender to notify this task */
         pxCond->xTaskToNotify = current_task_handle;
     }
+    /* If we have a signal from the other task, we should not ask to be notified */
     _exit_critical();
 
     if(signal_sent == pdFALSE) {
         /* Wait for other task to notify this task. */
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     }
+    /* If the signal was received, no wait needs to be done */
 #else
     uint32_t ulLocalWaitingThreads;
 
@@ -275,14 +277,16 @@ lv_result_t lv_thread_sync_signal(lv_thread_sync_t * pxCond)
     pxCond->xTaskToNotify = NULL;
     if(task_to_notify == NULL) {
         /* No task waiting to be notified. Send this signal for later */
-        pxCond->xSignalSent = pdTRUE;
+        pxCond->xSyncSignal = pdTRUE;
     }
+    /* If a task is already waiting, there is no need to set the sync signal */
     _exit_critical();
 
     if(task_to_notify != NULL) {
         /* There is a task waiting. Send a notification to it */
         xTaskNotifyGive(task_to_notify);
     }
+    /* If there was no task waiting to be notified, we sent a signal for it to see later. */
 #else
     /* Acquire the mutex. */
     xSemaphoreTake(pxCond->xSyncMutex, portMAX_DELAY);
@@ -346,8 +350,9 @@ lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * pxCond)
     pxCond->xTaskToNotify = NULL;
     if(task_to_notify == NULL) {
         /* No task waiting to be notified. Send this signal for later */
-        pxCond->xSignalSent = pdTRUE;
+        pxCond->xSyncSignal = pdTRUE;
     }
+    /* If a task is already waiting, there is no need to set the sync signal */
     _exit_critical();
 
     if(task_to_notify != NULL) {
@@ -355,6 +360,7 @@ lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * pxCond)
         vTaskNotifyGiveFromISR(task_to_notify, &xHigherPriorityTaskWoken);
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
+    /* If there was no task waiting to be notified, we sent a signal for it to see later. */
 #else
     /* Enter critical section to prevent preemption. */
     _enter_critical();
@@ -425,9 +431,11 @@ static void prvCheckMutexInit(lv_mutex_t * pxMutex)
 
 static void prvCondInit(lv_thread_sync_t * pxCond)
 {
+    pxCond->xIsInitialized = pdTRUE;
+    pxCond->xSyncSignal = pdFALSE;
+
 #if USE_FREERTOS_TASK_NOTIFY
     pxCond->xTaskToNotify = NULL;
-    pxCond->xSignalSent = pdFALSE;
 #else
     pxCond->xCondWaitSemaphore = xSemaphoreCreateCounting(ulMAX_COUNT, 0U);
 
@@ -449,10 +457,7 @@ static void prvCondInit(lv_thread_sync_t * pxCond)
 
     /* Condition variable successfully created. */
     pxCond->ulWaitingThreads = 0;
-    pxCond->xSyncSignal = pdFALSE;
 #endif
-
-    pxCond->xIsInitialized = pdTRUE;
 }
 
 static void prvCheckCondInit(lv_thread_sync_t * pxCond)

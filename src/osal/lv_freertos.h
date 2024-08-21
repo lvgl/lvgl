@@ -63,14 +63,13 @@ typedef struct {
 typedef struct {
     BaseType_t
     xIsInitialized;                       /**< Set to pdTRUE if this condition variable is initialized, pdFALSE otherwise. */
+    BaseType_t xSyncSignal;               /**< Set to pdTRUE if the thread is signaled, pdFALSE otherwise. */
 #if USE_FREERTOS_TASK_NOTIFY
-    TaskHandle_t xTaskToNotify;
-    BaseType_t xSignalSent;
+    TaskHandle_t xTaskToNotify;           /**< The task waiting to be signalled. NULL if nothing is waiting. */
 #else
     SemaphoreHandle_t xCondWaitSemaphore; /**< Threads block on this semaphore in lv_thread_sync_wait. */
     uint32_t ulWaitingThreads;            /**< The number of threads currently waiting on this condition variable. */
     SemaphoreHandle_t xSyncMutex;         /**< Threads take this mutex before accessing the condition variable. */
-    BaseType_t xSyncSignal;               /**< Set to pdTRUE if the thread is signaled, pdFALSE otherwise. */
 #endif
 } lv_thread_sync_t;
 
