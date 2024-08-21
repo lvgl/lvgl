@@ -17,16 +17,25 @@
 /*********************
  *      DEFINES
  *********************/
+
+#if LV_FS_DEFAULT_DRIVE_LETTER != '\0' && (LV_FS_DEFAULT_DRIVE_LETTER < 'A' || 'Z' < LV_FS_DEFAULT_DRIVE_LETTER)
+    #error "When enabled, LV_FS_DEFAULT_DRIVE_LETTER needs to be a capital ASCII letter (A-Z)"
+#endif
+
 #define fsdrv_ll_p &(LV_GLOBAL_DEFAULT()->fsdrv_ll)
 
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    char drive_letter;
+    const char * real_path;
+} resolved_path_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static const char * lv_fs_get_real_path(const char * path);
+static resolved_path_t lv_fs_resolve_path(const char * path);
 static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, void * buf, uint32_t btr, uint32_t * br);
 static lv_fs_res_t lv_fs_write_cached(lv_fs_file_t * file_p, const void * buf, uint32_t btw, uint32_t * bw);
 static lv_fs_res_t lv_fs_seek_cached(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whence);
@@ -71,8 +80,9 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         return LV_FS_RES_INV_PARAM;
     }
 
-    char letter = path[0];
-    lv_fs_drv_t * drv = lv_fs_get_drv(letter);
+    resolved_path_t resolved_path = lv_fs_resolve_path(path);
+
+    lv_fs_drv_t * drv = lv_fs_get_drv(resolved_path.drive_letter);
 
     if(drv == NULL) {
         LV_LOG_WARN("Can't open file (%s): unknown driver letter", path);
@@ -100,8 +110,7 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         file_p->file_d = file_p;
     }
     else {
-        const char * real_path = lv_fs_get_real_path(path);
-        void * file_d = drv->open_cb(drv, real_path, mode);
+        void * file_d = drv->open_cb(drv, resolved_path.real_path, mode);
         if(file_d == NULL || file_d == (void *)(-1)) {
             LV_PROFILER_END;
             return LV_FS_RES_UNKNOWN;
@@ -297,8 +306,9 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
 {
     if(path == NULL) return LV_FS_RES_INV_PARAM;
 
-    char letter = path[0];
-    lv_fs_drv_t * drv = lv_fs_get_drv(letter);
+    resolved_path_t resolved_path = lv_fs_resolve_path(path);
+
+    lv_fs_drv_t * drv = lv_fs_get_drv(resolved_path.drive_letter);
 
     if(drv == NULL) {
         return LV_FS_RES_NOT_EX;
@@ -316,8 +326,7 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
 
     LV_PROFILER_BEGIN;
 
-    const char * real_path = lv_fs_get_real_path(path);
-    void * dir_d = drv->dir_open_cb(drv, real_path);
+    void * dir_d = drv->dir_open_cb(drv, resolved_path.real_path);
 
     if(dir_d == NULL || dir_d == (void *)(-1)) {
         LV_PROFILER_END;
@@ -494,16 +503,36 @@ const char * lv_fs_get_last(const char * path)
  **********************/
 
 /**
- * Skip the driver letter and the possible : after the letter
+ * Extract the drive letter and the real path from LVGL's "abstracted file system" path string
  * @param path path string (E.g. S:/folder/file.txt)
- * @return pointer to the beginning of the real path (E.g. /folder/file.txt)
  */
-static const char * lv_fs_get_real_path(const char * path)
+static resolved_path_t lv_fs_resolve_path(const char * path)
 {
-    path++; /*Ignore the driver letter*/
-    if(*path == ':') path++;
+    resolved_path_t resolved;
 
-    return path;
+#if LV_FS_DEFAULT_DRIVE_LETTER != '\0' /*When using default drive letter, strict format (X:) is mandatory*/
+    bool has_drive_prefix = ('A' <= path[0]) && (path[0] <= 'Z') && (path[1] == ':');
+
+    if(has_drive_prefix) {
+        resolved.drive_letter = path[0];
+        resolved.real_path = path + 2;
+    }
+    else {
+        resolved.drive_letter = LV_FS_DEFAULT_DRIVE_LETTER;
+        resolved.real_path = path;
+    }
+# else /*Lean rules for backward compatibility*/
+    resolved.drive_letter = path[0];
+
+    if(*path != '\0') {
+        path++; /*Ignore the driver letter*/
+        if(*path == ':') path++;
+    }
+
+    resolved.real_path = path;
+#endif
+
+    return resolved;
 }
 
 static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, void * buf, uint32_t btr, uint32_t * br)

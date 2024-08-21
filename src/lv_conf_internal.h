@@ -2284,6 +2284,15 @@
 
 /*File system interfaces for common APIs */
 
+/*Setting a default driver letter allows skipping the driver prefix in filepaths*/
+#ifndef LV_FS_DEFAULT_DRIVE_LETTER
+    #ifdef CONFIG_LV_FS_DEFAULT_DRIVE_LETTER
+        #define LV_FS_DEFAULT_DRIVE_LETTER CONFIG_LV_FS_DEFAULT_DRIVE_LETTER
+    #else
+        #define LV_FS_DEFAULT_DRIVE_LETTER '\0'
+    #endif
+#endif
+
 /*API for fopen, fread, etc*/
 #ifndef LV_USE_FS_STDIO
     #ifdef CONFIG_LV_USE_FS_STDIO
