@@ -22,8 +22,9 @@ static void draw_event_cb(lv_event_t * e)
             };
             uint8_t major_tick = lv_scale_get_major_tick_every(obj);
             label_draw_dsc->color = color_idx[base_dsc->id1 / major_tick];
+            size_t len = lv_strlen(label_draw_dsc->text) + 3;
             lv_snprintf((char *)label_draw_dsc->text,
-                        sizeof(label_draw_dsc->text),
+                        len,
                         "%.1f",
                         base_dsc->id2 * 1.0f);
             lv_point_t size;
