@@ -349,13 +349,13 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         refr_position(obj, LV_ANIM_OFF);
     }
     else if(code == LV_EVENT_PRESSED) {
-       if(roller->option_cnt <= 1) return;
+        if(roller->option_cnt <= 1) return;
 
         roller->moved = 0;
         lv_anim_delete(get_label(obj), set_y_anim);
     }
     else if(code == LV_EVENT_PRESSING) {
-       if(roller->option_cnt <= 1) return;
+        if(roller->option_cnt <= 1) return;
 
         lv_indev_t * indev = lv_indev_active();
         lv_point_t p;
@@ -368,7 +368,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_RELEASED || code == LV_EVENT_PRESS_LOST) {
-       if(roller->option_cnt <= 1) return;
+        if(roller->option_cnt <= 1) return;
 
         release_handler(obj);
     }
@@ -405,7 +405,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_KEY) {
-       if(roller->option_cnt <= 1) return;
+        if(roller->option_cnt <= 1) return;
 
         uint32_t c = lv_event_get_key(e);
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
@@ -424,7 +424,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_ROTARY) {
-       if(roller->option_cnt <= 1) return;
+        if(roller->option_cnt <= 1) return;
 
         int32_t r = lv_event_get_rotary_diff(e);
         int32_t new_id = roller->sel_opt_id + r;
