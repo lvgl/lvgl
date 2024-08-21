@@ -423,9 +423,8 @@ static void texture_resize(lv_display_t * disp)
 #elif LV_COLOR_DEPTH == 16
     SDL_PixelFormatEnum px_format = SDL_PIXELFORMAT_RGB565;
 #else
-    //#error("Unsupported color format")
+#error("Unsupported color format")
 #endif
-    SDL_PixelFormatEnum px_format = SDL_PIXELFORMAT_RGB565;
     //    px_format = SDL_PIXELFORMAT_BGR24;
 
     dsc->texture = SDL_CreateTexture(dsc->renderer, px_format,
