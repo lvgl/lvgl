@@ -291,6 +291,12 @@ void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     suc = lv_area_intersect(&com_area, area_p, &scr_area);
     if(suc == false)  return; /*Out of the screen*/
 
+    if(disp->color_format == LV_COLOR_FORMAT_I1) {
+        com_area.x1 &= ~0x7; /*Round down*/
+        com_area.x2 += 7;    /*Round up*/
+        com_area.x2 &= ~0x7;
+    }
+
     /*If there were at least 1 invalid area in full refresh mode, redraw the whole screen*/
     if(disp->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
         disp->inv_areas[0] = scr_area;
