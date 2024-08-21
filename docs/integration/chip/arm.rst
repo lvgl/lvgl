@@ -9,35 +9,48 @@ Arm is a leading semiconductor and software design company, renowned for creatin
 Compile LVGL for Arm
 --------------------
 
-No specific action is required. Any compiler supporting the target Arm architecture can be used to compile LVGL's source code too. It includes GCC, LLVM, Ac6.
+No specific action is required. Any compiler that supports the target Arm architecture can be used to compile LVGL's source code, including GCC, LLVM, and Ac6.
 
-It's also possible to cross-compile LVGL to an MPU (instead of compiling it on the target hardware), or a shared library can be built as well. For more information check out :ref:`build_cmake`
+It is also possible to cross-compile LVGL for an MPU (instead of compiling it on the target hardware) or create a shared library. For more information, check out :ref:`build_cmake`.
 
-Getting started with Ac6
+Getting Started with Ac6
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Ac6 is the proprietary compiler of Arm. As Ac6 maintained by Arm it contains a lot of specific optimization, so you can expect the best performance by using it.
+Ac6 is the proprietary compiler from Arm. Since Ac6 is maintained by Arm, it contains many specific optimizations, so you can expect the best performance when using it.
 
-Ac6 is not free, but it has a community license which can be activated like this:
+Ac6 is not free, but it offers a community license that can be activated as follows:
 
-1. Download and install the Ac6 compiler from from `Arm's website <https://developer.arm.com/Tools%20and%20Software/Arm%20Compiler%20for%20Embedded>`__
-2. To register a community license go to ``bin`` folder of the compiler and in a Terminal run ``armlm.exe activate -server https://mdk-preview.keil.arm.com -product KEMDK-COM0``
+1. Download and install the Ac6 compiler from `Arm's website <https://developer.arm.com/Tools%20and%20Software/Arm%20Compiler%20for%20Embedded>`__.
+2. To register a community license, go to the ``bin`` folder of the compiler and, in a terminal, run ``armlm.exe activate -server https://mdk-preview.keil.arm.com -product KEMDK-COM0`` (On Linux, use ``./armlm``).
 
-Arm2D
------
+IDE Support
+-----------
 
-Arm Cortex-M55 and Cortex-M85 has the `SIMD Helium <https://www.arm.com/technologies/helium>`__ instructions set. It can effectively speed up UI rendering.
+There are no limitations on the supported IDEs. LVGL works in various vendors' IDEs, including Arm's Keil MDK, Renesas's e2 studio, NXP's MCUXpresso, ST's CubeIDE, as well as custom make or CMake projects.
 
-Arm2D is a library maintained by Arm, and it can be used to leverage the power Helium. By enabling ``LV_USE_DRAW_ARM2D_SYNC 1`` in ``lv_conf.h`` LVGL will use Arm2D's API to speed up software rendering.
+Arm2D and the Helium instruction set
+------------------------------------
 
-Note that Arm2D cannot be compiled with GCC, and it's recommended to use it with Ac6.
+Arm Cortex-M55 and Cortex-M85 have the `SIMD Helium <https://www.arm.com/technologies/helium>`__ instruction set.
+Among many others, this can effectively speed up UI rendering. :ref:`Arm2D <arm2d>` is a library maintained by Arm that leverages the Helium instruction set.
 
-To add Arm2D to you project follow these steps:
+Note that Arm2D cannot be compiled with GCC; it is recommended to use Ac6 or LLVM.
 
-- In order to utilize its power be sure to set ``mcpu`` to ``cortex-m85`` and add the ``-fvectorize`` flag. To test without SIMD use ``cortex-m85+nomve``
-- Arm2D can be downloaded from `https://github.com/ARM-software/Arm-2D <https://github.com/ARM-software/Arm-2D>`__ .
-- The CMSIS DSP library also needs to be added to the project
-- For better performance be sure the LTO is enabled and -Omax is used. -Omax cannot be selected from the list, but needs to be added manually as compiler flag (see above)
-Arm2D tries to read/write multiple data with a single instruction. Therefore it's important to use the fastest memory for LVGL's buffer. Usually it's the BSS and on this board it's 64kB. An array can be placed to this section like this: static uint8_t partial_draw_buf[64 * 1024] BSP_PLACE_IN_SECTION(".bss.dtcm_bss") BSP_ALIGN_VARIABLE(BSP_STACK_ALIGNMENT);
+To add Arm2D to your project, follow these steps:
+
+1. To utilize its power, ensure that ``mcpu`` is set to ``cortex-m85`` and add the ``-fvectorize`` flag. To test without SIMD, use ``cortex-m85+nomve``.
+2. Arm2D can be downloaded from `https://github.com/ARM-software/Arm-2D <https://github.com/ARM-software/Arm-2D>`__. Consider using the ``developing`` branch, which contains the latest updates.
+3. Add ``Arm-2D/Library/Include`` to the include paths.
+4. Copy ``Arm-2D/Library/Include/template/arm_2d_cfg.h`` to any location you prefer to provide the default configuration for Arm2D. Ensure that the folder containing ``arm_2d_cfg.h`` is added to the include path.
+5. The Arm2D repository contains several examples and templates; however, ensure that only ``Arm-2D/Library/Source`` is compiled.
+6. The CMSIS DSP library also needs to be added to the project. You can use CMSIS-PACKS or add it manually.
+7. For better performance, enable ``LTO`` (Link Time Optimization) and use ``-Omax`` or ``-Ofast``.
+8. Arm2D tries to read/write multiple data with a single instruction. Therefore, it's important to use the fastest memory (e.g., ``BSS`` or ``TCM``) for LVGL's buffer to avoid memory bandwidth bottlenecks.
+9. Enable ``LV_USE_DRAW_ARM2D_SYNC 1`` in ``lv_conf.h``.
+
+Neon Acceleration
+-----------------
+
+Several Cortex-A microprocessors support the `Neon SIMD <https://www.arm.com/technologies/neon>`__ instruction set. LVGL has built-in support to improve the performance of software rendering by utilizing Neon instructions. To enable Neon acceleration, set ``LV_USE_DRAW_SW_ASM`` to ``LV_DRAW_SW_ASM_NEON`` in ``lv_conf.h``.
 
 
