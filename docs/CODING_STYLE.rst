@@ -67,8 +67,8 @@ Coding guide
 
 Comments
 --------
-Above every function prototype in ``.h`` files that export the public API,
-add a Doxygen-formatted comment like this:
+Before every function prototype in ``.h`` files, include a Doxygen-formatted comment
+like this:
 
 .. code-block:: c
 
