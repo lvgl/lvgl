@@ -141,7 +141,7 @@ struct _lv_anim_t {
     uint32_t playback_duration;               /**< Duration of playback animation*/
     uint32_t repeat_delay;                    /**< Wait before repeat*/
     uint32_t repeat_cnt;                      /**< Repeat count for the animation*/
-    union lv_anim_path_para_t {
+    union _lv_anim_path_para_t {
         lv_anim_bezier3_para_t bezier3;       /**< Parameter used when path is custom_bezier*/
     } parameter;
 
