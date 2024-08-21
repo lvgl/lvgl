@@ -185,11 +185,11 @@ and so it neither needs to be capitalized nor does it need a period at the end.
 However, when whole sentences are needed for clarity, capitalize the first letter
 and use appropriate punctuation between sentences for clarity.
 
-Align the beginning of each description for improved readability.  Provide at
-least 2 spaces after the longest argument name for visual separation (improves
-readability). If a description of an argument continues on subsequent lines,
-indent the continuation lines by an additional 4 spaces to visually distinguish
-these lines from the beginning of a new argument description, like this:
+Align the beginning of each argument description for improved readability.  Provide
+at least 2 spaces after the longest argument name for visual separation (improves
+readability). If a description of an argument continues on subsequent lines, indent
+the continuation lines by an additional 4 spaces to visually distinguish these lines
+from the beginning of a new argument description, like this:
 
 .. code-block:: c
 
@@ -257,9 +257,9 @@ the ``@code`` and ``@endcode`` Doxygen commands like this:
        *     lv_x11_inputs_create(disp, &mouse_symbol);
        * @endcode
        *
-       * @param[in]  title    title of created X11 window
-       * @param[in]  hor_res  horizontal resolution (width) of X11 window
-       * @param[in]  ver_res  vertical resolution (height) of X11 window
+       * @param  title    title of created X11 window
+       * @param  hor_res  horizontal resolution (width) of X11 window
+       * @param  ver_res  vertical resolution (height) of X11 window
        *
        * @return  pointer to display object
        */
@@ -270,8 +270,8 @@ To refer the reader to additional information, you can say something like
 Doxygen will convert ``data_type_t`` or ``function_name()`` into a hyperlink to that
 documentation when it exists.
 
-If you create a new pair of ``.c`` and ``.h`` files (e.g. for a new driver), include
-a Doxygen comment like this at the top of each new file.  Doxygen will not parse the
+If you create a new pair of ``.c`` and ``.h`` files (e.g. for a new driver), ensure a
+Doxygen comment like this is at the top of each new file.  Doxygen will not parse the
 file without it.
 
 .. code-block:: c
