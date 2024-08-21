@@ -272,6 +272,23 @@ void test_obj_property_name(void)
 #endif
 }
 
+void test_obj_class_property(void)
+{
+#if LV_USE_OBJ_PROPERTY && LV_USE_OBJ_PROPERTY_NAME
+    /* An image obj has align property */
+    lv_obj_t * img = lv_image_create(lv_screen_active());
+    TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_OBJ_ALIGN, lv_obj_property_get_id(img, "align"));
+
+    /* obj class has align property but image doesn't. */
+    TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_OBJ_ALIGN, lv_obj_class_property_get_id(&lv_obj_class, "align"));
+    TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_ID_INVALID, lv_obj_class_property_get_id(&lv_image_class, "align"));
+
+    /* style can also have property name that conflicts with obj */
+    TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_STYLE_X, lv_style_property_get_id("x"));
+    TEST_ASSERT_EQUAL_UINT32(LV_PROPERTY_OBJ_X, lv_obj_property_get_id(img, "x"));
+#endif
+}
+
 void test_label_properties(void)
 {
 #if LV_USE_OBJ_PROPERTY
