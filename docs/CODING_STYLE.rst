@@ -16,7 +16,7 @@ Naming conventions
 -  In variable and function names use only lower case letters
    (e.g. *height_tmp*)
 -  In enums and defines use only upper case letters
-   (e.g. *e.g. MAX_LINE_NUM*)
+   (e.g. *MAX_LINE_NUM*)
 -  Global names (API):
 
    -  start with *lv*
@@ -72,48 +72,59 @@ add a Doxygen-formatted comment like this:
 
 .. code-block:: c
 
-   /**
-    * Create and add keyboard, mouse and scroll wheel objects and connect them to x11 display.
-    *
-    * This is a convenience method handling the typical input initialisation of an X11 window:
-    * - create keyboard (lv_x11_keyboard_create)
-    * - create mouse (with scroll wheel, lv_x11_mouse_create lv_x11_mousewheel_create)
-    *
-    * @param[in]  disp       object created by lv_x11_window_create()
-    * @param[in]  mouse_img  optional image description for mouse cursor
-    *                            (NULL for no/invisible mouse cursor)
-    *
-    * @note  Include any subtle points an API user or maintainer would need to know.
-    */
-   void lv_x11_inputs_create(lv_display_t * disp, lv_image_dsc_t const * mouse_img);
+    /**
+     * Brief description
+     *
+     * @return    short description of return value
+     */
+    example_type_t * lv_example(void);
 
-Separate sections within the comment with a blank line for added readability.
+Another example with arguments and more detail.
 
-Always use comments like this ``/* Description */`` not ``// Description``.
+.. code-block:: c
 
-Include a space after the ``/*`` and before the ``*/`` for added readability.
+    /**
+     * Brief description
+     *
+     * Additional detail here in subsequent paragraphs.  Function accomplishes these results:
+     * - description of result 1
+     * - description of result 2
+     *
+     * @param  disp       object created by lv_x11_window_create()
+     * @param  mouse_img  optional image description for mouse cursor
+     *                        (NULL for no/invisible mouse cursor)
+     *
+     * @note  Include any subtle points an API user or maintainer would need to know.
+     */
+    void lv_other_example(lv_display_t * disp, lv_image_dsc_t const * mouse_img);
 
-If you are writing documentation for a code member (like a function, data type
-or macro), use Doxygen comments like this:  ``/** Description */``.  See
-"Doxygen Comment Specifics" section below.
+When documenting a code member that is *before* the comment, such as a struct member,
+use ``/**<`` like this:
 
-Write readable code to avoid descriptive comments like:
+.. code-block:: c
 
-   ``x++; /* Add 1 to x */``.
+    /**
+     * Brief description of struct
+     */
+    typedef struct _lv_example_type_t {
+        char      *text;    /**< Brief description of this member */
+        uint16_t   length;  /**< Brief description of this member */
+    } lv_example_type_t;
+
+| When commenting code, use block comments like this ``/* Description */``,
+| not end-of-line comments like this ``// Description``.
+
+Include a space after the ``/*`` or ``/**<`` and before the ``*/`` for added readability.
+
+Write readable code to avoid descriptive comments like:  ``x++; /* Add 1 to x */``.
 
 The code should show clearly what you are doing.
 
-You should write **why** you did it:
+You should write **why** you did it:  ``x++;  /* Point to closing '\0' of string */``
 
-   ``x++;  /* Point to closing '\0' of string */``
+Short "code summaries" of a few lines are accepted: ``/* Calculate new coordinates */``
 
-Short "code summaries" of a few lines are accepted. E.g.
-
-   ``/* Calculate new coordinates */``
-
-In comments use \` \` when referring to a variable. E.g.
-
-   ``/* Update value of `x_act` */``
+In comments use \`...\` when referring to a variable: ``/* Update value of `x_act` */``
 
 When adding or modifying comments, priorities are (in order of importance):
 
@@ -132,44 +143,53 @@ that way -- information that cannot be conveyed by the source code alone.
 
 Doxygen Comment Specifics
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-1.  Doxygen is the first program in a data-flow chain that generates the online LVGL
-    API documentation from the files in the LVGL repository.  Doxygen detects comments
-    it should pay attention to by leading ``/**``.  It ignores comments that do not
-    have exactly two '\*'.
+Doxygen is the first program in a data-flow chain that generates the online LVGL
+API documentation from the files in the LVGL repository.  Doxygen detects comments
+it should pay attention to by leading ``/**``.  It ignores comments that do not
+have exactly two ``*``.
 
-    ``/** Description of code member immediately AFTER this comment. */``
+    | ``/** Description of code member AFTER this comment. */``
+    | ``code_member_here {...}`` (e.g. function, struct, etc.)
 
-    ``/**< Description of code member immediately BEFORE this comment, e.g. struct member. */``
+    ``variable_or_struct_member;  /**< Description of code member BEFORE this comment. */``
 
-2.  Add 2 spaces after Doxygen commands (they start with '@') for improved readability.
+Add 2 spaces after Doxygen commands (they start with '@') for improved readability.
 
-3.  When you want to refer to a function or data type, simply name the function or
-    data type "bare" within the comment.  Use \` around variable names, but leave
-    type names and function names bare.  Append "()" after function names.  Doxygen
-    generates a hyperlink to the function's documentation.
+Use \`...\` around variable names.  This *can* also be done with type, struct and
+function names when it adds clarity or readability.  Append empty "()" after function
+names. Doxygen generates a hyperlink to the type, struct or function's documentation
+when it exists.  Note:  if you put any text inside the "()", Doxygen will not
+generate a hyperlink in the generated coumentation.
 
-      ``@param[in]  disp     object created from lv_x11_window_create()``
+    ``@param  disp   `lv_display_t` object created by lv_x11_window_create()``
 
-4.  Always include a brief description of the code member you are documenting.  For
-    documentation that appears *before* the code member, if more detail is needed,
-    include a blank line below the brief description and add the detail below it.
-    (Doxygen needs the blank line to separate the "brief description" from the
-    "additional detail", and it treats it accordingly.  The blank line also improves
-    readability in the source code.)
+Always include a brief description of the code member you are documenting.  For
+documentation that appears *before* the code member, if more detail is needed,
+include a blank line below the brief description and add the detail below it.
+(Doxygen needs the blank line to separate the "brief description" from the
+"additional detail", and it treats it accordingly.  The blank line also improves
+readability in the source code.)  If a struct's member needs more than one line
+to adequately describe it, it is acceptable to place the description before the
+member.  In this case, remember to use ``/**``, not ``/**<``
 
-5.  To document a function's arguments, use the ``@param`` Doxygen command and a
-    "direction" attribute (``[in]``, ``[out]``, or ``[in,out]``), followed by 2
-    spaces and the name of the argument.  (Normally the description of the argument is
-    simply a noun phrase like "``object created from lv_x11_window_create()``"
-    and so it neither needs to be capitalized nor does it need a period at the end.
-    However, when whole sentences are needed in for clarity, please capitalize the
-    first letter and use appropriate punctuation between sentences for clarity.)
+To document a function's arguments, use the ``@param`` Doxygen command followed by 2
+spaces and the name of the argument.  ``[in]``, ``[out]``, or ``[in,out]`` can be
+appended to ``@param`` to clarify direction when it is important for clarity, like this:
 
-6.  Align the beginning of each description for improved readability.  Provide 2
-    spaces after the longest argument name for visual separation (improves readability).
-    If a description of an argument continues on subsequent lines, indent the continuation
-    lines by an additional 4 spaces to visually distinguish these lines from the
-    beginning of a new argument description, like this:
+    | ``@param[in]   value   input value``
+    | ``@param[in]   factor  multiplier``
+    | ``@param[out]  result  computed result``
+
+Normally the brief description is simply a noun phrase like "``computed result``"
+and so it neither needs to be capitalized nor does it need a period at the end.
+However, when whole sentences are needed for clarity, capitalize the first letter
+and use appropriate punctuation between sentences for clarity.
+
+Align the beginning of each description for improved readability.  Provide at
+least 2 spaces after the longest argument name for visual separation (improves
+readability). If a description of an argument continues on subsequent lines,
+indent the continuation lines by an additional 4 spaces to visually distinguish
+these lines from the beginning of a new argument description, like this:
 
 .. code-block:: c
 
@@ -177,35 +197,35 @@ Doxygen Comment Specifics
        * Add event handler function for object `obj`.
        *
        * Used by user code to respond to event when it happens with object `obj`.
-       * An object can have multiple event handlers.  They are called in the same order
-       * as they were added.
+       * An object can have multiple event handlers.  They are called in the same
+       * order as they were added.
        *
-       * @param[in]  obj        pointer to object to which to add event call-back
-       * @param[in]  filter     event code (e.g. `LV_EVENT_CLICKED`) indicating which
-       *                            event should be called. `LV_EVENT_ALL` can be used
-       *                            to receive all events.
-       * @param[in]  event_cb   address of event call-back function
-       * @param[in]  user_data  custom data to be made available to call-back function
-       *                            in `e->user_data` field.
+       * @param  obj        pointer to object to which to add event call-back
+       * @param  filter     event code (e.g. `LV_EVENT_CLICKED`) indicating which
+       *                        event should be called (`LV_EVENT_ALL` can be used
+       *                        to receive all events)
+       * @param  event_cb   address of event call-back function
+       * @param  user_data  custom data to be made available to call-back function
+       *                        in `e->user_data` field
        *
        * @return  handle to event (can be used in lv_obj_remove_event_dsc()).
        */
       lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
 
-7.  If you include a list of example values for an argument, do so by creating an
-    unordered list using '-', like this:
+If you include a list of example values for an argument, do so by creating a
+list using '-', like this:
 
 .. code-block:: c
 
       /**
        * Set color format of display.
        *
-       * @param[in]  disp          pointer to display object
-       * @param[in]  color_format  Possible values are:
-       *                               - LV_COLOR_FORMAT_RGB565
-       *                               - LV_COLOR_FORMAT_RGB888
-       *                               - LV_COLOR_FORMAT_XRGB888
-       *                               - LV_COLOR_FORMAT_ARGB888
+       * @param  disp          pointer to display object
+       * @param  color_format  possible values:
+       *                           - LV_COLOR_FORMAT_RGB565
+       *                           - LV_COLOR_FORMAT_RGB888
+       *                           - LV_COLOR_FORMAT_XRGB888
+       *                           - LV_COLOR_FORMAT_ARGB888
        *
        * @note  To change the endianness of rendered image in case of RGB565 format
        *        (i.e. swap the 2 bytes) call lv_draw_sw_rgb565_swap() in the `flush_cb`
@@ -213,9 +233,9 @@ Doxygen Comment Specifics
        */
       void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_format);
 
-8.  If a code example will be important to help other programmers better understand
-    how to use a function or data type (improving clarity), include an example using
-    the ``@code`` and ``@endcode`` Doxygen commands like this:
+If a code example will be important to help other programmers better understand
+how to use a function or data type (improving clarity), include an example using
+the ``@code`` and ``@endcode`` Doxygen commands like this:
 
 .. code-block:: c
 
@@ -245,13 +265,14 @@ Doxygen Comment Specifics
        */
       lv_display_t * lv_x11_window_create(char const * title, int32_t hor_res, int32_t ver_res);
 
-9.  To refer the reader to additional information, say "See data_type_t." or
-    "See also function_name()." (without the quotation marks).  Doxygen will include
-    a hyperlink to that documentation.
+To refer the reader to additional information, you can say something like
+``See also `data_type_t`.`` or ``See function_name() for more information.``.
+Doxygen will convert ``data_type_t`` or ``function_name()`` into a hyperlink to that
+documentation when it exists.
 
-10.  If you create a new pair of ``.c`` and ``.h`` files (e.g. for a new driver), include
-     a Doxygen-formatted comment like this at the top of each new file.  Doxygen will
-     not parse the file without it.
+If you create a new pair of ``.c`` and ``.h`` files (e.g. for a new driver), include
+a Doxygen comment like this at the top of each new file.  Doxygen will not parse the
+file without it.
 
 .. code-block:: c
 
