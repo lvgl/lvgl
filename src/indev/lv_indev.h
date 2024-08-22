@@ -153,6 +153,20 @@ void lv_indev_set_display(lv_indev_t * indev, struct lv_display_t * disp);
 void lv_indev_set_long_press_time(lv_indev_t * indev, uint16_t long_press_time);
 
 /**
+ * Set scroll limit to the input device
+ * @param indev pointer to an input device
+ * @param scroll_limit the number of pixels to slide before actually drag the object
+ */
+void lv_indev_set_scroll_limit(lv_indev_t * indev, uint8_t scroll_limit);
+
+/**
+ * Set scroll throw slow-down to the indev. Greater value means faster slow-down
+ * @param indev pointer to an input device
+ * @param scroll_throw the slow-down in [%]
+ */
+void lv_indev_set_scroll_throw(lv_indev_t * indev, uint8_t scroll_throw);
+
+/**
  * Get the type of an input device
  * @param indev pointer to an input device
  * @return the type of the input device from `lv_hal_indev_type_t` (`LV_INDEV_TYPE_...`)
