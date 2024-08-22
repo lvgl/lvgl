@@ -19,7 +19,6 @@ typedef int dummy_t;    /* Make GCC on windows happy, avoid empty translation un
  *      INCLUDES
  *********************/
 #include "lv_wayland.h"
-#include "lv_wayland_private.h"
 #include "lv_wayland_smm.h"
 
 #if LV_USE_WAYLAND
@@ -263,6 +262,8 @@ static struct graphic_object * create_graphic_obj(struct application * app, stru
 
 static uint32_t tick_get_cb(void);
 
+static void wayland_init(void);
+static void wayland_deinit(void);
 
 /**
  * The frame callback called when the compositor has finished rendering
@@ -2349,7 +2350,7 @@ static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
 /**
  * Initialize Wayland driver
  */
-void lv_wayland_init(void)
+static void wayland_init(void)
 {
     struct smm_events evs = {
         NULL,
@@ -2423,7 +2424,7 @@ void lv_wayland_init(void)
 /**
  * De-initialize Wayland driver
  */
-void lv_wayland_deinit(void)
+static void wayland_deinit(void)
 {
     struct window * window = NULL;
 
@@ -2503,6 +2504,8 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     int32_t window_width;
     int32_t window_height;
     int32_t stride;
+
+    wayland_init();
 
     window_width = hor_res;
     window_height = ver_res;
@@ -2599,6 +2602,7 @@ void lv_wayland_window_close(lv_display_t * disp)
     }
     window->shall_close = true;
     window->close_cb = NULL;
+    wayland_deinit();
 }
 
 /**
@@ -2827,6 +2831,7 @@ bool lv_wayland_timer_handler(void)
 
             /* Destroy graphical context and execute close_cb */
             _lv_wayland_handle_output();
+            wayland_deinit();
             return false;
         }
     }

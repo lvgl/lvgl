@@ -58,11 +58,6 @@
 #if LV_USE_WINDOWS
     #include "drivers/windows/lv_windows_context.h"
 #endif
-#ifndef _WIN32
-    #if LV_USE_WAYLAND
-        #include "drivers/wayland/lv_wayland_private.h"
-    #endif
-#endif
 
 /*********************
  *      DEFINES
@@ -217,12 +212,6 @@ void lv_init(void)
 
 #if LV_USE_WINDOWS
     lv_windows_platform_init();
-#endif
-
-#ifndef _WIN32
-#if LV_USE_WAYLAND
-    lv_wayland_init();
-#endif
 #endif
 
     lv_obj_style_init();
@@ -410,12 +399,6 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_SW
     lv_draw_sw_deinit();
-#endif
-
-#ifndef _WIN32
-#if LV_USE_WAYLAND
-    lv_wayland_deinit();
-#endif
 #endif
 
     lv_draw_deinit();
