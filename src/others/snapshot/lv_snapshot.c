@@ -128,7 +128,7 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
 
     while(layer.draw_task_head) {
         lv_draw_dispatch_wait_for_request();
-        lv_draw_dispatch();
+        lv_draw_dispatch_layer(disp_new, &layer);
     }
 
     disp_new->layer_head = layer_old;
