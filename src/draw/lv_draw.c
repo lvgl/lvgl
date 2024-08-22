@@ -160,12 +160,16 @@ void lv_draw_dispatch(void)
     bool render_running = false;
     lv_display_t * disp = lv_display_get_next(NULL);
     while(disp) {
-        lv_layer_t * layer = disp->layer_head;
-        while(layer) {
-            if(lv_draw_dispatch_layer(disp, layer))
-                render_running = true;
-            layer = layer->next;
+        /*If there are no redraw areas on the display, then skip drawing*/
+        if(disp->inv_p) {
+            lv_layer_t * layer = disp->layer_head;
+            while(layer) {
+                if(lv_draw_dispatch_layer(disp, layer))
+                    render_running = true;
+                layer = layer->next;
+            }
         }
+
         if(!render_running) {
             lv_draw_dispatch_request();
         }
