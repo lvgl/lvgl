@@ -30,9 +30,24 @@ In ``lv_conf.h`` enable ``LV_USE_FS_...`` and assign an upper cased
 letter to ``LV_FS_..._LETTER`` (e.g. ``'S'``). After that you can access
 files using that driver letter. E.g. ``"S:path/to/file.txt"``.
 
-The work directory can be set with ``LV_FS_..._PATH``. E.g.
+Working with common prefixes
+""""""""""""""""""""""""""""
+
+A **default driver letter** can be set by ``LV_FS_DEFAULT_DRIVE_LETTER``,
+which allows skipping the drive prefix in file paths.
+
+For example if ``LV_FS_DEFAULT_DRIVE_LETTER`` is set the ``'S'`` *"path/to/file.txt"* will mean *"S:path/to/file.txt"*. 
+
+This feature is useful if you have only a single driver and don't want to bother with LVGL's driver layer in the file paths.
+It also helps to use a unified path with LVGL's file system and normal file systems. 
+The original mechanism is not affected, so a path starting with drive letter will still work.
+
+The **working directory** can be set with ``LV_FS_..._PATH``. E.g.
 ``"/home/joe/projects/"`` The actual file/directory paths will be
-appended to it.
+appended to it, allowing to skip the common part.
+
+Caching
+"""""""
 
 :ref:`Cached reading <overview_file_system_cache>` is also supported if ``LV_FS_..._CACHE_SIZE`` is set to
 not ``0`` value. :cpp:func:`lv_fs_read` caches this size of data to lower the

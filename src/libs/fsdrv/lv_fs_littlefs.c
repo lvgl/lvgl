@@ -4,6 +4,19 @@
 #include "lfs.h"
 #include "../../core/lv_global.h"
 
+#if LV_FS_LITTLEFS_LETTER == '\0'
+    #error "LV_FS_LITTLEFS_LETTER must be set to a valid value"
+#else
+    #if (LV_FS_LITTLEFS_LETTER < 'A') || (LV_FS_LITTLEFS_LETTER > 'Z')
+        #if LV_FS_DEFAULT_DRIVE_LETTER != '\0' /*When using default drive letter, strict format (X:) is mandatory*/
+            #error "LV_FS_LITTLEFS_LETTER must be an upper case ASCII letter"
+        #else /*Lean rules for backward compatibility*/
+            #warning LV_FS_LITTLEFS_LETTER should be an upper case ASCII letter. \
+            Using a slash symbol as drive letter should be replaced with LV_FS_DEFAULT_DRIVE_LETTER mechanism
+        #endif
+    #endif
+#endif
+
 typedef struct LittleFile {
     lfs_file_t file;
 } LittleFile;

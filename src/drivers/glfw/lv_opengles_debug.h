@@ -10,10 +10,10 @@
 extern "C" {
 #endif
 
-#include <stdbool.h>
-
+#include "../../lv_conf_internal.h"
 #if LV_USE_OPENGLES
 
+#include <stdbool.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 

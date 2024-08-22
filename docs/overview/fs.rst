@@ -9,6 +9,10 @@ any type of file system. A file system is identified by an assigned
 drive letter. For example, if an SD card is associated with the letter
 ``'S'``, a file can be reached using ``"S:path/to/file.txt"``.
 
+.. note::
+
+	If you want to skip the drive prefix from the path, you can use the :c:macro:`LV_FS_DEFAULT_DRIVE_LETTER` config parameter.
+
 Ready to use drivers
 ********************
 

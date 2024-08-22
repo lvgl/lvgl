@@ -33,6 +33,7 @@ Below APIs needed to be implemented and linked to lvgl.
 
 .. code:: c
 
+    void lv_obj_set_id(lv_obj_t * obj, void * id);
     void lv_obj_assign_id(const lv_obj_class_t * class_p, lv_obj_t * obj);
     void lv_obj_free_id(lv_obj_t * obj);
     const char * lv_obj_stringify_id(lv_obj_t * obj, char * buf, uint32_t len);

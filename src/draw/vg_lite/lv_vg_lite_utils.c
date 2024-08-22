@@ -1144,11 +1144,23 @@ lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * ma
 
 void lv_vg_lite_set_scissor_area(const lv_area_t * area)
 {
+#if VGLITE_RELEASE_VERSION <= VGLITE_MAKE_VERSION(4,0,57)
+    /**
+     * In the new version of VG-Lite, vg_lite_set_scissor no longer needs to call vg_lite_enable_scissor and
+     * vg_lite_disable_scissor APIs.
+     *
+     * Original description in the manual:
+     * Description: This is a legacy scissor API function that can be used to set and enable a single scissor rectangle
+     * for the render target. This scissor API is supported by a different hardware mechanism other than the mask layer,
+     * and it is not enabled/disabled by vg_lite_enable_scissor and vg_lite_disable_scissor APIs.
+     */
+    LV_VG_LITE_CHECK_ERROR(vg_lite_enable_scissor());
+#endif
     LV_VG_LITE_CHECK_ERROR(vg_lite_set_scissor(
                                area->x1,
                                area->y1,
-                               lv_area_get_width(area),
-                               lv_area_get_height(area)));
+                               area->x2 + 1,
+                               area->y2 + 1));
 }
 
 void lv_vg_lite_disable_scissor(void)

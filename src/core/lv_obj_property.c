@@ -133,28 +133,56 @@ lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, uint32_
     return value;
 }
 
-lv_prop_id_t lv_obj_property_get_id(const lv_obj_t * obj, const char * name)
+lv_prop_id_t lv_style_property_get_id(const char * name)
 {
 #if LV_USE_OBJ_PROPERTY_NAME
-    const lv_obj_class_t * clz;
-    const lv_property_name_t * names;
     lv_property_name_t * found;
-
-    for(clz = obj->class_p; clz; clz = clz->base_class) {
-        names = clz->property_names;
-        if(names == NULL) {
-            /* try base class*/
-            continue;
-        }
-
-        found = lv_utils_bsearch(name, names, clz->names_count, sizeof(lv_property_name_t), property_name_compare);
-        if(found) return found->id;
-    }
-
     /*Check style property*/
     found = lv_utils_bsearch(name, lv_style_property_names, sizeof(lv_style_property_names) / sizeof(lv_property_name_t),
                              sizeof(lv_property_name_t), property_name_compare);
     if(found) return found->id;
+#else
+    LV_UNUSED(name);
+#endif
+    return LV_PROPERTY_ID_INVALID;
+}
+
+lv_prop_id_t lv_obj_class_property_get_id(const lv_obj_class_t * clz, const char * name)
+{
+#if LV_USE_OBJ_PROPERTY_NAME
+    const lv_property_name_t * names;
+    lv_property_name_t * found;
+
+    names = clz->property_names;
+    if(names == NULL) {
+        /* try base class*/
+        return LV_PROPERTY_ID_INVALID;
+    }
+
+    found = lv_utils_bsearch(name, names, clz->names_count, sizeof(lv_property_name_t), property_name_compare);
+    if(found) return found->id;
+#else
+    LV_UNUSED(obj);
+    LV_UNUSED(name);
+    LV_UNUSED(property_name_compare);
+#endif
+    return LV_PROPERTY_ID_INVALID;
+}
+
+lv_prop_id_t lv_obj_property_get_id(const lv_obj_t * obj, const char * name)
+{
+#if LV_USE_OBJ_PROPERTY_NAME
+    const lv_obj_class_t * clz;
+    lv_prop_id_t id;
+
+    for(clz = obj->class_p; clz; clz = clz->base_class) {
+        id = lv_obj_class_property_get_id(clz, name);
+        if(id != LV_PROPERTY_ID_INVALID) return id;
+    }
+
+    /*Check style property*/
+    id = lv_style_property_get_id(name);
+    if(id != LV_PROPERTY_ID_INVALID) return id;
 #else
     LV_UNUSED(obj);
     LV_UNUSED(name);

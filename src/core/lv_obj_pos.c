@@ -821,11 +821,19 @@ void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
     lv_area_copy(&area_tmp, area);
 
     if(!lv_obj_area_is_visible(obj, &area_tmp)) return;
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    /**
+     * When using the global matrix, the vertex coordinates of clip_area lose precision after transformation,
+     * which can be solved by expanding the redrawing area.
+     */
+    lv_area_increase(&area_tmp, 5, 5);
+#else
     if(obj->spec_attr && obj->spec_attr->layer_type == LV_LAYER_TYPE_TRANSFORM) {
         /*Make the area slightly larger to avoid rounding errors.
          *5 is an empirical value*/
         lv_area_increase(&area_tmp, 5, 5);
     }
+#endif
 
     lv_inv_area(lv_obj_get_display(obj),  &area_tmp);
 }

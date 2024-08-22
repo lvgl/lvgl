@@ -5,6 +5,19 @@
 #include <SPI.h>
 #include "SD.h"
 
+#if LV_FS_ARDUINO_SD_LETTER == '\0'
+    #error "LV_FS_ARDUINO_SD_LETTER must be set to a valid value"
+#else
+    #if (LV_FS_ARDUINO_SD_LETTER < 'A') || (LV_FS_ARDUINO_SD_LETTER > 'Z')
+        #if LV_FS_DEFAULT_DRIVE_LETTER != '\0' /*When using default drive letter, strict format (X:) is mandatory*/
+            #error "LV_FS_ARDUINO_SD_LETTER must be an upper case ASCII letter"
+        #else /*Lean rules for backward compatibility*/
+            #warning LV_FS_ARDUINO_SD_LETTER should be an upper case ASCII letter. \
+            Using a slash symbol as drive letter should be replaced with LV_FS_DEFAULT_DRIVE_LETTER mechanism
+        #endif
+    #endif
+#endif
+
 typedef struct SdFile {
     File file;
 } SdFile;
@@ -184,4 +197,10 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
     return (int32_t)(*pos_p) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
 
+#else /*LV_USE_FS_ARDUINO_SD == 0*/
+
+#if defined(LV_FS_ARDUINO_SD_LETTER) && LV_FS_ARDUINO_SD_LETTER != '\0'
+    #warning "LV_USE_FS_ARDUINO_SD is not enabled but LV_FS_ARDUINO_SD_LETTER is set"
 #endif
+
+#endif /*LV_USE_FS_ARDUINO_SD*/
