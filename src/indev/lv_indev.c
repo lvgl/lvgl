@@ -367,14 +367,14 @@ void lv_indev_set_long_press_time(lv_indev_t * indev, uint16_t long_press_time)
     indev->long_press_time = long_press_time;
 }
 
-void lv_indev_set_scroll_limit(lv_indev_t * indev, uint16_t scroll_limit)
+void lv_indev_set_scroll_limit(lv_indev_t * indev, uint8_t scroll_limit)
 {
     if(indev == NULL) return;
 
     indev->scroll_limit = scroll_limit;
 }
 
-void lv_indev_set_scroll_throw(lv_indev_t * indev, uint16_t scroll_throw)
+void lv_indev_set_scroll_throw(lv_indev_t * indev, uint8_t scroll_throw)
 {
     if(indev == NULL) return;
 
