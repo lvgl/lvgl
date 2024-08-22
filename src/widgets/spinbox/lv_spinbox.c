@@ -365,7 +365,7 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
             spinbox->step = 1;
             uint32_t i;
             for(i = 0; i < pos; i++) spinbox->step *= 10;
-            
+
             lv_spinbox_updatevalue(obj);
         }
     }
