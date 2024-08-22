@@ -113,6 +113,7 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
     layer.buf_area.y2 = snapshot_area.y1 + h - 1;
     layer.color_format = cf;
     layer._clip_area = snapshot_area;
+    layer.phy_clip_area = snapshot_area;
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     lv_matrix_identity(&layer.matrix);
 #endif

@@ -182,6 +182,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * data)
     dest_layer.color_format = LV_COLOR_FORMAT_ARGB8888;
     dest_layer.buf_area = task->area;
     dest_layer._clip_area = task->area;
+    dest_layer.phy_clip_area = task->area;
     lv_memzero(sdl_render_buf, lv_area_get_size(&dest_layer.buf_area) * 4 + 100);
 
     lv_display_t * disp = lv_refr_get_disp_refreshing();

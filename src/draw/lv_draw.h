@@ -84,6 +84,11 @@ struct lv_layer_t  {
      */
     lv_area_t _clip_area;
 
+    /**
+     * The physical clipping area relative to the display.
+     */
+    lv_area_t phy_clip_area;
+
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     /** Transform matrix to be applied when rendering the layer */
     lv_matrix_t matrix;
