@@ -223,7 +223,11 @@ Internally, LVGL rounds the redrawn areas to byte boundaries. This means the upd
 When setting up the buffers for rendering (:cpp:func:`lv_display_set_buffers`), make the buffer 8 bytes larger.
 This is necessary because LVGL skips 8 bytes in the buffer, as these are assumed to be used as a palette.
 
-Add this line in ``flush_cb`` to skip the palette: ``px_map += 8``.
+For example, a 128 x 64 monochrome buffer has 8192 pixels, which requires 8192 / 8 = 1024 bytes. To accommodate the palette, the buffer size should be 1024 + 8 = 1032 bytes.
+
+To skip the palette, include the following line in your ``flush_cb`` function: ``px_map += 8``.
+
+As usual, monochrome displays support partial, full and dirent rendering modes as well.
 
 User data
 ---------
