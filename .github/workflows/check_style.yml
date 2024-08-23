@@ -16,9 +16,8 @@ jobs:
       - name: Checkout astyle
         uses: actions/checkout@v4
         with:
-          repository: szepeviktor/astyle
+          repository: lvgl/astyle
           path: astyle
-          ref: v3.4.12
       - name: Install astyle
         run: |
           cd astyle/build/gcc/
