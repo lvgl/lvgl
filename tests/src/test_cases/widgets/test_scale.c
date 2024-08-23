@@ -32,7 +32,7 @@ void test_scale_render_example_1(void)
     lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
     lv_scale_set_range(scale, 10, 40);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("scale_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_1.png");
 }
 
 /* An vertical scale with section and custom styling */
@@ -117,7 +117,7 @@ void test_scale_render_example_2(void)
     lv_obj_set_style_radius(scale, 8, 0);
     lv_obj_set_style_pad_ver(scale, 20, 0);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("scale_2.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_2.png");
 }
 
 /* A simple round scale */
@@ -140,7 +140,7 @@ void test_scale_render_example_3(void)
     lv_obj_set_style_length(scale, 10, LV_PART_INDICATOR);
     lv_scale_set_range(scale, 10, 40);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("scale_3.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_3.png");
 }
 
 /* A round scale with section and custom styling */
@@ -219,7 +219,7 @@ void test_scale_render_example_4(void)
     lv_scale_section_set_style(section, LV_PART_ITEMS, &section_minor_tick_style);
     lv_scale_section_set_style(section, LV_PART_MAIN, &section_main_line_style);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("scale_4.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_4.png");
 }
 
 static void draw_event_cb(lv_event_t * e)
@@ -241,8 +241,12 @@ static void draw_event_cb(lv_event_t * e)
             };
             uint8_t major_tick = lv_scale_get_major_tick_every(obj);
             label_draw_dsc->color = color_idx[base_dsc->id1 / major_tick];
+            /*Free the previously allocated text if needed*/
+            if(label_draw_dsc->text_local) lv_free((void *)label_draw_dsc->text);
+            label_draw_dsc->text = lv_malloc(16);
+            label_draw_dsc->text_local = 1; /*Free the text automatically*/
             lv_snprintf((char *)label_draw_dsc->text,
-                        sizeof(label_draw_dsc->text),
+                        15, /*Not 16 because of the `\0`*/
                         "%.1f",
                         base_dsc->id2 * 1.0f);
             lv_point_t size;
@@ -277,7 +281,7 @@ void test_scale_render_example_7(void)
     lv_obj_add_event_cb(scale, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_add_flag(scale, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("scale_5.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_5.png");
 }
 
 void test_scale_set_style(void)
