@@ -22,9 +22,12 @@ static void draw_event_cb(lv_event_t * e)
             };
             uint8_t major_tick = lv_scale_get_major_tick_every(obj);
             label_draw_dsc->color = color_idx[base_dsc->id1 / major_tick];
-            size_t len = lv_strlen(label_draw_dsc->text) + 3;
+            /*Free the previously allocated text if needed*/
+            if(label_draw_dsc->text_local) lv_free((void *)label_draw_dsc->text);
+            label_draw_dsc->text = lv_malloc(16);
+            label_draw_dsc->text_local = 1; /*Free the text automatically*/
             lv_snprintf((char *)label_draw_dsc->text,
-                        len,
+                        15, /*Not 16 because of the `\0`*/
                         "%.1f",
                         base_dsc->id2 * 1.0f);
             lv_point_t size;
