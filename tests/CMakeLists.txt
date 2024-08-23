@@ -338,10 +338,7 @@ include_directories(${FREETYPE_INCLUDE_DIRS})
 
 if(OPTIONS_SDL)
     find_package(SDL2 REQUIRED)
-    find_library(NAME SDL2_image REQUIRED)
-    link_libraries(SDL2_image)
     include_directories(${SDL2_INCLUDE_DIRS})
-    include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
 endif()
 
 # libinput is required for the libinput device driver test case

@@ -204,7 +204,6 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
         lv_obj_remove_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
     }
 
-    SDL_Texture * texture = NULL;
     switch(task->type) {
         case LV_DRAW_TASK_TYPE_FILL: {
                 lv_draw_fill_dsc_t * fill_dsc = task->draw_dsc;
@@ -251,7 +250,6 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
             }
         case LV_DRAW_TASK_TYPE_LABEL: {
                 lv_draw_label_dsc_t label_dsc;
-                lv_draw_label_dsc_init(&label_dsc);
                 lv_memcpy(&label_dsc, task->draw_dsc, sizeof(label_dsc));
                 label_dsc.base.user_data = lv_sdl_window_get_renderer(disp);
                 lv_draw_label(&dest_layer, &label_dsc, &task->area);
@@ -259,7 +257,6 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
             break;
         case LV_DRAW_TASK_TYPE_ARC: {
                 lv_draw_arc_dsc_t arc_dsc;
-                lv_draw_arc_dsc_init(&arc_dsc);
                 lv_memcpy(&arc_dsc, task->draw_dsc, sizeof(arc_dsc));
                 arc_dsc.base.user_data = lv_sdl_window_get_renderer(disp);
                 lv_draw_arc(&dest_layer, &arc_dsc);
@@ -267,7 +264,6 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
             break;
         case LV_DRAW_TASK_TYPE_LINE: {
                 lv_draw_line_dsc_t line_dsc;
-                lv_draw_line_dsc_init(&line_dsc);
                 lv_memcpy(&line_dsc, task->draw_dsc, sizeof(line_dsc));
                 line_dsc.base.user_data = lv_sdl_window_get_renderer(disp);
                 lv_draw_line(&dest_layer, &line_dsc);
@@ -275,7 +271,6 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
             break;
         case LV_DRAW_TASK_TYPE_TRIANGLE: {
                 lv_draw_triangle_dsc_t triangle_dsc;
-                lv_draw_triangle_dsc_init(&triangle_dsc);
                 lv_memcpy(&triangle_dsc, task->draw_dsc, sizeof(triangle_dsc));
                 triangle_dsc.base.user_data = lv_sdl_window_get_renderer(disp);
                 lv_draw_triangle(&dest_layer, &triangle_dsc);
@@ -283,7 +278,6 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
             break;
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t image_dsc;
-                lv_draw_image_dsc_init(&image_dsc);
                 lv_memcpy(&image_dsc, task->draw_dsc, sizeof(image_dsc));
                 image_dsc.base.user_data = lv_sdl_window_get_renderer(disp);
                 lv_draw_image(&dest_layer, &image_dsc, &task->area);
@@ -300,8 +294,8 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
         }
     }
 
-    texture = SDL_CreateTexture(lv_sdl_window_get_renderer(disp), SDL_PIXELFORMAT_ARGB8888,
-                                SDL_TEXTUREACCESS_STATIC, texture_w, texture_h);
+    SDL_Texture * texture = SDL_CreateTexture(lv_sdl_window_get_renderer(disp), SDL_PIXELFORMAT_ARGB8888,
+                                              SDL_TEXTUREACCESS_STATIC, texture_w, texture_h);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_UpdateTexture(texture, NULL, sdl_render_buf, texture_w * 4);
 
