@@ -277,7 +277,7 @@ void test_scale_render_example_7(void)
     lv_obj_add_event_cb(scale, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_add_flag(scale, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("scale_7.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("scale_5.png");
 }
 
 void test_scale_set_style(void)
