@@ -28,7 +28,8 @@ repos:
           (?x)^(
               src/libs/ |
               src/lv_conf_internal.h |
-              tests/test_images
+              tests/test_images |
+              .pre-commit-config.yaml
            )
         types_or: ["c", "header"]
 -   repo: https://github.com/crate-ci/typos
@@ -37,9 +38,8 @@ repos:
     -   id: typos
         exclude: |
             (?x)^(
-                src/libs/ |
-              .pre-commit-config.yaml
+                src/libs/
              )
         config:
             skip:
-            - 'ACI'
+            - 'ACPI'

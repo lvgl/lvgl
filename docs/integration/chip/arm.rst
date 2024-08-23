@@ -39,7 +39,7 @@ Note that GCC has some known issues with Helium intrinsics. It is recommended to
 
 To add Arm2D to your project, follow these steps:
 
-1. To utilize its power, ensure that ``mcpu`` is set to ``cortex-m85`` and add the ``-fvectorize`` flag. To test without SIMD, use ``cortex-m85+nomve``.
+1. To utilize its power, ensure that ``mcpu`` is set to ``cortex-m85``, ``cortex-m55``, or ``cortex-m52`` and add the ``-fvectorize`` flag. To test without SIMD, use e.g. ``cortex-m85+nomve``.
 2. Arm2D can be downloaded from `https://github.com/ARM-software/Arm-2D <https://github.com/ARM-software/Arm-2D>`__. Consider using the ``developing`` branch, which contains the latest updates.
 3. Add ``Arm-2D/Library/Include`` to the include paths.
 4. Copy ``Arm-2D/Library/Include/template/arm_2d_cfg.h`` to any location you prefer to provide the default configuration for Arm2D. Ensure that the folder containing ``arm_2d_cfg.h`` is added to the include path.
