@@ -50,7 +50,7 @@ def get_args():
     if not os.path.exists(args.config):
         fatal(f"User config file not found at {args.config}")
     if not os.path.exists(args.defaults):
-        fatal(f"User defaults not found at {args.default}")
+        fatal(f"User defaults not found at {args.defaults}")
 
     return args
 
