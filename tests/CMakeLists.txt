@@ -326,6 +326,19 @@ if(NOT WIN32)
     # libjpeg is required for the jpeg test case
     find_package(JPEG REQUIRED)
     include_directories(${JPEG_INCLUDE_DIR})
+
+    # Wayland
+    find_package(PkgConfig)
+    pkg_check_modules(wayland-client REQUIRED wayland-client)
+    pkg_check_modules(wayland-cursor REQUIRED wayland-cursor)
+    pkg_check_modules(xkbcommon REQUIRED xkbcommon)
+
+    link_libraries(wayland-client wayland-cursor xkbcommon)
+
+    # Add auto generated source required for XDG shell
+    include_directories("${LVGL_TEST_DIR}/wayland_protocols")
+    target_sources(test_common PUBLIC "wayland_protocols/wayland_xdg_shell.c")
+
 endif()
 
 # libpng is required for the png test case

@@ -14,6 +14,9 @@ lvgl_test_dir = os.path.dirname(os.path.realpath(__file__))
 lvgl_script_path = os.path.join(lvgl_test_dir, "../scripts")
 sys.path.append(lvgl_script_path)
 
+wayland_dir = os.path.join(lvgl_test_dir, "wayland_protocols")
+wayland_protocols_dir = os.path.realpath("/usr/share/wayland-protocols")
+
 from LVGLImage import LVGLImage, ColorFormat, CompressMethod
 
 # Key values must match variable names in CMakeLists.txt.
@@ -70,6 +73,37 @@ def get_build_dir(options_name):
     global lvgl_test_dir
     return os.path.join(lvgl_test_dir, get_base_build_dir(options_name))
 
+def gen_wayland_protocols(clean):
+    '''Generates the xdg shell interface from wayland protocol definitions'''
+
+    if clean:
+        delete_dir_ignore_missing(wayland_dir)
+
+    if not os.path.isdir(wayland_dir):
+        os.mkdir(wayland_dir)
+        subprocess.check_call(['wayland-scanner',
+            'client-header',
+            os.path.join(wayland_protocols_dir, "stable/xdg-shell/xdg-shell.xml"),
+            os.path.join(wayland_dir, "wayland_xdg_shell.h.original"),
+        ])
+
+        subprocess.check_call(['wayland-scanner',
+            'private-code',
+            os.path.join(wayland_protocols_dir, "stable/xdg-shell/xdg-shell.xml"),
+            os.path.join(wayland_dir, "wayland_xdg_shell.c.original"),
+        ])
+
+        # Insert guards
+        with open(os.path.join(wayland_dir, "wayland_xdg_shell.h"), "w") as outfile:
+            subprocess.check_call(['sed','-e', "1i #if LV_BUILD_TEST", '-e', '$a #endif',
+                os.path.join(wayland_dir, "wayland_xdg_shell.h.original")], stdout=outfile)
+
+        with open(os.path.join(wayland_dir, "wayland_xdg_shell.c"), "w") as outfile:
+            subprocess.check_call(['sed','-e', "1i #if LV_BUILD_TEST", '-e', '$a #endif',
+                os.path.join(wayland_dir, "wayland_xdg_shell.c.original")], stdout=outfile)
+
+        subprocess.check_call(['rm', os.path.join(wayland_dir, "wayland_xdg_shell.c.original")])
+        subprocess.check_call(['rm', os.path.join(wayland_dir, "wayland_xdg_shell.h.original")])
 
 def build_tests(options_name, build_type, clean):
     '''Build all tests for the specified options name.'''
@@ -89,6 +123,10 @@ def build_tests(options_name, build_type, clean):
         delete_dir_ignore_missing(build_dir)
 
     os.chdir(lvgl_test_dir)
+
+    if platform.system() != 'Windows':
+        gen_wayland_protocols(clean)
+
     created_build_dir = False
     if not os.path.isdir(build_dir):
         os.mkdir(build_dir)

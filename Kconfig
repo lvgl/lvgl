@@ -1562,6 +1562,18 @@ menu "LVGL configuration"
 					With 2 buffers in flush_cb only and address change is required.
 		endchoice
 
+		config LV_USE_WAYLAND
+			bool "Use the wayland client to open a window and handle inputs on Linux or BSD"
+			default n
+		config LV_WAYLAND_WINDOW_DECORATIONS
+			bool "Draw client side window decorations, only necessary on Mutter (GNOME)"
+			depends on LV_USE_WAYLAND
+			default n
+		config LV_WAYLAND_WL_SHELL
+			bool "Support the legacy wl_shell instead of the default XDG Shell protocol"
+			depends on LV_USE_WAYLAND
+			default n
+
 		config LV_USE_LINUX_FBDEV
 			bool "Use Linux framebuffer device"
 			default n
