@@ -39,3 +39,6 @@ repos:
             (?x)^(
                 src/libs/
              )
+        config:
+            skip:
+            - 'ACPI'

@@ -4,29 +4,29 @@
 Arm
 ===
 
-Arm is a leading semiconductor and software design company, renowned for creating the Cortex-M microcontroller (MCU) cores and Cortex-A (MPU) processor cores, which are integral to a wide range of devices. These cores are at the heart of many embedded systems, powering chips from industry giants such as STMicroelectronics, NXP, and Renesas. Arm's energy-efficient designs are used in billions of devices worldwide, from microcontrollers to smartphones and servers. By licensing their processor designs, Arm enables a broad ecosystem of partners to develop customized solutions optimized for performance, power, and size. Arm's architecture is highly compatible with various operating systems and software libraries, including LVGL, making it a versatile choice for developers creating efficient, high-performance graphical user interfaces.
+Arm is a leading semiconductor and software design company, renowned for creating the Cortex-M microcontroller (MCU) cores and Cortex-A/R (MPU) processor cores, which are integral to a wide range of devices. These cores are at the heart of many embedded systems, powering chips from industry giants such as STMicroelectronics, NXP, and Renesas. Arm's energy-efficient designs are used in billions of devices worldwide, from microcontrollers to smartphones and servers. By licensing their processor designs, Arm enables a broad ecosystem of partners to develop customized solutions optimized for performance, power, and size. Arm's architecture is highly compatible with various operating systems and software libraries, including LVGL, making it a versatile choice for developers creating efficient, high-performance graphical user interfaces.
 
 Compile LVGL for Arm
 --------------------
 
-No specific action is required. Any compiler that supports the target Arm architecture can be used to compile LVGL's source code, including GCC, LLVM, and Ac6.
+No specific action is required. Any compiler that supports the target Arm architecture can be used to compile LVGL's source code, including GCC, LLVM, and AC6.
 
 It is also possible to cross-compile LVGL for an MPU (instead of compiling it on the target hardware) or create a shared library. For more information, check out :ref:`build_cmake`.
 
-Getting Started with Ac6
+Getting Started with AC6
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Ac6 is the proprietary compiler from Arm. Since Ac6 is maintained by Arm, it contains many specific optimizations, so you can expect the best performance when using it.
+Since AC6 is a proprietary toolchain, it contains many specific optimizations, so you can expect the best performance when using it.
 
-Ac6 is not free, but it offers a community license that can be activated as follows:
+AC6 is not free, but it offers a community license that can be activated as follows:
 
-1. Download and install the Ac6 compiler from `Arm's website <https://developer.arm.com/Tools%20and%20Software/Arm%20Compiler%20for%20Embedded>`__.
+1. Download and install the AC6 compiler from `Arm's website <https://developer.arm.com/Tools%20and%20Software/Arm%20Compiler%20for%20Embedded>`__.
 2. To register a community license, go to the ``bin`` folder of the compiler and, in a terminal, run ``armlm.exe activate -server https://mdk-preview.keil.arm.com -product KEMDK-COM0`` (On Linux, use ``./armlm``).
 
 IDE Support
 -----------
 
-There are no limitations on the supported IDEs. LVGL works in various vendors' IDEs, including Arm's Keil MDK, Renesas's e2 studio, NXP's MCUXpresso, ST's CubeIDE, as well as custom make or CMake projects.
+There are no limitations on the supported IDEs. LVGL works in various vendors' IDEs, including Arm's Keil MDK, IAR, Renesas's e2 studio, NXP's MCUXpresso, ST's CubeIDE, as well as custom make or CMake projects.
 
 Arm2D and the Helium instruction set
 ------------------------------------
@@ -34,7 +34,8 @@ Arm2D and the Helium instruction set
 Arm Cortex-M55 and Cortex-M85 have the `SIMD Helium <https://www.arm.com/technologies/helium>`__ instruction set.
 Among many others, this can effectively speed up UI rendering. :ref:`Arm2D <arm2d>` is a library maintained by Arm that leverages the Helium instruction set.
 
-Note that Arm2D cannot be compiled with GCC; it is recommended to use Ac6 or LLVM.
+Note that GCC has some known issues with Helium intrinsics. It is recommended to use AC6 or LLVM when dealing with Helium code.
+
 
 To add Arm2D to your project, follow these steps:
 
