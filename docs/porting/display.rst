@@ -173,7 +173,7 @@ The default color format of the display is set according to :c:macro:`LV_COLOR_D
 - :c:macro:`LV_COLOR_DEPTH` ``24``: RGB888 (3 bytes/pixel)
 - :c:macro:`LV_COLOR_DEPTH` ``16``: RGB565 (2 bytes/pixel)
 - :c:macro:`LV_COLOR_DEPTH` ``8``: L8 (1 bytes/pixel)
-- :c:macro:`LV_COLOR_DEPTH` ``1``: I1 (1 bit/pixel) Only support for horizontal mapped buffers.
+- :c:macro:`LV_COLOR_DEPTH` ``1``: I1 (1 bit/pixel) Only support for horizontal mapped buffers. See :refr:`monochrome` for more details:
 
 The ``color_format`` can be changed with
 :cpp:expr:`lv_display_set_color_depth(display, LV_COLOR_FORMAT_...)`.
@@ -205,6 +205,25 @@ to
 
 ``GGG BBBBB | RRRRR GGG``.
 
+.. _monochrome:
+
+Monochrome Displays
+-------------------
+
+LVGL supports rendering directly in a 1-bit format for monochrome displays.
+To enable it, set ``LV_COLOR_DEPTH 1`` or use :cpp:expr:`lv_display_set_color_format(display, LV_COLOR_FORMAT_I1)`.
+
+The :cpp:expr:`LV_COLOR_FORMAT_I1` format assumes that bytes are mapped to rows (i.e., the bits of a byte are written next to each other). Ensure that the LCD controller is configured accordingly.
+
+Internally, LVGL rounds the redrawn areas to byte boundaries. This means the updated areas will:
+
+- Start on an ``Nx8`` coordinate
+- End on an ``Nx8 - 1`` coordinate
+
+When setting up the buffers for rendering (:cpp:func:`lv_display_set_buffers`), make the buffer 8 bytes larger.
+This is necessary because LVGL skips 8 bytes in the buffer, as these are assumed to be used as a palette.
+
+Add this line in ``flush_cb`` to skip the palette: ``px_map += 8``.
 
 User data
 ---------
