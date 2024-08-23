@@ -37,8 +37,9 @@ repos:
     -   id: typos
         exclude: |
             (?x)^(
-                src/libs/
+                src/libs/ |
+              .pre-commit-config.yaml
              )
         config:
             skip:
-            - 'ACPI'
+            - 'ACI'
