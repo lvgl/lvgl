@@ -1510,10 +1510,16 @@ menu "LVGL configuration"
 			default 1 if LV_SDL_SINGLE_BUFFER
 			default 2 if LV_SDL_DOUBLE_BUFFER
 
+		config LV_SDL_ACCELERATED
+			bool "Use hardware acceleration"
+			depends on LV_USE_SDL
+			default y
+
 		config LV_SDL_FULLSCREEN
 			bool "SDL fullscreen"
 			depends on LV_USE_SDL
 			default n
+
 		config LV_SDL_DIRECT_EXIT
 			bool "Exit the application when all SDL windows are closed"
 			depends on LV_USE_SDL
