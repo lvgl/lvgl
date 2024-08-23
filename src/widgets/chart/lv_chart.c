@@ -313,6 +313,11 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
     }
 
     if(ser->y_points == NULL) {
+        if(ser->x_points) {
+            lv_free(ser->x_points);
+            ser->x_points = NULL;
+        }
+
         lv_ll_remove(&chart->series_ll, ser);
         lv_free(ser);
         return NULL;
