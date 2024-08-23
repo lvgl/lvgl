@@ -22,14 +22,21 @@ static void draw_event_cb(lv_event_t * e)
             };
             uint8_t major_tick = lv_scale_get_major_tick_every(obj);
             label_draw_dsc->color = color_idx[base_dsc->id1 / major_tick];
+            /* Figure out how many bytes we need to allocate */
+            char tmp_buffer[20] = {0}; /* Big enough buffer */
+            int needed_bytes = lv_snprintf(tmp_buffer, sizeof(tmp_buffer), "%.1f", base_dsc->id2 * 1.0f);
+            needed_bytes += 1U; /* null terminator */
+
             /*Free the previously allocated text if needed*/
             if(label_draw_dsc->text_local) lv_free((void *)label_draw_dsc->text);
-            label_draw_dsc->text = lv_malloc(16);
-            label_draw_dsc->text_local = 1; /*Free the text automatically*/
+            /*Mark text_local as 1 so space for the next text is allocated and the new string is copied into it*/
+            label_draw_dsc->text_local = 1;
+            label_draw_dsc->text = lv_malloc(needed_bytes); /*NOTE: Assumption that allocation succeeded*/
             lv_snprintf((char *)label_draw_dsc->text,
-                        15, /*Not 16 because of the `\0`*/
+                        needed_bytes,
                         "%.1f",
                         base_dsc->id2 * 1.0f);
+
             lv_point_t size;
             lv_text_get_size(&size, label_draw_dsc->text, label_draw_dsc->font, 0, 0, 1000, LV_TEXT_FLAG_NONE);
             int32_t new_w = size.x;
