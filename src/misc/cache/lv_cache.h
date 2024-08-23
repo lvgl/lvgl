@@ -1,10 +1,10 @@
 /**
-* @file lv_cache.h
-*
-*/
+ * @file lv_cache.h
+ *
+ */
 
-#ifndef LV_CACHE1_H
-#define LV_CACHE1_H
+#ifndef LV_CACHE_H
+#define LV_CACHE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,7 +69,7 @@ lv_cache_entry_t * lv_cache_acquire(lv_cache_t * cache, const void * key, void *
 /**
  * Acquire a cache entry with the given key. If the entry is not in the cache, it will create a new entry with the given key.
  * If the entry is found, it's priority will be changed by the cache's policy. And the `lv_cache_entry_t::ref_cnt` will be incremented.
- * If you want to use this API to simplify the code, you should provide a @lv_cache_ops_t::create_cb that creates a new entry with the given key.
+ * If you want to use this API to simplify the code, you should provide a `lv_cache_ops_t::create_cb` that creates a new entry with the given key.
  * This API is a combination of lv_cache_acquire() and lv_cache_add(). The effect is the same as calling lv_cache_acquire() and lv_cache_add() separately.
  * And the internal impact on cache is also consistent with these two APIs.
  * @param cache         The cache object pointer to acquire the entry.
@@ -227,4 +227,4 @@ const char * lv_cache_get_name(lv_cache_t * cache);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_CACHE_H*/
+#endif /* LV_CACHE_H */

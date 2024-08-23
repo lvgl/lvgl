@@ -1,5 +1,5 @@
-/*
- * lv_st7735.h
+/**
+ * @file lv_st7735.h
  *
  * This driver is just a wrapper around the generic MIPI compatible LCD controller driver
  *

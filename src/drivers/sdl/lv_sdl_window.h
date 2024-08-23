@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_SDL_DISP_H
-#define LV_SDL_DISP_H
+#ifndef LV_SDL_WINDOW_H
+#define LV_SDL_WINDOW_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,4 +59,4 @@ void lv_sdl_quit(void);
 } /* extern "C" */
 #endif
 
-#endif /* LV_SDL_DISP_H */
+#endif /* LV_SDL_WINDOW_H */

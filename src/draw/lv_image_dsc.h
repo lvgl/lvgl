@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_IMAGE_BUF_H
-#define LV_IMAGE_BUF_H
+#ifndef LV_IMAGE_DSC_H
+#define LV_IMAGE_DSC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -138,4 +138,4 @@ typedef struct {
 } /*extern "C"*/
 #endif
 
-#endif /*LV_IMAGE_BUF_H*/
+#endif /*LV_IMAGE_DSC_H*/
