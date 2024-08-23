@@ -292,9 +292,10 @@ void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     if(suc == false)  return; /*Out of the screen*/
 
     if(disp->color_format == LV_COLOR_FORMAT_I1) {
-        com_area.x1 &= ~0x7; /*Round down*/
-        com_area.x2 += 7;    /*Round up*/
-        com_area.x2 &= ~0x7;
+        /*Make sure that the X coordinates start and end on byte boundary.
+         *E.g. convert 11;27 to 8;31*/
+        com_area.x1 &= ~0x7; /*Round down: Nx8*/
+        com_area.x2 |= 0x7;    /*Round up: Nx8 - 1*/
     }
 
     /*If there were at least 1 invalid area in full refresh mode, redraw the whole screen*/
