@@ -458,9 +458,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             ${TEST_LIBS})
 
     if(OPTIONS_SDL)
-        target_link_libraries(${test_name} PRIVATE
-                ${SDL_LIBRARY}
-                ${SDL_IMAGE_LIBRARY})
+        target_link_libraries(${test_name} PRIVATE ${SDL_LIBRARY})
     endif()
 
 	if (NOT $ENV{NON_AMD64_BUILD})
