@@ -25,7 +25,6 @@ typedef struct SdFile {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void fs_init(void);
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p);
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
@@ -38,8 +37,6 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
  */
 extern "C" void lv_fs_arduino_sd_init(void)
 {
-    fs_init();
-
     lv_fs_drv_t * fs_drv = &(LV_GLOBAL_DEFAULT()->arduino_sd_fs_drv);
     lv_fs_drv_init(fs_drv);
 
@@ -61,17 +58,6 @@ extern "C" void lv_fs_arduino_sd_init(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-/*Initialize your Storage device and File system.*/
-static void fs_init(void)
-{
-    if(!SD.begin(LV_FS_ARDUINO_SD_CS_PIN, SPI, LV_FS_ARDUINO_SD_FREQUENCY)) {
-        LV_LOG_WARN("Driver Arduino SD Card not mounted");
-        return;
-    }
-
-    LV_LOG_WARN("Driver Arduino SD Card mounted");
-}
 
 /**
  * Open a file
