@@ -176,9 +176,6 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 
 static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
 {
-    static int32_t x = 0;
-    printf("%d\n", x++);
-
     lv_draw_task_t * task = u->task_act;
 
     lv_layer_t dest_layer;
@@ -295,7 +292,6 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
         default:
             return false;
     }
-
 
     while(dest_layer.draw_task_head) {
         lv_draw_dispatch_layer(disp, &dest_layer);

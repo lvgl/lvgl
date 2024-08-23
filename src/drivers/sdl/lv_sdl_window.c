@@ -144,6 +144,9 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
 #endif /*LV_USE_DRAW_SDL == 0*/
     lv_display_add_event_cb(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
 
+    /*Process the initial events*/
+    sdl_event_handler(NULL);
+
     return disp;
 }
 
@@ -315,7 +318,6 @@ static void sdl_event_handler(lv_timer_t * t)
             lv_display_t * disp = lv_sdl_get_disp_from_win_id(event.window.windowID);
             if(disp == NULL) continue;
             lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-
             switch(event.window.event) {
 #if SDL_VERSION_ATLEAST(2, 0, 5)
                 case SDL_WINDOWEVENT_TAKE_FOCUS:
