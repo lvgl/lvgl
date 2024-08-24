@@ -227,7 +227,7 @@ For example, a 128 x 64 monochrome buffer has 8192 pixels, which requires 8192 /
 
 To skip the palette, include the following line in your ``flush_cb`` function: ``px_map += 8``.
 
-As usual, monochrome displays support partial, full and direct rendering modes as well.
+As usual, monochrome displays support partial, full and direct rendering modes as well. In full and direct mode the buffer size should be large enough for the whole screen (``w x h / 8 + 8`` bytes)
 
 User data
 ---------
