@@ -1,3 +1,5 @@
+.. _arm2d:
+
 ==========
 Arm-2D GPU
 ==========
@@ -7,9 +9,9 @@ Microcontrollers**. It supports all Cortex-M processors ranging from
 Cortex-M0 to the latest Cortex-M85.
 
 Arm-2D accelerates LVGL9 with two modes: **Synchronous Mode** and
-**Asynchronous Mode**. 
+**Asynchronous Mode**.
 - When **Helium** and **ACI (Arm Custom Instruction)** are available, it is recommend
-  to use **Synchronous Mode** to accelerate LVGL. 
+  to use **Synchronous Mode** to accelerate LVGL.
 - When Arm-2D backed 2D-GPUs are available, for example, **DMAC-350 based 2D
   GPUs**, it is recommend to use **Asynchronous Mode** to accelerate LVGL.
 
@@ -20,12 +22,12 @@ How to Use
 **********
 
 In general:
-- you can set the macro :c:macro:`LV_USE_DRAW_ARM2D_SYNC` to ``1`` and 
-  :c:macro:`LV_DRAW_SW_ASM` to ``LV_DRAW_SW_ASM_HELIUM`` in ``lv_conf.h`` to 
-  enable Arm-2D synchronous acceleration for LVGL. 
-- You can set 
-  the macro :c:macro:`LV_USE_DRAW_ARM2D_ASYNC` to ``1`` in ``lv_conf.h`` to enable 
-  Arm-2D Asynchronous acceleration for LVGL. 
+- you can set the macro :c:macro:`LV_USE_DRAW_ARM2D_SYNC` to ``1`` and
+  :c:macro:`LV_DRAW_SW_ASM` to ``LV_DRAW_SW_ASM_HELIUM`` in ``lv_conf.h`` to
+  enable Arm-2D synchronous acceleration for LVGL.
+- You can set
+  the macro :c:macro:`LV_USE_DRAW_ARM2D_ASYNC` to ``1`` in ``lv_conf.h`` to enable
+  Arm-2D Asynchronous acceleration for LVGL.
 
 If you are using
 `CMSIS-Pack <https://github.com/lvgl/lvgl/tree/master/env_support/cmsis-pack>`__
@@ -47,7 +49,7 @@ LVGL (sometimes worse) for regular Cortex-M processors.
 -  The target processors support
    `Helium <https://developer.arm.com/documentation/102102/0103/?lang=en>`__.
 -  The device vendor provides an arm-2d compliant driver for their
-   proprietary 2D accelerators and/or ACI(Arm Customized Instruction).
+   proprietary 2D accelerators and/or ACI (Arm Customized Instruction).
 -  The target device contains
    `DMAC-350 <https://community.arm.com/arm-community-blogs/b/internet-of-things-blog/posts/arm-corelink-dma-350-next-generation-direct-memory-access-for-endpoint-ai>`__
 
