@@ -136,7 +136,6 @@ or anything else to optimize while the waiting for flush.
 If ``flush_wait_cb`` is not set, LVGL assume that `lv_display_flush_ready`
 is used.
 
-
 Rotation
 --------
 
@@ -213,21 +212,30 @@ Monochrome Displays
 LVGL supports rendering directly in a 1-bit format for monochrome displays.
 To enable it, set ``LV_COLOR_DEPTH 1`` or use :cpp:expr:`lv_display_set_color_format(display, LV_COLOR_FORMAT_I1)`.
 
-The :cpp:expr:`LV_COLOR_FORMAT_I1` format assumes that bytes are mapped to rows (i.e., the bits of a byte are written next to each other). Ensure that the LCD controller is configured accordingly.
+The :cpp:expr:`LV_COLOR_FORMAT_I1` format assumes that bytes are mapped to rows (i.e., the bits of a byte are written next to each other).
+The order of bits is MSB first, which means:
 
-Internally, LVGL rounds the redrawn areas to byte boundaries. This means the updated areas will:
+.. code::
 
-- Start on an ``Nx8`` coordinate
-- End on an ``Nx8 - 1`` coordinate
+             MSB           LSB
+   bits       7 6 5 4 3 2 1 0
+   pixels     0 1 2 3 4 5 6 7
+             Left         Right
+
+Ensure that the LCD controller is configured accordingly.
+
+Internally, LVGL rounds the redrawn areas to byte boundaries. Therefore, updated areas will:
+
+- Start on an ``Nx8`` coordinate.
+- End on an ``Nx8 - 1`` coordinate.
 
 When setting up the buffers for rendering (:cpp:func:`lv_display_set_buffers`), make the buffer 8 bytes larger.
-This is necessary because LVGL skips 8 bytes in the buffer, as these are assumed to be used as a palette.
-
-For example, a 128 x 64 monochrome buffer has 8192 pixels, which requires 8192 / 8 = 1024 bytes. To accommodate the palette, the buffer size should be 1024 + 8 = 1032 bytes.
+This is necessary because LVGL reserves 2 x 4 bytes in the buffer, as these are assumed to be used as a palette.
 
 To skip the palette, include the following line in your ``flush_cb`` function: ``px_map += 8``.
 
-As usual, monochrome displays support partial, full and direct rendering modes as well. In full and direct mode the buffer size should be large enough for the whole screen (``w x h / 8 + 8`` bytes)
+As usual, monochrome displays support partial, full, and direct rendering modes as well.
+In full and direct modes, the buffer size should be large enough for the whole screen, meaning ``(horizontal_resolution x vertical_resolution / 8) + 8`` bytes.
 
 User data
 ---------
