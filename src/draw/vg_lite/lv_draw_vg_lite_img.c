@@ -91,9 +91,6 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         lv_memset(&color, dsc->opa, sizeof(color));
     }
 
-    bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
-    vg_lite_filter_t filter = has_transform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
-
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
     lv_vg_lite_matrix_multiply(&matrix, &u->global_matrix);
@@ -101,6 +98,9 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
 
     LV_VG_LITE_ASSERT_SRC_BUFFER(&src_buf);
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
+
+    bool no_transform = lv_matrix_is_identity_or_translation((const lv_matrix_t *)&matrix);
+    vg_lite_filter_t filter = no_transform ? VG_LITE_FILTER_POINT : VG_LITE_FILTER_BI_LINEAR;
 
     /* If clipping is not required, blit directly */
     if(lv_area_is_in(&image_tf_area, draw_unit->clip_area, false) && dsc->clip_radius <= 0) {
