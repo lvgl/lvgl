@@ -291,6 +291,13 @@ void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     suc = lv_area_intersect(&com_area, area_p, &scr_area);
     if(suc == false)  return; /*Out of the screen*/
 
+    if(disp->color_format == LV_COLOR_FORMAT_I1) {
+        /*Make sure that the X coordinates start and end on byte boundary.
+         *E.g. convert 11;27 to 8;31*/
+        com_area.x1 &= ~0x7; /*Round down: Nx8*/
+        com_area.x2 |= 0x7;    /*Round up: Nx8 - 1*/
+    }
+
     /*If there were at least 1 invalid area in full refresh mode, redraw the whole screen*/
     if(disp->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
         disp->inv_areas[0] = scr_area;
@@ -1101,10 +1108,11 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 
 static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
 {
-    bool has_alpha = lv_color_format_has_alpha(disp->color_format);
-    lv_color_format_t cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : disp->color_format;
+    lv_color_format_t cf = disp->color_format;
     uint32_t stride = lv_draw_buf_width_to_stride(area_w, cf);
-    int32_t max_row = (uint32_t)disp->buf_act->data_size / stride;
+    uint32_t overhead = LV_COLOR_INDEXED_PALETTE_SIZE(cf) * sizeof(lv_color32_t);
+
+    int32_t max_row = (uint32_t)(disp->buf_act->data_size - overhead) / stride;
 
     if(max_row > area_h) max_row = area_h;
 
