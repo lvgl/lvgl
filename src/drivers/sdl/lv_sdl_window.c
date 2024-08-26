@@ -14,6 +14,7 @@
 #include "../../core/lv_global.h"
 #include "../../display/lv_display_private.h"
 #include "../../lv_init.h"
+#include "../../draw/lv_draw_buf.h"
 
 /* for aligned_alloc */
 #ifndef __USE_ISOC11
@@ -23,10 +24,6 @@
 
 #define SDL_MAIN_HANDLED /*To fix SDL's "undefined reference to WinMain" issue*/
 #include "lv_sdl_private.h"
-
-#if LV_USE_DRAW_SDL
-    #include <SDL2/SDL_image.h>
-#endif
 
 /*********************
  *      DEFINES
@@ -91,13 +88,6 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
         event_handler_timer = lv_timer_create(sdl_event_handler, 5, NULL);
         lv_tick_set_cb(SDL_GetTicks);
 
-#if LV_USE_DRAW_SDL
-        if(!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
-            fprintf(stderr, "could not initialize sdl2_image: %s\n", IMG_GetError());
-            return NULL;
-        }
-#endif
-
         inited = true;
     }
 
@@ -133,14 +123,18 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
                                LV_SDL_RENDER_MODE);
     }
 #else /*/*LV_USE_DRAW_SDL == 1*/
-    uint32_t stride = lv_draw_buf_width_to_stride(disp->hor_res,
-                                                  lv_display_get_color_format(disp));
     /*It will render directly to default Texture, so the buffer is not used, so just set something*/
-    static uint8_t dummy_buf[1];
-    lv_display_set_buffers(disp, dummy_buf, NULL, stride * disp->ver_res,
-                           LV_SDL_RENDER_MODE);
+    static lv_draw_buf_t draw_buf;
+    static uint8_t dummy_buf; /*It won't be used as it will render to the SDL textures directly*/
+    lv_draw_buf_init(&draw_buf, 4096, 4096, LV_COLOR_FORMAT_ARGB8888, 4096 * 4, &dummy_buf, 4096 * 4096 * 4);
+
+    lv_display_set_draw_buffers(disp, &draw_buf, NULL);
+    lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
 #endif /*LV_USE_DRAW_SDL == 0*/
     lv_display_add_event_cb(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
+
+    /*Process the initial events*/
+    sdl_event_handler(NULL);
 
     return disp;
 }
@@ -313,7 +307,6 @@ static void sdl_event_handler(lv_timer_t * t)
             lv_display_t * disp = lv_sdl_get_disp_from_win_id(event.window.windowID);
             if(disp == NULL) continue;
             lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-
             switch(event.window.event) {
 #if SDL_VERSION_ATLEAST(2, 0, 5)
                 case SDL_WINDOWEVENT_TAKE_FOCUS:
@@ -361,7 +354,8 @@ static void window_create(lv_display_t * disp)
                                    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                    hor_res * dsc->zoom, ver_res * dsc->zoom, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
 
-    dsc->renderer = SDL_CreateRenderer(dsc->window, -1, SDL_RENDERER_SOFTWARE);
+    dsc->renderer = SDL_CreateRenderer(dsc->window, -1,
+                                       LV_SDL_ACCELERATED ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE);
 #if LV_USE_DRAW_SDL == 0
     texture_resize(disp);
 

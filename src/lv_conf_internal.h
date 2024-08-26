@@ -3054,6 +3054,17 @@
             #define LV_SDL_BUF_COUNT        1    /*1 or 2*/
         #endif
     #endif
+    #ifndef LV_SDL_ACCELERATED
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_SDL_ACCELERATED
+                #define LV_SDL_ACCELERATED CONFIG_LV_SDL_ACCELERATED
+            #else
+                #define LV_SDL_ACCELERATED 0
+            #endif
+        #else
+            #define LV_SDL_ACCELERATED      1    /*1: Use hardware acceleration*/
+        #endif
+    #endif
     #ifndef LV_SDL_FULLSCREEN
         #ifdef CONFIG_LV_SDL_FULLSCREEN
             #define LV_SDL_FULLSCREEN CONFIG_LV_SDL_FULLSCREEN

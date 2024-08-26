@@ -42,6 +42,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
     dsc->width = 1;
     dsc->opa = LV_OPA_COVER;
     dsc->color = lv_color_black();
+    dsc->base.dsc_size = sizeof(lv_draw_line_dsc_t);
 }
 
 lv_draw_line_dsc_t * lv_draw_task_get_line_dsc(lv_draw_task_t * task)
