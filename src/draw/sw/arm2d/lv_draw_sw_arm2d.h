@@ -17,6 +17,7 @@ extern "C" {
  *********************/
 
 #include "../../../lv_conf_internal.h"
+#include "../../../misc/lv_area_private.h"
 
 #if LV_USE_DRAW_ARM2D_SYNC
 
