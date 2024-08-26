@@ -585,7 +585,7 @@
     #endif
 
     #if LV_USE_OS
-        /** Use additional draw thread for VG-Lite processing.*/
+        /** Use additional draw thread for VG-Lite processing. */
         #ifndef LV_USE_VGLITE_DRAW_THREAD
             #ifdef LV_KCONFIG_PRESENT
                 #ifdef CONFIG_LV_USE_VGLITE_DRAW_THREAD
@@ -3153,7 +3153,7 @@
                 #define LV_SDL_ACCELERATED 0
             #endif
         #else
-            #define LV_SDL_ACCELERATED      1    /*1: Use hardware acceleration*/
+            #define LV_SDL_ACCELERATED      1    /**< 1: Use hardware acceleration*/
         #endif
     #endif
     #ifndef LV_SDL_FULLSCREEN
@@ -3267,7 +3267,7 @@
     #endif
 #endif
 
-/*Driver for /dev/fb*/
+/** Driver for /dev/fb */
 #ifndef LV_USE_LINUX_FBDEV
     #ifdef CONFIG_LV_USE_LINUX_FBDEV
         #define LV_USE_LINUX_FBDEV CONFIG_LV_USE_LINUX_FBDEV
