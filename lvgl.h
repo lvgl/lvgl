@@ -118,6 +118,7 @@ extern "C" {
 
 #include "src/lv_api_map_v8.h"
 #include "src/lv_api_map_v9_0.h"
+#include "src/lv_api_map_v9_1.h"
 
 /*********************
  *      DEFINES
