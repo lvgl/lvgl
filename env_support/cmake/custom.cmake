@@ -80,8 +80,13 @@ file(GLOB LVGL_PUBLIC_HEADERS
     "${LVGL_ROOT_DIR}/lv_version.h")
 
 if(NOT LV_CONF_SKIP)
-	list(APPEND LVGL_PUBLIC_HEADERS
-		"${CMAKE_SOURCE_DIR}/lv_conf.h")
+  if (LV_CONF_PATH)
+    list(APPEND LVGL_PUBLIC_HEADERS
+    ${LV_CONF_PATH})
+  else()
+    list(APPEND LVGL_PUBLIC_HEADERS
+    "${CMAKE_SOURCE_DIR}/lv_conf.h")
+  endif()
 endif()
 
 if("${LIB_INSTALL_DIR}" STREQUAL "")
