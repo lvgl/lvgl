@@ -1313,6 +1313,15 @@
     #endif
 #endif
 
+/*Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default*/
+#ifndef LV_USE_PRIVATE_API
+    #ifdef CONFIG_LV_USE_PRIVATE_API
+        #define LV_USE_PRIVATE_API CONFIG_LV_USE_PRIVATE_API
+    #else
+        #define LV_USE_PRIVATE_API		0
+    #endif
+#endif
+
 /*==================
  *   FONT USAGE
  *===================*/
