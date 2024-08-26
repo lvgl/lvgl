@@ -236,6 +236,8 @@ To skip the palette, include the following line in your ``flush_cb`` function: `
 
 As usual, monochrome displays support partial, full, and direct rendering modes as well.
 In full and direct modes, the buffer size should be large enough for the whole screen, meaning ``(horizontal_resolution x vertical_resolution / 8) + 8`` bytes.
+As LVGL can not handle fractional width make sure to round the horizontal resolution to 8-
+(For example 90 to 96)
 
 User data
 ---------
