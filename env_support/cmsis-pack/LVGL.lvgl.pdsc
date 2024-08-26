@@ -44,10 +44,6 @@
       - LVGL 9.1.0
       - See Change Log
     </release>
-    <release date="2024-03-19" version="8.4.0" url="https://github.com/lvgl/lvgl/raw/v8.4.0/env_support/cmsis-pack/LVGL.lvgl.8.4.0.pack">
-      - LVGL 8.4.0
-      - Some minor fixes
-    </release>
     <release date="2024-01-24" version="9.0.0" url="https://github.com/lvgl/lvgl/raw/v9.0.0/env_support/cmsis-pack/LVGL.lvgl.9.0.0.pack">
       - LVGL 9.0.0
       - Implements a New Render Architecture that enables parallel processing
@@ -57,7 +53,10 @@
       - Adds Demos for benchmarks, render test etc,
       - Other fixes
     </release>
-    
+    <release date="2024-03-19" version="8.4.0" url="https://github.com/lvgl/lvgl/raw/v8.4.0/env_support/cmsis-pack/LVGL.lvgl.8.4.0.pack">
+      - LVGL 8.4.0
+      - Some minor fixes
+    </release>
     <release date="2023-12-05" version="8.3.11" url="https://github.com/lvgl/lvgl/raw/8194d83226c27c84f12dd51e16f5add9939215a5/env_support/cmsis-pack/LVGL.lvgl.8.3.11.pack">
       - LVGL 8.3.11
       - Add LittleFS Library to LVGL8
@@ -367,8 +366,7 @@
                 <file category="sourceC"            name="src/drivers/libinput/lv_xkb.c" />
                 
                 
-                <file category="sourceC"            name="src/drivers/glfw/lv_glfw_windows.c" />
-                <file category="sourceC"            name="src/drivers/glfw/lv_glfw_windows.c" />
+                <file category="sourceC"            name="src/drivers/glfw/lv_glfw_window.c" />
                 <file category="sourceC"            name="src/drivers/glfw/lv_opengles_debug.c" />
                 <file category="sourceC"            name="src/drivers/glfw/lv_opengles_driver.c" />
                 <file category="sourceC"            name="src/drivers/glfw/lv_opengles_texture.c" />
@@ -588,7 +586,7 @@
                 <file category="sourceC"            name="src/osal/lv_os.c"/>
                 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.1.6" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.3.0" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
@@ -1385,7 +1383,7 @@
                 <file category="sourceCpp"    name="src/libs/thorvg/tvgCapi.cpp" />
                 <file category="sourceCpp"    name="src/libs/thorvg/tvgCompressor.cpp" />
                 <file category="sourceCpp"    name="src/libs/thorvg/tvgFill.cpp" />
-                <file category="sourceCpp"    name="src/libs/thorvg/tvgGICanvas.cpp" />
+                <file category="sourceCpp"    name="src/libs/thorvg/tvgGlCanvas.cpp" />
                 <file category="sourceCpp"    name="src/libs/thorvg/tvgInitializer.cpp" />
                 <file category="sourceCpp"    name="src/libs/thorvg/tvgLines.cpp" />
                 <file category="sourceCpp"    name="src/libs/thorvg/tvgLoader.cpp" />

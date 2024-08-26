@@ -72,7 +72,7 @@ remove the misleading guide above this code segment.
    - LV_USE_ST7796
    - LV_USE_ILI9341
    - LV_USE_RENESAS_GLCDC   
-     
+   
 5. Update `LV_LOG_PRINTF` to `1` and `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER`
 
 
@@ -85,7 +85,7 @@ remove the misleading guide above this code segment.
 #define LV_DRAW_BUF_STRIDE_ALIGN		4
 #define LV_ATTRIBUTE_MEM_ALIGN          __attribute__((aligned(4)))
 ```
-Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
+Make sure `LV_MEM_SIZE` is no less than `(72*1024U)`.
 
 8. Remove following macro definitions in the `3rd party libraries` section:
 
