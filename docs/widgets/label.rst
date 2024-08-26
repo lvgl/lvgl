@@ -15,13 +15,13 @@ Parts and Styles
 ****************
 
 - :cpp:enumerator:`LV_PART_MAIN` Uses all the typical background properties and the
-   text properties. The padding values can be used to add space between
-   the text and the background.
+  text properties. The padding values can be used to add space between
+  the text and the background.
 - :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar that is shown when the text is
-   larger than the widget's size.
-- :cpp:enumerator:`LV_PART_SELECTED` Tells the style of the 
+  larger than the widget's size.
+- :cpp:enumerator:`LV_PART_SELECTED` Tells the style of the
   :ref:`selected text <lv_label_text_selection>`. Only ``text_color`` and ``bg_color`` style
-   properties can be used.
+  properties can be used.
 
 .. _lv_label_usage:
 
