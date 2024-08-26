@@ -51,8 +51,12 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
 void lv_draw_buf_vglite_init_handlers(void)
 {
     lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
+    lv_draw_buf_handlers_t * font_handlers = lv_draw_buf_get_font_handlers();
+    lv_draw_buf_handlers_t * image_handlers = lv_draw_buf_get_image_handlers();
 
     handlers->invalidate_cache_cb = _invalidate_cache;
+    font_handlers->invalidate_cache_cb = _invalidate_cache;
+    image_handlers->invalidate_cache_cb = _invalidate_cache;
 }
 
 /**********************
