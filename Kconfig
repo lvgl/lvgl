@@ -711,6 +711,10 @@ menu "LVGL configuration"
 			bool "Enable matrix support"
 			default n
 			select LV_USE_FLOAT
+
+		config LV_USE_PRIVATE_API
+			bool "Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default"
+			default n
 	endmenu
 
 	menu "Font Usage"
