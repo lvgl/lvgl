@@ -7,18 +7,19 @@ Changelog
 ------------------------------------------------------------------------------
 
 It's huge release with many interesting updates:
-- Wayland driver
+
+- Built-in `Wayland driver <https://docs.lvgl.io/master/integration/driver/wayland.html>`__
+- `OpenGL ES and GLFW driver <https://docs.lvgl.io/master/integration/driver/opengles.html>`__ with support for external textures
+- `Renesas GLCDC <https://docs.lvgl.io/master/integration/driver/display/renesas_glcdc.html>`__ driver
 - L8 and I1 rendering support
-- Transformations with matrix
-- LittleFS, ESP Little FS, Arduino FS
-- OpenglES and GLFW driver with supporting external textures
-- SDL renderer imporevements
-- Renesas GLCDC driver
-- Radial, Conic and Skew gradients supported by software rendering and VG-Lite
-- MQX and QNX support
-- Mouse hover handling
-- CI test for UEFI build
-- Lottie support
+- Matrix transformations during rendering
+- New `file system interfaces <https://docs.lvgl.io/master/libs/fs.html>`__: LittleFS, ESP LittleFS, Arduino FS
+- SDL renderer improvements (supporting all draw task types and improving speed)
+- Radial, Conic, and Skew `gradients supported <https://docs.lvgl.io/master/overview/style.html#metallic-knob-with-conic-gradient>`__ by software rendering and VG-Lite
+- `QNX <https://docs.lvgl.io/master/integration/os/qnx.html>`__ and `MQX <https://docs.lvgl.io/master/integration/os/mqx.html>`__ support
+- `Mouse hover handling <https://docs.lvgl.io/master/get-started/quick-overview.html>`__
+- `Lottie <https://docs.lvgl.io/master/widgets/lottie.html>`__ support
+- CI tests for UEFI builds
 
 And many smaller fixes and features
 
