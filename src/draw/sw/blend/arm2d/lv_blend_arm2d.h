@@ -35,6 +35,10 @@ extern "C" {
 #error Please upgrade to Arm-2D v1.1.6 or above
 #endif
 
+#ifndef LV_ARM2D_XRGB888_ALPHA_ALWAYS_FF
+#define LV_ARM2D_XRGB888_ALPHA_ALWAYS_FF 1
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -355,6 +359,7 @@ static inline lv_result_t lv_rgb888_blend_normal_to_rgb565_with_opa_arm2d(lv_dra
         return LV_RESULT_INVALID;
     }
 
+#if !LV_ARM2D_XRGB888_ALPHA_ALWAYS_FF
     __arm_2d_impl_cccn888_to_rgb565((uint32_t *)dsc->src_buf,
                                     src_stride,
                                     (uint16_t *)tmp_buf,
@@ -367,7 +372,14 @@ static inline lv_result_t lv_rgb888_blend_normal_to_rgb565_with_opa_arm2d(lv_dra
                                            des_stride,
                                            &draw_size,
                                            dsc->opa);
-
+#else
+    __arm_2d_impl_ccca8888_tile_copy_to_rgb565_with_opacity((uint32_t *)dsc->src_buf,
+                                                            src_stride,
+                                                            (uint16_t *)dsc->dest_buf,
+                                                            des_stride,
+                                                            &draw_size,
+                                                            dsc->opa);
+#endif
     lv_free(tmp_buf);
     return LV_RESULT_OK;
 }
@@ -388,6 +400,7 @@ static inline lv_result_t lv_rgb888_blend_normal_to_rgb565_with_mask_arm2d(lv_dr
         return LV_RESULT_INVALID;
     }
 
+#if !LV_ARM2D_XRGB888_ALPHA_ALWAYS_FF
     __arm_2d_impl_cccn888_to_rgb565((uint32_t *)dsc->src_buf,
                                     src_stride,
                                     (uint16_t *)tmp_buf,
@@ -402,6 +415,16 @@ static inline lv_result_t lv_rgb888_blend_normal_to_rgb565_with_mask_arm2d(lv_dr
                                       (uint16_t *)dsc->dest_buf,
                                       des_stride,
                                       &draw_size);
+#else
+    __arm_2d_impl_ccca8888_tile_copy_to_rgb565_with_src_mask((uint32_t *)dsc->src_buf,
+                                                             src_stride,
+                                                             (uint8_t *)dsc->mask_buf,
+                                                             dsc->mask_stride,
+                                                             &draw_size,
+                                                             (uint16_t *)dsc->dest_buf,
+                                                             des_stride,
+                                                             &draw_size);
+#endif
 
     lv_free(tmp_buf);
     return LV_RESULT_OK;
@@ -423,6 +446,7 @@ static inline lv_result_t lv_rgb888_blend_normal_to_rgb565_mix_mask_opa_arm2d(lv
         return LV_RESULT_INVALID;
     }
 
+#if !LV_ARM2D_XRGB888_ALPHA_ALWAYS_FF
     __arm_2d_impl_cccn888_to_rgb565((uint32_t *)dsc->src_buf,
                                     src_stride,
                                     (uint16_t *)tmp_buf,
@@ -438,6 +462,17 @@ static inline lv_result_t lv_rgb888_blend_normal_to_rgb565_mix_mask_opa_arm2d(lv
                                                              des_stride,
                                                              &draw_size,
                                                              dsc->opa);
+#else
+    __arm_2d_impl_ccca8888_tile_copy_to_rgb565_with_src_mask_and_opacity((uint32_t *)dsc->src_buf,
+                                                                         src_stride,
+                                                                         (uint8_t *)dsc->mask_buf,
+                                                                         dsc->mask_stride,
+                                                                         &draw_size,
+                                                                         (uint16_t *)dsc->dest_buf,
+                                                                         des_stride,
+                                                                         &draw_size,
+                                                                         dsc->opa);
+#endif
 
     lv_free(tmp_buf);
     return LV_RESULT_OK;
