@@ -1363,7 +1363,8 @@ static void indev_proc_release(lv_indev_t * indev)
                 if(send_event(LV_EVENT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
             }
             else {
-                if(send_event(LV_EVENT_SCROLL_THROW_BEGIN, indev_act) == LV_RESULT_INVALID) return;
+                lv_obj_send_event(scroll_obj, LV_EVENT_SCROLL_THROW_BEGIN, indev_act);
+                if(indev_reset_check(indev)) return;
             }
         }
         indev->pointer.act_obj = NULL;
