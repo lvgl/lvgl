@@ -34,7 +34,8 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_dma2d_opaque_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixel, lv_area_t * clipped_coords, int32_t dest_stride)
+void lv_draw_dma2d_opaque_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixel, lv_area_t * clipped_coords,
+                                int32_t dest_stride)
 {
     int32_t w = lv_area_get_width(clipped_coords);
     int32_t h = lv_area_get_height(clipped_coords);
@@ -107,7 +108,8 @@ void lv_draw_dma2d_opaque_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixe
     lv_draw_dma2d_configure_and_start_transfer(&conf);
 }
 
-void lv_draw_dma2d_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixel, lv_area_t * clipped_coords, int32_t dest_stride)
+void lv_draw_dma2d_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixel, lv_area_t * clipped_coords,
+                         int32_t dest_stride)
 {
     int32_t w = lv_area_get_width(clipped_coords);
     int32_t h = lv_area_get_height(clipped_coords);

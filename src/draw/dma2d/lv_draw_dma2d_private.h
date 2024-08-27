@@ -25,15 +25,15 @@ extern "C" {
  *********************/
 
 #if LV_USE_DRAW_DMA2D_INTERRUPT && LV_USE_OS
-    #define LV_DRAW_DMA2D_ASYNC 1
+#define LV_DRAW_DMA2D_ASYNC 1
 #else
-    #define LV_DRAW_DMA2D_ASYNC 0
+#define LV_DRAW_DMA2D_ASYNC 0
 #endif
 
 #if defined(__CORTEX_M) && (__CORTEX_M == 7)
-    #define LV_DRAW_DMA2D_CACHE 1
+#define LV_DRAW_DMA2D_CACHE 1
 #else
-    #define LV_DRAW_DMA2D_CACHE 0
+#define LV_DRAW_DMA2D_CACHE 0
 #endif
 
 /**********************
@@ -130,14 +130,16 @@ typedef struct {
 
 void lv_draw_dma2d_opaque_fill(lv_draw_dma2d_unit_t * u, void * first_pixel, int32_t w, int32_t h, int32_t stride);
 void lv_draw_dma2d_fill(lv_draw_dma2d_unit_t * u, void * first_pixel, int32_t w, int32_t h, int32_t stride);
-void lv_draw_dma2d_opaque_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixel, lv_area_t * clipped_coords, int32_t dest_stride);
-void lv_draw_dma2d_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixel, lv_area_t * clipped_coords, int32_t dest_stride);
+void lv_draw_dma2d_opaque_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixel, lv_area_t * clipped_coords,
+                                int32_t dest_stride);
+void lv_draw_dma2d_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixel, lv_area_t * clipped_coords,
+                         int32_t dest_stride);
 lv_draw_dma2d_output_cf_t lv_draw_dma2d_cf_to_dma2d_output_cf(lv_color_format_t cf);
 uint32_t lv_draw_dma2d_color_to_dma2d_ocolr(lv_draw_dma2d_output_cf_t cf, lv_color_t color);
 void lv_draw_dma2d_configure_and_start_transfer(const lv_draw_dma2d_configuration_t * conf);
 #if LV_DRAW_DMA2D_CACHE
-    void lv_draw_dma2d_invalidate_cache(const lv_draw_dma2d_cache_area_t * mem_area);
-    void lv_draw_dma2d_clean_cache(const lv_draw_dma2d_cache_area_t * mem_area);
+void lv_draw_dma2d_invalidate_cache(const lv_draw_dma2d_cache_area_t * mem_area);
+void lv_draw_dma2d_clean_cache(const lv_draw_dma2d_cache_area_t * mem_area);
 #endif
 
 /**********************
