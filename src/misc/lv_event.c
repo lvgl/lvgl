@@ -108,9 +108,11 @@ lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preproces
 
     if(is_traversing) return res;
 
-    list->is_traversing = false;
     if(e->deleted) cleanup_event_list_core(&back_array_head);
-    else cleanup_event_list(list);
+    else {
+        list->is_traversing = false;
+        cleanup_event_list(list);
+    }
 
     return res;
 }
