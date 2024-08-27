@@ -1367,7 +1367,7 @@
     #endif
 #endif
 
-/*Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default*/
+/** Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default */
 #ifndef LV_USE_PRIVATE_API
     #ifdef CONFIG_LV_USE_PRIVATE_API
         #define LV_USE_PRIVATE_API CONFIG_LV_USE_PRIVATE_API
@@ -3242,7 +3242,7 @@
     #endif
 #endif
 
-/*Use Wayland to open a window and handle input on Linux or BSD desktops */
+/** Use Wayland to open a window and handle input on Linux or BSD desktops */
 #ifndef LV_USE_WAYLAND
     #ifdef CONFIG_LV_USE_WAYLAND
         #define LV_USE_WAYLAND CONFIG_LV_USE_WAYLAND

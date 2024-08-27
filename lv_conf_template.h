@@ -482,7 +482,7 @@
  *  - Requires `LV_USE_FLOAT = 1` */
 #define LV_USE_MATRIX           0
 
-/*Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default*/
+/** Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default */
 #define LV_USE_PRIVATE_API		0
 
 /*==================
@@ -1009,7 +1009,7 @@
     #define LV_X11_RENDER_MODE_FULL    0  /**< Full render mode */
 #endif
 
-/*Use Wayland to open a window and handle input on Linux or BSD desktops */
+/** Use Wayland to open a window and handle input on Linux or BSD desktops */
 #define LV_USE_WAYLAND          0
 #if LV_USE_WAYLAND
     #define LV_WAYLAND_WINDOW_DECORATIONS   0    /*Draw client side window decorations only necessary on Mutter/GNOME*/
