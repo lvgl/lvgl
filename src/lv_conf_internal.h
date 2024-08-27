@@ -713,6 +713,14 @@
 #endif
 
 #if LV_USE_DRAW_DMA2D
+    #ifndef LV_DRAW_DMA2D_HAL_INCLUDE
+        #ifdef CONFIG_LV_DRAW_DMA2D_HAL_INCLUDE
+            #define LV_DRAW_DMA2D_HAL_INCLUDE CONFIG_LV_DRAW_DMA2D_HAL_INCLUDE
+        #else
+            #define LV_DRAW_DMA2D_HAL_INCLUDE "stm32h7xx_hal.h"
+        #endif
+    #endif
+
     /* if enabled, the user is required to call `lv_draw_dma2d_transfer_complete_interrupt_handler`
      * upon receiving the DMA2D global interrupt
      */
