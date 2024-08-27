@@ -116,6 +116,12 @@ void * lv_malloc_zeroed(size_t size)
     return alloc;
 }
 
+void * lv_calloc(size_t num, size_t size)
+{
+    LV_TRACE_MEM("allocating number of %lu each %lu bytes", (unsigned long)num, (unsigned long)size);
+    return lv_malloc_zeroed(num * size);
+}
+
 void lv_free(void * data)
 {
     LV_TRACE_MEM("freeing %p", data);
