@@ -118,7 +118,7 @@ void * lv_malloc_zeroed(size_t size)
 
 void * lv_calloc(size_t num, size_t size)
 {
-    LV_TRACE_MEM("allocating number of %lu each %lu bytes", (unsigned long)num, (unsigned long)size);
+    LV_TRACE_MEM("allocating number of %zu each %zu bytes", num, size);
     return lv_malloc_zeroed(num * size);
 }
 
