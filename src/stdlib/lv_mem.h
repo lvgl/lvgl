@@ -81,6 +81,13 @@ void * lv_calloc(size_t num, size_t size);
  * @param size requested size in bytes
  * @return pointer to allocated zeroed memory, or NULL on failure
  */
+void * lv_zalloc(size_t size);
+
+/**
+ * Allocate zeroed memory dynamically
+ * @param size requested size in bytes
+ * @return pointer to allocated zeroed memory, or NULL on failure
+ */
 void * lv_malloc_zeroed(size_t size);
 
 /**

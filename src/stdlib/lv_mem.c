@@ -122,6 +122,11 @@ void * lv_calloc(size_t num, size_t size)
     return lv_malloc_zeroed(num * size);
 }
 
+void * lv_zalloc(size_t size)
+{
+    return lv_malloc_zeroed(size);
+}
+
 void lv_free(void * data)
 {
     LV_TRACE_MEM("freeing %p", data);
