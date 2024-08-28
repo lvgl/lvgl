@@ -655,6 +655,24 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
             return;
         }
 
+        /*Calculate the angle of the pressed point*/
+        lv_value_precise_t angle = lv_atan2(info->point->y - p.y, info->point->x - p.x);
+        angle -= arc->rotation;
+        angle -= arc->bg_angle_start;  /*Make the angle relative to the start angle*/
+
+        /* If we click near the bg_angle_start the angle will be close to 360° instead of a small angle */
+        if(angle < 0) angle += 360;
+
+        const uint32_t circumference = (uint32_t)((2U * r * 314U) / 100U);  /* Equivalent to: 2r * 3.14, avoiding floats */
+        const lv_value_precise_t tolerance_deg = (360 * lv_dpx(50U)) / circumference;
+
+        /* Check if the angle is outside the drawn background arc */
+        const bool is_angle_within_bg_bounds = lv_arc_angle_within_bg_bounds(obj, angle, tolerance_deg);
+        if(!is_angle_within_bg_bounds) {
+            info->res = false;
+            return;
+        }
+
         /*Valid if no clicked outside*/
         lv_area_increase(&a, w + ext_click_area * 2, w + ext_click_area * 2);
         info->res = lv_area_is_point_on(&a, info->point, LV_RADIUS_CIRCLE);
