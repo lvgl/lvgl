@@ -276,16 +276,9 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt)
 static inline lv_color_t lv_color_make_rounding(uint8_t r, uint8_t g, uint8_t b)
 {
 #if LV_COLOR_DEPTH == 16
-    /* if the high bits are not all set and the highest low bit is set     */
-    /* then the high bits should be rounded up so add one to the high bits */
-    /* if((r & 0b11111000) != 0b11111000 && (r & 0b100)) r += 0b1000       */
-    if((r & 0xf8) != 0xf8 && (r & 0x04)) r += 0x08;
-    if((g & 0xfc) != 0xfc && (g & 0x02)) g += 0x04;
-    if((b & 0xf8) != 0xf8 && (b & 0x04)) b += 0x08;
-#elif LV_COLOR_DEPTH == 8
-    if((r & 0xe0) != 0xe0 && (r & 0x10)) r += 0x20;
-    if((g & 0xe0) != 0xe0 && (g & 0x10)) g += 0x20;
-    if((b & 0xc0) != 0xc0 && (b & 0x20)) b += 0x40;
+    if(r <= 251) r += 4;
+    if(g <= 253) g += 2;
+    if(b <= 251) b += 4;
 #endif
 
     return lv_color_make(r, g, b);
