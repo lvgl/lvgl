@@ -199,6 +199,8 @@ void lv_arc_set_rotation(lv_obj_t * obj, int32_t rotation)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_arc_t * arc = (lv_arc_t *)obj;
 
+    /* ensure the angle is in the range [0, 360) */
+    rotation = (rotation % 360 + 360) % 360;
     arc->rotation = rotation;
 
     lv_obj_invalidate(obj);
@@ -506,8 +508,8 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         angle -= arc->rotation;
         angle -= arc->bg_angle_start;  /*Make the angle relative to the start angle*/
 
-        /* If we click near the bg_angle_start the angle will be close to 360° instead of a small angle */
-        if(angle < 0) angle += 360;
+        /* ensure the angle is in the range [0, 360) */
+        angle = (angle % 360 + 360) % 360;
 
         const uint32_t circumference = (uint32_t)((2U * r * 314U) / 100U);  /* Equivalent to: 2r * 3.14, avoiding floats */
         const lv_value_precise_t tolerance_deg = (360 * lv_dpx(50U)) / circumference;
@@ -660,8 +662,8 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         angle -= arc->rotation;
         angle -= arc->bg_angle_start;  /*Make the angle relative to the start angle*/
 
-        /* If we click near the bg_angle_start the angle will be close to 360° instead of a small angle */
-        if(angle < 0) angle += 360;
+        /* ensure the angle is in the range [0, 360) */
+        angle = (angle % 360 + 360) % 360;
 
         const uint32_t circumference = (uint32_t)((2U * r * 314U) / 100U);  /* Equivalent to: 2r * 3.14, avoiding floats */
         const lv_value_precise_t tolerance_deg = (360 * lv_dpx(50U)) / circumference;
@@ -959,7 +961,9 @@ static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const lv_value_precise
     lv_arc_t * arc = (lv_arc_t *)obj;
 
     lv_value_precise_t bounds_angle = arc->bg_angle_end - arc->bg_angle_start;
-    if(bounds_angle < 0) bounds_angle += 360;
+
+    /* ensure the angle is in the range [0, 360) */
+    bounds_angle = (bounds_angle % 360 + 360) % 360;
 
     /* Angle is in the bounds */
     if(angle <= bounds_angle) {
