@@ -67,7 +67,7 @@ LV_EXPORT_CONST_INT(LV_STRIDE_AUTO);
 #define LV_DRAW_BUF_INIT_STATIC(name) \
     do { \
         lv_image_header_t * header = &name.header; \
-        lv_draw_buf_init(&name, header->w, header->h, header->cf, header->stride, buf_##name, sizeof(buf_##name)); \
+        lv_draw_buf_init(&name, header->w, header->h, (lv_color_format_t)header->cf, header->stride, buf_##name, sizeof(buf_##name)); \
         lv_draw_buf_set_flag(&name, LV_IMAGE_FLAGS_MODIFIABLE); \
     } while(0)
 
