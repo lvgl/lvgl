@@ -829,7 +829,7 @@
                 #define LV_LOG_TRACE_MEM 0
             #endif
         #else
-            #define LV_LOG_TRACE_MEM        1  /**< Enable/disable trace logs in memory operations. */
+            #define LV_LOG_TRACE_MEM        1   /**< Enable/disable trace logs in memory operations. */
         #endif
     #endif
     #ifndef LV_LOG_TRACE_TIMER
@@ -840,7 +840,7 @@
                 #define LV_LOG_TRACE_TIMER 0
             #endif
         #else
-            #define LV_LOG_TRACE_TIMER      1  /**< Enable/disable trace logs in timer operations. */
+            #define LV_LOG_TRACE_TIMER      1   /**< Enable/disable trace logs in timer operations. */
         #endif
     #endif
     #ifndef LV_LOG_TRACE_INDEV
@@ -851,7 +851,7 @@
                 #define LV_LOG_TRACE_INDEV 0
             #endif
         #else
-            #define LV_LOG_TRACE_INDEV      1  /**< Enable/disable trace logs in input device operations. */
+            #define LV_LOG_TRACE_INDEV      1   /**< Enable/disable trace logs in input device operations. */
         #endif
     #endif
     #ifndef LV_LOG_TRACE_DISP_REFR
@@ -862,7 +862,7 @@
                 #define LV_LOG_TRACE_DISP_REFR 0
             #endif
         #else
-            #define LV_LOG_TRACE_DISP_REFR  1  /**< Enable/disable trace logs in display re-draw operations. */
+            #define LV_LOG_TRACE_DISP_REFR  1   /**< Enable/disable trace logs in display re-draw operations. */
         #endif
     #endif
     #ifndef LV_LOG_TRACE_EVENT
@@ -873,7 +873,7 @@
                 #define LV_LOG_TRACE_EVENT 0
             #endif
         #else
-            #define LV_LOG_TRACE_EVENT      1  /**< Enable/disable trace logs in event dispatch logic. */
+            #define LV_LOG_TRACE_EVENT      1   /**< Enable/disable trace logs in event dispatch logic. */
         #endif
     #endif
     #ifndef LV_LOG_TRACE_OBJ_CREATE
@@ -884,7 +884,7 @@
                 #define LV_LOG_TRACE_OBJ_CREATE 0
             #endif
         #else
-            #define LV_LOG_TRACE_OBJ_CREATE 1  /**< Enable/disable trace logs in object creation (core `obj` creation plus every widget). */
+            #define LV_LOG_TRACE_OBJ_CREATE 1   /**< Enable/disable trace logs in object creation (core `obj` creation plus every widget). */
         #endif
     #endif
     #ifndef LV_LOG_TRACE_LAYOUT
@@ -895,7 +895,7 @@
                 #define LV_LOG_TRACE_LAYOUT 0
             #endif
         #else
-            #define LV_LOG_TRACE_LAYOUT     1  /**< Enable/disable trace logs in flex- and grid-layout operations. */
+            #define LV_LOG_TRACE_LAYOUT     1   /**< Enable/disable trace logs in flex- and grid-layout operations. */
         #endif
     #endif
     #ifndef LV_LOG_TRACE_ANIM
@@ -906,7 +906,7 @@
                 #define LV_LOG_TRACE_ANIM 0
             #endif
         #else
-            #define LV_LOG_TRACE_ANIM       1  /**< Enable/disable trace logs in animation logic. */
+            #define LV_LOG_TRACE_ANIM       1   /**< Enable/disable trace logs in animation logic. */
         #endif
     #endif
     #ifndef LV_LOG_TRACE_CACHE
@@ -917,7 +917,7 @@
                 #define LV_LOG_TRACE_CACHE 0
             #endif
         #else
-            #define LV_LOG_TRACE_CACHE      1  /**< Enable/disable trace logs in cache operations. */
+            #define LV_LOG_TRACE_CACHE      1   /**< Enable/disable trace logs in cache operations. */
         #endif
     #endif
 #endif  /*LV_USE_LOG*/
@@ -3245,14 +3245,14 @@
         #ifdef CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
             #define LV_WAYLAND_WINDOW_DECORATIONS CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
         #else
-            #define LV_WAYLAND_WINDOW_DECORATIONS   0    /*Draw client side window decorations only necessary on Mutter/GNOME*/
+            #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME */
         #endif
     #endif
     #ifndef LV_WAYLAND_WL_SHELL
         #ifdef CONFIG_LV_WAYLAND_WL_SHELL
             #define LV_WAYLAND_WL_SHELL CONFIG_LV_WAYLAND_WL_SHELL
         #else
-            #define LV_WAYLAND_WL_SHELL             0    /*Use the legacy wl_shell protocol instead of the default XDG shell*/
+            #define LV_WAYLAND_WL_SHELL             0    /**< Use the legacy wl_shell protocol instead of the default XDG shell */
         #endif
     #endif
 #endif
