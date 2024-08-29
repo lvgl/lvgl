@@ -294,6 +294,20 @@ void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_fo
 lv_color_format_t lv_display_get_color_format(lv_display_t * disp);
 
 /**
+ * Set the number of tiles for parallel rendering.
+ * @param disp              pointer to a display
+ * @param tile_cnt          number of tiles (1 =< tile_cnt < 256)
+ */
+void lv_display_set_tile_cnt(lv_display_t * disp, uint32_t tile_cnt);
+
+/**
+ * Get the number of tiles used for parallel rendering
+ * @param disp              pointer to a display
+ * @return                  number of tiles
+ */
+uint32_t lv_display_get_tile_cnt(lv_display_t * disp);
+
+/**
  * Enable anti-aliasing for the render engine
  * @param disp      pointer to a display
  * @param en        true/false

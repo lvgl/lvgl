@@ -398,7 +398,6 @@ uint32_t lv_draw_get_dependent_count(lv_draw_task_t * t_check)
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_display_t * disp = lv_refr_get_disp_refreshing();
     lv_layer_t * new_layer = lv_malloc_zeroed(sizeof(lv_layer_t));
     LV_ASSERT_MALLOC(new_layer);
     if(new_layer == NULL) {
@@ -406,28 +405,44 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
         return NULL;
     }
 
-    new_layer->parent = parent_layer;
-    new_layer->_clip_area = *area;
-    new_layer->buf_area = *area;
-    new_layer->phy_clip_area = *area;
-    new_layer->color_format = color_format;
-
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-    lv_matrix_identity(&new_layer->matrix);
-#endif
-
-    if(disp->layer_head) {
-        lv_layer_t * tail = disp->layer_head;
-        while(tail->next) tail = tail->next;
-        tail->next = new_layer;
-    }
-    else {
-        disp->layer_head = new_layer;
-    }
+    lv_draw_layer_init(new_layer, parent_layer, color_format, area);
 
     LV_PROFILER_DRAW_END;
     return new_layer;
 }
+
+void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_format_t color_format,
+                        const lv_area_t * area)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    LV_ASSERT_NULL(layer);
+    lv_memzero(layer, sizeof(lv_layer_t));
+    lv_display_t * disp = lv_refr_get_disp_refreshing();
+
+    layer->parent = parent_layer;
+    layer->_clip_area = *area;
+    layer->buf_area = *area;
+    layer->phy_clip_area = *area;
+    layer->color_format = color_format;
+
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    lv_matrix_identity(&layer->matrix);
+#endif
+
+    if(disp->layer_init) disp->layer_init(disp, layer);
+
+    if(disp->layer_head) {
+        lv_layer_t * tail = disp->layer_head;
+        while(tail->next) tail = tail->next;
+        tail->next = layer;
+    }
+    else {
+        disp->layer_head = layer;
+    }
+
+    LV_PROFILER_DRAW_END;
+}
+
 
 void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 {
