@@ -52,6 +52,8 @@ Coding guide
 -  Editor:
 
    -  Set editor to use 4 spaces for tab indentations (instead of tab characters).
+   -  Exception:  the `Kconfig` file and any make files require leading tab characters
+      on child items.
 
 -  Functions:
 
