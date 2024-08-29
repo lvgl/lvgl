@@ -52,7 +52,7 @@ Coding guide
 -  Editor:
 
    -  Set editor to use 4 spaces for tab indentations (instead of tab characters).
-   -  Exception:  the `Kconfig` file and any make files require leading tab characters
+   -  Exception:  the **Kconfig** file and any make files require leading tab characters
       on child items.
 
 -  Functions:
@@ -78,13 +78,11 @@ like this:
 
     /**
      * Brief description.  Add a blank line + additional paragraphs when more detail is needed.
-     *
      * @param  parent     brief description of argument.  Additional detail can appear
      *                        on subsequent lines.  List of accepted values:
      *                        - value one
      *                        - value two
      *                        - value three
-     *
      * @return   brief description of return value.
      */
     type_name_t * lv_function_name(lv_obj_t * parent);
@@ -151,10 +149,9 @@ illustrating most of the Doxygen commands used in LVGL.
 
     /**
      * Set alignment of objects placed in containers with LV_STYLE_FLEX_FLOW style.
-     *
+
      * The values for the `..._place` arguments come from the `lv_flex_align_t`
      * enumeration and have the same meanings as they do for flex containers in CSS.
-     *
      * @param  obj                   pointer to flex container.  It must have
      *                                   `LV_STYLE_FLEX_FLOW` style or nothing will happen.
      * @param  main_place            where to place items on main axis (in their track).
@@ -165,12 +162,10 @@ illustrating most of the Doxygen commands used in LVGL.
      *                                   - `LV_FLEX_ALIGN_CENTER`
      * @param  track_cross_place     where to place tracks in cross direction.
      *                                    (Any value of `lv_flex_align_t`.)
-     *
      * Example for a title bar layout:
      * @code
      *     lv_obj_set_flex_align(title_bar, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
      * @endcode
-     *
      * @see
      *     - https://css-tricks.com/snippets/css/a-guide-to-flexbox/
      *     - see  `lv_obj_set_flex_grow()` for additional information.
@@ -183,7 +178,8 @@ illustrating most of the Doxygen commands used in LVGL.
 
 - When more detail is needed, add a blank line below the brief description and add
   additional information that may be needed by LVGL API users, including preconditions
-  for calling the function.
+  for calling the function.  Doxygen needs the blank line to separate "brief" from
+  "detail" portions of the description.
 
 - Describe function parameters with the ``@param`` command.  When a function writes
   to the address contained by a pointer parameter, if not already obvious (e.g. when
