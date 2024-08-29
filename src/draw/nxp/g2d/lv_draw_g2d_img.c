@@ -38,11 +38,14 @@ extern struct g2d_buf * ctx_buf2;
  **********************/
 
 /* Blit simple w/ opa and alpha channel */
-static struct g2d_surface _g2d_set_src_surf(struct g2d_buf * buf, const lv_area_t * area, int32_t stride, lv_color_format_t cf, lv_opa_t opa);
+static struct g2d_surface _g2d_set_src_surf(struct g2d_buf * buf, const lv_area_t * area, int32_t stride,
+                                            lv_color_format_t cf, lv_opa_t opa);
 
-static struct g2d_surface _g2d_set_dst_surf(struct g2d_buf * buf, const lv_area_t * area, int32_t stride, lv_color_format_t cf);
+static struct g2d_surface _g2d_set_dst_surf(struct g2d_buf * buf, const lv_area_t * area, int32_t stride,
+                                            lv_color_format_t cf, const lv_draw_image_dsc_t * dsc);
 
-static void _g2d_blit(struct g2d_buf * dest_buf, struct g2d_surface dst_surf, struct g2d_buf * src_buf, struct g2d_surface src_surf);
+static void _g2d_blit(struct g2d_buf * dest_buf, struct g2d_surface dst_surf, struct g2d_buf * src_buf,
+                      struct g2d_surface src_surf);
 
 /**********************
  *  STATIC VARIABLES
@@ -102,7 +105,7 @@ void lv_draw_g2d_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc
     lv_color_format_t dest_cf = draw_buf->header.cf;
 
     struct g2d_surface src_surf = _g2d_set_src_surf(src_buf, &src_area, src_stride, src_cf, dsc->opa);
-    struct g2d_surface dst_surf = _g2d_set_dst_surf(dest_buf, &blend_area, dest_stride, dest_cf);
+    struct g2d_surface dst_surf = _g2d_set_dst_surf(dest_buf, &blend_area, dest_stride, dest_cf, dsc);
 
     _g2d_blit(dest_buf, dst_surf, src_buf, src_surf);
 }
@@ -111,7 +114,8 @@ void lv_draw_g2d_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc
  *   STATIC FUNCTIONS
  **********************/
 
-static struct g2d_surface _g2d_set_src_surf(struct g2d_buf * buf, const lv_area_t * area, int32_t stride, lv_color_format_t cf, lv_opa_t opa)
+static struct g2d_surface _g2d_set_src_surf(struct g2d_buf * buf, const lv_area_t * area, int32_t stride,
+                                            lv_color_format_t cf, lv_opa_t opa)
 {
     int32_t width  = lv_area_get_width(area);
     int32_t height = lv_area_get_height(area);
@@ -138,22 +142,48 @@ static struct g2d_surface _g2d_set_src_surf(struct g2d_buf * buf, const lv_area_
     return src_surf;
 }
 
-static struct g2d_surface _g2d_set_dst_surf(struct g2d_buf * buf, const lv_area_t * area, int32_t stride, lv_color_format_t cf)
+static struct g2d_surface _g2d_set_dst_surf(struct g2d_buf * buf, const lv_area_t * area, int32_t stride,
+                                            lv_color_format_t cf, const lv_draw_image_dsc_t * dsc)
 {
     int32_t width  = lv_area_get_width(area);
     int32_t height = lv_area_get_height(area);
+
+    lv_point_t pivot = dsc->pivot;
+    /*The offsets are now relative to the transformation result with pivot ULC*/
+    int32_t piv_offset_x = 0;
+    int32_t piv_offset_y = 0;
+    int32_t trim_x = 0;
+    int32_t trim_y = 0;
+    int32_t dest_w;
+    int32_t dest_h;
+
+    float fp_scale_x = (float)dsc->scale_x / LV_SCALE_NONE;
+    float fp_scale_y = (float)dsc->scale_y / LV_SCALE_NONE;
+    int32_t int_scale_x = (int32_t)fp_scale_x;
+    int32_t int_scale_y = (int32_t)fp_scale_y;
+
+    /*Any scale_factor in (k, k + 1] will result in a trim equal to k*/
+    trim_x = (fp_scale_x == int_scale_x) ? int_scale_x - 1 : int_scale_x;
+    trim_y = (fp_scale_y == int_scale_y) ? int_scale_y - 1 : int_scale_y;
+
+    dest_w = width * fp_scale_x + trim_x;
+    dest_h = height * fp_scale_y + trim_y;
+
+    /*Final pivot offset = scale_factor * rotation_pivot_offset + scaling_pivot_offset*/
+    piv_offset_x = floor(fp_scale_x * piv_offset_x) - floor((fp_scale_x - 1) * pivot.x);
+    piv_offset_y = floor(fp_scale_y * piv_offset_y) - floor((fp_scale_y - 1) * pivot.y);
 
     struct g2d_surface dst_surf;
 
     dst_surf.format = g2d_get_buf_format(cf);
 
-    dst_surf.left   = area->x1;
-    dst_surf.top    = area->y1;
-    dst_surf.right  = area->x1 + width;
-    dst_surf.bottom = area->y1 + height;
+    dst_surf.left   = area->x1 + piv_offset_x;
+    dst_surf.top    = area->y1 + piv_offset_y;
+    dst_surf.right  = area->x1 + piv_offset_x + dest_w - trim_x;
+    dst_surf.bottom = area->y1 + piv_offset_y + dest_h - trim_y;
     dst_surf.stride = stride;
-    dst_surf.width  = width;
-    dst_surf.height = height;
+    dst_surf.width  = dest_w - trim_x;
+    dst_surf.height = dest_h - trim_y;
 
     dst_surf.planes[0] = buf->buf_paddr;
     dst_surf.rot = G2D_ROTATION_0;
@@ -165,7 +195,8 @@ static struct g2d_surface _g2d_set_dst_surf(struct g2d_buf * buf, const lv_area_
     return dst_surf;
 }
 
-static void _g2d_blit(struct g2d_buf * dest_buf, struct g2d_surface dst_surf, struct g2d_buf * src_buf, struct g2d_surface src_surf)
+static void _g2d_blit(struct g2d_buf * dest_buf, struct g2d_surface dst_surf, struct g2d_buf * src_buf,
+                      struct g2d_surface src_surf)
 {
     g2d_cache_op(src_buf, G2D_CACHE_FLUSH);
     g2d_cache_op(dest_buf, G2D_CACHE_FLUSH);
