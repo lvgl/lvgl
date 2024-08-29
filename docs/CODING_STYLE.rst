@@ -251,6 +251,12 @@ Supported Doxygen Commands
     Tells Doxygen to link to an anchor provided elsewhere in the documentation.
     ``unique_string_identifier`` must exactly match a string used elsewhere with an
     ``@anchor`` command.  ``Link text`` is the text that will appear in the hyperlink.
+    Do not use the ``@ref`` command to try to create hyperlinks to documentation for
+    LVGL data types (structs, unions or typedefs) or functions.  Doxygen will generate
+    a warning and NOT create the link, because the *correct* way to create those links
+    is just to leave data types and function names bare.  (Surrounding those code
+    elements with single back-quotes does not change the meaning to Doxygen, it only
+    changes the font used in the hyperlink.)
 ``@see  text``
     Tells Doxygen to provide a "See also" pagraph in a highlighted section, helpful
     when additional information about a topic can be found elsewhere.
@@ -300,7 +306,7 @@ Here is example to show bracket placing and using of white spaces:
     *
     * @param  label  pointer to label object
     * @param  text   '\0' terminated character string.
-    *                    NULL to refresh with current text.
+    *                NULL to refresh with current text.
     */
    void lv_label_set_text(lv_obj_t * label, const char * text)
    {   /* Main brackets of functions in new line */
