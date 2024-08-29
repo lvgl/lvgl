@@ -239,7 +239,7 @@ void test_two_overlapping_arcs_can_be_interacted_independently(void)
 {
     arc = lv_arc_create(lv_screen_active());
     arc2 = lv_arc_create(lv_screen_active());
-    
+
     lv_arc_set_value(arc, 0);
     lv_arc_set_value(arc2, 0);
     lv_obj_set_size(arc, 100, 100);
@@ -254,11 +254,11 @@ void test_two_overlapping_arcs_can_be_interacted_independently(void)
     lv_arc_set_rotation(arc2, 355);
     lv_obj_center(arc);
     lv_obj_center(arc2);
-    
+
     // Add event callback to both arcs
     lv_obj_add_event_cb(arc, dummy_event_cb, LV_EVENT_PRESSED, NULL);
     lv_obj_add_event_cb(arc2, dummy_event_cb2, LV_EVENT_PRESSED, NULL);
-    
+
     // Reset event counters
     event_cnt = 0;
     event_cnt2 = 0;
