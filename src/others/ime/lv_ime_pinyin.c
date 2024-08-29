@@ -877,8 +877,8 @@ static void init_pinyin_dict(lv_obj_t * obj, const lv_pinyin_dict_t * dict)
         }
         else {
             headletter = dict[i].py[0];
+            pinyin_ime->py_num[letter_calc] = offset_count;
             letter_calc = headletter - 'a';
-            pinyin_ime->py_num[letter_calc - 1] = offset_count;
             offset_sum += offset_count;
             pinyin_ime->py_pos[letter_calc] = offset_sum;
 
