@@ -79,10 +79,10 @@ like this:
     /**
      * Brief description.  Add a blank line + additional paragraphs when more detail is needed.
      * @param  parent     brief description of argument.  Additional detail can appear
-     *                        on subsequent lines.  List of accepted values:
-     *                        - value one
-     *                        - value two
-     *                        - value three
+     *                    on subsequent lines.  List of accepted values:
+     *                    - value one
+     *                    - value two
+     *                    - value three
      * @return   brief description of return value.
      */
     type_name_t * lv_function_name(lv_obj_t * parent);
@@ -153,15 +153,15 @@ illustrating most of the Doxygen commands used in LVGL.
      * The values for the `..._place` arguments come from the `lv_flex_align_t`
      * enumeration and have the same meanings as they do for flex containers in CSS.
      * @param  obj                   pointer to flex container.  It must have
-     *                                   `LV_STYLE_FLEX_FLOW` style or nothing will happen.
+     *                               `LV_STYLE_FLEX_FLOW` style or nothing will happen.
      * @param  main_place            where to place items on main axis (in their track).
-     *                                   (Any value of `lv_flex_align_t`.)
+     *                               (Any value of `lv_flex_align_t`.)
      * @param  cross_place           where to place item in track on cross axis.
-     *                                   - `LV_FLEX_ALIGN_START`
-     *                                   - `LV_FLEX_ALIGN_END`
-     *                                   - `LV_FLEX_ALIGN_CENTER`
+     *                               - `LV_FLEX_ALIGN_START`
+     *                               - `LV_FLEX_ALIGN_END`
+     *                               - `LV_FLEX_ALIGN_CENTER`
      * @param  track_cross_place     where to place tracks in cross direction.
-     *                                    (Any value of `lv_flex_align_t`.)
+     *                               (Any value of `lv_flex_align_t`.)
      * Example for a title bar layout:
      * @code
      *     lv_obj_set_flex_align(title_bar, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
