@@ -26,7 +26,7 @@
    COLOR SETTINGS
  *====================*/
 
-/** Color depth: 8 (A8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888) */
+/** Color depth: 1 (I1), 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888) */
 #define LV_COLOR_DEPTH 16
 
 /*=========================
@@ -302,25 +302,15 @@
     #define LV_LOG_USE_FILE_LINE 1
 
     /* Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs. */
-
-    /** Enable/disable trace logs in memory operations. */
-    #define LV_LOG_TRACE_MEM        1
-    /** Enable/disable trace logs in timer operations. */
-    #define LV_LOG_TRACE_TIMER      1
-    /** Enable/disable trace logs in input device operations. */
-    #define LV_LOG_TRACE_INDEV      1
-    /** Enable/disable trace logs in display re-draw operations. */
-    #define LV_LOG_TRACE_DISP_REFR  1
-    /** Enable/disable trace logs in event dispatch logic. */
-    #define LV_LOG_TRACE_EVENT      1
-    /** Enable/disable trace logs in object creation (core `obj` creation plus every widget). */
-    #define LV_LOG_TRACE_OBJ_CREATE 1
-    /** Enable/disable trace logs in flex- and grid-layout operations. */
-    #define LV_LOG_TRACE_LAYOUT     1
-    /** Enable/disable trace logs in animation logic. */
-    #define LV_LOG_TRACE_ANIM       1
-    /** Enable/disable trace logs in cache operations. */
-    #define LV_LOG_TRACE_CACHE      1
+    #define LV_LOG_TRACE_MEM        1  /**< Enable/disable trace logs in memory operations. */
+    #define LV_LOG_TRACE_TIMER      1  /**< Enable/disable trace logs in timer operations. */
+    #define LV_LOG_TRACE_INDEV      1  /**< Enable/disable trace logs in input device operations. */
+    #define LV_LOG_TRACE_DISP_REFR  1  /**< Enable/disable trace logs in display re-draw operations. */
+    #define LV_LOG_TRACE_EVENT      1  /**< Enable/disable trace logs in event dispatch logic. */
+    #define LV_LOG_TRACE_OBJ_CREATE 1  /**< Enable/disable trace logs in object creation (core `obj` creation plus every widget). */
+    #define LV_LOG_TRACE_LAYOUT     1  /**< Enable/disable trace logs in flex- and grid-layout operations. */
+    #define LV_LOG_TRACE_ANIM       1  /**< Enable/disable trace logs in animation logic. */
+    #define LV_LOG_TRACE_CACHE      1  /**< Enable/disable trace logs in cache operations. */
 #endif  /*LV_USE_LOG*/
 
 /*-------------

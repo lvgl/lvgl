@@ -83,7 +83,7 @@
    COLOR SETTINGS
  *====================*/
 
-/** Color depth: 8 (A8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888) */
+/** Color depth: 1 (I1), 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888) */
 #ifndef LV_COLOR_DEPTH
     #ifdef CONFIG_LV_COLOR_DEPTH
         #define LV_COLOR_DEPTH CONFIG_LV_COLOR_DEPTH
@@ -821,8 +821,6 @@
     #endif
 
     /* Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs. */
-
-    /** Enable/disable trace logs in memory operations. */
     #ifndef LV_LOG_TRACE_MEM
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_LOG_TRACE_MEM
@@ -831,10 +829,9 @@
                 #define LV_LOG_TRACE_MEM 0
             #endif
         #else
-            #define LV_LOG_TRACE_MEM        1
+            #define LV_LOG_TRACE_MEM        1  /**< Enable/disable trace logs in memory operations. */
         #endif
     #endif
-    /** Enable/disable trace logs in timer operations. */
     #ifndef LV_LOG_TRACE_TIMER
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_LOG_TRACE_TIMER
@@ -843,10 +840,9 @@
                 #define LV_LOG_TRACE_TIMER 0
             #endif
         #else
-            #define LV_LOG_TRACE_TIMER      1
+            #define LV_LOG_TRACE_TIMER      1  /**< Enable/disable trace logs in timer operations. */
         #endif
     #endif
-    /** Enable/disable trace logs in input device operations. */
     #ifndef LV_LOG_TRACE_INDEV
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_LOG_TRACE_INDEV
@@ -855,10 +851,9 @@
                 #define LV_LOG_TRACE_INDEV 0
             #endif
         #else
-            #define LV_LOG_TRACE_INDEV      1
+            #define LV_LOG_TRACE_INDEV      1  /**< Enable/disable trace logs in input device operations. */
         #endif
     #endif
-    /** Enable/disable trace logs in display re-draw operations. */
     #ifndef LV_LOG_TRACE_DISP_REFR
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_LOG_TRACE_DISP_REFR
@@ -867,10 +862,9 @@
                 #define LV_LOG_TRACE_DISP_REFR 0
             #endif
         #else
-            #define LV_LOG_TRACE_DISP_REFR  1
+            #define LV_LOG_TRACE_DISP_REFR  1  /**< Enable/disable trace logs in display re-draw operations. */
         #endif
     #endif
-    /** Enable/disable trace logs in event dispatch logic. */
     #ifndef LV_LOG_TRACE_EVENT
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_LOG_TRACE_EVENT
@@ -879,10 +873,9 @@
                 #define LV_LOG_TRACE_EVENT 0
             #endif
         #else
-            #define LV_LOG_TRACE_EVENT      1
+            #define LV_LOG_TRACE_EVENT      1  /**< Enable/disable trace logs in event dispatch logic. */
         #endif
     #endif
-    /** Enable/disable trace logs in object creation (core `obj` creation plus every widget). */
     #ifndef LV_LOG_TRACE_OBJ_CREATE
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_LOG_TRACE_OBJ_CREATE
@@ -891,10 +884,9 @@
                 #define LV_LOG_TRACE_OBJ_CREATE 0
             #endif
         #else
-            #define LV_LOG_TRACE_OBJ_CREATE 1
+            #define LV_LOG_TRACE_OBJ_CREATE 1  /**< Enable/disable trace logs in object creation (core `obj` creation plus every widget). */
         #endif
     #endif
-    /** Enable/disable trace logs in flex- and grid-layout operations. */
     #ifndef LV_LOG_TRACE_LAYOUT
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_LOG_TRACE_LAYOUT
@@ -903,10 +895,9 @@
                 #define LV_LOG_TRACE_LAYOUT 0
             #endif
         #else
-            #define LV_LOG_TRACE_LAYOUT     1
+            #define LV_LOG_TRACE_LAYOUT     1  /**< Enable/disable trace logs in flex- and grid-layout operations. */
         #endif
     #endif
-    /** Enable/disable trace logs in animation logic. */
     #ifndef LV_LOG_TRACE_ANIM
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_LOG_TRACE_ANIM
@@ -915,10 +906,9 @@
                 #define LV_LOG_TRACE_ANIM 0
             #endif
         #else
-            #define LV_LOG_TRACE_ANIM       1
+            #define LV_LOG_TRACE_ANIM       1  /**< Enable/disable trace logs in animation logic. */
         #endif
     #endif
-    /** Enable/disable trace logs in cache operations. */
     #ifndef LV_LOG_TRACE_CACHE
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_LOG_TRACE_CACHE
@@ -927,7 +917,7 @@
                 #define LV_LOG_TRACE_CACHE 0
             #endif
         #else
-            #define LV_LOG_TRACE_CACHE      1
+            #define LV_LOG_TRACE_CACHE      1  /**< Enable/disable trace logs in cache operations. */
         #endif
     #endif
 #endif  /*LV_USE_LOG*/
