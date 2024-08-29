@@ -155,7 +155,7 @@ void lv_buttonmatrix_set_one_checked(lv_obj_t * obj, bool en);
  * @param obj       pointer to a button matrix object
  * @return          the current map
  */
-const char ** lv_buttonmatrix_get_map(const lv_obj_t * const obj);
+const char * const * lv_buttonmatrix_get_map(const lv_obj_t * obj);
 
 /**
  * Get the index of the lastly "activated" button by the user (pressed, released, focused etc)
