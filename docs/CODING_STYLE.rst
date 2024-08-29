@@ -49,11 +49,14 @@ Naming conventions
 
 Coding guide
 ------------
+-  Editor:
+
+   -  Set editor to use 4 spaces for tab indentations (instead of tab characters).
 
 -  Functions:
 
-   -  Write function with single responsibility
-   -  Make the functions ``static`` where possible
+   -  Write function with single responsibility.
+   -  Make the functions ``static`` where possible.
 
 -  Variables:
 
@@ -62,8 +65,7 @@ Coding guide
    -  Declare variables where needed (not all at function start)
    -  Use the smallest required scope
    -  Variables in a file (outside functions) are always *static*
-   -  Do not use global variables (use functions to set/get static
-      variables)
+   -  Do not use global variables (use functions to set/get static variables)
 
 Comments
 --------
@@ -73,206 +75,148 @@ like this:
 .. code-block:: c
 
     /**
-     * Brief description
+     * Brief description.  Add a blank line + additional paragraphs when more detail is needed.
      *
-     * @return    short description of return value
+     * @param  parent     brief description of argument.  Additional detail can appear
+     *                        on subsequent lines.  List of accepted values:
+     *                        - value one
+     *                        - value two
+     *                        - value three
+     *
+     * @return   brief description of return value.
      */
-    example_type_t * lv_example(void);
+    type_name_t * lv_function_name(lv_obj_t * parent);
 
-Another example with arguments and more detail.
-
-.. code-block:: c
-
-    /**
-     * Brief description
-     *
-     * Additional detail here in subsequent paragraphs.  Function accomplishes these results:
-     * - description of result 1
-     * - description of result 2
-     *
-     * @param  disp       object created by lv_x11_window_create()
-     * @param  mouse_img  optional image description for mouse cursor
-     *                        (NULL for no/invisible mouse cursor)
-     *
-     * @note  Include any subtle points an API user or maintainer would need to know.
-     */
-    void lv_other_example(lv_display_t * disp, lv_image_dsc_t const * mouse_img);
-
-When documenting a code member that is *before* the comment, such as a struct member,
-use ``/**<`` like this:
+The normal comment prefix ``/**`` causes the comment to document the code member
+coming *after* the comment.  When documenting a code member that is *before* the
+comment, such as a struct member, use ``/**<`` like this:
 
 .. code-block:: c
 
     /**
      * Brief description of struct
+     *
+     * When more detail is needed, add a blank line then the detail.
      */
     typedef struct _lv_example_type_t {
         char      *text;    /**< Brief description of this member */
         uint16_t   length;  /**< Brief description of this member */
     } lv_example_type_t;
 
-| When commenting code, use block comments like this ``/* Description */``,
-| not end-of-line comments like this ``// Description``.
+-  When commenting code, use block comments like this ``/* Description */``,
+   not end-of-line comments like this ``// Description``.
 
-Include a space after the ``/*`` or ``/**<`` and before the ``*/`` for added readability.
+-  Include a space after the ``/*`` or ``/**<`` and before the ``*/`` for improved readability.
 
-Write readable code to avoid descriptive comments like:  ``x++; /* Add 1 to x */``.
+-  Write readable code to avoid descriptive comments like:  ``x++; /* Add 1 to x */``.
 
-The code should show clearly what you are doing.
+-  The code should show clearly what you are doing.
 
-You should write **why** you did it:  ``x++;  /* Point to closing '\0' of string */``
+-  You should write **why** you did it:  ``x++;  /* Point to closing '\0' of string */``
 
-Short "code summaries" of a few lines are accepted: ``/* Calculate new coordinates */``
+-  Short "code summaries" of a few lines are accepted: ``/* Calculate new coordinates */``
 
-In comments use \`...\` when referring to a variable: ``/* Update value of `x_act` */``
+-  In comments use \`...\` when referring to a code element, such as a variable, type,
+   or struct name: ``/* Update value of `x_act` */``
 
-When adding or modifying comments, priorities are (in order of importance):
+-  When adding or modifying comments, priorities are (in order of importance):
 
-    1.  clarity (the ease with which other programmers can understand your intention),
-    2.  readability (the ease with which other programmers can read your comments),
-    3.  brevity (the quality of using few words when speaking or writing).
+       1.  clarity (the ease with which other programmers can understand your intention),
+       2.  readability (the ease with which other programmers can read your comments),
+       3.  brevity (the quality of using few words when speaking or writing).
 
-Blank lines within comments are desirable when they improve clarity and readability.
+-  Blank lines within comments are desirable when they improve clarity and readability.
 
-Remember, when you are writing source code, you are not just teaching the computer
-what to do, but also teaching other programmers how it works, not only users of the
-API, but also future maintainers of your source code.  Comments add information
-about what you were thinking when the code was written, and **why** you did things
-that way -- information that cannot be conveyed by the source code alone.
+-  Remember, when you are writing source code, you are not just teaching the computer
+   what to do, but also teaching other programmers how it works, not only users of the
+   API, but also future maintainers of your source code.  Comments add information
+   about what you were thinking when the code was written, and **why** you did things
+   that way---information that cannot be conveyed by the source code alone.
 
 
 Doxygen Comment Specifics
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-Doxygen is the first program in a data-flow chain that generates the online LVGL
-API documentation from the files in the LVGL repository.  Doxygen detects comments
-it should pay attention to by leading ``/**``.  It ignores comments that do not
-have exactly two ``*``.
+Doxygen is the first program in a chain that generates the online LVGL API
+documentation from the files in the LVGL repository.  Doxygen detects files it should
+pay attention to by them having a ``@file`` command inside a Doxygen comment.  Doxygen
+comments begin with a leading ``/**``.  It ignores comments that do not have exactly
+two ``*``.
 
-    | ``/** Description of code member AFTER this comment. */``
-    | ``code_member_here {...}`` (e.g. function, struct, etc.)
-
-    ``variable_or_struct_member;  /**< Description of code member BEFORE this comment. */``
-
-Add 2 spaces after Doxygen commands (they start with '@') for improved readability.
-
-Use \`...\` around variable names.  This *can* also be done with type, struct and
-function names when it adds clarity or readability.  Append empty "()" after function
-names. Doxygen generates a hyperlink to the type, struct or function's documentation
-when it exists.  Note:  if you put any text inside the "()", Doxygen will not
-generate a hyperlink in the generated coumentation.
-
-    ``@param  disp   `lv_display_t` object created by lv_x11_window_create()``
-
-Always include a brief description of the code member you are documenting.  For
-documentation that appears *before* the code member, if more detail is needed,
-include a blank line below the brief description and add the detail below it.
-(Doxygen needs the blank line to separate the "brief description" from the
-"additional detail", and it treats it accordingly.  The blank line also improves
-readability in the source code.)  If a struct's member needs more than one line
-to adequately describe it, it is acceptable to place the description before the
-member.  In this case, remember to use ``/**``, not ``/**<``
-
-To document a function's arguments, use the ``@param`` Doxygen command followed by 2
-spaces and the name of the argument.  ``[in]``, ``[out]``, or ``[in,out]`` can be
-appended to ``@param`` to clarify direction when it is important for clarity, like this:
-
-    | ``@param[in]   value   input value``
-    | ``@param[in]   factor  multiplier``
-    | ``@param[out]  result  computed result``
-
-Normally the brief description is simply a noun phrase like "``computed result``"
-and so it neither needs to be capitalized nor does it need a period at the end.
-However, when whole sentences are needed for clarity, capitalize the first letter
-and use appropriate punctuation between sentences for clarity.
-
-Align the beginning of each argument description for improved readability.  Provide
-at least 2 spaces after the longest argument name for visual separation (improves
-readability). If a description of an argument continues on subsequent lines, indent
-the continuation lines by an additional 4 spaces to visually distinguish these lines
-from the beginning of a new argument description, like this:
+The following is an illustration of an API function prototype with documentation
+illustrating most of the Doxygen commands used in LVGL.
 
 .. code-block:: c
 
-      /**
-       * Add event handler function for object `obj`.
-       *
-       * Used by user code to respond to event when it happens with object `obj`.
-       * An object can have multiple event handlers.  They are called in the same
-       * order as they were added.
-       *
-       * @param  obj        pointer to object to which to add event call-back
-       * @param  filter     event code (e.g. `LV_EVENT_CLICKED`) indicating which
-       *                        event should be called (`LV_EVENT_ALL` can be used
-       *                        to receive all events)
-       * @param  event_cb   address of event call-back function
-       * @param  user_data  custom data to be made available to call-back function
-       *                        in `e->user_data` field
-       *
-       * @return  handle to event (can be used in lv_obj_remove_event_dsc()).
-       */
-      lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
+    /**
+     * Set alignment of objects placed in containers with LV_STYLE_FLEX_FLOW style.
+     *
+     * The values for the `..._place` arguments come from the `lv_flex_align_t`
+     * enumeration and have the same meanings as they do for flex containers in CSS.
+     *
+     * @param  obj                   pointer to flex container.  It must have
+     *                                   `LV_STYLE_FLEX_FLOW` style or nothing will happen.
+     * @param  main_place            where to place items on main axis (in their track).
+     *                                   (Any value of `lv_flex_align_t`.)
+     * @param  cross_place           where to place item in track on cross axis.
+     *                                   - `LV_FLEX_ALIGN_START`
+     *                                   - `LV_FLEX_ALIGN_END`
+     *                                   - `LV_FLEX_ALIGN_CENTER`
+     * @param  track_cross_place     where to place tracks in cross direction.
+     *                                    (Any value of `lv_flex_align_t`.)
+     *
+     * Example for a title bar layout:
+     * @code
+     *     lv_obj_set_flex_align(title_bar, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+     * @endcode
+     *
+     * @see
+     *     - https://css-tricks.com/snippets/css/a-guide-to-flexbox/
+     *     - see  `lv_obj_set_flex_grow()` for additional information.
+     */
+    void lv_obj_set_flex_align(lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_align_t cross_place,
+                               lv_flex_align_t track_cross_place);
 
-If you include a list of example values for an argument, do so by creating a
-list using '-', like this:
 
-.. code-block:: c
+- Always start Doxygen comment with a breif description of the code element it documents.
 
-      /**
-       * Set color format of display.
-       *
-       * @param  disp          pointer to display object
-       * @param  color_format  possible values:
-       *                           - LV_COLOR_FORMAT_RGB565
-       *                           - LV_COLOR_FORMAT_RGB888
-       *                           - LV_COLOR_FORMAT_XRGB888
-       *                           - LV_COLOR_FORMAT_ARGB888
-       *
-       * @note  To change the endianness of rendered image in case of RGB565 format
-       *        (i.e. swap the 2 bytes) call lv_draw_sw_rgb565_swap() in the `flush_cb`
-       *        function.
-       */
-      void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_format);
+- When more detail is needed, add a blank line below the brief description and add
+  additional information that may be needed by LVGL API users, including preconditions
+  for calling the function.
 
-If a code example will be important to help other programmers better understand
-how to use a function or data type (improving clarity), include an example using
-the ``@code`` and ``@endcode`` Doxygen commands like this:
+- Describe function parameters with the ``@param`` command.  When a function writes
+  to the address contained by a pointer parameter, if not already obvious (e.g. when
+  the parameter name contains the word "out"), include the direction in the command
+  for clarity:
 
-.. code-block:: c
+      ``@param[out]  param_name     description``.
 
-      /**
-       * Create X11 display.
-       *
-       * The minimal initialisation for X11 display driver with keyboard/mouse support:
-       *
-       * @code
-       *     lv_display_t* disp = lv_x11_window_create("My Window Title", width, height);
-       *     lv_x11_inputs_create(disp, NULL);
-       * @endcode
-       *
-       * or with mouse cursor icon:
-       *
-       * @code
-       *     lv_image_dsc_t mouse_symbol = {...};
-       *     lv_display_t* disp = lv_x11_window_create("My Window Title", width, height);
-       *     lv_x11_inputs_create(disp, &mouse_symbol);
-       * @endcode
-       *
-       * @param  title    title of created X11 window
-       * @param  hor_res  horizontal resolution (width) of X11 window
-       * @param  ver_res  vertical resolution (height) of X11 window
-       *
-       * @return  pointer to display object
-       */
-      lv_display_t * lv_x11_window_create(char const * title, int32_t hor_res, int32_t ver_res);
+- Describe return values with the ``@return`` command.
 
-To refer the reader to additional information, you can say something like
-``See also `data_type_t`.`` or ``See function_name() for more information.``.
-Doxygen will convert ``data_type_t`` or ``function_name()`` into a hyperlink to that
-documentation when it exists.
+- Add at least 2 spaces after Doxygen commands for improved readability.
 
-If you create a new pair of ``.c`` and ``.h`` files (e.g. for a new driver), ensure a
-Doxygen comment like this is at the top of each new file.  Doxygen will not parse the
-file without it.
+- Use \`...\` around code elements (variables, type names, function names).  For type
+  names and function names, Doxygen generates a hyperlink to that code member's
+  documentation (when it exists) with or without the single back-quotes.
+
+- Append empty "()" to function names.  Doxygen will not generate a hyperlink to the
+  function's documentation without this.
+
+- Use proper grammar for clarity.  Descriptions of parameters do not need periods
+  after them unless they are full sentences.
+
+- Align edges of text around lists of parameters for ease of reading.
+
+- Lists (e.g. of accepted parameter values) can be created by using the '-' character.
+  If the list needs to be numbered, numbers can also be used.
+
+- Place example code in a code block by surrounding it with ``@code`` and ``@endcode`` commands.
+
+- Refer reader to additional information using the ``@see`` command.  Doxygen adds a
+  "See also" paragraph.  The text following the ``@see`` command will be indented.
+
+- If you create a new pair of ``.c`` and ``.h`` files (e.g. for a new driver), ensure
+  a Doxygen comment like this is at the top of each new file.  Doxygen will not parse
+  the file without the ``@file`` command being present.
 
 .. code-block:: c
 
@@ -280,6 +224,39 @@ file without it.
        * @file filename.c
        *
        */
+
+
+Supported Doxygen Commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+``@file``
+    Tells Doxygen to parse this file and also supplies documentation about
+    the file itself when applicable.
+``@param  name  description``
+    Tells Doxygen the following word is a function parameter, and the text that
+    follows it (until a blank line or another Doxygen command) is its description.
+``@return  description``
+    Tells Doxygen the following text is a description of the return value, used when applicable.
+``@code/@endcode``
+    These pair of Doxygen commands surround code that should be placed in a code block.
+    If comment is in a .C file, Doxygen will assume the language is C unless you specify
+    otherwise like this:  ``@code{.cpp}``, ``@code{.sh}``, etc..
+``@note  text``
+    Starts a paragraph where a note can be entered.  The note ends with a blank line,
+    the end of the comment, or another Doxygen command that indicates a new section.
+    If the note contains more than one paragraph, additional paragraphs can be added
+    by using additional ``@note`` commands.  At this writing, ``@par`` commands do not
+    add additional paragraphs to notes as indicated in Doxygen documentation.
+``@anchor  unique_string_identifier``
+    Tells Doxygen to make  ``unique_string_identifier``  an anchor that can be linked
+    to elsewhere using a ``@ref`` command.
+``@ref  unique_string_identifier  "Link text"``
+    Tells Doxygen to link to an anchor provided elsewhere in the documentation.
+    ``unique_string_identifier`` must exactly match a string used elsewhere with an
+    ``@anchor`` command.  ``Link text`` is the text that will appear in the hyperlink.
+``@see  text``
+    Tells Doxygen to provide a "See also" pagraph in a highlighted section, helpful
+    when additional information about a topic can be found elsewhere.
+
 
 
 API Conventions
@@ -323,9 +300,9 @@ Here is example to show bracket placing and using of white spaces:
    /**
     * Set new text for a label.  Memory will be allocated by label to store text.
     *
-    * @param[in]  label  pointer to label object
-    * @param[in]  text   '\0' terminated character string.
-    *                        NULL to refresh with current text.
+    * @param  label  pointer to label object
+    * @param  text   '\0' terminated character string.
+    *                    NULL to refresh with current text.
     */
    void lv_label_set_text(lv_obj_t * label, const char * text)
    {   /* Main brackets of functions in new line */
@@ -344,8 +321,6 @@ Here is example to show bracket placing and using of white spaces:
 
        ...
    }
-
-Use 4 spaces indentation instead of tab.
 
 You can use **astyle** to format the code. Run ``code-format.py`` from
 the ``scripts`` folder.
