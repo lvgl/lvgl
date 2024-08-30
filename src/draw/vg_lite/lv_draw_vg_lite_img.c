@@ -127,22 +127,17 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
 
         if(dsc->clip_radius) {
-            int32_t width = lv_area_get_width(coords);
-            int32_t height = lv_area_get_height(coords);
-            float r_short = LV_MIN(width, height) / 2.0f;
-            float radius = LV_MIN(dsc->clip_radius, r_short);
-
-            /**
-             * When clip_radius is enabled, the clipping edges
-             * are aligned with the image edges
-             */
+            /* apply the image transform to the path */
+            lv_vg_lite_path_set_transform(path, &matrix);
             lv_vg_lite_path_append_rect(
                 path,
-                coords->x1, coords->y1,
-                width, height,
-                radius);
+                0, 0,
+                lv_area_get_width(coords), lv_area_get_height(coords),
+                dsc->clip_radius * LV_SCALE_NONE / (float)dsc->scale_x);
+            lv_vg_lite_path_set_transform(path, NULL);
         }
         else {
+            /* append normal rect to the path */
             lv_vg_lite_path_append_rect(
                 path,
                 clip_area.x1, clip_area.y1,
