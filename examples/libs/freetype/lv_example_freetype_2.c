@@ -19,9 +19,9 @@ void lv_example_freetype_2(void)
                                                24,
                                                LV_FREETYPE_FONT_STYLE_NORMAL);
 
-    // this font is created from a downscaled NotoColorEmoji to 34x32px
-    // Subset containing only a single emoji was created using fonttools:
-    // Command: fonttools subset NotoColorEmoji.ttf --text=😀
+    /* this font is created from a downscaled NotoColorEmoji to 34x32px
+     * Subset containing only a single emoji was created using fonttools:
+     * Command: fonttools subset NotoColorEmoji.ttf --text=😀 */
     lv_font_t * font_emoji = lv_freetype_font_create(PATH_PREFIX "lvgl/examples/libs/freetype/NotoColorEmoji-32.subset.ttf",
                                                      LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
                                                      24,
