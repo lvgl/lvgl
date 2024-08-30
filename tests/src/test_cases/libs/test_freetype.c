@@ -466,8 +466,8 @@ void test_freetype_bitmap_rendering_test(void)
     lv_label_set_text(label2, UNIVERSAL_DECLARATION_OF_HUMAN_RIGHTS_JP);
     lv_obj_align_to(label2, label1, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
 
-    // test emoji rendering
-    // emoji font does not contain normal characters, use fallback to render them
+    /* test emoji rendering
+     * emoji font does not contain normal characters, use fallback to render them */
     font_emoji->fallback = font_normal;
 
     lv_obj_t * label_emoji = lv_label_create(lv_screen_active());
