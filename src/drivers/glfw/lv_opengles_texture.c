@@ -122,7 +122,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         GL_CALL(glBindTexture(GL_TEXTURE_2D, dsc->texture_id));
 
         GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-        /*Color depth: 8 (A8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
+        /*Color depth: 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
 #if LV_COLOR_DEPTH == 8
         GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, disp->hor_res, disp->ver_res, 0, GL_RED, GL_UNSIGNED_BYTE, dsc->fb1));
 #elif LV_COLOR_DEPTH == 16
@@ -145,6 +145,7 @@ static void release_disp_cb(lv_event_t * e)
     lv_display_t * disp = lv_event_get_user_data(e);
     lv_opengles_texture_t * dsc = lv_display_get_driver_data(disp);
     free(dsc->fb1);
+    GL_CALL(glDeleteTextures(1, &dsc->texture_id));
     lv_free(dsc);
 }
 

@@ -264,6 +264,9 @@
     #define LV_VG_LITE_STROKE_CACHE_CNT 32
 #endif
 
+/** Draw using cached OpenGLES textures*/
+#define LV_USE_DRAW_OPENGLES 0
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
