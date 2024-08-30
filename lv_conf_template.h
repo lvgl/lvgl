@@ -970,6 +970,16 @@
     #define LV_FILE_EXPLORER_QUICK_ACCESS        1
 #endif
 
+/*1: Enable freetype font manager*/
+/*Requires: LV_USE_FREETYPE*/
+#define LV_USE_FONT_MANAGER                     0
+#if LV_USE_FONT_MANAGER
+
+/*Font manager name max length*/
+#define LV_FONT_MANAGER_NAME_MAX_LEN            32
+
+#endif
+
 /*==================
  * DEVICES
  *==================*/

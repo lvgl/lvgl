@@ -3083,6 +3083,28 @@
     #endif
 #endif
 
+/*1: Enable freetype font manager*/
+/*Requires: LV_USE_FREETYPE*/
+#ifndef LV_USE_FONT_MANAGER
+    #ifdef CONFIG_LV_USE_FONT_MANAGER
+        #define LV_USE_FONT_MANAGER CONFIG_LV_USE_FONT_MANAGER
+    #else
+        #define LV_USE_FONT_MANAGER                     0
+    #endif
+#endif
+#if LV_USE_FONT_MANAGER
+
+/*Font manager name max length*/
+#ifndef LV_FONT_MANAGER_NAME_MAX_LEN
+    #ifdef CONFIG_LV_FONT_MANAGER_NAME_MAX_LEN
+        #define LV_FONT_MANAGER_NAME_MAX_LEN CONFIG_LV_FONT_MANAGER_NAME_MAX_LEN
+    #else
+        #define LV_FONT_MANAGER_NAME_MAX_LEN            32
+    #endif
+#endif
+
+#endif
+
 /*==================
  * DEVICES
  *==================*/

@@ -116,6 +116,21 @@ char * lv_strncat(char * dst, const char * src, size_t src_len)
     return tmp;
 }
 
+char * lv_strchr(const char * s, int c)
+{
+    for(; ; s++) {
+        if(*s == c) {
+            return (char *)s;
+        }
+
+        if(*s == '\0') {
+            break;
+        }
+    }
+
+    return NULL;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
