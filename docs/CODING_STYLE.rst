@@ -241,7 +241,7 @@ Supported Doxygen Commands
    is necessary.
 -  ``@note  text``
    starts a paragraph where a note can be entered.  The note ends with a blank line,
-   the end of the comment, or another Doxygen command that indicates a new section.
+   the end of the comment, or another Doxygen command that starts a new section.
    If the note contains more than one paragraph, additional paragraphs can be added
    by using additional ``@note`` commands.  At this writing, ``@par`` commands do not
    add additional paragraphs to notes as indicated in the Doxygen documentation.
