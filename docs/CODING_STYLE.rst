@@ -163,7 +163,7 @@ illustrating most of the Doxygen commands used in LVGL.
      * @param  track_cross_place     where to place tracks in cross direction.
      *                               (Any value of `lv_flex_align_t`.)
      * Example for a title bar layout:
-     * @code
+     * @code{.c}
      *     lv_obj_set_flex_align(title_bar, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
      * @endcode
      * @see
@@ -207,7 +207,7 @@ illustrating most of the Doxygen commands used in LVGL.
 - Lists (e.g. of accepted parameter values) can be created by using the '-' character.
   If the list needs to be numbered, numbers can also be used.
 
-- Place example code in a code block by surrounding it with ``@code`` and ``@endcode`` commands.
+- Place example code in a code block by surrounding it with ``@code{.c}`` and ``@endcode`` commands.
 
 - Refer reader to additional information using the ``@see`` command.  Doxygen adds a
   "See also" paragraph.  The text following the ``@see`` command will be indented.
@@ -226,40 +226,28 @@ illustrating most of the Doxygen commands used in LVGL.
 
 Supported Doxygen Commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-``@file``
-    Tells Doxygen to parse this file and also supplies documentation about
-    the file itself when applicable.
-``@param  name  description``
-    Tells Doxygen the following word is a function parameter, and the text that
-    follows it (until a blank line or another Doxygen command) is its description.
-``@return  description``
-    Tells Doxygen the following text is a description of the return value, used when applicable.
-``@code/@endcode``
-    These pair of Doxygen commands surround code that should be placed in a code block.
-    If comment is in a .C file, Doxygen will assume the language is C unless you specify
-    otherwise like this:  ``@code{.cpp}``, ``@code{.sh}``, etc..
-``@note  text``
-    Starts a paragraph where a note can be entered.  The note ends with a blank line,
-    the end of the comment, or another Doxygen command that indicates a new section.
-    If the note contains more than one paragraph, additional paragraphs can be added
-    by using additional ``@note`` commands.  At this writing, ``@par`` commands do not
-    add additional paragraphs to notes as indicated in Doxygen documentation.
-``@anchor  unique_string_identifier``
-    Tells Doxygen to make  ``unique_string_identifier``  an anchor that can be linked
-    to elsewhere using a ``@ref`` command.
-``@ref  unique_string_identifier  "Link text"``
-    Tells Doxygen to link to an anchor provided elsewhere in the documentation.
-    ``unique_string_identifier`` must exactly match a string used elsewhere with an
-    ``@anchor`` command.  ``Link text`` is the text that will appear in the hyperlink.
-    Do not use the ``@ref`` command to try to create hyperlinks to documentation for
-    LVGL data types (structs, unions or typedefs) or functions.  Doxygen will generate
-    a warning and NOT create the link, because the *correct* way to create those links
-    is just to leave data types and function names bare.  (Surrounding those code
-    elements with single back-quotes does not change the meaning to Doxygen, it only
-    changes the font used in the hyperlink.)
-``@see  text``
-    Tells Doxygen to provide a "See also" pagraph in a highlighted section, helpful
-    when additional information about a topic can be found elsewhere.
+-  ``@file``
+   tells Doxygen to parse this file and also supplies documentation about
+   the file itself when applicable (everything following it in the same comment).
+-  ``@param  name  description``
+   documents ``name`` as a function parameter, and ``description`` is the text that
+   follows it until Doxygen encounters a blank line or another Doxygen command.
+-  ``@return  description``
+   documents the return value until Doxygen encounters a blank line or another Doxygen command.
+-  ``@code{.c}/@endcode``
+   surrounds code that should be placed in a code block.  While Doxygen knows to use C
+   color-coding of code blocks in a .C file, the down-line part of the documentation
+   generation sequence does not, so the ``{.c}`` appendage to the ``@code`` command
+   is necessary.
+-  ``@note  text``
+   starts a paragraph where a note can be entered.  The note ends with a blank line,
+   the end of the comment, or another Doxygen command that indicates a new section.
+   If the note contains more than one paragraph, additional paragraphs can be added
+   by using additional ``@note`` commands.  At this writing, ``@par`` commands do not
+   add additional paragraphs to notes as indicated in the Doxygen documentation.
+-  ``@see  text``
+   generates a "See also" pagraph in a highlighted section, helpful when additional
+   information about a topic can be found elsewhere.
 
 
 
