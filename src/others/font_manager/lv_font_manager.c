@@ -94,9 +94,9 @@ lv_font_manager_t * lv_font_manager_create(uint32_t recycle_cache_size)
         return NULL;
     }
 
-    _lv_ll_init(&manager->refer_ll, sizeof(lv_font_refer_node_t));
-    _lv_ll_init(&manager->rec_ll, sizeof(lv_font_rec_node_t));
-    _lv_ll_init(&manager->path_ll, sizeof(lv_font_path_t));
+    lv_ll_init(&manager->refer_ll, sizeof(lv_font_refer_node_t));
+    lv_ll_init(&manager->rec_ll, sizeof(lv_font_rec_node_t));
+    lv_ll_init(&manager->path_ll, sizeof(lv_font_path_t));
 
     manager->recycle_manager = lv_font_manager_recycle_create(recycle_cache_size);
 
@@ -119,7 +119,7 @@ bool lv_font_manager_delete(lv_font_manager_t * manager)
 
     /* clean path map */
     lv_font_path_t * font_path;
-    _LV_LL_READ(&manager->path_ll, font_path) {
+    LV_LL_READ(&manager->path_ll, font_path) {
         if(!font_path->is_static) {
             lv_free(font_path->name);
             lv_free(font_path->path);
@@ -128,7 +128,7 @@ bool lv_font_manager_delete(lv_font_manager_t * manager)
         font_path->name = NULL;
         font_path->path = NULL;
     }
-    _lv_ll_clear(&manager->path_ll);
+    lv_ll_clear(&manager->path_ll);
 
     lv_free(manager);
 
@@ -149,7 +149,7 @@ void lv_font_manager_add_path_static(lv_font_manager_t * manager, const char * n
 bool lv_font_manager_remove_path(lv_font_manager_t * manager, const char * name)
 {
     lv_font_path_t * font_path;
-    _LV_LL_READ(&manager->path_ll, font_path) {
+    LV_LL_READ(&manager->path_ll, font_path) {
         if(lv_strcmp(name, font_path->name) == 0) {
             break;
         }
@@ -160,7 +160,7 @@ bool lv_font_manager_remove_path(lv_font_manager_t * manager, const char * name)
         return false;
     }
 
-    _lv_ll_remove(&manager->path_ll, font_path);
+    lv_ll_remove(&manager->path_ll, font_path);
 
     if(!font_path->is_static) {
         lv_free(font_path->name);
@@ -236,7 +236,7 @@ static lv_font_t * lv_font_manager_create_font_single(lv_font_manager_t * manage
     }
 
     /* add font record node */
-    lv_font_rec_node_t * rec_node = _lv_ll_ins_head(&manager->rec_ll);
+    lv_font_rec_node_t * rec_node = lv_ll_ins_head(&manager->rec_ll);
     LV_ASSERT_MALLOC(rec_node);
     lv_memzero(rec_node, sizeof(lv_font_rec_node_t));
 
@@ -274,7 +274,7 @@ static bool lv_font_manager_delete_font_single(lv_font_manager_t * manager, lv_f
     LV_ASSERT(retval);
 
     /* free rec_node */
-    _lv_ll_remove(&manager->rec_ll, rec_node);
+    lv_ll_remove(&manager->rec_ll, rec_node);
     lv_free(rec_node);
 
     LV_LOG_INFO("success");
@@ -376,7 +376,7 @@ static void lv_font_manager_add_path_core(lv_font_manager_t * manager, const cha
         return;
     }
 
-    lv_font_path_t * font_path = _lv_ll_ins_tail(&manager->path_ll);
+    lv_font_path_t * font_path = lv_ll_ins_tail(&manager->path_ll);
     LV_ASSERT_MALLOC(font_path);
     font_path->is_static = is_static;
 
@@ -402,7 +402,7 @@ static void lv_font_manager_add_path_core(lv_font_manager_t * manager, const cha
 static const char * lv_font_manager_get_path(lv_font_manager_t * manager, const char * name)
 {
     lv_font_path_t * font_path;
-    _LV_LL_READ(&manager->path_ll, font_path) {
+    LV_LL_READ(&manager->path_ll, font_path) {
         if(lv_strcmp(name, font_path->name) == 0) {
             return font_path->path;
         }
@@ -417,12 +417,12 @@ static bool lv_font_manager_check_resource(lv_font_manager_t * manager)
 
     /* Check the recorded font */
     lv_ll_t * rec_ll = &manager->rec_ll;
-    uint32_t rec_ll_len = _lv_ll_get_len(rec_ll);
+    uint32_t rec_ll_len = lv_ll_get_len(rec_ll);
     if(rec_ll_len) {
         LV_LOG_WARN("lvgl font resource[%" LV_PRIu32 "]:", rec_ll_len);
 
         lv_font_rec_node_t * node;
-        _LV_LL_READ(rec_ll, node) {
+        LV_LL_READ(rec_ll, node) {
             LV_LOG_WARN("font: %p(%d) -> ref: %s(%d)",
                         node,
                         (int)node->font.line_height,
@@ -433,12 +433,12 @@ static bool lv_font_manager_check_resource(lv_font_manager_t * manager)
 
     /* Check the recorded font resources created by freetype */
     lv_ll_t * refer_ll = &manager->refer_ll;
-    uint32_t refer_ll_len = _lv_ll_get_len(refer_ll);
+    uint32_t refer_ll_len = lv_ll_get_len(refer_ll);
     if(refer_ll_len) {
         LV_LOG_WARN("freetype font resource[%" LV_PRIu32 "]:", refer_ll_len);
 
         lv_font_refer_node_t * node;
-        _LV_LL_READ(refer_ll, node) {
+        LV_LL_READ(refer_ll, node) {
             LV_LOG_WARN("font: %s(%d), ref_cnt = %d",
                         node->ft_info.name,
                         node->ft_info.size,
@@ -458,7 +458,7 @@ static lv_font_rec_node_t * lv_font_manager_search_rec_node(lv_font_manager_t * 
     LV_ASSERT_NULL(font);
 
     lv_font_rec_node_t * rec_node;
-    _LV_LL_READ(&manager->rec_ll, rec_node) {
+    LV_LL_READ(&manager->rec_ll, rec_node) {
         if(font == &rec_node->font) {
             LV_LOG_INFO("font: %p(%d) matched", font, (int)font->line_height);
             return rec_node;
@@ -475,7 +475,7 @@ static lv_font_refer_node_t * lv_font_manager_search_refer_node(lv_font_manager_
     LV_ASSERT_NULL(ft_info);
 
     lv_font_refer_node_t * refer_node;
-    _LV_LL_READ(&manager->refer_ll, refer_node) {
+    LV_LL_READ(&manager->refer_ll, refer_node) {
         if(lv_freetype_info_is_equal(ft_info, &refer_node->ft_info)) {
             LV_LOG_INFO("font: %s(%d) matched", ft_info->name, ft_info->size);
             return refer_node;
@@ -549,7 +549,7 @@ static const lv_font_refer_node_t * lv_font_manager_get_freetype_font(lv_font_ma
     }
 
     /* add refer_node to refer_ll */
-    refer_node = _lv_ll_ins_head(&manager->refer_ll);
+    refer_node = lv_ll_ins_head(&manager->refer_ll);
     LV_ASSERT_MALLOC(refer_node);
     lv_memzero(refer_node, sizeof(lv_font_refer_node_t));
 
@@ -587,11 +587,11 @@ static bool lv_font_manager_reset_freetype_font(lv_font_manager_t * manager, con
         return true;
     }
 
-    /* if if ref_cnt is about to be 0, free font resource */
+    /* if ref_cnt is about to be 0, free font resource */
     lv_font_manager_delete_font_warpper(manager, refer_node);
 
     /* free refer_node */
-    _lv_ll_remove(&manager->refer_ll, refer_node);
+    lv_ll_remove(&manager->refer_ll, refer_node);
     lv_free(refer_node);
 
     LV_LOG_INFO("success");
