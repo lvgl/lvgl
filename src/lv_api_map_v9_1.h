@@ -40,8 +40,6 @@ extern "C" {
 #define _lv_event_mark_deleted lv_event_mark_deleted
 #define lv_obj_add_event lv_obj_add_event_cb
 
-#define _lv_anim_t lv_anim_t
-
 #define _LV_STYLE_LAST_BUILT_IN_PROP LV_STYLE_LAST_BUILT_IN_PROP
 #define _LV_FLEX_REVERSE LV_FLEX_REVERSE
 #define _LV_FLEX_WRAP  LV_FLEX_WRAP
