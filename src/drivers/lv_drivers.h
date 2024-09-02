@@ -43,6 +43,8 @@ extern "C" {
 
 #include "qnx/lv_qnx.h"
 
+#include "wayland/lv_wayland.h"
+
 /*********************
  *      DEFINES
  *********************/

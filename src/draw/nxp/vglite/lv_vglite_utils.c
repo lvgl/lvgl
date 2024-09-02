@@ -104,6 +104,13 @@ void vglite_run(void)
 #endif
 }
 
+#if LV_USE_VGLITE_DRAW_ASYNC
+void vglite_wait_for_finish(void)
+{
+    VGLITE_CHECK_ERROR(vg_lite_finish());
+}
+#endif
+
 vg_lite_color_t vglite_get_color(lv_color32_t lv_col32, bool gradient)
 {
     vg_lite_color_t vg_col32;

@@ -1,4 +1,4 @@
-# Kconfig file for LVGL v9.1.0
+# Kconfig file for LVGL v9.2.0
 
 menu "LVGL configuration"
 
@@ -346,26 +346,36 @@ menu "LVGL configuration"
 			depends on LV_USE_DRAW_VGLITE
 			default n
 
-		config LV_USE_VGLITE_DRAW_ASYNC
-			bool "Enable VGLite draw async"
+		config LV_USE_VGLITE_DRAW_THREAD
+			bool "Use additional draw thread for VG-Lite processing"
 			depends on LV_USE_DRAW_VGLITE && LV_USE_OS > 0
 			default y
+
+		config LV_USE_VGLITE_DRAW_ASYNC
+			bool "Enable VGLite draw async"
+			depends on LV_USE_VGLITE_DRAW_THREAD
+			default y
 			help
-				Queue multiple tasks and flash them once to the GPU.
+				Queue multiple tasks and flash them once to the GPU. The task ready state will be send asynchronous to dispatcher.
 
 		config LV_USE_VGLITE_ASSERT
 			bool "Enable VGLite asserts"
-			default n
 			depends on LV_USE_DRAW_VGLITE
+			default n
 
 		config LV_USE_DRAW_PXP
 			bool "Use NXP's PXP on iMX RTxxx platforms"
 			default n
 
+		config LV_USE_PXP_DRAW_THREAD
+			bool "Use additional draw thread for PXP processing"
+			depends on LV_USE_DRAW_PXP && LV_USE_OS > 0
+			default y
+
 		config LV_USE_PXP_ASSERT
 			bool "Enable PXP asserts"
-			default n
 			depends on LV_USE_DRAW_PXP
+			default n
 
 		config LV_USE_DRAW_DAVE2D
 			bool "Use Renesas Dave2D on RA platforms"
@@ -711,6 +721,10 @@ menu "LVGL configuration"
 			bool "Enable matrix support"
 			default n
 			select LV_USE_FLOAT
+
+		config LV_USE_PRIVATE_API
+			bool "Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default"
+			default n
 	endmenu
 
 	menu "Font Usage"
@@ -1124,10 +1138,16 @@ menu "LVGL configuration"
 	endmenu
 
 	menu "3rd Party Libraries"
+		config LV_FS_DEFAULT_DRIVE_LETTER
+			int "Default drive letter (e.g. 65 for 'A')"
+			default 0
+			help
+				Setting a default drive letter allows skipping the driver prefix in filepaths
+
 		config LV_USE_FS_STDIO
 			bool "File system on top of stdio API"
 		config LV_FS_STDIO_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65 )"
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_STDIO
 		config LV_FS_STDIO_PATH
@@ -1141,7 +1161,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_POSIX
 			bool "File system on top of posix API"
 		config LV_FS_POSIX_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_POSIX
 		config LV_FS_POSIX_PATH
@@ -1155,7 +1175,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_WIN32
 			bool "File system on top of Win32 API"
 		config LV_FS_WIN32_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_WIN32
 		config LV_FS_WIN32_PATH
@@ -1169,7 +1189,7 @@ menu "LVGL configuration"
 		config LV_USE_FS_FATFS
 			bool "File system on top of FatFS"
 		config LV_FS_FATFS_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_FATFS
 		config LV_FS_FATFS_CACHE_SIZE
@@ -1180,37 +1200,29 @@ menu "LVGL configuration"
 		config LV_USE_FS_MEMFS
 			bool "File system on top of memory-mapped API"
 		config LV_FS_MEMFS_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_MEMFS
 
 		config LV_USE_FS_LITTLEFS
 			bool "File system on top of littlefs API"
 		config LV_FS_LITTLEFS_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_LITTLEFS
 
 		config LV_USE_FS_ARDUINO_ESP_LITTLEFS
 			bool "File system on top of Arduino ESP littlefs API"
 		config LV_FS_ARDUINO_ESP_LITTLEFS_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_ARDUINO_ESP_LITTLEFS
 
 		config LV_USE_FS_ARDUINO_SD
 			bool "File system on top of Arduino SD API"
 		config LV_FS_ARDUINO_SD_LETTER
-			int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
-			depends on LV_USE_FS_ARDUINO_SD
-		config LV_FS_ARDUINO_SD_CS_PIN
-			int "Set the pin connected to the chip select line of the SD card"
-			default 0
-			depends on LV_USE_FS_ARDUINO_SD
-		config LV_FS_ARDUINO_SD_FREQUENCY
-			int "Set the frequency used by the chip of the SD CARD"
-			default 40000000
 			depends on LV_USE_FS_ARDUINO_SD
 
 		config LV_USE_LODEPNG
@@ -1452,6 +1464,15 @@ menu "LVGL configuration"
 			default y
 			help
 				This can save some memory, but not much. After the quick access bar is created, it can be hidden by clicking the button at the top left corner of the browsing area, which is very useful for small screen devices.
+	
+		config LV_USE_FONT_MANAGER
+			bool "Enable freetype font manager"
+			depends on LV_USE_FREETYPE
+			default n			
+		config LV_FONT_MANAGER_NAME_MAX_LEN
+			int "Font manager name max length"
+			depends on LV_USE_FONT_MANAGER
+			default 32
 	endmenu
 
 	menu "Devices"
@@ -1504,10 +1525,16 @@ menu "LVGL configuration"
 			default 1 if LV_SDL_SINGLE_BUFFER
 			default 2 if LV_SDL_DOUBLE_BUFFER
 
+		config LV_SDL_ACCELERATED
+			bool "Use hardware acceleration"
+			depends on LV_USE_SDL
+			default y
+
 		config LV_SDL_FULLSCREEN
 			bool "SDL fullscreen"
 			depends on LV_USE_SDL
 			default n
+
 		config LV_SDL_DIRECT_EXIT
 			bool "Exit the application when all SDL windows are closed"
 			depends on LV_USE_SDL
@@ -1563,6 +1590,18 @@ menu "LVGL configuration"
 					Always redraw the whole screen even if only one pixel has been changed.
 					With 2 buffers in flush_cb only and address change is required.
 		endchoice
+
+		config LV_USE_WAYLAND
+			bool "Use the wayland client to open a window and handle inputs on Linux or BSD"
+			default n
+		config LV_WAYLAND_WINDOW_DECORATIONS
+			bool "Draw client side window decorations, only necessary on Mutter (GNOME)"
+			depends on LV_USE_WAYLAND
+			default n
+		config LV_WAYLAND_WL_SHELL
+			bool "Support the legacy wl_shell instead of the default XDG Shell protocol"
+			depends on LV_USE_WAYLAND
+			default n
 
 		config LV_USE_LINUX_FBDEV
 			bool "Use Linux framebuffer device"
@@ -1689,7 +1728,7 @@ menu "LVGL configuration"
 			default n
 
 		config LV_USE_LIBINPUT
-    		bool "Use libinput input driver"
+			bool "Use libinput input driver"
 			default n
 
 		config LV_LIBINPUT_BSD

@@ -71,11 +71,11 @@ handle the supported draw tasks.
 
 .. code:: c
 
-  #if LV_USE_OS
+  #if LV_USE_PXP_DRAW_THREAD
     lv_thread_init(&draw_pxp_unit->thread, LV_THREAD_PRIO_HIGH, _pxp_render_thread_cb, 2 * 1024, draw_pxp_unit);
   #endif
 
-If `LV_USE_OS` is not defined, then no additional draw thread will be created
+If `LV_USE_PXP_DRAW_THREAD` is not defined, then no additional draw thread will be created
 and the PXP drawing task will get executed on the same LVGL main thread.
 
 `_pxp_evaluate()` will get called after each task is being created and will
@@ -218,7 +218,7 @@ and height, and command buffer size are in the SDK file "vglite_support.h".
 
 .. code:: c
 
-  #if LV_USE_GPU_NXP_VG_LITE
+  #if LV_USE_DRAW_VGLITE
     #include "vg_lite.h"
     #include "vglite_support.h"
   #endif
@@ -265,11 +265,11 @@ handle the supported draw tasks.
 
 .. code:: c
 
-  #if LV_USE_OS
+  #if LV_USE_VGLITE_DRAW_THREAD
     lv_thread_init(&draw_vglite_unit->thread, LV_THREAD_PRIO_HIGH, _vglite_render_thread_cb, 2 * 1024, draw_vglite_unit);
   #endif
 
-If `LV_USE_OS` is not defined, then no additional draw thread will be created
+If `LV_USE_VGLITE_DRAW_THREAD` is not defined, then no additional draw thread will be created
 and the VGLite drawing task will get executed on the same LVGL main thread.
 
 `_vglite_evaluate()` will get called after each task is being created and will

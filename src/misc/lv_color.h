@@ -171,7 +171,10 @@ typedef enum {
     LV_COLOR_FORMAT_YUV_END           = LV_COLOR_FORMAT_UYVY,
 
     /*Color formats in which LVGL can render*/
-#if LV_COLOR_DEPTH == 8
+#if LV_COLOR_DEPTH == 1
+    LV_COLOR_FORMAT_NATIVE            = LV_COLOR_FORMAT_I1,
+    LV_COLOR_FORMAT_NATIVE_WITH_ALPHA = LV_COLOR_FORMAT_I1,
+#elif LV_COLOR_DEPTH == 8
     LV_COLOR_FORMAT_NATIVE            = LV_COLOR_FORMAT_L8,
     LV_COLOR_FORMAT_NATIVE_WITH_ALPHA = LV_COLOR_FORMAT_AL88,
 #elif LV_COLOR_DEPTH == 16
@@ -183,7 +186,10 @@ typedef enum {
 #elif LV_COLOR_DEPTH == 32
     LV_COLOR_FORMAT_NATIVE            = LV_COLOR_FORMAT_XRGB8888,
     LV_COLOR_FORMAT_NATIVE_WITH_ALPHA = LV_COLOR_FORMAT_ARGB8888,
+#else
+#error "LV_COLOR_DEPTH should be 1, 8, 16, 24 or 32"
 #endif
+
 } lv_color_format_t;
 
 #define LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf) ((cf) >= LV_COLOR_FORMAT_A1 && (cf) <= LV_COLOR_FORMAT_A8)

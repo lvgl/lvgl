@@ -87,7 +87,7 @@ void lv_vg_lite_path_end(lv_vg_lite_path_t * path);
 void lv_vg_lite_path_append_rect(lv_vg_lite_path_t * path,
                                  float x, float y,
                                  float w, float h,
-                                 float rx, float ry);
+                                 float r);
 
 void lv_vg_lite_path_append_circle(lv_vg_lite_path_t * path,
                                    float cx, float cy,

@@ -74,7 +74,10 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
 
     vg_lite_buffer_t src_buf;
     lv_image_decoder_dsc_t decoder_dsc;
-    if(!lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->src, no_cache)) {
+
+    /* if not support blend normal, premultiply alpha */
+    bool premultiply = !lv_vg_lite_support_blend_normal();
+    if(!lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->src, no_cache, premultiply)) {
         LV_PROFILER_END;
         return;
     }
@@ -91,8 +94,9 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         lv_memset(&color, dsc->opa, sizeof(color));
     }
 
-    bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
-    vg_lite_filter_t filter = has_transform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
+    /* convert the blend mode to vg-lite blend mode, considering the premultiplied alpha */
+    bool has_pre_mul = lv_draw_buf_has_flag(decoder_dsc.decoded, LV_IMAGE_FLAGS_PREMULTIPLIED);
+    vg_lite_blend_t blend = lv_vg_lite_blend_mode(dsc->blend_mode, has_pre_mul);
 
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
@@ -101,6 +105,9 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
 
     LV_VG_LITE_ASSERT_SRC_BUFFER(&src_buf);
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
+
+    bool no_transform = lv_matrix_is_identity_or_translation((const lv_matrix_t *)&matrix);
+    vg_lite_filter_t filter = no_transform ? VG_LITE_FILTER_POINT : VG_LITE_FILTER_BI_LINEAR;
 
     /* If clipping is not required, blit directly */
     if(lv_area_is_in(&image_tf_area, draw_unit->clip_area, false) && dsc->clip_radius <= 0) {
@@ -118,7 +125,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
                                    &src_buf,
                                    &rect,
                                    &matrix,
-                                   lv_vg_lite_blend_mode(dsc->blend_mode),
+                                   blend,
                                    color,
                                    filter));
         LV_PROFILER_END_TAG("vg_lite_blit_rect");
@@ -140,14 +147,14 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
                 path,
                 coords->x1, coords->y1,
                 width, height,
-                radius, radius);
+                radius);
         }
         else {
             lv_vg_lite_path_append_rect(
                 path,
                 clip_area.x1, clip_area.y1,
                 lv_area_get_width(&clip_area), lv_area_get_height(&clip_area),
-                0, 0);
+                0);
         }
 
         lv_vg_lite_path_set_bonding_box_area(path, &clip_area);
@@ -168,7 +175,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
                                    &path_matrix,
                                    &src_buf,
                                    &matrix,
-                                   lv_vg_lite_blend_mode(dsc->blend_mode),
+                                   blend,
                                    VG_LITE_PATTERN_COLOR,
                                    0,
                                    color,

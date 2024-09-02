@@ -292,6 +292,13 @@ const char * lv_cache_get_name(lv_cache_t * cache)
     return cache->name;
 }
 
+lv_iter_t * lv_cache_iter_create(lv_cache_t * cache)
+{
+    LV_ASSERT_NULL(cache);
+    if(cache == NULL || cache->clz->iter_create_cb == NULL) return NULL;
+    return cache->clz->iter_create_cb(cache);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

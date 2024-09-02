@@ -120,6 +120,13 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
     vg_lite_matrix_t layer_matrix;
     lv_vg_lite_matrix(&layer_matrix, &t->matrix);
     lv_vg_lite_matrix_multiply(&u->global_matrix, &layer_matrix);
+
+    /* Crop out extra pixels drawn due to scaling accuracy issues */
+    if(vg_lite_query_feature(gcFEATURE_BIT_VG_SCISSOR)) {
+        lv_area_t scissor_area = layer->phy_clip_area;
+        lv_area_move(&scissor_area, -layer->buf_area.x1, -layer->buf_area.y1);
+        lv_vg_lite_set_scissor_area(&scissor_area);
+    }
 #endif
 
     switch(t->type) {

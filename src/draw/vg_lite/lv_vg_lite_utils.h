@@ -131,13 +131,13 @@ void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, co
 void lv_vg_lite_image_dec_init(vg_lite_matrix_t * matrix, int32_t x, int32_t y, const lv_draw_image_dsc_t * dsc);
 
 bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src,
-                                  bool no_cache);
+                                  bool no_cache, bool premultiply);
 
 void lv_vg_lite_image_dsc_init(struct _lv_draw_vg_lite_unit_t * unit);
 
 void lv_vg_lite_image_dsc_deinit(struct _lv_draw_vg_lite_unit_t * unit);
 
-vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode);
+vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode, bool has_pre_mul);
 
 uint32_t lv_vg_lite_get_palette_size(vg_lite_buffer_format_t format);
 

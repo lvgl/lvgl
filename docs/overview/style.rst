@@ -41,7 +41,7 @@ The objects can be in the combination of the following states:
 - :cpp:enumerator:`LV_STATE_FOCUSED`: (0x0002) Focused via keypad or encoder or clicked via touchpad/mouse
 - :cpp:enumerator:`LV_STATE_FOCUS_KEY`: (0x0004) Focused via keypad or encoder but not via touchpad/mouse
 - :cpp:enumerator:`LV_STATE_EDITED`: (0x0008) Edit by an encoder
-- :cpp:enumerator:`LV_STATE_HOVERED`: (0x0010) Hovered by mouse (not supported now)
+- :cpp:enumerator:`LV_STATE_HOVERED`: (0x0010) Hovered by mouse
 - :cpp:enumerator:`LV_STATE_PRESSED`: (0x0020) Being pressed
 - :cpp:enumerator:`LV_STATE_SCROLLED`: (0x0040) Being scrolled
 - :cpp:enumerator:`LV_STATE_DISABLED`: (0x0080) Disabled state

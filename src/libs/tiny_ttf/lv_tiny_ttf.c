@@ -123,7 +123,7 @@ static void lv_tiny_ttf_cache_create(ttf_font_desc_t * dsc);
 void lv_tiny_ttf_set_size(lv_font_t * font, int32_t font_size)
 {
     if(font_size <= 0) {
-        LV_LOG_ERROR("invalid font size: %"PRIx32, font_size);
+        LV_LOG_ERROR("invalid font size: %"LV_PRIx32, font_size);
         return;
     }
     ttf_font_desc_t * dsc = (ttf_font_desc_t *)font->dsc;

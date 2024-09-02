@@ -33,7 +33,7 @@ struct _lv_roller_t {
     uint32_t sel_opt_id;          /**< Index of the current option*/
     uint32_t sel_opt_id_ori;      /**< Store the original index on focus*/
     uint32_t inf_page_cnt;        /**< Number of extra pages added to make the roller look infinite */
-    lv_roller_mode_t mode : 1;
+    lv_roller_mode_t mode : 2;
     uint32_t moved : 1;
 };
 

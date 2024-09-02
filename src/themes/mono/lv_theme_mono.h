@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_USE_THEME_MONO_H
-#define LV_USE_THEME_MONO_H
+#ifndef LV_THEME_MONO_H
+#define LV_THEME_MONO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,4 +59,4 @@ void lv_theme_mono_deinit(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_USE_THEME_MONO_H*/
+#endif /* LV_THEME_MONO_H */

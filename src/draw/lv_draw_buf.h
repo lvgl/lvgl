@@ -67,7 +67,7 @@ LV_EXPORT_CONST_INT(LV_STRIDE_AUTO);
 #define LV_DRAW_BUF_INIT_STATIC(name) \
     do { \
         lv_image_header_t * header = &name.header; \
-        lv_draw_buf_init(&name, header->w, header->h, header->cf, header->stride, buf_##name, sizeof(buf_##name)); \
+        lv_draw_buf_init(&name, header->w, header->h, (lv_color_format_t)header->cf, header->stride, buf_##name, sizeof(buf_##name)); \
         lv_draw_buf_set_flag(&name, LV_IMAGE_FLAGS_MODIFIABLE); \
     } while(0)
 
@@ -87,10 +87,10 @@ typedef uint32_t (*lv_draw_buf_width_to_stride_cb)(uint32_t w, lv_color_format_t
 
 struct _lv_draw_buf_t {
     lv_image_header_t header;
-    uint32_t data_size;     /*Total buf size in bytes*/
+    uint32_t data_size;       /**< Total buf size in bytes */
     uint8_t * data;
-    void * unaligned_data;  /*Unaligned address of `data`, used internally by lvgl*/
-    const lv_draw_buf_handlers_t * handlers; /* draw buffer alloc/free ops. */
+    void * unaligned_data;    /**< Unaligned address of `data`, used internally by lvgl */
+    const lv_draw_buf_handlers_t * handlers; /**< draw buffer alloc/free ops. */
 };
 
 /**********************
@@ -112,7 +112,7 @@ void lv_draw_buf_init_with_default_handlers(lv_draw_buf_handlers_t * handlers);
  * @param buf_free_cb          the callback to free memory of the buffer
  * @param align_pointer_cb     the callback to align the buffer
  * @param invalidate_cache_cb  the callback to invalidate the cache of the buffer
- * @param flush_cache_cb       ???
+ * @param flush_cache_cb       the callback to flush buffer
  * @param width_to_stride_cb   the callback to calculate the stride based on the width and color format
  */
 void lv_draw_buf_handlers_init(lv_draw_buf_handlers_t * handlers,
@@ -275,10 +275,10 @@ lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t 
                                     uint32_t stride);
 
 /**
- * Destroy a draw buf by free the actual buffer if it's marked as LV_IMAGE_FLAGS_ALLOCATED in header.
+ * Destroy a draw buf by freeing the actual buffer if it's marked as LV_IMAGE_FLAGS_ALLOCATED in header.
  * Then free the lv_draw_buf_t struct.
  *
- * @param buf       the draw buffer to destroy
+ * @param draw_buf  the draw buffer to destroy
  */
 void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf);
 
@@ -304,7 +304,7 @@ lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride);
  */
 lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf);
 
-bool lv_draw_buf_has_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
+bool lv_draw_buf_has_flag(const lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
 
 void lv_draw_buf_set_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
 

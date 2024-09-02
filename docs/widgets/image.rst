@@ -41,7 +41,7 @@ To set the source of an image, use :cpp:expr:`lv_image_set_src(img, src)`.
 To generate a pixel array from a PNG, JPG or BMP image, use the `Online image converter tool <https://lvgl.io/tools/imageconverter>`__
 and set the converted image with its pointer  :cpp:expr:`lv_image_set_src(img1, &converted_img_var)`
 To make the variable visible in the C file, you need to declare it with
-:cpp:macro:`LV_IMAGE_DECLARE(converted_img_var)`.
+:cpp:expr:`LV_IMAGE_DECLARE(converted_img_var)`.
 
 To use external files, you also need to convert the image files using
 the online converter tool but now you should select the binary output

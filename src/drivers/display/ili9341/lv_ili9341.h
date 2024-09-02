@@ -1,5 +1,5 @@
-/*
- * lv_ili9341.h
+/**
+ * @file lv_ili9341.h
  *
  * This driver is just a wrapper around the generic MIPI compatible LCD controller driver
  *

@@ -168,9 +168,9 @@ void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
     if(lv_area_get_width(&a_clipped) <= 0) return;
     if(lv_area_get_height(&a_clipped) <= 0) return;
 
-    uint8_t px_size = lv_color_format_get_size(header->cf);
     uint8_t * buf = lv_draw_buf_goto_xy(draw_buf, a_clipped.x1, a_clipped.y1);
-    uint32_t line_length = lv_area_get_width(&a_clipped) * px_size;
+    uint8_t bpp = lv_color_format_get_bpp(header->cf);
+    uint32_t line_length = (lv_area_get_width(&a_clipped) * bpp + 7) >> 3;
     int32_t y;
     for(y = a_clipped.y1; y <= a_clipped.y2; y++) {
         lv_memzero(buf, line_length);
@@ -536,7 +536,7 @@ void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32
     palette[index] = color;
 }
 
-bool lv_draw_buf_has_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
+bool lv_draw_buf_has_flag(const lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
 {
     return draw_buf->header.flags & flag;
 }

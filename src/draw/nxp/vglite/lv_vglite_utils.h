@@ -96,6 +96,14 @@ bool vglite_cmd_buf_is_flushed(void);
 void vglite_run(void);
 
 /**
+ * Wait for VG-Lite finish.
+ *
+ */
+#if LV_USE_VGLITE_DRAW_ASYNC
+void vglite_wait_for_finish(void);
+#endif
+
+/**
  * Get vglite color. Premultiplies (if not hw already) and swizzles the given
  * LVGL 32bit color to obtain vglite color.
  *

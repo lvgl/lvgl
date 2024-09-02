@@ -367,6 +367,20 @@ void lv_indev_set_long_press_time(lv_indev_t * indev, uint16_t long_press_time)
     indev->long_press_time = long_press_time;
 }
 
+void lv_indev_set_scroll_limit(lv_indev_t * indev, uint8_t scroll_limit)
+{
+    if(indev == NULL) return;
+
+    indev->scroll_limit = scroll_limit;
+}
+
+void lv_indev_set_scroll_throw(lv_indev_t * indev, uint8_t scroll_throw)
+{
+    if(indev == NULL) return;
+
+    indev->scroll_throw = scroll_throw;
+}
+
 void * lv_indev_get_user_data(const lv_indev_t * indev)
 {
     if(indev == NULL) return NULL;
@@ -1349,7 +1363,8 @@ static void indev_proc_release(lv_indev_t * indev)
                 if(send_event(LV_EVENT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
             }
             else {
-                if(send_event(LV_EVENT_SCROLL_THROW_BEGIN, indev_act) == LV_RESULT_INVALID) return;
+                lv_obj_send_event(scroll_obj, LV_EVENT_SCROLL_THROW_BEGIN, indev_act);
+                if(indev_reset_check(indev)) return;
             }
         }
         indev->pointer.act_obj = NULL;

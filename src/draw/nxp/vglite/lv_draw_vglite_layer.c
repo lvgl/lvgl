@@ -18,9 +18,7 @@
 #if LV_USE_DRAW_VGLITE
 
 #include "../../../stdlib/lv_string.h"
-#if LV_USE_PARALLEL_DRAW_DEBUG
-    #include "../../../core/lv_global.h"
-#endif
+#include "../../../core/lv_global.h"
 
 /*********************
  *      DEFINES
@@ -38,9 +36,7 @@
  *  STATIC VARIABLES
  **********************/
 
-#if LV_USE_PARALLEL_DRAW_DEBUG
-    #define _draw_info LV_GLOBAL_DEFAULT()->draw_info
-#endif
+#define _draw_info LV_GLOBAL_DEFAULT()->draw_info
 
 /**********************
  *      MACROS
@@ -62,13 +58,15 @@ void lv_draw_vglite_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
     if(draw_buf == NULL)
         return;
 
-    const lv_area_t area_to_draw = {
-        .x1 = 0,
-        .y1 = 0,
-        .x2 = draw_buf->header.w - 1,
-        .y2 = draw_buf->header.h - 1
-    };
-    lv_draw_buf_invalidate_cache(draw_buf, &area_to_draw);
+    if(_draw_info.unit_cnt > 1) {
+        const lv_area_t area_to_draw = {
+            .x1 = 0,
+            .y1 = 0,
+            .x2 = draw_buf->header.w - 1,
+            .y2 = draw_buf->header.h - 1
+        };
+        lv_draw_buf_invalidate_cache(draw_buf, &area_to_draw);
+    }
 
     lv_draw_image_dsc_t new_draw_dsc = *draw_dsc;
     new_draw_dsc.src = draw_buf;

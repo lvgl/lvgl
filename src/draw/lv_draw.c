@@ -3,6 +3,10 @@
  *
  */
 
+/**
+ * Modified by NXP in 2024
+ */
+
 /*********************
  *      INCLUDES
  *********************/
@@ -78,6 +82,7 @@ void * lv_draw_create_unit(size_t size)
 
     new_unit->next = _draw_info.unit_head;
     _draw_info.unit_head = new_unit;
+    _draw_info.unit_cnt++;
 
     return new_unit;
 }
@@ -154,19 +159,32 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
     LV_PROFILER_END;
 }
 
+void lv_draw_wait_for_finish(void)
+{
+#if LV_USE_OS
+    lv_draw_unit_t * u = _draw_info.unit_head;
+    while(u) {
+        if(u->wait_for_finish_cb)
+            u->wait_for_finish_cb(u);
+        u = u->next;
+    }
+#endif
+}
+
 void lv_draw_dispatch(void)
 {
     LV_PROFILER_BEGIN;
-    bool render_running = false;
+    bool task_dispatched = false;
     lv_display_t * disp = lv_display_get_next(NULL);
     while(disp) {
         lv_layer_t * layer = disp->layer_head;
         while(layer) {
             if(lv_draw_dispatch_layer(disp, layer))
-                render_running = true;
+                task_dispatched = true;
             layer = layer->next;
         }
-        if(!render_running) {
+        if(!task_dispatched) {
+            lv_draw_wait_for_finish();
             lv_draw_dispatch_request();
         }
         disp = lv_display_get_next(disp);
@@ -231,7 +249,7 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
         t = t_next;
     }
 
-    bool render_running = false;
+    bool task_dispatched = false;
 
     /*This layer is ready, enable blending its buffer*/
     if(layer->parent && layer->all_tasks_added && layer->draw_task_head == NULL) {
@@ -256,13 +274,13 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
         lv_draw_unit_t * u = _draw_info.unit_head;
         while(u) {
             int32_t taken_cnt = u->dispatch_cb(u, layer);
-            if(taken_cnt != LV_DRAW_UNIT_IDLE) render_running = true;
+            if(taken_cnt != LV_DRAW_UNIT_IDLE) task_dispatched = true;
             u = u->next;
         }
     }
 
     LV_PROFILER_END;
-    return render_running;
+    return task_dispatched;
 }
 
 void lv_draw_dispatch_wait_for_request(void)
@@ -282,6 +300,11 @@ void lv_draw_dispatch_request(void)
 #else
     _draw_info.dispatch_req = 1;
 #endif
+}
+
+uint32_t lv_draw_get_unit_count(void)
+{
+    return _draw_info.unit_cnt;
 }
 
 lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id)
@@ -347,6 +370,7 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
     new_layer->parent = parent_layer;
     new_layer->_clip_area = *area;
     new_layer->buf_area = *area;
+    new_layer->phy_clip_area = *area;
     new_layer->color_format = color_format;
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
