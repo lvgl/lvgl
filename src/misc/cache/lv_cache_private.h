@@ -107,6 +107,10 @@ typedef lv_cache_entry_t * (*lv_cache_get_victim_cb)(lv_cache_t * cache, void * 
 typedef lv_cache_reserve_cond_res_t (*lv_cache_reserve_cond_cb)(lv_cache_t * cache, const void * key, size_t size,
                                                                 void * user_data);
 
+/**
+ * The cache iterator creation function, used by the cache class to create an iterator for the cache.
+ * @return A pointer to the created iterator, or NULL if the iterator cannot be created.
+ */
 typedef lv_iter_t * (*lv_cache_iter_create_cb)(lv_cache_t * cache);
 
 /**
