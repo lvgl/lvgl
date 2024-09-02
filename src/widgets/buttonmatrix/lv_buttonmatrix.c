@@ -51,7 +51,7 @@ static bool button_is_popover(lv_buttonmatrix_ctrl_t ctrl_bits);
 static bool button_is_checkable(lv_buttonmatrix_ctrl_t ctrl_bits);
 static bool button_get_checked(lv_buttonmatrix_ctrl_t ctrl_bits);
 static uint32_t get_button_from_point(lv_obj_t * obj, lv_point_t * p);
-static void allocate_button_areas_and_controls(const lv_obj_t * obj, const char ** map);
+static void allocate_button_areas_and_controls(const lv_obj_t * obj, const char * const * map);
 static void invalidate_button_area(const lv_obj_t * obj, uint32_t btn_idx);
 static void make_one_button_checked(lv_obj_t * obj, uint32_t btn_idx);
 static bool has_popovers_in_top_row(lv_obj_t * obj);
@@ -60,7 +60,7 @@ static bool has_popovers_in_top_row(lv_obj_t * obj);
  *  STATIC VARIABLES
  **********************/
 #if LV_WIDGETS_HAS_DEFAULT_VALUE
-static const char * lv_buttonmatrix_def_map[] = {"Btn1", "Btn2", "Btn3", "\n", "Btn4", "Btn5", ""};
+static const char * const lv_buttonmatrix_def_map[] = {"Btn1", "Btn2", "Btn3", "\n", "Btn4", "Btn5", ""};
 #endif
 
 const lv_obj_class_t lv_buttonmatrix_class = {
@@ -96,7 +96,7 @@ lv_obj_t * lv_buttonmatrix_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * map[])
+void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * const map[])
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     if(map == NULL) return;
@@ -125,7 +125,7 @@ void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * map[])
      *(A button can be 1,2,3... unit wide)*/
     uint32_t txt_tot_i = 0; /*Act. index in the str map*/
     uint32_t btn_tot_i = 0; /*Act. index of button areas*/
-    const char ** map_row = map;
+    const char * const * map_row = map;
 
     /*Count the units and the buttons in a line*/
     uint32_t row;
@@ -295,7 +295,7 @@ void lv_buttonmatrix_set_one_checked(lv_obj_t * obj, bool en)
  * Getter functions
  *====================*/
 
-const char ** lv_buttonmatrix_get_map(const lv_obj_t * obj)
+const char * const * lv_buttonmatrix_get_map(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -813,7 +813,7 @@ static void draw_main(lv_event_t * e)
  * @param obj pointer to button matrix object
  * @param map_p pointer to a string array
  */
-static void allocate_button_areas_and_controls(const lv_obj_t * obj, const char ** map)
+static void allocate_button_areas_and_controls(const lv_obj_t * obj, const char * const * map)
 {
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
     btnm->row_cnt = 1;
@@ -1029,7 +1029,7 @@ static bool has_popovers_in_top_row(lv_obj_t * obj)
         return false;
     }
 
-    const char ** map_row = btnm->map_p;
+    const char * const * map_row = btnm->map_p;
     uint32_t btn_cnt = 0;
 
     while(map_row[btn_cnt] && lv_strcmp(map_row[btn_cnt], "\n") != 0 && map_row[btn_cnt][0] != '\0') {
