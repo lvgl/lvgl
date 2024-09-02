@@ -50,6 +50,10 @@ void lv_draw_dma2d_opaque_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixe
     lv_draw_dma2d_fgbg_cf_t image_cf_dma2d = (lv_draw_dma2d_fgbg_cf_t) lv_draw_dma2d_cf_to_dma2d_output_cf(image_cf);
     uint32_t image_cf_size = LV_COLOR_FORMAT_GET_SIZE(image_cf);
 
+    const lv_image_dsc_t * img_dsc = dsc->src;
+    uint32_t image_stride = img_dsc->header.stride;
+    if(image_stride == 0) image_stride = image_cf_size * img_dsc->header.w;
+
 #if LV_DRAW_DMA2D_CACHE
     lv_draw_dma2d_cache_area_t dest_area = {
         .first_byte = dest_first_pixel,
@@ -64,10 +68,8 @@ void lv_draw_dma2d_opaque_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixe
     }
 #endif
 
-    const lv_image_dsc_t * img_dsc = dsc->src;
-
     const void * image_first_byte = img_dsc->data
-                                    + (img_dsc->header.stride * (clipped_coords->y1 - dsc->image_area.y1))
+                                    + (image_stride * (clipped_coords->y1 - dsc->image_area.y1))
                                     + (image_cf_size * (clipped_coords->x1 - dsc->image_area.x1));
 
 #if LV_DRAW_DMA2D_CACHE
@@ -75,7 +77,7 @@ void lv_draw_dma2d_opaque_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixe
         .first_byte = image_first_byte,
         .width_bytes = w * image_cf_size,
         .height = h,
-        .stride = dsc->header.stride
+        .stride = image_stride
     };
     /* make sure the image area is up-to-date in main memory for DMA2D */
     lv_draw_dma2d_clean_cache(&src_area);
@@ -92,7 +94,7 @@ void lv_draw_dma2d_opaque_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixe
         .output_cf = output_cf_dma2d,
 
         .fg_address = image_first_byte,
-        .fg_offset = (dsc->header.stride / image_cf_size) - w,
+        .fg_offset = (image_stride / image_cf_size) - w,
         .fg_cf = image_cf_dma2d
     };
 
@@ -135,6 +137,10 @@ void lv_draw_dma2d_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixel, lv_a
     lv_draw_dma2d_fgbg_cf_t image_cf_dma2d = (lv_draw_dma2d_fgbg_cf_t) lv_draw_dma2d_cf_to_dma2d_output_cf(image_cf);
     uint32_t image_cf_size = LV_COLOR_FORMAT_GET_SIZE(image_cf);
 
+    const lv_image_dsc_t * img_dsc = dsc->src;
+    uint32_t image_stride = img_dsc->header.stride;
+    if(image_stride == 0) image_stride = image_cf_size * img_dsc->header.w;
+
 #if LV_DRAW_DMA2D_CACHE
     lv_draw_dma2d_cache_area_t dest_area = {
         .first_byte = dest_first_pixel,
@@ -147,10 +153,8 @@ void lv_draw_dma2d_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixel, lv_a
     lv_draw_dma2d_clean_cache(&dest_area);
 #endif
 
-    const lv_image_dsc_t * img_dsc = dsc->src;
-
     const void * image_first_byte = img_dsc->data
-                                    + (img_dsc->header.stride * (clipped_coords->y1 - dsc->image_area.y1))
+                                    + (image_stride * (clipped_coords->y1 - dsc->image_area.y1))
                                     + (image_cf_size * (clipped_coords->x1 - dsc->image_area.x1));
 
 #if LV_DRAW_DMA2D_CACHE
@@ -158,7 +162,7 @@ void lv_draw_dma2d_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixel, lv_a
         .first_byte = image_first_byte,
         .width_bytes = w * image_cf_size,
         .height = h,
-        .stride = dsc->header.stride
+        .stride = image_stride
     };
     /* make sure the image area is up-to-date in main memory for DMA2D */
     lv_draw_dma2d_clean_cache(&src_area);
@@ -175,7 +179,7 @@ void lv_draw_dma2d_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixel, lv_a
         .output_cf = output_cf_dma2d,
 
         .fg_address = image_first_byte,
-        .fg_offset = (dsc->header.stride / image_cf_size) - w,
+        .fg_offset = (image_stride / image_cf_size) - w,
         .fg_cf = image_cf_dma2d,
         .fg_alpha_mode = LV_DRAW_DMA2D_ALPHA_MODE_MULTIPLY_IMAGE_ALPHA_CHANNEL,
         .fg_alpha = opa,
