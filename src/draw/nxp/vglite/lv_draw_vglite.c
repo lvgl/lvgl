@@ -291,16 +291,14 @@ static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(t == NULL)
         return LV_DRAW_UNIT_IDLE;
 
-    if(lv_draw_get_unit_count() > 1) {
-        /* Let the SW unit to draw this task. */
-        if(t->preferred_draw_unit_id != DRAW_UNIT_ID_VGLITE)
+    if(t->preferred_draw_unit_id != DRAW_UNIT_ID_VGLITE) {
+        /* Let the preferred known unit to draw this task. */
+        if(t->preferred_draw_unit_id != LV_DRAW_UNIT_NONE) {
             return LV_DRAW_UNIT_IDLE;
-    }
-    else {
-        /* Fake unsupported tasks as ready. */
-        if(t->preferred_draw_unit_id != DRAW_UNIT_ID_VGLITE) {
+        }
+        else {
+            /* Fake unsupported tasks as ready. */
             t->state = LV_DRAW_TASK_STATE_READY;
-
             /* Request a new dispatching as it can get a new task. */
             lv_draw_dispatch_request();
 
