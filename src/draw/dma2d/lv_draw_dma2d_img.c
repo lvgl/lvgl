@@ -83,6 +83,7 @@ void lv_draw_dma2d_opaque_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixe
 
     uint32_t output_offset = (dest_stride / output_cf_size) - w;
     lv_draw_dma2d_configuration_t conf = {
+        .mode = LV_DRAW_DMA2D_MODE_MEMORY_TO_MEMORY_WITH_PFC,
         .w = w,
         .h = h,
 
@@ -94,17 +95,26 @@ void lv_draw_dma2d_opaque_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixe
         .fg_offset = (dsc->header.stride / image_cf_size) - w,
         .fg_cf = image_cf_dma2d
     };
+
+    /* only process the background if the image might be transparent */
     if(lv_color_format_has_alpha(image_cf)) {
-        /* only process the background if the image might be transparent */
         conf.mode = LV_DRAW_DMA2D_MODE_MEMORY_TO_MEMORY_WITH_BLENDING;
 
         conf.bg_address = dest_first_pixel;
         conf.bg_offset = output_offset;
         conf.bg_cf = output_cf_dma2d;
     }
-    else {
-        conf.mode = LV_DRAW_DMA2D_MODE_MEMORY_TO_MEMORY_WITH_PFC;
+
+    /* Alpha channel should be treated as 0xFF if the cf is XRGB */
+    if(image_cf == LV_COLOR_FORMAT_XRGB8888) {
+        conf.fg_alpha_mode = LV_DRAW_DMA2D_ALPHA_MODE_REPLACE_ALPHA_CHANNEL;
+        conf.fg_alpha = 0xff;
     }
+    if(output_cf == LV_COLOR_FORMAT_XRGB8888) {
+        conf.bg_alpha_mode = LV_DRAW_DMA2D_ALPHA_MODE_REPLACE_ALPHA_CHANNEL;
+        conf.bg_alpha = 0xff;
+    }
+
     lv_draw_dma2d_configure_and_start_transfer(&conf);
 }
 
@@ -166,7 +176,7 @@ void lv_draw_dma2d_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixel, lv_a
 
         .fg_address = image_first_byte,
         .fg_offset = (dsc->header.stride / image_cf_size) - w,
-        .fg_cf = (lv_draw_dma2d_fgbg_cf_t) image_cf_dma2d,
+        .fg_cf = image_cf_dma2d,
         .fg_alpha_mode = LV_DRAW_DMA2D_ALPHA_MODE_MULTIPLY_IMAGE_ALPHA_CHANNEL,
         .fg_alpha = opa,
 
@@ -174,6 +184,16 @@ void lv_draw_dma2d_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixel, lv_a
         .bg_offset = output_offset,
         .bg_cf = output_cf_dma2d,
     };
+
+    /* Alpha channel should be treated as 0xFF if the cf is XRGB */
+    if(image_cf == LV_COLOR_FORMAT_XRGB8888) {
+        conf.fg_alpha_mode = LV_DRAW_DMA2D_ALPHA_MODE_REPLACE_ALPHA_CHANNEL;
+    }
+    if(output_cf == LV_COLOR_FORMAT_XRGB8888) {
+        conf.bg_alpha_mode = LV_DRAW_DMA2D_ALPHA_MODE_REPLACE_ALPHA_CHANNEL;
+        conf.bg_alpha = 0xff;
+    }
+
     lv_draw_dma2d_configure_and_start_transfer(&conf);
 }
 

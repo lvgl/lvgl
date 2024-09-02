@@ -108,6 +108,13 @@ void lv_draw_dma2d_fill(lv_draw_dma2d_unit_t * u, void * first_pixel, int32_t w,
         .bg_offset = output_offset,
         .bg_cf = (lv_draw_dma2d_fgbg_cf_t) output_cf
     };
+
+    /* Background alpha channel should be treated as 0xFF if the cf is XRGB */
+    if(cf == LV_COLOR_FORMAT_XRGB8888) {
+        conf.bg_alpha_mode = LV_DRAW_DMA2D_ALPHA_MODE_REPLACE_ALPHA_CHANNEL;
+        conf.bg_alpha = 0xff;
+    }
+
     lv_draw_dma2d_configure_and_start_transfer(&conf);
 }
 
