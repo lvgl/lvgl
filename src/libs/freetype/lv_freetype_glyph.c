@@ -147,7 +147,13 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
         lv_mutex_unlock(&dsc->cache_node->face_lock);
         return false;
     }
-    error = FT_Load_Glyph(face, glyph_index,  FT_LOAD_COMPUTE_METRICS | FT_LOAD_NO_AUTOHINT);
+
+    if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_OUTLINE) {
+        error = FT_Load_Glyph(face, glyph_index, FT_LOAD_COMPUTE_METRICS | FT_LOAD_NO_BITMAP | FT_LOAD_NO_AUTOHINT);
+    }
+    else if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_BITMAP) {
+        error = FT_Load_Glyph(face, glyph_index, FT_LOAD_COMPUTE_METRICS | FT_LOAD_NO_AUTOHINT);
+    }
     if(error) {
         FT_ERROR_MSG("FT_Load_Glyph", error);
         lv_mutex_unlock(&dsc->cache_node->face_lock);

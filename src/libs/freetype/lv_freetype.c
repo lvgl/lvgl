@@ -166,12 +166,12 @@ lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_rend
         error = FT_Set_Pixel_Sizes(face, 0, size);
     }
     else {
-        LV_LOG_WARN("font is not scalable, selecting available size\n");
+        LV_LOG_WARN("font is not scalable, selecting available size");
         error = FT_Select_Size(face, 0);
     }
     if(error) {
         FT_ERROR_MSG("FT_Set_Pixel_Sizes", error);
-        return false;
+        return NULL;
     }
 
     lv_font_t * font = &dsc->font;
