@@ -335,7 +335,7 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return 0;
 #else
         if(!check_transfer_completion()) {
-            return -1;
+            return LV_DRAW_UNIT_IDLE;
         }
         post_transfer_tasks(draw_dma2d_unit);
 #endif
