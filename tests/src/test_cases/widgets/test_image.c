@@ -366,6 +366,7 @@ void test_image_ignore_transformation_settings_when_tiled(void)
 void test_image_clip_radius(void)
 {
     lv_obj_t * par = lv_obj_create(lv_screen_active());
+    lv_obj_set_scrollbar_mode(par, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_style_radius(par, 0, 0);
     lv_obj_center(par);
 
