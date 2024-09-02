@@ -568,14 +568,19 @@ lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, const lv_span_t * 
     });
 }
 
-lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * point)
+lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * p)
 {
-    /* find previous span */
     const lv_spangroup_t * spangroup = (lv_spangroup_t *)obj;
     const lv_ll_t * spans = &spangroup->child_ll;
     const int32_t width = lv_obj_get_content_width(obj);
 
-    if(obj == NULL || point == NULL || lv_ll_get_head(spans) == NULL) return NULL;
+    if(obj == NULL || p == NULL || lv_ll_get_head(spans) == NULL) return NULL;
+
+    lv_point_t point;
+    point.x = p->x - obj->coords.x1;
+    point.y = p->y - obj->coords.y1;
+
+    /* find previous span */
 
     const lv_span_t * prev_span = NULL;
     lv_span_t * curr_span;
@@ -586,9 +591,9 @@ lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * po
             .x2 = lv_obj_get_style_pad_right(obj, LV_PART_MAIN),
             .y2 = 0
         });
-        if(lv_area_is_point_on(&coords.heading,  point, 0) ||
-           lv_area_is_point_on(&coords.middle,   point, 0) ||
-           lv_area_is_point_on(&coords.trailing, point, 0)) {
+        if(lv_area_is_point_on(&coords.heading,  &point, 0) ||
+           lv_area_is_point_on(&coords.middle,   &point, 0) ||
+           lv_area_is_point_on(&coords.trailing, &point, 0)) {
             return curr_span;
         }
         prev_span = curr_span;

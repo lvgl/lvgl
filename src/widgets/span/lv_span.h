@@ -247,9 +247,9 @@ lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, const lv_span_t * 
 
 /**
  * Get the span object by point.
- * @param obj
- * @param point
- * @return
+ * @param obj       pointer to a spangroup object.
+ * @param point     pointer to point containing absolute coordinates
+ * @return          pointer to the span under the point or `NULL` if not found.
  */
 lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * point);
 
