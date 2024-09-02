@@ -144,6 +144,13 @@ void lv_spangroup_set_max_lines(lv_obj_t * obj, int32_t lines);
 lv_style_t * lv_span_get_style(lv_span_t * span);
 
 /**
+ * Get a pointer to the text of a span
+ * @param span  pointer to the span
+ * @return      pointer to the text
+*/
+const char * lv_span_get_text(lv_span_t * span);
+
+/**
  * Get a spangroup child by its index.
  *
  * @param obj   The spangroup object

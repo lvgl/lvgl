@@ -261,6 +261,11 @@ lv_style_t * lv_span_get_style(lv_span_t * span)
     return &span->style;
 }
 
+const char * lv_span_get_text(lv_span_t * span)
+{
+    return &span->txt;
+}
+
 lv_span_t * lv_spangroup_get_child(const lv_obj_t * obj, int32_t id)
 {
     if(obj == NULL) {

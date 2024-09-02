@@ -1,8 +1,6 @@
 #include "../../lv_examples.h"
 #if LV_USE_SPAN && LV_BUILD_EXAMPLES
 
-#include "lvgl/src/lvgl_private.h"
-
 static void click_event_cb(lv_event_t * e)
 {
     lv_obj_t * spans = lv_event_get_target(e);
@@ -10,7 +8,8 @@ static void click_event_cb(lv_event_t * e)
     lv_point_t point;
     lv_indev_get_point(indev, &point);
     lv_span_t * span = lv_spangroup_get_span_by_point(spans, &point);
-    LV_LOG_USER("%s", span ? span->txt : "NULL");
+
+    LV_LOG_USER("%s", span ? lv_span_get_text(span) : "NULL");
 }
 
 /**
