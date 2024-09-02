@@ -283,11 +283,10 @@ static void lv_vg_lite_path_append_point(lv_vg_lite_path_t * path, float x, floa
     if(path->has_transform) {
         LV_VG_LITE_ASSERT_MATRIX(&path->matrix);
         /* transform point */
-        const vg_lite_float_t (*m)[3] = path->matrix.m;
         float ori_x = x;
         float ori_y = y;
-        x = ori_x * m[0][0] + ori_y * m[0][1] + m[0][2];
-        y = ori_x * m[1][0] + ori_y * m[1][1] + m[1][2];
+        x = ori_x * path->matrix.m[0][0] + ori_y * path->matrix.m[0][1] + path->matrix.m[0][2];
+        y = ori_x * path->matrix.m[1][0] + ori_y * path->matrix.m[1][1] + path->matrix.m[1][2];
     }
 
     if(path->base.format == VG_LITE_FP32) {

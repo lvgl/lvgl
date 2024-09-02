@@ -133,7 +133,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
                 path,
                 0, 0,
                 lv_area_get_width(coords), lv_area_get_height(coords),
-                dsc->clip_radius * LV_SCALE_NONE / (float)dsc->scale_x);
+                dsc->clip_radius);
             lv_vg_lite_path_set_transform(path, NULL);
         }
         else {
