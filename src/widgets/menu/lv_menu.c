@@ -256,7 +256,7 @@ void lv_menu_set_page(lv_obj_t * obj, lv_obj_t * page)
     }
     else {
         /* With sidebar disabled */
-        if(menu->cur_depth >= 2 || menu->mode_root_back_btn == LV_MENU_ROOT_BACK_BUTTON_ENABLED) {
+        if(menu->cur_depth >= 2 && menu->mode_root_back_btn == LV_MENU_ROOT_BACK_BUTTON_ENABLED) {
             lv_obj_remove_flag(menu->main_header_back_btn, LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(menu->main_header_back_btn, LV_OBJ_FLAG_CLICKABLE);
         }
