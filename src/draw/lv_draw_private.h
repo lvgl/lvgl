@@ -3,6 +3,10 @@
  *
  */
 
+/**
+ * Modified by NXP in 2024
+ */
+
 #ifndef LV_DRAW_PRIVATE_H
 #define LV_DRAW_PRIVATE_H
 
@@ -54,7 +58,7 @@ struct lv_draw_task_t {
     lv_matrix_t matrix;
 #endif
 
-    volatile int state;              /*int instead of lv_draw_task_state_t to be sure its atomic*/
+    volatile int state;              /** int instead of lv_draw_task_state_t to be sure its atomic */
 
     void * draw_dsc;
 
@@ -112,6 +116,51 @@ struct lv_draw_unit_t {
     int32_t (*evaluate_cb)(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 
     /**
+     * Called to signal the unit to complete all tasks in order to return their ready status.
+     * This callback can be implemented in case of asynchronous task processing.
+     * Below is an example to show the difference between synchronous and asynchronous:
+     *
+     * Synchronous:
+     * LVGL thread              DRAW thread                 HW
+     *
+     * task1             -->    submit               -->    Receive task1
+     *                          wait_for_finish()
+     *                   <--    task1->state = READY <--    Complete task1
+     * task2             -->    submit               -->    Receive task2
+     *                          wait_for_finish()
+     *                          task2->state = READY <--    Complete task2
+     * task3             -->    submit               -->    Receive task3
+     *                          wait_for_finish()
+     *                   <--    task3->state = READY <--    Complete task3
+     * task4             -->    submit               -->    Receive task4
+     *                          wait_for_finish()
+     *                   <--    task4->state = READY <--    Complete task4
+     * NO MORE TASKS
+     *
+     *
+     * Asynchronous:
+     * LVGL thread              DRAW thread                 HW
+     *                                                      is IDLE
+     * task1             -->    queue task1
+     *                          submit               -->    Receive task1
+     * task2             -->    queue task2                 is BUSY (with task1)
+     * task3             -->    queue task3                 still BUSY (with task1)
+     * task4             -->    queue task4                 becomes IDLE
+     *                   <--    task1->state = READY <--    Complete task1
+     *                          submit               -->    Receive task2, task3, task4
+     * NO MORE TASKS
+     * wait_for_finish_cb()     wait_for_finish()
+     *                                               <--    Complete task2, task3, task4
+     *                   <--    task2->state = READY <--
+     *                   <--    task3->state = READY <--
+     *                   <--    task4->state = READY <--
+     *
+     * @param draw_unit
+     * @return
+     */
+    int32_t (*wait_for_finish_cb)(lv_draw_unit_t * draw_unit);
+
+    /**
      * Called to delete draw unit.
      * @param draw_unit
      * @return
@@ -121,6 +170,7 @@ struct lv_draw_unit_t {
 
 typedef struct {
     lv_draw_unit_t * unit_head;
+    uint32_t unit_cnt;
     uint32_t used_memory_for_layers_kb;
 #if LV_USE_OS
     lv_thread_sync_t sync;

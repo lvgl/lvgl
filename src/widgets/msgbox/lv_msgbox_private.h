@@ -17,6 +17,7 @@ extern "C" {
 #include "lv_msgbox.h"
 
 #if LV_USE_MSGBOX
+#include "../../core/lv_obj_private.h"
 
 /*********************
  *      DEFINES

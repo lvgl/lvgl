@@ -61,7 +61,7 @@ typedef enum {
  **********************/
 
 /**
- * Initialize a flex layout the default values
+ * Initialize a flex layout to default values
  */
 void lv_flex_init(void);
 

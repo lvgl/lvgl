@@ -30,8 +30,8 @@ extern "C" {
  */
 typedef struct {
     uint16_t year;
-    int8_t month;  /** 1..12*/
-    int8_t day;    /** 1..31*/
+    int8_t month;  /**< 1..12 */
+    int8_t day;    /**< 1..31 */
 } lv_calendar_date_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_calendar_class;

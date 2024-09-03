@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 
 #include "lv_draw_sw.h"
+#include "../lv_draw_private.h"
 
 #if LV_USE_DRAW_SW
 

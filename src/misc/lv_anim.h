@@ -112,44 +112,45 @@ typedef int32_t (*lv_anim_get_value_cb_t)(lv_anim_t *);
 /** Callback used when the animation is deleted*/
 typedef void (*lv_anim_deleted_cb_t)(lv_anim_t *);
 
+/** Parameter used when path is custom_bezier */
 typedef struct {
     int16_t x1;
     int16_t y1;
     int16_t x2;
     int16_t y2;
-} lv_anim_bezier3_para_t; /**< Parameter used when path is custom_bezier*/
+} lv_anim_bezier3_para_t;
 
 /** Describes an animation*/
 struct lv_anim_t {
-    void * var;                                 /**<Variable to animate*/
-    lv_anim_exec_xcb_t exec_cb;                 /**< Function to execute to animate*/
-    lv_anim_custom_exec_cb_t custom_exec_cb;/**< Function to execute to animate,
-                                                 same purpose as exec_cb but different parameters*/
-    lv_anim_start_cb_t start_cb;         /**< Call it when the animation is starts (considering `delay`)*/
-    lv_anim_completed_cb_t completed_cb; /**< Call it when the animation is fully completed*/
-    lv_anim_deleted_cb_t deleted_cb;     /**< Call it when the animation is deleted*/
-    lv_anim_get_value_cb_t get_value_cb; /**< Get the current value in relative mode*/
-    void * user_data;                    /**< Custom user data*/
-    lv_anim_path_cb_t path_cb;         /**< Describe the path (curve) of animations*/
-    int32_t start_value;               /**< Start value*/
-    int32_t current_value;             /**< Current value*/
-    int32_t end_value;                 /**< End value*/
-    int32_t duration;                /**< Animation time in ms*/
-    int32_t act_time;            /**< Current time in animation. Set to negative to make delay.*/
-    uint32_t playback_delay;     /**< Wait before play back*/
-    uint32_t playback_duration;      /**< Duration of playback animation*/
-    uint32_t repeat_delay;       /**< Wait before repeat*/
-    uint32_t repeat_cnt;         /**< Repeat count for the animation*/
+    void * var;                               /**< Variable to animate*/
+    lv_anim_exec_xcb_t exec_cb;               /**< Function to execute to animate*/
+    lv_anim_custom_exec_cb_t custom_exec_cb;  /**< Function to execute to animate,
+                                               * same purpose as exec_cb but different parameters*/
+    lv_anim_start_cb_t start_cb;              /**< Call it when the animation is starts (considering `delay`)*/
+    lv_anim_completed_cb_t completed_cb;      /**< Call it when the animation is fully completed*/
+    lv_anim_deleted_cb_t deleted_cb;          /**< Call it when the animation is deleted*/
+    lv_anim_get_value_cb_t get_value_cb;      /**< Get the current value in relative mode*/
+    void * user_data;                         /**< Custom user data*/
+    lv_anim_path_cb_t path_cb;                /**< Describe the path (curve) of animations*/
+    int32_t start_value;                      /**< Start value*/
+    int32_t current_value;                    /**< Current value*/
+    int32_t end_value;                        /**< End value*/
+    int32_t duration;                         /**< Animation time in ms*/
+    int32_t act_time;                         /**< Current time in animation. Set to negative to make delay.*/
+    uint32_t playback_delay;                  /**< Wait before play back*/
+    uint32_t playback_duration;               /**< Duration of playback animation*/
+    uint32_t repeat_delay;                    /**< Wait before repeat*/
+    uint32_t repeat_cnt;                      /**< Repeat count for the animation*/
     union lv_anim_path_para_t {
-        lv_anim_bezier3_para_t bezier3; /**< Parameter used when path is custom_bezier*/
+        lv_anim_bezier3_para_t bezier3;       /**< Parameter used when path is custom_bezier*/
     } parameter;
 
-    /*Animation system use these - user shouldn't set*/
+    /* Animation system use these - user shouldn't set */
     uint32_t last_timer_run;
-    uint8_t playback_now : 1; /**< Play back is in progress*/
-    uint8_t run_round : 1;    /**< Indicates the animation has run in this round*/
-    uint8_t start_cb_called : 1;    /**< Indicates that the `start_cb` was already called*/
-    uint8_t early_apply  : 1;    /**< 1: Apply start value immediately even is there is `delay`*/
+    uint8_t playback_now : 1;     /**< Play back is in progress*/
+    uint8_t run_round : 1;        /**< Indicates the animation has run in this round*/
+    uint8_t start_cb_called : 1;  /**< Indicates that the `start_cb` was already called*/
+    uint8_t early_apply  : 1;     /**< 1: Apply start value immediately even is there is `delay`*/
 };
 
 /**********************
@@ -259,7 +260,7 @@ void lv_anim_set_deleted_cb(lv_anim_t * a, lv_anim_deleted_cb_t deleted_cb);
 /**
  * Make the animation to play back to when the forward direction is ready
  * @param a         pointer to an initialized `lv_anim_t` variable
- * @param time      the duration of the playback animation in milliseconds. 0: disable playback
+ * @param duration  duration of playback animation in milliseconds. 0: disable playback
  */
 void lv_anim_set_playback_duration(lv_anim_t * a, uint32_t duration);
 
@@ -307,9 +308,10 @@ void lv_anim_set_user_data(lv_anim_t * a, void * user_data);
 /**
  * Set parameter for cubic bezier path
  * @param a         pointer to an initialized `lv_anim_t` variable
- * @param x1        first control point
- * @param y1
- * @param y1        second control point
+ * @param x1        first control point X
+ * @param y1        first control point Y
+ * @param x2        second control point X
+ * @param y2        second control point Y
  */
 void lv_anim_set_bezier3_param(lv_anim_t * a, int16_t x1, int16_t y1, int16_t x2, int16_t y2);
 

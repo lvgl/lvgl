@@ -6,11 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_chart_private.h"
 #include "../../misc/lv_area_private.h"
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "lv_chart_private.h"
 #if LV_USE_CHART != 0
 
 #include "../../misc/lv_assert.h"
@@ -293,6 +293,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
     lv_chart_series_t * ser = lv_ll_ins_tail(&chart->series_ll);
     LV_ASSERT_MALLOC(ser);
     if(ser == NULL) return NULL;
+    lv_memzero(ser, sizeof(lv_chart_series_t));
 
     /* Allocate memory for point_cnt points, handle failure below */
     ser->y_points = lv_malloc(sizeof(int32_t) * chart->point_cnt);
@@ -313,6 +314,11 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
     }
 
     if(ser->y_points == NULL) {
+        if(ser->x_points) {
+            lv_free(ser->x_points);
+            ser->x_points = NULL;
+        }
+
         lv_ll_remove(&chart->series_ll, ser);
         lv_free(ser);
         return NULL;

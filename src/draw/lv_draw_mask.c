@@ -6,8 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_private.h"
 #include "lv_draw_mask_private.h"
+#include "lv_draw_private.h"
 #include "../core/lv_refr.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_types.h"

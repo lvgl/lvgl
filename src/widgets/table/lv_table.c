@@ -6,10 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_table_private.h"
 #include "../../misc/lv_area_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "lv_table_private.h"
 #if LV_USE_TABLE != 0
 
 #include "../../indev/lv_indev.h"

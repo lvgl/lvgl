@@ -73,7 +73,7 @@ lv_obj_t * lv_buttonmatrix_create(lv_obj_t * parent);
  * @param obj       pointer to a button matrix object
  * @param map       pointer a string array. The last string has to be: "". Use "\n" to make a line break.
  */
-void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * map[]);
+void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * const map[]);
 
 /**
  * Set the button control map (hidden, disabled etc.) for a button matrix.
@@ -155,7 +155,7 @@ void lv_buttonmatrix_set_one_checked(lv_obj_t * obj, bool en);
  * @param obj       pointer to a button matrix object
  * @return          the current map
  */
-const char ** lv_buttonmatrix_get_map(const lv_obj_t * obj);
+const char * const * lv_buttonmatrix_get_map(const lv_obj_t * obj);
 
 /**
  * Get the index of the lastly "activated" button by the user (pressed, released, focused etc)

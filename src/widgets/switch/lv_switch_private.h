@@ -17,6 +17,7 @@ extern "C" {
 #include "lv_switch.h"
 
 #if LV_USE_SWITCH != 0
+#include "../../core/lv_obj_private.h"
 
 /*********************
  *      DEFINES

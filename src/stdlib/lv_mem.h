@@ -33,14 +33,14 @@ typedef void * lv_mem_pool_t;
  * Heap information structure.
  */
 typedef struct {
-    size_t total_size; /**< Total heap size*/
+    size_t total_size;  /**< Total heap size */
     size_t free_cnt;
-    size_t free_size; /**< Size of available memory*/
+    size_t free_size;   /**< Size of available memory */
     size_t free_biggest_size;
     size_t used_cnt;
-    size_t max_used; /**< Max size of Heap memory used*/
-    uint8_t used_pct; /**< Percentage used*/
-    uint8_t frag_pct; /**< Amount of fragmentation*/
+    size_t max_used;    /**< Max size of Heap memory used */
+    uint8_t used_pct;   /**< Percentage used */
+    uint8_t frag_pct;   /**< Amount of fragmentation */
 } lv_mem_monitor_t;
 
 /**********************
@@ -67,6 +67,21 @@ void lv_mem_remove_pool(lv_mem_pool_t pool);
  * @return pointer to allocated uninitialized memory, or NULL on failure
  */
 void * lv_malloc(size_t size);
+
+/**
+ * Allocate a block of zeroed memory dynamically
+ * @param num requested number of element to be allocated.
+ * @param size requested size of each element in bytes.
+ * @return pointer to allocated zeroed memory, or NULL on failure
+ */
+void * lv_calloc(size_t num, size_t size);
+
+/**
+ * Allocate zeroed memory dynamically
+ * @param size requested size in bytes
+ * @return pointer to allocated zeroed memory, or NULL on failure
+ */
+void * lv_zalloc(size_t size);
 
 /**
  * Allocate zeroed memory dynamically
@@ -110,8 +125,8 @@ void lv_free_core(void * p);
 void * lv_realloc_core(void * p, size_t new_size);
 
 /**
- * Used internally to execute a plain malloc operation
- * @param size      size in bytes to malloc
+ * Used internally by lv_mem_monitor() to gather LVGL heap state information.
+ * @param mon_p      pointer to lv_mem_monitor_t object to be populated.
  */
 void lv_mem_monitor_core(lv_mem_monitor_t * mon_p);
 

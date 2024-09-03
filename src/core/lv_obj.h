@@ -108,7 +108,7 @@ typedef enum {
     LV_OBJ_FLAG_EVENT_BUBBLE    = (1L << 14), /**< Propagate the events to the parent too*/
     LV_OBJ_FLAG_GESTURE_BUBBLE  = (1L << 15), /**< Propagate the gestures to the parent*/
     LV_OBJ_FLAG_ADV_HITTEST     = (1L << 16), /**< Allow performing more accurate hit (click) test. E.g. consider rounded corners.*/
-    LV_OBJ_FLAG_IGNORE_LAYOUT   = (1L << 17), /**< Make the object position-able by the layouts*/
+    LV_OBJ_FLAG_IGNORE_LAYOUT   = (1L << 17), /**< Make the object not positioned by the layouts*/
     LV_OBJ_FLAG_FLOATING        = (1L << 18), /**< Do not scroll the object when the parent scrolls and ignore layout*/
     LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS = (1L << 19), /**< Send `LV_EVENT_DRAW_TASK_ADDED` events*/
     LV_OBJ_FLAG_OVERFLOW_VISIBLE = (1L << 20),/**< Do not clip the children to the parent's ext draw size*/
@@ -375,6 +375,14 @@ const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj);
  */
 bool lv_obj_is_valid(const lv_obj_t * obj);
 
+/**
+ * Utility to set an object reference to NULL when it gets deleted.
+ * The reference should be in a location that will not become invalid
+ * during the object's lifetime, i.e. static or allocated.
+ * @param obj_ptr   a pointer to a pointer to an object
+ */
+void lv_obj_null_on_delete(lv_obj_t ** obj_ptr);
+
 #if LV_USE_OBJ_ID
 /**
  * Set an id for an object.
@@ -399,14 +407,14 @@ void * lv_obj_get_id(const lv_obj_t * obj);
  * @param id        the id of the child object
  * @return          pointer to the child object or NULL if not found
  */
-lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, void * id);
+lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, const void * id);
 
 /**
  * Assign id to object if not previously assigned.
  * This function gets called automatically when LV_OBJ_ID_AUTO_ASSIGN is enabled.
  *
  * Set `LV_USE_OBJ_ID_BUILTIN` to use the builtin method to generate object ID.
- * Otherwise, these functions including `lv_obj_[assign|free|stringify]_id` and
+ * Otherwise, these functions including `lv_obj_[set|assign|free|stringify]_id` and
  * `lv_obj_id_compare`should be implemented externally.
  *
  * @param class_p   the class this obj belongs to. Note obj->class_p is the class currently being constructed.
@@ -415,8 +423,8 @@ lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, void * id);
 void lv_obj_assign_id(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
 /**
- * Free resources allocated by `lv_obj_assign_id`.
- * This function gets called automatically when object is deleted.
+ * Free resources allocated by `lv_obj_assign_id` or `lv_obj_set_id`.
+ * This function is also called automatically when object is deleted.
  * @param obj   pointer to an object
  */
 void lv_obj_free_id(lv_obj_t * obj);
@@ -431,7 +439,7 @@ void lv_obj_free_id(lv_obj_t * obj);
  * @param id2: the second id
  * @return     0 if they are equal, non-zero otherwise.
  */
-int lv_obj_id_compare(void * id1, void * id2);
+int lv_obj_id_compare(const void * id1, const void * id2);
 
 /**
  * Format an object's id into a string.

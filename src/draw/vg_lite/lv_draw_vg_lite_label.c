@@ -191,7 +191,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
             path,
             clip_area.x1, clip_area.y1,
             lv_area_get_width(&clip_area), lv_area_get_height(&clip_area),
-            0, 0);
+            0);
         lv_vg_lite_path_set_bonding_box_area(path, &clip_area);
         lv_vg_lite_path_end(path);
 

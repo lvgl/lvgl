@@ -33,6 +33,7 @@ extern "C" {
 #include "src/misc/lv_profiler_builtin.h"
 #include "src/misc/lv_rb.h"
 #include "src/misc/lv_utils.h"
+#include "src/misc/lv_iter.h"
 
 #include "src/tick/lv_tick.h"
 
@@ -118,6 +119,11 @@ extern "C" {
 
 #include "src/lv_api_map_v8.h"
 #include "src/lv_api_map_v9_0.h"
+#include "src/lv_api_map_v9_1.h"
+
+#if LV_USE_PRIVATE_API
+#include "src/lvgl_private.h"
+#endif
 
 /*********************
  *      DEFINES

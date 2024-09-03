@@ -111,9 +111,15 @@ typedef enum {
 
     LV_EVENT_PREPROCESS = 0x8000,   /** This is a flag that can be set with an event so it's processed
                                       before the class default event processing */
+    LV_EVENT_MARKED_DELETING = 0x10000,
 } lv_event_code_t;
 
-typedef lv_array_t lv_event_list_t;
+typedef struct {
+    lv_array_t array;
+    uint8_t is_traversing: 1;          /**< True: the list is being nested traversed */
+    uint8_t has_marked_deleting: 1;    /**< True: the list has marked deleting objects
+                                         when some of events are marked as deleting */
+} lv_event_list_t;
 
 /**
  * @brief Event callback.

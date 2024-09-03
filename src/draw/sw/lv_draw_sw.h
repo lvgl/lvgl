@@ -21,7 +21,12 @@ extern "C" {
 #include "../../display/lv_display.h"
 #include "../../osal/lv_os.h"
 
-#include "../../draw/lv_draw_vector.h"
+#include "../lv_draw_vector.h"
+#include "../lv_draw_triangle.h"
+#include "../lv_draw_label.h"
+#include "../lv_draw_image.h"
+#include "../lv_draw_line.h"
+#include "../lv_draw_arc.h"
 
 /*********************
  *      DEFINES
@@ -69,7 +74,7 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
 /**
  * Draw an image with SW render. It handles image decoding, tiling, transformations, and recoloring.
  * @param draw_unit     pointer to a draw unit
- * @param dsc           the draw descriptor
+ * @param draw_dsc      the draw descriptor
  * @param coords        the coordinates of the image
  */
 void lv_draw_sw_image(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
@@ -101,7 +106,7 @@ void lv_draw_sw_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc)
 /**
  * Blend a layer with SW render
  * @param draw_unit     pointer to a draw unit
- * @param dsc           the draw descriptor
+ * @param draw_dsc      the draw descriptor
  * @param coords        the coordinates of the layer
  */
 void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords);
@@ -124,12 +129,12 @@ void lv_draw_sw_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_rect_ds
 /**
  * Used internally to get a transformed are of an image
  * @param draw_unit     pointer to a draw unit
- * @param dest_area     the area to calculate, i.e. get this area from the transformed image
- * @param src_buf       the source buffer
+ * @param dest_area     area to calculate, i.e. get this area from the transformed image
+ * @param src_buf       source buffer
  * @param src_w         source buffer width in pixels
  * @param src_h         source buffer height in pixels
  * @param src_stride    source buffer stride in bytes
- * @param dsc           the draw descriptor
+ * @param draw_dsc      draw descriptor
  * @param sup           supplementary data
  * @param cf            color format of the source buffer
  * @param dest_buf      the destination buffer
@@ -151,6 +156,7 @@ void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc
  * Swap the upper and lower byte of an RGB565 buffer.
  * Might be required if a 8bit parallel port or an SPI port send the bytes in the wrong order.
  * The bytes will be swapped in place.
+ * @param buf           pointer to buffer
  * @param buf_size_px   number of pixels in the buffer
  */
 void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px);

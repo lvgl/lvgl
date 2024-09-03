@@ -321,7 +321,15 @@ typedef struct lv_rlottie_t lv_rlottie_t;
 
 typedef struct lv_ffmpeg_player_t lv_ffmpeg_player_t;
 
+typedef struct lv_glfw_window_t lv_glfw_window_t;
+typedef struct lv_glfw_texture_t lv_glfw_texture_t;
+
 typedef uint32_t lv_prop_id_t;
+
+struct _lv_iter_t;
+typedef struct _lv_iter_t lv_iter_t;
+
+typedef struct lv_draw_buf_t lv_draw_buf_t;
 
 #if LV_USE_OBJ_PROPERTY
 typedef struct lv_property_name_t lv_property_name_t;

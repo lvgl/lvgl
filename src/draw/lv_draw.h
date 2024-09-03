@@ -3,6 +3,10 @@
  *
  */
 
+/**
+ * Modified by NXP in 2024
+ */
+
 #ifndef LV_DRAW_H
 #define LV_DRAW_H
 
@@ -28,7 +32,7 @@ extern "C" {
  *      DEFINES
  *********************/
 #define LV_DRAW_UNIT_NONE  0
-#define LV_DRAW_UNIT_IDLE  -1   /*The draw unit is idle, new dispatching might be requested to try again*/
+#define LV_DRAW_UNIT_IDLE  -1   /**< The draw unit is idle, new dispatching might be requested to try again */
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
 #if !LV_USE_MATRIX
@@ -83,6 +87,11 @@ struct lv_layer_t  {
      * During drawing the layer's clip area shouldn't be used as it might be already changed for other draw tasks.
      */
     lv_area_t _clip_area;
+
+    /**
+     * The physical clipping area relative to the display.
+     */
+    lv_area_t phy_clip_area;
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     /** Transform matrix to be applied when rendering the layer */
@@ -167,10 +176,21 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer);
 void lv_draw_dispatch_wait_for_request(void);
 
 /**
+ * Wait for draw finish in case of asynchronous task execution.
+ * If `LV_USE_OS == 0` it just return.
+ */
+void lv_draw_wait_for_finish(void);
+
+/**
  * When a draw unit finished a draw task it needs to request dispatching
  * to let LVGL assign a new draw task to it
  */
 void lv_draw_dispatch_request(void);
+
+/**
+ * Get the total number of draw units.
+  */
+uint32_t lv_draw_get_unit_count(void);
 
 /**
  * Find and available draw task
@@ -244,17 +264,6 @@ void lv_draw_task_get_area(const lv_draw_task_t * t, lv_area_t * area);
 /**********************
  *      MACROS
  **********************/
-
-/**********************
- *   POST INCLUDES
- *********************/
-#include "lv_draw_rect.h"
-#include "lv_draw_label.h"
-#include "lv_draw_image.h"
-#include "lv_draw_arc.h"
-#include "lv_draw_line.h"
-#include "lv_draw_triangle.h"
-#include "lv_draw_mask.h"
 
 #ifdef __cplusplus
 } /*extern "C"*/

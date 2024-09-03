@@ -57,6 +57,17 @@ void lv_image_header_cache_drop(const void * src);
  */
 bool lv_image_header_cache_is_enabled(void);
 
+/**
+ * Create an iterator to iterate over the image header cache.
+ * @return an iterator to iterate over the image header cache.
+ */
+lv_iter_t * lv_image_header_cache_iter_create(void);
+
+/**
+ * Dump the content of the image header cache in a human-readable format with cache order.
+ */
+void lv_image_header_cache_dump(void);
+
 /*************************
  *    GLOBAL VARIABLES
  *************************/

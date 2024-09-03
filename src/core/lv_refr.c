@@ -6,13 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_refr_private.h"
+#include "lv_obj_draw_private.h"
 #include "../misc/lv_area_private.h"
 #include "../draw/sw/lv_draw_sw_mask_private.h"
 #include "../draw/lv_draw_mask_private.h"
 #include "lv_obj_private.h"
 #include "lv_obj_event_private.h"
-#include "lv_obj_draw_private.h"
-#include "lv_refr_private.h"
 #include "../display/lv_display.h"
 #include "../display/lv_display_private.h"
 #include "../tick/lv_tick.h"
@@ -290,6 +290,13 @@ void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
 
     suc = lv_area_intersect(&com_area, area_p, &scr_area);
     if(suc == false)  return; /*Out of the screen*/
+
+    if(disp->color_format == LV_COLOR_FORMAT_I1) {
+        /*Make sure that the X coordinates start and end on byte boundary.
+         *E.g. convert 11;27 to 8;31*/
+        com_area.x1 &= ~0x7; /*Round down: Nx8*/
+        com_area.x2 |= 0x7;    /*Round up: Nx8 - 1*/
+    }
 
     /*If there were at least 1 invalid area in full refresh mode, redraw the whole screen*/
     if(disp->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
@@ -588,14 +595,14 @@ static void refr_invalid_areas(void)
  * Reshape the draw buffer if required
  * @param layer  pointer to a layer which will be drawn
  */
-static void layer_reshape_draw_buf(lv_layer_t * layer)
+static void layer_reshape_draw_buf(lv_layer_t * layer, uint32_t stride)
 {
     lv_draw_buf_t * ret = lv_draw_buf_reshape(
                               layer->draw_buf,
                               layer->color_format,
                               lv_area_get_width(&layer->buf_area),
                               lv_area_get_height(&layer->buf_area),
-                              0);
+                              stride);
     LV_UNUSED(ret);
     LV_ASSERT_NULL(ret);
 }
@@ -621,19 +628,22 @@ static void refr_area(const lv_area_t * area_p)
         layer->buf_area.y1 = 0;
         layer->buf_area.x2 = lv_display_get_horizontal_resolution(disp_refr) - 1;
         layer->buf_area.y2 = lv_display_get_vertical_resolution(disp_refr) - 1;
-        layer_reshape_draw_buf(layer);
         lv_area_t disp_area;
         lv_area_set(&disp_area, 0, 0, lv_display_get_horizontal_resolution(disp_refr) - 1,
                     lv_display_get_vertical_resolution(disp_refr) - 1);
 
         if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
             disp_refr->last_part = 1;
+            layer_reshape_draw_buf(layer, layer->draw_buf->header.stride);
             layer->_clip_area = disp_area;
+            layer->phy_clip_area = disp_area;
             refr_area_part(layer);
         }
         else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
             disp_refr->last_part = disp_refr->last_area;
+            layer_reshape_draw_buf(layer, layer->draw_buf->header.stride);
             layer->_clip_area = *area_p;
+            layer->phy_clip_area = *area_p;
             refr_area_part(layer);
         }
         LV_PROFILER_END;
@@ -661,7 +671,8 @@ static void refr_area(const lv_area_t * area_p)
         layer->draw_buf = disp_refr->buf_act;
         layer->buf_area = sub_area;
         layer->_clip_area = sub_area;
-        layer_reshape_draw_buf(layer);
+        layer->phy_clip_area = sub_area;
+        layer_reshape_draw_buf(layer, LV_STRIDE_AUTO);
         if(sub_area.y2 > y2) sub_area.y2 = y2;
         row_last = sub_area.y2;
         if(y2 == row_last) disp_refr->last_part = 1;
@@ -678,7 +689,8 @@ static void refr_area(const lv_area_t * area_p)
         layer->draw_buf = disp_refr->buf_act;
         layer->buf_area = sub_area;
         layer->_clip_area = sub_area;
-        layer_reshape_draw_buf(layer);
+        layer->phy_clip_area = sub_area;
+        layer_reshape_draw_buf(layer, LV_STRIDE_AUTO);
         disp_refr->last_part = 1;
         refr_area_part(layer);
     }
@@ -1096,10 +1108,11 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 
 static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
 {
-    bool has_alpha = lv_color_format_has_alpha(disp->color_format);
-    lv_color_format_t cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : disp->color_format;
+    lv_color_format_t cf = disp->color_format;
     uint32_t stride = lv_draw_buf_width_to_stride(area_w, cf);
-    int32_t max_row = (uint32_t)disp->buf_act->data_size / stride;
+    uint32_t overhead = LV_COLOR_INDEXED_PALETTE_SIZE(cf) * sizeof(lv_color32_t);
+
+    int32_t max_row = (uint32_t)(disp->buf_act->data_size - overhead) / stride;
 
     if(max_row > area_h) max_row = area_h;
 

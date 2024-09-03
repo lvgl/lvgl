@@ -229,7 +229,7 @@ LVGL objects can be in a combination of the following states:
 - :cpp:enumerator:`LV_STATE_FOCUSED`: Focused via keypad or encoder or clicked via touchpad/mouse
 - :cpp:enumerator:`LV_STATE_FOCUS_KEY`: Focused via keypad or encoder but not via touchpad/mouse
 - :cpp:enumerator:`LV_STATE_EDITED`: Edit by an encoder
-- :cpp:enumerator:`LV_STATE_HOVERED`: Hovered by mouse (not supported now)
+- :cpp:enumerator:`LV_STATE_HOVERED`: Hovered by mouse
 - :cpp:enumerator:`LV_STATE_PRESSED`: Being pressed
 - :cpp:enumerator:`LV_STATE_SCROLLED`: Being scrolled
 - :cpp:enumerator:`LV_STATE_DISABLED`: Disabled

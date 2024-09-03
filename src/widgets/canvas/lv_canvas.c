@@ -3,11 +3,15 @@
  *
  */
 
+/**
+ * Modified by NXP in 2024
+ */
+
 /*********************
  *      INCLUDES
  *********************/
-#include "../../core/lv_obj_class_private.h"
 #include "lv_canvas_private.h"
+#include "../../core/lv_obj_class_private.h"
 #if LV_USE_CANVAS != 0
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_math.h"
@@ -378,6 +382,7 @@ void lv_canvas_init_layer(lv_obj_t * obj, lv_layer_t * layer)
     layer->color_format = header->cf;
     layer->buf_area = canvas_area;
     layer->_clip_area = canvas_area;
+    layer->phy_clip_area = canvas_area;
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     lv_matrix_identity(&layer->matrix);
 #endif
@@ -386,9 +391,17 @@ void lv_canvas_init_layer(lv_obj_t * obj, lv_layer_t * layer)
 void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
 {
     if(layer->draw_task_head == NULL) return;
+
+    bool task_dispatched;
+
     while(layer->draw_task_head) {
         lv_draw_dispatch_wait_for_request();
-        lv_draw_dispatch_layer(lv_obj_get_display(canvas), layer);
+        task_dispatched = lv_draw_dispatch_layer(lv_obj_get_display(canvas), layer);
+
+        if(!task_dispatched) {
+            lv_draw_wait_for_finish();
+            lv_draw_dispatch_request();
+        }
     }
     lv_obj_invalidate(canvas);
 }

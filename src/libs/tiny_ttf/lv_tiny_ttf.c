@@ -123,7 +123,7 @@ static void lv_tiny_ttf_cache_create(ttf_font_desc_t * dsc);
 void lv_tiny_ttf_set_size(lv_font_t * font, int32_t font_size)
 {
     if(font_size <= 0) {
-        LV_LOG_ERROR("invalid font size: %"PRIx32, font_size);
+        LV_LOG_ERROR("invalid font size: %"LV_PRIx32, font_size);
         return;
     }
     ttf_font_desc_t * dsc = (ttf_font_desc_t *)font->dsc;
@@ -519,7 +519,7 @@ static bool tiny_ttf_draw_data_cache_create_cb(tiny_ttf_cache_data_t * node, voi
     w = x2 - x1 + 1;
     h = y2 - y1 + 1;
 
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create_user(font_draw_buf_handlers, w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
     if(NULL == draw_buf) {
         LV_LOG_ERROR("tiny_ttf: out of memory");
         return false;
@@ -538,7 +538,7 @@ static void tiny_ttf_draw_data_cache_free_cb(tiny_ttf_cache_data_t * node, void 
 {
     LV_UNUSED(user_data);
 
-    lv_draw_buf_destroy_user(font_draw_buf_handlers, node->draw_buf);
+    lv_draw_buf_destroy(node->draw_buf);
 }
 
 static lv_cache_compare_res_t tiny_ttf_draw_data_cache_compare_cb(const tiny_ttf_cache_data_t * lhs,

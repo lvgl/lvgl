@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_DRAW_SW_BLEND_I1_H
-#define LV_DRAW_SW_BLEND_I1_H
+#ifndef LV_DRAW_SW_BLEND_TO_I1_H
+#define LV_DRAW_SW_BLEND_TO_I1_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,4 +42,4 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_image_to_i1(lv_draw_sw_blend_i
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_SW_BLEND_I1_H*/
+#endif /*LV_DRAW_SW_BLEND_TO_I1_H*/

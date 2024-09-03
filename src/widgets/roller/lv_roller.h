@@ -32,10 +32,10 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/** Roller mode.*/
+/** Roller mode. */
 typedef enum {
-    LV_ROLLER_MODE_NORMAL, /**< Normal mode (roller ends at the end of the options).*/
-    LV_ROLLER_MODE_INFINITE, /**< Infinite mode (roller can be scrolled forever).*/
+    LV_ROLLER_MODE_NORMAL,   /**< Normal mode (roller ends at the end of the options). */
+    LV_ROLLER_MODE_INFINITE, /**< Infinite mode (roller can be scrolled forever). */
 } lv_roller_mode_t;
 
 #if LV_USE_OBJ_PROPERTY

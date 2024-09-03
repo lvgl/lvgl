@@ -113,8 +113,8 @@ void lv_draw_vg_lite_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_re
     lv_vg_lite_path_set_bonding_box_area(path, &draw_area);
 
     /* Use rounded rectangles and normal rectangles of the same size to nest the cropped area */
-    lv_vg_lite_path_append_rect(path, dsc->area.x1, dsc->area.y1, w, h, r, r);
-    lv_vg_lite_path_append_rect(path, dsc->area.x1, dsc->area.y1, w, h, 0, 0);
+    lv_vg_lite_path_append_rect(path, dsc->area.x1, dsc->area.y1, w, h, r);
+    lv_vg_lite_path_append_rect(path, dsc->area.x1, dsc->area.y1, w, h, 0);
     lv_vg_lite_path_end(path);
 
     vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);

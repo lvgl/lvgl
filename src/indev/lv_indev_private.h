@@ -24,10 +24,10 @@ extern "C" {
  **********************/
 
 struct lv_indev_t {
-    /**< Input device type*/
+    /** Input device type*/
     lv_indev_type_t type;
 
-    /**< Function pointer to read input device data.*/
+    /** Function pointer to read input device data.*/
     lv_indev_read_cb_t read_cb;
 
     lv_indev_state_t state; /**< Current state of the input device.*/
@@ -38,6 +38,7 @@ struct lv_indev_t {
     uint8_t reset_query : 1;
     uint8_t enabled : 1;
     uint8_t wait_until_release : 1;
+    uint8_t stop_processing_query : 1;
 
     uint32_t pr_timestamp;         /**< Pressed time stamp*/
     uint32_t longpr_rep_timestamp; /**< Long press repeat time stamp*/
@@ -94,6 +95,7 @@ struct lv_indev_t {
         uint8_t scroll_dir : 4;
         uint8_t gesture_dir : 4;
         uint8_t gesture_sent : 1;
+        uint8_t press_moved : 1;
     } pointer;
     struct {
         /*Keypad data*/

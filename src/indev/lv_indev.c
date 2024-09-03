@@ -1,3 +1,4 @@
+#include "lv_indev_private.h"
 #include "../misc/lv_event_private.h"
 #include "../misc/lv_area_private.h"
 #include "../misc/lv_anim_private.h"
@@ -10,7 +11,6 @@
 /*********************
  *      INCLUDES
  ********************/
-#include "lv_indev_private.h"
 #include "lv_indev_scroll.h"
 #include "../display/lv_display_private.h"
 #include "../core/lv_global.h"
@@ -360,6 +360,27 @@ void lv_indev_set_display(lv_indev_t * indev, lv_display_t * disp)
     indev->disp = disp;
 }
 
+void lv_indev_set_long_press_time(lv_indev_t * indev, uint16_t long_press_time)
+{
+    if(indev == NULL) return;
+
+    indev->long_press_time = long_press_time;
+}
+
+void lv_indev_set_scroll_limit(lv_indev_t * indev, uint8_t scroll_limit)
+{
+    if(indev == NULL) return;
+
+    indev->scroll_limit = scroll_limit;
+}
+
+void lv_indev_set_scroll_throw(lv_indev_t * indev, uint8_t scroll_throw)
+{
+    if(indev == NULL) return;
+
+    indev->scroll_throw = scroll_throw;
+}
+
 void * lv_indev_get_user_data(const lv_indev_t * indev)
 {
     if(indev == NULL) return NULL;
@@ -371,6 +392,13 @@ void * lv_indev_get_driver_data(const lv_indev_t * indev)
     if(indev == NULL) return NULL;
 
     return indev->driver_data;
+}
+
+bool lv_indev_get_press_moved(const lv_indev_t * indev)
+{
+    if(indev == NULL) return false;
+
+    return indev->pointer.press_moved;
 }
 
 void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
@@ -386,6 +414,12 @@ void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
         }
         indev_obj_act = NULL;
     }
+}
+
+void lv_indev_stop_processing(lv_indev_t * indev)
+{
+    if(indev == NULL) return;
+    indev->stop_processing_query = 1;
 }
 
 void lv_indev_reset_long_press(lv_indev_t * indev)
@@ -1192,6 +1226,7 @@ static void indev_proc_press(lv_indev_t * indev)
             indev->pointer.gesture_sent   = 0;
             indev->pointer.gesture_sum.x  = 0;
             indev->pointer.gesture_sum.y  = 0;
+            indev->pointer.press_moved    = 0;
             indev->pointer.vect.x         = 0;
             indev->pointer.vect.y         = 0;
 
@@ -1220,6 +1255,10 @@ static void indev_proc_press(lv_indev_t * indev)
     indev->pointer.scroll_throw_vect.y = (indev->pointer.scroll_throw_vect.y + indev->pointer.vect.y) / 2;
 
     indev->pointer.scroll_throw_vect_ori = indev->pointer.scroll_throw_vect;
+
+    if(LV_ABS(indev->pointer.vect.x) > indev->scroll_limit || LV_ABS(indev->pointer.vect.y) > indev->scroll_limit) {
+        indev->pointer.press_moved = 1;
+    }
 
     if(indev_obj_act) {
         const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
@@ -1324,7 +1363,8 @@ static void indev_proc_release(lv_indev_t * indev)
                 if(send_event(LV_EVENT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
             }
             else {
-                if(send_event(LV_EVENT_SCROLL_THROW_BEGIN, indev_act) == LV_RESULT_INVALID) return;
+                lv_obj_send_event(scroll_obj, LV_EVENT_SCROLL_THROW_BEGIN, indev_act);
+                if(indev_reset_check(indev)) return;
             }
         }
         indev->pointer.act_obj = NULL;
@@ -1442,6 +1482,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
         indev->pointer.gesture_sum.x     = 0;
         indev->pointer.gesture_sum.y     = 0;
         indev->reset_query                     = 0;
+        indev->stop_processing_query           = 0;
         indev_obj_act                               = NULL;
     }
 }
@@ -1563,7 +1604,7 @@ void indev_gesture(lv_indev_t * indev)
         lv_obj_send_event(gesture_obj, LV_EVENT_GESTURE, indev_act);
         if(indev_reset_check(indev)) return;
 
-        lv_indev_send_event(indev_act, LV_EVENT_LONG_PRESSED, gesture_obj);
+        lv_indev_send_event(indev_act, LV_EVENT_GESTURE, gesture_obj);
         if(indev_reset_check(indev_act)) return;
     }
 }
@@ -1580,6 +1621,16 @@ static bool indev_reset_check(lv_indev_t * indev)
     }
 
     return indev->reset_query;
+}
+
+/**
+ * Checks if the stop_processing_query flag has been set. If so, do not send any events to the object
+ * @param indev pointer to an input device
+ * @return true if indev should stop processing the event.
+ */
+static bool indev_stop_processing_check(lv_indev_t * indev)
+{
+    return indev->stop_processing_query;
 }
 
 /**
@@ -1629,18 +1680,27 @@ static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj)
 
 static lv_result_t send_event(lv_event_code_t code, void * param)
 {
-    lv_obj_send_event(indev_obj_act, code, param);
-    if(indev_reset_check(indev_act)) return LV_RESULT_INVALID;
+    lv_indev_t * indev = indev_act;
 
     if(code == LV_EVENT_PRESSED ||
+       code == LV_EVENT_SHORT_CLICKED ||
        code == LV_EVENT_CLICKED ||
        code == LV_EVENT_RELEASED ||
        code == LV_EVENT_LONG_PRESSED ||
        code == LV_EVENT_LONG_PRESSED_REPEAT ||
        code == LV_EVENT_ROTARY) {
-        lv_indev_send_event(indev_act, code, indev_obj_act);
-        if(indev_reset_check(indev_act)) return LV_RESULT_INVALID;
+        lv_indev_send_event(indev, code, indev_obj_act);
+        if(indev_reset_check(indev)) return LV_RESULT_INVALID;
+
+        if(indev_stop_processing_check(indev)) {
+            /* Not send event to the object if stop processing query is set */
+            indev->stop_processing_query = 0;
+            return LV_RESULT_OK;
+        }
     }
+
+    lv_obj_send_event(indev_obj_act, code, param);
+    if(indev_reset_check(indev)) return LV_RESULT_INVALID;
 
     return LV_RESULT_OK;
 }

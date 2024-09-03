@@ -6,10 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_dropdown_private.h"
 #include "../../misc/lv_area_private.h"
 #include "../../core/lv_obj_class_private.h"
 #include "../../core/lv_obj.h"
-#include "lv_dropdown_private.h"
 #if LV_USE_DROPDOWN != 0
 
 #include "../../misc/lv_assert.h"

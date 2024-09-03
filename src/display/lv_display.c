@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../display/lv_display_private.h"
 #include "../misc/lv_event_private.h"
 #include "../misc/lv_anim_private.h"
 #include "../draw/lv_draw_private.h"
@@ -13,7 +14,6 @@
 #include "lv_display.h"
 #include "../misc/lv_math.h"
 #include "../core/lv_refr_private.h"
-#include "../display/lv_display_private.h"
 #include "../stdlib/lv_string.h"
 #include "../themes/lv_theme.h"
 #include "../core/lv_global.h"
@@ -158,7 +158,9 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
 void lv_display_delete(lv_display_t * disp)
 {
     bool was_default = false;
+    bool was_refr = false;
     if(disp == lv_display_get_default()) was_default = true;
+    if(disp == lv_refr_get_disp_refreshing()) was_refr = true;
 
     lv_display_send_event(disp, LV_EVENT_DELETE, NULL);
     lv_event_remove_all(&(disp->event_list));
@@ -205,6 +207,8 @@ void lv_display_delete(lv_display_t * disp)
     lv_free(disp);
 
     if(was_default) lv_display_set_default(lv_ll_get_head(disp_ll_p));
+
+    if(was_refr) lv_refr_set_disp_refreshing(NULL);
 }
 
 void lv_display_set_default(lv_display_t * disp)

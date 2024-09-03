@@ -1,3 +1,8 @@
+/**
+ * @file lv_symbol_def.h
+ *
+ */
+
 #ifndef LV_SYMBOL_DEF_H
 #define LV_SYMBOL_DEF_H
 

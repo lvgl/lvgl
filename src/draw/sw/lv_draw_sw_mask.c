@@ -6,11 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_draw_sw_mask_private.h"
 #include "../lv_draw_mask_private.h"
 #include "../lv_draw.h"
 
 #if LV_DRAW_SW_COMPLEX
-#include "lv_draw_sw_mask_private.h"
 #include "../../core/lv_global.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_log.h"

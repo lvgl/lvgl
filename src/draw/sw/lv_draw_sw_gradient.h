@@ -44,6 +44,8 @@ typedef lv_color_t lv_grad_color_t;
  * @param dsc       The gradient descriptor to use
  * @param range     The range to use in computation.
  * @param frac      The current part used in the range. frac is in [0; range]
+ * @param color_out Calculated gradient color
+ * @param opa_out   Calculated opacity
  */
 
 void /* LV_ATTRIBUTE_FAST_MEM */ lv_gradient_color_calculate(const lv_grad_dsc_t * dsc, int32_t range,

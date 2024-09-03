@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_lottie_private.h"
 #include "../../lv_conf_internal.h"
 #if LV_USE_LOTTIE
 
@@ -15,7 +16,6 @@
     #include "../../libs/thorvg/thorvg_capi.h"
 #endif
 
-#include "lv_lottie_private.h"
 #include "../../misc/lv_timer.h"
 #include "../../core/lv_obj_class_private.h"
 

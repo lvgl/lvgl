@@ -132,7 +132,7 @@ bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
     uint32_t i;
     for(i = 0; i < event_cnt; i++) {
         lv_event_dsc_t * dsc = lv_obj_get_event_dsc(obj, i);
-        if(dsc->cb == event_cb) {
+        if(dsc && dsc->cb == event_cb) {
             lv_obj_remove_event(obj, i);
             return true;
         }

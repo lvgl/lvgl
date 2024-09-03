@@ -23,7 +23,9 @@ extern "C" {
 #include "../../../lv_conf_internal.h"
 
 #if LV_USE_DRAW_VGLITE
-#include "../../sw/lv_draw_sw.h"
+#include "../../lv_draw_private.h"
+#include "../../sw/lv_draw_sw_private.h"
+#include "../../../misc/lv_area_private.h"
 
 /*********************
  *      DEFINES
@@ -33,7 +35,12 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef lv_draw_sw_unit_t lv_draw_vglite_unit_t;
+typedef struct lv_draw_vglite_unit {
+    lv_draw_sw_unit_t;
+#if LV_USE_VGLITE_DRAW_ASYNC
+    volatile bool wait_for_finish;
+#endif
+} lv_draw_vglite_unit_t;
 
 /**********************
  * GLOBAL PROTOTYPES

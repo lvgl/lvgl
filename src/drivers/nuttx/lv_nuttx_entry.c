@@ -17,6 +17,7 @@
 #include <pthread.h>
 #include "lv_nuttx_cache.h"
 #include "lv_nuttx_image_cache.h"
+#include "../../core/lv_global.h"
 #include "lv_nuttx_profiler.h"
 
 #include "../../../lvgl.h"

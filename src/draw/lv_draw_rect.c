@@ -6,9 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_draw_rect_private.h"
 #include "lv_draw_private.h"
 #include "../core/lv_obj.h"
-#include "lv_draw_rect_private.h"
 #include "../misc/lv_assert.h"
 #include "../core/lv_obj_event.h"
 #include "../stdlib/lv_string.h"

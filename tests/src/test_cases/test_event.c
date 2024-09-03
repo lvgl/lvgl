@@ -122,4 +122,25 @@ void test_event_stop_processing(void)
     TEST_ASSERT_EQUAL(post_cnt_2, 0);
 }
 
+static uint32_t click_count = 0;
+static void event_click_to_delete_cb(lv_event_t * e)
+{
+    lv_obj_t * obj = lv_event_get_target(e);
+    click_count++;
+
+    if(click_count      == 10) lv_obj_remove_event(obj, 0);
+    else if(click_count == 15) lv_obj_delete(obj);
+    else                       lv_obj_send_event(obj, LV_EVENT_CLICKED, NULL);
+}
+
+void test_event_delete_obj_in_recursive_event_call(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(obj, 200, 100);
+    lv_obj_add_event_cb(obj, event_click_to_delete_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(obj, NULL, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(obj, event_click_to_delete_cb, LV_EVENT_CLICKED, NULL);
+    lv_test_mouse_click_at(30, 30);
+}
+
 #endif

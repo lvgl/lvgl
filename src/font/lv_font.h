@@ -60,7 +60,7 @@ typedef struct {
     uint16_t box_h; /**< Height of the glyph's bounding box*/
     int16_t ofs_x;  /**< x offset of the bounding box*/
     int16_t ofs_y;  /**< y offset of the bounding box*/
-    lv_font_glyph_format_t format;  /**< Font format of the glyph see lv_font_glyph_format_t*/
+    lv_font_glyph_format_t format;  /**< Font format of the glyph see lv_font_glyph_format_t */
     uint8_t is_placeholder: 1;      /**< Glyph is missing. But placeholder will still be displayed*/
 
     union {
