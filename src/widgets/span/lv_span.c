@@ -459,6 +459,7 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
     lv_snippet_t snippet;   /* use to save cur_span info and push it to stack */
     lv_memset(&snippet, 0, sizeof(snippet));
 
+    lv_span_t * prev_span = cur_span;
     int32_t line_cnt = 0;
     int32_t lines = spans->lines < 0 ? INT32_MAX : spans->lines;
     /* the loop control how many lines need to draw */
@@ -471,7 +472,6 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
             /* switch to the next span when current is end */
             if(cur_txt[cur_txt_ofs] == '\0') {
                 cur_span->trailing_pos = txt_pos;
-                cur_span->trailing_height = max_line_h;
 
                 cur_span = lv_ll_get_next(&spans->child_ll, cur_span);
                 if(cur_span == NULL) break;
@@ -535,6 +535,15 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
 
         /* next line init */
         txt_pos.y += max_line_h;
+
+        /* iterate all the spans in the current line and set the trailing height to the max line height */
+        for(lv_span_t * tmp_span = prev_span;
+            tmp_span && tmp_span != cur_span;
+            tmp_span = lv_ll_get_next(&spans->child_ll, tmp_span))
+            tmp_span->trailing_height = max_line_h;
+
+        prev_span = cur_span;
+
         max_w = max_width;
         line_cnt += 1;
         if(line_cnt >= lines) {
