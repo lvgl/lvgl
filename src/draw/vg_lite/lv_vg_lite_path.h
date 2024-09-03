@@ -61,6 +61,8 @@ void lv_vg_lite_path_get_bonding_box(lv_vg_lite_path_t * path,
 
 bool lv_vg_lite_path_update_bonding_box(lv_vg_lite_path_t * path);
 
+void lv_vg_lite_path_set_transform(lv_vg_lite_path_t * path, const vg_lite_matrix_t * matrix);
+
 void lv_vg_lite_path_set_quality(lv_vg_lite_path_t * path, vg_lite_quality_t quality);
 
 vg_lite_path_t * lv_vg_lite_path_get_path(lv_vg_lite_path_t * path);
