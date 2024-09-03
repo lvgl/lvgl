@@ -1464,6 +1464,16 @@ menu "LVGL configuration"
 			default y
 			help
 				This can save some memory, but not much. After the quick access bar is created, it can be hidden by clicking the button at the top left corner of the browsing area, which is very useful for small screen devices.
+
+		config LVGL_VERSION_MAJOR
+			int
+			default 9 # LVGL_VERSION_MAJOR
+		config LVGL_VERSION_MINOR
+			int
+			default 2 # LVGL_VERSION_MINOR
+		config LVGL_VERSION_PATCH
+			int
+			default 0 # LVGL_VERSION_PATCH
 	endmenu
 
 	menu "Devices"
