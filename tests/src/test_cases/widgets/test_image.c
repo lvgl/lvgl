@@ -365,7 +365,12 @@ void test_image_ignore_transformation_settings_when_tiled(void)
 
 void test_image_clip_radius(void)
 {
-    lv_obj_t * img = lv_img_create(lv_screen_active());
+    lv_obj_t * par = lv_obj_create(lv_screen_active());
+    lv_obj_set_scrollbar_mode(par, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_style_radius(par, 0, 0);
+    lv_obj_center(par);
+
+    lv_obj_t * img = lv_img_create(par);
     lv_image_set_src(img, &test_arc_bg);
     lv_obj_center(img);
 
@@ -374,6 +379,12 @@ void test_image_clip_radius(void)
 
     lv_obj_set_style_radius(img, LV_RADIUS_CIRCLE, 0);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_clip_radius_circle.png");
+
+    /* parent cliped */
+    lv_obj_set_pos(img, -50, -20);
+    lv_image_set_scale(img, LV_SCALE_NONE * 2);
+    lv_image_set_rotation(img, 450);
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_clip_radius_circle_scaled_rotated.png");
 }
 
 void test_image_properties(void)
