@@ -163,28 +163,51 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect(layer, &draw_indic_dsc, &indic_area);
 
     /*Draw the knob*/
-    int32_t anim_value_x = 0;
-    int32_t knob_size = lv_obj_get_height(obj);
-    int32_t anim_length = lv_area_get_width(&obj->coords) - knob_size;
-
-    if(LV_SWITCH_IS_ANIMATING(sw)) {
-        /* Use the animation's coordinate */
-        anim_value_x = (anim_length * sw->anim_state) / LV_SWITCH_ANIM_STATE_END;
-    }
-    else {
-        /* Use LV_STATE_CHECKED to decide the coordinate */
-        bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
-        anim_value_x = chk ? anim_length : 0;
-    }
-
-    if(LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN)) {
-        anim_value_x = anim_length - anim_value_x;
-    }
-
     lv_area_t knob_area;
     lv_area_copy(&knob_area, &obj->coords);
-    knob_area.x1 += anim_value_x;
-    knob_area.x2 = knob_area.x1 + (knob_size > 0 ? knob_size - 1 : 0);
+
+    int32_t switch_w = lv_area_get_width(&obj->coords);
+    int32_t switch_h = lv_area_get_height(&obj->coords);
+    bool hor = switch_w >= switch_h ? true : false;
+
+    if(hor)
+    {
+        int32_t anim_value_x = 0;
+        int32_t knob_size = lv_obj_get_height(obj);
+        int32_t anim_length = lv_area_get_width(&obj->coords) - knob_size;
+        if(LV_SWITCH_IS_ANIMATING(sw)) {
+            /* Use the animation's coordinate */
+            anim_value_x = (anim_length * sw->anim_state) / LV_SWITCH_ANIM_STATE_END;
+        }
+        else {
+            /* Use LV_STATE_CHECKED to decide the coordinate */
+            bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
+            anim_value_x = chk ? anim_length : 0;
+        }
+
+        if(LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN)) {
+            anim_value_x = anim_length - anim_value_x;
+        }
+        knob_area.x1 += anim_value_x;
+        knob_area.x2 = knob_area.x1 + (knob_size > 0 ? knob_size - 1 : 0);
+    }
+    else
+    {
+        int32_t anim_value_y = 0;
+        int32_t knob_size = lv_obj_get_width(obj);
+        int32_t anim_length = lv_area_get_height(&obj->coords) - knob_size;
+        if(LV_SWITCH_IS_ANIMATING(sw)) {
+            /* Use the animation's coordinate */
+            anim_value_y = (anim_length * sw->anim_state) / LV_SWITCH_ANIM_STATE_END;
+        }
+        else {
+            /* Use LV_STATE_CHECKED to decide the coordinate */
+            bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
+            anim_value_y = chk ? anim_length : 0;
+        }
+        knob_area.y1 += anim_value_y;
+        knob_area.y2 = knob_area.y1 + (knob_size > 0 ? knob_size - 1 : 0);
+    }
 
     int32_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
     int32_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
