@@ -80,6 +80,31 @@ lv_obj_t * lv_switch_create(lv_obj_t * parent)
     return obj;
 }
 
+/*=====================
+ * Setter functions
+ *====================*/
+
+void lv_switch_set_orientation(lv_obj_t * obj, lv_switch_orientation_t orientation)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_switch_t * sw = (lv_switch_t *)obj;
+
+    sw->orientation = orientation;
+    lv_obj_invalidate(obj);
+}
+
+/*=====================
+ * Getter functions
+ *====================*/
+
+lv_switch_orientation_t lv_switch_get_orientation(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_switch_t * sw = (lv_switch_t *)obj;
+
+    return sw->orientation;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -92,6 +117,7 @@ static void lv_switch_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     lv_switch_t * sw = (lv_switch_t *)obj;
 
     sw->anim_state = LV_SWITCH_ANIM_STATE_INV;
+    sw->orientation = LV_SWITCH_ORIENTATION_AUTO;
 
     lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
@@ -168,7 +194,20 @@ static void draw_main(lv_event_t * e)
 
     int32_t switch_w = lv_area_get_width(&obj->coords);
     int32_t switch_h = lv_area_get_height(&obj->coords);
-    bool hor = switch_w >= switch_h ? true : false;
+    bool hor = false;
+
+    switch(sw->orientation) {
+        case LV_SWITCH_ORIENTATION_HORIZONTAL:
+            hor = true;
+            break;
+        case LV_SWITCH_ORIENTATION_VERTICAL:
+            hor = false;
+            break;
+        case LV_SWITCH_ORIENTATION_AUTO:
+        default:
+            hor = (switch_w >= switch_h);
+            break;
+    }
 
     if(hor) {
         int32_t anim_value_x = 0;
@@ -203,6 +242,11 @@ static void draw_main(lv_event_t * e)
             bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
             anim_value_y = chk ? anim_length : 0;
         }
+
+        if(LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN)) {
+            anim_value_y = anim_length - anim_value_y;
+        }
+
         knob_area.y1 += anim_value_y;
         knob_area.y2 = knob_area.y1 + (knob_size > 0 ? knob_size - 1 : 0);
     }
