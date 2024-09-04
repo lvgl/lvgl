@@ -70,7 +70,7 @@ static lv_snippet_t * lv_get_snippet(uint32_t index);
 static int32_t convert_indent_pct(lv_obj_t * spans, int32_t width);
 
 static lv_span_coords_t make_span_coords(const lv_span_t * prev_span, const lv_span_t * curr_span, int32_t width,
-                                         lv_area_t padding);
+                                         lv_area_t padding, int32_t indent);
 
 /**********************
  *  STATIC VARIABLES
@@ -561,6 +561,7 @@ lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, const lv_span_t * 
     const lv_spangroup_t * spangroup = (lv_spangroup_t *)obj;
     const lv_ll_t * spans = &spangroup->child_ll;
     const int32_t width = lv_obj_get_content_width(obj);
+    const int32_t indent = lv_spangroup_get_indent(obj);
 
     if(obj == NULL || span == NULL || lv_ll_get_head(spans) == NULL) return (lv_span_coords_t) {
         0
@@ -577,9 +578,9 @@ lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, const lv_span_t * 
     return make_span_coords(prev_span, curr_span, width, (lv_area_t) {
         .x1 = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width,
         .y1 = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width,
-        .x2 = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width,
-        .y2 = 0
-    });
+        .x2 = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width, .y2 = 0
+    },
+    indent);
 }
 
 lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * p)
@@ -587,6 +588,7 @@ lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * p)
     const lv_spangroup_t * spangroup = (lv_spangroup_t *)obj;
     const lv_ll_t * spans = &spangroup->child_ll;
     const int32_t width = lv_obj_get_content_width(obj);
+    const int32_t indent = lv_spangroup_get_indent(obj);
 
     if(obj == NULL || p == NULL || lv_ll_get_head(spans) == NULL) return NULL;
 
@@ -604,7 +606,8 @@ lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * p)
             .y1 = lv_obj_get_style_pad_top(obj, LV_PART_MAIN),
             .x2 = lv_obj_get_style_pad_right(obj, LV_PART_MAIN),
             .y2 = 0
-        });
+        },
+        indent);
         if(lv_area_is_point_on(&coords.heading,  &point, 0) ||
            lv_area_is_point_on(&coords.middle,   &point, 0) ||
            lv_area_is_point_on(&coords.trailing, &point, 0)) {
@@ -1168,7 +1171,7 @@ static void refresh_self_size(lv_obj_t * obj)
 }
 
 static lv_span_coords_t make_span_coords(const lv_span_t * prev_span, const lv_span_t * curr_span, const int32_t width,
-                                         const lv_area_t padding)
+                                         const lv_area_t padding, const int32_t indent)
 {
     lv_span_coords_t coords = { 0 };
 
@@ -1176,7 +1179,8 @@ static lv_span_coords_t make_span_coords(const lv_span_t * prev_span, const lv_s
 
     /* first line */
     if(prev_span == NULL) {
-        lv_area_set(&coords.heading, padding.x1, padding.y1, width + padding.x1, curr_span->trailing_pos.y + padding.y1);
+        lv_area_set(&coords.heading, padding.x1 + indent, padding.y1, width + padding.x1,
+                    curr_span->trailing_pos.y + padding.y1);
         lv_area_set(&coords.middle, coords.heading.x1, coords.heading.y2, curr_span->trailing_pos.x + padding.x1,
                     coords.heading.y2 + curr_span->trailing_height);
         lv_area_set(&coords.trailing, 0, 0, 0, 0);
