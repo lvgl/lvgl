@@ -127,8 +127,19 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
     lv_mutex_lock(&dsc->cache_node->face_lock);
 
     FT_Face face = dsc->cache_node->face;
-    FT_Set_Pixel_Sizes(face, 0, dsc->size);
-    error = FT_Load_Glyph(face, data->glyph_index,  FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL | FT_LOAD_NO_AUTOHINT);
+    if(FT_IS_SCALABLE(face)) {
+        error = FT_Set_Pixel_Sizes(face, 0, dsc->size);
+    }
+    else {
+        error = FT_Select_Size(face, 0);
+    }
+    if(error) {
+        FT_ERROR_MSG("FT_Set_Pixel_Sizes", error);
+        lv_mutex_unlock(&dsc->cache_node->face_lock);
+        return false;
+    }
+    error = FT_Load_Glyph(face, data->glyph_index,
+                          FT_LOAD_COLOR | FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL | FT_LOAD_NO_AUTOHINT);
     if(error) {
         FT_ERROR_MSG("FT_Load_Glyph", error);
         lv_mutex_unlock(&dsc->cache_node->face_lock);
@@ -154,12 +165,20 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
     uint16_t box_h = glyph_bitmap->bitmap.rows;         /*Height of the bitmap in [px]*/
     uint16_t box_w = glyph_bitmap->bitmap.width;        /*Width of the bitmap in [px]*/
 
-    uint32_t stride = lv_draw_buf_width_to_stride(box_w, LV_COLOR_FORMAT_A8);
-    data->draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, box_w, box_h, LV_COLOR_FORMAT_A8, stride);
+    lv_color_format_t col_format;
+    if(glyph_bitmap->bitmap.pixel_mode == FT_PIXEL_MODE_BGRA) {
+        col_format = LV_COLOR_FORMAT_ARGB8888;
+    }
+    else {
+        col_format = LV_COLOR_FORMAT_A8;
+    }
+    uint32_t pitch = glyph_bitmap->bitmap.pitch;
+    uint32_t stride = lv_draw_buf_width_to_stride(box_w, col_format);
+    data->draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, box_w, box_h, col_format, stride);
 
     for(int y = 0; y < box_h; ++y) {
-        lv_memcpy((uint8_t *)(data->draw_buf->data) + y * stride, glyph_bitmap->bitmap.buffer + y * box_w,
-                  box_w);
+        lv_memcpy((uint8_t *)(data->draw_buf->data) + y * stride, glyph_bitmap->bitmap.buffer + y * pitch,
+                  pitch);
     }
 
     FT_Done_Glyph(glyph);

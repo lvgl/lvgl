@@ -136,8 +136,24 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
     FT_Face face = dsc->cache_node->face;
     FT_UInt glyph_index = FT_Get_Char_Index(face, data->unicode);
 
-    FT_Set_Pixel_Sizes(face, 0, dsc->size);
-    error = FT_Load_Glyph(face, glyph_index,  FT_LOAD_COMPUTE_METRICS | FT_LOAD_NO_BITMAP | FT_LOAD_NO_AUTOHINT);
+    if(FT_IS_SCALABLE(face)) {
+        error = FT_Set_Pixel_Sizes(face, 0, dsc->size);
+    }
+    else {
+        error = FT_Select_Size(face, 0);
+    }
+    if(error) {
+        FT_ERROR_MSG("FT_Set_Pixel_Sizes", error);
+        lv_mutex_unlock(&dsc->cache_node->face_lock);
+        return false;
+    }
+
+    if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_OUTLINE) {
+        error = FT_Load_Glyph(face, glyph_index, FT_LOAD_COMPUTE_METRICS | FT_LOAD_NO_BITMAP | FT_LOAD_NO_AUTOHINT);
+    }
+    else if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_BITMAP) {
+        error = FT_Load_Glyph(face, glyph_index, FT_LOAD_COMPUTE_METRICS | FT_LOAD_NO_AUTOHINT);
+    }
     if(error) {
         FT_ERROR_MSG("FT_Load_Glyph", error);
         lv_mutex_unlock(&dsc->cache_node->face_lock);
@@ -171,7 +187,10 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
         dsc_out->ofs_x = glyph->bitmap_left;                         /*X offset of the bitmap in [pf]*/
         dsc_out->ofs_y = glyph->bitmap_top -
                          dsc_out->box_h;                             /*Y offset of the bitmap measured from the as line*/
-        dsc_out->format = LV_FONT_GLYPH_FORMAT_A8;
+        if(glyph->format == FT_GLYPH_FORMAT_BITMAP)
+            dsc_out->format = LV_FONT_GLYPH_FORMAT_IMAGE;
+        else
+            dsc_out->format = LV_FONT_GLYPH_FORMAT_A8;
     }
 
     dsc_out->is_placeholder = glyph_index == 0;
