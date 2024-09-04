@@ -120,15 +120,28 @@ static vg_lite_fill_t path_append_inner_rect(lv_vg_lite_path_t * path,
                                              int32_t x, int32_t y, int32_t w, int32_t h,
                                              float r)
 {
-    int32_t border_w = dsc->width;
-    float r_in = LV_MAX(0, r - border_w);
+    LV_PROFILER_BEGIN;
+
+    const float half_w = w / 2.0f;
+    const float half_h = h / 2.0f;
+    const int32_t border_w = dsc->width;
+    const float border_w_max = LV_MIN(half_w, half_h);
+
+    /* normal fill, no inner rect */
+    if(border_w >= border_w_max) {
+        LV_PROFILER_END;
+        return VG_LITE_FILL_EVEN_ODD;
+    }
+
+    const float r_in = r - border_w;
 
     /* full border, simple rect */
     if(dsc->side == LV_BORDER_SIDE_FULL) {
         lv_vg_lite_path_append_rect(path,
                                     x + border_w, y + border_w,
                                     w - border_w * 2, h - border_w * 2,
-                                    r_in);
+                                    r_in < 0 ? 0 : r_in);
+        LV_PROFILER_END;
         return VG_LITE_FILL_EVEN_ODD;
     }
 
@@ -160,6 +173,7 @@ static vg_lite_fill_t path_append_inner_rect(lv_vg_lite_path_t * path,
                                     w_inner,
                                     h_inner,
                                     0);
+        LV_PROFILER_END;
         return VG_LITE_FILL_EVEN_ODD;
     }
 
@@ -167,70 +181,150 @@ static vg_lite_fill_t path_append_inner_rect(lv_vg_lite_path_t * path,
     lv_vg_lite_path_reset(path, VG_LITE_FP32);
     lv_vg_lite_path_set_quality(path, VG_LITE_HIGH);
 
+    /* coordinate reference map: https://github.com/lvgl/lvgl/pull/6796 */
+    const float c1_x = x + r;
+    const float c1_y = y + r;
+    const float c2_x = x + w - r;
+    const float c2_y = c1_y;
+    const float c3_x = c2_x;
+    const float c3_y = y + h - r;
+    const float c4_x = c1_x;
+    const float c4_y = c3_y;
+
     /* complex rounded compound rectangle */
+    if(r_in <= 0) {
+        const float p1_x = x;
+        const float p1_y = y + border_w;
+        const float p2_x = x;
+        const float p2_y = y + r;
+        const float p3_x = x + r;
+        const float p3_y = y;
+        const float p4_x = x + border_w;
+        const float p4_y = y;
+
+        const float p5_x = x + w - border_w;
+        const float p5_y = y;
+        const float p6_x = x + w - r;
+        const float p6_y = y;
+        const float p7_x = x + w;
+        const float p7_y = y + r;
+        const float p8_x = x + w;
+        const float p8_y = y + border_w;
+
+        const float p9_x = x + w;
+        const float p9_y = y + h - border_w;
+        const float p10_x = x + w;
+        const float p10_y = y + h - r;
+        const float p11_x = x + w - r;
+        const float p11_y = y + h;
+        const float p12_x = x + w - border_w;
+        const float p12_y = y + h;
+
+        const float p13_x = x + border_w;
+        const float p13_y = y + h;
+        const float p14_x = x + r;
+        const float p14_y = y + h;
+        const float p15_x = x;
+        const float p15_y = y + h - r;
+        const float p16_x = x;
+        const float p16_y = y + h - border_w;
+
+        if(dsc->side & LV_BORDER_SIDE_BOTTOM) {
+            lv_vg_lite_path_move_to(path, p16_x, p16_y);
+            lv_vg_lite_path_line_to(path, p9_x, p9_y);
+            lv_vg_lite_path_line_to(path, p10_x, p10_y);
+            lv_vg_lite_path_append_arc_right_angle(path, p10_x, p10_y, c3_x, c3_y, p11_x, p11_y);
+            lv_vg_lite_path_line_to(path, p14_x, p14_y);
+            lv_vg_lite_path_append_arc_right_angle(path, p14_x, p14_y, c4_x, c4_y, p15_x, p15_y);
+            lv_vg_lite_path_close(path);
+        }
+
+        if(dsc->side & LV_BORDER_SIDE_TOP) {
+            lv_vg_lite_path_move_to(path, p1_x, p1_y);
+            lv_vg_lite_path_line_to(path, p2_x, p2_y);
+            lv_vg_lite_path_append_arc_right_angle(path, p2_x, p2_y, c1_x, c1_y, p3_x, p3_y);
+            lv_vg_lite_path_line_to(path, p6_x, p6_y);
+            lv_vg_lite_path_append_arc_right_angle(path, p6_x, p6_y, c2_x, c2_y, p7_x, p7_y);
+            lv_vg_lite_path_line_to(path, p8_x, p8_y);
+            lv_vg_lite_path_close(path);
+        }
+
+        if(dsc->side & LV_BORDER_SIDE_LEFT) {
+            lv_vg_lite_path_move_to(path, p4_x, p4_y);
+            lv_vg_lite_path_line_to(path, p13_x, p13_y);
+            lv_vg_lite_path_line_to(path, p14_x, p14_y);
+            lv_vg_lite_path_append_arc_right_angle(path, p14_x, p14_y, c4_x, c4_y, p15_x, p15_y);
+            lv_vg_lite_path_line_to(path, p2_x, p2_y);
+            lv_vg_lite_path_append_arc_right_angle(path, p2_x, p2_y, c1_x, c1_y, p3_x, p3_y);
+            lv_vg_lite_path_close(path);
+        }
+
+        if(dsc->side & LV_BORDER_SIDE_RIGHT) {
+            lv_vg_lite_path_move_to(path, p5_x, p5_y);
+            lv_vg_lite_path_line_to(path, p6_x, p6_y);
+            lv_vg_lite_path_append_arc_right_angle(path, p6_x, p6_y, c2_x, c2_y, p7_x, p7_y);
+            lv_vg_lite_path_line_to(path, p10_x, p10_y);
+            lv_vg_lite_path_append_arc_right_angle(path, p10_x, p10_y, c3_x, c3_y, p11_x, p11_y);
+            lv_vg_lite_path_line_to(path, p12_x, p12_y);
+            lv_vg_lite_path_close(path);
+        }
+
+        LV_PROFILER_END;
+        return VG_LITE_FILL_NON_ZERO;
+    }
 
     /* r^2 - r_in^2 = offset^2 */
-    float offset = MATH_SQRTF((2 * r_in) * border_w);
-    float sweep_alpha = MATH_DEGREES(MATH_ACOSF(r_in / r));
-    float sweep_beta = 90 - sweep_alpha;
+    const float offset = MATH_SQRTF((2 * r - border_w) * border_w);
+    const float sweep_alpha = MATH_DEGREES(MATH_ACOSF(r_in / r));
+    const float sweep_beta = 90 - sweep_alpha;
 
-    /* Coordinate reference map: https://github.com/lvgl/lvgl/pull/6796 */
-    float c1_x = x + r;
-    float c1_y = y + r;
-    float c2_x = x + w - r;
-    float c2_y = c1_y;
-    float c3_x = c2_x;
-    float c3_y = y + h - r;
-    float c4_x = c1_x;
-    float c4_y = c3_y;
+    const float p1_x = x + border_w;
+    const float p1_y = y + r;
+    const float p2_x = x;
+    const float p2_y = y + r;
+    const float p3_x = x + border_w;
+    const float p3_y = y + r - offset;
+    const float p4_x = x + r - offset;
+    const float p4_y = y + border_w;
+    const float p5_x = x + r;
+    const float p5_y = y;
+    const float p6_x = x + r;
+    const float p6_y = y + border_w;
 
-    float p1_x = x + border_w;
-    float p1_y = y + r;
-    float p2_x = x;
-    float p2_y = y + r;
-    float p3_x = x + border_w;
-    float p3_y = y + r - offset;
-    float p4_x = x + r - offset;
-    float p4_y = y + border_w;
-    float p5_x = x + r;
-    float p5_y = y;
-    float p6_x = x + r;
-    float p6_y = y + border_w;
+    const float p7_x = x + w - r;
+    const float p7_y = y + border_w;
+    const float p8_x = x + w - r;
+    const float p8_y = y;
+    const float p10_x = x + w - border_w;
+    const float p10_y = y + r - offset;
+    const float p11_x = x + w;
+    const float p11_y = y + r;
+    const float p12_x = x + w - border_w;
+    const float p12_y = y + r;
 
-    float p7_x = x + w - r;
-    float p7_y = y + border_w;
-    float p8_x = x + w - r;
-    float p8_y = y;
-    float p10_x = x + w - border_w;
-    float p10_y = y + r - offset;
-    float p11_x = x + w;
-    float p11_y = y + r;
-    float p12_x = x + w - border_w;
-    float p12_y = y + r;
+    const float p13_x = x + w - border_w;
+    const float p13_y = y + h - r;
+    const float p14_x = x + w;
+    const float p14_y = y + h - r;
+    const float p16_x = x + w - r + offset;
+    const float p16_y = y + h - border_w;
+    const float p17_x = x + w - r;
+    const float p17_y = y + h;
+    const float p18_x = x + w - r;
+    const float p18_y = y + h - border_w;
 
-    float p13_x = x + w - border_w;
-    float p13_y = y + h - r;
-    float p14_x = x + w;
-    float p14_y = y + h - r;
-    float p16_x = x + w - r + offset;
-    float p16_y = y + h - border_w;
-    float p17_x = x + w - r;
-    float p17_y = y + h;
-    float p18_x = x + w - r;
-    float p18_y = y + h - border_w;
-
-    float p19_x = x + r;
-    float p19_y = y + h - border_w;
-    float p20_x = x + r;
-    float p20_y = y + h;
-    float p21_x = x + r - offset;
-    float p21_y = y + h - border_w;
-    float p22_x = x + border_w;
-    float p22_y = y + h - r + offset;
-    float p23_x = x;
-    float p23_y = y + h - r;
-    float p24_x = x + border_w;
-    float p24_y = y + h - r;
+    const float p19_x = x + r;
+    const float p19_y = y + h - border_w;
+    const float p20_x = x + r;
+    const float p20_y = y + h;
+    const float p21_x = x + r - offset;
+    const float p21_y = y + h - border_w;
+    const float p22_x = x + border_w;
+    const float p22_y = y + h - r + offset;
+    const float p23_x = x;
+    const float p23_y = y + h - r;
+    const float p24_x = x + border_w;
+    const float p24_y = y + h - r;
 
     if(dsc->side & LV_BORDER_SIDE_BOTTOM) {
         lv_vg_lite_path_move_to(path, p21_x, p21_y);
@@ -246,7 +340,6 @@ static vg_lite_fill_t path_append_inner_rect(lv_vg_lite_path_t * path,
         lv_vg_lite_path_append_arc(path, c1_x, c1_y, r, 270 - sweep_alpha, sweep_alpha, false);
         lv_vg_lite_path_line_to(path, p8_x, p8_y);
         lv_vg_lite_path_append_arc(path, c2_x, c2_y, r, 270, sweep_alpha, false);
-        lv_vg_lite_path_line_to(path, p4_x, p4_y);
         lv_vg_lite_path_close(path);
     }
 
@@ -261,10 +354,9 @@ static vg_lite_fill_t path_append_inner_rect(lv_vg_lite_path_t * path,
 
     if(dsc->side & LV_BORDER_SIDE_RIGHT) {
         lv_vg_lite_path_move_to(path, p10_x, p10_y);
-        lv_vg_lite_path_append_arc(path, c2_x, c2_y, r, 270 + sweep_alpha, sweep_alpha, false);
+        lv_vg_lite_path_append_arc(path, c2_x, c2_y, r, 270 + sweep_beta, sweep_alpha, false);
         lv_vg_lite_path_line_to(path, p14_x, p14_y);
         lv_vg_lite_path_append_arc(path, c3_x, c3_y, r, 0, sweep_alpha, false);
-        lv_vg_lite_path_line_to(path, p10_x, p10_y);
         lv_vg_lite_path_close(path);
     }
 
@@ -300,6 +392,7 @@ static vg_lite_fill_t path_append_inner_rect(lv_vg_lite_path_t * path,
         lv_vg_lite_path_close(path);
     }
 
+    LV_PROFILER_END;
     return VG_LITE_FILL_NON_ZERO;
 }
 
