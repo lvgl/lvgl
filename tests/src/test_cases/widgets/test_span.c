@@ -423,7 +423,7 @@ void test_spangroup_get_span_coords(void)
     lv_obj_update_layout(spangroup);
 
     /* Define expected coordinates for testing */
-    const lv_span_coords_t test_coords[span_count] = {
+    const lv_span_coords_t test_coords[] = {
         {.heading = {.x1 = 40, .y1 = 20, .x2 = 280, .y2 = 20}, .middle = {.x1 = 40, .y1 = 20, .x2 = 241, .y2 = 36}, .trailing = {.x1 = 0, .y1 = 0, .x2 = 0, .y2 = 0}},
         {.heading = {.x1 = 241, .y1 = 20, .x2 = 280, .y2 = 36}, .middle = {.x1 = 20, .y1 = 36, .x2 = 280, .y2 = 63}, .trailing = {.x1 = 20, .y1 = 63, .x2 = 155, .y2 = 90}},
         {.heading = {.x1 = 155, .y1 = 63, .x2 = 280, .y2 = 90}, .middle = {.x1 = 20, .y1 = 90, .x2 = 280, .y2 = 90}, .trailing = {.x1 = 20, .y1 = 90, .x2 = 188, .y2 = 112}},
