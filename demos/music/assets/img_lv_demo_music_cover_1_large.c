@@ -448,6 +448,7 @@ img_lv_demo_music_cover_1_map[] = {
 const lv_image_dsc_t img_lv_demo_music_cover_1 = {
     .header.w = 428,
     .header.h = 428,
+    .header.stride = 1712,
     .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_lv_demo_music_cover_1_map,
     .data_size = sizeof(img_lv_demo_music_cover_1_map),

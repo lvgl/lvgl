@@ -58,6 +58,7 @@ const lv_image_dsc_t img_star = {
   .header.magic = LV_IMAGE_HEADER_MAGIC,
   .header.w = 30,
   .header.h = 29,
+  .header.stride = 120,
   .data_size = 870 * 4,
   .data = img_star_map,
 };
