@@ -170,8 +170,7 @@ static void draw_main(lv_event_t * e)
     int32_t switch_h = lv_area_get_height(&obj->coords);
     bool hor = switch_w >= switch_h ? true : false;
 
-    if(hor)
-    {
+    if(hor) {
         int32_t anim_value_x = 0;
         int32_t knob_size = lv_obj_get_height(obj);
         int32_t anim_length = lv_area_get_width(&obj->coords) - knob_size;
@@ -191,8 +190,7 @@ static void draw_main(lv_event_t * e)
         knob_area.x1 += anim_value_x;
         knob_area.x2 = knob_area.x1 + (knob_size > 0 ? knob_size - 1 : 0);
     }
-    else
-    {
+    else {
         int32_t anim_value_y = 0;
         int32_t knob_size = lv_obj_get_width(obj);
         int32_t anim_length = lv_area_get_height(&obj->coords) - knob_size;
