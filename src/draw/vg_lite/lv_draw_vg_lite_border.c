@@ -22,7 +22,7 @@
  *      DEFINES
  *********************/
 
-#define BORDER_HAS_SIDE(dsc_side, side) (((dsc_side) & (side)) == (side))
+#define HAS_BORDER_SIDE(dsc_side, side) (((dsc_side) & (side)) == (side))
 
 /**********************
  *      TYPEDEFS
@@ -191,7 +191,7 @@ static vg_lite_fill_t path_append_inner_rect(lv_vg_lite_path_t * path,
     const float c4_x = c1_x;
     const float c4_y = c3_y;
 
-    /* complex rounded compound rectangle */
+    /* When border_w > r, No need to calculate the intersection of the arc and the line */
     if(r_in <= 0) {
         const float p1_x = x;
         const float p1_y = y + border_w;
@@ -272,6 +272,8 @@ static vg_lite_fill_t path_append_inner_rect(lv_vg_lite_path_t * path,
         LV_PROFILER_END;
         return VG_LITE_FILL_NON_ZERO;
     }
+
+    /* When border_w < r, Calculate the intersection of an arc and a line */
 
     /* r^2 - r_in^2 = offset^2 */
     const float offset = MATH_SQRTF((2 * r - border_w) * border_w);
@@ -360,7 +362,9 @@ static vg_lite_fill_t path_append_inner_rect(lv_vg_lite_path_t * path,
         lv_vg_lite_path_close(path);
     }
 
-    if(BORDER_HAS_SIDE(dsc->side, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT)) {
+    /* Draw the rounded corners adjacent to the border */
+
+    if(HAS_BORDER_SIDE(dsc->side, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT)) {
         lv_vg_lite_path_move_to(path, p2_x, p2_y);
         lv_vg_lite_path_append_arc_right_angle(path, p2_x, p2_y, c1_x, c1_y, p5_x, p5_y);
         lv_vg_lite_path_line_to(path, p6_x, p6_y);
@@ -368,7 +372,7 @@ static vg_lite_fill_t path_append_inner_rect(lv_vg_lite_path_t * path,
         lv_vg_lite_path_close(path);
     }
 
-    if(BORDER_HAS_SIDE(dsc->side, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_RIGHT)) {
+    if(HAS_BORDER_SIDE(dsc->side, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_RIGHT)) {
         lv_vg_lite_path_move_to(path, p8_x, p8_y);
         lv_vg_lite_path_append_arc_right_angle(path, p8_x, p8_y, c2_x, c2_y, p11_x, p11_y);
         lv_vg_lite_path_line_to(path, p12_x, p12_y);
@@ -376,7 +380,7 @@ static vg_lite_fill_t path_append_inner_rect(lv_vg_lite_path_t * path,
         lv_vg_lite_path_close(path);
     }
 
-    if(BORDER_HAS_SIDE(dsc->side, LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_LEFT)) {
+    if(HAS_BORDER_SIDE(dsc->side, LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_LEFT)) {
         lv_vg_lite_path_move_to(path, p20_x, p20_y);
         lv_vg_lite_path_append_arc_right_angle(path, p20_x, p20_y, c4_x, c4_y, p23_x, p23_y);
         lv_vg_lite_path_line_to(path, p24_x, p24_y);
@@ -384,7 +388,7 @@ static vg_lite_fill_t path_append_inner_rect(lv_vg_lite_path_t * path,
         lv_vg_lite_path_close(path);
     }
 
-    if(BORDER_HAS_SIDE(dsc->side, LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_RIGHT)) {
+    if(HAS_BORDER_SIDE(dsc->side, LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_RIGHT)) {
         lv_vg_lite_path_move_to(path, p14_x, p14_y);
         lv_vg_lite_path_append_arc_right_angle(path, p14_x, p14_y, c3_x, c3_y, p17_x, p17_y);
         lv_vg_lite_path_line_to(path, p18_x, p18_y);
