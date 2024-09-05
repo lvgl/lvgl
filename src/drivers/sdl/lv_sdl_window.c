@@ -166,7 +166,7 @@ lv_display_t * lv_sdl_get_disp_from_win_id(uint32_t win_id)
 
     while(disp) {
         lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-        if(SDL_GetWindowID(dsc->window) == win_id) {
+        if(dsc != NULL && SDL_GetWindowID(dsc->window) == win_id) {
             return disp;
         }
         disp = lv_display_get_next(disp);
