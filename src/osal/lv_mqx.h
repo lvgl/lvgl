@@ -32,7 +32,7 @@ typedef _task_id lv_thread_t;
 
 typedef MUTEX_STRUCT _lv_mutex_t;
 
-typedef LWSEM_struct _lv_thread_sync_t;
+typedef LWSEM_STRUCT _lv_thread_sync_t;
 
 /**********************
  * GLOBAL PROTOTYPES
