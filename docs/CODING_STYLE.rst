@@ -98,7 +98,7 @@ comment, such as a struct member, use ``/**<`` like this:
      *
      * When more detail is needed, add a blank line then the detail.
      */
-    typedef struct _lv_example_type_t {
+    typedef struct {
         char      *text;    /**< Brief description of this member */
         uint16_t   length;  /**< Brief description of this member */
     } lv_example_type_t;
