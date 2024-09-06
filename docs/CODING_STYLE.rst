@@ -236,7 +236,7 @@ Supported Doxygen Commands
    documents the return value until Doxygen encounters a blank line or another Doxygen command.
 -  ``@code{.c}/@endcode``
    surrounds code that should be placed in a code block.  While Doxygen knows to use C
-   color-coding of code blocks in a .C file, the down-line part of the documentation
+   color-coding of code blocks in a .C file, the downstream part of the documentation
    generation sequence does not, so the ``{.c}`` appendage to the ``@code`` command
    is necessary.
 -  ``@note  text``
