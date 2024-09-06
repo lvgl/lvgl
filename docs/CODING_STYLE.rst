@@ -149,7 +149,7 @@ illustrating most of the Doxygen commands used in LVGL.
 
     /**
      * Set alignment of objects placed in containers with LV_STYLE_FLEX_FLOW style.
-
+     *
      * The values for the `..._place` arguments come from the `lv_flex_align_t`
      * enumeration and have the same meanings as they do for flex containers in CSS.
      * @param  obj                   pointer to flex container.  It must have
