@@ -91,14 +91,7 @@ void lv_draw_vg_lite_deinit(void)
 
 static bool check_image_is_supported(const lv_draw_image_dsc_t * dsc)
 {
-    lv_image_header_t header;
-    lv_result_t res = lv_image_decoder_get_info(dsc->src, &header);
-    if(res != LV_RESULT_OK) {
-        LV_LOG_TRACE("get image info failed");
-        return false;
-    }
-
-    return lv_vg_lite_is_src_cf_supported(header.cf);
+    return lv_vg_lite_is_src_cf_supported(dsc->header.cf);
 }
 
 static void draw_execute(lv_draw_vg_lite_unit_t * u)
