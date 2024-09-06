@@ -192,7 +192,7 @@ illustrating most of the Doxygen commands used in LVGL.
 
 - Add at least 2 spaces after Doxygen commands for improved readability.
 
-- Use \`...\` around code elements (variables, type names, function names).  For type
+- Use back-quotes (\`...\`) around code elements (variables, type names, function names).  For type
   names and function names, Doxygen generates a hyperlink to that code member's
   documentation (when it exists) with or without the single back-quotes.
 
