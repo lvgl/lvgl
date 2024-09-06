@@ -116,7 +116,7 @@ comment, such as a struct member, use ``/**<`` like this:
 
 -  Short "code summaries" of a few lines are accepted: ``/* Calculate new coordinates */``
 
--  In comments use \`...\` when referring to a code element, such as a variable, type,
+-  In comments use back-quotes (\`...\`) when referring to a code element, such as a variable, type,
    or struct name: ``/* Update value of `x_act` */``
 
 -  When adding or modifying comments, priorities are (in order of importance):
