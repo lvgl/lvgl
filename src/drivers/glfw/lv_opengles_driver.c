@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "../../display/lv_display.h"
+#include "../../misc/lv_area_private.h"
 
 #if LV_USE_OPENGLES
 
@@ -178,13 +179,16 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
     GL_CALL(glActiveTexture(GL_TEXTURE0));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
 
-    float tex_w = (float)lv_area_get_width(texture_area);
-    float tex_h = (float)lv_area_get_height(texture_area);
+    lv_area_t intersection;
+    lv_area_intersect(&intersection, texture_area, texture_clip_area);
+
+    float tex_w = (float)lv_area_get_width(&intersection);
+    float tex_h = (float)lv_area_get_height(&intersection);
 
     float hor_scale = tex_w / (float)disp_w;
     float ver_scale = tex_h / (float)disp_h;
-    float hor_translate = (float)texture_area->x1 / (float)disp_w * 2.0f - (1.0f - hor_scale);
-    float ver_translate = -((float)texture_area->y1 / (float)disp_h * 2.0f - (1.0f - ver_scale));
+    float hor_translate = (float)intersection.x1 / (float)disp_w * 2.0f - (1.0f - hor_scale);
+    float ver_translate = -((float)intersection.y1 / (float)disp_h * 2.0f - (1.0f - ver_scale));
     float matrix[9] = {
         hor_scale, 0.0f,      hor_translate,
         0.0f,      ver_scale, ver_translate,
