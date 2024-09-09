@@ -24,6 +24,8 @@
 /* Magic number from https://spencermortensen.com/articles/bezier-circle/ */
 #define PATH_ARC_MAGIC 0.55191502449351f
 
+#define PATH_MEM_SIZE_MIN 128
+
 #define SIGN(x) (math_zero(x) ? 0 : ((x) > 0 ? 1 : -1))
 
 #define VLC_OP_ARG_LEN(OP, LEN) \
@@ -260,10 +262,11 @@ static void lv_vg_lite_path_append_data(lv_vg_lite_path_t * path, const void * d
 
     if(path->base.path_length + len > path->mem_size) {
         if(path->mem_size == 0) {
-            path->mem_size = len;
+            path->mem_size = LV_MAX(len, PATH_MEM_SIZE_MIN);
         }
         else {
-            path->mem_size *= 2;
+            /* Increase memory size by 1.5 times */
+            path->mem_size = path->mem_size * 3 / 2;
         }
         path->base.path = lv_realloc(path->base.path, path->mem_size);
         LV_ASSERT_MALLOC(path->base.path);
