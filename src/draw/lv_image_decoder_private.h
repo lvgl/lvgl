@@ -33,7 +33,7 @@ extern "C" {
  * Default args:
  * all field are zero or false.
  */
-struct lv_image_decoder_args_t {
+struct _lv_image_decoder_args_t {
     bool stride_align;      /**< Whether stride should be aligned */
     bool premultiply;       /**< Whether image should be premultiplied or not after decoding */
     bool no_cache;          /**< When set, decoded image won't be put to cache, and decoder open will also ignore cache. */
@@ -41,7 +41,7 @@ struct lv_image_decoder_args_t {
     bool flush_cache;       /**< Whether to flush the data cache after decoding */
 };
 
-struct lv_image_decoder_t {
+struct _lv_image_decoder_t {
     lv_image_decoder_info_f_t info_cb;
     lv_image_decoder_open_f_t open_cb;
     lv_image_decoder_get_area_cb_t get_area_cb;
@@ -52,7 +52,7 @@ struct lv_image_decoder_t {
     void * user_data;
 };
 
-struct lv_image_cache_data_t {
+struct _lv_image_cache_data_t {
     lv_cache_slot_size_t slot;
 
     const void * src;
@@ -63,7 +63,7 @@ struct lv_image_cache_data_t {
     void * user_data;
 };
 
-struct lv_image_header_cache_data_t {
+struct _lv_image_header_cache_data_t {
     const void * src;
     lv_image_src_t src_type;
 
@@ -72,7 +72,7 @@ struct lv_image_header_cache_data_t {
 };
 
 /**Describe an image decoding session. Stores data about the decoding*/
-struct lv_image_decoder_dsc_t {
+struct _lv_image_decoder_dsc_t {
     /**The decoder which was able to open the image source*/
     lv_image_decoder_t * decoder;
 

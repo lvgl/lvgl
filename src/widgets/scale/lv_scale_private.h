@@ -27,7 +27,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_scale_section_t {
+struct _lv_scale_section_t {
     lv_style_t * main_style;
     lv_style_t * indicator_style;
     lv_style_t * items_style;
@@ -43,7 +43,7 @@ struct lv_scale_section_t {
     lv_point_t last_tick_in_section;
 };
 
-struct lv_scale_t {
+struct _lv_scale_t {
     lv_obj_t obj;
     lv_ll_t section_ll;     /**< Linked list for the sections (stores lv_scale_section_t)*/
     const char ** txt_src;

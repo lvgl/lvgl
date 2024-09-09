@@ -29,7 +29,7 @@ extern "C" {
  **********************/
 
 /** Data of the animimage */
-struct lv_animimg_t {
+struct _lv_animimg_t {
     lv_image_t img;
     lv_anim_t anim;
     /* picture sequence */

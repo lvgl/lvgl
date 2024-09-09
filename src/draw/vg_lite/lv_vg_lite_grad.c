@@ -53,7 +53,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static grad_item_t * grad_get(struct lv_draw_vg_lite_unit_t * u, const lv_vector_gradient_t * grad);
+static grad_item_t * grad_get(struct _lv_draw_vg_lite_unit_t * u, const lv_vector_gradient_t * grad);
 static void grad_cache_release_cb(void * entry, void * user_data);
 static bool grad_create_cb(grad_item_t * item, void * user_data);
 static void grad_free_cb(grad_item_t * item, void * user_data);
@@ -75,7 +75,7 @@ static vg_lite_gradient_spreadmode_t lv_spread_to_vg(lv_vector_gradient_spread_t
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_vg_lite_grad_init(struct lv_draw_vg_lite_unit_t * u, uint32_t cache_cnt)
+void lv_vg_lite_grad_init(struct _lv_draw_vg_lite_unit_t * u, uint32_t cache_cnt)
 {
     LV_ASSERT_NULL(u);
 
@@ -91,7 +91,7 @@ void lv_vg_lite_grad_init(struct lv_draw_vg_lite_unit_t * u, uint32_t cache_cnt)
     lv_vg_lite_pending_set_free_cb(u->grad_pending, grad_cache_release_cb, u->grad_cache);
 }
 
-void lv_vg_lite_grad_deinit(struct lv_draw_vg_lite_unit_t * u)
+void lv_vg_lite_grad_deinit(struct _lv_draw_vg_lite_unit_t * u)
 {
     LV_ASSERT_NULL(u);
     LV_ASSERT_NULL(u->grad_pending)
@@ -102,7 +102,7 @@ void lv_vg_lite_grad_deinit(struct lv_draw_vg_lite_unit_t * u)
 }
 
 bool lv_vg_lite_draw_grad(
-    struct lv_draw_vg_lite_unit_t * u,
+    struct _lv_draw_vg_lite_unit_t * u,
     vg_lite_buffer_t * buffer,
     vg_lite_path_t * path,
     const lv_vector_gradient_t * grad,
@@ -225,7 +225,7 @@ bool lv_vg_lite_draw_grad(
 }
 
 bool lv_vg_lite_draw_grad_helper(
-    struct lv_draw_vg_lite_unit_t * u,
+    struct _lv_draw_vg_lite_unit_t * u,
     vg_lite_buffer_t * buffer,
     vg_lite_path_t * path,
     const lv_area_t * area,
@@ -322,7 +322,7 @@ bool lv_vg_lite_draw_grad_helper(
  *   STATIC FUNCTIONS
  **********************/
 
-static grad_item_t * grad_get(struct lv_draw_vg_lite_unit_t * u, const lv_vector_gradient_t * grad)
+static grad_item_t * grad_get(struct _lv_draw_vg_lite_unit_t * u, const lv_vector_gradient_t * grad)
 {
     LV_ASSERT_NULL(u);
     LV_ASSERT_NULL(grad);

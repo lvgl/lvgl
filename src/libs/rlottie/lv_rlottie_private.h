@@ -29,7 +29,7 @@ extern "C" {
 /** definition in lottieanimation_capi.c */
 struct Lottie_Animation_S;
 
-struct lv_rlottie_t {
+struct _lv_rlottie_t {
     lv_image_t img_ext;
     struct Lottie_Animation_S * animation;
     lv_timer_t * task;

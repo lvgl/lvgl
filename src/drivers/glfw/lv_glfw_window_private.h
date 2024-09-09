@@ -32,7 +32,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_glfw_window_t {
+struct _lv_glfw_window_t {
     GLFWwindow * window;
     int32_t hor_res;
     int32_t ver_res;
@@ -43,7 +43,7 @@ struct lv_glfw_window_t {
     uint8_t closing : 1;
 };
 
-struct lv_glfw_texture_t {
+struct _lv_glfw_texture_t {
     lv_glfw_window_t * window;
     unsigned int texture_id;
     lv_area_t area;

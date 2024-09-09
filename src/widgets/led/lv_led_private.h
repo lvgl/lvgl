@@ -28,7 +28,7 @@ extern "C" {
  **********************/
 
 /** Data of led */
-struct lv_led_t {
+struct _lv_led_t {
     lv_obj_t obj;
     lv_color_t color;
     uint8_t bright;     /**< Current brightness of the LED (0..255)*/

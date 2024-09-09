@@ -34,7 +34,7 @@
  *      TYPEDEFS
  **********************/
 
-struct lv_vg_lite_path_t {
+struct _lv_vg_lite_path_t {
     vg_lite_path_t base;
     vg_lite_matrix_t matrix;
     size_t mem_size;
@@ -65,14 +65,14 @@ typedef struct {
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_vg_lite_path_init(struct lv_draw_vg_lite_unit_t * unit)
+void lv_vg_lite_path_init(struct _lv_draw_vg_lite_unit_t * unit)
 {
     LV_ASSERT_NULL(unit);
     unit->global_path = lv_vg_lite_path_create(VG_LITE_FP32);
     unit->path_in_use = false;
 }
 
-void lv_vg_lite_path_deinit(struct lv_draw_vg_lite_unit_t * unit)
+void lv_vg_lite_path_deinit(struct _lv_draw_vg_lite_unit_t * unit)
 {
     LV_ASSERT_NULL(unit);
     LV_ASSERT(!unit->path_in_use);
@@ -113,7 +113,7 @@ void lv_vg_lite_path_destroy(lv_vg_lite_path_t * path)
     LV_PROFILER_END;
 }
 
-lv_vg_lite_path_t * lv_vg_lite_path_get(struct lv_draw_vg_lite_unit_t * unit, vg_lite_format_t data_format)
+lv_vg_lite_path_t * lv_vg_lite_path_get(struct _lv_draw_vg_lite_unit_t * unit, vg_lite_format_t data_format)
 {
     LV_ASSERT_NULL(unit);
     LV_ASSERT_NULL(unit->global_path);
@@ -123,7 +123,7 @@ lv_vg_lite_path_t * lv_vg_lite_path_get(struct lv_draw_vg_lite_unit_t * unit, vg
     return unit->global_path;
 }
 
-void lv_vg_lite_path_drop(struct lv_draw_vg_lite_unit_t * unit, lv_vg_lite_path_t * path)
+void lv_vg_lite_path_drop(struct _lv_draw_vg_lite_unit_t * unit, lv_vg_lite_path_t * path)
 {
     LV_ASSERT_NULL(unit);
     LV_ASSERT_NULL(path);

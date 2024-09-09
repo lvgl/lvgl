@@ -28,7 +28,7 @@ extern "C" {
  * Describe the common methods of every object.
  * Similar to a C++ class.
  */
-struct lv_obj_class_t {
+struct _lv_obj_class_t {
     const lv_obj_class_t * base_class;
     /** class_p is the final class while obj->class_p is the class currently being [de]constructed. */
     void (*constructor_cb)(const lv_obj_class_t * class_p, lv_obj_t * obj);

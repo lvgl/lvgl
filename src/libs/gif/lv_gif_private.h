@@ -31,7 +31,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_gif_t {
+struct _lv_gif_t {
     lv_image_t img;
     gd_GIF * gif;
     lv_timer_t * timer;

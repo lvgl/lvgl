@@ -30,7 +30,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-struct lv_win_t {
+struct _lv_win_t {
     lv_obj_t obj;
 };
 

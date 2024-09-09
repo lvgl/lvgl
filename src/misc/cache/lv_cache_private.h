@@ -34,15 +34,15 @@ typedef enum {
     LV_CACHE_RESERVE_COND_ERROR        /**< An error occurred while checking the condition */
 } lv_cache_reserve_cond_res_t;
 
-struct lv_cache_ops_t;
-struct lv_cache_t;
-struct lv_cache_class_t;
-struct lv_cache_entry_t;
+struct _lv_cache_ops_t;
+struct _lv_cache_t;
+struct _lv_cache_class_t;
+struct _lv_cache_entry_t;
 
-typedef struct lv_cache_ops_t lv_cache_ops_t;
-typedef struct lv_cache_t lv_cache_t;
-typedef struct lv_cache_class_t lv_cache_class_t;
-typedef struct lv_cache_entry_t lv_cache_entry_t;
+typedef struct _lv_cache_ops_t lv_cache_ops_t;
+typedef struct _lv_cache_t lv_cache_t;
+typedef struct _lv_cache_class_t lv_cache_class_t;
+typedef struct _lv_cache_entry_t lv_cache_entry_t;
 
 typedef int8_t lv_cache_compare_res_t;
 typedef bool (*lv_cache_create_cb_t)(void * node, void * user_data);
@@ -116,7 +116,7 @@ typedef lv_iter_t * (*lv_cache_iter_create_cb)(lv_cache_t * cache);
 /**
  * The cache operations struct
  */
-struct lv_cache_ops_t {
+struct _lv_cache_ops_t {
     lv_cache_compare_cb_t compare_cb;    /**< Compare function for keys */
     lv_cache_create_cb_t create_cb;      /**< Create function for nodes */
     lv_cache_free_cb_t free_cb;          /**< Free function for nodes */
@@ -125,7 +125,7 @@ struct lv_cache_ops_t {
 /**
  * The cache entry struct
  */
-struct lv_cache_t {
+struct _lv_cache_t {
     const lv_cache_class_t * clz;     /**< Cache class. There are two built-in classes:
                                        * - lv_cache_class_lru_rb_count for LRU-based cache with count-based eviction policy.
                                        * - lv_cache_class_lru_rb_size for LRU-based cache with size-based eviction policy. */
@@ -135,7 +135,7 @@ struct lv_cache_t {
     uint32_t max_size;                /**< Maximum size of the cache */
     uint32_t size;                    /**< Current size of the cache */
 
-    lv_cache_ops_t ops;               /**< Cache operations struct lv_cache_ops_t */
+    lv_cache_ops_t ops;               /**< Cache operations struct _lv_cache_ops_t */
 
     lv_mutex_t lock;                  /**< Cache lock used to protect the cache in multithreading environments */
 
@@ -149,7 +149,7 @@ struct lv_cache_t {
  * - lv_cache_class_lru_rb_count for LRU-based cache with count-based eviction policy.
  * - lv_cache_class_lru_rb_size for LRU-based cache with size-based eviction policy.
  */
-struct lv_cache_class_t {
+struct _lv_cache_class_t {
     lv_cache_alloc_cb_t alloc_cb;                 /**< The allocation function for cache entries */
     lv_cache_init_cb_t init_cb;                   /**< The initialization function for cache entries */
     lv_cache_destroy_cb_t destroy_cb;             /**< The destruction function for cache entries */
@@ -169,9 +169,9 @@ struct lv_cache_class_t {
  * Cache entry slot
  *----------------*/
 
-struct lv_cache_slot_size_t;
+struct _lv_cache_slot_size_t;
 
-typedef struct lv_cache_slot_size_t lv_cache_slot_size_t;
+typedef struct _lv_cache_slot_size_t lv_cache_slot_size_t;
 
 /**
  * Cache entry slot struct
@@ -179,7 +179,7 @@ typedef struct lv_cache_slot_size_t lv_cache_slot_size_t;
  * To add new fields to the cache entry, add them to a new struct and add it to the first
  * field of the cache data struct.  And this one is a size slot for the cache entry.
  */
-struct lv_cache_slot_size_t {
+struct _lv_cache_slot_size_t {
     size_t size;
 };
 /**********************

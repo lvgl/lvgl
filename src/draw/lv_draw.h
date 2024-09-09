@@ -67,7 +67,7 @@ typedef enum {
     LV_DRAW_TASK_STATE_READY,
 } lv_draw_task_state_t;
 
-struct lv_layer_t  {
+struct _lv_layer_t  {
 
     /** Target draw buffer of the layer*/
     lv_draw_buf_t * draw_buf;

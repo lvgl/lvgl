@@ -30,7 +30,7 @@
  **********************/
 
 typedef void * path_drop_data_t;
-typedef void (*path_drop_func_t)(struct lv_draw_vg_lite_unit_t *, path_drop_data_t);
+typedef void (*path_drop_func_t)(struct _lv_draw_vg_lite_unit_t *, path_drop_data_t);
 
 /**********************
  *  STATIC PROTOTYPES
