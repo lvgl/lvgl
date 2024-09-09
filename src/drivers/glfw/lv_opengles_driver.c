@@ -17,6 +17,9 @@
  *      DEFINES
  *********************/
 
+// #define LV_MAP_0_TO_1(x, in_min, in_max) (LV_CLAMP(0.0f, (x - in_min) / (in_max - in_min), 1.0f))
+#define LV_MAP_0_TO_1(x, in_min, in_max) ((x - in_min) / (in_max - in_min))
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -170,13 +173,16 @@ void lv_opengles_deinit(void)
 }
 
 void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
-                                int32_t disp_h)
+                                int32_t disp_h, const lv_area_t * texture_clip_area)
 {
     GL_CALL(glActiveTexture(GL_TEXTURE0));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
 
-    float hor_scale = (float)lv_area_get_width(texture_area) / (float)disp_w;
-    float ver_scale = (float)lv_area_get_height(texture_area) / (float)disp_h;
+    float tex_w = (float)lv_area_get_width(texture_area);
+    float tex_h = (float)lv_area_get_height(texture_area);
+
+    float hor_scale = tex_w / (float)disp_w;
+    float ver_scale = tex_h / (float)disp_h;
     float hor_translate = (float)texture_area->x1 / (float)disp_w * 2.0f - (1.0f - hor_scale);
     float ver_translate = -((float)texture_area->y1 / (float)disp_h * 2.0f - (1.0f - ver_scale));
     float matrix[9] = {
@@ -184,6 +190,29 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
         0.0f,      ver_scale, ver_translate,
         0.0f,      0.0f,      1.0f
     };
+
+    // float tex_clip_x1 = (float)texture_clip_area->x1 / tex_w;
+    // float tex_clip_x2 = (float)(texture_clip_area->x2 + 1) / tex_w;
+    // float tex_clip_y1 = (float)texture_clip_area->y1 / tex_h;
+    // float tex_clip_y2 = (float)(texture_clip_area->y2 + 1) / tex_h;
+    float tex_clip_x1 = LV_MAP_0_TO_1((float)texture_clip_area->x1, (float)texture_area->x1, (float)texture_area->x2);
+    float tex_clip_x2 = LV_MAP_0_TO_1((float)texture_clip_area->x2, (float)texture_area->x1, (float)texture_area->x2);
+    float tex_clip_y1 = LV_MAP_0_TO_1((float)texture_clip_area->y1, (float)texture_area->y1, (float)texture_area->y2);
+    float tex_clip_y2 = LV_MAP_0_TO_1((float)texture_clip_area->y2, (float)texture_area->y1, (float)texture_area->y2);
+    // float positions[] = {
+    //     -1.0f,  1.0f,  0.0f, 0.0f,
+    //     1.0f,  1.0f,  1.0f, 0.0f,
+    //     1.0f, -1.0f,  1.0f, 1.0f,
+    //     -1.0f, -1.0f,  0.0f, 1.0f
+    // };
+    float positions[] = {
+        -1.0f,  1.0f,  tex_clip_x1, tex_clip_y1,
+        1.0f,  1.0f,  tex_clip_x2, tex_clip_y1,
+        1.0f, -1.0f,  tex_clip_x2, tex_clip_y2,
+        -1.0f, -1.0f,  tex_clip_x1, tex_clip_y2
+    };
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id));
+    GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_DYNAMIC_DRAW));
 
     lv_opengles_shader_bind();
     lv_opengles_shader_set_uniform1i("u_ColorDepth", LV_COLOR_DEPTH);
@@ -217,7 +246,7 @@ static void lv_opengles_vertex_buffer_init(const void * data, unsigned int size)
 {
     GL_CALL(glGenBuffers(1, &vertex_buffer_id));
     GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id));
-    GL_CALL(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
+    GL_CALL(glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW));
 }
 
 static void lv_opengles_vertex_buffer_deinit(void)

@@ -68,7 +68,6 @@ lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h)
         lv_display_delete(disp);
         return NULL;
     }
-    lv_memset(dsc->fb1, 0xff, buf_size);
 
     GL_CALL(glGenTextures(1, &dsc->texture_id));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, dsc->texture_id));
@@ -78,16 +77,17 @@ lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h)
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
     GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
 
-        /*Color depth: 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
+    /* set the dimensions and format to complete the texture */
+    /* Color depth: 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888) */
 #if LV_COLOR_DEPTH == 8
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, disp->hor_res, disp->ver_res, 0, GL_RED, GL_UNSIGNED_BYTE, dsc->fb1));
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, disp->hor_res, disp->ver_res, 0, GL_RED, GL_UNSIGNED_BYTE, NULL));
 #elif LV_COLOR_DEPTH == 16
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp->hor_res, disp->ver_res, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-                             dsc->fb1));
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp->hor_res, disp->ver_res, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
+                         NULL));
 #elif LV_COLOR_DEPTH == 24
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, disp->hor_res, disp->ver_res, 0, GL_BGR, GL_UNSIGNED_BYTE, dsc->fb1));
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, disp->hor_res, disp->ver_res, 0, GL_BGR, GL_UNSIGNED_BYTE, NULL));
 #elif LV_COLOR_DEPTH == 32
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp->hor_res, disp->ver_res, 0, GL_BGRA, GL_UNSIGNED_BYTE, dsc->fb1));
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp->hor_res, disp->ver_res, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL));
 #else
 #error("Unsupported color format")
 #endif

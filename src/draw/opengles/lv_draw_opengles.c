@@ -318,7 +318,6 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
     GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
     GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
 
-    GL_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, 1));
     /*Color depth: 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
 #if LV_COLOR_DEPTH == 8
     GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, texture_w, texture_h, 0, GL_RED, GL_UNSIGNED_BYTE, opengles_render_buf));
@@ -333,8 +332,6 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
 #else
 #error("Unsupported color format")
 #endif
-    GL_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
-
 
     glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -461,8 +458,8 @@ static void draw_from_cached_texture(lv_draw_opengles_unit_t * u)
 
     LV_UNUSED(dest_layer);
 
-    int32_t src_x = 0;
-    int32_t src_y = 0;
+    // int32_t src_x = 0;
+    // int32_t src_y = 0;
 
     // int32_t dst_x = u->base_unit.clip_area->x1;
     // int32_t dst_y = u->base_unit.clip_area->y1;
@@ -470,11 +467,11 @@ static void draw_from_cached_texture(lv_draw_opengles_unit_t * u)
     // int32_t width = lv_area_get_width(u->base_unit.clip_area);
     // int32_t height = lv_area_get_height(u->base_unit.clip_area);
 
-    int32_t dst_x = t->_real_area.x1;
-    int32_t dst_y = t->_real_area.y1;
+    // int32_t dst_x = t->_real_area.x1;
+    // int32_t dst_y = t->_real_area.y1;
 
-    int32_t width = lv_area_get_width(&t->_real_area);
-    int32_t height = lv_area_get_height(&t->_real_area);
+    // int32_t width = lv_area_get_width(&t->_real_area);
+    // int32_t height = lv_area_get_height(&t->_real_area);
 
 
     // lv_area_t a_disp = {0};
@@ -514,28 +511,30 @@ static void draw_from_cached_texture(lv_draw_opengles_unit_t * u)
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, framebuffer_width, framebuffer_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 
-    // Generate RBO
-    unsigned int rbo_gl;
-    GL_CALL(glGenRenderbuffers(1, &rbo_gl));
-    GL_CALL(glBindRenderbuffer(GL_RENDERBUFFER, rbo_gl));
-    GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, lv_display_get_horizontal_resolution(disp), lv_display_get_vertical_resolution(disp)));
+    // // Generate RBO
+    // unsigned int rbo_gl;
+    // GL_CALL(glGenRenderbuffers(1, &rbo_gl));
+    // GL_CALL(glBindRenderbuffer(GL_RENDERBUFFER, rbo_gl));
+    // GL_CALL(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, lv_display_get_horizontal_resolution(disp), lv_display_get_vertical_resolution(disp)));
 
     unsigned int framebuffer_gl;
     GL_CALL(glGenFramebuffers(1, &framebuffer_gl));
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_gl));
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, disp_texture, 0));
-    GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo_gl));
+    // GL_CALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo_gl));
 
     lv_opengles_viewport(0, 0, lv_display_get_horizontal_resolution(disp), lv_display_get_vertical_resolution(disp));
-    lv_area_t render_area = {.x1=dst_x, .y1=dst_y};
-    lv_area_set_width(&render_area, width);
-    lv_area_set_height(&render_area, height);
-    lv_opengles_render_texture(texture, &render_area, 0xff, lv_display_get_horizontal_resolution(disp), lv_display_get_vertical_resolution(disp));
+    lv_area_t clip_area = *u->base_unit.clip_area;
+    lv_area_move(&clip_area, -dest_layer->buf_area.x1, -dest_layer->buf_area.y1);
+    lv_area_t render_area = t->_real_area;
+    lv_area_move(&render_area, -dest_layer->buf_area.x1, -dest_layer->buf_area.y1);
+    lv_opengles_render_texture(texture, &render_area, 0xff, lv_display_get_horizontal_resolution(disp),
+                               lv_display_get_vertical_resolution(disp), &clip_area);
 
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     GL_CALL(glDeleteFramebuffers(1, &framebuffer_gl));
-    GL_CALL(glBindRenderbuffer(GL_RENDERBUFFER, 0));
-    GL_CALL(glDeleteRenderbuffers(1, &rbo_gl));
+    // GL_CALL(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+    // GL_CALL(glDeleteRenderbuffers(1, &rbo_gl));
 
     lv_cache_release(u->texture_cache, entry_cached, u);
 
