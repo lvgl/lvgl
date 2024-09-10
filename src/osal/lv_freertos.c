@@ -163,7 +163,7 @@ lv_result_t lv_mutex_unlock(lv_mutex_t * pxMutex)
     /* If mutex in uninitialized, perform initialization. */
     prvCheckMutexInit(pxMutex);
 
-    BaseType_t xMutexGiveStatus = xSemaphoreGive(pxMutex->xMutex);
+    BaseType_t xMutexGiveStatus = xSemaphoreGiveRecursive(pxMutex->xMutex);
     if(xMutexGiveStatus != pdTRUE) {
         LV_LOG_ERROR("xSemaphoreGive failed!");
         return LV_RESULT_INVALID;
