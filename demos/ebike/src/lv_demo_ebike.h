@@ -20,7 +20,7 @@ extern "C" {
  *********************/
 #define EBIKE_COLOR_TURQUOISE   lv_color_hex(0x55FFEB)
 #define EBIKE_COLOR_LIME        lv_color_hex(0x91FF3B)
-#define EBIKE_PORTRAIT          0    /*0: for 480x270..480x320, 1: for 480x800..720x1280*/
+#define EBIKE_PORTRAIT          1    /*0: for 480x270..480x320, 1: for 480x800..720x1280*/
 
 #if EBIKE_PORTRAIT
 LV_FONT_DECLARE(font_ebike_inter_20);
