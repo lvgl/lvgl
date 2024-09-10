@@ -180,9 +180,7 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
 
     lv_vg_lite_path_end(path);
 
-    vg_lite_matrix_t matrix;
-    vg_lite_identity(&matrix);
-    lv_vg_lite_matrix_multiply(&matrix, &u->global_matrix);
+    vg_lite_matrix_t matrix = u->global_matrix;
 
     vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa, true);
 
