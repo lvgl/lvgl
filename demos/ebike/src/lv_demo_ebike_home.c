@@ -8,6 +8,7 @@
  *********************/
 #include "lv_demo_ebike.h"
 #include "translations/lv_i18n.h"
+#include "../../../src/lvgl_private.h"
 
 /*********************
  *      DEFINES
