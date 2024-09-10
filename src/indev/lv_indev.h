@@ -290,7 +290,7 @@ uint32_t lv_indev_get_key(const lv_indev_t * indev);
  * Get the counter for consecutive clicks within a short distance and time.
  * The counter is updated before LV_EVENT_SHORT_CLICKED is fired.
  * @param indev pointer to an input device
- * @return 0 based short click streak counter
+ * @return short click streak counter
  */
 uint8_t lv_indev_get_short_click_streak(const lv_indev_t * indev);
 

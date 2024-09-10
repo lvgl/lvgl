@@ -1419,12 +1419,12 @@ static lv_result_t indev_proc_short_click(lv_indev_t * indev)
     /*Update streak for clicks within small distance and short time*/
     indev->pointer.short_click_streak++;
     if(lv_tick_elaps(indev->pointer.last_short_click_timestamp) > indev->long_press_time) {
-        indev->pointer.short_click_streak = 0;
+        indev->pointer.short_click_streak = 1;
     }
     else if(indev->type == LV_INDEV_TYPE_POINTER || indev->type == LV_INDEV_TYPE_BUTTON) {
         int32_t dx = indev->pointer.last_short_click_point.x - indev->pointer.act_point.x;
         int32_t dy = indev->pointer.last_short_click_point.y - indev->pointer.act_point.y;
-        if(dx * dx + dy * dy > indev->scroll_limit * indev->scroll_limit) indev->pointer.short_click_streak = 0;
+        if(dx * dx + dy * dy > indev->scroll_limit * indev->scroll_limit) indev->pointer.short_click_streak = 1;
     }
 
     indev->pointer.last_short_click_timestamp = lv_tick_get();
@@ -1437,7 +1437,7 @@ static lv_result_t indev_proc_short_click(lv_indev_t * indev)
     }
 
     /*Cycle through single/double/triple click*/
-    switch(indev->pointer.short_click_streak % 3) {
+    switch((indev->pointer.short_click_streak - 1) % 3) {
         case 0:
             return send_event(LV_EVENT_SINGLE_CLICKED, indev_act);
         case 1:

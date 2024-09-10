@@ -77,7 +77,7 @@ void test_click(void)
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_double_clicked);
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_triple_clicked);
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_long_pressed);
-    TEST_ASSERT_EQUAL_UINT8(0, counts.short_click_streak);
+    TEST_ASSERT_EQUAL_UINT8(1, counts.short_click_streak);
 
     /*Second click nearby.*/
     lv_memzero(&counts, sizeof(counts));
@@ -88,7 +88,7 @@ void test_click(void)
     TEST_ASSERT_EQUAL_UINT32(1, counts.num_double_clicked);
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_triple_clicked);
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_long_pressed);
-    TEST_ASSERT_EQUAL_UINT8(1, counts.short_click_streak);
+    TEST_ASSERT_EQUAL_UINT8(2, counts.short_click_streak);
 
     /*Third click nearby.*/
     lv_memzero(&counts, sizeof(counts));
@@ -99,7 +99,7 @@ void test_click(void)
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_double_clicked);
     TEST_ASSERT_EQUAL_UINT32(1, counts.num_triple_clicked);
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_long_pressed);
-    TEST_ASSERT_EQUAL_UINT8(2, counts.short_click_streak);
+    TEST_ASSERT_EQUAL_UINT8(3, counts.short_click_streak);
 
     /*Fourth click nearby.*/
     lv_memzero(&counts, sizeof(counts));
@@ -110,7 +110,7 @@ void test_click(void)
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_double_clicked);
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_triple_clicked);
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_long_pressed);
-    TEST_ASSERT_EQUAL_UINT8(3, counts.short_click_streak);
+    TEST_ASSERT_EQUAL_UINT8(4, counts.short_click_streak);
 
     /*Resetting the click streak due to distance.*/
     lv_memzero(&counts, sizeof(counts));
@@ -121,7 +121,7 @@ void test_click(void)
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_double_clicked);
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_triple_clicked);
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_long_pressed);
-    TEST_ASSERT_EQUAL_UINT8(0, counts.short_click_streak);
+    TEST_ASSERT_EQUAL_UINT8(1, counts.short_click_streak);
 
     /*Second click nearby.*/
     lv_memzero(&counts, sizeof(counts));
@@ -132,7 +132,7 @@ void test_click(void)
     TEST_ASSERT_EQUAL_UINT32(1, counts.num_double_clicked);
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_triple_clicked);
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_long_pressed);
-    TEST_ASSERT_EQUAL_UINT8(1, counts.short_click_streak);
+    TEST_ASSERT_EQUAL_UINT8(2, counts.short_click_streak);
 
     /*Resetting the click streak due to time.*/
     lv_memzero(&counts, sizeof(counts));
@@ -144,7 +144,7 @@ void test_click(void)
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_double_clicked);
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_triple_clicked);
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_long_pressed);
-    TEST_ASSERT_EQUAL_UINT8(0, counts.short_click_streak);
+    TEST_ASSERT_EQUAL_UINT8(1, counts.short_click_streak);
 
     /*Long press does not continue (or start) click streak.*/
     lv_memzero(&counts, sizeof(counts));
@@ -158,7 +158,7 @@ void test_click(void)
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_double_clicked);
     TEST_ASSERT_EQUAL_UINT32(0, counts.num_triple_clicked);
     TEST_ASSERT_EQUAL_UINT32(1, counts.num_long_pressed);
-    TEST_ASSERT_EQUAL_UINT8(0, counts.short_click_streak);
+    TEST_ASSERT_EQUAL_UINT8(1, counts.short_click_streak);
 }
 
 #endif
