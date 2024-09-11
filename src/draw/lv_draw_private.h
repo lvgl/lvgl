@@ -175,7 +175,7 @@ typedef struct {
 #if LV_USE_OS
     lv_thread_sync_t sync;
 #else
-    int dispatch_req;
+    volatile int dispatch_req;
 #endif
     lv_mutex_t circle_cache_mutex;
     bool task_running;

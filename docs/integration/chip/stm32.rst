@@ -264,3 +264,23 @@ variables:
       * Inform the graphics library that you are ready with the flushing*/
      lv_display_flush_ready(display);
    }
+
+DMA2D Support
+-------------
+
+LVGL supports DMA2D - a feature of some STM32 MCUs which can improve performance
+when blending fills and images. Some STM32 product lines such as STM32F4 STM32F7, STM32L4,
+STM32U5, and STM32H7 include models with DMA2D support.
+
+LVGL's integration with DMA2D can be enabled by setting ``LV_USE_DRAW_DMA2D``
+to ``1`` in ``lv_conf.h``
+
+With ``LV_USE_DRAW_DMA2D_INTERRUPT`` set to ``0`` and ``LV_USE_OS`` set to ``LV_OS_NONE``,
+DMA2D will draw some fills and images concurrently with the software render where
+possible. If ``LV_USE_DRAW_DMA2D_INTERRUPT`` is set to ``1`` and ``LV_USE_OS`` set to
+``LV_OS_FREERTOS`` (or another OS) the main difference will be that the core will idle
+instead of "busywait" while waiting for a DMA2D transfer to complete.
+
+If ``LV_USE_DRAW_DMA2D_INTERRUPT`` is enabled then you are required to call
+:cpp:expr:`lv_draw_dma2d_transfer_complete_interrupt_handler` whenever the DMA2D
+"transfer complete" global interrupt is received.

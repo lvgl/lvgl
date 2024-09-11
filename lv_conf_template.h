@@ -264,6 +264,18 @@
     #define LV_VG_LITE_STROKE_CACHE_CNT 32
 #endif
 
+/* Accelerate blends, fills, etc. with STM32 DMA2D */
+#define LV_USE_DRAW_DMA2D 0
+
+#if LV_USE_DRAW_DMA2D
+    #define LV_DRAW_DMA2D_HAL_INCLUDE "stm32h7xx_hal.h"
+
+    /* if enabled, the user is required to call `lv_draw_dma2d_transfer_complete_interrupt_handler`
+     * upon receiving the DMA2D global interrupt
+     */
+    #define LV_USE_DRAW_DMA2D_INTERRUPT 0
+#endif
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
