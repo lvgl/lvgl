@@ -53,7 +53,7 @@ void lv_opengles_deinit(void);
  * @param disp_h         height of the window being rendered to
  */
 void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
-                                int32_t disp_h, const lv_area_t * texture_clip_area);
+                                int32_t disp_h, const lv_area_t * texture_clip_area, bool flip);
 
 /**
  * Clear the window/display

@@ -529,7 +529,7 @@ static void draw_from_cached_texture(lv_draw_opengles_unit_t * u)
     lv_area_t render_area = t->_real_area;
     lv_area_move(&render_area, -dest_layer->buf_area.x1, -dest_layer->buf_area.y1);
     lv_opengles_render_texture(texture, &render_area, 0xff, lv_display_get_horizontal_resolution(disp),
-                               lv_display_get_vertical_resolution(disp), &clip_area);
+                               lv_display_get_vertical_resolution(disp), &clip_area, true);
 
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     GL_CALL(glDeleteFramebuffers(1, &framebuffer_gl));

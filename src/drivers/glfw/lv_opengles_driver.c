@@ -18,8 +18,7 @@
  *      DEFINES
  *********************/
 
-// #define LV_MAP_0_TO_1(x, in_min, in_max) (LV_CLAMP(0.0f, (x - in_min) / (in_max - in_min), 1.0f))
-#define LV_MAP_0_TO_1(x, in_min, in_max) ((x - in_min) / (in_max - in_min))
+#define LV_MAP_0_TO_1(x, in_min, in_max) (LV_CLAMP(0.0f, (x - in_min) / (in_max - in_min), 1.0f))
 
 /**********************
  *      TYPEDEFS
@@ -131,10 +130,10 @@ void lv_opengles_init(void)
     lv_opengles_enable_blending();
 
     float positions[] = {
-        -1.0f,  1.0f,  0.0f, 0.0f,
-        1.0f,  1.0f,  1.0f, 0.0f,
-        1.0f, -1.0f,  1.0f, 1.0f,
-        -1.0f, -1.0f,  0.0f, 1.0f
+        -1.0f,  1.0f,  0.0f, 1.0f,
+        1.0f,  1.0f,  1.0f, 1.0f,
+        1.0f, -1.0f,  1.0f, 0.0f,
+        -1.0f, -1.0f,  0.0f, 0.0f
     };
 
     unsigned int indices[] = {
@@ -174,13 +173,13 @@ void lv_opengles_deinit(void)
 }
 
 void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
-                                int32_t disp_h, const lv_area_t * texture_clip_area)
+                                int32_t disp_h, const lv_area_t * texture_clip_area, bool flip)
 {
+    lv_area_t intersection;
+    if(!lv_area_intersect(&intersection, texture_area, texture_clip_area)) return;
+
     GL_CALL(glActiveTexture(GL_TEXTURE0));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
-
-    lv_area_t intersection;
-    lv_area_intersect(&intersection, texture_area, texture_clip_area);
 
     float tex_w = (float)lv_area_get_width(&intersection);
     float tex_h = (float)lv_area_get_height(&intersection);
@@ -189,6 +188,7 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
     float ver_scale = tex_h / (float)disp_h;
     float hor_translate = (float)intersection.x1 / (float)disp_w * 2.0f - (1.0f - hor_scale);
     float ver_translate = -((float)intersection.y1 / (float)disp_h * 2.0f - (1.0f - ver_scale));
+    if(flip) ver_scale = -ver_scale;
     float matrix[9] = {
         hor_scale, 0.0f,      hor_translate,
         0.0f,      ver_scale, ver_translate,
@@ -210,10 +210,10 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
     //     -1.0f, -1.0f,  0.0f, 1.0f
     // };
     float positions[] = {
-        -1.0f,  1.0f,  tex_clip_x1, tex_clip_y1,
-        1.0f,  1.0f,  tex_clip_x2, tex_clip_y1,
-        1.0f, -1.0f,  tex_clip_x2, tex_clip_y2,
-        -1.0f, -1.0f,  tex_clip_x1, tex_clip_y2
+        -1.0f,  1.0f,  tex_clip_x1, tex_clip_y2,
+        1.0f,  1.0f,  tex_clip_x2, tex_clip_y2,
+        1.0f, -1.0f,  tex_clip_x2, tex_clip_y1,
+        -1.0f, -1.0f,  tex_clip_x1, tex_clip_y1
     };
     GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id));
     GL_CALL(glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_DYNAMIC_DRAW));

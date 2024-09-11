@@ -303,7 +303,7 @@ static void window_update_handler(lv_timer_t * t)
             lv_area_t clip_area = texture->area;
             lv_area_move(&clip_area, -texture->area.x1, -texture->area.y1);
             lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                       &clip_area);
+                                       &clip_area, false);
         }
 
         /* Swap front and back buffers */
