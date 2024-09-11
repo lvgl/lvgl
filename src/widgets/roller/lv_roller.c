@@ -158,13 +158,19 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
         LV_LOG_INFO("Using %" LV_PRIu32 " pages to make the roller look infinite", roller->inf_page_cnt);
 
         size_t opt_len = lv_strlen(options) + 1; /*+1 to add '\n' after option lists*/
-        char * opt_extra = lv_malloc(opt_len * roller->inf_page_cnt);
+        size_t opt_extra_len = opt_len * roller->inf_page_cnt;
+        if(opt_extra_len == 0) {
+            /*Prevent write overflow*/
+            opt_extra_len = 1;
+        }
+
+        char * opt_extra = lv_malloc(opt_extra_len);
         uint32_t i;
         for(i = 0; i < roller->inf_page_cnt; i++) {
             lv_strcpy(&opt_extra[opt_len * i], options);
             opt_extra[opt_len * (i + 1) - 1] = '\n';
         }
-        opt_extra[opt_len * roller->inf_page_cnt - 1] = '\0';
+        opt_extra[opt_extra_len - 1] = '\0';
         lv_label_set_text(label, opt_extra);
         lv_free(opt_extra);
 
