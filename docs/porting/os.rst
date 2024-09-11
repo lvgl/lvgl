@@ -23,6 +23,7 @@ you can use LVGL in a real multitasking environment. Just make use of a
 mutex to avoid the concurrent calling of LVGL functions.
 
 LVGL has a built-in mutex which can be used with:
+
 - :cpp:func:`lv_lock()` and :cpp:func:`lv_lock_isr()`
 - :cpp:func:`lv_unlock()`
 
