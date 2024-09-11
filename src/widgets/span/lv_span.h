@@ -232,6 +232,7 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width);
  * Get the span's coords in the spangroup.
  * @note Before calling this function, please make sure that the layout of span group has been updated.
  * Like calling lv_obj_update_layout() like function.
+ *
  *     +--------+
  *     |Heading +--->------------------+
  *     |  Pos   |   |     Heading      |
