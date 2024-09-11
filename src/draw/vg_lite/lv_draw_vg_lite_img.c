@@ -98,8 +98,14 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
     bool has_pre_mul = lv_draw_buf_has_flag(decoder_dsc.decoded, LV_IMAGE_FLAGS_PREMULTIPLIED);
     vg_lite_blend_t blend = lv_vg_lite_blend_mode(dsc->blend_mode, has_pre_mul);
 
+    /* original image matrix */
+    vg_lite_matrix_t image_matrix;
+    vg_lite_identity(&image_matrix);
+    lv_vg_lite_image_matrix(&image_matrix, coords->x1, coords->y1, dsc);
+
+    /* image drawing matrix */
     vg_lite_matrix_t matrix = u->global_matrix;
-    lv_vg_lite_image_matrix(&matrix, coords->x1, coords->y1, dsc);
+    lv_vg_lite_matrix_multiply(&matrix, &image_matrix);
 
     LV_VG_LITE_ASSERT_SRC_BUFFER(&src_buf);
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
@@ -132,9 +138,13 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
     else {
         lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
 
-        if(dsc->clip_radius) {
+        /**
+         * When the image is transformed or rounded, create a path around
+         * the image and follow the image_matrix for coordinate transformation
+         */
+        if(!no_transform || dsc->clip_radius) {
             /* apply the image transform to the path */
-            lv_vg_lite_path_set_transform(path, &matrix);
+            lv_vg_lite_path_set_transform(path, &image_matrix);
             lv_vg_lite_path_append_rect(
                 path,
                 0, 0,
