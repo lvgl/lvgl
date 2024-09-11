@@ -16,7 +16,7 @@ Naming conventions
 -  In variable and function names use only lower case letters
    (e.g. *height_tmp*)
 -  In enums and defines use only upper case letters
-   (e.g. *e.g. MAX_LINE_NUM*)
+   (e.g. *MAX_LINE_NUM*)
 -  Global names (API):
 
    -  start with *lv*
@@ -49,11 +49,16 @@ Naming conventions
 
 Coding guide
 ------------
+-  Editor:
+
+   -  Set editor to use 4 spaces for tab indentations (instead of tab characters).
+   -  Exception:  the **Kconfig** file and any make files require leading tab characters
+      on child items.
 
 -  Functions:
 
-   -  Write function with single responsibility
-   -  Make the functions ``static`` where possible
+   -  Write function with single responsibility.
+   -  Make the functions ``static`` where possible.
 
 -  Variables:
 
@@ -62,37 +67,188 @@ Coding guide
    -  Declare variables where needed (not all at function start)
    -  Use the smallest required scope
    -  Variables in a file (outside functions) are always *static*
-   -  Do not use global variables (use functions to set/get static
-      variables)
+   -  Do not use global variables (use functions to set/get static variables)
 
 Comments
 --------
+Before every function prototype in ``.h`` files, include a Doxygen-formatted comment
+like this:
 
-Before every function have in ``.h`` files a comment like this:
+.. code-block:: c
 
-.. code:: c
+    /**
+     * Brief description.  Add a blank line + additional paragraphs when more detail is needed.
+     * @param  parent     brief description of argument.  Additional detail can appear
+     *                    on subsequent lines.  List of accepted values:
+     *                    - value one
+     *                    - value two
+     *                    - value three
+     * @return   brief description of return value.
+     */
+    type_name_t * lv_function_name(lv_obj_t * parent);
 
-   /**
-    * Return with the screen of an object
-    * @param obj pointer to an object
-    * @return pointer to a screen
-    */
-   lv_obj_t * lv_obj_get_screen(lv_obj_t * obj);
+The normal comment prefix ``/**`` causes the comment to document the code member
+coming *after* the comment.  When documenting a code member that is *before* the
+comment, such as a struct member, use ``/**<`` like this:
 
-Always use ``/*Something*/`` format and NOT ``//Something``
+.. code-block:: c
 
-Write readable code to avoid descriptive comments like:
-``x++; /*Add 1 to x*/``. The code should show clearly what you are
-doing.
+    /**
+     * Brief description of struct
+     *
+     * When more detail is needed, add a blank line then the detail.
+     */
+    typedef struct {
+        char      *text;    /**< Brief description of this member */
+        uint16_t   length;  /**< Brief description of this member */
+    } lv_example_type_t;
 
-You should write **why** have you done this:
-``x++; /*Because of closing '\0' of the string*/``
+-  When commenting code, use block comments like this ``/* Description */``,
+   not end-of-line comments like this ``// Description``.
 
-Short "code summaries" of a few lines are accepted. E.g.
-``/*Calculate the new coordinates*/``
+-  Include a space after the ``/*`` or ``/**<`` and before the ``*/`` for improved readability.
 
-In comments use \` \` when referring to a variable. E.g.
-:literal:`/\*Update the value of \`x_act`*/`
+-  Write readable code to avoid descriptive comments like:  ``x++; /* Add 1 to x */``.
+
+-  The code should show clearly what you are doing.
+
+-  You should write **why** you did it:  ``x++;  /* Point to closing '\0' of string */``
+
+-  Short "code summaries" of a few lines are accepted: ``/* Calculate new coordinates */``
+
+-  In comments use back-quotes (\`...\`) when referring to a code element, such as a variable, type,
+   or struct name: ``/* Update value of `x_act` */``
+
+-  When adding or modifying comments, priorities are (in order of importance):
+
+       1.  clarity (the ease with which other programmers can understand your intention),
+       2.  readability (the ease with which other programmers can read your comments),
+       3.  brevity (the quality of using few words when speaking or writing).
+
+-  Blank lines within comments are desirable when they improve clarity and readability.
+
+-  Remember, when you are writing source code, you are not just teaching the computer
+   what to do, but also teaching other programmers how it works, not only users of the
+   API, but also future maintainers of your source code.  Comments add information
+   about what you were thinking when the code was written, and **why** you did things
+   that way---information that cannot be conveyed by the source code alone.
+
+
+Doxygen Comment Specifics
+~~~~~~~~~~~~~~~~~~~~~~~~~
+Doxygen is the first program in a chain that generates the online LVGL API
+documentation from the files in the LVGL repository.  Doxygen detects files it should
+pay attention to by them having a ``@file`` command inside a Doxygen comment.  Doxygen
+comments begin with a leading ``/**``.  It ignores comments that do not have exactly
+two ``*``.
+
+The following is an illustration of an API function prototype with documentation
+illustrating most of the Doxygen commands used in LVGL.
+
+.. code-block:: c
+
+    /**
+     * Set alignment of objects placed in containers with LV_STYLE_FLEX_FLOW style.
+     *
+     * The values for the `..._place` arguments come from the `lv_flex_align_t`
+     * enumeration and have the same meanings as they do for flex containers in CSS.
+     * @param  obj                   pointer to flex container.  It must have
+     *                               `LV_STYLE_FLEX_FLOW` style or nothing will happen.
+     * @param  main_place            where to place items on main axis (in their track).
+     *                               (Any value of `lv_flex_align_t`.)
+     * @param  cross_place           where to place item in track on cross axis.
+     *                               - `LV_FLEX_ALIGN_START`
+     *                               - `LV_FLEX_ALIGN_END`
+     *                               - `LV_FLEX_ALIGN_CENTER`
+     * @param  track_cross_place     where to place tracks in cross direction.
+     *                               (Any value of `lv_flex_align_t`.)
+     * Example for a title bar layout:
+     * @code{.c}
+     *     lv_obj_set_flex_align(title_bar, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+     * @endcode
+     * @see
+     *     - https://css-tricks.com/snippets/css/a-guide-to-flexbox/
+     *     - see  `lv_obj_set_flex_grow()` for additional information.
+     */
+    void lv_obj_set_flex_align(lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_align_t cross_place,
+                               lv_flex_align_t track_cross_place);
+
+
+- Always start Doxygen comment with a breif description of the code element it documents.
+
+- When more detail is needed, add a blank line below the brief description and add
+  additional information that may be needed by LVGL API users, including preconditions
+  for calling the function.  Doxygen needs the blank line to separate "brief" from
+  "detail" portions of the description.
+
+- Describe function parameters with the ``@param`` command.  When a function writes
+  to the address contained by a pointer parameter, if not already obvious (e.g. when
+  the parameter name contains the word "out"), include the direction in the command
+  for clarity:
+
+      ``@param[out]  param_name     description``.
+
+- Describe return values with the ``@return`` command.
+
+- Add at least 2 spaces after Doxygen commands for improved readability.
+
+- Use back-quotes (\`...\`) around code elements (variables, type names, function names).  For type
+  names and function names, Doxygen generates a hyperlink to that code member's
+  documentation (when it exists) with or without the single back-quotes.
+
+- Append empty "()" to function names.  Doxygen will not generate a hyperlink to the
+  function's documentation without this.
+
+- Use proper grammar for clarity.  Descriptions of parameters do not need periods
+  after them unless they are full sentences.
+
+- Align edges of text around lists of parameters for ease of reading.
+
+- Lists (e.g. of accepted parameter values) can be created by using the '-' character.
+  If the list needs to be numbered, numbers can also be used.
+
+- Place example code in a code block by surrounding it with ``@code{.c}`` and ``@endcode`` commands.
+
+- Refer reader to additional information using the ``@see`` command.  Doxygen adds a
+  "See also" paragraph.  The text following the ``@see`` command will be indented.
+
+- If you create a new pair of ``.c`` and ``.h`` files (e.g. for a new driver), ensure
+  a Doxygen comment like this is at the top of each new file.  Doxygen will not parse
+  the file without the ``@file`` command being present.
+
+.. code-block:: c
+
+      /**
+       * @file filename.c
+       *
+       */
+
+
+Supported Doxygen Commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+-  ``@file``
+   tells Doxygen to parse this file and also supplies documentation about
+   the file itself when applicable (everything following it in the same comment).
+-  ``@param  name  description``
+   documents ``name`` as a function parameter, and ``description`` is the text that
+   follows it until Doxygen encounters a blank line or another Doxygen command.
+-  ``@return  description``
+   documents the return value until Doxygen encounters a blank line or another Doxygen command.
+-  ``@code{.c}/@endcode``
+   surrounds code that should be placed in a code block.  While Doxygen knows to use C
+   color-coding of code blocks in a .C file, the downstream part of the documentation
+   generation sequence does not, so the ``{.c}`` appendage to the ``@code`` command
+   is necessary.
+-  ``@note  text``
+   starts a paragraph where a note can be entered.  The note ends with a blank line,
+   the end of the comment, or another Doxygen command that starts a new section.
+   If the note contains more than one paragraph, additional paragraphs can be added
+   by using additional ``@note`` commands.  At this writing, ``@par`` commands do not
+   add additional paragraphs to notes as indicated in the Doxygen documentation.
+-  ``@see  text``
+   generates a "See also" pagraph in a highlighted section, helpful when additional
+   information about a topic can be found elsewhere.
+
 
 
 API Conventions
@@ -131,32 +287,32 @@ Formatting
 
 Here is example to show bracket placing and using of white spaces:
 
-.. code:: c
+.. code-block:: c
 
    /**
-    * Set a new text for a label. Memory will be allocated to store the text by the label.
-    * @param label pointer to a label object
-    * @param text '\0' terminated character string. NULL to refresh with the current text.
+    * Set new text for a label.  Memory will be allocated by label to store text.
+    *
+    * @param  label  pointer to label object
+    * @param  text   '\0' terminated character string.
+    *                NULL to refresh with current text.
     */
    void lv_label_set_text(lv_obj_t * label, const char * text)
-   {   /*Main brackets of functions in new line*/
+   {   /* Main brackets of functions in new line */
 
-       if(label == NULL) return; /*No bracket only if the command is inline with the if statement*/
+       if(label == NULL) return; /* No bracket only if command is inline with if statement */
 
        lv_obj_inv(label);
 
        lv_label_ext_t * ext = lv_obj_get_ext(label);
 
        /*Comment before a section*/
-       if(text == ext->txt || text == NULL) {  /*Bracket of statements start inline*/
+       if(text == ext->txt || text == NULL) {  /* Bracket of statements starts on same line */
            lv_label_refr_text(label);
            return;
        }
 
        ...
    }
-
-Use 4 spaces indentation instead of tab.
 
 You can use **astyle** to format the code. Run ``code-format.py`` from
 the ``scripts`` folder.
@@ -173,7 +329,7 @@ Once you have ``pre-commit`` installed you will need to `set up the git
 hook scripts <https://pre-commit.com/#3-install-the-git-hook-scripts>`__
 with:
 
-.. code:: console
+.. code-block:: console
 
    pre-commit install
 
@@ -196,14 +352,14 @@ Skipping hooks
 
 If you want to skip any particular hook you can do so with:
 
-.. code:: console
+.. code-block:: console
 
    SKIP=name-of-the-hook git commit
 
 Testing hooks
 -------------
 
-It's no necessary to do a commit to test the hooks, you can test hooks
+It is not necessary to do a commit to test the hooks, you can test hooks
 by adding the files into the staging area and run:
 
 .. code:: console
