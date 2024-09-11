@@ -61,7 +61,7 @@ lv_display_t * lv_opengles_texture_create(int32_t w, int32_t h)
         return NULL;
     }
     uint32_t stride = lv_draw_buf_width_to_stride(w, lv_display_get_color_format(disp));
-    uint32_t buf_size = stride * w;
+    uint32_t buf_size = stride * h;
     dsc->fb1 = malloc(buf_size);
     if(dsc->fb1 == NULL) {
         lv_free(dsc);
