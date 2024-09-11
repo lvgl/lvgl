@@ -162,6 +162,15 @@ menu "LVGL configuration"
 			string "Custom OS include header"
 			default "stdint.h"
 			depends on LV_OS_CUSTOM
+
+        config LV_USE_FREERTOS_TASK_NOTIFY
+            bool "Use RTOS task with a direct notification for synchronization"
+            default y
+            depends on LV_OS_FREERTOS
+        help
+            Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
+            than unblocking a task using an intermediary object such as a binary semaphore.
+            RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
 	endmenu
 
 	menu "Rendering Configuration"
