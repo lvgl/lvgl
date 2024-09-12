@@ -41,6 +41,13 @@ typedef enum {
     LV_SPAN_MODE_LAST       /**< Fence member */
 } lv_span_mode_t;
 
+/** Coords of a span */
+typedef struct _lv_span_coords_t {
+    lv_area_t heading;
+    lv_area_t middle;
+    lv_area_t trailing;
+} lv_span_coords_t;
+
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_spangroup_class;
 
 /**********************
@@ -137,6 +144,13 @@ void lv_spangroup_set_max_lines(lv_obj_t * obj, int32_t lines);
 lv_style_t * lv_span_get_style(lv_span_t * span);
 
 /**
+ * Get a pointer to the text of a span
+ * @param span  pointer to the span
+ * @return      pointer to the text
+*/
+const char * lv_span_get_text(lv_span_t * span);
+
+/**
  * Get a spangroup child by its index.
  *
  * @param obj   The spangroup object
@@ -213,6 +227,39 @@ uint32_t lv_spangroup_get_expand_width(lv_obj_t * obj, uint32_t max_width);
 
  */
 int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width);
+
+/**
+ * Get the span's coords in the spangroup.
+ * @note Before calling this function, please make sure that the layout of span group has been updated.
+ * Like calling lv_obj_update_layout() like function.
+ *
+ *     +--------+
+ *     |Heading +--->------------------+
+ *     |  Pos   |   |     Heading      |
+ *     +--------+---+------------------+
+ *     |                               |
+ *     |                               |
+ *     |                               |
+ *     |            Middle   +--------+|
+ *     |                     |Trailing||
+ *     |                   +-|  Pos   ||
+ *     |                   | +--------+|
+ *     +-------------------v-----------+
+ *     |     Trailing      |
+ *     +-------------------+
+ * @param obj       pointer to a spangroup object.
+ * @param span      pointer to a span.
+ * @return the span's coords in the spangroup.
+ */
+lv_span_coords_t lv_spangroup_get_span_coords(lv_obj_t * obj, const lv_span_t * span);
+
+/**
+ * Get the span object by point.
+ * @param obj       pointer to a spangroup object.
+ * @param point     pointer to point containing absolute coordinates
+ * @return          pointer to the span under the point or `NULL` if not found.
+ */
+lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * point);
 
 /*=====================
  * Other functions

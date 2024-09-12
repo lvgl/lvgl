@@ -375,4 +375,108 @@ void test_spangroup_style_text_letter_space(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_08.png");
 }
 
+#if LV_FONT_MONTSERRAT_24 && LV_FONT_MONTSERRAT_20
+void test_spangroup_get_span_coords(void)
+{
+    /* Initialize the active screen and create a new span group */
+    active_screen = lv_screen_active();
+    spangroup = lv_spangroup_create(active_screen);
+
+    const uint32_t span_count = 5;
+    lv_span_t * spans[span_count];
+
+    /* Set styles and properties for the span group */
+    lv_obj_set_style_outline_width(spangroup, 1, 0);
+    lv_spangroup_set_indent(spangroup, 20);
+    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
+    lv_obj_set_width(spangroup, 300);
+    lv_obj_set_style_pad_all(spangroup, 20, LV_PART_MAIN);
+
+    /* Create spans and set their properties */
+    spans[0] = lv_spangroup_new_span(spangroup);
+    lv_span_set_text(spans[0], "China is a beautiful country.");
+    lv_style_set_text_color(lv_span_get_style(spans[0]), lv_palette_main(LV_PALETTE_RED));
+    lv_style_set_text_decor(lv_span_get_style(spans[0]), LV_TEXT_DECOR_UNDERLINE);
+    lv_style_set_text_opa(lv_span_get_style(spans[0]), LV_OPA_50);
+
+    spans[1] = lv_spangroup_new_span(spangroup);
+    lv_span_set_text_static(spans[1], "good good study, day day up.");
+    lv_style_set_text_font(lv_span_get_style(spans[1]), &lv_font_montserrat_24);
+    lv_style_set_text_color(lv_span_get_style(spans[1]), lv_palette_main(LV_PALETTE_GREEN));
+
+    spans[2] = lv_spangroup_new_span(spangroup);
+    lv_span_set_text_static(spans[2], "LVGL is an open-source graphics library.");
+    lv_style_set_text_color(lv_span_get_style(spans[2]), lv_palette_main(LV_PALETTE_BLUE));
+
+    spans[3] = lv_spangroup_new_span(spangroup);
+    lv_span_set_text_static(spans[3], "the boy no name.");
+    lv_style_set_text_color(lv_span_get_style(spans[3]), lv_palette_main(LV_PALETTE_GREEN));
+    lv_style_set_text_font(lv_span_get_style(spans[3]), &lv_font_montserrat_20);
+    lv_style_set_text_decor(lv_span_get_style(spans[3]), LV_TEXT_DECOR_UNDERLINE);
+
+    spans[4] = lv_spangroup_new_span(spangroup);
+    lv_span_set_text(spans[4], "I have a dream that hope to come true.");
+    lv_style_set_text_decor(lv_span_get_style(spans[4]), LV_TEXT_DECOR_STRIKETHROUGH);
+
+    /* Refresh the span group mode and update layout */
+    lv_spangroup_refr_mode(spangroup);
+    lv_obj_update_layout(spangroup);
+
+    /* Define expected coordinates for testing */
+    const lv_span_coords_t test_coords[] = {
+        {.heading = {.x1 = 40, .y1 = 20, .x2 = 280, .y2 = 20}, .middle = {.x1 = 40, .y1 = 20, .x2 = 241, .y2 = 36}, .trailing = {.x1 = 0, .y1 = 0, .x2 = 0, .y2 = 0}},
+        {.heading = {.x1 = 241, .y1 = 20, .x2 = 280, .y2 = 36}, .middle = {.x1 = 20, .y1 = 36, .x2 = 280, .y2 = 63}, .trailing = {.x1 = 20, .y1 = 63, .x2 = 155, .y2 = 90}},
+        {.heading = {.x1 = 155, .y1 = 63, .x2 = 280, .y2 = 90}, .middle = {.x1 = 20, .y1 = 90, .x2 = 280, .y2 = 90}, .trailing = {.x1 = 20, .y1 = 90, .x2 = 188, .y2 = 112}},
+        {.heading = {.x1 = 188, .y1 = 90, .x2 = 280, .y2 = 112}, .middle = {.x1 = 20, .y1 = 112, .x2 = 280, .y2 = 112}, .trailing = {.x1 = 20, .y1 = 112, .x2 = 116, .y2 = 134}},
+        {.heading = {.x1 = 116, .y1 = 112, .x2 = 280, .y2 = 134}, .middle = {.x1 = 20, .y1 = 134, .x2 = 280, .y2 = 134}, .trailing = {.x1 = 20, .y1 = 134, .x2 = 160, .y2 = 150}}
+    };
+
+    /* Define colors for visual testing */
+    const lv_color_t colors[] = {
+        lv_palette_main(LV_PALETTE_RED), lv_palette_main(LV_PALETTE_GREEN), lv_palette_main(LV_PALETTE_BLUE),
+        lv_palette_main(LV_PALETTE_YELLOW), lv_palette_main(LV_PALETTE_PURPLE), lv_palette_main(LV_PALETTE_ORANGE),
+        lv_palette_main(LV_PALETTE_INDIGO), lv_palette_main(LV_PALETTE_BROWN), lv_palette_main(LV_PALETTE_GREY),
+        lv_palette_main(LV_PALETTE_PINK)
+    };
+    const uint32_t color_count = sizeof(colors) / sizeof(colors[0]);
+    const lv_area_t area = spangroup->coords;
+
+    /* Iterate through spans and validate coordinates */
+    for(uint32_t i = 0; i < span_count; i++) {
+        lv_span_coords_t coords = lv_spangroup_get_span_coords(spangroup, spans[i]);
+        TEST_ASSERT_EQUAL_MEMORY(&coords.heading, &test_coords[i].heading, sizeof(lv_span_coords_t));
+
+        /* Visual testing */
+        const lv_color_t color = colors[i % color_count];
+
+        /* Create and style heading object */
+        lv_obj_t * obj_head = lv_obj_create(active_screen);
+        lv_obj_remove_style_all(obj_head);
+        lv_obj_set_pos(obj_head, coords.heading.x1 + area.x1, coords.heading.y1 + area.y1);
+        lv_obj_set_size(obj_head, coords.heading.x2 - coords.heading.x1, coords.heading.y2 - coords.heading.y1);
+        lv_obj_set_style_bg_color(obj_head, color, LV_PART_MAIN);
+        lv_obj_set_style_bg_opa(obj_head, LV_OPA_50, LV_PART_MAIN);
+
+        /* Create and style middle object */
+        lv_obj_t * obj_middle = lv_obj_create(active_screen);
+        lv_obj_remove_style_all(obj_middle);
+        lv_obj_set_pos(obj_middle, coords.middle.x1 + area.x1, coords.middle.y1 + area.y1);
+        lv_obj_set_size(obj_middle, coords.middle.x2 - coords.middle.x1, coords.middle.y2 - coords.middle.y1);
+        lv_obj_set_style_bg_color(obj_middle, color, LV_PART_MAIN);
+        lv_obj_set_style_bg_opa(obj_middle, LV_OPA_50, LV_PART_MAIN);
+
+        /* Create and style trailing object */
+        lv_obj_t * obj_trailing = lv_obj_create(active_screen);
+        lv_obj_remove_style_all(obj_trailing);
+        lv_obj_set_pos(obj_trailing, coords.trailing.x1 + area.x1, coords.trailing.y1 + area.y1);
+        lv_obj_set_size(obj_trailing, coords.trailing.x2 - coords.trailing.x1, coords.trailing.y2 - coords.trailing.y1);
+        lv_obj_set_style_bg_color(obj_trailing, color, LV_PART_MAIN);
+        lv_obj_set_style_bg_opa(obj_trailing, LV_OPA_50, LV_PART_MAIN);
+    }
+
+    /* Validate the final screenshot */
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_09.png");
+}
+#endif
+
 #endif
