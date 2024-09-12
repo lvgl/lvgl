@@ -15,7 +15,7 @@ static void event_cb(lv_event_t * e)
 /**
  * Add click event to a button
  */
-void lv_example_event_1(void)
+void lv_example_event_click(void)
 {
     lv_obj_t * btn = lv_button_create(lv_screen_active());
     lv_obj_set_size(btn, 100, 50);

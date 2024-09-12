@@ -285,6 +285,15 @@ lv_dir_t lv_indev_get_gesture_dir(const lv_indev_t * indev);
  */
 uint32_t lv_indev_get_key(const lv_indev_t * indev);
 
+
+/**
+ * Get the counter for consecutive clicks within a short distance and time.
+ * The counter is updated before LV_EVENT_SHORT_CLICKED is fired.
+ * @param indev pointer to an input device
+ * @return short click streak counter
+ */
+uint8_t lv_indev_get_short_click_streak(const lv_indev_t * indev);
+
 /**
  * Check the current scroll direction of an input device (for LV_INDEV_TYPE_POINTER and
  * LV_INDEV_TYPE_BUTTON)
