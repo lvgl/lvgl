@@ -1203,11 +1203,6 @@ static void indev_proc_press(lv_indev_t * indev)
 
             lv_obj_send_event(last_obj, LV_EVENT_PRESS_LOST, indev_act);
             if(indev_reset_check(indev)) return;
-
-            /*Do nothing until release and a new press*/
-            lv_indev_reset(indev, NULL);
-            lv_indev_wait_release(indev);
-            return;
         }
 
         indev->pointer.act_obj  = indev_obj_act; /*Save the pressed object*/
