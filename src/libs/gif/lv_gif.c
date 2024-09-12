@@ -137,6 +137,13 @@ void lv_gif_resume(lv_obj_t * obj)
     lv_timer_resume(gifobj->timer);
 }
 
+bool lv_gif_is_loaded(lv_obj_t * obj)
+{
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
+
+    return (gifobj->gif != NULL);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

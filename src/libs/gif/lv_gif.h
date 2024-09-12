@@ -72,6 +72,12 @@ void lv_gif_pause(lv_obj_t * obj);
  */
 void lv_gif_resume(lv_obj_t * obj);
 
+/**
+ * Checks if the GIF was loaded correctly.
+ * @param obj pointer to a gif obj
+ */
+bool lv_gif_is_loaded(lv_obj_t * obj);
+
 /**********************
  *      MACROS
  **********************/
