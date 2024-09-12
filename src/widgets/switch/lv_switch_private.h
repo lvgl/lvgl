@@ -34,7 +34,7 @@ extern "C" {
 struct lv_switch_t {
     lv_obj_t obj;
     int32_t anim_state;
-    lv_switch_orientation_t orientation : 2;  /**< Orientation of switch*/
+    lv_switch_orientation_t orientation : 3; /**< Orientation of switch*/
 };
 
 
