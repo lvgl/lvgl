@@ -242,7 +242,7 @@ static void perf_update_timer_cb(lv_timer_t * t)
     lv_timer_t * disp_refr_timer = lv_display_get_refr_timer(NULL);
     uint32_t disp_refr_period = disp_refr_timer->period;
 
-    info->calculated.fps = info->measured.refr_interval_sum ? (1000 * info->measured.refr_cnt / time_since_last_report) : 0;
+    info->calculated.fps = info->measured.refr_interval_sum ? (uint32_t)(1000.0 * info->measured.refr_cnt / time_since_last_report + 0.5) : 0;
     info->calculated.fps = LV_MIN(info->calculated.fps,
                                   1000 / disp_refr_period);   /*Limit due to possible off-by-one error*/
 
