@@ -116,7 +116,7 @@ void lv_draw_nema_gfx_init(void)
 
 
 #if LV_USE_OS
-    lv_thread_init(&draw_nema_gfx_unit->thread, LV_THREAD_PRIO_HIGH, nema_gfx_render_thread_cb, 2 * 1024,
+    lv_thread_init(&draw_nema_gfx_unit->thread, "nemagfx", LV_THREAD_PRIO_HIGH, nema_gfx_render_thread_cb, 2 * 1024,
                    draw_nema_gfx_unit);
 #endif
 }

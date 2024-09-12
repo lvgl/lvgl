@@ -95,7 +95,7 @@ void lv_draw_pxp_init(void)
     draw_pxp_unit->base_unit.name = "NXP_PXP";
 
 #if LV_USE_PXP_DRAW_THREAD
-    lv_thread_init(&draw_pxp_unit->thread, LV_THREAD_PRIO_HIGH, _pxp_render_thread_cb, 2 * 1024, draw_pxp_unit);
+    lv_thread_init(&draw_pxp_unit->thread, "pxpdraw", LV_THREAD_PRIO_HIGH, _pxp_render_thread_cb, 2 * 1024, draw_pxp_unit);
 #endif
 #endif /*LV_USE_DRAW_PXP*/
 }

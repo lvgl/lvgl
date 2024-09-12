@@ -85,7 +85,8 @@ void lv_draw_sw_init(void)
         draw_sw_unit->base_unit.name = "SW";
 
 #if LV_USE_OS
-        lv_thread_init(&draw_sw_unit->thread, LV_THREAD_PRIO_HIGH, render_thread_cb, LV_DRAW_THREAD_STACK_SIZE, draw_sw_unit);
+        lv_thread_init(&draw_sw_unit->thread, "swdraw", LV_THREAD_PRIO_HIGH, render_thread_cb, LV_DRAW_THREAD_STACK_SIZE,
+                       draw_sw_unit);
 #endif
     }
 
