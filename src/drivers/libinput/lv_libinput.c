@@ -58,7 +58,7 @@ lv_libinput_event_t * _get_event(lv_libinput_t * state);
 bool _event_pending(lv_libinput_t * state);
 lv_libinput_event_t * _create_event(lv_libinput_t * state);
 
-static void _read(lv_indev_t * indev, lv_indev_data_t * data);
+static bool _read(lv_indev_t * indev, lv_indev_data_t * data);
 static void _read_pointer(lv_libinput_t * state, struct libinput_event * event);
 static void _read_keypad(lv_libinput_t * state, struct libinput_event * event);
 
@@ -380,7 +380,7 @@ lv_libinput_event_t * _create_event(lv_libinput_t * dsc)
     return evt;
 }
 
-static void _read(lv_indev_t * indev, lv_indev_data_t * data)
+static bool _read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     lv_libinput_t * dsc = lv_indev_get_driver_data(indev);
     LV_ASSERT_NULL(dsc);
@@ -397,6 +397,18 @@ static void _read(lv_indev_t * indev, lv_indev_data_t * data)
     data->key = evt->key_val;
     data->continue_reading = _event_pending(dsc);
 
+    bool res = false;
+
+    if (data->state != dsc->last_event->pressed) res = true;
+
+    if (
+        data->state == LV_INDEV_STATE_PRESSED || data->key != dsc->last_event->key_val ||
+        data->point.x != dsc->last_event->point.x || data->point.y != dsc->last_event->point.y ) {
+
+        res = true;
+        data->continue_reading = true;
+    }
+
     dsc->last_event = *evt; /* Remember the last event for the next call */
 
     pthread_mutex_unlock(&dsc->event_lock);
@@ -404,6 +416,7 @@ static void _read(lv_indev_t * indev, lv_indev_data_t * data)
     if(evt)
         LV_LOG_TRACE("libinput_read: (%04d, %04d): %d continue_reading? %d", data->point.x, data->point.y, data->state,
                      data->continue_reading);
+    return res;
 }
 
 static void _read_pointer(lv_libinput_t * dsc, struct libinput_event * event)
@@ -426,7 +439,7 @@ static void _read_pointer(lv_libinput_t * dsc, struct libinput_event * event)
             pointer_event = libinput_event_get_pointer_event(event);
             break;
         default:
-            return; /* We don't care about this events */
+            return false; /* We don't care about this events */
     }
 
     /* We need to read unrotated display dimensions directly from the driver because libinput won't account
@@ -435,7 +448,7 @@ static void _read_pointer(lv_libinput_t * dsc, struct libinput_event * event)
 
     /* ignore more than 2 fingers as it will only confuse LVGL */
     if(touch_event && (slot = libinput_event_touch_get_slot(touch_event)) > 1)
-        return;
+        return false;
 
     evt = _create_event(dsc);
 

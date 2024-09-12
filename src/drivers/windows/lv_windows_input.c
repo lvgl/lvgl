@@ -37,19 +37,19 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void lv_windows_pointer_driver_read_callback(
+static bool lv_windows_pointer_driver_read_callback(
     lv_indev_t * indev,
     lv_indev_data_t * data);
 
 static void lv_windows_release_pointer_device_event_callback(lv_event_t * e);
 
-static void lv_windows_keypad_driver_read_callback(
+static bool lv_windows_keypad_driver_read_callback(
     lv_indev_t * indev,
     lv_indev_data_t * data);
 
 static void lv_windows_release_keypad_device_event_callback(lv_event_t * e);
 
-static void lv_windows_encoder_driver_read_callback(
+static bool lv_windows_encoder_driver_read_callback(
     lv_indev_t * indev,
     lv_indev_data_t * data);
 
@@ -206,18 +206,31 @@ lv_indev_t * lv_windows_acquire_encoder_indev(lv_display_t * display)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_windows_pointer_driver_read_callback(
+static bool lv_windows_pointer_driver_read_callback(
     lv_indev_t * indev,
     lv_indev_data_t * data)
 {
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 lv_windows_get_indev_window_handle(indev));
     if(!context) {
-        return;
+        return false;
+    }
+
+    bool res = false;
+
+    if (context->pointer.state != context->pointer.last_state) {
+        res = true;
+        context->pointer.last_state = context->pointer.state;
+    }
+
+    if (context->pointer.state == LV_INDEV_STATE_PRESSED) {
+        res = true;
+        data->continue_reading = true;
     }
 
     data->state = context->pointer.state;
     data->point = context->pointer.point;
+    return res;
 }
 
 static void lv_windows_release_pointer_device_event_callback(lv_event_t * e)
@@ -411,15 +424,17 @@ bool lv_windows_pointer_device_window_message_handler(
     return true;
 }
 
-static void lv_windows_keypad_driver_read_callback(
+static bool lv_windows_keypad_driver_read_callback(
     lv_indev_t * indev,
     lv_indev_data_t * data)
 {
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 lv_windows_get_indev_window_handle(indev));
     if(!context) {
-        return;
+        return false;
     }
+
+    bool res = false;
 
     lv_windows_keypad_queue_item_t * current = (lv_windows_keypad_queue_item_t *)(
                                                    lv_ll_get_head(&context->keypad.queue));
@@ -430,8 +445,24 @@ static void lv_windows_keypad_driver_read_callback(
         lv_ll_remove(&context->keypad.queue, current);
         lv_free(current);
 
-        data->continue_reading = true;
+        if (current->state != context->keypad.last_state) {
+            res = true;
+            context->keypad.last_state = current->state;
+        }
+
+        if (current->state == LV_INDEV_STATE_PRESSED) {
+            res = true;
+            data->continue_reading = true;
+        }
+
+        if (current->key != context->keypad.last_key) {
+            res = true;
+            data->continue_reading = true;
+            context->keypad.last_key = current->key;
+        }
     }
+
+    return res;
 }
 
 static void lv_windows_release_keypad_device_event_callback(lv_event_t * e)
@@ -740,19 +771,33 @@ bool lv_windows_keypad_device_window_message_handler(
     return true;
 }
 
-static void lv_windows_encoder_driver_read_callback(
+static bool lv_windows_encoder_driver_read_callback(
     lv_indev_t * indev,
     lv_indev_data_t * data)
 {
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 lv_windows_get_indev_window_handle(indev));
     if(!context) {
-        return;
+        return false;
+    }
+
+    bool res = false;
+
+    if (context->encoder.state != context->encoder.last_state) {
+        res = true;
+        context->encoder.last_state = context->encoder.state;
+    }
+
+    if (context->encoder.state == LV_INDEV_STATE_PRESSED || context->encoder.enc_diff != 0) {
+        res = true;
+        data->continue_reading = true;
     }
 
     data->state = context->encoder.state;
     data->enc_diff = context->encoder.enc_diff;
     context->encoder.enc_diff = 0;
+
+    return res;
 }
 
 static void lv_windows_release_encoder_device_event_callback(lv_event_t * e)

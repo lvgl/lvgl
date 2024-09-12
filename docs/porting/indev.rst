@@ -269,6 +269,20 @@ data instead of directly reading the input device. Setting the
 ``data->continue_reading`` flag will tell LVGL there is more data to
 read and it should call ``read_cb`` again.
 
+
+User input priority
+-------------------
+
+If you want to place priority on user input and updating the display this can be done by returning `true`
+from the read callback when there is user input. This will instruct LVGL to refresh the display immediatly
+after the input has been processed. You can further extend the priority by setting the
+``data->continue_reading`` field to `true` and returning `true`. This will loop the reading of the input
+device and refreshing the display after the input as been processed. Once there is no more user input then
+you would set ``data->continue_reading`` to `false` and return `true`. You only return `true` one time
+after the user inmput ends. Calls made to the read callback after that and there is no user input would
+return `false` from the read callback.
+
+
 Switching the input device to event-driven mode
 -----------------------------------------------
 
