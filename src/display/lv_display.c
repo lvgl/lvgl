@@ -420,6 +420,14 @@ void lv_display_set_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf1, lv_d
     disp->buf_act = disp->buf_1;
 }
 
+void lv_display_get_buffers(lv_display_t * disp, void ** buf1, void ** buf2)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return;
+    *buf1 = disp->_static_buf1.data;
+    *buf2 = disp->_static_buf2.data;
+}
+
 void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size,
                             lv_display_render_mode_t render_mode)
 {
@@ -481,6 +489,13 @@ void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t re
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
     disp->render_mode = render_mode;
+}
+
+lv_display_render_mode_t lv_display_get_render_mode(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return LV_DISPLAY_RENDER_MODE_PARTIAL;
+    return disp->render_mode;
 }
 
 void lv_display_set_flush_cb(lv_display_t * disp, lv_display_flush_cb_t flush_cb)

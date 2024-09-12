@@ -255,6 +255,14 @@ void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void *
                                         uint32_t stride, lv_display_render_mode_t render_mode);
 
 /**
+ * Get the raw buffer pointers for a display.
+ * @param disp              pointer to a display
+ * @param buf1              first buffer
+ * @param buf2              second buffer (can be `NULL`)
+ */
+void lv_display_get_buffers(lv_display_t * disp, void ** buf1, void ** buf2);
+
+/**
  * Set the buffers for a display, accept a draw buffer pointer.
  * Normally use `lv_display_set_buffers` is enough for most cases.
  * Use this function when an existing lv_draw_buf_t is available.
@@ -270,6 +278,13 @@ void lv_display_set_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf1, lv_d
  * @param render_mode       LV_DISPLAY_RENDER_MODE_PARTIAL/DIRECT/FULL
  */
 void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t render_mode);
+
+/**
+ * Get display render mode
+ * @param disp              pointer to a display
+ * @return                  the render mode
+ */
+lv_display_render_mode_t lv_display_get_render_mode(lv_display_t * disp);
 
 /**
  * Set the flush callback which will be called to copy the rendered image to the display.
