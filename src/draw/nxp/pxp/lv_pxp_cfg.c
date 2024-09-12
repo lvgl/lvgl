@@ -15,7 +15,8 @@
 
 #include "lv_pxp_cfg.h"
 
-#if LV_USE_DRAW_PXP
+#if LV_USE_PXP
+#if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
 #include "lv_pxp_osa.h"
 
 /*********************
@@ -88,4 +89,5 @@ void lv_pxp_wait(void)
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*LV_USE_DRAW_PXP*/
+#endif /*LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP*/
+#endif /*LV_USE_PXP*/
