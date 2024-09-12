@@ -619,9 +619,10 @@ static void rotate180_argb8888(const uint32_t * src, uint32_t * dst, int32_t wid
     }
 
     src_stride /= sizeof(uint32_t);
+    dest_stride /= sizeof(uint32_t);
 
     for(int32_t y = 0; y < height; ++y) {
-        int32_t dstIndex = (height - y - 1) * src_stride;
+        int32_t dstIndex = (height - y - 1) * dest_stride;
         int32_t srcIndex = y * src_stride;
         for(int32_t x = 0; x < width; ++x) {
             dst[dstIndex + width - x - 1] = src[srcIndex + x];
