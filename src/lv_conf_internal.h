@@ -629,16 +629,38 @@
 #endif
 
 /* Use NXP's PXP on iMX RTxxx platforms. */
-#ifndef LV_USE_DRAW_PXP
-    #ifdef CONFIG_LV_USE_DRAW_PXP
-        #define LV_USE_DRAW_PXP CONFIG_LV_USE_DRAW_PXP
+#ifndef LV_USE_PXP
+    #ifdef CONFIG_LV_USE_PXP
+        #define LV_USE_PXP CONFIG_LV_USE_PXP
     #else
-        #define LV_USE_DRAW_PXP 0
+        #define LV_USE_PXP 0
     #endif
 #endif
 
-#if LV_USE_DRAW_PXP
-    #if LV_USE_OS
+#if LV_USE_PXP
+    /* Use PXP for drawing.*/
+    #ifndef LV_USE_DRAW_PXP
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_DRAW_PXP
+                #define LV_USE_DRAW_PXP CONFIG_LV_USE_DRAW_PXP
+            #else
+                #define LV_USE_DRAW_PXP 0
+            #endif
+        #else
+            #define LV_USE_DRAW_PXP 1
+        #endif
+    #endif
+
+    /* Use PXP to rotate display.*/
+    #ifndef LV_USE_ROTATE_PXP
+        #ifdef CONFIG_LV_USE_ROTATE_PXP
+            #define LV_USE_ROTATE_PXP CONFIG_LV_USE_ROTATE_PXP
+        #else
+            #define LV_USE_ROTATE_PXP 0
+        #endif
+    #endif
+
+    #if LV_USE_DRAW_PXP && LV_USE_OS
         /* Use additional draw thread for PXP processing.*/
         #ifndef LV_USE_PXP_DRAW_THREAD
             #ifdef LV_KCONFIG_PRESENT
