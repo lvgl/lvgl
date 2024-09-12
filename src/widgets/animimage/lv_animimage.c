@@ -134,6 +134,13 @@ uint32_t lv_animimg_get_repeat_count(lv_obj_t * obj)
     return lv_anim_get_repeat_count(&animimg->anim);
 }
 
+lv_anim_t * lv_animimg_get_anim(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_animimg_t * animimg = (lv_animimg_t *)obj;
+    return &animimg->anim;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
