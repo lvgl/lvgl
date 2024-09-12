@@ -49,6 +49,7 @@ static void draw_main(lv_event_t * e);
 static void lv_switch_anim_exec_cb(void * sw, int32_t value);
 static void lv_switch_trigger_anim(lv_obj_t * obj);
 static void lv_switch_anim_completed(lv_anim_t * a);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -247,8 +248,8 @@ static void draw_main(lv_event_t * e)
             anim_value_y = anim_length - anim_value_y;
         }
 
-        knob_area.y1 += anim_value_y;
-        knob_area.y2 = knob_area.y1 + (knob_size > 0 ? knob_size - 1 : 0);
+        knob_area.y2 -= anim_value_y;
+        knob_area.y1 = knob_area.y2 - (knob_size > 0 ? knob_size - 1 : 0);
     }
 
     int32_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
