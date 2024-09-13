@@ -16,7 +16,7 @@
 #include <string.h>
 
 #if LV_USE_FREETYPE
-#include "../../libs/freetype/lv_freetype_private.h"
+    #include "../../libs/freetype/lv_freetype_private.h"
 #endif
 
 /*********************
