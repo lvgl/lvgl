@@ -95,6 +95,9 @@
 #define LV_USE_THORVG_INTERNAL  1
 #define LV_USE_LZ4_INTERNAL     1
 #define LV_USE_VECTOR_GRAPHIC   1
+#define LV_USE_SVG              1
+#define LV_USE_SVG_ANIMATION    1
+#define LV_USE_SVG_DEBUG        1
 #define LV_USE_PROFILER         1
 #define LV_PROFILER_INCLUDE     "lv_profiler_builtin.h"
 #define LV_USE_GRIDNAV          1
