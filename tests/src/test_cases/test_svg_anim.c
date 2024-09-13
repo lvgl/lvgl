@@ -16,9 +16,9 @@ void tearDown(void)
 void testAnimate(void)
 {
     const char * svg_anim0 = \
-                           "<svg><rect xml:id=\"RectElement\" x=\"300\" y=\"100\" width=\"300\" height=\"100\">"
-                           "<animate attributeName=\"x\" dur=\"9s\" fill=\"freeze\" from=\"300\" to=\"0\"/>"
-                           "</rect></svg>";
+                             "<svg><rect xml:id=\"RectElement\" x=\"300\" y=\"100\" width=\"300\" height=\"100\">"
+                             "<animate attributeName=\"x\" dur=\"9s\" fill=\"freeze\" from=\"300\" to=\"0\"/>"
+                             "</rect></svg>";
 
     lv_svg_node_t * svg_node_root = lv_svg_load_data(svg_anim0, lv_strlen(svg_anim0));
     lv_svg_node_t * svg_node = LV_SVG_NODE_CHILD(svg_node_root, 0);
@@ -45,9 +45,9 @@ void testAnimate(void)
 void testSet(void)
 {
     const char * svg_anim0 = \
-                           "<svg><rect xml:id=\"RectElement\" x=\"300\" y=\"100\" width=\"300\" height=\"100\">"
-                           "<set attributeName=\"x\" to=\"500\" values=\"0\"/>"
-                           "</rect></svg>";
+                             "<svg><rect xml:id=\"RectElement\" x=\"300\" y=\"100\" width=\"300\" height=\"100\">"
+                             "<set attributeName=\"x\" to=\"500\" values=\"0\"/>"
+                             "</rect></svg>";
 
     lv_svg_node_t * svg_node_root = lv_svg_load_data(svg_anim0, lv_strlen(svg_anim0));
     lv_svg_node_t * svg_node = LV_SVG_NODE_CHILD(svg_node_root, 0);
@@ -65,12 +65,12 @@ void testSet(void)
 void testAnimateMotion(void)
 {
     const char * svg_anim0 = \
-                           "<svg><path xml:id=\"path1\" d=\"M100,250 C 100,50 400,50 400,250\" "
-                           "fill=\"none\" stroke=\"blue\" stroke-width=\"7.06\"/>"
-                           "<animateMotion dur=\"6s\" repeatCount=\"indefinite\" rotate=\"auto\">"
-                           "<mpath xlink:href=\"#path1\"/>"
-                           "</animateMotion>"
-                           "</svg>";
+                             "<svg><path xml:id=\"path1\" d=\"M100,250 C 100,50 400,50 400,250\" "
+                             "fill=\"none\" stroke=\"blue\" stroke-width=\"7.06\"/>"
+                             "<animateMotion dur=\"6s\" repeatCount=\"indefinite\" rotate=\"auto\">"
+                             "<mpath xlink:href=\"#path1\"/>"
+                             "</animateMotion>"
+                             "</svg>";
 
     lv_svg_node_t * svg_node_root = lv_svg_load_data(svg_anim0, lv_strlen(svg_anim0));
     lv_svg_node_t * path_node = LV_SVG_NODE_CHILD(svg_node_root, 0);
@@ -93,13 +93,11 @@ void testAnimateMotion(void)
     TEST_ASSERT_EQUAL_FLOAT(rt, 0.0f);
     lv_svg_node_delete(svg_node_root);
 
-
     const char * svg_anim1 = \
-                           "<svg><circle r=\"5\" fill=\"blue\">"
-                           "<animateMotion begin=\"500ms\" dur=\"3.1s\" calcMode=\"linear\" keyPoints=\"0.5; 0.8; 1.0\" path=\"M15,43 C15,43 36,20 65,33\"/>"
-                           "</circle>"
-                           "</svg>";
-
+                             "<svg><circle r=\"5\" fill=\"blue\">"
+                             "<animateMotion begin=\"500ms\" dur=\"3.1s\" calcMode=\"linear\" keyPoints=\"0.5; 0.8; 1.0\" path=\"M15,43 C15,43 36,20 65,33\"/>"
+                             "</circle>"
+                             "</svg>";
 
     svg_node_root = lv_svg_load_data(svg_anim1, lv_strlen(svg_anim1));
     path_node = LV_SVG_NODE_CHILD(svg_node_root, 0);
@@ -130,14 +128,12 @@ void testAnimateMotion(void)
     TEST_ASSERT_EQUAL(lp->length, 2);
     lv_svg_node_delete(svg_node_root);
 
-
     const char * svg_anim2 = \
-                           "<svg><circle r=\"5\" fill=\"blue\">"
-                           "<animateMotion begin=\"5s;2s\" end=\"8s;10s\" values=\"100, 50;200 200\" keyTimes=\"100ms;200ms\""
-                           " keySplines=\"0 0 1.5 1.0; 0.5 0.5, 2.0,1.5\" additive=\"sum\" accumulate=\"none\"/>"
-                           "</circle>"
-                           "</svg>";
-
+                             "<svg><circle r=\"5\" fill=\"blue\">"
+                             "<animateMotion begin=\"5s;2s\" end=\"8s;10s\" values=\"100, 50;200 200\" keyTimes=\"100ms;200ms\""
+                             " keySplines=\"0 0 1.5 1.0; 0.5 0.5, 2.0,1.5\" additive=\"sum\" accumulate=\"none\"/>"
+                             "</circle>"
+                             "</svg>";
 
     svg_node_root = lv_svg_load_data(svg_anim2, lv_strlen(svg_anim2));
     path_node = LV_SVG_NODE_CHILD(svg_node_root, 0);
@@ -190,14 +186,14 @@ void testAnimateMotion(void)
 void testAnimateTransform(void)
 {
     const char * svg_anim0 = \
-                           "<svg><rect transform=\"skewX(30)\" x=0 y=0 width=100 height=100>"
-                           "<animateTransform attributeName=\"transform\" attributeType=\"XML\""
-                           "type=\"rotate\" from=\"0\" to=\"90\" dur=\"5s\""
-                           "additive=\"sum\" fill=\"freeze\"/>"
-                           "<animateTransform attributeName=\"transform\" attributeType=\"XML\""
-                           "type=\"scale\" from=\"1\" to=\"2\" dur=\"5s\" values=\"0.5; 0.2, 0.2\""
-                           "additive=\"sum\" fill=\"freeze\"/>"
-                           "</rect></svg>";
+                             "<svg><rect transform=\"skewX(30)\" x=0 y=0 width=100 height=100>"
+                             "<animateTransform attributeName=\"transform\" attributeType=\"XML\""
+                             "type=\"rotate\" from=\"0\" to=\"90\" dur=\"5s\""
+                             "additive=\"sum\" fill=\"freeze\"/>"
+                             "<animateTransform attributeName=\"transform\" attributeType=\"XML\""
+                             "type=\"scale\" from=\"1\" to=\"2\" dur=\"5s\" values=\"0.5; 0.2, 0.2\""
+                             "additive=\"sum\" fill=\"freeze\"/>"
+                             "</rect></svg>";
 
     lv_svg_node_t * svg_node_root = lv_svg_load_data(svg_anim0, lv_strlen(svg_anim0));
     lv_svg_node_t * path_node = LV_SVG_NODE_CHILD(svg_node_root, 0);
@@ -227,7 +223,7 @@ void testAnimateTransform(void)
     pt = (float *)(&ll->data);
     TEST_ASSERT_EQUAL_FLOAT(pt[0], 0.5f);
 
-    ll = (lv_svg_attr_values_list_t *)((uint8_t*)(&l->data) + sizeof(uint32_t) + sizeof(float) * 4);
+    ll = (lv_svg_attr_values_list_t *)((uint8_t *)(&l->data) + sizeof(uint32_t) + sizeof(float) * 4);
     TEST_ASSERT_EQUAL(ll->length, 2);
     pt = (float *)(&ll->data);
     TEST_ASSERT_EQUAL_FLOAT(pt[0], 0.2f);
@@ -239,10 +235,10 @@ void testAnimateTransform(void)
 void testAnimateColor(void)
 {
     const char * svg_anim0 = \
-                           "<svg><rect color=\"yellow\" fill=\"black\">"
-                           "<animateColor attributeName=\"fill\" from=\"red\" to=\"#DDF\" "
-                           "begin=\"1s\" dur=\"5s\" fill=\"freeze\" additive=\"sum\" repeatCount=5 restart=\"whenNotActive\" values=\"rgb(0,255,0);black\" />"
-                           "</rect></svg>";
+                             "<svg><rect color=\"yellow\" fill=\"black\">"
+                             "<animateColor attributeName=\"fill\" from=\"red\" to=\"#DDF\" "
+                             "begin=\"1s\" dur=\"5s\" fill=\"freeze\" additive=\"sum\" repeatCount=5 restart=\"whenNotActive\" values=\"rgb(0,255,0);black\" />"
+                             "</rect></svg>";
 
     lv_svg_node_t * svg_node_root = lv_svg_load_data(svg_anim0, lv_strlen(svg_anim0));
     lv_svg_node_t * path_node = LV_SVG_NODE_CHILD(svg_node_root, 0);
@@ -262,7 +258,7 @@ void testAnimateColor(void)
 
     lv_svg_attr_values_list_t * l = (LV_ARRAY_GET(&anim_node->attrs, 9, lv_svg_attr_t))->value.val;
     TEST_ASSERT_EQUAL(l->length, 2);
-    uint32_t *pc = (uint32_t *)(&l->data);
+    uint32_t * pc = (uint32_t *)(&l->data);
     TEST_ASSERT_EQUAL(pc[0], 0x00FF00);
     TEST_ASSERT_EQUAL(pc[1], 0x000000);
 
