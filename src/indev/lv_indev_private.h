@@ -21,6 +21,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#define LV_INDEV_VECT_HIST_SIZE 8
 
 /**********************
  *      TYPEDEFS
@@ -83,6 +84,9 @@ struct _lv_indev_t {
         lv_point_t last_point; /**< Last point of input device.*/
         lv_point_t last_raw_point; /**< Last point read from read_cb. */
         lv_point_t vect; /**< Difference between `act_point` and `last_point`.*/
+        lv_point_t vect_hist[LV_INDEV_VECT_HIST_SIZE];
+        uint32_t   vect_hist_timestamp[LV_INDEV_VECT_HIST_SIZE];
+        uint8_t    vect_hist_index;
         lv_point_t scroll_sum; /*Count the dragged pixels to check LV_INDEV_DEF_SCROLL_LIMIT*/
         lv_point_t scroll_throw_vect;
         lv_point_t scroll_throw_vect_ori;
