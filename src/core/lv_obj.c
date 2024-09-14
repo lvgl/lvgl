@@ -623,7 +623,8 @@ static void lv_obj_draw(lv_event_t * e)
         draw_scrollbar(obj, layer);
 
         /*If the border is drawn later disable loading other properties*/
-        if(lv_obj_get_style_border_post(obj, LV_PART_MAIN)) {
+        if(lv_obj_get_style_border_width(obj, LV_PART_MAIN) &&
+           lv_obj_get_style_border_post(obj, LV_PART_MAIN)) {
             lv_draw_rect_dsc_t draw_dsc;
             lv_draw_rect_dsc_init(&draw_dsc);
             draw_dsc.bg_opa = LV_OPA_TRANSP;
