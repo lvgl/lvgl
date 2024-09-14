@@ -326,6 +326,8 @@ typedef struct _lv_glfw_texture_t lv_glfw_texture_t;
 
 typedef uint32_t lv_prop_id_t;
 
+typedef struct _lv_array_t lv_array_t;
+
 typedef struct _lv_iter_t lv_iter_t;
 
 typedef struct _lv_draw_buf_t lv_draw_buf_t;

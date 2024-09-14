@@ -32,12 +32,12 @@ extern "C" {
  **********************/
 
 /** Description of a array*/
-typedef struct {
+struct _lv_array_t {
     uint8_t * data;
     uint32_t size;
     uint32_t capacity;
     uint32_t element_size;
-} lv_array_t;
+};
 
 /**********************
  * GLOBAL PROTOTYPES
