@@ -1384,7 +1384,7 @@ menu "LVGL configuration"
 		config LV_USE_MEM_MONITOR
 			bool "Show the used memory and the memory fragmentation"
 			default n
-			depends on LV_STDLIB_BUILTIN && LV_USE_SYSMON
+			depends on LV_USE_BUILTIN_MALLOC && LV_USE_SYSMON
 
 		choice
 			prompt "Memory monitor position"
