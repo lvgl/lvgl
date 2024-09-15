@@ -31,3 +31,4 @@ tests/wayland_protocols/
 *.bak
 tests/test_images/
 .vs/
+*.user
