@@ -6,4 +6,9 @@
 4.  git remote -v
 5.  git fetch upstream
 6、git switch -c   upstream/release/v9.2
-7、git push origin  upstream/release/v9.2
+7、git push -u origin  upstream/release/v9.2
+
+# 将custom.cmake 拆分成三部分
+custom.cmake
+customlib.cmake
+customcompiledef.cmake
