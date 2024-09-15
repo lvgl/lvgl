@@ -18,7 +18,10 @@
  *      DEFINES
  *********************/
 
-#define LV_MAP_0_TO_1(x, in_min, in_max) (LV_CLAMP(0.0f, (x - in_min) / (in_max - in_min), 1.0f))
+#define LV_OPENGLES_MAP(x, in_min, in_max, out_min, out_max) (((x) - (in_min)) * ((out_max) - (out_min)) / ((in_max) - (in_min)) + (out_min))
+#define LV_OPENGLES_MAP_CLAMP(x, in_min, in_max, out_min, out_max) (LV_CLAMP(out_min, LV_OPENGLES_MAP(x, in_min, in_max, out_min, out_max), out_max))
+// #define LV_MAP_0_TO_1(x, in_min, in_max) (LV_CLAMP(0.0f, ((x) - (in_min)) / ((in_max) - (in_min)), 1.0f))
+// #define LV_MAP_0_TO_1(x, in_min, in_max) (((x) - (in_min)) / ((in_max) - (in_min)))
 
 /**********************
  *      TYPEDEFS
@@ -199,10 +202,16 @@ void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_
     // float tex_clip_x2 = (float)(texture_clip_area->x2 + 1) / tex_w;
     // float tex_clip_y1 = (float)texture_clip_area->y1 / tex_h;
     // float tex_clip_y2 = (float)(texture_clip_area->y2 + 1) / tex_h;
-    float tex_clip_x1 = LV_MAP_0_TO_1((float)texture_clip_area->x1, (float)texture_area->x1, (float)texture_area->x2);
-    float tex_clip_x2 = LV_MAP_0_TO_1((float)texture_clip_area->x2, (float)texture_area->x1, (float)texture_area->x2);
-    float tex_clip_y1 = LV_MAP_0_TO_1((float)texture_clip_area->y1, (float)texture_area->y1, (float)texture_area->y2);
-    float tex_clip_y2 = LV_MAP_0_TO_1((float)texture_clip_area->y2, (float)texture_area->y1, (float)texture_area->y2);
+    float x_coef = 1.0f / (float)(2 * lv_area_get_width(texture_area));
+    float y_coef = 1.0f / (float)(2 * lv_area_get_height(texture_area));
+    float tex_clip_x1 = LV_OPENGLES_MAP_CLAMP((float)texture_clip_area->x1, (float)texture_area->x1,
+                                              (float)texture_area->x2, x_coef, 1.0f - x_coef);
+    float tex_clip_x2 = LV_OPENGLES_MAP_CLAMP((float)texture_clip_area->x2, (float)texture_area->x1,
+                                              (float)texture_area->x2, x_coef, 1.0f - x_coef);
+    float tex_clip_y1 = LV_OPENGLES_MAP_CLAMP((float)texture_clip_area->y1, (float)texture_area->y1,
+                                              (float)texture_area->y2, y_coef, 1.0f - y_coef);
+    float tex_clip_y2 = LV_OPENGLES_MAP_CLAMP((float)texture_clip_area->y2, (float)texture_area->y1,
+                                              (float)texture_area->y2, y_coef, 1.0f - y_coef);
     // float positions[] = {
     //     -1.0f,  1.0f,  0.0f, 0.0f,
     //     1.0f,  1.0f,  1.0f, 0.0f,
