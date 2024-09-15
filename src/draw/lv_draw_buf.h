@@ -67,7 +67,7 @@ LV_EXPORT_CONST_INT(LV_STRIDE_AUTO);
 #define LV_DRAW_BUF_INIT_STATIC(name) \
     do { \
         lv_image_header_t * header = &name.header; \
-        lv_draw_buf_init(&name, header->w, header->h, header->cf, header->stride, buf_##name, sizeof(buf_##name)); \
+        lv_draw_buf_init(&name, header->w, header->h, (lv_color_format_t)header->cf, header->stride, buf_##name, sizeof(buf_##name)); \
         lv_draw_buf_set_flag(&name, LV_IMAGE_FLAGS_MODIFIABLE); \
     } while(0)
 
@@ -85,7 +85,7 @@ typedef void (*lv_draw_buf_cache_operation_cb)(const lv_draw_buf_t * draw_buf, c
 
 typedef uint32_t (*lv_draw_buf_width_to_stride_cb)(uint32_t w, lv_color_format_t color_format);
 
-struct lv_draw_buf_t {
+struct _lv_draw_buf_t {
     lv_image_header_t header;
     uint32_t data_size;       /**< Total buf size in bytes */
     uint8_t * data;
@@ -304,7 +304,7 @@ lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride);
  */
 lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf);
 
-bool lv_draw_buf_has_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
+bool lv_draw_buf_has_flag(const lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
 
 void lv_draw_buf_set_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
 

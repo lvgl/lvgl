@@ -43,7 +43,7 @@ typedef struct {
     lv_indev_t * utouch_indev;
 } lv_nuttx_result_t;
 
-typedef struct lv_nuttx_ctx_t {
+typedef struct _lv_nuttx_ctx_t {
     void * image_cache;
 } lv_nuttx_ctx_t;
 

@@ -9,3 +9,4 @@ Chip vendors
     nxp
     renesas
     stm32
+    arm

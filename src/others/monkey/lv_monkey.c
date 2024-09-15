@@ -24,7 +24,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
-struct lv_monkey_t {
+struct _lv_monkey_t {
     lv_monkey_config_t config;
     lv_indev_data_t indev_data;
     lv_indev_t * indev;

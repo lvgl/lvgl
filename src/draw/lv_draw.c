@@ -179,8 +179,7 @@ void lv_draw_dispatch(void)
     while(disp) {
         lv_layer_t * layer = disp->layer_head;
         while(layer) {
-            /* If there are no tasks in the layer, skip it */
-            if(layer->draw_task_head && lv_draw_dispatch_layer(disp, layer))
+            if(lv_draw_dispatch_layer(disp, layer))
                 task_dispatched = true;
             layer = layer->next;
         }

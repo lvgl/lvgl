@@ -161,7 +161,18 @@ lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_rend
     freetype_on_font_set_cbs(dsc);
 
     FT_Face face = dsc->cache_node->face;
-    FT_Set_Pixel_Sizes(face, 0, size);
+    FT_Error error;
+    if(FT_IS_SCALABLE(face)) {
+        error = FT_Set_Pixel_Sizes(face, 0, size);
+    }
+    else {
+        LV_LOG_WARN("font is not scalable, selecting available size");
+        error = FT_Select_Size(face, 0);
+    }
+    if(error) {
+        FT_ERROR_MSG("FT_Set_Pixel_Sizes", error);
+        return NULL;
+    }
 
     lv_font_t * font = &dsc->font;
     font->dsc = dsc;

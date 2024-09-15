@@ -23,7 +23,7 @@
  *      TYPEDEFS
  **********************/
 
-typedef struct lv_freetype_outline_node_t {
+typedef struct _lv_freetype_outline_node_t {
     FT_UInt glyph_index;
     lv_freetype_outline_t outline;
 } lv_freetype_outline_node_t;

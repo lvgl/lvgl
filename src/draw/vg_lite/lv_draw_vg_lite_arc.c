@@ -149,9 +149,7 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
 
     lv_vg_lite_path_end(path);
 
-    vg_lite_matrix_t matrix;
-    vg_lite_identity(&matrix);
-    lv_vg_lite_matrix_multiply(&matrix, &u->global_matrix);
+    vg_lite_matrix_t matrix = u->global_matrix;
 
     vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa, true);
 
@@ -174,10 +172,8 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
     if(dsc->img_src) {
         vg_lite_buffer_t src_buf;
         lv_image_decoder_dsc_t decoder_dsc;
-        if(lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->img_src, false)) {
-            vg_lite_matrix_t path_matrix;
-            vg_lite_identity(&path_matrix);
-            lv_vg_lite_matrix_multiply(&path_matrix, &u->global_matrix);
+        if(lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->img_src, false, true)) {
+            vg_lite_matrix_t path_matrix = u->global_matrix;
 
             /* move image to center */
             vg_lite_translate(cx - radius_out, cy - radius_out, &matrix);

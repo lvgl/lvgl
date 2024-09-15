@@ -31,7 +31,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_checkbox_t {
+struct _lv_checkbox_t {
     lv_obj_t obj;
     char * txt;
     uint32_t static_txt : 1;

@@ -29,7 +29,7 @@ extern "C" {
  * all the previous characters needs to be checked to calculate the positions.
  * This structure stores an earlier (e.g. at -1000 px) coordinate and the index of that line.
  * Therefore the calculations can start from here.*/
-struct lv_draw_label_hint_t {
+struct _lv_draw_label_hint_t {
     /** Index of the line at `y` coordinate*/
     int32_t line_start;
 
@@ -41,7 +41,7 @@ struct lv_draw_label_hint_t {
     int32_t coord_y;
 };
 
-struct lv_draw_glyph_dsc_t {
+struct _lv_draw_glyph_dsc_t {
     void * glyph_data;  /**< Depends on `format` field, it could be image source or draw buf of bitmap or vector data. */
     lv_font_glyph_format_t format;
     const lv_area_t * letter_coords;

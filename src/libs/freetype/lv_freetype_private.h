@@ -60,12 +60,12 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_freetype_outline_vector_t {
+struct _lv_freetype_outline_vector_t {
     int32_t x;
     int32_t y;
 };
 
-struct lv_freetype_outline_event_param_t {
+struct _lv_freetype_outline_event_param_t {
     lv_freetype_outline_t outline;
     lv_freetype_outline_type_t type;
     lv_freetype_outline_vector_t to;
@@ -74,9 +74,9 @@ struct lv_freetype_outline_event_param_t {
 };
 
 
-typedef struct lv_freetype_cache_node_t lv_freetype_cache_node_t;
+typedef struct _lv_freetype_cache_node_t lv_freetype_cache_node_t;
 
-struct lv_freetype_cache_node_t {
+struct _lv_freetype_cache_node_t {
     const char * pathname;
     lv_freetype_font_style_t style;
     lv_freetype_font_render_mode_t render_mode;
@@ -93,7 +93,7 @@ struct lv_freetype_cache_node_t {
     lv_cache_t * draw_data_cache;
 };
 
-typedef struct lv_freetype_context_t {
+typedef struct _lv_freetype_context_t {
     FT_Library library;
     lv_ll_t face_id_ll;
     lv_event_cb_t event_cb;
@@ -103,7 +103,7 @@ typedef struct lv_freetype_context_t {
     lv_cache_t * cache_node_cache;
 } lv_freetype_context_t;
 
-typedef struct lv_freetype_font_dsc_t {
+typedef struct _lv_freetype_font_dsc_t {
     uint32_t magic_num;
     lv_font_t font;
     uint32_t size;

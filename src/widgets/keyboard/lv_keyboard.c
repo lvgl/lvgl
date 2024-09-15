@@ -176,19 +176,19 @@ static const lv_buttonmatrix_ctrl_t default_kb_ctrl_num_map[] = {
     1, 1, 1, 1, 1
 };
 
-static const char * * kb_map[10] = {
-    (const char * *)default_kb_map_lc,
-    (const char * *)default_kb_map_uc,
-    (const char * *)default_kb_map_spec,
-    (const char * *)default_kb_map_num,
-    (const char * *)default_kb_map_lc,
-    (const char * *)default_kb_map_lc,
-    (const char * *)default_kb_map_lc,
-    (const char * *)default_kb_map_lc,
+static const char * const * kb_map[10] = {
+    default_kb_map_lc,
+    default_kb_map_uc,
+    default_kb_map_spec,
+    default_kb_map_num,
+    default_kb_map_lc,
+    default_kb_map_lc,
+    default_kb_map_lc,
+    default_kb_map_lc,
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
-    (const char * *)default_kb_map_ar,
+    default_kb_map_ar,
 #endif
-    (const char * *)NULL
+    NULL
 };
 static const lv_buttonmatrix_ctrl_t * kb_ctrl[10] = {
     default_kb_ctrl_lc_map,
@@ -269,7 +269,7 @@ void lv_keyboard_set_popovers(lv_obj_t * obj, bool en)
     lv_keyboard_update_ctrl_map(obj);
 }
 
-void lv_keyboard_set_map(lv_obj_t * obj, lv_keyboard_mode_t mode, const char * map[],
+void lv_keyboard_set_map(lv_obj_t * obj, lv_keyboard_mode_t mode, const char * const map[],
                          const lv_buttonmatrix_ctrl_t ctrl_map[])
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -410,7 +410,7 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
     }
 }
 
-const char ** lv_keyboard_get_map_array(const lv_obj_t * kb)
+const char * const * lv_keyboard_get_map_array(const lv_obj_t * kb)
 {
     return lv_buttonmatrix_get_map(kb);
 }

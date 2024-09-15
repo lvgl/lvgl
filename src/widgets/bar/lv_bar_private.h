@@ -27,14 +27,14 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_bar_anim_t {
+struct _lv_bar_anim_t {
     lv_obj_t * bar;
     int32_t anim_start;
     int32_t anim_end;
     int32_t anim_state;
 };
 
-struct lv_bar_t {
+struct _lv_bar_t {
     lv_obj_t obj;
     int32_t cur_value;          /**< Current value of the bar*/
     int32_t min_value;          /**< Minimum value of the bar*/
@@ -44,8 +44,8 @@ struct lv_bar_t {
     bool val_reversed;          /**< Whether value been reversed */
     lv_bar_anim_t cur_value_anim;
     lv_bar_anim_t start_value_anim;
-    lv_bar_mode_t mode : 2;     /**< Type of bar*/
-    lv_bar_orientation_t orientation : 2;  /**< Orientation of bar*/
+    lv_bar_mode_t mode : 3;     /**< Type of bar*/
+    lv_bar_orientation_t orientation : 3;  /**< Orientation of bar*/
 };
 
 

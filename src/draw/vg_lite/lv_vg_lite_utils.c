@@ -714,7 +714,7 @@ void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, co
 }
 
 bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src,
-                                  bool no_cache)
+                                  bool no_cache, bool premultiply)
 {
     LV_ASSERT_NULL(buffer);
     LV_ASSERT_NULL(decoder_dsc);
@@ -722,7 +722,7 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
 
     lv_image_decoder_args_t args;
     lv_memzero(&args, sizeof(lv_image_decoder_args_t));
-    args.premultiply = !lv_vg_lite_support_blend_normal();
+    args.premultiply = premultiply;
     args.stride_align = true;
     args.use_indexed = true;
     args.no_cache = no_cache;
@@ -758,13 +758,13 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
     return true;
 }
 
-void lv_vg_lite_image_dsc_init(struct lv_draw_vg_lite_unit_t * unit)
+void lv_vg_lite_image_dsc_init(struct _lv_draw_vg_lite_unit_t * unit)
 {
     unit->image_dsc_pending = lv_vg_lite_pending_create(sizeof(lv_image_decoder_dsc_t), 4);
     lv_vg_lite_pending_set_free_cb(unit->image_dsc_pending, image_dsc_free_cb, NULL);
 }
 
-void lv_vg_lite_image_dsc_deinit(struct lv_draw_vg_lite_unit_t * unit)
+void lv_vg_lite_image_dsc_deinit(struct _lv_draw_vg_lite_unit_t * unit)
 {
     lv_vg_lite_pending_destroy(unit->image_dsc_pending);
     unit->image_dsc_pending = NULL;
@@ -778,14 +778,10 @@ void lv_vg_lite_rect(vg_lite_rectangle_t * rect, const lv_area_t * area)
     rect->height = lv_area_get_height(area);
 }
 
-#if LV_USE_MATRIX
-
 void lv_vg_lite_matrix(vg_lite_matrix_t * dest, const lv_matrix_t * src)
 {
     lv_memcpy(dest, src, sizeof(lv_matrix_t));
 }
-
-#endif
 
 uint32_t lv_vg_lite_get_palette_size(vg_lite_buffer_format_t format)
 {
@@ -819,9 +815,9 @@ vg_lite_color_t lv_vg_lite_color(lv_color_t color, lv_opa_t opa, bool pre_mul)
     return (uint32_t)opa << 24 | (uint32_t)color.blue << 16 | (uint32_t)color.green << 8 | color.red;
 }
 
-vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode)
+vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode, bool has_pre_mul)
 {
-    if(vg_lite_query_feature(gcFEATURE_BIT_VG_LVGL_SUPPORT)) {
+    if(!has_pre_mul && vg_lite_query_feature(gcFEATURE_BIT_VG_LVGL_SUPPORT)) {
         switch(blend_mode) {
             case LV_BLEND_MODE_NORMAL: /**< Simply mix according to the opacity value*/
                 return VG_LITE_BLEND_NORMAL_LVGL;
@@ -842,7 +838,7 @@ vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode)
 
     switch(blend_mode) {
         case LV_BLEND_MODE_NORMAL: /**< Simply mix according to the opacity value*/
-            if(vg_lite_query_feature(gcFEATURE_BIT_VG_HW_PREMULTIPLY)) {
+            if(!has_pre_mul && vg_lite_query_feature(gcFEATURE_BIT_VG_HW_PREMULTIPLY)) {
                 return VG_LITE_BLEND_PREMULTIPLY_SRC_OVER;
             }
             return VG_LITE_BLEND_SRC_OVER;
@@ -1173,7 +1169,7 @@ void lv_vg_lite_disable_scissor(void)
                                LV_VER_RES));
 }
 
-void lv_vg_lite_flush(struct lv_draw_vg_lite_unit_t * u)
+void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
 {
     LV_ASSERT_NULL(u);
     LV_PROFILER_BEGIN;
@@ -1201,7 +1197,7 @@ void lv_vg_lite_flush(struct lv_draw_vg_lite_unit_t * u)
     LV_PROFILER_END;
 }
 
-void lv_vg_lite_finish(struct lv_draw_vg_lite_unit_t * u)
+void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
 {
     LV_ASSERT_NULL(u);
     LV_PROFILER_BEGIN;

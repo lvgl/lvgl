@@ -133,4 +133,33 @@ void test_switch_should_state_change_when_event_bubbling_is_enabled(void)
     TEST_ASSERT(lv_obj_has_state(sw, LV_STATE_CHECKED));
 }
 
+
+void test_screeshots(void)
+{
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_clean(scr);
+
+    sw = lv_switch_create(lv_screen_active());
+
+    sw = lv_switch_create(lv_screen_active());
+    lv_obj_add_state(sw, LV_STATE_CHECKED);
+
+    sw = lv_switch_create(lv_screen_active());
+
+    sw = lv_switch_create(lv_screen_active());
+    lv_obj_add_state(sw, LV_STATE_CHECKED | LV_STATE_DISABLED);
+
+    sw = lv_switch_create(lv_screen_active());
+    lv_switch_set_orientation(sw, LV_SWITCH_ORIENTATION_VERTICAL);
+    lv_obj_set_size(sw, 50, 100);
+
+    sw = lv_switch_create(lv_screen_active());
+    lv_switch_set_orientation(sw, LV_SWITCH_ORIENTATION_VERTICAL);
+    lv_obj_add_state(sw, LV_STATE_CHECKED);
+    lv_obj_set_size(sw, 50, 100);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/switch_1.png");
+}
+
 #endif

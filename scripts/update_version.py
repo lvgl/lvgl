@@ -3,6 +3,7 @@
 import os
 import re
 import argparse
+from typing import List, Union
 
 
 def get_arg():
@@ -43,12 +44,12 @@ class RepoFileVersionReplacer:
     DIR_SCRIPTS = os.path.dirname(__file__)
     DIR_REPO_ROOT = os.path.join(DIR_SCRIPTS, "..")
 
-    def __init__(self, relative_path_segments: list[str], expected_occurrences: int):
+    def __init__(self, relative_path_segments: List[str], expected_occurrences: int):
         self.path_relative = os.path.join(*relative_path_segments)
         self.path = os.path.join(self.DIR_REPO_ROOT, self.path_relative)
         self.expected_occurrences = expected_occurrences
 
-    def applyVersionToLine(self, line: str, version: Version) -> str | None:
+    def applyVersionToLine(self, line: str, version: Version) -> Union[str, None]:
         return None
 
     def applyVersion(self, version: Version):
@@ -72,7 +73,7 @@ class RepoFileVersionReplacer:
 
 class PrefixReplacer(RepoFileVersionReplacer):
 
-    def __init__(self, relative_path_segments: list[str], prefix: str, expected_occurrences=1):
+    def __init__(self, relative_path_segments: List[str], prefix: str, expected_occurrences=1):
         super().__init__(relative_path_segments, expected_occurrences)
         self.prefix = prefix
 
@@ -84,7 +85,7 @@ class PrefixReplacer(RepoFileVersionReplacer):
 
 
 class MacroReplacer(RepoFileVersionReplacer):
-    def __init__(self, relative_path_segments: list[str]):
+    def __init__(self, relative_path_segments: List[str]):
         super().__init__(relative_path_segments, 4)
 
     def applyVersionToLine(self, line: str, version: Version):
