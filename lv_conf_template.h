@@ -264,7 +264,7 @@
     #define LV_VG_LITE_STROKE_CACHE_CNT 32
 #endif
 
-/*& Accelerate blends, fills, etc. with STM32 DMA2D */
+/** Accelerate blends, fills, etc. with STM32 DMA2D */
 #define LV_USE_DRAW_DMA2D 0
 
 #if LV_USE_DRAW_DMA2D

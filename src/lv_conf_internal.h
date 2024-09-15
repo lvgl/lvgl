@@ -745,7 +745,7 @@
     #endif
 #endif
 
-/*& Accelerate blends, fills, etc. with STM32 DMA2D */
+/** Accelerate blends, fills, etc. with STM32 DMA2D */
 #ifndef LV_USE_DRAW_DMA2D
     #ifdef CONFIG_LV_USE_DRAW_DMA2D
         #define LV_USE_DRAW_DMA2D CONFIG_LV_USE_DRAW_DMA2D
