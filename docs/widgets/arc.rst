@@ -105,13 +105,19 @@ the object non-clickable:
    lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
    lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
 
-Advanced hit test
------------------
+Interactive area
+----------------
 
-If the :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` flag is enabled the arc can be
-clicked through in the middle. Clicks are recognized only on the ring of
-the background arc. :cpp:func:`lv_obj_set_ext_click_size` makes the sensitive
-area larger inside and outside with the given number of pixels.
+By default :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` is disabled which 
+means the arc's whole area is interactive. 
+As usual :cpp:func:`lv_obj_set_ext_click_size` can be used to increase
+the sensitive area outside the arc by a specified number of pixels.
+
+If :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` is enabled the arc will be sensitive only 
+in the range of start and end background angles and on the arc itself (not inside the arc). 
+In this case ``ext_click_size`` makes the sensitive area ticker both inward and outward.
+Additionally, a tolerance of :cpp:expr:`lv_dpx(50)` pixels is applied to each angle, extending the 
+hit-test range along the arc's length.
 
 Place another object to the knob
 --------------------------------

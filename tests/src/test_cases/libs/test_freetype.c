@@ -417,7 +417,12 @@ void test_freetype_bitmap_rendering_test(void)
                                                             12,
                                                             LV_FREETYPE_FONT_STYLE_NORMAL);
 
-    if(!font_italic || !font_normal || !font_normal_small) {
+    lv_font_t * font_emoji = lv_freetype_font_create("../examples/libs/freetype/NotoColorEmoji-32.subset.ttf",
+                                                     LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
+                                                     12,
+                                                     LV_FREETYPE_FONT_STYLE_NORMAL);
+
+    if(!font_italic || !font_normal || !font_normal_small || !font_emoji) {
         LV_LOG_ERROR("freetype font create failed.");
         TEST_FAIL();
     }
@@ -437,6 +442,11 @@ void test_freetype_bitmap_rendering_test(void)
     lv_style_init(&style_normal_small);
     lv_style_set_text_font(&style_normal_small, font_normal_small);
 
+    static lv_style_t style_normal_emoji;
+    lv_style_init(&style_normal_emoji);
+    lv_style_set_text_font(&style_normal_emoji, font_emoji);
+    lv_style_set_text_align(&style_normal_emoji, LV_TEXT_ALIGN_CENTER);
+
     /*Create a label with the new style*/
     lv_obj_t * label0 = lv_label_create(lv_screen_active());
     lv_obj_add_style(label0, &style_italic, 0);
@@ -455,6 +465,16 @@ void test_freetype_bitmap_rendering_test(void)
     lv_obj_set_width(label2, lv_obj_get_width(lv_screen_active()) - 20);
     lv_label_set_text(label2, UNIVERSAL_DECLARATION_OF_HUMAN_RIGHTS_JP);
     lv_obj_align_to(label2, label1, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
+
+    /* test emoji rendering
+     * emoji font does not contain normal characters, use fallback to render them */
+    font_emoji->fallback = font_normal;
+
+    lv_obj_t * label_emoji = lv_label_create(lv_screen_active());
+    lv_obj_add_style(label_emoji, &style_normal_emoji, 0);
+    lv_obj_set_width(label_emoji, lv_obj_get_width(lv_screen_active()) - 20);
+    lv_label_set_text(label_emoji, "FreeType Emoji test: 😀");
+    lv_obj_align_to(label_emoji, label2, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
 
     TEST_FREETYPE_ASSERT_EQUAL_SCREENSHOT("1");
 }

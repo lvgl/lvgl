@@ -75,7 +75,7 @@ enum {
     LV_PROPERTY_ID_ANY          = 0x7ffffffe, /*Special ID used by lvgl to intercept all setter/getter call.*/
 };
 
-struct lv_property_name_t {
+struct _lv_property_name_t {
     const char * name;
     lv_prop_id_t id;
 };

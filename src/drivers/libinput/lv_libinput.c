@@ -39,7 +39,7 @@
  *      TYPEDEFS
  **********************/
 
-struct lv_libinput_device {
+struct _lv_libinput_device {
     lv_libinput_capability capabilities;
     char * path;
 };
@@ -71,7 +71,7 @@ static void _delete(lv_libinput_t * dsc);
  *  STATIC VARIABLES
  **********************/
 
-static struct lv_libinput_device * devices = NULL;
+static struct _lv_libinput_device * devices = NULL;
 static size_t num_devices = 0;
 
 static const int timeout = 100; // ms
@@ -270,7 +270,7 @@ static bool _add_scanned_device(char * path, lv_libinput_capability capabilities
 {
     /* Double array size every 2^n elements */
     if((num_devices & (num_devices + 1)) == 0) {
-        struct lv_libinput_device * tmp = realloc(devices, (2 * num_devices + 1) * sizeof(struct lv_libinput_device));
+        struct _lv_libinput_device * tmp = realloc(devices, (2 * num_devices + 1) * sizeof(struct _lv_libinput_device));
         if(!tmp) {
             perror("could not reallocate memory for devices array");
             return false;

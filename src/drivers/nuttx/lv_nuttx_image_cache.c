@@ -136,6 +136,19 @@ static bool defer_init(void)
     return true;
 }
 
+static void heap_memdump(struct mm_heap_s * heap)
+{
+    struct mm_memdump_s dump = {
+        PID_MM_ALLOC,
+#if CONFIG_MM_BACKTRACE >= 0
+        0,
+        ULONG_MAX
+#endif
+    };
+
+    mm_memdump(heap, &dump);
+}
+
 static void * malloc_cb(size_t size_bytes, lv_color_format_t color_format)
 {
     LV_UNUSED(color_format);
@@ -163,6 +176,7 @@ static void * malloc_cb(size_t size_bytes, lv_color_format_t color_format)
         bool evict_res = lv_cache_evict_one(img_cache_p, NULL);
         if(evict_res == false) {
             LV_LOG_ERROR("failed to evict one cache entry");
+            heap_memdump(ctx->heap);
             return NULL;
         }
     }

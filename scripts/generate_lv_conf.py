@@ -90,8 +90,8 @@ def generate_config(path_destination: str, path_source: str, defaults: dict):
 
             print(f"Applying: {key} = {value}")
             keys_used.add(key)
-        elif 'Set it to "1" to enable content' in src_line:
-            dst_line = '#if 1 /*Content enable*/'
+        elif 'Set this to "1" to enable content' in src_line:
+            dst_line = '#if 1 /* Enable content */'
         else:
             dst_line = src_line
 

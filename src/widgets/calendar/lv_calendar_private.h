@@ -28,7 +28,7 @@ extern "C" {
  **********************/
 
 /** Data of calendar */
-struct lv_calendar_t {
+struct _lv_calendar_t {
     lv_obj_t obj;
     /* New data for this type */
     lv_obj_t * btnm;

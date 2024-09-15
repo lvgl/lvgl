@@ -31,7 +31,7 @@ extern "C" {
  *   - If already set `true` and `point` shouldn't be clickable set to `false`
  *   - If already set to `true` you agree that `point` can click the object leave it as `true`
  */
-struct lv_hit_test_info_t {
+struct _lv_hit_test_info_t {
     const lv_point_t * point;   /**< A point relative to screen to check if it can click the object or not*/
     bool res;                   /**< true: `point` can click the object; false: it cannot*/
 };
@@ -41,7 +41,7 @@ struct lv_hit_test_info_t {
  * In the event use `const lv_area_t * area = lv_event_get_cover_area(e)` to get the area to check
  * and `lv_event_set_cover_res(e, res)` to set the result.
  */
-struct lv_cover_check_info_t {
+struct _lv_cover_check_info_t {
     lv_cover_res_t res;
     const lv_area_t * area;
 };

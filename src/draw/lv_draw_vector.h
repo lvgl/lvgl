@@ -86,7 +86,7 @@ typedef enum {
     LV_VECTOR_GRADIENT_STYLE_RADIAL,
 } lv_vector_gradient_style_t;
 
-struct lv_fpoint_t {
+struct _lv_fpoint_t {
     float x;
     float y;
 };

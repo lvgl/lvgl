@@ -150,9 +150,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
 
     lv_area_t image_area = *dsc->letter_coords;
 
-    vg_lite_matrix_t matrix;
-    vg_lite_identity(&matrix);
-    lv_vg_lite_matrix_multiply(&matrix, &u->global_matrix);
+    vg_lite_matrix_t matrix = u->global_matrix;
     vg_lite_translate(image_area.x1, image_area.y1, &matrix);
 
     vg_lite_buffer_t src_buf;
@@ -198,9 +196,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
         vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
         LV_VG_LITE_ASSERT_PATH(vg_lite_path);
 
-        vg_lite_matrix_t path_matrix;
-        vg_lite_identity(&path_matrix);
-        lv_vg_lite_matrix_multiply(&path_matrix, &u->global_matrix);
+        vg_lite_matrix_t path_matrix = u->global_matrix;
         LV_VG_LITE_ASSERT_MATRIX(&path_matrix);
 
         LV_PROFILER_BEGIN_TAG("vg_lite_draw_pattern");
@@ -255,10 +251,7 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
     vg_lite_identity(&matrix);
 
     /* matrix for drawing, different from matrix for calculating the bonding box */
-    vg_lite_matrix_t draw_matrix;
-    vg_lite_identity(&draw_matrix);
-
-    lv_vg_lite_matrix_multiply(&draw_matrix, &u->global_matrix);
+    vg_lite_matrix_t draw_matrix = u->global_matrix;
 
     /* convert to vg-lite coordinate */
     vg_lite_translate(pos.x - dsc->g->ofs_x, pos.y + dsc->g->box_h + dsc->g->ofs_y, &draw_matrix);

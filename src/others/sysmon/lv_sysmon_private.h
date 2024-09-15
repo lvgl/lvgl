@@ -26,13 +26,13 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_sysmon_backend_data_t {
+struct _lv_sysmon_backend_data_t {
     lv_subject_t subject;
     lv_timer_t * timer;
 };
 
 #if LV_USE_PERF_MONITOR
-struct lv_sysmon_perf_info_t {
+struct _lv_sysmon_perf_info_t {
     struct {
         bool inited;
         uint32_t refr_start;

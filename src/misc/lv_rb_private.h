@@ -24,15 +24,15 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_rb_node_t {
-    struct lv_rb_node_t * parent;
-    struct lv_rb_node_t * left;
-    struct lv_rb_node_t * right;
+struct _lv_rb_node_t {
+    struct _lv_rb_node_t * parent;
+    struct _lv_rb_node_t * left;
+    struct _lv_rb_node_t * right;
     lv_rb_color_t color;
     void * data;
 };
 
-struct lv_rb_t {
+struct _lv_rb_t {
     lv_rb_node_t * root;
     lv_rb_compare_t compare;
     size_t size;

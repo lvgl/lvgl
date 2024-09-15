@@ -36,14 +36,9 @@ extern "C" {
  **********************/
 
 #define _LV_EVENT_LAST  LV_EVENT_LAST
-#define _lv_obj_t   lv_obj_t
-#define _lv_obj_class_t lv_obj_class_t
-#define _lv_event_t lv_event_t
 #define _lv_event_code_t lv_event_code_t
 #define _lv_event_mark_deleted lv_event_mark_deleted
 #define lv_obj_add_event lv_obj_add_event_cb
-
-#define _lv_anim_t lv_anim_t
 
 #define _LV_STYLE_LAST_BUILT_IN_PROP LV_STYLE_LAST_BUILT_IN_PROP
 #define _LV_FLEX_REVERSE LV_FLEX_REVERSE
@@ -78,12 +73,9 @@ extern "C" {
 #define _lv_obj_get_ext_draw_size lv_obj_get_ext_draw_size
 #define _lv_indev_scroll_handler lv_indev_scroll_handler
 
-#define _lv_display_t lv_display_t
 #define _lv_display_refr_timer lv_disp_refr_timer
 #define _lv_disp_refr_timer lv_disp_refr_timer
 #define _lv_disp_get_refr_timer lv_disp_get_refr_timer
-
-#define _lv_timer_t lv_timer_t
 
 #define _lv_inv_area lv_inv_area
 

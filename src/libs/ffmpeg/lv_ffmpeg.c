@@ -60,7 +60,7 @@ struct ffmpeg_context_s {
 
 #pragma pack(1)
 
-struct lv_image_pixel_color_s {
+struct _lv_image_pixel_color_s {
     lv_color_t c;
     uint8_t alpha;
 };

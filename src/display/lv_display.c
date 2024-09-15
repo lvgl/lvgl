@@ -578,7 +578,7 @@ lv_obj_t * lv_display_get_layer_bottom(lv_display_t * disp)
     return disp->bottom_layer;
 }
 
-void lv_screen_load(struct lv_obj_t * scr)
+void lv_screen_load(struct _lv_obj_t * scr)
 {
     lv_screen_load_anim(scr, LV_SCR_LOAD_ANIM_NONE, 0, 0, false);
 }

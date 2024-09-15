@@ -19,7 +19,7 @@ static void event_cb(lv_event_t * e)
 /**
  * Demonstrate event bubbling
  */
-void lv_example_event_3(void)
+void lv_example_event_bubble(void)
 {
 
     lv_obj_t * cont = lv_obj_create(lv_screen_active());

@@ -374,7 +374,7 @@ lv_obj_t * lv_display_get_layer_bottom(lv_display_t * disp);
  * Load a screen on the default display
  * @param scr       pointer to a screen
  */
-void lv_screen_load(struct lv_obj_t * scr);
+void lv_screen_load(struct _lv_obj_t * scr);
 
 /**
  * Switch screen with animation
