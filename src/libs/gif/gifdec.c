@@ -327,7 +327,7 @@ get_key(gd_GIF *gif, int key_size, uint8_t *sub_len, uint8_t *shift, uint8_t *by
 
 #if LV_GIF_CACHE_DECODE_DATA
 /* Decompress image pixels.
- * Return 0 on success or -1 on out-of-memory or parse errror (w.r.t. LZW code table). */
+ * Return 0 on success or -1 on out-of-memory (w.r.t. LZW code table) or parse error. */
 static int
 read_image_data(gd_GIF *gif, int interlace)
 {
@@ -540,7 +540,7 @@ interlaced_line_index(int h, int y)
 }
 
 /* Decompress image pixels.
- * Return 0 on success or -1 on out-of-memory or parse errror (w.r.t. LZW code table). */
+ * Return 0 on success or -1 on out-of-memory (w.r.t. LZW code table) or parse error. */
 static int
 read_image_data(gd_GIF * gif, int interlace)
 {
@@ -621,7 +621,7 @@ read_image_data(gd_GIF * gif, int interlace)
 #endif
 
 /* Read image.
- * Return 0 on success or -1 on out-of-memory or parse error (w.r.t. LZW code table). */
+ * Return 0 on success or -1 on out-of-memory (w.r.t. LZW code table) or parse error. */
 static int
 read_image(gd_GIF * gif)
 {
