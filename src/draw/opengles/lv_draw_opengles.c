@@ -42,6 +42,7 @@ typedef struct {
     lv_draw_unit_t base_unit;
     lv_draw_task_t * task_act;
     lv_cache_t * texture_cache;
+    unsigned int framebuffer;
 } lv_draw_opengles_unit_t;
 
 typedef struct {
@@ -62,9 +63,12 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_data);
 
 static unsigned int layer_get_texture(lv_layer_t * layer);
+static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u);
+
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
+static uint8_t opengles_render_buf[2048 * 1024 * 4];
 
 /**********************
  *  STATIC VARIABLES
@@ -221,8 +225,6 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 
 static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_data)
 {
-    static uint8_t opengles_render_buf[2048 * 1024 * 4];
-
     lv_draw_task_t * task = u->task_act;
 
     lv_layer_t dest_layer;
@@ -455,9 +457,8 @@ static void blend_texture_layer(lv_draw_opengles_unit_t * u)
 
     GL_CALL(glBindTexture(GL_TEXTURE_2D, target_texture));
 
-    unsigned int framebuffer_gl;
-    GL_CALL(glGenFramebuffers(1, &framebuffer_gl));
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_gl));
+    unsigned int framebuffer = get_framebuffer(u);
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
 
     lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
@@ -466,7 +467,6 @@ static void blend_texture_layer(lv_draw_opengles_unit_t * u)
     lv_opengles_render_texture(src_texture, &area, draw_dsc->opa, targ_tex_w, targ_tex_h, &clip_area, false);
 
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-    GL_CALL(glDeleteFramebuffers(1, &framebuffer_gl));
 
 
     GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
@@ -588,9 +588,8 @@ static void draw_from_cached_texture(lv_draw_opengles_unit_t * u)
 
     GL_CALL(glBindTexture(GL_TEXTURE_2D, target_texture));
 
-    unsigned int framebuffer_gl;
-    GL_CALL(glGenFramebuffers(1, &framebuffer_gl));
-    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_gl));
+    unsigned int framebuffer = get_framebuffer(u);
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
     GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
 
     lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
@@ -601,7 +600,6 @@ static void draw_from_cached_texture(lv_draw_opengles_unit_t * u)
     lv_opengles_render_texture(texture, &render_area, 0xff, targ_tex_w, targ_tex_h, &clip_area, true);
 
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-    GL_CALL(glDeleteFramebuffers(1, &framebuffer_gl));
 
     lv_cache_release(u->texture_cache, entry_cached, u);
 
@@ -631,16 +629,14 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
             int32_t targ_tex_w = lv_area_get_width(&layer->buf_area);
             int32_t targ_tex_h = lv_area_get_height(&layer->buf_area);
 
-            unsigned int framebuffer_gl;
-            GL_CALL(glGenFramebuffers(1, &framebuffer_gl));
-            GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_gl));
+            unsigned int framebuffer = get_framebuffer(u);
+            GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
             GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
 
             lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
             lv_opengles_render_fill(fill_dsc->color, &fill_area, fill_dsc->opa, targ_tex_w, targ_tex_h);
 
             GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-            GL_CALL(glDeleteFramebuffers(1, &framebuffer_gl));
 
             return;
         }
@@ -657,6 +653,14 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
 static unsigned int layer_get_texture(lv_layer_t * layer)
 {
     return (unsigned int)(uintptr_t)layer->user_data;
+}
+
+static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u)
+{
+    if(u->framebuffer == 0) {
+        GL_CALL(glGenFramebuffers(1, &u->framebuffer));
+    }
+    return u->framebuffer;
 }
 
 #endif /*LV_USE_DRAW_OPENGLES*/
