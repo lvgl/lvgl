@@ -618,27 +618,33 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
 
-    // if(t->type == LV_DRAW_TASK_TYPE_FILL) {
-    //     lv_draw_fill_dsc_t * fill_dsc = t->draw_dsc;
-    //     if(fill_dsc->radius == 0 && fill_dsc->grad.dir == LV_GRAD_DIR_NONE) {
-    //         SDL_Rect rect;
-    //         lv_layer_t * layer = u->base_unit.target_layer;
-    //         lv_area_t fill_area = t->area;
-    //         lv_area_intersect(&fill_area, &fill_area, u->base_unit.clip_area);
+    if(t->type == LV_DRAW_TASK_TYPE_FILL) {
+        lv_draw_fill_dsc_t * fill_dsc = t->draw_dsc;
+        if(fill_dsc->radius == 0 && fill_dsc->grad.dir == LV_GRAD_DIR_NONE) {
+            lv_layer_t * layer = u->base_unit.target_layer;
+            lv_area_t fill_area = t->area;
+            lv_area_intersect(&fill_area, &fill_area, u->base_unit.clip_area);
+            lv_area_move(&fill_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
-    //         rect.x = fill_area.x1 - layer->buf_area.x1;
-    //         rect.y = fill_area.y1 - layer->buf_area.y1;
-    //         rect.w = lv_area_get_width(&fill_area);
-    //         rect.h = lv_area_get_height(&fill_area);
-    //         lv_display_t * disp = lv_refr_get_disp_refreshing();
-    //         SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
-    //         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    //         SDL_SetRenderDrawColor(renderer, fill_dsc->color.red, fill_dsc->color.green, fill_dsc->color.blue, fill_dsc->opa);
-    //         SDL_RenderSetClipRect(renderer, NULL);
-    //         SDL_RenderFillRect(renderer, &rect);
-    //         return;
-    //     }
-    // }
+            unsigned int target_texture = layer_get_texture(layer);
+            LV_ASSERT(target_texture != 0);
+            int32_t targ_tex_w = lv_area_get_width(&layer->buf_area);
+            int32_t targ_tex_h = lv_area_get_height(&layer->buf_area);
+
+            unsigned int framebuffer_gl;
+            GL_CALL(glGenFramebuffers(1, &framebuffer_gl));
+            GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_gl));
+            GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
+
+            lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
+            lv_opengles_render_fill(fill_dsc->color, &fill_area, fill_dsc->opa, targ_tex_w, targ_tex_h);
+
+            GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+            GL_CALL(glDeleteFramebuffers(1, &framebuffer_gl));
+
+            return;
+        }
+    }
 
     if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
         blend_texture_layer(u);
