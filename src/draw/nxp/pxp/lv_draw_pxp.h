@@ -23,7 +23,8 @@ extern "C" {
 #include "../../../lv_conf_internal.h"
 
 #if LV_USE_DRAW_PXP
-#include "../../sw/lv_draw_sw.h"
+#include "../../sw/lv_draw_sw_private.h"
+#include "../../../misc/lv_area_private.h"
 
 /*********************
  *      DEFINES
