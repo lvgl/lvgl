@@ -14,6 +14,7 @@
 #if LV_USE_DRAW_G2D
 #include "../../../misc/lv_area_private.h"
 #include "g2d.h"
+#include "lv_g2d_buf_map.h"
 
 /*********************
  *      DEFINES
@@ -56,12 +57,6 @@ static void _g2d_execute_drawing(lv_draw_g2d_unit_t * u);
  *  STATIC VARIABLES
  **********************/
 
-void * g2d_handle = NULL;
-
-extern struct g2d_buf * ctx_buf1;
-extern struct g2d_buf * ctx_buf2;
-extern struct g2d_buf * temp_buf;
-
 /**********************
  *      MACROS
  **********************/
@@ -72,14 +67,16 @@ extern struct g2d_buf * temp_buf;
 
 void lv_draw_g2d_init(void)
 {
+    lv_draw_buf_g2d_init_handlers();
+
     lv_draw_g2d_unit_t * draw_g2d_unit = lv_draw_create_unit(sizeof(lv_draw_g2d_unit_t));
     draw_g2d_unit->base_unit.evaluate_cb = _g2d_evaluate;
     draw_g2d_unit->base_unit.dispatch_cb = _g2d_dispatch;
     draw_g2d_unit->base_unit.delete_cb = _g2d_delete;
-    if(g2d_open(&g2d_handle)) {
+    g2d_create_buf_map();
+    if(g2d_open(&draw_g2d_unit->g2d_handle)) {
         LV_LOG_ERROR("g2d_open fail.\n");
     }
-
 #if LV_USE_G2D_DRAW_THREAD
     lv_thread_init(&draw_g2d_unit->thread, "g2ddraw", LV_THREAD_PRIO_HIGH, _g2d_render_thread_cb, 2 * 1024, draw_g2d_unit);
 #endif
@@ -87,14 +84,7 @@ void lv_draw_g2d_init(void)
 
 void lv_draw_g2d_deinit(void)
 {
-    g2d_free(temp_buf);
-    g2d_free(ctx_buf1);
-    g2d_free(ctx_buf2);
-    g2d_close(g2d_handle);
-
-    temp_buf = 0;
-    ctx_buf1 = 0;
-    ctx_buf2 = 0;
+    g2d_free_buf_map();
 }
 
 /**********************
@@ -150,8 +140,12 @@ static int32_t _g2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
     LV_UNUSED(u);
 
     const lv_draw_dsc_base_t * draw_dsc_base = (lv_draw_dsc_base_t *) t->draw_dsc;
+    lv_draw_buf_t * draw_buf = draw_dsc_base->layer->draw_buf;
 
     if(!_g2d_dest_cf_supported(draw_dsc_base->layer->color_format))
+        return 0;
+
+    if(draw_buf && !g2d_search_buf_map(draw_buf->data))
         return 0;
 
     switch(t->type) {
@@ -230,30 +224,27 @@ static int32_t _g2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
 static int32_t _g2d_delete(lv_draw_unit_t * draw_unit)
 {
-#if LV_USE_G2D_DRAW_THREAD
     lv_draw_g2d_unit_t * draw_g2d_unit = (lv_draw_g2d_unit_t *) draw_unit;
+    lv_result_t res = LV_RESULT_OK;
 
+#if LV_USE_G2D_DRAW_THREAD
     LV_LOG_INFO("Cancel G2D draw thread.");
     draw_g2d_unit->exit_status = true;
 
     if(draw_g2d_unit->inited)
         lv_thread_sync_signal(&draw_g2d_unit->sync);
 
-    lv_result_t res = lv_thread_delete(&draw_g2d_unit->thread);
+    res = lv_thread_delete(&draw_g2d_unit->thread);
+#endif
+    g2d_close(draw_g2d_unit->g2d_handle);
 
     return res;
-#else
-    LV_UNUSED(draw_unit);
-
-    return 0;
-#endif
 }
 
 static void _g2d_execute_drawing(lv_draw_g2d_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
-    lv_draw_unit_t * draw_unit = (lv_draw_unit_t *)u;
-    lv_layer_t * layer = draw_unit->target_layer;
+    lv_layer_t * layer = t->target_layer;
     lv_draw_buf_t * draw_buf = layer->draw_buf;
 
     t->draw_unit = (lv_draw_unit_t *)u;
@@ -270,10 +261,10 @@ static void _g2d_execute_drawing(lv_draw_g2d_unit_t * u)
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_g2d_fill(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_g2d_fill(t);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_g2d_img(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_g2d_img(t);
             break;
         default:
             break;

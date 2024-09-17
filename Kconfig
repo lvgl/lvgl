@@ -414,6 +414,13 @@ menu "LVGL configuration"
 			bool "Use NXP's G2D on MPU platforms"
 			default n
 
+		config LV_G2D_HASH_TABLE_SIZE
+			bool "Maximum number of buffers that can be stored for G2D draw unit."
+			default 50
+			depends on LV_USE_DRAW_G2D
+			help
+				Includes the frame buffers and assets.
+
 		config LV_USE_G2D_DRAW_THREAD
 			bool "Use additional draw thread for G2D processing"
 			depends on LV_USE_DRAW_G2D && LV_USE_OS > 0

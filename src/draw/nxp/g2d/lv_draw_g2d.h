@@ -33,7 +33,11 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef lv_draw_sw_unit_t lv_draw_g2d_unit_t;
+typedef struct lv_draw_g2d_unit {
+    lv_draw_sw_unit_t;
+
+    void * g2d_handle;
+} lv_draw_g2d_unit_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -43,9 +47,11 @@ void lv_draw_g2d_init(void);
 
 void lv_draw_g2d_deinit(void);
 
-void lv_draw_g2d_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_buf_g2d_init_handlers(void);
 
-void lv_draw_g2d_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_g2d_fill(lv_draw_task_t * t);
+
+void lv_draw_g2d_img(lv_draw_task_t * t);
 
 /**********************
  *      MACROS
