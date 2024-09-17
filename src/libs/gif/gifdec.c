@@ -117,7 +117,7 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
         LV_LOG_WARN("Zero size image");
         goto fail;
     }
-    #if LV_GIF_CACHE_DECODE_DATA
+#if LV_GIF_CACHE_DECODE_DATA
     if(0 == (INT_MAX - sizeof(gd_GIF) - LZW_CACHE_SIZE) / width / height / 5){
         LV_LOG_WARN("Image dimensions are too large");
         goto fail;
