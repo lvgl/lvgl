@@ -145,6 +145,12 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
     if(fill_draw_dsc && fill_area) {
         lv_draw_vg_lite_fill(draw_unit, fill_draw_dsc, fill_area);
     }
+
+    /* Flush in time to avoid accumulation of drawing commands */
+    u->letter_count++;
+    if(u->letter_count > PATH_FLUSH_COUNT_MAX) {
+        lv_vg_lite_flush(u);
+    }
 }
 
 static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_dsc_t * dsc)
@@ -296,12 +302,6 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
                                &u->target_buffer, vg_lite_path, VG_LITE_FILL_NON_ZERO,
                                &draw_matrix, VG_LITE_BLEND_SRC_OVER, lv_vg_lite_color(dsc->color, dsc->opa, true)));
     LV_PROFILER_END_TAG("vg_lite_draw");
-
-    u->letter_count++;
-    if(u->letter_count > PATH_FLUSH_COUNT_MAX) {
-        /* Flush in time to avoid accumulation of drawing commands */
-        lv_vg_lite_flush(u);
-    }
 
     LV_PROFILER_END;
 }
