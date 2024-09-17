@@ -58,7 +58,7 @@ typedef struct {
     bool continue_reading;  /**< If set to true, the read callback is invoked again, unless the device is in event-driven mode*/
 } lv_indev_data_t;
 
-typedef void (*lv_indev_read_cb_t)(lv_indev_t * indev, lv_indev_data_t * data);
+typedef bool (*lv_indev_read_cb_t)(lv_indev_t * indev, lv_indev_data_t * data);
 
 /**********************
  * GLOBAL PROTOTYPES

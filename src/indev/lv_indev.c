@@ -167,10 +167,12 @@ lv_indev_t * lv_indev_get_next(lv_indev_t * indev)
         return lv_ll_get_next(indev_ll_head, indev);
 }
 
-void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
+bool indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
 {
     LV_PROFILER_BEGIN;
     lv_memzero(data, sizeof(lv_indev_data_t));
+
+    bool ret = false;
 
     /* For touchpad sometimes users don't set the last pressed coordinate on release.
      * So be sure a coordinates are initialized to the last point */
@@ -189,12 +191,14 @@ void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
 
     if(indev->read_cb) {
         LV_TRACE_INDEV("calling indev_read_cb");
-        indev->read_cb(indev, data);
+        ret = indev->read_cb(indev, data);
     }
     else {
         LV_LOG_WARN("indev_read_cb is not registered");
     }
     LV_PROFILER_END;
+
+    return ret;
 }
 
 void lv_indev_read_timer_cb(lv_timer_t * timer)
@@ -225,11 +229,12 @@ void lv_indev_read(lv_indev_t * indev)
     LV_PROFILER_BEGIN;
 
     bool continue_reading;
+    bool refresh_display = false;
     lv_indev_data_t data;
 
     do {
         /*Read the data*/
-        indev_read_core(indev, &data);
+        refresh_display = indev_read_core(indev, &data);
         continue_reading = indev->mode != LV_INDEV_MODE_EVENT && data.continue_reading;
 
         /*The active object might be deleted even in the read function*/
@@ -260,6 +265,20 @@ void lv_indev_read(lv_indev_t * indev)
         }
         /*Handle reset query if it happened in during processing*/
         indev_proc_reset_query_handler(indev);
+
+        /*
+        This code places a higher priority in user
+        input and updating the display. To use this feature you set the
+        continue_reading in the lv_indev_data_t structure to true and return
+        true when there is user input. Optionally if you want to update
+        the display immediatly when there is user input then you can return true
+        from the callback and set the continue_reading field to false. That
+        will eliminate looping. The existing behavior of the continue_reading
+        field would work as it did when returning false form the callback
+        function
+        */
+        if (refresh_display) lv_refr_now(indev->disp);
+
     } while(continue_reading);
 
     /*End of indev processing, so no act indev*/

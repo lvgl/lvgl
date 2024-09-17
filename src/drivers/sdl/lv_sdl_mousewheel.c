@@ -20,7 +20,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void sdl_mousewheel_read(lv_indev_t * indev, lv_indev_data_t * data);
+static bool sdl_mousewheel_read(lv_indev_t * indev, lv_indev_data_t * data);
 static void release_indev_cb(lv_event_t * e);
 
 /**********************
@@ -62,13 +62,14 @@ lv_indev_t * lv_sdl_mousewheel_create(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static void sdl_mousewheel_read(lv_indev_t * indev, lv_indev_data_t * data)
+static bool sdl_mousewheel_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     lv_sdl_mousewheel_t * dsc = lv_indev_get_driver_data(indev);
 
     data->state = dsc->state;
     data->enc_diff = dsc->diff;
     dsc->diff = 0;
+    return false;
 }
 
 static void release_indev_cb(lv_event_t * e)

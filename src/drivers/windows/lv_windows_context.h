@@ -44,6 +44,8 @@ extern "C" {
 typedef struct _lv_windows_pointer_context_t {
     lv_indev_state_t state;
     lv_point_t point;
+    lv_point_t last_point;
+    lv_indev_state_t last_state;
     lv_indev_t * indev;
 } lv_windows_pointer_context_t;
 
@@ -57,12 +59,15 @@ typedef struct _lv_windows_keypad_context_t {
     uint16_t utf16_high_surrogate;
     uint16_t utf16_low_surrogate;
     lv_indev_t * indev;
+    uint32_t last_key;
+    lv_indev_state_t last_state;
 } lv_windows_keypad_context_t;
 
 typedef struct _lv_windows_encoder_context_t {
     lv_indev_state_t state;
     int16_t enc_diff;
     lv_indev_t * indev;
+    lv_indev_state_t last_state;
 } lv_windows_encoder_context_t;
 
 typedef struct _lv_windows_window_context_t {
