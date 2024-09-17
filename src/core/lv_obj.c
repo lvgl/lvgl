@@ -231,6 +231,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent)
 void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(lv_obj_has_flag(obj, f)) /*Check if all flags are set*/
+        return;
 
     bool was_on_layout = lv_obj_is_layout_positioned(obj);
 
@@ -268,6 +270,8 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(!lv_obj_has_flag_any(obj, f))
+        return;
 
     bool was_on_layout = lv_obj_is_layout_positioned(obj);
     if(f & LV_OBJ_FLAG_SCROLLABLE) {
