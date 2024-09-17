@@ -849,9 +849,11 @@ static void update_align(lv_obj_t * obj)
     if(img->align == LV_IMAGE_ALIGN_STRETCH) {
         lv_image_set_rotation(obj, 0);
         lv_image_set_pivot(obj, 0, 0);
-        int32_t scale_x = lv_obj_get_width(obj) * LV_SCALE_NONE / img->w;
-        int32_t scale_y = lv_obj_get_height(obj) * LV_SCALE_NONE / img->h;
-        scale_update(obj, scale_x, scale_y);
+        if(img->w != 0 && img->h != 0) {
+            int32_t scale_x = lv_obj_get_width(obj) * LV_SCALE_NONE / img->w;
+            int32_t scale_y = lv_obj_get_height(obj) * LV_SCALE_NONE / img->h;
+            scale_update(obj, scale_x, scale_y);
+        }
     }
     else if(img->align == LV_IMAGE_ALIGN_TILE) {
         lv_image_set_rotation(obj, 0);
