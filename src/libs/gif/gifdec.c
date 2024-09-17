@@ -637,7 +637,7 @@ read_image(gd_GIF * gif)
     gif->fy = read_num(gif);
     gif->fw = read_num(gif);
     gif->fh = read_num(gif);
-    if(gif->fx + gif->fw > gif->width || gif->fy + gif->fh > gif->height){
+    if(gif->fx + (uint32_t)gif->fw > gif->width || gif->fy + (uint32_t)gif->fh > gif->height){
         LV_LOG_WARN("Frame coordinates out of image bounds");
         return -1;
     }
