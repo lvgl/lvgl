@@ -435,6 +435,11 @@ void lv_image_set_inner_align(lv_obj_t * obj, lv_image_align_t align)
     lv_image_t * img = (lv_image_t *)obj;
     if(align == img->align) return;
 
+    /*If we're removing STRETCH, reset the scale*/
+    if(img->align == LV_IMAGE_ALIGN_STRETCH) {
+        lv_image_set_scale(obj, LV_SCALE_NONE);
+    }
+
     img->align = align;
     update_align(obj);
 
