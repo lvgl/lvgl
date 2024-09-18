@@ -238,14 +238,14 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         else {
             lv_draw_sw_rotate(px_map, fb_start, px_map_w, px_map_h, px_map_stride, fb_stride, rotation, cf);
         }
+    }
 
-        if(lv_display_flush_is_last(disp)) {
-            if(sdl_render_mode() != LV_DISPLAY_RENDER_MODE_PARTIAL) {
-                dsc->fb_act = px_map;
-            }
-
-            window_update(disp);
+    if(lv_display_flush_is_last(disp)) {
+        if(sdl_render_mode() != LV_DISPLAY_RENDER_MODE_PARTIAL) {
+            dsc->fb_act = px_map;
         }
+
+        window_update(disp);
     }
 #else
     LV_UNUSED(area);
