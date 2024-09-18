@@ -75,7 +75,12 @@ void _lv_obj_style_init(void)
 
 void lv_obj_add_style(lv_obj_t * obj, lv_style_t * style, lv_style_selector_t selector)
 {
+    LV_ASSERT(obj->style_cnt < 63);
+
     trans_del(obj, selector, LV_STYLE_PROP_ANY, NULL);
+
+    /*Try removing the style first to be sure it won't be added twice*/
+    lv_obj_remove_style(obj, style, selector);
 
     uint32_t i;
     /*Go after the transition and local styles*/
@@ -89,7 +94,9 @@ void lv_obj_add_style(lv_obj_t * obj, lv_style_t * style, lv_style_selector_t se
 
     /*Allocate space for the new style and shift the rest of the style to the end*/
     obj->style_cnt++;
+    LV_ASSERT(obj->style_cnt != 0);
     obj->styles = lv_mem_realloc(obj->styles, obj->style_cnt * sizeof(_lv_obj_style_t));
+    LV_ASSERT_MALLOC(obj->styles);
 
     uint32_t j;
     for(j = obj->style_cnt - 1; j > i ; j--) {
@@ -548,6 +555,7 @@ static lv_style_t * get_local_style(lv_obj_t * obj, lv_style_selector_t selector
     }
 
     obj->style_cnt++;
+    LV_ASSERT(obj->style_cnt != 0);
     obj->styles = lv_mem_realloc(obj->styles, obj->style_cnt * sizeof(_lv_obj_style_t));
     LV_ASSERT_MALLOC(obj->styles);
 
@@ -584,7 +592,9 @@ static _lv_obj_style_t * get_trans_style(lv_obj_t * obj,  lv_style_selector_t se
     if(i != obj->style_cnt) return &obj->styles[i];
 
     obj->style_cnt++;
+    LV_ASSERT(obj->style_cnt != 0);
     obj->styles = lv_mem_realloc(obj->styles, obj->style_cnt * sizeof(_lv_obj_style_t));
+    LV_ASSERT_MALLOC(obj->styles);
 
     for(i = obj->style_cnt - 1; i > 0 ; i--) {
         obj->styles[i] = obj->styles[i - 1];
