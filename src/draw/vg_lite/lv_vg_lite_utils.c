@@ -1175,6 +1175,7 @@ void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
     LV_PROFILER_BEGIN;
 
     u->flush_count++;
+    u->letter_count = 0;
 
 #if LV_VG_LITE_FLUSH_MAX_COUNT
     if(u->flush_count < LV_VG_LITE_FLUSH_MAX_COUNT) {
@@ -1212,6 +1213,7 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
     /* Clear image decoder dsc reference */
     lv_vg_lite_pending_remove_all(u->image_dsc_pending);
     u->flush_count = 0;
+    u->letter_count = 0;
     LV_PROFILER_END;
 }
 

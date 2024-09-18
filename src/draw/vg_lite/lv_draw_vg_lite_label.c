@@ -26,6 +26,14 @@
 
 #define PATH_QUALITY VG_LITE_HIGH
 #define PATH_DATA_COORD_FORMAT VG_LITE_S16
+
+#if LV_VG_LITE_FLUSH_MAX_COUNT > 0
+    #define PATH_FLUSH_COUNT_MAX 0
+#else
+    /* When using IDLE Flush mode, reduce the number of flushes */
+    #define PATH_FLUSH_COUNT_MAX 8
+#endif
+
 #define FT_F26DOT6_SHIFT 6
 
 /** After converting the font reference size, it is also necessary to scale the 26dot6 data
@@ -136,6 +144,12 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
 
     if(fill_draw_dsc && fill_area) {
         lv_draw_vg_lite_fill(draw_unit, fill_draw_dsc, fill_area);
+    }
+
+    /* Flush in time to avoid accumulation of drawing commands */
+    u->letter_count++;
+    if(u->letter_count > PATH_FLUSH_COUNT_MAX) {
+        lv_vg_lite_flush(u);
     }
 }
 
@@ -288,9 +302,6 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
                                &u->target_buffer, vg_lite_path, VG_LITE_FILL_NON_ZERO,
                                &draw_matrix, VG_LITE_BLEND_SRC_OVER, lv_vg_lite_color(dsc->color, dsc->opa, true)));
     LV_PROFILER_END_TAG("vg_lite_draw");
-
-    /* Flush in time to avoid accumulation of drawing commands */
-    lv_vg_lite_flush(u);
 
     LV_PROFILER_END;
 }
