@@ -18,6 +18,8 @@ extern "C" {
 
 #if LV_USE_LIBINPUT
 
+#include "lv_xkb_private.h"
+
 /*********************
  *      DEFINES
  *********************/
