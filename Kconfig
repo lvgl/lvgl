@@ -1411,11 +1411,13 @@ menu "LVGL configuration"
 				bool "Center"
 		endchoice
 
-		config LV_USE_PROFILER
+		menuconfig LV_USE_PROFILER
 			bool "Runtime performance profiler"
+
+		if LV_USE_PROFILER
+
 		config LV_USE_PROFILER_BUILTIN
 			bool "Enable the built-in profiler"
-			depends on LV_USE_PROFILER
 			default y
 		config LV_PROFILER_BUILTIN_BUF_SIZE
 			int "Default profiler trace buffer size in bytes"
@@ -1423,8 +1425,49 @@ menu "LVGL configuration"
 			default 16384
 		config LV_PROFILER_INCLUDE
 			string "Header to include for the profiler"
-			depends on LV_USE_PROFILER
 			default "lvgl/src/misc/lv_profiler_builtin.h"
+
+		config LV_PROFILER_LAYOUT
+			bool "Enable layout profiler"
+			default y
+
+		config LV_PROFILER_REFR
+			bool "Enable disp refr profiler"
+			default y
+
+		config LV_PROFILER_DRAW
+			bool "Enable draw profiler"
+			default y
+
+		config LV_PROFILER_INDEV
+			bool "Enable indev profiler"
+			default y
+
+		config LV_PROFILER_DECODER
+			bool "Enable decoder profiler"
+			default y
+
+		config LV_PROFILER_FONT
+			bool "Enable font profiler"
+			default y
+
+		config LV_PROFILER_FS
+			bool "Enable fs profiler"
+			default y
+
+		config LV_PROFILER_STYLE
+			bool "Enable style profiler"
+			default n
+
+		config LV_PROFILER_TIMER
+			bool "Enable timer profiler"
+			default y
+
+		config LV_PROFILER_CACHE
+			bool "Enable cache profiler"
+			default y
+
+		endif # LV_USE_PROFILER
 
 		config LV_USE_MONKEY
 			bool "Enable Monkey test"

@@ -296,7 +296,7 @@ void lv_obj_update_layout(const lv_obj_t * obj)
         LV_LOG_TRACE("Already running, returning");
         return;
     }
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_LAYOUT_BEGIN;
     update_layout_mutex = true;
 
     lv_obj_t * scr = lv_obj_get_screen(obj);
@@ -309,7 +309,7 @@ void lv_obj_update_layout(const lv_obj_t * obj)
     }
 
     update_layout_mutex = false;
-    LV_PROFILER_END;
+    LV_PROFILER_LAYOUT_END;
 }
 
 void lv_obj_set_align(lv_obj_t * obj, lv_align_t align)

@@ -278,6 +278,8 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
 
     if(!style_refr) return;
 
+    LV_PROFILER_STYLE_BEGIN;
+
     lv_obj_invalidate(obj);
 
     lv_part_t part = lv_obj_style_get_selector_part(selector);
@@ -316,6 +318,8 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
             refresh_children_style(obj);
         }
     }
+
+    LV_PROFILER_STYLE_END;
 }
 
 void lv_obj_enable_style_refresh(bool en)
@@ -353,6 +357,7 @@ bool lv_obj_has_style_prop(const lv_obj_t * obj, lv_style_selector_t selector, l
 void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t value,
                                  lv_style_selector_t selector)
 {
+    LV_PROFILER_STYLE_BEGIN;
     lv_style_t * style = get_local_style(obj, selector);
     if(selector == LV_PART_MAIN && lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_TRANSFORM)) {
         lv_obj_invalidate(obj);
@@ -371,6 +376,7 @@ void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_
 #endif
 
     lv_obj_refresh_style(obj, selector, prop);
+    LV_PROFILER_STYLE_END;
 }
 
 lv_style_res_t lv_obj_get_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t * value,
