@@ -82,6 +82,7 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
         case LV_COLOR_FORMAT_RGB888:
         case LV_COLOR_FORMAT_XRGB8888:
         case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_A8:
         case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_I1:
             break;
