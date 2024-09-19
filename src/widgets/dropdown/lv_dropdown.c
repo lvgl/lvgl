@@ -916,7 +916,7 @@ static void draw_main(lv_event_t * e)
         }
 
         if(symbol_type == LV_IMAGE_SRC_SYMBOL) {
-            symbol_area.y1 = obj->coords.y1 + top;
+            symbol_area.y1 = obj->coords.y1 + (lv_obj_get_height(obj) - symbol_h) / 2;
             symbol_area.y2 = symbol_area.y1 + symbol_h - 1;
             symbol_dsc.text = dropdown->symbol;
             lv_draw_label(layer, &symbol_dsc, &symbol_area);
@@ -943,8 +943,8 @@ static void draw_main(lv_event_t * e)
                      label_dsc.flag);
 
     lv_area_t txt_area;
-    txt_area.y1 = obj->coords.y1 + top;
-    txt_area.y2 = txt_area.y1 + size.y;
+    txt_area.y1 = obj->coords.y1 + (lv_obj_get_height(obj) - size.y) / 2;
+    txt_area.y2 = txt_area.y1 + size.y - 1;
     /*Center align the text if no symbol*/
     if(dropdown->symbol == NULL) {
         txt_area.x1 = obj->coords.x1 + (lv_obj_get_width(obj) - size.x) / 2;
