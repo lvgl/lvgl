@@ -44,10 +44,6 @@ static inline uint32_t get_layer_size_kb(uint32_t size_byte)
  **********************/
 
 /**********************
- *  STATIC VARIABLES
- **********************/
-
-/**********************
  *      MACROS
  **********************/
 
