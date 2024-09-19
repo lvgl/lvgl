@@ -662,6 +662,24 @@ extern "C" {
         }
     }
 
+    static void picture_bgra8888_to_l8(uint8_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size)
+    {
+        while(px_size--) {
+            *dest = (src->red * 19595 + src->green * 38469 + src->blue * 7472) >> 16;
+            src++;
+            dest++;
+        }
+    }
+
+    static void picture_bgra8888_to_alpha8(uint8_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size)
+    {
+        while(px_size--) {
+            *dest = src->alpha;
+            src++;
+            dest++;
+        }
+    }
+
     vg_lite_error_t vg_lite_finish(void)
     {
         vg_lite_ctx * ctx = vg_lite_ctx::get_instance();
@@ -693,6 +711,18 @@ extern "C" {
             case VG_LITE_BGR888:
                 picture_bgra8888_to_bgr888(
                     (vg_color24_t *)ctx->target_buffer,
+                    (const vg_color32_t *)ctx->get_temp_target_buffer(),
+                    ctx->target_px_size);
+                break;
+            case VG_LITE_L8:
+                picture_bgra8888_to_l8(
+                    (uint8_t *)ctx->target_buffer,
+                    (const vg_color32_t *)ctx->get_temp_target_buffer(),
+                    ctx->target_px_size);
+                break;
+            case VG_LITE_A8:
+                picture_bgra8888_to_alpha8(
+                    (uint8_t *)ctx->target_buffer,
                     (const vg_color32_t *)ctx->get_temp_target_buffer(),
                     ctx->target_px_size);
                 break;
