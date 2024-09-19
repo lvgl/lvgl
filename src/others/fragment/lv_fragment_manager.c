@@ -188,6 +188,10 @@ bool lv_fragment_manager_send_event(lv_fragment_manager_t * manager, int code, v
     LV_ASSERT_NULL(manager);
     lv_fragment_managed_states_t * p = NULL;
     LV_LL_READ_BACK(&manager->attached, p) {
+        if(!p) {
+            LV_LOG_WARN("No fragments are attached");
+            break;
+        }
         if(!p->obj_created || p->destroying_obj) continue;
         lv_fragment_t * instance = p->instance;
         if(!instance) continue;
