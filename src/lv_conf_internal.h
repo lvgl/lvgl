@@ -3742,6 +3742,15 @@
     #endif
 #endif
 
+/** SVG demo */
+#ifndef LV_USE_DEMO_SVG
+    #ifdef CONFIG_LV_USE_DEMO_SVG
+        #define LV_USE_DEMO_SVG CONFIG_LV_USE_DEMO_SVG
+    #else
+        #define LV_USE_DEMO_SVG  0
+    #endif
+#endif
+
 
 
 /*----------------------------------

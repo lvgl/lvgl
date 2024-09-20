@@ -1161,6 +1161,9 @@
 /** Vector graphic demo */
 #define LV_USE_DEMO_VECTOR_GRAPHIC  0
 
+/** SVG demo */
+#define LV_USE_DEMO_SVG  0
+
 /*--END OF LV_CONF_H--*/
 
 #endif /*LV_CONF_H*/

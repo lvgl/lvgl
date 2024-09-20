@@ -71,6 +71,10 @@ static const demo_entry_info_t demos_entry_info[] = {
     { "vector_graphic_not_buffered", .entry_cb = lv_demo_vector_graphic_not_buffered },
 #endif
 
+#if LV_USE_DEMO_SVG && LV_USE_VECTOR_GRAPHIC
+    { "svg", .entry_cb = lv_demo_svg },
+#endif
+
 #if LV_USE_DEMO_BENCHMARK
     { "benchmark", .entry_cb = lv_demo_benchmark },
 #endif
