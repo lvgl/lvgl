@@ -437,6 +437,9 @@ bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_NV12:
             return vg_lite_query_feature(gcFEATURE_BIT_VG_YUV_INPUT) ? true : false;
 
+        case LV_COLOR_FORMAT_YUY2:
+            return vg_lite_query_feature(gcFEATURE_BIT_VG_YUY2_INPUT) ? true : false;
+
         default:
             break;
     }
@@ -485,6 +488,9 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
 
         case LV_COLOR_FORMAT_NV12:
             return VG_LITE_NV12;
+
+        case LV_COLOR_FORMAT_YUY2:
+            return VG_LITE_YUY2;
 
         default:
             LV_LOG_ERROR("unsupported color format: %d", cf);
