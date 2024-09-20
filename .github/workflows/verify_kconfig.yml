@@ -1,0 +1,22 @@
+name: Verify Kconfig
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify-kconfig:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.7
+      - name: Run kconfig_verify.py
+        run: python3 -m pip install kconfiglib && python kconfig_verify.py ../Kconfig
+        working-directory: scripts
