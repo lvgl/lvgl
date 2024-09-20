@@ -33,6 +33,16 @@ Image sources
 To set the image in a state, use the
 :cpp:expr:`lv_animimg_set_src(imagebutton, dsc[], num)`.
 
+Using the inner animation
+-------------------------
+
+For more advanced use cases, the animation internally used by the image can be
+retrieved using the :cpp:expr:`lv_animimg_get_anim(image)`. This way, the
+:ref:`Animation <animations>` functions can be used, for example to
+override the animation values using the
+:cpp:expr:`lv_anim_set_values(anim, start, end)` or to set a callback
+on the animation completed event.
+
 .. _lv_animimg_events:
 
 Events
