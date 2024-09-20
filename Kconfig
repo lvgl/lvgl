@@ -445,12 +445,12 @@ menu "LVGL configuration"
 				Accelerate blends, fills, image decoding, etc. with STM32 DMA2D.
 
 		config LV_DRAW_DMA2D_HAL_INCLUDE
-			int "the header file for LVGL to include for DMA2D"
+			string "the header file for LVGL to include for DMA2D"
 			default "stm32h7xx_hal.h"
 			depends on LV_USE_DRAW_DMA2D
 
 		config LV_USE_DRAW_DMA2D_INTERRUPT
-			int "use the DMA2D transfer complete interrupt"
+			bool "use the DMA2D transfer complete interrupt"
 			default n
 			depends on LV_USE_DRAW_DMA2D
 			help
@@ -1384,7 +1384,7 @@ menu "LVGL configuration"
 		config LV_USE_MEM_MONITOR
 			bool "Show the used memory and the memory fragmentation"
 			default n
-			depends on LV_STDLIB_BUILTIN && LV_USE_SYSMON
+			depends on LV_USE_BUILTIN_MALLOC && LV_USE_SYSMON
 
 		choice
 			prompt "Memory monitor position"
