@@ -144,8 +144,9 @@ lv_result_t lv_array_concat(lv_array_t * array, const lv_array_t * other);
 /**
  * Push back element. Adds a new element to the end of the array.
  * If the array capacity is not enough for the new element, the array will be resized automatically.
+ * @note If the element is NULL, it will be added as an empty element.
  * @param array pointer to an `lv_array_t` variable
- * @param element pointer to the element to add
+ * @param element pointer to the element to add. NULL to push an empty element.
  * @return LV_RESULT_OK: success, otherwise: error
  */
 lv_result_t lv_array_push_back(lv_array_t * array, const void * element);
