@@ -22,6 +22,15 @@ extern "C" {
  *********************/
 
 /**********************
+ *      TYPEDEFS
+ **********************/
+
+typedef struct {
+    lv_calendar_date_t today;
+    bool leep_month;
+} lv_calendar_chinese_t;
+
+/**********************
  * GLOBAL PROTOTYPES
  **********************/
 
