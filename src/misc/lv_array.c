@@ -157,8 +157,13 @@ lv_result_t lv_array_push_back(lv_array_t * array, const void * element)
         lv_array_resize(array, array->capacity + LV_ARRAY_DEFAULT_CAPACITY);
     }
 
+    /**
+     * When the element is NULL, it means that the user wants to add an empty element.
+     */
     uint8_t * data = array->data + array->size * array->element_size;
-    lv_memcpy(data, element, array->element_size);
+    if(element) lv_memcpy(data, element, array->element_size);
+    else lv_memzero(data, array->element_size);
+
     array->size++;
     return LV_RESULT_OK;
 }
