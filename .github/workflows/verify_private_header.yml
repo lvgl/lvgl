@@ -1,0 +1,22 @@
+name: Verify lvgl_private.h
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify-kconfig:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.7
+      - name: Verify lvgl_private.h
+        run: python3 generate_private_header.py verify
+        working-directory: scripts
