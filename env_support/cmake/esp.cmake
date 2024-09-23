@@ -70,3 +70,9 @@ if(CONFIG_LV_ATTRIBUTE_FAST_MEM_USE_IRAM)
   target_compile_definitions(${COMPONENT_LIB}
                              PUBLIC "-DLV_ATTRIBUTE_FAST_MEM=IRAM_ATTR")
 endif()
+
+if(CONFIG_FREERTOS_SMP)
+    target_include_directories(${COMPONENT_LIB} PRIVATE "${IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/include/freertos/")
+else()
+    target_include_directories(${COMPONENT_LIB} PRIVATE "${IDF_PATH}/components/freertos/FreeRTOS-Kernel/include/freertos/")
+endif()
