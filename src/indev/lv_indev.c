@@ -169,7 +169,7 @@ lv_indev_t * lv_indev_get_next(lv_indev_t * indev)
 
 void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_INDEV_BEGIN;
     lv_memzero(data, sizeof(lv_indev_data_t));
 
     /* For touchpad sometimes users don't set the last pressed coordinate on release.
@@ -194,7 +194,8 @@ void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
     else {
         LV_LOG_WARN("indev_read_cb is not registered");
     }
-    LV_PROFILER_END;
+
+    LV_PROFILER_INDEV_END;
 }
 
 void lv_indev_read_timer_cb(lv_timer_t * timer)
@@ -222,7 +223,7 @@ void lv_indev_read(lv_indev_t * indev)
         return;
     }
 
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_INDEV_BEGIN;
 
     bool continue_reading;
     lv_indev_data_t data;
@@ -267,7 +268,7 @@ void lv_indev_read(lv_indev_t * indev)
     indev_obj_act = NULL;
 
     LV_TRACE_INDEV("finished");
-    LV_PROFILER_END;
+    LV_PROFILER_INDEV_END;
 }
 
 void lv_indev_enable(lv_indev_t * indev, bool enable)

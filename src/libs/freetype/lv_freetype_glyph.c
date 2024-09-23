@@ -81,6 +81,7 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
 {
     LV_ASSERT_NULL(font);
     LV_ASSERT_NULL(g_dsc);
+    LV_PROFILER_FONT_BEGIN;
 
     if(unicode_letter < 0x20) {
         g_dsc->adv_w  = 0;
@@ -89,6 +90,7 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
         g_dsc->ofs_x  = 0;
         g_dsc->ofs_y  = 0;
         g_dsc->format = LV_FONT_GLYPH_FORMAT_NONE;
+        LV_PROFILER_FONT_END;
         return true;
     }
 
@@ -105,6 +107,7 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
     lv_cache_entry_t * entry = lv_cache_acquire_or_create(glyph_cache, &search_key, dsc);
     if(entry == NULL) {
         LV_LOG_ERROR("glyph lookup failed for unicode = 0x%" LV_PRIx32, unicode_letter);
+        LV_PROFILER_FONT_END;
         return false;
     }
     lv_freetype_glyph_cache_data_t * data = lv_cache_entry_get_data(entry);
@@ -117,6 +120,7 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
     g_dsc->entry = NULL;
 
     lv_cache_release(glyph_cache, entry, NULL);
+    LV_PROFILER_FONT_END;
     return true;
 }
 
@@ -126,6 +130,7 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
 
 static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void * user_data)
 {
+    LV_PROFILER_FONT_BEGIN;
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)user_data;
 
     FT_Error error;
@@ -157,6 +162,7 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
     if(error) {
         FT_ERROR_MSG("FT_Load_Glyph", error);
         lv_mutex_unlock(&dsc->cache_node->face_lock);
+        LV_PROFILER_FONT_END;
         return false;
     }
 
@@ -198,6 +204,7 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
 
     lv_mutex_unlock(&dsc->cache_node->face_lock);
 
+    LV_PROFILER_FONT_END;
     return true;
 }
 static void freetype_glyph_free_cb(lv_freetype_glyph_cache_data_t * data, void * user_data)

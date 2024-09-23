@@ -62,7 +62,7 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
     lv_area_t blend_area;
     if(!lv_area_intersect(&blend_area, blend_dsc->blend_area, draw_unit->clip_area)) return;
 
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     lv_layer_t * layer = draw_unit->target_layer;
     uint32_t layer_stride_byte = layer->draw_buf->header.stride;
 
@@ -131,12 +131,12 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
     }
     else {
         if(!lv_area_intersect(&blend_area, &blend_area, blend_dsc->src_area)) {
-            LV_PROFILER_END;
+            LV_PROFILER_DRAW_END;
             return;
         }
 
         if(blend_dsc->mask_area && !lv_area_intersect(&blend_area, &blend_area, blend_dsc->mask_area)) {
-            LV_PROFILER_END;
+            LV_PROFILER_DRAW_END;
             return;
         }
 
@@ -218,7 +218,7 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
                 break;
         }
     }
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 /**********************
