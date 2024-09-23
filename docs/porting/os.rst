@@ -36,7 +36,7 @@ than ``LV_OS_NONE``.
 
 Here is some pseudocode to illustrate the concept:
 
-.. code:: c
+.. code-block:: c
 
    void lvgl_thread(void)
    {

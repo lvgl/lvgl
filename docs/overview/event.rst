@@ -205,7 +205,7 @@ To manually send events to an object, use
 For example, this can be used to manually close a message box by
 simulating a button press (although there are simpler ways to do this):
 
-.. code:: c
+.. code-block:: c
 
    /*Simulate the press of the first button (indexes start from zero)*/
    uint32_t btn_id = 0;

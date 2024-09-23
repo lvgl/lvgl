@@ -16,7 +16,7 @@ Naming conventions
 -  In variable and function names use only lower case letters
    (e.g. *height_tmp*)
 -  In enums and defines use only upper case letters
-   (e.g. *MAX_LINE_NUM*)
+   (e.g. *e.g. MAX_LINE_NUM*)
 -  Global names (API):
 
    -  start with *lv*

@@ -40,7 +40,7 @@ Obtaining LVGL
 LVGL is distributed through `ESP Registry <https://components.espressif.com/>`__, where all LVGL releases are uploaded.
 In case you do not want to use esp_lvgl_port, you can add `LVGL component <https://components.espressif.com/component/lvgl/lvgl>`__ into your project with following command:
 
-.. code:: sh
+.. code-block:: sh
 
    idf.py add-dependency lvgl/lvgl^9.*
 
@@ -50,7 +50,7 @@ Adjust the ``^9.*`` part to match your LVGL version requirement. More informatio
 
 For LVGL development and testing, it may be useful to use LVGL as a local component instead of from the ESP Registry, which offers only released versions and does not allow local modifications. To do this, clone LVGL to your project with the following command:
 
-.. code:: sh
+.. code-block:: sh
 
    git submodule add https://github.com/lvgl/lvgl.git components/lvgl
 
@@ -77,7 +77,7 @@ These components share a common public API, making it easy to migrate your proje
 
 To add a display or touch driver to your project, use a command like:
 
-.. code:: sh
+.. code-block:: sh
    idf.py add-dependency "espressif/esp_lcd_gc9a01^2.0.0"
 
 Using the File System under ESP-IDF

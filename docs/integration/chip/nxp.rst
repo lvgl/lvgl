@@ -50,30 +50,31 @@ Basic initialization:
 PXP draw initialization is done automatically in :cpp:func:`lv_init()` once the
 PXP is enabled, no user code is required:
 
-.. code:: c
+.. code-block:: c
 
-  #if LV_USE_DRAW_PXP
-    lv_draw_pxp_init();
-  #endif
+    #if LV_USE_DRAW_PXP
+        lv_draw_pxp_init();
+    #endif
 
 During PXP initialization, a new draw unit `lv_draw_pxp_unit_t` will be created
 with the additional callbacks:
 
-.. code:: c
+.. code-block:: c
 
     lv_draw_pxp_unit_t * draw_pxp_unit = lv_draw_create_unit(sizeof(lv_draw_pxp_unit_t));
     draw_pxp_unit->base_unit.evaluate_cb = _pxp_evaluate;
     draw_pxp_unit->base_unit.dispatch_cb = _pxp_dispatch;
     draw_pxp_unit->base_unit.delete_cb = _pxp_delete;
 
+
 and an addition thread `_pxp_render_thread_cb()` will be spawned in order to
 handle the supported draw tasks.
 
-.. code:: c
+.. code-block:: c
 
-  #if LV_USE_PXP_DRAW_THREAD
-    lv_thread_init(&draw_pxp_unit->thread, LV_THREAD_PRIO_HIGH, _pxp_render_thread_cb, 2 * 1024, draw_pxp_unit);
-  #endif
+    #if LV_USE_OS
+        lv_thread_init(&draw_pxp_unit->thread, LV_THREAD_PRIO_HIGH, _pxp_render_thread_cb, 2 * 1024, draw_pxp_unit);
+    #endif
 
 If `LV_USE_PXP_DRAW_THREAD` is not defined, then no additional draw thread will be created
 and the PXP drawing task will get executed on the same LVGL main thread.
@@ -90,6 +91,7 @@ unit for processing.
 
 `_pxp_delete()` will cleanup the PXP draw unit.
 
+
 Features supported:
 ^^^^^^^^^^^^^^^^^^^
 
@@ -100,7 +102,7 @@ power savings.
 
 Supported draw tasks are available in "src/draw/nxp/pxp/lv_draw_pxp.c":
 
-.. code:: c
+.. code-block:: c
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
@@ -118,7 +120,7 @@ Supported draw tasks are available in "src/draw/nxp/pxp/lv_draw_pxp.c":
 
 Additional, the screen rotation can be handled by the PXP:
 
-.. code::c
+.. code-block::c
 
   void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width, int32_t src_height,
                           int32_t src_stride, int32_t dest_stride, lv_display_rotation_t rotation,
@@ -131,6 +133,7 @@ Additional, the screen rotation can be handled by the PXP:
 - Scale and rotate (90, 180, 270 degree) source image RGB565.
 - Blending layers (w/ same supported formats as blitting).
 - Rotate screen (90, 180, 270 degree).
+
 
 Known limitations:
 ^^^^^^^^^^^^^^^^^^
@@ -172,6 +175,7 @@ Project setup:
    - fsl_pxp.c: PXP driver
    - fsl_cache.c: CPU cache handling functions
 
+
 PXP default configuration:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -188,6 +192,7 @@ PXP default configuration:
      drawing thread.
    - :cpp:func:`pxp_wait()`: Wait for PXP completion.
 
+
 VGLite accelerator
 ~~~~~~~~~~~~~~~~~~
 
@@ -195,6 +200,7 @@ Extra drawing features in LVGL can be handled by the VGLite engine. The
 CPU is available for other operations while the VGLite is running. An
 RTOS is required to block the LVGL drawing thread and switch to another
 task or suspend the CPU for power savings.
+
 
 Basic configuration:
 ^^^^^^^^^^^^^^^^^^^^
@@ -216,14 +222,14 @@ Initialize VGLite GPU before calling :cpp:func:`lv_init()` by specifying the
 width/height of tessellation window. The default values for tesselation width
 and height, and command buffer size are in the SDK file "vglite_support.h".
 
-.. code:: c
+.. code-block:: c
 
-  #if LV_USE_DRAW_VGLITE
-    #include "vg_lite.h"
-    #include "vglite_support.h"
-  #endif
+    #if LV_USE_DRAW_VGLITE
+        #include "vg_lite.h"
+        #include "vglite_support.h"
+    #endif
     ...
-  #if LV_USE_DRAW_VGLITE
+    #if LV_USE_DRAW_VGLITE
     if(vg_lite_init(DEFAULT_VG_LITE_TW_WIDTH, DEFAULT_VG_LITE_TW_HEIGHT) != VG_LITE_SUCCESS)
     {
         PRINTF("VGLite init error. STOP.");
@@ -239,21 +245,21 @@ and height, and command buffer size are in the SDK file "vglite_support.h".
         while (1)
             ;
     }
-  #endif
+    #endif
 
 VGLite draw initialization is done automatically in :cpp:func:`lv_init()` once
 the VGLite is enabled, no user code is required:
 
-.. code:: c
+.. code-block:: c
 
-  #if LV_USE_DRAW_VGLITE
-    lv_draw_vglite_init();
-  #endif
+    #if LV_USE_DRAW_VGLITE
+        lv_draw_vglite_init();
+    #endif
 
 During VGLite initialization, a new draw unit `lv_draw_vglite_unit_t` will be
 created with the additional callbacks:
 
-.. code:: c
+.. code-block:: c
 
     lv_draw_vglite_unit_t * draw_vglite_unit = lv_draw_create_unit(sizeof(lv_draw_vglite_unit_t));
     draw_vglite_unit->base_unit.evaluate_cb = _vglite_evaluate;
@@ -263,11 +269,11 @@ created with the additional callbacks:
 and an addition thread `_vglite_render_thread_cb()` will be spawned in order to
 handle the supported draw tasks.
 
-.. code:: c
+.. code-block:: c
 
-  #if LV_USE_VGLITE_DRAW_THREAD
-    lv_thread_init(&draw_vglite_unit->thread, LV_THREAD_PRIO_HIGH, _vglite_render_thread_cb, 2 * 1024, draw_vglite_unit);
-  #endif
+    #if LV_USE_OS
+        lv_thread_init(&draw_vglite_unit->thread, LV_THREAD_PRIO_HIGH, _vglite_render_thread_cb, 2 * 1024, draw_vglite_unit);
+    #endif
 
 If `LV_USE_VGLITE_DRAW_THREAD` is not defined, then no additional draw thread will be created
 and the VGLite drawing task will get executed on the same LVGL main thread.
@@ -284,6 +290,7 @@ VGLite draw unit for processing.
 
 `_vglite_delete()` will cleanup the VGLite draw unit.
 
+
 Advanced configuration:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -292,9 +299,9 @@ Advanced configuration:
   Enabling the blit split workaround will mitigate any quality degradation issue
   on screen's dimension > 352 pixels.
 
-.. code:: c
+  .. code-block:: c
 
-  #define VGLITE_BLIT_SPLIT_THR 352
+      #define VGLITE_BLIT_SPLIT_THR 352
 
 - By default, the blit split threshold is set to 352. Blits with width or height
   higher than this value will be done in multiple steps. Value must be multiple
@@ -320,7 +327,7 @@ power savings.
 
 Supported draw tasks are available in "src/draw/nxp/pxp/lv_draw_vglite.c":
 
-.. code:: c
+.. code-block:: c
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_LABEL:
@@ -378,6 +385,7 @@ Known limitations:
   tiled (4x4) buffer layouts. The pixel engine has no additional alignment
   requirement for linear buffer layouts (:c:macro:`VG_LITE_LINEAR`).
 
+
 Project setup:
 ^^^^^^^^^^^^^^
 
@@ -388,8 +396,7 @@ Project setup:
    - "src/draw/nxp/vglite/lv_draw_vglite_arc.c": draw arc
    - "src/draw/nxp/vglite/lv_draw_vglite_border.c": draw border
    - "src/draw/nxp/vglite/lv_draw_vglite_fill.c": fill area
-   - "src/draw/nxp/vglite/lv_draw_vglite_img.c": blit image (w/ optional
-   recolor or transformation)
+   - "src/draw/nxp/vglite/lv_draw_vglite_img.c": blit image (w/ optional recolor or transformation)
    - "src/draw/nxp/vglite/lv_draw_vglite_label.c": draw label
    - "src/draw/nxp/vglite/lv_draw_vglite_layer.c": layer blending
    - "src/draw/nxp/vglite/lv_draw_vglite_line.c": draw line

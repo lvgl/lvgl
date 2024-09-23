@@ -31,7 +31,7 @@ Set :c:macro:`LV_USE_OBJ_ID_BUILTIN` to `0` in ``lv_conf.h``.
 
 Below APIs needed to be implemented and linked to lvgl.
 
-.. code:: c
+.. code-block:: c
 
     void lv_obj_set_id(lv_obj_t * obj, void * id);
     void lv_obj_assign_id(const lv_obj_class_t * class_p, lv_obj_t * obj);

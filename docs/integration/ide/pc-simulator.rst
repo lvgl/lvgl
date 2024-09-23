@@ -48,7 +48,7 @@ another driver in ``lv_conf.h`` and calling its ``create`` function.
 For example to use the Linux frame buffer device instead of SDL just enable ``LV_USE_LINUX_FBDEV``
 and call
 
-.. code:: c
+.. code-block:: c
 
    lv_display_t *display = lv_linux_fbdev_create();
    lv_linux_fbdev_set_file(display, "/dev/fb0")

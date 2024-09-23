@@ -13,7 +13,7 @@ Install FFmpeg
 
 Download first FFmpeg from `here <https://www.ffmpeg.org/download.html>`__, then install it:
 
-.. code:: shell
+.. code-block:: shell
 
     ./configure --disable-all --disable-autodetect --disable-podpages --disable-asm --enable-avcodec --enable-avformat --enable-decoders --enable-encoders --enable-demuxers --enable-parsers --enable-protocol='file' --enable-swscale --enable-zlib
     make

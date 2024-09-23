@@ -47,7 +47,7 @@ There is no need to implement any platform-specific functions.
 
 The following code demonstrates using the diver in :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_DIRECT` mode.
 
-.. code:: c
+.. code-block:: c
 
     lv_display_t * disp = lv_renesas_glcdc_direct_create();
     lv_display_set_default(disp);
@@ -57,7 +57,7 @@ preferably in the fastest available memory region.
 
 Buffer swapping can be activated by passing a second buffer of same size instead of the :cpp:expr:`NULL` argument.
 
-.. code:: c
+.. code-block:: c
 
     static lv_color_t partial_draw_buf[DISPLAY_HSIZE_INPUT0 * DISPLAY_VSIZE_INPUT0 / 10] BSP_PLACE_IN_SECTION(".sdram") BSP_ALIGN_VARIABLE(1024);
 
@@ -74,7 +74,7 @@ Screen rotation
 
 Software based screen rotation is supported in partial mode. It uses the common API, no extra configuration is required:
 
-.. code:: c
+.. code-block:: c
 
     lv_display_set_rotation(lv_display_get_default(), LV_DISP_ROTATION_90);
     /* OR */

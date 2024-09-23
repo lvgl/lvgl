@@ -46,14 +46,14 @@ Configure Windows driver
 
 Enable the Windows driver support in lv_conf.h, by cmake compiler define or by KConfig
 
-.. code:: c
+.. code-block:: c
 
     #define LV_USE_WINDOWS  1
 
 Usage
 -----
 
-.. code:: c
+.. code-block:: c
 
     #include <Windows.h>
     #include "lvgl/lvgl.h"

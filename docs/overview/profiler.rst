@@ -40,7 +40,7 @@ To enable the profiler, set :c:macro:`LV_USE_PROFILER` in ``lv_conf.h`` and conf
 
 - Recommended configuration in **UNIX** environments:
 
-    .. code:: c
+    .. code-block:: c
 
         #include <sys/syscall.h>
         #include <sys/types.h>
@@ -78,7 +78,7 @@ To enable the profiler, set :c:macro:`LV_USE_PROFILER` in ``lv_conf.h`` and conf
 
 - Recommended configuration in **Arduino** environments:
 
-    .. code:: c
+    .. code-block:: c
 
         void my_profiler_init(void)
         {
@@ -91,7 +91,7 @@ To enable the profiler, set :c:macro:`LV_USE_PROFILER` in ``lv_conf.h`` and conf
 
 4. Log output configuration: LVGL uses the :cpp:func:`LV_LOG` interface by default to output trace information. If you want to use another interface to output log information (e.g., file stream), you can redirect the log output using the following code:
 
-    .. code:: c
+    .. code-block:: c
 
         static void my_log_print_cb(const char * buf)
         {
@@ -117,19 +117,19 @@ Process the logs
 
 Save the output log as `my_trace.txt`, use `trace_filter.py` for filtering and preprocessing:
 
-    .. code:: bash
+    .. code-block:: bash
 
         ./lvgl/scripts/trace_filter.py my_trace.txt
 
     or
 
-    .. code:: bash
+    .. code-block:: bash
 
         python3 ./lvgl/scripts/trace_filter.py my_trace.txt
 
 You will obtain a processed text file named `trace.systrace`, which roughly contains the following content:
 
-    .. code:: text
+    .. code-block:: text
 
         # tracer: nop
         #
@@ -162,7 +162,7 @@ Add Measurement Point
 
 Users can add their own measured functions:
 
-.. code:: c
+.. code-block:: c
 
     void my_function_1(void)
     {
@@ -198,7 +198,7 @@ If you wish to use a profiler method provided by your operating system, you can 
 
 Taking `NuttX <https://github.com/apache/nuttx>`_ RTOS as an example:
 
-.. code:: c
+.. code-block:: c
 
     #define LV_PROFILER_INCLUDE "nuttx/sched_note.h"
     #define LV_PROFILER_BEGIN          sched_note_begin(NOTE_TAG_ALWAYS)

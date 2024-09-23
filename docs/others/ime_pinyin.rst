@@ -62,7 +62,7 @@ to learn about the Hanyu Pinyin syllables and the syllable table.
 
 Then, write your own dictionary according to the following format:
 
-.. code:: c
+.. code-block:: c
 
    lv_100ask_pinyin_dict_t your_pinyin_dict[] = {
                { "a", "啊阿呵吖" },
@@ -87,7 +87,7 @@ Apply new dictionary
 After writing a dictionary according to the above dictionary format, you
 only need to call this function to set up and use your dictionary:
 
-.. code:: c
+.. code-block:: c
 
        lv_obj_t * pinyin_ime = lv_100ask_pinyin_ime_create(lv_screen_active());
        lv_100ask_pinyin_ime_set_dict(pinyin_ime, your_pinyin_dict);

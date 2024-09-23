@@ -11,14 +11,14 @@ Detailed introduction: http://www.libpng.org/pub/png/libpng.html
 Install
 -------
 
-.. code:: bash
+.. code-block:: bash
 
     sudo apt install libpng-dev
 
 Add libpng to your project
 --------------------------
 
-.. code:: cmake
+.. code-block:: cmake
 
     find_package(PNG REQUIRED)
     include_directories(${PNG_INCLUDE_DIR})

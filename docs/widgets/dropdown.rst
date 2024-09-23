@@ -51,7 +51,7 @@ List
 The list is hidden/shown on open/close. To add styles to it use
 :cpp:expr:`lv_dropdown_get_list(dropdown)` to get the list object. For example:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * list = lv_dropdown_get_list(dropdown) /*Get the list*/
    lv_obj_add_style(list, &my_style, selector)      /*Add the styles to the list*/

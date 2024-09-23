@@ -27,7 +27,7 @@ Configuring the driver
 
 Enable the ST7735 driver support in lv_conf.h, by cmake compiler define or by KConfig
 
-.. code:: c
+.. code-block:: c
 
 	#define LV_USE_ST7735  1
 
@@ -36,7 +36,7 @@ Usage
 
 You need to implement two platform-dependent functions:
 
-.. code:: c
+.. code-block:: c
 
 	/* Send short command to the LCD. This function shall wait until the transaction finishes. */
 	int32_t my_lcd_send_cmd(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, const uint8_t *param, size_t param_size)
@@ -52,7 +52,7 @@ You need to implement two platform-dependent functions:
 
 To create an ST7735-based display use the function
 
-.. code:: c
+.. code-block:: c
 
 	/**
 	 * Create an LCD display with ST7735 driver

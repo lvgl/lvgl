@@ -21,7 +21,7 @@ RGB
 
 Create colors from Red, Green and Blue channel values:
 
-.. code:: c
+.. code-block:: c
 
    /*All channels are 0-255*/
    lv_color_t c = lv_color_make(red, green, blue);
@@ -41,7 +41,7 @@ HSV
 
 Create colors from Hue, Saturation and Value values:
 
-.. code:: c
+.. code-block:: c
 
    //h = 0..359, s = 0..100, v = 0..100
    lv_color_t c = lv_color_hsv_to_rgb(h, s, v);
@@ -100,7 +100,7 @@ Modify and mix colors
 
 The following functions can modify a color:
 
-.. code:: c
+.. code-block:: c
 
    // Lighten a color. 0: no change, 255: white
    lv_color_t c = lv_color_lighten(c, lvl);

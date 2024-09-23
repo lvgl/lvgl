@@ -5,7 +5,7 @@ Sleep management
 The MCU can go to sleep when no user input happens. In this case, the
 main ``while(1)`` should look like this:
 
-.. code:: c
+.. code-block:: c
 
    while(1) {
      /*Normal operation (no sleep) in < 1 sec inactivity*/
@@ -23,7 +23,7 @@ main ``while(1)`` should look like this:
 You should also add the following lines to your input device read
 function to signal a wake-up (press, touch or click etc.) has happened:
 
-.. code:: c
+.. code-block:: c
 
    lv_tick_inc(LV_DEF_REFR_PERIOD); /*Force task execution on wake-up*/
    timer_start();                   /*Restart the timer where lv_tick_inc() is called*/
