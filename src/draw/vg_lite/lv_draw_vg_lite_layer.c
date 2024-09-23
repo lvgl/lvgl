@@ -49,7 +49,7 @@ void lv_draw_vg_lite_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t
     if(layer->draw_buf == NULL)
         return;
 
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
 
     /* The GPU output should already be premultiplied RGB */
     if(!lv_draw_buf_has_flag(layer->draw_buf, LV_IMAGE_FLAGS_PREMULTIPLIED)) {
@@ -64,7 +64,7 @@ void lv_draw_vg_lite_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t
      * otherwise it may cause the drawing to fail. */
     lv_vg_lite_finish(u);
 
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 /**********************

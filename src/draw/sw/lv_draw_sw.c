@@ -429,25 +429,25 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 
 static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     lv_draw_sw_unit_t * draw_sw_unit = (lv_draw_sw_unit_t *) draw_unit;
 
     /*Return immediately if it's busy with draw task*/
     if(draw_sw_unit->task_act) {
-        LV_PROFILER_END;
+        LV_PROFILER_DRAW_END;
         return 0;
     }
 
     lv_draw_task_t * t = NULL;
     t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_SW);
     if(t == NULL) {
-        LV_PROFILER_END;
+        LV_PROFILER_DRAW_END;
         return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
     }
 
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(buf == NULL) {
-        LV_PROFILER_END;
+        LV_PROFILER_DRAW_END;
         return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
     }
 
@@ -462,7 +462,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 #else
     execute_drawing_unit(draw_sw_unit);
 #endif
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
     return 1;
 }
 
@@ -498,7 +498,7 @@ static void render_thread_cb(void * ptr)
 
 static void execute_drawing(lv_draw_sw_unit_t * u)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     /*Render the draw task*/
     lv_draw_task_t * t = u->task_act;
     switch(t->type) {
@@ -584,7 +584,7 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
         lv_draw_sw_label((lv_draw_unit_t *)u, &label_dsc, &txt_area);
     }
 #endif
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888

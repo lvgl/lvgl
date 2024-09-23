@@ -59,6 +59,7 @@ uint8_t lv_color_format_get_bpp(lv_color_format_t cf)
 
         case LV_COLOR_FORMAT_RGB565A8:
         case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_YUY2:
         case LV_COLOR_FORMAT_AL88:
             return 16;
 
@@ -87,6 +88,7 @@ bool lv_color_format_has_alpha(lv_color_format_t cf)
         case LV_COLOR_FORMAT_I4:
         case LV_COLOR_FORMAT_I8:
         case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_ARGB8565:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_AL88:
             return true;

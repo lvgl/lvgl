@@ -54,7 +54,7 @@ void lv_draw_vg_lite_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle
     is_common = lv_area_intersect(&clip_area, &tri_area, draw_unit->clip_area);
     if(!is_common) return;
 
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
 
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
@@ -91,7 +91,7 @@ void lv_draw_vg_lite_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle
     }
     else { /* normal fill */
         vg_lite_color_t color = lv_vg_lite_color(dsc->bg_color, dsc->bg_opa, true);
-        LV_PROFILER_BEGIN_TAG("vg_lite_draw");
+        LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw");
         LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
                                    &u->target_buffer,
                                    vg_lite_path,
@@ -99,12 +99,12 @@ void lv_draw_vg_lite_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle
                                    &matrix,
                                    VG_LITE_BLEND_SRC_OVER,
                                    color));
-        LV_PROFILER_END_TAG("vg_lite_draw");
+        LV_PROFILER_DRAW_END_TAG("vg_lite_draw");
     }
 
     lv_vg_lite_path_drop(u, path);
 
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 /**********************

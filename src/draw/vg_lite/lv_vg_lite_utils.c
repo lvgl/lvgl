@@ -398,6 +398,8 @@ void lv_vg_lite_matrix_dump_info(const vg_lite_matrix_t * matrix)
 bool lv_vg_lite_is_dest_cf_supported(lv_color_format_t cf)
 {
     switch(cf) {
+        case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
@@ -419,6 +421,7 @@ bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf)
     switch(cf) {
         case LV_COLOR_FORMAT_A4:
         case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
@@ -436,6 +439,9 @@ bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf)
 
         case LV_COLOR_FORMAT_NV12:
             return vg_lite_query_feature(gcFEATURE_BIT_VG_YUV_INPUT) ? true : false;
+
+        case LV_COLOR_FORMAT_YUY2:
+            return vg_lite_query_feature(gcFEATURE_BIT_VG_YUY2_INPUT) ? true : false;
 
         default:
             break;
@@ -485,6 +491,9 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
 
         case LV_COLOR_FORMAT_NV12:
             return VG_LITE_NV12;
+
+        case LV_COLOR_FORMAT_YUY2:
+            return VG_LITE_YUY2;
 
         default:
             LV_LOG_ERROR("unsupported color format: %d", cf);
@@ -749,9 +758,9 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
 
     if(LV_COLOR_FORMAT_IS_INDEXED(decoded->header.cf)) {
         uint32_t palette_size = LV_COLOR_INDEXED_PALETTE_SIZE(decoded->header.cf);
-        LV_PROFILER_BEGIN_TAG("vg_lite_set_CLUT");
+        LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_set_CLUT");
         LV_VG_LITE_CHECK_ERROR(vg_lite_set_CLUT(palette_size, (vg_lite_uint32_t *)decoded->data));
-        LV_PROFILER_END_TAG("vg_lite_set_CLUT");
+        LV_PROFILER_DRAW_END_TAG("vg_lite_set_CLUT");
     }
 
     lv_vg_lite_buffer_from_draw_buf(buffer, decoded);
@@ -1172,14 +1181,15 @@ void lv_vg_lite_disable_scissor(void)
 void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
 {
     LV_ASSERT_NULL(u);
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
 
     u->flush_count++;
+    u->letter_count = 0;
 
 #if LV_VG_LITE_FLUSH_MAX_COUNT
     if(u->flush_count < LV_VG_LITE_FLUSH_MAX_COUNT) {
         /* Do not flush too often */
-        LV_PROFILER_END;
+        LV_PROFILER_DRAW_END;
         return;
     }
 #else
@@ -1187,20 +1197,20 @@ void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
     LV_VG_LITE_CHECK_ERROR(vg_lite_get_parameter(VG_LITE_GPU_IDLE_STATE, 1, (vg_lite_pointer)&is_gpu_idle));
     if(!is_gpu_idle) {
         /* Do not flush if GPU is busy */
-        LV_PROFILER_END;
+        LV_PROFILER_DRAW_END;
         return;
     }
 #endif
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_flush());
     u->flush_count = 0;
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
 {
     LV_ASSERT_NULL(u);
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
 
@@ -1212,7 +1222,8 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
     /* Clear image decoder dsc reference */
     lv_vg_lite_pending_remove_all(u->image_dsc_pending);
     u->flush_count = 0;
-    LV_PROFILER_END;
+    u->letter_count = 0;
+    LV_PROFILER_DRAW_END;
 }
 
 /**********************
