@@ -45,32 +45,32 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
    static uint8_t buf_2[BUFF_SIZE];
 
 - In your ``main()`` function, after initialising your CPU,
-  peripherals, and LCD panel, call :cpp:func:`lv_init` to initialise LVGL.
-  You can then create the display driver using
-  :cpp:func:`lv_display_create`, and register the frame buffers using
-  :cpp:func:`lv_display_set_buffers`.
+    peripherals, and LCD panel, call :cpp:func:`lv_init` to initialise LVGL.
+    You can then create the display driver using
+    :cpp:func:`lv_display_create`, and register the frame buffers using
+    :cpp:func:`lv_display_set_buffers`.
 
-.. code-block:: c
+    .. code-block:: c
 
-   //Initialise LVGL UI library
-   lv_init();
+        //Initialise LVGL UI library
+        lv_init();
 
-   lv_display_t * disp = lv_display_create(WIDTH, HEIGHT); /*Basic initialization with horizontal and vertical resolution in pixels*/
-   lv_display_set_flush_cb(disp, my_flush_cb); /*Set a flush callback to draw to the display*/
-   lv_display_set_buffers(disp, buf_1, buf_2, sizeof(buf_1), LV_DISPLAY_RENDER_MODE_PARTIAL); /*Set an initialized buffer*/
+        lv_display_t * disp = lv_display_create(WIDTH, HEIGHT); /*Basic initialization with horizontal and vertical resolution in pixels*/
+        lv_display_set_flush_cb(disp, my_flush_cb); /*Set a flush callback to draw to the display*/
+        lv_display_set_buffers(disp, buf_1, buf_2, sizeof(buf_1), LV_DISPLAY_RENDER_MODE_PARTIAL); /*Set an initialized buffer*/
 
 - Create some dummy objects to test the output:
 
-  .. code-block:: c
+    .. code-block:: c
 
-      /* Change the active screen's background color */
-      lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x003a57), LV_PART_MAIN);
-      lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(0xffffff), LV_PART_MAIN);
+        /* Change the active screen's background color */
+        lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x003a57), LV_PART_MAIN);
+        lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(0xffffff), LV_PART_MAIN);
 
-      /* Create a spinner */
-      lv_obj_t * spinner = lv_spinner_create(lv_screen_active(), 1000, 60);
-      lv_obj_set_size(spinner, 64, 64);
-      lv_obj_align(spinner, LV_ALIGN_BOTTOM_MID, 0, 0);
+        /* Create a spinner */
+        lv_obj_t * spinner = lv_spinner_create(lv_screen_active(), 1000, 60);
+        lv_obj_set_size(spinner, 64, 64);
+        lv_obj_align(spinner, LV_ALIGN_BOTTOM_MID, 0, 0);
 
 
 - Add a call to :cpp:func:`lv_timer_handler` inside your ``while(1)`` loop:

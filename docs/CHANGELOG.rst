@@ -285,7 +285,7 @@ Fixes
 - **fix(sdl): handle if the window_id is not set correctly in SDL** `6194 <https://github.com/lvgl/lvgl/pull/6194>`__
 - **fix(drivers): drm driver not initialising with small screens** `6244 <https://github.com/lvgl/lvgl/pull/6244>`__
 - **fix(freetype): fix potential multi-threaded data conflicts** `6252 <https://github.com/lvgl/lvgl/pull/6252>`__
-- **fix(vglite): build issues ** `6245 <https://github.com/lvgl/lvgl/pull/6245>`__
+- **fix(vglite): build issues** `6245 <https://github.com/lvgl/lvgl/pull/6245>`__
 - **fix(canvas): lv_canvas_set_px for indexed images** `6226 <https://github.com/lvgl/lvgl/pull/6226>`__
 - **fix(snapshot): fix memleak in lv_snapshot** `6147 <https://github.com/lvgl/lvgl/pull/6147>`__
 - **fix(span): fix span incorrect max height calculation** `6243 <https://github.com/lvgl/lvgl/pull/6243>`__

@@ -8,7 +8,7 @@ If you are new to ESP-IDF, follow the instructions in the `ESP-IDF Programming g
 
 
 LVGL Demo Projects for ESP32
----------------------------
+----------------------------
 
 For a quick start with LVGL and ESP32, the following pre-configured demo projects are available for specific development boards:
 
@@ -78,6 +78,7 @@ These components share a common public API, making it easy to migrate your proje
 To add a display or touch driver to your project, use a command like:
 
 .. code-block:: sh
+
    idf.py add-dependency "espressif/esp_lcd_gc9a01^2.0.0"
 
 Using the File System under ESP-IDF
@@ -91,9 +92,9 @@ The process is described in details below, using ``SPIFFS`` as demonstration.
 
    ESP-IDF has many, ready-to-use examples like
    `SPIFFS <https://github.com/espressif/esp-idf/tree/master/examples/storage/spiffsgen>`__
-   , 
-   `SD Card <https://github.com/espressif/esp-idf/tree/master/examples/storage/sd_card/sdspi>`__ 
-   and 
+   ,
+   `SD Card <https://github.com/espressif/esp-idf/tree/master/examples/storage/sd_card/sdspi>`__
+   and
    `LittleFS <https://github.com/espressif/esp-idf/tree/master/examples/storage/littlefs>`__
    .
 
@@ -141,7 +142,7 @@ The process is described in details below, using ``SPIFFS`` as demonstration.
    It supports various formats and compression.
 
    Meanwhile 3rd party libraries
-   (like :ref:`LodePNG<lodepng>` and :ref:`Tiny JPEG<tjpgd>`)
+   (like :ref:`LodePNG<lodepng_rst>` and :ref:`Tiny JPEG<tjpgd>`)
    allow using image files without conversion.
 
    After preparing the files, they should be moved to the target device:

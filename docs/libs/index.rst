@@ -22,6 +22,6 @@
     rlottie
     ffmpeg
     rle
-    arduino-littlefs
-    arduino-sd
+    arduino_esp_littlefs
+    arduino_sd
     lfs

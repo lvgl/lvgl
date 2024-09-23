@@ -171,14 +171,14 @@ Unsubscribe from a subject
 
 .. code-block:: c
 
-    //`observer` is the return value of `lv_subject_add_observer*`
+    /* `observer` is the return value of `lv_subject_add_observer*` */
     lv_observer_remove(observer);
 
 To unsubscribe a widget from a given or all subject use:
 
 .. code-block:: c
 
-    lv_obj_remove_from_subject(obj, subject); //`subject` can be NULL to unsubcribe from all
+    lv_obj_remove_from_subject(obj, subject); /* `subject` can be NULL to unsubcribe from all */
 
 .. _observer_subject_groups:
 
