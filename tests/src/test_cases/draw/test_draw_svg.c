@@ -33,9 +33,15 @@ void tearDown(void)
 static void draw_snapshot(const char * name)
 {
     LV_UNUSED(name);
+#ifndef NON_AMD64_BUILD
     char fn_buf[64];
-    lv_snprintf(fn_buf, sizeof(fn_buf), "draw/svg_draw_%s.png", name);
+    lv_snprintf(fn_buf, sizeof(fn_buf), "draw/svg_draw_%s.lp64.png", name);
     TEST_ASSERT_EQUAL_SCREENSHOT(fn_buf);
+#else
+    char fn_buf[64];
+    lv_snprintf(fn_buf, sizeof(fn_buf), "draw/svg_draw_%s.lp32.png", name);
+    TEST_ASSERT_EQUAL_SCREENSHOT(fn_buf);
+#endif
 }
 
 static void draw_svg(lv_svg_node_t * svg)
