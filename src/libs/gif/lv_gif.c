@@ -137,6 +137,36 @@ void lv_gif_resume(lv_obj_t * obj)
     lv_timer_resume(gifobj->timer);
 }
 
+bool lv_gif_is_loaded(lv_obj_t * obj)
+{
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
+
+    return (gifobj->gif != NULL);
+}
+
+int32_t lv_gif_get_loop_count(lv_obj_t * obj)
+{
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
+
+    if(gifobj->gif == NULL) {
+        return -1;
+    }
+
+    return gifobj->gif->loop_count;
+}
+
+void lv_gif_set_loop_count(lv_obj_t * obj, int32_t count)
+{
+    lv_gif_t * gifobj = (lv_gif_t *) obj;
+
+    if(gifobj->gif == NULL) {
+        LV_LOG_WARN("Gif resource not loaded correctly");
+        return;
+    }
+
+    gifobj->gif->loop_count = count;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

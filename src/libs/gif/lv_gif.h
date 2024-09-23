@@ -72,6 +72,25 @@ void lv_gif_pause(lv_obj_t * obj);
  */
 void lv_gif_resume(lv_obj_t * obj);
 
+/**
+ * Checks if the GIF was loaded correctly.
+ * @param obj pointer to a gif obj
+ */
+bool lv_gif_is_loaded(lv_obj_t * obj);
+
+/**
+ * Get the loop count for the GIF.
+ * @param obj pointer to a gif obj
+ */
+int32_t lv_gif_get_loop_count(lv_obj_t * obj);
+
+/**
+ * Set the loop count for the GIF.
+ * @param obj   pointer to a gif obj
+ * @param count the loop count to set
+ */
+void lv_gif_set_loop_count(lv_obj_t * obj, int32_t count);
+
 /**********************
  *      MACROS
  **********************/
