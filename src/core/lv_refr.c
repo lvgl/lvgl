@@ -665,6 +665,7 @@ static void refr_area(const lv_area_t * area_p)
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     lv_matrix_identity(&layer->matrix);
+    lv_display_rotate_area(disp_refr, &layer->phy_clip_area);
 
 #if LV_DRAW_DISPLAY_ROTATE_USE_MATRIX
     const lv_display_rotation_t rotation = lv_display_get_rotation(disp_refr);
