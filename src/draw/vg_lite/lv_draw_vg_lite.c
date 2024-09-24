@@ -138,9 +138,6 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
     if(vg_lite_query_feature(gcFEATURE_BIT_VG_SCISSOR)) {
         lv_area_t scissor_area = layer->phy_clip_area;
         lv_area_move(&scissor_area, -layer->buf_area.x1, -layer->buf_area.y1);
-#if LV_DRAW_DISPLAY_ROTATE_USE_MATRIX
-        lv_display_rotate_area(NULL, &scissor_area);
-#endif
         lv_vg_lite_set_scissor_area(&scissor_area);
     }
 #endif
