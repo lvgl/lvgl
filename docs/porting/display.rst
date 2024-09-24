@@ -20,7 +20,7 @@ flush_cb
 
 An example ``flush_cb`` looks like this:
 
-.. code:: c
+.. code-block:: c
 
    void my_flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map)
    {
@@ -83,7 +83,7 @@ The draw buffers can be set with
 
 Example:
 
-.. code:: c
+.. code-block:: c
 
    static uint16_t buf[LCD_HOR_RES * LCD_VER_RES / 10];
    lv_display_set_buffers(disp, buf, NULL, sizeof(buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
@@ -172,10 +172,10 @@ The default color format of the display is set according to :c:macro:`LV_COLOR_D
 - :c:macro:`LV_COLOR_DEPTH` ``24``: RGB888 (3 bytes/pixel)
 - :c:macro:`LV_COLOR_DEPTH` ``16``: RGB565 (2 bytes/pixel)
 - :c:macro:`LV_COLOR_DEPTH` ``8``: L8 (1 bytes/pixel)
-- :c:macro:`LV_COLOR_DEPTH` ``1``: I1 (1 bit/pixel) Only support for horizontal mapped buffers. See :refr:`monochrome` for more details:
+- :c:macro:`LV_COLOR_DEPTH` ``1``: I1 (1 bit/pixel) Only support for horizontal mapped buffers. See :ref:`monochrome` for more details:
 
 The ``color_format`` can be changed with
-:cpp:expr:`lv_display_set_color_depth(display, LV_COLOR_FORMAT_...)`.
+``lv_display_set_color_depth(display, LV_COLOR_FORMAT_...)`` .
 Besides the default value :c:macro:`LV_COLOR_FORMAT_ARGB8888` can be
 used as a well.
 
@@ -183,8 +183,8 @@ It's very important that draw buffer(s) should be large enough for any
 selected color format.
 
 
-Swap endianness
---------------
+Swap Endianness
+---------------
 
 In case of RGB565 color format it might be required to swap the 2 bytes
 because the SPI, I2C or 8 bit parallel port periphery sends them in the wrong order.
@@ -256,7 +256,7 @@ the TE signal.
 
 You can do this in the following way:
 
-.. code:: c
+.. code-block:: c
 
    /*Delete the original display refresh timer*/
    lv_display_delete_refr_timer(disp);
@@ -279,7 +279,7 @@ Force refreshing
 ----------------
 
 Normally the invalidated areas (marked for redraw) are rendered in :cpp:func:`lv_timer_handler` in every
-:c:macro:`LV_DEF_REFR_PERIOD` milliseconds. However, by using :cpp:func:`lv_refr_now(display)` you can ask LVGL to
+:c:macro:`LV_DEF_REFR_PERIOD` milliseconds. However, by using :cpp:expr:`lv_refr_now(display)` you can ask LVGL to
 redraw the invalid areas immediately. The refreshing will happen in :cpp:func:`lv_refr_now` which might take
 longer time.
 
@@ -313,8 +313,7 @@ Further reading
 
 -  `lv_port_disp_template.c <https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_disp_template.c>`__
    for a template for your own driver.
--  :ref:`Drawing <drawing>` to learn more about how rendering
-   works in LVGL.
+-  :ref:`Drawing <porting_draw>` to learn more about how rendering works in LVGL.
 -  :ref:`display_features` to learn more about higher
    level display features.
 

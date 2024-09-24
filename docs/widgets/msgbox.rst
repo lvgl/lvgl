@@ -42,13 +42,16 @@ Create a message box
 :cpp:expr:`lv_msgbox_create(parent)` creates a message box.
 If ``parent`` is ``NULL`` the message box will be modal.
 
-Get the parts
+E.g. ``const char * btn_txts[] = {"Ok", "Cancel", NULL}``.
+
+
+Get the Parts
 -------------
 
 The building blocks of the message box can be obtained using the
 following functions:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * lv_msgbox_get_content(lv_obj_t * obj);
    lv_obj_t * lv_msgbox_get_title(lv_obj_t * obj);

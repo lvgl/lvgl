@@ -13,24 +13,24 @@ drive letter. For example, if an SD card is associated with the letter
 
 	If you want to skip the drive prefix from the path, you can use the :c:macro:`LV_FS_DEFAULT_DRIVE_LETTER` config parameter.
 
-Ready to use drivers
+Ready-to-Use Drivers
 ********************
 
 LVGL contains prepared drivers for the API of POSIX, standard C,
 Windows, and `FATFS <http://elm-chan.org/fsw/ff/00index_e.html>`__.
 Learn more :ref:`here <libs_filesystem>`.
 
-Adding a driver
+Adding a Driver
 ***************
 
-Registering a driver
+Registering a Driver
 --------------------
 
 To add a driver, a :cpp:type:`lv_fs_drv_t` needs to be initialized like below.
 The :cpp:type:`lv_fs_drv_t` needs to be static, global or dynamically allocated
 and not a local variable.
 
-.. code:: c
+.. code-block:: c
 
    static lv_fs_drv_t drv;                   /*Needs to be static or global*/
    lv_fs_drv_init(&drv);                     /*Basic initialization*/
@@ -65,7 +65,7 @@ Open callback
 
 The prototype of ``open_cb`` looks like this:
 
-.. code:: c
+.. code-block:: c
 
    void * (*open_cb)(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
 
@@ -83,7 +83,7 @@ Other callbacks
 The other callbacks are quite similar. For example ``write_cb`` looks
 like this:
 
-.. code:: c
+.. code-block:: c
 
    lv_fs_res_t (*write_cb)(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw);
 
@@ -99,7 +99,7 @@ Usage example
 
 The example below shows how to read from a file:
 
-.. code:: c
+.. code-block:: c
 
    lv_fs_file_t f;
    lv_fs_res_t res;
@@ -120,7 +120,7 @@ This example shows how to read a directory's content. It's up to the
 driver how to mark directories in the result but it can be a good
 practice to insert a ``'/'`` in front of each directory name.
 
-.. code:: c
+.. code-block:: c
 
    lv_fs_dir_t dir;
    lv_fs_res_t res;
@@ -183,8 +183,8 @@ The implementation is documented below. Note that the FS functions make calls
 to other driver FS functions when the cache is enabled. i.e., ``lv_fs_read`` may call the driver's ``seek``
 so the driver needs to implement more callbacks when the cache is enabled.
 
-``lv_fs_read`` :sub:`(behavior when the cache is enabled)`
--------------------------------------------------
+``lv_fs_read`` :sub:`(Behavior When Cache is Enabled)`
+----------------------------------------------------------
 
 .. mermaid::
    :zoom:
@@ -230,21 +230,21 @@ so the driver needs to implement more callbacks when the cache is enabled.
              --> P["copy the required bytes
                     to the destination buffer"]
 
-``lv_fs_write`` :sub:`(behavior when the cache is enabled)`
---------------------------------------------------
+``lv_fs_write`` :sub:`(Behavior When Cache is Enabled)`
+-------------------------------------------------------
 
 The part of the cache that coincides with the written content
 will be updated to reflect the written content.
 
-``lv_fs_seek`` :sub:`(behavior when the cache is enabled)`
--------------------------------------------------
+``lv_fs_seek`` :sub:`(Behavior When Cache is Enabled)`
+------------------------------------------------------
 
 The driver's ``seek`` will not actually be called unless the ``whence``
 is ``LV_FS_SEEK_END``, in which case ``seek`` and ``tell`` will be called
 to determine where the end of the file is.
 
-``lv_fs_tell`` :sub:`(behavior when the cache is enabled)`
--------------------------------------------------
+``lv_fs_tell`` :sub:`(Behavior When Cache is Enabled)`
+------------------------------------------------------
 
 The driver's ``tell`` will not actually be called.
 

@@ -9,7 +9,7 @@ to render images of individual letters (glyph). A font is stored in a
 :cpp:type:`lv_font_t` variable and can be set in a style's *text_font* field.
 For example:
 
-.. code:: c
+.. code-block:: c
 
    lv_style_set_text_font(&my_style, &lv_font_montserrat_28);  /*Set a larger font*/
 
@@ -36,7 +36,7 @@ and be sure that, :c:macro:`LV_TXT_ENC` is set to :c:macro:`LV_TXT_ENC_UTF8` in
 
 To test it try
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * label1 = lv_label_create(lv_screen_active(), NULL);
    lv_label_set_text(label1, LV_SYMBOL_OK);
@@ -101,19 +101,19 @@ font.
 
 The symbols can be used singly as:
 
-.. code:: c
+.. code-block:: c
 
    lv_label_set_text(my_label, LV_SYMBOL_OK);
 
 Or together with strings (compile time string concatenation):
 
-.. code:: c
+.. code-block:: c
 
    lv_label_set_text(my_label, LV_SYMBOL_OK "Apply");
 
 Or more symbols together:
 
-.. code:: c
+.. code-block:: c
 
    lv_label_set_text(my_label, LV_SYMBOL_OK LV_SYMBOL_WIFI LV_SYMBOL_PLAY);
 
@@ -303,7 +303,7 @@ to have a special binary format. (Not TTF or WOFF). Use
 
 Example
 
-.. code:: c
+.. code-block:: c
 
    lv_font_t *my_font = lv_binfont_create("X:/path/to/my_font.bin");
    if(my_font == NULL) return;
@@ -313,8 +313,8 @@ Example
    /*Free the font if not required anymore*/
    lv_binfont_destroy(my_font);
 
-Load a font from a memory buffer at run-time
-******************************************
+Load a Font from a Memory Buffer at Run-Time
+********************************************
 
 :cpp:func:`lv_binfont_create_from_buffer` can be used to load a font from a memory buffer.
 This function may be useful to load a font from an external file system, which is not
@@ -325,7 +325,7 @@ supported by LVGL. The font needs to be in the same format as if it were loaded 
 
 Example
 
-.. code:: c
+.. code-block:: c
 
    lv_font_t *my_font;
    uint8_t *buf;
@@ -397,10 +397,10 @@ line 1
 
     #!/usr/bin/env python3
 
-Example for a 12px font
------------------------
+Example for a 12-px Font
+------------------------
 
-.. code:: bash
+.. code-block:: console
 
     cd mkttf
     ./mkttf.py ./TerminusMedium-12-12.bdf
@@ -432,7 +432,7 @@ the font's bitmap and read them when the library needs them. FreeType can be use
 
 To add a new font engine, a custom :cpp:type:`lv_font_t` variable needs to be created:
 
-.. code:: c
+.. code-block:: c
 
    /*Describe the properties of a font*/
    lv_font_t my_font;
@@ -487,7 +487,7 @@ font from ``fallback`` to handle.
 
 ``fallback`` can be chained, so it will try to solve until there is no ``fallback`` set.
 
-.. code:: c
+.. code-block:: c
 
    /* Roboto font doesn't have support for CJK glyphs */
    lv_font_t *roboto = my_font_load_function();

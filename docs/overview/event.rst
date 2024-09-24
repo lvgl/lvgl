@@ -20,7 +20,7 @@ Add events to a widget
 The user can assign callback functions to an object to see its events.
 In practice, it looks like this:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * btn = lv_button_create(lv_screen_active());
    lv_obj_add_event_cb(btn, my_event_cb, LV_EVENT_CLICKED, NULL);   /*Assign an event callback*/
@@ -42,7 +42,7 @@ more detail.
 
 More events can be added to an object, like this:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_add_event_cb(obj, my_event_cb_1, LV_EVENT_CLICKED, NULL);
    lv_obj_add_event_cb(obj, my_event_cb_2, LV_EVENT_PRESSED, NULL);
@@ -51,7 +51,7 @@ More events can be added to an object, like this:
 Even the same event callback can be used on an object with different
 ``user_data``. For example:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_add_event_cb(obj, increment_on_click, LV_EVENT_CLICKED, &num1);
    lv_obj_add_event_cb(obj, increment_on_click, LV_EVENT_CLICKED, &num2);
@@ -62,7 +62,7 @@ Other objects can use the same *event callback*.
 
 In the very same way events can attached to the input devices and displays like this
 
-.. code:: c
+.. code-block:: c
 
    lv_display_add_event_cb(disp, event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
    lv_indev_add_event_cb(indev, event_cb, LV_EVENT_CLICKED, NULL);
@@ -71,7 +71,7 @@ In the very same way events can attached to the input devices and displays like 
 Remove event(s) from widgets
 ****************************
 
-.. code:: c
+.. code-block:: c
 
    uint32_t i;
    uint32_t event_cnt = lv_obj_get_event_count(obj);
@@ -131,11 +131,11 @@ Input device events
 -  :cpp:enumerator:`LV_EVENT_HOVER_OVER`: Indev hover over object
 -  :cpp:enumerator:`LV_EVENT_HOVER_LEAVE`: Indev hover leave object
 
-Drawing events
+Drawing Events
 --------------
 
--  :cpp:enumerator:`LV_EVENT_COVER_CHECK`: Check if the object fully covers an area. The event parameter is :cpp:type:`lv_cover_check_info_t *`.
--  :cpp:enumerator:`LV_EVENT_REFR_EXT_DRAW_SIZE`: Get the required extra draw area around the object (e.g. for shadow). The event parameter is :cpp:type:`int32_t *` to store the size.
+-  :cpp:enumerator:`LV_EVENT_COVER_CHECK`: Check if the object fully covers an area. The event parameter is :cpp:type:`lv_cover_check_info_t` ``*``.
+-  :cpp:enumerator:`LV_EVENT_REFR_EXT_DRAW_SIZE`: Get the required extra draw area around the object (e.g. for shadow). The event parameter is :cpp:type:`int32_t` ``*`` to store the size.
 -  :cpp:enumerator:`LV_EVENT_DRAW_MAIN_BEGIN`: Starting the main drawing phase
 -  :cpp:enumerator:`LV_EVENT_DRAW_MAIN`: Perform the main drawing
 -  :cpp:enumerator:`LV_EVENT_DRAW_MAIN_END`: Finishing the main drawing phase
@@ -148,7 +148,7 @@ Special events
 --------------
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED`: The object's value has changed (i.e. slider moved)
--  :cpp:enumerator:`LV_EVENT_INSERT`: A text is inserted to the object. The event data is `char *` being inserted.
+-  :cpp:enumerator:`LV_EVENT_INSERT`: A text is inserted to the object. The event data is :cpp:type:`char` ``*`` being inserted.
 -  :cpp:enumerator:`LV_EVENT_REFRESH`: Notify the object to refresh something on it (for the user)
 -  :cpp:enumerator:`LV_EVENT_READY`: A process has finished
 -  :cpp:enumerator:`LV_EVENT_CANCEL`: A process has been cancelled
@@ -232,11 +232,11 @@ contains all data about the event. The following values can be gotten from it:
 
 - :cpp:expr:`lv_event_get_code(e)`: get the event code
 - :cpp:expr:`lv_event_get_current_target(e)`: get the object to which an event was sent. I.e. the object whose event handler is being called.
-- :cpp:expr:`lv_event_get_target(e)`: get the object that originally triggered the event (different from :cpp:func:`lv_event_get_target` if :ref:`event bubbling <events_bubbling>` is enabled)
+- :cpp:expr:`lv_event_get_target(e)`: get the object that originally triggered the event (different from :cpp:func:`lv_event_get_target` if :ref:`event bubbling <event_bubbling>` is enabled)
 - :cpp:expr:`lv_event_get_user_data(e)`: get the pointer passed as the last parameter of :cpp:func:`lv_obj_add_event`.
 - :cpp:expr:`lv_event_get_param(e)`: get the parameter passed as the last parameter of :cpp:func:`lv_event_send`
 
-.. _events_bubbling:
+.. _event_bubbling:
 
 Event bubbling
 **************

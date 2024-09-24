@@ -114,17 +114,17 @@ The process is described in details below, using ``SPIFFS`` as demonstration.
       The exact configuration depends on your flash size and existing partitions,
       but the new final result should look something like this:
 
-      .. code:: csv
+      .. csv-table:: Partition Table
 
-         nvs,      data, nvs,     0x9000,  0x6000,
-         phy_init, data, phy,     0xf000,  0x1000,
-         factory,  app,  factory, 0x10000, 1400k,
-         storage,  data, spiffs,         ,  400k,
+         nvs,      data, nvs,     0x9000,  0x6000
+         phy_init, data, phy,     0xf000,  0x1000
+         factory,  app,  factory, 0x10000, 1400k
+         storage,  data, spiffs,         ,  400k
 
 
       .. note::
 
-         If you are not using a custom ``parition.csv`` yet, it can be added
+         If you are not using a custom ``partition.csv`` yet, it can be added
          via ``menuconfig`` (``Partition Table → Partition Table → Custom partition table CSV``).
 
    - Apply changes to the build system
