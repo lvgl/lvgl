@@ -29,7 +29,7 @@ def process_index_rst(path):
 
 
 h1 = {
-    "get_started": "Get started",
+    "get_started": "Get Started",
     "styles": "Styles",
     "anim": "Animations",
     "event": "Events",
@@ -38,28 +38,29 @@ h1 = {
     "widgets": "Widgets"
 }
 
+# What about animage?
+
 widgets = {
-    "obj": "Base object",
+    "obj": "Base Object",
     "arc": "Arc",
     "bar": "Bar",
-    "btn": "Button",
-    "btnmatrix": "Button matrix",
+    "button": "Button",
+    "buttonmatrix": "Button Matrix",
     "calendar": "Calendar",
     "canvas": "Canvas",
     "chart": "Chart",
     "checkbox": "Checkbox",
-    "colorwheel": "Colorwheel",
     "dropdown": "Dropdown",
-    "img": "Image",
-    "imagebutton": "Image button",
+    "image": "Image",
+    "imagebutton": "Image Button",
     "keyboard": "Keyboard",
     "label": "Label",
     "led": "LED",
     "line": "Line",
     "list": "List",
+    "lottie": "Lottie",
     "menu": "Menu",
-    "meter": "Meter",
-    "msgbox": "Message box",
+    "msgbox": "Message Box",
     "roller": "Roller",
     "scale":"Scale",
     "slider": "Slider",
