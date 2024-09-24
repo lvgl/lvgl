@@ -1,5 +1,4 @@
 #include "../../lv_examples.h"
-#include <string.h>
 #if LV_BUILD_EXAMPLES
 #if LV_USE_SVG && LV_USE_VECTOR_GRAPHIC
 
@@ -8,11 +7,11 @@
  */
 static void event_cb(lv_event_t * e)
 {
-    static const char * svg_data = "<svg width=\"12cm\" height=\"4cm\" viewBox=\"0 0 1200 400\">"
+    static char svg_data[] = "<svg width=\"12cm\" height=\"4cm\" viewBox=\"0 0 1200 400\">"
                                    "<circle cx=\"600\" cy=\"200\" r=\"100\" fill=\"red\" stroke=\"blue\" stroke-width=\"10\"/></svg>";
 
     lv_layer_t * layer = lv_event_get_layer(e);
-    lv_svg_node_t * svg = lv_svg_load_data(svg_data, strlen(svg_data));
+    lv_svg_node_t * svg = lv_svg_load_data(svg_data, sizeof(svg_data)/sizeof(char));
     lv_draw_svg(layer, svg);
     lv_svg_node_delete(svg);
 }
