@@ -376,9 +376,6 @@ void lv_vg_lite_path_append_rect(
         lv_vg_lite_path_line_to(path, x + w, y);
         lv_vg_lite_path_line_to(path, x + w, y + h);
         lv_vg_lite_path_line_to(path, x, y + h);
-
-        /*when used as a clipping path, closed loop processing is required*/
-        lv_vg_lite_path_line_to(path, x, y);
         lv_vg_lite_path_close(path);
         LV_PROFILER_DRAW_END;
         return;

@@ -546,6 +546,7 @@ static void refr_sync_areas(void)
          * @todo Resize SDL window will trigger crash because of sync_area is larger than disp_area
          */
         lv_area_intersect(sync_area, sync_area, &disp_area);
+        lv_display_rotate_area(disp_refr, sync_area);
         lv_draw_buf_copy(off_screen, sync_area, on_screen, sync_area);
     }
 
