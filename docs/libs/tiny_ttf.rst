@@ -50,6 +50,6 @@ Example
 API
 ---
 
-:ref:`stb_rect_pack`
+:ref:`stb_rect_pack_h`
 
-:ref:`stb_truetype_htcw`
+:ref:`stb_truetype_htcw_h`

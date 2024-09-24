@@ -1,4 +1,4 @@
-.. _timer:
+.. _timers:
 
 ======
 Timers

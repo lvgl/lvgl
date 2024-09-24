@@ -59,8 +59,8 @@ Example
 API
 ---
 
-:ref:`lv_tjpgd`
+:ref:`lv_tjpgd_h`
 
-:ref:`tjpgd`
+:ref:`tjpgd_h`
 
-:ref:`tjpgdcnf`
+:ref:`tjpgdcnf_h`

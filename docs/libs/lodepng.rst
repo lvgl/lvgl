@@ -46,5 +46,5 @@ Example
 API
 ---
 
-:ref:`lodepng`
+:ref:`lodepng_h`
 
