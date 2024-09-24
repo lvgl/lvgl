@@ -1403,11 +1403,16 @@ static void draw_placeholder(lv_event_t * e)
         if(ta->one_line) ph_dsc.flag |= LV_TEXT_FLAG_EXPAND;
 
         int32_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+        int32_t right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
         int32_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+        int32_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
         int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
         lv_area_t ph_coords;
         lv_area_copy(&ph_coords, &obj->coords);
-        lv_area_move(&ph_coords, left + border_width, top + border_width);
+        ph_coords.x1 += left + border_width;
+        ph_coords.x2 -= right + border_width;
+        ph_coords.y1 += top + border_width;
+        ph_coords.y2 -= bottom + border_width;
         ph_dsc.text = ta->placeholder_txt;
         lv_draw_label(layer, &ph_dsc, &ph_coords);
     }
