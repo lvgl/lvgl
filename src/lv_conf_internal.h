@@ -266,6 +266,25 @@
         #endif
     #endif
 #endif
+#if LV_USE_OS == LV_OS_FREERTOS
+	/*
+	 * Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
+	 * than unblocking a task using an intermediary object such as a binary semaphore.
+	 *
+	 * RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
+	 */
+	#ifndef LV_USE_FREERTOS_TASK_NOTIFY
+	    #ifdef LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_USE_FREERTOS_TASK_NOTIFY
+	            #define LV_USE_FREERTOS_TASK_NOTIFY CONFIG_LV_USE_FREERTOS_TASK_NOTIFY
+	        #else
+	            #define LV_USE_FREERTOS_TASK_NOTIFY 0
+	        #endif
+	    #else
+	        #define LV_USE_FREERTOS_TASK_NOTIFY 1
+	    #endif
+	#endif
+#endif
 
 /*========================
  * RENDERING CONFIGURATION

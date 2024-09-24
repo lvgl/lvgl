@@ -37,14 +37,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/*
- * Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
- * than unblocking a task using an intermediary object such as a binary semaphore.
- *
- * RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
- */
-#define USE_FREERTOS_TASK_NOTIFY 1
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -64,7 +56,7 @@ typedef struct {
     BaseType_t
     xIsInitialized;                       /**< Set to pdTRUE if this condition variable is initialized, pdFALSE otherwise. */
     BaseType_t xSyncSignal;               /**< Set to pdTRUE if the thread is signaled, pdFALSE otherwise. */
-#if USE_FREERTOS_TASK_NOTIFY
+#if LV_USE_FREERTOS_TASK_NOTIFY
     TaskHandle_t xTaskToNotify;           /**< The task waiting to be signalled. NULL if nothing is waiting. */
 #else
     SemaphoreHandle_t xCondWaitSemaphore; /**< Threads block on this semaphore in lv_thread_sync_wait. */
