@@ -546,7 +546,9 @@ static void refr_sync_areas(void)
          * @todo Resize SDL window will trigger crash because of sync_area is larger than disp_area
          */
         lv_area_intersect(sync_area, sync_area, &disp_area);
+#if LV_DRAW_DISPLAY_ROTATE_USE_MATRIX
         lv_display_rotate_area(disp_refr, sync_area);
+#endif
         lv_draw_buf_copy(off_screen, sync_area, on_screen, sync_area);
     }
 
@@ -663,6 +665,8 @@ static void refr_area(const lv_area_t * area_p)
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     lv_matrix_identity(&layer->matrix);
+
+#if LV_DRAW_DISPLAY_ROTATE_USE_MATRIX
     const lv_display_rotation_t rotation = lv_display_get_rotation(disp_refr);
 
     if(rotation != LV_DISPLAY_ROTATION_0) {
@@ -692,6 +696,7 @@ static void refr_area(const lv_area_t * area_p)
 
         lv_matrix_translate(&layer->matrix, -pivot_x, -pivot_y);
     }
+#endif /* LV_DRAW_DISPLAY_ROTATE_USE_MATRIX */
 #endif /* LV_DRAW_TRANSFORM_USE_MATRIX */
 
     if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
