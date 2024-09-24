@@ -340,6 +340,22 @@
     #endif
 #endif
 
+/** Using matrix for display rotation.
+ * Requirements:
+ * - `LV_DRAW_TRANSFORM_USE_MATRIX = 1`.
+ */
+#ifndef LV_DRAW_DISPLAY_ROTATE_USE_MATRIX
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_DISPLAY_ROTATE_USE_MATRIX
+            #define LV_DRAW_DISPLAY_ROTATE_USE_MATRIX CONFIG_LV_DRAW_DISPLAY_ROTATE_USE_MATRIX
+        #else
+            #define LV_DRAW_DISPLAY_ROTATE_USE_MATRIX 0
+        #endif
+    #else
+        #define LV_DRAW_DISPLAY_ROTATE_USE_MATRIX       1
+    #endif
+#endif
+
 /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
  * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
  * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
