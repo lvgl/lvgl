@@ -340,8 +340,12 @@ static int32_t _vglite_wait_for_finish(lv_draw_unit_t * draw_unit)
     lv_draw_vglite_unit_t * draw_vglite_unit = (lv_draw_vglite_unit_t *) draw_unit;
     draw_vglite_unit->wait_for_finish = true;
 
+    /* Signal draw unit to finish its tasks and return READY state after completion. */
     if(draw_vglite_unit->inited)
         lv_thread_sync_signal(&draw_vglite_unit->sync);
+
+    /* Wait for finish now. */
+    lv_draw_dispatch_wait_for_request();
 
     return 1;
 }
