@@ -8,10 +8,10 @@
 static void event_cb(lv_event_t * e)
 {
     static char svg_data[] = "<svg width=\"12cm\" height=\"4cm\" viewBox=\"0 0 1200 400\">"
-                                   "<circle cx=\"600\" cy=\"200\" r=\"100\" fill=\"red\" stroke=\"blue\" stroke-width=\"10\"/></svg>";
+                             "<circle cx=\"600\" cy=\"200\" r=\"100\" fill=\"red\" stroke=\"blue\" stroke-width=\"10\"/></svg>";
 
     lv_layer_t * layer = lv_event_get_layer(e);
-    lv_svg_node_t * svg = lv_svg_load_data(svg_data, sizeof(svg_data)/sizeof(char));
+    lv_svg_node_t * svg = lv_svg_load_data(svg_data, sizeof(svg_data) / sizeof(char));
     lv_draw_svg(layer, svg);
     lv_svg_node_delete(svg);
 }
