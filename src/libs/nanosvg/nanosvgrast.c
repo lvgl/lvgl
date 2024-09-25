@@ -6,10 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
 #include "nanosvgrast.h"
 
 #if LV_USE_NANOSVG

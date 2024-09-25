@@ -16,6 +16,11 @@ extern "C" {
 #include "../../../lvgl.h"
 #if LV_USE_NANOSVG
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
 /*********************
  *      DEFINES
  *********************/

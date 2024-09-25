@@ -6,11 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
 #include "nanosvg.h"
 
 #if LV_USE_NANOSVG
