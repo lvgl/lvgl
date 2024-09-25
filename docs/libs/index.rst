@@ -25,3 +25,4 @@
     arduino_esp_littlefs
     arduino_sd
     lfs
+    nanosvg
