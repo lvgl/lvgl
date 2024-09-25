@@ -76,7 +76,7 @@ If you create a new directory you MUST have an `index.rst` file in that director
 and that index file needs to be pointed to in the `index.rst` file that is located
 in the parent directory.
 
-Lets take a look at the `index.rst` file that is located in the `docs/layouts` directory.
+Let's take a look at the `index.rst` file that is located in the `docs/layouts` directory.
 
 ```
     .. _layouts:
