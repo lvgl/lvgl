@@ -80,13 +80,18 @@ static lv_timer_t * event_handler_timer;
  *   GLOBAL FUNCTIONS
  **********************/
 
+int my_tick(void)
+{
+    return SDL_GetTicks() / 10;
+}
+
 lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
 {
     if(!inited) {
         SDL_Init(SDL_INIT_VIDEO);
         SDL_StartTextInput();
         event_handler_timer = lv_timer_create(sdl_event_handler, 5, NULL);
-        lv_tick_set_cb(SDL_GetTicks);
+        lv_tick_set_cb(my_tick);
 
         inited = true;
     }
