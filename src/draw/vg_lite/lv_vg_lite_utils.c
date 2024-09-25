@@ -883,11 +883,6 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
         return false;
     }
 
-    if(buffer->stride < 1) {
-        LV_LOG_ERROR("buffer stride(%d) < 1", (int)buffer->stride);
-        return false;
-    }
-
     if(!(buffer->tiled == VG_LITE_LINEAR || buffer->tiled == VG_LITE_TILED)) {
         LV_LOG_ERROR("buffer tiled(%d) is invalid", (int)buffer->tiled);
         return false;
@@ -895,12 +890,6 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
 
     if(buffer->memory == NULL) {
         LV_LOG_ERROR("buffer memory is NULL");
-        return false;
-    }
-
-    if((uint32_t)(uintptr_t)buffer->memory != buffer->address) {
-        LV_LOG_ERROR("buffer memory(%p) != address(%p)",
-                     buffer->memory, (void *)(uintptr_t)buffer->address);
         return false;
     }
 
