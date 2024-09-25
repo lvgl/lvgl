@@ -464,7 +464,7 @@ static scene_dsc_t scenes[] = {
 
     {.name = "Containers",                 .scene_time = 3000, .create_cb = containers_cb},
     {.name = "Containers with overlay",    .scene_time = 3000, .create_cb = containers_with_overlay_cb},
-    {.name = "Containers with opa",        .scene_time = 1000, .create_cb = containers_with_opa_cb},
+    {.name = "Containers with opa",        .scene_time = 3000, .create_cb = containers_with_opa_cb},
     {.name = "Containers with opa_layer",  .scene_time = 3000, .create_cb = containers_with_opa_layer_cb},
     {.name = "Containers with scrolling",  .scene_time = 5000, .create_cb = containers_with_scrolling_cb},
 
