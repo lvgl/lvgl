@@ -240,6 +240,21 @@ void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint3
                             lv_display_render_mode_t render_mode);
 
 /**
+ * Set the frame buffers for a display, similarly to `lv_display_set_buffers`, but allow
+ * for a custom stride as required by a display controller.
+ * This allows the frame buffers to have a stride alignment different from the rest of
+ * the buffers`
+ * @param disp              pointer to a display
+ * @param buf1              first buffer
+ * @param buf2              second buffer (can be `NULL`)
+ * @param buf_size          buffer size in byte
+ * @param stride            buffer stride in bytes
+ * @param render_mode       LV_DISPLAY_RENDER_MODE_PARTIAL/DIRECT/FULL
+ */
+void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size,
+                                        uint32_t stride, lv_display_render_mode_t render_mode);
+
+/**
  * Set the buffers for a display, accept a draw buffer pointer.
  * Normally use `lv_display_set_buffers` is enough for most cases.
  * Use this function when an existing lv_draw_buf_t is available.
