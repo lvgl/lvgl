@@ -5,7 +5,7 @@
 ## Building
 
 Building the documentation is pretty easy to do but it does have some requirements
-That have to be filled prior to building them.
+that have to be filled prior to building them.
 
 Here are the requirements:
 
