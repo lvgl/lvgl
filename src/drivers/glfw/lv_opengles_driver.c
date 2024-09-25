@@ -124,7 +124,8 @@ static const char * fragment_shader =
     "        float gray = texColor.r;\n"
     "        color = vec4(gray, gray, gray, u_Opa);\n"
     "    } else {\n"
-    "        color = vec4(texColor.rgb, texColor.a * u_Opa);\n"
+    "        float combinedAlpha = texColor.a * u_Opa;\n"
+    "        color = vec4(texColor.rgb * combinedAlpha, combinedAlpha);\n"
     "    }\n"
     "};\n";
 
@@ -276,7 +277,7 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
 static void lv_opengles_enable_blending(void)
 {
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 static void lv_opengles_vertex_buffer_init(const void * data, unsigned int size)
