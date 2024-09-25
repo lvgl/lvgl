@@ -72,7 +72,7 @@ handle the supported draw tasks.
 
 .. code-block:: c
 
-    #if LV_USE_OS
+    #if LV_USE_PXP_DRAW_THREAD
         lv_thread_init(&draw_pxp_unit->thread, LV_THREAD_PRIO_HIGH, _pxp_render_thread_cb, 2 * 1024, draw_pxp_unit);
     #endif
 
