@@ -208,70 +208,43 @@ static inline int sdl_render_mode(void)
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
 #if LV_USE_DRAW_SDL == 0
-    lv_area_t rotated_area;
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     lv_color_format_t cf = lv_display_get_color_format(disp);
 
     if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+        lv_area_t rotated_area = *area;
+        lv_display_rotate_area(disp, &rotated_area);
+
+        int32_t px_map_w = lv_area_get_width(area);
+        int32_t px_map_h = lv_area_get_height(area);
+        uint32_t px_map_stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), cf);
         uint32_t px_size = lv_color_format_get_size(cf);
 
-        if(rotation != LV_DISPLAY_ROTATION_0) {
-            int32_t w = lv_area_get_width(area);
-            int32_t h = lv_area_get_height(area);
-            uint32_t w_stride = lv_draw_buf_width_to_stride(w, cf);
-            uint32_t h_stride = lv_draw_buf_width_to_stride(h, cf);
-            size_t buf_size = w * h * px_size;
+        int32_t fb_stride = disp->hor_res * px_size;
+        uint8_t * fb_start = dsc->fb_act;
+        fb_start += rotated_area.y1 * fb_stride + rotated_area.x1 * px_size;
+        lv_display_rotation_t rotation = lv_display_get_rotation(disp);
 
-            /* (Re)allocate temporary buffer if needed */
-            if(!dsc->rotated_buf || dsc->rotated_buf_size != buf_size) {
-                dsc->rotated_buf = sdl_draw_buf_realloc_aligned(dsc->rotated_buf, buf_size);
-                dsc->rotated_buf_size = buf_size;
+        if(rotation == LV_DISPLAY_ROTATION_0) {
+            uint32_t px_map_line_bytes = lv_area_get_width(area) * px_size;
+
+            int32_t y;
+            for(y = area->y1; y <= area->y2; y++) {
+                lv_memcpy(fb_start, px_map, px_map_line_bytes);
+                px_map += px_map_stride;
+                fb_start += fb_stride;
             }
-
-            switch(rotation) {
-                case LV_DISPLAY_ROTATION_0:
-                    break;
-                case LV_DISPLAY_ROTATION_90:
-                    lv_draw_sw_rotate(px_map, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
-                    break;
-                case LV_DISPLAY_ROTATION_180:
-                    lv_draw_sw_rotate(px_map, dsc->rotated_buf, w, h, w_stride, w_stride, rotation, cf);
-                    break;
-                case LV_DISPLAY_ROTATION_270:
-                    lv_draw_sw_rotate(px_map, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
-                    break;
-            }
-
-            px_map = dsc->rotated_buf;
-
-            rotated_area = *area;
-            lv_display_rotate_area(disp, &rotated_area);
-            area = &rotated_area;
         }
-
-        uint32_t px_map_stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), cf);
-        uint32_t px_map_line_bytes = lv_area_get_width(area) * px_size;
-
-        uint8_t * fb_tmp = dsc->fb_act;
-        uint32_t fb_stride = disp->hor_res * px_size;
-        fb_tmp += area->y1 * fb_stride;
-        fb_tmp += area->x1 * px_size;
-
-        int32_t y;
-        for(y = area->y1; y <= area->y2; y++) {
-            lv_memcpy(fb_tmp, px_map, px_map_line_bytes);
-            px_map += px_map_stride;
-            fb_tmp += fb_stride;
+        else {
+            lv_draw_sw_rotate(px_map, fb_start, px_map_w, px_map_h, px_map_stride, fb_stride, rotation, cf);
         }
     }
 
-    /* TYPICALLY YOU DO NOT NEED THIS
-     * If it was the last part to refresh update the texture of the window.*/
     if(lv_display_flush_is_last(disp)) {
         if(sdl_render_mode() != LV_DISPLAY_RENDER_MODE_PARTIAL) {
             dsc->fb_act = px_map;
         }
+
         window_update(disp);
     }
 #else

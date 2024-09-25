@@ -162,6 +162,15 @@ menu "LVGL configuration"
 			string "Custom OS include header"
 			default "stdint.h"
 			depends on LV_OS_CUSTOM
+
+        config LV_USE_FREERTOS_TASK_NOTIFY
+            bool "Use RTOS task with a direct notification for synchronization"
+            default y
+            depends on LV_OS_FREERTOS
+        help
+            Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
+            than unblocking a task using an intermediary object such as a binary semaphore.
+            RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
 	endmenu
 
 	menu "Rendering Configuration"
@@ -445,12 +454,12 @@ menu "LVGL configuration"
 				Accelerate blends, fills, image decoding, etc. with STM32 DMA2D.
 
 		config LV_DRAW_DMA2D_HAL_INCLUDE
-			int "the header file for LVGL to include for DMA2D"
+			string "the header file for LVGL to include for DMA2D"
 			default "stm32h7xx_hal.h"
 			depends on LV_USE_DRAW_DMA2D
 
 		config LV_USE_DRAW_DMA2D_INTERRUPT
-			int "use the DMA2D transfer complete interrupt"
+			bool "use the DMA2D transfer complete interrupt"
 			default n
 			depends on LV_USE_DRAW_DMA2D
 			help
@@ -1384,7 +1393,7 @@ menu "LVGL configuration"
 		config LV_USE_MEM_MONITOR
 			bool "Show the used memory and the memory fragmentation"
 			default n
-			depends on LV_STDLIB_BUILTIN && LV_USE_SYSMON
+			depends on LV_USE_BUILTIN_MALLOC && LV_USE_SYSMON
 
 		choice
 			prompt "Memory monitor position"
@@ -1411,11 +1420,13 @@ menu "LVGL configuration"
 				bool "Center"
 		endchoice
 
-		config LV_USE_PROFILER
+		menuconfig LV_USE_PROFILER
 			bool "Runtime performance profiler"
+
+		if LV_USE_PROFILER
+
 		config LV_USE_PROFILER_BUILTIN
 			bool "Enable the built-in profiler"
-			depends on LV_USE_PROFILER
 			default y
 		config LV_PROFILER_BUILTIN_BUF_SIZE
 			int "Default profiler trace buffer size in bytes"
@@ -1423,8 +1434,49 @@ menu "LVGL configuration"
 			default 16384
 		config LV_PROFILER_INCLUDE
 			string "Header to include for the profiler"
-			depends on LV_USE_PROFILER
 			default "lvgl/src/misc/lv_profiler_builtin.h"
+
+		config LV_PROFILER_LAYOUT
+			bool "Enable layout profiler"
+			default y
+
+		config LV_PROFILER_REFR
+			bool "Enable disp refr profiler"
+			default y
+
+		config LV_PROFILER_DRAW
+			bool "Enable draw profiler"
+			default y
+
+		config LV_PROFILER_INDEV
+			bool "Enable indev profiler"
+			default y
+
+		config LV_PROFILER_DECODER
+			bool "Enable decoder profiler"
+			default y
+
+		config LV_PROFILER_FONT
+			bool "Enable font profiler"
+			default y
+
+		config LV_PROFILER_FS
+			bool "Enable fs profiler"
+			default y
+
+		config LV_PROFILER_STYLE
+			bool "Enable style profiler"
+			default n
+
+		config LV_PROFILER_TIMER
+			bool "Enable timer profiler"
+			default y
+
+		config LV_PROFILER_CACHE
+			bool "Enable cache profiler"
+			default y
+
+		endif # LV_USE_PROFILER
 
 		config LV_USE_MONKEY
 			bool "Enable Monkey test"
@@ -1484,15 +1536,25 @@ menu "LVGL configuration"
 			default y
 			help
 				This can save some memory, but not much. After the quick access bar is created, it can be hidden by clicking the button at the top left corner of the browsing area, which is very useful for small screen devices.
-	
+
 		config LV_USE_FONT_MANAGER
 			bool "Enable freetype font manager"
 			depends on LV_USE_FREETYPE
-			default n			
+			default n
 		config LV_FONT_MANAGER_NAME_MAX_LEN
 			int "Font manager name max length"
 			depends on LV_USE_FONT_MANAGER
 			default 32
+
+		config LVGL_VERSION_MAJOR
+			int
+			default 9 # LVGL_VERSION_MAJOR
+		config LVGL_VERSION_MINOR
+			int
+			default 2 # LVGL_VERSION_MINOR
+		config LVGL_VERSION_PATCH
+			int
+			default 0 # LVGL_VERSION_PATCH
 	endmenu
 
 	menu "Devices"

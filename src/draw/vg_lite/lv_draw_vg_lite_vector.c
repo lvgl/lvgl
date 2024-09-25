@@ -63,9 +63,9 @@ void lv_draw_vg_lite_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_tas
     if(layer->draw_buf == NULL)
         return;
 
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     lv_vector_for_each_destroy_tasks(dsc->task_list, task_draw_cb, draw_unit);
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 /**********************
@@ -85,7 +85,7 @@ static vg_lite_color_t lv_color32_to_vg(lv_color32_t color, lv_opa_t opa)
 
 static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     lv_draw_vg_lite_unit_t * u = ctx;
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
 
@@ -95,10 +95,10 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
         vg_lite_color_t c = lv_color32_to_vg(dsc->fill_dsc.color, LV_OPA_COVER);
         vg_lite_rectangle_t rect;
         lv_vg_lite_rect(&rect, &dsc->scissor_area);
-        LV_PROFILER_BEGIN_TAG("vg_lite_clear");
+        LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_clear");
         LV_VG_LITE_CHECK_ERROR(vg_lite_clear(&u->target_buffer, &rect, c));
-        LV_PROFILER_END_TAG("vg_lite_clear");
-        LV_PROFILER_END;
+        LV_PROFILER_DRAW_END_TAG("vg_lite_clear");
+        LV_PROFILER_DRAW_END;
         return;
     }
 
@@ -146,6 +146,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
 
             /* drop original path */
             lv_vg_lite_path_drop(u, lv_vg_path);
+            LV_PROFILER_DRAW_END;
             return;
         }
 
@@ -184,7 +185,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
         if(!lv_vg_lite_matrix_inverse(&result, &matrix)) {
             LV_LOG_ERROR("no inverse matrix");
             path_drop_func(u, path_drop_data);
-            LV_PROFILER_END;
+            LV_PROFILER_DRAW_END;
             return;
         }
 
@@ -202,7 +203,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     switch(dsc->fill_dsc.style) {
         case LV_VECTOR_DRAW_STYLE_SOLID: {
                 /* normal draw shape */
-                LV_PROFILER_BEGIN_TAG("vg_lite_draw");
+                LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw");
                 LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
                                            &u->target_buffer,
                                            vg_path,
@@ -210,7 +211,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                                            &matrix,
                                            blend,
                                            vg_color));
-                LV_PROFILER_END_TAG("vg_lite_draw");
+                LV_PROFILER_DRAW_END_TAG("vg_lite_draw");
             }
             break;
         case LV_VECTOR_DRAW_STYLE_PATTERN: {
@@ -230,7 +231,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
 
                     LV_VG_LITE_ASSERT_MATRIX(&pattern_matrix);
 
-                    LV_PROFILER_BEGIN_TAG("vg_lite_draw_pattern");
+                    LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw_pattern");
                     LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
                                                &u->target_buffer,
                                                vg_path,
@@ -243,7 +244,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                                                vg_color,
                                                recolor,
                                                VG_LITE_FILTER_BI_LINEAR));
-                    LV_PROFILER_END_TAG("vg_lite_draw_pattern");
+                    LV_PROFILER_DRAW_END_TAG("vg_lite_draw_pattern");
 
                     lv_vg_lite_pending_add(u->image_dsc_pending, &decoder_dsc);
                 }
@@ -288,7 +289,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
         lv_vg_lite_disable_scissor();
     }
 
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 static vg_lite_quality_t lv_quality_to_vg(lv_vector_path_quality_t quality)
@@ -307,7 +308,7 @@ static vg_lite_quality_t lv_quality_to_vg(lv_vector_path_quality_t quality)
 
 static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     lv_vg_lite_path_set_quality(dest, lv_quality_to_vg(src->quality));
 
     /* init bounds */
@@ -371,7 +372,7 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
     }
 
     lv_vg_lite_path_set_bonding_box(dest, min_x, min_y, max_x, max_y);
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 static vg_lite_path_type_t lv_path_opa_to_path_type(const lv_vector_draw_dsc_t * dsc)
