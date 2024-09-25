@@ -45,7 +45,7 @@ To build the documentation use the following command.
 
     python build.py skip_latex clean
 
-You may have to use the following command if you are un a Unix like OS
+You may have to use the following command if you are on a Unix like OS
 
     python3 build.py skip_latex clean
 
