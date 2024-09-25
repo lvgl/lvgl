@@ -300,6 +300,7 @@ add_library(test_common
         src/test_assets/test_arc_bg.c
         src/test_assets/test_img_lvgl_logo_png.c
         src/test_assets/test_img_lvgl_logo_jpg.c
+        src/test_assets/test_img_svg.c
         src/test_assets/test_img_emoji_F617.c
         src/test_assets/test_ubuntu_font.c
         src/test_assets/test_kern_one_otf.c

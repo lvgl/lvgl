@@ -26,6 +26,7 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 void lv_example_nanosvg_1(void);
+void lv_example_nanosvg_2(void);
 
 /**********************
  *      MACROS

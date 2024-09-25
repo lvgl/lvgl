@@ -103,10 +103,26 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
             return LV_RESULT_OK;
         }
     }
-    /* SVG file as data not supported for simplicity.
-     * Convert them to LVGL compatible C arrays directly. */
     else if(src_type == LV_IMAGE_SRC_VARIABLE) {
-        return LV_RESULT_INVALID;
+        const lv_image_dsc_t * img_dsc = src;
+
+        static const char magic[] = "<?xml";
+        if(lv_memcmp(img_dsc->data, magic, 5) != 0) return LV_RESULT_INVALID;
+
+        char * raw_data = lv_strdup((char *)img_dsc->data);
+
+        if(raw_data == NULL)
+            return LV_RESULT_INVALID;
+
+        g_image = nsvgParse(raw_data, "px", 96.0f);
+        lv_free(raw_data);
+        if(g_image == NULL)
+            return LV_RESULT_INVALID;
+
+        header->w = (uint32_t)g_image->width;
+        header->h = (uint32_t)g_image->height;
+        nsvgDelete(g_image);
+        return LV_RESULT_OK;
     }
 
     return LV_RESULT_INVALID;         /*If didn't succeeded earlier then it's an error*/
@@ -134,65 +150,69 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         g_image = nsvgParseFromFile(fn, "px", 96.0f);
         if(g_image == NULL)
             return LV_RESULT_INVALID;
-
-        lv_draw_buf_t * decoded = decode_svg_data(g_image);
-        nsvgDelete(g_image);
-        if(!decoded) {
-            LV_LOG_WARN("Error decoding SVG");
-            LV_PROFILER_DECODER_END_TAG("lv_nanosvg_decoder_open");
-            return LV_RESULT_INVALID;
-        }
-
-        lv_draw_buf_t * adjusted = lv_image_decoder_post_process(dsc, decoded);
-        if(adjusted == NULL) {
-            lv_draw_buf_destroy(decoded);
-            LV_PROFILER_DECODER_END_TAG("lv_nanosvg_decoder_open");
-            return LV_RESULT_INVALID;
-        }
-
-        /*The adjusted draw buffer is newly allocated.*/
-        if(adjusted != decoded) {
-            lv_draw_buf_destroy(decoded);
-            decoded = adjusted;
-        }
-
-        dsc->decoded = decoded;
-
-        if(dsc->args.no_cache) {
-            LV_PROFILER_DECODER_END_TAG("lv_nanosvg_decoder_open");
-            return LV_RESULT_OK;
-        }
-
-        /*If the image cache is disabled, just return the decoded image*/
-        if(!lv_image_cache_is_enabled()) {
-            LV_PROFILER_DECODER_END_TAG("lv_nanosvg_decoder_open");
-            return LV_RESULT_OK;
-        }
-
-        /*Add the decoded image to the cache*/
-        lv_image_cache_data_t search_key;
-        search_key.src_type = dsc->src_type;
-        search_key.src = dsc->src;
-        search_key.slot.size = decoded->data_size;
-
-        lv_cache_entry_t * entry = lv_image_decoder_add_to_cache(decoder, &search_key, decoded, NULL);
-
-        if(entry == NULL) {
-            LV_PROFILER_DECODER_END_TAG("lv_nanosvg_decoder_open");
-            return LV_RESULT_INVALID;
-        }
-        dsc->cache_entry = entry;
-
-        LV_PROFILER_DECODER_END_TAG("lv_nanosvg_decoder_open");
-        return LV_RESULT_OK;    /*If not returned earlier then it failed*/
     }
-    /* SVG file as data not supported for simplicity.
-     * Convert them to LVGL compatible C arrays directly. */
     else if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
+        const lv_image_dsc_t * img_dsc = dsc->src;
+        char * raw_data = lv_strdup((char *)img_dsc->data);
+
+        if(raw_data == NULL)
+            return LV_RESULT_INVALID;
+
+        g_image = nsvgParse(raw_data, "px", 96.0f);
+        lv_free(raw_data);
+        if(g_image == NULL)
+            return LV_RESULT_INVALID;
+    }
+    lv_draw_buf_t * decoded = decode_svg_data(g_image);
+    nsvgDelete(g_image);
+    if(!decoded) {
+        LV_LOG_WARN("Error decoding SVG");
+        LV_PROFILER_DECODER_END_TAG("lv_nanosvg_decoder_open");
         return LV_RESULT_INVALID;
     }
 
-    return LV_RESULT_INVALID;    /*If not returned earlier then it failed*/
+    lv_draw_buf_t * adjusted = lv_image_decoder_post_process(dsc, decoded);
+    if(adjusted == NULL) {
+        lv_draw_buf_destroy(decoded);
+        LV_PROFILER_DECODER_END_TAG("lv_nanosvg_decoder_open");
+        return LV_RESULT_INVALID;
+    }
+
+    /*The adjusted draw buffer is newly allocated.*/
+    if(adjusted != decoded) {
+        lv_draw_buf_destroy(decoded);
+        decoded = adjusted;
+    }
+
+    dsc->decoded = decoded;
+
+    if(dsc->args.no_cache) {
+        LV_PROFILER_DECODER_END_TAG("lv_nanosvg_decoder_open");
+        return LV_RESULT_OK;
+    }
+
+    /*If the image cache is disabled, just return the decoded image*/
+    if(!lv_image_cache_is_enabled()) {
+        LV_PROFILER_DECODER_END_TAG("lv_nanosvg_decoder_open");
+        return LV_RESULT_OK;
+    }
+
+    /*Add the decoded image to the cache*/
+    lv_image_cache_data_t search_key;
+    search_key.src_type = dsc->src_type;
+    search_key.src = dsc->src;
+    search_key.slot.size = decoded->data_size;
+
+    lv_cache_entry_t * entry = lv_image_decoder_add_to_cache(decoder, &search_key, decoded, NULL);
+
+    if(entry == NULL) {
+        LV_PROFILER_DECODER_END_TAG("lv_nanosvg_decoder_open");
+        return LV_RESULT_INVALID;
+    }
+    dsc->cache_entry = entry;
+
+    LV_PROFILER_DECODER_END_TAG("lv_nanosvg_decoder_open");
+    return LV_RESULT_OK;    /*If not returned earlier then it failed*/
 }
 
 /**

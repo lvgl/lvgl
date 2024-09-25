@@ -21,11 +21,15 @@ void tearDown(void)
 
 void test_nanosvg_1(void)
 {
-    lv_obj_t * img;
+    lv_obj_t * img1, * img2;
 
-    img = lv_image_create(active_screen);
-    lv_image_set_src(img, "A:src/test_assets/test_img_svg.svg");
-    lv_obj_center(img);
+    img1 = lv_image_create(active_screen);
+    lv_image_set_src(img1, "A:src/test_assets/test_img_svg.svg");
+    lv_obj_align(img1, LV_ALIGN_LEFT_MID, 150, 0);
+
+    img2 = lv_image_create(active_screen);
+    lv_image_set_src(img2, "A:src/test_assets/test_img_svg.svg");
+    lv_obj_align(img2, LV_ALIGN_RIGHT_MID, -150, 0);
 
 #ifndef NON_AMD64_BUILD
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/svg_1.lp64.png");
