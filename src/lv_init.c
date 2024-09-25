@@ -32,6 +32,7 @@
 #include "libs/lodepng/lv_lodepng.h"
 #include "libs/libpng/lv_libpng.h"
 #include "libs/tiny_ttf/lv_tiny_ttf.h"
+#include "libs/nanosvg/lv_nanosvg.h"
 #include "draw/lv_draw.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs_private.h"
@@ -324,6 +325,10 @@ void lv_init(void)
 
 #if LV_USE_BMP
     lv_bmp_init();
+#endif
+
+#if LV_USE_NANOSVG
+    lv_nanosvg_init();
 #endif
 
     /*Make FFMPEG last because the last converter will be checked first and

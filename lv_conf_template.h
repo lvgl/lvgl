@@ -879,6 +879,9 @@
     #define LV_FFMPEG_DUMP_FORMAT 0
 #endif
 
+/** Nanosvg library */
+#define LV_USE_NANOSVG  0
+
 /*==================
  * OTHERS
  *==================*/

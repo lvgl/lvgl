@@ -1336,6 +1336,10 @@ menu "LVGL configuration"
 			bool "Dump format"
 			depends on LV_USE_FFMPEG
 			default n
+
+		config LV_USE_NANOSVG
+			bool "Enable Nanosvg library"
+			default n
 	endmenu
 
 	menu "Others"

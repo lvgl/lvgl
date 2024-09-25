@@ -2816,6 +2816,15 @@
     #endif
 #endif
 
+/** Nanosvg library */
+#ifndef LV_USE_NANOSVG
+    #ifdef CONFIG_LV_USE_NANOSVG
+        #define LV_USE_NANOSVG CONFIG_LV_USE_NANOSVG
+    #else
+        #define LV_USE_NANOSVG  0
+    #endif
+#endif
+
 /*==================
  * OTHERS
  *==================*/
