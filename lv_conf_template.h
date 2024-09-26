@@ -137,12 +137,6 @@
  * - Rendering engine needs to support 3x3 matrix transformations. */
 #define LV_DRAW_TRANSFORM_USE_MATRIX            0
 
-/** Using matrix for display rotation.
- * Requirements:
- * - `LV_DRAW_TRANSFORM_USE_MATRIX = 1`.
- */
-#define LV_DRAW_DISPLAY_ROTATE_USE_MATRIX       1
-
 /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
  * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
  * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers

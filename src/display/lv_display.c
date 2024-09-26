@@ -867,6 +867,13 @@ void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation
     update_resolution(disp);
 }
 
+void lv_display_set_matrix_rotation(lv_display_t * disp, bool enable)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return;
+    disp->matrix_rotation = enable;
+}
+
 lv_display_rotation_t lv_display_get_rotation(lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
