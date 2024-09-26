@@ -546,8 +546,10 @@ static void refr_sync_areas(void)
          * @todo Resize SDL window will trigger crash because of sync_area is larger than disp_area
          */
         lv_area_intersect(sync_area, sync_area, &disp_area);
-#if LV_DRAW_TRANSFORM_USE_MATRIX && LV_DRAW_DISPLAY_ROTATE_USE_MATRIX
-        lv_display_rotate_area(disp_refr, sync_area);
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+        if(disp_refr->matrix_rotation) {
+            lv_display_rotate_area(disp_refr, sync_area);
+        }
 #endif
         lv_draw_buf_copy(off_screen, sync_area, on_screen, sync_area);
     }
@@ -665,39 +667,38 @@ static void refr_area(const lv_area_t * area_p)
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     lv_matrix_identity(&layer->matrix);
-    lv_display_rotate_area(disp_refr, &layer->phy_clip_area);
+    if(disp_refr->matrix_rotation) lv_display_rotate_area(disp_refr, &layer->phy_clip_area);
 
-#if LV_DRAW_DISPLAY_ROTATE_USE_MATRIX
-    const lv_display_rotation_t rotation = lv_display_get_rotation(disp_refr);
+    if(disp_refr->matrix_rotation) {
+        const lv_display_rotation_t rotation = lv_display_get_rotation(disp_refr);
+        if(rotation != LV_DISPLAY_ROTATION_0) {
+            /* Calculate midpoint coordinates using native resolution data */
+            const float pivot_x = disp_refr->hor_res / 2.0f;
+            const float pivot_y = disp_refr->ver_res / 2.0f;
+            lv_matrix_translate(&layer->matrix, pivot_x, pivot_y);
 
-    if(rotation != LV_DISPLAY_ROTATION_0) {
-        /* Calculate midpoint coordinates using native resolution data */
-        const float pivot_x = disp_refr->hor_res / 2.0f;
-        const float pivot_y = disp_refr->ver_res / 2.0f;
-        lv_matrix_translate(&layer->matrix, pivot_x, pivot_y);
+            /* The screen rotation direction defined by LVGL is opposite to the drawing angle */
+            switch(rotation) {
+                case LV_DISPLAY_ROTATION_90:
+                    lv_matrix_rotate(&layer->matrix, 270);
+                    break;
 
-        /* The screen rotation direction defined by LVGL is opposite to the drawing angle */
-        switch(rotation) {
-            case LV_DISPLAY_ROTATION_90:
-                lv_matrix_rotate(&layer->matrix, 270);
-                break;
+                case LV_DISPLAY_ROTATION_180:
+                    lv_matrix_rotate(&layer->matrix, 180);
+                    break;
 
-            case LV_DISPLAY_ROTATION_180:
-                lv_matrix_rotate(&layer->matrix, 180);
-                break;
+                case LV_DISPLAY_ROTATION_270:
+                    lv_matrix_rotate(&layer->matrix, 90);
+                    break;
 
-            case LV_DISPLAY_ROTATION_270:
-                lv_matrix_rotate(&layer->matrix, 90);
-                break;
+                default:
+                    LV_LOG_WARN("Invalid rotation: %d", rotation);
+                    break;
+            }
 
-            default:
-                LV_LOG_WARN("Invalid rotation: %d", rotation);
-                break;
+            lv_matrix_translate(&layer->matrix, -pivot_x, -pivot_y);
         }
-
-        lv_matrix_translate(&layer->matrix, -pivot_x, -pivot_y);
     }
-#endif /* LV_DRAW_DISPLAY_ROTATE_USE_MATRIX */
 #endif /* LV_DRAW_TRANSFORM_USE_MATRIX */
 
     if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {

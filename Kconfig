@@ -193,11 +193,6 @@ menu "LVGL configuration"
 			help
 				Requirements: The rendering engine needs to support 3x3 matrix transformations.
 
-		config LV_DRAW_DISPLAY_ROTATE_USE_MATRIX
-			bool "Using matrix for display rotation"
-			default y
-			depends on LV_DRAW_TRANSFORM_USE_MATRIX
-
 		config LV_DRAW_LAYER_SIMPLE_BUF_SIZE
 			int "Optimal size to buffer the widget with opacity"
 			default 24576
