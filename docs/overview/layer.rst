@@ -24,7 +24,7 @@ its children.
 
 .. image:: /misc/layers.png
 
-.. code:: c
+.. code-block:: c
 
    /*Create a screen*/
    lv_obj_t * scr = lv_obj_create(NULL, NULL);
@@ -89,7 +89,7 @@ everywhere. For example, a menu bar, a pop-up, etc. If the ``click``
 attribute is enabled, then ``layer_top`` will absorb all user clicks and
 acts as a modal.
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
 
@@ -128,8 +128,8 @@ In this case widget will be sliced into ``LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE`` siz
 If there is no memory for a new chunk, LVGL will try allocating layer when another chunk is rendered and freed.
 
 
-Transformed layer
----------------
+Transformed Layer
+-----------------
 
 When the widget is transformed a larger part of the widget needs to rendered to provide enough data for transformation. LVGL tries to render as small area of the widget as possible, but due to the nature of transformations no slicing is possible in this case.
 

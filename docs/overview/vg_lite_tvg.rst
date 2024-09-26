@@ -9,10 +9,10 @@ Its purpose is to simplify the debugging of VG-Lite adaptation and reduce the ti
 
 It has been integrated into the CI automated compilation and testing process to ensure that the VG-Lite rendering backend can be fully tested after each PR modification.
 
-How it works
+How It Works
 ************
 
-Sort out the APIs in the ``vg_lite.h`` header file provided by the vendor, re-implement the APIs using `ThorVG <https://github.com/thorvg/thorvg>`_, 
+Sort out the APIs in the ``vg_lite.h`` header file provided by the vendor, re-implement the APIs using `ThorVG <https://github.com/thorvg/thorvg>`_,
 and simulate the same rendering images as the real hardware on the simulator.
 
 Configuration
@@ -21,7 +21,7 @@ Configuration
 1. Enable VG-Lite rendering backend, see `VG-Lite Rendering Backend </overview/renderers/vg_lite>`__.
 
 2. Enable ThorVG and turn on the configuration :c:macro:`LV_USE_THORVG_INTERNAL` or :c:macro:`LV_USE_THORVG_EXTERNAL`.
-It is recommended to use the internal ThorVG library to ensure uniform rendering results.
+   It is recommended to use the internal ThorVG library to ensure uniform rendering results.
 
 3. Enable :c:macro:`LV_USE_VG_LITE_THORVG` and set :c:macro:`LV_DRAW_BUF_ALIGN` to 64. The rest of the options can remain default.
-Make sure :c:macro:`LV_VG_LITE_USE_GPU_INIT` is enabled, because the thorvg drawing context needs to be initialized before it can be used.
+   Make sure :c:macro:`LV_VG_LITE_USE_GPU_INIT` is enabled, because the thorvg drawing context needs to be initialized before it can be used.

@@ -1,7 +1,7 @@
 .. _get_started:
 
 ===========
-Get started
+Get Started
 ===========
 
 There are several ways to get your feet wet with LVGL. Here is one
@@ -17,7 +17,7 @@ are learning to use LVGL:
 7. Port LVGL to a board. See the :ref:`porting` guide or check the ready to use `Projects <https://github.com/lvgl?q=lv_port_&type=&language=>`__
 8. Read the :ref:`overview` page to get a better understanding of the library. (2-3 hours)
 9. Check the documentation of the :ref:`widgets` to see their features and usage
-10. If you have questions got to the `Forum <http://forum.lvgl.io/>`__
+10. If you have questions go to the `Forum <http://forum.lvgl.io/>`__
 11. Read the :ref:`contributing` guide to see how you can help to improve LVGL (15 minutes)
 
 

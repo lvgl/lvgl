@@ -52,20 +52,20 @@ Configure ticks
 Set the number of total ticks with :cpp:expr:`lv_scale_set_total_tick_count(scale, total_tick_count)` 
 and then configure the major tick being every Nth ticks with :cpp:expr:`lv_scale_set_major_tick_every(scale, nth_tick)`.
 
-Labels on major ticks can be configured with :cpp:expr:`lv_scale_set_label_show(scale, show_label)`, 
-set `show_label` to true if labels should be drawn, :cpp:expr:`false` to hide them. 
-If instead of a numerical value in the major ticks a text is required they can be set 
-with :cpp:expr:`lv_scale_set_text_src(scale, custom_labels)` using ``NULL`` as the last element, 
-i.e. :cpp:expr:`static char * custom_labels[3] = {"One", "Two", NULL};`.
+Labels on major ticks can be configured with :cpp:expr:`lv_scale_set_label_show(scale, show_label)`,
+set `show_label` to true if labels should be drawn, :cpp:expr:`false` to hide them.
+If instead of a numerical value in the major ticks a text is required they can be set
+with :cpp:expr:`lv_scale_set_text_src(scale, custom_labels)` using ``NULL`` as the last element,
+i.e. ``static char * custom_labels[3] = {"One", "Two", NULL}``.
 
 <strong> NOTE: </strong> The major tick value is calculated with the :cpp:expr:`lv_map` API (when not setting the custom labels),
 this calculation takes into consideration the total tick number and the scale range, so the label drawn can present rounding errors
 when the calculated value is a float number.
 
-The length of the ticks can be configured with the length style property on the :cpp:enumerator:`LV_PART_INDICATOR` 
-for major ticks and :cpp:enumerator:`LV_PART_ITEMS` for minor ticks, for example with local style: 
-:cpp:expr:`lv_obj_set_style_length(scale, 5, LV_PART_INDICATOR);` for major ticks 
-and :cpp:expr:`lv_obj_set_style_length(scale, 5, LV_PART_ITEMS);` for minor ticks. 
+The length of the ticks can be configured with the length style property on the :cpp:enumerator:`LV_PART_INDICATOR`
+for major ticks and :cpp:enumerator:`LV_PART_ITEMS` for minor ticks, for example with local style:
+:cpp:expr:`lv_obj_set_style_length(scale, 5, LV_PART_INDICATOR)` for major ticks
+and :cpp:expr:`lv_obj_set_style_length(scale, 5, LV_PART_ITEMS)` for minor ticks.
 
 Sections
 --------

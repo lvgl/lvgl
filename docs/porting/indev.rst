@@ -9,7 +9,7 @@ Types of input devices
 
 To create an input device use
 
-.. code:: c
+.. code-block:: c
 
    /*Register at least one display before you register any input devices*/
    lv_indev_t * indev = lv_indev_create();
@@ -35,7 +35,7 @@ Touchpad, mouse or any pointer
 Input devices that can click points on the screen belong to this
 category.
 
-.. code:: c
+.. code-block:: c
 
    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
    ...
@@ -68,10 +68,10 @@ the last clicked widget will be either scrolled or it's value will be incremente
 
 As this behavior is tightly related to the last clicked widget, the crown support is
 an extension of the pointer input device.  Just set ``data->diff`` to the number of
-turned steps and LVGL will automatically send :cpp:enum:`LV_EVENT_ROTARY` or scroll the widget based on the
+turned steps and LVGL will automatically send :cpp:enumerator:`LV_EVENT_ROTARY` or scroll the widget based on the
 ``editable`` flag in the widget's class. Non-editable widgets are scrolled and for editable widgets the event is sent.
 
-To get the steps in an event callback use :cpp:func:`int32_t diff = lv_event_get_rotary_diff(e)`
+To get the steps in an event callback use :cpp:func:`lv_event_get_rotary_diff`
 
 The rotary sensitivity can be adjusted on 2 levels:
 
@@ -101,7 +101,7 @@ To use a keyboard/keypad:
 - Use ``LV_KEY_...`` to navigate among the objects in the group. See
   ``lv_core/lv_group.h`` for the available keys.
 
-.. code:: c
+.. code-block:: c
 
 
    lv_indev_set_type(indev, LV_INDEV_TYPE_KEYPAD);
@@ -137,7 +137,7 @@ In short, the Encoder input devices work like this:
 To use an *Encoder* (similarly to the *Keypads*) the objects should be
 added to groups.
 
-.. code:: c
+.. code-block:: c
 
    lv_indev_set_type(indev, LV_INDEV_TYPE_ENCODER);
 
@@ -150,8 +150,8 @@ added to groups.
      else data->state = LV_INDEV_STATE_RELEASED;
    }
 
-Using buttons with Encoder logic
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Using Buttons with Encoder Logic
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In addition to standard encoder behavior, you can also utilize its logic
 to navigate(focus) and edit widgets using buttons. This is especially
@@ -168,7 +168,7 @@ You need to have 3 buttons available:
 If you hold the keys it will simulate an encoder advance with period
 specified in ``indev_drv.long_press_repeat_time``.
 
-.. code:: c
+.. code-block:: c
 
 
    lv_indev_set_type(indev, LV_INDEV_TYPE_ENCODER);
@@ -199,7 +199,7 @@ should look like ``const lv_point_t points_array[] = { {12,30},{60,90}, ...}``
 :important: The points_array can't go out of scope. Either declare it as a global variable
             or as a static variable inside a function.`
 
-.. code:: c
+.. code-block:: c
 
 
    lv_indev_set_type(indev, LV_INDEV_TYPE_BUTTON);
@@ -279,7 +279,7 @@ might need to read it by polling file descriptor (fd).
 
 You can do this in the following way:
 
-.. code:: c
+.. code-block:: c
 
    /*Update the input device's running mode to LV_INDEV_MODE_EVENT*/
    lv_indev_set_mode(indev, LV_INDEV_MODE_EVENT);

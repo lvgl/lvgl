@@ -1,7 +1,7 @@
 .. _quick-overview:
 
 ==============
-Quick overview
+Quick Overview
 ==============
 
 Here you can learn the most important things about LVGL. You should read
@@ -9,8 +9,9 @@ this first to get a general impression and read the detailed
 :ref:`porting` and :ref:`overview` sections
 after that.
 
-Get started in a simulator
---------------------------
+
+Getting Started with a Simulator
+--------------------------------
 
 Instead of porting LVGL to embedded hardware straight away, it's highly
 recommended to get started in a simulator first.
@@ -20,93 +21,97 @@ Go to the :ref:`simulator` section to get ready-to-use projects that can be run
 on your PC. This way you can save the time of porting for now and get some
 experience with LVGL immediately.
 
-Add LVGL into your project
---------------------------
+Add LVGL to Your Project
+------------------------
 
 If you would rather try LVGL on your own project follow these steps:
 
--  `Download <https://github.com/lvgl/lvgl/archive/master.zip>`__ or
-   clone the library from GitHub with ``git clone https://github.com/lvgl/lvgl.git``.
--  Copy the ``lvgl`` folder into your project. If you wish you can add only ``lvgl/lvgl.h``, ``lvgl/lv_version.h``, and ``lvgl/src``
-   for LVGL itself, and ``lvgl/examples`` and ``lvgl/demos`` for the examples and demos respectively.
--  Copy ``lvgl/lv_conf_template.h`` as ``lv_conf.h`` next to the
-   ``lvgl`` folder, change the first ``#if 0`` to ``1`` to enable the
-   file's content and set the :c:macro:`LV_COLOR_DEPTH` defines.
--  Include ``lvgl/lvgl.h`` in files where you need to use LVGL related functions.
+- `Download <https://github.com/lvgl/lvgl/archive/master.zip>`__ or
+  clone the library from GitHub with ``git clone https://github.com/lvgl/lvgl.git``.
+- Copy the ``lvgl`` folder into your project. If you wish you can add only ``lvgl/lvgl.h``, ``lvgl/lv_version.h``, and ``lvgl/src``
+  for LVGL itself, and ``lvgl/examples`` and ``lvgl/demos`` for the examples and demos respectively.
+- Copy ``lvgl/lv_conf_template.h`` as ``lv_conf.h`` next to the
+  ``lvgl`` folder, change the first ``#if 0`` to ``1`` to enable the
+  file's content and set the :c:macro:`LV_COLOR_DEPTH` defines.
+- Include ``lvgl/lvgl.h`` in files where you need to use LVGL related functions.
 -  Call :cpp:func:`lv_init`
--  Call :cpp:expr:`lv_tick_inc(x)` every ``x`` milliseconds in a Timer or Task
-   (``x`` should be between 1 and 10). It is required for the internal
-   timing of LVGL. Alternatively, register a ``tick_get_cb`` with
-   :cpp:func:`lv_tick_set_cb` so that LVGL can retrieve the current time directly.
--  Create a display.
+- Call :cpp:expr:`lv_tick_inc(x)` every ``x`` milliseconds in a Timer or Task
+  (``x`` should be between 1 and 10). It is required for the internal
+  timing of LVGL. Alternatively, register a ``tick_get_cb`` with
+  :cpp:func:`lv_tick_set_cb` so that LVGL can retrieve the current time directly.
+- Create a display.
 
-.. code:: c
 
-   lv_display_t *display = lv_display_create(MY_DISP_HOR_RES, MY_DISP_VER_RES);
+  .. code-block:: c
 
--  Create a draw buffer: LVGL supports multiple buffering methods. Here you
-   can see how to set up partial buffering
-   (that is render the screen and the changed areas in a smaller buffer).
-   The buffer size can be set freely but 1/10 screen size is a good starting point.
+      lv_display_t *display = lv_display_create(MY_DISP_HOR_RES, MY_DISP_VER_RES);
 
-.. code:: c
 
-   /*Declare a buffer for 1/10 screen size*/
-   #define BYTE_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /*will be 2 for RGB565 */
-   static uint8_t buf1[MY_DISP_HOR_RES * MY_DISP_VER_RES / 10 * BYTE_PER_PIXEL];
-   lv_display_set_buffers(display, buf1, NULL, sizeof(buf1), LV_DISPLAY_RENDER_MODE_PARTIAL);  /*Initialize the display buffer.*/
+- Create a draw buffer: LVGL supports multiple buffering methods. Here you can see how to set up partial buffering
+  (that is render the screen and the changed areas in a smaller buffer). The buffer size can be set freely but 1/10
+  screen size is a good starting point.
 
--  Implement and register a function which can copy the rendered image
-   to an area of your display:
+  .. code-block:: c
 
-.. code:: c
+     /* Declare a buffer for 1/10 screen size */
+     #define BYTE_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /*will be 2 for RGB565 */
+     static uint8_t buf1[MY_DISP_HOR_RES * MY_DISP_VER_RES / 10 * BYTE_PER_PIXEL];
+     lv_display_set_buffers(display, buf1, NULL, sizeof(buf1), LV_DISPLAY_RENDER_MODE_PARTIAL);  /* Initialize the display buffer. */
 
-   lv_display_set_flush_cb(display, my_disp_flush);
 
-   void my_disp_flush(lv_display_t * disp, const lv_area_t * area, lv_color_t * color_p)
-   {
-       int32_t x, y;
-       /*It's a very slow but simple implementation.
-        *`set_pixel` needs to be written by you to a set pixel on the screen*/
-       for(y = area->y1; y <= area->y2; y++) {
-           for(x = area->x1; x <= area->x2; x++) {
-               set_pixel(x, y, *color_p);
-               color_p++;
-           }
-       }
+- Implement and register a function which can copy the rendered image
+  to an area of your display:
 
-       lv_display_flush_ready(disp);         /* Indicate you are ready with the flushing*/
-   }
+  .. code-block:: c
 
--  Implement and register a function which can read an input device.
-   E.g. for a touchpad:
+     lv_display_set_flush_cb(display, my_disp_flush);
 
-.. code:: c
+     void my_disp_flush(lv_display_t * disp, const lv_area_t * area, lv_color_t * color_p)
+     {
+         int32_t x, y;
+         /*It's a very slow but simple implementation.
+          *`set_pixel` needs to be written by you to a set pixel on the screen*/
+         for(y = area->y1; y <= area->y2; y++) {
+             for(x = area->x1; x <= area->x2; x++) {
+                 set_pixel(x, y, *color_p);
+                 color_p++;
+             }
+         }
 
-   lv_indev_t * indev = lv_indev_create();           /*Create an input device*/
-   lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);  /*Touch pad is a pointer-like device*/
-   lv_ondev_set_read_cb(indev, my_touchpad_read);    /*Set your driver function*/
+         lv_display_flush_ready(disp);         /* Indicate you are ready with the flushing*/
+     }
 
-   void my_touchpad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
-   {
-       /*`touchpad_is_pressed` and `touchpad_get_xy` needs to be implemented by you*/
-       if(touchpad_is_pressed()) {
-         data->state = LV_INDEV_STATE_PRESSED;
-         touchpad_get_xy(&data->point.x, &data->point.y);
-       } else {
-         data->state = LV_INDEV_STATE_RELEASED;
-       }
 
-   }
+- Implement and register a function which can read an input device. E.g. for a touchpad:
 
--  Call :cpp:func:`lv_timer_handler` periodically every few milliseconds in
-   the main ``while(1)`` loop or in an operating system task. It will
-   redraw the screen if required, handle input devices, animation etc.
+  .. code-block:: c
+
+     lv_indev_t * indev = lv_indev_create();           /*Create an input device*/
+     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);  /*Touch pad is a pointer-like device*/
+     lv_ondev_set_read_cb(indev, my_touchpad_read);    /*Set your driver function*/
+
+     void my_touchpad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
+     {
+         /*`touchpad_is_pressed` and `touchpad_get_xy` needs to be implemented by you*/
+         if(touchpad_is_pressed()) {
+             data->state = LV_INDEV_STATE_PRESSED;
+             touchpad_get_xy(&data->point.x, &data->point.y);
+         } else {
+             data->state = LV_INDEV_STATE_RELEASED;
+         }
+     }
+
+
+- Call :cpp:func:`lv_timer_handler` periodically every few milliseconds in
+  the main ``while(1)`` loop or in an operating system task. It will
+  redraw the screen if required, handle input devices, animation etc.
+
 
 For a more detailed guide go to the :ref:`porting`
 section.
 
-Learn the basics
+
+Learn the Basics
 ----------------
 
 .. _quick-overview_widgets:
@@ -138,14 +143,14 @@ object to set its parameters.
 
 For example:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * slider1 = lv_slider_create(lv_screen_active());
 
 To set some basic attributes ``lv_obj_set_<parameter_name>(obj, <value>)`` functions can be used. For
 example:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_set_x(btn1, 30);
    lv_obj_set_y(btn1, 10);
@@ -155,7 +160,7 @@ Along with the basic attributes, widgets can have type specific
 parameters which are set by ``lv_<widget_type>_set_<parameter_name>(obj, <value>)`` functions. For
 example:
 
-.. code:: c
+.. code-block:: c
 
    lv_slider_set_value(slider1, 70, LV_ANIM_ON);
 
@@ -174,7 +179,7 @@ called if the object is clicked, released, dragged, being deleted, etc.
 
 A callback is assigned like this:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_CLICKED, NULL); /*Assign a callback to the button*/
 
@@ -190,13 +195,13 @@ the callback for any event.
 
 From :cpp:expr:`lv_event_t * e` the current event code can be retrieved with:
 
-.. code:: c
+.. code-block:: c
 
    lv_event_code_t code = lv_event_get_code(e);
 
 The object that triggered the event can be retrieved with:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * obj = lv_event_get_target(e);
 
@@ -213,9 +218,10 @@ has only one part called :cpp:enumerator:`LV_PART_MAIN`. However, a
 and :cpp:enumerator:`LV_PART_KNOB`.
 
 By using parts you can apply different styles to sub-elements of a
-widget. (See below)
+widget. (See below.)
 
 Read the widgets' documentation to learn which parts each uses.
+
 
 .. _quick-overview_states:
 
@@ -245,12 +251,13 @@ object is currently in that state.
 
 To manually add or remove states use:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_add_state(obj, LV_STATE_...);
    lv_obj_remove_state(obj, LV_STATE_...);
 
 .. _quick-overview_styles:
+
 
 Styles
 ~~~~~~
@@ -264,7 +271,7 @@ Before using a style it needs to be initialized with
 :cpp:expr:`lv_style_init(&style1)`. After that, properties can be added to
 configure the style. For example:
 
-.. code:: c
+.. code-block:: c
 
    static lv_style_t style1;
    lv_style_init(&style1);
@@ -277,25 +284,25 @@ Styles are assigned using the ORed combination of an object's part and
 state. For example to use this style on the slider's indicator when the
 slider is pressed:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_add_style(slider1, &style1, LV_PART_INDICATOR | LV_STATE_PRESSED);
 
 If the *part* is :cpp:enumerator:`LV_PART_MAIN` it can be omitted:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_add_style(btn1, &style1, LV_STATE_PRESSED); /*Equal to LV_PART_MAIN | LV_STATE_PRESSED*/
 
 Similarly, :cpp:enumerator:`LV_STATE_DEFAULT` can be omitted too:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_add_style(slider1, &style1, LV_PART_INDICATOR); /*Equal to LV_PART_INDICATOR | LV_STATE_DEFAULT*/
 
 For :cpp:enumerator:`LV_STATE_DEFAULT` and :cpp:enumerator:`LV_PART_MAIN` simply write ``0``:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_add_style(btn1, &style1, 0); /*Equal to LV_PART_MAIN | LV_STATE_DEFAULT*/
 
@@ -304,7 +311,7 @@ styles to a part of an object. For example ``style_btn`` can set a
 default button appearance, and ``style_btn_red`` can overwrite the
 background color to make the button red:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_add_style(btn1, &style_btn, 0);
    lv_obj_add_style(btn1, &style1_btn_red, 0);
@@ -321,13 +328,14 @@ style and all text on that screen will inherit it by default.
 Local style properties also can be added to objects. This creates a
 style which resides inside the object and is used only by the object:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_set_style_bg_color(slider1, lv_color_hex(0x2080bb), LV_PART_INDICATOR | LV_STATE_PRESSED);
 
 To learn all the features of styles see the :ref:`styles` section.
 
 .. _quick-overview_themes:
+
 
 Themes
 ~~~~~~
@@ -340,6 +348,7 @@ The theme for your application is a compile time configuration set in
 
 .. _quick-overview_examples:
 
+
 Examples
 --------
 
@@ -347,12 +356,13 @@ Examples
 
 .. _quick-overview_micropython:
 
+
 MicroPython
 -----------
 
 Learn more about :ref:`micropython`.
 
-.. code:: python
+.. code-block:: python
 
    # Initialize
    import display_driver
