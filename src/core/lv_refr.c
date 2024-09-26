@@ -51,6 +51,9 @@ static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
 static void draw_buf_flush(lv_display_t * disp);
 static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 static void wait_for_flushing(lv_display_t * disp);
+static bool is_partial(lv_display_t * disp);
+static bool is_direct(lv_display_t * disp);
+static bool is_full(lv_display_t * disp);
 
 /**********************
  *  STATIC VARIABLES
@@ -299,7 +302,7 @@ void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
     }
 
     /*If there were at least 1 invalid area in full refresh mode, redraw the whole screen*/
-    if(disp->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
+    if(is_full(disp)) {
         disp->inv_areas[0] = scr_area;
         disp->inv_p = 1;
         lv_display_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
@@ -406,10 +409,7 @@ void lv_display_refr_timer(lv_timer_t * tmr)
 
     /*In double buffered direct mode save the updated areas.
      *They will be used on the next call to synchronize the buffers.*/
-    bool direct_mode_sync_req = false;
-    if(lv_display_is_double_frame_buffered(disp_refr) &&
-       (disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT ||
-        disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT_AND_PARTIAL)) {
+    if(lv_display_is_double_frame_buffered(disp_refr) && is_direct(disp_refr)) {
         uint32_t i;
         for(i = 0; i < disp_refr->inv_p; i++) {
             if(disp_refr->inv_area_joined[i])
@@ -485,10 +485,7 @@ static void lv_refr_join_area(void)
 static void refr_sync_areas(void)
 {
     /*Do not sync if not direct or double buffered*/
-    if(disp_refr->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT &&
-       disp_refr->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT_AND_PARTIAL) {
-        return;
-    }
+    if(!is_direct(disp_refr)) return;
 
     /*Do not sync if not double buffered*/
     if(!lv_display_is_double_frame_buffered(disp_refr)) return;
@@ -503,8 +500,9 @@ static void refr_sync_areas(void)
 
     /*The buffers are already swapped.
      *So the active buffer is the off screen buffer where LVGL will render*/
-    lv_draw_buf_t * off_screen = disp_refr->buf_act;
-    lv_draw_buf_t * on_screen = disp_refr->buf_act == disp_refr->buf_1 ? disp_refr->buf_2 : disp_refr->buf_1;
+    lv_draw_buf_t * off_screen = disp_refr->frame_buf_act;
+    lv_draw_buf_t * on_screen = disp_refr->frame_buf_act == disp_refr->frame_buf_1 ? disp_refr->frame_buf_2 :
+                                disp_refr->frame_buf_1;
 
     uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
     uint32_t ver_res = lv_display_get_vertical_resolution(disp_refr);
@@ -593,7 +591,8 @@ static void refr_invalid_areas(void)
         disp_refr->last_part = 0;
 
         lv_area_t inv_a = disp_refr->inv_areas[i];
-        if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+        /*Handle PARTIAL and DIRECT + PARTIAL modes*/
+        if(is_partial(disp_refr)) {
             /*Calculate the max row num*/
             int32_t w = lv_area_get_width(&inv_a);
             int32_t h = lv_area_get_height(&inv_a);
@@ -626,8 +625,8 @@ static void refr_invalid_areas(void)
                 draw_buf_flush(disp_refr);
             }
         }
-        else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL ||
-                disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
+        /*Simple DIRECT and FULL modes*/
+        else {
             disp_refr->last_part = 1;
             refr_area(&disp_refr->inv_areas[i]);
             draw_buf_flush(disp_refr);
@@ -666,18 +665,19 @@ static void refr_area(const lv_area_t * area_p)
     layer->_clip_area = *area_p;
     layer->phy_clip_area = *area_p;
 
-    if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
+    if(is_partial(disp_refr)) {
+        /*In partial mode render this area to the buffer
+         *Also handle DIRECT + PARTIAL here*/
+        layer->buf_area = *area_p;
+        layer_reshape_draw_buf(layer, LV_STRIDE_AUTO);
+    }
+    else if(is_full(disp_refr)) {
         /*In full mode the area is always the full screen, so the buffer area to it too*/
         layer->buf_area = *area_p;
         layer_reshape_draw_buf(layer, layer->draw_buf->header.stride);
 
     }
-    else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        /*In partial mode render this area to the buffer*/
-        layer->buf_area = *area_p;
-        layer_reshape_draw_buf(layer, LV_STRIDE_AUTO);
-    }
-    else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
+    else if(is_direct(disp_refr)) {
         /*In direct mode the the buffer area is always the whole screen*/
         layer->buf_area.x1 = 0;
         layer->buf_area.y1 = 0;
@@ -771,7 +771,7 @@ static void refr_configured_layer(lv_layer_t * layer)
 
     /* In single buffered mode wait here until the buffer is freed.
      * Else we would draw into the buffer while it's still being transferred to the display*/
-    if(!lv_display_is_double_draw_buffered(disp_refr)) {
+    if(!lv_display_is_double_render_buffered(disp_refr)) {
         wait_for_flushing(disp_refr);
     }
     /*If the screen is transparent initialize it when the flushing is ready*/
@@ -1223,7 +1223,7 @@ static void draw_buf_flush(lv_display_t * disp)
      * and driver is ready to receive the new buffer.
      * If we need to wait here it means that the content of one buffer is being sent to display
      * and other buffer already contains the new rendered image. */
-    if(lv_display_is_double_draw_buffered(disp)) {
+    if(lv_display_is_double_render_buffered(disp)) {
         wait_for_flushing(disp_refr);
     }
 
@@ -1237,13 +1237,25 @@ static void draw_buf_flush(lv_display_t * disp)
     if(disp->flush_cb) {
         call_flush_cb(disp, &disp->refreshed_area, layer->draw_buf->data);
     }
-    /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
-    if(lv_display_is_double_draw_buffered(disp) && (disp->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT || flushing_last)) {
+
+    /*If there are 2 draw buffers for partial rendering swap them. */
+    if(lv_display_is_double_render_buffered(disp) && is_partial(disp)) {
         if(disp->buf_act == disp->buf_1) {
             disp->buf_act = disp->buf_2;
         }
         else {
             disp->buf_act = disp->buf_1;
+        }
+    }
+
+    /*In direct and full modes swap the frame buffers */
+    if(lv_display_is_double_frame_buffered(disp) && flushing_last &&
+       (is_direct(disp) || is_full(disp))) {
+        if(disp->frame_buf_act == disp->frame_buf_1) {
+            disp->frame_buf_act = disp->frame_buf_2;
+        }
+        else {
+            disp->frame_buf_act = disp->frame_buf_1;
         }
     }
 }
@@ -1296,4 +1308,21 @@ static void wait_for_flushing(lv_display_t * disp)
 
     LV_LOG_TRACE("end");
     LV_PROFILER_REFR_END;
+}
+
+static bool is_partial(lv_display_t * disp)
+{
+    return disp->render_mode & LV_DISPLAY_RENDER_MODE_PARTIAL ? true : false;
+}
+
+static bool is_direct(lv_display_t * disp)
+{
+    return disp->render_mode & LV_DISPLAY_RENDER_MODE_DIRECT ? true : false;
+
+}
+
+static bool is_full(lv_display_t * disp)
+{
+    return disp->render_mode & LV_DISPLAY_RENDER_MODE_FULL ? true : false;
+
 }

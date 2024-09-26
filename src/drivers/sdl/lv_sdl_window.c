@@ -107,20 +107,21 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
     lv_display_set_flush_cb(disp, flush_cb);
 
 #if LV_USE_DRAW_SDL == 0
-    if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+    /*PARTIAL and DIRECT_AND_PARTIAL*/
+    if(sdl_render_mode() & LV_DISPLAY_RENDER_MODE_PARTIAL) {
         dsc->buf1 = sdl_draw_buf_realloc_aligned(NULL, 32 * 1024);
 #if LV_SDL_BUF_COUNT == 2
         dsc->buf2 = sdl_draw_buf_realloc_aligned(NULL, 32 * 1024);
 #endif
-        lv_display_set_buffers(disp, dsc->buf1, dsc->buf2,
-                               32 * 1024, LV_DISPLAY_RENDER_MODE_PARTIAL);
+        lv_display_set_render_buffers(disp, dsc->buf1, dsc->buf2,
+                                      32 * 1024, LV_SDL_RENDER_MODE);
     }
     /*LV_DISPLAY_RENDER_MODE_DIRECT or FULL */
     else {
         uint32_t stride = lv_draw_buf_width_to_stride(disp->hor_res,
                                                       lv_display_get_color_format(disp));
-        lv_display_set_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res,
-                               LV_SDL_RENDER_MODE);
+        lv_display_set_render_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res,
+                                      LV_SDL_RENDER_MODE);
     }
 #else /*LV_USE_DRAW_SDL == 1*/
     /*It will render directly to default Texture, so the buffer is not used, so just set something*/
@@ -128,7 +129,7 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
     static uint8_t dummy_buf; /*It won't be used as it will render to the SDL textures directly*/
     lv_draw_buf_init(&draw_buf, 4096, 4096, LV_COLOR_FORMAT_ARGB8888, 4096 * 4, &dummy_buf, 4096 * 4096 * 4);
 
-    lv_display_set_draw_buffers(disp, &draw_buf, NULL);
+    lv_display_set_render_draw_buffers(disp, &draw_buf, NULL);
     lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
 #endif /*LV_USE_DRAW_SDL == 0*/
     lv_display_add_event_cb(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
@@ -210,7 +211,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     lv_color_format_t cf = lv_display_get_color_format(disp);
 
-    if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+    if(sdl_render_mode() & LV_DISPLAY_RENDER_MODE_PARTIAL) {
         lv_area_t rotated_area = *area;
         lv_display_rotate_area(disp, &rotated_area);
 
@@ -220,7 +221,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         uint32_t px_size = lv_color_format_get_size(cf);
 
         int32_t fb_stride = lv_draw_buf_width_to_stride(disp->hor_res, cf);
-        uint8_t * fb_start = dsc->fb_act;
+        uint8_t * fb_start = disp->frame_buf_act->data;
         fb_start += rotated_area.y1 * fb_stride + rotated_area.x1 * px_size;
         lv_display_rotation_t rotation = lv_display_get_rotation(disp);
 
@@ -240,8 +241,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     }
 
     if(lv_display_flush_is_last(disp)) {
-        if(sdl_render_mode() != LV_DISPLAY_RENDER_MODE_PARTIAL) {
-            dsc->fb_act = px_map;
+        if(sdl_render_mode() & LV_DISPLAY_RENDER_MODE_PARTIAL) {
+            dsc->fb_act = disp->frame_buf_act->data;
         }
 
         window_update(disp);
@@ -368,17 +369,19 @@ static void texture_resize(lv_display_t * disp)
 
     dsc->fb1 = sdl_draw_buf_realloc_aligned(dsc->fb1, stride * disp->ver_res);
     lv_memzero(dsc->fb1, stride * disp->ver_res);
+    dsc->fb_act = dsc->fb1;
 
-    if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        dsc->fb_act = dsc->fb1;
-    }
-    else {
 #if LV_SDL_BUF_COUNT == 2
-        dsc->fb2 = sdl_draw_buf_realloc_aligned(dsc->fb2, stride * disp->ver_res);
-        memset(dsc->fb2, 0x00, stride * disp->ver_res);
+    dsc->fb2 = sdl_draw_buf_realloc_aligned(dsc->fb2, stride * disp->ver_res);
+    lv_memzero(dsc->fb2, stride * disp->ver_res);
 #endif
-        lv_display_set_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res, LV_SDL_RENDER_MODE);
+    if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_DIRECT || sdl_render_mode() == LV_DISPLAY_RENDER_MODE_FULL) {
+        lv_display_set_render_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res, LV_SDL_RENDER_MODE);
     }
+    else if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_DIRECT_AND_PARTIAL) {
+        lv_display_set_frame_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res);
+    }
+
     if(dsc->texture) SDL_DestroyTexture(dsc->texture);
 
 #if LV_COLOR_DEPTH == 32

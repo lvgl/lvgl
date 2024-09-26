@@ -67,7 +67,7 @@ void lv_port_disp_init(void)
      * One buffer for partial rendering*/
     LV_ATTRIBUTE_MEM_ALIGN
     static uint8_t buf_1_1[MY_DISP_HOR_RES * 10 * BYTE_PER_PIXEL];            /*A buffer for 10 rows*/
-    lv_display_set_buffers(disp, buf_1_1, NULL, sizeof(buf_1_1), LV_DISPLAY_RENDER_MODE_PARTIAL);
+    lv_display_set_render_buffers(disp, buf_1_1, NULL, sizeof(buf_1_1), LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     /* Example 2
      * Two buffers for partial rendering
@@ -77,7 +77,7 @@ void lv_port_disp_init(void)
 
     LV_ATTRIBUTE_MEM_ALIGN
     static uint8_t buf_2_2[MY_DISP_HOR_RES * 10 * BYTE_PER_PIXEL];
-    lv_display_set_buffers(disp, buf_2_1, buf_2_2, sizeof(buf_2_1), LV_DISPLAY_RENDER_MODE_PARTIAL);
+    lv_display_set_render_buffers(disp, buf_2_1, buf_2_2, sizeof(buf_2_1), LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     /* Example 3
      * Two buffers screen sized buffer for double buffering.
@@ -87,7 +87,7 @@ void lv_port_disp_init(void)
 
     LV_ATTRIBUTE_MEM_ALIGN
     static uint8_t buf_3_2[MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTE_PER_PIXEL];
-    lv_display_set_buffers(disp, buf_3_1, buf_3_2, sizeof(buf_3_1), LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_render_buffers(disp, buf_3_1, buf_3_2, sizeof(buf_3_1), LV_DISPLAY_RENDER_MODE_DIRECT);
 
 }
 

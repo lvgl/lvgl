@@ -263,7 +263,7 @@ static void lv_windows_display_timer_callback(lv_timer_t * timer)
                 &context->display_framebuffer_base,
                 &context->display_framebuffer_size);
         if(context->display_framebuffer_context_handle) {
-            lv_display_set_buffers(
+            lv_display_set_render_buffers(
                 context->display_device_object,
                 context->display_framebuffer_base,
                 NULL,

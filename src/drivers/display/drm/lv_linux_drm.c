@@ -162,8 +162,8 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
      * to lv_display_create then the buffers aren't big enough for LV_DISPLAY_RENDER_MODE_DIRECT.
      */
     lv_display_set_resolution(disp, hor_res, ver_res);
-    lv_display_set_buffers(disp, drm_dev->drm_bufs[1].map, drm_dev->drm_bufs[0].map, buf_size,
-                           LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_render_buffers(disp, drm_dev->drm_bufs[1].map, drm_dev->drm_bufs[0].map, buf_size,
+                                  LV_DISPLAY_RENDER_MODE_DIRECT);
 
     if(width) {
         lv_display_set_dpi(disp, DIV_ROUND_UP(hor_res * 25400, width * 1000));

@@ -359,7 +359,7 @@
  * Debug
  *-----------*/
 
-/** 1: Draw random colored rectangles over the redrawn areas. */
+/** 1: Draw random colored rectangles over the redrawn areas of each widget*/
 #define LV_USE_REFR_DEBUG 0
 
 /** 1: Draw a red overlay for ARGB layers and a green overlay for RGB layers*/
