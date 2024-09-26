@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_conf_cmsis.h
  * Configuration file for v9.2.0
  */
