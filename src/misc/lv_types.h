@@ -139,8 +139,6 @@ typedef struct lv_fs_file_cache_t lv_fs_file_cache_t;
 
 typedef struct lv_fs_path_ex_t lv_fs_path_ex_t;
 
-typedef struct lv_fs_dir_t lv_fs_dir_t;
-
 typedef struct lv_image_decoder_args_t lv_image_decoder_args_t;
 
 typedef struct lv_image_cache_data_t lv_image_cache_data_t;
