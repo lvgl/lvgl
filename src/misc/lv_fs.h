@@ -91,6 +91,12 @@ typedef struct {
     lv_fs_file_cache_t * cache;
 } lv_fs_file_t;
 
+
+typedef struct {
+    void * dir_d;
+    lv_fs_drv_t * drv;
+} lv_fs_dir_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
