@@ -70,7 +70,6 @@ extern "C" {
 #include "widgets/buttonmatrix/lv_buttonmatrix_private.h"
 #include "widgets/slider/lv_slider_private.h"
 #include "widgets/switch/lv_switch_private.h"
-#include "widgets/calendar/lv_calendar_chinese_private.h"
 #include "widgets/calendar/lv_calendar_private.h"
 #include "widgets/imagebutton/lv_imagebutton_private.h"
 #include "widgets/bar/lv_bar_private.h"

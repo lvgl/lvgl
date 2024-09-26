@@ -185,8 +185,6 @@ typedef struct _lv_buttonmatrix_t lv_buttonmatrix_t;
 
 typedef struct _lv_calendar_t lv_calendar_t;
 
-typedef struct _lv_calendar_chinese_t lv_calendar_chinese_t;
-
 typedef struct _lv_canvas_t lv_canvas_t;
 
 typedef struct _lv_chart_series_t lv_chart_series_t;

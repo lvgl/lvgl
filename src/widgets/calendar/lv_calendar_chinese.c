@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_calendar_chinese_private.h"
 #include "lv_calendar_private.h"
 #if LV_USE_CALENDAR && LV_USE_CALENDAR_CHINESE
 
@@ -124,7 +123,7 @@ const char * lv_calendar_get_day_name(lv_calendar_date_t * gregorian)
 {
     uint16_t i, len;
     lv_calendar_chinese_t chinese_calendar;
-    chinese_calendar = lv_calendar_gregorian_to_chinese(gregorian);
+    lv_calendar_gregorian_to_chinese(gregorian, &chinese_calendar);
 
     if(gregorian->year > 2099 || gregorian->year < 1901)
         return NULL;
@@ -170,11 +169,11 @@ const char * lv_calendar_get_day_name(lv_calendar_date_t * gregorian)
     return (char *)chinese_calendar_day_name[chinese_calendar.today.day - 1];
 }
 
-lv_calendar_chinese_t lv_calendar_gregorian_to_chinese(lv_calendar_date_t * gregorian)
+void lv_calendar_gregorian_to_chinese(lv_calendar_date_t * gregorian_time, lv_calendar_chinese_t * chinese_time)
 {
-    uint16_t year = gregorian->year;
-    uint8_t month = gregorian->month;
-    uint8_t day = gregorian->day;
+    uint16_t year = gregorian_time->year;
+    uint8_t month = gregorian_time->month;
+    uint8_t day = gregorian_time->day;
 
     /*Record the number of days between the Spring Festival
     and the New Year's Day of that year.*/
@@ -191,14 +190,13 @@ lv_calendar_chinese_t lv_calendar_gregorian_to_chinese(lv_calendar_date_t * greg
     uint8_t index;
 
     bool leep_month;
-    lv_calendar_chinese_t chinese_calendar;
 
     if(year < 1901 || year > 2099) {
-        chinese_calendar.leep_month = 0;
-        chinese_calendar.today.year = 2000;
-        chinese_calendar.today.month = 1;
-        chinese_calendar.today.day = 1;
-        return chinese_calendar;
+        chinese_time->leep_month = 0;
+        chinese_time->today.year = 2000;
+        chinese_time->today.month = 1;
+        chinese_time->today.day = 1;
+        return;
     }
 
     if(((calendar_chinese_table[year - 1901] & 0x0060) >> 5) == 1)
@@ -274,11 +272,10 @@ lv_calendar_chinese_t lv_calendar_gregorian_to_chinese(lv_calendar_date_t * greg
 
         day = days_per_month - by_spring + 1;
     }
-    chinese_calendar.today.day = day;
-    chinese_calendar.today.month = month;
-    chinese_calendar.today.year = year;
-    chinese_calendar.leep_month = leep_month;
-    return chinese_calendar;
+    chinese_time->today.day = day;
+    chinese_time->today.month = month;
+    chinese_time->today.year = year;
+    chinese_time->leep_month = leep_month;
 }
 
 /**********************
