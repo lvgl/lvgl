@@ -10,6 +10,7 @@ Cortex-M0 to the latest Cortex-M85.
 
 Arm-2D accelerates LVGL9 with two modes: **Synchronous Mode** and
 **Asynchronous Mode**.
+
 - When **Helium** and **ACI (Arm Custom Instruction)** are available, it is recommend
   to use **Synchronous Mode** to accelerate LVGL.
 - When Arm-2D backed 2D-GPUs are available, for example, **DMAC-350 based 2D
@@ -18,10 +19,12 @@ Arm-2D accelerates LVGL9 with two modes: **Synchronous Mode** and
 Arm-2D is an open-source project on GitHub. For more, please refer to:
 https://github.com/ARM-software/Arm-2D.
 
+
 How to Use
 **********
 
 In general:
+
 - you can set the macro :c:macro:`LV_USE_DRAW_ARM2D_SYNC` to ``1`` and
   :c:macro:`LV_DRAW_SW_ASM` to ``LV_DRAW_SW_ASM_HELIUM`` in ``lv_conf.h`` to
   enable Arm-2D synchronous acceleration for LVGL.
@@ -62,4 +65,6 @@ Examples
 API
 ***
 
-:ref:`lv_gpu_arm2d`
+:ref:`lv_draw_sw_arm2d_h`
+
+:ref:`lv_blend_arm2d_h`

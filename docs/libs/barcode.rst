@@ -20,8 +20,8 @@ Use :cpp:func:`lv_barcode_create` to create a barcode object, and use
 
 Call :cpp:func:`lv_barcode_set_scale` to adjust scaling,
 call :cpp:func:`lv_barcode_set_dark_color` and :cpp:func:`lv_barcode_set_light_color`
-adjust color, call :cpp:func:`lv_barcode_set_direction` will set 
-direction to display, and call :cpp:func:`lv_barcode_update` again to regenerate 
+adjust color, call :cpp:func:`lv_barcode_set_direction` will set
+direction to display, and call :cpp:func:`lv_barcode_update` again to regenerate
 the barcode.
 
 Notes
@@ -46,5 +46,5 @@ Example
 API
 ---
 
-:ref:`code128`
+:ref:`code128_h`
 
