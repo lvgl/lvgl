@@ -177,7 +177,7 @@ static void x11_resolution_evt_cb(lv_event_t * e)
         int sz_buffers = (hor_res * ver_res * (LV_COLOR_DEPTH + 7) / 8);
         xd->buffer[0] = realloc(xd->buffer[0], sz_buffers);
         xd->buffer[1] = (LV_X11_DOUBLE_BUFFER ?  realloc(xd->buffer[1], sz_buffers) : NULL);
-        lv_display_set_buffers(disp, xd->buffer[0], xd->buffer[1], sz_buffers, LV_X11_RENDER_MODE);
+        lv_display_set_render_buffers(disp, xd->buffer[0], xd->buffer[1], sz_buffers, LV_X11_RENDER_MODE);
     }
 
     /* re-create cache image with new size */
@@ -380,7 +380,7 @@ lv_display_t * lv_x11_window_create(char const * title, int32_t hor_res, int32_t
     }
     xd->buffer[0] = malloc(sz_buffers);
     xd->buffer[1] = (LV_X11_DOUBLE_BUFFER ? malloc(sz_buffers) : NULL);
-    lv_display_set_buffers(disp, xd->buffer[0], xd->buffer[1], sz_buffers, LV_X11_RENDER_MODE);
+    lv_display_set_render_buffers(disp, xd->buffer[0], xd->buffer[1], sz_buffers, LV_X11_RENDER_MODE);
 
     xd->timer = lv_timer_create(x11_event_handler, 5, disp);
 

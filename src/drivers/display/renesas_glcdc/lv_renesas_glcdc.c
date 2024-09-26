@@ -165,7 +165,7 @@ static lv_display_t * glcdc_create(void * buf1, void * buf2, uint32_t buf_size, 
         LV_ASSERT(0);
     }
 
-    lv_display_set_buffers(display, buf1, buf2, buf_size, render_mode);
+    lv_display_set_render_buffers(display, buf1, buf2, buf_size, render_mode);
 
     return display;
 }

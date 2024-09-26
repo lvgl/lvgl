@@ -245,7 +245,7 @@ struct window {
 };
 
 /*********************************
- *   STATIC VARIABLES and FUNTIONS
+ *   STATIC VARIABLES and FUNCTIONS
  *********************************/
 
 static struct application application;
@@ -2512,7 +2512,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
 
 #if LV_WAYLAND_WINDOW_DECORATIONS
 
-    /* Decorations are enabled, caculate the body size */
+    /* Decorations are enabled, calculate the body size */
     if(!application.opt_disable_decorations) {
         window_width = hor_res + (2 * BORDER_SIZE);
         window_height = ver_res + (TITLE_BAR_HEIGHT + (2 * BORDER_SIZE));
@@ -2545,7 +2545,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
                                    stride);
 
 
-    lv_display_set_draw_buffers(window->lv_disp, window->lv_disp_draw_buf, NULL);
+    lv_display_set_render_draw_buffers(window->lv_disp, window->lv_disp_draw_buf, NULL);
     lv_display_set_render_mode(window->lv_disp, LV_DISPLAY_RENDER_MODE_PARTIAL);
     lv_display_set_flush_cb(window->lv_disp, _lv_wayland_flush);
     lv_display_set_user_data(window->lv_disp, window);

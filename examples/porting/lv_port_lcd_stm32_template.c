@@ -89,7 +89,7 @@ void lv_port_display_init(void)
         lv_free(buf1);
         return;
     }
-    lv_display_set_buffers(lcd_disp, buf1, buf2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
+    lv_display_set_render_buffers(lcd_disp, buf1, buf2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
 }
 
 /**********************

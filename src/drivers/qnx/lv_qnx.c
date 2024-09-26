@@ -384,7 +384,7 @@ static bool init_display_from_window(lv_display_t * disp)
     }
 #endif
 
-    lv_display_set_buffers(disp, ptr1, ptr2, bufsize, LV_DISPLAY_RENDER_MODE_FULL);
+    lv_display_set_render_buffers(disp, ptr1, ptr2, bufsize, LV_DISPLAY_RENDER_MODE_FULL);
     return true;
 }
 
