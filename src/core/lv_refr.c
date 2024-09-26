@@ -406,7 +406,10 @@ void lv_display_refr_timer(lv_timer_t * tmr)
 
     /*In double buffered direct mode save the updated areas.
      *They will be used on the next call to synchronize the buffers.*/
-    if(lv_display_is_double_buffered(disp_refr) && disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
+    bool direct_mode_sync_req = false;
+    if(lv_display_is_double_frame_buffered(disp_refr) &&
+       (disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT ||
+        disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT_AND_PARTIAL)) {
         uint32_t i;
         for(i = 0; i < disp_refr->inv_p; i++) {
             if(disp_refr->inv_area_joined[i])
@@ -482,10 +485,13 @@ static void lv_refr_join_area(void)
 static void refr_sync_areas(void)
 {
     /*Do not sync if not direct or double buffered*/
-    if(disp_refr->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT) return;
+    if(disp_refr->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT &&
+       disp_refr->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT_AND_PARTIAL) {
+        return;
+    }
 
     /*Do not sync if not double buffered*/
-    if(!lv_display_is_double_buffered(disp_refr)) return;
+    if(!lv_display_is_double_frame_buffered(disp_refr)) return;
 
     /*Do not sync if no sync areas*/
     if(lv_ll_is_empty(&disp_refr->sync_areas)) return;
@@ -765,7 +771,7 @@ static void refr_configured_layer(lv_layer_t * layer)
 
     /* In single buffered mode wait here until the buffer is freed.
      * Else we would draw into the buffer while it's still being transferred to the display*/
-    if(!lv_display_is_double_buffered(disp_refr)) {
+    if(!lv_display_is_double_draw_buffered(disp_refr)) {
         wait_for_flushing(disp_refr);
     }
     /*If the screen is transparent initialize it when the flushing is ready*/
@@ -1217,7 +1223,7 @@ static void draw_buf_flush(lv_display_t * disp)
      * and driver is ready to receive the new buffer.
      * If we need to wait here it means that the content of one buffer is being sent to display
      * and other buffer already contains the new rendered image. */
-    if(lv_display_is_double_buffered(disp)) {
+    if(lv_display_is_double_draw_buffered(disp)) {
         wait_for_flushing(disp_refr);
     }
 
@@ -1232,7 +1238,7 @@ static void draw_buf_flush(lv_display_t * disp)
         call_flush_cb(disp, &disp->refreshed_area, layer->draw_buf->data);
     }
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
-    if(lv_display_is_double_buffered(disp) && (disp->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT || flushing_last)) {
+    if(lv_display_is_double_draw_buffered(disp) && (disp->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT || flushing_last)) {
         if(disp->buf_act == disp->buf_1) {
             disp->buf_act = disp->buf_2;
         }

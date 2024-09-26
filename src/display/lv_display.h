@@ -53,6 +53,17 @@ typedef enum {
     LV_DISPLAY_RENDER_MODE_DIRECT,
 
     /**
+     * The combination of PARTIAL and DIRECT mode.
+     * Make LVGL render into 1 or 2 fast partial buffer(s) but also sync
+     * Also sync the frame buffers similarly in case of DIRECT mode.
+     * The partial buffers shall be set with `lv_display_set_buffers`, however
+     * the frame buffers needs to be set with `lv_display_set_frame_buffers`.
+     * To effectively use this mode 2 frame buffers and at least 1 partial buffer
+     * is required.
+     */
+    LV_DISPLAY_RENDER_MODE_DIRECT_AND_PARTIAL,
+
+    /**
      * Always redraw the whole screen even if only one pixel has been changed.
      * With 2 buffers in flush_cb only and address change is required.
      */
@@ -355,7 +366,10 @@ LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp);
 
 //! @endcond
 
-bool lv_display_is_double_buffered(lv_display_t * disp);
+bool lv_display_is_double_draw_buffered(lv_display_t * disp);
+
+
+bool lv_display_is_double_frame_buffered(lv_display_t * disp);
 
 /*---------------------
  * SCREENS

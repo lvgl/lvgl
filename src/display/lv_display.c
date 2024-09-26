@@ -418,6 +418,12 @@ void lv_display_set_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf1, lv_d
     disp->buf_1 = buf1;
     disp->buf_2 = buf2;
     disp->buf_act = disp->buf_1;
+
+    if(disp->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT ||
+       disp->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
+        disp->frame_buf_1 = disp->buf_1;
+        disp->frame_buf_2 = disp->buf_2;
+    }
 }
 
 void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size,
@@ -564,9 +570,14 @@ LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp)
     return disp->flushing_last;
 }
 
-bool lv_display_is_double_buffered(lv_display_t * disp)
+bool lv_display_is_double_draw_buffered(lv_display_t * disp)
 {
     return disp->buf_2 != NULL;
+}
+
+bool lv_display_is_double_frame_buffered(lv_display_t * disp)
+{
+    return disp->frame_buf_2 != NULL;
 }
 
 /*---------------------
