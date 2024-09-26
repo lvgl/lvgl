@@ -10,8 +10,8 @@
 
 #if LV_USE_DEMO_SVG
 
-extern size_t svg_len;
-extern char svg_data[];
+extern size_t img_demo_svg_tiger_len;
+extern char img_demo_svg_tiger_data[];
 
 /*********************
  *      DEFINES
@@ -42,7 +42,7 @@ static void event_cb(lv_event_t * e)
 
     lv_area_t rect = {0, 0, WIDTH, HEIGHT};
     lv_vector_dsc_set_fill_color(dsc, lv_color_white());
-    lv_vector_clear_area(dsc, &rect); // clear screen
+    lv_vector_clear_area(dsc, &rect); /* clear screen */
 
     lv_vector_dsc_scale(dsc, 0.5f, 0.5f);
 
@@ -61,7 +61,7 @@ static void event_cb(lv_event_t * e)
 
 void lv_demo_svg(void)
 {
-    lv_svg_node_t * svg = lv_svg_load_data(svg_data, svg_len);
+    lv_svg_node_t * svg = lv_svg_load_data(img_demo_svg_tiger_data, img_demo_svg_tiger_len);
     render_list = lv_svg_render_create(svg);
     lv_obj_add_event_cb(lv_screen_active(), event_cb, LV_EVENT_DRAW_MAIN, NULL);
     lv_svg_node_delete(svg);

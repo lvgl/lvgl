@@ -1,6 +1,6 @@
 #include <stddef.h>
 
-char svg_data [] = \
+char img_demo_svg_tiger_data [] = \
 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
 "<svg id=\"svg2\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 900 900\" version=\"1.1\">"
  "<g id=\"g4\" fill=\"none\" transform=\"matrix(1.7656463,0,0,1.7656463,324.90716,255.00942)\">"
@@ -728,4 +728,4 @@ char svg_data [] = \
 "</svg>";
 
 
-size_t svg_len = sizeof(svg_data) / sizeof(char);
+size_t img_demo_svg_tiger_len = sizeof(img_demo_svg_tiger_data) / sizeof(char);
