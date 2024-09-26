@@ -1331,7 +1331,7 @@ def run(project_path, temp_directory, *doc_paths):
 
             if html_includes:
                 html_includes = list(
-                    ':ref:`{0}`_h\n'.format(inc)
+                    ':ref:`{0}_h`\n'.format(inc)
                     for inc, _ in html_includes
                 )
 
