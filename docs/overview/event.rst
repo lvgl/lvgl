@@ -13,6 +13,8 @@ interesting to the user, e.g. when an object:
 - is redrawn, etc.
 
 Besides widgets, events can registered from displays and input devices too.
+It's not detailed below, however the same applies to displays and indevs as well
+by changing the prefix of the functions from ``lv_obj_`` to ``lv_display_`` or ``lv_indev_``.
 
 Add events to a widget
 **********************
@@ -188,11 +190,11 @@ Display events
 Custom events
 -------------
 
-Any custom event codes can be registered by
+Any number of custom event codes can be registered by
 ``uint32_t MY_EVENT_1 =`` :cpp:func:`lv_event_register_id`
 
-They can be sent to any object with
-:cpp:expr:`lv_event_send(obj, MY_EVENT_1, &some_data)`
+They can be sent to any objects with
+:cpp:expr:`lv_obj_send_event(obj, MY_EVENT_1, &some_data)`
 
 Sending events
 **************
@@ -207,7 +209,7 @@ simulating a button press (although there are simpler ways to do this):
 
    /*Simulate the press of the first button (indexes start from zero)*/
    uint32_t btn_id = 0;
-   lv_event_send(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
+   lv_obj_send_event(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
 
 The same works for display and input devices with
 :cpp:expr:`lv_display_send_event(obj, <EVENT_CODE>, &some_data)` and
@@ -234,7 +236,7 @@ contains all data about the event. The following values can be gotten from it:
 - :cpp:expr:`lv_event_get_current_target(e)`: get the object to which an event was sent. I.e. the object whose event handler is being called.
 - :cpp:expr:`lv_event_get_target(e)`: get the object that originally triggered the event (different from :cpp:func:`lv_event_get_target` if :ref:`event bubbling <events_bubbling>` is enabled)
 - :cpp:expr:`lv_event_get_user_data(e)`: get the pointer passed as the last parameter of :cpp:func:`lv_obj_add_event`.
-- :cpp:expr:`lv_event_get_param(e)`: get the parameter passed as the last parameter of :cpp:func:`lv_event_send`
+- :cpp:expr:`lv_event_get_param(e)`: get the parameter passed as the last parameter of :cpp:func:`lv_obj_send_event`
 
 .. _events_bubbling:
 
