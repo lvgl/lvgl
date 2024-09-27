@@ -132,7 +132,6 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
     lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
 #endif /*LV_USE_DRAW_SDL == 0*/
     lv_display_add_event_cb(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
-
     /*Process the initial events*/
     sdl_event_handler(NULL);
 
