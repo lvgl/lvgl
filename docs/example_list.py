@@ -38,8 +38,6 @@ h1 = {
     "widgets": "Widgets"
 }
 
-# What about animage?
-
 widgets = {
     "obj": "Base Object",
     "animimg": "Animation Image",
