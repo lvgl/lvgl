@@ -10,7 +10,7 @@ However, in the following conditions it's valid to call LVGL related
 functions:
 
 - In *events*. Learn more in :ref:`events`.
-- In *lv_timer*. Learn more in :ref:`timer`.
+- In *lv_timer*. Learn more in :ref:`timers`.
 
 Tasks and threads
 -----------------

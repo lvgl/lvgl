@@ -39,7 +39,7 @@ Memory requirements
 -------------------
 
 To decode and display a GIF animation the following amount of RAM is
-required: 
+required:
 
 - :c:macro:`LV_COLOR_DEPTH` ``8``: 3 x image width x image height
 - :c:macro:`LV_COLOR_DEPTH` ``16``: 4 x image width x image height
@@ -57,5 +57,5 @@ Example
 API
 ---
 
-:ref:`gifdec`
+:ref:`gifdec_h`
 
