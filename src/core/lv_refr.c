@@ -667,11 +667,12 @@ static void refr_area(const lv_area_t * area_p)
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     lv_matrix_identity(&layer->matrix);
-    if(disp_refr->matrix_rotation) lv_display_rotate_area(disp_refr, &layer->phy_clip_area);
 
     if(disp_refr->matrix_rotation) {
         const lv_display_rotation_t rotation = lv_display_get_rotation(disp_refr);
         if(rotation != LV_DISPLAY_ROTATION_0) {
+            lv_display_rotate_area(disp_refr, &layer->phy_clip_area);
+
             /* Calculate midpoint coordinates using native resolution data */
             const float pivot_x = disp_refr->hor_res / 2.0f;
             const float pivot_y = disp_refr->ver_res / 2.0f;
@@ -761,6 +762,9 @@ static void refr_area(const lv_area_t * area_p)
         lv_draw_layer_init(tile_layer, NULL, layer->color_format, &tile_area);
         tile_layer->buf_area = layer->buf_area; /*the buffer is still large*/
         tile_layer->draw_buf = layer->draw_buf;
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+        tile_layer->matrix = layer->matrix;
+#endif
         refr_configured_layer(tile_layer);
     }
 
@@ -793,10 +797,6 @@ static void refr_area(const lv_area_t * area_p)
 static void refr_configured_layer(lv_layer_t * layer)
 {
     LV_PROFILER_REFR_BEGIN;
-
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-    lv_matrix_identity(&layer->matrix);
-#endif
 
     /* In single buffered mode wait here until the buffer is freed.
      * Else we would draw into the buffer while it's still being transferred to the display*/
