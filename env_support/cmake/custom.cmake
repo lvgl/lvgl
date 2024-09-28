@@ -27,6 +27,18 @@ file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp ${LVGL_R
 add_library(lvgl ${SOURCES})
 add_library(lvgl::lvgl ALIAS lvgl)
 
+# Allow the user to specify custom libraries to link to LVGL.
+# For example, this allows for specifying the SDL library when using `LV_USE_SDL`.
+if(LV_LINK_LIBRARIES_PRIVATE)
+  target_link_libraries(lvgl PRIVATE ${LV_LINK_LIBRARIES_PRIVATE})
+endif()
+
+# These libraries are linked to lvgl publicly.
+# For example, this can be used for adding a dependency on a generated config file.
+if(LV_LINK_LIBRARIES_PUBLIC)
+  target_link_libraries(lvgl PUBLIC ${LV_LINK_LIBRARIES_PUBLIC})
+endif()
+
 target_compile_definitions(
   lvgl PUBLIC $<$<BOOL:${LV_LVGL_H_INCLUDE_SIMPLE}>:LV_LVGL_H_INCLUDE_SIMPLE>
               $<$<BOOL:${LV_CONF_INCLUDE_SIMPLE}>:LV_CONF_INCLUDE_SIMPLE>)
