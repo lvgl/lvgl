@@ -32,7 +32,7 @@
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
     #include "lv_conf_kconfig.h"
-    #ifdef CONFIG_LV_CONF_SKIP
+    #if defined(CONFIG_LV_CONF_SKIP) && !defined(LV_CONF_SKIP)
         #define LV_CONF_SKIP
     #endif
 #endif
