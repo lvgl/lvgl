@@ -131,14 +131,20 @@ class vg_lite_ctx
     public:
         std::unique_ptr<SwCanvas> canvas;
         void * target_buffer;
+        void * tvg_target_buffer;
         vg_lite_uint32_t target_px_size;
         vg_lite_buffer_format_t target_format;
+        vg_lite_rectangle_t scissor_rect;
+        bool scissor_is_set;
 
     public:
         vg_lite_ctx()
             : target_buffer { nullptr }
+            , tvg_target_buffer { nullptr }
             , target_px_size { 0 }
             , target_format { VG_LITE_BGRA8888 }
+            , scissor_rect { 0, 0, 0, 0 }
+            , scissor_is_set { false }
             , clut_2colors { 0 }
             , clut_4colors { 0 }
             , clut_16colors { 0 }
@@ -738,6 +744,7 @@ extern "C" {
 
         /* finish convert, clean target buffer info */
         ctx->target_buffer = nullptr;
+        ctx->tvg_target_buffer = nullptr;
         ctx->target_px_size = 0;
 
         return VG_LITE_SUCCESS;
@@ -866,6 +873,7 @@ extern "C" {
             case gcFEATURE_BIT_VG_USE_DST:
             case gcFEATURE_BIT_VG_RADIAL_GRADIENT:
             case gcFEATURE_BIT_VG_IM_REPEAT_REFLECT:
+            case gcFEATURE_BIT_VG_SCISSOR:
 
 #if LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
             case gcFEATURE_BIT_VG_LVGL_SUPPORT:
@@ -1884,21 +1892,30 @@ Empty_sequence_handler:
 
     vg_lite_error_t vg_lite_set_scissor(int32_t x, int32_t y, int32_t right, int32_t bottom)
     {
-        LV_UNUSED(x);
-        LV_UNUSED(y);
-        LV_UNUSED(right);
-        LV_UNUSED(bottom);
-        return VG_LITE_NOT_SUPPORT;
+        auto ctx = vg_lite_ctx::get_instance();
+        int32_t width = right - x;
+        int32_t height = bottom - y;
+
+        if(width <= 0 || height <= 0) {
+            return VG_LITE_INVALID_ARGUMENT;
+        }
+
+        ctx->scissor_rect.x = x;
+        ctx->scissor_rect.y = y;
+        ctx->scissor_rect.width = width;
+        ctx->scissor_rect.height = height;
+        ctx->scissor_is_set = true;
+        return VG_LITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_enable_scissor(void)
     {
-        return VG_LITE_NOT_SUPPORT;
+        return VG_LITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_disable_scissor(void)
     {
-        return VG_LITE_NOT_SUPPORT;
+        return VG_LITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_get_mem_size(vg_lite_uint32_t * size)
@@ -2336,8 +2353,6 @@ static Result shape_append_rect(std::unique_ptr<Shape> & shape, const vg_lite_bu
 
 static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
 {
-    void * tvg_target_buffer = nullptr;
-
     /* if target_buffer needs to be changed, finish current drawing */
     if(ctx->target_buffer && ctx->target_buffer != target->memory) {
         vg_lite_finish();
@@ -2347,21 +2362,36 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
     ctx->target_format = target->format;
     ctx->target_px_size = target->width * target->height;
 
+    void * canvas_target_buffer;
     if(TVG_IS_VG_FMT_SUPPORT(target->format)) {
         /* if target format is supported by VG, use target buffer directly */
-        tvg_target_buffer = target->memory;
+        canvas_target_buffer = target->memory;
     }
     else {
         /* if target format is not supported by VG, use internal buffer */
-        tvg_target_buffer = ctx->get_temp_target_buffer(target->width, target->height);
+        canvas_target_buffer = ctx->get_temp_target_buffer(target->width, target->height);
     }
 
+    /* Prevent repeated target setting */
+    if(ctx->tvg_target_buffer == canvas_target_buffer) {
+        return Result::Success;
+    }
+
+    ctx->tvg_target_buffer = canvas_target_buffer;
+
     Result res = ctx->canvas->target(
-                     (uint32_t *)tvg_target_buffer,
+                     (uint32_t *)ctx->tvg_target_buffer,
                      target->width,
                      target->width,
                      target->height,
                      SwCanvas::ARGB8888);
+
+    if(ctx->scissor_is_set) {
+        TVG_CHECK_RETURN_RESULT(
+            ctx->canvas->viewport(
+                ctx->scissor_rect.x, ctx->scissor_rect.y,
+                ctx->scissor_rect.width, ctx->scissor_rect.height));
+    }
 
     return res;
 }
