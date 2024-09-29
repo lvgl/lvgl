@@ -6,10 +6,14 @@ on:
 
 jobs:
   bom-check:
-    if: github.repository == 'lvgl/lvgl'
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
 
       - name: UTF-8 BOM
         run: |          
