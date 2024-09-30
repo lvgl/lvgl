@@ -431,7 +431,8 @@ int32_t lv_text_get_width(const char * txt, uint32_t length, const lv_font_t * f
             uint32_t letter_next;
             lv_text_encoded_letter_next_2(txt, &letter, &letter_next, &i);
 
-            if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
+            /*TODO: Check foor recolor flag*/
+            if(0 /*(flag & LV_TEXT_FLAG_RECOLOR) != 0*/) {
                 if(lv_text_is_cmd(&cmd_state, letter) != false) {
                     continue;
                 }
