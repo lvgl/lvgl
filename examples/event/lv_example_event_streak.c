@@ -8,7 +8,7 @@ static void short_click_event_cb(lv_event_t * e)
     lv_obj_t * info_label = lv_event_get_user_data(e);
     lv_indev_t * indev = lv_event_get_param(e);
     uint8_t cnt = lv_indev_get_short_click_streak(indev);
-    lv_label_set_text_fmt(info_label, "Short click streak: %"LV_PRIu32, cnt);
+    lv_label_set_text_fmt(info_label, "Short click streak: %u", cnt);
 }
 
 static void streak_event_cb(lv_event_t * e)
