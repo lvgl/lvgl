@@ -25,8 +25,25 @@ Example
 
 .. include:: ../examples/libs/svg/index.rst
 
+.. code:: c
+
+    lv_svg_node_t * svg_doc;
+    const char* svg_data = "<svg><rect x=\"0\" y=\"0\" width=\"100\" height=\"100\"/></svg>";
+
+    /* Create an SVG DOM tree*/
+    svg_doc = lv_svg_load_data(svg_data, svg_len); 
+    ...
+
+    /* Draw SVG image*/
+    lv_draw_svg(layer, svg_doc);
+    ...
+
+    /* Release the DOM tree*/
+    lv_svg_node_delete(svg_doc);
+
 .. _svg_api:
 
 API
 ---
+
 
