@@ -315,38 +315,6 @@ static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
 #endif
 }
 
-bool _lv_text_is_cmd(lv_text_cmd_state_t * state, uint32_t c)
-{
-    bool ret = false;
-
-    if(c == (uint32_t)LV_TXT_COLOR_CMD[0]) {
-        if(*state == LV_TEXT_CMD_STATE_WAIT) { /*Start char*/
-            *state = LV_TEXT_CMD_STATE_PAR;
-            ret    = true;
-        }
-        /*Other start char in parameter is escaped cmd. char*/
-        else if(*state == LV_TEXT_CMD_STATE_PAR) {
-            *state = LV_TEXT_CMD_STATE_WAIT;
-        }
-        /*Command end*/
-        else if(*state == LV_TEXT_CMD_STATE_IN) {
-            *state = LV_TEXT_CMD_STATE_WAIT;
-            ret    = true;
-        }
-    }
-
-    /*Skip the color parameter and wait the space after it*/
-    if(*state == LV_TEXT_CMD_STATE_PAR) {
-        if(c == ' ') {
-            *state = LV_TEXT_CMD_STATE_IN; /*After the parameter the text is in the command*/
-        }
-        ret = true;
-    }
-
-    return ret;
-}
-
-
 uint32_t lv_text_get_next_line(const char * txt, const lv_font_t * font,
                                int32_t letter_space, int32_t max_width,
                                int32_t * used_width, lv_text_flag_t flag)
