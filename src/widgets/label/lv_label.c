@@ -470,6 +470,8 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
     uint32_t length = new_line_start - line_start;
     calculate_x_coordinate(&x, align, bidi_txt, length, font, letter_space, &txt_coords);
 
+    lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
+
     uint32_t i = 0;
     uint32_t i_act = i;
 
@@ -480,6 +482,12 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
             uint32_t letter;
             uint32_t letter_next;
             lv_text_encoded_letter_next_2(bidi_txt, &letter, &letter_next, &i);
+
+            if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
+                if(lv_text_is_cmd(&cmd_state, bidi_txt[i]) != false) {
+                    continue; /*Skip the letter if it is part of a command*/
+                }
+            }
 
             int32_t gw = lv_font_get_glyph_width(font, letter, letter_next);
 
@@ -566,6 +574,8 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
         x += lv_area_get_width(&txt_coords) - line_w;
     }
 
+    lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
+
     int32_t last_x = 0;
     uint32_t i           = line_start;
     uint32_t i_current   = i;
@@ -577,6 +587,12 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
             /*Get the current letter and the next letter for kerning*/
             /*Be careful 'i' already points to the next character*/
             lv_text_encoded_letter_next_2(txt, &letter, &letter_next, &i);
+
+            if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
+                if(lv_text_is_cmd(&cmd_state, txt[i]) != false) {
+                    continue; /*Skip the letter if it is part of a command*/
+                }
+            }
 
             last_x = x;
             x += lv_font_get_glyph_width(font, letter, letter_next);
