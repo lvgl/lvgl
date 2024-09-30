@@ -239,32 +239,30 @@ In full and direct modes, the buffer size should be large enough for the whole s
 As LVGL can not handle fractional width make sure to round the horizontal resolution to 8-
 (For example 90 to 96)
 
-Constraints on the area redrawn area
-------------------------------------
+Constraints on the Redrawn Area
+-------------------------------
 
-Some display controllers have special requirements on the window area
-where the rendered image can be sent.
+Some display controllers have specific requirements for the window area where the rendered image can be sent
+(e.g., `x1` must be even, and `x2` must be odd).
 
-For example in case of ???? x1 must be even and x2 must be odd.
+In the case of monochrome displays, `x1` must be `Nx8`, and `x2` must be `Nx8 - 1`.
+(If the display uses `LV_COLOR_FORMAT_I1`, LVGL automatically applies this rounding. See :ref:`monochrome`.)
 
-In case of monochrme displays x1 must be ``Nx8`` and x2 must be ``Nx8 - 1``.
-(If the display has `LV_COLOR_FORMAT_I1` LVGL automatically applies this rounding. See :refr:`monochrome`)
-
-The size of the invalidated (redrawn) area can be controlled like this:
+The size of the invalidated (redrawn) area can be controlled as follows:
 
 .. code:: c
-  void rounder_event_cb(lv_event_t * e)
-  {
-	  lv_area_t * a = lv_event_get_invalidated_area(e);
 
-  	  a->x1 = a->x1 & (~0x1); /*Make sure that x1 is even*/
-	  a->x2 = a->x2 | 0x1; /*Make sure that x2 is odd*/
-  }
+    void rounder_event_cb(lv_event_t * e)
+    {
+        lv_area_t * a = lv_event_get_invalidated_area(e);
 
-  ...
+        a->x1 = a->x1 & (~0x1); /* Ensure that x1 is even */
+        a->x2 = a->x2 | 0x1;    /* Ensure that x2 is odd */
+    }
 
-  lv_display_add_event_cb(disp, rounder_event_cb, LV_EVENT_INVALIDATE_AREA, NULL);
+    ...
 
+    lv_display_add_event_cb(disp, rounder_event_cb, LV_EVENT_INVALIDATE_AREA, NULL);
 
 User data
 ---------
