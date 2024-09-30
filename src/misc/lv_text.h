@@ -43,6 +43,7 @@ typedef enum {
                                         Otherwise breaks are inserted at word boundaries, as configured via LV_TXT_BREAK_CHARS
                                         or according to LV_TXT_LINE_BREAK_LONG_LEN, LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN,
                                         and LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN.*/
+    LV_TEXT_FLAG_RECOLOR   = 0x08, /**< Enable parsing of recolor command*/
 } lv_text_flag_t;
 
 /** Label align policy*/
