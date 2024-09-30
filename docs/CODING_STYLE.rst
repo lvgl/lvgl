@@ -174,7 +174,7 @@ illustrating most of the Doxygen commands used in LVGL.
                                lv_flex_align_t track_cross_place);
 
 
-- Always start Doxygen comment with a breif description of the code element it documents.
+- Always start Doxygen comment with a brief description of the code element it documents.
 
 - When more detail is needed, add a blank line below the brief description and add
   additional information that may be needed by LVGL API users, including preconditions
@@ -208,6 +208,7 @@ illustrating most of the Doxygen commands used in LVGL.
   If the list needs to be numbered, numbers can also be used.
 
 - Place example code in a code block by surrounding it with ``@code{.c}`` and ``@endcode`` commands.
+  Doxygen doesn't need the ``{.c}`` part, but the downstream software does.
 
 - Refer reader to additional information using the ``@see`` command.  Doxygen adds a
   "See also" paragraph.  The text following the ``@see`` command will be indented.
@@ -285,7 +286,7 @@ To learn more refer to the documentation of `MicroPython <integration/bindings/m
 Formatting
 ----------
 
-Here is example to show bracket placing and using of white spaces:
+Here is example to show bracket placing and using of white space:
 
 .. code-block:: c
 
@@ -305,7 +306,7 @@ Here is example to show bracket placing and using of white spaces:
 
        lv_label_ext_t * ext = lv_obj_get_ext(label);
 
-       /*Comment before a section*/
+       /* Comment before a section */
        if(text == ext->txt || text == NULL) {  /* Bracket of statements starts on same line */
            lv_label_refr_text(label);
            return;

@@ -141,13 +141,13 @@ Starting from v8, every minor release is supported for 1 year.
 |v8.3     | 6 July, 2022 | 1 Jan, 2025  | Yes    |
 +---------+--------------+--------------+--------+
 |v8.4     | Mar 19, 2024 | Mar 20, 2025 | Yes    |
-+---------+--------------------------------------+
++---------+--------------+--------------+--------+
 |v9.0     | Jan 22, 2024 | Jan 22, 2025 | Yes    |
-+---------+--------------------------------------+
++---------+--------------+--------------+--------+
 |v9.1     | Mar 20, 2024 | Mar 20, 2025 | Yes    |
-+---------+--------------------------------------+
++---------+--------------+--------------+--------+
 |v9.2     | Aug 26, 2024 | Aug 26, 2025 | Yes    |
-+---------+--------------------------------------+
++---------+--------------+--------------+--------+
 
 
 FAQ
@@ -212,7 +212,7 @@ My display driver is not called. What have I missed?
 
 Be sure you are calling :cpp:expr:`lv_tick_inc(x)` in an interrupt and :cpp:func:`lv_timer_handler` in your main ``while(1)``.
 
-Learn more in the :ref:`tick` and :ref:`timer` sections.
+Learn more in the :ref:`tick` and :ref:`timer_handler` sections.
 
 
 Why is the display driver called only once? Only the upper part of the display is refreshed.

@@ -115,7 +115,7 @@ Learn more
 API
 ---
 
-:ref:`ftoption`
+:ref:`ftoption_h`
 
-:ref:`ftmodule`
+:ref:`ftmodule_h`
 

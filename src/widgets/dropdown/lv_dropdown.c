@@ -862,7 +862,6 @@ static void draw_main(lv_event_t * e)
     int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     int32_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
     int32_t right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width;
-    int32_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
 
     lv_draw_label_dsc_t symbol_dsc;
     lv_draw_label_dsc_init(&symbol_dsc);
@@ -906,24 +905,22 @@ static void draw_main(lv_event_t * e)
         }
 
         lv_area_t symbol_area;
+        symbol_area.y1 = obj->coords.y1;
+        symbol_area.y2 = symbol_area.y1 + symbol_h - 1;
+        symbol_area.x1 = obj->coords.x1;
+        symbol_area.x2 = symbol_area.x1 + symbol_w - 1;
         if(symbol_to_left) {
-            symbol_area.x1 = obj->coords.x1 + left;
-            symbol_area.x2 = symbol_area.x1 + symbol_w - 1;
+            lv_area_align(&obj->coords, &symbol_area, LV_ALIGN_LEFT_MID, left, 0);
         }
         else {
-            symbol_area.x1 = obj->coords.x2 - right - symbol_w;
-            symbol_area.x2 = symbol_area.x1 + symbol_w - 1;
+            lv_area_align(&obj->coords, &symbol_area, LV_ALIGN_RIGHT_MID, -right, 0);
         }
 
         if(symbol_type == LV_IMAGE_SRC_SYMBOL) {
-            symbol_area.y1 = obj->coords.y1 + top;
-            symbol_area.y2 = symbol_area.y1 + symbol_h - 1;
             symbol_dsc.text = dropdown->symbol;
             lv_draw_label(layer, &symbol_dsc, &symbol_area);
         }
         else {
-            symbol_area.y1 = obj->coords.y1 + (lv_obj_get_height(obj) - symbol_h) / 2;
-            symbol_area.y2 = symbol_area.y1 + symbol_h - 1;
             lv_draw_image_dsc_t img_dsc;
             lv_draw_image_dsc_init(&img_dsc);
             lv_obj_init_draw_image_dsc(obj, LV_PART_INDICATOR, &img_dsc);
@@ -943,22 +940,21 @@ static void draw_main(lv_event_t * e)
                      label_dsc.flag);
 
     lv_area_t txt_area;
-    txt_area.y1 = obj->coords.y1 + top;
-    txt_area.y2 = txt_area.y1 + size.y;
+    txt_area.x1 = obj->coords.x1;
+    txt_area.x2 = txt_area.x1 + size.x - 1;
+    txt_area.y1 = obj->coords.y1;
+    txt_area.y2 = txt_area.y1 + size.y - 1;
     /*Center align the text if no symbol*/
     if(dropdown->symbol == NULL) {
-        txt_area.x1 = obj->coords.x1 + (lv_obj_get_width(obj) - size.x) / 2;
-        txt_area.x2 = txt_area.x1 + size.x;
+        lv_area_align(&obj->coords, &txt_area, LV_ALIGN_CENTER, 0, 0);
     }
     else {
         /*Text to the right*/
         if(symbol_to_left) {
-            txt_area.x1 = obj->coords.x2 - right - size.x;
-            txt_area.x2 = txt_area.x1 + size.x;
+            lv_area_align(&obj->coords, &txt_area, LV_ALIGN_RIGHT_MID, -right, 0);
         }
         else {
-            txt_area.x1 = obj->coords.x1 + left;
-            txt_area.x2 = txt_area.x1 + size.x;
+            lv_area_align(&obj->coords, &txt_area, LV_ALIGN_LEFT_MID, left, 0);
         }
     }
 

@@ -77,6 +77,13 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->dpi              = LV_DPI_DEF;
     disp->color_format = LV_COLOR_FORMAT_NATIVE;
 
+
+#if defined(LV_DRAW_SW_DRAW_UNIT_CNT)
+    disp->tile_cnt = LV_DRAW_SW_DRAW_UNIT_CNT;
+#else
+    disp->tile_cnt = 1;
+#endif
+
     disp->layer_head = lv_malloc_zeroed(sizeof(lv_layer_t));
     LV_ASSERT_MALLOC(disp->layer_head);
     if(disp->layer_head == NULL) return NULL;
@@ -486,6 +493,24 @@ lv_color_format_t lv_display_get_color_format(lv_display_t * disp)
     if(disp == NULL) return LV_COLOR_FORMAT_UNKNOWN;
 
     return disp->color_format;
+}
+
+void lv_display_set_tile_cnt(lv_display_t * disp, uint32_t tile_cnt)
+{
+    LV_ASSERT_FORMAT_MSG(tile_cnt < 256, "tile_cnt must be smaller than 256 (%d was used)", tile_cnt);
+
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return;
+
+    disp->tile_cnt = tile_cnt;
+}
+
+uint32_t lv_display_get_tile_cnt(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return 0;
+
+    return disp->tile_cnt;
 }
 
 void lv_display_set_antialiasing(lv_display_t * disp, bool en)

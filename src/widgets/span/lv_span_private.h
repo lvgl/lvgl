@@ -32,6 +32,9 @@ struct _lv_span_t {
     lv_obj_t * spangroup;      /**<  a pointer to spangroup */
     lv_style_t style;          /**<  display text style */
     uint32_t static_flag : 1;  /**<  the text is static flag */
+
+    lv_point_t trailing_pos;
+    int32_t trailing_height;
 };
 
 /** Data of label*/

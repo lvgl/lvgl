@@ -422,6 +422,19 @@ static vg_lite_converter<vg_color32_t, uint8_t> conv_alpha4_to_bgra8888(
     }
 });
 
+static vg_lite_converter<vg_color32_t, uint8_t> conv_l8_to_bgra8888(
+    [](vg_color32_t * dest, const uint8_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
+{
+    while(px_size--) {
+        dest->alpha = 0xFF;
+        dest->red = *src;
+        dest->green = *src;
+        dest->blue = *src;
+        dest++;
+        src++;
+    }
+});
+
 /**********************
  *      MACROS
  **********************/
@@ -649,6 +662,24 @@ extern "C" {
         }
     }
 
+    static void picture_bgra8888_to_l8(uint8_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size)
+    {
+        while(px_size--) {
+            *dest = (src->red * 19595 + src->green * 38469 + src->blue * 7472) >> 16;
+            src++;
+            dest++;
+        }
+    }
+
+    static void picture_bgra8888_to_alpha8(uint8_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size)
+    {
+        while(px_size--) {
+            *dest = src->alpha;
+            src++;
+            dest++;
+        }
+    }
+
     vg_lite_error_t vg_lite_finish(void)
     {
         vg_lite_ctx * ctx = vg_lite_ctx::get_instance();
@@ -680,6 +711,18 @@ extern "C" {
             case VG_LITE_BGR888:
                 picture_bgra8888_to_bgr888(
                     (vg_color24_t *)ctx->target_buffer,
+                    (const vg_color32_t *)ctx->get_temp_target_buffer(),
+                    ctx->target_px_size);
+                break;
+            case VG_LITE_L8:
+                picture_bgra8888_to_l8(
+                    (uint8_t *)ctx->target_buffer,
+                    (const vg_color32_t *)ctx->get_temp_target_buffer(),
+                    ctx->target_px_size);
+                break;
+            case VG_LITE_A8:
+                picture_bgra8888_to_alpha8(
+                    (uint8_t *)ctx->target_buffer,
                     (const vg_color32_t *)ctx->get_temp_target_buffer(),
                     ctx->target_px_size);
                 break;
@@ -2437,6 +2480,11 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
 
             case VG_LITE_A8: {
                     conv_alpha8_to_bgra8888.convert(&target, source, color);
+                }
+                break;
+
+            case VG_LITE_L8: {
+                    conv_l8_to_bgra8888.convert(&target, source);
                 }
                 break;
 

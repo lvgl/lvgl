@@ -26,6 +26,14 @@
 
 #define PATH_QUALITY VG_LITE_HIGH
 #define PATH_DATA_COORD_FORMAT VG_LITE_S16
+
+#if LV_VG_LITE_FLUSH_MAX_COUNT > 0
+    #define PATH_FLUSH_COUNT_MAX 0
+#else
+    /* When using IDLE Flush mode, reduce the number of flushes */
+    #define PATH_FLUSH_COUNT_MAX 8
+#endif
+
 #define FT_F26DOT6_SHIFT 6
 
 /** After converting the font reference size, it is also necessary to scale the 26dot6 data
@@ -66,7 +74,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
 void lv_draw_vg_lite_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,
                            const lv_area_t * coords)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
 
 #if LV_USE_FREETYPE
     static bool is_init = false;
@@ -77,7 +85,7 @@ void lv_draw_vg_lite_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t
 #endif /* LV_USE_FREETYPE */
 
     lv_draw_label_iterate_characters(draw_unit, dsc, coords, draw_letter_cb);
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 /**********************
@@ -137,6 +145,12 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
     if(fill_draw_dsc && fill_area) {
         lv_draw_vg_lite_fill(draw_unit, fill_draw_dsc, fill_area);
     }
+
+    /* Flush in time to avoid accumulation of drawing commands */
+    u->letter_count++;
+    if(u->letter_count > PATH_FLUSH_COUNT_MAX) {
+        lv_vg_lite_flush(u);
+    }
 }
 
 static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_dsc_t * dsc)
@@ -146,7 +160,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
         return;
     }
 
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
 
     lv_area_t image_area = *dsc->letter_coords;
 
@@ -172,7 +186,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
         /* rect is used to crop the pixel-aligned padding area */
         vg_lite_rectangle_t rect;
         lv_vg_lite_rect(&rect, &src_area);
-        LV_PROFILER_BEGIN_TAG("vg_lite_blit_rect");
+        LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_blit_rect");
         LV_VG_LITE_CHECK_ERROR(vg_lite_blit_rect(
                                    &u->target_buffer,
                                    &src_buf,
@@ -181,7 +195,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
                                    VG_LITE_BLEND_SRC_OVER,
                                    color,
                                    VG_LITE_FILTER_LINEAR));
-        LV_PROFILER_END_TAG("vg_lite_blit_rect");
+        LV_PROFILER_DRAW_END_TAG("vg_lite_blit_rect");
     }
     else {
         lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_S16);
@@ -199,7 +213,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
         vg_lite_matrix_t path_matrix = u->global_matrix;
         LV_VG_LITE_ASSERT_MATRIX(&path_matrix);
 
-        LV_PROFILER_BEGIN_TAG("vg_lite_draw_pattern");
+        LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw_pattern");
         LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
                                    &u->target_buffer,
                                    vg_lite_path,
@@ -212,7 +226,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
                                    0,
                                    color,
                                    VG_LITE_FILTER_LINEAR));
-        LV_PROFILER_END_TAG("vg_lite_draw_pattern");
+        LV_PROFILER_DRAW_END_TAG("vg_lite_draw_pattern");
 
         lv_vg_lite_path_drop(u, path);
     }
@@ -222,7 +236,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
      * Later, use the font cache for management to improve efficiency.
      */
     lv_vg_lite_finish(u);
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 #if LV_USE_FREETYPE
@@ -235,7 +249,7 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
         return;
     }
 
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
 
     /* vg-lite bounding_box will crop the pixels on the edge, so +1px is needed here */
     path_clip_area.x2++;
@@ -264,7 +278,7 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
     vg_lite_matrix_t result;
     if(!lv_vg_lite_matrix_inverse(&result, &matrix)) {
         LV_LOG_ERROR("no inverse matrix");
-        LV_PROFILER_END;
+        LV_PROFILER_DRAW_END;
         return;
     }
 
@@ -283,21 +297,18 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
     LV_VG_LITE_ASSERT_PATH(vg_lite_path);
     LV_VG_LITE_ASSERT_MATRIX(&draw_matrix);
 
-    LV_PROFILER_BEGIN_TAG("vg_lite_draw");
+    LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw");
     LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
                                &u->target_buffer, vg_lite_path, VG_LITE_FILL_NON_ZERO,
                                &draw_matrix, VG_LITE_BLEND_SRC_OVER, lv_vg_lite_color(dsc->color, dsc->opa, true)));
-    LV_PROFILER_END_TAG("vg_lite_draw");
+    LV_PROFILER_DRAW_END_TAG("vg_lite_draw");
 
-    /* Flush in time to avoid accumulation of drawing commands */
-    lv_vg_lite_flush(u);
-
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 static void vg_lite_outline_push(const lv_freetype_outline_event_param_t * param)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     lv_vg_lite_path_t * outline = param->outline;
     LV_ASSERT_NULL(outline);
 
@@ -331,12 +342,12 @@ static void vg_lite_outline_push(const lv_freetype_outline_event_param_t * param
             LV_ASSERT(false);
             break;
     }
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 static void freetype_outline_event_cb(lv_event_t * e)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     lv_event_code_t code = lv_event_get_code(e);
     lv_freetype_outline_event_param_t * param = lv_event_get_param(e);
     switch(code) {
@@ -354,7 +365,7 @@ static void freetype_outline_event_cb(lv_event_t * e)
             LV_LOG_WARN("unknown event code: %d", code);
             break;
     }
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 #endif /* LV_USE_FREETYPE */
