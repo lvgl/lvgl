@@ -195,11 +195,13 @@ bool lv_text_is_cmd(lv_text_cmd_state_t * state, uint32_t c)
  * @param max_width max width of the text (break the lines to fit this size). Set COORD_MAX to avoid line breaks
  * @param flags settings for the text from 'txt_flag_type' enum
  * @param[out] word_w_ptr width (in pixels) of the parsed word. May be NULL.
+ * @param cmd_state Pointer to a lv_text_cmd_state_t variable which stored the current state of command proocessing
  * @return the index of the first char of the next word (in byte index not letter index. With UTF-8 they are different)
  */
 static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
                                       int32_t letter_space, int32_t max_width,
-                                      lv_text_flag_t flag, uint32_t * word_w_ptr)
+                                      lv_text_flag_t flag, uint32_t * word_w_ptr,
+                                      lv_text_cmd_state_t * cmd_state)
 {
     if(txt == NULL || txt[0] == '\0') return 0;
     if(font == NULL) return 0;
@@ -225,7 +227,7 @@ static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
 
         /*Handle the recolor command*/
         if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
-            if(_lv_text_is_cmd(cmd_state, letter)) {
+            if(lv_text_is_cmd(cmd_state, letter)) {
                 i = i_next;
                 i_next = i_next_next;
                 letter = letter_next;
@@ -370,6 +372,8 @@ uint32_t lv_text_get_next_line(const char * txt, const lv_font_t * font,
     }
 
     if(flag & LV_TEXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
+    lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
+
     uint32_t i = 0;                                        /*Iterating index into txt*/
 
     while(txt[i] != '\0' && max_width > 0) {
@@ -377,7 +381,7 @@ uint32_t lv_text_get_next_line(const char * txt, const lv_font_t * font,
         if(i == 0) word_flag |= LV_TEXT_FLAG_BREAK_ALL;
 
         uint32_t word_w = 0;
-        uint32_t advance = lv_text_get_next_word(&txt[i], font, letter_space, max_width, word_flag, &word_w);
+        uint32_t advance = lv_text_get_next_word(&txt[i], font, letter_space, max_width, word_flag, &word_w, &cmd_state);
         max_width -= word_w;
         line_w += word_w;
 
@@ -428,7 +432,7 @@ int32_t lv_text_get_width(const char * txt, uint32_t length, const lv_font_t * f
             lv_text_encoded_letter_next_2(txt, &letter, &letter_next, &i);
 
             if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
-                if(_lv_text_is_cmd(&cmd_state, letter) != false) {
+                if(lv_text_is_cmd(&cmd_state, letter) != false) {
                     continue;
                 }
             }
