@@ -71,7 +71,7 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
     lv_color_format_t cf = header->cf;
 
     if(area->y1 == 0) {
-        uint16_t size = stride * lv_area_get_height(area);
+        uint32_t size = stride * lv_area_get_height(area);
 
         /* Invalidate full buffer. */
         DEMO_CleanInvalidateCacheByAddr((void *)draw_buf->data, size);
