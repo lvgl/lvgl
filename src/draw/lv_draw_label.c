@@ -391,6 +391,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
                 draw_letter_dsc.color = dsc->color;
             }
 
+            draw_letter_dsc.color = color;
             draw_letter(draw_unit, &draw_letter_dsc, &pos, font, letter, cb);
 
             if(letter_w > 0) {
