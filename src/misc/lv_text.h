@@ -23,6 +23,9 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_TXT_COLOR_CMD
+#define LV_TXT_COLOR_CMD "#"
+#endif
 
 #define LV_TXT_ENC_UTF8 1
 #define LV_TXT_ENC_ASCII 2
@@ -54,6 +57,13 @@ typedef enum {
     LV_TEXT_ALIGN_RIGHT, /**< Align text to right*/
 } lv_text_align_t;
 
+/** State machine for text renderer. */
+typedef enum {
+    LV_TEXT_CMD_STATE_WAIT, /**< Waiting for command*/
+    LV_TEXT_CMD_STATE_PAR,  /**< Processing the parameter*/
+    LV_TEXT_CMD_STATE_IN,   /**< Processing the command*/
+} lv_text_cmd_state_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -84,6 +94,13 @@ void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
  */
 int32_t lv_text_get_width(const char * txt, uint32_t length, const lv_font_t * font, int32_t letter_space);
 
+/**
+ * Check if c is command state
+ * @param state
+ * @param c
+ * @return True if c is state
+ */
+bool lv_text_is_cmd(lv_text_cmd_state_t * state, uint32_t c);
 /**********************
  *      MACROS
  **********************/

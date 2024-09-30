@@ -136,6 +136,37 @@ void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
         size_res->y -= line_space;
 }
 
+bool lv_text_is_cmd(lv_text_cmd_state_t * state, uint32_t c)
+{
+    bool ret = false;
+
+    if(c == (uint32_t)LV_TXT_COLOR_CMD[0]) {
+        if(*state == LV_TEXT_CMD_STATE_WAIT) { /*Start char*/
+            *state = LV_TEXT_CMD_STATE_PAR;
+            ret = true;
+        }
+        /*Other start char in parameter is escaped cmd. char*/
+        else if(*state == LV_TEXT_CMD_STATE_WAIT) {
+            *state = LV_TEXT_CMD_STATE_WAIT;
+        }
+        /*Command end*/
+        else if(*state == LV_TEXT_CMD_STATE_IN) {
+            *state = LV_TEXT_CMD_STATE_WAIT;
+            ret = true;
+        }
+    }
+
+    /*Skip the color parameter and wait the space after it*/
+    if(*state == LV_TEXT_CMD_STATE_PAR) {
+        if(c == ' ') {
+            *state = LV_TEXT_CMD_STATE_IN; /*After the parameter the text is in the command*/
+        }
+        ret = true;
+    }
+
+    return ret;
+}
+
 /**
  * Get the next word of text. A word is delimited by break characters.
  *
@@ -191,6 +222,16 @@ static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
     while(txt[i] != '\0') {
         letter_next = lv_text_encoded_next(txt, &i_next_next);
         word_len++;
+
+        /*Handle the recolor command*/
+        if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
+            if(_lv_text_is_cmd(cmd_state, letter)) {
+                i = i_next;
+                i_next = i_next_next;
+                letter = letter_next;
+                continue;   /*Skip the letter if it is part of a command*/
+            }
+        }
 
         letter_w = lv_font_get_glyph_width(font, letter, letter_next);
         cur_w += letter_w;
@@ -272,6 +313,38 @@ static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
 #endif
 }
 
+bool _lv_text_is_cmd(lv_text_cmd_state_t * state, uint32_t c)
+{
+    bool ret = false;
+
+    if(c == (uint32_t)LV_TXT_COLOR_CMD[0]) {
+        if(*state == LV_TEXT_CMD_STATE_WAIT) { /*Start char*/
+            *state = LV_TEXT_CMD_STATE_PAR;
+            ret    = true;
+        }
+        /*Other start char in parameter is escaped cmd. char*/
+        else if(*state == LV_TEXT_CMD_STATE_PAR) {
+            *state = LV_TEXT_CMD_STATE_WAIT;
+        }
+        /*Command end*/
+        else if(*state == LV_TEXT_CMD_STATE_IN) {
+            *state = LV_TEXT_CMD_STATE_WAIT;
+            ret    = true;
+        }
+    }
+
+    /*Skip the color parameter and wait the space after it*/
+    if(*state == LV_TEXT_CMD_STATE_PAR) {
+        if(c == ' ') {
+            *state = LV_TEXT_CMD_STATE_IN; /*After the parameter the text is in the command*/
+        }
+        ret = true;
+    }
+
+    return ret;
+}
+
+
 uint32_t lv_text_get_next_line(const char * txt, const lv_font_t * font,
                                int32_t letter_space, int32_t max_width,
                                int32_t * used_width, lv_text_flag_t flag)
@@ -346,12 +419,19 @@ int32_t lv_text_get_width(const char * txt, uint32_t length, const lv_font_t * f
 
     uint32_t i                   = 0;
     int32_t width             = 0;
+    lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
 
     if(length != 0) {
         while(i < length) {
             uint32_t letter;
             uint32_t letter_next;
             lv_text_encoded_letter_next_2(txt, &letter, &letter_next, &i);
+
+            if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
+                if(_lv_text_is_cmd(&cmd_state, letter) != false) {
+                    continue;
+                }
+            }
 
             int32_t char_width = lv_font_get_glyph_width(font, letter, letter_next);
             if(char_width > 0) {
