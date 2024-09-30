@@ -274,6 +274,19 @@ void lv_label_set_text_selection_end(lv_obj_t * obj, uint32_t index)
 #endif
 }
 
+void lv_label_set_recolor(lv_obj_t * obj, bool en)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_label_t * label = (lv_label_t *)obj;
+    if(label->recolor == en) return;
+
+    label->recolor = en == false ? 0 : 1;
+
+    /*Refresh the text because the potential color codes in text needs to be hidden or revealed*/
+    lv_label_refr_text(obj);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -633,6 +646,14 @@ uint32_t lv_label_get_text_selection_end(const lv_obj_t * obj)
     LV_UNUSED(obj); /*Unused*/
     return LV_LABEL_TEXT_SELECTION_OFF;
 #endif
+}
+
+bool lv_label_get_recolor(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_label_t * label = (lv_label_t *)obj;
+    return label->recolor == 0 ? false : true;
 }
 
 /*=====================
