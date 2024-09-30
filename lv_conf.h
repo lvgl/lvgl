@@ -12,7 +12,7 @@
  */
 
 /* clang-format off */
-#if 0 /* Set this to "1" to enable content */
+#if 1 /* Set this to "1" to enable content */
 
 #ifndef LV_CONF_H
 #define LV_CONF_H
@@ -834,7 +834,7 @@
 #define LV_USE_BARCODE 0
 
 /** FreeType library */
-#define LV_USE_FREETYPE 0
+#define LV_USE_FREETYPE 1
 #if LV_USE_FREETYPE
     /** Let FreeType use LVGL memory and file porting */
     #define LV_FREETYPE_USE_LVGL_PORT 0
@@ -997,7 +997,7 @@
  *==================*/
 
 /** Use SDL to open window on PC and handle mouse and keyboard. */
-#define LV_USE_SDL              0
+#define LV_USE_SDL              1
 #if LV_USE_SDL
     #define LV_SDL_INCLUDE_PATH     <SDL2/SDL.h>
     #define LV_SDL_RENDER_MODE      LV_DISPLAY_RENDER_MODE_DIRECT   /**< LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance */
@@ -1116,7 +1116,7 @@
  ====================*/
 
 /** Show some widgets. This might be required to increase `LV_MEM_SIZE`. */
-#define LV_USE_DEMO_WIDGETS 0
+#define LV_USE_DEMO_WIDGETS 1
 
 /** Demonstrate usage of encoder and keyboard. */
 #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
