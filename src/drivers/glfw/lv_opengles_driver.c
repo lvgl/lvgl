@@ -98,7 +98,7 @@ static const char * vertex_shader =
 static const char * fragment_shader =
     "#version 300 es\n"
     "\n"
-    "precision mediump float;\n"
+    "precision lowp float;\n"
     "\n"
     "layout(location = 0) out vec4 color;\n"
     "\n"
