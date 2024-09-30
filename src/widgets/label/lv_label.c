@@ -697,6 +697,7 @@ static void lv_label_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_label_t * label = (lv_label_t *)obj;
 
     label->text       = NULL;
+    label->recolor    = 0;
     label->static_txt = 0;
     label->dot_end    = LV_LABEL_DOT_END_INV;
     label->long_mode  = LV_LABEL_LONG_WRAP;
@@ -764,6 +765,7 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
             int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
             int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
             lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
+            if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
             if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
 
             int32_t w = lv_obj_get_content_width(obj);
@@ -1317,6 +1319,7 @@ static lv_text_flag_t get_label_flags(lv_label_t * label)
 {
     lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
 
+    if(label->recolor) flag |= LV_TEXT_FLAG_RECOLOR;
     if(label->expand) flag |= LV_TEXT_FLAG_EXPAND;
 
     lv_obj_t * obj = (lv_obj_t *) label;
