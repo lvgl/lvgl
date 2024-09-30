@@ -1059,6 +1059,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             if(anim_template) {
                 a.act_time = anim_template->act_time;
                 a.repeat_delay = anim_template->repeat_delay;
+                a.repeat_cnt = anim_template->repeat_cnt;
             }
             else if(act_time < a.time) {
                 a.act_time = act_time;      /*To keep the old position when the label text is updated mid-scrolling*/
@@ -1086,6 +1087,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             if(anim_template) {
                 a.act_time = anim_template->act_time;
                 a.repeat_delay = anim_template->repeat_delay;
+                a.repeat_cnt = anim_template->repeat_cnt;
             }
             else if(act_time < a.time) {
                 a.act_time = act_time;      /*To keep the old position when the label text is updated mid-scrolling*/
