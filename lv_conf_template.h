@@ -276,7 +276,7 @@
     #define LV_USE_DRAW_DMA2D_INTERRUPT 0
 #endif
 
-/** Draw using cached OpenGLES textures*/
+/** Draw using cached OpenGLES textures */
 #define LV_USE_DRAW_OPENGLES 0
 
 /*=======================

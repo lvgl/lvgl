@@ -457,6 +457,11 @@ menu "LVGL configuration"
 				if enabled, the user is required to call
 				`lv_draw_dma2d_transfer_complete_interrupt_handler`
 				upon receiving the DMA2D global interrupt
+
+		config LV_USE_DRAW_OPENGLES
+			bool "Draw using cached OpenGLES textures"
+			default n
+			depends on LV_USE_OPENGLES
 	endmenu
 
 	menu "Feature Configuration"

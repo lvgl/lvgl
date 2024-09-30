@@ -422,7 +422,7 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
     if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
         lv_draw_label_dsc_t * label_dsc = t->draw_dsc;
         if(label_dsc->text_local) {
-            lv_cache_drop(u->texture_cache, &data_to_find, NULL);
+            lv_cache_drop(u->texture_cache, &data_to_find, u);
         }
     }
 }

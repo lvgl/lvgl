@@ -775,7 +775,7 @@
     #endif
 #endif
 
-/** Draw using cached OpenGLES textures*/
+/** Draw using cached OpenGLES textures */
 #ifndef LV_USE_DRAW_OPENGLES
     #ifdef CONFIG_LV_USE_DRAW_OPENGLES
         #define LV_USE_DRAW_OPENGLES CONFIG_LV_USE_DRAW_OPENGLES

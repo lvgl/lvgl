@@ -43,6 +43,7 @@ typedef struct {
     lv_draw_task_t * task_act;
     lv_cache_t * texture_cache;
     unsigned int framebuffer;
+    lv_draw_buf_t render_draw_buf;
 } lv_draw_opengles_unit_t;
 
 typedef struct {
@@ -55,6 +56,14 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static bool opengles_texture_cache_create_cb(cache_data_t * cached_data, void * user_data);
+static void opengles_texture_cache_free_cb(cache_data_t * cached_data, void * user_data);
+static lv_cache_compare_res_t opengles_texture_cache_compare_cb(const cache_data_t * lhs, const cache_data_t * rhs);
+
+static void blend_texture_layer(lv_draw_opengles_unit_t * u);
+static void draw_from_cached_texture(lv_draw_opengles_unit_t * u);
+
 static void execute_drawing(lv_draw_opengles_unit_t * u);
 
 static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
@@ -64,15 +73,13 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
 
 static unsigned int layer_get_texture(lv_layer_t * layer);
 static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u);
-
-/**********************
- *  GLOBAL PROTOTYPES
- **********************/
-static uint8_t opengles_render_buf[2048 * 1024 * 4];
+static unsigned int create_texture(int32_t w, int32_t h, const void * data);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+static lv_draw_opengles_unit_t * g_unit;
 
 /**********************
  *      MACROS
@@ -81,6 +88,35 @@ static uint8_t opengles_render_buf[2048 * 1024 * 4];
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+void lv_draw_opengles_init(void)
+{
+    lv_draw_opengles_unit_t * draw_opengles_unit = lv_draw_create_unit(sizeof(lv_draw_opengles_unit_t));
+    draw_opengles_unit->base_unit.dispatch_cb = dispatch;
+    draw_opengles_unit->base_unit.evaluate_cb = evaluate;
+    draw_opengles_unit->texture_cache = lv_cache_create(&lv_cache_class_lru_rb_count,
+    sizeof(cache_data_t), 128, (lv_cache_ops_t) {
+        .compare_cb = (lv_cache_compare_cb_t)opengles_texture_cache_compare_cb,
+        .create_cb = (lv_cache_create_cb_t)opengles_texture_cache_create_cb,
+        .free_cb = (lv_cache_free_cb_t)opengles_texture_cache_free_cb,
+    });
+    lv_cache_set_name(draw_opengles_unit->texture_cache, "OPENGLES_TEXTURE");
+
+    lv_draw_buf_init(&draw_opengles_unit->render_draw_buf, 0, 0, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO, NULL, 0);
+
+    g_unit = draw_opengles_unit;
+}
+
+void lv_draw_opengles_deinit(void)
+{
+    lv_free(g_unit->render_draw_buf.unaligned_data);
+    lv_cache_destroy(g_unit->texture_cache, g_unit);
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
 static bool opengles_texture_cache_create_cb(cache_data_t * cached_data, void * user_data)
 {
     return draw_to_texture((lv_draw_opengles_unit_t *)user_data, cached_data);
@@ -128,24 +164,6 @@ static lv_cache_compare_res_t opengles_texture_cache_compare_cb(const cache_data
     return 0;
 }
 
-void lv_draw_opengles_init(void)
-{
-    lv_draw_opengles_unit_t * draw_opengles_unit = lv_draw_create_unit(sizeof(lv_draw_opengles_unit_t));
-    draw_opengles_unit->base_unit.dispatch_cb = dispatch;
-    draw_opengles_unit->base_unit.evaluate_cb = evaluate;
-    draw_opengles_unit->texture_cache = lv_cache_create(&lv_cache_class_lru_rb_count,
-    sizeof(cache_data_t), 128, (lv_cache_ops_t) {
-        .compare_cb = (lv_cache_compare_cb_t)opengles_texture_cache_compare_cb,
-        .create_cb = (lv_cache_create_cb_t)opengles_texture_cache_create_cb,
-        .free_cb = (lv_cache_free_cb_t)opengles_texture_cache_free_cb,
-    });
-    lv_cache_set_name(draw_opengles_unit->texture_cache, "OPENGLES_TEXTURE");
-}
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
 static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_opengles_unit_t * draw_opengles_unit = (lv_draw_opengles_unit_t *) draw_unit;
@@ -167,28 +185,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
             int32_t w = lv_area_get_width(&layer->buf_area);
             int32_t h = lv_area_get_height(&layer->buf_area);
 
-            GL_CALL(glGenTextures(1, &texture));
-            GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
-            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-            GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-
-            /*Color depth: 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
-#if LV_COLOR_DEPTH == 8
-            GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, NULL));
-#elif LV_COLOR_DEPTH == 16
-            GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, w, h, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL));
-#elif LV_COLOR_DEPTH == 24
-            GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, NULL));
-#elif LV_COLOR_DEPTH == 32
-            GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL));
-#else
-#error("Unsupported color format")
-#endif
-
-            glGenerateMipmap(GL_TEXTURE_2D);
+            texture = create_texture(w, h, NULL);
 
             layer->user_data = (void *)(uintptr_t)texture;
         }
@@ -233,16 +230,23 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
     int32_t texture_w = lv_area_get_width(&task->_real_area);
     int32_t texture_h = lv_area_get_height(&task->_real_area);
 
-    lv_draw_buf_t draw_buf;
-    dest_layer.draw_buf = &draw_buf;
-    lv_draw_buf_init(dest_layer.draw_buf, texture_w, texture_h,
-                     LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO, opengles_render_buf, sizeof(opengles_render_buf));
+    if(NULL == lv_draw_buf_reshape(&u->render_draw_buf, LV_COLOR_FORMAT_ARGB8888, texture_w, texture_h, LV_STRIDE_AUTO)) {
+        uint8_t * data = u->render_draw_buf.unaligned_data;
+        uint32_t data_size = LV_DRAW_BUF_SIZE(texture_w, texture_h, LV_COLOR_FORMAT_ARGB8888);
+        data = lv_realloc(data, data_size);
+        LV_ASSERT_MALLOC(data);
+        lv_result_t init_result = lv_draw_buf_init(&u->render_draw_buf, texture_w, texture_h, LV_COLOR_FORMAT_ARGB8888,
+                                                   LV_STRIDE_AUTO, data, data_size);
+        LV_ASSERT(init_result == LV_RESULT_OK);
+    }
+
+    dest_layer.draw_buf = &u->render_draw_buf;
     dest_layer.color_format = LV_COLOR_FORMAT_ARGB8888;
 
     dest_layer.buf_area = task->_real_area;
     dest_layer._clip_area = task->_real_area;
     dest_layer.phy_clip_area = task->_real_area;
-    lv_memzero(opengles_render_buf, lv_area_get_size(&dest_layer.buf_area) * 4 + 100);
+    lv_memzero(u->render_draw_buf.unaligned_data, u->render_draw_buf.data_size);
 
     lv_display_t * disp = lv_refr_get_disp_refreshing();
 
@@ -343,37 +347,7 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
         }
     }
 
-    // unsigned int texture = SDL_CreateTexture(lv_sdl_window_get_renderer(disp), SDL_PIXELFORMAT_ARGB8888,
-    //                                           SDL_TEXTUREACCESS_STATIC, texture_w, texture_h);
-    // SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-    // SDL_UpdateTexture(texture, NULL, opengles_render_buf, texture_w * 4);
-
-    unsigned int texture;
-
-    GL_CALL(glGenTextures(1, &texture));
-    GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-
-    /*Color depth: 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888)*/
-#if LV_COLOR_DEPTH == 8
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, texture_w, texture_h, 0, GL_RED, GL_UNSIGNED_BYTE, opengles_render_buf));
-#elif LV_COLOR_DEPTH == 16
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, texture_w, texture_h, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
-                         opengles_render_buf));
-#elif LV_COLOR_DEPTH == 24
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_w, texture_h, 0, GL_BGR, GL_UNSIGNED_BYTE, opengles_render_buf));
-#elif LV_COLOR_DEPTH == 32
-    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture_w, texture_h, 0, GL_BGRA, GL_UNSIGNED_BYTE,
-                         opengles_render_buf));
-#else
-#error("Unsupported color format")
-#endif
-
-    glGenerateMipmap(GL_TEXTURE_2D);
+    unsigned int texture = create_texture(texture_w, texture_h, u->render_draw_buf.data);
 
     lv_draw_dsc_base_t * base_dsc = task->draw_dsc;
 
@@ -463,7 +437,6 @@ static void blend_texture_layer(lv_draw_opengles_unit_t * u)
 
     lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
     // TODO rotation
-    // TODO blending looks wrong
     lv_opengles_render_texture(src_texture, &area, draw_dsc->opa, targ_tex_w, targ_tex_h, &clip_area, false);
 
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
@@ -607,7 +580,7 @@ static void draw_from_cached_texture(lv_draw_opengles_unit_t * u)
     if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
         lv_draw_label_dsc_t * label_dsc = t->draw_dsc;
         if(label_dsc->text_local) {
-            lv_cache_drop(u->texture_cache, &data_to_find, NULL);
+            lv_cache_drop(u->texture_cache, &data_to_find, u);
         }
     }
 }
@@ -661,6 +634,28 @@ static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u)
         GL_CALL(glGenFramebuffers(1, &u->framebuffer));
     }
     return u->framebuffer;
+}
+
+static unsigned int create_texture(int32_t w, int32_t h, const void * data)
+{
+    unsigned int texture;
+
+    GL_CALL(glGenTextures(1, &texture));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, texture));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+    GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+    GL_CALL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+
+    /* LV_COLOR_DEPTH 32, 24, 16 are supported but the cached textures will always
+     * have full ARGB pixels since the alpha channel is required for blending.
+     */
+    GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, data));
+
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    return texture;
 }
 
 #endif /*LV_USE_DRAW_OPENGLES*/

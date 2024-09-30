@@ -30,6 +30,7 @@ extern "C" {
  **********************/
 
 void lv_draw_opengles_init(void);
+void lv_draw_opengles_deinit(void);
 
 /**********************
  *      MACROS

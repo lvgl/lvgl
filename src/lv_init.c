@@ -415,6 +415,10 @@ void lv_deinit(void)
     lv_draw_dma2d_deinit();
 #endif
 
+#if LV_USE_DRAW_OPENGLES
+    lv_draw_opengles_deinit();
+#endif
+
 #if LV_USE_DRAW_SW
     lv_draw_sw_deinit();
 #endif
