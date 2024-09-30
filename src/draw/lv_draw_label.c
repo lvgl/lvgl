@@ -32,10 +32,17 @@
 /**********************
  *      TYPEDEFS
  **********************/
+enum {
+    CMD_STATE_WAIT,
+    CMD_STATE_PAR,
+    CMD_STATE_IN,
+};
+typedef unsigned char cmd_state_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static uint8_t hex_char_to_num(char hex);
 static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
                         const lv_font_t * font, uint32_t letter, lv_draw_glyph_cb_t cb);
 
@@ -260,7 +267,11 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
     int32_t underline_width = font->underline_thickness ? font->underline_thickness : 1;
     int32_t line_start_x;
     uint32_t i;
+    uint32_t par_start = 0;
     int32_t letter_w;
+    cmd_state_t cmd_state = CMD_STATE_WAIT;
+    lv_color_t recolor = lv_color_black();
+    lv_color_t color = lv_color_black();
 
     /*Write out all lines*/
     while(dsc->text[line_start] != '\0') {
@@ -268,6 +279,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
         line_start_x = pos.x;
 
         /*Write all letter of a line*/
+        cmd_state = CMD_STATE_WAIT;
         i = 0;
 #if LV_USE_BIDI
         char * bidi_txt = lv_malloc(line_end - line_start + 1);
@@ -292,6 +304,52 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
             uint32_t letter;
             uint32_t letter_next;
             lv_text_encoded_letter_next_2(bidi_txt, &letter, &letter_next, &i);
+
+            /* Handle the recolor command */
+            if((dsc->flag & LV_TEXT_FLAG_RECOLOR) != 0) {
+                if(letter == (uint32_t)LV_TXT_COLOR_CMD[0]) {
+                    if(cmd_state == CMD_STATE_WAIT) { /*Start char*/
+                        par_start = i;
+                        cmd_state = CMD_STATE_PAR;
+                        continue;
+                    }
+                    else if(cmd_state == CMD_STATE_PAR) { /*Other start char in parameter escaped cmd. char*/
+                        cmd_state = CMD_STATE_WAIT;
+                    }
+                    else if(cmd_state == CMD_STATE_IN) { /*Command end*/
+                        cmd_state = CMD_STATE_WAIT;
+                        continue;
+                    }
+                }
+
+                /*Skip the color parameter and wait the space after it*/
+                if(cmd_state == CMD_STATE_PAR) {
+                    if(letter == ' ') {
+                        /*Get the parameter*/
+                        if(i - par_start == LABEL_RECOLOR_PAR_LENGTH + 1) {
+                            char buf[LABEL_RECOLOR_PAR_LENGTH + 1];
+                            lv_memcpy(buf, &bidi_txt[par_start], LABEL_RECOLOR_PAR_LENGTH);
+                            buf[LABEL_RECOLOR_PAR_LENGTH] = '\0';
+                            int r, g, b;
+                            r = (hex_char_to_num(buf[0]) << 4) + hex_char_to_num(buf[1]);
+                            g = (hex_char_to_num(buf[2]) << 4) + hex_char_to_num(buf[3]);
+                            b = (hex_char_to_num(buf[4]) << 4) + hex_char_to_num(buf[5]);
+
+                            recolor = lv_color_make(r, g, b);
+                        }
+                        else {
+                            recolor.red = dsc->color.red;
+                            recolor.blue = dsc->color.blue;
+                            recolor.green = dsc->color.green;
+                        }
+                        cmd_state = CMD_STATE_IN; /*After the parameter the text is in the command*/
+                    }
+                    continue;
+                }
+            }
+
+            color = dsc->color;
+            if(cmd_state == CMD_STATE_IN) color = recolor;
 
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
@@ -377,6 +435,49 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+/**
+ * Convert a hexadecimal characters to a number (0..15)
+ * @param hex Pointer to a hexadecimal character (0..9, A..F)
+ * @return the numerical value of `hex` or 0 on error
+ */
+static uint8_t hex_char_to_num(char hex)
+{
+    uint8_t result = 0;
+
+    if(hex >= '0' && hex <= '9') {
+        result = hex - '0';
+    }
+    else {
+        if(hex >= 'a') hex -= 'a' - 'A'; /*Convert to upper case*/
+
+        switch(hex) {
+            case 'A':
+                result = 10;
+                break;
+            case 'B':
+                result = 11;
+                break;
+            case 'C':
+                result = 12;
+                break;
+            case 'D':
+                result = 13;
+                break;
+            case 'E':
+                result = 14;
+                break;
+            case 'F':
+                result = 15;
+                break;
+            default:
+                result = 0;
+                break;
+        }
+    }
+
+    return result;
+}
 
 static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
                         const lv_font_t * font, uint32_t letter, lv_draw_glyph_cb_t cb)
