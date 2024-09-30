@@ -8,7 +8,7 @@ If you are new to ESP-IDF, follow the instructions in the `ESP-IDF Programming g
 
 
 LVGL Demo Projects for ESP32
----------------------------
+----------------------------
 
 For a quick start with LVGL and ESP32, the following pre-configured demo projects are available for specific development boards:
 
@@ -40,7 +40,7 @@ Obtaining LVGL
 LVGL is distributed through `ESP Registry <https://components.espressif.com/>`__, where all LVGL releases are uploaded.
 In case you do not want to use esp_lvgl_port, you can add `LVGL component <https://components.espressif.com/component/lvgl/lvgl>`__ into your project with following command:
 
-.. code:: sh
+.. code-block:: sh
 
    idf.py add-dependency lvgl/lvgl^9.*
 
@@ -50,7 +50,7 @@ Adjust the ``^9.*`` part to match your LVGL version requirement. More informatio
 
 For LVGL development and testing, it may be useful to use LVGL as a local component instead of from the ESP Registry, which offers only released versions and does not allow local modifications. To do this, clone LVGL to your project with the following command:
 
-.. code:: sh
+.. code-block:: sh
 
    git submodule add https://github.com/lvgl/lvgl.git components/lvgl
 
@@ -77,7 +77,8 @@ These components share a common public API, making it easy to migrate your proje
 
 To add a display or touch driver to your project, use a command like:
 
-.. code:: sh
+.. code-block:: sh
+
    idf.py add-dependency "espressif/esp_lcd_gc9a01^2.0.0"
 
 Using the File System under ESP-IDF
@@ -91,9 +92,9 @@ The process is described in details below, using ``SPIFFS`` as demonstration.
 
    ESP-IDF has many, ready-to-use examples like
    `SPIFFS <https://github.com/espressif/esp-idf/tree/master/examples/storage/spiffsgen>`__
-   , 
-   `SD Card <https://github.com/espressif/esp-idf/tree/master/examples/storage/sd_card/sdspi>`__ 
-   and 
+   ,
+   `SD Card <https://github.com/espressif/esp-idf/tree/master/examples/storage/sd_card/sdspi>`__
+   and
    `LittleFS <https://github.com/espressif/esp-idf/tree/master/examples/storage/littlefs>`__
    .
 
@@ -141,7 +142,7 @@ The process is described in details below, using ``SPIFFS`` as demonstration.
    It supports various formats and compression.
 
    Meanwhile 3rd party libraries
-   (like :ref:`LodePNG<lodepng>` and :ref:`Tiny JPEG<tjpgd>`)
+   (like :ref:`LodePNG<lodepng_rst>` and :ref:`Tiny JPEG<tjpgd>`)
    allow using image files without conversion.
 
    After preparing the files, they should be moved to the target device:

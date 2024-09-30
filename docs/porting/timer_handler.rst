@@ -13,7 +13,7 @@ periodically in one of the following:
 
 Example:
 
-.. code:: c
+.. code-block:: c
 
    while(1) {
      uint32_t time_till_next = lv_timer_handler();
@@ -24,7 +24,7 @@ If you want to use :cpp:func:`lv_timer_handler` in a super-loop, a helper
 function :cpp:func:`lv_timer_handler_run_in_period` is provided to simplify
 the porting:
 
-.. code:: c
+.. code-block:: c
 
    while(1) {
       ...
@@ -34,7 +34,7 @@ the porting:
 
 Or use the sleep time automatically calculated by LVGL:
 
-.. code:: c
+.. code-block:: c
 
    while(1) {
      ...
@@ -45,7 +45,7 @@ Or use the sleep time automatically calculated by LVGL:
 In an OS environment, you can use it together with the **delay** or
 **sleep** provided by OS to release CPU whenever possible:
 
-.. code:: c
+.. code-block:: c
 
    while (1) {
       uint32_t time_till_next = lv_timer_handler();

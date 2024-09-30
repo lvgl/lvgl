@@ -85,7 +85,7 @@ this debug information to the serial interface. To enable this feature
 you have to edit the ``lv_conf.h`` file and enable logging in the
 section ``log settings``:
 
-.. code:: c
+.. code-block:: c
 
    /*Log settings*/
    #define USE_LV_LOG      1   /*Enable/disable the log module*/

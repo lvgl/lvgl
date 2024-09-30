@@ -37,15 +37,21 @@ Follow the generic instructions for getting started with LVGL. After copying
 `lv_conf_template.h` to  `lv_conf.h` make the following changes to the latter:
 
 1. Enable QNX support:
-.. code::
+
+.. code-block:: c
+
     #define LV_USE_QNX 1
 
 2. Set colour depth to 32:
-.. code::
+
+.. code-block:: c
+
     #define LV_COLOR_DEPTH 32
 
 3. (Optional) Enable double-buffering:
-.. code::
+
+.. code-block:: c
+
     #define LV_QNX_BUF_COUNT 2
 
 Build LVGL as a Library
@@ -59,7 +65,7 @@ The top-level `qnx` directory includes a recursive make file for building LVGL,
 both as a shared library and as a static library for the supported
 architectures. To build all libraries, simply invoke `make` in this directory:
 
-.. code:: shell
+.. code-block:: shell
 
     # cd $(LVGL_ROOT)/env_support/qnx
     # make
@@ -68,7 +74,7 @@ If you prefer to build for a specific architecture and variant, go to the
 appropriate directory and run `make` there. For example, to build a shared
 library for ARMv8:
 
-.. code:: shell
+.. code-block:: shell
 
     # cd $(LVGL_ROOT)/env_support/qnx/aarch64/so.le
     # make
@@ -97,7 +103,7 @@ identical to that of a LVGL application written for any other platform.
 
 The following code shows how to create a "Hello World" application:
 
-.. code:: c
+.. code-block:: c
 
     #include <lvgl.h>
 
@@ -135,7 +141,7 @@ and then linking against the library. This can be done in many ways, using
 different build systems. The following is a simple make file for the example
 above, which builds for ARMv8 with the shared library:
 
-.. code:: makefile
+.. code-block:: makefile
 
     CC=qcc -Vgcc_ntoaarch64le
 

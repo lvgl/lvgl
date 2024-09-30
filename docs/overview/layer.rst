@@ -66,8 +66,10 @@ There are four explicit ways to bring an object to the foreground:
 - Use :cpp:expr:`lv_obj_swap(obj1, obj2)` to swap the relative layer position of two objects.
 - When :cpp:expr:`lv_obj_set_parent(obj, new_parent)` is used, ``obj`` will be on the foreground of the ``new_parent``.
 
+
 Screen-like layers
 ******************
+
 .. _layers_top_and_sys:
 
 Top and sys layers
@@ -128,7 +130,7 @@ In this case widget will be sliced into ``LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE`` siz
 If there is no memory for a new chunk, LVGL will try allocating layer when another chunk is rendered and freed.
 
 
-Transformed Layer
+Transformed layer
 -----------------
 
 When the widget is transformed a larger part of the widget needs to rendered to provide enough data for transformation. LVGL tries to render as small area of the widget as possible, but due to the nature of transformations no slicing is possible in this case.

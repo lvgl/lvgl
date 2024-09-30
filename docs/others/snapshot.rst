@@ -36,7 +36,7 @@ to invalidate cache by :cpp:func:`lv_image_cache_drop` before destroy the draw b
 
 Below code snippet explains usage of this API.
 
-.. code:: c
+.. code-block:: c
 
    void update_snapshot(lv_obj_t * obj, lv_obj_t * img_snapshot)
    {

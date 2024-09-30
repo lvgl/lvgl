@@ -88,14 +88,14 @@ First you need to install the pre-requisites on your system
 Let's use the `Windows Subsystem for
 Linux <https://acassis.wordpress.com/2018/01/10/how-to-build-nuttx-on-windows-10/>`__
 
-.. code:: shell
+.. code-block:: shell
 
    $ sudo apt-get install automake bison build-essential flex gcc-arm-none-eabi gperf git libncurses5-dev libtool libusb-dev libusb-1.0.0-dev pkg-config kconfig-frontends openocd
 
 Now let's create a workspace to save our files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: shell
+.. code-block:: shell
 
    $ mkdir ~/nuttxspace
    $ cd ~/nuttxspace
@@ -103,7 +103,7 @@ Now let's create a workspace to save our files
 Clone the NuttX and Apps repositories:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: shell
+.. code-block:: shell
 
    $ git clone https://github.com/apache/incubator-nuttx nuttx
    $ git clone https://github.com/apache/incubator-nuttx-apps apps
@@ -111,7 +111,7 @@ Clone the NuttX and Apps repositories:
 Configure NuttX to use the stm32f429i-disco board and the LVGL Demo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: shell
+.. code-block:: shell
 
    $ ./tools/configure.sh stm32f429i-disco:lvgl
    $ make
@@ -119,7 +119,7 @@ Configure NuttX to use the stm32f429i-disco board and the LVGL Demo
 If everything went fine you should have now the file ``nuttx.bin`` to
 flash on your board:
 
-.. code:: shell
+.. code-block:: shell
 
    $ ls -l nuttx.bin
    -rwxrwxr-x 1 alan alan 287144 Jun 27 09:26 nuttx.bin
@@ -127,13 +127,13 @@ flash on your board:
 Flashing the firmware in the board using OpenOCD:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: shell
+.. code-block:: shell
 
    $ sudo openocd -f interface/stlink-v2.cfg -f target/stm32f4x.cfg -c init -c "reset halt" -c "flash write_image erase nuttx.bin 0x08000000"
 
 Reset the board and using the 'NSH>' terminal start the LVGL demo:
 
-.. code:: shell
+.. code-block:: shell
 
    nsh> lvgldemo
 

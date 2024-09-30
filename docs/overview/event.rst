@@ -123,8 +123,8 @@ Input device events
 -  :cpp:enumerator:`LV_EVENT_SCROLL_THROW_BEGIN`:
 -  :cpp:enumerator:`LV_EVENT_SCROLL_END`: Scrolling ends
 -  :cpp:enumerator:`LV_EVENT_SCROLL`: Scrolling
--  :cpp:enumerator:`LV_EVENT_GESTURE`: A gesture is detected. Get the gesture with :cpp:expr:`lv_indev_get_gesture_dir(lv_indev_active());`
--  :cpp:enumerator:`LV_EVENT_KEY`: A key is sent to the object. Get the key with :cpp:expr:`lv_indev_get_key(lv_indev_active());`
+-  :cpp:enumerator:`LV_EVENT_GESTURE`: A gesture is detected. Get the gesture with :cpp:expr:`lv_indev_get_gesture_dir(lv_indev_active())`
+-  :cpp:enumerator:`LV_EVENT_KEY`: A key is sent to the object. Get the key with :cpp:expr:`lv_indev_get_key(lv_indev_active())`
 -  :cpp:enumerator:`LV_EVENT_FOCUSED`: The object is focused
 -  :cpp:enumerator:`LV_EVENT_DEFOCUSED`: The object is defocused
 -  :cpp:enumerator:`LV_EVENT_LEAVE`: The object is defocused but still selected
@@ -200,20 +200,20 @@ Sending events
 **************
 
 To manually send events to an object, use
-:cpp:expr:`lv_obj_send_event(obj, <EVENT_CODE>, &some_data)`.
+``lv_obj_send_event(obj, <EVENT_CODE>, &some_data)``.
 
 For example, this can be used to manually close a message box by
 simulating a button press (although there are simpler ways to do this):
 
-.. code:: c
+.. code-block:: c
 
    /*Simulate the press of the first button (indexes start from zero)*/
    uint32_t btn_id = 0;
    lv_obj_send_event(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
 
 The same works for display and input devices with
-:cpp:expr:`lv_display_send_event(obj, <EVENT_CODE>, &some_data)` and
-:cpp:expr:`lv_indev_send_event(obj, <EVENT_CODE>, &some_data)`.
+``lv_display_send_event(obj, <EVENT_CODE>, &some_data)`` and
+``lv_indev_send_event(obj, <EVENT_CODE>, &some_data)``.
 
 Refresh event
 -------------

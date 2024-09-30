@@ -16,14 +16,14 @@ Library source: https://github.com/libjpeg-turbo/libjpeg-turbo
 Install
 -------
 
-.. code:: bash
+.. code-block:: bash
 
     sudo apt install libjpeg-turbo8-dev
 
 Add libjpeg-turbo to your project
 ---------------------------------
 
-.. code:: cmake
+.. code-block:: cmake
 
     find_package(JPEG REQUIRED)
     include_directories(${JPEG_INCLUDE_DIR})

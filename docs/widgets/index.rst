@@ -15,7 +15,6 @@ Widgets
     buttonmatrix
     calendar
     chart
-    colorwheel
     canvas
     checkbox
     dropdown

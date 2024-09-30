@@ -358,6 +358,10 @@ void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_
                                  lv_style_selector_t selector)
 {
     LV_PROFILER_STYLE_BEGIN;
+
+    /*Stop running transitions wit this property */
+    trans_delete(obj, lv_obj_style_get_selector_part(selector), prop, NULL);
+
     lv_style_t * style = get_local_style(obj, selector);
     if(selector == LV_PART_MAIN && lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_TRANSFORM)) {
         lv_obj_invalidate(obj);

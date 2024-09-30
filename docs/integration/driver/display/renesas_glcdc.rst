@@ -11,7 +11,7 @@ Overview
     :alt: Architectural overview of Renesas GLCDC
     :align: center
 
-|
+<br/>
 
 GLCDC is a multi-stage graphics output peripheral used in Renesas MCUs.
 It is designed to automatically generate timing and data signals for different LCD panels.
@@ -25,11 +25,14 @@ It is designed to automatically generate timing and data signals for different L
 - Supports brightness adjustment, contrast adjustment, and gamma correction
 - Supports GLCDC interrupts to handle frame-buffer switching or underflow detection
 
-| Setting up a project and further integration with Renesas' ecosystem is described in detail on :ref:`page Renesas <renesas>`. 
-| Check out the following repositories for ready-to-use examples:
+
+Setting up a project and further integration with Renesas' ecosystem is described in detail on :ref:`page Renesas <renesas>`.
+Check out the following repositories for ready-to-use examples:
+
 - `EK-RA8D1 <https://github.com/lvgl/lv_port_renesas_ek-ra8d1>`__
 - `EK-RA6M3G <https://github.com/lvgl/lv_port_renesas_ek-ra6m3g>`__
 - `RX72N Envision Kit <https://github.com/lvgl/lv_port_renesas_rx72n-envision-kit>`__
+
 
 Prerequisites
 -------------
@@ -44,7 +47,7 @@ There is no need to implement any platform-specific functions.
 
 The following code demonstrates using the diver in :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_DIRECT` mode.
 
-.. code:: c
+.. code-block:: c
 
     lv_display_t * disp = lv_renesas_glcdc_direct_create();
     lv_display_set_default(disp);
@@ -54,7 +57,7 @@ preferably in the fastest available memory region.
 
 Buffer swapping can be activated by passing a second buffer of same size instead of the :cpp:expr:`NULL` argument.
 
-.. code:: c
+.. code-block:: c
 
     static lv_color_t partial_draw_buf[DISPLAY_HSIZE_INPUT0 * DISPLAY_VSIZE_INPUT0 / 10] BSP_PLACE_IN_SECTION(".sdram") BSP_ALIGN_VARIABLE(1024);
 
@@ -71,7 +74,7 @@ Screen rotation
 
 Software based screen rotation is supported in partial mode. It uses the common API, no extra configuration is required:
 
-.. code:: c
+.. code-block:: c
 
     lv_display_set_rotation(lv_display_get_default(), LV_DISP_ROTATION_90);
     /* OR */

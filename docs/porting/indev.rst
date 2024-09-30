@@ -82,9 +82,11 @@ The final diff is calculated like this:
 
 ``diff_final = diff_in * (indev_sensitivity / 256) +  (widget_sensitivity / 256);``
 
+
 For example, if both the indev and widget sensitivity is set to 128 (0.5), the input diff. will be
 multiplied by 0.25 (divided by 4). The value of the widget will be incremented by this value or
 the widget will be scrolled this amount of pixels.
+
 
 Keypad or keyboard
 ------------------
@@ -150,7 +152,7 @@ added to groups.
      else data->state = LV_INDEV_STATE_RELEASED;
    }
 
-Using Buttons with Encoder Logic
+Using buttons with Encoder logic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In addition to standard encoder behavior, you can also utilize its logic
