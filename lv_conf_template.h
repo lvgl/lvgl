@@ -602,6 +602,9 @@
  *  In these languages characters should be replaced with another form based on their position in the text */
 #define LV_USE_ARABIC_PERSIAN_CHARS 0
 
+/*The control character to use for signaling text recoloring*/
+#define LV_TXT_COLOR_CMD "#"
+
 /*==================
  * WIDGETS
  *================*/
