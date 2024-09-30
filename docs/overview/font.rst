@@ -313,7 +313,7 @@ Example
    /*Free the font if not required anymore*/
    lv_binfont_destroy(my_font);
 
-Load a Font from a Memory Buffer at Run-Time
+Load a font from a memory buffer at run-time
 ********************************************
 
 :cpp:func:`lv_binfont_create_from_buffer` can be used to load a font from a memory buffer.
@@ -397,8 +397,8 @@ line 1
 
     #!/usr/bin/env python3
 
-Example for a 12-px Font
-------------------------
+Example for a 12px font
+-----------------------
 
 .. code-block:: console
 

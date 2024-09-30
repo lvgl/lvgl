@@ -34,7 +34,7 @@ If the coming pixels are not repeated, it stores the non-repeat count value and
 original color value. For more details, the script used to compress the image
 can be found from ``lvgl/script/LVGLImage.py``.
 
-.. code:: python
+.. code-block:: python
 
     def rle_compress(self, data: bytearray, blksize: int, threshold=16):
         index = 0
@@ -71,7 +71,7 @@ Usage
 To use the RLE Decoder, enable it in ``lv_conf.h`` configuration file by setting :c:macro:`LV_USE_RLE` to `1`.
 The RLE image can be used same as other images.
 
-.. code:: c
+.. code-block:: c
 
    lv_image_set_src(img, "path/to/image.rle");
 
@@ -81,6 +81,6 @@ Generate RLE compressed binary images
 The image can be directly generated using script ``lvgl/script/LVGLImage.py``
 
 
-.. code:: bash
+.. code-block:: bash
 
    ./script/LVGLImage.py --ofmt BIN --cf I8 --compress RLE cogwheel.png

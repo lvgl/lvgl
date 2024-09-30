@@ -40,7 +40,7 @@ Button's text
 There is a text on each button. To specify them a descriptor string
 array, called *map*, needs to be used. The map can be set with
 :cpp:expr:`lv_buttonmatrix_set_map(buttonm, my_map)`. The declaration of a map should
-look like :cpp:expr:`const char * map[] = {"button1", "button2", "button3", NULL}`. Note
+look like ``const char * map[] = {"button1", "button2", "button3", NULL}``. Note
 that the last element has to be either ``NULL`` or an empty string
 (``""``)!
 

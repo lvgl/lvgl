@@ -24,13 +24,13 @@ Configure X11 driver
 --------------------
 
 1. Enable the X11 driver support in lv_conf.h, by cmake compiler define or by KConfig
-    .. code:: c
+    .. code-block:: c
 
         #define LV_USE_X11  1
 
 2. Optional configuration options:
     -  Direct Exit
-        .. code:: c
+        .. code-block:: c
 
             #define LV_X11_DIRECT_EXIT  1 /*preferred default - ends the application automatically if last window has been closed*/
             // or
@@ -38,14 +38,14 @@ Configure X11 driver
 
 
     -  Double buffering
-        .. code:: c
+        .. code-block:: c
 
             #define LV_X11_DOUBLE_BUFFER  1 /*preferred default*/
             // or
             #define LV_X11_DOUBLE_BUFFER  0 /*not recommended*/
 
     - Render mode
-        .. code:: c
+        .. code-block:: c
 
             #define LV_X11_RENDER_MODE_PARTIAL 1  /*LV_DISPLAY_RENDER_MODE_PARTIAL, preferred default*/
             // or
@@ -59,7 +59,7 @@ Usage
 | The minimal initialisation opening a window and enabling keyboard/mouse support
 | (e.g. in main.c, LV_X11_DIRECT_EXIT must be 1):
 
-.. code:: c
+.. code-block:: c
 
     int main(int argc, char ** argv)
     {
@@ -85,7 +85,7 @@ Usage
 | Full initialisation with mouse pointer symbol and own application exit handling
 | (dependent on LV_X11_DIRECT_EXIT (can be 1 or 0))
 
-.. code:: c
+.. code-block:: c
 
     bool terminated = false;
 

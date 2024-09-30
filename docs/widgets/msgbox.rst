@@ -45,7 +45,7 @@ If ``parent`` is ``NULL`` the message box will be modal.
 E.g. ``const char * btn_txts[] = {"Ok", "Cancel", NULL}``.
 
 
-Get the Parts
+Get the parts
 -------------
 
 The building blocks of the message box can be obtained using the

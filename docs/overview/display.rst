@@ -86,10 +86,10 @@ types are :ref:`Base object <lv_obj>` and :ref:`Image <lv_image>`
 (to create a wallpaper).
 
 To create a screen, use
-:cpp:expr:`lv_obj_t * scr = lv_<type>_create(NULL)`. ``NULL`` indicates no parent.
+``lv_obj_t * scr = lv_<type>_create(NULL)``. ``NULL`` indicates no parent.
 
 To load a screen, use :cpp:expr:`lv_screen_load(scr)`. To get the active screen,
-use :cpp:expr:`lv_screen_active()`. These functions work on the default display. If
+use :cpp:func:`lv_screen_active`. These functions work on the default display. If
 you want to specify which display to work on, use
 :cpp:expr:`lv_display_get_screen_active(disp)` and :cpp:expr:`lv_display_load_screen(disp, scr)`. A
 screen can be loaded with animations too. Read more

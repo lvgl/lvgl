@@ -27,7 +27,7 @@ Use GIF images from file
 
 For example:
 
-.. code:: c
+.. code-block:: c
 
    lv_gif_set_src(obj, "S:path/to/example.gif");
 

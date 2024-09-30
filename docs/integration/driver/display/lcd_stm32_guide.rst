@@ -80,7 +80,7 @@ Step-by-step instructions
 #. We are ready with the hardware configuration. Save the configuration and let STM32Cube generate the source.
 #. In the project tree clone the LVGL repository into the Middlewares/Third_Party folder (this tutorial uses the release/v9.0 branch of LVGL):
 	
-	.. code:: dosbatch
+	.. code-block:: dosbatch
 	
 		git clone https://github.com/lvgl/lvgl.git -b release/v9.0
 	
@@ -88,20 +88,20 @@ Step-by-step instructions
 #. Open 'lv_conf.h', and in line 15 change ``#if 0`` to ``#if 1``.
 #. Search for the string ``LV_USE_ST7735``, and enable the appropriate LCD driver by setting its value to 1. This example uses the ST7789 driver:
 
-	.. code:: c
+	.. code-block:: c
 	
 		#define LV_USE_ST7789		1
 	
 #. Right click the folder 'Middlewares/Third_Party/lvgl/tests', select Resource Configurations/Exclude from Build..., check both Debug and Release, then press OK.
 #. Right click the project name and select "Properties". In the C/C++ Build/Settings panel select MCU GCC Compiler/Include paths. In the Configuration dropdown select [ All configurations ]. Add the following Include path:
 
-	.. code:: c
+	.. code-block:: c
 	
 		../Middlewares/Third_Party/lvgl
 		
 #. Open Core/Src/stm32xxx_it.c (the file name depends on the processor variation). Add 'lv_tick.h' to the Private includes section:
 
-	.. code:: c
+	.. code-block:: c
 	
 		/* Private includes ----------------------------------------------------------*/
 		/* USER CODE BEGIN Includes */
@@ -110,7 +110,7 @@ Step-by-step instructions
 
 #. Find the function ``TIM2_IRQHandler``. Add a call to ``lv_tick_inc()``:
 
-	.. code:: c
+	.. code-block:: c
 
 		void TIM2_IRQHandler(void)
 		{
@@ -126,7 +126,7 @@ Step-by-step instructions
 
 #. Save the file, then open Core/Src/main.c. Add the following lines to the Private includes (if your LCD uses other than the ST7789, replace the driver path and header with the appropriate one):
 
-	.. code:: c
+	.. code-block:: c
 
 		/* Private includes ----------------------------------------------------------*/
 		/* USER CODE BEGIN Includes */
@@ -136,7 +136,7 @@ Step-by-step instructions
 
 #. Add the following lines to Private defines (change them according to your LCD specs):
 
-	.. code:: c
+	.. code-block:: c
 
 		#define LCD_H_RES	240
 		#define LCD_V_RES	320
@@ -145,7 +145,7 @@ Step-by-step instructions
 
 #. Add the following lines to the Private variables:
 
-	.. code:: c
+	.. code-block:: c
 		
 		osThreadId LvglTaskHandle;
 		lv_display_t *lcd_disp;
@@ -153,21 +153,21 @@ Step-by-step instructions
 
 #. Add the following line to the Private function prototypes:
 
-	.. code:: c
+	.. code-block:: c
 
 		void ui_init(lv_display_t *disp);
 		void LVGL_Task(void const *argument);
 
 #. Add the following lines after USER CODE BEGIN RTOS_THREADS:
 
-	.. code:: c
+	.. code-block:: c
 
 		osThreadDef(LvglTask, LVGL_Task, osPriorityIdle, 0, 1024);
 		LvglTaskHandle = osThreadCreate(osThread(LvglTask), NULL);
 
 #. Copy and paste the hardware initialization and the transfer callback functions from the example code after USER CODE BEGIN 4:
 
-	.. code:: c
+	.. code-block:: c
 
 		/* USER CODE BEGIN 4 */
 
@@ -250,7 +250,7 @@ Step-by-step instructions
 
 #. Add the LVGL_Task() function. Replace the ``lv_st7789_create()`` call with the appropriate driver. You can change the default orientation by adjusting the parameter of ``lv_display_set_rotation()``. You will also need to create the display buffers here. This example uses a double buffering scheme with 1/10th size partial buffers. In most cases this is a good compromise between the required memory size and performance, but you are free to experiment with other settings.
 
-	.. code:: c
+	.. code-block:: c
 	
 		void LVGL_Task(void const *argument)
 		{
@@ -297,7 +297,7 @@ Step-by-step instructions
 
 #. All that's left is to implement ``ui_init()`` to create the screen. Here's a simple "Hello World" example:
 
-	.. code:: c
+	.. code-block:: c
 
 		void ui_init(lv_display_t *disp)
 		{

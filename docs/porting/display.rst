@@ -183,7 +183,7 @@ It's very important that draw buffer(s) should be large enough for any
 selected color format.
 
 
-Swap Endianness
+Swap endianness
 ---------------
 
 In case of RGB565 color format it might be required to swap the 2 bytes
@@ -350,7 +350,8 @@ Further reading
 
 -  `lv_port_disp_template.c <https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_disp_template.c>`__
    for a template for your own driver.
--  :ref:`Drawing <porting_draw>` to learn more about how rendering works in LVGL.
+-  :ref:`Drawing <porting_draw>` to learn more about how rendering
+   works in LVGL.
 -  :ref:`display_features` to learn more about higher
    level display features.
 

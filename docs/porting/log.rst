@@ -41,7 +41,7 @@ can register a "logger" callback with :cpp:func:`lv_log_register_print_cb`.
 
 For example:
 
-.. code:: c
+.. code-block:: c
 
    void my_log_cb(lv_log_level_t level, const char * buf)
    {
