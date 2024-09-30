@@ -17,6 +17,7 @@ extern "C" {
 #include "lv_xkb.h"
 
 #if defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB
+#include "../../misc/lv_types.h"
 
 /*********************
  *      DEFINES

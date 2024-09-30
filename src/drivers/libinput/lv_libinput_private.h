@@ -17,6 +17,7 @@ extern "C" {
 #include "lv_libinput.h"
 
 #if LV_USE_LIBINPUT
+#include "../../misc/lv_types.h"
 
 #if LV_LIBINPUT_XKB
 #include "lv_xkb_private.h"
