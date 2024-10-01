@@ -139,7 +139,7 @@ typedef struct lv_fs_file_cache_t lv_fs_file_cache_t;
 
 typedef struct lv_fs_path_ex_t lv_fs_path_ex_t;
 
-typedef struct _lv_image_decoder_args_t lv_image_decoder_args_t;
+typedef struct lv_image_decoder_args_t lv_image_decoder_args_t;
 
 typedef struct lv_image_cache_data_t lv_image_cache_data_t;
 
@@ -184,8 +184,6 @@ typedef struct lv_button_t lv_button_t;
 typedef struct lv_buttonmatrix_t lv_buttonmatrix_t;
 
 typedef struct lv_calendar_t lv_calendar_t;
-
-typedef struct lv_calendar_chinese_t lv_calendar_chinese_t;
 
 typedef struct lv_canvas_t lv_canvas_t;
 
