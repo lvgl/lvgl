@@ -1035,7 +1035,9 @@
  * DEVICES
  *==================*/
 
-/** Use SDL to open window on PC and handle mouse and keyboard. */
+/** Use SDL to open window on PC and handle mouse and keyboard.
+ *  If using lvgl via CMake, you should also set the `LV_USE_SDL` CMake option.
+ */
 #define LV_USE_SDL              0
 #if LV_USE_SDL
     #define LV_SDL_INCLUDE_PATH     <SDL2/SDL.h>

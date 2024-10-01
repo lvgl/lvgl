@@ -8,6 +8,9 @@ option(LV_LVGL_H_INCLUDE_SIMPLE
 option(LV_CONF_INCLUDE_SIMPLE
        "Use #include \"lv_conf.h\" instead of #include \"../../lv_conf.h\"" ON)
 
+option(LV_USE_SDL
+       "Link SDL2::SDL2 target to lvgl. Enable this if you use LV_USE_SDL in your lv_conf.h." OFF)
+
 # Option LV_CONF_PATH, which should be the path for lv_conf.h
 # If set parent path LV_CONF_DIR is added to includes
 if( LV_CONF_PATH )
@@ -39,6 +42,17 @@ endif()
 # Add definition of LV_CONF_SKIP only if needed
 if(LV_CONF_SKIP)
   target_compile_definitions(lvgl PUBLIC LV_CONF_SKIP=1)
+endif()
+
+if(LV_USE_SDL)
+  find_package(SDL2 REQUIRED)
+  if(TARGET SDL2::SDL2)
+    target_link_libraries(lvgl PRIVATE SDL2::SDL2)
+  elseif(TARGET SDL2::SDL2-static)
+    target_link_libraries(lvgl PRIVATE SDL2::SDL2-static)
+  else()
+    message(FATAL_ERROR "SDL2 package does not define a valid target (SDL2::SDL2 or SDL2::SDL2-static)")
+  endif()
 endif()
 
 # Include root and optional parent path of LV_CONF_PATH
