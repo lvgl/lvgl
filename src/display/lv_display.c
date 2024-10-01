@@ -821,6 +821,17 @@ lv_result_t lv_display_send_event(lv_display_t * disp, lv_event_code_t code, voi
     return res;
 }
 
+lv_area_t * lv_event_get_invalidated_area(lv_event_t * e)
+{
+    if(e->code == LV_EVENT_INVALIDATE_AREA) {
+        return lv_event_get_param(e);
+    }
+    else {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return NULL;
+    }
+}
+
 void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation)
 {
     if(disp == NULL) disp = lv_display_get_default();

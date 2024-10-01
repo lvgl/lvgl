@@ -480,6 +480,13 @@ uint32_t lv_display_remove_event_cb_with_user_data(lv_display_t * disp, lv_event
 lv_result_t lv_display_send_event(lv_display_t * disp, lv_event_code_t code, void * param);
 
 /**
+ * Get the area to be invalidated. Can be used in `LV_EVENT_INVALIDATE_AREA`
+ * @param e     pointer to an event
+ * @return      the area to invalidated (can be modified as required)
+ */
+lv_area_t * lv_event_get_invalidated_area(lv_event_t * e);
+
+/**
  * Set the theme of a display. If there are no user created widgets yet the screens' theme will be updated
  * @param disp      pointer to a display
  * @param th        pointer to a theme
