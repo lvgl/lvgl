@@ -270,8 +270,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
     uint32_t par_start = 0;
     int32_t letter_w;
     cmd_state_t cmd_state = CMD_STATE_WAIT;
-    lv_color_t recolor = lv_color_black();
-    lv_color_t color = lv_color_black();
+    lv_color_t recolor = lv_color_black(); /* Holds the selected color inside the recolor command */
 
     /*Write out all lines*/
     while(dsc->text[line_start] != '\0') {
@@ -348,9 +347,6 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
                 }
             }
 
-            color = dsc->color;
-            if(cmd_state == CMD_STATE_IN) color = recolor;
-
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
             /*Always set the bg_coordinates for placeholder drawing*/
@@ -386,6 +382,9 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
                 draw_letter_dsc.color = dsc->sel_color;
                 fill_dsc.color = dsc->sel_bg_color;
                 cb(draw_unit, NULL, &fill_dsc, &bg_coords);
+            }
+            else if(cmd_state == CMD_STATE_IN) {
+                draw_letter_dsc.color = recolor;
             }
             else {
                 draw_letter_dsc.color = dsc->color;
