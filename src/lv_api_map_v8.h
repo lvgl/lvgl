@@ -56,7 +56,8 @@ typedef lv_anim_completed_cb_t      lv_anim_ready_cb_t;
 typedef lv_screen_load_anim_t       lv_scr_load_anim_t;
 
 #if LV_USE_BUTTONMATRIX
-typedef lv_buttonmatrix_ctrl_t      lv_btnmatrix_ctrl_t;
+//FIXME 报错，先屏蔽
+// typedef lv_buttonmatrix_ctrl_t      lv_btnmatrix_ctrl_t;
 #endif /* LV_USE_BUTTONMATRIX */
 
 #if LV_USE_IMAGEBUTTON
