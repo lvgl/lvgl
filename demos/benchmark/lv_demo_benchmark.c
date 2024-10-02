@@ -187,8 +187,8 @@ static void rotated_argb_image_cb(void)
     lv_obj_set_style_pad_bottom(scr, FALL_HEIGHT + PAD_BASIC, 0);
 
     LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_argb);
-    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 180;   /*180 instead of 160 to have less rotated images*/
-    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 180;
+    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 240;   /*240 instead of 160 to have less rotated images*/
+    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 240;
 
     if(hor_cnt < 1) hor_cnt = 1;
     if(ver_cnt < 1) ver_cnt = 1;
@@ -224,7 +224,7 @@ static void multiple_labels_cb(void)
                      LV_TEXT_FLAG_NONE);
 
     int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / (s.x * 3 / 2);
-    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / (s.y  * 2);
+    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / (s.y  * 3);
 
     if(hor_cnt < 1) hor_cnt = 1;
     if(ver_cnt < 1) ver_cnt = 1;
@@ -451,16 +451,16 @@ static void widgets_demo_cb(void)
  **********************/
 
 static scene_dsc_t scenes[] = {
-    //    {.name = "Empty screen",               .scene_time = 3000, .create_cb = empty_screen_cb},
-    //    {.name = "Moving wallpaper",           .scene_time = 3000, .create_cb = moving_wallpaper_cb},
-    //    {.name = "Single rectangle",           .scene_time = 3000, .create_cb = single_rectangle_cb},
-    //    {.name = "Multiple rectangles",        .scene_time = 3000, .create_cb = multiple_rectangles_cb},
-    //    {.name = "Multiple RGB images",        .scene_time = 3000, .create_cb = multiple_rgb_images_cb},
-    //    {.name = "Multiple ARGB images",       .scene_time = 3000, .create_cb = multiple_argb_images_cb},
-    //    {.name = "Rotated ARGB images",        .scene_time = 3000, .create_cb = rotated_argb_image_cb},
-    //    {.name = "Multiple labels",            .scene_time = 3000, .create_cb = multiple_labels_cb},
-    //    {.name = "Screen sized text",          .scene_time = 5000, .create_cb = screen_sized_text_cb},
-    //    {.name = "Multiple arcs",              .scene_time = 3000, .create_cb = multiple_arcs_cb},
+    {.name = "Empty screen",               .scene_time = 3000, .create_cb = empty_screen_cb},
+    {.name = "Moving wallpaper",           .scene_time = 3000, .create_cb = moving_wallpaper_cb},
+    {.name = "Single rectangle",           .scene_time = 3000, .create_cb = single_rectangle_cb},
+    {.name = "Multiple rectangles",        .scene_time = 3000, .create_cb = multiple_rectangles_cb},
+    {.name = "Multiple RGB images",        .scene_time = 3000, .create_cb = multiple_rgb_images_cb},
+    {.name = "Multiple ARGB images",       .scene_time = 3000, .create_cb = multiple_argb_images_cb},
+    {.name = "Rotated ARGB images",        .scene_time = 3000, .create_cb = rotated_argb_image_cb},
+    {.name = "Multiple labels",            .scene_time = 3000, .create_cb = multiple_labels_cb},
+    {.name = "Screen sized text",          .scene_time = 5000, .create_cb = screen_sized_text_cb},
+    {.name = "Multiple arcs",              .scene_time = 3000, .create_cb = multiple_arcs_cb},
 
     {.name = "Containers",                 .scene_time = 3000, .create_cb = containers_cb},
     {.name = "Containers with overlay",    .scene_time = 3000, .create_cb = containers_with_overlay_cb},
