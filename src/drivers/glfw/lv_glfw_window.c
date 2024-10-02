@@ -110,7 +110,7 @@ void lv_glfw_window_delete(lv_glfw_window_t * window)
     if(window->use_indev) {
         lv_glfw_texture_t * texture;
         LV_LL_READ(&window->textures, texture) {
-            lv_indev_delete(texture->indev);
+            if(texture->indev != NULL) lv_indev_delete(texture->indev);
         }
     }
     lv_ll_clear(&window->textures);
