@@ -91,17 +91,24 @@ Layouts           <=== Heading seen in documentation
     grid
 ```
 
-The first line is for the purposes of providing a uniquely-named link target that can be referenced elsewhere in the documentation.
+The first line is for the purposes of providing a uniquely-named link target that
+can be referenced elsewhere in the documentation.
 
     .. _{LINK NAME}:
 
-Replace `{LINK NAME}` with a link name that is unique among all documents under the `./docs/` directory.  It can have multiple words if needed or otherwise appropriate. While separating multiple words with spaces technically can work, we prefer separating these words with hyphens.  Example:  `ref-base-object`, to refer to the "Base Object" page in the Reference section of the documentation.
+Note that `{LINK NAME}` MUST be preceded by a single underscore.
+
+Replace `{LINK NAME}` with a link name that is unique among all documents under the `./docs/` directory.  It can have multiple words if needed to make it unique or when otherwise appropriate.  If multiple words are used, they can be separated with single spaces, hyphens or underscores.  Whatever you use, the separators used in `{LINK NAME}` must be identical.  `{LINK NAME}` strings are not case sensitive.  Example: `ref-base-object`, to refer to the "Base Object" page in the Reference section of the documentation.
 
 That unique name is then used to provide a link reference elsewhere in the documentation like this:
 
     :ref:`{LINK NAME}`
 
-The `.. _{LINK NAME}:` line should be above a heading and there **must** be a single empty line after it for the documentation-generation logic to process it correctly.
+This in-line markup (interpreted text) is then replaced by the title of the file or section heading just below the link target.  For this reason, there are 2 rules that **must** be followed for `:ref:` in-line link references to work:
+
+- the `.. _{LINK NAME}:` line **must** be above an `.rst` title or section heading, and
+
+- there **must** be a single empty line after it for the documentation-generation logic to process it correctly.
 
 
 ### Section Headings
@@ -116,7 +123,7 @@ This Is a Heading
 
 reStructuredText does not impose any particular heading levels assigned to certain characters since the structure is determined from the succession of headings.  So if you are modifying an existing .RST file, please follow the pattern already in use.
 
-If you are creating a new .RST file, this convention is used:
+If you are creating a new .RST file, use this convention:
 
     =====
     Title
@@ -165,23 +172,26 @@ To create a bulleted list, do the following:
     - item1 description
     - If you want to span multiple
       lines it must be done like this
-    - item3:  If you want to use a code block it must be
-      intended with the list item like this:
+    - If you want to include a code block under a list item, it must
+      be intended to match the list item's indentation like this:
 
       .. code-block: python
 
           # this is some code
 
-    - item4:  If you want to have several layers of bullets, indent
-      each new layer with the parent list item like this:
+    - If you want to have nested bulleted lists, indent each
+      new level to align with its parent list item like this:
 
       - level 2 item 1: text
       - level 2 item 2: text
 
-End all lists (including nested lists) with at least 1 empty line.
+    - Last list item.  Note that the nested list above is preceded
+      and followed by 1 blank line.
+
+All lists (including nested lists) **must** be preceded and followed with at least 1 blank line.  This is mandatory for the documentation-generation logic to process it correctly.
 
 
-### Referencing Portions of the API
+### Referencing API Documentation
 
 If you want to reference portions of the LVGL code from the documentation (in .RST files) there are special directives to do this:
 
