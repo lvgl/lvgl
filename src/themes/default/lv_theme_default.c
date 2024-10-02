@@ -940,7 +940,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.switch_knob, LV_PART_KNOB);
         lv_obj_add_style(obj, &theme->styles.disabled, LV_PART_KNOB | LV_STATE_DISABLED);
 
-        //        lv_obj_add_style(obj, &theme->styles.transition_normal, LV_PART_INDICATOR | LV_STATE_CHECKED);
+        lv_obj_add_style(obj, &theme->styles.transition_normal, LV_PART_INDICATOR | LV_STATE_CHECKED);
         lv_obj_add_style(obj, &theme->styles.transition_normal, LV_PART_INDICATOR);
     }
 #endif

@@ -399,18 +399,18 @@ static void widgets_demo_cb(void)
  **********************/
 
 static scene_dsc_t scenes[] = {
-    //    {.name = "Empty screen",               .scene_time = 3000, .create_cb = empty_screen_cb},
-    //    {.name = "Moving wallpaper",           .scene_time = 3000, .create_cb = moving_wallpaper_cb},
-    //    {.name = "Single rectangle",           .scene_time = 3000, .create_cb = single_rectangle_cb},
-    //    {.name = "Multiple rectangles",        .scene_time = 3000, .create_cb = multiple_rectangles_cb},
-    //    {.name = "Multiple RGB images",        .scene_time = 3000, .create_cb = multiple_rgb_images_cb},
-    //    {.name = "Multiple ARGB images",       .scene_time = 3000, .create_cb = multiple_argb_images_cb},
-    //    {.name = "Rotated ARGB images",        .scene_time = 3000, .create_cb = rotated_argb_image_cb},
-    //    {.name = "Multiple labels",            .scene_time = 3000, .create_cb = multiple_labels_cb},
-    //    {.name = "Screen sized text",          .scene_time = 5000, .create_cb = screen_sized_text_cb},
-    //    {.name = "Multiple arcs",              .scene_time = 3000, .create_cb = multiple_arcs_cb},
-    //
-    //    {.name = "Containers",                 .scene_time = 3000, .create_cb = containers_cb},
+    {.name = "Empty screen",               .scene_time = 3000, .create_cb = empty_screen_cb},
+    {.name = "Moving wallpaper",           .scene_time = 3000, .create_cb = moving_wallpaper_cb},
+    {.name = "Single rectangle",           .scene_time = 3000, .create_cb = single_rectangle_cb},
+    {.name = "Multiple rectangles",        .scene_time = 3000, .create_cb = multiple_rectangles_cb},
+    {.name = "Multiple RGB images",        .scene_time = 3000, .create_cb = multiple_rgb_images_cb},
+    {.name = "Multiple ARGB images",       .scene_time = 3000, .create_cb = multiple_argb_images_cb},
+    {.name = "Rotated ARGB images",        .scene_time = 3000, .create_cb = rotated_argb_image_cb},
+    {.name = "Multiple labels",            .scene_time = 3000, .create_cb = multiple_labels_cb},
+    {.name = "Screen sized text",          .scene_time = 5000, .create_cb = screen_sized_text_cb},
+    {.name = "Multiple arcs",              .scene_time = 3000, .create_cb = multiple_arcs_cb},
+
+    {.name = "Containers",                 .scene_time = 3000, .create_cb = containers_cb},
     {.name = "Containers with overlay",    .scene_time = 3000, .create_cb = containers_with_overlay_cb},
     {.name = "Containers with opa",        .scene_time = 3000, .create_cb = containers_with_opa_cb},
     {.name = "Containers with opa_layer",  .scene_time = 3000, .create_cb = containers_with_opa_layer_cb},
