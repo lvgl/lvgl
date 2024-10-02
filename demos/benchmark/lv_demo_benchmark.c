@@ -262,6 +262,10 @@ static void screen_sized_text_cb(void)
     lv_label_set_text(obj, txt);
 
     lv_obj_update_layout(obj);
+    if(lv_obj_get_height(obj) < ver_res * 2) {
+        lv_label_set_text_fmt(obj, "%s\n\n%s", txt, txt);
+        lv_obj_update_layout(obj);
+    }
 
     scroll_anim(scr, lv_obj_get_scroll_bottom(scr));
 }
@@ -729,7 +733,8 @@ static void summary_create(void)
 static void color_anim_cb(void * var, int32_t v)
 {
     LV_UNUSED(v);
-    lv_obj_set_style_bg_color(var, rnd_color(), 0);
+    lv_color_t c = rnd_color();
+    lv_obj_set_style_bg_color(var, c, 0);
     lv_obj_set_style_text_color(var, rnd_color(), 0);
 }
 
@@ -860,6 +865,23 @@ static int32_t rnd_next(int32_t min, int32_t max)
         0x8357a17d, 0x97e9c9cc, 0xad10ff52, 0x9923fc5c,
         0x8f2c840a, 0x20356ba2, 0x7997a677, 0x9a7f1800,
         0x35c7562b, 0xd901fe51, 0x8f4e053d, 0xa5b94923,
+        0xd2c5eedd, 0x24f0cc9b, 0x3aa7b571, 0xd289a1c9,
+        0x79c7dc3,  0x5bf68c86, 0xc9f55239, 0x42052cfb,
+        0x63dae9df, 0x75c9e11f, 0x407f9151, 0x104ebc63,
+        0xb4b52591, 0x53a46b7a, 0x9398d144, 0x9a7c6c3d,
+        0x76b35b78, 0xa028e33e, 0xbfe586e4, 0xf3f79731,
+        0x99591738, 0xd7b0a847, 0x1ffb1936, 0xfeeea2e4,
+        0xbc896279, 0xa8241a72, 0x871124fa, 0x27bb9866,
+        0x41794272, 0x92f5dc59, 0x98c9d185, 0x6fc5905b,
+        0xf0ba9f1a, 0x771cad1b, 0xf6285752, 0xb5ffcbc5,
+        0x6fd2b63c, 0x2c404190, 0x209469e6, 0x628531b1,
+        0x98a726bc, 0xcc6c0d97, 0x86c2e7b9, 0x7bc12e1f,
+        0xf9a67e10, 0xd5bf101f, 0xa1aaaf35, 0x69b078fc,
+        0x71d698b2, 0x9a954baa, 0xe7423a82, 0xdd9898e1,
+        0xf4980e5c, 0x4f3607b9, 0x9ce35d27, 0xb4b764e0,
+        0xa1fa3ad3, 0x220ad165, 0x282216b4, 0x7e583888,
+        0xf8315b2b, 0x81c27062, 0x8eb89a85,     /*Intentionally incomplete line to make the length of array more arbitrary*/
+
     };
 
     if(min == max) return min;
