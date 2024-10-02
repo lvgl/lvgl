@@ -30,11 +30,11 @@ There are also some Python specific libraries that need to be installed. You can
 * sphinx-rtd-dark-mode
 * typing-extensions
 
-To install using the `requirements.txt` file use the following command.
+To install using the `requirements.txt` file use the following command:
 
     pip install -r requirements.txt
 
-Once you have all of the requirements installed you are ready to build them. To build the documentation use the following command.
+Once you have all of the requirements installed you are ready to build the documentation.  Use the following command:
 
     python build.py skip_latex clean
 
@@ -42,14 +42,14 @@ You may have to use the following command if you are on a Unix like OS
 
     python3 build.py skip_latex clean
 
-The documentation will be output into the folder `out_html` in the root directory for LVGL.
+The documentation will be output into `./out_html/` in the root directory for LVGL.
 
 
 ## For Developers
 
 The most important thing that has to be done when contributing to LVGL is ***EVERYTHING MUST BE DOCUMENTED***.
 
-The below are some rules to follow when updating any of the `.rst` files located in the docs folder and any of it's subfolders.
+The below are some rules to follow when updating any of the `.rst` files located in the `./docs/` directory and any of it's subdirectories.
 
 
 ### index.rst files
@@ -91,20 +91,19 @@ Layouts           <=== Heading seen in documentation
     grid
 ```
 
-The first line is for the purposes of providing a uniquely-named link target that
-can be referenced elsewhere in the documentation.
+The first line is for the purposes of providing a uniquely-named link target that can be referenced elsewhere in the documentation.
 
     .. _{LINK NAME}:
 
-Note that `{LINK NAME}` MUST be preceded by a single underscore.
+Note that `{LINK NAME}` **must** be preceded by a single underscore.
 
-Replace `{LINK NAME}` with a link name that is unique among all documents under the `./docs/` directory.  It can have multiple words if needed to make it unique or when otherwise appropriate.  If multiple words are used, they can be separated with single spaces, hyphens or underscores.  Whatever you use, the separators used in `{LINK NAME}` must be identical.  `{LINK NAME}` strings are not case sensitive.  Example: `ref-base-object`, to refer to the "Base Object" page in the Reference section of the documentation.
+Replace `{LINK NAME}` with a link name that is unique among all documents under the `./docs/` directory.  It can have multiple words if needed to make it unique or when otherwise appropriate for clarity.  If multiple words are used, they can be separated with single spaces, hyphens or underscores.  Whatever you use, the separators used in `{LINK NAME}` must be identical.  `{LINK NAME}` strings are not case sensitive.  Example: `ref-base-object` refers to the "Base Object" page in the Reference section of the documentation.
 
 That unique name is then used to provide a link reference elsewhere in the documentation like this:
 
     :ref:`{LINK NAME}`
 
-This in-line markup (interpreted text) is then replaced by the title of the file or section heading just below the link target.  For this reason, there are 2 rules that **must** be followed for `:ref:` in-line link references to work:
+This in-line markup (interpreted text) is then replaced by the name of the section heading just below the link target.  For this reason, there are 2 rules that **must** be followed for `:ref:` in-line link references to work:
 
 - the `.. _{LINK NAME}:` line **must** be above an `.rst` title or section heading, and
 
@@ -113,7 +112,7 @@ This in-line markup (interpreted text) is then replaced by the title of the file
 
 ### Section Headings
 
-[Section headers](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#sections) are created by underlining (and optionally overlining) the section title with a punctuation character, at least as long as the text.  Example:
+[Section headings](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#sections) are created by underlining (and optionally overlining) the section title with a punctuation character, at least as long as the text.  Example:
 
 ```
 =================
@@ -146,45 +145,56 @@ If you are creating a new .RST file, use this convention:
 
 Note that the "underlining" can be longer than the heading title, but if it is shorter, the documentation-generation logic will fail with an error.
 
-For improved readability in the .RST file, place at least 2 blank lines above headings.
+For improved readability in the .RST file, place at least 2 blank lines above section headings.
 
 
 ### Code Blocks
 
 * Do not use tab characters in code blocks.
-* Indentations use 4 spaces.
+* Each indentation level use 4 spaces.
 * Include at least 1 empty line after a code block.
 * There must be one empty line between the code block directive and the code.
-* `.. code-block::` is the only directive that should be used.  Note carefully that unlike the link target directive above, this directive has 2 colons.  (The only ReST and sphinx directives that are valid with one `:` are link targets as shown above.)  Lone `::`, `:code:` or `.. code:` should not be used.
-* For syntax coloring appropriate to the language, specify the language after the directive.  Some examples are:
-  - `.. code-block:: python`,
+* `.. code-block::` is the only directive that should be used.  Note carefully that unlike the link target directive above, this directive has 2 colons.  (The only ReST and sphinx directives that are valid with one colon are link targets as shown above.)  Lone `::`, `:code:` or `.. code:` should not be used.
+* If you want to separate code into easier-to-understand sections you can do so with a single empty line.
+* For syntax highlighting appropriate to the language in the code block, specify the language after the directive.  Some examples are:
   - `.. code-block:: c`,
+  - `.. code-block:: cpp`,
+  - `.. code-block:: python`,
   - `.. code-block:: shell`,
+  - `.. code-block:: kconfig`,
+  - `.. code-block:: json`,
+  - `.. code-block:: yaml`,
+  - `.. code-block:: csharp` (or "cs"),
+  - `.. code-block:: vb.net`,
+  - `.. code-block:: dot` (graphviz),
+  - `.. code-block:: html`,
+  - `.. code-block:: css`,
+  - `.. code-block:: xml`,
   - `.. code-block:: make`.
-* If you want to separate code into easier-to-understand sections you can do so with a single empty line.  No more than ONE line.
 
+The full set of supported lexers are listed here:  https://pygments.org/docs/lexers/ .
 
 
 ### Bulleted Lists
 
 To create a bulleted list, do the following:
 
-    - item1 description
-    - If you want to span multiple
-      lines it must be done like this
-    - If you want to include a code block under a list item, it must
-      be intended to match the list item's indentation like this:
+    - First item description
+    - If you want to span multiple lines, indent subsequent
+      lines to align with item text like this.
+    - If you want to include a code block under a list item,
+      it must be intended to align with the list item like this:
 
       .. code-block: python
-
+                                 <=== blank line here is important
           # this is some code
-
+                                 <=== blank line here is important
     - If you want to have nested bulleted lists, indent each
       new level to align with its parent list item like this:
-
+                                 <=== blank line here is important
       - level 2 item 1: text
       - level 2 item 2: text
-
+                                 <=== blank line here is important
     - Last list item.  Note that the nested list above is preceded
       and followed by 1 blank line.
 
@@ -207,8 +217,7 @@ There is a special directive when wanting to use a more complex expression.  For
 
     :cpp:expr:`lv_obj_set_layout(obj, LV_LAYOUT_FLEX)`
 
-Arguments that are expressions (more than one word), or contain non-alphanumeric characters
-will cause the `:cpp:expr:` interpreted-text role to fail.  Examples:
+Arguments that are expressions (more than one word), or contain non-alphanumeric characters will cause the `:cpp:expr:` interpreted-text to fail.  Examples:
 
     :cpp:expr:`lv_obj_set_layout(obj, LV_LAYOUT_FLEX/GRID)`         <== arg with > 1 word
     :cpp:expr:`lv_obj_set_layout(obj, LV_LAYOUT_*)`                 <== asterisk
