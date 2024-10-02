@@ -313,8 +313,8 @@ static void containers_cb(void)
     lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
     lv_obj_set_style_pad_bottom(scr, FALL_HEIGHT + PAD_BASIC, 0);
 
-    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 300;
-    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 150;
+    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 350;
+    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 170;
 
     if(hor_cnt < 1) hor_cnt = 1;
     if(ver_cnt < 1) ver_cnt = 1;
@@ -337,8 +337,8 @@ static void containers_with_overlay_cb(void)
     lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
     lv_obj_set_style_pad_bottom(scr, FALL_HEIGHT + PAD_BASIC, 0);
 
-    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 300;
-    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 150;
+    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 350;
+    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 170;
 
     if(hor_cnt < 1) hor_cnt = 1;
     if(ver_cnt < 1) ver_cnt = 1;
@@ -364,8 +364,8 @@ static void containers_with_opa_cb(void)
     lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
     lv_obj_set_style_pad_bottom(scr, FALL_HEIGHT + PAD_BASIC, 0);
 
-    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 300;
-    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 150;
+    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 350;
+    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 170;
 
     if(hor_cnt < 1) hor_cnt = 1;
     if(ver_cnt < 1) ver_cnt = 1;
@@ -389,8 +389,8 @@ static void containers_with_opa_layer_cb(void)
     lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
     lv_obj_set_style_pad_bottom(scr, FALL_HEIGHT + PAD_BASIC, 0);
 
-    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 300;
-    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 150;
+    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 350;
+    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 170;
 
     if(hor_cnt < 1) hor_cnt = 1;
     if(ver_cnt < 1) ver_cnt = 1;
@@ -414,13 +414,13 @@ static void containers_with_scrolling_cb(void)
     lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
     lv_obj_set_style_pad_row(scr, 32, 0);
 
-    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 300;
+    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 400;
     int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / (120 + 32);
 
     if(hor_cnt < 1) hor_cnt = 1;
     if(ver_cnt < 1) ver_cnt = 1;
 
-    ver_cnt *= 3; /*To make it scroll*/
+    ver_cnt *= 2; /*To make it scroll*/
     if(ver_cnt < 20) ver_cnt = 20; /*The test with many widgets*/
 
     int32_t y;
@@ -451,16 +451,16 @@ static void widgets_demo_cb(void)
  **********************/
 
 static scene_dsc_t scenes[] = {
-    {.name = "Empty screen",               .scene_time = 3000, .create_cb = empty_screen_cb},
-    {.name = "Moving wallpaper",           .scene_time = 3000, .create_cb = moving_wallpaper_cb},
-    {.name = "Single rectangle",           .scene_time = 3000, .create_cb = single_rectangle_cb},
-    {.name = "Multiple rectangles",        .scene_time = 3000, .create_cb = multiple_rectangles_cb},
-    {.name = "Multiple RGB images",        .scene_time = 3000, .create_cb = multiple_rgb_images_cb},
-    {.name = "Multiple ARGB images",       .scene_time = 3000, .create_cb = multiple_argb_images_cb},
-    {.name = "Rotated ARGB images",        .scene_time = 3000, .create_cb = rotated_argb_image_cb},
-    {.name = "Multiple labels",            .scene_time = 3000, .create_cb = multiple_labels_cb},
-    {.name = "Screen sized text",          .scene_time = 5000, .create_cb = screen_sized_text_cb},
-    {.name = "Multiple arcs",              .scene_time = 3000, .create_cb = multiple_arcs_cb},
+    //    {.name = "Empty screen",               .scene_time = 3000, .create_cb = empty_screen_cb},
+    //    {.name = "Moving wallpaper",           .scene_time = 3000, .create_cb = moving_wallpaper_cb},
+    //    {.name = "Single rectangle",           .scene_time = 3000, .create_cb = single_rectangle_cb},
+    //    {.name = "Multiple rectangles",        .scene_time = 3000, .create_cb = multiple_rectangles_cb},
+    //    {.name = "Multiple RGB images",        .scene_time = 3000, .create_cb = multiple_rgb_images_cb},
+    //    {.name = "Multiple ARGB images",       .scene_time = 3000, .create_cb = multiple_argb_images_cb},
+    //    {.name = "Rotated ARGB images",        .scene_time = 3000, .create_cb = rotated_argb_image_cb},
+    //    {.name = "Multiple labels",            .scene_time = 3000, .create_cb = multiple_labels_cb},
+    //    {.name = "Screen sized text",          .scene_time = 5000, .create_cb = screen_sized_text_cb},
+    //    {.name = "Multiple arcs",              .scene_time = 3000, .create_cb = multiple_arcs_cb},
 
     {.name = "Containers",                 .scene_time = 3000, .create_cb = containers_cb},
     {.name = "Containers with overlay",    .scene_time = 3000, .create_cb = containers_with_overlay_cb},
