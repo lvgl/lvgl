@@ -111,6 +111,11 @@ void lv_draw_opengles_deinit(void)
 {
     lv_free(g_unit->render_draw_buf.unaligned_data);
     lv_cache_destroy(g_unit->texture_cache, g_unit);
+    if(g_unit->framebuffer != 0) {
+        GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+        GL_CALL(glDeleteFramebuffers(1, &g_unit->framebuffer));
+    }
+    g_unit = NULL;
 }
 
 /**********************
@@ -366,44 +371,6 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
 
 static void blend_texture_layer(lv_draw_opengles_unit_t * u)
 {
-    // lv_display_t * disp = lv_refr_get_disp_refreshing();
-    // SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
-
-    // SDL_Rect clip_rect;
-    // clip_rect.x = u->base_unit.clip_area->x1;
-    // clip_rect.y = u->base_unit.clip_area->y1;
-    // clip_rect.w = lv_area_get_width(u->base_unit.clip_area);
-    // clip_rect.h = lv_area_get_height(u->base_unit.clip_area);
-
-    // lv_draw_task_t * t = u->task_act;
-    // lv_draw_image_dsc_t * draw_dsc = t->draw_dsc;
-    // SDL_Rect rect;
-    // rect.w = (lv_area_get_width(&t->area) * draw_dsc->scale_x) / 256;
-    // rect.h = (lv_area_get_height(&t->area) * draw_dsc->scale_y) / 256;
-
-    // rect.x = -draw_dsc->pivot.x;
-    // rect.y = -draw_dsc->pivot.y;
-    // rect.x = (rect.x * draw_dsc->scale_x) / 256;
-    // rect.y = (rect.y * draw_dsc->scale_y) / 256;
-    // rect.x += t->area.x1 + draw_dsc->pivot.x;
-    // rect.y += t->area.y1 + draw_dsc->pivot.y;
-
-    // lv_layer_t * src_layer = (lv_layer_t *)draw_dsc->src;
-    // SDL_Texture * src_texture = layer_get_texture(src_layer);
-
-    // SDL_SetTextureAlphaMod(src_texture, draw_dsc->opa);
-    // SDL_SetTextureBlendMode(src_texture, SDL_BLENDMODE_BLEND);
-    // SDL_SetRenderTarget(renderer, layer_get_texture(u->base_unit.target_layer));
-    // SDL_RenderSetClipRect(renderer, &clip_rect);
-
-    // SDL_Point center = {draw_dsc->pivot.x, draw_dsc->pivot.y};
-    // SDL_RenderCopyEx(renderer, src_texture, NULL, &rect, draw_dsc->rotation / 10, &center, SDL_FLIP_NONE);
-    // //    SDL_RenderCopy(renderer, src_texture, NULL, &rect);
-
-    // SDL_DestroyTexture(src_texture);
-    // SDL_RenderSetClipRect(renderer, NULL);
-
-
     lv_area_t clip_area = *u->base_unit.clip_area;
 
     lv_draw_task_t * t = u->task_act;
@@ -452,7 +419,6 @@ static void draw_from_cached_texture(lv_draw_opengles_unit_t * u)
 
     cache_data_t data_to_find;
     data_to_find.draw_dsc = (lv_draw_dsc_base_t *)t->draw_dsc;
-
     data_to_find.w = lv_area_get_width(&t->_real_area);
     data_to_find.h = lv_area_get_height(&t->_real_area);
     data_to_find.texture = 0;
@@ -484,80 +450,13 @@ static void draw_from_cached_texture(lv_draw_opengles_unit_t * u)
 
     cache_data_t * data_cached = lv_cache_entry_get_data(entry_cached);
     unsigned int texture = data_cached->texture;
-    // lv_display_t * disp = lv_refr_get_disp_refreshing();
-    // SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
 
     lv_layer_t * dest_layer = u->base_unit.target_layer;
-    // SDL_Rect clip_rect;
-    // clip_rect.x = u->base_unit.clip_area->x1 - dest_layer->buf_area.x1;
-    // clip_rect.y = u->base_unit.clip_area->y1 - dest_layer->buf_area.y1;
-    // clip_rect.w = lv_area_get_width(u->base_unit.clip_area);
-    // clip_rect.h = lv_area_get_height(u->base_unit.clip_area);
-
-    // SDL_Rect rect;
-
-    // SDL_SetRenderTarget(renderer, layer_get_texture(dest_layer));
-
-    // rect.x = t->_real_area.x1 - dest_layer->buf_area.x1;
-    // rect.y = t->_real_area.y1 - dest_layer->buf_area.y1;
-    // rect.w = data_cached->w;
-    // rect.h = data_cached->h;
-
-    // SDL_RenderSetClipRect(renderer, &clip_rect);
-    // SDL_RenderCopy(renderer, texture, NULL, &rect);
-
-    // SDL_RenderSetClipRect(renderer, NULL);
-
 
     unsigned int target_texture = layer_get_texture(dest_layer);
     LV_ASSERT(target_texture != 0);
     int32_t targ_tex_w = lv_area_get_width(&dest_layer->buf_area);
     int32_t targ_tex_h = lv_area_get_height(&dest_layer->buf_area);
-
-
-    // int32_t src_x = 0;
-    // int32_t src_y = 0;
-
-    // int32_t dst_x = u->base_unit.clip_area->x1;
-    // int32_t dst_y = u->base_unit.clip_area->y1;
-
-    // int32_t width = lv_area_get_width(u->base_unit.clip_area);
-    // int32_t height = lv_area_get_height(u->base_unit.clip_area);
-
-    // int32_t dst_x = t->_real_area.x1;
-    // int32_t dst_y = t->_real_area.y1;
-
-    // int32_t width = lv_area_get_width(&t->_real_area);
-    // int32_t height = lv_area_get_height(&t->_real_area);
-
-
-    // lv_area_t a_disp = {0};
-    // lv_area_set_width(&a_disp, lv_display_get_horizontal_resolution(disp));
-    // lv_area_set_height(&a_disp, lv_display_get_vertical_resolution(disp));
-
-    // lv_area_t a_intersect;
-    // lv_area_intersect(&a_intersect, &t->_real_area, &a_disp);
-
-    // int32_t dst_x = a_intersect.x1;
-    // int32_t dst_y = a_intersect.y1;
-
-    // int32_t width = lv_area_get_width(&a_intersect);
-    // int32_t height = lv_area_get_height(&a_intersect);
-
-
-    // int32_t dst_x = u->base_unit.clip_area->x1 - dest_layer->buf_area.x1;
-    // int32_t dst_y = u->base_unit.clip_area->y1 - dest_layer->buf_area.y1;
-
-    // int32_t width = lv_area_get_width(u->base_unit.clip_area);
-    // int32_t height = lv_area_get_height(u->base_unit.clip_area);
-
-    // /*                        (GLuint srcName, GLenum srcTarget, GLint srcLevel, GLint srcX, GLint srcY, GLint srcZ,
-    //                            GLuint dstName, GLenum dstTarget, GLint dstLevel, GLint dstX, GLint dstY, GLint dstZ,
-    //                            GLsizei srcWidth, GLsizei srcHeight, GLsizei srcDepth); */
-    // GL_CALL(glCopyImageSubData(texture,      GL_TEXTURE_2D, 0, src_x, src_y, 0,
-    //                            target_texture, GL_TEXTURE_2D, 0, dst_x, dst_y, 0,
-    //                            width, height, 1));
-
 
     GL_CALL(glBindTexture(GL_TEXTURE_2D, target_texture));
 
@@ -576,7 +475,7 @@ static void draw_from_cached_texture(lv_draw_opengles_unit_t * u)
 
     lv_cache_release(u->texture_cache, entry_cached, u);
 
-    /*Do not cache label's with local text as the text will be freed*/
+    /*Do not cache labels with local text as the text will be freed*/
     if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
         lv_draw_label_dsc_t * label_dsc = t->draw_dsc;
         if(label_dsc->text_local) {
