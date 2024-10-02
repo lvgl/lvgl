@@ -1,52 +1,56 @@
 #include "./lv_i18n.h"
 #include "../../../src/stdlib/lv_string.h"
 
-////////////////////////////////////////////////////////////////////////////////
-// Define plural operands
-// http://unicode.org/reports/tr35/tr35-numbers.html#Operands
 
-// Integer version, simplified
+/**
+ * Define plural operands
+ * http://unicode.org/reports/tr35/tr35-numbers.html#Operands
+ */
 
-#define UNUSED(x) (void)(x)
+/* Integer version, simplified */
 
 static inline uint32_t op_n(int32_t val)
 {
     return (uint32_t)(val < 0 ? -val : val);
 }
+
 static inline uint32_t op_i(uint32_t val)
 {
     return val;
 }
-// always zero, when decimal part not exists.
+
+/* always zero, when decimal part not exists. */
 static inline uint32_t op_v(uint32_t val)
 {
-    UNUSED(val);
+    LV_UNUSED(val);
     return 0;
 }
+
 static inline uint32_t op_w(uint32_t val)
 {
-    UNUSED(val);
+    LV_UNUSED(val);
     return 0;
 }
 static inline uint32_t op_f(uint32_t val)
 {
-    UNUSED(val);
+    LV_UNUSED(val);
     return 0;
 }
+
 static inline uint32_t op_t(uint32_t val)
 {
-    UNUSED(val);
+    LV_UNUSED(val);
     return 0;
 }
 
 static uint8_t en_plural_fn(int32_t num)
 {
     uint32_t n = op_n(num);
-    UNUSED(n);
+    LV_UNUSED(n);
     uint32_t i = op_i(n);
-    UNUSED(i);
+    LV_UNUSED(i);
     uint32_t v = op_v(n);
-    UNUSED(v);
+    LV_UNUSED(v);
 
     if(i == 1 && v == 0) return LV_I18N_PLURAL_TYPE_ONE;
     return LV_I18N_PLURAL_TYPE_OTHER;
@@ -80,15 +84,13 @@ static lv_i18n_phrase_t ar_singulars[] = {
     {"Distance", "المسافة"},
     {"Top speed", "السرعة القصوى"},
     {"March %d", "مارس %d"},
-    {NULL, NULL} // End mark
+    {NULL, NULL} /* End mark */
 };
-
-
 
 static uint8_t ar_plural_fn(int32_t num)
 {
     uint32_t n = op_n(num);
-    UNUSED(n);
+    LV_UNUSED(n);
 
     uint32_t n100 = n % 100;
     if(n == 0) return LV_I18N_PLURAL_TYPE_ZERO;
@@ -127,14 +129,12 @@ static lv_i18n_phrase_t zh_singulars[] = {
     {"Distance", "距离"},
     {"Top speed", "最高时速"},
     {"March %d", "三月 %d"},
-    {NULL, NULL} // End mark
+    {NULL, NULL} /* End mark */
 };
-
-
 
 static uint8_t zh_plural_fn(int32_t num)
 {
-    UNUSED(num);
+    LV_UNUSED(num);
 
     return LV_I18N_PLURAL_TYPE_OTHER;
 }
@@ -150,13 +150,10 @@ const lv_i18n_language_pack_t lv_i18n_language_pack[] = {
     &en_lang,
     &ar_lang,
     &zh_lang,
-    NULL // End mark
+    NULL /* End mark */
 };
 
-////////////////////////////////////////////////////////////////////////////////
-
-
-// Internal state
+/* Internal state */
 static const lv_i18n_language_pack_t * current_lang_pack;
 static const lv_i18n_lang_t * current_lang;
 
@@ -195,7 +192,7 @@ int lv_i18n_set_locale(const char * l_name)
     uint16_t i;
 
     for(i = 0; current_lang_pack[i] != NULL; i++) {
-        // Found -> finish
+        /* Found -> finish */
         if(lv_strcmp(current_lang_pack[i]->locale_name, l_name) == 0) {
             current_lang = current_lang_pack[i];
             return 0;
@@ -232,17 +229,17 @@ const char * lv_i18n_get_text(const char * msg_id)
     const lv_i18n_lang_t * lang = current_lang;
     const void * txt;
 
-    // Search in current locale
+    /* Search in current locale */
     if(lang->singulars != NULL) {
         txt = __lv_i18n_get_text_core(lang->singulars, msg_id);
         if(txt != NULL) return txt;
     }
 
-    // Try to fallback
+    /* Try to fallback */
     if(lang == current_lang_pack[0]) return msg_id;
     lang = current_lang_pack[0];
 
-    // Repeat search for default locale
+    /* Repeat search for default locale */
     if(lang->singulars != NULL) {
         txt = __lv_i18n_get_text_core(lang->singulars, msg_id);
         if(txt != NULL) return txt;
@@ -265,7 +262,7 @@ const char * lv_i18n_get_text_plural(const char * msg_id, int32_t num)
     const void * txt;
     lv_i18n_plural_type_t ptype;
 
-    // Search in current locale
+    /* Search in current locale */
     if(lang->locale_plural_fn != NULL) {
         ptype = lang->locale_plural_fn(num);
 
@@ -275,11 +272,11 @@ const char * lv_i18n_get_text_plural(const char * msg_id, int32_t num)
         }
     }
 
-    // Try to fallback
+    /* Try to fallback */
     if(lang == current_lang_pack[0]) return msg_id;
     lang = current_lang_pack[0];
 
-    // Repeat search for default locale
+    /* Repeat search for default locale */
     if(lang->locale_plural_fn != NULL) {
         ptype = lang->locale_plural_fn(num);
 

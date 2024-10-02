@@ -522,7 +522,7 @@ lv_color_format_t lv_display_get_color_format(lv_display_t * disp)
 
 void lv_display_set_tile_cnt(lv_display_t * disp, uint32_t tile_cnt)
 {
-    LV_ASSERT_FORMAT_MSG(tile_cnt < 256, "tile_cnt must be smaller than 256 (%d was used)", tile_cnt);
+    LV_ASSERT_FORMAT_MSG(tile_cnt < 256, "tile_cnt must be smaller than 256 (%" LV_PRId32 " was used)", tile_cnt);
 
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
