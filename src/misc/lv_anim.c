@@ -536,6 +536,7 @@ static void anim_timer(lv_timer_t * param)
                 int32_t act_time_original = a->act_time; /*The unclipped version is used later to correctly repeat the animation*/
                 if(a->act_time > a->duration) a->act_time = a->duration;
 
+                int32_t act_time_before_exec = a->act_time;
                 int32_t new_value;
                 new_value = a->path_cb(a);
 
@@ -546,7 +547,10 @@ static void anim_timer(lv_timer_t * param)
                     if(!state.anim_list_changed && a->custom_exec_cb) a->custom_exec_cb(a, new_value);
                 }
 
-                a->act_time = act_time_original;
+                /*Restore the original time to see is there is over time.
+                 *Restore only if it wasn't changed in the `exec_cb` for some special reasons.*/
+                if(a->act_time == act_time_before_exec) a->act_time = act_time_original;
+
                 /*If the time is elapsed the animation is ready*/
                 if(!state.anim_list_changed && a->act_time >= a->duration) {
                     anim_completed_handler(a);
