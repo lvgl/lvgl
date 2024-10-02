@@ -163,7 +163,7 @@ for line in fin.read().splitlines():
     fout.write(f'{line}\n')
 
 fout.write(
-'''
+r'''
 
 /*----------------------------------
  * End of parsing lv_conf_template.h
@@ -213,6 +213,9 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
         #define LV_DRAW_THREAD_STACK_SIZE LV_DRAW_THREAD_STACKSIZE
     #endif
 #endif
+
+/*Allow only upper case letters and '/'  ('/' is a special case for backward compatibility)*/
+#define LV_FS_IS_VALID_LETTER(l) ((l) == '/' || ((l) >= 'A' && (l) <= 'Z'))
 
 /* If running without lv_conf.h, add typedefs with default value. */
 #ifdef LV_CONF_SKIP
