@@ -65,15 +65,15 @@ If you would rather try LVGL on your own project follow these steps:
 
      lv_display_set_flush_cb(display, my_disp_flush);
 
-     void my_disp_flush(lv_display_t * disp, const lv_area_t * area, lv_color_t * color_p)
+     void my_disp_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
      {
          int32_t x, y;
          /*It's a very slow but simple implementation.
-          *`set_pixel` needs to be written by you to a set pixel on the screen*/
+          *`put_px` needs to be written by you to put a pixel on the screen*/
          for(y = area->y1; y <= area->y2; y++) {
              for(x = area->x1; x <= area->x2; x++) {
-                 set_pixel(x, y, *color_p);
-                 color_p++;
+                 put_px(x, y, *px_map);
+                 px_map++;
              }
          }
 
