@@ -95,6 +95,19 @@ void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
 int32_t lv_text_get_width(const char * txt, uint32_t length, const lv_font_t * font, int32_t letter_space);
 
 /**
+ * Give the length of a text with a given font with text flags
+ * @param txt a '\0' terminate string
+ * @param length length of 'txt' in byte count and not characters (Á is 1 character but 2 bytes in
+ * UTF-8)
+ * @param font pointer to a font
+ * @param letter_space letter space
+ * @param flags settings for the text from ::lv_text_flag_t
+ * @return length of a char_num long text
+ */
+int32_t lv_text_get_width_with_flags(const char * txt, uint32_t length, const lv_font_t * font, int32_t letter_space,
+                                     lv_text_flag_t flags);
+
+/**
  * Check if c is command state
  * @param state
  * @param c

@@ -399,8 +399,40 @@ int32_t lv_text_get_width(const char * txt, uint32_t length, const lv_font_t * f
             uint32_t letter_next;
             lv_text_encoded_letter_next_2(txt, &letter, &letter_next, &i);
 
-            /*TODO: Check foor recolor flag*/
-            if(0 /*(flag & LV_TEXT_FLAG_RECOLOR) != 0*/) {
+            int32_t char_width = lv_font_get_glyph_width(font, letter, letter_next);
+            if(char_width > 0) {
+                width += char_width;
+                width += letter_space;
+            }
+        }
+
+        if(width > 0) {
+            width -= letter_space; /*Trim the last letter space. Important if the text is center
+                                      aligned*/
+        }
+    }
+
+    return width;
+}
+
+int32_t lv_text_get_width_with_flags(const char * txt, uint32_t length, const lv_font_t * font, int32_t letter_space,
+                                     lv_text_flag_t flags)
+{
+    if(txt == NULL) return 0;
+    if(font == NULL) return 0;
+    if(txt[0] == '\0') return 0;
+
+    uint32_t i                   = 0;
+    int32_t width             = 0;
+    lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
+
+    if(length != 0) {
+        while(i < length) {
+            uint32_t letter;
+            uint32_t letter_next;
+            lv_text_encoded_letter_next_2(txt, &letter, &letter_next, &i);
+
+            if((flags & LV_TEXT_FLAG_RECOLOR) != 0) {
                 if(lv_text_is_cmd(&cmd_state, letter) != false) {
                     continue;
                 }
