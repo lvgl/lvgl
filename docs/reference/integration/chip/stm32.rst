@@ -39,8 +39,8 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
    /* Frame buffers
     * Static or global buffer(s). The second buffer is optional
     * TODO: Adjust color format and choose buffer size. DISPLAY_WIDTH * 10 is one suggestion. */
-   #define BYTE_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /*will be 2 for RGB565 */
-   #define BUFF_SIZE (DISPLAY_WIDTH * 10 * BYTE_PER_PIXEL)
+   #define BYTES_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /*will be 2 for RGB565 */
+   #define BUFF_SIZE (DISPLAY_WIDTH * 10 * BYTES_PER_PIXEL)
    static uint8_t buf_1[BUFF_SIZE];
    static uint8_t buf_2[BUFF_SIZE];
 
@@ -155,10 +155,10 @@ A minimal example using STM32CubeIDE, HAL, and CMSISv1 (FreeRTOS).
 
     /* Frame buffers
      * Static or global buffer(s). The second buffer is optional */
-    #define BYTE_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /* will be 2 for RGB565 */
+    #define BYTES_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /* will be 2 for RGB565 */
     /* TODO: Declare your own BUFF_SIZE appropriate to your system. */
     static lv_color_t buf_1[BUFF_SIZE];
-    #define BUFF_SIZE (DISPLAY_WIDTH * 10 * BYTE_PER_PIXEL)
+    #define BUFF_SIZE (DISPLAY_WIDTH * 10 * BYTES_PER_PIXEL)
     static uint8_t buf_1[BUFF_SIZE];
     static lv_color_t buf_2[BUFF_SIZE];
 
