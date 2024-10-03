@@ -391,7 +391,6 @@ int32_t lv_text_get_width(const char * txt, uint32_t length, const lv_font_t * f
 
     uint32_t i                   = 0;
     int32_t width             = 0;
-    lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
 
     if(length != 0) {
         while(i < length) {
