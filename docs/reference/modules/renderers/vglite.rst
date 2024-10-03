@@ -1,6 +1,6 @@
-===================
-VG-Lite General GPU
-===================
+=======================
+NXP VG-Lite General GPU
+=======================
 
 This is a generic VG-Lite rendering backend implementation that is designed to utilize
 `VeriSilicon <https://verisilicon.com/>`_'s generic API to operate GPU hardware as much as possible.
@@ -65,4 +65,20 @@ VG-Lite Simulator
 
 LVGL integrates a VG-Lite simulator based on ThorVG.
 Its purpose is to simplify the debugging of VG-Lite adaptation and reduce the time of debugging and locating problems on hardware devices.
-For detailed instructions, see `VG-Lite Simulator <overview/vg_lite_tvg>`__.
+For detailed instructions, see `VG-Lite Simulator </overview/vg_lite_tvg>`__.
+
+
+API
+---
+
+:ref:`lv_draw_vglite_h`
+
+:ref:`lv_vglite_buf_h`
+
+:ref:`lv_vglite_matrix_h`
+
+:ref:`lv_vglite_path_h`
+
+:ref:`lv_vglite_utils_h`
+
+
