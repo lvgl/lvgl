@@ -783,6 +783,7 @@ static void draw_main(lv_event_t * e)
     lv_draw_label_dsc_t label_draw_dsc;
     lv_draw_label_dsc_init(&label_draw_dsc);
     label_draw_dsc.text = label->text;
+    label_draw_dsc.text_static = label->static_txt;
     label_draw_dsc.ofs_x = label->offset.x;
     label_draw_dsc.ofs_y = label->offset.y;
 #if LV_LABEL_LONG_TXT_HINT
