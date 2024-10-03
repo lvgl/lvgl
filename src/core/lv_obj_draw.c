@@ -310,7 +310,7 @@ void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
 
 int32_t lv_obj_get_ext_draw_size(const lv_obj_t * obj)
 {
-    if(obj->spec_attr) return obj->spec_attr->ext_draw_size;
+    if(obj!=NULL && obj->spec_attr) return obj->spec_attr->ext_draw_size;
     else return 0;
 }
 
