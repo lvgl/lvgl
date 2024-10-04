@@ -16,7 +16,7 @@ static void event_cb(lv_event_t * e)
     } else{
         lv_style_set_border_side(&style1, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT);
     }
-    change ~= change;
+    change = ~change;
     //Notify the object, that a property has been changed
     lv_obj_invalidate(obj);
 }
