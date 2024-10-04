@@ -44,23 +44,37 @@ These tasks are where the child widgets are not used via their API, but require 
 
 #### Exporting Code
 
-Code can be exported from the XML files. It is possible to support any custom language, but for now, we are focusing on C.
-
-For each widget, four files are exported:
-- `<widget_name>_gen.h` contains the generated API implementation of the widget.
-- `<widget_name>_private_gen.h` contains private API and data for the widget.
-- `<widget_name>_gen.c` contains the generated API and internals of the widget.
-- `<widget_name>.h` includes `<widget_name>_gen.h` and allows the user to define custom APIs.
-- `<widget_name>.c` contains hooks from `<widget_name>_gen.c` and allows the user to write custom code.
+For each widget, the following files are exported:
+- `<widget_name>_gen.h`: Contains the generated API implementation of the widget.
+- `<widget_name>_private_gen.h`: Contains private API and data for the widget.
+- `<widget_name>_gen.c`: Contains the generated API and internals of the widget.
+- `<widget_name>.h`: Includes `<widget_name>_gen.h` and allows the user to define custom APIs.
+- `<widget_name>.c`: Contains hooks from `<widget_name>_gen.c` and allows the user to write custom code.
+- `<widget_name>_xml_parser.c`: Processes the XML strings and calls the required functions according to the set attributes.
 
 #### Workflow
 
-1. Create a new XML file for a new widget.
-2. Describe its API (properties) in XML.
-3. Describe the view (children) in XML using existing widgets (no logic, just appearance).
-4. Create new widgets using the already existing widgets.
-5. Write custom code if needed and compile the widget to make it part of the preview.
-6. Add tests.
+The simpler workflow is when only the built-in widgets are used to describe how a screen or another component looks without adding a specific API. The workflow for this is the following:
+1. Describe the `view` and `styles` of a widget or screen using the existing widgets. It can be previewed instantly as the `view` is edited.
+2. Use this component or screen in one of the following ways:
+   1. Export C code for it, compile it as part of the application, and use it like`my_custom_widget_create(parent);`.
+   2. Use the XML description directly and let LVGL process/create it at runtime (`lv_xml_load(parent, my_custom_widget_xml_data);`).
+
+Using the built-in widgets of LVGL to create a new UI is important, but it's only part of the concept. The user should be able to add custom widgets to the editor as well. These custom widgets are very similar to LVGL's built-in widgets in terms of:
+- They also have their own specific API to hide the internals.
+- They are described as a class.
+- Any number of instances can be created.
+- They can be as complex as any built-in LVGL widget (e.g. chart, table, span, etc)
+
+As an example, we will use a `sliderbox` widget which consists of a slider, a `+` button, a `-` button, and a title. The `sliderbox` has an API to set its `range`, `value`, and `title`. The workflow to add such a new built-in widget is the follwing:
+
+1. Describe the `view` of the `sliderbox` using the built-in widgets, i.e., add a slider, two buttons, and a label, arrange and style these widgets. It can be previewed instantly as the `view` is edited.
+2. Describe the `api` as well (properties, enums, etc.).
+3. Export C code for the `sliderbox` (a new class, setter functions based on the API, and a skeleton for parsing XML for the widget are created automatically).
+4. Write the new widget's XML parser (helpers are available to simplify this) and the logic in the API functions (in XML parsing, call the corresponding setter functions of the `sliderbox` for an XML like `<sliderbox range="10 100" value="30" title="Hello"/>`).
+5. Compile the C files of the `sliderbox` back into the editor. From this point, the editor will know about this new widget, process its API, and can handle it when it's embedded it into other widgets.
+6. Write tests for the new widget to see how it behaves after different API calls.
+7. Use the `sliderbox` in a new widget. Since it is already compiled into the editor, it will work the same way as any other built-in widget.
 
 ### Notions and Conventions
 
