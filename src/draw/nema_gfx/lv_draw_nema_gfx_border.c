@@ -33,9 +33,9 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_nema_gfx.h"
-#include <math.h>
 
 #if LV_USE_NEMA_GFX
+#include <math.h>
 
 /**********************
  *   GLOBAL FUNCTIONS
