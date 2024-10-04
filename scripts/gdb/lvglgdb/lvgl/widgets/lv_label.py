@@ -30,6 +30,10 @@ class LVLabel(LVObject):
         return int(self._wv.safe_field("dot_begin", 0))
 
     @property
+    def max_lines(self):
+        return int(self._wv.safe_field("max_lines", 0))
+
+    @property
     def sel_start(self):
         return int(self._wv.safe_field("sel_start", 0))
 
@@ -88,6 +92,7 @@ class LVLabel(LVObject):
         d["text"] = self.text
         d["translation_tag"] = self.translation_tag
         d["dot_begin"] = self.dot_begin
+        d["max_lines"] = self.max_lines
         d["sel_start"] = self.sel_start
         d["sel_end"] = self.sel_end
         d["size_cache"] = self.size_cache

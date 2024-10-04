@@ -773,6 +773,34 @@ void test_label_long_mode_clip(void)
     TEST_ASSERT_EQUAL_SCREENSHOT(buf);
 }
 
+void test_label_max_lines(void)
+{
+    lv_obj_clean(lv_screen_active());
+    lv_obj_t * parent = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(parent, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(parent, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_text_line_space(parent, 10, LV_PART_MAIN);
+
+    const char * texts[] = {
+        "Fits in single line",
+        "Length such that exactly three lines will be needed for this text",
+        "Text\nwith line breaks\nwhere display will need more than three lines",
+    };
+
+    for(int i = 0; i < 3; i++) {
+        lv_obj_t * test_label = lv_label_create(parent);
+        lv_obj_set_width(test_label, 200);
+        lv_obj_set_style_bg_color(test_label, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
+        lv_obj_set_style_bg_opa(test_label, LV_OPA_100, LV_PART_MAIN);
+        lv_label_set_long_mode(test_label, LV_LABEL_LONG_MODE_DOTS);
+        lv_label_set_text(test_label, texts[i]);
+        lv_label_set_max_lines(test_label, 3);
+    }
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_max_lines.png");
+}
+
 void test_label_wrap_mode_clip(void)
 {
     lv_obj_clean(lv_screen_active());
