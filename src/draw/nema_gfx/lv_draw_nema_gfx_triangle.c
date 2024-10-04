@@ -60,7 +60,7 @@ void lv_draw_nema_gfx_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangl
     lv_area_move(&coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t clipped_coords;
-    if(!_lv_area_intersect(&clipped_coords, &coords, &rel_clip_area))
+    if(!lv_area_intersect(&clipped_coords, &coords, &rel_clip_area))
         return; /* Fully clipped, nothing to do */
 
     nema_set_clip(rel_clip_area.x1, rel_clip_area.y1, lv_area_get_width(&rel_clip_area),
@@ -140,11 +140,16 @@ void lv_draw_nema_gfx_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangl
             y1 = max_y;
         }
 
+        y0 -= layer->buf_area.y1;
+        y1 -= layer->buf_area.y1;
+        x0 -= layer->buf_area.x1;
+        x1 -= layer->buf_area.x1;
+
         uint8_t cmds_polygon[] = {NEMA_VG_PRIM_MOVE, NEMA_VG_PRIM_POLYGON};
-        float triangle_coords[] = {dsc->p[0].x, dsc->p[0].y,
+        float triangle_coords[] = {dsc->p[0].x - layer->buf_area.x1, dsc->p[0].y - layer->buf_area.y1,
                                    4.0f,
-                                   dsc->p[1].x, dsc->p[1].y,
-                                   dsc->p[2].x, dsc->p[2].y
+                                   dsc->p[1].x - layer->buf_area.x1, dsc->p[1].y - layer->buf_area.y1,
+                                   dsc->p[2].x - layer->buf_area.x1, dsc->p[2].y - layer->buf_area.y1
                                   };
         nema_enable_aa(0, 0, 0, 0);
         nema_vg_paint_set_grad_linear(draw_nema_gfx_unit->paint, draw_nema_gfx_unit->gradient, x0, y0, x1, y1,

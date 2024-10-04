@@ -44,7 +44,7 @@
  *      DEFINES
  *********************/
 
-#define DRAW_UNIT_ID_NEMA_GFX 5
+#define DRAW_UNIT_ID_NEMA_GFX 7
 
 /**********************
  *      TYPEDEFS
@@ -95,7 +95,7 @@ void lv_draw_nema_gfx_init(void)
     nema_init();
 #if LV_USE_NEMA_VG
     /*Initiallize NemaVG */
-    nema_vg_init(LV_NEMA_GFX_RESX, LV_NEMA_GFX_RESY);
+    nema_vg_init(LV_NEMA_GFX_MAX_RESX, LV_NEMA_GFX_MAX_RESY);
     /* Allocate VG Buffers*/
     draw_nema_gfx_unit->paint = nema_vg_paint_create();
     draw_nema_gfx_unit->gradient = nema_vg_grad_create();
@@ -139,7 +139,10 @@ static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * ta
             }
 #if LV_USE_NEMA_VG
         case LV_DRAW_TASK_TYPE_TRIANGLE:
-        case LV_DRAW_TASK_TYPE_ARC:
+        case LV_DRAW_TASK_TYPE_ARC: {
+                lv_draw_arc_dsc_t * draw_arc_dsc = (lv_draw_arc_dsc_t *) task->draw_dsc;
+                if(draw_arc_dsc->rounded == 0) break;
+            }
         case LV_DRAW_TASK_TYPE_FILL: {
                 if(task->preference_score > 80) {
                     task->preference_score = 80;

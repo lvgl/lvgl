@@ -70,6 +70,12 @@ static uint32_t lv_cf_to_nema(lv_color_format_t cf)
             return NEMA_L4;
         case LV_COLOR_FORMAT_I8:
             return NEMA_L8;
+        case LV_COLOR_FORMAT_RGB565:
+            return NEMA_RGB565;
+        case LV_COLOR_FORMAT_ARGB8888:
+            return NEMA_BGRA8888;
+        case LV_COLOR_FORMAT_XRGB8888:
+            return NEMA_BGRX8888;
         default:
             return LV_NEMA_GFX_COLOR_FORMAT;
     }
@@ -88,7 +94,13 @@ static void _draw_nema_gfx_tile(lv_draw_unit_t * draw_unit, const lv_draw_image_
     int32_t img_w = dsc->header.w;
     int32_t img_h = dsc->header.h;
 
-    lv_area_t tile_area = *coords;
+    lv_area_t tile_area;
+    if(lv_area_get_width(&dsc->image_area) >= 0) {
+        tile_area = dsc->image_area;
+    }
+    else {
+        tile_area = *coords;
+    }
     lv_area_set_width(&tile_area, img_w);
     lv_area_set_height(&tile_area, img_h);
 
@@ -98,7 +110,7 @@ static void _draw_nema_gfx_tile(lv_draw_unit_t * draw_unit, const lv_draw_image_
         while(tile_area.x1 <= draw_unit->clip_area->x2) {
 
             lv_area_t clipped_img_area;
-            if(_lv_area_intersect(&clipped_img_area, &tile_area, draw_unit->clip_area)) {
+            if(lv_area_intersect(&clipped_img_area, &tile_area, draw_unit->clip_area)) {
                 _draw_nema_gfx_img(draw_unit, dsc, &tile_area);
             }
 
@@ -126,7 +138,7 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
 
     lv_area_t blend_area;
     /*Let's get the blend area which is the intersection of the area to fill and the clip area.*/
-    if(!_lv_area_intersect(&blend_area, coords, draw_unit->clip_area))
+    if(!lv_area_intersect(&blend_area, coords, draw_unit->clip_area))
         return; /*Fully clipped, nothing to do*/
 
     lv_area_t rel_clip_area;
@@ -163,15 +175,15 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
                       lv_area_get_height(&(layer->buf_area)), LV_NEMA_GFX_COLOR_FORMAT,
                       lv_area_get_width(&(layer->buf_area))*LV_NEMA_GFX_FORMAT_MULTIPLIER);
 
-    nema_bind_src_tex((uintptr_t)(src_buf), tex_w, tex_h, color_format, -1,
+    nema_bind_src_tex((uintptr_t)(src_buf), tex_w, tex_h, color_format, img_dsc->header.stride,
                       dsc->antialias ? NEMA_FILTER_BL : NEMA_FILTER_PS);
 
-    if(recolor) {
-        lv_color32_t col32 = lv_color_to_32(dsc->recolor, LV_OPA_MIX2(dsc->recolor_opa, dsc->opa));
-        uint32_t color = nema_rgba(col32.red, col32.green, col32.blue, col32.alpha);
-        nema_set_recolor_color(color);
-        blending_mode |= NEMA_BLOP_RECOLOR;
-    }
+    /* if(recolor) {
+           lv_color32_t col32 = lv_color_to_32(dsc->recolor, LV_OPA_MIX2(dsc->recolor_opa, dsc->opa));
+           uint32_t color = nema_rgba(col32.red, col32.green, col32.blue, col32.alpha);
+           nema_set_recolor_color(color);
+           blending_mode |= NEMA_BLOP_RECOLOR;
+       } */
 
     if(dsc->opa < 255) {
         uint32_t rgba = ((uint32_t)dsc->opa << 24U) | ((uint32_t)dsc->opa << 16U) | ((uint32_t)dsc->opa << 8U) | ((

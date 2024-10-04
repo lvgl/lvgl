@@ -594,6 +594,14 @@
 #endif
 
 #if LV_USE_NEMA_GFX
+    #ifndef LV_NEMA_GFX_HAL_INCLUDE
+        #ifdef CONFIG_LV_NEMA_GFX_HAL_INCLUDE
+            #define LV_NEMA_GFX_HAL_INCLUDE CONFIG_LV_NEMA_GFX_HAL_INCLUDE
+        #else
+            #define LV_NEMA_GFX_HAL_INCLUDE <stm32u5xx_hal.h>
+        #endif
+    #endif
+
     /*Enable Vector Graphics Operations. Available only if NemaVG library is present*/
     #ifndef LV_USE_NEMA_VG
         #ifdef CONFIG_LV_USE_NEMA_VG
@@ -605,18 +613,18 @@
 
     #if LV_USE_NEMA_VG
         /*Define application's resolution used for VG related buffer allocation */
-        #ifndef LV_NEMA_GFX_RESX
-            #ifdef CONFIG_LV_NEMA_GFX_RESX
-                #define LV_NEMA_GFX_RESX CONFIG_LV_NEMA_GFX_RESX
+        #ifndef LV_NEMA_GFX_MAX_RESX
+            #ifdef CONFIG_LV_NEMA_GFX_MAX_RESX
+                #define LV_NEMA_GFX_MAX_RESX CONFIG_LV_NEMA_GFX_MAX_RESX
             #else
-                #define LV_NEMA_GFX_RESX 800
+                #define LV_NEMA_GFX_MAX_RESX 800
             #endif
         #endif
-        #ifndef LV_NEMA_GFX_RESY
-            #ifdef CONFIG_LV_NEMA_GFX_RESY
-                #define LV_NEMA_GFX_RESY CONFIG_LV_NEMA_GFX_RESY
+        #ifndef LV_NEMA_GFX_MAX_RESY
+            #ifdef CONFIG_LV_NEMA_GFX_MAX_RESY
+                #define LV_NEMA_GFX_MAX_RESY CONFIG_LV_NEMA_GFX_MAX_RESY
             #else
-                #define LV_NEMA_GFX_RESY 600
+                #define LV_NEMA_GFX_MAX_RESY 600
             #endif
         #endif
     #endif

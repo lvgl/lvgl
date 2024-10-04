@@ -80,8 +80,8 @@ void lv_draw_nema_gfx_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * 
                           draw_nema_gfx_unit->paint);
     }
     else {
-        nema_vg_draw_ring_generic(center.x, center.y, (float)dsc->radius - (float)dsc->width * 0.5f, dsc->start_angle,
-                                  end_angle, draw_nema_gfx_unit->paint, 0U);
+        /* nema_vg_draw_ring_generic(center.x, center.y, (float)dsc->radius - (float)dsc->width * 0.5f, dsc->start_angle,
+                                     end_angle, draw_nema_gfx_unit->paint, 0U); */
     }
 
     nema_cl_submit(&(draw_nema_gfx_unit->cl));

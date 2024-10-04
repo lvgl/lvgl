@@ -70,7 +70,7 @@ void lv_draw_nema_gfx_border(lv_draw_unit_t * draw_unit, const lv_draw_border_ds
     nema_set_clip(clip_area.x1, clip_area.y1, lv_area_get_width(&clip_area), lv_area_get_height(&clip_area));
 
     lv_area_t clipped_coords;
-    if(!_lv_area_intersect(&clipped_coords, &inward_coords, &clip_area))
+    if(!lv_area_intersect(&clipped_coords, &inward_coords, &clip_area))
         return; /*Fully clipped, nothing to do*/
 
     nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(layer->draw_buf->data), lv_area_get_width(&(layer->buf_area)),
@@ -78,10 +78,10 @@ void lv_draw_nema_gfx_border(lv_draw_unit_t * draw_unit, const lv_draw_border_ds
                       lv_area_get_width(&(layer->buf_area))*LV_NEMA_GFX_FORMAT_MULTIPLIER);
 
     /* Recalculate float Dimensions */
-    float x1 = (float)coords->x1 + ((float)width / 2.0f);
-    float x2 = (float)coords->x2 - ((float)width / 2.0f);
-    float y1 = (float)coords->y1 + ((float)width / 2.0f);
-    float y2 = (float)coords->y2 - ((float)width / 2.0f);
+    float x1 = (float)coords->x1 + ((float)width / 2.0f) - (float)layer->buf_area.x1;
+    float x2 = (float)coords->x2 - ((float)width / 2.0f) - (float)layer->buf_area.x1;
+    float y1 = (float)coords->y1 + ((float)width / 2.0f) - (float)layer->buf_area.y1;
+    float y2 = (float)coords->y2 - ((float)width / 2.0f) - (float)layer->buf_area.y1;
     float coords_bg_w = x2 - x1 + 1;
     float coords_bg_h = y2 - y1 + 1;
     int32_t short_side = LV_MIN(coords_bg_w, coords_bg_h);

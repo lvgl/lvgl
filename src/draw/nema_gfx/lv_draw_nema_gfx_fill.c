@@ -58,7 +58,7 @@ void lv_draw_nema_gfx_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t 
                   lv_area_get_height(&rel_clip_area));
 
     lv_area_t clipped_coords;
-    if(!_lv_area_intersect(&clipped_coords, &rel_coords, &rel_clip_area))
+    if(!lv_area_intersect(&clipped_coords, &rel_coords, &rel_clip_area))
         return; /*Fully clipped, nothing to do*/
 
     nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(layer->draw_buf->data), lv_area_get_width(&(layer->buf_area)),

@@ -45,6 +45,18 @@ extern "C" {
 
 #include "lv_draw_nema_gfx_utils.h"
 
+#include "../lv_draw_private.h"
+#include "../lv_draw_buf_private.h"
+#include "../lv_draw_image_private.h"
+#include "../lv_image_decoder_private.h"
+#include "../lv_draw_label_private.h"
+#include "../lv_draw_mask_private.h"
+#include "../lv_draw_rect_private.h"
+#include "../lv_draw_triangle_private.h"
+#include "../lv_draw_vector_private.h"
+
+#include "../../misc/lv_area_private.h"
+
 /**********************
  *      TYPEDEFS
  **********************/

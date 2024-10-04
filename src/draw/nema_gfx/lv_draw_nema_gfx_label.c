@@ -36,6 +36,7 @@
 #include "../../font/lv_font.h"
 #include "../../font/lv_font_fmt_txt.h"
 #include "../../misc/lv_utils.h"
+#include "../../misc/lv_text_private.h"
 
 #if LV_USE_NEMA_GFX
 
@@ -65,7 +66,7 @@ static void _draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc, 
 
 static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter);
 
-static int32_t unicode_list_compare(const void * ref, const void * element)
+static int unicode_list_compare(const void * ref, const void * element)
 {
     return ((int32_t)(*(uint16_t *)ref)) - ((int32_t)(*(uint16_t *)element));
 }
@@ -141,7 +142,7 @@ static void _draw_nema_gfx_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_
             lv_layer_t * layer = draw_unit->target_layer;
 
             lv_area_t blend_area;
-            if(!_lv_area_intersect(&blend_area, glyph_draw_dsc->letter_coords, draw_unit->clip_area))
+            if(!lv_area_intersect(&blend_area, glyph_draw_dsc->letter_coords, draw_unit->clip_area))
                 return;
             lv_area_move(&blend_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
@@ -210,7 +211,7 @@ static void _draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_
     int32_t w;
 
     lv_area_t clipped_area;
-    bool clip_ok = _lv_area_intersect(&clipped_area, coords, draw_unit->clip_area);
+    bool clip_ok = lv_area_intersect(&clipped_area, coords, draw_unit->clip_area);
     if(!clip_ok) return;
 
     lv_text_align_t align = dsc->align;
@@ -262,14 +263,14 @@ static void _draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_
         pos.y += dsc->hint->y;
     }
 
-    uint32_t line_end = line_start + _lv_text_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL,
-                                                            dsc->flag);
+    uint32_t line_end = line_start + lv_text_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL,
+                                                           dsc->flag);
 
     /*Go the first visible line*/
     while(pos.y + line_height_font < draw_unit->clip_area->y1) {
         /*Go to next line*/
         line_start = line_end;
-        line_end += _lv_text_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL, dsc->flag);
+        line_end += lv_text_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL, dsc->flag);
         pos.y += line_height;
 
         /*Save at the threshold coordinate*/
@@ -347,17 +348,17 @@ static void _draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_
             uint32_t logical_char_pos = 0;
             if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
 #if LV_USE_BIDI
-                logical_char_pos = _lv_text_encoded_get_char_id(dsc->text, line_start);
-                uint32_t t = _lv_text_encoded_get_char_id(bidi_txt, i);
+                logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start);
+                uint32_t t = lv_text_encoded_get_char_id(bidi_txt, i);
                 logical_char_pos += _lv_bidi_get_logical_pos(bidi_txt, NULL, line_end - line_start, base_dir, t, NULL);
 #else
-                logical_char_pos = _lv_text_encoded_get_char_id(dsc->text, line_start + i);
+                logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start + i);
 #endif
             }
 
             uint32_t letter;
             uint32_t letter_next;
-            _lv_text_encoded_letter_next_2(bidi_txt, &letter, &letter_next, &i);
+            lv_text_encoded_letter_next_2(bidi_txt, &letter, &letter_next, &i);
 
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
@@ -421,7 +422,7 @@ static void _draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_
 #endif
         /*Go to next line*/
         line_start = line_end;
-        line_end += _lv_text_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL, dsc->flag);
+        line_end += lv_text_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL, dsc->flag);
 
         pos.x = coords->x1;
         /*Align to middle*/
@@ -454,7 +455,7 @@ static void _draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc, 
 {
     lv_font_glyph_dsc_t g;
 
-    if(_lv_text_is_marker(letter)) /*Markers are valid letters but should not be rendered.*/
+    if(lv_text_is_marker(letter)) /*Markers are valid letters but should not be rendered.*/
         return;
 
     LV_PROFILER_BEGIN;
@@ -477,8 +478,8 @@ static void _draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc, 
     letter_coords.y2 = letter_coords.y1 + g.box_h - 1;
 
     /*If the letter is completely out of mask don't draw it*/
-    if(_lv_area_is_out(&letter_coords, draw_unit->clip_area, 0) &&
-       _lv_area_is_out(dsc->bg_coords, draw_unit->clip_area, 0)) {
+    if(lv_area_is_out(&letter_coords, draw_unit->clip_area, 0) &&
+       lv_area_is_out(dsc->bg_coords, draw_unit->clip_area, 0)) {
         LV_PROFILER_END;
         return;
     }
@@ -530,7 +531,7 @@ static void _draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc, 
         }
 
         if(!raw_bitmap) {
-            dsc->glyph_data = (void *)lv_font_get_glyph_bitmap(&g, letter, draw_buf);
+            dsc->glyph_data = (void *)lv_font_get_glyph_bitmap(&g, draw_buf);
         }
 
         dsc->format = dsc->glyph_data ? g.format : LV_FONT_GLYPH_FORMAT_NONE;
@@ -574,8 +575,8 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_TINY) {
             uint16_t key = rcp;
-            uint16_t * p = _lv_utils_bsearch(&key, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
-                                             sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
+            uint16_t * p = lv_utils_bsearch(&key, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
+                                            sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
 
             if(p) {
                 lv_uintptr_t ofs = p - fdsc->cmaps[i].unicode_list;
@@ -584,8 +585,8 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_FULL) {
             uint16_t key = rcp;
-            uint16_t * p = _lv_utils_bsearch(&key, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
-                                             sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
+            uint16_t * p = lv_utils_bsearch(&key, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
+                                            sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
 
             if(p) {
                 lv_uintptr_t ofs = p - fdsc->cmaps[i].unicode_list;
