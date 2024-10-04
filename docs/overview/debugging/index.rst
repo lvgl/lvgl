@@ -1,8 +1,8 @@
 .. _debugging:
 
-==============
-Debugging LVGL
-==============
+=========
+Debugging
+=========
 
 .. toctree::
     :maxdepth: 2
