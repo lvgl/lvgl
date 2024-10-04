@@ -30,6 +30,7 @@ void lv_example_event_streak(void);
 void lv_example_event_button(void);
 void lv_example_event_bubble(void);
 void lv_example_event_draw(void);
+void lv_example_event_manual(void);
 
 /**********************
  *      MACROS
