@@ -15,5 +15,4 @@ Porting
     timer_handler
     sleep
     os
-    log
     draw

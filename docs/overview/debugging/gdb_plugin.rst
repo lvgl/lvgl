@@ -1,19 +1,19 @@
-.. _tools:
+.. _gdb_plugin:
 
-=====
-Tools
-=====
+===========
+GDB Plug-In
+===========
 
-LVGL has provided many tools to help you develop and debug your application. They are located in the ``lvgl/scripts`` directory.
+Debugging LVGL with GDB
+-----------------------
 
-GDB Plugin
-**********
-
-### Debugging LVGL with GDB
-
-To facilitate debugging LVGL with GDB, a GDB plugin is provided. This plugin can be found in the ``lvgl/scripts/gdb`` directory.
-The GDB plugin can be used with any target where GDB is available. For example, you can use it to debug a device connected to a PC via JLink, which provides a GDB server. Additionally, if your device crashes and you have a core dump, you can use GDB to analyze the core dump.
-To load the LVGL GDB plugin within GDB's command line, type the following command:
+To facilitate debugging LVGL with GDB, a GDB plugin is provided. This plugin
+can be found in the ``lvgl/scripts/gdb`` directory. The GDB plugin can be used
+with any target where GDB is available. For example, you can use it to debug a
+device connected to a PC via JLink, which provides a GDB server. Additionally,
+if your device crashes and you have a core dump, you can use GDB to analyze the
+core dump. To load the LVGL GDB plugin within GDB's command line, type the
+following command:
 
 ``source lvgl/scripts/gdb/lvgl.py``
 
