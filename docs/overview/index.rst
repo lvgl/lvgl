@@ -23,8 +23,6 @@ Overview
     fs
     animations
     timer
-    profiler
     renderers/index
     new_widget
-    vg_lite_tvg
-    debugging
+    debugging/index
