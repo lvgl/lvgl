@@ -1,13 +1,8 @@
 .. _tools:
 
-=====
-Tools
-=====
-
-LVGL has provided many tools to help you develop and debug your application. They are located in the ``lvgl/scripts`` directory.
-
+==========
 GDB Plugin
-**********
+==========
 
 ### Debugging LVGL with GDB
 
