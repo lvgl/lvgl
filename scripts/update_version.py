@@ -124,7 +124,7 @@ class CmakeReplacer(MacroReplacer):
 class KconfigReplacer(RepoFileVersionReplacer):
     """Replace version info in Kconfig file"""
 
-    def __init__(self, relative_path_segments: List[str]):
+    def __init__(self, relative_path_segments: list[str]):
         super().__init__(relative_path_segments, 3)
 
     def applyVersionToLine(self, line: str, version: Version):
