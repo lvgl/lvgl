@@ -11,9 +11,11 @@ static void event_cb(lv_event_t * e)
     lv_obj_t * btn = lv_event_get_target(e);
     lv_obj_t * obj = lv_obj_get_parent(btn);
     //Change style properties
-    if(change){
+    if(change)
+    {
         lv_style_set_border_side(&style1, LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_RIGHT);
-    } else{
+    } else
+    {
         lv_style_set_border_side(&style1, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT);
     }
     change = ~change;
@@ -45,7 +47,7 @@ void lv_example_style_19(void)
     lv_obj_center(obj);
 
     //Create a button, and click event for it to change style properties on demand
-    lv_obj_t* btn = lv_btn_create(obj);
+    lv_obj_t * btn = lv_btn_create(obj);
     lv_obj_center(btn);
     lv_obj_add_event_cb(btn, event_cb, LV_EVENT_CLICKED, NULL);
 

@@ -10,7 +10,8 @@ static void event_clicked_cb(lv_event_t * e)
     lv_obj_t * label = lv_obj_get_child(btn, 0);
     lv_label_set_text_fmt(label, "%"LV_PRIu32, cnt);
     //Send a refresh if clicked enough
-    if(++cnt > 10){
+    if(++cnt > 10)
+    {
         lv_obj_send_event(btn, LV_EVENT_REFRESH, NULL);
     }
 }
