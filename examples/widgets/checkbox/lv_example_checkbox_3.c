@@ -6,7 +6,6 @@ static void event_handler0(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
     lv_obj_t * other_obj = lv_obj_get_child(lv_obj_get_parent(obj), (1 - lv_obj_get_child_cnt(obj)));
-    lv_state_t state = lv_obj_get_state(obj);
     if(code == LV_EVENT_VALUE_CHANGED) {
         //Handle style changes
         if(lv_obj_get_state(obj) == LV_STATE_CHECKED) {
