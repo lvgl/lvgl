@@ -69,6 +69,7 @@ void lv_example_chart_8(void);
 
 void lv_example_checkbox_1(void);
 void lv_example_checkbox_2(void);
+void lv_example_checkbox_3(void);
 
 void lv_example_dropdown_1(void);
 void lv_example_dropdown_2(void);
