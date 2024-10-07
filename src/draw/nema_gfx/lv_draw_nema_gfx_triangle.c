@@ -66,9 +66,12 @@ void lv_draw_nema_gfx_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangl
     nema_set_clip(rel_clip_area.x1, rel_clip_area.y1, lv_area_get_width(&rel_clip_area),
                   lv_area_get_height(&rel_clip_area));
 
+    lv_color_format_t dst_cf = layer->draw_buf->header.cf;
+    uint32_t dst_nema_cf = lv_nemagfx_cf_to_nema(dst_cf);
+
     nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(layer->draw_buf->data), lv_area_get_width(&(layer->buf_area)),
-                      lv_area_get_height(&(layer->buf_area)), LV_NEMA_GFX_COLOR_FORMAT,
-                      lv_area_get_width(&(layer->buf_area))*LV_NEMA_GFX_FORMAT_MULTIPLIER);
+                      lv_area_get_height(&(layer->buf_area)), dst_nema_cf,
+                      lv_area_get_width(&(layer->buf_area))*lv_color_format_get_size(dst_cf));
 
     if(dsc->bg_grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE) {
 
@@ -140,10 +143,10 @@ void lv_draw_nema_gfx_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangl
             y1 = max_y;
         }
 
-        y0 -= layer->buf_area.y1;
-        y1 -= layer->buf_area.y1;
-        x0 -= layer->buf_area.x1;
-        x1 -= layer->buf_area.x1;
+        y0 -= (float) layer->buf_area.y1;
+        y1 -= (float) layer->buf_area.y1;
+        x0 -= (float) layer->buf_area.x1;
+        x1 -= (float) layer->buf_area.x1;
 
         uint8_t cmds_polygon[] = {NEMA_VG_PRIM_MOVE, NEMA_VG_PRIM_POLYGON};
         float triangle_coords[] = {dsc->p[0].x - layer->buf_area.x1, dsc->p[0].y - layer->buf_area.y1,

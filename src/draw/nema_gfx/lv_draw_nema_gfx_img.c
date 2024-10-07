@@ -41,8 +41,6 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static uint32_t lv_cf_to_nema(lv_color_format_t cf);
-
 static void _draw_nema_gfx_tile(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
 static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
@@ -50,38 +48,6 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
 /**********************
  *  STATIC FUNCTIONS
  **********************/
-
-static uint32_t lv_cf_to_nema(lv_color_format_t cf)
-{
-    switch(cf) {
-        case LV_COLOR_FORMAT_A1:
-            return NEMA_A1;
-        case LV_COLOR_FORMAT_A2:
-            return NEMA_A2;
-        case LV_COLOR_FORMAT_A4:
-            return NEMA_A4;
-        case LV_COLOR_FORMAT_A8:
-            return NEMA_A8;
-        case LV_COLOR_FORMAT_I1:
-            return NEMA_L1;
-        case LV_COLOR_FORMAT_I2:
-            return NEMA_L2;
-        case LV_COLOR_FORMAT_I4:
-            return NEMA_L4;
-        case LV_COLOR_FORMAT_I8:
-            return NEMA_L8;
-        case LV_COLOR_FORMAT_RGB565:
-            return NEMA_RGB565;
-        case LV_COLOR_FORMAT_RGB888:
-            return NEMA_BGR24;
-        case LV_COLOR_FORMAT_ARGB8888:
-            return NEMA_BGRA8888;
-        case LV_COLOR_FORMAT_XRGB8888:
-            return NEMA_BGRX8888;
-        default:
-            return LV_NEMA_GFX_COLOR_FORMAT;
-    }
-}
 
 static void _draw_nema_gfx_tile(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
@@ -148,7 +114,7 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
     lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
-    bool recolor = (dsc->recolor_opa > LV_OPA_MIN);
+    /* bool recolor = (dsc->recolor_opa > LV_OPA_MIN); */
 
     /*Make the blend area relative to the buffer*/
     lv_area_move(&blend_area, -layer->buf_area.x1, -layer->buf_area.y1);
@@ -159,9 +125,12 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
     nema_set_clip(rel_clip_area.x1, rel_clip_area.y1, lv_area_get_width(&rel_clip_area),
                   lv_area_get_height(&rel_clip_area));
 
+    lv_color_format_t dst_cf = layer->draw_buf->header.cf;
+    uint32_t dst_nema_cf = lv_nemagfx_cf_to_nema(dst_cf);
+
     const void * src_buf = img_dsc->data;
 
-    uint32_t blending_mode = nemagfx_blending_mode(dsc->blend_mode);
+    uint32_t blending_mode = lv_nemagfx_blending_mode(dsc->blend_mode);
 
     lv_color_format_t src_cf = img_dsc->header.cf;
 
@@ -170,14 +139,14 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
         blending_mode |= NEMA_BLOP_SRC_PREMULT;
     }
 
-    uint32_t color_format = lv_cf_to_nema(src_cf);
+    uint32_t src_nema_cf = lv_nemagfx_cf_to_nema(src_cf);
     uint32_t src_stride = img_dsc->header.stride;
 
     nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(layer->draw_buf->data), lv_area_get_width(&(layer->buf_area)),
-                      lv_area_get_height(&(layer->buf_area)), LV_NEMA_GFX_COLOR_FORMAT,
-                      lv_area_get_width(&(layer->buf_area))*LV_NEMA_GFX_FORMAT_MULTIPLIER);
+                      lv_area_get_height(&(layer->buf_area)), dst_nema_cf,
+                      lv_area_get_width(&(layer->buf_area))*lv_color_format_get_size(dst_cf));
 
-    nema_bind_src_tex((uintptr_t)(src_buf), tex_w, tex_h, color_format, img_dsc->header.stride,
+    nema_bind_src_tex((uintptr_t)(src_buf), tex_w, tex_h, src_nema_cf, src_stride,
                       dsc->antialias ? NEMA_FILTER_BL : NEMA_FILTER_PS);
 
     /* if(recolor) {

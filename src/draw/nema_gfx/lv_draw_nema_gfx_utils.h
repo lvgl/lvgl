@@ -83,14 +83,21 @@ uintptr_t NEMA_VIRT2PHYS(void * addr);
  **********************/
 
 /**
+ * Convert a `lv_color_format_t` to a Nema color format.
+ * @param     cf  The LVGL color format
+ * @return        The Nema color format
+ */
+uint32_t lv_nemagfx_cf_to_nema(lv_color_format_t cf);
+
+/**
  * Get NemaGFX blending mode
  *
  * @param[in] lv_blend_mode The LVGL blend mode
  *
- * @retval NemaGFX blending mode
+ * @return NemaGFX blending mode
  *
  */
-uint32_t nemagfx_blending_mode(lv_blend_mode_t lv_blend_mode);
+uint32_t lv_nemagfx_blending_mode(lv_blend_mode_t lv_blend_mode);
 
 
 /**
@@ -103,7 +110,7 @@ uint32_t nemagfx_blending_mode(lv_blend_mode_t lv_blend_mode);
  * @param[in] opa Descriptor's opacity
  *
 */
-void nemagfx_grad_set(NEMA_VG_GRAD_HANDLE gradient, lv_grad_dsc_t lv_grad, lv_opa_t opa);
+void lv_nemagfx_grad_set(NEMA_VG_GRAD_HANDLE gradient, lv_grad_dsc_t lv_grad, lv_opa_t opa);
 
 /**********************
  *      MACROS

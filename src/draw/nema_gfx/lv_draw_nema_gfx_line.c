@@ -71,9 +71,12 @@ void lv_draw_nema_gfx_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t 
 
     uint32_t bg_color = nema_rgba(col32.red, col32.green, col32.blue, col32.alpha);
 
+    lv_color_format_t dst_cf = layer->draw_buf->header.cf;
+    uint32_t dst_nema_cf = lv_nemagfx_cf_to_nema(dst_cf);
+
     nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(layer->draw_buf->data), lv_area_get_width(&(layer->buf_area)),
-                      lv_area_get_height(&(layer->buf_area)), LV_NEMA_GFX_COLOR_FORMAT,
-                      lv_area_get_width(&(layer->buf_area))*LV_NEMA_GFX_FORMAT_MULTIPLIER);
+                      lv_area_get_height(&(layer->buf_area)), dst_nema_cf,
+                      lv_area_get_width(&(layer->buf_area))*lv_color_format_get_size(dst_cf));
 
     if(col32.alpha < 255U) {
         nema_set_blend_fill(NEMA_BL_SIMPLE);

@@ -1,8 +1,8 @@
 .. _stm32_nema_gfx:
 
-=============================================
-STM32 NemaGFX GPU (AKA NeoChrom or Chrom-ART)
-=============================================
+================================
+STM32 NemaGFX GPU (AKA NeoChrom)
+================================
 
 Some of the more powerful STM32 MCUs such as the
 STM32U5 feature a 2D GPU which can natively draw most

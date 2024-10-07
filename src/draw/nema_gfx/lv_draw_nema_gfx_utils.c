@@ -40,24 +40,57 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-uint32_t nemagfx_blending_mode(lv_blend_mode_t lv_blend_mode)
+uint32_t lv_nemagfx_cf_to_nema(lv_color_format_t cf)
+{
+    switch(cf) {
+        case LV_COLOR_FORMAT_A1:
+            return NEMA_A1;
+        case LV_COLOR_FORMAT_A2:
+            return NEMA_A2;
+        case LV_COLOR_FORMAT_A4:
+            return NEMA_A4;
+        case LV_COLOR_FORMAT_A8:
+            return NEMA_A8;
+        case LV_COLOR_FORMAT_I1:
+            return NEMA_L1;
+        case LV_COLOR_FORMAT_I2:
+            return NEMA_L2;
+        case LV_COLOR_FORMAT_I4:
+            return NEMA_L4;
+        case LV_COLOR_FORMAT_L8:
+        case LV_COLOR_FORMAT_I8:
+            return NEMA_L8;
+        case LV_COLOR_FORMAT_RGB565:
+            return NEMA_RGB565;
+        case LV_COLOR_FORMAT_RGB888:
+            return NEMA_BGR24;
+        case LV_COLOR_FORMAT_ARGB8888:
+            return NEMA_BGRA8888;
+        case LV_COLOR_FORMAT_XRGB8888:
+            return NEMA_BGRX8888;
+        default:
+            return LV_NEMA_GFX_COLOR_FORMAT;
+    }
+}
+
+uint32_t lv_nemagfx_blending_mode(lv_blend_mode_t lv_blend_mode)
 {
     uint32_t blending_mode;
     switch(lv_blend_mode) {
         case LV_BLEND_MODE_NORMAL:
-            blending_mode = NEMA_BL_SRC_OVER;
+            blending_mode = NEMA_BL_SIMPLE;
             break;
         case LV_BLEND_MODE_ADDITIVE:
             blending_mode = NEMA_BL_ADD;
             break;
         default:
-            blending_mode = NEMA_BL_SRC_OVER;
+            blending_mode = NEMA_BL_SIMPLE;
             break;
     }
     return blending_mode;
 }
 
-void nemagfx_grad_set(NEMA_VG_GRAD_HANDLE gradient, lv_grad_dsc_t lv_grad, lv_opa_t opa)
+void lv_nemagfx_grad_set(NEMA_VG_GRAD_HANDLE gradient, lv_grad_dsc_t lv_grad, lv_opa_t opa)
 {
 
     float stops[LV_GRADIENT_MAX_STOPS];
