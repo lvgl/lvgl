@@ -29,18 +29,24 @@ It's **not the goal** to allow creating the whole UI with XML either. It's accep
 
 #### APIs
 
-The XML files are used to create widgets with APIs. Widgets can be nested, and for higher-level widgets, new (simpler) APIs can be defined. Due to this, when custom widgets are embedded into another widget, they can be accessed via the target and simple API.
+The XML files are used to create widgets with or without APIs.
+Widgets can be nested, and for higher-level widgets, new (simpler) APIs can be defined.
+Due to this, when custom widgets are embedded into another widget, they can be accessed via a target and simple API.
 
-It is possible to pass the API parameters of a widget to its children (e.g., when `value` is set, it can be passed down to a child slider).
-
-Eventually, most of the visual tasks can be realized directly in the XML files, but the logic of the UI should be described from code.
+Eventually, most of the visual tasks can be realized directly in the XML files,
+but the logic of the UI should be described from code.
 
 What does the "logic" mean? For example:
 - What should happen when a button is clicked? Move to a new screen? Create a widget? Increment a value?
 - Read sensor data and show it on widgets.
 - Complex logic, such as adding a new series to a chart or setting a cell's value in a table.
 
-These tasks are where the child widgets are not used via their API, but require custom drawing and data management. These are outside of the scope of XML and preview; code should be written for these.
+These tasks are where the child widgets are not used via their API, but require custom drawing and data management. These are outside of the scope of XML and preview and code should be written for these.
+
+New widgets described in XMLs can be used in two ways:
+1. Export code, add the content of the setter API function (if there is a new API),
+compile the widget with the application and use its API from the application
+2. Make LVGL load the XML file at runtime. (Only if there is no new API defined)
 
 #### Exporting Code
 
@@ -54,8 +60,10 @@ For each widget, the following files are exported:
 
 #### Workflow
 
-The simpler workflow is when only the built-in widgets are used to describe how a screen or another component looks without adding a specific API. The workflow for this is the following:
-1. Describe the `view` and `styles` of a widget or screen using the existing widgets. It can be previewed instantly as the `view` is edited.
+The simpler workflow is when only the built-in widgets are used to describe how a screen or another widget looks without adding a specific API.
+The workflow for this is the following:
+1. Describe the `view` and `styles` of a widget or screen using the existing widgets.
+It can be previewed instantly as the `view` is edited.
 2. Use this component or screen in one of the following ways:
    1. Export C code for it, compile it as part of the application, and use it like`my_custom_widget_create(parent);`.
    2. Use the XML description directly and let LVGL process/create it at runtime (`lv_xml_load(parent, my_custom_widget_xml_data);`).
@@ -66,7 +74,7 @@ Using the built-in widgets of LVGL to create a new UI is important, but it's onl
 - Any number of instances can be created.
 - They can be as complex as any built-in LVGL widget (e.g. chart, table, span, etc)
 
-As an example, we will use a `sliderbox` widget which consists of a slider, a `+` button, a `-` button, and a title. The `sliderbox` has an API to set its `range`, `value`, and `title`. The workflow to add such a new built-in widget is the follwing:
+As an example, we will use a `sliderbox` widget which consists of a slider, a `+` button, a `-` button, and a title. The `sliderbox` has an API to set its `range`, `value`, and `title`. The workflow to add such a new built-in widget is the following:
 
 1. Describe the `view` of the `sliderbox` using the built-in widgets, i.e., add a slider, two buttons, and a label, arrange and style these widgets. It can be previewed instantly as the `view` is edited.
 2. Describe the `api` as well (properties, enums, etc.).
@@ -92,7 +100,6 @@ These are valid names:
 
 The following special syntaxes are used:
 - `!`: References constants. For example, `value="!const1"`.
-- `#`: References properties coming from API calls. For example, `main_color="#color"`.
 
 ### High-level example
 
@@ -517,49 +524,6 @@ lv_my_widget_set_item_color(parent, index, color);
 The `<view>` tag was mostly introduced above through examples hence only a few points are added here.
 
 
-#### Passing data
-When a new widget is created its API properties are described in the `<api>` tag.
-These properties can be passed to the children widgets. For example:
-```xml
-<!-- my_widgets.xml -->
-<api>
-	<enumdef name="layout">
-		<enum name="hor"/>
-		<enum name="ver"/>
-	</enumdef>
-
-	<arg name="width" type="px"/>
-	<arg name="click_event" type="event_cb"/>
-
-	<prop name="main_color">
-		<param name="color" type="color"/>
-	</prop>
-	<prop name="title">
-		<param name="text" type="string"/>
-	</prop>
-	<prop name="value">
-		<param name="value" type="int"/>
-	</prop>
-	<prop name="range">
-		<param name="min_value" type="int"/>
-		<param name="max_value" type="int"/>
-	</prop>
-</api>
-
-<view extends="obj" width="#width" style_bg_color="#main_color" flex_flow="column">
-	<label text="#title"/>
-	<slider value="#value" range="#range" mode="symmetrical"/>
-	<button width="size_content" height="size_content">
-		<events trigger="click">
-			<call_function name="#click_event"/>
-		</events>
-		<label text="Apply" align="center">
-	</button>
-</view>
-```
-
-Enum properties such as `layout` cannot be mapped directly, they require custom code.
-
 #### Store references
 
 As widgets are described a `store="true"` property can added to any widgets or elements to
@@ -577,6 +541,20 @@ typedef struct {
 	lv_obj_t * slider1;  /**< Some help */
 } lv_my_widget_t
 ```
+
+#### Extend
+
+The `view` element can have an `extend` attribute. It tells that the new widget is
+inherited from an other widget. For example
+```xml
+<view extend="slider" width="200px"/>
+```
+
+The default value of `extend` is `obj`.
+
+If the `<api>` element is missing the properties of the `extend`ed widget will be used.
+This way simple new widgets can be created by using the built-in widgets and not writing any logic.
+These simple widget can be loaded at runtime from XML too.
 
 ### Styles
 
