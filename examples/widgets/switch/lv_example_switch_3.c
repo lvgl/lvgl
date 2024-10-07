@@ -17,7 +17,7 @@ void lv_example_switch_3(void)
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     lv_obj_t * sw0;
-    lv_style_t * style0;
+    lv_style_t style0;
 
     //Define styles
     lv_style_init(&style0);
