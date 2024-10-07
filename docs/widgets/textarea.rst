@@ -77,7 +77,7 @@ Move the cursor
 
 The cursor position can be modified directly like
 :cpp:expr:`lv_textarea_set_cursor_pos(textarea, 10)`. The ``0`` position means
-"before the first characters", :cpp:enumerator:`LV_TA_CURSOR_LAST` means "after the
+"before the first characters", :cpp:enumerator:`LV_TEXTAREA_CURSOR_LAST` means "after the
 last character"
 
 You can step the cursor with
