@@ -21,12 +21,21 @@ static void lv_spinbox_decrement_event_cb(lv_event_t * e)
 
 void lv_example_spinbox_1(void)
 {
+
+    lv_style_t style;
+    lv_style_init(&style);
+
+    lv_style_set_bg_color(&style, lv_palette_main(LV_PALETTE_GREY));
+    lv_style_set_opa(&style, LV_OPA_30);
+
     spinbox = lv_spinbox_create(lv_screen_active());
     lv_spinbox_set_range(spinbox, -1000, 25000);
     lv_spinbox_set_digit_format(spinbox, 5, 2);
     lv_spinbox_step_prev(spinbox);
     lv_obj_set_width(spinbox, 100);
     lv_obj_center(spinbox);
+
+    lv_obj_add_style(spinbox, &style, LV_PART_CURSOR);
 
     int32_t h = lv_obj_get_height(spinbox);
 
