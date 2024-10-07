@@ -4,19 +4,35 @@
 
 ### Goal
 
-1. Describe widgets in a modular, reusable, and component-oriented way so that they can be embedded into each other.
-2. Allow generating easily extendable, developer-friendly code.
-3. Ensure that the XML files support describing the view without including the logic (similar to HTML).
-4. Create a preview to show the UIs described in an XML file in real-time, without recompiling.
-5. Provide an amazing user experience with autocompletion, tooltips, and help messages.
-6. Allow compiling the custom widget with custom code into the preview to check them with all the logic in place.
-7. Make the widgets testable and previewable in various configurations.
-8. Prepare for adding docs/help from the beginning, even in multiple languages.
+Support the developer where needed to proceed faster with the visual part of the UI, but allow writing code where it's more effective
+
+To achieve this
+- Think in components
+- Describer the widgetsin a declarative way
+- Allow nesting widgets
+- Generate developer friendly code
+- Load widgets in runtime
+- Realtime preview the components
+- Prepare for testing widgets
 
 It's **not the goal** to create a no-code tool. It is assumed that the user is a developer and can write code.
 The XML description should help with defining the view (and providing a preview) to allow fast iterations on the design.
 
-It's **not the goal** to allow creating the whole UI with XML either. It's acceptable to create visually heavy parts here and use the widget's API to dynamically create the more complex cases from code. It's also acceptable to define callbacks in code.
+Because of it it is **not the goal** to allow creating the whole UI with XML either. It's acceptable to create visually heavy parts here and use the widget's API to dynamically create the more complex cases from code.
+It's also acceptable to define callbacks in code.
+
+### Success criteria
+
+If these can be fulfilled, the tool is considered successful.
+
+1. **Component library**: Create a component library consisting of styled buttons, sliders, tabviews, etc and use these components to describe a finel UI
+2. **Access hand written components** Create a custom components manually (without the editor) and let's user use them in other components.
+3. **Widgets in the edtior** Create complex widgets in the editor, make them available in the editor, and allow using them in custom components.
+4. **Runtime loading** Allow loading even nested components in runtime.
+4. **Figma import** Allow loading styles and drawings from Figma with a simple copy-paste
+5. **Testing** Detect regression in components with CI
+6. **Collaboration** Let a designer preview the components and screens, and allow commenting on them.
+
 
 ### Design Considerations
 
@@ -25,83 +41,11 @@ It's **not the goal** to allow creating the whole UI with XML either. It's accep
 3. Focus on the view and do not develop a custom declarative language for the logic.
 4. Prefer approaches for which a straightforward and standard XSD (XML Schema) can be created. This allows supporting autocompletion and type validation, even in external XML editors.
 
-### Interacting with the XML
+### Workflows
 
-#### APIs
+#### Adding new built-in widgets
 
-The XML files are used to create widgets with or without APIs.
-Widgets can be nested, and for higher-level widgets, new (simpler) APIs can be defined.
-Due to this, when custom widgets are embedded into another widget, they can be accessed via a target and simple API.
-
-Eventually, most of the visual tasks can be realized directly in the XML files,
-but the logic of the UI should be described from code.
-
-What does the "logic" mean? For example:
-- What should happen when a button is clicked? Move to a new screen? Create a widget? Increment a value?
-- Read sensor data and show it on widgets.
-- Complex logic, such as adding a new series to a chart or setting a cell's value in a table.
-
-These tasks are where the child widgets are not used via their API, but require custom drawing and data management. These are outside of the scope of XML and preview and code should be written for these.
-
-New widgets described in XMLs can be used in two ways:
-1. Export code, add the content of the setter API function (if there is a new API),
-compile the widget with the application and use its API from the application
-2. Make LVGL load the XML file at runtime. (Only if there is no new API defined)
-
-#### Exporting Code
-
-For each widget, the following files are exported:
-- `<widget_name>_gen.h`: Contains the generated API implementation of the widget.
-- `<widget_name>_private_gen.h`: Contains private API and data for the widget.
-- `<widget_name>_gen.c`: Contains the generated API and internals of the widget.
-- `<widget_name>.h`: Includes `<widget_name>_gen.h` and allows the user to define custom APIs.
-- `<widget_name>.c`: Contains hooks from `<widget_name>_gen.c` and allows the user to write custom code.
-- `<widget_name>_xml_parser.c`: Processes the XML strings and calls the required functions according to the set attributes.
-
-#### Workflow
-
-The simpler workflow is when only the built-in widgets are used to describe how a screen or another widget looks without adding a specific API.
-The workflow for this is the following:
-1. Describe the `view` and `styles` of a widget or screen using the existing widgets.
-It can be previewed instantly as the `view` is edited.
-2. Use this component or screen in one of the following ways:
-   1. Export C code for it, compile it as part of the application, and use it like`my_custom_widget_create(parent);`.
-   2. Use the XML description directly and let LVGL process/create it at runtime (`lv_xml_load(parent, my_custom_widget_xml_data);`).
-
-Using the built-in widgets of LVGL to create a new UI is important, but it's only part of the concept. The user should be able to add custom widgets to the editor as well. These custom widgets are very similar to LVGL's built-in widgets in terms of:
-- They also have their own specific API to hide the internals.
-- They are described as a class.
-- Any number of instances can be created.
-- They can be as complex as any built-in LVGL widget (e.g. chart, table, span, etc)
-
-As an example, we will use a `sliderbox` widget which consists of a slider, a `+` button, a `-` button, and a title. The `sliderbox` has an API to set its `range`, `value`, and `title`. The workflow to add such a new built-in widget is the following:
-
-1. Describe the `view` of the `sliderbox` using the built-in widgets, i.e., add a slider, two buttons, and a label, arrange and style these widgets. It can be previewed instantly as the `view` is edited.
-2. Describe the `api` as well (properties, enums, etc.).
-3. Export C code for the `sliderbox` (a new class, setter functions based on the API, and a skeleton for parsing XML for the widget are created automatically).
-4. Write the new widget's XML parser (helpers are available to simplify this) and the logic in the API functions (in XML parsing, call the corresponding setter functions of the `sliderbox` for an XML like `<sliderbox range="10 100" value="30" title="Hello"/>`).
-5. Compile the C files of the `sliderbox` back into the editor. From this point, the editor will know about this new widget, process its API, and can handle it when it's embedded it into other widgets.
-6. Write tests for the new widget to see how it behaves after different API calls.
-7. Use the `sliderbox` in a new widget. Since it is already compiled into the editor, it will work the same way as any other built-in widget.
-
-### Notions and Conventions
-
-The standard XML format is followed: `<tag attribute="value"></tag>` or, if there are no children, `<tag attribute="value"/>`.
-
-Tag and attribute names must start with a letter and cannot have spaces or special characters, except:
-- `_`: Used to replace spaces.
-- `-`: Cannot be used in user-defined names, but is used in automatically created compound names for separation, e.g., `my_chart-my_series`. This avoids naming conflicts with user-defined names.
-
-These are valid names:
-- `my_slider`
-- `slider2`
-- `SuperSlider2000`
-- `value2_min`
-
-The following special syntaxes are used:
-- `!`: References constants. For example, `value="!const1"`.
-
-### High-level example
+### Example XML
 
 The interfaces of a widget are described in an `<api>` tag.
 The properties, elements (internal widgets), and enums of a given widget are defined here.
@@ -114,48 +58,185 @@ An example of a custom `sliderbox` widget:
 
 ```xml
 <!-- sliderbox.xml -->
-<api>
-	<enumdef name="mode">
-		<enum name="normal" help="Normal operation"/>
-		<enum name="inverted" help="Inverted operation"/>
-	</enumdef>
+<widget>
+	<api>
+		<enumdef name="mode">
+			<enum name="normal" help="Normal operation"/>
+			<enum name="inverted" help="Inverted operation"/>
+		</enumdef>
 
-	<prop name="range" help="The min and max range">
-		<param name="min_range" type="int" help="The minimum value"/>
-		<param name="max_range" type="int" help="The maximum value"/>
-	</prop>
-	<prop name="value" help="The current value">
-		<param name="value" type="int" help="The current value to set as an integer"/>
-	</prop>
-	<prop name="title" help="The title">
-		<param name="text" type="string" help="The title as a string"/>
-	</prop>
-</api>
+		<prop name="range" help="The min and max range">
+			<param name="min_range" type="int" help="The minimum value"/>
+			<param name="max_range" type="int" help="The maximum value"/>
+		</prop>
+		<prop name="value" help="The current value">
+			<param name="value" type="int" help="The current value to set as an integer"/>
+		</prop>
+		<prop name="title" help="The title">
+			<param name="text" type="string" help="The title as a string"/>
+		</prop>
+	</api>
 
-<styles>
-	<style name="main" bg_color="0xff0000" flex_flow="column"/>
-	<style name="blue" bg_color="0x0000ff"/>
-</styles>
+	<styles>
+		<style name="main" bg_color="0xff0000" flex_flow="column"/>
+		<style name="blue" bg_color="0x0000ff"/>
+	</styles>
 
-<view extends="obj" width="300px" height="size_content" styles="main blue-pressed">
-	<label text="Placeholder"/>
-	<slider width="100%" range="-100 100"/>
-	<button>
-		<label text="Apply"/>
-	</button>
-</view>
+	<view extends="obj" width="300px" height="size_content" styles="main blue-pressed">
+		<label text="Placeholder"/>
+		<slider width="100%" range="-100 100"/>
+		<button>
+			<label text="Apply"/>
+		</button>
+	</view>
+</widget>
 ```
 
 This is how it looks when the slider box is used, for example, in a list:
 
 ```xml
-<view>
+<view style_flex_flow="column">
 	<sliderbox value="40" mode="normal" title="First"/>
 	<sliderbox value="20" mode="inverted" title="Second"/>
 </view>
 ```
 
+For each property in `<api>` a setter function will be also exported where the user can  define any custom logic.
+
+An xml parser skeleton file will be also exported where the user can process the attributes and call the related setter functions.
+There are many helper functions to make is simple, so it should look like just this:
+```c
+if(lv_streq(attr, "color") my_widget_set_color(obj, lv_xml_str_to_color(value));
+if(lv_streq(attr, "limit") my_widget_set_limit(obj, atoi(value));
+```
+
+Once both the setters and XML parser is implemented the editor's core can be recompiled
+with this new widget, so that it will be parts of the editor and preview.
+
+In summary these file will be generated for widgets with API:
+- `<widget_name>_gen.h`: Contains the generated API implementation of the widget.
+- `<widget_name>_private_gen.h`: Contains private API and the data for the widget.
+- `<widget_name>_gen.c`: Contains the internals of the widget.
+- `<widget_name>.h`: Includes `<widget_name>_gen.h` and allows the user to define custom APIs.
+- `<widget_name>.c`: Contains hooks from `<widget_name>_gen.c` and allows the user to write custom code.
+- `<widget_name>_xml_parser.c`: Processes the XML strings and calls the required functions according to the set attributes.
+
+#### Using only the built-in widgets
+
+##### Example XML
+
+```xml
+<!-- my_button.xml-->
+<component>
+	<params>
+		<string name="text"/>
+		<event name="click_cb"/>
+	</params>
+
+	<consts>
+		<px name="width" value="100"/>
+	</consts>
+
+	<styles>
+		<style name="red" bg_color="0xff0000" width="#{width}"/>
+		<style name="blue" bg_color="0x0000ff"/>
+	</styles>
+
+	<view extends="button" styles="red blue:pressed">
+			<events trigger="clicked">
+			<call_function name="${click_cb} param="subject:counter"/>
+		</events>
+		<label text=${text} align="center"/>
+	</view>
+</component>
+```
+
+`my_button` can be sued like this on a screen.
+```xml
+<screen>
+	<view>
+		<my_button text="Settings" click_cb="open_settings">
+	</view>
+</screen>
+```
+
+##### Export C code
+
+From the XML file above a C function can be generated like this:
+```c
+lv_obj_t * my_button_create(lv_obj_t * parent, const char * title, lv_event_cb_t click_cb);
+```
+
+#### Load from XML
+
+Components created from XML at runtime like this:
+```c
+/*Save the XML, create the styles, save the constants, order of params, etc*/
+lv_xml_component_t * my_button = lv_xml_load_component("my_button.xml");
+```
+
+```c
+/* Create the widget according to the view and apply the params*/
+lv_obj_t * button1 =  lv_xml_create_component(my_button, parent, params);
+```
+
+When the screen is loaded like:
+```c
+lv_obj_t * screen = lv_xml_create_screen(my_screen);
+```
+
+It will handle both the built-in widgets and the custom components.
+
+
+#### Using a widget from C
+
+##### Example XML
+
+Just omit the `view`
+
+```xml
+<!-- my_slider.xml-->
+
+<component>
+	<params>
+		<...>
+	</param>
+</component>
+```
+
+or
+```xml
+<!-- my_slider.xml-->
+
+<widget>
+	<api>
+		<...>
+	</api>
+</widget>
+```
+
+
 ## XML Overview
+
+### Notions and Conventions
+
+The standard XML format is followed: `<tag attribute="value"></tag>` or, if there are no children, `<tag attribute="value"/>`.
+
+Tag and attribute names must start with a letter and cannot have spaces or special characters, except:
+- `_`: Used to replace spaces.
+- `-`: Cannot be used in user-defined names, but is used in automatically created compound names for separation, e.g., `my_chart-my_series`. This avoids naming conflicts with user-defined names.
+- `:`: Used for namespacing.
+
+These are valid names:
+- `my_slider`
+- `slider2`
+- `SuperSlider2000`
+- `value2_min`
+
+The following special syntaxes are used:
+- `#{}`: References constants. For example, `value="#{const1}"`.
+- `${}`: References arguments. For example, `value="${num}"`.
+
 
 ### Types
 The following built-in types are supported:
@@ -191,9 +272,37 @@ Types can be compound, meaning multiple options/types are possible. For example,
 When used as a type, a `+` suffix means multiple values can be selected and ORed. For example: `type="axis+"`.
 It's also possible to limit the possible options the user can select from an enum. For example: `type="dir(top bottom)"`
 
-### API and View
+### `<params>`
+
+`<params>` can be added in case of for simple widgets which are using only other built-in widget.
+
+The parameters defined here describe the parameters passed to the create function. Here is a detaield example:
+```xml
+<params>
+	<param name="title" type="string" help="The title"/>
+	<param name="limit" type="int" help="The max value" default="0"/>
+	<param name="mode" type="lv_slider:mode" help="The slider mode"/>
+</params>
+```
+
+There are a few interesting things to notice:
+- If a `default` value is added the parameter is optional. If it's omotted the default value will be sued. If there is no default value the element is mandatory.
+- As `type` any other widget's enums can be used in the following format: `<widget_name>:<enum_name>`
+
+In the view parameters can be used like this:
+```xml
+<view>
+	<label text="${title}"/>
+</view>
+```
+
+### `<api>`
 
 The following elements can be defined in the `<api>` section and used later in the `<view>`.
+
+Note that if the `<api>` is defined
+- More complex code will be generated to with the purpose of create full features widgets
+- `<params>` can't be defined.
 
 #### `<enumdef>`
 
@@ -281,8 +390,6 @@ By default, `name` in `<prop>` is used to build the name of the setter function 
 ```c
 <widget_name>_set_<prop_name>(lv_obj_t * obj, <param1_type> <param1_name>, <param2_type> <param2_name>, ...);
 ```
-
-For the sake of flexibility, an `alias` attribute can be defined in `<prop>` to explicitly set the name of the setter function. For example: <prop alias="custom_range_set">.
 
 `<prop>`s have an optional `<postponed>` `bool` attribute.
 By default it's `false` but if it's set to `true` the give property will be applied after all the children are created.
@@ -519,7 +626,7 @@ lv_my_widget_set_item_icon(parent, index, image1);
 lv_my_widget_set_item_color(parent, index, color);
 ```
 
-#### `<view>`
+### `<view>`
 
 The `<view>` tag was mostly introduced above through examples hence only a few points are added here.
 
@@ -542,6 +649,9 @@ typedef struct {
 } lv_my_widget_t
 ```
 
+It works only if there is `<api>` the pointers are stored in the widgets' class data.
+Without `<api>` element just a simple create function is exported.
+
 #### Extend
 
 The `view` element can have an `extend` attribute. It tells that the new widget is
@@ -555,6 +665,50 @@ The default value of `extend` is `obj`.
 If the `<api>` element is missing the properties of the `extend`ed widget will be used.
 This way simple new widgets can be created by using the built-in widgets and not writing any logic.
 These simple widget can be loaded at runtime from XML too.
+
+### `<screen>`
+
+In the XML normally components are described.
+By using a widget in the `<view>` if an XML file an instance of the widget will be created.
+
+However, besides components screens are also important to create a well structured UI.
+
+Screens can be created by using a `<screens>` element with `<screen>` children. For example:
+
+```xml
+<screens>
+	<screen name="main_screen" dynamic="true">
+		<styles .../>
+		<consts .../>
+		<subjects .../>
+		<images .../>
+		<fonts .../>
+		<view>
+			<header/>
+			<menu_selector/>
+			<footer/>
+		</view>
+	</screen>
+
+	<screen name="settings">
+		<view>
+			<list>
+				<checkbox text="Option1" bind="subject1"/>
+				<checkbox text="Option1" bind="subject2"/>
+			</list>
+		</view>
+	</screen>
+</screens>
+```
+
+Each `<screen>` elements will be exported into a separate file.
+As the example shows internal styles, constants, subjects, images and fonts also can be defined for each screen.
+
+If `dynamic="true"` is set the screen will be automatically created and deleted when it's loaded/unloaded.
+Otherwise the screen is created once when the widget library is initialized.
+
+When loading a screen from XML `lv_xml_load(NULL, xml_data, xml_data_len);` can be used.
+The first parameter (parent) is `NULL` as the screens has no parent.
 
 ### Styles
 
@@ -632,6 +786,13 @@ The supported types are:
 </consts>
 ```
 
+And they can be used like:
+```
+<styles>
+	<style name="style1" bg_color=#{color1}/>
+</styles>
+```
+
 The following is an example of the exported code:
 
 ```c
@@ -703,6 +864,13 @@ For the example above, two fonts will be generated, each guarded with:
 
 In the `<static_variant>`, any properties can be overridden (e.g., size, range, symbol, src_path) except the name.
 
+If the XML file of a widget loaded at run-time the fonts should be mapped to their names like this:
+
+```c
+lv_xml_map_font("font1", some_font); /* lv_font_t * some_font */
+```
+
+
 ### Images
 
 An `<images>` section can be added to a widget locally or in any `global.xml` files.
@@ -739,6 +907,15 @@ For the example above, two images will be generated, each guarded with:
 ```
 
 In the `<static_variant>`, any properties can be overridden (e.g., scale, color_format, src_path, memory) except the name.
+
+
+If the XML file of a widget loaded at run-time the images should be mapped to their names like this:
+
+```c
+lv_xml_map_image("logo1", &some_image);
+lv_xml_map_image("logo2", "A:path/to/file.png");
+```
+
 
 ### Subjects
 
@@ -825,6 +1002,12 @@ Event handlers can be specified for widgets like this:
 ```
 
 For `call_function`s the user needs to implement the function with the given name.
+
+If the XML file loaded at run-time the the `call_function` names should be mapped to C functions like this:
+
+```c
+lv_xml_map_event("some_callback", my_callback);
+```
 
 ### Translations
 
@@ -1011,8 +1194,8 @@ A single `project.xml` file should be created where the following content is spe
 	</renesas>
 
 	<simulator>
-		<display width="320" height="240" color_format="RGB565"/>
-		<display width="800" height="480" color_format="ARGB8888"/>
+		<display name="small" width="320" height="240" color_format="RGB565"/>
+		<display name="large" width="800" height="480" color_format="ARGB8888"/>
 	</simulator>
 </hardware>
 ```
@@ -1031,3 +1214,4 @@ The exact mechanism is still to be defined, but some special tags could support 
 <update_widget name="slider1" prop="range" param="10 200"/>
 <update_subject name="temp1" value="13"/>
 ```
+
