@@ -13,7 +13,8 @@ static void event_cb(lv_event_t * e)
     //Change style properties
     if(change) {
         lv_style_set_border_side(&style1, LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_RIGHT);
-    } else {
+    }
+    else {
         lv_style_set_border_side(&style1, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT);
     }
     change = ~change;
