@@ -17,7 +17,7 @@ void lv_example_switch_3(void)
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     lv_obj_t * sw0;
-    lv_style_t* style0;
+    lv_style_t * style0;
 
     //Define styles
     lv_style_init(&style0);
@@ -27,7 +27,7 @@ void lv_example_switch_3(void)
     //Create switch
     sw0 = lv_switch_create(lv_screen_active());
     lv_obj_center(sw0);
-    lv_obj_align(sw0,LV_ALIGN_LEFT_MID, 0, 0);
+    lv_obj_align(sw0, LV_ALIGN_LEFT_MID, 0, 0);
     lv_obj_set_size(sw0, 30, 60);
     lv_obj_add_event_cb(sw0, event_handler, LV_EVENT_ALL, NULL);
     lv_switch_set_orientation(sw0, LV_SWITCH_ORIENTATION_VERTICAL);
