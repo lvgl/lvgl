@@ -108,7 +108,7 @@ Gradients for button background
   :language: c
 
 Style report changes
--------------------------------
+--------------------
 
 .. lv_example:: styles/lv_example_style_19
   :language: c

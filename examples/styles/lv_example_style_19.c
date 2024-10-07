@@ -10,7 +10,7 @@ static void event_cb(lv_event_t * e)
     static uint8_t change = 0;
     lv_obj_t * btn = lv_event_get_target(e);
     lv_obj_t * obj = lv_obj_get_parent(btn);
-    //Change style properties
+    /*Change style properties*/
     if(change) {
         lv_style_set_border_side(&style1, LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_RIGHT);
     }
@@ -18,7 +18,7 @@ static void event_cb(lv_event_t * e)
         lv_style_set_border_side(&style1, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT);
     }
     change = ~change;
-    //Notify the object, that a property has been changed
+    /*Notify the object, that a property has been changed*/
     lv_obj_invalidate(obj);
 }
 /**
@@ -45,12 +45,12 @@ void lv_example_style_19(void)
     lv_obj_add_style(obj, &style1, 0);
     lv_obj_center(obj);
 
-    //Create a button, and click event for it to change style properties on demand
+    /*Create a button, and click event for it to change style properties on demand*/
     lv_obj_t * btn = lv_btn_create(obj);
     lv_obj_center(btn);
     lv_obj_add_event_cb(btn, event_cb, LV_EVENT_CLICKED, NULL);
 
-    //Create a label for user friendliness
+    /*Create a label for user friendliness*/
     lv_obj_t * label = lv_label_create(btn);
     lv_label_set_text(label, "Click me!");
     lv_obj_center(label);
