@@ -149,6 +149,7 @@ void lv_example_tabview_2(void);
 void lv_example_textarea_1(void);
 void lv_example_textarea_2(void);
 void lv_example_textarea_3(void);
+void lv_example_textarea_4(void);
 
 void lv_example_tileview_1(void);
 
