@@ -1900,6 +1900,15 @@ Empty_sequence_handler:
             return VG_LITE_INVALID_ARGUMENT;
         }
 
+        if(ctx->scissor_rect.x == x && ctx->scissor_rect.y == y &&
+           ctx->scissor_rect.width == width && ctx->scissor_rect.height == height) {
+            return VG_LITE_SUCCESS;
+        }
+
+        /*Finish the previous rendering before setting the new scissor*/
+        vg_lite_error_t error;
+        VG_LITE_RETURN_ERROR(vg_lite_finish());
+
         ctx->scissor_rect.x = x;
         ctx->scissor_rect.y = y;
         ctx->scissor_rect.width = width;
@@ -2379,12 +2388,12 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
 
     ctx->tvg_target_buffer = canvas_target_buffer;
 
-    Result res = ctx->canvas->target(
-                     (uint32_t *)ctx->tvg_target_buffer,
-                     target->width,
-                     target->width,
-                     target->height,
-                     SwCanvas::ARGB8888);
+    TVG_CHECK_RETURN_RESULT(ctx->canvas->target(
+                                (uint32_t *)ctx->tvg_target_buffer,
+                                target->width,
+                                target->width,
+                                target->height,
+                                SwCanvas::ARGB8888));
 
     if(ctx->scissor_is_set) {
         TVG_CHECK_RETURN_RESULT(
@@ -2393,7 +2402,7 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
                 ctx->scissor_rect.width, ctx->scissor_rect.height));
     }
 
-    return res;
+    return Result::Success;
 }
 
 static vg_lite_uint32_t width_to_stride(vg_lite_uint32_t w, vg_lite_buffer_format_t color_format)
