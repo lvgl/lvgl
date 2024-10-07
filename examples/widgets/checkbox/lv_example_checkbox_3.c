@@ -18,8 +18,8 @@ static void event_handler0(lv_event_t * e)
     }
 }
 
-void lv_example_checkbox_3(void){
-
+void lv_example_checkbox_3(void)
+{
     lv_obj_t * checkbox0;
     lv_obj_t * checkbox1;
     lv_obj_t * checkbox2;
