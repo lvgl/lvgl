@@ -139,8 +139,7 @@ used to add content to a texture and the driver will draw the texture in the win
 
         /* create objects on the screen of the sub texture */
         lv_display_set_default(sub_texture);
-        lv_obj_set_style_bg_color(lv_screen_active(), lv_color_black(), 0);
-        lv_example_anim_2();
+        lv_example_keyboard_2();
         lv_display_set_default(main_texture);
 
         /* position the sub texture within the window */
