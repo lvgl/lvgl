@@ -33,11 +33,11 @@ Dependencies
 ------------
 
 The Lottie widget uses the `ThorVG <https://github.com/thorvg/thorvg>`__ library which is `integrated into LVGL <https://github.com/lvgl/lvgl/tree/master/src/libs/thorvg>`__.
-In order to use Lottie animations ``LV_USE_THORVG_INTERNAL`` (to use the built-in ThorVG) or
-``LV_USE_THORVG_EXTERNAL`` (to link it externally) needs to enabled. For vector graphics in general
-``LV_USE_VECTOR_GRAPHIC`` also needs to be enabled.
+In order to use Lottie animations :c:macro:`LV_USE_THORVG_INTERNAL` (to use the built-in ThorVG) or
+:c:macro:`LV_USE_THORVG_EXTERNAL` (to link it externally) needs to enabled. For vector graphics in general
+:c:macro:`LV_USE_VECTOR_GRAPHIC` also needs to be enabled.
 
-As ThorVG is written in C++, when using ``LV_USE_THORVG_INTERNAL`` be sure that you
+As ThorVG is written in C++, when using :c:macro:`LV_USE_THORVG_INTERNAL` be sure that you
 can compile the cpp files.
 
 Set a buffer
@@ -50,10 +50,10 @@ The animations are rendered in ARGB8888 format, therefor the buffer's size shoul
 To keep the buffer size and the animation size consistent,
 the size of the widget (i.e. the size of the animation) is set to the dimensions of the buffer internally.
 
-The buffer can be set with either :cpp:expr:`void lv_lottie_set_buffer(lottie, w, h, buf);`
+The buffer can be set with either :cpp:expr:`lv_lottie_set_buffer(lottie, w, h, buf)`
 or :cpp:expr:`lv_lottie_set_draw_buf(lottie, draw_buf)`.
 
-When a draw buffer is used, it must be already initialized by the user with :cpp:expr:`LV_COLOR_FORMAT_ARGB8888` color format.
+When a draw buffer is used, it must be already initialized by the user with :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888` color format.
 
 Set a source
 ------------
@@ -66,14 +66,14 @@ following reasons:
 ``lvgl/scripts/filetohex.py`` can be used to convert a Lottie file a hex
 array. E.g.:
 
-.. code:: shell
+.. code-block:: shell
 
    ./filetohex.py path/to/lottie.json > out.txt
 
 To create an animation from data use
-:cpp:enumerator:`lv_lottie_set_src_data(lottie, data, sizeof(data))`
+:cpp:expr:`lv_lottie_set_src_data(lottie, data, sizeof(data))`
 
-Lottie animations can be opened from JSON files by using :cpp:enumerator:`lv_lottie_set_src_file(lottie, "path/to/file.json")`.
+Lottie animations can be opened from JSON files by using :cpp:expr:`lv_lottie_set_src_file(lottie, "path/to/file.json")`.
 Note that the Lottie loader doesn't support LVGL's File System interface but a "normal path" should be used without a driver letter.
 
 Get the animation

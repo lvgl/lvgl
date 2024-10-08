@@ -14,4 +14,4 @@ sudo apt install gcc gcc-multilib g++-multilib ninja-build \
     ruby-full gcovr cmake  python3 pngquant libinput-dev libxkbcommon-dev \
     libdrm-dev pkg-config wayland-protocols libwayland-dev libwayland-bin \
     libwayland-dev:i386 libxkbcommon-dev:i386
-pip3 install pypng lz4
+pip3 install pypng lz4 kconfiglib

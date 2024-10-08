@@ -44,7 +44,7 @@ typedef lv_result_t (*lv_property_getter_t)(const lv_obj_t *, lv_prop_id_t, lv_p
  **********************/
 
 static lv_result_t obj_property(lv_obj_t * obj, lv_prop_id_t id, lv_property_t * value, bool set);
-static int32_t property_name_compare(const void * ref, const void * element);
+static int property_name_compare(const void * ref, const void * element);
 
 /**********************
  *  STATIC VARIABLES
@@ -121,7 +121,7 @@ lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, uint32_
     uint32_t index = LV_PROPERTY_ID_INDEX(id);
 
     if(index == LV_PROPERTY_ID_INVALID || index >= LV_PROPERTY_ID_START) {
-        LV_LOG_WARN("invalid style property id %d", id);
+        LV_LOG_WARN("invalid style property id 0x%" LV_PRIx32, id);
         value.id = LV_PROPERTY_ID_INVALID;
         value.num = 0;
         return value;
@@ -232,7 +232,7 @@ static lv_result_t obj_property(lv_obj_t * obj, lv_prop_id_t id, lv_property_t *
 
             /*id matched but we got null pointer to functions*/
             if(set ? prop->setter == NULL : prop->getter == NULL) {
-                LV_LOG_WARN("NULL %s provided, id: %d", set ? "setter" : "getter", id);
+                LV_LOG_WARN("NULL %s provided, id: 0x%" LV_PRIx32, set ? "setter" : "getter", id);
                 return LV_RESULT_INVALID;
             }
 
@@ -278,7 +278,7 @@ static lv_result_t obj_property(lv_obj_t * obj, lv_prop_id_t id, lv_property_t *
                         break;
                     }
                 default: {
-                        LV_LOG_WARN("Unknown property id: 0x%08x", prop->id);
+                        LV_LOG_WARN("Unknown property id: 0x%08" LV_PRIx32, prop->id);
                         return LV_RESULT_INVALID;
                     }
             }
@@ -289,7 +289,7 @@ static lv_result_t obj_property(lv_obj_t * obj, lv_prop_id_t id, lv_property_t *
         /*If no setter found, try base class then*/
     }
 
-    LV_LOG_WARN("Unknown property id: 0x%08x", id);
+    LV_LOG_WARN("Unknown property id: 0x%08" LV_PRIx32, id);
     return LV_RESULT_INVALID;
 }
 

@@ -45,7 +45,7 @@ be :c:macro:`LV_GRID_TEMPLATE_LAST`.
 
 For example:
 
-.. code:: c
+.. code-block:: c
 
    static int32_t column_dsc[] = {100, 400, LV_GRID_TEMPLATE_LAST};   /*2 columns with 100 and 400 ps width*/
    static int32_t row_dsc[] = {100, 100, 100, LV_GRID_TEMPLATE_LAST}; /*3 100 px tall rows*/

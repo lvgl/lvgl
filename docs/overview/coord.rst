@@ -98,13 +98,13 @@ This is an internal mechanism and doesn't matter much as you use LVGL.
 However, there is one case in which you need to be aware of the
 implementation. If the style(s) of an object are removed by
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_remove_style_all(obj)
 
 or
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_remove_style(obj, NULL, LV_PART_MAIN);
 
@@ -112,7 +112,7 @@ the earlier set coordinates will be removed as well.
 
 For example:
 
-.. code:: c
+.. code-block:: c
 
    /*The size of obj1 will be set back to the default in the end*/
    lv_obj_set_size(obj1, 200, 100);  /*Now obj1 has 200;100 size*/
@@ -133,7 +133,7 @@ Simple way
 
 To simply set the x and y coordinates of an object use:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_set_x(obj, 10);        //Separate...
    lv_obj_set_y(obj, 20);
@@ -146,7 +146,7 @@ pixels of padding on every side the above code will place ``obj`` at
 
 Percentage values are calculated from the parent's content area size.
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_set_x(btn, lv_pct(10)); //x = 10 % of parent content area width
 
@@ -158,13 +158,13 @@ from the default top left. If the origin is changed e.g. to
 bottom-right, the (0,0) position means: align to the bottom-right
 corner. To change the origin use:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_set_align(obj, align);
 
 To change the alignment and set new coordinates:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_align(obj, align, x, y);
 
@@ -183,7 +183,7 @@ The following alignment options can be used:
 It's quite common to align a child to the center of its parent,
 therefore a dedicated function exists:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_center(obj);
 
@@ -196,7 +196,7 @@ children is updated automatically.
 The functions introduced above align the object to its parent. However,
 it's also possible to align an object to an arbitrary reference object.
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_align_to(obj_to_align, reference_obj, align, x, y);
 
@@ -219,7 +219,7 @@ an object outside the reference object:
 For example to align a label above a button and center the label
 horizontally:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_align_to(label, btn, LV_ALIGN_OUT_TOP_MID, 0, -10);
 
@@ -237,7 +237,7 @@ Sizing the Simple way
 
 The width and the height of an object can be set easily as well:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_set_width(obj, 200);       //Separate...
    lv_obj_set_height(obj, 100);
@@ -246,7 +246,7 @@ The width and the height of an object can be set easily as well:
 Percentage values are calculated based on the parent's content area
 size. For example to set the object's height to the screen height:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_set_height(obj, lv_pct(100));
 
@@ -263,7 +263,7 @@ The above functions set the size of an object's bounding box but the
 size of the content area can be set as well. This means an object's
 bounding box will be enlarged with the addition of padding.
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_set_content_width(obj, 50); //The actual width: padding left + 50 + padding right
    lv_obj_set_content_height(obj, 30); //The actual width: padding top + 30 + padding bottom
@@ -271,7 +271,7 @@ bounding box will be enlarged with the addition of padding.
 The size of the bounding box and the content area can be retrieved with
 the following functions:
 
-.. code:: c
+.. code-block:: c
 
    int32_t w = lv_obj_get_width(obj);
    int32_t h = lv_obj_get_height(obj);
@@ -303,7 +303,7 @@ However, using styles to set the coordinates has some great advantages:
 
 Here are some examples to set an object's size using a style:
 
-.. code:: c
+.. code-block:: c
 
    static lv_style_t style;
    lv_style_init(&style);
@@ -329,7 +329,7 @@ it's pressed.
 One way to achieve this is by setting a new Y coordinate for the pressed
 state:
 
-.. code:: c
+.. code-block:: c
 
    static lv_style_t style_normal;
    lv_style_init(&style_normal);
@@ -352,7 +352,7 @@ This works, but it's not really flexible because the pressed coordinate
 is hard-coded. If the buttons are not at y=100, ``style_pressed`` won't
 work as expected. Translations can be used to solve this:
 
-.. code:: c
+.. code-block:: c
 
    static lv_style_t style_normal;
    lv_style_init(&style_normal);
@@ -402,7 +402,7 @@ transformation is "only" a visual effect.
 
 This code enlarges a button when it's pressed:
 
-.. code:: c
+.. code-block:: c
 
    static lv_style_t style_pressed;
    lv_style_init(&style_pressed);
@@ -422,7 +422,7 @@ object's size from becoming smaller/larger than these values. They are
 especially useful if the size is set by percentage or
 :c:macro:`LV_SIZE_CONTENT`.
 
-.. code:: c
+.. code-block:: c
 
    static lv_style_t style_max_height;
    lv_style_init(&style_max_height);
@@ -434,7 +434,7 @@ especially useful if the size is set by percentage or
 Percentage values can be used as well which are relative to the size of
 the parent's content area.
 
-.. code:: c
+.. code-block:: c
 
    static lv_style_t style_max_height;
    lv_style_init(&style_max_height);
@@ -491,7 +491,7 @@ Adding new layouts
 
 LVGL can be freely extended by a custom layout like this:
 
-.. code:: c
+.. code-block:: c
 
    uint32_t MY_LAYOUT;
 
@@ -509,7 +509,7 @@ LVGL can be freely extended by a custom layout like this:
 Custom style properties can be added which can be retrieved and used in
 the update callback. For example:
 
-.. code:: c
+.. code-block:: c
 
    uint32_t MY_PROP;
    ...

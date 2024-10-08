@@ -57,7 +57,7 @@ To use the memory-mapped file emulation an ``lv_fs_path_ex_t`` object must be
 created and initialized. This object can be passed to :cpp:func:`lv_fs_open` as
 the file name:
 
-.. code:: c
+.. code-block:: c
 
   lv_fs_path_ex_t mempath;
   lv_fs_file_t file;

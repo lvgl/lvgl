@@ -32,7 +32,7 @@
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
     #include "lv_conf_kconfig.h"
-    #ifdef CONFIG_LV_CONF_SKIP
+    #if defined(CONFIG_LV_CONF_SKIP) && !defined(LV_CONF_SKIP)
         #define LV_CONF_SKIP
     #endif
 #endif
@@ -281,6 +281,25 @@
             #define LV_OS_CUSTOM_INCLUDE <stdint.h>
         #endif
     #endif
+#endif
+#if LV_USE_OS == LV_OS_FREERTOS
+	/*
+	 * Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
+	 * than unblocking a task using an intermediary object such as a binary semaphore.
+	 *
+	 * RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
+	 */
+	#ifndef LV_USE_FREERTOS_TASK_NOTIFY
+	    #ifdef LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_USE_FREERTOS_TASK_NOTIFY
+	            #define LV_USE_FREERTOS_TASK_NOTIFY CONFIG_LV_USE_FREERTOS_TASK_NOTIFY
+	        #else
+	            #define LV_USE_FREERTOS_TASK_NOTIFY 0
+	        #endif
+	    #else
+	        #define LV_USE_FREERTOS_TASK_NOTIFY 1
+	    #endif
+	#endif
 #endif
 
 /*========================
@@ -2982,6 +3001,132 @@
             #define LV_PROFILER_END_TAG   LV_PROFILER_BUILTIN_END_TAG
         #endif
     #endif
+
+    /*Enable layout profiler*/
+    #ifndef LV_PROFILER_LAYOUT
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_PROFILER_LAYOUT
+                #define LV_PROFILER_LAYOUT CONFIG_LV_PROFILER_LAYOUT
+            #else
+                #define LV_PROFILER_LAYOUT 0
+            #endif
+        #else
+            #define LV_PROFILER_LAYOUT 1
+        #endif
+    #endif
+
+    /*Enable disp refr profiler*/
+    #ifndef LV_PROFILER_REFR
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_PROFILER_REFR
+                #define LV_PROFILER_REFR CONFIG_LV_PROFILER_REFR
+            #else
+                #define LV_PROFILER_REFR 0
+            #endif
+        #else
+            #define LV_PROFILER_REFR 1
+        #endif
+    #endif
+
+    /*Enable draw profiler*/
+    #ifndef LV_PROFILER_DRAW
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_PROFILER_DRAW
+                #define LV_PROFILER_DRAW CONFIG_LV_PROFILER_DRAW
+            #else
+                #define LV_PROFILER_DRAW 0
+            #endif
+        #else
+            #define LV_PROFILER_DRAW 1
+        #endif
+    #endif
+
+    /*Enable indev profiler*/
+    #ifndef LV_PROFILER_INDEV
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_PROFILER_INDEV
+                #define LV_PROFILER_INDEV CONFIG_LV_PROFILER_INDEV
+            #else
+                #define LV_PROFILER_INDEV 0
+            #endif
+        #else
+            #define LV_PROFILER_INDEV 1
+        #endif
+    #endif
+
+    /*Enable decoder profiler*/
+    #ifndef LV_PROFILER_DECODER
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_PROFILER_DECODER
+                #define LV_PROFILER_DECODER CONFIG_LV_PROFILER_DECODER
+            #else
+                #define LV_PROFILER_DECODER 0
+            #endif
+        #else
+            #define LV_PROFILER_DECODER 1
+        #endif
+    #endif
+
+    /*Enable font profiler*/
+    #ifndef LV_PROFILER_FONT
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_PROFILER_FONT
+                #define LV_PROFILER_FONT CONFIG_LV_PROFILER_FONT
+            #else
+                #define LV_PROFILER_FONT 0
+            #endif
+        #else
+            #define LV_PROFILER_FONT 1
+        #endif
+    #endif
+
+    /*Enable fs profiler*/
+    #ifndef LV_PROFILER_FS
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_PROFILER_FS
+                #define LV_PROFILER_FS CONFIG_LV_PROFILER_FS
+            #else
+                #define LV_PROFILER_FS 0
+            #endif
+        #else
+            #define LV_PROFILER_FS 1
+        #endif
+    #endif
+
+    /*Enable style profiler*/
+    #ifndef LV_PROFILER_STYLE
+        #ifdef CONFIG_LV_PROFILER_STYLE
+            #define LV_PROFILER_STYLE CONFIG_LV_PROFILER_STYLE
+        #else
+            #define LV_PROFILER_STYLE 0
+        #endif
+    #endif
+
+    /*Enable timer profiler*/
+    #ifndef LV_PROFILER_TIMER
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_PROFILER_TIMER
+                #define LV_PROFILER_TIMER CONFIG_LV_PROFILER_TIMER
+            #else
+                #define LV_PROFILER_TIMER 0
+            #endif
+        #else
+            #define LV_PROFILER_TIMER 1
+        #endif
+    #endif
+
+    /*Enable cache profiler*/
+    #ifndef LV_PROFILER_CACHE
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_PROFILER_CACHE
+                #define LV_PROFILER_CACHE CONFIG_LV_PROFILER_CACHE
+            #else
+                #define LV_PROFILER_CACHE 0
+            #endif
+        #else
+            #define LV_PROFILER_CACHE 1
+        #endif
+    #endif
 #endif
 
 /** 1: Enable Monkey test */
@@ -3122,8 +3267,8 @@
     #endif
 #endif
 
-/*1: Enable freetype font manager*/
-/*Requires: LV_USE_FREETYPE*/
+/** 1: Enable freetype font manager
+ *  - Requires: LV_USE_FREETYPE */
 #ifndef LV_USE_FONT_MANAGER
     #ifdef CONFIG_LV_USE_FONT_MANAGER
         #define LV_USE_FONT_MANAGER CONFIG_LV_USE_FONT_MANAGER

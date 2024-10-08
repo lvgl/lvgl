@@ -22,7 +22,6 @@ Configure OpenGL Driver
 
 1. Required linked libraries: -lGL -lGLEW -lglfw
 2. Enable the OpenGL driver support in lv_conf.h, by cmake compiler define or by KConfig
-
     .. code-block:: c
 
         #define LV_USE_OPENGLES  1

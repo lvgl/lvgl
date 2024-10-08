@@ -23,14 +23,14 @@ Value, range and step
 
 - :cpp:expr:`lv_spinbox_set_value(spinbox, 1234)` sets a new value on the Spinbox.
 - :cpp:expr:`lv_spinbox_increment(spinbox)` and :cpp:expr:`lv_spinbox_decrement(spinbox)`
-increments/decrements the value of the Spinbox according to the currently selected digit.
+  increments/decrements the value of the Spinbox according to the currently selected digit.
 - :cpp:expr:`lv_spinbox_set_range(spinbox, -1000, 2500)` sets a range. If the
-value is changed by :cpp:func:`lv_spinbox_set_value`, by
-*Keys*,\ ``lv_spinbox_increment/decrement`` this range will be respected.
+  value is changed by :cpp:func:`lv_spinbox_set_value`, by
+  *Keys*,\ ``lv_spinbox_increment/decrement`` this range will be respected.
 - :cpp:expr:`lv_spinbox_set_step(spinbox, 100)` sets which digits to change on
-increment/decrement. Only multiples of ten can be set, and not for example 3.
+  increment/decrement. Only multiples of ten can be set, and not for example 3.
 - :cpp:expr:`lv_spinbox_set_cursor_pos(spinbox, 1)` sets the cursor to a specific
-digit to change on increment/decrement. For example position '0' sets the cursor to the least significant digit.
+  digit to change on increment/decrement. For example position '0' sets the cursor to the least significant digit.
 
 If an encoder is used as input device, the selected digit is shifted to
 the right by default whenever the encoder button is clicked. To change this behaviour to shifting
@@ -57,7 +57,7 @@ is disabled the value will remain at the minimum or maximum value.
 Events
 ******
 
--  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the value has changed.
+- :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the value has changed.
 
 See the events of the :ref:`Text area <lv_textarea>` too.
 
@@ -68,12 +68,12 @@ Learn more about :ref:`events`.
 Keys
 ****
 
--  ``LV_KEY_LEFT/RIGHT`` With *Keypad* move the cursor left/right. With
-   *Encoder* decrement/increment the selected digit.
--  ``LV_KEY_UP/DOWN`` With *Keypad* and *Encoder* increment/decrement
-   the value.
--  :cpp:enumerator:`LV_KEY_ENTER` With *Encoder* got the net digit. Jump to the first
-   after the last.
+- ``LV_KEY_LEFT/RIGHT`` With *Keypad* move the cursor left/right. With
+  *Encoder* decrement/increment the selected digit.
+- ``LV_KEY_UP/DOWN`` With *Keypad* and *Encoder* increment/decrement
+  the value.
+- :cpp:enumerator:`LV_KEY_ENTER` With *Encoder* got the net digit. Jump to the first
+  after the last.
 
 .. _lv_spinbox_example:
 

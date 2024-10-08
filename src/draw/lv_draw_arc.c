@@ -56,7 +56,7 @@ void lv_draw_arc(lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
     if(dsc->width == 0) return;
     if(dsc->start_angle == dsc->end_angle) return;
 
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     lv_area_t a;
     a.x1 = dsc->center.x - dsc->radius;
     a.y1 = dsc->center.y - dsc->radius;
@@ -70,7 +70,7 @@ void lv_draw_arc(lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
 
     lv_draw_finalize_task_creation(layer, t);
 
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_draw_arc_get_area(int32_t x, int32_t y, uint16_t radius,  lv_value_precise_t start_angle,

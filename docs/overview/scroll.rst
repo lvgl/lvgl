@@ -40,7 +40,7 @@ The scrollbars have their own dedicated part, called
 :cpp:enumerator:`LV_PART_SCROLLBAR`. For example a scrollbar can turn to red like
 this:
 
-.. code:: c
+.. code-block:: c
 
    static lv_style_t style_red;
    lv_style_init(&style_red);
@@ -55,7 +55,7 @@ scrolled. This allows adding different styles to the scrollbar or the
 object itself when scrolled. This code makes the scrollbar blue when the
 object is scrolled:
 
-.. code:: c
+.. code-block:: c
 
    static lv_style_t style_blue;
    lv_style_init(&style_blue);
@@ -219,7 +219,7 @@ element, either to restore it later, or to display dynamically some
 elements according to the current scroll. Here is an example to see how
 to combine scroll event and store the scroll top position.
 
-.. code:: c
+.. code-block:: c
 
    static int scroll_value = 0;
 
@@ -262,7 +262,7 @@ larger self size will too.
 LVGL uses the :cpp:enumerator:`LV_EVENT_GET_SELF_SIZE` event to get the self size of
 an object. Here is an example to see how to handle the event:
 
-.. code:: c
+.. code-block:: c
 
    if(event_code == LV_EVENT_GET_SELF_SIZE) {
        lv_point_t * p = lv_event_get_param(e);

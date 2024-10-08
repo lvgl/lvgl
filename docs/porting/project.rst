@@ -32,7 +32,7 @@ LVGL also supports ``make`` and ``CMake`` build systems out of the box.
 To add LVGL to your Makefile based build system add these lines to your
 main Makefile:
 
-.. code:: make
+.. code-block:: make
 
    LVGL_DIR_NAME ?= lvgl     #The name of the lvgl folder (change this if you have renamed it)
    LVGL_DIR ?= ${shell pwd}  #The path where the lvgl folder is
@@ -113,7 +113,7 @@ in TLS (Thread Local Storage).
 
 For example:
 
-.. code:: c
+.. code-block:: c
 
    lv_global_t * lv_global_default(void)
    {

@@ -18,7 +18,7 @@ Two APIs are provided to get/set widget properties. It can be enabled by setting
 
 Set :c:macro:`LV_USE_OBJ_PROPERTY_NAME` to `1` in order to use property name instead of ID.
 
-.. code:: c
+.. code-block:: c
 
     typedef struct {
         lv_prop_id_t id;
@@ -75,7 +75,7 @@ additional code to convert values from dict, table etc to a C struct before sett
 Another possible use case is to ease of creating UI from lots of code. For example, you can gather
 all properties to an array now and set properties with a for loop.
 
-.. code:: c
+.. code-block:: c
 
     lv_property_t props[] = {
         { .id = LV_PROPERTY_IMAGE_SRC, .ptr = &img_demo_widgets_avatar, },

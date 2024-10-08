@@ -177,7 +177,7 @@ C code
 
    </summary>
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * btn = lv_button_create(lv_screen_active());                   /*Add a button to the current screen*/
    lv_obj_center(btn);                                             /*Set its position*/
@@ -212,7 +212,7 @@ MicroPython code \| Online Simulator :gb:
 
    </summary>
 
-.. code:: python
+.. code-block:: python
 
    def btn_event_cb(e):
      print("Clicked")
@@ -253,7 +253,7 @@ C code
 
    </summary>
 
-.. code:: c
+.. code-block:: c
 
 
    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_COLUMN);
@@ -297,7 +297,7 @@ MicroPython code \| Online Simulator :gb:
 
    </summary>
 
-.. code:: python
+.. code-block:: python
 
    def event_handler(e):
        code = e.get_code()
@@ -359,7 +359,7 @@ C code
 
    </summary>
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * slider = lv_slider_create(lv_screen_active());
    lv_slider_set_value(slider, 70, LV_ANIM_OFF);
@@ -412,7 +412,7 @@ MicroPython code \| Online Simulator :gb:
 
    </summary>
 
-.. code:: python
+.. code-block:: python
 
    # Create a slider and add the style
    slider = lv.slider(lv.scr_act())
@@ -473,7 +473,7 @@ C code
 
    </summary>
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * ltr_label = lv_label_create(lv_screen_active());
    lv_label_set_text(ltr_label, "In modern terminology, a microcontroller is similar to a system on a chip (SoC).");
@@ -513,7 +513,7 @@ MicroPython code \| Online Simulator :gb:
 
    </summary>
 
-.. code:: python
+.. code-block:: python
 
    ltr_label = lv.label(lv.scr_act())
    ltr_label.set_text("In modern terminology, a microcontroller is similar to a system on a chip (SoC).")

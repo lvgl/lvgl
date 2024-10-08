@@ -1096,7 +1096,7 @@ def iter_src(n, p):
         html_files[name] = html_file
 
         with open(rst_file, 'w') as f:
-            f.write('.. _{0}:'.format(name))
+            f.write('.. _{0}_h:'.format(name))
             f.write('\n\n')
             f.write('=' * len(file))
             f.write('\n')
@@ -1331,7 +1331,7 @@ def run(project_path, temp_directory, *doc_paths):
 
             if html_includes:
                 html_includes = list(
-                    ':ref:`{0}`\n'.format(inc)
+                    ':ref:`{0}_h`\n'.format(inc)
                     for inc, _ in html_includes
                 )
 
