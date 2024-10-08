@@ -10,7 +10,7 @@ calling an "animator" function with the corresponding value parameter.
 
 The *animator* functions have the following prototype:
 
-.. code:: c
+.. code-block:: c
 
    void func(void * var, lv_anim_var_t value);
 
@@ -26,7 +26,7 @@ Create an animation
 To create an animation an :cpp:type:`lv_anim_t` variable has to be initialized
 and configured with ``lv_anim_set_...()`` functions.
 
-.. code:: c
+.. code-block:: c
 
 
    /* INITIALIZE AN ANIMATION

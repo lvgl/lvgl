@@ -132,7 +132,6 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
     lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
 #endif /*LV_USE_DRAW_SDL == 0*/
     lv_display_add_event_cb(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
-
     /*Process the initial events*/
     sdl_event_handler(NULL);
 
@@ -220,7 +219,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         uint32_t px_map_stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), cf);
         uint32_t px_size = lv_color_format_get_size(cf);
 
-        int32_t fb_stride = disp->hor_res * px_size;
+        int32_t fb_stride = lv_draw_buf_width_to_stride(disp->hor_res, cf);
         uint8_t * fb_start = dsc->fb_act;
         fb_start += rotated_area.y1 * fb_stride + rotated_area.x1 * px_size;
         lv_display_rotation_t rotation = lv_display_get_rotation(disp);

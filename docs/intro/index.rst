@@ -212,7 +212,7 @@ My display driver is not called. What have I missed?
 
 Be sure you are calling :cpp:expr:`lv_tick_inc(x)` in an interrupt and :cpp:func:`lv_timer_handler` in your main ``while(1)``.
 
-Learn more in the :ref:`tick` and :ref:`timer` sections.
+Learn more in the :ref:`tick` and :ref:`timer_handler` sections.
 
 
 Why is the display driver called only once? Only the upper part of the display is refreshed.

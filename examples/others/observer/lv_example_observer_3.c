@@ -128,10 +128,10 @@ static void time_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     lv_obj_t * label = lv_observer_get_target(observer);
 
     if(format == TIME_FORMAT_24) {
-        lv_label_set_text_fmt(label, "%d:%02d", hour, minute);
+        lv_label_set_text_fmt(label, "%" LV_PRId32 ":%02" LV_PRId32, hour, minute);
     }
     else {
-        lv_label_set_text_fmt(label, "%d:%02d %s", hour + 1, minute, am_pm == TIME_AM ? "am" : "pm");
+        lv_label_set_text_fmt(label, "%"LV_PRId32":%02"LV_PRId32" %s", hour + 1, minute, am_pm == TIME_AM ? "am" : "pm");
     }
 }
 

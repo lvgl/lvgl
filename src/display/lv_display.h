@@ -294,6 +294,20 @@ void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_fo
 lv_color_format_t lv_display_get_color_format(lv_display_t * disp);
 
 /**
+ * Set the number of tiles for parallel rendering.
+ * @param disp              pointer to a display
+ * @param tile_cnt          number of tiles (1 =< tile_cnt < 256)
+ */
+void lv_display_set_tile_cnt(lv_display_t * disp, uint32_t tile_cnt);
+
+/**
+ * Get the number of tiles used for parallel rendering
+ * @param disp              pointer to a display
+ * @return                  number of tiles
+ */
+uint32_t lv_display_get_tile_cnt(lv_display_t * disp);
+
+/**
  * Enable anti-aliasing for the render engine
  * @param disp      pointer to a display
  * @param en        true/false
@@ -464,6 +478,13 @@ uint32_t lv_display_remove_event_cb_with_user_data(lv_display_t * disp, lv_event
  * @return              LV_RESULT_OK: disp wasn't deleted in the event.
  */
 lv_result_t lv_display_send_event(lv_display_t * disp, lv_event_code_t code, void * param);
+
+/**
+ * Get the area to be invalidated. Can be used in `LV_EVENT_INVALIDATE_AREA`
+ * @param e     pointer to an event
+ * @return      the area to invalidated (can be modified as required)
+ */
+lv_area_t * lv_event_get_invalidated_area(lv_event_t * e);
 
 /**
  * Set the theme of a display. If there are no user created widgets yet the screens' theme will be updated

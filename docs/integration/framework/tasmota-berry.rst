@@ -82,7 +82,7 @@ Let's dive right into an example!
 A simple example
 ~~~~~~~~~~~~~~~~
 
-.. code:: python
+.. code-block:: python
 
    lv.start()                 # start LVGL
    scr = lv.screen_active()         # get default screen

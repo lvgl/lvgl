@@ -16,7 +16,7 @@ Using the simulator on a PC has the following advantages:
 - Easy Validation: The simulator is also very useful to report bugs because it
   provides a common platform for every user.
 - Better developer experience: On PC Debuggers are usually faster and better, you can log to files,
-  add a lot of ``printf``-s, do profiling, and so on.
+  add a lot of ``printf`` s, do profiling, and so on.
 
 
 Select an IDE
@@ -48,7 +48,7 @@ another driver in ``lv_conf.h`` and calling its ``create`` function.
 For example to use the Linux frame buffer device instead of SDL just enable ``LV_USE_LINUX_FBDEV``
 and call
 
-.. code:: c
+.. code-block:: c
 
    lv_display_t *display = lv_linux_fbdev_create();
    lv_linux_fbdev_set_file(display, "/dev/fb0")

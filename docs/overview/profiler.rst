@@ -4,8 +4,8 @@
 Profiler
 ========
 
-As the complexity of the application increases, performance issues such as low FPS and frequent cache misses 
-causing lag may arise. LVGL has internally set up some hooks for performance measurement to help developers 
+As the complexity of the application increases, performance issues such as low FPS and frequent cache misses
+causing lag may arise. LVGL has internally set up some hooks for performance measurement to help developers
 analyze and locate performance issues.
 
 .. _profiler_introduction:
@@ -13,10 +13,10 @@ analyze and locate performance issues.
 Introduction
 ************
 
-LVGL has a built-in trace system to track and record the timestamps of important events that occur during runtime, 
-such as rendering events and user input events. These event timestamps serve as important metrics for performance analysis. 
+LVGL has a built-in trace system to track and record the timestamps of important events that occur during runtime,
+such as rendering events and user input events. These event timestamps serve as important metrics for performance analysis.
 
-The trace system has a configurable record buffer that stores the names of event functions and their timestamps. 
+The trace system has a configurable record buffer that stores the names of event functions and their timestamps.
 When the buffer is full, the trace system prints the log information through the provided user interface.
 
 The output trace logs are formatted according to Android's `systrace <https://developer.android.com/topic/performance/tracing>`_
@@ -40,7 +40,7 @@ To enable the profiler, set :c:macro:`LV_USE_PROFILER` in ``lv_conf.h`` and conf
 
 - Recommended configuration in **UNIX** environments:
 
-    .. code:: c
+    .. code-block:: c
 
         #include <sys/syscall.h>
         #include <sys/types.h>
@@ -78,7 +78,7 @@ To enable the profiler, set :c:macro:`LV_USE_PROFILER` in ``lv_conf.h`` and conf
 
 - Recommended configuration in **Arduino** environments:
 
-    .. code:: c
+    .. code-block:: c
 
         void my_profiler_init(void)
         {
@@ -91,7 +91,7 @@ To enable the profiler, set :c:macro:`LV_USE_PROFILER` in ``lv_conf.h`` and conf
 
 4. Log output configuration: LVGL uses the :cpp:func:`LV_LOG` interface by default to output trace information. If you want to use another interface to output log information (e.g., file stream), you can redirect the log output using the following code:
 
-    .. code:: c
+    .. code-block:: c
 
         static void my_log_print_cb(const char * buf)
         {
@@ -117,19 +117,19 @@ Process the logs
 
 Save the output log as `my_trace.txt`, use `trace_filter.py` for filtering and preprocessing:
 
-    .. code:: bash
+    .. code-block:: bash
 
         ./lvgl/scripts/trace_filter.py my_trace.txt
 
     or
 
-    .. code:: bash
+    .. code-block:: bash
 
         python3 ./lvgl/scripts/trace_filter.py my_trace.txt
 
 You will obtain a processed text file named `trace.systrace`, which roughly contains the following content:
 
-    .. code:: text
+    .. code-block:: text
 
         # tracer: nop
         #
@@ -153,8 +153,8 @@ If the log parsing is successful, you will see the following screen:
 
 .. image:: /misc/perfetto_ui.png
 
-In the Perfetto UI, use the :kbd:`A` or :kbd:`D` keys to pan the timeline horizontally 
-and the :kbd:`W` or :kbd:`S` keys to zoom in or out on the timeline. 
+In the Perfetto UI, use the :kbd:`A` or :kbd:`D` keys to pan the timeline horizontally
+and the :kbd:`W` or :kbd:`S` keys to zoom in or out on the timeline.
 Use the mouse to move the focus and click on functions on the timeline to observe their execution time.
 
 Add Measurement Point
@@ -162,7 +162,7 @@ Add Measurement Point
 
 Users can add their own measured functions:
 
-.. code:: c
+.. code-block:: c
 
     void my_function_1(void)
     {
@@ -198,7 +198,7 @@ If you wish to use a profiler method provided by your operating system, you can 
 
 Taking `NuttX <https://github.com/apache/nuttx>`_ RTOS as an example:
 
-.. code:: c
+.. code-block:: c
 
     #define LV_PROFILER_INCLUDE "nuttx/sched_note.h"
     #define LV_PROFILER_BEGIN          sched_note_begin(NOTE_TAG_ALWAYS)
@@ -218,7 +218,7 @@ Please check the completeness of the logs. If the logs are incomplete, it may be
 
 1. Serial port reception errors caused by a high baud rate. You need to reduce the baud rate.
 2. Data corruption caused by other thread logs inserted during the printing of trace logs. You need to disable the log output of other threads or refer to the configuration above to use a separate log output interface.
-3. Make sure that the string passed in by :c:macro:`LV_PROFILER_BEGIN_TAG/END_TAG` is not a local variable on the stack or a string in shared memory, because currently only the string address is recorded and the content is not copied.
+3. Make sure that the string passed in by :c:macro:`LV_PROFILER_BEGIN_TAG` or :c:macro:`LV_PROFILER_END_TAG` is not a local variable on the stack or a string in shared memory, because currently only the string address is recorded and the content is not copied.
 
 Function execution time displayed as 0s in Perfetto
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -240,3 +240,4 @@ If the trace logs are not automatically printed when the buffer is not full, you
 
 1. Reduce the value of :c:macro:`LV_PROFILER_BUILTIN_BUF_SIZE` to fill the buffer more quickly and trigger automatic printing.
 2. Manually call or use a timer to call the :cpp:func:`lv_profiler_builtin_flush` function to force the log output.
+

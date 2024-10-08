@@ -28,6 +28,8 @@ src = src + Glob(os.path.join(lvgl_src_cwd,'*.c'))
 for root, dirs, files in os.walk(lvgl_src_cwd):
     for dir in dirs:
         current_path = os.path.join(root, dir)
+        if current_path == os.path.join(lvgl_src_cwd, 'libs', 'thorvg', 'rapidjson', 'msinttypes'): # exclude the msinttypes folder
+            continue
         src = src + Glob(os.path.join(current_path,'*.c')) # add all .c files
         if check_h_hpp_exists(current_path): # add .h and .hpp path
             inc = inc + [current_path]
