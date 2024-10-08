@@ -169,6 +169,35 @@ extern "C" {
  */
 #define LV_VERSION_CHECK(x,y,z) (x == LVGL_VERSION_MAJOR && (y < LVGL_VERSION_MINOR || (y == LVGL_VERSION_MINOR && z <= LVGL_VERSION_PATCH)))
 
+/** Checks if the current version is at least the specified x.y.z version.
+ *
+ * LV_VERSION_AT_LEAST vs. LV_VERSION_CHECK:
+ * - `LV_VERSION_CHECK` requires the same major version to match exactly, 
+ *   while `LV_VERSION_AT_LEAST` checks if the current version is at least the specified version.
+ * - `LV_VERSION_AT_LEAST` is more flexible and can be used to check for a minimum version.
+ *
+ * Usage:
+ *
+ * - Require v6 or higher
+ * #if LV_VERSION_AT_LEAST(6,0,0)
+ *   new_func_in_v6_or_higher();
+ * #endif
+ *
+ *
+ * - Require at least v5.3
+ * #if LV_VERSION_AT_LEAST(5,3,0)
+ *   new_feature_from_v5_3_or_higher();
+ * #endif
+ *
+ *
+ * - Require at least v5.3.2 bugfixes
+ * #if LV_VERSION_AT_LEAST(5,3,2)
+ *   bugfix_in_v5_3_2_or_higher();
+ * #endif
+ *
+ */
+#define LV_VERSION_AT_LEAST(x,y,z) (x > LVGL_VERSION_MAJOR || (x == LVGL_VERSION_MAJOR && (y > LVGL_VERSION_MINOR || (y == LVGL_VERSION_MINOR && z >= LVGL_VERSION_PATCH))))
+
 /**
  * Wrapper functions for VERSION macros
  */
