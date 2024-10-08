@@ -66,12 +66,18 @@ if len(args) >= 1:
         develop = True
 
 
-def cmd(s):
+def cmd(s, start_dir=None):
+    if start_dir is None:
+        start_dir = os.getcwd()
+
+    saved_dir = os.getcwd()
+    os.chdir(start_dir)
     print("")
     print(s)
     print("-------------------------------------")
-
     result = os.system(s)
+    os.chdir(saved_dir)
+
     if result != 0:
         print("Exit build due to previous error")
         sys.exit(result)
@@ -146,6 +152,8 @@ cmd('doxygen Doxyfile')
 os.chdir(base_path)
 
 print('Reading Doxygen output')
+
+doc_builder.EMIT_WARNINGS = False
 
 doc_builder.run(
     project_path,
