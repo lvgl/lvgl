@@ -15,6 +15,7 @@
 
 #include "lv_draw_pxp.h"
 
+#if LV_USE_PXP
 #if LV_USE_DRAW_PXP
 #include "../../lv_draw_buf_private.h"
 #include "lv_pxp_cfg.h"
@@ -51,8 +52,12 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
 void lv_draw_buf_pxp_init_handlers(void)
 {
     lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
+    lv_draw_buf_handlers_t * font_handlers = lv_draw_buf_get_font_handlers();
+    lv_draw_buf_handlers_t * image_handlers = lv_draw_buf_get_image_handlers();
 
     handlers->invalidate_cache_cb = _invalidate_cache;
+    font_handlers->invalidate_cache_cb = _invalidate_cache;
+    image_handlers->invalidate_cache_cb = _invalidate_cache;
 }
 
 /**********************
@@ -66,7 +71,7 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
     lv_color_format_t cf = header->cf;
 
     if(area->y1 == 0) {
-        uint16_t size = stride * lv_area_get_height(area);
+        uint32_t size = stride * lv_area_get_height(area);
 
         /* Invalidate full buffer. */
         DEMO_CleanInvalidateCacheByAddr((void *)draw_buf->data, size);
@@ -109,3 +114,4 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
 }
 
 #endif /*LV_USE_DRAW_PXP*/
+#endif /*LV_USE_PXP*/

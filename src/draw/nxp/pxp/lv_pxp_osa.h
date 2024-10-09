@@ -22,7 +22,8 @@ extern "C" {
 
 #include "../../../lv_conf_internal.h"
 
-#if LV_USE_DRAW_PXP
+#if LV_USE_PXP
+#if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
 #include "lv_pxp_cfg.h"
 
 /*********************
@@ -51,7 +52,8 @@ pxp_cfg_t * pxp_get_default_cfg(void);
  *      MACROS
  **********************/
 
-#endif /*LV_USE_DRAW_PXP*/
+#endif /*LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP*/
+#endif /*LV_USE_PXP*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
