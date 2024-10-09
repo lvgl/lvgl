@@ -6,39 +6,41 @@ Example
 </lv_spangroup>
 -->
 
-<api>
-	<enumdef name="overflow">
-		<enum name="clip" help=""/>
-		<enum name="ellipses" help=""/>
-	</enumdef>
-	<enumdef name="mode">
-		<enum name="fixed" help=""/>
-		<enum name="expand" help=""/>
-		<enum name="break" help=""/>
-	</enumdef>
+<widget>
+	<api>
+		<enumdef name="overflow">
+			<enum name="clip" help=""/>
+			<enum name="ellipses" help=""/>
+		</enumdef>
+		<enumdef name="mode">
+			<enum name="fixed" help=""/>
+			<enum name="expand" help=""/>
+			<enum name="break" help=""/>
+		</enumdef>
 
-    <prop name="align" help="align the text of the span group">
-    	<param name="align" type="text_align" help=""/>
-    </prop>
+	    <prop name="align" help="align the text of the span group">
+	    	<param name="align" type="text_align" help=""/>
+	    </prop>
 
-    <prop name="overflow" help="">
-    	<param name="overflow" type="overflow" help=""/>
-    </prop>
+	    <prop name="overflow" help="">
+	    	<param name="overflow" type="overflow" help=""/>
+	    </prop>
 
-    <prop name="mode" help="">
-    	<param name="mode" type="mode" help=""/>
-    </prop>
+	    <prop name="mode" help="">
+	    	<param name="mode" type="mode" help=""/>
+	    </prop>
 
-    <prop name="max_lines" help="">
-    	<param name="max_lines" type="int" help=""/>
-    </prop>
+	    <prop name="max_lines" help="">
+	    	<param name="max_lines" type="int" help=""/>
+	    </prop>
 
-    <prop name="indent" help="">
-    	<param name="indent" type="int" help=""/>
-    </prop>
+	    <prop name="indent" help="">
+	    	<param name="indent" type="int" help=""/>
+	    </prop>
 
-	<element name="span" type="custom:span" access="add">
-		<param name="text" type="string" help=""/>
-		<param name="style" type="style" help=""/>
-	</element>
-</api>
+		<element name="span" type="custom:span" access="add">
+			<param name="text" type="string" help=""/>
+			<param name="style" type="style" help=""/>
+		</element>
+	</api>
+</widget>

@@ -4,5 +4,7 @@ Example (the buffer needs to be set by the user)
 
 -->
 
-<api>
-</api>
+<widget>
+	<api>
+	</api>
+</widget>

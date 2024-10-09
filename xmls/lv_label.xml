@@ -2,21 +2,24 @@
 Example
 <lv_label text="Hello"
 -->
-<api>
-    <enumdef name="label_long">
-        <enum name="wrap" help="Wrap"/>
-        <enum name="scroll" help="Scroll if too long"/>
-    </enumdef>
 
-    <prop name="text">
-    	<param name="text" type="string" />
-   	</prop>
-    <prop name="text_fmt">
-    	<param name="fmt" type="string" />
-    	<param name="params" type="arglist" />
-   	</prop>
+<widget>
+	<api>
+	    <enumdef name="label_long">
+	        <enum name="wrap" help="Wrap"/>
+	        <enum name="scroll" help="Scroll if too long"/>
+	    </enumdef>
 
-    <prop name="long_mode">
-    	<param type="label_long" />
-    </prop>
-</api>
+	    <prop name="text">
+	    	<param name="text" type="string" />
+	   	</prop>
+	    <prop name="text_fmt">
+	    	<param name="fmt" type="string" />
+	    	<param name="params" type="arglist" />
+	   	</prop>
+
+	    <prop name="long_mode">
+	    	<param type="label_long" />
+	    </prop>
+	</api>
+</widget>

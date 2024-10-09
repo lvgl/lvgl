@@ -4,74 +4,84 @@
 
 ### Goal
 
-Create a UI editor tol LVGL to support the developer where needed to proceed faster with the visual part of the UI, but allow writing code where it's more effective
+Create a UI editor for LVGL to support developers in speeding up the visual part of the UI while allowing code writing where it's more effective.
 
-To achieve this
-- Think in components
-- Describe the widgets in a declarative way
-- Allow nesting widgets
-- Generate developer friendly code
-- Load widgets in runtime
-- Realtime preview the components
-- Suppert testing the new components
+To achieve this:
+- Think in components.
+- Describe the widgets in a declarative way.
+- Allow nesting of widgets.
+- Generate developer-friendly code.
+- Load widgets at runtime.
+- Provide a real-time preview of the components.
+- Support testing of the new components.
 
-It's **not the goal** to create a no-code tool. It is assumed that the user is a developer and can write code.
-The XML description should help with defining the view (and providing a preview) to allow fast iterations on the design.
+It's **not the goal** to create a no-code tool. The assumption is that the user is a developer and can write code. The XML description should help with defining the view (and providing a preview), allowing for fast design iterations.
 
-Because of it it is **not the goal** to allow creating the whole UI with XML either. It's acceptable to create visually heavy parts here and use the widget's API to dynamically create the more complex cases from code.
-It's also acceptable to define callbacks in code.
+Because of this, it is **not the goal** to allow creating the entire UI with XML. It is acceptable to create visually heavy parts here and use the widget's API to dynamically create more complex cases from code. It is also acceptable to define callbacks in code.
 
-### Success criteria
+### Success Criteria
 
-If these can be fulfilled, the tool is considered successful:
+If the following can be fulfilled, the tool is considered successful:
 
-1. **Component library (no handwritten code)**:
-    - Create a component library consisting of styled buttons, sliders and tabviews
-    - Load these components at run time from XML
-    - Support nested components
-2. **Access hand written components and widgets (no editor code)**
-	- Create a custom components or widget manually (without the editor)
-	- Describe only its interface for the editor
-	- Let user use and preview these as part of other components
-3. **Complex `widgets in the editor**
-	- Create a complex widgets in the editor which are completed with custom code
-	- Make them available in the editor, and allow using them in custom components or other widgets.
-4. **Runtime loading**
-    - Load nested components in runtime
-    - Use all three options from above
-4. **Figma import**
-	- Allow loading styles and more nexted elements from Figma is a simple way
-5. **Testing**
-	- Detect regression in components and widgets with CI
-6. **Collaboration**
-	- Let a designer preview the components and screens, and allow commenting on them.
+1. **Component Library (No Handwritten Code)**:
+    - Create a component library consisting of styled buttons, sliders, and tabviews.
+    - Load these components at runtime from XML.
+    - Support nested components.
+
+2. **Access Handwritten Components and Widgets (No Editor Code)**:
+    - Create custom components or widgets manually (without the editor).
+    - Describe only their interface for the editor.
+    - Allow users to use and preview these as part of other components.
+
+3. **Complex Widgets in the Editor**:
+    - Create complex widgets in the editor, completed with custom code.
+    - Make them available in the editor and allow using them in custom components or other widgets.
+
+4. **Runtime Loading**:
+    - Load nested components at runtime.
+    - Use all three options above.
+
+5. **Figma Import**:
+    - Allow loading styles and nested elements from Figma in a simple way.
+
+6. **Testing**:
+    - Detect regression in components and widgets with CI.
+
+7. **Collaboration**:
+    - Let a designer preview the components and screens in a browser and allow commenting on them.
+
+8. **Other Features**:
+    - Handle images and fonts.
+    - Allow creating variants for fonts, images, and styles.
+    - Support subjects.
+    - Support translations.
 
 ### Workflows
 
-The main purpoose of the editor is the create and test
-- **widgets**: just like the built-in widgets (built from classes, can have a large API). They can have custom C code to describe complex logics. Therefore even the custom widgets are compiled to the editor's preview to allow running their custom code too.
-- **components**: simple wrapper for a some widgets or other components. They only have a simple `create` function as API and can't have custom C code. Therefore components can be loaded at runtime from XML.
+The main purpose of the editor is to create and test:
+
+- **Widgets**: Similar to built-in widgets (built from classes, with a large API). They can have custom C code to describe complex logic. Custom widgets are compiled into the editor's preview to allow running their custom code.
+- **Components**: Simple wrappers for some widgets or other components. They only have a simple `create` function as their API and cannot have custom C code. Therefore, components can be loaded at runtime from XML.
 
 #### Widgets
 
 Main characteristics:
-  - similar to LVGL's built-in widgets
-  - built from classes
-  - have a large API
-  - support internal widgets (e.g. tabview's tabs)
-  - can have custom C code
-  - compiled to the editor's preview
+- Similar to LVGL's built-in widgets.
+- Built from classes.
+- Have a large API.
+- Support internal widgets (e.g., tabview's tabs).
+- Can have custom C code.
+- Compiled into the editor's preview.
 
-### Example XML
+Widgets are wrapped in a `<widget>` element.
 
-Widgets are wrapped to a `<widget>` element.
-
-The interfaces of a widget are described in an `<api>` tag.
-The properties, elements (internal widgets), and enums of a given widget are defined here.
+The interfaces of a widget are described in an `<api>` tag. The properties, elements (internal widgets), and enums of a given widget are defined here.
 
 In the `<styles>` section, styles and their properties can be defined.
 
 Widgets can be created, and their properties can be set, within a `<view>` tag.
+
+##### New Widget in the Editor
 
 An example of a custom `sliderbox` widget:
 
@@ -120,19 +130,17 @@ This is how it looks when the slider box is used, for example, in a list:
 </view>
 ```
 
-For each property in `<api>` a setter function will be also exported where the user can  define any custom logic.
+For each property in `<api>`, a setter function will also be exported where the user can define any custom logic.
 
-An xml parser skeleton file will be also exported where the user can process the attributes and call the related setter functions.
-There are many helper functions to make is simple, so it should look like just this:
+An XML parser skeleton file will also be exported where the user can process the attributes and call the related setter functions. There are many helper functions to make it simple, so it should look like this:
 ```c
-if(lv_streq(attr, "color") my_widget_set_color(obj, lv_xml_str_to_color(value));
-if(lv_streq(attr, "limit") my_widget_set_limit(obj, atoi(value));
+if(lv_streq(attr, "color")) my_widget_set_color(obj, lv_xml_str_to_color(value));
+if(lv_streq(attr, "limit")) my_widget_set_limit(obj, atoi(value));
 ```
 
-Once both the setters and XML parser is implemented the editor's core can be recompiled
-with this new widget, so that it will be parts of the editor and the preview.
+Once both the setters and XML parser are implemented, the editor's core can be recompiled with this new widget, so that it will be part of the editor and the preview.
 
-In summary these file will be generated for widgets with API:
+In summary, these files will be generated for widgets:
 - `<widget_name>_gen.h`: Contains the generated API implementation of the widget.
 - `<widget_name>_private_gen.h`: Contains private API and the data for the widget.
 - `<widget_name>_gen.c`: Contains the internals of the widget.
@@ -140,21 +148,29 @@ In summary these file will be generated for widgets with API:
 - `<widget_name>.c`: Contains hooks from `<widget_name>_gen.c` and allows the user to write custom code.
 - `<widget_name>_xml_parser.c`: Processes the XML strings and calls the required functions according to the set attributes.
 
+##### New Widget from Code
+
+It's also possible to create the entire widget from code. In this case, only an `<api>` element needs to be specified in the XML file. An XML parser also needs to be implemented to call the required API functions of the widget according to the parameters.
+
 #### Components
 
-Components are built from the built-in widgets without writing any code.
-Due to this they can be loaded directly from XML.
-They can also handle and access events and subjects declared globally.
+Main characteristics:
+- Built from widgets or other components.
+- They have only a single `create` function with some parameters.
+- Can be used for styling widgets or to create widgets/components together.
+- Cannot have custom C code.
+- Can be loaded from XML at runtime.
 
+##### New Component in the Editor
 
-##### Example XML
+The example below shows the XML of a `my_button` component.
 
 ```xml
-<!-- my_button.xml-->
+<!-- my_button.xml -->
 <component>
 	<params>
 		<string name="text"/>
-		<event name="click_cb"/>
+		<int name="radius" default="0"/>
 	</params>
 
 	<consts>
@@ -166,81 +182,57 @@ They can also handle and access events and subjects declared globally.
 		<style name="blue" bg_color="0x0000ff"/>
 	</styles>
 
-	<view extends="button" styles="red blue:pressed">
-			<events trigger="clicked">
-			<call_function name="${click_cb} param="subject:counter"/>
-		</events>
-		<label text=${text} align="center"/>
+	<view extends="button" style_radius="${radius}" styles="red blue:pressed">
+		<label text="${text}" align="center"/>
 	</view>
 </component>
 ```
 
-`my_button` can be sued like this on a screen.
+`my_button` can be used like this in a view:
 ```xml
-<screen>
-	<view>
-		<my_button text="Settings" click_cb="open_settings">
-	</view>
-</screen>
+<view>
+	<my_button text="Settings" click_cb="open_settings"/>
+</view>
 ```
 
-##### Export C code
-
-From the XML file above a C function can be generated like this:
+From the XML file above, a C function can be generated like this:
 ```c
-lv_obj_t * my_button_create(lv_obj_t * parent, const char * title, lv_event_cb_t click_cb);
+lv_obj_t * my_button_create(lv_obj_t * parent, const char * title, int32_t radius);
 ```
 
-#### Load from XML
-
-Components created from XML at runtime like this:
+In C, XML components can be loaded like this:
 ```c
-/*Save the XML, create the styles, save the constants, order of params, etc*/
-lv_xml_component_t * my_button = lv_xml_load_component("my_button.xml");
+/* Save the XML string, create the styles, save the constants, params, register a generic XML parser, etc. */
+lv_xml_component_t * my_button = lv_xml_load_component("path/to/my_button.xml");
 ```
+
+Once a component is loaded, instances can be created in two ways:
+- By calling C functions, like:
 
 ```c
-/* Create the widget according to the view and apply the params*/
-lv_obj_t * button1 =  lv_xml_create_component(my_button, parent, params);
+/* Create an instance according to some attributes. (e.g., const char * attrs[] = {"width", "100", "radius", "20", NULL, NULL};) */
+lv_obj_t * button1 = lv_xml_create_component(my_button, parent, attrs);
 ```
 
-When the screen is loaded like:
-```c
-lv_obj_t * screen = lv_xml_create_screen(my_screen);
-```
-
-It will handle both the built-in widgets and the custom components.
-
-
-#### Using a widget from C
-
-##### Example XML
-
-Just omit the `view`
-
+- From XML, by using the `my_button` component in the view of another XML:
 ```xml
-<!-- my_slider.xml-->
-
-<component>
-	<params>
-		<...>
-	</param>
-</component>
+<!-- my_card.xml -->
+...
+<view extends="obj" flex_flow="column">
+	<label text="Card1"/>
+	<my_button text="Apply"/>
+</view>
 ```
 
-or
-```xml
-<!-- my_slider.xml-->
+##### New Component from Code
 
-<widget>
-	<api>
-		<...>
-	</api>
-</widget>
-```
+If the component is created from code, only its `<params>` need to be described to define how to use the component.
 
+A generic XML parser will read the attributes and pass them as parameters to the component's `create` function.
 
-## XML Overview
+An additional feature could be to later use LVGL's DOM API to retrieve the structure and properties of the widgets and generate the view automatically. This could also help import UIs not created in the editor.
+
+## XML details
 
 ### Notions and Conventions
 
@@ -292,15 +284,15 @@ Any type can be an array in four ways:
 
 Types can be compound, meaning multiple options/types are possible. For example, for width: `type="px|%|content"`.
 
-`<enumdef>` can be used to create custom enums.
+`<enumdef>` can be used to create custom enums for widgets.
 When used as a type, a `+` suffix means multiple values can be selected and ORed. For example: `type="axis+"`.
 It's also possible to limit the possible options the user can select from an enum. For example: `type="dir(top bottom)"`
 
 ### `<params>`
 
-`<params>` can be added in case of for simple widgets which are using only other built-in widget.
+Used only in the case of `<component>`s to describe the parameters of the component.
 
-The parameters defined here describe the parameters passed to the create function. Here is a detaield example:
+Here is a detailed example:
 ```xml
 <params>
 	<param name="title" type="string" help="The title"/>
@@ -310,23 +302,21 @@ The parameters defined here describe the parameters passed to the create functio
 ```
 
 There are a few interesting things to notice:
-- If a `default` value is added the parameter is optional. If it's omotted the default value will be sued. If there is no default value the element is mandatory.
-- As `type` any other widget's enums can be used in the following format: `<widget_name>:<enum_name>`
+- If a `default` value is added, the parameter is optional. If it's omitted, the default value will be used. If there is no default value, the element is mandatory.
+- As `type`, any other widget's enums can be used in the following format: `<widget_name>:<enum_name>`
 
-In the view parameters can be used like this:
+In the view, parameters can be used like this:
 ```xml
 <view>
-	<label text="${title}"/>
+	<my_label title="Hello"/>
 </view>
 ```
 
+
 ### `<api>`
 
-The following elements can be defined in the `<api>` section and used later in the `<view>`.
-
-Note that if the `<api>` is defined
-- More complex code will be generated to with the purpose of create full features widgets
-- `<params>` can't be defined.
+The `<api>` tag can be used only in `<widget>`s to define the API of the widget.
+`<api>` is more complex than `<params>`. It supports the following elements and features.
 
 #### `<enumdef>`
 
@@ -371,7 +361,7 @@ typedef enum {
 } lv_my_widget_mode_t;
 ```
 
-This is how it can be used in a <view>:
+This is how it can be used in a `<view>`:
 ```xml
 <!-- complex_widget.xml -->
 <view>
@@ -379,26 +369,17 @@ This is how it can be used in a <view>:
 </view>
 ```
 
-#### `<arg>` and `<prop>`
-
-Right inside the `<api>` tag `<arg>` tags can be defined.
-Bedides the parent widget these will be passed as arguments to the create function.
+#### `<prop>`
 
 Inside `<prop>`s, `<param>` elements must be defined to describe the arguments.
-All properties are optional. If a property is not set, simply it won't be applied and the created widget's default value will be applied (e.g. `"text"` for label text) or the defined default value will be set as described below..
-
-All `<arg>`, `<prop>`, and `<param>` can have default values, however, their meanings differ for each tag:
-- `<arg default="10">`: If the argument is not defined, the default value will be passed as a parameter. If the default attribute is not added, the argument is mandatory.
-- `<prop default="10">`: When the widget is created, the related setter function will be called with the given default value. If the default attribute is omitted, no specific default value will be applied.
-- `<param default="10">`: The last parameters can be omitted if the default value is set. This is not useful if there is only a single parameter for a property, but it can be helpful for compound properties.
+All properties are optional. If a property is not set, it simply won't be applied, and the created widget's default value will be applied (e.g., `"text"` for label text) or the defined default value will be set as described below.
 
 For example:
 ```xml
 <api>
-	<arg name="main_color" type="color" help="Sets the color of the slider." default="0xff0"/>
 	<prop name="range" default="0 100" help="Set the range." help-zh="Chinese set range.">
 		<param name="range_min" type="int" help="Sets the minimum value." help-zh="Translation for range_min."/>
-		<param name="range_max" type="int" default="100" help="Sets the maximum value."/>
+		<param name="range_max" type="int" help="Sets the maximum value."/>
 	</prop>
 </api>
 ```
@@ -409,21 +390,20 @@ When a property is used, all parameters are set as a single attribute value. For
 <slider range="-100 100"/>
 ```
 
-Each property will correspond to a setter function.
-By default, `name` in `<prop>` is used to build the name of the setter function like this:
+Each property will correspond to a setter function. `name` in `<prop>` is used to build the name of the setter function like this:
 ```c
 <widget_name>_set_<prop_name>(lv_obj_t * obj, <param1_type> <param1_name>, <param2_type> <param2_name>, ...);
 ```
 
 `<prop>`s have an optional `<postponed>` `bool` attribute.
-By default it's `false` but if it's set to `true` the give property will be applied after all the children are created.
-A practical example is that for example the current tab of the tabview can not be set before the tabs are created.
+By default, it's `false`, but if it's set to `true`, the given property will be applied after all the children are created.
+A practical example is that, for example, the current tab of the tabview cannot be set before the tabs are created.
 
 The following code can be generated in a header file:
-```h
+```c
 /**
  * Create my_widget
- * @param parent  	 	The parent of my_widget
+ * @param parent  		The parent of my_widget
  * @param main_color  	Sets the color of the slider.
  * @return 				Pointer to the created widget
  */
@@ -441,7 +421,7 @@ void lv_my_widget_set_range(lv_obj_t * obj, lv_color_t main_color);
 void lv_my_widget_set_range(lv_obj_t * obj, int32_t range_min, int32_t range_max);
 ```
 
-When this widget is used in a <view> as a child, it looks like this:
+When this widget is used in a `<view>` as a child, it looks like this:
 ```xml
 <!-- complex_widget.xml -->
 <view>
@@ -486,12 +466,12 @@ It can be used like this:
 	</element>
 </api>
 
-<view>
-
+<view extends="obj">
+	<button name="btn1"/>
 </view>
 
-<view element="indicator" parent="name_from_the_normal_view">
-	...describe the element's view
+<view-element name="indicator" parent="btn1">
+	...describe the element's view. (The indicator will be added to btn1)
 </view>
 
 ```

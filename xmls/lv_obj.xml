@@ -3,52 +3,54 @@ Example
 <lv_obj width="100" add_flag="hidden"/>
  -->
 
-<api>
-	<enumdef name="flag">
-		<enum name="hidden"/>
-		<enum name="checkable"/>
-	</enumdef>
+<widget>
+	<api>
+		<enumdef name="flag">
+			<enum name="hidden"/>
+			<enum name="checkable"/>
+		</enumdef>
 
-    <prop name="name">
-    	<param name="text"  type="string"/>
-   	</prop>
+	    <prop name="name">
+	    	<param name="text"  type="string"/>
+	   	</prop>
 
-    <prop name="store">
-    	<param name="en"  type="bool"/>
-   	</prop>
+	    <prop name="store">
+	    	<param name="en"  type="bool"/>
+	   	</prop>
 
-    <prop name="x">
-    	<param name="value"  type="px|%"/>
-   	</prop>
+	    <prop name="x">
+	    	<param name="value"  type="px|%"/>
+	   	</prop>
 
-    <prop name="y">
-    	<param name="value"  type="px|%"/>
-   	</prop>
+	    <prop name="y">
+	    	<param name="value"  type="px|%"/>
+	   	</prop>
 
-    <prop name="width">
-    	<param name="value"  type="px|%"/>
-   	</prop>
+	    <prop name="width">
+	    	<param name="value"  type="px|%"/>
+	   	</prop>
 
-    <prop name="height">
-    	<param name="value"  type="px|%"/>
-   	</prop>
+	    <prop name="height">
+	    	<param name="value"  type="px|%"/>
+	   	</prop>
 
-    <prop name="align">
-    	<param name="value"  type="align"/>
-   	</prop>
+	    <prop name="align">
+	    	<param name="value"  type="align"/>
+	   	</prop>
 
-    <prop name="styles">
-    	<param name="styles"  type="styles[]"/>
-   	</prop>
+	    <prop name="styles">
+	    	<param name="styles"  type="styles[]"/>
+	   	</prop>
 
-    <prop name="style_bg_color">
-    	<param name="color"  type="color"/>
-   	</prop>
+	    <prop name="style_bg_color">
+	    	<param name="color"  type="color"/>
+	   	</prop>
 
-    <prop name="add_flag" alias="add_flag">
-    	<param name="flag" type="flag+"/>
-   	</prop>
-    <prop name="remove_flag" alias="remove_flag">
-    	<param name="flag" type="flag+"/>
-   	</prop>
-</api>
+	    <prop name="add_flag">
+	    	<param name="flag" type="flag+"/>
+	   	</prop>
+	    <prop name="remove_flag">
+	    	<param name="flag" type="flag+"/>
+	   	</prop>
+	</api>
+</widget>

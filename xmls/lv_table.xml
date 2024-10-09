@@ -6,44 +6,45 @@
 </lv_table>
 -->
 
-<api>
-    <enumdef name="cell_ctrl" help="Type of the chart">
-        <enum name="merge_right"/>
-        <enum name="text_crop"/>
-        <enum name="custom_1"/>
-        <enum name="custom_2"/>
-        <enum name="custom_3"/>
-        <enum name="custom_4"/>
-    </enumdef>
+<widget>
+	<api>
+	    <enumdef name="cell_ctrl" help="Type of the chart">
+	        <enum name="merge_right"/>
+	        <enum name="text_crop"/>
+	        <enum name="custom_1"/>
+	        <enum name="custom_2"/>
+	        <enum name="custom_3"/>
+	        <enum name="custom_4"/>
+	    </enumdef>
 
 
-    <prop name="row_cnt" help="">
-    	<param name="cnt" type="int" help=""/>
-    </prop>
-    <prop name="column_cnt" help="">
-    	<param name="cnt" type="int" help=""/>
-    </prop>
-    <prop name="selected cell" help="">
-    	<param name="row" type="int" help=""/>
-    	<param name="column" type="int" help=""/>
-    </prop>
+	    <prop name="row_cnt" help="">
+	    	<param name="cnt" type="int" help=""/>
+	    </prop>
+	    <prop name="column_cnt" help="">
+	    	<param name="cnt" type="int" help=""/>
+	    </prop>
+	    <prop name="selected cell" help="">
+	    	<param name="row" type="int" help=""/>
+	    	<param name="column" type="int" help=""/>
+	    </prop>
 
-    <element name="column" access="set">
-        <arg name="column" type="int" help=""/>
-    	<prop name="values" help="set values from an array">
-    		<param name="width" type="px" help="width of the column"/>
-    	</prop>
-    </element>
+	    <element name="column" access="set">
+	        <arg name="column" type="int" help=""/>
+	    	<prop name="values" help="set values from an array">
+	    		<param name="width" type="px" help="width of the column"/>
+	    	</prop>
+	    </element>
 
-    <element name="cell" access="set">
-        <arg name="row" type="int" help=""/>
-        <arg name="column" type="int" help=""/>
-    	<prop name="value" help="">
-    		<param name="text" type="string" help=""/>
-    	</prop>
-    	<prop name="ctrl" help="">
-    		<param name="ctrl" type="cell_ctrl+" help=""/>
-    	</prop>
-    </element>
-</api>
-
+	    <element name="cell" access="set">
+	        <arg name="row" type="int" help=""/>
+	        <arg name="column" type="int" help=""/>
+	    	<prop name="value" help="">
+	    		<param name="text" type="string" help=""/>
+	    	</prop>
+	    	<prop name="ctrl" help="">
+	    		<param name="ctrl" type="cell_ctrl+" help=""/>
+	    	</prop>
+	    </element>
+	</api>
+</widget>
