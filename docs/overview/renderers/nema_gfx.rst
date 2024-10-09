@@ -1,11 +1,11 @@
 .. _stm32_nema_gfx:
 
-================================
-STM32 NemaGFX GPU (AKA NeoChrom)
-================================
+===================================
+NemaGFX Acceleration (AKA NeoChrom)
+===================================
 
 Some of the more powerful STM32 MCUs such as the
-STM32U5 feature a 2D GPU which can natively draw most
+STM32U5 feature a 2.5D GPU which can natively draw most
 LVGL primitives.
 
 Get Started with the Riverdi STM32U5 5-inch Display
