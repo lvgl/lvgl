@@ -218,6 +218,10 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     LV_UNUSED(draw_unit);
 
+    /*If not refreshing the display probably it's a canvas rendering
+     *which his not support in SDL as it's not a texture.*/
+    if(lv_refr_get_disp_refreshing() == NULL) return 0;
+
     if(((lv_draw_dsc_base_t *)task->draw_dsc)->user_data == NULL) {
         task->preference_score = 0;
         task->preferred_draw_unit_id = DRAW_UNIT_ID_OPENGLES;
