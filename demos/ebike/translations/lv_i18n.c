@@ -48,7 +48,7 @@ static uint8_t en_plural_fn(int32_t num)
     uint32_t v = op_v(n);
     UNUSED(v);
 
-    if((i == 1 && v == 0)) return LV_I18N_PLURAL_TYPE_ONE;
+    if(i == 1 && v == 0) return LV_I18N_PLURAL_TYPE_ONE;
     return LV_I18N_PLURAL_TYPE_OTHER;
 }
 
@@ -91,11 +91,11 @@ static uint8_t ar_plural_fn(int32_t num)
     UNUSED(n);
 
     uint32_t n100 = n % 100;
-    if((n == 0)) return LV_I18N_PLURAL_TYPE_ZERO;
-    if((n == 1)) return LV_I18N_PLURAL_TYPE_ONE;
-    if((n == 2)) return LV_I18N_PLURAL_TYPE_TWO;
-    if(((3 <= n100 && n100 <= 10))) return LV_I18N_PLURAL_TYPE_FEW;
-    if(((11 <= n100 && n100 <= 99))) return LV_I18N_PLURAL_TYPE_MANY;
+    if(n == 0) return LV_I18N_PLURAL_TYPE_ZERO;
+    if(n == 1) return LV_I18N_PLURAL_TYPE_ONE;
+    if(n == 2) return LV_I18N_PLURAL_TYPE_TWO;
+    if(3 <= n100 && n100 <= 10) return LV_I18N_PLURAL_TYPE_FEW;
+    if(11 <= n100 && n100 <= 99) return LV_I18N_PLURAL_TYPE_MANY;
     return LV_I18N_PLURAL_TYPE_OTHER;
 }
 
