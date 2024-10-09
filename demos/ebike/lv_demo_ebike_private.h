@@ -21,21 +21,12 @@ extern "C" {
 #define EBIKE_COLOR_TURQUOISE   lv_color_hex(0x55FFEB)
 #define EBIKE_COLOR_LIME        lv_color_hex(0x91FF3B)
 
-#if LV_DEMO_EBIKE_PORTRAIT
 LV_FONT_DECLARE(font_ebike_inter_20)
 LV_FONT_DECLARE(font_ebike_trump_40)
 LV_FONT_DECLARE(font_ebike_trump_72)
 #define EBIKE_FONT_SMALL        &font_ebike_inter_20
 #define EBIKE_FONT_MEDIUM       &font_ebike_trump_40
 #define EBIKE_FONT_LARGE        &font_ebike_trump_72
-#else
-LV_FONT_DECLARE(font_ebike_inter_14)
-LV_FONT_DECLARE(font_ebike_trump_24)
-LV_FONT_DECLARE(font_ebike_trump_48)
-#define EBIKE_FONT_SMALL        &font_ebike_inter_14
-#define EBIKE_FONT_MEDIUM       &font_ebike_trump_24
-#define EBIKE_FONT_LARGE        &font_ebike_trump_48
-#endif
 
 /**********************
  *      TYPEDEFS

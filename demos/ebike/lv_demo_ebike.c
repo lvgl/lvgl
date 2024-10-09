@@ -35,11 +35,7 @@ static void language_observer_cb(lv_observer_t * observer, lv_subject_t * subjec
  **********************/
 static lv_obj_t * main_cont;
 #if LV_USE_LOTTIE
-    #if LV_DEMO_EBIKE_PORTRAIT
-        LV_DRAW_BUF_DEFINE_STATIC(lottie_ebike_draw_buf, 120, 120, LV_COLOR_FORMAT_ARGB8888);
-    #else
-        LV_DRAW_BUF_DEFINE_STATIC(lottie_ebike_draw_buf, 100, 100, LV_COLOR_FORMAT_ARGB8888);
-    #endif
+    LV_DRAW_BUF_DEFINE_STATIC(lottie_ebike_draw_buf, 120, 120, LV_COLOR_FORMAT_ARGB8888);
 #endif
 
 static lv_theme_t * theme_original;
@@ -80,13 +76,8 @@ void lv_demo_ebike(void)
     lv_obj_set_style_text_color(lv_screen_active(), lv_color_white(), 0);
 
     lv_obj_t * bg = lv_image_create(lv_screen_active());
-#if LV_DEMO_EBIKE_PORTRAIT
-    LV_IMAGE_DECLARE(img_ebike_bg_large);
-    lv_image_set_src(bg, &img_ebike_bg_large);
-#else
     LV_IMAGE_DECLARE(img_ebike_bg);
     lv_image_set_src(bg, &img_ebike_bg);
-#endif
 
     lv_obj_align(bg, LV_ALIGN_CENTER, 0, 0);
     lv_obj_add_flag(bg, LV_OBJ_FLAG_IGNORE_LAYOUT);
@@ -128,13 +119,9 @@ static void menu_bar_create(void)
     lv_obj_set_style_bg_color(menu_cont, lv_color_black(), 0);
     lv_obj_set_flex_flow(menu_cont, LV_DEMO_EBIKE_PORTRAIT ? LV_FLEX_FLOW_ROW : LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(menu_cont, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-#if LV_DEMO_EBIKE_PORTRAIT
-    lv_obj_set_size(menu_cont, lv_pct(100), 64);
+    lv_obj_set_size(menu_cont, 64, lv_pct(100));
     lv_obj_set_style_pad_gap(menu_cont, 32, 0);
-#else
-    lv_obj_set_size(menu_cont, 44, lv_pct(100));
-    lv_obj_set_style_pad_gap(menu_cont, 16, 0);
-#endif
+
     /*The menu always exists. If it's deleted, the demo was deleted, so clean up*/
     lv_obj_add_event_cb(menu_cont, menu_delete_event_cb, LV_EVENT_DELETE, NULL);
 

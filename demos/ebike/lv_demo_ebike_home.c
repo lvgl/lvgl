@@ -177,25 +177,14 @@ static lv_obj_t * left_cont_create(lv_obj_t * parent)
     lv_obj_remove_flag(left_cont, LV_OBJ_FLAG_SCROLLABLE);
 
     lv_obj_t * scale = lv_image_create(left_cont);
-#if LV_DEMO_EBIKE_PORTRAIT
     LV_IMAGE_DECLARE(img_ebike_scale_large);
     lv_image_set_src(scale, &img_ebike_scale_large);
     lv_obj_align(scale, LV_ALIGN_LEFT_MID, 0, 0);
-#else
-    LV_IMAGE_DECLARE(img_ebike_scale);
-    lv_image_set_src(scale, &img_ebike_scale);
-    lv_obj_align(scale, LV_ALIGN_LEFT_MID, 0, 0);
-#endif
 
     lv_obj_t * arc = lv_arc_create(left_cont);
 
-#if LV_DEMO_EBIKE_PORTRAIT
     lv_obj_set_size(arc, 660, 660);
     lv_obj_align(arc, LV_ALIGN_LEFT_MID, 82, 0);
-#else
-    lv_obj_set_size(arc, 440, 440);
-    lv_obj_align(arc, LV_ALIGN_LEFT_MID, 52, 0);
-#endif
     lv_obj_set_style_arc_width(arc, 20, 0);
     lv_obj_set_style_arc_width(arc, 20, LV_PART_INDICATOR);
     lv_obj_set_style_bg_opa(arc, LV_OPA_0, LV_PART_KNOB);
@@ -212,19 +201,11 @@ static lv_obj_t * left_cont_create(lv_obj_t * parent)
         lv_obj_t * obj = lv_obj_create(left_cont);
         lv_obj_set_style_bg_opa(obj, LV_OPA_0, 0);
 
-#if LV_DEMO_EBIKE_PORTRAIT
         lv_obj_set_size(obj, 60, 80);
         lv_obj_align(obj, LV_ALIGN_LEFT_MID, -10, 0);
         lv_obj_set_style_transform_pivot_x(obj, 390, 0);
         lv_obj_set_style_transform_pivot_y(obj, lv_pct(50), 0);
         lv_obj_set_style_transform_rotation(obj, -240 + i * 135, 0);
-#else
-        lv_obj_set_size(obj, 40, 50);
-        lv_obj_align(obj, LV_ALIGN_LEFT_MID, -10, 0);
-        lv_obj_set_style_transform_pivot_x(obj, 260, 0);
-        lv_obj_set_style_transform_pivot_y(obj, lv_pct(50), 0);
-        lv_obj_set_style_transform_rotation(obj, -260 + i * 150, 0);
-#endif
 
         lv_obj_t * label = lv_label_create(obj);
         lv_obj_align(label, LV_ALIGN_RIGHT_MID, 0, 0);
@@ -238,13 +219,9 @@ static lv_obj_t * left_cont_create(lv_obj_t * parent)
 
     lv_obj_t * dashboard_center_cont = lv_obj_create(left_cont);
     lv_obj_set_style_bg_opa(dashboard_center_cont, 0, 0);
-#if LV_DEMO_EBIKE_PORTRAIT
     lv_obj_align(dashboard_center_cont, LV_ALIGN_LEFT_MID, 32, 0);
     lv_obj_set_size(dashboard_center_cont, lv_pct(80), 240);
-#else
-    lv_obj_align(dashboard_center_cont, LV_ALIGN_LEFT_MID, 0, 0);
-    lv_obj_set_size(dashboard_center_cont, lv_pct(100), 240);
-#endif
+
     lv_obj_set_style_pad_left(dashboard_center_cont, 110, 0);
     lv_obj_remove_flag(dashboard_center_cont, LV_OBJ_FLAG_CLICKABLE);
 
@@ -265,7 +242,6 @@ static lv_obj_t * left_cont_create(lv_obj_t * parent)
     LV_IMAGE_DECLARE(img_ebike_arrow_right);
     lv_obj_t * icon3 = lv_image_create(top_cont);
     lv_image_set_src(icon3, &img_ebike_arrow_right);
-
 
     lv_obj_t * roller_cont = lv_obj_create(dashboard_center_cont);
     lv_obj_set_size(roller_cont, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
@@ -387,7 +363,7 @@ static lv_obj_t * bullets_create(lv_obj_t * parent)
     uint32_t i;
     for(i = 0; i < cnt; i++) {
         lv_obj_t * bullet = lv_obj_create(cont);
-        lv_obj_set_size(bullet, 5, 5);
+        lv_obj_set_size(bullet, 6, 6);
         lv_obj_set_style_transition(bullet, &dsc, 0);
         lv_obj_set_style_radius(bullet, LV_RADIUS_CIRCLE, 0);
         lv_obj_set_style_bg_color(bullet, lv_color_hex(0x000000), 0);
@@ -409,9 +385,9 @@ static lv_obj_t * right_cont_create(lv_obj_t * parent)
     lv_obj_set_style_bg_opa(right_cont, 0, 0);
 
     lv_obj_set_flex_flow(right_cont, LV_DEMO_EBIKE_PORTRAIT ? LV_FLEX_FLOW_ROW : LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_ver(right_cont, 12, 0);
+    lv_obj_set_style_pad_ver(right_cont, 48, 0);
     lv_obj_set_style_pad_hor(right_cont, 8, 0);
-    lv_obj_set_style_pad_gap(right_cont, 8, 0);
+    lv_obj_set_style_pad_gap(right_cont, 24, 0);
 
     lv_obj_t * battery = lv_bar_create(right_cont);
     lv_obj_set_size(battery, lv_pct(100), lv_pct(100));

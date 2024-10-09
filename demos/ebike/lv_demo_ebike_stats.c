@@ -86,11 +86,7 @@ void lv_demo_ebike_stats_create(lv_obj_t * parent)
     lv_obj_set_flex_flow(main_cont, LV_DEMO_EBIKE_PORTRAIT ? LV_FLEX_FLOW_COLUMN : LV_FLEX_FLOW_ROW);
 
     lv_obj_t * left_cont = left_cont_create(main_cont);
-#if LV_DEMO_EBIKE_PORTRAIT
-    lv_obj_set_size(left_cont, lv_pct(100), 120);
-#else
-    lv_obj_set_size(left_cont, 164, lv_pct(100));
-#endif
+    lv_obj_set_size(left_cont, 200, lv_pct(100));
 
     lv_obj_t * right_cont = right_cont_create(main_cont);
     lv_obj_set_size(right_cont, lv_pct(100), lv_pct(100));
@@ -129,7 +125,7 @@ static lv_obj_t * left_cont_create(lv_obj_t * parent)
 #if LV_DEMO_EBIKE_PORTRAIT
     lv_obj_align(stats_img, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
 #else
-    lv_obj_align(stats_img, LV_ALIGN_BOTTOM_MID, 0, 0);
+    lv_obj_align(stats_img, LV_ALIGN_BOTTOM_MID, 0, -16);
 #endif
     return left_cont;
 }
@@ -142,11 +138,8 @@ static void tabs_click_event_cb(lv_event_t * e)
 static lv_obj_t * tabs_create(lv_obj_t * parent)
 {
     lv_obj_t * btnm = lv_buttonmatrix_create(parent);
-#if LV_DEMO_EBIKE_PORTRAIT
-    lv_obj_set_size(btnm, lv_pct(100), 40);
-#else
-    lv_obj_set_size(btnm, lv_pct(100), 24);
-#endif
+    lv_obj_set_size(btnm, lv_pct(100), 60);
+
     lv_obj_set_style_bg_opa(btnm, 0, 0);
     lv_obj_set_style_bg_opa(btnm, 0, LV_PART_ITEMS);
     lv_obj_set_style_border_width(btnm, 1, LV_PART_ITEMS);
@@ -236,6 +229,7 @@ static lv_obj_t * data_cont_create(lv_obj_t * parent)
     lv_obj_set_style_flex_main_place(cont, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_cross_place(cont, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_style_flex_track_place(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, 0);
+    lv_obj_set_style_pad_ver(cont, 24, 0);
 
     LV_IMAGE_DECLARE(img_ebike_arrow_left_2);
     LV_IMAGE_DECLARE(img_ebike_arrow_right_2);
@@ -333,11 +327,7 @@ static void chart_draw_event_cb(lv_event_t * e)
 
 static void chart_refr_ext_draw(lv_event_t * e)
 {
-#if LV_DEMO_EBIKE_PORTRAIT
     lv_event_set_ext_draw_size(e, 48);
-#else
-    lv_event_set_ext_draw_size(e, 32);
-#endif
 }
 
 static void chart_draw_task_event_cb(lv_event_t * e)

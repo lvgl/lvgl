@@ -50,7 +50,7 @@ void lv_demo_ebike_settings_create(lv_obj_t * parent)
 #if LV_DEMO_EBIKE_PORTRAIT
     lv_obj_set_size(left_cont, lv_pct(100), 120);
 #else
-    lv_obj_set_size(left_cont, 164, lv_pct(100));
+    lv_obj_set_size(left_cont, 200, lv_pct(100));
 #endif
     lv_obj_t * right_cont = right_cont_create(main_cont);
     lv_obj_set_size(right_cont, lv_pct(100), lv_pct(100));
@@ -88,7 +88,7 @@ static lv_obj_t * left_cont_create(lv_obj_t * parent)
 #if LV_DEMO_EBIKE_PORTRAIT
     lv_obj_align(settings_img, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
 #else
-    lv_obj_align(settings_img, LV_ALIGN_BOTTOM_MID, 0, 0);
+    lv_obj_align(settings_img, LV_ALIGN_BOTTOM_MID, 0, -16);
 #endif
     return cont;
 }
