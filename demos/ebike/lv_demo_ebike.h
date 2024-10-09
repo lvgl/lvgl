@@ -40,7 +40,9 @@ extern "C" {
  **********************/
 
 /**
- * Create an ebike demo
+ * Create an ebike demo.
+ * If LV_DEMO_EBIKE_PORTRAIT is 0: the supported resolution as are: 320x240... 480x320
+ * If LV_DEMO_EBIKE_PORTRAIT is 1: the supported resolution as are: 480x600... 480x858
  */
 void lv_demo_ebike(void);
 
