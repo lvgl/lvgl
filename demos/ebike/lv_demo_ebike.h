@@ -13,11 +13,23 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../../lvgl/lvgl.h"
+#include "../../../lvgl/lvgl.h"
+
+#if LV_USE_DEMO_EBIKE
+
+/*Testing of dependencies*/
+#if LV_USE_BIDI == 0
+#error "BiDirectional text support is required. Enable it in lv_conf.h (LV_USE_BIDI 1)"
+#endif
+
+#if LV_USE_ARABIC_PERSIAN_CHARS == 0
+#error "Arabic/Perisan character processing is required. Enable it in lv_conf.h (LV_USE_ARABIC_PERSIAN_CHARS 1)"
+#endif
 
 /*********************
  *      DEFINES
  *********************/
+
 
 /**********************
  *      TYPEDEFS
@@ -40,6 +52,8 @@ void lv_demo_ebike(void);
 /**********************
  *      MACROS
  **********************/
+
+#endif /*LV_USE_DEMO_EBIKE*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

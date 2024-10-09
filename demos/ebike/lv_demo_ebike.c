@@ -36,7 +36,7 @@ static void language_observer_cb(lv_observer_t * observer, lv_subject_t * subjec
 static lv_obj_t * main_cont;
 #if LV_USE_LOTTIE
     #if LV_DEMO_EBIKE_PORTRAIT
-        LV_DRAW_BUF_DEFINE_STATIC(lottie_ebike_draw_buf, 200, 200, LV_COLOR_FORMAT_ARGB8888);
+        LV_DRAW_BUF_DEFINE_STATIC(lottie_ebike_draw_buf, 120, 120, LV_COLOR_FORMAT_ARGB8888);
     #else
         LV_DRAW_BUF_DEFINE_STATIC(lottie_ebike_draw_buf, 100, 100, LV_COLOR_FORMAT_ARGB8888);
     #endif
