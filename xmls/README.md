@@ -4,16 +4,16 @@
 
 ### Goal
 
-Support the developer where needed to proceed faster with the visual part of the UI, but allow writing code where it's more effective
+Create a UI editor tol LVGL to support the developer where needed to proceed faster with the visual part of the UI, but allow writing code where it's more effective
 
 To achieve this
 - Think in components
-- Describer the widgetsin a declarative way
+- Describe the widgets in a declarative way
 - Allow nesting widgets
 - Generate developer friendly code
 - Load widgets in runtime
 - Realtime preview the components
-- Prepare for testing widgets
+- Suppert testing the new components
 
 It's **not the goal** to create a no-code tool. It is assumed that the user is a developer and can write code.
 The XML description should help with defining the view (and providing a preview) to allow fast iterations on the design.
@@ -23,35 +23,48 @@ It's also acceptable to define callbacks in code.
 
 ### Success criteria
 
-If these can be fulfilled, the tool is considered successful.
+If these can be fulfilled, the tool is considered successful:
 
 1. **Component library (no handwritten code)**:
     - Create a component library consisting of styled buttons, sliders and tabviews
     - Load these components at run time from XML
-2. **Access hand written components (no editor code)**
-	- Create a custom components manually (without the editor)
-	- Let user use and preview them as part of other components.
-3. **Complex Widgets in the editor**
-	- Create a complex widgets in the editor which are completed withwith custom code
-	- Make them available in the editor, and allow using them in custom components.
+    - Support nested components
+2. **Access hand written components and widgets (no editor code)**
+	- Create a custom components or widget manually (without the editor)
+	- Describe only its interface for the editor
+	- Let user use and preview these as part of other components
+3. **Complex `widgets in the editor**
+	- Create a complex widgets in the editor which are completed with custom code
+	- Make them available in the editor, and allow using them in custom components or other widgets.
 4. **Runtime loading**
     - Load nested components in runtime
     - Use all three options from above
 4. **Figma import**
-	- Allow loading styles and drawings from Figma with a simple copy-paste
+	- Allow loading styles and more nexted elements from Figma is a simple way
 5. **Testing**
-	- Detect regression in components with CI
+	- Detect regression in components and widgets with CI
 6. **Collaboration**
 	- Let a designer preview the components and screens, and allow commenting on them.
 
 ### Workflows
 
+The main purpoose of the editor is the create and test
+- **widgets**: just like the built-in widgets (built from classes, can have a large API). They can have custom C code to describe complex logics. Therefore even the custom widgets are compiled to the editor's preview to allow running their custom code too.
+- **components**: simple wrapper for a some widgets or other components. They only have a simple `create` function as API and can't have custom C code. Therefore components can be loaded at runtime from XML.
+
 #### Widgets
 
-Widgets are built-in buinding blocks from which other widgets or components can be created.
-Widgets also have complex C API with setter/getter functions.
+Main characteristics:
+  - similar to LVGL's built-in widgets
+  - built from classes
+  - have a large API
+  - support internal widgets (e.g. tabview's tabs)
+  - can have custom C code
+  - compiled to the editor's preview
 
 ### Example XML
+
+Widgets are wrapped to a `<widget>` element.
 
 The interfaces of a widget are described in an `<api>` tag.
 The properties, elements (internal widgets), and enums of a given widget are defined here.
@@ -117,7 +130,7 @@ if(lv_streq(attr, "limit") my_widget_set_limit(obj, atoi(value));
 ```
 
 Once both the setters and XML parser is implemented the editor's core can be recompiled
-with this new widget, so that it will be parts of the editor and preview.
+with this new widget, so that it will be parts of the editor and the preview.
 
 In summary these file will be generated for widgets with API:
 - `<widget_name>_gen.h`: Contains the generated API implementation of the widget.
