@@ -41,4 +41,7 @@
     The rendering engine needs to support 3x3 matrix transformations.*/
 #define LV_DRAW_TRANSFORM_USE_MATRIX            1
 
+/*1: Enable API to take snapshot for object*/
+#define LV_USE_SNAPSHOT 1
+
 #endif /* LV_TEST_CONF_VG_LITE_H */

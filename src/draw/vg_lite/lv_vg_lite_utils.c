@@ -403,6 +403,9 @@ bool lv_vg_lite_is_dest_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_ARGB1555:
+        case LV_COLOR_FORMAT_ARGB4444:
+        case LV_COLOR_FORMAT_ARGB2222:
             return true;
 
         case LV_COLOR_FORMAT_ARGB8565:
@@ -425,6 +428,9 @@ bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_ARGB1555:
+        case LV_COLOR_FORMAT_ARGB4444:
+        case LV_COLOR_FORMAT_ARGB2222:
             return true;
 
         case LV_COLOR_FORMAT_I1:
@@ -475,6 +481,15 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
 
         case LV_COLOR_FORMAT_I8:
             return VG_LITE_INDEX_8;
+
+        case LV_COLOR_FORMAT_ARGB1555:
+            return VG_LITE_BGRA5551;
+
+        case LV_COLOR_FORMAT_ARGB4444:
+            return VG_LITE_BGRA4444;
+
+        case LV_COLOR_FORMAT_ARGB2222:
+            return  VG_LITE_BGRA2222;
 
         case LV_COLOR_FORMAT_RGB565:
             return VG_LITE_BGR565;
