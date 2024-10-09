@@ -39,3 +39,25 @@ node on the display (usually this is ``/dev/fb0``).
 If your screen stays black or only draws partially, you can try enabling direct rendering via ``LV_DISPLAY_RENDER_MODE_DIRECT``. Additionally,
 you can activate a force refresh mode with ``lv_linux_fbdev_set_force_refresh(true)``. This usually has a performance impact though and shouldn't
 be enabled unless really needed.
+
+
+Common mistakes
+---------------
+
+Default resolution issue
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+When the Linux kernel is loaded, it initializes various subsystems, including the framebuffer subsystem. The kernel detects the connected devices 
+during the boot process. If an HDMI display is connected, the kernel recognizes it through the HDMI interface. The kernel allocates a framebuffer, 
+which is a portion of RAM used to hold the image data for the display. This memory is used to store pixel data for rendering. With some screens, 
+a bad resolution can be set while configuring fbdev, resulting in having a bad resolution (visible and virtual). This happens when screen and the 
+board are connected with the HDMI, but the screen is not powered yet. Then if the board is powered up, the system will boot, and if the screen is 
+then powered up, it can happen that the fbdev resolution is bad.
+
+
+
+.. code-block::	
+	
+	fbset -fb /dev/fb0 # To check the resolution of fbdev
+
+
