@@ -25,25 +25,31 @@ It's also acceptable to define callbacks in code.
 
 If these can be fulfilled, the tool is considered successful.
 
-1. **Component library**: Create a component library consisting of styled buttons, sliders, tabviews, etc and use these components to describe a finel UI
-2. **Access hand written components** Create a custom components manually (without the editor) and let's user use them in other components.
-3. **Widgets in the edtior** Create complex widgets in the editor, make them available in the editor, and allow using them in custom components.
-4. **Runtime loading** Allow loading even nested components in runtime.
-4. **Figma import** Allow loading styles and drawings from Figma with a simple copy-paste
-5. **Testing** Detect regression in components with CI
-6. **Collaboration** Let a designer preview the components and screens, and allow commenting on them.
-
-
-### Design Considerations
-
-1. Use XML in an HTML-like way because it's already proven that it works for both small and large UIs, and people are familiar with it.
-2. The XML format should serve C, and not the other way around. That is, give freedom in the C API.
-3. Focus on the view and do not develop a custom declarative language for the logic.
-4. Prefer approaches for which a straightforward and standard XSD (XML Schema) can be created. This allows supporting autocompletion and type validation, even in external XML editors.
+1. **Component library (no handwritten code)**:
+    - Create a component library consisting of styled buttons, sliders and tabviews
+    - Load these components at run time from XML
+2. **Access hand written components (no editor code)**
+	- Create a custom components manually (without the editor)
+	- Let user use and preview them as part of other components.
+3. **Complex Widgets in the editor**
+	- Create a complex widgets in the editor which are completed withwith custom code
+	- Make them available in the editor, and allow using them in custom components.
+4. **Runtime loading**
+    - Load nested components in runtime
+    - Use all three options from above
+4. **Figma import**
+	- Allow loading styles and drawings from Figma with a simple copy-paste
+5. **Testing**
+	- Detect regression in components with CI
+6. **Collaboration**
+	- Let a designer preview the components and screens, and allow commenting on them.
 
 ### Workflows
 
-#### Adding new built-in widgets
+#### Widgets
+
+Widgets are built-in buinding blocks from which other widgets or components can be created.
+Widgets also have complex C API with setter/getter functions.
 
 ### Example XML
 
@@ -121,7 +127,12 @@ In summary these file will be generated for widgets with API:
 - `<widget_name>.c`: Contains hooks from `<widget_name>_gen.c` and allows the user to write custom code.
 - `<widget_name>_xml_parser.c`: Processes the XML strings and calls the required functions according to the set attributes.
 
-#### Using only the built-in widgets
+#### Components
+
+Components are built from the built-in widgets without writing any code.
+Due to this they can be loaded directly from XML.
+They can also handle and access events and subjects declared globally.
+
 
 ##### Example XML
 
