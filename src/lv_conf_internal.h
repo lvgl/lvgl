@@ -3560,6 +3560,15 @@
             #define LV_USE_NUTTX_TOUCHSCREEN    0
         #endif
     #endif
+
+    /*Touchscreen cursor size in pixels(<=0: disable cursor)*/
+    #ifndef LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
+        #ifdef CONFIG_LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
+            #define LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE CONFIG_LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
+        #else
+            #define LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE    0
+        #endif
+    #endif
 #endif
 
 /** Driver for /dev/dri/card */
