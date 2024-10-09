@@ -546,6 +546,11 @@ static void refr_sync_areas(void)
          * @todo Resize SDL window will trigger crash because of sync_area is larger than disp_area
          */
         lv_area_intersect(sync_area, sync_area, &disp_area);
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+        if(disp_refr->matrix_rotation) {
+            lv_display_rotate_area(disp_refr, sync_area);
+        }
+#endif
         lv_draw_buf_copy(off_screen, sync_area, on_screen, sync_area);
     }
 
@@ -660,11 +665,47 @@ static void refr_area(const lv_area_t * area_p)
     layer->_clip_area = *area_p;
     layer->phy_clip_area = *area_p;
 
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    lv_matrix_identity(&layer->matrix);
+
+    if(disp_refr->matrix_rotation) {
+        const lv_display_rotation_t rotation = lv_display_get_rotation(disp_refr);
+        if(rotation != LV_DISPLAY_ROTATION_0) {
+            lv_display_rotate_area(disp_refr, &layer->phy_clip_area);
+
+            /* Calculate midpoint coordinates using native resolution data */
+            const float pivot_x = disp_refr->hor_res / 2.0f;
+            const float pivot_y = disp_refr->ver_res / 2.0f;
+            lv_matrix_translate(&layer->matrix, pivot_x, pivot_y);
+
+            /* The screen rotation direction defined by LVGL is opposite to the drawing angle */
+            switch(rotation) {
+                case LV_DISPLAY_ROTATION_90:
+                    lv_matrix_rotate(&layer->matrix, 270);
+                    break;
+
+                case LV_DISPLAY_ROTATION_180:
+                    lv_matrix_rotate(&layer->matrix, 180);
+                    break;
+
+                case LV_DISPLAY_ROTATION_270:
+                    lv_matrix_rotate(&layer->matrix, 90);
+                    break;
+
+                default:
+                    LV_LOG_WARN("Invalid rotation: %d", rotation);
+                    break;
+            }
+
+            lv_matrix_translate(&layer->matrix, -pivot_x, -pivot_y);
+        }
+    }
+#endif /* LV_DRAW_TRANSFORM_USE_MATRIX */
+
     if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
         /*In full mode the area is always the full screen, so the buffer area to it too*/
         layer->buf_area = *area_p;
         layer_reshape_draw_buf(layer, layer->draw_buf->header.stride);
-
     }
     else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         /*In partial mode render this area to the buffer*/
@@ -721,6 +762,9 @@ static void refr_area(const lv_area_t * area_p)
         lv_draw_layer_init(tile_layer, NULL, layer->color_format, &tile_area);
         tile_layer->buf_area = layer->buf_area; /*the buffer is still large*/
         tile_layer->draw_buf = layer->draw_buf;
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+        tile_layer->matrix = layer->matrix;
+#endif
         refr_configured_layer(tile_layer);
     }
 
@@ -753,10 +797,6 @@ static void refr_area(const lv_area_t * area_p)
 static void refr_configured_layer(lv_layer_t * layer)
 {
     LV_PROFILER_REFR_BEGIN;
-
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-    lv_matrix_identity(&layer->matrix);
-#endif
 
     /* In single buffered mode wait here until the buffer is freed.
      * Else we would draw into the buffer while it's still being transferred to the display*/

@@ -159,6 +159,13 @@ void lv_display_set_offset(lv_display_t * disp, int32_t x, int32_t y);
 void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation);
 
 /**
+ * Use matrix rotation for the display. This function is depended on `LV_DRAW_TRANSFORM_USE_MATRIX`
+ * @param disp      pointer to a display (NULL to use the default display)
+ * @param enable    true: enable matrix rotation, false: disable
+ */
+void lv_display_set_matrix_rotation(lv_display_t * disp, bool enable);
+
+/**
  * Set the DPI (dot per inch) of the display.
  * dpi = sqrt(hor_res^2 + ver_res^2) / diagonal"
  * @param disp      pointer to a display

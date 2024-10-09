@@ -866,6 +866,13 @@ void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation
     update_resolution(disp);
 }
 
+void lv_display_set_matrix_rotation(lv_display_t * disp, bool enable)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return;
+    disp->matrix_rotation = enable;
+}
+
 lv_display_rotation_t lv_display_get_rotation(lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
@@ -1004,12 +1011,12 @@ void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area)
 {
     lv_display_rotation_t rotation = lv_display_get_rotation(disp);
 
+    if(rotation == LV_DISPLAY_ROTATION_0) return;
+
     int32_t w = lv_area_get_width(area);
     int32_t h = lv_area_get_height(area);
 
     switch(rotation) {
-        case LV_DISPLAY_ROTATION_0:
-            return;
         case LV_DISPLAY_ROTATION_90:
             area->y2 = disp->ver_res - area->x1 - 1;
             area->x1 = area->y1;
@@ -1027,6 +1034,8 @@ void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area)
             area->y2 = area->x2;
             area->x2 = area->x1 + h - 1;
             area->y1 = area->y2 - w + 1;
+            break;
+        default:
             break;
     }
 }
