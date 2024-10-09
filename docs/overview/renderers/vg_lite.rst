@@ -65,4 +65,4 @@ VG-Lite Simulator
 
 LVGL integrates a VG-Lite simulator based on ThorVG.
 Its purpose is to simplify the debugging of VG-Lite adaptation and reduce the time of debugging and locating problems on hardware devices.
-For detailed instructions, see `VG-Lite Simulator </overview/vg_lite_tvg>`__.
+For detailed instructions, see `VG-Lite Simulator <overview/vg_lite_tvg>`__.

@@ -14,7 +14,7 @@ Usage
 Enable :c:macro:`LV_USE_MONKEY` in ``lv_conf.h``.
 
 First configure monkey, use :c:struct:`lv_monkey_config_t` to define the
-configuration structure, set the ``type`` (check `input devices </overview/indev>`__ for the supported types), and then set the
+configuration structure, set the ``type`` (check `input devices <overview/indev>`__ for the supported types), and then set the
 range of ``period_range`` and ``input_range``, the monkey will output
 random operations at random times within this range. Call
 :cpp:func:`lv_monkey_create` to create monkey. Finally call

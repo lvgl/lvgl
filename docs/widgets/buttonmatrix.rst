@@ -11,8 +11,8 @@ The Button Matrix object is a lightweight way to display multiple
 buttons in rows and columns. Lightweight because the buttons are not
 actually created but just virtually drawn on the fly. This way, one
 button use only eight extra bytes of memory instead of the ~100-150
-bytes a normal `Button </widgets/button>`__ object plus the 100 or so bytes
-for the `Label </widgets/label>`__ object.
+bytes a normal `Button <widgets/button>`__ object plus the 100 or so bytes
+for the `Label <widgets/label>`__ object.
 
 The Button matrix is added to the default group (if one is set). Besides
 the Button matrix is an editable object to allow selecting and clicking

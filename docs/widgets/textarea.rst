@@ -7,8 +7,8 @@ Text area (lv_textarea)
 Overview
 ********
 
-The Text Area is a `Base object </widgets/obj.html>`__ with a
-`Label </widgets/label.html>`__ and a cursor on it. Texts or characters
+The Text Area is a `Base object <widgets/obj.html>`__ with a
+`Label <widgets/label.html>`__ and a cursor on it. Texts or characters
 can be added to it. Long lines are wrapped and when the text becomes
 long enough the Text area can be scrolled.
 
