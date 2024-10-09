@@ -9,7 +9,7 @@
 #include "lv_demo_ebike.h"
 #if LV_USE_DEMO_EBIKE
 
-#include "../../../src/lvgl_private.h"
+#include "../../src/lvgl_private.h"
 #include "translations/lv_i18n.h"
 #include "lv_demo_ebike_stats.h"
 #include "lv_demo_ebike_private.h"
@@ -523,6 +523,7 @@ static lv_obj_t * stat_card_create(lv_obj_t * parent, const char * name, lv_subj
 {
     lv_obj_t * cont = lv_obj_create(parent);
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_flex_track_place(cont, LV_FLEX_ALIGN_CENTER, 0);
     lv_obj_set_flex_grow(cont, 1);
     lv_obj_set_height(cont, LV_SIZE_CONTENT);
     lv_obj_set_style_bg_opa(cont, 0, 0);
