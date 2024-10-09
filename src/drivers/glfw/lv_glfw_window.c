@@ -303,7 +303,7 @@ static void window_update_handler(lv_timer_t * t)
             lv_area_t clip_area = texture->area;
 #if LV_USE_DRAW_OPENGLES
             lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
-                                       &clip_area, false);
+                                       &clip_area, texture_disp == NULL);
 #else
             lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
                                        &clip_area, true);
