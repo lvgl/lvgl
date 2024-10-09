@@ -32,5 +32,7 @@ jobs:
           days-before-close: 7
           exempt-issue-labels: '🔥 Important'
           exempt-pr-labels: '🔥 Important'
-          stale-issue-label: '🪹 Abandoned'
-          stale-pr-label: '🪹 Abandoned'
+          stale-issue-label: '💤 Stale'
+          stale-pr-label: '💤 Stale'
+          close-issue-label: '🪹 Abandoned'
+          close-pr-label: '🪹 Abandoned'
