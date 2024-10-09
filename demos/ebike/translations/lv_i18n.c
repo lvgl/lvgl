@@ -1,5 +1,5 @@
 #include "./lv_i18n.h"
-
+#include "../../../src/stdlib/lv_string.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Define plural operands
@@ -196,7 +196,7 @@ int lv_i18n_set_locale(const char * l_name)
 
     for(i = 0; current_lang_pack[i] != NULL; i++) {
         // Found -> finish
-        if(strcmp(current_lang_pack[i]->locale_name, l_name) == 0) {
+        if(lv_strcmp(current_lang_pack[i]->locale_name, l_name) == 0) {
             current_lang = current_lang_pack[i];
             return 0;
         }
@@ -210,7 +210,7 @@ static const char * __lv_i18n_get_text_core(lv_i18n_phrase_t * trans, const char
 {
     uint16_t i;
     for(i = 0; trans[i].msg_id != NULL; i++) {
-        if(strcmp(trans[i].msg_id, msg_id) == 0) {
+        if(lv_strcmp(trans[i].msg_id, msg_id) == 0) {
             /*The msg_id has found. Check the translation*/
             if(trans[i].translation) return trans[i].translation;
         }

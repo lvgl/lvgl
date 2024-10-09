@@ -5,8 +5,9 @@
 extern "C" {
 #endif
 
-#include <stdint.h>
-#include <string.h>
+#include "../../../src/lv_conf_internal.h"
+
+#include LV_STDINT_INCLUDE
 
 typedef enum {
     LV_I18N_PLURAL_TYPE_ZERO,

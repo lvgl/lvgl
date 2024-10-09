@@ -213,7 +213,7 @@ static lv_obj_t * right_cont_create(lv_obj_t * parent)
     lv_obj_set_style_radius(right_cont, 2, LV_PART_SCROLLBAR);
     lv_obj_set_style_bg_opa(right_cont, LV_OPA_40, LV_PART_SCROLLBAR);
     lv_obj_set_style_bg_color(right_cont, EBIKE_COLOR_TURQUOISE, LV_PART_SCROLLBAR);
-    if(strcmp(lv_i18n_get_current_locale(), "ar") == 0) {
+    if(lv_strcmp(lv_i18n_get_current_locale(), "ar") == 0) {
         lv_obj_set_style_base_dir(right_cont, LV_BASE_DIR_RTL, 0);
     }
     else {
