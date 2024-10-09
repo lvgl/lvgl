@@ -147,9 +147,7 @@ print("Add translation")
 add_translation.exec(temp_directory)
 
 print("Running doxygen")
-os.chdir(temp_directory)
-cmd('doxygen Doxyfile')
-os.chdir(base_path)
+cmd('doxygen Doxyfile', temp_directory)
 
 print('Reading Doxygen output')
 
