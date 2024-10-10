@@ -391,8 +391,11 @@ static void texture_resize(lv_display_t * disp)
 #else
 #error("Unsupported color format")
 #endif
-    //    px_format = SDL_PIXELFORMAT_BGR24;
-
+    /*Handle OLED support*/
+    if(lv_display_get_color_format(disp) == LV_COLOR_FORMAT_I1)
+    {
+        px_format = SDL_PIXELFORMAT_ARGB8888;
+    }
     dsc->texture = SDL_CreateTexture(dsc->renderer, px_format,
                                      SDL_TEXTUREACCESS_STATIC, disp->hor_res, disp->ver_res);
     SDL_SetTextureBlendMode(dsc->texture, SDL_BLENDMODE_BLEND);
