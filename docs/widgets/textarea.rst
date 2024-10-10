@@ -51,10 +51,18 @@ You can insert text or characters to the current cursor's position with:
 -  :cpp:expr:`lv_textarea_add_char(textarea, 'c')`
 -  :cpp:expr:`lv_textarea_add_text(textarea, "insert this text")`
 
+.. code-block:: c
+   lv_textarea_add_char(textarea0, 'A'); /*add character 'A' to textarea0*/
+   lv_textarea_add_text(textarea1, "A dummy text for example"); /*add the dummy text to textarea1*/
+
 To add wide characters like ``'á'``, ``'ß'`` or CJK characters use
 :cpp:expr:`lv_textarea_add_text(ta, "á")`.
 
 :cpp:expr:`lv_textarea_set_text(ta, "New text")` changes the whole text.
+
+.. code-block:: c
+   lv_textarea_add_text(textarea2, "Text before setting");
+   lv_textarea_set_text(textarea2, "This one will override the older text"); /*Set the text for textarea2. Previous text will be overwritten.*/
 
 Placeholder
 -----------
@@ -63,6 +71,9 @@ A placeholder text can be specified
 
 - which is displayed when the Text area is empty
 - with :cpp:expr:`lv_textarea_set_placeholder_text(ta, "Placeholder text")`
+
+.. code-block:: c
+   lv_textarea_set_placeholder_text(password_textarea, "Enter your password!"); /*Password textarea will display "Enter your password" when empty.*/
 
 Delete character
 ----------------
@@ -79,6 +90,9 @@ The cursor position can be modified directly like
 :cpp:expr:`lv_textarea_set_cursor_pos(textarea, 10)`. The ``0`` position means
 "before the first characters", :cpp:enumerator:`LV_TEXTAREA_CURSOR_LAST` means "after the
 last character"
+
+.. code-block:: c
+   lv_textarea_set_cursor_pos(textarea4, 1); /*Set the cursor after the 1st character*/
 
 You can step the cursor with
 
@@ -117,8 +131,15 @@ after some time or when a new character is entered. If ``•`` does not
 exist in the font, ``*`` will be used. You can override the default
 character with :cpp:expr:`lv_textarea_set_password_bullet(textarea, "x")`.
 
+.. code-block:: c
+   lv_textarea_set_password_bullet(password_box, "?"); /*password will be masked with '???????'*/
+
 In password mode :cpp:expr:`lv_textarea_get_text(textarea)` returns the actual
 text entered, not the bullet characters.
+
+.. code-block:: c
+   char* txt;
+   txt = lv_textarea_get_text(password_box); /*fetch the password*/
 
 The visibility time can be adjusted with :c:macro:`LV_TEXTAREA_DEF_PWD_SHOW_TIME` in ``lv_conf.h``.
 
@@ -129,11 +150,18 @@ You can set a list of accepted characters with
 :cpp:expr:`lv_textarea_set_accepted_chars(textarea, "0123456789.+-")`. Other
 characters will be ignored.
 
+.. code-block:: c
+   lv_textarea_set_accepted_chars(user_id, "0123456789"); /*user id can only accept numbers*/
+
 Max text length
 ---------------
 
 The maximum number of characters can be limited with
 :cpp:expr:`lv_textarea_set_max_length(textarea, max_char_num)`
+
+.. code-block:: c
+   uint8_t max_char_num = 12;
+   lv_textarea_set_max_length(user_name, max_char_num); /*user_name can be 12 characters long maximum*/
 
 Very long texts
 ---------------
@@ -167,6 +195,10 @@ Events
    been changed.
 -  :cpp:enumerator:`LV_EVENT_READY` Sent when :cpp:enumerator:`LV_KEY_ENTER` is pressed (or sent) to
    a one line text area.
+
+.. code-block:: c
+   static const char* txt = "Hello";
+   lv_textarea_set_insert_replace(greeting_box, txt); /*Set the greetings to txt, which contains "Hello"*/
 
 See the events of the :ref:`Base object <lv_obj>` too.
 

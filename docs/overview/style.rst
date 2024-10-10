@@ -306,6 +306,9 @@ Remove styles
 
 To remove all styles from an object use :cpp:expr:`lv_obj_remove_style_all(obj)`.
 
+.. code-block:: c
+   lv_obj_remove_style_all(slider1); /*Removes all styles from slider1*/
+
 To remove specific styles use
 :cpp:expr:`lv_obj_remove_style(obj, style, selector)`. This function will remove
 ``style`` only if the ``selector`` matches with the ``selector`` used in
@@ -313,6 +316,9 @@ To remove specific styles use
 ``selector`` and remove all matching styles. The ``selector`` can use
 the :cpp:enumerator:`LV_STATE_ANY` and :cpp:enumerator:`LV_PART_ANY` values to remove the style from
 any state or part.
+
+.. code-block:: c
+   lv_obj_remove_style(arc1, &red_style, LV_STATE_ANY | LV_PART_ANY); /*Removes red style from arc1 completely (all states and all parts)*/
 
 Report style changes
 --------------------
@@ -330,6 +336,16 @@ notified. There are 3 options to do this:
 3. To make LVGL check all objects to see if they use a style and refresh them
    when needed, call :cpp:expr:`lv_obj_report_style_change(&style)`. If ``style``
    is ``NULL`` all objects will be notified about a style change.
+
+.. code-block:: c
+   lv_obj_invalidate(btn2); /*Notify LVGL to redraw btn2 due to a property change*/
+   lv_obj_invalidate(lv_screen_active()); /*Redraw the whole active screen*/
+
+.. code-block:: c
+   lv_obj_refresh_style(slider4, LV_PART_ANY, LV_STYLE_PROP_ANY); /*Completely refresh slider4 with new properties*/
+
+.. code-block:: c
+   lv_obj_report_style_change(&style_green); /*Notify all objects that style_green has been updated*/
 
 Get a property's value on an object
 -----------------------------------
