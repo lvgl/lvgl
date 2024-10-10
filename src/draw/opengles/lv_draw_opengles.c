@@ -255,7 +255,7 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
     dest_layer.buf_area = task->_real_area;
     dest_layer._clip_area = task->_real_area;
     dest_layer.phy_clip_area = task->_real_area;
-    lv_memzero(u->render_draw_buf.unaligned_data, u->render_draw_buf.data_size);
+    lv_memzero(u->render_draw_buf.data, lv_area_get_size(&task->_real_area) * 4);
 
     lv_display_t * disp = lv_refr_get_disp_refreshing();
 
@@ -423,6 +423,7 @@ static void draw_from_cached_texture(lv_draw_opengles_unit_t * u)
 
     cache_data_t data_to_find;
     data_to_find.draw_dsc = (lv_draw_dsc_base_t *)t->draw_dsc;
+
     data_to_find.w = lv_area_get_width(&t->_real_area);
     data_to_find.h = lv_area_get_height(&t->_real_area);
     data_to_find.texture = 0;
@@ -434,16 +435,40 @@ static void draw_from_cached_texture(lv_draw_opengles_unit_t * u)
 
     /*img_dsc->image_area is an absolute coordinate so it's different
      *for the same image on a different position. So make it relative before using for cache. */
+    lv_area_t a = t->area;
     if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
         lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)data_to_find.draw_dsc;
         lv_area_move(&img_dsc->image_area, -t->area.x1, -t->area.y1);
     }
+    else if(t->type == LV_DRAW_TASK_TYPE_TRIANGLE) {
+        lv_draw_triangle_dsc_t * tri_dsc = (lv_draw_triangle_dsc_t *)data_to_find.draw_dsc;
+        tri_dsc->p[0].x -= t->area.x1;
+        tri_dsc->p[0].y -= t->area.y1;
+        tri_dsc->p[1].x -= t->area.x1;
+        tri_dsc->p[1].y -= t->area.y1;
+        tri_dsc->p[2].x -= t->area.x1;
+        tri_dsc->p[2].y -= t->area.y1;
+    }
+    else if(t->type == LV_DRAW_TASK_TYPE_LINE) {
+        lv_draw_line_dsc_t * line_dsc = (lv_draw_line_dsc_t *)data_to_find.draw_dsc;
+        line_dsc->p1.x -= t->area.x1;
+        line_dsc->p1.y -= t->area.y1;
+        line_dsc->p2.x -= t->area.x1;
+        line_dsc->p2.y -= t->area.y1;
+    }
+    else if(t->type == LV_DRAW_TASK_TYPE_ARC) {
+        lv_draw_arc_dsc_t * arc_dsc = (lv_draw_arc_dsc_t *)data_to_find.draw_dsc;
+        arc_dsc->center.x -= t->area.x1;
+        arc_dsc->center.y -= t->area.y1;
+    }
+
+    lv_area_move(&t->area, -a.x1, -a.y1);
+    lv_area_move(&t->_real_area, -a.x1, -a.y1);
 
     lv_cache_entry_t * entry_cached = lv_cache_acquire_or_create(u->texture_cache, &data_to_find, u);
-    if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
-        lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)data_to_find.draw_dsc;
-        lv_area_move(&img_dsc->image_area, t->area.x1, t->area.y1);
-    }
+
+    lv_area_move(&t->area, a.x1, a.y1);
+    lv_area_move(&t->_real_area, a.x1, a.y1);
 
     if(!entry_cached) {
         return;
