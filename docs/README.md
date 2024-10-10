@@ -91,23 +91,40 @@ Layouts           <=== Heading seen in documentation
     grid
 ```
 
-The first line is for the purposes of providing a uniquely-named link target that can be referenced elsewhere in the documentation.
+The first line is for the purposes of providing a uniquely-named **link target** that can be referenced elsewhere in the documentation.
 
     .. _{LINK NAME}:
 
-Note that `{LINK NAME}` **must** be preceded by a single underscore.
+Note that `{LINK NAME}`:
 
-Replace `{LINK NAME}` with a link name that is unique among all documents under the `./docs/` directory.  It can have multiple words if needed to make it unique or when otherwise appropriate for clarity.  If multiple words are used, they can be separated with single spaces, hyphens or underscores.  Whatever you use, the separators used in `{LINK NAME}` must be identical.  `{LINK NAME}` strings are not case sensitive.  Example: `ref-base-object` refers to the "Base Object" page in the Reference section of the documentation.
+- **must** be preceded by a single underscore, and
+- **must** be followed by at least one blank line for the doc-generation logic to process it correctly.
 
-That unique name is then used to provide a link reference elsewhere in the documentation like this:
+Replace `{LINK NAME}` with a link name that is unique among all documents under the `./docs/` directory.  It can have multiple words if needed to make it unique or when otherwise appropriate for clarity.  If multiple words are used, they can be separated with single spaces, hyphens or underscores.  Whatever you use, the `{LINK NAME}` string used to reference it must be identical.  `{LINK NAME}` strings are not case sensitive.
 
-    :ref:`{LINK NAME}`
+That unique name is then used to provide a link reference elsewhere in the documentation using one of two formats.
 
-This in-line markup (interpreted text) is then replaced by the name of the section heading just below the link target.  For this reason, there are 2 rules that **must** be followed for `:ref:` in-line link references to work:
 
-- the `.. _{LINK NAME}:` line **must** be above an `.rst` title or section heading, and
 
-- there **must** be a single empty line after it for the documentation-generation logic to process it correctly.
+##### When "link text" should be a title or section heading from the target document:
+
+```reStructuredText
+:ref:`{LINK NAME}`
+```
+
+This in-line markup (interpreted text using the Sphinx-defined custom `:ref:` role) is then replaced with a hyperlink whose "link text" is the name of the section heading just below the **link target**.  For this reason, when using this syntax, `{LINK NAME}` must reference **link target**s that are just above a title or section heading.
+
+
+
+##### When "link text" should be something else:
+
+```reStructuredText
+:ref:`other link text <{LINK NAME}>`
+```
+
+This latter syntax enables you to put a **link target** anywhere in an .RST file (not just above a heading) and link to it using this syntax.
+
+
 
 
 ### Section Headings
@@ -127,19 +144,19 @@ If you are creating a new .RST file, use this convention:
     =====
     Title
     =====
-
+    
     Chapter
     *******
-
+    
     Section
     -------
-
+    
     Sub Section
     ~~~~~~~~~~~
-
+    
     Sub Sub Section
     ^^^^^^^^^^^^^^^
-
+    
     Sub Sub Sub Section
     '''''''''''''''''''
 
@@ -154,7 +171,7 @@ For improved readability in the .RST file, place at least 2 blank lines above se
 * Each indentation level use 4 spaces.
 * Include at least 1 empty line after a code block.
 * There must be one empty line between the code block directive and the code.
-* `.. code-block::` is the only directive that should be used.  Note carefully that unlike the link target directive above, this directive has 2 colons.  (The only ReST and sphinx directives that are valid with one colon are link targets as shown above.)  Lone `::`, `:code:` or `.. code:` should not be used.
+* `.. code-block::` is the only directive that should be used.  Note carefully that unlike the **link target** directive above, this directive has 2 colons.  (The only ReST and sphinx directives that are valid with one colon are **link target**s as shown above.)  Lone `::`, `:code:` or `.. code:` should not be used.
 * If you want to separate code into easier-to-understand sections you can do so with a single empty line.
 * For syntax highlighting appropriate to the language in the code block, specify the language after the directive.  Some examples are:
   - `.. code-block:: c`,
@@ -184,7 +201,7 @@ To create a bulleted list, do the following:
       lines to align with item text like this.
     - If you want to include a code block under a list item,
       it must be intended to align with the list item like this:
-
+    
       .. code-block: python
                                  <=== blank line here is important
           # this is some code
