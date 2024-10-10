@@ -110,7 +110,7 @@ menu "LVGL configuration"
 		config LV_USE_DRAW_LAYER_MAX_MEMORY
 			bool "Use memory limit for layer allocation"
 
-		config LV_USE_DRAW_LAYER_MAX_MEMORY
+		config LV_DRAW_LAYER_MAX_MEMORY
 			int "Maximum layer size before allocation returns NULL"
 			default 2*1024U
 			depends LV_USE_DRAW_LAYER_MAX_MEMORY
