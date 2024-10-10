@@ -1133,6 +1133,9 @@
 /** Driver for Renesas GLCD */
 #define LV_USE_RENESAS_GLCDC    0
 
+/** Driver for NXP ELCDIF */
+#define LV_USE_NXP_ELCDIF   0
+
 /** LVGL Windows backend */
 #define LV_USE_WINDOWS    0
 
