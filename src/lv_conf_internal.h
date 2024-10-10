@@ -3885,6 +3885,24 @@
     #endif
 #endif
 
+/*E-bike demo with Lottie animations (if LV_USE_LOTTIE is enabled)*/
+#ifndef LV_USE_DEMO_EBIKE
+    #ifdef CONFIG_LV_USE_DEMO_EBIKE
+        #define LV_USE_DEMO_EBIKE CONFIG_LV_USE_DEMO_EBIKE
+    #else
+        #define LV_USE_DEMO_EBIKE			0
+    #endif
+#endif
+#if LV_USE_DEMO_EBIKE
+	#ifndef LV_DEMO_EBIKE_PORTRAIT
+	    #ifdef CONFIG_LV_DEMO_EBIKE_PORTRAIT
+	        #define LV_DEMO_EBIKE_PORTRAIT CONFIG_LV_DEMO_EBIKE_PORTRAIT
+	    #else
+	        #define LV_DEMO_EBIKE_PORTRAIT  0    /*0: for 480x270..480x320, 1: for 480x800..720x1280*/
+	    #endif
+	#endif
+#endif
+
 
 
 /*----------------------------------
