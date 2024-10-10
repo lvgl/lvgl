@@ -166,6 +166,24 @@ extern "C" {
 #define LV_VERSION_CHECK(x,y,z) (x == LVGL_VERSION_MAJOR && (y < LVGL_VERSION_MINOR || (y == LVGL_VERSION_MINOR && z <= LVGL_VERSION_PATCH)))
 
 /**
+ * Checks if the current version is greater than or equal to the specified x.y.z version.
+ *
+ * Usage:
+ *
+ * - Require at least v9.3.0
+ * #if LV_VERSION_CHECK_GE(9, 3, 0)
+ *   new_feature_from_v9_3();
+ * #endif
+ *
+ * - Require at least v7.5.1
+ * #if LV_VERSION_CHECK_GE(7, 5, 1)
+ *   enhancements_from_v7_5_1();
+ * #endif
+ *
+ */
+#define LV_VERSION_CHECK_GE(x,y,z) (x < LVGL_VERSION_MAJOR || (x == LVGL_VERSION_MAJOR && (y < LVGL_VERSION_MINOR || (y == LVGL_VERSION_MINOR && z <= LVGL_VERSION_PATCH))))
+
+/**
  * Wrapper functions for VERSION macros
  */
 
