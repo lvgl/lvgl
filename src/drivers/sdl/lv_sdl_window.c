@@ -112,15 +112,13 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
 #if LV_SDL_BUF_COUNT == 2
         dsc->buf2 = sdl_draw_buf_realloc_aligned(NULL, 32 * 1024);
 #endif
-        lv_display_set_buffers(disp, dsc->buf1, dsc->buf2,
-                               32 * 1024, LV_DISPLAY_RENDER_MODE_PARTIAL);
+        uint8_t palette_size = LV_COLOR_INDEXED_PALETTE_SIZE(lv_display_get_color_format(disp)) * 4;
+        lv_display_set_buffers(disp, dsc->buf1, dsc->buf2, (32 * 1024) + palette_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
     }
     /*LV_DISPLAY_RENDER_MODE_DIRECT or FULL */
     else {
-        uint32_t stride = lv_draw_buf_width_to_stride(disp->hor_res,
-                                                      lv_display_get_color_format(disp));
-        lv_display_set_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res,
-                               LV_SDL_RENDER_MODE);
+        uint32_t stride = lv_draw_buf_width_to_stride(disp->hor_res, lv_display_get_color_format(disp));
+        lv_display_set_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res, LV_SDL_RENDER_MODE);
     }
 #else /*LV_USE_DRAW_SDL == 1*/
     /*It will render directly to default Texture, so the buffer is not used, so just set something*/
@@ -206,11 +204,32 @@ static inline int sdl_render_mode(void)
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
-#if LV_USE_DRAW_SDL == 0
+
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     lv_color_format_t cf = lv_display_get_color_format(disp);
+    uint32_t * argb_px_map = NULL;
 
+#if LV_USE_DRAW_SDL == 0
     if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+
+        /*Update values in a special OLED I1 --> ARGB8888 case
+          We render everything in I1, but display it in ARGB8888*/
+        if(cf == LV_COLOR_FORMAT_I1) {
+            uint32_t argb_px_map_size;
+            /*I1 uses 1 bit wide pixels, ARGB8888 uses 4 byte wide pixels*/
+            cf = LV_COLOR_FORMAT_ARGB8888;
+            argb_px_map_size = lv_area_get_size(area) * 4;
+            argb_px_map = malloc(argb_px_map_size);
+            if(argb_px_map == NULL) {
+                LV_LOG_ERROR("Malloc failed!\n");
+                lv_display_flush_ready(disp);
+                free(argb_px_map);
+                return;
+            }
+            else {
+                lv_draw_sw_i1_to_argb8888((void **)&px_map, (void **)&argb_px_map, argb_px_map_size);
+            }
+        }
         lv_area_t rotated_area = *area;
         lv_display_rotate_area(disp, &rotated_area);
 
@@ -243,12 +262,15 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         if(sdl_render_mode() != LV_DISPLAY_RENDER_MODE_PARTIAL) {
             dsc->fb_act = px_map;
         }
-
         window_update(disp);
     }
+    free(argb_px_map);
 #else
     LV_UNUSED(area);
     LV_UNUSED(px_map);
+    LV_UNUSED(dsc);
+    LV_UNUSED(cf);
+    LV_UNUSED(argb_px_map);
     if(lv_display_flush_is_last(disp)) {
         window_update(disp);
     }
@@ -350,7 +372,14 @@ static void window_update(lv_display_t * disp)
 #if LV_USE_DRAW_SDL == 0
     int32_t hor_res = disp->hor_res;
     uint32_t stride = lv_draw_buf_width_to_stride(hor_res, lv_display_get_color_format(disp));
-    SDL_UpdateTexture(dsc->texture, NULL, dsc->fb_act, stride);
+    uint32_t sdl_stride = stride;
+    /*In some cases SDL stride might be different than LVGL render stride, like in I1 format.
+    SDL still uses ARGB8888 as the color format, but LVGL renders in I1, thus causing a mismatch
+    This ensures correct stride for SDL buffers in this case.*/
+    if(lv_display_get_color_format(disp) == LV_COLOR_FORMAT_I1) {
+        sdl_stride = hor_res * 4; /*Unwrap stride: for SDL a single pixel is 4*8bit, whereas I1 is 1bpp: conversion is simple*/
+    }
+    SDL_UpdateTexture(dsc->texture, NULL, dsc->fb_act, sdl_stride);
 
     SDL_RenderClear(dsc->renderer);
 
@@ -391,8 +420,10 @@ static void texture_resize(lv_display_t * disp)
 #else
 #error("Unsupported color format")
 #endif
-    //    px_format = SDL_PIXELFORMAT_BGR24;
-
+    /*Handle OLED support*/
+    if(lv_display_get_color_format(disp) == LV_COLOR_FORMAT_I1) {
+        px_format = SDL_PIXELFORMAT_ARGB8888;
+    }
     dsc->texture = SDL_CreateTexture(dsc->renderer, px_format,
                                      SDL_TEXTUREACCESS_STATIC, disp->hor_res, disp->ver_res);
     SDL_SetTextureBlendMode(dsc->texture, SDL_BLENDMODE_BLEND);
