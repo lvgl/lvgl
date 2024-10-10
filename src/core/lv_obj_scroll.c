@@ -434,6 +434,11 @@ bool lv_obj_is_scrolling(const lv_obj_t * obj)
         indev = lv_indev_get_next(indev);
     }
 
+    if(lv_anim_get((lv_obj_t *)obj, scroll_x_anim) != NULL ||
+       lv_anim_get((lv_obj_t *)obj, scroll_y_anim) != NULL) {
+        return true;
+    }
+
     return false;
 }
 
