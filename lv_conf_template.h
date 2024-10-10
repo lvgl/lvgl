@@ -83,6 +83,12 @@
     #endif
 #endif  /*LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN*/
 
+/*Layer memory allocation limits*/
+#define LV_USE_DRAW_LAYER_MAX_MEMORY 0
+#if LV_USE_DRAW_LAYER_MAX_MEMORY == 1
+    #define LV_DRAW_LAYER_MAX_MEMORY (2 * 1024U) /*Define your max layer memory here*/
+#endif
+
 /*====================
    HAL SETTINGS
  *====================*/
