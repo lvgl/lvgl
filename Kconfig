@@ -1807,6 +1807,13 @@ menu "LVGL configuration"
 			depends on LV_USE_NUTTX
 			default n
 
+		config LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
+			int "Touchscreen cursor size in pixels"
+			depends on LV_USE_NUTTX_TOUCHSCREEN
+			default 0
+			help 
+				Set to 0 to disable cursor, or set to a value greater than 0 to set the cursor size in pixels.
+
 		config LV_USE_LINUX_DRM
 			bool "Use Linux DRM device"
 			default n

@@ -519,6 +519,12 @@ void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point)
     }
 }
 
+lv_obj_t * lv_indev_get_cursor(lv_indev_t * indev)
+{
+    if(indev == NULL) return NULL;
+    return indev->cursor;
+}
+
 void lv_indev_wait_release(lv_indev_t * indev)
 {
     if(indev == NULL)return;
