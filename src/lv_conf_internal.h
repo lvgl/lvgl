@@ -3798,6 +3798,15 @@
     #endif
 #endif
 
+/** Driver for NXP ELCDIF */
+#ifndef LV_USE_NXP_ELCDIF
+    #ifdef CONFIG_LV_USE_NXP_ELCDIF
+        #define LV_USE_NXP_ELCDIF CONFIG_LV_USE_NXP_ELCDIF
+    #else
+        #define LV_USE_NXP_ELCDIF   0
+    #endif
+#endif
+
 /** LVGL Windows backend */
 #ifndef LV_USE_WINDOWS
     #ifdef CONFIG_LV_USE_WINDOWS
