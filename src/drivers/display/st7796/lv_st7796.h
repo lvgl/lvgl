@@ -84,10 +84,10 @@ void lv_st7796_send_cmd_list(lv_display_t * disp, const uint8_t * cmd_list);
  *      MACROS
  **********************/
 
+#endif /*LV_USE_ST7796*/
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_USE_ST7796*/
-
-#endif /* LV_ST7796_H */
+#endif /*LV_ST7796_H*/

@@ -129,6 +129,9 @@ void lv_draw_buf_handlers_init(lv_draw_buf_handlers_t * handlers,
  * @return                  pointer to the struct of handlers
  */
 lv_draw_buf_handlers_t * lv_draw_buf_get_handlers(void);
+lv_draw_buf_handlers_t * lv_draw_buf_get_font_handlers(void);
+lv_draw_buf_handlers_t * lv_draw_buf_get_image_handlers(void);
+
 
 /**
  * Align the address of a buffer. The buffer needs to be large enough for the real data after alignment
