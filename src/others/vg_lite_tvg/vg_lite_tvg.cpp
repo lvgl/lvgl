@@ -1890,11 +1890,11 @@ Empty_sequence_handler:
         return VG_LITE_NOT_SUPPORT;
     }
 
-    vg_lite_error_t vg_lite_set_scissor(int32_t x, int32_t y, int32_t right, int32_t bottom)
+    vg_lite_error_t vg_lite_set_scissor(vg_lite_int32_t x, vg_lite_int32_t y, vg_lite_int32_t right, vg_lite_int32_t bottom)
     {
         auto ctx = vg_lite_ctx::get_instance();
-        int32_t width = right - x;
-        int32_t height = bottom - y;
+        vg_lite_int32_t width = right - x;
+        vg_lite_int32_t height = bottom - y;
 
         if(width <= 0 || height <= 0) {
             return VG_LITE_INVALID_ARGUMENT;
