@@ -400,10 +400,6 @@ void lv_display_refr_timer(lv_timer_t * tmr)
     refr_invalid_areas();
 
     if(disp_refr->inv_p == 0) goto refr_finish;
-
-    /*If refresh happened ...*/
-    lv_display_send_event(disp_refr, LV_EVENT_RENDER_READY, NULL);
-
     /*In double buffered direct mode save the updated areas.
      *They will be used on the next call to synchronize the buffers.*/
     if(lv_display_is_double_buffered(disp_refr) && disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
@@ -628,6 +624,7 @@ static void refr_invalid_areas(void)
         }
     }
 
+    lv_display_send_event(disp_refr, LV_EVENT_RENDER_READY, NULL);
     disp_refr->rendering_in_progress = false;
     LV_PROFILER_REFR_END;
 }
