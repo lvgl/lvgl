@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_example_style.h
  *
  */
