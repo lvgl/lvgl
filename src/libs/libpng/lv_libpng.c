@@ -316,12 +316,12 @@ static lv_draw_buf_t * decode_png(lv_image_decoder_dsc_t * dsc)
         if(dsc->src_type == LV_IMAGE_SRC_FILE) {
             LV_LOG_ERROR("alloc PNG_IMAGE_SIZE(%" LV_PRIu32 ") failed: %s", (uint32_t)PNG_IMAGE_SIZE(image),
                          (const char *)dsc->src);
-            png_image_free(&image);
             lv_free(png_data);
         }
         else if(dsc->src_type == LV_IMAGE_SRC_VARIABLE)
             LV_LOG_ERROR("alloc PNG_IMAGE_SIZE(%" LV_PRIu32 ")", (uint32_t)PNG_IMAGE_SIZE(image));
 
+        png_image_free(&image);
         return NULL;
     }
 
