@@ -107,8 +107,8 @@ static const lv_i18n_lang_t ar_lang = {
 };
 
 static lv_i18n_phrase_t zh_singulars[] = {
-    {"Language", "語言"},
-    {"Title", "標題"},
+    {"Language", "语言"},
+    {"Title", "标题"},
     {"March 29", "3月29日"},
     {"Battery", "电池"},
     {"Distance today", "今日距离"},
@@ -119,7 +119,7 @@ static lv_i18n_phrase_t zh_singulars[] = {
     {"Lights", "灯"},
     {"Brightness", "亮度"},
     {"Volume", "音量"},
-    {"Max. speed", "最大限度。速度"},
+    {"Max. speed", "最大速度"},
     {"Light level", "光照强度"},
     {"STATS", "统计"},
     {"March %d - March %d", "三月 %d - 三月 %d"},
