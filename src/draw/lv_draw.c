@@ -456,6 +456,11 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
     int32_t h = lv_area_get_height(&layer->buf_area);
     uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, layer->color_format);
 
+    /*Avoid small allocation related failures*/
+    if((_draw_info.used_memory_for_layers_kb + layer_size_byte) > LV_DRAW_LAYER_MAX_MEMORY) {
+        return NULL;
+    }
+
     layer->draw_buf = lv_draw_buf_create(w, h, layer->color_format, 0);
 
     if(layer->draw_buf == NULL) {

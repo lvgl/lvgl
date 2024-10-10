@@ -107,6 +107,10 @@ menu "LVGL configuration"
 			default 0x0
 			depends on LV_USE_BUILTIN_MALLOC
 
+		config LV_DRAW_LAYER_MAX_MEMORY
+			int "Maximum layer size before allocation returns NULL"
+			default 2048
+
 	endmenu
 
 	menu "HAL Settings"
