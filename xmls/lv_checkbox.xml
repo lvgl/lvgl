@@ -1,0 +1,12 @@
+<!--
+Example
+<lv_checkbox text="Option 1"/>
+-->
+
+<widget>
+	<api>
+	    <prop name="text" help="The text of the checkbox">
+	    	<param name="text" type="string" help=""/>
+	    </prop>
+	</api>
+</widget>
