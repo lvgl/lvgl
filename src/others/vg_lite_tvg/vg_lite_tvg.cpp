@@ -2324,6 +2324,8 @@ static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t *
         cur += arg_len * fmt_len;
     }
 
+    TVG_CHECK_RETURN_RESULT(shape_set_stroke(shape, path));
+
     float x_min = path->bounding_box[0];
     float y_min = path->bounding_box[1];
     float x_max = path->bounding_box[2];
@@ -2333,8 +2335,6 @@ static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t *
        && math_equal(x_max, FLT_MAX) && math_equal(y_max, FLT_MAX)) {
         return Result::Success;
     }
-
-    TVG_CHECK_RETURN_RESULT(shape_set_stroke(shape, path));
 
     auto cilp = Shape::gen();
     TVG_CHECK_RETURN_RESULT(cilp->appendRect(x_min, y_min, x_max - x_min, y_max - y_min, 0, 0));
