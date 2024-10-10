@@ -1,11 +1,9 @@
 # Documentation
 
-----------------------------------------------
 
 ## Building
 
-Building the documentation is pretty easy to do but it does have some requirements
-that have to be filled prior to building them.
+Building the documentation is pretty easy to do but it does have some requirements that have to be filled prior to building them.
 
 Here are the requirements:
 
@@ -13,10 +11,7 @@ Here are the requirements:
 * Python >= 3.10
 * C compiler (gcc, msvc, clang, etc...)
 
-
-There are also some Python specific libraries that need to be installed.
-You can either install these individually or you can use pip to read the requirements
-file to install everything that is needed for Python.
+There are also some Python specific libraries that need to be installed. You can either install these individually or you can use pip to read the requirements file to install everything that is needed for Python.
 
 * Sphinx
 * breathe
@@ -35,13 +30,11 @@ file to install everything that is needed for Python.
 * sphinx-rtd-dark-mode
 * typing-extensions
 
-To install using the `requirements.txt` file use the following command.
+To install using the `requirements.txt` file use the following command:
 
     pip install -r requirements.txt
 
-
-Once you have all of the requirements installed you are ready to build them.
-To build the documentation use the following command.
+Once you have all of the requirements installed you are ready to build the documentation.  Use the following command:
 
     python build.py skip_latex clean
 
@@ -49,101 +42,104 @@ You may have to use the following command if you are on a Unix like OS
 
     python3 build.py skip_latex clean
 
-The documentation will be output into the folder `out_html` in the root directory
-for LVGL.
+The documentation will be output into `./out_html/` in the root directory for LVGL.
+
 
 ## For Developers
 
----------------------------------------
+The most important thing that has to be done when contributing to LVGL is ***EVERYTHING MUST BE DOCUMENTED***.
 
-The most important thing that has to be done when contributing to LVGL is
+The below are some rules to follow when updating any of the `.rst` files located in the `./docs/` directory and any of it's subdirectories.
 
-
-***EVERYTHING MUST BE DOCUMENTED***
-
---------------------------------------
-
-Some rules to follow when updating any of the `.rst` files located in the docs
-folder and any of it's subfolders.
-
-<br/>
 
 ### index.rst files
 
---------------------------
-
-If you create a new directory you MUST have an `index.rst` file in that directory
-and that index file needs to be pointed to in the `index.rst` file that is located
-in the parent directory.
+If you create a new directory you MUST have an `index.rst` file in that directory and that index file needs to be pointed to in the `index.rst` file that is located in the parent directory.
 
 Let's take a look at the `index.rst` file that is located in the `docs/layouts` directory.
 
 ```
-    .. _layouts:
+.. _layouts:
 
-    =======
-    Layouts
-    =======
+=======
+Layouts
+=======
 
 
-    .. toctree::
-        :maxdepth: 2
+.. toctree::
+    :maxdepth: 2
 
-        flex
-        grid
+    flex
+    grid
 ```
 
 
-That is what you see... Below is what the various parts of the file are.
+The below explains the parts of this file.
 
 ```
-    .. _layouts:      <=== Creates a reference that is linkable
+.. _layouts:      <=== Creates an explicit link target
+                  <=== Empty line -- important!
+=======
+Layouts           <=== Heading seen in documentation
+=======
 
-    =======
-    Layouts           <=== Heading seen in documentation
-    =======
 
+.. toctree::      <=== Table of contents
+    :maxdepth: 2  <=== Internal use and needs to always be set this way
 
-    .. toctree::      <=== Table of contents
-        :maxdepth: 2  <=== Internal use and need to always be set this way
-
-        flex          <=== .rst files located in directory with index.rst
-        grid
+    flex          <=== .rst files located in directory with index.rst
+    grid
 ```
 
-The first line is for the purposes of not having to statically link to other locations
-in the documentation.  It makes it easier when things get moved around as the link will
-change dynamically if that should occur.  In order to create the link it must be formatted
-in this manner.
+The first line is for the purposes of providing a uniquely-named **link target** that can be referenced elsewhere in the documentation.
 
     .. _{LINK NAME}:
 
-where you would replace `{LINK NAME}` with whatever name you wanted to provide.
-That name is what is going to be used to reference the link. This is done by using
+Note that `{LINK NAME}`:
 
-    :ref:`{LINK NAME}`
+- **must** be preceded by a single underscore, and
+- **must** be followed by at least one blank line for the doc-generation logic to process it correctly.
 
-The `.. _{LINK NAME}:` line MUST be above a heading and there MUST be a single empty line
-after it.  This is MANDATORY.
+Replace `{LINK NAME}` with a link name that is unique among all documents under the `./docs/` directory.  It can have multiple words if needed to make it unique or when otherwise appropriate for clarity.  If multiple words are used, they can be separated with single spaces, hyphens or underscores.  Whatever you use, the `{LINK NAME}` string used to reference it must be identical.  `{LINK NAME}` strings are not case sensitive.
+
+That unique name is then used to provide a link reference elsewhere in the documentation using one of two formats.
+
+
+
+##### When "link text" should be a title or section heading from the target document:
+
+```reStructuredText
+:ref:`{LINK NAME}`
+```
+
+This in-line markup (interpreted text using the Sphinx-defined custom `:ref:` role) is then replaced with a hyperlink whose "link text" is the name of the section heading just below the **link target**.  For this reason, when using this syntax, `{LINK NAME}` must reference **link target**s that are just above a title or section heading.
+
+
+
+##### When "link text" should be something else:
+
+```reStructuredText
+:ref:`other link text <{LINK NAME}>`
+```
+
+This latter syntax enables you to put a **link target** anywhere in an .RST file (not just above a heading) and link to it using this syntax.
 
 
 
 
 ### Section Headings
 
-------------------------------
+[Section headings](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#sections) are created by underlining (and optionally overlining) the section title with a punctuation character, at least as long as the text.  Example:
 
-[Section headers](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#sections)
-are created by underlining (and optionally overlining) the section title with
-a punctuation character, at least as long as the text.  Example
-
+```
 =================
 This Is a Heading
 =================
+```
 
-reStructuredText does not impose any particular heading levels assigned to certain characters since the structure is determined from the succession of headings.  So if you are modifying an existing .RST file, please follow the pattern it is already using.
+reStructuredText does not impose any particular heading levels assigned to certain characters since the structure is determined from the succession of headings.  So if you are modifying an existing .RST file, please follow the pattern already in use.
 
-If you are creating a new .RST file, this convention is used:
+If you are creating a new .RST file, use this convention:
 
     =====
     Title
@@ -161,61 +157,68 @@ If you are creating a new .RST file, this convention is used:
     Sub Sub Section
     ^^^^^^^^^^^^^^^
     
-    Paragraph
-    '''''''''
+    Sub Sub Sub Section
+    '''''''''''''''''''
 
-For improved readability in the .RST file, place at least 2 blank lines above headings.
+Note that the "underlining" can be longer than the heading title, but if it is shorter, the documentation-generation logic will fail with an error.
 
-
+For improved readability in the .RST file, place at least 2 blank lines above section headings.
 
 
 ### Code Blocks
 
---------------------------------------------------------------
+* Do not use tab characters in code blocks.
+* Each indentation level use 4 spaces.
+* Include at least 1 empty line after a code block.
+* There must be one empty line between the code block directive and the code.
+* `.. code-block::` is the only directive that should be used.  Note carefully that unlike the **link target** directive above, this directive has 2 colons.  (The only ReST and sphinx directives that are valid with one colon are **link target**s as shown above.)  Lone `::`, `:code:` or `.. code:` should not be used.
+* If you want to separate code into easier-to-understand sections you can do so with a single empty line.
+* For syntax highlighting appropriate to the language in the code block, specify the language after the directive.  Some examples are:
+  - `.. code-block:: c`,
+  - `.. code-block:: cpp`,
+  - `.. code-block:: python`,
+  - `.. code-block:: shell`,
+  - `.. code-block:: kconfig`,
+  - `.. code-block:: json`,
+  - `.. code-block:: yaml`,
+  - `.. code-block:: csharp` (or "cs"),
+  - `.. code-block:: vb.net`,
+  - `.. code-block:: dot` (graphviz),
+  - `.. code-block:: html`,
+  - `.. code-block:: css`,
+  - `.. code-block:: xml`,
+  - `.. code-block:: make`.
 
-* No tab characters are to be used in a code block.
-* Indents are done using 4 spaces and only 4 spaces.
-* Include 2 empty lines at the end of a code block.
-* One empty line between the code block directive and the code.
-* `.. code-block:` is the only directive that should be used. `::`, `:code:` or `.. code:` should not be used.
-* Specify the language after the directive. Some examples are:
-  - `.. code-block: python`,
-  - `.. code-block: c`,
-  - `.. code-block: shell`,
-  - `.. code-block: make`.
-* If you want to separate code into easier to understand sections you can do so with a single empty line.  No more than ONE line.
-
+The full set of supported lexers are listed here:  https://pygments.org/docs/lexers/ .
 
 
 ### Bulleted Lists
 
--------------------------------------------------------------
-
 To create a bulleted list, do the following:
 
-
-    - item1: description
-    - item2: If you want to span multiple
-      lines it must be done like this
-    - item3: If you want to use a code block it must be done like this
+    - First item description
+    - If you want to span multiple lines, indent subsequent
+      lines to align with item text like this.
+    - If you want to include a code block under a list item,
+      it must be intended to align with the list item like this:
     
       .. code-block: python
-    
+                                 <=== blank line here is important
           # this is some code
-    
-    - item3: If you want to have several layers of bullets it needs to be done like this
-    
+                                 <=== blank line here is important
+    - If you want to have nested bulleted lists, indent each
+      new level to align with its parent list item like this:
+                                 <=== blank line here is important
       - level 2 item 1: text
       - level 2 item 2: text
+                                 <=== blank line here is important
+    - Last list item.  Note that the nested list above is preceded
+      and followed by 1 blank line.
 
-End all lists with 2 empty lines except when it is a nested list.  Then you use a single empty line.  The same thing holds true for code blocks as well.  If it is nested into a list then a single empty line after.  If the nested list or code block is at the end of the first level then you need to use 2 empty lines.
+All lists (including nested lists) **must** be preceded and followed with at least 1 blank line.  This is mandatory for the documentation-generation logic to process it correctly.
 
 
-
-
-### Referencing Portions of the API
-
-------------------------
+### Referencing API Documentation
 
 If you want to reference portions of the LVGL code from the documentation (in .RST files) there are special directives to do this:
 
@@ -227,19 +230,24 @@ If you want to reference portions of the LVGL code from the documentation (in .R
     :cpp:struct:`lv_image_dsc_t`
     :cpp:union:`lv_style_value_t`
 
-There is a special directive when wanting to use a more complex expression.
-For example when showing the arguments passed to a function
+There is a special directive when wanting to use a more complex expression.  For example when showing the arguments passed to a function.
 
     :cpp:expr:`lv_obj_set_layout(obj, LV_LAYOUT_FLEX)`
 
-you CANNOT have expressions that are like this...
+Arguments that are expressions (more than one word), or contain non-alphanumeric characters will cause the `:cpp:expr:` interpreted-text to fail.  Examples:
 
-    :cpp:expr:`lv_obj_set_layout(obj, LV_LAYOUT_FLEX/GRID)`  <== arg with more than one word
-    :cpp:expr:`lv_obj_set_layout(obj, LV_LAYOUT_*)`  <== asterisk
-    :cpp:expr:`lv_obj_set_layout(*obj, LV_LAYOUT_FLEX)`  <== asterisk
-    :cpp:expr:`lv_obj_set_layout((lv_obj_t *)obj, LV_LAYOUT_FLEX)`  <== cast/asterisk
-    :cpp:expr:`lv_obj_set_layout(&obj, LV_LAYOUT_FLEX);`  <== ampersand
-    :cpp:expr:`lv_obj_set_layout(obj, ...)`  <== elipsis
+    :cpp:expr:`lv_obj_set_layout(obj, LV_LAYOUT_FLEX/GRID)`         <== arg with > 1 word
+    :cpp:expr:`lv_obj_set_layout(obj, LV_LAYOUT_*)`                 <== asterisk
+    :cpp:expr:`lv_obj_set_layout(*obj, LV_LAYOUT_FLEX)`             <== asterisk
+    :cpp:expr:`lv_obj_set_layout((lv_obj_t *)obj, LV_LAYOUT_FLEX)`  <== cast
+    :cpp:expr:`lv_obj_set_layout(&obj, LV_LAYOUT_FLEX);`            <== ampersand
+    :cpp:expr:`lv_obj_set_layout(obj, ...)`                         <== elipsis
 
-Those are all invalid.
+For such examples, simply use reStructuredText literal markup like this:
 
+    ``lv_obj_set_layout(obj, LV_LAYOUT_FLEX/GRID)``
+    ``lv_obj_set_layout(obj, LV_LAYOUT_*)``
+    ``lv_obj_set_layout(*obj, LV_LAYOUT_FLEX)``
+    ``lv_obj_set_layout((lv_obj_t *)obj, LV_LAYOUT_FLEX)``
+    ``lv_obj_set_layout(&obj, LV_LAYOUT_FLEX);``
+    ``lv_obj_set_layout(obj, ...)``
