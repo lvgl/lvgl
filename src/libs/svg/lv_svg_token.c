@@ -365,7 +365,9 @@ bool _lv_svg_tokenizer(const char * svg_data, uint32_t data_len, svg_token_proce
         .end = svg_data + data_len,
     };
 
-    while(state.cur <= state.end) {
+    bool finish = false;
+
+    while(!finish && state.cur <= state.end) {
         char ch = *(state.cur);
         if(ch == '\r' || ch == '\n') { // skip LR character
             state.cur++;
@@ -463,7 +465,14 @@ bool _lv_svg_tokenizer(const char * svg_data, uint32_t data_len, svg_token_proce
                         if(!token.start) {
                             token.start = state.cur;
                         }
-                        token.end = ++state.cur;
+
+                        token.end = state.cur;
+                        if(state.cur < state.end) {
+                            state.cur++;
+                        }
+                        else {
+                            finish = true;
+                        }
                     }
             }
         }
