@@ -1790,6 +1790,15 @@
     #endif
 #endif
 
+/*The control character to use for signaling text recoloring*/
+#ifndef LV_TXT_COLOR_CMD
+    #ifdef CONFIG_LV_TXT_COLOR_CMD
+        #define LV_TXT_COLOR_CMD CONFIG_LV_TXT_COLOR_CMD
+    #else
+        #define LV_TXT_COLOR_CMD "#"
+    #endif
+#endif
+
 /*==================
  * WIDGETS
  *================*/
