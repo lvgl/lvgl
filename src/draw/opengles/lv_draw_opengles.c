@@ -479,10 +479,11 @@ static void draw_from_cached_texture(lv_draw_opengles_unit_t * u)
 
     lv_cache_release(u->texture_cache, entry_cached, u);
 
-    /*Do not cache labels with local text as the text will be freed*/
+    /*Do not cache non static (const) texts as the text's pointer can be freed/reallocated
+     *at any time resulting in a wild pointer in the cached draw dsc. */
     if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
         lv_draw_label_dsc_t * label_dsc = t->draw_dsc;
-        if(label_dsc->text_local) {
+        if(!label_dsc->text_static) {
             lv_cache_drop(u->texture_cache, &data_to_find, u);
         }
     }
