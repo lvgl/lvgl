@@ -444,42 +444,10 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
  */
 static uint8_t hex_char_to_num(char hex)
 {
-    uint8_t result = 0;
-
-    if(hex >= '0' && hex <= '9') {
-        result = hex - '0';
-    }
-    else {
-        if(hex >= 'a') hex -= 'a' - 'A'; /*Convert to upper case*/
-
-        switch(hex) {
-            case 'A':
-                result = 10;
-                break;
-            case 'B':
-                result = 11;
-                break;
-            case 'C':
-                result = 12;
-                break;
-            case 'D':
-                result = 13;
-                break;
-            case 'E':
-                result = 14;
-                break;
-            case 'F':
-                result = 15;
-                break;
-            default:
-                result = 0;
-                break;
-        }
-    }
-
-    return result;
+    if(hex >= '0' && hex <= '9') return hex - '0';
+    if(hex >= 'a') hex -= 'a' - 'A'; /*Convert to upper case*/
+    return 'A' <= hex && hex <= 'F' ? hex - 'A' + 10 : 0;
 }
-
 static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
                         const lv_font_t * font, uint32_t letter, lv_draw_glyph_cb_t cb)
 {
