@@ -17,7 +17,7 @@ void tearDown(void)
 
 void test_render_to_argb2222(void)
 {
-#if LV_USE_DRAW_VG_LITE
+#if LV_USE_DRAW_VG_LITE && LV_USE_SNAPSHOT
 
     lv_opa_t opa_values[2] = {0xff, 0x80};
     uint32_t opa;
