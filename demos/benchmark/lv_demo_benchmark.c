@@ -235,7 +235,7 @@ static void multiple_labels_cb(void)
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * obj = lv_label_create(lv_screen_active());
             if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
-            lv_label_set_text(obj, "Hello LVGL!");
+            lv_label_set_text_static(obj, "Hello LVGL!");
             color_anim(obj);
         }
     }
@@ -244,11 +244,13 @@ static void multiple_labels_cb(void)
 static void screen_sized_text_cb(void)
 {
     const char * txt =
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec rhoncus arcu, in consectetur orci. Sed vitae dolor sed nisi ultrices vehicula quis ac dolor. Vivamus hendrerit hendrerit lectus, sed tempus velit suscipit in. Fusce eu tristique arcu. Sed et molestie leo, in lacinia nunc. Quisque semper lorem sed ante feugiat, at molestie risus blandit. Maecenas lobortis urna in diam feugiat porta. Ut facilisis mauris eget nibh posuere aliquet. Proin facilisis egestas magna, id vulputate massa bibendum a. Etiam gravida metus non egestas suscipit. Sed sollicitudin mollis nisi, eu fringilla leo vestibulum posuere. Donec et ex nulla. Phasellus et ornare justo, vel hendrerit justo. Curabitur pulvinar nunc sed tincidunt dignissim. Praesent eleifend lectus velit, id malesuada ante placerat id. Fusce massa erat, egestas vel venenatis eu, tempus nec est.\n\n"
-        "Phasellus iaculis malesuada molestie. Cras ullamcorper justo a dolor dignissim tincidunt. Mauris euismod risus quis lobortis mollis. Ut vitae placerat massa, aliquet various lectus. Nulla ac ornare purus, quis auctor velit. Donec posuere dolor rhoncus efficitur dictum. Integer venenatis aliquet nunc eu convallis. Nunc quis various velit. Suspendisse enim metus, molestie eget mauris sit amet, euismod volutpat turpis. Duis rhoncus commodo gravida. Pellentesque velit mi, dictum id consequat placerat, condimentum ac elit. Duis aliquet leo eu dolor cursus rhoncus. Quisque aliquam sapien ut purus hendrerit laoreet. Ut venenatis venenatis risus, a vestibulum enim lobortis a. Maecenas auctor tortor lorem, quis laoreet nulla aliquet a. Sed ipsum lorem, facilisis in congue a, dictum ut ligula.\n\n"
-        "Aliquam id tellus in enim hendrerit mattis. Sed ipsum arcu, feugiat sed eros quis, vulputate facilisis turpis. Quisque venenatis risus massa. Proin lacinia, nunc non ultrices commodo, ligula dolor lobortis lectus, iaculis pulvinar metus orci eu elit. Donec tincidunt lacinia semper. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec vitae odio risus. Donec sodales sed nulla sit amet iaculis. Duis lacinia mauris dictum, fermentum nibh eget, convallis tellus. Sed congue luctus purus non scelerisque. Etiam fermentum lacus mauris, at bibendum nunc aliquam at. Vivamus accumsan vestibulum pharetra. Proin rhoncus nisi purus, vel blandit metus auctor eget. Fusce dictum sed lectus sed aliquam. Praesent lobortis quam sed pretium tincidunt.\n\n"
-        "Integer vehicula vestibulum eros. Donec facilisis magna a est cursus, sed posuere velit faucibus. In et ultrices lorem. Sed et lacus finibus, vulputate odio et, finibus tellus. Aenean finibus nibh vehicula elementum maximus. Maecenas in luctus tortor, vitae ullamcorper lacus. Ut nulla elit, aliquam at vestibulum ut, pellentesque non justo.\n\n"
-        "Fusce dignissim turpis massa, eget semper purus semper at. Ut et augue vitae metus laoreet auctor. Morbi tincidunt, neque vel tincidunt interdum, sapien nibh finibus lorem, eu eleifend diam ipsum et eros. Duis iaculis vulputate lacinia. Phasellus id mauris sed magna gravida suscipit. Sed aliquet tincidunt ante ac posuere. In vestibulum quam ultricies, ultricies arcu eu, aliquam sapien. Phasellus sollicitudin velit facilisis, dignissim nisi sed, pellentesque magna.";
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque fringilla, lorem dapibus fringilla feugiat, justo arcu volutpat magna, vitae ultricies metus tortor nec est. Fusce ut tellus arcu. Fusce eu rutrum metus, nec porta felis. Sed sed ligula laoreet, sodales lacus blandit, elementum justo. Sed posuere quam ut pellentesque ullamcorper. In quis consequat magna. Etiam quis turpis nec lorem dictum finibus. Donec mattis enim dolor, consequat lacinia nisi scelerisque id. Nulla euismod, purus sit amet accumsan tempus, lorem lectus euismod dolor, sit amet facilisis nisl quam elementum nisi. Curabitur et massa eget lorem lacinia scelerisque eget vitae felis. Nulla facilisi.\n\n"
+        "Vivamus auctor sit amet ante id rhoncus. Duis a dolor neque. Mauris eu ornare tortor. Vivamus consequat, ipsum a volutpat congue, sem libero laoreet nulla, malesuada efficitur leo orci a est. Donec tincidunt nulla nibh, quis pretium mi fermentum quis. Fusce a mattis libero. Curabitur in felis suscipit, ultrices diam imperdiet, vestibulum arcu. Praesent id faucibus turpis. Pellentesque sed massa tincidunt, interdum purus tempus, pellentesque risus. Fusce feugiat magna eget nisl eleifend efficitur. Mauris ut convallis justo. Integer malesuada rutrum orci non tincidunt.\n\n"
+        "Nullam aliquet leo sit amet volutpat tincidunt. Mauris ac accumsan nibh. Morbi accumsan commodo leo, at hendrerit massa hendrerit et. Aliquam nec sodales ex. Morbi at aliquet sem. Sed at magna ut felis mollis dictum ut ac orci. Nunc id lorem lacus. Vivamus id accumsan dolor, sed suscipit nulla. Pellentesque dictum erat non bibendum tempor. Fusce arcu risus, eleifend in lacus a, iaculis fermentum sapien. Praesent sodales libero vitae massa suscipit tincidunt. Aliquam quis arcu urna. Nunc sit amet mi leo.\n\n"
+        "Aliquam erat volutpat. Sed viverra pharetra ipsum, sed various arcu various nec. Curabitur rutrum odio et pretium fermentum. Maecenas vitae ligula nisi. Maecenas nec dapibus erat. Suspendisse vel accumsan erat. Proin congue diam at turpis accumsan eleifend.\n\n"
+        "Etiam suscipit metus magna, in vulputate magna cursus eget. Donec vel rhoncus turpis. Phasellus vitae enim quis sapien pharetra aliquam quis a quam. In mauris nulla, euismod quis orci et, interdum finibus lorem. Aenean quis dolor eget est ultricies consectetur eu nec metus. Nullam at pulvinar elit. Aenean blandit faucibus sodales. Vivamus vel porta enim, et pharetra libero. Donec aliquet pretium erat viverra fermentum. Fusce sit amet porta mi. Nullam non elit ex. In luctus, nunc id iaculis ullamcorper, eros quam eleifend elit, quis dictum sem justo eu eros. Nulla vitae faucibus lectus. Nunc blandit, mi eget suscipit scelerisque, lorem nunc tincidunt tellus, eget gravida libero metus sed nunc.\n\n"
+        "Morbi erat libero, commodo sit amet turpis eget, efficitur pulvinar dolor. Pellentesque vehicula, velit eget auctor scelerisque, sem risus aliquam lectus, sit amet dapibus massa ex non magna. Donec magna leo, laoreet quis erat vitae, consequat aliquet tellus. Etiam vitae lectus erat. Mauris interdum feugiat aliquet. Nunc justo augue, mattis id finibus eu, sagittis id enim. Vivamus malesuada mauris sed nibh luctus, porta bibendum quam ornare. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vivamus malesuada magna nec diam tempus, laoreet imperdiet magna faucibus. Aliquam erat volutpat.\n\n"
+        "Aenean mattis lobortis quam in venenatis. Sed euismod convallis lectus vel euismod. Vestibulum consequat luctus neque. Quisque consequat bibendum neque eget mollis. Vivamus viverra vehicula eros vel dapibus. Nullam id lectus aliquam, sagittis mi efficitur, interdum mauris. Nunc at felis lobortis, lobortis erat a, euismod augue. In id purus malesuada, tempus magna at, porta mi. Sed tristique nunc eget placerat luctus. Pellentesque posuere non purus vitae malesuada. Curabitur hendrerit dolor metus, nec posuere orci placerat ac.\n\n";
 
     lv_obj_t * scr = lv_screen_active();
     int32_t hor_res = lv_display_get_horizontal_resolution(NULL);
@@ -259,13 +261,9 @@ static void screen_sized_text_cb(void)
 
     lv_obj_t * obj = lv_label_create(scr);
     lv_obj_set_width(obj, lv_pct(100));
-    lv_label_set_text(obj, txt);
+    lv_label_set_text_static(obj, txt);
 
     lv_obj_update_layout(obj);
-    if(lv_obj_get_height(obj) < ver_res * 2) {
-        lv_label_set_text_fmt(obj, "%s\n\n%s", txt, txt);
-        lv_obj_update_layout(obj);
-    }
 
     scroll_anim(scr, lv_obj_get_scroll_bottom(scr));
 }
@@ -823,12 +821,12 @@ static lv_obj_t * card_create(void)
     lv_image_set_src(child, &img_benchmark_avatar);
 
     child = lv_label_create(panel);
-    lv_label_set_text(child, "John Smith");
+    lv_label_set_text_static(child, "John Smith");
     lv_obj_set_style_text_font(child, &lv_font_montserrat_24, 0);
     lv_obj_set_pos(child, 100, 0);
 
     child = lv_label_create(panel);
-    lv_label_set_text(child, "A DIY enthusiast");
+    lv_label_set_text_static(child, "A DIY enthusiast");
     lv_obj_set_style_text_font(child, &lv_font_montserrat_14, 0);
     lv_obj_set_pos(child, 100, 30);
 
@@ -836,7 +834,7 @@ static lv_obj_t * card_create(void)
     lv_obj_set_pos(child, 100, 50);
 
     child = lv_label_create(child);
-    lv_label_set_text(child, "Connect");
+    lv_label_set_text_static(child, "Connect");
 
     return panel;
 }
