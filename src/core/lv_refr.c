@@ -399,6 +399,10 @@ void lv_display_refr_timer(lv_timer_t * tmr)
     }
 
     lv_refr_join_area();
+
+    /*Make sure that all rendering is finished before starting a new rendering.*/
+    wait_for_flushing(disp_refr);
+
     refr_sync_areas();
     refr_invalid_areas();
 
@@ -494,15 +498,9 @@ static void refr_sync_areas(void)
     if(lv_ll_is_empty(&disp_refr->sync_areas)) return;
 
     LV_PROFILER_REFR_BEGIN;
-    /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
-    /*We need to wait for ready here to not mess up the active screen*/
-    wait_for_flushing(disp_refr);
 
-    /*The buffers are already swapped.
-     *So the active buffer is the off screen buffer where LVGL will render*/
-    lv_draw_buf_t * off_screen = disp_refr->frame_buf_act;
-    lv_draw_buf_t * on_screen = disp_refr->frame_buf_act == disp_refr->frame_buf_1 ? disp_refr->frame_buf_2 :
-                                disp_refr->frame_buf_1;
+    lv_draw_buf_t * off_screen = lv_display_get_frame_buffer_off_screen(disp_refr);
+    lv_draw_buf_t * on_screen = lv_display_get_frame_buffer_on_screen(disp_refr);
 
     uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
     uint32_t ver_res = lv_display_get_vertical_resolution(disp_refr);
@@ -1248,14 +1246,14 @@ static void draw_buf_flush(lv_display_t * disp)
         }
     }
 
-    /*In direct and full modes swap the frame buffers */
+    /*In direct and full modes swap the frame buffers. */
     if(lv_display_is_double_frame_buffered(disp) && flushing_last &&
        (is_direct(disp) || is_full(disp))) {
-        if(disp->frame_buf_act == disp->frame_buf_1) {
-            disp->frame_buf_act = disp->frame_buf_2;
+        if(disp->frame_buf_off_screen == disp->frame_buf_1) {
+            disp->frame_buf_off_screen = disp->frame_buf_2;
         }
         else {
-            disp->frame_buf_act = disp->frame_buf_1;
+            disp->frame_buf_off_screen = disp->frame_buf_1;
         }
     }
 }

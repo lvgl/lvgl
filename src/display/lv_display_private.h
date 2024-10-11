@@ -68,17 +68,17 @@ struct _lv_display_t {
     lv_draw_buf_t * buf_1;
     lv_draw_buf_t * buf_2;
 
-    /** Internal, used by the library*/
+    /** The buffer LVGL renders now. Either buf_1 or buf_2*/
     lv_draw_buf_t * buf_act;
-
 
     lv_draw_buf_t _static_frame_buf1; /**< Used when user pass in a raw buffer as display draw buffer */
     lv_draw_buf_t _static_frame_buf2;
     lv_draw_buf_t * frame_buf_1;
     lv_draw_buf_t * frame_buf_2;
 
-    /** Internal, used by the library*/
-    lv_draw_buf_t * frame_buf_act;
+    /** The frame buffer which is used for rendering.
+     * Either frame_buf_1 or frame_buf_2, */
+    lv_draw_buf_t * frame_buf_off_screen;
 
     /** MANDATORY: Write the internal buffer (draw_buf) to the display. 'lv_display_flush_ready()' has to be
      * called when finished*/

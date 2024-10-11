@@ -418,12 +418,6 @@ void lv_display_set_render_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf
     disp->buf_1 = buf1;
     disp->buf_2 = buf2;
     disp->buf_act = disp->buf_1;
-
-    if(disp->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT ||
-       disp->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
-        disp->frame_buf_1 = disp->buf_1;
-        disp->frame_buf_2 = disp->buf_2;
-    }
 }
 
 void lv_display_set_render_buffers(lv_display_t * disp, void * buf1, void * buf2, size_t buf_size,
@@ -464,7 +458,7 @@ void lv_display_set_frame_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf1
 
     disp->frame_buf_1 = buf1;
     disp->frame_buf_2 = buf2;
-    disp->frame_buf_act = disp->frame_buf_1;
+    disp->frame_buf_off_screen = disp->frame_buf_1;
 }
 
 void lv_display_set_frame_buffers(lv_display_t * disp, void * buf1, void * buf2, size_t buf_size, uint32_t stride)
@@ -478,7 +472,26 @@ void lv_display_set_frame_buffers(lv_display_t * disp, void * buf1, void * buf2,
     lv_draw_buf_init(&disp->_static_frame_buf1, w, h, cf, stride, buf1, buf_size);
     lv_draw_buf_init(&disp->_static_frame_buf2, w, h, cf, stride, buf2, buf_size);
 
-    lv_display_set_frame_draw_buffers(disp, &disp->_static_frame_buf1, &disp->_static_frame_buf2);
+    lv_display_set_frame_draw_buffers(disp, &disp->_static_frame_buf1, buf2 ? &disp->_static_frame_buf2 : NULL);
+}
+
+void * lv_display_get_frame_buffer_off_screen(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return NULL;
+    return disp->frame_buf_off_screen->data;
+}
+
+void * lv_display_get_frame_buffer_on_screen(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return NULL;
+    if(disp->frame_buf_off_screen == disp->frame_buf_1) {
+        return disp->frame_buf_2->data;
+    }
+    else {
+        return disp->frame_buf_1->data;
+    }
 }
 
 void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t render_mode)
@@ -486,6 +499,15 @@ void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t re
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
     disp->render_mode = render_mode;
+
+    disp->buf_act = disp->buf_1;
+
+    if(disp->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT ||
+       disp->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
+        disp->frame_buf_1 = disp->buf_1;
+        disp->frame_buf_2 = disp->buf_2;
+        disp->frame_buf_off_screen = disp->frame_buf_1;
+    }
 }
 
 void lv_display_set_flush_cb(lv_display_t * disp, lv_display_flush_cb_t flush_cb)

@@ -221,7 +221,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         uint32_t px_size = lv_color_format_get_size(cf);
 
         int32_t fb_stride = lv_draw_buf_width_to_stride(disp->hor_res, cf);
-        uint8_t * fb_start = disp->frame_buf_act->data;
+        uint8_t * fb_start = lv_display_get_frame_buffer_off_screen(disp);
         fb_start += rotated_area.y1 * fb_stride + rotated_area.x1 * px_size;
         lv_display_rotation_t rotation = lv_display_get_rotation(disp);
 
@@ -241,8 +241,8 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     }
 
     if(lv_display_flush_is_last(disp)) {
-        if(sdl_render_mode() & LV_DISPLAY_RENDER_MODE_PARTIAL) {
-            dsc->fb_act = disp->frame_buf_act->data;
+        if(lv_display_is_double_frame_buffered(disp)) {
+            dsc->fb_act = lv_display_get_frame_buffer_off_screen(disp);
         }
 
         window_update(disp);

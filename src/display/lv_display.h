@@ -244,7 +244,7 @@ int32_t lv_display_get_dpi(const lv_display_t * disp);
  * For DIRECT/FULL rending modes, the buffer size must be at least
  * `hor_res * ver_res * lv_color_format_get_size(lv_display_get_color_format(disp))`
  * If render_mode is `LV_RENDER_MODE_DIRECT_AND_PARTIAL` `lv_display_set_frame_buffers`
- * also needs to be sued the set the frame buffers for DIRECT mode.
+ * also needs to be used the set the frame buffers for DIRECT mode.
  * @param disp              pointer to a display
  * @param buf1              first buffer
  * @param buf2              second buffer (can be `NULL`)
@@ -301,6 +301,19 @@ void lv_display_set_frame_buffers(lv_display_t * disp, void * buf1, void * buf2,
  * @param buf2              second buffer (can be `NULL`)
  */
 void lv_display_set_frame_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf1, lv_draw_buf_t * buf2);
+
+/**
+ * Get the frame buffer which is currently not displayed and used for rendering.
+ * If only one frame buffer was set then always that frame buffer will be returned.
+ * It's useful in FULL, DIRECT, and DIRECT_AND_PARTIAL rendering modes
+ * to get which buffer to show on the display when the last area was refreshed too
+ * (see `lv_display_flush_is_last()`)
+ * @param disp              pointer to a display
+ * @note in DIRECT and FULL mode when the render buffers are set
+ * they are used as frame buffers too and it's not required to call
+ * `lv_display_set_frame_buffers()` separately.
+ */
+void * lv_display_get_frame_buffer_off_screen(lv_display_t * disp);
 
 /**
  * Set display render mode
