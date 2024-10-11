@@ -2855,6 +2855,19 @@
                 #define LV_USE_PERF_MONITOR_LOG_MODE 0
             #endif
         #endif
+
+        /* 0: Display performance data only at the end, 1: Performance data is printed periodically */
+        #ifndef LV_USE_PERF_MONITOR_OBSERVER
+            #ifdef LV_KCONFIG_PRESENT
+                #ifdef CONFIG_LV_USE_PERF_MONITOR_OBSERVER
+                    #define LV_USE_PERF_MONITOR_OBSERVER CONFIG_LV_USE_PERF_MONITOR_OBSERVER
+                #else
+                    #define LV_USE_PERF_MONITOR_OBSERVER 0
+                #endif
+            #else
+                #define LV_USE_PERF_MONITOR_OBSERVER 1
+            #endif
+        #endif
     #endif
 
     /*1: Show the used memory and the memory fragmentation

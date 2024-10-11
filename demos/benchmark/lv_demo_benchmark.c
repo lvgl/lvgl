@@ -458,7 +458,7 @@ void lv_demo_benchmark(void)
 #if LV_USE_PERF_MONITOR
     lv_display_t * disp = lv_display_get_default();
     lv_subject_add_observer_obj(&disp->perf_sysmon_backend.subject, sysmon_perf_observer_cb, title, NULL);
-#if LV_USE_PERF_MONITOR_LOG_MODE
+#if LV_USE_PERF_MONITOR_LOG_MODE || !LV_USE_PERF_MONITOR_OBSERVER
     lv_obj_add_flag(title, LV_OBJ_FLAG_HIDDEN);
 #endif
 #else
@@ -522,7 +522,7 @@ static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * sub
         scene_name[0] = '\0';
     }
 
-#if !LV_USE_PERF_MONITOR_LOG_MODE
+#if !LV_USE_PERF_MONITOR_LOG_MODE && LV_USE_PERF_MONITOR_OBSERVER
     lv_obj_t * label = lv_observer_get_target(observer);
     lv_label_set_text_fmt(label,
                           "%s"

@@ -1380,6 +1380,11 @@ menu "LVGL configuration"
 			depends on LV_USE_PERF_MONITOR
 			default n
 
+		config LV_USE_PERF_MONITOR_OBSERVER
+			bool "Prints or displays performance data during rendering"
+			depends on LV_USE_PERF_MONITOR
+			default y
+
 		config LV_USE_MEM_MONITOR
 			bool "Show the used memory and the memory fragmentation"
 			default n
