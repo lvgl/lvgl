@@ -12,3 +12,4 @@ Renderers and GPUs
     stm32_dma2d
     vglite
     vg_lite
+    nema_gfx
