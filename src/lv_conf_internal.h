@@ -3746,6 +3746,25 @@
     #endif
 #endif
 
+/** Driver for ST LTDC */
+#ifndef LV_USE_ST_LTDC
+    #ifdef CONFIG_LV_USE_ST_LTDC
+        #define LV_USE_ST_LTDC CONFIG_LV_USE_ST_LTDC
+    #else
+        #define LV_USE_ST_LTDC    0
+    #endif
+#endif
+#if LV_USE_ST_LTDC
+    /* Only used for partial. */
+    #ifndef LV_ST_LTDC_USE_DMA2D_FLUSH
+        #ifdef CONFIG_LV_ST_LTDC_USE_DMA2D_FLUSH
+            #define LV_ST_LTDC_USE_DMA2D_FLUSH CONFIG_LV_ST_LTDC_USE_DMA2D_FLUSH
+        #else
+            #define LV_ST_LTDC_USE_DMA2D_FLUSH 0
+        #endif
+    #endif
+#endif
+
 /** LVGL Windows backend */
 #ifndef LV_USE_WINDOWS
     #ifdef CONFIG_LV_USE_WINDOWS

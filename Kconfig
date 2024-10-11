@@ -1871,6 +1871,15 @@ menu "LVGL configuration"
 			bool "Use Renesas GLCDC driver"
 			default n
 
+		config LV_USE_ST_LTDC
+			bool "Driver for ST LTDC"
+			default n
+
+		config LV_ST_LTDC_USE_DMA2D_FLUSH
+			bool "Only used for created partial mode LTDC displays"
+			default n
+			depends on LV_USE_ST_LTDC && !LV_USE_DRAW_DMA2D
+
 		config LV_USE_WINDOWS
 			bool "Use LVGL Windows backend"
 			depends on LV_OS_WINDOWS
