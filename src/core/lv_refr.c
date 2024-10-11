@@ -500,7 +500,8 @@ static void refr_sync_areas(void)
     LV_PROFILER_REFR_BEGIN;
 
     lv_draw_buf_t * off_screen = lv_display_get_frame_buffer_off_screen(disp_refr);
-    lv_draw_buf_t * on_screen = lv_display_get_frame_buffer_on_screen(disp_refr);
+    lv_draw_buf_t * on_screen = disp_refr->frame_buf_1 == disp_refr->frame_buf_off_screen ?
+                                disp_refr->frame_buf_2 : disp_refr->frame_buf_1;
 
     uint32_t hor_res = lv_display_get_horizontal_resolution(disp_refr);
     uint32_t ver_res = lv_display_get_vertical_resolution(disp_refr);

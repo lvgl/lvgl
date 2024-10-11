@@ -287,10 +287,10 @@ void lv_display_set_render_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf
  * @param buf1              first buffer
  * @param buf2              second buffer (can be `NULL`)
  * @param buf_size          buffer size in byte
- * @param stride			the stride of the frame buffer(s) (i.e. the line width in bytes).
+ * @param stride            the stride of the frame buffer(s) (i.e. the line width in bytes).
  *                          `LV_STRIDE_AUTO` can be used to calculate the stride automatically from the widget and color format
  */
-void lv_display_set_frame_buffers(lv_display_t * disp, void * buf1, void * buf2, size_t buf_size);
+void lv_display_set_frame_buffers(lv_display_t * disp, void * buf1, void * buf2, size_t buf_size, uint32_t stride);
 
 /**
  * Set frame buffers for LV_RENDER_MODE_DIRECT_AND_PARTIAL mode as draw buffers.
@@ -303,7 +303,20 @@ void lv_display_set_frame_buffers(lv_display_t * disp, void * buf1, void * buf2,
 void lv_display_set_frame_draw_buffers(lv_display_t * disp, lv_draw_buf_t * buf1, lv_draw_buf_t * buf2);
 
 /**
- * Get the frame buffer which is currently not displayed and used for rendering.
+ * Get the frame buffer  (as `lv_draw_buf_t`) which is currently not displayed and now used for rendering.
+ * If only one frame buffer was set then always that frame buffer will be returned.
+ * It's useful in FULL, DIRECT, and DIRECT_AND_PARTIAL rendering modes
+ * to get which buffer to show on the display when the last area was refreshed too
+ * (see `lv_display_flush_is_last()`)
+ * @param disp              pointer to a display
+ * @note in DIRECT and FULL mode when the render buffers are set
+ * they are used as frame buffers too and it's not required to call
+ * `lv_display_set_frame_buffers()` separately.
+ */
+lv_draw_buf_t * lv_display_get_frame_draw_buffer_off_screen(lv_display_t * disp);
+
+/**
+ * Get a pointer to the frame buffer (as a pixel array) which is currently not displayed and now used for rendering.
  * If only one frame buffer was set then always that frame buffer will be returned.
  * It's useful in FULL, DIRECT, and DIRECT_AND_PARTIAL rendering modes
  * to get which buffer to show on the display when the last area was refreshed too

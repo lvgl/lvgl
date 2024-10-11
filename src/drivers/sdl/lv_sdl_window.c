@@ -379,7 +379,7 @@ static void texture_resize(lv_display_t * disp)
         lv_display_set_render_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res, LV_SDL_RENDER_MODE);
     }
     else if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_DIRECT_AND_PARTIAL) {
-        lv_display_set_frame_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res);
+        lv_display_set_frame_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res, LV_STRIDE_AUTO);
     }
 
     if(dsc->texture) SDL_DestroyTexture(dsc->texture);

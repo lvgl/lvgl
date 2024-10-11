@@ -475,23 +475,18 @@ void lv_display_set_frame_buffers(lv_display_t * disp, void * buf1, void * buf2,
     lv_display_set_frame_draw_buffers(disp, &disp->_static_frame_buf1, buf2 ? &disp->_static_frame_buf2 : NULL);
 }
 
+lv_draw_buf_t * lv_display_get_frame_draw_buffer_off_screen(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return NULL;
+    return disp->frame_buf_off_screen;
+}
+
 void * lv_display_get_frame_buffer_off_screen(lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return NULL;
     return disp->frame_buf_off_screen->data;
-}
-
-void * lv_display_get_frame_buffer_on_screen(lv_display_t * disp)
-{
-    if(disp == NULL) disp = lv_display_get_default();
-    if(disp == NULL) return NULL;
-    if(disp->frame_buf_off_screen == disp->frame_buf_1) {
-        return disp->frame_buf_2->data;
-    }
-    else {
-        return disp->frame_buf_1->data;
-    }
 }
 
 void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t render_mode)
