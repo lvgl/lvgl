@@ -778,10 +778,10 @@ static void blend_mode_cb(lv_obj_t * parent)
     /*Make the parent darker for additive blending*/
     lv_obj_set_style_bg_color(parent, lv_color_hex(0x808080), 0);
 
-    static uint8_t buf_rgb565[LV_CANVAS_BUF_SIZE(36, 30, 16, LV_DRAW_BUF_STRIDE_ALIGN)];
-    static uint8_t buf_rgb888[LV_CANVAS_BUF_SIZE(36, 30, 24, LV_DRAW_BUF_STRIDE_ALIGN)];
-    static uint8_t buf_xrgb8888[LV_CANVAS_BUF_SIZE(36, 30, 32, LV_DRAW_BUF_STRIDE_ALIGN)];
-    static uint8_t buf_argb8888[LV_CANVAS_BUF_SIZE(36, 30, 32, LV_DRAW_BUF_STRIDE_ALIGN)];
+    static LV_ATTRIBUTE_MEM_ALIGN uint8_t buf_rgb565[LV_CANVAS_BUF_SIZE(36, 30, 16, LV_DRAW_BUF_STRIDE_ALIGN)];
+    static LV_ATTRIBUTE_MEM_ALIGN uint8_t buf_rgb888[LV_CANVAS_BUF_SIZE(36, 30, 24, LV_DRAW_BUF_STRIDE_ALIGN)];
+    static LV_ATTRIBUTE_MEM_ALIGN uint8_t buf_xrgb8888[LV_CANVAS_BUF_SIZE(36, 30, 32, LV_DRAW_BUF_STRIDE_ALIGN)];
+    static LV_ATTRIBUTE_MEM_ALIGN uint8_t buf_argb8888[LV_CANVAS_BUF_SIZE(36, 30, 32, LV_DRAW_BUF_STRIDE_ALIGN)];
 
     /*The canvas will stay in the top left corner to show the original image*/
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());

@@ -3,6 +3,7 @@
 #include "lv_test_indev.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #include "../unity/unity.h"
 
 #define HOR_RES 800
@@ -97,6 +98,7 @@ static void test_log_print_cb(lv_log_level_t level, const char * buf)
 void lv_test_assert_fail(void)
 {
     /*Handle error on test*/
+    assert(0);
 }
 
 #endif
