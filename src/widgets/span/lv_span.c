@@ -1018,16 +1018,11 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
             if(last_snippet->txt[last_snippet->bytes] == '\0') {
                 next_line_h = 0;
                 lv_span_t * next_span = lv_ll_get_next(&spans->child_ll, last_snippet->span);
-                if(next_span) { /* have the next line */
+                if(next_span && next_span->txt && next_span->txt[0]) { /* have the next line */
                     next_line_h = lv_font_get_line_height(lv_span_get_style_text_font(obj, next_span)) + line_space;
                 }
             }
             if(txt_pos.y + max_line_h + next_line_h - line_space > coords.y2 + 1) { /* for overflow if is end line. */
-                if(last_snippet->txt[last_snippet->bytes] != '\0') {
-                    // last_snippet->bytes = lv_strlen(last_snippet->txt);
-                    last_snippet->txt_w = lv_text_get_width_with_flags(last_snippet->txt, last_snippet->bytes, last_snippet->font,
-                                                                       last_snippet->letter_space, label_draw_dsc.flag);
-                }
                 ellipsis_valid = spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS;
                 is_end_line = true;
             }
@@ -1096,14 +1091,12 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
                 uint32_t dot_letter_w = lv_font_get_glyph_width(pinfo->font, '.', '.');
                 dot_width = dot_letter_w * 3;
 
-                if(a.x2 > clip_area.x2 - dot_width) {
-                    need_draw_ellipsis = true;
-                    label_draw_dsc.flag = LV_TEXT_FLAG_BREAK_ALL;
-                    uint32_t next_ofs;
-                    lv_text_get_snippet(pinfo->txt, pinfo->font, pinfo->letter_space,
-                                        pinfo->txt_w - dot_width, txt_flag, &pinfo->txt_w, &next_ofs);
-                    a.x2 = a.x1 + pinfo->txt_w;
-                }
+                label_draw_dsc.flag = LV_TEXT_FLAG_BREAK_ALL;
+                uint32_t next_ofs;
+                need_draw_ellipsis = lv_text_get_snippet(pinfo->txt, pinfo->font, pinfo->letter_space, coords.x2 - a.x1 - dot_width,
+                                                         label_draw_dsc.flag, &pinfo->txt_w, &next_ofs);
+                a.x2 = a.x1 + pinfo->txt_w;
+                label_draw_dsc.length = next_ofs + 1;
             }
 
             lv_draw_label(layer, &label_draw_dsc, &a);

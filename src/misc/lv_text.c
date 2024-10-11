@@ -246,6 +246,9 @@ static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
         if(break_index == NO_BREAK_FOUND && (cur_w - letter_space) > max_width) {
             break_index = i;
             break_letter_count = word_len - 1;
+            if(flag & LV_TEXT_FLAG_BREAK_ALL) {
+                break;
+            }
             /*break_index is now pointing at the character that doesn't fit*/
         }
 
