@@ -66,12 +66,18 @@ if len(args) >= 1:
         develop = True
 
 
-def cmd(s):
+def cmd(s, start_dir=None):
+    if start_dir is None:
+        start_dir = os.getcwd()
+
+    saved_dir = os.getcwd()
+    os.chdir(start_dir)
     print("")
     print(s)
     print("-------------------------------------")
-
     result = os.system(s)
+    os.chdir(saved_dir)
+
     if result != 0:
         print("Exit build due to previous error")
         sys.exit(result)
@@ -80,7 +86,7 @@ def cmd(s):
 # Get the current branch name
 status, br = subprocess.getstatusoutput("git branch --show-current")
 _, gitcommit = subprocess.getstatusoutput("git rev-parse HEAD")
-br = re.sub('\* ', '', br)
+br = re.sub(r'\* ', '', br)
 
 
 urlpath = re.sub('release/', '', br)
@@ -141,9 +147,11 @@ print("Add translation")
 add_translation.exec(temp_directory)
 
 print("Running doxygen")
-cmd('cd "{temp_directory}" && doxygen Doxyfile'.format(temp_directory=temp_directory))
+cmd('doxygen Doxyfile', temp_directory)
 
 print('Reading Doxygen output')
+
+doc_builder.EMIT_WARNINGS = False
 
 doc_builder.run(
     project_path,
@@ -205,11 +213,23 @@ else:
         f.write(index_data.encode('utf-8'))
 
 # BUILD HTML
-
-
+# This version of get_version() works correctly under Windows and Linux.
+# Credit:  @kdschlosser
 def get_version():
-    _, ver = subprocess.getstatusoutput("../scripts/find_version.sh")
-    return ver
+    path = os.path.join(project_path, 'lv_version.h')
+    with open(path, 'rb') as fle:
+        d = fle.read().decode('utf-8')
+
+    d = d.split('#define LVGL_VERSION_MAJOR', 1)[-1]
+    major, d = d.split('\n', 1)
+    d = d.split('#define LVGL_VERSION_MINOR', 1)[-1]
+    minor, d = d.split('\n', 1)
+
+    # d = d.split('#define LVGL_VERSION_PATCH', 1)[-1]
+    # patch, d = d.split('\n', 1)
+
+    return f'{major.strip()}.{minor.strip()}'
+
 
 cmd('sphinx-build -b html "{src}" "{dst}" -D version="{version}" -E -j {cpu}'.format(
     src=html_src_path,
