@@ -26,7 +26,7 @@
  *********************/
 
 /* Since thorvg has an upper limit on coordinates, choose a suitable value here */
-#define PATH_COORD_MAX (1 << 12)
+#define PATH_COORD_MAX (1 << 10)
 #define PATH_COORD_MIN (-PATH_COORD_MAX)
 
 /**********************
