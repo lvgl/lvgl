@@ -568,4 +568,43 @@ void test_anim_timeline_with_anim_start_cb_and_completed_cb(void)
     TEST_ASSERT_EQUAL(1, anim2_completed_called);
 }
 
+void test_anim_timeline_without_exec_cb_but_anim_start_cb_and_completed_cb(void)
+{
+    lv_anim_t anim1;
+
+    lv_anim_init(&anim1);
+    lv_anim_set_values(&anim1, 0, 1024);
+    lv_anim_set_duration(&anim1, 300);
+    lv_anim_set_exec_cb(&anim1, anim1_exec_cb);
+    lv_anim_set_start_cb(&anim1, anim1_start);
+    lv_anim_set_completed_cb(&anim1, anim1_completed);
+    anim1_start_called = 0;
+    anim1_completed_called = 0;
+
+    anim_timeline = lv_anim_timeline_create();
+    lv_anim_timeline_add(anim_timeline, 200, &anim1);
+    lv_anim_timeline_set_progress(anim_timeline, 0);
+    lv_anim_timeline_start(anim_timeline);
+
+    lv_refr_now(NULL);
+
+    /*
+     *           |----anim1----|
+     *
+     *   0       200   300    500
+     */
+
+    lv_test_wait(20); /*Wait 20 ms*/
+    TEST_ASSERT_EQUAL(0, anim1_start_called);
+    TEST_ASSERT_EQUAL(0, anim1_completed_called);
+
+    lv_test_wait(200); /*Now we are at 220ms */
+    TEST_ASSERT_EQUAL(1, anim1_start_called);
+    TEST_ASSERT_EQUAL(0, anim1_completed_called);
+
+    lv_test_wait(300); /*Now we are at 520ms */
+    TEST_ASSERT_EQUAL(1, anim1_start_called);
+    TEST_ASSERT_EQUAL(1, anim1_completed_called);
+}
+
 #endif
