@@ -16,7 +16,8 @@ void lv_example_scale_8(void)
     lv_obj_set_style_radius(scale_line, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_clip_corner(scale_line, true, 0);
     lv_obj_align(scale_line, LV_ALIGN_LEFT_MID, LV_PCT(2), 0);
-    lv_obj_set_style_transform_rotation(scale_line, LV_SCALE_LABEL_ROTATE_MATCH_TICKS | LV_SCALE_LABEL_ROTATE_KEEP_UPRIGHT, LV_PART_INDICATOR);
+    lv_obj_set_style_transform_rotation(scale_line, LV_SCALE_LABEL_ROTATE_MATCH_TICKS | LV_SCALE_LABEL_ROTATE_KEEP_UPRIGHT,
+                                        LV_PART_INDICATOR);
     lv_obj_set_style_translate_x(scale_line, 10, LV_PART_INDICATOR);
     lv_obj_set_style_length(scale_line, 15, LV_PART_INDICATOR);
     lv_obj_set_style_radial_offset(scale_line, 10, LV_PART_INDICATOR);
@@ -35,7 +36,7 @@ void lv_example_scale_8(void)
     lv_scale_set_angle_range(scale_line, 270);
     lv_scale_set_rotation(scale_line, 135);
 
-    lv_obj_t* needle_line = lv_line_create(scale_line);
+    lv_obj_t * needle_line = lv_line_create(scale_line);
 
     lv_obj_set_style_line_width(needle_line, 6, LV_PART_MAIN);
     lv_obj_set_style_line_rounded(needle_line, true, LV_PART_MAIN);
