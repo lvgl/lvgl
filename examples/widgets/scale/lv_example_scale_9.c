@@ -4,7 +4,7 @@
 /**
  * A simple horizontal scale with transforms
  */
-void lv_example_scale_7(void)
+void lv_example_scale_9(void)
 {
     lv_obj_t * scale = lv_scale_create(lv_screen_active());
     lv_obj_set_size(scale, lv_pct(80), 100);
