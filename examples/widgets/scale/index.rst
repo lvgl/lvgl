@@ -22,8 +22,8 @@ A round scale with section and custom styling
 .. lv_example:: widgets/scale/lv_example_scale_4
   :language: c
 
-An scale with section and custom styling
-""""""""""""""""""""""""""""""""""""""""
+A scale with section and custom styling
+"""""""""""""""""""""""""""""""""""""""
 
 .. lv_example:: widgets/scale/lv_example_scale_5
   :language: c
@@ -34,3 +34,14 @@ A round scale with multiple needles, resembling a clock
 .. lv_example:: widgets/scale/lv_example_scale_6
   :language: c
 
+A horizontal scale with labels rotated and translated
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. lv_example:: widgets/scale/lv_example_scale_7
+  :language: c
+
+A round scale with labels rotated and translated
+""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. lv_example:: widgets/scale/lv_example_scale_8
+  :language: c
