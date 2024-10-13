@@ -28,11 +28,13 @@ typedef struct {
 } lv_anim_timeline_dsc_t;
 
 /*Data of anim_timeline*/
-struct lv_anim_timeline_t {
+struct _lv_anim_timeline_t {
     lv_anim_timeline_dsc_t * anim_dsc;  /**< Dynamically allocated anim dsc array*/
     uint32_t anim_dsc_cnt;              /**< The length of anim dsc array*/
     uint32_t act_time;                  /**< Current time of the animation*/
     bool reverse;                       /**< Reverse playback*/
+    uint32_t repeat_count;              /**< Repeat count*/
+    uint32_t repeat_delay;              /**< Wait before repeat*/
 };
 
 /**********************
@@ -89,6 +91,8 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
     LV_ASSERT_NULL(at);
 
     uint32_t playtime = lv_anim_timeline_get_playtime(at);
+    uint32_t repeat = at->repeat_count;
+    uint32_t delay = at->repeat_delay;
     uint32_t start = at->act_time;
     uint32_t end = at->reverse ? 0 : playtime;
     uint32_t duration = end > start ? end - start : start - end;
@@ -107,6 +111,8 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
     lv_anim_set_values(&a, start, end);
     lv_anim_set_time(&a, duration);
     lv_anim_set_path_cb(&a, anim_timeline_path_cb);
+    lv_anim_set_repeat_count(&a, repeat);
+    lv_anim_set_repeat_delay(&a, delay);
     lv_anim_start(&a);
     return playtime;
 }
@@ -122,6 +128,18 @@ void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse)
 {
     LV_ASSERT_NULL(at);
     at->reverse = reverse;
+}
+
+void lv_anim_timeline_set_repeat_count(lv_anim_timeline_t * at, uint32_t cnt)
+{
+    LV_ASSERT_NULL(at);
+    at->repeat_count = cnt;
+}
+
+void lv_anim_timeline_set_repeat_delay(lv_anim_timeline_t * at, uint32_t delay)
+{
+    LV_ASSERT_NULL(at);
+    at->repeat_delay = delay;
 }
 
 void lv_anim_timeline_set_progress(lv_anim_timeline_t * at, uint16_t progress)
@@ -164,6 +182,18 @@ uint16_t lv_anim_timeline_get_progress(lv_anim_timeline_t * at)
     return lv_map(at->act_time, 0, playtime, 0, LV_ANIM_TIMELINE_PROGRESS_MAX);
 }
 
+uint32_t lv_anim_timeline_get_repeat_count(lv_anim_timeline_t * at)
+{
+    LV_ASSERT_NULL(at);
+    return  at->repeat_count;
+}
+
+uint32_t lv_anim_timeline_get_repeat_delay(lv_anim_timeline_t * at)
+{
+    LV_ASSERT_NULL(at);
+    return  at->repeat_delay;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -175,10 +205,6 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
     for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
         lv_anim_timeline_dsc_t * anim_dsc = &(at->anim_dsc[i]);
         lv_anim_t * a = &(anim_dsc->anim);
-
-        if(a->exec_cb == NULL && a->custom_exec_cb == NULL) {
-            continue;
-        }
 
         uint32_t start_time = anim_dsc->start_time;
         int32_t value = 0;

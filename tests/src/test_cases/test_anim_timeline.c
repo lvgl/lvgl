@@ -327,39 +327,147 @@ void test_anim_timeline_reverse(void)
     TEST_ASSERT_EQUAL(20, lv_obj_get_x(obj));
 }
 
+void test_anim_timeline_repeat(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(obj, 100, 100);
+    lv_obj_set_pos(obj, 30, 40);
+
+    lv_anim_t a1;
+    lv_anim_init(&a1);
+    lv_anim_set_exec_cb(&a1, (lv_anim_exec_xcb_t)lv_obj_set_x);
+    lv_anim_set_var(&a1, obj);
+    lv_anim_set_values(&a1, 0, 1000);
+    lv_anim_set_duration(&a1, 1000);
+
+    anim_timeline = lv_anim_timeline_create();
+    TEST_ASSERT_NOT_NULL(anim_timeline);
+
+    lv_anim_timeline_add(anim_timeline, 0, &a1);
+    lv_anim_timeline_set_repeat_count(anim_timeline, 3);
+    lv_anim_timeline_set_repeat_delay(anim_timeline, 1);
+    lv_anim_timeline_start(anim_timeline);
+
+    lv_refr_now(NULL);
+
+    TEST_ASSERT_EQUAL(1, lv_anim_timeline_get_repeat_delay(anim_timeline));
+    TEST_ASSERT_EQUAL(1000, lv_anim_timeline_get_playtime(anim_timeline));
+
+    lv_test_wait(100);
+    TEST_ASSERT_EQUAL(99, lv_obj_get_x(obj));
+
+    lv_test_wait(500);
+    TEST_ASSERT_EQUAL(599, lv_obj_get_x(obj));
+
+    lv_test_wait(400);
+    TEST_ASSERT_EQUAL(1000, lv_obj_get_x(obj));
+
+    lv_test_wait(1);
+    TEST_ASSERT_EQUAL(0, lv_obj_get_x(obj));
+
+    lv_test_wait(500);
+    TEST_ASSERT_EQUAL(500, lv_obj_get_x(obj));
+
+    lv_test_wait(500);
+    TEST_ASSERT_EQUAL(1000, lv_obj_get_x(obj));
+
+    lv_test_wait(701);
+    TEST_ASSERT_EQUAL(699, lv_obj_get_x(obj));
+
+    lv_test_wait(1000);
+    TEST_ASSERT_EQUAL(1000, lv_obj_get_x(obj));
+
+    lv_test_wait(1000);
+    TEST_ASSERT_EQUAL(1000, lv_obj_get_x(obj));
+
+}
+
+
+void test_anim_timeline_delay(void)
+{
+
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(obj, 100, 100);
+    lv_obj_set_pos(obj, 30, 40);
+
+    lv_anim_t a1;
+    lv_anim_init(&a1);
+    lv_anim_set_exec_cb(&a1, (lv_anim_exec_xcb_t)lv_obj_set_x);
+    lv_anim_set_var(&a1, obj);
+    lv_anim_set_values(&a1, 0, 1000);
+    lv_anim_set_duration(&a1, 1000);
+
+    anim_timeline = lv_anim_timeline_create();
+    TEST_ASSERT_NOT_NULL(anim_timeline);
+
+    lv_anim_timeline_add(anim_timeline, 0, &a1);
+    lv_anim_timeline_set_repeat_count(anim_timeline, 3);
+    lv_anim_timeline_set_repeat_delay(anim_timeline, 1000);
+    lv_anim_timeline_start(anim_timeline);
+
+    lv_refr_now(NULL);
+
+    TEST_ASSERT_EQUAL(1000, lv_anim_timeline_get_repeat_delay(anim_timeline));
+    TEST_ASSERT_EQUAL(1000, lv_anim_timeline_get_playtime(anim_timeline));
+
+    lv_test_wait(100);
+    TEST_ASSERT_EQUAL(99, lv_obj_get_x(obj));
+
+    lv_test_wait(500);
+    TEST_ASSERT_EQUAL(599, lv_obj_get_x(obj));
+
+    lv_test_wait(400);
+    TEST_ASSERT_EQUAL(1000, lv_obj_get_x(obj));
+
+    lv_test_wait(1000);
+    TEST_ASSERT_EQUAL(0, lv_obj_get_x(obj));
+
+    lv_test_wait(500);
+    TEST_ASSERT_EQUAL(500, lv_obj_get_x(obj));
+
+    lv_test_wait(500);
+    TEST_ASSERT_EQUAL(1000, lv_obj_get_x(obj));
+
+    lv_test_wait(1700);
+    TEST_ASSERT_EQUAL(699, lv_obj_get_x(obj));
+
+    lv_test_wait(1000);
+    TEST_ASSERT_EQUAL(1000, lv_obj_get_x(obj));
+
+    lv_test_wait(1000);
+    TEST_ASSERT_EQUAL(1000, lv_obj_get_x(obj));
+
+}
+
 void anim1_exec_cb(void * var, int32_t v)
 {
     LV_UNUSED(var);
-    printf("[anim1] %d\n", v);
+    LV_UNUSED(v);
 }
 void anim1_start(lv_anim_t * a)
 {
     LV_UNUSED(a);
-    printf("[anim1] start\n");
     anim1_start_called++;
 }
 void anim1_completed(lv_anim_t * a)
 {
     LV_UNUSED(a);
-    printf("[anim1] completed\n");
     anim1_completed_called++;
 }
 
 void anim2_exec_cb(void * var, int32_t v)
 {
     LV_UNUSED(var);
-    printf("                    [anim2] %d\n", v);
+    LV_UNUSED(v);
 }
 void anim2_start(lv_anim_t * a)
 {
     LV_UNUSED(a);
-    printf("                    [anim2] start\n");
     anim2_start_called++;
 }
 void anim2_completed(lv_anim_t * a)
 {
     LV_UNUSED(a);
-    printf("                    [anim2] completed\n");
     anim2_completed_called++;
 }
 
@@ -458,6 +566,45 @@ void test_anim_timeline_with_anim_start_cb_and_completed_cb(void)
     TEST_ASSERT_EQUAL(1, anim1_completed_called);
     TEST_ASSERT_EQUAL(1, anim2_start_called);
     TEST_ASSERT_EQUAL(1, anim2_completed_called);
+}
+
+void test_anim_timeline_without_exec_cb_but_anim_start_cb_and_completed_cb(void)
+{
+    lv_anim_t anim1;
+
+    lv_anim_init(&anim1);
+    lv_anim_set_values(&anim1, 0, 1024);
+    lv_anim_set_duration(&anim1, 300);
+    lv_anim_set_exec_cb(&anim1, anim1_exec_cb);
+    lv_anim_set_start_cb(&anim1, anim1_start);
+    lv_anim_set_completed_cb(&anim1, anim1_completed);
+    anim1_start_called = 0;
+    anim1_completed_called = 0;
+
+    anim_timeline = lv_anim_timeline_create();
+    lv_anim_timeline_add(anim_timeline, 200, &anim1);
+    lv_anim_timeline_set_progress(anim_timeline, 0);
+    lv_anim_timeline_start(anim_timeline);
+
+    lv_refr_now(NULL);
+
+    /*
+     *           |----anim1----|
+     *
+     *   0       200   300    500
+     */
+
+    lv_test_wait(20); /*Wait 20 ms*/
+    TEST_ASSERT_EQUAL(0, anim1_start_called);
+    TEST_ASSERT_EQUAL(0, anim1_completed_called);
+
+    lv_test_wait(200); /*Now we are at 220ms */
+    TEST_ASSERT_EQUAL(1, anim1_start_called);
+    TEST_ASSERT_EQUAL(0, anim1_completed_called);
+
+    lv_test_wait(300); /*Now we are at 520ms */
+    TEST_ASSERT_EQUAL(1, anim1_start_called);
+    TEST_ASSERT_EQUAL(1, anim1_completed_called);
 }
 
 #endif

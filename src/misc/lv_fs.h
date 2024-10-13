@@ -64,9 +64,9 @@ typedef enum {
     LV_FS_SEEK_END = 0x02,      /**< Set the position from the end of the file*/
 } lv_fs_whence_t;
 
-struct lv_fs_drv_t;
-typedef struct lv_fs_drv_t lv_fs_drv_t;
-struct lv_fs_drv_t {
+struct _lv_fs_drv_t;
+typedef struct _lv_fs_drv_t lv_fs_drv_t;
+struct _lv_fs_drv_t {
     char letter;
     uint32_t cache_size;
     bool (*ready_cb)(lv_fs_drv_t * drv);
@@ -90,6 +90,12 @@ typedef struct {
     lv_fs_drv_t * drv;
     lv_fs_file_cache_t * cache;
 } lv_fs_file_t;
+
+
+typedef struct {
+    void * dir_d;
+    lv_fs_drv_t * drv;
+} lv_fs_dir_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -175,7 +181,7 @@ lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, u
  * Set the position of the 'cursor' (read write pointer) in a file
  * @param file_p    pointer to a lv_fs_file_t variable
  * @param pos       the new position expressed in bytes index (0: start of file)
- * @param whence    tells from where set the position. See lv_fs_whence_t
+ * @param whence    tells from where to set position. See lv_fs_whence_t
  * @return          LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whence);

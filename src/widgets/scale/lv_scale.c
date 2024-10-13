@@ -6,9 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_scale_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "lv_scale_private.h"
 #if LV_USE_SCALE != 0
 
 #include "../../core/lv_group.h"
@@ -567,6 +567,9 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         if(is_major_tick) major_tick_idx++;
 
         const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count - 1, scale->range_min, scale->range_max);
+
+        label_dsc.base.id1 = tick_idx;
+        label_dsc.base.id2 = tick_value;
 
         /* Overwrite label and tick properties if tick value is within section range */
         lv_scale_section_t * section;
@@ -1510,7 +1513,7 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
                 tmp_width = minor_tick_dsc->width;
             }
 
-            section->first_tick_in_section.y = tick_point_a->y;
+            section->first_tick_in_section = *tick_point_a;
             /* Add 1px as adjustment if tmp_width is odd */
             if(tmp_width & 0x01U) {
                 if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
@@ -1530,7 +1533,7 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
                 tmp_width = minor_tick_dsc->width;
             }
 
-            section->last_tick_in_section.y = tick_point_a->y;
+            section->last_tick_in_section = *tick_point_a;
             /* Add 1px as adjustment if tmp_width is odd */
             if(tmp_width & 0x01U) {
                 if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {

@@ -6,12 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_roller_private.h"
 #include "../label/lv_label_private.h"
 #include "../../misc/lv_area_private.h"
 #include "../../misc/lv_anim_private.h"
 #include "../../core/lv_obj_private.h"
 #include "../../core/lv_obj_class_private.h"
-#include "lv_roller_private.h"
 #if LV_USE_ROLLER != 0
 
 #include "../../misc/lv_assert.h"
@@ -158,13 +158,19 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
         LV_LOG_INFO("Using %" LV_PRIu32 " pages to make the roller look infinite", roller->inf_page_cnt);
 
         size_t opt_len = lv_strlen(options) + 1; /*+1 to add '\n' after option lists*/
-        char * opt_extra = lv_malloc(opt_len * roller->inf_page_cnt);
+        size_t opt_extra_len = opt_len * roller->inf_page_cnt;
+        if(opt_extra_len == 0) {
+            /*Prevent write overflow*/
+            opt_extra_len = 1;
+        }
+
+        char * opt_extra = lv_malloc(opt_extra_len);
         uint32_t i;
         for(i = 0; i < roller->inf_page_cnt; i++) {
             lv_strcpy(&opt_extra[opt_len * i], options);
             opt_extra[opt_len * (i + 1) - 1] = '\n';
         }
-        opt_extra[opt_len * roller->inf_page_cnt - 1] = '\0';
+        opt_extra[opt_extra_len - 1] = '\0';
         lv_label_set_text(label, opt_extra);
         lv_free(opt_extra);
 
@@ -349,10 +355,14 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         refr_position(obj, LV_ANIM_OFF);
     }
     else if(code == LV_EVENT_PRESSED) {
+        if(roller->option_cnt <= 1) return;
+
         roller->moved = 0;
         lv_anim_delete(get_label(obj), set_y_anim);
     }
     else if(code == LV_EVENT_PRESSING) {
+        if(roller->option_cnt <= 1) return;
+
         lv_indev_t * indev = lv_indev_active();
         lv_point_t p;
         lv_indev_get_vect(indev, &p);
@@ -364,6 +374,8 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_RELEASED || code == LV_EVENT_PRESS_LOST) {
+        if(roller->option_cnt <= 1) return;
+
         release_handler(obj);
     }
     else if(code == LV_EVENT_FOCUSED) {
@@ -399,6 +411,8 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_KEY) {
+        if(roller->option_cnt <= 1) return;
+
         uint32_t c = lv_event_get_key(e);
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
             if(roller->sel_opt_id + 1 < roller->option_cnt) {
@@ -416,6 +430,8 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_ROTARY) {
+        if(roller->option_cnt <= 1) return;
+
         int32_t r = lv_event_get_rotary_diff(e);
         int32_t new_id = roller->sel_opt_id + r;
         new_id = LV_CLAMP(0, new_id, (int32_t)roller->option_cnt - 1);
@@ -495,6 +511,7 @@ static void draw_main(lv_event_t * e)
         area_ok = lv_area_intersect(&mask_sel, &layer->_clip_area, &sel_area);
         if(area_ok) {
             lv_obj_t * label = get_label(obj);
+            if(lv_label_get_recolor(label)) label_dsc.flag |= LV_TEXT_FLAG_RECOLOR;
 
             /*Get the size of the "selected text"*/
             lv_point_t label_sel_size;
@@ -553,6 +570,8 @@ static void draw_label(lv_event_t * e)
     lv_draw_label_dsc_t label_draw_dsc;
     lv_draw_label_dsc_init(&label_draw_dsc);
     lv_obj_init_draw_label_dsc(roller, LV_PART_MAIN, &label_draw_dsc);
+    if(lv_label_get_recolor(label_obj)) label_draw_dsc.flag |= LV_TEXT_FLAG_RECOLOR;
+
     lv_layer_t * layer = lv_event_get_layer(e);
 
     /*If the roller has shadow or outline it has some ext. draw size

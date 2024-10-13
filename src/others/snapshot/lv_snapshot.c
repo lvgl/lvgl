@@ -79,9 +79,11 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
 
     switch(cf) {
         case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_ARGB8565:
         case LV_COLOR_FORMAT_RGB888:
         case LV_COLOR_FORMAT_XRGB8888:
         case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_A8:
         case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_I1:
             break;
@@ -113,6 +115,7 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
     layer.buf_area.y2 = snapshot_area.y1 + h - 1;
     layer.color_format = cf;
     layer._clip_area = snapshot_area;
+    layer.phy_clip_area = snapshot_area;
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     lv_matrix_identity(&layer.matrix);
 #endif

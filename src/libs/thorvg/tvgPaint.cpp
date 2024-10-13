@@ -268,7 +268,8 @@ RenderData Paint::Impl::update(RenderMethod* renderer, const RenderTransform* pT
             }
             if (tryFastTrack) {
                 RenderRegion viewport2;
-                if ((compFastTrack = _compFastTrack(target, pTransform, target->pImpl->rTransform, viewport2)) == Result::Success) {
+                if (target->composite(nullptr) != CompositeMethod::ClipPath &&
+                   (compFastTrack = _compFastTrack(target, pTransform, target->pImpl->rTransform, viewport2)) == Result::Success) {
                     viewport = renderer->viewport();
                     viewport2.intersect(viewport);
                     renderer->viewport(viewport2);

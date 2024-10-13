@@ -35,23 +35,24 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_vg_lite_pending_t;
+struct _lv_vg_lite_pending_t;
 
-struct lv_draw_vg_lite_unit_t {
+struct _lv_draw_vg_lite_unit_t {
     lv_draw_unit_t base_unit;
     lv_draw_task_t * task_act;
 
-    struct lv_vg_lite_pending_t * image_dsc_pending;
+    struct _lv_vg_lite_pending_t * image_dsc_pending;
 
     lv_cache_t * grad_cache;
-    struct lv_vg_lite_pending_t * grad_pending;
+    struct _lv_vg_lite_pending_t * grad_pending;
 
     lv_cache_t * stroke_cache;
 
     uint16_t flush_count;
+    uint16_t letter_count;
     vg_lite_buffer_t target_buffer;
     vg_lite_matrix_t global_matrix;
-    struct lv_vg_lite_path_t * global_path;
+    struct _lv_vg_lite_path_t * global_path;
     bool path_in_use;
 };
 

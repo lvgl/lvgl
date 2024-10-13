@@ -63,7 +63,7 @@ You can align the object on its parent with
 setting will be relative to the set alignment mode. For example, this
 will shift the object by 10;20 px from the center of its parent:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_set_align(obj, LV_ALIGN_CENTER);
    lv_obj_set_pos(obj, 10, 20);
@@ -96,7 +96,7 @@ To get a specific child of a parent use :cpp:expr:`lv_obj_get_child(parent, idx)
 
 The children can be iterated like this:
 
-.. code:: c
+.. code-block:: c
 
    uint32_t i;
    for(i = 0; i < lv_obj_get_child_count(parent); i++) {
@@ -195,7 +195,7 @@ There are some attributes which can be enabled/disabled by
 -  :cpp:enumerator:`LV_OBJ_FLAG_EVENT_BUBBLE` Propagate the events to the parent too
 -  :cpp:enumerator:`LV_OBJ_FLAG_GESTURE_BUBBLE` Propagate the gestures to the parent
 -  :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` Allow performing more accurate hit (click) test. E.g. accounting for rounded corners
--  :cpp:enumerator:`LV_OBJ_FLAG_IGNORE_LAYOUT` Make the object positionable by the layouts
+-  :cpp:enumerator:`LV_OBJ_FLAG_IGNORE_LAYOUT` Make the object not positioned by the layouts
 -  :cpp:enumerator:`LV_OBJ_FLAG_FLOATING` Do not scroll the object when the parent scrolls and ignore layout
 -  :cpp:enumerator:`LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` Enable sending ``LV_EVENT_DRAW_TASK_ADDED`` events
 -  :cpp:enumerator:`LV_OBJ_FLAG_OVERFLOW_VISIBLE` Do not clip the children's content to the parent's boundary
@@ -211,7 +211,7 @@ There are some attributes which can be enabled/disabled by
 
 Some examples:
 
-.. code:: c
+.. code-block:: c
 
    /*Hide on object*/
    lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);

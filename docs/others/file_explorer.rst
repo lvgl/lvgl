@@ -84,7 +84,7 @@ You can use :cpp:func:`lv_file_explorer_get_cur_path` to get the current path
 and :cpp:func:`lv_file_explorer_get_sel_fn` to get the name of the currently
 selected file in the event processing function. For example:
 
-.. code:: c
+.. code-block:: c
 
    static void file_explorer_event_handler(lv_event_t * e)
    {

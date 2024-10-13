@@ -15,7 +15,7 @@ If enabled in ``lv_conf.h`` by :c:macro:`LV_USE_BMP` LVGL will register a new
 image decoder automatically so BMP files can be directly used as image
 sources. For example:
 
-.. code:: c
+.. code-block:: c
 
    lv_image_set_src(my_img, "S:path/to/picture.bmp");
 

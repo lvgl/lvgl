@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_draw_sw_img.c
  *
  */
@@ -127,7 +127,7 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
     }
 
     lv_draw_fill_dsc_t fill_dsc;
-    lv_draw_rect_dsc_init(&fill_dsc);
+    lv_draw_fill_dsc_init(&fill_dsc);
     fill_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
     fill_dsc.opa = LV_OPA_10;
     lv_draw_sw_fill(draw_unit, &fill_dsc, &area_rot);
@@ -135,8 +135,8 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
     lv_draw_border_dsc_t border_dsc;
     lv_draw_border_dsc_init(&border_dsc);
     border_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
-    border_dsc.opa = LV_OPA_100;
-    border_dsc.width = 2;
+    border_dsc.opa = LV_OPA_60;
+    border_dsc.width = 1;
     lv_draw_sw_border(draw_unit, &border_dsc, &area_rot);
 
     lv_point_t txt_size;

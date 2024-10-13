@@ -40,71 +40,38 @@ remove the misleading guide above this code segment.
 4. Remove macro definitions for
 
    - LV_USE_DEMO_WIDGETS
-   
    - LV_USE_DEMO_BENCHMARK
-   
    - LV_USE_IME_PINYIN
-   
    - LV_USE_OS
-   
    - LV_USE_FILE_EXPLORER
-   
    - LV_USE_DEMO_WIDGETS
-   
    - LV_USE_DEMO_KEYPAD_AND_ENCODER
-   
    - LV_USE_DEMO_BENCHMARK
-   
    - LV_USE_DEMO_RENDER
-   
    - LV_USE_DEMO_STRESS
-   
    - LV_USE_DEMO_MUSIC
-   
    - LV_USE_DEMO_FLEX_LAYOUT
-   
    - LV_USE_DEMO_MULTILANG
-   
    - LV_USE_DEMO_TRANSFORM
-   
    - LV_USE_DEMO_SCROLL
-   
    - LV_USE_DEMO_VECTOR_GRAPHIC
-   
    - LV_USE_DRAW_VGLITE
-   
    - LV_USE_DRAW_VG_LITE
-   
    - LV_USE_DRAW_PXP
-   
    - LV_USE_DRAW_SDL
-   
    - LV_USE_DRAW_ARM2D
-   
    - LV_USE_SNAPSHOT
-   
    - LV_USE_MONKEY
-   
    - LV_USE_GRIDNAV
-   
    - LV_USE_FRAGMENT
-   
    - LV_USE_IMGFONT
-   
    - LV_USE_LINUX_DRM
-   
    - LV_USE_TFT_ESPI
-   
    - LV_USE_ST7735
-   
    - LV_USE_ST7789
-   
    - LV_USE_ST7796
-   
    - LV_USE_ILI9341
-   
    - LV_USE_RENESAS_GLCDC   
-     
    
 5. Update `LV_LOG_PRINTF` to `1` and `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER`
 
@@ -118,7 +85,7 @@ remove the misleading guide above this code segment.
 #define LV_DRAW_BUF_STRIDE_ALIGN		4
 #define LV_ATTRIBUTE_MEM_ALIGN          __attribute__((aligned(4)))
 ```
-Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
+Make sure `LV_MEM_SIZE` is no less than `(72*1024U)`.
 
 8. Remove following macro definitions in the `3rd party libraries` section:
 
@@ -217,6 +184,14 @@ with:
 
 ```c
 #define LV_PROFILER_INCLUDE "src/misc/lv_profiler_builtin.h"
+```
+
+
+
+14. Add the following macro definition to **COLOR SETTINGS** section:
+
+```c
+#define LV_COLOR_16_SWAP 0
 ```
 
 

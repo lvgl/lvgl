@@ -31,7 +31,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_dropdown_t {
+struct _lv_dropdown_t {
     lv_obj_t obj;
     lv_obj_t * list;                /**< The dropped down list*/
     const char * text;              /**< Text to display on the dropdown's button*/
@@ -46,7 +46,7 @@ struct lv_dropdown_t {
     uint8_t selected_highlight: 1;  /**< 1: Make the selected option highlighted in the list*/
 };
 
-struct lv_dropdown_list_t {
+struct _lv_dropdown_list_t {
     lv_obj_t obj;
     lv_obj_t * dropdown;
 };

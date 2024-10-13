@@ -181,7 +181,7 @@ Hello world 标签
    <details>
      <summary>C code</summary>
 
-.. code:: c
+.. code-block:: c
 
    /*Change the active screen's background color*/
    lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x003a57), LV_PART_MAIN);
@@ -201,7 +201,7 @@ Hello world 标签
    <details>
      <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_direct=4ab7c40c35b0dc349aa2f0c3b00938d7d8e8ac9f" target="_blank">在线模拟器</a></summary>
 
-.. code:: python
+.. code-block:: python
 
    # Change the active screen's background color
    scr = lv.screen_active()
@@ -229,7 +229,7 @@ Hello world 标签
    <details>
      <summary>C code</summary>
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * button = lv_button_create(lv_screen_active());                   /*Add a button to the current screen*/
    lv_obj_center(button);                                             /*Set its position*/
@@ -255,7 +255,7 @@ Hello world 标签
    <details>
      <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=926bde43ec7af0146c486de470c53f11f167491e" target="_blank">在线模拟器</a></summary>
 
-.. code:: python
+.. code-block:: python
 
    def button_event_cb(e):
      print("Clicked")
@@ -286,7 +286,7 @@ Hello world 标签
    <details>
      <summary>C code</summary>
 
-.. code:: c
+.. code-block:: c
 
 
    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_COLUMN);
@@ -321,7 +321,7 @@ Hello world 标签
    <details>
      <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=311d37e5f70daf1cb0d2cad24c7f72751b5f1792" target="_blank">在线模拟器</a></summary>
 
-.. code:: python
+.. code-block:: python
 
    def event_handler(e):
        code = e.get_code()
@@ -373,7 +373,7 @@ Hello world 标签
    <details>
      <summary>C code</summary>
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * slider = lv_slider_create(lv_screen_active());
    lv_slider_set_value(slider, 70, LV_ANIM_OFF);
@@ -419,7 +419,7 @@ Hello world 标签
    <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=c431c7b4dfd2cc0dd9c392b74365d5af6ea986f0" target="_blank">在线模拟器</a>
    </summary>
 
-.. code:: python
+.. code-block:: python
 
    # Create a slider and add the style
    slider = lv.slider(lv.screen_active())
@@ -470,7 +470,7 @@ Hello world 标签
    <details>
      <summary>C code</summary>
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * ltr_label = lv_label_create(lv_screen_active());
    lv_label_set_text(ltr_label, "In modern terminology, a microcontroller is similar to a system on a chip (SoC).");
@@ -501,7 +501,7 @@ Hello world 标签
    <details>
      <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=18bb38200a64e10ead1aa17a65c977fc18131842" target="_blank">在线模拟器</a></summary>
 
-.. code:: python
+.. code-block:: python
 
    ltr_label = lv.label(lv.screen_active())
    ltr_label.set_text("In modern terminology, a microcontroller is similar to a system on a chip (SoC).")

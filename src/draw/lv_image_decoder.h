@@ -95,18 +95,18 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
 /**
  * Open an image.
  * Try the created image decoders one by one. Once one is able to open the image that decoder is saved in `dsc`
- * @param dsc   describes a decoding session. Simply a pointer to an `lv_image_decoder_dsc_t` variable.
- * @param src   the image source. Can be
- *  1) File name: E.g. "S:folder/img1.png" (The drivers needs to registered via `lv_fs_drv_register())`)
- *  2) Variable: Pointer to an `lv_image_dsc_t` variable
- *  3) Symbol: E.g. `LV_SYMBOL_OK`
- * @param args  args about how the image should be opened.
+ * @param dsc    describes a decoding session. Simply a pointer to an `lv_image_decoder_dsc_t` variable.
+ * @param src    the image source. Can be
+ *                 1) File name: E.g. "S:folder/img1.png" (The drivers needs to registered via `lv_fs_drv_register())`)
+ *                 2) Variable: Pointer to an `lv_image_dsc_t` variable
+ *                 3) Symbol: E.g. `LV_SYMBOL_OK`
+ * @param args   args about how the image should be opened.
  * @return LV_RESULT_OK: opened the image. `dsc->decoded` and `dsc->header` are set.
  *         LV_RESULT_INVALID: none of the registered image decoders were able to open the image.
  */
 lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, const lv_image_decoder_args_t * args);
 
-/***
+/**
  * Decode `full_area` pixels incrementally by calling in a loop. Set `decoded_area` to `LV_COORD_MIN` on first call.
  * @param dsc           image decoder descriptor
  * @param full_area     input parameter. the full area to decode after enough subsequent calls

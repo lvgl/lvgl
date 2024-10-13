@@ -205,6 +205,7 @@ if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
         -Werror=strict-aliasing
         -Wno-double-promotion
         -Wno-unreachable-code
+        -Wno-gnu-zero-variadic-macro-arguments
     )
 else()
     list(APPEND COMPILE_OPTIONS
@@ -326,6 +327,23 @@ if(NOT WIN32)
     # libjpeg is required for the jpeg test case
     find_package(JPEG REQUIRED)
     include_directories(${JPEG_INCLUDE_DIR})
+
+    # Wayland
+    find_package(PkgConfig)
+    pkg_check_modules(wayland_client wayland-client)
+
+    if (wayland_client_FOUND)
+        pkg_check_modules(wayland-cursor REQUIRED wayland-cursor)
+        pkg_check_modules(xkbcommon REQUIRED xkbcommon)
+
+        link_libraries(wayland-client wayland-cursor xkbcommon)
+
+        # Add auto generated source required for XDG shell
+        include_directories("${LVGL_TEST_DIR}/wayland_protocols")
+        target_sources(test_common PUBLIC "wayland_protocols/wayland_xdg_shell.c")
+    else()
+        add_definitions(-DLV_USE_WAYLAND=0)
+    endif()
 endif()
 
 # libpng is required for the png test case
@@ -338,10 +356,7 @@ include_directories(${FREETYPE_INCLUDE_DIRS})
 
 if(OPTIONS_SDL)
     find_package(SDL2 REQUIRED)
-    find_library(NAME SDL2_image REQUIRED)
-    link_libraries(SDL2_image)
     include_directories(${SDL2_INCLUDE_DIRS})
-    include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
 endif()
 
 # libinput is required for the libinput device driver test case
@@ -461,9 +476,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             ${TEST_LIBS})
 
     if(OPTIONS_SDL)
-        target_link_libraries(${test_name} PRIVATE
-                ${SDL_LIBRARY}
-                ${SDL_IMAGE_LIBRARY})
+        target_link_libraries(${test_name} PRIVATE ${SDL_LIBRARY})
     endif()
 
 	if (NOT $ENV{NON_AMD64_BUILD})

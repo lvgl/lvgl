@@ -11,8 +11,8 @@ The Button Matrix object is a lightweight way to display multiple
 buttons in rows and columns. Lightweight because the buttons are not
 actually created but just virtually drawn on the fly. This way, one
 button use only eight extra bytes of memory instead of the ~100-150
-bytes a normal `Button </widgets/button>`__ object plus the 100 or so bytes
-for the `Label </widgets/label>`__ object.
+bytes a normal `Button <widgets/button>`__ object plus the 100 or so bytes
+for the `Label <widgets/label>`__ object.
 
 The Button matrix is added to the default group (if one is set). Besides
 the Button matrix is an editable object to allow selecting and clicking
@@ -40,7 +40,7 @@ Button's text
 There is a text on each button. To specify them a descriptor string
 array, called *map*, needs to be used. The map can be set with
 :cpp:expr:`lv_buttonmatrix_set_map(buttonm, my_map)`. The declaration of a map should
-look like :cpp:expr:`const char * map[] = {"button1", "button2", "button3", NULL}`. Note
+look like ``const char * map[] = {"button1", "button2", "button3", NULL}``. Note
 that the last element has to be either ``NULL`` or an empty string
 (``""``)!
 

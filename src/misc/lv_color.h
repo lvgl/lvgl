@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_color.h
  *
  */
@@ -53,8 +53,8 @@ enum {
     LV_OPA_COVER  = 255,
 };
 
-#define LV_OPA_MIN 2    /*Opacities below this will be transparent*/
-#define LV_OPA_MAX 253  /*Opacities above this will fully cover*/
+#define LV_OPA_MIN 2    /**< Opacities below this will be transparent */
+#define LV_OPA_MAX 253  /**< Opacities above this will fully cover */
 
 /**
  * Get the pixel size of a color format in bits, bpp
@@ -75,6 +75,7 @@ enum {
                                             (cf) == LV_COLOR_FORMAT_AL88 ? 16 :     \
                                             (cf) == LV_COLOR_FORMAT_RGB565 ? 16 :   \
                                             (cf) == LV_COLOR_FORMAT_RGB565A8 ? 16 : \
+                                            (cf) == LV_COLOR_FORMAT_YUY2 ? 16 :     \
                                             (cf) == LV_COLOR_FORMAT_ARGB8565 ? 24 : \
                                             (cf) == LV_COLOR_FORMAT_RGB888 ? 24 :   \
                                             (cf) == LV_COLOR_FORMAT_ARGB8888 ? 32 : \
@@ -171,7 +172,10 @@ typedef enum {
     LV_COLOR_FORMAT_YUV_END           = LV_COLOR_FORMAT_UYVY,
 
     /*Color formats in which LVGL can render*/
-#if LV_COLOR_DEPTH == 8
+#if LV_COLOR_DEPTH == 1
+    LV_COLOR_FORMAT_NATIVE            = LV_COLOR_FORMAT_I1,
+    LV_COLOR_FORMAT_NATIVE_WITH_ALPHA = LV_COLOR_FORMAT_I1,
+#elif LV_COLOR_DEPTH == 8
     LV_COLOR_FORMAT_NATIVE            = LV_COLOR_FORMAT_L8,
     LV_COLOR_FORMAT_NATIVE_WITH_ALPHA = LV_COLOR_FORMAT_AL88,
 #elif LV_COLOR_DEPTH == 16
@@ -183,7 +187,10 @@ typedef enum {
 #elif LV_COLOR_DEPTH == 32
     LV_COLOR_FORMAT_NATIVE            = LV_COLOR_FORMAT_XRGB8888,
     LV_COLOR_FORMAT_NATIVE_WITH_ALPHA = LV_COLOR_FORMAT_ARGB8888,
+#else
+#error "LV_COLOR_DEPTH should be 1, 8, 16, 24 or 32"
 #endif
+
 } lv_color_format_t;
 
 #define LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf) ((cf) >= LV_COLOR_FORMAT_A1 && (cf) <= LV_COLOR_FORMAT_A8)
@@ -380,28 +387,28 @@ void lv_color16_premultiply(lv_color16_t * c, lv_opa_t a);
 
 /**
  * Get the luminance of a color: luminance = 0.3 R + 0.59 G + 0.11 B
- * @param color a color
+ * @param c a color
  * @return the brightness [0..255]
  */
 uint8_t lv_color_luminance(lv_color_t c);
 
 /**
  * Get the luminance of a color16: luminance = 0.3 R + 0.59 G + 0.11 B
- * @param color a color
+ * @param c a color
  * @return the brightness [0..255]
  */
 uint8_t lv_color16_luminance(const lv_color16_t c);
 
 /**
  * Get the luminance of a color24: luminance = 0.3 R + 0.59 G + 0.11 B
- * @param color a color
+ * @param c a color
  * @return the brightness [0..255]
  */
 uint8_t lv_color24_luminance(const uint8_t * c);
 
 /**
  * Get the luminance of a color32: luminance = 0.3 R + 0.59 G + 0.11 B
- * @param color a color
+ * @param c a color
  * @return the brightness [0..255]
  */
 uint8_t lv_color32_luminance(lv_color32_t c);

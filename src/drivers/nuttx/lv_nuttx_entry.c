@@ -17,6 +17,7 @@
 #include <pthread.h>
 #include "lv_nuttx_cache.h"
 #include "lv_nuttx_image_cache.h"
+#include "../../core/lv_global.h"
 #include "lv_nuttx_profiler.h"
 
 #include "../../../lvgl.h"
@@ -65,6 +66,8 @@ static void check_stack_size(void);
 
 #if LV_ENABLE_GLOBAL_CUSTOM
 
+static int lv_nuttx_tlskey = -1;
+
 static void lv_global_free(void * data)
 {
     if(data) {
@@ -74,18 +77,17 @@ static void lv_global_free(void * data)
 
 lv_global_t * lv_global_default(void)
 {
-    static int index = -1;
     lv_global_t * data = NULL;
 
-    if(index < 0) {
-        index = task_tls_alloc(lv_global_free);
+    if(lv_nuttx_tlskey < 0) {
+        lv_nuttx_tlskey = task_tls_alloc(lv_global_free);
     }
 
-    if(index >= 0) {
-        data = (lv_global_t *)task_tls_get_value(index);
+    if(lv_nuttx_tlskey >= 0) {
+        data = (lv_global_t *)task_tls_get_value(lv_nuttx_tlskey);
         if(data == NULL) {
             data = (lv_global_t *)calloc(1, sizeof(lv_global_t));
-            task_tls_set_value(index, (uintptr_t)data);
+            task_tls_set_value(lv_nuttx_tlskey, (uintptr_t)data);
         }
     }
     return data;

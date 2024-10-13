@@ -143,7 +143,28 @@ void lv_indev_set_driver_data(lv_indev_t * indev, void * driver_data);
  * @param indev pointer to an input device
  * @param disp pointer to an display
  */
-void lv_indev_set_display(lv_indev_t * indev, struct lv_display_t * disp);
+void lv_indev_set_display(lv_indev_t * indev, struct _lv_display_t * disp);
+
+/**
+ * Set long press time to indev
+ * @param  indev            pointer to input device
+ * @param  long_press_time  time long press time in ms
+ */
+void lv_indev_set_long_press_time(lv_indev_t * indev, uint16_t long_press_time);
+
+/**
+ * Set scroll limit to the input device
+ * @param indev pointer to an input device
+ * @param scroll_limit the number of pixels to slide before actually drag the object
+ */
+void lv_indev_set_scroll_limit(lv_indev_t * indev, uint8_t scroll_limit);
+
+/**
+ * Set scroll throw slow-down to the indev. Greater value means faster slow-down
+ * @param indev pointer to an input device
+ * @param scroll_throw the slow-down in [%]
+ */
+void lv_indev_set_scroll_throw(lv_indev_t * indev, uint8_t scroll_throw);
 
 /**
  * Get the type of an input device
@@ -195,11 +216,25 @@ void * lv_indev_get_user_data(const lv_indev_t * indev);
 void * lv_indev_get_driver_data(const lv_indev_t * indev);
 
 /**
+ * Get whether indev is moved while pressed
+ * @param indev pointer to an input device
+ * @return true: indev is moved while pressed; false: indev is not moved while pressed
+ */
+bool lv_indev_get_press_moved(const lv_indev_t * indev);
+
+/**
  * Reset one or all input devices
  * @param indev pointer to an input device to reset or NULL to reset all of them
  * @param obj pointer to an object which triggers the reset.
  */
 void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj);
+
+/**
+ * Touch and key related events are sent to the input device first and to the widget after that.
+ * If this functions called in an indev event, the event won't be sent to the widget.
+ * @param indev pointer to an input device
+ */
+void lv_indev_stop_processing(lv_indev_t * indev);
 
 /**
  * Reset the long press state of an input device
@@ -249,6 +284,15 @@ lv_dir_t lv_indev_get_gesture_dir(const lv_indev_t * indev);
  * @return the last pressed key (0 on error)
  */
 uint32_t lv_indev_get_key(const lv_indev_t * indev);
+
+
+/**
+ * Get the counter for consecutive clicks within a short distance and time.
+ * The counter is updated before LV_EVENT_SHORT_CLICKED is fired.
+ * @param indev pointer to an input device
+ * @return short click streak counter
+ */
+uint8_t lv_indev_get_short_click_streak(const lv_indev_t * indev);
 
 /**
  * Check the current scroll direction of an input device (for LV_INDEV_TYPE_POINTER and

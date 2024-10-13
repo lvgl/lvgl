@@ -63,12 +63,16 @@ Or rotated a fixed amount (on any scale type) - here for 20 degrees:
 :cpp:expr:`lv_obj_set_style_transform_rotation(scale, 20, LV_PART_INDICATOR);`
 Or both at the same time
 :cpp:expr:`lv_obj_set_style_transform_rotation(scale, LV_SCALE_LABEL_ROTATE_MATCH_TICKS + 200, LV_PART_INDICATOR);`
-Some labels of the scale might be drawn upside down (to match the tick) if the scale includes a certain angle range. 
-If you don't want this, to automatically rotate the labels to keep them upright, an additional flag can be used. 
+Some labels of the scale might be drawn upside down (to match the tick) if the scale includes a certain angle range.
+If you don't want this, to automatically rotate the labels to keep them upright, an additional flag can be used.
 Labels that would be upside down are then rotated 180
 :cpp:expr:`lv_obj_set_style_transform_rotation(scale, LV_SCALE_LABEL_ROTATE_MATCH_TICKS | LV_SCALE_LABEL_ROTATE_KEEP_UPRIGHT, LV_PART_INDICATOR);`
 Labels can also be moved a fixed distance in X and Y using e.g.
 :cpp:expr:`lv_obj_set_style_translate_x(scale, 10, LV_PART_INDICATOR);`
+
+<strong> NOTE: </strong> The major tick value is calculated with the :cpp:expr:`lv_map` API (when not setting the custom labels),
+this calculation takes into consideration the total tick number and the scale range, so the label drawn can present rounding errors
+when the calculated value is a float number.
 
 The length of the ticks can be configured with the length style property on the :cpp:enumerator:`LV_PART_INDICATOR`
 for major ticks and :cpp:enumerator:`LV_PART_ITEMS` for minor ticks, for example with local style:
@@ -78,6 +82,9 @@ padded in either direction (outwards or inwards) for RADIAL scales only with:
 :cpp:expr:`lv_obj_set_style_radial_offset(scale, 5, LV_PART_INDICATOR);` for major ticks and
 :cpp:expr:`lv_obj_set_style_radial_offset(scale, 5, LV_PART_ITEMS);` for minor .
 Using length and radial offset together allows total control of the tick position.
+i.e. :cpp:expr:`static char * custom_labels[3] = {"One", "Two", NULL}`.
+
+
 
 Sections
 --------

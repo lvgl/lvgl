@@ -13,9 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw.h"
 #include "../misc/lv_array.h"
 #include "../misc/lv_matrix.h"
+#include "lv_draw_image.h"
 
 #if LV_USE_VECTOR_GRAPHIC
 
@@ -86,7 +86,7 @@ typedef enum {
     LV_VECTOR_GRADIENT_STYLE_RADIAL,
 } lv_vector_gradient_style_t;
 
-struct lv_fpoint_t {
+struct _lv_fpoint_t {
     float x;
     float y;
 };

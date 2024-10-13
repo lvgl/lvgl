@@ -196,10 +196,10 @@ static inline bool lv_text_is_marker(uint32_t letter)
 
 /**
  * Give the size of an encoded character
- * @param str pointer to a character in a string
+ * @param txt  pointer to a character in a string
  * @return length of the encoded character (1,2,3 ...). O in invalid
  */
-extern uint8_t (*const lv_text_encoded_size)(const char * str);
+extern uint8_t (*const lv_text_encoded_size)(const char * txt);
 
 /**
  * Convert a Unicode letter to encoded
@@ -217,19 +217,21 @@ extern uint32_t (*const lv_text_encoded_conv_wc)(uint32_t c);
 
 /**
  * Decode the next encoded character from a string.
- * @param txt pointer to '\0' terminated string
- * @param i start index in 'txt' where to start.
- *                After the call it will point to the next encoded char in 'txt'.
- *                NULL to use txt[0] as index
+ * @param txt      pointer to '\0' terminated string
+ * @param i_start  start index in 'txt' where to start.
+ *                 After the call it will point to the next encoded char in 'txt'.
+ *                 NULL to use txt[0] as index
  * @return the decoded Unicode character or 0 on invalid data code
  */
-extern uint32_t (*const lv_text_encoded_next)(const char * txt, uint32_t * i);
+extern uint32_t (*const lv_text_encoded_next)(const char * txt, uint32_t * i_start);
 
 /**
  * Get the previous encoded character form a string.
- * @param txt pointer to '\0' terminated string
- * @param i_start index in 'txt' where to start. After the call it will point to the previous
- * encoded char in 'txt'.
+ *
+ * @param  txt      pointer to '\0' terminated string
+ * @param  i_start  index in 'txt' where to start. After the call it will point to the previous
+ *                    encoded char in 'txt'.
+ *
  * @return the decoded Unicode character or 0 on invalid data
  */
 extern uint32_t (*const lv_text_encoded_prev)(const char * txt, uint32_t * i_start);
@@ -247,7 +249,7 @@ extern uint32_t (*const lv_text_encoded_get_byte_id)(const char * txt, uint32_t 
  * Convert a byte index (in an encoded text) to character index.
  * E.g. in UTF-8 "AÁRT" index of 'R' is 2 but start at byte 3 because 'Á' is 2 bytes long
  * @param txt a '\0' terminated UTF-8 string
- * @param byte_id character index
+ * @param byte_id byte index
  * @return character index of the letter at 'byte_id'th position
  */
 extern uint32_t (*const lv_text_encoded_get_char_id)(const char * txt, uint32_t byte_id);

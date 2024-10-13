@@ -26,11 +26,11 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_color_filter_dsc_t;
+struct _lv_color_filter_dsc_t;
 
-typedef lv_color_t (*lv_color_filter_cb_t)(const struct lv_color_filter_dsc_t *, lv_color_t, lv_opa_t);
+typedef lv_color_t (*lv_color_filter_cb_t)(const struct _lv_color_filter_dsc_t *, lv_color_t, lv_opa_t);
 
-struct lv_color_filter_dsc_t {
+struct _lv_color_filter_dsc_t {
     lv_color_filter_cb_t filter_cb;
     void * user_data;
 };
@@ -61,7 +61,7 @@ lv_color32_t lv_color_mix32(lv_color32_t fg, lv_color32_t bg);
 /**
  * Get the brightness of a color
  * @param c   a color
- * @return    the brightness [0..255]
+ * @return brightness in range [0..255]
  */
 uint8_t lv_color_brightness(lv_color_t c);
 

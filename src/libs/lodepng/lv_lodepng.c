@@ -139,6 +139,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
+    LV_PROFILER_DECODER_BEGIN_TAG("lv_lodepng_decoder_open");
 
     const uint8_t * png_data = NULL;
     size_t png_data_size = 0;
@@ -152,6 +153,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                     lv_free((void *)png_data);
                 }
                 LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
+                LV_PROFILER_DECODER_END_TAG("lv_lodepng_decoder_open");
                 return LV_RESULT_INVALID;
             }
         }
@@ -162,6 +164,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         png_data_size = img_dsc->data_size;
     }
     else {
+        LV_PROFILER_DECODER_END_TAG("lv_lodepng_decoder_open");
         return LV_RESULT_INVALID;
     }
 
@@ -171,27 +174,35 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     if(!decoded) {
         LV_LOG_WARN("Error decoding PNG");
+        LV_PROFILER_DECODER_END_TAG("lv_lodepng_decoder_open");
         return LV_RESULT_INVALID;
     }
 
     lv_draw_buf_t * adjusted = lv_image_decoder_post_process(dsc, decoded);
     if(adjusted == NULL) {
-        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
+        lv_draw_buf_destroy(decoded);
+        LV_PROFILER_DECODER_END_TAG("lv_lodepng_decoder_open");
         return LV_RESULT_INVALID;
     }
 
     /*The adjusted draw buffer is newly allocated.*/
     if(adjusted != decoded) {
-        lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
+        lv_draw_buf_destroy(decoded);
         decoded = adjusted;
     }
 
     dsc->decoded = decoded;
 
-    if(dsc->args.no_cache) return LV_RESULT_OK;
+    if(dsc->args.no_cache) {
+        LV_PROFILER_DECODER_END_TAG("lv_lodepng_decoder_open");
+        return LV_RESULT_OK;
+    }
 
     /*If the image cache is disabled, just return the decoded image*/
-    if(!lv_image_cache_is_enabled()) return LV_RESULT_OK;
+    if(!lv_image_cache_is_enabled()) {
+        LV_PROFILER_DECODER_END_TAG("lv_lodepng_decoder_open");
+        return LV_RESULT_OK;
+    }
 
     /*Add the decoded image to the cache*/
     lv_image_cache_data_t search_key;
@@ -202,10 +213,12 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     lv_cache_entry_t * entry = lv_image_decoder_add_to_cache(decoder, &search_key, decoded, NULL);
 
     if(entry == NULL) {
+        LV_PROFILER_DECODER_END_TAG("lv_lodepng_decoder_open");
         return LV_RESULT_INVALID;
     }
     dsc->cache_entry = entry;
 
+    LV_PROFILER_DECODER_END_TAG("lv_lodepng_decoder_open");
     return LV_RESULT_OK;    /*If not returned earlier then it failed*/
 }
 
@@ -220,7 +233,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
     LV_UNUSED(decoder);
 
     if(dsc->args.no_cache ||
-       !lv_image_cache_is_enabled()) lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, (lv_draw_buf_t *)dsc->decoded);
+       !lv_image_cache_is_enabled()) lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
 }
 
 static lv_draw_buf_t * decode_png_data(const void * png_data, size_t png_data_size)

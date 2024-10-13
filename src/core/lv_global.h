@@ -65,18 +65,18 @@ struct _snippet_stack;
 #endif
 
 #if LV_USE_FREETYPE
-struct lv_freetype_context_t;
+struct _lv_freetype_context_t;
 #endif
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
-struct lv_profiler_builtin_ctx_t;
+struct _lv_profiler_builtin_ctx_t;
 #endif
 
 #if LV_USE_NUTTX
-struct lv_nuttx_ctx_t;
+struct _lv_nuttx_ctx_t;
 #endif
 
-typedef struct lv_global_t {
+typedef struct _lv_global_t {
     bool inited;
     bool deinit_in_progress;     /**< Can be used e.g. in the LV_EVENT_DELETE to deinit the drivers too */
 
@@ -182,7 +182,7 @@ typedef struct lv_global_t {
 #endif
 
 #if LV_USE_FREETYPE
-    struct lv_freetype_context_t * ft_context;
+    struct _lv_freetype_context_t * ft_context;
 #endif
 
 #if LV_USE_FONT_COMPRESSED
@@ -194,7 +194,7 @@ typedef struct lv_global_t {
 #endif
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
-    struct lv_profiler_builtin_ctx_t * profiler_context;
+    struct _lv_profiler_builtin_ctx_t * profiler_context;
 #endif
 
 #if LV_USE_FILE_EXPLORER != 0
@@ -215,12 +215,20 @@ typedef struct lv_global_t {
 #endif
 
 #if LV_USE_NUTTX
-    struct lv_nuttx_ctx_t * nuttx_ctx;
+    struct _lv_nuttx_ctx_t * nuttx_ctx;
 #endif
 
 #if LV_USE_OS != LV_OS_NONE
     lv_mutex_t lv_general_mutex;
 #endif
+
+#if LV_USE_OS == LV_OS_FREERTOS
+    uint32_t freertos_idle_time_sum;
+    uint32_t freertos_non_idle_time_sum;
+    uint32_t freertos_task_switch_timestamp;
+    bool freertos_idle_task_running;
+#endif
+
 
     void * user_data;
 } lv_global_t;

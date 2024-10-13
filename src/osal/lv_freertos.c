@@ -13,16 +13,14 @@
  *      INCLUDES
  *********************/
 #include "lv_os.h"
-
 #if LV_USE_OS == LV_OS_FREERTOS
 
-#if (ESP_PLATFORM)
-    #include "freertos/atomic.h"
-#else
-    #include "atomic.h"
-#endif
+#include "atomic.h"
 
+#include "../tick/lv_tick.h"
 #include "../misc/lv_log.h"
+#include "../core/lv_global.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -31,6 +29,8 @@
 #ifndef pcTASK_NAME
     #define pcTASK_NAME "lvglDraw"
 #endif
+
+#define globals LV_GLOBAL_DEFAULT()
 
 /**********************
  *      TYPEDEFS
@@ -46,11 +46,13 @@ static void prvMutexInit(lv_mutex_t * pxMutex);
 
 static void prvCheckMutexInit(lv_mutex_t * pxMutex);
 
-#if !USE_FREERTOS_TASK_NOTIFY
 static void prvCondInit(lv_thread_sync_t * pxCond);
 
 static void prvCheckCondInit(lv_thread_sync_t * pxCond);
 
+static void prvCheckCondInitIsr(lv_thread_sync_t * pxCond);
+
+#if !LV_USE_FREERTOS_TASK_NOTIFY
 static void prvTestAndDecrement(lv_thread_sync_t * pxCond,
                                 uint32_t ulLocalWaitingThreads);
 #endif
@@ -70,9 +72,13 @@ static void prvTestAndDecrement(lv_thread_sync_t * pxCond,
 #if (ESP_PLATFORM)
     #define _enter_critical()   taskENTER_CRITICAL(&critSectionMux);
     #define _exit_critical()    taskEXIT_CRITICAL(&critSectionMux);
+    #define _enter_critical_isr() taskENTER_CRITICAL_FROM_ISR();
+    #define _exit_critical_isr(x) taskEXIT_CRITICAL_FROM_ISR(x);
 #else
     #define _enter_critical()   taskENTER_CRITICAL();
     #define _exit_critical()    taskEXIT_CRITICAL();
+    #define _enter_critical_isr() taskENTER_CRITICAL_FROM_ISR();
+    #define _exit_critical_isr(x) taskEXIT_CRITICAL_FROM_ISR(x);
 #endif
 
 /**********************
@@ -83,7 +89,7 @@ lv_result_t lv_thread_init(lv_thread_t * pxThread, lv_thread_prio_t xSchedPriori
                            void (*pvStartRoutine)(void *), size_t usStackSize,
                            void * xAttr)
 {
-    pxThread->xTaskArg = xAttr;
+    pxThread->pTaskArg = xAttr;
     pxThread->pvStartRoutine = pvStartRoutine;
 
     BaseType_t xTaskCreateStatus = xTaskCreate(
@@ -123,7 +129,7 @@ lv_result_t lv_mutex_lock(lv_mutex_t * pxMutex)
     /* If mutex in uninitialized, perform initialization. */
     prvCheckMutexInit(pxMutex);
 
-    BaseType_t xMutexTakeStatus = xSemaphoreTake(pxMutex->xMutex, portMAX_DELAY);
+    BaseType_t xMutexTakeStatus = xSemaphoreTakeRecursive(pxMutex->xMutex, portMAX_DELAY);
     if(xMutexTakeStatus != pdTRUE) {
         LV_LOG_ERROR("xSemaphoreTake failed!");
         return LV_RESULT_INVALID;
@@ -159,7 +165,7 @@ lv_result_t lv_mutex_unlock(lv_mutex_t * pxMutex)
     /* If mutex in uninitialized, perform initialization. */
     prvCheckMutexInit(pxMutex);
 
-    BaseType_t xMutexGiveStatus = xSemaphoreGive(pxMutex->xMutex);
+    BaseType_t xMutexGiveStatus = xSemaphoreGiveRecursive(pxMutex->xMutex);
     if(xMutexGiveStatus != pdTRUE) {
         LV_LOG_ERROR("xSemaphoreGive failed!");
         return LV_RESULT_INVALID;
@@ -178,13 +184,8 @@ lv_result_t lv_mutex_delete(lv_mutex_t * pxMutex)
 
 lv_result_t lv_thread_sync_init(lv_thread_sync_t * pxCond)
 {
-#if USE_FREERTOS_TASK_NOTIFY
-    /* Store the handle of the calling task. */
-    pxCond->xTaskToNotify = xTaskGetCurrentTaskHandle();
-#else
     /* If the cond is uninitialized, perform initialization. */
     prvCheckCondInit(pxCond);
-#endif
 
     return LV_RESULT_OK;
 }
@@ -193,16 +194,29 @@ lv_result_t lv_thread_sync_wait(lv_thread_sync_t * pxCond)
 {
     lv_result_t lvRes = LV_RESULT_OK;
 
-#if USE_FREERTOS_TASK_NOTIFY
-    LV_UNUSED(pxCond);
-
-    /* Wait for other task to notify this task. */
-    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-#else
-    uint32_t ulLocalWaitingThreads;
-
     /* If the cond is uninitialized, perform initialization. */
     prvCheckCondInit(pxCond);
+
+#if LV_USE_FREERTOS_TASK_NOTIFY
+    TaskHandle_t xCurrentTaskHandle = xTaskGetCurrentTaskHandle();
+
+    _enter_critical();
+    BaseType_t xSyncSygnal = pxCond->xSyncSignal;
+    pxCond->xSyncSignal = pdFALSE;
+    if(xSyncSygnal == pdFALSE) {
+        /* The signal hasn't been sent yet. Tell the sender to notify this task */
+        pxCond->xTaskToNotify = xCurrentTaskHandle;
+    }
+    /* If we have a signal from the other task, we should not ask to be notified */
+    _exit_critical();
+
+    if(xSyncSygnal == pdFALSE) {
+        /* Wait for other task to notify this task. */
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    }
+    /* If the signal was received, no wait needs to be done */
+#else
+    uint32_t ulLocalWaitingThreads;
 
     /* Acquire the mutex. */
     xSemaphoreTake(pxCond->xSyncMutex, portMAX_DELAY);
@@ -260,13 +274,26 @@ lv_result_t lv_thread_sync_wait(lv_thread_sync_t * pxCond)
 
 lv_result_t lv_thread_sync_signal(lv_thread_sync_t * pxCond)
 {
-#if USE_FREERTOS_TASK_NOTIFY
-    /* Send a notification to the task waiting. */
-    xTaskNotifyGive(pxCond->xTaskToNotify);
-#else
     /* If the cond is uninitialized, perform initialization. */
     prvCheckCondInit(pxCond);
 
+#if LV_USE_FREERTOS_TASK_NOTIFY
+    _enter_critical();
+    TaskHandle_t xTaskToNotify = pxCond->xTaskToNotify;
+    pxCond->xTaskToNotify = NULL;
+    if(xTaskToNotify == NULL) {
+        /* No task waiting to be notified. Send this signal for later */
+        pxCond->xSyncSignal = pdTRUE;
+    }
+    /* If a task is already waiting, there is no need to set the sync signal */
+    _exit_critical();
+
+    if(xTaskToNotify != NULL) {
+        /* There is a task waiting. Send a notification to it */
+        xTaskNotifyGive(xTaskToNotify);
+    }
+    /* If there was no task waiting to be notified, we sent a signal for it to see later. */
+#else
     /* Acquire the mutex. */
     xSemaphoreTake(pxCond->xSyncMutex, portMAX_DELAY);
 
@@ -304,16 +331,14 @@ lv_result_t lv_thread_sync_signal(lv_thread_sync_t * pxCond)
 
 lv_result_t lv_thread_sync_delete(lv_thread_sync_t * pxCond)
 {
-#if USE_FREERTOS_TASK_NOTIFY
-    LV_UNUSED(pxCond);
-#else
+#if !LV_USE_FREERTOS_TASK_NOTIFY
     /* Cleanup all resources used by the cond. */
     vSemaphoreDelete(pxCond->xCondWaitSemaphore);
     vSemaphoreDelete(pxCond->xSyncMutex);
     pxCond->ulWaitingThreads = 0;
+#endif
     pxCond->xSyncSignal = pdFALSE;
     pxCond->xIsInitialized = pdFALSE;
-#endif
 
     return LV_RESULT_OK;
 }
@@ -321,16 +346,30 @@ lv_result_t lv_thread_sync_delete(lv_thread_sync_t * pxCond)
 lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * pxCond)
 {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-#if USE_FREERTOS_TASK_NOTIFY
-    /* Send a notification to the task waiting. */
-    vTaskNotifyGiveFromISR(pxCond->xTaskToNotify, &xHigherPriorityTaskWoken);
-    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-#else
-    /* If the cond is uninitialized, perform initialization. */
-    prvCheckCondInit(pxCond);
 
+    /* If the cond is uninitialized, perform initialization. */
+    prvCheckCondInitIsr(pxCond);
+
+#if LV_USE_FREERTOS_TASK_NOTIFY
+    uint32_t mask = _enter_critical_isr();
+    TaskHandle_t xTaskToNotify = pxCond->xTaskToNotify;
+    pxCond->xTaskToNotify = NULL;
+    if(xTaskToNotify == NULL) {
+        /* No task waiting to be notified. Send this signal for later */
+        pxCond->xSyncSignal = pdTRUE;
+    }
+    /* If a task is already waiting, there is no need to set the sync signal */
+    _exit_critical_isr(mask);
+
+    if(xTaskToNotify != NULL) {
+        /* There is a task waiting. Send a notification to it */
+        vTaskNotifyGiveFromISR(xTaskToNotify, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    }
+    /* If there was no task waiting to be notified, we sent a signal for it to see later. */
+#else
     /* Enter critical section to prevent preemption. */
-    _enter_critical();
+    uint32_t mask = _enter_critical_isr();
 
     pxCond->xSyncSignal = pdTRUE;
     BaseType_t xAnyHigherPriorityTaskWoken = pdFALSE;
@@ -341,11 +380,43 @@ lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * pxCond)
         xHigherPriorityTaskWoken |= xAnyHigherPriorityTaskWoken;
     }
 
-    _exit_critical();
+    _exit_critical_isr(mask);
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 #endif
 
     return LV_RESULT_OK;
+}
+
+
+void lv_freertos_task_switch_in(const char * name)
+{
+    if(lv_strcmp(name, "IDLE")) globals->freertos_idle_task_running = false;
+    else globals->freertos_idle_task_running = true;
+
+    globals->freertos_task_switch_timestamp = lv_tick_get();
+}
+
+void lv_freertos_task_switch_out(void)
+{
+    uint32_t elaps = lv_tick_elaps(globals->freertos_task_switch_timestamp);
+    if(globals->freertos_idle_task_running) globals->freertos_idle_time_sum += elaps;
+    else globals->freertos_non_idle_time_sum += elaps;
+}
+
+uint32_t lv_os_get_idle_percent(void)
+{
+    if(globals->freertos_non_idle_time_sum + globals->freertos_idle_time_sum == 0) {
+        LV_LOG_WARN("Not enough time elapsed to provide idle percentage");
+        return 0;
+    }
+
+    uint32_t pct = (globals->freertos_idle_time_sum * 100) / (globals->freertos_idle_time_sum +
+                                                              globals->freertos_non_idle_time_sum);
+
+    globals->freertos_non_idle_time_sum = 0;
+    globals->freertos_idle_time_sum = 0;
+
+    return pct;
 }
 
 /**********************
@@ -357,7 +428,7 @@ static void prvRunThread(void * pxArg)
     lv_thread_t * pxThread = (lv_thread_t *)pxArg;
 
     /* Run the thread routine. */
-    pxThread->pvStartRoutine((void *)pxThread->xTaskArg);
+    pxThread->pvStartRoutine((void *)pxThread->pTaskArg);
 
     vTaskDelete(NULL);
 }
@@ -396,9 +467,14 @@ static void prvCheckMutexInit(lv_mutex_t * pxMutex)
     }
 }
 
-#if !USE_FREERTOS_TASK_NOTIFY
 static void prvCondInit(lv_thread_sync_t * pxCond)
 {
+    pxCond->xIsInitialized = pdTRUE;
+    pxCond->xSyncSignal = pdFALSE;
+
+#if LV_USE_FREERTOS_TASK_NOTIFY
+    pxCond->xTaskToNotify = NULL;
+#else
     pxCond->xCondWaitSemaphore = xSemaphoreCreateCounting(ulMAX_COUNT, 0U);
 
     /* Ensure that the FreeRTOS semaphore was successfully created. */
@@ -419,14 +495,11 @@ static void prvCondInit(lv_thread_sync_t * pxCond)
 
     /* Condition variable successfully created. */
     pxCond->ulWaitingThreads = 0;
-    pxCond->xSyncSignal = pdFALSE;
-    pxCond->xIsInitialized = pdTRUE;
+#endif
 }
 
 static void prvCheckCondInit(lv_thread_sync_t * pxCond)
 {
-    BaseType_t xSemCreateStatus = pdTRUE;
-
     /* Check if the condition variable needs to be initialized. */
     if(pxCond->xIsInitialized == pdFALSE) {
         /* Cond initialization must be in a critical section to prevent two
@@ -445,6 +518,27 @@ static void prvCheckCondInit(lv_thread_sync_t * pxCond)
     }
 }
 
+static void prvCheckCondInitIsr(lv_thread_sync_t * pxCond)
+{
+    /* Check if the condition variable needs to be initialized. */
+    if(pxCond->xIsInitialized == pdFALSE) {
+        /* Cond initialization must be in a critical section to prevent two
+         * threads from initializing it at the same time. */
+        uint32_t mask = _enter_critical_isr();
+
+        /* Check again that the condition is still uninitialized, i.e. it wasn't
+         * initialized while this function was waiting to enter the critical
+         * section. */
+        if(pxCond->xIsInitialized == pdFALSE) {
+            prvCondInit(pxCond);
+        }
+
+        /* Exit the critical section. */
+        _exit_critical_isr(mask);
+    }
+}
+
+#if !LV_USE_FREERTOS_TASK_NOTIFY
 static void prvTestAndDecrement(lv_thread_sync_t * pxCond,
                                 uint32_t ulLocalWaitingThreads)
 {

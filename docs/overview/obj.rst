@@ -36,7 +36,7 @@ All object types share some basic attributes:
 You can set/get these attributes with ``lv_obj_set_...`` and
 ``lv_obj_get_...`` functions. For example:
 
-.. code:: c
+.. code-block:: c
 
    /*Set basic object attributes*/
    lv_obj_set_size(btn1, 100, 50);   /*Set a button's size*/
@@ -55,7 +55,7 @@ The object types have special attributes too. For example, a slider has
 For these special attributes, every object type may have unique API
 functions. For example for a slider:
 
-.. code:: c
+.. code-block:: c
 
    /*Set slider specific attributes*/
    lv_slider_set_range(slider1, 0, 100);                   /*Set the min. and max. values*/
@@ -87,7 +87,7 @@ it. Therefore, all positions are relative to the parent.
 
 .. image:: /misc/par_child1.png
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * parent = lv_obj_create(lv_screen_active());   /*Create a parent object on the current screen*/
    lv_obj_set_size(parent, 100, 80);                    /*Set the size of the parent*/
@@ -99,7 +99,7 @@ Modify the position of the parent:
 
 .. image:: /misc/par_child2.png
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_set_pos(parent, 50, 50); /*Move the parent. The child will move with it.*/
 
@@ -114,7 +114,7 @@ outside will not be visible.
 
 .. image:: /misc/par_child3.png
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_set_x(obj1, -30);    /*Move the child a little bit off the parent*/
 
@@ -137,7 +137,7 @@ currently attached sensors.
 
 Every widget has its own **create** function with a prototype like this:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * lv_<widget>_create(lv_obj_t * parent, <other parameters if any>);
 
@@ -150,7 +150,7 @@ type.
 There is a common **delete** function for all object types. It deletes
 the object and all of its children.
 
-.. code:: c
+.. code-block:: c
 
    void lv_obj_delete(lv_obj_t * obj);
 
@@ -167,6 +167,29 @@ using :cpp:expr:`lv_obj_clean(obj)`.
 You can use :cpp:expr:`lv_obj_delete_delayed(obj, 1000)` to delete an object after
 some time. The delay is expressed in milliseconds.
 
+Sometimes you're not sure whether an object was deleted and you need some way to
+check if it's still "alive". Anytime before the object is deleted, you can use
+cpp:expr:`lv_obj_null_on_delete(&obj)` to cause your object pointer to be set to ``NULL``
+when the object is deleted.
+
+Make sure the pointer variable itself stays valid until the object is deleted. Here
+is an example:
+
+.. code:: c
+
+   void some_timer_callback(lv_timer_t * t)
+   {
+      static lv_obj_t * my_label;
+      if(my_label == NULL) {
+         my_label = lv_label_create(lv_screen_active());
+         lv_obj_delete_delayed(my_label, 1000);
+         lv_obj_null_on_delete(&my_label);
+      }
+      else {
+         lv_obj_set_x(my_label, lv_obj_get_x(my_label) + 1);
+      }
+   }
+
 .. _objects_screens:
 
 Screens
@@ -178,7 +201,7 @@ Create screens
 The screens are special objects which have no parent object. So they can
 be created like:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * scr1 = lv_obj_create(NULL);
 

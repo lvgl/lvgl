@@ -1,5 +1,5 @@
 /**
- * @file lv_templ.h
+ * @file lv_tabview.h
  *
  */
 
@@ -68,6 +68,7 @@ void lv_tabview_set_tab_bar_position(lv_obj_t * obj, lv_dir_t dir);
 
 /**
  * Set the width or height of the tab bar
+ * @param obj       pointer to tabview widget
  * @param size      size of the tab bar in pixels or percentage.
  *                  will be used as width or height based on the position of the tab bar)
  */

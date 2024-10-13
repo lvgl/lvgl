@@ -41,7 +41,7 @@ The objects can be in the combination of the following states:
 - :cpp:enumerator:`LV_STATE_FOCUSED`: (0x0002) Focused via keypad or encoder or clicked via touchpad/mouse
 - :cpp:enumerator:`LV_STATE_FOCUS_KEY`: (0x0004) Focused via keypad or encoder but not via touchpad/mouse
 - :cpp:enumerator:`LV_STATE_EDITED`: (0x0008) Edit by an encoder
-- :cpp:enumerator:`LV_STATE_HOVERED`: (0x0010) Hovered by mouse (not supported now)
+- :cpp:enumerator:`LV_STATE_HOVERED`: (0x0010) Hovered by mouse
 - :cpp:enumerator:`LV_STATE_PRESSED`: (0x0020) Being pressed
 - :cpp:enumerator:`LV_STATE_SCROLLED`: (0x0040) Being scrolled
 - :cpp:enumerator:`LV_STATE_DISABLED`: (0x0080) Disabled state
@@ -194,7 +194,7 @@ be added or changed.
 Property set functions looks like this:
 ``lv_style_set_<property_name>(&style, <value>);`` For example:
 
-.. code:: c
+.. code-block:: c
 
    static lv_style_t style_btn;
    lv_style_init(&style_btn);
@@ -210,13 +210,13 @@ Property set functions looks like this:
 
 To remove a property use:
 
-.. code:: c
+.. code-block:: c
 
    lv_style_remove_prop(&style, LV_STYLE_BG_COLOR);
 
 To get a property's value from a style:
 
-.. code:: c
+.. code-block:: c
 
    lv_style_value_t v;
    lv_result_t res = lv_style_get_prop(&style, LV_STYLE_BG_COLOR, &v);
@@ -232,13 +232,13 @@ To get a property's value from a style:
 
 To reset a style (free all its data) use:
 
-.. code:: c
+.. code-block:: c
 
    lv_style_reset(&style);
 
 Styles can be built as ``const`` too to save RAM:
 
-.. code:: c
+.. code-block:: c
 
    const lv_style_const_prop_t style1_props[] = {
       LV_STYLE_CONST_WIDTH(50),
@@ -275,7 +275,7 @@ examples:
 
 Using :cpp:func:`lv_obj_add_style`:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_add_style(btn, &style_btn, 0);                     /*Default button style*/
    lv_obj_add_style(btn, &btn_red, LV_STATE_PRESSED);        /*Overwrite only some colors to red when pressed*/
@@ -296,7 +296,7 @@ place.
 
 Using :cpp:func:`lv_obj_replace_style`:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_add_style(btn, &style_btn, 0);                      /*Add a button style*/
    lv_obj_replace_style(btn, &style_btn, &new_style_btn, 0);  /*Replace the button style with a different one*/
@@ -341,7 +341,7 @@ To get a final value of property
   These functions use the object's current state and if no better candidate exists they return a default value.
   For example:
 
-.. code:: c
+.. code-block:: c
 
    lv_color_t color = lv_obj_get_style_bg_color(btn, LV_PART_MAIN);
 
@@ -365,7 +365,7 @@ Unlike in CSS, LVGL local styles can be assigned to states
 To set a local property use functions like
 ``lv_obj_set_style_<property_name>(obj, <value>, <selector>);``   For example:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_set_style_bg_color(slider, lv_color_red(), LV_PART_INDICATOR | LV_STATE_FOCUSED);
 
@@ -422,7 +422,7 @@ going back to default slowly.
 To describe a transition an :cpp:struct:`lv_transition_dsc_t` variable needs to be
 initialized and added to a style:
 
-.. code:: c
+.. code-block:: c
 
    /*Only its pointer is saved so must static, global or dynamically allocated */
    static const lv_style_prop_t trans_props[] = {
@@ -498,7 +498,7 @@ To set a theme for a display, two steps are required:
 Theme initialization functions can have different prototypes. This
 example shows how to set the "default" theme:
 
-.. code:: c
+.. code-block:: c
 
    lv_theme_t * th = lv_theme_default_init(display,  /*Use the DPI, size, etc from this display*/
                                            LV_COLOR_PALETTE_BLUE, LV_COLOR_PALETTE_CYAN,   /*Primary and secondary palette*/

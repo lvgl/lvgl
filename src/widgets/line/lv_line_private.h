@@ -27,8 +27,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Data of line*/
-struct lv_line_t {
+/** Data of line */
+struct _lv_line_t {
     lv_obj_t obj;
     union {
         const lv_point_precise_t * constant;

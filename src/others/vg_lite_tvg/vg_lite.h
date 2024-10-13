@@ -574,7 +574,7 @@ typedef unsigned int        vg_lite_color_t;
     typedef enum vg_lite_index_endian
     {
         VG_LITE_INDEX_LITTLE_ENDIAN,            /*! Parse the index pixel from low to high,
-                                                 *! when using index1, the parsing order is bit0~bit7. 
+                                                 *! when using index1, the parsing order is bit0~bit7.
                                                  *! when using index2, the parsing order is bit0:1,bit2:3,bit4:5.bit6:7.
                                                  *! when using index4, the parsing order is bit0:3,bit4:7.
                                                  */

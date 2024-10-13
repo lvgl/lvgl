@@ -1,3 +1,5 @@
+include("${CMAKE_CURRENT_LIST_DIR}/version.cmake")
+
 file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c ${LVGL_ROOT_DIR}/src/*.cpp)
 
 idf_build_get_property(LV_MICROPYTHON LV_MICROPYTHON)
@@ -67,4 +69,10 @@ target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_CONF_INCLUDE_SIMPLE")
 if(CONFIG_LV_ATTRIBUTE_FAST_MEM_USE_IRAM)
   target_compile_definitions(${COMPONENT_LIB}
                              PUBLIC "-DLV_ATTRIBUTE_FAST_MEM=IRAM_ATTR")
+endif()
+
+if(CONFIG_FREERTOS_SMP)
+    target_include_directories(${COMPONENT_LIB} PRIVATE "${IDF_PATH}/components/freertos/FreeRTOS-Kernel-SMP/include/freertos/")
+else()
+    target_include_directories(${COMPONENT_LIB} PRIVATE "${IDF_PATH}/components/freertos/FreeRTOS-Kernel/include/freertos/")
 endif()

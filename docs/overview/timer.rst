@@ -1,4 +1,4 @@
-.. _timer:
+.. _timers:
 
 ======
 Timers
@@ -7,7 +7,7 @@ Timers
 LVGL has a built-in timer system. You can register a function to have it
 be called periodically. The timers are handled and called in
 :cpp:func:`lv_timer_handler`, which needs to be called every few milliseconds.
-See `Porting </porting/timer-handler>`__ for more information.
+See `Porting <porting/timer-handler>`__ for more information.
 
 Timers are non-preemptive, which means a timer cannot interrupt another
 timer. Therefore, you can call any LVGL related function in a timer.
@@ -26,7 +26,7 @@ prototype.
 
 For example:
 
-.. code:: c
+.. code-block:: c
 
    void my_timer(lv_timer_t * timer)
    {
@@ -117,7 +117,7 @@ clear all asynchronous calls matching ``my_function`` and ``data_p``.
 
 For example:
 
-.. code:: c
+.. code-block:: c
 
    void my_screen_clean_up(void * scr)
    {

@@ -24,7 +24,7 @@ its children.
 
 .. image:: /misc/layers.png
 
-.. code:: c
+.. code-block:: c
 
    /*Create a screen*/
    lv_obj_t * scr = lv_obj_create(NULL, NULL);
@@ -66,8 +66,10 @@ There are four explicit ways to bring an object to the foreground:
 - Use :cpp:expr:`lv_obj_swap(obj1, obj2)` to swap the relative layer position of two objects.
 - When :cpp:expr:`lv_obj_set_parent(obj, new_parent)` is used, ``obj`` will be on the foreground of the ``new_parent``.
 
+
 Screen-like layers
 ******************
+
 .. _layers_top_and_sys:
 
 Top and sys layers
@@ -89,7 +91,7 @@ everywhere. For example, a menu bar, a pop-up, etc. If the ``click``
 attribute is enabled, then ``layer_top`` will absorb all user clicks and
 acts as a modal.
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
 
@@ -129,7 +131,7 @@ If there is no memory for a new chunk, LVGL will try allocating layer when anoth
 
 
 Transformed layer
----------------
+-----------------
 
 When the widget is transformed a larger part of the widget needs to rendered to provide enough data for transformation. LVGL tries to render as small area of the widget as possible, but due to the nature of transformations no slicing is possible in this case.
 

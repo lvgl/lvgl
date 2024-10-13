@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_draw.h"
+#include "lv_draw_rect.h"
 #include "../misc/lv_bidi.h"
 #include "../misc/lv_text.h"
 #include "../misc/lv_color.h"
@@ -52,6 +53,11 @@ typedef struct {
      * < 1: malloc buffer and copy `text` there.
      * 0: `text` is const and it's pointer will be valid during rendering.*/
     uint8_t text_local : 1;
+
+    /**
+     * Indicate that the text is constant and its pointer can be safely saved e.g. in a cache.
+     */
+    uint8_t text_static : 1;
     lv_draw_label_hint_t * hint;
 } lv_draw_label_dsc_t;
 

@@ -27,14 +27,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Data of pinyin_dict*/
-struct lv_pinyin_dict_t {
-    const char * const py;
-    const char * const py_mb;
-};
-
 /*Data of lv_ime_pinyin*/
-struct lv_ime_pinyin_t {
+struct _lv_ime_pinyin_t {
     lv_obj_t obj;
     lv_obj_t * kb;
     lv_obj_t * cand_panel;

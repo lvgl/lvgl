@@ -37,21 +37,13 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/*
- * Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
- * than unblocking a task using an intermediary object such as a binary semaphore.
- *
- * RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
- */
-#define USE_FREERTOS_TASK_NOTIFY 1
-
 /**********************
  *      TYPEDEFS
  **********************/
 
 typedef struct {
     void (*pvStartRoutine)(void *);       /**< Application thread function. */
-    void * xTaskArg;                      /**< Arguments for application thread function. */
+    void * pTaskArg;                      /**< Arguments for application thread function. */
     TaskHandle_t xTaskHandle;             /**< FreeRTOS task handle. */
 } lv_thread_t;
 
@@ -61,21 +53,44 @@ typedef struct {
 } lv_mutex_t;
 
 typedef struct {
-#if USE_FREERTOS_TASK_NOTIFY
-    TaskHandle_t xTaskToNotify;
-#else
     BaseType_t
     xIsInitialized;                       /**< Set to pdTRUE if this condition variable is initialized, pdFALSE otherwise. */
+    BaseType_t xSyncSignal;               /**< Set to pdTRUE if the thread is signaled, pdFALSE otherwise. */
+#if LV_USE_FREERTOS_TASK_NOTIFY
+    TaskHandle_t xTaskToNotify;           /**< The task waiting to be signalled. NULL if nothing is waiting. */
+#else
     SemaphoreHandle_t xCondWaitSemaphore; /**< Threads block on this semaphore in lv_thread_sync_wait. */
     uint32_t ulWaitingThreads;            /**< The number of threads currently waiting on this condition variable. */
     SemaphoreHandle_t xSyncMutex;         /**< Threads take this mutex before accessing the condition variable. */
-    BaseType_t xSyncSignal;               /**< Set to pdTRUE if the thread is signaled, pdFALSE otherwise. */
 #endif
 } lv_thread_sync_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Set it for `traceTASK_SWITCHED_IN()` as
+ * `lv_freertos_task_switch_in(pxCurrentTCB->pcTaskName)`
+ * to save the start time stamp of a task
+ * @param name      the name of the which is switched in
+ */
+void lv_freertos_task_switch_in(const char * name);
+
+/**
+ * Set it for `traceTASK_SWITCHED_OUT()` as
+ * `lv_freertos_task_switch_out()`
+ * to save finish time stamp of a task
+ */
+void lv_freertos_task_switch_out(void);
+
+/**
+ * Set it for `LV_SYSMON_GET_IDLE` to show the CPU usage
+ * as reported based the usage of FreeRTOS's idle task
+ * If it's important when a GPU is used.
+ * @return the idle percentage since the last call
+ */
+uint32_t lv_os_get_idle_percent(void);
 
 /**********************
  *      MACROS

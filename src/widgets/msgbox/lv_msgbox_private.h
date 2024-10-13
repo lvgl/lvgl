@@ -17,6 +17,7 @@ extern "C" {
 #include "lv_msgbox.h"
 
 #if LV_USE_MSGBOX
+#include "../../core/lv_obj_private.h"
 
 /*********************
  *      DEFINES
@@ -30,7 +31,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_msgbox_t {
+struct _lv_msgbox_t {
     lv_obj_t obj;
     lv_obj_t * header;
     lv_obj_t * content;

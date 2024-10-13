@@ -107,7 +107,7 @@ void lv_keyboard_set_popovers(lv_obj_t * kb, bool en);
  * @param ctrl_map  See 'lv_buttonmatrix_set_ctrl_map()' for more info.
 
  */
-void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * map[],
+void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * const map[],
                          const lv_buttonmatrix_ctrl_t ctrl_map[]);
 
 /*=====================
@@ -140,7 +140,7 @@ bool lv_keyboard_get_popovers(const lv_obj_t * obj);
  * @param kb        pointer to a keyboard object
  * @return          the current map
  */
-const char ** lv_keyboard_get_map_array(const lv_obj_t * kb);
+const char * const * lv_keyboard_get_map_array(const lv_obj_t * kb);
 
 /**
  * Get the index of the lastly "activated" button by the user (pressed, released, focused etc)

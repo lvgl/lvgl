@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 
 #include "lv_draw_sw.h"
+#include "../lv_draw_private.h"
 
 #if LV_USE_DRAW_SW
 
@@ -30,7 +31,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_draw_sw_unit_t {
+struct _lv_draw_sw_unit_t {
     lv_draw_unit_t base_unit;
     lv_draw_task_t * task_act;
 #if LV_USE_OS

@@ -253,7 +253,6 @@ static void profile_create(lv_obj_t * parent)
     LV_IMAGE_DECLARE(img_demo_widgets_avatar);
     lv_obj_t * avatar = lv_image_create(panel1);
     lv_image_set_src(avatar, &img_demo_widgets_avatar);
-    //    lv_image_set_src(avatar, "A:lvgl/demos/widgets/assets/avatar.png")
 
     lv_obj_t * name = lv_label_create(panel1);
     lv_label_set_text(name, "Elena Smith");
@@ -998,11 +997,11 @@ void shop_create(lv_obj_t * parent)
     lv_obj_add_style(title, &style_title, 0);
 
     LV_IMAGE_DECLARE(img_clothes);
-    create_shop_item(list, &img_clothes, "Blue jeans", "Clothes", "$722");
-    create_shop_item(list, &img_clothes, "Blue jeans", "Clothes", "$411");
-    create_shop_item(list, &img_clothes, "Blue jeans", "Clothes", "$917");
-    create_shop_item(list, &img_clothes, "Blue jeans", "Clothes", "$64");
-    create_shop_item(list, &img_clothes, "Blue jeans", "Clothes", "$805");
+    create_shop_item(list, &img_clothes, "Blue T-shirt", "Clothes", "$722");
+    create_shop_item(list, &img_clothes, "Blue T-shirt", "Clothes", "$411");
+    create_shop_item(list, &img_clothes, "Blue T-shirt", "Clothes", "$917");
+    create_shop_item(list, &img_clothes, "Blue T-shirt", "Clothes", "$64");
+    create_shop_item(list, &img_clothes, "Blue T-shirt", "Clothes", "$805");
 
     lv_obj_t * notifications = lv_obj_create(parent);
     if(disp_size == DISP_SMALL) {

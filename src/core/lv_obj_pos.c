@@ -296,7 +296,7 @@ void lv_obj_update_layout(const lv_obj_t * obj)
         LV_LOG_TRACE("Already running, returning");
         return;
     }
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_LAYOUT_BEGIN;
     update_layout_mutex = true;
 
     lv_obj_t * scr = lv_obj_get_screen(obj);
@@ -309,7 +309,7 @@ void lv_obj_update_layout(const lv_obj_t * obj)
     }
 
     update_layout_mutex = false;
-    LV_PROFILER_END;
+    LV_PROFILER_LAYOUT_END;
 }
 
 void lv_obj_set_align(lv_obj_t * obj, lv_align_t align)
@@ -821,11 +821,19 @@ void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
     lv_area_copy(&area_tmp, area);
 
     if(!lv_obj_area_is_visible(obj, &area_tmp)) return;
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    /**
+     * When using the global matrix, the vertex coordinates of clip_area lose precision after transformation,
+     * which can be solved by expanding the redrawing area.
+     */
+    lv_area_increase(&area_tmp, 5, 5);
+#else
     if(obj->spec_attr && obj->spec_attr->layer_type == LV_LAYER_TYPE_TRANSFORM) {
         /*Make the area slightly larger to avoid rounding errors.
          *5 is an empirical value*/
         lv_area_increase(&area_tmp, 5, 5);
     }
+#endif
 
     lv_inv_area(lv_obj_get_display(obj),  &area_tmp);
 }
@@ -1038,7 +1046,7 @@ static int32_t calc_content_width(lv_obj_t * obj)
                     default:
                         /* Consider other cases only if x=0 and use the width of the object.
                          * With x!=0 circular dependency could occur. */
-                        if(lv_obj_get_style_y(child, 0) == 0) {
+                        if(lv_obj_get_style_x(child, 0) == 0) {
                             child_res_tmp = lv_area_get_width(&child->coords) + space_left;
                             child_res_tmp += lv_obj_get_style_margin_right(child, LV_PART_MAIN);
                         }
