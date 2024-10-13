@@ -5,7 +5,7 @@
 /**
  * A simple round scale with label/tick translation
  */
-void lv_example_scale_8(lvvoid)
+void lv_example_scale_8(void)
 {
     lv_obj_t * scale_line = lv_scale_create(lv_screen_active());
 
