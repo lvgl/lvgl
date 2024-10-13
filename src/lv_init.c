@@ -63,6 +63,9 @@
 #if LV_USE_DRAW_DMA2D
     #include "draw/dma2d/lv_draw_dma2d.h"
 #endif
+#if LV_USE_DRAW_OPENGLES
+    #include "draw/opengles/lv_draw_opengles.h"
+#endif
 #if LV_USE_WINDOWS
     #include "drivers/windows/lv_windows_context.h"
 #endif
@@ -226,6 +229,10 @@ void lv_init(void)
 
 #if LV_USE_DRAW_DMA2D
     lv_draw_dma2d_init();
+#endif
+
+#if LV_USE_DRAW_OPENGLES
+    lv_draw_opengles_init();
 #endif
 
 #if LV_USE_WINDOWS
@@ -419,6 +426,10 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_DMA2D
     lv_draw_dma2d_deinit();
+#endif
+
+#if LV_USE_DRAW_OPENGLES
+    lv_draw_opengles_deinit();
 #endif
 
 #if LV_USE_DRAW_SW

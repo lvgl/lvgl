@@ -831,7 +831,7 @@
     #endif
 #endif
 
-/* Accelerate blends, fills, etc. with STM32 DMA2D */
+/** Accelerate blends, fills, etc. with STM32 DMA2D */
 #ifndef LV_USE_DRAW_DMA2D
     #ifdef CONFIG_LV_USE_DRAW_DMA2D
         #define LV_USE_DRAW_DMA2D CONFIG_LV_USE_DRAW_DMA2D
@@ -858,6 +858,15 @@
         #else
             #define LV_USE_DRAW_DMA2D_INTERRUPT 0
         #endif
+    #endif
+#endif
+
+/** Draw using cached OpenGLES textures */
+#ifndef LV_USE_DRAW_OPENGLES
+    #ifdef CONFIG_LV_USE_DRAW_OPENGLES
+        #define LV_USE_DRAW_OPENGLES CONFIG_LV_USE_DRAW_OPENGLES
+    #else
+        #define LV_USE_DRAW_OPENGLES 0
     #endif
 #endif
 
