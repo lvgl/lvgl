@@ -10,7 +10,7 @@ However, in the following conditions it's valid to call LVGL related
 functions:
 
 - In *events*. Learn more in :ref:`events`.
-- In *lv_timer*. Learn more in :ref:`timer`.
+- In *lv_timer*. Learn more in :ref:`timers`.
 
 Tasks and threads
 -----------------
@@ -23,6 +23,7 @@ you can use LVGL in a real multitasking environment. Just make use of a
 mutex to avoid the concurrent calling of LVGL functions.
 
 LVGL has a built-in mutex which can be used with:
+
 - :cpp:func:`lv_lock()` and :cpp:func:`lv_lock_isr()`
 - :cpp:func:`lv_unlock()`
 
@@ -35,7 +36,7 @@ than ``LV_OS_NONE``.
 
 Here is some pseudocode to illustrate the concept:
 
-.. code:: c
+.. code-block:: c
 
    void lvgl_thread(void)
    {

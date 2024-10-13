@@ -24,7 +24,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_theme_t {
+struct _lv_theme_t {
     lv_theme_apply_cb_t apply_cb;
     lv_theme_t * parent;            /**< Apply the current theme's style on top of this theme. */
     void * user_data;

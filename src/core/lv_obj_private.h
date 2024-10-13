@@ -28,7 +28,7 @@ extern "C" {
  * Special, rarely used attributes.
  * They are allocated automatically if any elements is set.
  */
-struct lv_obj_spec_attr_t {
+struct _lv_obj_spec_attr_t {
     lv_obj_t ** children;           /**< Store the pointer of the children in an array.*/
     lv_group_t * group_p;
     lv_event_list_t event_list;
@@ -46,7 +46,7 @@ struct lv_obj_spec_attr_t {
     uint16_t layer_type : 2;        /**< Cache the layer type here. Element of lv_intermediate_layer_type_t */
 };
 
-struct lv_obj_t {
+struct _lv_obj_t {
     const lv_obj_class_t * class_p;
     lv_obj_t * parent;
     lv_obj_spec_attr_t * spec_attr;

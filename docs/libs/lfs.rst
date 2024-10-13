@@ -19,7 +19,8 @@ When enabled :c:macro:`lv_littlefs_set_handler` can be used to set up a mount po
 Example
 -------
 
-.. code:: c
+.. code-block:: c
+
     #include "lfs.h"
 
     // configuration of the filesystem is provided by this struct

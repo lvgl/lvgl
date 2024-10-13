@@ -43,7 +43,7 @@ static void lv_refr_join_area(void);
 static void refr_invalid_areas(void);
 static void refr_sync_areas(void);
 static void refr_area(const lv_area_t * area_p);
-static void refr_area_part(lv_layer_t * layer);
+static void refr_configured_layer(lv_layer_t * layer);
 static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj);
 static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj);
 static void refr_obj(lv_layer_t * layer, lv_obj_t * obj);
@@ -347,7 +347,7 @@ void lv_refr_set_disp_refreshing(lv_display_t * disp)
 
 void lv_display_refr_timer(lv_timer_t * tmr)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_REFR_BEGIN;
     LV_TRACE_REFR("begin");
 
     if(tmr) {
@@ -355,7 +355,7 @@ void lv_display_refr_timer(lv_timer_t * tmr)
         /* Ensure the timer does not run again automatically.
          * This is done before refreshing in case refreshing invalidates something else.
          * However if the performance monitor is enabled keep the timer running to count the FPS.*/
-#if LV_USE_PERF_MONITOR
+#if !LV_USE_PERF_MONITOR
         lv_timer_pause(tmr);
 #endif
     }
@@ -365,26 +365,28 @@ void lv_display_refr_timer(lv_timer_t * tmr)
 
     if(disp_refr == NULL) {
         LV_LOG_WARN("No display registered");
+        LV_PROFILER_REFR_END;
         return;
     }
 
     lv_draw_buf_t * buf_act = disp_refr->buf_act;
     if(!(buf_act && buf_act->data && buf_act->data_size)) {
         LV_LOG_WARN("No draw buffer");
+        LV_PROFILER_REFR_END;
         return;
     }
 
     lv_display_send_event(disp_refr, LV_EVENT_REFR_START, NULL);
 
     /*Refresh the screen's layout if required*/
-    LV_PROFILER_BEGIN_TAG("layout");
+    LV_PROFILER_LAYOUT_BEGIN_TAG("layout");
     lv_obj_update_layout(disp_refr->act_scr);
     if(disp_refr->prev_scr) lv_obj_update_layout(disp_refr->prev_scr);
 
     lv_obj_update_layout(disp_refr->bottom_layer);
     lv_obj_update_layout(disp_refr->top_layer);
     lv_obj_update_layout(disp_refr->sys_layer);
-    LV_PROFILER_END_TAG("layout");
+    LV_PROFILER_LAYOUT_END_TAG("layout");
 
     /*Do nothing if there is no active screen*/
     if(disp_refr->act_scr == NULL) {
@@ -428,7 +430,7 @@ refr_finish:
     lv_display_send_event(disp_refr, LV_EVENT_REFR_READY, NULL);
 
     LV_TRACE_REFR("finished");
-    LV_PROFILER_END;
+    LV_PROFILER_REFR_END;
 }
 
 /**********************
@@ -440,7 +442,7 @@ refr_finish:
  */
 static void lv_refr_join_area(void)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_REFR_BEGIN;
     uint32_t join_from;
     uint32_t join_in;
     lv_area_t joined_area;
@@ -471,7 +473,7 @@ static void lv_refr_join_area(void)
             }
         }
     }
-    LV_PROFILER_END;
+    LV_PROFILER_REFR_END;
 }
 
 /**
@@ -488,7 +490,7 @@ static void refr_sync_areas(void)
     /*Do not sync if no sync areas*/
     if(lv_ll_is_empty(&disp_refr->sync_areas)) return;
 
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_REFR_BEGIN;
     /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
     /*We need to wait for ready here to not mess up the active screen*/
     wait_for_flushing(disp_refr);
@@ -549,7 +551,7 @@ static void refr_sync_areas(void)
 
     /*Clear sync areas*/
     lv_ll_clear(&disp_refr->sync_areas);
-    LV_PROFILER_END;
+    LV_PROFILER_REFR_END;
 }
 
 /**
@@ -558,7 +560,7 @@ static void refr_sync_areas(void)
 static void refr_invalid_areas(void)
 {
     if(disp_refr->inv_p == 0) return;
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_REFR_BEGIN;
 
     /*Find the last area which will be drawn*/
     int32_t i;
@@ -579,16 +581,55 @@ static void refr_invalid_areas(void)
 
     for(i = 0; i < (int32_t)disp_refr->inv_p; i++) {
         /*Refresh the unjoined areas*/
-        if(disp_refr->inv_area_joined[i] == 0) {
+        if(disp_refr->inv_area_joined[i]) continue;
 
-            if(i == last_i) disp_refr->last_area = 1;
-            disp_refr->last_part = 0;
+        if(i == last_i) disp_refr->last_area = 1;
+        disp_refr->last_part = 0;
+
+        lv_area_t inv_a = disp_refr->inv_areas[i];
+        if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+            /*Calculate the max row num*/
+            int32_t w = lv_area_get_width(&inv_a);
+            int32_t h = lv_area_get_height(&inv_a);
+
+            int32_t max_row = get_max_row(disp_refr, w, h);
+
+            int32_t row;
+            int32_t row_last = 0;
+            lv_area_t sub_area;
+            sub_area.x1 = inv_a.x1;
+            sub_area.x2 = inv_a.x2;
+            for(row = inv_a.y1; row + max_row - 1 <= inv_a.y2; row += max_row) {
+                /*Calc. the next y coordinates of draw_buf*/
+                sub_area.y1 = row;
+                sub_area.y2 = row + max_row - 1;
+                if(sub_area.y2 > inv_a.y2) sub_area.y2 = inv_a.y2;
+                row_last = sub_area.y2;
+                if(inv_a.y2 == row_last) disp_refr->last_part = 1;
+                refr_area(&sub_area);
+                draw_buf_flush(disp_refr);
+            }
+
+            /*If the last y coordinates are not handled yet ...*/
+            if(inv_a.y2 != row_last) {
+                /*Calc. the next y coordinates of draw_buf*/
+                sub_area.y1 = row;
+                sub_area.y2 = inv_a.y2;
+                disp_refr->last_part = 1;
+                refr_area(&sub_area);
+                draw_buf_flush(disp_refr);
+            }
+        }
+        else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL ||
+                disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
+            disp_refr->last_part = 1;
             refr_area(&disp_refr->inv_areas[i]);
+            draw_buf_flush(disp_refr);
         }
     }
 
     disp_refr->rendering_in_progress = false;
-    LV_PROFILER_END;
+    LV_PROFILER_REFR_END;
 }
 
 /**
@@ -613,94 +654,114 @@ static void layer_reshape_draw_buf(lv_layer_t * layer, uint32_t stride)
  */
 static void refr_area(const lv_area_t * area_p)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_REFR_BEGIN;
     lv_layer_t * layer = disp_refr->layer_head;
     layer->draw_buf = disp_refr->buf_act;
+    layer->_clip_area = *area_p;
+    layer->phy_clip_area = *area_p;
 
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-    lv_matrix_identity(&layer->matrix);
-#endif
+    if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
+        /*In full mode the area is always the full screen, so the buffer area to it too*/
+        layer->buf_area = *area_p;
+        layer_reshape_draw_buf(layer, layer->draw_buf->header.stride);
 
-    /*With full refresh just redraw directly into the buffer*/
-    /*In direct mode draw directly on the absolute coordinates of the buffer*/
-    if(disp_refr->render_mode != LV_DISPLAY_RENDER_MODE_PARTIAL) {
+    }
+    else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+        /*In partial mode render this area to the buffer*/
+        layer->buf_area = *area_p;
+        layer_reshape_draw_buf(layer, LV_STRIDE_AUTO);
+    }
+    else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
+        /*In direct mode the the buffer area is always the whole screen*/
         layer->buf_area.x1 = 0;
         layer->buf_area.y1 = 0;
         layer->buf_area.x2 = lv_display_get_horizontal_resolution(disp_refr) - 1;
         layer->buf_area.y2 = lv_display_get_vertical_resolution(disp_refr) - 1;
-        lv_area_t disp_area;
-        lv_area_set(&disp_area, 0, 0, lv_display_get_horizontal_resolution(disp_refr) - 1,
-                    lv_display_get_vertical_resolution(disp_refr) - 1);
+        layer_reshape_draw_buf(layer, layer->draw_buf->header.stride);
+    }
 
-        if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
-            disp_refr->last_part = 1;
-            layer_reshape_draw_buf(layer, layer->draw_buf->header.stride);
-            layer->_clip_area = disp_area;
-            layer->phy_clip_area = disp_area;
-            refr_area_part(layer);
+    /*Try to divide the area to smaller tiles*/
+    uint32_t tile_cnt = 1;
+    int32_t tile_h = lv_area_get_height(area_p);
+    if(LV_COLOR_FORMAT_IS_INDEXED(layer->color_format) == false) {
+        /* Assume that the the buffer size (can be screen sized or smaller in case of partial mode)
+         * and max tile size are the optimal scenario. From this calculate the ideal tile size
+         * and set the tile count and tile height accordingly.
+         */
+        uint32_t max_tile_cnt = disp_refr->tile_cnt;
+        uint32_t total_buf_size = layer->draw_buf->data_size;
+        uint32_t ideal_tile_size = total_buf_size / max_tile_cnt;
+        uint32_t area_buf_size = lv_area_get_size(area_p) * lv_color_format_get_size(layer->color_format);
+
+        tile_cnt = (area_buf_size + (ideal_tile_size - 1)) / ideal_tile_size; /*Round up*/
+        tile_h = lv_area_get_height(area_p) / tile_cnt;
+    }
+
+    if(tile_cnt == 1) {
+        refr_configured_layer(layer);
+    }
+    else {
+        /* Don't draw to the layers buffer of the display but create smaller dummy layers which are using the
+         * display's layer buffer. These will be the tiles. By using tiles it's more likely that there will
+         * be independent areas for each draw unit. */
+        lv_layer_t * tile_layers = lv_malloc(tile_cnt * sizeof(lv_layer_t));
+        LV_ASSERT_MALLOC(tile_layers);
+        if(tile_layers == NULL) {
+            disp_refr->refreshed_area = *area_p;
+            LV_PROFILER_REFR_END;
+            return;
         }
-        else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
-            disp_refr->last_part = disp_refr->last_area;
-            layer_reshape_draw_buf(layer, layer->draw_buf->header.stride);
-            layer->_clip_area = *area_p;
-            layer->phy_clip_area = *area_p;
-            refr_area_part(layer);
+        uint32_t i;
+        for(i = 0; i < tile_cnt; i++) {
+            lv_area_t tile_area;
+            lv_area_set(&tile_area, area_p->x1, area_p->y1 + i * tile_h,
+                        area_p->x2, area_p->y1 + (i + 1) * tile_h - 1);
+
+            if(i == tile_cnt - 1) {
+                tile_area.y2 = area_p->y2;
+            }
+
+            lv_layer_t * tile_layer = &tile_layers[i];
+            lv_draw_layer_init(tile_layer, NULL, layer->color_format, &tile_area);
+            tile_layer->buf_area = layer->buf_area; /*the buffer is still large*/
+            tile_layer->draw_buf = layer->draw_buf;
+            refr_configured_layer(tile_layer);
         }
-        LV_PROFILER_END;
-        return;
+
+
+        /*Wait until all tiles are ready and destroy remove them*/
+        for(i = 0; i < tile_cnt; i++) {
+            lv_layer_t * tile_layer = &tile_layers[i];
+            while(tile_layer->draw_task_head) {
+                lv_draw_dispatch_wait_for_request();
+                lv_draw_dispatch();
+            }
+
+            lv_layer_t * layer_i = disp_refr->layer_head;
+            while(layer_i) {
+                if(layer_i->next == tile_layer) {
+                    layer_i->next = tile_layer->next;
+                    break;
+                }
+                layer_i = layer_i->next;
+            }
+
+            if(disp_refr->layer_deinit) disp_refr->layer_deinit(disp_refr, tile_layer);
+        }
+        lv_free(tile_layers);
     }
 
-    /*Normal refresh: draw the area in parts*/
-    /*Calculate the max row num*/
-    int32_t w = lv_area_get_width(area_p);
-    int32_t h = lv_area_get_height(area_p);
-    int32_t y2 = area_p->y2 >= lv_display_get_vertical_resolution(disp_refr) ?
-                 lv_display_get_vertical_resolution(disp_refr) - 1 : area_p->y2;
-
-    int32_t max_row = get_max_row(disp_refr, w, h);
-
-    int32_t row;
-    int32_t row_last = 0;
-    lv_area_t sub_area;
-    for(row = area_p->y1; row + max_row - 1 <= y2; row += max_row) {
-        /*Calc. the next y coordinates of draw_buf*/
-        sub_area.x1 = area_p->x1;
-        sub_area.x2 = area_p->x2;
-        sub_area.y1 = row;
-        sub_area.y2 = row + max_row - 1;
-        layer->draw_buf = disp_refr->buf_act;
-        layer->buf_area = sub_area;
-        layer->_clip_area = sub_area;
-        layer->phy_clip_area = sub_area;
-        layer_reshape_draw_buf(layer, LV_STRIDE_AUTO);
-        if(sub_area.y2 > y2) sub_area.y2 = y2;
-        row_last = sub_area.y2;
-        if(y2 == row_last) disp_refr->last_part = 1;
-        refr_area_part(layer);
-    }
-
-    /*If the last y coordinates are not handled yet ...*/
-    if(y2 != row_last) {
-        /*Calc. the next y coordinates of draw_buf*/
-        sub_area.x1 = area_p->x1;
-        sub_area.x2 = area_p->x2;
-        sub_area.y1 = row;
-        sub_area.y2 = y2;
-        layer->draw_buf = disp_refr->buf_act;
-        layer->buf_area = sub_area;
-        layer->_clip_area = sub_area;
-        layer->phy_clip_area = sub_area;
-        layer_reshape_draw_buf(layer, LV_STRIDE_AUTO);
-        disp_refr->last_part = 1;
-        refr_area_part(layer);
-    }
-    LV_PROFILER_END;
+    disp_refr->refreshed_area = *area_p;
+    LV_PROFILER_REFR_END;
 }
 
-static void refr_area_part(lv_layer_t * layer)
+static void refr_configured_layer(lv_layer_t * layer)
 {
-    LV_PROFILER_BEGIN;
-    disp_refr->refreshed_area = layer->_clip_area;
+    LV_PROFILER_REFR_BEGIN;
+
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    lv_matrix_identity(&layer->matrix);
+#endif
 
     /* In single buffered mode wait here until the buffer is freed.
      * Else we would draw into the buffer while it's still being transferred to the display*/
@@ -709,13 +770,7 @@ static void refr_area_part(lv_layer_t * layer)
     }
     /*If the screen is transparent initialize it when the flushing is ready*/
     if(lv_color_format_has_alpha(disp_refr->color_format)) {
-        lv_area_t a = disp_refr->refreshed_area;
-        if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-            /*The area always starts at 0;0*/
-            lv_area_move(&a, -disp_refr->refreshed_area.x1, -disp_refr->refreshed_area.y1);
-        }
-
-        lv_draw_buf_clear(layer->draw_buf, &a);
+        lv_draw_buf_clear(layer->draw_buf, &layer->_clip_area);
     }
 
     lv_obj_t * top_act_scr = NULL;
@@ -757,8 +812,7 @@ static void refr_area_part(lv_layer_t * layer)
     refr_obj_and_children(layer, lv_display_get_layer_top(disp_refr));
     refr_obj_and_children(layer, lv_display_get_layer_sys(disp_refr));
 
-    draw_buf_flush(disp_refr);
-    LV_PROFILER_END;
+    LV_PROFILER_REFR_END;
 }
 
 /**
@@ -815,7 +869,7 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
     if(top_obj == NULL) top_obj = lv_display_get_screen_active(disp_refr);
     if(top_obj == NULL) return;  /*Shouldn't happen*/
 
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_REFR_BEGIN;
     /*Refresh the top object and its children*/
     refr_obj(layer, top_obj);
 
@@ -852,7 +906,7 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
         /*Go a level deeper*/
         parent = lv_obj_get_parent(parent);
     }
-    LV_PROFILER_END;
+    LV_PROFILER_REFR_END;
 }
 
 static lv_result_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_type_t layer_type,
@@ -1190,7 +1244,7 @@ static void draw_buf_flush(lv_display_t * disp)
 
 static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_REFR_BEGIN;
     LV_TRACE_REFR("Calling flush_cb on (%d;%d)(%d;%d) area with %p image pointer",
                   (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2, (void *)px_map);
 
@@ -1211,12 +1265,12 @@ static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t *
     disp->flush_cb(disp, &offset_area, px_map);
     lv_display_send_event(disp, LV_EVENT_FLUSH_FINISH, &offset_area);
 
-    LV_PROFILER_END;
+    LV_PROFILER_REFR_END;
 }
 
 static void wait_for_flushing(lv_display_t * disp)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_REFR_BEGIN;
     LV_LOG_TRACE("begin");
 
     lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_START, NULL);
@@ -1235,5 +1289,5 @@ static void wait_for_flushing(lv_display_t * disp)
     lv_display_send_event(disp, LV_EVENT_FLUSH_WAIT_FINISH, NULL);
 
     LV_LOG_TRACE("end");
-    LV_PROFILER_END;
+    LV_PROFILER_REFR_END;
 }

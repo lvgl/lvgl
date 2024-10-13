@@ -250,6 +250,8 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 
     if(style->prop_cnt == 0)  return false;
 
+    LV_PROFILER_STYLE_BEGIN;
+
     uint8_t * tmp = (lv_style_prop_t *)style->values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
     uint8_t * old_props = (uint8_t *)tmp;
     uint32_t i;
@@ -259,7 +261,11 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 
             size_t size = (style->prop_cnt - 1) * (sizeof(lv_style_value_t) + sizeof(lv_style_prop_t));
             uint8_t * new_values_and_props = lv_malloc(size);
-            if(new_values_and_props == NULL) return false;
+            if(new_values_and_props == NULL) {
+                LV_PROFILER_STYLE_END;
+                return false;
+            }
+
             style->values_and_props = new_values_and_props;
             style->prop_cnt--;
 
@@ -277,10 +283,12 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
             }
 
             lv_free(old_values);
+            LV_PROFILER_STYLE_END;
             return true;
         }
     }
 
+    LV_PROFILER_STYLE_END;
     return false;
 }
 
@@ -294,7 +302,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
     }
 
     LV_ASSERT(prop != LV_STYLE_PROP_INV);
-
+    LV_PROFILER_STYLE_BEGIN;
     lv_style_prop_t * props;
     int32_t i;
 
@@ -304,6 +312,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
             if(props[i] == prop) {
                 lv_style_value_t * values = (lv_style_value_t *)style->values_and_props;
                 values[i] = value;
+                LV_PROFILER_STYLE_END;
                 return;
             }
         }
@@ -311,7 +320,11 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 
     size_t size = (style->prop_cnt + 1) * (sizeof(lv_style_value_t) + sizeof(lv_style_prop_t));
     uint8_t * values_and_props = lv_realloc(style->values_and_props, size);
-    if(values_and_props == NULL) return;
+    if(values_and_props == NULL) {
+        LV_PROFILER_STYLE_END;
+        return;
+    }
+
     style->values_and_props = values_and_props;
 
     props = values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
@@ -331,6 +344,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 
     uint32_t group = lv_style_get_prop_group(prop);
     style->has_group |= (uint32_t)1 << group;
+    LV_PROFILER_STYLE_END;
 }
 
 lv_style_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)

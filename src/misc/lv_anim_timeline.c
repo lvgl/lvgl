@@ -28,7 +28,7 @@ typedef struct {
 } lv_anim_timeline_dsc_t;
 
 /*Data of anim_timeline*/
-struct lv_anim_timeline_t {
+struct _lv_anim_timeline_t {
     lv_anim_timeline_dsc_t * anim_dsc;  /**< Dynamically allocated anim dsc array*/
     uint32_t anim_dsc_cnt;              /**< The length of anim dsc array*/
     uint32_t act_time;                  /**< Current time of the animation*/
@@ -205,10 +205,6 @@ static void anim_timeline_set_act_time(lv_anim_timeline_t * at, uint32_t act_tim
     for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
         lv_anim_timeline_dsc_t * anim_dsc = &(at->anim_dsc[i]);
         lv_anim_t * a = &(anim_dsc->anim);
-
-        if(a->exec_cb == NULL && a->custom_exec_cb == NULL) {
-            continue;
-        }
 
         uint32_t start_time = anim_dsc->start_time;
         int32_t value = 0;

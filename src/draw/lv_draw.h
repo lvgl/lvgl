@@ -67,7 +67,7 @@ typedef enum {
     LV_DRAW_TASK_STATE_READY,
 } lv_draw_task_state_t;
 
-struct lv_layer_t  {
+struct _lv_layer_t  {
 
     /** Target draw buffer of the layer*/
     lv_draw_buf_t * draw_buf;
@@ -212,13 +212,24 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
 uint32_t lv_draw_get_dependent_count(lv_draw_task_t * t_check);
 
 /**
- * Create a new layer on a parent layer
+ * Create (allocate) a new layer on a parent layer
  * @param parent_layer      the parent layer to which the layer will be merged when it's rendered
  * @param color_format      the color format of the layer
  * @param area              the areas of the layer (absolute coordinates)
  * @return                  the new target_layer or NULL on error
  */
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area);
+
+/**
+ * Initialize a layer which is allocated by the user
+ * @param layer             pointer the layer to initialize (its lifetime needs to be managed by the user)
+ * @param parent_layer      the parent layer to which the layer will be merged when it's rendered
+ * @param color_format      the color format of the layer
+ * @param area              the areas of the layer (absolute coordinates)
+ * @return                  the new target_layer or NULL on error
+ */
+void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_format_t color_format,
+                        const lv_area_t * area);
 
 /**
  * Try to allocate a buffer for the layer.

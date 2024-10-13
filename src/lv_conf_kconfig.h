@@ -18,6 +18,16 @@ extern "C" {
 
 #  ifdef __NuttX__
 #    include <nuttx/config.h>
+/*
+ * Make sure version number in Kconfig file is correctly set.
+ * Mismatch can happen when user manually copy lvgl/Kconfig file to their project, like what NuttX does.
+ */
+#    include "../lv_version.h"
+
+#    if CONFIG_LVGL_VERSION_MAJOR != LVGL_VERSION_MAJOR || CONFIG_LVGL_VERSION_MINOR != LVGL_VERSION_MINOR \
+        || CONFIG_LVGL_VERSION_PATCH != LVGL_VERSION_PATCH
+#        warning "Version mismatch between Kconfig and lvgl/lv_version.h"
+#    endif
 #  elif defined(__RTTHREAD__)
 #    define LV_CONF_INCLUDE_SIMPLE
 #    include <lv_rt_thread_conf.h>

@@ -85,7 +85,7 @@ typedef void (*lv_draw_buf_cache_operation_cb)(const lv_draw_buf_t * draw_buf, c
 
 typedef uint32_t (*lv_draw_buf_width_to_stride_cb)(uint32_t w, lv_color_format_t color_format);
 
-struct lv_draw_buf_t {
+struct _lv_draw_buf_t {
     lv_image_header_t header;
     uint32_t data_size;       /**< Total buf size in bytes */
     uint8_t * data;
@@ -129,6 +129,9 @@ void lv_draw_buf_handlers_init(lv_draw_buf_handlers_t * handlers,
  * @return                  pointer to the struct of handlers
  */
 lv_draw_buf_handlers_t * lv_draw_buf_get_handlers(void);
+lv_draw_buf_handlers_t * lv_draw_buf_get_font_handlers(void);
+lv_draw_buf_handlers_t * lv_draw_buf_get_image_handlers(void);
+
 
 /**
  * Align the address of a buffer. The buffer needs to be large enough for the real data after alignment

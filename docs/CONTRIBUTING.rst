@@ -33,16 +33,13 @@ Mid and large scale issues are discussed in `Feature planning <https://github.co
 
 An issue can be developed when all the questions in the issue template are answered and there is no objection from any core member.
 
+We are using GitHub labels to show the state and attributes of the issues and Pull requests.
+If you are looking for contribution opportunities you can `Filter for these labels <https://github.com/lvgl/lvgl/labels>`__ :
 
-We are using GitHub Labels to show the state of the issue:
+- ``Simple``: Good choice to get started with LVGL contribution
+- ``PR needed``: We investigated the issue but it still needs to be implemented
+- ``Review needed``: A Pull request is opened and it needs review/testing
 
-- ``planning``: Still discussing how to approach it.
-- ``outlined``: We have come to a conclusion and the feature is ready to be developed.
-- ``request-change(<user-name>)``: Each core member has a dedicated label, and when they request a change, they add their label.
-- ``under development``: It's being developed by someone (can be developed only if no change is requested by the end of the cool-down phase).
-- ``ready``: The pitch is developed and merged into master.
-- ``stale``: Inactive, can be warmed up.
-- ``rejected``: Not interested in this feature for some reason.
 
 .. _contributing_pull_request:
 

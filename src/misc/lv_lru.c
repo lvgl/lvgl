@@ -23,13 +23,13 @@
  *      TYPEDEFS
  **********************/
 
-struct lv_lru_item_t {
+struct _lv_lru_item_t {
     void * value;
     void * key;
     size_t value_length;
     size_t key_length;
     uint64_t access_count;
-    struct lv_lru_item_t * next;
+    struct _lv_lru_item_t * next;
 };
 
 /**********************

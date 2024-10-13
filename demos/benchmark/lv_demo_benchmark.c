@@ -33,6 +33,13 @@
 #endif
 
 /**********************
+ *      DEFINES
+ **********************/
+#define HEADER_HEIGHT   48
+#define FALL_HEIGHT     80
+#define PAD_BASIC       8
+
+/**********************
  *      TYPEDEFS
  **********************/
 
@@ -62,8 +69,9 @@ static void summary_create(void);
 
 static void rnd_reset(void);
 static int32_t rnd_next(int32_t min, int32_t max);
+static lv_color_t rnd_color(void);
 static void shake_anim_y_cb(void * var, int32_t v);
-static void shake_anim(lv_obj_t * obj, int32_t y_max);
+static void fall_anim(lv_obj_t * obj, int32_t y_max);
 static void scroll_anim(lv_obj_t * obj, int32_t y_max);
 static void scroll_anim_y_cb(void * var, int32_t v);
 static void color_anim_cb(void * var, int32_t v);
@@ -80,13 +88,13 @@ static void empty_screen_cb(void)
 static void moving_wallpaper_cb(void)
 {
     lv_obj_set_style_pad_all(lv_screen_active(), 0, 0);
-    LV_IMAGE_DECLARE(img_benchmark_cogwheel_rgb);
+    LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_rgb);
 
     lv_obj_t * img = lv_image_create(lv_screen_active());
     lv_obj_set_size(img, lv_pct(150), lv_pct(150));
-    lv_image_set_src(img, &img_benchmark_cogwheel_rgb);
+    lv_image_set_src(img, &img_benchmark_lvgl_logo_rgb);
     lv_image_set_inner_align(img, LV_IMAGE_ALIGN_TILE);
-    shake_anim(img, - lv_display_get_vertical_resolution(NULL) / 3);
+    fall_anim(img, - lv_display_get_vertical_resolution(NULL) / 3);
 }
 
 static void single_rectangle_cb(void)
@@ -119,13 +127,14 @@ static void multiple_rectangles_cb(void)
 
 static void multiple_rgb_images_cb(void)
 {
-    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
-    lv_obj_set_style_pad_row(lv_screen_active(), 20, 0);
+    lv_obj_t * scr = lv_screen_active();
+    lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_obj_set_style_pad_bottom(scr, FALL_HEIGHT + PAD_BASIC, 0);
 
-    LV_IMAGE_DECLARE(img_benchmark_cogwheel_rgb);
-    int32_t hor_cnt = ((int32_t)lv_display_get_horizontal_resolution(NULL) - 16) / 116;
-    int32_t ver_cnt = ((int32_t)lv_display_get_vertical_resolution(NULL) - 116) / 116;
+    LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_rgb);
+    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 160;
+    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 160;
 
     if(hor_cnt < 1) hor_cnt = 1;
     if(ver_cnt < 1) ver_cnt = 1;
@@ -135,23 +144,24 @@ static void multiple_rgb_images_cb(void)
         int32_t x;
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * obj = lv_image_create(lv_screen_active());
-            lv_image_set_src(obj, &img_benchmark_cogwheel_rgb);
+            lv_image_set_src(obj, &img_benchmark_lvgl_logo_rgb);
             if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
 
-            shake_anim(obj, 80);
+            fall_anim(obj, 80);
         }
     }
 }
 
 static void multiple_argb_images_cb(void)
 {
-    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
-    lv_obj_set_style_pad_row(lv_screen_active(), 20, 0);
+    lv_obj_t * scr = lv_screen_active();
+    lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_obj_set_style_pad_bottom(scr, FALL_HEIGHT + PAD_BASIC, 0);
 
-    LV_IMAGE_DECLARE(img_benchmark_cogwheel_argb);
-    int32_t hor_cnt = ((int32_t)lv_display_get_horizontal_resolution(NULL) - 16) / 116;
-    int32_t ver_cnt = ((int32_t)lv_display_get_vertical_resolution(NULL) - 116) / 116;
+    LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_argb);
+    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 160;
+    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 160;
 
     if(hor_cnt < 1) hor_cnt = 1;
     if(ver_cnt < 1) ver_cnt = 1;
@@ -161,23 +171,24 @@ static void multiple_argb_images_cb(void)
         int32_t x;
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * obj = lv_image_create(lv_screen_active());
-            lv_image_set_src(obj, &img_benchmark_cogwheel_argb);
+            lv_image_set_src(obj, &img_benchmark_lvgl_logo_argb);
             if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
 
-            shake_anim(obj, 80);
+            fall_anim(obj, 80);
         }
     }
 }
 
 static void rotated_argb_image_cb(void)
 {
-    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
-    lv_obj_set_style_pad_row(lv_screen_active(), 20, 0);
+    lv_obj_t * scr = lv_screen_active();
+    lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_obj_set_style_pad_bottom(scr, FALL_HEIGHT + PAD_BASIC, 0);
 
-    LV_IMAGE_DECLARE(img_benchmark_cogwheel_argb);
-    int32_t hor_cnt = ((int32_t)lv_display_get_horizontal_resolution(NULL) - 16) / 116;
-    int32_t ver_cnt = ((int32_t)lv_display_get_vertical_resolution(NULL) - 116) / 116;
+    LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_argb);
+    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 240;   /*240 instead of 160 to have less rotated images*/
+    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 240;
 
     if(hor_cnt < 1) hor_cnt = 1;
     if(ver_cnt < 1) ver_cnt = 1;
@@ -187,35 +198,46 @@ static void rotated_argb_image_cb(void)
         int32_t x;
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * obj = lv_image_create(lv_screen_active());
-            lv_image_set_src(obj, &img_benchmark_cogwheel_argb);
+            lv_image_set_src(obj, &img_benchmark_lvgl_logo_argb);
             if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
 
             lv_image_set_rotation(obj, lv_rand(100, 3500));
-            shake_anim(obj, 80);
+            fall_anim(obj, 80);
         }
     }
 }
 
 static void multiple_labels_cb(void)
 {
-    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
-    lv_obj_set_style_pad_row(lv_screen_active(), 80, 0);
+    lv_obj_t * scr = lv_screen_active();
+    lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
+
+    int32_t hor_res = lv_display_get_horizontal_resolution(NULL);
+    int32_t ver_res = lv_display_get_vertical_resolution(NULL);
+    if(hor_res * ver_res > 800 * 480) lv_obj_set_style_text_font(scr, &lv_font_montserrat_26, 0);
+    else if(hor_res * ver_res > 320 * 240) lv_obj_set_style_text_font(scr, &lv_font_montserrat_20, 0);
+    else lv_obj_set_style_text_font(scr, &lv_font_montserrat_14, 0);
 
     lv_point_t s;
-    lv_text_get_size(&s, "Hello LVGL!", lv_obj_get_style_text_font(lv_screen_active(), 0), 0, 0, LV_COORD_MAX,
+    lv_text_get_size(&s, "Hello LVGL!", lv_obj_get_style_text_font(scr, 0), 0, 0, LV_COORD_MAX,
                      LV_TEXT_FLAG_NONE);
 
-    int32_t cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / (s.x + 30);
-    cnt = cnt * ((lv_display_get_vertical_resolution(NULL) - 200) / (s.y + 50));
+    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / (s.x * 3 / 2);
+    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / (s.y  * 3);
 
-    if(cnt < 1) cnt = 1;
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
 
-    int32_t i;
-    for(i = 0; i < cnt; i++) {
-        lv_obj_t * obj = lv_label_create(lv_screen_active());
-        lv_label_set_text(obj, "Hello LVGL!");
-        color_anim(obj);
+    int32_t y;
+    for(y = 0; y < ver_cnt; y++) {
+        int32_t x;
+        for(x = 0; x < hor_cnt; x++) {
+            lv_obj_t * obj = lv_label_create(lv_screen_active());
+            if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+            lv_label_set_text(obj, "Hello LVGL!");
+            color_anim(obj);
+        }
     }
 }
 
@@ -229,24 +251,35 @@ static void screen_sized_text_cb(void)
         "Fusce dignissim turpis massa, eget semper purus semper at. Ut et augue vitae metus laoreet auctor. Morbi tincidunt, neque vel tincidunt interdum, sapien nibh finibus lorem, eu eleifend diam ipsum et eros. Duis iaculis vulputate lacinia. Phasellus id mauris sed magna gravida suscipit. Sed aliquet tincidunt ante ac posuere. In vestibulum quam ultricies, ultricies arcu eu, aliquam sapien. Phasellus sollicitudin velit facilisis, dignissim nisi sed, pellentesque magna.";
 
     lv_obj_t * scr = lv_screen_active();
+    int32_t hor_res = lv_display_get_horizontal_resolution(NULL);
+    int32_t ver_res = lv_display_get_vertical_resolution(NULL);
+    if(hor_res * ver_res > 800 * 480) lv_obj_set_style_text_font(scr, &lv_font_montserrat_26, 0);
+    else if(hor_res * ver_res > 320 * 240) lv_obj_set_style_text_font(scr, &lv_font_montserrat_20, 0);
+    else lv_obj_set_style_text_font(scr, &lv_font_montserrat_14, 0);
 
     lv_obj_t * obj = lv_label_create(scr);
     lv_obj_set_width(obj, lv_pct(100));
     lv_label_set_text(obj, txt);
 
     lv_obj_update_layout(obj);
+    if(lv_obj_get_height(obj) < ver_res * 2) {
+        lv_label_set_text_fmt(obj, "%s\n\n%s", txt, txt);
+        lv_obj_update_layout(obj);
+    }
 
     scroll_anim(scr, lv_obj_get_scroll_bottom(scr));
 }
 
 static void multiple_arcs_cb(void)
 {
-    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_obj_t * scr = lv_screen_active();
+    lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
 
-    LV_IMAGE_DECLARE(img_benchmark_cogwheel_argb);
-    int32_t hor_cnt = (lv_display_get_horizontal_resolution(NULL) - 16) / lv_dpx(160);
-    int32_t ver_cnt = (lv_display_get_vertical_resolution(NULL) - 16) / lv_dpx(160);
+    LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_argb);
+
+    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 160;
+    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 160;
 
     if(hor_cnt < 1) hor_cnt = 1;
     if(ver_cnt < 1) ver_cnt = 1;
@@ -258,17 +291,16 @@ static void multiple_arcs_cb(void)
 
             lv_obj_t * obj = lv_arc_create(lv_screen_active());
             if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
-            lv_obj_set_size(obj, lv_dpx(100), lv_dpx(100));
+            lv_obj_set_size(obj, 100, 100);
             lv_obj_center(obj);
 
             lv_arc_set_bg_angles(obj, 0, 360);
 
-            lv_obj_set_style_margin_all(obj, lv_dpx(20), 0);
             lv_obj_set_style_arc_opa(obj, 0, LV_PART_MAIN);
             lv_obj_set_style_bg_opa(obj, 0, LV_PART_KNOB);
             lv_obj_set_style_arc_width(obj, 10, LV_PART_INDICATOR);
             lv_obj_set_style_arc_rounded(obj, false, LV_PART_INDICATOR);
-            lv_obj_set_style_arc_color(obj, lv_color_hex3(lv_rand(0x00f, 0xff0)), LV_PART_INDICATOR);
+            lv_obj_set_style_arc_color(obj, rnd_color(), LV_PART_INDICATOR);
             arc_anim(obj);
         }
     }
@@ -276,12 +308,13 @@ static void multiple_arcs_cb(void)
 
 static void containers_cb(void)
 {
+    lv_obj_t * scr = lv_screen_active();
+    lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_obj_set_style_pad_bottom(scr, FALL_HEIGHT + PAD_BASIC, 0);
 
-    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
-
-    int32_t hor_cnt = ((int32_t)lv_display_get_horizontal_resolution(NULL) - 16) / 300;
-    int32_t ver_cnt = ((int32_t)lv_display_get_vertical_resolution(NULL) - 16) / 150;
+    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 350;
+    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 170;
 
     if(hor_cnt < 1) hor_cnt = 1;
     if(ver_cnt < 1) ver_cnt = 1;
@@ -292,18 +325,20 @@ static void containers_cb(void)
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * card = card_create();
             if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
-            shake_anim(card, 30);
+            fall_anim(card, 30);
         }
     }
 }
 
 static void containers_with_overlay_cb(void)
 {
-    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_obj_t * scr = lv_screen_active();
+    lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_obj_set_style_pad_bottom(scr, FALL_HEIGHT + PAD_BASIC, 0);
 
-    int32_t hor_cnt = ((int32_t)lv_display_get_horizontal_resolution(NULL) - 16) / 300;
-    int32_t ver_cnt = ((int32_t)lv_display_get_vertical_resolution(NULL) - 16) / 150;
+    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 350;
+    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 170;
 
     if(hor_cnt < 1) hor_cnt = 1;
     if(ver_cnt < 1) ver_cnt = 1;
@@ -314,7 +349,7 @@ static void containers_with_overlay_cb(void)
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * card = card_create();
             if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
-            shake_anim(card, 30);
+            fall_anim(card, 30);
         }
     }
 
@@ -324,11 +359,13 @@ static void containers_with_overlay_cb(void)
 
 static void containers_with_opa_cb(void)
 {
-    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_obj_t * scr = lv_screen_active();
+    lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_obj_set_style_pad_bottom(scr, FALL_HEIGHT + PAD_BASIC, 0);
 
-    int32_t hor_cnt = ((int32_t)lv_display_get_horizontal_resolution(NULL) - 16) / 300;
-    int32_t ver_cnt = ((int32_t)lv_display_get_vertical_resolution(NULL) - 16) / 150;
+    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 350;
+    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 170;
 
     if(hor_cnt < 1) hor_cnt = 1;
     if(ver_cnt < 1) ver_cnt = 1;
@@ -340,18 +377,20 @@ static void containers_with_opa_cb(void)
             lv_obj_t * card = card_create();
             if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
             lv_obj_set_style_opa(card, LV_OPA_50, 0);
-            shake_anim(card, 30);
+            fall_anim(card, 30);
         }
     }
 }
 
 static void containers_with_opa_layer_cb(void)
 {
-    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_obj_t * scr = lv_screen_active();
+    lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_obj_set_style_pad_bottom(scr, FALL_HEIGHT + PAD_BASIC, 0);
 
-    int32_t hor_cnt = ((int32_t)lv_display_get_horizontal_resolution(NULL) - 16) / 300;
-    int32_t ver_cnt = ((int32_t)lv_display_get_vertical_resolution(NULL) - 16) / 150;
+    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 350;
+    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 170;
 
     if(hor_cnt < 1) hor_cnt = 1;
     if(ver_cnt < 1) ver_cnt = 1;
@@ -363,7 +402,7 @@ static void containers_with_opa_layer_cb(void)
             lv_obj_t * card = card_create();
             lv_obj_set_style_opa_layered(card, LV_OPA_50, 0);
             if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
-            shake_anim(card, 30);
+            fall_anim(card, 30);
         }
     }
 }
@@ -371,13 +410,26 @@ static void containers_with_opa_layer_cb(void)
 static void containers_with_scrolling_cb(void)
 {
     lv_obj_t * scr = lv_screen_active();
-
     lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
+    lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_obj_set_style_pad_row(scr, 32, 0);
 
-    uint32_t i;
-    for(i = 0; i < 50; i++) {
-        card_create();
+    int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 400;
+    int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / (120 + 32);
+
+    if(hor_cnt < 1) hor_cnt = 1;
+    if(ver_cnt < 1) ver_cnt = 1;
+
+    ver_cnt *= 2; /*To make it scroll*/
+    if(ver_cnt < 20) ver_cnt = 20; /*The test with many widgets*/
+
+    int32_t y;
+    for(y = 0; y < ver_cnt; y++) {
+        int32_t x;
+        for(x = 0; x < hor_cnt; x++) {
+            lv_obj_t * card = card_create();
+            if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+        }
     }
 
     lv_obj_update_layout(scr);
@@ -442,7 +494,7 @@ void lv_demo_benchmark(void)
     lv_obj_set_style_text_color(scr, lv_color_black(), 0);
     lv_obj_set_style_bg_color(scr, lv_palette_lighten(LV_PALETTE_GREY, 4), 0);
     lv_obj_set_style_pad_all(lv_screen_active(), 8, 0);
-    lv_obj_set_style_pad_top(lv_screen_active(), 48, 0);
+    lv_obj_set_style_pad_top(lv_screen_active(), HEADER_HEIGHT, 0);
     lv_obj_set_style_pad_gap(lv_screen_active(), 8, 0);
 
     lv_obj_t * title = lv_label_create(lv_layer_top());
@@ -473,9 +525,10 @@ static void load_scene(uint32_t scene)
     lv_obj_clean(scr);
     lv_obj_set_style_bg_color(scr, lv_palette_lighten(LV_PALETTE_GREY, 4), 0);
     lv_obj_set_style_text_color(scr, lv_color_black(), 0);
-    lv_obj_set_style_pad_all(lv_screen_active(), 8, 0);
-    lv_obj_set_style_pad_top(lv_screen_active(), 48, 0);
-    lv_obj_set_style_pad_gap(lv_screen_active(), 8, 0);
+    lv_obj_set_style_text_font(scr, LV_FONT_DEFAULT, 0);
+    lv_obj_set_style_pad_all(scr, PAD_BASIC, 0);
+    lv_obj_set_style_pad_gap(scr, PAD_BASIC, 0);
+    lv_obj_set_style_pad_top(scr, HEADER_HEIGHT, 0);
     lv_obj_set_layout(scr, LV_LAYOUT_NONE);
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
 
@@ -591,7 +644,7 @@ static void summary_create(void)
     lv_table_set_cell_value(table, 0, 3, "Avg. time (render + flush)");
 
     /* csv log */
-    LV_LOG("Benchmark Summary (%"LV_PRIu32".%"LV_PRIu32".%"LV_PRIu32" %s)\r\n",
+    LV_LOG("Benchmark Summary (%d.%d.%d %s)\r\n",
            LVGL_VERSION_MAJOR,
            LVGL_VERSION_MINOR,
            LVGL_VERSION_PATCH,
@@ -680,8 +733,9 @@ static void summary_create(void)
 static void color_anim_cb(void * var, int32_t v)
 {
     LV_UNUSED(v);
-    lv_obj_set_style_bg_color(var, lv_color_hex3(lv_rand(0x00f, 0xff0)), 0);
-    lv_obj_set_style_text_color(var, lv_color_hex3(lv_rand(0x00f, 0xff0)), 0);
+    lv_color_t c = rnd_color();
+    lv_obj_set_style_bg_color(var, c, 0);
+    lv_obj_set_style_text_color(var, rnd_color(), 0);
 }
 
 static void color_anim(lv_obj_t * obj)
@@ -741,7 +795,7 @@ static void shake_anim_y_cb(void * var, int32_t v)
     lv_obj_set_style_translate_y(var, v, 0);
 }
 
-static void shake_anim(lv_obj_t * obj, int32_t y_max)
+static void fall_anim(lv_obj_t * obj, int32_t y_max)
 {
     uint32_t t1 = rnd_next(300, 3000);
     uint32_t t2 = rnd_next(300, 3000);
@@ -811,6 +865,23 @@ static int32_t rnd_next(int32_t min, int32_t max)
         0x8357a17d, 0x97e9c9cc, 0xad10ff52, 0x9923fc5c,
         0x8f2c840a, 0x20356ba2, 0x7997a677, 0x9a7f1800,
         0x35c7562b, 0xd901fe51, 0x8f4e053d, 0xa5b94923,
+        0xd2c5eedd, 0x24f0cc9b, 0x3aa7b571, 0xd289a1c9,
+        0x79c7dc3,  0x5bf68c86, 0xc9f55239, 0x42052cfb,
+        0x63dae9df, 0x75c9e11f, 0x407f9151, 0x104ebc63,
+        0xb4b52591, 0x53a46b7a, 0x9398d144, 0x9a7c6c3d,
+        0x76b35b78, 0xa028e33e, 0xbfe586e4, 0xf3f79731,
+        0x99591738, 0xd7b0a847, 0x1ffb1936, 0xfeeea2e4,
+        0xbc896279, 0xa8241a72, 0x871124fa, 0x27bb9866,
+        0x41794272, 0x92f5dc59, 0x98c9d185, 0x6fc5905b,
+        0xf0ba9f1a, 0x771cad1b, 0xf6285752, 0xb5ffcbc5,
+        0x6fd2b63c, 0x2c404190, 0x209469e6, 0x628531b1,
+        0x98a726bc, 0xcc6c0d97, 0x86c2e7b9, 0x7bc12e1f,
+        0xf9a67e10, 0xd5bf101f, 0xa1aaaf35, 0x69b078fc,
+        0x71d698b2, 0x9a954baa, 0xe7423a82, 0xdd9898e1,
+        0xf4980e5c, 0x4f3607b9, 0x9ce35d27, 0xb4b764e0,
+        0xa1fa3ad3, 0x220ad165, 0x282216b4, 0x7e583888,
+        0xf8315b2b, 0x81c27062, 0x8eb89a85,     /*Intentionally incomplete line to make the length of array more arbitrary*/
+
     };
 
     if(min == max) return min;
@@ -828,6 +899,11 @@ static int32_t rnd_next(int32_t min, int32_t max)
     if(rnd_act >= sizeof(rnd_map) / sizeof(rnd_map[0])) rnd_act = 0;
 
     return r;
+}
+
+static lv_color_t rnd_color(void)
+{
+    return lv_palette_main(rnd_next(0, LV_PALETTE_LAST - 1));
 }
 
 #endif

@@ -40,11 +40,16 @@
 #include "misc/lv_fs.h"
 #include "osal/lv_os_private.h"
 
+#if LV_USE_NEMA_GFX
+    #include "draw/nema_gfx/lv_draw_nema_gfx.h"
+#endif
 #if LV_USE_DRAW_VGLITE
     #include "draw/nxp/vglite/lv_draw_vglite.h"
 #endif
-#if LV_USE_DRAW_PXP
-    #include "draw/nxp/pxp/lv_draw_pxp.h"
+#if LV_USE_PXP
+    #if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
+        #include "draw/nxp/pxp/lv_draw_pxp.h"
+    #endif
 #endif
 #if LV_USE_DRAW_DAVE2D
     #include "draw/renesas/dave2d/lv_draw_dave2d.h"
@@ -54,6 +59,12 @@
 #endif
 #if LV_USE_DRAW_VG_LITE
     #include "draw/vg_lite/lv_draw_vg_lite.h"
+#endif
+#if LV_USE_DRAW_DMA2D
+    #include "draw/dma2d/lv_draw_dma2d.h"
+#endif
+#if LV_USE_DRAW_OPENGLES
+    #include "draw/opengles/lv_draw_opengles.h"
 #endif
 #if LV_USE_WINDOWS
     #include "drivers/windows/lv_windows_context.h"
@@ -194,12 +205,18 @@ void lv_init(void)
     lv_draw_sw_init();
 #endif
 
+#if LV_USE_NEMA_GFX
+    lv_draw_nema_gfx_init();
+#endif
+
 #if LV_USE_DRAW_VGLITE
     lv_draw_vglite_init();
 #endif
 
-#if LV_USE_DRAW_PXP
+#if LV_USE_PXP
+#if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
     lv_draw_pxp_init();
+#endif
 #endif
 
 #if LV_USE_DRAW_DAVE2D
@@ -208,6 +225,14 @@ void lv_init(void)
 
 #if LV_USE_DRAW_SDL
     lv_draw_sdl_init();
+#endif
+
+#if LV_USE_DRAW_DMA2D
+    lv_draw_dma2d_init();
+#endif
+
+#if LV_USE_DRAW_OPENGLES
+    lv_draw_opengles_init();
 #endif
 
 #if LV_USE_WINDOWS
@@ -385,8 +410,10 @@ void lv_deinit(void)
 
     lv_obj_style_deinit();
 
-#if LV_USE_DRAW_PXP
+#if LV_USE_PXP
+#if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
     lv_draw_pxp_deinit();
+#endif
 #endif
 
 #if LV_USE_DRAW_VGLITE
@@ -395,6 +422,14 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_VG_LITE
     lv_draw_vg_lite_deinit();
+#endif
+
+#if LV_USE_DRAW_DMA2D
+    lv_draw_dma2d_deinit();
+#endif
+
+#if LV_USE_DRAW_OPENGLES
+    lv_draw_opengles_deinit();
 #endif
 
 #if LV_USE_DRAW_SW

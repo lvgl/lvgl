@@ -71,6 +71,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_proc_press(lv_indev_t * indev);
 static void indev_proc_release(lv_indev_t * indev);
+static lv_result_t indev_proc_short_click(lv_indev_t * indev);
 static void indev_proc_pointer_diff(lv_indev_t * indev);
 static lv_obj_t * pointer_search_obj(lv_display_t * disp, lv_point_t * p);
 static void indev_proc_reset_query_handler(lv_indev_t * indev);
@@ -168,7 +169,7 @@ lv_indev_t * lv_indev_get_next(lv_indev_t * indev)
 
 void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_INDEV_BEGIN;
     lv_memzero(data, sizeof(lv_indev_data_t));
 
     /* For touchpad sometimes users don't set the last pressed coordinate on release.
@@ -193,7 +194,8 @@ void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
     else {
         LV_LOG_WARN("indev_read_cb is not registered");
     }
-    LV_PROFILER_END;
+
+    LV_PROFILER_INDEV_END;
 }
 
 void lv_indev_read_timer_cb(lv_timer_t * timer)
@@ -221,7 +223,7 @@ void lv_indev_read(lv_indev_t * indev)
         return;
     }
 
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_INDEV_BEGIN;
 
     bool continue_reading;
     lv_indev_data_t data;
@@ -266,7 +268,7 @@ void lv_indev_read(lv_indev_t * indev)
     indev_obj_act = NULL;
 
     LV_TRACE_INDEV("finished");
-    LV_PROFILER_END;
+    LV_PROFILER_INDEV_END;
 }
 
 void lv_indev_enable(lv_indev_t * indev, bool enable)
@@ -483,6 +485,11 @@ uint32_t lv_indev_get_key(const lv_indev_t * indev)
         key = indev->keypad.last_key;
 
     return key;
+}
+
+uint8_t lv_indev_get_short_click_streak(const lv_indev_t * indev)
+{
+    return indev->pointer.short_click_streak;
 }
 
 lv_dir_t lv_indev_get_scroll_dir(const lv_indev_t * indev)
@@ -852,7 +859,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             if(send_event(LV_EVENT_RELEASED, indev_act) == LV_RESULT_INVALID) return;
 
             if(i->long_pr_sent == 0) {
-                if(send_event(LV_EVENT_SHORT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
+                if(indev_proc_short_click(i) == LV_RESULT_INVALID) return;
             }
 
             if(send_event(LV_EVENT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
@@ -863,6 +870,8 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
     indev_obj_act = NULL;
 }
+
+
 
 /**
  * Process a new point from LV_INDEV_TYPE_ENCODER input device
@@ -1015,7 +1024,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 }
 
                 if(i->long_pr_sent == 0 && is_enabled) {
-                    if(send_event(LV_EVENT_SHORT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
+                    if(indev_proc_short_click(i) == LV_RESULT_INVALID) return;
                 }
 
                 if(is_enabled) {
@@ -1029,7 +1038,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 if(!i->long_pr_sent || lv_group_get_obj_count(g) <= 1) {
                     if(is_enabled) {
                         if(send_event(LV_EVENT_RELEASED, indev_act) == LV_RESULT_INVALID) return;
-                        if(send_event(LV_EVENT_SHORT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
+                        if(indev_proc_short_click(i) == LV_RESULT_INVALID) return;
                         if(send_event(LV_EVENT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
                     }
 
@@ -1203,11 +1212,6 @@ static void indev_proc_press(lv_indev_t * indev)
 
             lv_obj_send_event(last_obj, LV_EVENT_PRESS_LOST, indev_act);
             if(indev_reset_check(indev)) return;
-
-            /*Do nothing until release and a new press*/
-            lv_indev_reset(indev, NULL);
-            lv_indev_wait_release(indev);
-            return;
         }
 
         indev->pointer.act_obj  = indev_obj_act; /*Save the pressed object*/
@@ -1358,7 +1362,7 @@ static void indev_proc_release(lv_indev_t * indev)
         if(is_enabled) {
             if(scroll_obj == NULL) {
                 if(indev->long_pr_sent == 0) {
-                    if(send_event(LV_EVENT_SHORT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
+                    if(indev_proc_short_click(indev) == LV_RESULT_INVALID) return;
                 }
                 if(send_event(LV_EVENT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
             }
@@ -1404,6 +1408,40 @@ static void indev_proc_release(lv_indev_t * indev)
 
         if(indev_reset_check(indev)) return;
     }
+}
+
+static lv_result_t indev_proc_short_click(lv_indev_t * indev)
+{
+    /*Update streak for clicks within small distance and short time*/
+    indev->pointer.short_click_streak++;
+    if(lv_tick_elaps(indev->pointer.last_short_click_timestamp) > indev->long_press_time) {
+        indev->pointer.short_click_streak = 1;
+    }
+    else if(indev->type == LV_INDEV_TYPE_POINTER || indev->type == LV_INDEV_TYPE_BUTTON) {
+        int32_t dx = indev->pointer.last_short_click_point.x - indev->pointer.act_point.x;
+        int32_t dy = indev->pointer.last_short_click_point.y - indev->pointer.act_point.y;
+        if(dx * dx + dy * dy > indev->scroll_limit * indev->scroll_limit) indev->pointer.short_click_streak = 1;
+    }
+
+    indev->pointer.last_short_click_timestamp = lv_tick_get();
+    lv_indev_get_point(indev, &indev->pointer.last_short_click_point);
+
+    /*Simple short click*/
+    lv_result_t res = send_event(LV_EVENT_SHORT_CLICKED, indev_act);
+    if(res == LV_RESULT_INVALID) {
+        return res;
+    }
+
+    /*Cycle through single/double/triple click*/
+    switch((indev->pointer.short_click_streak - 1) % 3) {
+        case 0:
+            return send_event(LV_EVENT_SINGLE_CLICKED, indev_act);
+        case 1:
+            return send_event(LV_EVENT_DOUBLE_CLICKED, indev_act);
+        case 2:
+            return send_event(LV_EVENT_TRIPLE_CLICKED, indev_act);
+    }
+    return res;
 }
 
 static void indev_proc_pointer_diff(lv_indev_t * indev)

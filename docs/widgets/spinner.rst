@@ -37,7 +37,7 @@ Events
 
 No special events are sent to the Spinner.
 
-See the events of the `Arc </widgets/arc>`__ too.
+See the events of the `Arc <widgets/arc>`__ too.
 
 Learn more about :ref:`events`.
 

@@ -1,5 +1,5 @@
 ===============================
-OpenGL ES Display/Inputs driver
+OpenGL ES Display/Inputs Driver
 ===============================
 
 Overview
@@ -17,19 +17,19 @@ The OpenGL driver uses GLEW GLFW to access the OpenGL window manager.
 
 1. Install GLEW and GLFW: ``sudo apt-get install libglew-dev libglfw3-dev``
 
-Configure OpenGL driver
+Configure OpenGL Driver
 -----------------------
 
 1. Required linked libraries: -lGL -lGLEW -lglfw
 2. Enable the OpenGL driver support in lv_conf.h, by cmake compiler define or by KConfig
-    .. code:: c
+    .. code-block:: c
 
         #define LV_USE_OPENGLES  1
 
-Basic usage
+Basic Usage
 -----------
 
-.. code:: c
+.. code-block:: c
 
     #include "lvgl/lvgl.h"
     #include "lvgl/examples/lv_examples.h"
@@ -75,13 +75,13 @@ Basic usage
         return 0;
     }
 
-Advanced usage
+Advanced Usage
 --------------
 
 The OpenGL driver can draw textures from the user. A third-party library could be
 used to add content to a texture and the driver will draw the texture in the window.
 
-.. code:: c
+.. code-block:: c
 
     #include "lvgl/lvgl.h"
     #include <GL/glew.h>
@@ -139,8 +139,7 @@ used to add content to a texture and the driver will draw the texture in the win
 
         /* create objects on the screen of the sub texture */
         lv_display_set_default(sub_texture);
-        lv_obj_set_style_bg_color(lv_screen_active(), lv_color_black(), 0);
-        lv_example_anim_2();
+        lv_example_keyboard_2();
         lv_display_set_default(main_texture);
 
         /* position the sub texture within the window */
@@ -195,3 +194,25 @@ used to add content to a texture and the driver will draw the texture in the win
         /* the texture is drawn on by LVGL and can be used by anything that uses OpenGL textures */
         third_party_lib_use_texture(sub_texture_id);
     }
+
+OpenGL Texture Caching Renderer
+-------------------------------
+
+There is a renderer in LVGL which caches software-rendered areas as OpenGL textures.
+The textures are retrieved from the cache and reused when there is a match.
+The performance will be drastically improved in most cases.
+
+.. code-block:: c
+
+    #define LV_USE_DRAW_OPENGLES 1
+
+Known Limitations
+~~~~~~~~~~~~~~~~~
+
+- Performance will be the same or slightly worse if the drawn areas are never found in the cache
+  due to objects with continuously varying colors or shapes. One example is a label whose color
+  is set to a random value every frame, as in the "Multiple labels" scene of the benchmark demo.
+- Layers with transparent pixels and an overall layer transparency will not blend correctly.
+  The effect can be observed in the "Containers with opa_layer" scene of the benchmark demo
+  in the border corners.
+- Layers with rotation are not currently supported. Images with rotation are fine.

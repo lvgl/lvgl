@@ -33,7 +33,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_display_t {
+struct _lv_display_t {
 
     /*---------------------
      * Resolution
@@ -91,6 +91,8 @@ struct lv_display_t {
 
     lv_display_render_mode_t render_mode;
     uint32_t antialiasing : 1;       /**< 1: anti-aliasing is enabled on this display.*/
+    uint32_t tile_cnt     : 8;       /**< Divide the display buffer into these number of tiles */
+
 
     /** 1: The current screen rendering is in progress*/
     uint32_t rendering_in_progress : 1;
@@ -141,8 +143,7 @@ struct lv_display_t {
 
     lv_event_list_t event_list;
 
-    uint32_t sw_rotate : 1; /**< 1: use software rotation (slower)*/
-    uint32_t rotation  : 2; /**< Element of  lv_display_rotation_t*/
+    uint32_t rotation  : 3; /**< Element of  lv_display_rotation_t*/
 
     lv_theme_t * theme;     /**< The theme assigned to the screen*/
 

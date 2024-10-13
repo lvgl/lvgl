@@ -5,13 +5,13 @@ NXP VGLite GPU
 API
 ---
 
-:ref:`lv_draw_vglite`
+:ref:`lv_draw_vglite_h`
 
-:ref:`lv_draw_vglite_arc`
+:ref:`lv_vglite_buf_h`
 
-:ref:`lv_draw_vglite_blend`
+:ref:`lv_vglite_matrix_h`
 
-:ref:`lv_draw_vglite_line`
+:ref:`lv_vglite_path_h`
 
-:ref:`lv_draw_vglite_rect`
+:ref:`lv_vglite_utils_h`
 

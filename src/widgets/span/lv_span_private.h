@@ -27,15 +27,18 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_span_t {
+struct _lv_span_t {
     char * txt;                /**<  a pointer to display text */
     lv_obj_t * spangroup;      /**<  a pointer to spangroup */
     lv_style_t style;          /**<  display text style */
     uint32_t static_flag : 1;  /**<  the text is static flag */
+
+    lv_point_t trailing_pos;
+    int32_t trailing_height;
 };
 
 /** Data of label*/
-struct lv_spangroup_t {
+struct _lv_spangroup_t {
     lv_obj_t obj;
     int32_t lines;
     int32_t indent;         /**<  first line indent */

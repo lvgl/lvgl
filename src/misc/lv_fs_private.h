@@ -24,7 +24,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_fs_file_cache_t {
+struct _lv_fs_file_cache_t {
     uint32_t start;
     uint32_t end;
     uint32_t file_position;
@@ -32,17 +32,11 @@ struct lv_fs_file_cache_t {
 };
 
 /** Extended path object to specify buffer for memory-mapped files */
-struct lv_fs_path_ex_t {
+struct _lv_fs_path_ex_t {
     char path[4];   /**<  This is needed to make it compatible with a normal path */
     const void * buffer;
     uint32_t size;
 };
-
-struct lv_fs_dir_t {
-    void * dir_d;
-    lv_fs_drv_t * drv;
-};
-
 
 /**********************
  * GLOBAL PROTOTYPES

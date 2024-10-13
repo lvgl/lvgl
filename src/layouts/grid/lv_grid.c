@@ -115,7 +115,7 @@ static inline int32_t get_margin_ver(lv_obj_t * obj)
            + lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
 }
 
-static inline int32_t div_round_closest(int32_t dividend, int32_t divisor)
+static inline int32_t lv_div_round_closest(int32_t dividend, int32_t divisor)
 {
     return (dividend + divisor / 2) / divisor;
 }
@@ -351,7 +351,7 @@ static void calc_cols(lv_obj_t * cont, lv_grid_calc_t * c)
         int32_t x = col_templ[i];
         if(IS_FR(x)) {
             int32_t f = GET_FR(x);
-            c->w[i] = div_round_closest(free_w * f, col_fr_cnt);
+            c->w[i] = lv_div_round_closest(free_w * f, col_fr_cnt);
             /*By updating remaining fr and width, we ensure f == col_fr_cnt
              *in the last loop iteration. That means the last iteration will
              *not have rounding errors and use all remaining space.*/
@@ -440,7 +440,7 @@ static void calc_rows(lv_obj_t * cont, lv_grid_calc_t * c)
         int32_t x = row_templ[i];
         if(IS_FR(x)) {
             int32_t f = GET_FR(x);
-            c->h[i] = div_round_closest(free_h * f, row_fr_cnt);
+            c->h[i] = lv_div_round_closest(free_h * f, row_fr_cnt);
             /*By updating remaining fr and height, we ensure f == row_fr_cnt
              *in the last loop iteration. That means the last iteration will
              *not have rounding errors and use all remaining space.*/

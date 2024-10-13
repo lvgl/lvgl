@@ -70,7 +70,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         return;
     }
 
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
 
     vg_lite_buffer_t src_buf;
     lv_image_decoder_dsc_t decoder_dsc;
@@ -78,7 +78,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
     /* if not support blend normal, premultiply alpha */
     bool premultiply = !lv_vg_lite_support_blend_normal();
     if(!lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->src, no_cache, premultiply)) {
-        LV_PROFILER_END;
+        LV_PROFILER_DRAW_END;
         return;
     }
 
@@ -98,13 +98,18 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
     bool has_pre_mul = lv_draw_buf_has_flag(decoder_dsc.decoded, LV_IMAGE_FLAGS_PREMULTIPLIED);
     vg_lite_blend_t blend = lv_vg_lite_blend_mode(dsc->blend_mode, has_pre_mul);
 
-    vg_lite_matrix_t matrix;
-    vg_lite_identity(&matrix);
-    lv_vg_lite_matrix_multiply(&matrix, &u->global_matrix);
-    lv_vg_lite_image_matrix(&matrix, coords->x1, coords->y1, dsc);
+    /* original image matrix */
+    vg_lite_matrix_t image_matrix;
+    vg_lite_identity(&image_matrix);
+    lv_vg_lite_image_matrix(&image_matrix, coords->x1, coords->y1, dsc);
+
+    /* image drawing matrix */
+    vg_lite_matrix_t matrix = u->global_matrix;
+    lv_vg_lite_matrix_multiply(&matrix, &image_matrix);
 
     LV_VG_LITE_ASSERT_SRC_BUFFER(&src_buf);
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
+    LV_VG_LITE_ASSERT_MATRIX(&matrix);
 
     bool no_transform = lv_matrix_is_identity_or_translation((const lv_matrix_t *)&matrix);
     vg_lite_filter_t filter = no_transform ? VG_LITE_FILTER_POINT : VG_LITE_FILTER_BI_LINEAR;
@@ -119,7 +124,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         vg_lite_rectangle_t rect;
         lv_vg_lite_rect(&rect, &src_area);
 
-        LV_PROFILER_BEGIN_TAG("vg_lite_blit_rect");
+        LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_blit_rect");
         LV_VG_LITE_CHECK_ERROR(vg_lite_blit_rect(
                                    &u->target_buffer,
                                    &src_buf,
@@ -128,14 +133,18 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
                                    blend,
                                    color,
                                    filter));
-        LV_PROFILER_END_TAG("vg_lite_blit_rect");
+        LV_PROFILER_DRAW_END_TAG("vg_lite_blit_rect");
     }
     else {
         lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
 
-        if(dsc->clip_radius) {
+        /**
+         * When the image is transformed or rounded, create a path around
+         * the image and follow the image_matrix for coordinate transformation
+         */
+        if(!no_transform || dsc->clip_radius) {
             /* apply the image transform to the path */
-            lv_vg_lite_path_set_transform(path, &matrix);
+            lv_vg_lite_path_set_transform(path, &image_matrix);
             lv_vg_lite_path_append_rect(
                 path,
                 0, 0,
@@ -158,11 +167,10 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
         LV_VG_LITE_ASSERT_PATH(vg_lite_path);
 
-        vg_lite_matrix_t path_matrix;
-        vg_lite_identity(&path_matrix);
-        lv_vg_lite_matrix_multiply(&path_matrix, &u->global_matrix);
+        vg_lite_matrix_t path_matrix = u->global_matrix;
+        LV_VG_LITE_ASSERT_MATRIX(&path_matrix);
 
-        LV_PROFILER_BEGIN_TAG("vg_lite_draw_pattern");
+        LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw_pattern");
         LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
                                    &u->target_buffer,
                                    vg_lite_path,
@@ -175,13 +183,13 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
                                    0,
                                    color,
                                    filter));
-        LV_PROFILER_END_TAG("vg_lite_draw_pattern");
+        LV_PROFILER_DRAW_END_TAG("vg_lite_draw_pattern");
 
         lv_vg_lite_path_drop(u, path);
     }
 
     lv_vg_lite_pending_add(u->image_dsc_pending, &decoder_dsc);
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 /**********************

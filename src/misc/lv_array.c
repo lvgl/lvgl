@@ -42,13 +42,25 @@ void lv_array_init(lv_array_t * array, uint32_t capacity, uint32_t element_size)
     array->element_size = element_size;
 
     array->data = lv_malloc(capacity * element_size);
+    array->inner_alloc = true;
     LV_ASSERT_MALLOC(array->data);
+}
+
+void lv_array_init_from_buf(lv_array_t * array, void * buf, uint32_t capacity, uint32_t element_size)
+{
+    LV_ASSERT_NULL(buf);
+    array->size = 0;
+    array->capacity = capacity;
+    array->element_size = element_size;
+
+    array->data = buf;
+    array->inner_alloc = false;
 }
 
 void lv_array_deinit(lv_array_t * array)
 {
     if(array->data) {
-        lv_free(array->data);
+        if(array->inner_alloc) lv_free(array->data);
         array->data = NULL;
     }
 
@@ -122,15 +134,24 @@ lv_result_t lv_array_erase(lv_array_t * array, uint32_t start, uint32_t end)
     return LV_RESULT_OK;
 }
 
-void lv_array_resize(lv_array_t * array, uint32_t new_capacity)
+bool lv_array_resize(lv_array_t * array, uint32_t new_capacity)
 {
+    if(array->inner_alloc == false) {
+        LV_LOG_WARN("Cannot resize array with external buffer");
+        return false;
+    }
+
     uint8_t * data = lv_realloc(array->data, new_capacity * array->element_size);
     LV_ASSERT_NULL(data);
+
+    if(data == NULL) return false;
+
     array->data = data;
     array->capacity = new_capacity;
     if(array->size > new_capacity) {
         array->size = new_capacity;
     }
+    return true;
 }
 
 lv_result_t lv_array_concat(lv_array_t * array, const lv_array_t * other)
@@ -139,7 +160,9 @@ lv_result_t lv_array_concat(lv_array_t * array, const lv_array_t * other)
     uint32_t size = other->size;
     if(array->size + size > array->capacity) {
         /*array is full*/
-        lv_array_resize(array, array->size + size);
+        if(lv_array_resize(array, array->size + size) == false) {
+            return LV_RESULT_INVALID;
+        }
     }
 
     uint8_t * data = array->data + array->size * array->element_size;
@@ -154,11 +177,18 @@ lv_result_t lv_array_push_back(lv_array_t * array, const void * element)
 
     if(array->size == array->capacity) {
         /*array is full*/
-        lv_array_resize(array, array->capacity + LV_ARRAY_DEFAULT_CAPACITY);
+        if(lv_array_resize(array, array->capacity + LV_ARRAY_DEFAULT_CAPACITY) == false) {
+            return LV_RESULT_INVALID;
+        }
     }
 
+    /**
+     * When the element is NULL, it means that the user wants to add an empty element.
+     */
     uint8_t * data = array->data + array->size * array->element_size;
-    lv_memcpy(data, element, array->element_size);
+    if(element) lv_memcpy(data, element, array->element_size);
+    else lv_memzero(data, array->element_size);
+
     array->size++;
     return LV_RESULT_OK;
 }

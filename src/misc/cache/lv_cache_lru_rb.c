@@ -60,7 +60,7 @@
  **********************/
 typedef uint32_t (get_data_size_cb_t)(const void * data);
 
-struct lv_lru_rb_t {
+struct _lv_lru_rb_t {
     lv_cache_t cache;
 
     lv_rb_t rb;
@@ -68,7 +68,7 @@ struct lv_lru_rb_t {
 
     get_data_size_cb_t * get_data_size_cb;
 };
-typedef struct lv_lru_rb_t lv_lru_rb_t_;
+typedef struct _lv_lru_rb_t lv_lru_rb_t_;
 /**********************
  *  STATIC PROTOTYPES
  **********************/

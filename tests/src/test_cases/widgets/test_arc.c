@@ -209,6 +209,8 @@ void test_arc_click_sustained_from_start_to_end_does_not_set_value_to_max(void)
 
     /* Click close to start angle */
     event_cnt = 0;
+    lv_test_mouse_release();
+    lv_test_indev_wait(50);
     lv_test_mouse_move_to(376, 285);
     lv_test_mouse_press();
     lv_test_indev_wait(500);
@@ -221,6 +223,8 @@ void test_arc_click_sustained_from_start_to_end_does_not_set_value_to_max(void)
     /* Click close to end angle */
     event_cnt = 0;
 
+    lv_test_mouse_release();
+    lv_test_indev_wait(50);
     lv_test_mouse_move_to(376, 285);
     lv_test_mouse_press();
     lv_test_indev_wait(500);
@@ -264,6 +268,8 @@ void test_two_overlapping_arcs_can_be_interacted_independently(void)
     event_cnt2 = 0;
 
     // Click on the position of the first arc (center)
+    lv_test_mouse_release();
+    lv_test_indev_wait(50);
     lv_test_mouse_move_to(400, 195);
     lv_test_mouse_press();
     lv_test_indev_wait(500);
@@ -275,6 +281,8 @@ void test_two_overlapping_arcs_can_be_interacted_independently(void)
     TEST_ASSERT_EQUAL_UINT32(1, event_cnt2);
 
     // click on the position of the second arc (center)
+    lv_test_mouse_release();
+    lv_test_indev_wait(50);
     lv_test_mouse_move_to(400, 285);
     lv_test_mouse_press();
     lv_test_indev_wait(500);

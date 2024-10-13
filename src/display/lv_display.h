@@ -240,6 +240,21 @@ void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint3
                             lv_display_render_mode_t render_mode);
 
 /**
+ * Set the frame buffers for a display, similarly to `lv_display_set_buffers`, but allow
+ * for a custom stride as required by a display controller.
+ * This allows the frame buffers to have a stride alignment different from the rest of
+ * the buffers`
+ * @param disp              pointer to a display
+ * @param buf1              first buffer
+ * @param buf2              second buffer (can be `NULL`)
+ * @param buf_size          buffer size in byte
+ * @param stride            buffer stride in bytes
+ * @param render_mode       LV_DISPLAY_RENDER_MODE_PARTIAL/DIRECT/FULL
+ */
+void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size,
+                                        uint32_t stride, lv_display_render_mode_t render_mode);
+
+/**
  * Set the buffers for a display, accept a draw buffer pointer.
  * Normally use `lv_display_set_buffers` is enough for most cases.
  * Use this function when an existing lv_draw_buf_t is available.
@@ -292,6 +307,20 @@ void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_fo
  * @return                  the color format
  */
 lv_color_format_t lv_display_get_color_format(lv_display_t * disp);
+
+/**
+ * Set the number of tiles for parallel rendering.
+ * @param disp              pointer to a display
+ * @param tile_cnt          number of tiles (1 =< tile_cnt < 256)
+ */
+void lv_display_set_tile_cnt(lv_display_t * disp, uint32_t tile_cnt);
+
+/**
+ * Get the number of tiles used for parallel rendering
+ * @param disp              pointer to a display
+ * @return                  number of tiles
+ */
+uint32_t lv_display_get_tile_cnt(lv_display_t * disp);
 
 /**
  * Enable anti-aliasing for the render engine
@@ -374,7 +403,7 @@ lv_obj_t * lv_display_get_layer_bottom(lv_display_t * disp);
  * Load a screen on the default display
  * @param scr       pointer to a screen
  */
-void lv_screen_load(struct lv_obj_t * scr);
+void lv_screen_load(struct _lv_obj_t * scr);
 
 /**
  * Switch screen with animation
@@ -464,6 +493,13 @@ uint32_t lv_display_remove_event_cb_with_user_data(lv_display_t * disp, lv_event
  * @return              LV_RESULT_OK: disp wasn't deleted in the event.
  */
 lv_result_t lv_display_send_event(lv_display_t * disp, lv_event_code_t code, void * param);
+
+/**
+ * Get the area to be invalidated. Can be used in `LV_EVENT_INVALIDATE_AREA`
+ * @param e     pointer to an event
+ * @return      the area to invalidated (can be modified as required)
+ */
+lv_area_t * lv_event_get_invalidated_area(lv_event_t * e);
 
 /**
  * Set the theme of a display. If there are no user created widgets yet the screens' theme will be updated

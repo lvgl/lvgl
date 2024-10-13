@@ -28,7 +28,7 @@ extern "C" {
  **********************/
 
 /** Data of button matrix */
-struct lv_buttonmatrix_t {
+struct _lv_buttonmatrix_t {
     lv_obj_t obj;
     const char * const * map_p;          /**< Pointer to the current map */
     lv_area_t * button_areas;            /**< Array of areas of buttons */

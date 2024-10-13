@@ -25,9 +25,9 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct lv_fragment_manager_t lv_fragment_manager_t;
+typedef struct _lv_fragment_manager_t lv_fragment_manager_t;
 
-struct lv_fragment_t {
+struct _lv_fragment_t {
     /**
      * Class of this fragment
      */
@@ -49,7 +49,7 @@ struct lv_fragment_t {
 
 };
 
-struct lv_fragment_class_t {
+struct _lv_fragment_class_t {
     /**
      * Constructor function for fragment class
      * @param self Fragment instance

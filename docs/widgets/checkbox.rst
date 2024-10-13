@@ -47,7 +47,7 @@ Check, uncheck, disable
 You can manually check, un-check, and disable the Checkbox by using the
 common state add/clear function:
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_add_state(cb, LV_STATE_CHECKED);   /*Make the checkbox checked*/
    lv_obj_remove_state(cb, LV_STATE_CHECKED); /*Make the checkbox unchecked*/

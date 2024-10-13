@@ -1096,7 +1096,7 @@ def iter_src(n, p):
         html_files[name] = html_file
 
         with open(rst_file, 'w') as f:
-            f.write('.. _{0}:'.format(name))
+            f.write('.. _{0}_h:'.format(name))
             f.write('\n\n')
             f.write('=' * len(file))
             f.write('\n')
@@ -1134,6 +1134,11 @@ def iter_src(n, p):
 
 
 def clean_name(nme):
+    # Handle error:
+    #     AttributeError: 'NoneType' object has no attribute 'startswith'
+    if nme is None:
+        return nme
+
     if nme.startswith('_lv_'):
         nme = nme[4:]
     elif nme.startswith('lv_'):
@@ -1146,6 +1151,11 @@ def clean_name(nme):
 
 
 def is_name_match(item_name, obj_name):
+    # Handle error:
+    #     AttributeError: 'NoneType' object has no attribute 'split'
+    if obj_name is None:
+        return False
+
     u_num = item_name.count('_') + 1
 
     obj_name = obj_name.split('_')
@@ -1207,7 +1217,7 @@ class XMLSearch(object):
 
         status, br = subprocess.getstatusoutput("git branch")
         _, gitcommit = subprocess.getstatusoutput("git rev-parse HEAD")
-        br = re.sub('\* ', '', br)
+        br = re.sub(r'\* ', '', br)
 
         urlpath = re.sub('release/', '', br)
 
@@ -1292,6 +1302,7 @@ def run(project_path, temp_directory, *doc_paths):
     if not os.path.exists(api_path):
         os.makedirs(api_path)
 
+    # Generate .RST files for API pages.
     iter_src('API', '')
     index = load_xml('index')
 
@@ -1331,7 +1342,7 @@ def run(project_path, temp_directory, *doc_paths):
 
             if html_includes:
                 html_includes = list(
-                    ':ref:`{0}`\n'.format(inc)
+                    ':ref:`{0}_h`\n'.format(inc)
                     for inc, _ in html_includes
                 )
 
