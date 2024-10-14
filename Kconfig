@@ -1281,9 +1281,16 @@ menu "LVGL configuration"
 			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_ARDUINO_SD
-		config LV_FS_ARDUINO_SD_PATH
+					config LV_FS_ARDUINO_SD_PATH
 			string "Set the working directory"
 			depends on LV_USE_FS_ARDUINO_SD
+
+		config LV_USE_FS_UEFI
+			bool "File system on top of the UEFI EFI_SIMPLE_FILE_SYSTEM_PROTOCOL"
+		config LV_USE_FS_UEFI_LETTER
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			default 0
+			depends on LV_USE_FS_UEFI
 
 		config LV_USE_LODEPNG
 			bool "PNG decoder library"
@@ -1917,6 +1924,35 @@ menu "LVGL configuration"
 		config LV_USE_WINDOWS
 			bool "Use LVGL Windows backend"
 			depends on LV_OS_WINDOWS
+			default n
+
+		config LV_USE_UEFI
+			bool "Use LVGL UEFI backend"
+			default n
+
+		config LV_UEFI_HEADERS_EDK2
+			bool "Use header files from the EDK2 project"
+			depends on LV_USE_UEFI
+			default n
+
+		config LV_UEFI_HEADERS_GNU_EFI
+			bool "Use header files from the gnu-efi project"
+			depends on LV_USE_UEFI
+			default n
+
+		config LV_UEFI_HEADERS_CUSTOM
+			bool "Use custom header files"
+			depends on LV_USE_UEFI
+			default n
+
+		config LV_UEFI_CUSTOM_INCLUDE_PATH
+			string "UEFI custom include path"
+			depends on LV_UEFI_HEADERS_CUSTOM
+			default "myefi.h"
+
+		config LV_UEFI_USE_MEMORY_SERVICES
+			bool "Use the memory services from the boot services table"
+			depends on LV_USE_UEFI
 			default n
 
 		config LV_USE_OPENGLES
