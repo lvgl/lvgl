@@ -137,6 +137,14 @@ Reset the board and using the 'NSH>' terminal start the LVGL demo:
 
    nsh> lvgldemo
 
+Configurations
+--------------
+Here are some configurations that you can use to customize your NuttX and LVGL setup:
+
+-  **LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP** - You can enable or disable the
+   LVGL image heap in NuttX. By default, it is disabled. If you enable
+   it, LVGL will use the NuttX heap instead.
+
 Where can I find more information?
 ----------------------------------
 
