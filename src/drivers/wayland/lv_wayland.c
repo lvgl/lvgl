@@ -1,7 +1,6 @@
 /*******************************************************************
  *
  * @file lv_wayland.c - The Wayland client for LVGL applications
- *
  * Based on the original file from the repository.
  *
  * Porting to LVGL 9.1
@@ -42,7 +41,6 @@ typedef int dummy_t;    /* Make GCC on windows happy, avoid empty translation un
 #include <xkbcommon/xkbcommon.h>
 
 #include "lvgl.h"
-
 
 #if !LV_WAYLAND_WL_SHELL
     #include "wayland_xdg_shell.h"
@@ -101,6 +99,7 @@ enum object_type {
 #define LAST_DECORATION (OBJECT_BORDER_RIGHT)
 #define NUM_DECORATIONS (LAST_DECORATION-FIRST_DECORATION+1)
 
+
 struct window;
 struct input {
     struct {
@@ -117,11 +116,10 @@ struct input {
         lv_indev_state_t state;
     } keyboard;
 
-    struct {
-        uint32_t x;
-        uint32_t y;
-        lv_indev_state_t state;
-    } touch;
+    lv_indev_touch_data_t touches[10];
+    uint8_t touch_event_cnt;
+    uint8_t primary_id;
+    lv_indev_gesture_pinch_t pinch_state;
 };
 
 struct seat {
@@ -883,6 +881,7 @@ static void touch_handle_down(void * data, struct wl_touch * wl_touch,
                               int32_t id, wl_fixed_t x_w, wl_fixed_t y_w)
 {
     struct application * app = data;
+    uint8_t i;
 
     LV_UNUSED(id);
     LV_UNUSED(time);
@@ -895,10 +894,15 @@ static void touch_handle_down(void * data, struct wl_touch * wl_touch,
     }
 
     app->touch_obj = wl_surface_get_user_data(surface);
+    i = app->touch_obj->input.touch_event_cnt;
 
-    app->touch_obj->input.touch.x = wl_fixed_to_int(x_w);
-    app->touch_obj->input.touch.y = wl_fixed_to_int(y_w);
-    app->touch_obj->input.touch.state = LV_INDEV_STATE_PRESSED;
+    app->touch_obj->input.touches[i].point.x = wl_fixed_to_int(x_w);
+    app->touch_obj->input.touches[i].point.y = wl_fixed_to_int(y_w);
+    app->touch_obj->input.touches[i].id = id;
+    app->touch_obj->input.touches[i].ts = time;
+    app->touch_obj->input.touches[i].state = LV_INDEV_STATE_PRESSED;
+    app->touch_obj->input.touch_event_cnt++;
+    
 
 #if LV_WAYLAND_WINDOW_DECORATIONS
     struct window * window = app->touch_obj->window;
@@ -927,17 +931,23 @@ static void touch_handle_up(void * data, struct wl_touch * wl_touch,
                             uint32_t serial, uint32_t time, int32_t id)
 {
     struct application * app = data;
+    uint8_t i;
 
     LV_UNUSED(serial);
     LV_UNUSED(time);
     LV_UNUSED(id);
     LV_UNUSED(wl_touch);
 
-    if(!app->touch_obj) {
-        return;
-    }
+    /* Create a released event */
+    i = app->touch_obj->input.touch_event_cnt;
 
-    app->touch_obj->input.touch.state = LV_INDEV_STATE_RELEASED;
+    app->touch_obj->input.touches[i].point.x = 0;
+    app->touch_obj->input.touches[i].point.y = 0;
+    app->touch_obj->input.touches[i].id = id;
+    app->touch_obj->input.touches[i].ts = time;
+    app->touch_obj->input.touches[i].state = LV_INDEV_STATE_RELEASED;
+
+    app->touch_obj->input.touch_event_cnt++;
 
 #if LV_WAYLAND_WINDOW_DECORATIONS
     struct window * window = app->touch_obj->window;
@@ -968,24 +978,49 @@ static void touch_handle_up(void * data, struct wl_touch * wl_touch,
     }
 #endif // LV_WAYLAND_WINDOW_DECORATIONS
 
-    app->touch_obj = NULL;
 }
 
 static void touch_handle_motion(void * data, struct wl_touch * wl_touch,
                                 uint32_t time, int32_t id, wl_fixed_t x_w, wl_fixed_t y_w)
 {
     struct application * app = data;
+    lv_indev_touch_data_t *touch;
+    lv_indev_touch_data_t *cur;
+    uint8_t i;
 
     LV_UNUSED(time);
     LV_UNUSED(id);
     LV_UNUSED(wl_touch);
 
-    if(!app->touch_obj) {
-        return;
+    touch = &app->touch_obj->input.touches[0];
+    cur = NULL;
+
+    for (i = 0; i < app->touch_obj->input.touch_event_cnt; i++) {
+	    if (touch->id == id) {
+		    cur = touch;
+	    }
+	    touch++;
     }
 
-    app->touch_obj->input.touch.x = wl_fixed_to_int(x_w);
-    app->touch_obj->input.touch.y = wl_fixed_to_int(y_w);
+    if (cur == NULL) {
+
+    	    i = app->touch_obj->input.touch_event_cnt;
+	    app->touch_obj->input.touches[i].point.x = wl_fixed_to_int(x_w);
+	    app->touch_obj->input.touches[i].point.y = wl_fixed_to_int(y_w);
+	    app->touch_obj->input.touches[i].id = id;
+	    app->touch_obj->input.touches[i].ts = time;
+	    app->touch_obj->input.touches[i].state = LV_INDEV_STATE_PRESSED;
+
+    	    app->touch_obj->input.touch_event_cnt++;
+
+    } else {
+	    cur->point.x = wl_fixed_to_int(x_w);
+	    cur->point.y = wl_fixed_to_int(y_w);
+	    cur->id = id;
+	    cur->ts = time;
+
+    }
+
 }
 
 static void touch_handle_frame(void * data, struct wl_touch * wl_touch)
@@ -2223,6 +2258,7 @@ skip:
 static void _lv_wayland_handle_input(void)
 {
     int prepare_read = wl_display_prepare_read(application.display);
+
     while(prepare_read != 0) {
         wl_display_dispatch_pending(application.display);
     }
@@ -2249,12 +2285,15 @@ static void _lv_wayland_handle_output(void)
             window->shall_close = false;
             shall_flush = true;
 
+	    /*TODO: De-initialize new touch fields - disabled for now */
+#if 0
             window->body->input.touch.x = 0;
             window->body->input.touch.y = 0;
             window->body->input.touch.state = LV_INDEV_STATE_RELEASED;
             if(window->application->touch_obj == window->body) {
                 window->application->touch_obj = NULL;
             }
+#endif
 
             window->body->input.pointer.x = 0;
             window->body->input.pointer.y = 0;
@@ -2334,13 +2373,62 @@ static void _lv_wayland_keyboard_read(lv_indev_t * drv, lv_indev_data_t * data)
 static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
     struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
+    lv_indev_touch_data_t *touch;
+    lv_indev_touch_data_t *cur;
+    lv_indev_gesture_pinch_t *pinch_gesture;
+    uint8_t touch_cnt;
+    uint8_t i;
+
+    pinch_gesture = &window->body->input.pinch_state;
+
     if(!window || window->closed) {
+
         return;
+
+    } else if (window->body->input.touch_event_cnt == 0) {
+	    
+	    /* No touch events to send */
+	    data->point.x = 0;
+	    data->point.y = 0;
+	    data->state = LV_INDEV_STATE_RELEASED;
+	    return;
     }
 
-    data->point.x = window->body->input.touch.x;
-    data->point.y = window->body->input.touch.y;
-    data->state = window->body->input.touch.state;
+    /* TODO: Query the gesture recognizer for the primary finger */
+    /* Getting the current state of finger id 0 - is not perfect */
+    /* Because in some cases the primary finger is not the finger with id/slot 0*/
+    touch = &window->body->input.touches[0];
+    cur = NULL;
+
+    for (i = 0; i < window->body->input.touch_event_cnt; i++) {
+	    if (touch->id == 0) {
+		    cur = touch;
+	    }
+	    touch++;
+    }
+
+    lv_indev_gesture_detect_pinch(pinch_gesture,
+		    &window->body->input.touches[0],
+		    window->body->input.touch_event_cnt);
+
+    /* Check if the pinch gesture was recognized */
+    if (pinch_gesture->state == LV_INDEV_GESTURE_STATE_RECOGNIZED) {
+
+	    /* TODO: Pass the scaling factor with the event, what's the best way to do it? */
+	    data->gesture = LV_INDEV_GESTURE_PINCH;
+	    LV_LOG_WARN("Detected pinch gesture scale: %g", pinch_gesture->scale);
+    }
+
+
+    LV_LOG_TRACE("collected touch events: %d", window->body->input.touch_event_cnt);
+
+    if (cur != NULL) {
+	    data->point.x = cur->point.x;
+	    data->point.y = cur->point.y;
+    	    data->state = cur->state;
+    }
+
+    window->body->input.touch_event_cnt = 0;
 }
 
 /**********************
