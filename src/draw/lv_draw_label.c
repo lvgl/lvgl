@@ -214,7 +214,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
         pos.y += dsc->hint->y;
     }
 
-    uint32_t remaining_len = dsc->length;
+    uint32_t remaining_len = dsc->text_length;
 
     uint32_t line_end = line_start + lv_text_get_next_line(&dsc->text[line_start], remaining_len, font, dsc->letter_space,
                                                            w, NULL, dsc->flag);
@@ -279,7 +279,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
     uint8_t is_first_space_after_cmd = 0;
 
     /*Write out all lines*/
-    while((!dsc->length || remaining_len) && dsc->text[line_start] != '\0') {
+    while((!dsc->text_length || remaining_len) && dsc->text[line_start] != '\0') {
         pos.x += x_ofs;
         line_start_x = pos.x;
 
@@ -294,7 +294,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
         const char * bidi_txt = dsc->text + line_start;
 #endif
 
-        while((!dsc->length || next_char_offset < remaining_len) && next_char_offset < line_end - line_start) {
+        while((!dsc->text_length || next_char_offset < remaining_len) && next_char_offset < line_end - line_start) {
             uint32_t logical_char_pos = 0;
 
             /* Check if the text selection is enabled */

@@ -334,10 +334,10 @@ uint32_t lv_text_get_next_line(const char * txt, uint32_t len,
      *without thinking about word wrapping*/
     if((flag & LV_TEXT_FLAG_EXPAND) || (flag & LV_TEXT_FLAG_FIT)) {
         uint32_t i;
-        for(i = 0; (!len || (len && i < len)) && txt[i] != '\n' && txt[i] != '\r' && txt[i] != '\0'; i++) {
+        for(i = 0; (!len || i < len) && txt[i] != '\n' && txt[i] != '\r' && txt[i] != '\0'; i++) {
             /*Just find the new line chars or string ends by incrementing `i`*/
         }
-        if((!len || (len && i < len)) && txt[i] != '\0') i++;    /*To go beyond `\n`*/
+        if((!len || i < len) && txt[i] != '\0') i++;    /*To go beyond `\n`*/
         if(used_width) *used_width = -1;
         return i;
     }
@@ -347,7 +347,7 @@ uint32_t lv_text_get_next_line(const char * txt, uint32_t len,
 
     uint32_t i = 0;                                        /*Iterating index into txt*/
 
-    while((!len || (len && i < len)) && txt[i] != '\0' && max_width > 0) {
+    while((!len || i < len) && txt[i] != '\0' && max_width > 0) {
         lv_text_flag_t word_flag = flag;
         if(i == 0) word_flag |= LV_TEXT_FLAG_BREAK_ALL;
 
