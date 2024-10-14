@@ -110,19 +110,26 @@ void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width
 {
     lv_pxp_reset();
 
-    /* convert rotation angle */
+    /* Convert rotation angle
+     * To be in sync with CPU, the received angle is counterclockwise
+     * and the PXP constants are for clockwise rotation
+     *
+     *    counterclockwise          clockwise
+     * LV_DISPLAY_ROTATION_90  -> kPXP_Rotate270
+     * LV_DISPLAY_ROTATION_270 -> kPXP_Rotate90
+     */
     pxp_rotate_degree_t pxp_rotation;
     switch(rotation) {
         case LV_DISPLAY_ROTATION_0:
             pxp_rotation = kPXP_Rotate0;
             break;
-        case LV_DISPLAY_ROTATION_90:
+        case LV_DISPLAY_ROTATION_270:
             pxp_rotation = kPXP_Rotate90;
             break;
         case LV_DISPLAY_ROTATION_180:
             pxp_rotation = kPXP_Rotate180;
             break;
-        case LV_DISPLAY_ROTATION_270:
+        case LV_DISPLAY_ROTATION_90:
             pxp_rotation = kPXP_Rotate270;
             break;
         default:
