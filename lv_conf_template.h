@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_conf.h
  * Configuration file for v9.3.0-dev
  */
@@ -115,7 +115,6 @@
 	/*
 	 * Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
 	 * than unblocking a task using an intermediary object such as a binary semaphore.
-	 *
 	 * RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
 	 */
 	#define LV_USE_FREERTOS_TASK_NOTIFY 1
@@ -207,6 +206,22 @@
     #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS    0
 #endif
 
+/*Use TSi's aka (Think Silicon) NemaGFX */
+#define LV_USE_NEMA_GFX 0
+
+#if LV_USE_NEMA_GFX
+    #define LV_NEMA_GFX_HAL_INCLUDE <stm32u5xx_hal.h>
+
+    /*Enable Vector Graphics Operations. Available only if NemaVG library is present*/
+    #define LV_USE_NEMA_VG 0
+
+    #if LV_USE_NEMA_VG
+        /*Define application's resolution used for VG related buffer allocation */
+        #define LV_NEMA_GFX_MAX_RESX 800
+        #define LV_NEMA_GFX_MAX_RESY 600
+    #endif
+#endif
+
 /** Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
 #define LV_USE_DRAW_VGLITE 0
 
@@ -229,10 +244,16 @@
 #endif
 
 /** Use NXP's PXP on iMX RTxxx platforms. */
-#define LV_USE_DRAW_PXP 0
+#define LV_USE_PXP 0
 
-#if LV_USE_DRAW_PXP
-    #if LV_USE_OS
+#if LV_USE_PXP
+    /** Use PXP for drawing.*/
+    #define LV_USE_DRAW_PXP 1
+
+    /** Use PXP to rotate display.*/
+    #define LV_USE_ROTATE_PXP 0
+
+    #if LV_USE_DRAW_PXP && LV_USE_OS
         /** Use additional draw thread for PXP processing.*/
         #define LV_USE_PXP_DRAW_THREAD 1
     #endif
@@ -273,7 +294,7 @@
     #define LV_VG_LITE_STROKE_CACHE_CNT 32
 #endif
 
-/* Accelerate blends, fills, etc. with STM32 DMA2D */
+/** Accelerate blends, fills, etc. with STM32 DMA2D */
 #define LV_USE_DRAW_DMA2D 0
 
 #if LV_USE_DRAW_DMA2D
@@ -284,6 +305,9 @@
      */
     #define LV_USE_DRAW_DMA2D_INTERRUPT 0
 #endif
+
+/** Draw using cached OpenGLES textures */
+#define LV_USE_DRAW_OPENGLES 0
 
 /*=======================
  * FEATURE CONFIGURATION
@@ -601,6 +625,9 @@
 /** Enable Arabic/Persian processing
  *  In these languages characters should be replaced with another form based on their position in the text */
 #define LV_USE_ARABIC_PERSIAN_CHARS 0
+
+/*The control character to use for signaling text recoloring*/
+#define LV_TXT_COLOR_CMD "#"
 
 /*==================
  * WIDGETS
@@ -1078,6 +1105,8 @@
 #define LV_USE_NUTTX    0
 
 #if LV_USE_NUTTX
+    #define LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP 0
+
     #define LV_USE_NUTTX_LIBUV    0
 
     /** Use Nuttx custom init API to open window and handle touchscreen */

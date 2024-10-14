@@ -167,6 +167,10 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     LV_UNUSED(draw_unit);
 
+    /*If not refreshing the display probably it's a canvas rendering
+     *which his not support in SDL as it's not a texture.*/
+    if(lv_refr_get_disp_refreshing() == NULL) return 0;
+
     if(((lv_draw_dsc_base_t *)task->draw_dsc)->user_data == NULL) {
         task->preference_score = 0;
         task->preferred_draw_unit_id = DRAW_UNIT_ID_SDL;
@@ -348,7 +352,6 @@ static void blend_texture_layer(lv_draw_sdl_unit_t * u)
 
     SDL_Point center = {draw_dsc->pivot.x, draw_dsc->pivot.y};
     SDL_RenderCopyEx(renderer, src_texture, NULL, &rect, draw_dsc->rotation / 10, &center, SDL_FLIP_NONE);
-    //    SDL_RenderCopy(renderer, src_texture, NULL, &rect);
 
     SDL_DestroyTexture(src_texture);
     SDL_RenderSetClipRect(renderer, NULL);
@@ -418,10 +421,11 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
 
     lv_cache_release(u->texture_cache, entry_cached, u);
 
-    /*Do not cache label's with local text as the text will be freed*/
+    /*Do not cache non static (const) texts as the text's pointer can be freed/reallocated
+     *at any time resulting in a wild pointer in the cached draw dsc. */
     if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
         lv_draw_label_dsc_t * label_dsc = t->draw_dsc;
-        if(label_dsc->text_local) {
+        if(!label_dsc->text_static) {
             lv_cache_drop(u->texture_cache, &data_to_find, NULL);
         }
     }

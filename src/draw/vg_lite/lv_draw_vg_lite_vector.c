@@ -25,6 +25,10 @@
  *      DEFINES
  *********************/
 
+/* Since thorvg has an upper limit on coordinates, choose a suitable value here */
+#define PATH_COORD_MAX (1 << 18)
+#define PATH_COORD_MIN (-PATH_COORD_MAX)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -178,6 +182,11 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     if(vg_lite_query_feature(gcFEATURE_BIT_VG_SCISSOR)) {
         /* set scissor area */
         lv_vg_lite_set_scissor_area(&dsc->scissor_area);
+
+        /* no bonding box */
+        lv_vg_lite_path_set_bonding_box(lv_vg_path,
+                                        (float)PATH_COORD_MIN, (float)PATH_COORD_MIN,
+                                        (float)PATH_COORD_MAX, (float)PATH_COORD_MAX);
     }
     else {
         /* calc inverse matrix */

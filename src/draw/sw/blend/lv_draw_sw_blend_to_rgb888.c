@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_draw_sw_blend_to_rgb888.c
  *
  */

@@ -34,6 +34,7 @@ extern "C" {
 #include "src/misc/lv_rb.h"
 #include "src/misc/lv_utils.h"
 #include "src/misc/lv_iter.h"
+#include "src/misc/lv_circle_buf.h"
 
 #include "src/tick/lv_tick.h"
 
