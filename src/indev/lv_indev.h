@@ -47,6 +47,15 @@ typedef enum {
     LV_INDEV_MODE_EVENT,
 } lv_indev_mode_t;
 
+typedef enum {
+    LV_INDEV_GESTURE_DISABLED = 0,
+    LV_INDEV_GESTURE_AUTO,
+    LV_INDEV_GESTURE_PINCH,
+    LV_INDEV_GESTURE_SWIPE,
+    LV_INDEV_GESTURE_ROTATE,
+    LV_INDEV_GESTURE_SCROLL,
+} lv_indev_gesture_type_t;
+
 /** Data structure passed to an input driver to fill*/
 typedef struct {
     lv_point_t point; /**< For LV_INDEV_TYPE_POINTER the currently pressed point*/
@@ -54,6 +63,7 @@ typedef struct {
     uint32_t btn_id;  /**< For LV_INDEV_TYPE_BUTTON the currently pressed button*/
     int16_t enc_diff; /**< For LV_INDEV_TYPE_ENCODER number of steps since the previous read*/
 
+    lv_indev_gesture_type_t gesture;
     lv_indev_state_t state; /**< LV_INDEV_STATE_RELEASED or LV_INDEV_STATE_PRESSED*/
     bool continue_reading;  /**< If set to true, the read callback is invoked again, unless the device is in event-driven mode*/
 } lv_indev_data_t;
