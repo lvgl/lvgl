@@ -236,34 +236,35 @@ static void perf_update_timer_cb(lv_timer_t * t)
     uint32_t LV_SYSMON_GET_IDLE(void);
 
     lv_sysmon_perf_info_t * info = &disp->perf_sysmon_info;
-    info->calculated.run_cnt++;
+    if(info->measured.render_cnt != 0) {
+        info->calculated.run_cnt++;
 
-    uint32_t time_since_last_report = lv_tick_elaps(info->measured.last_report_timestamp);
-    lv_timer_t * disp_refr_timer = lv_display_get_refr_timer(NULL);
-    uint32_t disp_refr_period = disp_refr_timer->period;
+        uint32_t time_since_last_report = lv_tick_elaps(info->measured.last_report_timestamp);
+        lv_timer_t * disp_refr_timer = lv_display_get_refr_timer(NULL);
+        uint32_t disp_refr_period = disp_refr_timer->period;
 
-    info->calculated.fps = info->measured.refr_interval_sum ? (1000 * info->measured.refr_cnt / time_since_last_report) : 0;
-    info->calculated.fps = LV_MIN(info->calculated.fps,
-                                  1000 / disp_refr_period);   /*Limit due to possible off-by-one error*/
+        info->calculated.fps = info->measured.refr_interval_sum ? (1000 * info->measured.refr_cnt / time_since_last_report) : 0;
+        info->calculated.fps = LV_MIN(info->calculated.fps,
+                                      1000 / disp_refr_period);   /*Limit due to possible off-by-one error*/
 
-    info->calculated.cpu = 100 - LV_SYSMON_GET_IDLE();
-    info->calculated.refr_avg_time = info->measured.refr_cnt ? (info->measured.refr_elaps_sum / info->measured.refr_cnt) :
-                                     0;
+        info->calculated.cpu = 100 - LV_SYSMON_GET_IDLE();
+        info->calculated.refr_avg_time = info->measured.refr_cnt ? (info->measured.refr_elaps_sum / info->measured.refr_cnt) :
+                                         0;
 
-    info->calculated.flush_avg_time = info->measured.render_cnt ?
-                                      ((info->measured.flush_in_render_elaps_sum + info->measured.flush_not_in_render_elaps_sum)
-                                       / info->measured.render_cnt) : 0;
-    /*Flush time was measured in rendering time so subtract it*/
-    info->calculated.render_avg_time = info->measured.render_cnt ? ((info->measured.render_elaps_sum -
-                                                                     info->measured.flush_in_render_elaps_sum) /
-                                                                    info->measured.render_cnt) : 0;
+        info->calculated.flush_avg_time = (info->measured.flush_in_render_elaps_sum +
+                                           info->measured.flush_not_in_render_elaps_sum)
+                                          / info->measured.render_cnt;
+        /*Flush time was measured in rendering time so subtract it*/
+        info->calculated.render_avg_time = (info->measured.render_elaps_sum - info->measured.flush_in_render_elaps_sum) /
+                                           info->measured.render_cnt;
 
-    info->calculated.cpu_avg_total = ((info->calculated.cpu_avg_total * (info->calculated.run_cnt - 1)) +
-                                      info->calculated.cpu) / info->calculated.run_cnt;
-    info->calculated.fps_avg_total = ((info->calculated.fps_avg_total * (info->calculated.run_cnt - 1)) +
-                                      info->calculated.fps) / info->calculated.run_cnt;
+        info->calculated.cpu_avg_total = ((info->calculated.cpu_avg_total * (info->calculated.run_cnt - 1)) +
+                                          info->calculated.cpu) / info->calculated.run_cnt;
+        info->calculated.fps_avg_total = ((info->calculated.fps_avg_total * (info->calculated.run_cnt - 1)) +
+                                          info->calculated.fps) / info->calculated.run_cnt;
 
-    lv_subject_set_pointer(&disp->perf_sysmon_backend.subject, info);
+        lv_subject_set_pointer(&disp->perf_sysmon_backend.subject, info);
+    }
 
     lv_sysmon_perf_info_t prev_info = *info;
     lv_memzero(info, sizeof(lv_sysmon_perf_info_t));
