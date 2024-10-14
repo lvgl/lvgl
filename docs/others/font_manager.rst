@@ -91,14 +91,14 @@ it is necessary to ensure that the application has deleted all fonts using :cpp:
 The font manager will check the reference status of all allocated fonts. If there are still fonts being referenced,
 the font manager will fail to destroy and return false.
 
-.. _fragment_example:
+.. _font_manager_example:
 
 Example
 -------
 
 .. include:: ../examples/others/font_manager/index.rst
 
-.. _fragment_api:
+.. _font_manager_api:
 
 API
 ---
