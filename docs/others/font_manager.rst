@@ -17,6 +17,8 @@ Usage
 
 Enable :c:macro:`LIB_FREETYPE` and `LV_USE_FONT_MANAGER` in ``lv_conf.h``.
 
+Configure :c:macro:`LV_FONT_MANAGER_NAME_MAX_LEN` to set the maximum length of the font name.
+
 Initialize Font Manager
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -65,7 +67,7 @@ to achieve font concatenation (when the corresponding glyph is not found in a fo
    /* Create label with the font */
    lv_obj_t * label = lv_label_create(lv_screen_active());
    lv_obj_set_style_text_font(label, g_font, 0);
-   lv_label_set_text(label, "Hello World");
+   lv_label_set_text(label, "Hello World!");
 
 Delete Font
 ~~~~~~~~~~~
