@@ -17,33 +17,33 @@ jobs:
 
       - name: UTF-8 BOM
         run: |          
-          if grep -lrE --include="*.c" $'\xEF\xBB\xBF' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.h" $'\xEF\xBB\xBF' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.rst" $'\xEF\xBB\xBF' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.txt" $'\xEF\xBB\xBF' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.mk" $'\xEF\xBB\xBF' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.py" $'\xEF\xBB\xBF' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="Makefile" $'\xEF\xBB\xBF' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.cmake" $'\xEF\xBB\xBF' .; then exit 1; else exit 0; fi
+          if grep -lrE --include="*.c" $'\xEF\xBB\xBF' .; then exit 1; fi
+          if grep -lrE --include="*.h" $'\xEF\xBB\xBF' .; then exit 1; fi
+          if grep -lrE --include="*.rst" $'\xEF\xBB\xBF' .; then exit 1; fi
+          if grep -lrE --include="*.txt" $'\xEF\xBB\xBF' .; then exit 1; fi
+          if grep -lrE --include="*.mk" $'\xEF\xBB\xBF' .; then exit 1; fi
+          if grep -lrE --include="*.py" $'\xEF\xBB\xBF' .; then exit 1; fi
+          if grep -lrE --include="Makefile" $'\xEF\xBB\xBF' .; then exit 1; fi
+          if grep -lrE --include="*.cmake" $'\xEF\xBB\xBF' .; then exit 1; fi
 
       - name: UTF-16LE BOM
         run: |
-          if grep -lrE --include="*.c" $'\xFF\xFE' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.h" $'\xFF\xFE' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.rst" $'\xFF\xFE' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.txt" $'\xFF\xFE' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.mk" $'\xFF\xFE' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.py" $'\xFF\xFE' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="Makefile" $'\xFF\xFE' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.cmake" $'\xFF\xFE' .; then exit 1; else exit 0; fi
+          if grep -lrE --include="*.c" $'\xFF\xFE' .; then exit 1; fi
+          if grep -lrE --include="*.h" $'\xFF\xFE' .; then exit 1; fi
+          if grep -lrE --include="*.rst" $'\xFF\xFE' .; then exit 1; fi
+          if grep -lrE --include="*.txt" $'\xFF\xFE' .; then exit 1; fi
+          if grep -lrE --include="*.mk" $'\xFF\xFE' .; then exit 1; fi
+          if grep -lrE --include="*.py" $'\xFF\xFE' .; then exit 1; fi
+          if grep -lrE --include="Makefile" $'\xFF\xFE' .; then exit 1; fi
+          if grep -lrE --include="*.cmake" $'\xFF\xFE' .; then exit 1; fi
 
       - name: UTF-16BE BOM
         run: |
-          if grep -lrE --include="*.c" $'\xFE\xFF' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.h" $'\xFE\xFF' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.rst" $'\xFE\xFF' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.txt" $'\xFE\xFF' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.mk" $'\xFE\xFF' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.py" $'\xFE\xFF' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="Makefile" $'\xFE\xFF' .; then exit 1; else exit 0; fi
-          if grep -lrE --include="*.cmake" $'\xFE\xFF' .; then exit 1; else exit 0; fi
+          if grep -lrE --include="*.c" $'\xFE\xFF' .; then exit 1; fi
+          if grep -lrE --include="*.h" $'\xFE\xFF' .; then exit 1; fi
+          if grep -lrE --include="*.rst" $'\xFE\xFF' .; then exit 1; fi
+          if grep -lrE --include="*.txt" $'\xFE\xFF' .; then exit 1; fi
+          if grep -lrE --include="*.mk" $'\xFE\xFF' .; then exit 1; fi
+          if grep -lrE --include="*.py" $'\xFE\xFF' .; then exit 1; fi
+          if grep -lrE --include="Makefile" $'\xFE\xFF' .; then exit 1; fi
+          if grep -lrE --include="*.cmake" $'\xFE\xFF' .; then exit 1; fi
