@@ -199,7 +199,7 @@ void setUp(void)
     g_ctx.par = lv_screen_active();
     g_ctx.config.label_cnt = MAX_LABEL_CNT;
     g_ctx.label_arr = lv_malloc_zeroed(sizeof(lv_obj_t *) * g_ctx.config.label_cnt);
-    LV_ASSERT_MALLOC(g_ctx.label_arr);
+    TEST_ASSERT_NOT_NULL(g_ctx.label_arr);
 }
 
 void tearDown(void)
@@ -250,10 +250,10 @@ void test_font_manager_stress(void)
                                     "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf");
     lv_font_manager_add_path_static(g_ctx.font_manager, "Arial", "../src/libs/freetype/arial.ttf");
     lv_font_manager_add_path(g_ctx.font_manager, "Montserrat-Bold", "../demos/multilang/assets/fonts/Montserrat-Bold.ttf");
-    lv_font_manager_add_path(g_ctx.font_manager, "UNKNOWN", "UNKNOWN_FONT_NAME");
+    lv_font_manager_add_path(g_ctx.font_manager, "UNKNOWN", "UNKNOWN_FONT_PATH");
 
     static const char * font_name_arr[] = {
-        "NotoSansSC-Regular",
+        "NotoSansSC-Regular,Arial",
         "Arial",
         "Montserrat-Bold",
         "UNKNOWN"
@@ -278,10 +278,11 @@ void test_font_manager_stress(void)
 
     font_stress_label_delete_all(&g_ctx);
 
-    for(int i = 0; i < g_ctx.config.font_cnt; i++) {
-        bool remove_ok = lv_font_manager_remove_path(g_ctx.font_manager, g_ctx.config.font_name_arr[i]);
-        TEST_ASSERT_TRUE(remove_ok);
-    }
+    bool remove_ok = lv_font_manager_remove_path(g_ctx.font_manager, "Arial");
+    TEST_ASSERT_TRUE(remove_ok);
+
+    remove_ok = lv_font_manager_remove_path(g_ctx.font_manager, "UNKNOWN");
+    TEST_ASSERT_TRUE(remove_ok);
 
     bool success = lv_font_manager_delete(g_ctx.font_manager);
     TEST_ASSERT_TRUE(success);

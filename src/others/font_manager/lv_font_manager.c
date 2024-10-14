@@ -199,9 +199,14 @@ lv_font_t * lv_font_manager_create_font(lv_font_manager_t * manager, const char 
         ret_font = lv_font_manager_create_font_single(manager, &ft_info);
     }
 
-    /* make LV_SYMBOL displayable */
-    if(ret_font) {
-        ret_font->fallback = LV_FONT_DEFAULT;
+    /* Append fallback font to make LV_SYMBOL displayable */
+    lv_font_t * cur_font = ret_font;
+    while(cur_font) {
+        if(cur_font->fallback == NULL) {
+            cur_font->fallback = LV_FONT_DEFAULT;
+            break;
+        }
+        cur_font = (lv_font_t *)cur_font->fallback;
     }
 
     return ret_font;
