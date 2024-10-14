@@ -40,6 +40,9 @@
 #include "misc/lv_fs.h"
 #include "osal/lv_os_private.h"
 
+#if LV_USE_NEMA_GFX
+    #include "draw/nema_gfx/lv_draw_nema_gfx.h"
+#endif
 #if LV_USE_DRAW_VGLITE
     #include "draw/nxp/vglite/lv_draw_vglite.h"
 #endif
@@ -59,6 +62,9 @@
 #endif
 #if LV_USE_DRAW_DMA2D
     #include "draw/dma2d/lv_draw_dma2d.h"
+#endif
+#if LV_USE_DRAW_OPENGLES
+    #include "draw/opengles/lv_draw_opengles.h"
 #endif
 #if LV_USE_WINDOWS
     #include "drivers/windows/lv_windows_context.h"
@@ -199,6 +205,10 @@ void lv_init(void)
     lv_draw_sw_init();
 #endif
 
+#if LV_USE_NEMA_GFX
+    lv_draw_nema_gfx_init();
+#endif
+
 #if LV_USE_DRAW_VGLITE
     lv_draw_vglite_init();
 #endif
@@ -219,6 +229,10 @@ void lv_init(void)
 
 #if LV_USE_DRAW_DMA2D
     lv_draw_dma2d_init();
+#endif
+
+#if LV_USE_DRAW_OPENGLES
+    lv_draw_opengles_init();
 #endif
 
 #if LV_USE_WINDOWS
@@ -412,6 +426,10 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_DMA2D
     lv_draw_dma2d_deinit();
+#endif
+
+#if LV_USE_DRAW_OPENGLES
+    lv_draw_opengles_deinit();
 #endif
 
 #if LV_USE_DRAW_SW

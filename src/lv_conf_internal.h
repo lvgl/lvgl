@@ -583,6 +583,52 @@
     #endif
 #endif
 
+/*Use TSi's aka (Think Silicon) NemaGFX */
+#ifndef LV_USE_NEMA_GFX
+    #ifdef CONFIG_LV_USE_NEMA_GFX
+        #define LV_USE_NEMA_GFX CONFIG_LV_USE_NEMA_GFX
+    #else
+        #define LV_USE_NEMA_GFX 0
+    #endif
+#endif
+
+#if LV_USE_NEMA_GFX
+    #ifndef LV_NEMA_GFX_HAL_INCLUDE
+        #ifdef CONFIG_LV_NEMA_GFX_HAL_INCLUDE
+            #define LV_NEMA_GFX_HAL_INCLUDE CONFIG_LV_NEMA_GFX_HAL_INCLUDE
+        #else
+            #define LV_NEMA_GFX_HAL_INCLUDE <stm32u5xx_hal.h>
+        #endif
+    #endif
+
+    /*Enable Vector Graphics Operations. Available only if NemaVG library is present*/
+    #ifndef LV_USE_NEMA_VG
+        #ifdef CONFIG_LV_USE_NEMA_VG
+            #define LV_USE_NEMA_VG CONFIG_LV_USE_NEMA_VG
+        #else
+            #define LV_USE_NEMA_VG 0
+        #endif
+    #endif
+
+    #if LV_USE_NEMA_VG
+        /*Define application's resolution used for VG related buffer allocation */
+        #ifndef LV_NEMA_GFX_MAX_RESX
+            #ifdef CONFIG_LV_NEMA_GFX_MAX_RESX
+                #define LV_NEMA_GFX_MAX_RESX CONFIG_LV_NEMA_GFX_MAX_RESX
+            #else
+                #define LV_NEMA_GFX_MAX_RESX 800
+            #endif
+        #endif
+        #ifndef LV_NEMA_GFX_MAX_RESY
+            #ifdef CONFIG_LV_NEMA_GFX_MAX_RESY
+                #define LV_NEMA_GFX_MAX_RESY CONFIG_LV_NEMA_GFX_MAX_RESY
+            #else
+                #define LV_NEMA_GFX_MAX_RESY 600
+            #endif
+        #endif
+    #endif
+#endif
+
 /** Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
 #ifndef LV_USE_DRAW_VGLITE
     #ifdef CONFIG_LV_USE_DRAW_VGLITE
@@ -785,7 +831,7 @@
     #endif
 #endif
 
-/* Accelerate blends, fills, etc. with STM32 DMA2D */
+/** Accelerate blends, fills, etc. with STM32 DMA2D */
 #ifndef LV_USE_DRAW_DMA2D
     #ifdef CONFIG_LV_USE_DRAW_DMA2D
         #define LV_USE_DRAW_DMA2D CONFIG_LV_USE_DRAW_DMA2D
@@ -812,6 +858,15 @@
         #else
             #define LV_USE_DRAW_DMA2D_INTERRUPT 0
         #endif
+    #endif
+#endif
+
+/** Draw using cached OpenGLES textures */
+#ifndef LV_USE_DRAW_OPENGLES
+    #ifdef CONFIG_LV_USE_DRAW_OPENGLES
+        #define LV_USE_DRAW_OPENGLES CONFIG_LV_USE_DRAW_OPENGLES
+    #else
+        #define LV_USE_DRAW_OPENGLES 0
     #endif
 #endif
 

@@ -110,7 +110,7 @@ void lv_glfw_window_delete(lv_glfw_window_t * window)
     if(window->use_indev) {
         lv_glfw_texture_t * texture;
         LV_LL_READ(&window->textures, texture) {
-            lv_indev_delete(texture->indev);
+            if(texture->indev != NULL) lv_indev_delete(texture->indev);
         }
     }
     lv_ll_clear(&window->textures);
@@ -300,7 +300,14 @@ static void window_update_handler(lv_timer_t * t)
                 lv_refr_now(texture_disp);
             }
 
-            lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res);
+            lv_area_t clip_area = texture->area;
+#if LV_USE_DRAW_OPENGLES
+            lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
+                                       &clip_area, texture_disp == NULL);
+#else
+            lv_opengles_render_texture(texture->texture_id, &texture->area, texture->opa, window->hor_res, window->ver_res,
+                                       &clip_area, true);
+#endif
         }
 
         /* Swap front and back buffers */
