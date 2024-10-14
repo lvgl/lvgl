@@ -265,7 +265,7 @@ static bool lv_font_manager_delete_font_single(lv_font_manager_t * manager, lv_f
     if(!rec_node) {
         LV_LOG_WARN("NO record found for font: %p(%d),"
                     " it was not created by font manager",
-                    font, (int)font->line_height);
+                    (void *)font, (int)font->line_height);
         return false;
     }
 
@@ -424,7 +424,7 @@ static bool lv_font_manager_check_resource(lv_font_manager_t * manager)
         lv_font_rec_node_t * node;
         LV_LL_READ(rec_ll, node) {
             LV_LOG_WARN("font: %p(%d) -> ref: %s(%d)",
-                        node,
+                        (void *)node,
                         (int)node->font.line_height,
                         node->refer_node_p->ft_info.name,
                         node->refer_node_p->ft_info.size);
@@ -460,7 +460,7 @@ static lv_font_rec_node_t * lv_font_manager_search_rec_node(lv_font_manager_t * 
     lv_font_rec_node_t * rec_node;
     LV_LL_READ(&manager->rec_ll, rec_node) {
         if(font == &rec_node->font) {
-            LV_LOG_INFO("font: %p(%d) matched", font, (int)font->line_height);
+            LV_LOG_INFO("font: %p(%d) matched", (void *)font, (int)font->line_height);
             return rec_node;
         }
     }
