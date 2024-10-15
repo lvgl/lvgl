@@ -54,6 +54,27 @@ no locking is done). It may conflict with existing definitions
 if you have an existing Nema HAL implementation. You may
 simply be able to remove yours.
 
+TSC Images
+**********
+
+TSC (ThinkSillicon Compression) images can be drawn by this renderer. The
+TSC 4/6/6A/12/12A color formats are part of :cpp:type:`lv_color_format_t`.
+All other renderers will ignore images with these color formats.
+Define an image descriptor variable with the corresponding
+TSC color format and the GPU will be able to draw it directly.
+Stride does not need to be specified because it will be computed by the
+renderer.
+
+.. code-block:: c
+
+    const lv_image_dsc_t img_demo_widgets_avatar_tsc6a = {
+        .header.cf = LV_COLOR_FORMAT_NEMA_TSC6A,
+        .header.w = 144,
+        .header.h = 144,
+        .data = img_demo_widgets_avatar_tsc6a_map,
+        .data_size = sizeof(img_demo_widgets_avatar_tsc6a_map),
+    };
+
 DMA2D
 *****
 

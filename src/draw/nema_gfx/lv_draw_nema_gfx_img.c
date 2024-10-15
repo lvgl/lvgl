@@ -140,7 +140,9 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
     }
 
     uint32_t src_nema_cf = lv_nemagfx_cf_to_nema(src_cf);
-    uint32_t src_stride = img_dsc->header.stride;
+    /* the stride should be computed internally for NEMA_TSC images and images missing a stride value */
+    uint32_t src_stride = (src_cf >= LV_COLOR_FORMAT_NEMA_TSC_START && src_cf <= LV_COLOR_FORMAT_NEMA_TSC_END)
+                          || img_dsc->header.stride == 0 ? -1 : img_dsc->header.stride;
 
     nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(layer->draw_buf->data), lv_area_get_width(&(layer->buf_area)),
                       lv_area_get_height(&(layer->buf_area)), dst_nema_cf,
