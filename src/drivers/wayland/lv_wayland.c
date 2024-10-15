@@ -893,6 +893,7 @@ static void touch_handle_down(void * data, struct wl_touch * wl_touch,
         return;
     }
 
+    /* Create the touch down event */
     app->touch_obj = wl_surface_get_user_data(surface);
     i = app->touch_obj->input.touch_event_cnt;
 
@@ -992,6 +993,7 @@ static void touch_handle_motion(void * data, struct wl_touch * wl_touch,
     LV_UNUSED(id);
     LV_UNUSED(wl_touch);
 
+    /* Update the contact point of the corresponding id with the latest coordinate */
     touch = &app->touch_obj->input.touches[0];
     cur = NULL;
 
