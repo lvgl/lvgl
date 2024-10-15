@@ -2900,6 +2900,29 @@
     #endif
 #endif
 
+/*SVG library*/
+#ifndef LV_USE_SVG
+    #ifdef CONFIG_LV_USE_SVG
+        #define LV_USE_SVG CONFIG_LV_USE_SVG
+    #else
+        #define LV_USE_SVG 0
+    #endif
+#endif
+#ifndef LV_USE_SVG_ANIMATION
+    #ifdef CONFIG_LV_USE_SVG_ANIMATION
+        #define LV_USE_SVG_ANIMATION CONFIG_LV_USE_SVG_ANIMATION
+    #else
+        #define LV_USE_SVG_ANIMATION 0
+    #endif
+#endif
+#ifndef LV_USE_SVG_DEBUG
+    #ifdef CONFIG_LV_USE_SVG_DEBUG
+        #define LV_USE_SVG_DEBUG CONFIG_LV_USE_SVG_DEBUG
+    #else
+        #define LV_USE_SVG_DEBUG 0
+    #endif
+#endif
+
 /** FFmpeg library for image decoding and playing videos.
  *  Supports all major image formats so do not enable other image decoder with it. */
 #ifndef LV_USE_FFMPEG
