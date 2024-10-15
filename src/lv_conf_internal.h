@@ -3753,6 +3753,8 @@
         #define LV_USE_NXP_ELCDIF CONFIG_LV_USE_NXP_ELCDIF
     #else
         #define LV_USE_NXP_ELCDIF   0
+    #endif
+#endif
 
 /** Driver for ST LTDC */
 #ifndef LV_USE_ST_LTDC
@@ -3762,7 +3764,6 @@
         #define LV_USE_ST_LTDC    0
     #endif
 #endif
-
 #if LV_USE_ST_LTDC
     /* Only used for partial. */
     #ifndef LV_ST_LTDC_USE_DMA2D_FLUSH
