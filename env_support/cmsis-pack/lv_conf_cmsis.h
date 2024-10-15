@@ -1,6 +1,6 @@
 /**
  * @file lv_conf_cmsis.h
- * Configuration file for v9.2.0
+ * Configuration file for v9.2.1
  */
 
 /* clang-format off */

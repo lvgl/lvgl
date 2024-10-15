@@ -7,8 +7,8 @@
 #define LVGL_VERSION_H
 
 #define LVGL_VERSION_MAJOR 9
-#define LVGL_VERSION_MINOR 3
-#define LVGL_VERSION_PATCH 0
-#define LVGL_VERSION_INFO "dev"
+#define LVGL_VERSION_MINOR 2
+#define LVGL_VERSION_PATCH 1
+#define LVGL_VERSION_INFO ""
 
 #endif /* LVGL_VERSION_H */
