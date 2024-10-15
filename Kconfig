@@ -1930,24 +1930,9 @@ menu "LVGL configuration"
 			bool "Use LVGL UEFI backend"
 			default n
 
-		config LV_UEFI_HEADERS_EDK2
-			bool "Use header files from the EDK2 project"
+		config LV_USE_UEFI_INCLUDE
+			string "Header that hides the actual framework (EDK2, gnu-efi, ...)"
 			depends on LV_USE_UEFI
-			default n
-
-		config LV_UEFI_HEADERS_GNU_EFI
-			bool "Use header files from the gnu-efi project"
-			depends on LV_USE_UEFI
-			default n
-
-		config LV_UEFI_HEADERS_CUSTOM
-			bool "Use custom header files"
-			depends on LV_USE_UEFI
-			default n
-
-		config LV_UEFI_CUSTOM_INCLUDE_PATH
-			string "UEFI custom include path"
-			depends on LV_UEFI_HEADERS_CUSTOM
 			default "myefi.h"
 
 		config LV_UEFI_USE_MEMORY_SERVICES

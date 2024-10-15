@@ -40,22 +40,8 @@
         #error Your compiler is not supported
     #endif
 
-    #if LV_UEFI_HEADERS_EDK2
-        #include <Uefi.h>
-        #include <Protocol/SimplePointer.h>
-        #include <Protocol/SimpleFileSystem.h>
-        #include <Protocol/AbsolutePointer.h>
-        #include <Protocol/GraphicsOutput.h>
-        #include <Protocol/SimpleTextIn.h>
-        #include <Protocol/SimpleTextOut.h>
-        #include <Protocol/Timestamp.h>
-        #include <Protocol/LoadedImage.h>
-        #include <Protocol/EdidActive.h>
-        #include <Guid/FileInfo.h>
-    #elif LV_UEFI_HEADERS_GNU_EFI
-        #include <efi.h>
-    #elif LV_UEFI_HEADERS_CUSTOM
-        #include LV_UEFI_CUSTOM_INCLUDE_PATH
+    #ifdef LV_USE_UEFI_INCLUDE
+        #include LV_USE_UEFI_INCLUDE
     #else
         #error No UEFI headers available
     #endif

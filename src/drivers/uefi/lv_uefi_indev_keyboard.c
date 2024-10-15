@@ -79,7 +79,7 @@ static EFI_GUID _uefi_guid_simple_text_input = EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL
  * @brief Create an indev object.
  * @return The created LVGL indev object.
 */
-lv_indev_t * lv_uefi_simple_text_input_indev_create()
+lv_indev_t * lv_uefi_simple_text_input_indev_create(void)
 {
     lv_indev_t * indev = NULL;
     lv_uefi_simple_text_input_context_t * indev_ctx = NULL;
@@ -107,9 +107,7 @@ lv_indev_t * lv_uefi_simple_text_input_indev_create()
  * @param handle The handle on which an instance of the EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL protocol is installed.
  * @return True if the interface was added.
 */
-bool lv_uefi_simple_text_input_indev_add_handle(
-    lv_indev_t * indev,
-    EFI_HANDLE handle)
+bool lv_uefi_simple_text_input_indev_add_handle(lv_indev_t * indev, EFI_HANDLE handle)
 {
     EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL * interface = NULL;
     lv_uefi_simple_text_input_handle_context_t * handle_ctx = NULL;
@@ -139,8 +137,7 @@ bool lv_uefi_simple_text_input_indev_add_handle(
  * @brief Add all available EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL interfaces to the indev.
  * @param indev Indev that was created with lv_uefi_simple_text_input_indev_create.
 */
-void lv_uefi_simple_text_input_indev_add_all(
-    lv_indev_t * indev)
+void lv_uefi_simple_text_input_indev_add_all(lv_indev_t * indev)
 {
     EFI_STATUS status;
     EFI_HANDLE * handles = NULL;
@@ -194,7 +191,7 @@ static void _simple_text_input_read_cb(lv_indev_t * indev, lv_indev_data_t * dat
     lv_uefi_simple_text_input_context_t * indev_ctx = (lv_uefi_simple_text_input_context_t *)lv_indev_get_user_data(indev);
     LV_ASSERT_NULL(indev_ctx);
 
-    // Empty the buffer before reading new values
+    /* Empty the buffer before reading new values */
     if(lv_ll_is_empty(&indev_ctx->key_cache)) {
         // Read from all registered devices
         for(node = lv_ll_get_head(&indev_ctx->handles); node != NULL; node = lv_ll_get_next(&indev_ctx->handles, node)) {
@@ -203,7 +200,7 @@ static void _simple_text_input_read_cb(lv_indev_t * indev, lv_indev_data_t * dat
         }
     }
 
-    // Return the first value
+    /* Return the first value */
     node = lv_ll_get_head(&indev_ctx->key_cache);
     if(node != NULL) {
         key_cache = (lv_uefi_simple_text_input_key_cache_t *)node;
@@ -213,7 +210,7 @@ static void _simple_text_input_read_cb(lv_indev_t * indev, lv_indev_data_t * dat
         lv_free(key_cache);
     }
 
-    // Continue reading if there are more values in the buffer
+    /* Continue reading if there are more values in the buffer */
     data->continue_reading = !lv_ll_is_empty(&indev_ctx->key_cache);
 }
 
@@ -262,13 +259,13 @@ static void _simple_text_input_read(lv_uefi_simple_text_input_context_t * indev_
 
     key = _key_from_uefi_key(&state);
 
-    // insert the press
+    /* insert the press */
     cache = (lv_uefi_simple_text_input_key_cache_t *) lv_ll_ins_tail(&indev_ctx->key_cache);
     LV_ASSERT_MALLOC(cache);
     cache->key = key;
     cache->pressed = true;
 
-    // insert the release
+    /* insert the release */
     cache = (lv_uefi_simple_text_input_key_cache_t *) lv_ll_ins_tail(&indev_ctx->key_cache);
     LV_ASSERT_MALLOC(cache);
     cache->key = key;
@@ -279,18 +276,18 @@ static uint32_t _utf8_from_unicode(UINT32 unicode)
 {
     uint8_t bytes[4] = {0, 0, 0, 0};
 
-    // unicode < 128 -> 1 byte
+    /* unicode < 128 -> 1 byte */
     if(unicode < 128) {
         bytes[0] |= unicode;
     }
-    // unicode < 2048 -> 2 byte
+    /* unicode < 2048 -> 2 byte */
     else if(unicode < 2048) {
         bytes[0] = 0xC0;
         bytes[0] |= unicode >> 6;
         bytes[1] = 0x80;
         bytes[1] |= (unicode & 0x003F);
     }
-    // unicode < 65536 -> 3 byte
+    /* unicode < 65536 -> 3 byte */
     else if(unicode < 65536) {
         bytes[0] = 0xE0;
         bytes[0] |= unicode >> 12;
@@ -324,7 +321,7 @@ static uint32_t _key_from_uefi_key(const EFI_KEY_DATA * key)
             return LV_KEY_END;
         case 0x17:
             return LV_KEY_ESC;
-        // ignore all other scan codes
+        /* ignore all other scan codes */
         default:
             break;
     }

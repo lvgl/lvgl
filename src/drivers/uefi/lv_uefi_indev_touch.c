@@ -72,8 +72,7 @@ static EFI_GUID _uefi_guid_absolute_pointer = EFI_ABSOLUTE_POINTER_PROTOCOL_GUID
  * @param display_res The resolution of the display in pixels, needed to scale the input.
  * @return The created LVGL indev object.
 */
-lv_indev_t * lv_uefi_absolute_pointer_indev_create(
-    lv_point_t * display_res)
+lv_indev_t * lv_uefi_absolute_pointer_indev_create(lv_point_t * display_res)
 {
     lv_indev_t * indev = NULL;
     lv_uefi_absolute_pointer_context_t * indev_ctx = NULL;
@@ -109,9 +108,7 @@ lv_indev_t * lv_uefi_absolute_pointer_indev_create(
  * @param handle The handle on which an instance of the EFI_ABSOLUTE_POINTER_PROTOCOL protocol is installed.
  * @return True if the interface was added.
 */
-bool lv_uefi_absolute_pointer_indev_add_handle(
-    lv_indev_t * indev,
-    EFI_HANDLE handle)
+bool lv_uefi_absolute_pointer_indev_add_handle(lv_indev_t * indev, EFI_HANDLE handle)
 {
     EFI_ABSOLUTE_POINTER_PROTOCOL * interface = NULL;
     lv_uefi_absolute_pointer_handle_context_t * handle_ctx = NULL;
@@ -148,8 +145,7 @@ bool lv_uefi_absolute_pointer_indev_add_handle(
  * @brief Add all available EFI_ABSOLUTE_POINTER_PROTOCOL interfaces to the indev.
  * @param indev Indev that was created with lv_uefi_absolute_pointer_indev_create.
 */
-void lv_uefi_absolute_pointer_indev_add_all(
-    lv_indev_t * indev)
+void lv_uefi_absolute_pointer_indev_add_all(lv_indev_t * indev)
 {
     EFI_STATUS status;
     EFI_HANDLE * handles = NULL;
@@ -201,7 +197,7 @@ static void _absolute_pointer_read_cb(lv_indev_t * indev, lv_indev_data_t * data
     lv_uefi_absolute_pointer_context_t * indev_ctx = (lv_uefi_absolute_pointer_context_t *)lv_indev_get_user_data(indev);
     LV_ASSERT_NULL(indev_ctx);
 
-    // Read from all registered devices
+    /* Read from all registered devices */
     for(node = lv_ll_get_head(&indev_ctx->handles); node != NULL; node = lv_ll_get_next(&indev_ctx->handles, node)) {
         lv_uefi_absolute_pointer_handle_context_t * handle_ctx = (lv_uefi_absolute_pointer_handle_context_t *) node;
         bool was_pressed = false;
@@ -211,7 +207,7 @@ static void _absolute_pointer_read_cb(lv_indev_t * indev, lv_indev_data_t * data
         data->state |= was_pressed ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
     }
 
-    // Sanitize the events position
+    /* Sanitize the events position */
     if(indev_ctx->position.x < 0) {
         indev_ctx->position.x = 0;
     }
@@ -277,7 +273,7 @@ static void _absolute_pointer_read(lv_uefi_absolute_pointer_context_t * indev_ct
         return;
     }
 
-    // verify the state
+    /* verify the state */
     if(state.CurrentX < handle_ctx->interface->Mode->AbsoluteMinX) return;
     if(state.CurrentY < handle_ctx->interface->Mode->AbsoluteMinY) return;
 
@@ -287,7 +283,7 @@ static void _absolute_pointer_read(lv_uefi_absolute_pointer_context_t * indev_ct
     indev_ctx->position.x = (pointer_pos.x * handle_ctx->factor_8.x) >> 8;
     indev_ctx->position.y = (pointer_pos.y * handle_ctx->factor_8.y) >> 8;
 
-    // Set the state to pressed if one of the interfaces reports a press
+    /* Set the state to pressed if one of the interfaces reports a press */
     *was_pressed = (state.ActiveButtons & EFI_ABSP_TouchActive) != 0;
 }
 

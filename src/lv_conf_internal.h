@@ -3892,50 +3892,28 @@
     #endif
 #endif
 #if LV_USE_UEFI
-    #ifndef LV_USE_UEFI_EDK2
+    #ifndef LV_USE_UEFI_INCLUDE
         #ifdef LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_USE_UEFI_EDK2
-                #define LV_USE_UEFI_EDK2 CONFIG_LV_USE_UEFI_EDK2
+            #ifdef CONFIG_LV_USE_UEFI_INCLUDE
+                #define LV_USE_UEFI_INCLUDE  CONFIG_LV_USE_UEFI_INCLUDE
             #else
-                #define LV_USE_UEFI_EDK2    0
+                #define LV_USE_UEFI_INCLUDE  "myefi.h"
             #endif
         #else
-            #define LV_USE_UEFI_EDK2    0
+            #define LV_USE_UEFI_INCLUDE    "myefi.h"
         #endif
     #endif
-    #ifndef LV_USE_UEFI_GNU_EFI
+    #ifndef LV_UEFI_USE_MEMORY_SERVICES
         #ifdef LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_USE_UEFI_GNU_EFI
-                #define LV_USE_UEFI_GNU_EFI CONFIG_LV_USE_UEFI_GNU_EFI
+            #ifdef CONFIG_LV_UEFI_USE_MEMORY_SERVICES
+                #define LV_UEFI_USE_MEMORY_SERVICES  CONFIG_LV_UEFI_USE_MEMORY_SERVICES
             #else
-                #define LV_USE_UEFI_GNU_EFI    0
+                #define LV_UEFI_USE_MEMORY_SERVICES  0
             #endif
         #else
-            #define LV_USE_UEFI_GNU_EFI    0
+            #define LV_UEFI_USE_MEMORY_SERVICES    0
         #endif
     #endif
-    #ifndef LV_USE_UEFI_CUSTOM
-        #ifdef LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_USE_UEFI_CUSTOM
-                #define LV_USE_UEFI_CUSTOM CONFIG_LV_USE_UEFI_CUSTOM
-            #else
-                #define LV_USE_UEFI_CUSTOM    0
-            #endif
-        #else
-            #define LV_USE_UEFI_CUSTOM    0
-        #endif
-    #endif
-#endif
-#if LV_USE_UEFI_CUSTOM
-        #ifdef LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_UEFI_CUSTOM_INCLUDE_PATH
-                #define LV_UEFI_CUSTOM_INCLUDE_PATH CONFIG_LV_UEFI_CUSTOM_INCLUDE_PATH
-            #else
-                #define LV_UEFI_CUSTOM_INCLUDE_PATH    "myefi.h"
-            #endif
-        #else
-            #define LV_UEFI_CUSTOM_INCLUDE_PATH    "myefi.h"
-        #endif
 #endif
 
 /** Use OpenGL to open window on PC and handle mouse and keyboard */

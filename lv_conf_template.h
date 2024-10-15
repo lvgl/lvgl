@@ -1202,10 +1202,7 @@
 /** LVGL UEFI backend */
 #define LV_USE_UEFI 0
 #if LV_USE_UEFI
-    #define LV_UEFI_HEADERS_EDK2    0   /**< Use headers from EDK2 */
-    #define LV_UEFI_HEADERS_GNU_EFI    0    /**< Use headers from gnu-efi */
-    #define LV_UEFI_HEADERS_CUSTOM  0   /**< Use custom headers */
-
+    #define LV_USE_UEFI_INCLUDE "myefi.h"   /**< Header that hides the actual framework (EDK2, gnu-efi, ...) */
     #define LV_UEFI_USE_MEMORY_SERVICES 0   /**< Use the memory functions from the boot services table */
 #endif
 #if LV_UEFI_HEADERS_CUSTOM

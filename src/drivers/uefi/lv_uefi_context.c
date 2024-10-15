@@ -48,9 +48,7 @@
  * @param system_table Pointer to the system table
  * @remark This has to be called before lv_init().
 */
-void lv_uefi_init(
-    EFI_HANDLE image_handle,
-    EFI_SYSTEM_TABLE * system_table)
+void lv_uefi_init(EFI_HANDLE image_handle, EFI_SYSTEM_TABLE * system_table)
 {
     LV_ASSERT_NULL(image_handle);
     LV_ASSERT_NULL(system_table);
@@ -67,7 +65,7 @@ void lv_uefi_init(
  *         implementation. LVGL users shouldn't use that because the
  *         LVGL has already used it in lv_init.
  */
-void lv_uefi_platform_init()
+void lv_uefi_platform_init(void)
 {
     LV_ASSERT_NULL(gLvEfiImageHandle);
     LV_ASSERT_NULL(gLvEfiST);
@@ -81,7 +79,7 @@ void lv_uefi_platform_init()
  *         implementation. LVGL users shouldn't use that because the
  *         LVGL has already used it in lv_deinit.
 */
-void lv_uefi_platform_deinit()
+void lv_uefi_platform_deinit(void)
 {
     ;
 }

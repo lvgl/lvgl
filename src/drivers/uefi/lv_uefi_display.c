@@ -66,8 +66,7 @@ static EFI_GUID _uefi_guid_edid_active = EFI_EDID_ACTIVE_PROTOCOL_GUID;
  * @param handle The handle on which an instance of the EFI_GRAPHICS_OUTPUT_PROTOCOL protocol is installed.
  * @return The created LVGL display object.
  */
-lv_display_t * lv_uefi_display_create(
-    void * handle)
+lv_display_t * lv_uefi_display_create(void * handle)
 {
     lv_display_t * display = NULL;
     lv_uefi_display_context_t * display_ctx;
@@ -94,7 +93,8 @@ lv_display_t * lv_uefi_display_create(
                                 display_ctx->gop_protocol->Mode->Info->VerticalResolution);
     lv_display_add_event_cb(display, _display_event_cb, LV_EVENT_DELETE, display);
     lv_display_set_flush_cb(display, _display_flush_cb);
-    lv_display_set_buffers(display, display_ctx->buffer, NULL, (uint32_t)display_ctx->buffer_size, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_buffers(display, display_ctx->buffer, NULL, (uint32_t)display_ctx->buffer_size,
+                           LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_user_data(display, display_ctx);
 
     goto finish;
@@ -117,7 +117,7 @@ finish:
  * @return The handle or NULL if not found.
  * @remark The active display need interfaces for EFI_GRAPHICS_OUTPUT_PROTOCOL and EFI_EDID_ACTIVE_PROTOCOL
 */
-void * lv_uefi_display_get_active()
+void * lv_uefi_display_get_active(void)
 {
     EFI_STATUS status;
     EFI_HANDLE active_handle = NULL;
@@ -154,7 +154,7 @@ finish:
  * @brief Try to find any display handle.
  * @return The handle or NULL if not found.
 */
-void * lv_uefi_display_get_any()
+void * lv_uefi_display_get_any(void)
 {
     EFI_STATUS status;
     EFI_HANDLE active_handle = NULL;
@@ -223,12 +223,12 @@ static void _display_flush_cb(lv_display_t * display, const lv_area_t * area, ui
         goto error;
     }
 
-    if( (uint32_t)(area->x1 + w) > display_ctx->gop_protocol->Mode->Info->HorizontalResolution) {
+    if((uint32_t)(area->x1 + w) > display_ctx->gop_protocol->Mode->Info->HorizontalResolution) {
         LV_LOG_ERROR("[lv_uefi] Invalid lv_display_flush_cb call (invalid width).");
         goto error;
     }
 
-    if( (uint32_t)(area->y1 + h) > display_ctx->gop_protocol->Mode->Info->HorizontalResolution) {
+    if((uint32_t)(area->y1 + h) > display_ctx->gop_protocol->Mode->Info->HorizontalResolution) {
         LV_LOG_ERROR("[lv_uefi] Invalid lv_display_flush_cb call (invalid height).");
         goto error;
     }

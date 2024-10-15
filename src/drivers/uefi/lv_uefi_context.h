@@ -48,7 +48,7 @@ void lv_uefi_init(
  *         implementation. LVGL users shouldn't use that because the
  *         LVGL has already used it in lv_init.
 */
-void lv_uefi_platform_init();
+void lv_uefi_platform_init(void);
 
 /**
  * @brief Cleanup the LVGL UEFI backend.
@@ -56,7 +56,7 @@ void lv_uefi_platform_init();
  *         implementation. LVGL users shouldn't use that because the
  *         LVGL has already used it in lv_deinit.
 */
-void lv_uefi_platform_deinit();
+void lv_uefi_platform_deinit(void);
 
 /**********************
  *      MACROS

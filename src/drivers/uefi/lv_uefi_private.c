@@ -51,9 +51,7 @@ EFI_RUNTIME_SERVICES * gLvEfiRT = NULL;
  * @param protocol The guid of the protocol.
  * @return TRUE if the protocol is installed, FALSE if not.
 */
-bool lv_uefi_protocol_test(
-    EFI_HANDLE handle,
-    EFI_GUID * protocol)
+bool lv_uefi_protocol_test(EFI_HANDLE handle, EFI_GUID * protocol)
 {
     EFI_STATUS status;
     void * interface = NULL;
@@ -85,9 +83,7 @@ bool lv_uefi_protocol_test(
  * @param protocol The guid of the protocol.
  * @return A pointer to the interface, NULL if the protocol couldn't be opened.
 */
-void * lv_uefi_protocol_open(
-    EFI_HANDLE handle,
-    EFI_GUID * protocol)
+void * lv_uefi_protocol_open(EFI_HANDLE handle, EFI_GUID * protocol)
 {
     EFI_STATUS status;
     void * interface = NULL;
@@ -127,9 +123,7 @@ void * lv_uefi_protocol_open(
  * @param handle The handle on which the protocol is installed.
  * @param protocol The guid of the protocol.
 */
-void lv_uefi_protocol_close(
-    EFI_HANDLE handle,
-    EFI_GUID * protocol)
+void lv_uefi_protocol_close(EFI_HANDLE handle, EFI_GUID * protocol)
 {
     EFI_STATUS status;
 
@@ -167,10 +161,7 @@ void lv_uefi_protocol_close(
  * @return The number of characters written to the buffer or 0 if
  * there was an error.
 */
-size_t lv_uefi_ucs2_to_ascii(
-    const CHAR16 * ucs2,
-    char * ascii,
-    size_t ascii_len)
+size_t lv_uefi_ucs2_to_ascii(const CHAR16 * ucs2, char * ascii, size_t ascii_len)
 {
     size_t invalid_character_count;
     size_t string_index;
@@ -188,7 +179,7 @@ size_t lv_uefi_ucs2_to_ascii(
         ascii[string_index] = (char) ucs2[string_index];
     }
 
-    // terminate the string even if there was an error
+    /* terminate the string even if there was an error */
     ascii[string_index] = 0x00;
 
     return invalid_character_count == 0 ? string_index : 0;
@@ -203,10 +194,7 @@ size_t lv_uefi_ucs2_to_ascii(
  * @return The number of bytes written to the buffer or 0 if
  * there was an error.
 */
-size_t lv_uefi_ascii_to_ucs2(
-    const char * ascii,
-    CHAR16 * ucs2,
-    size_t ucs2_len)
+size_t lv_uefi_ascii_to_ucs2(const char * ascii, CHAR16 * ucs2, size_t ucs2_len)
 {
     size_t invalid_character_count;
     size_t string_index;
@@ -224,7 +212,7 @@ size_t lv_uefi_ascii_to_ucs2(
         ucs2[string_index] = (CHAR16) ascii[string_index];
     }
 
-    // terminate the string even if there was an error
+    /* terminate the string even if there was an error */
     ucs2[string_index] = 0x0000;
 
     return invalid_character_count == 0 ? string_index : 0;
