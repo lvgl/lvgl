@@ -247,9 +247,6 @@ static void stroke_free_cb(stroke_item_t * item, void * user_data)
 
 static lv_cache_compare_res_t path_compare(const vg_lite_path_t * lhs, const vg_lite_path_t * rhs)
 {
-    LV_VG_LITE_ASSERT_PATH(lhs);
-    LV_VG_LITE_ASSERT_PATH(rhs);
-
     LV_ASSERT(lhs->format == VG_LITE_FP32);
     LV_ASSERT(rhs->format == VG_LITE_FP32);
 
