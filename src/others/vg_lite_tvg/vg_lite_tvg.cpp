@@ -469,7 +469,7 @@ static vg_lite_converter<vg_color32_t, vg_color_bgra5551_t> conv_bgra5551_to_bgr
         dest->red = src->red * 0xFF / 0x1F;
         dest->green = src->green * 0xFF / 0x1F;
         dest->blue = src->blue * 0xFF / 0x1F;
-        dest->alpha = src->alpha > (0xFF / 2) ? 1 : 0;
+        dest->alpha = src->alpha ? 0xFF : 0;
         src++;
         dest++;
     }
@@ -752,7 +752,7 @@ extern "C" {
             dest->red = src->red * 0x1F / 0xFF;
             dest->green = src->green * 0x1F / 0xFF;
             dest->blue = src->blue * 0x1F / 0xFF;
-            dest->alpha = src->alpha > (0xFF / 2) ? 0xFF : 0;
+            dest->alpha = src->alpha > (0xFF / 2) ? 1 : 0;
             src++;
             dest++;
         }
@@ -764,7 +764,7 @@ extern "C" {
             dest->red = src->red * 0xF / 0xFF;
             dest->green = src->green * 0xF / 0xFF;
             dest->blue = src->blue * 0xF / 0xFF;
-            dest->alpha = src->alpha *  0xF / 0xFF;
+            dest->alpha = src->alpha * 0xF / 0xFF;
             src++;
             dest++;
         }
@@ -776,7 +776,7 @@ extern "C" {
             dest->red = src->red * 0x3 / 0xFF;
             dest->green = src->green * 0x3 / 0xFF;
             dest->blue = src->blue * 0x3 / 0xFF;
-            dest->alpha = src->alpha *  0x3 / 0xFF;
+            dest->alpha = src->alpha * 0x3 / 0xFF;
             src++;
             dest++;
         }
