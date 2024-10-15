@@ -40,6 +40,10 @@ typedef struct {
     uint32_t heap_size;
 
     bool initialized;
+    bool independent_image_heap;
+
+    lv_draw_buf_malloc_cb malloc_cb;
+    lv_draw_buf_free_cb free_cb;
 } lv_nuttx_ctx_image_cache_t;
 /**********************
  *  STATIC PROTOTYPES
@@ -60,7 +64,7 @@ static void free_cb(void * draw_buf);
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_nuttx_image_cache_init(void)
+void lv_nuttx_image_cache_init(bool use_independent_image_heap)
 {
     lv_draw_buf_handlers_t * handlers = image_cache_draw_buf_handlers;
     handlers->buf_malloc_cb = malloc_cb;
@@ -69,17 +73,28 @@ void lv_nuttx_image_cache_init(void)
     ctx = lv_malloc_zeroed(sizeof(lv_nuttx_ctx_image_cache_t));
     LV_ASSERT_MALLOC(ctx);
 
+    ctx->malloc_cb = handlers->buf_malloc_cb;
+    ctx->free_cb = handlers->buf_free_cb;
+
+    handlers->buf_malloc_cb = malloc_cb;
+    handlers->buf_free_cb = free_cb;
+
     ctx->initialized = false;
+    ctx->independent_image_heap = use_independent_image_heap;
 }
 
 void lv_nuttx_image_cache_deinit(void)
 {
+    if(ctx->independent_image_heap == false) goto FREE_CONTEXT;
     if(ctx->initialized == false) goto FREE_CONTEXT;
 
     mm_uninitialize(ctx->heap);
     free(ctx->mem);
 
 FREE_CONTEXT:
+    lv_draw_buf_handlers_t * handlers = image_cache_draw_buf_handlers;
+    handlers->buf_malloc_cb = ctx->malloc_cb;
+    handlers->buf_free_cb = ctx->free_cb;
     lv_free(ctx);
 
     ctx = NULL;
@@ -152,8 +167,7 @@ static void heap_memdump(struct mm_heap_s * heap)
 static void * malloc_cb(size_t size_bytes, lv_color_format_t color_format)
 {
     LV_UNUSED(color_format);
-
-    if(ctx->initialized == false) {
+    if(ctx->independent_image_heap == true && ctx->initialized == false) {
         if(defer_init() == false) return NULL;
     }
 
@@ -161,7 +175,7 @@ static void * malloc_cb(size_t size_bytes, lv_color_format_t color_format)
     size_bytes += LV_DRAW_BUF_ALIGN - 1;
     uint32_t cache_max_size = lv_cache_get_max_size(img_cache_p, NULL);
 
-    if(size_bytes > cache_max_size) {
+    if(lv_cache_is_enabled(img_cache_p) && size_bytes > cache_max_size) {
         LV_LOG_ERROR("data size (%" LV_PRIu32 ") is larger than max size (%" LV_PRIu32 ")",
                      (uint32_t)size_bytes,
                      cache_max_size);
@@ -169,7 +183,13 @@ static void * malloc_cb(size_t size_bytes, lv_color_format_t color_format)
     }
 
     while(1) {
-        void * mem = mm_malloc(ctx->heap, size_bytes);
+        void * mem = NULL;
+        if(ctx->independent_image_heap) {
+            mem = mm_malloc(ctx->heap, size_bytes);
+        }
+        else if((!lv_cache_is_enabled(img_cache_p)) || (lv_cache_get_size(img_cache_p, NULL) + size_bytes < cache_max_size)) {
+            mem = ctx->malloc_cb(size_bytes, color_format);
+        }
         if(mem) return mem;
         LV_LOG_INFO("appears to be out of memory. attempting to evict one cache entry. with allocated size %" LV_PRIu32,
                     (uint32_t)size_bytes);
@@ -184,7 +204,12 @@ static void * malloc_cb(size_t size_bytes, lv_color_format_t color_format)
 
 static void free_cb(void * draw_buf)
 {
-    mm_free(ctx->heap, draw_buf);
+    if(ctx->independent_image_heap == true) {
+        mm_free(ctx->heap, draw_buf);
+    }
+    else {
+        ctx->free_cb(draw_buf);
+    }
 }
 
 #endif /* LV_USE_NUTTX */

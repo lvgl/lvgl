@@ -1110,6 +1110,8 @@
 #define LV_USE_NUTTX    0
 
 #if LV_USE_NUTTX
+    #define LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP 0
+
     #define LV_USE_NUTTX_LIBUV    0
 
     /** Use Nuttx custom init API to open window and handle touchscreen */
@@ -1226,6 +1228,12 @@
 
 /** Vector graphic demo */
 #define LV_USE_DEMO_VECTOR_GRAPHIC  0
+
+/*E-bike demo with Lottie animations (if LV_USE_LOTTIE is enabled)*/
+#define LV_USE_DEMO_EBIKE			0
+#if LV_USE_DEMO_EBIKE
+	#define LV_DEMO_EBIKE_PORTRAIT  0    /*0: for 480x270..480x320, 1: for 480x800..720x1280*/
+#endif
 
 /*--END OF LV_CONF_H--*/
 
