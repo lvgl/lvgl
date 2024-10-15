@@ -1459,7 +1459,7 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
                 tmp_width = minor_tick_dsc->width;
             }
 
-            section->first_tick_in_section.y = tick_point_a->y;
+            section->first_tick_in_section = *tick_point_a;
             /* Add 1px as adjustment if tmp_width is odd */
             if(tmp_width & 0x01U) {
                 if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
@@ -1479,7 +1479,7 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
                 tmp_width = minor_tick_dsc->width;
             }
 
-            section->last_tick_in_section.y = tick_point_a->y;
+            section->last_tick_in_section = *tick_point_a;
             /* Add 1px as adjustment if tmp_width is odd */
             if(tmp_width & 0x01U) {
                 if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {

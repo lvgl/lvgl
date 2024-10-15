@@ -7,7 +7,7 @@ Slider (lv_slider)
 Overview
 ********
 
-The Slider object looks like a `Bar </widgets/bar>`__ supplemented with
+The Slider object looks like a `Bar <widgets/bar>`__ supplemented with
 a knob. The knob can be dragged to set a value. Just like Bar, Slider
 can be vertical or horizontal.
 
@@ -80,7 +80,7 @@ Events
    being dragged.
 -  :cpp:enumerator:`LV_EVENT_RELEASED` Sent when the slider has just been released.
 
-See the events of the `Bar </widgets/bar>`__ too.
+See the events of the `Bar <widgets/bar>`__ too.
 
 Learn more about :ref:`events`.
 

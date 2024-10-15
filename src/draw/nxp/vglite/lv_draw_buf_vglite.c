@@ -35,6 +35,7 @@
  **********************/
 
 static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
+static uint32_t _width_to_stride(uint32_t w, lv_color_format_t cf);
 
 /**********************
  *  STATIC VARIABLES
@@ -51,8 +52,17 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
 void lv_draw_buf_vglite_init_handlers(void)
 {
     lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
+    lv_draw_buf_handlers_t * font_handlers = lv_draw_buf_get_font_handlers();
+    lv_draw_buf_handlers_t * image_handlers = lv_draw_buf_get_image_handlers();
 
     handlers->invalidate_cache_cb = _invalidate_cache;
+    font_handlers->invalidate_cache_cb = _invalidate_cache;
+    image_handlers->invalidate_cache_cb = _invalidate_cache;
+
+    handlers->width_to_stride_cb = _width_to_stride;
+    font_handlers->width_to_stride_cb = _width_to_stride;
+    image_handlers->width_to_stride_cb = _width_to_stride;
+
 }
 
 /**********************
@@ -66,7 +76,7 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
     lv_color_format_t cf = header->cf;
 
     if(area->y1 == 0) {
-        uint16_t size = stride * lv_area_get_height(area);
+        uint32_t size = stride * lv_area_get_height(area);
 
         /* Invalidate full buffer. */
         DEMO_CleanInvalidateCacheByAddr((void *)draw_buf->data, size);
@@ -106,6 +116,16 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
 
         DEMO_CleanInvalidateCacheByAddr((void *)line_addr, line_size);
     }
+}
+
+static uint32_t _width_to_stride(uint32_t w, lv_color_format_t cf)
+{
+    uint8_t bits_per_pixel = lv_color_format_get_bpp(cf);
+    uint32_t width_bits = (w * bits_per_pixel + 7) & ~7;
+    uint32_t width_bytes = width_bits / 8;
+    uint8_t align_bytes = vglite_get_stride_alignment(cf);
+
+    return (width_bytes + align_bytes - 1) & ~(align_bytes - 1);
 }
 
 #endif /*LV_USE_DRAW_VGLITE*/

@@ -18,7 +18,7 @@ and simulate the same rendering images as the real hardware on the simulator.
 Configuration
 *************
 
-1. Enable VG-Lite rendering backend, see `VG-Lite Rendering Backend </overview/renderers/vg_lite>`__.
+1. Enable VG-Lite rendering backend, see `VG-Lite Rendering Backend <overview/renderers/vg_lite>`__.
 
 2. Enable ThorVG and turn on the configuration :c:macro:`LV_USE_THORVG_INTERNAL` or :c:macro:`LV_USE_THORVG_EXTERNAL`.
    It is recommended to use the internal ThorVG library to ensure uniform rendering results.

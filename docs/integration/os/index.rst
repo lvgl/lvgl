@@ -11,3 +11,4 @@
     px5
     mqx
     qnx
+    yocto/index

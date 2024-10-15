@@ -39,12 +39,12 @@ main Makefile:
    include $(LVGL_DIR)/$(LVGL_DIR_NAME)/lvgl.mk
 
 For integration with CMake take a look this section of the
-`Documentation </integration/build/cmake>`__.
+`Documentation <integration/build/cmake>`__.
 
 Other platforms and tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The `Get started </integration/index>`__ section contains many platform
+The `Get started <integration/index>`__ section contains many platform
 specific descriptions e.g. for ESP32, Arduino, NXP, RT-Thread, NuttX,
 etc.
 
@@ -131,9 +131,9 @@ components. The order of the initialization is:
 1. Call :cpp:func:`lv_init`.
 2. Initialize your drivers.
 3. Register the display and input devices drivers in LVGL. Learn more
-   about `Display </porting/display>`__ and `Input
-   device </porting/indev>`__ registration.
+   about `Display <porting/display>`__ and `Input
+   device <porting/indev>`__ registration.
 4. Call :cpp:expr:`lv_tick_inc(x)` every ``x`` milliseconds in an interrupt to
-   report the elapsed time to LVGL. `Learn more </porting/tick>`__.
+   report the elapsed time to LVGL. `Learn more <porting/tick>`__.
 5. Call :cpp:func:`lv_timer_handler` every few milliseconds to handle LVGL
-   related tasks. `Learn more </porting/timer-handler>`__.
+   related tasks. `Learn more <porting/timer-handler>`__.

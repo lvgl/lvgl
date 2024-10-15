@@ -1138,6 +1138,7 @@ lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * ma
 
 void lv_vg_lite_set_scissor_area(const lv_area_t * area)
 {
+    LV_PROFILER_DRAW_BEGIN;
 #if VGLITE_RELEASE_VERSION <= VGLITE_MAKE_VERSION(4,0,57)
     /**
      * In the new version of VG-Lite, vg_lite_set_scissor no longer needs to call vg_lite_enable_scissor and
@@ -1155,16 +1156,19 @@ void lv_vg_lite_set_scissor_area(const lv_area_t * area)
                                area->y1,
                                area->x2 + 1,
                                area->y2 + 1));
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_vg_lite_disable_scissor(void)
 {
+    LV_PROFILER_DRAW_BEGIN;
     /* Restore full screen scissor */
     LV_VG_LITE_CHECK_ERROR(vg_lite_set_scissor(
                                0,
                                0,
                                LV_HOR_RES,
                                LV_VER_RES));
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)

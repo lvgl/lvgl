@@ -173,7 +173,7 @@ Note that :cpp:enumerator:`LV_CHART_UPDATE_MODE_SHIFT` also changes the
 Tick marks and labels
 ---------------------
 
-With the help of `Scale </widgets/scale>`__, vertical and horizontal scales can be added in a very flexible way.
+With the help of `Scale <widgets/scale>`__, vertical and horizontal scales can be added in a very flexible way.
 See the example below to learn more.
 
 Zoom

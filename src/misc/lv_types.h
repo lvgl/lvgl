@@ -326,6 +326,8 @@ typedef struct _lv_array_t lv_array_t;
 
 typedef struct _lv_iter_t lv_iter_t;
 
+typedef struct _lv_circle_buf_t lv_circle_buf_t;
+
 typedef struct _lv_draw_buf_t lv_draw_buf_t;
 
 #if LV_USE_OBJ_PROPERTY

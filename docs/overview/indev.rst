@@ -11,7 +11,7 @@ An input device usually means:
 - Encoders with left/right turn and push options
 - External hardware buttons which are assigned to specific points on the screen
 
-:important: Before reading further, please read the `Porting </porting/indev>`__ section of Input devices
+:important: Before reading further, please read the `Porting <porting/indev>`__ section of Input devices
 
 Pointers
 ********

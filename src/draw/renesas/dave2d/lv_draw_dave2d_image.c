@@ -9,6 +9,8 @@
 #include "lv_draw_dave2d.h"
 #if LV_USE_DRAW_DAVE2D
 
+#include "../../lv_image_decoder_private.h"
+
 /*********************
  *      DEFINES
  *********************/

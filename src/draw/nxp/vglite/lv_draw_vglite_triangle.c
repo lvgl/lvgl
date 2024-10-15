@@ -97,8 +97,8 @@ static void _vglite_draw_triangle(const lv_area_t * coords, const lv_area_t * cl
     tri_area.x2 = (int32_t)LV_MAX3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
     tri_area.y2 = (int32_t)LV_MAX3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
 
-    uint32_t width = tri_area.x2 - tri_area.x1;
-    uint32_t height = tri_area.y2 - tri_area.y1;
+    uint32_t width = lv_area_get_width(&tri_area);
+    uint32_t height = lv_area_get_height(&tri_area);
 
     /* Init path */
     int32_t triangle_path[] = { /*VG line path*/

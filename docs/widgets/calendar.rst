@@ -24,7 +24,7 @@ attached to the calendar.
 Parts and Styles
 ****************
 
-The calendar object uses the `Button matrix </widgets/buttonmatrix>`__
+The calendar object uses the `Button matrix <widgets/buttonmatrix>`__
 object under the hood to arrange the days into a matrix.
 
 - :cpp:enumerator:`LV_PART_MAIN` The background of the calendar. Uses all the background related style properties.

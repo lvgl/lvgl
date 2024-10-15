@@ -286,7 +286,6 @@
 	/*
 	 * Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
 	 * than unblocking a task using an intermediary object such as a binary semaphore.
-	 *
 	 * RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
 	 */
 	#ifndef LV_USE_FREERTOS_TASK_NOTIFY
@@ -584,6 +583,52 @@
     #endif
 #endif
 
+/*Use TSi's aka (Think Silicon) NemaGFX */
+#ifndef LV_USE_NEMA_GFX
+    #ifdef CONFIG_LV_USE_NEMA_GFX
+        #define LV_USE_NEMA_GFX CONFIG_LV_USE_NEMA_GFX
+    #else
+        #define LV_USE_NEMA_GFX 0
+    #endif
+#endif
+
+#if LV_USE_NEMA_GFX
+    #ifndef LV_NEMA_GFX_HAL_INCLUDE
+        #ifdef CONFIG_LV_NEMA_GFX_HAL_INCLUDE
+            #define LV_NEMA_GFX_HAL_INCLUDE CONFIG_LV_NEMA_GFX_HAL_INCLUDE
+        #else
+            #define LV_NEMA_GFX_HAL_INCLUDE <stm32u5xx_hal.h>
+        #endif
+    #endif
+
+    /*Enable Vector Graphics Operations. Available only if NemaVG library is present*/
+    #ifndef LV_USE_NEMA_VG
+        #ifdef CONFIG_LV_USE_NEMA_VG
+            #define LV_USE_NEMA_VG CONFIG_LV_USE_NEMA_VG
+        #else
+            #define LV_USE_NEMA_VG 0
+        #endif
+    #endif
+
+    #if LV_USE_NEMA_VG
+        /*Define application's resolution used for VG related buffer allocation */
+        #ifndef LV_NEMA_GFX_MAX_RESX
+            #ifdef CONFIG_LV_NEMA_GFX_MAX_RESX
+                #define LV_NEMA_GFX_MAX_RESX CONFIG_LV_NEMA_GFX_MAX_RESX
+            #else
+                #define LV_NEMA_GFX_MAX_RESX 800
+            #endif
+        #endif
+        #ifndef LV_NEMA_GFX_MAX_RESY
+            #ifdef CONFIG_LV_NEMA_GFX_MAX_RESY
+                #define LV_NEMA_GFX_MAX_RESY CONFIG_LV_NEMA_GFX_MAX_RESY
+            #else
+                #define LV_NEMA_GFX_MAX_RESY 600
+            #endif
+        #endif
+    #endif
+#endif
+
 /** Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
 #ifndef LV_USE_DRAW_VGLITE
     #ifdef CONFIG_LV_USE_DRAW_VGLITE
@@ -644,16 +689,38 @@
 #endif
 
 /** Use NXP's PXP on iMX RTxxx platforms. */
-#ifndef LV_USE_DRAW_PXP
-    #ifdef CONFIG_LV_USE_DRAW_PXP
-        #define LV_USE_DRAW_PXP CONFIG_LV_USE_DRAW_PXP
+#ifndef LV_USE_PXP
+    #ifdef CONFIG_LV_USE_PXP
+        #define LV_USE_PXP CONFIG_LV_USE_PXP
     #else
-        #define LV_USE_DRAW_PXP 0
+        #define LV_USE_PXP 0
     #endif
 #endif
 
-#if LV_USE_DRAW_PXP
-    #if LV_USE_OS
+#if LV_USE_PXP
+    /** Use PXP for drawing.*/
+    #ifndef LV_USE_DRAW_PXP
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_DRAW_PXP
+                #define LV_USE_DRAW_PXP CONFIG_LV_USE_DRAW_PXP
+            #else
+                #define LV_USE_DRAW_PXP 0
+            #endif
+        #else
+            #define LV_USE_DRAW_PXP 1
+        #endif
+    #endif
+
+    /** Use PXP to rotate display.*/
+    #ifndef LV_USE_ROTATE_PXP
+        #ifdef CONFIG_LV_USE_ROTATE_PXP
+            #define LV_USE_ROTATE_PXP CONFIG_LV_USE_ROTATE_PXP
+        #else
+            #define LV_USE_ROTATE_PXP 0
+        #endif
+    #endif
+
+    #if LV_USE_DRAW_PXP && LV_USE_OS
         /** Use additional draw thread for PXP processing.*/
         #ifndef LV_USE_PXP_DRAW_THREAD
             #ifdef LV_KCONFIG_PRESENT
@@ -764,7 +831,7 @@
     #endif
 #endif
 
-/* Accelerate blends, fills, etc. with STM32 DMA2D */
+/** Accelerate blends, fills, etc. with STM32 DMA2D */
 #ifndef LV_USE_DRAW_DMA2D
     #ifdef CONFIG_LV_USE_DRAW_DMA2D
         #define LV_USE_DRAW_DMA2D CONFIG_LV_USE_DRAW_DMA2D
@@ -791,6 +858,15 @@
         #else
             #define LV_USE_DRAW_DMA2D_INTERRUPT 0
         #endif
+    #endif
+#endif
+
+/** Draw using cached OpenGLES textures */
+#ifndef LV_USE_DRAW_OPENGLES
+    #ifdef CONFIG_LV_USE_DRAW_OPENGLES
+        #define LV_USE_DRAW_OPENGLES CONFIG_LV_USE_DRAW_OPENGLES
+    #else
+        #define LV_USE_DRAW_OPENGLES 0
     #endif
 #endif
 
@@ -1766,6 +1842,15 @@
         #define LV_USE_ARABIC_PERSIAN_CHARS CONFIG_LV_USE_ARABIC_PERSIAN_CHARS
     #else
         #define LV_USE_ARABIC_PERSIAN_CHARS 0
+    #endif
+#endif
+
+/*The control character to use for signaling text recoloring*/
+#ifndef LV_TXT_COLOR_CMD
+    #ifdef CONFIG_LV_TXT_COLOR_CMD
+        #define LV_TXT_COLOR_CMD CONFIG_LV_TXT_COLOR_CMD
+    #else
+        #define LV_TXT_COLOR_CMD "#"
     #endif
 #endif
 
@@ -3489,6 +3574,14 @@
 #endif
 
 #if LV_USE_NUTTX
+    #ifndef LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
+        #ifdef CONFIG_LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
+            #define LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP CONFIG_LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
+        #else
+            #define LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP 0
+        #endif
+    #endif
+
     #ifndef LV_USE_NUTTX_LIBUV
         #ifdef CONFIG_LV_USE_NUTTX_LIBUV
             #define LV_USE_NUTTX_LIBUV CONFIG_LV_USE_NUTTX_LIBUV
@@ -3653,12 +3746,31 @@
     #endif
 #endif
 
+
 /** Driver for NXP ELCDIF */
 #ifndef LV_USE_NXP_ELCDIF
     #ifdef CONFIG_LV_USE_NXP_ELCDIF
         #define LV_USE_NXP_ELCDIF CONFIG_LV_USE_NXP_ELCDIF
     #else
         #define LV_USE_NXP_ELCDIF   0
+
+/** Driver for ST LTDC */
+#ifndef LV_USE_ST_LTDC
+    #ifdef CONFIG_LV_USE_ST_LTDC
+        #define LV_USE_ST_LTDC CONFIG_LV_USE_ST_LTDC
+    #else
+        #define LV_USE_ST_LTDC    0
+    #endif
+#endif
+
+#if LV_USE_ST_LTDC
+    /* Only used for partial. */
+    #ifndef LV_ST_LTDC_USE_DMA2D_FLUSH
+        #ifdef CONFIG_LV_ST_LTDC_USE_DMA2D_FLUSH
+            #define LV_ST_LTDC_USE_DMA2D_FLUSH CONFIG_LV_ST_LTDC_USE_DMA2D_FLUSH
+        #else
+            #define LV_ST_LTDC_USE_DMA2D_FLUSH 0
+        #endif
     #endif
 #endif
 
@@ -3871,6 +3983,24 @@
     #else
         #define LV_USE_DEMO_VECTOR_GRAPHIC  0
     #endif
+#endif
+
+/*E-bike demo with Lottie animations (if LV_USE_LOTTIE is enabled)*/
+#ifndef LV_USE_DEMO_EBIKE
+    #ifdef CONFIG_LV_USE_DEMO_EBIKE
+        #define LV_USE_DEMO_EBIKE CONFIG_LV_USE_DEMO_EBIKE
+    #else
+        #define LV_USE_DEMO_EBIKE			0
+    #endif
+#endif
+#if LV_USE_DEMO_EBIKE
+	#ifndef LV_DEMO_EBIKE_PORTRAIT
+	    #ifdef CONFIG_LV_DEMO_EBIKE_PORTRAIT
+	        #define LV_DEMO_EBIKE_PORTRAIT CONFIG_LV_DEMO_EBIKE_PORTRAIT
+	    #else
+	        #define LV_DEMO_EBIKE_PORTRAIT  0    /*0: for 480x270..480x320, 1: for 480x800..720x1280*/
+	    #endif
+	#endif
 #endif
 
 

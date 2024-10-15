@@ -270,6 +270,8 @@ A minimal example using STM32CubeIDE, HAL, and CMSISv1 (FreeRTOS).
      lv_display_flush_ready(display);
    }
 
+.. _dma2d:
+
 DMA2D Support
 -------------
 
@@ -289,3 +291,5 @@ instead of "busywait" while waiting for a DMA2D transfer to complete.
 If ``LV_USE_DRAW_DMA2D_INTERRUPT`` is enabled then you are required to call
 :cpp:expr:`lv_draw_dma2d_transfer_complete_interrupt_handler` whenever the DMA2D
 "transfer complete" global interrupt is received.
+
+If your STM device has a Nema GPU, you can use the :ref:`Nema GFX renderer <stm32_nema_gfx>` instead.

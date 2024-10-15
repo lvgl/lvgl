@@ -122,7 +122,7 @@ void lv_nuttx_init(const lv_nuttx_dsc_t * dsc, lv_nuttx_result_t * result)
 
     lv_nuttx_cache_init();
 
-    lv_nuttx_image_cache_init();
+    lv_nuttx_image_cache_init(LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP);
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
     lv_nuttx_profiler_init();

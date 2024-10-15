@@ -15,7 +15,8 @@
 
 #include "lv_pxp_utils.h"
 
-#if LV_USE_DRAW_PXP
+#if LV_USE_PXP
+#if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
 
 /*********************
  *      DEFINES
@@ -89,6 +90,7 @@ pxp_as_pixel_format_t pxp_get_as_px_format(lv_color_format_t cf)
     return as_px_format;
 }
 
+#if LV_USE_DRAW_PXP
 pxp_ps_pixel_format_t pxp_get_ps_px_format(lv_color_format_t cf)
 {
     pxp_ps_pixel_format_t ps_px_format = kPXP_PsPixelFormatRGB565;
@@ -143,3 +145,5 @@ bool pxp_buf_aligned(const void * buf, uint32_t stride)
  **********************/
 
 #endif /*LV_USE_DRAW_PXP*/
+#endif /*LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP*/
+#endif /*LV_USE_PXP*/

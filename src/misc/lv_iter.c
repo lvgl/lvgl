@@ -6,7 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
+
+#include "lv_assert.h"
+
 #include "lv_iter.h"
+
+#include "lv_circle_buf.h"
 
 /*********************
  *      DEFINES
@@ -24,11 +29,8 @@ struct _lv_iter_t {
     uint32_t context_size;    /**< Size of the custom context in bytes */
 
     /* Peeking */
-    void  *  peek_buff;       /**< Buffer to store the next n element */
-    uint32_t peek_capacity;   /**< Size of the peek buffer in count of elements */
-    uint32_t peek_count;      /**< Number of elements currently in the peek buffer */
-    uint32_t peek_offset;     /**< Offset in the peek buffer */
-    uint32_t peek_iter_offset;/**< Offset in the peek buffer for the current iteration */
+    lv_circle_buf_t * peek_buf;   /**< Circular buffer for peeking */
+    uint32_t peek_offset;         /**< Offset in the peek buffer */
 
     /* Callbacks */
     lv_iter_next_cb next_cb;  /**< Callback to get the next element */
@@ -37,6 +39,8 @@ struct _lv_iter_t {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static bool peek_fill_cb(void * buf, uint32_t buf_len, int32_t index, void * user_data);
 
 /**********************
  *  GLOBAL VARIABLES
@@ -50,13 +54,12 @@ struct _lv_iter_t {
  *      MACROS
  **********************/
 
-#define PEEK_BUFF_OFFSET(iter, i) (void*)((uint8_t *)(iter)->peek_buff + (i) * (iter)->elem_size)
-
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_iter_t * lv_iter_create(void * instance, uint32_t elem_size, uint32_t context_size, lv_iter_next_cb next_cb)
+lv_iter_t * lv_iter_create(void * instance, const uint32_t elem_size, const uint32_t context_size,
+                           lv_iter_next_cb next_cb)
 {
     lv_iter_t * iter = lv_malloc_zeroed(sizeof(lv_iter_t));
     LV_ASSERT_MALLOC(iter);
@@ -79,95 +82,105 @@ lv_iter_t * lv_iter_create(void * instance, uint32_t elem_size, uint32_t context
     return iter;
 }
 
-void * lv_iter_get_context(lv_iter_t * iter)
+void * lv_iter_get_context(const lv_iter_t * iter)
 {
-    return iter->context;
+    LV_ASSERT_NULL(iter);
+
+    return iter ? iter->context : NULL;
 }
 
 void lv_iter_destroy(lv_iter_t * iter)
 {
+    LV_ASSERT_NULL(iter);
+    if(iter == NULL) return;
+
     if(iter->context_size > 0) lv_free(iter->context);
-    if(iter->peek_buff != NULL) lv_free(iter->peek_buff);
+    if(iter->peek_buf != NULL) lv_circle_buf_destroy(iter->peek_buf);
+
+    iter->context = NULL;
+    iter->peek_buf = NULL;
 
     lv_free(iter);
 }
 
-void lv_iter_make_peekable(lv_iter_t * iter, uint32_t capacity)
+void lv_iter_make_peekable(lv_iter_t * iter, const uint32_t capacity)
 {
+    LV_ASSERT_NULL(iter);
+    if(iter == NULL) return;
 
-    if(capacity == 0 || iter->peek_buff != NULL) return;
-    iter->peek_capacity = capacity;
-    iter->peek_buff = lv_malloc_zeroed(iter->peek_capacity * iter->elem_size);
-    LV_ASSERT_MALLOC(iter->peek_buff);
+    if(capacity == 0 || iter->peek_buf != NULL) return;
+    iter->peek_buf = lv_circle_buf_create(capacity, iter->elem_size);
+    LV_ASSERT_NULL(iter->peek_buf);
 }
 
 lv_result_t lv_iter_next(lv_iter_t * iter, void * elem)
 {
-    if(iter->peek_buff != NULL) {
-        if(iter->peek_iter_offset >= iter->peek_capacity) return LV_RESULT_INVALID;
-        if(iter->peek_iter_offset < iter->peek_count) {
-            void * buff = PEEK_BUFF_OFFSET(iter, iter->peek_iter_offset);
-            if(elem) lv_memcpy(elem, buff, iter->elem_size);
-            lv_memmove(iter->peek_buff, PEEK_BUFF_OFFSET(iter, iter->peek_iter_offset + 1),
-                       (iter->peek_count - iter->peek_iter_offset - 1) * iter->elem_size);
-            iter->peek_iter_offset = 0;
-            iter->peek_offset = 0;
-            iter->peek_count--;
-            return LV_RESULT_OK;
-        }
+    LV_ASSERT_NULL(iter);
+    if(iter == NULL) return LV_RESULT_INVALID;
+
+    lv_circle_buf_t * c_buf = iter->peek_buf;
+    if(c_buf != NULL && !lv_circle_buf_is_empty(c_buf)) {
+        if(elem) lv_circle_buf_read(c_buf, elem);
+        else lv_circle_buf_skip(c_buf);
+        iter->peek_offset = 0;
+        return LV_RESULT_OK;
     }
 
-    lv_result_t iter_res = iter->next_cb(iter->instance, iter->context, elem);
+    const lv_result_t iter_res = iter->next_cb(iter->instance, iter->context, elem);
     if(iter_res == LV_RESULT_INVALID) return LV_RESULT_INVALID;
 
-    if(iter->peek_buff != NULL) {
-        iter->peek_count = 0;
-        iter->peek_offset = 0;
-        iter->peek_iter_offset = 0;
-    }
+    if(c_buf != NULL) iter->peek_offset = 0;
 
     return iter_res;
 }
 
 lv_result_t lv_iter_peek(lv_iter_t * iter, void * elem)
 {
-    if(iter->peek_buff == NULL || iter->peek_count > iter->peek_capacity) return LV_RESULT_INVALID;
+    LV_ASSERT_NULL(iter);
+    if(iter == NULL) return LV_RESULT_INVALID;
 
-    if(iter->peek_offset >= iter->peek_count) {
-        uint32_t required = iter->peek_offset + 1 - iter->peek_count;
-        while(required --> 0) {
-            void * buff = PEEK_BUFF_OFFSET(iter, iter->peek_count);
-            lv_result_t iter_res = iter->next_cb(iter->instance, iter->context, buff);
-            if(iter_res == LV_RESULT_INVALID) {
-                return LV_RESULT_INVALID;
-            }
-            iter->peek_count++;
-        }
+    lv_circle_buf_t * c_buf = iter->peek_buf;
+    if(c_buf == NULL) return LV_RESULT_INVALID;
+
+    const uint32_t peek_count = lv_circle_buf_size(c_buf);
+    if(iter->peek_offset >= peek_count) {
+        const uint32_t required = iter->peek_offset + 1 - peek_count;
+        const uint32_t filled = lv_circle_buf_fill(c_buf, required, peek_fill_cb, iter);
+        if(filled != required) return LV_RESULT_INVALID;
     }
 
-    void * buff = PEEK_BUFF_OFFSET(iter, iter->peek_offset);
-    lv_memcpy(elem, buff, iter->elem_size);
+    lv_circle_buf_peek_at(c_buf, iter->peek_offset, elem);
 
     return LV_RESULT_OK;
 }
 
 lv_result_t lv_iter_peek_advance(lv_iter_t * iter)
 {
-    if(iter->peek_buff == NULL || iter->peek_offset + 1 >= iter->peek_capacity) return LV_RESULT_INVALID;
+    LV_ASSERT_NULL(iter);
+    if(iter == NULL) return LV_RESULT_INVALID;
+
+    if(iter->peek_buf == NULL || iter->peek_offset + 1 >= lv_circle_buf_capacity(iter->peek_buf))
+        return LV_RESULT_INVALID;
     iter->peek_offset++;
     return LV_RESULT_OK;
 }
 
 lv_result_t lv_iter_peek_reset(lv_iter_t * iter)
 {
-    if(iter->peek_buff == NULL) return LV_RESULT_INVALID;
+    LV_ASSERT_NULL(iter);
+    if(iter == NULL) return LV_RESULT_INVALID;
+
+    if(iter->peek_buf == NULL) return LV_RESULT_INVALID;
 
     iter->peek_offset = 0;
     return LV_RESULT_OK;
 }
 
-void lv_iter_inspect(lv_iter_t * iter, lv_iter_inspect_cb inspect_cb)
+void lv_iter_inspect(lv_iter_t * iter, const lv_iter_inspect_cb inspect_cb)
 {
+    LV_ASSERT_NULL(iter);
+    if(iter == NULL) return;
+
     void * elem = lv_malloc_zeroed(iter->elem_size);
     LV_ASSERT_MALLOC(elem);
 
@@ -186,3 +199,15 @@ void lv_iter_inspect(lv_iter_t * iter, lv_iter_inspect_cb inspect_cb)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static bool peek_fill_cb(void * buf, const uint32_t buf_len, const int32_t index, void * user_data)
+{
+    LV_UNUSED(buf_len);
+    LV_UNUSED(index);
+
+    const lv_iter_t * iter = user_data;
+    const lv_result_t iter_res = iter->next_cb(iter->instance, iter->context, buf);
+    if(iter_res == LV_RESULT_INVALID) return false;
+
+    return true;
+}
