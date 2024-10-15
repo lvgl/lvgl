@@ -36,7 +36,11 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2024-08-26" version="9.2.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.2.0.pack">
+    <release date="2024-10-15" version="9.2.1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.2.1.pack">
+      - LVGL 9.2.1
+      - See Change Log
+    </release>
+    <release date="2024-08-26" version="9.2.0" url="https://github.com/lvgl/lvgl/raw/v9.2.0/env_support/cmsis-pack/LVGL.lvgl.9.2.0.pack">
       - LVGL 9.2.0
       - See Change Log
     </release>
@@ -86,7 +90,7 @@
       - LVGL 8.3.6 release
       - Various fixes
     </release>
-    <release date="2023-02-06" version="8.3.5" url="https://github.com/lvgl/lvgl/raw/6b0092c0d91b2c7bfded48e04cc7b486ed3a72bd/env_support/cmsis-pack/LVGL.lvgl.8.3.6.pack">
+    <release date="2023-02-06" version="8.3.5" url="https://github.com/lvgl/lvgl/raw/e7e8cf846dce96f7542e27b5c9655bab680c31a1/env_support/cmsis-pack/LVGL.lvgl.8.3.5.pack">
       - LVGL 8.3.5 release
       - Use LVGL version as the cmsis-pack version
       - Fix GPU support for NXP PXP and NXP VGLite
