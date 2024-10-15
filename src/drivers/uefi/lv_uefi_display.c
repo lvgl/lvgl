@@ -94,7 +94,7 @@ lv_display_t * lv_uefi_display_create(
                                 display_ctx->gop_protocol->Mode->Info->VerticalResolution);
     lv_display_add_event_cb(display, _display_event_cb, LV_EVENT_DELETE, display);
     lv_display_set_flush_cb(display, _display_flush_cb);
-    lv_display_set_buffers(display, display_ctx->buffer, NULL, display_ctx->buffer_size, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_buffers(display, display_ctx->buffer, NULL, (uint32_t)display_ctx->buffer_size, LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_user_data(display, display_ctx);
 
     goto finish;
@@ -223,12 +223,12 @@ static void _display_flush_cb(lv_display_t * display, const lv_area_t * area, ui
         goto error;
     }
 
-    if((area->x1 + w) > display_ctx->gop_protocol->Mode->Info->HorizontalResolution) {
+    if( (uint32_t)(area->x1 + w) > display_ctx->gop_protocol->Mode->Info->HorizontalResolution) {
         LV_LOG_ERROR("[lv_uefi] Invalid lv_display_flush_cb call (invalid width).");
         goto error;
     }
 
-    if((area->y1 + h) > display_ctx->gop_protocol->Mode->Info->HorizontalResolution) {
+    if( (uint32_t)(area->y1 + h) > display_ctx->gop_protocol->Mode->Info->HorizontalResolution) {
         LV_LOG_ERROR("[lv_uefi] Invalid lv_display_flush_cb call (invalid height).");
         goto error;
     }
@@ -275,9 +275,9 @@ static bool _display_interface_is_valid(const EFI_GRAPHICS_OUTPUT_PROTOCOL * int
     if(interface->Mode == NULL) return FALSE;
     if(interface->Mode->Info == NULL) return FALSE;
     if(interface->Mode->Info->HorizontalResolution == 0) return FALSE;
-    if(interface->Mode->Info->HorizontalResolution >= 65535) return FALSE;
+    if(interface->Mode->Info->HorizontalResolution >= 32767) return FALSE;
     if(interface->Mode->Info->VerticalResolution == 0) return FALSE;
-    if(interface->Mode->Info->VerticalResolution >= 65535) return FALSE;
+    if(interface->Mode->Info->VerticalResolution >= 32767) return FALSE;
 
     return TRUE;
 }

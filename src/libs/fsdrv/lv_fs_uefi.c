@@ -86,7 +86,6 @@ static EFI_GUID _uefi_guid_file_info = EFI_FILE_INFO_ID;
  */
 void lv_fs_uefi_init(void)
 {
-    EFI_STATUS status;
     EFI_LOADED_IMAGE_PROTOCOL * interface_loaded_image = NULL;
     EFI_HANDLE fs_handle = NULL;
 
@@ -512,14 +511,6 @@ static void lv_fs_drv_uefi_init(lv_fs_drv_t * drv, char fs_drive_letter, EFI_HAN
     drv->dir_close_cb = lv_fs_uefi_dir_close_cb;
 
     drv->user_data = (void *) fs_handle;
-
-    goto finish;
-
-error:
-    lv_fs_drv_init(drv);
-
-finish:
-    ;
 }
 
 static void lv_fs_drv_uefi_deinit(lv_fs_drv_t * drv)
