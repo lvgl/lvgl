@@ -647,7 +647,7 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
         label_origin.x = tick_point_b->x + translate_x;
         label_origin.y = tick_point_b->y + translate_y;
         scale_get_label_coords(obj, label_dsc, &label_origin, &label_coords);
-        label_rotation = (label_rotation & LV_SCALE_ROTATION_ANGLE_MASK) * 10U;
+        label_rotation = (label_rotation & LV_SCALE_ROTATION_ANGLE_MASK);
     }
     else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
         translate_rotation = lv_obj_get_style_translate_radial(obj, LV_PART_INDICATOR);
@@ -684,7 +684,7 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
         int32_t label_rotation_temp = 0;
 
         if(label_rotation & LV_SCALE_LABEL_ROTATE_MATCH_TICKS) {
-            label_rotation_temp = ((label_rotation & LV_SCALE_ROTATION_ANGLE_MASK) * 10U) + angle_upscale;
+            label_rotation_temp = (label_rotation & LV_SCALE_ROTATION_ANGLE_MASK) + angle_upscale;
 
             /* keep text upright if the user asked for it, otherwise it will be upside-down on half the dial */
             if(label_rotation & LV_SCALE_LABEL_ROTATE_KEEP_UPRIGHT) {
@@ -698,7 +698,7 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
             label_rotation = label_rotation_temp;
         }
         else {
-            label_rotation = (label_rotation & LV_SCALE_ROTATION_ANGLE_MASK) * 10U;
+            label_rotation = label_rotation & LV_SCALE_ROTATION_ANGLE_MASK;
         }
 
         lv_point_transform(&point, angle_upscale, LV_SCALE_NONE, LV_SCALE_NONE, &center_point, false);

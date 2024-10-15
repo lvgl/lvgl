@@ -29,8 +29,6 @@ void lv_example_scale_8(void)
     lv_scale_set_total_tick_count(scale_line, 31);
     lv_scale_set_major_tick_every(scale_line, 5);
 
-    lv_obj_set_style_length(scale_line, 5, LV_PART_ITEMS);
-    lv_obj_set_style_length(scale_line, 10, LV_PART_INDICATOR);
     lv_scale_set_range(scale_line, 10, 40);
 
     lv_scale_set_angle_range(scale_line, 270);
@@ -40,6 +38,7 @@ void lv_example_scale_8(void)
 
     lv_obj_set_style_line_width(needle_line, 6, LV_PART_MAIN);
     lv_obj_set_style_line_rounded(needle_line, true, LV_PART_MAIN);
+    lv_scale_set_line_needle_value(scale_line, needle_line, 60, 30);
 }
 
 #endif

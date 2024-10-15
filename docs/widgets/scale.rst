@@ -83,8 +83,8 @@ padded in either direction (outwards or inwards) for RADIAL scales only with:
 :cpp:expr:`lv_obj_set_style_radial_offset(scale, 5, LV_PART_ITEMS);` for minor .
 Using length and radial offset together allows total control of the tick position.
 i.e. :cpp:expr:`static char * custom_labels[3] = {"One", "Two", NULL}`.
-
-
+It is also possible to offset the labels from the major ticks (either positive or negative) using 
+:cpp:expr:`lv_obj_set_style_pad_radial(scale, 5, LV_PART_INDICATOR);`
 
 Sections
 --------
