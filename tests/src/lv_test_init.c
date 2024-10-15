@@ -20,7 +20,14 @@ lv_indev_t * lv_test_encoder_indev;
 void lv_test_init(void)
 {
     lv_init();
+
     lv_log_register_print_cb(test_log_print_cb);
+
+#if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
+    /* Disable profiler, to reduce redundant profiler log printing  */
+    lv_profiler_builtin_set_enable(false);
+#endif
+
     hal_init();
 #if LV_USE_SYSMON
 #if LV_USE_MEM_MONITOR
