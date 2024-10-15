@@ -1,4 +1,5 @@
 cd build
 emcmake cmake ..
 emmake make -j$(nproc)
+echo "Built succesfully, opening index.html"
 code index.html
