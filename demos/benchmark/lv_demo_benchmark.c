@@ -14,8 +14,16 @@
     #error "LV_FONT_MONTSERRAT_14 is required for lv_demo_benchmark. Enable it in lv_conf.h."
 #endif
 
+#if LV_FONT_MONTSERRAT_20 == 0
+    #error "LV_FONT_MONTSERRAT_20 is required for lv_demo_benchmark. Enable it in lv_conf.h."
+#endif
+
 #if LV_FONT_MONTSERRAT_24 == 0
     #error "LV_FONT_MONTSERRAT_24 is required for lv_demo_benchmark. Enable it in lv_conf.h."
+#endif
+
+#if LV_FONT_MONTSERRAT_26 == 0
+    #error "LV_FONT_MONTSERRAT_26 is required for lv_demo_benchmark. Enable it in lv_conf.h."
 #endif
 
 #if LV_USE_DEMO_WIDGETS == 0
