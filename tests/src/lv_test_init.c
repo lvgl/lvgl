@@ -84,7 +84,7 @@ static void test_log_print_cb(lv_log_level_t level, const char * buf)
         return;
     }
 
-    TEST_PRINTF("%s\n", buf);
+    TEST_PRINTF("%s", buf);
 }
 
 void lv_test_assert_fail(void)
