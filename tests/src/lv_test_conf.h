@@ -70,8 +70,14 @@ typedef void * lv_user_data_t;
 #elif LV_TEST_OPTION == 6
 #define  LV_COLOR_DEPTH     32
 #define  LV_DPI_DEF         160
+
 #define  LV_DRAW_BUF_ALIGN  64
+#ifdef _WIN32
+#define  LV_ATTRIBUTE_MEM_ALIGN __declspec(align(LV_DRAW_BUF_ALIGN))
+#else
 #define  LV_ATTRIBUTE_MEM_ALIGN __attribute__((aligned(LV_DRAW_BUF_ALIGN)))
+#endif
+
 #include "lv_test_conf_vg_lite.h"
 #include "lv_test_conf_full.h"
 #elif LV_TEST_OPTION == 7
