@@ -873,6 +873,10 @@
 #   define LV_USE_LZ4_EXTERNAL  0
 #endif
 
+/*SVG library*/
+#define LV_USE_SVG_ANIMATION 0
+#define LV_USE_SVG_DEBUG 0
+
 /** FFmpeg library for image decoding and playing videos.
  *  Supports all major image formats so do not enable other image decoder with it. */
 #if LV_USE_FFMPEG

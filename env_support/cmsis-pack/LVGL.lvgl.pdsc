@@ -539,6 +539,7 @@
                 <file category="sourceC"            name="src/misc/lv_matrix.c" />
                 <file category="sourceC"            name="src/misc/lv_iter.c" />
                 <file category="sourceC"            name="src/misc/lv_circle_buf.c" />
+                <file category="sourceC"            name="src/misc/lv_tree.c" />
                 
                 
                 <!-- src/misc/cache-->
@@ -1254,6 +1255,24 @@
 
             </component>
             -->
+            
+            <component Cgroup="Libraries and Others" Csub="Libs SVG"  condition="LVGL-Essential">
+              <description>Add the SVG library</description>
+              <files>
+                <!-- src/libs/svg -->
+                <file category="sourceC"    name="src/libs/svg/lv_svg.c" />
+                <file category="sourceC"    name="src/libs/svg/lv_svg_parser.c" />
+                <file category="sourceC"    name="src/libs/svg/lv_svg_render.c" />
+                <file category="sourceC"    name="src/libs/svg/lv_svg_token.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable SVG library */
+#define LV_USE_SVG          1
+              </RTE_Components_h>
+
+            </component>
 
             <component Cgroup="Libraries and Others" Csub="Libs Barcode"  condition="LVGL-Essential">
               <description>Add the Barcode code library</description>
