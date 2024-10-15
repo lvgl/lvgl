@@ -291,7 +291,8 @@ static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
             break;
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * dsc = task->draw_dsc;
-                if(!(dsc->clip_radius == 0
+                if(!(dsc->header.cf < LV_COLOR_FORMAT_PROPRIETARY_START
+                     && dsc->clip_radius == 0
                      && dsc->bitmap_mask_src == NULL
                      && dsc->sup == NULL
                      && dsc->tile == 0

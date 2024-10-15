@@ -218,6 +218,11 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     LV_UNUSED(draw_unit);
 
+    if(task->type == LV_DRAW_TASK_TYPE_IMAGE &&
+       ((lv_draw_image_dsc_t *)task->draw_dsc)->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START) {
+        return 0;
+    }
+
     /*If not refreshing the display probably it's a canvas rendering
      *which his not support in SDL as it's not a texture.*/
     if(lv_refr_get_disp_refreshing() == NULL) return 0;

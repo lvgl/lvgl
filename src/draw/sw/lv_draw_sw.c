@@ -413,6 +413,10 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
                 if(masked && (cf == LV_COLOR_FORMAT_A8 || cf == LV_COLOR_FORMAT_RGB565A8)) {
                     return 0;
                 }
+
+                if(cf >= LV_COLOR_FORMAT_PROPRIETARY_START) {
+                    return 0;
+                }
             }
             break;
         default:
