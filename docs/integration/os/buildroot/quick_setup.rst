@@ -10,7 +10,7 @@ Get the repository
 
 .. code-block:: bash
 
-    git clone --recurse-submodules https://github.com/EDGEMTech/lvgl_buildroot_example.git
+    git clone --recurse-submodules https://github.com/lvgl/lv_buildroot.git
 
 Build the image
 
