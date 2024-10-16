@@ -57,9 +57,9 @@ remove the misleading guide above this code segment.
    - LV_USE_DEMO_VECTOR_GRAPHIC
    - LV_USE_DRAW_VGLITE
    - LV_USE_DRAW_VG_LITE
-   - LV_USE_DRAW_PXP
+   - LV_USE_PXP
    - LV_USE_DRAW_SDL
-   - LV_USE_DRAW_ARM2D
+   - LV_USE_DRAW_ARM2D_SYNC
    - LV_USE_SNAPSHOT
    - LV_USE_MONKEY
    - LV_USE_GRIDNAV
@@ -85,7 +85,7 @@ remove the misleading guide above this code segment.
 #define LV_DRAW_BUF_STRIDE_ALIGN		4
 #define LV_ATTRIBUTE_MEM_ALIGN          __attribute__((aligned(4)))
 ```
-Make sure `LV_MEM_SIZE` is no less than `(72*1024U)`.
+Make sure `LV_MEM_SIZE` is no less than `(128*1024U)`.
 
 8. Remove following macro definitions in the `3rd party libraries` section:
 
@@ -171,7 +171,7 @@ with:
         /*turn-on helium acceleration when Arm-2D and the Helium-powered device are detected */
         #if defined(__ARM_FEATURE_MVE) && __ARM_FEATURE_MVE
             #define LV_USE_DRAW_SW_ASM  LV_DRAW_SW_ASM_HELIUM
-            #define LV_USE_DRAW_ARM2D   1
+            #define LV_USE_DRAW_ARM2D_SYNC   1
         #endif
     #endif
 
