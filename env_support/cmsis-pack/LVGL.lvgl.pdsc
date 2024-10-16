@@ -910,7 +910,7 @@
               <RTE_Components_h>
 
 /*! \brief enable NXP PXP */
-#define LV_USE_DRAW_PXP     1
+#define LV_USE_PXP     1
               </RTE_Components_h>
 
             </component>
