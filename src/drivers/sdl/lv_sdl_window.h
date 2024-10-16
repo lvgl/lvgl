@@ -53,6 +53,7 @@ void lv_sdl_quit(void);
  *      MACROS
  **********************/
 
+
 #endif /* LV_DRV_SDL */
 
 #ifdef __cplusplus

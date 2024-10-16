@@ -76,6 +76,9 @@ static lv_timer_t * event_handler_timer;
  *      MACROS
  **********************/
 
+#define FSCALE(iv, fv) (int32_t)ceilf((float)(iv)/(fv))
+#define ZOOM(iv) FSCALE(iv, dsc->zoom)
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -288,7 +291,9 @@ static void sdl_event_handler(lv_timer_t * t)
                     break;
                 case SDL_WINDOWEVENT_RESIZED:
                     dsc->ignore_size_chg = 1;
-                    lv_display_set_resolution(disp, event.window.data1 / dsc->zoom, event.window.data2 / dsc->zoom);
+                    int32_t hres = ZOOM(event.window.data1);
+                    int32_t vres = ZOOM(event.window.data2);
+                    lv_display_set_resolution(disp, hres, vres);
                     dsc->ignore_size_chg = 0;
                     lv_refr_now(disp);
                     break;
@@ -313,7 +318,7 @@ static void sdl_event_handler(lv_timer_t * t)
 static void window_create(lv_display_t * disp)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    dsc->zoom = 1;
+    dsc->zoom = 1.0;
 
     int flag = SDL_WINDOW_RESIZABLE;
 #if LV_SDL_FULLSCREEN
@@ -324,7 +329,7 @@ static void window_create(lv_display_t * disp)
     int32_t ver_res = disp->ver_res;
     dsc->window = SDL_CreateWindow("LVGL Simulator",
                                    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                                   hor_res * dsc->zoom, ver_res * dsc->zoom, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
+                                   ZOOM(hor_res), ZOOM(ver_res), flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
 
     dsc->renderer = SDL_CreateRenderer(dsc->window, -1,
                                        LV_SDL_ACCELERATED ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE);
@@ -338,7 +343,7 @@ static void window_create(lv_display_t * disp)
 #endif
 #endif /*LV_USE_DRAW_SDL == 0*/
     /*Some platforms (e.g. Emscripten) seem to require setting the size again */
-    SDL_SetWindowSize(dsc->window, hor_res * dsc->zoom, ver_res * dsc->zoom);
+    SDL_SetWindowSize(dsc->window, ZOOM(hor_res), ZOOM(ver_res));
 #if LV_USE_DRAW_SDL == 0
     texture_resize(disp);
 #endif /*LV_USE_DRAW_SDL == 0*/
@@ -432,7 +437,7 @@ static void res_chg_event_cb(lv_event_t * e)
 
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     if(dsc->ignore_size_chg == false) {
-        SDL_SetWindowSize(dsc->window, disp->hor_res * dsc->zoom, disp->ver_res * dsc->zoom);
+        SDL_SetWindowSize(dsc->window, ZOOM(disp->hor_res), ZOOM(disp->ver_res));
     }
 
 #if LV_USE_DRAW_SDL == 0
