@@ -91,6 +91,14 @@ jobs:
         path: |
              tests/ref_imgs*/**/*_err.png
              test_screenshot_error.h
+    - name: Check for new files and fail if found
+      run: |
+            if git status --porcelain -- tests/ref_imgs* | grep '^??'; then
+              echo "New files were added during the build process."
+              exit 1
+            else
+              echo "No new files were found."
+            fi
 #    - name: Upload coverage to Codecov
 #      uses: codecov/codecov-action@v4
 #      if: github.event_name == 'push' && github.repository == 'lvgl/lvgl'
