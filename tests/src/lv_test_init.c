@@ -97,8 +97,11 @@ static void test_log_print_cb(lv_log_level_t level, const char * buf)
 
 void lv_test_assert_fail(void)
 {
+    /*Flush the output*/
+    fflush(stdout);
+
     /*Handle error on test*/
-    assert(0);
+    assert(false);
 }
 
 #endif
