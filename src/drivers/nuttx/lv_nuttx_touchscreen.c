@@ -43,6 +43,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void indev_set_cursor(lv_indev_t * indev, int32_t size);
 static void touchscreen_read(lv_indev_t * drv, lv_indev_data_t * data);
 static void touchscreen_delete_cb(lv_event_t * e);
 static lv_indev_t * touchscreen_init(int fd);
@@ -80,12 +81,40 @@ lv_indev_t * lv_nuttx_touchscreen_create(const char * dev_path)
         close(fd);
     }
 
+    indev_set_cursor(indev, LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE);
+
     return indev;
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void indev_set_cursor(lv_indev_t * indev, int32_t size)
+{
+    lv_obj_t * cursor_obj = lv_indev_get_cursor(indev);
+    if(size <= 0) {
+        if(cursor_obj) {
+            lv_obj_delete(cursor_obj);
+            lv_indev_set_cursor(indev, NULL);
+        }
+    }
+    else {
+        if(cursor_obj == NULL) {
+            cursor_obj = lv_obj_create(lv_layer_sys());
+            lv_obj_remove_style_all(cursor_obj);
+            lv_obj_set_style_radius(cursor_obj, LV_RADIUS_CIRCLE, 0);
+            lv_obj_set_style_bg_opa(cursor_obj, LV_OPA_50, 0);
+            lv_obj_set_style_bg_color(cursor_obj, lv_color_black(), 0);
+            lv_obj_set_style_border_width(cursor_obj, 2, 0);
+            lv_obj_set_style_border_color(cursor_obj, lv_palette_main(LV_PALETTE_GREY), 0);
+        }
+        lv_obj_set_size(cursor_obj, size, size);
+        lv_obj_set_style_translate_x(cursor_obj, -size / 2, 0);
+        lv_obj_set_style_translate_y(cursor_obj, -size / 2, 0);
+        lv_indev_set_cursor(indev, cursor_obj);
+    }
+}
 
 static void conv_touch_sample(lv_indev_t * drv,
                               lv_indev_data_t * data,
@@ -163,7 +192,7 @@ static void touchscreen_delete_cb(lv_event_t * e)
     if(touchscreen) {
         lv_indev_set_driver_data(indev, NULL);
         lv_indev_set_read_cb(indev, NULL);
-
+        indev_set_cursor(indev, -1);
         if(touchscreen->fd >= 0) {
             close(touchscreen->fd);
             touchscreen->fd = -1;
