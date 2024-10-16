@@ -76,7 +76,7 @@ static lv_timer_t * event_handler_timer;
  *      MACROS
  **********************/
 
-#define FSCALE(iv, fv) (int32_t)ceilf((float)(iv)/(fv))
+#define FSCALE(iv, fv) (int32_t)ceilf((float)(iv)*(fv))
 #define ZOOM(iv) FSCALE(iv, dsc->zoom)
 
 /**********************
