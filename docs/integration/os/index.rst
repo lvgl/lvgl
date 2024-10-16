@@ -12,3 +12,4 @@
     mqx
     qnx
     yocto/index
+    buildroot/index
