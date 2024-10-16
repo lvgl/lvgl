@@ -138,7 +138,7 @@ class LVObject(gdb.Value):
                 gdb.lookup_type("lv_style_const_prop_t").pointer()
             )
             for j in range(prop_cnt):
-                prop = values_and_props[j]["prop_ptr"]
+                prop = values_and_props[j]["prop"]
                 if prop == LV_STYLE_PROP_INV or prop == LV_STYLE_PROP_ANY:
                     continue
                 yield values_and_props[j]
@@ -210,7 +210,7 @@ def dump_obj_info(obj: LVObject):
 
 #  Dump lv_style_const_prop_t
 def dump_style_info(style: gdb.Value):
-    prop = int(style["prop_ptr"])
+    prop = int(style["prop"])
     value = style["value"]
     print(f"{prop} = {value}")
 
