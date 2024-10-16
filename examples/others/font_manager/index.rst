@@ -1,6 +1,6 @@
 
-Touchpad font manager example
------------------------
+Font manager example
+--------------------
 
-.. lv_example:: others/monkey/lv_example_font_manager_1
+.. lv_example:: others/font_manager/lv_example_font_manager_1
   :language: c
