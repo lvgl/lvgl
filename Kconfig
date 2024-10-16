@@ -1,4 +1,4 @@
-# Kconfig file for LVGL v9.2.1
+# Kconfig file for LVGL v9.3.0-dev
 
 menu "LVGL configuration"
 
