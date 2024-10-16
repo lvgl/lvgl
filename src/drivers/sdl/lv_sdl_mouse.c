@@ -145,7 +145,7 @@ void lv_sdl_mouse_handler(SDL_Event * event)
 
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
     int32_t ver_res = lv_display_get_vertical_resolution(disp);
-    uint8_t zoom = lv_sdl_window_get_zoom(disp);
+    float zoom = lv_sdl_window_get_zoom(disp);
 
     switch(event->type) {
         case SDL_WINDOWEVENT:
