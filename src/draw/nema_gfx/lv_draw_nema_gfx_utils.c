@@ -68,6 +68,16 @@ uint32_t lv_nemagfx_cf_to_nema(lv_color_format_t cf)
             return NEMA_BGRA8888;
         case LV_COLOR_FORMAT_XRGB8888:
             return NEMA_BGRX8888;
+        case LV_COLOR_FORMAT_NEMA_TSC4:
+            return NEMA_TSC4;
+        case LV_COLOR_FORMAT_NEMA_TSC6:
+            return NEMA_TSC6;
+        case LV_COLOR_FORMAT_NEMA_TSC6A:
+            return NEMA_TSC6A;
+        case LV_COLOR_FORMAT_NEMA_TSC12:
+            return NEMA_TSC12;
+        case LV_COLOR_FORMAT_NEMA_TSC12A:
+            return NEMA_TSC12A;
         default:
             return LV_NEMA_GFX_COLOR_FORMAT;
     }

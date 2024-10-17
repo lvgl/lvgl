@@ -242,6 +242,11 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
             }
 
         case LV_DRAW_TASK_TYPE_IMAGE: {
+                lv_draw_image_dsc_t * dsc = t->draw_dsc;
+                if(dsc->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START) {
+                    ret = 0;
+                    break;
+                }
 #if USE_D2
                 t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
                 t->preference_score = 0;
