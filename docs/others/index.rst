@@ -11,6 +11,7 @@ Others
     monkey
     gridnav
     file_explorer
+    font_manager
     fragment
     observer
     imgfont
