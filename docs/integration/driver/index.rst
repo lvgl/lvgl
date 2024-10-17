@@ -6,9 +6,9 @@ Drivers
     :maxdepth: 2
 
     display/index
-    touchpad/index
     libinput
-    X11
-    windows
     opengles
+    touchpad/index
     wayland
+    windows
+    X11

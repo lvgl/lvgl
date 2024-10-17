@@ -8,21 +8,21 @@ Overview
 .. toctree::
     :maxdepth: 2
 
-    obj
+    animations
+    color
     coord
+    debugging/index
+    display
+    event
+    font
+    fs
+    image
+    indev
+    layer
+    new_widget
+    obj
+    renderers/index
+    scroll
     style
     style-props
-    scroll
-    layer
-    event
-    indev
-    display
-    color
-    font
-    image
-    fs
-    animations
     timer
-    renderers/index
-    new_widget
-    debugging/index

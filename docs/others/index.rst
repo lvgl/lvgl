@@ -7,14 +7,14 @@ Others
 .. toctree::
     :maxdepth: 1
 
-    snapshot
-    monkey
-    gridnav
     file_explorer
     font_manager
     fragment
-    observer
-    imgfont
+    gridnav
     ime_pinyin
+    imgfont
+    monkey
     obj_id
     obj_property
+    observer
+    snapshot
