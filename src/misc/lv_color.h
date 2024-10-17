@@ -72,10 +72,13 @@ enum {
                                             (cf) == LV_COLOR_FORMAT_L8 ? 8 :        \
                                             (cf) == LV_COLOR_FORMAT_A8 ? 8 :        \
                                             (cf) == LV_COLOR_FORMAT_I8 ? 8 :        \
+                                            (cf) == LV_COLOR_FORMAT_ARGB2222 ? 8 :  \
                                             (cf) == LV_COLOR_FORMAT_AL88 ? 16 :     \
                                             (cf) == LV_COLOR_FORMAT_RGB565 ? 16 :   \
                                             (cf) == LV_COLOR_FORMAT_RGB565A8 ? 16 : \
                                             (cf) == LV_COLOR_FORMAT_YUY2 ? 16 :     \
+                                            (cf) == LV_COLOR_FORMAT_ARGB1555 ? 16 : \
+                                            (cf) == LV_COLOR_FORMAT_ARGB4444 ? 16 : \
                                             (cf) == LV_COLOR_FORMAT_ARGB8565 ? 24 : \
                                             (cf) == LV_COLOR_FORMAT_RGB888 ? 24 :   \
                                             (cf) == LV_COLOR_FORMAT_ARGB8888 ? 32 : \
@@ -154,6 +157,9 @@ typedef enum {
     LV_COLOR_FORMAT_A1                = 0x0B,
     LV_COLOR_FORMAT_A2                = 0x0C,
     LV_COLOR_FORMAT_A4                = 0x0D,
+    LV_COLOR_FORMAT_ARGB1555          = 0x16,
+    LV_COLOR_FORMAT_ARGB4444          = 0x17,
+    LV_COLOR_FORMAT_ARGB2222          = 0X18,
 
     /* reference to https://wiki.videolan.org/YUV/ */
     /*YUV planar formats*/
