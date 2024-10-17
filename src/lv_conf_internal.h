@@ -3778,6 +3778,16 @@
     #endif
 #endif
 
+
+/** Driver for NXP ELCDIF */
+#ifndef LV_USE_NXP_ELCDIF
+    #ifdef CONFIG_LV_USE_NXP_ELCDIF
+        #define LV_USE_NXP_ELCDIF CONFIG_LV_USE_NXP_ELCDIF
+    #else
+        #define LV_USE_NXP_ELCDIF   0
+    #endif
+#endif
+
 /** Driver for ST LTDC */
 #ifndef LV_USE_ST_LTDC
     #ifdef CONFIG_LV_USE_ST_LTDC
