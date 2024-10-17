@@ -320,6 +320,13 @@ lv_obj_t * lv_indev_get_scroll_obj(const lv_indev_t * indev);
 void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point);
 
 /**
+ * Get the cursor object of an input device (for LV_INDEV_TYPE_POINTER only)
+ * @param indev pointer to an input device
+ * @return pointer to the cursor object
+ */
+lv_obj_t * lv_indev_get_cursor(lv_indev_t * indev);
+
+/**
  * Do nothing until the next release
  * @param indev pointer to an input device
  */

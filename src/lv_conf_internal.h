@@ -2742,7 +2742,7 @@
         #define LV_USE_GIF 0
     #endif
 #endif
-    #if LV_USE_GIF
+#if LV_USE_GIF
     /** GIF decoder accelerate */
     #ifndef LV_GIF_CACHE_DECODE_DATA
         #ifdef CONFIG_LV_GIF_CACHE_DECODE_DATA
@@ -3653,6 +3653,15 @@
             #define LV_USE_NUTTX_TOUCHSCREEN CONFIG_LV_USE_NUTTX_TOUCHSCREEN
         #else
             #define LV_USE_NUTTX_TOUCHSCREEN    0
+        #endif
+    #endif
+
+    /*Touchscreen cursor size in pixels(<=0: disable cursor)*/
+    #ifndef LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
+        #ifdef CONFIG_LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
+            #define LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE CONFIG_LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
+        #else
+            #define LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE    0
         #endif
     #endif
 #endif

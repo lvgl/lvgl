@@ -851,7 +851,7 @@
 
 /** GIF decoder library */
 #define LV_USE_GIF 0
-    #if LV_USE_GIF
+#if LV_USE_GIF
     /** GIF decoder accelerate */
     #define LV_GIF_CACHE_DECODE_DATA 0
 #endif
@@ -1126,6 +1126,9 @@
 
     /** Driver for /dev/input */
     #define LV_USE_NUTTX_TOUCHSCREEN    0
+
+    /*Touchscreen cursor size in pixels(<=0: disable cursor)*/
+    #define LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE    0
 #endif
 
 /** Driver for /dev/dri/card */

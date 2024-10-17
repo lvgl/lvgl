@@ -8,14 +8,14 @@ Widgets
     :maxdepth: 1
 
     obj
-    arc
     animimg
+    arc
     bar
     button
     buttonmatrix
     calendar
-    chart
     canvas
+    chart
     checkbox
     dropdown
     image

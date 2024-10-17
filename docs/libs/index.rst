@@ -8,20 +8,21 @@
 .. toctree::
     :maxdepth: 1
 
-    fs
-    bmp
-    tjpgd
-    libjpeg_turbo
-    lodepng
-    libpng
-    gif
-    freetype
-    tiny_ttf
-    qrcode
-    barcode
-    rlottie
-    ffmpeg
-    rle
     arduino_esp_littlefs
     arduino_sd
+    barcode
+    bmp
+    ffmpeg
+    freetype
+    fs
+    gif
     lfs
+    libjpeg_turbo
+    libpng
+    lodepng
+    qrcode
+    rle
+    rlottie
+    svg
+    tiny_ttf
+    tjpgd

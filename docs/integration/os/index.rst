@@ -4,12 +4,12 @@
 
 .. toctree:: :maxdepth: 2
 
-    nuttx
-    rt-thread
     freertos
-    zephyr
-    px5
     mqx
+    nuttx
+    px5
     qnx
+    rt-thread
     yocto/index
     buildroot/index
+    zephyr
