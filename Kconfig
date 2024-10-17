@@ -375,7 +375,7 @@ menu "LVGL configuration"
 		config LV_USE_PXP
 		bool "Use NXP's PXP on iMX RTxxx platforms"
 		default n
-		
+
 		config LV_USE_DRAW_PXP
 		bool "Use PXP for drawing"
 			depends on LV_USE_PXP
@@ -1833,7 +1833,7 @@ menu "LVGL configuration"
 			int "Touchscreen cursor size in pixels"
 			depends on LV_USE_NUTTX_TOUCHSCREEN
 			default 0
-			help 
+			help
 				Set to 0 to disable cursor, or set to a value greater than 0 to set the cursor size in pixels.
 
 		config LV_USE_LINUX_DRM
@@ -1937,7 +1937,11 @@ menu "LVGL configuration"
 		config LV_USE_DEMO_BENCHMARK
 			bool "Benchmark your system"
 			default n
-			depends on LV_FONT_MONTSERRAT_14 && LV_FONT_MONTSERRAT_24 && LV_USE_DEMO_WIDGETS
+			select LV_FONT_MONTSERRAT_14
+			select LV_FONT_MONTSERRAT_20
+            select LV_FONT_MONTSERRAT_24
+			select LV_FONT_MONTSERRAT_26
+            select LV_USE_DEMO_WIDGETS
 		config LV_USE_DEMO_RENDER
 			bool "Render test for each primitives. Requires at least 480x272 display"
 			default n
