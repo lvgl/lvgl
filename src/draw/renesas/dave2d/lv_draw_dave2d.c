@@ -79,6 +79,7 @@ void lv_draw_dave2d_init(void)
     lv_draw_dave2d_unit_t * draw_dave2d_unit = lv_draw_create_unit(sizeof(lv_draw_dave2d_unit_t));
     draw_dave2d_unit->base_unit.dispatch_cb = lv_draw_dave2d_dispatch;
     draw_dave2d_unit->base_unit.evaluate_cb = _dave2d_evaluate;
+    draw_dave2d_unit->base_unit.name = "DAVE2D";
     draw_dave2d_unit->idx = DRAW_UNIT_ID_DAVE2D;
 
     result = lv_dave2d_init();

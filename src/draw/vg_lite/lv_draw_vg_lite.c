@@ -71,6 +71,7 @@ void lv_draw_vg_lite_init(void)
     unit->base_unit.dispatch_cb = draw_dispatch;
     unit->base_unit.evaluate_cb = draw_evaluate;
     unit->base_unit.delete_cb = draw_delete;
+    unit->base_unit.name = "VG_LITE";
 
     lv_vg_lite_image_dsc_init(unit);
 #if LV_USE_VECTOR_GRAPHIC

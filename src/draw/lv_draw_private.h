@@ -92,6 +92,11 @@ struct _lv_draw_unit_t {
     const lv_area_t * clip_area;
 
     /**
+     * Name of the draw unit, for debugging purposes only.
+     */
+    const char * name;
+
+    /**
      * Called to try to assign a draw task to itself.
      * `lv_draw_get_next_available_task` can be used to get an independent draw task.
      * A draw task should be assign only if the draw unit can draw it too

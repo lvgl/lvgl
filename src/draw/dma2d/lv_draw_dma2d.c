@@ -64,6 +64,7 @@ void lv_draw_dma2d_init(void)
     draw_dma2d_unit->base_unit.evaluate_cb = evaluate_cb;
     draw_dma2d_unit->base_unit.dispatch_cb = dispatch_cb;
     draw_dma2d_unit->base_unit.delete_cb = delete_cb;
+    draw_dma2d_unit->base_unit.name = "DMA2D";
 
 #if LV_DRAW_DMA2D_ASYNC
     g_unit = draw_dma2d_unit;

@@ -115,6 +115,7 @@ void lv_draw_vglite_init(void)
     draw_vglite_unit->base_unit.wait_for_finish_cb = _vglite_wait_for_finish;
 #endif
     draw_vglite_unit->base_unit.delete_cb = _vglite_delete;
+    draw_vglite_unit->base_unit.name = "NXP_VGLITE";
 
 #if LV_USE_VGLITE_DRAW_THREAD
     lv_thread_init(&draw_vglite_unit->thread, LV_THREAD_PRIO_HIGH, _vglite_render_thread_cb, 2 * 1024, draw_vglite_unit);
