@@ -627,6 +627,18 @@ void lv_obj_refr_pos(lv_obj_t * obj)
     if(LV_COORD_IS_PCT(x)) x = (pw * LV_COORD_GET_PCT(x)) / 100;
     if(LV_COORD_IS_PCT(y)) y = (ph * LV_COORD_GET_PCT(y)) / 100;
 
+    /*Handle positionings*/
+    if(pw) {
+        if(LV_COORD_IS_PCT(x) && LV_COORD_GET_PCT(x)) {
+            x = 0;
+        }
+    }
+    if(ph) {
+        if(LV_COORD_IS_PCT(y) && LV_COORD_GET_PCT(y)) {
+            y = 0;
+        }
+    }
+
     /*Handle percentage value of translate*/
     int32_t tr_x = lv_obj_get_style_translate_x(obj, LV_PART_MAIN);
     int32_t tr_y = lv_obj_get_style_translate_y(obj, LV_PART_MAIN);
