@@ -2742,7 +2742,7 @@
         #define LV_USE_GIF 0
     #endif
 #endif
-    #if LV_USE_GIF
+#if LV_USE_GIF
     /** GIF decoder accelerate */
     #ifndef LV_GIF_CACHE_DECODE_DATA
         #ifdef CONFIG_LV_GIF_CACHE_DECODE_DATA
