@@ -288,8 +288,8 @@ static void sdl_event_handler(lv_timer_t * t)
                     break;
                 case SDL_WINDOWEVENT_RESIZED:
                     dsc->ignore_size_chg = 1;
-                    int32_t hres = (int32_t)((float)(event.window.data1) * dsc->zoom);
-                    int32_t vres = (int32_t)((float)(event.window.data2) * dsc->zoom);
+                    int32_t hres = (int32_t)((float)(event.window.data1) / dsc->zoom);
+                    int32_t vres = (int32_t)((float)(event.window.data2) / dsc->zoom);
                     lv_display_set_resolution(disp, hres, vres);
                     dsc->ignore_size_chg = 0;
                     lv_refr_now(disp);
