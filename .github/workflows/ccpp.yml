@@ -103,12 +103,22 @@ jobs:
             echo "Found new file: $file"
           done
           zip -r untracked_ref_imgs.zip $NEW_REF_IMGS
+          echo "::set-output name=new_ref_imgs_found::true"
         else
           echo "No new files were found."
+          echo "::set-output name=new_ref_imgs_found::false"
         fi
+
     - name: Upload untracked reference images
-      if: steps.check_untracked_ref_imgs.outputs.new_ref_imgs != ''
+      if: steps.check_untracked_ref_imgs.outputs.new_ref_imgs_found == 'true'
       uses: actions/upload-artifact@v3
       with:
         name: Untracked Reference Images
         path: untracked_ref_imgs.zip
+
+    - name: Fail the build if new files were found
+      if: steps.check_untracked_ref_imgs.outputs.new_ref_imgs_found == 'true'
+      run: |
+        echo "Failing the build due to newly generated reference images."
+        exit 1
+
