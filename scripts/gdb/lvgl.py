@@ -188,6 +188,9 @@ class LVGL:
         disp = self.lv_global["disp_default"]
         return disp["act_scr"] if disp else None
 
+    def draw_info(self):
+        return self.lv_global["draw_info"]
+
 
 def set_lvgl_instance(lv_global: gdb.Value):
     global g_lvgl_instance
@@ -306,7 +309,50 @@ class InfoStyle(gdb.Command):
             print("  ", end="")
             dump_style_info(style)
 
+class InfoDrawUnit(gdb.Command):
+    """dump draw unit info"""
+
+    def __init__(self):
+        super(InfoDrawUnit, self).__init__(
+            "info draw_unit", gdb.COMMAND_USER, gdb.COMPLETE_EXPRESSION
+        )
+
+    def dump_draw_unit(self, draw_unit:gdb.Value):
+        # Dereference to get the string content of the name from draw_unit
+        name_address = draw_unit["name"]
+        name = name_address.string()
+
+        # Print draw_unit information and the name
+        print(f"Draw Unit: {draw_unit}, Name: {name}")
+
+        # Handle different draw_units based on the name
+        if name == "VG_LITE":
+            vg_lite_draw_unit = draw_unit.cast(gdb.lookup_type("lv_draw_vg_lite_unit_t").pointer())
+            print(gdb.execute(f'print *({vg_lite_draw_unit.type}){vg_lite_draw_unit}', to_string=True))
+        elif name == "SW":
+            sw_draw_unit = draw_unit.cast(gdb.lookup_type("lv_draw_sw_unit_t").pointer())
+            print(gdb.execute(f'print *({sw_draw_unit.type}){sw_draw_unit}', to_string=True))
+        else:
+            print(gdb.execute(f'print *({draw_unit.type}){draw_unit}', to_string=True))
+
+
+    def invoke(self, args, from_tty):
+        try:
+            if g_lvgl_instance is None:
+                print("LVGL instance is not set.")
+                return
+
+            unit = g_lvgl_instance.draw_info()["unit_head"]
+
+            while unit:
+                self.dump_draw_unit(unit)
+                unit = unit["next"]
+
+        except gdb.error as e:
+            print(f"Error: {e}")
+
 
 DumpObj()
 InfoStyle()
+InfoDrawUnit()
 set_lvgl_instance(None)
