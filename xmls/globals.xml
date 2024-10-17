@@ -1,0 +1,37 @@
+<const name="size_content" help="Involve all children"/>
+
+<api>
+    <enumdef name="state">
+        <enum name="default" help="Some help"/>
+        <enum name="pressed" help="Some help"/>
+        <enum name="checked" help="Some help"/>
+    </enumdef>
+    <enumdef name="part">
+        <enum name="main" help="Some help"/>
+        <enum name="scrollbar" help="Some help"/>
+        <enum name="indicator" help="Some help"/>
+        <enum name="knob" help="Some help"/>
+    </enumdef>
+    <enumdef name="align">
+        <enum name="top_left" help="Some help"/>
+        <enum name="bottom_right" help="Some help"/>
+        <enum name="center" help="Some help"/>
+    </enumdef>
+    <enumdef name="dir">
+        <enum name="top" help="Some help"/>
+        <enum name="bottom" help="Some help"/>
+        <enum name="left" help="Some help"/>
+        <enum name="right" help="Some help"/>
+    </enumdef>
+    <enumdef name="element_access">
+   		<enum name="implicit-single" help="A single instance is created automatically. Can be get by `lv_<widget_name>_get_<element_name>(widget)`"/>
+    	<enum name="implicit-multi"  help="Multiple instance are created automatically. Can be get by `lv_<widget_name>_get_<element_name>(widget, index)`" />
+        <enum name="explicit" help="Multiple instance can be created manually. Can be created by `lv_<widget_name>_add_<element_name>`"/>
+    </enumdef>
+    <enumdef name="flex_flow">
+            <enum name="row"            help="In a row"/>
+            <enum name="row_wrap"       help="In rows and wrap"/>
+            <enum name="column"         help="In a column"/>
+            <enum name="column_wrap"    help="In columns and wrap"/>
+    </enumdef>
+</api>
