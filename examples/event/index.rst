@@ -27,4 +27,7 @@ Draw event
 .. lv_example:: event/lv_example_event_draw
   :language: c
 
-
+Manual event handling
+----------
+.. lv_example:: event/lv_example_event_manual
+  :language: c

@@ -18,3 +18,8 @@ Text auto-formatting
 .. lv_example:: widgets/textarea/lv_example_textarea_3
   :language: c
 
+Textarea placeholder styling
+----------------------------
+
+.. lv_example:: widgets/textarea/lv_example_textarea_4
+  :language: c

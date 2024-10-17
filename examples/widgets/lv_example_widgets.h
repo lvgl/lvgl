@@ -69,6 +69,7 @@ void lv_example_chart_8(void);
 
 void lv_example_checkbox_1(void);
 void lv_example_checkbox_2(void);
+void lv_example_checkbox_3(void);
 
 void lv_example_dropdown_1(void);
 void lv_example_dropdown_2(void);
@@ -137,6 +138,7 @@ void lv_example_spinner_1(void);
 
 void lv_example_switch_1(void);
 void lv_example_switch_2(void);
+void lv_example_switch_3(void);
 
 void lv_example_table_1(void);
 void lv_example_table_2(void);
@@ -147,6 +149,7 @@ void lv_example_tabview_2(void);
 void lv_example_textarea_1(void);
 void lv_example_textarea_2(void);
 void lv_example_textarea_3(void);
+void lv_example_textarea_4(void);
 
 void lv_example_tileview_1(void);
 
