@@ -86,7 +86,11 @@
 /*Layer memory allocation limits*/
 #define LV_USE_DRAW_LAYER_MAX_MEMORY 0
 #if LV_USE_DRAW_LAYER_MAX_MEMORY == 1
-    #define LV_DRAW_LAYER_MAX_MEMORY (2 * 1024U) /*Define your max layer memory here*/
+    /** Limit the max allocated memory for simple and transformed layers. 
+     * It should be at least `LV_DRAW_LAYER_SIMPLE_BUF_SIZE` sized but if transformed layers are also used
+     * It should be enough to store the largest widget too (width x height x 4 area). 
+     * Set it to a very large value to have no limit. */
+    #define LV_DRAW_LAYER_MAX_MEMORY (32U * 1024U * 1024U)  /**< [bytes]*/
 #endif
 
 /*====================
