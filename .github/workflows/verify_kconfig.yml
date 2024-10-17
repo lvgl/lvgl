@@ -17,6 +17,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.7
+      - name: Check for leading spaces in Kconfig
+        working-directory: .
+        run: |
+          if grep -qP '^ +' Kconfig; then
+            echo "Error: Kconfig contains leading spaces instead of tabs"
+            exit 1
+          fi
       - name: Run kconfig_verify.py
         run: python3 -m pip install kconfiglib && python kconfig_verify.py ../Kconfig
         working-directory: scripts
