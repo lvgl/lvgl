@@ -8,11 +8,11 @@ Porting
 .. toctree::
     :maxdepth: 2
 
-    project
     display
+    draw
     indev
+    os
+    project
+    sleep
     tick
     timer_handler
-    sleep
-    os
-    draw
