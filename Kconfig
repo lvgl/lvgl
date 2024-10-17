@@ -163,14 +163,14 @@ menu "LVGL configuration"
 			default "stdint.h"
 			depends on LV_OS_CUSTOM
 
-        config LV_USE_FREERTOS_TASK_NOTIFY
-            bool "Use RTOS task with a direct notification for synchronization"
-            default y
-            depends on LV_OS_FREERTOS
-        help
-            Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
-            than unblocking a task using an intermediary object such as a binary semaphore.
-            RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
+		config LV_USE_FREERTOS_TASK_NOTIFY
+			bool "Use RTOS task with a direct notification for synchronization"
+			default y
+			depends on LV_OS_FREERTOS
+		help
+			Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
+			than unblocking a task using an intermediary object such as a binary semaphore.
+			RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
 	endmenu
 
 	menu "Rendering Configuration"
@@ -977,9 +977,9 @@ menu "LVGL configuration"
 			help
 				Minimum number of characters in a long word to put on a line after a break
 
-        config LV_TXT_COLOR_CMD
-            string "The control character to use for signalling text recoloring"
-            default "#"
+		config LV_TXT_COLOR_CMD
+			string "The control character to use for signalling text recoloring"
+			default "#"
 
 		config LV_USE_BIDI
 			bool "Support bidirectional texts"
@@ -1939,9 +1939,9 @@ menu "LVGL configuration"
 			default n
 			select LV_FONT_MONTSERRAT_14
 			select LV_FONT_MONTSERRAT_20
-            select LV_FONT_MONTSERRAT_24
+			select LV_FONT_MONTSERRAT_24
 			select LV_FONT_MONTSERRAT_26
-            select LV_USE_DEMO_WIDGETS
+			select LV_USE_DEMO_WIDGETS
 		config LV_USE_DEMO_RENDER
 			bool "Render test for each primitives. Requires at least 480x272 display"
 			default n
