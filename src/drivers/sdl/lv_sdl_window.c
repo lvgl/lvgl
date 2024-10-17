@@ -232,17 +232,17 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
                 for(int bit = 7; bit >= 0; bit--) {
                     /*White*/
                     if(((*(px_map + i) >> bit) & 1) == 1) {
-                        *(argb_px_map + (4*i) + 3) = 0;   /*A*/
-                        *(argb_px_map + (4*i) + 2) = 255; /*R*/
-                        *(argb_px_map + (4*i) + 1) = 255; /*G*/
-                        *(argb_px_map + (4*i) + 0) = 255; /*B*/
+                        *(argb_px_map + (4 * i) + 3) = 0;   /*A*/
+                        *(argb_px_map + (4 * i) + 2) = 255; /*R*/
+                        *(argb_px_map + (4 * i) + 1) = 255; /*G*/
+                        *(argb_px_map + (4 * i) + 0) = 255; /*B*/
                     }
                     /*Black*/
                     else {
-                        *(argb_px_map + (4*i) + 3) = 0; /*A*/
-                        *(argb_px_map + (4*i) + 2) = 0; /*R*/
-                        *(argb_px_map + (4*i) + 1) = 0; /*G*/
-                        *(argb_px_map + (4*i) + 0) = 0; /*B*/
+                        *(argb_px_map + (4 * i) + 3) = 0; /*A*/
+                        *(argb_px_map + (4 * i) + 2) = 0; /*R*/
+                        *(argb_px_map + (4 * i) + 1) = 0; /*G*/
+                        *(argb_px_map + (4 * i) + 0) = 0; /*B*/
                     }
                 }
             }
