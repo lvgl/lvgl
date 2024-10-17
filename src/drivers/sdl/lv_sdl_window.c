@@ -218,14 +218,16 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         cf = LV_COLOR_FORMAT_ARGB8888;
         /*I1 uses 1 bit wide pixels, ARGB8888 uses 4 byte wide pixels*/
         argb_px_map_size = lv_area_get_size(area) * 4;
-        argb_px_map = lv_malloc(argb_px_map_size);
+        argb_px_map = lv_realloc(argb_px_map, argb_px_map_size);
         if(argb_px_map == NULL) {
             LV_LOG_ERROR("Malloc failed!\n");
         }
         else {
             /*Extract the bits of I1 px_map and convert them to ARGB8888*/
             uint32_t px_map_size = argb_px_map_size / 4;
-            for(int i = 0; i < px_map_size; i++) {
+            /*Skip the palette*/
+            px_map += LV_COLOR_INDEXED_PALETTE_SIZE(LV_COLOR_FORMAT_I1) * 4;
+            for(uint32_t i = 0; i < px_map_size; i++) {
                 /*From MSB to LSB (pixel 0 to pixel 7 in a btye)*/
                 for(int bit = 7; bit >= 0; bit--) {
                     /*White*/
