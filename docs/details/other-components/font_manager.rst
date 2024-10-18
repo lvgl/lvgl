@@ -4,7 +4,7 @@
 Font Manager
 ============
 
-Font Manager is a secondary encapsulation based on :ref:`_freetype`, which
+Font Manager is a secondary encapsulation based on :ref:`freetype`, which
 facilitates upper-level applications to manage and use vector fonts. Currently
 supported functions include:
 

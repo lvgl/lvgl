@@ -24,5 +24,5 @@ are learning to use LVGL:
 
 .. _online demos:           https://lvgl.io/demos
 .. _ready-to-use projects:  https://github.com/lvgl?q=lv_port_&type=&language=
-.. _forum:                  http://forum.lvgl.io/
+.. _forum:                  https://forum.lvgl.io/
 

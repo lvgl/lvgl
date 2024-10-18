@@ -164,7 +164,7 @@ FAQ
 Where can I ask questions?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can ask questions in the forum: `https://forum.lvgl.io/ <forum_>`_.
+You can ask questions in the forum:  https://forum.lvgl.io/.
 
 We use `GitHub issues <https://github.com/lvgl/lvgl/issues>`_ for development related discussion.
 You should use them only if your question or issue is tightly related to the development of the library.
@@ -301,6 +301,3 @@ you must ensure that no LVGL function call be called while another LVGL call is 
 progress.  There are several ways to do this.  See the :ref:`os` section to
 learn more.
 
-
-
-.. include:: ../external_references.rst
