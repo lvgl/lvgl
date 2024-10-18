@@ -106,4 +106,3 @@ Gradients for button background
 
 .. lv_example:: styles/lv_example_style_18
   :language: c
-

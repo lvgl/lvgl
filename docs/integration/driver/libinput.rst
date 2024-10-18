@@ -49,7 +49,7 @@ Full keyboard support needs to be enabled separately.
 
     #define LV_LIBINPUT_XKB            1
     #define LV_LIBINPUT_XKB_KEY_MAP    { .rules = NULL, .model = "pc101", .layout = "us", .variant = NULL, .options = NULL }
-    
+
 To find the right key map values, you may use the ``setxkbmap -query`` command.
 
 Usage
@@ -84,4 +84,3 @@ If you want to connect a keyboard device to a textarea, create a dedicated input
     lv_group_t *keyboard_input_group = lv_group_create();
     lv_indev_set_group(indev, keyboard_input_group);
     lv_group_add_obj(keyboard_input_group, textarea);
-

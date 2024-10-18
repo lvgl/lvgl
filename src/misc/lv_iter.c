@@ -135,7 +135,7 @@ lv_result_t lv_iter_peek(lv_iter_t * iter, void * elem)
 
     if(iter->peek_offset >= iter->peek_count) {
         uint32_t required = iter->peek_offset + 1 - iter->peek_count;
-        while(required --> 0) {
+        while(required -- > 0) {
             void * buff = PEEK_BUFF_OFFSET(iter, iter->peek_count);
             lv_result_t iter_res = iter->next_cb(iter->instance, iter->context, buff);
             if(iter_res == LV_RESULT_INVALID) {

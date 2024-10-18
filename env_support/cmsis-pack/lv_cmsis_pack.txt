@@ -107,8 +107,8 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-/* When Arm Compilers using the MicroLib, provide an empty implementation for 
- * time() which is not included in the MicroLib 
+/* When Arm Compilers using the MicroLib, provide an empty implementation for
+ * time() which is not included in the MicroLib
  */
 #if defined(__IS_COMPILER_ARM_COMPILER__) && __IS_COMPILER_ARM_COMPILER__
 #   if defined(__MICROLIB)
@@ -134,6 +134,3 @@ uint32_t perfc_tick_get(void)
 #   endif
 
 #endif
-
-
-

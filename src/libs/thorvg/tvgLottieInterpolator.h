@@ -48,4 +48,3 @@ private:
 #endif //_TVG_LOTTIE_INTERPOLATOR_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

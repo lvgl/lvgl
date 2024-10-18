@@ -17,4 +17,3 @@ Menu
 
 .. lv_example:: widgets/dropdown/lv_example_dropdown_3
   :language: c
-

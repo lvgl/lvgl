@@ -326,4 +326,3 @@ bool mathUpdateOutlineBBox(const SwOutline* outline, const SwBBox& clipRegion, S
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

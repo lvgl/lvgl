@@ -68,4 +68,3 @@ void lv_unlock(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-

@@ -177,7 +177,7 @@ struct LottieMarker
     char* name = nullptr;
     float time = 0.0f;
     float duration = 0.0f;
-    
+
     ~LottieMarker()
     {
         free(name);
@@ -349,7 +349,7 @@ struct LottieTransform : LottieObject
 };
 
 
-struct LottieSolid : LottieObject 
+struct LottieSolid : LottieObject
 {
     LottieColor color = RGB24{255, 255, 255};
     LottieOpacity opacity = 255;
@@ -682,4 +682,3 @@ struct LottieComposition
 #endif //_TVG_LOTTIE_MODEL_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

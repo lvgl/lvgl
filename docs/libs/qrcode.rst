@@ -42,4 +42,3 @@ API
 ---
 
 :ref:`qrcodegen_h`
-

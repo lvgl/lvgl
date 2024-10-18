@@ -32,6 +32,6 @@ body:
       placeholder: |
         ```c
          your code here
-        ```  
+        ```
     validations:
       required: false

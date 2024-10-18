@@ -46,4 +46,3 @@ public:
 #endif //_TVG_ITERATOR_ACCESSOR_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

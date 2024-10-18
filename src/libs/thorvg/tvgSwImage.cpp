@@ -161,4 +161,3 @@ void imageFree(SwImage* image)
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

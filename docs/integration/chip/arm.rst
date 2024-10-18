@@ -53,5 +53,3 @@ Neon Acceleration
 -----------------
 
 Several Cortex-A microprocessors support the `Neon SIMD <https://www.arm.com/technologies/neon>`__ instruction set. LVGL has built-in support to improve the performance of software rendering by utilizing Neon instructions. To enable Neon acceleration, set ``LV_USE_DRAW_SW_ASM`` to ``LV_DRAW_SW_ASM_NEON`` in ``lv_conf.h``.
-
-

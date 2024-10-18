@@ -118,4 +118,3 @@ API
 :ref:`ftoption_h`
 
 :ref:`ftmodule_h`
-

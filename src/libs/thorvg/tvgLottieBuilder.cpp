@@ -481,7 +481,7 @@ static void _appendRect(Shape* shape, float x, float y, float w, float h, float 
             {x + w - rx, y}, //lineTo
             {x + w - rx + hrx, y}, {x + w, y + ry - hry}, {x + w, y + ry} //cubicTo
         };
-    
+
         if (transform) {
             for (int i = 0; i < ptsCnt; i++) mathTransform(transform, &points[i]);
         }
@@ -537,7 +537,7 @@ static void _appendCircle(Shape* shape, float cx, float cy, float rx, float ry, 
     if (transform) {
         for (int i = 0; i < ptsCnt; ++i) mathTransform(transform, &points[i]);
     }
-    
+
     shape->appendPath(commands, cmdsCnt, points, ptsCnt);
 }
 
@@ -618,7 +618,7 @@ static void _updateText(LottieGroup* parent, LottieObject** child, float frameNo
             cursor.x = 0.0f;
             cursor.y = ++line * (doc.height / scale);
         }
-        
+
         //find the glyph
         for (auto g = text->font->chars.begin(); g < text->font->chars.end(); ++g) {
             auto glyph = *g;
@@ -645,7 +645,7 @@ static void _updateText(LottieGroup* parent, LottieObject** child, float frameNo
 
                 scene->push(std::move(shape));
 
-                p += glyph->len; 
+                p += glyph->len;
 
                 //advance the cursor position horizontally
                 cursor.x += glyph->width + spacing + doc.tracking;
@@ -1375,4 +1375,3 @@ void LottieBuilder::build(LottieComposition* comp)
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

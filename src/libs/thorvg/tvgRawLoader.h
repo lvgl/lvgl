@@ -43,4 +43,3 @@ public:
 #endif //_TVG_RAW_LOADER_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

@@ -206,4 +206,3 @@ private:
 #endif //_TVG_ARRAY_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

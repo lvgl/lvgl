@@ -11,9 +11,9 @@ This guide is intended to be a step-by-step instruction of how to configure the 
 
 .. tip::
 	ST Micro provide their own TFT-LCD drivers in their X-CUBE-DISPLAY Software Extension Package. While these drivers can be used with LVGL as well, the LVGL LCD drivers do not depend on this package.
-	
+
 	The LVGL LCD drivers are meant as an alternative, simple to use API to implement LCD support for your LVGL-based project on any platform. Moreover, even in the initial release we support more LCD controllers than X-CUBE-DISPLAY currently provides, and we plan to add support for even more LCD controllers in the future.
-	
+
 	Please note however, that – unlike X-CUBE-DISPLAY – the LVGL LCD drivers do not implement the communication part, whether SPI, parallel i8080 bus or other. It is the user's responsibility to implement – and optimize – these on their chosen platform. LVGL will only provide examples for the most popular platforms.
 
 By following the steps you will have a fully functional program, which can be used as the foundation of your own LVGL-based project. If you are in a hurry and not interested in the details, you can find the final project `here <https://github.com/lvgl/lv_port_lcd_stm32>`__. You will only need to configure LVGL to use the driver corresponding to your hardware (if it is other than the ST7789), and implement the function ``ui_init()`` to create your widgets.
@@ -25,7 +25,7 @@ By following the steps you will have a fully functional program, which can be us
 .. note::
 
 	Although the example uses FreeRTOS, this is not a strict requirement with the LVGL LCD display drivers.
-	
+
 You can find the source code snippets of this guide in the `lv_port_lcd_stm32_template.c <https://github.com/lvgl/lvgl/examples/porting/lv_port_lcd_stm32_template.c>`__ example.
 
 Hardware configuration
@@ -79,30 +79,30 @@ Step-by-step instructions
 #. Open the Project Manager tab, and select Advanced Settings. On the right hand side there is a Register Callback window. Select SPI and set it to ENABLE.
 #. We are ready with the hardware configuration. Save the configuration and let STM32Cube generate the source.
 #. In the project tree clone the LVGL repository into the Middlewares/Third_Party folder (this tutorial uses the release/v9.0 branch of LVGL):
-	
+
 	.. code-block:: dosbatch
-	
+
 		git clone https://github.com/lvgl/lvgl.git -b release/v9.0
-	
+
 #. Cloning should create an 'lvgl' subfolder inside the 'Third_Party' folder. From the 'lvgl' folder copy 'lv_conf_template.h' into the 'Middlewares' folder, and rename it to 'lv_conf.h'. Refresh the project tree.
 #. Open 'lv_conf.h', and in line 15 change ``#if 0`` to ``#if 1``.
 #. Search for the string ``LV_USE_ST7735``, and enable the appropriate LCD driver by setting its value to 1. This example uses the ST7789 driver:
 
 	.. code-block:: c
-	
+
 		#define LV_USE_ST7789		1
-	
+
 #. Right click the folder 'Middlewares/Third_Party/lvgl/tests', select Resource Configurations/Exclude from Build..., check both Debug and Release, then press OK.
 #. Right click the project name and select "Properties". In the C/C++ Build/Settings panel select MCU GCC Compiler/Include paths. In the Configuration dropdown select [ All configurations ]. Add the following Include path:
 
 	.. code-block:: c
-	
+
 		../Middlewares/Third_Party/lvgl
-		
+
 #. Open Core/Src/stm32xxx_it.c (the file name depends on the processor variation). Add 'lv_tick.h' to the Private includes section:
 
 	.. code-block:: c
-	
+
 		/* Private includes ----------------------------------------------------------*/
 		/* USER CODE BEGIN Includes */
 		#include "./src/tick/lv_tick.h"
@@ -146,7 +146,7 @@ Step-by-step instructions
 #. Add the following lines to the Private variables:
 
 	.. code-block:: c
-		
+
 		osThreadId LvglTaskHandle;
 		lv_display_t *lcd_disp;
 		volatile int lcd_bus_busy = 0;
@@ -251,7 +251,7 @@ Step-by-step instructions
 #. Add the LVGL_Task() function. Replace the ``lv_st7789_create()`` call with the appropriate driver. You can change the default orientation by adjusting the parameter of ``lv_display_set_rotation()``. You will also need to create the display buffers here. This example uses a double buffering scheme with 1/10th size partial buffers. In most cases this is a good compromise between the required memory size and performance, but you are free to experiment with other settings.
 
 	.. code-block:: c
-	
+
 		void LVGL_Task(void const *argument)
 		{
 			/* Initialize LVGL */
@@ -317,4 +317,3 @@ Step-by-step instructions
 			lv_obj_set_style_text_color(obj, lv_color_black(), 0);
 			lv_label_set_text(obj, "Hello World!");
 		}
-		

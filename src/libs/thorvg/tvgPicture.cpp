@@ -137,7 +137,7 @@ Result Picture::Impl::load(ImageLoader* loader)
     if (!loader->read()) return Result::Unknown;
 
     this->w = loader->w;
-    this->h = loader->h;    
+    this->h = loader->h;
 
     return Result::Success;
 }
@@ -235,4 +235,3 @@ uint32_t Picture::mesh(const Polygon** triangles) const noexcept
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

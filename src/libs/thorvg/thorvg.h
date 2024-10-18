@@ -1062,7 +1062,7 @@ public:
      * @param[in] miterlimit The miterlimit imposes a limit on the extent of the stroke join, when the @c StrokeJoin::Miter join style is set. The default value is 4.
      *
      * @retval Result::Success when succeed, Result::NonSupport unsupported value, Result::FailedAllocation otherwise.
-     * 
+     *
      * @since 0.11
      */
     Result strokeMiterlimit(float miterlimit) noexcept;
@@ -2179,4 +2179,3 @@ std::unique_ptr<T> cast(Fill* fill)
 #endif //_THORVG_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

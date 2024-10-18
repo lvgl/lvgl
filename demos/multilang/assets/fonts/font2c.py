@@ -29,9 +29,3 @@ cmd = f"lv_font_conv --no-compress --no-prefilter --bpp 4 --size 22 --format lvg
 
 print("\n" + cmd)
 os.system(cmd)
-
-
-
-
-
-

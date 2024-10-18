@@ -93,4 +93,3 @@ uint16_t THORVG_VERSION_NUMBER();
 #endif //_TVG_COMMON_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

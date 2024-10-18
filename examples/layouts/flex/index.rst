@@ -33,5 +33,3 @@ RTL base direction changes order of the items
 
 .. lv_example:: layouts/flex/lv_example_flex_6
   :language: c
-
-

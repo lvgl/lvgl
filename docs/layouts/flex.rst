@@ -99,7 +99,7 @@ Flex grow
 Flex grow can be used to make one or more children fill the available
 space on the track. When more children have grow parameters, the
 available space will be distributed proportionally to the grow values.
-For example, there is 400 px remaining space and 4 objects with grow: 
+For example, there is 400 px remaining space and 4 objects with grow:
 
 - ``A`` with grow = 1
 - ``B`` with grow = 1

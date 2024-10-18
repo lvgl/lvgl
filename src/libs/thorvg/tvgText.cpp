@@ -112,4 +112,3 @@ uint32_t Text::identifier() noexcept
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

@@ -40,7 +40,7 @@ Supported boards
 .. list-table::
    :widths: 10 30 30 30
 
-   * - 
+   * -
      - **EK-RA8D1**
      - **EK-RA6M3G**
      - **RX72N Envision Kit**
@@ -49,25 +49,25 @@ Supported boards
      - 120MHz, Arm Cortex-M4 core
      - 240MHz, Renesas RXv3 core
    * - Memory
-     - 
+     -
          | 1MB internal, 64MB external SDRAM
          | 2MB internal, 64MB External Octo-SPI Flash
-     - 
+     -
          | 640kB internal SRAM
          | 2MB internal, 32MB external QSPI Flash
-     - 
+     -
          | 1MB internal SRAM
          | 4MB internal, 32MB external QSPI Flash
    * - Display
-     - 
+     -
          | 4.5”
          | 480x854
          | 2-lane MIPI
-     - 
+     -
          | 4.3”
          | 480x272
          | Parallel RGB565
-     - 
+     -
          | 4.3”
          | 480x272
          | Parallel RGB565
@@ -113,7 +113,7 @@ Get started with the Renesas ecosystem
     - Browse the cloned folder and press ``Finish``.
     - Double click on ``configuration.xml``. This will activate the `Configuration Window`.
 
-      Renesas' Flexible Software Package (FSP) incudes BSP and HAL layer support extended with multiple RTOS variants and other middleware stacks.
+      Renesas' Flexible Software Package (FSP) includes BSP and HAL layer support extended with multiple RTOS variants and other middleware stacks.
       The components will be available via code generation, including the entry point of *"main.c"*.
 
       Press ``Generate Project Content`` in the top right corner.
@@ -174,7 +174,7 @@ Get started with the Renesas ecosystem
     - Select the cloned folder and press ``Finish``.
     - Double click on ``RX72N_EnVision_LVGL.scfg``. This will activate the `Configuration Window`.
 
-      Renesas' Smart Configurator (SMC) incudes BSP and HAL layer support extended with multiple RTOS variants and other middleware stacks.
+      Renesas' Smart Configurator (SMC) includes BSP and HAL layer support extended with multiple RTOS variants and other middleware stacks.
       The components will be available via code generation, including the entry point of the application.
 
       Press ``Generate Code`` in the top right corner.

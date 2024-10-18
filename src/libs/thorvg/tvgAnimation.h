@@ -51,4 +51,3 @@ struct Animation::Impl
 #endif //_TVG_ANIMATION_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

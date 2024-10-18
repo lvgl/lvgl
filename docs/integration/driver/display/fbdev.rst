@@ -7,7 +7,7 @@ Overview
 
 The Linux framebuffer (fbdev) is a linux subsystem used to display graphics. It is a hardware-independent API that gives user space software
 access to the framebuffer (the part of a computer's video memory containing a current video frame) using only the Linux kernel's own basic
-facilities and its device file system interface, avoiding the need for libraries that implement video drivers in user space. 
+facilities and its device file system interface, avoiding the need for libraries that implement video drivers in user space.
 
 Prerequisites
 -------------

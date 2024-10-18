@@ -247,4 +247,3 @@ struct Picture::Impl
 #endif //_TVG_PICTURE_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

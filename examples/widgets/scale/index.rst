@@ -39,4 +39,3 @@ Customizing scale major tick label color with `LV_EVENT_DRAW_TASK_ADDED` event
 
 .. lv_example:: widgets/scale/lv_example_scale_7
   :language: c
-

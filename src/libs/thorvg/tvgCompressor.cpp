@@ -478,4 +478,3 @@ size_t b64Decode(const char* encoded, const size_t len, char** decoded)
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

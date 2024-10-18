@@ -17,4 +17,3 @@ Text auto-formatting
 
 .. lv_example:: widgets/textarea/lv_example_textarea_3
   :language: c
-

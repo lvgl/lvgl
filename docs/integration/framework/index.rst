@@ -8,4 +8,3 @@ Frameworks
     arduino
     platformio
     tasmota-berry
-

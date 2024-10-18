@@ -421,4 +421,3 @@ const lv_image_dsc_t test_RGB565_RLE_align64 = {
   .data_size = sizeof(test_RGB565_RLE_align64_map),
   .data = test_RGB565_RLE_align64_map,
 };
-

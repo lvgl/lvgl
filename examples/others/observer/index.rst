@@ -34,5 +34,3 @@ Modular style update on theme change
 
 .. lv_example:: others/observer/lv_example_observer_6
   :language: c
-
-

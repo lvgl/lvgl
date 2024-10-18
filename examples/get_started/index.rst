@@ -20,5 +20,3 @@ Create a slider and write its value on a label
 ----------------------------------------------
 .. lv_example:: get_started/lv_example_get_started_4
   :language: c
-
-

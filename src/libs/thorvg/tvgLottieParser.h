@@ -121,4 +121,3 @@ private:
 #endif //_TVG_LOTTIE_PARSER_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

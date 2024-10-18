@@ -40,4 +40,3 @@ char* strDirname(const char* path);                 //return the full directory 
 #endif //_TVG_STR_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

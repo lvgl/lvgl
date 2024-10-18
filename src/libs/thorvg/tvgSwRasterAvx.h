@@ -65,9 +65,9 @@ static inline __m128i ALPHA_BLEND(__m128i c, __m128i a)
 }
 
 
-static void avxRasterGrayscale8(uint8_t* dst, uint8_t val, uint32_t offset, int32_t len) 
+static void avxRasterGrayscale8(uint8_t* dst, uint8_t val, uint32_t offset, int32_t len)
 {
-    dst += offset; 
+    dst += offset;
 
     __m256i vecVal = _mm256_set1_epi8(val);
 
@@ -211,4 +211,3 @@ static bool avxRasterTranslucentRle(SwSurface* surface, const SwRleData* rle, ui
 #endif
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

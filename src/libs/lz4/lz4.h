@@ -874,4 +874,3 @@ LZ4LIB_API void LZ4_resetStream (LZ4_stream_t* streamPtr);
 #endif
 
 #endif /* LV_USE_LZ4_INTERNAL */
-

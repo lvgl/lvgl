@@ -53,4 +53,3 @@ There are some custom, LVGL specific asserts:
    - If the reference image is not found it will be created automatically from the rendered screen.
    - If the compare fails an `<image_name>_err.png` file will be created with the rendered content next to the reference image.
 - `TEST_ASSERT_EQUAL_COLOR(color1, color2)` Compare two colors.
-

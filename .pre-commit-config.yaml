@@ -5,6 +5,11 @@ repos:
     rev: v3.2.0
     hooks:
     -   id: trailing-whitespace
+    -   id: mixed-line-ending
+        args: [--fix=auto]
+    -   id: end-of-file-fixer
+    -   id: check-merge-conflict
+
 
 -   repo: local
     hooks:

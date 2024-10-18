@@ -95,5 +95,3 @@ const lv_image_dsc_t music_button_play = {
 };
 
 #endif /*LV_BUILD_TEST*/
-
-

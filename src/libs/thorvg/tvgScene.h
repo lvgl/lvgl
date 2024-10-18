@@ -232,4 +232,3 @@ struct Scene::Impl
 #endif //_TVG_SCENE_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

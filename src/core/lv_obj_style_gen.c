@@ -690,7 +690,8 @@ void lv_obj_set_style_opa_layered(lv_obj_t * obj, lv_opa_t value, lv_style_selec
     lv_obj_set_local_style_prop(obj, LV_STYLE_OPA_LAYERED, v, selector);
 }
 
-void lv_obj_set_style_color_filter_dsc(lv_obj_t * obj, const lv_color_filter_dsc_t * value, lv_style_selector_t selector)
+void lv_obj_set_style_color_filter_dsc(lv_obj_t * obj, const lv_color_filter_dsc_t * value,
+                                       lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = value
@@ -894,4 +895,3 @@ void lv_obj_set_style_grid_cell_row_span(lv_obj_t * obj, int32_t value, lv_style
     lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_CELL_ROW_SPAN, v, selector);
 }
 #endif /*LV_USE_GRID*/
-

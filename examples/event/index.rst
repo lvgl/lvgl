@@ -26,5 +26,3 @@ Draw event
 ----------
 .. lv_example:: event/lv_example_event_draw
   :language: c
-
-

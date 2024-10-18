@@ -18,8 +18,8 @@ Enable :c:macro:`LV_USE_IMGFONT` in ``lv_conf.h``.
 
 To create a new *imgfont* use :cpp:expr:`lv_imgfont_create(height, path_cb, user_data)`.
 
-- ``height`` Font size. 
-- ``path_cb`` A function to get the image path of a character. 
+- ``height`` Font size.
+- ``path_cb`` A function to get the image path of a character.
   Return ``NULL`` if no image should be shown, but the character itself.
 - ``user_data`` Pointer to user data.
 

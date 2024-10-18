@@ -83,4 +83,3 @@ private:
 #endif //_TVG_LOTTIELOADER_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

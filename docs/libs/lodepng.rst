@@ -48,4 +48,3 @@ API
 ---
 
 :ref:`lodepng_h`
-

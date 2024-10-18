@@ -910,4 +910,3 @@ SwOutline* strokeExportOutline(SwStroke* stroke, SwMpool* mpool, unsigned tid)
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

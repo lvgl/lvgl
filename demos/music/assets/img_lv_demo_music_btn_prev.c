@@ -80,5 +80,3 @@ const lv_image_dsc_t img_lv_demo_music_btn_prev = {
 };
 
 #endif /*LV_USE_DEMO_MUSIC*/
-
-

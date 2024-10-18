@@ -8,4 +8,3 @@ b = bytearray()
 b.extend(map(ord, s))
 
 for a in b: print(hex(a), end =", ")
-

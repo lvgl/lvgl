@@ -1295,4 +1295,3 @@ void LottieExpressions::retrieve(LottieExpressions* instance)
 #endif //THORVG_LOTTIE_EXPRESSIONS_SUPPORT
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

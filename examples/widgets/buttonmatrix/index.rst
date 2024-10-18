@@ -18,5 +18,3 @@ Pagination
 
 .. lv_example:: widgets/buttonmatrix/lv_example_buttonmatrix_3
   :language: c
-
-

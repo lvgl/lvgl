@@ -32,7 +32,7 @@ Usage
 Enable :c:macro:`LV_USE_LIBPNG` in ``lv_conf.h``.
 
 See the examples below.
-It should be noted that each image of this decoder needs to consume ``width x height x 4`` bytes of RAM, 
+It should be noted that each image of this decoder needs to consume ``width x height x 4`` bytes of RAM,
 and it needs to be combined with the :ref:`overview_image_caching` feature to ensure that the memory usage is within a reasonable range.
 The decoded image is stored in RGBA pixel format.
 
@@ -49,4 +49,3 @@ API
 ---
 
 :ref:`libpng`
-

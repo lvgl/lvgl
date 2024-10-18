@@ -14,4 +14,3 @@ API
 :ref:`lv_vglite_path_h`
 
 :ref:`lv_vglite_utils_h`
-

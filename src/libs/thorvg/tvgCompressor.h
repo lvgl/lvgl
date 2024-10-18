@@ -38,4 +38,3 @@ namespace tvg
 #endif  //_TVG_COMPRESSOR_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

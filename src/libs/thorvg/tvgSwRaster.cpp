@@ -377,7 +377,7 @@ static bool _rasterMattedRect(SwSurface* surface, const SwBBox& region, uint8_t 
     auto alpha = surface->alpha(surface->compositor->method);
 
     TVGLOG("SW_ENGINE", "Matted(%d) Rect [Region: %lu %lu %u %u]", (int)surface->compositor->method, region.min.x, region.min.y, w, h);
-    
+
     //32bits channels
     if (surface->channelSize == sizeof(uint32_t)) {
         auto color = surface->join(r, g, b, a);
@@ -719,7 +719,7 @@ static bool _rasterDirectScaledMaskedRleImage(SwSurface* surface, const SwImage*
     auto span = image->rle->spans;
     int32_t miny = 0, maxy = 0;
 
-    for (uint32_t i = 0; i < image->rle->size; ++i, ++span) {        
+    for (uint32_t i = 0; i < image->rle->size; ++i, ++span) {
         SCALED_IMAGE_RANGE_Y(span->y)
         auto cmp = &surface->compositor->image.buf8[span->y * surface->compositor->image.stride + span->x];
         auto dst = &surface->buf8[span->y * surface->stride + span->x];
@@ -1964,4 +1964,3 @@ bool rasterConvertCS(Surface* surface, ColorSpace to)
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

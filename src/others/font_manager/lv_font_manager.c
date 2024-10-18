@@ -485,7 +485,7 @@ static lv_font_refer_node_t * lv_font_manager_search_refer_node(lv_font_manager_
     return NULL;
 }
 
-static lv_font_t * lv_font_manager_create_font_warpper(lv_font_manager_t * manager, const lv_freetype_info_t * ft_info)
+static lv_font_t * lv_font_manager_create_font_wrapper(lv_font_manager_t * manager, const lv_freetype_info_t * ft_info)
 {
     LV_ASSERT_NULL(manager);
     LV_ASSERT_NULL(ft_info);
@@ -519,7 +519,7 @@ static lv_font_t * lv_font_manager_create_font_warpper(lv_font_manager_t * manag
     return font;
 }
 
-static void lv_font_manager_delete_font_warpper(lv_font_manager_t * manager, lv_font_refer_node_t * refer_node)
+static void lv_font_manager_delete_font_wrapper(lv_font_manager_t * manager, lv_font_refer_node_t * refer_node)
 {
     LV_ASSERT_NULL(manager);
     LV_ASSERT_NULL(refer_node);
@@ -542,7 +542,7 @@ static const lv_font_refer_node_t * lv_font_manager_get_freetype_font(lv_font_ma
 
     /* not fount refer_node, start to create font */
 
-    lv_font_t * font = lv_font_manager_create_font_warpper(manager, ft_info);
+    lv_font_t * font = lv_font_manager_create_font_wrapper(manager, ft_info);
 
     if(!font) {
         return NULL;
@@ -588,7 +588,7 @@ static bool lv_font_manager_reset_freetype_font(lv_font_manager_t * manager, con
     }
 
     /* if ref_cnt is about to be 0, free font resource */
-    lv_font_manager_delete_font_warpper(manager, refer_node);
+    lv_font_manager_delete_font_wrapper(manager, refer_node);
 
     /* free refer_node */
     lv_ll_remove(&manager->refer_ll, refer_node);

@@ -186,4 +186,3 @@ struct Text::Impl
 #endif //_TVG_TEXT_H
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

@@ -14,7 +14,7 @@ namespace tvg
  * This class extends the Animation and has additional interfaces.
  *
  * @see Animation
- * 
+ *
  * @note Experimental API
  */
 
@@ -39,11 +39,11 @@ public:
     Result override(const char* slot) noexcept;
 
     /**
-    * @brief Specifies a segment by marker. 
-    * 
-    * Markers are used to control animation playback by specifying start and end points, 
+    * @brief Specifies a segment by marker.
+    *
+    * Markers are used to control animation playback by specifying start and end points,
     * eliminating the need to know the exact frame numbers.
-    * Generally, markers are designated at the design level, 
+    * Generally, markers are designated at the design level,
     * meaning the callers must know the marker name in advance to use it.
     *
     * @param[in] marker The name of the segment marker.
@@ -64,24 +64,24 @@ public:
      * @brief Gets the marker count of the animation.
      *
      * @retval The count of the markers, zero if there is no marker.
-     * 
+     *
      * @see LottieAnimation::marker()
      * @note Experimental API
      */
     uint32_t markersCnt() noexcept;
-    
+
     /**
      * @brief Gets the marker name by a given index.
      *
      * @param[in] idx The index of the animation marker, starts from 0.
      *
      * @retval The name of marker when succeed, @c nullptr otherwise.
-     * 
+     *
      * @see LottieAnimation::markersCnt()
      * @note Experimental API
      */
     const char* marker(uint32_t idx) noexcept;
-    
+
     /**
      * @brief Creates a new LottieAnimation object.
      *
@@ -97,4 +97,3 @@ public:
 #endif //_THORVG_LOTTIE_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

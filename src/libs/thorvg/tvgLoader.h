@@ -43,4 +43,3 @@ struct LoaderMgr
 #endif //_TVG_LOADER_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

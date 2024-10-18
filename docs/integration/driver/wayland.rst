@@ -60,7 +60,7 @@ An example simulator is available in this `repo <https://github.com/lvgl/lv_port
 Usage
 -----
 
-#. In ``main.c`` ``#incude "lv_drivers/wayland/wayland.h"``
+#. In ``main.c`` ``#include "lv_drivers/wayland/wayland.h"``
 #. Enable the Wayland driver in ``lv_conf.h`` with ``LV_USE_WAYLAND 1``
 
 #. ``LV_COLOR_DEPTH`` should be set either to ``32`` or ``16`` in ``lv_conf.h``
@@ -114,7 +114,7 @@ Always call ``lv_wayland_timer_handler()`` in your timer loop instead of the reg
 This allows the wayland client to work on well on weston, resizing shared memory buffers during
 a commit does not work well on weston.
 
-Wrapping the call to ``lv_timer_hander()`` is a necessity to have more control over
+Wrapping the call to ``lv_timer_handler()`` is a necessity to have more control over
 when the LVGL flush callback is called.
 
 The custom timer handler returns ``false`` if the frame from previous cycle is not rendered.
@@ -177,4 +177,3 @@ This will create a log file called ``debug`` in the ``/tmp`` directory, copy-pas
 The log file contains LVGL logs and the wayland messages.
 
 Be sure to replicate the problem quickly otherwise the logs become too big
-

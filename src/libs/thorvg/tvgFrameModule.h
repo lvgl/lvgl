@@ -65,4 +65,3 @@ public:
 #endif //_TVG_FRAME_MODULE_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

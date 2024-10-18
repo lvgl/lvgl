@@ -240,7 +240,7 @@ class UnityTestRunnerGenerator
     output.puts('}') if @options[:externcincludes]
     if @options[:defines] && !@options[:defines].empty?
       output.puts("/* injected defines for unity settings, etc */")
-      @options[:defines].each do |d| 
+      @options[:defines].each do |d|
         def_only = d.match(/(\w+).*/)[1]
         output.puts("#ifndef #{def_only}\n#define #{d}\n#endif /* #{def_only} */")
       end

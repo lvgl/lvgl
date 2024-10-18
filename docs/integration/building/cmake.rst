@@ -76,5 +76,3 @@ You can also build your project using the command line. Run the following comman
 - ``cmake --preset windows-base``
 - ``cmake --build --preset windows-base_dbg``
 - ``ctest --preset windows-base_dbg``
-
-

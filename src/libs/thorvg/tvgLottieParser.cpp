@@ -995,16 +995,16 @@ void LottieParser::parseAssets()
 LottieMarker* LottieParser::parseMarker()
 {
     enterObject();
-    
+
     auto marker = new LottieMarker;
-    
+
     while (auto key = nextObjectKey()) {
         if (KEY_AS("cm")) marker->name = getStringCopy();
         else if (KEY_AS("tm")) marker->time = getFloat();
         else if (KEY_AS("dr")) marker->duration = getFloat();
         else skip(key);
     }
-    
+
     return marker;
 }
 
@@ -1147,7 +1147,7 @@ void LottieParser::parseText(Array<LottieObject*>& parent)
     while (auto key = nextObjectKey()) {
         if (KEY_AS("d")) parseProperty<LottieProperty::Type::TextDoc>(text->doc, text);
         else if (KEY_AS("a")) parseTextRange(text);
-        //else if (KEY_AS("p")) TVGLOG("LOTTIE", "Text Follow Path (p) is not supported"); 
+        //else if (KEY_AS("p")) TVGLOG("LOTTIE", "Text Follow Path (p) is not supported");
         //else if (KEY_AS("m")) TVGLOG("LOTTIE", "Text Alignment Option (m) is not supported");
         else skip(key);
     }
@@ -1402,4 +1402,3 @@ bool LottieParser::parse()
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

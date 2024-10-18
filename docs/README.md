@@ -148,19 +148,19 @@ If you are creating a new .RST file, this convention is used:
     =====
     Title
     =====
-    
+
     Chapter
     *******
-    
+
     Section
     -------
-    
+
     Sub Section
     ~~~~~~~~~~~
-    
+
     Sub Sub Section
     ^^^^^^^^^^^^^^^
-    
+
     Paragraph
     '''''''''
 
@@ -198,13 +198,13 @@ To create a bulleted list, do the following:
     - item2: If you want to span multiple
       lines it must be done like this
     - item3: If you want to use a code block it must be done like this
-    
+
       .. code-block: python
-    
+
           # this is some code
-    
+
     - item3: If you want to have several layers of bullets it needs to be done like this
-    
+
       - level 2 item 1: text
       - level 2 item 2: text
 
@@ -239,7 +239,6 @@ you CANNOT have expressions that are like this...
     :cpp:expr:`lv_obj_set_layout(*obj, LV_LAYOUT_FLEX)`  <== asterisk
     :cpp:expr:`lv_obj_set_layout((lv_obj_t *)obj, LV_LAYOUT_FLEX)`  <== cast/asterisk
     :cpp:expr:`lv_obj_set_layout(&obj, LV_LAYOUT_FLEX);`  <== ampersand
-    :cpp:expr:`lv_obj_set_layout(obj, ...)`  <== elipsis
+    :cpp:expr:`lv_obj_set_layout(obj, ...)`  <== ellipsis
 
 Those are all invalid.
-

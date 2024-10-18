@@ -12,7 +12,7 @@ coordinates was inspired by CSS. LVGL has by no means a complete
 implementation of CSS but a comparable subset is implemented (sometimes
 with minor adjustments).
 
-In short this means: 
+In short this means:
 
 - Explicitly set coordinates are stored in styles (size, position, layouts, etc.)
 - support min-width, max-width, min-height, max-height

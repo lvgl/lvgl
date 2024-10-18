@@ -29,5 +29,3 @@ Translate on scroll
 -------------------
 .. lv_example:: scroll/lv_example_scroll_6
   :language: c
-
-

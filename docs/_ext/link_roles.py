@@ -40,7 +40,7 @@ class TranslationLinkNodeTransform(SphinxPostTransform):
                 #doc_path = env.doc2path(docname, False)
                 urlpath = os.environ['LVGL_URLPATH']+'/'
                 return_path = URL_BASE.get(language, "") + urlpath
-                
+
                 url = '{}.html'.format(os.path.join(return_path, docname))
 
                 node.replace_self(nodes.reference(rawtext, link_text, refuri=url, **options))

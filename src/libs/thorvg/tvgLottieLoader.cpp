@@ -391,7 +391,7 @@ bool LottieLoader::segment(const char* marker, float& begin, float& end)
 {
     if (!comp) done();
     if (!comp) return false;
-    
+
     for (auto m = comp->markers.begin(); m < comp->markers.end(); ++m) {
         if (!strcmp(marker, (*m)->name)) {
             begin = (*m)->time / frameCnt;
@@ -404,4 +404,3 @@ bool LottieLoader::segment(const char* marker, float& begin, float& end)
 
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

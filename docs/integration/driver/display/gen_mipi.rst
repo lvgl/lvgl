@@ -87,7 +87,7 @@ Example
 
 .. note::
 	You can find a step-by-step guide and the actual implementation of the callbacks on an STM32F746 using STM32CubeIDE and the ST HAL libraries here: :ref:`lcd_stm32_guide`
-	
+
 
 .. code-block:: c
 

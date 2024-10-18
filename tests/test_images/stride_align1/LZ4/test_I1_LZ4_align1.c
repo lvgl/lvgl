@@ -59,4 +59,3 @@ const lv_image_dsc_t test_I1_LZ4_align1 = {
   .data_size = sizeof(test_I1_LZ4_align1_map),
   .data = test_I1_LZ4_align1_map,
 };
-

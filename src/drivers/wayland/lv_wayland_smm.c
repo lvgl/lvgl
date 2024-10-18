@@ -175,7 +175,7 @@ smm_group_t * smm_create(void)
 {
     struct smm_group * grp;
 
-    /* Allocate and intialize a new buffer group */
+    /* Allocate and initialize a new buffer group */
     grp = malloc(sizeof(struct smm_group));
     if(grp != NULL) {
         grp->size = smm_instance.page_sz;
@@ -644,7 +644,7 @@ struct smm_buffer * alloc_buffer(struct smm_buffer * last, size_t offset)
         offset
     };
 
-    /* Allocate and intialize a new buffer (including linking in to pool) */
+    /* Allocate and initialize a new buffer (including linking in to pool) */
     buf = malloc(sizeof(struct smm_buffer));
     if(buf != NULL) {
         memcpy(&buf->props, &initial_props, sizeof(struct smm_buffer_properties));

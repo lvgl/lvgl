@@ -149,4 +149,3 @@ namespace tvg
 #endif //_TVG_PAINT_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

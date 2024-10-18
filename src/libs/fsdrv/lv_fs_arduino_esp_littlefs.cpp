@@ -198,4 +198,3 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 #endif
 
 #endif /*LV_USE_FS_ARDUINO_ESP_LITTLEFS*/
-

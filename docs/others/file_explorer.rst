@@ -59,7 +59,7 @@ Sort
 
 You can use
 :cpp:expr:`lv_file_explorer_set_sort(file_explorer, LV_EXPLORER_SORT_XX)` to set
-sorting method. 
+sorting method.
 
 There are the following sorting methods:
 
@@ -112,4 +112,3 @@ Example
 
 API
 ---
-

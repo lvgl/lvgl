@@ -95,4 +95,3 @@ const lv_image_dsc_t test_A1_RLE_align1 = {
   .data_size = sizeof(test_A1_RLE_align1_map),
   .data = test_A1_RLE_align1_map,
 };
-

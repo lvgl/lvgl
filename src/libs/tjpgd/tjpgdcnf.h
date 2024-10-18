@@ -30,4 +30,3 @@
 /  1: + 32-bit barrel shifter. Suitable for 32-bit MCUs.
 /  2: + Table conversion for huffman decoding (wants 6 << HUFF_BIT bytes of RAM)
 */
-

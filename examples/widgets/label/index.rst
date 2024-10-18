@@ -28,4 +28,3 @@ Customize circular scrolling animation
 
 .. lv_example:: widgets/label/lv_example_label_5
   :language: c
-

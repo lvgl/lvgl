@@ -88,4 +88,3 @@ private:
 #endif /* _TVG_SW_RENDERER_H_ */
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

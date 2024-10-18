@@ -33,5 +33,3 @@ Demonstrate RTL direction on grid
 
 .. lv_example:: layouts/grid/lv_example_grid_6
   :language: c
-
-

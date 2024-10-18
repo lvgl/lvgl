@@ -166,4 +166,3 @@ static bool inline cRasterARGBtoABGR(Surface* surface)
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

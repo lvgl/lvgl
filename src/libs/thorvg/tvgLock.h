@@ -74,4 +74,3 @@ namespace tvg {
 
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

@@ -206,4 +206,3 @@ unique_ptr<Saver> Saver::gen() noexcept
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

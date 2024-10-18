@@ -71,8 +71,8 @@ remove the misleading guide above this code segment.
    - LV_USE_ST7789
    - LV_USE_ST7796
    - LV_USE_ILI9341
-   - LV_USE_RENESAS_GLCDC   
-   
+   - LV_USE_RENESAS_GLCDC
+
 5. Update `LV_LOG_PRINTF` to `1` and `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER`
 
 
@@ -111,31 +111,31 @@ Make sure `LV_MEM_SIZE` is no less than `(72*1024U)`.
     - \#define LV_USE_RLOTTIE 0
     - \#define LV_USE_FFMPEG 0
 
-9. update the definition of following macros: `LV_USE_VECTOR_GRAPHIC`, `LV_USE_THORVE_INTERNAL` and `LV_USE_THORVE_EXTERNAL` as 
+9. update the definition of following macros: `LV_USE_VECTOR_GRAPHIC`, `LV_USE_THORVE_INTERNAL` and `LV_USE_THORVE_EXTERNAL` as
 
     ```c
     /*Enable Vector Graphic APIs*/
     #ifndef LV_USE_VECTOR_GRAPHIC
     #   define LV_USE_VECTOR_GRAPHIC  0
-    
+
     /* Enable ThorVG (vector graphics library) from the src/libs folder */
     #   define LV_USE_THORVG_INTERNAL 0
-    
+
     /* Enable ThorVG by assuming that its installed and linked to the project */
     #   define LV_USE_THORVG_EXTERNAL 0
     #endif
     ```
 
-10. update the definition of following macros: `LV_USE_LZ4`, `LV_USE_LZ4_INTERNAL` and `LV_USE_LZ4_EXTERNAL` as 
+10. update the definition of following macros: `LV_USE_LZ4`, `LV_USE_LZ4_INTERNAL` and `LV_USE_LZ4_EXTERNAL` as
 
     ```c
     /*Enable LZ4 compress/decompress lib*/
     #ifndef LV_USE_LZ4
     #   define LV_USE_LZ4  0
-    
+
     /*Use lvgl built-in LZ4 lib*/
     #   define LV_USE_LZ4_INTERNAL  0
-    
+
     /*Use external LZ4 library*/
     #   define LV_USE_LZ4_EXTERNAL  0
     #endif

@@ -78,4 +78,3 @@ As a reference take a look at `lv_draw_sw.c <https://github.com/lvgl/lvgl/blob/m
 
 API
 ***
-

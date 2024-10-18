@@ -114,4 +114,3 @@ struct TaskScheduler
 #endif //_TVG_TASK_SCHEDULER_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

@@ -93,4 +93,3 @@ const lv_image_dsc_t test_A8_NONE_align64 = {
   .data_size = sizeof(test_A8_NONE_align64_map),
   .data = test_A8_NONE_align64_map,
 };
-

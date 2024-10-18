@@ -121,13 +121,13 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
     if(0 == (INT_MAX - sizeof(gd_GIF) - LZW_CACHE_SIZE) / width / height / 5){
         LV_LOG_WARN("Image dimensions are too large");
         goto fail;
-    } 
+    }
     gif = lv_malloc(sizeof(gd_GIF) + 5 * width * height + LZW_CACHE_SIZE);
     #else
     if(0 == (INT_MAX - sizeof(gd_GIF)) / width / height / 5){
         LV_LOG_WARN("Image dimensions are too large");
         goto fail;
-    } 
+    }
     gif = lv_malloc(sizeof(gd_GIF) + 5 * width * height);
     #endif
     if(!gif) goto fail;

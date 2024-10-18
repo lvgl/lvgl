@@ -58,4 +58,3 @@ API
 ---
 
 :ref:`gifdec_h`
-

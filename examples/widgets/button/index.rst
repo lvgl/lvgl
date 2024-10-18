@@ -17,4 +17,3 @@ Gummy button
 
 .. lv_example:: widgets/button/lv_example_button_3
   :language: c
-

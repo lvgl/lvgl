@@ -574,4 +574,3 @@ struct Box
 #endif
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

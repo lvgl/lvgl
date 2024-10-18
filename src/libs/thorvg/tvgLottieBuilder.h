@@ -51,4 +51,3 @@ struct LottieBuilder
 #endif //_TVG_LOTTIE_BUILDER_H
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

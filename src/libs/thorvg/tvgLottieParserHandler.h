@@ -131,7 +131,7 @@ struct LookaheadParserHandler
     }
 
     bool RawNumber(const char *, SizeType, TVG_UNUSED bool)
-    { 
+    {
         return false;
     }
 
@@ -203,4 +203,3 @@ struct LookaheadParserHandler
 #endif //_TVG_LOTTIE_PARSER_HANDLER_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

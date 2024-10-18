@@ -590,4 +590,3 @@ bool rasterConvertCS(Surface* surface, ColorSpace to);
 #endif /* _TVG_SW_COMMON_H_ */
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

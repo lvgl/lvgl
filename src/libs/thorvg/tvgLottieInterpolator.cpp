@@ -143,4 +143,3 @@ void LottieInterpolator::set(const char* key, Point& inTangent, Point& outTangen
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

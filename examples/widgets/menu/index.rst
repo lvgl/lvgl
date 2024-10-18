@@ -28,4 +28,3 @@ Complex Menu
 
 .. lv_example:: widgets/menu/lv_example_menu_5
   :language: c
-

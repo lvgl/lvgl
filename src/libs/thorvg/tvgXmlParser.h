@@ -61,4 +61,3 @@ const char* simpleXmlNodeTypeToString(SvgNodeType type);
 #endif //_TVG_SIMPLE_XML_PARSER_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

@@ -132,4 +132,3 @@ bool mpoolTerm(SwMpool* mpool)
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

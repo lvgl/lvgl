@@ -64,7 +64,7 @@ Result LottieAnimation::segment(const char* marker) noexcept
         static_cast<FrameModule*>(loader)->segment(0.0f, 1.0f);
         return Result::Success;
     }
-    
+
     float begin, end;
     if (!static_cast<LottieLoader*>(loader)->segment(marker, begin, end)) {
         return Result::InvalidArguments;
@@ -95,4 +95,3 @@ unique_ptr<LottieAnimation> LottieAnimation::gen() noexcept
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

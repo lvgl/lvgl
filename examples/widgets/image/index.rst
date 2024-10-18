@@ -24,5 +24,3 @@ Image offset and styling
 
 .. lv_example:: widgets/image/lv_example_image_4
   :language: c
-
-

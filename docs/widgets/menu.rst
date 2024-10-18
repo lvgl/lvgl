@@ -15,7 +15,7 @@ handles the traversal between pages automatically.
 Parts and Styles
 ****************
 
-The menu widget is built from the following objects: 
+The menu widget is built from the following objects:
 
 - Main container: :cpp:type:`lv_menu_main_cont`
 - Main header: :cpp:type:`lv_menu_main_header_cont`

@@ -19,4 +19,3 @@ Animation timeline
 ------------------
 .. lv_example:: anim/lv_example_anim_timeline_1
   :language: c
-

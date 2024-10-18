@@ -33,4 +33,3 @@ Scene* svgSceneBuild(SvgLoaderData& loaderData, Box vBox, float w, float h, Aspe
 #endif //_TVG_SVG_SCENE_BUILDER_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

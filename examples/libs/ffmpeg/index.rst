@@ -9,4 +9,3 @@ Decode video
 
 .. lv_example:: libs/ffmpeg/lv_example_ffmpeg_2
   :language: c
-

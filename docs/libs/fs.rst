@@ -36,10 +36,10 @@ Working with common prefixes
 A **default driver letter** can be set by ``LV_FS_DEFAULT_DRIVE_LETTER``,
 which allows skipping the drive prefix in file paths.
 
-For example if ``LV_FS_DEFAULT_DRIVE_LETTER`` is set the ``'S'`` *"path/to/file.txt"* will mean *"S:path/to/file.txt"*. 
+For example if ``LV_FS_DEFAULT_DRIVE_LETTER`` is set the ``'S'`` *"path/to/file.txt"* will mean *"S:path/to/file.txt"*.
 
 This feature is useful if you have only a single driver and don't want to bother with LVGL's driver layer in the file paths.
-It also helps to use a unified path with LVGL's file system and normal file systems. 
+It also helps to use a unified path with LVGL's file system and normal file systems.
 The original mechanism is not affected, so a path starting with drive letter will still work.
 
 The **working directory** can be set with ``LV_FS_..._PATH``. E.g.
@@ -74,4 +74,3 @@ the file name:
 
 API
 ***
-

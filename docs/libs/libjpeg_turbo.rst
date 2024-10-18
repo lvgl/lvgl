@@ -53,4 +53,3 @@ API
 ---
 
 :ref:`lv_libjpeg_turbo_h`
-

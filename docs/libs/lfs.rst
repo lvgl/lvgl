@@ -56,5 +56,3 @@ Example
 
 API
 ---
-
-

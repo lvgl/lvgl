@@ -60,7 +60,7 @@ COMPONENT_SRCDIRS := . \
                   src/extra/widgets/win
 
 ifeq ($(CONFIG_LV_USE_THORVG_INTERNAL),y)
-COMPONENT_SRCDIRS += src/extra/libs/thorvg 
+COMPONENT_SRCDIRS += src/extra/libs/thorvg
 endif
 
 COMPONENT_ADD_INCLUDEDIRS := $(COMPONENT_SRCDIRS) .

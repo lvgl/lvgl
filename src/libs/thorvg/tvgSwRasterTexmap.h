@@ -1211,4 +1211,3 @@ static bool _rasterTexmapPolygonMesh(SwSurface* surface, const SwImage* image, c
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */
-

@@ -894,4 +894,3 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value)
     lv_style_set_prop(style, LV_STYLE_GRID_CELL_ROW_SPAN, v);
 }
 #endif /*LV_USE_GRID*/
-

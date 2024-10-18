@@ -380,7 +380,7 @@ void test_image_clip_radius(void)
     lv_obj_set_style_radius(img, LV_RADIUS_CIRCLE, 0);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_clip_radius_circle.png");
 
-    /* parent cliped */
+    /* parent clipped */
     lv_obj_set_pos(img, -50, -20);
     lv_image_set_scale(img, LV_SCALE_NONE * 2);
     lv_image_set_rotation(img, 450);

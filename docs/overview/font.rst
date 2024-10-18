@@ -47,7 +47,7 @@ Built-in fonts
 **************
 
 There are several built-in fonts in different sizes, which can be
-enabled in ``lv_conf.h`` with *LV_FONT\_…* defines. 
+enabled in ``lv_conf.h`` with *LV_FONT\_…* defines.
 
 Normal fonts
 ------------

@@ -128,4 +128,3 @@ const lv_image_dsc_t img_lv_demo_music_btn_list_pause = {
     .data_size = sizeof(img_lv_demo_music_btn_list_pause_map),
 };
 #endif
-

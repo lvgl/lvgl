@@ -107,7 +107,7 @@ It's possible to make an object non-scrollable with
 Non-scrollable objects can still propagate the scrolling (chain) to
 their parents.
 
-The direction in which scrolling happens can be controlled by ``lv_obj_set_scroll_dir(obj, LV_DIR_...)``. 
+The direction in which scrolling happens can be controlled by ``lv_obj_set_scroll_dir(obj, LV_DIR_...)``.
 
 The following values are possible for the direction:
 

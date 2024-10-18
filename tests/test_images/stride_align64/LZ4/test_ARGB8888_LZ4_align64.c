@@ -215,4 +215,3 @@ const lv_image_dsc_t test_ARGB8888_LZ4_align64 = {
   .data_size = sizeof(test_ARGB8888_LZ4_align64_map),
   .data = test_ARGB8888_LZ4_align64_map,
 };
-

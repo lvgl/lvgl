@@ -51,4 +51,3 @@ body:
       placeholder: Other approaches that we have considered but dropped (just for the record).
     validations:
       required: false
-
