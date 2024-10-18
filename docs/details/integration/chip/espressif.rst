@@ -176,8 +176,8 @@ The process is described in details below, using ``SPIFFS`` as demonstration.
          }
 
          lv_obj_t * obj = lv_image_create(lv_screen_active());
-         lv_image_set_src(obj, "A:/spiffs/logo.bin");
-         lv_obj_center(obj);
+         lv_image_set_src(widget, "A:/spiffs/logo.bin");
+         lv_obj_center(widget);
       }
 
 - **Build and flash**

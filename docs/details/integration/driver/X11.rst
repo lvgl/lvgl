@@ -32,26 +32,26 @@ Configure X11 driver
     -  Direct Exit
         .. code-block:: c
 
-            #define LV_X11_DIRECT_EXIT  1 /*preferred default - ends the application automatically if last window has been closed*/
+            #define LV_X11_DIRECT_EXIT  1 /* preferred default - ends the application automatically if last window has been closed */
             // or
-            #define LV_X11_DIRECT_EXIT  0 /*application is responsible for ending the application (e.g. by own LV_EVENT_DELETE handler*/
+            #define LV_X11_DIRECT_EXIT  0 /* application is responsible for ending the application (e.g. by own LV_EVENT_DELETE handler */
 
 
     -  Double buffering
         .. code-block:: c
 
-            #define LV_X11_DOUBLE_BUFFER  1 /*preferred default*/
+            #define LV_X11_DOUBLE_BUFFER  1 /* preferred default */
             // or
-            #define LV_X11_DOUBLE_BUFFER  0 /*not recommended*/
+            #define LV_X11_DOUBLE_BUFFER  0 /* not recommended */
 
     - Render mode
         .. code-block:: c
 
-            #define LV_X11_RENDER_MODE_PARTIAL 1  /*LV_DISPLAY_RENDER_MODE_PARTIAL, preferred default*/
+            #define LV_X11_RENDER_MODE_PARTIAL 1  /* LV_DISPLAY_RENDER_MODE_PARTIAL, preferred default */
             // or
-            #define LV_X11_RENDER_MODE_DIRECT  1  /*LV_DISPLAY_RENDER_MODE_DIRECT, not recommended for X11 driver*/
+            #define LV_X11_RENDER_MODE_DIRECT  1  /* LV_DISPLAY_RENDER_MODE_DIRECT, not recommended for X11 driver */
             // or
-            #define LV_X11_RENDER_MODE_DULL    1  /*LV_DISPLAY_RENDER_MODE_FULL, not recommended for X11 driver*/
+            #define LV_X11_RENDER_MODE_DULL    1  /* LV_DISPLAY_RENDER_MODE_FULL, not recommended for X11 driver */
 
 Usage
 -----

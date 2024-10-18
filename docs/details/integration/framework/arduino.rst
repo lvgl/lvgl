@@ -5,7 +5,7 @@ Arduino
 The `LVGL library <https://github.com/lvgl/lvgl>`__ is directly available as Arduino libraries.
 
 Note that you need to choose a board powerful enough to run LVGL and
-your GUI. See the `requirements of LVGL <https://docs.lvgl.io/master/intro/index.html#requirements>`__.
+your GUI. See the :ref:`requirements of LVGL <requirements>`.
 
 For example ESP32 is a good candidate to create UI's with LVGL.
 
@@ -87,8 +87,8 @@ section ``log settings``:
 
 .. code-block:: c
 
-   /*Log settings*/
-   #define USE_LV_LOG      1   /*Enable/disable the log module*/
+   /* Log settings */
+   #define USE_LV_LOG      1   /* Enable/disable the log module */
    #if LV_USE_LOG
    /* How important log should be added:
     * LV_LOG_LEVEL_TRACE       A lot of logs to give detailed information

@@ -45,7 +45,7 @@ and it needs to be combined with the :ref:`overview_image_caching` feature to en
 Example
 -------
 
-.. include:: ../examples/libs/libjpeg_turbo/index.rst
+.. include:: ../../examples/libs/libjpeg_turbo/index.rst
 
 .. _libjpeg_api:
 

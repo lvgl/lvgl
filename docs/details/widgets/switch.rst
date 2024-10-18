@@ -10,7 +10,7 @@ Overview
 The Switch looks like a little slider and can be used to turn something
 on and off.
 
-Vertical Switch can be created if the width of the object is smaller than its height.
+Vertical Switch can be created if the width of the Widget is smaller than its height.
 
 .. _lv_switch_parts_and_styles:
 
@@ -27,7 +27,7 @@ Parts and Styles
    describe the knob(s). By default, the knob is square (with an
    optional corner radius) with side length equal to the smaller side of
    the slider. The knob can be made larger with the ``padding`` values.
-   Padding values can be asymmetric too.
+   Padding values can be asymmetric as well.
 
 .. _lv_switch_usage:
 
@@ -40,15 +40,15 @@ Change state
 The switch uses the standard :cpp:enumerator:`LV_STATE_CHECKED` state.
 
 To get the current state of the switch (with ``true`` being on), use
-:cpp:expr:`lv_obj_has_state(obj, LV_STATE_CHECKED)`.
+:cpp:expr:`lv_obj_has_state(widget, LV_STATE_CHECKED)`.
 
-Call :cpp:expr:`lv_obj_add_state(obj, LV_STATE_CHECKED)` to turn it on, or
-:cpp:expr:`lv_obj_remove_state(obj, LV_STATE_CHECKED)` to turn it off.
+Call :cpp:expr:`lv_obj_add_state(widget, LV_STATE_CHECKED)` to turn it on, or
+:cpp:expr:`lv_obj_remove_state(widget, LV_STATE_CHECKED)` to turn it off.
 
 Change orientation
 ------------------
 
-:cpp:expr:`lv_switch_set_orientation(obj, LV_SWITCH_ORIENTATION_VERTICAL)` change orientation, default orientation is :cpp:enumerator:`LV_SWITCH_ORIENTATION_AUTO`, adaptive based on the width and height of the object.
+:cpp:expr:`lv_switch_set_orientation(widget, LV_SWITCH_ORIENTATION_VERTICAL)` change orientation, default orientation is :cpp:enumerator:`LV_SWITCH_ORIENTATION_AUTO`, adaptive based on the width and height of the Widget.
 
 
 .. _lv_switch_events:
@@ -58,7 +58,7 @@ Events
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the switch changes state.
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See also:  events of :ref:`Base Widget <lv_obj>`.
 
 Learn more about :ref:`events`.
 
@@ -78,7 +78,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/switch/index.rst
+.. include:: ../../examples/widgets/switch/index.rst
 
 .. _lv_switch_api:
 

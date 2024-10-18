@@ -1,13 +1,13 @@
 .. _lv_tileview:
 
 =======================
-Tile view (lv_tileview)
+Tile View (lv_tileview)
 =======================
 
 Overview
 ********
 
-The Tile view is a container object whose elements (called *tiles*) can
+The Tile view is a container Widget whose elements (called *tiles*) can
 be arranged in grid form. A user can navigate between the tiles by
 swiping. Any direction of swiping can be disabled on the tiles
 individually to not allow moving from one tile to another.
@@ -71,7 +71,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/tileview/index.rst
+.. include:: ../../examples/widgets/tileview/index.rst
 
 .. _lv_tileview_api:
 

@@ -7,13 +7,13 @@ Calendar (lv_calendar)
 Overview
 ********
 
-The Calendar object is a classic calendar which can: - show the days of
+The Calendar Widget is a classic calendar which can: - show the days of
 any month in a 7x7 matrix - Show the name of the days - highlight the
 current day (today) - highlight any user-defined dates
 
 The Calendar is added to the default group (if it is set). Calendar is
-an editable object which allow selecting and clicking the dates with
-encoder navigation too.
+an editable Widget which allow selecting and clicking the dates with
+encoder navigation as well.
 
 To make the Calendar flexible, by default it doesn't show the current
 year or month. Instead, there are optional "headers" that can be
@@ -24,8 +24,8 @@ attached to the calendar.
 Parts and Styles
 ****************
 
-The calendar object uses the `Button matrix <widgets/buttonmatrix>`__
-object under the hood to arrange the days into a matrix.
+The calendar Widget uses the :ref:`Button Matrix <lv_buttonmatrix>`
+Widget under the hood to arrange the days into a matrix.
 
 - :cpp:enumerator:`LV_PART_MAIN` The background of the calendar. Uses all the background related style properties.
 - :cpp:enumerator:`LV_PART_ITEMS` Refers to the dates and day names. Button matrix control flags are set to differentiate the
@@ -79,22 +79,22 @@ Custom year list
 
 Sets a custom year list with :cpp:expr:`lv_calendar_header_dropdown_set_year_list(calendar, years_list)`
 where ``years_list`` is a pointer to the custom years list. It can be a constant string
-like ``static const char * years = "2023\n2022\n2021\n2020\n2019";``, 
+like ``static const char * years = "2023\n2022\n2021\n2020\n2019";``,
 or can be generated dynamically into a buffer as well.
 
 Chinese calendar
 ----------------
 
-The Chinese calendar is a traditional cultural tool that integrates elements 
-such as the lunar calendar, solar terms, and traditional festivals. It is 
-widely used in Chinese social life, helping people understand the dates of 
-the lunar calendar, arrange festival activities, and inherit the excellent 
-traditional culture of the Chinese nation. Whether in families, businesses, 
-or education, the Chinese calendar plays an irreplaceable role, enabling 
-people to better understand and appreciate the charm of Chinese traditional 
+The Chinese calendar is a traditional cultural tool that integrates elements
+such as the lunar calendar, solar terms, and traditional festivals. It is
+widely used in Chinese social life, helping people understand the dates of
+the lunar calendar, arrange festival activities, and inherit the excellent
+traditional culture of the Chinese nation. Whether in families, businesses,
+or education, the Chinese calendar plays an irreplaceable role, enabling
+people to better understand and appreciate the charm of Chinese traditional
 culture.
 
-If you want to use the Chinese calendar, please 
+If you want to use the Chinese calendar, please
 use :cpp:expr:`lv_calendar_set_chinese_mode(calendar, true)` to enable it.
 
 .. _lv_calendar_events:
@@ -145,7 +145,7 @@ contains 2 drop-drown lists: one for the year and another for the month.
 Example
 *******
 
-.. include:: ../examples/widgets/calendar/index.rst
+.. include:: ../../examples/widgets/calendar/index.rst
 
 .. _lv_calendar_api:
 

@@ -4,7 +4,7 @@
 BMP decoder
 ===========
 
-This extension allows the use of BMP images in LVGL. 
+This extension allows the use of BMP images in LVGL.
 
 Library source: https://github.com/caj-johnson/bmp-decoder
 
@@ -45,7 +45,7 @@ Limitations
 Example
 -------
 
-.. include:: ../examples/libs/bmp/index.rst
+.. include:: ../../examples/libs/bmp/index.rst
 
 .. _bmp_api:
 

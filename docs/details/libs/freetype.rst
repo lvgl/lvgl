@@ -102,7 +102,7 @@ please refer to example code.
 Examples
 --------
 
-.. include:: ../examples/libs/freetype/index.rst
+.. include:: ../../examples/libs/freetype/index.rst
 
 Learn more
 ----------

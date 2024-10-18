@@ -7,9 +7,9 @@ Span (lv_span)
 Overview
 ********
 
-A spangroup is the object that is used to display rich text. Different
-from the label object, ``spangroup`` can render text styled with
-different fonts, colors, and sizes into the spangroup object.
+A spangroup is the Widget that is used to display rich text. Different
+from the label Widget, ``spangroup`` can render text styled with
+different fonts, colors, and sizes into the spangroup Widget.
 
 .. _lv_span_parts_and_styles:
 
@@ -26,20 +26,20 @@ Usage
 Set text and style
 ------------------
 
-The spangroup object uses span to describe text and text style. so,
+The spangroup Widget uses span to describe text and text style. so,
 first we need to create ``span`` descriptor using ``lv_span_t * span = lv_spangroup_new_span(spangroup)``.
 Then use :cpp:expr:`lv_span_set_text(span, "text")` to set text. The style of the span is
-configured as with a normal style object by using its ``style`` member,
+configured as with a normal style Widget by using its ``style`` member,
 eg::cpp:expr:`lv_style_set_text_color(&span->style, lv_palette_main(LV_PALETTE_RED))`.
 
-If spangroup object ``mode != LV_SPAN_MODE_FIXED`` you must call
+If spangroup Widget ``mode != LV_SPAN_MODE_FIXED`` you must call
 :cpp:func:`lv_spangroup_refr_mode` after you have modified ``span``
 style(eg:set text, changed the font size, del span).
 
 Retrieving a span child
 -----------------------
 
-Spangroups store their children differently from normal objects, so
+Spangroups store their children differently from normal Widgets, so
 normal functions for getting children won't work.
 
 :cpp:expr:`lv_spangroup_get_child(spangroup, id)` will return a pointer to the
@@ -63,7 +63,7 @@ E.g. ``uint32_t size = lv_spangroup_get_span_count(spangroup)``
 Text align
 ----------
 
-Like label object, the spangroup can be set to one the following modes:
+Like label Widget, the spangroup can be set to one the following modes:
 
 - :cpp:enumerator:`LV_TEXT_ALIGN_LEFT` Align to left.
 - :cpp:enumerator:`LV_TEXT_ALIGN_CENTER` Align to center.
@@ -78,12 +78,12 @@ Modes
 
 The spangroup can be set to one the following modes:
 
-- :cpp:enumerator:`LV_SPAN_MODE_FIXED` Fixes the object size.
-- :cpp:enumerator:`LV_SPAN_MODE_EXPAND` Expand the object size to the text size but stay on a single line.
-- :cpp:enumerator:`LV_SPAN_MODE_BREAK` Keep width, break the too long lines and auto expand height.
+- :cpp:enumerator:`LV_SPAN_MODE_FIXED` Fixes the Widget size.
+- :cpp:enumerator:`LV_SPAN_MODE_EXPAND` Expand the Widget size to the text size but stay on a single line.
+- :cpp:enumerator:`LV_SPAN_MODE_BREAK` Keep width, break lines that are too long and auto expand height.
 
 Use the function :cpp:expr:`lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK)` to set
-object mode.
+Widget mode.
 
 Overflow
 --------
@@ -93,7 +93,7 @@ The spangroup can be set to one the following modes:
 - :cpp:enumerator:`LV_SPAN_OVERFLOW_CLIP` truncates the text at the limit of the area.
 - :cpp:enumerator:`LV_SPAN_OVERFLOW_ELLIPSIS` will display an ellipsis (``...``) when text overflows the area.
 
-Use function :cpp:expr:`lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_CLIP)` to set object overflow mode.
+Use function :cpp:expr:`lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_CLIP)` to set Widget overflow mode.
 
 First line indent
 -----------------
@@ -101,7 +101,7 @@ First line indent
 Use function :cpp:expr:`lv_spangroup_set_indent(spangroup, 20)` to set the indent of the
 first line. all modes support pixel units, in addition to :cpp:enumerator:`LV_SPAN_MODE_FIXED`
 and :cpp:enumerator:`LV_SPAN_MODE_BREAK` mode supports percentage units
-too.
+as well.
 
 Lines
 -----
@@ -124,7 +124,7 @@ Learn more about :ref:`events`.
 Keys
 ****
 
-No *Keys* are processed by the object type.
+No *Keys* are processed by the Widget type.
 
 Learn more about :ref:`indev_keys`.
 
@@ -133,7 +133,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/span/index.rst
+.. include:: ../../examples/widgets/span/index.rst
 
 .. _lv_span_api:
 

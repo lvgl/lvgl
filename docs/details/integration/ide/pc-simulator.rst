@@ -25,11 +25,11 @@ Select an IDE
 The simulator is ported to various IDEs (Integrated Development Environments).
 Choose your favorite IDE, read its README on GitHub, download the project, and load it to the IDE.
 
-- `Eclipse with SDL driver <https://github.com/lvgl/lv_sim_eclipse_sdl>`__: Recommended on Linux and Mac, supports CMake too
+- `Eclipse with SDL driver <https://github.com/lvgl/lv_sim_eclipse_sdl>`__: Recommended on Linux and Mac, supports CMake as well
 - `VisualStudio <https://github.com/lvgl/lv_port_pc_visual_studio>`__: Recommended on Windows
 - `VSCode with SDL driver <https://github.com/lvgl/lv_port_pc_vscode>`__: Recommended on Linux (SDL) and Mac (SDL)
 - `CodeBlocks <https://github.com/lvgl/lv_sim_codeblocks_win>`__: Recommended on Windows
-- `PlatformIO with SDL driver <https://github.com/lvgl/lv_platformio>`__: Recommended on Linux and Mac but has an STM32 environment too
+- `PlatformIO with SDL driver <https://github.com/lvgl/lv_platformio>`__: Recommended on Linux and Mac but has an STM32 environment as well
 - `Generic Linux <https://github.com/lvgl/lv_port_linux>`__: CMake based project where you can easily switch between fbdev, DRM, and SDL.
 - `MDK with FastModel <https://github.com/lvgl/lv_port_an547_cm55_sim>`__: For Windows
 
@@ -40,7 +40,7 @@ External project not maintained by the LVGL organization:
 Built-in drivers
 ----------------
 
-LVGL comes with several `built-in drivers <https://docs.lvgl.io/master/integration/driver/index.html>`__.
+LVGL comes with several :ref:`built-in drivers <drivers>`.
 
 Even if a simulator project comes with e.g. SDL, you can easily replace it by enabling
 another driver in ``lv_conf.h`` and calling its ``create`` function.

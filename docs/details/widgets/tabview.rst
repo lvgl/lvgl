@@ -7,7 +7,7 @@ Tabview (lv_tabview)
 Overview
 ********
 
-The Tab view object can be used to organize content in tabs. The Tab
+The Tab view Widget can be used to organize content in tabs. The Tab
 view is built from other widgets:
 
 - Main container: :ref:`lv_obj`
@@ -43,7 +43,7 @@ Add tabs
 --------
 
 New tabs can be added with :cpp:expr:`lv_tabview_add_tab(tabview, "Tab name")`.
-This will return a pointer to an :ref:`lv_obj` object where
+This will return a pointer to an :ref:`lv_obj` Widget where
 the tab's content can be created.
 
 Rename tabs
@@ -107,7 +107,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/tabview/index.rst
+.. include:: ../../examples/widgets/tabview/index.rst
 
 .. _lv_tabview_api:
 

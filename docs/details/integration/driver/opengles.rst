@@ -1,3 +1,5 @@
+.. opengl_es_driver:
+
 ===============================
 OpenGL ES Display/Inputs Driver
 ===============================
@@ -63,7 +65,7 @@ Basic Usage
         lv_image_set_src(cursor_obj, &mouse_cursor_icon);
         lv_indev_set_cursor(mouse, cursor_obj);
 
-        /* create objects on the screen */
+        /* create Widgets on the screen */
         lv_demo_widgets();
 
         while (1)
@@ -121,7 +123,7 @@ used to add content to a texture and the driver will draw the texture in the win
         lv_image_set_src(cursor_obj, &mouse_cursor_icon);
         lv_indev_set_cursor(main_texture_mouse, cursor_obj);
 
-        /* create objects on the screen of the main texture */
+        /* create Widgets on the screen of the main texture */
         lv_demo_widgets();
 
         /**********************
@@ -137,7 +139,7 @@ used to add content to a texture and the driver will draw the texture in the win
         unsigned int sub_texture_id = lv_opengles_texture_get_texture_id(sub_texture);
         lv_glfw_texture_t * window_sub_texture = lv_glfw_window_add_texture(window, sub_texture_id, sub_texture_w, sub_texture_h);
 
-        /* create objects on the screen of the sub texture */
+        /* create Widgets on the screen of the sub texture */
         lv_display_set_default(sub_texture);
         lv_example_keyboard_2();
         lv_display_set_default(main_texture);
@@ -210,9 +212,13 @@ Known Limitations
 ~~~~~~~~~~~~~~~~~
 
 - Performance will be the same or slightly worse if the drawn areas are never found in the cache
-  due to objects with continuously varying colors or shapes. One example is a label whose color
+  due to Widgets with continuously varying colors or shapes. One example is a label whose color
   is set to a random value every frame, as in the "Multiple labels" scene of the benchmark demo.
 - Layers with transparent pixels and an overall layer transparency will not blend correctly.
   The effect can be observed in the "Containers with opa_layer" scene of the benchmark demo
   in the border corners.
 - Layers with rotation are not currently supported. Images with rotation are fine.
+
+
+.. Comment:  The above blank line is necessary for Sphinx to not complain,
+    since it looks for the blank line after a bullet list.

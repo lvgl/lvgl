@@ -7,7 +7,7 @@ Line (lv_line)
 Overview
 ********
 
-The Line object is capable of drawing straight lines between a set of
+The Line Widget is capable of drawing straight lines between a set of
 points.
 
 .. _lv_line_parts_and_styles:
@@ -26,7 +26,7 @@ Set points
 ----------
 
 The points have to be stored in an :cpp:struct:`lv_point_precise_t` array and passed to
-the object by the :cpp:expr:`lv_line_set_points(lines, point_array, point_cnt)`
+the Widget by the :cpp:expr:`lv_line_set_points(lines, point_array, point_cnt)`
 function.
 
 Their coordinates can either be specified as raw pixel coordinates
@@ -45,10 +45,10 @@ the size is set explicitly, parts on the line may not be visible.
 Invert y
 --------
 
-By default, the *y == 0* point is in the top of the object. It might be
+By default, the *y == 0* point is in the top of the Widget. It might be
 counter-intuitive in some cases so the y coordinates can be inverted
 with :cpp:expr:`lv_line_set_y_invert(line, true)`. In this case, *y == 0* will
-be the bottom of the object. *y invert* is disabled by default.
+be the bottom of the Widget. *y invert* is disabled by default.
 
 .. _lv_line_events:
 
@@ -56,9 +56,9 @@ Events
 ******
 
 Only the `Generic events <../overview/event.html#generic-events>`__ are
-sent by the object type.
+sent by the Widget type.
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See also:  events of :ref:`Base Widget <lv_obj>`.
 
 Learn more about :ref:`events`.
 
@@ -67,7 +67,7 @@ Learn more about :ref:`events`.
 Keys
 ****
 
-No *Keys* are processed by the object type.
+No *Keys* are processed by the Widget type.
 
 Learn more about :ref:`indev_keys`.
 
@@ -76,7 +76,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/line/index.rst
+.. include:: ../../examples/widgets/line/index.rst
 
 .. _lv_line_api:
 

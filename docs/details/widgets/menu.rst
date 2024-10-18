@@ -15,7 +15,7 @@ handles the traversal between pages automatically.
 Parts and Styles
 ****************
 
-The menu widget is built from the following objects: 
+The menu widget is built from the following Widgets:
 
 - Main container: :cpp:type:`lv_menu_main_cont`
 - Main header: :cpp:type:`lv_menu_main_header_cont`
@@ -83,8 +83,8 @@ Linking between menu pages
 --------------------------
 
 For instance, you have created a button obj in the main page. When you
-click the button obj, you want it to open up a new page, use
-:cpp:expr:`lv_menu_set_load_page_event(menu, obj, new page)`.
+click the button Widget, you want it to open up a new page, use
+:cpp:expr:`lv_menu_set_load_page_event(menu, btn, new page)`.
 
 Create a menu container, section, separator
 -------------------------------------------
@@ -115,7 +115,7 @@ Events
    -  :cpp:expr:`lv_menu_back_button_is_root(menu, button)` to check if button is root
       back button
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See also:  events of :ref:`Base Widget <lv_obj>`.
 
 Learn more about :ref:`events`.
 
@@ -133,7 +133,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/menu/index.rst
+.. include:: ../../examples/widgets/menu/index.rst
 
 .. _lv_menu_api:
 

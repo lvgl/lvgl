@@ -7,7 +7,7 @@ Slider (lv_slider)
 Overview
 ********
 
-The Slider object looks like a `Bar <widgets/bar>`__ supplemented with
+The Slider Widget looks like a :ref:`Bar <lv_bar>` supplemented with
 a knob. The knob can be dragged to set a value. Just like Bar, Slider
 can be vertical or horizontal.
 
@@ -26,7 +26,7 @@ Parts and Styles
    knob(s). By default, the knob is square (with an optional corner
    radius) with side length equal to the smaller side of the slider. The
    knob can be made larger with the ``padding`` values. Padding values
-   can be asymmetric too.
+   can be asymmetric as well.
 
 .. _lv_slider_usage:
 
@@ -52,7 +52,7 @@ The slider can be one of the following modes:
 - :cpp:enumerator:`LV_SLIDER_MODE_NORMAL` A normal slider as described above
 - :cpp:enumerator:`LV_SLIDER_SYMMETRICAL` Draw the indicator form the zero value to
   current value. Requires negative minimum range and positive maximum range.
-- :cpp:enumerator:`LV_SLIDER_RANGE` Allows setting the start value too by
+- :cpp:enumerator:`LV_SLIDER_RANGE` Allows setting the start value as well by
   :cpp:expr:`lv_bar_set_start_value(bar, new_value, LV_ANIM_ON/OFF)`. The start
   value has to be always smaller than the end value.
 
@@ -80,7 +80,7 @@ Events
    being dragged.
 -  :cpp:enumerator:`LV_EVENT_RELEASED` Sent when the slider has just been released.
 
-See the events of the `Bar <widgets/bar>`__ too.
+See also:  events of :ref:`Bar <lv_bar>`.
 
 Learn more about :ref:`events`.
 
@@ -99,7 +99,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/slider/index.rst
+.. include:: ../../examples/widgets/slider/index.rst
 
 .. _lv_slider_api:
 

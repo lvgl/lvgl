@@ -4,31 +4,28 @@
 Introduction
 ============
 
-LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.
-
-.. image:: /misc/intro_data_flow_wo_flow_of_ctrl.png
-   :scale: 75 %
-   :alt:  LVGL Data Flow
-   :align:  center
+LVGL (Light and Versatile Graphics Library) is a free and open-source graphics
+library providing everything you need to create an embedded GUI with easy-to-use
+graphical elements, beautiful visual effects, and a low memory footprint.
 
 
 Key features
 ------------
 
-- Powerful building blocks such as buttons, charts, lists, sliders, images, etc.
+- Powerful building blocks such as :ref:`buttons, charts, lists, sliders, images <widgets>`, etc.
 - Advanced graphics with animations, anti-aliasing, opacity, smooth scrolling
 - Various input devices such as touchpad, mouse, keyboard, encoder, etc.
 - Multi-language support with UTF-8 encoding
-- Multi-display support, even with different color formats
+- Multi-display support, even with mixed color formats
 - Fully customizable graphic elements with CSS-like styles
 - Hardware independent:  use with any microcontroller or display
 - Scalable: able to operate with little memory (64 kB Flash, 16 kB RAM)
-- OS, external memory and GPU are supported but not required
+- :ref:`OS <os>`, external memory and :ref:`GPU <draw>` are supported but not required
 - Single frame buffer operation even with advanced graphic effects
 - Written in C for maximal compatibility (C++ compatible)
-- Simulator to start embedded GUI design on a PC without embedded hardware;
-- Code developed under similator can be shared with firmware to make UI development more efficient.
-- Binding to MicroPython
+- :ref:`Simulator <simulator>` to start embedded GUI design on a PC without embedded hardware
+- User code developed under similator can be shared with firmware to make UI development more efficient.
+- Binding to :ref:`MicroPython`
 - Tutorials, examples, themes for rapid GUI design
 - Documentation is available online
 - Free and open-source under MIT license
@@ -45,9 +42,9 @@ Basically, every modern controller which is able to drive a display is suitable 
 * > 16 MHz clock speed is recommended
 * Flash/ROM: > 64 kB for the very essential components (> 180 kB is recommended)
 * RAM:
-    * Static RAM usage: ~2 kB depending on the used features and object types
+    * Static RAM usage: ~2 kB depending on the used features and Widget types
     * stack: > 2kB (> 8 kB recommended)
-    * Dynamic data (heap): > 2 KB (> 48 kB is recommended if using many GUI objects).
+    * Dynamic data (heap): > 2 KB (> 48 kB is recommended if using many GUI Widgets).
         Set by :c:macro:`LV_MEM_SIZE` in ``lv_conf.h``.
     * Display buffer:  > *"Horizontal resolution"* pixels (> 10 X *"Horizontal resolution"* is recommended)
     * One frame buffer in the MCU or in an external display controller
@@ -78,7 +75,7 @@ You can choose from many different ways of contributing See :ref:`contributing` 
 Repository layout
 -----------------
 
-All repositories of the LVGL project are hosted on `GitHub <https://github.com/lvgl>`_
+All repositories of the LVGL project are hosted on `GitHub <https://github.com/lvgl>`_.
 
 You will find these repositories there:
 
@@ -115,7 +112,7 @@ Branches
 
 The core repositories have at least the following branches:
 
-* `master`: latest version, patches are merged directly here.
+* `master`: latest version, patches are merged directly here
 * `release/vX.Y`: stable versions of the minor releases
 * `fix/some-description`: temporary branches for bug fixes
 * `feat/some-description`: temporary branches for features
@@ -167,12 +164,12 @@ FAQ
 Where can I ask questions?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can ask questions in the forum: `https://forum.lvgl.io/ <https://forum.lvgl.io/>`_.
+You can ask questions in the forum: `https://forum.lvgl.io/ <forum_>`_.
 
 We use `GitHub issues <https://github.com/lvgl/lvgl/issues>`_ for development related discussion.
 You should use them only if your question or issue is tightly related to the development of the library.
 
-Before posting a question, please read this FAQ section since you might find answer to your issue here too.
+Before posting a question, please read this FAQ section since you might find the answer to your issue here as well.
 
 
 Is my MCU/hardware supported?
@@ -203,7 +200,7 @@ Some examples of the supported display types:
 * even LED matrices
 * or any other display where you can control the color/state of the pixels
 
-See the :ref:`display_interface` section to learn more.
+See the :ref:`display` section to learn more.
 
 
 LVGL doesn't start, randomly crashes or nothing is drawn on the display. What can be the problem?
@@ -211,17 +208,18 @@ LVGL doesn't start, randomly crashes or nothing is drawn on the display. What ca
 
 * Try increasing :c:macro:`LV_MEM_SIZE`.
 * Be sure your display works without LVGL. E.g. paint it to red on start up.
-* Enable :ref:`logging`
-* Enable assertions in ``lv_conf.h`` (`LV_USE_ASSERT_...`)
-* If you use an RTOS
-   * increase the stack size of the task which calls :cpp:func:`lv_timer_handler`
-   * Be sure you used a mutex as described here: :ref:`os_interrupt`
+* Enable :ref:`logging`.
+* Enable assertions in ``lv_conf.h`` (``LV_USE_ASSERT_...``).
+* If you use an RTOS:
+   * Increase the stack size of the task that calls :cpp:func:`lv_timer_handler`.
+   * Be sure you are using one of the methods for thread management as described in :ref:`os`.
 
 
 My display driver is not called. What have I missed?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Be sure you are calling :cpp:expr:`lv_tick_inc(x)` in an interrupt and :cpp:func:`lv_timer_handler` in your main ``while(1)``.
+Be sure you are calling :cpp:expr:`lv_tick_inc(x)` as prescribed in :ref:`tick` and
+are calling :cpp:func:`lv_timer_handler` as prescribed in :ref:`timer_handler`.
 
 Learn more in the :ref:`tick` and :ref:`timer_handler` sections.
 
@@ -229,13 +227,14 @@ Learn more in the :ref:`tick` and :ref:`timer_handler` sections.
 Why is the display driver called only once? Only the upper part of the display is refreshed.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Be sure you are calling :cpp:expr:`lv_display_flush_ready(drv)` at the end of your "*display flush callback*".
+Be sure you are calling :cpp:expr:`lv_display_flush_ready(drv)` at the end of your
+"*display flush callback*" as per :ref:`flush_callback` section.
 
 
 Why do I see only garbage on the screen?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Probably there a bug in your display driver. Try the following code without using LVGL. You should see a square with red-blue gradient.
+There is probably a bug in your display driver. Try the following code without using LVGL. You should see a square with red-blue gradient.
 
 .. code-block:: c
 
@@ -264,13 +263,13 @@ Probably there a bug in your display driver. Try the following code without usin
 Why do I see nonsense colors on the screen?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Probably LVGL's color format is not compatible with your display's color format. Check :c:macro:`LV_COLOR_DEPTH` in *lv_conf.h*.
+The configured LVGL color format is probably not compatible with your display's color format. Check :c:macro:`LV_COLOR_DEPTH` in *lv_conf.h*.
 
 
 How do I speed up my UI?
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-- Turn on compiler optimization and enable cache if your MCU has it.
+- Turn on compiler optimization and enable instruction- and data-caching if your MCU has them.
 - Increase the size of the display buffer.
 - Use two display buffers and flush the buffer with DMA (or similar peripheral) in the background.
 - Increase the clock speed of the SPI or parallel port if you use them to drive the display.
@@ -281,7 +280,7 @@ How do I speed up my UI?
 How do I reduce flash/ROM usage?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can disable all the unused features (such as animations, file system, GPU etc.) and object types in *lv_conf.h*.
+You can disable unused features (such as animations, file system, GPU etc.) and widget types in *lv_conf.h*.
 
 If you are using GCC/CLANG you can add `-fdata-sections -ffunction-sections` compiler flags and `--gc-sections` linker flag to remove unused functions and variables from the final binary. If possible, add the `-flto` compiler flag to enable link-time-optimisation together with `-Os` for GCC or `-Oz` for CLANG.
 
@@ -290,14 +289,18 @@ How do I reduce RAM usage?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * Lower the size of the *Display buffer*.
-* Reduce :c:macro:`LV_MEM_SIZE` in *lv_conf.h*. This memory is used when you create objects like buttons, labels, etc.
-* To work with lower :c:macro:`LV_MEM_SIZE` you can create objects only when required and delete them when they are not needed anymore.
+* Reduce :c:macro:`LV_MEM_SIZE` in *lv_conf.h*. This memory is used when you create Widgets like buttons, labels, etc.
+* To work with lower :c:macro:`LV_MEM_SIZE` you can create Widgets only when required and delete them when they are not needed anymore.
 
 
-How do I use LVGL an operating system?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+How do I use LVGL with an operating system?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To work with an operating system where tasks can interrupt each other (preemptively),
 you must ensure that no LVGL function call be called while another LVGL call is in
-progress.  There are several ways to do this. See the :ref:`os_interrupt` section to
+progress.  There are several ways to do this.  See the :ref:`os` section to
 learn more.
+
+
+
+.. include:: ../external_references.rst

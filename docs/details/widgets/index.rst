@@ -40,3 +40,4 @@ Widgets
     textarea
     tileview
     win
+    new_widget

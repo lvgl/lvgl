@@ -10,7 +10,7 @@ Fragment is a concept copied from
 It represents a reusable portion of your app's UI. A fragment defines
 and manages its own layout, has its own lifecycle, and can handle its
 own events. Like Android's Fragment that must be hosted by an activity
-or another fragment, Fragment in LVGL needs to be hosted by an object,
+or another fragment, Fragment in LVGL needs to be hosted by a Widget,
 or another fragment. The fragment's view hierarchy becomes part of, or
 attaches to, the host's view hierarchy.
 
@@ -55,7 +55,7 @@ Use ``lv_fragment_manager``
 
 .. code-block:: c
 
-   /* Create fragment instance, and objects will be added to container */
+   /* Create fragment instance, and Widgets will be added to container */
    lv_fragment_manager_t *manager = lv_fragment_manager_create(container, NULL);
    /* Replace current fragment with instance of sample_cls, and init_argument is user defined pointer */
    lv_fragment_manager_replace(manager, &sample_cls, init_argument);
@@ -78,7 +78,7 @@ Fragment Based Navigation
 Example
 -------
 
-.. include:: ../examples/others/fragment/index.rst
+.. include:: ../../examples/others/fragment/index.rst
 
 .. _fragment_api:
 

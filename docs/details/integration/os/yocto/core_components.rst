@@ -1,8 +1,11 @@
-Yocto Project Core Components
-#############################
+.. _yocto_project_core_components:
 
-The BitBake task executor together with various types of configuration files 
-form the OpenEmbedded-Core (OE-Core). This section overviews these components 
+=============================
+Yocto Project Core Components
+=============================
+
+The BitBake task executor together with various types of configuration files
+form the OpenEmbedded-Core (OE-Core). This section overviews these components
 by describing their use and how they interact.
 
 BitBake handles the parsing and execution of the data files. The data
@@ -18,20 +21,20 @@ itself is of various types:
    everything together.
 
 BitBake knows how to combine multiple data sources together and refers
-to each data source as a layer. 
+to each data source as a layer.
 
-Here are some brief details on these core components. 
+Here are some brief details on these core components.
 
 .. _bitbake_section:
 
 BitBake
 *******
 
-BitBake is the tool at the heart of the OpenEmbedded Build System and is 
-responsible for parsing the Metadata, generating a list of tasks from it, and 
+BitBake is the tool at the heart of the OpenEmbedded Build System and is
+responsible for parsing the Metadata, generating a list of tasks from it, and
 then executing those tasks.
 
-This section briefly introduces BitBake. If you want more information on 
+This section briefly introduces BitBake. If you want more information on
 BitBake, see the `BitBake User Manual <https://docs.yoctoproject.org/bitbake/2.
 8/index.html>`_.
 
@@ -54,7 +57,7 @@ Several different versions of ``matchbox-desktop`` might exist. BitBake chooses
 the one selected by the distribution configuration. You can get more details
 about how BitBake chooses between different target versions and providers in the
 "`Preferences <https://docs.yoctoproject.org/bitbake/2.8/bitbake-user-manual/
-bitbake-user-manual-execution.html#preferences>`_" section of the BitBake User 
+bitbake-user-manual-execution.html#preferences>`_" section of the BitBake User
 Manual.
 
 BitBake also tries to execute any dependent tasks first. So for example,
@@ -133,14 +136,14 @@ several pieces of hardware.
 There are many layers working in the Yocto Project development environment. The
 `Yocto Project Compatible Layer Index <https://www.yoctoproject.org/development/
 yocto-project-compatible-layers/>`_ and `OpenEmbedded Layer Index <https://
-layers.openembedded.org/layerindex/branch/master/layers/>`_ both contain layers 
+layers.openembedded.org/layerindex/branch/master/layers/>`_ both contain layers
 from
 which you can use or leverage.
 
-By convention, layers in the Yocto Project follow a specific form. Conforming 
-to a known structure allows BitBake to make assumptions during builds on where 
-to find types of metadata. You can find procedures and learn about tools (i.e. 
-``bitbake-layers``) for creating layers suitable for the Yocto Project in the 
+By convention, layers in the Yocto Project follow a specific form. Conforming
+to a known structure allows BitBake to make assumptions during builds on where
+to find types of metadata. You can find procedures and learn about tools (i.e.
+``bitbake-layers``) for creating layers suitable for the Yocto Project in the
 "`understanding and creating layers <https://docs.yoctoproject.org/dev-manual/
-layers.html#understanding-and-creating-layers>`_" section of the 
+layers.html#understanding-and-creating-layers>`_" section of the
 Yocto Project Development Tasks Manual.

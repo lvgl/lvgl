@@ -23,10 +23,10 @@ Set :c:macro:`LV_USE_OBJ_PROPERTY_NAME` to `1` in order to use property name ins
     typedef struct {
         lv_prop_id_t id;
         union {
-            int32_t num;                /**< Number integer number (opacity, enums, booleans or "normal" numbers)*/
-            const void * ptr;           /**< Constant pointers  (font, cone text, etc)*/
-            lv_color_t color;           /**< Colors*/
-            lv_value_precise_t precise; /**< float or int for precise value*/
+            int32_t num;                /**< Number integer number (opacity, enums, booleans or "normal" numbers) */
+            const void * ptr;           /**< Constant pointers  (font, cone text, etc) */
+            lv_color_t color;           /**< Colors */
+            lv_value_precise_t precise; /**< float or int for precise value */
             struct {
                 lv_style_value_t style; /**< Make sure it's the first element in struct. */
                 uint32_t selector;      /**< Style selector, lv_part_t | lv_state_t */
@@ -34,8 +34,8 @@ Set :c:macro:`LV_USE_OBJ_PROPERTY_NAME` to `1` in order to use property name ins
         };
     } lv_property_t;
 
-    lv_result_t lv_obj_set_property(lv_obj_t * obj, const lv_property_t * value);
-    lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id);
+    lv_result_t lv_obj_set_property(lv_obj_t * widget, const lv_property_t * value);
+    lv_property_t lv_obj_get_property(lv_obj_t * widget, lv_prop_id_t id);
 
     lv_prop_id_t lv_obj_property_get_id(const lv_obj_class_t * clz, const char * name);
 
@@ -86,4 +86,4 @@ all properties to an array now and set properties with a for loop.
         { .id = LV_STYLE_BG_COLOR, .color = (lv_color_t){.red = 0x11, .green = 0x22, .blue = 0x33}, },
     }
 
-    LV_OBJ_SET_PROPERTY_ARRAY(obj, props);
+    LV_OBJ_SET_PROPERTY_ARRAY(widget, props);

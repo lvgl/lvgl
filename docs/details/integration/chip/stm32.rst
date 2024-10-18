@@ -19,9 +19,9 @@ Including LVGL in a Project
   navigating to **C/C++ Build** -> **Settings** -> **Include paths**, and
   ensuring that the LVGL directory is listed.
 
-Now that the source files are included in your project, follow the
-instructions for `Porting <https://docs.lvgl.io/master/porting/project.html>`_ your
-project to create the ``lv_conf.h`` file, and initialise the display.
+Now that the source files are included in your project, follow the instructions to
+:ref:`add_lvgl_to_your_project` and to create the ``lv_conf.h`` file, and
+initialise the display.
 
 
 Bare Metal Example
@@ -39,7 +39,7 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
    /* Frame buffers
     * Static or global buffer(s). The second buffer is optional
     * TODO: Adjust color format and choose buffer size. DISPLAY_WIDTH * 10 is one suggestion. */
-   #define BYTES_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /*will be 2 for RGB565 */
+   #define BYTES_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /* will be 2 for RGB565 */
    #define BUFF_SIZE (DISPLAY_WIDTH * 10 * BYTES_PER_PIXEL)
    static uint8_t buf_1[BUFF_SIZE];
    static uint8_t buf_2[BUFF_SIZE];
@@ -55,15 +55,15 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
         //Initialise LVGL UI library
         lv_init();
 
-        lv_display_t * disp = lv_display_create(WIDTH, HEIGHT); /*Basic initialization with horizontal and vertical resolution in pixels*/
-        lv_display_set_flush_cb(disp, my_flush_cb); /*Set a flush callback to draw to the display*/
-        lv_display_set_buffers(disp, buf_1, buf_2, sizeof(buf_1), LV_DISPLAY_RENDER_MODE_PARTIAL); /*Set an initialized buffer*/
+        lv_display_t * disp = lv_display_create(WIDTH, HEIGHT); /* Basic initialization with horizontal and vertical resolution in pixels */
+        lv_display_set_flush_cb(disp, my_flush_cb); /* Set a flush callback to draw to the display */
+        lv_display_set_buffers(disp, buf_1, buf_2, sizeof(buf_1), LV_DISPLAY_RENDER_MODE_PARTIAL); /* Set an initialized buffer */
 
-- Create some dummy objects to test the output:
+- Create some dummy Widgets to test the output:
 
     .. code-block:: c
 
-        /* Change the active screen's background color */
+        /* Change Active Screen's background color */
         lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x003a57), LV_PART_MAIN);
         lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(0xffffff), LV_PART_MAIN);
 
@@ -138,7 +138,7 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
           HAL_GPIO_WritePin(CS_PORT, CS_PIN, GPIO_PIN_SET);
 
           /* IMPORTANT!!!
-           * Inform the graphics library that you are ready with the flushing*/
+           * Inform the graphics library that you are ready with the flushing */
           lv_display_flush_ready(disp);
       }
 
@@ -148,7 +148,7 @@ FreeRTOS Example
 
 A minimal example using STM32CubeIDE, HAL, and CMSISv1 (FreeRTOS).
 *Note that we have not used Mutexes in this example, however LVGL is* **NOT**
-*thread safe and so Mutexes should be used*. See: :ref:`os_interrupt`
+*thread safe and so Mutexes should be used*. See: :ref:`os`
 \* ``#include "lvgl.h"`` \* Create your frame buffer(s) as global variables:
 
 .. code-block:: c
@@ -178,11 +178,11 @@ A minimal example using STM32CubeIDE, HAL, and CMSISv1 (FreeRTOS).
    /* Register the touch controller with LVGL - Not included here for brevity. */
 
 
-- Create some dummy objects to test the output:
+- Create some dummy Widgets to test the output:
 
   .. code-block:: c
 
-    /* Change the active screen's background color */
+    /* Change Active Screen's background color */
     lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x003a57), LV_PART_MAIN);
     lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(0xffffff), LV_PART_MAIN);
 
@@ -266,7 +266,7 @@ A minimal example using STM32CubeIDE, HAL, and CMSISv1 (FreeRTOS).
      HAL_GPIO_WritePin(CS_PORT, CS_PIN, GPIO_PIN_SET);
 
      /* IMPORTANT!!!
-      * Inform the graphics library that you are ready with the flushing*/
+      * Inform the graphics library that you are ready with the flushing */
      lv_display_flush_ready(display);
    }
 

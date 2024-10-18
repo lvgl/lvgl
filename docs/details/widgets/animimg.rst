@@ -7,9 +7,9 @@ Animation Image (lv_animimg)
 Overview
 ********
 
-The animation image is similar to the normal 'Image' object. The only
+The animation image is similar to the normal 'Image' Widget. The only
 difference is that instead of one source image, you set an array of
-multiple source images.
+multiple source images that supply "frames" in an animation.
 
 You can specify a duration and repeat count.
 
@@ -38,7 +38,7 @@ Using the inner animation
 
 For more advanced use cases, the animation internally used by the image can be
 retrieved using the :cpp:expr:`lv_animimg_get_anim(image)`. This way, the
-:ref:`Animation <animations>` functions can be used, for example to
+:ref:`Animation <animation>` functions can be used, for example to
 override the animation values using the
 :cpp:expr:`lv_anim_set_values(anim, start, end)` or to set a callback
 on the animation completed event.
@@ -48,29 +48,37 @@ on the animation completed event.
 Events
 ******
 
-No special events are sent by image objects.
+No special events are sent by image Widgets.
 
-See the events of the Base object too.
+.. admonition:: Further Reading:
 
-Learn more about :ref:`events`.
+    Events of Base Widget.
+
+    Learn more about :ref:`events`.
+
 
 .. _lv_animimg_keys:
 
 Keys
 ****
 
-No Keys are processed by the object type.
+No Keys are processed by this Widget.
 
-Learn more about :ref:`indev_keys`.
+.. admonition:: Further Reading:
+
+    Learn more about :ref:`indev_keys`.
+
 
 .. _lv_animimg_example:
+
 
 Example
 *******
 
-.. include:: ../examples/widgets/animimg/index.rst
+.. include:: ../../examples/widgets/animimg/index.rst
 
 .. _lv_animimg_api:
+
 
 API
 ***

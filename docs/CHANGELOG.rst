@@ -1,24 +1,24 @@
 .. _changelog:
 
-Changelog
-=========
+Change Log
+==========
 
 `v9.2 <https://github.com/lvgl/lvgl/compare/v9.1.0...v9.2.0>`__ 26 August 2024
 ------------------------------------------------------------------------------
 
 It's huge release with many interesting updates:
 
-- Built-in `Wayland driver <https://docs.lvgl.io/master/integration/driver/wayland.html>`__
-- `OpenGL ES and GLFW driver <https://docs.lvgl.io/master/integration/driver/opengles.html>`__ with support for external textures
-- `Renesas GLCDC <https://docs.lvgl.io/master/integration/driver/display/renesas_glcdc.html>`__ driver
+- Built-in :ref:`Wayland driver <wayland_driver>`
+- :ref:`OpenGL ES and GLFW driver <opengl_es_driver>` with support for external textures
+- :ref:`renesas_glcdc` driver
 - L8 and I1 rendering support
 - Matrix transformations during rendering
-- New `file system interfaces <https://docs.lvgl.io/master/libs/fs.html>`__: LittleFS, ESP LittleFS, Arduino FS
+- New :ref:`file system interfaces <libs_filesystem>`: LittleFS, ESP LittleFS, Arduino FS
 - SDL renderer improvements (supporting all draw task types and improving speed)
-- Radial, Conic, and Skew `gradients supported <https://docs.lvgl.io/master/overview/style.html#metallic-knob-with-conic-gradient>`__ by software rendering and VG-Lite
-- `QNX <https://docs.lvgl.io/master/integration/os/qnx.html>`__ and `MQX <https://docs.lvgl.io/master/integration/os/mqx.html>`__ support
-- `Mouse hover handling <https://docs.lvgl.io/master/get-started/quick-overview.html>`__
-- `Lottie <https://docs.lvgl.io/master/widgets/lottie.html>`__ support
+- Radial, Conic, and Skew `gradients supported <https://docs.lvgl.io/master/details/base-widget/styles/style.html#metallic-knob-with-conic-gradient>`__ by software rendering and VG-Lite
+- :ref:`qnx` and :ref:`mqx` support
+- :ref:`Mouse hover handling <styles_states>`
+- :ref:`lv_lottie` support
 - CI tests for UEFI builds
 
 And many smaller fixes and features

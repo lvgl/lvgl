@@ -78,10 +78,10 @@ The draw function can draw to any color format to which LVGL can render. Typical
 Events
 ******
 
-No special events are sent by canvas objects. The same events are sent
+No special events are sent by canvas Widgets. The same events are sent
 as for the
 
-See the events of the :ref:`lv_image` too.
+See also:  events of :ref:`lv_image`.
 
 Learn more about :ref:`events`.
 
@@ -90,7 +90,7 @@ Learn more about :ref:`events`.
 Keys
 ****
 
-No *Keys* are processed by the object type.
+No *Keys* are processed by the Widget type.
 
 Learn more about :ref:`indev_keys`.
 
@@ -99,7 +99,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/canvas/index.rst
+.. include:: ../../examples/widgets/canvas/index.rst
 
 .. _lv_canvas_api:
 

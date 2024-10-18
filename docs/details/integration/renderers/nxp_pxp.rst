@@ -3,7 +3,7 @@ NXP PXP GPU
 ===========
 
 API
----
+***
 
 :ref:`lv_draw_pxp_h`
 

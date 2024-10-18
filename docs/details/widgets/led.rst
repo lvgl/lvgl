@@ -7,7 +7,7 @@ LED (lv_led)
 Overview
 ********
 
-The LEDs are rectangle-like (or circle) object whose brightness can be
+The LEDs are rectangle-like (or circle) Widget whose brightness can be
 adjusted. With lower brightness the colors of the LED become darker.
 
 .. _lv_led_parts_and_styles:
@@ -47,7 +47,7 @@ the ON and OFF state.
 Events
 ******
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See also:  events of :ref:`Base Widget <lv_obj>`.
 
 Learn more about :ref:`events`.
 
@@ -56,7 +56,7 @@ Learn more about :ref:`events`.
 Keys
 ****
 
-No *Keys* are processed by the object type.
+No *Keys* are processed by the Widget type.
 
 Learn more about :ref:`indev_keys`.
 
@@ -65,7 +65,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/led/index.rst
+.. include:: ../../examples/widgets/led/index.rst
 
 .. _lv_led_api:
 

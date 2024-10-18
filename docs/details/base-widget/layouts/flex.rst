@@ -14,8 +14,8 @@ adjust the spacing between the items and tracks, handle *grow* to make
 the item(s) fill the remaining space with respect to min/max width and
 height.
 
-To make an object flex container call
-:cpp:expr:`lv_obj_set_layout(obj, LV_LAYOUT_FLEX)`.
+To make a Widget flex container call
+:cpp:expr:`lv_obj_set_layout(widget, LV_LAYOUT_FLEX)`.
 
 Note that the flex layout feature of LVGL needs to be globally enabled
 with :c:macro:`LV_USE_FLEX` in ``lv_conf.h``.
@@ -43,7 +43,7 @@ With the following functions you can set a Flex layout on any parent.
 Flex flow
 ---------
 
-:cpp:expr:`lv_obj_set_flex_flow(obj, flex_flow)`
+:cpp:expr:`lv_obj_set_flex_flow(widget, flex_flow)`
 
 The possible values for ``flex_flow`` are:
 
@@ -62,7 +62,7 @@ Flex align
 ----------
 
 To manage the placement of the children use
-:cpp:expr:`lv_obj_set_flex_align(obj,  main_place, cross_place, track_cross_place)`
+:cpp:expr:`lv_obj_set_flex_align(widget,  main_place, cross_place, track_cross_place)`
 
 -  ``main_place`` determines how to distribute the items in their track
    on the main axis. E.g. flush the items to the right on :cpp:enumerator:`LV_FLEX_FLOW_ROW_WRAP`. (It's called
@@ -99,7 +99,7 @@ Flex grow
 Flex grow can be used to make one or more children fill the available
 space on the track. When more children have grow parameters, the
 available space will be distributed proportionally to the grow values.
-For example, there is 400 px remaining space and 4 objects with grow: 
+For example, there is 400 px remaining space and 4 Widgets with grow:
 
 - ``A`` with grow = 1
 - ``B`` with grow = 1
@@ -132,7 +132,7 @@ The following flex related style properties exist:
 Internal padding
 ----------------
 
-To modify the minimum space flexbox inserts between objects, the
+To modify the minimum space flexbox inserts between Widgets, the
 following properties can be set on the flex container style:
 
 -  ``pad_row`` Sets the padding between the rows.
@@ -140,7 +140,7 @@ following properties can be set on the flex container style:
 -  ``pad_column`` Sets the padding between the columns.
 
 These can for example be used if you don't want any padding between your
-objects: :cpp:expr:`lv_style_set_pad_column(&row_container_style,0)`
+Widgets: :cpp:expr:`lv_style_set_pad_column(&row_container_style,0)`
 
 .. _flex_other:
 
@@ -170,7 +170,7 @@ You can force Flex to put an item into a new line with
 Example
 *******
 
-.. include:: ../examples/layouts/flex/index.rst
+.. include:: ../../../examples/layouts/flex/index.rst
 
 .. _flex_api:
 

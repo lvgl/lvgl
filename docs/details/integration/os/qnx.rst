@@ -1,9 +1,11 @@
+.. _qnx:
+
 ===
 QNX
 ===
 
 What is QNX?
-------------
+************
 
 QNX is a commercial operating system first released in 1980. The operating
 system is based on a micro-kernel design, with the file system(s), network
@@ -13,7 +15,7 @@ address space.
 See www.qnx.com for more details.
 
 Highlight of QNX
-~~~~~~~~~~~~~~~~
+----------------
 
 - 64-bit only, runs on x86_64 and ARMv8
 - Requires an MMU as the design mandates separation among processes
@@ -24,14 +26,14 @@ Highlight of QNX
 - Safety certification to various automotive, industrial and medical standards
 
 How to run LVGL on QNX?
------------------------
+***********************
 
 There are two ways to use LVGL in your QNX project. The first is similar to how
 LVGL is used on other systems. The second is to build LVGL as either a shared or
 a static library.
 
 Include LVGL in Your Project
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 Follow the generic instructions for getting started with LVGL. After copying
 `lv_conf_template.h` to  `lv_conf.h` make the following changes to the latter:
@@ -55,7 +57,7 @@ Follow the generic instructions for getting started with LVGL. After copying
     #define LV_QNX_BUF_COUNT 2
 
 Build LVGL as a Library
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 **Note that this method is an alternative to including LVGL in your project. If
 you choose to build a library then you do not need to follow the instructions in
@@ -88,7 +90,7 @@ Before building the library, you may wish to edit
 double-buffering.
 
 Writing a LVGL Application
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 
 To create a LVGL application for QNX, follow these steps in your code:
 
@@ -134,7 +136,7 @@ The following code shows how to create a "Hello World" application:
     }
 
 Build the Application
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 Building the application consists of compiling the source with the LVGL headers,
 and then linking against the library. This can be done in many ways, using

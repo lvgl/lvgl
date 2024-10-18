@@ -105,7 +105,7 @@ The different "json_types" are as follows:
     - ``"name"``: The name of the function pointer.
     - ``"type"``: This contains the return type information for the function pointer.
     - ``"docstring"``: you should know what this is.
-    - ``"args"``: array of ``"arg"`` objects. This describes the fuction arguments/parameters.
+    - ``"args"``: array of ``"arg"`` Widgets. This describes the fuction arguments/parameters.
     - ``"quals"``: array of qualifiers, IE "const"
 
 
@@ -144,7 +144,7 @@ The different "json_types" are as follows:
       type as the type for the members of this enumeration group. Check the
       enumeration members type to get the correct type.
     - ``"docstring"``: you should know what this is.
-    - ``"members"``: array of ``"enum_member"`` objects
+    - ``"members"``: array of ``"enum_member"`` Widgets
 
 
 - ``"enum_member"``: Describes an enumeration item/member. Only found under

@@ -1,9 +1,12 @@
-================
-Set up a project
-================
+.. _setting-up-your-project:
 
-Get the library
----------------
+=======================
+Setting Up Your Project
+=======================
+
+
+Get LVGL
+--------
 
 LVGL is available on GitHub: https://github.com/lvgl/lvgl.
 
@@ -11,19 +14,40 @@ You can clone it or
 `Download <https://github.com/lvgl/lvgl/archive/refs/heads/master.zip>`__
 the latest version of the library from GitHub.
 
-Add lvgl to your project
+
+.. add_lvgl_to_your_project
+
+Add LVGL to your project
 ------------------------
 
-The graphics library itself is the ``lvgl`` directory. It contains a
-couple of folders but to use ``lvgl`` you only need the ``.c`` and ``.h``
-files in the ``src`` folder.
+1.  The graphics library itself is the ``lvgl`` directory. It contains several
+    directories but to use LVGL you only need the ``.c`` and ``.h`` files under
+    the ``src`` directory, plus ``lvgl/lvgl.h``, and ``lvgl/lv_version.h``.  You can
+    add ``lvgl/examples/`` and ``lvgl/demos/`` if you need examples and/or demos.
 
-Automatically add files
-~~~~~~~~~~~~~~~~~~~~~~~
+2.  Copy ``lvgl/lv_conf_template.h`` to ``lv_conf.h`` next to the ``lvgl`` folder.
+    Change the first ``#if 0`` to ``1`` to enable the file's content and set the
+    :c:macro:`LV_COLOR_DEPTH` define to align with the color depth used by your
+    display panel.  See comments in ``lv_conf.h`` for details.
 
-If your IDE automatically adds the files from the folders copied to the
-project folder (as Eclipse or VSCode does), you can simply copy the
-``lvgl`` folder as it is into your project.
+3.  Initialize LVGL once early during system execution by doing the following in
+    this order:
+
+    - Call :cpp:func:`lv_init`.
+    - Initialize your drivers.
+    - Create display(s), register buffer-flush callback, and set draw buffers.
+      See :ref:`display` for how to do this.
+    - Create and configure any input devices.
+      See :ref:`indev` for how to do this.
+    - Optionally set a theme with :cpp:func:`lv_display_set_theme`.
+
+4.  Supply LVGL with time awareness.  See :ref:`tick` for two ways to do this.
+
+5.  Ensure :cpp:func:`lv_timer_handler` gets called every few milliseconds to manage
+    LVGL timers.  See :ref:`timer_handler` for different ways to do this.
+
+6.  #include "lvgl/lvgl.h" in source files wherever you need to use LVGL functions.
+
 
 Make and CMake
 ~~~~~~~~~~~~~~
@@ -34,59 +58,56 @@ main Makefile:
 
 .. code-block:: make
 
-   LVGL_DIR_NAME ?= lvgl     #The name of the lvgl folder (change this if you have renamed it)
-   LVGL_DIR ?= ${shell pwd}  #The path where the lvgl folder is
-   include $(LVGL_DIR)/$(LVGL_DIR_NAME)/lvgl.mk
+    LVGL_DIR_NAME ?= lvgl     #The name of the lvgl folder (change this if you have renamed it)
+    LVGL_DIR ?= ${shell pwd}  #The path where the lvgl folder is
+    include $(LVGL_DIR)/$(LVGL_DIR_NAME)/lvgl.mk
 
 For integration with CMake take a look this section of the
-`Documentation <integration/build/cmake>`__.
+:ref:`Documentation <build_cmake>`.
+
 
 Other platforms and tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The `Get started <integration/index>`__ section contains many platform
-specific descriptions e.g. for ESP32, Arduino, NXP, RT-Thread, NuttX,
-etc.
+The :ref:`Integration <integration_index>` section contains many platform-specific
+descriptions e.g. for ESP32, Arduino, NXP, RT-Thread, NuttX, etc.
+
 
 Demos and Examples
 ~~~~~~~~~~~~~~~~~~
 
-The ``lvgl`` folder also contains an ``examples`` and a ``demos``
-folder. If you needed to add the source files manually to your project,
-you can do the same with the source files of these two folders too.
-``make`` and ``CMake`` handles the examples and demos, so no extra
-action required in these cases.
+The ``lvgl`` directory also contains an ``examples`` and a ``demos``
+directory.  If your project needs examples and/or demos, add the these
+directories to your project.  If ``make`` or ``CMake`` handle the
+examples and demos directories, no extra action is required.
+
 
 Configuration file
 ------------------
 
 There is a configuration header file for LVGL called **lv_conf.h**. You
-can modify this header to set the library's basic behavior, disable unused
-modules and features, adjust the size of buffers in compile-time,
-etc.
+can modify this header to set the library's behavior, disable unused
+modules and features, adjust the size of buffers, etc.
 
-To get ``lv_conf.h`` **copy lvgl/lv_conf_template.h** next to the
-``lvgl`` directory and rename it to *lv_conf.h*. Open the file and
-change the ``#if 0`` at the beginning to ``#if 1`` to enable its
-content. So the layout of the files should look like this:
+To get ``lv_conf.h``, follow the steps in #2 above.
+The layout of the files should look like this:
 
 ::
 
-   |-lvgl
-   |-lv_conf.h
-   |-other files and folders
+    lvgl/
+    lv_conf.h
+    other files and folders in your project
 
-Comments in the config file explain the meaning of the options. Be sure
-to set at least :c:macro:`LV_COLOR_DEPTH` according to your display's color
-depth. Note that, the examples and demos explicitly need to be enabled
-in ``lv_conf.h``.
+The comments in ``lv_conf.h`` explain the meaning of each setting.  Be sure
+to at least set :c:macro:`LV_COLOR_DEPTH` according to your display's color
+depth.  Note that the examples and demos explicitly need to be enabled
+in ``lv_conf.h`` if you need them.
 
 Alternatively, ``lv_conf.h`` can be copied to another place but then you
 should add the :c:macro:`LV_CONF_INCLUDE_SIMPLE` define to your compiler
 options (e.g. ``-DLV_CONF_INCLUDE_SIMPLE`` for GCC compiler) and set the
 include path manually (e.g. ``-I../include/gui``). In this case LVGL
-will attempt to include ``lv_conf.h`` simply with
-``#include "lv_conf.h"``.
+will attempt to include ``lv_conf.h`` simply with ``#include "lv_conf.h"``.
 
 You can even use a different name for ``lv_conf.h``. The custom path can
 be set via the :c:macro:`LV_CONF_PATH` define. For example
@@ -95,45 +116,30 @@ is set :c:macro:`LV_CONF_SKIP` is assumed to be ``0``.
 
 If :c:macro:`LV_CONF_SKIP` is defined, LVGL will not try to include
 ``lv_conf.h``. Instead you can pass the config defines using build
-options. For example ``"-DLV_COLOR_DEPTH=32 -DLV_USE_BUTTON=1"``. The unset
+options. For example ``"-DLV_COLOR_DEPTH=32 -DLV_USE_BUTTON=1"``.  Unset
 options will get a default value which is the same as the content of
 ``lv_conf_template.h``.
 
 LVGL also can be used via ``Kconfig`` and ``menuconfig``. You can use
-``lv_conf.h`` together with Kconfig too, but keep in mind that the value
-from ``lv_conf.h`` or build settings (``-D...``) overwrite the values
+``lv_conf.h`` together with Kconfig as well, but keep in mind that the values
+from ``lv_conf.h`` or build settings (``-D...``) override the values
 set in Kconfig. To ignore the configs from ``lv_conf.h`` simply remove
 its content, or define :c:macro:`LV_CONF_SKIP`.
 
 To enable multi-instance feature, set :c:macro:`LV_GLOBAL_CUSTOM` in
 ``lv_conf.h`` and provide a custom function to
 :cpp:func:`lv_global_default` using ``__thread`` or ``pthread_key_t``.
-It will allow running multiple LVGL instances by storing the global variables
-in TLS (Thread Local Storage).
+It will allow running multiple LVGL instances by storing LVGL's global variables
+in TLS (Thread-Local Storage).
 
 For example:
 
 .. code-block:: c
 
-   lv_global_t * lv_global_default(void)
-   {
-     static __thread lv_global_t lv_global;
-     return &lv_global;
-   }
+    lv_global_t * lv_global_default(void)
+    {
+        static __thread lv_global_t lv_global;
+        return &lv_global;
+    }
 
 
-Initialization
---------------
-
-To use the graphics library you have to initialize it and setup required
-components. The order of the initialization is:
-
-1. Call :cpp:func:`lv_init`.
-2. Initialize your drivers.
-3. Register the display and input devices drivers in LVGL. Learn more
-   about `Display <porting/display>`__ and `Input
-   device <porting/indev>`__ registration.
-4. Call :cpp:expr:`lv_tick_inc(x)` every ``x`` milliseconds in an interrupt to
-   report the elapsed time to LVGL. `Learn more <porting/tick>`__.
-5. Call :cpp:func:`lv_timer_handler` every few milliseconds to handle LVGL
-   related tasks. `Learn more <porting/timer-handler>`__.

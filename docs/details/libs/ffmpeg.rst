@@ -43,7 +43,7 @@ See the examples below.
 Example
 -------
 
-.. include:: ../examples/libs/ffmpeg/index.rst
+.. include:: ../../examples/libs/ffmpeg/index.rst
 
 .. _ffmpeg_api:
 

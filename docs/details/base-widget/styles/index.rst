@@ -7,5 +7,5 @@ Styles
 .. toctree::
     :maxdepth: 2
 
-    style-details.rst
-    style-props
+    style
+    style-properties

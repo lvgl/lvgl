@@ -11,7 +11,7 @@ Detailed introduction: https://github.com/lecram/gifdec
 When enabled in ``lv_conf.h`` with :c:macro:`LV_USE_GIF`
 :cpp:expr:`lv_gif_create(parent)` can be used to create a gif widget.
 
-:cpp:expr:`lv_gif_set_src(obj, src)` works very similarly to :cpp:func:`lv_image_set_src`.
+:cpp:expr:`lv_gif_set_src(widget, src)` works very similarly to :cpp:func:`lv_image_set_src`.
 As source, it also accepts images as variables (:c:struct:`lv_image_dsc_t`) or
 files.
 
@@ -29,7 +29,7 @@ For example:
 
 .. code-block:: c
 
-   lv_gif_set_src(obj, "S:path/to/example.gif");
+   lv_gif_set_src(widget, "S:path/to/example.gif");
 
 Note that, a file system driver needs to be registered to open images
 from files. Read more about it :ref:`overview_file_system` or just
@@ -50,7 +50,7 @@ required:
 Example
 -------
 
-.. include:: ../examples/libs/gif/index.rst
+.. include:: ../../examples/libs/gif/index.rst
 
 .. _gif_api:
 

@@ -10,13 +10,13 @@ Overview
 Tables, as usual, are built from rows, columns, and cells containing
 texts.
 
-The Table object is very lightweight because only the texts are stored.
-No real objects are created for cells but they are just drawn on the
+The Table Widget is very lightweight because only the texts are stored.
+No real Widgets are created for cells but they are just drawn on the
 fly.
 
 The Table is added to the default group (if it is set). Besides the
-Table is an editable object to allow selecting a cell with encoder
-navigation too.
+Table is an editable Widget to allow selecting a cell with encoder
+navigation as well.
 
 .. _lv_table_parts_and_styles:
 
@@ -58,7 +58,7 @@ Width and Height
 
 The width of the columns can be set with
 :cpp:expr:`lv_table_set_column_width(table, col_id, width)`. The overall width of
-the Table object will be set to the sum of columns widths.
+the Table Widget will be set to the sum of columns widths.
 
 The height is calculated automatically from the cell styles (font,
 padding etc) and the number of rows.
@@ -89,7 +89,7 @@ Events
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when a new cell is selected with
    keys.
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See also:  events of :ref:`Base Widget <lv_obj>`.
 
 Learn more about :ref:`events`.
 
@@ -115,7 +115,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/table/index.rst
+.. include:: ../../examples/widgets/table/index.rst
 
 MicroPython
 -----------

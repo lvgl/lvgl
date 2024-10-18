@@ -1,18 +1,16 @@
-.. _porting:
+.. _add_lvgl_to_your_project:
 
-=======
-Porting
-=======
-
+========================
+Add LVGL to Your Project
+========================
 
 .. toctree::
     :maxdepth: 2
 
-    display
-    draw
-    indev
-    os
     project
-    sleep
     tick
     timer_handler
+    sleep
+    os
+    draw
+

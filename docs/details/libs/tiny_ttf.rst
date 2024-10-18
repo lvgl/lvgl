@@ -43,7 +43,7 @@ if supported, or disable.
 Example
 -------
 
-.. include:: ../examples/libs/tiny_ttf/index.rst
+.. include:: ../../examples/libs/tiny_ttf/index.rst
 
 .. _tiny_ttf_api:
 

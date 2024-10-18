@@ -7,8 +7,8 @@ Image (lv_image)
 Overview
 ********
 
-Images are the basic object to display images from flash (as arrays) or
-from files. Images can display symbols (``LV_SYMBOL_...``) too.
+Images are the basic Widget to display images from flash (as arrays) or
+from files. Images can display symbols (``LV_SYMBOL_...``) as well.
 
 Using the :ref:`Image decoder interface <overview_image_decoder>` custom image formats
 can be supported as well.
@@ -41,7 +41,7 @@ To set the source of an image, use :cpp:expr:`lv_image_set_src(img, src)`.
 To generate a pixel array from a PNG, JPG or BMP image, use the `Online image converter tool <https://lvgl.io/tools/imageconverter>`__
 and set the converted image with its pointer  :cpp:expr:`lv_image_set_src(img1, &converted_img_var)`
 To make the variable visible in the C file, you need to declare it with
-:c:macro:`LV_IMAGE_DECLARE(converted_img_var)`.
+:cpp:expr:`LV_IMAGE_DECLARE(converted_img_var)`.
 
 To use external files, you also need to convert the image files using
 the online converter tool but now you should select the binary output
@@ -104,9 +104,9 @@ Offset
 
 With :cpp:expr:`lv_image_set_offset_x(img, x_ofs)` and
 :cpp:expr:`lv_image_set_offset_y(img, y_ofs)`, you can add some offset to the
-displayed image. Useful if the object size is smaller than the image
+displayed image. Useful if the Widget size is smaller than the image
 source size. Using the offset parameter a `Texture atlas <https://en.wikipedia.org/wiki/Texture_atlas>`__
-or a "running image" effect can be created by :ref:`Animating <animations>` the x or y offset.
+or a "running image" effect can be created by :ref:`Animating <animation>` the x or y offset.
 
 Transformations
 ---------------
@@ -138,7 +138,7 @@ In other words transformations work only on normal (A)RGB or A8 images stored as
 C array, or if a custom :ref:`overview_image_decoder`
 returns the whole image.
 
-Note that the real coordinates of image objects won't change during
+Note that the real coordinates of image Widgets won't change during
 transformation. That is :cpp:expr:`lv_obj_get_width/height/x/y()` will return
 the original, non-zoomed coordinates.
 
@@ -190,9 +190,9 @@ The alignment can be set by :cpp:func:`lv_image_set_inner_align`
 Events
 ******
 
-No special events are sent by image objects.
+No special events are sent by image Widgets.
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See also:  events of :ref:`Base Widget <lv_obj>`.
 
 Learn more about :ref:`events`.
 
@@ -201,7 +201,7 @@ Learn more about :ref:`events`.
 Keys
 ****
 
-No *Keys* are processed by the object type.
+No *Keys* are processed by the Widget type.
 
 Learn more about :ref:`indev_keys`.
 
@@ -210,7 +210,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/image/index.rst
+.. include:: ../../examples/widgets/image/index.rst
 
 .. _lv_image_api:
 

@@ -56,7 +56,8 @@ Labels on major ticks can be configured with :cpp:expr:`lv_scale_set_label_show(
 set `show_label` to true if labels should be drawn, :cpp:expr:`false` to hide them.
 If instead of a numerical value in the major ticks a text is required they can be set
 with :cpp:expr:`lv_scale_set_text_src(scale, custom_labels)` using ``NULL`` as the last element,
-i.e. :cpp:expr:`static char * custom_labels[3] = {"One", "Two", NULL};`.
+i.e. ``static char * custom_labels[3] = {"One", "Two", NULL}``.
+
 It's possible to have the labels automatically rotated to match the ticks (only for RADIAL scales) using
 :cpp:expr:`lv_obj_set_style_transform_rotation(scale, LV_SCALE_LABEL_ROTATE_MATCH_TICKS, LV_PART_INDICATOR);`
 Or rotated a fixed amount (on any scale type) - here for 20 degrees:
@@ -70,9 +71,12 @@ Labels that would be upside down are then rotated 180
 Labels can also be moved a fixed distance in X and Y using e.g.
 :cpp:expr:`lv_obj_set_style_translate_x(scale, 10, LV_PART_INDICATOR);`
 
-**NOTE:** The major tick value is calculated with the :cpp:expr:`lv_map` API (when not setting the custom labels),
-this calculation takes into consideration the total tick number and the scale range, so the label drawn can present rounding errors
-when the calculated value is a float number.
+.. note::
+
+    The major tick value is calculated with the :cpp:expr:`lv_map` API (when not
+    setting custom labels), this calculation takes into consideration the total
+    number of ticks and the scale range, so the label drawn can present rounding
+    errors when the calculated value is a float number.
 
 The length of the ticks can be configured with the length style property on the :cpp:enumerator:`LV_PART_INDICATOR`
 for major ticks and :cpp:enumerator:`LV_PART_ITEMS` for minor ticks, for example with local style:
@@ -124,7 +128,7 @@ No keys supported by this widget.
 Example
 *******
 
-.. include:: ../examples/widgets/scale/index.rst
+.. include:: ../../examples/widgets/scale/index.rst
 
 .. _lv_scale_api:
 

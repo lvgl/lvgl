@@ -1,8 +1,8 @@
 .. _overview_image:
 
-======
-Images
-======
+=================
+Images (lv_image)
+=================
 
 An image can be a file or a variable which stores the bitmap itself and
 some metadata.
@@ -146,27 +146,27 @@ variable to display it using LVGL. For example:
        .header.w = 80,
        .header.h = 60,
        .data_size = 80 * 60 * LV_COLOR_DEPTH / 8,
-       .header.cf = LV_COLOR_FORMAT_NATIVE,          /*Set the color format*/
+       .header.cf = LV_COLOR_FORMAT_NATIVE,          /* Set the color format */
        .data = my_img_data,
    };
 
 Another (possibly simpler) option to create and display an image at
-run-time is to use the :ref:`Canvas <lv_canvas>` object.
+run-time is to use the :ref:`Canvas <lv_canvas>` Widget.
 
 Use images
 ----------
 
 The simplest way to use an image in LVGL is to display it with an
-:ref:`lv_image` object:
+:ref:`lv_image` Widget:
 
 .. code-block:: c
 
    lv_obj_t * icon = lv_image_create(lv_screen_active(), NULL);
 
-   /*From variable*/
+   /* From variable */
    lv_image_set_src(icon, &my_icon_dsc);
 
-   /*From file*/
+   /* From file */
    lv_image_set_src(icon, "S:my_icon.bin");
 
 If the image was converted with the online converter, you should use
@@ -240,7 +240,7 @@ open/close the PNG files. It should look like this:
 
 .. code-block:: c
 
-   /*Create a new decoder and register functions */
+   /* Create a new decoder and register functions */
    lv_image_decoder_t * dec = lv_image_decoder_create();
    lv_image_decoder_set_info_cb(dec, decoder_info);
    lv_image_decoder_set_open_cb(dec, decoder_open);
@@ -257,7 +257,7 @@ open/close the PNG files. It should look like this:
     */
    static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
    {
-     /*Check whether the type `src` is known by the decoder*/
+     /* Check whether the type `src` is known by the decoder */
      if(is_png(src) == false) return LV_RESULT_INVALID;
 
      /* Read the PNG header and find `width` and `height` */
@@ -276,18 +276,18 @@ open/close the PNG files. It should look like this:
     */
    static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
    {
-     (void) decoder; /*Unused*/
+     (void) decoder; /* Unused */
 
-     /*Check whether the type `src` is known by the decoder*/
+     /* Check whether the type `src` is known by the decoder */
      if(is_png(dsc->src) == false) return LV_RESULT_INVALID;
 
-     /*Decode and store the image. If `dsc->decoded` is `NULL`, the `decoder_get_area` function will be called to get the image data line-by-line*/
+     /* Decode and store the image. If `dsc->decoded` is `NULL`, the `decoder_get_area` function will be called to get the image data line-by-line */
      dsc->decoded = my_png_decoder(dsc->src);
 
-     /*Change the color format if decoded image format is different than original format. For PNG it's usually decoded to ARGB8888 format*/
+     /* Change the color format if decoded image format is different than original format. For PNG it's usually decoded to ARGB8888 format */
      dsc->decoded.header.cf = LV_COLOR_FORMAT_...
 
-     /*Call a binary image decoder function if required. It's not required if `my_png_decoder` opened the image in true color format.*/
+     /* Call a binary image decoder function if required. It's not required if `my_png_decoder` opened the image in true color format. */
      lv_result_t res = lv_bin_decoder_open(decoder, dsc);
 
      return res;
@@ -359,13 +359,13 @@ open/close the PNG files. It should look like this:
     */
    static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
    {
-     /*Free all allocated data*/
+     /* Free all allocated data */
      my_png_cleanup();
 
      my_decoder_data_t * my_decoder_data = dsc->user_data;
      lv_draw_buf_destroy(my_decoder_data->partial);
 
-     /*Call the built-in close function if the built-in open/get_area was used*/
+     /* Call the built-in close function if the built-in open/get_area was used */
      lv_bin_decoder_close(decoder, dsc);
 
    }
@@ -390,8 +390,8 @@ Manually use an image decoder
 -----------------------------
 
 LVGL will use registered image decoders automatically if you try and
-draw a raw image (i.e. using the ``lv_image`` object) but you can use them
-manually too. Create an :cpp:type:`lv_image_decoder_dsc_t` variable to describe
+draw a raw image (i.e. using the ``lv_image`` Widget) but you can use them
+manually as well. Create an :cpp:type:`lv_image_decoder_dsc_t` variable to describe
 the decoding session and call :cpp:func:`lv_image_decoder_open`.
 
 The ``color`` parameter is used only with ``LV_COLOR_FORMAT_A1/2/4/8``
@@ -402,11 +402,11 @@ images to tell color of the image.
 
    lv_result_t res;
    lv_image_decoder_dsc_t dsc;
-   lv_image_decoder_args_t args = { 0 }; /*Custom decoder behavior via args*/
+   lv_image_decoder_args_t args = { 0 }; /* Custom decoder behavior via args */
    res = lv_image_decoder_open(&dsc, &my_img_dsc, &args);
 
    if(res == LV_RESULT_OK) {
-     /*Do something with `dsc->decoded`. You can copy out the decoded image by `lv_draw_buf_dup(dsc.decoded)`*/
+     /* Do something with `dsc->decoded`. You can copy out the decoded image by `lv_draw_buf_dup(dsc.decoded)`*/
      lv_image_decoder_close(&dsc);
    }
 
@@ -567,7 +567,7 @@ Clean the cache
 ---------------
 
 Let's say you have loaded a PNG image into a :cpp:struct:`lv_image_dsc_t` ``my_png``
-variable and use it in an ``lv_image`` object. If the image is already
+variable and use it in an ``lv_image`` Widget. If the image is already
 cached and you then change the underlying PNG file, you need to notify
 LVGL to cache the image again. Otherwise, there is no easy way of
 detecting that the underlying file changed and LVGL will still draw the
@@ -620,7 +620,7 @@ following code to replace the LVGL built-in cache manager:
 
    void my_cache_init(void)
    {
-    /*Initialize new cache manager.*/
+    /* Initialize new cache manager. */
     lv_cache_manager_t my_manager;
     my_manager.add_cb = my_cache_add_cb;
     my_manager.find_cb = my_cache_find_cb;
@@ -630,7 +630,7 @@ following code to replace the LVGL built-in cache manager:
     my_manager.set_max_size_cb = my_cache_set_max_size_cb;
     my_manager.empty_cb = my_cache_empty_cb;
 
-    /*Replace existing cache manager with the new one.*/
+    /* Replace existing cache manager with the new one. */
     lv_cache_lock();
     lv_cache_set_manager(&my_manager);
     lv_cache_unlock();

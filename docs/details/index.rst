@@ -9,7 +9,7 @@ Reference
 
     configuration/index
     modules/index
-    base-object/index
+    base-widget/index
     widgets/index
     other-components/index
     ../examples

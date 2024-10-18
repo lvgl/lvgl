@@ -1,7 +1,7 @@
 .. _lv_dropdown:
 
 ============================
-Drop-down list (lv_dropdown)
+Drop-Down List (lv_dropdown)
 ============================
 
 Overview
@@ -15,8 +15,8 @@ is created from which the user may select one option. When the user
 selects a new value, the list is deleted again.
 
 The Drop-down list is added to the default group (if it is set). Besides
-the Drop-down list is an editable object to allow selecting an option
-with encoder navigation too.
+the Drop-down list is an editable Widget to allow selecting an option
+with encoder navigation as well.
 
 .. _lv_dropdown_parts_and_styles:
 
@@ -49,7 +49,7 @@ List
    pressed+checked option. Also uses the typical background properties.
 
 The list is hidden/shown on open/close. To add styles to it use
-:cpp:expr:`lv_dropdown_get_list(dropdown)` to get the list object. For example:
+:cpp:expr:`lv_dropdown_get_list(dropdown)` to get the list Widget. For example:
 
 .. code-block:: c
 
@@ -80,7 +80,7 @@ variable.
 The :cpp:expr:`lv_dropdown_add_option(dropdown, "New option", pos)` function
 inserts a new option to ``pos`` index.
 
-To save memory the options can set from a static(constant) string too
+To save memory the options can set from a static(constant) string as well
 with :cpp:expr:`lv_dropdown_set_static_options(dropdown, options)`. In this case
 the options string should be alive while the drop-down list exists and
 :cpp:func:`lv_dropdown_add_option` can't be used
@@ -143,7 +143,7 @@ the drop-down list:
 - :cpp:enumerator:`LV_EVENT_CANCEL` Sent when the list is closed
 - :cpp:enumerator:`LV_EVENT_READY` Sent when the list is opened
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See also:  events of :ref:`Base Widget <lv_obj>`.
 
 Learn more about :ref:`events`.
 
@@ -164,7 +164,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/dropdown/index.rst
+.. include:: ../../examples/widgets/dropdown/index.rst
 
 .. _lv_dropdown_api:
 

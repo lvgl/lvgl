@@ -15,7 +15,7 @@ track's size can be set in pixel, to the largest item
 (:c:macro:`LV_GRID_CONTENT`) or in "Free unit" (FR) to distribute the free
 space proportionally.
 
-To make an object a grid container call :cpp:expr:`lv_obj_set_layout(obj, LV_LAYOUT_GRID)`.
+To make a Widget a grid container call :cpp:expr:`lv_obj_set_layout(widget, LV_LAYOUT_GRID)`.
 
 Note that the grid layout feature of LVGL needs to be globally enabled
 with :c:macro:`LV_USE_GRID` in ``lv_conf.h``.
@@ -47,11 +47,11 @@ For example:
 
 .. code-block:: c
 
-   static int32_t column_dsc[] = {100, 400, LV_GRID_TEMPLATE_LAST};   /*2 columns with 100 and 400 ps width*/
-   static int32_t row_dsc[] = {100, 100, 100, LV_GRID_TEMPLATE_LAST}; /*3 100 px tall rows*/
+   static int32_t column_dsc[] = {100, 400, LV_GRID_TEMPLATE_LAST};   /* 2 columns with 100 and 400 ps width */
+   static int32_t row_dsc[] = {100, 100, 100, LV_GRID_TEMPLATE_LAST}; /* 3 100 px tall rows */
 
 To set the descriptors on a parent use
-:cpp:expr:`lv_obj_set_grid_dsc_array(obj, col_dsc, row_dsc)`.
+:cpp:expr:`lv_obj_set_grid_dsc_array(widget, col_dsc, row_dsc)`.
 
 Besides simple settings the size in pixel you can use two special
 values:
@@ -105,7 +105,7 @@ If there are some empty space the track can be aligned several ways:
   item on the end line. Not applies to ``track_cross_place``.
 
 To set the track's alignment use
-:cpp:expr:`lv_obj_set_grid_align(obj, column_align, row_align)`.
+:cpp:expr:`lv_obj_set_grid_align(widget, column_align, row_align)`.
 
 .. _grid_subgrid:
 
@@ -151,7 +151,7 @@ The following Grid related style properties exist:
 Internal padding
 ----------------
 
-To modify the minimum space Grid inserts between objects, the following
+To modify the minimum space Grid inserts between Widgets, the following
 properties can be set on the Grid container style:
 
 -  ``pad_row`` Sets the padding between the rows.
@@ -176,7 +176,7 @@ The columns will be placed from right to left.
 Example
 *******
 
-.. include:: ../examples/layouts/grid/index.rst
+.. include:: ../../../examples/layouts/grid/index.rst
 
 .. _grid_api:
 

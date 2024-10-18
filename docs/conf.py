@@ -61,7 +61,7 @@ highlight_language = 'c'
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-source_suffix = ['.rst']
+source_suffix = {'.rst': 'restructuredtext'}
 
 
 # The master toctree document.
@@ -78,7 +78,8 @@ author = 'LVGL community'
 # built documents.
 #
 # The short X.Y version.
-# embeddedt: extract using scripts/find_version.sh
+# `version` is extracted from lv_version.h using a cross-platform compatible
+# Python function in build.py, and passed in on `sphinx-build` command line.
 
 version = ''
 
@@ -114,9 +115,12 @@ html_theme = 'sphinx_rtd_theme'
 # documentation.
 #
 
+# Note:  'display_version' option is now obsolete in the current (08-Oct-2024)
+# version of sphinx-rtd-theme (upgraded for Sphinx v8.x).  The removed line is
+# preserved by commenting it out in case it is ever needed again.
 
 html_theme_options = {
-    'display_version': True,
+    # 'display_version': True,
     'prev_next_buttons_location': 'both',
     'style_external_links': False,
     # 'vcs_pageview_mode': '',
@@ -133,7 +137,12 @@ html_theme_options = {
 
 
 # For site map generation
-html_baseurl = f"https://docs.lvgl.io/{os.environ['LVGL_URLPATH']}/"
+if "LVGL_URLPATH" not in os.environ:
+    os.environ['LVGL_URLPATH'] = 'master'
+
+_branch = os.getenv('LVGL_URLPATH')
+html_baseurl = f"https://docs.lvgl.io/{_branch}/"
+
 
 sitemap_url_scheme = "{link}"
 
@@ -141,8 +150,13 @@ sitemap_url_scheme = "{link}"
 
 #extlinks = {'github_link_base': (github_url + '%s', github_url)}
 
+if "LVGL_GITCOMMIT" not in os.environ:
+    os.environ['LVGL_GITCOMMIT'] = 'master'
+
+_git_commit_ref = os.getenv('LVGL_GITCOMMIT')
+
 html_context = {
-    'github_version': os.environ['LVGL_GITCOMMIT'],
+    'github_version': _git_commit_ref,
     'github_user': 'lvgl',
     'github_repo': 'lvgl',
     'display_github': True,
@@ -260,9 +274,15 @@ StandaloneHTMLBuilder.supported_image_types = [
     'image/jpeg'
 ]
 
-smartquotes = False
 
-repo_commit_hash = os.environ['LVGL_GITCOMMIT']
+# Enabling smart quotes action to convert -- to en dashes and --- to em dashes.
+# Converting quotation marks and ellipses is NOT done because the default
+# `smartquotes_action` 'qDe' is changed to just 'D' below, which accomplishes
+# the dash conversions as desired.
+smartquotes = True
+smartquotes_action = 'D'
+
+repo_commit_hash = _git_commit_ref
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
@@ -275,3 +295,5 @@ def setup(app):
     # app.add_transform(AutoStructify)
     app.add_css_file('css/custom.css')
     app.add_css_file('css/fontawesome.min.css')
+
+

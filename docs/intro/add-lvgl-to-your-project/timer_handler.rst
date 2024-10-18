@@ -4,12 +4,16 @@
 Timer Handler
 =============
 
-To handle the tasks of LVGL you need to call :cpp:func:`lv_timer_handler`
+To handle the timers of LVGL you need to call :cpp:func:`lv_timer_handler`
 periodically in one of the following:
 
-- *while(1)* of *main()* function
-- timer interrupt periodically (lower priority than :cpp:func:`lv_tick_inc`)
-- an OS task periodically
+- *while(1)* of *main()* function, or
+- an OS task periodically.  (See :ref:`os_threading_considerations`.)
+
+.. image:: /misc/intro_data_flow.png
+   :scale: 75 %
+   :alt:  LVGL Data Flow
+   :align:  center
 
 Example:
 
@@ -22,7 +26,7 @@ Example:
 
 If you want to use :cpp:func:`lv_timer_handler` in a super-loop, a helper
 function :cpp:func:`lv_timer_handler_run_in_period` is provided to simplify
-the porting:
+supplying LVGL with time awareness:
 
 .. code-block:: c
 
@@ -52,8 +56,8 @@ In an OS environment, you can use it together with the **delay** or
       os_delay_ms(time_till_next); /* delay to avoid unnecessary polling */
    }
 
-To learn more about timers visit the :ref:`timers`
-section.
+See :ref:`timer` section to learn more about timers.
+
 
 API
 ***
