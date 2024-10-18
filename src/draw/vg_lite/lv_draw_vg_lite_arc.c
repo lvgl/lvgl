@@ -159,31 +159,26 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
     }
 
     lv_vg_lite_path_end(path);
+    vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
 
     vg_lite_matrix_t matrix = u->global_matrix;
-
-    vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa, true);
-
-    vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
 
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
     LV_VG_LITE_ASSERT_PATH(vg_lite_path);
     LV_VG_LITE_ASSERT_MATRIX(&matrix);
 
-    LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw");
-    LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
-                               &u->target_buffer,
-                               vg_lite_path,
-                               fill,
-                               &matrix,
-                               VG_LITE_BLEND_SRC_OVER,
-                               color));
-    LV_PROFILER_DRAW_END_TAG("vg_lite_draw");
-
     if(dsc->img_src) {
         vg_lite_buffer_t src_buf;
         lv_image_decoder_dsc_t decoder_dsc;
         if(lv_vg_lite_buffer_open_image(&src_buf, &decoder_dsc, dsc->img_src, false, true)) {
+
+            vg_lite_color_t img_color = 0;
+            if(dsc->opa < LV_OPA_COVER) {
+                /* normal image opa */
+                src_buf.image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+                lv_memset(&img_color, dsc->opa, sizeof(img_color));
+            }
+
             vg_lite_matrix_t path_matrix = u->global_matrix;
 
             /* move image to center */
@@ -191,7 +186,9 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
             float img_half_h = decoder_dsc.decoded->header.h / 2.0f;
             vg_lite_translate(cx - img_half_w, cy - img_half_h, &matrix);
 
+            LV_VG_LITE_ASSERT_MATRIX(&matrix);
             LV_VG_LITE_ASSERT_MATRIX(&path_matrix);
+            LV_VG_LITE_ASSERT_SRC_BUFFER(&src_buf);
 
             LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw_pattern");
             LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
@@ -204,11 +201,23 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
                                        VG_LITE_BLEND_SRC_OVER,
                                        VG_LITE_PATTERN_COLOR,
                                        0,
-                                       color,
+                                       img_color,
                                        VG_LITE_FILTER_BI_LINEAR));
             LV_PROFILER_DRAW_END_TAG("vg_lite_draw_pattern");
             lv_vg_lite_pending_add(u->image_dsc_pending, &decoder_dsc);
         }
+    }
+    else {
+        /* normal color fill */
+        LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw");
+        LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
+                                   &u->target_buffer,
+                                   vg_lite_path,
+                                   fill,
+                                   &matrix,
+                                   VG_LITE_BLEND_SRC_OVER,
+                                   lv_vg_lite_color(dsc->color, dsc->opa, true)));
+        LV_PROFILER_DRAW_END_TAG("vg_lite_draw");
     }
 
     lv_vg_lite_path_drop(u, path);
