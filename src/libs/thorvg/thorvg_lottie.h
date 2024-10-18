@@ -15,7 +15,7 @@ namespace tvg
  *
  * @see Animation
  * 
- * @note Experimental API
+ * @since 0.15
  */
 
 #include "../../lv_conf_internal.h"
@@ -81,13 +81,13 @@ public:
      * @note Experimental API
      */
     const char* marker(uint32_t idx) noexcept;
-    
+
     /**
      * @brief Creates a new LottieAnimation object.
      *
      * @return A new LottieAnimation object.
      *
-     * @note Experimental API
+     * @since 0.15
      */
     static std::unique_ptr<LottieAnimation> gen() noexcept;
 };
