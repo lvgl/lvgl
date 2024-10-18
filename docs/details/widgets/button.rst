@@ -29,6 +29,8 @@ Usage
 
 There are no new features compared to :ref:`Base Widget <lv_obj>`.
 
+
+
 .. _lv_button_events:
 
 Events
@@ -38,7 +40,13 @@ Events
    enabled and the Widget is clicked. The event happens on transition
    to/from the checked state.
 
-Learn more about :ref:`events`.
+.. admonition::  Further Reading
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_button_keys:
 
@@ -49,9 +57,11 @@ Note that the state of :cpp:enumerator:`LV_KEY_ENTER` is translated to
 :cpp:enumerator:`LV_EVENT_PRESSED`, :cpp:enumerator:`LV_EVENT_PRESSING`
 and :cpp:enumerator:`LV_EVENT_RELEASED` etc.
 
-See also:  events of :ref:`Base Widget <lv_obj>`.
+.. admonition::  Further Reading
 
-Learn more about :ref:`indev_keys`.
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_button_example:
 
@@ -59,6 +69,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/button/index.rst
+
+
 
 .. _lv_button_api:
 

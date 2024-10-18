@@ -1,4 +1,4 @@
-.. opengl_es_driver:
+.. _opengl_es_driver:
 
 ===============================
 OpenGL ES Display/Inputs Driver

@@ -100,6 +100,8 @@ The "One check" feature can be enabled with
 :cpp:expr:`lv_buttonmatrix_set_one_checked(buttonm, true)` to allow only one button to
 be checked at a time.
 
+
+
 .. _lv_buttonmatrix_events:
 
 Events
@@ -109,8 +111,6 @@ Events
    repeated after long press. The event parameter is set to the ID of
    the pressed/released button.
 
-See also:  events of :ref:`Base Widget <lv_obj>`.
-
 :cpp:expr:`lv_buttonmatrix_get_selected_button(buttonm)` returns the index of the most
 recently released or focused button or :cpp:enumerator:`LV_BUTTONMATRIX_BUTTON_NONE` if no
 such button.
@@ -118,7 +118,13 @@ such button.
 :cpp:expr:`lv_buttonmatrix_get_button_text(buttonm, button_id)` returns a pointer to the
 text of ``button_id``\ th button.
 
-Learn more about :ref:`events`.
+.. admonition::  Further Reading
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_buttonmatrix_keys:
 
@@ -137,7 +143,11 @@ to the button matrix if used with encoder. This way, the pressed button
 repeat feature is disabled and on leaving edit mode the selected button
 won't be activated.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_buttonmatrix_example:
 
@@ -145,6 +155,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/buttonmatrix/index.rst
+
+
 
 .. _lv_buttonmatrix_api:
 

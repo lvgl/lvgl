@@ -165,25 +165,37 @@ Symbols
 The labels can display symbols alongside letters (or on their own). Read
 the :ref:`font` section to learn more about the symbols.
 
+
+
 .. _lv_label_events:
 
 Events
 ******
 
-No special events are sent by the Label.
+No special events are sent by Label Widgets.  By default, Label Widgets are created
+without the LV_OBJ_FLAG_CLICKABLE flag, but you can add it to make a Label Widget
+emit LV_EVENT_CLICKED events if desired.
 
-See also:  events of :ref:`Base Widget <lv_obj>`.
+.. admonition::  Further Reading
 
-Learn more about :ref:`events`.
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_label_keys:
 
 Keys
 ****
 
-No *Keys* are processed by the Widget type.
+No *Keys* are processed by Label Widgets.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_label_example:
 
@@ -191,6 +203,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/label/index.rst
+
+
 
 .. _lv_label_api:
 

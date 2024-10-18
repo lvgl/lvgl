@@ -78,6 +78,8 @@ Close the message box
 asynchronously. This is useful if you want the message box to close the on
 the next call to ``lv_timer_handler`` instead of immediately.
 
+
+
 .. _lv_msgbox_events:
 
 Events
@@ -85,16 +87,26 @@ Events
 
 No special events are sent by this widget.
 
-Learn more about :ref:`events`.
+.. admonition::  Further Reading
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_msgbox_keys:
 
 Keys
 ****
 
-No *Keys* are processed by the Widget type.
+No *Keys* are processed by Msgbox Widgets.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_msgbox_example:
 
@@ -102,6 +114,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/msgbox/index.rst
+
+
 
 .. _lv_msgbox_api:
 

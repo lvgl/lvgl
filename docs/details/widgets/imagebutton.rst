@@ -61,6 +61,8 @@ Instead of the regular :cpp:func:`lv_obj_add_state` and :cpp:func:`lv_obj_remove
 the :cpp:expr:`lv_imagebutton_set_state(imagebutton, LV_IMAGEBUTTON_STATE_...)` function should be
 used to manually set a state.
 
+
+
 .. _lv_imagebutton_events:
 
 Events
@@ -68,7 +70,13 @@ Events
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the button is toggled.
 
-Learn more about :ref:`events`.
+.. admonition::  Further Reading
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_imagebutton_keys:
 
@@ -81,7 +89,11 @@ Keys
    :cpp:enumerator:`LV_OBJ_FLAG_CHECKABLE` is enabled.
 -  :cpp:enumerator:`LV_KEY_ENTER` Clicks the button
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_imagebutton_example:
 
@@ -89,6 +101,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/imagebutton/index.rst
+
+
 
 .. _lv_imagebutton_api:
 

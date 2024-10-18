@@ -42,23 +42,35 @@ Texts
 
 :cpp:expr:`lv_list_add_text(list, text)` adds a text.
 
+
+
 .. _lv_list_events:
 
 Events
 ******
 
-No special events are sent by the List, but sent by the Button as usual.
+No special events are sent by List Widgets, but events are sent by Buttons as usual.
 
-Learn more about :ref:`events`.
+.. admonition::  Further Reading
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_list_keys:
 
 Keys
 ****
 
-No *Keys* are processed by the Widget type.
+No *Keys* are processed by List Widgets.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_list_example:
 
@@ -66,6 +78,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/list/index.rst
+
+
 
 .. _lv_list_api:
 

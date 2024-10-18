@@ -151,6 +151,8 @@ Any part of the text can be selected if enabled with
 :cpp:expr:`lv_textarea_set_text_selection(textarea, true)`. This works much like
 when you select text on your PC with your mouse.
 
+
+
 .. _lv_textarea_events:
 
 Events
@@ -167,9 +169,13 @@ Events
 -  :cpp:enumerator:`LV_EVENT_READY` Sent when :cpp:enumerator:`LV_KEY_ENTER` is pressed (or sent) to
    a one line text area.
 
-See also:  events of :ref:`Base Widget <lv_obj>`.
+.. admonition::  Further Reading
 
-Learn more about :ref:`events`.
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_textarea_keys:
 
@@ -179,7 +185,11 @@ Keys
 -  ``LV_KEY_UP/DOWN/LEFT/RIGHT`` Move the cursor
 -  ``Any character`` Add the character to the current cursor position
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_textarea_example:
 
@@ -187,6 +197,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/textarea/index.rst
+
+
 
 .. _lv_textarea_api:
 

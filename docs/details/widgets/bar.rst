@@ -59,22 +59,35 @@ The bar can be one of the following modes:
   ``lv_bar_set_start_value(bar, new_value, LV_ANIM_ON/OFF)``. The start
   value always has to be smaller than the end value.
 
+
+
 .. _lv_bar_events:
 
 Events
 ******
-See also:  events of :ref:`Base Widget <lv_obj>`.
 
-Learn more about :ref:`events`.
+No special events are sent by Bar Widgets.
+
+.. admonition::  Further Reading
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_bar_keys:
 
 Keys
 ****
 
-No *Keys* are processed by the Widget type.
+No *Keys* are processed by Bar Widgets.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_bar_example:
 
@@ -82,6 +95,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/bar/index.rst
+
+
 
 .. _lv_bar_api:
 

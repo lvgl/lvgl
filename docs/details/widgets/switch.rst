@@ -51,6 +51,7 @@ Change orientation
 :cpp:expr:`lv_switch_set_orientation(widget, LV_SWITCH_ORIENTATION_VERTICAL)` change orientation, default orientation is :cpp:enumerator:`LV_SWITCH_ORIENTATION_AUTO`, adaptive based on the width and height of the Widget.
 
 
+
 .. _lv_switch_events:
 
 Events
@@ -58,9 +59,13 @@ Events
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the switch changes state.
 
-See also:  events of :ref:`Base Widget <lv_obj>`.
+.. admonition::  Further Reading
 
-Learn more about :ref:`events`.
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_switch_keys:
 
@@ -71,7 +76,11 @@ Keys
 -  ``LV_KEY_DOWN/LEFT`` Turns off the slider
 -  :cpp:enumerator:`LV_KEY_ENTER` Toggles the switch
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_switch_example:
 
@@ -79,6 +88,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/switch/index.rst
+
+
 
 .. _lv_switch_api:
 

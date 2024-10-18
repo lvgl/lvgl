@@ -96,6 +96,8 @@ menu:
 - :cpp:expr:`lv_menu_section_create(parent page)` creates a new empty section.
 - :cpp:expr:`lv_menu_separator_create(parent page)` creates a separator.
 
+
+
 .. _lv_menu_events:
 
 Events
@@ -115,18 +117,26 @@ Events
    -  :cpp:expr:`lv_menu_back_button_is_root(menu, button)` to check if button is root
       back button
 
-See also:  events of :ref:`Base Widget <lv_obj>`.
+.. admonition::  Further Reading
 
-Learn more about :ref:`events`.
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_menu_keys:
 
 Keys
 ****
 
-No keys are handled by the menu widget.
+No *Keys* are processed by Menu Widgets.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_menu_example:
 
@@ -134,6 +144,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/menu/index.rst
+
+
 
 .. _lv_menu_api:
 

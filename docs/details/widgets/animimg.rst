@@ -43,18 +43,21 @@ override the animation values using the
 :cpp:expr:`lv_anim_set_values(anim, start, end)` or to set a callback
 on the animation completed event.
 
+
+
 .. _lv_animimg_events:
 
 Events
 ******
 
-No special events are sent by image Widgets.
+No special events are sent by Animation-Image Widgets.
 
-.. admonition:: Further Reading:
+.. admonition::  Further Reading
 
-    Events of Base Widget.
+    :ref:`lv_obj_events` are emitted by all Widgets.
 
     Learn more about :ref:`events`.
+
 
 
 .. _lv_animimg_keys:
@@ -62,23 +65,24 @@ No special events are sent by image Widgets.
 Keys
 ****
 
-No Keys are processed by this Widget.
+No *Keys* are processed by Animation-Image Widgets.
 
-.. admonition:: Further Reading:
+.. admonition::  Further Reading
 
     Learn more about :ref:`indev_keys`.
 
 
-.. _lv_animimg_example:
 
+.. _lv_animimg_example:
 
 Example
 *******
 
 .. include:: ../../examples/widgets/animimg/index.rst
 
-.. _lv_animimg_api:
 
+
+.. _lv_animimg_api:
 
 API
 ***

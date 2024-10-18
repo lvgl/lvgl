@@ -185,25 +185,37 @@ Or to automatically scale or tile the image
 
 The alignment can be set by :cpp:func:`lv_image_set_inner_align`
 
+
+
 .. _lv_image_events:
 
 Events
 ******
 
-No special events are sent by image Widgets.
+No special events are sent by Image Widgets.  By default, Image Widgets are created
+without the LV_OBJ_FLAG_CLICKABLE flag, but you can add it to make a Label Widget
+emit LV_EVENT_CLICKED events if desired.
 
-See also:  events of :ref:`Base Widget <lv_obj>`.
+.. admonition::  Further Reading
 
-Learn more about :ref:`events`.
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_image_keys:
 
 Keys
 ****
 
-No *Keys* are processed by the Widget type.
+No *Keys* are processed by Image Widgets.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_image_example:
 
@@ -211,6 +223,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/image/index.rst
+
+
 
 .. _lv_image_api:
 

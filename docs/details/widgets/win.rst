@@ -61,24 +61,36 @@ Get the parts
 :cpp:expr:`lv_win_get_content(win)` returns a pointer to the content container
 to which the content of the window can be added.
 
+
+
 .. _lv_win_events:
 
 Events
 ******
 
-No special events are sent by the windows, however events can be added
+No special events are sent by Window Widgets, however events can be added
 manually to the return value of :cpp:func:`lv_win_add_button`.
 
-Learn more about :ref:`events`.
+.. admonition::  Further Reading
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_win_keys:
 
 Keys
 ****
 
-No *Keys* are handled by the window.
+No *Keys* are processed by Window Widgets.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_win_example:
 
@@ -86,6 +98,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/win/index.rst
+
+
 
 .. _lv_win_api:
 

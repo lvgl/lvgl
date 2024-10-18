@@ -42,23 +42,35 @@ Use :cpp:expr:`lv_led_on(led)` and :cpp:expr:`lv_led_off(led)` to set the bright
 a predefined ON or OFF value. The :cpp:expr:`lv_led_toggle(led)` toggles between
 the ON and OFF state.
 
+
+
 .. _lv_led_events:
 
 Events
 ******
 
-See also:  events of :ref:`Base Widget <lv_obj>`.
+No special events are sent by LED Widgets.
 
-Learn more about :ref:`events`.
+.. admonition::  Further Reading
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_led_keys:
 
 Keys
 ****
 
-No *Keys* are processed by the Widget type.
+No *Keys* are processed by LED Widgets.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_led_example:
 
@@ -66,6 +78,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/led/index.rst
+
+
 
 .. _lv_led_api:
 

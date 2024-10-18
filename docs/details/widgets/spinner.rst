@@ -30,25 +30,37 @@ To create a spinner use
 Using :cpp:expr:`lv_spinner_set_anim_params(spinner, spin_duration, angle)` the duration
 of one revolution and the length of he arc can be customized.
 
+
+
 .. _lv_spinner_events:
 
 Events
 ******
 
-No special events are sent to the Spinner.
+No special events are sent to Spinner Widgets.
 
-See the events of the :ref:`lv_arc` as well.
+.. admonition::  Further Reading
 
-Learn more about :ref:`events`.
+    :ref:`Arc Events <lv_arc_events>`
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_spinner_keys:
 
 Keys
 ****
 
-No *Keys* are processed by the Widget type.
+No *Keys* are processed by Spinner Widgets.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_spinner_example:
 
@@ -56,6 +68,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/spinner/index.rst
+
+
 
 .. _lv_spinner_api:
 

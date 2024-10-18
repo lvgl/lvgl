@@ -97,6 +97,8 @@ culture.
 If you want to use the Chinese calendar, please
 use :cpp:expr:`lv_calendar_set_chinese_mode(calendar, true)` to enable it.
 
+
+
 .. _lv_calendar_events:
 
 Events
@@ -107,7 +109,14 @@ Events
    date currently being pressed. Returns :cpp:enumerator:`LV_RESULT_OK` if there is a
    valid pressed date, else :cpp:enumerator:`LV_RESULT_INVALID`.
 
-Learn more about :ref:`events`.
+
+.. admonition::  Further Reading
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_calendar_keys:
 
@@ -117,7 +126,11 @@ Keys
 -  ``LV_KEY_RIGHT/UP/LEFT/RIGHT`` To navigate among the buttons to dates
 -  :cpp:enumerator:`LV_KEY_ENTER` To press/release the selected date
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_calendar_header:
 
@@ -142,10 +155,14 @@ contains 2 drop-drown lists: one for the year and another for the month.
 
 .. _lv_calendar_example:
 
+
+
 Example
 *******
 
 .. include:: ../../examples/widgets/calendar/index.rst
+
+
 
 .. _lv_calendar_api:
 

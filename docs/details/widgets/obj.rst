@@ -13,14 +13,14 @@ screen, such as:
 - coordinates
 - parent Widget
 - children
-- contains the styles
-- attributes like *Clickable*, *Scrollable*, etc.
+- styles
+- flags like *Clickable*, *Scrollable*, etc.
 
-In object-oriented thinking, it is the base class from which all other
-Widgets in LVGL are inherited.
+From an object-oriented point if view, Base Widget is the base class from which all
+other Widgets inherit.
 
 The functions and functionalities of the Base Widget can be used with
-other widgets as well. For example :cpp:expr:`lv_obj_set_width(slider, 100)`
+other widgets as well.  For example :cpp:expr:`lv_obj_set_width(slider, 100)`.
 
 The Base Widget can be directly used as a simple widget: it's nothing
 more than a rectangle. In HTML terms, think of it as a ``<div>``.
@@ -50,8 +50,8 @@ Position
 ^^^^^^^^
 
 You can set the position relative to the parent with
-:cpp:expr:`lv_obj_set_x(widget, new_x)` and :cpp:expr:`lv_obj_set_y(widget, new_y)`, or both
-axes at the same time with :cpp:expr:`lv_obj_set_pos(widget, new_x, new_y)`.
+:cpp:expr:`lv_obj_set_x(widget, new_x)` and :cpp:expr:`lv_obj_set_y(widget, new_y)`,
+or both axes at the same time with :cpp:expr:`lv_obj_set_pos(widget, new_x, new_y)`.
 
 .. _lv_obj_alignment:
 
@@ -231,17 +231,69 @@ By default, the Widgets can be clicked only within their bounding area.
 However, this can be extended with
 :cpp:expr:`lv_obj_set_ext_click_area(widget, size)`.
 
-.. _events-1:
+
 
 .. _lv_obj_events:
 
-Events
-******
+Base-Widget Events
+******************
 
+.. _widget_events:
+
+Events from Input Devices
+-------------------------
+-  :cpp:enumerator:`LV_EVENT_PRESSED`              Widget has been pressed.
+-  :cpp:enumerator:`LV_EVENT_PRESSING`             Widget is being pressed (sent continuously while pressing).
+-  :cpp:enumerator:`LV_EVENT_PRESS_LOST`           Widget is still being pressed but slid cursor/finger off Widget.
+-  :cpp:enumerator:`LV_EVENT_SHORT_CLICKED`        Widget was pressed for a short period of time, then released. Not sent if scrolled.
+-  :cpp:enumerator:`LV_EVENT_SINGLE_CLICKED`       Sent for first short click within a small distance and short time.
+-  :cpp:enumerator:`LV_EVENT_DOUBLE_CLICKED`       Sent for second short click within small distance and short time.
+-  :cpp:enumerator:`LV_EVENT_TRIPLE_CLICKED`       Sent for third short click within small distance and short time.
+-  :cpp:enumerator:`LV_EVENT_LONG_PRESSED`         Object has been pressed for at least `long_press_time`.  Not sent if scrolled.
+-  :cpp:enumerator:`LV_EVENT_LONG_PRESSED_REPEAT`  Sent after `long_press_time` in every `long_press_repeat_time` ms.  Not sent if scrolled.
+-  :cpp:enumerator:`LV_EVENT_CLICKED`              Sent on release if not scrolled (regardless to long press).
+-  :cpp:enumerator:`LV_EVENT_RELEASED`             Sent in every cases when Widget has been released.
+-  :cpp:enumerator:`LV_EVENT_SCROLL_BEGIN`         Scrolling begins. The event parameter is a pointer to the animation of the scroll. Can be modified.
+-  :cpp:enumerator:`LV_EVENT_SCROLL_THROW_BEGIN`   Received when scrolling begins.
+-  :cpp:enumerator:`LV_EVENT_SCROLL_END`           Scrolling ended.
+-  :cpp:enumerator:`LV_EVENT_SCROLL`               Scrolling
+-  :cpp:enumerator:`LV_EVENT_GESTURE`              A gesture is detected. Get gesture with `lv_indev_get_gesture_dir(lv_indev_active());`
+-  :cpp:enumerator:`LV_EVENT_KEY`                  A key is sent to Widget. Get key with `lv_indev_get_key(lv_indev_active());`
+-  :cpp:enumerator:`LV_EVENT_FOCUSED`              Widget received focus,
+-  :cpp:enumerator:`LV_EVENT_DEFOCUSED`            Widget's focus has been lost.
+-  :cpp:enumerator:`LV_EVENT_LEAVE`                Widget's focus has been lost but is still selected.
+-  :cpp:enumerator:`LV_EVENT_HIT_TEST`             Perform advanced hit-testing.
+
+Special Events
+--------------
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` when the :cpp:enumerator:`LV_OBJ_FLAG_CHECKABLE` flag is
-   enabled and the Widget clicked (on transition to/from the checked state)
+   enabled and the Widget was clicked (on transition to/from the checked state)
 
-Learn more about :ref:`events`.
+Drawing Events
+--------------
+-  :cpp:enumerator:`LV_EVENT_DRAW_MAIN`            Performing drawing of main part
+-  :cpp:enumerator:`LV_EVENT_DRAW_MAIN_BEGIN`      Starting drawing of main part
+-  :cpp:enumerator:`LV_EVENT_DRAW_MAIN_END`        Finishing drawing of main part
+-  :cpp:enumerator:`LV_EVENT_DRAW_POST`            Perform the post draw phase (when all children are drawn)
+-  :cpp:enumerator:`LV_EVENT_DRAW_POST_BEGIN`      Starting the post draw phase (when all children are drawn)
+-  :cpp:enumerator:`LV_EVENT_DRAW_POST_END`        Finishing the post draw phase (when all children are drawn)
+
+Other Events
+------------
+-  :cpp:enumerator:`LV_EVENT_DELETE`               Object is being deleted
+-  :cpp:enumerator:`LV_EVENT_CHILD_CHANGED`        Child was removed, added, or its size, position were changed
+-  :cpp:enumerator:`LV_EVENT_CHILD_CREATED`        Child was created, always bubbles up to all parents
+-  :cpp:enumerator:`LV_EVENT_CHILD_DELETED`        Child was deleted, always bubbles up to all parents
+-  :cpp:enumerator:`LV_EVENT_SIZE_CHANGED`         Object coordinates/size have changed
+-  :cpp:enumerator:`LV_EVENT_STYLE_CHANGED`        Object's style has changed
+-  :cpp:enumerator:`LV_EVENT_LAYOUT_CHANGED`       A child's position has changed due to a layout recalculation (when container has flex or grid layout style)
+-  :cpp:enumerator:`LV_EVENT_GET_SELF_SIZE`        Get internal size of a widget
+
+.. admonition::  Further Reading
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_obj_keys:
 
@@ -260,9 +312,15 @@ If the Widget can only scroll vertically, :cpp:enumerator:`LV_KEY_LEFT` and
 an encoder input device. See :ref:`Input devices overview <indev>` for
 more on encoder behaviors and the edit mode.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. |image1| image:: /misc/align.png
+
+
 
 .. _lv_obj_example:
 
@@ -270,6 +328,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/obj/index.rst
+
+
 
 .. _lv_obj_api:
 

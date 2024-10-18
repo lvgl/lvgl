@@ -479,11 +479,11 @@ You can do this by:
 .. note:: For devices in event-driven mode, `data->continue_reading` is ignored.
 
 
-Further reading
-***************
+.. admonition::  Further Reading
 
-- `lv_port_indev_template.c <https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_indev_template.c>`__
-  for a template for your own Input-Device driver.
+    - `lv_port_indev_template.c <https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_indev_template.c>`__
+      for a template for your own Input-Device driver.
+
 
 
 .. _indev_api:

@@ -4,6 +4,8 @@
 Base Widget
 ===========
 
+The following details apply to all types of Widgets.
+
 .. toctree::
     :maxdepth:  3
 
