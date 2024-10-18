@@ -13,5 +13,6 @@ sudo apt install gcc gcc-multilib g++-multilib ninja-build \
     libpng-dev:i386 libjpeg-dev:i386 libfreetype6-dev:i386 \
     ruby-full gcovr cmake  python3 pngquant libinput-dev libxkbcommon-dev \
     libdrm-dev pkg-config wayland-protocols libwayland-dev libwayland-bin \
-    libwayland-dev:i386 libxkbcommon-dev:i386
+    libwayland-dev:i386 libxkbcommon-dev:i386 astyle
 pip3 install pypng lz4 kconfiglib
+pip3 install pre-commit
