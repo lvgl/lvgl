@@ -1,0 +1,18 @@
+<!--
+Example
+<lv_animinmg src="img1 img2" duration="300" repeat_count="3"/>
+-->
+<widget>
+	<api>
+	    <const name="infinite" help="Repeat the animation infinite times"/>
+	    <prop name="src"  help="Image sources">
+	        <param name="src_array" type="image_src[count]"/>
+	    </prop>
+	    <prop name="duration" help="Length of the animation in milliseconds">
+	        <param name="time_ms" type="int"/>
+	    </prop>
+	    <prop name="repeat_count">
+	        <param name="cnt" type="int"/>
+	    </prop>
+	</api>
+</widget>
