@@ -340,7 +340,7 @@ static void window_create(lv_display_t * disp)
 #endif
 #endif /*LV_USE_DRAW_SDL == 0*/
     /*Some platforms (e.g. Emscripten) seem to require setting the size again */
-    SDL_SetWindowSize(dsc->window, (int)((float)hor_res * dsc->zoom), (int)((float)ver_res * dsc->zoom));
+    SDL_SetWindowSize(dsc->window, hor_res, ver_res);
 #if LV_USE_DRAW_SDL == 0
     texture_resize(disp);
 #endif /*LV_USE_DRAW_SDL == 0*/
