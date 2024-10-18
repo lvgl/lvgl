@@ -188,6 +188,13 @@ class LVGL:
         disp = self.lv_global["disp_default"]
         return disp["act_scr"] if disp else None
 
+    def draw_units(self):
+        unit = self.lv_global["draw_info"]["unit_head"]
+
+        # Iterate through all draw units
+        while unit: 
+            yield unit
+            unit = unit["next"]
 
 def set_lvgl_instance(lv_global: gdb.Value):
     global g_lvgl_instance
@@ -306,7 +313,48 @@ class InfoStyle(gdb.Command):
             print("  ", end="")
             dump_style_info(style)
 
+class InfoDrawUnit(gdb.Command):
+    """dump draw unit info"""
+
+    def __init__(self):
+        super(InfoDrawUnit, self).__init__(
+            "info draw_unit", gdb.COMMAND_USER, gdb.COMPLETE_EXPRESSION
+        )
+
+    def dump_draw_unit(self, draw_unit:gdb.Value):
+        # Dereference to get the string content of the name from draw_unit
+        name = draw_unit["name"].string()
+
+        # Print draw_unit information and the name
+        print(f"Draw Unit: {draw_unit}, Name: {name}")
+
+        # Handle different draw_units based on the name
+        def lookup_type(name):
+            try:
+                return gdb.lookup_type(name)
+            except gdb.error:
+                return None
+
+        types = {
+            "DMA2D": lookup_type("lv_draw_dma2d_unit_t"),
+            "NEMA_GFX": lookup_type("lv_draw_nema_gfx_unit_t"),
+            "NXP_PXP": lookup_type("lv_draw_pxp_unit_t"),
+            "NXP_VGLITE": lookup_type("lv_draw_vglite_unit_t"),
+            "OPENGLES": lookup_type("lv_draw_opengles_unit_t"),
+            "DAVE2D": lookup_type("lv_draw_dave2d_unit_t"),
+            "SDL": lookup_type("lv_draw_sdl_unit_t"),
+            "SW": lookup_type("lv_draw_sw_unit_t"),
+            "VG_LITE": lookup_type("lv_draw_vg_lite_unit_t"),
+        }
+
+        type = types.get(name) or lookup_type("lv_draw_unit_t")
+        print(draw_unit.cast(type.pointer()).dereference().format_string(pretty_structs=True, symbols=True))
+
+    def invoke(self, args, from_tty):
+        for unit in g_lvgl_instance.draw_units():
+            self.dump_draw_unit(unit)
 
 DumpObj()
 InfoStyle()
+InfoDrawUnit()
 set_lvgl_instance(None)
