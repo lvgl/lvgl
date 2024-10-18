@@ -626,4 +626,31 @@ void test_label_with_recolor_cmd(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_recolor.png");
 }
 
+void test_label_max_lines(void)
+{
+    lv_obj_clean(lv_screen_active());
+
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_text_line_space(lv_screen_active(), 10, LV_PART_MAIN);
+
+    const char * texts[] = {
+        "Fits in single line",
+        "Length such that exactly three lines will be needed for this text",
+        "Text\nwith line breaks\nwhere display will need more than three lines",
+    };
+
+    for(int i = 0; i < 3; i++) {
+        lv_obj_t * test_label = lv_label_create(lv_screen_active());
+        lv_obj_set_width(test_label, 200);
+        lv_obj_set_style_bg_color(test_label, lv_palette_main(LV_PALETTE_GREY), LV_PART_MAIN);
+        lv_obj_set_style_bg_opa(test_label, LV_OPA_100, LV_PART_MAIN);
+        lv_label_set_long_mode(test_label, LV_LABEL_LONG_DOT);
+        lv_label_set_text(test_label, texts[i]);
+        lv_label_set_max_lines(test_label, 3);
+    }
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_max_lines.png");
+}
+
 #endif

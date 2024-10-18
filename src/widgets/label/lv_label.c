@@ -238,6 +238,14 @@ void lv_label_set_long_mode(lv_obj_t * obj, lv_label_long_mode_t long_mode)
     lv_label_refr_text(obj);
 }
 
+void lv_label_set_max_lines(lv_obj_t * obj, int32_t lines)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_label_t * label = (lv_label_t *)obj;
+    label->max_lines = lines;
+    lv_label_refr_text(obj);
+}
+
 void lv_label_set_text_selection_start(lv_obj_t * obj, uint32_t index)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -295,6 +303,13 @@ lv_label_long_mode_t lv_label_get_long_mode(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_label_t * label = (lv_label_t *)obj;
     return label->long_mode;
+}
+
+int32_t lv_label_get_max_lines(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    const lv_label_t * label = (const lv_label_t *)obj;
+    return label->max_lines;
 }
 
 void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t * pos)
@@ -781,12 +796,18 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
             int32_t w;
             if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) w = LV_COORD_MAX;
             else w = lv_obj_get_content_width(obj);
-            w = LV_MIN(w, lv_obj_get_style_max_width(obj, 0));
+            w = LV_MIN(w, lv_obj_get_style_max_width(obj, LV_PART_MAIN));
 
             uint32_t dot_begin = label->dot_begin;
             lv_label_revert_dots(obj);
             lv_text_get_size(&label->size_cache, label->text, font, letter_space, line_space, w, flag);
             lv_label_set_dots(obj, dot_begin);
+
+            int32_t max_h = lv_obj_get_style_max_height(obj, LV_PART_MAIN);
+            if(label->max_lines > 0) {
+                max_h = LV_MIN(max_h, lv_font_get_line_height(font) * label->max_lines + line_space * (label->max_lines - 1));
+            }
+            label->size_cache.y = LV_MIN(label->size_cache.y, max_h);
 
             label->invalid_size_cache = false;
         }
