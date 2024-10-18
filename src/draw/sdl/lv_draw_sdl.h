@@ -37,12 +37,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    lv_draw_unit_t base_unit;
-    lv_draw_task_t * task_act;
-    lv_cache_t * texture_cache;
-} lv_draw_sdl_unit_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

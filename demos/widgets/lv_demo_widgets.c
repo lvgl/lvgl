@@ -207,7 +207,7 @@ void lv_demo_widgets(void)
         lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
 
         label = lv_label_create(tab_bar);
-        lv_label_set_text(label, "Widgets demo");
+        lv_label_set_text_static(label, "Widgets demo");
         lv_obj_add_flag(label, LV_OBJ_FLAG_IGNORE_LAYOUT);
         lv_obj_add_style(label, &style_text_muted, 0);
         lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
@@ -255,33 +255,33 @@ static void profile_create(lv_obj_t * parent)
     lv_image_set_src(avatar, &img_demo_widgets_avatar);
 
     lv_obj_t * name = lv_label_create(panel1);
-    lv_label_set_text(name, "Elena Smith");
+    lv_label_set_text_static(name, "Elena Smith");
     lv_obj_add_style(name, &style_title, 0);
 
     lv_obj_t * dsc = lv_label_create(panel1);
     lv_obj_add_style(dsc, &style_text_muted, 0);
-    lv_label_set_text(dsc, "This is a short description of me. Take a look at my profile!");
+    lv_label_set_text_static(dsc, "This is a short description of me. Take a look at my profile!");
     lv_label_set_long_mode(dsc, LV_LABEL_LONG_WRAP);
 
     lv_obj_t * email_icn = lv_label_create(panel1);
     lv_obj_add_style(email_icn, &style_icon, 0);
-    lv_label_set_text(email_icn, LV_SYMBOL_ENVELOPE);
+    lv_label_set_text_static(email_icn, LV_SYMBOL_ENVELOPE);
 
     lv_obj_t * email_label = lv_label_create(panel1);
-    lv_label_set_text(email_label, "elena@smith.com");
+    lv_label_set_text_static(email_label, "elena@smith.com");
 
     lv_obj_t * call_icn = lv_label_create(panel1);
     lv_obj_add_style(call_icn, &style_icon, 0);
-    lv_label_set_text(call_icn, LV_SYMBOL_CALL);
+    lv_label_set_text_static(call_icn, LV_SYMBOL_CALL);
 
     lv_obj_t * call_label = lv_label_create(panel1);
-    lv_label_set_text(call_label, "+79 246 123 4567");
+    lv_label_set_text_static(call_label, "+79 246 123 4567");
 
     lv_obj_t * log_out_btn = lv_button_create(panel1);
     lv_obj_set_height(log_out_btn, LV_SIZE_CONTENT);
 
     lv_obj_t * label = lv_label_create(log_out_btn);
-    lv_label_set_text(label, "Log out");
+    lv_label_set_text_static(label, "Log out");
     lv_obj_center(label);
 
     lv_obj_t * invite_btn = lv_button_create(panel1);
@@ -289,7 +289,7 @@ static void profile_create(lv_obj_t * parent)
     lv_obj_set_height(invite_btn, LV_SIZE_CONTENT);
 
     label = lv_label_create(invite_btn);
-    lv_label_set_text(label, "Invite");
+    lv_label_set_text_static(label, "Invite");
     lv_obj_center(label);
 
     /*Create a keyboard*/
@@ -301,11 +301,11 @@ static void profile_create(lv_obj_t * parent)
     lv_obj_set_height(panel2, LV_SIZE_CONTENT);
 
     lv_obj_t * panel2_title = lv_label_create(panel2);
-    lv_label_set_text(panel2_title, "Your profile");
+    lv_label_set_text_static(panel2_title, "Your profile");
     lv_obj_add_style(panel2_title, &style_title, 0);
 
     lv_obj_t * user_name_label = lv_label_create(panel2);
-    lv_label_set_text(user_name_label, "User name");
+    lv_label_set_text_static(user_name_label, "User name");
     lv_obj_add_style(user_name_label, &style_text_muted, 0);
 
     lv_obj_t * user_name = lv_textarea_create(panel2);
@@ -314,7 +314,7 @@ static void profile_create(lv_obj_t * parent)
     lv_obj_add_event_cb(user_name, ta_event_cb, LV_EVENT_ALL, kb);
 
     lv_obj_t * password_label = lv_label_create(panel2);
-    lv_label_set_text(password_label, "Password");
+    lv_label_set_text_static(password_label, "Password");
     lv_obj_add_style(password_label, &style_text_muted, 0);
 
     lv_obj_t * password = lv_textarea_create(panel2);
@@ -324,14 +324,14 @@ static void profile_create(lv_obj_t * parent)
     lv_obj_add_event_cb(password, ta_event_cb, LV_EVENT_ALL, kb);
 
     lv_obj_t * gender_label = lv_label_create(panel2);
-    lv_label_set_text(gender_label, "Gender");
+    lv_label_set_text_static(gender_label, "Gender");
     lv_obj_add_style(gender_label, &style_text_muted, 0);
 
     lv_obj_t * gender = lv_dropdown_create(panel2);
     lv_dropdown_set_options_static(gender, "Male\nFemale\nOther");
 
     lv_obj_t * birthday_label = lv_label_create(panel2);
-    lv_label_set_text(birthday_label, "Birthday");
+    lv_label_set_text_static(birthday_label, "Birthday");
     lv_obj_add_style(birthday_label, &style_text_muted, 0);
 
     lv_obj_t * birthdate = lv_textarea_create(panel2);
@@ -341,11 +341,11 @@ static void profile_create(lv_obj_t * parent)
     /*Create the third panel*/
     lv_obj_t * panel3 = lv_obj_create(parent);
     lv_obj_t * panel3_title = lv_label_create(panel3);
-    lv_label_set_text(panel3_title, "Your skills");
+    lv_label_set_text_static(panel3_title, "Your skills");
     lv_obj_add_style(panel3_title, &style_title, 0);
 
     lv_obj_t * experience_label = lv_label_create(panel3);
-    lv_label_set_text(experience_label, "Experience");
+    lv_label_set_text_static(experience_label, "Experience");
     lv_obj_add_style(experience_label, &style_text_muted, 0);
 
     lv_obj_t * slider1 = lv_slider_create(panel3);
@@ -355,13 +355,13 @@ static void profile_create(lv_obj_t * parent)
     lv_obj_refresh_ext_draw_size(slider1);
 
     lv_obj_t * team_player_label = lv_label_create(panel3);
-    lv_label_set_text(team_player_label, "Team player");
+    lv_label_set_text_static(team_player_label, "Team player");
     lv_obj_add_style(team_player_label, &style_text_muted, 0);
 
     lv_obj_t * sw1 = lv_switch_create(panel3);
 
     lv_obj_t * hard_working_label = lv_label_create(panel3);
-    lv_label_set_text(hard_working_label, "Hard-working");
+    lv_label_set_text_static(hard_working_label, "Hard-working");
     lv_obj_add_style(hard_working_label, &style_text_muted, 0);
 
     lv_obj_t * sw2 = lv_switch_create(panel3);
@@ -897,8 +897,6 @@ void shop_create(lv_obj_t * parent)
     lv_obj_set_style_text_color(hint, lv_palette_main(LV_PALETTE_GREEN), 0);
 
     chart3 = lv_chart_create(panel1);
-    //    lv_chart_set_axis_tick(chart3, LV_CHART_AXIS_PRIMARY_Y, 0, 0, 6, 1, true, 80);
-    //    lv_chart_set_axis_tick(chart3, LV_CHART_AXIS_PRIMARY_X, 0, 0, 7, 1, true, 50);
     lv_chart_set_type(chart3, LV_CHART_TYPE_BAR);
     lv_chart_set_div_line_count(chart3, 6, 0);
     lv_chart_set_point_count(chart3, 7);
@@ -968,7 +966,6 @@ void shop_create(lv_obj_t * parent)
         lv_obj_set_width(chart3, LV_PCT(95));
         lv_obj_set_height(chart3, LV_VER_RES - 70);
         lv_obj_set_style_max_height(chart3, 300, 0);
-        //        lv_chart_set_scale_x(chart3, 512);
 
         lv_obj_set_grid_dsc_array(panel1, grid1_col_dsc, grid1_row_dsc);
         lv_obj_set_grid_cell(title, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 0, 1);
@@ -1187,7 +1184,7 @@ static lv_obj_t * create_scale_box(lv_obj_t * parent, const char * title, const 
     lv_obj_set_flex_grow(cont, 1);
 
     lv_obj_t * title_label = lv_label_create(cont);
-    lv_label_set_text(title_label, title);
+    lv_label_set_text_static(title_label, title);
     lv_obj_add_style(title_label, &style_title, 0);
 
     lv_obj_t * scale = lv_scale_create(cont);
@@ -1201,7 +1198,7 @@ static lv_obj_t * create_scale_box(lv_obj_t * parent, const char * title, const 
     lv_obj_add_style(bullet1, &style_bullet, 0);
     lv_obj_set_style_bg_color(bullet1, lv_palette_main(LV_PALETTE_RED), 0);
     lv_obj_t * label1 = lv_label_create(cont);
-    lv_label_set_text(label1, text1);
+    lv_label_set_text_static(label1, text1);
 
     lv_obj_t * bullet2 = lv_obj_create(cont);
     lv_obj_set_size(bullet2, 13, 13);
@@ -1209,7 +1206,7 @@ static lv_obj_t * create_scale_box(lv_obj_t * parent, const char * title, const 
     lv_obj_add_style(bullet2, &style_bullet, 0);
     lv_obj_set_style_bg_color(bullet2, lv_palette_main(LV_PALETTE_BLUE), 0);
     lv_obj_t * label2 = lv_label_create(cont);
-    lv_label_set_text(label2, text2);
+    lv_label_set_text_static(label2, text2);
 
     lv_obj_t * bullet3 = lv_obj_create(cont);
     lv_obj_set_size(bullet3, 13, 13);
@@ -1217,7 +1214,7 @@ static lv_obj_t * create_scale_box(lv_obj_t * parent, const char * title, const 
     lv_obj_add_style(bullet3, &style_bullet, 0);
     lv_obj_set_style_bg_color(bullet3, lv_palette_main(LV_PALETTE_GREEN), 0);
     lv_obj_t * label3 = lv_label_create(cont);
-    lv_label_set_text(label3, text3);
+    lv_label_set_text_static(label3, text3);
 
     if(disp_size == DISP_MEDIUM) {
         static int32_t grid_col_dsc[] = {LV_GRID_CONTENT, LV_GRID_FR(1), LV_GRID_CONTENT, LV_GRID_FR(8), LV_GRID_TEMPLATE_LAST};
@@ -1266,16 +1263,16 @@ static lv_obj_t * create_shop_item(lv_obj_t * parent, const void * img_src, cons
 
     lv_obj_t * label;
     label = lv_label_create(cont);
-    lv_label_set_text(label, name);
+    lv_label_set_text_static(label, name);
     lv_obj_set_grid_cell(label, LV_GRID_ALIGN_START, 2, 1, LV_GRID_ALIGN_END, 0, 1);
 
     label = lv_label_create(cont);
-    lv_label_set_text(label, category);
+    lv_label_set_text_static(label, category);
     lv_obj_add_style(label, &style_text_muted, 0);
     lv_obj_set_grid_cell(label, LV_GRID_ALIGN_START, 2, 1, LV_GRID_ALIGN_START, 1, 1);
 
     label = lv_label_create(cont);
-    lv_label_set_text(label, price);
+    lv_label_set_text_static(label, price);
     lv_obj_set_grid_cell(label, LV_GRID_ALIGN_END, 3, 1, LV_GRID_ALIGN_END, 0, 1);
 
     return cont;
