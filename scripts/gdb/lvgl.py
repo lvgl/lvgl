@@ -326,15 +326,29 @@ class InfoDrawUnit(gdb.Command):
         print(f"Draw Unit: {draw_unit}, Name: {name}")
 
         # Handle different draw_units based on the name
-        if name == "VG_LITE":
-            vg_lite_draw_unit = draw_unit.cast(gdb.lookup_type("lv_draw_vg_lite_unit_t").pointer())
-            print(gdb.execute(f'print *({vg_lite_draw_unit.type}){vg_lite_draw_unit}', to_string=True))
-        elif name == "SW":
-            sw_draw_unit = draw_unit.cast(gdb.lookup_type("lv_draw_sw_unit_t").pointer())
-            print(gdb.execute(f'print *({sw_draw_unit.type}){sw_draw_unit}', to_string=True))
-        else:
-            print(gdb.execute(f'print *({draw_unit.type}){draw_unit}', to_string=True))
+        types = {}
+        type_names = {
+            "DMA2D": "lv_draw_dma2d_unit_t",
+            "NEMA_GFX": "lv_draw_nema_gfx_unit_t",
+            "NXP_PXP": "lv_draw_pxp_unit_t",
+            "NXP_VGLITE": "lv_draw_vglite_unit_t",
+            "OPENGLES": "lv_draw_opengles_unit_t",
+            "DAVE2D": "lv_draw_dave2d_unit_t",
+            "SDL": "lv_draw_sdl_unit_t",
+            "SW": "lv_draw_sw_unit_t",
+            "VG_LITE": "lv_draw_vg_lite_unit_t",
+        }
 
+        # Scan available draw unit types
+        for index, type_name in type_names.items():
+            try:
+                types[index] = gdb.lookup_type(type_name)
+            except gdb.error:
+                pass
+
+        # Print the format string of the draw unit, if not found, use the default type
+        type = types.get(name, gdb.lookup_type("lv_draw_unit_t"))
+        print(draw_unit.cast(type.pointer()).dereference().format_string(pretty_structs=True, symbols=True))
 
     def invoke(self, args, from_tty):
         try:
@@ -344,6 +358,7 @@ class InfoDrawUnit(gdb.Command):
 
             unit = g_lvgl_instance.draw_info()["unit_head"]
 
+            # Iterate through all draw units
             while unit:
                 self.dump_draw_unit(unit)
                 unit = unit["next"]
