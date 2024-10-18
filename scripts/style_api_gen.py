@@ -62,6 +62,10 @@ props = [
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Move the object with this value in Y direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height." },
 
+{'name': 'TRANSLATE_RADIAL',
+'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Move the object around the centre of the parent object (e.g. around the circumference of a scale)"},
+
 {'name': 'TRANSFORM_SCALE_X',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
  'dsc': "Zoom an objects horizontally. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on" },
@@ -114,6 +118,10 @@ props = [
 {'name': 'PAD_COLUMN',
  'style_type': 'num',   'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets the padding between the columns. Used by the layouts."},
+
+{'name': 'PAD_RADIAL',
+'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Pad the text labels away from the scale ticks/remainder of the LV_PART_"},
 
 {'section': 'Margin', 'dsc' : "Properties to describe spacing around an object. Very similar to the margin properties in HTML."},
 {'name': 'MARGIN_TOP',
@@ -344,6 +352,10 @@ props = [
 {'name': 'RADIUS',
  'style_type': 'num', 'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the radius on every corner. The value is interpreted in pixel (>= 0) or `LV_RADIUS_CIRCLE` for max. radius"},
+
+{'name': 'RADIAL_OFFSET',
+'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Move the start point of the object (e.g. scale tick) radially"},
 
 {'name': 'CLIP_CORNER',
  'style_type': 'num',   'var_type': 'bool',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,

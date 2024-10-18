@@ -14,7 +14,7 @@
  * Generated code from properties.py
  */
 /* *INDENT-OFF* */
-const lv_property_name_t lv_style_property_names[112] = {
+const lv_property_name_t lv_style_property_names[115] = {
     {"align",                  LV_PROPERTY_STYLE_ALIGN,},
     {"anim",                   LV_PROPERTY_STYLE_ANIM,},
     {"anim_duration",          LV_PROPERTY_STYLE_ANIM_DURATION,},
@@ -93,10 +93,12 @@ const lv_property_name_t lv_style_property_names[112] = {
     {"pad_bottom",             LV_PROPERTY_STYLE_PAD_BOTTOM,},
     {"pad_column",             LV_PROPERTY_STYLE_PAD_COLUMN,},
     {"pad_left",               LV_PROPERTY_STYLE_PAD_LEFT,},
+    {"pad_radial",             LV_PROPERTY_STYLE_PAD_RADIAL,},
     {"pad_right",              LV_PROPERTY_STYLE_PAD_RIGHT,},
     {"pad_row",                LV_PROPERTY_STYLE_PAD_ROW,},
     {"pad_top",                LV_PROPERTY_STYLE_PAD_TOP,},
     {"prop_inv",               LV_PROPERTY_STYLE_PROP_INV,},
+    {"radial_offset",          LV_PROPERTY_STYLE_RADIAL_OFFSET,},
     {"radius",                 LV_PROPERTY_STYLE_RADIUS,},
     {"rotary_sensitivity",     LV_PROPERTY_STYLE_ROTARY_SENSITIVITY,},
     {"shadow_color",           LV_PROPERTY_STYLE_SHADOW_COLOR,},
@@ -122,6 +124,7 @@ const lv_property_name_t lv_style_property_names[112] = {
     {"transform_skew_y",       LV_PROPERTY_STYLE_TRANSFORM_SKEW_Y,},
     {"transform_width",        LV_PROPERTY_STYLE_TRANSFORM_WIDTH,},
     {"transition",             LV_PROPERTY_STYLE_TRANSITION,},
+    {"translate_radial",       LV_PROPERTY_STYLE_TRANSLATE_RADIAL,},
     {"translate_x",            LV_PROPERTY_STYLE_TRANSLATE_X,},
     {"translate_y",            LV_PROPERTY_STYLE_TRANSLATE_Y,},
     {"width",                  LV_PROPERTY_STYLE_WIDTH,},
