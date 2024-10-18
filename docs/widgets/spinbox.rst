@@ -32,6 +32,21 @@ Value, range and step
 - :cpp:expr:`lv_spinbox_set_cursor_pos(spinbox, 1)` sets the cursor to a specific
   digit to change on increment/decrement. For example position '0' sets the cursor to the least significant digit.
 
+.. code-block:: c
+  lv_spinbox_set_value(motor_speed, 360); /*Set the motor speed value to 360rpm*/
+
+.. code-block:: c
+  lv_spinbox_increment(elevator_level); /*Increment the level spinbox*/
+
+.. code-block:: c
+  lv_spinbox_set_range(water_temperature, 0, 100); /*Limit the temperature for the water*/
+
+.. code-block:: c
+  lv_spinbox_set_step(kilo_count, 10); /*Modify the weight in tens of kilos*/
+
+.. code-block:: c
+  lv_spinbox_set_cursor_pos(age, 1); /*Modify the age of a person with tens of years*/
+
 If an encoder is used as input device, the selected digit is shifted to
 the right by default whenever the encoder button is clicked. To change this behaviour to shifting
 to the left, the :cpp:expr:`lv_spinbox_set_digit_step_direction(spinbox, LV_DIR_LEFT)` can be used
@@ -44,6 +59,9 @@ sets the number format. ``digit_count`` is the number of digits
 excluding the decimal separator and the sign. ``separator_position`` is
 the number of digits before the decimal point. If 0, no decimal point is displayed.
 
+.. code-block:: c
+  lv_spinbox_set_digit_format(weight_spinbox, 4, 1); /*Set the weight box to: 'kg.ggg' format*/
+
 Rollover
 --------
 
@@ -51,6 +69,9 @@ Rollover
 rollover mode. If either the minimum or maximum value is reached with
 rollover enabled, the value will change to the other limit. If rollover
 is disabled the value will remain at the minimum or maximum value.
+
+.. code-block:: c
+  lv_spinbox_set_rollover(time_spinbox, true); /*Allow rollover for time*/
 
 .. _lv_spinbox_events:
 

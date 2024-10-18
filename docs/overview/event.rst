@@ -212,8 +212,22 @@ simulating a button press (although there are simpler ways to do this):
    lv_obj_send_event(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
 
 The same works for display and input devices with
-``lv_display_send_event(obj, <EVENT_CODE>, &some_data)`` and
+``lv_display_send_event(obj, <EVENT_CODE>, &some_data)``
+
+.. code-block:: c
+
+   /*Simulate a double tap for the display*/
+   uint32_t double_tap_time = 0;
+   lv_display_send_event(lv_display_get_default(), LV_EVENT_DOUBLE_CLICKED, &double_tap_time);
+
+and
 ``lv_indev_send_event(obj, <EVENT_CODE>, &some_data)``.
+
+.. code-block:: c
+
+   /*Simulate the press of a key on the keypad (keypad is lv_indev_t* type)*/
+   uint32_t key_id = 0;
+   lv_indev_send_event(keypad, LV_EVENT_PRESSED, &key_id);
 
 Refresh event
 -------------

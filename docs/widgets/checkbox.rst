@@ -37,9 +37,16 @@ The text can be modified with the
 :cpp:expr:`lv_checkbox_set_text(cb, "New text")` function and will be
 dynamically allocated.
 
+.. code-block:: c
+   lv_checkbox_set_text(chechkbox0, "Lorem ipsum"); /*Set the text of checkbox0 to lorem ipsum*/
+
 To set a static text, use :cpp:expr:`lv_checkbox_set_static_text(cb, txt)`. This
 way, only a pointer to ``txt`` will be stored. The text then shouldn't
 be deallocated while the checkbox exists.
+
+.. code-block:: c
+   char[] txt0 = "Reginam occidere...";
+   lv_checkbox_set_static_text(chechkbox4, txt0); /*Set the text of checkbox4. Ensure txt0 does not get deallocated!*/
 
 Check, uncheck, disable
 -----------------------
@@ -55,6 +62,13 @@ common state add/clear function:
 
 To get whether the checkbox is checked or not use:
 :cpp:expr:`lv_obj_has_state(cb, LV_STATE_CHECKED)`.
+
+.. code-block:: c
+   uint8_t dummy;
+   /*If checkbox40 is checked, set a variable*/
+   if(lv_obj_has_state(chechkbox40, LV_STATE_CHECKED)){
+     dummy = 2;
+   }
 
 .. _lv_checkbox_events:
 
