@@ -440,6 +440,13 @@ int32_t lv_clamp_width(int32_t width, int32_t min_width, int32_t max_width, int3
  */
 int32_t lv_clamp_height(int32_t height, int32_t min_height, int32_t max_height, int32_t ref_height);
 
+/**
+ * Checks whether the given object or any of its parent objects has been transformed.
+ * @param           obj Pointer to a constant lv_obj_t object.
+ * @return          true if the object or any of its parents is transformed, false otherwise.
+ */
+bool is_transformed(const lv_obj_t * obj);
+
 /**********************
  *      MACROS
  **********************/
