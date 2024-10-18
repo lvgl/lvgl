@@ -220,7 +220,7 @@ static lv_obj_t * right_cont_create(lv_obj_t * parent)
         lv_obj_set_style_base_dir(right_cont, LV_BASE_DIR_LTR, 0);
     }
 
-    dropdown_create(right_cont, _("Language"), "English\n中国人\nعربي", &ebike_subject_language);
+    dropdown_create(right_cont, _("Language"), "English\n简体中文\nعربي", &ebike_subject_language);
     switch_create(right_cont, _("Bluetooth"), NULL);
     switch_create(right_cont, _("Lights"), NULL);
     slider_create(right_cont, _("Brightness"));
