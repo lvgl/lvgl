@@ -88,8 +88,6 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
 
     float radius_out = dsc->radius;
     float radius_in = dsc->radius - dsc->width;
-    float half_width = dsc->width * 0.5f;
-    float radius_center = radius_out - half_width;
     float cx = dsc->center.x;
     float cy = dsc->center.y;
 
@@ -97,53 +95,66 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
 
     if(math_equal(sweep_angle, 360)) {
         lv_vg_lite_path_append_circle(path, cx, cy, radius_out, radius_out);
-        lv_vg_lite_path_append_circle(path, cx, cy, radius_in, radius_in);
+
+        /* radius_in <= 0, normal fill circle */
+        if(radius_in > 0) {
+            lv_vg_lite_path_append_circle(path, cx, cy, radius_in, radius_in);
+        }
         fill = VG_LITE_FILL_EVEN_ODD;
     }
     else {
-        /* radius_out start point */
         float start_angle_rad = MATH_RADIANS(start_angle);
-        float start_x = radius_out * MATH_COSF(start_angle_rad) + cx;
-        float start_y = radius_out * MATH_SINF(start_angle_rad) + cy;
-
-        /* radius_in start point */
         float end_angle_rad = MATH_RADIANS(end_angle);
-        float end_x = radius_in * MATH_COSF(end_angle_rad) + cx;
-        float end_y = radius_in * MATH_SINF(end_angle_rad) + cy;
 
-        lv_vg_lite_path_move_to(path, start_x, start_y);
+        if(radius_in > 0) {
+            /* radius_out start point */
+            float start_x = radius_out * MATH_COSF(start_angle_rad) + cx;
+            float start_y = radius_out * MATH_SINF(start_angle_rad) + cy;
 
-        /* radius_out arc */
-        lv_vg_lite_path_append_arc(path,
-                                   cx, cy,
-                                   radius_out,
-                                   start_angle,
-                                   sweep_angle,
-                                   false);
+            /* radius_in start point */
+            float end_x = radius_in * MATH_COSF(end_angle_rad) + cx;
+            float end_y = radius_in * MATH_SINF(end_angle_rad) + cy;
 
-        /* line to radius_in */
-        lv_vg_lite_path_line_to(path, end_x, end_y);
+            lv_vg_lite_path_move_to(path, start_x, start_y);
 
-        /* radius_in arc */
-        lv_vg_lite_path_append_arc(path,
-                                   cx, cy,
-                                   radius_in,
-                                   end_angle,
-                                   -sweep_angle,
-                                   false);
+            /* radius_out arc */
+            lv_vg_lite_path_append_arc(path,
+                                       cx, cy,
+                                       radius_out,
+                                       start_angle,
+                                       sweep_angle,
+                                       false);
 
-        /* close arc */
-        lv_vg_lite_path_close(path);
+            /* line to radius_in */
+            lv_vg_lite_path_line_to(path, end_x, end_y);
+
+            /* radius_in arc */
+            lv_vg_lite_path_append_arc(path,
+                                       cx, cy,
+                                       radius_in,
+                                       end_angle,
+                                       -sweep_angle,
+                                       false);
+
+            /* close arc */
+            lv_vg_lite_path_close(path);
+        }
+        else {
+            /* draw a normal arc pie shape */
+            lv_vg_lite_path_append_arc(path, cx, cy, radius_out, start_angle, sweep_angle, true);
+        }
 
         /* draw round */
-        if(dsc->rounded && half_width > 0) {
-            float rcx1 = cx + radius_center * MATH_COSF(end_angle_rad);
-            float rcy1 = cy + radius_center * MATH_SINF(end_angle_rad);
-            lv_vg_lite_path_append_circle(path, rcx1, rcy1, half_width, half_width);
+        if(dsc->rounded && dsc->width > 0) {
+            float round_radius = radius_out > dsc->width ? dsc->width / 2.0f : radius_out / 2.0f;
+            float round_center = radius_out - round_radius;
+            float rcx1 = cx + round_center * MATH_COSF(end_angle_rad);
+            float rcy1 = cy + round_center * MATH_SINF(end_angle_rad);
+            lv_vg_lite_path_append_circle(path, rcx1, rcy1, round_radius, round_radius);
 
-            float rcx2 = cx + radius_center * MATH_COSF(start_angle_rad);
-            float rcy2 = cy + radius_center * MATH_SINF(start_angle_rad);
-            lv_vg_lite_path_append_circle(path, rcx2, rcy2, half_width, half_width);
+            float rcx2 = cx + round_center * MATH_COSF(start_angle_rad);
+            float rcy2 = cy + round_center * MATH_SINF(start_angle_rad);
+            lv_vg_lite_path_append_circle(path, rcx2, rcy2, round_radius, round_radius);
         }
     }
 
@@ -176,7 +187,9 @@ void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * d
             vg_lite_matrix_t path_matrix = u->global_matrix;
 
             /* move image to center */
-            vg_lite_translate(cx - radius_out, cy - radius_out, &matrix);
+            float img_half_w = decoder_dsc.decoded->header.w / 2.0f;
+            float img_half_h = decoder_dsc.decoded->header.h / 2.0f;
+            vg_lite_translate(cx - img_half_w, cy - img_half_h, &matrix);
 
             LV_VG_LITE_ASSERT_MATRIX(&path_matrix);
 
