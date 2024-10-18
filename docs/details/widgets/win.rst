@@ -7,7 +7,7 @@ Window (lv_win)
 Overview
 ********
 
-The Window is container-like object built from a header with title and
+The Window is container-like Widget built from a header with title and
 buttons and a content area.
 
 .. _lv_win_parts_and_styles:
@@ -85,7 +85,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/win/index.rst
+.. include:: ../../examples/widgets/win/index.rst
 
 .. _lv_win_api:
 

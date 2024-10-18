@@ -66,7 +66,7 @@ Events
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when a new option is selected.
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See also:  events of :ref:`Base Widget <lv_obj>`.
 
 Learn more about :ref:`events`.
 
@@ -84,7 +84,7 @@ Keys
 Example
 *******
 
-.. include:: ../examples/widgets/roller/index.rst
+.. include:: ../../examples/widgets/roller/index.rst
 
 .. _lv_roller_api:
 

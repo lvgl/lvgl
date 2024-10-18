@@ -1,8 +1,8 @@
-.. _animations:
+.. _animation:
 
-==========
-Animations
-==========
+===================
+Animation (lv_anim)
+===================
 
 You can automatically change the value of a variable between a start and
 an end value using animations. Animation will happen by periodically
@@ -15,8 +15,8 @@ The *animator* functions have the following prototype:
    void func(void * var, lv_anim_var_t value);
 
 This prototype is compatible with the majority of the property *set*
-functions in LVGL. For example :cpp:expr:`lv_obj_set_x(obj, value)` or
-:cpp:expr:`lv_obj_set_width(obj, value)`
+functions in LVGL. For example :cpp:expr:`lv_obj_set_x(widget, value)` or
+:cpp:expr:`lv_obj_set_width(widget, value)`
 
 .. _animations_create:
 
@@ -38,54 +38,54 @@ and configured with ``lv_anim_set_...()`` functions.
    /* MANDATORY SETTINGS
     *------------------*/
 
-   /*Set the "animator" function*/
+   /* Set the "animator" function */
    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_obj_set_x);
 
-   /*Set target of the animation*/
-   lv_anim_set_var(&a, obj);
+   /* Set target of the animation */
+   lv_anim_set_var(&a, widget);
 
-   /*Length of the animation [ms]*/
+   /* Length of the animation [ms] */
    lv_anim_set_duration(&a, duration);
 
-   /*Set start and end values. E.g. 0, 150*/
+   /* Set start and end values. E.g. 0, 150 */
    lv_anim_set_values(&a, start, end);
 
    /* OPTIONAL SETTINGS
     *------------------*/
 
-   /*Time to wait before starting the animation [ms]*/
+   /* Time to wait before starting the animation [ms] */
    lv_anim_set_delay(&a, delay);
 
-   /*Set path (curve). Default is linear*/
+   /* Set path (curve). Default is linear */
    lv_anim_set_path_cb(&a, lv_anim_path_ease_in);
 
-   /*Set a callback to indicate when the animation is completed.*/
+   /* Set a callback to indicate when the animation is completed. */
    lv_anim_set_completed_cb(&a, completed_cb);
 
-   /*Set a callback to indicate when the animation is deleted (idle).*/
+   /* Set a callback to indicate when the animation is deleted (idle). */
    lv_anim_set_deleted_cb(&a, deleted_cb);
 
-   /*Set a callback to indicate when the animation is started (after delay).*/
+   /* Set a callback to indicate when the animation is started (after delay). */
    lv_anim_set_start_cb(&a, start_cb);
 
-   /*When ready, play the animation backward with this duration. Default is 0 (disabled) [ms]*/
+   /* When ready, play the animation backward with this duration. Default is 0 (disabled) [ms] */
    lv_anim_set_playback_duration(&a, time);
 
-   /*Delay before playback. Default is 0 (disabled) [ms]*/
+   /* Delay before playback. Default is 0 (disabled) [ms] */
    lv_anim_set_playback_delay(&a, delay);
 
-   /*Number of repetitions. Default is 1. LV_ANIM_REPEAT_INFINITE for infinite repetition*/
+   /* Number of repetitions. Default is 1. LV_ANIM_REPEAT_INFINITE for infinite repetition */
    lv_anim_set_repeat_count(&a, cnt);
 
-   /*Delay before repeat. Default is 0 (disabled) [ms]*/
+   /* Delay before repeat. Default is 0 (disabled) [ms] */
    lv_anim_set_repeat_delay(&a, delay);
 
-   /*true (default): apply the start value immediately, false: apply start value after delay when the anim. really starts. */
+   /* true (default): apply the start value immediately, false: apply start value after delay when the anim. really starts. */
    lv_anim_set_early_apply(&a, true/false);
 
    /* START THE ANIMATION
     *------------------*/
-   lv_anim_start(&a);                             /*Start the animation*/
+   lv_anim_start(&a);                             /* Start the animation */
 
 You can apply multiple different animations on the same variable at the
 same time. For example, animate the x and y coordinates with
@@ -166,7 +166,7 @@ after adding all animations and before starting to play.
 Call :cpp:expr:`lv_anim_timeline_stop(at)` to stop the animation timeline.
 
 Call :cpp:expr:`lv_anim_timeline_set_progress(at, progress)` function to set the
-state of the object corresponding to the progress of the timeline.
+state of the Widget corresponding to the progress of the timeline.
 
 Call :cpp:expr:`lv_anim_timeline_get_playtime(at)` function to get the total
 duration of the entire animation timeline.
@@ -175,8 +175,8 @@ Call :cpp:expr:`lv_anim_timeline_get_reverse(at)` function to get whether to
 reverse the animation timeline.
 
 Call :cpp:expr:`lv_anim_timeline_delete(at)` function to delete the animation timeline.
-**Note**: If you need to delete an object during animation, be sure to delete the
-anim timeline before deleting the object. Otherwise, the program may crash or behave abnormally.
+**Note**: If you need to delete a Widget during animation, be sure to delete the
+anim timeline before deleting the Widget. Otherwise, the program may crash or behave abnormally.
 
 .. image:: /misc/anim-timeline.png
 
@@ -185,7 +185,7 @@ anim timeline before deleting the object. Otherwise, the program may crash or be
 Examples
 ********
 
-.. include:: ../examples/anim/index.rst
+.. include:: ../../examples/anim/index.rst
 
 .. _animations_api:
 

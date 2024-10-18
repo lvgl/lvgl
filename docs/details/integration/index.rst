@@ -1,3 +1,5 @@
+.. _integration_index:
+
 =======================
 Integration and Drivers
 =======================
@@ -9,6 +11,7 @@ Integration and Drivers
     building/index
     chip/index
     driver/index
+    renderers/index
     framework/index
     ide/index
     os/index

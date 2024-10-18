@@ -20,9 +20,9 @@ To enable logging, set :c:macro:`LV_USE_LOG` in ``lv_conf.h`` and set
 - :c:macro:`LV_LOG_LEVEL_USER`: Only user messages
 - :c:macro:`LV_LOG_LEVEL_NONE`: Do not log anything
 
-The events which have a higher level than the set log level will be
-logged too. E.g. if you :c:macro:`LV_LOG_LEVEL_WARN`, errors will be also
-logged.
+The events which have a higher level than the set log level will be logged
+as well. E.g. if you :c:macro:`LV_LOG_LEVEL_WARN`, errors will be also logged.
+
 
 Printing logs
 *************

@@ -59,7 +59,7 @@ Events
 
 - :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the value has changed.
 
-See the events of the :ref:`Text area <lv_textarea>` too.
+See also:  events of :ref:`lv_textarea`.
 
 Learn more about :ref:`events`.
 
@@ -80,7 +80,7 @@ Keys
 Example
 *******
 
-.. include:: ../examples/widgets/spinbox/index.rst
+.. include:: ../../examples/widgets/spinbox/index.rst
 
 .. _lv_spinbox_api:
 

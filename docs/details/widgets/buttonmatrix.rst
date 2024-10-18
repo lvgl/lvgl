@@ -1,22 +1,22 @@
 .. _lv_buttonmatrix:
 
 ===============================
-Button matrix (lv_buttonmatrix)
+Button Matrix (lv_buttonmatrix)
 ===============================
 
 Overview
 ********
 
-The Button Matrix object is a lightweight way to display multiple
+The Button Matrix Widget is a lightweight way to display multiple
 buttons in rows and columns. Lightweight because the buttons are not
 actually created but just virtually drawn on the fly. This way, one
 button use only eight extra bytes of memory instead of the ~100-150
-bytes a normal `Button <widgets/button>`__ object plus the 100 or so bytes
-for the `Label <widgets/label>`__ object.
+bytes a normal :ref:`Button <lv_button>` Widget plus the 100 or so bytes
+for the :ref:`Label <lv_label>` Widget.
 
 The Button matrix is added to the default group (if one is set). Besides
-the Button matrix is an editable object to allow selecting and clicking
-the buttons with encoder navigation too.
+the Button matrix is an editable Widget to allow selecting and clicking
+the buttons with encoder navigation as well.
 
 .. _lv_buttonmatrix_parts_and_styles:
 
@@ -67,7 +67,7 @@ following parameters:
 
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_HIDDEN`: Makes a button hidden (hidden buttons still take up space in the layout, they are just not visible or clickable)
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_NO_REPEAT`: Disable repeating when the button is long pressed
-- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_DISABLED`: Makes a button disabled Like :cpp:enumerator:`LV_STATE_DISABLED` on normal objects
+- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_DISABLED`: Makes a button disabled Like :cpp:enumerator:`LV_STATE_DISABLED` on normal Widgets
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CHECKABLE`: Enable toggling of a button. I.e. :cpp:enumerator:`LV_STATE_CHECKED` will be added/removed as the button is clicked
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CHECKED`: Make the button checked. It will use the :cpp:enumerator:`LV_STATE_CHECHKED` styles.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CLICK_TRIG`: Enabled: send LV_EVENT_VALUE_CHANGE on CLICK, Disabled: send :cpp:enumerator:`LV_EVENT_VALUE_CHANGE` on PRESS
@@ -109,7 +109,7 @@ Events
    repeated after long press. The event parameter is set to the ID of
    the pressed/released button.
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See also:  events of :ref:`Base Widget <lv_obj>`.
 
 :cpp:expr:`lv_buttonmatrix_get_selected_button(buttonm)` returns the index of the most
 recently released or focused button or :cpp:enumerator:`LV_BUTTONMATRIX_BUTTON_NONE` if no
@@ -144,7 +144,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/buttonmatrix/index.rst
+.. include:: ../../examples/widgets/buttonmatrix/index.rst
 
 .. _lv_buttonmatrix_api:
 

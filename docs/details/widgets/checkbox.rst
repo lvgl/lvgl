@@ -7,7 +7,7 @@ Checkbox (lv_checkbox)
 Overview
 ********
 
-The Checkbox object is created from a "tick box" and a label. When the
+The Checkbox Widget is created from a "tick box" and a label. When the
 Checkbox is clicked the tick box is toggled.
 
 .. _lv_checkbox_parts_and_styles:
@@ -49,9 +49,9 @@ common state add/clear function:
 
 .. code-block:: c
 
-   lv_obj_add_state(cb, LV_STATE_CHECKED);   /*Make the checkbox checked*/
-   lv_obj_remove_state(cb, LV_STATE_CHECKED); /*Make the checkbox unchecked*/
-   lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED); /*Make the checkbox checked and disabled*/
+   lv_obj_add_state(cb, LV_STATE_CHECKED);   /* Make the checkbox checked */
+   lv_obj_remove_state(cb, LV_STATE_CHECKED); /* Make the checkbox unchecked */
+   lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED); /* Make the checkbox checked and disabled */
 
 To get whether the checkbox is checked or not use:
 :cpp:expr:`lv_obj_has_state(cb, LV_STATE_CHECKED)`.
@@ -63,7 +63,7 @@ Events
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the checkbox is toggled.
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See also:  events of :ref:`Base Widget <lv_obj>`.
 
 Learn more about :ref:`events`.
 
@@ -87,7 +87,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/checkbox/index.rst
+.. include:: ../../examples/widgets/checkbox/index.rst
 
 .. _lv_checkboxapi:
 

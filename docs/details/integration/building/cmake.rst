@@ -1,7 +1,7 @@
 .. _build_cmake:
 
 =====
-cmake
+CMake
 =====
 
 

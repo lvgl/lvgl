@@ -7,7 +7,7 @@ Keyboard (lv_keyboard)
 Overview
 ********
 
-The Keyboard object is a special :ref:`Button matrix <lv_buttonmatrix>`
+The Keyboard Widget is a special :ref:`Button matrix <lv_buttonmatrix>`
 with predefined keymaps and other features to realize a virtual keyboard
 to write texts into a :ref:`Text area <lv_textarea>`.
 
@@ -126,7 +126,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/keyboard/index.rst
+.. include:: ../../examples/widgets/keyboard/index.rst
 
 .. _lv_keyboard_api:
 

@@ -7,7 +7,7 @@ Chart (lv_chart)
 Overview
 ********
 
-Charts are a basic object to visualize data points. Currently *Line*
+Charts are a basic Widget to visualize data points. Currently *Line*
 charts (connect points with lines and/or draw points on them) and *Bar*
 charts are supported.
 
@@ -25,7 +25,7 @@ Parts and Styles
    charts ``pad_column`` sets the space between the columns of the
    adjacent indices.
 -  :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar used if the chart is zoomed. See
-   the :ref:`Base object <lv_obj>`\ 's documentation for details.
+   the :ref:`Base Widget <lv_obj>`\ 's documentation for details.
 -  :cpp:enumerator:`LV_PART_ITEMS` Refers to the line or bar series.
 
    -  Line chart: The *line* properties are used by the lines.
@@ -64,7 +64,7 @@ Data series
 
 You can add any number of series to the charts by
 :cpp:expr:`lv_chart_add_series(chart, color, axis)`. This allocates an
-:cpp:struct:`lv_chart_series_t` structure which contains the chosen ``color`` and
+:cpp:expr:`lv_chart_series_t` structure which contains the chosen ``color`` and
 an array for the data points. ``axis`` can have the following values:
 
 - :cpp:enumerator:`LV_CHART_AXIS_PRIMARY_Y`: Left axis
@@ -173,7 +173,7 @@ Note that :cpp:enumerator:`LV_CHART_UPDATE_MODE_SHIFT` also changes the
 Tick marks and labels
 ---------------------
 
-With the help of `Scale <widgets/scale>`__, vertical and horizontal scales can be added in a very flexible way.
+With the help of :ref:`Scale <lv_scale>`, vertical and horizontal scales can be added in a very flexible way.
 See the example below to learn more.
 
 Zoom
@@ -211,7 +211,7 @@ Events
    :cpp:expr:`lv_chart_get_pressed_point(chart)` returns the zero-based index of
    the pressed point.
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See also:  events of :ref:`Base Widget <lv_obj>`.
 
 Learn more about :ref:`events`.
 
@@ -220,7 +220,7 @@ Learn more about :ref:`events`.
 Keys
 ****
 
-No *Keys* are processed by the object type.
+No *Keys* are processed by the Widget type.
 
 Learn more about :ref:`indev_keys`.
 
@@ -229,7 +229,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/chart/index.rst
+.. include:: ../../examples/widgets/chart/index.rst
 
 .. _lv_chart_api:
 

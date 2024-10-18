@@ -1,20 +1,26 @@
-.. _objects:
+.. _widget_basics:
 
-=======
-Objects
-=======
+=============
+Widget Basics
+=============
 
-In LVGL the **basic building blocks** of a user interface are the
-objects, also called *Widgets*. For example a
+
+What is a Widget?
+*****************
+In LVGL a Widget is the **basic building block** of the user interface.
+The most fundamental of all of Widgets is :ref:`lv_obj`, on which all other
+widgets are based.
+
+Examples:  :ref:`Base Widget (and Screen) <lv_obj>`,
 :ref:`Button <lv_button>`, :ref:`Label <lv_label>`,
 :ref:`Image <lv_image>`, :ref:`List <lv_list>`,
 :ref:`Chart <lv_chart>` or :ref:`Text area <lv_textarea>`.
 
-You can see all the :ref:`Object types <widgets>` here.
+See :ref:`widgets` to see all Widget types.
 
-All objects are referenced using an :cpp:type:`lv_obj_t` pointer as a handle.
-This pointer can later be used to set or get the attributes of the
-object.
+All Widgets are referenced using an :cpp:type:`lv_obj_t` pointer as a handle.
+This pointer can later be used to read or change the Widget's attributes.
+
 
 .. _objects_attributes:
 
@@ -24,7 +30,7 @@ Attributes
 Basic attributes
 ----------------
 
-All object types share some basic attributes:
+All Widget types share some basic attributes:
 
 - Position
 - Size
@@ -38,45 +44,46 @@ You can set/get these attributes with ``lv_obj_set_...`` and
 
 .. code-block:: c
 
-   /*Set basic object attributes*/
-   lv_obj_set_size(btn1, 100, 50);   /*Set a button's size*/
-   lv_obj_set_pos(btn1, 20,30);      /*Set a button's position*/
+   /* Set basic Widget attributes */
+   lv_obj_set_size(btn1, 100, 50);   /* Set a button's size */
+   lv_obj_set_pos(btn1, 20,30);      /* Set a button's position */
 
-To see all the available functions visit the :ref:`Base object's documentation <lv_obj>`.
+To see all the available functions visit the :ref:`Base Widget's documentation <lv_obj>`.
 
 Specific attributes
 -------------------
 
-The object types have special attributes too. For example, a slider has
+The Widget types have special attributes as well. For example, a slider has
 
 - Minimum and maximum values
 - Current value
 
-For these special attributes, every object type may have unique API
+For these special attributes, every Widget type may have unique API
 functions. For example for a slider:
 
 .. code-block:: c
 
-   /*Set slider specific attributes*/
-   lv_slider_set_range(slider1, 0, 100);                   /*Set the min. and max. values*/
-   lv_slider_set_value(slider1, 40, LV_ANIM_ON);       /*Set the current value (position)*/
+   /* Set slider specific attributes */
+   lv_slider_set_range(slider1, 0, 100);               /* Set the min. and max. values */
+   lv_slider_set_value(slider1, 40, LV_ANIM_ON);       /* Set the current value (position) */
 
 The API of the widgets is described in their
 :ref:`Documentation <widgets>` but you can also check the respective
 header files (e.g. *widgets/lv_slider.h*)
 
+
 .. _objects_working_mechanisms:
 
-Working mechanisms
+Working Mechanisms
 ******************
 
 Parent-child structure
 ----------------------
 
-A parent object can be considered as the container of its children.
-Every object has exactly one parent object (except screens), but a
+A parent Widget can be considered as the container of its children.
+Every Widget has exactly one parent Widget (except Screens), but a
 parent can have any number of children. There is no limitation for the
-type of the parent but there are objects which are typically a parent
+type of the parent but there are Widgets which are typically a parent
 (e.g. button) or a child (e.g. label).
 
 Moving together
@@ -89,11 +96,11 @@ it. Therefore, all positions are relative to the parent.
 
 .. code-block:: c
 
-   lv_obj_t * parent = lv_obj_create(lv_screen_active());   /*Create a parent object on the current screen*/
-   lv_obj_set_size(parent, 100, 80);                    /*Set the size of the parent*/
+   lv_obj_t * parent = lv_obj_create(lv_screen_active());  /* Create a parent Widget on the current screen */
+   lv_obj_set_size(parent, 100, 80);                       /* Set the size of the parent */
 
-   lv_obj_t * obj1 = lv_obj_create(parent);             /*Create an object on the previously created parent object*/
-   lv_obj_set_pos(obj1, 10, 10);                        /*Set the position of the new object*/
+   lv_obj_t * obj1 = lv_obj_create(parent);                /* Create a Widget on the previously created parent Widget */
+   lv_obj_set_pos(widget1, 10, 10);                        /* Set the position of the new Widget */
 
 Modify the position of the parent:
 
@@ -101,9 +108,9 @@ Modify the position of the parent:
 
 .. code-block:: c
 
-   lv_obj_set_pos(parent, 50, 50); /*Move the parent. The child will move with it.*/
+   lv_obj_set_pos(parent, 50, 50); /* Move the parent. The child will move with it. */
 
-(For simplicity the adjusting of colors of the objects is not shown in
+(For simplicity the adjusting of colors of the Widgets is not shown in
 the example.)
 
 Visibility only on the parent
@@ -116,17 +123,17 @@ outside will not be visible.
 
 .. code-block:: c
 
-   lv_obj_set_x(obj1, -30);    /*Move the child a little bit off the parent*/
+   lv_obj_set_x(widget1, -30);    /* Move the child a little bit off the parent */
 
 This behavior can be overwritten with
-:cpp:expr:`lv_obj_add_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)` which allow the
+:cpp:expr:`lv_obj_add_flag(widget, LV_OBJ_FLAG_OVERFLOW_VISIBLE)` which allow the
 children to be drawn out of the parent.
 
-Create and delete objects
+Create and delete Widgets
 -------------------------
 
-In LVGL, objects can be created and deleted dynamically at run time. It
-means only the currently created (existing) objects consume RAM.
+In LVGL, Widgets can be created and deleted dynamically at run time. It
+means only the currently created (existing) Widgets consume RAM.
 
 This allows for the creation of a screen just when a button is clicked
 to open it, and for deletion of screens when a new screen is loaded.
@@ -141,38 +148,38 @@ Every widget has its own **create** function with a prototype like this:
 
    lv_obj_t * lv_<widget>_create(lv_obj_t * parent, <other parameters if any>);
 
-Typically, the create functions only have a *parent* parameter telling
-them on which object to create the new widget.
+Typically, the create functions only have a ``parent`` parameter telling
+them on which Widget to create the new Widget.
 
-The return value is a pointer to the created object with :cpp:type:`lv_obj_t` ``*``
+The return value is a pointer to the created Widget with :cpp:type:`lv_obj_t` ``*``
 type.
 
-There is a common **delete** function for all object types. It deletes
-the object and all of its children.
+There is a common **delete** function for all Widget types. It deletes
+the Widget and all of its children.
 
 .. code-block:: c
 
-   void lv_obj_delete(lv_obj_t * obj);
+   void lv_obj_delete(lv_obj_t * widget);
 
-:cpp:func:`lv_obj_delete` will delete the object immediately. If for any reason you
-can't delete the object immediately you can use
-:cpp:expr:`lv_obj_delete_async(obj)` which will perform the deletion on the next
+:cpp:func:`lv_obj_delete` will delete the Widget immediately. If for any reason you
+can't delete the Widget immediately you can use
+:cpp:expr:`lv_obj_delete_async(widget)` which will perform the deletion on the next
 call of :cpp:func:`lv_timer_handler`. This is useful e.g. if you want to
-delete the parent of an object in the child's :cpp:enumerator:`LV_EVENT_DELETE`
+delete the parent of a Widget in the child's :cpp:enumerator:`LV_EVENT_DELETE`
 handler.
 
-You can remove all the children of an object (but not the object itself)
-using :cpp:expr:`lv_obj_clean(obj)`.
+You can remove all the children of a Widget (but not the Widget itself)
+using :cpp:expr:`lv_obj_clean(widget)`.
 
-You can use :cpp:expr:`lv_obj_delete_delayed(obj, 1000)` to delete an object after
+You can use :cpp:expr:`lv_obj_delete_delayed(widget, 1000)` to delete a Widget after
 some time. The delay is expressed in milliseconds.
 
-Sometimes you're not sure whether an object was deleted and you need some way to
-check if it's still "alive". Anytime before the object is deleted, you can use
-cpp:expr:`lv_obj_null_on_delete(&obj)` to cause your object pointer to be set to ``NULL``
-when the object is deleted.
+Sometimes you're not sure whether a Widget was deleted and you need some way to
+check if it's still "alive". Anytime before the Widget is deleted, you can use
+cpp:expr:`lv_obj_null_on_delete(&widget)` to cause your Widget pointer to be set to ``NULL``
+when the Widget is deleted.
 
-Make sure the pointer variable itself stays valid until the object is deleted. Here
+Make sure the pointer variable itself stays valid until the Widget is deleted. Here
 is an example:
 
 .. code:: c
@@ -190,61 +197,86 @@ is an example:
       }
    }
 
-.. _objects_screens:
+
+
+.. _screens:
 
 Screens
 *******
 
-Create screens
---------------
+What are Screens?
+-----------------
 
-The screens are special objects which have no parent object. So they can
-be created like:
+Not to be confused with a :ref:`display`, Screens are simply any Widget created
+without a parent (i.e. passing NULL for the ``parent`` argument during creation).  As
+such, they form the "root" of a Widget Tree.
+
+Normally the Base Widget is used for this purpose since it has all the features most
+Screens need.  But an :ref:`lv_image` Widget can also be used to create a wallpaper
+background for the Widget Tree.
+
+All Screens:
+
+- are automatically attached to the :ref:`default_display` current when the Screen
+  was created;
+- automatically occupy the full area of the associated display;
+- cannot be moved, i.e. functions such as :cpp:func:`lv_obj_set_pos` and
+  :cpp:func:`lv_obj_set_size` cannot be used on screens.
+
+Each :ref:`display` object can have multiple screens associated with it, but not vice
+versa.  Thus the relationship::
+
+       Display
+          |
+         --- (one or more)
+         /|\
+    Screen Widgets  (root of a Widget Tree)
+          |
+          O  (zero or more)
+         /|\
+    Child Widgets
+
+
+Creating Screens
+----------------
+
+Screens are created like this:
 
 .. code-block:: c
 
    lv_obj_t * scr1 = lv_obj_create(NULL);
 
-Screens can be created with any object type. For example, a
-:ref:`Base object <lv_obj>` or an image to make a wallpaper.
+Screens can be deleted with :cpp:expr:`lv_obj_delete(scr)`, but be sure you do not
+delete the :ref:`active_screen`.
 
-Get the active screen
----------------------
 
-There is always an active screen on each display. By default, the
-library creates and loads a "Base object" as a screen for each display.
+.. _active_screen:
 
-To get the currently active screen use the :cpp:func:`lv_screen_active` function.
+Active Screen
+-------------
+While each :ref:`display` object can have any number of Screens Widgets associated
+with it, only one of those Screens is considered "Active" at any given time.  That
+Screen is referred to as the Display's "Active Screen".  For this reason, only one
+Screen and its child Widgets will ever be shown on a display at one time.
 
-.. _objects_load_screens:
+When each :ref:`display` object was created, a default screen was created with it and
+set as its "Active Screen".
 
-Load screens
-------------
+To get a pointer to the "Active Screen", call :cpp:func:`lv_screen_active`.
 
-To load a new screen, use :cpp:expr:`lv_screen_load(scr1)`.
+To set a Screen to be the "Active Screen", call :cpp:func:`lv_screen_load` or
+:cpp:func:`lv_screen_load_anim`.
 
-Layers
-------
 
-There are two automatically generated layers:
+.. _objects_loading_screens:
 
-- top layer
-- system layer
+Loading Screens
+---------------
 
-They are independent of the screens and they will be shown on every
-screen. The *top layer* is above every object on the screen and the
-*system layer* is above the *top layer*. You can add any pop-up windows
-to the *top layer* freely. But, the *system layer* is restricted to
-system-level things (e.g. mouse cursor will be placed there with
-:cpp:func:`lv_indev_set_cursor`).
+To load a new screen, use :cpp:expr:`lv_screen_load(scr1)`.  This sets ``scr1`` as
+the Active Screen.
 
-The :cpp:func:`lv_layer_top` and :cpp:func:`lv_layer_sys` functions return pointers
-to the top and system layers respectively.
-
-Read the :ref:`Layer overview <layers>` section to learn more
-about layers.
-
-Load screen with animation
+Load Screen with Animation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A new screen can be loaded with animation by using
@@ -264,18 +296,53 @@ The new screen will become active (returned by :cpp:func:`lv_screen_active`) whe
 the animation starts after ``delay`` time. All inputs are disabled
 during the screen animation.
 
-Handling multiple displays
---------------------------
 
-Screens are created on the currently selected *default display*. The
-*default display* is the last registered display with
-:cpp:func:`lv_display_create`. You can also explicitly select a new default
-display using :cpp:expr:`lv_display_set_default(disp)`.
+.. _layers_overview:
 
-:cpp:func:`lv_screen_active`, :cpp:func:`lv_screen_load` and :cpp:func:`lv_screen_load_anim` operate
-on the default display.
+Layers
+------
 
-Visit :ref:`display_multi_display_support` to learn more.
+When an ``lv_display_t`` object is created, 4 Screens (layers) are created and
+attached to it.
+
+1.  Bottom Layer
+2.  Active Screen
+3.  Top Layer
+4.  System Layer
+
+1, 3 and 4 are independent of the :ref:`active_screen` and they will be shown (if
+they contain anything that is visible) regardless of which screen is the Active
+Screen.  See :ref:`screen_layers` for more information.
+
+
+.. _transparent_screens:
+
+Transparent Screens
+-------------------
+
+Usually, the opacity of the Screen is :cpp:enumerator:`LV_OPA_COVER` to provide a
+solid background for its children. If this is not the case (opacity <
+100%) the display's ``bottom_layer`` will be visible.  If the bottom layer's
+opacity is also not :cpp:enumerator:`LV_OPA_COVER` LVGL will have no solid background
+to draw.
+
+This configuration (transparent Screen) could be useful to create, for example,
+on-screen display (OSD) menus where a video is played on a different hardware layer
+of the display panel, and a menu is overlaid on a higher layer.
+
+To properly render a UI on a transparent Screen the Display's color format needs to
+be set to one with an alpha channel (for example LV_COLOR_FORMAT_ARGB8888).
+
+In summary, to enable transparent screens and displays for OSD menu-like UIs:
+
+- Set the screen's ``bg_opa`` to transparent:
+  :cpp:expr:`lv_obj_set_style_bg_opa(lv_screen_active(), LV_OPA_TRANSP, LV_PART_MAIN)`
+- Set the bottom layer's ``bg_opa`` to transparent:
+  :cpp:expr:`lv_obj_set_style_bg_opa(lv_layer_bottom(), LV_OPA_TRANSP, LV_PART_MAIN)`
+- Set a color format with alpha channel. E.g.
+  :cpp:expr:`lv_display_set_color_format(disp, LV_COLOR_FORMAT_ARGB8888)`
+
+
 
 .. _objects_parts:
 
@@ -283,7 +350,7 @@ Parts
 *****
 
 The widgets are built from multiple parts. For example a
-:ref:`Base object <lv_obj>` uses the main and scrollbar parts but a
+:ref:`Base Widget <lv_obj>` uses the main and scrollbar parts but a
 :ref:`Slider <lv_slider>` uses the main, indicator and knob parts.
 Parts are similar to *pseudo-elements* in CSS.
 
@@ -302,12 +369,13 @@ The main purpose of parts is to allow styling the "components" of the
 widgets. They are described in more detail in the
 :ref:`Style overview <styles>` section.
 
+
 .. _objects_states:
 
 States
 ******
 
-The object can be in a combination of the following states:
+The Widget can be in a combination of the following states:
 
 - :cpp:enumerator:`LV_STATE_DEFAULT`: Normal, released state
 - :cpp:enumerator:`LV_STATE_CHECKED`: Toggled or checked state
@@ -324,23 +392,26 @@ The object can be in a combination of the following states:
 - :cpp:enumerator:`LV_STATE_USER_4`: Custom state
 
 The states are usually automatically changed by the library as the user
-interacts with an object (presses, releases, focuses, etc.). However,
-the states can be changed manually too. To set or clear given state (but
+interacts with a Widget (presses, releases, focuses, etc.). However,
+the states can be changed manually as well. To set or clear given state (but
 leave the other states untouched) use
-``lv_obj_add/remove_state(obj, LV_STATE_...)`` In both cases OR-ed state
+:cpp:expr:`lv_obj_add_state(widget, LV_STATE_...)` and
+:cpp:expr:`lv_obj_remove_state(widget, LV_STATE_...)`.  In both cases OR-ed state
 values can be used as well. E.g.
-:cpp:expr:`lv_obj_add_state(obj, part, LV_STATE_PRESSED | LV_PRESSED_CHECKED)`.
+:cpp:expr:`lv_obj_add_state(widget, part, LV_STATE_PRESSED | LV_PRESSED_CHECKED)`.
 
 To learn more about the states read the related section of the
 :ref:`Style overview <styles>`.
 
 .. _objects_snapshot:
 
+
 Snapshot
 ********
 
-A snapshot image can be generated for an object together with its
+A snapshot image can be generated for a Widget together with its
 children. Check details in :ref:`snapshot`.
+
 
 .. _objects_api:
 

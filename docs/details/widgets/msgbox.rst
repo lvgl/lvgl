@@ -1,7 +1,7 @@
 .. _lv_msgbox:
 
 =======================
-Message box (lv_msgbox)
+Message Box (lv_msgbox)
 =======================
 
 Overview
@@ -53,20 +53,20 @@ following functions:
 
 .. code-block:: c
 
-   lv_obj_t * lv_msgbox_get_content(lv_obj_t * obj);
-   lv_obj_t * lv_msgbox_get_title(lv_obj_t * obj);
-   lv_obj_t * lv_msgbox_get_header(lv_obj_t * obj);
-   lv_obj_t * lv_msgbox_get_footer(lv_obj_t * obj);
+   lv_obj_t * lv_msgbox_get_content(lv_obj_t * widget);
+   lv_obj_t * lv_msgbox_get_title(lv_obj_t * widget);
+   lv_obj_t * lv_msgbox_get_header(lv_obj_t * widget);
+   lv_obj_t * lv_msgbox_get_footer(lv_obj_t * widget);
 
-Functions that add something to the message box return the newly added object:
+Functions that add something to the message box return the newly added Widget:
 
 .. code:: c
 
-   lv_obj_t * lv_msgbox_add_text(lv_obj_t * obj, const char * text);
-   lv_obj_t * lv_msgbox_add_title(lv_obj_t * obj, const char * title);
-   lv_obj_t * lv_msgbox_add_close_button(lv_obj_t * obj);
-   lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * obj, const void * icon);
-   lv_obj_t * lv_msgbox_add_footer_button(lv_obj_t * obj, const char * text);
+   lv_obj_t * lv_msgbox_add_text(lv_obj_t * widget, const char * text);
+   lv_obj_t * lv_msgbox_add_title(lv_obj_t * widget, const char * title);
+   lv_obj_t * lv_msgbox_add_close_button(lv_obj_t * widget);
+   lv_obj_t * lv_msgbox_add_header_button(lv_obj_t * widget, const void * icon);
+   lv_obj_t * lv_msgbox_add_footer_button(lv_obj_t * widget, const char * text);
 
 
 Close the message box
@@ -92,7 +92,7 @@ Learn more about :ref:`events`.
 Keys
 ****
 
-No *Keys* are processed by the object type.
+No *Keys* are processed by the Widget type.
 
 Learn more about :ref:`indev_keys`.
 
@@ -101,7 +101,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/msgbox/index.rst
+.. include:: ../../examples/widgets/msgbox/index.rst
 
 .. _lv_msgbox_api:
 

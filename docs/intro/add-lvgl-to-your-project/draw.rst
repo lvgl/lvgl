@@ -1,10 +1,10 @@
-.. _porting_draw:
+.. _draw:
 
-==========
-Custom GPU
-==========
+================
+Drawing Pipeline
+================
 
-LVGL has a flexible and extendable draw pipeline. You can hook it to do
+LVGL has a flexible and extendable drawing pipeline.  You can hook it to do
 some rendering with a GPU or even completely replace the built-in
 software renderer.
 

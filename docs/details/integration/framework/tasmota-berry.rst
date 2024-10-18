@@ -62,7 +62,7 @@ Tasmota + Berry + LVGL could be used for:
 
 - Fast prototyping GUI.
 - Shortening the cycle of changing and fine-tuning the GUI.
-- Modelling the GUI in a more abstract way by defining reusable composite objects, taking
+- Modelling the GUI in a more abstract way by defining reusable composite Widgets, taking
   advantage of Berry's language features such as Inheritance, Closures, Exception Handling…
 - Make LVGL accessible to a larger audience. No need to know C to create a nice GUI on an embedded system.
 

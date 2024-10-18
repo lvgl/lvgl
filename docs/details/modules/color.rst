@@ -1,8 +1,8 @@
 .. _color:
 
-======
-Colors
-======
+================
+Color (lv_color)
+================
 
 The color module handles all color-related functions like changing color
 depth, creating colors from hex code, converting between color depths,
@@ -23,17 +23,17 @@ Create colors from Red, Green and Blue channel values:
 
 .. code-block:: c
 
-   /*All channels are 0-255*/
+   /* All channels are 0-255 */
    lv_color_t c = lv_color_make(red, green, blue);
 
 
-   /*Same but can be used for const initialization too */
+   /* Same but can be used for const initialization as well */
    lv_color_t c = LV_COLOR_MAKE(red, green, blue);
 
-   /*From hex code 0x000000..0xFFFFFF interpreted as RED + GREEN + BLUE*/
+   /* From hex code 0x000000..0xFFFFFF interpreted as RED + GREEN + BLUE */
    lv_color_t c = lv_color_hex(0x123456);
 
-   /*From 3 digits. Same as lv_color_hex(0x112233)*/
+   /* From 3 digits. Same as lv_color_hex(0x112233) */
    lv_color_t c = lv_color_hex3(0x123);
 
 HSV
@@ -85,12 +85,12 @@ The names of the colors are as follows:
 - :c:macro:`LV_PALETTE_GREY`
 
 To get the main color use
-``lv_color_t c = lv_palette_main(LV_PALETTE_...)``.
+:cpp:expr:`lv_color_t` ``c =`` :cpp:expr:`lv_palette_main(LV_PALETTE_...)`.
 
 For the lighter variants of a palette color use
-``lv_color_t c = lv_palette_lighten(LV_PALETTE_..., v)``. ``v`` can be
+:cpp:expr:`lv_color_t` ``c =`` :cpp:expr:`lv_palette_lighten(LV_PALETTE_..., v)`. ``v`` can be
 1..5. For the darker variants of a palette color use
-``lv_color_t c = lv_palette_darken(LV_PALETTE_..., v)``. ``v`` can be
+:cpp:expr:`lv_color_t` ``c =`` :cpp:expr:`lv_palette_darken(LV_PALETTE_..., v)`. ``v`` can be
 1..4.
 
 .. _color_modify_and_mix:

@@ -105,7 +105,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/lottie/index.rst
+.. include:: ../../examples/widgets/lottie/index.rst
 
 .. _lv_lottie_api:
 

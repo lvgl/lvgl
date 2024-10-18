@@ -1,8 +1,8 @@
-.. _fonts:
+.. _font:
 
-=====
-Fonts
-=====
+==============
+Font (lv_font)
+==============
 
 In LVGL fonts are collections of bitmaps and other information required
 to render images of individual letters (glyph). A font is stored in a
@@ -11,7 +11,7 @@ For example:
 
 .. code-block:: c
 
-   lv_style_set_text_font(&my_style, &lv_font_montserrat_28);  /*Set a larger font*/
+   lv_style_set_text_font(&my_style, &lv_font_montserrat_28);  /* Set a larger font */
 
 Fonts have a **format** property. It describes how the glyph draw data is stored.
 It has *2* categories: `Legacy simple format` and `Advanced format`.
@@ -25,6 +25,7 @@ The possible *bpp* values are 1, 2, 4 and 8 (higher values mean better quality).
 The *format* property also affects the amount of memory needed to store a
 font. For example, *format = LV_FONT_GLYPH_FORMAT_A4* makes a font nearly four times larger
 compared to *format = LV_FONT_GLYPH_FORMAT_A1*.
+
 
 Unicode support
 ***************
@@ -43,11 +44,12 @@ To test it try
 
 If all works well, a ✓ character should be displayed.
 
+
 Built-in fonts
 **************
 
 There are several built-in fonts in different sizes, which can be
-enabled in ``lv_conf.h`` with *LV_FONT\_…* defines. 
+enabled in ``lv_conf.h`` with *LV_FONT\_…* defines.
 
 Normal fonts
 ------------
@@ -117,7 +119,8 @@ Or more symbols together:
 
    lv_label_set_text(my_label, LV_SYMBOL_OK LV_SYMBOL_WIFI LV_SYMBOL_PLAY);
 
-Special features
+
+Special Features
 ****************
 
 Bidirectional support
@@ -127,8 +130,8 @@ Most languages use a Left-to-Right (LTR for short) writing direction,
 however some languages (such as Hebrew, Persian or Arabic) use
 Right-to-Left (RTL for short) direction.
 
-LVGL not only supports RTL texts but supports mixed (a.k.a.
-bidirectional, BiDi) text rendering too. Some examples:
+LVGL not only supports RTL text but supports mixed (a.k.a.
+bidirectional, BiDi) text rendering as well. Some examples:
 
 .. image:: /misc/bidi.png
 
@@ -137,24 +140,24 @@ BiDi support is enabled by :c:macro:`LV_USE_BIDI` in *lv_conf.h*
 All texts have a base direction (LTR or RTL) which determines some
 rendering rules and the default alignment of the text (Left or Right).
 However, in LVGL, the base direction is not only applied to labels. It's
-a general property which can be set for every object. If not set then it
+a general property which can be set for every Widget. If not set then it
 will be inherited from the parent. This means it's enough to set the
-base direction of a screen and every object will inherit it.
+base direction of a screen and every Widget will inherit it.
 
 The default base direction for screens can be set by
-:c:macro:`LV_BIDI_BASE_DIR_DEF` in *lv_conf.h* and other objects inherit the
+:c:macro:`LV_BIDI_BASE_DIR_DEF` in *lv_conf.h* and other Widgets inherit the
 base direction from their parent.
 
-To set an object's base direction use :cpp:expr:`lv_obj_set_style_base_dir(obj, base_dir, selector)`.
+To set a Widget's base direction use :cpp:expr:`lv_obj_set_style_base_dir(widget, base_dir, selector)`.
 The possible base directions are:
 
 - :cpp:enumerator:`LV_BASE_DIR_LTR`: Left to Right base direction
 - :cpp:enumerator:`LV_BASE_DIR_RTL`: Right to Left base direction
 - :cpp:enumerator:`LV_BASE_DIR_AUTO`: Auto detect base direction
 
-This list summarizes the effect of RTL base direction on objects:
+This list summarizes the effect of RTL base direction on Widgets:
 
-- Create objects by default on the right
+- Create Widgets by default on the right
 - ``lv_tabview``: Displays tabs from right to left
 - ``lv_checkbox``: Shows the box on the right
 - ``lv_buttonmatrix``: Shows buttons from right to left
@@ -237,8 +240,9 @@ To configure kerning at runtime, use :cpp:func:`lv_font_set_kerning`.
 
 .. _add_font:
 
-Add a new font
-**************
+
+Adding a New Font
+*****************
 
 There are several ways to add a new font to your project:
 
@@ -259,8 +263,9 @@ To declare a font in a file, use :cpp:expr:`LV_FONT_DECLARE(my_font_name)`.
 To make fonts globally available (like the built-in fonts), add them to
 :c:macro:`LV_FONT_CUSTOM_DECLARE` in *lv_conf.h*.
 
-Add new symbols
-***************
+
+Adding New Symbols
+******************
 
 The built-in symbols are created from the `FontAwesome <https://fontawesome.com/>`__ font.
 
@@ -290,8 +295,9 @@ The built-in symbols are created from the `FontAwesome <https://fontawesome.com/
        symbol in the font defined in ``style.text.font`` properties. To use the
        symbol you may need to change it. Eg ``style.text.font = my_font_name``
 
-Load a font at run-time
-***********************
+
+Loading a Font at Run-Time
+**************************
 
 :cpp:func:`lv_binfont_create` can be used to load a font from a file. The font needs
 to have a special binary format. (Not TTF or WOFF). Use
@@ -308,13 +314,14 @@ Example
    lv_font_t *my_font = lv_binfont_create("X:/path/to/my_font.bin");
    if(my_font == NULL) return;
 
-   /*Use the font*/
+   /* Use the font */
 
-   /*Free the font if not required anymore*/
+   /* Free the font if not required anymore */
    lv_binfont_destroy(my_font);
 
-Load a font from a memory buffer at run-time
-********************************************
+
+Loading a Font from a Memory Buffer at Run-Time
+***********************************************
 
 :cpp:func:`lv_binfont_create_from_buffer` can be used to load a font from a memory buffer.
 This function may be useful to load a font from an external file system, which is not
@@ -331,19 +338,20 @@ Example
    uint8_t *buf;
    uint32_t bufsize;
 
-   /*Read font file into the buffer from the external file system*/
+   /* Read font file into the buffer from the external file system */
    ...
 
-   /*Load font from the buffer*/
+   /* Load font from the buffer */
    my_font = lv_binfont_create_from_buffer((void *)buf, buf));
    if(my_font == NULL) return;
-   /*Use the font*/
+   /* Use the font */
 
-   /*Free the font if not required anymore*/
+   /* Free the font if not required anymore */
    lv_binfont_destroy(my_font);
 
-Use a BDF font
-**************
+
+Using a BDF Font
+****************
 
 Small displays with low resolution don't look pretty with automatically rendered fonts. A bitmap font provides
 the solution, but it's necessary to convert the bitmap font (BDF) to a TTF.
@@ -421,8 +429,9 @@ Create font for lvgl
 
 :note: use 1bpp because we don't use anti-aliasing. It doesn't look sharp on displays with a low resolution.
 
-Add a new font engine
-*********************
+
+Adding a New Font Engine
+************************
 
 LVGL's font interface is designed to be very flexible but, even so, you
 can add your own font engine in place of LVGL's internal one. For
@@ -434,14 +443,14 @@ To add a new font engine, a custom :cpp:type:`lv_font_t` variable needs to be cr
 
 .. code-block:: c
 
-   /*Describe the properties of a font*/
+   /* Describe the properties of a font */
    lv_font_t my_font;
-   my_font.get_glyph_dsc = my_get_glyph_dsc_cb;        /*Set a callback to get info about glyphs*/
-   my_font.get_glyph_bitmap = my_get_glyph_bitmap_cb;  /*Set a callback to get bitmap of a glyph*/
-   my_font.line_height = height;                       /*The real line height where any text fits*/
-   my_font.base_line = base_line;                      /*Base line measured from the top of line_height*/
-   my_font.dsc = something_required;                   /*Store any implementation specific data here*/
-   my_font.user_data = user_data;                      /*Optionally some extra user data*/
+   my_font.get_glyph_dsc = my_get_glyph_dsc_cb;        /* Set a callback to get info about glyphs */
+   my_font.get_glyph_bitmap = my_get_glyph_bitmap_cb;  /* Set a callback to get bitmap of a glyph */
+   my_font.line_height = height;                       /* The real line height where any text fits */
+   my_font.base_line = base_line;                      /* Base line measured from the top of line_height */
+   my_font.dsc = something_required;                   /* Store any implementation specific data here */
+   my_font.user_data = user_data;                      /* Optionally some extra user data */
 
    ...
 
@@ -451,19 +460,19 @@ To add a new font engine, a custom :cpp:type:`lv_font_t` variable needs to be cr
     */
    bool my_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter, uint32_t unicode_letter_next)
    {
-       /*Your code here*/
+       /* Your code here */
 
        /* Store the result.
         * For example ...
         */
-       dsc_out->adv_w = 12;        /*Horizontal space required by the glyph in [px]*/
-       dsc_out->box_h = 8;         /*Height of the bitmap in [px]*/
-       dsc_out->box_w = 6;         /*Width of the bitmap in [px]*/
-       dsc_out->ofs_x = 0;         /*X offset of the bitmap in [pf]*/
-       dsc_out->ofs_y = 3;         /*Y offset of the bitmap measured from the as line*/
+       dsc_out->adv_w = 12;        /* Horizontal space required by the glyph in [px] */
+       dsc_out->box_h = 8;         /* Height of the bitmap in [px] */
+       dsc_out->box_w = 6;         /* Width of the bitmap in [px] */
+       dsc_out->ofs_x = 0;         /* X offset of the bitmap in [pf] */
+       dsc_out->ofs_y = 3;         /* Y offset of the bitmap measured from the as line */
        dsc_out->format= LV_FONT_GLYPH_FORMAT_A2;
 
-       return true;                /*true: glyph found; false: glyph was not found*/
+       return true;                /* true: glyph found; false: glyph was not found */
    }
 
 
@@ -475,11 +484,12 @@ To add a new font engine, a custom :cpp:type:`lv_font_t` variable needs to be cr
        /* The bitmap should be a continuous bitstream where
         * each pixel is represented by `bpp` bits */
 
-       return bitmap;    /*Or NULL if not found*/
+       return bitmap;    /* Or NULL if not found */
    }
 
-Use font fallback
-*****************
+
+Using Font Fallback
+*******************
 
 You can specify ``fallback`` in :cpp:type:`lv_font_t` to provide fallback to the
 font. When the font fails to find glyph to a letter, it will try to let
@@ -495,6 +505,7 @@ font from ``fallback`` to handle.
    lv_font_t *droid_sans_fallback = my_font_load_function();
    /* So now we can display Roboto for supported characters while having wider characters set support */
    roboto->fallback = droid_sans_fallback;
+
 
 .. _fonts_api:
 

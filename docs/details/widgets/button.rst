@@ -7,10 +7,10 @@ Button (lv_button)
 Overview
 ********
 
-Buttons have no new features compared to the :ref:`Base object <lv_obj>`. They are useful for semantic purposes and have
+Buttons have no new features compared to the :ref:`Base Widget <lv_obj>`. They are useful for semantic purposes and have
 slightly different default settings.
 
-Buttons, by default, differ from Base object in the following ways: -
+Buttons, by default, differ from Base Widget in the following ways: -
 Not scrollable - Added to the default group - Default height and width
 set to :cpp:enumerator:`LV_SIZE_CONTENT`
 
@@ -27,7 +27,7 @@ Parts and Styles
 Usage
 *****
 
-There are no new features compared to :ref:`Base object <lv_obj>`.
+There are no new features compared to :ref:`Base Widget <lv_obj>`.
 
 .. _lv_button_events:
 
@@ -35,7 +35,7 @@ Events
 ******
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` when the :cpp:enumerator:`LV_OBJ_FLAG_CHECKABLE` flag is
-   enabled and the object is clicked. The event happens on transition
+   enabled and the Widget is clicked. The event happens on transition
    to/from the checked state.
 
 Learn more about :ref:`events`.
@@ -49,7 +49,7 @@ Note that the state of :cpp:enumerator:`LV_KEY_ENTER` is translated to
 :cpp:enumerator:`LV_EVENT_PRESSED`, :cpp:enumerator:`LV_EVENT_PRESSING`
 and :cpp:enumerator:`LV_EVENT_RELEASED` etc.
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See also:  events of :ref:`Base Widget <lv_obj>`.
 
 Learn more about :ref:`indev_keys`.
 
@@ -58,7 +58,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/button/index.rst
+.. include:: ../../examples/widgets/button/index.rst
 
 .. _lv_button_api:
 

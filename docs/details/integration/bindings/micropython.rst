@@ -59,7 +59,7 @@ MicroPython + LVGL could be used for:
 
 - Fast prototyping GUI.
 - Shortening the cycle of changing and fine-tuning the GUI.
-- Modelling the GUI in a more abstract way by defining reusable composite objects, taking advantage of Python's language features
+- Modelling the GUI in a more abstract way by defining reusable composite Widgets, taking advantage of Python's language features
   such as Inheritance, Closures, List Comprehension, Generators, Exception Handling, Arbitrary Precision Integers and others.
 - Make LVGL accessible to a larger audience. No need to know C to create a nice GUI on an embedded system. This goes well with
   `CircuitPython vision <https://learn.adafruit.com/welcome-to-circuitpython/what-is-circuitpython>`__.
@@ -110,7 +110,7 @@ edit a python script and run it.
 
 `Click here to experiment on the online simulator <https://sim.lvgl.io/>`__
 
-Many `LVGL examples <https://docs.lvgl.io/master/examples.html>`__ are available also for MicroPython. Just click the link!
+Many :ref:`LVGL examples <examples>` are available also for MicroPython. Just click the link!
 
 
 PC Simulator

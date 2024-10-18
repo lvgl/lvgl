@@ -51,7 +51,7 @@ Usage
 You can use animation from files or raw data (text). In either case
 first you need to enable :c:macro:`LV_USE_RLOTTIE` in ``lv_conf.h``.
 
-The ``width`` and ``height`` of the object be set in the *create*
+The ``width`` and ``height`` of the Widget be set in the *create*
 function and the animation will be scaled accordingly.
 
 Use Rlottie from file
@@ -283,7 +283,7 @@ IDF) with the appropriate :cpp:expr:`MALLOC_CAP` call - for SPIRAM usage this is
 Example
 -------
 
-.. include:: ../examples/libs/rlottie/index.rst
+.. include:: ../../examples/libs/rlottie/index.rst
 
 .. _rlottie_api:
 

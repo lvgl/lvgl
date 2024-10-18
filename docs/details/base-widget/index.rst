@@ -1,16 +1,16 @@
-.. _base-object:
+.. _base_widget:
 
 ===========
-Base Object
+Base Widget
 ===========
 
 .. toctree::
-    :maxdepth:  6
+    :maxdepth:  3
 
     obj
     coord
-    layers
+    layer
     styles/index
-    events
+    event
     layouts/index
-    scrolling
+    scroll

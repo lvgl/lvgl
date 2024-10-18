@@ -1,8 +1,8 @@
 .. _overview_file_system:
 
-===========
-File system
-===========
+=======================
+File System (lv_fs_drv)
+=======================
 
 LVGL has a 'File system' abstraction module that enables you to attach
 any type of file system. A file system is identified by an assigned
@@ -13,7 +13,7 @@ drive letter. For example, if an SD card is associated with the letter
 
 	If you want to skip the drive prefix from the path, you can use the :c:macro:`LV_FS_DEFAULT_DRIVE_LETTER` config parameter.
 
-Ready to use drivers
+Ready-to-use drivers
 ********************
 
 LVGL contains prepared drivers for the API of POSIX, standard C,
@@ -32,27 +32,27 @@ and not a local variable.
 
 .. code-block:: c
 
-   static lv_fs_drv_t drv;                   /*Needs to be static or global*/
-   lv_fs_drv_init(&drv);                     /*Basic initialization*/
+   static lv_fs_drv_t drv;                   /* Needs to be static or global */
+   lv_fs_drv_init(&drv);                     /* Basic initialization */
 
-   drv.letter = 'S';                         /*An uppercase letter to identify the drive */
-   drv.cache_size = my_cache_size;           /*Cache size for reading in bytes. 0 to not cache.*/
+   drv.letter = 'S';                         /* An uppercase letter to identify the drive */
+   drv.cache_size = my_cache_size;           /* Cache size for reading in bytes. 0 to not cache. */
 
-   drv.ready_cb = my_ready_cb;               /*Callback to tell if the drive is ready to use */
-   drv.open_cb = my_open_cb;                 /*Callback to open a file */
-   drv.close_cb = my_close_cb;               /*Callback to close a file */
-   drv.read_cb = my_read_cb;                 /*Callback to read a file */
-   drv.write_cb = my_write_cb;               /*Callback to write a file */
-   drv.seek_cb = my_seek_cb;                 /*Callback to seek in a file (Move cursor) */
-   drv.tell_cb = my_tell_cb;                 /*Callback to tell the cursor position  */
+   drv.ready_cb = my_ready_cb;               /* Callback to tell if the drive is ready to use */
+   drv.open_cb = my_open_cb;                 /* Callback to open a file */
+   drv.close_cb = my_close_cb;               /* Callback to close a file */
+   drv.read_cb = my_read_cb;                 /* Callback to read a file */
+   drv.write_cb = my_write_cb;               /* Callback to write a file */
+   drv.seek_cb = my_seek_cb;                 /* Callback to seek in a file (Move cursor) */
+   drv.tell_cb = my_tell_cb;                 /* Callback to tell the cursor position  */
 
-   drv.dir_open_cb = my_dir_open_cb;         /*Callback to open directory to read its content */
-   drv.dir_read_cb = my_dir_read_cb;         /*Callback to read a directory's content */
-   drv.dir_close_cb = my_dir_close_cb;       /*Callback to close a directory */
+   drv.dir_open_cb = my_dir_open_cb;         /* Callback to open directory to read its content */
+   drv.dir_read_cb = my_dir_read_cb;         /* Callback to read a directory's content */
+   drv.dir_close_cb = my_dir_close_cb;       /* Callback to close a directory */
 
-   drv.user_data = my_user_data;             /*Any custom data if required*/
+   drv.user_data = my_user_data;             /* Any custom data if required */
 
-   lv_fs_drv_register(&drv);                 /*Finally register the drive*/
+   lv_fs_drv_register(&drv);                 /* Finally register the drive */
 
 Any of the callbacks can be ``NULL`` to indicate that operation is not
 supported.
@@ -135,7 +135,7 @@ practice to insert a ``'/'`` in front of each directory name.
            break;
        }
 
-       /*fn is empty, if not more files to read*/
+       /* fn is empty, if not more files to read */
        if(strlen(fn) == 0) {
            break;
        }
@@ -148,7 +148,7 @@ practice to insert a ``'/'`` in front of each directory name.
 Use drives for images
 *********************
 
-:ref:`Image <lv_image>` objects can be opened from files too (besides
+:ref:`Image <lv_image>` Widgets can be opened from files as well (besides
 variables stored in the compiled program).
 
 To use files in image widgets the following callbacks are required:
@@ -183,8 +183,8 @@ The implementation is documented below. Note that the FS functions make calls
 to other driver FS functions when the cache is enabled. i.e., ``lv_fs_read`` may call the driver's ``seek``
 so the driver needs to implement more callbacks when the cache is enabled.
 
-``lv_fs_read`` :sub:`(behavior when the cache is enabled)`
-----------------------------------------------------------
+``lv_fs_read`` :sub:`(behavior when cache is enabled)`
+------------------------------------------------------
 
 .. mermaid::
    :zoom:
@@ -230,21 +230,21 @@ so the driver needs to implement more callbacks when the cache is enabled.
              --> P["copy the required bytes
                     to the destination buffer"]
 
-``lv_fs_write`` :sub:`(behavior when the cache is enabled)`
------------------------------------------------------------
+``lv_fs_write`` :sub:`(behavior when cache is enabled)`
+-------------------------------------------------------
 
 The part of the cache that coincides with the written content
 will be updated to reflect the written content.
 
-``lv_fs_seek`` :sub:`(behavior when the cache is enabled)`
-----------------------------------------------------------
+``lv_fs_seek`` :sub:`(behavior when cache is enabled)`
+------------------------------------------------------
 
 The driver's ``seek`` will not actually be called unless the ``whence``
 is ``LV_FS_SEEK_END``, in which case ``seek`` and ``tell`` will be called
 to determine where the end of the file is.
 
-``lv_fs_tell`` :sub:`(behavior when the cache is enabled)`
-----------------------------------------------------------
+``lv_fs_tell`` :sub:`(behavior when cache is enabled)`
+------------------------------------------------------
 
 The driver's ``tell`` will not actually be called.
 

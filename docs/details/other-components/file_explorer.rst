@@ -59,7 +59,7 @@ Sort
 
 You can use
 :cpp:expr:`lv_file_explorer_set_sort(file_explorer, LV_EXPLORER_SORT_XX)` to set
-sorting method. 
+sorting method.
 
 There are the following sorting methods:
 
@@ -92,8 +92,8 @@ selected file in the event processing function. For example:
        lv_obj_t * obj = lv_event_get_target(e);
 
        if(code == LV_EVENT_VALUE_CHANGED) {
-           char * cur_path =  lv_file_explorer_get_cur_path(obj);
-           char * sel_fn = lv_file_explorer_get_sel_fn(obj);
+           char * cur_path =  lv_file_explorer_get_cur_path(widget);
+           char * sel_fn = lv_file_explorer_get_sel_fn(widget);
            LV_LOG_USER("%s%s", cur_path, sel_fn);
        }
    }
@@ -106,7 +106,7 @@ through functions such as :cpp:func:`strcpy` and :cpp:func:`strcat` for later us
 Example
 -------
 
-.. include:: ../examples/others/file_explorer/index.rst
+.. include:: ../../examples/others/file_explorer/index.rst
 
 .. _file_explorer_api:
 

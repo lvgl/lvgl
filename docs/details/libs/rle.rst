@@ -19,7 +19,7 @@ to save more than 70% space as show in below statistic. It shows the file count
 of every compress level. For rare conditions, RLE compress may increase the file
 size if there's no large repetition in data.
 
-.. image:: /libs/rle-compress-statistics.png
+.. image:: rle-compress-statistics.png
    :alt: RLE compress statistics from a watch project
    :align: center
 
@@ -53,7 +53,7 @@ can be found from ``lvgl/script/LVGLImage.py``.
                 ctrl_byte = uint8_t(nonrepeat_cnt | 0x80)
                 compressed_data.append(ctrl_byte)
                 compressed_data.append(
-                    memview[index: index + nonrepeat_cnt*blksize])
+                    memview[index: index + nonrepeat_cnt * blksize])
                 index += nonrepeat_cnt * blksize
             else:
                 ctrl_byte = uint8_t(repeat_cnt)

@@ -1,16 +1,15 @@
 .. _lv_textarea:
 
 =======================
-Text area (lv_textarea)
+Text Area (lv_textarea)
 =======================
 
 Overview
 ********
 
-The Text Area is a `Base object <widgets/obj.html>`__ with a
-`Label <widgets/label.html>`__ and a cursor on it. Texts or characters
-can be added to it. Long lines are wrapped and when the text becomes
-long enough the Text area can be scrolled.
+The Text Area is a :ref:`base_widget` with a :ref:`lv_label` and a cursor on it.
+Texts or characters can be added to it.  Long lines are wrapped and when the text
+becomes long enough the Text area can be scrolled.
 
 One line mode and password modes are supported.
 
@@ -168,7 +167,7 @@ Events
 -  :cpp:enumerator:`LV_EVENT_READY` Sent when :cpp:enumerator:`LV_KEY_ENTER` is pressed (or sent) to
    a one line text area.
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See also:  events of :ref:`Base Widget <lv_obj>`.
 
 Learn more about :ref:`events`.
 
@@ -187,7 +186,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/textarea/index.rst
+.. include:: ../../examples/widgets/textarea/index.rst
 
 .. _lv_textarea_api:
 

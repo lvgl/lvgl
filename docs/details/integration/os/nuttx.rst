@@ -152,3 +152,7 @@ Where can I find more information?
    LPCXpresso54628 <https://acassis.wordpress.com/2018/07/19/running-nuttx-on-lpcxpresso54628-om13098/>`__
 -  NuttX mailing list: `Apache NuttX Mailing
    List <http://nuttx.incubator.apache.org/community/>`__
+
+
+.. Comment:  The above blank line is necessary for Sphinx to not complain,
+    since it looks for the blank line after a bullet list.

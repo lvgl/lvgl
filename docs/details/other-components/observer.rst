@@ -155,7 +155,7 @@ In the observer callback :cpp:expr:`lv_observer_get_target(observer)` can be use
 
 .. code-block:: c
 
-    lv_observer_t * observer = lv_subject_add_observer_obj(&some_subject, some_observer_cb, obj, user_data);
+    lv_observer_t * observer = lv_subject_add_observer_obj(&some_subject, some_observer_cb, widget, user_data);
 
 
 In more generic case any pointer can be saved a target:
@@ -178,7 +178,7 @@ To unsubscribe a widget from a given or all subject use:
 
 .. code-block:: c
 
-    lv_obj_remove_from_subject(obj, subject); /* `subject` can be NULL to unsubcribe from all */
+    lv_obj_remove_from_subject(widget, subject); /* `subject` can be NULL to unsubcribe from all */
 
 .. _observer_subject_groups:
 
@@ -202,10 +202,10 @@ this array as a parameter when you initialize a subject with group type.
 .. code-block:: c
 
     static lv_subject_t * subject_list[3] = {&subject_1, &subject_2, &subject_3};
-    lv_subject_init_group(&subject_all, subject_list, 3);  /*The last parameter is the number of elements*/
+    lv_subject_init_group(&subject_all, subject_list, 3);  /*The last parameter is the number of elements */
 
 You can add observers to subject groups in the regular way.
-The trick is that when any element of the group is notified the subject group will be notified too.
+The trick is that when any element of the group is notified the subject group will be notified as well.
 
 The above Voltage/Current measurement example looks like this in the practice:
 
@@ -248,38 +248,38 @@ The above Voltage/Current measurement example looks like this in the practice:
 Widget binding
 **************
 
-Base object
+Base Widget
 -----------
 
-Set an object flag if an integer subject's value is equal to a reference value, clear the flag otherwise
+Set a Widget flag if an integer subject's value is equal to a reference value, clear the flag otherwise
 
 .. code-block:: c
 
-    observer = lv_obj_bind_flag_if_eq(obj, &subject, LV_OBJ_FLAG_*, ref_value);
+    observer = lv_obj_bind_flag_if_eq(widget, &subject, LV_OBJ_FLAG_*, ref_value);
 
-Set an object flag if an integer subject's value is not equal to a reference value, clear the flag otherwise
-
-.. code-block:: c
-
-    observer = lv_obj_bind_flag_if_not_eq(obj, &subject, LV_OBJ_FLAG_*, ref_value);
-
-Set an object state if an integer subject's value is equal to a reference value, clear the flag otherwise
+Set a Widget flag if an integer subject's value is not equal to a reference value, clear the flag otherwise
 
 .. code-block:: c
 
-    observer = lv_obj_bind_state_if_eq(obj, &subject, LV_STATE_*, ref_value);
+    observer = lv_obj_bind_flag_if_not_eq(widget, &subject, LV_OBJ_FLAG_*, ref_value);
 
-Set an object state if an integer subject's value is not equal to a reference value, clear the flag otherwise
-
-.. code-block:: c
-
-    observer = lv_obj_bind_state_if_not_eq(obj, &subject, LV_STATE_*, ref_value);
-
-Set an integer subject to 1 when an object is checked and set it 0 when unchecked.
+Set a Widget state if an integer subject's value is equal to a reference value, clear the flag otherwise
 
 .. code-block:: c
 
-    observer = lv_obj_bind_checked(obj, &subject);
+    observer = lv_obj_bind_state_if_eq(widget, &subject, LV_STATE_*, ref_value);
+
+Set a Widget state if an integer subject's value is not equal to a reference value, clear the flag otherwise
+
+.. code-block:: c
+
+    observer = lv_obj_bind_state_if_not_eq(widget, &subject, LV_STATE_*, ref_value);
+
+Set an integer subject to 1 when a Widget is checked and set it 0 when unchecked.
+
+.. code-block:: c
+
+    observer = lv_obj_bind_checked(widget, &subject);
 
 Label
 -----
@@ -290,7 +290,7 @@ If the format string is ``NULL`` the value will be used directly. In this case o
 
 .. code-block:: c
 
-    observer = lv_label_bind_text(obj, &subject, format_string);
+    observer = lv_label_bind_text(widget, &subject, format_string);
 
 
 Arc
@@ -300,7 +300,7 @@ Bind an integer subject to an arc's value.
 
 .. code-block:: c
 
-    observer = lv_arc_bind_value(obj, &subject);
+    observer = lv_arc_bind_value(widget, &subject);
 
 Slider
 ------
@@ -309,7 +309,7 @@ Bind an integer subject to a slider's value
 
 .. code-block:: c
 
-    observer = lv_slider_bind_value(obj, &subject);
+    observer = lv_slider_bind_value(widget, &subject);
 
 Roller
 ------
@@ -318,7 +318,7 @@ Bind an integer subject to a roller's value
 
 .. code-block:: c
 
-    observer = lv_roller_bind_value(obj, &subject);
+    observer = lv_roller_bind_value(widget, &subject);
 
 
 Drop-down
@@ -327,14 +327,14 @@ Bind an integer subject to a drop-down's value
 
 .. code-block:: c
 
-    observer = lv_dropdown_bind_value(obj, &subject);
+    observer = lv_dropdown_bind_value(widget, &subject);
 
 .. _observer_example:
 
 Example
 *******
 
-.. include:: ../examples/others/observer/index.rst
+.. include:: ../../examples/others/observer/index.rst
 
 .. _observer_api:
 

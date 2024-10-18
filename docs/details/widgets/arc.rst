@@ -45,7 +45,7 @@ To set the start and end angle of the background arc use the
 :cpp:expr:`lv_arc_set_bg_angles(arc, start_angle, end_angle)` functions or
 ``lv_arc_set_bg_start/end_angle(arc, angle)``.
 
-Zero degrees is at the middle right (3 o'clock) of the object and the
+Zero degrees is at the middle right (3 o'clock) of the Widget and the
 degrees are increasing in clockwise direction. The angles should be in
 the [0;360] range.
 
@@ -98,7 +98,7 @@ exclusively use one or the other. Mixing the two might result in
 unintended behavior.
 
 To make the arc non-adjustable, remove the style of the knob and make
-the object non-clickable:
+the Widget non-clickable:
 
 .. code-block:: c
 
@@ -108,27 +108,27 @@ the object non-clickable:
 Interactive area
 ----------------
 
-By default :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` is disabled which 
-means the arc's whole area is interactive. 
+By default :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` is disabled which
+means the arc's whole area is interactive.
 As usual :cpp:func:`lv_obj_set_ext_click_size` can be used to increase
 the sensitive area outside the arc by a specified number of pixels.
 
-If :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` is enabled the arc will be sensitive only 
-in the range of start and end background angles and on the arc itself (not inside the arc). 
+If :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` is enabled the arc will be sensitive only
+in the range of start and end background angles and on the arc itself (not inside the arc).
 In this case ``ext_click_size`` makes the sensitive area ticker both inward and outward.
-Additionally, a tolerance of :cpp:expr:`lv_dpx(50)` pixels is applied to each angle, extending the 
+Additionally, a tolerance of :cpp:expr:`lv_dpx(50)` pixels is applied to each angle, extending the
 hit-test range along the arc's length.
 
-Place another object to the knob
+Place another Widget to the knob
 --------------------------------
 
-Another object can be positioned according to the current position of
+Another Widget can be positioned according to the current position of
 the arc in order to follow the arc's current value (angle). To do this
 use :cpp:expr:`lv_arc_align_obj_to_angle(arc, obj_to_align, radius_offset)`.
 
 Similarly
 :cpp:expr:`lv_arc_rotate_obj_to_angle(arc, obj_to_rotate, radius_offset)` can be
-used to rotate the object to the current value of the arc.
+used to rotate the Widget to the current value of the arc.
 
 It's a typical use case to call these functions in the ``VALUE_CHANGED``
 event of the arc.
@@ -163,7 +163,7 @@ Events
       -  ``draw_area``: the area of the knob
       -  ``rect_dsc``:
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See also:  events of :ref:`Base Widget <lv_obj>`.
 
 Learn more about :ref:`events`.
 
@@ -182,7 +182,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/arc/index.rst
+.. include:: ../../examples/widgets/arc/index.rst
 
 .. _lv_arc_api:
 

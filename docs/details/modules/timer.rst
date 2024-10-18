@@ -1,13 +1,13 @@
-.. _timers:
+.. _timer:
 
-======
-Timers
-======
+================
+Timer (lv_timer)
+================
 
 LVGL has a built-in timer system. You can register a function to have it
 be called periodically. The timers are handled and called in
 :cpp:func:`lv_timer_handler`, which needs to be called every few milliseconds.
-See `Porting <porting/timer-handler>`__ for more information.
+See :ref:`timer_handler` for more information.
 
 Timers are non-preemptive, which means a timer cannot interrupt another
 timer. Therefore, you can call any LVGL related function in a timer.
@@ -30,11 +30,11 @@ For example:
 
    void my_timer(lv_timer_t * timer)
    {
-     /*Use the user_data*/
+     /* Use the user_data */
      uint32_t * user_data = timer->user_data;
      printf("my_timer called with user data: %d\n", *user_data);
 
-     /*Do something with LVGL*/
+     /* Do something with LVGL */
      if(something_happened) {
        something_happened = false;
        lv_button_create(lv_screen_active(), NULL);
@@ -104,7 +104,7 @@ Asynchronous calls
 ******************
 
 In some cases, you can't perform an action immediately. For example, you
-can't delete an object because something else is still using it, or you
+can't delete a Widget because something else is still using it, or you
 don't want to block the execution now. For these cases,
 :cpp:expr:`lv_async_call(my_function, data_p)` can be used to call
 ``my_function`` on the next invocation of :cpp:func:`lv_timer_handler`.
@@ -121,24 +121,24 @@ For example:
 
    void my_screen_clean_up(void * scr)
    {
-     /*Free some resources related to `scr`*/
+     /* Free some resources related to `scr`*/
 
-     /*Finally delete the screen*/
+     /* Finally delete the screen */
      lv_obj_delete(scr);
    }
 
    ...
 
-   /*Do something with the object on the current screen*/
+   /* Do something with the Widget on the current screen */
 
-   /*Delete screen on next call of `lv_timer_handler`, not right now.*/
+   /* Delete screen on next call of `lv_timer_handler`, not right now. */
    lv_async_call(my_screen_clean_up, lv_screen_active());
 
-   /*The screen is still valid so you can do other things with it*/
+   /* The screen is still valid so you can do other things with it */
 
-If you just want to delete an object and don't need to clean anything up
+If you just want to delete a Widget and don't need to clean anything up
 in ``my_screen_cleanup`` you could just use :cpp:func:`lv_obj_delete_async` which
-will delete the object on the next call to :cpp:func:`lv_timer_handler`.
+will delete the Widget on the next call to :cpp:func:`lv_timer_handler`.
 
 .. _timer_api:
 

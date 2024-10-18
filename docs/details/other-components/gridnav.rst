@@ -5,7 +5,7 @@ Grid navigation
 ===============
 
 Grid navigation (gridnav for short) is a feature that changes the
-currently focused child object as arrow keys are pressed.
+currently focused child Widget as arrow keys are pressed.
 
 If the children are arranged into a grid-like layout then the up, down,
 left and right arrows move focus to the nearest sibling in the
@@ -20,10 +20,10 @@ Gridnav also works if the children are arranged into a single row or
 column. That makes it useful, for example, to simplify navigation on a
 :ref:`List widget <lv_list>`.
 
-Gridnav assumes that the object to which gridnav is added is part of a
-:ref:`group <indev_groups>`. This way, if the object with
-gridnav is focused, the arrow key presses are automatically forwarded to
-the object so that gridnav can process the arrow keys.
+Gridnav assumes that the Widget to which gridnav is added is part of a
+:ref:`group <indev_groups>`. This way, if the Widget with
+gridnav has focus, the arrow key presses are automatically forwarded to
+the Widget so that gridnav can process the arrow keys.
 
 To move the focus to the next widget of the group use
 :cpp:enumerator:`LV_KEY_NEXT` or :cpp:enumerator:`LV_KEY_PREV`.
@@ -39,33 +39,33 @@ gridnav will automatically scroll the child into view.
 Usage
 -----
 
-To add the gridnav feature to an object use
+To add the gridnav feature to a Widget use
 :cpp:expr:`lv_gridnav_add(cont, flags)`.
 
 ``flags`` control the behavior of gridnav:
 
 - :cpp:enumerator:`LV_GRIDNAV_CTRL_NONE`: Default settings
-- :cpp:enumerator:`LV_GRIDNAV_CTRL_ROLLOVER`: If there is no next/previous object in a
-  direction, the focus goes to the object in the next/previous row (on
+- :cpp:enumerator:`LV_GRIDNAV_CTRL_ROLLOVER`: If there is no next/previous Widget in a
+  direction, the focus goes to the Widget in the next/previous row (on
   left/right keys) or first/last row (on up/down keys)
 - :cpp:enumerator:`LV_GRIDNAV_CTRL_SCROLL_FIRST`: If an arrow is pressed and the focused
-  object can be scrolled in that direction then it will be scrolled instead of
-  going to the next/previous object. If there is no more room for scrolling the
-  next/previous object will be focused normally
+  Widget can be scrolled in that direction then it will be scrolled instead of
+  going to the next/previous Widget. If there is no more room for scrolling the
+  next/previous Widget will be focused normally
 - :cpp:enumerator:`LV_GRIDNAV_CTRL_HORIZONTAL_MOVE_ONLY`: Only use the left/right keys
-  for grid navigation. Up/down key events will be sent to the focused object.
+  for grid navigation. Up/down key events will be sent to the focused Widget.
 - :cpp:enumerator:`LV_GRIDNAV_CTRL_VERTICAL_MOVE_ONLY`: Only use the up/down keys
-  for grid navigation. Left/right key events will be sent to the focused object.
+  for grid navigation. Left/right key events will be sent to the focused Widget.
 
 :cpp:enumerator:`LV_GRIDNAV_CTRL_HORIZONTAL_MOVE_ONLY` and :cpp:enumerator:`LV_GRIDNAV_CTRL_VERTICAL_MOVE_ONLY`
 should not be used together.
 
-:cpp:expr:`lv_gridnav_remove(cont)` Removes gridnav from an object.
+:cpp:expr:`lv_gridnav_remove(cont)` Removes gridnav from a Widget.
 
-Focusable objects
+Focusable Widgets
 -----------------
 
-An object needs to be clickable or click focusable
+A Widget needs to be clickable or click focusable
 (:cpp:enumerator:`LV_OBJ_FLAG_CLICKABLE` or :cpp:enumerator:`LV_OBJ_FLAG_CLICK_FOCUSABLE`) and not
 hidden (:cpp:enumerator:`LV_OBJ_FLAG_HIDDEN`) to be focusable by gridnav.
 
@@ -74,7 +74,7 @@ hidden (:cpp:enumerator:`LV_OBJ_FLAG_HIDDEN`) to be focusable by gridnav.
 Example
 -------
 
-.. include:: ../examples/others/gridnav/index.rst
+.. include:: ../../examples/others/gridnav/index.rst
 
 .. _gridnav_api:
 

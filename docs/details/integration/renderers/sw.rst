@@ -1,9 +1,9 @@
 =================
-Software renderer
+Software Renderer
 =================
 
 API
----
+***
 
 :ref:`lv_draw_sw_h`
 

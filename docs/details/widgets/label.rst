@@ -7,7 +7,7 @@ Label (lv_label)
 Overview
 ********
 
-A label is the basic object type that is used to display text.
+A label is the basic Widget type that is used to display text.
 
 .. _lv_label_parts_and_styles:
 
@@ -40,21 +40,43 @@ Therefore, you don't need to keep the text you pass to
 With :cpp:expr:`lv_label_set_text_fmt(label, "Value: %d", 15)` printf formatting
 can be used to set the text.
 
-Labels are able to show text from a static character buffer. To do so,
-use :cpp:expr:`lv_label_set_text_static(label, "Text")`. In this case, the text
-is not stored in the dynamic memory and the given buffer is used
-directly instead. This means that the array can't be a local variable
-which goes out of scope when the function exits. Constant strings are
-safe to use with :cpp:func:`lv_label_set_text_static` (except when used with
-:cpp:enumerator:`LV_LABEL_LONG_DOT`, as it modifies the buffer in-place), as they are
-stored in ROM memory, which is always accessible.
+Labels are able to show text from a static character buffer as well.  To do so, use
+:cpp:expr:`lv_label_set_text_static(label, "Text")`.  In this case, the text is not
+stored in dynamic memory and the given buffer is used directly instead.  This means
+that the character buffer *must not* be a local variable that goes out of scope when
+the function exits.
+
+``const`` strings are safe to use with :cpp:func:`lv_label_set_text_static` since
+they are stored in ROM memory, which is always accessible.
+
+.. danger::
+
+    Do not use ``const`` strings with :cpp:func:`lv_label_set_text_static` when the
+    label is being used in :cpp:enumerator:`LV_LABEL_LONG_DOT` mode since the label
+    will attempt to do an in-place edit of the string.  This will cause an MCU
+    exception by attempting to modify program memory (ROM).
+
+.. caution::
+
+    If your label is updated with new strings rapidly (e.g. > 30X / second, such as
+    RPM in a dashboard), and the length of those strings changes frequently, it is
+    advisable to:
+
+    - allocate a static string buffer large enough contain the largest possible string,
+    - update that buffer with the new strings only when they will make a visible
+      difference for the end user, and
+    - update the label with :cpp:expr:`lv_label_set_text_static(label, buffer)` using that buffer.
+
+    Reason:  if you use :cpp:expr:`lv_label_set_text(label, new_text)`, a memory
+    realloc() will be forced every time the length of the string changes.  That
+    MCU overhead can be avoided by doing the above.
 
 .. _lv_label_newline:
 
 Newline
 -------
 
-Newline characters are handled automatically by the label object. You
+Newline characters are handled automatically by the label Widget. You
 can use ``\n`` to make a line break. For example:
 ``"line1\nline2\n\nline4"``
 
@@ -71,7 +93,7 @@ wider than the label's width can be manipulated according to several
 long mode policies. Similarly, the policies can be applied if the height
 of the text is greater than the height of the label.
 
-- :cpp:enumerator:`LV_LABEL_LONG_WRAP` Wrap too long lines. If the height is :c:macro:`LV_SIZE_CONTENT` the label's
+- :cpp:enumerator:`LV_LABEL_LONG_WRAP` Wrap lines that are too long. If the height is :c:macro:`LV_SIZE_CONTENT` the label's
   height will be expanded, otherwise the text will be clipped. (Default)
 - :cpp:enumerator:`LV_LABEL_LONG_DOT` Replaces the last 3 characters from bottom right corner of the label with dots (``.``)
 - :cpp:enumerator:`LV_LABEL_LONG_SCROLL` If the text is wider than the label scroll it horizontally back and forth. If it's
@@ -141,7 +163,7 @@ Symbols
 -------
 
 The labels can display symbols alongside letters (or on their own). Read
-the :ref:`fonts` section to learn more about the symbols.
+the :ref:`font` section to learn more about the symbols.
 
 .. _lv_label_events:
 
@@ -150,7 +172,7 @@ Events
 
 No special events are sent by the Label.
 
-See the events of the :ref:`Base object <lv_obj>` too.
+See also:  events of :ref:`Base Widget <lv_obj>`.
 
 Learn more about :ref:`events`.
 
@@ -159,7 +181,7 @@ Learn more about :ref:`events`.
 Keys
 ****
 
-No *Keys* are processed by the object type.
+No *Keys* are processed by the Widget type.
 
 Learn more about :ref:`indev_keys`.
 
@@ -168,7 +190,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/label/index.rst
+.. include:: ../../examples/widgets/label/index.rst
 
 .. _lv_label_api:
 

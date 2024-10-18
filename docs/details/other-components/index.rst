@@ -1,8 +1,8 @@
 .. _others:
 
-======
-Others
-======
+================
+Other Components
+================
 
 .. toctree::
     :maxdepth: 1

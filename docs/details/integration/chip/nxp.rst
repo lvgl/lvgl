@@ -5,7 +5,7 @@ NXP
 NXP has integrated LVGL into the MCUXpresso SDK packages for several of our
 microcontrollers as an optional software component, allowing easy evaluation and
 migration into your product design. LVGL is a free and open-source embedded
-graphic library with features that enable you need to create embedded GUIs with
+graphic library with features that enable you to create embedded GUIs with
 intuitive graphical elements, beautiful visual effects and a low memory
 footprint. The complete graphic framework includes a variety of widgets for you
 to use in the creation of your GUI, and supports more advanced functions such as

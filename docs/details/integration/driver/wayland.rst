@@ -1,3 +1,5 @@
+.. _wayland_driver:
+
 =============================
 Wayland Display/Inputs driver
 =============================

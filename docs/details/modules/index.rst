@@ -10,10 +10,8 @@ Modules
     display
     indev
     color
-    fonts
-    images
-    timers
-    animations
+    font
+    image
+    timer
+    animation
     fs
-    profiler
-    renderers/index

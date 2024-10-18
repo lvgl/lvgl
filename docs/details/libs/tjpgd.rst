@@ -53,7 +53,7 @@ Converting JPEG to C array
 Example
 -------
 
-.. include:: ../examples/libs/tjpgd/index.rst
+.. include:: ../../examples/libs/tjpgd/index.rst
 
 .. _tjpgd_api:
 

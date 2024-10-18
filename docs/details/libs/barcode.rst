@@ -28,7 +28,7 @@ Notes
 -----
 
 -  It is best not to manually set the width of the barcode, because when
-   the width of the object is lower than the width of the barcode, the
+   the width of the Widget is lower than the width of the barcode, the
    display will be incomplete due to truncation.
 -  The scale adjustment can only be an integer multiple, for example,
    :cpp:expr:`lv_barcode_set_scale(barcode, 2)` means 2x scaling.
@@ -39,7 +39,7 @@ Notes
 Example
 -------
 
-.. include:: ../examples/libs/barcode/index.rst
+.. include:: ../../examples/libs/barcode/index.rst
 
 .. _barcode_api:
 

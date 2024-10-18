@@ -34,7 +34,7 @@ Notes
 Example
 -------
 
-.. include:: ../examples/libs/qrcode/index.rst
+.. include:: ../../examples/libs/qrcode/index.rst
 
 .. _qrcode_api:
 

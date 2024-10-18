@@ -7,7 +7,7 @@ Spinner (lv_spinner)
 Overview
 ********
 
-The Spinner object is a spinning arc over a ring.
+The Spinner Widget is a spinning arc over a ring.
 
 .. _lv_spinner_parts_and_styles:
 
@@ -37,7 +37,7 @@ Events
 
 No special events are sent to the Spinner.
 
-See the events of the `Arc <widgets/arc>`__ too.
+See the events of the :ref:`lv_arc` as well.
 
 Learn more about :ref:`events`.
 
@@ -46,7 +46,7 @@ Learn more about :ref:`events`.
 Keys
 ****
 
-No *Keys* are processed by the object type.
+No *Keys* are processed by the Widget type.
 
 Learn more about :ref:`indev_keys`.
 
@@ -55,7 +55,7 @@ Learn more about :ref:`indev_keys`.
 Example
 *******
 
-.. include:: ../examples/widgets/spinner/index.rst
+.. include:: ../../examples/widgets/spinner/index.rst
 
 .. _lv_spinner_api:
 
