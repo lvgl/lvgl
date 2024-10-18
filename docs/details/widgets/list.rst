@@ -53,7 +53,7 @@ No special events are sent by List Widgets, but events are sent by Buttons as us
 
 .. admonition::  Further Reading
 
-    :ref:`lv_obj_events` are emitted by all Widgets.
+    Learn more about :ref:`lv_obj_events` emitted by all Widgets.
 
     Learn more about :ref:`events`.
 
