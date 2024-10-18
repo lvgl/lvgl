@@ -48,6 +48,8 @@ The Tile view can scroll to a tile with
 :cpp:expr:`lv_tileview_set_tile(tileview, tile_obj, LV_ANIM_ON/OFF)` or
 :cpp:expr:`lv_tileview_set_tile_by_index(tileview, col_id, row_id, LV_ANIM_ON/OFF)`
 
+
+
 .. _lv_tileview_events:
 
 Events
@@ -57,14 +59,26 @@ Events
    :cpp:expr:`lv_tileview_get_tile_active(tabview)` can be used to get current
    tile.
 
+.. admonition::  Further Reading
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
+
 .. _lv_tileview_keys:
 
 Keys
 ****
 
-*Keys* are not handled by the Tile view.
+No *Keys* are processed by Tileview Widgets.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_tileview_example:
 
@@ -72,6 +86,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/tileview/index.rst
+
+
 
 .. _lv_tileview_api:
 

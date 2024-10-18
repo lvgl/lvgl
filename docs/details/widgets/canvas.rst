@@ -73,6 +73,8 @@ The draw function can draw to any color format to which LVGL can render. Typical
 :cpp:enumerator:`LV_COLOR_FORMAT_RGB565`, :cpp:enumerator:`LV_COLOR_FORMAT_RGB888`,
 :cpp:enumerator:`LV_COLOR_FORMAT_XRGB888`, and :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888`.
 
+
+
 .. _lv_canvas_events:
 
 Events
@@ -81,18 +83,26 @@ Events
 No special events are sent by canvas Widgets. The same events are sent
 as for the
 
-See also:  events of :ref:`lv_image`.
+.. admonition::  Further Reading
 
-Learn more about :ref:`events`.
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_canvas_keys:
 
 Keys
 ****
 
-No *Keys* are processed by the Widget type.
+No *Keys* are processed by Canvas Widgets.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_canvas_example:
 
@@ -100,6 +110,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/canvas/index.rst
+
+
 
 .. _lv_canvas_api:
 

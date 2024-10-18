@@ -50,26 +50,35 @@ counter-intuitive in some cases so the y coordinates can be inverted
 with :cpp:expr:`lv_line_set_y_invert(line, true)`. In this case, *y == 0* will
 be the bottom of the Widget. *y invert* is disabled by default.
 
+
+
 .. _lv_line_events:
 
 Events
 ******
 
-Only the `Generic events <../overview/event.html#generic-events>`__ are
-sent by the Widget type.
+Only the :ref:`Generic events <events>` are sent by Line Widgets.
 
-See also:  events of :ref:`Base Widget <lv_obj>`.
+.. admonition::  Further Reading
 
-Learn more about :ref:`events`.
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_line_keys:
 
 Keys
 ****
 
-No *Keys* are processed by the Widget type.
+No *Keys* are processed by Line Widgets.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_line_example:
 
@@ -77,6 +86,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/line/index.rst
+
+
 
 .. _lv_line_api:
 

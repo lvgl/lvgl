@@ -81,6 +81,8 @@ automatically sets the table size to show all the columns and rows.
 If the width or height is set to a smaller number than the "intrinsic"
 size then the table becomes scrollable.
 
+
+
 .. _lv_table_events:
 
 Events
@@ -89,16 +91,20 @@ Events
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when a new cell is selected with
    keys.
 
-See also:  events of :ref:`Base Widget <lv_obj>`.
+.. admonition::  Further Reading
 
-Learn more about :ref:`events`.
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_table_keys:
 
 Keys
 ****
 
-The following *Keys* are processed by the Tables: -
+The following *Keys* are processed by Table Widgets: -
 ``LV_KEY_RIGHT/LEFT/UP/DOWN/`` Select a cell.
 
 Note that, as usual, the state of :cpp:enumerator:`LV_KEY_ENTER` is translated to
@@ -108,7 +114,11 @@ Note that, as usual, the state of :cpp:enumerator:`LV_KEY_ENTER` is translated t
 currently selected cell. Row and column will be set to
 :c:macro:`LV_TABLE_CELL_NONE` no cell is selected.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_table_example:
 
@@ -121,6 +131,8 @@ MicroPython
 -----------
 
 No examples yet.
+
+
 
 .. _lv_table_api:
 

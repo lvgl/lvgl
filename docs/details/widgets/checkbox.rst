@@ -56,6 +56,8 @@ common state add/clear function:
 To get whether the checkbox is checked or not use:
 :cpp:expr:`lv_obj_has_state(cb, LV_STATE_CHECKED)`.
 
+
+
 .. _lv_checkbox_events:
 
 Events
@@ -63,9 +65,13 @@ Events
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the checkbox is toggled.
 
-See also:  events of :ref:`Base Widget <lv_obj>`.
+.. admonition::  Further Reading
 
-Learn more about :ref:`events`.
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_checkbox_keys:
 
@@ -80,7 +86,11 @@ The following *Keys* are processed by the 'Buttons': -
 Note that, as usual, the state of :cpp:enumerator:`LV_KEY_ENTER` is translated to
 ``LV_EVENT_PRESSED/PRESSING/RELEASED`` etc.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_checkbox_example:
 
@@ -88,6 +98,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/checkbox/index.rst
+
+
 
 .. _lv_checkboxapi:
 

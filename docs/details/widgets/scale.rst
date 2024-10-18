@@ -89,6 +89,8 @@ For labels the following properties can be configured:
 For lines (main line, major and minor ticks) the following properties can be configured:
 :cpp:func:`lv_style_set_line_color`, :cpp:func:`lv_style_set_line_width`.
 
+
+
 .. _lv_scale_events:
 
 Events
@@ -96,12 +98,26 @@ Events
 
 No events supported by this widget.
 
+.. admonition::  Further Reading
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
+
 .. _lv_scale_keys:
 
 Keys
 ****
 
-No keys supported by this widget.
+No *Keys* are processed by Scale Widgets.
+
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_scale_example:
 
@@ -109,6 +125,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/scale/index.rst
+
+
 
 .. _lv_scale_api:
 

@@ -88,6 +88,8 @@ with the original map:
 - ``"abc"`` Load the lower case map.
 - ``"1#"`` Load the lower case map.
 
+
+
 .. _lv_keyboard_events:
 
 Events
@@ -104,11 +106,19 @@ The keyboard has a **default event handler** callback called
 changing, the assigned text area, etc. You can remove it and replace it
 with a custom event handler if you wish.
 
+.. note::
 
-:note: In 8.0 and newer, adding an event handler to the keyboard does not remove the default event handler.
-       This behavior differs from v7, where adding an event handler would always replace the previous one.
+    In 8.0 and newer, adding an event handler to the keyboard does not remove the
+    default event handler. This behavior differs from v7, where adding an event
+    handler would always replace the previous one.
 
-Learn more about :ref:`events`.
+.. admonition::  Further Reading
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_keyboard_keys:
 
@@ -119,7 +129,11 @@ Keys
    select one.
 -  :cpp:enumerator:`LV_KEY_ENTER` To press/release the selected button.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_keyboard_example:
 
@@ -127,6 +141,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/keyboard/index.rst
+
+
 
 .. _lv_keyboard_api:
 

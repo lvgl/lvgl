@@ -52,6 +52,8 @@ rollover mode. If either the minimum or maximum value is reached with
 rollover enabled, the value will change to the other limit. If rollover
 is disabled the value will remain at the minimum or maximum value.
 
+
+
 .. _lv_spinbox_events:
 
 Events
@@ -59,9 +61,15 @@ Events
 
 - :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the value has changed.
 
-See also:  events of :ref:`lv_textarea`.
+.. admonition::  Further Reading
 
-Learn more about :ref:`events`.
+    :ref:`Textarea Events <lv_textarea_events>`.
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_spinbox_keys:
 
@@ -75,12 +83,20 @@ Keys
 - :cpp:enumerator:`LV_KEY_ENTER` With *Encoder* got the net digit. Jump to the first
   after the last.
 
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
+
 .. _lv_spinbox_example:
 
 Example
 *******
 
 .. include:: ../../examples/widgets/spinbox/index.rst
+
+
 
 .. _lv_spinbox_api:
 

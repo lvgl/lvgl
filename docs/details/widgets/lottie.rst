@@ -83,22 +83,35 @@ Get the animation
 Lottie animation. By default it is running infinitely at 60FPS however the LVGL animation
 can be freely adjusted.
 
+
+
 .. _lv_lottie_events:
 
 Events
 ******
 
-No special events are sent by the Lottie widget.
+No *Keys* are processed by Lottie Widgets.
 
-Learn more about :ref:`events`.
+.. admonition::  Further Reading
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_lottie_keys:
 
 Keys
 ****
 
-No keys are processed by the Lottie widget
-Learn more about :ref:`indev_keys`.
+No keys are processed by Lottie Widgets.
+
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_lottie_example:
 
@@ -106,6 +119,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/lottie/index.rst
+
+
 
 .. _lv_lottie_api:
 

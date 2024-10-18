@@ -163,9 +163,14 @@ Events
       -  ``draw_area``: the area of the knob
       -  ``rect_dsc``:
 
-See also:  events of :ref:`Base Widget <lv_obj>`.
 
-Learn more about :ref:`events`.
+.. admonition::  Further Reading
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_arc_keys:
 
@@ -175,7 +180,11 @@ Keys
 -  ``LV_KEY_RIGHT/UP`` Increases the value by one.
 -  ``LV_KEY_LEFT/DOWN`` Decreases the value by one.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_arc_example:
 
@@ -183,6 +192,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/arc/index.rst
+
+
 
 .. _lv_arc_api:
 

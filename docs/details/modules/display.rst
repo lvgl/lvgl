@@ -641,12 +641,12 @@ You can manually trigger an activity using
 
 
 
-Further Reading
-***************
+.. admonition::  Further Reading
 
--  `lv_port_disp_template.c <https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_disp_template.c>`__
-   for a template for your own driver.
--  :ref:`Drawing <draw>` to learn more about how rendering works in LVGL.
+    -  `lv_port_disp_template.c <https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_disp_template.c>`__
+       for a template for your own driver.
+    -  :ref:`Drawing <draw>` to learn more about how rendering works in LVGL.
+
 
 
 API

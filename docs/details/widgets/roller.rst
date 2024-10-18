@@ -59,6 +59,8 @@ This function calculates the height with the current style. If the font,
 line space, border width, etc. of the roller changes this function needs
 to be called again.
 
+
+
 .. _lv_roller_events:
 
 Events
@@ -66,9 +68,13 @@ Events
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when a new option is selected.
 
-See also:  events of :ref:`Base Widget <lv_obj>`.
+.. admonition::  Further Reading
 
-Learn more about :ref:`events`.
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_roller_keys:
 
@@ -79,12 +85,20 @@ Keys
 -  ``LV_KEY_LEFT/UP`` Select the previous option
 -  :cpp:enumerator:`LY_KEY_ENTER` Apply the selected option (Send :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` event)
 
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
+
 .. _lv_roller_example:
 
 Example
 *******
 
 .. include:: ../../examples/widgets/roller/index.rst
+
+
 
 .. _lv_roller_api:
 

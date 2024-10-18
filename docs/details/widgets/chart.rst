@@ -202,6 +202,8 @@ point.
 the cursor at a point. If the point's position changes (new value or
 scrolling) the cursor will move with the point.
 
+
+
 .. _lv_chart_events:
 
 Events
@@ -211,18 +213,26 @@ Events
    :cpp:expr:`lv_chart_get_pressed_point(chart)` returns the zero-based index of
    the pressed point.
 
-See also:  events of :ref:`Base Widget <lv_obj>`.
+.. admonition::  Further Reading
 
-Learn more about :ref:`events`.
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_chart_keys:
 
 Keys
 ****
 
-No *Keys* are processed by the Widget type.
+No *Keys* are processed by Chart Widgets.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_chart_example:
 
@@ -230,6 +240,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/chart/index.rst
+
+
 
 .. _lv_chart_api:
 

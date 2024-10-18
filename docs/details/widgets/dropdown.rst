@@ -130,22 +130,24 @@ Manually open/close
 To manually open or close the drop-down list the
 ``lv_dropdown_open/close(dropdown)`` function can be used.
 
+
+
 .. _lv_dropdown_events:
 
 Events
 ******
 
-Apart from the `Generic events <../overview/event.html#generic-events>`__, the following
-`Special events <../overview/event.html#special-events>`__ are sent by
-the drop-down list:
-
 - :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the new option is selected or the list is opened/closed.
 - :cpp:enumerator:`LV_EVENT_CANCEL` Sent when the list is closed
 - :cpp:enumerator:`LV_EVENT_READY` Sent when the list is opened
 
-See also:  events of :ref:`Base Widget <lv_obj>`.
+.. admonition::  Further Reading
 
-Learn more about :ref:`events`.
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_dropdown_keys:
 
@@ -157,7 +159,11 @@ Keys
 -  :cpp:enumerator:`LV_KEY_ENTER` Apply the selected option (Sends
    :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` event and closes the drop-down list).
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_dropdown_example:
 
@@ -165,6 +171,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/dropdown/index.rst
+
+
 
 .. _lv_dropdown_api:
 

@@ -70,6 +70,8 @@ feature is enabled by adding the :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST`:
 
 The extended click area (set by :cpp:expr:`lv_obj_set_ext_click_area(slider, value)`) increases to knob's click area.
 
+
+
 .. _lv_slider_events:
 
 Events
@@ -80,9 +82,15 @@ Events
    being dragged.
 -  :cpp:enumerator:`LV_EVENT_RELEASED` Sent when the slider has just been released.
 
-See also:  events of :ref:`Bar <lv_bar>`.
+.. admonition::  Further Reading
 
-Learn more about :ref:`events`.
+    :ref:`Bar Events <lv_bar_events>`.
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_slider_keys:
 
@@ -92,7 +100,11 @@ Keys
 -  ``LV_KEY_UP/RIGHT`` Increment the slider's value by 1
 -  ``LV_KEY_DOWN/LEFT`` Decrement the slider's value by 1
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_slider_example:
 
@@ -100,6 +112,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/slider/index.rst
+
+
 
 .. _lv_slider_api:
 

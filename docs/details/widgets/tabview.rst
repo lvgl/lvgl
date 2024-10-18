@@ -81,6 +81,8 @@ Get the parts
 - :cpp:expr:`lv_tabview_get_content(tabview)` returns the container for tabs content
 - :cpp:expr:`lv_tabview_get_tab_bar(tabview)` returns the container for tabs buttons
 
+
+
 .. _lv_tabview_events:
 
 Events
@@ -90,7 +92,13 @@ Events
    or clicking the tab button. :cpp:expr:`lv_tabview_get_tab_active(tabview)`
    returns the zero based index of the current tab.
 
-Learn more about :ref:`events`.
+.. admonition::  Further Reading
+
+    :ref:`lv_obj_events` are emitted by all Widgets.
+
+    Learn more about :ref:`events`.
+
+
 
 .. _lv_tabview_keys:
 
@@ -100,7 +108,11 @@ Keys
 Keys have effect only on the tab buttons.
 Add manually to a group if required.
 
-Learn more about :ref:`indev_keys`.
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
 
 .. _lv_tabview_example:
 
@@ -108,6 +120,8 @@ Example
 *******
 
 .. include:: ../../examples/widgets/tabview/index.rst
+
+
 
 .. _lv_tabview_api:
 

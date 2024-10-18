@@ -4,17 +4,20 @@
 Widget Basics
 =============
 
+The following details apply to all types of Widgets.
+
+
 
 What is a Widget?
 *****************
 In LVGL a Widget is the **basic building block** of the user interface.
-The most fundamental of all of Widgets is :ref:`lv_obj`, on which all other
-widgets are based.
+The most fundamental of all of Widgets is the :ref:`Base Widget <lv_obj>`, on which
+all other widgets are based.
 
 Examples:  :ref:`Base Widget (and Screen) <lv_obj>`,
 :ref:`Button <lv_button>`, :ref:`Label <lv_label>`,
 :ref:`Image <lv_image>`, :ref:`List <lv_list>`,
-:ref:`Chart <lv_chart>` or :ref:`Text area <lv_textarea>`.
+:ref:`Chart <lv_chart>` and :ref:`Text Area <lv_textarea>`.
 
 See :ref:`widgets` to see all Widget types.
 
@@ -22,7 +25,8 @@ All Widgets are referenced using an :cpp:type:`lv_obj_t` pointer as a handle.
 This pointer can later be used to read or change the Widget's attributes.
 
 
-.. _objects_attributes:
+
+.. _widget_attributes:
 
 Attributes
 **********
@@ -48,7 +52,8 @@ You can set/get these attributes with ``lv_obj_set_...`` and
    lv_obj_set_size(btn1, 100, 50);   /* Set a button's size */
    lv_obj_set_pos(btn1, 20,30);      /* Set a button's position */
 
-To see all the available functions visit the :ref:`Base Widget's documentation <lv_obj>`.
+To see the features available to all widgets, see :ref:`Base Widget's documentation <lv_obj>`.
+
 
 Specific attributes
 -------------------
@@ -72,7 +77,8 @@ The API of the widgets is described in their
 header files (e.g. *widgets/lv_slider.h*)
 
 
-.. _objects_working_mechanisms:
+
+.. _widget_working_mechanisms:
 
 Working Mechanisms
 ******************
@@ -268,7 +274,7 @@ To set a Screen to be the "Active Screen", call :cpp:func:`lv_screen_load` or
 :cpp:func:`lv_screen_load_anim`.
 
 
-.. _objects_loading_screens:
+.. _loading_screens:
 
 Loading Screens
 ---------------
@@ -344,7 +350,7 @@ In summary, to enable transparent screens and displays for OSD menu-like UIs:
 
 
 
-.. _objects_parts:
+.. _widget_parts:
 
 Parts
 *****
@@ -370,7 +376,8 @@ widgets. They are described in more detail in the
 :ref:`Style overview <styles>` section.
 
 
-.. _objects_states:
+
+.. _widget_states:
 
 States
 ******
@@ -403,8 +410,9 @@ values can be used as well. E.g.
 To learn more about the states read the related section of the
 :ref:`Style overview <styles>`.
 
-.. _objects_snapshot:
 
+
+.. _widget_snapshot:
 
 Snapshot
 ********
