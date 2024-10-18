@@ -323,8 +323,7 @@ class InfoDrawUnit(gdb.Command):
 
     def dump_draw_unit(self, draw_unit:gdb.Value):
         # Dereference to get the string content of the name from draw_unit
-        name_address = draw_unit["name"]
-        name = name_address.string()
+        name = draw_unit["name"].string()
 
         # Print draw_unit information and the name
         print(f"Draw Unit: {draw_unit}, Name: {name}")
