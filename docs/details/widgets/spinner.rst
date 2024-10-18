@@ -43,7 +43,7 @@ No special events are sent to Spinner Widgets.
 
     :ref:`Arc Events <lv_arc_events>`
 
-    :ref:`lv_obj_events` are emitted by all Widgets.
+    Learn more about :ref:`lv_obj_events` emitted by all Widgets.
 
     Learn more about :ref:`events`.
 

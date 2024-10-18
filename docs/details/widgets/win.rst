@@ -73,7 +73,7 @@ manually to the return value of :cpp:func:`lv_win_add_button`.
 
 .. admonition::  Further Reading
 
-    :ref:`lv_obj_events` are emitted by all Widgets.
+    Learn more about :ref:`lv_obj_events` emitted by all Widgets.
 
     Learn more about :ref:`events`.
 

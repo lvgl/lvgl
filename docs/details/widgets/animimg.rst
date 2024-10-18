@@ -54,7 +54,7 @@ No special events are sent by Animation-Image Widgets.
 
 .. admonition::  Further Reading
 
-    :ref:`lv_obj_events` are emitted by all Widgets.
+    Learn more about :ref:`lv_obj_events` emitted by all Widgets.
 
     Learn more about :ref:`events`.
 
