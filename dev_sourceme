@@ -1,0 +1,19 @@
+#Dev sourceme for linux development
+
+#Install the prerequisites inside scripts
+echo 'Installing prerequisites'
+./scripts/install-prerequisites.sh
+
+#Make sure git pre-commit hook is set up
+echo 'Setting up pre-commit'
+cd .git/hooks
+cp pre-commit.sample pre-commit
+rm pre-commit.sample
+cd ../..
+
+#Run pre-commit once, for feedback
+echo 'Checking pre-commit'
+pre-commit
+
+#Finally: start the development
+echo 'LVGL is set up for development!'
