@@ -300,9 +300,9 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
     bool is_ext_draw = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE);
     bool is_inheritable = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_INHERITABLE);
     bool is_layer_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_LAYER_UPDATE);
-    bool is_transform_rotation = (prop == LV_STYLE_TRANSFORM_ROTATION) ? true : false;
-    bool is_transform_scale_x = (prop == LV_STYLE_TRANSFORM_SCALE_X) ? true : false;
-    bool is_transform_scale_y = (prop == LV_STYLE_TRANSFORM_SCALE_Y) ? true : false;
+    bool is_transform_rotation = lv_style_prop_has_flag(prop, LV_STYLE_TRANSFORM_ROTATION);
+    bool is_transform_scale_x = lv_style_prop_has_flag(prop, LV_STYLE_TRANSFORM_SCALE_X);
+    bool is_transform_scale_y = lv_style_prop_has_flag(prop, LV_STYLE_TRANSFORM_SCALE_Y);
 
     if(is_layout_refr) {
         if(part == LV_PART_ANY ||
