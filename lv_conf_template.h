@@ -1165,6 +1165,10 @@
 /** Driver for Renesas GLCD */
 #define LV_USE_RENESAS_GLCDC    0
 
+
+/** Driver for NXP ELCDIF */
+#define LV_USE_NXP_ELCDIF   0
+
 /** Driver for ST LTDC */
 #define LV_USE_ST_LTDC    0
 #if LV_USE_ST_LTDC

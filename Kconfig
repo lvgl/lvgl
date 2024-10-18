@@ -1882,6 +1882,10 @@ menu "LVGL configuration"
 			bool "Generic MIPI driver"
 			default y if LV_USE_ST7735 || LV_USE_ST7789 || LV_USE_ST7796 || LV_USE_ILI9341
 
+		config LV_USE_NXP_ELCDIF
+			bool "Use NXP ELCDIF to generate display"
+			default n
+
 		config LV_USE_RENESAS_GLCDC
 			bool "Use Renesas GLCDC driver"
 			default n
