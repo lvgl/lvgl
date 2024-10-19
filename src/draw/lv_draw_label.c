@@ -291,23 +291,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
 #endif
 
         while(i < line_end - line_start) {
-
             uint32_t logical_char_pos = 0;
-            /* Restart recolor variable */
-            recolor.red = dsc->color.red;
-            recolor.blue = dsc->color.blue;
-            recolor.green = dsc->color.green;
-
-            /* Check if the text selection is enabled */
-            if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
-#if LV_USE_BIDI
-                logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start);
-                uint32_t t = lv_text_encoded_get_char_id(bidi_txt, i);
-                logical_char_pos += lv_bidi_get_logical_pos(bidi_txt, NULL, line_end - line_start, base_dir, t, NULL);
-#else
-                logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start + i);
-#endif
-            }
 
             uint32_t letter;
             uint32_t letter_next;
@@ -353,10 +337,26 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
 
                         recolor = lv_color_make(r, g, b);
                     }
+                    else {
+                        recolor.red = dsc->color.red;
+                        recolor.blue = dsc->color.blue;
+                        recolor.green = dsc->color.green;
+                    }
 
                     /*After the parameter the text is in the command*/
                     cmd_state = CMD_STATE_IN;
                 }
+            }
+
+            /* Check if the text selection is enabled */
+            if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
+#if LV_USE_BIDI
+                logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start);
+                uint32_t t = lv_text_encoded_get_char_id(bidi_txt, i);
+                logical_char_pos += lv_bidi_get_logical_pos(bidi_txt, NULL, line_end - line_start, base_dir, t, NULL);
+#else
+                logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start + i);
+#endif
             }
 
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
