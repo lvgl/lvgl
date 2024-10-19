@@ -294,6 +294,17 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
         while(i < line_end - line_start) {
             uint32_t logical_char_pos = 0;
 
+            /* Check if the text selection is enabled */
+            if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
+#if LV_USE_BIDI
+                logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start);
+                uint32_t t = lv_text_encoded_get_char_id(bidi_txt, i);
+                logical_char_pos += lv_bidi_get_logical_pos(bidi_txt, NULL, line_end - line_start, base_dir, t, NULL);
+#else
+                logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start + i);
+#endif
+            }
+
             uint32_t letter;
             uint32_t letter_next;
             lv_text_encoded_letter_next_2(bidi_txt, &letter, &letter_next, &i);
@@ -359,17 +370,6 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
                 if(is_first_space_after_cmd) {
                     continue;
                 }
-            }
-
-            /* Check if the text selection is enabled */
-            if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
-#if LV_USE_BIDI
-                logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start);
-                uint32_t t = lv_text_encoded_get_char_id(bidi_txt, i);
-                logical_char_pos += lv_bidi_get_logical_pos(bidi_txt, NULL, line_end - line_start, base_dir, t, NULL);
-#else
-                logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start + i);
-#endif
             }
 
             /* If we're in the CMD_STATE_IN state then we need to subtract the recolor command length */
