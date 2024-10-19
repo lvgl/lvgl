@@ -359,6 +359,11 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
 #endif
             }
 
+            /* If we're in the CMD_STATE_IN state then we need to subtract the recolor command length */
+            if(cmd_state == CMD_STATE_IN) {
+                logical_char_pos -= (LABEL_RECOLOR_PAR_LENGTH + 1);
+            }
+
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
             /*Always set the bg_coordinates for placeholder drawing*/
