@@ -4,7 +4,7 @@
 Tick Interface
 ==============
 
-LVGL needs a awareness of elapsed time (in milliseconds) for animations and other tasks.
+LVGL needs awareness of elapsed time (in milliseconds) for animations and other tasks.
 
 .. image:: /misc/intro_data_flow.png
    :scale: 75 %

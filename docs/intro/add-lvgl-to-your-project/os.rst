@@ -95,7 +95,7 @@ before any other LVGL function is started.
     - :cpp:func:`lv_tick_inc` (see :ref:`tick` for more information) and
     - :cpp:func:`lv_display_flush_ready` (see :ref:`flush_callback` for more information)
 
-    The reason this is okay is that the LVGL data changed by them is atomic.
+    The reason this is okay is that the LVGL data changed by them is :ref:`atomic <atomic>`.
 
     If an interrupt MUST convey information to part of your application that calls
     LVGL functions, set a flag or other atomic value that your LVGL-calling thread
