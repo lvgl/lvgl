@@ -370,10 +370,10 @@ To set a local property use functions like
     lv_obj_set_style_bg_color(slider, lv_color_red(), LV_PART_INDICATOR | LV_STATE_FOCUSED);
 
 
-.. _style_properties_description:
+.. _style_properties_overview:
 
-Style Properties
-****************
+Style Properties Overview
+*************************
 
 For the full list of style properties click :ref:`here <style_properties>`.
 
