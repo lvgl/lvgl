@@ -20,10 +20,10 @@ may have seen on smartwatches.
 Parts and Styles
 ****************
 
-The Tile view is built from an :ref:`lv_obj` container and
-:ref:`lv_obj` tiles.
+The Tile view is built from an :ref:`base_widget` container and
+:ref:`base_widget` tiles.
 
-The parts and styles work the same as for :ref:`lv_obj`.
+The parts and styles work the same as for :ref:`base_widget`.
 
 .. _lv_tileview_usage:
 

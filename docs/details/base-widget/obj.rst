@@ -4,17 +4,13 @@
 Widget Basics
 =============
 
-The following details apply to all types of Widgets.
-
 
 
 What is a Widget?
 *****************
-In LVGL a Widget is the **basic building block** of the user interface.
-The most fundamental of all of Widgets is the :ref:`Base Widget <lv_obj>`, on which
-all other widgets are based.
+A Widget is the **basic building block** of the LVGL user interface.
 
-Examples:  :ref:`Base Widget (and Screen) <lv_obj>`,
+Examples of Widgets:  :ref:`Base Widget (and Screen) <base_widget>`,
 :ref:`Button <lv_button>`, :ref:`Label <lv_label>`,
 :ref:`Image <lv_image>`, :ref:`List <lv_list>`,
 :ref:`Chart <lv_chart>` and :ref:`Text Area <lv_textarea>`.
@@ -26,10 +22,27 @@ This pointer can later be used to read or change the Widget's attributes.
 
 
 
+.. _base_widget:
+
+Base Widget
+***********
+The most fundamental of all of Widgets is the Base Widget, on which all other widgets
+are based.  From an Object-Oriented perspective, think of the Base Widget as the
+Widget class from which all other Widgets inherit.
+
+The functions and functionalities of the Base Widget can be used with
+other widgets as well.  For example :cpp:expr:`lv_obj_set_width(slider, 100)`.
+
+The Base Widget can be directly used as a simple widget: it's nothing
+more than a rectangle. In HTML terms, think of it as a ``<div>``.
+
+
+
 .. _widget_attributes:
 
 Attributes
 **********
+
 
 Basic attributes
 ----------------
@@ -40,8 +53,9 @@ All Widget types share some basic attributes:
 - Size
 - Parent
 - Styles
-- Event handlers
-- Etc
+- Events it emits
+- Flags like *Clickable*, *Scollable*, etc.
+- Etc.
 
 You can set/get these attributes with ``lv_obj_set_...`` and
 ``lv_obj_get_...`` functions. For example:
@@ -52,11 +66,11 @@ You can set/get these attributes with ``lv_obj_set_...`` and
    lv_obj_set_size(btn1, 100, 50);   /* Set a button's size */
    lv_obj_set_pos(btn1, 20,30);      /* Set a button's position */
 
-To see the features available to all widgets, see :ref:`Base Widget's documentation <lv_obj>`.
+For complete details on position, size, coordinates and layouts, see :ref:`coord`.
 
 
-Specific attributes
--------------------
+Widget-specific attributes
+--------------------------
 
 The Widget types have special attributes as well. For example, a slider has
 
@@ -77,6 +91,48 @@ The API of the widgets is described in their
 header files (e.g. *widgets/lv_slider.h*)
 
 
+.. _lv_obj_parents_and_children:
+
+Parents and children
+--------------------
+
+A Widget's parent is set when the widget is created --- the parent is passed to the
+creation function.
+
+To get a Widget's current parent, use :cpp:expr:`lv_obj_get_parent(widget)`.
+
+You can move the Widget to a new parent with :cpp:expr:`lv_obj_set_parent(widget, new_parent)`.
+
+To get a specific child of a parent use :cpp:expr:`lv_obj_get_child(parent, idx)`.
+Some examples for ``idx``:
+
+- ``0`` get the child created first
+- ``1`` get the child created second
+- ``-1`` get the child created last
+
+You can iterate through a parent Widget's children like this:
+
+.. code-block:: c
+
+    uint32_t i;
+    for(i = 0; i < lv_obj_get_child_count(parent); i++) {
+        lv_obj_t * child = lv_obj_get_child(parent, i);
+        /* Do something with child. */
+    }
+
+:cpp:expr:`lv_obj_get_index(widget)` returns the index of the Widget in its parent.
+It is equivalent to the number of older children in the parent.
+
+You can bring a Widget to the foreground or send it to the background with
+:cpp:expr:`lv_obj_move_foreground(widget)` and :cpp:expr:`lv_obj_move_background(widget)`.
+
+You can change the index of a Widget in its parent using :cpp:expr:`lv_obj_move_to_index(widget, index)`.
+
+You can swap the position of two Widgets with :cpp:expr:`lv_obj_swap(widget1, widget2)`.
+
+To get a Widget's Screen (highest-level parent) use :cpp:expr:`lv_obj_get_screen(widget)`.
+
+
 
 .. _widget_working_mechanisms:
 
@@ -86,11 +142,12 @@ Working Mechanisms
 Parent-child structure
 ----------------------
 
-A parent Widget can be considered as the container of its children.
-Every Widget has exactly one parent Widget (except Screens), but a
-parent can have any number of children. There is no limitation for the
-type of the parent but there are Widgets which are typically a parent
-(e.g. button) or a child (e.g. label).
+A parent Widget can be considered as the container of its children.  Every Widget has
+exactly one parent Widget (except Screens), but a parent Widget can have any number
+of children.  There is no limitation for the type of the parent but there are Widgets
+which are typically a parent (e.g. button) or a child (e.g. label).
+
+
 
 Moving together
 ---------------
@@ -102,11 +159,11 @@ it. Therefore, all positions are relative to the parent.
 
 .. code-block:: c
 
-   lv_obj_t * parent = lv_obj_create(lv_screen_active());  /* Create a parent Widget on the current screen */
-   lv_obj_set_size(parent, 100, 80);                       /* Set the size of the parent */
+   lv_obj_t * parent = lv_obj_create(lv_screen_active());  /* Create a parent Widget on current screen */
+   lv_obj_set_size(parent, 100, 80);                       /* Set size of parent */
 
-   lv_obj_t * obj1 = lv_obj_create(parent);                /* Create a Widget on the previously created parent Widget */
-   lv_obj_set_pos(widget1, 10, 10);                        /* Set the position of the new Widget */
+   lv_obj_t * obj1 = lv_obj_create(parent);                /* Create a Widget on previously created parent Widget */
+   lv_obj_set_pos(widget1, 10, 10);                        /* Set position of new Widget */
 
 Modify the position of the parent:
 
@@ -356,7 +413,7 @@ Parts
 *****
 
 The widgets are built from multiple parts. For example a
-:ref:`Base Widget <lv_obj>` uses the main and scrollbar parts but a
+:ref:`Base Widget <base_widget>` uses the main and scrollbar parts but a
 :ref:`Slider <lv_slider>` uses the main, indicator and knob parts.
 Parts are similar to *pseudo-elements* in CSS.
 
@@ -412,6 +469,146 @@ To learn more about the states read the related section of the
 
 
 
+.. _lv_obj_flags:
+
+Flags
+*****
+
+There are some Widget attributes which can be enabled/disabled by
+:cpp:expr:`lv_obj_add_flag(widget, LV_OBJ_FLAG_...)` and
+:cpp:expr:`lv_obj_remove_flag(widget, LV_OBJ_FLAG_...)`.
+
+-  :cpp:enumerator:`LV_OBJ_FLAG_HIDDEN` Make the Widget hidden. (Like it wasn't there at all)
+-  :cpp:enumerator:`LV_OBJ_FLAG_CLICKABLE` Make the Widget clickable by input devices
+-  :cpp:enumerator:`LV_OBJ_FLAG_CLICK_FOCUSABLE` Add focused state to the Widget when clicked
+-  :cpp:enumerator:`LV_OBJ_FLAG_CHECKABLE` Toggle checked state when the Widget is clicked
+-  :cpp:enumerator:`LV_OBJ_FLAG_SCROLLABLE` Make the Widget scrollable
+-  :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_ELASTIC` Allow scrolling inside but with slower speed
+-  :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_MOMENTUM` Make the Widget scroll further when "thrown"
+-  :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_ONE` Allow scrolling only one snappable children
+-  :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_CHAIN_HOR` Allow propagating the horizontal scroll to a parent
+-  :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_CHAIN_VER` Allow propagating the vertical scroll to a parent
+-  :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_CHAIN` Simple packaging for (:cpp:expr:`LV_OBJ_FLAG_SCROLL_CHAIN_HOR | LV_OBJ_FLAG_SCROLL_CHAIN_VER`)
+-  :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_ON_FOCUS` Automatically scroll Widget to make it visible when focused
+-  :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_WITH_ARROW` Allow scrolling the focused Widget with arrow keys
+-  :cpp:enumerator:`LV_OBJ_FLAG_SNAPPABLE` If scroll snap is enabled on the parent it can snap to this Widget
+-  :cpp:enumerator:`LV_OBJ_FLAG_PRESS_LOCK` Keep the Widget pressed even if the press slid from the Widget
+-  :cpp:enumerator:`LV_OBJ_FLAG_EVENT_BUBBLE` Propagate the events to the parent as well
+-  :cpp:enumerator:`LV_OBJ_FLAG_GESTURE_BUBBLE` Propagate the gestures to the parent
+-  :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` Allow performing more accurate hit (click) test. E.g. accounting for rounded corners
+-  :cpp:enumerator:`LV_OBJ_FLAG_IGNORE_LAYOUT` Make the Widget not positioned by the layouts
+-  :cpp:enumerator:`LV_OBJ_FLAG_FLOATING` Do not scroll the Widget when the parent scrolls and ignore layout
+-  :cpp:enumerator:`LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS` Enable sending ``LV_EVENT_DRAW_TASK_ADDED`` events
+-  :cpp:enumerator:`LV_OBJ_FLAG_OVERFLOW_VISIBLE` Do not clip the children's content to the parent's boundary
+-  :cpp:enumerator:`LV_OBJ_FLAG_FLEX_IN_NEW_TRACK` Start a new flex track on this item
+-  :cpp:enumerator:`LV_OBJ_FLAG_LAYOUT_1` Custom flag, free to use by layouts
+-  :cpp:enumerator:`LV_OBJ_FLAG_LAYOUT_2` Custom flag, free to use by layouts
+-  :cpp:enumerator:`LV_OBJ_FLAG_WIDGET_1` Custom flag, free to use by widget
+-  :cpp:enumerator:`LV_OBJ_FLAG_WIDGET_2` Custom flag, free to use by widget
+-  :cpp:enumerator:`LV_OBJ_FLAG_USER_1` Custom flag, free to use by user
+-  :cpp:enumerator:`LV_OBJ_FLAG_USER_2` Custom flag, free to use by user
+-  :cpp:enumerator:`LV_OBJ_FLAG_USER_3` Custom flag, free to use by user
+-  :cpp:enumerator:`LV_OBJ_FLAG_USER_4` Custom flag, free to use by user
+
+Some examples:
+
+.. code-block:: c
+
+    /* Hide on Widget */
+    lv_obj_add_flag(widget, LV_OBJ_FLAG_HIDDEN);
+
+    /* Make a Widget non-clickable */
+    lv_obj_remove_flag(widget, LV_OBJ_FLAG_CLICKABLE);
+
+
+
+.. _lv_obj_events:
+
+Base-Widget Events
+******************
+
+.. _widget_events:
+
+Events from Input Devices
+-------------------------
+-  :cpp:enumerator:`LV_EVENT_PRESSED`              Widget has been pressed.
+-  :cpp:enumerator:`LV_EVENT_PRESSING`             Widget is being pressed (sent continuously while pressing).
+-  :cpp:enumerator:`LV_EVENT_PRESS_LOST`           Widget is still being pressed but slid cursor/finger off Widget.
+-  :cpp:enumerator:`LV_EVENT_SHORT_CLICKED`        Widget was pressed for a short period of time, then released. Not sent if scrolled.
+-  :cpp:enumerator:`LV_EVENT_SINGLE_CLICKED`       Sent for first short click within a small distance and short time.
+-  :cpp:enumerator:`LV_EVENT_DOUBLE_CLICKED`       Sent for second short click within small distance and short time.
+-  :cpp:enumerator:`LV_EVENT_TRIPLE_CLICKED`       Sent for third short click within small distance and short time.
+-  :cpp:enumerator:`LV_EVENT_LONG_PRESSED`         Object has been pressed for at least `long_press_time`.  Not sent if scrolled.
+-  :cpp:enumerator:`LV_EVENT_LONG_PRESSED_REPEAT`  Sent after `long_press_time` in every `long_press_repeat_time` ms.  Not sent if scrolled.
+-  :cpp:enumerator:`LV_EVENT_CLICKED`              Sent on release if not scrolled (regardless to long press).
+-  :cpp:enumerator:`LV_EVENT_RELEASED`             Sent in every cases when Widget has been released.
+-  :cpp:enumerator:`LV_EVENT_SCROLL_BEGIN`         Scrolling begins. The event parameter is a pointer to the animation of the scroll. Can be modified.
+-  :cpp:enumerator:`LV_EVENT_SCROLL_THROW_BEGIN`   Received when scrolling begins.
+-  :cpp:enumerator:`LV_EVENT_SCROLL_END`           Scrolling ended.
+-  :cpp:enumerator:`LV_EVENT_SCROLL`               Scrolling
+-  :cpp:enumerator:`LV_EVENT_GESTURE`              A gesture is detected. Get gesture with `lv_indev_get_gesture_dir(lv_indev_active());`
+-  :cpp:enumerator:`LV_EVENT_KEY`                  A key is sent to Widget. Get key with `lv_indev_get_key(lv_indev_active());`
+-  :cpp:enumerator:`LV_EVENT_FOCUSED`              Widget received focus,
+-  :cpp:enumerator:`LV_EVENT_DEFOCUSED`            Widget's focus has been lost.
+-  :cpp:enumerator:`LV_EVENT_LEAVE`                Widget's focus has been lost but is still selected.
+-  :cpp:enumerator:`LV_EVENT_HIT_TEST`             Perform advanced hit-testing.
+
+Special Events
+--------------
+-  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` when the :cpp:enumerator:`LV_OBJ_FLAG_CHECKABLE` flag is
+   enabled and the Widget was clicked (on transition to/from the checked state)
+
+Drawing Events
+--------------
+-  :cpp:enumerator:`LV_EVENT_DRAW_MAIN`            Performing drawing of main part
+-  :cpp:enumerator:`LV_EVENT_DRAW_MAIN_BEGIN`      Starting drawing of main part
+-  :cpp:enumerator:`LV_EVENT_DRAW_MAIN_END`        Finishing drawing of main part
+-  :cpp:enumerator:`LV_EVENT_DRAW_POST`            Perform the post draw phase (when all children are drawn)
+-  :cpp:enumerator:`LV_EVENT_DRAW_POST_BEGIN`      Starting the post draw phase (when all children are drawn)
+-  :cpp:enumerator:`LV_EVENT_DRAW_POST_END`        Finishing the post draw phase (when all children are drawn)
+
+Other Events
+------------
+-  :cpp:enumerator:`LV_EVENT_DELETE`               Object is being deleted
+-  :cpp:enumerator:`LV_EVENT_CHILD_CHANGED`        Child was removed, added, or its size, position were changed
+-  :cpp:enumerator:`LV_EVENT_CHILD_CREATED`        Child was created, always bubbles up to all parents
+-  :cpp:enumerator:`LV_EVENT_CHILD_DELETED`        Child was deleted, always bubbles up to all parents
+-  :cpp:enumerator:`LV_EVENT_SIZE_CHANGED`         Object coordinates/size have changed
+-  :cpp:enumerator:`LV_EVENT_STYLE_CHANGED`        Object's style has changed
+-  :cpp:enumerator:`LV_EVENT_LAYOUT_CHANGED`       A child's position has changed due to a layout recalculation (when container has flex or grid layout style)
+-  :cpp:enumerator:`LV_EVENT_GET_SELF_SIZE`        Get internal size of a widget
+
+.. admonition::  Further Reading
+
+    Learn more about :ref:`events`.
+
+
+
+.. _lv_obj_keys:
+
+Keys
+****
+
+If :cpp:enumerator:`LV_OBJ_FLAG_CHECKABLE` is enabled, :cpp:enumerator:`LV_KEY_RIGHT` and
+:cpp:enumerator:`LV_KEY_UP` make the Widget checked, and :cpp:enumerator:`LV_KEY_LEFT` and
+:cpp:enumerator:`LV_KEY_DOWN` make it unchecked.
+
+If :cpp:enumerator:`LV_OBJ_FLAG_SCROLLABLE` is enabled, but the Widget is not editable
+(as declared by the widget class), the arrow keys (:cpp:enumerator:`LV_KEY_UP`,
+:cpp:enumerator:`LV_KEY_DOWN`, :cpp:enumerator:`LV_KEY_LEFT`, :cpp:enumerator:`LV_KEY_RIGHT`) scroll the Widget.
+If the Widget can only scroll vertically, :cpp:enumerator:`LV_KEY_LEFT` and
+:cpp:enumerator:`LV_KEY_RIGHT` will scroll up/down instead, making it compatible with
+an encoder input device. See :ref:`Input devices overview <indev>` for
+more on encoder behaviors and the edit mode.
+
+.. admonition::  Further Reading
+
+    Learn more about :ref:`indev_keys`.
+
+
+
+
+
 .. _widget_snapshot:
 
 Snapshot
@@ -421,7 +618,15 @@ A snapshot image can be generated for a Widget together with its
 children. Check details in :ref:`snapshot`.
 
 
-.. _objects_api:
+
+Example
+*******
+
+.. include:: ../../examples/widgets/obj/index.rst
+
+
+
+.. _lv_obj_api:
 
 API
 ***

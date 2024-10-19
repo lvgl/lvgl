@@ -7,9 +7,9 @@ Text Area (lv_textarea)
 Overview
 ********
 
-The Text Area is a :ref:`base_widget` with a :ref:`lv_label` and a cursor on it.
-Texts or characters can be added to it.  Long lines are wrapped and when the text
-becomes long enough the Text area can be scrolled.
+The Text Area is a :ref:`base_widget_overview` with a :ref:`lv_label` and a cursor on
+it.  Texts or characters can be added to it.  Long lines are wrapped and when the
+text becomes long enough the Text area can be scrolled.
 
 One line mode and password modes are supported.
 

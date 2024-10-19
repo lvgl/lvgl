@@ -12,7 +12,7 @@ In LVGL scrolling works very intuitively: if a Widget is outside its
 parent content area (the size without padding), the parent becomes
 scrollable and scrollbar(s) will appear. That's it.
 
-Any Widget can be scrollable including ``lv_obj``, ``lv_image``,
+Any Widget can be scrollable including :ref:`base_widget`, ``lv_image``,
 ``lv_button``, ``lv_meter``, etc
 
 The Widget can either be scrolled horizontally or vertically in one

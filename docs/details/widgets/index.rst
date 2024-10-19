@@ -7,7 +7,6 @@ Widgets
 .. toctree::
     :maxdepth: 1
 
-    obj
     animimg
     arc
     bar

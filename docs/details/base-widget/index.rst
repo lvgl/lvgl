@@ -1,4 +1,4 @@
-.. _base_widget:
+.. _base_widget_overview:
 
 ===========
 Base Widget

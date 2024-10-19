@@ -178,7 +178,6 @@ To use a keyboard or keypad:
 
 .. code-block:: c
 
-
    lv_indev_set_type(indev, LV_INDEV_TYPE_KEYPAD);
 
    ...
@@ -231,16 +230,17 @@ To use an Encoder (similar to the *Keypads*) the Widgets should be added to a gr
 
 .. _indev_groups:
 
-Groups
-------
+Widget Groups
+-------------
+When input focus needs to be managed among a set of Widgets (e.g. to capture user
+input from a keypad or encoder), that set of Widgets is placed in a group which
+thereafter manages how input focus moves from Widget to Widget.
 
-Objects you want to control with a keypad or encoder need to be added to
-a *Group*. In every group there is exactly one object with focus which
-receives the pressed keys or the encoder actions. For example, if a
-:ref:`Text Area <lv_textarea>` has focus and you press some letter
-on a keyboard, the keys will be sent and inserted into the text area.
-Similarly, if a :ref:`Slider <lv_slider>` has focus and you press
-the left or right arrows, the slider's value will be changed.
+In each group there is exactly one object with focus which receives the pressed keys
+or the encoder actions.  For example, if a :ref:`Text Area <lv_textarea>` has focus
+and you press some letter on a keyboard, the keys will be sent and inserted into the
+text area.  Similarly, if a :ref:`Slider <lv_slider>` has focus and you press the
+left or right arrows, the slider's value will be changed.
 
 You need to associate an input device with a group.  An input device can
 send key events to only one group but a group can receive data from more
@@ -249,8 +249,15 @@ than one input device.
 To create a group use :cpp:expr:`lv_group_t * g = lv_group_create()` and to add
 a Widget to the group use :cpp:expr:`lv_group_add_obj(g, widget)`.
 
-To associate a group with an input device use
-:cpp:expr:`lv_indev_set_group(indev, g)`.
+Once a Widget has been added to a group, you can find out what group it is in
+using :cpp:expr:`lv_obj_get_group(widget)`.
+
+To find out if a Widget in a group has focus, call :cpp:expr:`lv_obj_is_focused(widget)`.
+If the Widget is not part of a group, this function will return ``false``.
+
+To associate a group with an input device use :cpp:expr:`lv_indev_set_group(indev, g)`.
+
+
 
 .. _indev_keys:
 
