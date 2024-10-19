@@ -2900,7 +2900,8 @@
     #endif
 #endif
 
-/*SVG library*/
+/*SVG library
+ *  - Requires `LV_USE_VECTOR_GRAPHIC = 1` */
 #ifndef LV_USE_SVG
     #ifdef CONFIG_LV_USE_SVG
         #define LV_USE_SVG CONFIG_LV_USE_SVG
