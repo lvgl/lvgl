@@ -8,7 +8,7 @@ There are several ways to get your feet wet with LVGL. Here is one
 recommended order of documents to read and things to play with while you
 are learning to use LVGL:
 
-1. If not already read, start with :ref:`introduction` and :ref:`overview` pages of
+1. If not already read, start with :ref:`introduction` page of
    the documentation (5 minutes).
 2. Check out the `Online Demos`_ to see LVGL in action (3 minutes).
 3. Read the :ref:`overview` page of the documentation (15 minutes).
