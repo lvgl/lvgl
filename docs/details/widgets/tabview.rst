@@ -10,10 +10,10 @@ Overview
 The Tab view Widget can be used to organize content in tabs. The Tab
 view is built from other widgets:
 
-- Main container: :ref:`lv_obj`
-- Tab buttons: an :ref:`lv_obj` with :ref:`lv_button`
-- Container for the tabs: :ref:`lv_obj`
-- Content of the tabs: :ref:`lv_obj`
+- Main container: :ref:`base_widget`
+- Tab buttons: an :ref:`base_widget` with :ref:`lv_button`
+- Container for the tabs: :ref:`base_widget`
+- Content of the tabs: :ref:`base_widget`
 
 The tab buttons can be positioned on the top, bottom, left and right
 side of the Tab view.
@@ -26,8 +26,8 @@ sliding horizontally on the content.
 Parts and Styles
 ****************
 
-There are no special parts on the Tab view but the ``lv_obj`` and
-``lv_button`` widgets are used to create the Tab view.
+There are no special parts on the Tab view but the :ref:`base_widget` and
+:ref:`lv_button` widgets are used to create the Tab view.
 
 .. _lv_tabview_usage:
 
@@ -43,7 +43,7 @@ Add tabs
 --------
 
 New tabs can be added with :cpp:expr:`lv_tabview_add_tab(tabview, "Tab name")`.
-This will return a pointer to an :ref:`lv_obj` Widget where
+This will return a pointer to a :ref:`base_widget` where
 the tab's content can be created.
 
 Rename tabs

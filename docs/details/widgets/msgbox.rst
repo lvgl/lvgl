@@ -27,7 +27,7 @@ Parts and Styles
 The message box is built from other widgets, so you can check these
 widgets' documentation for details.
 
-- Content, header, and footer: :ref:`lv_obj`
+- Content, header, and footer: :ref:`base_widget`
 - Buttons: :ref:`lv_button`
 - Title and content text: :ref:`lv_label`
 

@@ -8,24 +8,24 @@ Positions, Sizes and Layouts
 Overview
 ********
 
-Similarly to many other parts of LVGL, the concept of setting the
+Similar to many other parts of LVGL, the concept of setting the
 coordinates was inspired by CSS. LVGL has by no means a complete
 implementation of CSS but a comparable subset is implemented (sometimes
 with minor adjustments).
 
 In short this means:
 
-- Explicitly set coordinates are stored in styles (size, position, layouts, etc.)
+- Explicitly set coordinates are stored in styles (position, size, layouts, etc.)
 - support min-width, max-width, min-height, max-height
 - have pixel, percentage, and "content" units
 - x=0; y=0 coordinate means the top-left corner of the parent plus the left/top padding plus border width
 - width/height means the full size, the "content area" is smaller with padding and border width
 - a subset of flexbox and grid layouts are supported
 
-.. _coord_unites:
+.. _coord_units:
 
 Units
------
+*****
 
 -  pixel: Simply a position in pixels. An integer always means pixels.
    E.g. :cpp:expr:`lv_obj_set_x(btn, 10)`
@@ -36,10 +36,12 @@ Units
    Widget to involve all the children. It's similar to ``auto`` in CSS.
    E.g. :cpp:expr:`lv_obj_set_width(btn, LV_SIZE_CONTENT)`.
 
+
+
 .. _coord_boxing_model:
 
 Boxing model
-------------
+************
 
 LVGL follows CSS's `border-box <https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing>`__
 model. A Widget's "box" is built from the following parts:
@@ -60,8 +62,8 @@ The outline is drawn outside the bounding box.
 
 .. _coord_notes:
 
-Important notes
----------------
+Important Notes
+***************
 
 This section describes special cases in which LVGL's behavior might be
 unexpected.
@@ -69,7 +71,7 @@ unexpected.
 .. _coord_postponed_coordinate_calculation:
 
 Postponed coordinate calculation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------
 
 LVGL doesn't recalculate all the coordinate changes immediately. This is
 done to improve performance. Instead, the Widgets are marked as "dirty"
@@ -87,7 +89,7 @@ the screen of ``obj``.
 .. _coord_removing styles:
 
 Removing styles
-^^^^^^^^^^^^^^^
+---------------
 
 As it's described in the :ref:`coord_using_styles` section,
 coordinates can also be set via style properties. To be more precise,
@@ -125,10 +127,12 @@ For example:
    lv_obj_set_size(widget2, 200, 100);
 
 
+
 .. _positioning_widgets:
 
 Positioning Widgets
 *******************
+
 
 Direct
 ------
@@ -152,25 +156,31 @@ Percentage values are calculated from the parent's content area size.
 
    lv_obj_set_x(btn, lv_pct(10)); //x = 10 % of parent content area width
 
+
 Alignment
 ---------
 
-In some cases it's convenient to change the origin of the positioning
-from the default top left. If the origin is changed e.g. to
-bottom-right, the (0,0) position means: align to the bottom-right
-corner. To change the origin use:
+
+Inside parent widget
+~~~~~~~~~~~~~~~~~~~~
+In many cases it is more convenient to tell LVGL to align your object relative to
+an "anchor point" in its parent *other* than its upper left corner.  To establish
+that "anchor point", call :cpp:expr:`lv_obj_set_align(widget, LV_ALIGN_...)`.  After
+that call, that "anchor point" will be remembered until another one is established.
+In other words, every futire x and y setting for that Widget will be relative to the
+that "anchor point".
+
+Example:  Position Widget (10,20) px relative to the center of its parent:
 
 .. code-block:: c
 
-   lv_obj_set_align(widget, align);
+   lv_obj_set_align(widget, LV_ALIGN_CENTER);
+   lv_obj_set_pos(widget, 10, 20);
 
-To change the alignment and set new coordinates:
+   /* Or combine the above in one function... */
+   lv_obj_align(widget, LV_ALIGN_CENTER, 10, 20);
 
-.. code-block:: c
-
-   lv_obj_align(widget, align, x, y);
-
-The following alignment options can be used:
+9 convenient "anchor points" can be used with these functions:
 
 - :cpp:enumerator:`LV_ALIGN_TOP_LEFT`
 - :cpp:enumerator:`LV_ALIGN_TOP_MID`
@@ -181,6 +191,8 @@ The following alignment options can be used:
 - :cpp:enumerator:`LV_ALIGN_LEFT_MID`
 - :cpp:enumerator:`LV_ALIGN_RIGHT_MID`
 - :cpp:enumerator:`LV_ALIGN_CENTER`
+
+See illustration below to visualize what these mean.
 
 It's quite common to align a child to the center of its parent,
 therefore a dedicated function exists:
@@ -195,15 +207,16 @@ therefore a dedicated function exists:
 If the parent's size changes, the set alignment and position of the
 children is updated automatically.
 
-The functions introduced above align the Widget to its parent. However,
-it's also possible to align a Widget to an arbitrary reference Widget.
+
+Relative to another Widget
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+Alternately, you can choose an "anchor point" on another Widget.
 
 .. code-block:: c
 
-   lv_obj_align_to(widget_to_align, reference_widget, align, x, y);
+   lv_obj_align_to(widget, reference_widget, align, x, y);
 
-Besides the alignments options above, the following can be used to align
-a Widget outside the reference Widget:
+where ``align`` can be done of the following:
 
 -  :cpp:enumerator:`LV_ALIGN_OUT_TOP_LEFT`
 -  :cpp:enumerator:`LV_ALIGN_OUT_TOP_MID`
@@ -218,16 +231,20 @@ a Widget outside the reference Widget:
 -  :cpp:enumerator:`LV_ALIGN_OUT_RIGHT_MID`
 -  :cpp:enumerator:`LV_ALIGN_OUT_RIGHT_BOTTOM`
 
-For example to align a label above a button and center the label
-horizontally:
+Example:  to horizontally center a label 10 pixels above a button:
 
 .. code-block:: c
 
    lv_obj_align_to(label, btn, LV_ALIGN_OUT_TOP_MID, 0, -10);
 
-Note that, unlike with :cpp:func:`lv_obj_align`, :cpp:func:`lv_obj_align_to` cannot
-realign the Widget if its coordinates or the reference Widget's
-coordinates change.
+Note that, unlike with :cpp:func:`lv_obj_align`, :cpp:func:`lv_obj_align_to`
+does not remember the "anchor point" used, and so will not automatically reposition
+the aligned widget if the reference widget later moves.
+
+The following illustration shows the meaning of each "anchor point" mentioned above.
+
+.. image:: /misc/align.png
+
 
 
 .. _coord_size:
@@ -235,7 +252,7 @@ coordinates change.
 Size
 ****
 
-Sizing the Simple way
+Sizing the simple way
 ---------------------
 
 The width and the height of a Widget can be set easily as well:
@@ -259,7 +276,7 @@ its children. Note that only children on the right and bottom sides will
 be considered and children on the top and left remain cropped. This
 limitation makes the behavior more predictable.
 
-Objects with :cpp:enumerator:`LV_OBJ_FLAG_HIDDEN` or :cpp:enumerator:`LV_OBJ_FLAG_FLOATING` will be
+Widgets with :cpp:enumerator:`LV_OBJ_FLAG_HIDDEN` or :cpp:enumerator:`LV_OBJ_FLAG_FLOATING` will be
 ignored by the :c:macro:`LV_SIZE_CONTENT` calculation.
 
 The above functions set the size of a Widget's bounding box but the
@@ -280,6 +297,18 @@ the following functions:
    int32_t h = lv_obj_get_height(widget);
    int32_t content_w = lv_obj_get_content_width(widget);
    int32_t content_h = lv_obj_get_content_height(widget);
+
+
+.. _extending_click_area:
+
+Extending the click area
+------------------------
+
+By default, Widgets can be clicked only within their bounding area.  However,
+especially with small Widgets, it can be helpful to make a Widget's "clickable" area
+larger.  You can do this with :cpp:expr:`lv_obj_set_ext_click_area(widget, size)`.
+
+
 
 .. _coord_using_styles:
 
@@ -446,12 +475,15 @@ the parent's content area.
    lv_obj_set_height(widget, lv_pct(100));
    lv_obj_add_style(widget, &style_max_height, LV_STATE_DEFAULT); //Limit the height to half parent height
 
+
+
 .. _coord_layout:
 
 Layout
 ******
 
-Layout Overview
+
+Layout overview
 ---------------
 
 Layouts can update the position and size of a Widget's children. They
@@ -466,8 +498,9 @@ There is only one function that is the same for every layout:
 For further settings of the parent and children see the documentation of
 the given layout.
 
-Built-in layout
----------------
+
+Built-in layouts
+----------------
 
 LVGL comes with two very powerful layouts:
 
@@ -476,6 +509,7 @@ LVGL comes with two very powerful layouts:
 
 Both are heavily inspired by the CSS layouts with the same name.
 Layouts are described in detail in their own section of documentation.
+
 
 Flags
 -----
@@ -488,6 +522,7 @@ behave with layouts:
 - :cpp:enumerator:`LV_OBJ_FLAG_FLOATING` Same as :cpp:enumerator:`LV_OBJ_FLAG_IGNORE_LAYOUT` but the Widget with :cpp:enumerator:`LV_OBJ_FLAG_FLOATING` will be ignored in :c:macro:`LV_SIZE_CONTENT` calculations.
 
 These flags can be added/removed with :cpp:expr:`lv_obj_add_flag(widget, FLAG)` and :cpp:expr:`lv_obj_remove_flag(widget, FLAG)`
+
 
 Adding new layouts
 ------------------
@@ -528,10 +563,14 @@ the update callback. For example:
        lv_style_set_prop(style, LV_STYLE_MY_PROP, v);
    }
 
+
+
 .. _coord_example:
 
 Examples
 ********
+
+
 
 .. _coord_api:
 

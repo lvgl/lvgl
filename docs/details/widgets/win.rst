@@ -18,11 +18,11 @@ Parts and Styles
 The Window is built from other widgets so you can check their
 documentation for details:
 
-- Background: :ref:`lv_obj`
-- Header on the background: :ref:`lv_obj`
+- Background: :ref:`base_widget`
+- Header on the background: :ref:`base_widget`
 - Title on the header: :ref:`lv_label`
 - Buttons on the header: :ref:`lv_button`
-- Content area on the background: :ref:`lv_obj`
+- Content area on the background: :ref:`base_widget`
 
 .. _lv_win_usage:
 

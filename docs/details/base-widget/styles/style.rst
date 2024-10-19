@@ -24,7 +24,7 @@ border width, font, text color and so on. It's similar to a ``class`` in CSS.
 - The most recently added style has higher precedence. This means if a property
   is specified in two styles the newest style in the Widget will be used.
 - Some properties (e.g. text color) can be inherited from a parent(s) if it's not specified in a Widget.
-- Objects can also have local styles with higher precedence than "normal" styles.
+- Widgets can also have local styles with higher precedence than "normal" styles.
 - Unlike CSS (where pseudo-classes describe different states, e.g. ``:focus``),
   in LVGL a property is assigned to a given state.
 - Transitions can be applied when the Widget changes state.
@@ -157,7 +157,7 @@ pressed text color will be used.
 Parts
 *****
 
-Objects can be composed of *parts* which may each have their own styles.
+Widgets can be composed of *parts* which may each have their own styles.
 
 The following predefined parts exist in LVGL:
 

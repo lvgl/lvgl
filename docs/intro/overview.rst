@@ -101,15 +101,17 @@ interactive user interface, an application next creates a tree of Widgets that L
 can render to the associated dislay, and with which the user can interact.
 
 Widgets are "intelligent" LVGL graphical elements such as :ref:`Base Widgets
-<base_widget>` (simple rectangles and :ref:`screens`), Buttons, Labels, Checkboxes,
-Switches, Sliders, Charts, etc.  Go to :ref:`widgets` to see the full list.
+<base_widget_overview>` (simple rectangles and :ref:`screens`), Buttons, Labels,
+Checkboxes, Switches, Sliders, Charts, etc.  Go to :ref:`widgets` to see the full
+list.
 
 To build this Widget Tree, the application first acquires a pointer to a Screen Widget.
 A system designer is free to use the default Screen created with the :ref:`display`
 and/or create his own.  To create a new Screen Widget, simply create a Widget passing
 NULL as the parent argument.  Technically, this can be any type of Widget, but in
-most cases it is a :ref:`base_widget`.  (An example of another type of Widget being
-used as a Screen is an :ref:`lv_image` Widget to supply an image for the background.)
+most cases it is a :ref:`base_widget_overview`.  (An example of another type of
+Widget being used as a Screen is an :ref:`lv_image` Widget to supply an image for the
+background.)
 
 The application then adds Widgets to this Screen as children in the tree.  Widgets
 are automatically added as children to their parent Widgets at time of creation ---
