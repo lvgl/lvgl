@@ -269,7 +269,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
     int32_t underline_width = font->underline_thickness ? font->underline_thickness : 1;
     int32_t line_start_x;
     uint32_t i;
-    uint32_t par_start = 0;
+    uint32_t recolor_command_start_index = 0;
     int32_t letter_w;
     cmd_state_t cmd_state = CMD_STATE_WAIT;
     lv_color_t recolor = lv_color_black(); /* Holds the selected color inside the recolor command */
@@ -291,7 +291,14 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
 #endif
 
         while(i < line_end - line_start) {
+
             uint32_t logical_char_pos = 0;
+            /* Restart recolor variable */
+            recolor.red = dsc->color.red;
+            recolor.blue = dsc->color.blue;
+            recolor.green = dsc->color.green;
+
+            /* Check if the text selection is enabled */
             if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
 #if LV_USE_BIDI
                 logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start);
@@ -310,7 +317,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
             if((dsc->flag & LV_TEXT_FLAG_RECOLOR) != 0) {
                 if(letter == (uint32_t)LV_TXT_COLOR_CMD[0]) {
                     if(cmd_state == CMD_STATE_WAIT) { /*Start char*/
-                        par_start = i;
+                        recolor_command_start_index = i;
                         cmd_state = CMD_STATE_PAR;
                         continue;
                     }
@@ -323,29 +330,32 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
                     }
                 }
 
-                /*Skip the color parameter and wait the space after it*/
+                /* Skip the color parameter and wait the space after it
+                 * Once we have reach the space ' ', then we will extract the color information
+                 * and store it into the recolor variable */
                 if(cmd_state == CMD_STATE_PAR) {
-                    if(letter == ' ') {
-                        /*Get the parameter*/
-                        if(i - par_start == LABEL_RECOLOR_PAR_LENGTH + 1) {
-                            char buf[LABEL_RECOLOR_PAR_LENGTH + 1];
-                            lv_memcpy(buf, &bidi_txt[par_start], LABEL_RECOLOR_PAR_LENGTH);
-                            buf[LABEL_RECOLOR_PAR_LENGTH] = '\0';
-                            int r, g, b;
-                            r = (hex_char_to_num(buf[0]) << 4) + hex_char_to_num(buf[1]);
-                            g = (hex_char_to_num(buf[2]) << 4) + hex_char_to_num(buf[3]);
-                            b = (hex_char_to_num(buf[4]) << 4) + hex_char_to_num(buf[5]);
-
-                            recolor = lv_color_make(r, g, b);
-                        }
-                        else {
-                            recolor.red = dsc->color.red;
-                            recolor.blue = dsc->color.blue;
-                            recolor.green = dsc->color.green;
-                        }
-                        cmd_state = CMD_STATE_IN; /*After the parameter the text is in the command*/
+                    /* Not the space? Continue with the next character */
+                    if(letter != ' ') {
+                        continue;
                     }
-                    continue;
+
+                    /*Get the recolor parameter*/
+                    if((i - recolor_command_start_index) == LABEL_RECOLOR_PAR_LENGTH + 1) {
+                        /* Temporary buffer to hold the recolor information */
+                        char buf[LABEL_RECOLOR_PAR_LENGTH + 1];
+                        lv_memcpy(buf, &bidi_txt[recolor_command_start_index], LABEL_RECOLOR_PAR_LENGTH);
+                        buf[LABEL_RECOLOR_PAR_LENGTH] = '\0';
+
+                        uint8_t r, g, b;
+                        r = (hex_char_to_num(buf[0]) << 4) + hex_char_to_num(buf[1]);
+                        g = (hex_char_to_num(buf[2]) << 4) + hex_char_to_num(buf[3]);
+                        b = (hex_char_to_num(buf[4]) << 4) + hex_char_to_num(buf[5]);
+
+                        recolor = lv_color_make(r, g, b);
+                    }
+
+                    /*After the parameter the text is in the command*/
+                    cmd_state = CMD_STATE_IN;
                 }
             }
 
@@ -380,6 +390,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
                 }
             }
 
+            /* Handle text selection */
             if(sel_start != 0xFFFF && sel_end != 0xFFFF && logical_char_pos >= sel_start && logical_char_pos < sel_end) {
                 draw_letter_dsc.color = dsc->sel_color;
                 fill_dsc.color = dsc->sel_bg_color;
