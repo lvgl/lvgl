@@ -12,7 +12,7 @@ Properties related to size, position, alignment and layout of Widgets.
 width
 ~~~~~
 
-Sets the width of Widget. Pixel, percentage and `LV_SIZE_CONTENT` values can be used. Percentage values are relative to the width of the parent's content area.
+Sets width of Widget. Pixel, percentage and `LV_SIZE_CONTENT` values can be used. Percentage values are relative to the width of the parent's content area.
 
 .. raw:: html
 
@@ -54,7 +54,7 @@ Sets a maximal width. Pixel and percentage values can be used. Percentage values
 height
 ~~~~~~
 
-Sets the height of Widget. Pixel, percentage and `LV_SIZE_CONTENT` can be used. Percentage values are relative to the height of the parent's content area.
+Sets height of Widget. Pixel, percentage and `LV_SIZE_CONTENT` can be used. Percentage values are relative to the height of the parent's content area.
 
 .. raw:: html
 
