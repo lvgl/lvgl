@@ -373,7 +373,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
             }
 
             /* If we're in the CMD_STATE_IN state then we need to subtract the recolor command length */
-            if(cmd_state == CMD_STATE_IN) {
+            if(((dsc->flag & LV_TEXT_FLAG_RECOLOR) != 0) && (cmd_state == CMD_STATE_IN)) {
                 logical_char_pos -= (LABEL_RECOLOR_PAR_LENGTH + 1);
             }
 
