@@ -273,6 +273,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
     int32_t letter_w;
     cmd_state_t cmd_state = CMD_STATE_WAIT;
     lv_color_t recolor = lv_color_black(); /* Holds the selected color inside the recolor command */
+    uint8_t is_first_space_after_cmd = 0;
 
     /*Write out all lines*/
     while(dsc->text[line_start] != '\0') {
@@ -314,6 +315,13 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
                     }
                 }
 
+                if((cmd_state == CMD_STATE_PAR) && (letter == ' ') && (is_first_space_after_cmd == 0)) {
+                    is_first_space_after_cmd = 1;
+                }
+                else {
+                    is_first_space_after_cmd = 0;
+                }
+
                 /* Skip the color parameter and wait the space after it
                  * Once we have reach the space ' ', then we will extract the color information
                  * and store it into the recolor variable */
@@ -345,6 +353,11 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
 
                     /*After the parameter the text is in the command*/
                     cmd_state = CMD_STATE_IN;
+                }
+
+                /* Don't draw the first space after the recolor command */
+                if(is_first_space_after_cmd) {
+                    continue;
                 }
             }
 
