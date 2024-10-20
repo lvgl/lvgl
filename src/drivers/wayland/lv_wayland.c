@@ -119,7 +119,7 @@ struct input {
     lv_indev_touch_data_t touches[10];
     uint8_t touch_event_cnt;
     uint8_t primary_id;
-    lv_indev_gesture_pinch_t pinch_state;
+    lv_indev_gesture_recognizer_t recognizer;
 };
 
 struct seat {
@@ -1012,15 +1012,14 @@ static void touch_handle_motion(void * data, struct wl_touch * wl_touch,
 	    app->touch_obj->input.touches[i].id = id;
 	    app->touch_obj->input.touches[i].ts = time;
 	    app->touch_obj->input.touches[i].state = LV_INDEV_STATE_PRESSED;
-
     	    app->touch_obj->input.touch_event_cnt++;
 
     } else {
+
 	    cur->point.x = wl_fixed_to_int(x_w);
 	    cur->point.y = wl_fixed_to_int(y_w);
 	    cur->id = id;
 	    cur->ts = time;
-
     }
 
 }
@@ -2376,61 +2375,50 @@ static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
     struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
     lv_indev_touch_data_t *touch;
-    lv_indev_touch_data_t *cur;
-    lv_indev_gesture_pinch_t *pinch_gesture;
+    lv_point_t primary_point;
+    bool is_active;
+    lv_indev_gesture_recognizer_t *recognizer;
     uint8_t touch_cnt;
     uint8_t i;
 
-    pinch_gesture = &window->body->input.pinch_state;
-
     if(!window || window->closed) {
-
         return;
-
-    } else if (window->body->input.touch_event_cnt == 0) {
-	    
-	    /* No touch events to send */
-	    data->point.x = 0;
-	    data->point.y = 0;
-	    data->state = LV_INDEV_STATE_RELEASED;
-	    return;
     }
 
-    /* TODO: Query the gesture recognizer for the primary finger */
-    /* Getting the current state of finger id 0 - is not perfect */
-    /* Because in some cases the primary finger is not the finger with id/slot 0*/
+    /* Collect touches if there are any - send them to the gesture recognizer */
+    recognizer = &window->body->input.recognizer;
     touch = &window->body->input.touches[0];
-    cur = NULL;
-
-    for (i = 0; i < window->body->input.touch_event_cnt; i++) {
-	    if (touch->id == 0) {
-		    cur = touch;
-	    }
-	    touch++;
-    }
-
-    lv_indev_gesture_detect_pinch(pinch_gesture,
-		    &window->body->input.touches[0],
-		    window->body->input.touch_event_cnt);
-
-    /* Check if the pinch gesture was recognized */
-    if (pinch_gesture->state == LV_INDEV_GESTURE_STATE_RECOGNIZED) {
-
-	    /* TODO: Pass the scaling factor with the event, what's the best way to do it? */
-	    data->gesture = LV_INDEV_GESTURE_PINCH;
-	    LV_LOG_WARN("Detected pinch gesture scale: %g", pinch_gesture->scale);
-    }
-
 
     LV_LOG_TRACE("collected touch events: %d", window->body->input.touch_event_cnt);
 
-    if (cur != NULL) {
-	    data->point.x = cur->point.x;
-	    data->point.y = cur->point.y;
-    	    data->state = cur->state;
-    }
+    lv_indev_gesture_detect_pinch(recognizer, &window->body->input.touches[0],
+            window->body->input.touch_event_cnt);
 
     window->body->input.touch_event_cnt = 0;
+
+    /* If there is a single contact point use its coords,
+     * when there are no contact points it's set to 0,0
+     *
+     * Note: If a gesture was detected, the primary point is overwritten
+     * by the center of the gesture within indev.c
+     */
+    lv_indev_gesture_get_primary_point(recognizer, &primary_point);
+    data->point.x = primary_point.x;
+    data->point.y = primary_point.y;
+
+    /* The call below returns false if there are no active contact points */
+    /* - OR when the gesture has ended, false is considered as a RELEASED state */
+    is_active = lv_indev_gesture_recognizer_is_active(recognizer);
+
+    if (is_active == false) {
+    data->state = LV_INDEV_STATE_RELEASED;
+        LV_LOG_TRACE("indev data state: %d (released)", data->state);
+
+    } else {
+    data->state = LV_INDEV_STATE_PRESSED;
+        LV_LOG_TRACE("indev data state: %d (pressed)", data->state);
+    }
+
 }
 
 /**********************
@@ -2663,6 +2651,11 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     lv_indev_set_type(window->lv_indev_touch, LV_INDEV_TYPE_POINTER);
     lv_indev_set_read_cb(window->lv_indev_touch, _lv_wayland_touch_read);
     lv_indev_set_display(window->lv_indev_touch, window->lv_disp);
+
+    /* Bind the gesture recognizer to the indev device */
+    /* So that lvgl object can recieve LV_EVENT_GESTURE_* events with a reference */
+    /* to the gesture recognizer state (scale, distance, speed, dir) */
+    lv_indev_gesture_bind_recognizer(window->lv_indev_touch, &window->body->input.recognizer);
 
     if(!window->lv_indev_touch) {
         LV_LOG_ERROR("failed to register touch indev");
