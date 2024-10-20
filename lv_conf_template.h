@@ -1251,6 +1251,9 @@
 	#define LV_DEMO_EBIKE_PORTRAIT  0    /*0: for 480x270..480x320, 1: for 480x800..720x1280*/
 #endif
 
+/*Multi-touch gestures demo*/
+#define LV_USE_DEMO_GESTURES        1
+
 /*--END OF LV_CONF_H--*/
 
 #endif /*LV_CONF_H*/

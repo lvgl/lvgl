@@ -63,6 +63,10 @@ extern "C" {
 #include "ebike/lv_demo_ebike.h"
 #endif
 
+#if LV_USE_DEMO_GESTURES
+#include "gestures/lv_demo_gestures.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
