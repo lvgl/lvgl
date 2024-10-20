@@ -12,6 +12,7 @@
  *      INCLUDES
  ********************/
 #include "lv_indev_scroll.h"
+#include "lv_indev_gesture.h"
 #include "../display/lv_display_private.h"
 #include "../core/lv_global.h"
 #include "../core/lv_obj_private.h"
@@ -721,6 +722,13 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->pointer.act_point.y = data->point.y;
     i->pointer.diff = data->enc_diff;
 
+    /*Was a gesture recognized? - if so set the act_point to the center point of the gesture*/
+    if(i->gesture_recognizer != NULL &&
+        i->gesture_recognizer->state == LV_INDEV_GESTURE_STATE_RECOGNIZED) {
+        i->pointer.act_point.x = i->gesture_recognizer->info->center.x;
+        i->pointer.act_point.x = i->gesture_recognizer->info->center.y;
+    }
+
     /*Process the diff first as scrolling will be processed in indev_proc_release*/
     indev_proc_pointer_diff(i);
 
@@ -1270,12 +1278,25 @@ static void indev_proc_press(lv_indev_t * indev)
         indev->pointer.press_moved = 1;
     }
 
+    /* Send a gesture event to a potential indev cb callback, even if no object was found */
+    if(indev->gesture_recognizer != NULL &&
+            indev->gesture_recognizer->state == LV_INDEV_GESTURE_STATE_RECOGNIZED) {
+            lv_indev_send_event(indev, LV_EVENT_GESTURE_PINCH, indev->gesture_recognizer);
+    }
+
     if(indev_obj_act) {
         const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+
+        if(indev->gesture_recognizer != NULL &&
+            indev->gesture_recognizer->state == LV_INDEV_GESTURE_STATE_RECOGNIZED) {
+            /* NOTE: hardcoded to pinch for now */
+            if(send_event(LV_EVENT_GESTURE_PINCH, indev->gesture_recognizer) == LV_RESULT_INVALID) return;
+        }
 
         if(is_enabled) {
             if(send_event(LV_EVENT_PRESSING, indev_act) == LV_RESULT_INVALID) return;
         }
+
 
         if(indev_act->wait_until_release) return;
 
@@ -1356,10 +1377,27 @@ static void indev_proc_release(lv_indev_t * indev)
         lv_timer_pause(indev->read_timer);
     }
 
+    /* Send a gesture event to a potential indev cb callback, even if no object was found */
+    if(indev->gesture_recognizer != NULL &&
+            indev->gesture_recognizer->state == LV_INDEV_GESTURE_STATE_ENDED) {
+            lv_indev_send_event(indev, LV_EVENT_GESTURE_PINCH, indev->gesture_recognizer);
+    }
+
     if(indev_obj_act) {
         LV_LOG_INFO("released");
 
         const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+
+        if(is_enabled && indev->gesture_recognizer != NULL) {
+            switch(indev->gesture_recognizer->state) {
+            case LV_INDEV_GESTURE_STATE_ENDED:
+                /* NOTE: hardcoded to pinch for now */
+                if(send_event(LV_EVENT_GESTURE_PINCH, indev->gesture_recognizer) == LV_RESULT_INVALID) return;
+                break;
+            default:
+                LV_ASSERT_MSG(true, "event is not matching with the gesture recognizer state");
+            }
+        }
 
         if(is_enabled) {
             if(send_event(LV_EVENT_RELEASED, indev_act) == LV_RESULT_INVALID) return;
