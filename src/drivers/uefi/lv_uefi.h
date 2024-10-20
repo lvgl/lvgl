@@ -8,6 +8,8 @@
 
 #if LV_USE_UEFI
 
+    #include LV_USE_UEFI_INCLUDE
+
     #if defined(__clang__) || defined(__GNUC__)
         #if defined(__x86_64__)
             #define __LV_UEFI_ARCH_X64__
