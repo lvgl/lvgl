@@ -100,6 +100,7 @@ void lv_example_file_explorer_2(void)
 
     lv_obj_add_event_cb(file_explorer, file_explorer_event_handler, LV_EVENT_ALL, NULL);
 
+#if LV_FILE_EXPLORER_QUICK_ACCESS
     /*Quick access status control button*/
     lv_obj_t * fe_quick_access_obj = lv_file_explorer_get_quick_access_area(file_explorer);
     lv_obj_t * fe_header_obj = lv_file_explorer_get_header(file_explorer);
@@ -127,6 +128,7 @@ void lv_example_file_explorer_2(void)
     lv_obj_align(dd, LV_ALIGN_RIGHT_MID, 0, 0);
 
     lv_obj_add_event_cb(dd, dd_event_handler, LV_EVENT_VALUE_CHANGED, file_explorer);
+#endif
 }
 
 #endif
