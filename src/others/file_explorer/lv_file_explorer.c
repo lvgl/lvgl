@@ -604,7 +604,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
     lv_label_set_text_fmt(explorer->path_label, LV_SYMBOL_EYE_OPEN" %s", path);
 
     size_t current_path_len = lv_strlen(explorer->current_path);
-    if((*((explorer->current_path) + current_path_len) != '/') && (current_path_len < LV_FILE_EXPLORER_PATH_MAX_LEN)) {
+    if((explorer->current_path[current_path_len - 1] != '/') && (current_path_len < LV_FILE_EXPLORER_PATH_MAX_LEN)) {
         *((explorer->current_path) + current_path_len) = '/';
     }
 }
