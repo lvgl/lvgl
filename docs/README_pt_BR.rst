@@ -89,7 +89,7 @@ algum suporte durante o desenvolvimento de seu próximo projeto de GUI.
 -  Pode ser compilado para qualquer display MCU ou MPU, e qualquer
    sistema operacional de tempo real (RT-OS).
 -  Suporta monitores monocromáticos, ePaper, OLED ou TFT. :ref:`Guia de
-   portabilidade <setting-up-your-project>`
+   portabilidade <initializing_lvgl>`
 -  Distribuído sob a licença do MIT, para que você também possa usá-lo
    facilmente em projetos comerciais.
 -  Precisa de apenas 32 kB de RAM e 128 kB de Flash, um frame buffer e

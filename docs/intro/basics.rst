@@ -1,8 +1,8 @@
-.. _overview:
+.. _lvgl_basics:
 
-========
-Overview
-========
+===========
+LVGL Basics
+===========
 
 LVGL (Light and Versatile Graphics Library) is a free and open-source graphics
 library providing everything you need to create an embedded GUI with easy-to-use
@@ -11,8 +11,11 @@ graphical elements, beautiful visual effects, and a low memory footprint.
 How does it do this?
 
 
-LVGL Basics
-***********
+
+.. _basic_data_flow:
+
+Overview of LVGL's Data Flow
+****************************
 
 .. figure:: /misc/intro_data_flow.png
     :scale: 75 %
@@ -23,23 +26,17 @@ LVGL Basics
     Overview of LVGL Data Flow
 
 
-.. _display_refresh:
+You create one :ref:`display` for each physical display panel, create
+:ref:`basics_screen_widgets` on them, add :ref:`basics_widgets` onto those Screens.
+To handle touch, mouse, keypad, etc., you :ref:`create an Input Device <indev_creation>`
+for each.  The :ref:`tick_interface` tells LVGL what time is it.  :ref:`timer_handler`
+drives LVGL's timers which, in turn, perform all of LVGL's time-related tasks:
 
-Display Refresh Sequence
-------------------------
-
-During initialization, your application creates one :ref:`display` object per display
-panel.  (See :ref:`setting-up-your-project`.)  This act creates one :ref:`timer` per
-display that periodically triggers a refresh sequence for that display, as shown in
-the diagram (triggered by by periodic calls to :cpp:func:`lv_timer_handler`).  For
-each such timer, when it is time to do so, it:
-
-1.  determines which widgets in the Widget Tree need to be rendered (E, G and H in the illustration);
-2.  renders finished pixels for those widgets into a buffer;
-3.  calls your application-defined :ref:`flush_callback` to copy those pixels to the display.
-
-If the available buffer is smaller than the area that needs to be updated, #2 and #3
-are repeated until the entire area has been updated on the display.
+- periodically refreshes displays,
+- reads input devices,
+- fires events,
+- runs any animations, and
+- runs user-created timers.
 
 
 .. _applications_job:
@@ -47,18 +44,25 @@ are repeated until the entire area has been updated on the display.
 Application's Job
 -----------------
 
-After initialization, your application code merely needs to create Widget Trees when
+After initialization, the application's job is merely to create Widget Trees when
 they are needed, manage events those Widgets generate (by way of user interaction
 and other things), and delete them when they are no longer needed.  LVGL takes care
 of the rest.
+
+
+
+.. _basics_major_concepts:
+
+Major Concepts
+**************
 
 
 .. _display-vs-screen:
 
 Display vs Screen
 -----------------
-Before we get into details about Widgets, let us first clarify the difference between
-two terms that you will hereafter see frequently:
+Before we get into any details about Widgets, let us first clarify the difference
+between two terms that you will hereafter see frequently:
 
 - A **Display** or **Display Panel** is the physical hardware displaying the pixels.
 - A :ref:`display` object is an object in RAM that represents a **Display** meant
@@ -74,7 +78,7 @@ Many functions related to Screen Widgets use the default display.
 See :ref:`default_display` for more information.
 
 
-.. _overview_screen_widgets:
+.. _basics_screen_widgets:
 
 Screen Widgets
 --------------
@@ -92,13 +96,13 @@ The Active Screen is the screen (and its child Widgets) currently being displaye
 See :ref:`active_screen` for more information.
 
 
-.. _overview_widgets:
+.. _basics_widgets:
 
 Widgets
 -------
-After LVGL is initialized (see :ref:`setting-up-your-project`), to create an
-interactive user interface, an application next creates a tree of Widgets that LVGL
-can render to the associated dislay, and with which the user can interact.
+After LVGL is initialized (see :ref:`initializing_lvgl`), to create an interactive
+user interface, an application next creates a tree of Widgets that LVGL can render to
+the associated dislay, and with which the user can interact.
 
 Widgets are "intelligent" LVGL graphical elements such as :ref:`Base Widgets
 <base_widget_overview>` (simple rectangles and :ref:`screens`), Buttons, Labels,
@@ -147,7 +151,7 @@ If multiple Screens are maintained in RAM simultaneously, it is up to the system
 designer as to how they are managed.
 
 
-.. _overview_creating_widgets:
+.. _basics_creating_widgets:
 
 Creating Widgets
 ~~~~~~~~~~~~~~~~
@@ -165,7 +169,7 @@ For example:
     lv_obj_t * slider1 = lv_slider_create(lv_screen_active());
 
 
-.. _overview_modifying_widgets:
+.. _basics_modifying_widgets:
 
 Modifying Widgets
 ~~~~~~~~~~~~~~~~~
@@ -202,8 +206,17 @@ or view it on GitHub, e.g.
 - https://github.com/lvgl/lvgl/blob/master/src/widgets/slider/lv_slider.h .
 
 
+.. _basics_deleting_widgets:
 
-.. _overview_events:
+Deleting Widgets
+~~~~~~~~~~~~~~~~
+To delete any widget and its children::
+
+    lv_obj_delete(lv_obj_t * widget)
+
+
+
+.. _basics_events:
 
 Events
 ------
@@ -247,7 +260,7 @@ The Widget that triggered the event can be retrieved with:
 To learn all features of the events go to the :ref:`events` section.
 
 
-.. _overview_parts:
+.. _basics_parts:
 
 Parts
 -----
@@ -262,7 +275,7 @@ By using parts you can apply different styles to sub-elements of a widget.  (See
 Read the Widget's documentation to learn which parts it uses.
 
 
-.. _overview_states:
+.. _basics_states:
 
 States
 ------
@@ -296,7 +309,7 @@ To manually add or remove states use:
    lv_obj_remove_state(widget, LV_STATE_...);
 
 
-.. _overview_styles:
+.. _basics_styles:
 
 Styles
 ------
@@ -375,7 +388,7 @@ style which resides inside the Widget and is used only by that Widget:
 To learn all the features of styles see :ref:`styles`.
 
 
-.. _overview_themes:
+.. _basics_themes:
 
 Themes
 ------
@@ -387,12 +400,12 @@ The theme for your application is a compile time configuration set in
 ``lv_conf.h``.
 
 
-.. _overview_micropython:
+.. _basics_micropython:
 
 MicroPython
 -----------
 
-See :ref:`micropython` to learn about MicroPython.
+LVGL can even be used with :ref:`micropython`.
 
 .. code-block:: python
 
@@ -410,7 +423,7 @@ See :ref:`micropython` to learn about MicroPython.
 
 
 
-.. _overview_examples:
+.. _basics_examples:
 
 Basic Examples
 **************

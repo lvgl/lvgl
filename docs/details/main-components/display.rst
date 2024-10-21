@@ -58,7 +58,7 @@ it is representing, as well as other things relevant to its lifetime:
 - The :ref:`draw_buffers` assigned to it
 - The :ref:`flush_callback` function that moves pixels from :ref:`draw_buffers` to Display hardware
 - What areas of the display have been updated (made "dirty") so rendering logic can
-  compute what to render during a :ref:`display_refresh`
+  compute what to render during a :ref:`display refresh <basic_data_flow>`
 - Optional custom pointer as :ref:`display_user_data`
 
 
@@ -222,59 +222,6 @@ cause the function to target the Default Display.  Check the API documentation f
 the function you are calling to be sure.
 
 
-.. _flush_callback:
-
-Flush Callback
---------------
-
-Draw buffer(s) are simple array(s) that LVGL uses to render the display's
-content.  Once rendering is has been completed, the content of the draw buffer is
-sent to the display using a Flush Callback function.
-
-An example looks like this:
-
-.. code-block:: c
-
-    void my_flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map)
-    {
-        /* The most simple case (also the slowest) to send all rendered pixels to the
-         * screen one-by-one.  `put_px` is just an example.  It needs to be implemented by you. */
-        uint16_t * buf16 = (uint16_t *)px_map; /* Let's say it's a 16 bit (RGB565) display */
-        int32_t x, y;
-        for(y = area->y1; y <= area->y2; y++) {
-            for(x = area->x1; x <= area->x2; x++) {
-                put_px(x, y, *buf16);
-                buf16++;
-            }
-        }
-
-        /* IMPORTANT!!!
-         * Inform LVGL that flushing is complete so buffer can be modified again. */
-        lv_display_flush_ready(disp);
-    }
-
-During system initialization, tell LVGL you want that function to copy pixels from
-rendered pixel-buffers to a particular display by doing the following:
-
-.. code-block:: c
-
-    lv_display_set_flush_cb(display1, my_flush_cb)
-
-Note that which display is targeted is passed to the function, so you can use the
-same function for multiple displays, or use different functions for multiple
-displays.  It's up to you.
-
-.. note::
-
-    :cpp:expr:`lv_display_flush_ready(display1)` needs to be called when flushing is
-    complete to inform LVGL that the buffer is available again to render new content
-    into it.
-
-LVGL might render the screen in multiple chunks and therefore call your Flush
-Callback multiple times.  To see whether the current call is for the last chunk being
-rendered, use :cpp:expr:`lv_display_flush_is_last(display1)`.
-
-
 .. _draw_buffers:
 
 Draw Buffer(s)
@@ -340,6 +287,60 @@ of the other buffer is sent to the display in the background.  DMA or
 other hardware should be used to transfer data to the display so the MCU
 can continue drawing.  Doing so allows *rendering* and *refreshing* the
 display to become parallel operations.
+
+
+.. _flush_callback:
+
+Flush Callback
+--------------
+
+Draw buffer(s) are simple array(s) that LVGL uses to render the display's
+content.  Once rendering is has been completed, the content of the draw buffer is
+sent to the display using a Flush Callback function.
+
+An example looks like this:
+
+.. code-block:: c
+
+    void my_flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map)
+    {
+        /* The most simple case (also the slowest) to send all rendered pixels to the
+         * screen one-by-one.  `put_px` is just an example.  It needs to be implemented by you. */
+        uint16_t * buf16 = (uint16_t *)px_map; /* Let's say it's a 16 bit (RGB565) display */
+        int32_t x, y;
+        for(y = area->y1; y <= area->y2; y++) {
+            for(x = area->x1; x <= area->x2; x++) {
+                put_px(x, y, *buf16);
+                buf16++;
+            }
+        }
+
+        /* IMPORTANT!!!
+         * Inform LVGL that flushing is complete so buffer can be modified again. */
+        lv_display_flush_ready(disp);
+    }
+
+During system initialization, tell LVGL you want that function to copy pixels from
+rendered pixel-buffers to a particular display by doing the following:
+
+.. code-block:: c
+
+    lv_display_set_flush_cb(display1, my_flush_cb)
+
+Note that which display is targeted is passed to the function, so you can use the
+same function for multiple displays, or use different functions for multiple
+displays.  It's up to you.
+
+.. note::
+
+    :cpp:expr:`lv_display_flush_ready(display1)` needs to be called when flushing is
+    complete to inform LVGL that the buffer is available again to render new content
+    into it.
+
+LVGL might render the screen in multiple chunks and therefore call your Flush
+Callback multiple times.  To see whether the current call is for the last chunk being
+rendered, use :cpp:expr:`lv_display_flush_is_last(display1)`.
+
 
 
 Advanced Options

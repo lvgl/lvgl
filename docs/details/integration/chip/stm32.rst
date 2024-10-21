@@ -148,7 +148,7 @@ FreeRTOS Example
 
 A minimal example using STM32CubeIDE, HAL, and CMSISv1 (FreeRTOS).
 *Note that we have not used Mutexes in this example, however LVGL is* **NOT**
-*thread safe and so Mutexes should be used*. See: :ref:`os`
+*thread safe and so Mutexes should be used*. See: :ref:`threading`
 \* ``#include "lvgl.h"`` \* Create your frame buffer(s) as global variables:
 
 .. code-block:: c

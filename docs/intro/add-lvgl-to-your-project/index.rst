@@ -4,13 +4,15 @@
 Add LVGL to Your Project
 ========================
 
+
 .. toctree::
     :maxdepth: 2
 
-    project
-    tick
+    getting_lvgl
+    building_lvgl
+    configuration
+    connecting_lvgl
     timer_handler
-    sleep
-    os
-    draw
+    threading
+    other_platforms
 

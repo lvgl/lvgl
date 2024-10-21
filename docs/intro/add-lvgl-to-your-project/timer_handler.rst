@@ -4,11 +4,11 @@
 Timer Handler
 =============
 
-To handle the timers of LVGL you need to call :cpp:func:`lv_timer_handler`
+To drive the timers of LVGL you need to call :cpp:func:`lv_timer_handler`
 periodically in one of the following:
 
 - *while(1)* of *main()* function, or
-- an OS task periodically.  (See :ref:`os_threading_considerations`.)
+- an OS task periodically.  (See :ref:`lvgl_and_threads`.)
 
 .. image:: /misc/intro_data_flow.png
    :scale: 75 %

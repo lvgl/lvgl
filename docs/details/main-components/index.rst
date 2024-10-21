@@ -1,8 +1,8 @@
-.. _modules:
+.. _main_components:
 
-=======
-Modules
-=======
+===============
+Main Components
+===============
 
 .. toctree::
     :maxdepth: 2
@@ -15,3 +15,4 @@ Modules
     timer
     animation
     fs
+    draw

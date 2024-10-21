@@ -5,6 +5,8 @@ Input Device (lv_indev)
 =======================
 
 
+.. _indev_creation:
+
 Creating an Input Device
 ************************
 

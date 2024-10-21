@@ -7,6 +7,6 @@ Introduction
     :maxdepth: 1
 
     introduction
-    overview
+    basics
     getting_started
     add-lvgl-to-your-project/index

@@ -20,7 +20,7 @@ Key features
 - Fully customizable graphic elements with CSS-like styles
 - Hardware independent:  use with any microcontroller or display
 - Scalable: able to operate with little memory (64 kB Flash, 16 kB RAM)
-- :ref:`OS <os>`, external memory and :ref:`GPU <draw>` are supported but not required
+- :ref:`OS <threading>`, external memory and :ref:`GPU <draw>` are supported but not required
 - Single frame buffer operation even with advanced graphic effects
 - Written in C for maximal compatibility (C++ compatible)
 - :ref:`Simulator <simulator>` to start embedded GUI design on a PC without embedded hardware
@@ -212,16 +212,17 @@ LVGL doesn't start, randomly crashes or nothing is drawn on the display. What ca
 * Enable assertions in ``lv_conf.h`` (``LV_USE_ASSERT_...``).
 * If you use an RTOS:
    * Increase the stack size of the task that calls :cpp:func:`lv_timer_handler`.
-   * Be sure you are using one of the methods for thread management as described in :ref:`os`.
+   * Be sure you are using one of the methods for thread management as described in :ref:`threading`.
 
 
 My display driver is not called. What have I missed?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Be sure you are calling :cpp:expr:`lv_tick_inc(x)` as prescribed in :ref:`tick` and
-are calling :cpp:func:`lv_timer_handler` as prescribed in :ref:`timer_handler`.
+Be sure you are calling :cpp:expr:`lv_tick_inc(x)` as prescribed in
+:ref:`tick_interface` and are calling :cpp:func:`lv_timer_handler` as prescribed in
+:ref:`timer_handler`.
 
-Learn more in the :ref:`tick` and :ref:`timer_handler` sections.
+Learn more in the :ref:`tick_interface` and :ref:`timer_handler` sections.
 
 
 Why is the display driver called only once? Only the upper part of the display is refreshed.
@@ -298,6 +299,6 @@ How do I use LVGL with an operating system?
 
 To work with an operating system where tasks can interrupt each other (preemptively),
 you must ensure that no LVGL function call be called while another LVGL call is in
-progress.  There are several ways to do this.  See the :ref:`os` section to
+progress.  There are several ways to do this.  See the :ref:`threading` section to
 learn more.
 
