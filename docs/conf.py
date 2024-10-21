@@ -44,7 +44,8 @@ extensions = [
     'sphinx_design',
     'sphinx_rtd_dark_mode',
     'link_roles',
-    'sphinxcontrib.mermaid'
+    'sphinxcontrib.mermaid',
+    'sphinx_reredirects'
 ]
 
 default_dark_mode = False
@@ -283,7 +284,22 @@ smartquotes = True
 smartquotes_action = 'D'
 
 repo_commit_hash = _git_commit_ref
+print(f"repo_commit_hash from conf.py:  [{repo_commit_hash}]")
 
+# -- Options for sphinx_reredirects ---------------------------------------
+
+# The below generates .HTML page redirects for pages that have been moved.
+# Browsers are redirected via `<meta http-equiv="refresh" content="0; url=new_url">`.
+redirects = {
+    "get-started/index": "../intro/getting_started.html"               ,
+    "integration/index": "../details/integration/index.html"           ,
+    "porting/index":     "../intro/add-lvgl-to-your-project/index.html",
+    "overview/index":    "../details/main-components/index.html"       ,
+    "layouts/index":     "../details/base-widget/layouts/index.html"   ,
+    "libs/index":        "../details/libs/index.html"                  ,
+    "others/index":      "../details/other-components/index.html"
+
+}
 
 # Example configuration for intersphinx: refer to the Python standard library.
 
