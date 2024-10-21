@@ -33,7 +33,7 @@ Widget class from which all other Widgets inherit.
 The functions and functionalities of the Base Widget can be used with
 other widgets as well.  For example :cpp:expr:`lv_obj_set_width(slider, 100)`.
 
-The Base Widget can be directly used as a simple widget:  while it is a simple
+The Base Widget can be used directly as a simple widget.  While it is a simple
 rectangle, it has a large number of features shared with all Widgets, detailed
 below and in subsequent pages.  In HTML terms, think of it as a ``<div>``.
 

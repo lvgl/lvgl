@@ -8,5 +8,4 @@ Introduction
 
     introduction
     basics
-    getting_started
     add-lvgl-to-your-project/index

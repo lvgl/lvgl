@@ -105,10 +105,10 @@ before any other LVGL function is started.
     If you are using an OS, there are a few other options.  See below.
 
 
-.. _os_tasks_and_threads:
+.. _tasks:
 
-Tasks and Threads
-*****************
+Tasks
+*****
 Under an OS, it is common to have many threads of execution ("tasks" in some OSes)
 performing services for the application.  In some cases, such threads can acquire
 data that should be shown (or otherwise reflected) in the user interface, and doing

@@ -284,7 +284,6 @@ smartquotes = True
 smartquotes_action = 'D'
 
 repo_commit_hash = _git_commit_ref
-print(f"repo_commit_hash from conf.py:  [{repo_commit_hash}]")
 
 # -- Options for sphinx_reredirects ---------------------------------------
 

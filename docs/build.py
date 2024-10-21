@@ -279,7 +279,6 @@ else:
         os.path.join(temp_directory, 'details', 'base-widget'),
         os.path.join(temp_directory, 'details', 'base-widget', 'layouts'),
         os.path.join(temp_directory, 'details', 'base-widget', 'styles'),
-        os.path.join(temp_directory, 'details', 'configuration'),
         os.path.join(temp_directory, 'details', 'debugging'),
         os.path.join(temp_directory, 'details', 'integration'),
         os.path.join(temp_directory, 'details', 'integration', 'bindings'),
@@ -294,7 +293,7 @@ else:
         os.path.join(temp_directory, 'details', 'integration', 'os', 'yocto'),
         os.path.join(temp_directory, 'details', 'integration', 'renderers'),
         os.path.join(temp_directory, 'details', 'libs'),
-        os.path.join(temp_directory, 'details', 'modules'),
+        os.path.join(temp_directory, 'details', 'main-components'),
         os.path.join(temp_directory, 'details', 'other-components'),
         os.path.join(temp_directory, 'details', 'widgets')
     )
