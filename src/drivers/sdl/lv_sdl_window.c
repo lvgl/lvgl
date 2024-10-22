@@ -233,11 +233,11 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
                     for(int bit = 7; bit >= 0; bit--) {
                         /*White*/
                         if(((*(px_map + i) >> bit) & 1) == 1) {
-                            *(argb_px_map_tmp) = 0xFFFFFFFF;
+                            *(argb_px_map_tmp) = 0x00FFFFFF;
                         }
                         /*Black*/
                         else {
-                            *(argb_px_map_tmp) = 0xFF000000;
+                            *(argb_px_map_tmp) = 0x00000000;
                         }
                         argb_px_map_tmp++;
                     }
@@ -385,7 +385,14 @@ static void window_update(lv_display_t * disp)
 #if LV_USE_DRAW_SDL == 0
     int32_t hor_res = disp->hor_res;
     uint32_t stride = lv_draw_buf_width_to_stride(hor_res, lv_display_get_color_format(disp));
-    SDL_UpdateTexture(dsc->texture, NULL, dsc->fb_act, stride);
+    uint32_t sdl_stride = stride;
+    /*In some cases SDL stride might be different than LVGL render stride, like in I1 format.
+    SDL still uses ARGB8888 as the color format, but LVGL renders in I1, thus causing a mismatch
+    This ensures correct stride for SDL buffers in this case.*/
+    if(lv_display_get_color_format(disp) == LV_COLOR_FORMAT_I1) {
+        sdl_stride = stride * (4 * 8); /*Unwrap stride: for SDL a single pixel is 4*8bit, whereas I1 is 1bpp*/
+    }
+    SDL_UpdateTexture(dsc->texture, NULL, dsc->fb_act, sdl_stride);
 
     SDL_RenderClear(dsc->renderer);
 
