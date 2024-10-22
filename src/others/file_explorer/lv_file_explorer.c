@@ -497,7 +497,7 @@ static void browser_file_event_handler(lv_event_t * e)
         lv_table_get_selected_cell(explorer->file_table, &row, &col);
         selected_text = lv_table_get_cell_value(explorer->file_table, row, col);
 
-        selected_text = selected_text + 5; // skip table cell format
+        selected_text = selected_text + 5; /* skip table cell format */
 
         /* Three navigation modes are supported:
          * - Navigate to current directory
