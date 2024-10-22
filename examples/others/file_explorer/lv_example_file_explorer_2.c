@@ -19,6 +19,7 @@ static void file_explorer_event_handler(lv_event_t * e)
     }
 }
 
+#if LV_FILE_EXPLORER_QUICK_ACCESS
 static void btn_event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
@@ -50,6 +51,7 @@ static void dd_event_handler(lv_event_t * e)
         }
     }
 }
+#endif
 
 void lv_example_file_explorer_2(void)
 {
