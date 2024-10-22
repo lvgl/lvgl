@@ -112,15 +112,13 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
 #if LV_SDL_BUF_COUNT == 2
         dsc->buf2 = sdl_draw_buf_realloc_aligned(NULL, 32 * 1024);
 #endif
-        lv_display_set_buffers(disp, dsc->buf1, dsc->buf2,
-                               32 * 1024, LV_DISPLAY_RENDER_MODE_PARTIAL);
+        uint8_t palette_size = LV_COLOR_INDEXED_PALETTE_SIZE(lv_display_get_color_format(disp)) * 4;
+        lv_display_set_buffers(disp, dsc->buf1, dsc->buf2, (32 * 1024) + palette_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
     }
     /*LV_DISPLAY_RENDER_MODE_DIRECT or FULL */
     else {
-        uint32_t stride = lv_draw_buf_width_to_stride(disp->hor_res,
-                                                      lv_display_get_color_format(disp));
-        lv_display_set_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res,
-                               LV_SDL_RENDER_MODE);
+        uint32_t stride = lv_draw_buf_width_to_stride(disp->hor_res, lv_display_get_color_format(disp));
+        lv_display_set_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res, LV_SDL_RENDER_MODE);
     }
 #else /*LV_USE_DRAW_SDL == 1*/
     /*It will render directly to default Texture, so the buffer is not used, so just set something*/
@@ -209,49 +207,45 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 #if LV_USE_DRAW_SDL == 0
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     lv_color_format_t cf = lv_display_get_color_format(disp);
-
-    /*Update values in a special OLED I1 --> ARGB8888 case
-      We render everything in I1, but display it in ARGB8888*/
-    static uint8_t * argb_px_map;
-    if(cf == LV_COLOR_FORMAT_I1) {
-        uint32_t argb_px_map_size;
-        cf = LV_COLOR_FORMAT_ARGB8888;
-        /*I1 uses 1 bit wide pixels, ARGB8888 uses 4 byte wide pixels*/
-        argb_px_map_size = lv_area_get_size(area) * 4;
-        argb_px_map = lv_realloc(argb_px_map, argb_px_map_size);
-        if(argb_px_map == NULL) {
-            LV_LOG_ERROR("Malloc failed!\n");
-        }
-        else {
-            /*Extract the bits of I1 px_map and convert them to ARGB8888*/
-            uint32_t px_map_size = argb_px_map_size / 4;
-            /*Skip the palette*/
-            px_map += LV_COLOR_INDEXED_PALETTE_SIZE(LV_COLOR_FORMAT_I1) * 4;
-            for(uint32_t i = 0; i < px_map_size; i++) {
-                /*From MSB to LSB (pixel 0 to pixel 7 in a btye)*/
-                for(int bit = 7; bit >= 0; bit--) {
-                    /*White*/
-                    if(((*(px_map + i) >> bit) & 1) == 1) {
-                        *(argb_px_map + (4 * i) + 3) = 0;   /*A*/
-                        *(argb_px_map + (4 * i) + 2) = 255; /*R*/
-                        *(argb_px_map + (4 * i) + 1) = 255; /*G*/
-                        *(argb_px_map + (4 * i) + 0) = 255; /*B*/
-                    }
-                    /*Black*/
-                    else {
-                        *(argb_px_map + (4 * i) + 3) = 0; /*A*/
-                        *(argb_px_map + (4 * i) + 2) = 0; /*R*/
-                        *(argb_px_map + (4 * i) + 1) = 0; /*G*/
-                        *(argb_px_map + (4 * i) + 0) = 0; /*B*/
-                    }
-                }
-            }
-            /*Pass the pixel map handle*/
-            px_map = argb_px_map;
-        }
-    }
+    static uint32_t * argb_px_map = NULL;
 
     if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+
+        /*Update values in a special OLED I1 --> ARGB8888 case
+          We render everything in I1, but display it in ARGB8888*/
+        if(cf == LV_COLOR_FORMAT_I1) {
+            uint32_t argb_px_map_size;
+            /*I1 uses 1 bit wide pixels, ARGB8888 uses 4 byte wide pixels*/
+            cf = LV_COLOR_FORMAT_ARGB8888;
+            argb_px_map_size = lv_area_get_size(area) * 4;
+            argb_px_map = realloc(argb_px_map, argb_px_map_size);
+            if(argb_px_map == NULL) {
+                LV_LOG_ERROR("Malloc failed!\n");
+            }
+            else {
+                /*Extract the bits of I1 px_map and convert them to ARGB8888*/
+                uint32_t px_map_size = argb_px_map_size / (4 * 8);
+                uint32_t * argb_px_map_tmp = argb_px_map;
+                /*Skip the palette*/
+                px_map += LV_COLOR_INDEXED_PALETTE_SIZE(LV_COLOR_FORMAT_I1) * 4;
+                for(uint32_t i = 0; i < px_map_size; i++) {
+                    /*From MSB to LSB (pixel 0 to pixel 7 in a byte)*/
+                    for(int bit = 7; bit >= 0; bit--) {
+                        /*White*/
+                        if(((*(px_map + i) >> bit) & 1) == 1) {
+                            *(argb_px_map_tmp) = 0xFFFFFFFF;
+                        }
+                        /*Black*/
+                        else {
+                            *(argb_px_map_tmp) = 0xFF000000;
+                        }
+                        argb_px_map_tmp++;
+                    }
+                }
+                /*Pass the pixel map handle*/
+                px_map = (uint8_t *)argb_px_map;
+            }
+        }
         lv_area_t rotated_area = *area;
         lv_display_rotate_area(disp, &rotated_area);
 

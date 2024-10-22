@@ -331,6 +331,7 @@ lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t 
 
     /*If color format is unknown, keep using the original color format.*/
     if(cf == LV_COLOR_FORMAT_UNKNOWN) cf = draw_buf->header.cf;
+
     if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
 
     uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
