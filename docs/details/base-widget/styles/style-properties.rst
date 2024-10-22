@@ -208,7 +208,7 @@ Move Widget with this value in Y direction. Applied after layouts, aligns and ot
 translate_radial
 ~~~~~~~~~~~~~~~~
 
-Move the object around the centre of the parent object (e.g. around the circumference of a scale)
+Move object around the centre of the parent object (e.g. around the circumference of a scale)
 
 .. raw:: html
 
@@ -409,7 +409,7 @@ Sets the padding between the columns. Used by the layouts.
 pad_radial
 ~~~~~~~~~~
 
-Pad the text labels away from the scale ticks/remainder of the LV_PART_
+Pad text labels away from the scale ticks/remainder of the LV_PART_
 
 .. raw:: html
 
@@ -1243,7 +1243,7 @@ Set radius on every corner. The value is interpreted in pixels (>= 0) or `LV_RAD
 radial_offset
 ~~~~~~~~~~~~~
 
-Move the start point of the object (e.g. scale tick) radially
+Move start point of object (e.g. scale tick) radially
 
 .. raw:: html
 

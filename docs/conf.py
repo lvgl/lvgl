@@ -290,7 +290,7 @@ repo_commit_hash = _git_commit_ref
 # The below generates .HTML page redirects for pages that have been moved.
 # Browsers are redirected via `<meta http-equiv="refresh" content="0; url=new_url">`.
 redirects = {
-    "get-started/index": "../intro/getting_started.html"               ,
+    "get-started/index": "../intro/basics.html#going-deeper"           ,
     "integration/index": "../details/integration/index.html"           ,
     "porting/index":     "../intro/add-lvgl-to-your-project/index.html",
     "overview/index":    "../details/main-components/index.html"       ,
