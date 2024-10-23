@@ -1,8 +1,9 @@
-# Usage: source lvgl.py
 import argparse
-from typing import Iterator, Union
+from typing import Iterator, Union, Optional
 
 import gdb
+
+from .value import Value
 
 gdb.execute("set pagination off")
 gdb.write("set pagination off\n")
@@ -12,31 +13,31 @@ gdb.write("set python print-stack full\n")
 g_lvgl_instance = None
 
 
-class LVList:
+class LVList(Value):
     """LVGL linked list iterator"""
 
-    def __init__(self, ll: gdb.Value, nodetype: Union[gdb.Type, str] = None):
+    def __init__(self, ll: Value, nodetype: Union[gdb.Type, str] = None):
         if not ll:
             raise ValueError("Invalid linked list")
+        super().__init__(ll)
 
-        self.ll = ll
         self.nodetype = (
             gdb.lookup_type(nodetype).pointer()
             if isinstance(nodetype, str)
             else nodetype
         )
         self.lv_ll_node_t = gdb.lookup_type("lv_ll_node_t").pointer()
-        self.current = ll["head"]
-        self._next_offset = ll["n_size"] + self.lv_ll_node_t.sizeof
-        self._prev_offset = ll["n_size"]
+        self.current = self.head
+        self._next_offset = self.n_size + self.lv_ll_node_t.sizeof
+        self._prev_offset = self.n_size
 
     def _next(self, node):
-        next = gdb.Value(int(node) + self._next_offset)
-        return next.cast(self.lv_ll_node_t.pointer()).dereference()
+        next_value = Value(int(node) + self._next_offset)
+        return next_value.cast(self.lv_ll_node_t, ptr=True).dereference()
 
     def _prev(self, node):
-        prev = gdb.Value(int(node) + self._prev_offset)
-        return prev.cast(self.lv_ll_node_t)
+        prev_value = Value(int(node) + self._prev_offset)
+        return prev_value.cast(self.lv_ll_node_t, ptr=True).dereference()
 
     def __iter__(self):
         return self
@@ -54,130 +55,99 @@ class LVList:
     @property
     def len(self):
         len = 0
-        node = self.ll["head"]
+        node = self.head
         while node:
             len += 1
             node = self._next(node)
         return len
 
-    @property
-    def head(self):
-        return self.ll["head"]
 
-    @property
-    def tail(self):
-        return self.ll["tail"]
-
-    @property
-    def size(self):
-        return self.ll["n_size"]
-
-
-class LVObject(gdb.Value):
+class LVObject(Value):
     """LVGL object"""
 
-    def __init__(self, obj: gdb.Value):
-        super().__init__(obj)
-        self.obj = obj
-
-    @property
-    def class_p(self):
-        return self.obj["class_p"]
+    def __init__(self, obj: Value):
+        super().__init__(obj.cast("lv_obj_t", ptr=True))
 
     @property
     def class_name(self):
-        name = self.class_p["name"]
+        name = self.class_p.name
         return name.string() if name else "unknown"
 
     @property
-    def coords(self):
-        return self.obj["coords"]
-
-    @property
     def x1(self):
-        return int(self.coords["x1"])
+        return int(self.coords.x1)
 
     @property
     def y1(self):
-        return int(self.coords["y1"])
+        return int(self.coords.y1)
 
     @property
     def x2(self):
-        return int(self.coords["x2"])
+        return int(self.coords.x2)
 
     @property
     def y2(self):
-        return int(self.coords["y2"])
+        return int(self.coords.y2)
 
     @property
     def child_count(self):
-        return self.obj["spec_attr"]["child_cnt"] if self.obj["spec_attr"] else 0
+        return self.spec_attr.child_cnt if self.spec_attr else 0
 
     @property
     def childs(self):
-        if not self.obj["spec_attr"]:
+        if not self.spec_attr:
             return
 
         for i in range(self.child_count):
-            child = self.obj["spec_attr"]["children"][i]
+            child = self.spec_attr.children[i]
             yield LVObject(child)
 
     @property
     def styles(self):
         LV_STYLE_PROP_INV = 0
         LV_STYLE_PROP_ANY = 0xFF
-        count = self.obj["style_cnt"]
+        count = self.style_cnt
         if count == 0:
             return
 
-        styles = self.obj["styles"]
+        styles = self.super_value("styles")
         for i in range(count):
-            style = styles[i]["style"]
-            prop_cnt = style["prop_cnt"]
-            values_and_props = style["values_and_props"].cast(
-                gdb.lookup_type("lv_style_const_prop_t").pointer()
-            )
+            style = styles[i].style
+            prop_cnt = style.prop_cnt
+            values_and_props = style.values_and_props.cast("lv_style_const_prop_t", ptr=True)
             for j in range(prop_cnt):
-                prop = values_and_props[j]["prop"]
+                prop = values_and_props[j].prop
                 if prop == LV_STYLE_PROP_INV or prop == LV_STYLE_PROP_ANY:
                     continue
                 yield values_and_props[j]
 
     def get_child(self, index: int):
         return (
-            self.obj["spec_attr"]["children"][index] if self.obj["spec_attr"] else None
+            self.spec_attr.children[index] if self.spec_attr else None
         )
 
 
-class LVDisplay(gdb.Value):
+class LVDisplay(Value):
     """LVGL display"""
 
-    def __init__(self, disp: gdb.Value):
+    def __init__(self, disp: Value):
         super().__init__(disp)
-        self.disp = disp
 
     @property
     def screens(self):
+        screens = self.super_value("screens")
         for i in range(self.screen_cnt):
-            yield LVObject(self.disp["screens"][i])
-
-    @property
-    def screen_cnt(self):
-        return self.disp["screen_cnt"]
-
-    @property
-    def act_scr(self):
-        return self.disp["act_scr"]
+            yield LVObject(screens[i])
 
 
 class LVGL:
     """LVGL instance"""
 
-    def __init__(self, lv_global: gdb.Value):
-        self.lv_global = lv_global.cast(gdb.lookup_type("lv_global_t").pointer())
+    def __init__(self, lv_global: Value):
+        self.lv_global = lv_global.cast("lv_global_t", ptr=True)
 
     def displays(self) -> Iterator[LVDisplay]:
-        ll = self.lv_global["disp_ll"]
+        ll = self.lv_global.disp_ll
         if not ll:
             return
 
@@ -185,26 +155,35 @@ class LVGL:
             yield LVDisplay(disp)
 
     def screen_active(self):
-        disp = self.lv_global["disp_default"]
-        return disp["act_scr"] if disp else None
+        disp = self.lv_global.disp_default
+        return disp.act_scr if disp else None
 
     def draw_units(self):
-        unit = self.lv_global["draw_info"]["unit_head"]
+        unit = self.lv_global.draw_info.unit_head
 
         # Iterate through all draw units
-        while unit: 
+        while unit:
             yield unit
-            unit = unit["next"]
+            unit = unit.next
 
-def set_lvgl_instance(lv_global: gdb.Value):
+
+def set_lvgl_instance(lv_global: Union[gdb.Value, Value, None]):
     global g_lvgl_instance
 
     if not lv_global:
         try:
-            lv_global = gdb.parse_and_eval("lv_global").address
+            lv_global = Value(gdb.parse_and_eval("lv_global").address)
         except gdb.error as e:
             print(f"Failed to get lv_global: {e}")
             return
+
+    if not isinstance(lv_global, Value):
+        lv_global = Value(lv_global)
+
+    inited = lv_global.inited
+    if not inited:
+        print("\x1b[31mlvgl is not initialized yet. Please call `set_lvgl_instance(None)` later.\x1b[0m")
+        return
 
     g_lvgl_instance = LVGL(lv_global)
 
@@ -216,9 +195,9 @@ def dump_obj_info(obj: LVObject):
 
 
 #  Dump lv_style_const_prop_t
-def dump_style_info(style: gdb.Value):
-    prop = int(style["prop"])
-    value = style["value"]
+def dump_style_info(style: Value):
+    prop = int(style.prop)
+    value = style.value
     print(f"{prop} = {value}")
 
 
@@ -306,12 +285,13 @@ class InfoStyle(gdb.Command):
             print("Invalid obj: ", args.obj)
             return
 
-        obj = obj.cast(gdb.lookup_type("lv_obj_t").pointer())
+        obj = Value(obj)
 
         # show all styles applied to this obj
         for style in LVObject(obj).styles:
             print("  ", end="")
             dump_style_info(style)
+
 
 class InfoDrawUnit(gdb.Command):
     """dump draw unit info"""
@@ -321,9 +301,9 @@ class InfoDrawUnit(gdb.Command):
             "info draw_unit", gdb.COMMAND_USER, gdb.COMPLETE_EXPRESSION
         )
 
-    def dump_draw_unit(self, draw_unit:gdb.Value):
+    def dump_draw_unit(self, draw_unit: Value):
         # Dereference to get the string content of the name from draw_unit
-        name = draw_unit["name"].string()
+        name = draw_unit.name.string()
 
         # Print draw_unit information and the name
         print(f"Draw Unit: {draw_unit}, Name: {name}")
@@ -347,14 +327,9 @@ class InfoDrawUnit(gdb.Command):
             "VG_LITE": lookup_type("lv_draw_vg_lite_unit_t"),
         }
 
-        type = types.get(name) or lookup_type("lv_draw_unit_t")
-        print(draw_unit.cast(type.pointer()).dereference().format_string(pretty_structs=True, symbols=True))
+        type = types.get(name, lookup_type("lv_draw_unit_t"))
+        print(draw_unit.cast(type, ptr=True).dereference().format_string(pretty_structs=True, symbols=True))
 
     def invoke(self, args, from_tty):
         for unit in g_lvgl_instance.draw_units():
             self.dump_draw_unit(unit)
-
-DumpObj()
-InfoStyle()
-InfoDrawUnit()
-set_lvgl_instance(None)
