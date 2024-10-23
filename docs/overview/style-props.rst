@@ -203,6 +203,20 @@ Move the object with this value in Y direction. Applied after layouts, aligns an
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
   </ul>
 
+translate_radial
+~~~~~~~~~~~~~~~~
+
+Move the object around the centre of the parent object (e.g. around the circumference of a scale)
+
+.. raw:: html
+
+  <ul>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> Yes</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  </ul>
+
 transform_scale_x
 ~~~~~~~~~~~~~~~~~
 
@@ -387,6 +401,20 @@ Sets the padding between the columns. Used by the layouts.
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> Yes</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  </ul>
+
+pad_radial
+~~~~~~~~~~
+
+Pad the text labels away from the scale ticks/remainder of the LV_PART_
+
+.. raw:: html
+
+  <ul>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
   </ul>
 
@@ -1200,6 +1228,20 @@ radius
 ~~~~~~
 
 Set the radius on every corner. The value is interpreted in pixel (>= 0) or `LV_RADIUS_CIRCLE` for max. radius
+
+.. raw:: html
+
+  <ul>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  </ul>
+
+radial_offset
+~~~~~~~~~~~~~
+
+Move the start point of the object (e.g. scale tick) radially
 
 .. raw:: html
 
