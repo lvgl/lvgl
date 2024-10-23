@@ -315,4 +315,14 @@ void test_invert(void)
     TEST_ASSERT_EQUAL_UINT8_ARRAY(&expected_buf[3], &buf3[3], 2);
 }
 
+void test_vtile(void)
+{
+    uint8_t src_buf[8] = {0x3C, 0x42, 0x81, 0xA5, 0x81, 0x81, 0x42, 0x3C};
+    uint8_t tmp_buf[8] = {0};
+    uint8_t expected_buf[8] = {0x3C, 0x42, 0x91, 0x81, 0x81, 0x91, 0x42, 0x3C};
+
+    lv_draw_sw_i1_convert_to_vtiled(src_buf, 8, 8, 8, tmp_buf, 8, false);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(expected_buf, src_buf, 8);
+}
+
 #endif
