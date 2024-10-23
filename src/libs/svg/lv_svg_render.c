@@ -1740,7 +1740,7 @@ static uint32_t _calc_path_data_size(lv_vector_path_t * path)
     return size;
 }
 
-static void _get_obj_size(struct _lv_svg_render_obj * obj, uint32_t * size)
+static void _get_obj_size(const struct _lv_svg_render_obj * obj, uint32_t * size)
 {
     *size += sizeof(lv_svg_render_obj_t);
     if(obj->id) {
@@ -1754,38 +1754,38 @@ static void _get_obj_size(struct _lv_svg_render_obj * obj, uint32_t * size)
     }
 }
 
-static void _get_viewport_size(struct _lv_svg_render_obj * obj, uint32_t * size)
+static void _get_viewport_size(const struct _lv_svg_render_obj * obj, uint32_t * size)
 {
     _get_obj_size(obj, size);
     *size += sizeof(float) * 2;
     *size += sizeof(bool);
 }
 
-static void _get_rect_size(struct _lv_svg_render_obj * obj, uint32_t * size)
+static void _get_rect_size(const struct _lv_svg_render_obj * obj, uint32_t * size)
 {
     _get_obj_size(obj, size);
     *size += sizeof(float) * 6;
 }
 
-static void _get_circle_size(struct _lv_svg_render_obj * obj, uint32_t * size)
+static void _get_circle_size(const struct _lv_svg_render_obj * obj, uint32_t * size)
 {
     _get_obj_size(obj, size);
     *size += sizeof(float) * 3;
 }
 
-static void _get_ellipse_size(struct _lv_svg_render_obj * obj, uint32_t * size)
+static void _get_ellipse_size(const struct _lv_svg_render_obj * obj, uint32_t * size)
 {
     _get_obj_size(obj, size);
     *size += sizeof(float) * 4;
 }
 
-static void _get_line_size(struct _lv_svg_render_obj * obj, uint32_t * size)
+static void _get_line_size(const struct _lv_svg_render_obj * obj, uint32_t * size)
 {
     _get_obj_size(obj, size);
     *size += sizeof(float) * 4;
 }
 
-static void _get_poly_size(struct _lv_svg_render_obj * obj, uint32_t * size)
+static void _get_poly_size(const struct _lv_svg_render_obj * obj, uint32_t * size)
 {
     _get_obj_size(obj, size);
     lv_svg_render_poly_t * poly = (lv_svg_render_poly_t *)obj;
@@ -1797,7 +1797,7 @@ static void _get_poly_size(struct _lv_svg_render_obj * obj, uint32_t * size)
     *size += sizeof(void *);
 }
 
-static void _get_use_size(struct _lv_svg_render_obj * obj, uint32_t * size)
+static void _get_use_size(const struct _lv_svg_render_obj * obj, uint32_t * size)
 {
     _get_obj_size(obj, size);
     lv_svg_render_use_t * use = (lv_svg_render_use_t *)obj;
@@ -1809,7 +1809,7 @@ static void _get_use_size(struct _lv_svg_render_obj * obj, uint32_t * size)
 
 }
 
-static void _get_image_size(struct _lv_svg_render_obj * obj, uint32_t * size)
+static void _get_image_size(const struct _lv_svg_render_obj * obj, uint32_t * size)
 {
     _get_obj_size(obj, size);
     *size += sizeof(lv_draw_image_dsc_t);
@@ -1817,21 +1817,21 @@ static void _get_image_size(struct _lv_svg_render_obj * obj, uint32_t * size)
     *size += sizeof(float) * 4;
 }
 
-static void _get_solid_size(struct _lv_svg_render_obj * obj, uint32_t * size)
+static void _get_solid_size(const struct _lv_svg_render_obj * obj, uint32_t * size)
 {
     _get_obj_size(obj, size);
     *size += sizeof(lv_color_t);
     *size += sizeof(float);
 }
 
-static void _get_grad_size(struct _lv_svg_render_obj * obj, uint32_t * size)
+static void _get_grad_size(const struct _lv_svg_render_obj * obj, uint32_t * size)
 {
     _get_obj_size(obj, size);
     *size += sizeof(lv_vector_gradient_t);
     *size += sizeof(lv_svg_gradient_units_t);
 }
 
-static void _get_span_size(struct _lv_svg_render_obj * obj, uint32_t * size)
+static void _get_span_size(const struct _lv_svg_render_obj * obj, uint32_t * size)
 {
     _get_obj_size(obj, size);
     lv_svg_render_tspan_t * span = (lv_svg_render_tspan_t *)obj;
@@ -1847,7 +1847,7 @@ static void _get_span_size(struct _lv_svg_render_obj * obj, uint32_t * size)
     *size += sizeof(void *) * 3;
 }
 
-static void _get_txt_size(struct _lv_svg_render_obj * obj, uint32_t * size)
+static void _get_txt_size(const struct _lv_svg_render_obj * obj, uint32_t * size)
 {
     _get_obj_size(obj, size);
     lv_svg_render_text_t * txt = (lv_svg_render_text_t *)obj;
@@ -1864,14 +1864,14 @@ static void _get_txt_size(struct _lv_svg_render_obj * obj, uint32_t * size)
     *size += sizeof(void *) * 3;
 }
 
-static void _get_content_size(struct _lv_svg_render_obj * obj, uint32_t * size)
+static void _get_content_size(const struct _lv_svg_render_obj * obj, uint32_t * size)
 {
     _get_obj_size(obj, size);
     lv_svg_render_content_t * content = (lv_svg_render_content_t *)obj;
     *size += sizeof(uint32_t) * (content->count + 1);
 }
 
-static void _get_group_size(struct _lv_svg_render_obj * obj, uint32_t * size)
+static void _get_group_size(const struct _lv_svg_render_obj * obj, uint32_t * size)
 {
     _get_obj_size(obj, size);
     lv_svg_render_group_t * group = (lv_svg_render_group_t *)obj;

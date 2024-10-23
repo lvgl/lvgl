@@ -44,7 +44,7 @@ typedef struct _lv_svg_render_obj {
     void (*render)(const struct _lv_svg_render_obj * obj, lv_vector_dsc_t * dsc, const lv_matrix_t * matrix);
     void (*set_attr)(struct _lv_svg_render_obj * obj, lv_vector_draw_dsc_t * dsc, const lv_svg_attr_t * attr);
     void (*get_bounds)(const struct _lv_svg_render_obj * obj, lv_area_t * area);
-    void (*get_size)(struct _lv_svg_render_obj * obj, uint32_t * size);
+    void (*get_size)(const struct _lv_svg_render_obj * obj, uint32_t * size);
     void (*destroy)(struct _lv_svg_render_obj * obj);
 } lv_svg_render_obj_t;
 
