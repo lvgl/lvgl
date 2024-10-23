@@ -104,8 +104,6 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
         return;
     }
 
-    LV_PROFILER_DRAW_BEGIN;
-
     lv_draw_image_dsc_t * new_image_dsc = lv_malloc(sizeof(*dsc));
     lv_memcpy(new_image_dsc, dsc, sizeof(*dsc));
     lv_result_t res = lv_image_decoder_get_info(new_image_dsc->src, &new_image_dsc->header);
@@ -116,16 +114,52 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
         return;
     }
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords);
-    t->draw_dsc = new_image_dsc;
-    t->type = LV_DRAW_TASK_TYPE_IMAGE;
+    if(new_image_dsc->header.flags & LV_IMAGE_FLAGS_CUSTOM_DRAW) {
+        lv_image_decoder_dsc_t decoder_dsc;
+        res = lv_image_decoder_open(&decoder_dsc, new_image_dsc->src, NULL);
+        if(res != LV_RESULT_OK) {
+            LV_LOG_ERROR("Failed to open image");
+            return;
+        }
 
-    lv_image_buf_get_transformed_area(&t->_real_area, lv_area_get_width(coords), lv_area_get_height(coords),
-                                      dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
-    lv_area_move(&t->_real_area, coords->x1, coords->y1);
+        if(decoder_dsc.decoder && decoder_dsc.decoder->custom_draw_cb) {
+            lv_area_t draw_area = layer->buf_area;
+            int32_t xpos = coords->x1 - draw_area.x1;
+            int32_t ypos = coords->y1 - draw_area.y1;
 
-    lv_draw_finalize_task_creation(layer, t);
-    LV_PROFILER_DRAW_END;
+            lv_area_t coords_area = *coords;
+            lv_area_move(&coords_area, -(coords->x1 - xpos), -(coords->y1 - ypos));
+
+            layer->_clip_area = coords_area;
+#if LV_USE_MATRIX
+            lv_matrix_t matrix;
+            lv_matrix_identity(&matrix);
+            lv_matrix_translate(&matrix, dsc->pivot.x, dsc->pivot.y);
+            lv_matrix_rotate(&matrix, dsc->rotation / 10.0f);
+            lv_matrix_scale(&matrix, dsc->scale_x / 255.0f, dsc->scale_y / 255.0f);
+            lv_matrix_translate(&matrix, -dsc->pivot.x, -dsc->pivot.y);
+
+            decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, &matrix);
+#else
+            decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area);
+#endif
+        }
+        lv_free(new_image_dsc);
+    }
+    else {
+        LV_PROFILER_DRAW_BEGIN;
+
+        lv_draw_task_t * t = lv_draw_add_task(layer, coords);
+        t->draw_dsc = new_image_dsc;
+        t->type = LV_DRAW_TASK_TYPE_IMAGE;
+
+        lv_image_buf_get_transformed_area(&t->_real_area, lv_area_get_width(coords), lv_area_get_height(coords),
+                                          dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
+        lv_area_move(&t->_real_area, coords->x1, coords->y1);
+
+        lv_draw_finalize_task_creation(layer, t);
+        LV_PROFILER_DRAW_END;
+    }
 }
 
 lv_image_src_t lv_image_src_get_type(const void * src)

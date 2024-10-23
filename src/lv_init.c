@@ -40,6 +40,10 @@
 #include "misc/lv_fs.h"
 #include "osal/lv_os_private.h"
 
+#if LV_USE_SVG
+    #include "libs/svg/lv_svg_decoder.h"
+#endif
+
 #if LV_USE_NEMA_GFX
     #include "draw/nema_gfx/lv_draw_nema_gfx.h"
 #endif
@@ -342,6 +346,10 @@ void lv_init(void)
 
 #if LV_USE_BMP
     lv_bmp_init();
+#endif
+
+#if LV_USE_SVG
+    lv_svg_decoder_init();
 #endif
 
     /*Make FFMPEG last because the last converter will be checked first and
