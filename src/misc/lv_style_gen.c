@@ -122,6 +122,14 @@ void lv_style_set_translate_y(lv_style_t * style, int32_t value)
     lv_style_set_prop(style, LV_STYLE_TRANSLATE_Y, v);
 }
 
+void lv_style_set_translate_radial(lv_style_t * style, int32_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TRANSLATE_RADIAL, v);
+}
+
 void lv_style_set_transform_scale_x(lv_style_t * style, int32_t value)
 {
     lv_style_value_t v = {
@@ -224,6 +232,14 @@ void lv_style_set_pad_column(lv_style_t * style, int32_t value)
         .num = (int32_t)value
     };
     lv_style_set_prop(style, LV_STYLE_PAD_COLUMN, v);
+}
+
+void lv_style_set_pad_radial(lv_style_t * style, int32_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_PAD_RADIAL, v);
 }
 
 void lv_style_set_margin_top(lv_style_t * style, int32_t value)
@@ -664,6 +680,14 @@ void lv_style_set_radius(lv_style_t * style, int32_t value)
         .num = (int32_t)value
     };
     lv_style_set_prop(style, LV_STYLE_RADIUS, v);
+}
+
+void lv_style_set_radial_offset(lv_style_t * style, int32_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_RADIAL_OFFSET, v);
 }
 
 void lv_style_set_clip_corner(lv_style_t * style, bool value)

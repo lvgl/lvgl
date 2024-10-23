@@ -29,7 +29,7 @@
     /**
     * It is found that thorvg cannot handle large coordinates well.
     * When the coordinates are larger than 4096, the calculation of tvgSwRle module will overflow in 32-bit system.
-    * So we use FLT_MAX and FLT_MIN to write the mark to bonding_box to tell vg_lite_tvg not to add clip path to the current path.
+    * So we use FLT_MAX and FLT_MIN to write the mark to bounding_box to tell vg_lite_tvg not to add clip path to the current path.
     */
     #define PATH_COORD_MAX FLT_MAX
     #define PATH_COORD_MIN FLT_MIN
@@ -130,7 +130,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
 
     /* get path bounds */
     float min_x, min_y, max_x, max_y;
-    lv_vg_lite_path_get_bonding_box(lv_vg_path, &min_x, &min_y, &max_x, &max_y);
+    lv_vg_lite_path_get_bounding_box(lv_vg_path, &min_x, &min_y, &max_x, &max_y);
 
     /* convert path type */
     vg_lite_path_type_t path_type = lv_path_opa_to_path_type(dsc);
@@ -193,10 +193,10 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
         /* set scissor area */
         lv_vg_lite_set_scissor_area(&dsc->scissor_area);
 
-        /* no bonding box */
-        lv_vg_lite_path_set_bonding_box(lv_vg_path,
-                                        (float)PATH_COORD_MIN, (float)PATH_COORD_MIN,
-                                        (float)PATH_COORD_MAX, (float)PATH_COORD_MAX);
+        /* no bounding box */
+        lv_vg_lite_path_set_bounding_box(lv_vg_path,
+                                         (float)PATH_COORD_MIN, (float)PATH_COORD_MIN,
+                                         (float)PATH_COORD_MAX, (float)PATH_COORD_MAX);
     }
     else {
         /* calc inverse matrix */
@@ -216,7 +216,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
         lv_point_precise_t p2 = { dsc->scissor_area.x2 + 1, dsc->scissor_area.y2 + 1 };
         lv_point_precise_t p2_res = lv_vg_lite_matrix_transform_point(&result, &p2);
 
-        lv_vg_lite_path_set_bonding_box(lv_vg_path, p1_res.x, p1_res.y, p2_res.x, p2_res.y);
+        lv_vg_lite_path_set_bounding_box(lv_vg_path, p1_res.x, p1_res.y, p2_res.x, p2_res.y);
     }
 
     switch(dsc->fill_dsc.style) {
@@ -392,7 +392,7 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
         }
     }
 
-    lv_vg_lite_path_set_bonding_box(dest, min_x, min_y, max_x, max_y);
+    lv_vg_lite_path_set_bounding_box(dest, min_x, min_y, max_x, max_y);
     LV_PROFILER_DRAW_END;
 }
 

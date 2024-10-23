@@ -16,7 +16,7 @@
     extern const lv_property_name_t lv_label_property_names[4];
     extern const lv_property_name_t lv_obj_property_names[73];
     extern const lv_property_name_t lv_roller_property_names[3];
-    extern const lv_property_name_t lv_style_property_names[112];
+    extern const lv_property_name_t lv_style_property_names[115];
     extern const lv_property_name_t lv_textarea_property_names[15];
 #endif
 #endif
