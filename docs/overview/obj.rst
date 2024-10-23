@@ -120,7 +120,19 @@ outside will not be visible.
 
 This behavior can be overwritten with
 :cpp:expr:`lv_obj_add_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)` which allow the
-children to be drawn out of the parent.
+children to be drawn out of the parent. In addition to this, you must register
+the following event callback (this was not required in previous versions).
+
+Note: ``ext_width`` should be the maximum absolute width the children will be
+drawn within.
+
+.. code-block:: c
+
+    static void ext_draw_size_event_cb(lv_event_t * e)
+    {
+        lv_coord_t * cur_size = lv_event_get_param(e);
+        *cur_size = LV_MAX(*cur_size, ext_width);
+    }
 
 Create and delete objects
 -------------------------
