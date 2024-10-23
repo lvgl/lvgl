@@ -151,9 +151,9 @@ vg_lite_path_t * lv_vg_lite_path_get_path(lv_vg_lite_path_t * path)
     return &path->base;
 }
 
-void lv_vg_lite_path_set_bonding_box(lv_vg_lite_path_t * path,
-                                     float min_x, float min_y,
-                                     float max_x, float max_y)
+void lv_vg_lite_path_set_bounding_box(lv_vg_lite_path_t * path,
+                                      float min_x, float min_y,
+                                      float max_x, float max_y)
 {
     LV_ASSERT_NULL(path);
     path->base.bounding_box[0] = min_x;
@@ -162,16 +162,16 @@ void lv_vg_lite_path_set_bonding_box(lv_vg_lite_path_t * path,
     path->base.bounding_box[3] = max_y;
 }
 
-void lv_vg_lite_path_set_bonding_box_area(lv_vg_lite_path_t * path, const lv_area_t * area)
+void lv_vg_lite_path_set_bounding_box_area(lv_vg_lite_path_t * path, const lv_area_t * area)
 {
     LV_ASSERT_NULL(path);
     LV_ASSERT_NULL(area);
-    lv_vg_lite_path_set_bonding_box(path, area->x1, area->y1, area->x2 + 1, area->y2 + 1);
+    lv_vg_lite_path_set_bounding_box(path, area->x1, area->y1, area->x2 + 1, area->y2 + 1);
 }
 
-void lv_vg_lite_path_get_bonding_box(lv_vg_lite_path_t * path,
-                                     float * min_x, float * min_y,
-                                     float * max_x, float * max_y)
+void lv_vg_lite_path_get_bounding_box(lv_vg_lite_path_t * path,
+                                      float * min_x, float * min_y,
+                                      float * max_x, float * max_y)
 {
     LV_ASSERT_NULL(path);
     if(min_x) *min_x = path->base.bounding_box[0];
@@ -210,7 +210,7 @@ static void path_bounds_iter_cb(void * user_data, uint8_t op_code, const float *
     }
 }
 
-bool lv_vg_lite_path_update_bonding_box(lv_vg_lite_path_t * path)
+bool lv_vg_lite_path_update_bounding_box(lv_vg_lite_path_t * path)
 {
     LV_ASSERT_NULL(path);
 
@@ -232,7 +232,7 @@ bool lv_vg_lite_path_update_bonding_box(lv_vg_lite_path_t * path)
     lv_vg_lite_path_for_each_data(lv_vg_lite_path_get_path(path), path_bounds_iter_cb, &bounds);
 
     /* set bounds */
-    lv_vg_lite_path_set_bonding_box(path, bounds.min_x, bounds.min_y, bounds.max_x, bounds.max_y);
+    lv_vg_lite_path_set_bounding_box(path, bounds.min_x, bounds.min_y, bounds.max_x, bounds.max_y);
 
     LV_PROFILER_DRAW_END;
 
