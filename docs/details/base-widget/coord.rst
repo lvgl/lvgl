@@ -38,9 +38,9 @@ Units
 
 
 
-.. _coord_boxing_model:
+.. _boxing_model:
 
-Boxing model
+Boxing Model
 ************
 
 LVGL follows CSS's `border-box <https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing>`__
@@ -164,11 +164,11 @@ Alignment
 Inside parent widget
 ~~~~~~~~~~~~~~~~~~~~
 In many cases it is more convenient to tell LVGL to align your object relative to
-an "anchor point" in its parent *other* than its upper left corner.  To establish
-that "anchor point", call :cpp:expr:`lv_obj_set_align(widget, LV_ALIGN_...)`.  After
-that call, that "anchor point" will be remembered until another one is established.
+an "anchor" in its parent *other* than its upper left corner.  To establish
+that "anchor", call :cpp:expr:`lv_obj_set_align(widget, LV_ALIGN_...)`.  After
+that call, that "anchor" will be remembered until another one is established.
 In other words, every futire x and y setting for that Widget will be relative to the
-that "anchor point".
+that "anchor".
 
 Example:  Position Widget (10,20) px relative to the center of its parent:
 
@@ -180,7 +180,7 @@ Example:  Position Widget (10,20) px relative to the center of its parent:
    /* Or combine the above in one function... */
    lv_obj_align(widget, LV_ALIGN_CENTER, 10, 20);
 
-9 convenient "anchor points" can be used with these functions:
+9 convenient "anchors" can be used with these functions:
 
 - :cpp:enumerator:`LV_ALIGN_TOP_LEFT`
 - :cpp:enumerator:`LV_ALIGN_TOP_MID`
@@ -210,7 +210,7 @@ children is updated automatically.
 
 Relative to another Widget
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-Alternately, you can choose an "anchor point" on another Widget.
+Alternately, you can choose an "anchor" on another Widget.
 
 .. code-block:: c
 
@@ -238,10 +238,10 @@ Example:  to horizontally center a label 10 pixels above a button:
    lv_obj_align_to(label, btn, LV_ALIGN_OUT_TOP_MID, 0, -10);
 
 Note that, unlike with :cpp:func:`lv_obj_align`, :cpp:func:`lv_obj_align_to`
-does not remember the "anchor point" used, and so will not automatically reposition
+does not remember the "anchor" used, and so will not automatically reposition
 the aligned widget if the reference widget later moves.
 
-The following illustration shows the meaning of each "anchor point" mentioned above.
+The following illustration shows the meaning of each "anchor" mentioned above.
 
 .. image:: /misc/align.png
 
