@@ -232,6 +232,16 @@ int lv_strcmp(const char * s1, const char * s2)
     return *(const unsigned char *)s1 - *(const unsigned char *)s2;
 }
 
+int lv_strncmp(const char * s1, const char * s2, size_t len)
+{
+    while(len > 0 && *s1 && (*s1 == *s2)) {
+        s1++;
+        s2++;
+        len--;
+    }
+    return *(const unsigned char *)s1 - *(const unsigned char *)s2;
+}
+
 char * lv_strdup(const char * src)
 {
     size_t len = lv_strlen(src) + 1;
