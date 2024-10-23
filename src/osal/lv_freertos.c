@@ -129,7 +129,7 @@ lv_result_t lv_mutex_lock(lv_mutex_t * pxMutex)
     /* If mutex in uninitialized, perform initialization. */
     prvCheckMutexInit(pxMutex);
 
-    BaseType_t xMutexTakeStatus = xSemaphoreTakeRecursive(pxMutex->xMutex, portMAX_DELAY);
+    BaseType_t xMutexTakeStatus = xSemaphoreTake(pxMutex->xMutex, portMAX_DELAY);
     if(xMutexTakeStatus != pdTRUE) {
         LV_LOG_ERROR("xSemaphoreTake failed!");
         return LV_RESULT_INVALID;
@@ -165,7 +165,7 @@ lv_result_t lv_mutex_unlock(lv_mutex_t * pxMutex)
     /* If mutex in uninitialized, perform initialization. */
     prvCheckMutexInit(pxMutex);
 
-    BaseType_t xMutexGiveStatus = xSemaphoreGiveRecursive(pxMutex->xMutex);
+    BaseType_t xMutexGiveStatus = xSemaphoreGive(pxMutex->xMutex);
     if(xMutexGiveStatus != pdTRUE) {
         LV_LOG_ERROR("xSemaphoreGive failed!");
         return LV_RESULT_INVALID;
