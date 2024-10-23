@@ -14,6 +14,7 @@
 
 #include "lv_svg.h"
 #include "../../draw/lv_draw_buf_private.h"
+#include "../../display/lv_display_private.h"
 
 /*********************
  *      DEFINES
@@ -107,8 +108,9 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
                 return LV_RESULT_INVALID;
             }
 
-            width = LV_COORD_MAX;
-            height = LV_COORD_MAX;
+            lv_display_t * disp = lv_display_get_default();
+            width = disp->hor_res;
+            height = disp->ver_res;
         }
         else {
             const lv_image_dsc_t * img_dsc = src_data;
@@ -141,7 +143,7 @@ static lv_result_t svg_decoder_open(lv_image_decoder_t * decoder, lv_image_decod
     LV_UNUSED(decoder); /*Unused*/
     LV_PROFILER_DECODER_BEGIN_TAG("lv_svg_decoder_open");
 
-    const uint8_t * svg_data = NULL;
+    uint8_t * svg_data = NULL;
     uint32_t svg_data_size = 0;
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
@@ -163,7 +165,7 @@ static lv_result_t svg_decoder_open(lv_image_decoder_t * decoder, lv_image_decod
     }
     else if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
         const lv_image_dsc_t * img_dsc = dsc->src;
-        svg_data = img_dsc->data;
+        svg_data = (uint8_t *)img_dsc->data;
         svg_data_size = (uint32_t)img_dsc->data_size;
     }
     else {
@@ -190,7 +192,7 @@ static lv_result_t svg_decoder_open(lv_image_decoder_t * decoder, lv_image_decod
     draw_buf->header.magic = LV_IMAGE_HEADER_MAGIC;
     draw_buf->data = NULL;
     draw_buf->unaligned_data = (void *)draw_list;
-    draw_buf->data_size = svg_data_size;  // FIXME : real svg data size!!
+    draw_buf->data_size = lv_svg_render_get_size(draw_list);
     draw_buf->handlers = &_svg_draw_buf_handler;
 
     dsc->decoded = draw_buf;
@@ -287,8 +289,8 @@ static void svg_draw_buf_free(void * svg_buf)
 static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, const lv_area_t * coords,
                      const lv_matrix_t * m)
 {
-    lv_draw_buf_t * draw_buf = dsc->decoded;
-    lv_svg_render_obj_t * list = draw_buf->unaligned_data;
+    const lv_draw_buf_t * draw_buf = dsc->decoded;
+    const lv_svg_render_obj_t * list = draw_buf->unaligned_data;
 
     lv_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
     lv_matrix_t matrix;
