@@ -39,7 +39,7 @@ h1 = {
 }
 
 widgets = {
-    "obj": "Base Object",
+    "obj": "Base Widget",
     "animimg": "Animation Image",
     "arc": "Arc",
     "bar": "Bar",
