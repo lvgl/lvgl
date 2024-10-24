@@ -146,6 +146,15 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
                 bitmap_out_tmp += stride;
             }
         }
+        else if(fdsc->bpp == 8) {
+            for(y = 0; y < gdsc->box_h; y ++) {
+                for(x = 0; x < gdsc->box_w; x++, i++) {
+                    bitmap_out_tmp[x] = *bitmap_in;
+                    bitmap_in++;
+                }
+                bitmap_out_tmp += stride;
+            }
+        }
         return draw_buf;
     }
     /*Handle compressed bitmap*/
