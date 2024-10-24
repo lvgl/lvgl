@@ -65,6 +65,7 @@ void lv_draw_arc(lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
     lv_draw_task_t * t = lv_draw_add_task(layer, &a);
 
     t->draw_dsc = lv_malloc(sizeof(*dsc));
+    LV_ASSERT_MALLOC(t->draw_dsc);
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
     t->type = LV_DRAW_TASK_TYPE_ARC;
 
