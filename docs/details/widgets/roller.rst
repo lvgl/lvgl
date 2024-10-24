@@ -43,6 +43,10 @@ You can select an option manually with
 :cpp:expr:`lv_roller_set_selected(roller, id, LV_ANIM_ON)`,
 where *id* is the index of an option.
 
+If you don't know the index of an option can also select an option with
+:cpp:expr:`lv_roller_set_selected_str(roller, str, LV_ANIM_ON)`,
+where *str* is the string equal to one of the options.
+
 Get selected option
 -------------------
 

@@ -275,6 +275,34 @@ void lv_roller_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_s
     buf[c] = '\0';
 }
 
+bool lv_roller_set_selected_str(lv_obj_t * obj, const char * sel_opt, lv_anim_enable_t anim)
+{
+    const char * options = lv_roller_get_options(obj);
+    size_t options_len = lv_strlen(options);
+
+    bool option_found = false;
+
+    uint32_t current_option = 0;
+    size_t line_start = 0;
+
+    for(size_t i = 0; i < options_len; i++) {
+        if(options[i] == '\n') {
+            /* See if this is the correct option */
+            if(lv_strncmp(&options[line_start], sel_opt, i - line_start) == 0) {
+                lv_roller_set_selected(obj, current_option, anim);
+                option_found = true;
+                break;
+            }
+
+            current_option++;
+            line_start = i + 1;
+        }
+    }
+
+    return option_found;
+}
+
+
 /**
  * Get the options of a roller
  * @param roller pointer to roller object

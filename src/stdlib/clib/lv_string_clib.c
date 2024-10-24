@@ -86,6 +86,11 @@ int lv_strcmp(const char * s1, const char * s2)
     return strcmp(s1, s2);
 }
 
+int lv_strncmp(const char * s1, const char * s2, size_t len)
+{
+    return strncmp(s1, s2, len);
+}
+
 char * lv_strdup(const char * src)
 {
     /*strdup uses malloc, so use the lv_malloc when LV_USE_STDLIB_MALLOC is not LV_STDLIB_CLIB */

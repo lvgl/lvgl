@@ -86,6 +86,11 @@ int lv_strcmp(const char * s1, const char * s2)
     return rt_strcmp(s1, s2);
 }
 
+int lv_strncmp(const char * s1, const char * s2, size_t len)
+{
+    return rt_strncmp(s1, s2, len);
+}
+
 char * lv_strdup(const char * src)
 {
     size_t len = lv_strlen(src) + 1;

@@ -120,6 +120,15 @@ char * lv_strcpy(char * dst, const char * src);
 int lv_strcmp(const char * s1, const char * s2);
 
 /**
+ * @brief  This function will compare two strings up to the given length.
+ * @param s1    pointer to the first string
+ * @param s2    pointer to the second string
+ * @param len   the maximum amount of characters to compare
+ * @return      the difference between the value of the first unmatching character.
+ */
+int lv_strncmp(const char * s1, const char * s2, size_t len);
+
+/**
  * @brief Duplicate a string by allocating a new one and copying the content.
  * @param src Pointer to the source of data to be copied.
  * @return A pointer to the new allocated string. NULL if failed.
