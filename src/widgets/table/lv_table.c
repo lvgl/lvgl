@@ -277,7 +277,7 @@ void lv_table_set_column_count(lv_obj_t * obj, uint32_t col_cnt)
         int32_t i;
         for(i = 0; i < (int32_t)old_col_cnt - (int32_t)col_cnt; i++) {
             uint32_t idx = old_col_start + min_col_cnt + i;
-            if(table->cell_data[idx]->user_data) {
+            if(table->cell_data[idx] && table->cell_data[idx]->user_data) {
                 lv_free(table->cell_data[idx]->user_data);
                 table->cell_data[idx]->user_data = NULL;
             }
