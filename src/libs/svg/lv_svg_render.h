@@ -11,7 +11,11 @@
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_SVG && LV_USE_VECTOR_GRAPHIC
+#if LV_USE_SVG
+#if !LV_USE_VECTOR_GRAPHIC
+    #error "LV_USE_SVG requires LV_USE_VECTOR_GRAPHIC = 1"
+#endif
+
 #include "lv_svg.h"
 #include "../../misc/lv_types.h"
 #include "../../draw/lv_draw_vector_private.h"
