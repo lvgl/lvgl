@@ -89,7 +89,6 @@ struct _lv_vector_dsc_t {
     lv_draw_vector_task_dsc_t tasks;
 };
 
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

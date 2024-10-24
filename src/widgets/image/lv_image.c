@@ -793,7 +793,6 @@ static void draw_image(lv_event_t * e)
 
             lv_draw_image(layer, &draw_dsc, &coords);
             layer->_clip_area = clip_area_ori;
-
         }
         else if(img->src_type == LV_IMAGE_SRC_SYMBOL) {
             lv_draw_label_dsc_t label_dsc;
