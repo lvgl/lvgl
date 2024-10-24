@@ -144,7 +144,7 @@ the original, non-zoomed coordinates.
 
 **IMPORTANT** The transformation of the image is independent of the
 transformation properties coming from styles. (See
-:ref:`here <styles_opacity_blend_modes_transformations>`). The main
+:ref:`here <style_opacity_blend_modes_transformations>`). The main
 differences are that pure image widget transformation
 
 - doesn't transform the children of the image widget

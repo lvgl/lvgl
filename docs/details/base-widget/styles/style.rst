@@ -4,20 +4,20 @@
 Style Details
 =============
 
-*Styles* are used to set the appearance of Widgets. Styles in lvgl are
+Styles are used to set the appearance of Widgets.  Styles in lvgl are
 heavily inspired by CSS. The concept in a nutshell is that a
 style is an :cpp:type:`lv_style_t` variable which can hold properties like
 border width, font, text color and so on. It's similar to a ``class`` in CSS.
 
 - Styles can be assigned to Widgets to change their appearance. Upon
-  assignment, the target part (*pseudo-element* in CSS) and target state
-  (*pseudo class*) can be specified. For example one can add
+  assignment, the target part (pseudo-element_ in CSS) and target state
+  (pseudo-class_ in CSS) can be specified. For example one can add
   ``style_blue`` to the knob of a slider when it's in pressed state.
 - The same style can be used by any number of Widgets.
 - Styles can be cascaded which means multiple styles may be assigned to a Widget and
   each style can have different properties. Therefore, not all properties
   have to be specified in a style. LVGL will search for a property until a
-  style defines it or use a default if it's not specified by any of the
+  style defines it or use a default value if it's not specified by any of the
   styles. For example ``style_btn`` can result in a default gray button
   and ``style_btn_red`` can add only a ``background-color=red`` to
   overwrite the background color.
@@ -25,11 +25,13 @@ border width, font, text color and so on. It's similar to a ``class`` in CSS.
   is specified in two styles the newest style in the Widget will be used.
 - Some properties (e.g. text color) can be inherited from a parent(s) if it's not specified in a Widget.
 - Widgets can also have local styles with higher precedence than "normal" styles.
-- Unlike CSS (where pseudo-classes describe different states, e.g. ``:focus``),
+- Unlike CSS (where pseudo-classes_ describe different states, e.g. ``:focus``),
   in LVGL a property is assigned to a given state.
 - Transitions can be applied when the Widget changes state.
 
-.. _styles_states:
+
+
+.. _style_states:
 
 States
 ******
@@ -60,8 +62,9 @@ property will be used. Typically this means the property with
 :cpp:enumerator:`LV_STATE_DEFAULT` is used.˛ If the property is not set even for the
 default state the default value will be used. (See later)
 
-But what does the "best matching state's property" really mean? States
-have a precedence which is shown by their value (see in the above list).
+What does the "best matching state's property" mean?
+----------------------------------------------------
+States have a precedence which is shown by their value (see in the above list).
 A higher value means higher precedence. To determine which state's
 property to use let's take an example. Imagine the background color is
 defined like this:
@@ -93,15 +96,15 @@ defined like this:
 Some practical notes:
 
 - The precedence (value) of states is quite intuitive, and it's something the
-  user would expect naturally. E.g. if a Widget has focus the user will still
+  user would expect naturally. Example:  if a Widget has focus the user will still
   want to see if it's pressed, therefore the pressed state has a higher
   precedence. If the focused state had a higher precedence it would overwrite
   the pressed color.
 - If you want to set a property for all states (e.g. red background color)
   just set it for the default state. If the Widget can't find a property
   for its current state it will fall back to the default state's property.
-- Use ORed states to describe the properties for complex cases. (E.g.
-  pressed + checked + focused)
+- Use ORed states to describe the properties for complex cases (e.g.
+  pressed + checked + focused).
 - It might be a good idea to use different
   style elements for different states. For example, finding background
   colors for released, pressed, checked + pressed, focused, focused +
@@ -109,9 +112,11 @@ Some practical notes:
   Instead, for example, use the background color for pressed and checked
   states and indicate the focused state with a different border color.
 
-.. _styles_cascading:
 
-Cascading styles
+
+.. _style_cascading:
+
+Cascading Styles
 ****************
 
 It's not required to set all the properties in one style. It's possible
@@ -138,7 +143,9 @@ style (red). When the button is pressed the light-gray color is a better
 match because it describes the current state perfectly, so the button
 will be light-gray.
 
-.. _styles_inheritance:
+
+
+.. _style_inheritance:
 
 Inheritance
 ***********
@@ -147,12 +154,14 @@ Some properties (typically those related to text) can be inherited from
 the parent Widget's styles. Inheritance is applied only if the given
 property is not set in the Widget's styles (even in default state). In
 this case, if the property is inheritable, the property's value will be
-searched in the parents until a Widget specifies a value for the
+searched up the parent hierarchy until a Widget specifies a value for the
 property. The parents will use their own state to determine the value.
-So if a button is pressed, and the text color comes from here, the
+So if a button is pressed, and the text color comes from a parent, the
 pressed text color will be used.
 
-.. _styles_parts:
+
+
+.. _style_parts:
 
 Parts
 *****
@@ -172,16 +181,18 @@ The following predefined parts exist in LVGL:
 
 For example a :ref:`Slider <lv_slider>` has three parts:
 
-- Background
+- Main (background)
 - Indicator
 - Knob
 
 This means all three parts of the slider can have their own styles. See
 later how to add styles to Widgets and parts.
 
-.. _styles_initialize:
 
-Initialize styles and set/get properties
+
+.. _style_initialize:
+
+Initialize Styles and Set/Get Properties
 ****************************************
 
 Styles are stored in :cpp:type:`lv_style_t` variables. Style variables should be
@@ -224,7 +235,8 @@ To get a property's value from a style:
        do_something(v.color);
    }
 
-:cpp:union:`lv_style_value_t` has 3 fields:
+:cpp:union:`lv_style_value_t` has 3 fields, only one of which will apply, depending
+on the type of property it is applied to:
 
 - :cpp:member:`num`: for integer, boolean and opacity properties
 - :cpp:member:`color`: for color properties
@@ -251,13 +263,15 @@ Styles can be built as ``const`` as well to save RAM:
 Later ``const`` style can be used like any other style but (obviously)
 new properties cannot be added.
 
-.. _styles_add_remove:
+
+
+.. _style_add_remove:
 
 Add and remove styles to a widget
 *********************************
 
-A style on its own is not that useful. It must be assigned to a Widget
-to take effect.
+A style on its own has no effect until it is added (assigned) to a Widget.
+
 
 Add styles
 ----------
@@ -287,8 +301,8 @@ To replace a specific style of a Widget use
 :cpp:expr:`lv_obj_replace_style(widget, old_style, new_style, selector)`. This
 function will only replace ``old_style`` with ``new_style`` if the
 ``selector`` matches the ``selector`` used in ``lv_obj_add_style``. Both
-styles, i.e. ``old_style`` and ``new_style``, must not be ``NULL`` (for
-adding and removing separate functions exist). If the combination of
+``old_style`` and ``new_style`` must not be ``NULL``.  Separate functions exist for
+adding and removing styles.  If the combination of
 ``old_style`` and ``selector`` exists multiple times in ``obj``\ 's
 styles, all occurrences will be replaced. The return value of the
 function indicates whether at least one successful replacement took
@@ -314,8 +328,8 @@ To remove specific styles use
 the :cpp:enumerator:`LV_STATE_ANY` and :cpp:enumerator:`LV_PART_ANY` values to remove the style from
 any state or part.
 
-Report style changes
---------------------
+Reporting style changes
+-----------------------
 
 If a style which is already assigned to a Widget changes (i.e. a
 property is added or changed), the Widgets using that style should be
@@ -331,23 +345,28 @@ notified. There are 3 options to do this:
    when needed, call :cpp:expr:`lv_obj_report_style_change(&style)`. If ``style``
    is ``NULL`` all Widgets will be notified about a style change.
 
-Get a property's value on a Widget
------------------------------------
+Get a style property's value on a Widget
+----------------------------------------
 
-To get a final value of property
+To get the final value of a style's property considering
 
-- considering cascading, inheritance, local styles and transitions (see below)
-- property get functions like this can be used: ``lv_obj_get_style_<property_name>(widget, <part>)``.
-  These functions use the Widget's current state and if no better candidate exists they return a default value.
-  For example:
+- cascading,
+- inheritance,
+- local styles and transitions (see below)
+
+property "get" functions like this can be used: ``lv_obj_get_style_<property_name>(widget, <part>)``.
+These functions use the Widget's current state and if no better candidate exists they return the default value.
+For example:
 
 .. code-block:: c
 
     lv_color_t color = lv_obj_get_style_bg_color(btn, LV_PART_MAIN);
 
-.. _styles_local:
 
-Local styles
+
+.. _style_local:
+
+Local Styles
 ************
 
 In addition to "normal" styles, Widgets can also store local styles.
@@ -360,7 +379,7 @@ freed when the Widget is deleted. They are useful to add local
 customization to a Widget.
 
 Unlike in CSS, LVGL local styles can be assigned to states
-(*pseudo-classes*) and parts (*pseudo-elements*).
+(pseudo-classes_) and parts (pseudo-elements_).
 
 To set a local property use functions like
 ``lv_obj_set_style_<property_name>(widget, <value>, <selector>);``   For example:
@@ -368,6 +387,7 @@ To set a local property use functions like
 .. code-block:: c
 
     lv_obj_set_style_bg_color(slider, lv_color_red(), LV_PART_INDICATOR | LV_STATE_FOCUSED);
+
 
 
 .. _style_properties_overview:
@@ -381,9 +401,9 @@ For the full list of style properties click :ref:`here <style_properties>`.
 Typical background properties
 -----------------------------
 
-In the documentation of the widgets you will see sentences like "The
+In documentation of widgets you will see sentences like "The
 widget uses the typical background properties". These "typical
-background properties" are the ones related to:
+background properties" are the properties being referred to:
 
 - Background
 - Border
@@ -393,7 +413,11 @@ background properties" are the ones related to:
 - Width and height transformation
 - X and Y translation
 
-.. _styles_transitions:
+See :ref:`boxing_model` for the meanings of these terms.
+
+
+
+.. _style_transitions:
 
 Transitions
 ***********
@@ -436,14 +460,16 @@ initialized and added to a style:
 
    lv_style_set_transition(&style1, &trans1);
 
-.. _styles_opacity_blend_modes_transformations:
 
-Opacity, Blend modes and Transformations
+
+.. _style_opacity_blend_modes_transformations:
+
+Opacity, Blend Modes and Transformations
 ****************************************
 
 If the ``opa``, ``blend_mode``, ``transform_angle``, or
-``transform_zoom`` properties are set to their non-default value LVGL
-creates a snapshot about the widget and all its children in order to
+``transform_zoom`` properties are set to a non-default value LVGL
+creates a snapshot of the widget and its children in order to
 blend the whole widget with the set opacity, blend mode and
 transformation properties.
 
@@ -459,32 +485,36 @@ configured by the following properties in ``lv_conf.h``:
 - :cpp:enumerator:`LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE`: [bytes] used if :cpp:enumerator:`LV_LAYER_SIMPLE_BUF_SIZE` couldn't be allocated.
 
 If transformation properties were also used the layer cannot be
-rendered in chunks, but one larger memory needs to be allocated. The
+rendered in chunks, but one larger memory block needs to be allocated. The
 required memory depends on the angle, zoom and pivot parameters, and the
 size of the area to redraw, but it's never larger than the size of the
 widget (including the extra draw size used for shadow, outline, etc).
 
 If the widget can fully cover the area to redraw, LVGL creates an RGB
 layer (which is faster to render and uses less memory). If the opposite
-case ARGB rendering needs to be used. A widget might not cover its area
-if it has radius, ``bg_opa != 255``, has shadow, outline, etc.
+case ARGB rendering needs to be used, a widget might not cover its area
+if it has radius, ``bg_opa < 255``, has shadow, outline, etc.
 
 The click area of the widget is also transformed accordingly.
 
-.. _styles_color_filter:
 
-Color filter
+
+.. _style_color_filter:
+
+Color Filter
 ************
 
 TODO
 
-.. _styles_themes:
+
+
+.. _style_themes:
 
 Themes
 ******
 
 Themes are a collection of styles. If there is an active theme LVGL
-applies it on every created widget. This will give a default appearance
+applies it to every newly-created widget. This will give a default appearance
 to the UI which can then be modified by adding further styles.
 
 Every display can have a different theme. For example, you could have a
@@ -501,12 +531,15 @@ example shows how to set the "default" theme:
 
 .. code-block:: c
 
-   lv_theme_t * th = lv_theme_default_init(display,  /* Use the DPI, size, etc from this display */
-                                           LV_COLOR_PALETTE_BLUE, LV_COLOR_PALETTE_CYAN,   /* Primary and secondary palette */
-                                           false,    /* Light or dark mode */
-                                           &lv_font_montserrat_10, &lv_font_montserrat_14, &lv_font_montserrat_18); /* Small, normal, large fonts */
+   lv_theme_t * th = lv_theme_default_init(display,                 /* Use DPI, size, etc. from this display */
+                                           LV_COLOR_PALETTE_BLUE,   /* Primary and secondary palette */
+                                           LV_COLOR_PALETTE_CYAN,
+                                           false,                   /* Dark theme?  False = light theme. */
+                                           &lv_font_montserrat_10,  /* Small, normal, large fonts */
+                                           &lv_font_montserrat_14,
+                                           &lv_font_montserrat_18);
 
-   lv_display_set_theme(display, th); /* Assign the theme to the display */
+   lv_display_set_theme(display, th); /* Assign theme to display */
 
 The included themes are enabled in ``lv_conf.h``. If the default theme
 is enabled by :c:macro:`LV_USE_THEME_DEFAULT` LVGL automatically initializes
@@ -523,7 +556,7 @@ E.g. default theme -> custom theme -> dark theme.
 :cpp:expr:`lv_theme_set_parent(new_theme, base_theme)` extends the
 ``base_theme`` with the ``new_theme``.
 
-There is an example for it below.
+There is an example of this below.
 
 .. _styles_example:
 
@@ -531,6 +564,18 @@ Examples
 ********
 
 .. include:: ../../../examples/styles/index.rst
+
+
+
+..  Hyperlinks
+
+.. _pseudo-elements:
+.. _pseudo-element:   https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors#pseudo-classes_and_pseudo-elements
+.. _pseudo-classes:
+.. _pseudo-class:     https://developer.mozilla.org/en-US/docs/Glossary/Pseudo-class
+
+
+
 
 .. _styles_api:
 
