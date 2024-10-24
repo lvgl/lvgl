@@ -108,6 +108,12 @@ typedef enum {
     LV_EVENT_FLUSH_WAIT_START,
     LV_EVENT_FLUSH_WAIT_FINISH,
 
+    /* Gesture events, emitted if the gesture recognizer has detected a gesture */
+    LV_EVENT_GESTURE_PINCH,
+    LV_EVENT_GESTURE_SWIPE,
+    LV_EVENT_GESTURE_ROTATE,
+    LV_EVENT_GESTURE_SCROLL,
+
     LV_EVENT_VSYNC,
 
     LV_EVENT_LAST,                 /** Number of default events */
