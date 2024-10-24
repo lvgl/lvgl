@@ -23,7 +23,25 @@
 #include "../../lv_conf_internal.h"
 #if LV_USE_THORVG_INTERNAL
 
+#include <cstdarg>
 #include "tvgScene.h"
+
+/************************************************************************/
+/* Internal Class Implementation                                        */
+/************************************************************************/
+
+Result Scene::Impl::resetEffects()
+{
+    if (effects) {
+        for (auto e = effects->begin(); e < effects->end(); ++e) {
+            delete(*e);
+        }
+        delete(effects);
+        effects = nullptr;
+    }
+    return Result::Success;
+}
+
 
 /************************************************************************/
 /* External Class Implementation                                        */
@@ -31,7 +49,6 @@
 
 Scene::Scene() : pImpl(new Impl(this))
 {
-    Paint::pImpl->id = TVG_CLASS_ID_SCENE;
 }
 
 
@@ -47,9 +64,15 @@ unique_ptr<Scene> Scene::gen() noexcept
 }
 
 
-uint32_t Scene::identifier() noexcept
+TVG_DEPRECATED uint32_t Scene::identifier() noexcept
 {
-    return TVG_CLASS_ID_SCENE;
+    return (uint32_t) Type::Scene;
+}
+
+
+Type Scene::type() const noexcept
+{
+    return Type::Scene;
 }
 
 
@@ -81,6 +104,33 @@ Result Scene::clear(bool free) noexcept
 list<Paint*>& Scene::paints() noexcept
 {
     return pImpl->paints;
+}
+
+
+Result Scene::push(SceneEffect effect, ...) noexcept
+{
+    if (effect == SceneEffect::ClearAll) return pImpl->resetEffects();
+
+    if (!pImpl->effects) pImpl->effects = new Array<RenderEffect*>;
+
+    va_list args;
+    va_start(args, effect);
+
+    RenderEffect* re = nullptr;
+
+    switch (effect) {
+        case SceneEffect::GaussianBlur: {
+            re = RenderEffectGaussian::gen(args);
+            break;
+        }
+        default: break;
+    }
+
+    if (!re) return Result::InvalidArguments;
+
+    pImpl->effects->push(re);
+
+    return Result::Success;
 }
 
 #endif /* LV_USE_THORVG_INTERNAL */
