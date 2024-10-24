@@ -132,7 +132,7 @@ int32_t lv_obj_get_scroll_y(const lv_obj_t * obj);
 
 /**
  * Return the height of the area above the object.
- * That is the number of pixels the object can be scrolled down.
+ * That is the number of pixels the object can be scrolled up.
  * Normally positive but can be negative when scrolled inside.
  * @param obj       pointer to an object
  * @return          the scrollable area above the object in pixels
@@ -150,19 +150,19 @@ int32_t lv_obj_get_scroll_bottom(lv_obj_t * obj);
 
 /**
  * Return the width of the area on the left the object.
- * That is the number of pixels the object can be scrolled down.
+ * That is the number of pixels the object can be scrolled left.
  * Normally positive but can be negative when scrolled inside.
  * @param obj       pointer to an object
- * @return          the scrollable area on the left the object in pixels
+ * @return          the scrollable area on the left of the object in pixels
  */
 int32_t lv_obj_get_scroll_left(lv_obj_t * obj);
 
 /**
  * Return the width of the area on the right the object.
- * That is the number of pixels the object can be scrolled down.
+ * That is the number of pixels the object can be scrolled right.
  * Normally positive but can be negative when scrolled inside.
  * @param obj       pointer to an object
- * @return          the scrollable area on the right the object in pixels
+ * @return          the scrollable area on the right of the object in pixels
  */
 int32_t lv_obj_get_scroll_right(lv_obj_t * obj);
 
