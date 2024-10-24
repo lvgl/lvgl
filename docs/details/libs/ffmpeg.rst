@@ -40,6 +40,13 @@ See the examples below.
 
 .. _ffmpeg_example:
 
+Events
+------
+
+- :cpp:enumerator:`LV_EVENT_READY` Sent when playback is complete and auto-restart is not enabled.
+
+Learn more about :ref:`events`.
+
 Example
 -------
 
