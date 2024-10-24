@@ -11,4 +11,5 @@ Renderers and GPUs
     nxp_pxp
     sdl
     stm32_dma2d
+    vglite
     vg_lite
