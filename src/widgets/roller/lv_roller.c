@@ -287,7 +287,7 @@ bool lv_roller_set_selected_str(lv_obj_t * obj, const char * sel_opt, lv_anim_en
 
     for(size_t i = 0; i < options_len; i++) {
         if(options[i] == '\n') {
-            // See if this is the correct option
+            /* See if this is the correct option */
             if(lv_strncmp(&options[line_start], sel_opt, i - line_start) == 0) {
                 lv_roller_set_selected(obj, current_option, anim);
                 option_found = true;
