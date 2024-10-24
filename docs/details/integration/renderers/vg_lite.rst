@@ -1,4 +1,4 @@
-.. _vglite:
+.. _vg_lite:
 
 ===================
 VG-Lite General GPU
