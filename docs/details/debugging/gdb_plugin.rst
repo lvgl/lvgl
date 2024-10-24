@@ -73,3 +73,18 @@ Example:
       32 = {num = 90, ptr = 0x5a, color = {blue = 90 'Z', green = 0 '\000', red = 0 '\000'}}
       158 = {num = 32767, ptr = 0x7fff, color = {blue = 255 '\377', green = 127 '\177', red = 0 '\000'}}
     (gdb)
+
+Connect to Debugger
+-------------------
+
+This command provides the ability to connect and debug GDB Python Script using IDE.
+
+Connect to ``PyCharm`` / ``VSCode`` / ``Eclipse(not support yet)``
+
+``debugger -t pycharm``
+
+``debugger -t vscode``
+
+``debugger -t eclipse``
+
+How to use it specifically, search ``pydevd_pycharm`` / ``debugpy`` for details.
