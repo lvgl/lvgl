@@ -997,6 +997,24 @@ static lv_result_t get_pressed_cell(lv_obj_t * obj, uint32_t * row, uint32_t * c
     lv_point_t p;
     lv_indev_get_point(lv_indev_active(), &p);
 
+    /* Calculate total height of rows so we know if the click was outside them */
+    lv_area_t area;
+    lv_obj_get_coords(obj, &area);
+
+    uint8_t idx = 0;
+    int32_t total_row_height = 0;
+
+    for(idx = 0; idx < table->row_cnt; ++idx) {
+        total_row_height += *(table->row_h);
+    }
+
+    /* Clicked outside rows on empty space */
+    if(p.y > (total_row_height + area.y1)) {
+        if(col) *col = LV_TABLE_CELL_NONE;
+        if(row) *row = LV_TABLE_CELL_NONE;
+        return LV_RESULT_INVALID;
+    }
+
     int32_t tmp;
     if(col) {
         int32_t x = p.x + lv_obj_get_scroll_x(obj);
