@@ -90,9 +90,50 @@ void lv_vg_lite_dump_info(void)
                     ret ? "YES" : "NO");
     }
 
-    vg_lite_uint32_t mem_avail = 0;
-    vg_lite_get_mem_size(&mem_avail);
-    LV_LOG_USER("Memory Available: %" LV_PRId32 " Bytes", (uint32_t)mem_avail);
+    vg_lite_uint32_t mem_size = 0;
+    vg_lite_get_mem_size(&mem_size);
+    LV_LOG_USER("Memory size: %" LV_PRId32 " Bytes", (uint32_t)mem_size);
+}
+
+void lv_vg_lite_error_dump_info(vg_lite_error_t error)
+{
+    LV_LOG_USER("Error code: %d(%s)", (int)error, lv_vg_lite_error_string(error));
+    switch(error) {
+        case VG_LITE_SUCCESS:
+            LV_LOG_USER("No error");
+            break;
+
+        case VG_LITE_OUT_OF_MEMORY:
+        case VG_LITE_OUT_OF_RESOURCES: {
+                vg_lite_uint32_t mem_size = 0;
+                vg_lite_error_t ret = vg_lite_get_mem_size(&mem_size);
+                if(ret != VG_LITE_SUCCESS) {
+                    LV_LOG_ERROR("vg_lite_get_mem_size error: %d(%s)",
+                                 (int)ret, lv_vg_lite_error_string(ret));
+                    return;
+                }
+
+                LV_LOG_USER("Memory size: %" LV_PRId32 " Bytes", (uint32_t)mem_size);
+            }
+            break;
+
+        case VG_LITE_TIMEOUT:
+        case VG_LITE_FLEXA_TIME_OUT: {
+                vg_lite_error_t ret = vg_lite_dump_command_buffer();
+                if(ret != VG_LITE_SUCCESS) {
+                    LV_LOG_ERROR("vg_lite_dump_command_buffer error: %d(%s)",
+                                 (int)ret, lv_vg_lite_error_string(ret));
+                    return;
+                }
+
+                LV_LOG_USER("Command buffer finished");
+            }
+            break;
+
+        default:
+            lv_vg_lite_dump_info();
+            break;
+    }
 }
 
 const char * lv_vg_lite_error_string(vg_lite_error_t error)
