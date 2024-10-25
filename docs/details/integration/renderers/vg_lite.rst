@@ -1,8 +1,8 @@
-.. _vglite:
+.. _vg_lite:
 
-===============
-NXP VG-Lite GPU
-===============
+===================
+VG-Lite General GPU
+===================
 
 This is a generic VG-Lite rendering backend implementation that is designed to utilize
 `VeriSilicon <https://verisilicon.com/>`_'s generic API to operate GPU hardware as much as possible.
