@@ -727,18 +727,6 @@ menu "LVGL configuration"
 			int "Required alignment size for buffers"
 			default 1
 
-		config LV_ATTRIBUTE_MEM_ALIGN
-			string "Will be added where memories needs to be aligned (with -Os data might not be aligned to boundary by default)."
-			default ""
-			help
-				E.g. __attribute__((aligned(LV_ATTRIBUTE_MEM_ALIGN_SIZE)))
-
-		config LV_ATTRIBUTE_LARGE_CONST
-			string "Attribute to mark large constant arrays for example font's bitmaps"
-			default ""
-			help
-				E.g. __attribute__((section("DataQuickAccess"))) 
-
 		config LV_ATTRIBUTE_FAST_MEM_USE_IRAM
 			bool "Set IRAM as LV_ATTRIBUTE_FAST_MEM"
 			help
@@ -1357,13 +1345,6 @@ menu "LVGL configuration"
 		config LV_USE_SYSMON
 			bool "Enable system monitor component"
 			default n
-
-		config LV_SYSMON_GET_IDLE
-			string "Get the idle percentage."
-			depends on LV_USE_SYSMON
-			default "lv_timer_get_idle"
-			help
-				E.g. uint32_t my_get_idle(void);
 
 		config LV_USE_PERF_MONITOR
 			bool "Show CPU usage and FPS count"
