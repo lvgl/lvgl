@@ -122,9 +122,9 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
                 return LV_RESULT_INVALID;
             }
 
-            lv_display_t * disp = lv_display_get_default();
-            width = disp->hor_res;
-            height = disp->ver_res;
+            width = 1;
+            width = 1;
+            header->flags |= LV_IMAGE_FLAGS_AUTO_STRETCH;
         }
         else {
             const lv_image_dsc_t * img_dsc = src_data;
