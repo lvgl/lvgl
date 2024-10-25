@@ -1003,9 +1003,14 @@ static lv_result_t get_pressed_cell(lv_obj_t * obj, uint32_t * row, uint32_t * c
 
     uint8_t idx = 0;
     int32_t total_row_height = 0;
+    int32_t total_column_width = 0;
 
     for(idx = 0; idx < table->row_cnt; ++idx) {
         total_row_height += *(table->row_h);
+    }
+
+    for(idx = 0; idx < table->col_cnt; ++idx) {
+        total_column_width += *(table->col_w);
     }
 
     /* Clicked outside rows on empty space */
@@ -1014,6 +1019,13 @@ static lv_result_t get_pressed_cell(lv_obj_t * obj, uint32_t * row, uint32_t * c
         if(row) *row = LV_TABLE_CELL_NONE;
         return LV_RESULT_INVALID;
     }
+    /* Clicked outside columns on empty space */
+    else if(p.x > (total_column_width + area.x1)) {
+        if(col) *col = LV_TABLE_CELL_NONE;
+        if(row) *row = LV_TABLE_CELL_NONE;
+        return LV_RESULT_INVALID;
+    }
+    else { /*Nothing to do*/ }
 
     int32_t tmp;
     if(col) {
