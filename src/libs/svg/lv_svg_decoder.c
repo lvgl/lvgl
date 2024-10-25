@@ -82,8 +82,9 @@ void lv_svg_decoder_deinit(void)
  **********************/
 static bool _valid_svg_data(const uint8_t * data, uint32_t data_size)
 {
-    return (lv_memcmp(data, "<svg", data_size) == 0)
-           || (lv_memcmp(data, "<?xml", data_size) == 0);
+    if(data_size < 4) return false;
+    return (lv_memcmp(data, "<svg", 4) == 0)
+           || (lv_memcmp(data, "<?xml", 5) == 0);
 }
 
 static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * src,
