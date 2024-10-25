@@ -234,6 +234,10 @@ int lv_strcmp(const char * s1, const char * s2)
 
 int lv_strncmp(const char * s1, const char * s2, size_t len)
 {
+    if(len == 0) {
+        return 0;
+    }
+
     while(len > 0 && *s1 && (*s1 == *s2)) {
         if(--len == 0) {
             return 0;
