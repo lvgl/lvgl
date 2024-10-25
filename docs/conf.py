@@ -280,6 +280,9 @@ StandaloneHTMLBuilder.supported_image_types = [
 # Converting quotation marks and ellipses is NOT done because the default
 # `smartquotes_action` 'qDe' is changed to just 'D' below, which accomplishes
 # the dash conversions as desired.
+#
+# For list of all possible smartquotes_action values, see:
+#     https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-smartquotes_action
 smartquotes = True
 smartquotes_action = 'D'
 
@@ -290,14 +293,29 @@ repo_commit_hash = _git_commit_ref
 # The below generates .HTML page redirects for pages that have been moved.
 # Browsers are redirected via `<meta http-equiv="refresh" content="0; url=new_url">`.
 redirects = {
-    "get-started/index": "../intro/basics.html#going-deeper"           ,
-    "integration/index": "../details/integration/index.html"           ,
-    "porting/index":     "../intro/add-lvgl-to-your-project/index.html",
-    "overview/index":    "../details/main-components/index.html"       ,
-    "layouts/index":     "../details/base-widget/layouts/index.html"   ,
-    "libs/index":        "../details/libs/index.html"                  ,
-    "others/index":      "../details/other-components/index.html"
-
+    "get-started/index":                "../intro/basics.html#going-deeper"                     ,
+    "get-started/platforms/espressif":  "../details/integration/chip/espressif.html"            ,
+    "get-started/quick-overview":       "../intro/basics.html"                                  ,
+    "integration/building/cmake":       "../details/integration/building/cmake.html"            ,
+    "integration/framework/arduino":    "../details/integration/framework/arduino.html"         ,
+    "integration/ide/pc-simulator":     "../details/integration/ide/pc-simulator.html"          ,
+    "integration/index":                "../details/integration/index.html"                     ,
+    "integration/os/nuttx":             "../details/integration/os/nuttx.html"                  ,
+    "integration/os/rt-thread":         "../details/integration/os/rt-thread.html"              ,
+    "integration/os/zephyr":            "../details/integration/os/zephyr.html"                 ,
+    "layouts/flex":                     "../details/base-widget/layouts/flex.html"              ,
+    "layouts/grid":                     "../details/base-widget/layouts/grid.html"              ,
+    "layouts/index":                    "../details/base-widget/layouts/index.html"             ,
+    "libs/index":                       "../details/libs/index.html"                            ,
+    "others/index":                     "../details/other-components/index.html"                ,
+    "overview/display":                 "../details/main-components/display.html"               ,
+    "overview/index":                   "../details/main-components/index.html"                 ,
+    "overview/index":                   "../details/main-components/index.html"                 ,
+    "overview/style":                   "../details/overview/style.html"                        ,
+    "porting/indev":                    "../details/details/main-components/indev.html"         ,
+    "porting/index":                    "../intro/add-lvgl-to-your-project/index.html"          ,
+    "porting/project":                  "../intro/add-lvgl-to-your-project/connecting_lvgl.html",
+    "widgets/index":                    "../details/widgets/index.html"                         ,
 }
 
 # Example configuration for intersphinx: refer to the Python standard library.
