@@ -80,6 +80,13 @@ void lv_svg_decoder_deinit(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+static bool _valid_svg_data(const uint8_t * data, uint32_t data_size)
+{
+    if(data_size < 4) return false;
+    return (lv_memcmp(data, "<svg", 4) == 0)
+           || (lv_memcmp(data, "<?xml", 5) == 0);
+}
+
 static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * src,
                                     lv_image_header_t * header)
 {
@@ -99,12 +106,19 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
             }
 
             uint32_t rn;
-            lv_fs_read(&src->file, buf, sizeof(buf), &rn);
+            lv_fs_res_t res;
+            res = lv_fs_read(&src->file, buf, sizeof(buf), &rn);
+            if(res != LV_FS_RES_OK) {
+                LV_LOG_WARN("can't open %s", (char *)src_data);
+                return LV_RESULT_INVALID;
+            }
 
-            if(rn != sizeof(buf)) return LV_RESULT_INVALID;
+            if(rn != sizeof(buf)) {
+                LV_LOG_WARN("failed to read %s header, just %u bytes", rn);
+                return LV_RESULT_INVALID;
+            }
 
-            if(lv_memcmp(buf, "<?xml", 5) != 0
-               && lv_memcmp(buf, "<svg", 4) != 0)  {
+            if(!_valid_svg_data(buf, rn)) {
                 return LV_RESULT_INVALID;
             }
 
@@ -114,13 +128,11 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
         }
         else {
             const lv_image_dsc_t * img_dsc = src_data;
-            const uint32_t data_size = img_dsc->data_size;
+            uint32_t data_size = img_dsc->data_size;
             width = img_dsc->header.w;
             height = img_dsc->header.h;
 
-            if(data_size < 4) return LV_RESULT_INVALID;
-            if(lv_memcmp(img_dsc->data, "<?xml", 5) != 0
-               && lv_memcmp(img_dsc->data, "<svg", 4) != 0)  {
+            if(!_valid_svg_data(img_dsc->data, data_size)) {
                 return LV_RESULT_INVALID;
             }
         }
@@ -207,7 +219,7 @@ static lv_result_t svg_decoder_open(lv_image_decoder_t * decoder, lv_image_decod
         lv_cache_entry_t * entry = lv_image_decoder_add_to_cache(decoder, &search_key, draw_buf, NULL);
 
         if(entry == NULL) {
-            lv_draw_buf_destroy_user(&_svg_draw_buf_handler, draw_buf);
+            lv_draw_buf_destroy(draw_buf);
             LV_PROFILER_DECODER_END_TAG("lv_svg_decoder_open");
             return LV_RESULT_INVALID;
         }
@@ -223,7 +235,7 @@ static void svg_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc
     LV_UNUSED(decoder); /*Unused*/
 
     if(dsc->args.no_cache ||
-       !lv_image_cache_is_enabled()) lv_draw_buf_destroy_user(&_svg_draw_buf_handler, (lv_draw_buf_t *)dsc->decoded);
+       !lv_image_cache_is_enabled()) lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
 }
 
 static uint8_t * alloc_file(const char * filename, uint32_t * size)
@@ -260,7 +272,7 @@ static uint8_t * alloc_file(const char * filename, uint32_t * size)
     /*Read file to buffer*/
     data = lv_malloc(data_size);
     if(data == NULL) {
-        LV_LOG_WARN("malloc failed for data");
+        LV_LOG_WARN("malloc failed for data size %u", data_size);
         goto failed;
     }
 
@@ -292,6 +304,8 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
     const lv_draw_buf_t * draw_buf = dsc->decoded;
     const lv_svg_render_obj_t * list = draw_buf->unaligned_data;
 
+    LV_PROFILER_DRAW_BEGIN;
+
     lv_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
     lv_matrix_t matrix;
     lv_matrix_identity(&matrix);
@@ -306,6 +320,8 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
     lv_draw_svg_render(ctx, list);
     lv_draw_vector(ctx);
     lv_vector_dsc_delete(ctx);
+
+    LV_PROFILER_DRAW_END;
 }
 
 #endif /*LV_USE_SVG*/
