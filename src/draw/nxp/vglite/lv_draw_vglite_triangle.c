@@ -114,9 +114,6 @@ static void _vglite_draw_triangle(const lv_area_t * coords, const lv_area_t * cl
                                          (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
                                          ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
-    vg_lite_matrix_t matrix;
-    vg_lite_identity(&matrix);
-
     /* Init Color */
     lv_color32_t col32 = lv_color_to_32(dsc->bg_color, dsc->bg_opa);
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
@@ -164,11 +161,11 @@ static void _vglite_draw_triangle(const lv_area_t * coords, const lv_area_t * cl
             vg_lite_scale((float)width / 256.0f, 1.0f, grad_matrix);
         }
 
-        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, &gradient,
+        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, NULL, &gradient,
                                                  VG_LITE_BLEND_SRC_OVER));
     }
     else {
-        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol));
+        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
     }
 
     vglite_run();

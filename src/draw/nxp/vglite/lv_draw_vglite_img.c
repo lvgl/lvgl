@@ -389,10 +389,6 @@ static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * 
                                          (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
                                          ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
-    /* Path Matrix */
-    vg_lite_matrix_t path_matrix;
-    vg_lite_identity(&path_matrix);
-
     /* Pattern Image */
     vg_lite_buffer_t * src_vgbuf = vglite_get_src_buf();
     src_vgbuf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
@@ -413,7 +409,7 @@ static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * 
     vg_lite_filter_t filter = has_transform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
 
     /* Draw Pattern */
-    VGLITE_CHECK_ERROR(vg_lite_draw_pattern(dst_vgbuf, &path, VG_LITE_FILL_NON_ZERO, &path_matrix,
+    VGLITE_CHECK_ERROR(vg_lite_draw_pattern(dst_vgbuf, &path, VG_LITE_FILL_NON_ZERO, NULL,
                                             src_vgbuf, &vgmatrix, vgblend, VG_LITE_PATTERN_REPEAT,
                                             0, vgcol, filter));
 }
