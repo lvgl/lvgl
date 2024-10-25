@@ -114,7 +114,7 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
             }
 
             if(rn != sizeof(buf)) {
-                LV_LOG_WARN("failed to read %s header, just %u bytes", rn);
+                LV_LOG_WARN("failed to read %s header, just %u bytes", (char *)src_data, rn);
                 return LV_RESULT_INVALID;
             }
 
