@@ -17,7 +17,7 @@ It's huge release with many interesting updates:
 - SDL renderer improvements (supporting all draw task types and improving speed)
 - Radial, Conic, and Skew `gradients supported <https://docs.lvgl.io/master/details/base-widget/styles/style.html#metallic-knob-with-conic-gradient>`__ by software rendering and VG-Lite
 - :ref:`qnx` and :ref:`mqx` support
-- :ref:`Mouse hover handling <styles_states>`
+- :ref:`Mouse hover handling <style_states>`
 - :ref:`lv_lottie` support
 - CI tests for UEFI builds
 
