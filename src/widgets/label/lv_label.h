@@ -133,7 +133,7 @@ void lv_label_set_text_selection_end(lv_obj_t * obj, uint32_t index);
  * Enable the recoloring by in-line commands
  * @param obj           pointer to a label object
  * @param en            true: enable recoloring, false: disable
- * @example "This is a #ff0000 red# word"
+ * Example: "This is a #ff0000 red# word"
  */
 void lv_label_set_recolor(lv_obj_t * obj, bool en);
 

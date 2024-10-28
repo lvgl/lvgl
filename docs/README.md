@@ -52,7 +52,18 @@ The most important thing that has to be done when contributing to LVGL is ***EVE
 The below are some rules to follow when updating any of the `.rst` files located in the `./docs/` directory and any of it's subdirectories.
 
 
-### index.rst files
+### What to Name Your `.rst` File
+
+The documentation-generation logic uses the stem of the file name (i.e. "event" from file name "event.rst") and compares this with code-element names found by Doxygen.  If a match is found, then it appends hyperlinks to the API pages that contain those code elements (names of macros, enum/struct/union types, variables, namespaces, typedefs and functions).
+
+If this is appropriate for the .RST file you are creating, ensure the stem of the file name matches the beginning part of the code-element name you want it to be associated with.
+
+If this is *not* appropriate for the .RST file you are creating, ensure the stem of the file name DOES NOT match any code-element names found in the LVGL header files under the ./src/ directory.
+
+In alignment with the above, use a file name stem that is appropriate to the topic being covered.
+
+
+### index.rst Files
 
 If you create a new directory you MUST have an `index.rst` file in that directory and that index file needs to be pointed to in the `index.rst` file that is located in the parent directory.
 
@@ -124,6 +135,8 @@ This in-line markup (interpreted text using the Sphinx-defined custom `:ref:` ro
 
 This latter syntax enables you to put a **link target** anywhere in an .RST file (not just above a heading) and link to it using this syntax.
 
+Note:  This latter syntax was either added or fixed in Sphinx recently.  It did not work in Sphinx 7.3.7.
+
 
 
 
@@ -144,19 +157,19 @@ If you are creating a new .RST file, use this convention:
     =====
     Title
     =====
-    
+
     Chapter
     *******
-    
+
     Section
     -------
-    
+
     Sub Section
     ~~~~~~~~~~~
-    
+
     Sub Sub Section
     ^^^^^^^^^^^^^^^
-    
+
     Sub Sub Sub Section
     '''''''''''''''''''
 
@@ -201,7 +214,7 @@ To create a bulleted list, do the following:
       lines to align with item text like this.
     - If you want to include a code block under a list item,
       it must be intended to align with the list item like this:
-    
+
       .. code-block: python
                                  <=== blank line here is important
           # this is some code
@@ -232,22 +245,23 @@ If you want to reference portions of the LVGL code from the documentation (in .R
 
 There is a special directive when wanting to use a more complex expression.  For example when showing the arguments passed to a function.
 
-    :cpp:expr:`lv_obj_set_layout(obj, LV_LAYOUT_FLEX)`
+    :cpp:expr:`lv_obj_set_layout(widget, LV_LAYOUT_FLEX)`
+    :cpp:expr:`lv_slider_set_mode(slider, LV_SLIDER_MODE_...)`
 
 Arguments that are expressions (more than one word), or contain non-alphanumeric characters will cause the `:cpp:expr:` interpreted-text to fail.  Examples:
 
-    :cpp:expr:`lv_obj_set_layout(obj, LV_LAYOUT_FLEX/GRID)`         <== arg with > 1 word
-    :cpp:expr:`lv_obj_set_layout(obj, LV_LAYOUT_*)`                 <== asterisk
-    :cpp:expr:`lv_obj_set_layout(*obj, LV_LAYOUT_FLEX)`             <== asterisk
-    :cpp:expr:`lv_obj_set_layout((lv_obj_t *)obj, LV_LAYOUT_FLEX)`  <== cast
-    :cpp:expr:`lv_obj_set_layout(&obj, LV_LAYOUT_FLEX);`            <== ampersand
-    :cpp:expr:`lv_obj_set_layout(obj, ...)`                         <== elipsis
+    :cpp:expr:`lv_obj_set_layout(widget, LV_LAYOUT_FLEX/GRID)`         <== arg with > 1 word
+    :cpp:expr:`lv_obj_set_layout(widget, LV_LAYOUT_*)`                 <== asterisk
+    :cpp:expr:`lv_obj_set_layout(*widget, LV_LAYOUT_FLEX)`             <== asterisk
+    :cpp:expr:`lv_obj_set_layout((lv_obj_t *)widget, LV_LAYOUT_FLEX)`  <== cast
+    :cpp:expr:`lv_obj_set_layout(&widget, LV_LAYOUT_FLEX);`            <== ampersand & semicolon
+    :cpp:expr:`lv_obj_set_layout(widget, ...)`                         <== lone elipsis
 
 For such examples, simply use reStructuredText literal markup like this:
 
-    ``lv_obj_set_layout(obj, LV_LAYOUT_FLEX/GRID)``
-    ``lv_obj_set_layout(obj, LV_LAYOUT_*)``
-    ``lv_obj_set_layout(*obj, LV_LAYOUT_FLEX)``
-    ``lv_obj_set_layout((lv_obj_t *)obj, LV_LAYOUT_FLEX)``
-    ``lv_obj_set_layout(&obj, LV_LAYOUT_FLEX);``
-    ``lv_obj_set_layout(obj, ...)``
+    ``lv_obj_set_layout(widget, LV_LAYOUT_FLEX/GRID)``
+    ``lv_obj_set_layout(widget, LV_LAYOUT_*)``
+    ``lv_obj_set_layout(*widget, LV_LAYOUT_FLEX)``
+    ``lv_obj_set_layout((lv_obj_t *)widget, LV_LAYOUT_FLEX)``
+    ``lv_obj_set_layout(&widget, LV_LAYOUT_FLEX);``
+    ``lv_obj_set_layout(widget, ...)``

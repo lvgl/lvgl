@@ -78,7 +78,7 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->color_format = LV_COLOR_FORMAT_NATIVE;
 
 
-#if defined(LV_DRAW_SW_DRAW_UNIT_CNT)
+#if defined(LV_DRAW_SW_DRAW_UNIT_CNT) && (LV_DRAW_SW_DRAW_UNIT_CNT != 0)
     disp->tile_cnt = LV_DRAW_SW_DRAW_UNIT_CNT;
 #else
     disp->tile_cnt = 1;
