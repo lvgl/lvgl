@@ -64,7 +64,7 @@ struct _lv_chart_t {
     uint32_t vdiv_cnt;          /**< Number of vertical division lines*/
     uint32_t point_cnt;         /**< Point number in a data line*/
     lv_chart_type_t type  : 3;  /**< Line or column chart*/
-    lv_chart_update_mode_t update_mode : 1;
+    lv_chart_update_mode_t update_mode : 2;
 };
 
 

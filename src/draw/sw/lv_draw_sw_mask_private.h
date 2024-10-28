@@ -53,7 +53,7 @@ struct _lv_draw_sw_mask_line_param_t {
         lv_point_t p2;
 
         /*Which side to keep?*/
-        lv_draw_sw_mask_line_side_t side : 2;
+        lv_draw_sw_mask_line_side_t side : 3;
     } cfg;
 
     /** A point of the line */
