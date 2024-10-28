@@ -35,8 +35,12 @@ int         event_count;
 int         saved_scroll_x;
 int         saved_scroll_y;
 
-void scroll_update_cb(lv_event_t * e)
-{
+static void scroll_update_cb(lv_event_t* e);
+static void button_event_cb(lv_event_t* e);
+
+static void scroll_update_cb(lv_event_t * e) {
+    LV_UNUSED(e);
+
     event_count++;
 
     sprintf(x_value_buffer, "%d", lv_obj_get_scroll_x(scrolling_panel));
