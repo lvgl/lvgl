@@ -593,23 +593,40 @@
 #endif
 
 #if LV_USE_NEMA_GFX
-    #ifndef LV_NEMA_GFX_HAL_INCLUDE
-        #ifdef CONFIG_LV_NEMA_GFX_HAL_INCLUDE
-            #define LV_NEMA_GFX_HAL_INCLUDE CONFIG_LV_NEMA_GFX_HAL_INCLUDE
+    /*Compile the HAL implementation for Nema provided by LVGL. Disable to use your own*/
+    #ifndef LV_USE_PROVIDED_NEMA_GFX_HAL
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_PROVIDED_NEMA_GFX_HAL
+                #define LV_USE_PROVIDED_NEMA_GFX_HAL CONFIG_LV_USE_PROVIDED_NEMA_GFX_HAL
+            #else
+                #define LV_USE_PROVIDED_NEMA_GFX_HAL 0
+            #endif
         #else
-            #define LV_NEMA_GFX_HAL_INCLUDE <stm32u5xx_hal.h>
+            #define LV_USE_PROVIDED_NEMA_GFX_HAL 1
+        #endif
+    #endif
+    #if LV_USE_PROVIDED_NEMA_GFX_HAL
+        #ifndef LV_NEMA_GFX_HAL_INCLUDE
+            #ifdef CONFIG_LV_NEMA_GFX_HAL_INCLUDE
+                #define LV_NEMA_GFX_HAL_INCLUDE CONFIG_LV_NEMA_GFX_HAL_INCLUDE
+            #else
+                #define LV_NEMA_GFX_HAL_INCLUDE <stm32u5xx_hal.h>
+            #endif
         #endif
     #endif
 
     /*Enable Vector Graphics Operations. Available only if NemaVG library is present*/
     #ifndef LV_USE_NEMA_VG
-        #ifdef CONFIG_LV_USE_NEMA_VG
-            #define LV_USE_NEMA_VG CONFIG_LV_USE_NEMA_VG
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_NEMA_VG
+                #define LV_USE_NEMA_VG CONFIG_LV_USE_NEMA_VG
+            #else
+                #define LV_USE_NEMA_VG 0
+            #endif
         #else
-            #define LV_USE_NEMA_VG 0
+            #define LV_USE_NEMA_VG 1
         #endif
     #endif
-
     #if LV_USE_NEMA_VG
         /*Define application's resolution used for VG related buffer allocation */
         #ifndef LV_NEMA_GFX_MAX_RESX

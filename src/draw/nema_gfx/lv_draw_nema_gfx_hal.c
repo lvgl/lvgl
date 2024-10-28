@@ -12,11 +12,13 @@
 #include "../../lv_conf_internal.h"
 #if LV_USE_NEMA_GFX
 
+#if LV_USE_PROVIDED_NEMA_GFX_HAL
+
 #include "../../misc/lv_types.h"
 #include "../../misc/lv_assert.h"
 #include "../../stdlib/lv_string.h"
 
-#include "config.h"
+#include "lv_draw_nema_gfx_config.h" /* This config file is for Nema only. */
 #include <nema_sys_defs.h>
 #include <nema_core.h>
 
@@ -259,5 +261,7 @@ void platform_invalidate_cache(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+#endif /* LV_USE_PROVIDED_NEMA_GFX_HAL */
 
 #endif /* LV_USE_NEMA_GFX */

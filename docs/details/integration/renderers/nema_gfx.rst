@@ -1,12 +1,12 @@
-.. _stm32_nema_gfx:
+.. _nema_gfx:
 
-===================================
-NemaGFX Acceleration (AKA NeoChrom)
-===================================
+====================
+NemaGFX Acceleration
+====================
 
-Some of the more powerful STM32 MCUs such as the
-STM32U5 feature a 2.5D GPU which can natively draw most
-LVGL primitives.
+NemaGFX is a high-level graphics API supported
+by many embedded 2.5D GPUs. LVGL can use it to
+natively render LVGL graphics.
 
 Get Started with the Riverdi STM32U5 5-inch Display
 ***************************************************
@@ -51,8 +51,9 @@ and not yet working in
 "src/draw/nema_gfx/lv_draw_nema_gfx_hal.c" implements the HAL functionality
 required by Nema to allocate memory and lock resources (in this implementation,
 no locking is done). It may conflict with existing definitions
-if you have an existing Nema HAL implementation. You may
-simply be able to remove yours.
+if you have an existing Nema HAL implementation. You may eliminate the conflict
+by setting :c:macro:`LV_USE_PROVIDED_NEMA_GFX_HAL` to ``0`` to stop LVGL's
+Nema GFX HAL implementation from compiling.
 
 TSC Images
 **********
