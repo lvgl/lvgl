@@ -27,27 +27,37 @@ static void event_cb(lv_event_t * e)
             int32_t * y_array = lv_chart_get_y_array(chart, ser);
             int32_t value = y_array[id];
 
-            char buf[16];
-            lv_snprintf(buf, sizeof(buf), LV_SYMBOL_DUMMY"$%d", value);
-
+            /*Draw a rectangle above the clicked point*/
+            lv_layer_t * layer = lv_event_get_layer(e);
             lv_draw_rect_dsc_t draw_rect_dsc;
             lv_draw_rect_dsc_init(&draw_rect_dsc);
             draw_rect_dsc.bg_color = lv_color_black();
             draw_rect_dsc.bg_opa = LV_OPA_50;
             draw_rect_dsc.radius = 3;
-            draw_rect_dsc.bg_image_src = buf;
-            draw_rect_dsc.bg_image_recolor = lv_color_white();
 
             lv_area_t chart_obj_coords;
             lv_obj_get_coords(chart, &chart_obj_coords);
-            lv_area_t a;
-            a.x1 = chart_obj_coords.x1 + p.x - 20;
-            a.x2 = chart_obj_coords.x1 + p.x + 20;
-            a.y1 = chart_obj_coords.y1 + p.y - 30;
-            a.y2 = chart_obj_coords.y1 + p.y - 10;
+            lv_area_t rect_area;
+            rect_area.x1 = chart_obj_coords.x1 + p.x - 20;
+            rect_area.x2 = chart_obj_coords.x1 + p.x + 20;
+            rect_area.y1 = chart_obj_coords.y1 + p.y - 30;
+            rect_area.y2 = chart_obj_coords.y1 + p.y - 10;
+            lv_draw_rect(layer, &draw_rect_dsc, &rect_area);
 
-            lv_layer_t * layer = lv_event_get_layer(e);
-            lv_draw_rect(layer, &draw_rect_dsc, &a);
+            /*Draw the value as label to the center of the rectangle*/
+            char buf[16];
+            lv_snprintf(buf, sizeof(buf), LV_SYMBOL_DUMMY"$%d", value);
+
+            lv_draw_label_dsc_t draw_label_dsc;
+            lv_draw_label_dsc_init(&draw_label_dsc);
+            draw_label_dsc.color = lv_color_white();
+            draw_label_dsc.text = buf;
+            draw_label_dsc.text_local = 1;
+            draw_label_dsc.align = LV_TEXT_ALIGN_CENTER;
+            lv_area_t label_area = rect_area;
+            lv_area_set_height(&label_area, lv_font_get_line_height(draw_label_dsc.font));
+            lv_area_align(&rect_area, &label_area, LV_ALIGN_CENTER, 0, 0);
+            lv_draw_label(layer, &draw_label_dsc, &label_area);
 
             ser = lv_chart_get_series_next(chart, ser);
         }
