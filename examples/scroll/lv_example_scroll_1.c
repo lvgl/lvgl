@@ -35,7 +35,8 @@ int         event_count;
 int         saved_scroll_x;
 int         saved_scroll_y;
 
-void scroll_update_cb(lv_event_t* e) {
+void scroll_update_cb(lv_event_t * e)
+{
     event_count++;
 
     sprintf(x_value_buffer, "%d", lv_obj_get_scroll_x(scrolling_panel));
@@ -54,13 +55,15 @@ void scroll_update_cb(lv_event_t* e) {
     lv_label_set_text_static(event_count_value_label, event_count_buffer);
 }
 
-void button_event_cb(lv_event_t* e) {
+void button_event_cb(lv_event_t * e)
+{
     lv_obj_t * obj = lv_event_get_user_data(e);
 
-    if (obj == save_button) {
+    if(obj == save_button) {
         saved_scroll_x = lv_obj_get_scroll_x(scrolling_panel);
         saved_scroll_y = lv_obj_get_scroll_y(scrolling_panel);
-    } else {
+    }
+    else {
         lv_obj_scroll_to(scrolling_panel, saved_scroll_x, saved_scroll_y, LV_ANIM_ON);
     }
 }
@@ -110,7 +113,7 @@ void lv_example_scroll_1(void)
     lv_style_set_text_align(&value_label_style, LV_TEXT_ALIGN_RIGHT);
     lv_style_set_size(&value_label_style, value_label_width, line_height - 1);
 
-    lv_obj_t* scr;
+    lv_obj_t * scr;
     scr = lv_screen_active();
     x_value_label = lv_label_create(scr);
     y_value_label = lv_label_create(scr);
