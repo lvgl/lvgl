@@ -88,8 +88,8 @@ algum suporte durante o desenvolvimento de seu próximo projeto de GUI.
    dependências externas.
 -  Pode ser compilado para qualquer display MCU ou MPU, e qualquer
    sistema operacional de tempo real (RT-OS).
--  Suporta monitores monocromáticos, ePaper, OLED ou TFT. :ref:`Guia de
-   portabilidade <initializing_lvgl>`
+-  Suporta monitores monocromáticos, ePaper, OLED ou TFT. `Guia de
+   portabilidade <https://docs.lvgl.io/master/intro/add-lvgl-to-your-project/connecting_lvgl.html>`__
 -  Distribuído sob a licença do MIT, para que você também possa usá-lo
    facilmente em projetos comerciais.
 -  Precisa de apenas 32 kB de RAM e 128 kB de Flash, um frame buffer e
@@ -126,7 +126,7 @@ algum suporte durante o desenvolvimento de seu próximo projeto de GUI.
 -  Nenhum sistema de compilação personalizado é usado. Você pode
    construir o LVGL enquanto constrói os outros arquivos do seu projeto.
 -  O suporte para Make e
-   :ref:`CMake <build_cmake>`
+   `CMake <https://docs.lvgl.io/master/details/integration/building/cmake.html>`__
    já vem incluído.
 -  `Desenvolva no
    PC <https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html>`__
@@ -614,7 +614,7 @@ Esta lista irá guiá-lo para começar com o LVGL passo a passo.
    `introdução <https://docs.lvgl.io/master/intro/index.html>`__ da
    documentação (~5 minutos)
 3. Familiarize-se com o básico na página de `visão geral
-   rápida <https://docs.lvgl.io/master/intro/overview.html>`__
+   rápida <https://docs.lvgl.io/master/intro/basics.html>`__
    (~15 minutos)
 
 **Começando a usar o LVGL**
@@ -632,7 +632,7 @@ Esta lista irá guiá-lo para começar com o LVGL passo a passo.
 **Torne-se um profissional**
 
 7. Leia a página `visão
-   geral <https://docs.lvgl.io/master/details/modules/index.html>`__ para
+   geral <https://docs.lvgl.io/master/details/main-components/index.html>`__ para
    entender melhor a biblioteca (~2-3 horas)
 8. Verifique a documentação dos
    `widgets <https://docs.lvgl.io/master/details/widgets/index.html>`__ para ver
