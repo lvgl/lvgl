@@ -44,7 +44,7 @@ Our team is ready to help you with graphics design, UI implementation and consul
 **Free and Portable**
   - A fully portable C (C++ compatible) library with no external dependencies.
   - Can be compiled to any MCU or MPU, with any (RT)OS.
-  - Supports monochrome, ePaper, OLED or TFT displays, or even monitors. [Porting Guide](https://docs.lvgl.io/master/porting/project.html)
+  - Supports monochrome, ePaper, OLED or TFT displays, or even monitors. [Displays](https://docs.lvgl.io/master/details/main-components/display.html)
   - Distributed under the MIT license, so you can easily use it in commercial projects too.
   - Needs only 32kB RAM and 128 kB Flash, a frame buffer, and at least an 1/10 screen sized buffer for rendering.
   - OS, External memory and GPU are supported but not required.
