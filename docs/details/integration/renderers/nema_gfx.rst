@@ -52,7 +52,7 @@ and not yet working in
 required by Nema to allocate memory and lock resources (in this implementation,
 no locking is done). It may conflict with existing definitions
 if you have an existing Nema HAL implementation. You may eliminate the conflict
-by setting :c:macro:`LV_USE_PROVIDED_NEMA_GFX_HAL` to ``0`` to stop LVGL's
+by setting :c:macro:`LV_USE_PROVIDED_NEMA_GFX_HAL_FOR_STM32` to ``0`` to stop LVGL's
 Nema GFX HAL implementation from compiling.
 
 TSC Images

@@ -211,8 +211,8 @@
 
 #if LV_USE_NEMA_GFX
     /*Compile the HAL implementation for Nema provided by LVGL. Disable to use your own*/
-    #define LV_USE_PROVIDED_NEMA_GFX_HAL 1
-    #if LV_USE_PROVIDED_NEMA_GFX_HAL
+    #define LV_USE_PROVIDED_NEMA_GFX_HAL_FOR_STM32 1
+    #if LV_USE_PROVIDED_NEMA_GFX_HAL_FOR_STM32
         #define LV_NEMA_GFX_HAL_INCLUDE <stm32u5xx_hal.h>
     #endif
 

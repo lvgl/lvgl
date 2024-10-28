@@ -594,18 +594,18 @@
 
 #if LV_USE_NEMA_GFX
     /*Compile the HAL implementation for Nema provided by LVGL. Disable to use your own*/
-    #ifndef LV_USE_PROVIDED_NEMA_GFX_HAL
+    #ifndef LV_USE_PROVIDED_NEMA_GFX_HAL_FOR_STM32
         #ifdef LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_USE_PROVIDED_NEMA_GFX_HAL
-                #define LV_USE_PROVIDED_NEMA_GFX_HAL CONFIG_LV_USE_PROVIDED_NEMA_GFX_HAL
+            #ifdef CONFIG_LV_USE_PROVIDED_NEMA_GFX_HAL_FOR_STM32
+                #define LV_USE_PROVIDED_NEMA_GFX_HAL_FOR_STM32 CONFIG_LV_USE_PROVIDED_NEMA_GFX_HAL_FOR_STM32
             #else
-                #define LV_USE_PROVIDED_NEMA_GFX_HAL 0
+                #define LV_USE_PROVIDED_NEMA_GFX_HAL_FOR_STM32 0
             #endif
         #else
-            #define LV_USE_PROVIDED_NEMA_GFX_HAL 1
+            #define LV_USE_PROVIDED_NEMA_GFX_HAL_FOR_STM32 1
         #endif
     #endif
-    #if LV_USE_PROVIDED_NEMA_GFX_HAL
+    #if LV_USE_PROVIDED_NEMA_GFX_HAL_FOR_STM32
         #ifndef LV_NEMA_GFX_HAL_INCLUDE
             #ifdef CONFIG_LV_NEMA_GFX_HAL_INCLUDE
                 #define LV_NEMA_GFX_HAL_INCLUDE CONFIG_LV_NEMA_GFX_HAL_INCLUDE
