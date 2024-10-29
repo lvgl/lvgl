@@ -15,12 +15,16 @@ static void scroll_update_cb(lv_event_t * e)
 {
     LV_UNUSED(e);
 
-    LV_LOG_USER("[%d] lv_obj_get_scroll_x(panel)", lv_obj_get_scroll_x(panel));
-    LV_LOG_USER("[%d] lv_obj_get_scroll_y(panel)", lv_obj_get_scroll_y(panel));
-    LV_LOG_USER("[%d] lv_obj_get_scroll_top(panel)", lv_obj_get_scroll_top(panel));
-    LV_LOG_USER("[%d] lv_obj_get_scroll_bottom(panel)", lv_obj_get_scroll_bottom(panel));
-    LV_LOG_USER("[%d] lv_obj_get_scroll_left(panel)", lv_obj_get_scroll_left(panel));
-    LV_LOG_USER("[%d] lv_obj_get_scroll_right(panel)", lv_obj_get_scroll_right(panel));
+    LV_LOG_USER(
+            "lv_obj_get_scroll_...() results:\n"
+            "  x[%d] y[%d] top[%d] bottom[%d] left[%d] right[%d]",
+            lv_obj_get_scroll_x(panel),
+            lv_obj_get_scroll_y(panel),
+            lv_obj_get_scroll_top(panel),
+            lv_obj_get_scroll_bottom(panel),
+            lv_obj_get_scroll_left(panel),
+            lv_obj_get_scroll_right(panel)
+            );
 }
 
 void button_event_cb(lv_event_t * e)
