@@ -5,7 +5,6 @@ Scrolling
 =========
 
 
-
 Overview
 ********
 
@@ -143,8 +142,8 @@ Scroll momentum
 ---------------
 
 When the user scrolls a Widget and releases it, LVGL can emulate
-inertial momentum for the scrolling. It's like the Widget was "thrown" (a
-:ref:`gesture <indev_gestures>`) and scrolling slows down smoothly.
+inertial momentum for the scrolling. It's like the Widget was "thrown"
+and scrolling slows down smoothly.
 
 Scroll momentum can be enabled/disabled with the
 :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_MOMENTUM` flag.
