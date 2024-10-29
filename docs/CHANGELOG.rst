@@ -3,7 +3,7 @@
 Changelog
 =========
 
-`v9.2.0 <https://github.com/lvgl/lvgl/compare/v9.2.1...v9.2.0>`__ 24 October 2024
+`v9.2.1 <https://github.com/lvgl/lvgl/compare/v9.2.1...v9.2.0>`__ 24 October 2024
 ---------------------------------------------------------------------------------
 
 
