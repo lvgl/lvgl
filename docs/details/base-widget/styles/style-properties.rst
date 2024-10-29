@@ -409,7 +409,7 @@ Sets the padding between the columns. Used by the layouts.
 pad_radial
 ~~~~~~~~~~
 
-Pad text labels away from the scale ticks/remainder of the LV_PART_
+Pad text labels away from the scale ticks/remainder of the ``LV_PART_``
 
 .. raw:: html
 
