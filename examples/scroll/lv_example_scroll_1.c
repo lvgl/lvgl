@@ -90,8 +90,8 @@ void lv_example_scroll_1(void)
     lv_label_set_text_static(lbl, "Save");
     lbl = lv_label_create(restore_button);
     lv_label_set_text_static(lbl, "Restore");
-    lv_obj_align_to(save_button, panel, LV_ALIGN_OUT_LEFT_BOTTOM, -10, -40);
-    lv_obj_align_to(restore_button, panel, LV_ALIGN_OUT_LEFT_BOTTOM, -10, 0);
+    lv_obj_align_to(save_button, panel, LV_ALIGN_OUT_LEFT_MID, -10, -20);
+    lv_obj_align_to(restore_button, panel, LV_ALIGN_OUT_LEFT_MID, -10, 20);
     lv_obj_add_event_cb(save_button, button_event_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_add_event_cb(restore_button, button_event_cb, LV_EVENT_CLICKED, NULL);
 }
