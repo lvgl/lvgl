@@ -452,6 +452,11 @@ lv_observer_t * lv_obj_bind_checked(lv_obj_t * obj, lv_subject_t * subject)
 #if LV_USE_LABEL
 lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt)
 {
+    if((subject == NULL) || (obj == NULL)) {
+        LV_LOG_WARN("NULL pointer");
+        return NULL;
+    }
+
     if(fmt == NULL) {
         if(subject->type != LV_SUBJECT_TYPE_STRING && subject->type != LV_SUBJECT_TYPE_POINTER) {
             LV_LOG_WARN("Incompatible subject type: %d", subject->type);
@@ -474,6 +479,11 @@ lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const
 #if LV_USE_ARC
 lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
+    if((subject == NULL) || (obj == NULL)) {
+        LV_LOG_WARN("NULL pointer");
+        return NULL;
+    }
+
     if(subject->type != LV_SUBJECT_TYPE_INT) {
         LV_LOG_WARN("Incompatible subject type: %d", subject->type);
         return NULL;
@@ -489,6 +499,11 @@ lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 #if LV_USE_SLIDER
 lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
+    if((subject == NULL) || (obj == NULL)) {
+        LV_LOG_WARN("NULL pointer");
+        return NULL;
+    }
+
     if(subject->type != LV_SUBJECT_TYPE_INT) {
         LV_LOG_WARN("Incompatible subject type: %d", subject->type);
         return NULL;
@@ -505,6 +520,11 @@ lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 
 lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
+    if((subject == NULL) || (obj == NULL)) {
+        LV_LOG_WARN("NULL pointer");
+        return NULL;
+    }
+
     if(subject->type != LV_SUBJECT_TYPE_INT) {
         LV_LOG_WARN("Incompatible subject type: %d", subject->type);
         return NULL;
@@ -522,6 +542,11 @@ lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 
 lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
+    if((subject == NULL) || (obj == NULL)) {
+        LV_LOG_WARN("NULL pointer");
+        return NULL;
+    }
+
     if(subject->type != LV_SUBJECT_TYPE_INT) {
         LV_LOG_WARN("Incompatible subject type: %d", subject->type);
         return NULL;
@@ -568,6 +593,11 @@ static void unsubscribe_on_delete_cb(lv_event_t * e)
 static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, lv_observer_cb_t cb, uint32_t flag,
                                         int32_t ref_value, bool inv)
 {
+    if((subject == NULL) || (obj == NULL)) {
+        LV_LOG_WARN("NULL pointer");
+        return NULL;
+    }
+
     if(subject->type != LV_SUBJECT_TYPE_INT) {
         LV_LOG_WARN("Incompatible subject type: %d", subject->type);
         return NULL;
