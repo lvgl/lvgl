@@ -7,7 +7,7 @@ static void event_handler0(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_obj_t * other_obj = lv_obj_get_child(lv_obj_get_parent(obj), (1 - lv_obj_get_child_cnt(obj)));
     if(code == LV_EVENT_VALUE_CHANGED) {
-        //Handle style changes
+        /*Handle style changes*/
         if(lv_obj_get_state(obj) == LV_STATE_CHECKED) {
             //If other object is also checked, then trigger an event manually for the 3rd object
             if(lv_obj_get_state(other_obj) == LV_STATE_CHECKED) {

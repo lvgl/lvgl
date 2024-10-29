@@ -45,7 +45,7 @@ way, only a pointer to ``txt`` will be stored. The text then shouldn't
 be deallocated while the checkbox exists.
 
 .. code-block:: c
-   char[] txt0 = "Reginam occidere...";
+   const char * txt0 = "Reginam occidere...";
    lv_checkbox_set_static_text(chechkbox4, txt0); /*Set the text of checkbox4. Ensure txt0 does not get deallocated!*/
 
 Check, uncheck, disable
