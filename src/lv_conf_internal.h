@@ -593,7 +593,7 @@
 #endif
 
 #if LV_USE_NEMA_GFX
-    /*Compile the HAL implementation for Nema provided by LVGL. Disable to use your own*/
+    /*Compile the Nema HAL implementation for STM32 provided by LVGL. Disable to use your own*/
     #ifndef LV_USE_PROVIDED_NEMA_GFX_HAL_FOR_STM32
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_USE_PROVIDED_NEMA_GFX_HAL_FOR_STM32

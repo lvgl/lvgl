@@ -31,49 +31,48 @@
  */
 #ifdef SIMULATOR
 
-#define LOCATION_PRAGMA(name)
-#define LOCATION_PRAGMA_NOLOAD(name)
-#define LOCATION_ATTRIBUTE(name)
-#define LOCATION_ATTRIBUTE_NOLOAD(name)
-#define FORCE_INLINE_FUNCTION inline
-#if defined(__GNUC__)
+    #define LOCATION_PRAGMA(name)
+    #define LOCATION_PRAGMA_NOLOAD(name)
+    #define LOCATION_ATTRIBUTE(name)
+    #define LOCATION_ATTRIBUTE_NOLOAD(name)
+    #define FORCE_INLINE_FUNCTION inline
 
 #elif defined(__GNUC__) && !defined(__ARMCC_VERSION)
 
-// xgcc
-#define LOCATION_PRAGMA(name)
-#define LOCATION_PRAGMA_NOLOAD(name)
-#define LOCATION_ATTRIBUTE(name) __attribute__((section(STR(name)))) __attribute__((aligned(4)))
-#define LOCATION_ATTRIBUTE_NOLOAD(name) __attribute__((section(STR(name)))) __attribute__((aligned(4)))
-#define FORCE_INLINE_FUNCTION __attribute__((always_inline)) inline
+    // xgcc
+    #define LOCATION_PRAGMA(name)
+    #define LOCATION_PRAGMA_NOLOAD(name)
+    #define LOCATION_ATTRIBUTE(name) __attribute__((section(STR(name)))) __attribute__((aligned(4)))
+    #define LOCATION_ATTRIBUTE_NOLOAD(name) __attribute__((section(STR(name)))) __attribute__((aligned(4)))
+    #define FORCE_INLINE_FUNCTION __attribute__((always_inline)) inline
 
 #elif defined __ICCARM__
 
-// IAR
-#define LOCATION_PRAGMA(name) _Pragma(STR(location = name))
-#define LOCATION_PRAGMA_NOLOAD(name) _Pragma(STR(location = name))
-#define LOCATION_ATTRIBUTE(name)
-#define LOCATION_ATTRIBUTE_NOLOAD(name)
-#define FORCE_INLINE_FUNCTION _Pragma("inline=forced")
-#pragma diag_suppress = Pe236
+    // IAR
+    #define LOCATION_PRAGMA(name) _Pragma(STR(location = name))
+    #define LOCATION_PRAGMA_NOLOAD(name) _Pragma(STR(location = name))
+    #define LOCATION_ATTRIBUTE(name)
+    #define LOCATION_ATTRIBUTE_NOLOAD(name)
+    #define FORCE_INLINE_FUNCTION _Pragma("inline=forced")
+    #pragma diag_suppress = Pe236
 
 #elif defined(__ARMCC_VERSION)
 
-// Keil
-#define LOCATION_PRAGMA(name)
-#define LOCATION_PRAGMA_NOLOAD(name)
-#define LOCATION_ATTRIBUTE(name) __attribute__((section(name))) __attribute__((aligned(4)))
-#define LOCATION_ATTRIBUTE_NOLOAD(name) __attribute__((section(name), zero_init)) __attribute__((aligned(4)))
-#define FORCE_INLINE_FUNCTION inline
+    // Keil
+    #define LOCATION_PRAGMA(name)
+    #define LOCATION_PRAGMA_NOLOAD(name)
+    #define LOCATION_ATTRIBUTE(name) __attribute__((section(name))) __attribute__((aligned(4)))
+    #define LOCATION_ATTRIBUTE_NOLOAD(name) __attribute__((section(name), zero_init)) __attribute__((aligned(4)))
+    #define FORCE_INLINE_FUNCTION inline
 
 #else
 
-// Other/Unknown
-#define LOCATION_PRAGMA(name)
-#define LOCATION_PRAGMA_NOLOAD(name)
-#define LOCATION_ATTRIBUTE(name)
-#define LOCATION_ATTRIBUTE_NOLOAD(name)
-#define FORCE_INLINE_FUNCTION
+    // Other/Unknown
+    #define LOCATION_PRAGMA(name)
+    #define LOCATION_PRAGMA_NOLOAD(name)
+    #define LOCATION_ATTRIBUTE(name)
+    #define LOCATION_ATTRIBUTE_NOLOAD(name)
+    #define FORCE_INLINE_FUNCTION
 
 #endif
 
@@ -112,16 +111,16 @@
  * this.
  */
 #ifdef __GNUC__
-#define RESTRICT __restrict__
+    #define RESTRICT __restrict__
 #else
-#define RESTRICT
+    #define RESTRICT
 #endif // __GNUC__
 
 /** Use KEEP to make sure the compiler does not remove this. */
 #ifdef __ICCARM__
-#define KEEP __root
+    #define KEEP __root
 #else
-#define KEEP
+    #define KEEP
 #endif
 
-#endif // LV_DRAW_NEMA_GFX_CONFIG_H
+#endif /* LV_DRAW_NEMA_GFX_CONFIG_H */
