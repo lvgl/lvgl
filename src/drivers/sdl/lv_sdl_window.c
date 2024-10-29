@@ -223,12 +223,10 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
             if(argb_px_map == NULL) {
                 LV_LOG_ERROR("Malloc failed!\n");
                 lv_display_flush_ready(disp);
-                free(argb_px_map);
                 return;
             }
-            else {
-                lv_draw_sw_i1_to_argb8888((void **)&px_map, (void **)&argb_px_map, argb_px_map_size);
-            }
+            lv_draw_sw_i1_to_argb8888((void **)&px_map, (void **)&argb_px_map, argb_px_map_size);
+            px_map = (uint8_t *)argb_px_map;
         }
         lv_area_t rotated_area = *area;
         lv_display_rotate_area(disp, &rotated_area);

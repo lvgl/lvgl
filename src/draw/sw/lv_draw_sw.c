@@ -238,8 +238,6 @@ void lv_draw_sw_i1_to_argb8888(void ** buf_i1, void ** buf_argb8888, size_t buf_
             argb_px_map_arith++;
         }
     }
-    /*Pass the pixel map handle*/
-    *buf_i1 = *buf_argb8888;
 }
 
 void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px)
