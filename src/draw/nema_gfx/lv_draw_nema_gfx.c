@@ -104,6 +104,7 @@ void lv_draw_nema_gfx_init(void)
     draw_nema_gfx_unit->base_unit.dispatch_cb = nema_gfx_dispatch;
     draw_nema_gfx_unit->base_unit.evaluate_cb = nema_gfx_evaluate;
     draw_nema_gfx_unit->base_unit.delete_cb = nema_gfx_delete;
+    draw_nema_gfx_unit->base_unit.name = "NEMA_GFX";
     /*Create GPU Command List*/
     draw_nema_gfx_unit->cl = nema_cl_create();
     /*Bind Command List*/

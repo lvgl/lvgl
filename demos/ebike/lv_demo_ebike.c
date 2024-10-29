@@ -62,7 +62,10 @@ lv_subject_t ebike_subject_language;
 void lv_demo_ebike(void)
 {
     lv_i18n_init(lv_i18n_language_pack);
+
+#if LV_USE_LOTTIE
     LV_DRAW_BUF_INIT_STATIC(lottie_ebike_draw_buf);
+#endif
 
     lv_subject_init_int(&ebike_subject_language, 0);
     lv_subject_add_observer_obj(&ebike_subject_language, language_observer_cb, lv_screen_active(), NULL);
@@ -103,10 +106,12 @@ void lv_demo_ebike(void)
     menu_bar_create();
 }
 
+#if LV_USE_LOTTIE
 lv_draw_buf_t * lv_demo_ebike_get_lottie_draw_buf(void)
 {
     return &lottie_ebike_draw_buf;
 }
+#endif
 
 /**********************
  *   STATIC FUNCTIONS

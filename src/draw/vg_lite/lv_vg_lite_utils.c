@@ -90,9 +90,50 @@ void lv_vg_lite_dump_info(void)
                     ret ? "YES" : "NO");
     }
 
-    vg_lite_uint32_t mem_avail = 0;
-    vg_lite_get_mem_size(&mem_avail);
-    LV_LOG_USER("Memory Available: %" LV_PRId32 " Bytes", (uint32_t)mem_avail);
+    vg_lite_uint32_t mem_size = 0;
+    vg_lite_get_mem_size(&mem_size);
+    LV_LOG_USER("Memory size: %" LV_PRId32 " Bytes", (uint32_t)mem_size);
+}
+
+void lv_vg_lite_error_dump_info(vg_lite_error_t error)
+{
+    LV_LOG_USER("Error code: %d(%s)", (int)error, lv_vg_lite_error_string(error));
+    switch(error) {
+        case VG_LITE_SUCCESS:
+            LV_LOG_USER("No error");
+            break;
+
+        case VG_LITE_OUT_OF_MEMORY:
+        case VG_LITE_OUT_OF_RESOURCES: {
+                vg_lite_uint32_t mem_size = 0;
+                vg_lite_error_t ret = vg_lite_get_mem_size(&mem_size);
+                if(ret != VG_LITE_SUCCESS) {
+                    LV_LOG_ERROR("vg_lite_get_mem_size error: %d(%s)",
+                                 (int)ret, lv_vg_lite_error_string(ret));
+                    return;
+                }
+
+                LV_LOG_USER("Memory size: %" LV_PRId32 " Bytes", (uint32_t)mem_size);
+            }
+            break;
+
+        case VG_LITE_TIMEOUT:
+        case VG_LITE_FLEXA_TIME_OUT: {
+                vg_lite_error_t ret = vg_lite_dump_command_buffer();
+                if(ret != VG_LITE_SUCCESS) {
+                    LV_LOG_ERROR("vg_lite_dump_command_buffer error: %d(%s)",
+                                 (int)ret, lv_vg_lite_error_string(ret));
+                    return;
+                }
+
+                LV_LOG_USER("Command buffer finished");
+            }
+            break;
+
+        default:
+            lv_vg_lite_dump_info();
+            break;
+    }
 }
 
 const char * lv_vg_lite_error_string(vg_lite_error_t error)
@@ -279,7 +320,7 @@ void lv_vg_lite_path_dump_info(const vg_lite_path_t * path)
 
     LV_LOG_USER("address: %p", (void *)path->path);
     LV_LOG_USER("length: %d", (int)len);
-    LV_LOG_USER("bonding box: (%0.2f, %0.2f) - (%0.2f, %0.2f)",
+    LV_LOG_USER("bounding box: (%0.2f, %0.2f) - (%0.2f, %0.2f)",
                 path->bounding_box[0], path->bounding_box[1],
                 path->bounding_box[2], path->bounding_box[3]);
     LV_LOG_USER("format: %d", (int)path->format);
@@ -403,6 +444,9 @@ bool lv_vg_lite_is_dest_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_ARGB1555:
+        case LV_COLOR_FORMAT_ARGB4444:
+        case LV_COLOR_FORMAT_ARGB2222:
             return true;
 
         case LV_COLOR_FORMAT_ARGB8565:
@@ -425,6 +469,9 @@ bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_ARGB1555:
+        case LV_COLOR_FORMAT_ARGB4444:
+        case LV_COLOR_FORMAT_ARGB2222:
             return true;
 
         case LV_COLOR_FORMAT_I1:
@@ -475,6 +522,15 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
 
         case LV_COLOR_FORMAT_I8:
             return VG_LITE_INDEX_8;
+
+        case LV_COLOR_FORMAT_ARGB1555:
+            return VG_LITE_BGRA5551;
+
+        case LV_COLOR_FORMAT_ARGB4444:
+            return VG_LITE_BGRA4444;
+
+        case LV_COLOR_FORMAT_ARGB2222:
+            return  VG_LITE_BGRA2222;
 
         case LV_COLOR_FORMAT_RGB565:
             return VG_LITE_BGR565;

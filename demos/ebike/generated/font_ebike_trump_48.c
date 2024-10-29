@@ -4,10 +4,18 @@
  * Opts: --no-compress --no-prefilter --bpp 4 --size 48 --font TrumpGothicPro.ttf -r 0x20-0x7F --format lvgl -o font_ebike_trump_48.c --force-fast-kern-format
  ******************************************************************************/
 
-#ifdef LV_LVGL_H_INCLUDE_SIMPLE
+#ifdef __has_include
+    #if __has_include("lvgl.h")
+        #ifndef LV_LVGL_H_INCLUDE_SIMPLE
+            #define LV_LVGL_H_INCLUDE_SIMPLE
+        #endif
+    #endif
+#endif
+
+#if defined(LV_LVGL_H_INCLUDE_SIMPLE)
     #include "lvgl.h"
 #else
-    #include "lvgl/lvgl.h"
+    #include "../../../lvgl.h"
 #endif
 
 #ifndef FONT_EBIKE_TRUMP_48

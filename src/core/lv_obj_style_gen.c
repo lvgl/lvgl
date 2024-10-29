@@ -122,6 +122,14 @@ void lv_obj_set_style_translate_y(lv_obj_t * obj, int32_t value, lv_style_select
     lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSLATE_Y, v, selector);
 }
 
+void lv_obj_set_style_translate_radial(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSLATE_RADIAL, v, selector);
+}
+
 void lv_obj_set_style_transform_scale_x(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
@@ -224,6 +232,14 @@ void lv_obj_set_style_pad_column(lv_obj_t * obj, int32_t value, lv_style_selecto
         .num = (int32_t)value
     };
     lv_obj_set_local_style_prop(obj, LV_STYLE_PAD_COLUMN, v, selector);
+}
+
+void lv_obj_set_style_pad_radial(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_PAD_RADIAL, v, selector);
 }
 
 void lv_obj_set_style_margin_top(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
@@ -664,6 +680,14 @@ void lv_obj_set_style_radius(lv_obj_t * obj, int32_t value, lv_style_selector_t 
         .num = (int32_t)value
     };
     lv_obj_set_local_style_prop(obj, LV_STYLE_RADIUS, v, selector);
+}
+
+void lv_obj_set_style_radial_offset(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_RADIAL_OFFSET, v, selector);
 }
 
 void lv_obj_set_style_clip_corner(lv_obj_t * obj, bool value, lv_style_selector_t selector)
