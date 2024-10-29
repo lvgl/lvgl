@@ -48,6 +48,7 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path);
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint32_t fn_len);
 static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p);
+static lv_fs_res_t fs_errno_to_res(int errno_val);
 
 /**********************
  *  STATIC VARIABLES
@@ -139,7 +140,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
     int ret = close(fd);
     if(ret < 0) {
         LV_LOG_WARN("Could not close file: %d, errno: %d", fd, errno);
-        return LV_FS_RES_FS_ERR;
+        return fs_errno_to_res(errno);
     }
 
     return LV_FS_RES_OK;
@@ -163,7 +164,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
     ssize_t ret = read(fd, buf, btr);
     if(ret < 0) {
         LV_LOG_WARN("Could not read file: %d, errno: %d", fd, errno);
-        return LV_FS_RES_FS_ERR;
+        return fs_errno_to_res(errno);
     }
 
     *br = (uint32_t)ret;
@@ -187,7 +188,7 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
     ssize_t ret = write(fd, buf, btw);
     if(ret < 0) {
         LV_LOG_WARN("Could not write file: %d, errno: %d", fd, errno);
-        return LV_FS_RES_FS_ERR;
+        return fs_errno_to_res(errno);
     }
 
     *bw = (uint32_t)ret;
@@ -224,7 +225,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
     off_t offset = lseek(fd, pos, w);
     if(offset < 0) {
         LV_LOG_WARN("Could not seek file: %d, errno: %d", fd, errno);
-        return LV_FS_RES_FS_ERR;
+        return fs_errno_to_res(errno);
     }
 
     return LV_FS_RES_OK;
@@ -246,7 +247,7 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
     off_t offset = lseek(fd, 0, SEEK_CUR);
     if(offset < 0) {
         LV_LOG_WARN("Could not get position of file: %d, errno: %d", fd, errno);
-        return LV_FS_RES_FS_ERR;
+        return fs_errno_to_res(errno);
     }
 
     *pos_p = (uint32_t)offset;
@@ -318,11 +319,63 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
     int ret = closedir(dir_p);
     if(ret < 0) {
         LV_LOG_WARN("Could not close directory: errno: %d", errno);
-        return LV_FS_RES_FS_ERR;
+        return fs_errno_to_res(errno);
     }
 
     return LV_FS_RES_OK;
 }
+
+/**
+ * Convert an errno value to a lv_fs_res_t value
+ * @param errno_val an errno value
+ * @return a corresponding lv_fs_res_t value
+ */
+static lv_fs_res_t fs_errno_to_res(int errno_val)
+{
+    switch(errno_val) {
+        case 0:
+            return LV_FS_RES_OK;
+
+        case EIO: /* I/O error */
+            return LV_FS_RES_HW_ERR;
+
+        case EFAULT: /* Bad address */
+            return LV_FS_RES_FS_ERR;
+
+        case ENOENT: /* No such file or directory */
+            return LV_FS_RES_NOT_EX;
+
+        case ENOSPC: /* No space left on device */
+            return LV_FS_RES_FULL;
+
+        case EALREADY: /* Operation already in progress */
+            return LV_FS_RES_LOCKED;
+
+        case EACCES: /* Permission denied */
+            return LV_FS_RES_DENIED;
+
+        case EBUSY: /* Device or resource busy */
+            return LV_FS_RES_BUSY;
+
+        case ETIMEDOUT: /* Connection timed out */
+            return LV_FS_RES_TOUT;
+
+        case ENOSYS: /* Invalid system call number */
+            return LV_FS_RES_NOT_IMP;
+
+        case ENOMEM: /* Out of memory */
+            return LV_FS_RES_OUT_OF_MEM;
+
+        case EINVAL: /* "Invalid argument" */
+            return LV_FS_RES_INV_PARAM;
+
+        default:
+            break;
+    }
+
+    return LV_FS_RES_UNKNOWN;
+}
+
 #else /*LV_USE_FS_POSIX == 0*/
 
 #if defined(LV_FS_POSIX_LETTER) && LV_FS_POSIX_LETTER != '\0'
