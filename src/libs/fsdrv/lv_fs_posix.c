@@ -357,13 +357,13 @@ static lv_fs_res_t fs_errno_to_res(int errno_val)
         case ENOSPC: /* No space left on device */
             return LV_FS_RES_FULL;
 
-        case EBUSY: /* Operation already in progress */
+        case EALREADY: /* Operation already in progress */
             return LV_FS_RES_LOCKED;
 
         case EACCES: /* Permission denied */
             return LV_FS_RES_DENIED;
 
-        case EAGAIN: /* Try again */
+        case EBUSY: /* Device or resource busy */
             return LV_FS_RES_BUSY;
 
         case ETIMEDOUT: /* Connection timed out */
