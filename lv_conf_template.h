@@ -213,7 +213,7 @@
     /*Compile the Nema HAL implementation for STM32 provided by LVGL. Disable to use your own*/
     #define LV_USE_PROVIDED_NEMA_GFX_HAL_FOR_STM32 1
     #if LV_USE_PROVIDED_NEMA_GFX_HAL_FOR_STM32
-        #define LV_NEMA_GFX_HAL_INCLUDE <stm32u5xx_hal.h>
+        #define LV_NEMA_GFX_STM32_HAL_INCLUDE <stm32u5xx_hal.h>
     #endif
 
     /*Enable Vector Graphics Operations. Available only if NemaVG library is present*/

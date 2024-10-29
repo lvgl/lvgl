@@ -25,7 +25,7 @@
 #include <assert.h>
 #include <string.h>
 
-#include LV_NEMA_GFX_HAL_INCLUDE
+#include LV_NEMA_GFX_STM32_HAL_INCLUDE
 
 #include <cmsis_os2.h>
 

@@ -606,11 +606,11 @@
         #endif
     #endif
     #if LV_USE_PROVIDED_NEMA_GFX_HAL_FOR_STM32
-        #ifndef LV_NEMA_GFX_HAL_INCLUDE
-            #ifdef CONFIG_LV_NEMA_GFX_HAL_INCLUDE
-                #define LV_NEMA_GFX_HAL_INCLUDE CONFIG_LV_NEMA_GFX_HAL_INCLUDE
+        #ifndef LV_NEMA_GFX_STM32_HAL_INCLUDE
+            #ifdef CONFIG_LV_NEMA_GFX_STM32_HAL_INCLUDE
+                #define LV_NEMA_GFX_STM32_HAL_INCLUDE CONFIG_LV_NEMA_GFX_STM32_HAL_INCLUDE
             #else
-                #define LV_NEMA_GFX_HAL_INCLUDE <stm32u5xx_hal.h>
+                #define LV_NEMA_GFX_STM32_HAL_INCLUDE <stm32u5xx_hal.h>
             #endif
         #endif
     #endif
