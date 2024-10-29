@@ -1,4 +1,4 @@
-# Kconfig file for LVGL v9.2.1
+# Kconfig file for LVGL v9.2.2
 
 menu "LVGL configuration"
 
@@ -375,7 +375,7 @@ menu "LVGL configuration"
 		config LV_USE_PXP
 		bool "Use NXP's PXP on iMX RTxxx platforms"
 		default n
-		
+
 		config LV_USE_DRAW_PXP
 		bool "Use PXP for drawing"
 			depends on LV_USE_PXP
@@ -1492,7 +1492,7 @@ menu "LVGL configuration"
 			default 2 # LVGL_VERSION_MINOR
 		config LVGL_VERSION_PATCH
 			int
-			default 1 # LVGL_VERSION_PATCH
+			default 2 # LVGL_VERSION_PATCH
 	endmenu
 
 	menu "Devices"
