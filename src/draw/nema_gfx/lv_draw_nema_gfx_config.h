@@ -76,36 +76,6 @@
 
 #endif
 
-/** A macro for placing Font Glyph in memory. */
-#define FONT_GLYPH_LOCATION_FLASH_PRAGMA LOCATION_PRAGMA("FontFlashSection")
-/** A macro for placing Font Glyph attribute in memory. */
-#define FONT_GLYPH_LOCATION_FLASH_ATTRIBUTE LOCATION_ATTRIBUTE("FontFlashSection")
-
-/** A macro for placing Font table in memory. */
-#define FONT_TABLE_LOCATION_FLASH_PRAGMA LOCATION_PRAGMA("FontFlashSection")
-/** A macro for placing Font table attribute in memory. */
-#define FONT_TABLE_LOCATION_FLASH_ATTRIBUTE LOCATION_ATTRIBUTE("FontFlashSection")
-
-/** A macro for placing Font lookup table in memory. */
-#define FONT_SEARCHTABLE_LOCATION_FLASH_PRAGMA LOCATION_PRAGMA("FontSearchFlashSection")
-/** A macro for placing Font table attribute in memory. */
-#define FONT_SEARCHTABLE_LOCATION_FLASH_ATTRIBUTE LOCATION_ATTRIBUTE("FontSearchFlashSection")
-
-/** A macro for placing Font kerning in memory. */
-#define FONT_KERNING_LOCATION_FLASH_PRAGMA LOCATION_PRAGMA("FontSearchFlashSection")
-/** A macro for placing Font kerning attribute in memory. */
-#define FONT_KERNING_LOCATION_FLASH_ATTRIBUTE LOCATION_ATTRIBUTE("FontSearchFlashSection")
-
-/** A macro for placing Text kerning in memory. */
-#define TEXT_LOCATION_FLASH_PRAGMA LOCATION_PRAGMA("TextFlashSection")
-/** A macro for placing Text attribute in memory. */
-#define TEXT_LOCATION_FLASH_ATTRIBUTE LOCATION_ATTRIBUTE("TextFlashSection")
-
-/** A generic macro for placing an element in memory. */
-#define LOCATION_EXTFLASH_PRAGMA LOCATION_PRAGMA("ExtFlashSection")
-/** A generic macro for placing an element attribute in memory. */
-#define LOCATION_EXTFLASH_ATTRIBUTE LOCATION_ATTRIBUTE("ExtFlashSection")
-
 /**
  * To be able to use __restrict__ on the supported platform. The IAR compiler does not support
  * this.
