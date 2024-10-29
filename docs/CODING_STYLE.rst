@@ -45,6 +45,7 @@ Naming conventions
       - ``alloc`` allocate
       - ``ctrl`` control
       - ``pos`` position
+
    -  Avoid adding new abbreviations
 
 Coding guide
@@ -57,17 +58,17 @@ Coding guide
 
 -  Functions:
 
-   -  Write function with single responsibility.
-   -  Make the functions ``static`` where possible.
+   -  Write functions that use the single-responsibility principle.
+   -  Make functions ``static`` when not part of that object's public API (where possible).
 
 -  Variables:
 
-   -  One line, one declaration (BAD: char x, y;)
-   -  Use ``<stdint.h>`` (*uint8_t*, *int32_t* etc)
-   -  Declare variables where needed (not all at function start)
-   -  Use the smallest required scope
-   -  Variables in a file (outside functions) are always *static*
-   -  Do not use global variables (use functions to set/get static variables)
+   -  One line, one declaration (BAD: char x, y;).
+   -  Use ``<stdint.h>`` (*uint8_t*, *int32_t* etc).
+   -  Declare variables where needed (not all at function start).
+   -  Use the smallest required scope.
+   -  Variables in a file (outside functions) are always *static*.
+   -  Do not use global variables (use functions to set/get static variables).
 
 Comments
 --------
@@ -88,7 +89,7 @@ like this:
     type_name_t * lv_function_name(lv_obj_t * parent);
 
 The normal comment prefix ``/**`` causes the comment to document the code member
-coming *after* the comment.  When documenting a code member that is *before* the
+*after* the comment.  When documenting a code member that is *before* the
 comment, such as a struct member, use ``/**<`` like this:
 
 .. code-block:: c
@@ -286,7 +287,7 @@ To learn more refer to the documentation of `MicroPython <integration/bindings/m
 Formatting
 ----------
 
-Here is example to show bracket placing and using of white space:
+Here is example to show bracket placement and use of white space:
 
 .. code-block:: c
 
