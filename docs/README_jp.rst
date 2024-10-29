@@ -75,7 +75,7 @@ Cライブラリ。(C++互換) -
 任意の(RT)OS、任意のMCU・MPU用にコンパイル可能。 -
 電子ペーパー、OLEDディスプレイ、TFTディスプレイ、白黒ディスプレイ、モニターに対応。
 `Porting
-Guide <https://docs-lvgl-io.translate.goog/master/intro/add-lvgl-to-your-project/project.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+Guide <https://docs-lvgl-io.translate.goog/master/intro/add-lvgl-to-your-project/connecting_lvgl.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 - MITライセンスにより商用利用可能。 - システム要件：RAM 32KB、Flash
 128KB、フレームバッファ、レンダリング用に1/10以上のスクリーンサイズのバッファ。
 - OS、外部メモリ、GPUもサポート。
@@ -98,9 +98,9 @@ Guide <https://docs-lvgl-io.translate.goog/master/intro/add-lvgl-to-your-project
 アニメーション、アンチエイリアシング、不透明度、スムーズスクロール、シャドウ、画像変換などをサポートするレンダリングエンジン。
 -
 マウス、タッチパッド、キーパッド、キーボード、外部ボタン、エンコーダ等の
-`入力デバイス <https://docs-lvgl-io.translate.goog/master/details/modules/indev.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+`入力デバイス <https://docs-lvgl-io.translate.goog/master/details/main-components/indev.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 をサポート。 -
-`マルチディスプレイ <https://docs-lvgl-io.translate.goog/master/details/modules/display.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+`マルチディスプレイ <https://docs-lvgl-io.translate.goog/master/details/main-components/display.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 対応。
 
 **Binding と Build をサポート** - `MicroPython
@@ -556,7 +556,7 @@ LVGLを使い始める時は、以下の順に進める事をおすすめしま�
    `Introduction <https://docs-lvgl-io.translate.goog/master/intro/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
    を読みましょう。 (5分間)
 3. LVGLの基本に慣れるため `Quick
-   overview <https://docs-lvgl-io.translate.goog/master/intro/overview.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+   overview <https://docs-lvgl-io.translate.goog/master/intro/basics.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
    を読みましょう。 (15分間)
 
 **LVGLを使ってみましょう**
@@ -573,7 +573,7 @@ LVGLを使い始める時は、以下の順に進める事をおすすめしま�
 **より詳しく体験してみましょう**
 
 7. ライブラリの理解を深めるため
-   `Overview <https://docs-lvgl-io.translate.goog/master/details/modules/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+   `Overview <https://docs-lvgl-io.translate.goog/master/details/main-components/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
    を読みましょう。 (2～3時間)
 8. ウィジェットの機能や使い方の詳細は
    `Widgets <https://docs-lvgl-io.translate.goog/master/details/widgets/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__

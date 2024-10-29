@@ -72,7 +72,7 @@ RAM 和 128 KB Flash、C 编译器、帧缓冲区和至少 1/10 屏幕大小的�
 -  一个完全可移植的 C（C++ 兼容）库，没有外部依赖关系。
 -  可以编译到任何 MCU 或 MPU，使用任何 RTOS 或者操作系统。
 -  支持单色、ePaper、OLED、TFT 显示器或者模拟器。
-   `移植指南 <https://docs.lvgl.io/master/intro/add-lvgl-to-your-project/project.html>`__
+   `移植指南 <https://docs.lvgl.io/master/intro/add-lvgl-to-your-project/connecting_lvgl.html>`__
 -  该项目使用 MIT 许可证，因此您可以在商业项目中轻松使用它。
 -  仅需 32 KB RAM 和 128 KB Flash，一个帧缓冲区，以及至少 1/10 屏幕大小的渲染缓冲区。
 -  支持使用可选的操作系统、外部存储器和 GPU。
@@ -89,8 +89,8 @@ RAM 和 128 KB Flash、C 编译器、帧缓冲区和至少 1/10 屏幕大小的�
 -  文本支持 UTF-8 编码，支持 CJK、泰语、印地语、阿拉伯语和波斯语书写系统。
 -  支持自动换行、字距调整、文本滚动、亚像素渲染、拼音输入法、文本表情符号。
 -  渲染引擎支持动画、抗锯齿、不透明度、平滑滚动、阴影、图形变换等。
--  支持鼠标、触摸板、小键盘、键盘、外部按钮、编码器\ `输入设备 <https://docs.lvgl.io/master/details/modules/indev.html>`__\ 。
--  支持\ `多显示器 <https://docs.lvgl.io/master/details/modules/display.html#multiple-display-support>`__\ 。
+-  支持鼠标、触摸板、小键盘、键盘、外部按钮、编码器\ `输入设备 <https://docs.lvgl.io/master/details/main-components/indev.html>`__\ 。
+-  支持\ `多显示器 <https://docs.lvgl.io/master/details/main-components/display.html#multiple-display-support>`__\ 。
 
 **绑定和构建支持**
 
@@ -540,7 +540,7 @@ Hello world 标签
 
 1. 查看\ `在线演示 <https://lvgl.io/demos>`__\ ，了解 LVGL 的实际操作（3 分钟）
 2. 阅读\ `文档 <https://docs.lvgl.io/master/intro/index.html>`__\ 的简介页（5 分钟）
-3. 熟悉\ `快速概览 <https://docs.lvgl.io/master/intro/overview.html>`__
+3. 熟悉\ `快速概览 <https://docs.lvgl.io/master/intro/basics.html>`__
    页面上的基本知识（15 分钟）
 
 **开始使用 LVGL**
@@ -551,7 +551,7 @@ Hello world 标签
 
 **成为专业人士**
 
-7. 阅读\ `概述 <https://docs.lvgl.io/master/details/modules/index.html>`__\ 页面以更好地了解图书馆（2-3 小时）
+7. 阅读\ `概述 <https://docs.lvgl.io/master/details/main-components/index.html>`__\ 页面以更好地了解图书馆（2-3 小时）
 8. 查看\ `控件 <https://docs.lvgl.io/master/details/widgets/index.html>`__\ 的文档以查看其功能和用法
 
 **获得帮助并帮助他人**
