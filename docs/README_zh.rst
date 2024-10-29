@@ -72,25 +72,25 @@ RAM 和 128 KB Flash、C 编译器、帧缓冲区和至少 1/10 屏幕大小的�
 -  一个完全可移植的 C（C++ 兼容）库，没有外部依赖关系。
 -  可以编译到任何 MCU 或 MPU，使用任何 RTOS 或者操作系统。
 -  支持单色、ePaper、OLED、TFT 显示器或者模拟器。
-   `移植指南 <https://docs.lvgl.io/master/porting/project.html>`__
+   `移植指南 <https://docs.lvgl.io/master/intro/add-lvgl-to-your-project/connecting_lvgl.html>`__
 -  该项目使用 MIT 许可证，因此您可以在商业项目中轻松使用它。
 -  仅需 32 KB RAM 和 128 KB Flash，一个帧缓冲区，以及至少 1/10 屏幕大小的渲染缓冲区。
 -  支持使用可选的操作系统、外部存储器和 GPU。
 
 **控件、样式、布局等**
 
--  30+ 内置\ `控件 <https://docs.lvgl.io/master/widgets/index.html>`__:
+-  30+ 内置\ `控件 <https://docs.lvgl.io/master/details/widgets/index.html>`__:
     按钮、标签、滑块、图表、键盘、仪表、弧形、表格等等。
--  灵活的\ `样式系统 <https://docs.lvgl.io/master/overview/style.html>`__
+-  灵活的\ `样式系统 <https://docs.lvgl.io/master/details/base-widget/styles/style.html>`__
    支持约 100 个样式属性，可在任何状态下自定义控件的任何部分。
--  `Flex 布局 <https://docs.lvgl.io/master/layouts/flex.html>`__ 和
-   `Grid 布局 <https://docs.lvgl.io/master/layouts/grid.html>`__
+-  `Flex 布局 <https://docs.lvgl.io/master/details/base-widget/layouts/flex.html>`__ 和
+   `Grid 布局 <https://docs.lvgl.io/master/details/base-widget/layouts/grid.html>`__
    可以响应式自动调整控件的大小和位置。
 -  文本支持 UTF-8 编码，支持 CJK、泰语、印地语、阿拉伯语和波斯语书写系统。
 -  支持自动换行、字距调整、文本滚动、亚像素渲染、拼音输入法、文本表情符号。
 -  渲染引擎支持动画、抗锯齿、不透明度、平滑滚动、阴影、图形变换等。
--  支持鼠标、触摸板、小键盘、键盘、外部按钮、编码器\ `输入设备 <https://docs.lvgl.io/master/porting/indev.html>`__\ 。
--  支持\ `多显示器 <https://docs.lvgl.io/master/overview/display.html#multiple-display-support>`__\ 。
+-  支持鼠标、触摸板、小键盘、键盘、外部按钮、编码器\ `输入设备 <https://docs.lvgl.io/master/details/main-components/indev.html>`__\ 。
+-  支持\ `多显示器 <https://docs.lvgl.io/master/details/main-components/display.html#multiple-display-support>`__\ 。
 
 **绑定和构建支持**
 
@@ -99,7 +99,7 @@ RAM 和 128 KB Flash、C 编译器、帧缓冲区和至少 1/10 屏幕大小的�
 -  `PikaScript 绑定 <https://blog.lvgl.io/2022-08-24/pikascript-and-lvgl>`__
    在 MCU 上的更轻更简单的 Python 版本
 -  未使用自定义生成系统。您可以在构建项目的其他文件时构建 LVGL。
--  支持开箱即用的 Make 和 \ `CMake <https://docs.lvgl.io/master/integration/building/cmake.html>`__\  编译系统。
+-  支持开箱即用的 Make 和 \ `CMake <https://docs.lvgl.io/master/details/integration/building/cmake.html>`__\  编译系统。
 -  支持在 \ `PC 上开发 <https://docs.lvgl.io/master/integration/ide/pc-simulator.html>`__\ ，并可以在嵌入式硬件上使用相同的 UI 代码。
 -  支持使用我们的 \ `Emscripten 移植 <https://github.com/lvgl/lv_web_emscripten>`__\  从而将 C 写的 UI 代码转换为 HTML 文件。
 
@@ -183,7 +183,7 @@ Hello world 标签
 
 .. code-block:: c
 
-   /*Change the active screen's background color*/
+   /* Change Active Screen's background color */
    lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x003a57), LV_PART_MAIN);
 
    /*Create a white label, set its text and align it to the center*/
@@ -203,7 +203,7 @@ Hello world 标签
 
 .. code-block:: python
 
-   # Change the active screen's background color
+   # Change Active Screen's background color
    scr = lv.screen_active()
    scr.set_style_bg_color(lv.color_hex(0x003a57), lv.PART.MAIN)
 
@@ -400,7 +400,7 @@ Hello world 标签
    /*Add the style sheet to the slider's INDICATOR part*/
    lv_obj_add_style(slider, &style_indicator, LV_PART_INDICATOR);
 
-   /*Add the same style to the KNOB part too and locally overwrite some properties*/
+   /*Add the same style to the KNOB part as well and locally overwrite some properties*/
    lv_obj_add_style(slider, &style_indicator, LV_PART_KNOB);
 
    lv_obj_set_style_outline_color(slider, lv_color_hex(0x0096FF), LV_PART_KNOB);
@@ -448,7 +448,7 @@ Hello world 标签
    slider.add_style(style_indicator, lv.PART.INDICATOR)
    slider.add_style(style_indicator, lv.PART.KNOB)
 
-   # Add the same style to the KNOB part too and locally overwrite some properties
+   # Add the same style to the KNOB part as well and locally overwrite some properties
    slider.set_style_outline_color(lv.color_hex(0x0096FF), lv.PART.KNOB)
    slider.set_style_outline_width(3, lv.PART.KNOB)
    slider.set_style_outline_pad(-5, lv.PART.KNOB)
@@ -540,19 +540,19 @@ Hello world 标签
 
 1. 查看\ `在线演示 <https://lvgl.io/demos>`__\ ，了解 LVGL 的实际操作（3 分钟）
 2. 阅读\ `文档 <https://docs.lvgl.io/master/intro/index.html>`__\ 的简介页（5 分钟）
-3. 熟悉\ `快速概览 <https://docs.lvgl.io/master/get-started/quick-overview.html>`__
+3. 熟悉\ `快速概览 <https://docs.lvgl.io/master/intro/basics.html>`__
    页面上的基本知识（15 分钟）
 
 **开始使用 LVGL**
 
 4. 设置\ `模拟器 <https://docs.lvgl.io/master/integration/ide/pc-simulator.html#simulator>`__  （10 分钟）
 5. 尝试一些\ `示例 <https://github.com/lvgl/lvgl/tree/master/examples>`__
-6. 将LVGL端口连接到线路板。请参阅\ `移植 <https://docs.lvgl.io/master/porting/index.html>`__\ 指南，或查看现成的\ `项目 <https://github.com/lvgl?q=lv_port_>`__
+6. 将LVGL端口连接到线路板。请参阅\ `移植 <https://docs.lvgl.io/master/intro/add-lvgl-to-your-project/index.html>`__\ 指南，或查看现成的\ `项目 <https://github.com/lvgl?q=lv_port_>`__
 
 **成为专业人士**
 
-7. 阅读\ `概述 <https://docs.lvgl.io/master/overview/index.html>`__\ 页面以更好地了解图书馆（2-3 小时）
-8. 查看\ `控件 <https://docs.lvgl.io/master/widgets/index.html>`__\ 的文档以查看其功能和用法
+7. 阅读\ `概述 <https://docs.lvgl.io/master/details/main-components/index.html>`__\ 页面以更好地了解图书馆（2-3 小时）
+8. 查看\ `控件 <https://docs.lvgl.io/master/details/widgets/index.html>`__\ 的文档以查看其功能和用法
 
 **获得帮助并帮助他人**
 

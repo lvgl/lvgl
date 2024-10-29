@@ -11,6 +11,7 @@
  *      INCLUDES
  *********************/
 #include "../misc/lv_area_private.h"
+#include "../misc/lv_assert.h"
 #include "lv_draw_private.h"
 #include "sw/lv_draw_sw.h"
 #include "../display/lv_display_private.h"
@@ -79,7 +80,7 @@ void lv_draw_deinit(void)
 void * lv_draw_create_unit(size_t size)
 {
     lv_draw_unit_t * new_unit = lv_malloc_zeroed(size);
-
+    LV_ASSERT_MALLOC(new_unit);
     new_unit->next = _draw_info.unit_head;
     _draw_info.unit_head = new_unit;
     _draw_info.unit_cnt++;
@@ -91,7 +92,7 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_draw_task_t * new_task = lv_malloc_zeroed(sizeof(lv_draw_task_t));
-
+    LV_ASSERT_MALLOC(new_task);
     new_task->area = *coords;
     new_task->_real_area = *coords;
     new_task->clip_area = layer->_clip_area;
@@ -143,8 +144,13 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
             if(u->evaluate_cb) u->evaluate_cb(u, t);
             u = u->next;
         }
-
-        lv_draw_dispatch();
+        if(t->preferred_draw_unit_id == LV_DRAW_UNIT_NONE) {
+            LV_LOG_WARN("the draw task was not taken by any units");
+            t->state = LV_DRAW_TASK_STATE_READY;
+        }
+        else {
+            lv_draw_dispatch();
+        }
     }
     else {
         /*Let the draw units set their preference score*/
@@ -322,14 +328,8 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
     if(_draw_info.unit_cnt <= 1) {
         lv_draw_task_t * t = layer->draw_task_head;
         while(t) {
-            /*Mark unsupported draw tasks as ready as no one else will consume them*/
-            if(t->state == LV_DRAW_TASK_STATE_QUEUED &&
-               t->preferred_draw_unit_id != LV_DRAW_UNIT_NONE &&
-               t->preferred_draw_unit_id != draw_unit_id) {
-                t->state = LV_DRAW_TASK_STATE_READY;
-            }
             /*Not queued yet, leave this layer while the first task will be queued*/
-            else if(t->state != LV_DRAW_TASK_STATE_QUEUED) {
+            if(t->state != LV_DRAW_TASK_STATE_QUEUED) {
                 t = NULL;
                 break;
             }

@@ -148,7 +148,7 @@ illustrating most of the Doxygen commands used in LVGL.
 .. code-block:: c
 
     /**
-     * Set alignment of objects placed in containers with LV_STYLE_FLEX_FLOW style.
+     * Set alignment of Widgets placed in containers with LV_STYLE_FLEX_FLOW style.
      *
      * The values for the `..._place` arguments come from the `lv_flex_align_t`
      * enumeration and have the same meanings as they do for flex containers in CSS.
@@ -170,7 +170,7 @@ illustrating most of the Doxygen commands used in LVGL.
      *     - https://css-tricks.com/snippets/css/a-guide-to-flexbox/
      *     - see  `lv_obj_set_flex_grow()` for additional information.
      */
-    void lv_obj_set_flex_align(lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_align_t cross_place,
+    void lv_obj_set_flex_align(lv_obj_t * widget, lv_flex_align_t main_place, lv_flex_align_t cross_place,
                                lv_flex_align_t track_cross_place);
 
 
@@ -264,12 +264,12 @@ follow some coding conventions:
 - Use typed pointers instead of :cpp:expr:`void *` pointers
 - Widget constructor must follow the ``lv_<widget_name>_create(lv_obj_t * parent)`` pattern.
 - Widget members function must start with ``lv_<widget_name>`` and should receive :cpp:expr:`lv_obj_t *` as first
-  argument which is a pointer to widget object itself.
+  argument which is a pointer to Widget object itself.
 - ``struct`` APIs should follow the widgets' conventions. That is to receive a pointer to the ``struct`` as the
   first argument, and the prefix of the ``struct`` name should be used as the prefix of the
-  function name too (e.g. :cpp:expr:`lv_display_set_default(lv_display_t * disp)`)
+  function name as well (e.g. :cpp:expr:`lv_display_set_default(lv_display_t * disp)`)
 - Functions and ``struct``\ s which are not part of the public API must begin with underscore in order to mark them as "private".
-- Argument must be named in H files too.
+- Argument must be named in H files as well.
 - Do not ``malloc`` into a static or global variables. Instead declare the variable in ``lv_global_t``
   structure in ``lv_global.h`` and mark the variable with :cpp:expr:`(LV_GLOBAL_DEFAULT()->variable)` when it's used.
 - To register and use callbacks one of the following needs to be followed.
@@ -293,7 +293,7 @@ Here is example to show bracket placing and using of white space:
    /**
     * Set new text for a label.  Memory will be allocated by label to store text.
     *
-    * @param  label  pointer to label object
+    * @param  label  pointer to label Widget
     * @param  text   '\0' terminated character string.
     *                NULL to refresh with current text.
     */

@@ -1,4 +1,12 @@
+"""
+Create lv_conf.h in same directory as this file
+from ../lv_conf_template.h that has:
 
+1.  all its #define LV_USE... 0-or-1 options set to 1
+     (except for LV_USER_PROFILER),
+2.  all its #define LV_FONT... 0-or-1 options set to 1,
+3.  its #if 0 directive set to #if 1.
+"""
 import os
 
 base_path = os.path.dirname(__file__)
@@ -25,7 +33,7 @@ def run(c_path=None):
         if 'LV_USE_PROFILER' in line:
             continue
 
-        if 'LV_USE' in line or 'LV_FONT' in line and '#define' in line:
+        if 'LV_USE' in line or ('LV_FONT' in line and '#define' in line):
             line = [item for item in line.split(' ') if item]
 
             for j, item in enumerate(line):

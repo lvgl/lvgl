@@ -2900,7 +2900,8 @@
     #endif
 #endif
 
-/*SVG library*/
+/*SVG library
+ *  - Requires `LV_USE_VECTOR_GRAPHIC = 1` */
 #ifndef LV_USE_SVG
     #ifdef CONFIG_LV_USE_SVG
         #define LV_USE_SVG CONFIG_LV_USE_SVG
@@ -4076,6 +4077,9 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
         #define LV_DRAW_THREAD_STACK_SIZE LV_DRAW_THREAD_STACKSIZE
     #endif
 #endif
+
+/*Allow only upper case letters and '/'  ('/' is a special case for backward compatibility)*/
+#define LV_FS_IS_VALID_LETTER(l) ((l) == '/' || ((l) >= 'A' && (l) <= 'Z'))
 
 /* If running without lv_conf.h, add typedefs with default value. */
 #ifdef LV_CONF_SKIP

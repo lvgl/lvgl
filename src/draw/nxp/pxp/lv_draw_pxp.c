@@ -92,6 +92,7 @@ void lv_draw_pxp_init(void)
     draw_pxp_unit->base_unit.evaluate_cb = _pxp_evaluate;
     draw_pxp_unit->base_unit.dispatch_cb = _pxp_dispatch;
     draw_pxp_unit->base_unit.delete_cb = _pxp_delete;
+    draw_pxp_unit->base_unit.name = "NXP_PXP";
 
 #if LV_USE_PXP_DRAW_THREAD
     lv_thread_init(&draw_pxp_unit->thread, LV_THREAD_PRIO_HIGH, _pxp_render_thread_cb, 2 * 1024, draw_pxp_unit);
@@ -286,6 +287,9 @@ static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
                 const lv_image_dsc_t * img_dsc = draw_dsc->src;
+
+                if(img_dsc->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START)
+                    return 0;
 
                 if(draw_dsc->tile)
                     return 0;
