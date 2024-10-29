@@ -11,6 +11,8 @@ which makes Kconfig build systems fail.
 
 **It's highly recommended to update v9.2.1 to v9.2.2.**
 
+See the Change log of v9.2.1 `here <https://github.com/lvgl/lvgl/blob/59a6b61c9580b65089010c5273f2fcdd6c4d2aae/docs/CHANGELOG.rst>`__ .
+
 
 Fixes
 ~~~~~
