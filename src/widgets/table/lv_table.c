@@ -997,36 +997,10 @@ static lv_result_t get_pressed_cell(lv_obj_t * obj, uint32_t * row, uint32_t * c
     lv_point_t p;
     lv_indev_get_point(lv_indev_active(), &p);
 
-    /* Calculate total height of rows so we know if the click was outside them */
-    lv_area_t area;
-    lv_obj_get_coords(obj, &area);
-
-    uint32_t idx = 0;
-    int32_t total_row_height = 0;
-    int32_t total_column_width = 0;
-
-    for(idx = 0; idx < table->row_cnt; ++idx) {
-        total_row_height += table->row_h[idx];
-    }
-
-    for(idx = 0; idx < table->col_cnt; ++idx) {
-        total_column_width += table->col_w[idx];
-    }
-
-    /* Clicked outside rows on empty space */
-    if(p.y > (total_row_height + area.y1)) {
-        if(col) *col = LV_TABLE_CELL_NONE;
-        if(row) *row = LV_TABLE_CELL_NONE;
-        return LV_RESULT_INVALID;
-    }
-    /* Clicked outside columns on empty space */
-    else if(p.x > (total_column_width + area.x1)) {
-        if(col) *col = LV_TABLE_CELL_NONE;
-        if(row) *row = LV_TABLE_CELL_NONE;
-        return LV_RESULT_INVALID;
-    }
-
     int32_t tmp;
+    bool is_click_on_valid_column = false;
+    bool is_click_on_valid_row = false;
+
     if(col) {
         int32_t x = p.x + lv_obj_get_scroll_x(obj);
 
@@ -1042,7 +1016,10 @@ static lv_result_t get_pressed_cell(lv_obj_t * obj, uint32_t * row, uint32_t * c
         tmp = 0;
         for(*col = 0; *col < table->col_cnt; (*col)++) {
             tmp += table->col_w[*col];
-            if(x < tmp) break;
+            if(x < tmp) {
+                is_click_on_valid_column = true;
+                break;
+            }
         }
     }
 
@@ -1056,11 +1033,20 @@ static lv_result_t get_pressed_cell(lv_obj_t * obj, uint32_t * row, uint32_t * c
 
         for(*row = 0; *row < table->row_cnt; (*row)++) {
             tmp += table->row_h[*row];
-            if(y < tmp) break;
+            if(y < tmp) {
+                is_click_on_valid_row = true;
+                break;
+            }
         }
     }
 
-    return LV_RESULT_OK;
+    /* If the click was on valid column AND row then return valid result, return invalid otherwise */
+    lv_result_t result = LV_RESULT_INVALID;
+    if((is_click_on_valid_column) && (is_click_on_valid_row)) {
+        result = LV_RESULT_OK;
+    }
+
+    return result;
 }
 
 /* Returns number of bytes to allocate based on chars configuration */
