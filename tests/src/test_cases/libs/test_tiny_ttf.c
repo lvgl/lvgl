@@ -78,27 +78,6 @@ void test_tiny_ttf_kerning(void)
     lv_tiny_ttf_destroy(font_none);
 }
 
-/*Combining Diacritical Marks test
- *See https://github.com/lvgl/lvgl/issues/7090
- *It's not a TinyTTF feature but it's convenient to test it here
- *instead of generating a new font*/
-void test_tiny_ttf_cdm(void)
-{
-    /*Create a font*/
-    extern const uint8_t test_ubuntu_font[];
-    extern size_t test_ubuntu_font_size;
-    lv_font_t * font = lv_tiny_ttf_create_data(test_ubuntu_font, test_ubuntu_font_size, 30);
-
-    lv_obj_t * label = lv_label_create(lv_screen_active());
-    lv_obj_set_style_text_font(label, font, 0);
-    lv_label_set_text(label, "Zażółć gęślą jaźń");
-
-#ifndef NON_AMD64_BUILD
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/tiny_ttf_cdm.png");
-#endif
-    lv_obj_delete(label);
-    lv_tiny_ttf_destroy(font);
-}
 #endif
 
 #endif

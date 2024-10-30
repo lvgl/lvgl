@@ -626,4 +626,43 @@ void test_label_with_recolor_cmd(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_recolor.png");
 }
 
+
+
+/*Combining Diacritical Marks test
+ *See https://github.com/lvgl/lvgl/issues/7090
+ *It's not a TinyTTF feature but it's convenient to test it here
+ *instead of generating a new font*/
+void test_tiny_ttf_cdm(void)
+{
+    /*Use UTF-8 hex to make sure that Combining Diacritical Marks are used*/
+    /*"Zażółć, 0xgęślą, 0xjaźń"*/
+    const uint8_t text1[] = {0x5A, 0x61, 0x7A, 0xCC, 0x87, 0xC3, 0xB3, 0xC5, 0x82, 0xC4, 0x87, 0x20,
+                             0x67, 0xC4, 0x99, 0xC5, 0x9B, 0x6C, 0xC4, 0x85, 0x20,
+                             0x6A, 0x61, 0xC5, 0xBA, 0xC5, 0x84, 0x00
+                            };
+
+    /*"ZAŻÓŁĆ GĘŚLĄ JAŹŃ"*/
+    const uint8_t text2[] = {0x5A, 0x41, 0x5A, 0xCC, 0x87, 0x4F, 0xCC, 0x81, 0xC5, 0x81, 0x43, 0xCC, 0x81, 0x20,
+                             0x47, 0x45, 0xCC, 0xA8, 0x53, 0xCC, 0x81, 0x4C, 0x41, 0xCC, 0xA8, 0x20,
+                             0x4A, 0x41, 0x5A, 0xCC, 0x81, 0x4E, 0xCC, 0x81, 0x00
+                            };
+
+    LV_FONT_DECLARE(test_font_cdm);
+
+    lv_obj_clean(lv_screen_active());
+
+    lv_obj_t * label1 = lv_label_create(lv_screen_active());
+    lv_obj_set_style_text_font(label1, &test_font_cdm, 0);
+    lv_label_set_text(label1, (const char *)text1);
+    lv_obj_set_pos(label1, 10, 10);
+
+    lv_obj_t * label2 = lv_label_create(lv_screen_active());
+    lv_obj_set_style_text_font(label2, &test_font_cdm, 0);
+    lv_label_set_text(label2, (const char *)text2);
+    lv_obj_set_pos(label2, 10, 80);
+
+    /*Upper case is not perfect*/
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_cdm.png");
+}
+
 #endif

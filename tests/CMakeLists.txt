@@ -290,6 +290,7 @@ add_library(test_common
         src/test_assets/test_font_1.c
         src/test_assets/test_font_2.c
         src/test_assets/test_font_3.c
+        src/test_assets/test_font_cdm.c
         src/test_assets/test_font_montserrat_ascii_1bpp.c
         src/test_assets/test_font_montserrat_ascii_2bpp.c
         src/test_assets/test_font_montserrat_ascii_4bpp.c
