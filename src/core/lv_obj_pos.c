@@ -1170,7 +1170,7 @@ static void layout_update_core(lv_obj_t * obj)
 
 static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p_count, bool inv)
 {
-#if LV_USE_MATRIX
+#if LV_DRAW_TRANSFORM_USE_MATRIX
     const lv_matrix_t * style_matrix = lv_obj_get_style_transform_matrix(obj, 0);
     if(style_matrix) {
         lv_matrix_t m;
