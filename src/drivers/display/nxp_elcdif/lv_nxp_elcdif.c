@@ -74,7 +74,7 @@ lv_display_t * lv_nxp_display_elcdif_create(elcdif_rgb_mode_config_t config, voi
     /*A handle for the display*/
     lv_display_t * disp;
 
-    //Create the display, or return NULL if invalid mode
+    /*Create the display, or return NULL if invalid mode*/
     switch(mode) {
         case LV_DISPLAY_RENDER_MODE_DIRECT:
         case LV_DISPLAY_RENDER_MODE_FULL:
