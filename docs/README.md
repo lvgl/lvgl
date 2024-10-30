@@ -63,6 +63,11 @@ If this is *not* appropriate for the .RST file you are creating, ensure the stem
 In alignment with the above, use a file name stem that is appropriate to the topic being covered.
 
 
+### Text Format
+
+While with `.md` files, it is important to allow paragraphs to flow off to the right with one long line so that when they are formatted as `.html` files, the paragraphs will word-wrap with the width of the browser, this is not true with reStructuredText (`.rst` files).  [Sphinx](https://www.sphinx-doc.org/en/master/) and its underlying [docutils parsing engine](https://docutils.sourceforge.io/docs/) conveniently combine grouped text into a proper paragraph with that word-wrapping behavior.  This allows the source text documents to be nicely word-wrapped so that they are more readable in text- and code-editors that do not have wide editing windows.  So please wrap the text around column 80.  Wrapping at "exactly" column 80 is not important, but readability and ease of editing is.
+
+
 ### index.rst Files
 
 If you create a new directory you MUST have an `index.rst` file in that directory and that index file needs to be pointed to in the `index.rst` file that is located in the parent directory.
@@ -265,3 +270,5 @@ For such examples, simply use reStructuredText literal markup like this:
     ``lv_obj_set_layout((lv_obj_t *)widget, LV_LAYOUT_FLEX)``
     ``lv_obj_set_layout(&widget, LV_LAYOUT_FLEX);``
     ``lv_obj_set_layout(widget, ...)``
+
+
