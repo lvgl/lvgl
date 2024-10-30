@@ -24,7 +24,7 @@ Key features
 - Single frame buffer operation even with advanced graphic effects
 - Written in C for maximal compatibility (C++ compatible)
 - :ref:`Simulator <simulator>` to start embedded GUI design on a PC without embedded hardware
-- User code developed under similator can be shared with firmware to make UI development more efficient.
+- User code developed under simulator can be shared with firmware to make UI development more efficient.
 - Binding to :ref:`MicroPython`
 - Tutorials, examples, themes for rapid GUI design
 - Documentation is available online

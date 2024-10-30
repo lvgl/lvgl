@@ -4,10 +4,18 @@
  * Opts: --no-compress --no-prefilter --bpp 4 --size 40 --font TrumpGothicPro.ttf -r 0x20-0x7F --font ../../../scripts/built_in_font/DejaVuSans.ttf --range 0xFEA9,0xFE8D,0xFEAA,0xFECB,0xFEF9,0xFE95,0xFE8E,0xFEF3,0xFE8B,0xFEBC,0xFEA3,0xFE87,0xFEF4 --font ../../../scripts/built_in_font/SimSun.woff --symbols 语語言標題月日电池今日距离天的速度时间设置蓝牙灯亮度音量最大限度光照强统计三平均高时速简体中文。 --format lvgl -o font_ebike_trump_40.c --force-fast-kern-format
  ******************************************************************************/
 
-#ifdef LV_LVGL_H_INCLUDE_SIMPLE
+#ifdef __has_include
+    #if __has_include("lvgl.h")
+        #ifndef LV_LVGL_H_INCLUDE_SIMPLE
+            #define LV_LVGL_H_INCLUDE_SIMPLE
+        #endif
+    #endif
+#endif
+
+#if defined(LV_LVGL_H_INCLUDE_SIMPLE)
     #include "lvgl.h"
 #else
-    #include "lvgl/lvgl.h"
+    #include "../../../lvgl.h"
 #endif
 
 #ifndef FONT_EBIKE_TRUMP_40

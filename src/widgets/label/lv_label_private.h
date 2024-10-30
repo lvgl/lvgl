@@ -45,7 +45,7 @@ struct _lv_label_t {
 
     lv_point_t size_cache;              /**< Text size cache */
     lv_point_t offset;                  /**< Text draw position offset */
-    lv_label_long_mode_t long_mode : 3; /**< Determine what to do with the long texts */
+    lv_label_long_mode_t long_mode : 4; /**< Determine what to do with the long texts */
     uint8_t static_txt : 1;             /**< Flag to indicate the text is static */
     uint8_t recolor : 1;                /**< Enable in-line letter re-coloring*/
     uint8_t expand : 1;                 /**< Ignore real width (used by the library with LV_LABEL_LONG_SCROLL) */

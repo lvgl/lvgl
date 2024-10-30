@@ -121,7 +121,7 @@ props = [
 
 {'name': 'PAD_RADIAL',
 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Pad text labels away from the scale ticks/remainder of the LV_PART_"},
+ 'dsc': "Pad text labels away from the scale ticks/remainder of the ``LV_PART_``"},
 
 {'section': 'Margin', 'dsc' : "Properties to describe spacing around a Widget. Very similar to the margin properties in HTML."},
 {'name': 'MARGIN_TOP',

@@ -263,15 +263,7 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
     /* calc convert matrix */
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
-
-    /* matrix for drawing, different from matrix for calculating the bounding box */
-    vg_lite_matrix_t draw_matrix = u->global_matrix;
-
-    /* convert to vg-lite coordinate */
-    vg_lite_translate(pos.x - dsc->g->ofs_x, pos.y + dsc->g->box_h + dsc->g->ofs_y, &draw_matrix);
     vg_lite_translate(pos.x - dsc->g->ofs_x, pos.y + dsc->g->box_h + dsc->g->ofs_y, &matrix);
-
-    vg_lite_scale(scale, scale, &draw_matrix);
     vg_lite_scale(scale, scale, &matrix);
 
     /* calc inverse matrix */
@@ -290,6 +282,10 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
 
     /* Since the font uses Cartesian coordinates, the y coordinates need to be reversed */
     lv_vg_lite_path_set_bounding_box(outline, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
+
+    /* matrix for drawing, different from matrix for calculating the bounding box */
+    vg_lite_matrix_t draw_matrix = u->global_matrix;
+    lv_vg_lite_matrix_multiply(&draw_matrix, &matrix);
 
     vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(outline);
 
