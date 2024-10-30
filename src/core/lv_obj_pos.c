@@ -988,13 +988,19 @@ void lv_obj_set_transform(lv_obj_t * obj, const lv_matrix_t * matrix)
 {
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    if(!matrix) {
+        lv_obj_reset_transform(obj);
+        return;
+    }
+
     lv_obj_allocate_spec_attr(obj);
     if(!obj->spec_attr->matrix) {
         obj->spec_attr->matrix = lv_malloc(sizeof(lv_matrix_t));;
         LV_ASSERT_MALLOC(obj->spec_attr->matrix);
     }
 
-    /* Invalidate the old aree */
+    /* Invalidate the old area */
     lv_obj_invalidate(obj);
 
     /* Copy the matrix */
@@ -1009,6 +1015,35 @@ void lv_obj_set_transform(lv_obj_t * obj, const lv_matrix_t * matrix)
     LV_UNUSED(obj);
     LV_UNUSED(matrix);
     LV_LOG_WARN("Transform matrix is not used because LV_DRAW_TRANSFORM_USE_MATRIX is disabled");
+#endif
+}
+
+void lv_obj_reset_transform(lv_obj_t * obj)
+{
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(!obj->spec_attr) {
+        return;
+    }
+
+    if(!obj->spec_attr->matrix) {
+        return;
+    }
+
+    /* Invalidate the old area */
+    lv_obj_invalidate(obj);
+
+    /* Free the matrix */
+    lv_free(obj->spec_attr->matrix);
+    obj->spec_attr->matrix = NULL;
+
+    /* Matrix is cleared. Update the layer type */
+    lv_obj_update_layer_type(obj);
+
+    /* Invalidate the new area */
+    lv_obj_invalidate(obj);
+#else
+    LV_UNUSED(obj);
 #endif
 }
 

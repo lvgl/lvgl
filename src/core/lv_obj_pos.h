@@ -206,6 +206,13 @@ void lv_obj_center(lv_obj_t * obj);
 void lv_obj_set_transform(lv_obj_t * obj, const lv_matrix_t * matrix);
 
 /**
+ * Reset the transfrom matrix of an object to identity matrix
+ * @param obj       pointer to an object
+ * @note `LV_DRAW_TRANSFORM_USE_MATRIX` needs to be enabled.
+ */
+void lv_obj_reset_transform(lv_obj_t * obj);
+
+/**
  * Copy the coordinates of an object to an area
  * @param obj       pointer to an object
  * @param coords    pointer to an area to store the coordinates
