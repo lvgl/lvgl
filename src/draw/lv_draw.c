@@ -458,6 +458,7 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 
     /*Avoid small allocation related failures*/
     if((_draw_info.used_memory_for_layers_kb + layer_size_byte) > LV_DRAW_LAYER_MAX_MEMORY) {
+        LV_LOG_INFO("LV_DRAW_LAYER_MAX_MEMORY is reached when allocating the layer. ")
         return NULL;
     }
 

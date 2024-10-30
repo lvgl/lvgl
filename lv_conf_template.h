@@ -83,12 +83,11 @@
     #endif
 #endif  /*LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN*/
 
-/*Layer memory allocation limits*/
-    /** Limit the max allocated memory for simple and transformed layers.
+     /* Limit the max allocated memory for simple and transformed layers.
      * It should be at least `LV_DRAW_LAYER_SIMPLE_BUF_SIZE` sized but if transformed layers are also used
      * It should be enough to store the largest widget too (width x height x 4 area).
      * Set it to a very large value to have no limit. */
-    #define LV_DRAW_LAYER_MAX_MEMORY (2 * 1024U)  /**< [bytes]*/
+    #define LV_DRAW_LAYER_MAX_MEMORY (32 * 1024 * 1024U)  /**< [bytes]*/
 
 /*====================
    HAL SETTINGS
