@@ -96,7 +96,7 @@ props = [
 
 {'name': 'TRANSFORM_MATRIX',
  'style_type': 'ptr',   'var_type': 'const lv_matrix_t *' ,  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "An initialized `lv_matrix_t` to describe a matrix."},
+ 'dsc': "An initialized `lv_matrix_t` to describe a matrix. Requires rendering backend to support matrix transformation"},
 
 {'section': 'Padding', 'dsc' : "Properties to describe spacing between the parent's sides and the children and among the children. Very similar to the padding properties in HTML."},
 {'name': 'PAD_TOP',

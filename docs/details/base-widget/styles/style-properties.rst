@@ -320,7 +320,7 @@ Skew Widget vertically. The value is interpreted in 0.1 degree units. E.g. 450 m
 transform_matrix
 ~~~~~~~~~~~~~~~~
 
-An initialized `lv_matrix_t` to describe a matrix.
+An initialized `lv_matrix_t` to describe a matrix. Requires rendering backend to support matrix transformation
 
 .. raw:: html
 
