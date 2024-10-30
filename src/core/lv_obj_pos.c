@@ -984,7 +984,7 @@ void lv_obj_center(lv_obj_t * obj)
     lv_obj_align(obj, LV_ALIGN_CENTER, 0, 0);
 }
 
-void lv_obj_set_transform_matrix(lv_obj_t * obj, const lv_matrix_t * matrix)
+void lv_obj_set_transform(lv_obj_t * obj, const lv_matrix_t * matrix)
 {
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -1012,7 +1012,7 @@ void lv_obj_set_transform_matrix(lv_obj_t * obj, const lv_matrix_t * matrix)
 #endif
 }
 
-const lv_matrix_t * lv_obj_get_transform_matrix(const lv_obj_t * obj)
+const lv_matrix_t * lv_obj_get_transform(const lv_obj_t * obj)
 {
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -1213,7 +1213,7 @@ static void layout_update_core(lv_obj_t * obj)
 static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p_count, bool inv)
 {
 #if LV_DRAW_TRANSFORM_USE_MATRIX
-    const lv_matrix_t * obj_matrix = lv_obj_get_transform_matrix(obj);
+    const lv_matrix_t * obj_matrix = lv_obj_get_transform(obj);
     if(obj_matrix) {
         lv_matrix_t m;
         lv_matrix_identity(&m);

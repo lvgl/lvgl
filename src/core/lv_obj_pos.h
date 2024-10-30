@@ -203,7 +203,7 @@ void lv_obj_center(lv_obj_t * obj);
  * @param matrix    pointer to a matrix to set
  * @note `LV_DRAW_TRANSFORM_USE_MATRIX` needs to be enabled.
  */
-void lv_obj_set_transform_matrix(lv_obj_t * obj, const lv_matrix_t * matrix);
+void lv_obj_set_transform(lv_obj_t * obj, const lv_matrix_t * matrix);
 
 /**
  * Copy the coordinates of an object to an area
@@ -355,7 +355,7 @@ void lv_obj_move_children_by(lv_obj_t * obj, int32_t x_diff, int32_t y_diff, boo
  * @param obj       pointer to an object
  * @return          pointer to the transform matrix or NULL if not set
  */
-const lv_matrix_t * lv_obj_get_transform_matrix(const lv_obj_t * obj);
+const lv_matrix_t * lv_obj_get_transform(const lv_obj_t * obj);
 
 /**
  * Transform a point using the angle and zoom style properties of an object

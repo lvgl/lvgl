@@ -973,7 +973,7 @@ static bool obj_get_matrix(lv_obj_t * obj, lv_matrix_t * matrix)
 {
     lv_matrix_identity(matrix);
 
-    const lv_matrix_t * obj_matrix = lv_obj_get_transform_matrix(obj);
+    const lv_matrix_t * obj_matrix = lv_obj_get_transform(obj);
     if(obj_matrix) {
         lv_matrix_translate(matrix, obj->coords.x1, obj->coords.y1);
         lv_matrix_multiply(matrix, obj_matrix);
