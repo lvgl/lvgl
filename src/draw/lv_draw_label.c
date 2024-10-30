@@ -292,6 +292,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
         const char * bidi_txt = dsc->text + line_start;
 #endif
 
+        int32_t letter_w_prev = 0;
         while(next_char_offset < line_end - line_start) {
             uint32_t logical_char_pos = 0;
 
@@ -428,11 +429,22 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
                 draw_letter_dsc.color = dsc->color;
             }
 
+            /*In case of "Combining Diacritical Marks" go back to the previous letter
+             *as these are accent which are drawn on top of the previous letter*/
+            if(letter >= 0x0300 && letter <= 0x036F) {
+                pos.x -= letter_w_prev;
+            }
             draw_letter(draw_unit, &draw_letter_dsc, &pos, font, letter, cb);
+
+            /*"Combining Diacritical Marks" have zero width, so go back to the normal position*/
+            if(letter >= 0x0300 && letter <= 0x036F) {
+                pos.x += letter_w_prev;
+            }
 
             if(letter_w > 0) {
                 pos.x += letter_w + dsc->letter_space;
             }
+            letter_w_prev = letter_w;
         }
 
 #if LV_USE_BIDI
