@@ -855,15 +855,6 @@ void lv_obj_invalidate(const lv_obj_t * obj)
     lv_obj_invalidate_area(obj, &obj_coords);
 }
 
-bool is_transformed(const lv_obj_t * obj)
-{
-    while(obj) {
-        if(obj->spec_attr && obj->spec_attr->layer_type == LV_LAYER_TYPE_TRANSFORM) return true;
-        obj = obj->parent;
-    }
-    return false;
-}
-
 bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
 {
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return false;
@@ -995,6 +986,15 @@ void lv_obj_center(lv_obj_t * obj)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static bool is_transformed(const lv_obj_t * obj)
+{
+    while(obj) {
+        if(obj->spec_attr && obj->spec_attr->layer_type == LV_LAYER_TYPE_TRANSFORM) return true;
+        obj = obj->parent;
+    }
+    return false;
+}
 
 static int32_t calc_content_width(lv_obj_t * obj)
 {
