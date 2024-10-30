@@ -14,7 +14,7 @@
  * Generated code from properties.py
  */
 /* *INDENT-OFF* */
-const lv_property_name_t lv_style_property_names[116] = {
+const lv_property_name_t lv_style_property_names[115] = {
     {"align",                  LV_PROPERTY_STYLE_ALIGN,},
     {"anim",                   LV_PROPERTY_STYLE_ANIM,},
     {"anim_duration",          LV_PROPERTY_STYLE_ANIM_DURATION,},
@@ -115,7 +115,6 @@ const lv_property_name_t lv_style_property_names[116] = {
     {"text_line_space",        LV_PROPERTY_STYLE_TEXT_LINE_SPACE,},
     {"text_opa",               LV_PROPERTY_STYLE_TEXT_OPA,},
     {"transform_height",       LV_PROPERTY_STYLE_TRANSFORM_HEIGHT,},
-    {"transform_matrix",       LV_PROPERTY_STYLE_TRANSFORM_MATRIX,},
     {"transform_pivot_x",      LV_PROPERTY_STYLE_TRANSFORM_PIVOT_X,},
     {"transform_pivot_y",      LV_PROPERTY_STYLE_TRANSFORM_PIVOT_Y,},
     {"transform_rotation",     LV_PROPERTY_STYLE_TRANSFORM_ROTATION,},

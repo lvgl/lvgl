@@ -94,10 +94,6 @@ props = [
   'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
   'dsc': "Skew Widget vertically. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg."},
 
-{'name': 'TRANSFORM_MATRIX',
- 'style_type': 'ptr',   'var_type': 'const lv_matrix_t *' ,  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "An initialized `lv_matrix_t` to describe a matrix. Requires rendering backend to support matrix transformation"},
-
 {'section': 'Padding', 'dsc' : "Properties to describe spacing between the parent's sides and the children and among the children. Very similar to the padding properties in HTML."},
 {'name': 'PAD_TOP',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,

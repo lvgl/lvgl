@@ -36,7 +36,6 @@ void lv_style_set_transform_pivot_x(lv_style_t * style, int32_t value);
 void lv_style_set_transform_pivot_y(lv_style_t * style, int32_t value);
 void lv_style_set_transform_skew_x(lv_style_t * style, int32_t value);
 void lv_style_set_transform_skew_y(lv_style_t * style, int32_t value);
-void lv_style_set_transform_matrix(lv_style_t * style, const lv_matrix_t * value);
 void lv_style_set_pad_top(lv_style_t * style, int32_t value);
 void lv_style_set_pad_bottom(lv_style_t * style, int32_t value);
 void lv_style_set_pad_left(lv_style_t * style, int32_t value);
@@ -243,11 +242,6 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, int32_t value);
 #define LV_STYLE_CONST_TRANSFORM_SKEW_Y(val) \
     { \
         .prop = LV_STYLE_TRANSFORM_SKEW_Y, .value = { .num = (int32_t)val } \
-    }
-
-#define LV_STYLE_CONST_TRANSFORM_MATRIX(val) \
-    { \
-        .prop = LV_STYLE_TRANSFORM_MATRIX, .value = { .ptr = val } \
     }
 
 #define LV_STYLE_CONST_PAD_TOP(val) \
