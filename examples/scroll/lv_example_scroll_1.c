@@ -1,6 +1,5 @@
 #include "../lv_examples.h"
 #if LV_BUILD_EXAMPLES
-#include <stdio.h>  /* For sprintf() prototype. */
 
 lv_obj_t  * panel;
 lv_obj_t  * save_button;
@@ -15,9 +14,7 @@ static void scroll_update_cb(lv_event_t * e)
 {
     LV_UNUSED(e);
 
-    LV_LOG_USER(
-        "lv_obj_get_scroll_...() results:\n"
-        "  x[%d] y[%d] top[%d] bottom[%d] left[%d] right[%d]",
+    LV_LOG("scroll info: x:%3d, y:%3d, top:%3d, bottom:%3d, left:%3d, right:%3d\n",
         lv_obj_get_scroll_x(panel),
         lv_obj_get_scroll_y(panel),
         lv_obj_get_scroll_top(panel),
