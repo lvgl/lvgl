@@ -6,16 +6,28 @@
 #ifndef LV_NXP_ELCDIF_DRIVER_H
 #define LV_NXP_ELCDIF_DRIVER_H
 
-#include "../../../lvgl.h"
-
 #if LV_USE_NXP_ELCDIF == 1
-
-#include "fsl_elcdif.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/*********************
+ *      INCLUDES
+ *********************/
+#include "../../../lvgl.h"
+#include "fsl_elcdif.h"
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
 /**
  * API to create display for NXP processors by default. Sets internal buffers and callbacks and everything accordingly
  * @param config : NXP eLCD config
@@ -40,6 +52,10 @@ lv_display_t * lv_nxp_display_elcdif_create(elcdif_rgb_mode_config_t config, voi
  */
 lv_display_t * lv_nxp_display_elcdif_create_direct(elcdif_rgb_mode_config_t config, void * frame_buffer1,
                                                    void * frame_buffer2, size_t buf_size);
+
+/**********************
+ *      MACROS
+ **********************/
 
 #ifdef __cplusplus
 } /*extern "C"*/
