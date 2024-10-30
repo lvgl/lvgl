@@ -186,6 +186,14 @@ void lv_obj_set_style_transform_skew_y(lv_obj_t * obj, int32_t value, lv_style_s
     lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_SKEW_Y, v, selector);
 }
 
+void lv_obj_set_style_transform_matrix(lv_obj_t * obj, const lv_matrix_t * value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .ptr = value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TRANSFORM_MATRIX, v, selector);
+}
+
 void lv_obj_set_style_pad_top(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {

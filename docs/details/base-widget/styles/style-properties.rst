@@ -317,6 +317,20 @@ Skew Widget vertically. The value is interpreted in 0.1 degree units. E.g. 450 m
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> Yes</li>
   </ul>
 
+transform_matrix
+~~~~~~~~~~~~~~~~
+
+An initialized `lv_matrix_t` to describe a matrix.
+
+.. raw:: html
+
+  <ul>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `NULL`</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  </ul>
+
 Padding
 -------
 

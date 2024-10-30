@@ -969,11 +969,17 @@ static bool alpha_test_area_on_obj(lv_obj_t * obj, const lv_area_t * area)
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
 
-static void refr_obj_matrix(lv_layer_t * layer, lv_obj_t * obj)
+static bool obj_get_matrix(lv_obj_t * obj, lv_matrix_t * matrix)
 {
-    lv_matrix_t ori_matrix = layer->matrix;
-    lv_matrix_t obj_matrix;
-    lv_matrix_identity(&obj_matrix);
+    lv_matrix_identity(matrix);
+
+    const lv_matrix_t * style_matrix = lv_obj_get_style_transform_matrix(obj, 0);
+    if(style_matrix) {
+        lv_matrix_translate(matrix, obj->coords.x1, obj->coords.y1);
+        lv_matrix_multiply(matrix, style_matrix);
+        lv_matrix_translate(matrix, -obj->coords.x1, -obj->coords.y1);
+        return true;
+    }
 
     lv_point_t pivot = {
         .x = lv_obj_get_style_transform_pivot_x(obj, 0),
@@ -991,28 +997,38 @@ static void refr_obj_matrix(lv_layer_t * layer, lv_obj_t * obj)
 
     if(scale_x <= 0 || scale_y <= 0) {
         /* NOT draw if scale is negative or zero */
-        return;
+        return false;
     }
 
     /* generate the obj matrix */
-    lv_matrix_translate(&obj_matrix, pivot.x, pivot.y);
+    lv_matrix_translate(matrix, pivot.x, pivot.y);
     if(rotation != 0) {
-        lv_matrix_rotate(&obj_matrix, rotation * 0.1f);
+        lv_matrix_rotate(matrix, rotation * 0.1f);
     }
 
     if(scale_x != LV_SCALE_NONE || scale_y != LV_SCALE_NONE) {
         lv_matrix_scale(
-            &obj_matrix,
+            matrix,
             (float)scale_x / LV_SCALE_NONE,
             (float)scale_y / LV_SCALE_NONE
         );
     }
 
     if(skew_x != 0 || skew_y != 0) {
-        lv_matrix_skew(&obj_matrix, skew_x, skew_y);
+        lv_matrix_skew(matrix, skew_x, skew_y);
     }
 
-    lv_matrix_translate(&obj_matrix, -pivot.x, -pivot.y);
+    lv_matrix_translate(matrix, -pivot.x, -pivot.y);
+    return true;
+}
+
+static void refr_obj_matrix(lv_layer_t * layer, lv_obj_t * obj)
+{
+    lv_matrix_t ori_matrix = layer->matrix;
+    lv_matrix_t obj_matrix;
+    if(!obj_get_matrix(obj, &obj_matrix)) {
+        return;
+    }
 
     /* apply the obj matrix */
     lv_matrix_multiply(&layer->matrix, &obj_matrix);
