@@ -71,6 +71,7 @@ struct _lv_image_pixel_color_s {
  *  STATIC PROTOTYPES
  **********************/
 
+static char * ffmpeg_resolve_path(const char * path);
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * src, lv_image_header_t * header);
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
@@ -255,6 +256,66 @@ void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en)
  *   STATIC FUNCTIONS
  **********************/
 
+static char * ffmpeg_resolve_path(const char * path)
+{
+    size_t path_len = lv_strlen(path);
+
+    /*Get relative path*/
+    char driver_letter;
+#if LV_FS_DEFAULT_DRIVE_LETTER != '\0' /*When using default drive letter, strict format (X:) is mandatory*/
+    bool has_drive_prefix = ('A' <= path[0]) && (path[0] <= 'Z') && (path[1] == ':');
+
+    if(has_drive_prefix) {
+        driver_letter = path[0];
+        path = path + 2;
+        path_len -= 2;
+    }
+    else {
+        driver_letter = LV_FS_DEFAULT_DRIVE_LETTER;
+    }
+# else /*Lean rules for backward compatibility*/
+    driver_letter = path[0];
+
+    if(*path != '\0') {
+        path++; /*Ignore the driver letter*/
+        path_len--;
+        if(*path == ':') {
+            path++;
+            path_len--;
+        }
+    }
+#endif
+
+    if(path_len <= 0) return NULL;
+
+    /*Get driver prefix*/
+    const char * prefix = NULL;
+#if LV_USE_FS_STDIO
+    if(driver_letter == LV_FS_STDIO_LETTER) {
+        prefix = LV_FS_STDIO_PATH;
+    }
+#endif
+#if LV_USE_FS_POSIX
+    if(driver_letter == LV_FS_POSIX_LETTER) {
+        prefix = LV_FS_POSIX_PATH;
+    }
+#endif
+#if LV_USE_FS_WIN32
+    if(driver_letter == LV_FS_WIN32_LETTER) {
+        prefix = LV_FS_WIN32_PATH;
+    }
+#endif
+    /*Other FSs are not supported by FFmpeg, AFAIK*/
+    if(prefix == NULL) return NULL;
+    size_t prefix_len = lv_strlen(prefix);
+
+    char * res = lv_malloc(prefix_len + path_len + 1);
+    lv_memcpy(res, prefix, prefix_len);
+    lv_memcpy(res + prefix_len, path, path_len + 1);
+
+    return res; /*The caller is responsible for freeing the memory*/
+}
+
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header)
 {
     LV_UNUSED(decoder);
@@ -264,13 +325,15 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
     lv_image_src_t src_type = dsc->src_type;
 
     if(src_type == LV_IMAGE_SRC_FILE) {
-        const char * fn = src;
+        char * fn = ffmpeg_resolve_path(src);
 
         if(ffmpeg_get_image_header(fn, header) < 0) {
             LV_LOG_ERROR("ffmpeg can't get image header");
+            lv_free(fn);
             return LV_RESULT_INVALID;
         }
 
+        lv_free(fn);
         return LV_RESULT_OK;
     }
 
@@ -289,9 +352,10 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     LV_UNUSED(decoder);
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-        const char * path = dsc->src;
+        char * path = ffmpeg_resolve_path(dsc->src);
 
         struct ffmpeg_context_s * ffmpeg_ctx = ffmpeg_open_file(path);
+        lv_free(path);
 
         if(ffmpeg_ctx == NULL) {
             return LV_RESULT_INVALID;
@@ -658,7 +722,7 @@ static int ffmpeg_update_next_frame(struct ffmpeg_context_s * ffmpeg_ctx)
     return ret;
 }
 
-struct ffmpeg_context_s * ffmpeg_open_file(const char * path)
+static struct ffmpeg_context_s * ffmpeg_open_file(const char * path)
 {
     if(path == NULL || lv_strlen(path) == 0) {
         LV_LOG_ERROR("file path is empty");
