@@ -15,6 +15,7 @@ Here are the **similarity** for simulator mode and application mode.
 - Support Windows touch input.
 - Support Windows input method integration input.
 - Support Per-monitor DPI Aware (both V1 and V2).
+- Provide HWND-based interoperability for other Windows UI infrastructures.
 
 Here are the **differences** for simulator mode and application mode.
 
@@ -31,6 +32,8 @@ Application Mode
 - Designed for Windows desktop application development scenario.
 - Have the Window resizing support and LVGL display resolution will be changed.
 - When Windows DPI scaling setting is changed, the LVGL display DPI value will also be changed.
+- The resolution you set for lv_windows_create_display is the window size instead of window client size for following the convention of other Windows desktop UI infrastructures.
+- The applications based on this mode should adapt the LVGL display resolution changing for supporting window resizing properly.
 
 Prerequisites
 -------------
