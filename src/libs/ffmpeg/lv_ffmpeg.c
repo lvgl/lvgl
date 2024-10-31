@@ -258,6 +258,7 @@ void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en)
 
 static char * ffmpeg_resolve_path(const char * path)
 {
+#if (LV_USE_FS_STDIO || LV_USE_FS_POSIX || LV_USE_FS_WIN32)
     size_t path_len = lv_strlen(path);
 
     /*Get relative path*/
@@ -314,6 +315,9 @@ static char * ffmpeg_resolve_path(const char * path)
     lv_memcpy(res + prefix_len, path, path_len + 1);
 
     return res; /*The caller is responsible for freeing the memory*/
+#else
+    return NULL;
+#endif /*if (LV_USE_FS_STDIO || LV_USE_FS_POSIX || LV_USE_FS_WIN32)*/
 }
 
 static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header)
@@ -326,6 +330,10 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     if(src_type == LV_IMAGE_SRC_FILE) {
         char * fn = ffmpeg_resolve_path(src);
+        if(fn == NULL) {
+            /*Maybe other decoder can handle it, so keep silence here*/
+            return LV_RESULT_INVALID;
+        }
 
         if(ffmpeg_get_image_header(fn, header) < 0) {
             LV_LOG_ERROR("ffmpeg can't get image header");
@@ -353,6 +361,10 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         char * path = ffmpeg_resolve_path(dsc->src);
+        if(path == NULL) {
+            /*Maybe other decoder can handle it, so keep silence here*/
+            return LV_RESULT_INVALID;
+        }
 
         struct ffmpeg_context_s * ffmpeg_ctx = ffmpeg_open_file(path);
         lv_free(path);
