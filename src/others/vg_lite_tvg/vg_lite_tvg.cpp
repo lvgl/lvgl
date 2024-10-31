@@ -2042,7 +2042,7 @@ Empty_sequence_handler:
     vg_lite_error_t vg_lite_get_mem_size(vg_lite_uint32_t * size)
     {
         *size = 0;
-        return VG_LITE_NOT_SUPPORT;
+        return VG_LITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_source_global_alpha(vg_lite_global_alpha_t alpha_mode, uint8_t alpha_value)
@@ -2140,6 +2140,13 @@ Empty_sequence_handler:
         }
 
         return VG_LITE_NOT_SUPPORT;
+    }
+
+    vg_lite_error_t vg_lite_dump_command_buffer(void)
+    {
+        LV_LOG_USER("command:");
+        LV_LOG_USER("@[commit]");
+        return VG_LITE_SUCCESS;
     }
 } /* extern "C" */
 

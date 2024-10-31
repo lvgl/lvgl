@@ -282,6 +282,35 @@ void lv_draw_sw_i1_invert(void * buf, uint32_t buf_size)
     }
 }
 
+void lv_draw_sw_i1_convert_to_vtiled(const void * buf, uint32_t buf_size, uint32_t width, uint32_t height,
+                                     void * out_buf,
+                                     uint32_t out_buf_size, bool bit_order_lsb)
+{
+    LV_ASSERT(buf && out_buf);
+    LV_ASSERT(width % 8 == 0 && height % 8 == 0);
+    LV_ASSERT(buf_size == (width / 8) * height);
+    LV_ASSERT(out_buf_size >= buf_size);
+
+    lv_memset(out_buf, 0, out_buf_size);
+
+    const uint8_t * src_buf = (uint8_t *)buf;
+    uint8_t * dst_buf = (uint8_t *)out_buf;
+
+    for(uint32_t y = 0; y < height; y++) {
+        for(uint32_t x = 0; x < width; x++) {
+            uint32_t src_index = y * width + x;
+            uint32_t dst_index = x * height + y;
+            uint8_t bit = (src_buf[src_index / 8] >> (7 - (src_index % 8))) & 0x01;
+            if(bit_order_lsb) {
+                dst_buf[dst_index / 8] |= (bit << (dst_index % 8));
+            }
+            else {
+                dst_buf[dst_index / 8] |= (bit << (7 - (dst_index % 8)));
+            }
+        }
+    }
+}
+
 void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t src_height, int32_t src_stride,
                        int32_t dest_stride, lv_display_rotation_t rotation, lv_color_format_t color_format)
 {

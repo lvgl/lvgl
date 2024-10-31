@@ -44,31 +44,31 @@ Our team is ready to help you with graphics design, UI implementation and consul
 **Free and Portable**
   - A fully portable C (C++ compatible) library with no external dependencies.
   - Can be compiled to any MCU or MPU, with any (RT)OS.
-  - Supports monochrome, ePaper, OLED or TFT displays, or even monitors. [Porting Guide](https://docs.lvgl.io/master/porting/project.html)
+  - Supports monochrome, ePaper, OLED or TFT displays, or even monitors. [Displays](https://docs.lvgl.io/master/details/main-components/display.html)
   - Distributed under the MIT license, so you can easily use it in commercial projects too.
   - Needs only 32kB RAM and 128 kB Flash, a frame buffer, and at least an 1/10 screen sized buffer for rendering.
   - OS, External memory and GPU are supported but not required.
 
 **Widgets, Styles, Layouts and more**
-  - 30+ built-in [Widgets](https://docs.lvgl.io/master/widgets/index.html):  Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table and many more.
-  - Flexible [Style system](https://docs.lvgl.io/master/overview/style.html) with  ~100 style properties to customize any part of the widgets in any state.
-  - [Flexbox](https://docs.lvgl.io/master/layouts/flex.html) and [Grid](https://docs.lvgl.io/master/layouts/grid.html)-like layouts engines to automatically size and position the widgets in a responsive way.
+  - 30+ built-in [Widgets](https://docs.lvgl.io/master/details/widgets/index.html):  Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table and many more.
+  - Flexible [Style system](https://docs.lvgl.io/master/details/base-widget/styles/style.html) with  ~100 style properties to customize any part of the widgets in any state.
+  - [Flexbox](https://docs.lvgl.io/master/details/base-widget/layouts/flex.html) and [Grid](https://docs.lvgl.io/master/details/base-widget/layouts/grid.html)-like layouts engines to automatically size and position the widgets in a responsive way.
   - Texts are rendered with UTF-8 encoding supporting CJK, Thai, Hindi, Arabic, Persian writing systems.
   - Word wrapping, kerning, text scrolling, sub-pixel rendering, Pinyin-IME Chinese input, Emojis in texts.
   - Rendering engine supporting animations, anti-aliasing, opacity, smooth scrolling, shadows, image transformation, etc  
-  - Supports Mouse, Touchpad, Keypad, Keyboard, External buttons, Encoder [Input devices](https://docs.lvgl.io/master/porting/indev.html).
-  - [Multiple display](https://docs.lvgl.io/master/overview/display.html#multiple-display-support) support.
+  - Supports Mouse, Touchpad, Keypad, Keyboard, External buttons, Encoder [Input devices](https://docs.lvgl.io/master/details/main-components/indev.html).
+  - [Multiple display](https://docs.lvgl.io/master/details/main-components/display.html#how-many-displays-can-lvgl-use) support.
 
 **Binding and Build Support**
   - [MicroPython Binding](https://blog.lvgl.io/2019-02-20/micropython-bindings) exposes LVGL API
   - [PikaScript Binding](https://blog.lvgl.io/2022-08-24/pikascript-and-lvgl) python on MCU lighter and easier.
   - No custom build system is used. You can build LVGL as you build the other files of your project.
-  - Support for Make and [CMake](https://docs.lvgl.io/master/integration/building/cmake.html) is included out of the box.
-  - [Develop on PC](https://docs.lvgl.io/master/integration/ide/pc-simulator.html) and use the same UI code on embedded hardware.
+  - Support for Make and [CMake](https://docs.lvgl.io/master/details/integration/building/cmake.html) is included out of the box.
+  - [Develop on PC](https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html) and use the same UI code on embedded hardware.
   - Convert the C UI code to HTML file with our [Emscripten port](https://github.com/lvgl/lv_web_emscripten).
 
 **Docs, Tools, and Services**
-  - Detailed [Documentation](https://docs.lvgl.io/) with [100+ simple examples](https://docs.lvgl.io/master/index.html)
+  - Detailed [Documentation](https://docs.lvgl.io/) with [100+ simple examples](https://docs.lvgl.io/master/examples.html)
   - [Services](https://lvgl.io/services) such as User interface design, Implementation and Consulting to make UI development simpler and faster.
 
 ## :heart: Sponsor
@@ -92,13 +92,13 @@ If someone implements or fixes an issue labeled as [Sponsored](https://github.co
 
 ## :package: Packages
 LVGL is available as:
-- [Arduino library](https://docs.lvgl.io/master/integration/framework/arduino.html)
+- [Arduino library](https://docs.lvgl.io/master/details/integration/framework/arduino.html)
 - [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
-- [Zephyr library](https://docs.lvgl.io/master/integration/os/zephyr.html)
+- [Zephyr library](https://docs.lvgl.io/master/details/integration/os/zephyr.html)
 - [ESP-IDF(ESP32) component](https://components.espressif.com/components/lvgl/lvgl)
 - [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
-- [NuttX library](https://docs.lvgl.io/master/integration/os/nuttx.html)
-- [RT-Thread RTOS](https://docs.lvgl.io/master/integration/os/rt-thread.html)
+- [NuttX library](https://docs.lvgl.io/master/details/integration/os/nuttx.html)
+- [RT-Thread RTOS](https://docs.lvgl.io/master/details/integration/os/rt-thread.html)
 - CMSIS-Pack
 - [RIOT OS package](https://doc.riot-os.org/group__pkg__lvgl.html#details)
 
@@ -419,20 +419,20 @@ This list will guide you to get started with LVGL step-by-step.
 
 **Get Familiar with LVGL**
 
-  1. Check the [Online demos](https://lvgl.io/demos) to see LVGL in action (3 minutes)
-  2. Read the [Introduction](https://docs.lvgl.io/master/intro/index.html) page of the documentation (5 minutes)
-  3. Get familiar with the basics on the [Quick overview](https://docs.lvgl.io/master/get-started/quick-overview.html) page (15 minutes)
+  1. Check the [Online demos](https://lvgl.io/demos) to see LVGL in action (3 minutes).
+  2. Read the [Introduction](https://docs.lvgl.io/master/intro/index.html) page of the documentation (5 minutes).
+  3. Get familiar with the basics on the [Quick overview](https://docs.lvgl.io/master/intro/basics.html) page (15 minutes).
 
 **Start to Use LVGL**
 
-  4. Set up a [Simulator](https://docs.lvgl.io/master/integration/ide/pc-simulator.html#simulator) (10 minutes)
-  5. Try out some [Examples](https://github.com/lvgl/lvgl/tree/master/examples)
-  6. Port LVGL to a board. See the [Porting](https://docs.lvgl.io/master/porting/index.html) guide or check the ready to use [Projects](https://github.com/lvgl?q=lv_port_)
+  4. Set up a [Simulator](https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html#simulator) (10 minutes).
+  5. Try out some [Examples](https://github.com/lvgl/lvgl/tree/master/examples).
+  6. Port LVGL to a board. See the [Porting](https://docs.lvgl.io/master/intro/add-lvgl-to-your-project/index.html) guide or check out the ready-to-use [Projects](https://github.com/lvgl?q=lv_port_).
 
 **Become a Pro**
 
-  7. Read the [Overview](https://docs.lvgl.io/master/overview/index.html) page to get a better understanding of the library (2-3 hours)
-  8. Check the documentation of the [Widgets](https://docs.lvgl.io/master/widgets/index.html) to see their features and usage
+  7. Read the [Main-Components](https://docs.lvgl.io/master/details/main-components/index.html) page to get a better understanding of the library (2-3 hours)
+  8. Check the documentation of the [Widgets](https://docs.lvgl.io/master/details/widgets/index.html) to see their features and usage
 
 **Get Help and Help Others**
 

@@ -547,13 +547,15 @@ static void anim_timer(lv_timer_t * param)
                     if(!state.anim_list_changed && a->custom_exec_cb) a->custom_exec_cb(a, new_value);
                 }
 
-                /*Restore the original time to see is there is over time.
-                 *Restore only if it wasn't changed in the `exec_cb` for some special reasons.*/
-                if(a->act_time == act_time_before_exec) a->act_time = act_time_original;
+                if(!state.anim_list_changed) {
+                    /*Restore the original time to see is there is over time.
+                     *Restore only if it wasn't changed in the `exec_cb` for some special reasons.*/
+                    if(a->act_time == act_time_before_exec) a->act_time = act_time_original;
 
-                /*If the time is elapsed the animation is ready*/
-                if(!state.anim_list_changed && a->act_time >= a->duration) {
-                    anim_completed_handler(a);
+                    /*If the time is elapsed the animation is ready*/
+                    if(a->act_time >= a->duration) {
+                        anim_completed_handler(a);
+                    }
                 }
             }
         }
