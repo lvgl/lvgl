@@ -1024,22 +1024,28 @@ static bool obj_get_matrix(lv_obj_t * obj, lv_matrix_t * matrix)
 
 static void refr_obj_matrix(lv_layer_t * layer, lv_obj_t * obj)
 {
-    lv_matrix_t ori_matrix = layer->matrix;
     lv_matrix_t obj_matrix;
     if(!obj_get_matrix(obj, &obj_matrix)) {
+        /* NOT draw if obj matrix is not available */
         return;
     }
+
+    lv_matrix_t matrix_inv;
+    if(!lv_matrix_inverse(&matrix_inv, &obj_matrix)) {
+        /* NOT draw if matrix is not invertible */
+        return;
+    }
+
+    /* save original matrix */
+    lv_matrix_t ori_matrix = layer->matrix;
 
     /* apply the obj matrix */
     lv_matrix_multiply(&layer->matrix, &obj_matrix);
 
     /* calculate clip area without transform */
-    lv_matrix_t matrix_reverse;
-    lv_matrix_inverse(&matrix_reverse, &obj_matrix);
-
     lv_area_t clip_area = layer->_clip_area;
     lv_area_t clip_area_ori = layer->_clip_area;
-    clip_area = lv_matrix_transform_area(&matrix_reverse, &clip_area);
+    clip_area = lv_matrix_transform_area(&matrix_inv, &clip_area);
 
     /* increase the clip area by 1 pixel to avoid rounding errors */
     if(!lv_matrix_is_identity_or_translation(&obj_matrix)) {
