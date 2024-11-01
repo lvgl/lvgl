@@ -78,6 +78,11 @@ uint32_t lv_nemagfx_cf_to_nema(lv_color_format_t cf)
             return NEMA_TSC12;
         case LV_COLOR_FORMAT_NEMA_TSC12A:
             return NEMA_TSC12A;
+            /*Guard for previous NemaGFX Version*/
+#ifdef NEMA_TSC6AP
+        case LV_COLOR_FORMAT_NEMA_TSC6AP:
+            return NEMA_TSC6AP;
+#endif
         default:
             return LV_NEMA_GFX_COLOR_FORMAT;
     }
@@ -117,6 +122,19 @@ void lv_nemagfx_grad_set(NEMA_VG_GRAD_HANDLE gradient, lv_grad_dsc_t lv_grad, lv
     }
 
     nema_vg_grad_set(gradient, cnt, stops, colors);
+}
+
+bool lv_nemagfx_is_cf_supported(lv_color_format_t cf)
+{
+
+    switch(cf) {
+        case LV_COLOR_FORMAT_ARGB8565:
+        case LV_COLOR_FORMAT_RGB565A8:
+            return false;
+        default:
+            break;
+    }
+    return true;
 }
 
 #endif /*LV_USE_NEMA_GFX*/
