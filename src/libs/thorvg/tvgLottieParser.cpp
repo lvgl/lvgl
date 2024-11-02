@@ -37,7 +37,7 @@
 #define KEY_AS(name) !strcmp(key, name)
 
 
-static LottieExpression* _expression(char* code, LottieComposition* comp, LottieLayer* layer, LottieObject* object, LottieProperty* property, LottieProperty::Type type)
+static LottieExpression* _expression(char* code, LottieComposition* comp, LottieLayer* layer, LottieObject* object, LottieProperty* property)
 {
     if (!comp->expressions) comp->expressions = true;
 
@@ -47,18 +47,25 @@ static LottieExpression* _expression(char* code, LottieComposition* comp, Lottie
     inst->layer = layer;
     inst->object = object;
     inst->property = property;
-    inst->type = type;
-    inst->enabled = true;
 
     return inst;
 }
 
 
-static char* _int2str(int num)
+static unsigned long _int2str(int num)
 {
     char str[20];
     snprintf(str, 20, "%d", num);
-    return strdup(str);
+    return djb2Encode(str);
+}
+
+
+LottieEffect* LottieParser::getEffect(int type)
+{
+    switch (type) {
+        case 29: return new LottieGaussianBlur;
+        default: return nullptr;
+    }
 }
 
 
@@ -75,36 +82,9 @@ CompositeMethod LottieParser::getMaskMethod(bool inversed)
         case 's': return CompositeMethod::SubtractMask;
         case 'i': return CompositeMethod::IntersectMask;
         case 'f': return CompositeMethod::DifferenceMask;
+        case 'l': return CompositeMethod::LightenMask;
+        case 'd': return CompositeMethod::DarkenMask;
         default: return CompositeMethod::None;
-    }
-}
-
-
-BlendMethod LottieParser::getBlendMethod()
-{
-    switch (getInt()) {
-        case 0: return BlendMethod::Normal;
-        case 1: return BlendMethod::Multiply;
-        case 2: return BlendMethod::Screen;
-        case 3: return BlendMethod::Overlay;
-        case 4: return BlendMethod::Darken;
-        case 5: return BlendMethod::Lighten;
-        case 6: return BlendMethod::ColorDodge;
-        case 7: return BlendMethod::ColorBurn;
-        case 8: return BlendMethod::HardLight;
-        case 9: return BlendMethod::SoftLight;
-        case 10: return BlendMethod::Difference;
-        case 11: return BlendMethod::Exclusion;
-        //case 12: return BlendMethod::Hue:
-        //case 13: return BlendMethod::Saturation:
-        //case 14: return BlendMethod::Color:
-        //case 15: return BlendMethod::Luminosity:
-        case 16: return BlendMethod::Add;
-        //case 17: return BlendMethod::HardMix:
-        default: {
-            TVGERR("LOTTIE", "Non-Supported Blend Mode");
-            return BlendMethod::Normal;
-        }
     }
 }
 
@@ -182,7 +162,7 @@ void LottieParser::getValue(TextDocument& doc)
 {
     enterObject();
     while (auto key = nextObjectKey()) {
-        if (KEY_AS("s")) doc.size = getFloat();
+        if (KEY_AS("s")) doc.size = getFloat() * 0.01f;
         else if (KEY_AS("f")) doc.name = getStringCopy();
         else if (KEY_AS("t")) doc.text = getStringCopy();
         else if (KEY_AS("j")) doc.justify = getInt();
@@ -277,7 +257,8 @@ void LottieParser::getValue(ColorStop& color)
 {
     if (peekType() == kArrayType) enterArray();
 
-    color.input = new Array<float>(static_cast<LottieGradient*>(context.parent)->colorStops.count);
+    if (!color.input) color.input = new Array<float>(static_cast<LottieGradient*>(context.parent)->colorStops.count * 6);
+    else color.input->clear();
 
     while (nextArrayValue()) color.input->push(getFloat());
 }
@@ -291,6 +272,19 @@ void LottieParser::getValue(Array<Point>& pts)
         Point pt;
         getValue(pt);
         pts.push(pt);
+    }
+}
+
+
+void LottieParser::getValue(int8_t& val)
+{
+    if (peekType() == kArrayType) {
+        enterArray();
+        if (nextArrayValue()) val = getInt();
+        //discard rest
+        while (nextArrayValue()) getInt();
+    } else {
+        val = getFloat();
     }
 }
 
@@ -321,17 +315,22 @@ void LottieParser::getValue(float& val)
 }
 
 
-void LottieParser::getValue(Point& pt)
+bool LottieParser::getValue(Point& pt)
 {
+    auto type = peekType();
+    if (type == kNullType) return false;
+
     int i = 0;
     auto ptr = (float*)(&pt);
 
-    if (peekType() == kArrayType) enterArray();
+    if (type == kArrayType) enterArray();
 
     while (nextArrayValue()) {
         auto val = getFloat();
         if (i < 2) ptr[i++] = val;
     }
+
+    return true;
 }
 
 
@@ -343,7 +342,7 @@ void LottieParser::getValue(RGB24& color)
 
     while (nextArrayValue()) {
         auto val = getFloat();
-        if (i < 3) color.rgb[i++] = int32_t(lroundf(val * 255.0f));
+        if (i < 3) color.rgb[i++] = REMAP255(val);
     }
 
     //TODO: color filter?
@@ -373,14 +372,11 @@ void LottieParser::parseSlotProperty(T& prop)
 template<typename T>
 bool LottieParser::parseTangent(const char *key, LottieVectorFrame<T>& value)
 {
-    if (KEY_AS("ti")) {
-        value.hasTangent = true;
-        getValue(value.inTangent);
-    } else if (KEY_AS("to")) {
-        value.hasTangent = true;
-        getValue(value.outTangent);
-    } else return false;
+    if (KEY_AS("ti") && getValue(value.inTangent)) ;
+    else if (KEY_AS("to") && getValue(value.outTangent)) ;       
+    else return false;
 
+    value.hasTangent = true;
     return true;
 }
 
@@ -504,30 +500,55 @@ void LottieParser::parseProperty(T& prop, LottieObject* obj)
             for (auto slot = comp->slots.begin(); slot < comp->slots.end(); ++slot) {
                 if (strcmp((*slot)->sid, sid)) continue;
                 (*slot)->pairs.push({obj, 0});
-                return;
+                break;
             }
             comp->slots.push(new LottieSlot(sid, obj, type));
-        } else if (!strcmp(key, "x")) {
-            prop.exp = _expression(getStringCopy(), comp, context.layer, context.parent, &prop, type);
-        }
-        else skip(key);
+        } else if (KEY_AS("x")) {
+            prop.exp = _expression(getStringCopy(), comp, context.layer, context.parent, &prop);
+        } else if (KEY_AS("ix")) {
+            prop.ix = getInt();
+        } else skip(key);
     }
+    prop.type = type;
+}
+
+
+bool LottieParser::parseCommon(LottieObject* obj, const char* key)
+{
+    if (KEY_AS("nm")) {
+        obj->id = djb2Encode(getString());
+        return true;
+    } else if (KEY_AS("hd")) {
+        obj->hidden = getBool();
+        return true;
+    } else return false;
+}
+
+
+bool LottieParser::parseDirection(LottieShape* shape, const char* key)
+{
+    if (KEY_AS("d")) {
+        if (getInt() == 3) {
+            shape->clockwise = false;       //default is true
+        }
+        return true;
+    }
+    return false;
 }
 
 
 LottieRect* LottieParser::parseRect()
 {
     auto rect = new LottieRect;
-    if (!rect) return nullptr;
 
     context.parent = rect;
 
     while (auto key = nextObjectKey()) {
-        if (KEY_AS("s")) parseProperty<LottieProperty::Type::Point>(rect->size);
-        else if (KEY_AS("p"))parseProperty<LottieProperty::Type::Position>(rect->position);
+        if (parseCommon(rect, key)) continue;
+        else if (KEY_AS("s")) parseProperty<LottieProperty::Type::Point>(rect->size);
+        else if (KEY_AS("p")) parseProperty<LottieProperty::Type::Position>(rect->position);
         else if (KEY_AS("r")) parseProperty<LottieProperty::Type::Float>(rect->radius);
-        else if (KEY_AS("nm")) rect->name = getStringCopy();
-        else if (KEY_AS("hd")) rect->hidden = getBool();
+        else if (parseDirection(rect, key)) continue;
         else skip(key);
     }
     rect->prepare();
@@ -538,15 +559,14 @@ LottieRect* LottieParser::parseRect()
 LottieEllipse* LottieParser::parseEllipse()
 {
     auto ellipse = new LottieEllipse;
-    if (!ellipse) return nullptr;
 
     context.parent = ellipse;
 
     while (auto key = nextObjectKey()) {
-        if (KEY_AS("nm")) ellipse->name = getStringCopy();
+        if (parseCommon(ellipse, key)) continue;
         else if (KEY_AS("p")) parseProperty<LottieProperty::Type::Position>(ellipse->position);
         else if (KEY_AS("s")) parseProperty<LottieProperty::Type::Point>(ellipse->size);
-        else if (KEY_AS("hd")) ellipse->hidden = getBool();
+        else if (parseDirection(ellipse, key)) continue;
         else skip(key);
     }
     ellipse->prepare();
@@ -557,7 +577,6 @@ LottieEllipse* LottieParser::parseEllipse()
 LottieTransform* LottieParser::parseTransform(bool ddd)
 {
     auto transform = new LottieTransform;
-    if (!transform) return nullptr;
 
     context.parent = transform;
 
@@ -567,7 +586,8 @@ LottieTransform* LottieParser::parseTransform(bool ddd)
     }
 
     while (auto key = nextObjectKey()) {
-        if (KEY_AS("p"))
+        if (parseCommon(transform, key)) continue;
+        else if (KEY_AS("p"))
         {
             enterObject();
             while (auto key = nextObjectKey()) {
@@ -576,9 +596,10 @@ LottieTransform* LottieParser::parseTransform(bool ddd)
                 //check separateCoord to figure out whether "x(expression)" / "x(coord)"
                 else if (transform->coords && KEY_AS("x")) parseProperty<LottieProperty::Type::Float>(transform->coords->x);
                 else if (transform->coords && KEY_AS("y")) parseProperty<LottieProperty::Type::Float>(transform->coords->y);
-                else if (KEY_AS("x")) transform->position.exp = _expression(getStringCopy(), comp, context.layer, context.parent, &transform->position, LottieProperty::Type::Position);
+                else if (KEY_AS("x")) transform->position.exp = _expression(getStringCopy(), comp, context.layer, context.parent, &transform->position);
                 else skip(key);
             }
+            transform->position.type = LottieProperty::Type::Position;
         }
         else if (KEY_AS("a")) parseProperty<LottieProperty::Type::Point>(transform->anchor);
         else if (KEY_AS("s")) parseProperty<LottieProperty::Type::Point>(transform->scale);
@@ -587,7 +608,6 @@ LottieTransform* LottieParser::parseTransform(bool ddd)
         else if (transform->rotationEx && KEY_AS("rx")) parseProperty<LottieProperty::Type::Float>(transform->rotationEx->x);
         else if (transform->rotationEx && KEY_AS("ry")) parseProperty<LottieProperty::Type::Float>(transform->rotationEx->y);
         else if (transform->rotationEx && KEY_AS("rz")) parseProperty<LottieProperty::Type::Float>(transform->rotation);
-        else if (KEY_AS("nm")) transform->name = getStringCopy();
         else if (KEY_AS("sk")) parseProperty<LottieProperty::Type::Float>(transform->skewAngle);
         else if (KEY_AS("sa")) parseProperty<LottieProperty::Type::Float>(transform->skewAxis);
         else skip(key);
@@ -600,17 +620,15 @@ LottieTransform* LottieParser::parseTransform(bool ddd)
 LottieSolidFill* LottieParser::parseSolidFill()
 {
     auto fill = new LottieSolidFill;
-    if (!fill) return nullptr;
 
     context.parent = fill;
 
     while (auto key = nextObjectKey()) {
-        if (KEY_AS("nm")) fill->name = getStringCopy();
+        if (parseCommon(fill, key)) continue;
         else if (KEY_AS("c")) parseProperty<LottieProperty::Type::Color>(fill->color, fill);
         else if (KEY_AS("o")) parseProperty<LottieProperty::Type::Opacity>(fill->opacity, fill);
         else if (KEY_AS("fillEnabled")) fill->hidden |= !getBool();
         else if (KEY_AS("r")) fill->rule = getFillRule();
-        else if (KEY_AS("hd")) fill->hidden = getBool();
         else skip(key);
     }
     fill->prepare();
@@ -641,19 +659,17 @@ void LottieParser::parseStrokeDash(LottieStroke* stroke)
 LottieSolidStroke* LottieParser::parseSolidStroke()
 {
     auto stroke = new LottieSolidStroke;
-    if (!stroke) return nullptr;
 
     context.parent = stroke;
 
     while (auto key = nextObjectKey()) {
-        if (KEY_AS("c")) parseProperty<LottieProperty::Type::Color>(stroke->color, stroke);
+        if (parseCommon(stroke, key)) continue;
+        else if (KEY_AS("c")) parseProperty<LottieProperty::Type::Color>(stroke->color, stroke);
         else if (KEY_AS("o")) parseProperty<LottieProperty::Type::Opacity>(stroke->opacity, stroke);
         else if (KEY_AS("w")) parseProperty<LottieProperty::Type::Float>(stroke->width, stroke);
         else if (KEY_AS("lc")) stroke->cap = getStrokeCap();
         else if (KEY_AS("lj")) stroke->join = getStrokeJoin();
         else if (KEY_AS("ml")) stroke->miterLimit = getFloat();
-        else if (KEY_AS("nm")) stroke->name = getStringCopy();
-        else if (KEY_AS("hd")) stroke->hidden = getBool();
         else if (KEY_AS("fillEnabled")) stroke->hidden |= !getBool();
         else if (KEY_AS("d")) parseStrokeDash(stroke);
         else skip(key);
@@ -674,22 +690,22 @@ void LottieParser::getPathSet(LottiePathSet& path)
             } else {
                 getValue(path.value);
             }
-        } else if (!strcmp(key, "x")) {
-            path.exp = _expression(getStringCopy(), comp, context.layer, context.parent, &path, LottieProperty::Type::PathSet);
+        } else if (KEY_AS("x")) {
+            path.exp = _expression(getStringCopy(), comp, context.layer, context.parent, &path);
         } else skip(key);
     }
+    path.type = LottieProperty::Type::PathSet;
 }
 
 
 LottiePath* LottieParser::parsePath()
 {
     auto path = new LottiePath;
-    if (!path) return nullptr;
 
     while (auto key = nextObjectKey()) {
-        if (KEY_AS("nm")) path->name = getStringCopy();
+        if (parseCommon(path, key)) continue;
         else if (KEY_AS("ks")) getPathSet(path->pathset);
-        else if (KEY_AS("hd")) path->hidden = getBool();
+        else if (parseDirection(path, key)) continue;
         else skip(key);
     }
     path->prepare();
@@ -700,12 +716,11 @@ LottiePath* LottieParser::parsePath()
 LottiePolyStar* LottieParser::parsePolyStar()
 {
     auto star = new LottiePolyStar;
-    if (!star) return nullptr;
 
     context.parent = star;
 
     while (auto key = nextObjectKey()) {
-        if (KEY_AS("nm")) star->name = getStringCopy();
+        if (parseCommon(star, key)) continue;
         else if (KEY_AS("p")) parseProperty<LottieProperty::Type::Position>(star->position);
         else if (KEY_AS("pt")) parseProperty<LottieProperty::Type::Float>(star->ptsCnt);
         else if (KEY_AS("ir")) parseProperty<LottieProperty::Type::Float>(star->innerRadius);
@@ -714,7 +729,7 @@ LottiePolyStar* LottieParser::parsePolyStar()
         else if (KEY_AS("os")) parseProperty<LottieProperty::Type::Float>(star->outerRoundness);
         else if (KEY_AS("r")) parseProperty<LottieProperty::Type::Float>(star->rotation);
         else if (KEY_AS("sy")) star->type = (LottiePolyStar::Type) getInt();
-        else if (KEY_AS("hd")) star->hidden = getBool();
+        else if (parseDirection(star, key)) continue;
         else skip(key);
     }
     star->prepare();
@@ -725,14 +740,12 @@ LottiePolyStar* LottieParser::parsePolyStar()
 LottieRoundedCorner* LottieParser::parseRoundedCorner()
 {
     auto corner = new LottieRoundedCorner;
-    if (!corner) return nullptr;
 
     context.parent = corner;
 
     while (auto key = nextObjectKey()) {
-        if (KEY_AS("nm")) corner->name = getStringCopy();
+        if (parseCommon(corner, key)) continue;
         else if (KEY_AS("r")) parseProperty<LottieProperty::Type::Float>(corner->radius);
-        else if (KEY_AS("hd")) corner->hidden = getBool();
         else skip(key);
     }
     corner->prepare();
@@ -764,14 +777,12 @@ void LottieParser::parseGradient(LottieGradient* gradient, const char* key)
 LottieGradientFill* LottieParser::parseGradientFill()
 {
     auto fill = new LottieGradientFill;
-    if (!fill) return nullptr;
 
     context.parent = fill;
 
     while (auto key = nextObjectKey()) {
-        if (KEY_AS("nm")) fill->name = getStringCopy();
+        if (parseCommon(fill, key)) continue;
         else if (KEY_AS("r")) fill->rule = getFillRule();
-        else if (KEY_AS("hd")) fill->hidden = getBool();
         else parseGradient(fill, key);
     }
 
@@ -784,16 +795,14 @@ LottieGradientFill* LottieParser::parseGradientFill()
 LottieGradientStroke* LottieParser::parseGradientStroke()
 {
     auto stroke = new LottieGradientStroke;
-    if (!stroke) return nullptr;
 
     context.parent = stroke;
 
     while (auto key = nextObjectKey()) {
-        if (KEY_AS("nm")) stroke->name = getStringCopy();
+        if (parseCommon(stroke, key)) continue;
         else if (KEY_AS("lc")) stroke->cap = getStrokeCap();
         else if (KEY_AS("lj")) stroke->join = getStrokeJoin();
         else if (KEY_AS("ml")) stroke->miterLimit = getFloat();
-        else if (KEY_AS("hd")) stroke->hidden = getBool();
         else if (KEY_AS("w")) parseProperty<LottieProperty::Type::Float>(stroke->width);
         else if (KEY_AS("d")) parseStrokeDash(stroke);
         else parseGradient(stroke, key);
@@ -807,17 +816,15 @@ LottieGradientStroke* LottieParser::parseGradientStroke()
 LottieTrimpath* LottieParser::parseTrimpath()
 {
     auto trim = new LottieTrimpath;
-    if (!trim) return nullptr;
 
     context.parent = trim;
 
     while (auto key = nextObjectKey()) {
-        if (KEY_AS("nm")) trim->name = getStringCopy();
+        if (parseCommon(trim, key)) continue;
         else if (KEY_AS("s")) parseProperty<LottieProperty::Type::Float>(trim->start);
         else if (KEY_AS("e")) parseProperty<LottieProperty::Type::Float>(trim->end);
         else if (KEY_AS("o")) parseProperty<LottieProperty::Type::Float>(trim->offset);
         else if (KEY_AS("m")) trim->type = static_cast<LottieTrimpath::Type>(getInt());
-        else if (KEY_AS("hd")) trim->hidden = getBool();
         else skip(key);
     }
     trim->prepare();
@@ -829,15 +836,14 @@ LottieTrimpath* LottieParser::parseTrimpath()
 LottieRepeater* LottieParser::parseRepeater()
 {
     auto repeater = new LottieRepeater;
-    if (!repeater) return nullptr;
 
     context.parent = repeater;
 
     while (auto key = nextObjectKey()) {
-        if (KEY_AS("nm")) repeater->name = getStringCopy();
+        if (parseCommon(repeater, key)) continue;
         else if (KEY_AS("c")) parseProperty<LottieProperty::Type::Float>(repeater->copies);
         else if (KEY_AS("o")) parseProperty<LottieProperty::Type::Float>(repeater->offset);
-        else if (KEY_AS("m")) repeater->inorder = getInt();
+        else if (KEY_AS("m")) repeater->inorder = getInt() == 2;
         else if (KEY_AS("tr"))
         {
             enterObject();
@@ -851,12 +857,30 @@ LottieRepeater* LottieParser::parseRepeater()
                 else skip(key);
             }
         }
-        else if (KEY_AS("hd")) repeater->hidden = getBool();
         else skip(key);
     }
     repeater->prepare();
 
     return repeater;
+}
+
+
+LottieOffsetPath* LottieParser::parseOffsetPath()
+{
+    auto offsetPath = new LottieOffsetPath;
+
+    context.parent = offsetPath;
+
+    while (auto key = nextObjectKey()) {
+        if (parseCommon(offsetPath, key)) continue;
+        else if (KEY_AS("a")) parseProperty<LottieProperty::Type::Float>(offsetPath->offset);
+        else if (KEY_AS("lj")) offsetPath->join = getStrokeJoin();
+        else if (KEY_AS("ml")) parseProperty<LottieProperty::Type::Float>(offsetPath->miterLimit);
+        else skip(key);
+    }
+    offsetPath->prepare();
+
+    return offsetPath;
 }
 
 
@@ -878,11 +902,11 @@ LottieObject* LottieParser::parseObject()
     else if (!strcmp(type, "gs")) return parseGradientStroke();
     else if (!strcmp(type, "tm")) return parseTrimpath();
     else if (!strcmp(type, "rp")) return parseRepeater();
-    else if (!strcmp(type, "mm")) TVGERR("LOTTIE", "MergePath(mm) is not supported yet");
-    else if (!strcmp(type, "pb")) TVGERR("LOTTIE", "Puker/Bloat(pb) is not supported yet");
-    else if (!strcmp(type, "tw")) TVGERR("LOTTIE", "Twist(tw) is not supported yet");
-    else if (!strcmp(type, "op")) TVGERR("LOTTIE", "Offset Path(op) is not supported yet");
-    else if (!strcmp(type, "zz")) TVGERR("LOTTIE", "Zig Zag(zz) is not supported yet");
+    else if (!strcmp(type, "mm")) TVGLOG("LOTTIE", "MergePath(mm) is not supported yet");
+    else if (!strcmp(type, "pb")) TVGLOG("LOTTIE", "Puker/Bloat(pb) is not supported yet");
+    else if (!strcmp(type, "tw")) TVGLOG("LOTTIE", "Twist(tw) is not supported yet");
+    else if (!strcmp(type, "op")) return parseOffsetPath();
+    else if (!strcmp(type, "zz")) TVGLOG("LOTTIE", "ZigZag(zz) is not supported yet");
     return nullptr;
 }
 
@@ -901,7 +925,7 @@ void LottieParser::parseObject(Array<LottieObject*>& parent)
 }
 
 
-LottieImage* LottieParser::parseImage(const char* data, const char* subPath, bool embedded)
+LottieImage* LottieParser::parseImage(const char* data, const char* subPath, bool embedded, float width, float height)
 {
     //Used for Image Asset
     auto image = new LottieImage;
@@ -924,6 +948,8 @@ LottieImage* LottieParser::parseImage(const char* data, const char* subPath, boo
         snprintf(image->path, len, "%s%s%s", dirName, subPath, data);
     }
 
+    image->width = width;
+    image->height = height;
     image->prepare();
 
     return image;
@@ -935,31 +961,34 @@ LottieObject* LottieParser::parseAsset()
     enterObject();
 
     LottieObject* obj = nullptr;
-    char *id = nullptr;
+    unsigned long id = 0;
 
     //Used for Image Asset
     const char* data = nullptr;
     const char* subPath = nullptr;
+    float width = 0.0f;
+    float height = 0.0f;
     auto embedded = false;
 
     while (auto key = nextObjectKey()) {
         if (KEY_AS("id"))
         {
             if (peekType() == kStringType) {
-                id = getStringCopy();
+                id = djb2Encode(getString());
             } else {
                 id = _int2str(getInt());
             }
         }
-        else if (KEY_AS("layers")) obj = parseLayers();
+        else if (KEY_AS("layers")) obj = parseLayers(comp->root);
         else if (KEY_AS("u")) subPath = getString();
         else if (KEY_AS("p")) data = getString();
+        else if (KEY_AS("w")) width = getFloat();
+        else if (KEY_AS("h")) height = getFloat();
         else if (KEY_AS("e")) embedded = getInt();
         else skip(key);
     }
-    if (data) obj = parseImage(data, subPath, embedded);
-    if (obj) obj->name = id;
-    else free(id);
+    if (data) obj = parseImage(data, subPath, embedded, width, height);
+    if (obj) obj->id = id;
     return obj;
 }
 
@@ -1059,12 +1088,10 @@ void LottieParser::parseFonts()
 LottieObject* LottieParser::parseGroup()
 {
     auto group = new LottieGroup;
-    if (!group) return nullptr;
 
     while (auto key = nextObjectKey()) {
-        if (KEY_AS("nm")) {
-            group->name = getStringCopy();
-        } else if (KEY_AS("it")) {
+        if (parseCommon(group, key)) continue;
+        else if (KEY_AS("it")) {
             enterArray();
             while (nextArrayValue()) parseObject(group->children);
         } else skip(key);
@@ -1085,34 +1112,19 @@ void LottieParser::parseTimeRemap(LottieLayer* layer)
 }
 
 
-uint8_t LottieParser::getDirection()
-{
-    auto v = getInt();
-    if (v == 1) return 0;
-    if (v == 2) return 3;
-    if (v == 3) return 2;
-    return 0;
-}
-
 void LottieParser::parseShapes(Array<LottieObject*>& parent)
 {
-    uint8_t direction;
-
     enterArray();
     while (nextArrayValue()) {
-        direction = 0;
         enterObject();
         while (auto key = nextObjectKey()) {
             if (KEY_AS("it")) {
                 enterArray();
                 while (nextArrayValue()) parseObject(parent);
-            } else if (KEY_AS("d")) {
-                direction = getDirection();
             } else if (KEY_AS("ty")) {
                 if (auto child = parseObject()) {
                     if (child->hidden) delete(child);
                     else parent.push(child);
-                    if (direction > 0) static_cast<LottieShape*>(child)->direction = direction;
                 }
             } else skip(key);
         }
@@ -1125,15 +1137,47 @@ void LottieParser::parseTextRange(LottieText* text)
     enterArray();
     while (nextArrayValue()) {
         enterObject();
+
+        auto selector = new LottieTextRange;
+
         while (auto key = nextObjectKey()) {
-            if (KEY_AS("a")) {  //text style
+            if (KEY_AS("s")) { // text range selector
                 enterObject();
                 while (auto key = nextObjectKey()) {
-                    if (KEY_AS("t")) parseProperty<LottieProperty::Type::Float>(text->spacing);
+                    if (KEY_AS("t")) selector->expressible = (bool) getInt();
+                    else if (KEY_AS("xe")) parseProperty<LottieProperty::Type::Float>(selector->maxEase);
+                    else if (KEY_AS("ne")) parseProperty<LottieProperty::Type::Float>(selector->minEase);
+                    else if (KEY_AS("a")) parseProperty<LottieProperty::Type::Float>(selector->maxAmount);
+                    else if (KEY_AS("b")) selector->based = (LottieTextRange::Based) getInt();
+                    else if (KEY_AS("rn")) selector->random = getInt() ? rand() : 0;
+                    else if (KEY_AS("sh")) selector->shape = (LottieTextRange::Shape) getInt();
+                    else if (KEY_AS("o")) parseProperty<LottieProperty::Type::Float>(selector->offset);
+                    else if (KEY_AS("r")) selector->rangeUnit = (LottieTextRange::Unit) getInt();
+                    else if (KEY_AS("sm")) parseProperty<LottieProperty::Type::Float>(selector->smoothness);
+                    else if (KEY_AS("s")) parseProperty<LottieProperty::Type::Float>(selector->start);
+                    else if (KEY_AS("e")) parseProperty<LottieProperty::Type::Float>(selector->end);
+                    else skip(key);
+                }
+            } else if (KEY_AS("a")) { // text style
+                enterObject();
+                while (auto key = nextObjectKey()) {
+                    if (KEY_AS("t")) parseProperty<LottieProperty::Type::Float>(selector->style.letterSpacing);
+                    else if (KEY_AS("ls")) parseProperty<LottieProperty::Type::Color>(selector->style.lineSpacing);
+                    else if (KEY_AS("fc")) parseProperty<LottieProperty::Type::Color>(selector->style.fillColor);
+                    else if (KEY_AS("fo")) parseProperty<LottieProperty::Type::Color>(selector->style.fillOpacity);
+                    else if (KEY_AS("sw")) parseProperty<LottieProperty::Type::Float>(selector->style.strokeWidth);
+                    else if (KEY_AS("sc")) parseProperty<LottieProperty::Type::Color>(selector->style.strokeColor);
+                    else if (KEY_AS("so")) parseProperty<LottieProperty::Type::Opacity>(selector->style.strokeOpacity);
+                    else if (KEY_AS("o")) parseProperty<LottieProperty::Type::Opacity>(selector->style.opacity);
+                    else if (KEY_AS("p")) parseProperty<LottieProperty::Type::Position>(selector->style.position);
+                    else if (KEY_AS("s")) parseProperty<LottieProperty::Type::Position>(selector->style.scale);
+                    else if (KEY_AS("r")) parseProperty<LottieProperty::Type::Float>(selector->style.rotation);
                     else skip(key);
                 }
             } else skip(key);
         }
+
+        text->ranges.push(selector);
     }
 }
 
@@ -1147,8 +1191,16 @@ void LottieParser::parseText(Array<LottieObject*>& parent)
     while (auto key = nextObjectKey()) {
         if (KEY_AS("d")) parseProperty<LottieProperty::Type::TextDoc>(text->doc, text);
         else if (KEY_AS("a")) parseTextRange(text);
-        //else if (KEY_AS("p")) TVGLOG("LOTTIE", "Text Follow Path (p) is not supported"); 
-        //else if (KEY_AS("m")) TVGLOG("LOTTIE", "Text Alignment Option (m) is not supported");
+        else if (KEY_AS("p"))
+        {
+            TVGLOG("LOTTIE", "Text Follow Path (p) is not supported");
+            skip(key);
+        }
+        else if (KEY_AS("m"))
+        {
+            TVGLOG("LOTTIE", "Text Alignment Option (m) is not supported");
+            skip(key);
+        }
         else skip(key);
     }
 
@@ -1172,15 +1224,25 @@ void LottieParser::getLayerSize(float& val)
 LottieMask* LottieParser::parseMask()
 {
     auto mask = new LottieMask;
-    if (!mask) return nullptr;
+    auto valid = true;  //skip if the mask mode is none.
 
     enterObject();
     while (auto key = nextObjectKey()) {
         if (KEY_AS("inv")) mask->inverse = getBool();
-        else if (KEY_AS("mode")) mask->method = getMaskMethod(mask->inverse);
-        else if (KEY_AS("pt")) getPathSet(mask->pathset);
-        else if (KEY_AS("o")) parseProperty<LottieProperty::Type::Opacity>(mask->opacity);
+        else if (KEY_AS("mode"))
+        {
+            mask->method = getMaskMethod(mask->inverse);
+            if (mask->method == CompositeMethod::None) valid = false;
+        }
+        else if (valid && KEY_AS("pt")) getPathSet(mask->pathset);
+        else if (valid && KEY_AS("o")) parseProperty<LottieProperty::Type::Opacity>(mask->opacity);
+        else if (valid && KEY_AS("x")) parseProperty<LottieProperty::Type::Float>(mask->expand);
         else skip(key);
+    }
+
+    if (!valid) {
+        delete(mask);
+        return nullptr;
     }
 
     return mask;
@@ -1191,29 +1253,99 @@ void LottieParser::parseMasks(LottieLayer* layer)
 {
     enterArray();
     while (nextArrayValue()) {
-        auto mask = parseMask();
-        layer->masks.push(mask);
+        if (auto mask = parseMask()) {
+            layer->masks.push(mask);
+        }
     }
 }
 
 
-LottieLayer* LottieParser::parseLayer()
+void LottieParser::parseGaussianBlur(LottieGaussianBlur* effect)
+{
+    int idx = 0;  //blurness -> direction -> wrap
+    enterArray();
+    while (nextArrayValue()) {
+        enterObject();
+        while (auto key = nextObjectKey()) {
+            if (KEY_AS("v")) {
+                enterObject();
+                while (auto key = nextObjectKey()) {
+                    if (KEY_AS("k")) {
+                        if (idx == 0) parsePropertyInternal(effect->blurness);
+                        else if (idx == 1) parsePropertyInternal(effect->direction);
+                        else if (idx == 2) parsePropertyInternal(effect->wrap);
+                        else skip(key);
+                        ++idx;
+                    } else skip(key);
+                }
+            } else skip(key);
+        }
+    }
+}
+
+
+void LottieParser::parseEffect(LottieEffect* effect)
+{
+    switch (effect->type) {
+        case LottieEffect::GaussianBlur: {
+            parseGaussianBlur(static_cast<LottieGaussianBlur*>(effect));
+            break;
+        }
+        default: break;
+    }
+}
+
+
+void LottieParser::parseEffects(LottieLayer* layer)
+{
+    auto invalid = true;
+
+    enterArray();
+    while (nextArrayValue()) {
+        LottieEffect* effect = nullptr;
+        enterObject();
+        while (auto key = nextObjectKey()) {
+            //type must be priortized.
+            if (KEY_AS("ty"))
+            {
+                effect = getEffect(getInt());
+                if (!effect) break;
+                else invalid = false;
+            }
+            else if (effect && KEY_AS("en")) effect->enable = getInt();
+            else if (effect && KEY_AS("ef")) parseEffect(effect);
+            else skip(key);
+        }
+        //TODO: remove when all effects were guaranteed.
+        if (invalid) {
+            TVGLOG("LOTTIE", "Not supported Layer Effect = %d", effect ? (int)effect->type : -1);
+            while (auto key = nextObjectKey()) skip(key);
+        } else layer->effects.push(effect);
+    }
+}
+
+
+LottieLayer* LottieParser::parseLayer(LottieLayer* precomp)
 {
     auto layer = new LottieLayer;
-    if (!layer) return nullptr;
 
-    layer->comp = comp;
+    layer->comp = precomp;
     context.layer = layer;
 
     auto ddd = false;
+    RGB24 color;
 
     enterObject();
 
     while (auto key = nextObjectKey()) {
-        if (KEY_AS("ddd")) ddd = getInt();  //3d layer
-        else if (KEY_AS("ind")) layer->id = getInt();
+        if (KEY_AS("nm"))
+        {
+            layer->name = getStringCopy();
+            layer->id = djb2Encode(layer->name);
+        }
+        else if (KEY_AS("ddd")) ddd = getInt();  //3d layer
+        else if (KEY_AS("ind")) layer->idx = getInt();
         else if (KEY_AS("ty")) layer->type = (LottieLayer::Type) getInt();
-        else if (KEY_AS("nm")) layer->name = getStringCopy();
         else if (KEY_AS("sr")) layer->timeStretch = getFloat();
         else if (KEY_AS("ks"))
         {
@@ -1225,65 +1357,43 @@ LottieLayer* LottieParser::parseLayer()
         else if (KEY_AS("ip")) layer->inFrame = getFloat();
         else if (KEY_AS("op")) layer->outFrame = getFloat();
         else if (KEY_AS("st")) layer->startFrame = getFloat();
-        else if (KEY_AS("bm")) layer->blendMethod = getBlendMethod();
-        else if (KEY_AS("parent")) layer->pid = getInt();
+        else if (KEY_AS("bm")) layer->blendMethod = (BlendMethod) getInt();
+        else if (KEY_AS("parent")) layer->pidx = getInt();
         else if (KEY_AS("tm")) parseTimeRemap(layer);
         else if (KEY_AS("w") || KEY_AS("sw")) getLayerSize(layer->w);
         else if (KEY_AS("h") || KEY_AS("sh")) getLayerSize(layer->h);
-        else if (KEY_AS("sc")) layer->color = getColor(getString());
-        else if (KEY_AS("tt")) layer->matte.type = getMatteType();
+        else if (KEY_AS("sc")) color = getColor(getString());
+        else if (KEY_AS("tt")) layer->matteType = getMatteType();
+        else if (KEY_AS("tp")) layer->mid = getInt();
         else if (KEY_AS("masksProperties")) parseMasks(layer);
         else if (KEY_AS("hd")) layer->hidden = getBool();
-        else if (KEY_AS("refId")) layer->refId = getStringCopy();
+        else if (KEY_AS("refId")) layer->rid = djb2Encode(getString());
         else if (KEY_AS("td")) layer->matteSrc = getInt();      //used for matte layer
         else if (KEY_AS("t")) parseText(layer->children);
-        else if (KEY_AS("ef"))
-        {
-            TVGERR("LOTTIE", "layer effect(ef) is not supported!");
-            skip(key);
-        }
+        else if (KEY_AS("ef")) parseEffects(layer);
         else skip(key);
     }
 
-    //Not a valid layer
-    if (!layer->transform) {
-        delete(layer);
-        return nullptr;
-    }
-
-    layer->prepare();
+    layer->prepare(&color);
 
     return layer;
 }
 
 
-LottieLayer* LottieParser::parseLayers()
+LottieLayer* LottieParser::parseLayers(LottieLayer* root)
 {
-    auto root = new LottieLayer;
-    if (!root) return nullptr;
+    auto precomp = new LottieLayer;
 
-    root->type = LottieLayer::Precomp;
-    root->comp = comp;
+    precomp->type = LottieLayer::Precomp;
+    precomp->comp = root;
 
     enterArray();
     while (nextArrayValue()) {
-        if (auto layer = parseLayer()) {
-            if (layer->matte.type == CompositeMethod::None) {
-                root->children.push(layer);
-            } else {
-                //matte source must be located in the right previous.
-                auto matte = static_cast<LottieLayer*>(root->children.last());
-                if (matte->matteSrc) {
-                    layer->matte.target = matte;
-                } else {
-                    TVGLOG("LOTTIE", "Matte Source(%s) is not designated?", matte->name);
-                }
-                root->children.last() = layer;
-            }
-        }
+        precomp->children.push(parseLayer(precomp));
     }
-    root->prepare();
-    return root;
+
+    precomp->prepare();
+    return precomp;
 }
 
 
@@ -1337,7 +1447,7 @@ bool LottieParser::apply(LottieSlot* slot)
         case LottieProperty::Type::Color: {
             obj = new LottieSolid;
             context.parent = obj;
-             parseSlotProperty<LottieProperty::Type::Color>(static_cast<LottieSolid*>(obj)->color);
+            parseSlotProperty<LottieProperty::Type::Color>(static_cast<LottieSolid*>(obj)->color);
             break;
         }
         case LottieProperty::Type::TextDoc: {
@@ -1368,20 +1478,22 @@ bool LottieParser::parse()
 
     if (comp) delete(comp);
     comp = new LottieComposition;
-    if (!comp) return false;
 
     Array<LottieGlyph*> glyphs;
+
+    auto startFrame = 0.0f;
+    auto endFrame = 0.0f;
 
     while (auto key = nextObjectKey()) {
         if (KEY_AS("v")) comp->version = getStringCopy();
         else if (KEY_AS("fr")) comp->frameRate = getFloat();
-        else if (KEY_AS("ip")) comp->startFrame = getFloat();
-        else if (KEY_AS("op")) comp->endFrame = getFloat();
+        else if (KEY_AS("ip")) startFrame = getFloat();
+        else if (KEY_AS("op")) endFrame = getFloat();
         else if (KEY_AS("w")) comp->w = getFloat();
         else if (KEY_AS("h")) comp->h = getFloat();
         else if (KEY_AS("nm")) comp->name = getStringCopy();
         else if (KEY_AS("assets")) parseAssets();
-        else if (KEY_AS("layers")) comp->root = parseLayers();
+        else if (KEY_AS("layers")) comp->root = parseLayers(comp->root);
         else if (KEY_AS("fonts")) parseFonts();
         else if (KEY_AS("chars")) parseChars(glyphs);
         else if (KEY_AS("markers")) parseMarkers();
@@ -1393,8 +1505,8 @@ bool LottieParser::parse()
         return false;
     }
 
-    comp->root->inFrame = comp->startFrame;
-    comp->root->outFrame = comp->endFrame;
+    comp->root->inFrame = startFrame;
+    comp->root->outFrame = endFrame;
 
     postProcess(glyphs);
 

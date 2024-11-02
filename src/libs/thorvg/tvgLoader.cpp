@@ -297,10 +297,10 @@ LoadModule* LoaderMgr::loader(const string& path, bool* invalid)
 {
     *invalid = false;
 
-    //TODO: lottie is not sharable.
+    //TODO: svg & lottie is not sharable.
     auto allowCache = true;
     auto ext = path.substr(path.find_last_of(".") + 1);
-    if (!ext.compare("json")) allowCache = false;
+    if (!ext.compare("svg") || !ext.compare("json")) allowCache = false;
 
     if (allowCache) {
         if (auto loader = _findFromCache(path)) return loader;
@@ -434,6 +434,30 @@ LoadModule* LoaderMgr::loader(const uint32_t *data, uint32_t w, uint32_t h, bool
         return loader;
     }
     delete(loader);
+    return nullptr;
+}
+
+
+//loads fonts from memory - loader is cached (regardless of copy value) in order to access it while setting font
+LoadModule* LoaderMgr::loader(const char* name, const char* data, uint32_t size, TVG_UNUSED const string& mimeType, bool copy)
+{
+#ifdef THORVG_TTF_LOADER_SUPPORT
+    //TODO: add check for mimetype ?
+    if (auto loader = _findFromCache(name)) return loader;
+
+    //function is dedicated for ttf loader (the only supported font loader)
+    auto loader = new TtfLoader;
+    if (loader->open(data, size, copy)) {
+        loader->hashpath = strdup(name);
+        loader->pathcache = true;
+        ScopedLock lock(key);
+        _activeLoaders.back(loader);
+        return loader;
+    }
+
+    TVGLOG("LOADER", "The font data \"%s\" could not be loaded.", name);
+    delete(loader);
+#endif
     return nullptr;
 }
 
