@@ -171,6 +171,23 @@ void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px);
  */
 void lv_draw_sw_i1_invert(void * buf, uint32_t buf_size);
 
+
+/**
+ * Convert a draw buffer in I1 color format from htiled (row-wise)
+ * to vtiled (column-wise) buffer layout. The conversion assumes that the buffer width
+ * and height is rounded to a multiple of 8.
+ * @param buf           pointer to the buffer to be converted
+ * @param buf_size      size of the buffer in bytes
+ * @param width         width of the buffer
+ * @param height        height of the buffer
+ * @param out_buf       pointer to the output buffer
+ * @param out_buf_size  size of the output buffer in bytes
+ * @param bit_order_lsb bit order of the resulting vtiled buffer
+ */
+void lv_draw_sw_i1_convert_to_vtiled(const void * buf, uint32_t buf_size, uint32_t width, uint32_t height,
+                                     void * out_buf,
+                                     uint32_t out_buf_size, bool bit_order_lsb);
+
 /**
  * Rotate a buffer into another buffer
  * @param src           the source buffer
