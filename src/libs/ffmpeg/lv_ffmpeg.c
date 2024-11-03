@@ -332,7 +332,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
     if(src_type == LV_IMAGE_SRC_FILE) {
         char * fn = ffmpeg_resolve_path(src);
         if(fn == NULL) {
-            /*Maybe other decoder can handle it, so keep silence here*/
+            /*Maybe other decoder can handle it, so keep silent here*/
             return LV_RESULT_INVALID;
         }
 
@@ -363,7 +363,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         char * path = ffmpeg_resolve_path(dsc->src);
         if(path == NULL) {
-            /*Maybe other decoder can handle it, so keep silence here*/
+            /*Maybe other decoder can handle it, so keep silent here*/
             return LV_RESULT_INVALID;
         }
 
