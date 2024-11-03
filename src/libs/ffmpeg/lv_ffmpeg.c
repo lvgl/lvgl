@@ -311,6 +311,7 @@ static char * ffmpeg_resolve_path(const char * path)
     size_t prefix_len = lv_strlen(prefix);
 
     char * res = lv_malloc(prefix_len + path_len + 1);
+    if(res == NULL) return NULL;
     lv_memcpy(res, prefix, prefix_len);
     lv_memcpy(res + prefix_len, path, path_len + 1);
 
