@@ -227,7 +227,7 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
     int32_t h = lv_obj_get_content_height(obj);
 
     if(chart->type == LV_CHART_TYPE_LINE) {
-        if (chart->point_cnt > 1) {
+        if(chart->point_cnt > 1) {
             p_out->x = (w * id) / (chart->point_cnt - 1);
         } 
         else {
@@ -246,7 +246,7 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
 
         int32_t block_w = (w - ((chart->point_cnt - 1) * block_gap)) / chart->point_cnt;
 
-        if (chart->point_cnt > 1) {
+        if(chart->point_cnt > 1) {
             p_out->x = (int32_t)((int32_t)(w - block_w) * id) / (chart->point_cnt - 1);
         } 
         else {
