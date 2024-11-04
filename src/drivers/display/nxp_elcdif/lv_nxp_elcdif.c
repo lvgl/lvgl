@@ -10,6 +10,11 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "fsl_video_common.h"
+#include "fsl_elcdif.h"
+#include "fsl_lpi2c.h"
+#include "fsl_gpio.h"
+#include "fsl_cache.h"
 
 /*********************
  *      DEFINES
@@ -22,10 +27,13 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
 static lv_color_format_t lv_nxp_elcdif_to_lvgl_color_converter(elcdif_rgb_mode_config_t config);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
+static bool s_framePending;
 
 /**********************
  *      MACROS
@@ -34,61 +42,63 @@ static lv_color_format_t lv_nxp_elcdif_to_lvgl_color_converter(elcdif_rgb_mode_c
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-lv_display_t * lv_nxp_display_elcdif_create(elcdif_rgb_mode_config_t config, void * frame_buffer1,
-                                            void * frame_buffer2, size_t buf_size, lv_display_render_mode_t mode,
-                                            void (init_cb)(void), lv_display_flush_cb_t flush_cb, lv_display_flush_wait_cb_t wait_cb)
-{
-    /*A handle for the display*/
-    lv_display_t * disp;
-
-    /*Create the display, or return NULL if invalid mode*/
-    switch(mode) {
-        case LV_DISPLAY_RENDER_MODE_DIRECT:
-        case LV_DISPLAY_RENDER_MODE_FULL:
-        case LV_DISPLAY_RENDER_MODE_PARTIAL:
-            disp = lv_display_create(config.panelWidth, config.panelHeight);
-            break;
-        default :
-            LV_LOG_ERROR("Display mode not supported. NULL returned!")
-            return NULL;
-    }
-
-    if(!disp) {
-        LV_LOG_ERROR("Malloc failed : lv_nxp_display_elcdif_create")
-        return NULL;
-    }
-    /*Set color format and buffers*/
-    lv_color_format_t color_format = lv_nxp_elcdif_to_lvgl_color_converter(config);
-    lv_display_set_color_format(disp, color_format);
-    lv_display_set_buffers(disp, frame_buffer1, frame_buffer2, buf_size, mode);
-
-    /*Set callbacks*/
-    if(flush_cb)
-        lv_display_set_flush_cb(disp, flush_cb);
-    if(wait_cb)
-        lv_display_set_flush_wait_cb(disp, wait_cb);
-
-    /*HW dependent initialization callback*/
-    if(init_cb)
-        init_cb();
-
-    return disp;
-}
 
 lv_display_t * lv_nxp_display_elcdif_create_direct(elcdif_rgb_mode_config_t config, void * frame_buffer1,
                                                    void * frame_buffer2, size_t buf_size)
 {
     /*A handle for the display*/
-    lv_display_t * disp;
+    lv_display_t * disp = lv_display_create(config.panelWidth, config.panelHeight);
 
-    /*Create display, fixed parameters*/
-    disp = lv_nxp_display_elcdif_create(config, frame_buffer1, frame_buffer2, buf_size, LV_DISPLAY_RENDER_MODE_DIRECT, NULL,
-                                        NULL, NULL);
+    /*Set color format and buffers*/
+    lv_color_format_t color_format = lv_nxp_elcdif_to_lvgl_color_converter(config);
+    lv_display_set_color_format(disp, color_format);
+    lv_display_set_buffers(disp, frame_buffer1, frame_buffer2, buf_size, mode);
+    lv_display_set_flush_cb(disp, flush_cb);
+
+    ELCDIF_EnableInterrupts(LCDIF, kELCDIF_CurFrameDoneInterruptEnable);
+    NVIC_EnableIRQ(LCDIF_IRQn);
+
     return disp;
 }
+
+void LCDIF_IRQHandler(void)
+{
+    uint32_t intStatus = ELCDIF_GetInterruptStatus(LCDIF);
+
+    ELCDIF_ClearInterruptStatus(LCDIF, intStatus);
+
+    if(s_framePending) {
+        if(intStatus & kELCDIF_CurFrameDone) {
+            s_framePending = false;
+        }
+    }
+    SDK_ISR_EXIT_BARRIER;
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
+{
+    DCACHE_CleanInvalidateByRange((uint32_t)color_p, DEMO_FB_SIZE);
+
+    if(!lv_display_flush_is_last(disp)) {
+        lv_disp_flush_ready(disp_drv);
+        return;
+    }
+
+    ELCDIF_SetNextBufferAddr(LCDIF, (uint32_t)color_p);
+
+    s_framePending = true;
+
+    while(s_framePending);
+
+    lv_disp_flush_ready(disp_drv);
+}
+
+
 static lv_color_format_t lv_nxp_elcdif_to_lvgl_color_converter(elcdif_rgb_mode_config_t config)
 {
     /*Handle color format conversion*/
