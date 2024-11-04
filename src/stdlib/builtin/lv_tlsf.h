@@ -41,7 +41,7 @@
 ** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "../../osal/lv_os.h"
+//#include "../../osal/lv_os.h"
 #include "../../misc/lv_ll.h"
 #include "../../misc/lv_types.h"
 

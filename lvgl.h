@@ -36,7 +36,8 @@ extern "C" {
 #include "src/misc/lv_iter.h"
 #include "src/misc/lv_circle_buf.h"
 #include "src/misc/lv_tree.h"
-  
+#include "src/misc/cache/lv_image_cache.h"
+
 #include "src/tick/lv_tick.h"
 
 #include "src/core/lv_obj.h"
@@ -113,10 +114,8 @@ extern "C" {
 
 #include "src/layouts/lv_layout.h"
 
-#include "src/draw/lv_draw.h"
 #include "src/draw/lv_draw_buf.h"
 #include "src/draw/lv_draw_vector.h"
-#include "src/draw/sw/lv_draw_sw.h"
 
 #include "src/themes/lv_theme.h"
 

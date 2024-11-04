@@ -135,6 +135,10 @@ typedef struct _lv_color_filter_dsc_t lv_color_filter_dsc_t;
 
 typedef struct _lv_event_dsc_t lv_event_dsc_t;
 
+typedef struct _lv_cache_t lv_cache_t;
+
+typedef struct _lv_cache_entry_t lv_cache_entry_t;
+
 typedef struct _lv_fs_file_cache_t lv_fs_file_cache_t;
 
 typedef struct _lv_fs_path_ex_t lv_fs_path_ex_t;
