@@ -104,6 +104,27 @@ static inline lv_color32_t get_px(color_t p)
 #endif
 
 /**
+ * Converts X11 display planes (bits per pixel) to bytes per pixel.
+ * @param[in] dplanes X11 display planes value
+ */
+static inline int lv_dplanes_to_bytes(int dplanes)
+{
+    switch(dplanes) {
+        case 8:
+            return 1;
+        case 16:
+            return 2;
+        case 24:
+            return 4;
+        case 32:
+            return 4;
+    }
+
+    // Should not happen
+    return 0;
+}
+
+/**
  * Flush the content of the internal buffer the specific area on the display.
  * @param[in] disp    the created X11 display object from @lv_x11_window_create
  * @param[in] area    area to be updated
@@ -130,16 +151,55 @@ static void x11_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * 
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
 
     uint32_t      dst_offs;
-    lv_color32_t * dst_data;
     color_t   *   src_data = (color_t *)px_map + (LV_X11_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL ? 0 : hor_res *
                                                   area->y1 + area->x1);
-    for(int16_t y = area->y1; y <= area->y2; y++) {
-        dst_offs = area->x1 + y * hor_res;
-        dst_data = &((lv_color32_t *)(xd->xdata))[dst_offs];
-        for(int16_t x = area->x1; x <= area->x2; x++, src_data++, dst_data++) {
-            *dst_data = get_px(*src_data);
+
+    if(xd->dplanes == 24) { // X11 uses RGB888
+        lv_color32_t * dst_data;
+        for(int16_t y = area->y1; y <= area->y2; y++) {
+            dst_offs = area->x1 + y * hor_res;
+            dst_data = &((lv_color32_t *)(xd->xdata))[dst_offs];
+            for(int16_t x = area->x1; x <= area->x2; x++, src_data++, dst_data++) {
+                *dst_data = get_px(*src_data);
+            }
+            src_data += (LV_X11_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL ? 0 : hor_res - (area->x2 - area->x1 + 1));
         }
-        src_data += (LV_X11_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL ? 0 : hor_res - (area->x2 - area->x1 + 1));
+    }
+    else if(xd->dplanes == 16) { // X11 uses RGB565
+        lv_color32_t p;
+        lv_color16_t * dst_data;
+        for(int16_t y = area->y1; y <= area->y2; y++) {
+            dst_offs = area->x1 + y * hor_res;
+            dst_data = &((lv_color16_t *)(xd->xdata))[dst_offs];
+            for(int16_t x = area->x1; x <= area->x2; x++, src_data++, dst_data++) {
+                p = get_px(*src_data);
+                // Convert RGB888 to RGB565 with rounding
+                dst_data->red   = (p.red   + 4) >> 3;
+                dst_data->green = (p.green + 2) >> 2;
+                dst_data->blue  = (p.blue  + 4) >> 3;
+            }
+            src_data += (LV_X11_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL ? 0 : hor_res - (area->x2 - area->x1 + 1));
+        }
+    }
+    else if(xd->dplanes == 8) { // X11 uses 8-bit grayscale
+        lv_color32_t p;
+        uint32_t luma;
+        uint8_t * dst_data;
+        for(int16_t y = area->y1; y <= area->y2; y++) {
+            dst_offs = area->x1 + y * hor_res;
+            dst_data = &((uint8_t *)(xd->xdata))[dst_offs];
+            for(int16_t x = area->x1; x <= area->x2; x++, src_data++, dst_data++) {
+                p = get_px(*src_data);
+                // Convert RGB888 to grayscale by computing luminance according
+                // to BT.709:
+                //   Y = 0.2126 * R + 0.7152 * G + 0.0722 * B
+                // In the line below the coefficients are multiplied by 2^16.
+                // The division is done with rounding.
+                luma = (13933 * p.red + 46871 * p.green + 4732 * p.blue + 32768) >> 16;
+                *dst_data = (uint8_t)luma;
+            }
+            src_data += (LV_X11_RENDER_MODE == LV_DISPLAY_RENDER_MODE_PARTIAL ? 0 : hor_res - (area->x2 - area->x1 + 1));
+        }
     }
 
     if(lv_display_flush_is_last(disp)) {
@@ -182,7 +242,7 @@ static void x11_resolution_evt_cb(lv_event_t * e)
 
     /* re-create cache image with new size */
     XDestroyImage(xd->ximage);
-    size_t sz_buffers = hor_res * ver_res * sizeof(lv_color32_t);
+    size_t sz_buffers = hor_res * ver_res * lv_dplanes_to_bytes(xd->dplanes);
     xd->xdata = malloc(sz_buffers); /* use clib method here, x11 memory not part of device footprint */
     xd->ximage = XCreateImage(xd->hdr.display, xd->visual, xd->dplanes, ZPixmap, 0, xd->xdata,
                               hor_res, ver_res, lv_color_format_get_bpp(LV_COLOR_FORMAT_ARGB8888), 0);
@@ -338,8 +398,8 @@ static void x11_window_create(lv_display_t * disp, char const * title)
     x11_hide_cursor(disp);
 
     /* create cache XImage */
-    size_t sz_buffers = hor_res * ver_res * sizeof(lv_color32_t);
     xd->dplanes = XDisplayPlanes(xd->hdr.display, screen);
+    size_t sz_buffers = hor_res * ver_res * lv_dplanes_to_bytes(xd->dplanes);
     xd->xdata = malloc(sz_buffers); /* use clib method here, x11 memory not part of device footprint */
     xd->ximage = XCreateImage(xd->hdr.display, xd->visual, xd->dplanes, ZPixmap, 0, xd->xdata,
                               hor_res, ver_res, lv_color_format_get_bpp(LV_COLOR_FORMAT_ARGB8888), 0);
