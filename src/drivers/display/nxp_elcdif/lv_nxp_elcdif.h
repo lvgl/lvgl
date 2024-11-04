@@ -6,6 +6,8 @@
 #ifndef LV_NXP_ELCDIF_DRIVER_H
 #define LV_NXP_ELCDIF_DRIVER_H
 
+#include "../../../lvgl.h"
+
 #if LV_USE_NXP_ELCDIF == 1
 
 #ifdef __cplusplus
@@ -15,7 +17,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../lvgl.h"
+
 #include "fsl_elcdif.h"
 /*********************
  *      DEFINES
