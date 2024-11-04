@@ -495,6 +495,7 @@ lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 #if LV_USE_SLIDER
 lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
+    LV_ASSERT_NULL(subject);
     LV_ASSERT_NULL(obj);
 
     if(subject->type != LV_SUBJECT_TYPE_INT) {
