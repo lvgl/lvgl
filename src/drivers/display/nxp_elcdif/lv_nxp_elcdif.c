@@ -4,11 +4,13 @@
  * Driver for NXP's ELCD
  */
 
+#include "lv_nxp_elcdif.h"
+
 #if LV_USE_NXP_ELCDIF == 1
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_nxp_elcdif.h"
+
 /*********************
  *      DEFINES
  *********************/
