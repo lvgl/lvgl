@@ -36,8 +36,12 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2024-10-16" version="9.3.0-dev1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.3.0-dev1.pack">
-      - LVGL 9.2.1
+    <release date="2024-10-31" version="9.3.0-dev2" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.3.0-dev2.pack">
+      - LVGL 9.3.0-dev
+      - See Change Log
+    </release>
+    <release date="2024-10-29" version="9.2.2" url="https://github.com/lvgl/lvgl/raw/v9.2.2/env_support/cmsis-pack/LVGL.lvgl.9.2.2.pack">
+      - LVGL 9.2.2
       - See Change Log
     </release>
     <release date="2024-10-16" version="9.2.1" url="https://github.com/lvgl/lvgl/raw/v9.2.1/env_support/cmsis-pack/LVGL.lvgl.9.2.1.pack">
@@ -364,7 +368,7 @@
     </conditions>
 
     <components>
-        <bundle Cbundle="LVGL9" Cclass="LVGL" Cversion="9.3.0-dev1">
+        <bundle Cbundle="LVGL9" Cclass="LVGL" Cversion="9.3.0-dev2">
             <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
             <doc></doc>
             <component Cgroup="Essential">

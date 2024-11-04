@@ -151,3 +151,8 @@ div.body {
   border: 1px solid #e1e4e5;
   font-size: 75%;
 }
+
+/* This replaces a color present in `pygments.css` which is used to highlight recognized
+ * function names.  It is too dark for DARK mode, and nearly black in LIGHT mode so it is
+ * difficult to tell that it is even highlighted.  This color override remedies both. */
+.highlight .nf { color: #2648ee } /* Name.Function */

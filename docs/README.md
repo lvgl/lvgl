@@ -154,24 +154,26 @@ reStructuredText does not impose any particular heading levels assigned to certa
 
 If you are creating a new .RST file, use this convention:
 
-    =====
-    Title
-    =====
+```
+=====
+Title
+=====
 
-    Chapter
-    *******
+Chapter
+*******
 
-    Section
-    -------
+Section
+-------
 
-    Sub Section
-    ~~~~~~~~~~~
+Sub Section
+~~~~~~~~~~~
 
-    Sub Sub Section
-    ^^^^^^^^^^^^^^^
+Sub Sub Section
+^^^^^^^^^^^^^^^
 
-    Sub Sub Sub Section
-    '''''''''''''''''''
+Sub Sub Sub Section
+'''''''''''''''''''
+```
 
 Note that the "underlining" can be longer than the heading title, but if it is shorter, the documentation-generation logic will fail with an error.
 
@@ -187,6 +189,7 @@ For improved readability in the .RST file, place at least 2 blank lines above se
 * `.. code-block::` is the only directive that should be used.  Note carefully that unlike the **link target** directive above, this directive has 2 colons.  (The only ReST and sphinx directives that are valid with one colon are **link target**s as shown above.)  Lone `::`, `:code:` or `.. code:` should not be used.
 * If you want to separate code into easier-to-understand sections you can do so with a single empty line.
 * For syntax highlighting appropriate to the language in the code block, specify the language after the directive.  Some examples are:
+
   - `.. code-block:: c`,
   - `.. code-block:: cpp`,
   - `.. code-block:: python`,

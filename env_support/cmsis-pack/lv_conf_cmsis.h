@@ -873,7 +873,8 @@
 #   define LV_USE_LZ4_EXTERNAL  0
 #endif
 
-/*SVG library*/
+/*SVG library
+ *  - Requires `LV_USE_VECTOR_GRAPHIC = 1` */
 #define LV_USE_SVG_ANIMATION 0
 #define LV_USE_SVG_DEBUG 0
 

@@ -94,7 +94,7 @@ void lv_chart_set_type(lv_obj_t * obj, lv_chart_type_t type)
     if(type == LV_CHART_TYPE_SCATTER) {
         lv_chart_series_t * ser;
         LV_LL_READ_BACK(&chart->series_ll, ser) {
-            ser->x_points = lv_malloc(sizeof(lv_point_t) * chart->point_cnt);
+            ser->x_points = lv_malloc(sizeof(int32_t) * chart->point_cnt);
             LV_ASSERT_MALLOC(ser->x_points);
             if(ser->x_points == NULL) return;
         }

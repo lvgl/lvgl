@@ -319,7 +319,7 @@ const char * lv_buttonmatrix_get_button_text(const lv_obj_t * obj, uint32_t btn_
     if(btn_id == LV_BUTTONMATRIX_BUTTON_NONE) return NULL;
 
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
-    if(btn_id > btnm->btn_cnt) return NULL;
+    if(btn_id >= btnm->btn_cnt) return NULL;
 
     uint32_t txt_i = 0;
     uint32_t btn_i = 0;
