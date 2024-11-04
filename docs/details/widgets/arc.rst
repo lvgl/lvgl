@@ -4,6 +4,7 @@
 Arc (lv_arc)
 ============
 
+
 Overview
 ********
 
@@ -26,6 +27,7 @@ Parts and Styles
    size is the same as the indicator's width. Larger padding makes it
    larger, smaller padding makes it smaller.
 
+
 .. _lv_arc_usage:
 
 Usage
@@ -41,18 +43,20 @@ is 0..100.
 
 The indicator arc is drawn on the main part's arc. This if the value is
 set to maximum the indicator arc will cover the entire "background" arc.
-To set the start and end angle of the background arc use the
-:cpp:expr:`lv_arc_set_bg_angles(arc, start_angle, end_angle)` functions or
-``lv_arc_set_bg_start/end_angle(arc, angle)``.
+To set the start and end angle of the background arc use any of these functions:
+
+- :cpp:expr:`lv_arc_set_bg_start_angle(arc, angle)`
+- :cpp:expr:`lv_arc_set_bg_end_angle(arc, angle)`
+- :cpp:expr:`lv_arc_set_bg_angles(arc, start_angle, end_angle)`
 
 Zero degrees is at the middle right (3 o'clock) of the Widget and the
-degrees are increasing in clockwise direction. The angles should be in
-the [0;360] range.
+degrees increasing in the clockwise direction.  The angle values should be in
+the range [0..360].
 
 Rotation
 --------
 
-An offset to the 0 degree position can be added with
+An offset to the 0-degree position can be added with
 :cpp:expr:`lv_arc_set_rotation(arc, deg)`.
 
 Mode
@@ -60,45 +64,48 @@ Mode
 
 The arc can be one of the following modes:
 
-- :cpp:enumerator:`LV_ARC_MODE_NORMAL` The indicator arc is drawn from the minimum value to the current.
-- :cpp:enumerator:`LV_ARC_MODE_REVERSE` The indicator arc is drawn counter-clockwise
-  from the maximum value to the current.
-- :cpp:enumerator:`LV_ARC_MODE_SYMMETRICAL` The indicator arc is drawn from the middle point to the current value.
+- :cpp:enumerator:`LV_ARC_MODE_NORMAL` Indicator arc is drawn clockwise from minimum to current value.
+- :cpp:enumerator:`LV_ARC_MODE_REVERSE` Indicator arc is drawn counter-clockwise
+  from maximum to current value.
+- :cpp:enumerator:`LV_ARC_MODE_SYMMETRICAL` Indicator arc is drawn from middle point to current value.
 
 The mode can be set by :cpp:expr:`lv_arc_set_mode(arc, LV_ARC_MODE_...)` and
-used only if the angle is set by :cpp:func:`lv_arc_set_value` or the arc is
-adjusted by finger.
+has no effect until angle is set by :cpp:func:`lv_arc_set_value` or value of the arc
+is changed by pointer input (finger, mouse, etc.).
 
 Change rate
 -----------
 
-If the arc is pressed the current value will set with a limited speed
-according to the set *change rate*. The change rate is defined in
-degree/second unit and can be set with
-:cpp:expr:`lv_arc_set_change_rage(arc, rate)`
+When the arc's value is changed by pointer input (finger, mouse, etc.), the rate of
+its change is limited according to its *change rate*.  Change rate is defined in
+degrees/second units and can be set with
+:cpp:expr:`lv_arc_set_change_rate(arc, rate)`
 
 Knob offset
 -----------
 
 Changing the knob offset allows the location of the knob to be moved
-relative to the end of the arc The knob offset can be set by
-:cpp:expr:`lv_arc_set_knob_offset(arc, offset_angle)`, will only be visible if
-:cpp:enumerator:`LV_PART_KNOB` is visible
+relative to the end of the arc.  The knob offset can be set by
+:cpp:expr:`lv_arc_set_knob_offset(arc, offset_angle)`, and will only be visible if
+:cpp:enumerator:`LV_PART_KNOB` is visible.
 
-Setting the indicator manually
-------------------------------
+Setting indicator programmatically
+----------------------------------
 
-It's also possible to set the angles of the indicator arc directly with
-:cpp:expr:`lv_arc_set_angles(arc, start_angle, end_angle)` function or
-``lv_arc_set_start/end_angle(arc, start_angle)``. In this case the set
-"value" and "mode" are ignored.
+It is possible to set indicator angle directly with any of these functions:
 
-In other words, the angle and value settings are independent. You should
-exclusively use one or the other. Mixing the two might result in
-unintended behavior.
+- :cpp:expr:`lv_arc_set_start_angle(arc, start_angle)`
+- :cpp:expr:`lv_arc_set_end_angle(arc, end_angle)`
+- :cpp:expr:`lv_arc_set_angles(arc, start_angle, end_angle)`
 
-To make the arc non-adjustable, remove the style of the knob and make
-the Widget non-clickable:
+When used, "value" and "mode" are ignored.
+
+In other words, the angle and value settings are independent.  You should
+exclusively use one or the other of the two methods.  Mixing the two could
+result in unintended behavior.
+
+To make the arc non-adjustable by external input, remove the style of the knob and
+make the Widget non-clickable:
 
 .. code-block:: c
 
@@ -110,51 +117,53 @@ Interactive area
 
 By default :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` is disabled which
 means the arc's whole area is interactive.
-As usual :cpp:func:`lv_obj_set_ext_click_size` can be used to increase
-the sensitive area outside the arc by a specified number of pixels.
+As usual :cpp:func:`lv_obj_set_ext_click_area` can be used to increase
+the area that will respond to pointer input (touch, mouse, etc.) outside the arc by a
+specified number of pixels.
 
 If :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` is enabled the arc will be sensitive only
-in the range of start and end background angles and on the arc itself (not inside the arc).
-In this case ``ext_click_size`` makes the sensitive area ticker both inward and outward.
+in the range between start and end background angles and on the arc itself (not inside the arc).
+In this case ``ext_click_area`` makes the sensitive area ticker both inward and outward.
 Additionally, a tolerance of :cpp:expr:`lv_dpx(50)` pixels is applied to each angle, extending the
 hit-test range along the arc's length.
 
-Place another Widget to the knob
+Place another Widget on the knob
 --------------------------------
 
 Another Widget can be positioned according to the current position of
 the arc in order to follow the arc's current value (angle). To do this
-use :cpp:expr:`lv_arc_align_obj_to_angle(arc, obj_to_align, radius_offset)`.
+use :cpp:expr:`lv_arc_align_obj_to_angle(arc, widget_to_align, radius_offset)`.
 
 Similarly
-:cpp:expr:`lv_arc_rotate_obj_to_angle(arc, obj_to_rotate, radius_offset)` can be
+:cpp:expr:`lv_arc_rotate_obj_to_angle(arc, widget_to_rotate, radius_offset)` can be
 used to rotate the Widget to the current value of the arc.
 
-It's a typical use case to call these functions in the ``VALUE_CHANGED``
+A typical use case is to call these functions in the ``VALUE_CHANGED``
 event of the arc.
+
 
 .. _lv_arc_events:
 
 Events
 ******
 
--  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` sent when the arc is pressed/dragged to
-   set a new value.
+-  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` sent when arc is pressed/dragged to
+   a new value.
 -  :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN` and :cpp:enumerator:`LV_EVENT_DRAW_PART_END` are sent
    with the following types:
 
    -  :cpp:enumerator:`LV_ARC_DRAW_PART_BACKGROUND` The background arc.
 
       -  ``part``: :cpp:enumerator:`LV_PART_MAIN`
-      -  ``p1``: center of the arc
-      -  ``radius``: radius of the arc
+      -  ``p1``: center of arc
+      -  ``radius``: radius of arc
       -  ``arc_dsc``
 
    -  :cpp:enumerator:`LV_ARC_DRAW_PART_FOREGROUND` The foreground arc.
 
       -  ``part``: :cpp:enumerator:`LV_PART_INDICATOR`
-      -  ``p1``: center of the arc
-      -  ``radius``: radius of the arc
+      -  ``p1``: center of arc
+      -  ``radius``: radius of arc
       -  ``arc_dsc``
 
    -  LV_ARC_DRAW_PART_KNOB The knob
@@ -177,8 +186,8 @@ Events
 Keys
 ****
 
--  ``LV_KEY_RIGHT/UP`` Increases the value by one.
--  ``LV_KEY_LEFT/DOWN`` Decreases the value by one.
+-  ``LV_KEY_RIGHT/UP`` Increases value by one.
+-  ``LV_KEY_LEFT/DOWN`` Decreases value by one.
 
 .. admonition::  Further Reading
 
