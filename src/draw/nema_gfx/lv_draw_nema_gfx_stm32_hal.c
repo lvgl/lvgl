@@ -18,7 +18,6 @@
 #include "../../misc/lv_assert.h"
 #include "../../stdlib/lv_string.h"
 
-#include "lv_draw_nema_gfx_config.h" /* This config file is for Nema only. */
 #include <nema_sys_defs.h>
 #include <nema_core.h>
 
@@ -65,7 +64,6 @@ extern GPU2D_HandleTypeDef hgpu2d;
  *  STATIC VARIABLES
  **********************/
 
-LOCATION_PRAGMA_NOLOAD("Nemagfx_Memory_Pool_Buffer")
 static uint8_t nemagfx_pool_mem[NEMAGFX_MEM_POOL_SIZE]; /* NemaGFX memory pool */
 
 static nema_ringbuffer_t ring_buffer_str;
