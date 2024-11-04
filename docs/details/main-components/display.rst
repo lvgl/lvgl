@@ -493,7 +493,9 @@ buffer in I1 color format from a row-wise (htiled) to a column-wise (vtiled) buf
 layout.  This conversion is necessary for certain display controllers that require a
 different draw buffer mapping.  The function assumes that the buffer width and height
 are rounded to a multiple of 8.  The bit order of the resulting vtiled buffer can be
-specified using the `bit_order_lsb` parameter.
+specified using the `bit_order_lsb` parameter.  For more details, refer to the
+implementation in :cpp:func:`lv_draw_sw_i1_convert_to_vtiled` in
+:file:`src/draw/sw/lv_draw_sw.c`.
 
 For more details, refer to the implementation in
 :cpp:func:`lv_draw_sw_i1_convert_to_vtiled` in :file:`src/draw/sw/lv_draw_sw.c`.
