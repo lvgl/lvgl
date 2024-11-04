@@ -25,22 +25,22 @@ Usage
 Set points
 ----------
 
-The points have to be stored in an :cpp:struct:`lv_point_precise_t` array and passed to
+A Line's points have to be stored in an :cpp:struct:`lv_point_precise_t` array and passed to
 the Widget by the :cpp:expr:`lv_line_set_points(lines, point_array, point_cnt)`
 function.
 
 Their coordinates can either be specified as raw pixel coordinates
-(e.g. ``{5, 10}``), or as a percentage of the line's bounding box using
-:cpp:expr:`lv_pct(x)`. In the latter case, the line's width/height may need to
-be set explicitly using ``lv_obj_set_width/height``, as percentage
-values do not automatically expand the bounding box.
+(e.g. ``{5, 10}``), or as a percentage of the Line's bounding box using
+:cpp:expr:`lv_pct(x)`. In the latter case, the Line's width/height may need to
+be set explicitly using :cpp:func:`lv_obj_set_width` and :cpp:func:`lv_obj_set_height`,
+as percentage values do not automatically expand the bounding box.
 
 Auto-size
 ---------
 
 By default, the Line's width and height are set to :c:macro:`LV_SIZE_CONTENT`.
 This means it will automatically set its size to fit all the points. If
-the size is set explicitly, parts on the line may not be visible.
+the size is set explicitly, parts on the Line may not be visible.
 
 Invert y
 --------
@@ -48,7 +48,7 @@ Invert y
 By default, the *y == 0* point is in the top of the Widget. It might be
 counter-intuitive in some cases so the y coordinates can be inverted
 with :cpp:expr:`lv_line_set_y_invert(line, true)`. In this case, *y == 0* will
-be the bottom of the Widget. *y invert* is disabled by default.
+be at the bottom of the Widget. *y invert* is disabled by default.
 
 
 
@@ -57,7 +57,7 @@ be the bottom of the Widget. *y invert* is disabled by default.
 Events
 ******
 
-Only the :ref:`Generic events <events>` are sent by Line Widgets.
+Only :ref:`generic events <events>` are sent by Line Widgets.
 
 .. admonition::  Further Reading
 
