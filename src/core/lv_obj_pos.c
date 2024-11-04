@@ -33,6 +33,7 @@ static int32_t calc_content_width(lv_obj_t * obj);
 static int32_t calc_content_height(lv_obj_t * obj);
 static void layout_update_core(lv_obj_t * obj);
 static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p_count, bool inv);
+static bool is_transformed(const lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -878,7 +879,12 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     /*The area is not on the object*/
     if(!lv_area_intersect(area, area, &obj_coords)) return false;
 
-    lv_obj_get_transformed_area(obj, area, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
+    if(!is_transformed(obj)) {
+        *area = obj->coords;
+    }
+    else {
+        lv_obj_get_transformed_area(obj, area, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
+    }
 
     /*Truncate recursively to the parents*/
     lv_obj_t * parent = lv_obj_get_parent(obj);
@@ -893,7 +899,12 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
             lv_area_increase(&parent_coords, parent_ext_size, parent_ext_size);
         }
 
-        lv_obj_get_transformed_area(parent, &parent_coords, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
+        if(!is_transformed(parent)) {
+            parent_coords = parent->coords;
+        }
+        else {
+            lv_obj_get_transformed_area(parent, &parent_coords, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
+        }
         if(!lv_area_intersect(area, area, &parent_coords)) return false;
 
         parent = lv_obj_get_parent(parent);
@@ -975,6 +986,15 @@ void lv_obj_center(lv_obj_t * obj)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static bool is_transformed(const lv_obj_t * obj)
+{
+    while(obj) {
+        if(obj->spec_attr && obj->spec_attr->layer_type == LV_LAYER_TYPE_TRANSFORM) return true;
+        obj = obj->parent;
+    }
+    return false;
+}
 
 static int32_t calc_content_width(lv_obj_t * obj)
 {
