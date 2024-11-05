@@ -1,7 +1,11 @@
-/**
+/*******************************************************************
  * @file lv_demo_gestures.h
  *
- */
+ * Copyright (c) 2024 EDGEMTech Ltd.
+ *
+ * Author: EDGEMTech Ltd, Erik Tagirov (erik.tagirov@edgemtech.ch)
+ *
+ ******************************************************************/
 
 #ifndef LV_DEMO_GESTURES_H
 #define LV_DEMO_GESTURES_H

@@ -1,6 +1,6 @@
-/*
+/*******************************************************************
+ *
  * @file lv_demo_gestures.c
- * @author EDGEMTech Ltd. erik.tagirov@edgemtech.ch
  *
  * This is a simple example program that demonstrates how to use
  * the gesture recognition API, please refer to lv_indev_gesture.h or the documentation 
@@ -10,7 +10,12 @@
  * is detected. A single finger moves the rectangle around,
  * a swipe gesture creates another rectangle to interact with - up to 5 are allowed.
  * A rotation gesture, obviously rotates the rectangle.
- */
+ *
+ * Copyright (c) 2024 EDGEMTech Ltd
+ *
+ * Author: EDGEMTech Ltd, Erik Tagirov (erik.tagirov@edgemtech.ch)
+ *
+ ******************************************************************/
 
 /*********************
  *      INCLUDES
@@ -143,7 +148,8 @@ static void label_scale(lv_event_t *gesture_event)
 
     /* The gesture has started or is on-going */
 
-    /* Avoids a situation where the rectangle becomes too small */
+    /* Avoids a situation where the rectangle becomes too small,
+     * do not perform the scaling - leave straight away */
     if (scale < 0.4) {
         return;
     }

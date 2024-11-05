@@ -1,8 +1,13 @@
-/**
- * @file lv_indev_gesture.c @description Recognize gestures that consist of multiple touch events
+/******************************************************************
+ * @file lv_indev_gesture.c
  *
- * @author EDGEMTech Ltd. erik.tagirov@edgemtech.ch
- */
+ * Recognize gestures that consist of multiple touch events
+ *
+ * Copyright (c) 2024 EDGEMTech Ltd
+ *
+ * Author EDGEMTech Ltd. (erik.tagirov@edgemtech.ch)
+ *
+ ******************************************************************/
 
 /********************
  *      INCLUDES

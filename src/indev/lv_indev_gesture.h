@@ -1,7 +1,12 @@
-/**
+/*******************************************************************
+ *
  * @file lv_indev_gesture.h
- * @author EDGEMTech Ltd, erik.tagirov@edgemtech.ch
- */
+ *
+ * Copyright (c) 2024 EDGEMTech Ltd.
+ *
+ * Author EDGEMTech Ltd, (erik.tagirov@edgemtech.ch)
+ *
+ ******************************************************************/
 
 #ifndef LV_INDEV_GESTURE_H
 #define LV_INDEV_GESTURE_H

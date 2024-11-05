@@ -1275,14 +1275,14 @@ static void indev_proc_press(lv_indev_t * indev)
     }
 
     /* Send a gesture event to a potential indev cb callback, even if no object was found */
-    if(indev->gesture_type != LV_INDEV_GESTURE_NONE) {
+    if (indev->gesture_type != LV_INDEV_GESTURE_NONE) {
             lv_indev_send_event(indev, LV_EVENT_GESTURE, indev_act);
     }
 
     if(indev_obj_act) {
         const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
-        if(indev->gesture_type != LV_INDEV_GESTURE_NONE) {
+        if (indev->gesture_type != LV_INDEV_GESTURE_NONE) {
             /* NOTE: hardcoded to pinch for now */
             if(send_event(LV_EVENT_GESTURE, indev_act) == LV_RESULT_INVALID) return;
         }
@@ -1372,7 +1372,7 @@ static void indev_proc_release(lv_indev_t * indev)
     }
 
     /* Send a gesture event to a potential indev cb callback, even if no object was found */
-    if(indev->gesture_type != LV_INDEV_GESTURE_NONE) {
+    if (indev->gesture_type != LV_INDEV_GESTURE_NONE) {
             lv_indev_send_event(indev, LV_EVENT_GESTURE, indev_act);
     }
 
@@ -1381,7 +1381,7 @@ static void indev_proc_release(lv_indev_t * indev)
 
         const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
-        if(is_enabled && indev->gesture_type != LV_INDEV_GESTURE_NONE) {
+        if (is_enabled && indev->gesture_type != LV_INDEV_GESTURE_NONE) {
             if(send_event(LV_EVENT_GESTURE, indev_act) == LV_RESULT_INVALID) return;
         }
 

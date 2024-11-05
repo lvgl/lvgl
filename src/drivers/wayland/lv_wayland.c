@@ -973,11 +973,11 @@ static void touch_handle_up(void * data, struct wl_touch * wl_touch,
                 xdg_toplevel_set_minimized(window->xdg_toplevel);
                 window->flush_pending = true;
             }
-#endif // LV_WAYLAND_XDG_SHELL
+#endif /* LV_WAYLAND_XDG_SHELL */
         default:
             break;
     }
-#endif // LV_WAYLAND_WINDOW_DECORATIONS
+#endif /* LV_WAYLAND_WINDOW_DECORATIONS */
 
 }
 
@@ -2285,16 +2285,6 @@ static void _lv_wayland_handle_output(void)
             window->closed = true;
             window->shall_close = false;
             shall_flush = true;
-
-	    /*TODO: De-initialize new touch fields - disabled for now */
-#if 0
-            window->body->input.touch.x = 0;
-            window->body->input.touch.y = 0;
-            window->body->input.touch.state = LV_INDEV_STATE_RELEASED;
-            if(window->application->touch_obj == window->body) {
-                window->application->touch_obj = NULL;
-            }
-#endif
 
             window->body->input.pointer.x = 0;
             window->body->input.pointer.y = 0;
