@@ -697,54 +697,59 @@ static void refr_area(const lv_area_t * area_p)
         tile_h = lv_area_get_height(area_p) / tile_cnt;
     }
 
-    /* Don't draw to the layers buffer of the display but create smaller dummy layers which are using the
-     * display's layer buffer. These will be the tiles. By using tiles it's more likely that there will
-     * be independent areas for each draw unit. */
-    lv_layer_t * tile_layers = lv_malloc(tile_cnt * sizeof(lv_layer_t));
-    LV_ASSERT_MALLOC(tile_layers);
-    if(tile_layers == NULL) {
-        disp_refr->refreshed_area = *area_p;
-        LV_PROFILER_REFR_END;
-        return;
+    if(tile_cnt == 1) {
+        refr_configured_layer(layer);
     }
-    uint32_t i;
-    for(i = 0; i < tile_cnt; i++) {
-        lv_area_t tile_area;
-        lv_area_set(&tile_area, area_p->x1, area_p->y1 + i * tile_h,
-                    area_p->x2, area_p->y1 + (i + 1) * tile_h - 1);
-
-        if(i == tile_cnt - 1) {
-            tile_area.y2 = area_p->y2;
+    else {
+        /* Don't draw to the layers buffer of the display but create smaller dummy layers which are using the
+         * display's layer buffer. These will be the tiles. By using tiles it's more likely that there will
+         * be independent areas for each draw unit. */
+        lv_layer_t * tile_layers = lv_malloc(tile_cnt * sizeof(lv_layer_t));
+        LV_ASSERT_MALLOC(tile_layers);
+        if(tile_layers == NULL) {
+            disp_refr->refreshed_area = *area_p;
+            LV_PROFILER_REFR_END;
+            return;
         }
+        uint32_t i;
+        for(i = 0; i < tile_cnt; i++) {
+            lv_area_t tile_area;
+            lv_area_set(&tile_area, area_p->x1, area_p->y1 + i * tile_h,
+                        area_p->x2, area_p->y1 + (i + 1) * tile_h - 1);
 
-        lv_layer_t * tile_layer = &tile_layers[i];
-        lv_draw_layer_init(tile_layer, NULL, layer->color_format, &tile_area);
-        tile_layer->buf_area = layer->buf_area; /*the buffer is still large*/
-        tile_layer->draw_buf = layer->draw_buf;
-        refr_configured_layer(tile_layer);
-    }
-
-
-    /*Wait until all tiles are ready and destroy remove them*/
-    for(i = 0; i < tile_cnt; i++) {
-        lv_layer_t * tile_layer = &tile_layers[i];
-        while(tile_layer->draw_task_head) {
-            lv_draw_dispatch_wait_for_request();
-            lv_draw_dispatch();
-        }
-
-        lv_layer_t * layer_i = disp_refr->layer_head;
-        while(layer_i) {
-            if(layer_i->next == tile_layer) {
-                layer_i->next = tile_layer->next;
-                break;
+            if(i == tile_cnt - 1) {
+                tile_area.y2 = area_p->y2;
             }
-            layer_i = layer_i->next;
+
+            lv_layer_t * tile_layer = &tile_layers[i];
+            lv_draw_layer_init(tile_layer, NULL, layer->color_format, &tile_area);
+            tile_layer->buf_area = layer->buf_area; /*the buffer is still large*/
+            tile_layer->draw_buf = layer->draw_buf;
+            refr_configured_layer(tile_layer);
         }
 
-        if(disp_refr->layer_deinit) disp_refr->layer_deinit(disp_refr, tile_layer);
+
+        /*Wait until all tiles are ready and destroy remove them*/
+        for(i = 0; i < tile_cnt; i++) {
+            lv_layer_t * tile_layer = &tile_layers[i];
+            while(tile_layer->draw_task_head) {
+                lv_draw_dispatch_wait_for_request();
+                lv_draw_dispatch();
+            }
+
+            lv_layer_t * layer_i = disp_refr->layer_head;
+            while(layer_i) {
+                if(layer_i->next == tile_layer) {
+                    layer_i->next = tile_layer->next;
+                    break;
+                }
+                layer_i = layer_i->next;
+            }
+
+            if(disp_refr->layer_deinit) disp_refr->layer_deinit(disp_refr, tile_layer);
+        }
+        lv_free(tile_layers);
     }
-    lv_free(tile_layers);
 
     disp_refr->refreshed_area = *area_p;
     LV_PROFILER_REFR_END;
@@ -1160,6 +1165,11 @@ static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
     lv_color_format_t cf = disp->color_format;
     uint32_t stride = lv_draw_buf_width_to_stride(area_w, cf);
     uint32_t overhead = LV_COLOR_INDEXED_PALETTE_SIZE(cf) * sizeof(lv_color32_t);
+
+    if(stride == 0) {
+        LV_LOG_WARN("Invalid stride. Value is 0");
+        return 0;
+    }
 
     int32_t max_row = (uint32_t)(disp->buf_act->data_size - overhead) / stride;
 

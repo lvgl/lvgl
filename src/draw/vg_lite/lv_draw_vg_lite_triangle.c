@@ -59,7 +59,7 @@ void lv_draw_vg_lite_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
-    lv_vg_lite_path_set_bonding_box_area(path, &clip_area);
+    lv_vg_lite_path_set_bounding_box_area(path, &clip_area);
     lv_vg_lite_path_move_to(path, dsc->p[0].x, dsc->p[0].y);
     lv_vg_lite_path_line_to(path, dsc->p[1].x, dsc->p[1].y);
     lv_vg_lite_path_line_to(path, dsc->p[2].x, dsc->p[2].y);

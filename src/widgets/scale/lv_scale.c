@@ -636,11 +636,23 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
         label_dsc->text_local = 1;
     }
 
+    int32_t translate_x = lv_obj_get_style_translate_x(obj, LV_PART_INDICATOR);
+    int32_t translate_y = lv_obj_get_style_translate_y(obj, LV_PART_INDICATOR);
+    int32_t label_rotation = lv_obj_get_style_transform_rotation(obj, LV_PART_INDICATOR);
+    int32_t translate_rotation = 0;
+
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
        || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
-        scale_get_label_coords(obj, label_dsc, tick_point_b, &label_coords);
+        lv_point_t label_origin;
+        label_origin.x = tick_point_b->x + translate_x;
+        label_origin.y = tick_point_b->y + translate_y;
+        scale_get_label_coords(obj, label_dsc, &label_origin, &label_coords);
+        label_rotation = (label_rotation & LV_SCALE_ROTATION_ANGLE_MASK);
     }
     else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
+        translate_rotation = lv_obj_get_style_translate_radial(obj, LV_PART_INDICATOR);
+        uint32_t label_gap = lv_obj_get_style_pad_radial(obj, LV_PART_INDICATOR) + LV_SCALE_DEFAULT_LABEL_GAP;
+
         lv_area_t scale_area;
         lv_obj_get_content_coords(obj, &scale_area);
 
@@ -651,10 +663,10 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
         center_point.y = scale_area.y1 + radius_edge;
 
         const int32_t major_len = lv_obj_get_style_length(obj, LV_PART_INDICATOR);
-        uint32_t label_gap = LV_SCALE_DEFAULT_LABEL_GAP; /* TODO: Add to style properties */
 
         /* Also take into consideration the letter space of the style */
-        int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1);
+        int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1) +
+                                (translate_rotation * 10U);
         angle_upscale += scale->rotation * 10U;
 
         uint32_t radius_text = 0;
@@ -667,8 +679,28 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
         else { /* Nothing to do */ }
 
         lv_point_t point;
-        point.x = center_point.x + radius_text;
-        point.y = center_point.y;
+        point.x = center_point.x + radius_text + translate_x;
+        point.y = center_point.y + translate_y;
+        int32_t label_rotation_temp = 0;
+
+        if(label_rotation & LV_SCALE_LABEL_ROTATE_MATCH_TICKS) {
+            label_rotation_temp = (label_rotation & LV_SCALE_ROTATION_ANGLE_MASK) + angle_upscale;
+
+            /* keep text upright if the user asked for it, otherwise it will be upside-down on half the dial */
+            if(label_rotation & LV_SCALE_LABEL_ROTATE_KEEP_UPRIGHT) {
+                while(label_rotation_temp > 3600) {
+                    label_rotation_temp -= 3600;
+                }
+                if(label_rotation_temp > 900 && label_rotation_temp < 2400) {
+                    label_rotation_temp += 1800;
+                }
+            }
+            label_rotation = label_rotation_temp;
+        }
+        else {
+            label_rotation = label_rotation & LV_SCALE_ROTATION_ANGLE_MASK;
+        }
+
         lv_point_transform(&point, angle_upscale, LV_SCALE_NONE, LV_SCALE_NONE, &center_point, false);
         scale_get_label_coords(obj, label_dsc, &point, &label_coords);
     }
@@ -677,7 +709,26 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
         return;
     }
 
-    lv_draw_label(layer, label_dsc, &label_coords);
+    if(label_rotation > 0) {
+        /*Draw the label to a new layer and draw the layer rotated*/
+        lv_layer_t * layer_label = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &label_coords);
+        lv_draw_label(layer_label, label_dsc, &label_coords);
+
+        lv_point_t pivot_point;
+        /* Set pivot point to the center of the label so it matches the scale curve */
+        pivot_point.x = lv_area_get_width(&label_coords) / 2;
+        pivot_point.y = lv_area_get_height(&label_coords) / 2;
+
+        lv_draw_image_dsc_t layer_draw_dsc;
+        lv_draw_image_dsc_init(&layer_draw_dsc);
+        layer_draw_dsc.src = layer_label;
+        layer_draw_dsc.rotation = label_rotation;
+        layer_draw_dsc.pivot = pivot_point;
+        lv_draw_layer(layer, &layer_draw_dsc, &label_coords);
+    }
+    else {
+        lv_draw_label(layer, label_dsc, &label_coords);
+    }
 }
 
 static void scale_calculate_main_compensation(lv_obj_t * obj)
@@ -950,12 +1001,15 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
 
     int32_t minor_len = 0;
     int32_t major_len = 0;
+    int32_t radial_offset = 0;
 
     if(is_major_tick) {
         major_len = lv_obj_get_style_length(obj, LV_PART_INDICATOR);
+        radial_offset = lv_obj_get_style_radial_offset(obj, LV_PART_INDICATOR);
     }
     else {
         minor_len = lv_obj_get_style_length(obj, LV_PART_ITEMS);
+        radial_offset = lv_obj_get_style_radial_offset(obj, LV_PART_ITEMS);
     }
 
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
@@ -1083,11 +1137,11 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
             adjusted_radio_with_tick_len = point_closer_to_arc + (is_major_tick ? major_len : minor_len);
         }
 
-        tick_point_a->x = center_point.x + point_closer_to_arc;
+        tick_point_a->x = center_point.x + point_closer_to_arc + radial_offset;
         tick_point_a->y = center_point.y;
         lv_point_transform(tick_point_a, angle_upscale, LV_SCALE_NONE, LV_SCALE_NONE, &center_point, false);
 
-        tick_point_b->x = center_point.x + adjusted_radio_with_tick_len;
+        tick_point_b->x = center_point.x + adjusted_radio_with_tick_len + radial_offset;
         tick_point_b->y = center_point.y;
         lv_point_transform(tick_point_b, angle_upscale, LV_SCALE_NONE, LV_SCALE_NONE, &center_point, false);
     }
@@ -1205,7 +1259,7 @@ static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_
  * Checks if the arc has a custom section configuration or not and sets the properties accordingly.
  *
  * @param obj       pointer to a scale object
- * @param line_dsc  pointer to arc descriptor
+ * @param arc_dsc  pointer to arc descriptor
  * @param items_section_style  pointer to indicator section style
  */
 static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc, lv_style_t * section_style)
@@ -1214,37 +1268,57 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
         lv_style_value_t value;
         lv_style_res_t res;
 
-        /* Line width */
+        /* arc width */
         res = lv_style_get_prop(section_style, LV_STYLE_ARC_WIDTH, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->width = (int32_t)value.num;
         }
         else {
-            arc_dsc->width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
+            arc_dsc->width = lv_obj_get_style_arc_width(obj, LV_PART_MAIN);
         }
 
-        /* Line color */
+        /* arc color */
         res = lv_style_get_prop(section_style, LV_STYLE_ARC_COLOR, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->color = value.color;
         }
         else {
-            arc_dsc->color = lv_obj_get_style_line_color(obj, LV_PART_MAIN);
+            arc_dsc->color = lv_obj_get_style_arc_color(obj, LV_PART_MAIN);
         }
 
-        /* Line opa */
+        /* arc opa */
         res = lv_style_get_prop(section_style, LV_STYLE_ARC_OPA, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->opa = (lv_opa_t)value.num;
         }
         else {
-            arc_dsc->opa = lv_obj_get_style_line_opa(obj, LV_PART_MAIN);
+            arc_dsc->opa = lv_obj_get_style_arc_opa(obj, LV_PART_MAIN);
+        }
+
+        /* arc rounded */
+        res = lv_style_get_prop(section_style, LV_STYLE_ARC_ROUNDED, &value);
+        if(res == LV_STYLE_RES_FOUND) {
+            arc_dsc->rounded = (uint8_t)value.num;
+        }
+        else {
+            arc_dsc->rounded = lv_obj_get_style_arc_rounded(obj, LV_PART_MAIN);
+        }
+
+        /* arc image src */
+        res = lv_style_get_prop(section_style, LV_STYLE_ARC_IMAGE_SRC, &value);
+        if(res == LV_STYLE_RES_FOUND) {
+            arc_dsc->img_src = (const void *)value.ptr;
+        }
+        else {
+            arc_dsc->img_src = lv_obj_get_style_arc_image_src(obj, LV_PART_MAIN);
         }
     }
     else {
-        arc_dsc->color = lv_obj_get_style_line_color(obj, LV_PART_MAIN);
-        arc_dsc->opa = lv_obj_get_style_line_opa(obj, LV_PART_MAIN);
-        arc_dsc->width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
+        arc_dsc->color = lv_obj_get_style_arc_color(obj, LV_PART_MAIN);
+        arc_dsc->opa = lv_obj_get_style_arc_opa(obj, LV_PART_MAIN);
+        arc_dsc->width = lv_obj_get_style_arc_width(obj, LV_PART_MAIN);
+        arc_dsc->rounded = lv_obj_get_style_arc_rounded(obj, LV_PART_MAIN);
+        arc_dsc->img_src = lv_obj_get_style_arc_image_src(obj, LV_PART_MAIN);
     }
 }
 
@@ -1459,7 +1533,7 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
                 tmp_width = minor_tick_dsc->width;
             }
 
-            section->first_tick_in_section.y = tick_point_a->y;
+            section->first_tick_in_section = *tick_point_a;
             /* Add 1px as adjustment if tmp_width is odd */
             if(tmp_width & 0x01U) {
                 if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
@@ -1479,7 +1553,7 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
                 tmp_width = minor_tick_dsc->width;
             }
 
-            section->last_tick_in_section.y = tick_point_a->y;
+            section->last_tick_in_section = *tick_point_a;
             /* Add 1px as adjustment if tmp_width is odd */
             if(tmp_width & 0x01U) {
                 if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {

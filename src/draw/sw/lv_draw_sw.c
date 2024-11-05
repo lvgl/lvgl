@@ -175,6 +175,7 @@ void lv_draw_sw_init(void)
         draw_sw_unit->base_unit.evaluate_cb = evaluate;
         draw_sw_unit->idx = i;
         draw_sw_unit->base_unit.delete_cb = LV_USE_OS ? lv_draw_sw_delete : NULL;
+        draw_sw_unit->base_unit.name = "SW";
 
 #if LV_USE_OS
         lv_thread_init(&draw_sw_unit->thread, LV_THREAD_PRIO_HIGH, render_thread_cb, LV_DRAW_THREAD_STACK_SIZE, draw_sw_unit);
@@ -278,6 +279,35 @@ void lv_draw_sw_i1_invert(void * buf, uint32_t buf_size)
 
     for(i = 0; i < buf_size; ++i) {
         byte_buf[i] = ~byte_buf[i];
+    }
+}
+
+void lv_draw_sw_i1_convert_to_vtiled(const void * buf, uint32_t buf_size, uint32_t width, uint32_t height,
+                                     void * out_buf,
+                                     uint32_t out_buf_size, bool bit_order_lsb)
+{
+    LV_ASSERT(buf && out_buf);
+    LV_ASSERT(width % 8 == 0 && height % 8 == 0);
+    LV_ASSERT(buf_size == (width / 8) * height);
+    LV_ASSERT(out_buf_size >= buf_size);
+
+    lv_memset(out_buf, 0, out_buf_size);
+
+    const uint8_t * src_buf = (uint8_t *)buf;
+    uint8_t * dst_buf = (uint8_t *)out_buf;
+
+    for(uint32_t y = 0; y < height; y++) {
+        for(uint32_t x = 0; x < width; x++) {
+            uint32_t src_index = y * width + x;
+            uint32_t dst_index = x * height + y;
+            uint8_t bit = (src_buf[src_index / 8] >> (7 - (src_index % 8))) & 0x01;
+            if(bit_order_lsb) {
+                dst_buf[dst_index / 8] |= (bit << (dst_index % 8));
+            }
+            else {
+                dst_buf[dst_index / 8] |= (bit << (7 - (dst_index % 8)));
+            }
+        }
     }
 }
 
@@ -411,6 +441,10 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 
                 lv_color_format_t cf = draw_dsc->header.cf;
                 if(masked && (cf == LV_COLOR_FORMAT_A8 || cf == LV_COLOR_FORMAT_RGB565A8)) {
+                    return 0;
+                }
+
+                if(cf >= LV_COLOR_FORMAT_PROPRIETARY_START) {
                     return 0;
                 }
             }

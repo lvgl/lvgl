@@ -15,7 +15,8 @@
 
 #include "lv_pxp_osa.h"
 
-#if LV_USE_DRAW_PXP
+#if LV_USE_PXP
+#if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
 #include "lv_pxp_utils.h"
 #include "../../../misc/lv_log.h"
 #include "../../../osal/lv_os.h"
@@ -183,4 +184,5 @@ static void _pxp_wait(void)
 #endif
 }
 
-#endif /*LV_USE_DRAW_PXP*/
+#endif /*LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP*/
+#endif /*LV_USE_PXP*/

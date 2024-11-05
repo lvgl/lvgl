@@ -21,5 +21,7 @@ target_link_libraries(index
     lvgl
     lvgl_examples
     lvgl_demos
+    lvgl_thorvg
+    SDL2
 )
 set_target_properties(index PROPERTIES LINK_FLAGS "--shell-file ${PROJECT_SOURCE_DIR}/lvgl/.devcontainer/lvgl_shell.html -s SINGLE_FILE=1")

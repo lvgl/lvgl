@@ -32,7 +32,7 @@
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
     #include "lv_conf_kconfig.h"
-    #ifdef CONFIG_LV_CONF_SKIP
+    #if defined(CONFIG_LV_CONF_SKIP) && !defined(LV_CONF_SKIP)
         #define LV_CONF_SKIP
     #endif
 #endif
@@ -286,7 +286,6 @@
 	/*
 	 * Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
 	 * than unblocking a task using an intermediary object such as a binary semaphore.
-	 *
 	 * RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
 	 */
 	#ifndef LV_USE_FREERTOS_TASK_NOTIFY
@@ -584,6 +583,52 @@
     #endif
 #endif
 
+/*Use TSi's aka (Think Silicon) NemaGFX */
+#ifndef LV_USE_NEMA_GFX
+    #ifdef CONFIG_LV_USE_NEMA_GFX
+        #define LV_USE_NEMA_GFX CONFIG_LV_USE_NEMA_GFX
+    #else
+        #define LV_USE_NEMA_GFX 0
+    #endif
+#endif
+
+#if LV_USE_NEMA_GFX
+    #ifndef LV_NEMA_GFX_HAL_INCLUDE
+        #ifdef CONFIG_LV_NEMA_GFX_HAL_INCLUDE
+            #define LV_NEMA_GFX_HAL_INCLUDE CONFIG_LV_NEMA_GFX_HAL_INCLUDE
+        #else
+            #define LV_NEMA_GFX_HAL_INCLUDE <stm32u5xx_hal.h>
+        #endif
+    #endif
+
+    /*Enable Vector Graphics Operations. Available only if NemaVG library is present*/
+    #ifndef LV_USE_NEMA_VG
+        #ifdef CONFIG_LV_USE_NEMA_VG
+            #define LV_USE_NEMA_VG CONFIG_LV_USE_NEMA_VG
+        #else
+            #define LV_USE_NEMA_VG 0
+        #endif
+    #endif
+
+    #if LV_USE_NEMA_VG
+        /*Define application's resolution used for VG related buffer allocation */
+        #ifndef LV_NEMA_GFX_MAX_RESX
+            #ifdef CONFIG_LV_NEMA_GFX_MAX_RESX
+                #define LV_NEMA_GFX_MAX_RESX CONFIG_LV_NEMA_GFX_MAX_RESX
+            #else
+                #define LV_NEMA_GFX_MAX_RESX 800
+            #endif
+        #endif
+        #ifndef LV_NEMA_GFX_MAX_RESY
+            #ifdef CONFIG_LV_NEMA_GFX_MAX_RESY
+                #define LV_NEMA_GFX_MAX_RESY CONFIG_LV_NEMA_GFX_MAX_RESY
+            #else
+                #define LV_NEMA_GFX_MAX_RESY 600
+            #endif
+        #endif
+    #endif
+#endif
+
 /** Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
 #ifndef LV_USE_DRAW_VGLITE
     #ifdef CONFIG_LV_USE_DRAW_VGLITE
@@ -644,16 +689,38 @@
 #endif
 
 /** Use NXP's PXP on iMX RTxxx platforms. */
-#ifndef LV_USE_DRAW_PXP
-    #ifdef CONFIG_LV_USE_DRAW_PXP
-        #define LV_USE_DRAW_PXP CONFIG_LV_USE_DRAW_PXP
+#ifndef LV_USE_PXP
+    #ifdef CONFIG_LV_USE_PXP
+        #define LV_USE_PXP CONFIG_LV_USE_PXP
     #else
-        #define LV_USE_DRAW_PXP 0
+        #define LV_USE_PXP 0
     #endif
 #endif
 
-#if LV_USE_DRAW_PXP
-    #if LV_USE_OS
+#if LV_USE_PXP
+    /** Use PXP for drawing.*/
+    #ifndef LV_USE_DRAW_PXP
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_DRAW_PXP
+                #define LV_USE_DRAW_PXP CONFIG_LV_USE_DRAW_PXP
+            #else
+                #define LV_USE_DRAW_PXP 0
+            #endif
+        #else
+            #define LV_USE_DRAW_PXP 1
+        #endif
+    #endif
+
+    /** Use PXP to rotate display.*/
+    #ifndef LV_USE_ROTATE_PXP
+        #ifdef CONFIG_LV_USE_ROTATE_PXP
+            #define LV_USE_ROTATE_PXP CONFIG_LV_USE_ROTATE_PXP
+        #else
+            #define LV_USE_ROTATE_PXP 0
+        #endif
+    #endif
+
+    #if LV_USE_DRAW_PXP && LV_USE_OS
         /** Use additional draw thread for PXP processing.*/
         #ifndef LV_USE_PXP_DRAW_THREAD
             #ifdef LV_KCONFIG_PRESENT
@@ -764,7 +831,7 @@
     #endif
 #endif
 
-/* Accelerate blends, fills, etc. with STM32 DMA2D */
+/** Accelerate blends, fills, etc. with STM32 DMA2D */
 #ifndef LV_USE_DRAW_DMA2D
     #ifdef CONFIG_LV_USE_DRAW_DMA2D
         #define LV_USE_DRAW_DMA2D CONFIG_LV_USE_DRAW_DMA2D
@@ -791,6 +858,15 @@
         #else
             #define LV_USE_DRAW_DMA2D_INTERRUPT 0
         #endif
+    #endif
+#endif
+
+/** Draw using cached OpenGLES textures */
+#ifndef LV_USE_DRAW_OPENGLES
+    #ifdef CONFIG_LV_USE_DRAW_OPENGLES
+        #define LV_USE_DRAW_OPENGLES CONFIG_LV_USE_DRAW_OPENGLES
+    #else
+        #define LV_USE_DRAW_OPENGLES 0
     #endif
 #endif
 
@@ -1769,6 +1845,15 @@
     #endif
 #endif
 
+/*The control character to use for signaling text recoloring*/
+#ifndef LV_TXT_COLOR_CMD
+    #ifdef CONFIG_LV_TXT_COLOR_CMD
+        #define LV_TXT_COLOR_CMD CONFIG_LV_TXT_COLOR_CMD
+    #else
+        #define LV_TXT_COLOR_CMD "#"
+    #endif
+#endif
+
 /*==================
  * WIDGETS
  *================*/
@@ -2657,7 +2742,7 @@
         #define LV_USE_GIF 0
     #endif
 #endif
-    #if LV_USE_GIF
+#if LV_USE_GIF
     /** GIF decoder accelerate */
     #ifndef LV_GIF_CACHE_DECODE_DATA
         #ifdef CONFIG_LV_GIF_CACHE_DECODE_DATA
@@ -2812,6 +2897,30 @@
         #define LV_USE_LZ4_EXTERNAL CONFIG_LV_USE_LZ4_EXTERNAL
     #else
         #define LV_USE_LZ4_EXTERNAL  0
+    #endif
+#endif
+
+/*SVG library
+ *  - Requires `LV_USE_VECTOR_GRAPHIC = 1` */
+#ifndef LV_USE_SVG
+    #ifdef CONFIG_LV_USE_SVG
+        #define LV_USE_SVG CONFIG_LV_USE_SVG
+    #else
+        #define LV_USE_SVG 0
+    #endif
+#endif
+#ifndef LV_USE_SVG_ANIMATION
+    #ifdef CONFIG_LV_USE_SVG_ANIMATION
+        #define LV_USE_SVG_ANIMATION CONFIG_LV_USE_SVG_ANIMATION
+    #else
+        #define LV_USE_SVG_ANIMATION 0
+    #endif
+#endif
+#ifndef LV_USE_SVG_DEBUG
+    #ifdef CONFIG_LV_USE_SVG_DEBUG
+        #define LV_USE_SVG_DEBUG CONFIG_LV_USE_SVG_DEBUG
+    #else
+        #define LV_USE_SVG_DEBUG 0
     #endif
 #endif
 
@@ -3258,8 +3367,8 @@
     #endif
 #endif
 
-/*1: Enable freetype font manager*/
-/*Requires: LV_USE_FREETYPE*/
+/** 1: Enable freetype font manager
+ *  - Requires: LV_USE_FREETYPE */
 #ifndef LV_USE_FONT_MANAGER
     #ifdef CONFIG_LV_USE_FONT_MANAGER
         #define LV_USE_FONT_MANAGER CONFIG_LV_USE_FONT_MANAGER
@@ -3489,6 +3598,14 @@
 #endif
 
 #if LV_USE_NUTTX
+    #ifndef LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
+        #ifdef CONFIG_LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
+            #define LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP CONFIG_LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
+        #else
+            #define LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP 0
+        #endif
+    #endif
+
     #ifndef LV_USE_NUTTX_LIBUV
         #ifdef CONFIG_LV_USE_NUTTX_LIBUV
             #define LV_USE_NUTTX_LIBUV CONFIG_LV_USE_NUTTX_LIBUV
@@ -3537,6 +3654,15 @@
             #define LV_USE_NUTTX_TOUCHSCREEN CONFIG_LV_USE_NUTTX_TOUCHSCREEN
         #else
             #define LV_USE_NUTTX_TOUCHSCREEN    0
+        #endif
+    #endif
+
+    /*Touchscreen cursor size in pixels(<=0: disable cursor)*/
+    #ifndef LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
+        #ifdef CONFIG_LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
+            #define LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE CONFIG_LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
+        #else
+            #define LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE    0
         #endif
     #endif
 #endif
@@ -3650,6 +3776,25 @@
         #define LV_USE_RENESAS_GLCDC CONFIG_LV_USE_RENESAS_GLCDC
     #else
         #define LV_USE_RENESAS_GLCDC    0
+    #endif
+#endif
+
+/** Driver for ST LTDC */
+#ifndef LV_USE_ST_LTDC
+    #ifdef CONFIG_LV_USE_ST_LTDC
+        #define LV_USE_ST_LTDC CONFIG_LV_USE_ST_LTDC
+    #else
+        #define LV_USE_ST_LTDC    0
+    #endif
+#endif
+#if LV_USE_ST_LTDC
+    /* Only used for partial. */
+    #ifndef LV_ST_LTDC_USE_DMA2D_FLUSH
+        #ifdef CONFIG_LV_ST_LTDC_USE_DMA2D_FLUSH
+            #define LV_ST_LTDC_USE_DMA2D_FLUSH CONFIG_LV_ST_LTDC_USE_DMA2D_FLUSH
+        #else
+            #define LV_ST_LTDC_USE_DMA2D_FLUSH 0
+        #endif
     #endif
 #endif
 
@@ -3864,6 +4009,24 @@
     #endif
 #endif
 
+/*E-bike demo with Lottie animations (if LV_USE_LOTTIE is enabled)*/
+#ifndef LV_USE_DEMO_EBIKE
+    #ifdef CONFIG_LV_USE_DEMO_EBIKE
+        #define LV_USE_DEMO_EBIKE CONFIG_LV_USE_DEMO_EBIKE
+    #else
+        #define LV_USE_DEMO_EBIKE			0
+    #endif
+#endif
+#if LV_USE_DEMO_EBIKE
+	#ifndef LV_DEMO_EBIKE_PORTRAIT
+	    #ifdef CONFIG_LV_DEMO_EBIKE_PORTRAIT
+	        #define LV_DEMO_EBIKE_PORTRAIT CONFIG_LV_DEMO_EBIKE_PORTRAIT
+	    #else
+	        #define LV_DEMO_EBIKE_PORTRAIT  0    /*0: for 480x270..480x320, 1: for 480x800..720x1280*/
+	    #endif
+	#endif
+#endif
+
 
 
 /*----------------------------------
@@ -3914,6 +4077,9 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
         #define LV_DRAW_THREAD_STACK_SIZE LV_DRAW_THREAD_STACKSIZE
     #endif
 #endif
+
+/*Allow only upper case letters and '/'  ('/' is a special case for backward compatibility)*/
+#define LV_FS_IS_VALID_LETTER(l) ((l) == '/' || ((l) >= 'A' && (l) <= 'Z'))
 
 /* If running without lv_conf.h, add typedefs with default value. */
 #ifdef LV_CONF_SKIP

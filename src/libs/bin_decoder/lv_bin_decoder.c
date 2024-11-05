@@ -324,6 +324,10 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     if(dsc->decoded == NULL) return LV_RESULT_OK; /*Need to read via get_area_cb*/
 
     lv_draw_buf_t * decoded = (lv_draw_buf_t *)dsc->decoded;
+    if(dsc->header.flags & LV_IMAGE_FLAGS_PREMULTIPLIED) {
+        lv_draw_buf_set_flag(decoded, LV_IMAGE_FLAGS_PREMULTIPLIED);
+    }
+
     lv_draw_buf_t * adjusted = lv_image_decoder_post_process(dsc, decoded);
     if(adjusted == NULL) {
         free_decoder_data(dsc);

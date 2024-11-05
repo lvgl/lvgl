@@ -25,6 +25,14 @@
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef struct {
+    lv_draw_unit_t base_unit;
+    lv_draw_task_t * task_act;
+    lv_cache_t * texture_cache;
+    lv_draw_buf_t render_draw_buf;
+} lv_draw_sdl_unit_t;
+
 typedef struct {
     lv_draw_dsc_base_t * draw_dsc;
     int32_t w;
@@ -45,7 +53,6 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data);
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
-static uint8_t sdl_render_buf[2048 * 1024 * 4];
 
 /**********************
  *  STATIC VARIABLES
@@ -111,6 +118,7 @@ void lv_draw_sdl_init(void)
     lv_draw_sdl_unit_t * draw_sdl_unit = lv_draw_create_unit(sizeof(lv_draw_sdl_unit_t));
     draw_sdl_unit->base_unit.dispatch_cb = dispatch;
     draw_sdl_unit->base_unit.evaluate_cb = evaluate;
+    draw_sdl_unit->base_unit.name = "SDL";
     draw_sdl_unit->texture_cache = lv_cache_create(&lv_cache_class_lru_rb_count,
     sizeof(cache_data_t), 128, (lv_cache_ops_t) {
         .compare_cb = (lv_cache_compare_cb_t)sdl_texture_cache_compare_cb,
@@ -118,6 +126,8 @@ void lv_draw_sdl_init(void)
         .free_cb = (lv_cache_free_cb_t)sdl_texture_cache_free_cb,
     });
     lv_cache_set_name(draw_sdl_unit->texture_cache, "SDL_TEXTURE");
+
+    lv_draw_buf_init(&draw_sdl_unit->render_draw_buf, 0, 0, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO, NULL, 0);
 }
 
 /**********************
@@ -167,6 +177,15 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
     LV_UNUSED(draw_unit);
 
+    if(task->type == LV_DRAW_TASK_TYPE_IMAGE &&
+       ((lv_draw_image_dsc_t *)task->draw_dsc)->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START) {
+        return 0;
+    }
+
+    /*If not refreshing the display probably it's a canvas rendering
+     *which his not support in SDL as it's not a texture.*/
+    if(lv_refr_get_disp_refreshing() == NULL) return 0;
+
     if(((lv_draw_dsc_base_t *)task->draw_dsc)->user_data == NULL) {
         task->preference_score = 0;
         task->preferred_draw_unit_id = DRAW_UNIT_ID_SDL;
@@ -184,16 +203,25 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
     int32_t texture_w = lv_area_get_width(&task->_real_area);
     int32_t texture_h = lv_area_get_height(&task->_real_area);
 
-    lv_draw_buf_t draw_buf;
-    dest_layer.draw_buf = &draw_buf;
-    lv_draw_buf_init(dest_layer.draw_buf, texture_w, texture_h,
-                     LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO, sdl_render_buf, sizeof(sdl_render_buf));
-    dest_layer.color_format = LV_COLOR_FORMAT_ARGB8888;
+    if(!lv_draw_buf_reshape(&u->render_draw_buf, LV_COLOR_FORMAT_ARGB8888, texture_w, texture_h, LV_STRIDE_AUTO)) {
+        uint8_t * data = u->render_draw_buf.unaligned_data;
+        uint32_t data_size = LV_DRAW_BUF_SIZE(texture_w, texture_h, LV_COLOR_FORMAT_ARGB8888);
+        if(data == NULL) data = malloc(data_size);
+        else data = realloc(data, data_size);
 
+        LV_ASSERT_MALLOC(data);
+        lv_result_t init_result = lv_draw_buf_init(&u->render_draw_buf, texture_w, texture_h, LV_COLOR_FORMAT_ARGB8888,
+                                                   LV_STRIDE_AUTO, data, data_size);
+        LV_ASSERT(init_result == LV_RESULT_OK);
+    }
+
+
+    dest_layer.draw_buf = &u->render_draw_buf;
+    dest_layer.color_format = LV_COLOR_FORMAT_ARGB8888;
     dest_layer.buf_area = task->_real_area;
     dest_layer._clip_area = task->_real_area;
     dest_layer.phy_clip_area = task->_real_area;
-    lv_memzero(sdl_render_buf, lv_area_get_size(&dest_layer.buf_area) * 4 + 100);
+    lv_memzero(u->render_draw_buf.data, lv_area_get_size(&task->_real_area) * 4);
 
     lv_display_t * disp = lv_refr_get_disp_refreshing();
 
@@ -297,7 +325,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
     SDL_Texture * texture = SDL_CreateTexture(lv_sdl_window_get_renderer(disp), SDL_PIXELFORMAT_ARGB8888,
                                               SDL_TEXTUREACCESS_STATIC, texture_w, texture_h);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-    SDL_UpdateTexture(texture, NULL, sdl_render_buf, texture_w * 4);
+    SDL_UpdateTexture(texture, NULL, u->render_draw_buf.data, texture_w * 4);
 
     lv_draw_dsc_base_t * base_dsc = task->draw_dsc;
 
@@ -348,7 +376,6 @@ static void blend_texture_layer(lv_draw_sdl_unit_t * u)
 
     SDL_Point center = {draw_dsc->pivot.x, draw_dsc->pivot.y};
     SDL_RenderCopyEx(renderer, src_texture, NULL, &rect, draw_dsc->rotation / 10, &center, SDL_FLIP_NONE);
-    //    SDL_RenderCopy(renderer, src_texture, NULL, &rect);
 
     SDL_DestroyTexture(src_texture);
     SDL_RenderSetClipRect(renderer, NULL);
@@ -370,23 +397,46 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
     void * user_data_saved = data_to_find.draw_dsc->user_data;
     data_to_find.draw_dsc->user_data = NULL;
 
-    /*img_dsc->image_area is an absolute coordinate so it's different
-     *for the same image on a different position. So make it relative before using for cache. */
+    /*Absolute coordinates are different for the same draw_dsc on a different position.
+     *So make everything relative to 0;0  before caching*/
+    lv_area_t a = t->area;
     if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
         lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)data_to_find.draw_dsc;
         lv_area_move(&img_dsc->image_area, -t->area.x1, -t->area.y1);
     }
+    else if(t->type == LV_DRAW_TASK_TYPE_TRIANGLE) {
+        lv_draw_triangle_dsc_t * tri_dsc = (lv_draw_triangle_dsc_t *)data_to_find.draw_dsc;
+        tri_dsc->p[0].x -= t->area.x1;
+        tri_dsc->p[0].y -= t->area.y1;
+        tri_dsc->p[1].x -= t->area.x1;
+        tri_dsc->p[1].y -= t->area.y1;
+        tri_dsc->p[2].x -= t->area.x1;
+        tri_dsc->p[2].y -= t->area.y1;
+    }
+    else if(t->type == LV_DRAW_TASK_TYPE_LINE) {
+        lv_draw_line_dsc_t * line_dsc = (lv_draw_line_dsc_t *)data_to_find.draw_dsc;
+        line_dsc->p1.x -= t->area.x1;
+        line_dsc->p1.y -= t->area.y1;
+        line_dsc->p2.x -= t->area.x1;
+        line_dsc->p2.y -= t->area.y1;
+    }
+    else if(t->type == LV_DRAW_TASK_TYPE_ARC) {
+        lv_draw_arc_dsc_t * arc_dsc = (lv_draw_arc_dsc_t *)data_to_find.draw_dsc;
+        arc_dsc->center.x -= t->area.x1;
+        arc_dsc->center.y -= t->area.y1;
+    }
+
+    lv_area_move(&t->area, -a.x1, -a.y1);
+    lv_area_move(&t->_real_area, -a.x1, -a.y1);
 
     lv_cache_entry_t * entry_cached = lv_cache_acquire_or_create(u->texture_cache, &data_to_find, u);
-    if(t->type == LV_DRAW_TASK_TYPE_IMAGE) {
-        lv_draw_image_dsc_t * img_dsc = (lv_draw_image_dsc_t *)data_to_find.draw_dsc;
-        lv_area_move(&img_dsc->image_area, t->area.x1, t->area.y1);
-    }
+
+    lv_area_move(&t->area, a.x1, a.y1);
+    lv_area_move(&t->_real_area, a.x1, a.y1);
 
     if(!entry_cached) {
         return;
     }
-
 
     data_to_find.draw_dsc->user_data = user_data_saved;
 
@@ -418,10 +468,11 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
 
     lv_cache_release(u->texture_cache, entry_cached, u);
 
-    /*Do not cache label's with local text as the text will be freed*/
+    /*Do not cache non static (const) texts as the text's pointer can be freed/reallocated
+     *at any time resulting in a wild pointer in the cached draw dsc. */
     if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
         lv_draw_label_dsc_t * label_dsc = t->draw_dsc;
-        if(label_dsc->text_local) {
+        if(!label_dsc->text_static) {
             lv_cache_drop(u->texture_cache, &data_to_find, NULL);
         }
     }

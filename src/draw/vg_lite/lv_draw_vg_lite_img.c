@@ -161,7 +161,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
                 0);
         }
 
-        lv_vg_lite_path_set_bonding_box_area(path, &clip_area);
+        lv_vg_lite_path_set_bounding_box_area(path, &clip_area);
         lv_vg_lite_path_end(path);
 
         vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
