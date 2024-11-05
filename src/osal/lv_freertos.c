@@ -61,7 +61,7 @@ static void prvTestAndDecrement(lv_thread_sync_t * pxCond,
  *  STATIC VARIABLES
  **********************/
 
-#if (ESP_PLATFORM)
+#ifdef ESP_PLATFORM
     static portMUX_TYPE critSectionMux = portMUX_INITIALIZER_UNLOCKED;
 #endif
 
@@ -69,7 +69,7 @@ static void prvTestAndDecrement(lv_thread_sync_t * pxCond,
  *      MACROS
  **********************/
 
-#if (ESP_PLATFORM)
+#ifdef ESP_PLATFORM
     #define _enter_critical()   taskENTER_CRITICAL(&critSectionMux);
     #define _exit_critical()    taskEXIT_CRITICAL(&critSectionMux);
     #define _enter_critical_isr() taskENTER_CRITICAL_FROM_ISR();
