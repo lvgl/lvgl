@@ -17,7 +17,9 @@
  *********************/
 #include "lv_demo_gestures.h"
 
-#if LV_USE_DEMO_GESTURES
+#if LV_USE_DEMO_GESTURES && \
+    LV_USE_GESTURE_RECOGNITION && \
+    LV_USE_FLOAT
 
 /*********************
  *      DEFINES
@@ -91,7 +93,7 @@ void lv_demo_gestures(void)
 
     lv_obj_add_style(label, &label_style, LV_STATE_DEFAULT);
 
-    lv_obj_add_event_cb(label, label_scale, LV_EVENT_GESTURE_PINCH, label);
+    lv_obj_add_event_cb(label, label_scale, LV_EVENT_GESTURE, label);
     lv_obj_add_event_cb(label, label_move, LV_EVENT_PRESSING, label);
 
 }
@@ -109,16 +111,14 @@ static void label_scale(lv_event_t *gesture_event)
 
     static int initial_w = -1;
     static int initial_h = -1;
-    lv_indev_gesture_recognizer_t *recognizer;
     lv_indev_gesture_state_t state;
     lv_point_t center_pnt;
     float scale;
 
-    recognizer = lv_indev_gesture_get_recognizer(gesture_event);
-    scale = lv_indev_gesture_get_scale(gesture_event);
-    state = lv_indev_gesture_get_state(gesture_event);
+    scale = lv_event_get_pinch_scale(gesture_event);
+    state = lv_event_get_gesture_state(gesture_event);
 
-    lv_indev_gesture_get_center_point(gesture_event, &center_pnt);
+    lv_indev_get_point(lv_indev_active(), &center_pnt);
 
     if (state == LV_INDEV_GESTURE_STATE_ENDED) {
         /* Pinch gesture has ended - reset the width/height for the next pinch gesture*/
@@ -148,11 +148,6 @@ static void label_scale(lv_event_t *gesture_event)
         return;
     }
 
-    /* Subtract the detection threshold - Avoids choppy scaling */
-    if (scale > 1.0) {
-        scale -= 0.5;
-    }
-
     label_width = initial_w * scale;
     label_height = initial_h * scale;
     label_x = center_pnt.x - label_width / 2;
@@ -168,7 +163,6 @@ static void label_scale(lv_event_t *gesture_event)
     lv_style_set_y(&label_style, (int)label_y);
 
     lv_obj_add_style(label, &label_style, LV_STATE_DEFAULT);
-
 }
 
 /**
@@ -178,20 +172,15 @@ static void label_scale(lv_event_t *gesture_event)
 static void label_move(lv_event_t *event)
 {
     lv_point_t pnt;
-    lv_indev_t *indev;
-    lv_indev_gesture_recognizer_t *recognizer;
     lv_indev_gesture_state_t state;
 
-    indev = (lv_indev_t *)lv_event_get_param(event);
-    recognizer = lv_indev_gesture_indev_get_recognizer(indev);
-    state = lv_indev_gesture_recognizer_get_state(recognizer);
+    state = lv_event_get_gesture_state(event);
+    lv_indev_get_point(lv_indev_active(), &pnt);
 
     /* Do not move and when a pinch gesture is ongoing */
-    if (recognizer != NULL && state == LV_INDEV_GESTURE_STATE_RECOGNIZED) {
+    if (state == LV_INDEV_GESTURE_STATE_RECOGNIZED) {
         return;
     }
-
-    lv_indev_get_point(indev, &pnt);
 
     LV_LOG_TRACE("label move %p x: %d y: %d\n", event, pnt.x, pnt.y);
 
@@ -205,4 +194,4 @@ static void label_move(lv_event_t *event)
     lv_obj_add_style(label, &label_style, LV_STATE_DEFAULT);
 }
 
-#endif /* LV_USE_DEMO_GESTURES */
+#endif /* LV_USE_DEMO_GESTURES && LV_USE_FLOAT */

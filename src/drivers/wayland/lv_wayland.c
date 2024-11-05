@@ -900,7 +900,7 @@ static void touch_handle_down(void * data, struct wl_touch * wl_touch,
     app->touch_obj->input.touches[i].point.x = wl_fixed_to_int(x_w);
     app->touch_obj->input.touches[i].point.y = wl_fixed_to_int(y_w);
     app->touch_obj->input.touches[i].id = id;
-    app->touch_obj->input.touches[i].ts = time;
+    app->touch_obj->input.touches[i].timestamp = time;
     app->touch_obj->input.touches[i].state = LV_INDEV_STATE_PRESSED;
     app->touch_obj->input.touch_event_cnt++;
     
@@ -945,7 +945,7 @@ static void touch_handle_up(void * data, struct wl_touch * wl_touch,
     app->touch_obj->input.touches[i].point.x = 0;
     app->touch_obj->input.touches[i].point.y = 0;
     app->touch_obj->input.touches[i].id = id;
-    app->touch_obj->input.touches[i].ts = time;
+    app->touch_obj->input.touches[i].timestamp = time;
     app->touch_obj->input.touches[i].state = LV_INDEV_STATE_RELEASED;
 
     app->touch_obj->input.touch_event_cnt++;
@@ -1010,7 +1010,7 @@ static void touch_handle_motion(void * data, struct wl_touch * wl_touch,
 	    app->touch_obj->input.touches[i].point.x = wl_fixed_to_int(x_w);
 	    app->touch_obj->input.touches[i].point.y = wl_fixed_to_int(y_w);
 	    app->touch_obj->input.touches[i].id = id;
-	    app->touch_obj->input.touches[i].ts = time;
+	    app->touch_obj->input.touches[i].timestamp = time;
 	    app->touch_obj->input.touches[i].state = LV_INDEV_STATE_PRESSED;
     	    app->touch_obj->input.touch_event_cnt++;
 
@@ -1019,7 +1019,7 @@ static void touch_handle_motion(void * data, struct wl_touch * wl_touch,
 	    cur->point.x = wl_fixed_to_int(x_w);
 	    cur->point.y = wl_fixed_to_int(y_w);
 	    cur->id = id;
-	    cur->ts = time;
+	    cur->timestamp = time;
     }
 
 }
@@ -2373,9 +2373,13 @@ static void _lv_wayland_keyboard_read(lv_indev_t * drv, lv_indev_data_t * data)
 
 static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
+
+/* The gesture recognition feature, currently requires the use floats */
+
+#if LV_USE_GESTURE_RECOGNITION && LV_USE_FLOAT
+
     struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
     lv_indev_touch_data_t *touch;
-    lv_point_t primary_point;
     bool is_active;
     lv_indev_gesture_recognizer_t *recognizer;
     uint8_t touch_cnt;
@@ -2396,28 +2400,10 @@ static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
 
     window->body->input.touch_event_cnt = 0;
 
-    /* If there is a single contact point use its coords,
-     * when there are no contact points it's set to 0,0
-     *
-     * Note: If a gesture was detected, the primary point is overwritten
-     * by the center of the gesture within indev.c
-     */
-    lv_indev_gesture_get_primary_point(recognizer, &primary_point);
-    data->point.x = primary_point.x;
-    data->point.y = primary_point.y;
+    /* Set the gesture information, before returning to LVGL */
+    lv_indev_set_gesture_data(data, recognizer);
 
-    /* The call below returns false if there are no active contact points */
-    /* - OR when the gesture has ended, false is considered as a RELEASED state */
-    is_active = lv_indev_gesture_recognizer_is_active(recognizer);
-
-    if (is_active == false) {
-    data->state = LV_INDEV_STATE_RELEASED;
-        LV_LOG_TRACE("indev data state: %d (released)", data->state);
-
-    } else {
-    data->state = LV_INDEV_STATE_PRESSED;
-        LV_LOG_TRACE("indev data state: %d (pressed)", data->state);
-    }
+#endif
 
 }
 
@@ -2651,11 +2637,6 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     lv_indev_set_type(window->lv_indev_touch, LV_INDEV_TYPE_POINTER);
     lv_indev_set_read_cb(window->lv_indev_touch, _lv_wayland_touch_read);
     lv_indev_set_display(window->lv_indev_touch, window->lv_disp);
-
-    /* Bind the gesture recognizer to the indev device */
-    /* So that lvgl object can recieve LV_EVENT_GESTURE_* events with a reference */
-    /* to the gesture recognizer state (scale, distance, speed, dir) */
-    lv_indev_gesture_bind_recognizer(window->lv_indev_touch, &window->body->input.recognizer);
 
     if(!window->lv_indev_touch) {
         LV_LOG_ERROR("failed to register touch indev");
