@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - 2024 the ThorVG project. All rights reserved.
+ * Copyright (c) 2024 the ThorVG project. All rights reserved.
 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,44 +23,42 @@
 #include "../../lv_conf_internal.h"
 #if LV_USE_THORVG_INTERNAL
 
-#ifndef _TVG_LINES_H_
-#define _TVG_LINES_H_
+#ifndef _TVG_LOTTIE_RENDER_POOLER_H_
+#define _TVG_LOTTIE_RENDER_POOLER_H_
 
 #include "tvgCommon.h"
+#include "tvgArray.h"
+#include "tvgPaint.h"
 
-namespace tvg
-{
 
-struct Line
+template<typename T>
+struct LottieRenderPooler
 {
-    Point pt1;
-    Point pt2;
+    Array<T*> pooler;
+
+    ~LottieRenderPooler()
+    {
+        for (auto p = pooler.begin(); p < pooler.end(); ++p) {
+            if (PP(*p)->unref() == 0) delete(*p);
+        }
+    }
+
+    T* pooling(bool copy = false)
+    {
+        //return available one.
+        for (auto p = pooler.begin(); p < pooler.end(); ++p) {
+            if (PP(*p)->refCnt == 1) return *p;
+        }
+
+        //no empty, generate a new one.
+        auto p = copy ? static_cast<T*>(pooler[0]->duplicate()) : T::gen().release();
+        PP(p)->ref();
+        pooler.push(p);
+        return p;
+    }
 };
 
-float lineLength(const Point& pt1, const Point& pt2);
-void lineSplitAt(const Line& cur, float at, Line& left, Line& right);
-
-
-struct Bezier
-{
-    Point start;
-    Point ctrl1;
-    Point ctrl2;
-    Point end;
-};
-
-void bezSplit(const Bezier&cur, Bezier& left, Bezier& right);
-float bezLength(const Bezier& cur);
-void bezSplitLeft(Bezier& cur, float at, Bezier& left);
-float bezAt(const Bezier& bz, float at, float length);
-void bezSplitAt(const Bezier& cur, float at, Bezier& left, Bezier& right);
-Point bezPointAt(const Bezier& bz, float t);
-float bezAngleAt(const Bezier& bz, float t);
-
-float bezLengthApprox(const Bezier& cur);
-float bezAtApprox(const Bezier& bz, float at, float length);
-}
-
-#endif //_TVG_LINES_H_
+#endif //_TVG_LOTTIE_RENDER_POOLER_H_
 
 #endif /* LV_USE_THORVG_INTERNAL */
+
