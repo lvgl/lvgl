@@ -98,6 +98,9 @@ uint32_t lv_nemagfx_blending_mode(lv_blend_mode_t lv_blend_mode)
         case LV_BLEND_MODE_ADDITIVE:
             blending_mode = NEMA_BL_ADD;
             break;
+        case LV_BLEND_MODE_MULTIPLY:
+            blending_mode = nema_blending_mode(NEMA_BF_DESTCOLOR, NEMA_BF_INVSRCALPHA, NEMA_BLOP_SRC_PREMULT);
+            break;
         default:
             blending_mode = NEMA_BL_SIMPLE;
             break;

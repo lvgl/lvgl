@@ -186,7 +186,7 @@ static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * ta
                 if(!lv_nemagfx_is_cf_supported(img_dsc->header.cf))
                     break;
 
-                if(draw_image_dsc->blend_mode == LV_BLEND_MODE_NORMAL || draw_image_dsc->blend_mode == LV_BLEND_MODE_ADDITIVE) {
+                if(draw_image_dsc->blend_mode != LV_BLEND_MODE_SUBTRACTIVE) {
                     if(task->preference_score > 80) {
                         task->preference_score = 80;
                         task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
