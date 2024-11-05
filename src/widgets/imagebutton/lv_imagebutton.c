@@ -253,11 +253,14 @@ static void refr_image(lv_obj_t * obj)
     lv_imagebutton_t * imagebutton = (lv_imagebutton_t *)obj;
     lv_imagebutton_state_t state  = suggest_state(obj, get_state(obj));
 
-    const void * src = imagebutton->src_mid[state].img_src;
-    if(src == NULL) return;
+    lv_imagebutton_src_info_t * src_left = &imagebutton->src_left[state];
+    lv_imagebutton_src_info_t * src_mid = &imagebutton->src_mid[state];
+    lv_imagebutton_src_info_t * src_right = &imagebutton->src_right[state];
+    if(src_left->img_src == NULL && src_mid->img_src == NULL && src_right->img_src == NULL) return;
 
     lv_obj_refresh_self_size(obj);
-    lv_obj_set_height(obj, imagebutton->src_mid[state].header.h); /*Keep the user defined width*/
+    lv_obj_set_height(obj, LV_MAX3(src_left->header.h, src_mid->header.h,
+                                   src_right->header.h)); /*Keep the user defined height*/
 
     lv_obj_invalidate(obj);
 }
