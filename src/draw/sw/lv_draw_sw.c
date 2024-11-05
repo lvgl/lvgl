@@ -216,26 +216,26 @@ static int32_t lv_draw_sw_delete(lv_draw_unit_t * draw_unit)
 #endif
 }
 
-void lv_draw_sw_i1_to_argb8888(void ** buf_i1, void ** buf_argb8888, size_t buf_size_px)
+void lv_draw_sw_i1_to_argb8888(const void * buf_i1, void * buf_argb8888, uint32_t buf_size_px)
 {
     /*Extract the bits of I1 px_map and convert them to ARGB8888*/
-    uint32_t px_map_size = buf_size_px / (4 * 8) ;
-    uint32_t * argb_px_map_arith = *buf_argb8888;
-    uint8_t * buf_i1_arith = *buf_i1;
+    const uint8_t * src = buf_i1;
+    uint32_t * dst = buf_argb8888;
     /*Skip the palette*/
-    buf_i1_arith += LV_COLOR_INDEXED_PALETTE_SIZE(LV_COLOR_FORMAT_I1) * 4;
-    for(uint32_t i = 0; i < px_map_size; i++) {
+    src += LV_COLOR_INDEXED_PALETTE_SIZE(LV_COLOR_FORMAT_I1) * 4;
+    uint32_t i1_byte_count = buf_size_px / 8;
+    for(uint32_t i = 0; i < i1_byte_count; i++) {
         /*From MSB to LSB (pixel 0 to pixel 7 in a byte)*/
-        for(int bit = 7; bit >= 0; bit--) {
+        for(int32_t bit = 7; bit >= 0; bit--) {
             /*White*/
-            if(((*(buf_i1_arith + i) >> bit) & 1) == 1) {
-                *(argb_px_map_arith) = 0x00FFFFFF;
+            if((src[i] >> bit) & 1) {
+                *dst = 0xFFFFFFFFu;
             }
             /*Black*/
             else {
-                *(argb_px_map_arith) = 0x00000000;
+                *dst = 0xFF000000u;
             }
-            argb_px_map_arith++;
+            dst++;
         }
     }
 }

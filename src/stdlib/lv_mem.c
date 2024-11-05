@@ -145,7 +145,7 @@ void * lv_realloc(void * data_p, size_t new_size)
         return &zero_mem;
     }
 
-    if(data_p == &zero_mem || data_p == NULL) return lv_malloc(new_size);
+    if(data_p == &zero_mem) return lv_malloc(new_size);
 
     void * new_p = lv_realloc_core(data_p, new_size);
 
