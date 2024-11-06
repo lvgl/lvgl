@@ -174,7 +174,8 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
         blending_mode |= NEMA_BLOP_STENCIL_TXTY;
         const lv_image_dsc_t * mask = dsc->bitmap_mask_src;
         const void * mask_buf = mask->data;
-        nema_bind_tex(NEMA_TEX3, (uintptr_t)NEMA_VIRT2PHYS(mask_buf), mask->header.w, mask->header.h, NEMA_A8,
+        nema_bind_tex(NEMA_TEX3, (uintptr_t)NEMA_VIRT2PHYS(mask_buf), mask->header.w, mask->header.h,
+                      lv_nemagfx_mask_cf_to_nema(mask->header.cf),
                       mask->header.stride, NEMA_FILTER_BL);
     }
 
