@@ -1,0 +1,57 @@
+name: Issue Labeling Based on PRs
+
+on:
+  pull_request:
+    types: [opened, edited, closed]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  label_on_pr_reference:
+    runs-on: ubuntu-latest
+    if: github.event.action == 'opened' || github.event.action == 'edited'
+    steps:
+      - name: Check for "fixes" or "resolves" reference
+        id: check_fix
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const body = context.payload.pull_request.body;
+            const issueRegex = /(fix(es)?:?|resolv(es|e)?:?)\s?#(\d+)/i;
+            const match = body.match(issueRegex);
+            return match ? match[4] : null;
+
+      - name: Apply "👨‍💻 PR opened" Label
+        if: steps.check_fix.outputs.result
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          labels: '👨‍💻 PR opened'
+          number: ${{ steps.check_fix.outputs.result }}
+
+  label_on_merge:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Check for "fixes" or "resolves" reference in merged PR
+        id: check_fix
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const body = context.payload.pull_request.body;
+            const issueRegex = /(fix(es)?:?|resolv(es|e)?:?)\s?#(\d+)/i;
+            const match = body.match(issueRegex);
+            return match ? match[4] : null;
+
+      - name: Apply "🎉 Completed" Label and Remove "In Progress" Label
+        if: steps.check_fix.outputs.result
+        uses: actions-ecosystem/action-update-labels@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ steps.check_fix.outputs.result }}
+          add-labels: '🎉 Completed'
+          remove-labels: '👨‍💻 PR opened'
+
