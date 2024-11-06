@@ -75,7 +75,7 @@ Button behavior
 Each button's behavior can be customized with the following control flags:
 
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_HIDDEN`: Hides button; it continues to hold its space in layout.
-- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_NO_REPEAT`: Do not emit LV_EVENT_LONG_PRESSED_REPEAT events while button is long-pressed.
+- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_NO_REPEAT`: Do not emit :cpp:enumerator:`LV_EVENT_LONG_PRESSED_REPEAT` events while button is long-pressed.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_DISABLED`: Disables button like LV_STATE_DISABLED on normal Widgets.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CHECKABLE`: Enable toggling of LV_STATE_CHECKED when clicked.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CHECKED`: Make the button checked. It will use the :cpp:enumerator:`LV_STATE_CHECHKED` styles.
