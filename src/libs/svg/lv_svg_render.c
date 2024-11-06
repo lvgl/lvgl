@@ -1831,6 +1831,7 @@ static void _get_grad_size(const struct _lv_svg_render_obj * obj, uint32_t * siz
     *size += sizeof(lv_svg_gradient_units_t);
 }
 
+#if LV_USE_FREETYPE
 static void _get_span_size(const struct _lv_svg_render_obj * obj, uint32_t * size)
 {
     _get_obj_size(obj, size);
@@ -1870,6 +1871,7 @@ static void _get_content_size(const struct _lv_svg_render_obj * obj, uint32_t * 
     lv_svg_render_content_t * content = (lv_svg_render_content_t *)obj;
     *size += sizeof(uint32_t) * (content->count + 1);
 }
+#endif
 
 static void _get_group_size(const struct _lv_svg_render_obj * obj, uint32_t * size)
 {
