@@ -61,9 +61,10 @@ jobs:
 
   build-esp32s3:
     runs-on: ubuntu-22.04
+    name: Build ESP IDF ESP32S3
     container: espressif/idf:v5.3.1
     steps:
-    - name: Checkout LVGL
+    - name: Clone LVGL as a Component
       uses: actions/checkout@v4
       with:
         path: components/lvgl
