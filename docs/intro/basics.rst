@@ -102,7 +102,7 @@ Widgets
 -------
 After LVGL is initialized (see :ref:`initializing_lvgl`), to create an interactive
 user interface, an application next creates a tree of Widgets that LVGL can render to
-the associated dislay, and with which the user can interact.
+the associated display, and with which the user can interact.
 
 Widgets are "intelligent" LVGL graphical elements such as :ref:`Base Widgets
 <base_widget_overview>` (simple rectangles and :ref:`screens`), Buttons, Labels,
