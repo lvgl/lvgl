@@ -87,8 +87,7 @@ void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t
  *      MACROS
  **********************/
 
-
-#endif /*LV_USE_DRAW_SW_UTILS*/
+#endif /*LV_USE_DRAW_SW*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
