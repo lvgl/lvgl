@@ -81,7 +81,7 @@ Each button's behavior can be customized with the following control flags:
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CHECKED`: Make the button checked. It will use the :cpp:enumerator:`LV_STATE_CHECHKED` styles.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CLICK_TRIG`: 1: Enables sending LV_EVENT_VALUE_CHANGE on CLICK, 0: sends LV_EVENT_VALUE_CHANGE on PRESS.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_POPOVER`: Show button text in a pop-over while being pressed.
-- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_RECOLOR`: Enable text recoloring with `#color`
+- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_RECOLOR`: Enable text recoloring with ``#color``
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CUSTOM_1`: Custom free-to-use flag
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CUSTOM_2`: Custom free-to-use flag
 
