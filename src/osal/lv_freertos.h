@@ -23,7 +23,7 @@ extern "C" {
 
 #if LV_USE_OS == LV_OS_FREERTOS
 
-#if (ESP_PLATFORM)
+#ifdef ESP_PLATFORM
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"

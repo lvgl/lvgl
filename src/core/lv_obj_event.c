@@ -371,7 +371,6 @@ static lv_result_t event_send_core(lv_event_t * e)
     if(parent && event_is_bubbled(e)) {
         e->current_target = parent;
         res = event_send_core(e);
-        if(res != LV_RESULT_OK || e->stop_processing || e->stop_bubbling) return res;
     }
 
     return res;

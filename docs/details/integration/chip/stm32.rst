@@ -292,4 +292,4 @@ If ``LV_USE_DRAW_DMA2D_INTERRUPT`` is enabled then you are required to call
 :cpp:expr:`lv_draw_dma2d_transfer_complete_interrupt_handler` whenever the DMA2D
 "transfer complete" global interrupt is received.
 
-If your STM device has a Nema GPU, you can use the :ref:`Nema GFX renderer <stm32_nema_gfx>` instead.
+If your STM device has a NeoChrom GPU, you can use the :ref:`Nema GFX renderer <nema_gfx>` instead.

@@ -12,18 +12,19 @@
 #include "../../lv_conf_internal.h"
 #if LV_USE_NEMA_GFX
 
+#if LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32
+
 #include "../../misc/lv_types.h"
 #include "../../misc/lv_assert.h"
 #include "../../stdlib/lv_string.h"
 
-#include "config.h"
 #include <nema_sys_defs.h>
 #include <nema_core.h>
 
 #include <assert.h>
 #include <string.h>
 
-#include LV_NEMA_GFX_HAL_INCLUDE
+#include LV_NEMA_STM32_HAL_INCLUDE
 
 #include <cmsis_os2.h>
 
@@ -63,7 +64,6 @@ extern GPU2D_HandleTypeDef hgpu2d;
  *  STATIC VARIABLES
  **********************/
 
-LOCATION_PRAGMA_NOLOAD("Nemagfx_Memory_Pool_Buffer")
 static uint8_t nemagfx_pool_mem[NEMAGFX_MEM_POOL_SIZE]; /* NemaGFX memory pool */
 
 static nema_ringbuffer_t ring_buffer_str;
@@ -259,5 +259,7 @@ void platform_invalidate_cache(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+#endif /* LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32 */
 
 #endif /* LV_USE_NEMA_GFX */
