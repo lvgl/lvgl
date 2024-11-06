@@ -647,6 +647,8 @@ static void strip_ext(char * dir)
 
 static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j)
 {
+    if(i == j) return;
+
     const char * tmp;
     tmp = lv_table_get_cell_value(tb, i, 0);
     lv_table_set_cell_value(tb, 0, 2, tmp);
@@ -690,9 +692,10 @@ static void sort_by_file_kind(lv_obj_t * tb, int16_t lo, int16_t hi)
     int16_t gt = hi;
     const char * v = lv_table_get_cell_value(tb, lo, 1);
     while(i <= gt) {
-        if(lv_strcmp(lv_table_get_cell_value(tb, i, 1), v) < 0)
+        int strcmp_result = lv_strcmp(lv_table_get_cell_value(tb, i, 1), v);
+        if(strcmp_result < 0)
             exch_table_item(tb, lt++, i++);
-        else if(lv_strcmp(lv_table_get_cell_value(tb, i, 1), v) > 0)
+        else if(strcmp_result > 0)
             exch_table_item(tb, i, gt--);
         else
             i++;
