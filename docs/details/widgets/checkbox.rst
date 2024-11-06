@@ -39,7 +39,7 @@ The text can be modified with
 :cpp:expr:`lv_checkbox_set_text(cb, "New text")` and will be
 dynamically allocated.
 
-To set static text, use :cpp:expr:`lv_checkbox_set_static_text(cb, txt)`. This
+To set static text, use :cpp:expr:`lv_checkbox_set_text_static(cb, txt)`. This
 way, only a pointer to ``txt`` will be stored.  The provided text buffer must remain
 available for the life of the Checkbox.
 
