@@ -116,6 +116,7 @@ extern "C" {
 
 #include "src/draw/lv_draw_buf.h"
 #include "src/draw/lv_draw_vector.h"
+#include "src/draw/sw/lv_draw_sw_utils.h"
 
 #include "src/themes/lv_theme.h"
 
