@@ -55,11 +55,11 @@ To set the current date (today), use the
 :cpp:expr:`lv_calendar_set_today_date(calendar, year, month, day)` function.
 ``month`` needs to be in 1..12 range and ``day`` in 1..31 range.
 
-Shown date
-----------
+Month shown
+-----------
 
 To set the shown date, use
-:cpp:expr:`lv_calendar_set_shown_date(calendar, year, month)`
+:cpp:expr:`lv_calendar_set_showed_date(calendar, year, month)`
 
 Highlighted days
 ----------------
