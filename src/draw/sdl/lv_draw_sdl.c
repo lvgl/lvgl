@@ -159,8 +159,6 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     }
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    draw_sdl_unit->base_unit.target_layer = layer;
-    draw_sdl_unit->base_unit.clip_area = &t->clip_area;
     draw_sdl_unit->task_act = t;
 
     execute_drawing(draw_sdl_unit);
@@ -342,18 +340,17 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
     return true;
 }
 
-static void blend_texture_layer(lv_draw_sdl_unit_t * u)
+static void blend_texture_layer(lv_draw_task_t * t)
 {
     lv_display_t * disp = lv_refr_get_disp_refreshing();
     SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
 
     SDL_Rect clip_rect;
-    clip_rect.x = u->base_unit.clip_area->x1;
-    clip_rect.y = u->base_unit.clip_area->y1;
-    clip_rect.w = lv_area_get_width(u->base_unit.clip_area);
-    clip_rect.h = lv_area_get_height(u->base_unit.clip_area);
+    clip_rect.x = t->clip_area.x1;
+    clip_rect.y = t->clip_area.y1;
+    clip_rect.w = lv_area_get_width(&t->clip_area);
+    clip_rect.h = lv_area_get_height(&t->clip_area);
 
-    lv_draw_task_t * t = u->task_act;
     lv_draw_image_dsc_t * draw_dsc = t->draw_dsc;
     SDL_Rect rect;
     rect.w = (lv_area_get_width(&t->area) * draw_dsc->scale_x) / 256;
@@ -371,7 +368,7 @@ static void blend_texture_layer(lv_draw_sdl_unit_t * u)
 
     SDL_SetTextureAlphaMod(src_texture, draw_dsc->opa);
     SDL_SetTextureBlendMode(src_texture, SDL_BLENDMODE_BLEND);
-    SDL_SetRenderTarget(renderer, layer_get_texture(u->base_unit.target_layer));
+    SDL_SetRenderTarget(renderer, layer_get_texture(t->target_layer));
     SDL_RenderSetClipRect(renderer, &clip_rect);
 
     SDL_Point center = {draw_dsc->pivot.x, draw_dsc->pivot.y};
@@ -445,12 +442,12 @@ static void draw_from_cached_texture(lv_draw_sdl_unit_t * u)
     lv_display_t * disp = lv_refr_get_disp_refreshing();
     SDL_Renderer * renderer = lv_sdl_window_get_renderer(disp);
 
-    lv_layer_t * dest_layer = u->base_unit.target_layer;
+    lv_layer_t * dest_layer = t->target_layer;
     SDL_Rect clip_rect;
-    clip_rect.x = u->base_unit.clip_area->x1 - dest_layer->buf_area.x1;
-    clip_rect.y = u->base_unit.clip_area->y1 - dest_layer->buf_area.y1;
-    clip_rect.w = lv_area_get_width(u->base_unit.clip_area);
-    clip_rect.h = lv_area_get_height(u->base_unit.clip_area);
+    clip_rect.x = t->clip_area.x1 - dest_layer->buf_area.x1;
+    clip_rect.y = t->clip_area.y1 - dest_layer->buf_area.y1;
+    clip_rect.w = lv_area_get_width(&t->clip_area);
+    clip_rect.h = lv_area_get_height(&t->clip_area);
 
     SDL_Rect rect;
 
@@ -486,9 +483,9 @@ static void execute_drawing(lv_draw_sdl_unit_t * u)
         lv_draw_fill_dsc_t * fill_dsc = t->draw_dsc;
         if(fill_dsc->radius == 0 && fill_dsc->grad.dir == LV_GRAD_DIR_NONE) {
             SDL_Rect rect;
-            lv_layer_t * layer = u->base_unit.target_layer;
-            lv_area_t fill_area = t->area;
-            lv_area_intersect(&fill_area, &fill_area, u->base_unit.clip_area);
+            lv_layer_t * layer = t->target_layer;
+            lv_area_t fill_area;
+            lv_area_intersect(&fill_area, &t->area, &t->clip_area);
 
             rect.x = fill_area.x1 - layer->buf_area.x1;
             rect.y = fill_area.y1 - layer->buf_area.y1;
@@ -505,7 +502,7 @@ static void execute_drawing(lv_draw_sdl_unit_t * u)
     }
 
     if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
-        blend_texture_layer(u);
+        blend_texture_layer(t);
         return;
     }
 

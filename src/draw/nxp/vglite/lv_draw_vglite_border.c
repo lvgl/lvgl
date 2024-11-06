@@ -64,7 +64,7 @@ static void _vglite_draw_border(const lv_area_t * coords, const lv_area_t * clip
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_border(lv_draw_unit_t * draw_unit, const lv_draw_border_dsc_t * dsc,
+void lv_draw_vglite_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc,
                            const lv_area_t * coords)
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
@@ -74,7 +74,7 @@ void lv_draw_vglite_border(lv_draw_unit_t * draw_unit, const lv_draw_border_dsc_
     if(dsc->side == (lv_border_side_t)LV_BORDER_SIDE_NONE)
         return;
 
-    lv_layer_t * layer = draw_unit->target_layer;
+    lv_layer_t * layer = t->target_layer;
     lv_area_t inward_coords;
     int32_t width = dsc->width;
 
@@ -87,7 +87,7 @@ void lv_draw_vglite_border(lv_draw_unit_t * draw_unit, const lv_draw_border_dsc_
     lv_area_move(&inward_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t clip_area;
-    lv_area_copy(&clip_area, draw_unit->clip_area);
+    lv_area_copy(&clip_area, &t->clip_area);
     lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t clipped_coords;
