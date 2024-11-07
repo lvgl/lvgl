@@ -163,8 +163,10 @@ void lv_subject_snprintf(lv_subject_t * subject, const char * format, ...)
     va_list va;
     va_start(va, format);
     const int ret = lv_vsnprintf((char *)subject->value.pointer, subject->size, format, va);
-    LV_UNUSED(ret)
+    LV_UNUSED(ret);
     va_end(va);
+
+    lv_subject_notify(subject);
 }
 
 const char * lv_subject_get_string(lv_subject_t * subject)
