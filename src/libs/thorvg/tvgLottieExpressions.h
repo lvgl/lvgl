@@ -27,10 +27,13 @@
 #define _TVG_LOTTIE_EXPRESSIONS_H_
 
 #include "tvgCommon.h"
+#include "tvgLottieCommon.h"
 
 struct LottieExpression;
 struct LottieComposition;
-struct RGB24;
+struct LottieLayer;
+struct LottieRoundnessModifier;
+struct LottieOffsetModifier;
 
 #ifdef THORVG_LOTTIE_EXPRESSIONS_SUPPORT
 
@@ -44,14 +47,12 @@ public:
     bool result(float frameNo, NumType& out, LottieExpression* exp)
     {
         auto bm_rt = evaluate(frameNo, exp);
+        if (jerry_value_is_undefined(bm_rt)) return false;
 
-        if (auto prop = static_cast<Property*>(jerry_object_get_native_ptr(bm_rt, nullptr))) {
-            out = (*prop)(frameNo);
-        } else if (jerry_value_is_number(bm_rt)) {
+        if (jerry_value_is_number(bm_rt)) {
             out = (NumType) jerry_value_as_number(bm_rt);
-        } else {
-            TVGERR("LOTTIE", "Failed dispatching a Value!");
-            return false;
+        } else if (auto prop = static_cast<Property*>(jerry_object_get_native_ptr(bm_rt, nullptr))) {
+            out = (*prop)(frameNo);
         }
         jerry_value_free(bm_rt);
         return true;
@@ -61,21 +62,17 @@ public:
     bool result(float frameNo, Point& out, LottieExpression* exp)
     {
         auto bm_rt = evaluate(frameNo, exp);
+        if (jerry_value_is_undefined(bm_rt)) return false;
 
-        if (jerry_value_is_object(bm_rt)) {
-            if (auto prop = static_cast<Property*>(jerry_object_get_native_ptr(bm_rt, nullptr))) {
-                out = (*prop)(frameNo);
-            } else {
-                auto x = jerry_object_get_index(bm_rt, 0);
-                auto y = jerry_object_get_index(bm_rt, 1);
-                out.x = jerry_value_as_number(x);
-                out.y = jerry_value_as_number(y);
-                jerry_value_free(x);
-                jerry_value_free(y);
-            }
+        if (auto prop = static_cast<Property*>(jerry_object_get_native_ptr(bm_rt, nullptr))) {
+            out = (*prop)(frameNo);
         } else {
-            TVGERR("LOTTIE", "Failed dispatching Point!");
-            return false;
+            auto x = jerry_object_get_index(bm_rt, 0);
+            auto y = jerry_object_get_index(bm_rt, 1);
+            out.x = jerry_value_as_number(x);
+            out.y = jerry_value_as_number(y);
+            jerry_value_free(x);
+            jerry_value_free(y);
         }
         jerry_value_free(bm_rt);
         return true;
@@ -85,12 +82,20 @@ public:
     bool result(float frameNo, RGB24& out, LottieExpression* exp)
     {
         auto bm_rt = evaluate(frameNo, exp);
+        if (jerry_value_is_undefined(bm_rt)) return false;
 
         if (auto color = static_cast<Property*>(jerry_object_get_native_ptr(bm_rt, nullptr))) {
             out = (*color)(frameNo);
         } else {
-            TVGERR("LOTTIE", "Failed dispatching Color!");
-            return false;
+            auto r = jerry_object_get_index(bm_rt, 0);
+            auto g = jerry_object_get_index(bm_rt, 1);
+            auto b = jerry_object_get_index(bm_rt, 2);
+            out.rgb[0] = REMAP255(jerry_value_as_number(r));
+            out.rgb[1] = REMAP255(jerry_value_as_number(g));
+            out.rgb[2] = REMAP255(jerry_value_as_number(b));
+            jerry_value_free(r);
+            jerry_value_free(g);
+            jerry_value_free(b);
         }
         jerry_value_free(bm_rt);
         return true;
@@ -100,28 +105,24 @@ public:
     bool result(float frameNo, Fill* fill, LottieExpression* exp)
     {
         auto bm_rt = evaluate(frameNo, exp);
+        if (jerry_value_is_undefined(bm_rt)) return false;
 
         if (auto colorStop = static_cast<Property*>(jerry_object_get_native_ptr(bm_rt, nullptr))) {
             (*colorStop)(frameNo, fill, this);
-        } else {
-            TVGERR("LOTTIE", "Failed dispatching ColorStop!");
-            return false;
         }
         jerry_value_free(bm_rt);
         return true;
     }
 
     template<typename Property>
-    bool result(float frameNo, Array<PathCommand>& cmds, Array<Point>& pts, Matrix* transform, float roundness, LottieExpression* exp)
+    bool result(float frameNo, Array<PathCommand>& cmds, Array<Point>& pts, Matrix* transform, const LottieRoundnessModifier* roundness, const LottieOffsetModifier* offsetPath, LottieExpression* exp)
     {
         auto bm_rt = evaluate(frameNo, exp);
+        if (jerry_value_is_undefined(bm_rt)) return false;
 
         if (auto pathset = static_cast<Property*>(jerry_object_get_native_ptr(bm_rt, nullptr))) {
-            (*pathset)(frameNo, cmds, pts, transform, roundness);
-         } else {
-            TVGERR("LOTTIE", "Failed dispatching PathSet!");
-            return false;
-         }
+            (*pathset)(frameNo, cmds, pts, transform, roundness, offsetPath);
+        }
         jerry_value_free(bm_rt);
         return true;
     }
@@ -138,12 +139,14 @@ private:
 
     jerry_value_t evaluate(float frameNo, LottieExpression* exp);
     jerry_value_t buildGlobal();
-    void buildComp(LottieComposition* comp);
+
+    void buildComp(LottieComposition* comp, float frameNo, LottieExpression* exp);
+    void buildComp(jerry_value_t context, float frameNo, LottieLayer* comp, LottieExpression* exp);
+    void buildGlobal(LottieExpression* exp);
 
     //global object, attributes, methods
     jerry_value_t global;
     jerry_value_t comp;
-    jerry_value_t layer;
     jerry_value_t thisComp;
     jerry_value_t thisLayer;
     jerry_value_t thisProperty;
@@ -157,7 +160,7 @@ struct LottieExpressions
     template<typename Property> bool result(TVG_UNUSED float, TVG_UNUSED Point&, LottieExpression*) { return false; }
     template<typename Property> bool result(TVG_UNUSED float, TVG_UNUSED RGB24&, TVG_UNUSED LottieExpression*) { return false; }
     template<typename Property> bool result(TVG_UNUSED float, TVG_UNUSED Fill*, TVG_UNUSED LottieExpression*) { return false; }
-    template<typename Property> bool result(TVG_UNUSED float, TVG_UNUSED Array<PathCommand>&, TVG_UNUSED Array<Point>&, TVG_UNUSED Matrix* transform, TVG_UNUSED float, TVG_UNUSED LottieExpression*) { return false; }
+    template<typename Property> bool result(TVG_UNUSED float, TVG_UNUSED Array<PathCommand>&, TVG_UNUSED Array<Point>&, TVG_UNUSED Matrix* transform, TVG_UNUSED const LottieRoundnessModifier*, TVG_UNUSED const LottieOffsetModifier*, TVG_UNUSED LottieExpression*) { return false; }
     void update(TVG_UNUSED float) {}
     static LottieExpressions* instance() { return nullptr; }
     static void retrieve(TVG_UNUSED LottieExpressions* instance) {}

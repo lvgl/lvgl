@@ -51,6 +51,9 @@ fout.write(
 #define LV_DRAW_SW_ASM_HELIUM       2
 #define LV_DRAW_SW_ASM_CUSTOM       255
 
+#define LV_NEMA_HAL_CUSTOM          0
+#define LV_NEMA_HAL_STM32           1
+
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
     #include "lv_conf_kconfig.h"

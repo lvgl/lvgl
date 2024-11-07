@@ -95,8 +95,8 @@ See the :ref:`DMA2D support <dma2d>`.
 
 .. admonition::  Further Reading
 
-    You may be interested in enabling the :ref:`Nema GFX renderer <stm32_nema_gfx>`
-    if your STM32 has a GPU which is supported by Nema GFX.
+    You may be interested in enabling the :ref:`Nema GFX renderer <nema_gfx>`
+    if your STM32 has a NeoChrom GPU.
 
     `lv_port_riverdi_stm32u5 <https://github.com/lvgl/lv_port_riverdi_stm32u5>`__
     is a way to quick way to get started with LTDC on LVGL.

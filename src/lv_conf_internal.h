@@ -29,6 +29,9 @@
 #define LV_DRAW_SW_ASM_HELIUM       2
 #define LV_DRAW_SW_ASM_CUSTOM       255
 
+#define LV_NEMA_HAL_CUSTOM          0
+#define LV_NEMA_HAL_STM32           1
+
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
     #include "lv_conf_kconfig.h"
@@ -593,11 +596,23 @@
 #endif
 
 #if LV_USE_NEMA_GFX
-    #ifndef LV_NEMA_GFX_HAL_INCLUDE
-        #ifdef CONFIG_LV_NEMA_GFX_HAL_INCLUDE
-            #define LV_NEMA_GFX_HAL_INCLUDE CONFIG_LV_NEMA_GFX_HAL_INCLUDE
+    /** Select which NemaGFX HAL to use. Possible options:
+     * - LV_NEMA_HAL_CUSTOM
+     * - LV_NEMA_HAL_STM32 */
+    #ifndef LV_USE_NEMA_HAL
+        #ifdef CONFIG_LV_USE_NEMA_HAL
+            #define LV_USE_NEMA_HAL CONFIG_LV_USE_NEMA_HAL
         #else
-            #define LV_NEMA_GFX_HAL_INCLUDE <stm32u5xx_hal.h>
+            #define LV_USE_NEMA_HAL LV_NEMA_HAL_CUSTOM
+        #endif
+    #endif
+    #if LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32
+        #ifndef LV_NEMA_STM32_HAL_INCLUDE
+            #ifdef CONFIG_LV_NEMA_STM32_HAL_INCLUDE
+                #define LV_NEMA_STM32_HAL_INCLUDE CONFIG_LV_NEMA_STM32_HAL_INCLUDE
+            #else
+                #define LV_NEMA_STM32_HAL_INCLUDE <stm32u5xx_hal.h>
+            #endif
         #endif
     #endif
 
@@ -609,7 +624,6 @@
             #define LV_USE_NEMA_VG 0
         #endif
     #endif
-
     #if LV_USE_NEMA_VG
         /*Define application's resolution used for VG related buffer allocation */
         #ifndef LV_NEMA_GFX_MAX_RESX
