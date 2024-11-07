@@ -132,7 +132,7 @@ void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf,
 void lv_subject_copy_string(lv_subject_t * subject, const char * buf)
 {
     if(subject->type != LV_SUBJECT_TYPE_STRING) {
-        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_INT");
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_STRING");
         return;
     }
 
@@ -145,6 +145,26 @@ void lv_subject_copy_string(lv_subject_t * subject, const char * buf)
 
     lv_subject_notify(subject);
 
+}
+
+void lv_subject_snprintf(lv_subject_t * subject, const char * format, ...)
+{
+    if(subject->type != LV_SUBJECT_TYPE_STRING) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_STRING");
+        return;
+    }
+
+    if(subject->size < 1) return;
+
+    if(subject->prev_value.pointer) {
+        lv_strlcpy((char *)subject->prev_value.pointer, subject->value.pointer, subject->size);
+    }
+
+    va_list va;
+    va_start(va, format);
+    const int ret = lv_vsnprintf((char *)subject->value.pointer, subject->size, format, va);
+    LV_UNUSED(ret)
+    va_end(va);
 }
 
 const char * lv_subject_get_string(lv_subject_t * subject)
