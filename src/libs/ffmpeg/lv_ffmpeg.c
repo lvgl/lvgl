@@ -267,7 +267,6 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
     LV_UNUSED(decoder);
 
     /* Get the source type */
-    const void * src = dsc->src;
     lv_image_src_t src_type = dsc->src_type;
 
     if(src_type == LV_IMAGE_SRC_FILE) {
@@ -684,7 +683,7 @@ static int ffmpeg_update_next_frame(struct ffmpeg_context_s * ffmpeg_ctx)
 static int ffmpeg_lvfs_read(void * ptr, uint8_t * buf, int buf_size)
 {
     lv_fs_file_t * file = ptr;
-    int bytesRead = 0;
+    uint32_t bytesRead = 0;
     lv_fs_res_t res = lv_fs_read(file, buf, buf_size, &bytesRead);
     if(bytesRead == 0)
         return AVERROR_EOF;  /* Let FFmpeg know that we have reached eof */
