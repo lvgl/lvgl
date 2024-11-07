@@ -19,10 +19,6 @@ Example
 	    <prop name="symbol" help="The symbol, usually a caret">
 	    	<param name="img_src" type="simg_src" help=""/>
 	    </prop>
-	    <prop name="day_names" help="set the names for the days">
-	    	<param name="names" type="string[7]" help="the 7 day names as an array"/>
-	    </prop>
-
-		<element name="list" access="get" help=""/>
+	    <element name="list" access="get" help=""/>
 	</api>
 </widget>
