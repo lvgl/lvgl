@@ -15,9 +15,9 @@ Example
 	    <prop name="tab_bar_position" type="dir">
 	    	<param name="idx" type="dir(top bottom left right)" help=""/>
 	    </prop>
-	    <element name="tab_bar" type="obj" access="implicit-single">
+	    <element name="tab_bar" type="obj" access="get">
 	    </element>
-	    <element name="tab" type="obj" access="explicit">
+	    <element name="tab" type="obj" access="add">
 	        <arg name="text" type="string" arg="true"/>
 	    </element>
 	</api>
