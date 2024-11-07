@@ -10,20 +10,22 @@ Overview
 The Checkbox Widget is created from a "tick box" and a label. When the
 Checkbox is clicked the tick box is toggled.
 
+
 .. _lv_checkbox_parts_and_styles:
 
 Parts and Styles
 ****************
 
--  :cpp:enumerator:`LV_PART_MAIN` The is the background of the Checkbox and it uses
-   the text and all the typical background style properties.
-   ``pad_column`` adjusts the spacing between the tickbox and the label
+-  :cpp:enumerator:`LV_PART_MAIN` Background of Checkbox and it uses
+   the text- and all the typical background-style properties.
+   ``pad_column`` adjusts spacing between tickbox and label
 -  :cpp:enumerator:`LV_PART_INDICATOR` The "tick box" is a square that uses all the
    typical background style properties. By default, its size is equal to
    the height of the main part's font. Padding properties make the tick
    box larger in the respective directions.
 
-The Checkbox is added to the default group (if it is set).
+The Checkbox is added to the default group (if one is set).
+
 
 .. _lv_checkbox_usage:
 
@@ -33,27 +35,27 @@ Usage
 Text
 ----
 
-The text can be modified with the
-:cpp:expr:`lv_checkbox_set_text(cb, "New text")` function and will be
+The text can be modified with
+:cpp:expr:`lv_checkbox_set_text(cb, "New text")` and will be
 dynamically allocated.
 
-To set a static text, use :cpp:expr:`lv_checkbox_set_static_text(cb, txt)`. This
-way, only a pointer to ``txt`` will be stored. The text then shouldn't
-be deallocated while the checkbox exists.
+To set static text, use :cpp:expr:`lv_checkbox_set_text_static(cb, txt)`. This
+way, only a pointer to ``txt`` will be stored.  The provided text buffer must remain
+available for the life of the Checkbox.
 
 Check, uncheck, disable
 -----------------------
 
-You can manually check, un-check, and disable the Checkbox by using the
+You can programmatically check, un-check, and disable the Checkbox by using the
 common state add/clear function:
 
 .. code-block:: c
 
-   lv_obj_add_state(cb, LV_STATE_CHECKED);   /* Make the checkbox checked */
-   lv_obj_remove_state(cb, LV_STATE_CHECKED); /* Make the checkbox unchecked */
-   lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED); /* Make the checkbox checked and disabled */
+   lv_obj_add_state(cb, LV_STATE_CHECKED);    /* Make Checkbox checked */
+   lv_obj_remove_state(cb, LV_STATE_CHECKED); /* Make Checkbox unchecked */
+   lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED); /* Make Checkbox checked and disabled */
 
-To get whether the checkbox is checked or not use:
+To find out whether the Checkbox is checked use
 :cpp:expr:`lv_obj_has_state(cb, LV_STATE_CHECKED)`.
 
 
@@ -63,7 +65,7 @@ To get whether the checkbox is checked or not use:
 Events
 ******
 
--  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the checkbox is toggled.
+-  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when Checkbox is toggled.
 
 .. admonition::  Further Reading
 
@@ -78,10 +80,11 @@ Events
 Keys
 ****
 
-The following *Keys* are processed by the 'Buttons': -
-``LV_KEY_RIGHT/UP`` Go to toggled state if toggling is enabled -
-``LV_KEY_LEFT/DOWN`` Go to non-toggled state if toggling is enabled -
-:cpp:enumerator:`LV_KEY_ENTER` Clicks the checkbox and toggles it
+The following *Keys* are processed by Checkbox:
+
+- ``LV_KEY_RIGHT/UP`` Go to CHECKED state if Checkbox is enabled
+- ``LV_KEY_LEFT/DOWN`` Go to non-CHECKED state if Checkbox is enabled
+- :cpp:enumerator:`LV_KEY_ENTER` Clicks the Checkbox and toggles its value.
 
 Note that, as usual, the state of :cpp:enumerator:`LV_KEY_ENTER` is translated to
 ``LV_EVENT_PRESSED/PRESSING/RELEASED`` etc.

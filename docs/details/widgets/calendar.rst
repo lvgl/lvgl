@@ -7,17 +7,21 @@ Calendar (lv_calendar)
 Overview
 ********
 
-The Calendar Widget is a classic calendar which can: - show the days of
-any month in a 7x7 matrix - Show the name of the days - highlight the
-current day (today) - highlight any user-defined dates
+The Calendar Widget is a classic calendar which can:
 
-The Calendar is added to the default group (if it is set). Calendar is
+- show the days of any month in a 7x7 matrix;
+- show the name of the days;
+- highlight the current day (today);
+- highlight any user-defined dates.
+
+The Calendar is added to the default group (if one is set). Calendar is
 an editable Widget which allow selecting and clicking the dates with
-encoder navigation as well.
+encoder or keyboard navigation as well as pointer-type input devices.
 
-To make the Calendar flexible, by default it doesn't show the current
+To make the Calendar flexible, by default it does not show the current
 year or month. Instead, there are optional "headers" that can be
 attached to the calendar.
+
 
 .. _lv_calendar_parts_and_styles:
 
@@ -27,13 +31,14 @@ Parts and Styles
 The calendar Widget uses the :ref:`Button Matrix <lv_buttonmatrix>`
 Widget under the hood to arrange the days into a matrix.
 
-- :cpp:enumerator:`LV_PART_MAIN` The background of the calendar. Uses all the background related style properties.
-- :cpp:enumerator:`LV_PART_ITEMS` Refers to the dates and day names. Button matrix control flags are set to differentiate the
+- :cpp:enumerator:`LV_PART_MAIN` Calendar background. Uses all the background-related style properties.
+- :cpp:enumerator:`LV_PART_ITEMS` Refers to dates and day names. Button matrix control flags are set to differentiate the
   buttons and a custom drawer event is added modify the properties of the buttons as follows:
 
-  - day names have no border, no background and drawn with a gray color
-  - days of the previous and next month have :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_DISABLED` flag
+  - day names have no border, no background and are drawn with a gray color
+  - days of the previous and next month have the :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_DISABLED` flag
   - today has a thicker border with the theme's primary color - highlighted days have some opacity with the theme's primary color.
+
 
 .. _lv_calendar_usage:
 
@@ -50,37 +55,41 @@ To set the current date (today), use the
 :cpp:expr:`lv_calendar_set_today_date(calendar, year, month, day)` function.
 ``month`` needs to be in 1..12 range and ``day`` in 1..31 range.
 
-Shown date
-----------
+Month shown
+-----------
 
 To set the shown date, use
-:cpp:expr:`lv_calendar_set_shown_date(calendar, year, month)`
+:cpp:expr:`lv_calendar_set_showed_date(calendar, year, month)`
 
 Highlighted days
 ----------------
 
 The list of highlighted dates should be stored in a
-:cpp:struct:`lv_calendar_date_t` array loaded by
+:cpp:struct:`lv_calendar_date_t` array and applied to the Calendar by calling
 :cpp:expr:`lv_calendar_set_highlighted_dates(calendar, highlighted_dates, date_num)`.
-Only the array's pointer will be saved so the array should be a static
-or global variable.
+Only the array's pointer will be saved so the array should be have static or
+global scope.
 
-Name of the days
-----------------
+Names of days
+-------------
 
-The name of the days can be adjusted with
+The names of the days can be adjusted with
 :cpp:expr:`lv_calendar_set_day_names(calendar, day_names)` where ``day_names``
 looks like ``const char * day_names[7] = {"Su", "Mo", ...};`` Only the
-pointer of the day names is saved so the elements should be static,
-global or constant variables.
+pointer of the day names is saved so the array should have static or
+global scope.
 
 Custom year list
 ----------------
 
-Sets a custom year list with :cpp:expr:`lv_calendar_header_dropdown_set_year_list(calendar, years_list)`
+Set a custom year list with :cpp:expr:`lv_calendar_header_dropdown_set_year_list(calendar, years_list)`
 where ``years_list`` is a pointer to the custom years list. It can be a constant string
 like ``static const char * years = "2023\n2022\n2021\n2020\n2019";``,
-or can be generated dynamically into a buffer as well.
+or can be generated dynamically into a buffer as well.  Calendar stores these in a
+Drop-Down List Widget via :cpp:func:`lv_dropdown_set_options` so the passed string
+pointer can be supplied by a local variable or buffer and does not need to persist
+beyond the call.
+
 
 Chinese calendar
 ----------------
@@ -105,9 +114,9 @@ Events
 ******
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent if a date is clicked.
-   :cpp:expr:`lv_calendar_get_pressed_date(calendar, &date)` set ``date`` to the
+   :cpp:expr:`lv_calendar_get_pressed_date(calendar, &date)` to set ``date`` to the
    date currently being pressed. Returns :cpp:enumerator:`LV_RESULT_OK` if there is a
-   valid pressed date, else :cpp:enumerator:`LV_RESULT_INVALID`.
+   valid pressed date; otherwise it returns :cpp:enumerator:`LV_RESULT_INVALID`.
 
 
 .. admonition::  Further Reading
@@ -137,21 +146,21 @@ Keys
 Headers
 *******
 
-**From v8.1 the header is added directly into the Calendar widget and
+**From LVGL v8.1 onward, the header is added directly into the Calendar Widget and
 the API of the headers has been changed.**
 
 Arrow buttons
 -------------
 
 :cpp:expr:`lv_calendar_header_arrow_create(calendar)` creates a header that
-contains a left and right arrow on the sides and a text with the current
-year and month between them.
+contains a left and right arrow on the sides and text between the arrows showing the
+current year and month.
 
 Drop-down
 ---------
 
 :cpp:expr:`lv_calendar_header_dropdown_create(calendar)` creates a header that
-contains 2 drop-drown lists: one for the year and another for the month.
+contains 2 Drop-Drown List Widgets for the year and month.
 
 .. _lv_calendar_example:
 
