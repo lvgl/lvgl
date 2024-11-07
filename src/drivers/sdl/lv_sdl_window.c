@@ -87,6 +87,7 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
         SDL_StartTextInput();
         event_handler_timer = lv_timer_create(sdl_event_handler, 5, NULL);
         lv_tick_set_cb(SDL_GetTicks);
+        lv_delay_set_cb(SDL_Delay);
 
         inited = true;
     }
