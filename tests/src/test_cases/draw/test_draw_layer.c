@@ -50,6 +50,7 @@ void test_draw_layer_bitmap_mask_from_variable(void)
 
 #ifndef NON_AMD64_BUILD
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/draw_layer_bitmap_mask.png");
+#endif
 }
 
 void test_draw_layer_bitmap_mask_from_image(void)
