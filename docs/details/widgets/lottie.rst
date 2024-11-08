@@ -70,6 +70,12 @@ array. E.g.:
 
    ./filetohex.py path/to/lottie.json > out.txt
 
+``lvgl/scripts/filetohex.py`` only support one-character string. And it is recommended to end with a null terminate to avoid rendering issues. E.g.:
+
+.. code-block:: shell
+
+   ./filetohex.py path/to/lottie.json --filter-character --null-terminate > out.txt
+
 To create an animation from data use
 :cpp:expr:`lv_lottie_set_src_data(lottie, data, sizeof(data))`
 
