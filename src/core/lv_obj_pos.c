@@ -880,7 +880,7 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     if(!lv_area_intersect(area, area, &obj_coords)) return false;
 
     if(!is_transformed(obj)) {
-        *area = obj->coords;
+        *area = obj_coords;
     }
     else {
         lv_obj_get_transformed_area(obj, area, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
