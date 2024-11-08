@@ -301,6 +301,12 @@ static void radius_only(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
     const lv_draw_buf_t * decoded = decoder_dsc->decoded;
     uint32_t img_stride = decoded->header.stride;
     lv_color_format_t cf = decoded->header.cf;
+    lv_color_format_t cf_ori = cf;
+    if(cf == LV_COLOR_FORMAT_RGB565A8) {
+        cf = LV_COLOR_FORMAT_RGB565;
+    }
+
+
     lv_draw_sw_blend_dsc_t blend_dsc;
     lv_memzero(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));
     blend_dsc.opa = draw_dsc->opa;
@@ -309,7 +315,6 @@ static void radius_only(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
     blend_dsc.src_area = img_coords;
     blend_dsc.src_buf = decoded->data;
     blend_dsc.src_color_format = cf;
-
 
     lv_area_t blend_area = *clipped_img_area;
     blend_dsc.blend_area = &blend_area;
@@ -322,15 +327,40 @@ static void radius_only(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
     blend_dsc.mask_area = &blend_area;
     blend_dsc.mask_stride = blend_w;
 
+    if(cf == LV_COLOR_FORMAT_A8) {
+        blend_dsc.src_buf = NULL;
+        blend_dsc.color = draw_dsc->recolor;
+    }
+
     lv_draw_sw_mask_radius_param_t mask_param;
     lv_draw_sw_mask_radius_init(&mask_param, img_coords, draw_dsc->clip_radius, false);
 
     void * masks[2] = {0};
     masks[0] = &mask_param;
 
+    int32_t image_h = lv_area_get_height(img_coords);
     while(blend_area.y1 <= y_last) {
-        lv_memset(mask_buf, 0xff, blend_w);
+        if(cf_ori == LV_COLOR_FORMAT_RGB565A8) {
+            const uint8_t * mask_start = decoded->data + img_stride * image_h;
+            int32_t y_ofs = blend_area.y1 - img_coords->y1;
+            int32_t x_ofs = blend_area.x1 - img_coords->x1;
+            lv_memcpy(mask_buf, mask_start + y_ofs * img_stride / 2  + x_ofs, blend_w);
+        }
+        else if(cf_ori == LV_COLOR_FORMAT_A8) {
+            int32_t y_ofs = blend_area.y1 - img_coords->y1;
+            int32_t x_ofs = blend_area.x1 - img_coords->x1;
+            lv_memcpy(mask_buf, decoded->data + img_stride  + y_ofs * img_stride + x_ofs, blend_w);
+        }
+        else {
+            lv_memset(mask_buf, 0xff, blend_w);
+
+        }
+
         blend_dsc.mask_res = lv_draw_sw_mask_apply(masks, mask_buf, blend_area.x1, blend_area.y1, blend_w);
+
+        if(cf_ori == LV_COLOR_FORMAT_RGB565A8 || cf_ori == LV_COLOR_FORMAT_A8) {
+            blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
+        }
 
         /*Blend*/
         lv_draw_sw_blend(draw_unit, &blend_dsc);
@@ -376,6 +406,7 @@ static void recolor_only(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
         blend_dsc.mask_buf = decoded->data + img_stride * src_h;
         blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
         blend_dsc.src_color_format = LV_COLOR_FORMAT_RGB565;
+        blend_dsc.mask_stride = img_stride / 2;
     }
 
     int32_t y_last = blend_area.y2;
