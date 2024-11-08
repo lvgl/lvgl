@@ -193,9 +193,6 @@ void lv_style_reset(lv_style_t * style)
 
     if(style->prop_cnt != 255) lv_free(style->values_and_props);
     lv_memzero(style, sizeof(lv_style_t));
-#if LV_USE_ASSERT_STYLE
-    style->sentinel = LV_STYLE_SENTINEL_VALUE;
-#endif
 }
 
 lv_style_prop_t lv_style_register_prop(uint8_t flag)
