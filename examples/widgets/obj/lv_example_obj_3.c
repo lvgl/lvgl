@@ -1,5 +1,6 @@
 #include "../../lv_examples.h"
-#if LV_BUILD_EXAMPLES && LV_DRAW_TRANSFORM_USE_MATRIX
+#if LV_BUILD_EXAMPLES
+#if LV_DRAW_TRANSFORM_USE_MATRIX
 
 static void timer_cb(lv_timer_t * timer)
 {
@@ -37,4 +38,5 @@ void lv_example_obj_3(void)
     lv_obj_center(label);
 }
 
-#endif
+#endif /*LV_DRAW_TRANSFORM_USE_MATRIX*/
+#endif /*LV_BUILD_EXAMPLES*/
