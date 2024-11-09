@@ -176,6 +176,8 @@ lv_result_t lv_mutex_unlock(lv_mutex_t * pxMutex)
 
 lv_result_t lv_mutex_delete(lv_mutex_t * pxMutex)
 {
+    if(pxMutex->xIsInitialized == pdFALSE)
+        return LV_RESULT_INVALID;
     vSemaphoreDelete(pxMutex->xMutex);
     pxMutex->xIsInitialized = pdFALSE;
 
