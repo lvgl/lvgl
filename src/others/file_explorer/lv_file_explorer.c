@@ -560,7 +560,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
         return;
     }
 
-    lv_table_set_cell_value_fmt(explorer->file_table, index++, 0, LV_SYMBOL_DIRECTORY "  %s", "..");
+    lv_table_set_cell_value_fmt(explorer->file_table, index++, 0, LV_SYMBOL_LEFT "  %s", "Back");
     lv_table_set_cell_value(explorer->file_table, 0, 1, "0");
     lv_table_set_cell_value(explorer->file_table, 1, 1, "0");
 
