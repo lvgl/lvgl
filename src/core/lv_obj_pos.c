@@ -10,6 +10,7 @@
 #include "../layouts/lv_layout_private.h"
 #include "lv_obj_event_private.h"
 #include "lv_obj_draw_private.h"
+#include "lv_obj_style_private.h"
 #include "lv_obj_private.h"
 #include "../display/lv_display.h"
 #include "../display/lv_display_private.h"
@@ -983,6 +984,82 @@ void lv_obj_center(lv_obj_t * obj)
     lv_obj_align(obj, LV_ALIGN_CENTER, 0, 0);
 }
 
+void lv_obj_set_transform(lv_obj_t * obj, const lv_matrix_t * matrix)
+{
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    if(!matrix) {
+        lv_obj_reset_transform(obj);
+        return;
+    }
+
+    lv_obj_allocate_spec_attr(obj);
+    if(!obj->spec_attr->matrix) {
+        obj->spec_attr->matrix = lv_malloc(sizeof(lv_matrix_t));;
+        LV_ASSERT_MALLOC(obj->spec_attr->matrix);
+    }
+
+    /* Invalidate the old area */
+    lv_obj_invalidate(obj);
+
+    /* Copy the matrix */
+    *obj->spec_attr->matrix = *matrix;
+
+    /* Matrix is set. Update the layer type */
+    lv_obj_update_layer_type(obj);
+
+    /* Invalidate the new area */
+    lv_obj_invalidate(obj);
+#else
+    LV_UNUSED(obj);
+    LV_UNUSED(matrix);
+    LV_LOG_WARN("Transform matrix is not used because LV_DRAW_TRANSFORM_USE_MATRIX is disabled");
+#endif
+}
+
+void lv_obj_reset_transform(lv_obj_t * obj)
+{
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(!obj->spec_attr) {
+        return;
+    }
+
+    if(!obj->spec_attr->matrix) {
+        return;
+    }
+
+    /* Invalidate the old area */
+    lv_obj_invalidate(obj);
+
+    /* Free the matrix */
+    lv_free(obj->spec_attr->matrix);
+    obj->spec_attr->matrix = NULL;
+
+    /* Matrix is cleared. Update the layer type */
+    lv_obj_update_layer_type(obj);
+
+    /* Invalidate the new area */
+    lv_obj_invalidate(obj);
+#else
+    LV_UNUSED(obj);
+#endif
+}
+
+const lv_matrix_t * lv_obj_get_transform(const lv_obj_t * obj)
+{
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(obj->spec_attr) {
+        return obj->spec_attr->matrix;
+    }
+#else
+    LV_UNUSED(obj);
+#endif
+    return NULL;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -1170,6 +1247,31 @@ static void layout_update_core(lv_obj_t * obj)
 
 static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p_count, bool inv)
 {
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    const lv_matrix_t * obj_matrix = lv_obj_get_transform(obj);
+    if(obj_matrix) {
+        lv_matrix_t m;
+        lv_matrix_identity(&m);
+        lv_matrix_translate(&m, obj->coords.x1, obj->coords.y1);
+        lv_matrix_multiply(&m, obj_matrix);
+        lv_matrix_translate(&m, -obj->coords.x1, -obj->coords.y1);
+
+        if(inv) {
+            lv_matrix_t inv_m;
+            lv_matrix_inverse(&inv_m, &m);
+            m = inv_m;
+        }
+
+        for(size_t i = 0; i < p_count; i++) {
+            lv_point_precise_t p_precise = lv_point_to_precise(&p[i]);
+            lv_point_precise_t res = lv_matrix_transform_precise_point(&m, &p_precise);
+            p[i] = lv_point_from_precise(&res);
+        }
+
+        return;
+    }
+#endif /* LV_DRAW_TRANSFORM_USE_MATRIX */
+
     int32_t angle = lv_obj_get_style_transform_rotation(obj, 0);
     int32_t scale_x = lv_obj_get_style_transform_scale_x_safe(obj, 0);
     int32_t scale_y = lv_obj_get_style_transform_scale_y_safe(obj, 0);

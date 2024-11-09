@@ -541,6 +541,13 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
         lv_event_remove_all(&obj->spec_attr->event_list);
 
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+        if(obj->spec_attr->matrix) {
+            lv_free(obj->spec_attr->matrix);
+            obj->spec_attr->matrix = NULL;
+        }
+#endif
+
         lv_free(obj->spec_attr);
         obj->spec_attr = NULL;
     }
