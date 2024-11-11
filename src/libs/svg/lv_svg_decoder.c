@@ -80,7 +80,7 @@ void lv_svg_decoder_deinit(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-static bool _valid_svg_data(const uint8_t * data, uint32_t data_size)
+static bool valid_svg_data(const uint8_t * data, uint32_t data_size)
 {
     return (data_size >= 4 && lv_memcmp(data, "<svg", 4) == 0)
            || (data_size >= 5 && lv_memcmp(data, "<?xml", 5) == 0);
@@ -117,7 +117,7 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
                 return LV_RESULT_INVALID;
             }
 
-            if(!_valid_svg_data(buf, rn)) {
+            if(!valid_svg_data(buf, rn)) {
                 return LV_RESULT_INVALID;
             }
 
@@ -131,7 +131,7 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
             width = img_dsc->header.w;
             height = img_dsc->header.h;
 
-            if(!_valid_svg_data(img_dsc->data, data_size)) {
+            if(!valid_svg_data(img_dsc->data, data_size)) {
                 return LV_RESULT_INVALID;
             }
         }
