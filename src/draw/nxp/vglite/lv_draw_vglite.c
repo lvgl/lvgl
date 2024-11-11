@@ -257,6 +257,10 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                     return 0;
                 }
 
+#if CHIPID == 0x255
+                if(draw_dsc->tile)
+                    return 0;
+#endif
 #if LV_USE_VGLITE_BLIT_SPLIT
                 bool has_transform = (draw_dsc->rotation != 0 || draw_dsc->scale_x != LV_SCALE_NONE ||
                                       draw_dsc->scale_y != LV_SCALE_NONE);
