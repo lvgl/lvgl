@@ -37,9 +37,11 @@ Usage
 Mode
 ----
 
-Once your Scale Widget is created, set its shape, orientation and what side of the
-line the major ticks are drawn on by setting its mode with
-:cpp:expr:`lv_scale_set_mode(scale, mode)`, where ``mode`` can be one of these values:
+When a Scale Widget is created, it starts out in MODE
+:cpp:enumerator:`LV_SCALE_MODE_HORIZONTAL_BOTTOM`.  This makes the scale horizontal
+with tick marks below the line.  If you need it to have a different shape, orientation
+or tick position, use :cpp:expr:`lv_scale_set_mode(scale, mode)`, where ``mode`` can
+be any of these values:
 
 - :cpp:enumerator:`LV_SCALE_MODE_HORIZONTAL_TOP`
 - :cpp:enumerator:`LV_SCALE_MODE_HORIZONTAL_BOTTOM`
