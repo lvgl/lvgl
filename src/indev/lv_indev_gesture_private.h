@@ -46,7 +46,7 @@ struct lv_indev_gesture_motion {
 
 typedef struct lv_indev_gesture_motion lv_indev_gesture_motion_t;
 
-/* General descriptor for a gesture, used by recognizer state machines to track 
+/* General descriptor for a gesture, used by recognizer state machines to track
  * the scale, rotation, and translation NOTE: (this will likely become private) */
 struct lv_indev_gesture {
 
@@ -56,7 +56,7 @@ struct lv_indev_gesture {
     lv_point_t center;                  /* Center point */
     float scale;                        /* Scale factor & previous scale factor */
     float p_scale;
-    float scale_factors_x[LV_GESTURE_MAX_POINTS];	/* Scale factor relative to center for each point */
+    float scale_factors_x[LV_GESTURE_MAX_POINTS];   /* Scale factor relative to center for each point */
     float scale_factors_y[LV_GESTURE_MAX_POINTS];
 
     float delta_x;                      /* Translation & previous translation */
@@ -84,9 +84,10 @@ struct lv_indev_gesture_configuration {
  *      MACROS
  **********************/
 
+#endif /* END LV_USE_RECOGNITION */
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /* END LV_USE_RECOGNITION */
 #endif /* END LV_INDEV_GESTURE_PRIVATE_H */

@@ -63,13 +63,13 @@ typedef struct {
 typedef struct {
     lv_indev_gesture_type_t type;       /* The detected gesture type */
     lv_indev_gesture_state_t state;     /* The gesture state ongoing, recognized */
-    lv_indev_gesture_t *info;           /* Information on the motion of each touch point */
+    lv_indev_gesture_t * info;          /* Information on the motion of each touch point */
     float scale;                        /* Relevant for the pinch gesture */
     float rotation;                     /* Relevant for rotation */
     float distance;                     /* Relevant for swipes */
     float speed;
 
-    lv_indev_gesture_configuration_t *config;
+    lv_indev_gesture_configuration_t * config;
 
 } lv_indev_gesture_recognizer_t;
 
@@ -86,7 +86,8 @@ typedef struct {
  * @param touches           pointer to the first element of the collected touch events
  * @param touch_cnt         length of passed touch event array.
  */
-void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t *recognizer, lv_indev_touch_data_t *touches, uint16_t touch_cnt);
+void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recognizer, lv_indev_touch_data_t * touches,
+                                   uint16_t touch_cnt);
 
 
 /**
@@ -96,7 +97,7 @@ void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t *recognizer, lv
  * @param touches           pointer to the first element of the collected touch events
  * @param touch_cnt         length of passed touch event array.
  */
-void lv_indev_set_pinch_up_threshold(lv_indev_gesture_recognizer_t *recognizer, float threshold);
+void lv_indev_set_pinch_up_threshold(lv_indev_gesture_recognizer_t * recognizer, float threshold);
 
 /**
  * Set the threshold for the pinch gesture scale down, when the scale factor of gesture
@@ -105,14 +106,14 @@ void lv_indev_set_pinch_up_threshold(lv_indev_gesture_recognizer_t *recognizer, 
  * @param touches           pointer to the first element of the collected touch events
  * @param touch_cnt         length of passed touch event array.
  */
-void lv_indev_set_pinch_down_threshold(lv_indev_gesture_recognizer_t *recognizer, float threshold);
+void lv_indev_set_pinch_down_threshold(lv_indev_gesture_recognizer_t * recognizer, float threshold);
 
 /**
  * Obtains the current scale of a pinch gesture
  * @param gesture_event     pointer to a gesture recognizer event
  * @return                  the scale of the current gesture
  */
-float lv_event_get_pinch_scale(lv_event_t *gesture_event);
+float lv_event_get_pinch_scale(lv_event_t * gesture_event);
 
 /**
  * Sets the state of the recognizer to a indev data structure,
@@ -120,44 +121,45 @@ float lv_event_get_pinch_scale(lv_event_t *gesture_event);
  * @param data the indev data
  * @param recognizer pointer to a gesture recognizer
  */
-void lv_indev_set_gesture_data(lv_indev_data_t *data, lv_indev_gesture_recognizer_t *recognizer);
+void lv_indev_set_gesture_data(lv_indev_data_t * data, lv_indev_gesture_recognizer_t * recognizer);
 
 /**
  * Obtains the center point of a gesture
  * @param gesture_event     pointer to a gesture recognizer event
  * @param point             pointer to a point
  */
-void lv_indev_get_gesture_center_point(lv_indev_gesture_recognizer_t *recognizer, lv_point_t *point);
+void lv_indev_get_gesture_center_point(lv_indev_gesture_recognizer_t * recognizer, lv_point_t * point);
 
 /**
  * Obtains the current state of the gesture recognizer attached to an event
  * @param gesture_event     pointer to a gesture recognizer event
  * @return                  current state of the gesture recognizer
  */
-lv_indev_gesture_state_t lv_event_get_gesture_state(lv_event_t *gesture_event);
+lv_indev_gesture_state_t lv_event_get_gesture_state(lv_event_t * gesture_event);
 
 /**
  * Obtains the coordinates of the current primary point
  * @param recognizer        pointer to a gesture recognizer
  * @param point             pointer to a point
  */
-void lv_indev_get_gesture_primary_point(lv_indev_gesture_recognizer_t *recognizer, lv_point_t *point);
+void lv_indev_get_gesture_primary_point(lv_indev_gesture_recognizer_t * recognizer, lv_point_t * point);
 
 /**
  * Allows to determine if there is an are ongoing gesture
  * @param recognizer        pointer to a gesture recognizer
  * @return                  false if there are no contact points, or the gesture has ended - true otherwise
  */
-bool lv_indev_recognizer_is_active(lv_indev_gesture_recognizer_t *recognizer);
+bool lv_indev_recognizer_is_active(lv_indev_gesture_recognizer_t * recognizer);
 
 
 /**********************
  *      MACROS
  **********************/
 
+#endif /* END LV_USE_RECOGNITION */
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /* END LV_USE_RECOGNITION */
 #endif /* END LV_INDEV_GESTURE_H */

@@ -39,14 +39,14 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void label_scale(lv_event_t *gesture_event);
-static void label_move(lv_event_t *event);
+static void label_scale(lv_event_t * gesture_event);
+static void label_move(lv_event_t * event);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 
-static lv_obj_t *label;
+static lv_obj_t * label;
 static lv_style_t label_style;
 static float label_width;
 static float label_height;
@@ -67,8 +67,8 @@ static float label_y;
  */
 void lv_example_gestures(void)
 {
-    lv_obj_t *rectangle;
-    lv_obj_t *root_view;
+    lv_obj_t * rectangle;
+    lv_obj_t * root_view;
 
     label_width = RECT_INIT_WIDTH;
     label_height = RECT_INIT_HEIGHT;
@@ -108,7 +108,7 @@ void lv_example_gestures(void)
  * Called when a pinch event occurs - scales the label
  * @param gesture_event point to a LV_EVENT_PINCH event
  */
-static void label_scale(lv_event_t *gesture_event)
+static void label_scale(lv_event_t * gesture_event)
 {
 
     static int initial_w = -1;
@@ -122,7 +122,7 @@ static void label_scale(lv_event_t *gesture_event)
 
     lv_indev_get_point(lv_indev_active(), &center_pnt);
 
-    if (state == LV_INDEV_GESTURE_STATE_ENDED) {
+    if(state == LV_INDEV_GESTURE_STATE_ENDED) {
         /* Pinch gesture has ended - reset the width/height for the next pinch gesture*/
         initial_w = -1;
         initial_h = -1;
@@ -131,7 +131,7 @@ static void label_scale(lv_event_t *gesture_event)
         return;
     }
 
-    if (initial_h == -1 || initial_w == -1) {
+    if(initial_h == -1 || initial_w == -1) {
 
         LV_ASSERT(state == LV_INDEV_GESTURE_STATE_RECOGNIZED);
 
@@ -147,7 +147,7 @@ static void label_scale(lv_event_t *gesture_event)
 
     /* Avoids a situation where the rectangle becomes too small,
      * do not perform the scaling - leave straight away */
-    if (scale < 0.4) {
+    if(scale < 0.4) {
         return;
     }
 
@@ -157,7 +157,7 @@ static void label_scale(lv_event_t *gesture_event)
     label_y = center_pnt.y - label_height / 2;
 
     LV_LOG_TRACE("label scale: %g label x: %g label y: %g w: %g h: %g\n",
-            scale, label_x, label_y, label_width, label_height);
+                 scale, label_x, label_y, label_width, label_height);
 
     /* Update position and size */
     lv_style_set_width(&label_style, (int)label_width);
@@ -172,7 +172,7 @@ static void label_scale(lv_event_t *gesture_event)
  * Called when a LV_EVENT_PRESSING occurs on the rectangle - moves the label
  * @param event pointer to the event
  */
-static void label_move(lv_event_t *event)
+static void label_move(lv_event_t * event)
 {
     lv_point_t pnt;
     lv_indev_gesture_state_t state;
@@ -181,7 +181,7 @@ static void label_move(lv_event_t *event)
     lv_indev_get_point(lv_indev_active(), &pnt);
 
     /* Do not move and when a pinch gesture is ongoing */
-    if (state == LV_INDEV_GESTURE_STATE_RECOGNIZED) {
+    if(state == LV_INDEV_GESTURE_STATE_RECOGNIZED) {
         return;
     }
 
