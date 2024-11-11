@@ -1367,6 +1367,14 @@
     #endif
 #endif
 
+#ifndef LV_USE_GESTURE_RECOGNITION
+    #ifdef CONFIG_LV_USE_GESTURE_RECOGNITION
+        #define LV_USE_GESTURE_RECOGNITION CONFIG_LV_USE_GESTURE_RECOGNITION
+    #else
+        #define LV_USE_GESTURE_RECOGNITION          0
+    #endif
+#endif
+
 /*=====================
  *  COMPILER SETTINGS
  *====================*/

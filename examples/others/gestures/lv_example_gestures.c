@@ -1,15 +1,13 @@
 /*******************************************************************
  *
- * @file lv_demo_gestures.c
+ * @file lv_example_gestures.c
  *
  * This is a simple example program that demonstrates how to use
- * the gesture recognition API, please refer to lv_indev_gesture.h or the documentation 
+ * the gesture recognition API, please refer to lv_indev_gesture.h or the documentation
  * for more details
  *
- * The demo starts with a single rectangle that is scaled when a pinch gesture
+ * The application starts with a single rectangle that is scaled when a pinch gesture
  * is detected. A single finger moves the rectangle around,
- * a swipe gesture creates another rectangle to interact with - up to 5 are allowed.
- * A rotation gesture, obviously rotates the rectangle.
  *
  * Copyright (c) 2024 EDGEMTech Ltd
  *
@@ -20,10 +18,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_demo_gestures.h"
+#include "../../lv_examples.h"
 
-#if LV_USE_DEMO_GESTURES && \
-    LV_USE_GESTURE_RECOGNITION && \
+#if LV_USE_GESTURE_RECOGNITION && \
     LV_USE_FLOAT
 
 /*********************
@@ -68,7 +65,7 @@ static float label_y;
  * Entry point it creates the screen, and the label
  * Set event callbacks on the label
  */
-void lv_demo_gestures(void)
+void lv_example_gestures(void)
 {
     lv_obj_t *rectangle;
     lv_obj_t *root_view;
@@ -200,4 +197,4 @@ static void label_move(lv_event_t *event)
     lv_obj_add_style(label, &label_style, LV_STATE_DEFAULT);
 }
 
-#endif /* LV_USE_DEMO_GESTURES && LV_USE_FLOAT */
+#endif /* LV_USE_GESTURE_RECOGNITION && LV_USE_FLOAT */

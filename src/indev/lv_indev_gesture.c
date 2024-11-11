@@ -16,10 +16,10 @@
 #include <math.h>
 #include "lv_indev_private.h"
 #include "lv_indev_gesture.h"
+#include "lv_indev_gesture_private.h"
 #include "../misc/lv_event_private.h"
 
-/* Currently, the multi-touch gesture recognition requires floats */
-#if LV_USE_GESTURE_RECOGNITION && LV_USE_FLOAT
+#if LV_USE_GESTURE_RECOGNITION
 
 /********************
  *      DEFINES
@@ -185,7 +185,9 @@ void lv_indev_set_gesture_data(lv_indev_data_t *data, lv_indev_gesture_recognize
         lv_indev_get_gesture_center_point(recognizer, &cur_pnt);
         data->point.x = cur_pnt.x;
         data->point.y = cur_pnt.y;
-        /* Fall through */
+        data->gesture_type = LV_INDEV_GESTURE_PINCH;
+        data->gesture_data = (void *) recognizer;
+        break;
 
     case LV_INDEV_GESTURE_STATE_ENDED:
         data->gesture_type = LV_INDEV_GESTURE_PINCH;
@@ -599,4 +601,4 @@ static void gesture_calculate_factors(lv_indev_gesture_t *gesture, int touch_poi
 
 }
 
-#endif /* LV_USE_FLOAT */
+#endif /* LV_USE_GESTURE_RECOGNITION */

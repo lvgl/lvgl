@@ -1,5 +1,5 @@
 /*******************************************************************
- * @file lv_demo_gestures.h
+ * @file lv_example_gestures.h
  *
  * Copyright (c) 2024 EDGEMTech Ltd.
  *
@@ -7,8 +7,8 @@
  *
  ******************************************************************/
 
-#ifndef LV_DEMO_GESTURES_H
-#define LV_DEMO_GESTURES_H
+#ifndef LV_EXAMPLE_GESTURES_H
+#define LV_EXAMPLE_GESTURES_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,7 +17,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_demos.h"
 
 /*********************
  *      DEFINES
@@ -31,8 +30,8 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-/* Demo entry point */
-void lv_demo_gestures(void);
+/* Example entry point */
+void lv_example_gestures(void);
 
 /**********************
  *      MACROS
@@ -42,4 +41,4 @@ void lv_demo_gestures(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DEMO_GESTURES_H*/
+#endif /*LV_EXAMPLE_GESTURES_H*/
