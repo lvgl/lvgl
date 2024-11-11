@@ -22,8 +22,6 @@
     #error "Invalid drive letter"
 #endif
 
-#define MAX_PATH_LEN 256
-
 /**********************
  *      TYPEDEFS
  **********************/
