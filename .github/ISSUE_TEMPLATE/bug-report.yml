@@ -17,6 +17,14 @@ body:
       placeholder: e.g. v9.0.0
     validations:
       required: true
+  - type: input
+    id: development_environment
+    attributes:
+      label: Development environment
+      description: Tell us what development environment you use
+      placeholder: e.g. Visual Studio
+    validations:
+      required: true
   - type: textarea
     id: what-happened
     attributes:
