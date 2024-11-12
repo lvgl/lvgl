@@ -773,7 +773,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
             else if(dropdown->sel_opt_id + 1 < dropdown->option_cnt) {
                 dropdown->sel_opt_id++;
-                position_to_selected(obj, LV_ANIM_OFF);
+                position_to_selected(obj, LV_ANIM_ON);
             }
         }
         else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
@@ -783,7 +783,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
             else if(dropdown->sel_opt_id > 0) {
                 dropdown->sel_opt_id--;
-                position_to_selected(obj, LV_ANIM_OFF);
+                position_to_selected(obj, LV_ANIM_ON);
             }
         }
         else if(c == LV_KEY_ESC) {
