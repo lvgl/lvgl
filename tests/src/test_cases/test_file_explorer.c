@@ -29,14 +29,14 @@ void test_file_explorer_read_dir(void)
 {
     uint8_t back_row = 0, dev_row = 0, shm_row = 0, home_row = 0, user_row = 0;
 
-    mkdir("src/test_files/test_file_explorer_floder", 0777);
-    mkdir("src/test_files/test_file_explorer_floder/dev", 0777);
-    mkdir("src/test_files/test_file_explorer_floder/dev/shm", 0777);
-    mkdir("src/test_files/test_file_explorer_floder/home", 0777);
-    mkdir("src/test_files/test_file_explorer_floder/home/web_user", 0777);
+    mkdir("src/test_files/test_file_explorer_folder", 0777);
+    mkdir("src/test_files/test_file_explorer_folder/dev", 0777);
+    mkdir("src/test_files/test_file_explorer_folder/dev/shm", 0777);
+    mkdir("src/test_files/test_file_explorer_folder/home", 0777);
+    mkdir("src/test_files/test_file_explorer_folder/home/web_user", 0777);
 
-    lv_file_explorer_open_dir(file_explorer_obj, "A:src/test_files/test_file_explorer_floder");
-    TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_floder/",
+    lv_file_explorer_open_dir(file_explorer_obj, "A:src/test_files/test_file_explorer_folder");
+    TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
     for(uint8_t i = 0; i < file_table->row_cnt; i++) {
@@ -53,7 +53,7 @@ void test_file_explorer_read_dir(void)
 
     file_table->row_act = dev_row;
     lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
-    TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_floder/dev/",
+    TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/dev/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
     for(uint8_t i = 0; i < file_table->row_cnt; i++) {
@@ -64,22 +64,22 @@ void test_file_explorer_read_dir(void)
 
     file_table->row_act = shm_row;
     lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
-    TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_floder/dev/shm/",
+    TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/dev/shm/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
     file_table->row_act = back_row;
     lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
-    TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_floder/dev/",
+    TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/dev/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
     file_table->row_act = back_row;
     lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
-    TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_floder/",
+    TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
     file_table->row_act = home_row;
     lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
-    TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_floder/home/",
+    TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/home/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
     for(uint8_t i = 0; i < file_table->row_cnt; i++) {
@@ -90,14 +90,14 @@ void test_file_explorer_read_dir(void)
 
     file_table->row_act = user_row;
     lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
-    TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_floder/home/web_user/",
+    TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/home/web_user/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
-    rmdir("src/test_files/test_file_explorer_floder/dev/shm");
-    rmdir("src/test_files/test_file_explorer_floder/dev");
-    rmdir("src/test_files/test_file_explorer_floder/home/web_user");
-    rmdir("src/test_files/test_file_explorer_floder/home");
-    rmdir("src/test_files/test_file_explorer_floder");
+    rmdir("src/test_files/test_file_explorer_folder/dev/shm");
+    rmdir("src/test_files/test_file_explorer_folder/dev");
+    rmdir("src/test_files/test_file_explorer_folder/home/web_user");
+    rmdir("src/test_files/test_file_explorer_folder/home");
+    rmdir("src/test_files/test_file_explorer_folder");
 
 }
 
