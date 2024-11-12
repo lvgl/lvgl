@@ -448,7 +448,7 @@ redirects = {
     "widgets/roller":                             "../details/widgets/roller.html"                                  ,
     "widgets/scale":                              "../details/widgets/scale.html"                                   ,
     "widgets/slider":                             "../details/widgets/slider.html"                                  ,
-    "widgets/span":                               "../details/widgets/span.html"                                    ,
+    "widgets/span":                               "../details/widgets/spangroup.html"                               ,
     "widgets/spinbox":                            "../details/widgets/spinbox.html"                                 ,
     "widgets/spinner":                            "../details/widgets/spinner.html"                                 ,
     "widgets/switch":                             "../details/widgets/switch.html"                                  ,
@@ -457,6 +457,7 @@ redirects = {
     "widgets/textarea":                           "../details/widgets/textarea.html"                                ,
     "widgets/tileview":                           "../details/widgets/tileview.html"                                ,
     "widgets/win":                                "../details/widgets/win.html"                                     ,
+    "details/widgets/span":                       "../../details/widgets/spangroup.html"                            ,
 }
 
 # Example configuration for intersphinx: refer to the Python standard library.
