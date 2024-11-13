@@ -135,7 +135,7 @@ void lv_ffmpeg_init(void)
 int lv_ffmpeg_get_frame_num(const char * path)
 {
     int ret = -1;
-    struct ffmpeg_context_s * ffmpeg_ctx = ffmpeg_open_file(path, false);
+    struct ffmpeg_context_s * ffmpeg_ctx = ffmpeg_open_file(path, LV_FFMPEG_PLAYER_USE_LV_FS);
 
     if(ffmpeg_ctx) {
         ret = ffmpeg_ctx->video_stream->nb_frames;
@@ -166,7 +166,7 @@ lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
 
     lv_timer_pause(player->timer);
 
-    player->ffmpeg_ctx = ffmpeg_open_file(path, false);
+    player->ffmpeg_ctx = ffmpeg_open_file(path, LV_FFMPEG_PLAYER_USE_LV_FS);
 
     if(!player->ffmpeg_ctx) {
         LV_LOG_ERROR("ffmpeg file open failed: %s", path);

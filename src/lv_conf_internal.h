@@ -2956,6 +2956,20 @@
             #define LV_FFMPEG_DUMP_FORMAT 0
         #endif
     #endif
+    /** Use lvgl file path in FFmpeg Player widget 
+     *  You won't be able to open URLs after enabling this feature.
+     *  Note that FFmpeg image decoder will always use lvgl file system. */
+    #ifndef LV_FFMPEG_PLAYER_USE_LV_FS
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_FFMPEG_PLAYER_USE_LV_FS
+                #define LV_FFMPEG_PLAYER_USE_LV_FS CONFIG_LV_FFMPEG_PLAYER_USE_LV_FS
+            #else
+                #define LV_FFMPEG_PLAYER_USE_LV_FS 0
+            #endif
+        #else
+            #define LV_FFMPEG_PLAYER_USE_LV_FS 0
+        #endif
+    #endif
 #endif
 
 /*==================
