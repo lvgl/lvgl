@@ -11,9 +11,9 @@ Overview
 
 Scale Widgets show linear or circular scales with ranges and sections with custom styling.
 
+
+
 .. _lv_scale_parts_and_styles:
-
-
 
 Parts and Styles
 ****************
@@ -50,11 +50,13 @@ be any of these values:
 - :cpp:enumerator:`LV_SCALE_MODE_ROUND_INNER`
 - :cpp:enumerator:`LV_SCALE_MODE_ROUND_OUTER`
 
-Set range
----------
+
+Setting range
+-------------
 
 A Scale's starts its life with a default range of [0..100].  You can change this
 range with :cpp:expr:`lv_scale_set_range(scale, min, max)`.
+
 
 Tick drawing order
 ------------------
@@ -63,7 +65,8 @@ Normally ticks and their labels are drawn first and the main line is drawn next,
 giving the ticks and their labels the appearance of being underneath the main line
 when there is overlap.  You can reverse this sequence if you wish, making the ticks
 and labels appear on top the main line, using
-:cpp:expr:`lv_scale_set_draw_ticks_on_top(scale, true)`.
+:cpp:expr:`lv_scale_set_draw_ticks_on_top(scale, true)`.  (This effect can be
+reversed by passing ``false`` instead.)
 
 Example with with ticks and labels drawn *under* the main line (default):
 
@@ -73,8 +76,9 @@ Example with ticks and labels drawn *on top of* the main line:
 
 .. image:: /misc/scale_ticks_on_top.png
 
-Configure ticks
----------------
+
+Configuring ticks
+-----------------
 
 You configure the major and minor ticks of a Scale by calling 2 functions:
 
@@ -135,27 +139,95 @@ Using length and radial offset together allows total control of the tick positio
 It is also possible to offset the labels from the major ticks (either positive or negative) using
 :cpp:expr:`lv_obj_set_style_pad_radial(scale, 5, LV_PART_INDICATOR)`
 
+
+.. _scale_sections:
+
 Sections
 --------
 
-A Section is a portion of the Scale between the minimum and maximum values of its range.
-A Section can be created with :cpp:expr:`lv_scale_add_section(scale)`, which returns
-a pointer to a :cpp:type:`lv_scale_section_t` object.
+Sections make it possible for portions of a Scale to *convey meaning* by using
+different style properties to draw them (colors, line thicknesses, font, etc.).
 
-The range of the Section is configured with
+A Section represents a sub-range of the Scale, whose styles (like cascading style
+sheets) take precedence while drawing the PARTS (lines, arcs, ticks and labels) of
+the Scale that are within the range of that Section.
+
+If a PART of a Scale is within the range of 2 or more Sections (i.e. those Sections
+overlap), the styles properties belonging to the most recently added Section takes
+precedence over the same style properties of other Section(s) that "involve" that
+PART.  To state it another way, while drawing PARTS that are within the range of 2 or
+more Sections, Scale takes the style property of the most recently added Section that
+has had that style property added to it.
+
+
+.. _scale_creating_sections:
+
+Creating Sections
+~~~~~~~~~~~~~~~~~
+
+A Section is created using :cpp:expr:`lv_scale_add_section(scale)`, which returns a
+pointer to a :cpp:type:`lv_scale_section_t` object.  This creates a section with
+range [0..0] which ensures that section will not be drawn.
+
+Next, you set the range of the Section using
 :cpp:expr:`lv_scale_section_set_range(section, min, max)` where ``min`` and ``max``
-are the Section's boundary values that should be within the Scale's value range.
-The style of each of the three parts of the Scale Section can be set with
-:cpp:expr:`lv_scale_section_set_style(section, PART, style_pointer)`, where ``PART`` can be
-:cpp:enumerator:`LV_PART_MAIN`, :cpp:enumerator:`LV_PART_ITEMS` or :cpp:enumerator:`LV_PART_INDICATOR`,
-and :cpp:expr:`style_pointer` should point to a global or static :cpp:type:`lv_style_t` variable.
+are the Section's boundary values that should normally be within the Scale's value
+range.  (If they are not within that range, Scale will only use that Section's style
+properties for the part of the Section that is within the Scale's range.  This could
+be useful to temporarily "disable" a Section from impacting the drawing of the Scale,
+e.g. :cpp:expr:`lv_scale_section_set_range(section, 0, -1)`.)
 
-For labels the following properties can be configured:
-:cpp:func:`lv_style_set_text_font`, :cpp:func:`lv_style_set_text_color`,
-:cpp:func:`lv_style_set_text_letter_space`, :cpp:func:`lv_style_set_text_opa`.
 
-For lines (main line, major and minor ticks) the following properties can be configured:
-:cpp:func:`lv_style_set_line_color`, :cpp:func:`lv_style_set_line_width`.
+.. _scale_styling_sections:
+
+Styling Sections
+~~~~~~~~~~~~~~~~
+You set a section's style properties by creating a :cpp:type:`lv_style_t` object
+for each PART you want to appear different from the normal Scale, add then for each
+of those styles, add the style properties you want to be modified.  Styles can be
+shared among PARTS and a :cpp:type:`lv_style_t` object can be used by more than one
+PART.  And more than one :cpp:type:`lv_style_t` object can be added to each part,
+as documented in :ref:`style_cascading`.
+
+You attach your :cpp:type:`lv_style_t` object to each Section it will apply to using
+:cpp:expr:`lv_scale_section_set_style(section, PART, style_pointer)`, where ``PART``
+indicates which :ref:`PART(s) <lv_scale_parts_and_styles>` of the parent Scale it
+will apply to, namely :cpp:enumerator:`LV_PART_MAIN`, :cpp:enumerator:`LV_PART_ITEMS`
+and/or :cpp:enumerator:`LV_PART_INDICATOR`.  Bit-wise OR the PART values together
+to make the style apply to more than one part.  ``style_pointer`` should point to
+a global or static (or dynamically-allocated) :cpp:type:`lv_style_t` object, since it
+needs to remain valid through the life of the Scale.
+
+The style properties that are used during Scale drawing (and are thus useful) are:
+
+- For main line *when it is a straight line* (:cpp:enumerator:`LV_PART_MAIN`):
+
+  :LV_STYLE_LINE_WIDTH:         :cpp:func:`lv_style_set_line_width`
+  :LV_STYLE_LINE_COLOR:         :cpp:func:`lv_style_set_line_color`
+  :LV_STYLE_LINE_OPA:           :cpp:func:`lv_style_set_line_opa`
+
+- For main line *when it is an arc* (:cpp:enumerator:`LV_PART_MAIN`):
+
+  :LV_STYLE_ARC_WIDTH:          :cpp:func:`lv_style_set_arc_width`
+  :LV_STYLE_ARC_COLOR:          :cpp:func:`lv_style_set_arc_color`
+  :LV_STYLE_ARC_OPA:            :cpp:func:`lv_style_set_arc_opa`
+  :LV_STYLE_ARC_ROUNDED:        :cpp:func:`lv_style_set_arc_rounded`
+  :LV_STYLE_ARC_IMAGE_SRC:      :cpp:func:`lv_style_set_arc_image_src`
+
+- For tick lines (:cpp:enumerator:`LV_PART_ITEMS` and :cpp:enumerator:`LV_PART_INDICATOR`):
+
+  :LV_STYLE_LINE_WIDTH:         :cpp:func:`lv_style_set_line_width`
+  :LV_STYLE_LINE_COLOR:         :cpp:func:`lv_style_set_line_color`
+  :LV_STYLE_LINE_OPA:           :cpp:func:`lv_style_set_line_opa`
+
+- For labels on major ticks (:cpp:enumerator:`LV_PART_INDICATOR`)
+
+  :LV_STYLE_TEXT_COLOR:         :cpp:func:`lv_style_set_text_color`
+  :LV_STYLE_TEXT_OPA:           :cpp:func:`lv_style_set_text_opa`
+  :LV_STYLE_TEXT_LETTER_SPACE:  :cpp:func:`lv_style_set_text_letter_space`
+  :LV_STYLE_TEXT_FONT:          :cpp:func:`lv_style_set_text_font`
+
+
 
 
 
