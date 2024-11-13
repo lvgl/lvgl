@@ -18,11 +18,11 @@ body:
     validations:
       required: true
   - type: input
-    id: development_environment
+    id: platform
     attributes:
-      label: Development environment
-      description: Tell us what development environment you use
-      placeholder: e.g. Visual Studio
+      label: Platform
+      description: Tell us platform and environment you use
+      placeholder: e.g. Visual Studio simulator, or STM32F769 Discovery with Zephyr, or Eclipse with SDL on Linux 
     validations:
       required: true
   - type: textarea
