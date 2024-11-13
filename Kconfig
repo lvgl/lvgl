@@ -1377,7 +1377,7 @@ menu "LVGL configuration"
 			depends on LV_USE_FFMPEG
 			default n
 			help
-    			You won't be able to open URLs after enabling this feature.
+				You won't be able to open URLs after enabling this feature.
 				Note that FFmpeg image decoder will always use lvgl file system. 
 	endmenu
 
