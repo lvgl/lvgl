@@ -489,7 +489,6 @@ static void browser_file_event_handler(lv_event_t * e)
         const char * selected_text = NULL;
         uint32_t row;
         uint32_t col;
-        uint8_t navigate_to_current_dir = 0;
         uint8_t navigate_to_parent_dir = 0;
         uint8_t navigate_to_child = 0;
 
@@ -503,11 +502,9 @@ static void browser_file_event_handler(lv_event_t * e)
          * - Navigate to current directory
          * - Navigate to parent directory
          * - Navigate to (current directory) child */
-        navigate_to_current_dir = (lv_strcmp(selected_text, LV_FILE_NAVIGATION_CURRENT_DIR) == 0);
         navigate_to_parent_dir = (lv_strcmp(selected_text, LV_FILE_NAVIGATION_PARENT_DIR) == 0);
         navigate_to_child = !navigate_to_parent_dir;
 
-        if(navigate_to_current_dir)  return; /* Do nothing */
 
         if((navigate_to_parent_dir) && (lv_strlen(explorer->current_path) > 3)) {
             strip_ext(explorer->current_path);
