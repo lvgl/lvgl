@@ -295,7 +295,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * path = dsc->src;
 
-        struct ffmpeg_context_s * ffmpeg_ctx = ffmpeg_open_file(path, &dsc->file);
+        struct ffmpeg_context_s * ffmpeg_ctx = ffmpeg_open_file(path, true);
 
         if(ffmpeg_ctx == NULL) {
             return LV_RESULT_INVALID;
