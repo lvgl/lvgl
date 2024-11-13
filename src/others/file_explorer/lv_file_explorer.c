@@ -25,7 +25,7 @@
 #define quick_access_list_button_style (LV_GLOBAL_DEFAULT()->fe_list_button_style)
 
 #define LV_FILE_NAVIGATION_CURRENT_DIR  "."
-#define LV_FILE_NAVIGATION_PARENT_DIR   ".."
+#define LV_FILE_NAVIGATION_PARENT_DIR   "Back"
 
 /**********************
  *      TYPEDEFS
