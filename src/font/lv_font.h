@@ -19,7 +19,6 @@ extern "C" {
 #include "lv_symbol_def.h"
 #include "../draw/lv_draw_buf.h"
 #include "../misc/lv_area.h"
-#include "../misc/cache/lv_cache.h"
 
 /*********************
  *      DEFINES

@@ -16,6 +16,7 @@ extern "C" {
 #include "../lv_types.h"
 #include "../../osal/lv_os.h"
 #include "../lv_profiler.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -35,6 +36,7 @@ void   lv_cache_entry_set_invalid(lv_cache_entry_t * entry, bool is_invalid);
 void   lv_cache_entry_set_cache(lv_cache_entry_t * entry, const lv_cache_t * cache);
 void * lv_cache_entry_acquire_data(lv_cache_entry_t * entry);
 void   lv_cache_entry_release_data(lv_cache_entry_t * entry, void * user_data);
+
 /*************************
  *    GLOBAL VARIABLES
  *************************/
