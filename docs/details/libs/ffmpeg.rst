@@ -33,9 +33,7 @@ Enable :c:macro:`LV_USE_FFMPEG` in ``lv_conf.h``.
 
 See the examples below.
 
-:note: FFmpeg extension doesn't use LVGL's file system. You can
-       simply pass the path to the image or video as usual on your operating
-       system or platform.
+:note: Enable :c:macro:`LV_FFMPEG_PLAYER_USE_LV_FS` in ``lv_conf.h`` if you want to integrate the lvgl file system into FFmpeg.
 
 
 .. _ffmpeg_example:
