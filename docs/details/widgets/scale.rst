@@ -9,7 +9,8 @@ Scale (lv_scale)
 Overview
 ********
 
-Scale Widgets show linear or circular scales with ranges and sections with custom styling.
+Scale Widgets show linear or circular scales with configurable ranges, tick counts,
+placement, labeling, and sub-sections (:ref:`scale_sections`) with custom styling.
 
 
 
@@ -126,9 +127,9 @@ Labels can also be moved a fixed distance in X and Y pixels using
     number of ticks and the Scale range, so the label drawn can present rounding
     errors when the calculated value is a floating-point value.
 
-The length of the ticks can be configured with the length style property on the
+The length of the ticks can be configured with the length Style property on the
 :cpp:enumerator:`LV_PART_INDICATOR` for major ticks and :cpp:enumerator:`LV_PART_ITEMS`
-for minor ticks.  Example with local style:
+for minor ticks.  Example with local Style:
 :cpp:expr:`lv_obj_set_style_length(scale, 5, LV_PART_INDICATOR)` for major ticks
 and :cpp:expr:`lv_obj_set_style_length(scale, 5, LV_PART_ITEMS)` for minor ticks. The ticks can be
 padded in either direction (outwards or inwards) for ``..._ROUND_...`` Scales only with:
@@ -146,18 +147,16 @@ Sections
 --------
 
 Sections make it possible for portions of a Scale to *convey meaning* by using
-different style properties to draw them (colors, line thicknesses, font, etc.).
+different Style properties to draw them (colors, line thicknesses, font, etc.).
 
-A Section represents a sub-range of the Scale, whose styles (like cascading style
-sheets) take precedence while drawing the PARTS (lines, arcs, ticks and labels) of
+A Section represents a sub-range of the Scale, whose Styles (like Cascading Style
+Sheets) take precedence while drawing the PARTS (lines, arcs, ticks and labels) of
 the Scale that are within the range of that Section.
 
 If a PART of a Scale is within the range of 2 or more Sections (i.e. those Sections
-overlap), the styles properties belonging to the most recently added Section takes
+overlap), the Style's properties belonging to the most recently added Section takes
 precedence over the same style properties of other Section(s) that "involve" that
-PART.  To state it another way, while drawing PARTS that are within the range of 2 or
-more Sections, Scale takes the style property of the most recently added Section that
-has had that style property added to it.
+PART.
 
 
 .. _scale_creating_sections:
@@ -166,39 +165,70 @@ Creating Sections
 ~~~~~~~~~~~~~~~~~
 
 A Section is created using :cpp:expr:`lv_scale_add_section(scale)`, which returns a
-pointer to a :cpp:type:`lv_scale_section_t` object.  This creates a section with
-range [0..0] which ensures that section will not be drawn.
+pointer to a :cpp:type:`lv_scale_section_t` object.  This creates a Section with
+range [0..0] and no Styles added to it, which ensures that Section will not be drawn
+yet:  it needs both a range inside the Scale's range and at least one :ref:`Style
+<styles>` added to it before it will be used in drawing the Scale.
 
-Next, you set the range of the Section using
-:cpp:expr:`lv_scale_section_set_range(section, min, max)` where ``min`` and ``max``
-are the Section's boundary values that should normally be within the Scale's value
-range.  (If they are not within that range, Scale will only use that Section's style
-properties for the part of the Section that is within the Scale's range.  This could
-be useful to temporarily "disable" a Section from impacting the drawing of the Scale,
-e.g. :cpp:expr:`lv_scale_section_set_range(section, 0, -1)`.)
+Next, set the range using :cpp:expr:`lv_scale_section_set_range(section, min, max)`
+where ``min`` and ``max`` are the Section's boundary values that should normally be
+within the Scale's value range.  (If they are only partially within the Scale's
+range, the Scale will only use that portion of the Section that overlaps the Scale's
+range.  If a Section's range is not within the Scale's range at all, it will not be
+used in drawing.  That can be useful to temporarily "disable" a Section, e.g.
+:cpp:expr:`lv_scale_section_set_range(section, 0, -1)`.)
 
 
 .. _scale_styling_sections:
 
 Styling Sections
 ~~~~~~~~~~~~~~~~
-You set a section's style properties by creating a :cpp:type:`lv_style_t` object
-for each PART you want to appear different from the normal Scale, add then for each
-of those styles, add the style properties you want to be modified.  Styles can be
-shared among PARTS and a :cpp:type:`lv_style_t` object can be used by more than one
-PART.  And more than one :cpp:type:`lv_style_t` object can be added to each part,
-as documented in :ref:`style_cascading`.
+You set a Section's Style properties by creating a :cpp:type:`lv_style_t` object
+for each "section" you want to appear different than the parent Scale.  Add style
+style properties as is documented in :ref:`style_initialize`.
 
-You attach your :cpp:type:`lv_style_t` object to each Section it will apply to using
-:cpp:expr:`lv_scale_section_set_style(section, PART, style_pointer)`, where ``PART``
-indicates which :ref:`PART(s) <lv_scale_parts_and_styles>` of the parent Scale it
-will apply to, namely :cpp:enumerator:`LV_PART_MAIN`, :cpp:enumerator:`LV_PART_ITEMS`
-and/or :cpp:enumerator:`LV_PART_INDICATOR`.  Bit-wise OR the PART values together
-to make the style apply to more than one part.  ``style_pointer`` should point to
-a global or static (or dynamically-allocated) :cpp:type:`lv_style_t` object, since it
-needs to remain valid through the life of the Scale.
+You attach each :cpp:type:`lv_style_t` object to each Section it will apply to using
+:cpp:expr:`lv_scale_section_set_style(section, PART, style_pointer)`, where:
 
-The style properties that are used during Scale drawing (and are thus useful) are:
+- ``style_pointer`` should point to the contents of a global or static variable (can
+  be dynamically-allocated), since it needs to remain valid through the life of the
+  Scale; and
+
+- ``PART`` indicates which single :ref:`PART <lv_scale_parts_and_styles>` of the
+  parent Scale it will apply to, namely :cpp:enumerator:`LV_PART_MAIN`,
+  :cpp:enumerator:`LV_PART_ITEMS` or :cpp:enumerator:`LV_PART_INDICATOR`.
+
+Unlike adding normal styles to Widgets, you cannot combine PARTs by bit-wise OR-ing
+the PART values together to get the style to apply to more than one part.  However,
+you can do something like this to accomplish the same thing:
+
+.. code-block:: c
+
+    lv_style_t  tick_style;
+    lv_style_init(&tick_style);
+    lv_style_set_line_color(&tick_style, lv_palette_darken(LV_PALETTE_RED, 3));
+    lv_scale_section_set_style(section, LV_PART_ITEMS, &tick_style);
+    lv_scale_section_set_style(section, LV_PART_INDICATOR, &tick_style);
+
+to get that one Style object to apply to both major and minor ticks.
+
+:cpp:type:`lv_style_t` objects can be shared among Sections and among PARTs, but
+unlike normal Styles added to a Widget, a Section can only have 1 style per PART.
+Thus, doing this:
+
+.. code-block:: c
+
+    lv_scale_section_set_style(section, LV_PART_INDICATOR, &tick_style_1);
+    lv_scale_section_set_style(section, LV_PART_INDICATOR, &tick_style_2);
+
+replaces ``tick_style_1`` with ``tick_style_2`` for part
+:cpp:enumerator:`LV_PART_INDICATOR` rather than adding to it.
+
+
+Useful Style Properties for Sections
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Style properties that are used during Scale drawing (and are thus useful) are:
 
 - For main line *when it is a straight line* (:cpp:enumerator:`LV_PART_MAIN`):
 
@@ -226,8 +256,6 @@ The style properties that are used during Scale drawing (and are thus useful) ar
   :LV_STYLE_TEXT_OPA:           :cpp:func:`lv_style_set_text_opa`
   :LV_STYLE_TEXT_LETTER_SPACE:  :cpp:func:`lv_style_set_text_letter_space`
   :LV_STYLE_TEXT_FONT:          :cpp:func:`lv_style_set_text_font`
-
-
 
 
 
