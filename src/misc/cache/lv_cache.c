@@ -10,6 +10,7 @@
 #include "../../stdlib/lv_sprintf.h"
 #include "../lv_assert.h"
 #include "lv_cache_entry_private.h"
+#include "lv_cache_private.h"
 
 /*********************
  *      DEFINES
@@ -25,6 +26,7 @@
 static void cache_drop_internal_no_lock(lv_cache_t * cache, const void * key, void * user_data);
 static bool cache_evict_one_internal_no_lock(lv_cache_t * cache, void * user_data);
 static lv_cache_entry_t * cache_add_internal_no_lock(lv_cache_t * cache, const void * key, void * user_data);
+
 /**********************
  *  GLOBAL VARIABLES
  **********************/
