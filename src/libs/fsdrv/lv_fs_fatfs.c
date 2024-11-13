@@ -117,7 +117,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     FIL * f = lv_malloc(sizeof(FIL));
     if(f == NULL) return NULL;
 
-    char buf[MAX_PATH_LEN];
+    char buf[LV_FS_MAX_PATH_LEN];
     lv_snprintf(buf, sizeof(buf), LV_FS_FATFS_PATH "%s", path);
 
     FRESULT res = f_open(f, buf, flags);
@@ -235,7 +235,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     DIR * d = lv_malloc(sizeof(DIR));
     if(d == NULL) return NULL;
 
-    char buf[MAX_PATH_LEN];
+    char buf[LV_FS_MAX_PATH_LEN];
     lv_snprintf(buf, sizeof(buf), LV_FS_FATFS_PATH "%s", path);
 
     FRESULT res = f_opendir(d, buf);

@@ -82,7 +82,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     LittleFile * lf = lv_malloc(sizeof(LittleFile));
     LV_ASSERT_MALLOC(lf);
 
-    char buf[MAX_PATH_LEN];
+    char buf[LV_FS_MAX_PATH_LEN];
     lv_snprintf(buf, sizeof(buf), LV_FS_LITTLEFS_PATH "%s", path);
 
     lfs_t * lfs = drv->user_data;
@@ -203,7 +203,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     LittleDirectory * ld = lv_malloc(sizeof(LittleDirectory));
     LV_ASSERT_MALLOC(ld);
 
-    char buf[MAX_PATH_LEN];
+    char buf[LV_FS_MAX_PATH_LEN];
     lv_snprintf(buf, sizeof(buf), LV_FS_LITTLEFS_PATH "%s", path);
 
     lfs_t * lfs = drv->user_data;
