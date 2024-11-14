@@ -516,7 +516,13 @@ static void browser_file_event_handler(lv_event_t * e)
             strip_ext(file_name);
             /*Remove the last '/' character*/
             strip_ext(file_name);
-            lv_snprintf((char *)file_name, sizeof(file_name), "%s/", file_name); /* Append / at the end */
+
+            /* Append / at the end */
+            size_t stripped_file_name_length = lv_strlen(file_name);
+            *(file_name + stripped_file_name_length) = '/';
+            if(stripped_file_name_length + 1 < LV_FILE_EXPLORER_PATH_MAX_LEN) {
+                *(file_name + stripped_file_name_length + 1) = '\0';
+            }
         }
         else {
             if(navigate_to_child) {
