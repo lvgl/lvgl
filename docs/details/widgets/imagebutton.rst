@@ -4,15 +4,17 @@
 Image Button (lv_imagebutton)
 =============================
 
+
 Overview
 ********
 
-The Image button is very similar to the simple 'Button' Widget. The only
-difference is that it displays user-defined images in each state instead
-of drawing a rectangle.
+The Image Button is very similar to the simple 'Button' Widget. The only
+difference is that it displays user-defined images for each state instead
+of drawing a rectangle.  The list of states is covered below.
 
 You can set a left, right and center image, and the center image will be
 repeated to match the width of the Widget.
+
 
 .. _lv_imagebutton_parts_and_styles:
 
@@ -20,8 +22,9 @@ Parts and Styles
 ****************
 
 -  :cpp:enumerator:`LV_PART_MAIN` Refers to the image(s). If background style
-   properties are used, a rectangle will be drawn behind the image
-   button.
+   properties are used, a rectangle will be drawn behind the Image
+   Button.
+
 
 .. _lv_imagebutton_usage:
 
@@ -31,15 +34,16 @@ Usage
 Image sources
 -------------
 
-To set the image in a state, use the
+To set the image for a particular state, use
 :cpp:expr:`lv_imagebutton_set_src(imagebutton, LV_IMAGEBUTTON_STATE_..., src_left, src_center, src_right)`.
 
-The image sources work the same as described in the :ref:`Image Widget <lv_image>`
-except that "Symbols" are not supported by the Image button. Any of the sources can ``NULL``.
+The image sources work the same as described in :ref:`Image Widget <lv_image>`
+except that "Symbols" are not supported by the Image Button. ``NULL`` can be passed
+for any of the sources.
 
-If only ``src_center`` is specified, the width of the widget will be set automatically to the
+If only ``src_center`` is specified, the width of the Widget will be set automatically to the
 width of the image. However, if all three sources are set, the width needs to be set by the user
-(using e.g. :cpp:expr:`lv_obj_set_width`) and the center image will be tiled to fill the given size.
+(using e.g. :cpp:func:`lv_obj_set_width`) and the center image will be tiled as needed to fill the given size.
 
 The possible states are:
 
@@ -50,16 +54,17 @@ The possible states are:
 - :cpp:enumerator:`LV_IMAGEBUTTON_STATE_CHECKED_PRESSED`
 - :cpp:enumerator:`LV_IMAGEBUTTON_STATE_CHECKED_DISABLED`
 
-If you set sources only in :cpp:enumerator:`LV_IMAGEBUTTON_STATE_RELEASED`, these sources
-will be used in other states as well. If you set e.g. :cpp:enumerator:`LV_IMAGEBUTTON_STATE_PRESSED`
-they will be used in pressed state instead of the released images.
+The image sources set for state :cpp:enumerator:`LV_IMAGEBUTTON_STATE_RELEASED` are
+used for any state that has not had image sources set for it.  If an image sources
+have been set for other states, e.g. :cpp:enumerator:`LV_IMAGEBUTTON_STATE_PRESSED`,
+they will be used instead when the Image Button is in that state.
 
-States
-------
+Setting State Programmatically
+------------------------------
 
 Instead of the regular :cpp:func:`lv_obj_add_state` and :cpp:func:`lv_obj_remove_state` functions,
-the :cpp:expr:`lv_imagebutton_set_state(imagebutton, LV_IMAGEBUTTON_STATE_...)` function should be
-used to manually set a state.
+use :cpp:expr:`lv_imagebutton_set_state(imagebutton, LV_IMAGEBUTTON_STATE_...)` to
+set the state of Image Buttons.
 
 
 
@@ -68,7 +73,8 @@ used to manually set a state.
 Events
 ******
 
--  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the button is toggled.
+-  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when Image Button's CHECKED state is toggled.
+   This requires the Image Button's :cpp:enumerator:`LV_OBJ_FLAG_CHECKABLE` flag to be set.
 
 .. admonition::  Further Reading
 
@@ -83,11 +89,11 @@ Events
 Keys
 ****
 
--  ``LV_KEY_RIGHT/UP`` Go to toggled state if :cpp:enumerator:`LV_OBJ_FLAG_CHECKABLE`
+-  ``LV_KEY_RIGHT/UP`` Go to CHECKED state if :cpp:enumerator:`LV_OBJ_FLAG_CHECKABLE`
    is enabled.
--  ``LV_KEY_LEFT/DOWN`` Go to non-toggled state if
+-  ``LV_KEY_LEFT/DOWN`` Go to un-CHECKED state if
    :cpp:enumerator:`LV_OBJ_FLAG_CHECKABLE` is enabled.
--  :cpp:enumerator:`LV_KEY_ENTER` Clicks the button
+-  :cpp:enumerator:`LV_KEY_ENTER` Clicks the Image Button
 
 .. admonition::  Further Reading
 

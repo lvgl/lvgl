@@ -4,44 +4,49 @@
 Button Matrix (lv_buttonmatrix)
 ===============================
 
+
 Overview
 ********
 
 The Button Matrix Widget is a lightweight way to display multiple
-buttons in rows and columns. Lightweight because the buttons are not
-actually created but just virtually drawn on the fly. This way, one
-button use only eight extra bytes of memory instead of the ~100-150
+Buttons in rows and columns --- lightweight because the buttons are not
+actually created but just virtually drawn on the fly.  With Button Matrix,
+each button uses only eight extra bytes of memory instead of the ~100-150
 bytes a normal :ref:`Button <lv_button>` Widget plus the 100 or so bytes
 for the :ref:`Label <lv_label>` Widget.
 
-The Button matrix is added to the default group (if one is set). Besides
-the Button matrix is an editable Widget to allow selecting and clicking
-the buttons with encoder navigation as well.
+New Button Matrix Widgets are added to the default group (if one is set).
+Additionally, Button Matrix is an editable Widget:  it allows selecting and clicking
+the buttons with encoder and keyboard navigation as well.
+
 
 .. _lv_buttonmatrix_parts_and_styles:
 
 Parts and Styles
 ****************
 
--  :cpp:enumerator:`LV_PART_MAIN` The background of the button matrix, uses the
+-  :cpp:enumerator:`LV_PART_MAIN` The background of the Button Matrix, uses the
    typical background style properties. ``pad_row`` and ``pad_column``
    sets the space between the buttons.
 -  :cpp:enumerator:`LV_PART_ITEMS` The buttons all use the text and typical background
    style properties except translations and transformations.
+
 
 .. _lv_buttonmatrix_usage:
 
 Usage
 *****
 
-Button's text
--------------
+.. _button map:
 
-There is a text on each button. To specify them a descriptor string
-array, called *map*, needs to be used. The map can be set with
-:cpp:expr:`lv_buttonmatrix_set_map(buttonm, my_map)`. The declaration of a map should
+Button map
+-----------
+
+The number of buttons, their positions and text are controlled by a descriptor string
+array, called a *map*, passed to
+:cpp:expr:`lv_buttonmatrix_set_map(btn_matrix, my_map)`. The declaration of a map should
 look like ``const char * map[] = {"button1", "button2", "button3", NULL}``. Note
-that the last element has to be either ``NULL`` or an empty string
+that the last element must be either ``NULL`` or an empty string
 (``""``)!
 
 Use ``"\n"`` in the map to insert a **line break**. E.g.
@@ -50,54 +55,67 @@ width calculated automatically. So in the example the first row will
 have 2 buttons each with 50% width and a second row with 1 button having
 100% width.
 
-Control buttons
+.. note::
+    The number of buttons neither includes the newline elements nor the terminating
+    element of the array.
+
+Button widths
+-------------
+
+The buttons' width can be set in proportion to the width of other buttons in the same
+row with :cpp:expr:`lv_buttonmatrix_set_button_width(btn_matrix, button_id, width)` E.g. in a
+line with two buttons: *buttonA, width = 1* and *buttonB, width = 2*, *buttonA*
+will have 33 % width and *buttonB* will have 66 % width.  This is similar to how the
+`"flex-grow" <https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow>`__
+property works in CSS. The width must be in the range [1..15] with the default being 1.
+
+Button behavior
 ---------------
 
-The buttons' width can be set relative to the other button in the same
-row with :cpp:expr:`lv_buttonmatrix_set_button_width(buttonm, button_id, width)` E.g. in a
-line with two buttons: *buttonA, width = 1* and *buttonB, width = 2*, *buttonA*
-will have 33 % width and *buttonB* will have 66 % width. It's similar to
-how the
-`"flex-grow" <https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow>`__
-property works in CSS. The width must be in the [1..15] range and the
-default width is 1.
+Each button's behavior can be customized with the following control flags:
 
-In addition to the width, each button can be customized with the
-following parameters:
-
-- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_HIDDEN`: Makes a button hidden (hidden buttons still take up space in the layout, they are just not visible or clickable)
-- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_NO_REPEAT`: Disable repeating when the button is long pressed
-- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_DISABLED`: Makes a button disabled Like :cpp:enumerator:`LV_STATE_DISABLED` on normal Widgets
-- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CHECKABLE`: Enable toggling of a button. I.e. :cpp:enumerator:`LV_STATE_CHECKED` will be added/removed as the button is clicked
+- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_HIDDEN`: Hides button; it continues to hold its space in layout.
+- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_NO_REPEAT`: Do not emit :cpp:enumerator:`LV_EVENT_LONG_PRESSED_REPEAT` events while button is long-pressed.
+- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_DISABLED`: Disables button like :cpp:enumerator:`LV_STATE_DISABLED` on normal Widgets.
+- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CHECKABLE`: Enable toggling of :cpp:enumerator:`LV_STATE_CHECKED` when clicked.
 - :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CHECKED`: Make the button checked. It will use the :cpp:enumerator:`LV_STATE_CHECHKED` styles.
-- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CLICK_TRIG`: Enabled: send LV_EVENT_VALUE_CHANGE on CLICK, Disabled: send :cpp:enumerator:`LV_EVENT_VALUE_CHANGE` on PRESS
-- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_POPOVER`: Show the button label in a popover when pressing this key
-- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CUSTOM_1`: Custom free to use flag
-- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CUSTOM_2`: Custom free to use flag
+- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CLICK_TRIG`: 1: Enables sending :cpp:enumerator:`LV_EVENT_VALUE_CHANGE` on ``CLICK``, 0: sends :cpp:enumerator:`LV_EVENT_VALUE_CHANGE` on ``PRESS``.
+- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_POPOVER`: Show button text in a pop-over while being pressed.
+- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_RECOLOR`: Enable text recoloring with ``#color``
+- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CUSTOM_1`: Custom free-to-use flag
+- :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_CUSTOM_2`: Custom free-to-use flag
 
-By default, all flags are disabled.
+By default, these flags are disabled.
 
-To set or clear a button's control attribute, use
-:cpp:expr:`lv_buttonmatrix_set_button_ctrl(buttonm, button_id, LV_BUTTONMATRIX_CTRL_...)` and
-:cpp:expr:`lv_buttonmatrix_clear_button_ctrl(buttonm, button_id, LV_BUTTONMATRIX_CTRL_...)`
-respectively. More ``LV_BUTTONMATRIX_CTRL_...`` values can be OR-ed
+To set and clear a button's control flags, use
 
-To set/clear the same control attribute for all buttons of a button
-matrix, use :cpp:expr:`lv_buttonmatrix_set_button_ctrl_all(buttonm, LV_BUTTONMATRIX_CTRL_...)`
-and :cpp:expr:`lv_buttonmatrix_clear_button_ctrl_all(buttonm, LV_BUTTONMATRIX_CTRL_...)`.
+- :cpp:expr:`lv_buttonmatrix_set_button_ctrl(btn_matrix, button_id, LV_BUTTONMATRIX_CTRL_...)` and
+- :cpp:expr:`lv_buttonmatrix_clear_button_ctrl(btn_matrix, button_id, LV_BUTTONMATRIX_CTRL_...)`
 
-The set a control map for a button matrix (similarly to the map for the
-text), use :cpp:expr:`lv_buttonmatrix_set_ctrl_map(buttonm, ctrl_map)`. An element of
-``ctrl_map`` should look like
+respectively.  ``button_id`` is a zero-based button index (0 = first button).
+``LV_BUTTONMATRIX_CTRL_...`` values can be bit-wise OR-ed together when passed to
+these functions.
+
+To set and clear the same control attribute for all buttons in a Button Matrix, use
+
+- :cpp:expr:`lv_buttonmatrix_set_button_ctrl_all(btn_matrix, LV_BUTTONMATRIX_CTRL_...)` and
+- :cpp:expr:`lv_buttonmatrix_clear_button_ctrl_all(btn_matrix, LV_BUTTONMATRIX_CTRL_...)`
+
+respectively.
+
+To set a control map for a Button Matrix (similar to `Button map`_), use
+
+- :cpp:expr:`lv_buttonmatrix_set_ctrl_map(btn_matrix, ctrl_map)`.
+
+An element of ``ctrl_map`` should look like
 :cpp:expr:`ctrl_map[0] = width | LV_BUTTONMATRIX_CTRL_NO_REPEAT |  LV_BUTTONMATRIX_CTRL_CHECHKABLE`.
-The number of elements should be equal to the number of buttons
-(excluding newlines characters).
+The number of elements must be equal to the number of buttons.
 
-One check
----------
+One checked
+-----------
 
-The "One check" feature can be enabled with
-:cpp:expr:`lv_buttonmatrix_set_one_checked(buttonm, true)` to allow only one button to
+The "One-checked" feature can be enabled with
+:cpp:expr:`lv_buttonmatrix_set_one_checked(btn_matrix, true)` to allow only one button to
 be checked at a time.
 
 
@@ -111,12 +129,12 @@ Events
    repeated after long press. The event parameter is set to the ID of
    the pressed/released button.
 
-:cpp:expr:`lv_buttonmatrix_get_selected_button(buttonm)` returns the index of the most
-recently released or focused button or :cpp:enumerator:`LV_BUTTONMATRIX_BUTTON_NONE` if no
-such button.
+:cpp:expr:`lv_buttonmatrix_get_selected_button(btn_matrix)` returns the index of the button
+most recently released (the button with focus) or :cpp:enumerator:`LV_BUTTONMATRIX_BUTTON_NONE`
+if no such button was found.
 
-:cpp:expr:`lv_buttonmatrix_get_button_text(buttonm, button_id)` returns a pointer to the
-text of ``button_id``\ th button.
+:cpp:expr:`lv_buttonmatrix_get_button_text(btn_matrix, button_id)` returns a pointer
+to the text of the button specified by zero-based index ``button_id``.
 
 .. admonition::  Further Reading
 
@@ -135,13 +153,12 @@ Keys
    select one
 -  :cpp:enumerator:`LV_KEY_ENTER` To press/release the selected button
 
-Note that long pressing the button matrix with an encoder can mean to
+Note that long pressing the Button Matrix with an encoder can mean to
 enter/leave edit mode and simply long pressing a button to make it
-repeat as well. To avoid this contradiction it's suggested to add
-:cpp:expr:`lv_buttonmatrix_set_button_ctrl_all(buttonm, LV_BUTTONMATRIX_CTRL_CLICK_TRIG | LV_BUTTONMATRIX_CTRL_NO_REPEAT)`
-to the button matrix if used with encoder. This way, the pressed button
-repeat feature is disabled and on leaving edit mode the selected button
-won't be activated.
+repeat as well. To avoid this contradiction, add
+:cpp:expr:`lv_buttonmatrix_set_button_ctrl_all(btn_matrix, LV_BUTTONMATRIX_CTRL_CLICK_TRIG | LV_BUTTONMATRIX_CTRL_NO_REPEAT)`
+to the Button Matrix if used with an encoder.  This disables the repeat feature so
+the button will not be activated upon leaving edit mode.
 
 .. admonition::  Further Reading
 

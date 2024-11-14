@@ -9,6 +9,7 @@
 #include "../../lv_examples.h"
 
 #if LV_BUILD_EXAMPLES
+#include "../../../src/osal/lv_os.h"
 
 /*********************
  *      DEFINES

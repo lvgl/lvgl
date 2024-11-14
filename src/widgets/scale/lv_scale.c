@@ -1259,7 +1259,7 @@ static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_
  * Checks if the arc has a custom section configuration or not and sets the properties accordingly.
  *
  * @param obj       pointer to a scale object
- * @param line_dsc  pointer to arc descriptor
+ * @param arc_dsc  pointer to arc descriptor
  * @param items_section_style  pointer to indicator section style
  */
 static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc, lv_style_t * section_style)
@@ -1268,37 +1268,57 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
         lv_style_value_t value;
         lv_style_res_t res;
 
-        /* Line width */
+        /* arc width */
         res = lv_style_get_prop(section_style, LV_STYLE_ARC_WIDTH, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->width = (int32_t)value.num;
         }
         else {
-            arc_dsc->width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
+            arc_dsc->width = lv_obj_get_style_arc_width(obj, LV_PART_MAIN);
         }
 
-        /* Line color */
+        /* arc color */
         res = lv_style_get_prop(section_style, LV_STYLE_ARC_COLOR, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->color = value.color;
         }
         else {
-            arc_dsc->color = lv_obj_get_style_line_color(obj, LV_PART_MAIN);
+            arc_dsc->color = lv_obj_get_style_arc_color(obj, LV_PART_MAIN);
         }
 
-        /* Line opa */
+        /* arc opa */
         res = lv_style_get_prop(section_style, LV_STYLE_ARC_OPA, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->opa = (lv_opa_t)value.num;
         }
         else {
-            arc_dsc->opa = lv_obj_get_style_line_opa(obj, LV_PART_MAIN);
+            arc_dsc->opa = lv_obj_get_style_arc_opa(obj, LV_PART_MAIN);
+        }
+
+        /* arc rounded */
+        res = lv_style_get_prop(section_style, LV_STYLE_ARC_ROUNDED, &value);
+        if(res == LV_STYLE_RES_FOUND) {
+            arc_dsc->rounded = (uint8_t)value.num;
+        }
+        else {
+            arc_dsc->rounded = lv_obj_get_style_arc_rounded(obj, LV_PART_MAIN);
+        }
+
+        /* arc image src */
+        res = lv_style_get_prop(section_style, LV_STYLE_ARC_IMAGE_SRC, &value);
+        if(res == LV_STYLE_RES_FOUND) {
+            arc_dsc->img_src = (const void *)value.ptr;
+        }
+        else {
+            arc_dsc->img_src = lv_obj_get_style_arc_image_src(obj, LV_PART_MAIN);
         }
     }
     else {
-        arc_dsc->color = lv_obj_get_style_line_color(obj, LV_PART_MAIN);
-        arc_dsc->opa = lv_obj_get_style_line_opa(obj, LV_PART_MAIN);
-        arc_dsc->width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
+        arc_dsc->color = lv_obj_get_style_arc_color(obj, LV_PART_MAIN);
+        arc_dsc->opa = lv_obj_get_style_arc_opa(obj, LV_PART_MAIN);
+        arc_dsc->width = lv_obj_get_style_arc_width(obj, LV_PART_MAIN);
+        arc_dsc->rounded = lv_obj_get_style_arc_rounded(obj, LV_PART_MAIN);
+        arc_dsc->img_src = lv_obj_get_style_arc_image_src(obj, LV_PART_MAIN);
     }
 }
 

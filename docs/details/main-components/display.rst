@@ -488,6 +488,39 @@ meaning ``(horizontal_resolution x vertical_resolution / 8) + 8`` bytes.
 As LVGL can not handle fractional width make sure to round the horizontal resolution
 to 8 bits (for example 90 to 96).
 
+The :cpp:func:`lv_draw_sw_i1_convert_to_vtiled` function is used to convert a draw
+buffer in I1 color format from a row-wise (htiled) to a column-wise (vtiled) buffer
+layout.  This conversion is necessary for certain display controllers that require a
+different draw buffer mapping.  The function assumes that the buffer width and height
+are rounded to a multiple of 8.  The bit order of the resulting vtiled buffer can be
+specified using the `bit_order_lsb` parameter.
+
+For more details, refer to the implementation in
+:cpp:func:`lv_draw_sw_i1_convert_to_vtiled` in :file:`src/draw/sw/lv_draw_sw.c`.
+
+To ensure that the redrawn areas start and end on byte boundaries, you can add a
+rounder callback to your display driver.  This callback will round the width and
+height to the nearest multiple of 8.
+
+Here is an example of how to implement and set a rounder callback:
+
+.. code:: c
+
+    static void my_rounder_cb(lv_event_t *e)
+    {
+        lv_area_t *area = lv_event_get_param(e);
+
+        /* Round the height to the nearest multiple of 8 */
+        area->y1 = (area->y1 & ~0x7);
+        area->y2 = (area->y2 | 0x7);
+    }
+
+    lv_display_add_event_cb(display, my_rounder_cb, LV_EVENT_INVALIDATE_AREA, display);
+
+In this example, the `my_rounder_cb` function rounds the coordinates of the redrawn
+area to the nearest multiple of 8. The `x1` and `y1` coordinates are rounded down,
+while the `x2` and `y2` coordinates are rounded up. This ensures that the width and
+height of the redrawn area are always multiples of 8.
 
 Constraints on Redrawn Area
 ---------------------------

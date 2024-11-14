@@ -63,6 +63,11 @@ If this is *not* appropriate for the .RST file you are creating, ensure the stem
 In alignment with the above, use a file name stem that is appropriate to the topic being covered.
 
 
+### Text Format
+
+While with `.md` files, it is important to allow paragraphs to flow off to the right with one long line so that when they are formatted as `.html` files, the paragraphs will word-wrap with the width of the browser, this is not true with reStructuredText (`.rst` files).  [Sphinx](https://www.sphinx-doc.org/en/master/) and its underlying [docutils parsing engine](https://docutils.sourceforge.io/docs/) conveniently combine grouped text into a proper paragraph with that word-wrapping behavior.  This allows the source text documents to be nicely word-wrapped so that they are more readable in text- and code-editors that do not have wide editing windows.  So please wrap the text around column 86 or narrower.  Wrapping at *exactly* column 86 is not important, but readability and ease of editing is.
+
+
 ### index.rst Files
 
 If you create a new directory you MUST have an `index.rst` file in that directory and that index file needs to be pointed to in the `index.rst` file that is located in the parent directory.
@@ -154,24 +159,26 @@ reStructuredText does not impose any particular heading levels assigned to certa
 
 If you are creating a new .RST file, use this convention:
 
-    =====
-    Title
-    =====
+```
+=====
+Title
+=====
 
-    Chapter
-    *******
+Chapter
+*******
 
-    Section
-    -------
+Section
+-------
 
-    Sub Section
-    ~~~~~~~~~~~
+Sub Section
+~~~~~~~~~~~
 
-    Sub Sub Section
-    ^^^^^^^^^^^^^^^
+Sub Sub Section
+^^^^^^^^^^^^^^^
 
-    Sub Sub Sub Section
-    '''''''''''''''''''
+Sub Sub Sub Section
+'''''''''''''''''''
+```
 
 Note that the "underlining" can be longer than the heading title, but if it is shorter, the documentation-generation logic will fail with an error.
 
@@ -187,6 +194,7 @@ For improved readability in the .RST file, place at least 2 blank lines above se
 * `.. code-block::` is the only directive that should be used.  Note carefully that unlike the **link target** directive above, this directive has 2 colons.  (The only ReST and sphinx directives that are valid with one colon are **link target**s as shown above.)  Lone `::`, `:code:` or `.. code:` should not be used.
 * If you want to separate code into easier-to-understand sections you can do so with a single empty line.
 * For syntax highlighting appropriate to the language in the code block, specify the language after the directive.  Some examples are:
+
   - `.. code-block:: c`,
   - `.. code-block:: cpp`,
   - `.. code-block:: python`,
@@ -265,3 +273,5 @@ For such examples, simply use reStructuredText literal markup like this:
     ``lv_obj_set_layout((lv_obj_t *)widget, LV_LAYOUT_FLEX)``
     ``lv_obj_set_layout(&widget, LV_LAYOUT_FLEX);``
     ``lv_obj_set_layout(widget, ...)``
+
+

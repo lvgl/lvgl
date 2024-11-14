@@ -639,7 +639,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
     /*Move the table to the top*/
     lv_obj_scroll_to_y(explorer->file_table, 0, LV_ANIM_OFF);
 
-    lv_strlcpy(explorer->current_path, path, sizeof(explorer->current_path));
+    lv_strncpy(explorer->current_path, path, sizeof(explorer->current_path));
     lv_label_set_text_fmt(explorer->path_label, LV_SYMBOL_EYE_OPEN" %s", path);
 
     size_t current_path_len = lv_strlen(explorer->current_path);
@@ -667,6 +667,7 @@ static void strip_ext(char * dir)
 
 static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j)
 {
+    if(i == j) return;
     const char * i_value = lv_table_get_cell_value(tb, i, 0);
 
     char * tmp_i_value = lv_malloc(lv_strlen(i_value) + 1);

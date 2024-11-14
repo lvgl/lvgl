@@ -7,10 +7,10 @@ Image (lv_image)
 Overview
 ********
 
-Images are the basic Widget to display images from flash (as arrays) or
+Images are Widgets that display images from flash (as arrays) or
 from files. Images can display symbols (``LV_SYMBOL_...``) as well.
 
-Using the :ref:`Image decoder interface <overview_image_decoder>` custom image formats
+Using the :ref:`Image decoder interface <overview_image_decoder>`, custom image formats
 can be supported as well.
 
 .. _lv_image_parts_and_styles:
@@ -19,7 +19,7 @@ Parts and Styles
 ****************
 
 - :cpp:enumerator:`LV_PART_MAIN` A background rectangle that uses the typical
-  background style properties and the image itself using the image
+  background style properties, and the image itself uses the image
   style properties.
 
 .. _lv_image_usage:
@@ -32,47 +32,52 @@ Image source
 
 To provide maximum flexibility, the source of the image can be:
 
-- a variable in code (a C array with the pixels).
+- a variable in code (a C array containing the pixels).
 - a file stored externally (e.g. on an SD card).
-- a text with :ref:`Symbols <fonts_symbols>`.
+- a :ref:`Symbol <fonts_symbols>` as text.
 
 To set the source of an image, use :cpp:expr:`lv_image_set_src(img, src)`.
 
 To generate a pixel array from a PNG, JPG or BMP image, use the `Online image converter tool <https://lvgl.io/tools/imageconverter>`__
-and set the converted image with its pointer  :cpp:expr:`lv_image_set_src(img1, &converted_img_var)`
-To make the variable visible in the C file, you need to declare it with
+and set the converted image as the image source with its pointer with
+:cpp:expr:`lv_image_set_src(img1, &converted_img_var)`.
+To make the converted image variable accessible from the C file, declare it with
 :cpp:expr:`LV_IMAGE_DECLARE(converted_img_var)`.
 
 To use external files, you also need to convert the image files using
-the online converter tool but now you should select the binary output
+the online converter tool, but select the binary output
 format. You also need to use LVGL's file system module and register a
-driver with some functions for the basic file operation. Go to the
-:ref:`File system <overview_file_system>` to learn more. To set an image sourced
-from a file, use :cpp:expr:`lv_image_set_src(img, "S:folder1/my_img.bin")`.
+driver with some functions for basic file operations.  See
+:ref:`File system <overview_file_system>` to learn more.  Then set the translated
+image as the image source with :cpp:expr:`lv_image_set_src(img, "S:folder1/my_img.bin")`.
 
-You can also set a symbol similarly to :ref:`Labels <lv_label>`. In
+You can also set a symbol as an image source similar to a :ref:`Labels <lv_label>`. In
 this case, the image will be rendered as text according to the *font*
-specified in the style. It enables to use of light-weight monochrome
-"letters" instead of real images. You can set symbol like
+specified in the style. It enables the use of light-weight monochrome
+"characters" instead of real images. You can set a symbol as an image source with
 :cpp:expr:`lv_image_set_src(img1, LV_SYMBOL_OK)`.
 
 Label as an image
 -----------------
 
-Images and labels are sometimes used to convey the same thing. For
-example, to describe what a button does. Therefore, images and labels
-are somewhat interchangeable, that is the images can display texts by
-using :c:macro:`LV_SYMBOL_DUMMY` as the prefix of the text. For example,
-:cpp:expr:`lv_image_set_src(img, LV_SYMBOL_DUMMY, "Some text")`.
+Images and labels are sometimes used to convey the same thing, such as
+describing what a button does.  In this context, images and labels
+are somewhat interchangeable:  images can display text by
+using the macro :c:macro:`LV_SYMBOL_DUMMY` (which equates to a 3-byte C string
+containing a special code) as the prefix of the text.  For example,
+``lv_image_set_src(img, LV_SYMBOL_DUMMY "Some text")``.
 
 Transparency
 ------------
 
-The internal (variable) and external images support 2 transparency
+The internal (pixel array) and external images support 2 transparency
 handling methods:
 
--  **Alpha byte**: An alpha byte is added to every pixel that contains
-   the pixel's opacity
+-  **Alpha byte**: An alpha channel is added to every pixel that contains
+   its opacity, typically a byte.  It is the 'A' in the the various color formats
+   that contain an alpha channel, such as ARGB8888, ARGB8565, ARGB1555, etc.
+-  **Indexed transparent color**:  a specific index in a color palette serves to
+   signal transparency for each pixel that uses it.
 
 Palette and Alpha index
 -----------------------
@@ -80,11 +85,11 @@ Palette and Alpha index
 Besides the *True color* (RGB) color format, the following formats are
 supported:
 
-- **Indexed**: Image has a palette.
-- **Alpha indexed**: Only alpha values are stored.
+- **Indexed**: Image has a color palette, and each pixel is an index into that palette.
+- **Alpha indexed**: The values stored at pixel positions are alpha (opacity) values.
 
-These options can be selected in the image converter. To learn more
-about the color formats, read the :ref:`Images <overview_image>` section.
+These options can be selected in the image converter. Learn more
+about color formats in the :ref:`overview_image_color_formats` section.
 
 Recolor
 -------
@@ -95,7 +100,7 @@ inactive, pressed, etc.) of an image without storing more versions of
 the same image. This feature can be enabled in the style by setting
 ``img_recolor_opa`` between :cpp:enumerator:`LV_OPA_TRANSP` (no recolor, value: 0) and
 :cpp:enumerator:`LV_OPA_COVER` (full recolor, value: 255). The default value is
-:cpp:enumerator:`LV_OPA_TRANSP` so this feature is disabled.
+:cpp:enumerator:`LV_OPA_TRANSP` causing this feature to be disabled.
 
 The color to mix is set by ``img_recolor``.
 
@@ -111,55 +116,56 @@ or a "running image" effect can be created by :ref:`Animating <animation>` the x
 Transformations
 ---------------
 
-Using the :cpp:expr:`lv_image_set_scale(img, factor)` the images will be zoomed.
+You can zoom images in or out by using :cpp:expr:`lv_image_set_scale(img, factor)`.
 Set ``factor`` to ``256`` or :c:macro:`LV_SCALE_NONE` to disable zooming. A
 larger value enlarges the images (e.g. ``512`` double size), a smaller
-value shrinks it (e.g. ``128`` half size). Fractional scale works as
-well. E.g. ``281`` for 10% enlargement.
+value shrinks it (e.g. ``128`` half size). Fractional scaling works using a value
+that is proportionally larger or smaller, e.g. ``281`` for 10% enlargement.
 
 :cpp:expr:`lv_image_set_scale_x(img, factor)` and
-:cpp:expr:`lv_image_set_scale_y(img, factor)` also can be used to
-the scale independently horizontally and vertically (non-uniform scale).
+:cpp:expr:`lv_image_set_scale_y(img, factor)` can also be used to
+set the horizontal and vertical scaling independently.  They can be different values.
 
-To rotate the image use :cpp:expr:`lv_image_set_rotation(img, angle)`. Angle has 0.1
-degree precision, so for 45.8° set 458.
+To rotate the image use :cpp:expr:`lv_image_set_rotation(img, angle_x10)`.
+The ``angle_x10`` argument is an ``int32_t`` containing the angle (in degrees)
+multiplied by 10.  This gives 0.1-degree resolution.  Example:  458 means 45.8°.
 
 By default, the pivot point of the rotation is the center of the image.
-It can be changed with :cpp:expr:`lv_image_set_pivot(img, pivot_x, pivot_y)`.
-``0;0`` is the top left corner.
+This can be changed with :cpp:expr:`lv_image_set_pivot(img, pivot_x, pivot_y)` where
+the coordinates ``(0,0)`` represent the top left corner.
 
 The quality of the transformation can be adjusted with
-:cpp:expr:`lv_image_set_antialias(img, true)`. With enabled anti-aliasing
-the transformations are higher quality but slower.
+:cpp:expr:`lv_image_set_antialias(img, true)`. Enabling anti-aliasing
+causes the transformations to be of higher quality, but slower.
 
-The transformations require the whole image to be available. Therefore
-indexed images (``LV_COLOR_FORMAT_I1/2/4/8_...``), alpha only images cannot be transformed.
-In other words transformations work only on normal (A)RGB or A8 images stored as
-C array, or if a custom :ref:`overview_image_decoder`
-returns the whole image.
+Transformations require the whole image to be available. Therefore
+indexed images (``LV_COLOR_FORMAT_I1/2/4/8_...``) and alpha only images cannot be transformed.
+In other words transformations work only on normal (A)RGB or A8 images stored as a
+C array, or on images provided by a custom :ref:`overview_image_decoder`
+that returns the whole image.
 
-Note that the real coordinates of image Widgets won't change during
+Note that the real coordinates of image Widgets do not change with a
 transformation. That is :cpp:expr:`lv_obj_get_width/height/x/y()` will return
 the original, non-zoomed coordinates.
 
-**IMPORTANT** The transformation of the image is independent of the
-transformation properties coming from styles. (See
-:ref:`here <style_opacity_blend_modes_transformations>`). The main
-differences are that pure image widget transformation
+**IMPORTANT**:  The transformation of the image is independent of the transformation
+properties :ref:`coming from styles <style_opacity_blend_modes_transformations>`.
+The main differences are that pure Image Widget transformations:
 
-- doesn't transform the children of the image widget
-- image is transformed directly without creating an intermediate layer (buffer) to snapshot the widget
+- do not transform the children of the Image Widget, and
+- the image is transformed directly without creating an intermediate layer (buffer) to snapshot the Widget.
 
 Inner align
 -----------
 
-By default the image widget's width and height is :cpp:enumerator:`LV_SIZE_CONTENT`.
-It means that the widget will be sized automatically according to the image source.
+By default the image Widget's width and height are :cpp:enumerator:`LV_SIZE_CONTENT`,
+meaning that the Widget will be sized automatically to the size of its image source.
 
-If the widget's width or height is set the larger value the ``inner_align`` property tells
-how to align the image source inside the widget.
+If the Widget's width or height is set to a different value, the value of the ``inner_align``
+property (set using :cpp:expr:`lv_image_set_inner_align(widget, align)`) governs how
+the image source is aligned inside the Widget.
 
-The alignment set any of these:
+``align`` can be any of these values:
 
 - :cpp:enumerator:`LV_IMAGE_ALIGN_DEFAULT`: Meaning top left
 - :cpp:enumerator:`LV_IMAGE_ALIGN_TOP_LEFT`
@@ -174,16 +180,14 @@ The alignment set any of these:
 - :cpp:enumerator:`LV_IMAGE_ALIGN_STRETCH`
 - :cpp:enumerator:`LV_IMAGE_ALIGN_TILE`
 
-The ``offset`` value is applied after the image source is aligned. For example setting an ``y=-10``
-and :cpp:enumerator:`LV_IMAGE_ALIGN_CENTER` will move the image source up a little bit
-from the center of the widget.
+Any ``offset`` value is applied after the image source is aligned. For example setting
+an offset of ``y=-10`` with ``align`` == :cpp:enumerator:`LV_IMAGE_ALIGN_CENTER` will
+move the image source up 10 pixels from the center of the Widget.
 
-Or to automatically scale or tile the image
+To automatically scale or tile the image, pass one of these ``align`` values:
 
-- :cpp:enumerator:`LV_IMAGE_ALIGN_STRETCH` Set X and Y scale to fill the widget's area
-- :cpp:enumerator:`LV_IMAGE_ALIGN_TILE` Tile the image to will the widget area. Offset is applied to shift the tiling.
-
-The alignment can be set by :cpp:func:`lv_image_set_inner_align`
+- :cpp:enumerator:`LV_IMAGE_ALIGN_STRETCH` Set X and Y scale to fill the Widget's area
+- :cpp:enumerator:`LV_IMAGE_ALIGN_TILE` Tile image to fill Widget's area. Offset is applied to shift the tiling.
 
 
 
@@ -193,8 +197,8 @@ Events
 ******
 
 No special events are sent by Image Widgets.  By default, Image Widgets are created
-without the LV_OBJ_FLAG_CLICKABLE flag, but you can add it to make a Label Widget
-emit LV_EVENT_CLICKED events if desired.
+without the LV_OBJ_FLAG_CLICKABLE flag, but you can add it to make an Image Widget
+detect and emit LV_EVENT_CLICKED events if desired.
 
 .. admonition::  Further Reading
 
