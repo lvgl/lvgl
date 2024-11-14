@@ -4,11 +4,13 @@
 List (lv_list)
 ==============
 
+
 Overview
 ********
 
-The List is basically a rectangle with vertical layout to which Buttons
-and Texts can be added
+The List Widget is basically a rectangle with vertical layout to which Buttons
+and Text can be added.
+
 
 .. _lv_list_parts_and_styles:
 
@@ -17,11 +19,14 @@ Parts and Styles
 
 **Background**
 
-- :cpp:enumerator:`LV_PART_MAIN` The main part of the list that uses all the typical background properties
-- :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar. See the :ref:`base_widget`
+- :cpp:enumerator:`LV_PART_MAIN` The main part of the List that uses all the typical background properties
+- :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar. See :ref:`base_widget`
   documentation for details.
 
-**Buttons and Texts** See the :ref:`Button <lv_button>`\ 's and :ref:`Label <lv_label>`\ 's documentation.
+**Buttons and Text**
+
+- See the :ref:`Button <lv_button>`'s and :ref:`Label <lv_label>`'s documentation.
+
 
 .. _lv_list_usage:
 
@@ -32,16 +37,17 @@ Buttons
 -------
 
 :cpp:expr:`lv_list_add_button(list, icon, text)` adds a full-width button with an icon
+(that can be an image or symbol) and text.  This function returns a pointer to the
+button created, which you can use to, for example, add an event call-back.
 
-- that can be an image or symbol
-- and a text.
+The text is scrolled horizontally if it is longer than the button.
 
-The text starts to scroll horizontally if it's too long.
+Text
+----
 
-Texts
------
-
-:cpp:expr:`lv_list_add_text(list, text)` adds a text.
+:cpp:expr:`lv_list_add_text(list, text)` adds a text string.  This function returns a
+pointer to the label created, which you can use to, for example, change its text
+with one of the ``lv_label_set_text...()`` functions.
 
 
 
@@ -50,7 +56,7 @@ Texts
 Events
 ******
 
-No special events are sent by List Widgets, but events are sent by Buttons as usual.
+No special events are sent by List Widgets, but events can be sent by Buttons as usual.
 
 .. admonition::  Further Reading
 
