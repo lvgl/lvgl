@@ -54,7 +54,7 @@ typedef enum {
 
     /**
      * Always redraw the whole screen even if only one pixel has been changed.
-     * With 2 buffers in flush_cb only and address change is required.
+     * With 2 buffers in flush_cb only an address change is required.
      */
     LV_DISPLAY_RENDER_MODE_FULL,
 } lv_display_render_mode_t;
