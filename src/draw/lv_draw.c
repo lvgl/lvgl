@@ -35,7 +35,7 @@ static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check);
 
 static inline uint32_t get_layer_size_kb(uint32_t size_byte)
 {
-    return size_byte < 1024 ? 1 : size_byte >> 10;
+    return (size_byte >> 10) + 1;
 }
 /**********************
  *  STATIC VARIABLES
@@ -219,8 +219,8 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
                     int32_t h = lv_area_get_height(&layer_drawn->buf_area);
                     uint32_t layer_size_byte = h * layer_drawn->draw_buf->header.stride;
 
-                    _draw_info.used_memory_for_layers_kb -= get_layer_size_kb(layer_size_byte);
-                    LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB\n", _draw_info.used_memory_for_layers_kb);
+                    _draw_info.used_memory_for_layers -= layer_size_byte;
+                    LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB\n", get_layer_size_kb(_draw_info.used_memory_for_layers));
                     lv_draw_buf_destroy(layer_drawn->draw_buf);
                     layer_drawn->draw_buf = NULL;
                 }
@@ -457,8 +457,8 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
     uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, layer->color_format);
 
     /*Avoid small allocation related failures*/
-    if((_draw_info.used_memory_for_layers_kb + layer_size_byte) > LV_DRAW_LAYER_MAX_MEMORY) {
-        LV_LOG_INFO("LV_DRAW_LAYER_MAX_MEMORY is reached when allocating the layer. ");
+    if((_draw_info.used_memory_for_layers + layer_size_byte) > LV_DRAW_LAYER_MAX_MEMORY) {
+        LV_LOG_WARN("LV_DRAW_LAYER_MAX_MEMORY was reached when allocating the layer.");
         return NULL;
     }
 
@@ -469,8 +469,8 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
         return NULL;
     }
 
-    _draw_info.used_memory_for_layers_kb += get_layer_size_kb(layer_size_byte);
-    LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB\n", _draw_info.used_memory_for_layers_kb);
+    _draw_info.used_memory_for_layers += layer_size_byte;
+    LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB\n", get_layer_size_kb(_draw_info.used_memory_for_layers));
 
     if(lv_color_format_has_alpha(layer->color_format)) {
         lv_draw_buf_clear(layer->draw_buf, NULL);
