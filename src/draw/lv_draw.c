@@ -456,7 +456,8 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
     int32_t h = lv_area_get_height(&layer->buf_area);
     uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, layer->color_format);
 
-    /*Avoid small allocation related failures*/
+    /* Do not allocate the layer if the sum of allocated layer sizes
+     * will exceed `LV_DRAW_LAYER_MAX_MEMORY` */
     if((_draw_info.used_memory_for_layers + layer_size_byte) > LV_DRAW_LAYER_MAX_MEMORY) {
         LV_LOG_WARN("LV_DRAW_LAYER_MAX_MEMORY was reached when allocating the layer.");
         return NULL;
