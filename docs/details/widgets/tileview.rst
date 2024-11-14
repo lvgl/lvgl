@@ -14,7 +14,7 @@ swiping. Any direction of swiping can be disabled on the tiles
 individually to not allow moving from one tile to another.
 
 If the Tile View is screen sized, the user interface resembles what you
-may have seen on smart watches.
+may have seen on smartwatches.
 
 
 
