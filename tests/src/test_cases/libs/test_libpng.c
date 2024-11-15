@@ -58,7 +58,7 @@ void test_libpng_1(void)
 
     create_images();
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/libpng_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/png_1.png");
 
     size_t mem_before = lv_test_get_free_mem();
     for(uint32_t i = 0; i < 20; i++) {
@@ -68,7 +68,7 @@ void test_libpng_1(void)
         lv_refr_now(NULL);
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/libpng_1.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/png_1.png");
 
     TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 32);
 
