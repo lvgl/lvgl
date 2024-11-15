@@ -186,7 +186,7 @@ Styling Sections
 
 You set a Section's Style properties by creating a :cpp:type:`lv_style_t` object
 for each "section" you want to appear different than the parent Scale.  Add style
-style properties as is documented in :ref:`style_initialize`.
+properties as is documented in :ref:`style_initialize`.
 
 You attach each :cpp:type:`lv_style_t` object to each Section it will apply to using
 :cpp:expr:`lv_scale_section_set_style(section, PART, style_pointer)`, where:
@@ -205,7 +205,7 @@ you can do something like this to accomplish the same thing:
 
 .. code-block:: c
 
-    lv_style_t  tick_style;
+    static lv_style_t  tick_style;
     lv_style_init(&tick_style);
     lv_style_set_line_color(&tick_style, lv_palette_darken(LV_PALETTE_RED, 3));
     lv_scale_section_set_style(section, LV_PART_ITEMS, &tick_style);
