@@ -55,7 +55,7 @@ be any of these values:
 Setting range
 -------------
 
-A Scale's starts its life with a default range of [0..100].  You can change this
+A Scale starts its life with a default range of [0..100].  You can change this
 range with :cpp:expr:`lv_scale_set_range(scale, min, max)`.
 
 
@@ -108,7 +108,7 @@ rotate the major-tick labels to match the rotation of the major ticks using
 
 Alternately, labels can be rotated by a fixed amount (for any Scale mode).  This
 example rotates labels by 20 degrees:
-:cpp:expr:`lv_obj_set_style_transform_rotation(scale, 20, LV_PART_INDICATOR)`.
+:cpp:expr:`lv_obj_set_style_transform_rotation(scale, 200, LV_PART_INDICATOR)`.
 
 Or both of the above can be done at the same time:
 :cpp:expr:`lv_obj_set_style_transform_rotation(scale, LV_SCALE_LABEL_ROTATE_MATCH_TICKS + 200, LV_PART_INDICATOR)`.
@@ -183,6 +183,7 @@ used in drawing.  That can be useful to temporarily "disable" a Section, e.g.
 
 Styling Sections
 ~~~~~~~~~~~~~~~~
+
 You set a Section's Style properties by creating a :cpp:type:`lv_style_t` object
 for each "section" you want to appear different than the parent Scale.  Add style
 style properties as is documented in :ref:`style_initialize`.
