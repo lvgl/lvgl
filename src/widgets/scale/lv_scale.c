@@ -1395,12 +1395,12 @@ static void scale_find_section_tick_idx(lv_obj_t * obj)
 
         lv_scale_section_t * section;
         LV_LL_READ_BACK(&scale->section_ll, section) {
-            if (section->minor_range <= tick_value && section->major_range >= tick_value) {
-                if (LV_SCALE_TICK_IDX_DEFAULT_ID == section->first_tick_idx_in_section) {
+            if(section->minor_range <= tick_value && section->major_range >= tick_value) {
+                if(LV_SCALE_TICK_IDX_DEFAULT_ID == section->first_tick_idx_in_section) {
                     section->first_tick_idx_in_section = tick_idx;
                     section->first_tick_idx_is_major = is_major_tick;
                 }
-                if (LV_SCALE_TICK_IDX_DEFAULT_ID == section->last_tick_idx_in_section) {
+                if(LV_SCALE_TICK_IDX_DEFAULT_ID == section->last_tick_idx_in_section) {
                     /* This gets it initialized when the beginning and ending range values are the same. */
                     section->last_tick_idx_in_section = tick_idx;
                     section->last_tick_idx_is_major = is_major_tick;
@@ -1408,7 +1408,7 @@ static void scale_find_section_tick_idx(lv_obj_t * obj)
                 /* Now keep setting the `last_tick_idx_...` values as we
                  * proceed through the `for` loop so it is left with the
                  * actual last-tick value that is within the Scale's range. */
-                else if (section->first_tick_idx_in_section != tick_idx) {
+                else if(section->first_tick_idx_in_section != tick_idx) {
                     section->last_tick_idx_in_section = tick_idx;
                     section->last_tick_idx_is_major = is_major_tick;
                 }
