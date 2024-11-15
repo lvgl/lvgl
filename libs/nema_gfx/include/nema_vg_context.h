@@ -78,17 +78,33 @@ typedef float nema_vg_float_t; /**< Floating point data type (default is 'float'
 #define NEMA_VG_ERR_NO_INIT                 (0x00100000U)  /**< VG uninitialized */
 #define NEMA_VG_ERR_INVALID_STROKE_WIDTH    (0x00200000U)  /**< Invalid stroke width */
 #define NEMA_VG_ERR_INVALID_OPACITY         (0x00400000U)  /**< Invalid opacity */
+#define NEMA_VG_ERR_INVALID_CAP_STYLE       (0x00800000U)  /**< Invalid cap style */
+#define NEMA_VG_ERR_INVALID_JOIN_STYLE      (0x01000000U)  /**< Invalid join style */
+#define NEMA_VG_ERR_INVALID_STENCIL_SIZE    (0x02000000U)  /**< Invalid stencil buffer size */
 
-#define NEMA_VG_FILL_DRAW               (0x00U) /**< DEPRECATED Stroke fill rule */
-#define NEMA_VG_STROKE                  (0x00U) /**< Stroke fill rule */
-#define NEMA_VG_FILL_EVEN_ODD           (0x01U) /**< Evenodd fill rule */
-#define NEMA_VG_FILL_NON_ZERO           (0x02U) /**< Non zero fill rule */
+#define NEMA_VG_FILL_DRAW                   (0x00U) /**< DEPRECATED Stroke fill rule */
+#define NEMA_VG_STROKE                      (0x00U) /**< Stroke fill rule */
+#define NEMA_VG_FILL_EVEN_ODD               (0x01U) /**< Evenodd fill rule */
+#define NEMA_VG_FILL_NON_ZERO               (0x02U) /**< Non zero fill rule */
 
-#define NEMA_VG_QUALITY_BETTER          (0x00U) /**< Better rendering quality (default option, balances rendering quality and performance)*/
-#define NEMA_VG_QUALITY_FASTER          (0x01U) /**< Faster rendering quality (favors performance over rendering quality)*/
-#define NEMA_VG_QUALITY_MAXIMUM         (0x02U) /**< Maximum rendering quality (favors rendering quality over performance)*/
-#define NEMA_VG_QUALITY_NON_AA          (0x10U) /**< Rendering quality without AA*/
+#define NEMA_VG_QUALITY_BETTER              (0x00U) /**< Better rendering quality (default option, balances rendering quality and performance)*/
+#define NEMA_VG_QUALITY_FASTER              (0x01U) /**< Faster rendering quality (favors performance over rendering quality)*/
+#define NEMA_VG_QUALITY_MAXIMUM             (0x02U) /**< Maximum rendering quality (favors rendering quality over performance)*/
+#define NEMA_VG_QUALITY_NON_AA              (0x10U) /**< Rendering quality without AA*/
 
+#define NEMA_VG_CAP_BUTT                    (0x00U) /**< Butt cap*/
+#define NEMA_VG_CAP_ROUND                   (0x01U) /**< Round cap*/
+#define NEMA_VG_CAP_SQUARE                  (0x02U) /**< Square cap*/
+#define NEMA_VG_CAP_MAX                     (0x03U) /**< Max value for cap*/
+
+#define NEMA_VG_JOIN_BEVEL                  (0x00U) /**< Bevel join*/
+#define NEMA_VG_JOIN_MITER                  (0x01U) /**< Mitter join*/
+#define NEMA_VG_JOIN_ROUND                  (0x02U) /**< Round join*/
+#define NEMA_VG_JOIN_MAX                    (0x03U) /**< Max for join*/
+
+#define NEMA_VG_TSVG_DISABLE_NONE          (0x00000000U) /**< Disable none*/
+#define NEMA_VG_TSVG_DISABLE_CAPS          (0x00000001U) /**< Disable caps*/
+#define NEMA_VG_TSVG_DISABLE_JOINS         (0x00000002U) /**< Disable joins*/
 
 /** \brief Set the global transformation matrix. Global matrix will be applied in all NemaVG rendering operations that will follow.
  *
@@ -110,6 +126,36 @@ void nema_vg_reset_global_matrix(void);
  *
  */
 void nema_vg_set_fill_rule(uint8_t fill_rule);
+
+/** \brief Set the stroke width that will be applied when stroking a path.
+ *
+ * \param width Stroke width to be set
+ *
+ */
+void nema_vg_stroke_set_width(float width);
+
+ /** \brief Set stroke cap style
+ *
+ * \param cap_style Cap style (NEMA_VG_CAP_BUTT | NEMA_VG_CAP_SQUARE | NEMA_VG_CAP_ROUND)
+ *
+ */
+void nema_vg_stroke_set_cap_style(uint8_t start_cap_style, uint8_t end_cap_style);
+
+ /** \brief Set stroke join style
+ *
+ * \param join_style Join style (NEMA_VG_JOIN_BEVEL | NEMA_VG_JOIN_MITER | NEMA_VG_JOIN_ROUND)
+ *
+ */
+void nema_vg_stroke_set_join_style(uint8_t join_style);
+
+ /** \brief Set stroke miter limit
+ * If miter join is chosen and miter length is bigger than the product
+ * of miter limit and stroke width a bevel join will be added instead
+ *
+ * \param miter_limit miter join limit to be set
+ *
+ */
+void nema_vg_stroke_set_miter_limit(float miter_limit);
 
 /** \brief Enable/Disable Masking.
  *
