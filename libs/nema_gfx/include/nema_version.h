@@ -25,26 +25,31 @@
  *  in the software.
  ******************************************************************************/
 
+/**
+ * @file
+ * @brief Contains version numbers for NemaGFX API and the currently supported font version.
+ *
+ */
 
-#ifndef NEMA_UTILS_H_
-#define NEMA_UTILS_H_
-
-#include "nema_hal.h"
+#ifndef NEMA_VERSION_H__
+#define NEMA_VERSION_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-float           nema_get_time(void);
-float           nema_get_wall_time(void);
-nema_buffer_t   nema_load_file(const char *filename, int length, void *buffer);
-int             nema_save_file(const char *filename, int length, void *buffer);
-unsigned int    nema_rand(void);
-void            nema_calculate_fps(void);
-void *          nema_memcpy ( void * destination, const void * source, size_t num );
+#define NEMA_MAJOR_VERSION    0x01U       /**< NemaGFX API version, major number */
+#define NEMA_MINOR_VERSION    0x04U       /**< NemaGFX API version, minor number */
+#define NEMA_REVISION_VERSION 0x0BU      /**< NemaGFX API version, revision number */
+#define NEMA_IMP_VERSION      0x00240600U /**< NemaGFX API version, implementation in format 0x00YYMM00 (Y: year, M: month) */
+
+#define NEMA_API_VERSION ((NEMA_MAJOR_VERSION << 16) + (NEMA_MINOR_VERSION << 8) + (NEMA_REVISION_VERSION)) /**< NemaGFX API version in format 0x00MMmmrr (M:major, m:minor, r:revision if any) */
+
+#define NEMA_FONT_VERSION     0x01U       /**< Current font version */
+
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif //NEMA_VERSION_H__

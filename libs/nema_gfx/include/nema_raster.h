@@ -64,6 +64,9 @@ void nema_raster_triangle (int x0, int y0, int x1, int y1, int x2, int y2);
 void nema_raster_quad (int x0,int y0,int x1,int y1,int x2,int y2,int x3,int y3);
 
 /** \private */
+void nema_raster_circle(float x, float y, float r);
+
+/** \private */
 void nema_raster_circle_aa(float x, float y, float r);
 
 /** \private */
@@ -99,6 +102,13 @@ nema_raster_quad_f(float x0, float y0, float x1, float y1,
 /** \private */
 void
 nema_raster_stroked_arc_aa( float x0, float y0, float r, float w, float start_angle, float end_angle);
+
+/** \private */
+// aa_mask: 
+//   RAST_AA_E0: AA on first ending
+//   RAST_AA_E2: AA on last ending
+void
+nema_raster_stroked_arc_aa_mask( float x0, float y0, float r, float w, float start_angle, float end_angle, uint32_t aa_mask);
 
 #ifdef __cplusplus
 }

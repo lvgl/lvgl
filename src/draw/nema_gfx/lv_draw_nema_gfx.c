@@ -140,10 +140,7 @@ static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * ta
             }
 #if LV_USE_NEMA_VG
         case LV_DRAW_TASK_TYPE_TRIANGLE:
-        case LV_DRAW_TASK_TYPE_ARC: {
-                lv_draw_arc_dsc_t * draw_arc_dsc = (lv_draw_arc_dsc_t *) task->draw_dsc;
-                if(draw_arc_dsc->rounded == 0) break;
-            }
+        case LV_DRAW_TASK_TYPE_ARC:
         case LV_DRAW_TASK_TYPE_FILL: {
                 if(task->preference_score > 80) {
                     task->preference_score = 80;
