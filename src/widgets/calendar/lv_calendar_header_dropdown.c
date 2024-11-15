@@ -174,10 +174,10 @@ static void value_changed_event_cb(lv_event_t * e)
     const uint32_t year = (year_p[0] - '0') * 1000 + (year_p[1] - '0') * 100 + (year_p[2] - '0') * 10 +
                           (year_p[3] - '0');
 
-    lv_dropdown_set_selected(year_dd, year - cur_date->year);
+    lv_dropdown_set_selected(year_dd, year - cur_date->year, LV_ANIM_OFF);
 
     lv_obj_t * month_dd = lv_obj_get_child(header, 1);
-    lv_dropdown_set_selected(month_dd, cur_date->month - 1);
+    lv_dropdown_set_selected(month_dd, cur_date->month - 1, LV_ANIM_OFF);
 }
 
 #endif /*LV_USE_CALENDAR_HEADER_ARROW*/

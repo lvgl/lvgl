@@ -87,7 +87,7 @@ the options string's contents must remain available for the life of the Drop-Dow
 List and :cpp:func:`lv_dropdown_add_option` cannot be used.
 
 You can select an option programmatically with
-:cpp:expr:`lv_dropdown_set_selected(dropdown, id)`, where ``id`` is the index of
+:cpp:expr:`lv_dropdown_set_selected(dropdown, id, LV_ANIM_ON/LV_ANIM_OFF)`, where ``id`` is the index of
 the target option.
 
 Get selected option
