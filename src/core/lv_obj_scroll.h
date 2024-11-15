@@ -93,6 +93,7 @@ lv_scrollbar_mode_t lv_obj_get_scrollbar_mode(const lv_obj_t * obj);
 /**
  * Get directions Widget can be scrolled (set with `lv_obj_set_scroll_dir()`)
  * @param obj       pointer to Widget
+ * @return          current scroll direction bit(s)
  */
 lv_dir_t lv_obj_get_scroll_dir(const lv_obj_t * obj);
 

@@ -1,11 +1,11 @@
 #include "../lv_examples.h"
 #if LV_BUILD_EXAMPLES
 
-lv_obj_t  * panel;
-lv_obj_t  * save_button;
-lv_obj_t  * restore_button;
-int         saved_scroll_x;
-int         saved_scroll_y;
+static lv_obj_t  * panel;
+static lv_obj_t  * save_button;
+static lv_obj_t  * restore_button;
+static int         saved_scroll_x;
+static int         saved_scroll_y;
 
 static void scroll_update_cb(lv_event_t * e);
 static void button_event_cb(lv_event_t * e);
@@ -14,7 +14,8 @@ static void scroll_update_cb(lv_event_t * e)
 {
     LV_UNUSED(e);
 
-    LV_LOG("scroll info: x:%3d, y:%3d, top:%3d, bottom:%3d, left:%3d, right:%3d\n",
+    LV_LOG("scroll info: x:%3"LV_PRId32", y:%3"LV_PRId32", top:%3"LV_PRId32", "
+           "bottom:%3"LV_PRId32", left:%3"LV_PRId32", right:%3"LV_PRId32"\n",
            lv_obj_get_scroll_x(panel),
            lv_obj_get_scroll_y(panel),
            lv_obj_get_scroll_top(panel),
@@ -24,7 +25,7 @@ static void scroll_update_cb(lv_event_t * e)
           );
 }
 
-void button_event_cb(lv_event_t * e)
+static void button_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target_obj(e);
 
