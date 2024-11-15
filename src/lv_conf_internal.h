@@ -4041,6 +4041,15 @@
 	#endif
 #endif
 
+/** High-resolution demo */
+#ifndef LV_USE_DEMO_HIGH_RES
+    #ifdef CONFIG_LV_USE_DEMO_HIGH_RES
+        #define LV_USE_DEMO_HIGH_RES CONFIG_LV_USE_DEMO_HIGH_RES
+    #else
+        #define LV_USE_DEMO_HIGH_RES        0
+    #endif
+#endif
+
 
 
 /*----------------------------------
