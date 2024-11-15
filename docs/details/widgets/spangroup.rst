@@ -15,7 +15,7 @@ See example below.
 
 A Spangroup contains 0 or more Span Descriptors ("Spans").  Each Span contains its
 own text and style properties for that text.  You add 1 Span (as a child) to the
-Spangroup for each "span" of uniquely-style text needed.  Each Span so added is
+Spangroup for each "span" of uniquely-styled text needed.  Each Span so added is
 appended to the end of the list.  The list sequence determines the order in which the
 Spans are displayed.  Spans can be added to, and removed from, the Spangroup
 throughout its life.  The number of Spans that can be added is limited only by

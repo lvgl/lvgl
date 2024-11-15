@@ -88,7 +88,7 @@ Keys
   *Encoder* decrement/increment the selected digit.
 - ``LV_KEY_UP/DOWN`` With *Keypad* and *Encoder* increment/decrement
   the value.
-- :cpp:enumerator:`LV_KEY_ENTER` With *Encoder*, move focus to net digit.  If focus
+- :cpp:enumerator:`LV_KEY_ENTER` With *Encoder*, move focus to next digit.  If focus
   is on last digit, focus moves to first digit.
 
 .. admonition::  Further Reading
