@@ -145,12 +145,7 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
 #endif
 
 #if LV_USE_PARALLEL_DRAW_DEBUG
-    uint32_t idx = 0;
-    lv_draw_unit_t * draw_unit_tmp = _draw_info.unit_head;
-    while(draw_unit_tmp != draw_unit) {
-        draw_unit_tmp = draw_unit_tmp->next;
-        idx++;
-    }
+    int32_t idx = draw_unit->idx;
 
     lv_draw_fill_dsc_t fill_dsc;
     lv_draw_fill_dsc_init(&fill_dsc);

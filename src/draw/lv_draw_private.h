@@ -94,9 +94,10 @@ struct _lv_draw_unit_t {
     const lv_area_t * clip_area;
 
     /**
-     * Name of the draw unit, for debugging purposes only.
+     * Name and ID of the draw unit, for debugging purposes only.
      */
     const char * name;
+    int32_t idx;
 
     /**
      * Called to try to assign a draw task to itself.

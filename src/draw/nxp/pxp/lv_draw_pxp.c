@@ -412,12 +412,8 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
         if(!lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area))
             return;
 
-        int32_t idx = 0;
-        lv_draw_unit_t * draw_unit_tmp = _draw_info.unit_head;
-        while(draw_unit_tmp != (lv_draw_unit_t *)u) {
-            draw_unit_tmp = draw_unit_tmp->next;
-            idx++;
-        }
+        int32_t idx = u->base_unit.idx;
+
         lv_draw_rect_dsc_t rect_dsc;
         lv_draw_rect_dsc_init(&rect_dsc);
         rect_dsc.bg_color = lv_palette_main(idx % LV_PALETTE_LAST);

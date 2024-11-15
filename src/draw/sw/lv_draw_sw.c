@@ -80,7 +80,6 @@ void lv_draw_sw_init(void)
         lv_draw_sw_unit_t * draw_sw_unit = lv_draw_create_unit(sizeof(lv_draw_sw_unit_t));
         draw_sw_unit->base_unit.dispatch_cb = dispatch;
         draw_sw_unit->base_unit.evaluate_cb = evaluate;
-        draw_sw_unit->idx = i;
         draw_sw_unit->base_unit.delete_cb = LV_USE_OS ? lv_draw_sw_delete : NULL;
         draw_sw_unit->base_unit.name = "SW";
 
@@ -300,12 +299,8 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
         lv_area_t draw_area;
         if(!lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area)) return;
 
-        int32_t idx = 0;
-        lv_draw_unit_t * draw_unit_tmp = _draw_info.unit_head;
-        while(draw_unit_tmp != (lv_draw_unit_t *)u) {
-            draw_unit_tmp = draw_unit_tmp->next;
-            idx++;
-        }
+        int32_t idx = u->base_unit.idx;
+
         lv_draw_fill_dsc_t fill_dsc;
         lv_draw_fill_dsc_init(&fill_dsc);
         fill_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
