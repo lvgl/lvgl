@@ -39,6 +39,12 @@ Example
     /* Release the DOM tree*/
     lv_svg_node_delete(svg_doc);
 
+`lv_image` also supports svg image, For example:
+
+.. code-block:: c
+
+    lv_image_set_src(widget, "S:path/to/example.svg");
+
 .. _svg_api:
 
 API
