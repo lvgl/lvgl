@@ -780,6 +780,28 @@ void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, co
     }
 }
 
+vg_lite_color_t lv_vg_lite_image_recolor(vg_lite_buffer_t * buffer, const lv_draw_image_dsc_t * dsc)
+{
+    LV_ASSERT_NULL(buffer);
+    LV_ASSERT_NULL(dsc);
+
+    if((buffer->format == VG_LITE_A4 || buffer->format == VG_LITE_A8) || dsc->recolor_opa > LV_OPA_TRANSP) {
+        /* alpha image and image recolor */
+        buffer->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+        return lv_vg_lite_color(dsc->recolor, LV_OPA_MIX2(dsc->opa, dsc->recolor_opa), true);
+    }
+
+    if(dsc->opa < LV_OPA_COVER) {
+        /* normal image opa */
+        buffer->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+        vg_lite_color_t color;
+        lv_memset(&color, dsc->opa, sizeof(color));
+        return color;
+    }
+
+    return 0;
+}
+
 bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src,
                                   bool no_cache, bool premultiply)
 {
