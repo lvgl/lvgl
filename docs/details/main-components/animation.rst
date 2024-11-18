@@ -10,7 +10,7 @@ the thing being changed can be virtually anything in your system.  It is very
 convenient to apply this to LVGL Widgets in your user interface (UI), to change their
 appearance, size or location over time.  But because it is --- at its core --- a
 generic change-over-time manager, complete with a variety of optional event
-callbacks, its application can be much wider than just to UI components.
+callbacks, its application can be wider than just to UI components.
 
 For each Animation you create, it accomplishes the above by providing a generic
 method of varying a signed integer from a start value to an end value over a
@@ -65,8 +65,9 @@ height being changed by another Animation.
 Create an Animation
 *******************
 
-To create an Animation an :cpp:type:`lv_anim_t` variable has to be initialized
-and configured with ``lv_anim_set_...()`` functions.
+To create an Animation, start by creating an Animation *template* in an
+:cpp:type:`lv_anim_t` variable.  It has to be initialized and configured with
+``lv_anim_set_...()`` functions.
 
 .. code-block:: c
 
@@ -157,7 +158,7 @@ Alternately, you can provide your own Path function.
 
 :cpp:expr:`lv_anim_init(&my_anim)` sets the Path to :cpp:func:`lv_anim_path_linear`
 by default.  If you want to use a different Path (including a custom Path function
-you create), you set it using :cpp:expr:`lv_anim_set_path_cb(&anim_template, path_cb)`.
+you provide), you set it using :cpp:expr:`lv_anim_set_path_cb(&anim_template, path_cb)`.
 
 If you provide your own custom Path function, its prototype is:
 
@@ -177,7 +178,7 @@ Normally, you set the Animation duration directly using
 the *rate* is known but the duration is not known.  Given an Animation's ``start``
 and ``end`` values, *rate* here means the number of units of change per second, i.e.
 how quickly (units per second) the Animation's value needs to change between the
-``start`` and ``end`` value.  In such cases there is a utility function
+``start`` and ``end`` value.  For such cases there is a utility function
 :cpp:func:`lv_anim_speed_to_time` you can use to compute the Animation's duration, so
 you can set it like this:
 
@@ -263,12 +264,12 @@ from the list of running Animations.  This does not impact your Animation templa
 Deleting Animations
 *******************
 
-If one of these two conditions exists:
+You should delete an Animation using :cpp:expr:`lv_anim_delete(var, func)` if one of
+these two conditions exists:
 
 - the object (variable) being animated stops being relevant, or
-- a running animation needs to be stopped before it is completed,
+- a running animation needs to be stopped before it is completed.
 
-you should delete the animation using :cpp:expr:`lv_anim_delete(var, func)`.
 If you kept a copy of the pointer returned by :cpp:func:`lv_anim_start` as
 ``running_anim``, you can delete the running animation like this:
 
@@ -316,7 +317,7 @@ It supports forward and backward playback of the entire Animation group, using
 :cpp:expr:`lv_anim_timeline_set_reverse(timeline, reverse)`. Note that if you want to
 play in reverse from the end of the Timeline, you need to call
 :cpp:expr:`lv_anim_timeline_set_progress(timeline, LV_ANIM_TIMELINE_PROGRESS_MAX)`
-after adding all Animations and before starting to play.
+after adding all Animations and before telling it to start playing.
 
 Call :cpp:expr:`lv_anim_timeline_pause(timeline)` to pause the Animation Timeline.
 Note:  this does not preserve its state.  The only way to start it again is to call
@@ -332,7 +333,7 @@ proportion of the Timeline that has "played".  Example:  a ``progress`` value of
 half-way point.
 
 Call :cpp:expr:`lv_anim_timeline_get_playtime(timeline)` function to get the total
-duration of the entire Animation Timeline.
+duration (in milliseconds) of the entire Animation Timeline.
 
 Call :cpp:expr:`lv_anim_timeline_get_reverse(timeline)` function to get whether the
 Animation Timeline is also played in reverse after its forward play completes.
