@@ -1063,7 +1063,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #endif
 
 #if LV_USE_LABEL && LV_USE_TEXTAREA
-    else if (lv_obj_check_type(obj, &lv_label_class) && lv_obj_check_type(parent, &lv_textarea_class)) {
+    else if(lv_obj_check_type(obj, &lv_label_class) && lv_obj_check_type(parent, &lv_textarea_class)) {
         lv_obj_add_style(obj, &theme->styles.bg_color_primary, LV_PART_SELECTED);
     }
 #endif
