@@ -626,8 +626,15 @@ void lv_obj_refr_pos(lv_obj_t * obj)
     /*Handle percentage value*/
     int32_t pw = lv_obj_get_content_width(parent);
     int32_t ph = lv_obj_get_content_height(parent);
-    if(LV_COORD_IS_PCT(x)) x = (pw * LV_COORD_GET_PCT(x)) / 100;
-    if(LV_COORD_IS_PCT(y)) y = (ph * LV_COORD_GET_PCT(y)) / 100;
+    if(LV_COORD_IS_PCT(x)) {
+        if(lv_obj_get_style_width(parent, 0) == LV_SIZE_CONTENT) x = 0; /*Avoid circular dependency*/
+        else x = (pw * LV_COORD_GET_PCT(x)) / 100;
+    }
+
+    if(LV_COORD_IS_PCT(y)) {
+        if(lv_obj_get_style_height(parent, 0) == LV_SIZE_CONTENT) y = 0; /*Avoid circular dependency*/
+        y = (ph * LV_COORD_GET_PCT(y)) / 100;
+    }
 
     /*Handle percentage value of translate*/
     int32_t tr_x = lv_obj_get_style_translate_x(obj, LV_PART_MAIN);
@@ -881,7 +888,7 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     if(!lv_area_intersect(area, area, &obj_coords)) return false;
 
     if(!is_transformed(obj)) {
-        *area = obj->coords;
+        *area = obj_coords;
     }
     else {
         lv_obj_get_transformed_area(obj, area, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);

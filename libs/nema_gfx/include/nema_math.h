@@ -269,7 +269,7 @@ int nema_f2fx(float f); //   ((int)(((a)*((float)0x10000)+0.5f)))
  * \return Remainder
  *
  */
-#define nema_fmod(x, y) (x - nema_truncf(x / y) * y)
+#define nema_fmod(x, y) ( (x) - nema_truncf( ( (x) / (y) ) ) * (y) )
 
 #ifdef __cplusplus
 }

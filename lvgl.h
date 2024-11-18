@@ -36,12 +36,14 @@ extern "C" {
 #include "src/misc/lv_iter.h"
 #include "src/misc/lv_circle_buf.h"
 #include "src/misc/lv_tree.h"
-  
+#include "src/misc/cache/lv_image_cache.h"
+
 #include "src/tick/lv_tick.h"
 
 #include "src/core/lv_obj.h"
 #include "src/core/lv_group.h"
 #include "src/indev/lv_indev.h"
+#include "src/indev/lv_indev_gesture.h"
 #include "src/core/lv_refr.h"
 #include "src/display/lv_display.h"
 
@@ -113,10 +115,9 @@ extern "C" {
 
 #include "src/layouts/lv_layout.h"
 
-#include "src/draw/lv_draw.h"
 #include "src/draw/lv_draw_buf.h"
 #include "src/draw/lv_draw_vector.h"
-#include "src/draw/sw/lv_draw_sw.h"
+#include "src/draw/sw/lv_draw_sw_utils.h"
 
 #include "src/themes/lv_theme.h"
 
@@ -129,6 +130,7 @@ extern "C" {
 #if LV_USE_PRIVATE_API
 #include "src/lvgl_private.h"
 #endif
+
 
 /*********************
  *      DEFINES

@@ -7,15 +7,15 @@ Lottie (lv_lottie)
 Overview
 ********
 
-The Lottie widget is capable of parsing, rasterizing, and playing `Lottie animations <https://lottiefiles.com>`__.
+The Lottie Widget is capable of parsing, rasterizing, and playing `Lottie animations <https://lottiefiles.com>`__.
 
 The Lottie animations are vector based animation. Think of it as the modern combination of SVG and GIF.
 
 The animations can be downloaded from various sources, such as `https://lottiefiles.com/ <https://lottiefiles.com/>`__
-or you can create your own animations using for example Adobe After Effects.
+or you can create your own animations using, for example, Adobe After Effects.
 
-The Lottie widget is based on :ref:`lv_canvas` because in order to render the animation
-the user needs to provide a buffer where the current frame is stored.
+The Lottie Widget is based on :ref:`lv_canvas` because in order to render the animation
+the user needs to provide a buffer where the current animation frame is stored.
 
 .. _lv_lottie_parts_and_styles:
 
@@ -32,9 +32,9 @@ Usage
 Dependencies
 ------------
 
-The Lottie widget uses the `ThorVG <https://github.com/thorvg/thorvg>`__ library which is `integrated into LVGL <https://github.com/lvgl/lvgl/tree/master/src/libs/thorvg>`__.
+The Lottie Widget uses the `ThorVG <https://github.com/thorvg/thorvg>`__ library which is `integrated into LVGL <https://github.com/lvgl/lvgl/tree/master/src/libs/thorvg>`__.
 In order to use Lottie animations :c:macro:`LV_USE_THORVG_INTERNAL` (to use the built-in ThorVG) or
-:c:macro:`LV_USE_THORVG_EXTERNAL` (to link it externally) needs to enabled. For vector graphics in general
+:c:macro:`LV_USE_THORVG_EXTERNAL` (to link it externally) needs to enabled in ``lv_conf.h``. For vector graphics in general
 :c:macro:`LV_USE_VECTOR_GRAPHIC` also needs to be enabled.
 
 As ThorVG is written in C++, when using :c:macro:`LV_USE_THORVG_INTERNAL` be sure that you
@@ -43,12 +43,12 @@ can compile the cpp files.
 Set a buffer
 ------------
 
-In order to render the animation a buffer needs to assign to the Lottie widget.
+In order to render the animation a buffer needs to be assigned to the Lottie Widget.
 The animations are rendered in ARGB8888 format, therefor the buffer's size should be equal to
 ``target_width x target_height x 4`` bytes.
 
 To keep the buffer size and the animation size consistent,
-the size of the widget (i.e. the size of the animation) is set to the dimensions of the buffer internally.
+the size of the Widget (i.e. the size of the animation) is set to the dimensions of the buffer internally.
 
 The buffer can be set with either :cpp:expr:`lv_lottie_set_buffer(lottie, w, h, buf)`
 or :cpp:expr:`lv_lottie_set_draw_buf(lottie, draw_buf)`.
@@ -58,17 +58,20 @@ When a draw buffer is used, it must be already initialized by the user with :cpp
 Set a source
 ------------
 
-``lv_example_lottie_approve.c`` contains an example animation. Instead storing the JSON string, a hex array is stored for the
+``lv_example_lottie_approve.c`` contains an example animation. Instead of storing the JSON string, a hex array is stored for the
 following reasons:
-- avoid escaping ``"`` character in the JSON file
-- some compilers don't support very long strings
 
-``lvgl/scripts/filetohex.py`` can be used to convert a Lottie file a hex
+- to avoid escaping ``"`` character in the JSON file, and
+- some compilers don't support very long strings.
+
+``lvgl/scripts/filetohex.py`` can be used to convert a Lottie file to a hex
 array. E.g.:
 
 .. code-block:: shell
 
-   ./filetohex.py path/to/lottie.json > out.txt
+   ./filetohex.py path/to/lottie.json --filter-character --null-terminate > out.txt
+
+``--filter-character`` filters out non-ASCII characters and ``--null-terminate`` makes sure that a trailing zero is appended to properly close the string.
 
 To create an animation from data use
 :cpp:expr:`lv_lottie_set_src_data(lottie, data, sizeof(data))`
@@ -79,7 +82,11 @@ Note that the Lottie loader doesn't support LVGL's File System interface but a "
 Get the animation
 -----------------
 
-``lv_anim_t * a = lv_lottie_get_anim(lottie)`` return the LVGL animation which controls the
+.. code-block:: c
+
+    lv_anim_t * a = lv_lottie_get_anim(lottie)
+
+returns the LVGL animation which controls the
 Lottie animation. By default it is running infinitely at 60FPS however the LVGL animation
 can be freely adjusted.
 
@@ -90,7 +97,7 @@ can be freely adjusted.
 Events
 ******
 
-No *Keys* are processed by Lottie Widgets.
+No events are emitted by Lottie Widgets.
 
 .. admonition::  Further Reading
 

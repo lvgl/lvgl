@@ -12,6 +12,7 @@
  *      INCLUDES
  ********************/
 #include "lv_indev_scroll.h"
+#include "lv_indev_gesture.h"
 #include "../display/lv_display_private.h"
 #include "../core/lv_global.h"
 #include "../core/lv_obj_private.h"
@@ -369,6 +370,13 @@ void lv_indev_set_long_press_time(lv_indev_t * indev, uint16_t long_press_time)
     indev->long_press_time = long_press_time;
 }
 
+void lv_indev_set_long_press_repeat_time(lv_indev_t * indev, uint16_t long_press_repeat_time)
+{
+    if(indev == NULL) return;
+
+    indev->long_press_repeat_time = long_press_repeat_time;
+}
+
 void lv_indev_set_scroll_limit(lv_indev_t * indev, uint8_t scroll_limit)
 {
     if(indev == NULL) return;
@@ -720,6 +728,9 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->pointer.act_point.x = data->point.x;
     i->pointer.act_point.y = data->point.y;
     i->pointer.diff = data->enc_diff;
+
+    i->gesture_type = data->gesture_type;
+    i->gesture_data = data->gesture_data;
 
     /*Process the diff first as scrolling will be processed in indev_proc_release*/
     indev_proc_pointer_diff(i);
@@ -1270,12 +1281,23 @@ static void indev_proc_press(lv_indev_t * indev)
         indev->pointer.press_moved = 1;
     }
 
+    /* Send a gesture event to a potential indev cb callback, even if no object was found */
+    if(indev->gesture_type != LV_INDEV_GESTURE_NONE) {
+        lv_indev_send_event(indev, LV_EVENT_GESTURE, indev_act);
+    }
+
     if(indev_obj_act) {
         const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+
+        if(indev->gesture_type != LV_INDEV_GESTURE_NONE) {
+            /* NOTE: hardcoded to pinch for now */
+            if(send_event(LV_EVENT_GESTURE, indev_act) == LV_RESULT_INVALID) return;
+        }
 
         if(is_enabled) {
             if(send_event(LV_EVENT_PRESSING, indev_act) == LV_RESULT_INVALID) return;
         }
+
 
         if(indev_act->wait_until_release) return;
 
@@ -1356,10 +1378,19 @@ static void indev_proc_release(lv_indev_t * indev)
         lv_timer_pause(indev->read_timer);
     }
 
+    /* Send a gesture event to a potential indev cb callback, even if no object was found */
+    if(indev->gesture_type != LV_INDEV_GESTURE_NONE) {
+        lv_indev_send_event(indev, LV_EVENT_GESTURE, indev_act);
+    }
+
     if(indev_obj_act) {
         LV_LOG_INFO("released");
 
         const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+
+        if(is_enabled && indev->gesture_type != LV_INDEV_GESTURE_NONE) {
+            if(send_event(LV_EVENT_GESTURE, indev_act) == LV_RESULT_INVALID) return;
+        }
 
         if(is_enabled) {
             if(send_event(LV_EVENT_RELEASED, indev_act) == LV_RESULT_INVALID) return;

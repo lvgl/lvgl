@@ -18,6 +18,7 @@
 
 #include "../../misc/lv_timer.h"
 #include "../../core/lv_obj_class_private.h"
+#include "../../misc/cache/lv_image_cache.h"
 
 /*********************
  *      DEFINES

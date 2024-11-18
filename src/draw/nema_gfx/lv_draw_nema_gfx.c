@@ -140,10 +140,7 @@ static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * ta
             }
 #if LV_USE_NEMA_VG
         case LV_DRAW_TASK_TYPE_TRIANGLE:
-        case LV_DRAW_TASK_TYPE_ARC: {
-                lv_draw_arc_dsc_t * draw_arc_dsc = (lv_draw_arc_dsc_t *) task->draw_dsc;
-                if(draw_arc_dsc->rounded == 0) break;
-            }
+        case LV_DRAW_TASK_TYPE_ARC:
         case LV_DRAW_TASK_TYPE_FILL: {
                 if(task->preference_score > 80) {
                     task->preference_score = 80;
@@ -177,7 +174,16 @@ static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * ta
 #endif
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * draw_image_dsc = (lv_draw_image_dsc_t *) task->draw_dsc;
-                if(draw_image_dsc->blend_mode == LV_BLEND_MODE_NORMAL || draw_image_dsc->blend_mode == LV_BLEND_MODE_ADDITIVE) {
+                /*Guard for previous NemaGFX Version*/
+#ifndef NEMA_BLOP_RECOLOR
+                if(draw_image_dsc->recolor_opa > LV_OPA_MIN)
+                    break;
+#endif
+                const lv_image_dsc_t * img_dsc = draw_image_dsc->src;
+                if(!lv_nemagfx_is_cf_supported(img_dsc->header.cf))
+                    break;
+
+                if(draw_image_dsc->blend_mode != LV_BLEND_MODE_SUBTRACTIVE) {
                     if(task->preference_score > 80) {
                         task->preference_score = 80;
                         task->preferred_draw_unit_id = DRAW_UNIT_ID_NEMA_GFX;
@@ -246,11 +252,11 @@ static int32_t nema_gfx_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
     /* Return 0 is no selection, some tasks can be supported by other units. */
     if(t == NULL || t->preferred_draw_unit_id != DRAW_UNIT_ID_NEMA_GFX)
-        return 0;
+        return LV_DRAW_UNIT_IDLE;
 
     void * buf = lv_draw_layer_alloc_buf(layer);
     if(buf == NULL)
-        return -1;
+        return LV_DRAW_UNIT_IDLE;
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_nema_gfx_unit->base_unit.target_layer = layer;

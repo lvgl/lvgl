@@ -13,8 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-
 #include "lv_image_decoder.h"
+#include "../misc/cache/lv_cache.h"
 
 /*********************
  *      DEFINES

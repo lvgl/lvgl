@@ -4,17 +4,23 @@
 Spinner (lv_spinner)
 ====================
 
+
 Overview
 ********
 
-The Spinner Widget is a spinning arc over a ring.
+The Spinner Widget is a spinning arc over a ring, typically used to show some type of
+activity is in progress.
+
+
 
 .. _lv_spinner_parts_and_styles:
 
 Parts and Styles
 ****************
 
-The parts are identical to the parts of :ref:`lv_arc`.
+Spinner's parts are identical to those of :ref:`Arc <lv_arc_parts_and_styles>`.
+
+
 
 .. _lv_spinner_usage:
 
@@ -27,8 +33,8 @@ Create a spinner
 To create a spinner use
 :cpp:expr:`lv_spinner_create(parent)`.
 
-Using :cpp:expr:`lv_spinner_set_anim_params(spinner, spin_duration, angle)` the duration
-of one revolution and the length of he arc can be customized.
+Use :cpp:expr:`lv_spinner_set_anim_params(spinner, spin_duration, angle)` to
+customize the duration of one revolution and the length of the arc.
 
 
 
@@ -37,7 +43,7 @@ of one revolution and the length of he arc can be customized.
 Events
 ******
 
-No special events are sent to Spinner Widgets.
+No special events are sent by Spinner Widgets.
 
 .. admonition::  Further Reading
 

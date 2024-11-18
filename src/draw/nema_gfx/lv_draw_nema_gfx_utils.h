@@ -83,6 +83,13 @@ uintptr_t NEMA_VIRT2PHYS(void * addr);
  **********************/
 
 /**
+ * Check if  `lv_color_format_t` is supported.
+ * @param     cf  The LVGL color format
+ * @return        True/false
+ */
+bool lv_nemagfx_is_cf_supported(lv_color_format_t cf);
+
+/**
  * Convert a `lv_color_format_t` to a Nema color format.
  * @param     cf  The LVGL color format
  * @return        The Nema color format

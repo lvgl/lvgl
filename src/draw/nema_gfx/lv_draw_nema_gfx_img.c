@@ -45,6 +45,8 @@ static void _draw_nema_gfx_tile(lv_draw_unit_t * draw_unit, const lv_draw_image_
 
 static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
+static uint32_t lv_nemagfx_mask_cf_to_nema(lv_color_format_t cf);
+
 /**********************
  *  STATIC FUNCTIONS
  **********************/
@@ -114,7 +116,7 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
     lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
-    /* bool recolor = (dsc->recolor_opa > LV_OPA_MIN); */
+    bool recolor = (dsc->recolor_opa > LV_OPA_MIN);
 
     /*Make the blend area relative to the buffer*/
     lv_area_move(&blend_area, -layer->buf_area.x1, -layer->buf_area.y1);
@@ -151,18 +153,30 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
     nema_bind_src_tex((uintptr_t)(src_buf), tex_w, tex_h, src_nema_cf, src_stride,
                       dsc->antialias ? NEMA_FILTER_BL : NEMA_FILTER_PS);
 
-    /* if(recolor) {
-           lv_color32_t col32 = lv_color_to_32(dsc->recolor, LV_OPA_MIX2(dsc->recolor_opa, dsc->opa));
-           uint32_t color = nema_rgba(col32.red, col32.green, col32.blue, col32.alpha);
-           nema_set_recolor_color(color);
-           blending_mode |= NEMA_BLOP_RECOLOR;
-       } */
+    /*Guard for previous NemaGFX Version*/
+#ifdef NEMA_BLOP_RECOLOR
+    if(recolor) {
+        lv_color32_t col32 = lv_color_to_32(dsc->recolor, LV_OPA_MIX2(dsc->recolor_opa, dsc->opa));
+        uint32_t color = nema_rgba(col32.red, col32.green, col32.blue, col32.alpha);
+        nema_set_recolor_color(color);
+        blending_mode |= NEMA_BLOP_RECOLOR;
+    }
+#endif
 
     if(dsc->opa < 255) {
         uint32_t rgba = ((uint32_t)dsc->opa << 24U) | ((uint32_t)dsc->opa << 16U) | ((uint32_t)dsc->opa << 8U) | ((
                                                                                                                       uint32_t)dsc->opa);
         nema_set_const_color(rgba);
         blending_mode |= NEMA_BLOP_MODULATE_A;
+    }
+
+    if(dsc->bitmap_mask_src != NULL) {
+        blending_mode |= NEMA_BLOP_STENCIL_TXTY;
+        const lv_image_dsc_t * mask = dsc->bitmap_mask_src;
+        const void * mask_buf = mask->data;
+        nema_bind_tex(NEMA_TEX3, (uintptr_t)NEMA_VIRT2PHYS(mask_buf), mask->header.w, mask->header.h,
+                      lv_nemagfx_mask_cf_to_nema(mask->header.cf),
+                      mask->header.stride, NEMA_FILTER_BL);
     }
 
     nema_set_blend_blit(blending_mode);
@@ -208,6 +222,26 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
     nema_cl_submit(&(draw_nema_gfx_unit->cl));
 
 }
+
+/*NemaGFX does mask operations with A8,A4,A2 and A1 formats*/
+static uint32_t lv_nemagfx_mask_cf_to_nema(lv_color_format_t cf)
+{
+    switch(cf) {
+        case LV_COLOR_FORMAT_A1:
+            return NEMA_A1;
+        case LV_COLOR_FORMAT_A2:
+            return NEMA_A2;
+        case LV_COLOR_FORMAT_A4:
+            return NEMA_A4;
+        case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_L8:
+        default:
+            break;
+    }
+
+    return NEMA_A8;
+}
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
