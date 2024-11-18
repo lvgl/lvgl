@@ -43,6 +43,7 @@ extern "C" {
 #include "src/core/lv_obj.h"
 #include "src/core/lv_group.h"
 #include "src/indev/lv_indev.h"
+#include "src/indev/lv_indev_gesture.h"
 #include "src/core/lv_refr.h"
 #include "src/display/lv_display.h"
 
@@ -129,6 +130,7 @@ extern "C" {
 #if LV_USE_PRIVATE_API
 #include "src/lvgl_private.h"
 #endif
+
 
 /*********************
  *      DEFINES
