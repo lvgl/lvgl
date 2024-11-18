@@ -67,6 +67,7 @@ void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
     lv_memzero(dsc, sizeof(lv_draw_label_dsc_t));
     dsc->opa = LV_OPA_COVER;
     dsc->color = lv_color_black();
+    dsc->text_length = LV_TEXT_LEN_MAX;
     dsc->font = LV_FONT_DEFAULT;
     dsc->sel_start = LV_DRAW_LABEL_NO_TXT_SEL;
     dsc->sel_end = LV_DRAW_LABEL_NO_TXT_SEL;
@@ -279,7 +280,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
     uint8_t is_first_space_after_cmd = 0;
 
     /*Write out all lines*/
-    while((!dsc->text_length || remaining_len) && dsc->text[line_start] != '\0') {
+    while(remaining_len && dsc->text[line_start] != '\0') {
         pos.x += x_ofs;
         line_start_x = pos.x;
 
@@ -294,7 +295,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
         const char * bidi_txt = dsc->text + line_start;
 #endif
 
-        while((!dsc->text_length || next_char_offset < remaining_len) && next_char_offset < line_end - line_start) {
+        while(next_char_offset < remaining_len && next_char_offset < line_end - line_start) {
             uint32_t logical_char_pos = 0;
 
             /* Check if the text selection is enabled */
