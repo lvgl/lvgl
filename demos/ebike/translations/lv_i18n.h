@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "../../../src/lv_conf_internal.h"
+#if LV_USE_DEMO_EBIKE
 
 #include LV_STDINT_INCLUDE
 
@@ -78,6 +79,7 @@ void __lv_i18n_reset(void);
 #define _(text) lv_i18n_get_text(text)
 #define _p(text, num) lv_i18n_get_text_plural(text, num)
 
+#endif /*LV_USE_DEMO_EBIKE*/
 
 #ifdef __cplusplus
 } /* extern "C" */
