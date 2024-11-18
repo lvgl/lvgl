@@ -17,7 +17,7 @@ body:
       placeholder: e.g. v9.0.0
     validations:
       required: true
-  - type: input
+  - type: textarea
     id: platform
     attributes:
       label: Platform
