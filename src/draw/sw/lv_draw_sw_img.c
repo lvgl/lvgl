@@ -333,7 +333,7 @@ static void radius_only(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
     }
 
     lv_draw_sw_mask_radius_param_t mask_param;
-    lv_draw_sw_mask_radius_init(&mask_param, img_coords, draw_dsc->clip_radius, false);
+    lv_draw_sw_mask_radius_init(&mask_param, &draw_dsc->image_area, draw_dsc->clip_radius, false);
 
     void * masks[2] = {0};
     masks[0] = &mask_param;
