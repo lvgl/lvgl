@@ -15,8 +15,8 @@ callbacks, its application can be wider than just to UI components.
 For each Animation you create, it accomplishes the above by providing a generic
 method of varying a signed integer from a start value to an end value over a
 specified time period.  It allows you to specify what object it applies to (the
-"variable") and even provide custom "user data", both of which are available in most
-of the callback functions that can be called as the Animation is playing through.
+"variable"), which is available in the callback functions that are called as the
+Animation is playing through.
 
 This variation over time can be linear (default), it can be on a path (curve) that
 you specify, and there is even a variety of commonly-used non-linear effects that can
