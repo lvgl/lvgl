@@ -75,7 +75,7 @@ d2_s32 lv_draw_dave2d_cf_fb_get(void)
             d2_fb_mode = d2_mode_argb8888;
             break;
         case DISPLAY_IN_FORMAT_32BITS_RGB888: ///< RGB888,   32 bits
-            d2_fb_mode = d2_mode_argb8888;
+            d2_fb_mode = d2_mode_argb8888; //GLCDC ignores Alpha when configured for RGB888
             break;
         case  DISPLAY_IN_FORMAT_16BITS_ARGB4444: ///< ARGB4444, 16 bits
             d2_fb_mode = d2_mode_argb4444;
@@ -118,7 +118,7 @@ d2_u32 lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(lv_color_format_t colour_format)
             d2_lvgl_mode = d2_mode_rgb565;
             break;
         case(LV_COLOR_FORMAT_RGB888):
-            d2_lvgl_mode = d2_mode_rgb888; //LV_COLOR_FORMAT_RGB888 is 3 byte format, not supported by GLCDC, or D2D as a framebuffer format
+            d2_lvgl_mode = d2_mode_rgb888;
             break;
         case(LV_COLOR_FORMAT_ARGB1555):
             d2_lvgl_mode = d2_mode_argb1555;
