@@ -106,6 +106,13 @@ lv_result_t lv_thread_sync_signal(lv_thread_sync_t * sync)
     return LV_RESULT_INVALID;
 }
 
+lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * sync)
+{
+    LV_UNUSED(sync);
+    LV_ASSERT(0);
+    return LV_RESULT_INVALID;
+}
+
 lv_result_t lv_thread_sync_delete(lv_thread_sync_t * sync)
 {
     LV_UNUSED(sync);

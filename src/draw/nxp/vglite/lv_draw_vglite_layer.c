@@ -18,9 +18,7 @@
 #if LV_USE_DRAW_VGLITE
 
 #include "../../../stdlib/lv_string.h"
-#if LV_USE_PARALLEL_DRAW_DEBUG
-    #include "../../../core/lv_global.h"
-#endif
+#include "../../../core/lv_global.h"
 
 /*********************
  *      DEFINES
@@ -38,9 +36,7 @@
  *  STATIC VARIABLES
  **********************/
 
-#if LV_USE_PARALLEL_DRAW_DEBUG
-    #define _draw_info LV_GLOBAL_DEFAULT()->draw_info
-#endif
+#define _draw_info LV_GLOBAL_DEFAULT()->draw_info
 
 /**********************
  *      MACROS
@@ -62,13 +58,15 @@ void lv_draw_vglite_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
     if(draw_buf == NULL)
         return;
 
-    const lv_area_t area_to_draw = {
-        .x1 = 0,
-        .y1 = 0,
-        .x2 = draw_buf->header.w - 1,
-        .y2 = draw_buf->header.h - 1
-    };
-    lv_draw_buf_invalidate_cache(draw_buf, &area_to_draw);
+    if(_draw_info.unit_cnt > 1) {
+        const lv_area_t area_to_draw = {
+            .x1 = 0,
+            .y1 = 0,
+            .x2 = draw_buf->header.w - 1,
+            .y2 = draw_buf->header.h - 1
+        };
+        lv_draw_buf_invalidate_cache(draw_buf, &area_to_draw);
+    }
 
     lv_draw_image_dsc_t new_draw_dsc = *draw_dsc;
     new_draw_dsc.src = draw_buf;
@@ -84,8 +82,8 @@ void lv_draw_vglite_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         int32_t w = lv_area_get_width(coords);
         int32_t h = lv_area_get_height(coords);
 
-        _lv_image_buf_get_transformed_area(&area_rot, w, h, draw_dsc->rotation, draw_dsc->scale_x, draw_dsc->scale_y,
-                                           &draw_dsc->pivot);
+        lv_image_buf_get_transformed_area(&area_rot, w, h, draw_dsc->rotation, draw_dsc->scale_x, draw_dsc->scale_y,
+                                          &draw_dsc->pivot);
 
         area_rot.x1 += coords->x1;
         area_rot.y1 += coords->y1;
@@ -93,7 +91,7 @@ void lv_draw_vglite_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         area_rot.y2 += coords->y1;
     }
     lv_area_t draw_area;
-    if(!_lv_area_intersect(&draw_area, &area_rot, draw_unit->clip_area)) return;
+    if(!lv_area_intersect(&draw_area, &area_rot, draw_unit->clip_area)) return;
 #endif
 
 #if LV_USE_LAYER_DEBUG
@@ -122,13 +120,13 @@ void lv_draw_vglite_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
 
     lv_draw_fill_dsc_t fill_dsc;
     lv_draw_rect_dsc_init(&fill_dsc);
-    fill_dsc.color = lv_palette_main(idx % _LV_PALETTE_LAST);
+    fill_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
     fill_dsc.opa = LV_OPA_10;
     lv_draw_sw_fill(draw_unit, &fill_dsc, &area_rot);
 
     lv_draw_border_dsc_t border_dsc;
     lv_draw_border_dsc_init(&border_dsc);
-    border_dsc.color = lv_palette_main(idx % _LV_PALETTE_LAST);
+    border_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
     border_dsc.opa = LV_OPA_100;
     border_dsc.width = 2;
     lv_draw_sw_border(draw_unit, &border_dsc, &area_rot);

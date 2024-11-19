@@ -17,6 +17,7 @@ extern "C" {
  *********************/
 
 #include "../../../lv_conf_internal.h"
+#include "../../../misc/lv_area_private.h"
 
 #if LV_USE_DRAW_ARM2D_SYNC
 
@@ -37,7 +38,7 @@ extern "C" {
  *********************/
 #ifndef LV_DRAW_SW_RGB565_SWAP
     #define LV_DRAW_SW_RGB565_SWAP(__buf_ptr, __buf_size_px)                    \
-        _lv_draw_sw_rgb565_swap_helium((__buf_ptr), (__buf_size_px))
+        lv_draw_sw_rgb565_swap_helium((__buf_ptr), (__buf_size_px))
 #endif
 
 #ifndef LV_DRAW_SW_IMAGE
@@ -49,7 +50,7 @@ extern "C" {
                          __blend_area,                                          \
                          __draw_unit,                                           \
                          __draw_dsc)                                            \
-        _lv_draw_sw_image_helium(   (__transformed),                            \
+        lv_draw_sw_image_helium(   (__transformed),                            \
                                     (__cf),                                     \
                                     (uint8_t *)(__src_buf),                     \
                                     (__img_coords),                             \
@@ -61,7 +62,7 @@ extern "C" {
 
 #ifndef LV_DRAW_SW_RGB565_RECOLOR
     #define LV_DRAW_SW_RGB565_RECOLOR(__src_buf, __blend_area, __color, __opa)  \
-        _lv_draw_sw_image_recolor_rgb565(   (__src_buf),                        \
+        lv_draw_sw_image_recolor_rgb565(   (__src_buf),                        \
                                             &(__blend_area),                    \
                                             (__color),                          \
                                             (__opa))
@@ -73,7 +74,7 @@ extern "C" {
                                         __color,                                \
                                         __opa,                                  \
                                         __cf)                                   \
-        _lv_draw_sw_image_recolor_rgb888(   (__src_buf),                        \
+        lv_draw_sw_image_recolor_rgb888(   (__src_buf),                        \
                                             &(__blend_area),                    \
                                             (__color),                          \
                                             (__opa),                            \
@@ -161,14 +162,14 @@ extern void arm_2d_helper_swap_rgb16(uint16_t * phwBuffer, uint32_t wCount);
         }                                                                       \
     } while(0);
 
-static inline lv_result_t _lv_draw_sw_rgb565_swap_helium(void * buf, uint32_t buf_size_px)
+static inline lv_result_t lv_draw_sw_rgb565_swap_helium(void * buf, uint32_t buf_size_px)
 {
     arm_2d_helper_swap_rgb16((uint16_t *)buf, buf_size_px);
     return LV_RESULT_OK;
 }
 
-static inline lv_result_t _lv_draw_sw_image_helium( 
-                                        bool is_transform, 
+static inline lv_result_t lv_draw_sw_image_helium(
+                                        bool is_transform,
                                         lv_color_format_t src_cf,
                                         const uint8_t *src_buf,
                                         const lv_area_t * coords,
@@ -217,7 +218,7 @@ static inline lv_result_t _lv_draw_sw_image_helium(
         /* ------------- prepare parameters for arm-2d APIs - BEGIN --------- */
 
         lv_area_t blend_area;
-        if(!_lv_area_intersect(&blend_area, des_area, draw_unit->clip_area)) {
+        if(!lv_area_intersect(&blend_area, des_area, draw_unit->clip_area)) {
             break;
         }
 
@@ -241,17 +242,17 @@ static inline lv_result_t _lv_draw_sw_image_helium(
 //            des_size.iWidth = (int16_t)des_w;
 //            des_size.iHeight = (int16_t)des_h;
 //        } while(0);
-//        
+//
 //        arm_2d_size_t copy_size = {
 //            .iWidth = MIN(des_size.iWidth, src_size.iWidth),
 //            .iHeight = MIN(des_size.iHeight, src_size.iHeight),
 //        };
-//        
+//
 //        int32_t des_stride = lv_draw_buf_width_to_stride(
-//                                lv_area_get_width(&layer->buf_area), 
+//                                lv_area_get_width(&layer->buf_area),
 //                                des_cf);
 //        uint8_t *des_buf_moved = (uint8_t *)lv_draw_layer_go_to_xy(
-//                                            layer, 
+//                                            layer,
 //                                            blend_area.x1 - layer->buf_area.x1,
 //                                            blend_area.y1 - layer->buf_area.y1);
         uint8_t *des_buf = (uint8_t *)lv_draw_layer_go_to_xy(layer, 0, 0);
@@ -524,7 +525,7 @@ static inline lv_result_t _lv_draw_sw_image_helium(
     return result;
 }
 
-static inline lv_result_t _lv_draw_sw_image_recolor_rgb565(
+static inline lv_result_t lv_draw_sw_image_recolor_rgb565(
                                                 const uint8_t *src_buf,
                                                 const lv_area_t * blend_area,
                                                 lv_color_t color,
@@ -548,7 +549,7 @@ static inline lv_result_t _lv_draw_sw_image_recolor_rgb565(
     return LV_RESULT_OK;
 }
 
-static inline lv_result_t _lv_draw_sw_image_recolor_rgb888(
+static inline lv_result_t lv_draw_sw_image_recolor_rgb888(
                                                 const uint8_t *src_buf,
                                                 const lv_area_t * blend_area,
                                                 lv_color_t color,

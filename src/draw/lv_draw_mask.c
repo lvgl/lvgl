@@ -6,7 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_mask.h"
+#include "lv_draw_mask_private.h"
+#include "lv_draw_private.h"
 #include "../core/lv_refr.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_types.h"
@@ -52,11 +53,12 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_mask_rect(lv_layer_t * layer, const lv_draw_m
         LV_LOG_WARN("Only layers with alpha channel can be masked");
         return;
     }
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
 
     lv_draw_task_t * t = lv_draw_add_task(layer, &layer->buf_area);
 
     t->draw_dsc = lv_malloc(sizeof(*dsc));
+    LV_ASSERT_MALLOC(t->draw_dsc);
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
     t->type = LV_DRAW_TASK_TYPE_MASK_RECTANGLE;
 
@@ -72,7 +74,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_mask_rect(lv_layer_t * layer, const lv_draw_m
     }
 
     lv_draw_finalize_task_creation(layer, t);
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 /**********************

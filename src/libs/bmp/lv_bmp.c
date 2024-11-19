@@ -6,10 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../draw/lv_image_decoder_private.h"
 #include "../../../lvgl.h"
 #if LV_USE_BMP
 
 #include <string.h>
+#include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES
@@ -35,7 +37,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * src, lv_image_header_t * header);
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 
 static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
@@ -82,34 +84,31 @@ void lv_bmp_deinit(void)
 
 /**
  * Get info about a BMP image
- * @param src can be file name or pointer to a C array
+ * @param dsc image descriptor containing the source and type of the image and other info.
  * @param header store the info here
  * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info
  */
-static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header)
 {
     LV_UNUSED(decoder);
 
-    lv_image_src_t src_type = lv_image_src_get_type(src);          /*Get the source type*/
+    const void * src = dsc->src;
+    lv_image_src_t src_type = dsc->src_type;          /*Get the source type*/
 
     /*If it's a BMP file...*/
     if(src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = src;
         if(lv_strcmp(lv_fs_get_ext(fn), "bmp") == 0) {              /*Check the extension*/
             /*Save the data in the header*/
-            lv_fs_file_t f;
-            lv_fs_res_t res = lv_fs_open(&f, src, LV_FS_MODE_RD);
-            if(res != LV_FS_RES_OK) return LV_RESULT_INVALID;
             uint8_t headers[54];
 
-            lv_fs_read(&f, headers, 54, NULL);
+            lv_fs_read(&dsc->file, headers, 54, NULL);
             uint32_t w;
             uint32_t h;
             lv_memcpy(&w, headers + 18, 4);
             lv_memcpy(&h, headers + 22, 4);
             header->w = w;
             header->h = h;
-            lv_fs_close(&f);
 
             uint16_t bpp;
             lv_memcpy(&bpp, headers + 28, 2);
@@ -161,7 +160,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         lv_memset(&b, 0x00, sizeof(b));
 
         lv_fs_res_t res = lv_fs_open(&b.f, dsc->src, LV_FS_MODE_RD);
-        if(res == LV_RESULT_OK) return LV_RESULT_INVALID;
+        if(res != LV_FS_RES_OK) return LV_RESULT_INVALID;
 
         uint8_t header[54];
         lv_fs_read(&b.f, header, 54, NULL);
@@ -206,11 +205,11 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         lv_draw_buf_t * reshaped = lv_draw_buf_reshape(decoded, dsc->header.cf, w_px, 1, LV_STRIDE_AUTO);
         if(reshaped == NULL) {
             if(decoded != NULL) {
-                lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, decoded);
+                lv_draw_buf_destroy(decoded);
                 decoded = NULL;
                 dsc->decoded = NULL;
             }
-            decoded = lv_draw_buf_create_user(image_cache_draw_buf_handlers, w_px, 1, dsc->header.cf, LV_STRIDE_AUTO);
+            decoded = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, w_px, 1, dsc->header.cf, LV_STRIDE_AUTO);
             if(decoded == NULL) return LV_RESULT_INVALID;
         }
         else {
@@ -247,7 +246,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
     bmp_dsc_t * b = dsc->user_data;
     lv_fs_close(&b->f);
     lv_free(dsc->user_data);
-    if(dsc->decoded) lv_draw_buf_destroy_user(image_cache_draw_buf_handlers, (void *)dsc->decoded);
+    if(dsc->decoded) lv_draw_buf_destroy((void *)dsc->decoded);
 
 }
 

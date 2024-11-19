@@ -82,7 +82,7 @@ void lv_draw_vglite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * 
     lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t clipped_coords;
-    if(!_lv_area_intersect(&clipped_coords, &relative_coords, &clip_area))
+    if(!lv_area_intersect(&clipped_coords, &relative_coords, &clip_area))
         return; /*Fully clipped, nothing to do*/
 
     /*

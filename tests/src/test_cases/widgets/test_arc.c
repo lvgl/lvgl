@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "../../lvgl_private.h"
 
 #include "unity/unity.h"
 #include "lv_test_indev.h"
@@ -17,9 +18,12 @@ void test_arc_angles_when_reversed(void);
 
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * arc = NULL;
+static lv_obj_t * arc2 = NULL;
 static uint32_t event_cnt;
+static uint32_t event_cnt2;
 
 static void dummy_event_cb(lv_event_t * e);
+static void dummy_event_cb2(lv_event_t * e);
 
 void setUp(void)
 {
@@ -205,6 +209,8 @@ void test_arc_click_sustained_from_start_to_end_does_not_set_value_to_max(void)
 
     /* Click close to start angle */
     event_cnt = 0;
+    lv_test_mouse_release();
+    lv_test_indev_wait(50);
     lv_test_mouse_move_to(376, 285);
     lv_test_mouse_press();
     lv_test_indev_wait(500);
@@ -217,6 +223,8 @@ void test_arc_click_sustained_from_start_to_end_does_not_set_value_to_max(void)
     /* Click close to end angle */
     event_cnt = 0;
 
+    lv_test_mouse_release();
+    lv_test_indev_wait(50);
     lv_test_mouse_move_to(376, 285);
     lv_test_mouse_press();
     lv_test_indev_wait(500);
@@ -231,10 +239,75 @@ void test_arc_click_sustained_from_start_to_end_does_not_set_value_to_max(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/arc_3.png");
 }
 
+void test_two_overlapping_arcs_can_be_interacted_independently(void)
+{
+    arc = lv_arc_create(lv_screen_active());
+    arc2 = lv_arc_create(lv_screen_active());
+
+    lv_arc_set_value(arc, 0);
+    lv_arc_set_value(arc2, 0);
+    lv_obj_set_size(arc, 100, 100);
+    lv_obj_set_size(arc2, 100, 100);
+    lv_arc_set_bg_angles(arc, 20, 160);
+    lv_arc_set_bg_angles(arc2, 200, 340);
+    lv_obj_add_flag(arc, LV_OBJ_FLAG_ADV_HITTEST);
+    lv_obj_add_flag(arc2, LV_OBJ_FLAG_ADV_HITTEST);
+    lv_arc_set_value(arc, 10);
+    lv_arc_set_value(arc2, 10);
+    lv_arc_set_rotation(arc, 355);
+    lv_arc_set_rotation(arc2, 355);
+    lv_obj_center(arc);
+    lv_obj_center(arc2);
+
+    // Add event callback to both arcs
+    lv_obj_add_event_cb(arc, dummy_event_cb, LV_EVENT_PRESSED, NULL);
+    lv_obj_add_event_cb(arc2, dummy_event_cb2, LV_EVENT_PRESSED, NULL);
+
+    // Reset event counters
+    event_cnt = 0;
+    event_cnt2 = 0;
+
+    // Click on the position of the first arc (center)
+    lv_test_mouse_release();
+    lv_test_indev_wait(50);
+    lv_test_mouse_move_to(400, 195);
+    lv_test_mouse_press();
+    lv_test_indev_wait(500);
+    lv_test_mouse_release();
+    lv_test_indev_wait(50);
+
+    // Verify that the event callback was called for the first arc
+    TEST_ASSERT_EQUAL_UINT32(0, event_cnt);
+    TEST_ASSERT_EQUAL_UINT32(1, event_cnt2);
+
+    // click on the position of the second arc (center)
+    lv_test_mouse_release();
+    lv_test_indev_wait(50);
+    lv_test_mouse_move_to(400, 285);
+    lv_test_mouse_press();
+    lv_test_indev_wait(500);
+    lv_test_mouse_release();
+    lv_test_indev_wait(50);
+
+    // Verify that the event callback was called for the second arc
+    TEST_ASSERT_EQUAL_UINT32(1, event_cnt);
+    TEST_ASSERT_EQUAL_UINT32(1, event_cnt2);
+
+    // Verify that the screen remains as expected after the interactions
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/overlapping_arcs_test.png");
+}
+
+
 static void dummy_event_cb(lv_event_t * e)
 {
     LV_UNUSED(e);
     event_cnt++;
+}
+
+static void dummy_event_cb2(lv_event_t * e)
+{
+    LV_UNUSED(e);
+    event_cnt2++;
 }
 
 #endif

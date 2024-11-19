@@ -24,18 +24,19 @@ extern "C" {
  *********************/
 
 /** Switch knob extra area correction factor */
-#define _LV_SWITCH_KNOB_EXT_AREA_CORRECTION 2
+#define LV_SWITCH_KNOB_EXT_AREA_CORRECTION 2
+
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_switch_class;
 
 /**********************
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    lv_obj_t obj;
-    int32_t anim_state;
-} lv_switch_t;
-
-LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_switch_class;
+typedef enum {
+    LV_SWITCH_ORIENTATION_AUTO,
+    LV_SWITCH_ORIENTATION_HORIZONTAL,
+    LV_SWITCH_ORIENTATION_VERTICAL
+} lv_switch_orientation_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -47,6 +48,28 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_switch_class;
  * @return          pointer to the created switch
  */
 lv_obj_t * lv_switch_create(lv_obj_t * parent);
+
+/*=====================
+ * Setter functions
+ *====================*/
+
+/**
+ * Set the orientation of switch.
+ * @param obj           pointer to switch object
+ * @param orientation   switch orientation from `lv_switch_orientation_t`
+ */
+void lv_switch_set_orientation(lv_obj_t * obj, lv_switch_orientation_t orientation);
+
+/*=====================
+ * Getter functions
+ *====================*/
+
+/**
+ * Get the orientation of switch.
+ * @param obj       pointer to switch object
+ * @return          switch orientation from ::lv_switch_orientation_t
+ */
+lv_switch_orientation_t lv_switch_get_orientation(lv_obj_t * obj);
 
 /**********************
  *      MACROS

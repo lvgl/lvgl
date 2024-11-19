@@ -7,10 +7,12 @@
  *      INCLUDES
  *********************/
 
+#include "../../draw/lv_image_decoder_private.h"
 #include "../lv_assert.h"
 #include "../../core/lv_global.h"
 
 #include "lv_image_header_cache.h"
+#include "../lv_iter.h"
 
 /*********************
  *      DEFINES
@@ -31,6 +33,7 @@
 static lv_cache_compare_res_t image_header_cache_compare_cb(const lv_image_header_cache_data_t * lhs,
                                                             const lv_image_header_cache_data_t * rhs);
 static void image_header_cache_free_cb(lv_image_header_cache_data_t * entry, void * user_data);
+static void iter_inspect_cb(void * elem);
 
 /**********************
  *  GLOBAL VARIABLES
@@ -93,6 +96,21 @@ bool lv_image_header_cache_is_enabled(void)
     return lv_cache_is_enabled(img_header_cache_p);
 }
 
+lv_iter_t * lv_image_header_cache_iter_create(void)
+{
+    return lv_cache_iter_create(img_header_cache_p);
+}
+
+void lv_image_header_cache_dump(void)
+{
+    lv_iter_t * iter = lv_image_cache_iter_create();
+    if(iter == NULL) return;
+
+    LV_LOG_USER("Image cache dump:");
+    LV_LOG_USER("\tsize\tdata_size\tcf\trc\ttype\tdecoded\t\t\tsrc");
+    lv_iter_inspect(iter, iter_inspect_cb);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -129,4 +147,33 @@ static void image_header_cache_free_cb(lv_image_header_cache_data_t * entry, voi
     LV_UNUSED(user_data); /*Unused*/
 
     if(entry->src_type == LV_IMAGE_SRC_FILE) lv_free((void *)entry->src);
+}
+
+static void iter_inspect_cb(void * elem)
+{
+    lv_image_cache_data_t * data = (lv_image_cache_data_t *)elem;
+    lv_draw_buf_t * decoded = (lv_draw_buf_t *)data->decoded;
+    lv_image_header_t * header = &decoded->header;
+    lv_cache_entry_t * entry = lv_cache_entry_get_entry(data, img_header_cache_p->node_size);
+
+    LV_UNUSED(decoded);
+    LV_UNUSED(header);
+    LV_UNUSED(entry);
+
+    /*  size    data_size   cf  rc  type    decoded         src*/
+#define IMAGE_CACHE_DUMP_FORMAT "	%4dx%-4d	%9"LV_PRIu32"	%d	%" LV_PRId32 "	"
+    switch(data->src_type) {
+        case LV_IMAGE_SRC_FILE:
+            LV_LOG_USER(IMAGE_CACHE_DUMP_FORMAT "file\t%-12p\t%s", header->w, header->h, decoded->data_size, header->cf,
+                        lv_cache_entry_get_ref(entry), (void *)data->decoded, (char *)data->src);
+            break;
+        case LV_IMAGE_SRC_VARIABLE:
+            LV_LOG_USER(IMAGE_CACHE_DUMP_FORMAT "var \t%-12p\t%p", header->w, header->h, decoded->data_size, header->cf,
+                        lv_cache_entry_get_ref(entry), (void *)data->decoded, data->src);
+            break;
+        default:
+            LV_LOG_USER(IMAGE_CACHE_DUMP_FORMAT "unkn\t%-12p\t%p", header->w, header->h, decoded->data_size, header->cf,
+                        lv_cache_entry_get_ref(entry), (void *)data->decoded, data->src);
+            break;
+    }
 }

@@ -3,6 +3,7 @@
 import os
 import re
 import argparse
+from typing import List, Union
 
 
 def get_arg():
@@ -43,12 +44,12 @@ class RepoFileVersionReplacer:
     DIR_SCRIPTS = os.path.dirname(__file__)
     DIR_REPO_ROOT = os.path.join(DIR_SCRIPTS, "..")
 
-    def __init__(self, relative_path_segments: list[str], expected_occurrences: int):
+    def __init__(self, relative_path_segments: List[str], expected_occurrences: int):
         self.path_relative = os.path.join(*relative_path_segments)
         self.path = os.path.join(self.DIR_REPO_ROOT, self.path_relative)
         self.expected_occurrences = expected_occurrences
 
-    def applyVersionToLine(self, line: str, version: Version) -> str | None:
+    def applyVersionToLine(self, line: str, version: Version) -> Union[str, None]:
         return None
 
     def applyVersion(self, version: Version):
@@ -72,7 +73,7 @@ class RepoFileVersionReplacer:
 
 class PrefixReplacer(RepoFileVersionReplacer):
 
-    def __init__(self, relative_path_segments: list[str], prefix: str, expected_occurrences=1):
+    def __init__(self, relative_path_segments: List[str], prefix: str, expected_occurrences=1):
         super().__init__(relative_path_segments, expected_occurrences)
         self.prefix = prefix
 
@@ -84,7 +85,7 @@ class PrefixReplacer(RepoFileVersionReplacer):
 
 
 class MacroReplacer(RepoFileVersionReplacer):
-    def __init__(self, relative_path_segments: list[str]):
+    def __init__(self, relative_path_segments: List[str]):
         super().__init__(relative_path_segments, 4)
 
     def applyVersionToLine(self, line: str, version: Version):
@@ -121,6 +122,35 @@ class CmakeReplacer(MacroReplacer):
     def getReplacement(self, val: str):
         return r'\g<1>' + val + r'\g<3>'
 
+class KconfigReplacer(RepoFileVersionReplacer):
+    """Replace version info in Kconfig file"""
+
+    def __init__(self, relative_path_segments: List[str]):
+        super().__init__(relative_path_segments, 3)
+
+    def applyVersionToLine(self, line: str, version: Version):
+        targets = {
+            'LVGL_VERSION_MAJOR': version.major,
+            'LVGL_VERSION_MINOR': version.minor,
+            'LVGL_VERSION_PATCH': version.patch,
+        }
+
+        for key, val in targets.items():
+            pattern = self.getPattern(key)
+            repl = self.getReplacement(val)
+            replaced, n = re.subn(pattern, repl, line)
+            if n > 0:
+                return replaced
+
+        return None
+    def getPattern(self, key: str):
+        # Match the version fields in Kconfig file
+        return rf'(^\s+default\s+)(\d+) # ({key})'
+
+    def getReplacement(self, val: str):
+        # Replace the version value
+        return r'\g<1>' + val + r' # \g<3>'
+
 
 if __name__ == '__main__':
     args = get_arg()
@@ -130,8 +160,9 @@ if __name__ == '__main__':
 
     targets = [
         MacroReplacer(['lv_version.h']),
-        CmakeReplacer(['env_support', 'cmake', 'custom.cmake']),
+        CmakeReplacer(['env_support', 'cmake', 'version.cmake']),
         PrefixReplacer(['lv_conf_template.h'], 'Configuration file for v'),
+        KconfigReplacer(['Kconfig']),
     ]
 
     if version.is_release:

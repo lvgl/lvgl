@@ -14,7 +14,13 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../lvgl.h"
+#include "../../lv_conf_internal.h"
+#include "../../misc/lv_types.h"
+#include "../../draw/lv_draw_buf.h"
+#include "../../widgets/image/lv_image.h"
+#include "../../core/lv_obj_class.h"
+#include LV_STDBOOL_INCLUDE
+#include LV_STDINT_INCLUDE
 #if LV_USE_GIF
 
 #include "gifdec.h"
@@ -26,14 +32,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-typedef struct {
-    lv_image_t img;
-    gd_GIF * gif;
-    lv_timer_t * timer;
-    lv_draw_buf_t imgdsc;
-    uint32_t last_call;
-} lv_gif_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_gif_class;
 
@@ -73,6 +71,25 @@ void lv_gif_pause(lv_obj_t * obj);
  * @param obj pointer to a gif obj
  */
 void lv_gif_resume(lv_obj_t * obj);
+
+/**
+ * Checks if the GIF was loaded correctly.
+ * @param obj pointer to a gif obj
+ */
+bool lv_gif_is_loaded(lv_obj_t * obj);
+
+/**
+ * Get the loop count for the GIF.
+ * @param obj pointer to a gif obj
+ */
+int32_t lv_gif_get_loop_count(lv_obj_t * obj);
+
+/**
+ * Set the loop count for the GIF.
+ * @param obj   pointer to a gif obj
+ * @param count the loop count to set
+ */
+void lv_gif_set_loop_count(lv_obj_t * obj, int32_t count);
 
 /**********************
  *      MACROS

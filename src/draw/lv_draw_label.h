@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_draw.h"
+#include "lv_draw_rect.h"
 #include "../misc/lv_bidi.h"
 #include "../misc/lv_text.h"
 #include "../misc/lv_color.h"
@@ -27,23 +28,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-/** Store some info to speed up drawing of very large texts
- * It takes a lot of time to get the first visible character because
- * all the previous characters needs to be checked to calculate the positions.
- * This structure stores an earlier (e.g. at -1000 px) coordinate and the index of that line.
- * Therefore the calculations can start from here.*/
-typedef struct _lv_draw_label_hint_t {
-    /** Index of the line at `y` coordinate*/
-    int32_t line_start;
-
-    /** Give the `y` coordinate of the first letter at `line start` index. Relative to the label's coordinates*/
-    int32_t y;
-
-    /** The 'y1' coordinate of the label when the hint was saved.
-     * Used to invalidate the hint if the label has moved too much.*/
-    int32_t coord_y;
-} lv_draw_label_hint_t;
 
 typedef struct {
     lv_draw_dsc_base_t base;
@@ -69,19 +53,13 @@ typedef struct {
      * < 1: malloc buffer and copy `text` there.
      * 0: `text` is const and it's pointer will be valid during rendering.*/
     uint8_t text_local : 1;
+
+    /**
+     * Indicate that the text is constant and its pointer can be safely saved e.g. in a cache.
+     */
+    uint8_t text_static : 1;
     lv_draw_label_hint_t * hint;
 } lv_draw_label_dsc_t;
-
-typedef struct {
-    void * glyph_data;  /*Depends on `format` field, it could be image source or draw buf of bitmap or vector data.*/
-    lv_font_glyph_format_t format;
-    const lv_area_t * letter_coords;
-    const lv_area_t * bg_coords;
-    const lv_font_glyph_dsc_t * g;
-    lv_color_t color;
-    lv_opa_t opa;
-    lv_draw_buf_t * _draw_buf; /*a shared draw buf for get_bitmap, do not use it directly, use glyph_data instead*/
-} lv_draw_glyph_dsc_t;
 
 /**
  * Passed as a parameter to `lv_draw_label_iterate_characters` to

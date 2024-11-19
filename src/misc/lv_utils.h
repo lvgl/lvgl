@@ -35,19 +35,19 @@ extern "C" {
  *  argument (the search key) is less that it's second (a table entry),
  *  zero if equal, and positive if greater.
  *
- *  @note Items in the array must be in ascending order.
+ * @note Items in the array must be in ascending order.
  *
  * @param key    Pointer to item being searched for
  * @param base   Pointer to first element to search
  * @param n      Number of elements
  * @param size   Size of each element
- * @param cmp    Pointer to comparison function (see #unicode_list_compare as a comparison function
- * example)
+ * @param cmp    Pointer to comparison function (see unicode_list_compare()
+ *                 as a comparison function example)
  *
  * @return a pointer to a matching item, or NULL if none exists.
  */
-void * _lv_utils_bsearch(const void * key, const void * base, uint32_t n, uint32_t size,
-                         int32_t (*cmp)(const void * pRef, const void * pElement));
+void * lv_utils_bsearch(const void * key, const void * base, size_t n, size_t size,
+                        int (*cmp)(const void * pRef, const void * pElement));
 
 /**
  * Save a draw buf to a file

@@ -44,7 +44,8 @@ extensions = [
     'sphinx_design',
     'sphinx_rtd_dark_mode',
     'link_roles',
-    'sphinxcontrib.mermaid'
+    'sphinxcontrib.mermaid',
+    'sphinx_reredirects'
 ]
 
 default_dark_mode = False
@@ -61,7 +62,7 @@ highlight_language = 'c'
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-source_suffix = ['.rst']
+source_suffix = {'.rst': 'restructuredtext'}
 
 
 # The master toctree document.
@@ -78,7 +79,8 @@ author = 'LVGL community'
 # built documents.
 #
 # The short X.Y version.
-# embeddedt: extract using scripts/find_version.sh
+# `version` is extracted from lv_version.h using a cross-platform compatible
+# Python function in build.py, and passed in on `sphinx-build` command line.
 
 version = ''
 
@@ -114,9 +116,12 @@ html_theme = 'sphinx_rtd_theme'
 # documentation.
 #
 
+# Note:  'display_version' option is now obsolete in the current (08-Oct-2024)
+# version of sphinx-rtd-theme (upgraded for Sphinx v8.x).  The removed line is
+# preserved by commenting it out in case it is ever needed again.
 
 html_theme_options = {
-    'display_version': True,
+    # 'display_version': True,
     'prev_next_buttons_location': 'both',
     'style_external_links': False,
     # 'vcs_pageview_mode': '',
@@ -133,7 +138,12 @@ html_theme_options = {
 
 
 # For site map generation
-html_baseurl = f"https://docs.lvgl.io/{os.environ['LVGL_URLPATH']}/"
+if "LVGL_URLPATH" not in os.environ:
+    os.environ['LVGL_URLPATH'] = 'master'
+
+_branch = os.getenv('LVGL_URLPATH')
+html_baseurl = f"https://docs.lvgl.io/{_branch}/"
+
 
 sitemap_url_scheme = "{link}"
 
@@ -141,8 +151,13 @@ sitemap_url_scheme = "{link}"
 
 #extlinks = {'github_link_base': (github_url + '%s', github_url)}
 
+if "LVGL_GITCOMMIT" not in os.environ:
+    os.environ['LVGL_GITCOMMIT'] = 'master'
+
+_git_commit_ref = os.getenv('LVGL_GITCOMMIT')
+
 html_context = {
-    'github_version': os.environ['LVGL_GITCOMMIT'],
+    'github_version': _git_commit_ref,
     'github_user': 'lvgl',
     'github_repo': 'lvgl',
     'display_github': True,
@@ -260,10 +275,190 @@ StandaloneHTMLBuilder.supported_image_types = [
     'image/jpeg'
 ]
 
-smartquotes = False
 
-repo_commit_hash = os.environ['LVGL_GITCOMMIT']
+# Enabling smart quotes action to convert -- to en dashes and --- to em dashes.
+# Converting quotation marks and ellipses is NOT done because the default
+# `smartquotes_action` 'qDe' is changed to just 'D' below, which accomplishes
+# the dash conversions as desired.
+#
+# For list of all possible smartquotes_action values, see:
+#     https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-smartquotes_action
+smartquotes = True
+smartquotes_action = 'D'
 
+repo_commit_hash = _git_commit_ref
+
+# -- Options for sphinx_reredirects ---------------------------------------
+
+# The below generates .HTML page redirects for pages that have been moved.
+# Browsers are redirected via `<meta http-equiv="refresh" content="0; url=new_url">`.
+redirects = {
+    "get-started/index":                          "../intro/basics.html"                                            ,
+    "get-started/quick-overview":                 "../intro/basics.html"                                            ,
+    "integration/bindings/api_json":              "../../details/integration/bindings/api_json.html"                ,
+    "integration/bindings/cpp":                   "../../details/integration/bindings/cpp.html"                     ,
+    "integration/bindings/index":                 "../../details/integration/bindings/index.html"                   ,
+    "integration/bindings/javascript":            "../../details/integration/bindings/javascript.html"              ,
+    "integration/bindings/micropython":           "../../details/integration/bindings/micropython.html"             ,
+    "integration/bindings/pikascript":            "../../details/integration/bindings/pikascript.html"              ,
+    "integration/building/cmake":                 "../../details/integration/building/cmake.html"                   ,
+    "integration/building/index":                 "../../details/integration/building/index.html"                   ,
+    "integration/building/make":                  "../../details/integration/building/make.html"                    ,
+    "integration/chip/arm":                       "../../details/integration/chip/arm.html"                         ,
+    "integration/chip/espressif":                 "../../details/integration/chip/espressif.html"                   ,
+    "integration/chip/index":                     "../../details/integration/chip/index.html"                       ,
+    "integration/chip/nxp":                       "../../details/integration/chip/nxp.html"                         ,
+    "integration/chip/renesas":                   "../../details/integration/chip/renesas.html"                     ,
+    "integration/chip/stm32":                     "../../details/integration/chip/stm32.html"                       ,
+    "integration/driver/X11":                     "../../details/integration/driver/X11.html"                       ,
+    "integration/driver/display/fbdev":           "../../../details/integration/driver/display/fbdev.html"          ,
+    "integration/driver/display/gen_mipi":        "../../../details/integration/driver/display/gen_mipi.html"       ,
+    "integration/driver/display/ili9341":         "../../../details/integration/driver/display/ili9341.html"        ,
+    "integration/driver/display/index":           "../../../details/integration/driver/display/index.html"          ,
+    "integration/driver/display/lcd_stm32_guide": "../../../details/integration/driver/display/lcd_stm32_guide.html",
+    "integration/driver/display/renesas_glcdc":   "../../../details/integration/driver/display/renesas_glcdc.html"  ,
+    "integration/driver/display/st7735":          "../../../details/integration/driver/display/st7735.html"         ,
+    "integration/driver/display/st7789":          "../../../details/integration/driver/display/st7789.html"         ,
+    "integration/driver/display/st7796":          "../../../details/integration/driver/display/st7796.html"         ,
+    "integration/driver/display/st_ltdc":         "../../../details/integration/driver/display/st_ltdc.html"        ,
+    "integration/driver/index":                   "../../details/integration/driver/index.html"                     ,
+    "integration/driver/libinput":                "../../details/integration/driver/libinput.html"                  ,
+    "integration/driver/opengles":                "../../details/integration/driver/opengles.html"                  ,
+    "integration/driver/touchpad/evdev":          "../../../details/integration/driver/touchpad/evdev.html"         ,
+    "integration/driver/touchpad/ft6x36":         "../../../details/integration/driver/touchpad/ft6x36.html"        ,
+    "integration/driver/touchpad/index":          "../../../details/integration/driver/touchpad/index.html"         ,
+    "integration/driver/wayland":                 "../../details/integration/driver/wayland.html"                   ,
+    "integration/driver/windows":                 "../../details/integration/driver/windows.html"                   ,
+    "integration/framework/arduino":              "../../details/integration/framework/arduino.html"                ,
+    "integration/framework/index":                "../../details/integration/framework/index.html"                  ,
+    "integration/framework/platformio":           "../../details/integration/framework/platformio.html"             ,
+    "integration/framework/tasmota-berry":        "../../details/integration/framework/tasmota-berry.html"          ,
+    "integration/ide/index":                      "../../details/integration/ide/index.html"                        ,
+    "integration/ide/mdk":                        "../../details/integration/ide/mdk.html"                          ,
+    "integration/ide/pc-simulator":               "../../details/integration/ide/pc-simulator.html"                 ,
+    "integration/index":                          "../details/integration/index.html"                               ,
+    "integration/os/freertos":                    "../../details/integration/os/freertos.html"                      ,
+    "integration/os/index":                       "../../details/integration/os/index.html"                         ,
+    "integration/os/mqx":                         "../../details/integration/os/mqx.html"                           ,
+    "integration/os/nuttx":                       "../../details/integration/os/nuttx.html"                         ,
+    "integration/os/px5":                         "../../details/integration/os/px5.html"                           ,
+    "integration/os/qnx":                         "../../details/integration/os/qnx.html"                           ,
+    "integration/os/rt-thread":                   "../../details/integration/os/rt-thread.html"                     ,
+    "integration/os/yocto/core_components":       "../../../details/integration/os/yocto/core_components.html"      ,
+    "integration/os/yocto/index":                 "../../../details/integration/os/yocto/index.html"                ,
+    "integration/os/yocto/lvgl_recipe":           "../../../details/integration/os/yocto/lvgl_recipe.html"          ,
+    "integration/os/yocto/terms_and_variables":   "../../../details/integration/os/yocto/terms_and_variables.html"  ,
+    "integration/os/zephyr":                      "../../details/integration/os/zephyr.html"                        ,
+    "layouts/flex":                               "../details/base-widget/layouts/flex.html"                        ,
+    "layouts/grid":                               "../details/base-widget/layouts/grid.html"                        ,
+    "layouts/index":                              "../details/base-widget/layouts/index.html"                       ,
+    "libs/arduino_esp_littlefs":                  "../details/libs/arduino_esp_littlefs.html"                       ,
+    "libs/arduino_sd":                            "../details/libs/arduino_sd.html"                                 ,
+    "libs/barcode":                               "../details/libs/barcode.html"                                    ,
+    "libs/bmp":                                   "../details/libs/bmp.html"                                        ,
+    "libs/ffmpeg":                                "../details/libs/ffmpeg.html"                                     ,
+    "libs/freetype":                              "../details/libs/freetype.html"                                   ,
+    "libs/fs":                                    "../details/libs/fs.html"                                         ,
+    "libs/gif":                                   "../details/libs/gif.html"                                        ,
+    "libs/index":                                 "../details/libs/index.html"                                      ,
+    "libs/lfs":                                   "../details/libs/lfs.html"                                        ,
+    "libs/libjpeg_turbo":                         "../details/libs/libjpeg_turbo.html"                              ,
+    "libs/libpng":                                "../details/libs/libpng.html"                                     ,
+    "libs/lodepng":                               "../details/libs/lodepng.html"                                    ,
+    "libs/qrcode":                                "../details/libs/qrcode.html"                                     ,
+    "libs/rle":                                   "../details/libs/rle.html"                                        ,
+    "libs/rlottie":                               "../details/libs/rlottie.html"                                    ,
+    "libs/svg":                                   "../details/libs/svg.html"                                        ,
+    "libs/tiny_ttf":                              "../details/libs/tiny_ttf.html"                                   ,
+    "libs/tjpgd":                                 "../details/libs/tjpgd.html"                                      ,
+    "others/file_explorer":                       "../details/other-components/file_explorer.html"                  ,
+    "others/font_manager":                        "../details/other-components/font_manager.html"                   ,
+    "others/fragment":                            "../details/other-components/fragment.html"                       ,
+    "others/gridnav":                             "../details/other-components/gridnav.html"                        ,
+    "others/ime_pinyin":                          "../details/other-components/ime_pinyin.html"                     ,
+    "others/imgfont":                             "../details/other-components/imgfont.html"                        ,
+    "others/index":                               "../details/other-components/index.html"                          ,
+    "others/monkey":                              "../details/other-components/monkey.html"                         ,
+    "others/obj_id":                              "../details/other-components/obj_id.html"                         ,
+    "others/obj_property":                        "../details/other-components/obj_property.html"                   ,
+    "others/observer":                            "../details/other-components/observer.html"                       ,
+    "others/snapshot":                            "../details/other-components/snapshot.html"                       ,
+    "overview/animations":                        "../details/main-components/animation.html"                       ,
+    "overview/color":                             "../details/main-components/color.html"                           ,
+    "overview/coord":                             "../details/base-widget/coord.html"                               ,
+    "overview/debugging/gdb_plugin":              "../../details/debugging/gdb_plugin.html"                         ,
+    "overview/debugging/index":                   "../../details/debugging/index.html"                              ,
+    "overview/debugging/log":                     "../../details/debugging/log.html"                                ,
+    "overview/debugging/profiler":                "../../details/debugging/profiler.html"                           ,
+    "overview/debugging/vg_lite_tvg":             "../../details/debugging/vg_lite_tvg.html"                        ,
+    "overview/display":                           "../details/main-components/display.html"                         ,
+    "overview/event":                             "../details/base-widget/event.html"                               ,
+    "overview/font":                              "../details/main-components/font.html"                            ,
+    "overview/fs":                                "../details/main-components/fs.html"                              ,
+    "overview/image":                             "../details/main-components/image.html"                           ,
+    "overview/indev":                             "../details/main-components/indev.html"                           ,
+    "overview/index":                             "../details/main-components/index.html"                           ,
+    "overview/layer":                             "../details/base-widget/layer.html"                               ,
+    "overview/new_widget":                        "../details/widgets/new_widget.html"                              ,
+    "overview/obj":                               "../details/base-widget/obj.html"                                 ,
+    "overview/renderers/arm2d":                   "../../details/integration/renderers/arm2d.html"                  ,
+    "overview/renderers/index":                   "../../details/integration/renderers/index.html"                  ,
+    "overview/renderers/nema_gfx":                "../../details/integration/renderers/nema_gfx.html"               ,
+    "overview/renderers/pxp":                     "../../details/integration/renderers/nxp_pxp.html"                ,
+    "overview/renderers/sdl":                     "../../details/integration/renderers/sdl.html"                    ,
+    "overview/renderers/stm32_dma2d":             "../../details/integration/renderers/stm32_dma2d.html"            ,
+    "overview/renderers/sw":                      "../../details/integration/renderers/sw.html"                     ,
+    "overview/renderers/vg_lite":                 "../../details/integration/renderers/vg_lite.html"                ,
+    "overview/renderers/vglite":                  "../../details/integration/renderers/nxp_vglite_gpu.html"         ,
+    "overview/scroll":                            "../details/base-widget/scroll.html"                              ,
+    "overview/style":                             "../details/base-widget/styles/style.html"                        ,
+    "overview/style-props":                       "../details/base-widget/styles/style-properties.html"             ,
+    "overview/timer":                             "../details/main-components/timer.html"                           ,
+    "porting/display":                            "../details/main-components/display.html"                         ,
+    "porting/draw":                               "../details/main-components/draw.html"                            ,
+    "porting/indev":                              "../details/main-components/indev.html"                           ,
+    "porting/index":                              "../intro/add-lvgl-to-your-project/index.html"                    ,
+    "porting/os":                                 "../intro/add-lvgl-to-your-project/threading.html"                ,
+    "porting/project":                            "../intro/add-lvgl-to-your-project/connecting_lvgl.html"          ,
+    "porting/sleep":                              "../intro/add-lvgl-to-your-project/threading.html"                ,
+    "porting/tick":                               "../intro/add-lvgl-to-your-project/connecting_lvgl.html"          ,
+    "porting/timer_handler":                      "../intro/add-lvgl-to-your-project/timer_handler.html"            ,
+    "widgets/animimg":                            "../details/widgets/animimg.html"                                 ,
+    "widgets/arc":                                "../details/widgets/arc.html"                                     ,
+    "widgets/bar":                                "../details/widgets/bar.html"                                     ,
+    "widgets/button":                             "../details/widgets/button.html"                                  ,
+    "widgets/buttonmatrix":                       "../details/widgets/buttonmatrix.html"                            ,
+    "widgets/calendar":                           "../details/widgets/calendar.html"                                ,
+    "widgets/canvas":                             "../details/widgets/canvas.html"                                  ,
+    "widgets/chart":                              "../details/widgets/chart.html"                                   ,
+    "widgets/checkbox":                           "../details/widgets/checkbox.html"                                ,
+    "widgets/dropdown":                           "../details/widgets/dropdown.html"                                ,
+    "widgets/image":                              "../details/widgets/image.html"                                   ,
+    "widgets/imagebutton":                        "../details/widgets/imagebutton.html"                             ,
+    "widgets/index":                              "../details/widgets/index.html"                                   ,
+    "widgets/keyboard":                           "../details/widgets/keyboard.html"                                ,
+    "widgets/label":                              "../details/widgets/label.html"                                   ,
+    "widgets/led":                                "../details/widgets/led.html"                                     ,
+    "widgets/line":                               "../details/widgets/line.html"                                    ,
+    "widgets/list":                               "../details/widgets/list.html"                                    ,
+    "widgets/lottie":                             "../details/widgets/lottie.html"                                  ,
+    "widgets/menu":                               "../details/widgets/menu.html"                                    ,
+    "widgets/msgbox":                             "../details/widgets/msgbox.html"                                  ,
+    "widgets/obj":                                "../details/base-widget/obj.html"                                 ,
+    "widgets/roller":                             "../details/widgets/roller.html"                                  ,
+    "widgets/scale":                              "../details/widgets/scale.html"                                   ,
+    "widgets/slider":                             "../details/widgets/slider.html"                                  ,
+    "widgets/span":                               "../details/widgets/spangroup.html"                               ,
+    "widgets/spinbox":                            "../details/widgets/spinbox.html"                                 ,
+    "widgets/spinner":                            "../details/widgets/spinner.html"                                 ,
+    "widgets/switch":                             "../details/widgets/switch.html"                                  ,
+    "widgets/table":                              "../details/widgets/table.html"                                   ,
+    "widgets/tabview":                            "../details/widgets/tabview.html"                                 ,
+    "widgets/textarea":                           "../details/widgets/textarea.html"                                ,
+    "widgets/tileview":                           "../details/widgets/tileview.html"                                ,
+    "widgets/win":                                "../details/widgets/win.html"                                     ,
+    "details/widgets/span":                       "../../details/widgets/spangroup.html"                            ,
+}
 
 # Example configuration for intersphinx: refer to the Python standard library.
 
@@ -275,3 +470,5 @@ def setup(app):
     # app.add_transform(AutoStructify)
     app.add_css_file('css/custom.css')
     app.add_css_file('css/fontawesome.min.css')
+
+

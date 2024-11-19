@@ -1,4 +1,4 @@
-﻿#include "../../lv_conf_internal.h"
+#include "../../lv_conf_internal.h"
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
 #ifndef LV_TLSF_H
@@ -41,7 +41,6 @@
 ** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "../../osal/lv_os.h"
 #include "../../misc/lv_ll.h"
 #include "../../misc/lv_types.h"
 
@@ -53,16 +52,6 @@ extern "C" {
 /* lv_pool_t: a block of memory that TLSF can manage. */
 typedef void * lv_tlsf_t;
 typedef void * lv_pool_t;
-
-typedef struct {
-#if LV_USE_OS
-    lv_mutex_t mutex;
-#endif
-    lv_tlsf_t tlsf;
-    size_t cur_used;
-    size_t max_used;
-    lv_ll_t  pool_ll;
-} lv_tlsf_state_t;
 
 /* Create/destroy a memory pool. */
 lv_tlsf_t lv_tlsf_create(void * mem);

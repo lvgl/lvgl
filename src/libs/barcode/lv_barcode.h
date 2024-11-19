@@ -1,5 +1,5 @@
 /**
- * @file lv_barcode.c
+ * @file lv_barcode.h
  *
  */
 
@@ -27,15 +27,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-/*Data of barcode*/
-typedef struct {
-    lv_canvas_t canvas;
-    lv_color_t dark_color;
-    lv_color_t light_color;
-    uint16_t scale;
-    lv_dir_t direction;
-} lv_barcode_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_barcode_class;
 
@@ -77,6 +68,13 @@ void lv_barcode_set_scale(lv_obj_t * obj, uint16_t scale);
  * @param direction draw direction (`LV_DIR_HOR` or `LB_DIR_VER`)
  */
 void lv_barcode_set_direction(lv_obj_t * obj, lv_dir_t direction);
+
+/**
+ * Set the tiled mode of a barcode object
+ * @param obj pointer to barcode object
+ * @param tiled true: tiled mode, false: normal mode (default)
+ */
+void lv_barcode_set_tiled(lv_obj_t * obj, bool tiled);
 
 /**
  * Set the data of a barcode object

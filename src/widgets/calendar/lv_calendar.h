@@ -30,34 +30,9 @@ extern "C" {
  */
 typedef struct {
     uint16_t year;
-    int8_t month;  /** 1..12*/
-    int8_t day;    /** 1..31*/
+    int8_t month;  /**< 1..12 */
+    int8_t day;    /**< 1..31 */
 } lv_calendar_date_t;
-
-/*Data of calendar*/
-typedef struct {
-    lv_obj_t obj;
-    /*New data for this type*/
-    lv_obj_t * btnm;
-    lv_calendar_date_t today;           /**< Date of today*/
-    lv_calendar_date_t showed_date;     /**< Currently visible month (day is ignored)*/
-    lv_calendar_date_t * highlighted_dates; /**< Apply different style on these days (pointer to user-defined array)*/
-    size_t highlighted_dates_num;          /**< Number of elements in `highlighted_days`*/
-    const char * map[8 * 7];
-#ifdef LV_USE_CALENDAR_CHINESE
-    bool use_chinese_calendar;
-
-    /* 7 * 6: A week has 7 days, and the calendar displays 6 weeks in total.
-       20: Including the number of dates, line breaks, names for each day,
-       and reserving several spaces for addresses.*/
-    char nums [7 * 6][20];
-#else
-    /* 7 * 6: A week has 7 days, and the calendar displays 6 weeks in total.
-       6: Including the number of dates, and reserving several spaces for
-       addresses.*/
-    char nums [7 * 6][4];
-#endif
-} lv_calendar_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_calendar_class;
 

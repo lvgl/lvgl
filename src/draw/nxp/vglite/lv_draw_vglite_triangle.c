@@ -76,7 +76,7 @@ void lv_draw_vglite_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_
     lv_area_move(&coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t clipped_coords;
-    if(!_lv_area_intersect(&clipped_coords, &coords, &clip_area))
+    if(!lv_area_intersect(&clipped_coords, &coords, &clip_area))
         return; /* Fully clipped, nothing to do */
 
     _vglite_draw_triangle(&coords, &clip_area, dsc);
@@ -97,8 +97,8 @@ static void _vglite_draw_triangle(const lv_area_t * coords, const lv_area_t * cl
     tri_area.x2 = (int32_t)LV_MAX3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
     tri_area.y2 = (int32_t)LV_MAX3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
 
-    uint32_t width = tri_area.x2 - tri_area.x1;
-    uint32_t height = tri_area.y2 - tri_area.y1;
+    uint32_t width = lv_area_get_width(&tri_area);
+    uint32_t height = lv_area_get_height(&tri_area);
 
     /* Init path */
     int32_t triangle_path[] = { /*VG line path*/
@@ -134,10 +134,13 @@ static void _vglite_draw_triangle(const lv_area_t * coords, const lv_area_t * cl
 
         /* Gradient Setup */
         vg_lite_uint32_t cnt = LV_MAX(dsc->bg_grad.stops_count, LV_GRADIENT_MAX_STOPS);
+        lv_opa_t bg_opa;
+
         for(uint8_t i = 0; i < cnt; i++) {
             stops[i] = dsc->bg_grad.stops[i].frac;
+            bg_opa = LV_OPA_MIX2(dsc->bg_grad.stops[i].opa, dsc->bg_opa);
 
-            col32[i] = lv_color_to_32(dsc->bg_grad.stops[i].color, dsc->bg_grad.stops[i].opa);
+            col32[i] = lv_color_to_32(dsc->bg_grad.stops[i].color, bg_opa);
             colors[i] = vglite_get_color(col32[i], true);
         }
 

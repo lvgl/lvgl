@@ -6,7 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_checkbox.h"
+#include "lv_checkbox_private.h"
+#include "../../core/lv_obj_private.h"
+#include "../../core/lv_obj_class_private.h"
 #if LV_USE_CHECKBOX != 0
 
 #include "../../misc/lv_assert.h"
@@ -75,7 +77,7 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
         size_t len;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-        len = _lv_text_ap_calc_bytes_count(txt) + 1;
+        len = lv_text_ap_calc_bytes_count(txt) + 1;
 #else
         len = lv_strlen(txt) + 1;
 #endif
@@ -87,7 +89,7 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
         if(NULL == cb->txt) return;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-        _lv_text_ap_proc(txt, cb->txt);
+        lv_text_ap_proc(txt, cb->txt);
 #else
         lv_strcpy(cb->txt, txt);
 #endif

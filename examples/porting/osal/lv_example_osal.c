@@ -9,6 +9,7 @@
 #include "../../lv_examples.h"
 
 #if LV_BUILD_EXAMPLES
+#include "../../../src/osal/lv_os.h"
 
 /*********************
  *      DEFINES
@@ -76,7 +77,7 @@ static void increment_thread_entry(void * user_data)
     lv_lock();
     counter_label = lv_label_create(lv_scr_act());
     lv_obj_align(counter_label, LV_ALIGN_CENTER, 0, 0);
-    lv_label_set_text_fmt(counter_label, "Pressed %u times", press_count);
+    lv_label_set_text_fmt(counter_label, "Pressed %" LV_PRIu32 " times", press_count);
     lv_unlock();
 
     while(true) {
@@ -86,7 +87,7 @@ static void increment_thread_entry(void * user_data)
         press_count += 1;
 
         lv_lock();
-        lv_label_set_text_fmt(counter_label, "Pressed %u times", press_count);
+        lv_label_set_text_fmt(counter_label, "Pressed %" LV_PRIu32 " times", press_count);
         lv_unlock();
     }
 }

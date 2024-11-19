@@ -6,12 +6,16 @@ import shutil
 import subprocess
 import sys
 import os
+import platform
 from itertools import chain
 from pathlib import Path
 
 lvgl_test_dir = os.path.dirname(os.path.realpath(__file__))
 lvgl_script_path = os.path.join(lvgl_test_dir, "../scripts")
 sys.path.append(lvgl_script_path)
+
+wayland_dir = os.path.join(lvgl_test_dir, "wayland_protocols")
+wayland_protocols_dir = os.path.realpath("/usr/share/wayland-protocols")
 
 from LVGLImage import LVGLImage, ColorFormat, CompressMethod
 
@@ -23,6 +27,9 @@ build_only_options = {
     'OPTIONS_FULL_32BIT': 'Full config, 32 bit color depth',
     'OPTIONS_VG_LITE': 'VG-Lite simulator with full config, 32 bit color depth',
 }
+
+if platform.system() != 'Windows':
+    build_only_options['OPTIONS_SDL'] = 'SDL simulator with full config, 32 bit color depth'
 
 test_options = {
     'OPTIONS_TEST_SYSHEAP': 'Test config, system heap, 32 bit color depth',
@@ -66,6 +73,37 @@ def get_build_dir(options_name):
     global lvgl_test_dir
     return os.path.join(lvgl_test_dir, get_base_build_dir(options_name))
 
+def gen_wayland_protocols(clean):
+    '''Generates the xdg shell interface from wayland protocol definitions'''
+
+    if clean:
+        delete_dir_ignore_missing(wayland_dir)
+
+    if not os.path.isdir(wayland_dir):
+        os.mkdir(wayland_dir)
+        subprocess.check_call(['wayland-scanner',
+            'client-header',
+            os.path.join(wayland_protocols_dir, "stable/xdg-shell/xdg-shell.xml"),
+            os.path.join(wayland_dir, "wayland_xdg_shell.h.original"),
+        ])
+
+        subprocess.check_call(['wayland-scanner',
+            'private-code',
+            os.path.join(wayland_protocols_dir, "stable/xdg-shell/xdg-shell.xml"),
+            os.path.join(wayland_dir, "wayland_xdg_shell.c.original"),
+        ])
+
+        # Insert guards
+        with open(os.path.join(wayland_dir, "wayland_xdg_shell.h"), "w") as outfile:
+            subprocess.check_call(['sed','-e', "1i #if LV_BUILD_TEST", '-e', '$a #endif',
+                os.path.join(wayland_dir, "wayland_xdg_shell.h.original")], stdout=outfile)
+
+        with open(os.path.join(wayland_dir, "wayland_xdg_shell.c"), "w") as outfile:
+            subprocess.check_call(['sed','-e', "1i #if LV_BUILD_TEST", '-e', '$a #endif',
+                os.path.join(wayland_dir, "wayland_xdg_shell.c.original")], stdout=outfile)
+
+        subprocess.check_call(['rm', os.path.join(wayland_dir, "wayland_xdg_shell.c.original")])
+        subprocess.check_call(['rm', os.path.join(wayland_dir, "wayland_xdg_shell.h.original")])
 
 def build_tests(options_name, build_type, clean):
     '''Build all tests for the specified options name.'''
@@ -85,6 +123,10 @@ def build_tests(options_name, build_type, clean):
         delete_dir_ignore_missing(build_dir)
 
     os.chdir(lvgl_test_dir)
+
+    if platform.system() != 'Windows':
+        gen_wayland_protocols(clean)
+
     created_build_dir = False
     if not os.path.isdir(build_dir):
         os.mkdir(build_dir)
@@ -139,7 +181,7 @@ def generate_code_coverage_report():
     cmd = ['gcovr', '--root', root_dir, '--html-details', '--output',
            html_report_file, '--xml', 'report/coverage.xml',
            '-j', str(os.cpu_count()), '--print-summary',
-           '--html-title', 'LVGL Test Coverage', '--filter', '../src/.*/lv_.*\.c']
+           '--html-title', 'LVGL Test Coverage', '--filter', r'../src/.*/lv_.*\.c']
 
     subprocess.check_call(cmd)
     print("Done: See %s" % html_report_file, flush=True)

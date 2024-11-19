@@ -1,5 +1,5 @@
 /**
- * @file lv_templ.h
+ * @file lv_tabview.h
  *
  */
 
@@ -21,16 +21,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-typedef struct {
-    lv_obj_t obj;
-    uint32_t tab_cur;
-    lv_dir_t tab_pos;
-} lv_tabview_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_tabview_class;
 
@@ -78,6 +68,7 @@ void lv_tabview_set_tab_bar_position(lv_obj_t * obj, lv_dir_t dir);
 
 /**
  * Set the width or height of the tab bar
+ * @param obj       pointer to tabview widget
  * @param size      size of the tab bar in pixels or percentage.
  *                  will be used as width or height based on the position of the tab bar)
  */

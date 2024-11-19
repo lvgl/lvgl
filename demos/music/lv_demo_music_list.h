@@ -27,8 +27,8 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-lv_obj_t * _lv_demo_music_list_create(lv_obj_t * parent);
-void _lv_demo_music_list_button_check(uint32_t track_id, bool state);
+lv_obj_t * lv_demo_music_list_create(lv_obj_t * parent);
+void lv_demo_music_list_button_check(uint32_t track_id, bool state);
 
 /**********************
  *      MACROS

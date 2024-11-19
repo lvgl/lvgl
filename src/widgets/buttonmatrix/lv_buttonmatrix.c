@@ -6,7 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_buttonmatrix.h"
+#include "lv_buttonmatrix_private.h"
+#include "../../misc/lv_area_private.h"
+#include "../../core/lv_obj_private.h"
+#include "../../core/lv_obj_class_private.h"
 #if LV_USE_BUTTONMATRIX != 0
 
 #include "../../misc/lv_assert.h"
@@ -48,16 +51,17 @@ static bool button_is_popover(lv_buttonmatrix_ctrl_t ctrl_bits);
 static bool button_is_checkable(lv_buttonmatrix_ctrl_t ctrl_bits);
 static bool button_get_checked(lv_buttonmatrix_ctrl_t ctrl_bits);
 static uint32_t get_button_from_point(lv_obj_t * obj, lv_point_t * p);
-static void allocate_button_areas_and_controls(const lv_obj_t * obj, const char ** map);
+static void allocate_button_areas_and_controls(const lv_obj_t * obj, const char * const * map);
 static void invalidate_button_area(const lv_obj_t * obj, uint32_t btn_idx);
 static void make_one_button_checked(lv_obj_t * obj, uint32_t btn_idx);
 static bool has_popovers_in_top_row(lv_obj_t * obj);
+static bool button_is_recolor(lv_buttonmatrix_ctrl_t ctrl_bits);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 #if LV_WIDGETS_HAS_DEFAULT_VALUE
-static const char * lv_buttonmatrix_def_map[] = {"Btn1", "Btn2", "Btn3", "\n", "Btn4", "Btn5", ""};
+static const char * const lv_buttonmatrix_def_map[] = {"Btn1", "Btn2", "Btn3", "\n", "Btn4", "Btn5", ""};
 #endif
 
 const lv_obj_class_t lv_buttonmatrix_class = {
@@ -93,7 +97,7 @@ lv_obj_t * lv_buttonmatrix_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * map[])
+void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * const map[])
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     if(map == NULL) return;
@@ -122,7 +126,7 @@ void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * map[])
      *(A button can be 1,2,3... unit wide)*/
     uint32_t txt_tot_i = 0; /*Act. index in the str map*/
     uint32_t btn_tot_i = 0; /*Act. index of button areas*/
-    const char ** map_row = map;
+    const char * const * map_row = map;
 
     /*Count the units and the buttons in a line*/
     uint32_t row;
@@ -292,7 +296,7 @@ void lv_buttonmatrix_set_one_checked(lv_obj_t * obj, bool en)
  * Getter functions
  *====================*/
 
-const char ** lv_buttonmatrix_get_map(const lv_obj_t * obj)
+const char * const * lv_buttonmatrix_get_map(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -315,7 +319,7 @@ const char * lv_buttonmatrix_get_button_text(const lv_obj_t * obj, uint32_t btn_
     if(btn_id == LV_BUTTONMATRIX_BUTTON_NONE) return NULL;
 
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
-    if(btn_id > btnm->btn_cnt) return NULL;
+    if(btn_id >= btnm->btn_cnt) return NULL;
 
     uint32_t txt_i = 0;
     uint32_t btn_i = 0;
@@ -452,14 +456,17 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
         }
     }
     else if(code == LV_EVENT_PRESSING) {
-        /*If a slid to a new button, discard the current button and don't press any buttons*/
         if(btnm->btn_id_sel != LV_BUTTONMATRIX_BUTTON_NONE) {
             lv_indev_t * indev = lv_event_get_indev(e);
-            lv_indev_get_point(indev, &p);
-            uint32_t btn_pr = get_button_from_point(obj, &p);
-            if(btn_pr != btnm->btn_id_sel) {
-                invalidate_button_area(obj, btnm->btn_id_sel); /*Invalidate the old area*/
-                btnm->btn_id_sel = LV_BUTTONMATRIX_BUTTON_NONE;
+            lv_indev_type_t indev_type = lv_indev_get_type(indev);
+            if(indev_type == LV_INDEV_TYPE_POINTER || indev_type == LV_INDEV_TYPE_BUTTON) {
+                /*If pointer device slid to a new button, discard the current button and don't press any buttons*/
+                lv_indev_get_point(indev, &p);
+                uint32_t btn_pr = get_button_from_point(obj, &p);
+                if(btn_pr != btnm->btn_id_sel) {
+                    invalidate_button_area(obj, btnm->btn_id_sel); /*Invalidate the old area*/
+                    btnm->btn_id_sel = LV_BUTTONMATRIX_BUTTON_NONE;
+                }
             }
         }
     }
@@ -746,6 +753,10 @@ static void draw_main(lv_event_t * e)
             obj->skip_trans = 0;
         }
 
+        bool recolor = button_is_recolor(btnm->ctrl_bits[btn_i]);
+        if(recolor) draw_label_dsc_act.flag |= LV_TEXT_FLAG_RECOLOR;
+        else draw_label_dsc_act.flag &= ~LV_TEXT_FLAG_RECOLOR;
+
         draw_rect_dsc_act.base.id1 = btn_i;
 
         /*Remove borders on the edges if `LV_BORDER_SIDE_INTERNAL`*/
@@ -775,9 +786,9 @@ static void draw_main(lv_event_t * e)
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
         /*Get the size of the Arabic text and process it*/
-        size_t len_ap = _lv_text_ap_calc_bytes_count(txt);
+        size_t len_ap = lv_text_ap_calc_bytes_count(txt);
         if(len_ap < sizeof(txt_ap)) {
-            _lv_text_ap_proc(txt, txt_ap);
+            lv_text_ap_proc(txt, txt_ap);
             txt = txt_ap;
         }
 #endif
@@ -810,7 +821,7 @@ static void draw_main(lv_event_t * e)
  * @param obj pointer to button matrix object
  * @param map_p pointer to a string array
  */
-static void allocate_button_areas_and_controls(const lv_obj_t * obj, const char ** map)
+static void allocate_button_areas_and_controls(const lv_obj_t * obj, const char * const * map)
 {
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
     btnm->row_cnt = 1;
@@ -950,7 +961,7 @@ static uint32_t get_button_from_point(lv_obj_t * obj, lv_point_t * p)
                                                                                     BTN_EXTRA_CLICK_AREA_MAX); /*-2 for rounding error*/
         else btn_area.y2 += obj_cords.y1 + prow;
 
-        if(_lv_area_is_point_on(&btn_area, p, 0) != false) {
+        if(lv_area_is_point_on(&btn_area, p, 0) != false) {
             break;
         }
     }
@@ -1026,7 +1037,7 @@ static bool has_popovers_in_top_row(lv_obj_t * obj)
         return false;
     }
 
-    const char ** map_row = btnm->map_p;
+    const char * const * map_row = btnm->map_p;
     uint32_t btn_cnt = 0;
 
     while(map_row[btn_cnt] && lv_strcmp(map_row[btn_cnt], "\n") != 0 && map_row[btn_cnt][0] != '\0') {
@@ -1037,6 +1048,11 @@ static bool has_popovers_in_top_row(lv_obj_t * obj)
     }
 
     return false;
+}
+
+static bool button_is_recolor(lv_buttonmatrix_ctrl_t ctrl_bits)
+{
+    return (ctrl_bits & LV_BUTTONMATRIX_CTRL_RECOLOR) ? true : false;
 }
 
 #endif

@@ -7,7 +7,8 @@
  *      INCLUDES
  *********************/
 
-#include "lv_libinput.h"
+#include "../../indev/lv_indev_private.h"
+#include "lv_libinput_private.h"
 
 #if LV_USE_LIBINPUT
 
@@ -38,7 +39,7 @@
  *      TYPEDEFS
  **********************/
 
-struct lv_libinput_device {
+struct _lv_libinput_device {
     lv_libinput_capability capabilities;
     char * path;
 };
@@ -70,7 +71,7 @@ static void _delete(lv_libinput_t * dsc);
  *  STATIC VARIABLES
  **********************/
 
-static struct lv_libinput_device * devices = NULL;
+static struct _lv_libinput_device * devices = NULL;
 static size_t num_devices = 0;
 
 static const int timeout = 100; // ms
@@ -269,7 +270,7 @@ static bool _add_scanned_device(char * path, lv_libinput_capability capabilities
 {
     /* Double array size every 2^n elements */
     if((num_devices & (num_devices + 1)) == 0) {
-        struct lv_libinput_device * tmp = realloc(devices, (2 * num_devices + 1) * sizeof(struct lv_libinput_device));
+        struct _lv_libinput_device * tmp = realloc(devices, (2 * num_devices + 1) * sizeof(struct _lv_libinput_device));
         if(!tmp) {
             perror("could not reallocate memory for devices array");
             return false;
@@ -603,7 +604,7 @@ static void _read_keypad(lv_libinput_t * dsc, struct libinput_event * event)
                 /* Only record button state when actual output is produced to prevent widgets from refreshing */
                 evt->pressed = (key_state == LIBINPUT_KEY_STATE_RELEASED) ? LV_INDEV_STATE_RELEASED : LV_INDEV_STATE_PRESSED;
 
-                // just release the key immediatly after it got pressed.
+                // just release the key immediately after it got pressed.
                 // but don't handle special keys where holding a key makes sense
                 if(evt->key_val != LV_KEY_BACKSPACE &&
                    evt->key_val != LV_KEY_UP &&

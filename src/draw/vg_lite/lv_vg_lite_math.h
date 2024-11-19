@@ -36,6 +36,7 @@ extern "C" {
 #define MATH_SINF(x) sinf(x)
 #define MATH_COSF(x) cosf(x)
 #define MATH_ASINF(x) asinf(x)
+#define MATH_ACOSF(x) acosf(x)
 #define MATH_FABSF(x) fabsf(x)
 #define MATH_SQRTF(x) sqrtf(x)
 

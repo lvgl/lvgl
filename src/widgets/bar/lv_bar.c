@@ -6,12 +6,16 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_bar.h"
+#include "lv_bar_private.h"
+#include "../../misc/lv_area_private.h"
+#include "../../draw/lv_draw_mask_private.h"
+#include "../../core/lv_obj_private.h"
+#include "../../core/lv_obj_class_private.h"
 #if LV_USE_BAR != 0
 
 #include "../../draw/lv_draw.h"
 #include "../../misc/lv_assert.h"
-#include "../../misc/lv_anim.h"
+#include "../../misc/lv_anim_private.h"
 #include "../../misc/lv_math.h"
 
 /*********************
@@ -49,8 +53,8 @@ static void lv_bar_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_indic(lv_event_t * e);
 static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_t * value_ptr,
-                                       _lv_bar_anim_t * anim_info, lv_anim_enable_t en);
-static void lv_bar_init_anim(lv_obj_t * bar, _lv_bar_anim_t * bar_anim);
+                                       lv_bar_anim_t * anim_info, lv_anim_enable_t en);
+static void lv_bar_init_anim(lv_obj_t * bar, lv_bar_anim_t * bar_anim);
 static void lv_bar_anim(void * bar, int32_t value);
 static void lv_bar_anim_completed(lv_anim_t * a);
 
@@ -509,7 +513,7 @@ static void draw_indic(lv_event_t * e)
     /*The indicator is fully drawn if it's larger than the bg*/
     if((bg_left < 0 || bg_right < 0 || bg_top < 0 || bg_bottom < 0)) radius_issue = false;
     else if(indic_radius >= bg_radius) radius_issue = false;
-    else if(_lv_area_is_in(&indic_area, &bar_coords, bg_radius)) radius_issue = false;
+    else if(lv_area_is_in(&indic_area, &bar_coords, bg_radius)) radius_issue = false;
 
     if(radius_issue || mask_needed) {
         if(!radius_issue) {
@@ -624,14 +628,14 @@ static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 static void lv_bar_anim(void * var, int32_t value)
 {
-    _lv_bar_anim_t * bar_anim = var;
+    lv_bar_anim_t * bar_anim = var;
     bar_anim->anim_state    = value;
     lv_obj_invalidate(bar_anim->bar);
 }
 
 static void lv_bar_anim_completed(lv_anim_t * a)
 {
-    _lv_bar_anim_t * var = a->var;
+    lv_bar_anim_t * var = a->var;
     lv_obj_t * obj = (lv_obj_t *)var->bar;
     lv_bar_t * bar = (lv_bar_t *)obj;
 
@@ -644,7 +648,7 @@ static void lv_bar_anim_completed(lv_anim_t * a)
 }
 
 static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_t * value_ptr,
-                                       _lv_bar_anim_t * anim_info, lv_anim_enable_t en)
+                                       lv_bar_anim_t * anim_info, lv_anim_enable_t en)
 {
     if(en == LV_ANIM_OFF) {
         lv_anim_delete(anim_info, NULL);
@@ -683,7 +687,7 @@ static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_
     }
 }
 
-static void lv_bar_init_anim(lv_obj_t * obj, _lv_bar_anim_t * bar_anim)
+static void lv_bar_init_anim(lv_obj_t * obj, lv_bar_anim_t * bar_anim)
 {
     bar_anim->bar = obj;
     bar_anim->anim_start = 0;

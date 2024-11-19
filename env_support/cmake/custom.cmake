@@ -1,9 +1,4 @@
-set(LVGL_VERSION_MAJOR "9")
-set(LVGL_VERSION_MINOR "1")
-set(LVGL_VERSION_PATCH "1")
-set(LVGL_VERSION_INFO  "dev")
-set(LVGL_VERSION ${LVGL_VERSION_MAJOR}.${LVGL_VERSION_MINOR}.${LVGL_VERSION_PATCH})
-set(LVGL_SOVERSION ${LVGL_VERSION_MAJOR})
+include("${CMAKE_CURRENT_LIST_DIR}/version.cmake")
 
 # Option to define LV_LVGL_H_INCLUDE_SIMPLE, default: ON
 option(LV_LVGL_H_INCLUDE_SIMPLE
@@ -85,8 +80,13 @@ file(GLOB LVGL_PUBLIC_HEADERS
     "${LVGL_ROOT_DIR}/lv_version.h")
 
 if(NOT LV_CONF_SKIP)
-	list(APPEND LVGL_PUBLIC_HEADERS
-		"${CMAKE_SOURCE_DIR}/lv_conf.h")
+  if (LV_CONF_PATH)
+    list(APPEND LVGL_PUBLIC_HEADERS
+    ${LV_CONF_PATH})
+  else()
+    list(APPEND LVGL_PUBLIC_HEADERS
+    "${CMAKE_SOURCE_DIR}/lv_conf.h")
+  endif()
 endif()
 
 if("${LIB_INSTALL_DIR}" STREQUAL "")
@@ -99,24 +99,25 @@ if("${INC_INSTALL_DIR}" STREQUAL "")
   set(INC_INSTALL_DIR "include/lvgl")
 endif()
 
+
 #Install headers
 install(
   DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src"
-  DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
+  DESTINATION "${INC_INSTALL_DIR}"
   FILES_MATCHING
   PATTERN "*.h")
 
 # Install headers from the LVGL_PUBLIC_HEADERS variable
 install(
   FILES ${LVGL_PUBLIC_HEADERS}
-  DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
+  DESTINATION "${INC_INSTALL_DIR}/"
 )
 
 # install example headers
 if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
   install(
     DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/examples"
-    DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
+    DESTINATION "${INC_INSTALL_DIR}"
     FILES_MATCHING
     PATTERN "*.h")
 endif()
@@ -125,18 +126,18 @@ endif()
 if(NOT LV_CONF_BUILD_DISABLE_DEMOS)
   install(
     DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/demos"
-    DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
+    DESTINATION "${INC_INSTALL_DIR}"
     FILES_MATCHING
     PATTERN "*.h")
 endif()
 
 
-configure_file("${LVGL_ROOT_DIR}/lvgl.pc.in" lvgl.pc @ONLY)
-configure_file("${LVGL_ROOT_DIR}/lv_version.h.in" lv_version.h @ONLY)
+configure_file("${LVGL_ROOT_DIR}/lvgl.pc.in" ${CMAKE_CURRENT_BINARY_DIR}/lvgl.pc @ONLY)
+configure_file("${LVGL_ROOT_DIR}/lv_version.h.in" ${CMAKE_CURRENT_BINARY_DIR}/lv_version.h @ONLY)
 
 install(
   FILES "${CMAKE_CURRENT_BINARY_DIR}/lvgl.pc"
-  DESTINATION "${LIB_INSTALL_DIR}/pkgconfig/")
+  DESTINATION "share/pkgconfig/")
 
 # Install library
 set_target_properties(
@@ -144,9 +145,8 @@ set_target_properties(
   PROPERTIES OUTPUT_NAME lvgl
              VERSION ${LVGL_VERSION}
              SOVERSION ${LVGL_SOVERSION}
-             ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-             LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+             ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
+             LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
              PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
 
 install(
@@ -164,9 +164,8 @@ if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
     PROPERTIES OUTPUT_NAME lvgl_thorvg
                VERSION ${LVGL_VERSION}
                SOVERSION ${LVGL_SOVERSION}
-               ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-               LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-               RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+               ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
+               LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
                PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
 
   install(
@@ -184,9 +183,8 @@ if(NOT LV_CONF_BUILD_DISABLE_DEMOS)
     PROPERTIES OUTPUT_NAME lvgl_demos
                VERSION ${LVGL_VERSION}
                SOVERSION ${LVGL_SOVERSION}
-               ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-               LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-               RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+               ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
+               LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
                PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
 
   install(
@@ -204,9 +202,8 @@ if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
     PROPERTIES OUTPUT_NAME lvgl_examples
                VERSION ${LVGL_VERSION}
                SOVERSION ${LVGL_SOVERSION}
-               ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-               LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-               RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+               ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
+               LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
                PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
 
   install(

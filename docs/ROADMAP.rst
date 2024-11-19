@@ -50,12 +50,12 @@ Architecture
   (see `here <https://github.com/lvgl/lvgl/pull/3390#pullrequestreview-990710921>`__)
 - |check| Make LVGL render independent areas in parallel.
   `#4016 <https://github.com/lvgl/lvgl/issues/4016>`__
-- |check| Drop `lv_mem_buf_get` as tlsf should be fast enough for normal allocations too.
+- |check| Drop `lv_mem_buf_get` as tlsf should be fast enough for normal allocations as well.
   Fragmentation is also lower if processes can completely clean up after themselves.
 - |check| More color formats: 24 bit, ARGB1555, ARGB4444 etc
   (see `here <https://forum.lvgl.io/t/keypad-input-device-why-lv-event-long-pressed-only-on-enter/10263>`__)
 - |check| Unified caching #3116 #3415
-- |check| Variable binding. I.e create properties which can be bound to objects and those objects are notified on value change. Maybe based on `lv_msg`?
+- |check| Variable binding. I.e create properties which can be bound to Widgets and those Widgets are notified on value change. Maybe based on `lv_msg`?
 - |uncheck| Add GPU abstraction for display rotation
 - |check| Replace the `read_line_cb` of the image decoders with `get_area_cb`
 - |check| Limit the image caching size in bytes instead of image count
@@ -144,7 +144,7 @@ Widgets
 - |uncheck| `lv_bar`, `lv_arc`: handle max < min for fill direction swapping #4039
 - |uncheck| `lv_bar`, `lv_slider`, `lv_arc`: make possible to move the knob only inside the background (see `here <https://forum.lvgl.io/t/slider-knob-out-of-the-track/11956>`__)
 - |uncheck| Improve `lv_label_align_t` #1656
-- |uncheck| `lv_label` reconsider label long modes. (support min/max-width/height too) #3420
+- |uncheck| `lv_label` reconsider label long modes. (support min/max-width/height as well) #3420
 - |uncheck| `lv_roller` make it more flexible #4009
 
 Others
@@ -164,7 +164,7 @@ Ideas
 - Reconsider how themes should work.
 - Better way to reset global variables in `lv_deinit()` #3385
 - `lv_array`: replace linked lists with array where possible (arrays are faster and uses less memory)
-- Reconsider how to handle UTF-8 characters (allow different encoding too) and Bidi. Maybe create an abstraction for textshaping.
+- Reconsider how to handle UTF-8 characters (allow different encoding as well) and Bidi. Maybe create an abstraction for textshaping.
 - Consider direct binary font format support
 - Improve groups. `Discussion <https://forum.lvgl.io/t/lv-group-tabindex/2927/3>`__.
   Reconsider focusing logic. Allow having no widget selected (on web it's possible). Keep editing state in `lv_obj_t`

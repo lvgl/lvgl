@@ -1,5 +1,5 @@
 /**
- * @file lv_cb.h
+ * @file lv_checkbox.h
  *
  */
 
@@ -21,16 +21,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-typedef struct {
-    lv_obj_t obj;
-    char * txt;
-    uint32_t static_txt : 1;
-} lv_checkbox_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_checkbox_class;
 

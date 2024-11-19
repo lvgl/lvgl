@@ -6,11 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_obj_draw.h"
-#include "lv_obj.h"
+#include "lv_obj_draw_private.h"
+#include "lv_obj_private.h"
+#include "lv_obj_style.h"
 #include "../display/lv_display.h"
 #include "../indev/lv_indev.h"
 #include "../stdlib/lv_string.h"
+#include "../draw/lv_draw_arc.h"
 
 /*********************
  *      DEFINES
@@ -288,7 +290,7 @@ void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    int32_t s_old = _lv_obj_get_ext_draw_size(obj);
+    int32_t s_old = lv_obj_get_ext_draw_size(obj);
     int32_t s_new = 0;
     lv_obj_send_event(obj, LV_EVENT_REFR_EXT_DRAW_SIZE, &s_new);
 
@@ -306,13 +308,13 @@ void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
     if(s_new != s_old) lv_obj_invalidate(obj);
 }
 
-int32_t _lv_obj_get_ext_draw_size(const lv_obj_t * obj)
+int32_t lv_obj_get_ext_draw_size(const lv_obj_t * obj)
 {
     if(obj->spec_attr) return obj->spec_attr->ext_draw_size;
     else return 0;
 }
 
-lv_layer_type_t _lv_obj_get_layer_type(const lv_obj_t * obj)
+lv_layer_type_t lv_obj_get_layer_type(const lv_obj_t * obj)
 {
 
     if(obj->spec_attr) return (lv_layer_type_t)obj->spec_attr->layer_type;

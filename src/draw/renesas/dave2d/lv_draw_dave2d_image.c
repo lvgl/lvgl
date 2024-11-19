@@ -9,6 +9,8 @@
 #include "lv_draw_dave2d.h"
 #if LV_USE_DRAW_DAVE2D
 
+#include "../../lv_image_decoder_private.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -40,10 +42,10 @@ void lv_draw_dave2d_image(lv_draw_dave2d_unit_t * draw_unit, const lv_draw_image
                           const lv_area_t * coords)
 {
     if(!draw_dsc->tile) {
-        _lv_draw_image_normal_helper((lv_draw_unit_t *)draw_unit, draw_dsc, coords, img_draw_core);
+        lv_draw_image_normal_helper((lv_draw_unit_t *)draw_unit, draw_dsc, coords, img_draw_core);
     }
     else {
-        _lv_draw_image_tiled_helper((lv_draw_unit_t *)draw_unit, draw_dsc, coords, img_draw_core);
+        lv_draw_image_tiled_helper((lv_draw_unit_t *)draw_unit, draw_dsc, coords, img_draw_core);
     }
 }
 

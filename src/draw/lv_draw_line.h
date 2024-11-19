@@ -35,10 +35,10 @@ typedef struct {
     int32_t dash_width;
     int32_t dash_gap;
     lv_opa_t opa;
-    lv_blend_mode_t blend_mode  : 2;
+    lv_blend_mode_t blend_mode  : 3;
     uint8_t round_start : 1;
     uint8_t round_end   : 1;
-    uint8_t raw_end     : 1;    /*Do not bother with perpendicular line ending if it's not visible for any reason*/
+    uint8_t raw_end     : 1;    /**< Do not bother with perpendicular line ending if it's not visible for any reason */
 } lv_draw_line_dsc_t;
 
 /**********************

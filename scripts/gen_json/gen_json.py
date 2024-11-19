@@ -362,7 +362,7 @@ if __name__ == '__main__':
             "using this feature."
         ),
         action="store",
-        default=os.path.join(temp_directory, "lvgl.h")
+        default=os.path.join(temp_directory, "lvgl", "lvgl.h")
     )
     parser.add_argument(
         '--filter-private',

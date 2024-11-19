@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_draw_sw_gradient.c
  *
  */
@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_sw_gradient.h"
+#include "lv_draw_sw_gradient_private.h"
 #if LV_USE_DRAW_SW
 
 #include "../../misc/lv_types.h"

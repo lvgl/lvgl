@@ -47,8 +47,9 @@ static struct rt_thread lvgl_thread;
 static rt_uint8_t lvgl_thread_stack[PKG_LVGL_THREAD_STACK_SIZE];
 
 #if LV_USE_LOG
-static void lv_rt_log(const char *buf)
+static void lv_rt_log(lv_log_level_t level, const char * buf)
 {
+    (void) level;
     LOG_I(buf);
 }
 #endif /* LV_USE_LOG */
@@ -66,11 +67,11 @@ static void lvgl_thread_entry(void *parameter)
     lv_log_register_print_cb(lv_rt_log);
 #endif /* LV_USE_LOG */
     lv_init();
+    lv_tick_set_cb(&rt_tick_get_millisecond);
     lv_port_disp_init();
     lv_port_indev_init();
     lv_user_gui_init();
 
-    lv_tick_set_cb(&rt_tick_get_millisecond);
 
 #ifdef PKG_USING_CPU_USAGE
     cpu_usage_init();

@@ -33,89 +33,31 @@ LV_EXPORT_CONST_INT(LV_CHART_POINT_NONE);
 /**
  * Chart types
  */
-enum _lv_chart_type_t {
+typedef enum {
     LV_CHART_TYPE_NONE,     /**< Don't draw the series*/
     LV_CHART_TYPE_LINE,     /**< Connect the points with lines*/
     LV_CHART_TYPE_BAR,      /**< Draw columns*/
     LV_CHART_TYPE_SCATTER,  /**< Draw points and lines in 2D (x,y coordinates)*/
-};
-
-#ifdef DOXYGEN
-typedef _lv_chart_type_t lv_chart_type_t;
-#else
-typedef uint8_t lv_chart_type_t;
-#endif /*DOXYGEN*/
+} lv_chart_type_t;
 
 /**
  * Chart update mode for `lv_chart_set_next`
  */
-enum _lv_chart_update_mode_t {
+typedef enum {
     LV_CHART_UPDATE_MODE_SHIFT,     /**< Shift old data to the left and add the new one the right*/
     LV_CHART_UPDATE_MODE_CIRCULAR,  /**< Add the new data in a circular way*/
-};
-
-#ifdef DOXYGEN
-typedef _lv_chart_update_mode_t lv_chart_update_mode_t;
-#else
-typedef uint8_t lv_chart_update_mode_t;
-#endif /*DOXYGEN*/
+} lv_chart_update_mode_t;
 
 /**
  * Enumeration of the axis'
  */
-enum _lv_chart_axis_t {
+typedef enum {
     LV_CHART_AXIS_PRIMARY_Y     = 0x00,
     LV_CHART_AXIS_SECONDARY_Y   = 0x01,
     LV_CHART_AXIS_PRIMARY_X     = 0x02,
     LV_CHART_AXIS_SECONDARY_X   = 0x04,
-    _LV_CHART_AXIS_LAST
-};
-
-#ifdef DOXYGEN
-typedef _lv_chart_axis_t lv_chart_axis_t;
-#else
-typedef uint8_t lv_chart_axis_t;
-#endif /*DOXYGEN*/
-
-/**
- * Descriptor a chart series
- */
-typedef struct {
-    int32_t * x_points;
-    int32_t * y_points;
-    lv_color_t color;
-    uint32_t start_point;
-    uint32_t hidden : 1;
-    uint32_t x_ext_buf_assigned : 1;
-    uint32_t y_ext_buf_assigned : 1;
-    uint32_t x_axis_sec : 1;
-    uint32_t y_axis_sec : 1;
-} lv_chart_series_t;
-
-typedef struct {
-    lv_point_t pos;
-    int32_t point_id;
-    lv_color_t color;
-    lv_chart_series_t * ser;
-    lv_dir_t dir;
-    uint32_t pos_set: 1; /*1: pos is set; 0: point_id is set*/
-} lv_chart_cursor_t;
-
-typedef struct {
-    lv_obj_t obj;
-    lv_ll_t series_ll;     /**< Linked list for the series (stores lv_chart_series_t)*/
-    lv_ll_t cursor_ll;     /**< Linked list for the cursors (stores lv_chart_cursor_t)*/
-    int32_t ymin[2];
-    int32_t ymax[2];
-    int32_t xmin[2];
-    int32_t xmax[2];
-    int32_t pressed_point_id;
-    uint32_t hdiv_cnt;      /**< Number of horizontal division lines*/
-    uint32_t vdiv_cnt;      /**< Number of vertical division lines*/
-    uint32_t point_cnt;    /**< Point number in a data line*/
-    lv_chart_type_t type  : 3; /**< Line or column chart*/
-    lv_chart_update_mode_t update_mode : 1;
-} lv_chart_t;
+    LV_CHART_AXIS_LAST
+} lv_chart_axis_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_chart_class;
 
@@ -239,6 +181,14 @@ void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hid
  * @param color     the new color of the series
  */
 void lv_chart_set_series_color(lv_obj_t * chart, lv_chart_series_t * series, lv_color_t color);
+
+/**
+ * Get the color of a series
+ * @param chart     pointer to a chart object.
+ * @param series    pointer to a series object
+ * @return          the color of the series
+ */
+lv_color_t lv_chart_get_series_color(lv_obj_t * chart, const lv_chart_series_t * series);
 
 /**
  * Set the index of the x-axis start point in the data array.

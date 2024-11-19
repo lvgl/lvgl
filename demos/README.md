@@ -11,19 +11,19 @@
  * DEMO USAGE
  ====================*/
 
-/*Show some widget. It might be required to increase `LV_MEM_SIZE` */
+/* Show some widget. It might be required to increase `LV_MEM_SIZE` */
 #define LV_USE_DEMO_WIDGETS        0
 
-/*Demonstrate the usage of encoder and keyboard*/
+/* Demonstrate the usage of encoder and keyboard */
 #define LV_USE_DEMO_KEYPAD_AND_ENCODER     0
 
-/*Benchmark your system*/
+/* Benchmark your system */
 #define LV_USE_DEMO_BENCHMARK   0
 
-/*Stress test for LVGL*/
+/* Stress test for LVGL */
 #define LV_USE_DEMO_STRESS      0
 
-/*Music player demo*/
+/* Music player demo */
 #define LV_USE_DEMO_MUSIC       0
 #if LV_USE_DEMO_MUSIC
 # define LV_DEMO_MUSIC_SQUARE       0
@@ -33,16 +33,16 @@
 # define LV_DEMO_MUSIC_AUTO_PLAY    0
 #endif
 
-/*Flex layout demo*/
+/* Flex layout demo */
 #define LV_USE_DEMO_FLEX_LAYOUT     0
 
-/*Smart-phone like multi-language demo*/
+/* Smart-phone like multi-language demo */
 #define LV_USE_DEMO_MULTILANG       0
 
-/*Widget transformation demo*/
+/* Widget transformation demo */
 #define LV_USE_DEMO_TRANSFORM       0
 
-/*Demonstrate scroll settings*/
+/* Demonstrate scroll settings */
 #define LV_USE_DEMO_SCROLL          0
 ...
 ```
@@ -122,7 +122,7 @@ See in [widgets](https://github.com/lvgl/lvgl/tree/master/demos/widgets) folder.
 For running this demo properly, please make sure **LV_MEM_SIZE** is at least **38KB** (and **48KB** is recommended):
 
 ```c
-#define LV_MEME_SIZE    (38ul * 1024ul)
+#define LV_MEM_SIZE    (38ul * 1024ul)
 ```
 
 

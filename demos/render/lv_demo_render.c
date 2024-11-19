@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_demo_render.c
  *
  */
@@ -10,7 +10,6 @@
 
 #if LV_USE_DEMO_RENDER
 
-#include "../../src/display/lv_display_private.h"
 #include "../../src/core/lv_global.h"
 
 /*********************
@@ -336,6 +335,7 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
     LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb565);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_argb8888);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_l8);
+    LV_IMAGE_DECLARE(img_render_lvgl_logo_i1);
 
     const void * srcs[] = {
         &img_render_lvgl_logo_argb8888,
@@ -343,6 +343,7 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
         &img_render_lvgl_logo_rgb888,
         &img_render_lvgl_logo_rgb565,
         &img_render_lvgl_logo_l8,
+        &img_render_lvgl_logo_i1,
     };
 
     const void * names[] = {
@@ -351,6 +352,7 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
         "RGB\n888",
         "RGB\n565",
         "L8",
+        "I1",
     };
 
     uint32_t stopAt = startAt + LV_MIN(sizeof(srcs) / sizeof(void *) - startAt, 4);
@@ -528,12 +530,14 @@ static void triangle_draw_event_cb(lv_event_t * e)
 
     lv_point_t * p_rel = lv_event_get_user_data(e);
 
-    dsc.p[0].x = p_rel[0].x + obj->coords.x1 + 8;
-    dsc.p[0].y = p_rel[0].y + obj->coords.y1 + 2;
-    dsc.p[1].x = p_rel[1].x + obj->coords.x1 + 8;
-    dsc.p[1].y = p_rel[1].y + obj->coords.y1 + 2;
-    dsc.p[2].x = p_rel[2].x + obj->coords.x1 + 8;
-    dsc.p[2].y = p_rel[2].y + obj->coords.y1 + 2;
+    lv_area_t coords;
+    lv_obj_get_coords(obj, &coords);
+    dsc.p[0].x = p_rel[0].x + coords.x1 + 8;
+    dsc.p[0].y = p_rel[0].y + coords.y1 + 2;
+    dsc.p[1].x = p_rel[1].x + coords.x1 + 8;
+    dsc.p[1].y = p_rel[1].y + coords.y1 + 2;
+    dsc.p[2].x = p_rel[2].x + coords.x1 + 8;
+    dsc.p[2].y = p_rel[2].y + coords.y1 + 2;
 
     lv_opa_t opa = lv_obj_get_style_opa(obj, 0);
     dsc.bg_grad.dir = lv_obj_get_style_bg_grad_dir(obj, 0);
@@ -764,6 +768,21 @@ static lv_obj_t * create_blend_mode_obj(lv_obj_t * parent, int32_t col, int32_t 
     return obj;
 }
 
+static void canvas_draw_buf_reshape(lv_draw_buf_t * draw_buf)
+{
+#if LV_USE_DRAW_VG_LITE
+    /* VG-Lite requires automatic stride calculation */
+    lv_draw_buf_t * buf = lv_draw_buf_reshape(draw_buf,
+                                              draw_buf->header.cf,
+                                              draw_buf->header.w,
+                                              draw_buf->header.h,
+                                              LV_STRIDE_AUTO);
+    LV_ASSERT_MSG(buf == draw_buf, "Reshape failed");
+#else
+    LV_UNUSED(draw_buf);
+#endif
+}
+
 static void blend_mode_cb(lv_obj_t * parent)
 {
 
@@ -774,17 +793,16 @@ static void blend_mode_cb(lv_obj_t * parent)
     /*Make the parent darker for additive blending*/
     lv_obj_set_style_bg_color(parent, lv_color_hex(0x808080), 0);
 
-    static uint8_t buf_rgb565[LV_CANVAS_BUF_SIZE(36, 30, 16, LV_DRAW_BUF_STRIDE_ALIGN)];
-    static uint8_t buf_rgb888[LV_CANVAS_BUF_SIZE(36, 30, 24, LV_DRAW_BUF_STRIDE_ALIGN)];
-    static uint8_t buf_xrgb8888[LV_CANVAS_BUF_SIZE(36, 30, 32, LV_DRAW_BUF_STRIDE_ALIGN)];
-    static uint8_t buf_argb8888[LV_CANVAS_BUF_SIZE(36, 30, 32, LV_DRAW_BUF_STRIDE_ALIGN)];
+    LV_DRAW_BUF_DEFINE_STATIC(buf_rgb565, 36, 30, LV_COLOR_FORMAT_RGB565);
+    LV_DRAW_BUF_DEFINE_STATIC(buf_rgb888, 36, 30, LV_COLOR_FORMAT_RGB888);
+    LV_DRAW_BUF_DEFINE_STATIC(buf_xrgb8888, 36, 30, LV_COLOR_FORMAT_XRGB8888);
+    LV_DRAW_BUF_DEFINE_STATIC(buf_argb8888, 36, 30, LV_COLOR_FORMAT_ARGB8888);
 
     /*The canvas will stay in the top left corner to show the original image*/
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
 
     const char * cf_txt[] = {"RGB565", "RGB888.", "XRGB8888", "ARGB8888"};
-    lv_color_format_t cf_values[] = {LV_COLOR_FORMAT_RGB565, LV_COLOR_FORMAT_RGB888, LV_COLOR_FORMAT_XRGB8888, LV_COLOR_FORMAT_ARGB8888};
-    uint8_t * cf_bufs[] = {buf_rgb565, buf_rgb888, buf_xrgb8888, buf_argb8888};
+    lv_draw_buf_t * cf_bufs[] = {&buf_rgb565, &buf_rgb888, &buf_xrgb8888, &buf_argb8888};
     static lv_draw_buf_t image_dscs[4];
 
     const char * mode_txt[] = {"Add.", "Sub.", "Mul."};
@@ -803,7 +821,8 @@ static void blend_mode_cb(lv_obj_t * parent)
         lv_label_set_text(cf_label, cf_txt[cf]);
         lv_obj_set_grid_cell(cf_label, LV_GRID_ALIGN_CENTER, 1 + cf * 2, 2, LV_GRID_ALIGN_CENTER, 0, 1);
 
-        lv_canvas_set_buffer(canvas, cf_bufs[cf], 36, 30, cf_values[cf]);
+        canvas_draw_buf_reshape(cf_bufs[cf]);
+        lv_canvas_set_draw_buf(canvas, cf_bufs[cf]);
         create_blend_mode_image_buffer(canvas);
         lv_draw_buf_t * img_src = lv_canvas_get_draw_buf(canvas);
         image_dscs[cf] = *img_src;
@@ -1129,7 +1148,7 @@ void lv_demo_render(lv_demo_render_scene_t id, lv_opa_t opa)
 
 const char * lv_demo_render_get_scene_name(lv_demo_render_scene_t id)
 {
-    if(id > _LV_DEMO_RENDER_SCENE_NUM) return NULL;
+    if(id > LV_DEMO_RENDER_SCENE_NUM) return NULL;
     return scenes[id].name;
 }
 

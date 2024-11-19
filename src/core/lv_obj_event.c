@@ -6,7 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_obj.h"
+#include "../misc/lv_event_private.h"
+#include "lv_obj_event_private.h"
+#include "lv_obj_class_private.h"
+#include "lv_obj_private.h"
 #include "../indev/lv_indev.h"
 #include "../indev/lv_indev_private.h"
 
@@ -58,13 +61,13 @@ lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void *
     e.stop_bubbling = 0;
     e.stop_processing = 0;
 
-    _lv_event_push(&e);
+    lv_event_push(&e);
 
     /*Send the event*/
     lv_result_t res = event_send_core(&e);
 
     /*Remove this element from the list*/
-    _lv_event_pop(&e);
+    lv_event_pop(&e);
 
     return res;
 }
@@ -129,7 +132,7 @@ bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
     uint32_t i;
     for(i = 0; i < event_cnt; i++) {
         lv_event_dsc_t * dsc = lv_obj_get_event_dsc(obj, i);
-        if(dsc->cb == event_cb) {
+        if(dsc && dsc->cb == event_cb) {
             lv_obj_remove_event(obj, i);
             return true;
         }
@@ -368,7 +371,6 @@ static lv_result_t event_send_core(lv_event_t * e)
     if(parent && event_is_bubbled(e)) {
         e->current_target = parent;
         res = event_send_core(e);
-        if(res != LV_RESULT_OK || e->stop_processing || e->stop_bubbling) return res;
     }
 
     return res;

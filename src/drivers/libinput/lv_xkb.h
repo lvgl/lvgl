@@ -18,21 +18,13 @@ extern "C" {
 
 #if defined(LV_LIBINPUT_XKB) && LV_LIBINPUT_XKB
 
+#include "../../misc/lv_types.h"
 #include <stdbool.h>
 #include <xkbcommon/xkbcommon.h>
 
 /*********************
  *      DEFINES
  *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-typedef struct {
-    struct xkb_keymap * keymap;
-    struct xkb_state * state;
-} lv_xkb_t;
 
 /**********************
  * GLOBAL PROTOTYPES

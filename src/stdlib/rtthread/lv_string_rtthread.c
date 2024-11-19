@@ -55,7 +55,7 @@ size_t lv_strlen(const char * str)
     return rt_strlen(str);
 }
 
-int32_t lv_memcmp(const void * p1, const void * p2, size_t len)
+int lv_memcmp(const void * p1, const void * p2, size_t len)
 {
     return rt_memcmp(p1, p2, len);
 }
@@ -81,9 +81,14 @@ char * lv_strcpy(char * dst, const char * src)
     return rt_strcpy(dst, src);
 }
 
-int32_t lv_strcmp(const char * s1, const char * s2)
+int lv_strcmp(const char * s1, const char * s2)
 {
     return rt_strcmp(s1, s2);
+}
+
+int lv_strncmp(const char * s1, const char * s2, size_t len)
+{
+    return rt_strncmp(s1, s2, len);
 }
 
 char * lv_strdup(const char * src)
@@ -114,6 +119,21 @@ char * lv_strncat(char * dst, const char * src, size_t src_len)
     }
     *dst = '\0';
     return tmp;
+}
+
+char * lv_strchr(const char * s, int c)
+{
+    for(; ; s++) {
+        if(*s == c) {
+            return (char *)s;
+        }
+
+        if(*s == '\0') {
+            break;
+        }
+    }
+
+    return NULL;
 }
 
 /**********************

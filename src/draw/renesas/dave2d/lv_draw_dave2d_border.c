@@ -1,6 +1,7 @@
 #include "lv_draw_dave2d.h"
 #if LV_USE_DRAW_DAVE2D
 
+
 static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * draw_unit, const lv_area_t * outer_area,
                                        const lv_area_t * inner_area,
                                        int32_t rout, int32_t rin, lv_color_t color, lv_opa_t opa);
@@ -55,7 +56,7 @@ static void dave2d_draw_border_simple(lv_draw_dave2d_unit_t * u, const lv_area_t
     int32_t y;
     bool is_common;
 
-    is_common = _lv_area_intersect(&clip_area, outer_area, u->base_unit.clip_area);
+    is_common = lv_area_intersect(&clip_area, outer_area, u->base_unit.clip_area);
     if(!is_common) return;
 
 #if LV_USE_OS
@@ -170,7 +171,7 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
     outer_area = *orig_outer_area;
     inner_area = *orig_inner_area;
 
-    if(!_lv_area_intersect(&draw_area, &outer_area, u->base_unit.clip_area)) return;
+    if(!lv_area_intersect(&draw_area, &outer_area, u->base_unit.clip_area)) return;
 
 #if LV_USE_OS
     lv_result_t  status;
@@ -285,7 +286,7 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
             arc_area.x2 = core_area.x1;
             arc_area.y2 = core_area.y1;
 
-            if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
+            if(lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
                 d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
                             (d2_border)clip_arc.y2);
                 result = d2_renderwedge(u->d2_handle,
@@ -312,7 +313,7 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
             arc_area.x2 = core_area.x1;
             arc_area.y2 = core_area.y2 + rout;
 
-            if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
+            if(lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
 
                 d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
                             (d2_border)clip_arc.y2);
@@ -348,7 +349,7 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
                 arc_area.x2 = core_area.x2 + rout;
                 arc_area.y2 = core_area.y1;
 
-                if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
+                if(lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
 
                     d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
                                 (d2_border)clip_arc.y2);
@@ -376,7 +377,7 @@ static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * u, const lv_area_
                 arc_area.x2 = core_area.x2 + rout;
                 arc_area.y2 = core_area.y2 + rout;
 
-                if(_lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
+                if(lv_area_intersect(&clip_arc, &arc_area, &draw_area)) {
 
                     d2_cliprect(u->d2_handle, (d2_border)clip_arc.x1, (d2_border)clip_arc.y1, (d2_border)clip_arc.x2,
                                 (d2_border)clip_arc.y2);

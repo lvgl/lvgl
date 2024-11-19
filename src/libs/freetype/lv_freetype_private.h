@@ -14,7 +14,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../lvgl.h"
+#include "lv_freetype.h"
+#include "../../misc/cache/lv_cache.h"
+#include "../../misc/lv_ll.h"
+#include "../../font/lv_font.h"
 
 #if LV_USE_FREETYPE
 
@@ -56,6 +59,20 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+struct _lv_freetype_outline_vector_t {
+    int32_t x;
+    int32_t y;
+};
+
+struct _lv_freetype_outline_event_param_t {
+    lv_freetype_outline_t outline;
+    lv_freetype_outline_type_t type;
+    lv_freetype_outline_vector_t to;
+    lv_freetype_outline_vector_t control1;
+    lv_freetype_outline_vector_t control2;
+};
+
 
 typedef struct _lv_freetype_cache_node_t lv_freetype_cache_node_t;
 

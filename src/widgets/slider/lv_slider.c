@@ -6,7 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_slider.h"
+#include "lv_slider_private.h"
+#include "../../misc/lv_area_private.h"
+#include "../../core/lv_obj_private.h"
+#include "../../core/lv_obj_event_private.h"
+#include "../../core/lv_obj_class_private.h"
 #if LV_USE_SLIDER != 0
 
 #include "../../misc/lv_assert.h"
@@ -79,6 +83,59 @@ bool lv_slider_is_dragged(const lv_obj_t * obj)
     return slider->dragging;
 }
 
+void lv_slider_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
+{
+    lv_bar_set_value(obj, value, anim);
+}
+
+void lv_slider_set_left_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
+{
+    lv_bar_set_start_value(obj, value, anim);
+}
+
+void lv_slider_set_range(lv_obj_t * obj, int32_t min, int32_t max)
+{
+    lv_bar_set_range(obj, min, max);
+}
+
+void lv_slider_set_mode(lv_obj_t * obj, lv_slider_mode_t mode)
+{
+    lv_bar_set_mode(obj, (lv_bar_mode_t)mode);
+}
+
+int32_t lv_slider_get_value(const lv_obj_t * obj)
+{
+    return lv_bar_get_value(obj);
+}
+
+int32_t lv_slider_get_left_value(const lv_obj_t * obj)
+{
+    return lv_bar_get_start_value(obj);
+}
+
+int32_t lv_slider_get_min_value(const lv_obj_t * obj)
+{
+    return lv_bar_get_min_value(obj);
+}
+
+int32_t lv_slider_get_max_value(const lv_obj_t * obj)
+{
+    return lv_bar_get_max_value(obj);
+}
+
+lv_slider_mode_t lv_slider_get_mode(lv_obj_t * slider)
+{
+    lv_bar_mode_t mode = lv_bar_get_mode(slider);
+    if(mode == LV_BAR_MODE_SYMMETRICAL) return LV_SLIDER_MODE_SYMMETRICAL;
+    else if(mode == LV_BAR_MODE_RANGE) return LV_SLIDER_MODE_RANGE;
+    else return LV_SLIDER_MODE_NORMAL;
+}
+
+bool lv_slider_is_symmetrical(lv_obj_t * obj)
+{
+    return lv_bar_is_symmetrical(obj);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -123,13 +180,13 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_area_t a;
         lv_area_copy(&a, &slider->right_knob_area);
         lv_area_increase(&a, ext_click_area, ext_click_area);
-        info->res = _lv_area_is_point_on(&a, info->point, 0);
+        info->res = lv_area_is_point_on(&a, info->point, 0);
 
         /*There's still a chance that there is a hit if there is another knob*/
         if((info->res == false) && (type == LV_SLIDER_MODE_RANGE)) {
             lv_area_copy(&a, &slider->left_knob_area);
             lv_area_increase(&a, ext_click_area, ext_click_area);
-            info->res = _lv_area_is_point_on(&a, info->point, 0);
+            info->res = lv_area_is_point_on(&a, info->point, 0);
         }
     }
     else if(code == LV_EVENT_PRESSED) {

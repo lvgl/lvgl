@@ -29,28 +29,60 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-#if LV_TINY_TTF_FILE_SUPPORT !=0
-/* create a font from the specified file or path with the specified line height.*/
+#if LV_TINY_TTF_FILE_SUPPORT != 0
+/**
+ * Create a font from the specified file or path with the specified line height.
+ * @param path        the path or file name of the font
+ * @param font_size   the font size in pixel
+ * @return a font object
+ */
 lv_font_t * lv_tiny_ttf_create_file(const char * path, int32_t font_size);
 
-/* create a font from the specified file or path with the specified line height with the specified cache size.*/
-lv_font_t * lv_tiny_ttf_create_file_ex(const char * path, int32_t font_size, size_t cache_size);
+/**
+ * Create a font from the specified file or path with the specified line height with the specified cache size.
+ * @param path        the path or file name of the font
+ * @param font_size   the font size in pixel
+ * @param kerning     kerning value in pixel
+ * @param cache_size  the cache size in count
+ * @return a font object
+ */
+lv_font_t * lv_tiny_ttf_create_file_ex(const char * path, int32_t font_size, lv_font_kerning_t kerning,
+                                       size_t cache_size);
 #endif
 
-void lv_tiny_ttf_init(void);
-
-void lv_tiny_ttf_deinit(void);
-
-/* create a font from the specified data pointer with the specified line height.*/
+/**
+ * Create a font from the specified data pointer with the specified line height.
+ * @param data        the data pointer
+ * @param data_size   the data size
+ * @param font_size   the font size in pixel
+ * @return a font object
+ */
 lv_font_t * lv_tiny_ttf_create_data(const void * data, size_t data_size, int32_t font_size);
 
-/* create a font from the specified data pointer with the specified line height and the specified cache size.*/
-lv_font_t * lv_tiny_ttf_create_data_ex(const void * data, size_t data_size, int32_t font_size, size_t cache_size);
+/**
+ * Create a font from the specified data pointer with the specified line height and the specified cache size.
+ * @param data        the data pointer
+ * @param data_size   the data size
+ * @param font_size   the font size in pixel
+ * @param kerning     kerning value in pixel
+ * @param cache_size  the cache size in count
+ * @return
+ */
+lv_font_t * lv_tiny_ttf_create_data_ex(const void * data, size_t data_size, int32_t font_size,
+                                       lv_font_kerning_t kerning, size_t cache_size);
 
-/* set the size of the font to a new font_size*/
+/**
+ * Set the size of the font to a new font_size
+ * @note the font bitmap cache and glyph cache will be flushed.
+ * @param font        the font object
+ * @param font_size   the font size in pixel
+ */
 void lv_tiny_ttf_set_size(lv_font_t * font, int32_t font_size);
 
-/* destroy a font previously created with lv_tiny_ttf_create_xxxx()*/
+/**
+ * Destroy a font previously created with lv_tiny_ttf_create_xxxx()
+ * @param font        the font object
+ */
 void lv_tiny_ttf_destroy(lv_font_t * font);
 
 /**********************

@@ -72,6 +72,20 @@ void lv_anim_timeline_pause(lv_anim_timeline_t * at);
 void lv_anim_timeline_set_reverse(lv_anim_timeline_t * at, bool reverse);
 
 /**
+ * Make the animation timeline repeat itself.
+ * @param at        pointer to the animation timeline.
+ * @param cnt       repeat count or `LV_ANIM_REPEAT_INFINITE` for infinite repetition. 0: to disable repetition.
+ */
+void lv_anim_timeline_set_repeat_count(lv_anim_timeline_t * at, uint32_t cnt);
+
+/**
+ * Set a delay before repeating the animation timeline.
+ * @param at        pointer to the animation timeline.
+ * @param delay     delay in milliseconds before repeating the animation timeline.
+ */
+void lv_anim_timeline_set_repeat_delay(lv_anim_timeline_t * at, uint32_t delay);
+
+/**
  * Set the progress of the animation timeline.
  * @param at        pointer to the animation timeline.
  * @param progress  set value 0~65535 to map 0~100% animation progress.
@@ -98,6 +112,18 @@ bool lv_anim_timeline_get_reverse(lv_anim_timeline_t * at);
  * @return return value 0~65535 to map 0~100% animation progress.
  */
 uint16_t lv_anim_timeline_get_progress(lv_anim_timeline_t * at);
+
+/**
+ * Get repeat count of the animation timeline.
+ * @param at    pointer to the animation timeline.
+ */
+uint32_t lv_anim_timeline_get_repeat_count(lv_anim_timeline_t * at);
+
+/**
+ * Get repeat delay of the animation timeline.
+ * @param at    pointer to the animation timeline.
+ */
+uint32_t lv_anim_timeline_get_repeat_delay(lv_anim_timeline_t * at);
 
 /**********************
  *      MACROS

@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 
+#include "../lv_image_decoder_private.h"
 #include "lv_vg_lite_decoder.h"
 
 #if LV_USE_DRAW_VG_LITE
@@ -14,6 +15,7 @@
 #include "lv_vg_lite_utils.h"
 #include <stdlib.h>
 #include <string.h>
+#include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES
@@ -39,15 +41,11 @@
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    lv_draw_buf_t yuv;  /*A draw buffer struct for yuv variable image*/
-} decoder_data_t;
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * src, lv_image_header_t * header);
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void image_color32_pre_mul(lv_color32_t * img_data, uint32_t px_size);
@@ -152,15 +150,11 @@ static void image_decode_to_index8_line(uint8_t * dest, const uint8_t * src, int
     }
 }
 
-static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_image_header_t * header)
 {
-    lv_result_t res = lv_bin_decoder_info(decoder, src, header);
+    lv_result_t res = lv_bin_decoder_info(decoder, dsc, header);
     if(res != LV_RESULT_OK) {
         return res;
-    }
-
-    if(LV_COLOR_FORMAT_IS_YUV(header->cf)) {
-        return LV_RESULT_OK;
     }
 
     if(!IS_CONV_INDEX_FORMAT(header->cf)) {
@@ -191,44 +185,22 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
     int32_t width = dsc->header.w;
     int32_t height = dsc->header.h;
 
-    /*In case of uncompressed formats the image stored in the ROM/RAM.
-     *So simply give its pointer*/
-    const uint8_t * image_data = ((lv_image_dsc_t *)dsc->src)->data;
-    uint32_t image_data_size = ((lv_image_dsc_t *)dsc->src)->data_size;
-
-    /* if is YUV format, no need to copy */
-    if(LV_COLOR_FORMAT_IS_YUV(src_cf)) {
-        decoder_data_t * decoder_data = dsc->user_data;
-        if(decoder_data == NULL) {
-            decoder_data = lv_malloc_zeroed(sizeof(decoder_data_t));
-            LV_ASSERT_MALLOC(decoder_data);
-        }
-        lv_draw_buf_t * draw_buf = &decoder_data->yuv;
-        uint32_t stride = lv_draw_buf_width_to_stride(width, src_cf);
-        lv_draw_buf_init(draw_buf, width, height, src_cf, stride, (void *)image_data, image_data_size);
-
-        /* Use allocated bit to indicate we should not free the memory */
-        draw_buf->header.flags &= ~LV_IMAGE_FLAGS_ALLOCATED;
-
-        /* Do not add this kind of image to cache, since its life is managed by user. */
-        dsc->args.no_cache = true;
-
-        dsc->decoded = draw_buf;
-        return LV_RESULT_OK;
-    }
-
     /* create draw buf */
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create_user(image_cache_draw_buf_handlers, width, height, DEST_IMG_FORMAT,
-                                                       LV_STRIDE_AUTO);
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, width, height, DEST_IMG_FORMAT,
+                                                     LV_STRIDE_AUTO);
     if(draw_buf == NULL) {
         return LV_RESULT_INVALID;
     }
+
+    lv_draw_buf_clear(draw_buf, NULL);
     dsc->decoded = draw_buf;
 
     uint32_t src_stride = image_stride(&src_img_buf.header);
     uint32_t dest_stride = draw_buf->header.stride;
 
-    const uint8_t * src = image_data;
+    /*In case of uncompressed formats the image stored in the ROM/RAM.
+     *So simply give its pointer*/
+    const uint8_t * src = ((lv_image_dsc_t *)dsc->src)->data;
     uint8_t * dest = draw_buf->data;
 
     /* index format only */
@@ -286,12 +258,14 @@ static lv_result_t decoder_open_file(lv_image_decoder_t * decoder, lv_image_deco
         return LV_RESULT_INVALID;
     }
 
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create_user(image_cache_draw_buf_handlers, width, height, DEST_IMG_FORMAT,
-                                                       LV_STRIDE_AUTO);
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create_ex(image_cache_draw_buf_handlers, width, height, DEST_IMG_FORMAT,
+                                                     LV_STRIDE_AUTO);
     if(draw_buf == NULL) {
         lv_fs_close(&file);
         return LV_RESULT_INVALID;
     }
+
+    lv_draw_buf_clear(draw_buf, NULL);
 
     /* get stride */
     uint32_t src_stride = image_stride(&src_header);
@@ -363,16 +337,6 @@ failed:
     return LV_RESULT_INVALID;
 }
 
-static void decoder_draw_buf_free(lv_draw_buf_t * draw_buf)
-{
-    if((draw_buf->header.flags & LV_IMAGE_FLAGS_ALLOCATED) == 0) {
-        /* This must be the yuv variable image. */
-        return;
-    }
-
-    lv_draw_buf_destroy(draw_buf);
-}
-
 /**
  * Decode an image using the vg_lite gpu.
  * @param decoder pointer to the decoder
@@ -409,7 +373,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         lv_cache_entry_t * entry = lv_image_decoder_add_to_cache(decoder, &search_key, dsc->decoded, NULL);
 
         if(entry == NULL) {
-            decoder_draw_buf_free((lv_draw_buf_t *)dsc->decoded);
+            lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
             dsc->decoded = NULL;
             return LV_RESULT_INVALID;
         }
@@ -423,9 +387,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
 {
     LV_UNUSED(decoder); /*Unused*/
 
-    if(dsc->args.no_cache || !lv_image_cache_is_enabled()) decoder_draw_buf_free((lv_draw_buf_t *)dsc->decoded);
-
-    if(decoder->user_data) free(decoder->user_data);
+    if(dsc->args.no_cache || !lv_image_cache_is_enabled()) lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
 }
 
 #endif /*LV_USE_DRAW_VG_LITE*/

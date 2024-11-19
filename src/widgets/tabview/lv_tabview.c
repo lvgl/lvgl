@@ -6,6 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_tabview_private.h"
+#include "../../core/lv_obj_class_private.h"
 #include "../../lvgl.h"
 
 #if LV_USE_TABVIEW
@@ -168,6 +170,11 @@ void lv_tabview_set_tab_bar_position(lv_obj_t * obj, lv_dir_t dir)
         case LV_DIR_RIGHT:
             lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW_REVERSE);
             break;
+        case LV_DIR_HOR:
+        case LV_DIR_VER:
+        case LV_DIR_ALL:
+        case LV_DIR_NONE:
+            break;
     }
 
     lv_obj_t * tab_bar = lv_tabview_get_tab_bar(obj);
@@ -191,6 +198,11 @@ void lv_tabview_set_tab_bar_position(lv_obj_t * obj, lv_dir_t dir)
             lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
             lv_obj_set_scroll_snap_x(cont, LV_SCROLL_SNAP_NONE);
             lv_obj_set_scroll_snap_y(cont, LV_SCROLL_SNAP_CENTER);
+            break;
+        case LV_DIR_HOR:
+        case LV_DIR_VER:
+        case LV_DIR_ALL:
+        case LV_DIR_NONE:
             break;
     }
 

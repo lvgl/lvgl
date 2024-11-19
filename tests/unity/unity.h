@@ -11,8 +11,8 @@
 #define UNITY
 
 #define UNITY_VERSION_MAJOR    2
-#define UNITY_VERSION_MINOR    5
-#define UNITY_VERSION_BUILD    2
+#define UNITY_VERSION_MINOR    6
+#define UNITY_VERSION_BUILD    0
 #define UNITY_VERSION          ((UNITY_VERSION_MAJOR << 16) | (UNITY_VERSION_MINOR << 8) | UNITY_VERSION_BUILD)
 
 #ifdef __cplusplus
@@ -91,7 +91,7 @@ void verifyTest(void);
  *     - define UNITY_SUPPORT_TEST_CASES to include the TEST_CASE macro, though really it's mostly about the runner generator script
 
  * Parameterized Tests
- *     - you'll want to create a define of TEST_CASE(...) which basically evaluates to nothing
+ *     - you'll want to create a define of TEST_CASE(...), TEST_RANGE(...) and/or TEST_MATRIX(...) which basically evaluates to nothing
 
  * Tests with Arguments
  *     - you'll want to define UNITY_USE_COMMAND_LINE_ARGS if you have the test runner passing arguments to Unity
@@ -107,17 +107,27 @@ void verifyTest(void);
 #define TEST_MESSAGE(message)                                                                      UnityMessage((message), __LINE__)
 #define TEST_ONLY()
 #ifdef UNITY_INCLUDE_PRINT_FORMATTED
-#define TEST_PRINTF(message, ...)                                                                  UnityPrintF(__LINE__, (message), __VA_ARGS__)
+#define TEST_PRINTF(message, ...)                                                                  UnityPrintF(__LINE__, (message), ##__VA_ARGS__)
 #endif
 
 /* It is not necessary for you to call PASS. A PASS condition is assumed if nothing fails.
  * This method allows you to abort a test immediately with a PASS state, ignoring the remainder of the test. */
 #define TEST_PASS()                                                                                TEST_ABORT()
-#define TEST_PASS_MESSAGE(message)                                                                 do { UnityMessage((message), __LINE__); TEST_ABORT(); } while(0)
+#define TEST_PASS_MESSAGE(message)                                                                 do { UnityMessage((message), __LINE__); TEST_ABORT(); } while (0)
 
-/* This macro does nothing, but it is useful for build tools (like Ceedling) to make use of this to figure out
- * which files should be linked to in order to perform a test. Use it like TEST_FILE("sandwiches.c") */
-#define TEST_FILE(a)
+/*-------------------------------------------------------
+ * Build Directives
+ *-------------------------------------------------------
+
+ * These macros do nothing, but they are useful for additional build context.
+ * Tools (like Ceedling) can scan for these directives and make use of them for
+ * per-test-executable #include search paths and linking. */
+
+/* Add source files to a test executable's compilation and linking. Ex: TEST_SOURCE_FILE("sandwiches.c") */
+#define TEST_SOURCE_FILE(a)
+
+/* Customize #include search paths for a test executable's compilation. Ex: TEST_INCLUDE_PATH("src/module_a/inc") */
+#define TEST_INCLUDE_PATH(a)
 
 /*-------------------------------------------------------
  * Test Asserts (simple)
@@ -286,6 +296,7 @@ void verifyTest(void);
 #define TEST_ASSERT_HEX64_ARRAY_WITHIN(delta, expected, actual, num_elements)                      UNITY_TEST_ASSERT_HEX64_ARRAY_WITHIN((delta), (expected), (actual), num_elements, __LINE__, NULL)
 #define TEST_ASSERT_CHAR_ARRAY_WITHIN(delta, expected, actual, num_elements)                       UNITY_TEST_ASSERT_CHAR_ARRAY_WITHIN((delta), (expected), (actual), num_elements, __LINE__, NULL)
 
+
 /* Structs and Strings */
 #define TEST_ASSERT_EQUAL_PTR(expected, actual)                                                    UNITY_TEST_ASSERT_EQUAL_PTR((expected), (actual), __LINE__, NULL)
 #define TEST_ASSERT_EQUAL_STRING(expected, actual)                                                 UNITY_TEST_ASSERT_EQUAL_STRING((expected), (actual), __LINE__, NULL)
@@ -338,9 +349,16 @@ void verifyTest(void);
 
 /* Floating Point (If Enabled) */
 #define TEST_ASSERT_FLOAT_WITHIN(delta, expected, actual)                                          UNITY_TEST_ASSERT_FLOAT_WITHIN((delta), (expected), (actual), __LINE__, NULL)
+#define TEST_ASSERT_FLOAT_NOT_WITHIN(delta, expected, actual)                                      UNITY_TEST_ASSERT_FLOAT_NOT_WITHIN((delta), (expected), (actual), __LINE__, NULL)
 #define TEST_ASSERT_EQUAL_FLOAT(expected, actual)                                                  UNITY_TEST_ASSERT_EQUAL_FLOAT((expected), (actual), __LINE__, NULL)
+#define TEST_ASSERT_NOT_EQUAL_FLOAT(expected, actual)                                              UNITY_TEST_ASSERT_NOT_EQUAL_FLOAT((expected), (actual), __LINE__, NULL)
+#define TEST_ASSERT_FLOAT_ARRAY_WITHIN(delta, expected, actual, num_elements)                      UNITY_TEST_ASSERT_FLOAT_ARRAY_WITHIN((delta), (expected), (actual), (num_elements), __LINE__, NULL)
 #define TEST_ASSERT_EQUAL_FLOAT_ARRAY(expected, actual, num_elements)                              UNITY_TEST_ASSERT_EQUAL_FLOAT_ARRAY((expected), (actual), (num_elements), __LINE__, NULL)
 #define TEST_ASSERT_EACH_EQUAL_FLOAT(expected, actual, num_elements)                               UNITY_TEST_ASSERT_EACH_EQUAL_FLOAT((expected), (actual), (num_elements), __LINE__, NULL)
+#define TEST_ASSERT_GREATER_THAN_FLOAT(threshold, actual)                                          UNITY_TEST_ASSERT_GREATER_THAN_FLOAT((threshold), (actual), __LINE__, NULL)
+#define TEST_ASSERT_GREATER_OR_EQUAL_FLOAT(threshold, actual)                                      UNITY_TEST_ASSERT_GREATER_OR_EQUAL_FLOAT((threshold), (actual), __LINE__, NULL)
+#define TEST_ASSERT_LESS_THAN_FLOAT(threshold, actual)                                             UNITY_TEST_ASSERT_LESS_THAN_FLOAT((threshold), (actual), __LINE__, NULL)
+#define TEST_ASSERT_LESS_OR_EQUAL_FLOAT(threshold, actual)                                         UNITY_TEST_ASSERT_LESS_OR_EQUAL_FLOAT((threshold), (actual), __LINE__, NULL)
 #define TEST_ASSERT_FLOAT_IS_INF(actual)                                                           UNITY_TEST_ASSERT_FLOAT_IS_INF((actual), __LINE__, NULL)
 #define TEST_ASSERT_FLOAT_IS_NEG_INF(actual)                                                       UNITY_TEST_ASSERT_FLOAT_IS_NEG_INF((actual), __LINE__, NULL)
 #define TEST_ASSERT_FLOAT_IS_NAN(actual)                                                           UNITY_TEST_ASSERT_FLOAT_IS_NAN((actual), __LINE__, NULL)
@@ -352,9 +370,16 @@ void verifyTest(void);
 
 /* Double (If Enabled) */
 #define TEST_ASSERT_DOUBLE_WITHIN(delta, expected, actual)                                         UNITY_TEST_ASSERT_DOUBLE_WITHIN((delta), (expected), (actual), __LINE__, NULL)
+#define TEST_ASSERT_DOUBLE_NOT_WITHIN(delta, expected, actual)                                     UNITY_TEST_ASSERT_DOUBLE_NOT_WITHIN((delta), (expected), (actual), __LINE__, NULL)
 #define TEST_ASSERT_EQUAL_DOUBLE(expected, actual)                                                 UNITY_TEST_ASSERT_EQUAL_DOUBLE((expected), (actual), __LINE__, NULL)
+#define TEST_ASSERT_NOT_EQUAL_DOUBLE(expected, actual)                                             UNITY_TEST_ASSERT_NOT_EQUAL_DOUBLE((expected), (actual), __LINE__, NULL)
+#define TEST_ASSERT_DOUBLE_ARRAY_WITHIN(delta, expected, actual, num_elements)                     UNITY_TEST_ASSERT_DOUBLE_ARRAY_WITHIN((delta), (expected), (actual), (num_elements), __LINE__, NULL)
 #define TEST_ASSERT_EQUAL_DOUBLE_ARRAY(expected, actual, num_elements)                             UNITY_TEST_ASSERT_EQUAL_DOUBLE_ARRAY((expected), (actual), (num_elements), __LINE__, NULL)
 #define TEST_ASSERT_EACH_EQUAL_DOUBLE(expected, actual, num_elements)                              UNITY_TEST_ASSERT_EACH_EQUAL_DOUBLE((expected), (actual), (num_elements), __LINE__, NULL)
+#define TEST_ASSERT_GREATER_THAN_DOUBLE(threshold, actual)                                         UNITY_TEST_ASSERT_GREATER_THAN_DOUBLE((threshold), (actual), __LINE__, NULL)
+#define TEST_ASSERT_GREATER_OR_EQUAL_DOUBLE(threshold, actual)                                     UNITY_TEST_ASSERT_GREATER_OR_EQUAL_DOUBLE((threshold), (actual), __LINE__, NULL)
+#define TEST_ASSERT_LESS_THAN_DOUBLE(threshold, actual)                                            UNITY_TEST_ASSERT_LESS_THAN_DOUBLE((threshold), (actual), __LINE__, NULL)
+#define TEST_ASSERT_LESS_OR_EQUAL_DOUBLE(threshold, actual)                                        UNITY_TEST_ASSERT_LESS_OR_EQUAL_DOUBLE((threshold), (actual), __LINE__, NULL)
 #define TEST_ASSERT_DOUBLE_IS_INF(actual)                                                          UNITY_TEST_ASSERT_DOUBLE_IS_INF((actual), __LINE__, NULL)
 #define TEST_ASSERT_DOUBLE_IS_NEG_INF(actual)                                                      UNITY_TEST_ASSERT_DOUBLE_IS_NEG_INF((actual), __LINE__, NULL)
 #define TEST_ASSERT_DOUBLE_IS_NAN(actual)                                                          UNITY_TEST_ASSERT_DOUBLE_IS_NAN((actual), __LINE__, NULL)
@@ -441,6 +466,7 @@ void verifyTest(void);
 #define TEST_ASSERT_NOT_EQUAL_HEX32_MESSAGE(threshold, actual, message)                            UNITY_TEST_ASSERT_NOT_EQUAL_HEX32((threshold), (actual), __LINE__, (message))
 #define TEST_ASSERT_NOT_EQUAL_HEX64_MESSAGE(threshold, actual, message)                            UNITY_TEST_ASSERT_NOT_EQUAL_HEX64((threshold), (actual), __LINE__, (message))
 #define TEST_ASSERT_NOT_EQUAL_CHAR_MESSAGE(threshold, actual, message)                             UNITY_TEST_ASSERT_NOT_EQUAL_CHAR((threshold), (actual), __LINE__, (message))
+
 
 /* Integer Greater Than/ Less Than (of all sizes) */
 #define TEST_ASSERT_GREATER_THAN_MESSAGE(threshold, actual, message)                               UNITY_TEST_ASSERT_GREATER_THAN_INT((threshold), (actual), __LINE__, (message))
@@ -553,6 +579,7 @@ void verifyTest(void);
 #define TEST_ASSERT_HEX64_ARRAY_WITHIN_MESSAGE(delta, expected, actual, num_elements, message)     UNITY_TEST_ASSERT_HEX64_ARRAY_WITHIN((delta), (expected), (actual), num_elements, __LINE__, (message))
 #define TEST_ASSERT_CHAR_ARRAY_WITHIN_MESSAGE(delta, expected, actual, num_elements, message)      UNITY_TEST_ASSERT_CHAR_ARRAY_WITHIN((delta), (expected), (actual), num_elements, __LINE__, (message))
 
+
 /* Structs and Strings */
 #define TEST_ASSERT_EQUAL_PTR_MESSAGE(expected, actual, message)                                   UNITY_TEST_ASSERT_EQUAL_PTR((expected), (actual), __LINE__, (message))
 #define TEST_ASSERT_EQUAL_STRING_MESSAGE(expected, actual, message)                                UNITY_TEST_ASSERT_EQUAL_STRING((expected), (actual), __LINE__, (message))
@@ -606,8 +633,14 @@ void verifyTest(void);
 /* Floating Point (If Enabled) */
 #define TEST_ASSERT_FLOAT_WITHIN_MESSAGE(delta, expected, actual, message)                         UNITY_TEST_ASSERT_FLOAT_WITHIN((delta), (expected), (actual), __LINE__, (message))
 #define TEST_ASSERT_EQUAL_FLOAT_MESSAGE(expected, actual, message)                                 UNITY_TEST_ASSERT_EQUAL_FLOAT((expected), (actual), __LINE__, (message))
+#define TEST_ASSERT_NOT_EQUAL_FLOAT_MESSAGE(expected, actual, message)                             UNITY_TEST_ASSERT_NOT_EQUAL_FLOAT((expected), (actual), __LINE__, (message))
+#define TEST_ASSERT_FLOAT_ARRAY_WITHIN_MESSAGE(delta, expected, actual, num_elements, message)     UNITY_TEST_ASSERT_FLOAT_ARRAY_WITHIN((delta), (expected), (actual), (num_elements), __LINE__, (message))
 #define TEST_ASSERT_EQUAL_FLOAT_ARRAY_MESSAGE(expected, actual, num_elements, message)             UNITY_TEST_ASSERT_EQUAL_FLOAT_ARRAY((expected), (actual), (num_elements), __LINE__, (message))
 #define TEST_ASSERT_EACH_EQUAL_FLOAT_MESSAGE(expected, actual, num_elements, message)              UNITY_TEST_ASSERT_EACH_EQUAL_FLOAT((expected), (actual), (num_elements), __LINE__, (message))
+#define TEST_ASSERT_GREATER_THAN_FLOAT_MESSAGE(threshold, actual, message)                         UNITY_TEST_ASSERT_GREATER_THAN_FLOAT((threshold), (actual), __LINE__, (message))
+#define TEST_ASSERT_GREATER_OR_EQUAL_FLOAT_MESSAGE(threshold, actual, message)                     UNITY_TEST_ASSERT_GREATER_OR_EQUAL_FLOAT((threshold), (actual), __LINE__, (message))
+#define TEST_ASSERT_LESS_THAN_FLOAT_MESSAGE(threshold, actual, message)                            UNITY_TEST_ASSERT_LESS_THAN_FLOAT((threshold), (actual), __LINE__, (message))
+#define TEST_ASSERT_LESS_OR_EQUAL_FLOAT_MESSAGE(threshold, actual, message)                        UNITY_TEST_ASSERT_LESS_OR_EQUAL_FLOAT((threshold), (actual), __LINE__, (message))
 #define TEST_ASSERT_FLOAT_IS_INF_MESSAGE(actual, message)                                          UNITY_TEST_ASSERT_FLOAT_IS_INF((actual), __LINE__, (message))
 #define TEST_ASSERT_FLOAT_IS_NEG_INF_MESSAGE(actual, message)                                      UNITY_TEST_ASSERT_FLOAT_IS_NEG_INF((actual), __LINE__, (message))
 #define TEST_ASSERT_FLOAT_IS_NAN_MESSAGE(actual, message)                                          UNITY_TEST_ASSERT_FLOAT_IS_NAN((actual), __LINE__, (message))
@@ -620,8 +653,14 @@ void verifyTest(void);
 /* Double (If Enabled) */
 #define TEST_ASSERT_DOUBLE_WITHIN_MESSAGE(delta, expected, actual, message)                        UNITY_TEST_ASSERT_DOUBLE_WITHIN((delta), (expected), (actual), __LINE__, (message))
 #define TEST_ASSERT_EQUAL_DOUBLE_MESSAGE(expected, actual, message)                                UNITY_TEST_ASSERT_EQUAL_DOUBLE((expected), (actual), __LINE__, (message))
+#define TEST_ASSERT_NOT_EQUAL_DOUBLE_MESSAGE(expected, actual, message)                            UNITY_TEST_ASSERT_NOT_EQUAL_DOUBLE((expected), (actual), __LINE__, (message))
+#define TEST_ASSERT_DOUBLE_ARRAY_WITHIN_MESSAGE(delta, expected, actual, num_elements, message)    UNITY_TEST_ASSERT_DOUBLE_ARRAY_WITHIN((delta), (expected), (actual), (num_elements), __LINE__, (message))
 #define TEST_ASSERT_EQUAL_DOUBLE_ARRAY_MESSAGE(expected, actual, num_elements, message)            UNITY_TEST_ASSERT_EQUAL_DOUBLE_ARRAY((expected), (actual), (num_elements), __LINE__, (message))
 #define TEST_ASSERT_EACH_EQUAL_DOUBLE_MESSAGE(expected, actual, num_elements, message)             UNITY_TEST_ASSERT_EACH_EQUAL_DOUBLE((expected), (actual), (num_elements), __LINE__, (message))
+#define TEST_ASSERT_GREATER_THAN_DOUBLE_MESSAGE(threshold, actual, message)                        UNITY_TEST_ASSERT_GREATER_THAN_DOUBLE((threshold), (actual), __LINE__, (message))
+#define TEST_ASSERT_GREATER_OR_EQUAL_DOUBLE_MESSAGE(threshold, actual, message)                    UNITY_TEST_ASSERT_GREATER_OR_EQUAL_DOUBLE((threshold), (actual), __LINE__, (message))
+#define TEST_ASSERT_LESS_THAN_DOUBLE_MESSAGE(threshold, actual, message)                           UNITY_TEST_ASSERT_LESS_THAN_DOUBLE((threshold), (actual), __LINE__, (message))
+#define TEST_ASSERT_LESS_OR_EQUAL_DOUBLE_MESSAGE(threshold, actual, message)                       UNITY_TEST_ASSERT_LESS_OR_EQUAL_DOUBLE((threshold), (actual), __LINE__, (message))
 #define TEST_ASSERT_DOUBLE_IS_INF_MESSAGE(actual, message)                                         UNITY_TEST_ASSERT_DOUBLE_IS_INF((actual), __LINE__, (message))
 #define TEST_ASSERT_DOUBLE_IS_NEG_INF_MESSAGE(actual, message)                                     UNITY_TEST_ASSERT_DOUBLE_IS_NEG_INF((actual), __LINE__, (message))
 #define TEST_ASSERT_DOUBLE_IS_NAN_MESSAGE(actual, message)                                         UNITY_TEST_ASSERT_DOUBLE_IS_NAN((actual), __LINE__, (message))

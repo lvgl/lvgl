@@ -96,6 +96,14 @@ bool vglite_cmd_buf_is_flushed(void);
 void vglite_run(void);
 
 /**
+ * Wait for VG-Lite finish.
+ *
+ */
+#if LV_USE_VGLITE_DRAW_ASYNC
+void vglite_wait_for_finish(void);
+#endif
+
+/**
  * Get vglite color. Premultiplies (if not hw already) and swizzles the given
  * LVGL 32bit color to obtain vglite color.
  *
@@ -128,17 +136,17 @@ vg_lite_blend_t vglite_get_blend_mode(lv_blend_mode_t lv_blend_mode);
 vg_lite_buffer_format_t vglite_get_buf_format(lv_color_format_t cf);
 
 /**
- * Get vglite buffer alignment.
+ * Get vglite stride alignment.
  *
  * @param[in] cf Color format
  *
  * @retval Alignment requirement in bytes
  *
  */
-uint8_t vglite_get_alignment(lv_color_format_t cf);
+uint8_t vglite_get_stride_alignment(lv_color_format_t cf);
 
 /**
- * Check memory and stride alignment.
+ * Check source start address and stride alignment.
  *
  * @param[in] buf Buffer address
  * @param[in] stride Stride of buffer in bytes
@@ -147,7 +155,7 @@ uint8_t vglite_get_alignment(lv_color_format_t cf);
  * @retval true Alignment OK
  *
  */
-bool vglite_buf_aligned(const void * buf, uint32_t stride, lv_color_format_t cf);
+bool vglite_src_buf_aligned(const void * buf, uint32_t stride, lv_color_format_t cf);
 
 /**********************
  *      MACROS

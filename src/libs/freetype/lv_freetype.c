@@ -6,7 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_freetype.h"
+#include "../../misc/lv_fs_private.h"
+#include "lv_freetype_private.h"
 
 #if LV_USE_FREETYPE
 
@@ -88,7 +89,7 @@ lv_result_t lv_freetype_init(uint32_t max_glyph_cnt)
         return LV_RESULT_INVALID;
     }
 
-    _lv_ll_init(&ctx->face_id_ll, sizeof(face_id_node_t));
+    lv_ll_init(&ctx->face_id_ll, sizeof(face_id_node_t));
 
     lv_cache_ops_t ops = {
         .compare_cb = (lv_cache_compare_cb_t)cache_node_cache_compare_cb,
@@ -160,7 +161,18 @@ lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_rend
     freetype_on_font_set_cbs(dsc);
 
     FT_Face face = dsc->cache_node->face;
-    FT_Set_Pixel_Sizes(face, 0, size);
+    FT_Error error;
+    if(FT_IS_SCALABLE(face)) {
+        error = FT_Set_Pixel_Sizes(face, 0, size);
+    }
+    else {
+        LV_LOG_WARN("font is not scalable, selecting available size");
+        error = FT_Select_Size(face, 0);
+    }
+    if(error) {
+        FT_ERROR_MSG("FT_Set_Pixel_Sizes", error);
+        return NULL;
+    }
 
     lv_font_t * font = &dsc->font;
     font->dsc = dsc;
@@ -289,7 +301,7 @@ static FTC_FaceID lv_freetype_req_face_id(lv_freetype_context_t * ctx, const cha
     face_id_node_t * node;
 
     /* search cache */
-    _LV_LL_READ(ll_p, node) {
+    LV_LL_READ(ll_p, node) {
         if(strcmp(node->pathname, pathname) == 0) {
             node->ref_cnt++;
             LV_LOG_INFO("reuse face_id: %s, ref_cnt = %d", node->pathname, node->ref_cnt);
@@ -298,7 +310,7 @@ static FTC_FaceID lv_freetype_req_face_id(lv_freetype_context_t * ctx, const cha
     }
 
     /* insert new cache */
-    node = _lv_ll_ins_tail(ll_p);
+    node = lv_ll_ins_tail(ll_p);
     LV_ASSERT_MALLOC(node);
 
 #if LV_USE_FS_MEMFS
@@ -327,13 +339,13 @@ static void lv_freetype_drop_face_id(lv_freetype_context_t * ctx, FTC_FaceID fac
 {
     lv_ll_t * ll_p = &ctx->face_id_ll;
     face_id_node_t * node;
-    _LV_LL_READ(ll_p, node) {
+    LV_LL_READ(ll_p, node) {
         if(face_id == node->pathname) {
             LV_LOG_INFO("found face_id: %s, ref_cnt = %d", node->pathname, node->ref_cnt);
             node->ref_cnt--;
             if(node->ref_cnt == 0) {
                 LV_LOG_INFO("drop face_id: %s", node->pathname);
-                _lv_ll_remove(ll_p, node);
+                lv_ll_remove(ll_p, node);
                 lv_free(node->pathname);
                 lv_free(node);
             }

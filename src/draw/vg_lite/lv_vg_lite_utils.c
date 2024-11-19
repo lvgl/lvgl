@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 
+#include "../lv_image_decoder_private.h"
 #include "lv_vg_lite_utils.h"
 
 #if LV_USE_DRAW_VG_LITE
@@ -17,6 +18,7 @@
 #include "lv_vg_lite_grad.h"
 #include "lv_draw_vg_lite_type.h"
 #include <string.h>
+#include <math.h>
 
 /*********************
  *      DEFINES
@@ -88,9 +90,50 @@ void lv_vg_lite_dump_info(void)
                     ret ? "YES" : "NO");
     }
 
-    vg_lite_uint32_t mem_avail = 0;
-    vg_lite_get_mem_size(&mem_avail);
-    LV_LOG_USER("Memory Available: %" LV_PRId32 " Bytes", (uint32_t)mem_avail);
+    vg_lite_uint32_t mem_size = 0;
+    vg_lite_get_mem_size(&mem_size);
+    LV_LOG_USER("Memory size: %" LV_PRId32 " Bytes", (uint32_t)mem_size);
+}
+
+void lv_vg_lite_error_dump_info(vg_lite_error_t error)
+{
+    LV_LOG_USER("Error code: %d(%s)", (int)error, lv_vg_lite_error_string(error));
+    switch(error) {
+        case VG_LITE_SUCCESS:
+            LV_LOG_USER("No error");
+            break;
+
+        case VG_LITE_OUT_OF_MEMORY:
+        case VG_LITE_OUT_OF_RESOURCES: {
+                vg_lite_uint32_t mem_size = 0;
+                vg_lite_error_t ret = vg_lite_get_mem_size(&mem_size);
+                if(ret != VG_LITE_SUCCESS) {
+                    LV_LOG_ERROR("vg_lite_get_mem_size error: %d(%s)",
+                                 (int)ret, lv_vg_lite_error_string(ret));
+                    return;
+                }
+
+                LV_LOG_USER("Memory size: %" LV_PRId32 " Bytes", (uint32_t)mem_size);
+            }
+            break;
+
+        case VG_LITE_TIMEOUT:
+        case VG_LITE_FLEXA_TIME_OUT: {
+                vg_lite_error_t ret = vg_lite_dump_command_buffer();
+                if(ret != VG_LITE_SUCCESS) {
+                    LV_LOG_ERROR("vg_lite_dump_command_buffer error: %d(%s)",
+                                 (int)ret, lv_vg_lite_error_string(ret));
+                    return;
+                }
+
+                LV_LOG_USER("Command buffer finished");
+            }
+            break;
+
+        default:
+            lv_vg_lite_dump_info();
+            break;
+    }
 }
 
 const char * lv_vg_lite_error_string(vg_lite_error_t error)
@@ -275,15 +318,102 @@ void lv_vg_lite_path_dump_info(const vg_lite_path_t * path)
 
     LV_ASSERT(len > 0);
 
-    LV_LOG_USER("address: %p", path->path);
+    LV_LOG_USER("address: %p", (void *)path->path);
     LV_LOG_USER("length: %d", (int)len);
-    LV_LOG_USER("bonding box: (%0.2f, %0.2f) - (%0.2f, %0.2f)",
+    LV_LOG_USER("bounding box: (%0.2f, %0.2f) - (%0.2f, %0.2f)",
                 path->bounding_box[0], path->bounding_box[1],
                 path->bounding_box[2], path->bounding_box[3]);
     LV_LOG_USER("format: %d", (int)path->format);
     LV_LOG_USER("quality: %d", (int)path->quality);
+    LV_LOG_USER("path_changed: %d", (int)path->path_changed);
+    LV_LOG_USER("pdata_internal: %d", (int)path->pdata_internal);
+    LV_LOG_USER("type: %d", (int)path->path_type);
+    LV_LOG_USER("add_end: %d", (int)path->add_end);
 
     lv_vg_lite_path_for_each_data(path, path_data_print_cb, NULL);
+
+    if(path->stroke) {
+        LV_LOG_USER("stroke_path: %p", (void *)path->stroke_path);
+        LV_LOG_USER("stroke_size: %d", (int)path->stroke_size);
+        LV_LOG_USER("stroke_color: 0x%X", (int)path->stroke_color);
+        lv_vg_lite_stroke_dump_info(path->stroke);
+    }
+}
+
+void lv_vg_lite_stroke_dump_info(const vg_lite_stroke_t * stroke)
+{
+    LV_ASSERT(stroke != NULL);
+    LV_LOG_USER("stroke: %p", (void *)stroke);
+
+    /* Stroke parameters */
+    LV_LOG_USER("cap_style: 0x%X", (int)stroke->cap_style);
+    LV_LOG_USER("join_style: 0x%X", (int)stroke->join_style);
+    LV_LOG_USER("line_width: %f", stroke->line_width);
+    LV_LOG_USER("miter_limit: %f", stroke->miter_limit);
+
+    LV_LOG_USER("dash_pattern: %p", (void *)stroke->dash_pattern);
+    LV_LOG_USER("pattern_count: %d", (int)stroke->pattern_count);
+    if(stroke->dash_pattern) {
+        for(int i = 0; i < (int)stroke->pattern_count; i++) {
+            LV_LOG_USER("dash_pattern[%d]: %f", i, stroke->dash_pattern[i]);
+        }
+    }
+
+    LV_LOG_USER("dash_phase: %f", stroke->dash_phase);
+    LV_LOG_USER("dash_length: %f", stroke->dash_length);
+    LV_LOG_USER("dash_index: %d", (int)stroke->dash_index);
+    LV_LOG_USER("half_width: %f", stroke->half_width);
+
+    /* Total length of stroke dash patterns. */
+    LV_LOG_USER("pattern_length: %f", stroke->pattern_length);
+
+    /* For fast checking. */
+    LV_LOG_USER("miter_square: %f", stroke->miter_square);
+
+    /* Temp storage of stroke subPath. */
+    LV_LOG_USER("path_points: %p", (void *)stroke->path_points);
+    LV_LOG_USER("path_end: %p", (void *)stroke->path_end);
+    LV_LOG_USER("point_count: %d", (int)stroke->point_count);
+
+    LV_LOG_USER("left_point: %p", (void *)stroke->left_point);
+    LV_LOG_USER("right_point: %p", (void *)stroke->right_point);
+    LV_LOG_USER("stroke_points: %p", (void *)stroke->stroke_points);
+    LV_LOG_USER("stroke_end: %p", (void *)stroke->stroke_end);
+    LV_LOG_USER("stroke_count: %d", (int)stroke->stroke_count);
+
+    /* Divide stroke path according to move or move_rel for avoiding implicit closure. */
+    LV_LOG_USER("path_list_divide: %p", (void *)stroke->path_list_divide);
+
+    /* pointer to current divided path data. */
+    LV_LOG_USER("cur_list: %p", (void *)stroke->cur_list);
+
+    /* Flag that add end_path in driver. */
+    LV_LOG_USER("add_end: %d", (int)stroke->add_end);
+    LV_LOG_USER("dash_reset: %d", (int)stroke->dash_reset);
+
+    /* Sub path list. */
+    LV_LOG_USER("stroke_paths: %p", (void *)stroke->stroke_paths);
+
+    /* Last sub path. */
+    LV_LOG_USER("last_stroke: %p", (void *)stroke->last_stroke);
+
+    /* Swing area handling. */
+    LV_LOG_USER("swing_handling: %d", (int)stroke->swing_handling);
+    LV_LOG_USER("swing_deltax: %f", stroke->swing_deltax);
+    LV_LOG_USER("swing_deltay: %f", stroke->swing_deltay);
+    LV_LOG_USER("swing_start: %p", (void *)stroke->swing_start);
+    LV_LOG_USER("swing_stroke: %p", (void *)stroke->swing_stroke);
+    LV_LOG_USER("swing_length: %f", stroke->swing_length);
+    LV_LOG_USER("swing_centlen: %f", stroke->swing_centlen);
+    LV_LOG_USER("swing_count: %d", (int)stroke->swing_count);
+    LV_LOG_USER("need_swing: %d", (int)stroke->need_swing);
+    LV_LOG_USER("swing_ccw: %d", (int)stroke->swing_ccw);
+
+    LV_LOG_USER("stroke_length: %f", stroke->stroke_length);
+    LV_LOG_USER("stroke_size: %d", (int)stroke->stroke_size);
+
+    LV_LOG_USER("fattened: %d", (int)stroke->fattened);
+    LV_LOG_USER("closed: %d", (int)stroke->closed);
 }
 
 void lv_vg_lite_buffer_dump_info(const vg_lite_buffer_t * buffer)
@@ -309,9 +439,14 @@ void lv_vg_lite_matrix_dump_info(const vg_lite_matrix_t * matrix)
 bool lv_vg_lite_is_dest_cf_supported(lv_color_format_t cf)
 {
     switch(cf) {
+        case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_ARGB1555:
+        case LV_COLOR_FORMAT_ARGB4444:
+        case LV_COLOR_FORMAT_ARGB2222:
             return true;
 
         case LV_COLOR_FORMAT_ARGB8565:
@@ -330,14 +465,20 @@ bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf)
     switch(cf) {
         case LV_COLOR_FORMAT_A4:
         case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_ARGB1555:
+        case LV_COLOR_FORMAT_ARGB4444:
+        case LV_COLOR_FORMAT_ARGB2222:
             return true;
 
         case LV_COLOR_FORMAT_I1:
         case LV_COLOR_FORMAT_I2:
         case LV_COLOR_FORMAT_I4:
+            return vg_lite_query_feature(gcFEATURE_BIT_VG_INDEX_ENDIAN) ? true : false;
+
         case LV_COLOR_FORMAT_I8:
             return vg_lite_query_feature(gcFEATURE_BIT_VG_IM_INDEX_FORMAT) ? true : false;
 
@@ -347,6 +488,9 @@ bool lv_vg_lite_is_src_cf_supported(lv_color_format_t cf)
 
         case LV_COLOR_FORMAT_NV12:
             return vg_lite_query_feature(gcFEATURE_BIT_VG_YUV_INPUT) ? true : false;
+
+        case LV_COLOR_FORMAT_YUY2:
+            return vg_lite_query_feature(gcFEATURE_BIT_VG_YUY2_INPUT) ? true : false;
 
         default:
             break;
@@ -379,6 +523,15 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
         case LV_COLOR_FORMAT_I8:
             return VG_LITE_INDEX_8;
 
+        case LV_COLOR_FORMAT_ARGB1555:
+            return VG_LITE_BGRA5551;
+
+        case LV_COLOR_FORMAT_ARGB4444:
+            return VG_LITE_BGRA4444;
+
+        case LV_COLOR_FORMAT_ARGB2222:
+            return  VG_LITE_BGRA2222;
+
         case LV_COLOR_FORMAT_RGB565:
             return VG_LITE_BGR565;
 
@@ -396,6 +549,9 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
 
         case LV_COLOR_FORMAT_NV12:
             return VG_LITE_NV12;
+
+        case LV_COLOR_FORMAT_YUY2:
+            return VG_LITE_YUY2;
 
         default:
             LV_LOG_ERROR("unsupported color format: %d", cf);
@@ -624,8 +780,30 @@ void lv_vg_lite_image_matrix(vg_lite_matrix_t * matrix, int32_t x, int32_t y, co
     }
 }
 
+vg_lite_color_t lv_vg_lite_image_recolor(vg_lite_buffer_t * buffer, const lv_draw_image_dsc_t * dsc)
+{
+    LV_ASSERT_NULL(buffer);
+    LV_ASSERT_NULL(dsc);
+
+    if((buffer->format == VG_LITE_A4 || buffer->format == VG_LITE_A8) || dsc->recolor_opa > LV_OPA_TRANSP) {
+        /* alpha image and image recolor */
+        buffer->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+        return lv_vg_lite_color(dsc->recolor, LV_OPA_MIX2(dsc->opa, dsc->recolor_opa), true);
+    }
+
+    if(dsc->opa < LV_OPA_COVER) {
+        /* normal image opa */
+        buffer->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+        vg_lite_color_t color;
+        lv_memset(&color, dsc->opa, sizeof(color));
+        return color;
+    }
+
+    return 0;
+}
+
 bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_dsc_t * decoder_dsc, const void * src,
-                                  bool no_cache)
+                                  bool no_cache, bool premultiply)
 {
     LV_ASSERT_NULL(buffer);
     LV_ASSERT_NULL(decoder_dsc);
@@ -633,7 +811,7 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
 
     lv_image_decoder_args_t args;
     lv_memzero(&args, sizeof(lv_image_decoder_args_t));
-    args.premultiply = !lv_vg_lite_support_blend_normal();
+    args.premultiply = premultiply;
     args.stride_align = true;
     args.use_indexed = true;
     args.no_cache = no_cache;
@@ -660,9 +838,9 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
 
     if(LV_COLOR_FORMAT_IS_INDEXED(decoded->header.cf)) {
         uint32_t palette_size = LV_COLOR_INDEXED_PALETTE_SIZE(decoded->header.cf);
-        LV_PROFILER_BEGIN_TAG("vg_lite_set_CLUT");
+        LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_set_CLUT");
         LV_VG_LITE_CHECK_ERROR(vg_lite_set_CLUT(palette_size, (vg_lite_uint32_t *)decoded->data));
-        LV_PROFILER_END_TAG("vg_lite_set_CLUT");
+        LV_PROFILER_DRAW_END_TAG("vg_lite_set_CLUT");
     }
 
     lv_vg_lite_buffer_from_draw_buf(buffer, decoded);
@@ -687,6 +865,11 @@ void lv_vg_lite_rect(vg_lite_rectangle_t * rect, const lv_area_t * area)
     rect->y = area->y1;
     rect->width = lv_area_get_width(area);
     rect->height = lv_area_get_height(area);
+}
+
+void lv_vg_lite_matrix(vg_lite_matrix_t * dest, const lv_matrix_t * src)
+{
+    lv_memcpy(dest, src, sizeof(lv_matrix_t));
 }
 
 uint32_t lv_vg_lite_get_palette_size(vg_lite_buffer_format_t format)
@@ -721,9 +904,9 @@ vg_lite_color_t lv_vg_lite_color(lv_color_t color, lv_opa_t opa, bool pre_mul)
     return (uint32_t)opa << 24 | (uint32_t)color.blue << 16 | (uint32_t)color.green << 8 | color.red;
 }
 
-vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode)
+vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode, bool has_pre_mul)
 {
-    if(vg_lite_query_feature(gcFEATURE_BIT_VG_LVGL_SUPPORT)) {
+    if(!has_pre_mul && vg_lite_query_feature(gcFEATURE_BIT_VG_LVGL_SUPPORT)) {
         switch(blend_mode) {
             case LV_BLEND_MODE_NORMAL: /**< Simply mix according to the opacity value*/
                 return VG_LITE_BLEND_NORMAL_LVGL;
@@ -744,7 +927,7 @@ vg_lite_blend_t lv_vg_lite_blend_mode(lv_blend_mode_t blend_mode)
 
     switch(blend_mode) {
         case LV_BLEND_MODE_NORMAL: /**< Simply mix according to the opacity value*/
-            if(vg_lite_query_feature(gcFEATURE_BIT_VG_HW_PREMULTIPLY)) {
+            if(!has_pre_mul && vg_lite_query_feature(gcFEATURE_BIT_VG_HW_PREMULTIPLY)) {
                 return VG_LITE_BLEND_PREMULTIPLY_SRC_OVER;
             }
             return VG_LITE_BLEND_SRC_OVER;
@@ -785,11 +968,6 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
         return false;
     }
 
-    if(buffer->stride < 1) {
-        LV_LOG_ERROR("buffer stride(%d) < 1", (int)buffer->stride);
-        return false;
-    }
-
     if(!(buffer->tiled == VG_LITE_LINEAR || buffer->tiled == VG_LITE_TILED)) {
         LV_LOG_ERROR("buffer tiled(%d) is invalid", (int)buffer->tiled);
         return false;
@@ -797,12 +975,6 @@ bool lv_vg_lite_buffer_check(const vg_lite_buffer_t * buffer, bool is_src)
 
     if(buffer->memory == NULL) {
         LV_LOG_ERROR("buffer memory is NULL");
-        return false;
-    }
-
-    if((uint32_t)(uintptr_t)buffer->memory != buffer->address) {
-        LV_LOG_ERROR("buffer memory(%p) != address(%p)",
-                     buffer->memory, (void *)(uintptr_t)buffer->address);
         return false;
     }
 
@@ -899,10 +1071,26 @@ bool lv_vg_lite_path_check(const vg_lite_path_t * path)
         return false;
     }
 
-    uint8_t end_op_code = VLC_GET_OP_CODE(end - fmt_len);
-    if(end_op_code != VLC_OP_END) {
-        LV_LOG_ERROR("%d (%s) -> is NOT VLC_OP_END", end_op_code, lv_vg_lite_vlc_op_string(end_op_code));
-        return false;
+    switch(path->path_type) {
+        case VG_LITE_DRAW_ZERO:
+        case VG_LITE_DRAW_FILL_PATH:
+        case VG_LITE_DRAW_FILL_STROKE_PATH: {
+                /* Check end op code */
+                uint8_t end_op_code = VLC_GET_OP_CODE(end - fmt_len);
+                if(end_op_code != VLC_OP_END) {
+                    LV_LOG_ERROR("%d (%s) -> is NOT VLC_OP_END", end_op_code, lv_vg_lite_vlc_op_string(end_op_code));
+                    return false;
+                }
+            }
+            break;
+
+        case VG_LITE_DRAW_STROKE_PATH:
+            /* No need to check stroke path end */
+            break;
+
+        default:
+            LV_LOG_ERROR("path type(%d) is invalid", (int)path->path_type);
+            return false;
     }
 
     return true;
@@ -1023,41 +1211,58 @@ lv_point_precise_t lv_vg_lite_matrix_transform_point(const vg_lite_matrix_t * ma
 {
     lv_point_precise_t p;
     const vg_lite_float_t (*m)[3] = matrix->m;
-    p.x = (lv_value_precise_t)(point->x * m[0][0] + point->y * m[0][1] + m[0][2]);
-    p.y = (lv_value_precise_t)(point->x * m[1][0] + point->y * m[1][1] + m[1][2]);
+    p.x = (lv_value_precise_t)roundf(point->x * m[0][0] + point->y * m[0][1] + m[0][2]);
+    p.y = (lv_value_precise_t)roundf(point->x * m[1][0] + point->y * m[1][1] + m[1][2]);
     return p;
 }
 
 void lv_vg_lite_set_scissor_area(const lv_area_t * area)
 {
+    LV_PROFILER_DRAW_BEGIN;
+#if VGLITE_RELEASE_VERSION <= VGLITE_MAKE_VERSION(4,0,57)
+    /**
+     * In the new version of VG-Lite, vg_lite_set_scissor no longer needs to call vg_lite_enable_scissor and
+     * vg_lite_disable_scissor APIs.
+     *
+     * Original description in the manual:
+     * Description: This is a legacy scissor API function that can be used to set and enable a single scissor rectangle
+     * for the render target. This scissor API is supported by a different hardware mechanism other than the mask layer,
+     * and it is not enabled/disabled by vg_lite_enable_scissor and vg_lite_disable_scissor APIs.
+     */
+    LV_VG_LITE_CHECK_ERROR(vg_lite_enable_scissor());
+#endif
     LV_VG_LITE_CHECK_ERROR(vg_lite_set_scissor(
                                area->x1,
                                area->y1,
-                               lv_area_get_width(area),
-                               lv_area_get_height(area)));
+                               area->x2 + 1,
+                               area->y2 + 1));
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_vg_lite_disable_scissor(void)
 {
+    LV_PROFILER_DRAW_BEGIN;
     /* Restore full screen scissor */
     LV_VG_LITE_CHECK_ERROR(vg_lite_set_scissor(
                                0,
                                0,
                                LV_HOR_RES,
                                LV_VER_RES));
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
 {
     LV_ASSERT_NULL(u);
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
 
     u->flush_count++;
+    u->letter_count = 0;
 
 #if LV_VG_LITE_FLUSH_MAX_COUNT
     if(u->flush_count < LV_VG_LITE_FLUSH_MAX_COUNT) {
         /* Do not flush too often */
-        LV_PROFILER_END;
+        LV_PROFILER_DRAW_END;
         return;
     }
 #else
@@ -1065,20 +1270,20 @@ void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
     LV_VG_LITE_CHECK_ERROR(vg_lite_get_parameter(VG_LITE_GPU_IDLE_STATE, 1, (vg_lite_pointer)&is_gpu_idle));
     if(!is_gpu_idle) {
         /* Do not flush if GPU is busy */
-        LV_PROFILER_END;
+        LV_PROFILER_DRAW_END;
         return;
     }
 #endif
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_flush());
     u->flush_count = 0;
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
 {
     LV_ASSERT_NULL(u);
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish());
 
@@ -1090,7 +1295,8 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
     /* Clear image decoder dsc reference */
     lv_vg_lite_pending_remove_all(u->image_dsc_pending);
     u->flush_count = 0;
-    LV_PROFILER_END;
+    u->letter_count = 0;
+    LV_PROFILER_DRAW_END;
 }
 
 /**********************

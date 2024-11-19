@@ -6,12 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_obj.h"
+#include "lv_obj_private.h"
+#include "lv_obj_class_private.h"
 #include "../indev/lv_indev.h"
 #include "../indev/lv_indev_private.h"
 #include "../display/lv_display.h"
 #include "../display/lv_display_private.h"
-#include "../misc/lv_anim.h"
+#include "../misc/lv_anim_private.h"
 #include "../misc/lv_async.h"
 #include "../core/lv_global.h"
 
@@ -308,7 +309,7 @@ lv_display_t * lv_obj_get_display(const lv_obj_t * obj)
 
     lv_display_t * d;
     lv_ll_t * disp_head = disp_ll_p;
-    _LV_LL_READ(disp_head, d) {
+    LV_LL_READ(disp_head, d) {
         uint32_t i;
         for(i = 0; i < d->screen_cnt; i++) {
             if(d->screens[i] == scr) return d;
@@ -392,7 +393,7 @@ lv_obj_t * lv_obj_get_sibling_by_type(const lv_obj_t * obj, int32_t idx, const l
     int32_t sibling_idx = (int32_t)lv_obj_get_index_by_type(obj, class_p) + idx;
     if(sibling_idx < 0) return NULL;
 
-    return lv_obj_get_child(parent, sibling_idx);
+    return lv_obj_get_child_by_type(parent, sibling_idx, class_p);
 }
 
 uint32_t lv_obj_get_child_count(const lv_obj_t * obj)
@@ -555,7 +556,7 @@ static void obj_delete_core(lv_obj_t * obj)
     }
 
     /*All children deleted. Now clean up the object specific data*/
-    _lv_obj_destruct(obj);
+    lv_obj_destruct(obj);
 
     /*Remove the screen for the screen list*/
     if(obj->parent == NULL) {

@@ -15,6 +15,7 @@
 
 #include "lv_draw_pxp.h"
 
+#if LV_USE_PXP
 #if LV_USE_DRAW_PXP
 #include "lv_pxp_cfg.h"
 #include "lv_pxp_utils.h"
@@ -82,7 +83,7 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc
     bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
     if(has_transform)
         lv_area_copy(&blend_area, &rel_coords);
-    else if(!_lv_area_intersect(&blend_area, &rel_coords, &rel_clip_area))
+    else if(!lv_area_intersect(&blend_area, &rel_coords, &rel_clip_area))
         return; /*Fully clipped, nothing to do*/
 
     const uint8_t * src_buf = img_dsc->data;
@@ -252,8 +253,8 @@ static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area,
         dest_h = src_h * fp_scale_y + trim_y;
 
         /*Final pivot offset = scale_factor * rotation_pivot_offset + scaling_pivot_offset*/
-        piv_offset_x = floor(fp_scale_x * piv_offset_x) - floor((fp_scale_x - 1) * pivot.x);
-        piv_offset_y = floor(fp_scale_y * piv_offset_y) - floor((fp_scale_y - 1) * pivot.y);
+        piv_offset_x = floorf(fp_scale_x * piv_offset_x) - floorf((fp_scale_x - 1) * pivot.x);
+        piv_offset_y = floorf(fp_scale_y * piv_offset_y) - floorf((fp_scale_y - 1) * pivot.y);
     }
 
     /*PS buffer - source image*/
@@ -363,3 +364,4 @@ static void _pxp_blit(uint8_t * dest_buf, const lv_area_t * dest_area, int32_t d
 }
 
 #endif /*LV_USE_DRAW_PXP*/
+#endif /*LV_USE_PXP*/

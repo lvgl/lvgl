@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../core/lv_obj.h"
+#include "lv_calendar.h"
 #if LV_USE_CALENDAR && LV_USE_CALENDAR_CHINESE
 
 /*********************
@@ -49,10 +50,10 @@ const char * lv_calendar_get_day_name(lv_calendar_date_t * gregorian);
 
 /**
  * Get the chinese time of the gregorian time (reference: https://www.cnblogs.com/liyang31tg/p/4123171.html)
- * @param gregorian   need to convert to chinese time in gregorian time
- * @return            return the chinese time of the gregorian time
+ * @param gregorian_time   need to convert to chinese time in gregorian time
+ * @param chinese_time     the chinese time convert from gregorian time
  */
-lv_calendar_chinese_t lv_calendar_gregorian_to_chinese(lv_calendar_date_t * gregorian);
+void lv_calendar_gregorian_to_chinese(lv_calendar_date_t * gregorian_time, lv_calendar_chinese_t * chinese_time);
 
 /**********************
  *      MACROS

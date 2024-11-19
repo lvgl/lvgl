@@ -11,8 +11,8 @@
 
 #include "../../core/lv_group.h"
 #include "../../stdlib/lv_string.h"
+#include "lv_sdl_private.h"
 
-#include LV_SDL_INCLUDE_PATH
 /*********************
  *      DEFINES
  *********************/
@@ -97,7 +97,7 @@ static void release_indev_cb(lv_event_t * e)
     }
 }
 
-void _lv_sdl_mouse_handler(SDL_Event * event)
+void lv_sdl_mouse_handler(SDL_Event * event)
 {
     uint32_t win_id = UINT32_MAX;
     switch(event->type) {
@@ -127,7 +127,7 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
             return;
     }
 
-    lv_display_t * disp = _lv_sdl_get_disp_from_win_id(win_id);
+    lv_display_t * disp = lv_sdl_get_disp_from_win_id(win_id);
 
     /*Find a suitable indev*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
@@ -145,7 +145,7 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
 
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
     int32_t ver_res = lv_display_get_vertical_resolution(disp);
-    uint8_t zoom = lv_sdl_window_get_zoom(disp);
+    float zoom = lv_sdl_window_get_zoom(disp);
 
     switch(event->type) {
         case SDL_WINDOWEVENT:
@@ -163,13 +163,13 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
         case SDL_MOUSEBUTTONDOWN:
             if(event->button.button == SDL_BUTTON_LEFT) {
                 indev_dev->left_button_down = true;
-                indev_dev->last_x = event->motion.x / zoom;
-                indev_dev->last_y = event->motion.y / zoom;
+                indev_dev->last_x = (int16_t)((float)(event->motion.x) / zoom);
+                indev_dev->last_y = (int16_t)((float)(event->motion.y) / zoom);
             }
             break;
         case SDL_MOUSEMOTION:
-            indev_dev->last_x = event->motion.x / zoom;
-            indev_dev->last_y = event->motion.y / zoom;
+            indev_dev->last_x = (int16_t)((float)(event->motion.x) / zoom);
+            indev_dev->last_y = (int16_t)((float)(event->motion.y) / zoom);
             break;
 
         case SDL_FINGERUP:

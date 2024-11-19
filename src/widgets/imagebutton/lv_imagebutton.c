@@ -6,8 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_imagebutton_private.h"
+#include "../../misc/lv_area_private.h"
+#include "../../draw/lv_draw_private.h"
+#include "../../core/lv_obj_private.h"
+#include "../../core/lv_obj_event_private.h"
+#include "../../core/lv_obj_class_private.h"
 
-#include "lv_imagebutton.h"
 
 #if LV_USE_IMAGEBUTTON != 0
 
@@ -231,7 +236,7 @@ static void draw_main(lv_event_t * e)
         coords_part.y2 = coords.y2;
 
         lv_area_t clip_area_center;
-        if(_lv_area_intersect(&clip_area_center, &coords_part, &layer->_clip_area)) {
+        if(lv_area_intersect(&clip_area_center, &coords_part, &layer->_clip_area)) {
             lv_area_t clip_area_ori = layer->_clip_area;
             layer->_clip_area = clip_area_center;
             img_dsc.src = src_info->img_src;

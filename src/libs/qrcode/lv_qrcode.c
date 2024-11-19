@@ -6,7 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../../lvgl.h"
+#include "../../core/lv_obj_class_private.h"
+#include "lv_qrcode_private.h"
 
 #if LV_USE_QRCODE
 
@@ -70,7 +71,7 @@ void lv_qrcode_set_size(lv_obj_t * obj, int32_t size)
     LV_LOG_INFO("set canvas buffer: %p, size = %d", (void *)new_buf, (int)size);
 
     /*Clear canvas buffer*/
-    lv_canvas_fill_bg(obj, lv_color_white(), LV_OPA_COVER);
+    lv_draw_buf_clear(new_buf, NULL);
 
     if(old_buf != NULL) lv_draw_buf_destroy(old_buf);
 }
@@ -100,10 +101,12 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
         return LV_RESULT_INVALID;
     }
 
-    lv_canvas_set_palette(obj, 0, lv_color_to_32(qrcode->dark_color, 0xff));
-    lv_canvas_set_palette(obj, 1, lv_color_to_32(qrcode->light_color, 0xff));
-    lv_color_t c = lv_color_hex(1);
-    lv_canvas_fill_bg(obj, c, LV_OPA_COVER);
+    lv_draw_buf_clear(draw_buf, NULL);
+    lv_canvas_set_palette(obj, 0, lv_color_to_32(qrcode->light_color, LV_OPA_COVER));
+    lv_canvas_set_palette(obj, 1, lv_color_to_32(qrcode->dark_color, LV_OPA_COVER));
+    lv_image_cache_drop(draw_buf);
+
+    lv_obj_invalidate(obj);
 
     if(data_len > qrcodegen_BUFFER_LEN_MAX) return LV_RESULT_INVALID;
 
@@ -140,12 +143,16 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
         return LV_RESULT_INVALID;
     }
 
+    /* Temporarily disable invalidation to improve the efficiency of lv_canvas_set_px */
+    lv_display_enable_invalidation(lv_obj_get_display(obj), false);
+
     int32_t obj_w = draw_buf->header.w;
     qr_size = qrcodegen_getSize(qr0);
     scale = obj_w / qr_size;
     int scaled = qr_size * scale;
     int margin = (obj_w - scaled) / 2;
     uint8_t * buf_u8 = (uint8_t *)draw_buf->data + 8;    /*+8 skip the palette*/
+    lv_color_t c = lv_color_hex(1);
 
     /* Copy the qr code canvas:
      * A simple `lv_canvas_set_px` would work but it's slow for so many pixels.
@@ -163,15 +170,16 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
             if(aligned == false && (x & 0x7) == 0) aligned = true;
 
             if(aligned == false) {
-                c = lv_color_hex(a ? 0 : 1);
-                lv_canvas_set_px(obj, x, y, c, LV_OPA_COVER);
+                if(a) {
+                    lv_canvas_set_px(obj, x, y, c, LV_OPA_COVER);
+                }
             }
             else {
                 if(!a) b |= (1 << (7 - p));
                 p++;
                 if(p == 8) {
                     uint32_t px = row_byte_cnt * y + (x >> 3);
-                    buf_u8[px] = b;
+                    buf_u8[px] = ~b;
                     b = 0;
                     p = 0;
                 }
@@ -184,7 +192,7 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
             b |= (1 << (8 - p)) - 1;
 
             uint32_t px = row_byte_cnt * y + (x >> 3);
-            buf_u8[px] = b;
+            buf_u8[px] = ~b;
         }
 
         /*The Qr is probably scaled so simply to the repeated rows*/
@@ -194,6 +202,9 @@ lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_le
             lv_memcpy((uint8_t *)buf_u8 + row_byte_cnt * (y + s), row_ori, row_byte_cnt);
         }
     }
+
+    /* invalidate the canvas to refresh it */
+    lv_display_enable_invalidation(lv_obj_get_display(obj), true);
 
     lv_free(qr0);
     lv_free(data_tmp);

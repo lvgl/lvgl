@@ -6,7 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_animimage.h"
+#include "lv_animimage_private.h"
+#include "../../core/lv_obj_class_private.h"
 #if LV_USE_ANIMIMG != 0
 
 /*Testing of dependencies*/
@@ -131,6 +132,13 @@ uint32_t lv_animimg_get_repeat_count(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     return lv_anim_get_repeat_count(&animimg->anim);
+}
+
+lv_anim_t * lv_animimg_get_anim(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_animimg_t * animimg = (lv_animimg_t *)obj;
+    return &animimg->anim;
 }
 
 /**********************

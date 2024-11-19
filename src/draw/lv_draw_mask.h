@@ -1,10 +1,10 @@
 /**
- * @file lv_draw_mask_rect.h
+ * @file lv_draw_mask.h
  *
  */
 
-#ifndef LV_DRAW_MASK_RECT_H
-#define LV_DRAW_MASK_RECT_H
+#ifndef LV_DRAW_MASK_H
+#define LV_DRAW_MASK_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,7 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw.h"
 #include "../misc/lv_color.h"
 #include "../misc/lv_area.h"
 #include "../misc/lv_style.h"
@@ -21,16 +20,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-typedef struct {
-    lv_draw_dsc_base_t base;
-
-    lv_area_t area;
-    int32_t radius;
-} lv_draw_mask_rect_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -64,4 +53,4 @@ void lv_draw_mask_rect(lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_MASK_RECT_H*/
+#endif /*LV_DRAW_MASK_H*/

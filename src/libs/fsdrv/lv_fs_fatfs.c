@@ -20,8 +20,8 @@
     #define DIR FF_DIR  /* ESP IDF typedefs `DIR` as `FF_DIR` in its version of ff.h. Use `FF_DIR` in LVGL too */
 #endif
 
-#if LV_FS_FATFS_LETTER == '\0'
-    #error "LV_FS_FATFS_LETTER must be an upper case ASCII letter"
+#if !LV_FS_IS_VALID_LETTER(LV_FS_FATFS_LETTER)
+    #error "Invalid drive letter"
 #endif
 
 /**********************

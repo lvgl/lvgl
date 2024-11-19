@@ -25,10 +25,11 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_example_event_1(void);
-void lv_example_event_2(void);
-void lv_example_event_3(void);
-void lv_example_event_4(void);
+void lv_example_event_click(void);
+void lv_example_event_streak(void);
+void lv_example_event_button(void);
+void lv_example_event_bubble(void);
+void lv_example_event_draw(void);
 
 /**********************
  *      MACROS

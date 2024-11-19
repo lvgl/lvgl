@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_profiler_builtin.h"
+#include "lv_profiler_builtin_private.h"
 #include "../lvgl.h"
 #include "../core/lv_global.h"
 

@@ -5,7 +5,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_mem.h"
+#include "lv_mem_private.h"
 #include "lv_string.h"
 #include "../misc/lv_assert.h"
 #include "../misc/lv_log.h"
@@ -114,6 +114,17 @@ void * lv_malloc_zeroed(size_t size)
 
     LV_TRACE_MEM("allocated at %p", alloc);
     return alloc;
+}
+
+void * lv_calloc(size_t num, size_t size)
+{
+    LV_TRACE_MEM("allocating number of %zu each %zu bytes", num, size);
+    return lv_malloc_zeroed(num * size);
+}
+
+void * lv_zalloc(size_t size)
+{
+    return lv_malloc_zeroed(size);
 }
 
 void lv_free(void * data)

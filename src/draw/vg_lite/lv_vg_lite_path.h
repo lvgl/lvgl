@@ -49,17 +49,19 @@ void lv_vg_lite_path_drop(lv_draw_vg_lite_unit_t * unit, lv_vg_lite_path_t * pat
 
 void lv_vg_lite_path_reset(lv_vg_lite_path_t * path, vg_lite_format_t data_format);
 
-void lv_vg_lite_path_set_bonding_box_area(lv_vg_lite_path_t * path, const lv_area_t * area);
+void lv_vg_lite_path_set_bounding_box_area(lv_vg_lite_path_t * path, const lv_area_t * area);
 
-void lv_vg_lite_path_set_bonding_box(lv_vg_lite_path_t * path,
-                                     float min_x, float min_y,
-                                     float max_x, float max_y);
+void lv_vg_lite_path_set_bounding_box(lv_vg_lite_path_t * path,
+                                      float min_x, float min_y,
+                                      float max_x, float max_y);
 
-void lv_vg_lite_path_get_bonding_box(lv_vg_lite_path_t * path,
-                                     float * min_x, float * min_y,
-                                     float * max_x, float * max_y);
+void lv_vg_lite_path_get_bounding_box(lv_vg_lite_path_t * path,
+                                      float * min_x, float * min_y,
+                                      float * max_x, float * max_y);
 
-bool lv_vg_lite_path_update_bonding_box(lv_vg_lite_path_t * path);
+bool lv_vg_lite_path_update_bounding_box(lv_vg_lite_path_t * path);
+
+void lv_vg_lite_path_set_transform(lv_vg_lite_path_t * path, const vg_lite_matrix_t * matrix);
 
 void lv_vg_lite_path_set_quality(lv_vg_lite_path_t * path, vg_lite_quality_t quality);
 
@@ -87,7 +89,7 @@ void lv_vg_lite_path_end(lv_vg_lite_path_t * path);
 void lv_vg_lite_path_append_rect(lv_vg_lite_path_t * path,
                                  float x, float y,
                                  float w, float h,
-                                 float rx, float ry);
+                                 float r);
 
 void lv_vg_lite_path_append_circle(lv_vg_lite_path_t * path,
                                    float cx, float cy,
@@ -104,6 +106,8 @@ void lv_vg_lite_path_append_arc(lv_vg_lite_path_t * path,
                                 float start_angle,
                                 float sweep,
                                 bool pie);
+
+void lv_vg_lite_path_append_path(lv_vg_lite_path_t * dest, const lv_vg_lite_path_t * src);
 
 uint8_t lv_vg_lite_vlc_op_arg_len(uint8_t vlc_op);
 

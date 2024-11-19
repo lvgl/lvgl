@@ -1,3 +1,6 @@
+#ifndef LV_TEST_CONF_FULL_H
+#define LV_TEST_CONF_FULL_H
+
 #define LV_MEM_SIZE                     (32 * 1024 * 1024)
 #define LV_DRAW_SW_SHADOW_CACHE_SIZE    8
 #define LV_DRAW_THREAD_STACK_SIZE    (64 * 1024) /*Increase stack size to 64KB in order to run ThorVG*/
@@ -10,6 +13,7 @@
 #define LV_USE_ASSERT_OBJ               1
 #define LV_USE_ASSERT_STYLE             1
 #define LV_USE_FLOAT      1
+#define LV_USE_MATRIX     1
 
 #define LV_FONT_MONTSERRAT_8    1
 #define LV_FONT_MONTSERRAT_10   1
@@ -91,6 +95,9 @@
 #define LV_USE_THORVG_INTERNAL  1
 #define LV_USE_LZ4_INTERNAL     1
 #define LV_USE_VECTOR_GRAPHIC   1
+#define LV_USE_SVG              1
+#define LV_USE_SVG_ANIMATION    1
+#define LV_USE_SVG_DEBUG        1
 #define LV_USE_PROFILER         1
 #define LV_PROFILER_INCLUDE     "lv_profiler_builtin.h"
 #define LV_USE_GRIDNAV          1
@@ -106,6 +113,7 @@
 #define LV_USE_DEMO_MUSIC       1
 #define LV_USE_DEMO_BENCHMARK   1
 #define LV_USE_DEMO_SCROLL      1
+#define LV_USE_DEMO_EBIKE       1
 #define LV_USE_DEMO_VECTOR_GRAPHIC  1
 
 #define LV_USE_OBJ_ID           1
@@ -120,6 +128,11 @@
 
 #ifndef LV_USE_LINUX_FBDEV
     #define LV_USE_LINUX_FBDEV  1
+#endif
+
+#ifndef LV_USE_WAYLAND
+    #define LV_USE_WAYLAND  1
+    #define LV_WAYLAND_WINDOW_DECORATIONS 1
 #endif
 
 #define LV_USE_ILI9341      1
@@ -145,4 +158,8 @@
 #define LV_FREETYPE_USE_LVGL_PORT 0
 #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 10
 
+#define LV_USE_FONT_MANAGER 1
+
 #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS    1
+
+#endif /* LV_TEST_CONF_FULL_H */

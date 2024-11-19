@@ -4,6 +4,10 @@
 #include "lfs.h"
 #include "../../core/lv_global.h"
 
+#if !LV_FS_IS_VALID_LETTER(LV_FS_LITTLEFS_LETTER)
+    #error "Invalid drive letter"
+#endif
+
 typedef struct LittleFile {
     lfs_file_t file;
 } LittleFile;

@@ -1,6 +1,8 @@
 #include "lv_draw_dave2d.h"
 #if LV_USE_DRAW_DAVE2D
 
+#include "../../lv_draw_label_private.h"
+
 static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                                           lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area);
 
@@ -30,7 +32,7 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
     letter_coords = *glyph_draw_dsc->letter_coords;
 
     bool is_common;
-    is_common = _lv_area_intersect(&clip_area, glyph_draw_dsc->letter_coords, u->clip_area);
+    is_common = lv_area_intersect(&clip_area, glyph_draw_dsc->letter_coords, u->clip_area);
     if(!is_common) return;
 
     x = 0 - unit->base_unit.target_layer->buf_area.x1;

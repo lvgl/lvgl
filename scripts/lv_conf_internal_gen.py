@@ -23,14 +23,14 @@ fout.write(
 '''/**
  * GENERATED FILE, DO NOT EDIT IT!
  * @file lv_conf_internal.h
- * Make sure all the defines of lv_conf.h have a default value
-**/
+ * This file ensures all defines of lv_conf.h have a default value.
+ */
 
 #ifndef LV_CONF_INTERNAL_H
 #define LV_CONF_INTERNAL_H
 /* clang-format off */
 
-/*Config options*/
+/* Config options */
 #define LV_OS_NONE          0
 #define LV_OS_PTHREAD       1
 #define LV_OS_FREERTOS      2
@@ -51,15 +51,18 @@ fout.write(
 #define LV_DRAW_SW_ASM_HELIUM       2
 #define LV_DRAW_SW_ASM_CUSTOM       255
 
-/* Handle special Kconfig options */
+#define LV_NEMA_HAL_CUSTOM          0
+#define LV_NEMA_HAL_STM32           1
+
+/** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
     #include "lv_conf_kconfig.h"
-    #ifdef CONFIG_LV_CONF_SKIP
+    #if defined(CONFIG_LV_CONF_SKIP) && !defined(LV_CONF_SKIP)
         #define LV_CONF_SKIP
     #endif
 #endif
 
-/*If "lv_conf.h" is available from here try to use it later.*/
+/* If "lv_conf.h" is available from here try to use it later. */
 #ifdef __has_include
     #if __has_include("lv_conf.h")
         #ifndef LV_CONF_INCLUDE_SIMPLE
@@ -68,18 +71,18 @@ fout.write(
     #endif
 #endif
 
-/*If lv_conf.h is not skipped include it*/
-#ifndef LV_CONF_SKIP
-    #ifdef LV_CONF_PATH                           /*If there is a path defined for lv_conf.h use it*/
+/* If lv_conf.h is not skipped, include it. */
+#if !defined(LV_CONF_SKIP) || defined(LV_CONF_PATH)
+    #ifdef LV_CONF_PATH                           /* If there is a path defined for lv_conf.h, use it */
         #define __LV_TO_STR_AUX(x) #x
         #define __LV_TO_STR(x) __LV_TO_STR_AUX(x)
         #include __LV_TO_STR(LV_CONF_PATH)
         #undef __LV_TO_STR_AUX
         #undef __LV_TO_STR
-    #elif defined(LV_CONF_INCLUDE_SIMPLE)         /*Or simply include lv_conf.h is enabled*/
+    #elif defined(LV_CONF_INCLUDE_SIMPLE)         /* Or simply include lv_conf.h is enabled. */
         #include "lv_conf.h"
     #else
-        #include "../../lv_conf.h"                /*Else assume lv_conf.h is next to the lvgl folder*/
+        #include "../../lv_conf.h"                /* Else assume lv_conf.h is next to the lvgl folder. */
     #endif
     #if !defined(LV_CONF_H) && !defined(LV_CONF_SUPPRESS_DEFINE_CHECK)
         /* #include will sometimes silently fail when __has_include is used */
@@ -89,7 +92,7 @@ fout.write(
 #endif
 
 #ifdef CONFIG_LV_COLOR_DEPTH
-    #define _LV_KCONFIG_PRESENT
+    #define LV_KCONFIG_PRESENT
 #endif
 
 /*----------------------------------
@@ -131,7 +134,7 @@ for line in fin.read().splitlines():
 
       fout.write(
         f'{indent}#ifndef {name}\n'
-        f'{indent}    #ifdef _LV_KCONFIG_PRESENT\n'
+        f'{indent}    #ifdef LV_KCONFIG_PRESENT\n'
         f'{indent}        #ifdef CONFIG_{name.upper()}\n'
         f'{indent}            #define {name} CONFIG_{name.upper()}\n'
         f'{indent}        #else\n'
@@ -163,7 +166,7 @@ for line in fin.read().splitlines():
     fout.write(f'{line}\n')
 
 fout.write(
-'''
+r'''
 
 /*----------------------------------
  * End of parsing lv_conf_template.h
@@ -175,9 +178,9 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_STRIDE_ALIGN);
 LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
 #endif
 
-#undef _LV_KCONFIG_PRESENT
+#undef LV_KCONFIG_PRESENT
 
-/*Set some defines if a dependency is disabled*/
+/* Set some defines if a dependency is disabled. */
 #if LV_USE_LOG == 0
     #define LV_LOG_LEVEL            LV_LOG_LEVEL_NONE
     #define LV_LOG_TRACE_MEM        0
@@ -214,7 +217,10 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #endif
 #endif
 
-/*If running without lv_conf.h add typedefs with default value*/
+/*Allow only upper case letters and '/'  ('/' is a special case for backward compatibility)*/
+#define LV_FS_IS_VALID_LETTER(l) ((l) == '/' || ((l) >= 'A' && (l) <= 'Z'))
+
+/* If running without lv_conf.h, add typedefs with default value. */
 #ifdef LV_CONF_SKIP
     #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)    /*Disable warnings for Visual Studio*/
         #define _CRT_SECURE_NO_WARNINGS

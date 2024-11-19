@@ -1,50 +1,10 @@
 /**
- * @file lv_templ.c
- *
- */
-
-/*********************
- *      INCLUDES
- *********************/
-
-/*********************
- *      DEFINES
- *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-/*This typedef exists purely to keep -Wpedantic happy when the file is empty.*/
-/*It can be removed.*/
-typedef int _keep_pedantic_happy;
-
-/**********************
- *  STATIC PROTOTYPES
- **********************/
-
-/**********************
- *  STATIC VARIABLES
- **********************/
-
-/**********************
- *      MACROS
- **********************/
-
-/**********************
- *   GLOBAL FUNCTIONS
- **********************/
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-/**
  * @file lv_gridnav.h
  *
  */
 
-#ifndef LV_GRIDFOCUS_H
-#define LV_GRIDFOCUS_H
+#ifndef LV_GRIDNAV_H
+#define LV_GRIDNAV_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -132,4 +92,4 @@ void lv_gridnav_set_focused(lv_obj_t * cont, lv_obj_t * to_focus, lv_anim_enable
 } /*extern "C"*/
 #endif
 
-#endif /*LV_GRIDFOCUS_H*/
+#endif /* LV_GRIDNAV_H */

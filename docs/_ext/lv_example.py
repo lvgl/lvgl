@@ -106,7 +106,25 @@ class LvExample(Directive):
 
 def setup(app):
     app.add_directive("lv_example", LvExample)
-    app.add_config_value("repo_commit_hash", "", "env")
+    # Direct [View on GitHub] links in examples to use current
+    # branch (stored in LVGL_GITCOMMIT environment variable) instead
+    # of the current commit hash as was being done previously.
+    # Default to 'master' if Sphinx is being run outside of `build.py`.
+    # Resulting example link:
+    # [https://github.com/lvgl/lvgl/blob/master/examples/anim/lv_example_anim_1.c].
+    # [https://github.com/lvgl/lvgl/blob/v8.4.0/examples/anim/lv_example_anim_1.c].
+    # [https://github.com/lvgl/lvgl/blob/v9.2.0/examples/anim/lv_example_anim_1.c].
+    if 'LVGL_GITCOMMIT' in os.environ:
+        git_commit = os.environ['LVGL_GITCOMMIT']
+    else:
+        git_commit = 'master'
+
+    app.add_config_value("repo_commit_hash", git_commit, "env")
+
+    # if 'repo_commit_hash' in app.config._options:
+    #     print(f"repo_commit_hash from lv_example.py:  [{app.config._options['repo_commit_hash']}]")
+    # else:
+    #     print("repo_commit_hash not found in [app.config._options] at this time.")
 
     return {
         'version': '0.1',

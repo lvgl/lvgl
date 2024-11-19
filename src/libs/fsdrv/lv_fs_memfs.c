@@ -40,12 +40,17 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../../misc/lv_fs_private.h"
 #include "../../../lvgl.h"
 #if LV_USE_FS_MEMFS
 
 /*********************
  *      DEFINES
  *********************/
+
+#if !LV_FS_IS_VALID_LETTER(LV_FS_MEMFS_LETTER)
+    #error "Invalid drive letter"
+#endif
 
 /**********************
  *      TYPEDEFS

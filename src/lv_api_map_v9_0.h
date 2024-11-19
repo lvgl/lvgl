@@ -41,6 +41,16 @@ extern "C" {
 
 #define LV_DRAW_BUF_DEFINE               LV_DRAW_BUF_DEFINE_STATIC
 
+#define _lv_utils_bsearch                lv_utils_bsearch
+#define lv_draw_buf_align_user           lv_draw_buf_align_ex
+#define lv_draw_buf_create_user          lv_draw_buf_create_ex
+#define lv_draw_buf_width_to_stride_user lv_draw_buf_width_to_stride_ex
+#define lv_draw_buf_dup_user             lv_draw_buf_dup_ex
+
+#define lv_draw_buf_invalidate_cache_user(handlers, drawbuf, area)  lv_draw_buf_invalidate_cache(drawbuf, area)
+#define lv_draw_buf_flush_cache_user(handlers, drawbuf, area)       lv_draw_buf_flush_cache(drawbuf, area)
+#define lv_draw_buf_destroy_user(handlers, drawbuf)                 lv_draw_buf_destroy(drawbuf)
+
 /**********************
  *      MACROS
  **********************/

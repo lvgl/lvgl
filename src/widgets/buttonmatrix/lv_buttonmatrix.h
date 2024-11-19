@@ -1,5 +1,5 @@
 /**
- * @file lv_btnmatrix.h
+ * @file lv_buttonmatrix.h
  *
  */
 
@@ -29,44 +29,25 @@ LV_EXPORT_CONST_INT(LV_BUTTONMATRIX_BUTTON_NONE);
  *      TYPEDEFS
  **********************/
 
-/** Type to store button control bits (disabled, hidden etc.)
- * The first 3 bits are used to store the width*/
-enum _lv_buttonmatrix_ctrl_t {
-    _LV_BUTTONMATRIX_WIDTH            = 0x000F, /**< Reserved to store the size units*/
-    LV_BUTTONMATRIX_CTRL_HIDDEN       = 0x0010, /**< Button hidden*/
-    LV_BUTTONMATRIX_CTRL_NO_REPEAT    = 0x0020, /**< Do not repeat press this button.*/
-    LV_BUTTONMATRIX_CTRL_DISABLED     = 0x0040, /**< Disable this button.*/
-    LV_BUTTONMATRIX_CTRL_CHECKABLE    = 0x0080, /**< The button can be toggled.*/
-    LV_BUTTONMATRIX_CTRL_CHECKED      = 0x0100, /**< Button is currently toggled (e.g. checked).*/
-    LV_BUTTONMATRIX_CTRL_CLICK_TRIG   = 0x0200, /**< 1: Send LV_EVENT_VALUE_CHANGE on CLICK, 0: Send LV_EVENT_VALUE_CHANGE on PRESS*/
-    LV_BUTTONMATRIX_CTRL_POPOVER      = 0x0400, /**< Show a popover when pressing this key*/
-    _LV_BUTTONMATRIX_CTRL_RESERVED_1  = 0x0800, /**< Reserved for later use*/
-    _LV_BUTTONMATRIX_CTRL_RESERVED_2  = 0x1000, /**< Reserved for later use*/
-    _LV_BUTTONMATRIX_CTRL_RESERVED_3  = 0x2000, /**< Reserved for later use*/
-    LV_BUTTONMATRIX_CTRL_CUSTOM_1     = 0x4000, /**< Custom free to use flag*/
-    LV_BUTTONMATRIX_CTRL_CUSTOM_2     = 0x8000, /**< Custom free to use flag*/
-};
-
-#ifdef DOXYGEN
-typedef _lv_buttonmatrix_ctrl_t lv_buttonmatrix_ctrl_t;
-#else
-typedef uint32_t lv_buttonmatrix_ctrl_t;
-#endif /*DOXYGEN*/
+/** Type to store button control flags (disabled, hidden etc.)
+ *  The least-significant 4 bits are used to store button-width proportions in range [1..15]. */
+typedef enum {
+    LV_BUTTONMATRIX_CTRL_HIDDEN       = 0x0010, /**< Hides button; it continues to hold its space in layout. */
+    LV_BUTTONMATRIX_CTRL_NO_REPEAT    = 0x0020, /**< Do not emit LV_EVENT_LONG_PRESSED_REPEAT events while button is long-pressed. */
+    LV_BUTTONMATRIX_CTRL_DISABLED     = 0x0040, /**< Disables button like LV_STATE_DISABLED on normal Widgets. */
+    LV_BUTTONMATRIX_CTRL_CHECKABLE    = 0x0080, /**< Enable toggling of LV_STATE_CHECKED when clicked. */
+    LV_BUTTONMATRIX_CTRL_CHECKED      = 0x0100, /**< Make the button checked. It will use the :cpp:enumerator:`LV_STATE_CHECHKED` styles. */
+    LV_BUTTONMATRIX_CTRL_CLICK_TRIG   = 0x0200, /**< 1: Enables sending LV_EVENT_VALUE_CHANGE on CLICK, 0: sends LV_EVENT_VALUE_CHANGE on PRESS. */
+    LV_BUTTONMATRIX_CTRL_POPOVER      = 0x0400, /**< Show button text in a pop-over while being pressed. */
+    LV_BUTTONMATRIX_CTRL_RECOLOR      = 0x0800, /**< Enable text recoloring with `#color` */
+    LV_BUTTONMATRIX_CTRL_RESERVED_2   = 0x1000, /**< Reserved for later use */
+    LV_BUTTONMATRIX_CTRL_RESERVED_3   = 0x2000, /**< Reserved for later use */
+    LV_BUTTONMATRIX_CTRL_CUSTOM_1     = 0x4000, /**< Custom free-to-use flag */
+    LV_BUTTONMATRIX_CTRL_CUSTOM_2     = 0x8000, /**< Custom free-to-use flag */
+} lv_buttonmatrix_ctrl_t;
 
 typedef bool (*lv_buttonmatrix_button_draw_cb_t)(lv_obj_t * btnm, uint32_t btn_id, const lv_area_t * draw_area,
                                                  const lv_area_t * clip_area);
-
-/*Data of button matrix*/
-typedef struct {
-    lv_obj_t obj;
-    const char ** map_p;                              /*Pointer to the current map*/
-    lv_area_t * button_areas;                         /*Array of areas of buttons*/
-    lv_buttonmatrix_ctrl_t * ctrl_bits;                       /*Array of control bytes*/
-    uint32_t btn_cnt;                                 /*Number of button in 'map_p'(Handled by the library)*/
-    uint32_t row_cnt;                                 /*Number of rows in 'map_p'(Handled by the library)*/
-    uint32_t btn_id_sel;    /*Index of the active button (being pressed/released etc) or LV_BUTTONMATRIX_BUTTON_NONE*/
-    uint32_t one_check : 1;  /*Single button toggled at once*/
-} lv_buttonmatrix_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_buttonmatrix_class;
 
@@ -92,7 +73,7 @@ lv_obj_t * lv_buttonmatrix_create(lv_obj_t * parent);
  * @param obj       pointer to a button matrix object
  * @param map       pointer a string array. The last string has to be: "". Use "\n" to make a line break.
  */
-void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * map[]);
+void lv_buttonmatrix_set_map(lv_obj_t * obj, const char * const map[]);
 
 /**
  * Set the button control map (hidden, disabled etc.) for a button matrix.
@@ -142,7 +123,6 @@ void lv_buttonmatrix_set_button_ctrl_all(lv_obj_t * obj, lv_buttonmatrix_ctrl_t 
  * Clear the attributes of all buttons of a button matrix
  * @param obj       pointer to a button matrix object
  * @param ctrl      attribute(s) to set from `lv_buttonmatrix_ctrl_t`. Values can be ORed.
- * @param en        true: set the attributes; false: clear the attributes
  */
 void lv_buttonmatrix_clear_button_ctrl_all(lv_obj_t * obj, lv_buttonmatrix_ctrl_t ctrl);
 
@@ -175,7 +155,7 @@ void lv_buttonmatrix_set_one_checked(lv_obj_t * obj, bool en);
  * @param obj       pointer to a button matrix object
  * @return          the current map
  */
-const char ** lv_buttonmatrix_get_map(const lv_obj_t * obj);
+const char * const * lv_buttonmatrix_get_map(const lv_obj_t * obj);
 
 /**
  * Get the index of the lastly "activated" button by the user (pressed, released, focused etc)

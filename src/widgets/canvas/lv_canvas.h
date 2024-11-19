@@ -29,13 +29,6 @@ extern "C" {
  **********************/
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_canvas_class;
 
-/*Data of canvas*/
-typedef struct {
-    lv_image_t img;
-    lv_draw_buf_t * draw_buf;
-    lv_draw_buf_t static_buf;
-} lv_canvas_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -53,16 +46,18 @@ lv_obj_t * lv_canvas_create(lv_obj_t * parent);
 
 /**
  * Set a buffer for the canvas.
- * Use `lv_canvas_set_draw_buf` instead if you need to set a buffer with alignment requirement.
- * @param buf a buffer where the content of the canvas will be.
- * The required size is (lv_image_color_format_get_px_size(cf) * w) / 8 * h)
- * It can be allocated with `lv_malloc()` or
- * it can be statically allocated array (e.g. static lv_color_t buf[100*50]) or
- * it can be an address in RAM or external SRAM
- * @param canvas pointer to a canvas object
- * @param w width of the canvas
- * @param h height of the canvas
- * @param cf color format. `LV_COLOR_FORMAT...`
+ *
+ * Use lv_canvas_set_draw_buf() instead if you need to set a buffer with alignment requirement.
+ *
+ * @param obj    pointer to a canvas object
+ * @param buf    buffer where content of canvas will be.
+ *                 The required size is (lv_image_color_format_get_px_size(cf) * w) / 8 * h)
+ *                 It can be allocated with `lv_malloc()` or
+ *                 it can be statically allocated array (e.g. static lv_color_t buf[100*50]) or
+ *                 it can be an address in RAM or external SRAM
+ * @param w      width of canvas
+ * @param h      height of canvas
+ * @param cf     color format. `LV_COLOR_FORMAT...`
  */
 void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, int32_t w, int32_t h, lv_color_format_t cf);
 
@@ -138,7 +133,7 @@ const void * lv_canvas_get_buf(lv_obj_t * canvas);
 
 /**
  * Copy a buffer to the canvas
- * @param canvas        pointer to a canvas object
+ * @param obj           pointer to a canvas object
  * @param canvas_area   the area of the canvas to copy
  * @param dest_buf      pointer to a buffer to store the copied data
  * @param dest_area     the area of the destination buffer to copy to. If omitted NULL, copy to the whole `dest_buf`
@@ -148,7 +143,7 @@ void lv_canvas_copy_buf(lv_obj_t * obj, const lv_area_t * canvas_area, lv_draw_b
 
 /**
  * Fill the canvas with color
- * @param canvas    pointer to a canvas
+ * @param obj       pointer to a canvas
  * @param color     the background color
  * @param opa       the desired opacity
  */
@@ -179,10 +174,7 @@ void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer);
 /**
  * Just a wrapper to `LV_CANVAS_BUF_SIZE` for bindings.
  */
-static inline uint32_t lv_canvas_buf_size(int32_t w, int32_t h, uint8_t bpp, uint8_t stride)
-{
-    return (uint32_t)LV_CANVAS_BUF_SIZE(w, h, bpp, stride);
-}
+uint32_t lv_canvas_buf_size(int32_t w, int32_t h, uint8_t bpp, uint8_t stride);
 
 #endif /*LV_USE_CANVAS*/
 

@@ -104,6 +104,13 @@ void vglite_run(void)
 #endif
 }
 
+#if LV_USE_VGLITE_DRAW_ASYNC
+void vglite_wait_for_finish(void)
+{
+    VGLITE_CHECK_ERROR(vg_lite_finish());
+}
+#endif
+
 vg_lite_color_t vglite_get_color(lv_color32_t lv_col32, bool gradient)
 {
     vg_lite_color_t vg_col32;
@@ -218,7 +225,7 @@ vg_lite_buffer_format_t vglite_get_buf_format(lv_color_format_t cf)
     return vg_buffer_format;
 }
 
-uint8_t vglite_get_alignment(lv_color_format_t cf)
+uint8_t vglite_get_stride_alignment(lv_color_format_t cf)
 {
     uint8_t align_bytes = LV_COLOR_DEPTH / 8 * 16; /*16 pixels*/
 
@@ -226,20 +233,12 @@ uint8_t vglite_get_alignment(lv_color_format_t cf)
         case LV_COLOR_FORMAT_I1:
         case LV_COLOR_FORMAT_I2:
         case LV_COLOR_FORMAT_I4:
-            /*
-             * VGLite alignment require 8 bytes.
-             * But ARM clean and invalidate cache needs 32 bytes address alignment.
-             */
-            align_bytes = 32;
+            align_bytes = 8;
             break;
         case LV_COLOR_FORMAT_I8:
         case LV_COLOR_FORMAT_A8:
         case LV_COLOR_FORMAT_L8:
-            /*
-             * VGLite alignment require 16 bytes.
-             * But ARM clean and invalidate cache needs 32 bytes address alignment.
-             */
-            align_bytes = 32;
+            align_bytes = 16;
             break;
         case LV_COLOR_FORMAT_RGB565:
             align_bytes = 32;
@@ -261,18 +260,16 @@ uint8_t vglite_get_alignment(lv_color_format_t cf)
     return align_bytes;
 }
 
-bool vglite_buf_aligned(const void * buf, uint32_t stride, lv_color_format_t cf)
+bool vglite_src_buf_aligned(const void * buf, uint32_t stride, lv_color_format_t cf)
 {
-    uint8_t align_bytes = vglite_get_alignment(cf);
-
     /* No alignment requirement for destination buffer when using mode VG_LITE_LINEAR */
 
     /* Test for pointer alignment */
-    if((uintptr_t)buf % align_bytes)
+    if((uintptr_t)buf % LV_ATTRIBUTE_MEM_ALIGN_SIZE)
         return false;
 
     /* Test for stride alignment */
-    if(stride == 0 || stride % align_bytes)
+    if(stride == 0 || stride % vglite_get_stride_alignment(cf))
         return false;
 
     return true;

@@ -39,6 +39,7 @@ typedef struct {
 
     void * mem;
     void * mem2;
+    void * mem_off_screen;
     uint32_t mem2_yoffset;
 
     lv_draw_buf_t buf1;
@@ -141,8 +142,7 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
     uint32_t data_size = h * stride;
     lv_draw_buf_init(&dsc->buf1, w, h, color_format, stride, dsc->mem, data_size);
 
-    /* double buffer mode */
-
+    /* Check buffer mode */
     bool double_buffer = dsc->pinfo.yres_virtual == (dsc->vinfo.yres * 2);
     if(double_buffer) {
         if((ret = fbdev_init_mem2(dsc)) < 0) {
@@ -150,9 +150,22 @@ int lv_nuttx_fbdev_set_file(lv_display_t * disp, const char * file)
         }
 
         lv_draw_buf_init(&dsc->buf2, w, h, color_format, stride, dsc->mem2, data_size);
+        lv_display_set_draw_buffers(disp, &dsc->buf1, &dsc->buf2);
+    }
+    else {
+        dsc->mem_off_screen = malloc(data_size);
+        LV_ASSERT_MALLOC(dsc->mem_off_screen);
+        if(!dsc->mem_off_screen) {
+            ret = -ENOMEM;
+            LV_LOG_ERROR("Failed to allocate memory for off-screen buffer");
+            goto errout;
+        }
+
+        LV_LOG_USER("Use off-screen mode, memory: %p, size: %" LV_PRIu32, dsc->mem_off_screen, data_size);
+        lv_draw_buf_init(&dsc->buf2, w, h, color_format, stride, dsc->mem_off_screen, data_size);
+        lv_display_set_draw_buffers(disp, &dsc->buf2, NULL);
     }
 
-    lv_display_set_draw_buffers(disp, &dsc->buf1, double_buffer ? &dsc->buf2 : NULL);
     lv_display_set_color_format(disp, color_format);
     lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
     lv_display_set_resolution(disp, dsc->vinfo.xres, dsc->vinfo.yres);
@@ -191,9 +204,9 @@ static void fbdev_join_inv_areas(lv_display_t * disp, lv_area_t * final_inv_area
                 area_joined = true;
             }
             else {
-                _lv_area_join(final_inv_area,
-                              final_inv_area,
-                              area_p);
+                lv_area_join(final_inv_area,
+                             final_inv_area,
+                             area_p);
             }
         }
     }
@@ -217,24 +230,24 @@ static void display_refr_timer_cb(lv_timer_t * tmr)
     }
 
     if(pfds[0].revents & POLLOUT) {
-        _lv_display_refr_timer(tmr);
+        lv_display_refr_timer(tmr);
     }
 }
 
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
 {
+    LV_UNUSED(color_p);
     lv_nuttx_fb_t * dsc = lv_display_get_driver_data(disp);
+
+    if(dsc->mem_off_screen) {
+        /* When rendering in off-screen mode, copy the drawing buffer to fb */
+        /* buf2(off-screen buffer) -> buf1(fbmem)*/
+        lv_draw_buf_copy(&dsc->buf1, area, &dsc->buf2, area);
+    }
 
     /* Skip the non-last flush */
 
     if(!lv_display_flush_is_last(disp)) {
-        lv_display_flush_ready(disp);
-        return;
-    }
-
-    if(dsc->mem == NULL ||
-       area->x2 < 0 || area->y2 < 0 ||
-       area->x1 > (int32_t)dsc->vinfo.xres - 1 || area->y1 > (int32_t)dsc->vinfo.yres - 1) {
         lv_display_flush_ready(disp);
         return;
     }
@@ -379,6 +392,13 @@ static void display_release_cb(lv_event_t * e)
             close(dsc->fd);
             dsc->fd = -1;
         }
+
+        if(dsc->mem_off_screen) {
+            /* Free the off-screen buffer */
+            free(dsc->mem_off_screen);
+            dsc->mem_off_screen = NULL;
+        }
+
         lv_free(dsc);
     }
     LV_LOG_USER("Done");

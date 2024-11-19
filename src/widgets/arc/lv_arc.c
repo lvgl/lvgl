@@ -6,7 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_arc.h"
+#include "lv_arc_private.h"
+#include "../../misc/lv_area_private.h"
+#include "../../core/lv_obj_private.h"
+#include "../../core/lv_obj_event_private.h"
+#include "../../core/lv_obj_class_private.h"
 #if LV_USE_ARC != 0
 
 #include "../../core/lv_group.h"
@@ -195,6 +199,9 @@ void lv_arc_set_rotation(lv_obj_t * obj, int32_t rotation)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_arc_t * arc = (lv_arc_t *)obj;
 
+    /* ensure the angle is in the range [0, 360) */
+    while(rotation < 0) rotation += 360;
+    while(rotation >= 360) rotation -= 360;
     arc->rotation = rotation;
 
     lv_obj_invalidate(obj);
@@ -502,8 +509,9 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         angle -= arc->rotation;
         angle -= arc->bg_angle_start;  /*Make the angle relative to the start angle*/
 
-        /* If we click near the bg_angle_start the angle will be close to 360° instead of a small angle */
-        if(angle < 0) angle += 360;
+        /* ensure the angle is in the range [0, 360) */
+        while(angle < 0) angle += 360;
+        while(angle >= 360) angle -= 360;
 
         const uint32_t circumference = (uint32_t)((2U * r * 314U) / 100U);  /* Equivalent to: 2r * 3.14, avoiding floats */
         const lv_value_precise_t tolerance_deg = (360 * lv_dpx(50U)) / circumference;
@@ -646,14 +654,33 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_area_t a;
         /*Invalid if clicked inside*/
         lv_area_set(&a, p.x - r, p.y - r, p.x + r, p.y + r);
-        if(_lv_area_is_point_on(&a, info->point, LV_RADIUS_CIRCLE)) {
+        if(lv_area_is_point_on(&a, info->point, LV_RADIUS_CIRCLE)) {
+            info->res = false;
+            return;
+        }
+
+        /*Calculate the angle of the pressed point*/
+        lv_value_precise_t angle = lv_atan2(info->point->y - p.y, info->point->x - p.x);
+        angle -= arc->rotation;
+        angle -= arc->bg_angle_start;  /*Make the angle relative to the start angle*/
+
+        /* ensure the angle is in the range [0, 360) */
+        while(angle < 0) angle += 360;
+        while(angle >= 360) angle -= 360;
+
+        const uint32_t circumference = (uint32_t)((2U * r * 314U) / 100U);  /* Equivalent to: 2r * 3.14, avoiding floats */
+        const lv_value_precise_t tolerance_deg = (360 * lv_dpx(50U)) / circumference;
+
+        /* Check if the angle is outside the drawn background arc */
+        const bool is_angle_within_bg_bounds = lv_arc_angle_within_bg_bounds(obj, angle, tolerance_deg);
+        if(!is_angle_within_bg_bounds) {
             info->res = false;
             return;
         }
 
         /*Valid if no clicked outside*/
         lv_area_increase(&a, w + ext_click_area * 2, w + ext_click_area * 2);
-        info->res = _lv_area_is_point_on(&a, info->point, LV_RADIUS_CIRCLE);
+        info->res = lv_area_is_point_on(&a, info->point, LV_RADIUS_CIRCLE);
     }
     else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         int32_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
@@ -937,7 +964,10 @@ static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const lv_value_precise
     lv_arc_t * arc = (lv_arc_t *)obj;
 
     lv_value_precise_t bounds_angle = arc->bg_angle_end - arc->bg_angle_start;
-    if(bounds_angle < 0) bounds_angle += 360;
+
+    /* ensure the angle is in the range [0, 360) */
+    while(bounds_angle < 0) bounds_angle += 360;
+    while(bounds_angle >= 360) bounds_angle -= 360;
 
     /* Angle is in the bounds */
     if(angle <= bounds_angle) {

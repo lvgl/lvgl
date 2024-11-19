@@ -25,6 +25,8 @@
     #define MY_DISP_VER_RES    240
 #endif
 
+#define BYTE_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /*will be 2 for RGB565 */
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -63,21 +65,28 @@ void lv_port_disp_init(void)
 
     /* Example 1
      * One buffer for partial rendering*/
-    static lv_color_t buf_1_1[MY_DISP_HOR_RES * 10];                          /*A buffer for 10 rows*/
+    LV_ATTRIBUTE_MEM_ALIGN
+    static uint8_t buf_1_1[MY_DISP_HOR_RES * 10 * BYTE_PER_PIXEL];            /*A buffer for 10 rows*/
     lv_display_set_buffers(disp, buf_1_1, NULL, sizeof(buf_1_1), LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     /* Example 2
      * Two buffers for partial rendering
      * In flush_cb DMA or similar hardware should be used to update the display in the background.*/
-    static lv_color_t buf_2_1[MY_DISP_HOR_RES * 10];
-    static lv_color_t buf_2_2[MY_DISP_HOR_RES * 10];
+    LV_ATTRIBUTE_MEM_ALIGN
+    static uint8_t buf_2_1[MY_DISP_HOR_RES * 10 * BYTE_PER_PIXEL];
+
+    LV_ATTRIBUTE_MEM_ALIGN
+    static uint8_t buf_2_2[MY_DISP_HOR_RES * 10 * BYTE_PER_PIXEL];
     lv_display_set_buffers(disp, buf_2_1, buf_2_2, sizeof(buf_2_1), LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     /* Example 3
      * Two buffers screen sized buffer for double buffering.
      * Both LV_DISPLAY_RENDER_MODE_DIRECT and LV_DISPLAY_RENDER_MODE_FULL works, see their comments*/
-    static lv_color_t buf_3_1[MY_DISP_HOR_RES * MY_DISP_VER_RES];
-    static lv_color_t buf_3_2[MY_DISP_HOR_RES * MY_DISP_VER_RES];
+    LV_ATTRIBUTE_MEM_ALIGN
+    static uint8_t buf_3_1[MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTE_PER_PIXEL];
+
+    LV_ATTRIBUTE_MEM_ALIGN
+    static uint8_t buf_3_2[MY_DISP_HOR_RES * MY_DISP_VER_RES * BYTE_PER_PIXEL];
     lv_display_set_buffers(disp, buf_3_1, buf_3_2, sizeof(buf_3_1), LV_DISPLAY_RENDER_MODE_DIRECT);
 
 }

@@ -17,6 +17,11 @@
 /*********************
  *      DEFINES
  *********************/
+
+#if !LV_FS_IS_VALID_LETTER(LV_FS_WIN32_LETTER)
+    #error "Invalid drive letter"
+#endif
+
 #define MAX_PATH_LEN 256
 
 /**********************

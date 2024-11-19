@@ -32,13 +32,24 @@ extern "C" {
 #include "../stdlib/builtin/lv_tlsf.h"
 
 #if LV_USE_FONT_COMPRESSED
-#include "../font/lv_font_fmt_txt.h"
+#include "../font/lv_font_fmt_txt_private.h"
 #endif
 
 #include "../tick/lv_tick.h"
 #include "../layouts/lv_layout.h"
 
 #include "../misc/lv_types.h"
+
+#include "../misc/lv_timer_private.h"
+#include "../misc/lv_anim_private.h"
+#include "../tick/lv_tick_private.h"
+#include "../draw/lv_draw_buf_private.h"
+#include "../draw/lv_draw_private.h"
+#include "../draw/sw/lv_draw_sw_private.h"
+#include "../draw/sw/lv_draw_sw_mask_private.h"
+#include "../stdlib/builtin/lv_tlsf_private.h"
+#include "../others/sysmon/lv_sysmon_private.h"
+#include "../layouts/lv_layout_private.h"
 
 /*********************
  *      DEFINES
@@ -115,7 +126,7 @@ typedef struct _lv_global_t {
     lv_draw_sw_shadow_cache_t sw_shadow_cache;
 #endif
 #if LV_DRAW_SW_COMPLEX
-    _lv_draw_sw_mask_radius_circle_dsc_arr_t sw_circle_cache;
+    lv_draw_sw_mask_radius_circle_dsc_arr_t sw_circle_cache;
 #endif
 
 #if LV_USE_LOG
@@ -174,10 +185,6 @@ typedef struct _lv_global_t {
     struct _lv_freetype_context_t * ft_context;
 #endif
 
-#if LV_USE_TINY_TTF
-    lv_cache_t * tiny_ttf_cache;
-#endif
-
 #if LV_USE_FONT_COMPRESSED
     lv_font_fmt_rle_t font_fmt_rle;
 #endif
@@ -214,6 +221,14 @@ typedef struct _lv_global_t {
 #if LV_USE_OS != LV_OS_NONE
     lv_mutex_t lv_general_mutex;
 #endif
+
+#if LV_USE_OS == LV_OS_FREERTOS
+    uint32_t freertos_idle_time_sum;
+    uint32_t freertos_non_idle_time_sum;
+    uint32_t freertos_task_switch_timestamp;
+    bool freertos_idle_task_running;
+#endif
+
 
     void * user_data;
 } lv_global_t;

@@ -23,13 +23,13 @@ extern "C" {
 
 /*Possible log level. For compatibility declare it independently from `LV_USE_LOG`*/
 
-#define LV_LOG_LEVEL_TRACE 0 /**< A lot of logs to give detailed information*/
-#define LV_LOG_LEVEL_INFO  1 /**< Log important events*/
-#define LV_LOG_LEVEL_WARN  2 /**< Log if something unwanted happened but didn't caused problem*/
-#define LV_LOG_LEVEL_ERROR 3 /**< Only critical issue, when the system may fail*/
-#define LV_LOG_LEVEL_USER  4 /**< Custom logs from the user*/
-#define LV_LOG_LEVEL_NONE  5 /**< Do not log anything*/
-#define _LV_LOG_LEVEL_NUM  6 /**< Number of log levels*/
+#define LV_LOG_LEVEL_TRACE 0 /**< Log detailed information. */
+#define LV_LOG_LEVEL_INFO  1 /**< Log important events. */
+#define LV_LOG_LEVEL_WARN  2 /**< Log if something unwanted happened but didn't caused problem. */
+#define LV_LOG_LEVEL_ERROR 3 /**< Log only critical issues, when system may fail. */
+#define LV_LOG_LEVEL_USER  4 /**< Log only custom log messages added by the user. */
+#define LV_LOG_LEVEL_NONE  5 /**< Do not log anything. */
+#define LV_LOG_LEVEL_NUM   6 /**< Number of log levels */
 
 LV_EXPORT_CONST_INT(LV_LOG_LEVEL_TRACE);
 LV_EXPORT_CONST_INT(LV_LOG_LEVEL_INFO);
@@ -88,15 +88,15 @@ void lv_log(const char * format, ...) LV_FORMAT_ATTRIBUTE(1, 2);
  * @param format    printf-like format string
  * @param ...       parameters for `format`
  */
-void _lv_log_add(lv_log_level_t level, const char * file, int line,
-                 const char * func, const char * format, ...) LV_FORMAT_ATTRIBUTE(5, 6);
+void lv_log_add(lv_log_level_t level, const char * file, int line,
+                const char * func, const char * format, ...) LV_FORMAT_ATTRIBUTE(5, 6);
 
 /**********************
  *      MACROS
  **********************/
 #ifndef LV_LOG_TRACE
 #  if LV_LOG_LEVEL <= LV_LOG_LEVEL_TRACE
-#    define LV_LOG_TRACE(...) _lv_log_add(LV_LOG_LEVEL_TRACE, LV_LOG_FILE, LV_LOG_LINE, __func__, __VA_ARGS__)
+#    define LV_LOG_TRACE(...) lv_log_add(LV_LOG_LEVEL_TRACE, LV_LOG_FILE, LV_LOG_LINE, __func__, __VA_ARGS__)
 #  else
 #    define LV_LOG_TRACE(...) do {}while(0)
 #  endif
@@ -104,7 +104,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line,
 
 #ifndef LV_LOG_INFO
 #  if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
-#    define LV_LOG_INFO(...) _lv_log_add(LV_LOG_LEVEL_INFO, LV_LOG_FILE, LV_LOG_LINE, __func__, __VA_ARGS__)
+#    define LV_LOG_INFO(...) lv_log_add(LV_LOG_LEVEL_INFO, LV_LOG_FILE, LV_LOG_LINE, __func__, __VA_ARGS__)
 #  else
 #    define LV_LOG_INFO(...) do {}while(0)
 #  endif
@@ -112,7 +112,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line,
 
 #ifndef LV_LOG_WARN
 #  if LV_LOG_LEVEL <= LV_LOG_LEVEL_WARN
-#    define LV_LOG_WARN(...) _lv_log_add(LV_LOG_LEVEL_WARN, LV_LOG_FILE, LV_LOG_LINE, __func__, __VA_ARGS__)
+#    define LV_LOG_WARN(...) lv_log_add(LV_LOG_LEVEL_WARN, LV_LOG_FILE, LV_LOG_LINE, __func__, __VA_ARGS__)
 #  else
 #    define LV_LOG_WARN(...) do {}while(0)
 #  endif
@@ -120,7 +120,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line,
 
 #ifndef LV_LOG_ERROR
 #  if LV_LOG_LEVEL <= LV_LOG_LEVEL_ERROR
-#    define LV_LOG_ERROR(...) _lv_log_add(LV_LOG_LEVEL_ERROR, LV_LOG_FILE, LV_LOG_LINE, __func__, __VA_ARGS__)
+#    define LV_LOG_ERROR(...) lv_log_add(LV_LOG_LEVEL_ERROR, LV_LOG_FILE, LV_LOG_LINE, __func__, __VA_ARGS__)
 #  else
 #    define LV_LOG_ERROR(...) do {}while(0)
 #  endif
@@ -128,7 +128,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line,
 
 #ifndef LV_LOG_USER
 #  if LV_LOG_LEVEL <= LV_LOG_LEVEL_USER
-#    define LV_LOG_USER(...) _lv_log_add(LV_LOG_LEVEL_USER, LV_LOG_FILE, LV_LOG_LINE, __func__, __VA_ARGS__)
+#    define LV_LOG_USER(...) lv_log_add(LV_LOG_LEVEL_USER, LV_LOG_FILE, LV_LOG_LINE, __func__, __VA_ARGS__)
 #  else
 #    define LV_LOG_USER(...) do {}while(0)
 #  endif
@@ -145,7 +145,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line,
 #else /*LV_USE_LOG*/
 
 /*Do nothing if `LV_USE_LOG 0`*/
-#define _lv_log_add(level, file, line, ...)
+#define lv_log_add(level, file, line, ...)
 #define LV_LOG_TRACE(...) do {}while(0)
 #define LV_LOG_INFO(...) do {}while(0)
 #define LV_LOG_WARN(...) do {}while(0)
