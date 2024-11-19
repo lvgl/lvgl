@@ -77,7 +77,7 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
         if(blend_dsc->mask_buf == NULL) fill_dsc.mask_buf = NULL;
         else if(blend_dsc->mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) fill_dsc.mask_buf = NULL;
         else fill_dsc.mask_buf = blend_dsc->mask_buf;
-
+        fill_dsc.mask_stride = 0;
 
         fill_dsc.relative_area  = blend_area;
         lv_area_move(&fill_dsc.relative_area, -layer->buf_area.x1, -layer->buf_area.y1);
@@ -160,6 +160,7 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
         if(blend_dsc->mask_buf == NULL) image_dsc.mask_buf = NULL;
         else if(blend_dsc->mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) image_dsc.mask_buf = NULL;
         else image_dsc.mask_buf = blend_dsc->mask_buf;
+        image_dsc.mask_stride = 0;
 
         if(image_dsc.mask_buf) {
             LV_ASSERT_NULL(blend_dsc->mask_area);
