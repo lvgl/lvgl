@@ -855,6 +855,7 @@ static void update_align(lv_obj_t * obj)
         lv_image_set_rotation(obj, 0);
         lv_image_set_pivot(obj, 0, 0);
         if(img->w != 0 && img->h != 0) {
+            lv_obj_update_layout(obj);
             int32_t scale_x = lv_obj_get_width(obj) * LV_SCALE_NONE / img->w;
             int32_t scale_y = lv_obj_get_height(obj) * LV_SCALE_NONE / img->h;
             scale_update(obj, scale_x, scale_y);

@@ -35,6 +35,7 @@ static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 static void create_widget3_info(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const lv_image_dsc_t * img_dsc,
                                 const char * text, const char * number, const char * unit);
 static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
+static void charging_status_label_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 /**********************
  *  STATIC VARIABLES
@@ -71,37 +72,7 @@ void lv_demo_high_res_app_ev_charging(lv_obj_t * base_obj)
 
     /* top margin */
 
-    lv_obj_t * top_margin = lv_obj_create(bg_cont);
-    lv_obj_remove_style_all(top_margin);
-    lv_obj_set_size(top_margin, LV_PCT(100), c->sz->gap[10]);
-    lv_obj_set_align(top_margin, LV_ALIGN_TOP_MID);
-    lv_obj_set_flex_flow(top_margin, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(top_margin, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_t * date_label = lv_label_create(top_margin);
-    lv_label_set_text_static(date_label, "Tuesday, 31 October");
-    lv_obj_add_style(date_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    lv_obj_add_style(date_label, &c->fonts[FONT_LABEL_SM], 0);
-
-    lv_obj_t * time_label = lv_label_create(top_margin);
-    lv_label_set_text_static(time_label, "09:36");
-    lv_obj_add_style(time_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    lv_obj_add_style(time_label, &c->fonts[FONT_LABEL_SM], 0);
-
-    lv_obj_t * top_margin_right_cluster = lv_demo_high_res_simple_container_create(top_margin, false, c->sz->gap[6],
-                                                                                   LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_t * wifi_icon = lv_image_create(top_margin_right_cluster);
-    lv_image_set_src(wifi_icon, c->imgs[IMG_WIFI_ICON]);
-    lv_obj_add_style(wifi_icon, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_A8_IMG], 0);
-
-    lv_obj_t * health_icon = lv_image_create(top_margin_right_cluster);
-    lv_image_set_src(health_icon, c->imgs[IMG_HEALTH_ICON]);
-    lv_obj_add_style(health_icon, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_A8_IMG], 0);
-
-    lv_obj_t * setting_icon = lv_image_create(top_margin_right_cluster);
-    lv_image_set_src(setting_icon, c->imgs[IMG_SETTING_ICON]);
-    lv_obj_add_style(setting_icon, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_A8_IMG], 0);
+    lv_obj_t * top_margin = lv_demo_high_res_top_margin_create(base_obj, bg_cont, 0, true, c);
 
     /* app info */
 
@@ -408,7 +379,6 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_size(arc, c->sz->ev_charging_arc_diameter, c->sz->ev_charging_arc_diameter);
     lv_arc_set_rotation(arc, 270);
     lv_arc_set_bg_angles(arc, 0, 360);
-    lv_arc_set_value(arc, 88);
     lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
     lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_style_arc_rounded(arc, false, 0);
@@ -421,32 +391,43 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_flex_flow(arc, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(arc, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_set_style_pad_row(arc, c->sz->gap[2], 0);
+    lv_arc_bind_value(arc, &c->subjects.ev_charge_percent);
 
     lv_obj_t * percent_label = lv_label_create(arc);
-    lv_label_set_text_static(percent_label, "88%");
     lv_obj_add_style(percent_label, &c->fonts[FONT_LABEL_2XL], 0);
     lv_obj_set_style_text_color(percent_label, lv_color_white(), 0);
+    lv_label_bind_text(percent_label, &c->subjects.ev_charge_percent, "%d%%");
 
-    lv_obj_t * stop_charging_box = lv_obj_create(arc);
-    lv_obj_remove_style_all(stop_charging_box);
-    lv_obj_set_size(stop_charging_box, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    lv_obj_set_style_pad_hor(stop_charging_box, c->sz->gap[6], 0);
-    lv_obj_set_style_pad_ver(stop_charging_box, c->sz->gap[3], 0);
-    lv_obj_set_style_bg_color(stop_charging_box, lv_color_white(), 0);
-    lv_obj_set_style_bg_opa(stop_charging_box, LV_OPA_30, 0);
-    lv_obj_set_style_radius(stop_charging_box, LV_COORD_MAX, 0);
+    lv_obj_t * charging_status_box = lv_obj_create(arc);
+    lv_obj_remove_style_all(charging_status_box);
+    lv_obj_set_size(charging_status_box, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_style_pad_hor(charging_status_box, c->sz->gap[6], 0);
+    lv_obj_set_style_pad_ver(charging_status_box, c->sz->gap[3], 0);
+    lv_obj_set_style_bg_color(charging_status_box, lv_color_white(), 0);
+    lv_obj_set_style_bg_opa(charging_status_box, LV_OPA_30, 0);
+    lv_obj_set_style_radius(charging_status_box, LV_COORD_MAX, 0);
+    lv_obj_add_flag(charging_status_box, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_flag(charging_status_box, LV_OBJ_FLAG_CHECKABLE);
+    lv_obj_bind_checked(charging_status_box, &c->subjects.ev_is_charging);
 
-    lv_obj_t * stop_charging_label = lv_label_create(stop_charging_box);
-    lv_label_set_text_static(stop_charging_label, "Stop charging");
-    lv_obj_add_style(stop_charging_label, &c->fonts[FONT_LABEL_SM], 0);
-    lv_obj_set_style_text_color(stop_charging_label, lv_color_white(), 0);
-    lv_obj_center(stop_charging_label);
+    lv_obj_t * charging_status_label = lv_label_create(charging_status_box);
+    lv_obj_add_style(charging_status_label, &c->fonts[FONT_LABEL_SM], 0);
+    lv_obj_set_style_text_color(charging_status_label, lv_color_white(), 0);
+    lv_obj_center(charging_status_label);
+    lv_subject_add_observer_obj(&c->subjects.ev_is_charging, charging_status_label_cb, charging_status_label, NULL);
 
     lv_obj_t * info_box = lv_demo_high_res_simple_container_create(widget, false, c->sz->gap[5], LV_FLEX_ALIGN_CENTER);
     lv_obj_set_width(info_box, LV_PCT(100));
     create_widget3_info(c, info_box, c->imgs[IMG_TIME_ICON], "Time to\nfull charge", "1.2", "h");
     create_widget3_info(c, info_box, c->imgs[IMG_ENERGY_ICON], "Energy\nconsumed", "10.12", "kW");
     create_widget3_info(c, info_box, c->imgs[IMG_RANGE_ICON], "Driving\nRange", "209", "km");
+}
+
+static void charging_status_label_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * charging_status_label = lv_observer_get_target_obj(observer);
+    bool is_charging = lv_subject_get_int(subject);
+    lv_label_set_text_static(charging_status_label, is_charging ? "Stop charging" : "Start charging");
 }
 
 #endif /*LV_USE_DEMO_HIGH_RES*/

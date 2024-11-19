@@ -12,10 +12,13 @@
 
 #include "../../src/widgets/image/lv_image.h"
 #include "../../src/widgets/canvas/lv_canvas.h"
+#include "../../src/widgets/label/lv_label.h"
 
 /*********************
  *      DEFINES
  *********************/
+
+#define ARRAY_LEN(arr) (sizeof(arr) / sizeof(*arr))
 
 /**********************
  *      TYPEDEFS
@@ -64,6 +67,7 @@ static void init_fonts_lg(lv_style_t * fonts);
 static void theme_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void free_ctx_event_cb(lv_event_t * e);
 static lv_image_dsc_t * image_preload(const void * src, lv_color_format_t cf);
+static void label_text_tenths_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 /**********************
  *  STATIC PROTOTYPES
@@ -97,6 +101,7 @@ static const lv_demo_high_res_sizes_t sizes_all[SIZE_COUNT] = {
         .card_radius = 12,
         .health_panel_width = 133,
         .settings_panel_width = 179,
+        .home_bottom_margin_height = 53,
         .init_fonts_cb = init_fonts_sm
     },
     {
@@ -112,6 +117,7 @@ static const lv_demo_high_res_sizes_t sizes_all[SIZE_COUNT] = {
         .card_radius = 18,
         .health_panel_width = 200,
         .settings_panel_width = 268,
+        .home_bottom_margin_height = 80,
         .init_fonts_cb = init_fonts_md
     },
     {
@@ -127,6 +133,7 @@ static const lv_demo_high_res_sizes_t sizes_all[SIZE_COUNT] = {
         .card_radius = 27,
         .health_panel_width = 300,
         .settings_panel_width = 402,
+        .home_bottom_margin_height = 120,
         .init_fonts_cb = init_fonts_lg
     }
 };
@@ -258,12 +265,55 @@ lv_obj_t * lv_demo_high_res_base_obj_create(void)
     c->th.user_data = c;
     lv_subject_add_observer(&c->th, theme_observer_cb, c);
 
+    c->top_margin_subjects_are_init = false;
+
     /* API subjects */
 
     lv_subject_init_pointer(&c->subjects.logo, "img_lv_demo_high_res_lvgl_logo.png");
     lv_subject_init_pointer(&c->subjects.logo_dark, NULL);
     lv_subject_init_int(&c->subjects.hour, 9);
     lv_subject_init_int(&c->subjects.minute, 36);
+    lv_subject_init_pointer(&c->subjects.week_day_name, "Tuesday");
+    lv_subject_init_int(&c->subjects.month_day, 31);
+    lv_subject_init_pointer(&c->subjects.month_name, "October");
+    lv_subject_init_int(&c->subjects.temperature_outdoor, 140); /* tenths of a degree */
+    lv_subject_init_int(&c->subjects.temperature_outdoor_low, 100); /* tenths of a degree */
+    lv_subject_init_int(&c->subjects.temperature_outdoor_high, 190); /* tenths of a degree */
+    lv_subject_init_pointer(&c->subjects.temperature_outdoor_description, "Cloudy");
+    lv_subject_init_pointer(&c->subjects.temperature_outdoor_image, NULL);
+    lv_subject_init_int(&c->subjects.temperature_indoor, 225); /* tenths of a degree */
+    lv_subject_init_int(&c->subjects.gas_savings_total_spent, 128);
+    lv_subject_init_int(&c->subjects.gas_savings_gas_equivalent, 340);
+    lv_subject_init_pointer(&c->subjects.security_slides, NULL);
+    lv_subject_init_int(&c->subjects.ev_charge_percent, 88);
+
+    lv_subject_init_int(&c->subjects.temperature_units_are_celsius, 1);
+    lv_subject_init_int(&c->subjects.volume, 63);
+    lv_subject_init_int(&c->subjects.main_light_temperature, 4000);
+    lv_subject_init_int(&c->subjects.main_light_intensity, 52);
+    lv_subject_init_int(&c->subjects.ev_is_charging, 1);
+
+    c->subject_groups.logo.members[0] = &c->subjects.logo;
+    c->subject_groups.logo.members[1] = &c->subjects.logo_dark;
+    lv_subject_init_group(&c->subject_groups.logo.group, c->subject_groups.logo.members,
+                          ARRAY_LEN(c->subject_groups.logo.members));
+    c->subject_groups.time.members[0] = &c->subjects.hour;
+    c->subject_groups.time.members[1] = &c->subjects.minute;
+    lv_subject_init_group(&c->subject_groups.time.group, c->subject_groups.time.members,
+                          ARRAY_LEN(c->subject_groups.time.members));
+    c->subject_groups.date.members[0] = &c->subjects.week_day_name;
+    c->subject_groups.date.members[1] = &c->subjects.month_day;
+    c->subject_groups.date.members[2] = &c->subjects.month_name;
+    lv_subject_init_group(&c->subject_groups.date.group, c->subject_groups.date.members,
+                          ARRAY_LEN(c->subject_groups.date.members));
+    c->subject_groups.temps_high_low.members[0] = &c->subjects.temperature_outdoor_high;
+    c->subject_groups.temps_high_low.members[1] = &c->subjects.temperature_outdoor_low;
+    lv_subject_init_group(&c->subject_groups.temps_high_low.group, c->subject_groups.temps_high_low.members,
+                          ARRAY_LEN(c->subject_groups.temps_high_low.members));
+    c->subject_groups.gas_savings.members[0] = &c->subjects.gas_savings_total_spent;
+    c->subject_groups.gas_savings.members[1] = &c->subjects.gas_savings_gas_equivalent;
+    lv_subject_init_group(&c->subject_groups.gas_savings.group, c->subject_groups.gas_savings.members,
+                          ARRAY_LEN(c->subject_groups.gas_savings.members));
 
     return base_obj;
 }
@@ -284,6 +334,23 @@ lv_obj_t * lv_demo_high_res_simple_container_create(lv_obj_t * parent, bool vert
     }
     lv_obj_set_flex_align(obj, LV_FLEX_ALIGN_START, align_cross_place, align_cross_place);
     return obj;
+}
+
+void lv_demo_high_res_label_bind_text_tenths(lv_obj_t * label, lv_subject_t * subject, const char * fmt)
+{
+    lv_subject_add_observer_obj(subject, label_text_tenths_cb, label, (void *) fmt);
+}
+
+void lv_demo_high_res_fmt_tenths(char * dst, uint32_t dst_size, int32_t val)
+{
+    int32_t full = val / 10;
+    int32_t fraction = val % 10;
+    if(fraction) {
+        lv_snprintf(dst, dst_size, "%d.%d", full, fraction);
+    }
+    else {
+        lv_snprintf(dst, dst_size, "%d", full);
+    }
 }
 
 void lv_demo_high_res_theme_observer_image_src_cb(lv_observer_t * observer, lv_subject_t * subject)
@@ -419,10 +486,18 @@ static void free_ctx_event_cb(lv_event_t * e)
         lv_style_reset(&c->fonts[i]);
     }
 
-    lv_subject_deinit(&c->subjects.logo);
-    lv_subject_deinit(&c->subjects.logo_dark);
-    lv_subject_deinit(&c->subjects.hour);
-    lv_subject_deinit(&c->subjects.minute);
+    lv_demo_high_res_top_margin_deinit_subjects(c);
+
+    lv_subject_deinit(&c->subject_groups.logo.group);
+    lv_subject_deinit(&c->subject_groups.time.group);
+    lv_subject_deinit(&c->subject_groups.date.group);
+    lv_subject_deinit(&c->subject_groups.temps_high_low.group);
+    lv_subject_deinit(&c->subject_groups.gas_savings.group);
+
+    lv_subject_t * subjects = (lv_subject_t *) &c->subjects;
+    for(uint32_t i = 0; i < sizeof(c->subjects) / sizeof(lv_subject_t); i++) {
+        lv_subject_deinit(&subjects[i]);
+    }
 
     lv_free(c);
 }
@@ -457,6 +532,16 @@ static lv_image_dsc_t * image_preload(const void * src, lv_color_format_t cf)
     lv_obj_delete(canvas);
 
     return (lv_image_dsc_t *) dest;
+}
+
+static void label_text_tenths_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    int32_t val = lv_subject_get_int(subject);
+    const char * fmt = lv_observer_get_user_data(observer);
+    lv_obj_t * label = lv_observer_get_target_obj(observer);
+    char buf[16];
+    lv_demo_high_res_fmt_tenths(buf, sizeof(buf), val);
+    lv_label_set_text_fmt(label, fmt, buf);
 }
 
 #endif /*LV_USE_DEMO_HIGH_RES*/

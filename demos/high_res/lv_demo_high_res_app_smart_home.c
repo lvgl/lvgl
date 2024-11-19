@@ -64,43 +64,11 @@ void lv_demo_high_res_app_smart_home(lv_obj_t * base_obj)
     lv_obj_remove_style_all(bg_cont);
     lv_obj_set_size(bg_cont, LV_PCT(100), LV_PCT(100));
     lv_obj_set_flex_flow(bg_cont, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_top(bg_cont, c->sz->gap[7], 0);
 
     /* top margin */
 
-    lv_obj_t * top_margin = lv_obj_create(bg_cont);
-    lv_obj_remove_style_all(top_margin);
-    lv_obj_set_size(top_margin, LV_PCT(100), c->sz->gap[10]);
-    lv_obj_set_style_pad_top(bg_cont, c->sz->gap[7],
-                             0); /* pad the top of the background obj `bg_cont` instead of the margin */
-    lv_obj_set_style_pad_left(top_margin, c->sz->gap[10], 0);
-    lv_obj_set_style_pad_right(top_margin, c->sz->gap[10], 0);
-    lv_obj_set_flex_flow(top_margin, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(top_margin, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_t * date_label = lv_label_create(top_margin);
-    lv_label_set_text_static(date_label, "Tuesday, 31 October");
-    lv_obj_add_style(date_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    lv_obj_add_style(date_label, &c->fonts[FONT_LABEL_SM], 0);
-
-    lv_obj_t * time_label = lv_label_create(top_margin);
-    lv_label_set_text_static(time_label, "09:36");
-    lv_obj_add_style(time_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    lv_obj_add_style(time_label, &c->fonts[FONT_LABEL_SM], 0);
-
-    lv_obj_t * top_margin_right_cluster = lv_demo_high_res_simple_container_create(top_margin, false, c->sz->gap[6],
-                                                                                   LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_t * wifi_icon = lv_image_create(top_margin_right_cluster);
-    lv_image_set_src(wifi_icon, c->imgs[IMG_WIFI_ICON]);
-    lv_obj_add_style(wifi_icon, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_A8_IMG], 0);
-
-    lv_obj_t * health_icon = lv_image_create(top_margin_right_cluster);
-    lv_image_set_src(health_icon, c->imgs[IMG_HEALTH_ICON]);
-    lv_obj_add_style(health_icon, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_A8_IMG], 0);
-
-    lv_obj_t * setting_icon = lv_image_create(top_margin_right_cluster);
-    lv_image_set_src(setting_icon, c->imgs[IMG_SETTING_ICON]);
-    lv_obj_add_style(setting_icon, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_A8_IMG], 0);
+    lv_demo_high_res_top_margin_create(base_obj, bg_cont, c->sz->gap[10], true, c);
 
     /* app info */
 
@@ -184,18 +152,18 @@ static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_style_radius(main_temp_box, LV_COORD_MAX, 0);
 
     lv_obj_t * main_temp = lv_label_create(main_temp_box);
-    lv_label_set_text_static(main_temp, "22.5\xc2\xb0");
     lv_obj_add_style(main_temp, &c->fonts[FONT_LABEL_2XL], 0);
     lv_obj_set_style_text_color(main_temp, lv_color_white(), 0);
     lv_obj_center(main_temp);
+    lv_demo_high_res_label_bind_text_tenths(main_temp, &c->subjects.temperature_indoor, "%s\xc2\xb0");
 
     lv_obj_t * outdoor_temp_box = lv_demo_high_res_simple_container_create(widget, true, c->sz->gap[2],
                                                                            LV_FLEX_ALIGN_CENTER);
 
     lv_obj_t * outdoor_temp = lv_label_create(outdoor_temp_box);
-    lv_label_set_text_static(outdoor_temp, "14\xc2\xb0");
     lv_obj_add_style(outdoor_temp, &c->fonts[FONT_LABEL_XL], 0);
     lv_obj_set_style_text_color(outdoor_temp, lv_color_white(), 0);
+    lv_demo_high_res_label_bind_text_tenths(outdoor_temp, &c->subjects.temperature_outdoor, "%s\xc2\xb0");
 
     lv_obj_t * outdoor_label = lv_label_create(outdoor_temp_box);
     lv_label_set_text_static(outdoor_label, "Outdoor");

@@ -78,37 +78,7 @@ void lv_demo_high_res_app_thermostat(lv_obj_t * base_obj)
 
     /* top margin */
 
-    lv_obj_t * top_margin = lv_obj_create(bg_cont);
-    lv_obj_remove_style_all(top_margin);
-    lv_obj_set_size(top_margin, LV_PCT(100), c->sz->gap[10]);
-    lv_obj_set_align(top_margin, LV_ALIGN_TOP_MID);
-    lv_obj_set_flex_flow(top_margin, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(top_margin, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_t * date_label = lv_label_create(top_margin);
-    lv_label_set_text_static(date_label, "Tuesday, 31 October");
-    lv_obj_add_style(date_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    lv_obj_add_style(date_label, &c->fonts[FONT_LABEL_SM], 0);
-
-    lv_obj_t * time_label = lv_label_create(top_margin);
-    lv_label_set_text_static(time_label, "09:36");
-    lv_obj_add_style(time_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    lv_obj_add_style(time_label, &c->fonts[FONT_LABEL_SM], 0);
-
-    lv_obj_t * top_margin_right_cluster = lv_demo_high_res_simple_container_create(top_margin, false, c->sz->gap[6],
-                                                                                   LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_t * wifi_icon = lv_image_create(top_margin_right_cluster);
-    lv_image_set_src(wifi_icon, c->imgs[IMG_WIFI_ICON]);
-    lv_obj_add_style(wifi_icon, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_A8_IMG], 0);
-
-    lv_obj_t * health_icon = lv_image_create(top_margin_right_cluster);
-    lv_image_set_src(health_icon, c->imgs[IMG_HEALTH_ICON]);
-    lv_obj_add_style(health_icon, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_A8_IMG], 0);
-
-    lv_obj_t * setting_icon = lv_image_create(top_margin_right_cluster);
-    lv_image_set_src(setting_icon, c->imgs[IMG_SETTING_ICON]);
-    lv_obj_add_style(setting_icon, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_A8_IMG], 0);
+    lv_obj_t * top_margin = lv_demo_high_res_top_margin_create(base_obj, bg_cont, 0, true, c);
 
     /* app info */
 

@@ -154,8 +154,32 @@ typedef struct {
     int32_t card_radius;
     int32_t health_panel_width;
     int32_t settings_panel_width;
+    int32_t home_bottom_margin_height;
     void (*init_fonts_cb)(lv_style_t * fonts);
 } lv_demo_high_res_sizes_t;
+
+typedef struct {
+    struct {
+        lv_subject_t group;
+        lv_subject_t * members[2];
+    } logo;
+    struct {
+        lv_subject_t group;
+        lv_subject_t * members[2];
+    } time;
+    struct {
+        lv_subject_t group;
+        lv_subject_t * members[3];
+    } date;
+    struct {
+        lv_subject_t group;
+        lv_subject_t * members[2];
+    } temps_high_low;
+    struct {
+        lv_subject_t group;
+        lv_subject_t * members[2];
+    } gas_savings;
+} lv_demo_high_res_subject_groups_t;
 
 typedef struct {
     const lv_demo_high_res_sizes_t * sz;
@@ -163,7 +187,11 @@ typedef struct {
     lv_style_t styles[STYLE_COLOR_COUNT][STYLE_TYPE_COUNT];
     lv_style_t fonts[FONT_COUNT];
     lv_subject_t th;
+    bool top_margin_subjects_are_init;
+    lv_subject_t top_margin_health_subject;
+    lv_subject_t top_margin_setting_subject;
     lv_demo_high_res_subjects_t subjects;
+    lv_demo_high_res_subject_groups_t subject_groups;
 } lv_demo_high_res_ctx_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_demo_high_res_theme_t lv_demo_high_res_theme_light;
@@ -181,9 +209,14 @@ void lv_demo_high_res_app_ev_charging(lv_obj_t * base_obj);
 void lv_demo_high_res_app_smart_meter(lv_obj_t * base_obj);
 void lv_demo_high_res_app_thermostat(lv_obj_t * base_obj);
 void lv_demo_high_res_app_security(lv_obj_t * base_obj);
+lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * base_obj, lv_obj_t * parent, int32_t pad_hor, bool show_time,
+                                              lv_demo_high_res_ctx_t * c);
+void lv_demo_high_res_top_margin_deinit_subjects(lv_demo_high_res_ctx_t * c);
 
 lv_obj_t * lv_demo_high_res_simple_container_create(lv_obj_t * parent, bool vertical, int32_t pad,
                                                     lv_flex_align_t align_cross_place);
+void lv_demo_high_res_label_bind_text_tenths(lv_obj_t * label, lv_subject_t * subject, const char * fmt);
+void lv_demo_high_res_fmt_tenths(char * dst, uint32_t dst_size, int32_t val);
 void lv_demo_high_res_theme_observer_image_src_cb(lv_observer_t * observer, lv_subject_t * subject);
 void lv_demo_high_res_theme_observer_obj_bg_image_src_cb(lv_observer_t * observer, lv_subject_t * subject);
 
