@@ -169,7 +169,7 @@ endif()
 
 # Options lvgl and examples are compiled with.
 set(COMPILE_OPTIONS
-    -DLV_CONF_PATH=${LVGL_TEST_DIR}/src/lv_test_conf.h
+    -DLV_CONF_PATH="${LVGL_TEST_DIR}/src/lv_test_conf.h"
     -DLV_BUILD_TEST
     ${BUILD_OPTIONS}
     ${BUILD_TARGET_DEF}
