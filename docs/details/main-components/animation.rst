@@ -327,7 +327,7 @@ beginning or at the point set by
 
 Call :cpp:expr:`lv_anim_timeline_set_progress(timeline, progress)` function to set the
 state of the Animation Timeline according to the ``progress`` value.  ``progress`` is
-a value between ``0`` and :c:macro:`LV_ANIM_TIMELINE_PROGRESS_MAX` to indicate the
+a value between ``0`` and ``32767`` (:c:macro:`LV_ANIM_TIMELINE_PROGRESS_MAX`) to indicate the
 proportion of the Timeline that has "played".  Example:  a ``progress`` value of
 :cpp:expr:`LV_ANIM_TIMELINE_PROGRESS_MAX / 2` would set the Timeline playback to its
 half-way point.
