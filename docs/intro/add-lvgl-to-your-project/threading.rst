@@ -93,8 +93,9 @@ before any other LVGL function is started.
 
     These two LVGL functions may be called from any thread:
 
-    - :cpp:func:`lv_tick_inc` (see :ref:`tick_interface` for more information) and
-    - :cpp:func:`lv_display_flush_ready` (see :ref:`flush_callback` for more information)
+    - :cpp:func:`lv_tick_inc` (if writing to a ``uint32_t`` is atomic on your
+      platform; see :ref:`tick_interface` for more information) and
+    - :cpp:func:`lv_display_flush_ready` (:ref:`flush_callback` for more information)
 
     The reason this is okay is that the LVGL data changed by them is :ref:`atomic <atomic>`.
 
@@ -103,6 +104,12 @@ before any other LVGL function is started.
     (or an :ref:`LVGL Timer <timer>` you create) can read from and take action.
 
     If you are using an OS, there are a few other options.  See below.
+
+
+Ensuring Time Updates are Atomic
+--------------------------------
+See
+
 
 
 .. _tasks:
