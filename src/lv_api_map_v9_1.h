@@ -27,8 +27,9 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-static void lv_calendar_set_showed_date(lv_obj_t* obj, uint32_t year, uint32_t month) {
-	lv_calendar_set_month_shown(obj, year, month);
+static void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month)
+{
+    lv_calendar_set_month_shown(obj, year, month);
 }
 
 /**********************
