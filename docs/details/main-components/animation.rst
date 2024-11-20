@@ -267,7 +267,7 @@ Deleting Animations
 You should delete an Animation using :cpp:expr:`lv_anim_delete(var, func)` if one of
 these two conditions exists:
 
-- the object (variable) being animated stops being relevant, or
+- the object (variable) being animated is deleted or
 - a running animation needs to be stopped before it is completed.
 
 If you kept a copy of the pointer returned by :cpp:func:`lv_anim_start` as
