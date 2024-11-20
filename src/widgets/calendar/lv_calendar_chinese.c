@@ -116,7 +116,7 @@ void lv_calendar_set_chinese_mode(lv_obj_t * obj, bool en)
 {
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
     calendar->use_chinese_calendar = en;
-    lv_calendar_set_showed_date(obj, calendar->today.year, calendar->today.month);
+    lv_calendar_set_month_shown(obj, calendar->today.year, calendar->today.month);
 }
 
 const char * lv_calendar_get_day_name(lv_calendar_date_t * gregorian)

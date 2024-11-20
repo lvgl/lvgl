@@ -256,7 +256,7 @@ lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * curso
  * @param ser       pointer to a data series on 'chart'
  * @param value     the new value for all points. `LV_CHART_POINT_NONE` can be used to hide the points.
  */
-void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value);
+void lv_chart_set_all_values(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value);
 
 /**
  * Set the next point's Y value according to the update mode policy.

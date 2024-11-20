@@ -136,7 +136,7 @@ static void month_event_cb(lv_event_t * e)
         }
     }
 
-    lv_calendar_set_showed_date(calendar, newd.year, newd.month);
+    lv_calendar_set_month_shown(calendar, newd.year, newd.month);
 
     lv_obj_t * label = lv_obj_get_child(header, 1);
     lv_label_set_text_fmt(label, "%d %s", newd.year, month_names_def[newd.month - 1]);
