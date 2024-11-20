@@ -1384,6 +1384,13 @@ menu "LVGL configuration"
 			bool "Dump format"
 			depends on LV_USE_FFMPEG
 			default n
+		config LV_FFMPEG_PLAYER_USE_LV_FS
+			bool "Use lvgl file path in FFmpeg Player widget"
+			depends on LV_USE_FFMPEG
+			default n
+			help
+				You won't be able to open URLs after enabling this feature.
+				Note that FFmpeg image decoder will always use lvgl file system. 
 	endmenu
 
 	menu "Others"
