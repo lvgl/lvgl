@@ -4,17 +4,9 @@
  * Opts: --bpp 8 --size 16 --no-compress --font Roboto-Medium.ttf --range 32-127,176 --format lvgl -o font_lv_demo_high_res_roboto_medium_16.c
  ******************************************************************************/
 
-#ifdef LV_LVGL_H_INCLUDE_SIMPLE
-#include "lvgl.h"
-#else
-#include "lvgl/lvgl.h"
-#endif
+#include "../../../lvgl.h"
 
-#ifndef FONT_LV_DEMO_HIGH_RES_ROBOTO_MEDIUM_16
-#define FONT_LV_DEMO_HIGH_RES_ROBOTO_MEDIUM_16 1
-#endif
-
-#if FONT_LV_DEMO_HIGH_RES_ROBOTO_MEDIUM_16
+#if LV_USE_DEMO_HIGH_RES
 
 /*-----------------
  *    BITMAPS
@@ -1986,5 +1978,5 @@ lv_font_t font_lv_demo_high_res_roboto_medium_16 = {
 
 
 
-#endif /*#if FONT_LV_DEMO_HIGH_RES_ROBOTO_MEDIUM_16*/
+#endif /*#if LV_USE_DEMO_HIGH_RES*/
 

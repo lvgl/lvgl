@@ -155,8 +155,8 @@ static lv_obj_t * create_perfmon(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c
     lv_obj_add_style(lab1, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_t * divider = lv_line_create(cont);
     lv_obj_set_size(divider, LV_PCT(100), c->sz->gap[4]);
-    static const lv_point_precise_t points[] = {{LV_PCT(0), LV_PCT(50)}, {LV_PCT(100), LV_PCT(50)}};
-    lv_line_set_points(divider, points, 2);
+    //    static const lv_point_precise_t points[] = {{LV_PCT(0), LV_PCT(50)}, {LV_PCT(100), LV_PCT(50)}};
+    //    lv_line_set_points(divider, points, 2);
     lv_obj_set_style_line_width(divider, 1, 0);
     lv_obj_add_style(divider, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_set_style_line_opa(divider, LV_OPA_10, 0);

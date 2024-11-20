@@ -223,7 +223,7 @@ static void theme_observer_accent_span_cb(lv_observer_t * observer, lv_subject_t
 static void app_card_click_cb(lv_event_t * e)
 {
     lv_obj_t * app_card = lv_event_get_target_obj(e);
-    app_cb_t app_cb = lv_event_get_user_data(e);
+    app_cb_t app_cb = (app_cb_t)((uintptr_t)lv_event_get_user_data(e));
 
     lv_obj_t * base_obj = lv_obj_get_parent(lv_obj_get_parent(lv_obj_get_parent(app_card)));
     lv_obj_clean(base_obj);
@@ -240,7 +240,7 @@ static void app_card_create(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const
     lv_obj_set_style_bg_opa(app_card, 16 * 255 / 100, 0);
     lv_obj_set_style_pad_all(app_card, c->sz->gap[7], 0);
     lv_obj_add_style(app_card, &c->styles[STYLE_COLOR_ACCENT][STYLE_TYPE_OBJ], 0);
-    lv_obj_add_event_cb(app_card, app_card_click_cb, LV_EVENT_CLICKED, app_cb);
+    lv_obj_add_event_cb(app_card, app_card_click_cb, LV_EVENT_CLICKED, (void *)((lv_uintptr_t)app_cb));
 
     lv_obj_t * label = lv_label_create(app_card);
     lv_label_set_text(label, text);
@@ -291,6 +291,7 @@ static void set_dark_theme_event_cb(lv_event_t * e)
 
 static void time_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
+    LV_UNUSED(subject);
     lv_obj_t * spangroup = lv_observer_get_target_obj(observer);
     lv_demo_high_res_ctx_t * c = lv_observer_get_user_data(observer);
 
@@ -305,6 +306,7 @@ static void time_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 
 static void date_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
+    LV_UNUSED(subject);
     lv_obj_t * spangroup = lv_observer_get_target_obj(observer);
     lv_demo_high_res_ctx_t * c = lv_observer_get_user_data(observer);
 
@@ -319,6 +321,7 @@ static void date_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 
 static void logo_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
+    LV_UNUSED(subject);
     lv_obj_t * logo = lv_observer_get_target_obj(observer);
     lv_demo_high_res_ctx_t * c = lv_observer_get_user_data(observer);
 
@@ -340,6 +343,7 @@ static void logo_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 
 static void temps_high_low_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
+    LV_UNUSED(subject);
     lv_demo_high_res_ctx_t * c = lv_observer_get_user_data(observer);
     lv_obj_t * label = lv_observer_get_target_obj(observer);
     char buf1[16];

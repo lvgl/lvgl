@@ -4,17 +4,9 @@
  * Opts: --bpp 8 --size 90 --no-compress --font RobotoSlab-Regular.ttf --range 32-127,176 --format lvgl -o font_lv_demo_high_res_roboto_slab_regular_90.c
  ******************************************************************************/
 
-#ifdef LV_LVGL_H_INCLUDE_SIMPLE
-#include "lvgl.h"
-#else
-#include "lvgl/lvgl.h"
-#endif
+#include "../../../lvgl.h"
 
-#ifndef FONT_LV_DEMO_HIGH_RES_ROBOTO_SLAB_REGULAR_90
-#define FONT_LV_DEMO_HIGH_RES_ROBOTO_SLAB_REGULAR_90 1
-#endif
-
-#if FONT_LV_DEMO_HIGH_RES_ROBOTO_SLAB_REGULAR_90
+#if LV_USE_DEMO_HIGH_RES
 
 /*-----------------
  *    BITMAPS
@@ -31443,5 +31435,5 @@ lv_font_t font_lv_demo_high_res_roboto_slab_regular_90 = {
 
 
 
-#endif /*#if FONT_LV_DEMO_HIGH_RES_ROBOTO_SLAB_REGULAR_90*/
+#endif /*#if LV_USE_DEMO_HIGH_RES*/
 
