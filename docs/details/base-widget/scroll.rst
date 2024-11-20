@@ -74,8 +74,23 @@ can be set directly on the :cpp:enumerator:`LV_PART_SCROLLBAR` part of a Widget 
 the Widget's or any parent's main part to make a scrollbar inherit the
 base direction.
 
-``pad_left/right/top/bottom`` sets the spacing around the scrollbars and
-``width`` sets the scrollbar's width.
+``pad_left/right/top/bottom`` sets the spacing around the scrollbars,
+``width`` sets the scrollbar's width and ``length`` sets the scrollbar's length:
+
+.. code-block:: c
+
+   static lv_style_t style_scrollbar;
+   lv_style_init(&style_scrollbar);
+   lv_style_set_pad_left(&style_scrollbar, 2);
+   lv_style_set_pad_right(&style_scrollbar, 2);
+   lv_style_set_pad_top(&style_scrollbar, 2);
+   lv_style_set_pad_bottom(&style_scrollbar, 2);
+   lv_style_set_width(&style_scrollbar, 10);
+   lv_style_set_length(&style_scrollbar, 50);
+
+   ...
+
+   lv_obj_add_style(widget, &style_scrollbar, LV_PART_SCROLLBAR);
 
 
 .. _scroll_events:
