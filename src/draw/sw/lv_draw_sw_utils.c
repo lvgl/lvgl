@@ -197,7 +197,7 @@ void lv_draw_sw_i1_convert_to_vtiled(const void * buf, uint32_t buf_size, uint32
 {
     LV_ASSERT(buf && out_buf);
     LV_ASSERT(width % 8 == 0 && height % 8 == 0);
-    LV_ASSERT(buf_size == (width / 8) * height);
+    LV_ASSERT(buf_size >= (width / 8) * height);
     LV_ASSERT(out_buf_size >= buf_size);
 
     lv_memset(out_buf, 0, out_buf_size);
