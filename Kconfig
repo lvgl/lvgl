@@ -1240,6 +1240,9 @@ menu "LVGL configuration"
 			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_FATFS
+		config LV_FS_FATFS_PATH
+			string "Set the working directory"
+			depends on LV_USE_FS_FATFS
 		config LV_FS_FATFS_CACHE_SIZE
 			int ">0 to cache this number of bytes in lv_fs_read()"
 			default 0
@@ -1258,6 +1261,9 @@ menu "LVGL configuration"
 			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_LITTLEFS
+		config LV_FS_LITTLEFS_PATH
+			string "Set the working directory"
+			depends on LV_USE_FS_LITTLEFS
 
 		config LV_USE_FS_ARDUINO_ESP_LITTLEFS
 			bool "File system on top of Arduino ESP littlefs API"
@@ -1265,12 +1271,18 @@ menu "LVGL configuration"
 			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_ARDUINO_ESP_LITTLEFS
+		config LV_FS_ARDUINO_ESP_LITTLEFS_PATH
+			string "Set the working directory"
+			depends on LV_USE_FS_ARDUINO_ESP_LITTLEFS
 
 		config LV_USE_FS_ARDUINO_SD
 			bool "File system on top of Arduino SD API"
 		config LV_FS_ARDUINO_SD_LETTER
 			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
+			depends on LV_USE_FS_ARDUINO_SD
+		config LV_FS_ARDUINO_SD_PATH
+			string "Set the working directory"
 			depends on LV_USE_FS_ARDUINO_SD
 
 		config LV_USE_LODEPNG
