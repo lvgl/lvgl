@@ -59,7 +59,7 @@ int lv_ffmpeg_get_frame_num(const char * path);
 lv_obj_t * lv_ffmpeg_player_create(lv_obj_t * parent);
 
 /**
- * Set the path of the file to be played
+ * Set the path of the file to be played.
  * @param obj pointer to a ffmpeg_player object
  * @param path video file path
  * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info.
