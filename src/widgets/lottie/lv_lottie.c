@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_lottie.c
  *
  */
@@ -128,7 +128,7 @@ void lv_lottie_set_src_data(lv_obj_t * obj, const void * src, size_t src_size)
     lv_anim_set_time(lottie->anim, (int32_t)f_total * 1000 / 60); /*60 FPS*/
     lottie->anim->act_time = 0;
     lottie->anim->end_value = (int32_t)f_total;
-    lottie->anim->playback_now = false;
+    lottie->anim->reverse_play_in_progress = false;
     lottie_update(lottie, 0);   /*Render immediately*/
 }
 
@@ -146,7 +146,7 @@ void lv_lottie_set_src_file(lv_obj_t * obj, const char * src)
     lv_anim_set_time(lottie->anim, (int32_t)f_total * 1000 / 60); /*60 FPS*/
     lottie->anim->act_time = 0;
     lottie->anim->end_value = (int32_t)f_total;
-    lottie->anim->playback_now = false;
+    lottie->anim->reverse_play_in_progress = false;
     lottie_update(lottie, 0);   /*Render immediately*/
 }
 

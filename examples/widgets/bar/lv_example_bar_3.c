@@ -1,4 +1,4 @@
-#include "../../lv_examples.h"
+﻿#include "../../lv_examples.h"
 #if LV_USE_BAR && LV_BUILD_EXAMPLES
 
 static void set_temp(void * bar, int32_t temp)
@@ -29,7 +29,7 @@ void lv_example_bar_3(void)
     lv_anim_init(&a);
     lv_anim_set_exec_cb(&a, set_temp);
     lv_anim_set_duration(&a, 3000);
-    lv_anim_set_playback_duration(&a, 3000);
+    lv_anim_set_reverse_duration(&a, 3000);
     lv_anim_set_var(&a, bar);
     lv_anim_set_values(&a, -20, 40);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);

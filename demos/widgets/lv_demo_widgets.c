@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_demo_widgets.c
  *
  */
@@ -235,7 +235,7 @@ void lv_demo_widgets_start_slideshow(void)
     lv_anim_init(&a);
     lv_anim_set_exec_cb(&a, scroll_anim_y_cb);
     lv_anim_set_duration(&a, t);
-    lv_anim_set_playback_duration(&a, t);
+    lv_anim_set_reverse_duration(&a, t);
     lv_anim_set_values(&a, 0, v);
     lv_anim_set_var(&a, tab);
     lv_anim_set_completed_cb(&a, slideshow_anim_completed_cb);
@@ -701,7 +701,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
     lv_anim_set_var(&a, arc);
     lv_anim_set_duration(&a, 4100);
-    lv_anim_set_playback_duration(&a, 2700);
+    lv_anim_set_reverse_duration(&a, 2700);
     lv_anim_start(&a);
 
     arc = lv_arc_create(scale1);
@@ -717,7 +717,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
     lv_anim_set_var(&a, arc);
     lv_anim_set_duration(&a, 2600);
-    lv_anim_set_playback_duration(&a, 3200);
+    lv_anim_set_reverse_duration(&a, 3200);
     lv_anim_start(&a);
 
     arc = lv_arc_create(scale1);
@@ -733,7 +733,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
     lv_anim_set_var(&a, arc);
     lv_anim_set_duration(&a, 2800);
-    lv_anim_set_playback_duration(&a, 1800);
+    lv_anim_set_reverse_duration(&a, 1800);
     lv_anim_start(&a);
 
     /*Scale 2*/
@@ -864,7 +864,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_anim_set_exec_cb(&a, scale3_anim_cb);
     lv_anim_set_var(&a, scale3);
     lv_anim_set_duration(&a, 4100);
-    lv_anim_set_playback_duration(&a, 800);
+    lv_anim_set_reverse_duration(&a, 800);
     lv_anim_start(&a);
 
     lv_obj_align(scale3_mbps_label, LV_ALIGN_TOP_MID, 10, lv_pct(55));
@@ -1673,7 +1673,7 @@ static void slideshow_anim_completed_cb(lv_anim_t * a_old)
     lv_anim_init(&a);
     lv_anim_set_exec_cb(&a, scroll_anim_y_cb);
     lv_anim_set_duration(&a, t);
-    lv_anim_set_playback_duration(&a, t);
+    lv_anim_set_reverse_duration(&a, t);
     lv_anim_set_values(&a, 0, v);
     lv_anim_set_var(&a, tab);
     lv_anim_set_completed_cb(&a, slideshow_anim_completed_cb);
