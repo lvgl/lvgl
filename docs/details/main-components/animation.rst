@@ -29,10 +29,11 @@ The main callback called during an Animation (when it is playing) is called an
 
     void func(void * var, lv_anim_var_t value);
 
-This prototype is compatible with the majority of the style-property *set* functions
-in LVGL.  This is true for both functions that set properties on :cpp:type:`lv_style_t`
-objects (e.g. :ref:`shared styles <style_initialize>`) as well as a large number of
-functions that set :ref:`local style properties <style_local>`) directly on objects .
+This prototype makes it easy to use most of the LVGL *set* functions directly or via a trivial wrapper. It includes:
+  
+  - most of the widget properties
+  - functions that set :ref:`local style properties <style_local>`) directly on objects (needs a wrapper to set set the *selector*)
+  -  set properties on :cpp:type:`lv_style_t` objects (e.g. :ref:`shared styles <style_initialize>`)  (``lv_obj_report_style_change`` needs to be called to notify the widgets having the style)
 
 - ``lv_style_set_<property_name>(&style, <value>)``
 - ``lv_obj_set_<property_name>(widget, <value>)``
