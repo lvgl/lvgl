@@ -108,7 +108,9 @@ before any other LVGL function is started.
 
 Ensuring Time Updates are Atomic
 --------------------------------
-See
+For LVGL's time-related tasks to be reliable, the time updates via the Tick Interface
+must be reliable and the Tick Value must appear :ref:`atomic <atomic>` to LVGL.  See
+:ref:`tick_interface` for details.
 
 
 
