@@ -44,7 +44,6 @@ typedef struct {
     lv_subject_t temperature_indoor;                    /* int32_t (tenths of a degree) */
     lv_subject_t gas_savings_total_spent;               /* int32_t */
     lv_subject_t gas_savings_gas_equivalent;            /* int32_t */
-    lv_subject_t security_slides;                       /* image array pointer */
     lv_subject_t ev_charge_percent;                     /* int32_t */
     /* output subjects */
     lv_subject_t temperature_units_are_celsius;         /* int32_t (bool) */

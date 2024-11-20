@@ -18,8 +18,6 @@
  *      DEFINES
  *********************/
 
-#define ARRAY_LEN(arr) (sizeof(arr) / sizeof(*arr))
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -87,7 +85,7 @@ const lv_demo_high_res_theme_t lv_demo_high_res_theme_dark = {
     .accent = LV_COLOR_MAKE(0xe1, 0x2b, 0x17),
 };
 
-static const lv_demo_high_res_sizes_t sizes_all[SIZE_COUNT] = {
+const lv_demo_high_res_sizes_t lv_demo_high_res_sizes_all[SIZE_COUNT] = {
     {
         .gap = {0, 2, 4, 6, 9, 12, 14, 16, 20, 24, 32},
         .icon = {16, 21, 32, 42, 64},
@@ -95,6 +93,7 @@ static const lv_demo_high_res_sizes_t sizes_all[SIZE_COUNT] = {
         .widget_long_edge = 256,
         .card_short_edge = 120,
         .ev_charging_arc_diameter = 160,
+        .smart_meter_collapsed_part_height = 48,
         .slider_width = 27,
         .small_chart_height = 67,
         .large_chart_height = 167,
@@ -111,6 +110,7 @@ static const lv_demo_high_res_sizes_t sizes_all[SIZE_COUNT] = {
         .widget_long_edge = 384,
         .card_short_edge = 180,
         .ev_charging_arc_diameter = 240,
+        .smart_meter_collapsed_part_height = 72,
         .slider_width = 40,
         .small_chart_height = 100,
         .large_chart_height = 250,
@@ -127,6 +127,7 @@ static const lv_demo_high_res_sizes_t sizes_all[SIZE_COUNT] = {
         .widget_long_edge = 576,
         .card_short_edge = 270,
         .ev_charging_arc_diameter = 360,
+        .smart_meter_collapsed_part_height = 108,
         .slider_width = 60,
         .small_chart_height = 150,
         .large_chart_height = 375,
@@ -141,6 +142,8 @@ static const lv_demo_high_res_sizes_t sizes_all[SIZE_COUNT] = {
 /**********************
  *      MACROS
  **********************/
+
+#define ARRAY_LEN(arr) (sizeof(arr) / sizeof(*arr))
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -174,18 +177,20 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path)
     if(!is_exact) {
         LV_LOG_WARN("a display size of exactly 800x480, 1280x720, or 1920x1080 is recommended for the high-res demo");
     }
-    c->sz = &sizes_all[size];
+    c->sz = &lv_demo_high_res_sizes_all[size];
 
     static const struct {
         const char * name;
         lv_color_format_t cf;
     } image_details[IMG_COUNT] = {
+        {"album_art", LV_COLOR_FORMAT_ARGB8888},
         {"arrow_left", LV_COLOR_FORMAT_ARGB8888},
         {"backward_icon", LV_COLOR_FORMAT_ARGB8888},
         {"cold_icon", LV_COLOR_FORMAT_ARGB8888},
         {"dry_icon", LV_COLOR_FORMAT_ARGB8888},
         {"energy_icon", LV_COLOR_FORMAT_ARGB8888},
         {"ev_charging_app_icon", LV_COLOR_FORMAT_ARGB8888},
+        {"ev_charging_widget3_1_bg", LV_COLOR_FORMAT_ARGB8888},
         {"ev_charging_widget3_bg", LV_COLOR_FORMAT_ARGB8888},
         {"fan", LV_COLOR_FORMAT_ARGB8888},
         {"forward_icon", LV_COLOR_FORMAT_ARGB8888},
@@ -214,18 +219,18 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path)
         {"volume", LV_COLOR_FORMAT_ARGB8888},
         {"weather", LV_COLOR_FORMAT_ARGB8888},
         {"wifi_icon", LV_COLOR_FORMAT_ARGB8888},
-        {"light_bg_ev_charging", LV_COLOR_FORMAT_ARGB8888},
-        {"dark_bg_ev_charging", LV_COLOR_FORMAT_ARGB8888},
+        {"light_bg_ev_charging", LV_COLOR_FORMAT_NATIVE},
+        {"dark_bg_ev_charging", LV_COLOR_FORMAT_NATIVE},
         {"light_bg_home", LV_COLOR_FORMAT_NATIVE},
         {"dark_bg_home", LV_COLOR_FORMAT_NATIVE},
-        {"light_bg_security", LV_COLOR_FORMAT_ARGB8888},
-        {"dark_bg_security", LV_COLOR_FORMAT_ARGB8888},
-        {"light_bg_smart_home", LV_COLOR_FORMAT_ARGB8888},
-        {"dark_bg_smart_home", LV_COLOR_FORMAT_ARGB8888},
-        {"light_bg_smart_meter", LV_COLOR_FORMAT_ARGB8888},
-        {"dark_bg_smart_meter", LV_COLOR_FORMAT_ARGB8888},
-        {"light_bg_thermostat", LV_COLOR_FORMAT_ARGB8888},
-        {"dark_bg_thermostat", LV_COLOR_FORMAT_ARGB8888},
+        {"light_bg_security", LV_COLOR_FORMAT_NATIVE},
+        {"dark_bg_security", LV_COLOR_FORMAT_NATIVE},
+        {"light_bg_smart_home", LV_COLOR_FORMAT_NATIVE},
+        {"dark_bg_smart_home", LV_COLOR_FORMAT_NATIVE},
+        {"light_bg_smart_meter", LV_COLOR_FORMAT_NATIVE},
+        {"dark_bg_smart_meter", LV_COLOR_FORMAT_NATIVE},
+        {"light_bg_thermostat", LV_COLOR_FORMAT_NATIVE},
+        {"dark_bg_thermostat", LV_COLOR_FORMAT_NATIVE},
         {"light_dark_theme_icon", LV_COLOR_FORMAT_ARGB8888},
         {"dark_dark_theme_icon", LV_COLOR_FORMAT_ARGB8888},
         {"light_light_theme_icon", LV_COLOR_FORMAT_ARGB8888},
@@ -265,6 +270,9 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path)
     c->th.user_data = c;
     lv_subject_add_observer(&c->th, theme_observer_cb, c);
 
+    c->base_path = lv_strdup(base_path);
+    LV_ASSERT_MALLOC(c->base_path);
+
     c->top_margin_subjects_are_init = false;
 
     /* API subjects */
@@ -280,11 +288,10 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path)
     lv_subject_init_int(&c->subjects.temperature_outdoor_low, 100); /* tenths of a degree */
     lv_subject_init_int(&c->subjects.temperature_outdoor_high, 190); /* tenths of a degree */
     lv_subject_init_pointer(&c->subjects.temperature_outdoor_description, "Cloudy");
-    lv_subject_init_pointer(&c->subjects.temperature_outdoor_image, NULL);
+    lv_subject_init_pointer(&c->subjects.temperature_outdoor_image, c->imgs[IMG_WEATHER]);
     lv_subject_init_int(&c->subjects.temperature_indoor, 225); /* tenths of a degree */
     lv_subject_init_int(&c->subjects.gas_savings_total_spent, 128);
     lv_subject_init_int(&c->subjects.gas_savings_gas_equivalent, 340);
-    lv_subject_init_pointer(&c->subjects.security_slides, NULL);
     lv_subject_init_int(&c->subjects.ev_charge_percent, 88);
 
     lv_subject_init_int(&c->subjects.temperature_units_are_celsius, 1);
@@ -485,6 +492,8 @@ static void free_ctx_event_cb(lv_event_t * e)
     for(uint32_t i = 0; i < FONT_COUNT; i++) {
         lv_style_reset(&c->fonts[i]);
     }
+
+    lv_free(c->base_path);
 
     lv_demo_high_res_top_margin_deinit_subjects(c);
 

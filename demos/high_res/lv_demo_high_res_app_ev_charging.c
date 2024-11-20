@@ -36,6 +36,8 @@ static void create_widget3_info(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, c
                                 const char * text, const char * number, const char * unit);
 static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 static void charging_status_label_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void gas_savings_saved_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void charging_status_bg_img_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 /**********************
  *  STATIC VARIABLES
@@ -60,15 +62,17 @@ void lv_demo_high_res_app_ev_charging(lv_obj_t * base_obj)
     lv_obj_set_size(bg, LV_PCT(100), LV_PCT(100));
 
     lv_obj_t * bg_img = lv_image_create(bg);
-    lv_subject_add_observer_obj(&c->th, lv_demo_high_res_theme_observer_image_src_cb, bg_img, &c->imgs[IMG_LIGHT_BG_HOME]);
+    lv_subject_add_observer_obj(&c->th, lv_demo_high_res_theme_observer_image_src_cb, bg_img,
+                                &c->imgs[IMG_LIGHT_BG_EV_CHARGING]);
 
     lv_obj_t * bg_cont = lv_obj_create(bg);
     lv_obj_remove_style_all(bg_cont);
     lv_obj_set_size(bg_cont, LV_PCT(100), LV_PCT(100));
     lv_obj_set_style_pad_top(bg_cont, c->sz->gap[7], 0);
-    lv_obj_set_style_pad_bottom(bg_cont, c->sz->gap[10], 0);
-    lv_obj_set_style_pad_left(bg_cont, c->sz->gap[10], 0);
-    lv_obj_set_style_pad_right(bg_cont, c->sz->gap[10], 0);
+    int32_t app_padding = c->sz == &lv_demo_high_res_sizes_all[SIZE_SM] ? c->sz->gap[9] : c->sz->gap[10];
+    lv_obj_set_style_pad_bottom(bg_cont, app_padding, 0);
+    lv_obj_set_style_pad_left(bg_cont, app_padding, 0);
+    lv_obj_set_style_pad_right(bg_cont, app_padding, 0);
 
     /* top margin */
 
@@ -100,7 +104,8 @@ void lv_demo_high_res_app_ev_charging(lv_obj_t * base_obj)
 
     /* widgets */
 
-    lv_obj_t * widgets = lv_demo_high_res_simple_container_create(bg_cont, false, c->sz->gap[7], LV_FLEX_ALIGN_END);
+    int32_t widget_gap_padding = c->sz == &lv_demo_high_res_sizes_all[SIZE_SM] ? c->sz->gap[4] : c->sz->gap[7];
+    lv_obj_t * widgets = lv_demo_high_res_simple_container_create(bg_cont, false, widget_gap_padding, LV_FLEX_ALIGN_END);
     lv_obj_set_align(widgets, LV_ALIGN_BOTTOM_RIGHT);
 
     create_widget1(c, widgets);
@@ -127,7 +132,7 @@ static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_remove_style_all(widget);
     lv_obj_set_size(widget, c->sz->card_long_edge, c->sz->card_long_edge);
     lv_subject_add_observer_obj(&c->th, lv_demo_high_res_theme_observer_obj_bg_image_src_cb, widget,
-                                &c->imgs[IMG_LIGHT_WIDGET1_BG]);
+                                &c->imgs[IMG_LIGHT_WIDGET3_BG]);
     lv_obj_set_style_pad_all(widget, c->sz->gap[7], 0);
     lv_obj_set_flex_flow(widget, LV_FLEX_FLOW_COLUMN);
 
@@ -152,7 +157,7 @@ static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_flex_align(saved_box, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
 
     lv_obj_t * saved_amount_label = lv_label_create(saved_box);
-    lv_label_set_text_static(saved_amount_label, "$212");
+    lv_subject_add_observer_obj(&c->subject_groups.gas_savings.group, gas_savings_saved_cb, saved_amount_label, c);
     lv_obj_add_style(saved_amount_label, &c->fonts[FONT_LABEL_XL], 0);
     lv_obj_add_style(saved_amount_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_t * saved_label = lv_label_create(saved_box);
@@ -368,6 +373,7 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_style_pad_all(widget, c->sz->gap[7], 0);
     lv_obj_set_flex_flow(widget, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(widget, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_subject_add_observer_obj(&c->subjects.ev_is_charging, charging_status_bg_img_cb, widget, c);
 
     lv_obj_t * top_label = lv_label_create(widget);
     lv_label_set_text_static(top_label, "Charging");
@@ -428,6 +434,23 @@ static void charging_status_label_cb(lv_observer_t * observer, lv_subject_t * su
     lv_obj_t * charging_status_label = lv_observer_get_target_obj(observer);
     bool is_charging = lv_subject_get_int(subject);
     lv_label_set_text_static(charging_status_label, is_charging ? "Stop charging" : "Start charging");
+}
+
+static void gas_savings_saved_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * label = lv_observer_get_target_obj(observer);
+    lv_demo_high_res_ctx_t * c = lv_observer_get_user_data(observer);
+    lv_label_set_text_fmt(label, "$%d",
+                          lv_subject_get_int(&c->subjects.gas_savings_gas_equivalent) - lv_subject_get_int(&c->subjects.gas_savings_total_spent));
+}
+
+static void charging_status_bg_img_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * widget = lv_observer_get_target_obj(observer);
+    lv_demo_high_res_ctx_t * c = lv_observer_get_user_data(observer);
+    bool is_charging = lv_subject_get_int(subject);
+    lv_obj_set_style_bg_image_src(widget, c->imgs[is_charging ? IMG_EV_CHARGING_WIDGET3_BG : IMG_EV_CHARGING_WIDGET3_1_BG],
+                                  0);
 }
 
 #endif /*LV_USE_DEMO_HIGH_RES*/

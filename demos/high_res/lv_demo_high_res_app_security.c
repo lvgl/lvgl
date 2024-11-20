@@ -17,6 +17,8 @@
  *      DEFINES
  *********************/
 
+#define SECURITY_APP_SLIDES_DIR "security_app_slides"
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -55,7 +57,7 @@ void lv_demo_high_res_app_security(lv_obj_t * base_obj)
 
     lv_obj_t * bg_img = lv_image_create(bg);
     lv_subject_add_observer_obj(&c->th, lv_demo_high_res_theme_observer_image_src_cb, bg_img,
-                                (void *)&c->imgs[IMG_LIGHT_BG_HOME]);
+                                (void *)&c->imgs[IMG_LIGHT_BG_SECURITY]);
 
     lv_obj_t * bg_cont = lv_obj_create(bg);
     lv_obj_remove_style_all(bg_cont);
@@ -93,19 +95,18 @@ void lv_demo_high_res_app_security(lv_obj_t * base_obj)
     lv_obj_add_style(app_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_add_style(app_label, &c->fonts[FONT_HEADING_LG], 0);
 
+    /* slides */
 
     lv_fs_res_t res;
 
     lv_fs_dir_t dir;
-    res = lv_fs_dir_open(&dir, "security_app_slides");
+    res = lv_fs_dir_open(&dir, SECURITY_APP_SLIDES_DIR);
     if(res != LV_FS_RES_OK) {
         lv_obj_t * label = lv_label_create(bg_cont);
-        lv_label_set_text(label, "Couldn't open the 'security_app_slides' folder to load the images");
+        lv_label_set_text(label, "Couldn't open the '" SECURITY_APP_SLIDES_DIR "' folder to load the images");
         lv_obj_center(label);
         return;
     }
-
-    /* slides */
 
     lv_obj_t * slides_cont = lv_obj_create(bg_cont);
     lv_obj_remove_style_all(slides_cont);
@@ -134,15 +135,15 @@ void lv_demo_high_res_app_security(lv_obj_t * base_obj)
 
     lv_obj_t * slide;
 
-    char buf[128];
+    char buf[256];
     while(1) {
         res = lv_fs_dir_read(&dir, buf, sizeof(buf));
         LV_ASSERT(res == LV_FS_RES_OK);
         if(!*buf) break;
-        slide = lv_image_create(slides_cont);
-        lv_memmove(buf + sizeof("security_app_slides"), buf, lv_strlen(buf) + 1);
-        lv_strcpy(buf, "security_app_slides");
-        buf[sizeof("security_app_slides") - 1] = '/';
+        slide = lv_image_create(slide_deck);
+        lv_memmove(buf + sizeof(SECURITY_APP_SLIDES_DIR), buf, lv_strlen(buf) + 1);
+        lv_strcpy(buf, SECURITY_APP_SLIDES_DIR);
+        buf[sizeof(SECURITY_APP_SLIDES_DIR) - 1] = '/';
         lv_image_set_src(slide, buf);
     }
     res = lv_fs_dir_close(&dir);

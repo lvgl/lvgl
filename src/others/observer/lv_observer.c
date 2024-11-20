@@ -62,6 +62,10 @@ static void obj_value_changed_event_cb(lv_event_t * e);
     static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
 
+#if LV_USE_IMAGE
+    static void image_src_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -551,6 +555,24 @@ lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 
 #endif /*LV_USE_DROPDOWN*/
 
+#if LV_USE_IMAGE
+
+lv_observer_t * lv_image_bind_src(lv_obj_t * obj, lv_subject_t * subject)
+{
+    LV_ASSERT_NULL(subject);
+    LV_ASSERT_NULL(obj);
+
+    if(subject->type != LV_SUBJECT_TYPE_POINTER && subject->type != LV_SUBJECT_TYPE_STRING) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, image_src_observer_cb, obj, NULL);
+    return observer;
+}
+
+#endif /*LV_USE_IMAGE*/
+
 lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer)
 {
     return (lv_obj_t *)lv_observer_get_target(observer);
@@ -739,5 +761,15 @@ static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * 
 }
 
 #endif /*LV_USE_DROPDOWN*/
+
+#if LV_USE_IMAGE
+
+static void image_src_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_image_set_src(observer->target, subject->value.pointer);
+}
+
+#endif /*LV_USE_IMAGE*/
+
 
 #endif /*LV_USE_OBSERVER*/

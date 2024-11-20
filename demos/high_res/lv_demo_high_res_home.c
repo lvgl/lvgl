@@ -108,14 +108,14 @@ void lv_demo_high_res_home(lv_obj_t * base_obj)
     lv_obj_t * weather_left = lv_demo_high_res_simple_container_create(weather, true, c->sz->gap[2], LV_FLEX_ALIGN_START);
 
     lv_obj_t * weather_img = lv_image_create(weather_left);
-    lv_image_set_src(weather_img, c->imgs[IMG_WEATHER]);
+    lv_image_bind_src(weather_img, &c->subjects.temperature_outdoor_image);
     lv_obj_add_style(weather_img, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_A8_IMG], 0);
 
     lv_obj_t * weather_left_bottom = lv_demo_high_res_simple_container_create(weather_left, true, c->sz->gap[3],
                                                                               LV_FLEX_ALIGN_START);
 
     lv_obj_t * weather_label = lv_label_create(weather_left_bottom);
-    lv_label_set_text_static(weather_label, "Cloudy");
+    lv_label_bind_text(weather_label, &c->subjects.temperature_outdoor_description, NULL);
     lv_obj_add_style(weather_label, &c->styles[STYLE_COLOR_ACCENT][STYLE_TYPE_TEXT], 0);
     lv_obj_add_style(weather_label, &c->fonts[FONT_LABEL_MD], 0);
 
@@ -330,11 +330,24 @@ static void logo_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 
     const lv_demo_high_res_theme_t * th = lv_subject_get_pointer(&c->th);
     const void * dark_src = lv_subject_get_pointer(&c->subjects.logo_dark);
+    const void * src;
     if(th == &lv_demo_high_res_theme_dark && dark_src != NULL) {
-        lv_image_set_src(logo, dark_src);
+        src = dark_src;
     }
     else {
-        lv_image_set_src(logo, lv_subject_get_pointer(&c->subjects.logo));
+        src = lv_subject_get_pointer(&c->subjects.logo);
+    }
+    if(lv_image_src_get_type(src) == LV_IMAGE_SRC_FILE) {
+        char * buf = lv_malloc(lv_strlen(c->base_path) + 1 + lv_strlen(src) + 1);
+        LV_ASSERT_MALLOC(buf);
+        lv_strcpy(buf, c->base_path);
+        lv_strcat(buf, "/");
+        lv_strcat(buf, src);
+        lv_image_set_src(logo, buf);
+        lv_free(buf);
+    }
+    else {
+        lv_image_set_src(logo, src);
     }
 
     int32_t scale = lv_image_get_scale_y(logo);

@@ -36,9 +36,11 @@ static void widget2_slider_changed_cb(lv_event_t * e);
 static void widget2_temperature_button_clicked_cb(lv_event_t * e);
 static lv_obj_t * create_widget2_value(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const char * title_val,
                                        const char * range_val, int32_t temperature_val);
+static void weekdays_weekends_clicked_cb(lv_event_t * e);
 static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
-static void create_widget3_setting(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const lv_image_dsc_t * img_dsc,
-                                   const char * text_val);
+static lv_obj_t * create_widget3_setting(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const lv_image_dsc_t * img_dsc,
+                                         const char * text_val, bool active);
+static void widget3_setting_clicked_cb(lv_event_t * e);
 static void widget3_slider_label_cb(lv_event_t * e);
 static void widget3_scale_and_arc_box_ext_draw_size_event_cb(lv_event_t * e);
 static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
@@ -66,15 +68,17 @@ void lv_demo_high_res_app_thermostat(lv_obj_t * base_obj)
     lv_obj_set_size(bg, LV_PCT(100), LV_PCT(100));
 
     lv_obj_t * bg_img = lv_image_create(bg);
-    lv_subject_add_observer_obj(&c->th, lv_demo_high_res_theme_observer_image_src_cb, bg_img, &c->imgs[IMG_LIGHT_BG_HOME]);
+    lv_subject_add_observer_obj(&c->th, lv_demo_high_res_theme_observer_image_src_cb, bg_img,
+                                &c->imgs[IMG_LIGHT_BG_THERMOSTAT]);
 
     lv_obj_t * bg_cont = lv_obj_create(bg);
     lv_obj_remove_style_all(bg_cont);
     lv_obj_set_size(bg_cont, LV_PCT(100), LV_PCT(100));
     lv_obj_set_style_pad_top(bg_cont, c->sz->gap[7], 0);
-    lv_obj_set_style_pad_bottom(bg_cont, c->sz->gap[10], 0);
-    lv_obj_set_style_pad_left(bg_cont, c->sz->gap[10], 0);
-    lv_obj_set_style_pad_right(bg_cont, c->sz->gap[10], 0);
+    int32_t app_padding = c->sz == &lv_demo_high_res_sizes_all[SIZE_SM] ? c->sz->gap[9] : c->sz->gap[10];
+    lv_obj_set_style_pad_bottom(bg_cont, app_padding, 0);
+    lv_obj_set_style_pad_left(bg_cont, app_padding, 0);
+    lv_obj_set_style_pad_right(bg_cont, app_padding, 0);
 
     /* top margin */
 
@@ -106,7 +110,8 @@ void lv_demo_high_res_app_thermostat(lv_obj_t * base_obj)
 
     /* widgets */
 
-    lv_obj_t * widgets = lv_demo_high_res_simple_container_create(bg_cont, false, c->sz->gap[7], LV_FLEX_ALIGN_END);
+    int32_t widget_gap_padding = c->sz == &lv_demo_high_res_sizes_all[SIZE_SM] ? c->sz->gap[4] : c->sz->gap[7];
+    lv_obj_t * widgets = lv_demo_high_res_simple_container_create(bg_cont, false, widget_gap_padding, LV_FLEX_ALIGN_END);
     lv_obj_set_align(widgets, LV_ALIGN_BOTTOM_RIGHT);
 
     create_widget1(c, widgets);
@@ -303,6 +308,22 @@ static lv_obj_t * create_widget2_value(lv_demo_high_res_ctx_t * c, lv_obj_t * pa
     return box;
 }
 
+static void weekdays_weekends_clicked_cb(lv_event_t * e)
+{
+    lv_obj_t * label = lv_event_get_target_obj(e);
+    lv_obj_t * box = lv_obj_get_parent(label);
+    lv_obj_t * weekdays_label = lv_obj_get_child(box, 0);
+    lv_obj_t * weekends_label = lv_obj_get_child(box, 1);
+    if(label == weekdays_label) {
+        lv_obj_set_style_text_opa(weekdays_label, LV_OPA_COVER, 0);
+        lv_obj_set_style_text_opa(weekends_label, LV_OPA_30, 0);
+    }
+    else {
+        lv_obj_set_style_text_opa(weekdays_label, LV_OPA_30, 0);
+        lv_obj_set_style_text_opa(weekends_label, LV_OPA_COVER, 0);
+    }
+}
+
 static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
 {
     lv_obj_t * widget = lv_obj_create(widgets);
@@ -338,6 +359,11 @@ static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_add_style(weekends_label, &c->fonts[FONT_LABEL_SM], 0);
     lv_obj_add_style(weekends_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_set_style_text_opa(weekends_label, LV_OPA_30, 0);
+
+    lv_obj_add_event_cb(weekdays_label, weekdays_weekends_clicked_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(weekends_label, weekdays_weekends_clicked_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_flag(weekdays_label, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_flag(weekends_label, LV_OBJ_FLAG_CLICKABLE);
 
     lv_obj_t * slider_box = lv_demo_high_res_simple_container_create(outer_slider_box, false, 0, LV_FLEX_ALIGN_CENTER);
     lv_obj_set_width(slider_box, LV_PCT(100));
@@ -403,8 +429,8 @@ static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_add_event_cb(slider_right, widget2_slider_changed_cb, LV_EVENT_VALUE_CHANGED, lv_obj_get_child(value2, 1));
 }
 
-static void create_widget3_setting(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const lv_image_dsc_t * img_dsc,
-                                   const char * text_val)
+static lv_obj_t * create_widget3_setting(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const lv_image_dsc_t * img_dsc,
+                                         const char * text_val, bool active)
 {
     lv_obj_t * setting = lv_obj_create(parent);
     lv_obj_remove_style_all(setting);
@@ -414,24 +440,61 @@ static void create_widget3_setting(lv_demo_high_res_ctx_t * c, lv_obj_t * parent
     lv_obj_set_style_pad_row(setting, c->sz->gap[5], 0);
     lv_obj_set_flex_grow(setting, 1);
     lv_obj_set_style_bg_color(setting, lv_color_white(), 0);
-    lv_obj_set_style_bg_opa(setting, LV_OPA_60, 0);
+    lv_obj_set_style_bg_opa(setting, active ? LV_OPA_60 : LV_OPA_20, 0);
     lv_obj_set_style_radius(setting, c->sz->gap[3], 0);
     lv_obj_set_style_pad_all(setting, c->sz->gap[5], 0);
+    lv_obj_add_flag(setting, LV_OBJ_FLAG_CLICKABLE);
 
     lv_obj_t * icon = lv_image_create(setting);
     lv_image_set_src(icon, img_dsc);
     lv_image_set_inner_align(icon, LV_IMAGE_ALIGN_CENTER);
     lv_obj_set_size(icon, c->sz->icon[ICON_XL], c->sz->icon[ICON_XL]);
     lv_obj_set_style_bg_color(icon, lv_color_white(), 0);
-    lv_obj_set_style_bg_opa(icon, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_opa(icon, active ? LV_OPA_COVER : LV_OPA_40, 0);
     lv_obj_set_style_radius(icon, LV_COORD_MAX, 0);
     lv_obj_set_style_shadow_width(icon, 50, 0);
     lv_obj_set_style_shadow_opa(icon, 15 * 255 / 100, 0);
+    lv_obj_add_flag(icon, LV_OBJ_FLAG_EVENT_BUBBLE);
 
     lv_obj_t * label = lv_label_create(setting);
     lv_label_set_text_static(label, text_val);
     lv_obj_add_style(label, &c->fonts[FONT_LABEL_SM], 0);
     lv_obj_add_style(label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+
+    return setting;
+}
+
+static void widget3_setting_clicked_cb(lv_event_t * e)
+{
+    lv_obj_t * setting = lv_event_get_target_obj(e);
+    lv_obj_t * setting_box = lv_obj_get_parent(setting);
+    lv_obj_t * setting1 = lv_obj_get_child(setting_box, 0);
+    lv_obj_t * setting2 = lv_obj_get_child(setting_box, 1);
+    lv_obj_t * setting3 = lv_obj_get_child(setting_box, 2);
+    if(setting == setting1) {
+        lv_obj_set_style_bg_opa(setting1, LV_OPA_60, 0);
+        lv_obj_set_style_bg_opa(lv_obj_get_child(setting1, 0), LV_OPA_COVER, 0);
+        lv_obj_set_style_bg_opa(setting2, LV_OPA_20, 0);
+        lv_obj_set_style_bg_opa(lv_obj_get_child(setting2, 0), LV_OPA_40, 0);
+        lv_obj_set_style_bg_opa(setting3, LV_OPA_20, 0);
+        lv_obj_set_style_bg_opa(lv_obj_get_child(setting3, 0), LV_OPA_40, 0);
+    }
+    else if(setting == setting2) {
+        lv_obj_set_style_bg_opa(setting1, LV_OPA_20, 0);
+        lv_obj_set_style_bg_opa(lv_obj_get_child(setting1, 0), LV_OPA_40, 0);
+        lv_obj_set_style_bg_opa(setting2, LV_OPA_60, 0);
+        lv_obj_set_style_bg_opa(lv_obj_get_child(setting2, 0), LV_OPA_COVER, 0);
+        lv_obj_set_style_bg_opa(setting3, LV_OPA_20, 0);
+        lv_obj_set_style_bg_opa(lv_obj_get_child(setting3, 0), LV_OPA_40, 0);
+    }
+    else {
+        lv_obj_set_style_bg_opa(setting1, LV_OPA_20, 0);
+        lv_obj_set_style_bg_opa(lv_obj_get_child(setting1, 0), LV_OPA_40, 0);
+        lv_obj_set_style_bg_opa(setting2, LV_OPA_20, 0);
+        lv_obj_set_style_bg_opa(lv_obj_get_child(setting2, 0), LV_OPA_40, 0);
+        lv_obj_set_style_bg_opa(setting3, LV_OPA_60, 0);
+        lv_obj_set_style_bg_opa(lv_obj_get_child(setting3, 0), LV_OPA_COVER, 0);
+    }
 }
 
 static void widget3_slider_label_cb(lv_event_t * e)
@@ -532,11 +595,15 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_add_style(current_temperature_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_set_style_text_align(current_temperature_label, LV_TEXT_ALIGN_CENTER, 0);
 
-    lv_obj_t * info_box = lv_demo_high_res_simple_container_create(widget, false, c->sz->gap[5], LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_width(info_box, LV_PCT(100));
-    create_widget3_setting(c, info_box, c->imgs[IMG_COLD_ICON], "Cold");
-    create_widget3_setting(c, info_box, c->imgs[IMG_DRY_ICON], "Dry");
-    create_widget3_setting(c, info_box, c->imgs[IMG_HEAT_ICON], "Heat");
+    lv_obj_t * setting_box = lv_demo_high_res_simple_container_create(widget, false, c->sz->gap[5], LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_width(setting_box, LV_PCT(100));
+    lv_obj_t * setting1 = create_widget3_setting(c, setting_box, c->imgs[IMG_COLD_ICON], "Cold", true);
+    lv_obj_t * setting2 = create_widget3_setting(c, setting_box, c->imgs[IMG_DRY_ICON], "Dry", false);
+    lv_obj_t * setting3 = create_widget3_setting(c, setting_box, c->imgs[IMG_HEAT_ICON], "Heat", false);
+
+    lv_obj_add_event_cb(setting1, widget3_setting_clicked_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(setting2, widget3_setting_clicked_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(setting3, widget3_setting_clicked_cb, LV_EVENT_CLICKED, NULL);
 
     lv_obj_t * slider_box = lv_demo_high_res_simple_container_create(widget, true, c->sz->gap[4], LV_FLEX_ALIGN_START);
     lv_obj_set_width(slider_box, LV_PCT(100));

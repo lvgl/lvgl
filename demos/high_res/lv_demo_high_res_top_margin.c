@@ -37,6 +37,8 @@ static lv_obj_t * create_settings(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * 
 static lv_obj_t * create_setting_label_cont(lv_obj_t * parent, const char * text, lv_demo_high_res_ctx_t * c);
 static void setting_clicked_cb(lv_event_t * e);
 static void uncheck_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void date_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void time_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 /**********************
  *  STATIC VARIABLES
@@ -68,14 +70,14 @@ lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * base_obj, lv_obj_t * pa
 
     if(show_time) {
         lv_obj_t * date_label = lv_label_create(top_margin);
-        lv_label_set_text_static(date_label, "Tuesday, 31 October");
         lv_obj_add_style(date_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
         lv_obj_add_style(date_label, &c->fonts[FONT_LABEL_SM], 0);
+        lv_subject_add_observer_obj(&c->subject_groups.date.group, date_observer_cb, date_label, c);
 
         lv_obj_t * time_label = lv_label_create(top_margin);
-        lv_label_set_text_static(time_label, "09:36");
         lv_obj_add_style(time_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
         lv_obj_add_style(time_label, &c->fonts[FONT_LABEL_SM], 0);
+        lv_subject_add_observer_obj(&c->subject_groups.time.group, time_observer_cb, time_label, c);
     }
     else {
         lv_obj_t * logout_icon = lv_image_create(top_margin);
@@ -269,6 +271,28 @@ static void uncheck_cb(lv_observer_t * observer, lv_subject_t * subject)
        && lv_subject_get_int(disable)) {
         lv_subject_set_int(disable, 0);
     }
+}
+
+static void date_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    LV_UNUSED(subject);
+    lv_obj_t * date_label = lv_observer_get_target_obj(observer);
+    lv_demo_high_res_ctx_t * c = lv_observer_get_user_data(observer);
+
+    lv_label_set_text_fmt(date_label, "%s, %d %s",
+                          (char *)lv_subject_get_pointer(&c->subjects.week_day_name),
+                          lv_subject_get_int(&c->subjects.month_day),
+                          (char *)lv_subject_get_pointer(&c->subjects.month_name));
+}
+
+static void time_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    LV_UNUSED(subject);
+    lv_obj_t * time_label = lv_observer_get_target_obj(observer);
+    lv_demo_high_res_ctx_t * c = lv_observer_get_user_data(observer);
+
+    lv_label_set_text_fmt(time_label, "%02d:%02d", lv_subject_get_int(&c->subjects.hour),
+                          lv_subject_get_int(&c->subjects.minute));
 }
 
 #endif /*LV_USE_DEMO_HIGH_RES*/

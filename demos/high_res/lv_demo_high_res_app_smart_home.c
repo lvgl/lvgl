@@ -58,7 +58,8 @@ void lv_demo_high_res_app_smart_home(lv_obj_t * base_obj)
     lv_obj_set_size(bg, LV_PCT(100), LV_PCT(100));
 
     lv_obj_t * bg_img = lv_image_create(bg);
-    lv_subject_add_observer_obj(&c->th, lv_demo_high_res_theme_observer_image_src_cb, bg_img, &c->imgs[IMG_LIGHT_BG_HOME]);
+    lv_subject_add_observer_obj(&c->th, lv_demo_high_res_theme_observer_image_src_cb, bg_img,
+                                &c->imgs[IMG_LIGHT_BG_SMART_HOME]);
 
     lv_obj_t * bg_cont = lv_obj_create(bg);
     lv_obj_remove_style_all(bg_cont);
@@ -185,7 +186,7 @@ static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_remove_style_all(widget);
     lv_obj_set_size(widget, c->sz->card_long_edge, c->sz->card_long_edge);
     lv_subject_add_observer_obj(&c->th, lv_demo_high_res_theme_observer_obj_bg_image_src_cb, widget,
-                                &c->imgs[IMG_LIGHT_WIDGET1_BG]);
+                                &c->imgs[IMG_LIGHT_WIDGET2_BG]);
     lv_obj_set_style_pad_all(widget, c->sz->gap[7], 0);
     lv_obj_set_flex_flow(widget, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(widget, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
@@ -227,7 +228,7 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_remove_style_all(widget);
     lv_obj_set_size(widget, c->sz->card_long_edge, c->sz->card_long_edge);
     lv_subject_add_observer_obj(&c->th, lv_demo_high_res_theme_observer_obj_bg_image_src_cb, widget,
-                                &c->imgs[IMG_LIGHT_WIDGET1_BG]);
+                                &c->imgs[IMG_LIGHT_WIDGET3_BG]);
     lv_obj_set_style_pad_all(widget, c->sz->gap[7], 0);
 
     lv_obj_t * top_label = lv_label_create(widget);
@@ -273,6 +274,29 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_t * slider_volume_img = lv_image_create(slider);
     lv_image_set_src(slider_volume_img, c->imgs[IMG_VOLUME]);
     lv_obj_align(slider_volume_img, LV_ALIGN_BOTTOM_MID, 0, -8);
+
+    lv_obj_t * album_art = lv_image_create(widget);
+    lv_image_set_src(album_art, c->imgs[IMG_ALBUM_ART]);
+
+    lv_obj_t * controls = lv_demo_high_res_simple_container_create(widget, false, 0, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_align(controls, LV_ALIGN_LEFT_MID);
+
+    lv_obj_t * prev_song = lv_image_create(controls);
+    lv_image_set_src(prev_song, c->imgs[IMG_BACKWARD_ICON]);
+    lv_obj_set_style_image_recolor(prev_song, lv_color_white(), 0);
+    lv_obj_set_style_image_recolor_opa(prev_song, LV_OPA_COVER, 0);
+
+    lv_obj_t * play = lv_image_create(controls);
+    lv_image_set_src(play, c->imgs[IMG_PLAY_ICON]);
+    lv_obj_set_style_image_recolor(play, lv_color_white(), 0);
+    lv_obj_set_style_image_recolor_opa(play, LV_OPA_COVER, 0);
+
+    lv_obj_t * next_song = lv_image_create(controls);
+    lv_image_set_src(next_song, c->imgs[IMG_FORWARD_ICON]);
+    lv_obj_set_style_image_recolor(next_song, lv_color_white(), 0);
+    lv_obj_set_style_image_recolor_opa(next_song, LV_OPA_COVER, 0);
+
+    lv_obj_align_to(album_art, controls, LV_ALIGN_CENTER, 0, 0);
 }
 
 static void widget4_slider_delete_cb(lv_event_t * e)

@@ -31,12 +31,14 @@
 static void back_clicked_cb(lv_event_t * e);
 static lv_obj_t * create_widget1_part(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const char * title_val,
                                       const char * daily_val, const char * weekly_val);
+static void widget1_anim_height_range(lv_demo_high_res_ctx_t * c, int32_t * min, int32_t * max);
 static void widget1_open_part1_anim_cb(void * arg, int32_t val);
 static void widget1_open_part2_anim_cb(void * arg, int32_t val);
 static void widget1_clicked_cb(lv_event_t * e);
 static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 static lv_obj_t * widget23_chart_label(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const char * text);
 static void widget2_chart_event_draw_task_cb(lv_event_t * e);
+static void widget2_chart_bar_clicked_cb(lv_event_t * e);
 static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 static void widget3_chart_draw_task_event_cb(lv_event_t * e);
 static lv_obj_t * create_widget3_stat(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const char * title_val,
@@ -66,15 +68,17 @@ void lv_demo_high_res_app_smart_meter(lv_obj_t * base_obj)
     lv_obj_set_size(bg, LV_PCT(100), LV_PCT(100));
 
     lv_obj_t * bg_img = lv_image_create(bg);
-    lv_subject_add_observer_obj(&c->th, lv_demo_high_res_theme_observer_image_src_cb, bg_img, &c->imgs[IMG_LIGHT_BG_HOME]);
+    lv_subject_add_observer_obj(&c->th, lv_demo_high_res_theme_observer_image_src_cb, bg_img,
+                                &c->imgs[IMG_LIGHT_BG_SMART_METER]);
 
     lv_obj_t * bg_cont = lv_obj_create(bg);
     lv_obj_remove_style_all(bg_cont);
     lv_obj_set_size(bg_cont, LV_PCT(100), LV_PCT(100));
     lv_obj_set_style_pad_top(bg_cont, c->sz->gap[7], 0);
-    lv_obj_set_style_pad_bottom(bg_cont, c->sz->gap[10], 0);
-    lv_obj_set_style_pad_left(bg_cont, c->sz->gap[10], 0);
-    lv_obj_set_style_pad_right(bg_cont, c->sz->gap[10], 0);
+    int32_t app_padding = c->sz == &lv_demo_high_res_sizes_all[SIZE_SM] ? c->sz->gap[9] : c->sz->gap[10];
+    lv_obj_set_style_pad_bottom(bg_cont, app_padding, 0);
+    lv_obj_set_style_pad_left(bg_cont, app_padding, 0);
+    lv_obj_set_style_pad_right(bg_cont, app_padding, 0);
 
     /* top margin */
 
@@ -106,7 +110,8 @@ void lv_demo_high_res_app_smart_meter(lv_obj_t * base_obj)
 
     /* widgets */
 
-    lv_obj_t * widgets = lv_demo_high_res_simple_container_create(bg_cont, false, c->sz->gap[7], LV_FLEX_ALIGN_END);
+    int32_t widget_gap_padding = c->sz == &lv_demo_high_res_sizes_all[SIZE_SM] ? c->sz->gap[4] : c->sz->gap[7];
+    lv_obj_t * widgets = lv_demo_high_res_simple_container_create(bg_cont, false, widget_gap_padding, LV_FLEX_ALIGN_END);
     lv_obj_set_align(widgets, LV_ALIGN_BOTTOM_RIGHT);
 
     create_widget1(c, widgets);
@@ -145,7 +150,6 @@ static lv_obj_t * create_widget1_part(lv_demo_high_res_ctx_t * c, lv_obj_t * par
     lv_obj_t * title = lv_label_create(part);
     lv_label_set_text_static(title, title_val);
     lv_obj_add_style(title, &c->fonts[FONT_LABEL_MD], 0);
-    lv_obj_add_style(title, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
 
     lv_obj_t * box = lv_obj_create(part);
     lv_obj_remove_style_all(box);
@@ -161,7 +165,7 @@ static lv_obj_t * create_widget1_part(lv_demo_high_res_ctx_t * c, lv_obj_t * par
     lv_obj_t * daily_label = lv_label_create(daily_box);
     lv_label_set_text_static(daily_label, "Daily");
     lv_obj_add_style(daily_label, &c->fonts[FONT_LABEL_SM], 0);
-    lv_obj_add_style(daily_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+    lv_obj_set_style_text_color(daily_label, lv_color_black(), 0);
 
     lv_obj_t * daily_value_box = lv_demo_high_res_simple_container_create(daily_box, false, c->sz->gap[1],
                                                                           LV_FLEX_ALIGN_END);
@@ -170,11 +174,11 @@ static lv_obj_t * create_widget1_part(lv_demo_high_res_ctx_t * c, lv_obj_t * par
     lv_obj_t * daily_value_label = lv_label_create(daily_value_box);
     lv_label_set_text_static(daily_value_label, daily_val);
     lv_obj_add_style(daily_value_label, &c->fonts[FONT_LABEL_LG], 0);
-    lv_obj_add_style(daily_value_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+    lv_obj_set_style_text_color(daily_value_label, lv_color_black(), 0);
     lv_obj_t * daily_kwh_label = lv_label_create(daily_value_box);
     lv_label_set_text_static(daily_kwh_label, "kWh");
     lv_obj_add_style(daily_kwh_label, &c->fonts[FONT_LABEL_SM], 0);
-    lv_obj_add_style(daily_kwh_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+    lv_obj_set_style_text_color(daily_kwh_label, lv_color_black(), 0);
     lv_obj_set_style_text_opa(daily_kwh_label, LV_OPA_40, 0);
 
     lv_obj_t * weekly_box = lv_demo_high_res_simple_container_create(box, true, c->sz->gap[2], LV_FLEX_ALIGN_START);
@@ -184,7 +188,7 @@ static lv_obj_t * create_widget1_part(lv_demo_high_res_ctx_t * c, lv_obj_t * par
     lv_obj_t * weekly_label = lv_label_create(weekly_box);
     lv_label_set_text_static(weekly_label, "Weekly");
     lv_obj_add_style(weekly_label, &c->fonts[FONT_LABEL_SM], 0);
-    lv_obj_add_style(weekly_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+    lv_obj_set_style_text_color(weekly_label, lv_color_black(), 0);
 
     lv_obj_t * weekly_value_box = lv_demo_high_res_simple_container_create(weekly_box, false, c->sz->gap[1],
                                                                            LV_FLEX_ALIGN_END);
@@ -193,38 +197,70 @@ static lv_obj_t * create_widget1_part(lv_demo_high_res_ctx_t * c, lv_obj_t * par
     lv_obj_t * weekly_value_label = lv_label_create(weekly_value_box);
     lv_label_set_text_static(weekly_value_label, weekly_val);
     lv_obj_add_style(weekly_value_label, &c->fonts[FONT_LABEL_LG], 0);
-    lv_obj_add_style(weekly_value_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+    lv_obj_set_style_text_color(weekly_value_label, lv_color_black(), 0);
     lv_obj_t * weekly_kwh_label = lv_label_create(weekly_value_box);
     lv_label_set_text_static(weekly_kwh_label, "kWh");
     lv_obj_add_style(weekly_kwh_label, &c->fonts[FONT_LABEL_SM], 0);
-    lv_obj_add_style(weekly_kwh_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+    lv_obj_set_style_text_color(weekly_kwh_label, lv_color_black(), 0);
     lv_obj_set_style_text_opa(weekly_kwh_label, LV_OPA_40, 0);
 
     return part;
 }
 
+static void widget1_anim_height_range(lv_demo_high_res_ctx_t * c, int32_t * min, int32_t * max)
+{
+    *min = c->sz->smart_meter_collapsed_part_height;
+    *max = c->sz->card_long_edge - c->sz->gap[7] - c->sz->smart_meter_collapsed_part_height;
+}
+
 static void widget1_open_part1_anim_cb(void * arg, int32_t val)
 {
     lv_obj_t * box = arg;
+    lv_demo_high_res_ctx_t * c = lv_obj_get_user_data(box);
     lv_obj_t * part1 = lv_obj_get_child(box, 0);
     lv_obj_t * part2 = lv_obj_get_child(box, 1);
-    lv_obj_set_height(part1, lv_map(val, 0, 1000, 72, 204));
+    int32_t min;
+    int32_t max;
+    widget1_anim_height_range(c, &min, &max);
+    lv_obj_set_height(part1, lv_map(val, 0, 1000, min, max));
     lv_obj_set_style_bg_image_opa(part1, lv_map(val, 0, 1000, 255, 0), 0);
     lv_obj_set_style_bg_image_opa(part2, lv_map(val, 0, 1000, 0, 255), 0);
     lv_obj_set_style_opa(lv_obj_get_child(part1, 1), lv_map(val, 0, 1000, 0, 255), 0);
     lv_obj_set_style_opa(lv_obj_get_child(part2, 1), lv_map(val, 0, 1000, 255, 0), 0);
+    const lv_demo_high_res_theme_t * th = lv_subject_get_pointer(&c->th);
+    if(th == &lv_demo_high_res_theme_dark) {
+        int32_t g = lv_map(val, 0, 1000, 0, 255);
+        int32_t ginv = 255 - g;
+        lv_obj_set_style_text_color(lv_obj_get_child(part1, 0), th == &lv_demo_high_res_theme_light
+                                    ? lv_color_make(g, g, g) : lv_color_make(ginv, ginv, ginv), 0);
+        lv_obj_set_style_text_color(lv_obj_get_child(part2, 0), th == &lv_demo_high_res_theme_light
+                                    ? lv_color_make(ginv, ginv, ginv) : lv_color_make(g, g, g), 0);
+    }
 }
 
 static void widget1_open_part2_anim_cb(void * arg, int32_t val)
 {
     lv_obj_t * box = arg;
+    lv_demo_high_res_ctx_t * c = lv_obj_get_user_data(box);
     lv_obj_t * part1 = lv_obj_get_child(box, 0);
     lv_obj_t * part2 = lv_obj_get_child(box, 1);
-    lv_obj_set_height(part1, lv_map(val, 0, 1000, 204, 72));
+    int32_t min;
+    int32_t max;
+    widget1_anim_height_range(c, &min, &max);
+    lv_obj_set_height(part1, lv_map(val, 0, 1000, max, min));
     lv_obj_set_style_bg_image_opa(part1, lv_map(val, 0, 1000, 0, 255), 0);
     lv_obj_set_style_bg_image_opa(part2, lv_map(val, 0, 1000, 255, 0), 0);
     lv_obj_set_style_opa(lv_obj_get_child(part1, 1), lv_map(val, 0, 1000, 255, 0), 0);
     lv_obj_set_style_opa(lv_obj_get_child(part2, 1), lv_map(val, 0, 1000, 0, 255), 0);
+    const lv_demo_high_res_theme_t * th = lv_subject_get_pointer(&c->th);
+    if(th == &lv_demo_high_res_theme_dark) {
+        int32_t g = lv_map(val, 0, 1000, 0, 255);
+        int32_t ginv = 255 - g;
+        lv_obj_set_style_text_color(lv_obj_get_child(part1, 0), th == &lv_demo_high_res_theme_light
+                                    ? lv_color_make(ginv, ginv, ginv) : lv_color_make(g, g, g), 0);
+        lv_obj_set_style_text_color(lv_obj_get_child(part2, 0), th == &lv_demo_high_res_theme_light
+                                    ? lv_color_make(g, g, g) : lv_color_make(ginv, ginv, ginv), 0);
+    }
 }
 
 static void widget1_clicked_cb(lv_event_t * e)
@@ -252,13 +288,22 @@ static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_size(box, c->sz->card_long_edge, c->sz->card_long_edge);
     lv_obj_set_flex_flow(box, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_pad_row(box, c->sz->gap[7], 0);
+    lv_obj_set_user_data(box, c);
 
-    lv_obj_t * part1 = create_widget1_part(c, box, "Self-consumption", "??.??", "??.??");
-    lv_obj_set_height(part1, 72);
+    lv_obj_t * part_title;
+
+    lv_obj_t * part1 = create_widget1_part(c, box, "Self-consumption", "14.71", "89.32");
+    lv_obj_set_height(part1, c->sz->smart_meter_collapsed_part_height);
     lv_obj_set_style_opa(lv_obj_get_child(part1, 1), LV_OPA_TRANSP, 0);
+    part_title = lv_obj_get_child(part1, 0);
+    const lv_demo_high_res_theme_t * th = lv_subject_get_pointer(&c->th);
+    lv_obj_set_style_text_color(part_title, th == &lv_demo_high_res_theme_light ? lv_color_black() : lv_color_white(), 0);
+
     lv_obj_t * part2 = create_widget1_part(c, box, "Production", "12.56", "90.28");
     lv_obj_set_flex_grow(part2, 1);
     lv_obj_set_style_bg_image_opa(part2, LV_OPA_TRANSP, 0);
+    part_title = lv_obj_get_child(part2, 0);
+    lv_obj_set_style_text_color(part_title, lv_color_black(), 0);
 
     lv_obj_add_event_cb(part1, widget1_clicked_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_add_event_cb(part2, widget1_clicked_cb, LV_EVENT_CLICKED, NULL);
@@ -277,30 +322,46 @@ static lv_obj_t * widget23_chart_label(lv_demo_high_res_ctx_t * c, lv_obj_t * pa
 static void widget2_chart_event_draw_task_cb(lv_event_t * e)
 {
     lv_draw_task_t * t = lv_event_get_draw_task(e);
+    lv_draw_task_type_t type = lv_draw_task_get_type(t);
+    if(type != LV_DRAW_TASK_TYPE_FILL) {
+        return;
+    }
     lv_draw_dsc_base_t * base_draw_dsc = lv_draw_task_get_draw_dsc(t);
-    if(lv_draw_task_get_type(t) != LV_DRAW_TASK_TYPE_FILL) return;
-    if(base_draw_dsc->part != LV_PART_MAIN) return;
+    lv_obj_t * obj = lv_event_get_target_obj(e);
+    uint32_t idx = (uint32_t)(uintptr_t)lv_obj_get_user_data(obj);
+    if(base_draw_dsc->part == LV_PART_MAIN) {
+        lv_draw_rect_dsc_t rect_draw_dsc;
+        lv_draw_rect_dsc_init(&rect_draw_dsc);
+        rect_draw_dsc.bg_color = lv_color_white();
+        rect_draw_dsc.bg_opa = LV_OPA_20;
 
-    lv_obj_t * obj = lv_event_get_target(e);
+        lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
+        lv_point_t col_pos;
+        lv_chart_get_point_pos_by_id(obj, ser, idx, &col_pos);
 
-    lv_draw_rect_dsc_t rect_draw_dsc;
-    lv_draw_rect_dsc_init(&rect_draw_dsc);
-    rect_draw_dsc.bg_color = lv_color_white();
-    rect_draw_dsc.bg_opa = LV_OPA_20;
+        int32_t w = lv_obj_get_content_width(obj) / lv_chart_get_point_count(obj);
 
-    lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
-    lv_point_t col_pos;
-    lv_chart_get_point_pos_by_id(obj, ser, 4, &col_pos);
+        lv_area_t a;
+        a.x1 = obj->coords.x1 + col_pos.x - w / 2;
+        a.x2 = obj->coords.x1 + col_pos.x + w / 2;
+        a.y1 = obj->coords.y1;
+        a.y2 = obj->coords.y2;
 
-    int32_t w = lv_obj_get_content_width(obj) / lv_chart_get_point_count(obj);
+        lv_draw_rect(base_draw_dsc->layer, &rect_draw_dsc, &a);
+    }
+    else if(base_draw_dsc->part == LV_PART_ITEMS) {
+        lv_draw_fill_dsc_t * fill_dsc = lv_draw_task_get_fill_dsc(t);
+        if(fill_dsc->base.id2 != idx) {
+            fill_dsc->opa = LV_OPA_40;
+        }
+    }
+}
 
-    lv_area_t a;
-    a.x1 = obj->coords.x1 + col_pos.x - w / 2;
-    a.x2 = obj->coords.x1 + col_pos.x + w / 2;
-    a.y1 = obj->coords.y1;
-    a.y2 = obj->coords.y2;
-
-    lv_draw_rect(base_draw_dsc->layer, &rect_draw_dsc, &a);
+static void widget2_chart_bar_clicked_cb(lv_event_t * e)
+{
+    lv_obj_t * chart = lv_event_get_target_obj(e);
+    lv_obj_set_user_data(chart, (void *)(uintptr_t)lv_chart_get_pressed_point(chart));
+    lv_obj_invalidate(chart);
 }
 
 static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
@@ -352,6 +413,7 @@ static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_style_pad_row(chart_grid, 5, 0);
 
     lv_obj_t * chart = lv_chart_create(chart_grid);
+    lv_obj_set_user_data(chart, (void *)(uintptr_t)4);
     lv_obj_set_height(chart, c->sz->small_chart_height);
     lv_obj_set_style_bg_opa(chart, LV_OPA_MIN + 1, 0);
     lv_obj_set_style_pad_column(chart, c->sz->gap[1], 0);
@@ -379,6 +441,8 @@ static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_chart_set_ext_y_array(chart, ser, (int32_t *)chart_values);
     lv_chart_set_point_count(chart, sizeof(chart_values) / sizeof(*chart_values));
     lv_chart_refresh(chart);
+
+    lv_obj_add_event_cb(chart, widget2_chart_bar_clicked_cb, LV_EVENT_VALUE_CHANGED, NULL);
 
     lv_obj_t * hscale_label_1 = widget23_chart_label(c, chart_grid, "Aug 2");
     lv_obj_set_grid_cell(hscale_label_1, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 1, 1);

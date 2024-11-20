@@ -30,12 +30,14 @@ extern "C" {
  **********************/
 
 enum {
-    IMG_ARROW_LEFT = 0,
+    IMG_ALBUM_ART = 0,
+    IMG_ARROW_LEFT,
     IMG_BACKWARD_ICON,
     IMG_COLD_ICON,
     IMG_DRY_ICON,
     IMG_ENERGY_ICON,
     IMG_EV_CHARGING_APP_ICON,
+    IMG_EV_CHARGING_WIDGET3_1_BG,
     IMG_EV_CHARGING_WIDGET3_BG,
     IMG_FAN,
     IMG_FORWARD_ICON,
@@ -148,6 +150,7 @@ typedef struct {
     int32_t widget_long_edge;
     int32_t card_short_edge;
     int32_t ev_charging_arc_diameter;
+    int32_t smart_meter_collapsed_part_height;
     int32_t slider_width;
     int32_t small_chart_height;
     int32_t large_chart_height;
@@ -187,6 +190,7 @@ typedef struct {
     lv_style_t styles[STYLE_COLOR_COUNT][STYLE_TYPE_COUNT];
     lv_style_t fonts[FONT_COUNT];
     lv_subject_t th;
+    char * base_path;
     bool top_margin_subjects_are_init;
     lv_subject_t top_margin_health_subject;
     lv_subject_t top_margin_setting_subject;
@@ -196,6 +200,7 @@ typedef struct {
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_demo_high_res_theme_t lv_demo_high_res_theme_light;
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_demo_high_res_theme_t lv_demo_high_res_theme_dark;
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_demo_high_res_sizes_t lv_demo_high_res_sizes_all[SIZE_COUNT];
 
 /**********************
  * GLOBAL PROTOTYPES
