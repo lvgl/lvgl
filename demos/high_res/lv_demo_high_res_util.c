@@ -146,7 +146,7 @@ static const lv_demo_high_res_sizes_t sizes_all[SIZE_COUNT] = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_demo_high_res_base_obj_create(void)
+lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path)
 {
     lv_demo_high_res_ctx_t * c = lv_malloc(sizeof(lv_demo_high_res_ctx_t));
     LV_ASSERT_MALLOC(c);
@@ -244,8 +244,8 @@ lv_obj_t * lv_demo_high_res_base_obj_create(void)
     const char * size_prefix = size == SIZE_SM ? "sm" : size == SIZE_MD ? "md" : "lg";
     for(uint32_t i = 0; i < IMG_COUNT; i++) {
         char path_buf[256];
-        int chars = lv_snprintf(path_buf, sizeof(path_buf), "img_lv_demo_high_res_%s_%s.png",
-                                image_details[i].name, size_prefix);
+        int chars = lv_snprintf(path_buf, sizeof(path_buf), "%s/img_lv_demo_high_res_%s_%s.png",
+                                base_path, image_details[i].name, size_prefix);
         LV_ASSERT(chars < (int)sizeof(path_buf));
         c->imgs[i] = image_preload(path_buf, image_details[i].cf);
     }

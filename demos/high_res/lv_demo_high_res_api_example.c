@@ -44,7 +44,7 @@ static int32_t celsius_temperatures[4];
 
 void lv_demo_high_res_api_example(void)
 {
-    lv_demo_high_res_subjects_t * api = lv_demo_high_res();
+    lv_demo_high_res_subjects_t * api = lv_demo_high_res(NULL);
 
     lv_subject_add_observer(&api->ev_is_charging, ev_is_charging_cb, api);
 

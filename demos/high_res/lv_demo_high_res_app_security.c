@@ -93,6 +93,18 @@ void lv_demo_high_res_app_security(lv_obj_t * base_obj)
     lv_obj_add_style(app_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_add_style(app_label, &c->fonts[FONT_HEADING_LG], 0);
 
+
+    lv_fs_res_t res;
+
+    lv_fs_dir_t dir;
+    res = lv_fs_dir_open(&dir, "security_app_slides");
+    if(res != LV_FS_RES_OK) {
+        lv_obj_t * label = lv_label_create(bg_cont);
+        lv_label_set_text(label, "Couldn't open the 'security_app_slides' folder to load the images");
+        lv_obj_center(label);
+        return;
+    }
+
     /* slides */
 
     lv_obj_t * slides_cont = lv_obj_create(bg_cont);
@@ -102,6 +114,7 @@ void lv_demo_high_res_app_security(lv_obj_t * base_obj)
     lv_obj_set_flex_align(slides_cont, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_set_align(slides_cont, LV_ALIGN_BOTTOM_MID);
     lv_obj_set_style_pad_row(slides_cont, c->sz->gap[3], 0);
+
 
     lv_obj_t * slide_deck_cont = lv_obj_create(slides_cont);
     lv_obj_remove_style_all(slide_deck_cont);
@@ -121,17 +134,12 @@ void lv_demo_high_res_app_security(lv_obj_t * base_obj)
 
     lv_obj_t * slide;
 
-    lv_fs_res_t res;
-
-    lv_fs_dir_t dir;
-    res = lv_fs_dir_open(&dir, "security_app_slides");
-    LV_ASSERT(res == LV_FS_RES_OK);
     char buf[128];
     while(1) {
         res = lv_fs_dir_read(&dir, buf, sizeof(buf));
         LV_ASSERT(res == LV_FS_RES_OK);
         if(!*buf) break;
-        slide = lv_image_create(slide_deck);
+        slide = lv_image_create(slides_cont);
         lv_memmove(buf + sizeof("security_app_slides"), buf, lv_strlen(buf) + 1);
         lv_strcpy(buf, "security_app_slides");
         buf[sizeof("security_app_slides") - 1] = '/';

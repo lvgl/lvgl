@@ -14,6 +14,7 @@
 #include "../../src/widgets/label/lv_label.h"
 #include "../../src/widgets/line/lv_line.h"
 #include "../../src/display/lv_display_private.h"
+//#include "../../src/others/sysmon/lv_sysmon_private.h"
 
 /*********************
  *      DEFINES
@@ -153,6 +154,9 @@ static lv_obj_t * create_perfmon(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c
     lv_obj_t * lab1 = lv_label_create(cont);
     lv_obj_add_style(lab1, &c->fonts[FONT_LABEL_XS], 0);
     lv_obj_add_style(lab1, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+    lv_label_set_text(lab1, "Perf. monitor is not enabled");
+
+#if LV_USE_PERF_MONITOR
     lv_obj_t * divider = lv_line_create(cont);
     lv_obj_set_size(divider, LV_PCT(100), c->sz->gap[4]);
     //    static const lv_point_precise_t points[] = {{LV_PCT(0), LV_PCT(50)}, {LV_PCT(100), LV_PCT(50)}};
@@ -170,10 +174,11 @@ static lv_obj_t * create_perfmon(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c
 
     lv_display_t * disp = lv_display_get_default();
     lv_subject_add_observer_obj(&disp->perf_sysmon_backend.subject, perfmon_data_cb, cont, NULL);
-
+#endif
     return perfmon;
 }
 
+#if LV_USE_PERF_MONITOR
 static void perfmon_data_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * cont = lv_observer_get_target_obj(observer);
@@ -187,7 +192,9 @@ static void perfmon_data_cb(lv_observer_t * observer, lv_subject_t * subject)
     lv_label_set_text_fmt(lab2, "Refresh: %ums", perf->calculated.render_avg_time + perf->calculated.flush_avg_time);
     lv_label_set_text_fmt(lab3, "Render / Flush: %ums / %ums", perf->calculated.render_avg_time,
                           perf->calculated.flush_avg_time);
+
 }
+#endif
 
 static lv_obj_t * create_settings(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c)
 {

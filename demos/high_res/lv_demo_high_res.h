@@ -60,9 +60,12 @@ typedef struct {
 
 /**
  * Start the High Resolution Demo on the default display.
- * @return  a struct subjects to control the UI and react to input
+ * @param assets_base_path  folder where the image assets are.
+ *                          If NULL "lvgl/demos/high_res/assets" will be used.
+ * @return                  a struct with subjects to control the UI
+ *                          and react to input
  */
-lv_demo_high_res_subjects_t * lv_demo_high_res(void);
+lv_demo_high_res_subjects_t * lv_demo_high_res(const char * assets_base_path);
 
 /**
  * Start the High Resolution Demo on the default display.

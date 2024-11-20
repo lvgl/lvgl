@@ -201,7 +201,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_demo_high_res_theme_t lv_demo_high_res_
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_obj_t * lv_demo_high_res_base_obj_create(void);
+lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path);
 
 void lv_demo_high_res_home(lv_obj_t * base_obj);
 void lv_demo_high_res_app_smart_home(lv_obj_t * base_obj);

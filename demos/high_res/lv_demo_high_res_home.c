@@ -233,6 +233,7 @@ static void app_card_click_cb(lv_event_t * e)
 static void app_card_create(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const char * text,
                             const lv_image_dsc_t * icon_img_dsc, app_cb_t app_cb)
 {
+    if(icon_img_dsc == NULL) return;
     lv_obj_t * app_card = lv_obj_create(parent);
     lv_obj_remove_style_all(app_card);
     lv_obj_set_size(app_card, c->sz->card_long_edge, c->sz->card_short_edge);
