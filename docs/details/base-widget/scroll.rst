@@ -92,6 +92,9 @@ base direction.
 
    lv_obj_add_style(widget, &style_scrollbar, LV_PART_SCROLLBAR);
 
+The minimum length of the scrollbar is fixed to 10, while its maximum length is limited by the
+Widget's height or width, depending on whether the scrollbar is vertical or horizontal. Any length value
+set outside of these limits will automatically result in a length fixed to either limit.
 
 .. _scroll_events:
 
