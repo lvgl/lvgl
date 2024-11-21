@@ -1136,11 +1136,8 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
              * If it really doesn't need alpha use it. Else switch to the ARGB size*/
             layer_area_act.y2 = layer_area_act.y1 + max_rgb_row_height - 1;
             if(layer_area_act.y2 > layer_area_full.y2) layer_area_act.y2 = layer_area_full.y2;
-            bool area_need_alpha = alpha_test_area_on_obj(obj, &layer_area_act);
-
             const void * bitmap_mask_src = lv_obj_get_style_bitmap_mask_src(obj, 0);
-            if(bitmap_mask_src) area_need_alpha  = true;
-
+            bool area_need_alpha = bitmap_mask_src || alpha_test_area_on_obj(obj, &layer_area_act);
             if(area_need_alpha) {
                 layer_area_act.y2 = layer_area_act.y1 + max_argb_row_height - 1;
                 if(layer_area_act.y2 > layer_area_full.y2) layer_area_act.y2 = layer_area_full.y2;
