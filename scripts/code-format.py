@@ -59,7 +59,7 @@ if include_examples:
     os.system(f'astyle --options={cfg_file} --recursive "{script_dir}/../examples/*.c,*.cpp,*.h"')
 
 if include_src:
-    print("Formatting src")
+    print("\nFormatting src")
     os.system(f'astyle --options={cfg_file} --recursive "{script_dir}/../src/*.c,*.cpp,*.h"')
 
 if include_tests:
