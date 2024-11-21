@@ -22,7 +22,7 @@
 #if LV_DRAW_SW_SUPPORT_ARGB8888
     #include "lv_draw_sw_blend_to_argb8888.h"
 #endif
-#if LV_DRAW_SW_SUPPORT_RGB888
+#if LV_DRAW_SW_SUPPORT_RGB888 || LV_DRAW_SW_SUPPORT_XRGB8888
     #include "lv_draw_sw_blend_to_rgb888.h"
 #endif
 #if LV_DRAW_SW_SUPPORT_I1

@@ -51,7 +51,7 @@ typedef struct {
 static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int32_t yin, int32_t * xout,
                                      int32_t * yout);
 
-#if LV_DRAW_SW_SUPPORT_RGB888
+#if LV_DRAW_SW_SUPPORT_RGB888 || LV_DRAW_SW_SUPPORT_XRGB8888
 static void transform_rgb888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                              int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                              int32_t x_end, uint8_t * dest_buf, bool aa, uint32_t px_size);
@@ -290,7 +290,7 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
  *   STATIC FUNCTIONS
  **********************/
 
-#if LV_DRAW_SW_SUPPORT_RGB888
+#if LV_DRAW_SW_SUPPORT_RGB888 || LV_DRAW_SW_SUPPORT_XRGB8888
 
 static void transform_rgb888(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                              int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
