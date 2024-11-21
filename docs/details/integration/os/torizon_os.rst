@@ -1,3 +1,5 @@
+.. _torizon-os-section:  
+
 Torizon OS
 ==========
 
