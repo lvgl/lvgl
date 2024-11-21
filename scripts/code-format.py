@@ -29,22 +29,21 @@ if args:
     include_tests = False
 
     for arg in args:
-        match arg:
-            case "demos":
-                include_demos = True
-            case "examples":
-                include_examples = True
-            case 'src':
-                include_src = True
-            case 'tests':
-                include_tests = False
-            case _:
-                arg_abort = True
-                print(f'Argument [{arg}] not recognized.')
-                print('Usage:')
-                print('  python code-format.py [dir [dir ...]]')
-                print('  where: dir can be demos, examples, src or tests.')
-                exit(1)
+        if arg == "demos":
+            include_demos = True
+        elif arg == "examples":
+            include_examples = True
+        elif arg == "src":
+            include_src = True
+        elif arg == "tests":
+            include_tests = False
+        else:
+            arg_abort = True
+            print(f'Argument [{arg}] not recognized.')
+            print('Usage:')
+            print('  python code-format.py [dir [dir ...]]')
+            print('  where: dir can be demos, examples, src or tests.')
+            exit(1)
 
 script_dir = os.path.realpath(__file__)
 script_dir = os.path.dirname(script_dir)
