@@ -142,6 +142,7 @@ Verdin Computer on Module:
       verdin-arm-family/nxp-imx95-evaluation-kit#verdin-imx95>`_
 
 Verdin Carrier Boards: 
+
     - `Verdin Development Board with HDMI Adapter <https://www.toradex.com/
       products/carrier-board/verdin-development-board-kit>`_
     - `Dahlia Carrier Board with HDMI Adapter <https://www.toradex.com/products/
@@ -153,7 +154,7 @@ Verdin Carrier Boards:
       ivy-carrier-board>`_
 
 TorizonOS 
-~~~~~~~~~
+---------
 
 TorizonOS is a Linux-based operating system developed by Toradex, tailored for 
 embedded systems. It is designed to simplify the development, deployment, and 
@@ -170,7 +171,7 @@ More information is provided on the `Torizon documentation <https://www.torizon.
 io/torizon-os>`_.
 
 Toradex examples
-~~~~~~~~~~~~~~~~
+----------------
 
 There are existing ready to use repositories available. Click `here <https://
 github.com/lvgl?q=lv_port_toradex&type=all&language=&sort=>`_ to check them out.
