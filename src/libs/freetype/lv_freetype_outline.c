@@ -13,6 +13,10 @@
 
 #if LV_USE_FREETYPE
 
+#if LV_USE_NEMA_VG
+    #include "../../draw/nema_gfx/lv_nema_gfx_path.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -353,6 +357,38 @@ static lv_freetype_outline_t outline_create(
         .shift = 0,
         .delta = 0
     };
+
+#if LV_USE_NEMA_VG
+    /*Calculate Total Segmenets Before decompose */
+    int tag_size = face->glyph->outline.n_points;
+    unsigned char * tags = face->glyph->outline.tags;
+    int segments = 0;
+    int vectors = 0;
+
+    for(int j = 0; j < tag_size; j++) {
+        if(tags[j] & 0x1 == 0x1) {
+            segments++;
+            vectors++;
+        }
+        else {
+            int jj = j + 1 < tag_size ? j + 1 : 0;
+            if(tags[jj] & 0x1) {
+                vectors++;
+            }
+            else {
+                segments++;
+                vectors += 2;
+            }
+        }
+    }
+    /*Also for every contour we may have a line for close*/
+    segments += face->glyph->outline.n_contours;
+    vectors += face->glyph->outline.n_contours;
+
+    lv_nema_gfx_path_t * nema_gfx_path = (lv_nema_gfx_path_t *) param.outline;
+    nema_gfx_path->data_size = vectors * 2;
+    nema_gfx_path->seg_size = segments;
+#endif
 
     /* Run outline decompose again to fill outline data */
     error = FT_Outline_Decompose(&face->glyph->outline, &outline_funcs, outline);

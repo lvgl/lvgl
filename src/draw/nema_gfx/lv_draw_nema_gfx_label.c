@@ -35,15 +35,21 @@
 #include "lv_draw_nema_gfx.h"
 
 #if LV_USE_NEMA_GFX
-#include "../../font/lv_font.h"
-#include "../../font/lv_font_fmt_txt.h"
 #include "../../misc/lv_utils.h"
 #include "../../misc/lv_text_private.h"
+#include "../../lvgl.h"
+#include "../../libs/freetype/lv_freetype_private.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define LV_LABEL_HINT_UPDATE_TH 1024 /*Update the "hint" if the label's y coordinates have changed more then this*/
+#define FT_F26DOT6_SHIFT 6
+
+/** After converting the font reference size, it is also necessary to scale the 26dot6 data
+ * in the path to the real physical size
+ */
+#define FT_F26DOT6_TO_PATH_SCALE(x) (LV_FREETYPE_F26DOT6_TO_FLOAT(x) / (1 << FT_F26DOT6_SHIFT))
 
 /*Forward declarations*/
 void nema_set_matrix(nema_matrix3x3_t m);
@@ -71,6 +77,17 @@ static int unicode_list_compare(const void * ref, const void * element)
     return ((int32_t)(*(uint16_t *)ref)) - ((int32_t)(*(uint16_t *)element));
 }
 
+#if LV_USE_FREETYPE && LV_USE_NEMA_VG
+
+    #include "lv_nema_gfx_path.h"
+
+    static void _draw_nema_gfx_outline(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * glyph_draw_dsc);
+
+    static void freetype_outline_event_cb(lv_event_t * e);
+
+    static void lv_nema_gfx_outline_push(const lv_freetype_outline_event_param_t * param);
+#endif
+
 static bool raw_bitmap = false;
 
 /**********************
@@ -95,6 +112,15 @@ void lv_draw_nema_gfx_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_
 
     nema_set_clip(clip_area.x1, clip_area.y1, lv_area_get_width(&clip_area), lv_area_get_height(&clip_area));
 
+#if LV_USE_FREETYPE && LV_USE_NEMA_VG
+    /*We need to initiallize in every new label task*/
+    static bool is_init = false;
+    if(!is_init) {
+        lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, draw_unit);
+        is_init = true;
+    }
+#endif /* LV_USE_FREETYPE */
+
     _draw_label_iterate_characters(draw_unit, dsc, coords);
 
     lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)draw_unit;
@@ -105,6 +131,120 @@ void lv_draw_nema_gfx_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+#if LV_USE_FREETYPE && LV_USE_NEMA_VG
+
+static void _draw_nema_gfx_outline(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * glyph_draw_dsc)
+{
+
+    lv_area_t blend_area;
+    if(!_lv_area_intersect(&blend_area, glyph_draw_dsc->letter_coords, draw_unit->clip_area))
+        return;
+
+    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)draw_unit;
+
+    lv_nema_gfx_path_t * nema_gfx_path = (lv_nema_gfx_path_t *)glyph_draw_dsc->glyph_data;
+
+    lv_point_t pos = {glyph_draw_dsc->letter_coords->x1, glyph_draw_dsc->letter_coords->y1};
+
+    float scale = FT_F26DOT6_TO_PATH_SCALE(lv_freetype_outline_get_scale(glyph_draw_dsc->g->resolved_font));
+
+    /*Calculate Path Matrix*/
+    nema_matrix3x3_t matrix;
+    nema_mat3x3_load_identity(matrix);
+    nema_mat3x3_scale(matrix, scale, -scale);
+    nema_mat3x3_translate(matrix, pos.x - glyph_draw_dsc->g->ofs_x,
+                          pos.y + glyph_draw_dsc->g->box_h + glyph_draw_dsc->g->ofs_y);
+
+    nema_vg_path_clear(nema_gfx_path->path);
+    nema_vg_paint_clear(nema_gfx_path->paint);
+
+    nema_vg_set_fill_rule(NEMA_VG_FILL_EVEN_ODD);
+
+    nema_vg_path_set_shape(nema_gfx_path->path, nema_gfx_path->seg_size, nema_gfx_path->seg, nema_gfx_path->data_size,
+                           nema_gfx_path->data);
+
+    nema_vg_paint_set_type(nema_gfx_path->paint, NEMA_VG_PAINT_COLOR);
+
+    lv_color32_t dsc_col32 = lv_color_to_32(glyph_draw_dsc->color, glyph_draw_dsc->opa);
+    uint32_t nema_dsc_color = nema_rgba(dsc_col32.red, dsc_col32.green, dsc_col32.blue, dsc_col32.alpha);
+
+    nema_vg_paint_set_paint_color(nema_gfx_path->paint, nema_dsc_color);
+
+    nema_vg_path_set_matrix(nema_gfx_path->path, matrix);
+    nema_vg_draw_path(nema_gfx_path->path, nema_gfx_path->paint);
+
+    return;
+}
+
+static bool new_alloc = false;
+
+static void freetype_outline_event_cb(lv_event_t * e)
+{
+    LV_PROFILER_BEGIN;
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_freetype_outline_event_param_t * param = lv_event_get_param(e);
+    if(new_alloc) {
+        /*Now we can do the nessecary memory allocations*/
+        lv_nema_gfx_path_alloc(param->outline);
+    }
+    switch(code) {
+        case LV_EVENT_CREATE:
+            new_alloc = true;
+            param->outline = lv_nema_gfx_path_create();
+            break;
+        case LV_EVENT_DELETE:
+            new_alloc = false;
+            lv_nema_gfx_path_destroy(param->outline);
+            break;
+        case LV_EVENT_INSERT:
+            new_alloc = false;
+            lv_nema_gfx_outline_push(param);
+            break;
+        default:
+            new_alloc = false;
+            LV_LOG_WARN("unknown event code: %d", code);
+            break;
+    }
+    LV_PROFILER_END;
+}
+
+static void lv_nema_gfx_outline_push(const lv_freetype_outline_event_param_t * param)
+{
+    LV_PROFILER_BEGIN;
+    lv_nema_gfx_path_t * outline = param->outline;
+    LV_ASSERT_NULL(outline);
+
+    lv_freetype_outline_type_t type = param->type;
+    switch(type) {
+        case LV_FREETYPE_OUTLINE_END:
+            lv_nema_gfx_path_end(outline);
+            break;
+        case LV_FREETYPE_OUTLINE_MOVE_TO:
+            lv_nema_gfx_path_move_to(outline, param->to.x, param->to.y);
+            break;
+        case LV_FREETYPE_OUTLINE_LINE_TO:
+            lv_nema_gfx_path_line_to(outline, param->to.x, param->to.y);
+            break;
+        case LV_FREETYPE_OUTLINE_CUBIC_TO:
+            lv_nema_gfx_path_cubic_to(outline, param->control1.x, param->control1.y,
+                                      param->control2.x, param->control2.y,
+                                      param->to.x, param->to.y);
+            break;
+        case LV_FREETYPE_OUTLINE_CONIC_TO:
+            lv_nema_gfx_path_quad_to(outline, param->control1.x, param->control1.y,
+                                     param->to.x, param->to.y);
+            break;
+        default:
+            LV_LOG_ERROR("unknown point type: %d", type);
+            LV_ASSERT(false);
+            break;
+    }
+    LV_PROFILER_END;
+}
+
+#endif /* LV_USE_FREETYPE && LV_USE_NEMA_VG */
+
+
 static inline uint8_t _bpp_nema_gfx_format(lv_draw_glyph_dsc_t * glyph_draw_dsc)
 {
     uint32_t format = glyph_draw_dsc->g->format;
@@ -186,6 +326,15 @@ static void _draw_nema_gfx_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_
             lv_draw_nema_gfx_img(draw_unit, &img_dsc, glyph_draw_dsc->letter_coords);
 #endif
         }
+
+#if LV_USE_FREETYPE && LV_USE_NEMA_VG
+        else if(glyph_draw_dsc->format == LV_FONT_GLYPH_FORMAT_VECTOR) {
+            if(lv_freetype_is_outline_font(glyph_draw_dsc->g->resolved_font)) {
+                _draw_nema_gfx_outline(draw_unit, glyph_draw_dsc);
+            }
+        }
+#endif
+
     }
 
     if(fill_draw_dsc && fill_area) {
