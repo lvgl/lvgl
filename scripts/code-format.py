@@ -36,7 +36,7 @@ if args:
         elif arg == "src":
             include_src = True
         elif arg == "tests":
-            include_tests = False
+            include_tests = True
         else:
             print(f'Argument [{arg}] not recognized.')
             print('Usage:')
