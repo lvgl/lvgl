@@ -31,6 +31,7 @@ extern "C" {
 /**
  * Get the next line of text. Check line length and break chars too.
  * @param txt a '\0' terminated string
+ * @param len length of 'txt' in bytes
  * @param font pointer to a font
  * @param letter_space letter space
  * @param max_width max width of the text (break the lines to fit this size). Set COORD_MAX to avoid
@@ -41,7 +42,7 @@ extern "C" {
  * @return the index of the first char of the new line (in byte index not letter index. With UTF-8
  * they are different)
  */
-uint32_t lv_text_get_next_line(const char * txt, const lv_font_t * font, int32_t letter_space,
+uint32_t lv_text_get_next_line(const char * txt, uint32_t len, const lv_font_t * font, int32_t letter_space,
                                int32_t max_width, int32_t * used_width, lv_text_flag_t flag);
 
 /**

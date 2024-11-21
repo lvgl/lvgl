@@ -33,6 +33,7 @@ typedef struct {
     lv_draw_dsc_base_t base;
 
     const char * text;
+    uint32_t text_length;
     const lv_font_t * font;
     uint32_t sel_start;
     uint32_t sel_end;
