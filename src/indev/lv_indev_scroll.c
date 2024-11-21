@@ -639,10 +639,19 @@ static void scroll_limit_diff(lv_indev_t * indev, int32_t * diff_x, int32_t * di
 static int32_t elastic_diff(lv_obj_t * scroll_obj, int32_t diff, int32_t scroll_start, int32_t scroll_end,
                             lv_dir_t dir)
 {
+    if(diff == 0) return 0;
+
     /*Scroll back to the edge if required*/
     if(!lv_obj_has_flag(scroll_obj, LV_OBJ_FLAG_SCROLL_ELASTIC)) {
-        if(scroll_end + diff < 0) diff = - scroll_end;
-        if(scroll_start - diff < 0) diff = scroll_start;
+        /*
+         * If the scrolling object does not set the `LV_OBJ_FLAG_SCROLL_ELASTIC` flag,
+         * make sure that `diff` will not cause the scroll to exceed the `start` or `end` boundary of the content.
+         * If the content has exceeded the boundary due to external factors like `LV_SCROLL_SNAP_CENTER`,
+         * then respect the current position instead of going straight back to 0.
+         */
+        const int32_t scroll_ended = diff > 0 ? scroll_start : scroll_end;
+        if(scroll_ended < 0) diff = 0;
+        else if(scroll_ended - diff < 0) diff = scroll_ended;
     }
     /*Handle elastic scrolling*/
     else {
