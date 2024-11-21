@@ -1,6 +1,8 @@
 #include "lv_draw_dave2d.h"
 #if LV_USE_DRAW_DAVE2D
 
+#include "../../../misc/lv_area_private.h"
+
 void lv_draw_dave2d_line(lv_draw_dave2d_unit_t * u, const lv_draw_line_dsc_t * dsc)
 {
 
