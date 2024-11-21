@@ -72,7 +72,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-#if LV_DRAW_SW_SUPPORT_ARGB8888
+#if LV_DRAW_SW_SUPPORT_ARGB8888 || LV_DRAW_SW_SUPPORT_XRGB8888
 static void rotate90_argb8888(const uint32_t * src, uint32_t * dst, int32_t src_width, int32_t src_height,
                               int32_t src_stride,
                               int32_t dst_stride);
@@ -318,7 +318,7 @@ void lv_draw_sw_rotate(const void * src, void * dest, int32_t src_width, int32_t
  *   STATIC FUNCTIONS
  **********************/
 
-#if LV_DRAW_SW_SUPPORT_ARGB8888
+#if LV_DRAW_SW_SUPPORT_ARGB8888 || LV_DRAW_SW_SUPPORT_XRGB8888
 
 static void rotate270_argb8888(const uint32_t * src, uint32_t * dst, int32_t src_width, int32_t src_height,
                                int32_t src_stride,
