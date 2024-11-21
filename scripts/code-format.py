@@ -38,7 +38,6 @@ if args:
         elif arg == "tests":
             include_tests = False
         else:
-            arg_abort = True
             print(f'Argument [{arg}] not recognized.')
             print('Usage:')
             print('  python code-format.py [dir [dir ...]]')
