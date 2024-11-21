@@ -34,6 +34,7 @@
  *********************/
 #include "../../core/lv_refr.h"
 
+#if LV_USE_NEMA_GFX
 #if LV_USE_NEMA_VG
 
 #include "lv_nema_gfx_path.h"
@@ -146,4 +147,5 @@ void lv_nema_gfx_path_end(lv_nema_gfx_path_t * path)
 
 }
 
-#endif
+#endif  /*LV_USE_NEMA_VG*/
+#endif  /*LV_USE_NEMA_GFX*/

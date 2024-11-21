@@ -13,9 +13,11 @@
 
 #if LV_USE_FREETYPE
 
-#if LV_USE_NEMA_VG
-    #include "../../draw/nema_gfx/lv_nema_gfx_path.h"
-#endif
+#if LV_USE_NEMA_GFX
+    #if LV_USE_NEMA_VG
+        #include "../../draw/nema_gfx/lv_nema_gfx_path.h"
+    #endif  /*LV_USE_NEMA_VG*/
+#endif  /*LV_USE_NEMA_GFX*/
 
 /*********************
  *      DEFINES
@@ -358,6 +360,7 @@ static lv_freetype_outline_t outline_create(
         .delta = 0
     };
 
+#if LV_USE_NEMA_GFX
 #if LV_USE_NEMA_VG
     /*Calculate Total Segmenets Before decompose */
     int tag_size = face->glyph->outline.n_points;
@@ -388,7 +391,8 @@ static lv_freetype_outline_t outline_create(
     lv_nema_gfx_path_t * nema_gfx_path = (lv_nema_gfx_path_t *) param.outline;
     nema_gfx_path->data_size = vectors * 2;
     nema_gfx_path->seg_size = segments;
-#endif
+#endif  /*LV_USE_NEMA_VG*/
+#endif  /*LV_USE_NEMA_GFX*/
 
     /* Run outline decompose again to fill outline data */
     error = FT_Outline_Decompose(&face->glyph->outline, &outline_funcs, outline);

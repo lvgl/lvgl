@@ -42,6 +42,7 @@ extern "C" {
 
 #include "lv_draw_nema_gfx.h"
 
+#if LV_USE_NEMA_GFX
 #if LV_USE_NEMA_VG
 
 /**********************
@@ -87,6 +88,7 @@ void lv_nema_gfx_path_end(lv_nema_gfx_path_t * nema_gfx_path);
 
 
 #endif  /*LV_USE_NEMA_VG*/
+#endif  /*LV_USE_NEMA_GFX*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
