@@ -33,7 +33,7 @@ This prototype makes it easy to use most of the LVGL *set* functions directly or
   
   - most of the widget properties
   - functions that set :ref:`local style properties <style_local>`) directly on objects (needs a wrapper to set set the *selector*)
-  -  set properties on :cpp:type:`lv_style_t` objects (e.g. :ref:`shared styles <style_initialize>`)  (``lv_obj_report_style_change`` needs to be called to notify the widgets having the style)
+  - set properties on :cpp:type:`lv_style_t` objects (e.g. :ref:`shared styles <style_initialize>`)  (``lv_obj_report_style_change`` needs to be called to notify the widgets having the style)
 
 - ``lv_style_set_<property_name>(&style, <value>)``
 - ``lv_obj_set_<property_name>(widget, <value>)``
