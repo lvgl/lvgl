@@ -114,10 +114,10 @@ void lv_draw_nema_gfx_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_
 
 #if LV_USE_FREETYPE && LV_USE_NEMA_VG
     /*We need to initiallize in every new label task*/
-    static bool is_init = false;
-    if(!is_init) {
+    static bool is_inited = false;
+    if(!is_inited) {
         lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, draw_unit);
-        is_init = true;
+        is_inited = true;
     }
 #endif /* LV_USE_FREETYPE */
 
