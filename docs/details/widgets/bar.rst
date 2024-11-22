@@ -11,9 +11,6 @@ Overview
 The bar Widget has a background and an indicator. The length of the
 indicator against the background indicates the bar's current value.
 
-Vertical bars can be created if the width of the Widget is smaller than
-its height.
-
 Both the start and end values of the bar can be set.  Changing the start value to a
 value other than the minimum value in its range changes the start position of the indicator.
 
@@ -40,13 +37,13 @@ Usage
 Orientation and size
 --------------------
 
-- for orientation, width and height, simply set width and height style properties;
-- :cpp:expr:`lv_bar_set_orientation(slider, orientation)` to override orientation
+- for orientation, width and height, simply set width and height properties;
+- :cpp:expr:`lv_bar_set_orientation(bar, orientation)` to override orientation
   caused by ``width`` and ``height``.  Valid values for ``orientation`` are:
 
-  - LV_BAR_ORIENTATION_AUTO,
-  - LV_BAR_ORIENTATION_HORIZONTAL,
-  - LV_BAR_ORIENTATION_VERTICAL.
+  - :cpp:enumerator:`LV_BAR_ORIENTATION_AUTO`
+  - :cpp:enumerator:`LV_BAR_ORIENTATION_HORIZONTAL`
+  - :cpp:enumerator:`LV_BAR_ORIENTATION_VERTICAL`
 
 
 Value and range
@@ -62,7 +59,6 @@ bottom to top in vertical mode. If the minimum value is greater than the maximum
 
 The new value in :cpp:func:`lv_bar_set_value` can be set with or without an
 animation depending on the last parameter (``LV_ANIM_ON/OFF``).
-
 
 Modes
 -----
