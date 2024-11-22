@@ -76,6 +76,14 @@ void lv_indev_scroll_handler(lv_indev_t * indev)
         parent = lv_obj_get_parent(parent);
     }
 
+    if(scale_x == 0) {
+        scale_x = 1;
+    }
+
+    if(scale_y == 0) {
+        scale_y = 1;
+    }
+
     if(angle != 0 || scale_x != LV_SCALE_NONE || scale_y != LV_SCALE_NONE) {
         angle = -angle;
         scale_x = (256 * 256) / scale_x;
@@ -290,6 +298,14 @@ lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev)
             scale_x = (scale_x * zoom_act_x) >> 8;
             scale_y = (scale_y * zoom_act_y) >> 8;
             parent = lv_obj_get_parent(parent);
+        }
+
+        if(scale_x == 0) {
+            scale_x = 1;
+        }
+
+        if(scale_y == 0) {
+            scale_y = 1;
         }
 
         lv_point_t obj_scroll_sum = indev->pointer.scroll_sum;
