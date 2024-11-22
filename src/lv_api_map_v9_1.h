@@ -27,11 +27,6 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-static inline void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month)
-{
-    lv_calendar_set_month_shown(obj, year, month);
-}
-
 /**********************
  *      MACROS
  **********************/
@@ -84,6 +79,7 @@ static inline void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, ui
 
 #define _lv_inv_area lv_inv_area
 #define lv_chart_set_all_value lv_chart_set_all_values
+#define lv_calendar_set_showed_date lv_calendar_set_month_shown
 
 /**********************
  * DEPRECATED FUNCTIONS
