@@ -1,0 +1,27 @@
+<!--
+Example
+<lv_slider mode="range" value="30"/>
+ -->
+
+<widget>
+	<api>
+	    <enumdef name="lv_slider_mode">
+	        <enum name="normal" help="Normal left to right slider"/>
+	        <enum name="range" help="Two knobs with to set a range"/>
+	        <enum name="symmetrical" help="The indicaror is grwing from zero"/>
+	    </enumdef>
+	    <prop name="range" type="int">
+	    	<param name="range_min" type="int"/>
+	    	<param name="range_max" type="int"/>
+	    </prop>
+
+	    <prop name="value" type="int">
+	    	<param name="range_min" type="int"/>
+	    	<param name="anim" type="bool" default="false"/>
+	    </prop>
+
+	    <prop name="mode" type="enum:lv_slider_mode">
+	    	<param name="range_min" type="int"/>
+	    </prop>
+	</api>
+</widget>

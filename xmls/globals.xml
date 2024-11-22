@@ -1,0 +1,45 @@
+<const name="size_content" help="Involve all children"/>
+
+<api>
+    <enumdef name="lv_style_state">
+        <enum name="default" help="Some help"/>
+        <enum name="pressed" help="Some help"/>
+        <enum name="checked" help="Some help"/>
+    </enumdef>
+    <enumdef name="lv_style_part">
+        <enum name="main" help="Some help"/>
+        <enum name="scrollbar" help="Some help"/>
+        <enum name="indicator" help="Some help"/>
+        <enum name="knob" help="Some help"/>
+    </enumdef>
+    <enumdef name="lv_align">
+        <enum name="top_left" help="Some help"/>
+        <enum name="bottom_right" help="Some help"/>
+        <enum name="center" help="Some help"/>
+    </enumdef>
+    <enumdef name="lv_dir">
+        <enum name="top" help="Some help"/>
+        <enum name="bottom" help="Some help"/>
+        <enum name="left" help="Some help"/>
+        <enum name="right" help="Some help"/>
+    </enumdef>
+    <enumdef name="lv_flex_flow">
+            <enum name="row"            		help="In a row"/>
+            <enum name="row_wrap"       		help="In rows and wrap"/>
+            <enum name="row_reverse"    		help="In a row with reverse"/>
+            <enum name="row_wrap_reverse"   	help="In rows with wrap and reverse"/>
+            <enum name="column"         		help="In a column"/>
+            <enum name="column_wrap"    		help="In columns and wrap"/>
+            <enum name="column_reverse"         help="In a column with reverse"/>
+            <enum name="column_wrap_reverse"    help="In columns with wrap and reverse"/>
+    </enumdef>
+    <enumdef name="lv_flex_align">
+            <enum name="center"         help=""/>
+            <enum name="start"    		help=""/>
+            <enum name="end"       		help=""/>
+            <enum name="space_around"  	help=""/>
+            <enum name="space_between"  help=""/>
+             <enum name="space_evenly"  help=""/>
+    </enumdef>
+
+</api>

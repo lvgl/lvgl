@@ -28,6 +28,7 @@ extern "C" {
 #include "src/others/ime/lv_ime_pinyin_private.h"
 #include "src/others/fragment/lv_fragment_private.h"
 #include "src/others/observer/lv_observer_private.h"
+#include "src/others/xml/lv_xml_private.h"
 #include "src/libs/qrcode/lv_qrcode_private.h"
 #include "src/libs/barcode/lv_barcode_private.h"
 #include "src/libs/gif/lv_gif_private.h"

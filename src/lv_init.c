@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "others/sysmon/lv_sysmon_private.h"
 #include "misc/lv_timer_private.h"
 #include "misc/lv_profiler_builtin_private.h"
 #include "misc/lv_anim_private.h"
@@ -39,6 +38,8 @@
 #include "themes/simple/lv_theme_simple.h"
 #include "misc/lv_fs.h"
 #include "osal/lv_os_private.h"
+#include "others/sysmon/lv_sysmon_private.h"
+#include "others/xml/lv_xml.h"
 
 #if LV_USE_NEMA_GFX
     #include "draw/nema_gfx/lv_draw_nema_gfx.h"
@@ -355,6 +356,10 @@ void lv_init(void)
      *it's superior to any other */
 #if LV_USE_FFMPEG
     lv_ffmpeg_init();
+#endif
+
+#if LV_USE_XML
+    lv_xml_init();
 #endif
 
     lv_initialized = true;

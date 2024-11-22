@@ -1,0 +1,38 @@
+<!--
+Example
+<lv_bar mode="symmetrical" angles="100° 200°" bg_angles="30° 150° range="40 100" value="60"/>
+-->
+
+<widget>
+	<api>
+		<enumdef name="lv_bar_mode" help="the mode">
+			<enum name="normal" help="normal"/>
+			<enum name="symmetrical" help="sym"/>
+			<enum name="range" help="range"/>
+		</enumdef>
+
+		<enumdef name="bar_orientation" help="">
+			<enum name="auto" help=""/>
+			<enum name="horizontal" help=""/>
+			<enum name="vertical" help=""/>
+		</enumdef>
+
+	    <prop name="range" help="The range">
+	    	<param name ="min" type="int" help="The min range"/>
+	    	<param name ="max" type="int" help="The max range"/>
+	   	</prop>
+
+	    <prop name="value" help="The current value">
+	    	<param name ="value" type="int" help="The current value"/>
+	    	<param name ="animated" type="bool" help="Set the value with animation" optional="true" default="false"/>
+	   	</prop>
+
+	    <prop name="mode" help="The mode">
+	    	<param name="mode" type="enum:lv_bar_mode"/>
+	   	</prop>
+
+	    <prop name="orientation" help="Orientation">
+	    	<param name="mode" type="enum:lv_bar_orientation"/>
+	   	</prop>
+	</api>
+</widget>
