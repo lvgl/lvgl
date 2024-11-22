@@ -78,22 +78,11 @@ There are two ways to provide this information to LVGL:
         called from an interrupt if writing to a ``uint32_t`` value is atomic on your
         platform.  See below and the :ref:`threading` section to learn more.
 
-Either way, it is up to the system designer to ensure that the tick value can never
-be read when it is in a partially-written state.  Whether this is because ``uint32_t``
-values are :ref:`atomic <atomic>` on your platform, or because the value is protected
-from being seen in a partially-written state with a MUTEX or other mechanism, it is
-vital that this value can never be used by LVGL in a corrupted state.
-
-If writing a ``uint32_t`` value is not :ref:`atomic <atomic>` on your system (e.g. if
-it is on a 16-bit platform and writing a ``uint32_t`` requires two [2] machine
-intructions to write), then it is up to you to protect that value from being seen in
-a partially-written state.
-
-Assuming your elapsed-milliseconds value is updated in an interrupt service routine
-(ISR), an example of one way of doing this on a microcontroller that uses the Harvard
-instruction set (as do most 16-bit PIC microcontrollers), is using the ``disi``
-assembly instruction that disables interrupts for a specified number of clock cycles.
-Example:
+Either way, the writing of the ``uint32_t`` Tick value must be :ref:`atomic <atomic>`,
+which is usually the case with a 32- or 64-bit platform.  If you are using a 16-bit
+system (causing the update of the Tick value to not be atomic) and your platform uses
+the Harvard instruction set, you can set a function like this as the callback passed
+to :cpp:expr:`lv_tick_set_cb(my_get_milliseconds)`:
 
 .. code-block:: c
 

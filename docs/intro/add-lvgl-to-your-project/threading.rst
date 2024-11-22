@@ -16,12 +16,12 @@ Thread
     In "bare-metal" implementations (i.e. no OS), threads include:
 
     - the main thread executing a while(1) loop that runs the system, and
-    - interrupts.
+    - interrupt service routines (ISRs).
 
     When running under an OS, threads include:
 
     - each task (or process),
-    - interrupts, and
+    - ISRs, and
     - advanced OSes can have multiple "execution threads" within a processes.
 
 .. _atomic operation:
