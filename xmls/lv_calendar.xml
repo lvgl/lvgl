@@ -1,0 +1,36 @@
+<!--
+Example
+<lv_calendar src="img1 img2" duration="300" repeat_count="3"/>
+-->
+
+<widget>
+	<api>
+	    <prop name="today_date" help="Current date">
+	    	<param name="year" type="int" help=""/>
+	    	<param name="month" type="int" help=""/>
+	    	<param name="day" type="int" help=""/>
+	    </prop>
+	    <prop name="shown_date" help="Shown date">
+	    	<param name="year" type="int" help=""/>
+	    	<param name="month" type="int" help=""/>
+	    	<param name="day" type="int" help=""/>
+	    </prop>
+	    <prop name="shown_date" help="Shown date">
+	    	<param name="year" type="int" help=""/>
+	    	<param name="month" type="int" help=""/>
+	    	<param name="day" type="int" help=""/>
+	    </prop>
+	    <prop name="day_names" help="set the names for the days">
+	    	<param name="names" type="string[7]" help="the 7 day names as an array"/>
+	    </prop>
+	    <prop name="chinese_mode" help="">
+		    <param name="enable" type="bool" help=""/>
+	    </prop>
+		<element name="header_arrow" access="explicit" help=""/>
+		<element name="header_dropdown" access="explicit" help="">
+			<prop name="year_list">
+				<param name="list" type="string" />
+			</prop>
+		</element>
+	</api>
+</widget>

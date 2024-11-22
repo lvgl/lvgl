@@ -1076,10 +1076,13 @@
 #define LV_USE_FONT_MANAGER                     0
 #if LV_USE_FONT_MANAGER
 
-/*Font manager name max length*/
+/**Font manager name max length*/
 #define LV_FONT_MANAGER_NAME_MAX_LEN            32
 
 #endif
+
+/** Enable loading XML UIs runtime */
+#define LV_USE_XML	0
 
 /*==================
  * DEVICES

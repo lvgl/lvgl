@@ -1,0 +1,71 @@
+<!--
+Example
+<lv_obj width="100" add_flag="hidden"/>
+ -->
+
+<widget>
+	<api>
+	    <prop name="name">
+	    	<param name="text"  type="string"/>
+	   	</prop>
+
+	    <prop name="store">
+	    	<param name="en"  type="bool"/>
+	   	</prop>
+
+	    <prop name="x">
+	    	<param name="value"  type="px|%"/>
+	   	</prop>
+
+	    <prop name="y">
+	    	<param name="value"  type="px|%"/>
+	   	</prop>
+
+	    <prop name="width">
+	    	<param name="value"  type="px|%"/>
+	   	</prop>
+
+	    <prop name="height">
+	    	<param name="value"  type="px|%"/>
+	   	</prop>
+
+	    <prop name="align">
+	    	<param name="value"  type="align"/>
+	   	</prop>
+
+	    <prop name="styles">
+	    	<param name="styles"  type="styles[]"/>
+	   	</prop>
+
+	    <prop name="style_bg_color">
+	    	<param name="color"  type="color"/>
+	   	</prop>
+	    <prop name="style_border_color">
+	    	<param name="color"  type="color"/>
+	   	</prop>
+	    <prop name="style_border_width">
+	    	<param name="width"  type="int"/>
+	   	</prop>
+	    <prop name="style_text_color">
+	    	<param name="color"  type="color"/>
+	   	</prop>
+	    <prop name="style_radius">
+	    	<param name="radius"  type="int"/>
+	   	</prop>
+	    <prop name="style_radius">
+	    	<param name="radius"  type="int"/>
+	   	</prop>
+
+	    <prop name="clickable">
+	    	<param name="value" type="bool"/>
+	   	</prop>
+
+	    <prop name="scrollable">
+	    	<param name="value" type="bool"/>
+	   	</prop>
+
+	    <prop name="checkable">
+	    	<param name="value" type="bool"/>
+	   	</prop>
+	</api>
+</widget>

@@ -1,0 +1,24 @@
+<!--
+Example
+<lv_dropdown options="option1\noption2" dir="left">
+	<lv_dropdown-list style="red"/>
+</lv_dropdown>
+-->
+
+<widget>
+	<api>
+	    <prop name="text" help="Show it instead of the selected options">
+	    	<param name="text" type="string" help=""/>
+	    </prop>
+	    <prop name="options" help="The options as a \n separated string">
+	    	<param name="text" type="string" help=""/>
+	    </prop>
+	    <prop name="selected" help="The index of the selected option">
+	    	<param name="idx" type="int" help=""/>
+	    </prop>
+	    <prop name="symbol" help="The symbol, usually a caret">
+	    	<param name="img_src" type="simg_src" help=""/>
+	    </prop>
+	    <element name="list" access="get" help=""/>
+	</api>
+</widget>

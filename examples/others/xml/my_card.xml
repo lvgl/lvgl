@@ -1,0 +1,23 @@
+<component>
+	<consts>
+		<px name="size" value="100%"/>
+	</consts>
+
+	<api>
+		<prop name="title" type="string" default="No title"/>
+		<prop name="action" type="string" default="No action"/>
+		<prop name="bg_color" type="color" default="0xcccccc"/>
+		<prop name="btn_rel_style" type="style" />
+		<prop name="btn_pr_style" type="style" />
+	</api>
+
+	<styles>
+		<style name="gray" bg_color="0x888888"/>
+		<style name="blue" bg_color="0x0000ff"/>
+	</styles>
+
+	<view extends="lv_obj" style_radius="3" width="#size" height="content" style_bg_color="$bg_color" >
+		<lv_label text="$title" align="left_mid"/>
+		<my_button styles="$btn_rel_style $btn_pr_style:pressed" btn_text="$action" align="right_mid"/>
+	</view>
+</component>
