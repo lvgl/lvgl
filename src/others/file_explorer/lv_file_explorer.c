@@ -534,7 +534,7 @@ static void browser_file_event_handler(lv_event_t * e)
             else { /* Nothing to do*/ }
         }
 
-        // Navigate to the file path if this is a directory
+        /* Navigate to the file path if this is a directory */
         if(file_entry_user_data->file_kind == FILE_KIND_DIR) {
             lv_fs_dir_t dir;
             lv_fs_res_t res = lv_fs_dir_open(&dir, file_name);
