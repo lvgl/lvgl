@@ -183,6 +183,89 @@ lv_event_code_t lv_event_get_code(lv_event_t * e)
     return e->code & ~LV_EVENT_PREPROCESS;
 }
 
+const char* lv_event_code_get_name(lv_event_code_t code)
+{
+    switch(code & ~LV_EVENT_PREPROCESS)
+    {
+        case LV_EVENT_ALL:                  return "ALL";
+
+                                            /* Input device events*/
+        case LV_EVENT_PRESSED:              return "PRESSED";
+        case LV_EVENT_PRESSING:             return "PRESSING";
+        case LV_EVENT_PRESS_LOST:           return "PRESS_LOST";
+        case LV_EVENT_SHORT_CLICKED:        return "SHORT_CLICKED";
+        case LV_EVENT_LONG_PRESSED:         return "LONG_PRESSED";
+        case LV_EVENT_LONG_PRESSED_REPEAT:  return "LONG_PRESSED_REPEAT";
+        case LV_EVENT_CLICKED:              return "CLICKED";
+        case LV_EVENT_RELEASED:             return "RELEASED";
+        case LV_EVENT_SCROLL_BEGIN:         return "SCROLL_BEGIN";
+        case LV_EVENT_SCROLL_THROW_BEGIN:   return "SCROLL_THROW_BEGIN";
+        case LV_EVENT_SCROLL_END:           return "SCROLL_END";
+        case LV_EVENT_SCROLL:               return "SCROLL";
+        case LV_EVENT_GESTURE:              return "GESTURE";
+        case LV_EVENT_KEY:                  return "KEY";
+        case LV_EVENT_ROTARY:               return "ROTARY";
+        case LV_EVENT_FOCUSED:              return "FOCUSED";
+        case LV_EVENT_DEFOCUSED:            return "DEFOCUSED";
+        case LV_EVENT_LEAVE:                return "LEAVE";
+        case LV_EVENT_HIT_TEST:             return "HIT_TEST";
+        case LV_EVENT_INDEV_RESET:          return "INDEV_RESET";
+        case LV_EVENT_HOVER_OVER:           return "HOVER_OVER";
+        case LV_EVENT_HOVER_LEAVE:          return "HOVER_LEAVE";
+
+                                            /* Drawing events*/
+        case LV_EVENT_COVER_CHECK:          return "COVER_CHECK";
+        case LV_EVENT_REFR_EXT_DRAW_SIZE:   return "REFR_EXT_DRAW_SIZE";
+        case LV_EVENT_DRAW_MAIN_BEGIN:      return "DRAW_MAIN_BEGIN";
+        case LV_EVENT_DRAW_MAIN:            return "DRAW_MAIN";
+        case LV_EVENT_DRAW_MAIN_END:        return "DRAW_MAIN_END";
+        case LV_EVENT_DRAW_POST_BEGIN:      return "DRAW_POST_BEGIN";
+        case LV_EVENT_DRAW_POST:            return "DRAW_POST";
+        case LV_EVENT_DRAW_POST_END:        return "DRAW_POST_END";
+        case LV_EVENT_DRAW_TASK_ADDED:      return "DRAW_TASK_ADDED";
+
+                                            /* Special events*/
+        case LV_EVENT_VALUE_CHANGED:        return "VALUE_CHANGED";
+        case LV_EVENT_INSERT:               return "INSERT";
+        case LV_EVENT_REFRESH:              return "REFRESH";
+        case LV_EVENT_READY:                return "READY";
+        case LV_EVENT_CANCEL:               return "CANCEL";
+
+                                            /* Other events*/
+        case LV_EVENT_CREATE:               return "CREATE";
+        case LV_EVENT_DELETE:               return "DELETE";
+        case LV_EVENT_CHILD_CHANGED:        return "CHILD_CHANGED";
+        case LV_EVENT_CHILD_CREATED:        return "CHILD_CREATED";
+        case LV_EVENT_CHILD_DELETED:        return "CHILD_DELETED";
+        case LV_EVENT_SCREEN_UNLOAD_START:  return "SCREEN_UNLOAD_START";
+        case LV_EVENT_SCREEN_LOAD_START:    return "SCREEN_LOAD_START";
+        case LV_EVENT_SCREEN_LOADED:        return "SCREEN_LOADED";
+        case LV_EVENT_SCREEN_UNLOADED:      return "SCREEN_UNLOADED";
+        case LV_EVENT_SIZE_CHANGED:         return "SIZE_CHANGED";
+        case LV_EVENT_STYLE_CHANGED:        return "STYLE_CHANGED";
+        case LV_EVENT_LAYOUT_CHANGED:       return "LAYOUT_CHANGED";
+        case LV_EVENT_GET_SELF_SIZE:        return "GET_SELF_SIZE";
+
+                                            /* Events of optional LVGL components*/
+        case LV_EVENT_INVALIDATE_AREA:      return "INVALIDATE_AREA";
+        case LV_EVENT_RESOLUTION_CHANGED:   return "RESOLUTION_CHANGED";
+        case LV_EVENT_COLOR_FORMAT_CHANGED: return "COLOR_FORMAT_CHANGED";
+        case LV_EVENT_REFR_REQUEST:         return "REFR_REQUEST";
+        case LV_EVENT_REFR_START:           return "REFR_START";
+        case LV_EVENT_REFR_READY:           return "REFR_READY";
+        case LV_EVENT_RENDER_START:         return "RENDER_START";
+        case LV_EVENT_RENDER_READY:         return "RENDER_READY";
+        case LV_EVENT_FLUSH_START:          return "FLUSH_START";
+        case LV_EVENT_FLUSH_FINISH:         return "FLUSH_FINISH";
+        case LV_EVENT_FLUSH_WAIT_START:     return "FLUSH_WAIT_START";
+        case LV_EVENT_FLUSH_WAIT_FINISH:    return "FLUSH_WAIT_FINISH";
+
+        case LV_EVENT_VSYNC:                return "VSYNC";
+
+        default:                            return "unknown";
+    }
+}
+
 void * lv_event_get_param(lv_event_t * e)
 {
     return e->param;

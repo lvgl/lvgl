@@ -161,6 +161,13 @@ void * lv_event_get_current_target(lv_event_t * e);
 lv_event_code_t lv_event_get_code(lv_event_t * e);
 
 /**
+ * Get the event code's name
+ * @param code  the event code. (E.g. `LV_EVENT_CLICKED`, `LV_EVENT_FOCUSED`, etc)
+ * @return null terminated string of event code name.
+ */
+const char* lv_event_code_get_name(lv_event_code_t code);
+
+/**
  * Get the parameter passed when the event was sent
  * @param e     pointer to the event descriptor
  * @return      pointer to the parameter
