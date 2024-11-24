@@ -44,7 +44,7 @@ void lv_example_style_17(void)
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_obj_set_width(label, LV_PCT(80));
     lv_label_set_text(label, "LV_USE_DRAW_SW_COMPLEX_GRADIENTS is not enabled");
-    lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_label_set_long_mode(label, LV_LABEL_LONG_MODE_SCROLL_CIRCULAR);
     lv_obj_center(label);
 }
 
