@@ -8,18 +8,19 @@ Drawing Pipeline
 Overview
 ********
 
-Drawing is computing pixel colors and writing them into a buffer where they will be
-delivered to a display panel as pixels.
+Drawing is writing pixel colors into a buffer where they will be delivered to a
+display panel as pixels.  Sometimes it involves computing those colors before they
+are written (e.g. combining them with other colors when an object has partial opacity).
 
-On modern computing hardware, there can sometimes be options for different ways
-drawing can be accomplished.  For example, some MCUs come with hardware that is
-very good (and fast) at certain types of drawing tasks.  Alternatively, you might
-have access to a drawing library that performs certain types of drawing tasks with
-great efficiency.  To make it possible to utilize such facilities in the most
-efficient fashion, LVGL v9 and onwards implements a "Drawing Pipeline", like an
-assembly line, where decisions are made as to which drawing tasks drawing tasks
-(:ref:`Draw Tasks`) are given to which "logic entities" (:ref:`Draw Units`) in order
-to be carried out.
+On modern computing hardware meant to be used with larger display panels, there are
+sometimes options for different ways drawing can be accomplished.  For example, some
+MCUs come with hardware that is very good (and fast) at certain types of drawing
+tasks.  Alternatively, you might have access to a drawing library that performs
+certain types of drawing tasks with great efficiency.  To make it possible to utilize
+such facilities in the most efficient fashion, LVGL v9 and onwards implements a
+"Drawing Pipeline", like an assembly line, where decisions are made as to which
+drawing tasks drawing tasks (:ref:`Draw Tasks`) are given to which "logic entities"
+(:ref:`Draw Units`) in order to be carried out.
 
 This Pipeline is designed so that it is both flexible and extendable.  As a
 programmer, you can hook into it in order to provide LVGL with guidance as to what
@@ -32,11 +33,11 @@ software rendering logic to any degree you choose.
 Draw Tasks
 ----------
 
-A "Draw Task" is a package of information that is created at the beginning
-of the Drawing Pipeline when a request to draw is made.  Functions such as
-:cpp:expr:`lv_draw_rect()` and :cpp:expr:`lv_draw_label()` create one or more Draw
-Tasks and pass them down the Drawing Pipeline.  Each Draw Task carries all the
-information required to:
+A "Draw Task" (:cpp:type:`lv_draw_task_t`) is a package of information that is
+created at the beginning of the Drawing Pipeline when a request to draw is made.
+Functions such as :cpp:expr:`lv_draw_rect()` and :cpp:expr:`lv_draw_label()` create
+one or more Draw Tasks and pass them down the Drawing Pipeline.  Each Draw Task
+carries all the information required to:
 
 - compute which :ref:`Draw Unit <draw units>` should receive this task, and
 - give the Draw Unit all the details required accomplish the drawing task.
@@ -54,10 +55,6 @@ A Draw Task carries the following information:
   to software rendering (more on this below)
 - next:  a link to the next drawing task in the list.
 
-If you are familiar with OpenGL, you can see this begins to resemble the information
-packages delivered to OpenGL, which then takes over and accomplishes the drawing
-with the available drawing resources.
-
 Draw Tasks are collected in a list and periodically dispatched to Draw Units.
 
 
@@ -66,9 +63,10 @@ Draw Tasks are collected in a list and periodically dispatched to Draw Units.
 Draw Units
 ----------
 
-A "Draw Unit" is any "logic entity" that can generate the output required by a
-:ref:`Draw Task <draw tasks>`.  This can be a CPU core, a GPU, a new rendering library
-for certain (or all) Draw Tasks, or anything that can accomplish drawing.
+A "Draw Unit" (based on :cpp:type:`lv_draw_unit_t`) is any "logic entity" that can
+generate the output required by a :ref:`Draw Task <draw tasks>`.  This can be a CPU
+core, a GPU, a new rendering library for certain (or all) Draw Tasks, or anything
+that can accomplish drawing.
 
 During LVGL's initialization (:cpp:func:`lv_init`), a list of Draw Units is created.
 If :c:macro:`LV_USE_DRAW_SW` is set to ``1`` in ``lv_conf.h`` (it is by default), the
@@ -133,18 +131,18 @@ Dispatching
 -----------
 
 While collecting Draw Tasks LVGL frequently dispatches the collected Draw Tasks to
-the assigned Draw Units. This is handled via the ``dispatch_cb`` of the Draw Units.
+their assigned Draw Units. This is handled via the ``dispatch_cb`` of the Draw Units.
 
-If a Draw Unit is busy with another Draw Task, it just returns. However, it is
+If a Draw Unit is busy with another Draw Task, it just returns. However, if it is
 available it can take a Draw Task.
 
 :cpp:expr:`lv_draw_get_next_available_task(layer, previous_task, draw_unit_id)` is a
 useful helper function which is used by the ``dispatch_cb`` to get the next Draw Task
 it should act on.  If it handled the task, it sets the Draw Task's ``state`` field to
-:cpp:enumerator:`LV_DRAW_TASK_STATE_READY` (meaning "completed").
-available Draw Task.  "Available" means that has been queued and assigned to a given
-Draw Unit and is ready to be carried out.  The ramifications of having multiple
-drawing threads are taken into account for this.
+:cpp:enumerator:`LV_DRAW_TASK_STATE_READY` (meaning "completed").  "Available" in
+this context means that has been queued and assigned to a given Draw Unit and is
+ready to be carried out.  The ramifications of having multiple drawing threads are
+taken into account for this.
 
 
 Layers
@@ -155,8 +153,8 @@ display has a "main" layer, but during rendering additional layers might be crea
 internally to handle for example arbitrary Widget transformations.
 
 
-Hierarchy of Objects
---------------------
+Object Hierarchy
+----------------
 
 All of the above have this relationship at run time:
 
