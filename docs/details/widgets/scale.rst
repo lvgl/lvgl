@@ -55,8 +55,14 @@ be any of these values:
 Setting range
 -------------
 
-A Scale starts its life with a default range of [0..100].  You can change this
-range with :cpp:expr:`lv_scale_set_range(scale, min, max)`.
+A Scale starts its life with a default numeric range of [0..100] and a default
+angular range of 270.  You can change these ranges with:
+
+- :cpp:expr:`lv_scale_set_range(scale, min, max)`, and
+- :cpp:expr:`lv_scale_set_angle_range(scale, angle_range)`
+
+where ``min`` and ``max`` will become the numeric low and high values for the Scale,
+and ``angle_range`` is the angle between the low end and the high end of the Scale.
 
 
 Tick drawing order
