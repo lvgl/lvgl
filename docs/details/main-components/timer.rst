@@ -4,25 +4,43 @@
 Timer (lv_timer)
 ================
 
-LVGL has a built-in timer system. You can register a function to have it
-be called periodically. The timers are handled and called in
+LVGL has a built-in Timer system. You can register a function to have it
+be called periodically. The Timers are handled and called in
 :cpp:func:`lv_timer_handler`, which needs to be called every few milliseconds.
 See :ref:`timer_handler` for more information.
 
-Timers are non-preemptive, which means a timer cannot interrupt another
-timer. Therefore, you can call any LVGL related function in a timer.
+By default, LVGL itself uses Timers to:
 
-Create a timer
-**************
+- refresh each display --- during the creation of each :ref:`Display`, a Timer is
+  created for that Display.  that Timer refreshes the display based on the configured
+  value of :c:macro:`LV_DEF_REFR_PERIOD`, and also sends all display-related events,
+  like :cpp:enumerator:`LV_EVENT_REFR_START`, :cpp:enumerator:`LV_EVENT_REFR_READY`,
+  etc.
+- read input devices --- during the creation of each :ref:`indev`, a Timer is
+  created for that Input Device based on the configured value of
+  :c:macro:`LV_DEF_REFR_PERIOD`.  That Timer causes that input device to be read and
+  also sends all input-device-related events, like :cpp:enumerator:`LV_EVENT_CLICKED`,
+  :cpp:enumerator:`LV_EVENT_PRESSED`, etc.
+- update system-monitor values --- during LVGL initialization, a Timer is created
+  based on the configured value of :c:macro:`LV_SYSMON_REFR_PERIOD_DEF` that updates
+  the state of LVGL's memory heap.
 
-To create a new timer, use
-:cpp:expr:`lv_timer_create(timer_cb, period_ms, user_data)`. It will create an
-:cpp:type:`lv_timer_t` ``*`` variable, which can be used later to modify the
-parameters of the timer. :cpp:func:`lv_timer_create_basic` can also be used.
-This allows you to create a new timer without specifying any parameters.
+Timers are non-preemptive, which means a Timer cannot interrupt another
+Timer. Therefore, you can call any LVGL related function in a Timer.
 
-A timer callback should have a ``void (*lv_timer_cb_t)(lv_timer_t *)``
-prototype.
+
+
+Creating a Timer
+****************
+
+To create a new Timer, use
+:cpp:expr:`lv_timer_create(timer_cb, period_ms, user_data)`. It returns an
+:cpp:type:`lv_timer_t` ``*`` which can be used later to modify the
+parameters of the Timer, pause it, or delete it when it is no longer needed.
+:cpp:func:`lv_timer_create_basic` can also be used to create a new Timer without
+specifying any parameters.
+
+A Timer callback should have this prototype:  ``void (*lv_timer_cb_t)(lv_timer_t *)``.
 
 For example:
 
@@ -37,7 +55,7 @@ For example:
      /* Do something with LVGL */
      if(something_happened) {
        something_happened = false;
-       lv_button_create(lv_screen_active(), NULL);
+       lv_button_create(lv_screen_active());
      }
    }
 
@@ -46,74 +64,110 @@ For example:
    static uint32_t user_data = 10;
    lv_timer_t * timer = lv_timer_create(my_timer, 500,  &user_data);
 
+
+
 Ready and Reset
 ***************
 
-:cpp:expr:`lv_timer_ready(timer)` makes a timer run on the next call of
+:cpp:expr:`lv_timer_ready(timer)` makes a Timer run on the next call of
 :cpp:func:`lv_timer_handler`.
 
-:cpp:expr:`lv_timer_reset(timer)` resets the period of a timer. It will be
-called again after the defined period of milliseconds has elapsed.
+:cpp:expr:`lv_timer_reset(timer)` resets the period of a Timer. It will be
+called again after its currently-set period (in milliseconds) has elapsed.
 
-Set parameters
-**************
 
-You can modify some timer parameters later:
 
-- :cpp:expr:`lv_timer_set_cb(timer, new_cb)`
-- :cpp:expr:`lv_timer_set_period(timer, new_period)`
-
-Repeat count
-************
-
-You can make a timer repeat only a given number of times with
-:cpp:expr:`lv_timer_set_repeat_count(timer, count)`. The timer will
-automatically be deleted after it's called the defined number of times.
-Set the count to ``-1`` to repeat indefinitely.
-
-Enable and Disable
+Setting Parameters
 ******************
 
-You can enable or disable a timer with :cpp:expr:`lv_timer_enable(en)`.
+You can modify these Timer parameters at any time during its life:
+
+- :cpp:expr:`lv_timer_set_cb(timer, new_cb)`
+- :cpp:expr:`lv_timer_set_period(timer, new_period_ms)`
+- :cpp:expr:`lv_timer_set_user_data(timer, user_data)`
+
+
+
+Repeat Count
+************
+
+When a Timer is created, its repeat-count is set to ``-1`` to cause it to repeat
+indefinitely.  You can make a Timer repeat only a given number of times with
+:cpp:expr:`lv_timer_set_repeat_count(timer, count)`.  By default, once the Timer has
+run ``count`` times, it will be automatically deleted.
+
+You can use :cpp:expr:`lv_timer_set_auto_delete(timer, false)` if you want the timer
+to instead be paused after it has run ``count`` times.  This can be handy if you
+reuse that timer repeatedly and want to avoid the CPU and :cpp:func:`lv_malloc`
+overhead of repeatedly creating and deleting a timer.  If you use this option, you
+will need to set its repeat count (to either ``-1`` or a positive repeat count, since
+it will have decremented to ``0``) and :ref:`resume <timer_pause_and_resume>` it to
+make it active again.
+
+
+
+.. _timer_pause_and_resume:
 
 Pause and Resume
 ****************
 
-:cpp:expr:`lv_timer_pause(timer)` pauses the specified timer.
+:cpp:expr:`lv_timer_pause(timer)` pauses the specified Timer.
 
-:cpp:expr:`lv_timer_resume(timer)` resumes the specified timer.
+:cpp:expr:`lv_timer_resume(timer)` resumes the specified Timer.
 
-Measure idle time
-*****************
+
+
+Measuring Idle Time
+*******************
 
 You can get the idle percentage time of :cpp:func:`lv_timer_handler` with
 :cpp:func:`lv_timer_get_idle`. Note that, it doesn't measure the idle time of
-the overall system, only :cpp:func:`lv_timer_handler`. It can be misleading if
-you use an operating system and call :cpp:func:`lv_timer_handler` in a timer, as
-it won't actually measure the time the OS spends in an idle thread.
+the overall system, only :cpp:func:`lv_timer_handler`.  This can be misleading if
+you are using an operating system, as it does not actually measure the time the OS
+spends in an idle thread.
 
-Timer handler resume callback
+
+
+Enable and Disable
+******************
+
+You can enable or disable the entire Timer system with :cpp:expr:`lv_timer_enable(en)`.
+
+
+
+Timer Handler Resume Callback
 *****************************
 
-When the `lv_timer_handler` is stopped, if you want to pay attention to the wake-up
-timing of the `lv_timer_handler`, you can set a resume callback using
-:cpp:expr:`lv_timer_handler_set_resume_cb(cb, user_data)`.
-The callback should have a ``void (*lv_timer_handler_resume_cb_t)(void*)`` prototype.
+When the Timer system has been disabled (causing :cpp:func:`lv_timer_handler` to
+return early before it has processed any timers), if you want to take some action
+when the Timer system is re-enabled again, set a resume callback using
+:cpp:expr:`lv_timer_handler_set_resume_cb(cb, user_data)`. The callback should have
+this prototype:  ``void (*lv_timer_handler_resume_cb_t)(void*)``.
+
+
 
 Asynchronous calls
 ******************
 
-In some cases, you can't perform an action immediately. For example, you
-can't delete a Widget because something else is still using it, or you
-don't want to block the execution now. For these cases,
+There are several cases in which you may not want to perform an action immediately.
+Some examples are:
+
+- you cannot delete a Widget because something else is still using it,
+- you don't want to block execution now, or
+- you detect the need to delete a Widget in a thread other than the thread making
+  LVGL calls (e.g. in a case where you are using a :ref:`Gateway Thread <Gateway
+  Thread>` to make all LVGL calls in a multi-threaded environment).
+
+For these cases,
 :cpp:expr:`lv_async_call(my_function, data_p)` can be used to call
-``my_function`` on the next invocation of :cpp:func:`lv_timer_handler`.
-``data_p`` will be passed to the function when it's called. Note that
-only the data pointer is saved, so you need to ensure that the variable
-will be "alive" while the function is called. It can be *static*, global
-or dynamically allocated data. If you want to cancel an asynchronous
-call, call :cpp:expr:`lv_async_call_cancel(my_function, data_p)`, which will
-clear all asynchronous calls matching ``my_function`` and ``data_p``.
+``my_function`` on the next invocation of :cpp:func:`lv_timer_handler`.  As a side
+effect, also ensures it is in a thread in which it is safe to make LVGL calls.
+``data_p`` will be passed to the function when it's called. Note that only the data's
+pointer is saved, so whatever it is pointing to needs to remain valid until the
+function is called, so it can point to ``static``, global or dynamically allocated
+data. If you want to cancel an asynchronous call, call
+:cpp:expr:`lv_async_call_cancel(my_function, data_p)`, which will remove all
+asynchronous calls matching ``my_function`` and ``data_p``.
 
 For example:
 
@@ -137,8 +191,10 @@ For example:
    /* The screen is still valid so you can do other things with it */
 
 If you just want to delete a Widget and don't need to clean anything up
-in ``my_screen_cleanup`` you could just use :cpp:func:`lv_obj_delete_async` which
+in ``my_screen_cleanup`` you could just use :cpp:expr:`lv_obj_delete_async(widget)` which
 will delete the Widget on the next call to :cpp:func:`lv_timer_handler`.
+
+
 
 .. _timer_api:
 
