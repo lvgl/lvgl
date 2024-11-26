@@ -134,7 +134,7 @@ Enable and Disable
 You can temporarily disable Timer handling with :cpp:expr:`lv_timer_enable(false)`.
 Be advised:  this also pauses handling of Timers that refresh Display(s) and read
 from input devices, so don't forget to re-enable it with
-:cpp:expr:`lv_timer_enable(false)` as soon as the need for the pause is over.
+:cpp:expr:`lv_timer_enable(true)` as soon as the need for the pause is over.
 
 
 
