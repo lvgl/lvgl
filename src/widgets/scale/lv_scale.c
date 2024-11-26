@@ -179,7 +179,7 @@ void lv_scale_set_rotation(lv_obj_t * obj, int32_t rotation)
     if(normalized_angle < 0 || normalized_angle > 360) {
         normalized_angle = rotation % 360;
 
-        if(rotation < 0) {
+        if(normalized_angle < 0) {
             normalized_angle += 360;
         }
     }
