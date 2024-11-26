@@ -12,7 +12,7 @@ See :ref:`timer_handler` for more information.
 By default, LVGL itself uses Timers to:
 
 - refresh each display --- during the creation of each :ref:`Display`, a Timer is
-  created for that Display.  that Timer refreshes the display based on the configured
+  created for that Display.  That Timer refreshes the display based on the configured
   value of :c:macro:`LV_DEF_REFR_PERIOD`, and also sends all display-related events,
   like :cpp:enumerator:`LV_EVENT_REFR_START`, :cpp:enumerator:`LV_EVENT_REFR_READY`,
   etc.
