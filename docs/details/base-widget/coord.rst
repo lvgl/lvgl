@@ -84,11 +84,11 @@ Boxing Model
 LVGL follows CSS's `border-box <https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing>`__
 model. A Widget's "box" is built from the following parts:
 
-- bounding box: the width/height of the elements.
-- border width: the width of the border.
-- padding: space between the sides of the Widget and its children.
-- margin: space outside of the Widget (considered only by some layouts)
-- content: the content area which is the size of the bounding box reduced by the border width and padding.
+:bounding box:  the width/height of the elements.
+:border width:  the width of the border.
+:padding:       space between the sides of the Widget and its children.
+:margin:        space outside of the Widget (considered only by some layouts)
+:content:       the content area which is the size of the bounding box reduced by the border width and padding.
 
 .. image:: /misc/boxmodel.png
     :alt: The box models of LVGL: The content area is smaller than the bounding box with the padding and border width
@@ -391,6 +391,8 @@ position setting. However, to keep the LVGL API lean, only the most
 common coordinate setting features have a "simple" version and the more
 complex features can be used via styles.
 
+
+
 .. _coord_translation:
 
 Translation
@@ -458,6 +460,8 @@ even laid out Widgets' position can be translated.
 The translation actually moves the Widget. That means it makes the
 scrollbars and :c:macro:`LV_SIZE_CONTENT` sized Widgets react to the position
 change.
+
+
 
 .. _coord_transformation:
 

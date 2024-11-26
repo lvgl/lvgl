@@ -15,7 +15,8 @@ adjusted. With lower brightness the color of the LED becomes darker.
 Parts and Styles
 ****************
 
--  :cpp:enumerator:`LV_LED_PART_MAIN` uses all the typical background style properties.
+- :cpp:enumerator:`LV_LED_PART_MAIN` uses the :ref:`typical background style
+  properties <typical bg props>`.
 
 .. _lv_led_usage:
 

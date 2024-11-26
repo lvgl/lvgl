@@ -15,7 +15,8 @@ points.
 Parts and Styles
 ****************
 
--  :cpp:enumerator:`LV_PART_MAIN` uses all the typical background properties and line style properties.
+-  :cpp:enumerator:`LV_PART_MAIN` uses the :ref:`typical background <typical bg props>`
+   and line style properties.
 
 .. _lv_line_usage:
 

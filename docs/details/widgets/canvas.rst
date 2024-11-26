@@ -18,8 +18,8 @@ LVGL's extensive drawing engine.
 Parts and Styles
 ****************
 
-- :cpp:enumerator:`LV_PART_MAIN` Uses the typical rectangle and image style
-  properties.
+-  :cpp:enumerator:`LV_PART_MAIN` Uses the :ref:`typical background <typical bg props>`
+   and image style properties.
 
 
 .. _lv_canvas_usage:

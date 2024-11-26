@@ -221,7 +221,7 @@ props = [
 {'section': 'Outline', 'dsc':'Properties to describe the outline. It\'s like a border but drawn outside of the rectangles.' },
 {'name': 'OUTLINE_WIDTH',
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Set width of outline in pixels. "},
+ 'dsc': "Set width of outline in pixels."},
 
 {'name': 'OUTLINE_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
@@ -288,7 +288,7 @@ props = [
 
 {'name': 'LINE_ROUNDED',
  'style_type': 'num',   'var_type': 'bool' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Make end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending "},
+ 'dsc': "Make end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending"},
 
 {'name': 'LINE_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
@@ -305,7 +305,7 @@ props = [
 
 {'name': 'ARC_ROUNDED',
  'style_type': 'num',   'var_type': 'bool' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Make end points of arcs rounded. `true`: rounded, `false`: perpendicular line ending "},
+ 'dsc': "Make end points of arcs rounded. `true`: rounded, `false`: perpendicular line ending"},
 
 {'name': 'ARC_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
@@ -330,7 +330,7 @@ props = [
 
 {'name': 'TEXT_FONT',
  'style_type': 'ptr',   'var_type': 'const lv_font_t *',  'default':'`LV_FONT_DEFAULT`', 'inherited': 1, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set font of text (a pointer `lv_font_t *`). "},
+ 'dsc': "Set font of text (a pointer `lv_font_t *`)."},
 
 {'name': 'TEXT_LETTER_SPACE',
 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 1, 'layout': 1, 'ext_draw': 0,
@@ -379,11 +379,11 @@ props = [
 
  {'name': 'ANIM',
  'style_type': 'ptr',   'var_type': 'const lv_anim_t *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Animation template for Widget's animation. Should be a pointer to `lv_anim_t`. The animation parameters are widget specific, e.g. animation time could be the E.g. blink time of the cursor on the text area or scroll time of a roller. See Widgets' documentation to learn more."},
+ 'dsc': "Animation template for Widget's animation. Should be a pointer to `lv_anim_t`. The animation parameters are widget specific, e.g. animation time could be the E.g. blink time of the cursor on the Text Area or scroll time of a roller. See Widgets' documentation to learn more."},
 
 {'name': 'ANIM_DURATION',
  'style_type': 'num',   'var_type': 'uint32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Animation duration in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See Widgets' documentation to learn more."},
+ 'dsc': "Animation duration in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the Text Area or scroll time of a roller. See Widgets' documentation to learn more."},
 
 {'name': 'TRANSITION',
  'style_type': 'ptr',   'var_type': 'const lv_style_transition_dsc_t *' ,  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
