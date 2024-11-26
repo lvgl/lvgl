@@ -146,7 +146,7 @@ void lv_scale_set_angle_range(lv_obj_t * obj, uint32_t angle_range);
  *                      - 300 = 1 o'clock
  *                      - 330 = 2 o'clock
  */
-void lv_scale_set_rotation(lv_obj_t * obj, int32_t angle);
+void lv_scale_set_rotation(lv_obj_t * obj, int32_t rotation);
 
 /**
  * Point line needle to specified value.
@@ -155,9 +155,9 @@ void lv_scale_set_rotation(lv_obj_t * obj, int32_t angle);
  *                         managed by the Scale unless the line point array was previously set
  *                         using `lv_line_set_points_mutable`.
  * @param needle_length    length of the needle
- *                         needle_length>0 needle_length=needle_length;
- *                         needle_length<0 needle_length=radius-|needle_length|;
- * @param value            needle to point to the corresponding value
+ *                         - needle_length>0: needle_length=needle_length;
+ *                         - needle_length<0: needle_length=radius-|needle_length|;
+ * @param value            Scale value needle will point to
  */
 void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length,
                                     int32_t value);
@@ -166,8 +166,8 @@ void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int3
  * Point image needle to specified value;
    image must point to the right. E.g. -O------>
  * @param obj              pointer to Scale Widget
- * @param needle_img       needle_img of the Scale
- * @param value            needle to point to the corresponding value
+ * @param needle_img       pointer to needle's Image
+ * @param value            Scale value needle will point to
  */
 void lv_scale_set_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, int32_t value);
 
@@ -203,15 +203,15 @@ lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj);
 
 /**
  * Set range for specified Scale Section
- * @param section       pointer to Scale Section object
+ * @param section       pointer to Section
  * @param range_min     Section new minimum value
  * @param range_max     Section new maximum value
  */
 void lv_scale_section_set_range(lv_scale_section_t * section, int32_t min, int32_t max);
 
 /**
- * Set style for the specified part of the specified Scale Section.
- * @param section             pointer to Scale Section object
+ * Set style for specified part of Section.
+ * @param section             pointer to Section
  * @param part                the part of the Scale the style will apply to, e.g. LV_PART_INDICATOR
  * @param section_part_style  pointer to style to apply
  */
@@ -259,21 +259,21 @@ bool lv_scale_get_label_show(lv_obj_t * obj);
 /**
  * Get Scale's range in degrees
  * @param obj   pointer to Scale Widget
- * @return      Scale angle_range
+ * @return      Scale's angle_range
  */
 uint32_t lv_scale_get_angle_range(lv_obj_t * obj);
 
 /**
  * Get minimum value for Scale
  * @param obj   pointer to Scale Widget
- * @return      minimum Scale value
+ * @return      Scale's minimum value
  */
 int32_t lv_scale_get_range_min_value(lv_obj_t * obj);
 
 /**
  * Get maximum value for Scale
  * @param obj   pointer to Scale Widget
- * @return      maximum Scale value
+ * @return      Scale's maximum value
  */
 int32_t lv_scale_get_range_max_value(lv_obj_t * obj);
 
