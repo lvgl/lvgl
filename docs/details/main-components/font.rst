@@ -61,7 +61,14 @@ Languages like Arabic, Persian, and Hebrew, which use Right-to-Left
 (RTL) or mixed writing directions, are also supported in LVGL.
 Learn more :ref:`here <bidi>`.
 
-For characters such as ``é`` ``ü``, ``ő``, ``Á``, and ``Ű``, it is recommended
+
+.. |Aacute| unicode:: U+000C1 .. LATIN CAPITAL LETTER A WITH ACUTE
+.. |eacute| unicode:: U+000E9 .. LATIN SMALL LETTER E WITH ACUTE
+.. |otilde| unicode:: U+000F5 .. LATIN SMALL LETTER O WITH TILDE
+.. |Utilde| unicode:: U+00168 .. LATIN CAPITAL LETTER U WITH TILDE
+.. |uuml|   unicode:: U+000FC .. LATIN SMALL LETTER U WITH DIAERESIS
+
+For characters such as '|eacute|', '|uuml|', '|otilde|', '|Aacute|', and '|Utilde|', it is recommended
 to use the single Unicode format (NFC) rather than decomposing them into
 a base letter and diacritics (e.g. ``u + ¨``).
 
