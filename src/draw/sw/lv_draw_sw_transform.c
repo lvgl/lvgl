@@ -278,7 +278,7 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
                 break;
 #endif
             default:
-                LV_LOG_WARN("Color format %02X is not enabled."
+                LV_LOG_WARN("Color format 0x%02X is not enabled. "
                             "See lv_color.h to find the name of the color formats and "
                             "enable the related LV_DRAW_SW_SUPPORT_* in lv_conf.h.",
                             src_cf);
