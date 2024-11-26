@@ -470,7 +470,7 @@ void lv_objid_builtin_destroy(void);
         LV_ASSERT_MSG(lv_obj_is_valid(obj_p)  == true, "The object is invalid, deleted or corrupted?"); \
     } while(0)
 # else
-#  define LV_ASSERT_OBJ(obj_p, obj_class) do{}while(0)
+#  define LV_ASSERT_OBJ(obj_p, obj_class) LV_ASSERT_NULL(obj_p)
 #endif
 
 #if LV_USE_LOG && LV_LOG_TRACE_OBJ_CREATE

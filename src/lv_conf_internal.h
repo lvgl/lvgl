@@ -2630,6 +2630,13 @@
             #define LV_FS_FATFS_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
         #endif
     #endif
+    #ifndef LV_FS_FATFS_PATH
+        #ifdef CONFIG_LV_FS_FATFS_PATH
+            #define LV_FS_FATFS_PATH CONFIG_LV_FS_FATFS_PATH
+        #else
+            #define LV_FS_FATFS_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
+        #endif
+    #endif
     #ifndef LV_FS_FATFS_CACHE_SIZE
         #ifdef CONFIG_LV_FS_FATFS_CACHE_SIZE
             #define LV_FS_FATFS_CACHE_SIZE CONFIG_LV_FS_FATFS_CACHE_SIZE
@@ -2673,6 +2680,13 @@
             #define LV_FS_LITTLEFS_LETTER '\0'  /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
         #endif
     #endif
+    #ifndef LV_FS_LITTLEFS_PATH
+        #ifdef CONFIG_LV_FS_LITTLEFS_PATH
+            #define LV_FS_LITTLEFS_PATH CONFIG_LV_FS_LITTLEFS_PATH
+        #else
+            #define LV_FS_LITTLEFS_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
+        #endif
+    #endif
 #endif
 
 /** API for Arduino LittleFs. */
@@ -2691,6 +2705,13 @@
             #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
         #endif
     #endif
+    #ifndef LV_FS_ARDUINO_ESP_LITTLEFS_PATH
+        #ifdef CONFIG_LV_FS_ARDUINO_ESP_LITTLEFS_PATH
+            #define LV_FS_ARDUINO_ESP_LITTLEFS_PATH CONFIG_LV_FS_ARDUINO_ESP_LITTLEFS_PATH
+        #else
+            #define LV_FS_ARDUINO_ESP_LITTLEFS_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
+        #endif
+    #endif
 #endif
 
 /** API for Arduino Sd. */
@@ -2707,6 +2728,13 @@
             #define LV_FS_ARDUINO_SD_LETTER CONFIG_LV_FS_ARDUINO_SD_LETTER
         #else
             #define LV_FS_ARDUINO_SD_LETTER '\0'          /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+        #endif
+    #endif
+    #ifndef LV_FS_ARDUINO_SD_PATH
+        #ifdef CONFIG_LV_FS_ARDUINO_SD_PATH
+            #define LV_FS_ARDUINO_SD_PATH CONFIG_LV_FS_ARDUINO_SD_PATH
+        #else
+            #define LV_FS_ARDUINO_SD_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
         #endif
     #endif
 #endif
@@ -2964,6 +2992,16 @@
             #define LV_FFMPEG_DUMP_FORMAT CONFIG_LV_FFMPEG_DUMP_FORMAT
         #else
             #define LV_FFMPEG_DUMP_FORMAT 0
+        #endif
+    #endif
+    /** Use lvgl file path in FFmpeg Player widget 
+     *  You won't be able to open URLs after enabling this feature.
+     *  Note that FFmpeg image decoder will always use lvgl file system. */
+    #ifndef LV_FFMPEG_PLAYER_USE_LV_FS
+        #ifdef CONFIG_LV_FFMPEG_PLAYER_USE_LV_FS
+            #define LV_FFMPEG_PLAYER_USE_LV_FS CONFIG_LV_FFMPEG_PLAYER_USE_LV_FS
+        #else
+            #define LV_FFMPEG_PLAYER_USE_LV_FS 0
         #endif
     #endif
 #endif

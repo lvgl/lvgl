@@ -59,7 +59,7 @@ LV_EXPORT_CONST_INT(LV_SCALE_NONE);
 #else
 #define LV_STYLE_CONST_INIT(var_name, prop_array)                       \
     const lv_style_t var_name = {                                       \
-        .values_and_props = prop_array,                                 \
+        .values_and_props = (void*)prop_array,                          \
         .has_group = 0xFFFFFFFF,                                        \
         .prop_cnt = 255,                                                \
     }
