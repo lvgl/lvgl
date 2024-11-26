@@ -131,7 +131,7 @@ spends in an idle thread.
 Enable and Disable
 ******************
 
-You can temporarily disable the all Timer handling with :cpp:expr:`lv_timer_enable(false)`.
+You can temporarily disable Timer handling with :cpp:expr:`lv_timer_enable(false)`.
 Don't forget to re-enable it with :cpp:expr:`lv_timer_enable(false)` as soon as the
 need for the pause is over.
 
