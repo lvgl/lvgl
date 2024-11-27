@@ -71,19 +71,20 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
  *   GLOBAL FUNCTIONS
  **********************/
 
+void lv_draw_vg_lite_label_init(lv_draw_unit_t * draw_unit)
+{
+#if LV_USE_FREETYPE
+    /*Set up the freetype outline event*/
+    lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, draw_unit);
+#else
+    LV_UNUSED(draw_unit);
+#endif /* LV_USE_FREETYPE */
+}
+
 void lv_draw_vg_lite_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,
                            const lv_area_t * coords)
 {
     LV_PROFILER_DRAW_BEGIN;
-
-#if LV_USE_FREETYPE
-    static bool is_init = false;
-    if(!is_init) {
-        lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, draw_unit);
-        is_init = true;
-    }
-#endif /* LV_USE_FREETYPE */
-
     lv_draw_label_iterate_characters(draw_unit, dsc, coords, draw_letter_cb);
     LV_PROFILER_DRAW_END;
 }
