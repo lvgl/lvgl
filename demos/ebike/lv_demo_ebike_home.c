@@ -12,7 +12,7 @@
 #include "lv_demo_ebike_private.h"
 #include "lv_demo_ebike_home.h"
 #include "translations/lv_i18n.h"
-#include "../../src/lvgl_private.h"
+#include "../../lvgl_private.h"
 
 /*********************
  *      DEFINES

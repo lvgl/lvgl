@@ -7,7 +7,7 @@
  *********************/
 #include "lv_nuttx_libuv.h"
 
-#include "../../../lvgl.h"
+#include "../../lvgl.h"
 #include "../../lvgl_private.h"
 
 #if LV_USE_NUTTX
