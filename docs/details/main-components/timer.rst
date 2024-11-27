@@ -21,9 +21,9 @@ By default, LVGL itself uses Timers to:
   :c:macro:`LV_DEF_REFR_PERIOD`.  That Timer causes that input device to be read and
   also sends all input-device-related events, like :cpp:enumerator:`LV_EVENT_CLICKED`,
   :cpp:enumerator:`LV_EVENT_PRESSED`, etc.
-- update system-monitor values --- during LVGL initialization, a Timer is created
-  based on the configured value of :c:macro:`LV_SYSMON_REFR_PERIOD_DEF` that updates
-  the state of LVGL's memory heap.
+- update system-monitor values --- if :c:macro:`LV_USE_SYSMON` is set to ``1`` in
+  ``lv_conf.h``, one or more timers can be created to periodically compute and
+  monitor system performance statistics, such as the state of LVGL's memory heap.
 
 Timers are non-preemptive, which means a Timer cannot interrupt another
 Timer. Therefore, you can call any LVGL related function in a Timer.
@@ -121,10 +121,20 @@ Measuring Idle Time
 *******************
 
 You can get the idle percentage time of :cpp:func:`lv_timer_handler` with
-:cpp:func:`lv_timer_get_idle`. Note that, it doesn't measure the idle time of
-the overall system, only :cpp:func:`lv_timer_handler`.  This can be misleading if
-you are using an operating system, as it does not actually measure the time the OS
-spends in an idle thread.
+:cpp:func:`lv_timer_get_idle`. Note that it does not measure the idle time of
+the overall system, only of :cpp:func:`lv_timer_handler`.  This can be misleading if
+you are using an operating system and DMA and/or GPU are used during rendering, as it
+does not actually measure the time the OS spends in an idle thread.
+
+If you are using an OS and wish to get the time the CPU is spending in an idle
+thread, one way of doing so is configuring :c:macro:`LV_USE_SYSMON` and
+:c:macro:`LV_USE_PERF_MONITOR` to ``1`` in ``lv_conf.h`` (if they are not already),
+and setting the macro :c:macro:`LV_SYSMON_GET_IDLE` to the name of a function that
+fetches the percent of CPU time spent in the OS's idle thread.  An example of such
+a function is :cpp:func:`lv_os_get_idle_percent` in ``lv_freertos.c``.  While the
+configuration is set this way, some system performance statistics (including CPU
+load) will appear on the display in a partially-transparent label whose location is
+set by the :c:macro:`LV_USE_PERF_MONITOR_POS` macro.
 
 
 
