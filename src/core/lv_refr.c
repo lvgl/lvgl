@@ -1133,7 +1133,10 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
              * If it really doesn't need alpha use it. Else switch to the ARGB size*/
             layer_area_act.y2 = layer_area_act.y1 + max_rgb_row_height - 1;
             if(layer_area_act.y2 > layer_area_full.y2) layer_area_act.y2 = layer_area_full.y2;
-            bool area_need_alpha = alpha_test_area_on_obj(obj, &layer_area_act);
+
+            const void * bitmap_mask_src = lv_obj_get_style_bitmap_mask_src(obj, 0);
+            bool area_need_alpha = bitmap_mask_src || alpha_test_area_on_obj(obj, &layer_area_act);
+
             if(area_need_alpha) {
                 layer_area_act.y2 = layer_area_act.y1 + max_argb_row_height - 1;
                 if(layer_area_act.y2 > layer_area_full.y2) layer_area_act.y2 = layer_area_full.y2;
@@ -1170,7 +1173,7 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
             layer_draw_dsc.skew_y = lv_obj_get_style_transform_skew_y(obj, 0);
             layer_draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, 0);
             layer_draw_dsc.antialias = disp_refr->antialiasing;
-            layer_draw_dsc.bitmap_mask_src = lv_obj_get_style_bitmap_mask_src(obj, 0);
+            layer_draw_dsc.bitmap_mask_src = bitmap_mask_src;
             layer_draw_dsc.image_area = obj_draw_size;
             layer_draw_dsc.src = new_layer;
 
