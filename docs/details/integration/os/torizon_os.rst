@@ -7,16 +7,16 @@ Torizon OS is an open-source software platform that aims to simplify the
 development and maintenance of embedded Linux software.
 
 By using docker containers it allows developers to focus on the application
-instead of building and maintaining a custom distribution
+instead of building and maintaining a custom distribution.
 
 This guide explains how to create a docker image containing LVGL and a simple demo
-application that can be deployed on any Toradex device running TorizonOS
+application that can be deployed on any Toradex device running TorizonOS.
 
 Prerequisites
 -------------
 
-To follow this guide you obviously need to have a Toradex SoM along with a carrier board
-more information is available on the Toradex `website <https://www.toradex.com/computer-on-modules>`_
+To follow this guide you obviously need to have a Toradex SoM along with a carrier board.
+More information is available on the Toradex `website <https://www.toradex.com/computer-on-modules>`_.
 
 
 .. note::
@@ -24,19 +24,19 @@ more information is available on the Toradex `website <https://www.toradex.com/c
    You need to be familiar with some Docker fundamentals to be able to understand and follow
    this guide. Also Docker needs to be present on the development host.
 
-The `Toradex documentation <https://developer.toradex.com>`_ is a helpful resource, this article contains many references
+The `Toradex documentation <https://developer.toradex.com>`_ is a helpful resource. This article contains many references
 to it.
 
 Board setup
 -----------
 
-Begin by installing TorizonOS by using the Toradex Easy Installer,
-Follow the official bring-up `guides <https://developer.toradex.com/quickstart/bringup/>`_
+Begin by installing TorizonOS by using the Toradex Easy Installer.
+Follow the official bring-up `guides <https://developer.toradex.com/quickstart/bringup/>`_.
 
 In the Easy Installer, select TorizonCore as the operating system to install.
 
-Copy the IP address that was assigned to the device by the DHCP server on your network,
-the address is displayed in the bottom right corner. It will be used later.
+Copy the IP address that was assigned to the device by the DHCP server on your network.
+The address is displayed in the bottom right corner. It will be used later.
 
 Once the setup is complete, the device will boot into TorizonOS.
 
@@ -61,15 +61,15 @@ by typing the following commands:
    docker run --rm -it --privileged torizon/binfmt
    docker run --rm -it --pull always --platform linux/arm64/v8 debian arch
 
-The second command should print ``aarch64``
+The second command should print ``aarch64``.
 
 More information on the build environment for Torizon containers is available `here
-<https://developer.toradex.com/torizon/application-development/working-with-containers/configure-build-environment-for-torizon-containers/>`_
+<https://developer.toradex.com/torizon/application-development/working-with-containers/configure-build-environment-for-torizon-containers/>`_.
 
 Let's begin by creating a directory that will contain the ``Dockerfile`` and source code
 that will be used to build the image.
 
-Type the following commands in a terminal window
+Type the following commands in a terminal window: 
 
 .. code-block:: sh
 
@@ -243,7 +243,7 @@ You now have a running LVGL application, where to go from here ?
   write scripts to automate the building/pushing/pulling operations
 
 * Read this `article <https://developer.toradex.com/torizon/application-development/application-development-overview>`_
-  to understand how to design applications for Torizon OS
+  to understand how to design applications for Torizon OS.
 
 * Getting familiar with Torizon Cloud and Torizon OS builder is
   also recommended when you get closer to production.
