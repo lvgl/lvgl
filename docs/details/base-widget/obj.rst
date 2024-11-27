@@ -201,8 +201,7 @@ drawn within.
 
     static void ext_draw_size_event_cb(lv_event_t * e)
     {
-        lv_coord_t * cur_size = lv_event_get_param(e);
-        *cur_size = LV_MAX(*cur_size, ext_width);
+        lv_event_set_ext_draw_size(e, 30); /*Set 30px extra draw area around the widget*/
     }
 
 Create and delete Widgets
