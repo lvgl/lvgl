@@ -145,6 +145,8 @@ void lv_scale_set_angle_range(lv_obj_t * obj, uint32_t angle_range);
  *                      - 270 = 12 o'clock
  *                      - 300 = 1 o'clock
  *                      - 330 = 2 o'clock
+ *                      - -30 = 2 o'clock
+ *                      - 390 = 4 o'clock
  */
 void lv_scale_set_rotation(lv_obj_t * obj, int32_t rotation);
 
