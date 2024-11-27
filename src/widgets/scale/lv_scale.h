@@ -133,7 +133,7 @@ void lv_scale_set_angle_range(lv_obj_t * obj, uint32_t angle_range);
  * (Applies only to round Scales.)
  * @param obj       pointer to Scale Widget
  * @param rotation  clockwise angular offset (in degrees) from the 3-o'clock position
- *                  of the low end of the scake; negative values are first normalized
+ *                  of the low end of the scale; negative and >360 values are first normalized
  *                  to range [0..360].
  *                  Examples:
  *                      -   0 = 3 o'clock (right side)
