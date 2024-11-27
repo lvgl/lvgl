@@ -200,7 +200,7 @@ void lv_init(void)
     lv_group_init();
 
 #if LV_USE_FREETYPE
-    /* Since the drawing unit needs to register the freetype time,
+    /* Since the drawing unit needs to register the freetype event,
      * initialize the freetype module first
      */
     lv_freetype_init(LV_FREETYPE_CACHE_FT_GLYPH_CNT);
