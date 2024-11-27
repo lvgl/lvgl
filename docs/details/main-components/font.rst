@@ -15,10 +15,10 @@ For example:
 
 Fonts have a **format** property. It describes how the glyph draw data is stored.
 It has *2* categories: `Legacy simple format` and `Advanced format`.
-In the legacy simple format, the font is stored in a simple array of bitmaps.
-In the advanced format, the font is stored in a different way like `Vector`, `SVG`, etc.
+In the most simple case, the font is stored in a simple array of bitmaps.
+In the advanced format, the font can be stored in a different way like `Vector`, `SVG`, etc.
 
-In the legacy simple format, the value stored for a pixel determines the pixel's opacity.
+In case of the simple format, the value stored for a pixel determines the pixel's opacity.
 This way, with higher *bpp (bit per pixel)*, the edges of the letter can be smoother.
 The possible *bpp* values are 1, 2, 4 and 8 (higher values mean better quality).
 
@@ -43,6 +43,38 @@ To test it try
    lv_label_set_text(label1, LV_SYMBOL_OK);
 
 If all works well, a ✓ character should be displayed.
+
+
+Typesetting
+***********
+
+Although LVGL can decode and display any Unicode characters
+(assuming the font supports them), LVGL cannot correctly render
+all complex languages.
+
+The standard Latin-based languages (e.g., English, Spanish, German)
+and East Asian languages such as Chinese, Japanese, and Korean (CJK)
+are relatively straightforward, as their characters are simply
+written from left to right.
+
+Languages like Arabic, Persian, and Hebrew, which use Right-to-Left
+(RTL) or mixed writing directions, are also supported in LVGL.
+Learn more :ref:`here <bidi>`.
+
+
+.. |Aacute| unicode:: U+000C1 .. LATIN CAPITAL LETTER A WITH ACUTE
+.. |eacute| unicode:: U+000E9 .. LATIN SMALL LETTER E WITH ACUTE
+.. |otilde| unicode:: U+000F5 .. LATIN SMALL LETTER O WITH TILDE
+.. |Utilde| unicode:: U+00168 .. LATIN CAPITAL LETTER U WITH TILDE
+.. |uuml|   unicode:: U+000FC .. LATIN SMALL LETTER U WITH DIAERESIS
+
+For characters such as '|eacute|', '|uuml|', '|otilde|', '|Aacute|', and '|Utilde|', it is recommended
+to use the single Unicode format (NFC) rather than decomposing them into
+a base letter and diacritics (e.g. ``u + ¨``).
+
+Complex languages where subsequent characters combine into a single glyph
+and where the resulting glyph has no individual Unicode representation
+(e.g., Devanagari), have limited support in LVGL.
 
 
 Built-in fonts
@@ -123,6 +155,8 @@ Or more symbols together:
 Special Features
 ****************
 
+.. _bidi:
+
 Bidirectional support
 ---------------------
 
@@ -181,29 +215,6 @@ However, there are some limitations:
 - Only displaying text is supported (e.g. on labels), text inputs (e.g. text area) don't support this feature.
 - Static text (i.e. const) is not processed. E.g. texts set by :cpp:func:`lv_label_set_text` will be "Arabic processed" but :cpp:func:`lv_label_set_text_static` won't.
 - Text get functions (e.g. :cpp:func:`lv_label_get_text`) will return the processed text.
-
-Subpixel rendering
-------------------
-
-Subpixel rendering allows for tripling the horizontal resolution by
-rendering anti-aliased edges on Red, Green and Blue channels instead of
-at pixel level granularity. This takes advantage of the position of
-physical color channels of each pixel, resulting in higher quality
-letter anti-aliasing. Learn more
-`here <https://en.wikipedia.org/wiki/Subpixel_rendering>`__.
-
-For subpixel rendering, the fonts need to be generated with special
-settings:
-
-- In the online converter tick the ``Subpixel`` box
-- In the command line tool use ``--lcd`` flag. Note that the generated font needs about three times more memory.
-
-Subpixel rendering works only if the color channels of the pixels have a
-horizontal layout. That is the R, G, B channels are next to each other
-and not above each other. The order of color channels also needs to
-match with the library settings. By default, LVGL assumes ``RGB`` order,
-however this can be swapped by setting :c:macro:`LV_SUBPX_BGR`  ``1`` in
-*lv_conf.h*.
 
 .. _fonts_compressed:
 

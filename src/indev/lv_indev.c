@@ -1428,6 +1428,14 @@ static void indev_proc_release(lv_indev_t * indev)
                 parent = lv_obj_get_parent(parent);
             }
 
+            if(scale_x == 0) {
+                scale_x = 1;
+            }
+
+            if(scale_y == 0) {
+                scale_y = 1;
+            }
+
             if(angle != 0 || scale_y != LV_SCALE_NONE || scale_x != LV_SCALE_NONE) {
                 angle = -angle;
                 scale_x = (256 * 256) / scale_x;

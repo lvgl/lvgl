@@ -160,7 +160,8 @@ void lv_scale_set_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, int3
 /**
  * Set custom text source for major ticks labels
  * @param obj       pointer to a scale object
- * @param txt_src   pointer to an array of strings which will be display at major ticks
+ * @param txt_src   pointer to an array of strings which will be display at major ticks;
+ *                  last element must be a NULL pointer.
  */
 void lv_scale_set_text_src(lv_obj_t * obj, const char * txt_src[]);
 
