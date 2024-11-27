@@ -81,16 +81,16 @@ Type the following commands in a terminal window:
    git -C lv_port_linux submodule update --init
 
 These commands create the project directory and the ``Dockerfile``.
-``git`` is used to download the ``lv_port_linux`` and ``lvgl`` repositories from Github
+``git`` is used to download the ``lv_port_linux`` and ``lvgl`` repositories from Github.
 
 .. note::
 
    By default, ``lv_port_linux`` is configured to use the legacy framebuffer device
    ``/dev/fb0``. It is also possible to use another rendering backend by enabling the
-   correct options in ``lv_port_linux/lv_conf.h``
+   correct options in ``lv_port_linux/lv_conf.h``.
 
 
-Now edit the Dockerfile copy-paste the block below into the file:
+Now edit the Dockerfile. Copy-paste the block below into the file:
 
 .. code-block::
 
@@ -143,14 +143,14 @@ Now edit the Dockerfile copy-paste the block below into the file:
    ENTRYPOINT [ "./lvglsim" ]
 
 
-The ``Dockerfile`` acts like a recipe to build two images and  ``build`` and ``deploy``
+The ``Dockerfile`` acts like a recipe to build two images and  ``build`` and ``deploy``.
 
-First it downloads the necessary packages to build the simulator using Debian's package manager ``apt-get``
+First it downloads the necessary packages to build the simulator using Debian's package manager ``apt-get``.
 
-After compilation, the resulting executable is written to ``lv_port_linux/bin/lvglsim``
+After compilation, the resulting executable is written to ``lv_port_linux/bin/lvglsim``.
 
-The ``deploy`` image will be deployed on the device,
-the executable created in the previous image is copied to the ``/usr/bin`` directory of the current image.
+The ``deploy`` image will be deployed on the device.
+The executable created in the previous image is copied to the ``/usr/bin`` directory of the current image.
 
 This creates a smaller image that does not include the tool chain and the build dependencies.
 
@@ -158,10 +158,10 @@ The images are built with the following command:
 
 ``docker build . -t lvgl_app``
 
-Docker will interpret the ``Dockerfile`` present in the current working directory,
-the ``-t`` argument gives a name to the resulting image.
+Docker will interpret the ``Dockerfile`` present in the current working directory.
+The ``-t`` argument gives a name to the resulting image.
 
-Upon completion, ensure that the image is listed by Docker
+Upon completion, ensure that the image is listed by Docker:
 
 ``docker image list | grep lvgl_app``
 
@@ -170,32 +170,32 @@ It should display the image along with its ID that will be used later.
 Deploying the container image to the device
 -------------------------------------------
 
-The image is now ready to be deployed on the device, there are several ways to perform
+The image is now ready to be deployed on the device. There are several ways to perform
 this task.
 
-Read `this article <https://developer.toradex.com/torizon/application-development/working-with-containers/deploying-container-images-to-torizoncore/>`_ for more information
+Read `this article <https://developer.toradex.com/torizon/application-development/working-with-containers/deploying-container-images-to-torizoncore/>`_ for more information.
 
-For this guide, we are going to setup a Docker registry container on the development host,
-which will be accessible from any device on your LAN. The Toradex board being on the same network,
+For this guide, we are going to setup a Docker registry container on the development host 
+which will be accessible from any device on your LAN. The Toradex board being on the same network 
 will be able to pull the image from the registry.
 
 The registry is created like so:
 
 ``docker run -d -p 5000:5000 --name registry registry:2.7``
 
-The ``-d`` flag runs the container in detached mode, the ``-p`` argument specifies the port mapping,
-the registry container will listen on port ``TCP/5000`` and will map to the same port externally.
+The ``-d`` flag runs the container in detached mode. The ``-p`` argument specifies the port mapping.
+The registry container will listen on port ``TCP/5000`` and will map to the same port externally.
 
-Push the image created in the previous step to the newly created registry
+Push the image created in the previous step to the newly created registry:
 
 ``docker tag <IMAGE_ID> 127.0.0.1:5000/lvgl-app``
 
 ``docker push 127.0.0.1:5000/lvgl-app``
 
 By default a local container registry uses clear text HTTP so the Docker instance
-running on the device has to be configured to allow fetching images from an 'insecure' repository
+running on the device has to be configured to allow fetching images from an 'insecure' repository.
 
-Get the IP address of the development host and open a remote shell on the device
+Get the IP address of the development host and open a remote shell on the device.
 
 .. code-block:: sh
 
@@ -221,26 +221,26 @@ By default, Docker containers are isolated from the hardware
 of the host system. While this is great for security, an embedded application will obviously need
 `access to the hardware. <https://developer.toradex.com/torizon/application-development/use-cases/peripheral-access/best-practices-with-hardware-access/>`_
 
-The container running the LVGL application needs access to the framebuffer device ``/dev/fb0``
+The container running the LVGL application needs access to the framebuffer device ``/dev/fb0``.
 
-By using the ``--device`` argument it is possible to map a device to a container
+By using the ``--device`` argument it is possible to map a device to a container.
 
-Start the container like so
+Start the container like so:
 
 ``docker run --device /dev/fb0:/dev/fb0 <IMAGE_ID>``
 
 Conclusion
 ----------
 
-You now have a running LVGL application, where to go from here ?
+You now have a running LVGL application. Where to go from here?
 
-* You are now ready to build your LVGL application for Torizon OS,
-  it is recommended to get familiar with VSCode IDE extension
+* You are now ready to build your LVGL application for Torizon OS.
+  It is recommended to get familiar with VSCode IDE extension
   as it will simplify your workflow.
 
   If you are a VSCode user, it is the best way to develop for Torizon OS. If you use
   another editor or IDE you can always
-  write scripts to automate the building/pushing/pulling operations
+  write scripts to automate the building/pushing/pulling operations.
 
 * Read this `article <https://developer.toradex.com/torizon/application-development/application-development-overview>`_
   to understand how to design applications for Torizon OS.
