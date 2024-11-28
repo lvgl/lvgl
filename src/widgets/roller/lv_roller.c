@@ -880,11 +880,19 @@ static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect)
         angle += lv_obj_get_style_transform_rotation(parent, 0);
         int32_t zoom_act_x = lv_obj_get_style_transform_scale_x_safe(parent, 0);
         int32_t zoom_act_y = lv_obj_get_style_transform_scale_y_safe(parent, 0);
-        scale_x = (scale_y * zoom_act_x) >> 8;
+        scale_x = (scale_x * zoom_act_x) >> 8;
         scale_y = (scale_y * zoom_act_y) >> 8;
         parent = lv_obj_get_parent(parent);
     }
     lv_point_t pivot = { 0, 0 };
+
+    if(scale_x == 0) {
+        scale_x = 1;
+    }
+
+    if(scale_y == 0) {
+        scale_y = 1;
+    }
 
     scale_x = 256 * 256 / scale_x;
     scale_y = 256 * 256 / scale_y;

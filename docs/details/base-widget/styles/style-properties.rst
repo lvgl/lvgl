@@ -428,7 +428,7 @@ Properties to describe spacing around a Widget. Very similar to the margin prope
 margin_top
 ~~~~~~~~~~
 
-Sets margin on the top. Widget will keep this space from its siblings in layouts. 
+Sets margin on the top. Widget will keep this space from its siblings in layouts.
 
 .. raw:: html
 

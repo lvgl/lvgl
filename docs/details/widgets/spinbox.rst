@@ -4,33 +4,40 @@
 Spinbox (lv_spinbox)
 ====================
 
+
 Overview
 ********
 
-The Spinbox contains a number as text which can be increased or
-decreased by *Keys* or API functions. Under the hood the Spinbox is a
-modified :ref:`Text area <lv_textarea>`.
+Spinbox contains an integer displayed as a decimal number with a possible fixed
+decimal point position and a configurable number of digits.  The value can be
+increased or decreased by *Keys* or API functions.  Under the hood Spinbox is a
+:ref:`lv_textarea` with behaviors extended to enable a numeric value
+to be viewed and modified with configurable constraints.
+
+
 
 .. _lv_spinbox_parts_and_styles:
 
 Parts and Styles
 ****************
 
-The parts of the Spinbox are identical to the :ref:`Text area <lv_textarea>`.
+Spinbox's parts are identical to those of :ref:`Text Area <lv_textarea_parts_and_styles>`.
 
 Value, range and step
 ---------------------
 
-- :cpp:expr:`lv_spinbox_set_value(spinbox, 1234)` sets a new value on the Spinbox.
+- :cpp:expr:`lv_spinbox_set_value(spinbox, 1234)` sets a new value for the Spinbox.
 - :cpp:expr:`lv_spinbox_increment(spinbox)` and :cpp:expr:`lv_spinbox_decrement(spinbox)`
-  increments/decrements the value of the Spinbox according to the currently selected digit.
-- :cpp:expr:`lv_spinbox_set_range(spinbox, -1000, 2500)` sets a range. If the
-  value is changed by :cpp:func:`lv_spinbox_set_value`, by
-  *Keys*,\ ``lv_spinbox_increment/decrement`` this range will be respected.
-- :cpp:expr:`lv_spinbox_set_step(spinbox, 100)` sets which digits to change on
-  increment/decrement. Only multiples of ten can be set, and not for example 3.
+  increments/decrements the value of the Spinbox according to the currently-selected digit.
+- :cpp:expr:`lv_spinbox_set_range(spinbox, -1000, 2500)` sets its range. If the
+  value is changed by :cpp:expr:`lv_spinbox_set_value(spinbox)`, by *Keys*,
+  by :cpp:expr:`lv_spinbox_increment(spinbox)` or :cpp:expr:`lv_spinbox_decrement(spinbox)`
+  this range will be respected.
+- :cpp:expr:`lv_spinbox_set_step(spinbox, 100)` sets which digit to change on
+  increment/decrement. Only multiples of ten can be set.
 - :cpp:expr:`lv_spinbox_set_cursor_pos(spinbox, 1)` sets the cursor to a specific
-  digit to change on increment/decrement. For example position '0' sets the cursor to the least significant digit.
+  digit to change on increment/decrement. Position '0' sets the cursor to
+  the least significant digit.
 
 If an encoder is used as input device, the selected digit is shifted to
 the right by default whenever the encoder button is clicked. To change this behaviour to shifting
@@ -40,17 +47,18 @@ Format
 ------
 
 :cpp:expr:`lv_spinbox_set_digit_format(spinbox, digit_count, separator_position)`
-sets the number format. ``digit_count`` is the number of digits
-excluding the decimal separator and the sign. ``separator_position`` is
-the number of digits before the decimal point. If 0, no decimal point is displayed.
+sets the number format. ``digit_count`` is the total number of digits to display.
+``separator_position`` is the number of leading digits before the decimal point.
+Pass 0 for ``separator_position`` to display no decimal point.
 
 Rollover
 --------
 
 :cpp:expr:`lv_spinbox_set_rollover(spinbox, true/false)` enables/disabled
 rollover mode. If either the minimum or maximum value is reached with
-rollover enabled, the value will change to the other limit. If rollover
-is disabled the value will remain at the minimum or maximum value.
+rollover enabled, and the user attempts to continue changing the value in
+the same direction, the value will change to the other limit.  If rollover
+is disabled the value will stop at the minimum or maximum value.
 
 
 
@@ -59,7 +67,7 @@ is disabled the value will remain at the minimum or maximum value.
 Events
 ******
 
-- :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the value has changed.
+- :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when value has changed.
 
 .. admonition::  Further Reading
 
@@ -80,8 +88,8 @@ Keys
   *Encoder* decrement/increment the selected digit.
 - ``LV_KEY_UP/DOWN`` With *Keypad* and *Encoder* increment/decrement
   the value.
-- :cpp:enumerator:`LV_KEY_ENTER` With *Encoder* got the net digit. Jump to the first
-  after the last.
+- :cpp:enumerator:`LV_KEY_ENTER` With *Encoder*, move focus to next digit.  If focus
+  is on last digit, focus moves to first digit.
 
 .. admonition::  Further Reading
 

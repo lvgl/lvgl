@@ -40,8 +40,8 @@ extern "C" {
 
 #define NEMA_VG_MAJOR_VERSION    0x01U       /**< NemaVG API version, major number */
 #define NEMA_VG_MINOR_VERSION    0x01U       /**< NemaVG API version, minor number */
-#define NEMA_VG_REVISION_VERSION 0x05U       /**< NemaVG API version, revision number */
-#define NEMA_VG_IMP_VERSION      0x00231000U /**< NemaVG API version, implementation in format 0x00YYMM00 (Y: year, M: month) */
+#define NEMA_VG_REVISION_VERSION 0x07U       /**< NemaVG API version, revision number */
+#define NEMA_VG_IMP_VERSION      0x00240600U /**< NemaVG API version, implementation in format 0x00YYMM00 (Y: year, M: month) */
 
 #define NEMA_VG_API_VERSION ((NEMA_VG_MAJOR_VERSION << 16) + (NEMA_VG_MINOR_VERSION << 8) + (NEMA_VG_REVISION_VERSION)) /**< NemaVG API version in format 0x00MMmmrr (M:major, m:minor, r:revision if any) */
 

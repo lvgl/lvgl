@@ -15,3 +15,4 @@ Integration and Drivers
     framework/index
     ide/index
     os/index
+    boards/index

@@ -76,6 +76,14 @@ void lv_indev_scroll_handler(lv_indev_t * indev)
         parent = lv_obj_get_parent(parent);
     }
 
+    if(scale_x == 0) {
+        scale_x = 1;
+    }
+
+    if(scale_y == 0) {
+        scale_y = 1;
+    }
+
     if(angle != 0 || scale_x != LV_SCALE_NONE || scale_y != LV_SCALE_NONE) {
         angle = -angle;
         scale_x = (256 * 256) / scale_x;
@@ -290,6 +298,14 @@ lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev)
             scale_x = (scale_x * zoom_act_x) >> 8;
             scale_y = (scale_y * zoom_act_y) >> 8;
             parent = lv_obj_get_parent(parent);
+        }
+
+        if(scale_x == 0) {
+            scale_x = 1;
+        }
+
+        if(scale_y == 0) {
+            scale_y = 1;
         }
 
         lv_point_t obj_scroll_sum = indev->pointer.scroll_sum;
@@ -639,10 +655,19 @@ static void scroll_limit_diff(lv_indev_t * indev, int32_t * diff_x, int32_t * di
 static int32_t elastic_diff(lv_obj_t * scroll_obj, int32_t diff, int32_t scroll_start, int32_t scroll_end,
                             lv_dir_t dir)
 {
+    if(diff == 0) return 0;
+
     /*Scroll back to the edge if required*/
     if(!lv_obj_has_flag(scroll_obj, LV_OBJ_FLAG_SCROLL_ELASTIC)) {
-        if(scroll_end + diff < 0) diff = - scroll_end;
-        if(scroll_start - diff < 0) diff = scroll_start;
+        /*
+         * If the scrolling object does not set the `LV_OBJ_FLAG_SCROLL_ELASTIC` flag,
+         * make sure that `diff` will not cause the scroll to exceed the `start` or `end` boundary of the content.
+         * If the content has exceeded the boundary due to external factors like `LV_SCROLL_SNAP_CENTER`,
+         * then respect the current position instead of going straight back to 0.
+         */
+        const int32_t scroll_ended = diff > 0 ? scroll_start : scroll_end;
+        if(scroll_ended < 0) diff = 0;
+        else if(scroll_ended - diff < 0) diff = scroll_ended;
     }
     /*Handle elastic scrolling*/
     else {

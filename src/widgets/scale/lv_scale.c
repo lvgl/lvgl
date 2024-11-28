@@ -332,17 +332,9 @@ lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
     if(section == NULL) return NULL;
 
     /* Section default values */
-    section->main_style = NULL;
-    section->indicator_style = NULL;
-    section->items_style = NULL;
-    section->minor_range = 0U;
-    section->major_range = 0U;
+    lv_memzero(section, sizeof(lv_scale_section_t));
     section->first_tick_idx_in_section = LV_SCALE_TICK_IDX_DEFAULT_ID;
     section->last_tick_idx_in_section = LV_SCALE_TICK_IDX_DEFAULT_ID;
-    section->first_tick_idx_is_major = 0U;
-    section->last_tick_idx_is_major = 0U;
-    section->first_tick_in_section_width = 0U;
-    section->last_tick_in_section_width = 0U;
 
     return section;
 }
@@ -444,13 +436,13 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     scale->label_enabled = LV_SCALE_LABEL_ENABLED_DEFAULT;
     scale->angle_range = LV_SCALE_DEFAULT_ANGLE_RANGE;
     scale->rotation = LV_SCALE_DEFAULT_ROTATION;
-    scale->range_min = 0U;
-    scale->range_max = 100U;
-    scale->last_tick_width = 0U;
-    scale->first_tick_width = 0U;
+    scale->range_min = 0;
+    scale->range_max = 100;
+    scale->last_tick_width = 0;
+    scale->first_tick_width = 0;
     scale->post_draw = false;
     scale->draw_ticks_on_top = false;
-    scale->custom_label_cnt = 0U;
+    scale->custom_label_cnt = 0;
     scale->txt_src = NULL;
 
     lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
@@ -557,16 +549,18 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     lv_draw_line_dsc_init(&main_line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &main_line_dsc);
 
-    const uint32_t total_tick_count = scale->total_tick_count;
-    uint32_t tick_idx = 0;
-    uint32_t major_tick_idx = 0;
+    /* These 2 values need to be signed since they are being passed
+     * to `lv_map()` which expects signed integers. */
+    const int32_t total_tick_count = scale->total_tick_count;
+    int32_t tick_idx = 0;
+    uint32_t major_tick_idx = 0U;
     for(tick_idx = 0; tick_idx < total_tick_count; tick_idx++) {
         /* A major tick is the one which has a label in it */
         bool is_major_tick = false;
         if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
         if(is_major_tick) major_tick_idx++;
 
-        const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count - 1, scale->range_min, scale->range_max);
+        const int32_t tick_value = lv_map(tick_idx, 0, total_tick_count - 1, scale->range_min, scale->range_max);
 
         label_dsc.base.id1 = tick_idx;
         label_dsc.base.id2 = tick_value;
@@ -658,16 +652,16 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
 
         /* Find the center of the scale */
         lv_point_t center_point;
-        int32_t radius_edge = LV_MIN(lv_area_get_width(&scale_area) / 2U, lv_area_get_height(&scale_area) / 2U);
+        int32_t radius_edge = LV_MIN(lv_area_get_width(&scale_area) / 2, lv_area_get_height(&scale_area) / 2);
         center_point.x = scale_area.x1 + radius_edge;
         center_point.y = scale_area.y1 + radius_edge;
 
         const int32_t major_len = lv_obj_get_style_length(obj, LV_PART_INDICATOR);
 
         /* Also take into consideration the letter space of the style */
-        int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1) +
-                                (translate_rotation * 10U);
-        angle_upscale += scale->rotation * 10U;
+        int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1U) +
+                                (translate_rotation * 10);
+        angle_upscale += scale->rotation * 10;
 
         uint32_t radius_text = 0;
         if(LV_SCALE_MODE_ROUND_INNER == scale->mode) {
@@ -756,7 +750,7 @@ static void scale_calculate_main_compensation(lv_obj_t * obj)
 
         const bool is_major_tick = tick_idx % scale->major_tick_every == 0;
 
-        const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count - 1, scale->range_min, scale->range_max);
+        const int32_t tick_value = lv_map(tick_idx, 0, total_tick_count - 1, scale->range_min, scale->range_max);
 
         /* Overwrite label and tick properties if tick value is within section range */
         lv_scale_section_t * section;
@@ -812,24 +806,24 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
         const int32_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
         const int32_t pad_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width;
 
-        int32_t x_ofs = 0U;
-        int32_t y_ofs = 0U;
+        int32_t x_ofs = 0;
+        int32_t y_ofs = 0;
 
         if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
-            x_ofs = obj->coords.x2 + (line_dsc.width / 2U) - pad_right;
+            x_ofs = obj->coords.x2 + (line_dsc.width / 2) - pad_right;
             y_ofs = obj->coords.y1 + pad_top;
         }
         else if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-            x_ofs = obj->coords.x1 + (line_dsc.width / 2U) + pad_left;
+            x_ofs = obj->coords.x1 + (line_dsc.width / 2) + pad_left;
             y_ofs = obj->coords.y1 + pad_top;
         }
         if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
             x_ofs = obj->coords.x1 + pad_right;
-            y_ofs = obj->coords.y1 + (line_dsc.width / 2U) + pad_top;
+            y_ofs = obj->coords.y1 + (line_dsc.width / 2) + pad_top;
         }
         else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
             x_ofs = obj->coords.x1 + pad_left;
-            y_ofs = obj->coords.y2 + (line_dsc.width / 2U) - pad_bottom;
+            y_ofs = obj->coords.y2 + (line_dsc.width / 2) - pad_bottom;
         }
         else { /* Nothing to do */ }
 
@@ -838,14 +832,14 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
 
         /* Setup the tick points */
         if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-            main_line_point_a.x = x_ofs - 1U;
+            main_line_point_a.x = x_ofs - 1;
             main_line_point_a.y = y_ofs;
-            main_line_point_b.x = x_ofs - 1U;
+            main_line_point_b.x = x_ofs - 1;
             main_line_point_b.y = obj->coords.y2 - pad_bottom;
 
             /* Adjust main line with initial and last tick width */
-            main_line_point_a.y -= scale->last_tick_width / 2U;
-            main_line_point_b.y += scale->first_tick_width / 2U;
+            main_line_point_a.y -= scale->last_tick_width / 2;
+            main_line_point_b.y += scale->first_tick_width / 2;
         }
         else {
             main_line_point_a.x = x_ofs;
@@ -855,8 +849,8 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             main_line_point_b.y = y_ofs;
 
             /* Adjust main line with initial and last tick width */
-            main_line_point_a.x -= scale->last_tick_width / 2U;
-            main_line_point_b.x += scale->first_tick_width / 2U;
+            main_line_point_a.x -= scale->last_tick_width / 2;
+            main_line_point_b.x += scale->first_tick_width / 2;
         }
 
         line_dsc.p1 = lv_point_to_precise(&main_line_point_a);
@@ -873,8 +867,8 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             lv_point_t section_point_a;
             lv_point_t section_point_b;
 
-            const int32_t first_tick_width_halved = (int32_t)(section->first_tick_in_section_width / 2U);
-            const int32_t last_tick_width_halved = (int32_t)(section->last_tick_in_section_width / 2U);
+            const int32_t first_tick_width_halved = (int32_t)(section->first_tick_in_section_width / 2);
+            const int32_t last_tick_width_halved = (int32_t)(section->last_tick_in_section_width / 2);
 
             /* Calculate the position of the section based on the ticks (first and last) index */
             if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
@@ -970,7 +964,7 @@ static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, int32_t 
     int32_t top_bg = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
     int32_t bottom_bg = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
 
-    int32_t r = (LV_MIN(lv_obj_get_width(obj) - left_bg - right_bg, lv_obj_get_height(obj) - top_bg - bottom_bg)) / 2U;
+    int32_t r = (LV_MIN(lv_obj_get_width(obj) - left_bg - right_bg, lv_obj_get_height(obj) - top_bg - bottom_bg)) / 2;
 
     center->x = obj->coords.x1 + r + left_bg;
     center->y = obj->coords.y1 + r + top_bg;
@@ -1026,25 +1020,25 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
         const int32_t tick_pad_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
         const int32_t tick_pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
 
-        int32_t x_ofs = 0U;
-        int32_t y_ofs = 0U;
+        int32_t x_ofs = 0;
+        int32_t y_ofs = 0;
 
         if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
-            x_ofs = obj->coords.x2 + (main_line_dsc.width / 2U) - pad_right;
+            x_ofs = obj->coords.x2 + (main_line_dsc.width / 2) - pad_right;
             y_ofs = obj->coords.y1 + (pad_top + tick_pad_top);
         }
         else if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-            x_ofs = obj->coords.x1 + (main_line_dsc.width / 2U) + pad_left;
+            x_ofs = obj->coords.x1 + (main_line_dsc.width / 2) + pad_left;
             y_ofs = obj->coords.y1 + (pad_top + tick_pad_top);
         }
         else if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
             x_ofs = obj->coords.x1 + (pad_right + tick_pad_right);
-            y_ofs = obj->coords.y1 + (main_line_dsc.width / 2U) + pad_top;
+            y_ofs = obj->coords.y1 + (main_line_dsc.width / 2) + pad_top;
         }
         /* LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode */
         else {
             x_ofs = obj->coords.x1 + (pad_left + tick_pad_left);
-            y_ofs = obj->coords.y2 + (main_line_dsc.width / 2U) - pad_bottom;
+            y_ofs = obj->coords.y2 + (main_line_dsc.width / 2) - pad_bottom;
         }
 
         /* Adjust length when tick will be drawn on horizontal top or vertical right scales */
@@ -1082,7 +1076,7 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
             }
             else { /* Nothing to do */ }
 
-            tick_point_a->x = x_ofs - 1U; /* Move extra pixel out of scale boundary */
+            tick_point_a->x = x_ofs - 1; /* Move extra pixel out of scale boundary */
             tick_point_a->y = vertical_position;
             tick_point_b->x = tick_point_a->x - tick_length;
             tick_point_b->y = vertical_position;
@@ -1115,12 +1109,12 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
 
         /* Find the center of the scale */
         lv_point_t center_point;
-        const int32_t radius_edge = LV_MIN(lv_area_get_width(&scale_area) / 2U, lv_area_get_height(&scale_area) / 2U);
+        const int32_t radius_edge = LV_MIN(lv_area_get_width(&scale_area) / 2, lv_area_get_height(&scale_area) / 2);
         center_point.x = scale_area.x1 + radius_edge;
         center_point.y = scale_area.y1 + radius_edge;
 
-        int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1);
-        angle_upscale += scale->rotation * 10U;
+        int32_t angle_upscale = (int32_t)((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1U);
+        angle_upscale += scale->rotation * 10;
 
         /* Draw a little bit longer lines to be sure the mask will clip them correctly
          * and to get a better precision. Adding the main line width to the calculation so we don't have gaps
@@ -1168,8 +1162,8 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
 
     /* Set the label draw area at some distance of the major tick */
     if((LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) || (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
-        label_coords->x1 = tick_point->x - (label_size.x / 2U);
-        label_coords->x2 = tick_point->x + (label_size.x / 2U);
+        label_coords->x1 = tick_point->x - (label_size.x / 2);
+        label_coords->x2 = tick_point->x + (label_size.x / 2);
 
         if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
             label_coords->y1 = tick_point->y + lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
@@ -1181,8 +1175,8 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
         }
     }
     else if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
-        label_coords->y1 = tick_point->y - (label_size.y / 2U);
-        label_coords->y2 = tick_point->y + (label_size.y / 2U);
+        label_coords->y1 = tick_point->y - (label_size.y / 2);
+        label_coords->y2 = tick_point->y + (label_size.y / 2);
 
         if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
             label_coords->x1 = tick_point->x - label_size.x - lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
@@ -1194,8 +1188,8 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
         }
     }
     else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
-        label_coords->x1 = tick_point->x - (label_size.x / 2U);
-        label_coords->y1 = tick_point->y - (label_size.y / 2U);
+        label_coords->x1 = tick_point->x - (label_size.x / 2);
+        label_coords->y1 = tick_point->y - (label_size.y / 2);
         label_coords->x2 = label_coords->x1 + label_size.x;
         label_coords->y2 = label_coords->y1 + label_size.y;
     }
@@ -1259,7 +1253,7 @@ static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_
  * Checks if the arc has a custom section configuration or not and sets the properties accordingly.
  *
  * @param obj       pointer to a scale object
- * @param line_dsc  pointer to arc descriptor
+ * @param arc_dsc  pointer to arc descriptor
  * @param items_section_style  pointer to indicator section style
  */
 static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc, lv_style_t * section_style)
@@ -1268,37 +1262,57 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
         lv_style_value_t value;
         lv_style_res_t res;
 
-        /* Line width */
+        /* arc width */
         res = lv_style_get_prop(section_style, LV_STYLE_ARC_WIDTH, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->width = (int32_t)value.num;
         }
         else {
-            arc_dsc->width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
+            arc_dsc->width = lv_obj_get_style_arc_width(obj, LV_PART_MAIN);
         }
 
-        /* Line color */
+        /* arc color */
         res = lv_style_get_prop(section_style, LV_STYLE_ARC_COLOR, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->color = value.color;
         }
         else {
-            arc_dsc->color = lv_obj_get_style_line_color(obj, LV_PART_MAIN);
+            arc_dsc->color = lv_obj_get_style_arc_color(obj, LV_PART_MAIN);
         }
 
-        /* Line opa */
+        /* arc opa */
         res = lv_style_get_prop(section_style, LV_STYLE_ARC_OPA, &value);
         if(res == LV_STYLE_RES_FOUND) {
             arc_dsc->opa = (lv_opa_t)value.num;
         }
         else {
-            arc_dsc->opa = lv_obj_get_style_line_opa(obj, LV_PART_MAIN);
+            arc_dsc->opa = lv_obj_get_style_arc_opa(obj, LV_PART_MAIN);
+        }
+
+        /* arc rounded */
+        res = lv_style_get_prop(section_style, LV_STYLE_ARC_ROUNDED, &value);
+        if(res == LV_STYLE_RES_FOUND) {
+            arc_dsc->rounded = (uint8_t)value.num;
+        }
+        else {
+            arc_dsc->rounded = lv_obj_get_style_arc_rounded(obj, LV_PART_MAIN);
+        }
+
+        /* arc image src */
+        res = lv_style_get_prop(section_style, LV_STYLE_ARC_IMAGE_SRC, &value);
+        if(res == LV_STYLE_RES_FOUND) {
+            arc_dsc->img_src = (const void *)value.ptr;
+        }
+        else {
+            arc_dsc->img_src = lv_obj_get_style_arc_image_src(obj, LV_PART_MAIN);
         }
     }
     else {
-        arc_dsc->color = lv_obj_get_style_line_color(obj, LV_PART_MAIN);
-        arc_dsc->opa = lv_obj_get_style_line_opa(obj, LV_PART_MAIN);
-        arc_dsc->width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
+        arc_dsc->color = lv_obj_get_style_arc_color(obj, LV_PART_MAIN);
+        arc_dsc->opa = lv_obj_get_style_arc_opa(obj, LV_PART_MAIN);
+        arc_dsc->width = lv_obj_get_style_arc_width(obj, LV_PART_MAIN);
+        arc_dsc->rounded = lv_obj_get_style_arc_rounded(obj, LV_PART_MAIN);
+        arc_dsc->img_src = lv_obj_get_style_arc_image_src(obj, LV_PART_MAIN);
     }
 }
 
@@ -1377,7 +1391,7 @@ static void scale_find_section_tick_idx(lv_obj_t * obj)
         bool is_major_tick = false;
         if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
 
-        const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count - 1, min_out, max_out);
+        const int32_t tick_value = lv_map(tick_idx, 0, total_tick_count - 1, min_out, max_out);
 
         lv_scale_section_t * section;
         LV_LL_READ_BACK(&scale->section_ll, section) {
@@ -1386,12 +1400,23 @@ static void scale_find_section_tick_idx(lv_obj_t * obj)
                     section->first_tick_idx_in_section = tick_idx;
                     section->first_tick_idx_is_major = is_major_tick;
                 }
-                if(section->first_tick_idx_in_section != tick_idx) {
+                if(LV_SCALE_TICK_IDX_DEFAULT_ID == section->last_tick_idx_in_section) {
+                    /* This gets it initialized when the beginning and ending range values are the same. */
+                    section->last_tick_idx_in_section = tick_idx;
+                    section->last_tick_idx_is_major = is_major_tick;
+                }
+                /* Now keep setting the `last_tick_idx_...` values as we
+                 * proceed through the `for` loop so it is left with the
+                 * actual last-tick value that is within the Scale's range. */
+                else if(section->first_tick_idx_in_section != tick_idx) {
                     section->last_tick_idx_in_section = tick_idx;
                     section->last_tick_idx_is_major = is_major_tick;
                 }
             }
-            else { /* Nothing to do */ }
+            else {
+                /* `tick_value` is outside Section's range.
+                 * Nothing to do. */
+            }
         }
     }
 }
@@ -1517,15 +1542,19 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
             /* Add 1px as adjustment if tmp_width is odd */
             if(tmp_width & 0x01U) {
                 if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-                    tmp_width += 1U;
+                    tmp_width += 1;
                 }
                 else {
-                    tmp_width -= 1U;
+                    tmp_width -= 1;
                 }
             }
             section->first_tick_in_section_width = tmp_width;
         }
-        else if(tick_idx == section->last_tick_idx_in_section) {
+
+        /* This can also apply when
+         * (tick_idx == section->first_tick_idx_in_section) when the
+         * beginning and ending vlues of the range are the same. */
+        if(tick_idx == section->last_tick_idx_in_section) {
             if(section->last_tick_idx_is_major) {
                 tmp_width = major_tick_dsc->width;
             }
@@ -1537,10 +1566,10 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
             /* Add 1px as adjustment if tmp_width is odd */
             if(tmp_width & 0x01U) {
                 if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-                    tmp_width -= 1U;
+                    tmp_width -= 1;
                 }
                 else {
-                    tmp_width += 1U;
+                    tmp_width += 1;
                 }
             }
             section->last_tick_in_section_width = tmp_width;

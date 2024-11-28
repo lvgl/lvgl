@@ -89,7 +89,7 @@ bool LookaheadParserHandler::nextArrayValue()
 
 int LookaheadParserHandler::getInt()
 {
-    if (state != kHasNumber || !val.IsInt()) {
+    if (state != kHasNumber) {
         Error();
         return 0;
     }

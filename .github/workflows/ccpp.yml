@@ -59,6 +59,22 @@ jobs:
       env:
         CC: cl
 
+  build-esp32s3:
+    runs-on: ubuntu-22.04
+    name: Build ESP IDF ESP32S3
+    container: espressif/idf:v5.3.1
+    steps:
+    - name: Clone LVGL as a Component
+      uses: actions/checkout@v4
+      with:
+        path: components/lvgl
+    - name: Copy IDF Project Example
+      run: . /opt/esp/idf/export.sh && cp -r $IDF_PATH/examples/get-started/hello_world/* .
+    - name: Set Target ESP32S3
+      run: . /opt/esp/idf/export.sh && idf.py set-target esp32s3
+    - name: Build
+      run: . /opt/esp/idf/export.sh && idf.py build
+
   test-native:
     runs-on: ubuntu-22.04
     strategy:
@@ -111,7 +127,7 @@ jobs:
 
     - name: Upload untracked reference images
       if: steps.check_untracked_ref_imgs.outputs.new_ref_imgs_found == 'true'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Untracked Reference Images
         path: untracked_ref_imgs.zip

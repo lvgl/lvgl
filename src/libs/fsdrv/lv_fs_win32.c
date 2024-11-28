@@ -22,14 +22,12 @@
     #error "Invalid drive letter"
 #endif
 
-#define MAX_PATH_LEN 256
-
 /**********************
  *      TYPEDEFS
  **********************/
 typedef struct {
     HANDLE dir_p;
-    char next_fn[MAX_PATH_LEN];
+    char next_fn[LV_FS_MAX_PATH_LEN];
     lv_fs_res_t next_error;
 } dir_handle_t;
 
@@ -371,7 +369,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     WIN32_FIND_DATAA fdata;
 
     /*Make the path relative to the current directory (the projects root folder)*/
-    char buf[MAX_PATH_LEN];
+    char buf[LV_FS_MAX_PATH_LEN];
 #ifdef LV_FS_WIN32_PATH
     lv_snprintf(buf, sizeof(buf), LV_FS_WIN32_PATH "%s\\*", path);
 #else

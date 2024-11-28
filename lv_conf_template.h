@@ -216,11 +216,16 @@
 #define LV_USE_NEMA_GFX 0
 
 #if LV_USE_NEMA_GFX
-    #define LV_NEMA_GFX_HAL_INCLUDE <stm32u5xx_hal.h>
+    /** Select which NemaGFX HAL to use. Possible options:
+     * - LV_NEMA_HAL_CUSTOM
+     * - LV_NEMA_HAL_STM32 */
+    #define LV_USE_NEMA_HAL LV_NEMA_HAL_CUSTOM
+    #if LV_USE_NEMA_HAL == LV_NEMA_HAL_STM32
+        #define LV_NEMA_STM32_HAL_INCLUDE <stm32u5xx_hal.h>
+    #endif
 
     /*Enable Vector Graphics Operations. Available only if NemaVG library is present*/
     #define LV_USE_NEMA_VG 0
-
     #if LV_USE_NEMA_VG
         /*Define application's resolution used for VG related buffer allocation */
         #define LV_NEMA_GFX_MAX_RESX 800
@@ -475,6 +480,10 @@
     /** Enable multi-thread render */
     #define LV_VG_LITE_THORVG_THREAD_RENDER 0
 #endif
+
+/* Enable the multi-touch gesture recognition feature */
+/* Gesture recognition requires the use of floats */
+#define LV_USE_GESTURE_RECOGNITION 0
 
 /*=====================
  *  COMPILER SETTINGS
@@ -811,6 +820,7 @@
 #define LV_USE_FS_FATFS 0
 #if LV_USE_FS_FATFS
     #define LV_FS_FATFS_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+    #define LV_FS_FATFS_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
     #define LV_FS_FATFS_CACHE_SIZE 0    /**< >0 to cache this number of bytes in lv_fs_read() */
 #endif
 
@@ -824,18 +834,21 @@
 #define LV_USE_FS_LITTLEFS 0
 #if LV_USE_FS_LITTLEFS
     #define LV_FS_LITTLEFS_LETTER '\0'  /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+    #define LV_FS_LITTLEFS_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
 #endif
 
 /** API for Arduino LittleFs. */
 #define LV_USE_FS_ARDUINO_ESP_LITTLEFS 0
 #if LV_USE_FS_ARDUINO_ESP_LITTLEFS
     #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+    #define LV_FS_ARDUINO_ESP_LITTLEFS_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
 #endif
 
 /** API for Arduino Sd. */
 #define LV_USE_FS_ARDUINO_SD 0
 #if LV_USE_FS_ARDUINO_SD
     #define LV_FS_ARDUINO_SD_LETTER '\0'          /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+    #define LV_FS_ARDUINO_SD_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
 #endif
 
 /** LODEPNG decoder library */
@@ -925,6 +938,10 @@
 #if LV_USE_FFMPEG
     /** Dump input information to stderr */
     #define LV_FFMPEG_DUMP_FORMAT 0
+    /** Use lvgl file path in FFmpeg Player widget 
+     *  You won't be able to open URLs after enabling this feature.
+     *  Note that FFmpeg image decoder will always use lvgl file system. */
+    #define LV_FFMPEG_PLAYER_USE_LV_FS 0
 #endif
 
 /*==================

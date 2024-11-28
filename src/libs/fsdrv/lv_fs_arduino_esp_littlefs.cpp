@@ -77,7 +77,10 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     else if(mode == (LV_FS_MODE_WR | LV_FS_MODE_RD))
         flags = FILE_WRITE;
 
-    File file = LittleFS.open(path, flags);
+    char buf[LV_FS_MAX_PATH_LEN];
+    lv_snprintf(buf, sizeof(buf), LV_FS_ARDUINO_ESP_LITTLEFS_PATH "%s", path);
+
+    File file = LittleFS.open(buf, flags);
     if(!file) {
         return NULL;
     }

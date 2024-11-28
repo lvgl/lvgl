@@ -4,28 +4,31 @@
 Bar (lv_bar)
 ============
 
+
 Overview
 ********
 
-The bar Widget has a background and an indicator on it. The width of the
-indicator is set according to the current value of the bar.
+The bar Widget has a background and an indicator. The length of the
+indicator against the background indicates the bar's current value.
 
 Vertical bars can be created if the width of the Widget is smaller than
 its height.
 
-Not only the end, but also the start value of the bar can be set, which
-changes the start position of the indicator.
+Both the start and end values of the bar can be set.  Changing the start value to a
+value other than the minimum value in its range changes the start position of the indicator.
+
+
 
 .. _lv_bar_parts_and_styles:
 
 Parts and Styles
 ****************
 
--  :cpp:enumerator:`LV_PART_MAIN` The background of the bar and it uses the typical
+-  :cpp:enumerator:`LV_PART_MAIN` The bar's background.  It uses the typical
    background style properties. Adding padding makes the indicator
    smaller or larger. The ``anim_time`` style property sets the
    animation time if the values set with :cpp:enumerator:`LV_ANIM_ON`.
--  :cpp:enumerator:`LV_PART_INDICATOR` The indicator itself; also uses all the typical
+-  :cpp:enumerator:`LV_PART_INDICATOR` The bar's indicator; also uses all the typical
    background properties.
 
 .. _lv_bar_usage:
@@ -33,19 +36,33 @@ Parts and Styles
 Usage
 *****
 
+
+Orientation and size
+--------------------
+
+- for orientation, width and height, simply set width and height style properties;
+- :cpp:expr:`lv_bar_set_orientation(slider, orientation)` to override orientation
+  caused by ``width`` and ``height``.  Valid values for ``orientation`` are:
+
+  - LV_BAR_ORIENTATION_AUTO,
+  - LV_BAR_ORIENTATION_HORIZONTAL,
+  - LV_BAR_ORIENTATION_VERTICAL.
+
+
 Value and range
 ---------------
 
-A new value can be set by
-``lv_bar_set_value(bar, new_value, LV_ANIM_ON/OFF)``. The value is
+A new value can be set with
+:cpp:expr:`lv_bar_set_value(bar, new_value, LV_ANIM_ON/OFF)`. The value is
 interpreted in a range (minimum and maximum values) which can be
 modified with :cpp:expr:`lv_bar_set_range(bar, min, max)`. The default range is
 0..100, and the default drawing direction is from left to right in horizontal mode and
 bottom to top in vertical mode. If the minimum value is greater than the maximum value, like
-100..0, the drawing direction changes to the opposite direction.
+100..0, the drawing direction is reversed.
 
 The new value in :cpp:func:`lv_bar_set_value` can be set with or without an
 animation depending on the last parameter (``LV_ANIM_ON/OFF``).
+
 
 Modes
 -----
@@ -53,11 +70,11 @@ Modes
 The bar can be one of the following modes:
 
 - :cpp:enumerator:`LV_BAR_MODE_NORMAL` A normal bar as described above
-- :cpp:enumerator:`LV_BAR_MODE_SYMMETRICAL` Draw the indicator from the zero value to current value. Requires a negative
-  minimum range and positive maximum range.
-- :cpp:enumerator:`LV_BAR_MODE_RANGE` Allows setting the start value as well by
-  ``lv_bar_set_start_value(bar, new_value, LV_ANIM_ON/OFF)``. The start
-  value always has to be smaller than the end value.
+- :cpp:enumerator:`LV_BAR_MODE_SYMMETRICAL` Draws indicator from zero value to current value. Requires a negative
+  minimum value and positive maximum value, e.g. [-100..100].
+- :cpp:enumerator:`LV_BAR_MODE_RANGE` Allows setting the start value as well with
+  :cpp:expr:`lv_bar_set_start_value(bar, new_value, LV_ANIM_ON/OFF)`. The start
+  value must be smaller than the end value.
 
 
 

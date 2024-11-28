@@ -79,6 +79,10 @@ void lv_imagebutton_set_src(lv_obj_t * obj, lv_imagebutton_state_t state, const 
 
     lv_imagebutton_t * imagebutton = (lv_imagebutton_t *)obj;
 
+    if((src_left || src_right) && !src_mid) {
+        LV_LOG_WARN("middle image source is not set while left and/or right image sources are");
+    }
+
     update_src_info(&imagebutton->src_left[state], src_left);
     update_src_info(&imagebutton->src_mid[state], src_mid);
     update_src_info(&imagebutton->src_right[state], src_right);

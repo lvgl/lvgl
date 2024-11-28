@@ -1,4 +1,5 @@
 #include "../../lv_examples.h"
+#include "../../../src/lvgl_private.h"
 
 #if LV_USE_CHART && LV_DRAW_SW_COMPLEX && LV_BUILD_EXAMPLES
 

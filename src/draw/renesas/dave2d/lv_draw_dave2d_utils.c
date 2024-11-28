@@ -75,7 +75,7 @@ d2_s32 lv_draw_dave2d_cf_fb_get(void)
             d2_fb_mode = d2_mode_argb8888;
             break;
         case DISPLAY_IN_FORMAT_32BITS_RGB888: ///< RGB888,   32 bits
-            d2_fb_mode = d2_mode_rgb888;
+            d2_fb_mode = d2_mode_argb8888; //GLCDC ignores Alpha when configured for RGB888
             break;
         case  DISPLAY_IN_FORMAT_16BITS_ARGB4444: ///< ARGB4444, 16 bits
             d2_fb_mode = d2_mode_argb4444;
@@ -99,16 +99,37 @@ d2_u32 lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(lv_color_format_t colour_format)
     d2_u32 d2_lvgl_mode = 0;
 
     switch(colour_format) {
+        case(LV_COLOR_FORMAT_I1):
+            d2_lvgl_mode = d2_mode_i1;
+            break;
+        case(LV_COLOR_FORMAT_I2):
+            d2_lvgl_mode = d2_mode_i2;
+            break;
+        case(LV_COLOR_FORMAT_I4):
+            d2_lvgl_mode = d2_mode_i4;
+            break;
+        case(LV_COLOR_FORMAT_I8):
+            d2_lvgl_mode = d2_mode_i4;
+            break;
         case(LV_COLOR_FORMAT_A8):
-            d2_lvgl_mode = d2_mode_alpha8; //?
+            d2_lvgl_mode = d2_mode_alpha8;
             break;
         case(LV_COLOR_FORMAT_RGB565):
             d2_lvgl_mode = d2_mode_rgb565;
             break;
         case(LV_COLOR_FORMAT_RGB888):
-            d2_lvgl_mode = d2_mode_argb8888; //?
+            d2_lvgl_mode = d2_mode_rgb888;
+            break;
+        case(LV_COLOR_FORMAT_ARGB1555):
+            d2_lvgl_mode = d2_mode_argb1555;
+            break;
+        case(LV_COLOR_FORMAT_ARGB4444):
+            d2_lvgl_mode = d2_mode_argb4444;
             break;
         case(LV_COLOR_FORMAT_ARGB8888):
+            d2_lvgl_mode = d2_mode_argb8888;
+            break;
+        case(LV_COLOR_FORMAT_XRGB8888):
             d2_lvgl_mode = d2_mode_argb8888;
             break;
 
@@ -131,6 +152,27 @@ void d2_framebuffer_from_layer(d2_device * handle, lv_layer_t * layer)
                    (d2_u32)lv_area_get_width(&buffer_area),
                    (d2_u32)lv_area_get_height(&buffer_area),
                    lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(layer->color_format));
+}
+
+bool lv_draw_dave2d_is_dest_cf_supported(lv_color_format_t cf)
+{
+    bool result;
+
+    switch(cf) {
+        case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_ARGB4444:
+            result = true;
+            break;
+
+        default:
+            result = false;
+            break;
+    }
+
+    return result;
 }
 
 /**********************

@@ -35,19 +35,19 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void init_style(lv_obj_t * obj);
 
-static void browser_file_event_handler(lv_event_t * e);
 #if LV_FILE_EXPLORER_QUICK_ACCESS
     static void quick_access_event_handler(lv_event_t * e);
     static void quick_access_area_event_handler(lv_event_t * e);
 #endif
 
-static void init_style(lv_obj_t * obj);
+static void browser_file_event_handler(lv_event_t * e);
 static void show_dir(lv_obj_t * obj, const char * path);
 static void strip_ext(char * dir);
+static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j);
 static void file_explorer_sort(lv_obj_t * obj);
 static void sort_by_file_kind(lv_obj_t * tb, int16_t lo, int16_t hi);
-static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j);
 static bool is_end_with(const char * str1, const char * str2);
 
 /**********************
@@ -619,7 +619,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
     /*Move the table to the top*/
     lv_obj_scroll_to_y(explorer->file_table, 0, LV_ANIM_OFF);
 
-    lv_strlcpy(explorer->current_path, path, sizeof(explorer->current_path));
+    lv_strncpy(explorer->current_path, path, sizeof(explorer->current_path));
     lv_label_set_text_fmt(explorer->path_label, LV_SYMBOL_EYE_OPEN" %s", path);
 
     size_t current_path_len = lv_strlen(explorer->current_path);
@@ -647,6 +647,8 @@ static void strip_ext(char * dir)
 
 static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j)
 {
+    if(i == j) return;
+
     const char * tmp;
     tmp = lv_table_get_cell_value(tb, i, 0);
     lv_table_set_cell_value(tb, 0, 2, tmp);
@@ -690,9 +692,10 @@ static void sort_by_file_kind(lv_obj_t * tb, int16_t lo, int16_t hi)
     int16_t gt = hi;
     const char * v = lv_table_get_cell_value(tb, lo, 1);
     while(i <= gt) {
-        if(lv_strcmp(lv_table_get_cell_value(tb, i, 1), v) < 0)
+        int strcmp_result = lv_strcmp(lv_table_get_cell_value(tb, i, 1), v);
+        if(strcmp_result < 0)
             exch_table_item(tb, lt++, i++);
-        else if(lv_strcmp(lv_table_get_cell_value(tb, i, 1), v) > 0)
+        else if(strcmp_result > 0)
             exch_table_item(tb, i, gt--);
         else
             i++;

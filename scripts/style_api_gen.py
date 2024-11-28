@@ -126,7 +126,7 @@ props = [
 {'section': 'Margin', 'dsc' : "Properties to describe spacing around a Widget. Very similar to the margin properties in HTML."},
 {'name': 'MARGIN_TOP',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Sets margin on the top. Widget will keep this space from its siblings in layouts. "},
+ 'dsc': "Sets margin on the top. Widget will keep this space from its siblings in layouts."},
 
 {'name': 'MARGIN_BOTTOM',
  'style_type': 'num',   'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,

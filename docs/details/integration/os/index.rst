@@ -12,3 +12,4 @@
     rt-thread
     yocto/index
     zephyr
+    torizon_os

@@ -31,6 +31,9 @@ extern "C" {
 struct _lv_obj_spec_attr_t {
     lv_obj_t ** children;           /**< Store the pointer of the children in an array.*/
     lv_group_t * group_p;
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    lv_matrix_t * matrix;           /**< The transform matrix*/
+#endif
     lv_event_list_t event_list;
 
     lv_point_t scroll;              /**< The current X/Y scroll offset*/

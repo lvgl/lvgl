@@ -1,7 +1,6 @@
 /*******************************************************************
  *
  * @file lv_wayland.c - The Wayland client for LVGL applications
- *
  * Based on the original file from the repository.
  *
  * Porting to LVGL 9.1
@@ -42,7 +41,6 @@ typedef int dummy_t;    /* Make GCC on windows happy, avoid empty translation un
 #include <xkbcommon/xkbcommon.h>
 
 #include "lvgl.h"
-
 
 #if !LV_WAYLAND_WL_SHELL
     #include "wayland_xdg_shell.h"
@@ -101,6 +99,7 @@ enum object_type {
 #define LAST_DECORATION (OBJECT_BORDER_RIGHT)
 #define NUM_DECORATIONS (LAST_DECORATION-FIRST_DECORATION+1)
 
+
 struct window;
 struct input {
     struct {
@@ -117,11 +116,12 @@ struct input {
         lv_indev_state_t state;
     } keyboard;
 
-    struct {
-        uint32_t x;
-        uint32_t y;
-        lv_indev_state_t state;
-    } touch;
+#if LV_USE_GESTURE_RECOGNITION
+    lv_indev_touch_data_t touches[10];
+    uint8_t touch_event_cnt;
+    uint8_t primary_id;
+    lv_indev_gesture_recognizer_t recognizer;
+#endif
 };
 
 struct seat {
@@ -878,11 +878,14 @@ static const struct wl_keyboard_listener keyboard_listener = {
     .modifiers  = keyboard_handle_modifiers,
 };
 
+#if LV_USE_GESTURE_RECOGNITION
+
 static void touch_handle_down(void * data, struct wl_touch * wl_touch,
                               uint32_t serial, uint32_t time, struct wl_surface * surface,
                               int32_t id, wl_fixed_t x_w, wl_fixed_t y_w)
 {
     struct application * app = data;
+    uint8_t i;
 
     LV_UNUSED(id);
     LV_UNUSED(time);
@@ -894,11 +897,16 @@ static void touch_handle_down(void * data, struct wl_touch * wl_touch,
         return;
     }
 
+    /* Create the touch down event */
     app->touch_obj = wl_surface_get_user_data(surface);
+    i = app->touch_obj->input.touch_event_cnt;
 
-    app->touch_obj->input.touch.x = wl_fixed_to_int(x_w);
-    app->touch_obj->input.touch.y = wl_fixed_to_int(y_w);
-    app->touch_obj->input.touch.state = LV_INDEV_STATE_PRESSED;
+    app->touch_obj->input.touches[i].point.x = wl_fixed_to_int(x_w);
+    app->touch_obj->input.touches[i].point.y = wl_fixed_to_int(y_w);
+    app->touch_obj->input.touches[i].id = id;
+    app->touch_obj->input.touches[i].timestamp = time;
+    app->touch_obj->input.touches[i].state = LV_INDEV_STATE_PRESSED;
+    app->touch_obj->input.touch_event_cnt++;
 
 #if LV_WAYLAND_WINDOW_DECORATIONS
     struct window * window = app->touch_obj->window;
@@ -927,17 +935,25 @@ static void touch_handle_up(void * data, struct wl_touch * wl_touch,
                             uint32_t serial, uint32_t time, int32_t id)
 {
     struct application * app = data;
+    uint8_t i;
 
     LV_UNUSED(serial);
     LV_UNUSED(time);
     LV_UNUSED(id);
     LV_UNUSED(wl_touch);
 
-    if(!app->touch_obj) {
-        return;
-    }
+#if LV_USE_GESTURE_RECOGNITION
+    /* Create a released event */
+    i = app->touch_obj->input.touch_event_cnt;
 
-    app->touch_obj->input.touch.state = LV_INDEV_STATE_RELEASED;
+    app->touch_obj->input.touches[i].point.x = 0;
+    app->touch_obj->input.touches[i].point.y = 0;
+    app->touch_obj->input.touches[i].id = id;
+    app->touch_obj->input.touches[i].timestamp = time;
+    app->touch_obj->input.touches[i].state = LV_INDEV_STATE_RELEASED;
+
+    app->touch_obj->input.touch_event_cnt++;
+#endif
 
 #if LV_WAYLAND_WINDOW_DECORATIONS
     struct window * window = app->touch_obj->window;
@@ -962,30 +978,56 @@ static void touch_handle_up(void * data, struct wl_touch * wl_touch,
                 xdg_toplevel_set_minimized(window->xdg_toplevel);
                 window->flush_pending = true;
             }
-#endif // LV_WAYLAND_XDG_SHELL
+#endif /* LV_WAYLAND_XDG_SHELL */
         default:
             break;
     }
-#endif // LV_WAYLAND_WINDOW_DECORATIONS
+#endif /* LV_WAYLAND_WINDOW_DECORATIONS */
 
-    app->touch_obj = NULL;
 }
 
 static void touch_handle_motion(void * data, struct wl_touch * wl_touch,
                                 uint32_t time, int32_t id, wl_fixed_t x_w, wl_fixed_t y_w)
 {
     struct application * app = data;
+    lv_indev_touch_data_t * touch;
+    lv_indev_touch_data_t * cur;
+    uint8_t i;
 
     LV_UNUSED(time);
     LV_UNUSED(id);
     LV_UNUSED(wl_touch);
 
-    if(!app->touch_obj) {
-        return;
+    /* Update the contact point of the corresponding id with the latest coordinate */
+    touch = &app->touch_obj->input.touches[0];
+    cur = NULL;
+
+    for(i = 0; i < app->touch_obj->input.touch_event_cnt; i++) {
+        if(touch->id == id) {
+            cur = touch;
+        }
+        touch++;
     }
 
-    app->touch_obj->input.touch.x = wl_fixed_to_int(x_w);
-    app->touch_obj->input.touch.y = wl_fixed_to_int(y_w);
+    if(cur == NULL) {
+
+        i = app->touch_obj->input.touch_event_cnt;
+        app->touch_obj->input.touches[i].point.x = wl_fixed_to_int(x_w);
+        app->touch_obj->input.touches[i].point.y = wl_fixed_to_int(y_w);
+        app->touch_obj->input.touches[i].id = id;
+        app->touch_obj->input.touches[i].timestamp = time;
+        app->touch_obj->input.touches[i].state = LV_INDEV_STATE_PRESSED;
+        app->touch_obj->input.touch_event_cnt++;
+
+    }
+    else {
+
+        cur->point.x = wl_fixed_to_int(x_w);
+        cur->point.y = wl_fixed_to_int(y_w);
+        cur->id = id;
+        cur->timestamp = time;
+    }
+
 }
 
 static void touch_handle_frame(void * data, struct wl_touch * wl_touch)
@@ -1008,6 +1050,8 @@ static const struct wl_touch_listener touch_listener = {
     .frame  = touch_handle_frame,
     .cancel = touch_handle_cancel,
 };
+
+#endif /* END LV_USE_GESTURE_RECOGNITION */
 
 static void seat_handle_capabilities(void * data, struct wl_seat * wl_seat, enum wl_seat_capability caps)
 {
@@ -1039,10 +1083,12 @@ static void seat_handle_capabilities(void * data, struct wl_seat * wl_seat, enum
         seat->wl_keyboard = NULL;
     }
 
+#if LV_USE_GESTURE_RECOGNITION
     if((caps & WL_SEAT_CAPABILITY_TOUCH) && !seat->wl_touch) {
         seat->wl_touch = wl_seat_get_touch(wl_seat);
         wl_touch_add_listener(seat->wl_touch, &touch_listener, app);
     }
+#endif
     else if(!(caps & WL_SEAT_CAPABILITY_TOUCH) && seat->wl_touch) {
         wl_touch_destroy(seat->wl_touch);
         seat->wl_touch = NULL;
@@ -2223,6 +2269,7 @@ skip:
 static void _lv_wayland_handle_input(void)
 {
     int prepare_read = wl_display_prepare_read(application.display);
+
     while(prepare_read != 0) {
         wl_display_dispatch_pending(application.display);
     }
@@ -2248,13 +2295,6 @@ static void _lv_wayland_handle_output(void)
             window->closed = true;
             window->shall_close = false;
             shall_flush = true;
-
-            window->body->input.touch.x = 0;
-            window->body->input.touch.y = 0;
-            window->body->input.touch.state = LV_INDEV_STATE_RELEASED;
-            if(window->application->touch_obj == window->body) {
-                window->application->touch_obj = NULL;
-            }
 
             window->body->input.pointer.x = 0;
             window->body->input.pointer.y = 0;
@@ -2331,17 +2371,39 @@ static void _lv_wayland_keyboard_read(lv_indev_t * drv, lv_indev_data_t * data)
     data->state = window->body->input.keyboard.state;
 }
 
+#if LV_USE_GESTURE_RECOGNITION
+
 static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
+
     struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
+    lv_indev_touch_data_t * touch;
+    bool is_active;
+    lv_indev_gesture_recognizer_t * recognizer;
+    uint8_t touch_cnt;
+    uint8_t i;
+
     if(!window || window->closed) {
         return;
     }
 
-    data->point.x = window->body->input.touch.x;
-    data->point.y = window->body->input.touch.y;
-    data->state = window->body->input.touch.state;
+    /* Collect touches if there are any - send them to the gesture recognizer */
+    recognizer = &window->body->input.recognizer;
+    touch = &window->body->input.touches[0];
+
+    LV_LOG_TRACE("collected touch events: %d", window->body->input.touch_event_cnt);
+
+    lv_indev_gesture_detect_pinch(recognizer, &window->body->input.touches[0],
+                                  window->body->input.touch_event_cnt);
+
+    window->body->input.touch_event_cnt = 0;
+
+    /* Set the gesture information, before returning to LVGL */
+    lv_indev_set_gesture_data(data, recognizer);
+
 }
+
+#endif /* END LV_USE_GESTURE_RECOGNITION */
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -2569,6 +2631,8 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
         LV_LOG_ERROR("failed to register pointeraxis indev");
     }
 
+#if LV_USE_GESTURE_RECOGNITION
+
     window->lv_indev_touch = lv_indev_create();
     lv_indev_set_type(window->lv_indev_touch, LV_INDEV_TYPE_POINTER);
     lv_indev_set_read_cb(window->lv_indev_touch, _lv_wayland_touch_read);
@@ -2577,6 +2641,8 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     if(!window->lv_indev_touch) {
         LV_LOG_ERROR("failed to register touch indev");
     }
+
+#endif /* END LV_USE_GESTURE_RECOGNITION */
 
     window->lv_indev_keyboard = lv_indev_create();
     lv_indev_set_type(window->lv_indev_keyboard, LV_INDEV_TYPE_KEYPAD);

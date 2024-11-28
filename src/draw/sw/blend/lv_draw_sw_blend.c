@@ -22,7 +22,7 @@
 #if LV_DRAW_SW_SUPPORT_ARGB8888
     #include "lv_draw_sw_blend_to_argb8888.h"
 #endif
-#if LV_DRAW_SW_SUPPORT_RGB888
+#if LV_DRAW_SW_SUPPORT_RGB888 || LV_DRAW_SW_SUPPORT_XRGB8888
     #include "lv_draw_sw_blend_to_rgb888.h"
 #endif
 #if LV_DRAW_SW_SUPPORT_I1
@@ -162,6 +162,7 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
         else image_dsc.mask_buf = blend_dsc->mask_buf;
 
         if(image_dsc.mask_buf) {
+            LV_ASSERT_NULL(blend_dsc->mask_area);
             image_dsc.mask_buf = blend_dsc->mask_buf;
             image_dsc.mask_stride = blend_dsc->mask_stride ? blend_dsc->mask_stride : lv_area_get_width(blend_dsc->mask_area);
             image_dsc.mask_buf += image_dsc.mask_stride * (blend_area.y1 - blend_dsc->mask_area->y1) +
