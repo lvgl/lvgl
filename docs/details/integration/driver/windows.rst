@@ -70,13 +70,17 @@ Usage
         int32_t zoom_level = 100;
         bool allow_dpi_override = false;
         bool simulator_mode = false;
+        bool top_level = false;
+        bool frameless = false;
         lv_display_t* display = lv_windows_create_display(
             L"LVGL Display Window",
             800,
             480,
             zoom_level,
             allow_dpi_override,
-            simulator_mode);
+            simulator_mode,
+            top_level,
+            frameless);
         if (!display)
         {
             return -1;

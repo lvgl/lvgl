@@ -49,6 +49,8 @@ extern "C" {
  *                           Windows DPI scaling setting dynamically.
  * @param simulator_mode Create simulator mode display if true, or create
  *                       application mode display.
+ * @param top_level Create a top-level window.
+ * @param frameless Create a frameless window.
  * @return The created LVGL display object.
 */
 lv_display_t * lv_windows_create_display(
@@ -57,7 +59,9 @@ lv_display_t * lv_windows_create_display(
     int32_t ver_res,
     int32_t zoom_level,
     bool allow_dpi_override,
-    bool simulator_mode);
+    bool simulator_mode,
+    bool top_level,
+    bool frameless);
 
 /**
  * @brief Get the window handle from specific LVGL display object.
