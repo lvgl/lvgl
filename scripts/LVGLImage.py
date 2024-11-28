@@ -872,7 +872,7 @@ class LVGLImage:
     def _png_to_indexed(self, cf: ColorFormat, filename: str):
         # convert to palette mode
         auto_cf = cf is None
-        print(filename)
+        logging.info(filename)
         # read the image data to get the metadata
         reader = png.Reader(filename=filename)
         w, h, rows, metadata = reader.read()
