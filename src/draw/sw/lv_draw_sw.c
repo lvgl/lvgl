@@ -152,11 +152,7 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
                     return 0;
                 }
 
-                bool transformed = draw_dsc->rotation != 0 || draw_dsc->scale_x != LV_SCALE_NONE ||
-                                   draw_dsc->scale_y != LV_SCALE_NONE ? true : false;
-
                 bool masked = draw_dsc->bitmap_mask_src != NULL;
-                if(masked && transformed)  return 0;
 
                 lv_color_format_t cf = draw_dsc->header.cf;
                 if(masked && (cf == LV_COLOR_FORMAT_A8 || cf == LV_COLOR_FORMAT_RGB565A8)) {
