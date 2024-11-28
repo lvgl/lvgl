@@ -22,8 +22,8 @@ By default, LVGL itself uses Timers to:
   also sends all input-device-related events, like :cpp:enumerator:`LV_EVENT_CLICKED`,
   :cpp:enumerator:`LV_EVENT_PRESSED`, etc.
 - update system-monitor values --- if :c:macro:`LV_USE_SYSMON` is set to ``1`` in
-  ``lv_conf.h``, one or more timers can be created to periodically compute and
-  monitor system performance statistics, such as the state of LVGL's memory heap.
+  ``lv_conf.h``, one or more timers are created to periodically compute and
+  monitor system performance statistics and LVGL's memory usage.
 
 Timers are non-preemptive, which means a Timer cannot interrupt another
 Timer. Therefore, you can call any LVGL related function in a Timer.
