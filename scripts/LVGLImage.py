@@ -879,7 +879,7 @@ class LVGLImage:
 
         # to preserve original palette data only convert the image if needed. For this
         # check if image has a palette and the requested palette size equals the existing one 
-        if not 'palette' in metadata or not auto_cf and not len(metadata['palette']) ==  2 ** cf.bpp:
+        if not 'palette' in metadata or not auto_cf and len(metadata['palette']) !=  2 ** cf.bpp:
             # reread and convert file
             reader = png.Reader(
                 bytes=PngQuant(256 if auto_cf else cf.ncolors).convert(filename))
