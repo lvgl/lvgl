@@ -137,7 +137,7 @@ static void _draw_nema_gfx_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_
 #endif
         }
         else if(glyph_draw_dsc->format >= LV_FONT_GLYPH_FORMAT_A1 &&
-                glyph_draw_dsc->format <= LV_FONT_GLYPH_FORMAT_A8) {
+                glyph_draw_dsc->format <= LV_FONT_GLYPH_FORMAT_A8_ALIGNED) {
             /*Do not draw transparent things*/
             if(glyph_draw_dsc->opa <= LV_OPA_MIN)
                 return;
@@ -153,6 +153,7 @@ static void _draw_nema_gfx_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_
             const void * mask_buf = draw_buf->data;
 
 
+            glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
             int32_t x = glyph_draw_dsc->letter_coords->x1 - layer->buf_area.x1;
             int32_t y = glyph_draw_dsc->letter_coords->y1 - layer->buf_area.y1;
             int32_t w = glyph_draw_dsc->g->box_w;

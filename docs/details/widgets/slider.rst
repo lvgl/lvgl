@@ -4,71 +4,94 @@
 Slider (lv_slider)
 ==================
 
+
+
 Overview
 ********
 
-The Slider Widget looks like a :ref:`Bar <lv_bar>` supplemented with
-a knob. The knob can be dragged to set a value. Just like Bar, Slider
+The Slider Widget looks like a :ref:`lv_bar` supplemented with
+a knob. The knob can be dragged to set the Slider's value. Like Bar, a Slider
 can be vertical or horizontal.
+
+
 
 .. _lv_slider_parts_and_styles:
 
 Parts and Styles
 ****************
 
--  :cpp:enumerator:`LV_PART_MAIN` The background of the slider. Uses all the typical
-   background style properties. ``padding`` makes the indicator smaller
-   in the respective direction.
+-  :cpp:enumerator:`LV_PART_MAIN` The background of the Slider. Uses the
+   :ref:`typical background style properties <typical bg props>`. ``padding`` makes
+   the indicator smaller in the respective direction.
 -  :cpp:enumerator:`LV_PART_INDICATOR` The indicator that shows the current state of
-   the slider. Also uses all the typical background style properties.
--  :cpp:enumerator:`LV_PART_KNOB` A rectangle (or circle) drawn at the current value.
-   Also uses all the typical background properties to describe the
-   knob(s). By default, the knob is square (with an optional corner
-   radius) with side length equal to the smaller side of the slider. The
-   knob can be made larger with the ``padding`` values. Padding values
-   can be asymmetric as well.
+   the Slider; also uses the :ref:`typical background style properties <typical bg props>`.
+-  :cpp:enumerator:`LV_PART_KNOB` A rectangle (or circle) drawn at the current value;
+   also uses the :ref:`typical background style properties <typical bg props>` to
+   describe the knob(s).  By default, the knob is round (radius-style can modify this)
+   with side length equal to the smaller dimension of the Slider.  The knob can be
+   made larger with the ``padding`` values.  Padding values can be asymmetric as well.
+
+
 
 .. _lv_slider_usage:
 
 Usage
 *****
 
-Value and range
----------------
+Value, range and orientation
+----------------------------
 
-To set an initial value use :cpp:expr:`lv_slider_set_value(slider, new_value, LV_ANIM_ON/OFF)`. The
-animation time is set by the styles' ``anim_time`` property.
+Once a Slider is created, it has:
 
-To specify the range (min, max values), :cpp:expr:`lv_slider_set_range(slider, min , max)` can be used.
-The default range is 0..100, and the default drawing direction is from left to right in horizontal mode and
-bottom to top in vertical mode. If the minimum value is greater than the maximum value, like
-100..0, the drawing direction changes to the opposite direction.
+- value == 0
+- default range of [0..100],
+- horizontal orientation, with
+- default width of approximately 2 inches (according to configured value of :c:macro:`LV_DPI_DEF`),
+- default hight of approximately 1/10 inch (according to configured value of :c:macro:`LV_DPI_DEF`).
+
+To set a different value use:
+
+- :cpp:expr:`lv_slider_set_value(slider, new_value, LV_ANIM_ON/OFF)` (animation time
+  is set by the styles' ``anim_time`` property);
+- :cpp:expr:`lv_slider_set_range(slider, min , max)`; and
+- for orientation, width and height, simply set width and height style properties;
+- :cpp:expr:`lv_bar_set_orientation(slider, orientation)` to override orientation
+  caused by ``width`` and ``height``.  Valid values for ``orientation`` are:
+
+  - LV_BAR_ORIENTATION_AUTO,
+  - LV_BAR_ORIENTATION_HORIZONTAL,
+  - LV_BAR_ORIENTATION_VERTICAL.
+
+The default drawing direction is from left to right in horizontal orientation and
+bottom to top in vertical orientation.  If the minimum value is set to be greater
+than the maximum value (e.g. [100..0]), the drawing direction is reversed.
 
 Modes
 -----
 
-The slider can be one of the following modes:
+The Slider can be in one of the following modes:
 
-- :cpp:enumerator:`LV_SLIDER_MODE_NORMAL` A normal slider as described above
-- :cpp:enumerator:`LV_SLIDER_SYMMETRICAL` Draw the indicator form the zero value to
+- :cpp:enumerator:`LV_SLIDER_MODE_NORMAL` A normal Slider as described above (default)
+- :cpp:enumerator:`LV_SLIDER_SYMMETRICAL` Draw the indicator from the zero value to
   current value. Requires negative minimum range and positive maximum range.
 - :cpp:enumerator:`LV_SLIDER_RANGE` Allows setting the start value as well by
-  :cpp:expr:`lv_bar_set_start_value(bar, new_value, LV_ANIM_ON/OFF)`. The start
-  value has to be always smaller than the end value.
+  :cpp:expr:`lv_bar_set_start_value(slider, new_value, LV_ANIM_ON/OFF)`. The start
+  value must always be smaller than the end value.
 
 The mode can be changed with :cpp:expr:`lv_slider_set_mode(slider, LV_SLIDER_MODE_...)`
 
 Knob-only mode
 --------------
 
-Normally, the slider can be adjusted either by dragging the knob, or by
-clicking on the slider bar. In the latter case the knob moves to the
-point clicked and slider value changes accordingly. In some cases it is
-desirable to set the slider to react on dragging the knob only. This
-feature is enabled by adding the :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST`:
+Normally, the Slider can be adjusted either by dragging the knob, or by
+clicking on the Slider bar. In the latter case the knob moves to the
+point clicked and the Slider value changes accordingly. In some cases it is
+desirable to set the Slider to react on dragging the knob only. This
+feature is enabled by adding the :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` flag:
 :cpp:expr:`lv_obj_add_flag(slider, LV_OBJ_FLAG_ADV_HITTEST)`.
 
-The extended click area (set by :cpp:expr:`lv_obj_set_ext_click_area(slider, value)`) increases to knob's click area.
+Any extended click area (set by :cpp:expr:`lv_obj_set_ext_click_area(slider, value)`)
+increases the knob's click area.
 
 
 
@@ -77,10 +100,10 @@ The extended click area (set by :cpp:expr:`lv_obj_set_ext_click_area(slider, val
 Events
 ******
 
--  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent while the slider is being dragged or
-   changed with keys. The event is sent continuously while the slider is
+-  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent while the Slider is being dragged or
+   changed with keys. The event is sent continuously while the Slider is
    being dragged.
--  :cpp:enumerator:`LV_EVENT_RELEASED` Sent when the slider has just been released.
+-  :cpp:enumerator:`LV_EVENT_RELEASED` Sent once when Slider is released.
 
 .. admonition::  Further Reading
 
@@ -97,8 +120,8 @@ Events
 Keys
 ****
 
--  ``LV_KEY_UP/RIGHT`` Increment the slider's value by 1
--  ``LV_KEY_DOWN/LEFT`` Decrement the slider's value by 1
+-  ``LV_KEY_UP/RIGHT`` Increment Slider's value by 1.
+-  ``LV_KEY_DOWN/LEFT`` Decrement Slider's value by 1.
 
 .. admonition::  Further Reading
 

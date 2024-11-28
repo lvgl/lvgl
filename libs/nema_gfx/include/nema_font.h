@@ -175,7 +175,7 @@ void nema_string_indexed_get_bbox(const int *ids, int id_count, int *w, int *h, 
 /** \brief Returns the horizontal advance (in pixels) of the bound font
  *
  */
-int nema_font_get_x_advance();
+int nema_font_get_x_advance(void);
 
 #ifdef __cplusplus
 }

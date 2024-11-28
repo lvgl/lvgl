@@ -71,19 +71,20 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
  *   GLOBAL FUNCTIONS
  **********************/
 
+void lv_draw_vg_lite_label_init(lv_draw_unit_t * draw_unit)
+{
+#if LV_USE_FREETYPE
+    /*Set up the freetype outline event*/
+    lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, draw_unit);
+#else
+    LV_UNUSED(draw_unit);
+#endif /* LV_USE_FREETYPE */
+}
+
 void lv_draw_vg_lite_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,
                            const lv_area_t * coords)
 {
     LV_PROFILER_DRAW_BEGIN;
-
-#if LV_USE_FREETYPE
-    static bool is_init = false;
-    if(!is_init) {
-        lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, draw_unit);
-        is_init = true;
-    }
-#endif /* LV_USE_FREETYPE */
-
     lv_draw_label_iterate_characters(draw_unit, dsc, coords, draw_letter_cb);
     LV_PROFILER_DRAW_END;
 }
@@ -101,7 +102,12 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
             case LV_FONT_GLYPH_FORMAT_A1:
             case LV_FONT_GLYPH_FORMAT_A2:
             case LV_FONT_GLYPH_FORMAT_A4:
-            case LV_FONT_GLYPH_FORMAT_A8: {
+            case LV_FONT_GLYPH_FORMAT_A8:
+            case LV_FONT_GLYPH_FORMAT_A1_ALIGNED:
+            case LV_FONT_GLYPH_FORMAT_A2_ALIGNED:
+            case LV_FONT_GLYPH_FORMAT_A4_ALIGNED:
+            case LV_FONT_GLYPH_FORMAT_A8_ALIGNED: {
+                    glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                     draw_letter_bitmap(u, glyph_draw_dsc);
                 }
                 break;
@@ -109,6 +115,7 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
 #if LV_USE_FREETYPE
             case LV_FONT_GLYPH_FORMAT_VECTOR: {
                     if(lv_freetype_is_outline_font(glyph_draw_dsc->g->resolved_font)) {
+                        glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                         draw_letter_outline(u, glyph_draw_dsc);
                     }
                 }
@@ -116,6 +123,7 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
 #endif /* LV_USE_FREETYPE */
 
             case LV_FONT_GLYPH_FORMAT_IMAGE: {
+                    glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                     lv_draw_image_dsc_t image_dsc;
                     lv_draw_image_dsc_init(&image_dsc);
                     image_dsc.opa = glyph_draw_dsc->opa;
@@ -168,7 +176,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
     vg_lite_translate(image_area.x1, image_area.y1, &matrix);
 
     vg_lite_buffer_t src_buf;
-    lv_draw_buf_t * draw_buf = dsc->glyph_data;
+    const lv_draw_buf_t * draw_buf = dsc->glyph_data;
     lv_vg_lite_buffer_from_draw_buf(&src_buf, draw_buf);
 
     vg_lite_color_t color;

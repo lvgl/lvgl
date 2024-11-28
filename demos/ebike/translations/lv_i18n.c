@@ -1,6 +1,7 @@
 #include "./lv_i18n.h"
 #include "../../../src/stdlib/lv_string.h"
 
+#if LV_USE_DEMO_EBIKE
 
 /**
  * Define plural operands
@@ -298,3 +299,5 @@ const char * lv_i18n_get_current_locale(void)
     if(!current_lang) return NULL;
     return current_lang->locale_name;
 }
+
+#endif /*#if LV_USE_DEMO_EBIKE*/

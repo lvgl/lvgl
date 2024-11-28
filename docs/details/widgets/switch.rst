@@ -4,30 +4,36 @@
 Switch (lv_switch)
 ==================
 
+
 Overview
 ********
 
-The Switch looks like a little slider and can be used to turn something
-on and off.
+Switch Widgets look like little sliders and are used to display, and optionally
+modify, a value that can be "on" or "off".
 
-Vertical Switch can be created if the width of the Widget is smaller than its height.
+By default, a Switch is oriented horizontally.  It's orientation will be vertical
+if you set ``width`` < ``height``.
+
+
 
 .. _lv_switch_parts_and_styles:
 
 Parts and Styles
 ****************
 
--  :cpp:enumerator:`LV_PART_MAIN` The background of the switch uses all the typical
-   background style properties. ``padding`` makes the indicator smaller
+-  :cpp:enumerator:`LV_PART_MAIN` Switch's background; uses the :ref:`typical
+   background style properties <typical bg props>`. ``padding`` makes the indicator smaller
    in the respective direction.
 -  :cpp:enumerator:`LV_PART_INDICATOR` The indicator that shows the current state of
-   the switch. Also uses all the typical background style properties.
--  :cpp:enumerator:`LV_PART_KNOB` A rectangle (or circle) drawn at left or right side
-   of the indicator. Also uses all the typical background properties to
-   describe the knob(s). By default, the knob is square (with an
-   optional corner radius) with side length equal to the smaller side of
-   the slider. The knob can be made larger with the ``padding`` values.
+   the Switch; also uses the :ref:`typical background style properties <typical bg props>`.
+-  :cpp:enumerator:`LV_PART_KNOB` A rectangle (or circle) drawn at the left or right
+   side of the indicator; also uses the :ref:`typical background style properties
+   <typical bg props>` to modify the knob's appearance. By default, the knob is round
+   (radius-style can modify this) with diameter slightly smaller than the smaller
+   side of the slider.  The knob can be made larger with the ``padding`` values.
    Padding values can be asymmetric as well.
+
+
 
 .. _lv_switch_usage:
 
@@ -37,18 +43,27 @@ Usage
 Change state
 ------------
 
-The switch uses the standard :cpp:enumerator:`LV_STATE_CHECKED` state.
+The Switch uses the standard :cpp:enumerator:`LV_STATE_CHECKED` state.
 
-To get the current state of the switch (with ``true`` being on), use
+To get the current state of the Switch (with ``true`` being on), use
 :cpp:expr:`lv_obj_has_state(widget, LV_STATE_CHECKED)`.
 
 Call :cpp:expr:`lv_obj_add_state(widget, LV_STATE_CHECKED)` to turn it on, or
-:cpp:expr:`lv_obj_remove_state(widget, LV_STATE_CHECKED)` to turn it off.
+:cpp:expr:`lv_obj_remove_state(widget, LV_STATE_CHECKED)` to turn it off
+programmatically.
 
 Change orientation
 ------------------
 
-:cpp:expr:`lv_switch_set_orientation(widget, LV_SWITCH_ORIENTATION_VERTICAL)` change orientation, default orientation is :cpp:enumerator:`LV_SWITCH_ORIENTATION_AUTO`, adaptive based on the width and height of the Widget.
+Swith a Switch is created, its default orientation is
+:cpp:enumerator:`LV_SWITCH_ORIENTATION_AUTO`, which causes it to be oriented based
+on ``width`` and ``height``.  You can change this behavior using
+:cpp:expr:`lv_switch_set_orientation(widget, orientation)`.  Possible values for
+``orientation`` are:
+
+- :cpp:enumerator:`LV_SWITCH_ORIENTATION_AUTO`
+- :cpp:enumerator:`LV_SWITCH_ORIENTATION_HORIZONTAL`
+- :cpp:enumerator:`LV_SWITCH_ORIENTATION_VERTICAL`
 
 
 
@@ -57,7 +72,7 @@ Change orientation
 Events
 ******
 
--  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the switch changes state.
+-  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when Switch changes state.
 
 .. admonition::  Further Reading
 
@@ -72,9 +87,9 @@ Events
 Keys
 ****
 
--  ``LV_KEY_UP/RIGHT`` Turns on the slider
--  ``LV_KEY_DOWN/LEFT`` Turns off the slider
--  :cpp:enumerator:`LV_KEY_ENTER` Toggles the switch
+-  ``LV_KEY_UP/RIGHT`` Turns Switch ON
+-  ``LV_KEY_DOWN/LEFT`` Turns Switch OFF
+-  :cpp:enumerator:`LV_KEY_ENTER` Toggles the Switch
 
 .. admonition::  Further Reading
 

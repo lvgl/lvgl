@@ -74,11 +74,7 @@ fout.write(
 /* If lv_conf.h is not skipped, include it. */
 #if !defined(LV_CONF_SKIP) || defined(LV_CONF_PATH)
     #ifdef LV_CONF_PATH                           /* If there is a path defined for lv_conf.h, use it */
-        #define __LV_TO_STR_AUX(x) #x
-        #define __LV_TO_STR(x) __LV_TO_STR_AUX(x)
-        #include __LV_TO_STR(LV_CONF_PATH)
-        #undef __LV_TO_STR_AUX
-        #undef __LV_TO_STR
+        #include LV_CONF_PATH                     /* Note: Make sure to define custom CONF_PATH as a string */
     #elif defined(LV_CONF_INCLUDE_SIMPLE)         /* Or simply include lv_conf.h is enabled. */
         #include "lv_conf.h"
     #else

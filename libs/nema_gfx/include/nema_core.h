@@ -37,5 +37,6 @@
 #include "nema_math.h"
 #include "nema_matrix3x3.h"
 #include "nema_matrix4x4.h"
+#include "nema_version.h"
 
 #endif

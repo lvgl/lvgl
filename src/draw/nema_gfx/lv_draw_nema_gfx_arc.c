@@ -62,10 +62,23 @@ void lv_draw_nema_gfx_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * 
 
     nema_set_clip(clip_area.x1, clip_area.y1, lv_area_get_width(&clip_area), lv_area_get_height(&clip_area));
 
+    lv_value_precise_t start_angle = dsc->start_angle;
     lv_value_precise_t end_angle = dsc->end_angle;
 
-    if(dsc->start_angle >= dsc->end_angle)
-        end_angle = dsc->end_angle + 360.f;
+    if(start_angle >= end_angle) {
+        end_angle += 360.0f;
+    }
+
+    if(end_angle - start_angle > 360.0f) {
+        start_angle = 0.0f;
+        end_angle = 360.0f;
+    }
+    else {
+        while(end_angle > 360.0f) {
+            start_angle -= 360.0f;
+            end_angle -= 360.0f;
+        }
+    }
 
     nema_vg_paint_clear(draw_nema_gfx_unit->paint);
     nema_vg_paint_set_type(draw_nema_gfx_unit->paint, NEMA_VG_PAINT_COLOR);
@@ -76,12 +89,12 @@ void lv_draw_nema_gfx_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * 
     nema_vg_set_blend(NEMA_BL_SRC_OVER | NEMA_BLOP_SRC_PREMULT);
 
     if(dsc->rounded == 1) {
-        nema_vg_draw_ring(center.x, center.y, (float)dsc->radius - (float)dsc->width * 0.5f, dsc->start_angle, end_angle,
+        nema_vg_draw_ring(center.x, center.y, (float)dsc->radius - (float)dsc->width * 0.5f, start_angle, end_angle,
                           draw_nema_gfx_unit->paint);
     }
     else {
-        /* nema_vg_draw_ring_generic(center.x, center.y, (float)dsc->radius - (float)dsc->width * 0.5f, dsc->start_angle,
-                                     end_angle, draw_nema_gfx_unit->paint, 0U); */
+        nema_vg_draw_ring_generic(center.x, center.y, (float)dsc->radius - (float)dsc->width * 0.5f, start_angle,
+                                  end_angle, draw_nema_gfx_unit->paint, 0U);
     }
 
     nema_cl_submit(&(draw_nema_gfx_unit->cl));

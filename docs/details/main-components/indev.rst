@@ -123,7 +123,6 @@ If you did some action on a gesture you can call
 :cpp:expr:`lv_indev_wait_release(lv_indev_active())` in the event handler to
 prevent LVGL sending further input-device-related events.
 
-
 .. _indev_crown:
 
 Crown Behavior
@@ -157,6 +156,72 @@ For example, if both the indev and widget sensitivity is set to 128 (0.5), the i
 diff will be multiplied by 0.25.  The value of the Widget will be incremented by that
 value or the Widget will be scrolled that amount of pixels.
 
+Multi-touch gestures
+====================
+
+LVGL has the ability to recognize multi-touch gestures, when a gesture
+is detected a ``LV_EVENT_GESTURE`` is passed to the object on which the
+gesture occurred. Currently, only the pinch gesture is supported
+more gesture types will be implemented soon.
+
+To enable the multi-touch gesture recognition set the
+``LV_USE_GESTURE_RECOGNITION`` option in the ``lv_conf.h`` file.
+
+Touch event collection
+~~~~~~~~~~~~~~~~~~~~~~
+
+The driver or application collects touch events until the indev read callback
+is called. It is the responsibility of the driver to call
+the gesture recognition function of the appropriate type. For example
+to recognise pinch gestures call ``lv_indev_gesture_detect_pinch``.
+
+After calling the gesture detection function, it's necessary to call
+the ``lv_indev_set_gesture_data`` function to set the ``gesture_data``
+and ``gesture_type`` fields of the structure ``lv_indev_data_t``
+
+.. code-block::
+
+   /* The recognizer keeps the state of the gesture */
+   static lv_indev_gesture_recognizer_t recognizer;
+
+   /* An array that stores the collected touch events */
+   static lv_indev_touch_data_t touches[10];
+
+   /* A counter that needs to be incremented each time a touch event is recieved */
+   static uint8_t touch_cnt;
+
+   static void touch_read_callback(lv_indev_t * drv, lv_indev_data_t * data)
+   {
+
+        lv_indev_touch_data_t * touch;
+        uint8_t i;
+
+
+        touch = &touches[0];
+        lv_indev_gesture_detect_pinch(recognizer, &touches[0],
+                                      touch_cnt);
+
+        touch_cnt = 0;
+
+        /* Set the gesture information, before returning to LVGL */
+        lv_indev_set_gesture_data(data, recognizer);
+
+   }
+
+A touch event is represented by the ``lv_indev_touch_data_t`` structure, the fields
+being 1:1 compatible with events emitted by the `libinput <https://wayland.freedesktop.org/libinput/doc/latest/>`_ library
+
+Handling touch events
+~~~~~~~~~~~~~~~~~~~~~
+
+Touch events are handled like any other event. First, setup a listener for the ``LV_EVENT_GESTURE`` event type by defining and setting the callback function.
+
+The state or scale of the pinch gesture can be retrieved by
+calling the ``lv_event_get_pinch_scale`` and ``lv_indev_get_gesture_state`` from within the 
+callback.
+
+An example of such an application is available in
+the source tree ``examples/others/gestures/lv_example_gestures.c``
 
 Keypad or Keyboard
 ------------------

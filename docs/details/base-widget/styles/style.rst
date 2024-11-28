@@ -176,7 +176,7 @@ The following predefined parts exist in LVGL:
 - :cpp:enumerator:`LV_PART_KNOB`: Like a handle to grab to adjust a value
 - :cpp:enumerator:`LV_PART_SELECTED`: Indicate the currently selected option or section
 - :cpp:enumerator:`LV_PART_ITEMS`: Used if the widget has multiple similar elements (e.g. table cells)
-- :cpp:enumerator:`LV_PART_CURSOR`: Mark a specific place e.g. text area's or chart's cursor
+- :cpp:enumerator:`LV_PART_CURSOR`: Mark a specific place e.g. Text Area's or chart's cursor
 - :cpp:enumerator:`LV_PART_CUSTOM_FIRST`: Custom part identifiers can be added starting from here.
 
 For example a :ref:`Slider <lv_slider>` has three parts:
@@ -398,11 +398,13 @@ Style Properties Overview
 For the full list of style properties click :ref:`here <style_properties>`.
 
 
+.. _typical bg props:
+
 Typical background properties
 -----------------------------
 
 In documentation of widgets you will see sentences like "The
-widget uses the typical background properties". These "typical
+_____ Widget uses the typical background style properties".  These "typical
 background properties" are the properties being referred to:
 
 - Background

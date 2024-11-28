@@ -199,6 +199,13 @@ void lv_init(void)
 
     lv_group_init();
 
+#if LV_USE_FREETYPE
+    /* Since the drawing unit needs to register the freetype event,
+     * initialize the freetype module first
+     */
+    lv_freetype_init(LV_FREETYPE_CACHE_FT_GLYPH_CNT);
+#endif
+
     lv_draw_init();
 
 #if LV_USE_DRAW_SW
@@ -348,11 +355,6 @@ void lv_init(void)
      *it's superior to any other */
 #if LV_USE_FFMPEG
     lv_ffmpeg_init();
-#endif
-
-#if LV_USE_FREETYPE
-    /*Init freetype library*/
-    lv_freetype_init(LV_FREETYPE_CACHE_FT_GLYPH_CNT);
 #endif
 
     lv_initialized = true;

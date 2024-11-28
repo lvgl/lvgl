@@ -145,17 +145,16 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     size_t png_data_size = 0;
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
-        if(lv_strcmp(lv_fs_get_ext(fn), "png") == 0) {              /*Check the extension*/
-            unsigned error;
-            error = lodepng_load_file((void *)&png_data, &png_data_size, fn);  /*Load the file*/
-            if(error) {
-                if(png_data != NULL) {
-                    lv_free((void *)png_data);
-                }
-                LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
-                LV_PROFILER_DECODER_END_TAG("lv_lodepng_decoder_open");
-                return LV_RESULT_INVALID;
+
+        /*Load the file*/
+        unsigned error = lodepng_load_file((void *)&png_data, &png_data_size, fn);
+        if(error) {
+            if(png_data != NULL) {
+                lv_free((void *)png_data);
             }
+            LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
+            LV_PROFILER_DECODER_END_TAG("lv_lodepng_decoder_open");
+            return LV_RESULT_INVALID;
         }
     }
     else if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {

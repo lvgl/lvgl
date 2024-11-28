@@ -118,6 +118,13 @@ void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf,
 void lv_subject_copy_string(lv_subject_t * subject, const char * buf);
 
 /**
+ * Print a formated string to a subject. It will notify all the observers as well.
+ * @param subject   pointer to the subject
+ * @param format    the format string
+ */
+void lv_subject_snprintf(lv_subject_t * subject, const char * format, ...) LV_FORMAT_ATTRIBUTE(2, 3);
+
+/**
  * Get the current value of an string subject
  * @param subject   pointer to the subject
  * @return          pointer to the buffer containing the current value

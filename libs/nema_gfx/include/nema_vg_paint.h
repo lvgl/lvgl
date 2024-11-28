@@ -125,7 +125,7 @@ void nema_vg_paint_set_paint_color(NEMA_VG_PAINT_HANDLE paint, uint32_t rgba);
  */
 void nema_vg_paint_set_opacity(NEMA_VG_PAINT_HANDLE paint, float opacity);
 
- /** \brief Set stroke width
+ /** \brief Set stroke width - DEPRECATED USE nema_vg_stroke_set_width
  *
  * \param paint Pointer (handle) to paint object
  * \param stroke_width Stroke width to be set

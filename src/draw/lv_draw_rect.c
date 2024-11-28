@@ -233,6 +233,7 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
                 bg_image_dsc->tile = dsc->bg_image_tiled;
                 bg_image_dsc->header = header;
                 bg_image_dsc->clip_radius = dsc->radius;
+                bg_image_dsc->image_area = *coords;
                 t->type = LV_DRAW_TASK_TYPE_IMAGE;
                 lv_draw_finalize_task_creation(layer, t);
             }
