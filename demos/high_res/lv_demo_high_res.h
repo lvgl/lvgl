@@ -36,22 +36,26 @@ typedef struct {
     lv_subject_t week_day_name;                         /* string pointer */
     lv_subject_t month_day;                             /* int32_t */
     lv_subject_t month_name;                            /* string pointer */
-    lv_subject_t temperature_outdoor;                   /* int32_t (tenths of a degree) */
-    lv_subject_t temperature_outdoor_low;               /* int32_t (tenths of a degree) */
-    lv_subject_t temperature_outdoor_high;              /* int32_t (tenths of a degree) */
-    lv_subject_t temperature_outdoor_description;       /* string pointer */
-    lv_subject_t temperature_outdoor_image;             /* image pointer */
-    lv_subject_t temperature_indoor;                    /* int32_t (tenths of a degree) */
-    lv_subject_t gas_savings_total_spent;               /* int32_t */
-    lv_subject_t gas_savings_gas_equivalent;            /* int32_t */
-    lv_subject_t ev_charge_percent;                     /* int32_t */
+    lv_subject_t temperature_outdoor;                   /* int32_t (tenths of a degree C) */
+    lv_subject_t temperature_indoor;                    /* int32_t (tenths of a degree C) */
+    lv_subject_t wifi_ssid;                             /* string pointer */
+    lv_subject_t wifi_ip;                               /* string pointer */
+
     /* output subjects */
-    lv_subject_t temperature_units_are_celsius;         /* int32_t (bool) */
     lv_subject_t volume;                                /* int32_t */
     lv_subject_t main_light_temperature;                /* int32_t */
     lv_subject_t main_light_intensity;                  /* int32_t */
-    lv_subject_t ev_is_charging;                        /* int32_t (bool) */
+    lv_subject_t music_play;                            /* int32_t */
+    lv_subject_t thermostat_fan_speed;                  /* int32_t */
+    lv_subject_t thermostat_target_temperature;         /* int32_t (degrees C)*/
+
+    /* input+output subjects */
+    lv_subject_t locked;                                /* int32_t */
+
+    void * user_data;                                   /* optional extra data field for the user */
 } lv_demo_high_res_subjects_t;
+
+typedef void (*lv_demo_high_res_exit_cb_t)(lv_demo_high_res_subjects_t * subjects);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -59,12 +63,19 @@ typedef struct {
 
 /**
  * Start the High Resolution Demo on the default display.
+ * This demo requires `LV_USE_DEMO_HIGH_RES` and `LV_FONT_FMT_TXT_LARGE`
+ * to be enabled as well as a filesystem driver to be configured and the
+ * `LV_FS_DEFAULT_DRIVE_LETTER` set. The display size should be
+ * 800x480, 1280x720, or 1920x1080.
  * @param assets_base_path  folder where the image assets are.
- *                          If NULL "lvgl/demos/high_res/assets" will be used.
+ *                          If `NULL` "lvgl/demos/high_res/assets" will be used.
+ * @param exit_cb           A callback function which will be called when the
+ *                          "logout" button is clicked, or `NULL` to do nothing.
  * @return                  a struct with subjects to control the UI
  *                          and react to input
  */
-lv_demo_high_res_subjects_t * lv_demo_high_res(const char * assets_base_path);
+lv_demo_high_res_subjects_t * lv_demo_high_res(const char * assets_base_path,
+                                               lv_demo_high_res_exit_cb_t exit_cb);
 
 /**
  * Start the High Resolution Demo on the default display.

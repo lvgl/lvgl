@@ -14,7 +14,6 @@
 #include "../../src/widgets/label/lv_label.h"
 #include "../../src/widgets/line/lv_line.h"
 #include "../../src/display/lv_display_private.h"
-//#include "../../src/others/sysmon/lv_sysmon_private.h"
 
 /*********************
  *      DEFINES
@@ -28,15 +27,17 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_obj_t * create_checkable_icon(lv_obj_t * parent, lv_subject_t * subject, lv_image_dsc_t ** img_dsc_pair,
-                                        lv_demo_high_res_ctx_t * c);
-static void icon_checked_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void logout_cb(lv_event_t * e);
+static lv_obj_t * create_icon(lv_obj_t * parent, lv_subject_t * subject, lv_image_dsc_t ** img_dsc_pair,
+                              lv_demo_high_res_ctx_t * c);
+static void icon_clicked_cb(lv_event_t * e);
+static lv_obj_t * create_wifi(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c);
+static void wifi_icon_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static lv_obj_t * create_perfmon(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c);
 static void perfmon_data_cb(lv_observer_t * observer, lv_subject_t * subject);
 static lv_obj_t * create_settings(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c);
 static lv_obj_t * create_setting_label_cont(lv_obj_t * parent, const char * text, lv_demo_high_res_ctx_t * c);
 static void setting_clicked_cb(lv_event_t * e);
-static void uncheck_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void date_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void time_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
@@ -48,6 +49,8 @@ static void time_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
  *      MACROS
  **********************/
 
+#define ARRAY_LEN(arr) (sizeof(arr) / sizeof(*arr))
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -57,6 +60,7 @@ lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * base_obj, lv_obj_t * pa
 {
     if(!c->top_margin_subjects_are_init) {
         c->top_margin_subjects_are_init = true;
+        lv_subject_init_int(&c->top_margin_wifi_subject, 0);
         lv_subject_init_int(&c->top_margin_health_subject, 0);
         lv_subject_init_int(&c->top_margin_setting_subject, 0);
     }
@@ -83,28 +87,36 @@ lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * base_obj, lv_obj_t * pa
         lv_obj_t * logout_icon = lv_image_create(top_margin);
         lv_image_set_src(logout_icon, c->imgs[IMG_LOGOUT_ICON]);
         lv_obj_add_style(logout_icon, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_A8_IMG], 0);
+        lv_obj_add_flag(logout_icon, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_add_event_cb(logout_icon, logout_cb, LV_EVENT_CLICKED, c);
     }
 
     lv_obj_t * top_margin_right_cluster = lv_demo_high_res_simple_container_create(top_margin, false, c->sz->gap[6],
                                                                                    LV_FLEX_ALIGN_CENTER);
 
-    lv_obj_t * wifi_icon = lv_image_create(top_margin_right_cluster);
+    lv_obj_t * wifi_icon = create_icon(top_margin_right_cluster, &c->top_margin_wifi_subject, NULL, c);
     lv_image_set_src(wifi_icon, c->imgs[IMG_WIFI_ICON]);
-    lv_obj_add_style(wifi_icon, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_A8_IMG], 0);
+    lv_subject_add_observer_obj(&c->subject_groups.wifi.group, wifi_icon_observer_cb, wifi_icon, c);
+    lv_obj_t * wifi = create_wifi(base_obj, c);
+    lv_obj_bind_flag_if_eq(wifi, &c->top_margin_wifi_subject, LV_OBJ_FLAG_HIDDEN, 0);
 
-    create_checkable_icon(top_margin_right_cluster, &c->top_margin_health_subject, &c->imgs[IMG_HEALTH_ICON], c);
+    lv_obj_t * health_icon = create_icon(top_margin_right_cluster, &c->top_margin_health_subject, &c->imgs[IMG_HEALTH_ICON],
+                                         c);
+    lv_image_set_src(health_icon, c->imgs[lv_subject_get_int(&c->top_margin_health_subject) ? IMG_HEALTH_ICON_BOLD :
+                                          IMG_HEALTH_ICON]);
     lv_obj_t * perfmon = create_perfmon(base_obj, c);
     lv_obj_bind_flag_if_eq(perfmon, &c->top_margin_health_subject, LV_OBJ_FLAG_HIDDEN, 0);
 
-    create_checkable_icon(top_margin_right_cluster, &c->top_margin_setting_subject, &c->imgs[IMG_SETTING_ICON], c);
+    lv_obj_t * settings_icon = create_icon(top_margin_right_cluster, &c->top_margin_setting_subject,
+                                           &c->imgs[IMG_SETTING_ICON], c);
+    lv_image_set_src(settings_icon, c->imgs[lv_subject_get_int(&c->top_margin_setting_subject) ? IMG_SETTING_ICON_BOLD :
+                                            IMG_SETTING_ICON]);
     lv_obj_t * settings = create_settings(base_obj, c);
     lv_obj_bind_flag_if_eq(settings, &c->top_margin_setting_subject, LV_OBJ_FLAG_HIDDEN, 0);
 
-    lv_obj_align_to(perfmon, top_margin_right_cluster, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
-    lv_obj_align_to(settings, top_margin_right_cluster, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
-
-    lv_subject_add_observer(&c->top_margin_health_subject, uncheck_cb, &c->top_margin_setting_subject);
-    lv_subject_add_observer(&c->top_margin_setting_subject, uncheck_cb, &c->top_margin_health_subject);
+    lv_obj_align_to(wifi, wifi_icon, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+    lv_obj_align_to(perfmon, health_icon, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+    lv_obj_align_to(settings, settings_icon, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
 
     return top_margin;
 }
@@ -113,6 +125,7 @@ void lv_demo_high_res_top_margin_deinit_subjects(lv_demo_high_res_ctx_t * c)
 {
     if(!c->top_margin_subjects_are_init) return;
     c->top_margin_subjects_are_init = false;
+    lv_subject_deinit(&c->top_margin_wifi_subject);
     lv_subject_deinit(&c->top_margin_health_subject);
     lv_subject_deinit(&c->top_margin_setting_subject);
 }
@@ -121,23 +134,76 @@ void lv_demo_high_res_top_margin_deinit_subjects(lv_demo_high_res_ctx_t * c)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_obj_t * create_checkable_icon(lv_obj_t * parent, lv_subject_t * subject, lv_image_dsc_t ** img_dsc_pair,
-                                        lv_demo_high_res_ctx_t * c)
+static void logout_cb(lv_event_t * e)
+{
+    lv_demo_high_res_ctx_t * c = lv_event_get_user_data(e);
+    if(c->exit_cb) c->exit_cb(&c->subjects);
+}
+
+static lv_obj_t * create_icon(lv_obj_t * parent, lv_subject_t * subject, lv_image_dsc_t ** img_dsc_pair,
+                              lv_demo_high_res_ctx_t * c)
 {
     lv_obj_t * icon = lv_image_create(parent);
     lv_obj_add_style(icon, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_A8_IMG], 0);
-    lv_obj_add_flag(icon, LV_OBJ_FLAG_CHECKABLE);
+    subject->user_data = icon;
+    lv_obj_set_user_data(icon, img_dsc_pair);
     lv_obj_add_flag(icon, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_bind_checked(icon, subject);
-    lv_subject_add_observer_obj(subject, icon_checked_cb, icon, img_dsc_pair);
+    lv_obj_add_event_cb(icon, icon_clicked_cb, LV_EVENT_CLICKED, c);
     return icon;
 }
 
-static void icon_checked_cb(lv_observer_t * observer, lv_subject_t * subject)
+static void icon_clicked_cb(lv_event_t * e)
 {
-    lv_obj_t * icon = lv_observer_get_target_obj(observer);
-    lv_image_dsc_t ** pair = lv_observer_get_user_data(observer);
-    lv_image_set_src(icon, pair[lv_subject_get_int(subject)]);
+    lv_obj_t * clicked_icon = lv_event_get_target_obj(e);
+    lv_demo_high_res_ctx_t * c = lv_event_get_user_data(e);
+    lv_subject_t * icon_subjects[] = {
+        &c->top_margin_wifi_subject,
+        &c->top_margin_health_subject,
+        &c->top_margin_setting_subject
+    };
+    for(int32_t i = 0; i < (int32_t)ARRAY_LEN(icon_subjects); i++) {
+        lv_subject_t * subject = icon_subjects[i];
+        lv_obj_t * icon = subject->user_data;
+        lv_image_dsc_t ** pair = lv_obj_get_user_data(icon);
+        int32_t value = icon == clicked_icon && !lv_subject_get_int(subject);
+        lv_subject_set_int(subject, value);
+        if(pair) lv_image_set_src(icon, pair[value]);
+    }
+}
+
+static lv_obj_t * create_wifi(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c)
+{
+    lv_obj_t * settings = lv_obj_create(base_obj);
+    lv_obj_remove_style_all(settings);
+    lv_obj_add_flag(settings, LV_OBJ_FLAG_FLOATING);
+    lv_obj_set_style_bg_opa(settings, LV_OPA_COVER, 0);
+    lv_obj_set_style_radius(settings, c->sz->gap[3], 0);
+    lv_obj_set_size(settings, c->sz->settings_panel_width, LV_SIZE_CONTENT);
+    lv_obj_set_style_pad_all(settings, c->sz->gap[7], 0);
+    lv_obj_add_style(settings, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_OBJ], 0);
+
+    lv_obj_t * cont = lv_demo_high_res_simple_container_create(settings, true, c->sz->gap[4], LV_FLEX_ALIGN_START);
+    lv_obj_set_width(cont, LV_PCT(100));
+
+    lv_obj_t * ssid = lv_label_create(cont);
+    lv_label_bind_text(ssid, &c->subjects.wifi_ssid, "SSID: %s");
+    lv_obj_add_style(ssid, &c->fonts[FONT_LABEL_XS], 0);
+    lv_obj_add_style(ssid, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+    lv_obj_t * ip = lv_label_create(cont);
+    lv_label_bind_text(ip, &c->subjects.wifi_ip, "IP: %s");
+    lv_obj_add_style(ip, &c->fonts[FONT_LABEL_XS], 0);
+    lv_obj_add_style(ip, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+
+    return settings;
+}
+
+static void wifi_icon_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * wifi_icon = lv_observer_get_target_obj(observer);
+    lv_demo_high_res_ctx_t * c = lv_observer_get_user_data(observer);
+    lv_obj_set_style_opa(wifi_icon, lv_subject_get_pointer(&c->subjects.wifi_ssid)
+                         || lv_subject_get_pointer(&c->subjects.wifi_ip)
+                         ? LV_OPA_COVER : LV_OPA_50, 0);
 }
 
 static lv_obj_t * create_perfmon(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c)
@@ -215,11 +281,10 @@ static lv_obj_t * create_settings(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * 
     lv_obj_set_style_text_opa(lv_obj_get_child(temperature_label_cont, 0), LV_OPA_60, 0);
 
     lv_obj_t * celsius_label_cont = create_setting_label_cont(settings, "Celsius (\xc2\xb0""C)", c);
-    lv_obj_set_style_bg_opa(celsius_label_cont, 255 * lv_subject_get_int(&c->subjects.temperature_units_are_celsius), 0);
+    lv_obj_set_style_bg_opa(celsius_label_cont, 255 * lv_subject_get_int(&c->temperature_units_are_celsius), 0);
 
     lv_obj_t * fahrenheit_label_cont = create_setting_label_cont(settings, "Fahrenheit (\xc2\xb0""F)", c);
-    lv_obj_set_style_bg_opa(fahrenheit_label_cont, 255 * !lv_subject_get_int(&c->subjects.temperature_units_are_celsius),
-                            0);
+    lv_obj_set_style_bg_opa(fahrenheit_label_cont, 255 * !lv_subject_get_int(&c->temperature_units_are_celsius), 0);
 
     lv_obj_add_event_cb(celsius_label_cont, setting_clicked_cb, LV_EVENT_CLICKED, c);
     lv_obj_add_event_cb(fahrenheit_label_cont, setting_clicked_cb, LV_EVENT_CLICKED, c);
@@ -254,22 +319,12 @@ static void setting_clicked_cb(lv_event_t * e)
     if(obj == celsius) {
         lv_obj_set_style_bg_opa(celsius, LV_OPA_COVER, 0);
         lv_obj_set_style_bg_opa(fahrenheit, LV_OPA_TRANSP, 0);
-        lv_subject_set_int(&c->subjects.temperature_units_are_celsius, 1);
+        lv_subject_set_int(&c->temperature_units_are_celsius, 1);
     }
     else {
         lv_obj_set_style_bg_opa(fahrenheit, LV_OPA_COVER, 0);
         lv_obj_set_style_bg_opa(celsius, LV_OPA_TRANSP, 0);
-        lv_subject_set_int(&c->subjects.temperature_units_are_celsius, 0);
-    }
-}
-
-static void uncheck_cb(lv_observer_t * observer, lv_subject_t * subject)
-{
-    lv_subject_t * disable = lv_observer_get_user_data(observer);
-    if(lv_subject_get_int(subject)
-       && !lv_subject_get_previous_int(subject)
-       && lv_subject_get_int(disable)) {
-        lv_subject_set_int(disable, 0);
+        lv_subject_set_int(&c->temperature_units_are_celsius, 0);
     }
 }
 

@@ -393,16 +393,6 @@ lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject);
 lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject);
 #endif
 
-#if LV_USE_IMAGE
-/**
- * Bind a pointer or string subject to an images's src
- * @param obj       pointer to an image
- * @param subject   pointer to a subject
- * @return          pointer to the created observer
- */
-lv_observer_t * lv_image_bind_src(lv_obj_t * obj, lv_subject_t * subject);
-#endif
-
 /**********************
  *      MACROS
  **********************/

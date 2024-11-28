@@ -37,7 +37,6 @@ static void set_dark_theme_event_cb(lv_event_t * e);
 static void time_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void date_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void logo_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
-static void temps_high_low_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 /**********************
  *  STATIC VARIABLES
@@ -108,29 +107,28 @@ void lv_demo_high_res_home(lv_obj_t * base_obj)
     lv_obj_t * weather_left = lv_demo_high_res_simple_container_create(weather, true, c->sz->gap[2], LV_FLEX_ALIGN_START);
 
     lv_obj_t * weather_img = lv_image_create(weather_left);
-    lv_image_bind_src(weather_img, &c->subjects.temperature_outdoor_image);
+    lv_image_set_src(weather_img, c->imgs[IMG_WEATHER]);
     lv_obj_add_style(weather_img, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_A8_IMG], 0);
 
     lv_obj_t * weather_left_bottom = lv_demo_high_res_simple_container_create(weather_left, true, c->sz->gap[3],
                                                                               LV_FLEX_ALIGN_START);
 
     lv_obj_t * weather_label = lv_label_create(weather_left_bottom);
-    lv_label_bind_text(weather_label, &c->subjects.temperature_outdoor_description, NULL);
+    lv_label_set_text_static(weather_label, "Cloudy");
     lv_obj_add_style(weather_label, &c->styles[STYLE_COLOR_ACCENT][STYLE_TYPE_TEXT], 0);
     lv_obj_add_style(weather_label, &c->fonts[FONT_LABEL_MD], 0);
 
     lv_obj_t * weather_hi_lo_label = lv_label_create(weather_left_bottom);
+    lv_label_set_text_static(weather_hi_lo_label, "H: 19\xc2\xb0   L: 10\xc2\xb0");
     lv_obj_add_style(weather_hi_lo_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_add_style(weather_hi_lo_label, &c->fonts[FONT_LABEL_MD], 0);
-    lv_subject_add_observer_obj(&c->subject_groups.temps_high_low.group, temps_high_low_observer_cb, weather_hi_lo_label,
-                                c);
 
     lv_obj_t * weather_right = lv_demo_high_res_simple_container_create(weather, true, c->sz->gap[2], LV_FLEX_ALIGN_CENTER);
 
     lv_obj_t * weather_temperature_label = lv_label_create(weather_right);
     lv_obj_add_style(weather_temperature_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_add_style(weather_temperature_label, &c->fonts[FONT_HEADING_XL], 0);
-    lv_demo_high_res_label_bind_text_tenths(weather_temperature_label, &c->subjects.temperature_outdoor, "%s\xc2\xb0");
+    lv_demo_high_res_label_bind_temperature(weather_temperature_label, &c->subjects.temperature_outdoor, c);
 
     lv_obj_t * weather_temperature_location_label = lv_label_create(weather_right);
     lv_label_set_text_static(weather_temperature_location_label, "Outdoor");
@@ -155,7 +153,7 @@ void lv_demo_high_res_home(lv_obj_t * base_obj)
     app_card_create(c, apps, "Smart Home", c->imgs[IMG_SMART_HOME_APP_ICON], lv_demo_high_res_app_smart_home);
     app_card_create(c, apps, "Smart Meter", c->imgs[IMG_SMART_METER_APP_ICON], lv_demo_high_res_app_smart_meter);
     app_card_create(c, apps, "Thermostat", c->imgs[IMG_THERMOSTAT_APP_ICON], lv_demo_high_res_app_thermostat);
-    app_card_create(c, apps, "Security", c->imgs[IMG_SECURITY_APP_ICON], lv_demo_high_res_app_security);
+    app_card_create(c, apps, "About", c->imgs[IMG_ABOUT_APP_ICON], lv_demo_high_res_app_about);
 
     /* bottom_margin */
 
@@ -353,20 +351,6 @@ static void logo_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     int32_t scale = lv_image_get_scale_y(logo);
     lv_image_set_inner_align(logo, LV_IMAGE_ALIGN_DEFAULT);
     lv_image_set_scale(logo, scale);
-}
-
-static void temps_high_low_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
-{
-    LV_UNUSED(subject);
-    lv_demo_high_res_ctx_t * c = lv_observer_get_user_data(observer);
-    lv_obj_t * label = lv_observer_get_target_obj(observer);
-    char buf1[16];
-    char buf2[16];
-    int32_t high_val = lv_subject_get_int(&c->subjects.temperature_outdoor_high);
-    int32_t low_val = lv_subject_get_int(&c->subjects.temperature_outdoor_low);
-    lv_demo_high_res_fmt_tenths(buf1, sizeof(buf1), high_val);
-    lv_demo_high_res_fmt_tenths(buf2, sizeof(buf2), low_val);
-    lv_label_set_text_fmt(label, "H: %s\xc2\xb0   L: %s\xc2\xb0", buf1, buf2);
 }
 
 #endif /*LV_USE_DEMO_HIGH_RES*/

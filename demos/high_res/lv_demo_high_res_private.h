@@ -30,7 +30,8 @@ extern "C" {
  **********************/
 
 enum {
-    IMG_ALBUM_ART = 0,
+    IMG_ABOUT_APP_ICON = 0,
+    IMG_ALBUM_ART,
     IMG_ARROW_LEFT,
     IMG_BACKWARD_ICON,
     IMG_COLD_ICON,
@@ -49,16 +50,18 @@ enum {
     IMG_MAIN_LIGHT_SLIDER,
     IMG_MINUS,
     IMG_PAGER_LEFT,
+    IMG_PAGER_PAUSE,
+    IMG_PAGER_PLAY,
     IMG_PAGER_RIGHT,
     IMG_PLAY_ICON,
     IMG_PLAY_ICON_1,
     IMG_PLUS,
     IMG_RANGE_ICON,
-    IMG_SECURITY_APP_ICON,
     IMG_SETTING_ICON,
     IMG_SETTING_ICON_BOLD,
     IMG_SMART_HOME_APP_ICON,
     IMG_SMART_HOME_WIDGET1_BG,
+    IMG_SMART_HOME_WIDGET2_BG,
     IMG_SMART_METER_APP_ICON,
     IMG_THERMOSTAT_APP_ICON,
     IMG_TIME_ICON,
@@ -66,12 +69,12 @@ enum {
     IMG_VOLUME,
     IMG_WEATHER,
     IMG_WIFI_ICON,
+    IMG_LIGHT_BG_ABOUT,
+    IMG_DARK_BG_ABOUT,
     IMG_LIGHT_BG_EV_CHARGING,
     IMG_DARK_BG_EV_CHARGING,
     IMG_LIGHT_BG_HOME,
     IMG_DARK_BG_HOME,
-    IMG_LIGHT_BG_SECURITY,
-    IMG_DARK_BG_SECURITY,
     IMG_LIGHT_BG_SMART_HOME,
     IMG_DARK_BG_SMART_HOME,
     IMG_LIGHT_BG_SMART_METER,
@@ -149,6 +152,7 @@ typedef struct {
     int32_t card_long_edge;
     int32_t widget_long_edge;
     int32_t card_short_edge;
+    int32_t smart_home_arc_diameter;
     int32_t ev_charging_arc_diameter;
     int32_t smart_meter_collapsed_part_height;
     int32_t slider_width;
@@ -177,11 +181,7 @@ typedef struct {
     struct {
         lv_subject_t group;
         lv_subject_t * members[2];
-    } temps_high_low;
-    struct {
-        lv_subject_t group;
-        lv_subject_t * members[2];
-    } gas_savings;
+    } wifi;
 } lv_demo_high_res_subject_groups_t;
 
 typedef struct {
@@ -191,7 +191,11 @@ typedef struct {
     lv_style_t fonts[FONT_COUNT];
     lv_subject_t th;
     char * base_path;
+    lv_demo_high_res_exit_cb_t exit_cb;
+    lv_subject_t temperature_units_are_celsius;
+    lv_subject_t smart_meter_selected_bar;
     bool top_margin_subjects_are_init;
+    lv_subject_t top_margin_wifi_subject;
     lv_subject_t top_margin_health_subject;
     lv_subject_t top_margin_setting_subject;
     lv_demo_high_res_subjects_t subjects;
@@ -206,22 +210,22 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_demo_high_res_sizes_t lv_demo_high_res_
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path);
+lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path,
+                                            lv_demo_high_res_exit_cb_t exit_cb);
 
 void lv_demo_high_res_home(lv_obj_t * base_obj);
 void lv_demo_high_res_app_smart_home(lv_obj_t * base_obj);
 void lv_demo_high_res_app_ev_charging(lv_obj_t * base_obj);
 void lv_demo_high_res_app_smart_meter(lv_obj_t * base_obj);
 void lv_demo_high_res_app_thermostat(lv_obj_t * base_obj);
-void lv_demo_high_res_app_security(lv_obj_t * base_obj);
+void lv_demo_high_res_app_about(lv_obj_t * base_obj);
 lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * base_obj, lv_obj_t * parent, int32_t pad_hor, bool show_time,
                                               lv_demo_high_res_ctx_t * c);
 void lv_demo_high_res_top_margin_deinit_subjects(lv_demo_high_res_ctx_t * c);
 
 lv_obj_t * lv_demo_high_res_simple_container_create(lv_obj_t * parent, bool vertical, int32_t pad,
                                                     lv_flex_align_t align_cross_place);
-void lv_demo_high_res_label_bind_text_tenths(lv_obj_t * label, lv_subject_t * subject, const char * fmt);
-void lv_demo_high_res_fmt_tenths(char * dst, uint32_t dst_size, int32_t val);
+void lv_demo_high_res_label_bind_temperature(lv_obj_t * label, lv_subject_t * subject, lv_demo_high_res_ctx_t * c);
 void lv_demo_high_res_theme_observer_image_src_cb(lv_observer_t * observer, lv_subject_t * subject);
 void lv_demo_high_res_theme_observer_obj_bg_image_src_cb(lv_observer_t * observer, lv_subject_t * subject);
 

@@ -36,12 +36,10 @@ static void widget2_slider_changed_cb(lv_event_t * e);
 static void widget2_temperature_button_clicked_cb(lv_event_t * e);
 static lv_obj_t * create_widget2_value(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const char * title_val,
                                        const char * range_val, int32_t temperature_val);
-static void weekdays_weekends_clicked_cb(lv_event_t * e);
 static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 static lv_obj_t * create_widget3_setting(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const lv_image_dsc_t * img_dsc,
                                          const char * text_val, bool active);
 static void widget3_setting_clicked_cb(lv_event_t * e);
-static void widget3_slider_label_cb(lv_event_t * e);
 static void widget3_scale_and_arc_box_ext_draw_size_event_cb(lv_event_t * e);
 static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 
@@ -77,8 +75,7 @@ void lv_demo_high_res_app_thermostat(lv_obj_t * base_obj)
     lv_obj_set_style_pad_top(bg_cont, c->sz->gap[7], 0);
     int32_t app_padding = c->sz == &lv_demo_high_res_sizes_all[SIZE_SM] ? c->sz->gap[9] : c->sz->gap[10];
     lv_obj_set_style_pad_bottom(bg_cont, app_padding, 0);
-    lv_obj_set_style_pad_left(bg_cont, app_padding, 0);
-    lv_obj_set_style_pad_right(bg_cont, app_padding, 0);
+    lv_obj_set_style_pad_hor(bg_cont, app_padding, 0);
 
     /* top margin */
 
@@ -308,22 +305,6 @@ static lv_obj_t * create_widget2_value(lv_demo_high_res_ctx_t * c, lv_obj_t * pa
     return box;
 }
 
-static void weekdays_weekends_clicked_cb(lv_event_t * e)
-{
-    lv_obj_t * label = lv_event_get_target_obj(e);
-    lv_obj_t * box = lv_obj_get_parent(label);
-    lv_obj_t * weekdays_label = lv_obj_get_child(box, 0);
-    lv_obj_t * weekends_label = lv_obj_get_child(box, 1);
-    if(label == weekdays_label) {
-        lv_obj_set_style_text_opa(weekdays_label, LV_OPA_COVER, 0);
-        lv_obj_set_style_text_opa(weekends_label, LV_OPA_30, 0);
-    }
-    else {
-        lv_obj_set_style_text_opa(weekdays_label, LV_OPA_30, 0);
-        lv_obj_set_style_text_opa(weekends_label, LV_OPA_COVER, 0);
-    }
-}
-
 static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
 {
     lv_obj_t * widget = lv_obj_create(widgets);
@@ -345,25 +326,6 @@ static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
                                                                            LV_FLEX_ALIGN_START);
     lv_obj_set_width(outer_slider_box, LV_PCT(100));
     lv_obj_set_style_pad_top(outer_slider_box, c->sz->gap[5], 0);
-
-    lv_obj_t * weekdays_weekends_box = lv_demo_high_res_simple_container_create(outer_slider_box, false, 18,
-                                                                                LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_t * weekdays_label = lv_label_create(weekdays_weekends_box);
-    lv_label_set_text_static(weekdays_label, "Weekdays");
-    lv_obj_add_style(weekdays_label, &c->fonts[FONT_LABEL_SM], 0);
-    lv_obj_add_style(weekdays_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-
-    lv_obj_t * weekends_label = lv_label_create(weekdays_weekends_box);
-    lv_label_set_text_static(weekends_label, "Weekends");
-    lv_obj_add_style(weekends_label, &c->fonts[FONT_LABEL_SM], 0);
-    lv_obj_add_style(weekends_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    lv_obj_set_style_text_opa(weekends_label, LV_OPA_30, 0);
-
-    lv_obj_add_event_cb(weekdays_label, weekdays_weekends_clicked_cb, LV_EVENT_CLICKED, NULL);
-    lv_obj_add_event_cb(weekends_label, weekdays_weekends_clicked_cb, LV_EVENT_CLICKED, NULL);
-    lv_obj_add_flag(weekdays_label, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_add_flag(weekends_label, LV_OBJ_FLAG_CLICKABLE);
 
     lv_obj_t * slider_box = lv_demo_high_res_simple_container_create(outer_slider_box, false, 0, LV_FLEX_ALIGN_CENTER);
     lv_obj_set_width(slider_box, LV_PCT(100));
@@ -497,18 +459,9 @@ static void widget3_setting_clicked_cb(lv_event_t * e)
     }
 }
 
-static void widget3_slider_label_cb(lv_event_t * e)
-{
-    lv_obj_t * slider = lv_event_get_target_obj(e);
-    lv_obj_t * slider_pct_label = lv_event_get_user_data(e);
-    lv_label_set_text_fmt(slider_pct_label, "%d%%", lv_slider_get_value(slider));
-}
-
 static void widget3_scale_and_arc_box_ext_draw_size_event_cb(lv_event_t * e)
 {
-    int32_t * cur_size = lv_event_get_param(e);
-    lv_demo_high_res_ctx_t * c = lv_event_get_user_data(e);
-    *cur_size += c->sz->gap[5] * 2;
+    lv_event_set_ext_draw_size(e, 100);
 }
 
 static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
@@ -564,8 +517,7 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_size(arc, c->sz->card_long_edge, c->sz->card_long_edge);
     lv_arc_set_rotation(arc, 180);
     lv_arc_set_bg_angles(arc, 0, 180);
-    lv_arc_set_range(arc, 0, 15);
-    lv_arc_set_value(arc, 9);
+    lv_arc_set_range(arc, 15, 30);
 
     lv_obj_set_style_arc_rounded(arc, false, 0);
     lv_obj_set_style_arc_rounded(arc, false, LV_PART_INDICATOR);
@@ -585,9 +537,11 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_align(current_temperature_box, LV_ALIGN_BOTTOM_MID);
 
     lv_obj_t * current_temperature_val_label = lv_label_create(current_temperature_box);
-    lv_label_set_text_static(current_temperature_val_label, "24\xc2\xb0");
     lv_obj_add_style(current_temperature_val_label, &c->fonts[FONT_LABEL_2XL], 0);
     lv_obj_add_style(current_temperature_val_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+
+    lv_arc_bind_value(arc, &c->subjects.thermostat_target_temperature);
+    lv_label_bind_text(current_temperature_val_label, &c->subjects.thermostat_target_temperature, "%d\xc2\xb0");
 
     lv_obj_t * current_temperature_label = lv_label_create(current_temperature_box);
     lv_label_set_text_static(current_temperature_label, "Current\ntemperature");
@@ -630,9 +584,12 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_add_style(slider_pct_label, &c->fonts[FONT_LABEL_XS], 0);
     lv_obj_add_style(slider_pct_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_align(slider_pct_label, LV_ALIGN_RIGHT_MID, -10, 0);
+
+    lv_slider_bind_value(slider, &c->subjects.thermostat_fan_speed);
+    lv_label_bind_text(slider_pct_label, &c->subjects.thermostat_fan_speed, "%d%%");
+
     lv_label_set_text_static(slider_pct_label, "40%");
     lv_slider_set_value(slider, 40, LV_ANIM_OFF);
-    lv_obj_add_event_cb(slider, widget3_slider_label_cb, LV_EVENT_VALUE_CHANGED, slider_pct_label);
 
     lv_obj_t * slider_volume_img = lv_image_create(slider);
     lv_image_set_src(slider_volume_img, c->imgs[IMG_FAN]);

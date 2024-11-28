@@ -15,6 +15,7 @@
 #include "../../src/widgets/chart/lv_chart_private.h"
 #include "../../src/core/lv_obj_private.h"
 #include "../../src/draw/lv_draw_private.h"
+#include "../../src/misc/lv_math.h"
 
 /*********************
  *      DEFINES
@@ -39,10 +40,12 @@ static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 static lv_obj_t * widget23_chart_label(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const char * text);
 static void widget2_chart_event_draw_task_cb(lv_event_t * e);
 static void widget2_chart_bar_clicked_cb(lv_event_t * e);
+static void widget2_chart_selected_day_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 static void widget3_chart_draw_task_event_cb(lv_event_t * e);
+static void widget3_chart_selected_day_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static lv_obj_t * create_widget3_stat(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const char * title_val,
-                                      const char * kwh_val, const char * detail_val, bool black_text);
+                                      const char * kwh_val, const char * detail_val);
 static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 
 /**********************
@@ -77,8 +80,7 @@ void lv_demo_high_res_app_smart_meter(lv_obj_t * base_obj)
     lv_obj_set_style_pad_top(bg_cont, c->sz->gap[7], 0);
     int32_t app_padding = c->sz == &lv_demo_high_res_sizes_all[SIZE_SM] ? c->sz->gap[9] : c->sz->gap[10];
     lv_obj_set_style_pad_bottom(bg_cont, app_padding, 0);
-    lv_obj_set_style_pad_left(bg_cont, app_padding, 0);
-    lv_obj_set_style_pad_right(bg_cont, app_padding, 0);
+    lv_obj_set_style_pad_hor(bg_cont, app_padding, 0);
 
     /* top margin */
 
@@ -321,6 +323,8 @@ static lv_obj_t * widget23_chart_label(lv_demo_high_res_ctx_t * c, lv_obj_t * pa
 
 static void widget2_chart_event_draw_task_cb(lv_event_t * e)
 {
+    lv_demo_high_res_ctx_t * c = lv_event_get_user_data(e);
+    uint32_t idx = lv_subject_get_int(&c->smart_meter_selected_bar);
     lv_draw_task_t * t = lv_event_get_draw_task(e);
     lv_draw_task_type_t type = lv_draw_task_get_type(t);
     if(type != LV_DRAW_TASK_TYPE_FILL) {
@@ -328,7 +332,6 @@ static void widget2_chart_event_draw_task_cb(lv_event_t * e)
     }
     lv_draw_dsc_base_t * base_draw_dsc = lv_draw_task_get_draw_dsc(t);
     lv_obj_t * obj = lv_event_get_target_obj(e);
-    uint32_t idx = (uint32_t)(uintptr_t)lv_obj_get_user_data(obj);
     if(base_draw_dsc->part == LV_PART_MAIN) {
         lv_draw_rect_dsc_t rect_draw_dsc;
         lv_draw_rect_dsc_init(&rect_draw_dsc);
@@ -360,7 +363,15 @@ static void widget2_chart_event_draw_task_cb(lv_event_t * e)
 static void widget2_chart_bar_clicked_cb(lv_event_t * e)
 {
     lv_obj_t * chart = lv_event_get_target_obj(e);
-    lv_obj_set_user_data(chart, (void *)(uintptr_t)lv_chart_get_pressed_point(chart));
+    lv_demo_high_res_ctx_t * c = lv_event_get_user_data(e);
+    uint32_t clicked_bar = lv_chart_get_pressed_point(chart);
+
+    lv_subject_set_int(&c->smart_meter_selected_bar, clicked_bar);
+}
+
+static void widget2_chart_selected_day_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * chart = lv_observer_get_target_obj(observer);
     lv_obj_invalidate(chart);
 }
 
@@ -413,7 +424,6 @@ static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_style_pad_row(chart_grid, 5, 0);
 
     lv_obj_t * chart = lv_chart_create(chart_grid);
-    lv_obj_set_user_data(chart, (void *)(uintptr_t)4);
     lv_obj_set_height(chart, c->sz->small_chart_height);
     lv_obj_set_style_bg_opa(chart, LV_OPA_MIN + 1, 0);
     lv_obj_set_style_pad_column(chart, c->sz->gap[1], 0);
@@ -425,7 +435,7 @@ static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_style_radius(chart, 0, 0);
     lv_obj_set_style_pad_all(chart, 0, 0);
 
-    lv_obj_add_event_cb(chart, widget2_chart_event_draw_task_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_add_event_cb(chart, widget2_chart_event_draw_task_cb, LV_EVENT_DRAW_TASK_ADDED, c);
     lv_obj_add_flag(chart, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
 
     lv_obj_set_grid_cell(chart, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_START, 0, 1);
@@ -442,7 +452,8 @@ static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_chart_set_point_count(chart, sizeof(chart_values) / sizeof(*chart_values));
     lv_chart_refresh(chart);
 
-    lv_obj_add_event_cb(chart, widget2_chart_bar_clicked_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(chart, widget2_chart_bar_clicked_cb, LV_EVENT_VALUE_CHANGED, c);
+    lv_subject_add_observer_obj(&c->smart_meter_selected_bar, widget2_chart_selected_day_observer_cb, chart, NULL);
 
     lv_obj_t * hscale_label_1 = widget23_chart_label(c, chart_grid, "Aug 2");
     lv_obj_set_grid_cell(hscale_label_1, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 1, 1);
@@ -503,42 +514,51 @@ static void widget3_chart_draw_task_event_cb(lv_event_t * e)
     }
 }
 
+static void widget3_chart_selected_day_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * chart = lv_observer_get_target_obj(observer);
+    lv_chart_series_t * ser = lv_chart_get_series_next(chart, NULL);
+    int32_t idx = lv_subject_get_int(subject);
+    static bool data_is_init = false;
+    static int32_t data[24 * 7];
+    if(!data_is_init) {
+        data_is_init = true;
+        for(int32_t i = 0; i < 24 * 7; i++) {
+            data[i] = lv_map(-lv_trigo_cos(i * 15), -32767, 32767, -105, 105) + lv_rand(-20, 20);
+        }
+    }
+    lv_chart_set_ext_y_array(chart, ser, &data[idx * 24]);
+    lv_chart_refresh(chart);
+}
+
 static lv_obj_t * create_widget3_stat(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const char * title_val,
-                                      const char * kwh_val, const char * detail_val, bool black_text)
+                                      const char * kwh_val, const char * detail_val)
 {
     lv_obj_t * obj = lv_demo_high_res_simple_container_create(parent, true, c->sz->gap[4], LV_FLEX_ALIGN_START);
     lv_obj_set_flex_grow(obj, 1);
-    lv_obj_set_style_pad_all(obj, c->sz->gap[5], 0);
-    lv_obj_set_style_bg_color(obj, lv_color_white(), 0);
-    lv_obj_set_style_radius(obj, c->sz->gap[3], 0);
-    lv_obj_set_style_bg_opa(obj, LV_OPA_COVER, 0);
 
     lv_obj_t * title_label = lv_label_create(obj);
     lv_label_set_text_static(title_label, title_val);
     lv_obj_add_style(title_label, &c->fonts[FONT_LABEL_SM], 0);
-    if(!black_text) lv_obj_add_style(title_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    else lv_obj_set_style_text_color(title_label, lv_color_black(), 0);
+    lv_obj_set_style_text_color(title_label, lv_color_black(), 0);
 
     lv_obj_t * kwh_box = lv_demo_high_res_simple_container_create(obj, false, c->sz->gap[1], LV_FLEX_ALIGN_END);
 
     lv_obj_t * kwh_value_label = lv_label_create(kwh_box);
     lv_label_set_text_static(kwh_value_label, kwh_val);
     lv_obj_add_style(kwh_value_label, &c->fonts[FONT_LABEL_XL], 0);
-    if(!black_text) lv_obj_add_style(kwh_value_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    else lv_obj_set_style_text_color(kwh_value_label, lv_color_black(), 0);
+    lv_obj_set_style_text_color(kwh_value_label, lv_color_black(), 0);
 
     lv_obj_t * kwh_label = lv_label_create(kwh_box);
     lv_label_set_text_static(kwh_label, "kWh");
     lv_obj_add_style(kwh_label, &c->fonts[FONT_LABEL_SM], 0);
-    if(!black_text) lv_obj_add_style(kwh_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    else lv_obj_set_style_text_color(kwh_label, lv_color_black(), 0);
+    lv_obj_set_style_text_color(kwh_label, lv_color_black(), 0);
     lv_obj_set_style_text_opa(kwh_label, LV_OPA_60, 0);
 
     lv_obj_t * detail_label = lv_label_create(obj);
     lv_label_set_text_static(detail_label, detail_val);
     lv_obj_add_style(detail_label, &c->fonts[FONT_LABEL_SM], 0);
-    if(!black_text) lv_obj_add_style(detail_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    else lv_obj_set_style_text_color(detail_label, lv_color_black(), 0);
+    lv_obj_set_style_text_color(detail_label, lv_color_black(), 0);
     lv_obj_set_style_text_opa(detail_label, LV_OPA_60, 0);
 
     return obj;
@@ -593,14 +613,9 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_style_line_dash_gap(chart, 1, 0);
     lv_obj_add_event_cb(chart, widget3_chart_draw_task_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_add_flag(chart, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
-    lv_chart_series_t * ser = lv_chart_add_series(chart, lv_color_white(), LV_CHART_AXIS_PRIMARY_Y);
-    static const int32_t chart_values[] = {-27, -100, -72, -49, -72, -38, -49, -12,
-                                           35, 70, 100, 114, 125, 100, 89, 81, 35, 64, 35,
-                                           -61, -72, -81, -66, -20
-                                          };
-    lv_chart_set_ext_y_array(chart, ser, (int32_t *)chart_values);
-    lv_chart_set_point_count(chart, sizeof(chart_values) / sizeof(*chart_values));
-    lv_chart_refresh(chart);
+    lv_chart_add_series(chart, lv_color_white(), LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_set_point_count(chart, 24);
+    lv_subject_add_observer_obj(&c->smart_meter_selected_bar, widget3_chart_selected_day_observer_cb, chart, NULL);
 
     lv_obj_t * hscale_label_1 = widget23_chart_label(c, chart_grid, "0h");
     lv_obj_set_grid_cell(hscale_label_1, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 1, 1);
@@ -616,9 +631,8 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
 
     lv_obj_t * stat_box = lv_demo_high_res_simple_container_create(widget, false, c->sz->gap[5], LV_FLEX_ALIGN_CENTER);
     lv_obj_set_width(stat_box, LV_PCT(100));
-    create_widget3_stat(c, stat_box, "Sep 1, 2024", "+12", "P:  +36kWh U: -18kWh", true);
-    lv_obj_t * stat2 = create_widget3_stat(c, stat_box, "Week 41", "-56", "P:  +243kWh U: -299kWh", false);
-    lv_obj_set_style_bg_opa(stat2, 16 * 255 / 100, 0);
+    create_widget3_stat(c, stat_box, "Sep 1, 2024", "+12", "P:  +36kWh U: -18kWh");
+    create_widget3_stat(c, stat_box, "Week 41", "-56", "P:  +243kWh U: -299kWh");
 }
 
 #endif /*LV_USE_DEMO_HIGH_RES*/

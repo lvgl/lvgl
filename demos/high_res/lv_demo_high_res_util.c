@@ -65,7 +65,7 @@ static void init_fonts_lg(lv_style_t * fonts);
 static void theme_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void free_ctx_event_cb(lv_event_t * e);
 static lv_image_dsc_t * image_preload(const void * src, lv_color_format_t cf);
-static void label_text_tenths_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void label_text_temperature_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 /**********************
  *  STATIC PROTOTYPES
@@ -92,6 +92,7 @@ const lv_demo_high_res_sizes_t lv_demo_high_res_sizes_all[SIZE_COUNT] = {
         .card_long_edge = 200,
         .widget_long_edge = 256,
         .card_short_edge = 120,
+        .smart_home_arc_diameter = 107,
         .ev_charging_arc_diameter = 160,
         .smart_meter_collapsed_part_height = 48,
         .slider_width = 27,
@@ -109,6 +110,7 @@ const lv_demo_high_res_sizes_t lv_demo_high_res_sizes_all[SIZE_COUNT] = {
         .card_long_edge = 300,
         .widget_long_edge = 384,
         .card_short_edge = 180,
+        .smart_home_arc_diameter = 160,
         .ev_charging_arc_diameter = 240,
         .smart_meter_collapsed_part_height = 72,
         .slider_width = 40,
@@ -126,6 +128,7 @@ const lv_demo_high_res_sizes_t lv_demo_high_res_sizes_all[SIZE_COUNT] = {
         .card_long_edge = 450,
         .widget_long_edge = 576,
         .card_short_edge = 270,
+        .smart_home_arc_diameter = 240,
         .ev_charging_arc_diameter = 360,
         .smart_meter_collapsed_part_height = 108,
         .slider_width = 60,
@@ -149,7 +152,8 @@ const lv_demo_high_res_sizes_t lv_demo_high_res_sizes_all[SIZE_COUNT] = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path)
+lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path,
+                                            lv_demo_high_res_exit_cb_t exit_cb)
 {
     lv_demo_high_res_ctx_t * c = lv_malloc(sizeof(lv_demo_high_res_ctx_t));
     LV_ASSERT_MALLOC(c);
@@ -183,6 +187,7 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path)
         const char * name;
         lv_color_format_t cf;
     } image_details[IMG_COUNT] = {
+        {"about_app_icon", LV_COLOR_FORMAT_ARGB8888},
         {"album_art", LV_COLOR_FORMAT_ARGB8888},
         {"arrow_left", LV_COLOR_FORMAT_ARGB8888},
         {"backward_icon", LV_COLOR_FORMAT_ARGB8888},
@@ -202,16 +207,18 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path)
         {"main_light_slider", LV_COLOR_FORMAT_ARGB8888},
         {"minus", LV_COLOR_FORMAT_ARGB8888},
         {"pager_left", LV_COLOR_FORMAT_ARGB8888},
+        {"pager_pause", LV_COLOR_FORMAT_ARGB8888},
+        {"pager_play", LV_COLOR_FORMAT_ARGB8888},
         {"pager_right", LV_COLOR_FORMAT_ARGB8888},
         {"play_icon", LV_COLOR_FORMAT_ARGB8888},
         {"play_icon_1", LV_COLOR_FORMAT_ARGB8888},
         {"plus", LV_COLOR_FORMAT_ARGB8888},
         {"range_icon", LV_COLOR_FORMAT_ARGB8888},
-        {"security_app_icon", LV_COLOR_FORMAT_ARGB8888},
         {"setting_icon", LV_COLOR_FORMAT_ARGB8888},
         {"setting_icon_bold", LV_COLOR_FORMAT_ARGB8888},
         {"smart_home_app_icon", LV_COLOR_FORMAT_ARGB8888},
         {"smart_home_widget1_bg", LV_COLOR_FORMAT_ARGB8888},
+        {"smart_home_widget2_bg", LV_COLOR_FORMAT_ARGB8888},
         {"smart_meter_app_icon", LV_COLOR_FORMAT_ARGB8888},
         {"thermostat_app_icon", LV_COLOR_FORMAT_ARGB8888},
         {"time_icon", LV_COLOR_FORMAT_ARGB8888},
@@ -219,12 +226,12 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path)
         {"volume", LV_COLOR_FORMAT_ARGB8888},
         {"weather", LV_COLOR_FORMAT_ARGB8888},
         {"wifi_icon", LV_COLOR_FORMAT_ARGB8888},
+        {"light_bg_about", LV_COLOR_FORMAT_NATIVE},
+        {"dark_bg_about", LV_COLOR_FORMAT_NATIVE},
         {"light_bg_ev_charging", LV_COLOR_FORMAT_NATIVE},
         {"dark_bg_ev_charging", LV_COLOR_FORMAT_NATIVE},
         {"light_bg_home", LV_COLOR_FORMAT_NATIVE},
         {"dark_bg_home", LV_COLOR_FORMAT_NATIVE},
-        {"light_bg_security", LV_COLOR_FORMAT_NATIVE},
-        {"dark_bg_security", LV_COLOR_FORMAT_NATIVE},
         {"light_bg_smart_home", LV_COLOR_FORMAT_NATIVE},
         {"dark_bg_smart_home", LV_COLOR_FORMAT_NATIVE},
         {"light_bg_smart_meter", LV_COLOR_FORMAT_NATIVE},
@@ -273,10 +280,16 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path)
     c->base_path = lv_strdup(base_path);
     LV_ASSERT_MALLOC(c->base_path);
 
+    c->exit_cb = exit_cb;
+
+    lv_subject_init_int(&c->temperature_units_are_celsius, 1);
+    lv_subject_init_int(&c->smart_meter_selected_bar, 4);
+
     c->top_margin_subjects_are_init = false;
 
     /* API subjects */
 
+    /* input subjects */
     lv_subject_init_pointer(&c->subjects.logo, "img_lv_demo_high_res_lvgl_logo.png");
     lv_subject_init_pointer(&c->subjects.logo_dark, NULL);
     lv_subject_init_int(&c->subjects.hour, 9);
@@ -285,20 +298,24 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path)
     lv_subject_init_int(&c->subjects.month_day, 31);
     lv_subject_init_pointer(&c->subjects.month_name, "October");
     lv_subject_init_int(&c->subjects.temperature_outdoor, 140); /* tenths of a degree */
-    lv_subject_init_int(&c->subjects.temperature_outdoor_low, 100); /* tenths of a degree */
-    lv_subject_init_int(&c->subjects.temperature_outdoor_high, 190); /* tenths of a degree */
-    lv_subject_init_pointer(&c->subjects.temperature_outdoor_description, "Cloudy");
-    lv_subject_init_pointer(&c->subjects.temperature_outdoor_image, c->imgs[IMG_WEATHER]);
     lv_subject_init_int(&c->subjects.temperature_indoor, 225); /* tenths of a degree */
-    lv_subject_init_int(&c->subjects.gas_savings_total_spent, 128);
-    lv_subject_init_int(&c->subjects.gas_savings_gas_equivalent, 340);
-    lv_subject_init_int(&c->subjects.ev_charge_percent, 88);
+    // lv_subject_init_pointer(&c->subjects.wifi_ssid, "my home Wi-Fi network");
+    // lv_subject_init_pointer(&c->subjects.wifi_ip, "192.168.1.1");
+    lv_subject_init_pointer(&c->subjects.wifi_ssid, NULL);
+    lv_subject_init_pointer(&c->subjects.wifi_ip, NULL);
 
-    lv_subject_init_int(&c->subjects.temperature_units_are_celsius, 1);
+    /* output subjects */
     lv_subject_init_int(&c->subjects.volume, 63);
     lv_subject_init_int(&c->subjects.main_light_temperature, 4000);
     lv_subject_init_int(&c->subjects.main_light_intensity, 52);
-    lv_subject_init_int(&c->subjects.ev_is_charging, 1);
+    lv_subject_init_int(&c->subjects.music_play, 1);
+    lv_subject_init_int(&c->subjects.thermostat_fan_speed, 40);
+    lv_subject_init_int(&c->subjects.thermostat_target_temperature, 24); /* degrees */
+
+    /* input+output subjects */
+    lv_subject_init_int(&c->subjects.locked, 0);
+
+    c->subjects.user_data = NULL;
 
     c->subject_groups.logo.members[0] = &c->subjects.logo;
     c->subject_groups.logo.members[1] = &c->subjects.logo_dark;
@@ -313,14 +330,10 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path)
     c->subject_groups.date.members[2] = &c->subjects.month_name;
     lv_subject_init_group(&c->subject_groups.date.group, c->subject_groups.date.members,
                           ARRAY_LEN(c->subject_groups.date.members));
-    c->subject_groups.temps_high_low.members[0] = &c->subjects.temperature_outdoor_high;
-    c->subject_groups.temps_high_low.members[1] = &c->subjects.temperature_outdoor_low;
-    lv_subject_init_group(&c->subject_groups.temps_high_low.group, c->subject_groups.temps_high_low.members,
-                          ARRAY_LEN(c->subject_groups.temps_high_low.members));
-    c->subject_groups.gas_savings.members[0] = &c->subjects.gas_savings_total_spent;
-    c->subject_groups.gas_savings.members[1] = &c->subjects.gas_savings_gas_equivalent;
-    lv_subject_init_group(&c->subject_groups.gas_savings.group, c->subject_groups.gas_savings.members,
-                          ARRAY_LEN(c->subject_groups.gas_savings.members));
+    c->subject_groups.wifi.members[0] = &c->subjects.wifi_ssid;
+    c->subject_groups.wifi.members[1] = &c->subjects.wifi_ip;
+    lv_subject_init_group(&c->subject_groups.wifi.group, c->subject_groups.wifi.members,
+                          ARRAY_LEN(c->subject_groups.wifi.members));
 
     return base_obj;
 }
@@ -343,21 +356,11 @@ lv_obj_t * lv_demo_high_res_simple_container_create(lv_obj_t * parent, bool vert
     return obj;
 }
 
-void lv_demo_high_res_label_bind_text_tenths(lv_obj_t * label, lv_subject_t * subject, const char * fmt)
+void lv_demo_high_res_label_bind_temperature(lv_obj_t * label, lv_subject_t * subject, lv_demo_high_res_ctx_t * c)
 {
-    lv_subject_add_observer_obj(subject, label_text_tenths_cb, label, (void *) fmt);
-}
-
-void lv_demo_high_res_fmt_tenths(char * dst, uint32_t dst_size, int32_t val)
-{
-    int32_t full = val / 10;
-    int32_t fraction = val % 10;
-    if(fraction) {
-        lv_snprintf(dst, dst_size, "%d.%d", full, fraction);
-    }
-    else {
-        lv_snprintf(dst, dst_size, "%d", full);
-    }
+    lv_obj_set_user_data(label, c);
+    lv_subject_add_observer_obj(subject, label_text_temperature_cb, label, subject);
+    lv_subject_add_observer_obj(&c->temperature_units_are_celsius, label_text_temperature_cb, label, subject);
 }
 
 void lv_demo_high_res_theme_observer_image_src_cb(lv_observer_t * observer, lv_subject_t * subject)
@@ -495,16 +498,18 @@ static void free_ctx_event_cb(lv_event_t * e)
 
     lv_free(c->base_path);
 
+    lv_subject_deinit(&c->temperature_units_are_celsius);
+    lv_subject_deinit(&c->smart_meter_selected_bar);
+
     lv_demo_high_res_top_margin_deinit_subjects(c);
 
     lv_subject_deinit(&c->subject_groups.logo.group);
     lv_subject_deinit(&c->subject_groups.time.group);
     lv_subject_deinit(&c->subject_groups.date.group);
-    lv_subject_deinit(&c->subject_groups.temps_high_low.group);
-    lv_subject_deinit(&c->subject_groups.gas_savings.group);
+    lv_subject_deinit(&c->subject_groups.wifi.group);
 
     lv_subject_t * subjects = (lv_subject_t *) &c->subjects;
-    for(uint32_t i = 0; i < sizeof(c->subjects) / sizeof(lv_subject_t); i++) {
+    for(uint32_t i = 0; i < (sizeof(c->subjects) - sizeof(void *)) / sizeof(lv_subject_t); i++) {
         lv_subject_deinit(&subjects[i]);
     }
 
@@ -543,14 +548,30 @@ static lv_image_dsc_t * image_preload(const void * src, lv_color_format_t cf)
     return (lv_image_dsc_t *) dest;
 }
 
-static void label_text_tenths_cb(lv_observer_t * observer, lv_subject_t * subject)
+static void label_text_temperature_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    int32_t val = lv_subject_get_int(subject);
-    const char * fmt = lv_observer_get_user_data(observer);
+    lv_subject_t * temperature_subject = lv_observer_get_user_data(observer);
+    int32_t val = lv_subject_get_int(temperature_subject);
     lv_obj_t * label = lv_observer_get_target_obj(observer);
+    lv_demo_high_res_ctx_t * c = lv_obj_get_user_data(label);
+
+    if(!lv_subject_get_int(&c->temperature_units_are_celsius)) {
+        /* convert to fahrenheit */
+        /* + 320 instead of 32 because temperatures in are tenths of a degree */
+        val = val * 9 / 5 + 320;
+    }
+
+    int32_t full = val / 10;
+    int32_t fraction = val % 10;
     char buf[16];
-    lv_demo_high_res_fmt_tenths(buf, sizeof(buf), val);
-    lv_label_set_text_fmt(label, fmt, buf);
+    if(fraction) {
+        lv_snprintf(buf, sizeof(buf), "%d.%d\xc2\xb0", full, fraction);
+    }
+    else {
+        lv_snprintf(buf, sizeof(buf), "%d\xc2\xb0", full);
+    }
+
+    lv_label_set_text(label, buf);
 }
 
 #endif /*LV_USE_DEMO_HIGH_RES*/

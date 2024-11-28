@@ -22,17 +22,14 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void charging_anim_cb(void * api_v, int32_t val);
-static void ev_is_charging_cb(lv_observer_t * observer, lv_subject_t * subject);
-static int32_t celsius_to_celsius(int32_t cel);
-static int32_t celsius_to_fahrenheit(int32_t cel);
-static void temperature_units_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void exit_cb(lv_demo_high_res_subjects_t * api);
+static void output_subject_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void locked_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void locked_timer_cb(lv_timer_t * t);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-static int32_t celsius_temperatures[4];
 
 /**********************
  *      MACROS
@@ -44,63 +41,52 @@ static int32_t celsius_temperatures[4];
 
 void lv_demo_high_res_api_example(void)
 {
-    lv_demo_high_res_subjects_t * api = lv_demo_high_res(NULL);
+    lv_demo_high_res_subjects_t * api = lv_demo_high_res(NULL, exit_cb);
 
-    lv_subject_add_observer(&api->ev_is_charging, ev_is_charging_cb, api);
+    // TODO set logo
 
-    celsius_temperatures[0] = lv_subject_get_int(&api->temperature_outdoor);
-    celsius_temperatures[1] = lv_subject_get_int(&api->temperature_outdoor_low);
-    celsius_temperatures[2] = lv_subject_get_int(&api->temperature_outdoor_high);
-    celsius_temperatures[3] = lv_subject_get_int(&api->temperature_indoor);
-    lv_subject_add_observer(&api->temperature_units_are_celsius, temperature_units_cb, api);
+    // TODO others
+    lv_subject_set_int(&api->volume, 50);
+
+    lv_subject_add_observer(&api->volume, output_subject_observer_cb, (void *)"volume");
+    lv_subject_add_observer(&api->main_light_temperature, output_subject_observer_cb, (void *)"main_light_temperature");
+    lv_subject_add_observer(&api->main_light_intensity, output_subject_observer_cb, (void *)"main_light_intensity");
+    lv_subject_add_observer(&api->music_play, output_subject_observer_cb, (void *)"music_play");
+    lv_subject_add_observer(&api->thermostat_fan_speed, output_subject_observer_cb, (void *)"thermostat_fan_speed");
+    lv_subject_add_observer(&api->thermostat_target_temperature, output_subject_observer_cb,
+                            (void *)"thermostat_target_temperature");
+
+    lv_subject_add_observer(&api->locked, locked_observer_cb, NULL);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void charging_anim_cb(void * api_v, int32_t val)
+static void exit_cb(lv_demo_high_res_subjects_t * api)
 {
-    lv_demo_high_res_subjects_t * api = api_v;
-    lv_subject_set_int(&api->ev_charge_percent, val);
+    lv_obj_delete(lv_obj_get_child(lv_screen_active(), 0));
 }
 
-static void ev_is_charging_cb(lv_observer_t * observer, lv_subject_t * subject)
+static void output_subject_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    lv_demo_high_res_subjects_t * api = lv_observer_get_user_data(observer);
-    bool ev_is_charging = lv_subject_get_int(subject);
-
-    lv_anim_t a;
-    lv_anim_init(&a);
-    int32_t start = lv_subject_get_int(&api->ev_charge_percent);
-    int32_t end = ev_is_charging ? 88 : 36;
-    lv_anim_set_duration(&a, LV_ABS(end - start) * 35);
-    lv_anim_set_exec_cb(&a, charging_anim_cb);
-    lv_anim_set_values(&a, start, end);
-    lv_anim_set_var(&a, api);
-    lv_anim_start(&a);
+    const char * subject_name = lv_observer_get_user_data(observer);
+    LV_LOG_USER("%s output subject value: %"PRId32, subject_name, lv_subject_get_int(subject));
 }
 
-static int32_t celsius_to_celsius(int32_t cel)
+static void locked_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    return cel;
+    if(lv_subject_get_int(subject)) {
+        lv_timer_t * timer = lv_timer_create(locked_timer_cb, 3000, subject);
+        lv_timer_set_auto_delete(timer, true);
+        lv_timer_set_repeat_count(timer, 1);
+    }
 }
 
-static int32_t celsius_to_fahrenheit(int32_t cel)
+static void locked_timer_cb(lv_timer_t * t)
 {
-    return cel * 9 / 5 + 320; /* + 320 instead of 32 because temperatures are tenths */
-}
-
-static void temperature_units_cb(lv_observer_t * observer, lv_subject_t * subject)
-{
-    lv_demo_high_res_subjects_t * api = lv_observer_get_user_data(observer);
-    bool units_are_celsius = lv_subject_get_int(subject);
-
-    int32_t (*conversion)(int32_t cel) = units_are_celsius ? celsius_to_celsius : celsius_to_fahrenheit;
-    lv_subject_set_int(&api->temperature_outdoor, conversion(celsius_temperatures[0]));
-    lv_subject_set_int(&api->temperature_outdoor_low, conversion(celsius_temperatures[1]));
-    lv_subject_set_int(&api->temperature_outdoor_high, conversion(celsius_temperatures[2]));
-    lv_subject_set_int(&api->temperature_indoor, conversion(celsius_temperatures[3]));
+    lv_subject_t * locked_subject = lv_timer_get_user_data(t);
+    lv_subject_set_int(locked_subject, 0);
 }
 
 #endif /*LV_USE_DEMO_HIGH_RES*/
