@@ -101,6 +101,7 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
         switch(glyph_draw_dsc->format) {
             case LV_FONT_GLYPH_FORMAT_A1:
             case LV_FONT_GLYPH_FORMAT_A2:
+            case LV_FONT_GLYPH_FORMAT_A3:
             case LV_FONT_GLYPH_FORMAT_A4:
             case LV_FONT_GLYPH_FORMAT_A8:
             case LV_FONT_GLYPH_FORMAT_A1_ALIGNED:

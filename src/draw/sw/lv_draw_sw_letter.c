@@ -83,6 +83,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_unit_t * draw_unit, lv_
                 break;
             case LV_FONT_GLYPH_FORMAT_A1:
             case LV_FONT_GLYPH_FORMAT_A2:
+            case LV_FONT_GLYPH_FORMAT_A3:
             case LV_FONT_GLYPH_FORMAT_A4:
             case LV_FONT_GLYPH_FORMAT_A8:
             case LV_FONT_GLYPH_FORMAT_A1_ALIGNED:
