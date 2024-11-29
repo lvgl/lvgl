@@ -341,9 +341,7 @@ static void _draw_nema_gfx_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_
                 nema_raster_rect(x, y, w, h);
             }
             else {
-                nema_buffer_t src_bo = nema_buffer_create(w * h);
-                memcpy(src_bo.base_virt, mask_buf, w * h);
-                nema_bind_src_tex((uintptr_t)NEMA_VIRT2PHYS(src_bo.base_virt), w, h, _bpp_nema_gfx_format(glyph_draw_dsc), -1,
+                nema_bind_src_tex((uintptr_t)(mask_buf), w, h, _bpp_nema_gfx_format(glyph_draw_dsc), -1,
                                   NEMA_FILTER_PS);
                 nema_blit(x, y);
             }
