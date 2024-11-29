@@ -74,9 +74,27 @@ can be set directly on the :cpp:enumerator:`LV_PART_SCROLLBAR` part of a Widget,
 on the Widget's LV_PART_MAIN part, or that of any of its parents, to make a scrollbar
 inherit the base direction.
 
-``pad_left/right/top/bottom`` sets the spacing around the scrollbars and
-``width`` sets the scrollbar's width.
+``pad_left/right/top/bottom`` sets the spacing around the scrollbars,
+``width`` sets the scrollbar's width and ``length`` sets the scrollbar's length:
+If `length` is not set or left at `0` the scrollbar's length will be set automatically according to the length of the content.  
+.. code-block:: c
 
+   static lv_style_t style_scrollbar;
+   lv_style_init(&style_scrollbar);
+   lv_style_set_pad_left(&style_scrollbar, 2);
+   lv_style_set_pad_right(&style_scrollbar, 2);
+   lv_style_set_pad_top(&style_scrollbar, 2);
+   lv_style_set_pad_bottom(&style_scrollbar, 2);
+   lv_style_set_width(&style_scrollbar, 10);
+   lv_style_set_length(&style_scrollbar, 50);
+
+   ...
+
+   lv_obj_add_style(widget, &style_scrollbar, LV_PART_SCROLLBAR);
+
+The minimum length of the scrollbar is fixed to 10, while its maximum length is limited by the
+Widget's height or width, depending on whether the scrollbar is vertical or horizontal. Any length value
+set outside of these limits will automatically result in a length fixed to either limit.
 
 .. _scroll_events:
 

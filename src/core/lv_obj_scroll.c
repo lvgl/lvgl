@@ -504,6 +504,7 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
     int32_t left_space = lv_obj_get_style_pad_left(obj, LV_PART_SCROLLBAR);
     int32_t right_space = lv_obj_get_style_pad_right(obj, LV_PART_SCROLLBAR);
     int32_t thickness = lv_obj_get_style_width(obj, LV_PART_SCROLLBAR);
+    int32_t length = lv_obj_get_style_length(obj, LV_PART_SCROLLBAR);
 
     int32_t obj_h = lv_obj_get_height(obj);
     int32_t obj_w = lv_obj_get_width(obj);
@@ -533,7 +534,8 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
         }
 
         int32_t sb_h = ((obj_h - top_space - bottom_space - hor_req_space) * obj_h) / content_h;
-        sb_h = LV_MAX(sb_h, SCROLLBAR_MIN_SIZE);
+        sb_h = LV_MAX(length > 0 ? length : sb_h, SCROLLBAR_MIN_SIZE); /*Style-defined size, calculated size, or minimum size*/
+        sb_h = LV_MIN(sb_h, obj_h); /*Limit scrollbar length to parent height*/
         rem = (obj_h - top_space - bottom_space - hor_req_space) -
               sb_h;  /*Remaining size from the scrollbar track that is not the scrollbar itself*/
         int32_t scroll_h = content_h - obj_h; /*The size of the content which can be really scrolled*/
@@ -571,7 +573,8 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
         hor_area->x2 = obj->coords.x2;
 
         int32_t sb_w = ((obj_w - left_space - right_space - ver_reg_space) * obj_w) / content_w;
-        sb_w = LV_MAX(sb_w, SCROLLBAR_MIN_SIZE);
+        sb_w = LV_MAX(length > 0 ? length : sb_w, SCROLLBAR_MIN_SIZE); /*Style-defined size, calculated size, or minimum size*/
+        sb_w = LV_MIN(sb_w, obj_w); /*Limit scrollbar length to parent width*/
         rem = (obj_w - left_space - right_space - ver_reg_space) -
               sb_w;  /*Remaining size from the scrollbar track that is not the scrollbar itself*/
         int32_t scroll_w = content_w - obj_w; /*The size of the content which can be really scrolled*/
