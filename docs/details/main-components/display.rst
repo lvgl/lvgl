@@ -410,7 +410,7 @@ Below is an example for rotating when the rendering mode is
 
 .. code-block:: c
 	/*Rotate a partially rendered area to another buffer and send it*/
-	void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map
+	void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 	{
 		lv_display_rotation_t rotation = lv_display_get_rotation(disp);
 		lv_area_t rotated_area;
