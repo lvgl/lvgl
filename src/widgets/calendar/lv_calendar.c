@@ -117,7 +117,7 @@ void lv_calendar_set_highlighted_dates(lv_obj_t * obj, lv_calendar_date_t highli
     highlight_update(obj);
 }
 
-void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month)
+void lv_calendar_set_month_shown(lv_obj_t * obj, uint32_t year, uint32_t month)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
@@ -332,7 +332,7 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 
     lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
 
-    lv_calendar_set_showed_date(obj, calendar->showed_date.year, calendar->showed_date.month);
+    lv_calendar_set_month_shown(obj, calendar->showed_date.year, calendar->showed_date.month);
     lv_calendar_set_today_date(obj, calendar->today.year, calendar->today.month, calendar->today.day);
 }
 

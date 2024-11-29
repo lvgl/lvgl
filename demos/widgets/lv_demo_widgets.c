@@ -1324,7 +1324,7 @@ static void birthday_event_cb(lv_event_t * e)
                 if(disp_size == DISP_SMALL) lv_obj_set_size(calendar, 180, 200);
                 else if(disp_size == DISP_MEDIUM) lv_obj_set_size(calendar, 200, 220);
                 else  lv_obj_set_size(calendar, 300, 330);
-                lv_calendar_set_showed_date(calendar, 1990, 01);
+                lv_calendar_set_month_shown(calendar, 1990, 01);
                 lv_obj_align(calendar, LV_ALIGN_CENTER, 0, 30);
                 lv_obj_add_event_cb(calendar, calendar_event_cb, LV_EVENT_ALL, ta);
 
