@@ -442,7 +442,7 @@ Below is an example for rotating when the rendering mode is
 	    my_send_colors(px_map);
 	}
 
-Below is an example for rotatig when the renderig mode is
+Below is an example for rotating when the rendering mode is
 :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_PARTIAL` and the image can be rotated directly
 into a **frame buffer of the LCD periphery**.
 
