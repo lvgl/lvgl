@@ -234,4 +234,4 @@ void test_calendar_chinese_calendar(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/calendar_09.png");
 }
 
-#endif
+#endif  /* LV_BUILD_TEST */
