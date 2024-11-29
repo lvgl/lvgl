@@ -35,7 +35,7 @@ choice of several different types of units you can use.
                      E.g. :cpp:expr:`lv_obj_set_x(btn, 10)`.
 
 :percentage:         Specify size as a percentage of the size of the Widget's
-                     parent or of itself, depending on the property).
+                     parent or of itself, depending on the property.
                      :cpp:expr:`lv_pct(value)` converts ``value`` to a percentage.
                      E.g. :cpp:expr:`lv_obj_set_width(btn, lv_pct(50))`.  If you want
                      to avoid the overhead of the call to :cpp:func:`lv_pct`, you can
