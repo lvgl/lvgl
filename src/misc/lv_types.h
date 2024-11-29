@@ -269,6 +269,8 @@ typedef struct _lv_qrcode_t lv_qrcode_t;
 
 typedef struct _lv_freetype_outline_vector_t lv_freetype_outline_vector_t;
 
+typedef struct _lv_freetype_outline_sizes_t lv_freetype_outline_sizes_t;
+
 typedef struct _lv_freetype_outline_event_param_t lv_freetype_outline_event_param_t;
 
 typedef struct _lv_fpoint_t lv_fpoint_t;

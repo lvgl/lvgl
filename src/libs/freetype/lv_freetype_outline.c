@@ -337,20 +337,6 @@ static lv_freetype_outline_t outline_create(
         }
     }
 
-    lv_result_t res;
-    lv_freetype_outline_event_param_t param;
-
-    lv_memzero(&param, sizeof(param));
-    res = outline_send_event(ctx, LV_EVENT_CREATE, &param);
-
-    lv_freetype_outline_t outline = param.outline;
-
-    if(res != LV_RESULT_OK || !outline) {
-        LV_LOG_ERROR("Outline object create failed");
-        LV_PROFILER_FONT_END;
-        return NULL;
-    }
-
     FT_Outline_Funcs outline_funcs = {
         .move_to = outline_move_to_cb,
         .line_to = outline_line_to_cb,
@@ -360,8 +346,11 @@ static lv_freetype_outline_t outline_create(
         .delta = 0
     };
 
-#if LV_USE_NEMA_GFX
-#if LV_USE_NEMA_VG
+
+    lv_result_t res;
+    lv_freetype_outline_event_param_t param;
+    lv_memzero(&param, sizeof(param));
+
     /*Calculate Total Segmenets Before decompose */
     int tag_size = face->glyph->outline.n_points;
     unsigned char * tags = face->glyph->outline.tags;
@@ -388,11 +377,18 @@ static lv_freetype_outline_t outline_create(
     segments += face->glyph->outline.n_contours;
     vectors += face->glyph->outline.n_contours;
 
-    lv_nema_gfx_path_t * nema_gfx_path = (lv_nema_gfx_path_t *) param.outline;
-    nema_gfx_path->data_size = vectors * 2;
-    nema_gfx_path->seg_size = segments;
-#endif  /*LV_USE_NEMA_VG*/
-#endif  /*LV_USE_NEMA_GFX*/
+    param.sizes.data_size = vectors * 2;
+    param.sizes.segments_size = segments;
+
+    res = outline_send_event(ctx, LV_EVENT_CREATE, &param);
+
+    lv_freetype_outline_t outline = param.outline;
+
+    if(res != LV_RESULT_OK || !outline) {
+        LV_LOG_ERROR("Outline object create failed");
+        LV_PROFILER_FONT_END;
+        return NULL;
+    }
 
     /* Run outline decompose again to fill outline data */
     error = FT_Outline_Decompose(&face->glyph->outline, &outline_funcs, outline);

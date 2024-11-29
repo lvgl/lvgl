@@ -97,6 +97,8 @@ void lv_draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
 void lv_draw_nema_gfx_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,
                             const lv_area_t * coords);
 
+void lv_draw_nema_gfx_label_init(lv_draw_unit_t * draw_unit);
+
 void lv_draw_nema_gfx_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
                             const lv_area_t * coords);
 

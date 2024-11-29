@@ -86,7 +86,11 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
 
-    if(g_dsc->req_raw_bitmap) return &fdsc->glyph_bitmap[gdsc->bitmap_index];
+    if(g_dsc->req_raw_bitmap) {
+        const uint8_t * raw_bitmap_out = &fdsc->glyph_bitmap[gdsc->bitmap_index];
+        draw_buf->data = (uint8_t *) raw_bitmap_out;
+        return draw_buf;
+    }
 
     int32_t gsize = (int32_t) gdsc->box_w * gdsc->box_h;
     if(gsize == 0) return NULL;
