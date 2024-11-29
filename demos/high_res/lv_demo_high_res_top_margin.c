@@ -31,10 +31,13 @@ static void logout_cb(lv_event_t * e);
 static lv_obj_t * create_icon(lv_obj_t * parent, lv_subject_t * subject, lv_image_dsc_t ** img_dsc_pair,
                               lv_demo_high_res_ctx_t * c);
 static void icon_clicked_cb(lv_event_t * e);
+static void wifi_ssid_ip_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static lv_obj_t * create_wifi(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c);
 static void wifi_icon_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static lv_obj_t * create_perfmon(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c);
-static void perfmon_data_cb(lv_observer_t * observer, lv_subject_t * subject);
+#if LV_USE_PERF_MONITOR
+    static void perfmon_data_cb(lv_observer_t * observer, lv_subject_t * subject);
+#endif
 static lv_obj_t * create_settings(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c);
 static lv_obj_t * create_setting_label_cont(lv_obj_t * parent, const char * text, lv_demo_high_res_ctx_t * c);
 static void setting_clicked_cb(lv_event_t * e);
@@ -137,7 +140,7 @@ void lv_demo_high_res_top_margin_deinit_subjects(lv_demo_high_res_ctx_t * c)
 static void logout_cb(lv_event_t * e)
 {
     lv_demo_high_res_ctx_t * c = lv_event_get_user_data(e);
-    if(c->exit_cb) c->exit_cb(&c->subjects);
+    if(c->exit_cb) c->exit_cb(&c->api);
 }
 
 static lv_obj_t * create_icon(lv_obj_t * parent, lv_subject_t * subject, lv_image_dsc_t ** img_dsc_pair,
@@ -171,6 +174,19 @@ static void icon_clicked_cb(lv_event_t * e)
     }
 }
 
+static void wifi_ssid_ip_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * label = lv_observer_get_target_obj(observer);
+    const char * ssid_ip = lv_observer_get_user_data(observer);
+    const char * ssid_ip_value = lv_subject_get_pointer(subject);
+    if(ssid_ip_value) {
+        lv_label_set_text_fmt(label, "%s: %s", ssid_ip, ssid_ip_value);
+    }
+    else {
+        lv_label_set_text_fmt(label, "%s: (offline)", ssid_ip);
+    }
+}
+
 static lv_obj_t * create_wifi(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c)
 {
     lv_obj_t * settings = lv_obj_create(base_obj);
@@ -186,23 +202,25 @@ static lv_obj_t * create_wifi(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c)
     lv_obj_set_width(cont, LV_PCT(100));
 
     lv_obj_t * ssid = lv_label_create(cont);
-    lv_label_bind_text(ssid, &c->subjects.wifi_ssid, "SSID: %s");
     lv_obj_add_style(ssid, &c->fonts[FONT_LABEL_XS], 0);
     lv_obj_add_style(ssid, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+    lv_subject_add_observer_obj(&c->api.subjects.wifi_ssid, wifi_ssid_ip_observer_cb, ssid, (void *)"SSID");
     lv_obj_t * ip = lv_label_create(cont);
-    lv_label_bind_text(ip, &c->subjects.wifi_ip, "IP: %s");
+    lv_label_bind_text(ip, &c->api.subjects.wifi_ip, "IP: %s");
     lv_obj_add_style(ip, &c->fonts[FONT_LABEL_XS], 0);
     lv_obj_add_style(ip, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+    lv_subject_add_observer_obj(&c->api.subjects.wifi_ip, wifi_ssid_ip_observer_cb, ip, (void *)"IP");
 
     return settings;
 }
 
 static void wifi_icon_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
+    LV_UNUSED(subject);
     lv_obj_t * wifi_icon = lv_observer_get_target_obj(observer);
     lv_demo_high_res_ctx_t * c = lv_observer_get_user_data(observer);
-    lv_obj_set_style_opa(wifi_icon, lv_subject_get_pointer(&c->subjects.wifi_ssid)
-                         || lv_subject_get_pointer(&c->subjects.wifi_ip)
+    lv_obj_set_style_opa(wifi_icon, lv_subject_get_pointer(&c->api.subjects.wifi_ssid)
+                         || lv_subject_get_pointer(&c->api.subjects.wifi_ip)
                          ? LV_OPA_COVER : LV_OPA_50, 0);
 }
 
@@ -227,8 +245,8 @@ static lv_obj_t * create_perfmon(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c
 #if LV_USE_PERF_MONITOR
     lv_obj_t * divider = lv_line_create(cont);
     lv_obj_set_size(divider, LV_PCT(100), c->sz->gap[4]);
-    //    static const lv_point_precise_t points[] = {{LV_PCT(0), LV_PCT(50)}, {LV_PCT(100), LV_PCT(50)}};
-    //    lv_line_set_points(divider, points, 2);
+    /* static const lv_point_precise_t points[] = {{LV_PCT(0), LV_PCT(50)}, {LV_PCT(100), LV_PCT(50)}}; */
+    /* lv_line_set_points(divider, points, 2); */
     lv_obj_set_style_line_width(divider, 1, 0);
     lv_obj_add_style(divider, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_set_style_line_opa(divider, LV_OPA_10, 0);
@@ -256,9 +274,9 @@ static void perfmon_data_cb(lv_observer_t * observer, lv_subject_t * subject)
     lv_obj_t * lab2 = lv_obj_get_child(cont, 2);
     lv_obj_t * lab3 = lv_obj_get_child(cont, 3);
 
-    lv_label_set_text_fmt(lab1, "%u FPS, %u%% CPU", perf->calculated.fps, perf->calculated.cpu);
-    lv_label_set_text_fmt(lab2, "Refresh: %ums", perf->calculated.render_avg_time + perf->calculated.flush_avg_time);
-    lv_label_set_text_fmt(lab3, "Render / Flush: %ums / %ums", perf->calculated.render_avg_time,
+    lv_label_set_text_fmt(lab1, "%"PRIu32" FPS, %"PRIu32"%% CPU", perf->calculated.fps, perf->calculated.cpu);
+    lv_label_set_text_fmt(lab2, "Refresh: %"PRIu32"ms", perf->calculated.render_avg_time + perf->calculated.flush_avg_time);
+    lv_label_set_text_fmt(lab3, "Render / Flush: %"PRIu32"ms / %"PRIu32"ms", perf->calculated.render_avg_time,
                           perf->calculated.flush_avg_time);
 
 }
@@ -334,10 +352,10 @@ static void date_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     lv_obj_t * date_label = lv_observer_get_target_obj(observer);
     lv_demo_high_res_ctx_t * c = lv_observer_get_user_data(observer);
 
-    lv_label_set_text_fmt(date_label, "%s, %d %s",
-                          (char *)lv_subject_get_pointer(&c->subjects.week_day_name),
-                          lv_subject_get_int(&c->subjects.month_day),
-                          (char *)lv_subject_get_pointer(&c->subjects.month_name));
+    lv_label_set_text_fmt(date_label, "%s, %"PRId32" %s",
+                          (char *)lv_subject_get_pointer(&c->api.subjects.week_day_name),
+                          lv_subject_get_int(&c->api.subjects.month_day),
+                          (char *)lv_subject_get_pointer(&c->api.subjects.month_name));
 }
 
 static void time_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
@@ -346,8 +364,8 @@ static void time_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     lv_obj_t * time_label = lv_observer_get_target_obj(observer);
     lv_demo_high_res_ctx_t * c = lv_observer_get_user_data(observer);
 
-    lv_label_set_text_fmt(time_label, "%02d:%02d", lv_subject_get_int(&c->subjects.hour),
-                          lv_subject_get_int(&c->subjects.minute));
+    lv_label_set_text_fmt(time_label, "%02d:%02d", lv_subject_get_int(&c->api.subjects.hour),
+                          lv_subject_get_int(&c->api.subjects.minute));
 }
 
 #endif /*LV_USE_DEMO_HIGH_RES*/

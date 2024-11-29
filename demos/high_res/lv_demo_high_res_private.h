@@ -25,6 +25,8 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#define EV_CHARGING_RANGE_END 10000
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -169,10 +171,6 @@ typedef struct {
     struct {
         lv_subject_t group;
         lv_subject_t * members[2];
-    } logo;
-    struct {
-        lv_subject_t group;
-        lv_subject_t * members[2];
     } time;
     struct {
         lv_subject_t group;
@@ -190,15 +188,18 @@ typedef struct {
     lv_style_t styles[STYLE_COLOR_COUNT][STYLE_TYPE_COUNT];
     lv_style_t fonts[FONT_COUNT];
     lv_subject_t th;
-    char * base_path;
+    char * logo_path;
+    char * slides_path;
     lv_demo_high_res_exit_cb_t exit_cb;
     lv_subject_t temperature_units_are_celsius;
+    lv_obj_t * ev_charging_bg_cont;
+    lv_subject_t ev_charging_progress;
     lv_subject_t smart_meter_selected_bar;
     bool top_margin_subjects_are_init;
     lv_subject_t top_margin_wifi_subject;
     lv_subject_t top_margin_health_subject;
     lv_subject_t top_margin_setting_subject;
-    lv_demo_high_res_subjects_t subjects;
+    lv_demo_high_res_api_t api;
     lv_demo_high_res_subject_groups_t subject_groups;
 } lv_demo_high_res_ctx_t;
 
@@ -210,7 +211,9 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_demo_high_res_sizes_t lv_demo_high_res_
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path,
+lv_obj_t * lv_demo_high_res_base_obj_create(const char * assets_path,
+                                            const char * logo_path,
+                                            const char * slides_path,
                                             lv_demo_high_res_exit_cb_t exit_cb);
 
 void lv_demo_high_res_home(lv_obj_t * base_obj);

@@ -36,7 +36,7 @@ static void set_light_theme_event_cb(lv_event_t * e);
 static void set_dark_theme_event_cb(lv_event_t * e);
 static void time_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void date_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
-static void logo_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void hi_lo_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 /**********************
  *  STATIC VARIABLES
@@ -71,7 +71,8 @@ void lv_demo_high_res_home(lv_obj_t * base_obj)
 
     /* top margin */
 
-    lv_demo_high_res_top_margin_create(base_obj, bg_cont, c->sz->gap[10], false, c);
+    lv_demo_high_res_top_margin_create(base_obj, bg_cont,
+                                       c->sz == &lv_demo_high_res_sizes_all[SIZE_SM] ? c->sz->gap[9] : c->sz->gap[10], false, c);
 
     /* info area */
 
@@ -119,16 +120,16 @@ void lv_demo_high_res_home(lv_obj_t * base_obj)
     lv_obj_add_style(weather_label, &c->fonts[FONT_LABEL_MD], 0);
 
     lv_obj_t * weather_hi_lo_label = lv_label_create(weather_left_bottom);
-    lv_label_set_text_static(weather_hi_lo_label, "H: 19\xc2\xb0   L: 10\xc2\xb0");
     lv_obj_add_style(weather_hi_lo_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_add_style(weather_hi_lo_label, &c->fonts[FONT_LABEL_MD], 0);
+    lv_subject_add_observer_obj(&c->temperature_units_are_celsius, hi_lo_observer_cb, weather_hi_lo_label, NULL);
 
     lv_obj_t * weather_right = lv_demo_high_res_simple_container_create(weather, true, c->sz->gap[2], LV_FLEX_ALIGN_CENTER);
 
     lv_obj_t * weather_temperature_label = lv_label_create(weather_right);
     lv_obj_add_style(weather_temperature_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_add_style(weather_temperature_label, &c->fonts[FONT_HEADING_XL], 0);
-    lv_demo_high_res_label_bind_temperature(weather_temperature_label, &c->subjects.temperature_outdoor, c);
+    lv_demo_high_res_label_bind_temperature(weather_temperature_label, &c->api.subjects.temperature_outdoor, c);
 
     lv_obj_t * weather_temperature_location_label = lv_label_create(weather_right);
     lv_label_set_text_static(weather_temperature_location_label, "Outdoor");
@@ -167,7 +168,11 @@ void lv_demo_high_res_home(lv_obj_t * base_obj)
 
     lv_obj_t * logo = lv_image_create(bottom_margin);
     lv_obj_set_height(logo, c->sz->icon[1]);
-    lv_subject_add_observer_obj(&c->subject_groups.logo.group, logo_observer_cb, logo, c);
+    lv_image_set_inner_align(logo, LV_IMAGE_ALIGN_STRETCH);
+    lv_image_set_src(logo, c->logo_path);
+    int32_t scale = lv_image_get_scale_y(logo);
+    lv_image_set_inner_align(logo, LV_IMAGE_ALIGN_DEFAULT);
+    lv_image_set_scale(logo, scale);
 
     lv_obj_t * theme_selector = lv_demo_high_res_simple_container_create(bottom_margin, false, c->sz->gap[4],
                                                                          LV_FLEX_ALIGN_CENTER);
@@ -296,10 +301,10 @@ static void time_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 
     char buf[16];
 
-    lv_snprintf(buf, sizeof(buf), "%02"LV_PRId32, lv_subject_get_int(&c->subjects.hour));
+    lv_snprintf(buf, sizeof(buf), "%02"LV_PRId32, lv_subject_get_int(&c->api.subjects.hour));
     lv_span_set_text(lv_spangroup_get_child(spangroup, 0), buf);
 
-    lv_snprintf(buf, sizeof(buf), ":%02"LV_PRId32, lv_subject_get_int(&c->subjects.minute));
+    lv_snprintf(buf, sizeof(buf), ":%02"LV_PRId32, lv_subject_get_int(&c->api.subjects.minute));
     lv_span_set_text(lv_spangroup_get_child(spangroup, 1), buf);
 }
 
@@ -311,46 +316,18 @@ static void date_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 
     char buf[32];
 
-    lv_snprintf(buf, sizeof(buf), "%s, ", lv_subject_get_pointer(&c->subjects.week_day_name));
+    lv_snprintf(buf, sizeof(buf), "%s, ", lv_subject_get_pointer(&c->api.subjects.week_day_name));
     lv_span_set_text(lv_spangroup_get_child(spangroup, 0), buf);
-    lv_snprintf(buf, sizeof(buf), "%d %s", lv_subject_get_int(&c->subjects.month_day),
-                lv_subject_get_pointer(&c->subjects.month_name));
+    lv_snprintf(buf, sizeof(buf), "%"PRId32" %s", lv_subject_get_int(&c->api.subjects.month_day),
+                lv_subject_get_pointer(&c->api.subjects.month_name));
     lv_span_set_text(lv_spangroup_get_child(spangroup, 1), buf);
 }
 
-static void logo_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+static void hi_lo_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    LV_UNUSED(subject);
-    lv_obj_t * logo = lv_observer_get_target_obj(observer);
-    lv_demo_high_res_ctx_t * c = lv_observer_get_user_data(observer);
-
-    lv_image_set_inner_align(logo, LV_IMAGE_ALIGN_STRETCH);
-
-    const lv_demo_high_res_theme_t * th = lv_subject_get_pointer(&c->th);
-    const void * dark_src = lv_subject_get_pointer(&c->subjects.logo_dark);
-    const void * src;
-    if(th == &lv_demo_high_res_theme_dark && dark_src != NULL) {
-        src = dark_src;
-    }
-    else {
-        src = lv_subject_get_pointer(&c->subjects.logo);
-    }
-    if(lv_image_src_get_type(src) == LV_IMAGE_SRC_FILE) {
-        char * buf = lv_malloc(lv_strlen(c->base_path) + 1 + lv_strlen(src) + 1);
-        LV_ASSERT_MALLOC(buf);
-        lv_strcpy(buf, c->base_path);
-        lv_strcat(buf, "/");
-        lv_strcat(buf, src);
-        lv_image_set_src(logo, buf);
-        lv_free(buf);
-    }
-    else {
-        lv_image_set_src(logo, src);
-    }
-
-    int32_t scale = lv_image_get_scale_y(logo);
-    lv_image_set_inner_align(logo, LV_IMAGE_ALIGN_DEFAULT);
-    lv_image_set_scale(logo, scale);
+    lv_obj_t * weather_hi_lo_label = lv_observer_get_target_obj(observer);
+    lv_label_set_text_static(weather_hi_lo_label,
+                             lv_subject_get_int(subject) ? "H: 19\xc2\xb0   L: 10\xc2\xb0" : "H: 66.2\xc2\xb0   L: 50\xc2\xb0");
 }
 
 #endif /*LV_USE_DEMO_HIGH_RES*/

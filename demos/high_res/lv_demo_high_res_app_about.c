@@ -17,8 +17,6 @@
  *      DEFINES
  *********************/
 
-#define ABOUT_APP_SLIDES_DIR "about_app_slides"
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -103,13 +101,15 @@ void lv_demo_high_res_app_about(lv_obj_t * base_obj)
     lv_fs_res_t res;
 
     lv_fs_dir_t dir;
-    res = lv_fs_dir_open(&dir, ABOUT_APP_SLIDES_DIR);
+    res = lv_fs_dir_open(&dir, c->slides_path);
     if(res != LV_FS_RES_OK) {
         lv_obj_t * label = lv_label_create(bg_cont);
-        lv_label_set_text(label, "Couldn't open the '" ABOUT_APP_SLIDES_DIR "' folder to load the images");
+        lv_label_set_text_fmt(label, "Couldn't open the '%s' folder to load the images", c->slides_path);
         lv_obj_center(label);
         return;
     }
+    res = lv_fs_dir_close(&dir);
+    LV_ASSERT(res == LV_FS_RES_OK);
 
     lv_obj_t * slides_cont = lv_obj_create(bg_cont);
     lv_obj_remove_style_all(slides_cont);
@@ -141,25 +141,26 @@ void lv_demo_high_res_app_about(lv_obj_t * base_obj)
     lv_obj_add_event_cb(left, left_clicked_cb, LV_EVENT_CLICKED, slide_deck);
     lv_obj_add_event_cb(right, right_clicked_cb, LV_EVENT_CLICKED, slide_deck);
 
-    lv_timer_t * play_pause_timer = lv_timer_create(play_pause_timer_cb, 1000, slide_deck);
+    lv_timer_t * play_pause_timer = lv_timer_create(play_pause_timer_cb, 5000, slide_deck);
     lv_obj_add_event_cb(play_pause, play_pause_clicked_cb, LV_EVENT_CLICKED, play_pause_timer);
     lv_obj_add_event_cb(bg_cont, bg_cont_delete_cb, LV_EVENT_DELETE, play_pause_timer);
 
     lv_obj_t * slide;
 
     char buf[256];
-    while(1) {
-        res = lv_fs_dir_read(&dir, buf, sizeof(buf));
+    for(int32_t i = 1; ; i++) {
+        lv_snprintf(buf, sizeof(buf), "%s/%"PRId32".png", c->slides_path, i);
+        lv_fs_file_t file;
+        res = lv_fs_open(&file, buf, LV_FS_MODE_RD);
+        if(res != LV_FS_RES_OK) {
+            break;
+        }
+        res = lv_fs_close(&file);
         LV_ASSERT(res == LV_FS_RES_OK);
-        if(!*buf) break;
+
         slide = lv_image_create(slide_deck);
-        lv_memmove(buf + sizeof(ABOUT_APP_SLIDES_DIR), buf, lv_strlen(buf) + 1);
-        lv_strcpy(buf, ABOUT_APP_SLIDES_DIR);
-        buf[sizeof(ABOUT_APP_SLIDES_DIR) - 1] = '/';
         lv_image_set_src(slide, buf);
     }
-    res = lv_fs_dir_close(&dir);
-    LV_ASSERT(res == LV_FS_RES_OK);
 
     slide = lv_obj_get_child(slide_deck, 0);
     if(slide) {
@@ -204,7 +205,8 @@ static lv_obj_t * create_button(lv_obj_t * parent, const void * img_src, lv_demo
     lv_obj_set_style_opa(button, LV_OPA_20, LV_STATE_DISABLED);
     lv_obj_t * img = lv_image_create(button);
     lv_image_set_src(img, img_src);
-    lv_obj_add_style(img, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_A8_IMG], 0);
+    lv_obj_set_style_image_recolor(img, lv_color_white(), 0);
+    lv_obj_set_style_image_recolor_opa(img, LV_OPA_COVER, 0);
     lv_obj_center(img);
     return button;
 }

@@ -20,14 +20,11 @@
  *      DEFINES
  *********************/
 
-#define ANIM_RANGE_END 10000
-
 /**********************
  *      TYPEDEFS
  **********************/
 
 typedef struct {
-    lv_demo_high_res_ctx_t * c;
     lv_obj_t * percent_label;
     lv_obj_t * arc;
     lv_obj_t * spent_label_large;
@@ -37,8 +34,8 @@ typedef struct {
     lv_obj_t * time_to_full_label;
     lv_obj_t * energy_consumed_label;
     lv_obj_t * driving_range_label;
-    int32_t last_v;
-    bool is_animating_up;
+    lv_obj_t * widget3;
+    lv_obj_t * charging_status_label;
 } anim_state_t;
 
 /**********************
@@ -46,13 +43,16 @@ typedef struct {
  **********************/
 
 static void bg_cont_delete_cb(lv_event_t * e);
+static void base_obj_delete_cb(lv_event_t * e);
+static void anim_state_apply(anim_state_t * anim_state, int32_t v);
 static void anim_exec_cb(void * var, int32_t v);
+static void anim_completed_cb(lv_anim_t * a);
 static void back_clicked_cb(lv_event_t * e);
 static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 static lv_obj_t * widget2_chart_label(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const char * text);
 static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 static lv_obj_t * create_widget3_info(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const lv_image_dsc_t * img_dsc,
-                                      const char * text, const char * number, const char * unit);
+                                      const char * text, const char * unit);
 static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 static void charging_status_box_clicked_cb(lv_event_t * e);
 
@@ -92,14 +92,25 @@ void lv_demo_high_res_app_ev_charging(lv_obj_t * base_obj)
     int32_t app_padding = c->sz == &lv_demo_high_res_sizes_all[SIZE_SM] ? c->sz->gap[9] : c->sz->gap[10];
     lv_obj_set_style_pad_bottom(bg_cont, app_padding, 0);
     lv_obj_set_style_pad_hor(bg_cont, app_padding, 0);
+    c->ev_charging_bg_cont = bg_cont;
+    lv_obj_add_event_cb(bg_cont, bg_cont_delete_cb, LV_EVENT_DELETE, base_obj);
 
-    anim_state_t * anim_state = lv_malloc_zeroed(sizeof(anim_state_t));
-    LV_ASSERT_MALLOC(anim_state);
-    anim_state->c = c;
-    anim_state->last_v = ANIM_RANGE_END;
-    anim_state->is_animating_up = true;
+    anim_state_t * anim_state = NULL;
+    uint32_t base_obj_event_count = lv_obj_get_event_count(base_obj);
+    for(uint32_t i = 0; i < base_obj_event_count; i++) {
+        lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(base_obj, i);
+        lv_event_cb_t event_cb = lv_event_dsc_get_cb(event_dsc);
+        if(event_cb == base_obj_delete_cb) {
+            anim_state = lv_event_dsc_get_user_data(event_dsc);
+            break;
+        }
+    }
+    if(anim_state == NULL) {
+        anim_state = lv_malloc_zeroed(sizeof(anim_state_t));
+        LV_ASSERT_MALLOC(anim_state);
+        lv_obj_add_event_cb(base_obj, base_obj_delete_cb, LV_EVENT_DELETE, anim_state);
+    }
     lv_obj_set_user_data(bg_cont, anim_state);
-    lv_obj_add_event_cb(bg_cont, bg_cont_delete_cb, LV_EVENT_DELETE, NULL);
 
     /* top margin */
 
@@ -138,6 +149,8 @@ void lv_demo_high_res_app_ev_charging(lv_obj_t * base_obj)
     create_widget1(c, widgets);
     create_widget2(c, widgets);
     create_widget3(c, widgets);
+
+    anim_state_apply(anim_state, lv_subject_get_int(&c->ev_charging_progress));
 }
 
 /**********************
@@ -146,47 +159,73 @@ void lv_demo_high_res_app_ev_charging(lv_obj_t * base_obj)
 
 static void bg_cont_delete_cb(lv_event_t * e)
 {
-    lv_obj_t * bg_cont = lv_event_get_target_obj(e);
-    anim_state_t * anim_state = lv_obj_get_user_data(bg_cont);
+    lv_obj_t * base_obj = lv_event_get_user_data(e);
+    lv_demo_high_res_ctx_t * c = lv_obj_get_user_data(base_obj);
+    if(!c) return;
+    c->ev_charging_bg_cont = NULL;
+}
+
+static void base_obj_delete_cb(lv_event_t * e)
+{
+    anim_state_t * anim_state = lv_event_get_user_data(e);
     lv_free(anim_state);
 }
 
-static void anim_exec_cb(void * var, int32_t v)
+static void anim_state_apply(anim_state_t * anim_state, int32_t v)
 {
-    lv_obj_t * bg_cont = var;
-    anim_state_t * anim_state = lv_obj_get_user_data(bg_cont);
-    anim_state->last_v = v;
-
-    if(!anim_state->is_animating_up) v = ANIM_RANGE_END - v;
-
-    int32_t v_range_100 = lv_map(v, 0, ANIM_RANGE_END, 0, 100);
+    int32_t v_range_100 = lv_map(v, 0, EV_CHARGING_RANGE_END, 0, 100);
     lv_label_set_text_fmt(anim_state->percent_label, "%"LV_PRId32"%%", v_range_100);
     lv_arc_set_value(anim_state->arc, v_range_100);
 
-    int32_t v_range_spent = lv_map(v, 0, ANIM_RANGE_END, 119, 128);
+    int32_t v_range_spent = lv_map(v, 0, EV_CHARGING_RANGE_END, 96, 176);
     lv_label_set_text_fmt(anim_state->spent_label_large, "$%"LV_PRId32, v_range_spent);
     char buf[32];
     lv_snprintf(buf, sizeof(buf), "$%"LV_PRId32" - ", v_range_spent);
     lv_span_set_text(anim_state->spent_span_small, buf);
     lv_label_set_text_fmt(anim_state->saved_label, "$%"LV_PRId32, 340 - v_range_spent);
 
-    int32_t v_range_charged = lv_map(v, 0, ANIM_RANGE_END, 640, 683);
+    int32_t v_range_charged = lv_map(v, 0, EV_CHARGING_RANGE_END, 640, 683);
     lv_label_set_text_fmt(anim_state->charged_label, "%"LV_PRId32, v_range_charged);
 
-    int32_t v_range_time_to_full = lv_map(v, 0, ANIM_RANGE_END, 72, 0);
+    int32_t v_range_time_to_full = lv_map(v, 0, EV_CHARGING_RANGE_END, 72, 0);
     int32_t whole = v_range_time_to_full / 10;
     int32_t fraction = v_range_time_to_full % 10;
     lv_label_set_text_fmt(anim_state->time_to_full_label,
                           "%"LV_PRId32".%"LV_PRId32, whole, fraction);
 
-    int32_t v_range_consumed = lv_map(v, 0, ANIM_RANGE_END, 0, 1012);
+    int32_t v_range_consumed = lv_map(v, 0, EV_CHARGING_RANGE_END, 0, 1012);
     whole = v_range_consumed / 100;
     fraction = v_range_consumed % 100;
     lv_label_set_text_fmt(anim_state->energy_consumed_label,
                           "%"LV_PRId32".%"LV_PRId32, whole, fraction);
 
-    int32_t v_range_driving_range = lv_map(v, 0, ANIM_RANGE_END, 0, 240);
+    int32_t v_range_driving_range = lv_map(v, 0, EV_CHARGING_RANGE_END, 0, 240);
     lv_label_set_text_fmt(anim_state->driving_range_label, "%"LV_PRId32, v_range_driving_range);
+}
+
+static void anim_exec_cb(void * var, int32_t v)
+{
+    lv_obj_t * base_obj = var;
+    lv_demo_high_res_ctx_t * c = lv_obj_get_user_data(base_obj);
+
+    lv_subject_set_int(&c->ev_charging_progress, v);
+
+    if(c->ev_charging_bg_cont) {
+        anim_state_t * anim_state = lv_obj_get_user_data(c->ev_charging_bg_cont);
+        anim_state_apply(anim_state, v);
+    }
+}
+
+static void anim_completed_cb(lv_anim_t * a)
+{
+    lv_obj_t * base_obj = lv_anim_get_user_data(a);
+    lv_demo_high_res_ctx_t * c = lv_obj_get_user_data(base_obj);
+    lv_obj_t * bg_cont = c->ev_charging_bg_cont;
+    if(!bg_cont) return;
+    anim_state_t * anim_state = lv_obj_get_user_data(bg_cont);
+
+    lv_obj_set_style_bg_image_src(anim_state->widget3, c->imgs[IMG_EV_CHARGING_WIDGET3_1_BG], 0);
+    lv_label_set_text_static(anim_state->charging_status_label, start_charging_string);
 }
 
 static void back_clicked_cb(lv_event_t * e)
@@ -232,7 +271,6 @@ static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_flex_align(saved_box, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
 
     lv_obj_t * saved_amount_label = lv_label_create(saved_box);
-    lv_label_set_text_static(saved_amount_label, "$212");
     lv_obj_add_style(saved_amount_label, &c->fonts[FONT_LABEL_XL], 0);
     lv_obj_add_style(saved_amount_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     anim_state->saved_label = saved_amount_label;
@@ -247,7 +285,6 @@ static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_add_style(total_spent_span, &c->fonts[FONT_LABEL_XS], 0);
     lv_obj_add_style(total_spent_span, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_span_t * total_spent_amount = lv_spangroup_new_span(total_spent_span);
-    lv_span_set_text_static(total_spent_amount, "$128 - ");
     anim_state->spent_span_small = total_spent_amount;
     lv_span_t * total_spent_label = lv_spangroup_new_span(total_spent_span);
     lv_span_set_text_static(total_spent_label, "Total spent");
@@ -380,7 +417,6 @@ static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
                                                                              LV_FLEX_ALIGN_END);
 
     lv_obj_t * charged_amount_number = lv_label_create(charged_amount_box);
-    lv_label_set_text_static(charged_amount_number, "683");
     lv_obj_add_style(charged_amount_number, &c->fonts[FONT_LABEL_XL], 0);
     lv_obj_add_style(charged_amount_number, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     anim_state->charged_label = charged_amount_number;
@@ -400,14 +436,13 @@ static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_add_style(spent_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
 
     lv_obj_t * spent_amount_number = lv_label_create(spent_box);
-    lv_label_set_text_static(spent_amount_number, "$128");
     lv_obj_add_style(spent_amount_number, &c->fonts[FONT_LABEL_XL], 0);
     lv_obj_add_style(spent_amount_number, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     anim_state->spent_label_large = spent_amount_number;
 }
 
 static lv_obj_t * create_widget3_info(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const lv_image_dsc_t * img_dsc,
-                                      const char * text, const char * number, const char * unit)
+                                      const char * text, const char * unit)
 {
     lv_obj_t * info = lv_obj_create(parent);
     lv_obj_remove_style_all(info);
@@ -435,7 +470,6 @@ static lv_obj_t * create_widget3_info(lv_demo_high_res_ctx_t * c, lv_obj_t * par
     lv_obj_t * sub_box2 = lv_demo_high_res_simple_container_create(info, false, c->sz->gap[1], LV_FLEX_ALIGN_END);
 
     lv_obj_t * label_number = lv_label_create(sub_box2);
-    lv_label_set_text_static(label_number, number);
     lv_obj_add_style(label_number, &c->fonts[FONT_LABEL_LG], 0);
     lv_obj_set_style_text_color(label_number, lv_color_white(), 0);
 
@@ -451,16 +485,19 @@ static lv_obj_t * create_widget3_info(lv_demo_high_res_ctx_t * c, lv_obj_t * par
 static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
 {
     lv_obj_t * bg_cont = lv_obj_get_parent(widgets);
+    lv_obj_t * base_obj = lv_obj_get_parent(bg_cont);
+    bool is_animating = NULL != lv_anim_get(base_obj, anim_exec_cb);
     anim_state_t * anim_state = lv_obj_get_user_data(bg_cont);
 
     lv_obj_t * widget = lv_obj_create(widgets);
     lv_obj_remove_style_all(widget);
     lv_obj_set_size(widget, c->imgs[IMG_LIGHT_WIDGET5_BG]->header.w, c->imgs[IMG_LIGHT_WIDGET5_BG]->header.h);
-    lv_obj_set_style_bg_image_src(widget, c->imgs[IMG_EV_CHARGING_WIDGET3_BG], 0);
     lv_obj_set_style_pad_all(widget, c->sz->gap[7], 0);
     lv_obj_set_flex_flow(widget, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(widget, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_bg_image_src(widget, c->imgs[IMG_EV_CHARGING_WIDGET3_BG], 0);
+    lv_obj_set_style_bg_image_src(widget, c->imgs[is_animating ? IMG_EV_CHARGING_WIDGET3_BG : IMG_EV_CHARGING_WIDGET3_1_BG],
+                                  0);
+    anim_state->widget3 = widget;
 
     lv_obj_t * top_label = lv_label_create(widget);
     lv_label_set_text_static(top_label, "Charging");
@@ -484,13 +521,11 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_flex_flow(arc, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(arc, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_set_style_pad_row(arc, c->sz->gap[2], 0);
-    lv_arc_set_value(arc, 88);
     anim_state->arc = arc;
 
     lv_obj_t * percent_label = lv_label_create(arc);
     lv_obj_add_style(percent_label, &c->fonts[FONT_LABEL_2XL], 0);
     lv_obj_set_style_text_color(percent_label, lv_color_white(), 0);
-    lv_label_set_text_static(percent_label, "88%");
     anim_state->percent_label = percent_label;
 
     lv_obj_t * charging_status_box = lv_obj_create(arc);
@@ -508,42 +543,48 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_add_style(charging_status_label, &c->fonts[FONT_LABEL_SM], 0);
     lv_obj_set_style_text_color(charging_status_label, lv_color_white(), 0);
     lv_obj_center(charging_status_label);
-    lv_label_set_text_static(charging_status_label, stop_charging_string);
+    lv_label_set_text_static(charging_status_label, is_animating ? stop_charging_string : start_charging_string);
+    anim_state->charging_status_label = charging_status_label;
 
     lv_obj_t * info_box = lv_demo_high_res_simple_container_create(widget, false, c->sz->gap[5], LV_FLEX_ALIGN_CENTER);
     lv_obj_set_width(info_box, LV_PCT(100));
-    anim_state->time_to_full_label = create_widget3_info(c, info_box, c->imgs[IMG_TIME_ICON], "Time to\nfull charge", "1.2",
-                                                         "h");
+    anim_state->time_to_full_label = create_widget3_info(c, info_box, c->imgs[IMG_TIME_ICON], "Time to\nfull charge", "h");
     anim_state->energy_consumed_label = create_widget3_info(c, info_box, c->imgs[IMG_ENERGY_ICON], "Energy\nconsumed",
-                                                            "10.12", "kW");
-    anim_state->driving_range_label = create_widget3_info(c, info_box, c->imgs[IMG_RANGE_ICON], "Driving\nRange", "209",
-                                                          "km");
+                                                            "kW");
+    anim_state->driving_range_label = create_widget3_info(c, info_box, c->imgs[IMG_RANGE_ICON], "Driving\nRange", "km");
 }
 
 static void charging_status_box_clicked_cb(lv_event_t * e)
 {
     lv_obj_t * bg_cont = lv_event_get_user_data(e);
-    anim_state_t * anim_state = lv_obj_get_user_data(bg_cont);
+    lv_obj_t * base_obj = lv_obj_get_parent(bg_cont);
+    lv_demo_high_res_ctx_t * c = lv_obj_get_user_data(base_obj);
     lv_obj_t * charging_status_box = lv_event_get_target_obj(e);
     lv_obj_t * charging_status_label = lv_obj_get_child(charging_status_box, 0);
     bool was_charging = lv_label_get_text(charging_status_label) == stop_charging_string;
     lv_label_set_text_static(charging_status_label, was_charging ? start_charging_string : stop_charging_string);
 
     lv_obj_t * widget = lv_obj_get_parent(lv_obj_get_parent(charging_status_box));
-    lv_obj_set_style_bg_image_src(widget,
-                                  anim_state->c->imgs[was_charging ? IMG_EV_CHARGING_WIDGET3_1_BG : IMG_EV_CHARGING_WIDGET3_BG], 0);
+    lv_obj_set_style_bg_image_src(widget, c->imgs[was_charging ? IMG_EV_CHARGING_WIDGET3_1_BG : IMG_EV_CHARGING_WIDGET3_BG],
+                                  0);
 
-    int32_t start_v = ANIM_RANGE_END - anim_state->last_v;
-    anim_state->is_animating_up = !was_charging;
+    if(was_charging) {
+        lv_anim_delete(base_obj, anim_exec_cb);
+    }
+    else {
+        int32_t start_v = lv_subject_get_int(&c->ev_charging_progress);
+        if(start_v >= EV_CHARGING_RANGE_END) start_v = 0;
 
-    lv_anim_t a;
-    lv_anim_init(&a);
-    lv_anim_set_values(&a, start_v, ANIM_RANGE_END);
-    lv_anim_set_duration(&a, anim_state->is_animating_up ? ANIM_RANGE_END * 3 : 0);
-    lv_anim_set_exec_cb(&a, anim_exec_cb);
-    lv_anim_set_var(&a, bg_cont);
-    lv_anim_set_early_apply(&a, true);
-    lv_anim_start(&a);
+        lv_anim_t a;
+        lv_anim_init(&a);
+        lv_anim_set_values(&a, start_v, EV_CHARGING_RANGE_END);
+        lv_anim_set_duration(&a, (EV_CHARGING_RANGE_END - start_v) * 5);
+        lv_anim_set_exec_cb(&a, anim_exec_cb);
+        lv_anim_set_completed_cb(&a, anim_completed_cb);
+        lv_anim_set_var(&a, base_obj);
+        lv_anim_set_user_data(&a, base_obj);
+        lv_anim_start(&a);
+    }
 }
 
 #endif /*LV_USE_DEMO_HIGH_RES*/

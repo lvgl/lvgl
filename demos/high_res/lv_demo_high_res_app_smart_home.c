@@ -29,6 +29,9 @@
 
 static void back_clicked_cb(lv_event_t * e);
 static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
+static void charging_arc_observer(lv_observer_t * observer, lv_subject_t * subject);
+static void charging_percent_label_observer(lv_observer_t * observer, lv_subject_t * subject);
+static void charging_time_until_full_label_observer(lv_observer_t * observer, lv_subject_t * subject);
 static void create_widget_charging(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 static void widget2_slider_released_cb(lv_event_t * e);
 static void widget2_slider_locked_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
@@ -71,7 +74,8 @@ void lv_demo_high_res_app_smart_home(lv_obj_t * base_obj)
 
     /* top margin */
 
-    lv_demo_high_res_top_margin_create(base_obj, bg_cont, c->sz->gap[10], true, c);
+    lv_demo_high_res_top_margin_create(base_obj, bg_cont,
+                                       c->sz == &lv_demo_high_res_sizes_all[SIZE_SM] ? c->sz->gap[9] : c->sz->gap[10], true, c);
 
     /* app info */
 
@@ -159,7 +163,7 @@ static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_add_style(main_temp, &c->fonts[FONT_LABEL_2XL], 0);
     lv_obj_set_style_text_color(main_temp, lv_color_white(), 0);
     lv_obj_center(main_temp);
-    lv_demo_high_res_label_bind_temperature(main_temp, &c->subjects.temperature_indoor, c);
+    lv_demo_high_res_label_bind_temperature(main_temp, &c->api.subjects.temperature_indoor, c);
 
     lv_obj_t * outdoor_temp_box = lv_demo_high_res_simple_container_create(widget, true, c->sz->gap[2],
                                                                            LV_FLEX_ALIGN_CENTER);
@@ -167,12 +171,33 @@ static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_t * outdoor_temp = lv_label_create(outdoor_temp_box);
     lv_obj_add_style(outdoor_temp, &c->fonts[FONT_LABEL_XL], 0);
     lv_obj_set_style_text_color(outdoor_temp, lv_color_white(), 0);
-    lv_demo_high_res_label_bind_temperature(outdoor_temp, &c->subjects.temperature_outdoor, c);
+    lv_demo_high_res_label_bind_temperature(outdoor_temp, &c->api.subjects.temperature_outdoor, c);
 
     lv_obj_t * outdoor_label = lv_label_create(outdoor_temp_box);
     lv_label_set_text_static(outdoor_label, "Outdoor");
     lv_obj_add_style(outdoor_label, &c->fonts[FONT_LABEL_SM], 0);
     lv_obj_set_style_text_color(outdoor_label, lv_color_white(), 0);
+}
+
+static void charging_arc_observer(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * arc = lv_observer_get_target_obj(observer);
+    lv_arc_set_value(arc, lv_map(lv_subject_get_int(subject), 0, EV_CHARGING_RANGE_END, 0, 100));
+}
+
+static void charging_percent_label_observer(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * label = lv_observer_get_target_obj(observer);
+    lv_label_set_text_fmt(label, "%"LV_PRId32"%%", lv_map(lv_subject_get_int(subject), 0, EV_CHARGING_RANGE_END, 0, 100));
+}
+
+static void charging_time_until_full_label_observer(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * label = lv_observer_get_target_obj(observer);
+    int32_t v_range_time_to_full = lv_map(lv_subject_get_int(subject), 0, EV_CHARGING_RANGE_END, 72, 0);
+    int32_t whole = v_range_time_to_full / 10;
+    int32_t fraction = v_range_time_to_full % 10;
+    lv_label_set_text_fmt(label, "%"LV_PRId32".%"LV_PRId32, whole, fraction);
 }
 
 static void create_widget_charging(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
@@ -210,13 +235,13 @@ static void create_widget_charging(lv_demo_high_res_ctx_t * c, lv_obj_t * widget
     lv_obj_set_style_arc_color(arc, lv_color_white(), 0);
     lv_obj_set_style_arc_color(arc, lv_color_white(), LV_PART_INDICATOR);
     lv_obj_set_style_arc_opa(arc, LV_OPA_20, 0);
-    lv_arc_set_value(arc, 88);
+    lv_subject_add_observer_obj(&c->ev_charging_progress, charging_arc_observer, arc, NULL);
 
     lv_obj_t * percent_label = lv_label_create(arc);
     lv_obj_add_style(percent_label, &c->fonts[FONT_LABEL_XL], 0);
     lv_obj_set_style_text_color(percent_label, lv_color_white(), 0);
-    lv_label_set_text_static(percent_label, "88%");
     lv_obj_center(percent_label);
+    lv_subject_add_observer_obj(&c->ev_charging_progress, charging_percent_label_observer, percent_label, NULL);
 
     lv_obj_t * num_label_cont = lv_demo_high_res_simple_container_create(widget,
                                                                          false,
@@ -225,9 +250,10 @@ static void create_widget_charging(lv_demo_high_res_ctx_t * c, lv_obj_t * widget
     lv_obj_set_width(num_label_cont, LV_PCT(100));
 
     lv_obj_t * time_to_full_num_label = lv_label_create(num_label_cont);
-    lv_label_set_text_static(time_to_full_num_label, "1.2");
     lv_obj_add_style(time_to_full_num_label, &c->fonts[FONT_LABEL_XL], 0);
     lv_obj_set_style_text_color(time_to_full_num_label, lv_color_white(), 0);
+    lv_subject_add_observer_obj(&c->ev_charging_progress, charging_time_until_full_label_observer, time_to_full_num_label,
+                                NULL);
 
     lv_obj_t * h_label = lv_label_create(num_label_cont);
     lv_label_set_text_static(h_label, "h");
@@ -245,7 +271,7 @@ static void widget2_slider_released_cb(lv_event_t * e)
 {
     lv_obj_t * slider = lv_event_get_target_obj(e);
     lv_demo_high_res_ctx_t * c = lv_event_get_user_data(e);
-    lv_subject_set_int(&c->subjects.locked, lv_slider_get_value(slider) >= 100);
+    lv_subject_set_int(&c->api.subjects.locked, lv_slider_get_value(slider) >= 100);
 }
 
 static void widget2_slider_locked_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
@@ -283,10 +309,10 @@ static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_style_bg_color(slider, lv_color_white(), LV_PART_KNOB);
     lv_obj_set_style_bg_color(slider, lv_color_white(), 0);
     lv_obj_set_style_bg_opa(slider, LV_OPA_30, 0);
-    lv_slider_set_value(slider, lv_subject_get_int(&c->subjects.locked) ? 100 : 0, LV_ANIM_OFF);
+    lv_slider_set_value(slider, lv_subject_get_int(&c->api.subjects.locked) ? 100 : 0, LV_ANIM_OFF);
     lv_obj_set_style_anim_duration(slider, lv_anim_speed(2000), 0);
     lv_obj_add_event_cb(slider, widget2_slider_released_cb, LV_EVENT_RELEASED, c);
-    lv_subject_add_observer_obj(&c->subjects.locked, widget2_slider_locked_observer_cb, slider, c);
+    lv_subject_add_observer_obj(&c->api.subjects.locked, widget2_slider_locked_observer_cb, slider, c);
 
     lv_obj_t * bottom_label = lv_label_create(widget);
     lv_label_set_text_static(bottom_label, "Swipe to lock screen");
@@ -301,7 +327,7 @@ static void widget3_play_pause_clicked_cb(lv_event_t * e)
 
     bool was_playing = lv_image_get_src(play_pause_img) == c->imgs[IMG_PLAY_ICON];
     lv_image_set_src(play_pause_img, c->imgs[was_playing ? IMG_PLAY_ICON_1 : IMG_PLAY_ICON]);
-    lv_subject_set_int(&c->subjects.music_play, !was_playing);
+    lv_subject_set_int(&c->api.subjects.music_play, !was_playing);
 }
 
 static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
@@ -350,8 +376,8 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_add_style(slider_pct_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_align(slider_pct_label, LV_ALIGN_TOP_MID, 0, 10);
 
-    lv_slider_bind_value(slider, &c->subjects.volume);
-    lv_label_bind_text(slider_pct_label, &c->subjects.volume, "%d%%");
+    lv_slider_bind_value(slider, &c->api.subjects.volume);
+    lv_label_bind_text(slider_pct_label, &c->api.subjects.volume, "%"PRId32"%%");
 
     lv_obj_t * slider_volume_img = lv_image_create(slider);
     lv_image_set_src(slider_volume_img, c->imgs[IMG_VOLUME]);
@@ -369,7 +395,7 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_style_image_recolor_opa(prev_song, LV_OPA_COVER, 0);
 
     lv_obj_t * play_pause_img = lv_image_create(controls);
-    lv_image_set_src(play_pause_img, c->imgs[lv_subject_get_int(&c->subjects.music_play) ? IMG_PLAY_ICON :
+    lv_image_set_src(play_pause_img, c->imgs[lv_subject_get_int(&c->api.subjects.music_play) ? IMG_PLAY_ICON :
                                              IMG_PLAY_ICON_1]);
     lv_obj_set_style_image_recolor(play_pause_img, lv_color_white(), 0);
     lv_obj_set_style_image_recolor_opa(play_pause_img, LV_OPA_COVER, 0);
@@ -410,6 +436,7 @@ static void create_widget4(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_style_bg_opa(temperature_slider, LV_OPA_TRANSP, 0);
     lv_obj_set_style_bg_opa(temperature_slider, LV_OPA_TRANSP, LV_PART_INDICATOR);
     lv_obj_set_style_bg_color(temperature_slider, lv_color_white(), LV_PART_KNOB);
+    lv_obj_set_style_radius(temperature_slider, 0, 0);
     lv_obj_set_style_pad_ver(temperature_slider, 4, 0);
     lv_obj_set_style_pad_hor(temperature_slider, -((c->sz->slider_width - 6) / 2), LV_PART_KNOB);
     lv_obj_set_style_bg_image_src(temperature_slider, c->imgs[IMG_MAIN_LIGHT_SLIDER], 0);
@@ -426,8 +453,8 @@ static void create_widget4(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_add_style(temperature_value_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_set_style_text_opa(temperature_value_label, LV_OPA_40, 0);
 
-    lv_slider_bind_value(temperature_slider, &c->subjects.main_light_temperature);
-    lv_label_bind_text(temperature_value_label, &c->subjects.main_light_temperature, "%d K");
+    lv_slider_bind_value(temperature_slider, &c->api.subjects.main_light_temperature);
+    lv_label_bind_text(temperature_value_label, &c->api.subjects.main_light_temperature, "%"PRId32" K");
 
     lv_obj_t * slider = lv_slider_create(widget);
     lv_obj_set_size(slider, LV_PCT(100), c->sz->slider_width);
@@ -446,8 +473,8 @@ static void create_widget4(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_add_style(slider_pct_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_align(slider_pct_label, LV_ALIGN_RIGHT_MID, -10, 0);
 
-    lv_slider_bind_value(slider, &c->subjects.main_light_intensity);
-    lv_label_bind_text(slider_pct_label, &c->subjects.main_light_intensity, "%d%%");
+    lv_slider_bind_value(slider, &c->api.subjects.main_light_intensity);
+    lv_label_bind_text(slider_pct_label, &c->api.subjects.main_light_intensity, "%"PRId32"%%");
 
     lv_obj_t * slider_lamp_img = lv_image_create(slider);
     lv_image_set_src(slider_lamp_img, c->imgs[IMG_LAMP]);

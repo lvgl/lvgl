@@ -152,14 +152,16 @@ const lv_demo_high_res_sizes_t lv_demo_high_res_sizes_all[SIZE_COUNT] = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path,
+lv_obj_t * lv_demo_high_res_base_obj_create(const char * assets_path,
+                                            const char * logo_path,
+                                            const char * slides_path,
                                             lv_demo_high_res_exit_cb_t exit_cb)
 {
-    lv_demo_high_res_ctx_t * c = lv_malloc(sizeof(lv_demo_high_res_ctx_t));
+    lv_demo_high_res_ctx_t * c = lv_malloc_zeroed(sizeof(lv_demo_high_res_ctx_t));
     LV_ASSERT_MALLOC(c);
     lv_obj_t * base_obj = lv_obj_create(lv_screen_active());
     lv_obj_set_user_data(base_obj, c);
-    lv_obj_add_event_cb(base_obj, free_ctx_event_cb, LV_EVENT_DELETE, c);
+    lv_obj_add_event_cb(base_obj, free_ctx_event_cb, LV_EVENT_DELETE, NULL);
 
     lv_display_t * disp = lv_display_get_default();
     int32_t hres = lv_display_get_horizontal_resolution(disp);
@@ -257,7 +259,7 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path,
     for(uint32_t i = 0; i < IMG_COUNT; i++) {
         char path_buf[256];
         int chars = lv_snprintf(path_buf, sizeof(path_buf), "%s/img_lv_demo_high_res_%s_%s.png",
-                                base_path, image_details[i].name, size_prefix);
+                                assets_path, image_details[i].name, size_prefix);
         LV_ASSERT(chars < (int)sizeof(path_buf));
         c->imgs[i] = image_preload(path_buf, image_details[i].cf);
     }
@@ -277,12 +279,16 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path,
     c->th.user_data = c;
     lv_subject_add_observer(&c->th, theme_observer_cb, c);
 
-    c->base_path = lv_strdup(base_path);
-    LV_ASSERT_MALLOC(c->base_path);
+    c->logo_path = lv_strdup(logo_path);
+    LV_ASSERT_MALLOC(c->logo_path);
+    c->slides_path = lv_strdup(slides_path);
+    LV_ASSERT_MALLOC(c->slides_path);
 
     c->exit_cb = exit_cb;
 
     lv_subject_init_int(&c->temperature_units_are_celsius, 1);
+    c->ev_charging_bg_cont = NULL;
+    lv_subject_init_int(&c->ev_charging_progress, EV_CHARGING_RANGE_END * 88 / 100);
     lv_subject_init_int(&c->smart_meter_selected_bar, 4);
 
     c->top_margin_subjects_are_init = false;
@@ -290,48 +296,41 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * base_path,
     /* API subjects */
 
     /* input subjects */
-    lv_subject_init_pointer(&c->subjects.logo, "img_lv_demo_high_res_lvgl_logo.png");
-    lv_subject_init_pointer(&c->subjects.logo_dark, NULL);
-    lv_subject_init_int(&c->subjects.hour, 9);
-    lv_subject_init_int(&c->subjects.minute, 36);
-    lv_subject_init_pointer(&c->subjects.week_day_name, "Tuesday");
-    lv_subject_init_int(&c->subjects.month_day, 31);
-    lv_subject_init_pointer(&c->subjects.month_name, "October");
-    lv_subject_init_int(&c->subjects.temperature_outdoor, 140); /* tenths of a degree */
-    lv_subject_init_int(&c->subjects.temperature_indoor, 225); /* tenths of a degree */
-    // lv_subject_init_pointer(&c->subjects.wifi_ssid, "my home Wi-Fi network");
-    // lv_subject_init_pointer(&c->subjects.wifi_ip, "192.168.1.1");
-    lv_subject_init_pointer(&c->subjects.wifi_ssid, NULL);
-    lv_subject_init_pointer(&c->subjects.wifi_ip, NULL);
+    lv_subject_init_int(&c->api.subjects.hour, 9);
+    lv_subject_init_int(&c->api.subjects.minute, 36);
+    lv_subject_init_pointer(&c->api.subjects.week_day_name, "Tuesday");
+    lv_subject_init_int(&c->api.subjects.month_day, 31);
+    lv_subject_init_pointer(&c->api.subjects.month_name, "October");
+    lv_subject_init_int(&c->api.subjects.temperature_outdoor, 140); /* tenths of a degree */
+    lv_subject_init_int(&c->api.subjects.temperature_indoor, 225); /* tenths of a degree */
+    lv_subject_init_pointer(&c->api.subjects.wifi_ssid, NULL);
+    lv_subject_init_pointer(&c->api.subjects.wifi_ip, NULL);
 
     /* output subjects */
-    lv_subject_init_int(&c->subjects.volume, 63);
-    lv_subject_init_int(&c->subjects.main_light_temperature, 4000);
-    lv_subject_init_int(&c->subjects.main_light_intensity, 52);
-    lv_subject_init_int(&c->subjects.music_play, 1);
-    lv_subject_init_int(&c->subjects.thermostat_fan_speed, 40);
-    lv_subject_init_int(&c->subjects.thermostat_target_temperature, 24); /* degrees */
+    lv_subject_init_int(&c->api.subjects.music_play, 1);
 
     /* input+output subjects */
-    lv_subject_init_int(&c->subjects.locked, 0);
+    lv_subject_init_int(&c->api.subjects.locked, 0);
+    lv_subject_init_int(&c->api.subjects.volume, 63);
+    lv_subject_init_int(&c->api.subjects.main_light_temperature, 4000);
+    lv_subject_init_int(&c->api.subjects.main_light_intensity, 52);
+    lv_subject_init_int(&c->api.subjects.thermostat_fan_speed, 40);
+    lv_subject_init_int(&c->api.subjects.thermostat_target_temperature, 240); /* tenths of a degree */
 
-    c->subjects.user_data = NULL;
+    c->api.base_obj = base_obj;
+    c->api.user_data = NULL;
 
-    c->subject_groups.logo.members[0] = &c->subjects.logo;
-    c->subject_groups.logo.members[1] = &c->subjects.logo_dark;
-    lv_subject_init_group(&c->subject_groups.logo.group, c->subject_groups.logo.members,
-                          ARRAY_LEN(c->subject_groups.logo.members));
-    c->subject_groups.time.members[0] = &c->subjects.hour;
-    c->subject_groups.time.members[1] = &c->subjects.minute;
+    c->subject_groups.time.members[0] = &c->api.subjects.hour;
+    c->subject_groups.time.members[1] = &c->api.subjects.minute;
     lv_subject_init_group(&c->subject_groups.time.group, c->subject_groups.time.members,
                           ARRAY_LEN(c->subject_groups.time.members));
-    c->subject_groups.date.members[0] = &c->subjects.week_day_name;
-    c->subject_groups.date.members[1] = &c->subjects.month_day;
-    c->subject_groups.date.members[2] = &c->subjects.month_name;
+    c->subject_groups.date.members[0] = &c->api.subjects.week_day_name;
+    c->subject_groups.date.members[1] = &c->api.subjects.month_day;
+    c->subject_groups.date.members[2] = &c->api.subjects.month_name;
     lv_subject_init_group(&c->subject_groups.date.group, c->subject_groups.date.members,
                           ARRAY_LEN(c->subject_groups.date.members));
-    c->subject_groups.wifi.members[0] = &c->subjects.wifi_ssid;
-    c->subject_groups.wifi.members[1] = &c->subjects.wifi_ip;
+    c->subject_groups.wifi.members[0] = &c->api.subjects.wifi_ssid;
+    c->subject_groups.wifi.members[1] = &c->api.subjects.wifi_ip;
     lv_subject_init_group(&c->subject_groups.wifi.group, c->subject_groups.wifi.members,
                           ARRAY_LEN(c->subject_groups.wifi.members));
 
@@ -402,12 +401,12 @@ static void init_fonts_sm(lv_style_t * fonts)
     lv_style_set_text_font(&fonts[FONT_HEADING_MD], &font_lv_demo_high_res_roboto_slab_regular_20);
     lv_style_set_text_font(&fonts[FONT_HEADING_LG], &font_lv_demo_high_res_roboto_slab_regular_40);
     lv_style_set_text_font(&fonts[FONT_HEADING_XL], &font_lv_demo_high_res_roboto_slab_light_80);
-    lv_style_set_text_font(&fonts[FONT_HEADING_XXL], &font_lv_demo_high_res_roboto_slab_light_107); // rounded
+    lv_style_set_text_font(&fonts[FONT_HEADING_XXL], &font_lv_demo_high_res_roboto_slab_light_107);
     lv_style_set_text_font(&fonts[FONT_LABEL_XS], &font_lv_demo_high_res_roboto_medium_8);
     lv_style_set_text_line_space(&fonts[FONT_LABEL_XS],
                                  30 * lv_font_get_line_height(&font_lv_demo_high_res_roboto_medium_8) / 100); /* +30% */
-    // lv_style_set_text_letter_space(&fonts[FONT_LABEL_XS], 197 * lv_font_get_letter_space(&font_lv_demo_high_res_roboto_medium_8) / 200); /* -1.5% */
-    lv_style_set_text_font(&fonts[FONT_LABEL_SM], &font_lv_demo_high_res_roboto_medium_11); // rounded
+    /* lv_style_set_text_letter_space(&fonts[FONT_LABEL_XS], 197 * lv_font_get_letter_space(&font_lv_demo_high_res_roboto_medium_8) / 200); */ /* -1.5% */
+    lv_style_set_text_font(&fonts[FONT_LABEL_SM], &font_lv_demo_high_res_roboto_medium_11);
     lv_style_set_text_font(&fonts[FONT_LABEL_MD], &font_lv_demo_high_res_roboto_medium_16);
     lv_style_set_text_font(&fonts[FONT_LABEL_LG], &font_lv_demo_high_res_roboto_slab_bold_20);
     lv_style_set_text_font(&fonts[FONT_LABEL_XL], &font_lv_demo_high_res_roboto_slab_bold_24);
@@ -423,7 +422,7 @@ static void init_fonts_md(lv_style_t * fonts)
     lv_style_set_text_font(&fonts[FONT_LABEL_XS], &font_lv_demo_high_res_roboto_medium_12);
     lv_style_set_text_line_space(&fonts[FONT_LABEL_XS],
                                  30 * lv_font_get_line_height(&font_lv_demo_high_res_roboto_medium_12) / 100); /* +30% */
-    // lv_style_set_text_letter_space(&fonts[FONT_LABEL_XS], 197 * lv_font_get_letter_space(&font_lv_demo_high_res_roboto_medium_12) / 200); /* -1.5% */
+    /* lv_style_set_text_letter_space(&fonts[FONT_LABEL_XS], 197 * lv_font_get_letter_space(&font_lv_demo_high_res_roboto_medium_12) / 200); */ /* -1.5% */
     lv_style_set_text_font(&fonts[FONT_LABEL_SM], &font_lv_demo_high_res_roboto_medium_16);
     lv_style_set_text_font(&fonts[FONT_LABEL_MD], &font_lv_demo_high_res_roboto_medium_24);
     lv_style_set_text_font(&fonts[FONT_LABEL_LG], &font_lv_demo_high_res_roboto_slab_bold_30);
@@ -440,7 +439,7 @@ static void init_fonts_lg(lv_style_t * fonts)
     lv_style_set_text_font(&fonts[FONT_LABEL_XS], &font_lv_demo_high_res_roboto_medium_18);
     lv_style_set_text_line_space(&fonts[FONT_LABEL_XS],
                                  30 * lv_font_get_line_height(&font_lv_demo_high_res_roboto_medium_18) / 100); /* +30% */
-    // lv_style_set_text_letter_space(&fonts[FONT_LABEL_XS], 197 * lv_font_get_letter_space(&font_lv_demo_high_res_roboto_medium_18) / 200); /* -1.5% */
+    /* lv_style_set_text_letter_space(&fonts[FONT_LABEL_XS], 197 * lv_font_get_letter_space(&font_lv_demo_high_res_roboto_medium_18) / 200); */ /* -1.5% */
     lv_style_set_text_font(&fonts[FONT_LABEL_SM], &font_lv_demo_high_res_roboto_medium_24);
     lv_style_set_text_font(&fonts[FONT_LABEL_MD], &font_lv_demo_high_res_roboto_medium_36);
     lv_style_set_text_font(&fonts[FONT_LABEL_LG], &font_lv_demo_high_res_roboto_slab_bold_45);
@@ -478,7 +477,8 @@ static void theme_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 
 static void free_ctx_event_cb(lv_event_t * e)
 {
-    lv_demo_high_res_ctx_t * c = lv_event_get_user_data(e);
+    lv_obj_t * base_obj = lv_event_get_target_obj(e);
+    lv_demo_high_res_ctx_t * c = lv_obj_get_user_data(base_obj);
 
     lv_subject_deinit(&c->th);
 
@@ -496,24 +496,27 @@ static void free_ctx_event_cb(lv_event_t * e)
         lv_style_reset(&c->fonts[i]);
     }
 
-    lv_free(c->base_path);
+    lv_free(c->logo_path);
+    lv_free(c->slides_path);
 
     lv_subject_deinit(&c->temperature_units_are_celsius);
+    lv_subject_deinit(&c->ev_charging_progress);
     lv_subject_deinit(&c->smart_meter_selected_bar);
 
     lv_demo_high_res_top_margin_deinit_subjects(c);
 
-    lv_subject_deinit(&c->subject_groups.logo.group);
     lv_subject_deinit(&c->subject_groups.time.group);
     lv_subject_deinit(&c->subject_groups.date.group);
     lv_subject_deinit(&c->subject_groups.wifi.group);
 
-    lv_subject_t * subjects = (lv_subject_t *) &c->subjects;
-    for(uint32_t i = 0; i < (sizeof(c->subjects) - sizeof(void *)) / sizeof(lv_subject_t); i++) {
+    lv_subject_t * subjects = (lv_subject_t *) &c->api.subjects;
+    for(uint32_t i = 0; i < sizeof(c->api.subjects) / sizeof(lv_subject_t); i++) {
         lv_subject_deinit(&subjects[i]);
     }
 
     lv_free(c);
+
+    lv_obj_set_user_data(base_obj, NULL);
 }
 
 static lv_image_dsc_t * image_preload(const void * src, lv_color_format_t cf)
@@ -550,6 +553,7 @@ static lv_image_dsc_t * image_preload(const void * src, lv_color_format_t cf)
 
 static void label_text_temperature_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
+    LV_UNUSED(subject);
     lv_subject_t * temperature_subject = lv_observer_get_user_data(observer);
     int32_t val = lv_subject_get_int(temperature_subject);
     lv_obj_t * label = lv_observer_get_target_obj(observer);
@@ -565,10 +569,10 @@ static void label_text_temperature_cb(lv_observer_t * observer, lv_subject_t * s
     int32_t fraction = val % 10;
     char buf[16];
     if(fraction) {
-        lv_snprintf(buf, sizeof(buf), "%d.%d\xc2\xb0", full, fraction);
+        lv_snprintf(buf, sizeof(buf), "%"PRId32".%"PRId32"\xc2\xb0", full, fraction);
     }
     else {
-        lv_snprintf(buf, sizeof(buf), "%d\xc2\xb0", full);
+        lv_snprintf(buf, sizeof(buf), "%"PRId32"\xc2\xb0", full);
     }
 
     lv_label_set_text(label, buf);

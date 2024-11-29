@@ -38,15 +38,19 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_demo_high_res_subjects_t * lv_demo_high_res(const char * assets_base_path,
-                                               lv_demo_high_res_exit_cb_t exit_cb)
+lv_demo_high_res_api_t * lv_demo_high_res(const char * assets_path,
+                                          const char * logo_path,
+                                          const char * slides_path,
+                                          lv_demo_high_res_exit_cb_t exit_cb)
 {
-    if(assets_base_path == NULL) assets_base_path = "lvgl/demos/high_res/assets";
-    lv_obj_t * base_obj = lv_demo_high_res_base_obj_create(assets_base_path, exit_cb);
+    if(assets_path == NULL) assets_path = "lvgl/demos/high_res/assets";
+    if(logo_path == NULL) logo_path = "lvgl/demos/high_res/assets/img_lv_demo_high_res_lvgl_logo.png";
+    if(slides_path == NULL) slides_path = "about_app_slides";
+    lv_obj_t * base_obj = lv_demo_high_res_base_obj_create(assets_path, logo_path, slides_path, exit_cb);
     lv_demo_high_res_home(base_obj);
 
     lv_demo_high_res_ctx_t * c = lv_obj_get_user_data(base_obj);
-    return &c->subjects;
+    return &c->api;
 }
 
 /**********************

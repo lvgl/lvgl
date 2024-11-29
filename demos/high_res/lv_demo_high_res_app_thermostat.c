@@ -41,6 +41,8 @@ static lv_obj_t * create_widget3_setting(lv_demo_high_res_ctx_t * c, lv_obj_t * 
                                          const char * text_val, bool active);
 static void widget3_setting_clicked_cb(lv_event_t * e);
 static void widget3_scale_and_arc_box_ext_draw_size_event_cb(lv_event_t * e);
+static void temperature_arc_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void temperature_arc_changed_cb(lv_event_t * e);
 static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 
 /**********************
@@ -464,6 +466,21 @@ static void widget3_scale_and_arc_box_ext_draw_size_event_cb(lv_event_t * e)
     lv_event_set_ext_draw_size(e, 100);
 }
 
+static void temperature_arc_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * arc = lv_observer_get_target_obj(observer);
+    lv_arc_set_value(arc, (lv_subject_get_int(subject) + 5) / 10);
+}
+
+static void temperature_arc_changed_cb(lv_event_t * e)
+{
+    lv_obj_t * arc = lv_event_get_target_obj(e);
+    lv_subject_t * temperature_subject = lv_event_get_user_data(e);
+
+    int32_t arc_val = lv_arc_get_value(arc);
+    lv_subject_set_int(temperature_subject, arc_val * 10);
+}
+
 static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
 {
     lv_obj_t * widget = lv_obj_create(widgets);
@@ -540,8 +557,11 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_add_style(current_temperature_val_label, &c->fonts[FONT_LABEL_2XL], 0);
     lv_obj_add_style(current_temperature_val_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
 
-    lv_arc_bind_value(arc, &c->subjects.thermostat_target_temperature);
-    lv_label_bind_text(current_temperature_val_label, &c->subjects.thermostat_target_temperature, "%d\xc2\xb0");
+    lv_subject_add_observer_obj(&c->api.subjects.thermostat_target_temperature, temperature_arc_observer_cb, arc, NULL);
+    lv_obj_add_event_cb(arc, temperature_arc_changed_cb, LV_EVENT_VALUE_CHANGED,
+                        &c->api.subjects.thermostat_target_temperature);
+    lv_demo_high_res_label_bind_temperature(current_temperature_val_label, &c->api.subjects.thermostat_target_temperature,
+                                            c);
 
     lv_obj_t * current_temperature_label = lv_label_create(current_temperature_box);
     lv_label_set_text_static(current_temperature_label, "Current\ntemperature");
@@ -585,8 +605,8 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_add_style(slider_pct_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_align(slider_pct_label, LV_ALIGN_RIGHT_MID, -10, 0);
 
-    lv_slider_bind_value(slider, &c->subjects.thermostat_fan_speed);
-    lv_label_bind_text(slider_pct_label, &c->subjects.thermostat_fan_speed, "%d%%");
+    lv_slider_bind_value(slider, &c->api.subjects.thermostat_fan_speed);
+    lv_label_bind_text(slider_pct_label, &c->api.subjects.thermostat_fan_speed, "%"PRId32"%%");
 
     lv_label_set_text_static(slider_pct_label, "40%");
     lv_slider_set_value(slider, 40, LV_ANIM_OFF);
