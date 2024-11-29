@@ -12,7 +12,7 @@ The Image Button is very similar to the simple 'Button' Widget. The only
 difference is that it displays user-defined images for each state instead
 of drawing a rectangle.  The list of states is covered below.
 
-You can set a left, right and center image, and the center image will be
+You can set a left, right and middle image, and the middle image will be
 repeated to match the width of the Widget.
 
 
@@ -34,16 +34,16 @@ Usage
 Image sources
 -------------
 
-To set the image for a particular state, use
-:cpp:expr:`lv_imagebutton_set_src(imagebutton, LV_IMAGEBUTTON_STATE_..., src_left, src_center, src_right)`.
+To set the image in a state, use the
+:cpp:expr:`lv_imagebutton_set_src(imagebutton, LV_IMAGEBUTTON_STATE_..., src_left, src_mid, src_right)`.
 
-The image sources work the same as described in :ref:`Image Widget <lv_image>`
-except that "Symbols" are not supported by the Image Button. ``NULL`` can be passed
-for any of the sources.
+The image sources work the same as described in the :ref:`Image Widget <lv_image>`
+except that "Symbols" are not supported by the Image button. Any of the sources can ``NULL``.
+Typically the middle image should be one of the set image sources.
 
-If only ``src_center`` is specified, the width of the Widget will be set automatically to the
+If only ``src_mid`` is specified, the width of the widget will be set automatically to the
 width of the image. However, if all three sources are set, the width needs to be set by the user
-(using e.g. :cpp:func:`lv_obj_set_width`) and the center image will be tiled as needed to fill the given size.
+(using e.g. :cpp:expr:`lv_obj_set_width`) and the middle image will be tiled to fill the given size.
 
 The possible states are:
 

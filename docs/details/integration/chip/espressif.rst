@@ -42,7 +42,7 @@ In case you do not want to use esp_lvgl_port, you can add `LVGL component <https
 
 .. code-block:: sh
 
-   idf.py add-dependency lvgl/lvgl^9.*
+   idf.py add-dependency "lvgl/lvgl^9.*"
 
 Adjust the ``^9.*`` part to match your LVGL version requirement. More information on version specifications can be found in the `IDF Component Manager documentation <https://docs.espressif.com/projects/idf-component-manager/en/latest/reference/versioning.html#range-specifications>`__. During the next build, the LVGL component will be fetched from the component registry and added to the project.
 
