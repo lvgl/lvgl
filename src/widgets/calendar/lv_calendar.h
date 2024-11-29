@@ -70,7 +70,7 @@ void lv_calendar_set_today_date(lv_obj_t * obj, uint32_t year, uint32_t month, u
  * @param year          today's year
  * @param month         today's month [1..12]
  */
-void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month);
+void lv_calendar_set_month_shown(lv_obj_t * obj, uint32_t year, uint32_t month);
 
 /**
  * Set the highlighted dates
