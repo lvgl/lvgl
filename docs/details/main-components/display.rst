@@ -317,7 +317,7 @@ An example looks like this:
 
         /* IMPORTANT!!!
          * Inform LVGL that flushing is complete so buffer can be modified again. */
-        lv_display_flush_ready(disp);
+        lv_display_flush_ready(display);
     }
 
 During system initialization, tell LVGL you want that function to copy pixels from
