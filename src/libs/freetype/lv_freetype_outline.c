@@ -13,12 +13,6 @@
 
 #if LV_USE_FREETYPE
 
-#if LV_USE_NEMA_GFX
-    #if LV_USE_NEMA_VG
-        #include "../../draw/nema_gfx/lv_nema_gfx_path.h"
-    #endif  /*LV_USE_NEMA_VG*/
-#endif  /*LV_USE_NEMA_GFX*/
-
 /*********************
  *      DEFINES
  *********************/
