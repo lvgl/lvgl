@@ -404,7 +404,7 @@ The same is true for :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_FULL`.
 In the case of :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_PARTIAL` the small rendered areas
 can be rotated on their own before flushing to the frame buffer.
 
-Below is an example for rotatig when the renderig mode is
+Below is an example for rotating when the rendering mode is
 :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_PARTIAL` and the rotated image should be sent to a
 **display controller**.
 
