@@ -304,7 +304,7 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * assets_path,
     lv_subject_init_int(&c->api.subjects.temperature_outdoor, 140); /* tenths of a degree */
     lv_subject_init_int(&c->api.subjects.temperature_indoor, 225); /* tenths of a degree */
     lv_subject_init_pointer(&c->api.subjects.wifi_ssid, NULL);
-    lv_subject_init_pointer(&c->api.subjects.wifi_ip, NULL);
+    lv_subject_init_pointer(&c->api.subjects.wifi_ip, "?");
 
     /* output subjects */
     lv_subject_init_int(&c->api.subjects.music_play, 1);
