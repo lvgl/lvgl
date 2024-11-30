@@ -49,6 +49,52 @@ static void update_knob_pos(lv_obj_t * obj, bool check_drag);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t properties[] = {
+    {
+        .id = LV_PROPERTY_SLIDER_VALUE,
+        .setter = lv_slider_set_value,
+        .getter = lv_slider_get_value,
+    },
+    {
+        .id = LV_PROPERTY_SLIDER_LEFT_VALUE,
+        .setter = lv_slider_set_left_value,
+        .getter = lv_slider_get_left_value,
+    },
+    {
+        .id = LV_PROPERTY_SLIDER_RANGE,
+        .setter = lv_slider_set_range,
+        .getter = NULL,
+    },
+    {
+        .id = LV_PROPERTY_SLIDER_MIN_VALUE,
+        .setter = NULL,
+        .getter = lv_slider_get_min_value,
+    },
+    {
+        .id = LV_PROPERTY_SLIDER_MAX_VALUE,
+        .setter = NULL,
+        .getter = lv_slider_get_max_value,
+    },
+    {
+        .id = LV_PROPERTY_SLIDER_MODE,
+        .setter = lv_slider_set_mode,
+        .getter = lv_slider_get_mode,
+    },
+    {
+        .id = LV_PROPERTY_SLIDER_IS_DRAGGED,
+        .setter = NULL,
+        .getter = lv_slider_is_dragged,
+    },
+    {
+        .id = LV_PROPERTY_SLIDER_IS_SYMMETRICAL,
+        .setter = NULL,
+        .getter = lv_slider_is_symmetrical,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_slider_class = {
     .constructor_cb = lv_slider_constructor,
     .event_cb = lv_slider_event,
@@ -57,6 +103,17 @@ const lv_obj_class_t lv_slider_class = {
     .instance_size = sizeof(lv_slider_t),
     .base_class = &lv_bar_class,
     .name = "slider",
+#if LV_USE_OBJ_PROPERTY
+    .prop_index_start = LV_PROPERTY_SLIDER_START,
+    .prop_index_end = LV_PROPERTY_SLIDER_END,
+    .properties = properties,
+    .properties_count = sizeof(properties) / sizeof(properties[0]),
+
+#if LV_USE_OBJ_PROPERTY_NAME
+    .property_names = lv_slider_property_names,
+    .names_count = sizeof(lv_slider_property_names) / sizeof(lv_property_name_t),
+#endif
+#endif
 };
 
 /**********************
