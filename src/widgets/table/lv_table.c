@@ -1097,7 +1097,7 @@ static void get_cell_area(lv_obj_t * obj, uint32_t row, uint32_t col, lv_area_t 
     uint32_t col_merge = 0;
     int32_t offset = 0;
     for(col_merge = 0; col_merge + col < table->col_cnt - 1; col_merge++) {
-        lv_table_cell_t * next_cell_data = table->cell_data[row*table->col_cnt + col_merge];
+        lv_table_cell_t * next_cell_data = table->cell_data[row * table->col_cnt + col_merge];
 
         if(is_cell_empty(next_cell_data)) break;
 
