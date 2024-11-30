@@ -29,6 +29,8 @@ typedef void (*lv_property_set_precise_t)(lv_obj_t *, lv_value_precise_t);
 typedef void (*lv_property_set_color_t)(lv_obj_t *, lv_color_t);
 typedef void (*lv_property_set_point_t)(lv_obj_t *, lv_point_t *);
 typedef void (*lv_property_set_pointer_t)(lv_obj_t *, const void *);
+typedef void (*lv_property_set_prop_t)(lv_obj_t *, const lv_property_t *);
+
 typedef lv_result_t (*lv_property_setter_t)(lv_obj_t *, lv_prop_id_t, const lv_property_t *);
 
 typedef int32_t (*lv_property_get_int_t)(const lv_obj_t *);
@@ -37,6 +39,7 @@ typedef lv_value_precise_t (*lv_property_get_precise_t)(const lv_obj_t *);
 typedef lv_color_t (*lv_property_get_color_t)(const lv_obj_t *);
 typedef lv_point_t (*lv_property_get_point_t)(lv_obj_t *);
 typedef void * (*lv_property_get_pointer_t)(const lv_obj_t *);
+typedef void (*lv_property_get_prop_t)(lv_obj_t *, lv_property_t *);
 typedef lv_result_t (*lv_property_getter_t)(const lv_obj_t *, lv_prop_id_t, lv_property_t *);
 
 /**********************
@@ -275,6 +278,11 @@ static lv_result_t obj_property(lv_obj_t * obj, lv_prop_id_t id, lv_property_t *
                 case LV_PROPERTY_TYPE_FONT: {
                         if(set)((lv_property_set_pointer_t)(prop->setter))(obj, value->ptr);
                         else value->ptr = ((lv_property_get_pointer_t)(prop->getter))(obj);
+                        break;
+                    }
+                case LV_PROPERTY_TYPE_MIXED: {
+                        if(set)((lv_property_set_prop_t)(prop->setter))(obj, value);
+                        else((lv_property_get_prop_t)(prop->getter))(obj, value);
                         break;
                     }
                 default: {
