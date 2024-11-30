@@ -41,10 +41,8 @@ static void clock_timer_cb(lv_timer_t * t);
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_demo_high_res_api_example(const char * assets_path, const char * logo_path, const char * slides_path)
+void lv_demo_high_res_api_example(lv_demo_high_res_api_t * api)
 {
-    lv_demo_high_res_api_t * api = lv_demo_high_res(assets_path, logo_path, slides_path, exit_cb);
-
     /* see lv_demo_high_res.h for documentation of the available subjects */
     lv_subject_set_int(&api->subjects.volume, 50);
     lv_subject_set_pointer(&api->subjects.month_name, "August");
