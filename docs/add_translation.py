@@ -43,7 +43,7 @@ def exec(temp_directory):
             f.write(LANGUAGE + content)
     """
 
-    rst_file = temp_directory + "/index.rst"
+    rst_file = os.path.join(temp_directory, 'index.rst')
     with open(rst_file, 'r+', encoding='utf-8') as f:
         content = f.read()
         f.seek(0, 0)
