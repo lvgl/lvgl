@@ -88,31 +88,31 @@ lv_result_t lv_obj_set_properties(lv_obj_t * obj, const lv_property_t * value, u
     return LV_RESULT_OK;
 }
 
-lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id)
+lv_result_t lv_obj_get_property(lv_obj_t * obj, lv_property_t * prop)
 {
     lv_result_t result;
-    lv_property_t value = { 0 };
+    lv_prop_id_t id = prop->id;
 
     uint32_t index = LV_PROPERTY_ID_INDEX(id);
     if(id == LV_PROPERTY_ID_INVALID || index > LV_PROPERTY_ID_ANY) {
         LV_LOG_WARN("Invalid property id to get from %p", obj);
-        value.id = LV_PROPERTY_ID_INVALID;
-        value.num = 0;
-        return value;
+        prop->id = LV_PROPERTY_ID_INVALID;
+        prop->num = 0;
+        return LV_RESULT_INVALID;
     }
 
     if(index < LV_PROPERTY_ID_START) {
-        lv_obj_get_local_style_prop(obj, index, &value.style, 0);
-        value.id = id;
-        value.selector = 0;
-        return value;
+        lv_obj_get_local_style_prop(obj, index, &prop->style, 0);
+        prop->id = id;
+        prop->selector = 0;
+        return LV_RESULT_OK;
     }
 
-    result = obj_property(obj, id, &value, false);
+    result = obj_property(obj, id, prop, false);
     if(result != LV_RESULT_OK)
-        value.id = LV_PROPERTY_ID_INVALID;
+        prop->id = LV_PROPERTY_ID_INVALID;
 
-    return value;
+    return result;
 }
 
 lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, uint32_t selector)
@@ -221,7 +221,7 @@ static lv_result_t obj_property(lv_obj_t * obj, lv_prop_id_t id, lv_property_t *
 
             /*pass id and value directly to widget's property method*/
             if(prop->id == LV_PROPERTY_ID_ANY) {
-                value->id = prop->id;
+                value->id = id;
                 if(set) return ((lv_property_setter_t)prop->setter)(obj, id, value);
                 else return ((lv_property_getter_t)prop->getter)(obj, id, value);
             }

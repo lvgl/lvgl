@@ -463,47 +463,60 @@ void test_dropdown_properties(void)
     prop.ptr = "Hello";
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_STRING("Hello", lv_dropdown_get_text(obj));
-    TEST_ASSERT_EQUAL_STRING("Hello", lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_TEXT).ptr);
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_STRING("Hello", prop.ptr);
 
     prop.id = LV_PROPERTY_DROPDOWN_OPTIONS;
     prop.ptr = "Option 1\nOption 2";
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_STRING("Option 1\nOption 2", lv_dropdown_get_options(obj));
-    TEST_ASSERT_EQUAL_STRING("Option 1\nOption 2", lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_OPTIONS).ptr);
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_STRING("Option 1\nOption 2", prop.ptr);
 
+    prop.id = LV_PROPERTY_DROPDOWN_OPTION_COUNT;
     TEST_ASSERT_EQUAL(2, lv_dropdown_get_option_count(obj));
-    TEST_ASSERT_EQUAL(2, lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_OPTION_COUNT).num);
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL(2, prop.num);
 
     prop.id = LV_PROPERTY_DROPDOWN_SELECTED;
     prop.num = 1;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_INT(1, lv_dropdown_get_selected(obj));
-    TEST_ASSERT_EQUAL_INT(1, lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_SELECTED).num);
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(1, prop.num);
 
     prop.id = LV_PROPERTY_DROPDOWN_DIR;
     prop.num = LV_DIR_LEFT;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_INT(LV_DIR_LEFT, lv_dropdown_get_dir(obj));
-    TEST_ASSERT_EQUAL_INT(LV_DIR_LEFT, lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_DIR).num);
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_DIR_LEFT, prop.num);
 
     prop.id = LV_PROPERTY_DROPDOWN_SYMBOL;
     prop.ptr = LV_SYMBOL_DOWN;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_STRING(LV_SYMBOL_DOWN, lv_dropdown_get_symbol(obj));
-    TEST_ASSERT_EQUAL_STRING(LV_SYMBOL_DOWN, lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_SYMBOL).ptr);
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_STRING(LV_SYMBOL_DOWN, prop.ptr);
 
     prop.id = LV_PROPERTY_DROPDOWN_SELECTED_HIGHLIGHT;
     prop.num = true;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_TRUE(lv_dropdown_get_selected_highlight(obj));
-    TEST_ASSERT_TRUE(lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_SELECTED_HIGHLIGHT).num);
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_TRUE(prop.num);
 
     lv_dropdown_open(obj);
+    prop.id = LV_PROPERTY_DROPDOWN_IS_OPEN;
     TEST_ASSERT_TRUE(lv_dropdown_is_open(obj));
-    TEST_ASSERT_TRUE(lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_IS_OPEN).enable);
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_TRUE(prop.enable);
+
     lv_dropdown_close(obj);
+    prop.id = LV_PROPERTY_DROPDOWN_IS_OPEN;
     TEST_ASSERT_FALSE(lv_dropdown_is_open(obj));
-    TEST_ASSERT_FALSE(lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_IS_OPEN).enable);
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_FALSE(prop.enable);
 #endif
 }
 

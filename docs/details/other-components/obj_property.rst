@@ -35,7 +35,7 @@ Set :c:macro:`LV_USE_OBJ_PROPERTY_NAME` to `1` in order to use property name ins
     } lv_property_t;
 
     lv_result_t lv_obj_set_property(lv_obj_t * widget, const lv_property_t * value);
-    lv_property_t lv_obj_get_property(lv_obj_t * widget, lv_prop_id_t id);
+    lv_result_t lv_obj_get_property(lv_obj_t * obj, lv_property_t *prop);
 
     lv_prop_id_t lv_obj_property_get_id(const lv_obj_class_t * clz, const char * name);
 

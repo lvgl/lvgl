@@ -358,14 +358,16 @@ void test_roller_properties(void)
     prop.id = LV_PROPERTY_ROLLER_OPTIONS;
     prop.ptr = "One\nTwo\nThree";
     lv_roller_set_options(obj, prop.ptr, LV_ROLLER_MODE_NORMAL);
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_STRING("One\nTwo\nThree", lv_roller_get_options(obj));
-    TEST_ASSERT_EQUAL_STRING("One\nTwo\nThree", lv_obj_get_property(obj, LV_PROPERTY_ROLLER_OPTIONS).ptr);
+    TEST_ASSERT_EQUAL_STRING("One\nTwo\nThree", prop.ptr);
 
     prop.id = LV_PROPERTY_ROLLER_SELECTED;
     prop.num = 1;
     lv_roller_set_selected(obj, 1, LV_ANIM_OFF);
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_INT(1, lv_roller_get_selected(obj));
-    TEST_ASSERT_EQUAL_INT(1, lv_obj_get_property(obj, LV_PROPERTY_ROLLER_SELECTED).num);
+    TEST_ASSERT_EQUAL_INT(1, prop.num);
 #endif
 }
 
