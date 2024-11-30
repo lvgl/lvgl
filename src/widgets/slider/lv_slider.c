@@ -46,9 +46,54 @@ static bool is_slider_horizontal(lv_obj_t * obj);
 static void drag_start(lv_obj_t * obj);
 static void update_knob_pos(lv_obj_t * obj, bool check_drag);
 
+#if LV_USE_OBJ_PROPERTY
+    static void property_set_value(lv_obj_t * obj, const lv_property_t * prop);
+    static void property_get_value(lv_obj_t * obj, lv_property_t * prop);
+    static void property_set_left_value(lv_obj_t * obj, const lv_property_t * prop);
+    static void property_get_left_value(lv_obj_t * obj, lv_property_t * prop);
+    static void property_set_range(lv_obj_t * obj, const lv_property_t * prop);
+    static void property_get_range(lv_obj_t * obj, lv_property_t * prop);
+#endif
+
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t properties[] = {
+    {
+        .id = LV_PROPERTY_SLIDER_VALUE,
+        .setter = property_set_value,
+        .getter = property_get_value,
+    },
+    {
+        .id = LV_PROPERTY_SLIDER_LEFT_VALUE,
+        .setter = property_set_left_value,
+        .getter = property_get_left_value,
+    },
+    {
+        .id = LV_PROPERTY_SLIDER_RANGE,
+        .setter = property_set_range,
+        .getter = property_get_range,
+    },
+    {
+        .id = LV_PROPERTY_SLIDER_MODE,
+        .setter = lv_slider_set_mode,
+        .getter = lv_slider_get_mode,
+    },
+    {
+        .id = LV_PROPERTY_SLIDER_IS_DRAGGED,
+        .setter = NULL,
+        .getter = lv_slider_is_dragged,
+    },
+    {
+        .id = LV_PROPERTY_SLIDER_IS_SYMMETRICAL,
+        .setter = NULL,
+        .getter = lv_slider_is_symmetrical,
+    },
+};
+#endif
+
 const lv_obj_class_t lv_slider_class = {
     .constructor_cb = lv_slider_constructor,
     .event_cb = lv_slider_event,
@@ -57,6 +102,17 @@ const lv_obj_class_t lv_slider_class = {
     .instance_size = sizeof(lv_slider_t),
     .base_class = &lv_bar_class,
     .name = "slider",
+#if LV_USE_OBJ_PROPERTY
+    .prop_index_start = LV_PROPERTY_SLIDER_START,
+    .prop_index_end = LV_PROPERTY_SLIDER_END,
+    .properties = properties,
+    .properties_count = sizeof(properties) / sizeof(properties[0]),
+
+#if LV_USE_OBJ_PROPERTY_NAME
+    .property_names = lv_slider_property_names,
+    .names_count = sizeof(lv_slider_property_names) / sizeof(lv_property_name_t),
+#endif
+#endif
 };
 
 /**********************
@@ -552,5 +608,59 @@ static void update_knob_pos(lv_obj_t * obj, bool check_drag)
             return;
     }
 }
+
+#if LV_USE_OBJ_PROPERTY
+static void property_set_value(lv_obj_t * obj, const lv_property_t * prop)
+{
+    uint32_t count = prop->count;
+    if(count == 0) {
+        lv_slider_set_value(obj, prop->num, LV_ANIM_OFF);
+    }
+    else {
+        LV_ASSERT(count == 2 && prop->properties);
+        lv_slider_set_value(obj, prop->properties[0].num, prop->properties[1].enable ? LV_ANIM_ON : LV_ANIM_OFF);
+    }
+}
+
+static void property_get_value(lv_obj_t * obj, lv_property_t * prop)
+{
+    LV_ASSERT((int32_t)(prop->id) == LV_PROPERTY_SLIDER_VALUE && prop->count == 2);
+    prop->properties[0].num = lv_slider_get_value(obj);
+}
+
+static void property_set_left_value(lv_obj_t * obj, const lv_property_t * prop)
+{
+    uint32_t count = prop->count;
+
+    if(count == 0) {
+        lv_slider_set_left_value(obj, prop->num, LV_ANIM_OFF);
+    }
+    else {
+        LV_ASSERT(count == 2 && prop->properties);
+        lv_slider_set_left_value(obj, prop->properties[0].num, prop->properties[1].enable ? LV_ANIM_ON : LV_ANIM_OFF);
+    }
+}
+
+static void property_get_left_value(lv_obj_t * obj, lv_property_t * prop)
+{
+    LV_ASSERT((int32_t)(prop->id) == LV_PROPERTY_SLIDER_LEFT_VALUE && prop->count == 2);
+    prop->properties[0].num = lv_slider_get_left_value(obj);
+}
+
+static void property_set_range(lv_obj_t * obj, const lv_property_t * prop)
+{
+    uint32_t count = prop->count;
+    LV_ASSERT(count == 2 && prop->properties);
+    lv_slider_set_range(obj, prop->properties[0].num, prop->properties[1].num);
+}
+
+static void property_get_range(lv_obj_t * obj, lv_property_t * prop)
+{
+    LV_ASSERT((int32_t)(prop->id) == LV_PROPERTY_SLIDER_RANGE && prop->count == 2);
+    prop->properties[0].num = lv_slider_get_min_value(obj);
+    prop->properties[1].num = lv_slider_get_max_value(obj);
+}
+
+#endif
 
 #endif

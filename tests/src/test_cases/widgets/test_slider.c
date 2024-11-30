@@ -212,4 +212,65 @@ void test_slider_range_event_hit_test(void)
     TEST_ASSERT(info.res);
 }
 
+void test_slider_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_slider_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    lv_property_t values[2];
+
+    prop.id = LV_PROPERTY_SLIDER_RANGE;
+    prop.properties = values;
+    prop.count = 2;
+    values[0].num = 10;
+    values[1].num = 100;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(values[0].num, 10);
+    TEST_ASSERT_EQUAL_INT(values[1].num, 100);
+    TEST_ASSERT_EQUAL_INT(lv_slider_get_min_value(obj), 10);
+    TEST_ASSERT_EQUAL_INT(lv_slider_get_max_value(obj), 100);
+
+    prop.id = LV_PROPERTY_SLIDER_VALUE;
+    prop.properties = values;
+    prop.count = 2;
+    values[0].num = 50;
+    values[1].enable = false;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(values[0].num, 50);
+    TEST_ASSERT_EQUAL_INT(lv_slider_get_value(obj), 50);
+
+    prop.id = LV_PROPERTY_SLIDER_MODE;
+    prop.num = LV_SLIDER_MODE_RANGE;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(prop.num, LV_SLIDER_MODE_RANGE);
+    TEST_ASSERT_EQUAL_INT(lv_slider_get_mode(obj), LV_SLIDER_MODE_RANGE);
+
+    prop.id = LV_PROPERTY_SLIDER_LEFT_VALUE;
+    prop.properties = values;
+    prop.count = 2;
+    values[0].num = 40;
+    values[1].enable = false;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(values[0].num, 40);
+    TEST_ASSERT_EQUAL_INT(lv_slider_get_left_value(obj), 40);
+
+    prop.id = LV_PROPERTY_SLIDER_IS_DRAGGED;
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_FALSE(prop.enable);
+    TEST_ASSERT_FALSE(lv_slider_is_dragged(obj));
+
+    prop.id = LV_PROPERTY_SLIDER_IS_SYMMETRICAL;
+    TEST_ASSERT_TRUE(lv_obj_get_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_FALSE(prop.enable);
+    TEST_ASSERT_FALSE(lv_slider_is_dragged(obj));
+
+#endif
+}
+
+
 #endif
