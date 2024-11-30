@@ -2972,6 +2972,15 @@
     #endif
 #endif
 
+/** Use to rasterized svg to image in decoder because of 16bit not support in ThorVG */
+#ifndef LV_USE_SVG_DECODER_RASTERIZED
+    #ifdef CONFIG_LV_USE_SVG_DECODER_RASTERIZED
+        #define LV_USE_SVG_DECODER_RASTERIZED CONFIG_LV_USE_SVG_DECODER_RASTERIZED
+    #else
+        #define LV_USE_SVG_DECODER_RASTERIZED 0
+    #endif
+#endif
+
 /** FFmpeg library for image decoding and playing videos.
  *  Supports all major image formats so do not enable other image decoder with it. */
 #ifndef LV_USE_FFMPEG

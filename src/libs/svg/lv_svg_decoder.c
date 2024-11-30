@@ -305,10 +305,35 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
 
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
+#if LV_USE_SVG_DECODER_RASTERIZED
+    bool alloc_layer = false;
+    lv_layer_t * target_layer = NULL;
+    lv_draw_image_dsc_t layer_draw_dsc;
+    if(layer->color_format != LV_COLOR_FORMAT_ARGB8888) {
+        lv_area_t rc = {0, 0, lv_area_get_width(coords), lv_area_get_height(coords)};
+        target_layer = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &rc);
+
+        lv_draw_image_dsc_init(&layer_draw_dsc);
+        layer_draw_dsc.src = target_layer;
+        alloc_layer = true;
+    }
+    else {
+        target_layer = (lv_layer_t *)layer;
+    }
+#else
+    lv_layer_t * target_layer = (lv_layer_t *)layer;
+#endif
+
+    lv_vector_dsc_t * ctx = lv_vector_dsc_create(target_layer);
     lv_matrix_t matrix;
     lv_matrix_identity(&matrix);
+#if LV_USE_SVG_DECODER_RASTERIZED
+    if(!alloc_layer) {
+        lv_matrix_translate(&matrix, coords->x1, coords->y1);
+    }
+#else
     lv_matrix_translate(&matrix, coords->x1, coords->y1);
+#endif
     if(image_dsc) {
         lv_matrix_translate(&matrix, image_dsc->pivot.x, image_dsc->pivot.y);
         lv_matrix_rotate(&matrix, image_dsc->rotation / 10.0f);
@@ -320,6 +345,11 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
     lv_draw_vector(ctx);
     lv_vector_dsc_delete(ctx);
 
+#if LV_USE_SVG_DECODER_RASTERIZED
+    if(alloc_layer) {
+        lv_draw_layer(layer, &layer_draw_dsc, coords);
+    }
+#endif
     LV_PROFILER_DRAW_END;
 }
 
