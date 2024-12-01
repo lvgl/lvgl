@@ -4091,6 +4091,9 @@
  * End of parsing lv_conf_template.h
  -----------------------------------*/
 
+/*Fix inconsistent name*/
+#define LV_USE_ANIMIMAGE LV_USE_ANIMIMG
+
 #ifndef __ASSEMBLY__
 LV_EXPORT_CONST_INT(LV_DPI_DEF);
 LV_EXPORT_CONST_INT(LV_DRAW_BUF_STRIDE_ALIGN);
