@@ -22,14 +22,16 @@ In short this means:
 - width/height means the full size, the "content area" is smaller with padding and border width
 - a subset of flexbox and grid layouts are supported
 
+
+
 .. _coord_units:
 
-Units
-*****
+Length Units
+************
 
-When passing "distance units" as arguments to functions that modify position, size,
-etc., in many cases, to make layout of your UI maximally convenient, you have a
-choice of several different types of units you can use.
+When passing "length units" (a.k.a. "distance units") as arguments to functions that
+modify position, size, etc., in many cases, to make layout of your UI maximally
+convenient, you have a choice of several different types of units you can use.
 
 :pixels:             Specify size as pixels:  an integer value always means pixels.
                      E.g. :cpp:expr:`lv_obj_set_x(btn, 10)`.
@@ -91,6 +93,8 @@ keeps a "padding margin" when placing a Widget's children.
 
 The outline is drawn outside the bounding box.
 
+
+
 .. _coord_notes:
 
 Important Notes
@@ -116,6 +120,8 @@ the coordinates. To do this call :cpp:func:`lv_obj_update_layout`.
 The size and position might depend on the parent or layout. Therefore
 :cpp:func:`lv_obj_update_layout` recalculates the coordinates of all Widgets on
 the screen of ``obj``.
+
+
 
 .. _coord_removing styles:
 
