@@ -349,7 +349,7 @@ static void radius_only(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
         else if(cf_ori == LV_COLOR_FORMAT_A8) {
             int32_t y_ofs = blend_area.y1 - img_coords->y1;
             int32_t x_ofs = blend_area.x1 - img_coords->x1;
-            lv_memcpy(mask_buf, decoded->data + img_stride  + y_ofs * img_stride + x_ofs, blend_w);
+            lv_memcpy(mask_buf, decoded->data + y_ofs * img_stride + x_ofs, blend_w);
         }
         else {
             lv_memset(mask_buf, 0xff, blend_w);
