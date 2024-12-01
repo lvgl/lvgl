@@ -8,7 +8,7 @@
  *********************/
 #include "../../../lvgl.h"
 
-#if defined(LV_USE_FS_UEFI) && defined(LV_USE_UEFI)
+#if LV_USE_FS_UEFI && LV_USE_UEFI
 
 #include "../../drivers/uefi/lv_uefi_private.h"
 
@@ -600,7 +600,7 @@ static EFI_FILE_INFO * lv_fs_uefi_get_info(EFI_FILE_PROTOCOL * file)
 
 #else /* LV_FS_UEFI_LETTER == 0*/
 
-#if defined(LV_FS_UEFI_LETTER) && LV_FS_UEFI_LETTER != '\0'
+#if LV_FS_UEFI_LETTER && LV_FS_UEFI_LETTER != '\0'
     #warning "LV_FS_UEFI is not enabled but LV_FS_UEFI_LETTER is set"
 #endif
 
