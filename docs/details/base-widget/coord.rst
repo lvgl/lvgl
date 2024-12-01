@@ -33,8 +33,9 @@ When passing "length units" (a.k.a. "distance units" or "size units") as argumen
 functions that modify position, size, etc., to make layout of your UI convenient, you
 have a choice of several different types of units you can use.
 
-:pixels:             Specify size as pixels:  an integer value always means pixels.
-                     E.g. :cpp:expr:`lv_obj_set_x(btn, 10)`.
+:pixels:             Specify size as pixels:  an integer value <
+                     :c:macro:`LV_COORD_MAX` always means pixels.  E.g.
+                     :cpp:expr:`lv_obj_set_x(btn, 10)`.
 
 :percentage:         Specify size as a percentage of the size of the Widget's
                      parent or of itself, depending on the property.
