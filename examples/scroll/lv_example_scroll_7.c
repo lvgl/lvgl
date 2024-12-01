@@ -21,13 +21,14 @@ static void update_scroll(lv_obj_t * obj)
     int32_t bottom_num_original = bottom_num;
 
     /* load items we're getting close to */
-    while(lv_obj_get_scroll_bottom(obj) < 200) {
+    while(bottom_num > -30 && lv_obj_get_scroll_bottom(obj) < 200) {
+        bottom_num -= 1;
         load_item(obj, bottom_num);
         lv_obj_update_layout(obj);
         LV_LOG_USER("loaded bottom num: %"PRId32, bottom_num);
-        bottom_num -= 1;
     }
-    while(lv_obj_get_scroll_top(obj) < 200) {
+    while(top_num < 30 && lv_obj_get_scroll_top(obj) < 200) {
+        top_num += 1;
         int32_t bottom_before = lv_obj_get_scroll_bottom(obj);
         lv_obj_t * new_item = load_item(obj, top_num);
         lv_obj_move_to_index(new_item, 0);
@@ -35,18 +36,18 @@ static void update_scroll(lv_obj_t * obj)
         int32_t bottom_after = lv_obj_get_scroll_bottom(obj);
         lv_obj_scroll_by(obj, 0, bottom_before - bottom_after, LV_ANIM_OFF);
         LV_LOG_USER("loaded top num: %"PRId32, top_num);
-        top_num += 1;
     }
 
     /* delete far-away items */
     while(lv_obj_get_scroll_bottom(obj) > 600) {
+        bottom_num += 1;
         lv_obj_t * child = lv_obj_get_child(obj, -1);
         lv_obj_delete(child);
         lv_obj_update_layout(obj);
         LV_LOG_USER("deleted bottom num: %"PRId32, bottom_num);
-        bottom_num += 1;
     }
     while(lv_obj_get_scroll_top(obj) > 600) {
+        top_num -= 1;
         int32_t bottom_before = lv_obj_get_scroll_bottom(obj);
         lv_obj_t * child = lv_obj_get_child(obj, 0);
         lv_obj_delete(child);
@@ -54,7 +55,6 @@ static void update_scroll(lv_obj_t * obj)
         int32_t bottom_after = lv_obj_get_scroll_bottom(obj);
         lv_obj_scroll_by(obj, 0, bottom_before - bottom_after, LV_ANIM_OFF);
         LV_LOG_USER("deleted top num: %"PRId32, top_num);
-        top_num -= 1;
     }
 
     if(top_num != top_num_original) {
@@ -92,7 +92,7 @@ void lv_example_scroll_7(void)
     lv_obj_set_style_opa(obj, LV_OPA_TRANSP, LV_PART_SCROLLBAR);
 
     high_label = lv_label_create(scr);
-    lv_label_set_text_static(high_label, "current largest\nloaded value:\n0");
+    lv_label_set_text_static(high_label, "current largest\nloaded value:");
     lv_obj_align(high_label, LV_ALIGN_TOP_LEFT, 10, 10);
 
     lv_obj_t * checkbox = lv_checkbox_create(scr);
@@ -101,11 +101,12 @@ void lv_example_scroll_7(void)
     lv_obj_add_event_cb(checkbox, checkbox_cb, LV_EVENT_VALUE_CHANGED, obj);
 
     low_label = lv_label_create(scr);
-    lv_label_set_text_static(low_label, "current smallest\nloaded value:\n0");
+    lv_label_set_text_static(low_label, "current smallest\nloaded value:");
     lv_obj_align(low_label, LV_ALIGN_BOTTOM_LEFT, 10, -10);
 
     top_num = 3;
-    bottom_num = 2;
+    bottom_num = 4;
+    lv_obj_update_layout(obj);
     update_scroll(obj);
     lv_obj_add_event_cb(obj, scroll_cb, LV_EVENT_SCROLL, NULL);
 }
