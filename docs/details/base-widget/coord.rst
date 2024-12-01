@@ -29,8 +29,8 @@ In short this means:
 Length Units
 ************
 
-When passing "length units" (a.k.a. "distance units") as arguments to functions that
-modify position, size, etc., in many cases, to make layout of your UI maximally
+When passing "length units" (a.k.a. "distance units" or "size units") as arguments to
+functions that modify position, size, etc., in many cases, to make layout of your UI
 convenient, you have a choice of several different types of units you can use.
 
 :pixels:             Specify size as pixels:  an integer value always means pixels.
