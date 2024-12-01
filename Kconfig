@@ -1281,7 +1281,7 @@ menu "LVGL configuration"
 			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
 			default 0
 			depends on LV_USE_FS_ARDUINO_SD
-					config LV_FS_ARDUINO_SD_PATH
+		config LV_FS_ARDUINO_SD_PATH
 			string "Set the working directory"
 			depends on LV_USE_FS_ARDUINO_SD
 
