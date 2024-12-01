@@ -59,12 +59,12 @@ static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect);
 static const lv_property_ops_t properties[] = {
     {
         .id = LV_PROPERTY_ROLLER_OPTIONS,
-        .setter = NULL,
+        .setter = lv_roller_set_options,
         .getter = lv_roller_get_options,
     },
     {
         .id = LV_PROPERTY_ROLLER_SELECTED,
-        .setter = NULL,
+        .setter = lv_roller_set_selected,
         .getter = lv_roller_get_selected,
     },
     {

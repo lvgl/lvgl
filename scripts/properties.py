@@ -45,7 +45,7 @@ def find_headers(directory):
 def read_widget_properties(directory):
 
     def match_properties(file_path):
-        pattern = r'^\s*LV_PROPERTY_ID\((\w+),\s*(\w+),\s*(\w+),\s*(\d+)\)'
+        pattern = r'^\s*LV_PROPERTY_ID2?\((\w+),\s*(\w+),\s*(\w+)(,\s*(\w+))?,\s*(\d+)\)'
         with open(file_path, 'r') as file:
             for line in file.readlines():
                 match = re.match(pattern, line)
