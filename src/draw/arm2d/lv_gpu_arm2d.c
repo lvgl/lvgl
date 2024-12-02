@@ -421,41 +421,41 @@
 
 
 static void convert_cb(const lv_area_t * dest_area,
-                        const void * src_buf,
-                        lv_coord_t src_w,
-                        lv_coord_t src_h,
-                        lv_coord_t src_stride,
-                        const lv_draw_img_dsc_t * draw_dsc,
-                        lv_img_cf_t cf,
-                        lv_color_t * cbuf,
-                        lv_opa_t * abuf);
+                       const void * src_buf,
+                       lv_coord_t src_w,
+                       lv_coord_t src_h,
+                       lv_coord_t src_stride,
+                       const lv_draw_img_dsc_t * draw_dsc,
+                       lv_img_cf_t cf,
+                       lv_color_t * cbuf,
+                       lv_opa_t * abuf);
 
 static bool /* LV_ATTRIBUTE_FAST_MEM */ arm_2d_fill_normal(lv_color_t * dest_buf,
-                                                            const lv_area_t * dest_area,
-                                                            lv_coord_t dest_stride,
-                                                            lv_color_t color,
-                                                            lv_opa_t opa,
-                                                            const lv_opa_t * mask,
-                                                            lv_coord_t mask_stride);
+                                                           const lv_area_t * dest_area,
+                                                           lv_coord_t dest_stride,
+                                                           lv_color_t color,
+                                                           lv_opa_t opa,
+                                                           const lv_opa_t * mask,
+                                                           lv_coord_t mask_stride);
 
 static bool /* LV_ATTRIBUTE_FAST_MEM */ arm_2d_copy_normal(lv_color_t * dest_buf,
-                                                            const lv_area_t * dest_area,
-                                                            lv_coord_t dest_stride,
-                                                            const lv_color_t * src_buf,
-                                                            lv_coord_t src_stride,
-                                                            lv_opa_t opa,
-                                                            const lv_opa_t * mask,
-                                                            lv_coord_t mask_stride);
+                                                           const lv_area_t * dest_area,
+                                                           lv_coord_t dest_stride,
+                                                           const lv_color_t * src_buf,
+                                                           lv_coord_t src_stride,
+                                                           lv_opa_t opa,
+                                                           const lv_opa_t * mask,
+                                                           lv_coord_t mask_stride);
 
 
 static void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx,
                                                             const lv_draw_sw_blend_dsc_t * dsc);
 static void /* LV_ATTRIBUTE_FAST_MEM */ lv_gpu_arm2d_wait_cb(lv_draw_ctx_t * draw_ctx);
 static void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
-                                                                    const lv_draw_img_dsc_t * draw_dsc,
-                                                                    const lv_area_t * coords,
-                                                                    const uint8_t * src_buf,
-                                                                    lv_img_cf_t cf);
+                                                                  const lv_draw_img_dsc_t * draw_dsc,
+                                                                  const lv_area_t * coords,
+                                                                  const uint8_t * src_buf,
+                                                                  lv_img_cf_t cf);
 
 /**********************
  *  STATIC VARIABLES
@@ -494,7 +494,7 @@ extern void test_flush(lv_color_t * color_p);
 
 
 static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx,
-                                                        const lv_draw_sw_blend_dsc_t * dsc)
+                                                      const lv_draw_sw_blend_dsc_t * dsc)
 {
     const lv_opa_t * mask;
     if(dsc->mask_buf == NULL) mask = NULL;
@@ -580,12 +580,12 @@ static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx,
 }
 
 static bool LV_ATTRIBUTE_FAST_MEM arm_2d_fill_normal(lv_color_t * dest_buf,
-                                                        const lv_area_t * dest_area,
-                                                        lv_coord_t dest_stride,
-                                                        lv_color_t color,
-                                                        lv_opa_t opa,
-                                                        const lv_opa_t * mask,
-                                                        lv_coord_t mask_stride)
+                                                     const lv_area_t * dest_area,
+                                                     lv_coord_t dest_stride,
+                                                     lv_color_t color,
+                                                     lv_opa_t opa,
+                                                     const lv_opa_t * mask,
+                                                     lv_coord_t mask_stride)
 {
     arm_2d_size_t target_size = {
         .iWidth = lv_area_get_width(dest_area),
@@ -596,17 +596,17 @@ static bool LV_ATTRIBUTE_FAST_MEM arm_2d_fill_normal(lv_color_t * dest_buf,
     if(mask == NULL) {
         if(opa >= LV_OPA_MAX) {
             __arm_2d_impl_colour_filling((color_int *)dest_buf,
-                                            dest_stride,
-                                            &target_size,
-                                            color.full);
+                                         dest_stride,
+                                         &target_size,
+                                         color.full);
         }
         /*Has opacity*/
         else {
             __arm_2d_impl_colour_filling_with_opacity((color_int *)dest_buf,
-                                                        dest_stride,
-                                                        &target_size,
-                                                        color.full,
-                                                        opa);
+                                                      dest_stride,
+                                                      &target_size,
+                                                      color.full,
+                                                      opa);
         }
     }
     /*Masked*/
@@ -614,21 +614,21 @@ static bool LV_ATTRIBUTE_FAST_MEM arm_2d_fill_normal(lv_color_t * dest_buf,
         /*Only the mask matters*/
         if(opa >= LV_OPA_MAX) {
             __arm_2d_impl_colour_filling_mask((color_int *)dest_buf,
-                                                dest_stride,
-                                                (uint8_t *)mask,
-                                                mask_stride,
-                                                &target_size,
-                                                color.full);
+                                              dest_stride,
+                                              (uint8_t *)mask,
+                                              mask_stride,
+                                              &target_size,
+                                              color.full);
         }
         /*With opacity*/
         else {
             __arm_2d_impl_colour_filling_mask_opacity((color_int *)dest_buf,
-                                                        dest_stride,
-                                                        (uint8_t *)mask,
-                                                        mask_stride,
-                                                        &target_size,
-                                                        color.full,
-                                                        opa);
+                                                      dest_stride,
+                                                      (uint8_t *)mask,
+                                                      mask_stride,
+                                                      &target_size,
+                                                      color.full,
+                                                      opa);
         }
     }
 
@@ -636,13 +636,13 @@ static bool LV_ATTRIBUTE_FAST_MEM arm_2d_fill_normal(lv_color_t * dest_buf,
 }
 
 static bool LV_ATTRIBUTE_FAST_MEM arm_2d_copy_normal(lv_color_t * dest_buf,
-                                                        const lv_area_t * dest_area,
-                                                        lv_coord_t dest_stride,
-                                                        const lv_color_t * src_buf,
-                                                        lv_coord_t src_stride,
-                                                        lv_opa_t opa,
-                                                        const lv_opa_t * mask,
-                                                        lv_coord_t mask_stride)
+                                                     const lv_area_t * dest_area,
+                                                     lv_coord_t dest_stride,
+                                                     const lv_color_t * src_buf,
+                                                     lv_coord_t src_stride,
+                                                     lv_opa_t opa,
+                                                     const lv_opa_t * mask,
+                                                     lv_coord_t mask_stride)
 
 {
     int32_t w = lv_area_get_width(dest_area);
@@ -657,18 +657,18 @@ static bool LV_ATTRIBUTE_FAST_MEM arm_2d_copy_normal(lv_color_t * dest_buf,
     if(mask == NULL) {
         if(opa >= LV_OPA_MAX) {
             __arm_2d_impl_copy((color_int *)src_buf,
-                                src_stride,
-                                (color_int *)dest_buf,
-                                dest_stride,
-                                &copy_size);
+                               src_stride,
+                               (color_int *)dest_buf,
+                               dest_stride,
+                               &copy_size);
         }
         else {
             __arm_2d_impl_alpha_blending((color_int *)src_buf,
-                                            src_stride,
-                                            (color_int *)dest_buf,
-                                            dest_stride,
-                                            &copy_size,
-                                            opa);
+                                         src_stride,
+                                         (color_int *)dest_buf,
+                                         dest_stride,
+                                         &copy_size,
+                                         opa);
         }
     }
     /*Masked*/
@@ -676,25 +676,25 @@ static bool LV_ATTRIBUTE_FAST_MEM arm_2d_copy_normal(lv_color_t * dest_buf,
         /*Only the mask matters*/
         if(opa > LV_OPA_MAX) {
             __arm_2d_impl_src_msk_copy((color_int *)src_buf,
-                                        src_stride,
-                                        (uint8_t *)mask,
-                                        mask_stride,
-                                        &copy_size,
-                                        (color_int *)dest_buf,
-                                        dest_stride,
-                                        &copy_size);
+                                       src_stride,
+                                       (uint8_t *)mask,
+                                       mask_stride,
+                                       &copy_size,
+                                       (color_int *)dest_buf,
+                                       dest_stride,
+                                       &copy_size);
         }
         /*Handle opa and mask values too*/
         else {
             __arm_2d_impl_tile_copy_with_src_mask_and_opacity((color_int *)src_buf,
-                                                                src_stride,
-                                                                (uint8_t *)mask,
-                                                                mask_stride,
-                                                                &copy_size,
-                                                                (color_int *)dest_buf,
-                                                                dest_stride,
-                                                                &copy_size,
-                                                                opa);
+                                                              src_stride,
+                                                              (uint8_t *)mask,
+                                                              mask_stride,
+                                                              &copy_size,
+                                                              (color_int *)dest_buf,
+                                                              dest_stride,
+                                                              &copy_size,
+                                                              opa);
         }
     }
 
@@ -800,8 +800,8 @@ static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_
         blend_area.y2 = blend_area.y1 + buf_h - 1;
 
         lv_draw_mask_res_t mask_res_def = (cf != LV_IMG_CF_TRUE_COLOR || draw_dsc->angle ||
-                                            draw_dsc->zoom != LV_IMG_ZOOM_NONE) ?
-        LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
+                                           draw_dsc->zoom != LV_IMG_ZOOM_NONE) ?
+                                          LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
         blend_dsc.mask_res = mask_res_def;
 
         if(cf == LV_IMG_CF_ALPHA_8BIT) {
@@ -972,14 +972,14 @@ static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_
 #endif
                 && (draw_dsc->recolor_opa == LV_OPA_TRANSP)
                 && (((LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED == cf)
-                        || (LV_IMG_CF_TRUE_COLOR == cf))
+                     || (LV_IMG_CF_TRUE_COLOR == cf))
                     || (LV_IMG_CF_RGB565A8 == cf)
 #if defined(__ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__) &&  __ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__
                     || ((LV_IMG_CF_TRUE_COLOR_ALPHA == cf)
                         && (LV_COLOR_DEPTH == 32))
 #endif
-                    )
-                ) {
+                   )
+               ) {
 
             uint8_t * mask_after_rgb = src_buf + sizeof(lv_color_t) * src_w * src_h;
         /* *INDENT-OFF* */
