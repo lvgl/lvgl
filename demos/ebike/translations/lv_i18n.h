@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "../../../src/lv_conf_internal.h"
+#include "../../../lvgl.h"
 #if LV_USE_DEMO_EBIKE
 
 #include LV_STDINT_INCLUDE
