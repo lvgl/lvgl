@@ -227,15 +227,7 @@ void lv_draw_sw_i1_to_argb8888(const void * buf_i1, void * buf_argb8888, uint32_
     for(uint32_t i = 0; i < i1_byte_count; i++) {
         /*From MSB to LSB (pixel 0 to pixel 7 in a byte)*/
         for(int32_t bit = 7; bit >= 0; bit--) {
-            /*White*/
-            if((src[i] >> bit) & 1) {
-                *dst = 0xFFFFFFFFu;
-            }
-            /*Black*/
-            else {
-                *dst = 0xFF000000u;
-            }
-            dst++;
+            *dst++ = ((src[i] >> bit) & 1) ? 0xFFFFFFFFu : 0xFF000000u;
         }
     }
 }
