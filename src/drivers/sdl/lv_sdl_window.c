@@ -219,15 +219,18 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         if(cf == LV_COLOR_FORMAT_I1) {
             /*I1 uses 1 bit wide pixels, ARGB8888 uses 4 byte wide pixels*/
             cf = LV_COLOR_FORMAT_ARGB8888;
-            uint32_t pixel_count = lv_area_get_size(area);
-            uint32_t argb_px_map_size = pixel_count * 4;
+            uint32_t width = lv_area_get_width(area);
+            uint32_t height = lv_area_get_height(area);
+            uint32_t argb_px_map_size = width * height * 4;
             argb_px_map = malloc(argb_px_map_size);
             if(argb_px_map == NULL) {
                 LV_LOG_ERROR("malloc failed");
                 lv_display_flush_ready(disp);
                 return;
             }
-            lv_draw_sw_i1_to_argb8888(px_map, argb_px_map, pixel_count);
+            /* skip the palette */
+            px_map += LV_COLOR_INDEXED_PALETTE_SIZE(LV_COLOR_FORMAT_I1) * 4;
+            lv_draw_sw_i1_to_argb8888(px_map, argb_px_map, width, height, width / 8, width * 4, 0xFF000000u, 0xFFFFFFFFu);
             px_map = (uint8_t *)argb_px_map;
         }
 
