@@ -13,7 +13,7 @@
 #include "lv_demo_music_main.h"
 #include "lv_demo_music_list.h"
 #if LV_DEMO_MUSIC_AUTO_PLAY && LV_USE_PERF_MONITOR
-    #include "../../src/display/lv_display_private.h"
+    #include "../../lvgl_private.h"
 #endif
 
 /*********************

@@ -37,7 +37,7 @@
 #include "../../src/core/lv_global.h"
 
 #if LV_USE_PERF_MONITOR
-    #include "../../src/display/lv_display_private.h"
+    #include "../../lvgl_private.h"
 #endif
 
 /**********************
