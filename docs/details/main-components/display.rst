@@ -409,38 +409,32 @@ Below is an example for rotating when the rendering mode is
 **display controller**.
 
 .. code-block:: c
-	/*Rotate a partially rendered area to another buffer and send it*/
-	void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
-	{
-		lv_display_rotation_t rotation = lv_display_get_rotation(disp);
-		lv_area_t rotated_area;
-		if(rotation != LV_DISPLAY_ROTATION_0) {
-			lv_color_format_t cf = lv_display_get_color_format(disp);
-
-			/*Calculate the position of the rotated area*/
-			rotated_area = *area;
-			lv_display_rotate_area(disp, &rotated_area);
-
-			/*Calculate the source stride (bytes in a line) from the width of the area*/
-			uint32_t src_stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), cf);
-
-			/*Calculate the stride of the destination (rotated) area too*/
-			uint32_t dest_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&rotated_area), cf);
-
-			/*Have a buffer to store the rotated area and perform the rotation*/
-			static uint8_t rotated_buf[500*1014];
-	        int32_t src_w = lv_area_get_width(area);
-	        int32_t src_h = lv_area_get_height(area);
-			lv_draw_sw_rotate(px_map, rotated_buf, src_w, src_h, src_stride, dest_stride, rotation, cf);
-
-			/*Use the rotated area and rotated buffer from now on*/
-			area = &rotated_area;
-			px_map = rotated_buf;
-		}
-
-	    my_set_window(area->x1, area->y1, area->x2, area->y2);
-	    my_send_colors(px_map);
-	}
+    /*Rotate a partially rendered area to another buffer and send it*/
+    void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
+    {
+        lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+        lv_area_t rotated_area;
+        if(rotation != LV_DISPLAY_ROTATION_0) {
+            lv_color_format_t cf = lv_display_get_color_format(disp);
+            /*Calculate the position of the rotated area*/
+            rotated_area = *area;
+            lv_display_rotate_area(disp, &rotated_area);
+            /*Calculate the source stride (bytes in a line) from the width of the area*/
+            uint32_t src_stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), cf);
+            /*Calculate the stride of the destination (rotated) area too*/
+            uint32_t dest_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&rotated_area), cf);
+            /*Have a buffer to store the rotated area and perform the rotation*/
+            static uint8_t rotated_buf[500*1014];
+            int32_t src_w = lv_area_get_width(area);
+            int32_t src_h = lv_area_get_height(area);
+            lv_draw_sw_rotate(px_map, rotated_buf, src_w, src_h, src_stride, dest_stride, rotation, cf);
+            /*Use the rotated area and rotated buffer from now on*/
+            area = &rotated_area;
+            px_map = rotated_buf;
+        }
+        my_set_window(area->x1, area->y1, area->x2, area->y2);
+        my_send_colors(px_map);
+    }
 
 Below is an example for rotating when the rendering mode is
 :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_PARTIAL` and the image can be rotated directly
