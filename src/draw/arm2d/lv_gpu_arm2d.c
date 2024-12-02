@@ -89,6 +89,8 @@
 #define arm_2d_tile_copy                arm_2d_rgb16_tile_copy
 #define arm_2d_alpha_blending           arm_2d_rgb565_alpha_blending
 #define arm_2d_tile_copy_with_src_mask  arm_2d_rgb565_tile_copy_with_src_mask
+#define __arm_2d_impl_tile_copy_with_src_mask_and_opacity                       \
+    __arm_2d_impl_rgb565_tile_copy_with_src_mask_and_opacity
 #define arm_2d_color_t                  arm_2d_color_rgb565_t
 
 /* arm-2d direct mode apis */
@@ -128,6 +130,8 @@
 #define arm_2d_tile_copy                arm_2d_rgb32_tile_copy
 #define arm_2d_alpha_blending           arm_2d_cccn888_alpha_blending
 #define arm_2d_tile_copy_with_src_mask  arm_2d_cccn888_tile_copy_with_src_mask
+#define __arm_2d_impl_tile_copy_with_src_mask_and_opacity                       \
+    __arm_2d_impl_cccn888_tile_copy_with_src_mask_and_opacity
 #define arm_2d_color_t                  arm_2d_color_cccn888_t
 
 /* arm-2d direct mode apis */
@@ -407,615 +411,421 @@
 
 /* *INDENT-ON* */
 
-/**********************
- *      TYPEDEFS
- **********************/
+        /**********************
+         *      TYPEDEFS
+         **********************/
 
-/**********************
- *  STATIC PROTOTYPES
- **********************/
+        /**********************
+         *  STATIC PROTOTYPES
+         **********************/
 
-#if __ARM_2D_HAS_HW_ACC__
-static bool /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_arm2d_fill_colour(const arm_2d_tile_t * target_tile,
-                                                                  const arm_2d_region_t * region,
-                                                                  lv_color_t color,
-                                                                  lv_opa_t opa,
-                                                                  const arm_2d_tile_t * mask_tile);
 
-static bool /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_arm2d_tile_copy(const arm_2d_tile_t * target_tile,
-                                                                const arm_2d_region_t * region,
-                                                                arm_2d_tile_t * source_tile,
-                                                                lv_opa_t opa,
-                                                                arm_2d_tile_t * mask_tile);
-#else
+        static void convert_cb(const lv_area_t * dest_area,
+                               const void * src_buf,
+                               lv_coord_t src_w,
+                               lv_coord_t src_h,
+                               lv_coord_t src_stride,
+                               const lv_draw_img_dsc_t * draw_dsc,
+                               lv_img_cf_t cf,
+                               lv_color_t * cbuf,
+                               lv_opa_t * abuf);
 
-static void convert_cb(const lv_area_t * dest_area,
-                       const void * src_buf,
-                       lv_coord_t src_w,
-                       lv_coord_t src_h,
-                       lv_coord_t src_stride,
-                       const lv_draw_img_dsc_t * draw_dsc,
-                       lv_img_cf_t cf,
-                       lv_color_t * cbuf,
-                       lv_opa_t * abuf);
+        static bool /* LV_ATTRIBUTE_FAST_MEM */ arm_2d_fill_normal(lv_color_t * dest_buf,
+                                                                   const lv_area_t * dest_area,
+                                                                   lv_coord_t dest_stride,
+                                                                   lv_color_t color,
+                                                                   lv_opa_t opa,
+                                                                   const lv_opa_t * mask,
+                                                                   lv_coord_t mask_stride);
 
-static bool /* LV_ATTRIBUTE_FAST_MEM */ arm_2d_fill_normal(lv_color_t * dest_buf,
-                                                           const lv_area_t * dest_area,
-                                                           lv_coord_t dest_stride,
-                                                           lv_color_t color,
-                                                           lv_opa_t opa,
-                                                           const lv_opa_t * mask,
-                                                           lv_coord_t mask_stride);
+        static bool /* LV_ATTRIBUTE_FAST_MEM */ arm_2d_copy_normal(lv_color_t * dest_buf,
+                                                                   const lv_area_t * dest_area,
+                                                                   lv_coord_t dest_stride,
+                                                                   const lv_color_t * src_buf,
+                                                                   lv_coord_t src_stride,
+                                                                   lv_opa_t opa,
+                                                                   const lv_opa_t * mask,
+                                                                   lv_coord_t mask_stride);
 
-static bool /* LV_ATTRIBUTE_FAST_MEM */ arm_2d_copy_normal(lv_color_t * dest_buf,
-                                                           const lv_area_t * dest_area,
-                                                           lv_coord_t dest_stride,
-                                                           const lv_color_t * src_buf,
-                                                           lv_coord_t src_stride,
-                                                           lv_opa_t opa,
-                                                           const lv_opa_t * mask,
-                                                           lv_coord_t mask_stride);
-#endif
 
-static void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx,
-                                                            const lv_draw_sw_blend_dsc_t * dsc);
-static void /* LV_ATTRIBUTE_FAST_MEM */ lv_gpu_arm2d_wait_cb(lv_draw_ctx_t * draw_ctx);
-static void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
-                                                                  const lv_draw_img_dsc_t * draw_dsc,
-                                                                  const lv_area_t * coords,
-                                                                  const uint8_t * src_buf,
-                                                                  lv_img_cf_t cf);
+        static void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx,
+                                                                    const lv_draw_sw_blend_dsc_t * dsc);
+        static void /* LV_ATTRIBUTE_FAST_MEM */ lv_gpu_arm2d_wait_cb(lv_draw_ctx_t * draw_ctx);
+        static void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
+                                                                          const lv_draw_img_dsc_t * draw_dsc,
+                                                                          const lv_area_t * coords,
+                                                                          const uint8_t * src_buf,
+                                                                          lv_img_cf_t cf);
 
-/**********************
- *  STATIC VARIABLES
- **********************/
+        /**********************
+         *  STATIC VARIABLES
+         **********************/
 
-/**********************
- *      MACROS
- **********************/
+        /**********************
+         *      MACROS
+         **********************/
 
-/**********************
- *   GLOBAL FUNCTIONS
- **********************/
+        /**********************
+         *   GLOBAL FUNCTIONS
+         **********************/
 
-void lv_draw_arm2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
-{
-    arm_2d_init();
+        void lv_draw_arm2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
+        {
+            arm_2d_init();
 
-    lv_draw_sw_init_ctx(drv, draw_ctx);
+            lv_draw_sw_init_ctx(drv, draw_ctx);
 
-    lv_draw_arm2d_ctx_t * arm2d_draw_ctx = (lv_draw_sw_ctx_t *)draw_ctx;
+            lv_draw_arm2d_ctx_t * arm2d_draw_ctx = (lv_draw_sw_ctx_t *)draw_ctx;
 
-    arm2d_draw_ctx->blend = lv_draw_arm2d_blend;
-    arm2d_draw_ctx->base_draw.wait_for_finish = lv_gpu_arm2d_wait_cb;
+            arm2d_draw_ctx->blend = lv_draw_arm2d_blend;
+            arm2d_draw_ctx->base_draw.wait_for_finish = lv_gpu_arm2d_wait_cb;
 
-#if !__ARM_2D_HAS_HW_ACC__
-    arm2d_draw_ctx->base_draw.draw_img_decoded = lv_draw_arm2d_img_decoded;
-#endif
+            arm2d_draw_ctx->base_draw.draw_img_decoded = lv_draw_arm2d_img_decoded;
 
-}
-
-void lv_draw_arm2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
-{
-    LV_UNUSED(drv);
-    LV_UNUSED(draw_ctx);
-}
-
-extern void test_flush(lv_color_t * color_p);
-
-#if __ARM_2D_HAS_HW_ACC__
-static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx,
-                                                      const lv_draw_sw_blend_dsc_t * dsc)
-{
-    const lv_opa_t * mask;
-    if(dsc->mask_buf == NULL) mask = NULL;
-    if(dsc->mask_buf && dsc->mask_res == LV_DRAW_MASK_RES_TRANSP) return;
-    else if(dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask = NULL;
-    else mask = dsc->mask_buf;
-
-    lv_area_t blend_area;
-    if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_ctx->clip_area)) {
-        return;
-    }
-
-    bool is_accelerated = false;
-
-    if(dsc->blend_mode == LV_BLEND_MODE_NORMAL
-       &&    lv_area_get_size(&blend_area) > 100) {
-
-        __PREPARE_TARGET_TILE__(blend_area);
-        __PREPARE_SOURCE_TILE__(dsc, blend_area);
-        __PREPARE_MASK_TILE__(dsc, blend_area, mask, false);
-
-        if(src_buf) {
-            is_accelerated = lv_draw_arm2d_tile_copy(
-                                 &target_tile,
-                                 &target_region,
-                                 &source_tile,
-                                 dsc->opa,
-                                 (NULL == mask) ? NULL : &mask_tile);
-        }
-        else {
-            is_accelerated = lv_draw_arm2d_fill_colour(
-                                 &target_tile,
-                                 &target_region,
-                                 dsc->color,
-                                 dsc->opa,
-                                 (NULL == mask) ? NULL : &mask_tile);
-        }
-    }
-
-    if(!is_accelerated) {
-        lv_draw_sw_blend_basic(draw_ctx, dsc);
-    }
-}
-
-static bool LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_fill_colour(const arm_2d_tile_t * target_tile,
-                                                            const arm_2d_region_t * region,
-                                                            lv_color_t color,
-                                                            lv_opa_t opa,
-                                                            const arm_2d_tile_t * mask_tile)
-{
-    arm_fsm_rt_t result = (arm_fsm_rt_t)ARM_2D_ERR_NONE;
-
-    if(NULL == mask_tile) {
-        if(opa >= LV_OPA_MAX) {
-            result = arm_2d_fill_colour(target_tile, region, color.full);
-        }
-        else {
-#if LV_COLOR_SCREEN_TRANSP
-            return false;
-#else
-            result = arm_2d_fill_colour_with_alpha(
-                         target_tile,
-                         region,
-            (arm_2d_color_t) {
-                color.full
-            },
-            opa);
-#endif
-        }
-    }
-    else {
-
-        if(opa >= LV_OPA_MAX) {
-            result = arm_2d_fill_colour_with_mask(
-                         target_tile,
-                         region,
-                         mask_tile,
-            (arm_2d_color_t) {
-                color.full
-            });
-        }
-        else {
-#if LV_COLOR_SCREEN_TRANSP
-            return false;
-#else
-            result = arm_2d_fill_colour_with_mask_and_opacity(
-                         target_tile,
-                         region,
-                         mask_tile,
-            (arm_2d_color_t) {
-                color.full
-            },
-            opa);
-#endif
-        }
-    }
-
-    if(result < 0) {
-        /* error detected */
-        return false;
-    }
-
-    return true;
-
-}
-
-static bool LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_tile_copy(const arm_2d_tile_t * target_tile,
-                                                          const arm_2d_region_t * region,
-                                                          arm_2d_tile_t * source_tile,
-                                                          lv_opa_t opa,
-                                                          arm_2d_tile_t * mask_tile)
-{
-    arm_fsm_rt_t result = (arm_fsm_rt_t)ARM_2D_ERR_NONE;
-
-    if(NULL == mask_tile) {
-        if(opa >= LV_OPA_MAX) {
-            result = arm_2d_tile_copy(source_tile,
-                                      target_tile,
-                                      region,
-                                      ARM_2D_CP_MODE_COPY);
-        }
-#if LV_COLOR_SCREEN_TRANSP
-        else {
-            return false;  /* not supported */
-        }
-#else
-        else {
-            result = arm_2d_alpha_blending(source_tile,
-                                           target_tile,
-                                           region,
-                                           opa);
-        }
-#endif
-    }
-    else {
-#if LV_COLOR_SCREEN_TRANSP
-        return false;       /* not support */
-#else
-
-        if(opa >= LV_OPA_MAX) {
-            result = arm_2d_tile_copy_with_src_mask(source_tile,
-                                                    mask_tile,
-                                                    target_tile,
-                                                    region,
-                                                    ARM_2D_CP_MODE_COPY);
-        }
-        else {
-            return false;
-        }
-#endif
-    }
-
-    if(result < 0) {
-        /* error detected */
-        return false;
-    }
-
-    return true;
-}
-
-static void lv_gpu_arm2d_wait_cb(lv_draw_ctx_t * draw_ctx)
-{
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-
-    arm_2d_op_wait_async(NULL);
-    if(disp->driver && disp->driver->wait_cb) {
-        disp->driver->wait_cb(disp->driver);
-    }
-    lv_draw_sw_wait_for_finish(draw_ctx);
-}
-#else
-
-static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx,
-                                                      const lv_draw_sw_blend_dsc_t * dsc)
-{
-    const lv_opa_t * mask;
-    if(dsc->mask_buf == NULL) mask = NULL;
-    if(dsc->mask_buf && dsc->mask_res == LV_DRAW_MASK_RES_TRANSP) return;
-    else if(dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask = NULL;
-    else mask = dsc->mask_buf;
-
-    lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
-
-    lv_area_t blend_area;
-    if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_ctx->clip_area)) return;
-
-    //lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-
-    bool is_accelerated = false;
-    do {
-
-        /* target buffer */
-        lv_color_t * dest_buf = draw_ctx->buf;
-        lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-        if(disp->driver->screen_transp == 0) {
-            dest_buf += dest_stride * (blend_area.y1 - draw_ctx->buf_area->y1) + (blend_area.x1 - draw_ctx->buf_area->x1);
-        }
-        else {
-            /*With LV_COLOR_DEPTH 16 it means ARGB8565 (3 bytes format)*/
-            uint8_t * dest_buf8 = (uint8_t *) dest_buf;
-            dest_buf8 += dest_stride * (blend_area.y1 - draw_ctx->buf_area->y1) * LV_IMG_PX_SIZE_ALPHA_BYTE;
-            dest_buf8 += (blend_area.x1 - draw_ctx->buf_area->x1) * LV_IMG_PX_SIZE_ALPHA_BYTE;
-            dest_buf = (lv_color_t *)dest_buf8;
         }
 
-        /* source buffer */
-        const lv_color_t * src_buf = dsc->src_buf;
-        lv_coord_t src_stride;
-        if(src_buf) {
-            src_stride = lv_area_get_width(dsc->blend_area);
-            src_buf += src_stride * (blend_area.y1 - dsc->blend_area->y1) + (blend_area.x1 - dsc->blend_area->x1);
-        }
-        else {
-            src_stride = 0;
+        void lv_draw_arm2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
+        {
+            LV_UNUSED(drv);
+            LV_UNUSED(draw_ctx);
         }
 
-        lv_coord_t mask_stride;
-        if(mask) {
-            mask_stride = lv_area_get_width(dsc->mask_area);
-            mask += mask_stride * (blend_area.y1 - dsc->mask_area->y1) + (blend_area.x1 - dsc->mask_area->x1);
-        }
-        else {
-            mask_stride = 0;
+        extern void test_flush(lv_color_t * color_p);
+
+
+        static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx,
+                                                              const lv_draw_sw_blend_dsc_t * dsc)
+        {
+            const lv_opa_t * mask;
+            if(dsc->mask_buf == NULL) mask = NULL;
+            if(dsc->mask_buf && dsc->mask_res == LV_DRAW_MASK_RES_TRANSP) return;
+            else if(dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask = NULL;
+            else mask = dsc->mask_buf;
+
+            lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+
+            lv_area_t blend_area;
+            if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_ctx->clip_area)) return;
+
+            //lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+
+            bool is_accelerated = false;
+            do {
+
+                /* target buffer */
+                lv_color_t * dest_buf = draw_ctx->buf;
+                lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+                if(disp->driver->screen_transp == 0) {
+                    dest_buf += dest_stride * (blend_area.y1 - draw_ctx->buf_area->y1) + (blend_area.x1 - draw_ctx->buf_area->x1);
+                }
+                else {
+                    /*With LV_COLOR_DEPTH 16 it means ARGB8565 (3 bytes format)*/
+                    uint8_t * dest_buf8 = (uint8_t *) dest_buf;
+                    dest_buf8 += dest_stride * (blend_area.y1 - draw_ctx->buf_area->y1) * LV_IMG_PX_SIZE_ALPHA_BYTE;
+                    dest_buf8 += (blend_area.x1 - draw_ctx->buf_area->x1) * LV_IMG_PX_SIZE_ALPHA_BYTE;
+                    dest_buf = (lv_color_t *)dest_buf8;
+                }
+
+                /* source buffer */
+                const lv_color_t * src_buf = dsc->src_buf;
+                lv_coord_t src_stride;
+                if(src_buf) {
+                    src_stride = lv_area_get_width(dsc->blend_area);
+                    src_buf += src_stride * (blend_area.y1 - dsc->blend_area->y1) + (blend_area.x1 - dsc->blend_area->x1);
+                }
+                else {
+                    src_stride = 0;
+                }
+
+                lv_coord_t mask_stride;
+                if(mask) {
+                    mask_stride = lv_area_get_width(dsc->mask_area);
+                    mask += mask_stride * (blend_area.y1 - dsc->mask_area->y1) + (blend_area.x1 - dsc->mask_area->x1);
+                }
+                else {
+                    mask_stride = 0;
+                }
+
+                lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+
+                if(disp->driver->screen_transp) {
+                    break;
+                }
+                if(dsc->src_buf == NULL) {
+                    if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
+                        is_accelerated = arm_2d_fill_normal(dest_buf,
+                                                            &blend_area,
+                                                            dest_stride,
+                                                            dsc->color,
+                                                            dsc->opa,
+                                                            mask,
+                                                            mask_stride);
+                    }
+                }
+                else {
+                    if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
+                        is_accelerated = arm_2d_copy_normal(dest_buf,
+                                                            &blend_area,
+                                                            dest_stride,
+                                                            src_buf,
+                                                            src_stride,
+                                                            dsc->opa,
+                                                            mask,
+                                                            mask_stride);
+                    }
+                }
+            } while(0);
+
+            if(!is_accelerated) lv_draw_sw_blend_basic(draw_ctx, dsc);
         }
 
-        lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+        static bool LV_ATTRIBUTE_FAST_MEM arm_2d_fill_normal(lv_color_t * dest_buf,
+                                                             const lv_area_t * dest_area,
+                                                             lv_coord_t dest_stride,
+                                                             lv_color_t color,
+                                                             lv_opa_t opa,
+                                                             const lv_opa_t * mask,
+                                                             lv_coord_t mask_stride)
+        {
+            arm_2d_size_t target_size = {
+                .iWidth = lv_area_get_width(dest_area),
+                .iHeight = lv_area_get_height(dest_area),
+            };
 
-        if(disp->driver->screen_transp) {
-            break;
-        }
-        if(dsc->src_buf == NULL) {
-            if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
-                is_accelerated = arm_2d_fill_normal(dest_buf,
-                                                    &blend_area,
-                                                    dest_stride,
-                                                    dsc->color,
-                                                    dsc->opa,
-                                                    mask,
-                                                    mask_stride);
+            /*No mask*/
+            if(mask == NULL) {
+                if(opa >= LV_OPA_MAX) {
+                    __arm_2d_impl_colour_filling((color_int *)dest_buf,
+                                                 dest_stride,
+                                                 &target_size,
+                                                 color.full);
+                }
+                /*Has opacity*/
+                else {
+                    __arm_2d_impl_colour_filling_with_opacity((color_int *)dest_buf,
+                                                              dest_stride,
+                                                              &target_size,
+                                                              color.full,
+                                                              opa);
+                }
             }
-        }
-        else {
-            if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
-                is_accelerated = arm_2d_copy_normal(dest_buf,
-                                                    &blend_area,
-                                                    dest_stride,
-                                                    src_buf,
-                                                    src_stride,
-                                                    dsc->opa,
-                                                    mask,
-                                                    mask_stride);
-            }
-        }
-    } while(0);
-
-    if(!is_accelerated) lv_draw_sw_blend_basic(draw_ctx, dsc);
-}
-
-static bool LV_ATTRIBUTE_FAST_MEM arm_2d_fill_normal(lv_color_t * dest_buf,
-                                                     const lv_area_t * dest_area,
-                                                     lv_coord_t dest_stride,
-                                                     lv_color_t color,
-                                                     lv_opa_t opa,
-                                                     const lv_opa_t * mask,
-                                                     lv_coord_t mask_stride)
-{
-    arm_2d_size_t target_size = {
-        .iWidth = lv_area_get_width(dest_area),
-        .iHeight = lv_area_get_height(dest_area),
-    };
-
-    /*No mask*/
-    if(mask == NULL) {
-        if(opa >= LV_OPA_MAX) {
-            __arm_2d_impl_colour_filling((color_int *)dest_buf,
-                                         dest_stride,
-                                         &target_size,
-                                         color.full);
-        }
-        /*Has opacity*/
-        else {
-            __arm_2d_impl_colour_filling_with_opacity((color_int *)dest_buf,
-                                                      dest_stride,
-                                                      &target_size,
-                                                      color.full,
-                                                      opa);
-        }
-    }
-    /*Masked*/
-    else {
-        /*Only the mask matters*/
-        if(opa >= LV_OPA_MAX) {
-            __arm_2d_impl_colour_filling_mask((color_int *)dest_buf,
-                                              dest_stride,
-                                              (uint8_t *)mask,
-                                              mask_stride,
-                                              &target_size,
-                                              color.full);
-        }
-        /*With opacity*/
-        else {
-            __arm_2d_impl_colour_filling_mask_opacity((color_int *)dest_buf,
+            /*Masked*/
+            else {
+                /*Only the mask matters*/
+                if(opa >= LV_OPA_MAX) {
+                    __arm_2d_impl_colour_filling_mask((color_int *)dest_buf,
                                                       dest_stride,
                                                       (uint8_t *)mask,
                                                       mask_stride,
                                                       &target_size,
-                                                      color.full,
-                                                      opa);
-        }
-    }
+                                                      color.full);
+                }
+                /*With opacity*/
+                else {
+                    __arm_2d_impl_colour_filling_mask_opacity((color_int *)dest_buf,
+                                                              dest_stride,
+                                                              (uint8_t *)mask,
+                                                              mask_stride,
+                                                              &target_size,
+                                                              color.full,
+                                                              opa);
+                }
+            }
 
-    return true;
-}
-
-static bool LV_ATTRIBUTE_FAST_MEM arm_2d_copy_normal(lv_color_t * dest_buf,
-                                                     const lv_area_t * dest_area,
-                                                     lv_coord_t dest_stride,
-                                                     const lv_color_t * src_buf,
-                                                     lv_coord_t src_stride,
-                                                     lv_opa_t opa,
-                                                     const lv_opa_t * mask,
-                                                     lv_coord_t mask_stride)
-
-{
-    int32_t w = lv_area_get_width(dest_area);
-    int32_t h = lv_area_get_height(dest_area);
-
-    arm_2d_size_t copy_size = {
-        .iWidth = lv_area_get_width(dest_area),
-        .iHeight = lv_area_get_height(dest_area),
-    };
-
-    /*Simple fill (maybe with opacity), no masking*/
-    if(mask == NULL) {
-        if(opa >= LV_OPA_MAX) {
-            __arm_2d_impl_copy((color_int *)src_buf,
-                               src_stride,
-                               (color_int *)dest_buf,
-                               dest_stride,
-                               &copy_size);
-        }
-        else {
-            __arm_2d_impl_alpha_blending((color_int *)src_buf,
-                                         src_stride,
-                                         (color_int *)dest_buf,
-                                         dest_stride,
-                                         &copy_size,
-                                         opa);
-        }
-    }
-    /*Masked*/
-    else {
-        /*Only the mask matters*/
-        if(opa > LV_OPA_MAX) {
-            __arm_2d_impl_src_msk_copy((color_int *)src_buf,
-                                       src_stride,
-                                       (uint8_t *)mask,
-                                       mask_stride,
-                                       &copy_size,
-                                       (color_int *)dest_buf,
-                                       dest_stride,
-                                       &copy_size);
-        }
-        /*Handle opa and mask values too*/
-        else {
-            __arm_2d_impl_gray8_colour_filling_with_opacity((uint8_t *)mask,
-                                                            mask_stride,
-                                                            &copy_size,
-                                                            0x00,
-                                                            255 - opa);
-
-            __arm_2d_impl_src_msk_copy((color_int *)src_buf,
-                                       src_stride,
-                                       (uint8_t *)mask,
-                                       mask_stride,
-                                       &copy_size,
-                                       (color_int *)dest_buf,
-                                       dest_stride,
-                                       &copy_size);
-        }
-    }
-
-    return true;
-}
-
-static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
-                                                            const lv_draw_img_dsc_t * draw_dsc,
-                                                            const lv_area_t * coords,
-                                                            const uint8_t * src_buf,
-                                                            lv_img_cf_t cf)
-{
-    /*Use the clip area as draw area*/
-    lv_area_t draw_area;
-    lv_area_copy(&draw_area, draw_ctx->clip_area);
-    const uint8_t * src_buf_org = src_buf;
-
-    bool mask_any = lv_draw_mask_is_any(&draw_area);
-    bool transform = draw_dsc->angle != 0 || draw_dsc->zoom != LV_IMG_ZOOM_NONE ? true : false;
-
-    lv_area_t blend_area;
-    lv_draw_sw_blend_dsc_t blend_dsc;
-
-    lv_memset_00(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));
-    blend_dsc.opa = draw_dsc->opa;
-    blend_dsc.blend_mode = draw_dsc->blend_mode;
-    blend_dsc.blend_area = &blend_area;
-
-    if(lv_img_cf_is_chroma_keyed(cf)) cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
-    else if(cf == LV_IMG_CF_ALPHA_8BIT) {}
-    else if(cf == LV_IMG_CF_RGB565A8) {}
-    else if(lv_img_cf_has_alpha(cf)) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
-    else cf = LV_IMG_CF_TRUE_COLOR;
-
-    /*The simplest case just copy the pixels into the draw_buf*/
-    if(!mask_any && !transform && cf == LV_IMG_CF_TRUE_COLOR && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
-        blend_dsc.src_buf = (const lv_color_t *)src_buf;
-
-        blend_dsc.blend_area = coords;
-        lv_draw_sw_blend(draw_ctx, &blend_dsc);
-    }
-    else if(!mask_any && !transform && cf == LV_IMG_CF_ALPHA_8BIT) {
-        lv_area_t clipped_coords;
-        if(!_lv_area_intersect(&clipped_coords, coords, draw_ctx->clip_area)) return;
-
-        blend_dsc.mask_buf = (lv_opa_t *)src_buf;
-        blend_dsc.mask_area = coords;
-        blend_dsc.src_buf = NULL;
-        blend_dsc.color = draw_dsc->recolor;
-        blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-
-        blend_dsc.blend_area = coords;
-        lv_draw_sw_blend(draw_ctx, &blend_dsc);
-    }
-#if LV_COLOR_DEPTH == 16
-    else if(!mask_any && !transform && cf == LV_IMG_CF_RGB565A8 && draw_dsc->recolor_opa == LV_OPA_TRANSP &&
-            blend_dsc.opa >= LV_OPA_MAX) {
-        lv_coord_t src_w = lv_area_get_width(coords);
-        lv_coord_t src_h = lv_area_get_height(coords);
-        blend_dsc.src_buf = (const lv_color_t *)src_buf;
-        blend_dsc.mask_buf = (lv_opa_t *)src_buf;
-        blend_dsc.mask_buf += sizeof(lv_color_t) * src_w * src_h;
-        blend_dsc.blend_area = coords;
-        blend_dsc.mask_area = coords;
-        blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-        lv_draw_sw_blend(draw_ctx, &blend_dsc);
-    }
-#endif
-    /*In the other cases every pixel need to be checked one-by-one*/
-    else {
-        blend_area.x1 = draw_ctx->clip_area->x1;
-        blend_area.x2 = draw_ctx->clip_area->x2;
-        blend_area.y1 = draw_ctx->clip_area->y1;
-        blend_area.y2 = draw_ctx->clip_area->y2;
-
-        lv_coord_t src_w = lv_area_get_width(coords);
-        lv_coord_t src_h = lv_area_get_height(coords);
-        lv_coord_t blend_h = lv_area_get_height(&blend_area);
-        lv_coord_t blend_w = lv_area_get_width(&blend_area);
-
-        uint32_t max_buf_size = MAX_BUF_SIZE;
-        uint32_t blend_size = lv_area_get_size(&blend_area);
-        uint32_t buf_h;
-        uint32_t buf_w = blend_w;
-        if(blend_size <= max_buf_size) {
-            buf_h = blend_h;
-        }
-        else {
-            /*Round to full lines*/
-            buf_h = max_buf_size / blend_w;
+            return true;
         }
 
-        /*Create buffers and masks*/
-        uint32_t buf_size = buf_w * buf_h;
+        static bool LV_ATTRIBUTE_FAST_MEM arm_2d_copy_normal(lv_color_t * dest_buf,
+                                                             const lv_area_t * dest_area,
+                                                             lv_coord_t dest_stride,
+                                                             const lv_color_t * src_buf,
+                                                             lv_coord_t src_stride,
+                                                             lv_opa_t opa,
+                                                             const lv_opa_t * mask,
+                                                             lv_coord_t mask_stride)
 
-        lv_color_t * rgb_buf = lv_mem_buf_get(buf_size * sizeof(lv_color_t));
-        lv_opa_t * mask_buf = lv_mem_buf_get(buf_size);
-        blend_dsc.mask_buf = mask_buf;
-        blend_dsc.mask_area = &blend_area;
-        blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-        blend_dsc.src_buf = rgb_buf;
-        lv_coord_t y_last = blend_area.y2;
-        blend_area.y2 = blend_area.y1 + buf_h - 1;
+        {
+            int32_t w = lv_area_get_width(dest_area);
+            int32_t h = lv_area_get_height(dest_area);
 
-        lv_draw_mask_res_t mask_res_def = (cf != LV_IMG_CF_TRUE_COLOR || draw_dsc->angle ||
-                                           draw_dsc->zoom != LV_IMG_ZOOM_NONE) ?
-                                          LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
-        blend_dsc.mask_res = mask_res_def;
-
-        if(cf == LV_IMG_CF_ALPHA_8BIT) {
-            /* original code:
-               lv_color_fill(rgb_buf, draw_dsc->recolor, buf_size);
-             */
             arm_2d_size_t copy_size = {
-                .iWidth = buf_w,
-                .iHeight = buf_h,
+                .iWidth = lv_area_get_width(dest_area),
+                .iHeight = lv_area_get_height(dest_area),
             };
 
-            /* apply re-colour */
-            __arm_2d_impl_colour_filling(
-                (color_int *)rgb_buf,
-                buf_w,
-                &copy_size,
-                (color_int)draw_dsc->recolor.full);
+            /*Simple fill (maybe with opacity), no masking*/
+            if(mask == NULL) {
+                if(opa >= LV_OPA_MAX) {
+                    __arm_2d_impl_copy((color_int *)src_buf,
+                                       src_stride,
+                                       (color_int *)dest_buf,
+                                       dest_stride,
+                                       &copy_size);
+                }
+                else {
+                    __arm_2d_impl_alpha_blending((color_int *)src_buf,
+                                                 src_stride,
+                                                 (color_int *)dest_buf,
+                                                 dest_stride,
+                                                 &copy_size,
+                                                 opa);
+                }
+            }
+            /*Masked*/
+            else {
+                /*Only the mask matters*/
+                if(opa > LV_OPA_MAX) {
+                    __arm_2d_impl_src_msk_copy((color_int *)src_buf,
+                                               src_stride,
+                                               (uint8_t *)mask,
+                                               mask_stride,
+                                               &copy_size,
+                                               (color_int *)dest_buf,
+                                               dest_stride,
+                                               &copy_size);
+                }
+                /*Handle opa and mask values too*/
+                else {
+                    __arm_2d_impl_tile_copy_with_src_mask_and_opacity((color_int *)src_buf,
+                                                                      src_stride,
+                                                                      (uint8_t *)mask,
+                                                                      mask_stride,
+                                                                      &copy_size,
+                                                                      (color_int *)dest_buf,
+                                                                      dest_stride,
+                                                                      &copy_size,
+                                                                      opa);
+                }
+            }
+
+            return true;
         }
 
-        bool is_accelerated = false;
+        static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
+                                                                    const lv_draw_img_dsc_t * draw_dsc,
+                                                                    const lv_area_t * coords,
+                                                                    const uint8_t * src_buf,
+                                                                    lv_img_cf_t cf)
+        {
+            /*Use the clip area as draw area*/
+            lv_area_t draw_area;
+            lv_area_copy(&draw_area, draw_ctx->clip_area);
+            const uint8_t * src_buf_org = src_buf;
 
-        if(!transform) {
-            if(LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED == cf)  {
-                /* copy with colour keying */
+            bool mask_any = lv_draw_mask_is_any(&draw_area);
+            bool transform = draw_dsc->angle != 0 || draw_dsc->zoom != LV_IMG_ZOOM_NONE ? true : false;
+
+            lv_area_t blend_area;
+            lv_draw_sw_blend_dsc_t blend_dsc;
+
+            lv_memset_00(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));
+            blend_dsc.opa = draw_dsc->opa;
+            blend_dsc.blend_mode = draw_dsc->blend_mode;
+            blend_dsc.blend_area = &blend_area;
+
+            if(lv_img_cf_is_chroma_keyed(cf)) cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
+            else if(cf == LV_IMG_CF_ALPHA_8BIT) {}
+            else if(cf == LV_IMG_CF_RGB565A8) {}
+            else if(lv_img_cf_has_alpha(cf)) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+            else cf = LV_IMG_CF_TRUE_COLOR;
+
+            /*The simplest case just copy the pixels into the draw_buf*/
+            if(!mask_any && !transform && cf == LV_IMG_CF_TRUE_COLOR && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
+                blend_dsc.src_buf = (const lv_color_t *)src_buf;
+
+                blend_dsc.blend_area = coords;
+                lv_draw_sw_blend(draw_ctx, &blend_dsc);
+            }
+            else if(!mask_any && !transform && cf == LV_IMG_CF_ALPHA_8BIT) {
+                lv_area_t clipped_coords;
+                if(!_lv_area_intersect(&clipped_coords, coords, draw_ctx->clip_area)) return;
+
+                blend_dsc.mask_buf = (lv_opa_t *)src_buf;
+                blend_dsc.mask_area = coords;
+                blend_dsc.src_buf = NULL;
+                blend_dsc.color = draw_dsc->recolor;
+                blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+
+                blend_dsc.blend_area = coords;
+                lv_draw_sw_blend(draw_ctx, &blend_dsc);
+            }
+#if LV_COLOR_DEPTH == 16
+            else if(!mask_any && !transform && cf == LV_IMG_CF_RGB565A8 && draw_dsc->recolor_opa == LV_OPA_TRANSP &&
+                    blend_dsc.opa >= LV_OPA_MAX) {
+                lv_coord_t src_w = lv_area_get_width(coords);
+                lv_coord_t src_h = lv_area_get_height(coords);
+                blend_dsc.src_buf = (const lv_color_t *)src_buf;
+                blend_dsc.mask_buf = (lv_opa_t *)src_buf;
+                blend_dsc.mask_buf += sizeof(lv_color_t) * src_w * src_h;
+                blend_dsc.blend_area = coords;
+                blend_dsc.mask_area = coords;
+                blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                lv_draw_sw_blend(draw_ctx, &blend_dsc);
+            }
+#endif
+            /*In the other cases every pixel need to be checked one-by-one*/
+            else {
+                blend_area.x1 = draw_ctx->clip_area->x1;
+                blend_area.x2 = draw_ctx->clip_area->x2;
+                blend_area.y1 = draw_ctx->clip_area->y1;
+                blend_area.y2 = draw_ctx->clip_area->y2;
+
+                lv_coord_t src_w = lv_area_get_width(coords);
+                lv_coord_t src_h = lv_area_get_height(coords);
+                lv_coord_t blend_h = lv_area_get_height(&blend_area);
+                lv_coord_t blend_w = lv_area_get_width(&blend_area);
+
+                uint32_t max_buf_size = MAX_BUF_SIZE;
+                uint32_t blend_size = lv_area_get_size(&blend_area);
+                uint32_t buf_h;
+                uint32_t buf_w = blend_w;
+                if(blend_size <= max_buf_size) {
+                    buf_h = blend_h;
+                }
+                else {
+                    /*Round to full lines*/
+                    buf_h = max_buf_size / blend_w;
+                }
+
+                /*Create buffers and masks*/
+                uint32_t buf_size = buf_w * buf_h;
+
+                lv_color_t * rgb_buf = lv_mem_buf_get(buf_size * sizeof(lv_color_t));
+                lv_opa_t * mask_buf = lv_mem_buf_get(buf_size);
+                blend_dsc.mask_buf = mask_buf;
+                blend_dsc.mask_area = &blend_area;
+                blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                blend_dsc.src_buf = rgb_buf;
+                lv_coord_t y_last = blend_area.y2;
+                blend_area.y2 = blend_area.y1 + buf_h - 1;
+
+                lv_draw_mask_res_t mask_res_def = (cf != LV_IMG_CF_TRUE_COLOR || draw_dsc->angle ||
+                                                   draw_dsc->zoom != LV_IMG_ZOOM_NONE) ?
+                LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
+                blend_dsc.mask_res = mask_res_def;
+
+                if(cf == LV_IMG_CF_ALPHA_8BIT) {
+                    /* original code:
+                       lv_color_fill(rgb_buf, draw_dsc->recolor, buf_size);
+                     */
+                    arm_2d_size_t copy_size = {
+                        .iWidth = buf_w,
+                        .iHeight = buf_h,
+                    };
+
+                    /* apply re-colour */
+                    __arm_2d_impl_colour_filling(
+                        (color_int *)rgb_buf,
+                        buf_w,
+                        &copy_size,
+                        (color_int)draw_dsc->recolor.full);
+                }
+
+                bool is_accelerated = false;
+
+                if(!transform) {
+                    if(LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED == cf)  {
+                        /* copy with colour keying */
 
                 /* *INDENT-OFF* */
                 __RECOLOUR_WRAPPER(
@@ -1054,11 +864,11 @@ static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_
                     is_accelerated = true;
                 )
                 /* *INDENT-ON* */
-            }
-            else if((LV_COLOR_DEPTH == 32)
-                    &&     !mask_any
-                    && (LV_IMG_CF_TRUE_COLOR_ALPHA == cf)) {
-                /* accelerate copy-with-source-masks-and-opacity */
+                    }
+                    else if((LV_COLOR_DEPTH == 32)
+                            &&     !mask_any
+                            && (LV_IMG_CF_TRUE_COLOR_ALPHA == cf)) {
+                        /* accelerate copy-with-source-masks-and-opacity */
 
                 /* *INDENT-OFF* */
                 __RECOLOUR_WRAPPER(
@@ -1066,46 +876,19 @@ static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_
 
                     uint8_t * mask_temp_buf = NULL;
                     if(blend_dsc.opa < LV_OPA_MAX) {
-                        mask_temp_buf = lv_mem_buf_get(copy_size.iHeight * copy_size.iWidth);
-                        if(NULL == mask_temp_buf) {
-                            LV_LOG_WARN(
-                                "Failed to allocate memory for alpha mask,"
-                                " use normal route instead.");
-                            break;
-                        }
-                        lv_memset_00(mask_temp_buf, copy_size.iHeight * copy_size.iWidth);
-
-                        __arm_2d_impl_gray8_colour_filling_channel_mask_opacity(
-                            mask_temp_buf,
+                        __arm_2d_impl_ccca8888_tile_copy_to_cccn888_with_opacity(
+                            (uint32_t *)src_buf_tmp,
                             src_stride,
-                            (uint32_t *)
-                            ((uintptr_t)src_buf_tmp + LV_IMG_PX_SIZE_ALPHA_BYTE - 1),
-                            src_stride,
-                            &copy_size,
-                            0xFF,
-                            blend_dsc.opa);
-
-                        __arm_2d_impl_src_msk_copy(
-                            (color_int *)src_buf_tmp,
-                            src_stride,
-                            mask_temp_buf,
-                            src_stride,
-                            &copy_size,
-                            (color_int *)dest_buf,
+                            (uint32_t *)dest_buf,
                             dest_stride,
-                            &copy_size);
-
-                        lv_mem_buf_release(mask_temp_buf);
+                            &copy_size,
+                            blend_dsc.opa);
                     }
                     else {
-                        __arm_2d_impl_src_chn_msk_copy(
-                            (color_int *)src_buf_tmp,
+                        __arm_2d_impl_ccca8888_to_cccn888(
+                            (uint32_t *)src_buf_tmp,
                             src_stride,
-                            (uint32_t *)
-                            ((uintptr_t)src_buf_tmp + LV_IMG_PX_SIZE_ALPHA_BYTE - 1),
-                            src_stride,
-                            &copy_size,
-                            (color_int *)dest_buf,
+                            (uint32_t *)dest_buf,
                             dest_stride,
                             &copy_size);
                     }
@@ -1113,47 +896,28 @@ static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_
                     is_accelerated = true;
                 )
                 /* *INDENT-ON* */
-            }
-            else if(!mask_any
-                    && (LV_IMG_CF_RGB565A8 == cf)) {
-                /* accelerate copy-with-source-masks-and-opacity */
+                    }
+                    else if(!mask_any
+                            && (LV_IMG_CF_RGB565A8 == cf)) {
+                        /* accelerate copy-with-source-masks-and-opacity */
 
-                uint8_t * mask_after_rgb = src_buf + sizeof(lv_color_t) * src_w * src_h;
+                        uint8_t * mask_after_rgb = src_buf + sizeof(lv_color_t) * src_w * src_h;
                 /* *INDENT-OFF* */
                 __RECOLOUR_WRAPPER(
                     __PREPARE_LL_ACCELERATION__();
 
                     uint8_t * mask_temp_buf = NULL;
                     if(blend_dsc.opa < LV_OPA_MAX) {
-                        mask_temp_buf = lv_mem_buf_get(copy_size.iHeight * copy_size.iWidth);
-                        if(NULL == mask_temp_buf) {
-                            LV_LOG_WARN(
-                                "Failed to allocate memory for alpha mask,"
-                                " use normal route instead.");
-                            break;
-                        }
-                        lv_memset_00(mask_temp_buf, copy_size.iHeight * copy_size.iWidth);
-
-                        __arm_2d_impl_gray8_colour_filling_mask_opacity(
-                            mask_temp_buf,
+                        __arm_2d_impl_rgb565_tile_copy_with_src_mask_and_opacity(
+                            (uint16_t *)src_buf_tmp,
                             src_stride,
-                            mask_after_rgb,
+                            (uint8_t *)mask_after_rgb,
                             src_stride,
                             &copy_size,
-                            0xFF,
-                            blend_dsc.opa);
-
-                        __arm_2d_impl_src_msk_copy(
-                            (color_int *)src_buf_tmp,
-                            src_stride,
-                            mask_temp_buf,
-                            src_stride,
-                            &copy_size,
-                            (color_int *)dest_buf,
+                            (uint16_t *)dest_buf,
                             dest_stride,
-                            &copy_size);
-
-                        lv_mem_buf_release(mask_temp_buf);
+                            &copy_size,
+                            blend_dsc.opa);
                     }
                     else {
                         __arm_2d_impl_src_msk_copy(
@@ -1170,9 +934,9 @@ static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_
                     is_accelerated = true;
                 )
                 /* *INDENT-ON* */
-            }
-            else if(!mask_any && (cf == LV_IMG_CF_TRUE_COLOR)) {
-                /* accelerate copy-with-source-masks-and-opacity */
+                    }
+                    else if(!mask_any && (cf == LV_IMG_CF_TRUE_COLOR)) {
+                        /* accelerate copy-with-source-masks-and-opacity */
 
                 /* *INDENT-OFF* */
                 __RECOLOUR_WRAPPER(
@@ -1198,26 +962,26 @@ static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_
                     is_accelerated = true;
                 )
                 /* *INDENT-ON* */
-            }
-        }
-        else if(!mask_any
+                    }
+                }
+                else if(!mask_any
 #if defined(__ARM_2D_HAS_ANTI_ALIAS_TRANSFORM__) && __ARM_2D_HAS_ANTI_ALIAS_TRANSFORM__
-                && (draw_dsc->antialias == 1)
+                        && (draw_dsc->antialias == 1)
 #else
-                && (draw_dsc->antialias == 0)
+                        && (draw_dsc->antialias == 0)
 #endif
-                && (draw_dsc->recolor_opa == LV_OPA_TRANSP)
-                && (((LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED == cf)
-                     || (LV_IMG_CF_TRUE_COLOR == cf))
-                    || (LV_IMG_CF_RGB565A8 == cf)
+                        && (draw_dsc->recolor_opa == LV_OPA_TRANSP)
+                        && (((LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED == cf)
+                             || (LV_IMG_CF_TRUE_COLOR == cf))
+                            || (LV_IMG_CF_RGB565A8 == cf)
 #if defined(__ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__) &&  __ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__
-                    || ((LV_IMG_CF_TRUE_COLOR_ALPHA == cf)
-                        && (LV_COLOR_DEPTH == 32))
+                            || ((LV_IMG_CF_TRUE_COLOR_ALPHA == cf)
+                                && (LV_COLOR_DEPTH == 32))
 #endif
-                   )
-               ) {
+                           )
+                       ) {
 
-            uint8_t * mask_after_rgb = src_buf + sizeof(lv_color_t) * src_w * src_h;
+                    uint8_t * mask_after_rgb = src_buf + sizeof(lv_color_t) * src_w * src_h;
             /* *INDENT-OFF* */
             __RECOLOUR_WRAPPER(
                 /* accelerate transform without re-color */
@@ -1291,7 +1055,6 @@ static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_
                     );
                     is_accelerated = true;
                 }
-    #if ARM_2D_VERISON >= 10103
                 else if (LV_IMG_CF_TRUE_COLOR == cf) {
                     __ARM_2D_PREPARE_TRANS_AND_TARGET_REGION(
                         arm_2d_tile_transform_only_with_opacity_prepare,
@@ -1308,7 +1071,6 @@ static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_
                     );
                     is_accelerated = true;
                 }
-    #endif
                 else if (LV_IMG_CF_RGB565A8 == cf) {
                     static arm_2d_tile_t mask_tile;
                     mask_tile = source_tile;
@@ -1367,7 +1129,7 @@ static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_
     #endif
             )
             /* *INDENT-ON* */
-        }
+                }
 
         /* *INDENT-OFF* */
         if(!is_accelerated) while(blend_area.y1 <= y_last) {
@@ -1444,7 +1206,6 @@ static void lv_gpu_arm2d_wait_cb(lv_draw_ctx_t * draw_ctx)
     lv_draw_sw_wait_for_finish(draw_ctx);
 }
 
-#endif
 
 /**********************
  *   STATIC FUNCTIONS
