@@ -441,39 +441,35 @@ Below is an example for rotating when the rendering mode is
 into a **frame buffer of the LCD periphery**.
 
 .. code-block:: c
-	/*Rotate a partially rendered area to the frame buffer*/
-	void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
-	{
-	    lv_color_format_t cf = lv_display_get_color_format(disp);
-	    uint32_t px_size = lv_color_format_get_size(cf);
-
-	    /*Calculate the position of the rotated area*/
-	    lv_area_t rotated_area = *area;
-	    lv_display_rotate_area(disp, &rotated_area);
-
-	    /*Calculate the properties of the source buffer*/
-	    int32_t src_w = lv_area_get_width(area);
-	    int32_t src_h = lv_area_get_height(area);
-	    uint32_t src_stride = lv_draw_buf_width_to_stride(src_w, cf);
-
-	    /*Calculate the properties of the frame buffer*/
-	    int32_t fb_stride = lv_draw_buf_width_to_stride(disp->hor_res, cf);
-	    uint8_t * fb_start = my_fb_address;
-	    fb_start += rotated_area.y1 * fb_stride + rotated_area.x1 * px_size;
-
-	    lv_display_rotation_t rotation = lv_display_get_rotation(disp);
-	    if(rotation == LV_DISPLAY_ROTATION_0) {
-	        int32_t y;
-	        for(y = area->y1; y <= area->y2; y++) {
-	            lv_memcpy(fb_start, px_map, src_stride);
-	            px_map += src_stride;
-	            fb_start += fb_stride;
-	        }
-	    }
-	    else {
-	        lv_draw_sw_rotate(px_map, fb_start, src_w, src_h, src_stride, fb_stride, rotation, cf);
-	    }
-	}
+    /*Rotate a partially rendered area to the frame buffer*/
+    void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
+    {
+        lv_color_format_t cf = lv_display_get_color_format(disp);
+        uint32_t px_size = lv_color_format_get_size(cf);
+        /*Calculate the position of the rotated area*/
+        lv_area_t rotated_area = *area;
+        lv_display_rotate_area(disp, &rotated_area);
+        /*Calculate the properties of the source buffer*/
+        int32_t src_w = lv_area_get_width(area);
+        int32_t src_h = lv_area_get_height(area);
+        uint32_t src_stride = lv_draw_buf_width_to_stride(src_w, cf);
+        /*Calculate the properties of the frame buffer*/
+        int32_t fb_stride = lv_draw_buf_width_to_stride(disp->hor_res, cf);
+        uint8_t * fb_start = my_fb_address;
+        fb_start += rotated_area.y1 * fb_stride + rotated_area.x1 * px_size;
+        lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+        if(rotation == LV_DISPLAY_ROTATION_0) {
+            int32_t y;
+            for(y = area->y1; y <= area->y2; y++) {
+                lv_memcpy(fb_start, px_map, src_stride);
+                px_map += src_stride;
+                fb_start += fb_stride;
+            }
+        }
+        else {
+            lv_draw_sw_rotate(px_map, fb_start, src_w, src_h, src_stride, fb_stride, rotation, cf);
+        }
+    }
 
 Color Format
 ------------
