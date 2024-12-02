@@ -25,7 +25,6 @@ extern "C" {
 #include "../misc/lv_profiler.h"
 #include "../misc/lv_matrix.h"
 #include "lv_image_decoder.h"
-#include "../osal/lv_os.h"
 #include "lv_draw_buf.h"
 
 /*********************

@@ -11,6 +11,7 @@
  *      INCLUDES
  *********************/
 #include "../misc/lv_area_private.h"
+#include "../misc/lv_assert.h"
 #include "lv_draw_private.h"
 #include "sw/lv_draw_sw.h"
 #include "../display/lv_display_private.h"
@@ -31,14 +32,12 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check);
+static void lv_cleanup_task(lv_draw_task_t * t, lv_display_t * disp);
 
 static inline uint32_t get_layer_size_kb(uint32_t size_byte)
 {
     return size_byte < 1024 ? 1 : size_byte >> 10;
 }
-/**********************
- *  STATIC VARIABLES
- **********************/
 
 /**********************
  *  STATIC VARIABLES
@@ -79,7 +78,7 @@ void lv_draw_deinit(void)
 void * lv_draw_create_unit(size_t size)
 {
     lv_draw_unit_t * new_unit = lv_malloc_zeroed(size);
-
+    LV_ASSERT_MALLOC(new_unit);
     new_unit->next = _draw_info.unit_head;
     _draw_info.unit_head = new_unit;
     _draw_info.unit_cnt++;
@@ -91,7 +90,7 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_draw_task_t * new_task = lv_malloc_zeroed(sizeof(lv_draw_task_t));
-
+    LV_ASSERT_MALLOC(new_task);
     new_task->area = *coords;
     new_task->_real_area = *coords;
     new_task->clip_area = layer->_clip_area;
@@ -143,8 +142,13 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
             if(u->evaluate_cb) u->evaluate_cb(u, t);
             u = u->next;
         }
-
-        lv_draw_dispatch();
+        if(t->preferred_draw_unit_id == LV_DRAW_UNIT_NONE) {
+            LV_LOG_WARN("the draw task was not taken by any units");
+            t->state = LV_DRAW_TASK_STATE_READY;
+        }
+        else {
+            lv_draw_dispatch();
+        }
     }
     else {
         /*Let the draw units set their preference score*/
@@ -198,50 +202,15 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
     /*Remove the finished tasks first*/
     lv_draw_task_t * t_prev = NULL;
     lv_draw_task_t * t = layer->draw_task_head;
+    lv_draw_task_t * t_next;
     while(t) {
-        lv_draw_task_t * t_next = t->next;
+        t_next = t->next;
         if(t->state == LV_DRAW_TASK_STATE_READY) {
-            if(t_prev) t_prev->next = t->next;      /*Remove it by assigning the next task to the previous*/
-            else layer->draw_task_head = t_next;    /*If it was the head, set the next as head*/
-
-            /*If it was layer drawing free the layer too*/
-            if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
-                lv_draw_image_dsc_t * draw_image_dsc = t->draw_dsc;
-                lv_layer_t * layer_drawn = (lv_layer_t *)draw_image_dsc->src;
-
-                if(layer_drawn->draw_buf) {
-                    int32_t h = lv_area_get_height(&layer_drawn->buf_area);
-                    uint32_t layer_size_byte = h * layer_drawn->draw_buf->header.stride;
-
-                    _draw_info.used_memory_for_layers_kb -= get_layer_size_kb(layer_size_byte);
-                    LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB\n", _draw_info.used_memory_for_layers_kb);
-                    lv_draw_buf_destroy(layer_drawn->draw_buf);
-                    layer_drawn->draw_buf = NULL;
-                }
-
-                /*Remove the layer from  the display's*/
-                if(disp) {
-                    lv_layer_t * l2 = disp->layer_head;
-                    while(l2) {
-                        if(l2->next == layer_drawn) {
-                            l2->next = layer_drawn->next;
-                            break;
-                        }
-                        l2 = l2->next;
-                    }
-
-                    if(disp->layer_deinit) disp->layer_deinit(disp, layer_drawn);
-                    lv_free(layer_drawn);
-                }
-            }
-            lv_draw_label_dsc_t * draw_label_dsc = lv_draw_task_get_label_dsc(t);
-            if(draw_label_dsc && draw_label_dsc->text_local) {
-                lv_free((void *)draw_label_dsc->text);
-                draw_label_dsc->text = NULL;
-            }
-
-            lv_free(t->draw_dsc);
-            lv_free(t);
+            lv_cleanup_task(t, disp);
+            if(t_prev != NULL)
+                t_prev->next = t_next;
+            else
+                layer->draw_task_head = t_next;
         }
         else {
             t_prev = t;
@@ -322,14 +291,8 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
     if(_draw_info.unit_cnt <= 1) {
         lv_draw_task_t * t = layer->draw_task_head;
         while(t) {
-            /*Mark unsupported draw tasks as ready as no one else will consume them*/
-            if(t->state == LV_DRAW_TASK_STATE_QUEUED &&
-               t->preferred_draw_unit_id != LV_DRAW_UNIT_NONE &&
-               t->preferred_draw_unit_id != draw_unit_id) {
-                t->state = LV_DRAW_TASK_STATE_READY;
-            }
             /*Not queued yet, leave this layer while the first task will be queued*/
-            else if(t->state != LV_DRAW_TASK_STATE_QUEUED) {
+            if(t->state != LV_DRAW_TASK_STATE_QUEUED) {
                 t = NULL;
                 break;
             }
@@ -522,4 +485,52 @@ static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check)
     LV_PROFILER_DRAW_END;
 
     return true;
+}
+
+/**
+ * Clean-up resources allocated by a finished task
+ * @param t         pointer to a draw task
+ * @param disp      pointer to a display on which the task was drawn
+ */
+static void lv_cleanup_task(lv_draw_task_t * t, lv_display_t * disp)
+{
+    /*If it was layer drawing free the layer too*/
+    if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
+        lv_draw_image_dsc_t * draw_image_dsc = t->draw_dsc;
+        lv_layer_t * layer_drawn = (lv_layer_t *)draw_image_dsc->src;
+
+        if(layer_drawn->draw_buf) {
+            int32_t h = lv_area_get_height(&layer_drawn->buf_area);
+            uint32_t layer_size_byte = h * layer_drawn->draw_buf->header.stride;
+
+            _draw_info.used_memory_for_layers_kb -= get_layer_size_kb(layer_size_byte);
+            LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB\n", _draw_info.used_memory_for_layers_kb);
+            lv_draw_buf_destroy(layer_drawn->draw_buf);
+            layer_drawn->draw_buf = NULL;
+        }
+
+        /*Remove the layer from  the display's*/
+        if(disp) {
+            lv_layer_t * l2 = disp->layer_head;
+            while(l2) {
+                if(l2->next == layer_drawn) {
+                    l2->next = layer_drawn->next;
+                    break;
+                }
+                l2 = l2->next;
+            }
+
+            if(disp->layer_deinit) disp->layer_deinit(disp, layer_drawn);
+            lv_free(layer_drawn);
+        }
+    }
+    lv_draw_label_dsc_t * draw_label_dsc = lv_draw_task_get_label_dsc(t);
+    if(draw_label_dsc && draw_label_dsc->text_local) {
+        lv_free((void *)draw_label_dsc->text);
+        draw_label_dsc->text = NULL;
+    }
+
+    lv_free(t->draw_dsc);
+    lv_free(t);
+
 }

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_draw_sw_blend_to_rgb888.c
  *
  */
@@ -9,7 +9,7 @@
 #include "lv_draw_sw_blend_to_rgb888.h"
 #if LV_USE_DRAW_SW
 
-#if LV_DRAW_SW_SUPPORT_RGB888
+#if LV_DRAW_SW_SUPPORT_RGB888 || LV_DRAW_SW_SUPPORT_XRGB8888
 
 #include "lv_draw_sw_blend_private.h"
 #include "../../../misc/lv_math.h"
@@ -980,6 +980,6 @@ static inline void * LV_ATTRIBUTE_FAST_MEM drawbuf_next_row(const void * buf, ui
     return (void *)((uint8_t *)buf + stride);
 }
 
-#endif
+#endif /*LV_DRAW_SW_SUPPORT_RGB888 || LV_DRAW_SW_SUPPORT_XRGB8888*/
 
-#endif
+#endif /*LV_USE_DRAW_SW*/

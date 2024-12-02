@@ -1,6 +1,8 @@
 #include "lv_draw_dave2d.h"
 #if LV_USE_DRAW_DAVE2D
 
+#include "../../../misc/lv_area_private.h"
+
 static void dave2d_draw_border_complex(lv_draw_dave2d_unit_t * draw_unit, const lv_area_t * outer_area,
                                        const lv_area_t * inner_area,
                                        int32_t rout, int32_t rin, lv_color_t color, lv_opa_t opa);

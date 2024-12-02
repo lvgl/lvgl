@@ -55,6 +55,7 @@ static void allocate_button_areas_and_controls(const lv_obj_t * obj, const char 
 static void invalidate_button_area(const lv_obj_t * obj, uint32_t btn_idx);
 static void make_one_button_checked(lv_obj_t * obj, uint32_t btn_idx);
 static bool has_popovers_in_top_row(lv_obj_t * obj);
+static bool button_is_recolor(lv_buttonmatrix_ctrl_t ctrl_bits);
 
 /**********************
  *  STATIC VARIABLES
@@ -318,7 +319,7 @@ const char * lv_buttonmatrix_get_button_text(const lv_obj_t * obj, uint32_t btn_
     if(btn_id == LV_BUTTONMATRIX_BUTTON_NONE) return NULL;
 
     lv_buttonmatrix_t * btnm = (lv_buttonmatrix_t *)obj;
-    if(btn_id > btnm->btn_cnt) return NULL;
+    if(btn_id >= btnm->btn_cnt) return NULL;
 
     uint32_t txt_i = 0;
     uint32_t btn_i = 0;
@@ -455,14 +456,17 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
         }
     }
     else if(code == LV_EVENT_PRESSING) {
-        /*If a slid to a new button, discard the current button and don't press any buttons*/
         if(btnm->btn_id_sel != LV_BUTTONMATRIX_BUTTON_NONE) {
             lv_indev_t * indev = lv_event_get_indev(e);
-            lv_indev_get_point(indev, &p);
-            uint32_t btn_pr = get_button_from_point(obj, &p);
-            if(btn_pr != btnm->btn_id_sel) {
-                invalidate_button_area(obj, btnm->btn_id_sel); /*Invalidate the old area*/
-                btnm->btn_id_sel = LV_BUTTONMATRIX_BUTTON_NONE;
+            lv_indev_type_t indev_type = lv_indev_get_type(indev);
+            if(indev_type == LV_INDEV_TYPE_POINTER || indev_type == LV_INDEV_TYPE_BUTTON) {
+                /*If pointer device slid to a new button, discard the current button and don't press any buttons*/
+                lv_indev_get_point(indev, &p);
+                uint32_t btn_pr = get_button_from_point(obj, &p);
+                if(btn_pr != btnm->btn_id_sel) {
+                    invalidate_button_area(obj, btnm->btn_id_sel); /*Invalidate the old area*/
+                    btnm->btn_id_sel = LV_BUTTONMATRIX_BUTTON_NONE;
+                }
             }
         }
     }
@@ -748,6 +752,10 @@ static void draw_main(lv_event_t * e)
             obj->state = state_ori;
             obj->skip_trans = 0;
         }
+
+        bool recolor = button_is_recolor(btnm->ctrl_bits[btn_i]);
+        if(recolor) draw_label_dsc_act.flag |= LV_TEXT_FLAG_RECOLOR;
+        else draw_label_dsc_act.flag &= ~LV_TEXT_FLAG_RECOLOR;
 
         draw_rect_dsc_act.base.id1 = btn_i;
 
@@ -1040,6 +1048,11 @@ static bool has_popovers_in_top_row(lv_obj_t * obj)
     }
 
     return false;
+}
+
+static bool button_is_recolor(lv_buttonmatrix_ctrl_t ctrl_bits)
+{
+    return (ctrl_bits & LV_BUTTONMATRIX_CTRL_RECOLOR) ? true : false;
 }
 
 #endif

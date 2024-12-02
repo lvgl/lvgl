@@ -64,6 +64,7 @@ void lv_draw_dma2d_init(void)
     draw_dma2d_unit->base_unit.evaluate_cb = evaluate_cb;
     draw_dma2d_unit->base_unit.dispatch_cb = dispatch_cb;
     draw_dma2d_unit->base_unit.delete_cb = delete_cb;
+    draw_dma2d_unit->base_unit.name = "DMA2D";
 
 #if LV_DRAW_DMA2D_ASYNC
     g_unit = draw_dma2d_unit;
@@ -291,7 +292,8 @@ static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
             break;
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * dsc = task->draw_dsc;
-                if(!(dsc->clip_radius == 0
+                if(!(dsc->header.cf < LV_COLOR_FORMAT_PROPRIETARY_START
+                     && dsc->clip_radius == 0
                      && dsc->bitmap_mask_src == NULL
                      && dsc->sup == NULL
                      && dsc->tile == 0

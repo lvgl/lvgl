@@ -738,7 +738,7 @@ static bool lv_text_get_snippet(const char * txt, const lv_font_t * font,
     real_max_width++;
 #endif
 
-    uint32_t ofs = lv_text_get_next_line(txt, font, letter_space, real_max_width, use_width, flag);
+    uint32_t ofs = lv_text_get_next_line(txt, LV_TEXT_LEN_MAX, font, letter_space, real_max_width, use_width, flag);
     *end_ofs = ofs;
 
     if(txt[ofs] == '\0' && *use_width < max_width && !(ofs && (txt[ofs - 1] == '\n' || txt[ofs - 1] == '\r'))) {
@@ -1018,16 +1018,11 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
             if(last_snippet->txt[last_snippet->bytes] == '\0') {
                 next_line_h = 0;
                 lv_span_t * next_span = lv_ll_get_next(&spans->child_ll, last_snippet->span);
-                if(next_span) { /* have the next line */
+                if(next_span && next_span->txt && next_span->txt[0]) { /* have the next line */
                     next_line_h = lv_font_get_line_height(lv_span_get_style_text_font(obj, next_span)) + line_space;
                 }
             }
             if(txt_pos.y + max_line_h + next_line_h - line_space > coords.y2 + 1) { /* for overflow if is end line. */
-                if(last_snippet->txt[last_snippet->bytes] != '\0') {
-                    last_snippet->bytes = lv_strlen(last_snippet->txt);
-                    last_snippet->txt_w = lv_text_get_width(last_snippet->txt, last_snippet->bytes, last_snippet->font,
-                                                            last_snippet->letter_space);
-                }
                 ellipsis_valid = spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS;
                 is_end_line = true;
             }
@@ -1076,76 +1071,45 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
             }
             uint32_t txt_bytes = pinfo->bytes;
 
-            /* overflow */
-            uint32_t dot_letter_w = 0;
+            if(pos.x > clip_area.x2) {
+                continue;
+            }
+
+            label_draw_dsc.text = bidi_txt;
+            label_draw_dsc.text_length = txt_bytes;
+            label_draw_dsc.letter_space = pinfo->letter_space;
+            label_draw_dsc.decor = lv_span_get_style_text_decor(obj, pinfo->span);
+            lv_area_t a;
+            a.x1 = pos.x;
+            a.y1 = pos.y;
+            a.x2 = a.x1 + pinfo->txt_w;
+            a.y2 = a.y1 + pinfo->line_h;
+
+            bool need_draw_ellipsis = false;
             uint32_t dot_width = 0;
+            /* deal overflow */
             if(ellipsis_valid) {
-                dot_letter_w = lv_font_get_glyph_width(pinfo->font, '.', '.');
+                uint32_t dot_letter_w = lv_font_get_glyph_width(pinfo->font, '.', '.');
                 dot_width = dot_letter_w * 3;
-            }
-            int32_t ellipsis_width = coords.x1 + max_width - dot_width;
 
-            uint32_t j = 0;
-            while(j < txt_bytes) {
-                /* skip invalid fields */
-                if(pos.x > clip_area.x2) {
-                    break;
-                }
-                uint32_t letter      = lv_text_encoded_next(bidi_txt, &j);
-                uint32_t letter_next = lv_text_encoded_next(&bidi_txt[j], NULL);
-                int32_t letter_w = lv_font_get_glyph_width(pinfo->font, letter, letter_next);
-
-                /* skip invalid fields */
-                if(pos.x + letter_w + pinfo->letter_space < clip_area.x1) {
-                    if(letter_w > 0) {
-                        pos.x = pos.x + letter_w + pinfo->letter_space;
-                    }
-                    continue;
-                }
-
-                if(ellipsis_valid && pos.x + letter_w + pinfo->letter_space > ellipsis_width) {
-                    for(int ell = 0; ell < 3; ell++) {
-                        lv_draw_character(layer, &label_draw_dsc, &pos, '.');
-                        pos.x = pos.x + dot_letter_w + pinfo->letter_space;
-                    }
-                    if(pos.x <= ellipsis_width) {
-                        pos.x = ellipsis_width + 1;
-                    }
-                    break;
-                }
-                else {
-                    lv_draw_character(layer, &label_draw_dsc, &pos, letter);
-                    if(letter_w > 0) {
-                        pos.x = pos.x + letter_w + pinfo->letter_space;
-                    }
-                }
+                label_draw_dsc.flag = LV_TEXT_FLAG_BREAK_ALL;
+                uint32_t next_ofs;
+                need_draw_ellipsis = lv_text_get_snippet(pinfo->txt, pinfo->font, pinfo->letter_space, coords.x2 - a.x1 - dot_width,
+                                                         label_draw_dsc.flag, &pinfo->txt_w, &next_ofs);
+                a.x2 = a.x1 + pinfo->txt_w;
+                label_draw_dsc.text_length = next_ofs + 1;
             }
 
-            /* draw decor */
-            lv_text_decor_t decor = lv_span_get_style_text_decor(obj, pinfo->span);
-            if(decor != LV_TEXT_DECOR_NONE) {
-                lv_draw_line_dsc_t line_dsc;
-                lv_draw_line_dsc_init(&line_dsc);
-                line_dsc.color = label_draw_dsc.color;
-                line_dsc.width = label_draw_dsc.font->underline_thickness ? pinfo->font->underline_thickness : 1;
-                line_dsc.opa = label_draw_dsc.opa;
-                line_dsc.blend_mode = label_draw_dsc.blend_mode;
+            lv_draw_label(layer, &label_draw_dsc, &a);
 
-                if(decor & LV_TEXT_DECOR_STRIKETHROUGH) {
-                    int32_t y = pos.y + ((pinfo->line_h - line_space) >> 1)  + (line_dsc.width >> 1);
-                    lv_point_precise_set(&line_dsc.p1, txt_pos.x, y);
-                    lv_point_precise_set(&line_dsc.p2, pos.x, y);
-                    lv_draw_line(layer, &line_dsc);
-                }
-
-                if(decor & LV_TEXT_DECOR_UNDERLINE) {
-                    int32_t y = pos.y + pinfo->line_h - line_space - pinfo->font->base_line - pinfo->font->underline_position;
-                    lv_point_precise_set(&line_dsc.p1, txt_pos.x, y);
-                    lv_point_precise_set(&line_dsc.p2, pos.x, y);
-                    lv_draw_line(layer, &line_dsc);
-                }
+            if(need_draw_ellipsis) {
+                label_draw_dsc.text = "...";
+                a.x1 = a.x2;
+                a.x2 = a.x1 + dot_width;
+                lv_draw_label(layer, &label_draw_dsc, &a);
             }
-            txt_pos.x = pos.x;
+
+            txt_pos.x = a.x2;
         }
 
 Next_line_init:

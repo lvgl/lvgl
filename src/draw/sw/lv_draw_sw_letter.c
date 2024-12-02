@@ -84,14 +84,19 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_unit_t * draw_unit, lv_
             case LV_FONT_GLYPH_FORMAT_A1:
             case LV_FONT_GLYPH_FORMAT_A2:
             case LV_FONT_GLYPH_FORMAT_A4:
-            case LV_FONT_GLYPH_FORMAT_A8: {
+            case LV_FONT_GLYPH_FORMAT_A8:
+            case LV_FONT_GLYPH_FORMAT_A1_ALIGNED:
+            case LV_FONT_GLYPH_FORMAT_A2_ALIGNED:
+            case LV_FONT_GLYPH_FORMAT_A4_ALIGNED:
+            case LV_FONT_GLYPH_FORMAT_A8_ALIGNED: {
+                    glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                     lv_area_t mask_area = *glyph_draw_dsc->letter_coords;
                     mask_area.x2 = mask_area.x1 + lv_draw_buf_width_to_stride(lv_area_get_width(&mask_area), LV_COLOR_FORMAT_A8) - 1;
                     lv_draw_sw_blend_dsc_t blend_dsc;
                     lv_memzero(&blend_dsc, sizeof(blend_dsc));
                     blend_dsc.color = glyph_draw_dsc->color;
                     blend_dsc.opa = glyph_draw_dsc->opa;
-                    lv_draw_buf_t * draw_buf = glyph_draw_dsc->glyph_data;
+                    const lv_draw_buf_t * draw_buf = glyph_draw_dsc->glyph_data;
                     blend_dsc.mask_buf = draw_buf->data;
                     blend_dsc.mask_area = &mask_area;
                     blend_dsc.mask_stride = draw_buf->header.stride;
@@ -102,6 +107,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_unit_t * draw_unit, lv_
                 }
                 break;
             case LV_FONT_GLYPH_FORMAT_IMAGE: {
+                    glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                     lv_draw_image_dsc_t img_dsc;
                     lv_draw_image_dsc_init(&img_dsc);
                     img_dsc.rotation = 0;

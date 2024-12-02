@@ -33,6 +33,7 @@ typedef struct {
     lv_draw_dsc_base_t base;
 
     const char * text;
+    uint32_t text_length;
     const lv_font_t * font;
     uint32_t sel_start;
     uint32_t sel_end;
@@ -53,6 +54,11 @@ typedef struct {
      * < 1: malloc buffer and copy `text` there.
      * 0: `text` is const and it's pointer will be valid during rendering.*/
     uint8_t text_local : 1;
+
+    /**
+     * Indicate that the text is constant and its pointer can be safely saved e.g. in a cache.
+     */
+    uint8_t text_static : 1;
     lv_draw_label_hint_t * hint;
 } lv_draw_label_dsc_t;
 

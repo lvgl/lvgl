@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_windows_input.c
  *
  */

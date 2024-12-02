@@ -80,6 +80,7 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
                                 lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area)
 {
     if(glyph_draw_dsc) {
+
         switch(glyph_draw_dsc->format) {
 
             case LV_FONT_GLYPH_FORMAT_NONE: {
@@ -94,7 +95,7 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
 #endif
                 }
                 break;
-            case LV_FONT_GLYPH_FORMAT_A1 ... LV_FONT_GLYPH_FORMAT_A8: {
+            case LV_FONT_GLYPH_FORMAT_A1 ... LV_FONT_GLYPH_FORMAT_A8_ALIGNED: {
                     /*Do not draw transparent things*/
                     if(glyph_draw_dsc->opa <= LV_OPA_MIN)
                         return;
@@ -106,7 +107,7 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
                         return;
                     lv_area_move(&blend_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
-                    const lv_draw_buf_t * draw_buf = glyph_draw_dsc->glyph_data;
+                    const lv_draw_buf_t * draw_buf = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                     const void * mask_buf = draw_buf->data;
 
                     uint32_t mask_width = lv_area_get_width(glyph_draw_dsc->letter_coords);
@@ -132,6 +133,7 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
                 break;
             case LV_FONT_GLYPH_FORMAT_IMAGE: {
 #if LV_USE_IMGFONT
+                    glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
                     lv_draw_image_dsc_t img_dsc;
                     lv_draw_image_dsc_init(&img_dsc);
                     img_dsc.opa = glyph_draw_dsc->opa;

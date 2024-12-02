@@ -5,10 +5,10 @@ import re
 import sys
 
 props = [
-{'section': 'Size and position', 'dsc':'Properties related to size, position, alignment and layout of the objects.' },
+{'section': 'Size and position', 'dsc':'Properties related to size, position, alignment and layout of Widgets.' },
 {'name': 'WIDTH',
  'style_type': 'num',   'var_type': 'int32_t' , 'default':'Widget dependent', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Sets the width of object. Pixel, percentage and `LV_SIZE_CONTENT` values can be used. Percentage values are relative to the width of the parent's content area."},
+ 'dsc': "Sets width of Widget. Pixel, percentage and `LV_SIZE_CONTENT` values can be used. Percentage values are relative to the width of the parent's content area."},
 
 {'name': 'MIN_WIDTH',
  'style_type': 'num',   'var_type': 'int32_t' , 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
@@ -20,7 +20,7 @@ props = [
 
 {'name': 'HEIGHT',
  'style_type': 'num',   'var_type': 'int32_t' , 'default':'Widget dependent', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Sets the height of object. Pixel, percentage and `LV_SIZE_CONTENT` can be used. Percentage values are relative to the height of the parent's content area."},
+ 'dsc': "Sets height of Widget. Pixel, percentage and `LV_SIZE_CONTENT` can be used. Percentage values are relative to the height of the parent's content area."},
 
 {'name': 'MIN_HEIGHT',
  'style_type': 'num',   'var_type': 'int32_t' , 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
@@ -32,63 +32,67 @@ props = [
 
 {'name': 'LENGTH',
  'style_type': 'num',   'var_type': 'int32_t' , 'default':'0', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Its meaning depends on the type of the widget. For example in case of lv_scale it means the length of the ticks."},
+ 'dsc': "Its meaning depends on the type of Widget. For example in case of lv_scale it means the length of the ticks."},
 
 {'name': 'X',
  'style_type': 'num',   'var_type': 'int32_t' , 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set the X coordinate of the object considering the set `align`. Pixel and percentage values can be used. Percentage values are relative to the width of the parent's content area."},
+ 'dsc': "Set X coordinate of Widget considering the ``align`` setting. Pixel and percentage values can be used. Percentage values are relative to the width of the parent's content area."},
 
 {'name': 'Y',
  'style_type': 'num',   'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set the Y coordinate of the object considering the set `align`. Pixel and percentage values can be used. Percentage values are relative to the height of the parent's content area."},
+ 'dsc': "Set Y coordinate of Widget considering the ``align`` setting. Pixel and percentage values can be used. Percentage values are relative to the height of the parent's content area."},
 
 {'name': 'ALIGN',
  'style_type': 'num',   'var_type': 'lv_align_t', 'default':'`LV_ALIGN_DEFAULT`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set the alignment which tells from which point of the parent the X and Y coordinates should be interpreted. The possible values are: `LV_ALIGN_DEFAULT`, `LV_ALIGN_TOP_LEFT/MID/RIGHT`, `LV_ALIGN_BOTTOM_LEFT/MID/RIGHT`, `LV_ALIGN_LEFT/RIGHT_MID`, `LV_ALIGN_CENTER`. `LV_ALIGN_DEFAULT` means `LV_ALIGN_TOP_LEFT` with LTR base direction and `LV_ALIGN_TOP_RIGHT` with RTL base direction."},
+ 'dsc': "Set the alignment which tells from which point of the parent the X and Y coordinates should be interpreted. Possible values are: `LV_ALIGN_DEFAULT`, `LV_ALIGN_TOP_LEFT/MID/RIGHT`, `LV_ALIGN_BOTTOM_LEFT/MID/RIGHT`, `LV_ALIGN_LEFT/RIGHT_MID`, `LV_ALIGN_CENTER`. `LV_ALIGN_DEFAULT` means `LV_ALIGN_TOP_LEFT` with LTR base direction and `LV_ALIGN_TOP_RIGHT` with RTL base direction."},
 
 {'name': 'TRANSFORM_WIDTH',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Make the object wider on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width." },
+ 'dsc': "Make Widget wider on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to Widget's width." },
 
 {'name': 'TRANSFORM_HEIGHT',
   'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Make the object higher on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height." },
+ 'dsc': "Make Widget higher on both sides with this value. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to Widget's height." },
 
 {'name': 'TRANSLATE_X',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Move the object with this value in X direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's width." },
+ 'dsc': "Move Widget with this value in X direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to Widget's width." },
 
 {'name': 'TRANSLATE_Y',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Move the object with this value in Y direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height." },
+ 'dsc': "Move Widget with this value in Y direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to Widget's height." },
+
+{'name': 'TRANSLATE_RADIAL',
+'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Move object around the centre of the parent object (e.g. around the circumference of a scale)"},
 
 {'name': 'TRANSFORM_SCALE_X',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
- 'dsc': "Zoom an objects horizontally. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on" },
+ 'dsc': "Zoom Widget horizontally. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on" },
 
 {'name': 'TRANSFORM_SCALE_Y',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
- 'dsc': "Zoom an objects vertically. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on" },
+ 'dsc': "Zoom Widget vertically. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on" },
 
 {'name': 'TRANSFORM_ROTATION',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
- 'dsc': "Rotate an objects. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg."},
+ 'dsc': "Rotate Widget. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg."},
 
 {'name': 'TRANSFORM_PIVOT_X',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the pivot point's X coordinate for transformations. Relative to the object's top left corner'"},
+ 'dsc': "Set pivot point's X coordinate for transformations. Relative to Widget's top left corner'"},
 
 {'name': 'TRANSFORM_PIVOT_Y',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the pivot point's Y coordinate for transformations. Relative to the object's top left corner'"},
+ 'dsc': "Set pivot point's Y coordinate for transformations. Relative to Widget's top left corner'"},
 
 {'name': 'TRANSFORM_SKEW_X',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
- 'dsc': "Skew an object horizontally. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg."},
+ 'dsc': "Skew Widget horizontally. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg."},
 
 {'name': 'TRANSFORM_SKEW_Y',
   'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
-  'dsc': "Skew an object vertically. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg."},
+  'dsc': "Skew Widget vertically. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg."},
 
 {'section': 'Padding', 'dsc' : "Properties to describe spacing between the parent's sides and the children and among the children. Very similar to the padding properties in HTML."},
 {'name': 'PAD_TOP',
@@ -115,59 +119,63 @@ props = [
  'style_type': 'num',   'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets the padding between the columns. Used by the layouts."},
 
-{'section': 'Margin', 'dsc' : "Properties to describe spacing around an object. Very similar to the margin properties in HTML."},
+{'name': 'PAD_RADIAL',
+'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Pad text labels away from the scale ticks/remainder of the ``LV_PART_``"},
+
+{'section': 'Margin', 'dsc' : "Properties to describe spacing around a Widget. Very similar to the margin properties in HTML."},
 {'name': 'MARGIN_TOP',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Sets the margin on the top. The object will keep this space from its siblings in layouts. "},
+ 'dsc': "Sets margin on the top. Widget will keep this space from its siblings in layouts."},
 
 {'name': 'MARGIN_BOTTOM',
  'style_type': 'num',   'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Sets the margin on the bottom. The object will keep this space from its siblings in layouts."},
+ 'dsc': "Sets margin on the bottom. Widget will keep this space from its siblings in layouts."},
 
 {'name': 'MARGIN_LEFT',
  'style_type': 'num',   'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Sets the margin on the left. The object will keep this space from its siblings in layouts."},
+ 'dsc': "Sets margin on the left. Widget will keep this space from its siblings in layouts."},
 
 {'name': 'MARGIN_RIGHT',
   'style_type': 'num',   'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Sets the margin on the right. The object will keep this space from its siblings in layouts."},
+ 'dsc': "Sets margin on the right. Widget will keep this space from its siblings in layouts."},
 
-{'section': 'Background', 'dsc':'Properties to describe the background color and image of the objects.' },
+{'section': 'Background', 'dsc':'Properties to describe the background color and image of Widget.' },
 {'name': 'BG_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t', 'default':'`0xffffff`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
- 'dsc': "Set the background color of the object."},
+ 'dsc': "Set background color of Widget."},
 
 {'name': 'BG_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`LV_OPA_TRANSP`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the opacity of the background. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
+ 'dsc': "Set opacity of the background. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
 {'name': 'BG_GRAD_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
- 'dsc': "Set the gradient color of the background. Used only if `grad_dir` is not `LV_GRAD_DIR_NONE`"},
+ 'dsc': "Set gradient color of the background. Used only if `grad_dir` is not `LV_GRAD_DIR_NONE`"},
 
 {'name': 'BG_GRAD_DIR',
  'style_type': 'num',   'var_type': 'lv_grad_dir_t',  'default':'`LV_GRAD_DIR_NONE`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the direction of the gradient of the background. The possible values are `LV_GRAD_DIR_NONE/HOR/VER`."},
+ 'dsc': "Set direction of the gradient of the background. Possible values are `LV_GRAD_DIR_NONE/HOR/VER`."},
 
 {'name': 'BG_MAIN_STOP',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the point from which the background color should start for gradients. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on"},
+ 'dsc': "Set point from which background color should start for gradients. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on"},
 
 {'name': 'BG_GRAD_STOP',
  'style_type': 'num',   'var_type': 'int32_t',  'default':255, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the point from which the background's gradient color should start. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on"},
+ 'dsc': "Set point from which background's gradient color should start. 0 means to top/left side, 255 the bottom/right side, 128 the center, and so on"},
 
 {'name': 'BG_MAIN_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':255, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the opacity of the first gradient color"},
+ 'dsc': "Set opacity of the first gradient color"},
 
 {'name': 'BG_GRAD_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':255, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the opacity of the second gradient color"},
+ 'dsc': "Set opacity of the second gradient color"},
 
 {'name': 'BG_GRAD',
  'style_type': 'ptr',   'var_type': 'const lv_grad_dsc_t *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the gradient definition. The pointed instance must exist while the object is alive. NULL to disable. It wraps `BG_GRAD_COLOR`, `BG_GRAD_DIR`, `BG_MAIN_STOP` and `BG_GRAD_STOP` into one descriptor and allows creating gradients with more colors too. If it's set other gradient related properties will be ignored'"},
+ 'dsc': "Set gradient definition. The pointed instance must exist while Widget is alive. NULL to disable. It wraps `BG_GRAD_COLOR`, `BG_GRAD_DIR`, `BG_MAIN_STOP` and `BG_GRAD_STOP` into one descriptor and allows creating gradients with more colors as well. If it's set other gradient related properties will be ignored'"},
 
 {'name': 'BG_IMAGE_SRC',
  'style_type': 'ptr',   'var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
@@ -175,7 +183,7 @@ props = [
 
 {'name': 'BG_IMAGE_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the opacity of the background image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
+ 'dsc': "Set opacity of the background image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
 {'name': 'BG_IMAGE_RECOLOR',
  'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
@@ -183,28 +191,28 @@ props = [
 
 {'name': 'BG_IMAGE_RECOLOR_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`LV_OPA_TRANSP`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the intensity of background image recoloring. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means no mixing, 255, `LV_OPA_100` or `LV_OPA_COVER` means full recoloring, other values or LV_OPA_10, LV_OPA_20, etc are interpreted proportionally."},
+ 'dsc': "Set intensity of background image recoloring. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means no mixing, 255, `LV_OPA_100` or `LV_OPA_COVER` means full recoloring, other values or LV_OPA_10, LV_OPA_20, etc are interpreted proportionally."},
 
 {'name': 'BG_IMAGE_TILED',
  'style_type': 'num',   'var_type': 'bool',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "If enabled the background image will be tiled. The possible values are `true` or `false`."},
+ 'dsc': "If enabled the background image will be tiled. Possible values are `true` or `false`."},
 
 {'section': 'Border', 'dsc':'Properties to describe the borders' },
 {'name': 'BORDER_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
- 'dsc': "Set the color of the border"},
+ 'dsc': "Set color of the border"},
 
 {'name': 'BORDER_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the opacity of the border. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
+ 'dsc': "Set opacity of the border. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
 {'name': 'BORDER_WIDTH',
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set the width of the border. Only pixel values can be used."},
+ 'dsc': "Set width of the border. Only pixel values can be used."},
 
 {'name': 'BORDER_SIDE',
  'style_type': 'num',   'var_type': 'lv_border_side_t',  'default':'`LV_BORDER_SIDE_NONE`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set only which side(s) the border should be drawn. The possible values are `LV_BORDER_SIDE_NONE/TOP/BOTTOM/LEFT/RIGHT/INTERNAL`. OR-ed values can be used as well, e.g. `LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT`."},
+ 'dsc': "Set only which side(s) the border should be drawn. Possible values are `LV_BORDER_SIDE_NONE/TOP/BOTTOM/LEFT/RIGHT/INTERNAL`. OR-ed values can be used as well, e.g. `LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT`."},
 
 {'name': 'BORDER_POST',
 'style_type': 'num',   'var_type': 'bool' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -213,137 +221,141 @@ props = [
 {'section': 'Outline', 'dsc':'Properties to describe the outline. It\'s like a border but drawn outside of the rectangles.' },
 {'name': 'OUTLINE_WIDTH',
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Set the width of the outline in pixels. "},
+ 'dsc': "Set width of outline in pixels. "},
 
 {'name': 'OUTLINE_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
- 'dsc': "Set the color of the outline."},
+ 'dsc': "Set color of outline."},
 
 {'name': 'OUTLINE_OPA',
 'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Set the opacity of the outline. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
+ 'dsc': "Set opacity of outline. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
 {'name': 'OUTLINE_PAD',
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Set the padding of the outline, i.e. the gap between object and the outline."},
+ 'dsc': "Set padding of outline, i.e. the gap between Widget and the outline."},
 
 {'section': 'Shadow', 'dsc':'Properties to describe the shadow drawn under the rectangles.' },
 {'name': 'SHADOW_WIDTH',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Set the width of the shadow in pixels. The value should be >= 0."},
+ 'dsc': "Set width of the shadow in pixels. The value should be >= 0."},
 
 {'name': 'SHADOW_OFFSET_X',
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Set an offset on the shadow in pixels in X direction. "},
+ 'dsc': "Set an offset on the shadow in pixels in X direction."},
 
 {'name': 'SHADOW_OFFSET_Y',
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Set an offset on the shadow in pixels in Y direction. "},
+ 'dsc': "Set an offset on the shadow in pixels in Y direction."},
 
 {'name': 'SHADOW_SPREAD',
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Make the shadow calculation to use a larger or smaller rectangle as base. The value can be in pixel to make the area larger/smaller"},
+ 'dsc': "Make shadow calculation to use a larger or smaller rectangle as base. The value can be in pixels to make the area larger/smaller"},
 
 {'name': 'SHADOW_COLOR',
   'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
- 'dsc': "Set the color of the shadow"},
+ 'dsc': "Set color of shadow"},
 
 {'name': 'SHADOW_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Set the opacity of the shadow. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
+ 'dsc': "Set opacity of shadow. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
 {'section': 'Image', 'dsc':'Properties to describe the images' },
 {'name': 'IMAGE_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the opacity of an image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
+ 'dsc': "Set opacity of an image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
 {'name': 'IMAGE_RECOLOR',
  'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
- 'dsc': "Set color to mixt to the image."},
+ 'dsc': "Set color to mix with the image."},
 
 {'name': 'IMAGE_RECOLOR_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the intensity of the color mixing. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
+ 'dsc': "Set intensity of color mixing. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
-{'section': 'Line', 'dsc':'Properties to describe line-like objects' },
+{'section': 'Line', 'dsc':'Properties to describe line-like Widgets' },
 {'name': 'LINE_WIDTH',
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Set the width of the lines in pixel."},
+ 'dsc': "Set width of lines in pixels."},
 
 {'name': 'LINE_DASH_WIDTH',
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the width of dashes in pixel. Note that dash works only on horizontal and vertical lines"},
+ 'dsc': "Set width of dashes in pixels. Note that dash works only on horizontal and vertical lines"},
 
 {'name': 'LINE_DASH_GAP',
  'style_type': 'num',   'var_type': 'int32_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the gap between dashes in pixel. Note that dash works only on horizontal and vertical lines"},
+ 'dsc': "Set gap between dashes in pixels. Note that dash works only on horizontal and vertical lines"},
 
 {'name': 'LINE_ROUNDED',
  'style_type': 'num',   'var_type': 'bool' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Make the end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending "},
+ 'dsc': "Make end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending "},
 
 {'name': 'LINE_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
- 'dsc': "Set the color of the lines."},
+ 'dsc': "Set color of lines."},
 
 {'name': 'LINE_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the opacity of the lines."},
+ 'dsc': "Set opacity of lines."},
 
 {'section': 'Arc', 'dsc':'TODO' },
 {'name': 'ARC_WIDTH',
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Set the width (thickness) of the arcs in pixel."},
+ 'dsc': "Set width (thickness) of arcs in pixels."},
 
 {'name': 'ARC_ROUNDED',
  'style_type': 'num',   'var_type': 'bool' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Make the end points of the arcs rounded. `true`: rounded, `false`: perpendicular line ending "},
+ 'dsc': "Make end points of arcs rounded. `true`: rounded, `false`: perpendicular line ending "},
 
 {'name': 'ARC_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
- 'dsc': "Set the color of the arc."},
+ 'dsc': "Set color of arc."},
 
 {'name': 'ARC_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the opacity of the arcs."},
+ 'dsc': "Set opacity of arcs."},
 
 {'name': 'ARC_IMAGE_SRC',
  'style_type': 'ptr',   'var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set an image from which the arc will be masked out. It's useful to display complex effects on the arcs. Can be a pointer to `lv_image_dsc_t` or a path to a file"},
+ 'dsc': "Set an image from which arc will be masked out. It's useful to display complex effects on the arcs. Can be a pointer to `lv_image_dsc_t` or a path to a file"},
 
 {'section': 'Text', 'dsc':'Properties to describe the properties of text. All these properties are inherited.' },
 {'name': 'TEXT_COLOR',
 'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 1, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
- 'dsc': "Sets the color of the text."},
+ 'dsc': "Sets color of text."},
 
 {'name': 'TEXT_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`LV_OPA_COVER`', 'inherited': 1, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the opacity of the text. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
+ 'dsc': "Set opacity of text. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
 {'name': 'TEXT_FONT',
  'style_type': 'ptr',   'var_type': 'const lv_font_t *',  'default':'`LV_FONT_DEFAULT`', 'inherited': 1, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set the font of the text (a pointer `lv_font_t *`). "},
+ 'dsc': "Set font of text (a pointer `lv_font_t *`). "},
 
 {'name': 'TEXT_LETTER_SPACE',
 'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 1, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set the letter space in pixels"},
+ 'dsc': "Set letter space in pixels"},
 
 {'name': 'TEXT_LINE_SPACE',
  'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 1, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set the line space in pixels."},
+ 'dsc': "Set line space in pixels."},
 
 {'name': 'TEXT_DECOR',
  'style_type': 'num',   'var_type': 'lv_text_decor_t' ,  'default':'`LV_TEXT_DECOR_NONE`', 'inherited': 1, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set decoration for the text. The possible values are `LV_TEXT_DECOR_NONE/UNDERLINE/STRIKETHROUGH`. OR-ed values can be used as well." },
+ 'dsc': "Set decoration for the text. Possible values are `LV_TEXT_DECOR_NONE/UNDERLINE/STRIKETHROUGH`. OR-ed values can be used as well." },
 
 {'name': 'TEXT_ALIGN',
 'style_type': 'num',   'var_type': 'lv_text_align_t' ,  'default':'`LV_TEXT_ALIGN_AUTO`', 'inherited': 1, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set how to align the lines of the text. Note that it doesn't align the object itself, only the lines inside the object. The possible values are `LV_TEXT_ALIGN_LEFT/CENTER/RIGHT/AUTO`. `LV_TEXT_ALIGN_AUTO` detect the text base direction and uses left or right alignment accordingly"},
+ 'dsc': "Set how to align the lines of the text. Note that it doesn't align the Widget itself, only the lines inside the Widget. Possible values are `LV_TEXT_ALIGN_LEFT/CENTER/RIGHT/AUTO`. `LV_TEXT_ALIGN_AUTO` detect the text base direction and uses left or right alignment accordingly"},
 
 {'section': 'Miscellaneous', 'dsc':'Mixed properties for various purposes.' },
 {'name': 'RADIUS',
  'style_type': 'num', 'var_type': 'int32_t', 'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set the radius on every corner. The value is interpreted in pixel (>= 0) or `LV_RADIUS_CIRCLE` for max. radius"},
+ 'dsc': "Set radius on every corner. The value is interpreted in pixels (>= 0) or `LV_RADIUS_CIRCLE` for max. radius"},
+
+{'name': 'RADIAL_OFFSET',
+'style_type': 'num',   'var_type': 'int32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Move start point of object (e.g. scale tick) radially"},
 
 {'name': 'CLIP_CORNER',
  'style_type': 'num',   'var_type': 'bool',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -351,15 +363,15 @@ props = [
 
 {'name': 'OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`LV_OPA_COVER`', 'inherited': 1, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Scale down all opacity values of the object by this factor. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency." },
+ 'dsc': "Scale down all opacity values of the Widget by this factor. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency." },
 
 {'name': 'OPA_LAYERED',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`LV_OPA_COVER`', 'inherited': 1, 'layout': 0, 'ext_draw': 0,
- 'dsc': "First draw the object on the layer, then scale down layer opacity factor. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency." },
+ 'dsc': "First draw Widget on the layer, then scale down layer opacity factor. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency." },
 
 {'name': 'COLOR_FILTER_DSC',
  'style_type': 'ptr',   'var_type': 'const lv_color_filter_dsc_t *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Mix a color to all colors of the object." },
+ 'dsc': "Mix a color with all colors of the Widget." },
 
 {'name': 'COLOR_FILTER_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_TRANSP`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -367,35 +379,35 @@ props = [
 
  {'name': 'ANIM',
  'style_type': 'ptr',   'var_type': 'const lv_anim_t *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "The animation template for the object's animation. Should be a pointer to `lv_anim_t`. The animation parameters are widget specific, e.g. animation time could be the E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more."},
+ 'dsc': "Animation template for Widget's animation. Should be a pointer to `lv_anim_t`. The animation parameters are widget specific, e.g. animation time could be the E.g. blink time of the cursor on the text area or scroll time of a roller. See Widgets' documentation to learn more."},
 
 {'name': 'ANIM_DURATION',
  'style_type': 'num',   'var_type': 'uint32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "The animation duration in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more."},
+ 'dsc': "Animation duration in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See Widgets' documentation to learn more."},
 
 {'name': 'TRANSITION',
  'style_type': 'ptr',   'var_type': 'const lv_style_transition_dsc_t *' ,  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "An initialized `lv_style_transition_dsc_t` to describe a transition."},
+ 'dsc': "An initialized ``lv_style_transition_dsc_t`` to describe a transition."},
 
 {'name': 'BLEND_MODE',
  'style_type': 'num',   'var_type': 'lv_blend_mode_t' ,  'default':'`LV_BLEND_MODE_NORMAL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Describes how to blend the colors to the background. The possible values are `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE/MULTIPLY`"},
+ 'dsc': "Describes how to blend the colors to the background. Possible values are `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE/MULTIPLY`"},
 
 {'name': 'LAYOUT',
  'style_type': 'num',   'var_type': 'uint16_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set the layout if the object. The children will be repositioned and resized according to the policies set for the layout. For the possible values see the documentation of the layouts."},
+ 'dsc': "Set layout of Widget. Children will be repositioned and resized according to policies set for the layout. For possible values see documentation of the layouts."},
 
 {'name': 'BASE_DIR',
  'style_type': 'num',   'var_type': 'lv_base_dir_t', 'default':'`LV_BASE_DIR_AUTO`', 'inherited': 1, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set the base direction of the object. The possible values are `LV_BIDI_DIR_LTR/RTL/AUTO`."},
+ 'dsc': "Set base direction of Widget. Possible values are `LV_BIDI_DIR_LTR/RTL/AUTO`."},
 
 {'name': 'BITMAP_MASK_SRC',
  'style_type': 'ptr',   'var_type': 'const void *', 'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "If set a layer will be created for the widget and the layer will be masked with this A8 bitmap mask."},
+ 'dsc': "If set, a layer will be created for the widget and the layer will be masked with this A8 bitmap mask."},
 
 {'name': 'ROTARY_SENSITIVITY',
  'style_type': 'num',   'var_type': 'uint32_t', 'default':'`256`', 'inherited': 1, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Adjust the sensitivity for rotary encoders in 1/256 unit. It means, 128: slow down the rotary to half, 512: speeds up to double, 256: no change"},
+ 'dsc': "Adjust sensitivity for rotary encoders in 1/256 unit. It means, 128: slow down the rotary to half, 512: speeds up to double, 256: no change"},
 
 {'section': 'Flex', 'dsc':'Flex layout properties.',  'guard':'LV_USE_FLEX'},
 
@@ -421,7 +433,7 @@ props = [
 
 {'name': 'FLEX_GROW',
  'style_type': 'num',   'var_type': 'uint8_t', 'default':'`LV_FLEX_ALIGN_ROW`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Defines how much space to take proportionally from the free space of the object's track"},
+ 'dsc': "Defines how much space to take proportionally from the free space of the Widget's track"},
 
 
 
@@ -447,27 +459,27 @@ props = [
 
 {'name': 'GRID_CELL_COLUMN_POS',
  'style_type': 'num',   'var_type': 'int32_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set the column in which the object should be placed"},
+ 'dsc': "Set column in which Widget should be placed."},
 
 {'name': 'GRID_CELL_X_ALIGN',
  'style_type': 'num',   'var_type': 'lv_grid_align_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set how to align the object horizontally."},
+ 'dsc': "Set how to align Widget horizontally."},
 
 {'name': 'GRID_CELL_COLUMN_SPAN',
  'style_type': 'num',   'var_type': 'int32_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set how many columns the object should span. Needs to be >= 1"},
+ 'dsc': "Set how many columns Widget should span. Needs to be >= 1."},
 
 {'name': 'GRID_CELL_ROW_POS',
  'style_type': 'num',   'var_type': 'int32_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set the row in which the object should be placed"},
+ 'dsc': "Set row in which Widget should be placed."},
 
 {'name': 'GRID_CELL_Y_ALIGN',
  'style_type': 'num',   'var_type': 'lv_grid_align_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set how to align the object vertically."},
+ 'dsc': "Set how to align Widget vertically."},
 
 {'name': 'GRID_CELL_ROW_SPAN',
  'style_type': 'num',   'var_type': 'int32_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set how many rows the object should span. Needs to be >= 1"},
+ 'dsc': "Set how many rows Widget should span. Needs to be >= 1."},
 ]
 
 
@@ -715,10 +727,12 @@ print('''\
 ''')
 print('#endif /* LV_STYLE_GEN_H */')
 
-sys.stdout = open(base_dir + '/../docs/overview/style-props.rst', 'w')
+sys.stdout = open(base_dir + '/../docs/details/base-widget/styles/style-properties.rst', 'w')
 
+print('.. _style_properties:')
+print()
 print('================')
-print('Style properties')
+print('Style Properties')
 print('================')
 
 for p in props:

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_color.c
  *
  */
@@ -55,12 +55,15 @@ uint8_t lv_color_format_get_bpp(lv_color_format_t cf)
         case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_A8:
         case LV_COLOR_FORMAT_I8:
+        case LV_COLOR_FORMAT_ARGB2222:
             return 8;
 
         case LV_COLOR_FORMAT_RGB565A8:
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_YUY2:
         case LV_COLOR_FORMAT_AL88:
+        case LV_COLOR_FORMAT_ARGB1555:
+        case LV_COLOR_FORMAT_ARGB4444:
             return 16;
 
         case LV_COLOR_FORMAT_ARGB8565:
@@ -91,6 +94,9 @@ bool lv_color_format_has_alpha(lv_color_format_t cf)
         case LV_COLOR_FORMAT_ARGB8565:
         case LV_COLOR_FORMAT_ARGB8888:
         case LV_COLOR_FORMAT_AL88:
+        case LV_COLOR_FORMAT_ARGB2222:
+        case LV_COLOR_FORMAT_ARGB1555:
+        case LV_COLOR_FORMAT_ARGB4444:
             return true;
         default:
             return false;

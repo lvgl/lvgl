@@ -89,7 +89,7 @@ algum suporte durante o desenvolvimento de seu próximo projeto de GUI.
 -  Pode ser compilado para qualquer display MCU ou MPU, e qualquer
    sistema operacional de tempo real (RT-OS).
 -  Suporta monitores monocromáticos, ePaper, OLED ou TFT. `Guia de
-   portabilidade <https://docs.lvgl.io/master/porting/project.html>`__
+   portabilidade <https://docs.lvgl.io/master/intro/add-lvgl-to-your-project/connecting_lvgl.html>`__
 -  Distribuído sob a licença do MIT, para que você também possa usá-lo
    facilmente em projetos comerciais.
 -  Precisa de apenas 32 kB de RAM e 128 kB de Flash, um frame buffer e
@@ -126,10 +126,10 @@ algum suporte durante o desenvolvimento de seu próximo projeto de GUI.
 -  Nenhum sistema de compilação personalizado é usado. Você pode
    construir o LVGL enquanto constrói os outros arquivos do seu projeto.
 -  O suporte para Make e
-   `CMake <https://docs.lvgl.io/master/get-started/platforms/cmake.html>`__
+   `CMake <https://docs.lvgl.io/master/details/integration/building/cmake.html>`__
    já vem incluído.
 -  `Desenvolva no
-   PC <https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html>`__
+   PC <https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html>`__
    e use o mesmo código de interface do usuário em hardwares
    incorporados (embedded hardware).
 -  Converta o código C para um arquivo HTML com o `Emscripten
@@ -187,19 +187,19 @@ receberá o pagamento em alguns dias.
 LVGL está disponível para:
 
 -  `Arduino
-   library <https://docs.lvgl.io/master/get-started/platforms/arduino.html>`__
+   library <https://docs.lvgl.io/master/details/entegration/framework/arduino.html>`__
 -  `PlatformIO
    package <https://registry.platformio.org/libraries/lvgl/lvgl>`__
 -  `Zephyr
    library <https://docs.zephyrproject.org/latest/kconfig.html#CONFIG_LVGL>`__
 -  `ESP32
-   component <https://docs.lvgl.io/master/get-started/platforms/espressif.html>`__
+   component <https://docs.lvgl.io/master/details/integration/chip/espressif.html>`__
 -  `NXP MCUXpresso
    component <https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY>`__
 -  `NuttX
-   library <https://docs.lvgl.io/master/get-started/os/nuttx.html>`__
+   library <https://docs.lvgl.io/master/details/integration/os/nuttx.html>`__
 -  `RT-Thread
-   RTOS <https://docs.lvgl.io/master/get-started/os/rt-thread.html>`__
+   RTOS <https://docs.lvgl.io/master/details/integration/os/rt-thread.html>`__
 -  NXP MCUXpresso library
 -  CMSIS-Pack
 
@@ -614,28 +614,28 @@ Esta lista irá guiá-lo para começar com o LVGL passo a passo.
    `introdução <https://docs.lvgl.io/master/intro/index.html>`__ da
    documentação (~5 minutos)
 3. Familiarize-se com o básico na página de `visão geral
-   rápida <https://docs.lvgl.io/master/get-started/quick-overview.html>`__
+   rápida <https://docs.lvgl.io/master/intro/basics.html>`__
    (~15 minutos)
 
 **Começando a usar o LVGL**
 
 4. Configure um
-   `simulador <https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html>`__
+   `simulador <https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html>`__
    (~10 minutos)
 5. Experimente alguns
    `exemplos <https://github.com/lvgl/lvgl/tree/master/examples>`__
 6. Porte o LVGL para uma placa. Veja o guia `portando o
-   LVGL <https://docs.lvgl.io/master/porting/index.html>`__ ou veja um
+   LVGL <https://docs.lvgl.io/master/intro/add-lvgl-to-your-project/index.html>`__ ou veja um
    projeto pronto para usar em
    `projetos <https://github.com/lvgl?q=lv_port_>`__
 
 **Torne-se um profissional**
 
 7. Leia a página `visão
-   geral <https://docs.lvgl.io/master/overview/index.html>`__ para
+   geral <https://docs.lvgl.io/master/details/main-components/index.html>`__ para
    entender melhor a biblioteca (~2-3 horas)
 8. Verifique a documentação dos
-   `widgets <https://docs.lvgl.io/master/widgets/index.html>`__ para ver
+   `widgets <https://docs.lvgl.io/master/details/widgets/index.html>`__ para ver
    seus recursos e usabilidade
 
 **Obtenha ajuda e ajude outras pessoas**

@@ -36,7 +36,19 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2024-08-26" version="9.2.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.2.0.pack">
+    <release date="2024-10-31" version="9.3.0-dev2" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.3.0-dev2.pack">
+      - LVGL 9.3.0-dev
+      - See Change Log
+    </release>
+    <release date="2024-10-29" version="9.2.2" url="https://github.com/lvgl/lvgl/raw/v9.2.2/env_support/cmsis-pack/LVGL.lvgl.9.2.2.pack">
+      - LVGL 9.2.2
+      - See Change Log
+    </release>
+    <release date="2024-10-16" version="9.2.1" url="https://github.com/lvgl/lvgl/raw/v9.2.1/env_support/cmsis-pack/LVGL.lvgl.9.2.1.pack">
+      - LVGL 9.2.1
+      - See Change Log
+    </release>
+    <release date="2024-08-26" version="9.2.0" url="https://github.com/lvgl/lvgl/raw/v9.2.0/env_support/cmsis-pack/LVGL.lvgl.9.2.0.pack">
       - LVGL 9.2.0
       - See Change Log
     </release>
@@ -86,7 +98,7 @@
       - LVGL 8.3.6 release
       - Various fixes
     </release>
-    <release date="2023-02-06" version="8.3.5" url="https://github.com/lvgl/lvgl/raw/6b0092c0d91b2c7bfded48e04cc7b486ed3a72bd/env_support/cmsis-pack/LVGL.lvgl.8.3.6.pack">
+    <release date="2023-02-06" version="8.3.5" url="https://github.com/lvgl/lvgl/raw/e7e8cf846dce96f7542e27b5c9655bab680c31a1/env_support/cmsis-pack/LVGL.lvgl.8.3.5.pack">
       - LVGL 8.3.5 release
       - Use LVGL version as the cmsis-pack version
       - Fix GPU support for NXP PXP and NXP VGLite
@@ -182,6 +194,7 @@
             <accept Tcompiler="CLANG"/>
         </condition>
         
+        
         <condition id="NEON">
             <description>Support NEON based processors</description>
             <accept  Dcore="Cortex-A8"/>
@@ -196,6 +209,27 @@
             <accept  Dcore="Cortex-A57"/>
             <accept  Dcore="Cortex-A72"/>
             <accept  Dcore="Cortex-A73"/>
+        </condition>
+
+        <condition id="Armv8-M Mainline Processors">
+            <accept  Dcore="ARMV81MML"/>
+            
+            <accept  Dcore="Cortex-M33"/>
+            <accept  Dcore="Star-MC1"/>
+            <accept  Dcore="Cortex-M35P"/>
+            <accept  Dcore="Cortex-M55"/>
+            <accept  Dcore="Cortex-M85"/>
+            <accept  Dcore="Cortex-M52"/>
+        </condition>
+        
+        
+        <condition id="Armv8-M Mainline Library">
+            <require condition="Armv8-M Mainline Processors" />
+            <accept Tcompiler="ARMCC" Toptions="AC6"/>
+            <accept Tcompiler="ARMCC" Toptions="AC6LTO"/>
+            <accept Tcompiler="GCC"/>
+            <accept Tcompiler="CLANG"/>
+            <accept Tcompiler="IAR"/>
         </condition>
         
         <condition id="Helium">
@@ -217,6 +251,7 @@
             <require condition="Helium" />
             <require condition="GNU Assembler" />
         </condition>
+        
 
         <condition id="LVGL-Essential">
             <description>Require LVGL Essential Service</description>
@@ -250,6 +285,7 @@
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
+            <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>-->
         </condition>
 
         <condition id="LVGL-GPU-SWM341-DMA2D">
@@ -262,6 +298,7 @@
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
+            <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>-->
         </condition>
 
         <condition id="LVGL-GPU-NXP-PXP">
@@ -274,6 +311,7 @@
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>
         </condition>
 
         <condition id="LVGL-GPU-NXP-VGLite">
@@ -286,6 +324,7 @@
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>
         </condition>
 
         <condition id="LVGL-GPU-GD32-IPA">
@@ -298,6 +337,7 @@
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>-->
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>
         </condition>
         
         <condition id="LVGL-GPU-Renesas-Dave2D">
@@ -310,11 +350,25 @@
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
             <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
             <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>-->
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>
+        </condition>
+        
+        <condition id="LVGL-GPU-NEMA-GFX">
+            <description>Condition for TSi's aka (Think Silicon) NemaGFX</description>
+            <require condition="LVGL-Essential"/>
+            <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU STM32-DMA2D"/>-->
+            <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU SWM341-DMA2D"/>-->
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-PXP"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NXP-VGLite"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU GD32-IPA"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU VG-Lite"/>
+            <deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU Renesas-Dave2D"/>
+            <!--<deny Cclass="LVGL" Cgroup="LVGL9" Csub="GPU NEMA-GFX"/>-->
         </condition>
     </conditions>
 
     <components>
-        <bundle Cbundle="LVGL9" Cclass="LVGL" Cversion="9.2.0">
+        <bundle Cbundle="LVGL9" Cclass="LVGL" Cversion="9.3.0-dev2">
             <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
             <doc></doc>
             <component Cgroup="Essential">
@@ -339,7 +393,6 @@
                 <file category="sourceC"            name="src/core/lv_obj_style_gen.c" />
                 <file category="sourceC"            name="src/core/lv_obj_tree.c" />
                 <file category="sourceC"            name="src/core/lv_refr.c" />
-                
                 
                 <!-- src/drivers -->
                 <file category="sourceC"            name="src/drivers/evdev/lv_evdev.c" />
@@ -419,6 +472,9 @@
                 <file category="sourceC"            name="src/draw/sw/blend/lv_draw_sw_blend_to_rgb888.c" />
                 <file category="sourceAsm"          name="src/draw/sw/blend/neon/lv_blend_neon.S"  condition="NEON GNU Assembler"/>
                 <file category="sourceAsm"          name="src/draw/sw/blend/helium/lv_blend_helium.S"  condition="Helium GNU Assembler"/>
+                
+                <!-- src/draw/opengles-->
+                <file category="sourceC"            name="src/draw/opengles/lv_draw_opengles.c" />
 
                 <!-- src/font -->
                 <file category="sourceC"            name="src/font/lv_binfont_loader.c" />
@@ -489,6 +545,10 @@
                 <file category="sourceC"            name="src/misc/lv_timer.c" />
                 <file category="sourceC"            name="src/misc/lv_utils.c" />
                 <file category="sourceC"            name="src/misc/lv_matrix.c" />
+                <file category="sourceC"            name="src/misc/lv_iter.c" />
+                <file category="sourceC"            name="src/misc/lv_circle_buf.c" />
+                <file category="sourceC"            name="src/misc/lv_tree.c" />
+                
                 
                 <!-- src/misc/cache-->
                 <file category="sourceC"            name="src/misc/cache/lv_cache_lru_rb.c" />
@@ -586,7 +646,7 @@
                 <file category="sourceC"            name="src/osal/lv_os.c"/>
                 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.3.0" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="2.4.0" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
@@ -731,6 +791,19 @@
               <RTE_Components_h>
 /* use display driver for Renesas GLCD */
 #define LV_USE_RENESAS_GLCDC    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="ST LTDC" condition="LVGL-Essential">
+              <description>Add the display driver for ST LTDC </description>
+              <files>
+                <file category="sourceC"            name="src/drivers/display/st_ltdc/lv_st_ltdc.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for ST LTDC */
+#define LV_USE_ST_LTDC    1
 
               </RTE_Components_h>
             </component>
@@ -906,7 +979,7 @@
               <RTE_Components_h>
 
 /*! \brief enable NXP PXP */
-#define LV_USE_DRAW_PXP     1
+#define LV_USE_PXP     1
               </RTE_Components_h>
 
             </component>
@@ -985,6 +1058,136 @@
               </RTE_Components_h>
 
             </component>
+            
+            <component Cgroup="Acceleration" Csub="GPU STM32-DMA2D"  condition="LVGL-GPU-STM32-DMA2D">
+              <description>An hardware acceleration from STM32-DMA2D</description>
+              <files>
+                <file category="sourceC"      name="src/draw/dma2d/lv_draw_dma2d.c" />
+                <file category="sourceC"      name="src/draw/dma2d/lv_draw_dma2d_fill.c" />
+                <file category="sourceC"      name="src/draw/dma2d/lv_draw_dma2d_img.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable STM32 DMA2D */
+#define LV_USE_DRAW_DMA2D      1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="Acceleration" Csub="GPU NemaGFX"  Cvariant="libnemagfx-float-abi-hard-wc16" isDefaultVariant="true" condition="LVGL-GPU-NEMA-GFX">
+              <description>TSi's aka (Think Silicon) NemaGFX</description>
+              <files>
+                <!-- src/draw/nema_gfx/ -->
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_hal.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_img.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_label.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_layer.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+
+                <!-- libs/nema_gfx/ -->
+                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33/gcc/libnemagfx-float-abi-hard-wc16.a"     condition="Armv8-M Mainline Library" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief Use TSi's aka (Think Silicon) NemaGFX */
+#define LV_USE_NEMA_GFX      1
+              </RTE_Components_h>
+
+            </component>
+            
+            
+            <component Cgroup="Acceleration" Csub="GPU NemaGFX"  Cvariant="libnemagfx-float-abi-hard" condition="LVGL-GPU-NEMA-GFX">
+              <description>TSi's aka (Think Silicon) NemaGFX</description>
+              <files>
+                <!-- src/draw/nema_gfx/ -->
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_hal.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_img.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_label.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_layer.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+
+                <!-- libs/nema_gfx/ -->
+                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33/gcc/libnemagfx-float-abi-hard.a"          condition="Armv8-M Mainline Library" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief Use TSi's aka (Think Silicon) NemaGFX */
+#define LV_USE_NEMA_GFX      1
+              </RTE_Components_h>
+
+            </component>
+            
+            <component Cgroup="Acceleration" Csub="GPU NemaGFX"  Cvariant="libnemagfx-wc16" condition="LVGL-GPU-NEMA-GFX">
+              <description>TSi's aka (Think Silicon) NemaGFX</description>
+              <files>
+                <!-- src/draw/nema_gfx/ -->
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_hal.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_img.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_label.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_layer.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+
+                <!-- libs/nema_gfx/ -->
+                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33/gcc/libnemagfx-wc16.a"                    condition="Armv8-M Mainline Library" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief Use TSi's aka (Think Silicon) NemaGFX */
+#define LV_USE_NEMA_GFX      1
+              </RTE_Components_h>
+
+            </component>
+
+
+            <component Cgroup="Acceleration" Csub="GPU NemaGFX"  Cvariant="libnemagfx" condition="LVGL-GPU-NEMA-GFX">
+              <description>TSi's aka (Think Silicon) NemaGFX</description>
+              <files>
+                <!-- src/draw/nema_gfx/ -->
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_arc.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_border.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_fill.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_hal.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_img.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_label.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_layer.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_line.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c" />
+                <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
+
+                <!-- libs/nema_gfx/ -->
+                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33/gcc/libnemagfx.a"                         condition="Armv8-M Mainline Library" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief Use TSi's aka (Think Silicon) NemaGFX */
+#define LV_USE_NEMA_GFX      1
+              </RTE_Components_h>
+
+            </component>
 
             <!-- not available yet 
             <component Cgroup="Acceleration" Csub="GPU Arm-2D"  isDefaultVariant="true" Cversion="2.0.0">
@@ -1002,19 +1205,7 @@
 
             </component>
 
-            <component Cgroup="Acceleration" Csub="GPU STM32-DMA2D"  condition="LVGL-GPU-STM32-DMA2D">
-              <description>An hardware acceleration from STM32-DMA2D</description>
-              <files>
-                <file category="sourceC"      name="src/draw/stm32_dma2d/lv_gpu_stm32_dma2d.c" />
-              </files>
 
-              <RTE_Components_h>
-
-/*! \brief enable STM32 DMA2D */
-#define LV_USE_GPU_STM32_DMA2D      1
-              </RTE_Components_h>
-
-            </component>
 
             <component Cgroup="Acceleration" Csub="GPU SWM341-DMA2D"  condition="LVGL-GPU-SWM341-DMA2D">
               <description>An hardware acceleration from SWM341-DMA2D</description>
@@ -1072,6 +1263,24 @@
 
             </component>
             -->
+            
+            <component Cgroup="Libraries and Others" Csub="Libs SVG"  condition="LVGL-Essential">
+              <description>Add the SVG library</description>
+              <files>
+                <!-- src/libs/svg -->
+                <file category="sourceC"    name="src/libs/svg/lv_svg.c" />
+                <file category="sourceC"    name="src/libs/svg/lv_svg_parser.c" />
+                <file category="sourceC"    name="src/libs/svg/lv_svg_render.c" />
+                <file category="sourceC"    name="src/libs/svg/lv_svg_token.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable SVG library */
+#define LV_USE_SVG          1
+              </RTE_Components_h>
+
+            </component>
 
             <component Cgroup="Libraries and Others" Csub="Libs Barcode"  condition="LVGL-Essential">
               <description>Add the Barcode code library</description>
@@ -1469,7 +1678,6 @@
 
             </component>
 
-
             <component Cgroup="Libraries and Others" Csub="File Explorer"  condition="LVGL-Essential">
               <description>Add a file explorer</description>
               <files>
@@ -1484,7 +1692,7 @@
               </RTE_Components_h>
 
             </component>
-            
+
             <component Cgroup="Libraries and Others" Csub="Fragment"  condition="LVGL-Essential">
               <description>Add the Fragment service</description>
               <files>
@@ -1546,6 +1754,24 @@
 
             </component>
 
+
+            <component Cgroup="Libraries and Others" Csub="Font Manager"  condition="LVGL-Essential">
+              <description>Add the support for freetype font manager</description>
+              <files>
+                <!-- src/others/font_manager -->
+                <file category="sourceC"            name="src/others/font_manager/lv_font_manager.c" />
+                <file category="sourceC"            name="src/others/font_manager/lv_font_manager_recycle.c" />
+                <file category="sourceC"            name="src/others/font_manager/lv_font_manager_utils.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief Enable freetype font manager */
+#define LV_USE_FONT_MANAGER          1
+              </RTE_Components_h>
+
+            </component>
+
             <component Cgroup="Libraries and Others" Csub="Monkey"  condition="LVGL-Essential">
               <description>Add the Monkey test service</description>
               <files>
@@ -1580,10 +1806,8 @@
               <description>Add the official benchmark.</description>
               <files>
                 <!-- demos/benchmark -->
-                <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_alpha256.c" />
-                <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_argb.c" />
-                <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_indexed16.c" />
-                <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_rgb.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_lvgl_logo_argb.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_lvgl_logo_rgb.c" />
                 <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_avatar.c" />
 
                 <file category="sourceC"    name="demos/benchmark/assets/lv_font_benchmark_montserrat_12_compr_az.c.c" />
@@ -1700,6 +1924,34 @@
                 <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_xrgb8888.c" />
                 <file category="sourceC"    name="demos/render/assets/img_render_lvgl_logo_i1.c" />
                 
+                <!-- demos/ebike -->
+                <file category="sourceC"    name="demos/ebike/generated/font_ebike_130.c" />
+                <file category="sourceC"    name="demos/ebike/generated/font_ebike_56.c" />
+                <file category="sourceC"    name="demos/ebike/generated/font_ebike_inter_14.c" />
+                <file category="sourceC"    name="demos/ebike/generated/font_ebike_inter_20.c" />
+                <file category="sourceC"    name="demos/ebike/generated/font_ebike_trump_24.c" />
+                <file category="sourceC"    name="demos/ebike/generated/font_ebike_trump_40.c" />
+                <file category="sourceC"    name="demos/ebike/generated/font_ebike_trump_48.c" />
+                <file category="sourceC"    name="demos/ebike/generated/font_ebike_trump_72.c" />
+                <file category="sourceC"    name="demos/ebike/generated/img_ebike_arrow_left.c" />
+                <file category="sourceC"    name="demos/ebike/generated/img_ebike_arrow_left_2.c" />
+                <file category="sourceC"    name="demos/ebike/generated/img_ebike_arrow_right.c" />
+                <file category="sourceC"    name="demos/ebike/generated/img_ebike_arrow_right_2.c" />
+                <file category="sourceC"    name="demos/ebike/generated/img_ebike_bg.c" />
+                <file category="sourceC"    name="demos/ebike/generated/img_ebike_bg_large.c" />
+                <file category="sourceC"    name="demos/ebike/generated/img_ebike_clock.c" />
+                <file category="sourceC"    name="demos/ebike/generated/img_ebike_dropdown_icon.c" />
+                <file category="sourceC"    name="demos/ebike/generated/img_ebike_home.c" />
+                <file category="sourceC"    name="demos/ebike/generated/img_ebike_lamp.c" />
+                <file category="sourceC"    name="demos/ebike/generated/img_ebike_scale.c" />
+                <file category="sourceC"    name="demos/ebike/generated/img_ebike_scale_large.c" />
+                <file category="sourceC"    name="demos/ebike/generated/img_ebike_settings.c" />
+                <file category="sourceC"    name="demos/ebike/generated/img_ebike_settings_large.c" />
+                <file category="sourceC"    name="demos/ebike/generated/img_ebike_stats.c" />
+                <file category="sourceC"    name="demos/ebike/generated/img_ebike_stats_large.c" />
+                <file category="sourceC"    name="demos/ebike/generated/img_ebike_whether.c" />
+                <file category="sourceC"    name="demos/ebike/generated/lottie_ebike_settings.c" />
+                <file category="sourceC"    name="demos/ebike/generated/lottie_ebike_stats.c" />
               </files>
 
             </component>
@@ -1880,6 +2132,26 @@
               </RTE_Components_h>
 
             </component>
+
+            <component Cgroup="Demos" Csub="e-Bike" condition="LVGL-Essential-Assets">
+              <description>E-bike demo with Lottie animations</description>
+              <files>
+                <!-- demos/ebike -->
+                <file category="sourceC"    name="demos/ebike/lv_demo_ebike.c" />
+                <file category="sourceC"    name="demos/ebike/lv_demo_ebike_home.c" />
+                <file category="sourceC"    name="demos/ebike/lv_demo_ebike_settings.c" />
+                <file category="sourceC"    name="demos/ebike/lv_demo_ebike_stats.c" />
+                <file category="sourceC"    name="demos/ebike/translations/lv_i18n.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief E-bike demo with Lottie animations*/
+#define LV_USE_DEMO_EBIKE              1
+              </RTE_Components_h>
+
+            </component>
+
         </bundle>
     </components>
 

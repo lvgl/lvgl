@@ -45,6 +45,7 @@ Naming conventions
       - ``alloc`` allocate
       - ``ctrl`` control
       - ``pos`` position
+
    -  Avoid adding new abbreviations
 
 Coding guide
@@ -57,17 +58,17 @@ Coding guide
 
 -  Functions:
 
-   -  Write function with single responsibility.
-   -  Make the functions ``static`` where possible.
+   -  Write functions that use the single-responsibility principle.
+   -  Make functions ``static`` when not part of that object's public API (where possible).
 
 -  Variables:
 
-   -  One line, one declaration (BAD: char x, y;)
-   -  Use ``<stdint.h>`` (*uint8_t*, *int32_t* etc)
-   -  Declare variables where needed (not all at function start)
-   -  Use the smallest required scope
-   -  Variables in a file (outside functions) are always *static*
-   -  Do not use global variables (use functions to set/get static variables)
+   -  One line, one declaration (BAD: char x, y;).
+   -  Use ``<stdint.h>`` (*uint8_t*, *int32_t* etc).
+   -  Declare variables where needed (not all at function start).
+   -  Use the smallest required scope.
+   -  Variables in a file (outside functions) are always *static*.
+   -  Do not use global variables (use functions to set/get static variables).
 
 Comments
 --------
@@ -88,7 +89,7 @@ like this:
     type_name_t * lv_function_name(lv_obj_t * parent);
 
 The normal comment prefix ``/**`` causes the comment to document the code member
-coming *after* the comment.  When documenting a code member that is *before* the
+*after* the comment.  When documenting a code member that is *before* the
 comment, such as a struct member, use ``/**<`` like this:
 
 .. code-block:: c
@@ -148,7 +149,7 @@ illustrating most of the Doxygen commands used in LVGL.
 .. code-block:: c
 
     /**
-     * Set alignment of objects placed in containers with LV_STYLE_FLEX_FLOW style.
+     * Set alignment of Widgets placed in containers with LV_STYLE_FLEX_FLOW style.
      *
      * The values for the `..._place` arguments come from the `lv_flex_align_t`
      * enumeration and have the same meanings as they do for flex containers in CSS.
@@ -170,7 +171,7 @@ illustrating most of the Doxygen commands used in LVGL.
      *     - https://css-tricks.com/snippets/css/a-guide-to-flexbox/
      *     - see  `lv_obj_set_flex_grow()` for additional information.
      */
-    void lv_obj_set_flex_align(lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_align_t cross_place,
+    void lv_obj_set_flex_align(lv_obj_t * widget, lv_flex_align_t main_place, lv_flex_align_t cross_place,
                                lv_flex_align_t track_cross_place);
 
 
@@ -264,12 +265,12 @@ follow some coding conventions:
 - Use typed pointers instead of :cpp:expr:`void *` pointers
 - Widget constructor must follow the ``lv_<widget_name>_create(lv_obj_t * parent)`` pattern.
 - Widget members function must start with ``lv_<widget_name>`` and should receive :cpp:expr:`lv_obj_t *` as first
-  argument which is a pointer to widget object itself.
+  argument which is a pointer to Widget object itself.
 - ``struct`` APIs should follow the widgets' conventions. That is to receive a pointer to the ``struct`` as the
   first argument, and the prefix of the ``struct`` name should be used as the prefix of the
-  function name too (e.g. :cpp:expr:`lv_display_set_default(lv_display_t * disp)`)
+  function name as well (e.g. :cpp:expr:`lv_display_set_default(lv_display_t * disp)`)
 - Functions and ``struct``\ s which are not part of the public API must begin with underscore in order to mark them as "private".
-- Argument must be named in H files too.
+- Argument must be named in H files as well.
 - Do not ``malloc`` into a static or global variables. Instead declare the variable in ``lv_global_t``
   structure in ``lv_global.h`` and mark the variable with :cpp:expr:`(LV_GLOBAL_DEFAULT()->variable)` when it's used.
 - To register and use callbacks one of the following needs to be followed.
@@ -286,14 +287,14 @@ To learn more refer to the documentation of `MicroPython <integration/bindings/m
 Formatting
 ----------
 
-Here is example to show bracket placing and using of white space:
+Here is example to show bracket placement and use of white space:
 
 .. code-block:: c
 
    /**
     * Set new text for a label.  Memory will be allocated by label to store text.
     *
-    * @param  label  pointer to label object
+    * @param  label  pointer to label Widget
     * @param  text   '\0' terminated character string.
     *                NULL to refresh with current text.
     */

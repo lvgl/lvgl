@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_style.h
  *
  */
@@ -59,7 +59,7 @@ LV_EXPORT_CONST_INT(LV_SCALE_NONE);
 #else
 #define LV_STYLE_CONST_INIT(var_name, prop_array)                       \
     const lv_style_t var_name = {                                       \
-        .values_and_props = prop_array,                                 \
+        .values_and_props = (void*)prop_array,                          \
         .has_group = 0xFFFFFFFF,                                        \
         .prop_cnt = 255,                                                \
     }
@@ -140,10 +140,10 @@ typedef struct {
 typedef struct {
     lv_gradient_stop_t   stops[LV_GRADIENT_MAX_STOPS];  /**< A gradient stop array */
     uint8_t              stops_count;                   /**< The number of used stops in the array */
-    lv_grad_dir_t        dir : 3;                       /**< The gradient direction.
+    lv_grad_dir_t        dir : 4;                       /**< The gradient direction.
                                                          * Any of LV_GRAD_DIR_NONE, LV_GRAD_DIR_VER, LV_GRAD_DIR_HOR,
                                                          * LV_GRAD_TYPE_LINEAR, LV_GRAD_TYPE_RADIAL, LV_GRAD_TYPE_CONICAL */
-    lv_grad_extend_t     extend : 2;                    /**< Behaviour outside the defined range.
+    lv_grad_extend_t     extend : 3;                    /**< Behaviour outside the defined range.
                                                          * LV_GRAD_EXTEND_NONE, LV_GRAD_EXTEND_PAD, LV_GRAD_EXTEND_REPEAT, LV_GRAD_EXTEND_REFLECT */
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
     union {
@@ -203,6 +203,8 @@ enum {
     LV_STYLE_ALIGN                  = 10,
 
     LV_STYLE_RADIUS                 = 12,
+    LV_STYLE_RADIAL_OFFSET          = 13,
+    LV_STYLE_PAD_RADIAL             = 14,
 
     /*Group 1*/
     LV_STYLE_PAD_TOP                = 16,
@@ -311,6 +313,7 @@ enum {
     LV_STYLE_TRANSFORM_SKEW_Y       = 114,
     LV_STYLE_BITMAP_MASK_SRC        = 115,
     LV_STYLE_ROTARY_SENSITIVITY     = 116,
+    LV_STYLE_TRANSLATE_RADIAL       = 117,
 
     LV_STYLE_FLEX_FLOW              = 125,
     LV_STYLE_FLEX_MAIN_PLACE        = 126,

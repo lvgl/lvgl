@@ -615,4 +615,15 @@ void test_label_max_width(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_max_width.png");
 }
 
+void test_label_with_recolor_cmd(void)
+{
+    lv_obj_clean(lv_screen_active());
+
+    lv_obj_t * label_recolor = lv_label_create(lv_screen_active());
+    lv_label_set_text(label_recolor, "Write a #ff0000 red# word");
+    lv_label_set_recolor(label_recolor, true);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_recolor.png");
+}
+
 #endif

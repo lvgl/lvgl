@@ -144,7 +144,8 @@ typedef struct {
 typedef enum {
     LV_FONT_FMT_TXT_PLAIN      = 0,
     LV_FONT_FMT_TXT_COMPRESSED = 1,
-    LV_FONT_FMT_TXT_COMPRESSED_NO_PREFILTER = 1,
+    LV_FONT_FMT_TXT_COMPRESSED_NO_PREFILTER = 2,
+    LV_FONT_FMT_PLAIN_ALIGNED      = 3,
 } lv_font_fmt_txt_bitmap_format_t;
 
 /** Describe store for additional data for fonts */

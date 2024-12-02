@@ -56,7 +56,7 @@ static lv_result_t btn_release_handler(lv_obj_t * obj);
 static lv_result_t list_release_handler(lv_obj_t * list_obj);
 static void list_press_handler(lv_obj_t * page);
 static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, int32_t y);
-static void position_to_selected(lv_obj_t * obj);
+static void position_to_selected(lv_obj_t * dropdown_obj, lv_anim_enable_t anim_en);
 static lv_obj_t * get_label(const lv_obj_t * obj);
 
 /**********************
@@ -347,7 +347,7 @@ void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt)
     dropdown->sel_opt_id_orig = dropdown->sel_opt_id;
 
     if(dropdown->list) {
-        position_to_selected(obj);
+        position_to_selected(obj, LV_ANIM_OFF);
     }
 
     lv_obj_invalidate(obj);
@@ -576,7 +576,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     if(list_h > list_fit_h) list_h = list_fit_h;
     lv_obj_set_height(dropdown->list, list_h);
 
-    position_to_selected(dropdown_obj);
+    position_to_selected(dropdown_obj, LV_ANIM_OFF);
 
     if(dir == LV_DIR_BOTTOM)     lv_obj_align_to(dropdown->list, dropdown_obj, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
     else if(dir == LV_DIR_TOP)   lv_obj_align_to(dropdown->list, dropdown_obj, LV_ALIGN_OUT_TOP_LEFT, 0, 0);
@@ -773,7 +773,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
             else if(dropdown->sel_opt_id + 1 < dropdown->option_cnt) {
                 dropdown->sel_opt_id++;
-                position_to_selected(obj);
+                position_to_selected(obj, LV_ANIM_ON);
             }
         }
         else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
@@ -783,7 +783,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
             else if(dropdown->sel_opt_id > 0) {
                 dropdown->sel_opt_id--;
-                position_to_selected(obj);
+                position_to_selected(obj, LV_ANIM_ON);
             }
         }
         else if(c == LV_KEY_ESC) {
@@ -810,7 +810,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
             new_id = LV_CLAMP(0, new_id, (int32_t)dropdown->option_cnt - 1);
 
             dropdown->sel_opt_id = new_id;
-            position_to_selected(obj);
+            position_to_selected(obj, LV_ANIM_ON);
         }
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
@@ -1198,7 +1198,7 @@ static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, int32_t y)
  * Set the position of list when it is closed to show the selected item
  * @param ddlist pointer to a drop down list
  */
-static void position_to_selected(lv_obj_t * dropdown_obj)
+static void position_to_selected(lv_obj_t * dropdown_obj, lv_anim_enable_t anim_en)
 {
     lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
 
@@ -1214,7 +1214,7 @@ static void position_to_selected(lv_obj_t * dropdown_obj)
     int32_t line_y1 = dropdown->sel_opt_id * unit_h;
 
     /*Scroll to the selected option*/
-    lv_obj_scroll_to_y(dropdown->list, line_y1, LV_ANIM_OFF);
+    lv_obj_scroll_to_y(dropdown->list, line_y1, anim_en);
     lv_obj_invalidate(dropdown->list);
 }
 

@@ -210,7 +210,8 @@ static bool stroke_create_cb(stroke_item_t * item, void * user_data)
                                 0);
 
     if(error != VG_LITE_SUCCESS) {
-        LV_LOG_ERROR("vg_lite_set_stroke failed: %d(%s)", (int)error, lv_vg_lite_error_string(error));
+        LV_LOG_ERROR("vg_lite_set_stroke error: %d", (int)error);
+        lv_vg_lite_error_dump_info(error);
         stroke_free_cb(item, NULL);
         return false;
     }
@@ -227,7 +228,8 @@ static bool stroke_create_cb(stroke_item_t * item, void * user_data)
     LV_ASSERT_MSG(vg_path->path == ori_path, "vg_path->path should not change");
 
     if(error != VG_LITE_SUCCESS) {
-        LV_LOG_ERROR("vg_lite_update_stroke failed: %d(%s)", (int)error, lv_vg_lite_error_string(error));
+        LV_LOG_ERROR("vg_lite_update_stroke error: %d", (int)error);
+        lv_vg_lite_error_dump_info(error);
         stroke_free_cb(item, NULL);
         return false;
     }
@@ -247,9 +249,6 @@ static void stroke_free_cb(stroke_item_t * item, void * user_data)
 
 static lv_cache_compare_res_t path_compare(const vg_lite_path_t * lhs, const vg_lite_path_t * rhs)
 {
-    LV_VG_LITE_ASSERT_PATH(lhs);
-    LV_VG_LITE_ASSERT_PATH(rhs);
-
     LV_ASSERT(lhs->format == VG_LITE_FP32);
     LV_ASSERT(rhs->format == VG_LITE_FP32);
 

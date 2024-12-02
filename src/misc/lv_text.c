@@ -106,7 +106,7 @@ void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
 
     /*Calc. the height and longest line*/
     while(text[line_start] != '\0') {
-        new_line_start += lv_text_get_next_line(&text[line_start], font, letter_space, max_width, NULL, flag);
+        new_line_start += lv_text_get_next_line(&text[line_start], LV_TEXT_LEN_MAX, font, letter_space, max_width, NULL, flag);
 
         if((unsigned long)size_res->y + (unsigned long)letter_height + (unsigned long)line_space > LV_MAX_OF(int32_t)) {
             LV_LOG_WARN("integer overflow while calculating text height");
@@ -134,6 +134,37 @@ void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
         size_res->y = letter_height;
     else
         size_res->y -= line_space;
+}
+
+bool lv_text_is_cmd(lv_text_cmd_state_t * state, uint32_t c)
+{
+    bool ret = false;
+
+    if(c == (uint32_t)LV_TXT_COLOR_CMD[0]) {
+        if(*state == LV_TEXT_CMD_STATE_WAIT) { /*Start char*/
+            *state = LV_TEXT_CMD_STATE_PAR;
+            ret = true;
+        }
+        /*Other start char in parameter is escaped cmd. char*/
+        else if(*state == LV_TEXT_CMD_STATE_WAIT) {
+            *state = LV_TEXT_CMD_STATE_WAIT;
+        }
+        /*Command end*/
+        else if(*state == LV_TEXT_CMD_STATE_IN) {
+            *state = LV_TEXT_CMD_STATE_WAIT;
+            ret = true;
+        }
+    }
+
+    /*Skip the color parameter and wait the space after it*/
+    if(*state == LV_TEXT_CMD_STATE_PAR) {
+        if(c == ' ') {
+            *state = LV_TEXT_CMD_STATE_IN; /*After the parameter the text is in the command*/
+        }
+        ret = true;
+    }
+
+    return ret;
 }
 
 /**
@@ -164,11 +195,13 @@ void lv_text_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
  * @param max_width max width of the text (break the lines to fit this size). Set COORD_MAX to avoid line breaks
  * @param flags settings for the text from 'txt_flag_type' enum
  * @param[out] word_w_ptr width (in pixels) of the parsed word. May be NULL.
+ * @param cmd_state Pointer to a lv_text_cmd_state_t variable which stored the current state of command proocessing
  * @return the index of the first char of the next word (in byte index not letter index. With UTF-8 they are different)
  */
 static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
                                       int32_t letter_space, int32_t max_width,
-                                      lv_text_flag_t flag, uint32_t * word_w_ptr)
+                                      lv_text_flag_t flag, uint32_t * word_w_ptr,
+                                      lv_text_cmd_state_t * cmd_state)
 {
     if(txt == NULL || txt[0] == '\0') return 0;
     if(font == NULL) return 0;
@@ -192,6 +225,16 @@ static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
         letter_next = lv_text_encoded_next(txt, &i_next_next);
         word_len++;
 
+        /*Handle the recolor command*/
+        if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
+            if(lv_text_is_cmd(cmd_state, letter)) {
+                i = i_next;
+                i_next = i_next_next;
+                letter = letter_next;
+                continue;   /*Skip the letter if it is part of a command*/
+            }
+        }
+
         letter_w = lv_font_get_glyph_width(font, letter, letter_next);
         cur_w += letter_w;
 
@@ -203,6 +246,9 @@ static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
         if(break_index == NO_BREAK_FOUND && (cur_w - letter_space) > max_width) {
             break_index = i;
             break_letter_count = word_len - 1;
+            if(flag & LV_TEXT_FLAG_BREAK_ALL) {
+                break;
+            }
             /*break_index is now pointing at the character that doesn't fit*/
         }
 
@@ -272,9 +318,9 @@ static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
 #endif
 }
 
-uint32_t lv_text_get_next_line(const char * txt, const lv_font_t * font,
-                               int32_t letter_space, int32_t max_width,
-                               int32_t * used_width, lv_text_flag_t flag)
+uint32_t lv_text_get_next_line(const char * txt, uint32_t len,
+                               const lv_font_t * font, int32_t letter_space,
+                               int32_t max_width, int32_t * used_width, lv_text_flag_t flag)
 {
     if(used_width) *used_width = 0;
 
@@ -288,23 +334,25 @@ uint32_t lv_text_get_next_line(const char * txt, const lv_font_t * font,
      *without thinking about word wrapping*/
     if((flag & LV_TEXT_FLAG_EXPAND) || (flag & LV_TEXT_FLAG_FIT)) {
         uint32_t i;
-        for(i = 0; txt[i] != '\n' && txt[i] != '\r' && txt[i] != '\0'; i++) {
+        for(i = 0; i < len && txt[i] != '\n' && txt[i] != '\r' && txt[i] != '\0'; i++) {
             /*Just find the new line chars or string ends by incrementing `i`*/
         }
-        if(txt[i] != '\0') i++;    /*To go beyond `\n`*/
+        if(i < len && txt[i] != '\0') i++;    /*To go beyond `\n`*/
         if(used_width) *used_width = -1;
         return i;
     }
 
     if(flag & LV_TEXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
+    lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
+
     uint32_t i = 0;                                        /*Iterating index into txt*/
 
-    while(txt[i] != '\0' && max_width > 0) {
+    while(i < len && txt[i] != '\0' && max_width > 0) {
         lv_text_flag_t word_flag = flag;
         if(i == 0) word_flag |= LV_TEXT_FLAG_BREAK_ALL;
 
         uint32_t word_w = 0;
-        uint32_t advance = lv_text_get_next_word(&txt[i], font, letter_space, max_width, word_flag, &word_w);
+        uint32_t advance = lv_text_get_next_word(&txt[i], font, letter_space, max_width, word_flag, &word_w, &cmd_state);
         max_width -= word_w;
         line_w += word_w;
 
@@ -352,6 +400,45 @@ int32_t lv_text_get_width(const char * txt, uint32_t length, const lv_font_t * f
             uint32_t letter;
             uint32_t letter_next;
             lv_text_encoded_letter_next_2(txt, &letter, &letter_next, &i);
+
+            int32_t char_width = lv_font_get_glyph_width(font, letter, letter_next);
+            if(char_width > 0) {
+                width += char_width;
+                width += letter_space;
+            }
+        }
+
+        if(width > 0) {
+            width -= letter_space; /*Trim the last letter space. Important if the text is center
+                                      aligned*/
+        }
+    }
+
+    return width;
+}
+
+int32_t lv_text_get_width_with_flags(const char * txt, uint32_t length, const lv_font_t * font, int32_t letter_space,
+                                     lv_text_flag_t flags)
+{
+    if(txt == NULL) return 0;
+    if(font == NULL) return 0;
+    if(txt[0] == '\0') return 0;
+
+    uint32_t i                   = 0;
+    int32_t width             = 0;
+    lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
+
+    if(length != 0) {
+        while(i < length) {
+            uint32_t letter;
+            uint32_t letter_next;
+            lv_text_encoded_letter_next_2(txt, &letter, &letter_next, &i);
+
+            if((flags & LV_TEXT_FLAG_RECOLOR) != 0) {
+                if(lv_text_is_cmd(&cmd_state, letter) != false) {
+                    continue;
+                }
+            }
 
             int32_t char_width = lv_font_get_glyph_width(font, letter, letter_next);
             if(char_width > 0) {

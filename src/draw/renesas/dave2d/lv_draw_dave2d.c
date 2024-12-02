@@ -9,6 +9,7 @@
 #include "lv_draw_dave2d.h"
 #if LV_USE_DRAW_DAVE2D
 #include "../../lv_draw_buf_private.h"
+#include "../../../misc/lv_area_private.h"
 
 /*********************
  *      DEFINES
@@ -79,6 +80,7 @@ void lv_draw_dave2d_init(void)
     lv_draw_dave2d_unit_t * draw_dave2d_unit = lv_draw_create_unit(sizeof(lv_draw_dave2d_unit_t));
     draw_dave2d_unit->base_unit.dispatch_cb = lv_draw_dave2d_dispatch;
     draw_dave2d_unit->base_unit.evaluate_cb = _dave2d_evaluate;
+    draw_dave2d_unit->base_unit.name = "DAVE2D";
     draw_dave2d_unit->idx = DRAW_UNIT_ID_DAVE2D;
 
     result = lv_dave2d_init();
@@ -215,6 +217,11 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
     LV_UNUSED(u);
     int32_t ret = 0;
 
+    lv_draw_dsc_base_t * draw_dsc_base = (lv_draw_dsc_base_t *) t->draw_dsc;
+
+    if(!lv_draw_dave2d_is_dest_cf_supported(draw_dsc_base->layer->color_format))
+        return 0;
+
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL: {
 #if USE_D2
@@ -242,6 +249,11 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
             }
 
         case LV_DRAW_TASK_TYPE_IMAGE: {
+                lv_draw_image_dsc_t * dsc = t->draw_dsc;
+                if(dsc->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START) {
+                    ret = 0;
+                    break;
+                }
 #if USE_D2
                 t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
                 t->preference_score = 0;
@@ -358,6 +370,11 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
         }
 #endif
         return LV_DRAW_UNIT_IDLE;  /*Couldn't start rendering*/
+    }
+
+    /* Return if target buffer format is not supported. */
+    if(!lv_draw_dave2d_is_dest_cf_supported(layer->color_format)) {
+        return LV_DRAW_UNIT_IDLE; /*Couldn't start rendering*/
     }
 
     void * buf = lv_draw_layer_alloc_buf(layer);

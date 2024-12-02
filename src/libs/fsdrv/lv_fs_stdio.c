@@ -21,20 +21,10 @@
 /*********************
  *      DEFINES
  *********************/
-#if LV_FS_STDIO_LETTER == '\0'
-    #error "LV_FS_STDIO_LETTER must be set to a valid value"
-#else
-    #if (LV_FS_STDIO_LETTER < 'A') || (LV_FS_STDIO_LETTER > 'Z')
-        #if LV_FS_DEFAULT_DRIVE_LETTER != '\0' /*When using default drive letter, strict format (X:) is mandatory*/
-            #error "LV_FS_STDIO_LETTER must be an upper case ASCII letter"
-        #else /*Lean rules for backward compatibility*/
-            #warning LV_FS_STDIO_LETTER should be an upper case ASCII letter. \
-            Using a slash symbol as drive letter should be replaced with LV_FS_DEFAULT_DRIVE_LETTER mechanism
-        #endif
-    #endif
-#endif
 
-#define MAX_PATH_LEN 256
+#if !LV_FS_IS_VALID_LETTER(LV_FS_STDIO_LETTER)
+    #error "Invalid drive letter"
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -42,7 +32,7 @@
 typedef struct {
 #ifdef _WIN32
     HANDLE dir_p;
-    char next_fn[MAX_PATH_LEN];
+    char next_fn[LV_FS_MAX_PATH_LEN];
 #else
     DIR * dir_p;
 #endif
@@ -126,7 +116,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 
     /*Make the path relative to the current directory (the projects root folder)*/
 
-    char buf[MAX_PATH_LEN];
+    char buf[LV_FS_MAX_PATH_LEN];
     lv_snprintf(buf, sizeof(buf), LV_FS_STDIO_PATH "%s", path);
 
     return fopen(buf, flags);
@@ -236,7 +226,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     dir_handle_t * handle = (dir_handle_t *)lv_malloc(sizeof(dir_handle_t));
 #ifndef WIN32
     /*Make the path relative to the current directory (the projects root folder)*/
-    char buf[MAX_PATH_LEN];
+    char buf[LV_FS_MAX_PATH_LEN];
     lv_snprintf(buf, sizeof(buf), LV_FS_STDIO_PATH "%s", path);
     handle->dir_p = opendir(buf);
     if(handle->dir_p == NULL) {
@@ -249,7 +239,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     WIN32_FIND_DATAA fdata;
 
     /*Make the path relative to the current directory (the projects root folder)*/
-    char buf[MAX_PATH_LEN];
+    char buf[LV_FS_MAX_PATH_LEN];
     lv_snprintf(buf, sizeof(buf), LV_FS_STDIO_PATH "%s\\*", path);
 
     lv_strcpy(handle->next_fn, "");

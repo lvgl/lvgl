@@ -1,4 +1,4 @@
-﻿/**
+/**
 * @file lv_test_assert.c
 *
 * Copyright 2002-2010 Guillaume Cottenceau.

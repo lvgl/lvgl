@@ -95,6 +95,9 @@
 #define LV_USE_THORVG_INTERNAL  1
 #define LV_USE_LZ4_INTERNAL     1
 #define LV_USE_VECTOR_GRAPHIC   1
+#define LV_USE_SVG              1
+#define LV_USE_SVG_ANIMATION    1
+#define LV_USE_SVG_DEBUG        1
 #define LV_USE_PROFILER         1
 #define LV_PROFILER_INCLUDE     "lv_profiler_builtin.h"
 #define LV_USE_GRIDNAV          1
@@ -110,6 +113,7 @@
 #define LV_USE_DEMO_MUSIC       1
 #define LV_USE_DEMO_BENCHMARK   1
 #define LV_USE_DEMO_SCROLL      1
+#define LV_USE_DEMO_EBIKE       1
 #define LV_USE_DEMO_VECTOR_GRAPHIC  1
 
 #define LV_USE_OBJ_ID           1
@@ -153,6 +157,8 @@
 #define LV_USE_FREETYPE 1
 #define LV_FREETYPE_USE_LVGL_PORT 0
 #define LV_FREETYPE_CACHE_FT_GLYPH_CNT 10
+
+#define LV_USE_FONT_MANAGER 1
 
 #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS    1
 

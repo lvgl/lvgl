@@ -120,6 +120,27 @@ typedef struct {
 } vg_color32_t;
 
 typedef struct {
+    uint8_t blue : 4;
+    uint8_t green : 4;
+    uint8_t red : 4;
+    uint8_t alpha : 4;
+} vg_color_bgra4444_t;
+
+typedef struct {
+    uint8_t blue : 2;
+    uint8_t green : 2;
+    uint8_t red : 2;
+    uint8_t alpha : 2;
+} vg_color_bgra2222_t;
+
+typedef struct {
+    uint8_t blue : 5;
+    uint8_t green : 5;
+    uint8_t red : 5;
+    uint8_t alpha : 1;
+} vg_color_bgra5551_t;
+
+typedef struct {
     vg_lite_float_t x;
     vg_lite_float_t y;
 } vg_lite_fpoint_t;
@@ -131,14 +152,20 @@ class vg_lite_ctx
     public:
         std::unique_ptr<SwCanvas> canvas;
         void * target_buffer;
+        void * tvg_target_buffer;
         vg_lite_uint32_t target_px_size;
         vg_lite_buffer_format_t target_format;
+        vg_lite_rectangle_t scissor_rect;
+        bool scissor_is_set;
 
     public:
         vg_lite_ctx()
             : target_buffer { nullptr }
+            , tvg_target_buffer { nullptr }
             , target_px_size { 0 }
             , target_format { VG_LITE_BGRA8888 }
+            , scissor_rect { 0, 0, 0, 0 }
+            , scissor_is_set { false }
             , clut_2colors { 0 }
             , clut_4colors { 0 }
             , clut_16colors { 0 }
@@ -435,6 +462,45 @@ static vg_lite_converter<vg_color32_t, uint8_t> conv_l8_to_bgra8888(
     }
 });
 
+static vg_lite_converter<vg_color32_t, vg_color_bgra5551_t> conv_bgra5551_to_bgra8888(
+    [](vg_color32_t * dest, const vg_color_bgra5551_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
+{
+    while(px_size--) {
+        dest->red = src->red * 0xFF / 0x1F;
+        dest->green = src->green * 0xFF / 0x1F;
+        dest->blue = src->blue * 0xFF / 0x1F;
+        dest->alpha = src->alpha ? 0xFF : 0;
+        src++;
+        dest++;
+    }
+});
+
+static vg_lite_converter<vg_color32_t, vg_color_bgra4444_t> conv_bgra4444_to_bgra8888(
+    [](vg_color32_t * dest, const vg_color_bgra4444_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
+{
+    while(px_size--) {
+        dest->red = src->red * 0xFF / 0xF;
+        dest->green = src->green * 0xFF / 0xF;
+        dest->blue = src->blue * 0xFF / 0xF;
+        dest->alpha = src->alpha * 0xFF / 0xF;
+        src++;
+        dest++;
+    }
+});
+
+static vg_lite_converter<vg_color32_t, vg_color_bgra2222_t> conv_bgra2222_to_bgra8888(
+    [](vg_color32_t * dest, const vg_color_bgra2222_t * src, vg_lite_uint32_t px_size, vg_lite_uint32_t /* color */)
+{
+    while(px_size--) {
+        dest->red = src->red * 0xFF / 0x3;
+        dest->green = src->green * 0xFF / 0x3;
+        dest->blue = src->blue * 0xFF / 0x3;
+        dest->alpha = src->alpha * 0xFF / 0x3;
+        src++;
+        dest++;
+    }
+});
+
 /**********************
  *      MACROS
  **********************/
@@ -680,6 +746,43 @@ extern "C" {
         }
     }
 
+    static void picture_bgra8888_to_bgra5551(vg_color_bgra5551_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size)
+    {
+        while(px_size--) {
+            dest->red = src->red * 0x1F / 0xFF;
+            dest->green = src->green * 0x1F / 0xFF;
+            dest->blue = src->blue * 0x1F / 0xFF;
+            dest->alpha = src->alpha > (0xFF / 2) ? 1 : 0;
+            src++;
+            dest++;
+        }
+    }
+
+    static void picture_bgra8888_to_bgra4444(vg_color_bgra4444_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size)
+    {
+        while(px_size--) {
+            dest->red = src->red * 0xF / 0xFF;
+            dest->green = src->green * 0xF / 0xFF;
+            dest->blue = src->blue * 0xF / 0xFF;
+            dest->alpha = src->alpha * 0xF / 0xFF;
+            src++;
+            dest++;
+        }
+    }
+
+    static void picture_bgra8888_to_bgra2222(vg_color_bgra2222_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size)
+    {
+        while(px_size--) {
+            dest->red = src->red * 0x3 / 0xFF;
+            dest->green = src->green * 0x3 / 0xFF;
+            dest->blue = src->blue * 0x3 / 0xFF;
+            dest->alpha = src->alpha * 0x3 / 0xFF;
+            src++;
+            dest++;
+        }
+    }
+
+
     vg_lite_error_t vg_lite_finish(void)
     {
         vg_lite_ctx * ctx = vg_lite_ctx::get_instance();
@@ -726,6 +829,21 @@ extern "C" {
                     (const vg_color32_t *)ctx->get_temp_target_buffer(),
                     ctx->target_px_size);
                 break;
+            case VG_LITE_BGRA5551:
+                picture_bgra8888_to_bgra5551((vg_color_bgra5551_t *)ctx->target_buffer,
+                                             (const vg_color32_t *)ctx->get_temp_target_buffer(),
+                                             ctx->target_px_size);
+                break;
+            case VG_LITE_BGRA4444:
+                picture_bgra8888_to_bgra4444((vg_color_bgra4444_t *)ctx->target_buffer,
+                                             (const vg_color32_t *)ctx->get_temp_target_buffer(),
+                                             ctx->target_px_size);
+                break;
+            case VG_LITE_BGRA2222:
+                picture_bgra8888_to_bgra2222((vg_color_bgra2222_t *)ctx->target_buffer,
+                                             (const vg_color32_t *)ctx->get_temp_target_buffer(),
+                                             ctx->target_px_size);
+                break;
             case VG_LITE_BGRA8888:
             case VG_LITE_BGRX8888:
                 /* No conversion required. */
@@ -738,6 +856,7 @@ extern "C" {
 
         /* finish convert, clean target buffer info */
         ctx->target_buffer = nullptr;
+        ctx->tvg_target_buffer = nullptr;
         ctx->target_px_size = 0;
 
         return VG_LITE_SUCCESS;
@@ -866,6 +985,7 @@ extern "C" {
             case gcFEATURE_BIT_VG_USE_DST:
             case gcFEATURE_BIT_VG_RADIAL_GRADIENT:
             case gcFEATURE_BIT_VG_IM_REPEAT_REFLECT:
+            case gcFEATURE_BIT_VG_SCISSOR:
 
 #if LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
             case gcFEATURE_BIT_VG_LVGL_SUPPORT:
@@ -1882,29 +2002,47 @@ Empty_sequence_handler:
         return VG_LITE_NOT_SUPPORT;
     }
 
-    vg_lite_error_t vg_lite_set_scissor(int32_t x, int32_t y, int32_t right, int32_t bottom)
+    vg_lite_error_t vg_lite_set_scissor(vg_lite_int32_t x, vg_lite_int32_t y, vg_lite_int32_t right, vg_lite_int32_t bottom)
     {
-        LV_UNUSED(x);
-        LV_UNUSED(y);
-        LV_UNUSED(right);
-        LV_UNUSED(bottom);
-        return VG_LITE_NOT_SUPPORT;
+        auto ctx = vg_lite_ctx::get_instance();
+        vg_lite_int32_t width = right - x;
+        vg_lite_int32_t height = bottom - y;
+
+        if(width <= 0 || height <= 0) {
+            return VG_LITE_INVALID_ARGUMENT;
+        }
+
+        if(ctx->scissor_rect.x == x && ctx->scissor_rect.y == y &&
+           ctx->scissor_rect.width == width && ctx->scissor_rect.height == height) {
+            return VG_LITE_SUCCESS;
+        }
+
+        /*Finish the previous rendering before setting the new scissor*/
+        vg_lite_error_t error;
+        VG_LITE_RETURN_ERROR(vg_lite_finish());
+
+        ctx->scissor_rect.x = x;
+        ctx->scissor_rect.y = y;
+        ctx->scissor_rect.width = width;
+        ctx->scissor_rect.height = height;
+        ctx->scissor_is_set = true;
+        return VG_LITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_enable_scissor(void)
     {
-        return VG_LITE_NOT_SUPPORT;
+        return VG_LITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_disable_scissor(void)
     {
-        return VG_LITE_NOT_SUPPORT;
+        return VG_LITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_get_mem_size(vg_lite_uint32_t * size)
     {
         *size = 0;
-        return VG_LITE_NOT_SUPPORT;
+        return VG_LITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_source_global_alpha(vg_lite_global_alpha_t alpha_mode, uint8_t alpha_value)
@@ -2002,6 +2140,13 @@ Empty_sequence_handler:
         }
 
         return VG_LITE_NOT_SUPPORT;
+    }
+
+    vg_lite_error_t vg_lite_dump_command_buffer(void)
+    {
+        LV_LOG_USER("command:");
+        LV_LOG_USER("@[commit]");
+        return VG_LITE_SUCCESS;
     }
 } /* extern "C" */
 
@@ -2298,6 +2443,8 @@ static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t *
         cur += arg_len * fmt_len;
     }
 
+    TVG_CHECK_RETURN_RESULT(shape_set_stroke(shape, path));
+
     float x_min = path->bounding_box[0];
     float y_min = path->bounding_box[1];
     float x_max = path->bounding_box[2];
@@ -2307,8 +2454,6 @@ static Result shape_append_path(std::unique_ptr<Shape> & shape, vg_lite_path_t *
        && math_equal(x_max, FLT_MAX) && math_equal(y_max, FLT_MAX)) {
         return Result::Success;
     }
-
-    TVG_CHECK_RETURN_RESULT(shape_set_stroke(shape, path));
 
     auto cilp = Shape::gen();
     TVG_CHECK_RETURN_RESULT(cilp->appendRect(x_min, y_min, x_max - x_min, y_max - y_min, 0, 0));
@@ -2336,8 +2481,6 @@ static Result shape_append_rect(std::unique_ptr<Shape> & shape, const vg_lite_bu
 
 static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
 {
-    void * tvg_target_buffer = nullptr;
-
     /* if target_buffer needs to be changed, finish current drawing */
     if(ctx->target_buffer && ctx->target_buffer != target->memory) {
         vg_lite_finish();
@@ -2347,23 +2490,38 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
     ctx->target_format = target->format;
     ctx->target_px_size = target->width * target->height;
 
+    void * canvas_target_buffer;
     if(TVG_IS_VG_FMT_SUPPORT(target->format)) {
         /* if target format is supported by VG, use target buffer directly */
-        tvg_target_buffer = target->memory;
+        canvas_target_buffer = target->memory;
     }
     else {
         /* if target format is not supported by VG, use internal buffer */
-        tvg_target_buffer = ctx->get_temp_target_buffer(target->width, target->height);
+        canvas_target_buffer = ctx->get_temp_target_buffer(target->width, target->height);
     }
 
-    Result res = ctx->canvas->target(
-                     (uint32_t *)tvg_target_buffer,
-                     target->width,
-                     target->width,
-                     target->height,
-                     SwCanvas::ARGB8888);
+    /* Prevent repeated target setting */
+    if(ctx->tvg_target_buffer == canvas_target_buffer) {
+        return Result::Success;
+    }
 
-    return res;
+    ctx->tvg_target_buffer = canvas_target_buffer;
+
+    TVG_CHECK_RETURN_RESULT(ctx->canvas->target(
+                                (uint32_t *)ctx->tvg_target_buffer,
+                                target->width,
+                                target->width,
+                                target->height,
+                                SwCanvas::ARGB8888));
+
+    if(ctx->scissor_is_set) {
+        TVG_CHECK_RETURN_RESULT(
+            ctx->canvas->viewport(
+                ctx->scissor_rect.x, ctx->scissor_rect.y,
+                ctx->scissor_rect.width, ctx->scissor_rect.height));
+    }
+
+    return Result::Success;
 }
 
 static vg_lite_uint32_t width_to_stride(vg_lite_uint32_t w, vg_lite_buffer_format_t color_format)
@@ -2505,6 +2663,21 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
 
             case VG_LITE_BGR565: {
                     conv_bgr565_to_bgra8888.convert(&target, source);
+                }
+                break;
+
+            case VG_LITE_BGRA5551: {
+                    conv_bgra5551_to_bgra8888.convert(&target, source);
+                }
+                break;
+
+            case VG_LITE_BGRA4444: {
+                    conv_bgra4444_to_bgra8888.convert(&target, source);
+                }
+                break;
+
+            case VG_LITE_BGRA2222: {
+                    conv_bgra2222_to_bgra8888.convert(&target, source);
                 }
                 break;
 

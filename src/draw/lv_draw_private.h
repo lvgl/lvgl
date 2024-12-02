@@ -19,6 +19,8 @@ extern "C" {
  *********************/
 
 #include "lv_draw.h"
+#include "../osal/lv_os.h"
+#include "../misc/cache/lv_cache.h"
 
 /*********************
  *      DEFINES
@@ -90,6 +92,11 @@ struct _lv_draw_unit_t {
     lv_layer_t * target_layer;
 
     const lv_area_t * clip_area;
+
+    /**
+     * Name of the draw unit, for debugging purposes only.
+     */
+    const char * name;
 
     /**
      * Called to try to assign a draw task to itself.

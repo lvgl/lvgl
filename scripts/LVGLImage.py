@@ -469,7 +469,9 @@ class LVGLCompressData:
 
         if self.compress == CompressMethod.RLE:
             # RLE compression performs on pixel unit, pad data to pixel unit
-            pad = b'\x00' * (self.blk_size - self.raw_data_len % self.blk_size)
+            pad = b'\x00' * 0
+            if self.raw_data_len % self.blk_size:
+                pad = b'\x00' * (self.blk_size - self.raw_data_len % self.blk_size)
             compressed = RLEImage().rle_compress(raw_data + pad, self.blk_size)
         elif self.compress == CompressMethod.LZ4:
             compressed = lz4.block.compress(raw_data, store_size=False)
@@ -870,9 +872,19 @@ class LVGLImage:
     def _png_to_indexed(self, cf: ColorFormat, filename: str):
         # convert to palette mode
         auto_cf = cf is None
-        reader = png.Reader(
-            bytes=PngQuant(256 if auto_cf else cf.ncolors).convert(filename))
-        w, h, rows, _ = reader.read()
+
+        # read the image data to get the metadata
+        reader = png.Reader(filename=filename)
+        w, h, rows, metadata = reader.read()
+
+        # to preserve original palette data only convert the image if needed. For this
+        # check if image has a palette and the requested palette size equals the existing one 
+        if not 'palette' in metadata or not auto_cf and len(metadata['palette']) !=  2 ** cf.bpp:
+            # reread and convert file
+            reader = png.Reader(
+                bytes=PngQuant(256 if auto_cf else cf.ncolors).convert(filename))
+            w, h, rows, _ = reader.read()
+
         palette = reader.palette(alpha="force")  # always return alpha
 
         palette_len = len(palette)

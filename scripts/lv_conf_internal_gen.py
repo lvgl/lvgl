@@ -51,6 +51,9 @@ fout.write(
 #define LV_DRAW_SW_ASM_HELIUM       2
 #define LV_DRAW_SW_ASM_CUSTOM       255
 
+#define LV_NEMA_HAL_CUSTOM          0
+#define LV_NEMA_HAL_STM32           1
+
 /** Handle special Kconfig options. */
 #ifndef LV_KCONFIG_IGNORE
     #include "lv_conf_kconfig.h"
@@ -71,11 +74,7 @@ fout.write(
 /* If lv_conf.h is not skipped, include it. */
 #if !defined(LV_CONF_SKIP) || defined(LV_CONF_PATH)
     #ifdef LV_CONF_PATH                           /* If there is a path defined for lv_conf.h, use it */
-        #define __LV_TO_STR_AUX(x) #x
-        #define __LV_TO_STR(x) __LV_TO_STR_AUX(x)
-        #include __LV_TO_STR(LV_CONF_PATH)
-        #undef __LV_TO_STR_AUX
-        #undef __LV_TO_STR
+        #include LV_CONF_PATH                     /* Note: Make sure to define custom CONF_PATH as a string */
     #elif defined(LV_CONF_INCLUDE_SIMPLE)         /* Or simply include lv_conf.h is enabled. */
         #include "lv_conf.h"
     #else
@@ -163,7 +162,7 @@ for line in fin.read().splitlines():
     fout.write(f'{line}\n')
 
 fout.write(
-'''
+r'''
 
 /*----------------------------------
  * End of parsing lv_conf_template.h
@@ -213,6 +212,9 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
         #define LV_DRAW_THREAD_STACK_SIZE LV_DRAW_THREAD_STACKSIZE
     #endif
 #endif
+
+/*Allow only upper case letters and '/'  ('/' is a special case for backward compatibility)*/
+#define LV_FS_IS_VALID_LETTER(l) ((l) == '/' || ((l) >= 'A' && (l) <= 'Z'))
 
 /* If running without lv_conf.h, add typedefs with default value. */
 #ifdef LV_CONF_SKIP

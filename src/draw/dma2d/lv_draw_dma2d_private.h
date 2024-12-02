@@ -18,6 +18,7 @@ extern "C" {
 #if LV_USE_DRAW_DMA2D
 
 #include "../lv_draw_private.h"
+#include "../sw/lv_draw_sw.h"
 #include LV_DRAW_DMA2D_HAL_INCLUDE
 
 /*********************

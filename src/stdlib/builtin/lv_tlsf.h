@@ -1,4 +1,4 @@
-﻿#include "../../lv_conf_internal.h"
+#include "../../lv_conf_internal.h"
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
 #ifndef LV_TLSF_H
@@ -41,7 +41,6 @@
 ** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "../../osal/lv_os.h"
 #include "../../misc/lv_ll.h"
 #include "../../misc/lv_types.h"
 

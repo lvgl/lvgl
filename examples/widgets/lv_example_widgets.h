@@ -111,6 +111,7 @@ void lv_example_msgbox_2(void);
 
 void lv_example_obj_1(void);
 void lv_example_obj_2(void);
+void lv_example_obj_3(void);
 
 void lv_example_roller_1(void);
 void lv_example_roller_2(void);
@@ -123,6 +124,8 @@ void lv_example_scale_4(void);
 void lv_example_scale_5(void);
 void lv_example_scale_6(void);
 void lv_example_scale_7(void);
+void lv_example_scale_8(void);
+void lv_example_scale_9(void);
 
 void lv_example_slider_1(void);
 void lv_example_slider_2(void);

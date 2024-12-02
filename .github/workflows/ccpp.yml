@@ -59,6 +59,22 @@ jobs:
       env:
         CC: cl
 
+  build-esp32s3:
+    runs-on: ubuntu-22.04
+    name: Build ESP IDF ESP32S3
+    container: espressif/idf:v5.3.1
+    steps:
+    - name: Clone LVGL as a Component
+      uses: actions/checkout@v4
+      with:
+        path: components/lvgl
+    - name: Copy IDF Project Example
+      run: . /opt/esp/idf/export.sh && cp -r $IDF_PATH/examples/get-started/hello_world/* .
+    - name: Set Target ESP32S3
+      run: . /opt/esp/idf/export.sh && idf.py set-target esp32s3
+    - name: Build
+      run: . /opt/esp/idf/export.sh && idf.py build
+
   test-native:
     runs-on: ubuntu-22.04
     strategy:
@@ -91,9 +107,34 @@ jobs:
         path: |
              tests/ref_imgs*/**/*_err.png
              test_screenshot_error.h
-#    - name: Upload coverage to Codecov
-#      uses: codecov/codecov-action@v4
-#      if: github.event_name == 'push' && github.repository == 'lvgl/lvgl'
-#      with:
-#        fail_ci_if_error: true
-#        verbose: true
+    - id: check_untracked_ref_imgs
+      name: Check for new files and upload them as artifacts if found
+      run: |
+        NEW_REF_IMGS=$(git status --porcelain -- tests/ref_imgs* | grep '^??' | awk '{print $2}')
+
+        if [ -n "$NEW_REF_IMGS" ]; then
+          echo "New files were added during the build process."
+          echo "Uploading untracked ref. images as artifacts..."
+          for file in $NEW_REF_IMGS; do
+            echo "Found new file: $file"
+          done
+          zip -r untracked_ref_imgs.zip $NEW_REF_IMGS
+          echo "::set-output name=new_ref_imgs_found::true"
+        else
+          echo "No new files were found."
+          echo "::set-output name=new_ref_imgs_found::false"
+        fi
+
+    - name: Upload untracked reference images
+      if: steps.check_untracked_ref_imgs.outputs.new_ref_imgs_found == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: Untracked Reference Images
+        path: untracked_ref_imgs.zip
+
+    - name: Fail the build if new files were found
+      if: steps.check_untracked_ref_imgs.outputs.new_ref_imgs_found == 'true'
+      run: |
+        echo "Failing the build due to newly generated reference images."
+        exit 1
+

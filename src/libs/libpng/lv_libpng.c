@@ -271,10 +271,6 @@ static lv_draw_buf_t * decode_png(lv_image_decoder_dsc_t * dsc)
     image.version = PNG_IMAGE_VERSION;
 
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
-        if(lv_strcmp(lv_fs_get_ext(dsc->src), "png") != 0) {              /*Check the extension*/
-            return NULL;
-        }
-
         png_data = alloc_file(dsc->src, &png_data_size);
         if(png_data == NULL) {
             LV_LOG_WARN("can't load file: %s", (const char *)dsc->src);
@@ -321,6 +317,7 @@ static lv_draw_buf_t * decode_png(lv_image_decoder_dsc_t * dsc)
         else if(dsc->src_type == LV_IMAGE_SRC_VARIABLE)
             LV_LOG_ERROR("alloc PNG_IMAGE_SIZE(%" LV_PRIu32 ")", (uint32_t)PNG_IMAGE_SIZE(image));
 
+        png_image_free(&image);
         return NULL;
     }
 

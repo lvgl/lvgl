@@ -22,17 +22,8 @@
  *      DEFINES
  *********************/
 
-#if LV_FS_POSIX_LETTER == '\0'
-    #error "LV_FS_POSIX_LETTER must be set to a valid value"
-#else
-    #if (LV_FS_POSIX_LETTER < 'A') || (LV_FS_POSIX_LETTER > 'Z')
-        #if LV_FS_DEFAULT_DRIVE_LETTER != '\0' /*When using default drive letter, strict format (X:) is mandatory*/
-            #error "LV_FS_POSIX_LETTER must be an upper case ASCII letter"
-        #else /*Lean rules for backward compatibility*/
-            #warning LV_FS_POSIX_LETTER should be an upper case ASCII letter. \
-            Using a slash symbol as drive letter should be replaced with LV_FS_DEFAULT_DRIVE_LETTER mechanism
-        #endif
-    #endif
+#if !LV_FS_IS_VALID_LETTER(LV_FS_POSIX_LETTER)
+    #error "Invalid drive letter"
 #endif
 
 /** The reason for 'fd + 1' is because open() may return a legal fd with a value of 0,
@@ -57,6 +48,7 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path);
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn, uint32_t fn_len);
 static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p);
+static lv_fs_res_t fs_errno_to_res(int errno_val);
 
 /**********************
  *  STATIC VARIABLES
@@ -121,7 +113,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     else if(mode == (LV_FS_MODE_WR | LV_FS_MODE_RD)) flags = O_RDWR | O_CREAT;
 
     /*Make the path relative to the current directory (the projects root folder)*/
-    char buf[256];
+    char buf[LV_FS_MAX_PATH_LEN];
     lv_snprintf(buf, sizeof(buf), LV_FS_POSIX_PATH "%s", path);
 
     int fd = open(buf, flags, 0666);
@@ -148,7 +140,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
     int ret = close(fd);
     if(ret < 0) {
         LV_LOG_WARN("Could not close file: %d, errno: %d", fd, errno);
-        return LV_FS_RES_FS_ERR;
+        return fs_errno_to_res(errno);
     }
 
     return LV_FS_RES_OK;
@@ -172,7 +164,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
     ssize_t ret = read(fd, buf, btr);
     if(ret < 0) {
         LV_LOG_WARN("Could not read file: %d, errno: %d", fd, errno);
-        return LV_FS_RES_FS_ERR;
+        return fs_errno_to_res(errno);
     }
 
     *br = (uint32_t)ret;
@@ -196,7 +188,7 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
     ssize_t ret = write(fd, buf, btw);
     if(ret < 0) {
         LV_LOG_WARN("Could not write file: %d, errno: %d", fd, errno);
-        return LV_FS_RES_FS_ERR;
+        return fs_errno_to_res(errno);
     }
 
     *bw = (uint32_t)ret;
@@ -233,7 +225,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
     off_t offset = lseek(fd, pos, w);
     if(offset < 0) {
         LV_LOG_WARN("Could not seek file: %d, errno: %d", fd, errno);
-        return LV_FS_RES_FS_ERR;
+        return fs_errno_to_res(errno);
     }
 
     return LV_FS_RES_OK;
@@ -255,7 +247,7 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
     off_t offset = lseek(fd, 0, SEEK_CUR);
     if(offset < 0) {
         LV_LOG_WARN("Could not get position of file: %d, errno: %d", fd, errno);
-        return LV_FS_RES_FS_ERR;
+        return fs_errno_to_res(errno);
     }
 
     *pos_p = (uint32_t)offset;
@@ -327,11 +319,63 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
     int ret = closedir(dir_p);
     if(ret < 0) {
         LV_LOG_WARN("Could not close directory: errno: %d", errno);
-        return LV_FS_RES_FS_ERR;
+        return fs_errno_to_res(errno);
     }
 
     return LV_FS_RES_OK;
 }
+
+/**
+ * Convert an errno value to a lv_fs_res_t value
+ * @param errno_val an errno value
+ * @return a corresponding lv_fs_res_t value
+ */
+static lv_fs_res_t fs_errno_to_res(int errno_val)
+{
+    switch(errno_val) {
+        case 0:
+            return LV_FS_RES_OK;
+
+        case EIO: /* I/O error */
+            return LV_FS_RES_HW_ERR;
+
+        case EFAULT: /* Bad address */
+            return LV_FS_RES_FS_ERR;
+
+        case ENOENT: /* No such file or directory */
+            return LV_FS_RES_NOT_EX;
+
+        case ENOSPC: /* No space left on device */
+            return LV_FS_RES_FULL;
+
+        case EALREADY: /* Operation already in progress */
+            return LV_FS_RES_LOCKED;
+
+        case EACCES: /* Permission denied */
+            return LV_FS_RES_DENIED;
+
+        case EBUSY: /* Device or resource busy */
+            return LV_FS_RES_BUSY;
+
+        case ETIMEDOUT: /* Connection timed out */
+            return LV_FS_RES_TOUT;
+
+        case ENOSYS: /* Invalid system call number */
+            return LV_FS_RES_NOT_IMP;
+
+        case ENOMEM: /* Out of memory */
+            return LV_FS_RES_OUT_OF_MEM;
+
+        case EINVAL: /* "Invalid argument" */
+            return LV_FS_RES_INV_PARAM;
+
+        default:
+            break;
+    }
+
+    return LV_FS_RES_UNKNOWN;
+}
+
 #else /*LV_USE_FS_POSIX == 0*/
 
 #if defined(LV_FS_POSIX_LETTER) && LV_FS_POSIX_LETTER != '\0'
