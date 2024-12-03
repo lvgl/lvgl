@@ -360,7 +360,7 @@
     #ifdef CONFIG_LV_DRAW_LAYER_MAX_MEMORY
         #define LV_DRAW_LAYER_MAX_MEMORY CONFIG_LV_DRAW_LAYER_MAX_MEMORY
     #else
-        #define LV_DRAW_LAYER_MAX_MEMORY (32 * 1024 * 1024)  /**< [bytes]*/
+        #define LV_DRAW_LAYER_MAX_MEMORY 0  /**< No limit by default [bytes]*/
     #endif
 #endif
 
