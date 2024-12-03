@@ -223,7 +223,7 @@ Events
    buffer passed must be survive long enough for the call to `lv_timer_handler()`
    that is driving the event to return (after which the Text Area's label will have
    copied the text).  So it should not be a local buffer (created on the stack)
-   where its contents an be destroyed before that happens.  Passing ``""`` means "do
+   where its contents will be destroyed before that happens.  Passing ``""`` means "do
    not insert anything".
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when the content of the Text Area
    has changed.
