@@ -91,7 +91,7 @@ lv_vg_lite_path_t * lv_vg_lite_path_create(vg_lite_format_t data_format)
     LV_ASSERT(vg_lite_init_path(
                   &path->base,
                   data_format,
-                  VG_LITE_MEDIUM,
+                  VG_LITE_HIGH,
                   0,
                   NULL,
                   0, 0, 0, 0)
@@ -139,7 +139,7 @@ void lv_vg_lite_path_reset(lv_vg_lite_path_t * path, vg_lite_format_t data_forma
     LV_ASSERT_NULL(path);
     path->base.path_length = 0;
     path->base.format = data_format;
-    path->base.quality = VG_LITE_MEDIUM;
+    path->base.quality = VG_LITE_HIGH;
     path->base.path_type = VG_LITE_DRAW_ZERO;
     path->format_len = lv_vg_lite_path_format_len(data_format);
     path->has_transform = false;
