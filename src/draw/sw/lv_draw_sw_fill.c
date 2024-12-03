@@ -127,6 +127,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, lv_draw_fill_dsc_t * dsc, const
 
     /*Prepare complex gradient*/
     if(grad_dir >= LV_GRAD_DIR_LINEAR) {
+        LV_ASSERT_NULL(grad);
         switch(grad_dir) {
             case LV_GRAD_DIR_LINEAR:
                 lv_gradient_linear_setup(&dsc->grad, coords);
@@ -169,6 +170,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, lv_draw_fill_dsc_t * dsc, const
 
             switch(grad_dir) {
                 case LV_GRAD_DIR_VER:
+                    LV_ASSERT_NULL(grad);
                     blend_dsc.color = grad->color_map[top_y - bg_coords.y1];
                     blend_dsc.opa = grad->opa_map[top_y - bg_coords.y1];
                     break;
@@ -210,6 +212,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, lv_draw_fill_dsc_t * dsc, const
 
             switch(grad_dir) {
                 case LV_GRAD_DIR_VER:
+                    LV_ASSERT_NULL(grad);
                     blend_dsc.color = grad->color_map[bottom_y - bg_coords.y1];
                     blend_dsc.opa = grad->opa_map[bottom_y - bg_coords.y1];
                     break;
@@ -277,6 +280,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, lv_draw_fill_dsc_t * dsc, const
             case LV_GRAD_DIR_CONICAL:
                 blend_dsc.mask_res = transp ? LV_DRAW_SW_MASK_RES_CHANGED : LV_DRAW_SW_MASK_RES_FULL_COVER;
                 blend_dsc.mask_buf = grad_opa_map;
+                break;
             default:
                 break;
         }
@@ -289,6 +293,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, lv_draw_fill_dsc_t * dsc, const
 
             switch(grad_dir) {
                 case LV_GRAD_DIR_VER:
+                    LV_ASSERT_NULL(grad);
                     blend_dsc.color = grad->color_map[h - bg_coords.y1];
                     if(opa >= LV_OPA_MAX) blend_dsc.opa = grad->opa_map[h - bg_coords.y1];
                     else blend_dsc.opa = LV_OPA_MIX2(grad->opa_map[h - bg_coords.y1], opa);
