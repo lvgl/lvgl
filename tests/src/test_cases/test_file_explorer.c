@@ -40,7 +40,7 @@ void test_file_explorer_read_dir(void)
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
     for(uint8_t i = 0; i < file_table->row_cnt; i++) {
-        if(lv_strcmp(lv_table_get_cell_value(file_explorer->file_table, i, 0), LV_SYMBOL_DIRECTORY "  ..") == 0) {
+        if(lv_strcmp(lv_table_get_cell_value(file_explorer->file_table, i, 0), LV_SYMBOL_LEFT "  Back") == 0) {
             back_row = i;
         }
         if(lv_strcmp(lv_table_get_cell_value(file_explorer->file_table, i, 0), LV_SYMBOL_DIRECTORY "  dev") == 0) {
