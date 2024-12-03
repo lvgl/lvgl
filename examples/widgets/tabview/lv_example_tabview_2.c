@@ -38,7 +38,7 @@ void lv_example_tabview_2(void)
     lv_label_set_text(label, "Third tab");
 
     label = lv_label_create(tab4);
-    lv_label_set_text(label, "Forth tab");
+    lv_label_set_text(label, "Fourth tab");
 
     label = lv_label_create(tab5);
     lv_label_set_text(label, "Fifth tab");
