@@ -52,6 +52,8 @@ it is representing, as well as other things relevant to its lifetime:
 - Resolution (width and height in pixels)
 - Color Depth (bits per pixel)
 - Color Format (how colors in pixels are laid out)
+- DPI (default is configured :c:macro:`LV_DPI_DEF` in ``lv_conf.h``, but can be
+  modified with :cpp:expr:`lv_display_set_dpi(disp, new_dpi)`).
 - 4 :ref:`screen_layers` automatically created with each display
 - All :ref:`screens` created in association with this display (and not yet deleted---only
   one is dislayed at any given time)
