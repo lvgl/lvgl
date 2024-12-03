@@ -1,7 +1,7 @@
 #include "../../lv_examples.h"
-#include "../../../src/lvgl_private.h"
 
 #if LV_USE_CHART && LV_DRAW_SW_COMPLEX && LV_BUILD_EXAMPLES
+#include "../../../lvgl_private.h"
 
 static void hook_division_lines(lv_event_t * e);
 static void add_faded_area(lv_event_t * e);
