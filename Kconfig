@@ -204,7 +204,7 @@ menu "LVGL configuration"
 
 		config LV_DRAW_LAYER_MAX_MEMORY
 			int "The maximum amount of memory that can be used for layers"
-			default 33554432
+			default 0
 			help
 				Limit the max allocated memory for simple and transformed layers.
 				It should be at least `LV_DRAW_LAYER_SIMPLE_BUF_SIZE` sized but if transformed layers are also used
