@@ -38,7 +38,7 @@ Usage
 Create a Window
 ---------------
 
-:cpp:expr:`lv_win_create(parent)` creates a Window that, is initially
+:cpp:expr:`lv_win_create(parent)` creates a Window that is initially
 composed of the following Widget structure:
 
 - Background (a :ref:`base_widget`, the main window container), is set up to be a
