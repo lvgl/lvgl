@@ -79,7 +79,7 @@ void lv_draw_vg_lite_init(void)
 #endif
     lv_vg_lite_path_init(unit);
     lv_vg_lite_decoder_init();
-    lv_draw_vg_lite_label_init(&unit->base_unit);
+    lv_draw_vg_lite_label_init(unit);
 }
 
 void lv_draw_vg_lite_deinit(void)
@@ -294,6 +294,7 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit)
 #endif
     lv_vg_lite_path_deinit(unit);
     lv_vg_lite_decoder_deinit();
+    lv_draw_vg_lite_label_deinit(unit);
     return 1;
 }
 

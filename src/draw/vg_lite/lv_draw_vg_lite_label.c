@@ -7,19 +7,20 @@
  *      INCLUDES
  *********************/
 
-#include "../../misc/lv_area_private.h"
-#include "../../libs/freetype/lv_freetype_private.h"
-#include "../lv_draw_label_private.h"
-#include "lv_draw_vg_lite.h"
-
 #include "../../lvgl.h"
 
 #if LV_USE_DRAW_VG_LITE
 
+#include "lv_draw_vg_lite.h"
+#include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_utils.h"
 #include "lv_vg_lite_path.h"
-#include "lv_draw_vg_lite_type.h"
-#include <float.h>
+#include "lv_vg_lite_pending.h"
+#include "../../misc/cache/lv_cache_entry_private.h"
+#include "../../misc/lv_area_private.h"
+#include "../../libs/freetype/lv_freetype_private.h"
+#include "../lv_draw_label_private.h"
+
 
 /*********************
  *      DEFINES
@@ -54,6 +55,8 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
 
 static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc);
 
+static void bitmap_cache_release_cb(void * entry, void * user_data);
+
 #if LV_USE_FREETYPE
     static void freetype_outline_event_cb(lv_event_t * e);
     static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc);
@@ -70,14 +73,26 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_draw_vg_lite_label_init(lv_draw_unit_t * draw_unit)
+
+void lv_draw_vg_lite_label_init(struct _lv_draw_vg_lite_unit_t * u)
 {
 #if LV_USE_FREETYPE
     /*Set up the freetype outline event*/
-    lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, draw_unit);
+    lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, u);
 #else
-    LV_UNUSED(draw_unit);
+    LV_UNUSED(u);
 #endif /* LV_USE_FREETYPE */
+
+    u->bitmap_font_pending = lv_vg_lite_pending_create(sizeof(lv_font_glyph_dsc_t), 8);
+    lv_vg_lite_pending_set_free_cb(u->bitmap_font_pending, bitmap_cache_release_cb, NULL);
+}
+
+void lv_draw_vg_lite_label_deinit(struct _lv_draw_vg_lite_unit_t * u)
+{
+    LV_ASSERT_NULL(u);
+    LV_ASSERT_NULL(u->bitmap_font_pending)
+    lv_vg_lite_pending_destroy(u->bitmap_font_pending);
+    u->bitmap_font_pending = NULL;
 }
 
 void lv_draw_vg_lite_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords)
@@ -270,12 +285,24 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
         lv_vg_lite_path_drop(u, path);
     }
 
-    /* TODO: The temporary buffer of the built-in font is reused.
-     * You need to wait for the GPU to finish using the buffer before releasing it.
-     * Later, use the font cache for management to improve efficiency.
-     */
+#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
+    /* Increment the cache reference count */
+    lv_cache_entry_acquire_data(dsc->g->entry);
+
+    lv_vg_lite_pending_add(u->bitmap_font_pending, dsc->g);
+#else
+    /* No caching, wait for GPU finish before releasing the data */
     lv_vg_lite_finish(u);
+#endif
+
     LV_PROFILER_DRAW_END;
+}
+
+static void bitmap_cache_release_cb(void * entry, void * user_data)
+{
+    LV_UNUSED(user_data);
+    lv_font_glyph_dsc_t * g_dsc = entry;
+    lv_font_glyph_release_draw_data(g_dsc);
 }
 
 #if LV_USE_FREETYPE
