@@ -23,7 +23,7 @@
 #endif /*LV_USE_FONT_COMPRESSED*/
 
 #if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
-    #define font_image_cache LV_GLOBAL_DEFAULT()->font_image_cache
+    #define font_bitmap_cache LV_GLOBAL_DEFAULT()->font_bitmap_cache
     #define font_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->font_draw_buf_handlers)
 #endif
 
@@ -42,7 +42,7 @@ typedef struct {
 
     /* value */
     lv_draw_buf_t * draw_buf;
-} font_image_cache_data_t;
+} font_bitmap_cache_data_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -51,8 +51,8 @@ static void * get_bitmap(const lv_font_fmt_txt_dsc_t * fdsc, const lv_font_fmt_t
                          lv_draw_buf_t * draw_buf);
 
 #if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
-    static lv_cache_t * font_image_cache_init(uint32_t cache_size);
-    static void font_image_cache_deinit(lv_cache_t * cache);
+    static lv_cache_t * font_bitmap_cache_init(uint32_t cache_size);
+    static void font_bitmap_cache_deinit(lv_cache_t * cache);
     static void * get_bitmap_cached(lv_font_glyph_dsc_t * g_dsc, const lv_font_fmt_txt_dsc_t * fdsc, uint32_t gid);
 #endif /*LV_FONT_FMT_TXT_CACHE_GLYPH_CNT*/
 
@@ -101,15 +101,15 @@ static const uint8_t opa2_table[4] = {0, 85, 170, 255};
 void lv_font_fmt_txt_init(void)
 {
 #if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
-    font_image_cache = font_image_cache_init(LV_FONT_FMT_TXT_CACHE_GLYPH_CNT);
+    font_bitmap_cache = font_bitmap_cache_init(LV_FONT_FMT_TXT_CACHE_GLYPH_CNT);
 #endif
 }
 
 void lv_font_fmt_txt_deinit(void)
 {
 #if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
-    font_image_cache_deinit(font_image_cache);
-    font_image_cache = NULL;
+    font_bitmap_cache_deinit(font_bitmap_cache);
+    font_bitmap_cache = NULL;
 #endif
 }
 
@@ -146,7 +146,7 @@ void lv_font_release_glyph_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
 {
     LV_UNUSED(font);
 #if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
-    lv_cache_release(font_image_cache, g_dsc->entry, NULL);
+    lv_cache_release(font_bitmap_cache, g_dsc->entry, NULL);
 #endif
     g_dsc->entry = NULL;
 }
@@ -315,7 +315,7 @@ static void * get_bitmap(const lv_font_fmt_txt_dsc_t * fdsc, const lv_font_fmt_t
 
 #if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
 
-static bool font_image_create_cb(font_image_cache_data_t * data, void * user_data)
+static bool font_image_create_cb(font_bitmap_cache_data_t * data, void * user_data)
 {
     LV_UNUSED(user_data);
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &data->fdsc->glyph_dsc[data->glyph_index];
@@ -341,14 +341,14 @@ static bool font_image_create_cb(font_image_cache_data_t * data, void * user_dat
     return true;
 }
 
-static void font_image_free_cb(font_image_cache_data_t * data, void * user_data)
+static void font_image_free_cb(font_bitmap_cache_data_t * data, void * user_data)
 {
     LV_UNUSED(user_data);
     lv_draw_buf_destroy(data->draw_buf);
 }
 
-static lv_cache_compare_res_t font_image_compare_cb(const font_image_cache_data_t * lhs,
-                                                    const font_image_cache_data_t * rhs)
+static lv_cache_compare_res_t font_image_compare_cb(const font_bitmap_cache_data_t * lhs,
+                                                    const font_bitmap_cache_data_t * rhs)
 {
     if(lhs->glyph_index != rhs->glyph_index) {
         return lhs->glyph_index > rhs->glyph_index ? 1 : -1;
@@ -359,7 +359,7 @@ static lv_cache_compare_res_t font_image_compare_cb(const font_image_cache_data_
     return 0;
 }
 
-static lv_cache_t * font_image_cache_init(uint32_t cache_size)
+static lv_cache_t * font_bitmap_cache_init(uint32_t cache_size)
 {
     lv_cache_ops_t ops = {
         .compare_cb = (lv_cache_compare_cb_t)font_image_compare_cb,
@@ -367,14 +367,14 @@ static lv_cache_t * font_image_cache_init(uint32_t cache_size)
         .free_cb = (lv_cache_free_cb_t)font_image_free_cb,
     };
 
-    lv_cache_t * cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(font_image_cache_data_t),
+    lv_cache_t * cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(font_bitmap_cache_data_t),
                                          cache_size, ops);
-    lv_cache_set_name(cache, "FONT_IMAGE_CACHE");
+    lv_cache_set_name(cache, "font_bitmap_cache");
 
     return cache;
 }
 
-static void font_image_cache_deinit(lv_cache_t * cache)
+static void font_bitmap_cache_deinit(lv_cache_t * cache)
 {
     lv_cache_destroy(cache, NULL);
 }
@@ -382,19 +382,19 @@ static void font_image_cache_deinit(lv_cache_t * cache)
 static void * get_bitmap_cached(lv_font_glyph_dsc_t * g_dsc, const lv_font_fmt_txt_dsc_t * fdsc, uint32_t glyph_index)
 {
     LV_PROFILER_FONT_BEGIN;
-    font_image_cache_data_t search_key = {
+    font_bitmap_cache_data_t search_key = {
         .fdsc = fdsc,
         .glyph_index = glyph_index,
     };
 
-    lv_cache_entry_t * entry = lv_cache_acquire_or_create(font_image_cache, &search_key, NULL);
+    lv_cache_entry_t * entry = lv_cache_acquire_or_create(font_bitmap_cache, &search_key, NULL);
 
     if(!entry) {
         return NULL;
     }
 
     g_dsc->entry = entry;
-    font_image_cache_data_t * cache_node = lv_cache_entry_get_data(entry);
+    font_bitmap_cache_data_t * cache_node = lv_cache_entry_get_data(entry);
 
     LV_PROFILER_FONT_END;
     return cache_node->draw_buf;
