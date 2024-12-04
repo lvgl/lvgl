@@ -22,19 +22,57 @@ In short this means:
 - width/height means the full size, the "content area" is smaller with padding and border width
 - a subset of flexbox and grid layouts are supported
 
+
+
 .. _coord_units:
 
-Units
-*****
+Length Units
+************
 
--  pixel: Simply a position in pixels. An integer always means pixels.
-   E.g. :cpp:expr:`lv_obj_set_x(btn, 10)`
--  percentage: The percentage of the size of the Widget or its parent
-   (depending on the property). :cpp:expr:`lv_pct(value)` converts a value to
-   percentage. E.g. :cpp:expr:`lv_obj_set_width(btn, lv_pct(50))`
--  :c:macro:`LV_SIZE_CONTENT`: Special value to set the width/height of an
-   Widget to involve all the children. It's similar to ``auto`` in CSS.
-   E.g. :cpp:expr:`lv_obj_set_width(btn, LV_SIZE_CONTENT)`.
+When passing "length units" (a.k.a. "distance units" or "size units") as arguments to
+functions that modify position, size, etc., to make layout of your UI convenient, you
+have a choice of several different types of units you can use.
+
+:pixels:             Specify size as pixels:  an integer value <
+                     :c:macro:`LV_COORD_MAX` always means pixels.  E.g.
+                     :cpp:expr:`lv_obj_set_x(btn, 10)`.
+
+:percentage:         Specify size as a percentage of the size of the Widget's
+                     parent or of itself, depending on the property.
+                     :cpp:expr:`lv_pct(value)` converts ``value`` to a percentage.
+                     E.g. :cpp:expr:`lv_obj_set_width(btn, lv_pct(50))`.  If you want
+                     to avoid the overhead of the call to :cpp:func:`lv_pct`, you can
+                     also use the macro :c:macro:`LV_PCT(x)` to mean the same thing.
+                     Note that when you use this feature, your value is *stored as a
+                     percent* so that if/when the size of the parent container (or
+                     other positioning factor) changes, this style value dynamically
+                     retains its meaning.
+
+:contained content:  Specify size as a function of the Widget's children.  The macro
+                     :c:macro:`LV_SIZE_CONTENT`: passed as a size value has special
+                     meaning:  it means to set the width and/or height of a Widget
+                     just large enough to include all of its children.  This is
+                     similar to ``auto`` in CSS.  E.g.
+                     :cpp:expr:`lv_obj_set_width(btn, LV_SIZE_CONTENT)`.
+
+:inches:             Specify size as 1/160-th portion of an inch as if it were pixels
+                     on a 160-DPI display, even though a display may have a different
+                     DPI.  Use :cpp:expr:`lv_dpx(n)` or :c:macro:`LV_DPX(n)` to do
+                     this.  Examples:
+
+                     +----+-----+----------------------------+
+                     | n  | DPI | Computed Pixels            |
+                     +====+=====+============================+
+                     | 40 | 320 | 80 pixels to make 1/4 inch |
+                     +----+-----+----------------------------+
+                     | 40 | 160 | 40 pixels to make 1/4 inch |
+                     +----+-----+----------------------------+
+                     | 40 | 130 | 33 pixels to make 1/4 inch |
+                     +----+-----+----------------------------+
+                     | 80 | 130 | 66 pixels to make 1/2 inch |
+                     +----+-----+----------------------------+
+
+                     See DPI under :ref:`display_features`.
 
 
 
@@ -59,6 +97,8 @@ The border is drawn inside the bounding box. Inside the border LVGL
 keeps a "padding margin" when placing a Widget's children.
 
 The outline is drawn outside the bounding box.
+
+
 
 .. _coord_notes:
 
@@ -85,6 +125,8 @@ the coordinates. To do this call :cpp:func:`lv_obj_update_layout`.
 The size and position might depend on the parent or layout. Therefore
 :cpp:func:`lv_obj_update_layout` recalculates the coordinates of all Widgets on
 the screen of ``obj``.
+
+
 
 .. _coord_removing styles:
 

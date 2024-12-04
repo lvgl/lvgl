@@ -15,6 +15,8 @@ extern "C" {
  *********************/
 #include "lv_indev.h"
 #include "../misc/lv_anim.h"
+#include "lv_indev_scroll.h"
+
 /*********************
  *      DEFINES
  *********************/
