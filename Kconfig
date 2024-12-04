@@ -972,6 +972,7 @@ menu "LVGL configuration"
 
 		config LV_FONT_FMT_TXT_CACHE_GLYPH_CNT
 			int "Number of glyphs to cache in the build-in font cache."
+			default 0
 			help
 				This can improve performance if the same text is drawn multiple times.
 
