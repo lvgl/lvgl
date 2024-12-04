@@ -179,12 +179,18 @@ void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
     if(lv_area_get_height(&a_clipped) <= 0) return;
 
     uint8_t * buf = lv_draw_buf_goto_xy(draw_buf, a_clipped.x1, a_clipped.y1);
+    uint8_t * alpha_buf = draw_buf->data + (buf - draw_buf->data) / 2 + (stride * draw_buf->header.h);
     uint8_t bpp = lv_color_format_get_bpp(header->cf);
     uint32_t line_length = (lv_area_get_width(&a_clipped) * bpp + 7) >> 3;
     int32_t y;
     for(y = a_clipped.y1; y <= a_clipped.y2; y++) {
         lv_memzero(buf, line_length);
         buf += stride;
+        if(draw_buf->header.cf == LV_COLOR_FORMAT_RGB565A8)
+        {
+            lv_memzero(alpha_buf, (line_length / 2));
+            alpha_buf += (stride / 2);
+        }
     }
 }
 
@@ -192,7 +198,9 @@ void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
                       const lv_draw_buf_t * src, const lv_area_t * src_area)
 {
     uint8_t * dest_bufc;
+    uint8_t * dest_alpha_bufc;
     uint8_t * src_bufc;
+    uint8_t * src_alpha_bufc;
     int32_t line_width;
 
     /*Source and dest color format must be same. Color conversion is not supported yet.*/
@@ -221,6 +229,11 @@ void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
 
     if(dest_area) dest_bufc = lv_draw_buf_goto_xy(dest, dest_area->x1, dest_area->y1);
     else dest_bufc = lv_draw_buf_goto_xy(dest, 0, 0);
+    if (dest->header.cf == LV_COLOR_FORMAT_RGB565A8)
+    {
+        dest_alpha_bufc = dest->data + ((dest_bufc - dest->data) / 2 + (dest->header.w * dest->header.h * 2));
+        src_alpha_bufc  = src->data + ((src_bufc - src->data) / 2 + (src->header.w * src->header.h * 2));
+    }
 
     int32_t start_y, end_y;
     if(dest_area) {
@@ -240,6 +253,12 @@ void lv_draw_buf_copy(lv_draw_buf_t * dest, const lv_area_t * dest_area,
         lv_memcpy(dest_bufc, src_bufc, line_bytes);
         dest_bufc += dest_stride;
         src_bufc += src_stride;
+        if (dest->header.cf == LV_COLOR_FORMAT_RGB565A8)
+        {
+            lv_memcpy(dest_alpha_bufc, src_alpha_bufc, line_width);
+            dest_alpha_bufc += dest->header.w;
+            src_alpha_bufc += src->header.w;
+        }
     }
 }
 

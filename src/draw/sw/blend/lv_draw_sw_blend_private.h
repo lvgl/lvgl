@@ -48,9 +48,11 @@ struct _lv_draw_sw_blend_dsc_t {
 
 struct _lv_draw_sw_blend_fill_dsc_t {
     void * dest_buf;
+    void * dest_alpha_buf;
     int32_t dest_w;
     int32_t dest_h;
     int32_t dest_stride;
+    int32_t dest_alpha_stride;
     const lv_opa_t * mask_buf;
     int32_t mask_stride;
     lv_color_t color;
@@ -60,9 +62,11 @@ struct _lv_draw_sw_blend_fill_dsc_t {
 
 struct _lv_draw_sw_blend_image_dsc_t {
     void * dest_buf;
+    void * dest_alpha_buf;
     int32_t dest_w;
     int32_t dest_h;
     int32_t dest_stride;
+    int32_t dest_alpha_stride;
     const lv_opa_t * mask_buf;
     int32_t mask_stride;
     const void * src_buf;

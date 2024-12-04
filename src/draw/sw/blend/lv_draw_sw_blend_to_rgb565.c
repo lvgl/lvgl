@@ -217,10 +217,36 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb565(lv_draw_sw_blend_fil
     const lv_opa_t * mask = dsc->mask_buf;
     int32_t mask_stride = dsc->mask_stride;
     uint16_t * dest_buf_u16 = dsc->dest_buf;
+    uint8_t * alpha_buf_u8 = dsc->dest_alpha_buf;
     int32_t dest_stride = dsc->dest_stride;
+    int32_t dest_alpha_stride = dsc->dest_alpha_stride;
 
     int32_t x;
     int32_t y;
+
+    for (y = 0; y < h; y++)
+    {
+        if(mask == NULL) 
+        {
+            lv_memset(alpha_buf_u8, opa, w);
+            alpha_buf_u8 += dest_alpha_stride;
+        }
+        else if(opa > LV_OPA_MIN)
+        {
+            for(x = 0; x < w; x++)
+            {
+               alpha_buf_u8[x] = alpha_buf_u8[x] | LV_OPA_MIX2(mask[x], opa);
+            }
+            mask += mask_stride;
+            alpha_buf_u8 += dest_alpha_stride;
+        }
+        else
+        {
+            lv_memset(alpha_buf_u8, opa, w);
+            alpha_buf_u8 += dest_alpha_stride;
+        }
+    }
+    mask = dsc->mask_buf;
 
     LV_UNUSED(w);
     LV_UNUSED(h);
@@ -760,7 +786,9 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_
     int32_t h = dsc->dest_h;
     lv_opa_t opa = dsc->opa;
     uint16_t * dest_buf_u16 = dsc->dest_buf;
+    uint8_t * alpha_buf_u8 = dsc->dest_alpha_buf;
     int32_t dest_stride = dsc->dest_stride;
+    int32_t dest_alpha_stride = dsc->dest_alpha_stride;
     const uint16_t * src_buf_u16 = dsc->src_buf;
     int32_t src_stride = dsc->src_stride;
     const lv_opa_t * mask_buf = dsc->mask_buf;
@@ -768,6 +796,31 @@ static void LV_ATTRIBUTE_FAST_MEM rgb565_image_blend(lv_draw_sw_blend_image_dsc_
 
     int32_t x;
     int32_t y;
+
+    for (y = 0; y < h; y++)
+    {
+        if(mask_buf == NULL) 
+        {
+            lv_memset(alpha_buf_u8, opa, w);
+            alpha_buf_u8 += dest_alpha_stride;
+        }
+        else if(opa > LV_OPA_MIN)
+        {
+            for(x = 0; x < w; x++)
+            {
+               alpha_buf_u8[x] = alpha_buf_u8[x] | LV_OPA_MIX2(mask_buf[x], opa);
+            }
+            mask_buf += mask_stride;
+            alpha_buf_u8 += dest_alpha_stride;
+        }
+        else
+        {
+            lv_memset(alpha_buf_u8, opa, w);
+            alpha_buf_u8 += dest_alpha_stride;
+        }
+    }
+
+    mask_buf = dsc->mask_buf;
 
     if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
         if(mask_buf == NULL && opa >= LV_OPA_MAX) {

@@ -84,6 +84,8 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
         lv_area_move(&fill_dsc.relative_area, -layer->buf_area.x1, -layer->buf_area.y1);
         fill_dsc.dest_buf = lv_draw_layer_go_to_xy(layer, blend_area.x1 - layer->buf_area.x1,
                                                    blend_area.y1 - layer->buf_area.y1);
+        fill_dsc.dest_alpha_buf = layer->draw_buf->data + (((uint8_t*)fill_dsc.dest_buf - (uint8_t*)layer->draw_buf->data) / 2 + (layer->draw_buf->header.stride * layer->draw_buf->header.h));
+        fill_dsc.dest_alpha_stride = layer->draw_buf->header.stride / 2;
         if(fill_dsc.mask_buf) {
             fill_dsc.mask_stride = blend_dsc->mask_stride == 0  ? lv_area_get_width(blend_dsc->mask_area) : blend_dsc->mask_stride;
             fill_dsc.mask_buf += fill_dsc.mask_stride * (blend_area.y1 - blend_dsc->mask_area->y1) +
@@ -93,6 +95,7 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
         switch(layer->color_format) {
 #if LV_DRAW_SW_SUPPORT_RGB565
             case LV_COLOR_FORMAT_RGB565:
+            case LV_COLOR_FORMAT_RGB565A8:
                 lv_draw_sw_blend_color_to_rgb565(&fill_dsc);
                 break;
 #endif
@@ -178,6 +181,8 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
 
         image_dsc.dest_buf = lv_draw_layer_go_to_xy(layer, blend_area.x1 - layer->buf_area.x1,
                                                     blend_area.y1 - layer->buf_area.y1);
+        image_dsc.dest_alpha_buf = layer->draw_buf->data + (((uint8_t*)image_dsc.dest_buf - (uint8_t*)layer->draw_buf->data) / 2 + (layer->draw_buf->header.stride * layer->draw_buf->header.h));
+        image_dsc.dest_alpha_stride = layer->draw_buf->header.stride / 2;
 
         switch(layer->color_format) {
 #if LV_DRAW_SW_SUPPORT_RGB565
