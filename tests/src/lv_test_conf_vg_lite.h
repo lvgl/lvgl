@@ -41,7 +41,7 @@
     The rendering engine needs to support 3x3 matrix transformations.*/
 #define LV_DRAW_TRANSFORM_USE_MATRIX            1
 
-/** Number of glyphs to cache in the build-in font cache.
+/** Number of glyphs to cache in the built-in font cache.
  *  This can improve performance if the same text is drawn multiple times. */
 #define LV_FONT_FMT_TXT_CACHE_GLYPH_CNT 64
 

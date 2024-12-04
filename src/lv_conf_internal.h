@@ -1822,7 +1822,7 @@
     #endif
 #endif
 
-/** Number of glyphs to cache in the build-in font cache.
+/** Number of glyphs to cache in the built-in font cache.
  *  This can improve performance if the same text is drawn multiple times. */
 #ifndef LV_FONT_FMT_TXT_CACHE_GLYPH_CNT
     #ifdef CONFIG_LV_FONT_FMT_TXT_CACHE_GLYPH_CNT
