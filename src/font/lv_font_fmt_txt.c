@@ -101,7 +101,6 @@ static const uint8_t opa2_table[4] = {0, 85, 170, 255};
 void lv_font_fmt_txt_init(void)
 {
 #if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
-    LV_ASSERT(font_image_cache == NULL);
     font_image_cache = font_image_cache_init(LV_FONT_FMT_TXT_CACHE_GLYPH_CNT);
 #endif
 }
@@ -318,6 +317,7 @@ static void * get_bitmap(const lv_font_fmt_txt_dsc_t * fdsc, const lv_font_fmt_t
 
 static bool font_image_create_cb(font_image_cache_data_t * data, void * user_data)
 {
+    LV_UNUSED(user_data);
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &data->fdsc->glyph_dsc[data->glyph_index];
     lv_draw_buf_t * draw_buf = lv_draw_buf_create_ex(
                                    font_draw_buf_handlers,
@@ -388,6 +388,10 @@ static void * get_bitmap_cached(lv_font_glyph_dsc_t * g_dsc, const lv_font_fmt_t
     };
 
     lv_cache_entry_t * entry = lv_cache_acquire_or_create(font_image_cache, &search_key, NULL);
+
+    if(!entry) {
+        return NULL;
+    }
 
     g_dsc->entry = entry;
     font_image_cache_data_t * cache_node = lv_cache_entry_get_data(entry);
