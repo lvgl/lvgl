@@ -87,7 +87,6 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
     }
 
     lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
-    lv_vg_lite_path_set_quality(path, VG_LITE_MEDIUM);
     lv_vg_lite_path_set_bounding_box_area(path, &rel_clip_area);
 
     /* head point */
