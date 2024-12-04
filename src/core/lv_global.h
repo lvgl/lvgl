@@ -199,7 +199,7 @@ typedef struct _lv_global_t {
 #endif
 
 #if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
-    lv_cache_t * font_image_cache;
+    lv_cache_t * font_bitmap_cache;
 #endif
 
 #if LV_USE_SPAN != 0
