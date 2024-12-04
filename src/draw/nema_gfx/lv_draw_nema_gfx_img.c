@@ -106,7 +106,7 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
     lv_layer_t * layer = draw_unit->target_layer;
     const lv_image_dsc_t * img_dsc = dsc->src;
 
-    bool masked = dsc->bitmap_mask_src != NULL ? true : false ;
+    bool masked = dsc->bitmap_mask_src != NULL;
 
     lv_area_t blend_area;
     /*Let's get the blend area which is the intersection of the area to fill and the clip area.*/
@@ -173,7 +173,7 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
     }
 
     if(!has_transform && masked && !recolor) {
-        if(dsc->bitmap_mask_src->header.cf == LV_COLOR_FORMAT_A8 || LV_COLOR_FORMAT_L8) {
+        if(dsc->bitmap_mask_src->header.cf == LV_COLOR_FORMAT_A8 || dsc->bitmap_mask_src->header.cf == LV_COLOR_FORMAT_L8) {
             blending_mode |= NEMA_BLOP_STENCIL_TXTY;
             const lv_image_dsc_t * mask = dsc->bitmap_mask_src;
             const void * mask_buf = mask->data;
