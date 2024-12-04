@@ -64,7 +64,9 @@ void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
     }
 
 #if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
-    /* Fallback to built-in release function */
+    /* Since the old font resource does not register the release_glyph function in the font structure,
+     * it is processed here as a fallback to ensure forward compatibility.
+     */
     if(lv_font_fmt_txt_is_built_in(font)) {
         lv_font_release_glyph_fmt_txt(font, g_dsc);
     }
