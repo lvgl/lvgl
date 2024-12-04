@@ -42,7 +42,7 @@ have a choice of several different types of units you can use.
                      :cpp:expr:`lv_pct(value)` converts ``value`` to a percentage.
                      E.g. :cpp:expr:`lv_obj_set_width(btn, lv_pct(50))`.  If you want
                      to avoid the overhead of the call to :cpp:func:`lv_pct`, you can
-                     also use the macro :c:macro:`LV_PCT(x)` to mean the same thing.
+                     also use the macro :cpp:expr:`LV_PCT(x)` to mean the same thing.
                      Note that when you use this feature, your value is *stored as a
                      percent* so that if/when the size of the parent container (or
                      other positioning factor) changes, this style value dynamically
@@ -57,7 +57,7 @@ have a choice of several different types of units you can use.
 
 :inches:             Specify size as 1/160-th portion of an inch as if it were pixels
                      on a 160-DPI display, even though a display may have a different
-                     DPI.  Use :cpp:expr:`lv_dpx(n)` or :c:macro:`LV_DPX(n)` to do
+                     DPI.  Use :cpp:expr:`lv_dpx(n)` or :cpp:expr:`LV_DPX(n)` to do
                      this.  Examples:
 
                      +----+-----+----------------------------+
