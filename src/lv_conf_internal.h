@@ -1822,6 +1822,16 @@
     #endif
 #endif
 
+/** Number of glyphs to cache in the build-in font cache.
+ *  This can improve performance if the same text is drawn multiple times. */
+#ifndef LV_FONT_FMT_TXT_CACHE_GLYPH_CNT
+    #ifdef CONFIG_LV_FONT_FMT_TXT_CACHE_GLYPH_CNT
+        #define LV_FONT_FMT_TXT_CACHE_GLYPH_CNT CONFIG_LV_FONT_FMT_TXT_CACHE_GLYPH_CNT
+    #else
+        #define LV_FONT_FMT_TXT_CACHE_GLYPH_CNT 0
+    #endif
+#endif
+
 /** Enables/disables support for compressed fonts. */
 #ifndef LV_USE_FONT_COMPRESSED
     #ifdef CONFIG_LV_USE_FONT_COMPRESSED

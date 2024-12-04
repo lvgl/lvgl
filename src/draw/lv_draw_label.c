@@ -592,6 +592,7 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
     }
 
     if(g.resolved_font) {
+#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT == 0
         lv_draw_buf_t * draw_buf = NULL;
         if(LV_FONT_GLYPH_FORMAT_NONE < g.format && g.format < LV_FONT_GLYPH_FORMAT_IMAGE) {
             /*Only check draw buf for bitmap glyph*/
@@ -607,6 +608,7 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
                 dsc->_draw_buf = draw_buf;
             }
         }
+#endif
 
         dsc->format = g.format;
     }

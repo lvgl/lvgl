@@ -22,6 +22,11 @@
     #define font_rle LV_GLOBAL_DEFAULT()->font_fmt_rle
 #endif /*LV_USE_FONT_COMPRESSED*/
 
+#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
+    #define font_image_cache LV_GLOBAL_DEFAULT()->font_image_cache
+    #define font_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->font_draw_buf_handlers)
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -30,9 +35,27 @@ typedef struct {
     uint32_t gid_right;
 } kern_pair_ref_t;
 
+typedef struct {
+    /* key */
+    const lv_font_fmt_txt_dsc_t * fdsc;
+    uint32_t glyph_index;
+
+    /* value */
+    lv_draw_buf_t * draw_buf;
+} font_image_cache_data_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void * get_bitmap(const lv_font_fmt_txt_dsc_t * fdsc, const lv_font_fmt_txt_glyph_dsc_t * gdsc,
+                         lv_draw_buf_t * draw_buf);
+
+#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
+    static lv_cache_t * font_image_cache_init(uint32_t cache_size);
+    static void font_image_cache_deinit(lv_cache_t * cache);
+    static void * get_bitmap_cached(lv_font_glyph_dsc_t * g_dsc, const lv_font_fmt_txt_dsc_t * fdsc, uint32_t gid);
+#endif /*LV_FONT_FMT_TXT_CACHE_GLYPH_CNT*/
+
 static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter);
 static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t gid_right);
 static int unicode_list_compare(const void * ref, const void * element);
@@ -75,10 +98,31 @@ static const uint8_t opa2_table[4] = {0, 85, 170, 255};
  *   GLOBAL FUNCTIONS
  **********************/
 
+void lv_font_fmt_txt_init(void)
+{
+#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
+    LV_ASSERT(font_image_cache == NULL);
+    font_image_cache = font_image_cache_init(LV_FONT_FMT_TXT_CACHE_GLYPH_CNT);
+#endif
+}
+
+void lv_font_fmt_txt_deinit(void)
+{
+#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
+    font_image_cache_deinit(font_image_cache);
+    font_image_cache = NULL;
+#endif
+}
+
+bool lv_font_fmt_txt_is_built_in(const lv_font_t * font)
+{
+    LV_ASSERT_NULL(font);
+    return font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt;
+}
+
 const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     const lv_font_t * font = g_dsc->resolved_font;
-    uint8_t * bitmap_out = draw_buf->data;
 
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
     uint32_t gid = g_dsc->gid.index;
@@ -91,6 +135,80 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
     int32_t gsize = (int32_t) gdsc->box_w * gdsc->box_h;
     if(gsize == 0) return NULL;
 
+#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
+    LV_UNUSED(draw_buf);
+    return get_bitmap_cached(g_dsc, fdsc, gid);
+#else
+    return get_bitmap(fdsc, gdsc, draw_buf);
+#endif
+}
+
+void lv_font_release_glyph_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc)
+{
+    LV_UNUSED(font);
+#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
+    lv_cache_release(font_image_cache, g_dsc->entry, NULL);
+#endif
+    g_dsc->entry = NULL;
+}
+
+bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
+                                   uint32_t unicode_letter_next)
+{
+    /*It fixes a strange compiler optimization issue: https://github.com/lvgl/lvgl/issues/4370*/
+    bool is_tab = unicode_letter == '\t';
+    if(is_tab) {
+        unicode_letter = ' ';
+    }
+    lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
+    uint32_t gid = get_glyph_dsc_id(font, unicode_letter);
+    if(!gid) return false;
+
+    int8_t kvalue = 0;
+    if(fdsc->kern_dsc) {
+        uint32_t gid_next = get_glyph_dsc_id(font, unicode_letter_next);
+        if(gid_next) {
+            kvalue = get_kern_value(font, gid, gid_next);
+        }
+    }
+
+    /*Put together a glyph dsc*/
+    const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
+
+    int32_t kv = ((int32_t)((int32_t)kvalue * fdsc->kern_scale) >> 4);
+
+    uint32_t adv_w = gdsc->adv_w;
+    if(is_tab) adv_w *= 2;
+
+    adv_w += kv;
+    adv_w  = (adv_w + (1 << 3)) >> 4;
+
+    dsc_out->adv_w = adv_w;
+    dsc_out->box_h = gdsc->box_h;
+    dsc_out->box_w = gdsc->box_w;
+    dsc_out->ofs_x = gdsc->ofs_x;
+    dsc_out->ofs_y = gdsc->ofs_y;
+    dsc_out->format = (uint8_t)fdsc->bpp;
+    if(fdsc->bitmap_format == LV_FONT_FMT_PLAIN_ALIGNED) {
+        /*Offset in the enum to the ALIGNED values */
+        dsc_out->format += LV_FONT_GLYPH_FORMAT_A1_ALIGNED - LV_FONT_GLYPH_FORMAT_A1;
+    }
+    dsc_out->is_placeholder = false;
+    dsc_out->gid.index = gid;
+
+    if(is_tab) dsc_out->box_w = dsc_out->box_w * 2;
+
+    return true;
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static void * get_bitmap(const lv_font_fmt_txt_dsc_t * fdsc, const lv_font_fmt_txt_glyph_dsc_t * gdsc,
+                         lv_draw_buf_t * draw_buf)
+{
+    uint8_t * bitmap_out = draw_buf->data;
     bool byte_aligned = fdsc->bitmap_format == LV_FONT_FMT_PLAIN_ALIGNED;
 
     if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN || fdsc->bitmap_format == LV_FONT_FMT_PLAIN_ALIGNED) {
@@ -182,75 +300,103 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
         }
         return draw_buf;
     }
-    /*Handle compressed bitmap*/
-    else {
-#if LV_USE_FONT_COMPRESSED
-        bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED;
-        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], bitmap_out, gdsc->box_w, gdsc->box_h,
-                   (uint8_t)fdsc->bpp, prefilter);
-        return draw_buf;
-#else /*!LV_USE_FONT_COMPRESSED*/
-        LV_LOG_WARN("Compressed fonts is used but LV_USE_FONT_COMPRESSED is not enabled in lv_conf.h");
-        return NULL;
-#endif
-    }
 
-    /*If not returned earlier then the letter is not found in this font*/
+    /*Handle compressed bitmap*/
+
+#if LV_USE_FONT_COMPRESSED
+    bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED;
+    decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], bitmap_out, gdsc->box_w, gdsc->box_h,
+               (uint8_t)fdsc->bpp, prefilter);
+    return draw_buf;
+#else /*!LV_USE_FONT_COMPRESSED*/
+    LV_LOG_WARN("Compressed fonts is used but LV_USE_FONT_COMPRESSED is not enabled in lv_conf.h");
     return NULL;
+#endif
 }
 
-bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
-                                   uint32_t unicode_letter_next)
+#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
+
+static bool font_image_create_cb(font_image_cache_data_t * data, void * user_data)
 {
-    /*It fixes a strange compiler optimization issue: https://github.com/lvgl/lvgl/issues/4370*/
-    bool is_tab = unicode_letter == '\t';
-    if(is_tab) {
-        unicode_letter = ' ';
-    }
-    lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
-    uint32_t gid = get_glyph_dsc_id(font, unicode_letter);
-    if(!gid) return false;
-
-    int8_t kvalue = 0;
-    if(fdsc->kern_dsc) {
-        uint32_t gid_next = get_glyph_dsc_id(font, unicode_letter_next);
-        if(gid_next) {
-            kvalue = get_kern_value(font, gid, gid_next);
-        }
+    const lv_font_fmt_txt_glyph_dsc_t * gdsc = &data->fdsc->glyph_dsc[data->glyph_index];
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create_ex(
+                                   font_draw_buf_handlers,
+                                   gdsc->box_w,
+                                   gdsc->box_h,
+                                   LV_COLOR_FORMAT_A8,
+                                   LV_STRIDE_AUTO);
+    if(!draw_buf) {
+        return false;
     }
 
-    /*Put together a glyph dsc*/
-    const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
-
-    int32_t kv = ((int32_t)((int32_t)kvalue * fdsc->kern_scale) >> 4);
-
-    uint32_t adv_w = gdsc->adv_w;
-    if(is_tab) adv_w *= 2;
-
-    adv_w += kv;
-    adv_w  = (adv_w + (1 << 3)) >> 4;
-
-    dsc_out->adv_w = adv_w;
-    dsc_out->box_h = gdsc->box_h;
-    dsc_out->box_w = gdsc->box_w;
-    dsc_out->ofs_x = gdsc->ofs_x;
-    dsc_out->ofs_y = gdsc->ofs_y;
-    dsc_out->format = (uint8_t)fdsc->bpp;
-    if(fdsc->bitmap_format == LV_FONT_FMT_PLAIN_ALIGNED) {
-        /*Offset in the enum to the ALIGNED values */
-        dsc_out->format += LV_FONT_GLYPH_FORMAT_A1_ALIGNED - LV_FONT_GLYPH_FORMAT_A1;
+    if(!get_bitmap(data->fdsc, gdsc, draw_buf)) {
+        lv_draw_buf_destroy(draw_buf);
+        return false;
     }
-    dsc_out->is_placeholder = false;
-    dsc_out->gid.index = gid;
 
-    if(is_tab) dsc_out->box_w = dsc_out->box_w * 2;
+    LV_LOG_TRACE("Create font image cache entry for glyph_index %d, size %dx%d",
+                 data->glyph_index, draw_buf->header.w, draw_buf->header.h);
 
+    data->draw_buf = draw_buf;
     return true;
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
+static void font_image_free_cb(font_image_cache_data_t * data, void * user_data)
+{
+    LV_UNUSED(user_data);
+    lv_draw_buf_destroy(data->draw_buf);
+}
+
+static lv_cache_compare_res_t font_image_compare_cb(const font_image_cache_data_t * lhs,
+                                                    const font_image_cache_data_t * rhs)
+{
+    if(lhs->glyph_index != rhs->glyph_index) {
+        return lhs->glyph_index > rhs->glyph_index ? 1 : -1;
+    }
+    if(lhs->fdsc != rhs->fdsc) {
+        return lhs->fdsc > rhs->fdsc ? 1 : -1;
+    }
+    return 0;
+}
+
+static lv_cache_t * font_image_cache_init(uint32_t cache_size)
+{
+    lv_cache_ops_t ops = {
+        .compare_cb = (lv_cache_compare_cb_t)font_image_compare_cb,
+        .create_cb = (lv_cache_create_cb_t)font_image_create_cb,
+        .free_cb = (lv_cache_free_cb_t)font_image_free_cb,
+    };
+
+    lv_cache_t * cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(font_image_cache_data_t),
+                                         cache_size, ops);
+    lv_cache_set_name(cache, "FONT_IMAGE_CACHE");
+
+    return cache;
+}
+
+static void font_image_cache_deinit(lv_cache_t * cache)
+{
+    lv_cache_destroy(cache, NULL);
+}
+
+static void * get_bitmap_cached(lv_font_glyph_dsc_t * g_dsc, const lv_font_fmt_txt_dsc_t * fdsc, uint32_t glyph_index)
+{
+    LV_PROFILER_FONT_BEGIN;
+    font_image_cache_data_t search_key = {
+        .fdsc = fdsc,
+        .glyph_index = glyph_index,
+    };
+
+    lv_cache_entry_t * entry = lv_cache_acquire_or_create(font_image_cache, &search_key, NULL);
+
+    g_dsc->entry = entry;
+    font_image_cache_data_t * cache_node = lv_cache_entry_get_data(entry);
+
+    LV_PROFILER_FONT_END;
+    return cache_node->draw_buf;
+}
+
+#endif /*LV_FONT_FMT_TXT_CACHE_GLYPH_CNT*/
 
 static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
 {

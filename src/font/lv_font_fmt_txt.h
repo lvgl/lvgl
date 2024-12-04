@@ -191,12 +191,37 @@ typedef struct {
  **********************/
 
 /**
+ * Initialize the built-in fonts
+ */
+void lv_font_fmt_txt_init(void);
+
+/**
+ * Deinitialize the built-in fonts
+ */
+void lv_font_fmt_txt_deinit(void);
+
+/**
+ * Check if a font is built-in
+ * @param font pointer to font
+ * @return true: font is built-in
+ *         false: font is not built-in
+ */
+bool lv_font_fmt_txt_is_built_in(const lv_font_t * font);
+
+/**
  * Used as `get_glyph_bitmap` callback in lvgl's native font format if the font is uncompressed.
  * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index and format.
  * @param draw_buf      a draw buffer that can be used to store the bitmap of the glyph, it's OK not to use it.
  * @return pointer to an A8 bitmap (not necessarily bitmap_out) or NULL if `unicode_letter` not found
  */
 const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
+
+/**
+ * Release reference to the glyph bitmap and descriptor.
+ * @param font pointer to font
+ * @param g_dsc pointer to glyph descriptor
+ */
+void lv_font_release_glyph_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc);
 
 /**
  * Used as `get_glyph_dsc` callback in lvgl's native font format if the font is uncompressed.
