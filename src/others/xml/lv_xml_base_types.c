@@ -52,7 +52,7 @@ lv_align_t lv_xml_align_string_to_enum_value(const char * txt)
 {
     if(lv_streq("top_left", txt)) return LV_ALIGN_TOP_LEFT;
     if(lv_streq("top_mid", txt)) return LV_ALIGN_TOP_MID;
-    if(lv_streq("top_right", txt)) return LV_ALIGN_TOP_LEFT;
+    if(lv_streq("top_right", txt)) return LV_ALIGN_TOP_RIGHT;
     if(lv_streq("bottom_left", txt)) return LV_ALIGN_BOTTOM_LEFT;
     if(lv_streq("bottom_mid", txt)) return LV_ALIGN_BOTTOM_MID;
     if(lv_streq("bottom_right", txt)) return LV_ALIGN_BOTTOM_RIGHT;
