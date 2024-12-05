@@ -149,6 +149,7 @@ Argument Descriptions
 #            is allowed!!! Ask me how long it took me to figure this out.
 # ****************************************************************************
 
+
 def run():
     # Python Library Imports
     import sys
@@ -181,7 +182,6 @@ def run():
     # This saves a huge amount of time during long document projects.
     # ---------------------------------------------------------------------
     # Set defaults.
-    arg_abort = False
     clean = False
     skip_latex = False
     skip_api = False
