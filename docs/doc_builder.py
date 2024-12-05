@@ -1471,6 +1471,11 @@ class XMLSearch(object):
         return defines.get(m_name, None)
 
 
+def announce(*args):
+    args = ' '.join(repr(arg) for arg in args)
+    print(f'{os.path.basename(__file__)}:  ', args)
+
+
 def run(project_path, temp_directory, *doc_paths):
     """
     This function does 2 things:
@@ -1496,7 +1501,7 @@ def run(project_path, temp_directory, *doc_paths):
     api_path = os.path.join(base_path, 'API')
     lvgl_src_path = os.path.join(project_path, 'src')
 
-    print(f"{os.path.basename(__file__)}:  Generating API documentation .RST files...")
+    announce("Generating API documentation .RST files...")
 
     if not os.path.exists(api_path):
         os.makedirs(api_path)
@@ -1518,7 +1523,7 @@ def run(project_path, temp_directory, *doc_paths):
     #    - unions,
     #    - typedefs,
     #    - functions.
-    print(f"{os.path.basename(__file__)}:  Building source-code identifier look-up tables...")
+    announce("Building source-code symbol tables...")
 
     for compound in index:
         compound.attrib['name'] = compound[0].text.strip()
@@ -1567,7 +1572,7 @@ def run(project_path, temp_directory, *doc_paths):
         )
 
     # For each directory entry in `doc_paths` array...
-    print(f"{os.path.basename(__file__)}:  Adding API-page hyperlinks to source docs...")
+    announce("Adding API-page hyperlinks to source docs...")
 
     for folder in doc_paths:
         # Fetch a list of '.rst' files excluding 'index.rst'.
