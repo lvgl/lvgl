@@ -42,6 +42,7 @@ struct _lv_indev_t {
 
     uint32_t pr_timestamp;         /**< Pressed time stamp*/
     uint32_t longpr_rep_timestamp; /**< Long press repeat time stamp*/
+    lv_timer_t * longpr_timer;
 
     void * driver_data;
     void * user_data;

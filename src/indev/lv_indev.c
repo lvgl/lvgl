@@ -153,6 +153,9 @@ void lv_indev_delete(lv_indev_t * indev)
     /*Clean up the read timer first*/
     if(indev->read_timer) lv_timer_delete(indev->read_timer);
 
+    /*Clean up the long press timer*/
+    if(indev->longpr_timer) lv_timer_delete(indev->longpr_timer);
+
     /*Remove the input device from the list*/
     lv_ll_remove(indev_ll_head, indev);
     /*Free the memory of the input device*/
@@ -568,6 +571,9 @@ void lv_indev_set_mode(lv_indev_t * indev, lv_indev_mode_t mode)
             lv_timer_resume(indev->read_timer);
         }
     }
+
+    if(mode != LV_INDEV_MODE_EVENT && indev->longpr_timer)
+        lv_timer_pause(indev->longpr_timer);
 }
 
 lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
@@ -1156,6 +1162,54 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->pointer.last_point.y = i->pointer.act_point.y;
 }
 
+static void indev_proc_long_press(lv_indev_t * indev)
+{
+    const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+
+    /*If there is no scrolling then check for long press time*/
+    if(indev->pointer.scroll_obj == NULL && indev->long_pr_sent == 0) {
+        /*Send a long press event if enough time elapsed*/
+        if(lv_tick_elaps(indev->pr_timestamp) > indev_act->long_press_time) {
+            if(is_enabled) {
+                if(send_event(LV_EVENT_LONG_PRESSED, indev_act) == LV_RESULT_INVALID) return;
+            }
+            /*Mark it to do not send the event again*/
+            indev->long_pr_sent = 1;
+
+            /*Save the long press time stamp for the long press repeat handler*/
+            indev->longpr_rep_timestamp = lv_tick_get();
+
+            if(indev->mode == LV_INDEV_MODE_EVENT && indev->longpr_timer) {
+                lv_timer_set_period(indev->longpr_timer, LV_INDEV_DEF_LONG_PRESS_REP_TIME);
+            }
+        }
+    }
+
+    if(indev->pointer.scroll_obj == NULL && indev->long_pr_sent == 1) {
+        if(lv_tick_elaps(indev->longpr_rep_timestamp) > indev_act->long_press_repeat_time) {
+            if(is_enabled) {
+                if(send_event(LV_EVENT_LONG_PRESSED_REPEAT, indev_act) == LV_RESULT_INVALID) return;
+            }
+            indev->longpr_rep_timestamp = lv_tick_get();
+        }
+    }
+}
+
+static void indev_proc_long_press_timer_cb(lv_timer_t * t)
+{
+    lv_indev_t * indev = lv_timer_get_user_data(t);
+
+    if(indev_reset_check(indev)) return;
+
+    if(indev->wait_until_release != 0) return;
+
+    indev_act = indev;
+    indev_obj_act = indev->pointer.act_obj;
+    indev_proc_long_press(indev);
+    indev_act = NULL;
+    indev_obj_act = NULL;
+}
+
 /**
  * Process the pressed state of LV_INDEV_TYPE_POINTER input devices
  * @param indev pointer to an input device 'proc'
@@ -1254,6 +1308,17 @@ static void indev_proc_press(lv_indev_t * indev)
             indev_click_focus(indev_act);
             if(indev_reset_check(indev)) return;
 
+            if(indev_act->mode == LV_INDEV_MODE_EVENT) {
+                if(!indev->longpr_timer) {
+                    indev->longpr_timer
+                        = lv_timer_create(indev_proc_long_press_timer_cb, LV_INDEV_DEF_LONG_PRESS_TIME, indev);
+                }
+                else {
+                    lv_timer_reset(indev->longpr_timer);
+                    lv_timer_set_period(indev->longpr_timer, LV_INDEV_DEF_LONG_PRESS_TIME);
+                    lv_timer_resume(indev->longpr_timer);
+                }
+            }
         }
     }
 
@@ -1284,32 +1349,8 @@ static void indev_proc_press(lv_indev_t * indev)
         indev_gesture(indev);
         if(indev_reset_check(indev)) return;
 
-        if(indev->mode == LV_INDEV_MODE_EVENT && indev->read_timer && lv_timer_get_paused(indev->read_timer)) {
-            lv_timer_resume(indev->read_timer);
-        }
-
-        /*If there is no scrolling then check for long press time*/
-        if(indev->pointer.scroll_obj == NULL && indev->long_pr_sent == 0) {
-            /*Send a long press event if enough time elapsed*/
-            if(lv_tick_elaps(indev->pr_timestamp) > indev_act->long_press_time) {
-                if(is_enabled) {
-                    if(send_event(LV_EVENT_LONG_PRESSED, indev_act) == LV_RESULT_INVALID) return;
-                }
-                /*Mark it to do not send the event again*/
-                indev->long_pr_sent = 1;
-
-                /*Save the long press time stamp for the long press repeat handler*/
-                indev->longpr_rep_timestamp = lv_tick_get();
-            }
-        }
-
-        if(indev->pointer.scroll_obj == NULL && indev->long_pr_sent == 1) {
-            if(lv_tick_elaps(indev->longpr_rep_timestamp) > indev_act->long_press_repeat_time) {
-                if(is_enabled) {
-                    if(send_event(LV_EVENT_LONG_PRESSED_REPEAT, indev_act) == LV_RESULT_INVALID) return;
-                }
-                indev->longpr_rep_timestamp = lv_tick_get();
-            }
+        if(indev->mode != LV_INDEV_MODE_EVENT) {
+            indev_proc_long_press(indev);
         }
     }
 }
@@ -1341,7 +1382,12 @@ static void indev_proc_release(lv_indev_t * indev)
 
     if(indev->wait_until_release) {
         lv_obj_send_event(indev->pointer.act_obj, LV_EVENT_PRESS_LOST, indev_act);
-        if(indev_reset_check(indev)) return;
+        if(indev_reset_check(indev)) {
+            if(indev->mode == LV_INDEV_MODE_EVENT && indev->longpr_timer) {
+                lv_timer_pause(indev->longpr_timer);
+            }
+            return;
+        }
 
         indev->pointer.act_obj  = NULL;
         indev->pointer.last_obj = NULL;
@@ -1352,8 +1398,8 @@ static void indev_proc_release(lv_indev_t * indev)
     indev_obj_act = indev->pointer.act_obj;
     lv_obj_t * scroll_obj = indev->pointer.scroll_obj;
 
-    if(indev->mode == LV_INDEV_MODE_EVENT && indev->read_timer && !lv_timer_get_paused(indev->read_timer)) {
-        lv_timer_pause(indev->read_timer);
+    if(indev->mode == LV_INDEV_MODE_EVENT && indev->longpr_timer) {
+        lv_timer_pause(indev->longpr_timer);
     }
 
     if(indev_obj_act) {
