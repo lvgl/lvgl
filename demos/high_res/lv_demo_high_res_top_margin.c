@@ -206,7 +206,6 @@ static lv_obj_t * create_wifi(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c)
     lv_obj_add_style(ssid, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_subject_add_observer_obj(&c->api.subjects.wifi_ssid, wifi_ssid_ip_observer_cb, ssid, (void *)"SSID");
     lv_obj_t * ip = lv_label_create(cont);
-    lv_label_bind_text(ip, &c->api.subjects.wifi_ip, "IP: %s");
     lv_obj_add_style(ip, &c->fonts[FONT_LABEL_XS], 0);
     lv_obj_add_style(ip, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_subject_add_observer_obj(&c->api.subjects.wifi_ip, wifi_ssid_ip_observer_cb, ip, (void *)"IP");
