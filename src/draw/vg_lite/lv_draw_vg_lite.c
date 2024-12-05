@@ -80,6 +80,7 @@ void lv_draw_vg_lite_init(void)
 #endif
     lv_vg_lite_path_init(unit);
     lv_vg_lite_decoder_init();
+    lv_draw_vg_lite_label_init(&unit->base_unit);
 }
 
 void lv_draw_vg_lite_deinit(void)

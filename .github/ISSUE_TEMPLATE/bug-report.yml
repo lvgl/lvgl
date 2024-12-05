@@ -18,6 +18,14 @@ body:
     validations:
       required: true
   - type: textarea
+    id: platform
+    attributes:
+      label: Platform
+      description: Tell us about the platform and environment you use
+      placeholder: e.g. Visual Studio simulator, or STM32F769 Discovery with Zephyr, or Eclipse with SDL on Linux 
+    validations:
+      required: true
+  - type: textarea
     id: what-happened
     attributes:
       label: What happened?

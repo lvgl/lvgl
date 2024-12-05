@@ -85,7 +85,7 @@ void lv_bar_set_range(lv_obj_t * obj, int32_t min, int32_t max);
 /**
  * Set the type of bar.
  * @param obj       pointer to bar object
- * @param mode      bar type from ::lv_bar_mode_t
+ * @param mode      bar type from `lv_bar_mode_t`
  */
 void lv_bar_set_mode(lv_obj_t * obj, lv_bar_mode_t mode);
 
@@ -131,14 +131,14 @@ int32_t lv_bar_get_max_value(const lv_obj_t * obj);
 /**
  * Get the type of bar.
  * @param obj       pointer to bar object
- * @return          bar type from ::lv_bar_mode_t
+ * @return          bar type from `lv_bar_mode_t`
  */
 lv_bar_mode_t lv_bar_get_mode(lv_obj_t * obj);
 
 /**
  * Get the orientation of bar.
  * @param obj       pointer to bar object
- * @return          bar orientation from ::lv_bar_orientation_t
+ * @return          bar orientation from `lv_bar_orientation_t`
  */
 lv_bar_orientation_t lv_bar_get_orientation(lv_obj_t * obj);
 

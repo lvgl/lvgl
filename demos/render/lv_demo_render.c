@@ -10,7 +10,7 @@
 
 #if LV_USE_DEMO_RENDER
 
-#include "../../src/core/lv_global.h"
+#include "../../lvgl_private.h"
 
 /*********************
  *      DEFINES
@@ -333,6 +333,7 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
     LV_IMAGE_DECLARE(img_render_lvgl_logo_xrgb8888);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb888);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb565);
+    LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb565a8);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_argb8888);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_l8);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_i1);
@@ -342,6 +343,7 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
         &img_render_lvgl_logo_xrgb8888,
         &img_render_lvgl_logo_rgb888,
         &img_render_lvgl_logo_rgb565,
+        &img_render_lvgl_logo_rgb565a8,
         &img_render_lvgl_logo_l8,
         &img_render_lvgl_logo_i1,
     };
@@ -351,6 +353,7 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
         "XRGB\n8888",
         "RGB\n888",
         "RGB\n565",
+        "RGB\n565A8",
         "L8",
         "I1",
     };

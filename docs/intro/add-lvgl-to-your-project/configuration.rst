@@ -36,7 +36,9 @@ will attempt to include ``lv_conf.h`` simply with ``#include "lv_conf.h"``.
 You can even use a different name for ``lv_conf.h``. The custom path can
 be set via the :c:macro:`LV_CONF_PATH` define. For example
 ``-DLV_CONF_PATH="/home/joe/my_project/my_custom_conf.h"``. If this define
-is set :c:macro:`LV_CONF_SKIP` is assumed to be ``0``.
+is set :c:macro:`LV_CONF_SKIP` is assumed to be ``0``. Please notice,
+when defining the :c:macro:`LV_CONF_PATH`, you need to make sure it is
+defined as a string, otherwise a build error will be raised.
 
 If :c:macro:`LV_CONF_SKIP` is defined, LVGL will not try to include
 ``lv_conf.h``. Instead you can pass the config defines using build

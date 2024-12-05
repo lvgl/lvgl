@@ -72,6 +72,7 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
     const lv_font_t * f = font_p;
 
     dsc_out->resolved_font = NULL;
+    dsc_out->req_raw_bitmap = 0;
 
     while(f) {
         bool found = f->get_glyph_dsc(f, dsc_out, letter, f->kerning == LV_FONT_KERNING_NONE ? 0 : letter_next);

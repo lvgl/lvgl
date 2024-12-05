@@ -50,11 +50,12 @@ typedef struct _img_obj_ {
 typedef img_obj_t nema_img_obj_t;
 
 typedef enum {
-    NEMA_NOTEX = -1,    /**< No Texture */
-    NEMA_TEX0  =  0,    /**< Texture 0 */
-    NEMA_TEX1  =  1,    /**< Texture 1 */
-    NEMA_TEX2  =  2,    /**< Texture 2 */
-    NEMA_TEX3  =  3     /**< Texture 3 */
+    NEMA_NOTEX  = -1,    /**< No Texture */
+    NEMA_TEX0   =  0,    /**< Texture 0 */
+    NEMA_TEX1   =  1,    /**< Texture 1 */
+    NEMA_TEX2   =  2,    /**< Texture 2 */
+    NEMA_TEX3   =  3,    /**< Texture 3 */
+    NEMA_TEXMAX =  4     /**< Enum max value */
 } nema_tex_t;
 
 #define NEMA_RGBX8888   0x00U  /**< RGBX8888 */
@@ -120,6 +121,7 @@ typedef enum {
 #define NEMA_ABGR4444   0x4bU  /**< ABGR4444 (Available if HW enabled - check HW manual) */
 #define NEMA_TSC12      0x4cU  /**< TSC12    (Available if HW enabled - check HW manual) */
 #define NEMA_TSC12A     0x4dU  /**< TSC12A   (Available if HW enabled - check HW manual) */
+#define NEMA_TSC6AP     0x4eU  /**< TSC6AP   (Available if HW enabled - check HW manual) */
 
 #define NEMA_DITHER     0x80U  /**< Nema Dithering */
 #define NEMA_FORMAT_MASK 0x7FU /**< Format Mask */

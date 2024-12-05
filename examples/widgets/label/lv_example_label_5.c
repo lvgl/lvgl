@@ -2,7 +2,7 @@
 #if LV_USE_LABEL && LV_BUILD_EXAMPLES
 
 /**
- * Show customizing the circular scrolling animation of a label with `LV_LABEL_LONG_SCROLL_CIRCULAR`
+ * Show customizing the circular scrolling animation of a label with `LV_LABEL_LONG_MODE_SCROLL_CIRCULAR`
  * long mode.
  */
 void lv_example_label_5(void)
@@ -20,7 +20,7 @@ void lv_example_label_5(void)
     lv_style_set_anim(&label_style, &animation_template);
 
     lv_obj_t * label1 = lv_label_create(lv_screen_active());
-    lv_label_set_long_mode(label1, LV_LABEL_LONG_SCROLL_CIRCULAR);      /*Circular scroll*/
+    lv_label_set_long_mode(label1, LV_LABEL_LONG_MODE_SCROLL_CIRCULAR);      /*Circular scroll*/
     lv_obj_set_width(label1, 150);
     lv_label_set_text(label1, "It is a circularly scrolling text. ");
     lv_obj_align(label1, LV_ALIGN_CENTER, 0, 40);

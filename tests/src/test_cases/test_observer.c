@@ -94,10 +94,20 @@ void test_observer_string(void)
     TEST_ASSERT_EQUAL_STRING("how are you?", lv_subject_get_string(&subject));
     TEST_ASSERT_EQUAL_STRING("my name is John", lv_subject_get_previous_string(&subject));
 
+    lv_subject_snprintf(&subject, "I ate %d pizzas", 10);
+    TEST_ASSERT_EQUAL_STRING("I ate 10 pizzas", lv_subject_get_string(&subject));
+    TEST_ASSERT_EQUAL_STRING("how are you?", lv_subject_get_previous_string(&subject));
+
+    lv_subject_snprintf(&subject, "%d: %s", 1, "Coding is fun !");
+    TEST_ASSERT_EQUAL_STRING("1: Coding is fun !", lv_subject_get_string(&subject));
+    TEST_ASSERT_EQUAL_STRING("I ate 10 pizzas", lv_subject_get_previous_string(&subject));
+
+
+
     /*Clip long text*/
     lv_subject_copy_string(&subject, "text to be clipped to 32 chars.this should be clipped");
     TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars.", lv_subject_get_string(&subject));
-    TEST_ASSERT_EQUAL_STRING("how are you?", lv_subject_get_previous_string(&subject));
+    TEST_ASSERT_EQUAL_STRING("1: Coding is fun !", lv_subject_get_previous_string(&subject));
 
     /*Check if the previous string is clipped correctly*/
     lv_subject_copy_string(&subject, "a");

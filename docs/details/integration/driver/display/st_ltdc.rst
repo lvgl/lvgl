@@ -81,6 +81,20 @@ Providing a second partial buffer can improve CPU utilization and increase
 performance compared to
 a single buffer if :c:macro:`LV_ST_LTDC_USE_DMA2D_FLUSH` is enabled.
 
+Display Rotation
+****************
+
+The driver supports display rotation with
+:cpp:expr:`lv_display_set_rotation(disp, rotation)` where rotation is one of
+:cpp:enumerator:`LV_DISP_ROTATION_90`, :cpp:enumerator:`LV_DISP_ROTATION_180`,
+or :cpp:enumerator:`LV_DISP_ROTATION_270`. The rotation is initially
+:cpp:enumerator:`LV_DISP_ROTATION_0`.
+
+The rotation is done in software and only works if the display was
+created using :cpp:func:`lv_st_ltdc_create_partial`.
+:c:macro:`LV_ST_LTDC_USE_DMA2D_FLUSH` will be have no effect if rotation
+is used.
+
 DMA2D
 *****
 

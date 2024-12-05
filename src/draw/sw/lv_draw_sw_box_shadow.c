@@ -104,11 +104,13 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
     if(cache->cache_size == corner_size && cache->cache_r == r_sh) {
         /*Use the cache if available*/
         sh_buf = lv_malloc(corner_size * corner_size);
+        LV_ASSERT_MALLOC(sh_buf);
         lv_memcpy(sh_buf, cache->cache, corner_size * corner_size);
     }
     else {
         /*A larger buffer is required for calculation*/
         sh_buf = lv_malloc(corner_size * corner_size * sizeof(uint16_t));
+        LV_ASSERT_MALLOC(sh_buf);
         shadow_draw_corner_buf(&core_area, (uint16_t *)sh_buf, dsc->width, r_sh);
 
         /*Cache the corner if it fits into the cache size*/
@@ -120,6 +122,7 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
     }
 #else
     sh_buf = lv_malloc(corner_size * corner_size * sizeof(uint16_t));
+    LV_ASSERT_MALLOC(sh_buf);
     shadow_draw_corner_buf(&core_area, (uint16_t *)sh_buf, dsc->width, r_sh);
 #endif /*LV_DRAW_SW_SHADOW_CACHE_SIZE*/
 

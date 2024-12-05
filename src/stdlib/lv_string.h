@@ -128,6 +128,17 @@ int lv_strcmp(const char * s1, const char * s2);
  */
 int lv_strncmp(const char * s1, const char * s2, size_t len);
 
+/** Returns true if the two strings are equal.
+ * Just a wrapper around strcmp for convenience.
+ * @param s1    pointer to the first string
+ * @param s2    pointer to the second string
+ * @return      true: the strings are equal; false: otherwise
+ */
+static inline bool lv_streq(const char * s1, const char * s2)
+{
+    return lv_strcmp(s1, s2) == 0;
+}
+
 /**
  * @brief Duplicate a string by allocating a new one and copying the content.
  * @param src Pointer to the source of data to be copied.

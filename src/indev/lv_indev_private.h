@@ -15,6 +15,8 @@ extern "C" {
  *********************/
 #include "lv_indev.h"
 #include "../misc/lv_anim.h"
+#include "lv_indev_scroll.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -112,6 +114,9 @@ struct _lv_indev_t {
                                       here by the buttons*/
     lv_event_list_t event_list;
     lv_anim_t * scroll_throw_anim;
+
+    lv_indev_gesture_type_t gesture_type;
+    void * gesture_data;
 };
 
 /**********************

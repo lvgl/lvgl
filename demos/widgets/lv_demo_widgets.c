@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_demo_widgets.h"
-#include "../../src/lvgl_private.h"
+#include "../../lvgl_private.h"
 
 #if LV_USE_DEMO_WIDGETS
 
@@ -262,7 +262,7 @@ static void profile_create(lv_obj_t * parent)
     lv_obj_t * dsc = lv_label_create(panel1);
     lv_obj_add_style(dsc, &style_text_muted, 0);
     lv_label_set_text_static(dsc, "This is a short description of me. Take a look at my profile!");
-    lv_label_set_long_mode(dsc, LV_LABEL_LONG_WRAP);
+    lv_label_set_long_mode(dsc, LV_LABEL_LONG_MODE_WRAP);
 
     lv_obj_t * email_icn = lv_label_create(panel1);
     lv_obj_add_style(email_icn, &style_icon, 0);
@@ -1324,7 +1324,7 @@ static void birthday_event_cb(lv_event_t * e)
                 if(disp_size == DISP_SMALL) lv_obj_set_size(calendar, 180, 200);
                 else if(disp_size == DISP_MEDIUM) lv_obj_set_size(calendar, 200, 220);
                 else  lv_obj_set_size(calendar, 300, 330);
-                lv_calendar_set_showed_date(calendar, 1990, 01);
+                lv_calendar_set_month_shown(calendar, 1990, 01);
                 lv_obj_align(calendar, LV_ALIGN_CENTER, 0, 30);
                 lv_obj_add_event_cb(calendar, calendar_event_cb, LV_EVENT_ALL, ta);
 

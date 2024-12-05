@@ -52,11 +52,7 @@
 /* If lv_conf.h is not skipped, include it. */
 #if !defined(LV_CONF_SKIP) || defined(LV_CONF_PATH)
     #ifdef LV_CONF_PATH                           /* If there is a path defined for lv_conf.h, use it */
-        #define __LV_TO_STR_AUX(x) #x
-        #define __LV_TO_STR(x) __LV_TO_STR_AUX(x)
-        #include __LV_TO_STR(LV_CONF_PATH)
-        #undef __LV_TO_STR_AUX
-        #undef __LV_TO_STR
+        #include LV_CONF_PATH                     /* Note: Make sure to define custom CONF_PATH as a string */
     #elif defined(LV_CONF_INCLUDE_SIMPLE)         /* Or simply include lv_conf.h is enabled. */
         #include "lv_conf.h"
     #else
@@ -1367,6 +1363,16 @@
     #endif
 #endif
 
+/* Enable the multi-touch gesture recognition feature */
+/* Gesture recognition requires the use of floats */
+#ifndef LV_USE_GESTURE_RECOGNITION
+    #ifdef CONFIG_LV_USE_GESTURE_RECOGNITION
+        #define LV_USE_GESTURE_RECOGNITION CONFIG_LV_USE_GESTURE_RECOGNITION
+    #else
+        #define LV_USE_GESTURE_RECOGNITION 0
+    #endif
+#endif
+
 /*=====================
  *  COMPILER SETTINGS
  *====================*/
@@ -2620,6 +2626,13 @@
             #define LV_FS_FATFS_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
         #endif
     #endif
+    #ifndef LV_FS_FATFS_PATH
+        #ifdef CONFIG_LV_FS_FATFS_PATH
+            #define LV_FS_FATFS_PATH CONFIG_LV_FS_FATFS_PATH
+        #else
+            #define LV_FS_FATFS_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
+        #endif
+    #endif
     #ifndef LV_FS_FATFS_CACHE_SIZE
         #ifdef CONFIG_LV_FS_FATFS_CACHE_SIZE
             #define LV_FS_FATFS_CACHE_SIZE CONFIG_LV_FS_FATFS_CACHE_SIZE
@@ -2663,6 +2676,13 @@
             #define LV_FS_LITTLEFS_LETTER '\0'  /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
         #endif
     #endif
+    #ifndef LV_FS_LITTLEFS_PATH
+        #ifdef CONFIG_LV_FS_LITTLEFS_PATH
+            #define LV_FS_LITTLEFS_PATH CONFIG_LV_FS_LITTLEFS_PATH
+        #else
+            #define LV_FS_LITTLEFS_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
+        #endif
+    #endif
 #endif
 
 /** API for Arduino LittleFs. */
@@ -2681,6 +2701,13 @@
             #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
         #endif
     #endif
+    #ifndef LV_FS_ARDUINO_ESP_LITTLEFS_PATH
+        #ifdef CONFIG_LV_FS_ARDUINO_ESP_LITTLEFS_PATH
+            #define LV_FS_ARDUINO_ESP_LITTLEFS_PATH CONFIG_LV_FS_ARDUINO_ESP_LITTLEFS_PATH
+        #else
+            #define LV_FS_ARDUINO_ESP_LITTLEFS_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
+        #endif
+    #endif
 #endif
 
 /** API for Arduino Sd. */
@@ -2697,6 +2724,13 @@
             #define LV_FS_ARDUINO_SD_LETTER CONFIG_LV_FS_ARDUINO_SD_LETTER
         #else
             #define LV_FS_ARDUINO_SD_LETTER '\0'          /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+        #endif
+    #endif
+    #ifndef LV_FS_ARDUINO_SD_PATH
+        #ifdef CONFIG_LV_FS_ARDUINO_SD_PATH
+            #define LV_FS_ARDUINO_SD_PATH CONFIG_LV_FS_ARDUINO_SD_PATH
+        #else
+            #define LV_FS_ARDUINO_SD_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
         #endif
     #endif
 #endif
@@ -2954,6 +2988,16 @@
             #define LV_FFMPEG_DUMP_FORMAT CONFIG_LV_FFMPEG_DUMP_FORMAT
         #else
             #define LV_FFMPEG_DUMP_FORMAT 0
+        #endif
+    #endif
+    /** Use lvgl file path in FFmpeg Player widget 
+     *  You won't be able to open URLs after enabling this feature.
+     *  Note that FFmpeg image decoder will always use lvgl file system. */
+    #ifndef LV_FFMPEG_PLAYER_USE_LV_FS
+        #ifdef CONFIG_LV_FFMPEG_PLAYER_USE_LV_FS
+            #define LV_FFMPEG_PLAYER_USE_LV_FS CONFIG_LV_FFMPEG_PLAYER_USE_LV_FS
+        #else
+            #define LV_FFMPEG_PLAYER_USE_LV_FS 0
         #endif
     #endif
 #endif
@@ -3392,7 +3436,7 @@
 #endif
 #if LV_USE_FONT_MANAGER
 
-/*Font manager name max length*/
+/**Font manager name max length*/
 #ifndef LV_FONT_MANAGER_NAME_MAX_LEN
     #ifdef CONFIG_LV_FONT_MANAGER_NAME_MAX_LEN
         #define LV_FONT_MANAGER_NAME_MAX_LEN CONFIG_LV_FONT_MANAGER_NAME_MAX_LEN
@@ -3401,6 +3445,15 @@
     #endif
 #endif
 
+#endif
+
+/** Enable loading XML UIs runtime */
+#ifndef LV_USE_XML
+    #ifdef CONFIG_LV_USE_XML
+        #define LV_USE_XML CONFIG_LV_USE_XML
+    #else
+        #define LV_USE_XML	0
+    #endif
 #endif
 
 /*==================

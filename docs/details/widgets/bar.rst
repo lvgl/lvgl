@@ -4,17 +4,17 @@
 Bar (lv_bar)
 ============
 
+
 Overview
 ********
 
 The bar Widget has a background and an indicator. The length of the
 indicator against the background indicates the bar's current value.
 
-Vertical bars can be created if the width of the Widget is smaller than
-its height.
-
 Both the start and end values of the bar can be set.  Changing the start value to a
 value other than the minimum value in its range changes the start position of the indicator.
+
+
 
 .. _lv_bar_parts_and_styles:
 
@@ -32,6 +32,19 @@ Parts and Styles
 
 Usage
 *****
+
+
+Orientation and size
+--------------------
+
+- for orientation, width and height, simply set width and height properties;
+- :cpp:expr:`lv_bar_set_orientation(bar, orientation)` to override orientation
+  caused by ``width`` and ``height``.  Valid values for ``orientation`` are:
+
+  - :cpp:enumerator:`LV_BAR_ORIENTATION_AUTO`
+  - :cpp:enumerator:`LV_BAR_ORIENTATION_HORIZONTAL`
+  - :cpp:enumerator:`LV_BAR_ORIENTATION_VERTICAL`
+
 
 Value and range
 ---------------

@@ -471,7 +471,7 @@ lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * curso
  * Set/Get value(s)
  *====================*/
 
-void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value)
+void lv_chart_set_all_values(lv_obj_t * obj, lv_chart_series_t * ser, int32_t value)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);

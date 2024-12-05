@@ -72,7 +72,7 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_scale_class;
 /**
  * Create an scale object
  * @param parent    pointer to an object, it will be the parent of the new scale
- * @return          pointer to the created scale
+ * @return          pointer to created Scale Widget
  */
 lv_obj_t * lv_scale_create(lv_obj_t * parent);
 
@@ -85,119 +85,137 @@ lv_obj_t * lv_scale_create(lv_obj_t * parent);
  *====================*/
 
 /**
- * Set scale mode. See lv_scale_mode_t
- * @param obj       pointer the scale object
+ * Set scale mode. See lv_scale_mode_t.
+ * @param obj       pointer to Scale Widget
  * @param mode      the new scale mode
  */
 void lv_scale_set_mode(lv_obj_t * obj, lv_scale_mode_t mode);
 
 /**
- * Set scale total tick count (including minor and major ticks)
- * @param obj       pointer the scale object
+ * Set scale total tick count (including minor and major ticks).
+ * @param obj       pointer to Scale Widget
  * @param total_tick_count    New total tick count
  */
 void lv_scale_set_total_tick_count(lv_obj_t * obj, uint32_t total_tick_count);
 
 /**
- * Sets how often the major tick will be drawn
- * @param obj                 pointer the scale object
+ * Sets how often major ticks are drawn.
+ * @param obj                 pointer to Scale Widget
  * @param major_tick_every    the new count for major tick drawing
  */
 void lv_scale_set_major_tick_every(lv_obj_t * obj, uint32_t major_tick_every);
 
 /**
- * Sets label visibility
- * @param obj           pointer the scale object
+ * Sets label visibility.
+ * @param obj           pointer to Scale Widget
  * @param show_label    true/false to enable tick label
  */
 void lv_scale_set_label_show(lv_obj_t * obj, bool show_label);
 
 /**
- * Set the minimal and maximal values on a scale
- * @param obj       pointer to a scale object
- * @param min       minimum value of the scale
- * @param max       maximum value of the scale
+ * Set minimum and maximum values on Scale.
+ * @param obj       pointer to Scale Widget
+ * @param min       minimum value of Scale
+ * @param max       maximum value of Scale
  */
 void lv_scale_set_range(lv_obj_t * obj, int32_t min, int32_t max);
 
 /**
- * Set properties specific to round scale
- * @param obj           pointer to a scale object
- * @param angle_range   the angular range of the scale
+ * Set angle between the low end and the high end of the Scale.
+ * (Applies only to round Scales.)
+ * @param obj         pointer to Scale Widget
+ * @param max_angle   angle in degrees from Scale minimum where top end of Scale will be drawn
  */
 void lv_scale_set_angle_range(lv_obj_t * obj, uint32_t angle_range);
 
 /**
- * Set properties specific to round scale
- * @param obj       pointer to a scale object
- * @param rotation  the angular offset from the 3 o'clock position (clock-wise)
+ * Set angular offset from the 3-o'clock position of the low end of the Scale.
+ * (Applies only to round Scales.)
+ * @param obj       pointer to Scale Widget
+ * @param rotation  clockwise angular offset (in degrees) from the 3-o'clock position
+ *                  of the low end of the scale; negative and >360 values are first normalized
+ *                  to range [0..360].
+ *                  Examples:
+ *                      -   0 = 3 o'clock (right side)
+ *                      -  30 = 4 o'clock
+ *                      -  60 = 5 o'clock
+ *                      -  90 = 6 o'clock
+ *                      - 135 = midway between 7 and 8 o'clock (default)
+ *                      - 180 = 9 o'clock
+ *                      - 270 = 12 o'clock
+ *                      - 300 = 1 o'clock
+ *                      - 330 = 2 o'clock
+ *                      - -30 = 2 o'clock
+ *                      - 390 = 4 o'clock
  */
 void lv_scale_set_rotation(lv_obj_t * obj, int32_t rotation);
 
 /**
- * Point the needle to the corresponding value through the line
- * @param obj              pointer to a scale object
- * @param needle_line      needle_line of the scale. The line points will be allocated and
- *                         managed by the scale unless the line point array was previously set
+ * Point line needle to specified value.
+ * @param obj              pointer to Scale Widget
+ * @param needle_line      needle_line of the Scale. The line points will be allocated and
+ *                         managed by the Scale unless the line point array was previously set
  *                         using `lv_line_set_points_mutable`.
  * @param needle_length    length of the needle
- *                         needle_length>0 needle_length=needle_length;
- *                         needle_length<0 needle_length=radius-|needle_length|;
- * @param value            needle to point to the corresponding value
+ *                         - needle_length>0: needle_length=needle_length;
+ *                         - needle_length<0: needle_length=radius-|needle_length|;
+ * @param value            Scale value needle will point to
  */
 void lv_scale_set_line_needle_value(lv_obj_t * obj, lv_obj_t * needle_line, int32_t needle_length,
                                     int32_t value);
 
 /**
- * Point the needle to the corresponding value through the image,
+ * Point image needle to specified value;
    image must point to the right. E.g. -O------>
- * @param obj              pointer to a scale object
- * @param needle_img       needle_img of the scale
- * @param value            needle to point to the corresponding value
+ * @param obj              pointer to Scale Widget
+ * @param needle_img       pointer to needle's Image
+ * @param value            Scale value needle will point to
  */
 void lv_scale_set_image_needle_value(lv_obj_t * obj, lv_obj_t * needle_img, int32_t value);
 
 /**
- * Set custom text source for major ticks labels
- * @param obj       pointer to a scale object
- * @param txt_src   pointer to an array of strings which will be display at major ticks
+ * Set custom text source for major ticks labels.
+ * @param obj       pointer to Scale Widget
+ * @param txt_src   pointer to an array of strings which will be display at major ticks;
+ *                  last element must be a NULL pointer.
  */
 void lv_scale_set_text_src(lv_obj_t * obj, const char * txt_src[]);
 
 /**
- * Draw the scale after all the children are drawn
- * @param obj       pointer to a scale object
+ * Draw Scale after all its children are drawn.
+ * @param obj       pointer to Scale Widget
  * @param en        true: enable post draw
  */
 void lv_scale_set_post_draw(lv_obj_t * obj, bool en);
 
 /**
- * Draw the scale ticks on top of all parts
- * @param obj       pointer to a scale object
+ * Draw Scale ticks on top of all other parts.
+ * @param obj       pointer to Scale Widget
  * @param en        true: enable draw ticks on top of all parts
  */
 void lv_scale_set_draw_ticks_on_top(lv_obj_t * obj, bool en);
 
 /**
- * Add a section to the given scale
- * @param obj       pointer to a scale object
- * @return          pointer to the new section
+ * Add a Section to specified Scale.  Section will not be drawn until
+ * a valid range is set for it using `lv_scale_section_set_range()`.
+ * @param obj       pointer to Scale Widget
+ * @return          pointer to new Section
  */
 lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj);
 
 /**
- * Set the range for the given scale section
- * @param section       pointer to a scale section object
- * @param minor_range   section new minor range
- * @param major_range   section new major range
+ * Set range for specified Scale Section
+ * @param section       pointer to Section
+ * @param range_min     Section new minimum value
+ * @param range_max     Section new maximum value
  */
-void lv_scale_section_set_range(lv_scale_section_t * section, int32_t minor_range, int32_t major_range);
+void lv_scale_section_set_range(lv_scale_section_t * section, int32_t min, int32_t max);
 
 /**
- * Set the style of the part for the given scale section
- * @param section   pointer to a scale section object
- * @param part      the part for the section, e.g. LV_PART_INDICATOR
- * @param section_part_style Pointer to the section part style
+ * Set style for specified part of Section.
+ * @param section             pointer to Section
+ * @param part                the part of the Scale the style will apply to, e.g. LV_PART_INDICATOR
+ * @param section_part_style  pointer to style to apply
  */
 void lv_scale_section_set_style(lv_scale_section_t * section, lv_part_t part, lv_style_t * section_part_style);
 
@@ -207,50 +225,57 @@ void lv_scale_section_set_style(lv_scale_section_t * section, lv_part_t part, lv
 
 /**
  * Get scale mode. See lv_scale_mode_t
- * @param obj   pointer the scale object
+ * @param obj   pointer to Scale Widget
  * @return      Scale mode
  */
 lv_scale_mode_t lv_scale_get_mode(lv_obj_t * obj);
 
 /**
  * Get scale total tick count (including minor and major ticks)
- * @param obj   pointer the scale object
+ * @param obj   pointer to Scale Widget
  * @return      Scale total tick count
  */
 int32_t lv_scale_get_total_tick_count(lv_obj_t * obj);
 
 /**
- * Gets how often the major tick will be drawn
- * @param obj   pointer the scale object
+ * Get how often the major tick will be drawn
+ * @param obj   pointer to Scale Widget
  * @return      Scale major tick every count
  */
 int32_t lv_scale_get_major_tick_every(lv_obj_t * obj);
 
 /**
+ * Get angular location of low end of Scale.
+ * @param obj   pointer to Scale Widget
+ * @return      Scale major tick every count
+ */
+lv_scale_mode_t lv_scale_get_rotation(lv_obj_t * obj);
+
+/**
  * Gets label visibility
- * @param obj   pointer the scale object
+ * @param obj   pointer to Scale Widget
  * @return      true if tick label is enabled, false otherwise
  */
 bool lv_scale_get_label_show(lv_obj_t * obj);
 
 /**
- * Get angle range of a round scale
- * @param obj   pointer to a scale object
- * @return      Scale angle_range
+ * Get Scale's range in degrees
+ * @param obj   pointer to Scale Widget
+ * @return      Scale's angle_range
  */
 uint32_t lv_scale_get_angle_range(lv_obj_t * obj);
 
 /**
- * Get the min range for the given scale section
- * @param obj   pointer to a scale section object
- * @return      section minor range
+ * Get minimum value for Scale
+ * @param obj   pointer to Scale Widget
+ * @return      Scale's minimum value
  */
 int32_t lv_scale_get_range_min_value(lv_obj_t * obj);
 
 /**
- * Get the max range for the given scale section
- * @param obj   pointer to a scale section object
- * @return      section max range
+ * Get maximum value for Scale
+ * @param obj   pointer to Scale Widget
+ * @return      Scale's maximum value
  */
 int32_t lv_scale_get_range_max_value(lv_obj_t * obj);
 

@@ -11,4 +11,6 @@
     qnx
     rt-thread
     yocto/index
+    buildroot/index
     zephyr
+    torizon_os
