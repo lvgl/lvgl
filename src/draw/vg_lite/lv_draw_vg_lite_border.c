@@ -177,7 +177,6 @@ static vg_lite_fill_t path_append_inner_rect(lv_vg_lite_path_t * path,
 
     /* reset outter rect path */
     lv_vg_lite_path_reset(path, VG_LITE_FP32);
-    lv_vg_lite_path_set_quality(path, VG_LITE_HIGH);
 
     /* coordinate reference map: https://github.com/lvgl/lvgl/pull/6796 */
     const float c1_x = x + r;

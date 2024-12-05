@@ -438,6 +438,44 @@ void test_scale_angle_range(void)
     TEST_ASSERT_EQUAL(angle_range, lv_scale_get_angle_range(scale));
 }
 
+void test_scale_rotation(void)
+{
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
+
+    lv_scale_set_rotation(scale, 135);
+    TEST_ASSERT_EQUAL(lv_scale_get_rotation(scale), 135);
+
+    lv_scale_set_rotation(scale, 375); /* 15 */
+    TEST_ASSERT_EQUAL(lv_scale_get_rotation(scale), 15);
+
+    lv_scale_set_rotation(scale, 540); /* 180 */
+    TEST_ASSERT_EQUAL(lv_scale_get_rotation(scale), 180);
+
+    lv_scale_set_rotation(scale, 1085); /* 5 */
+    TEST_ASSERT_EQUAL(lv_scale_get_rotation(scale), 5);
+
+    lv_scale_set_rotation(scale, -90); /* 270 */
+    TEST_ASSERT_EQUAL(lv_scale_get_rotation(scale), 270);
+
+    lv_scale_set_rotation(scale, -270); /* 90 */
+    TEST_ASSERT_EQUAL(lv_scale_get_rotation(scale), 90);
+
+    lv_scale_set_rotation(scale, -355); /* 5 */
+    TEST_ASSERT_EQUAL(lv_scale_get_rotation(scale), 5);
+
+    lv_scale_set_rotation(scale, -370); /* 350 */
+    TEST_ASSERT_EQUAL(lv_scale_get_rotation(scale), 350);
+
+    lv_scale_set_rotation(scale, -405); /* 315 */
+    TEST_ASSERT_EQUAL(lv_scale_get_rotation(scale), 315);
+
+    lv_scale_set_rotation(scale, -450); /* 270 */
+    TEST_ASSERT_EQUAL(lv_scale_get_rotation(scale), 270);
+
+    lv_scale_set_rotation(scale, -1075); /* 5 */
+    TEST_ASSERT_EQUAL(lv_scale_get_rotation(scale), 5);
+}
+
 void test_scale_range(void)
 {
     lv_obj_t * scale = lv_scale_create(lv_screen_active());

@@ -1,0 +1,46 @@
+<!--
+Example
+<lv_spangroup mode="fixed">
+	<lv_spangroup-span text="hello " style="red"/>
+	<lv_spangroup-span text="world" style="blue"/>
+</lv_spangroup>
+-->
+
+<widget>
+	<api>
+		<enumdef name="lv_span_overflow">
+			<enum name="clip" help=""/>
+			<enum name="ellipses" help=""/>
+		</enumdef>
+		<enumdef name="lv_span_mode">
+			<enum name="fixed" help=""/>
+			<enum name="expand" help=""/>
+			<enum name="break" help=""/>
+		</enumdef>
+
+	    <prop name="align" help="align the text of the span group">
+	    	<param name="align" type="enum:lv_text_align" help=""/>
+	    </prop>
+
+	    <prop name="overflow" help="">
+	    	<param name="overflow" type="enum:lv_span_overflow" help=""/>
+	    </prop>
+
+	    <prop name="mode" help="">
+	    	<param name="mode" type="enum:lv_span_mode" help=""/>
+	    </prop>
+
+	    <prop name="max_lines" help="">
+	    	<param name="max_lines" type="int" help=""/>
+	    </prop>
+
+	    <prop name="indent" help="">
+	    	<param name="indent" type="int" help=""/>
+	    </prop>
+
+		<element name="span" type="custom:span" access="add">
+			<param name="text" type="string" help=""/>
+			<param name="style" type="style" help=""/>
+		</element>
+	</api>
+</widget>

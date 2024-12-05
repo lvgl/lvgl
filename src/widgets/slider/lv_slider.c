@@ -103,6 +103,11 @@ void lv_slider_set_mode(lv_obj_t * obj, lv_slider_mode_t mode)
     lv_bar_set_mode(obj, (lv_bar_mode_t)mode);
 }
 
+void lv_slider_set_orientation(lv_obj_t * obj, lv_slider_orientation_t orientation)
+{
+    lv_bar_set_orientation(obj, (lv_bar_orientation_t)orientation);
+}
+
 int32_t lv_slider_get_value(const lv_obj_t * obj)
 {
     return lv_bar_get_value(obj);
@@ -129,6 +134,14 @@ lv_slider_mode_t lv_slider_get_mode(lv_obj_t * slider)
     if(mode == LV_BAR_MODE_SYMMETRICAL) return LV_SLIDER_MODE_SYMMETRICAL;
     else if(mode == LV_BAR_MODE_RANGE) return LV_SLIDER_MODE_RANGE;
     else return LV_SLIDER_MODE_NORMAL;
+}
+
+lv_slider_orientation_t lv_slider_get_orientation(lv_obj_t * slider)
+{
+    lv_bar_orientation_t ori = lv_bar_get_orientation(slider);
+    if(ori == LV_BAR_ORIENTATION_HORIZONTAL) return LV_SLIDER_ORIENTATION_HORIZONTAL;
+    else if(ori == LV_BAR_ORIENTATION_VERTICAL) return LV_SLIDER_ORIENTATION_VERTICAL;
+    else return LV_SLIDER_ORIENTATION_AUTO;
 }
 
 bool lv_slider_is_symmetrical(lv_obj_t * obj)
@@ -388,7 +401,10 @@ static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, const int32_t k
 
 static bool is_slider_horizontal(lv_obj_t * obj)
 {
-    return lv_obj_get_width(obj) >= lv_obj_get_height(obj);
+    lv_slider_t * slider = (lv_slider_t *)obj;
+    if(slider->bar.orientation == LV_BAR_ORIENTATION_AUTO) return lv_obj_get_width(obj) >= lv_obj_get_height(obj);
+    else if(slider->bar.orientation == LV_BAR_ORIENTATION_HORIZONTAL) return true;
+    else return false;
 }
 
 static void drag_start(lv_obj_t * obj)

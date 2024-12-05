@@ -225,7 +225,7 @@ You have several options to set the Y-values for a data series:
    the zero-based index of the point you wish to update.
 3. Use :cpp:expr:`lv_chart_set_next_value(chart, series, value)`.
    (See `Update modes`_ below.)
-4. Set all points to a single Y-value with :cpp:expr:`lv_chart_set_all_value(chart, series, value)`.
+4. Set all points to a single Y-value with :cpp:expr:`lv_chart_set_all_values(chart, series, value)`.
 
 Use :c:macro:`LV_CHART_POINT_NONE` as value to make the library skip drawing
 that point, column, or scatter-point.

@@ -12,6 +12,7 @@
 
 #include "lv_st_ltdc.h"
 #include "../../../display/lv_display_private.h"
+#include "../../../draw/sw/lv_draw_sw.h"
 #include "ltdc.h"
 
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
@@ -154,41 +155,51 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         LTDC_LayerCfgTypeDef * layer_cfg = &hltdc.LayerCfg[layer_idx];
 
         lv_color_format_t cf = lv_display_get_color_format(disp);
-        int32_t disp_width = lv_display_get_horizontal_resolution(disp);
+        int32_t disp_width = disp->hor_res;
 
         uint8_t * fb = (uint8_t *) layer_cfg->FBStartAdress;
         uint32_t px_size = lv_color_format_get_size(cf);
         uint32_t fb_stride = px_size * disp_width;
-        uint8_t * first_pixel = fb + fb_stride * area->y1 + px_size * area->x1;
+        lv_area_t rotated_area = *area;
+        lv_display_rotate_area(disp, &rotated_area);
+        uint8_t * first_pixel = fb + fb_stride * rotated_area.y1 + px_size * rotated_area.x1;
 
         int32_t area_width = lv_area_get_width(area);
         int32_t area_height = lv_area_get_height(area);
 
+        lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+        if(rotation == LV_DISPLAY_ROTATION_0) {
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
-        uint32_t dma2d_input_cf = get_dma2d_input_cf_from_lv_cf(cf);
-        uint32_t dma2d_output_cf = get_dma2d_output_cf_from_layer_cf(layer_cfg->PixelFormat);
+            uint32_t dma2d_input_cf = get_dma2d_input_cf_from_lv_cf(cf);
+            uint32_t dma2d_output_cf = get_dma2d_output_cf_from_layer_cf(layer_cfg->PixelFormat);
 
-        while(DMA2D->CR & DMA2D_CR_START);
-        DMA2D->FGPFCCR = dma2d_input_cf;
-        DMA2D->FGMAR = (uint32_t)px_map;
-        DMA2D->FGOR = 0;
-        DMA2D->OPFCCR = dma2d_output_cf;
-        DMA2D->OMAR = (uint32_t)first_pixel;
-        DMA2D->OOR = disp_width - area_width;
-        DMA2D->NLR = (area_width << DMA2D_NLR_PL_Pos) | (area_height << DMA2D_NLR_NL_Pos);
-        g_data.dma2d_interrupt_owner = layer_idx + 1;
-        DMA2D->CR = DMA2D_CR_START | DMA2D_CR_TCIE | (0x1U << DMA2D_CR_MODE_Pos); /* memory-to-memory with PFC */
+            while(DMA2D->CR & DMA2D_CR_START);
+            DMA2D->FGPFCCR = dma2d_input_cf;
+            DMA2D->FGMAR = (uint32_t)px_map;
+            DMA2D->FGOR = 0;
+            DMA2D->OPFCCR = dma2d_output_cf;
+            DMA2D->OMAR = (uint32_t)first_pixel;
+            DMA2D->OOR = disp_width - area_width;
+            DMA2D->NLR = (area_width << DMA2D_NLR_PL_Pos) | (area_height << DMA2D_NLR_NL_Pos);
+            g_data.dma2d_interrupt_owner = layer_idx + 1;
+            DMA2D->CR = DMA2D_CR_START | DMA2D_CR_TCIE | (0x1U << DMA2D_CR_MODE_Pos); /* memory-to-memory with PFC */
 #else
-        uint32_t area_stride = px_size * area_width;
-        uint8_t * fb_p = first_pixel;
-        uint8_t * px_map_p = px_map;
-        for(int i = 0; i < area_height; i++) {
-            lv_memcpy(fb_p, px_map_p, area_stride);
-            fb_p += fb_stride;
-            px_map_p += area_stride;
-        }
-        g_data.disp_flushed_in_flush_cb[layer_idx] = true;
+            uint32_t area_stride = px_size * area_width;
+            uint8_t * fb_p = first_pixel;
+            uint8_t * px_map_p = px_map;
+            for(int i = 0; i < area_height; i++) {
+                lv_memcpy(fb_p, px_map_p, area_stride);
+                fb_p += fb_stride;
+                px_map_p += area_stride;
+            }
+            g_data.disp_flushed_in_flush_cb[layer_idx] = true;
 #endif
+        }
+        else {
+            uint32_t area_stride = px_size * area_width;
+            lv_draw_sw_rotate(px_map, first_pixel, area_width, area_height, area_stride, fb_stride, rotation, cf);
+            g_data.disp_flushed_in_flush_cb[layer_idx] = true;
+        }
     }
 }
 

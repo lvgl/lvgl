@@ -1,6 +1,6 @@
-#include "../../src/themes/lv_theme_private.h"
 #include "../lv_examples.h"
 #if LV_BUILD_EXAMPLES && LV_USE_IMAGE
+#include "../../lvgl_private.h"
 
 static lv_style_t style_btn;
 

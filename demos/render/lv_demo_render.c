@@ -10,7 +10,7 @@
 
 #if LV_USE_DEMO_RENDER
 
-#include "../../src/core/lv_global.h"
+#include "../../lvgl_private.h"
 
 /*********************
  *      DEFINES

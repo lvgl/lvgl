@@ -174,9 +174,17 @@ void lv_scale_set_rotation(lv_obj_t * obj, int32_t rotation)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_scale_t * scale = (lv_scale_t *)obj;
+    int32_t normalized_angle = rotation;
 
-    scale->rotation = rotation;
+    if(normalized_angle < 0 || normalized_angle > 360) {
+        normalized_angle = rotation % 360;
 
+        if(normalized_angle < 0) {
+            normalized_angle += 360;
+        }
+    }
+
+    scale->rotation = normalized_angle;
     lv_obj_invalidate(obj);
 }
 
@@ -335,16 +343,19 @@ lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
     lv_memzero(section, sizeof(lv_scale_section_t));
     section->first_tick_idx_in_section = LV_SCALE_TICK_IDX_DEFAULT_ID;
     section->last_tick_idx_in_section = LV_SCALE_TICK_IDX_DEFAULT_ID;
+    /* Initial range is [0..-1] to make it "neutral" (i.e. will not be drawn until user
+     * sets a different range).  `range_min` is already 0 from `lv_memzero()` above. */
+    section->range_max = -1;
 
     return section;
 }
 
-void lv_scale_section_set_range(lv_scale_section_t * section, int32_t minor_range, int32_t major_range)
+void lv_scale_section_set_range(lv_scale_section_t * section, int32_t min, int32_t max)
 {
     if(NULL == section) return;
 
-    section->minor_range = minor_range;
-    section->major_range = major_range;
+    section->range_min = min;
+    section->range_max = max;
 }
 
 void lv_scale_section_set_style(lv_scale_section_t * section, lv_part_t part, lv_style_t * section_part_style)
@@ -387,6 +398,12 @@ int32_t lv_scale_get_major_tick_every(lv_obj_t * obj)
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
     return scale->major_tick_every;
+}
+
+lv_scale_mode_t lv_scale_get_rotation(lv_obj_t * obj)
+{
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    return scale->rotation;
 }
 
 bool lv_scale_get_label_show(lv_obj_t * obj)
@@ -568,7 +585,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         /* Overwrite label and tick properties if tick value is within section range */
         lv_scale_section_t * section;
         LV_LL_READ_BACK(&scale->section_ll, section) {
-            if(section->minor_range <= tick_value && section->major_range >= tick_value) {
+            if(section->range_min <= tick_value && section->range_max >= tick_value) {
                 if(is_major_tick) {
                     scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
                     scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
@@ -755,7 +772,7 @@ static void scale_calculate_main_compensation(lv_obj_t * obj)
         /* Overwrite label and tick properties if tick value is within section range */
         lv_scale_section_t * section;
         LV_LL_READ_BACK(&scale->section_ll, section) {
-            if(section->minor_range <= tick_value && section->major_range >= tick_value) {
+            if(section->range_min <= tick_value && section->range_max >= tick_value) {
                 if(is_major_tick) {
                     scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
                 }
@@ -933,9 +950,9 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             scale_get_center(obj, &section_arc_center, &section_arc_radius);
 
             /* TODO: Add compensation for the width of the first and last tick over the arc */
-            const int32_t section_start_angle = lv_map(section->minor_range, scale->range_min, scale->range_max, scale->rotation,
+            const int32_t section_start_angle = lv_map(section->range_min, scale->range_min, scale->range_max, scale->rotation,
                                                        scale->rotation + scale->angle_range);
-            const int32_t section_end_angle = lv_map(section->major_range, scale->range_min, scale->range_max, scale->rotation,
+            const int32_t section_end_angle = lv_map(section->range_max, scale->range_min, scale->range_max, scale->rotation,
                                                      scale->rotation + scale->angle_range);
 
             scale_set_arc_properties(obj, &main_arc_section_dsc, section->main_style);
@@ -1395,7 +1412,7 @@ static void scale_find_section_tick_idx(lv_obj_t * obj)
 
         lv_scale_section_t * section;
         LV_LL_READ_BACK(&scale->section_ll, section) {
-            if(section->minor_range <= tick_value && section->major_range >= tick_value) {
+            if(section->range_min <= tick_value && section->range_max >= tick_value) {
                 if(LV_SCALE_TICK_IDX_DEFAULT_ID == section->first_tick_idx_in_section) {
                     section->first_tick_idx_in_section = tick_idx;
                     section->first_tick_idx_is_major = is_major_tick;
@@ -1519,7 +1536,7 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
     lv_scale_section_t * section;
 
     LV_LL_READ_BACK(&scale->section_ll, section) {
-        if(section->minor_range <= tick_value && section->major_range >= tick_value) {
+        if(section->range_min <= tick_value && section->range_max >= tick_value) {
             if(is_major_tick) {
                 scale_set_line_properties(obj, major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
             }

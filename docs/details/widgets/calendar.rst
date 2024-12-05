@@ -59,7 +59,7 @@ Month shown
 -----------
 
 To set the shown date, use
-:cpp:expr:`lv_calendar_set_showed_date(calendar, year, month)`
+:cpp:expr:`lv_calendar_set_month_shown(calendar, year, month)`
 
 Highlighted days
 ----------------

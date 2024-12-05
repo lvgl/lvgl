@@ -30,6 +30,21 @@ extern "C" {
  **********************/
 
 /**
+ * Converts an I1 buffer to ARGB8888 format.
+ * @param buf_i1              pointer to buffer with I1 formatted render
+ * @param buf_argb8888        pointer to buffer for ARGB8888 render
+ * @param width               width in pixels of the area.
+ *                            must be a multiple of 8.
+ * @param height              height in pixels of the area
+ * @param buf_i1_stride       stride of i1 buffer in bytes
+ * @param buf_argb8888_stride stride of argb8888 buffer in bytes
+ * @param index0_color        color of the 0 bits of i1 buf
+ * @param index1_color        color of the 1 bits of i1 buf
+ */
+void lv_draw_sw_i1_to_argb8888(const void * buf_i1, void * buf_argb8888, uint32_t width, uint32_t height,
+                               uint32_t buf_i1_stride, uint32_t buf_argb8888_stride, uint32_t index0_color, uint32_t index1_color);
+
+/**
  * Swap the upper and lower byte of an RGB565 buffer.
  * Might be required if a 8bit parallel port or an SPI port send the bytes in the wrong order.
  * The bytes will be swapped in place.
