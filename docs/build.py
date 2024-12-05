@@ -191,41 +191,39 @@ def run():
     args = sys.argv[1:]
 
     for arg in args:
-        match arg:
-            case "clean":
-                clean = True
-            case "skip_latex":
-                skip_latex = True
-            case 'skip_api':
-                skip_api = True
-            case 'no_fresh_env':
-                fresh_sphinx_env = False
-            case 'preserve':
-                preserve = True
-            case 'fixed_tmp_dir':
-                fixed_tmp_dir = True
-            case 'skip_trans':
-                skip_trans = True
-            case 'no_copy':
-                no_copy = True
-            case 'docs_dev':
-                docs_dev = True
-            case 'update':
-                update = True
-            case _:
-                arg_abort = True
-                print(f'Argument [{arg}] not recognized.')
-
-    if arg_abort:
-        exit(1)
-    else:
-        # Arg ramifications:
-        # docs_dev implies no_fresh_env, preserve, fixed_tmp_dir, and no_copy.
-        if docs_dev:
+        # We use chained `if-elif-else` instea of `match` for those on Linux
+        # systems that will not have the required version 3.10 of Python yet.
+        if arg == "clean":
+            clean = True
+        elif arg == "skip_latex":
+            skip_latex = True
+        elif arg == 'skip_api':
+            skip_api = True
+        elif arg == 'no_fresh_env':
             fresh_sphinx_env = False
+        elif arg == 'preserve':
             preserve = True
+        elif arg == 'fixed_tmp_dir':
             fixed_tmp_dir = True
+        elif arg == 'skip_trans':
+            skip_trans = True
+        elif arg == 'no_copy':
             no_copy = True
+        elif arg == 'docs_dev':
+            docs_dev = True
+        elif arg == 'update':
+            update = True
+        else:
+            print(f'Argument [{arg}] not recognized.')
+            exit(1)
+
+    # Arg ramifications:
+    # docs_dev implies no_fresh_env, preserve, fixed_tmp_dir, and no_copy.
+    if docs_dev:
+        fresh_sphinx_env = False
+        preserve = True
+        fixed_tmp_dir = True
+        no_copy = True
 
     # ---------------------------------------------------------------------
     # Due to the modifications that take place to the documentation files
