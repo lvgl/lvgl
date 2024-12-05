@@ -54,13 +54,13 @@ To set a different value use:
 - :cpp:expr:`lv_slider_set_value(slider, new_value, LV_ANIM_ON/OFF)` (animation time
   is set by the styles' ``anim_time`` property);
 - :cpp:expr:`lv_slider_set_range(slider, min , max)`; and
-- for orientation, width and height, simply set width and height style properties;
-- :cpp:expr:`lv_bar_set_orientation(slider, orientation)` to override orientation
+- for orientation, width and height, simply set width and height properties;
+- :cpp:expr:`lv_slider_set_orientation(slider, orientation)` to override orientation
   caused by ``width`` and ``height``.  Valid values for ``orientation`` are:
 
-  - LV_BAR_ORIENTATION_AUTO,
-  - LV_BAR_ORIENTATION_HORIZONTAL,
-  - LV_BAR_ORIENTATION_VERTICAL.
+  - :cpp:enumerator:`LV_SLIDER_ORIENTATION_AUTO`
+  - :cpp:enumerator:`LV_SLIDER_ORIENTATION_HORIZONTAL`
+  - :cpp:enumerator:`LV_SLIDER_ORIENTATION_VERTICAL`
 
 The default drawing direction is from left to right in horizontal orientation and
 bottom to top in vertical orientation.  If the minimum value is set to be greater

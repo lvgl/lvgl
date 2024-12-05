@@ -302,10 +302,10 @@ void test_label_properties(void)
     TEST_ASSERT_EQUAL_STRING("Hello world", lv_obj_get_property(obj, LV_PROPERTY_LABEL_TEXT).ptr);
 
     prop.id = LV_PROPERTY_LABEL_LONG_MODE;
-    prop.num = LV_LABEL_LONG_SCROLL;
+    prop.num = LV_LABEL_LONG_MODE_SCROLL;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
-    TEST_ASSERT_EQUAL_INT(LV_LABEL_LONG_SCROLL, lv_label_get_long_mode(obj));
-    TEST_ASSERT_EQUAL_INT(LV_LABEL_LONG_SCROLL, lv_obj_get_property(obj, LV_PROPERTY_LABEL_LONG_MODE).num);
+    TEST_ASSERT_EQUAL_INT(LV_LABEL_LONG_MODE_SCROLL, lv_label_get_long_mode(obj));
+    TEST_ASSERT_EQUAL_INT(LV_LABEL_LONG_MODE_SCROLL, lv_obj_get_property(obj, LV_PROPERTY_LABEL_LONG_MODE).num);
 
 #if LV_LABEL_TEXT_SELECTION
     prop.id = LV_PROPERTY_LABEL_TEXT_SELECTION_START;

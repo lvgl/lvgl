@@ -1,0 +1,12 @@
+<component>
+	<api>
+		<prop name="color" type="color" default="0x000000"/>
+		<prop name="style"  type="style"/>
+	</api>
+
+	<view extends="lv_label"
+		  style_text_color="$color"
+		  styles="$style"
+		  style_text_font="lv_montserrat_18">
+	</view>
+</component>
