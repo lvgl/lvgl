@@ -1,3 +1,11 @@
+.. |check|  unicode:: U+02713 .. CHECK MARK
+.. |Aacute| unicode:: U+000C1 .. LATIN CAPITAL LETTER A WITH ACUTE
+.. |eacute| unicode:: U+000E9 .. LATIN SMALL LETTER E WITH ACUTE
+.. |otilde| unicode:: U+000F5 .. LATIN SMALL LETTER O WITH TILDE
+.. |Utilde| unicode:: U+00168 .. LATIN CAPITAL LETTER U WITH TILDE
+.. |uuml|   unicode:: U+000FC .. LATIN SMALL LETTER U WITH DIAERESIS
+.. |uml|    unicode:: U+000A8 .. DIAERESIS
+
 .. _font:
 
 ==============
@@ -11,29 +19,37 @@ For example:
 
 .. code-block:: c
 
-   lv_style_set_text_font(&my_style, &lv_font_montserrat_28);  /* Set a larger font */
+    lv_style_set_text_font(&my_style, &lv_font_montserrat_28);  /* Set a larger font */
 
-Fonts have a **format** property. It describes how the glyph draw data is stored.
-It has *2* categories: `Legacy simple format` and `Advanced format`.
-In the most simple case, the font is stored in a simple array of bitmaps.
-In the advanced format, the font can be stored in a different way like `Vector`, `SVG`, etc.
+Fonts have a **format** property. It describes how the glyph data is stored.
+At this writing there are 12 possible values that this field can take, and those
+values fall into 2 categories:
 
-In case of the simple format, the value stored for a pixel determines the pixel's opacity.
-This way, with higher *bpp (bit per pixel)*, the edges of the letter can be smoother.
-The possible *bpp* values are 1, 2, 4 and 8 (higher values mean better quality).
+:Legacy simple: 1, 2, 4 or 8-bpp (aligned or unaligned) and image format, and
+:Advanced:      vector, SVG, and custom formats; for the latter, the user provides
+                the rendering logic.
 
-The *format* property also affects the amount of memory needed to store a
-font. For example, *format = LV_FONT_GLYPH_FORMAT_A4* makes a font nearly four times larger
-compared to *format = LV_FONT_GLYPH_FORMAT_A1*.
+For simple formats:
+
+- the font is stored as an array of bitmaps, one bitmap per glyph;
+- the value stored for each pixel determines the pixel's opacity, enabling edges
+  to be smoother --- higher bpp values result in smoother edges.
+
+For advanced formats, the font information is stored in its respective format.
+
+The **format** property also affects the amount of memory needed to store a
+font. For example, ``format = LV_FONT_GLYPH_FORMAT_A4`` makes a font nearly four
+times larger compared to ``format = LV_FONT_GLYPH_FORMAT_A1``.
 
 
-Unicode support
+
+Unicode Support
 ***************
 
 LVGL supports **UTF-8** encoded Unicode characters. Your editor needs to
 be configured to save your code/text as UTF-8 (usually this the default)
-and be sure that, :c:macro:`LV_TXT_ENC` is set to :c:macro:`LV_TXT_ENC_UTF8` in
-*lv_conf.h*. (This is the default value)
+and be sure that :c:macro:`LV_TXT_ENC` is set to :c:macro:`LV_TXT_ENC_UTF8` in
+``lv_conf.h``. (This is the default value.)
 
 To test it try
 
@@ -42,7 +58,7 @@ To test it try
    lv_obj_t * label1 = lv_label_create(lv_screen_active(), NULL);
    lv_label_set_text(label1, LV_SYMBOL_OK);
 
-If all works well, a ✓ character should be displayed.
+If all works well, a '\ |check|\ ' character should be displayed.
 
 
 Typesetting
@@ -61,32 +77,26 @@ Languages like Arabic, Persian, and Hebrew, which use Right-to-Left
 (RTL) or mixed writing directions, are also supported in LVGL.
 Learn more :ref:`here <bidi>`.
 
-
-.. |Aacute| unicode:: U+000C1 .. LATIN CAPITAL LETTER A WITH ACUTE
-.. |eacute| unicode:: U+000E9 .. LATIN SMALL LETTER E WITH ACUTE
-.. |otilde| unicode:: U+000F5 .. LATIN SMALL LETTER O WITH TILDE
-.. |Utilde| unicode:: U+00168 .. LATIN CAPITAL LETTER U WITH TILDE
-.. |uuml|   unicode:: U+000FC .. LATIN SMALL LETTER U WITH DIAERESIS
-
-For characters such as '|eacute|', '|uuml|', '|otilde|', '|Aacute|', and '|Utilde|', it is recommended
-to use the single Unicode format (NFC) rather than decomposing them into
-a base letter and diacritics (e.g. ``u + ¨``).
+For characters such as '|eacute|', '|uuml|', '|otilde|', '|Aacute|', and '|Utilde|',
+it is recommended to use the single Unicode format (NFC) rather than decomposing them
+into a base letter and diacritics (e.g. ``u`` + |uml|).
 
 Complex languages where subsequent characters combine into a single glyph
 and where the resulting glyph has no individual Unicode representation
 (e.g., Devanagari), have limited support in LVGL.
 
 
-Built-in fonts
+
+Built-In Fonts
 **************
 
 There are several built-in fonts in different sizes, which can be
-enabled in ``lv_conf.h`` with *LV_FONT\_…* defines.
+enabled in ``lv_conf.h`` with *LV_FONT_...* defines.
 
-Normal fonts
+Normal Fonts
 ------------
 
-Containing all the ASCII characters, the degree symbol (U+00B0), the
+The following fonts contain all ASCII characters, the degree symbol (U+00B0), the
 bullet symbol (U+2022) and the built-in symbols (see below).
 
 - :c:macro:`LV_FONT_MONTSERRAT_12`: 12 px font
@@ -120,9 +130,13 @@ Special fonts
 
 The built-in fonts are **global variables** with names like
 :cpp:var:`lv_font_montserrat_16` for a 16 px height font. To use them in a
-style, just add a pointer to a font variable like shown above.
+style, just add a pointer to a font variable like this:
 
-The built-in fonts with *bpp = 4* contain the ASCII characters and use
+.. code-block:: c
+
+    lv_style_set_text_font(&my_style, &lv_font_montserrat_28);
+
+The built-in fonts with ``bpp = 4`` contain the ASCII characters and use
 the `Montserrat <https://fonts.google.com/specimen/Montserrat>`__ font.
 
 In addition to the ASCII range, the following symbols are also added to
@@ -152,6 +166,7 @@ Or more symbols together:
    lv_label_set_text(my_label, LV_SYMBOL_OK LV_SYMBOL_WIFI LV_SYMBOL_PLAY);
 
 
+
 Special Features
 ****************
 
@@ -169,17 +184,17 @@ bidirectional, BiDi) text rendering as well. Some examples:
 
 .. image:: /misc/bidi.png
 
-BiDi support is enabled by :c:macro:`LV_USE_BIDI` in *lv_conf.h*
+BiDi support is enabled by setting :c:macro:`LV_USE_BIDI` to a non-zero value in ``lv_conf.h``.
 
 All text has a base direction (LTR or RTL) which determines some
-rendering rules and the default alignment of the text (Left or Right).
+rendering rules and the default alignment of the text (left or right).
 However, in LVGL, the base direction is not only applied to labels. It's
 a general property which can be set for every Widget. If not set then it
 will be inherited from the parent. This means it's enough to set the
-base direction of a screen and every Widget will inherit it.
+base direction of a screen and its child Widgets will inherit it.
 
 The default base direction for screens can be set by
-:c:macro:`LV_BIDI_BASE_DIR_DEF` in *lv_conf.h* and other Widgets inherit the
+:c:macro:`LV_BIDI_BASE_DIR_DEF` in ``lv_conf.h`` and other Widgets inherit the
 base direction from their parent.
 
 To set a Widget's base direction use :cpp:expr:`lv_obj_set_style_base_dir(widget, base_dir, selector)`.
@@ -194,10 +209,11 @@ This list summarizes the effect of RTL base direction on Widgets:
 - Create Widgets by default on the right
 - ``lv_tabview``: Displays tabs from right to left
 - ``lv_checkbox``: Shows the box on the right
-- ``lv_buttonmatrix``: Shows buttons from right to left
+- ``lv_buttonmatrix``: Orders buttons from right to left
 - ``lv_list``: Shows icons on the right
 - ``lv_dropdown``: Aligns options to the right
-- The text strings in ``lv_table``, ``lv_buttonmatrix``, ``lv_keyboard``, ``lv_tabview``, ``lv_dropdown``, ``lv_roller`` are "BiDi processed" to be displayed correctly
+- The text strings in ``lv_table``, ``lv_buttonmatrix``, ``lv_keyboard``, ``lv_tabview``,
+  ``lv_dropdown``, ``lv_roller`` are "BiDi processed" to be displayed correctly
 
 Arabic and Persian support
 --------------------------
@@ -208,12 +224,15 @@ different form of the same letter needs to be used when it is isolated,
 at start, middle or end positions. Besides these, some conjunction rules
 should also be taken into account.
 
-LVGL supports these rules if :c:macro:`LV_USE_ARABIC_PERSIAN_CHARS` is enabled.
+LVGL supports these rules if :c:macro:`LV_USE_ARABIC_PERSIAN_CHARS` is enabled
+in ``lv_conf.h``.
 
 However, there are some limitations:
 
-- Only displaying text is supported (e.g. on labels), text inputs (e.g. text area) don't support this feature.
-- Static text (i.e. const) is not processed. E.g. text set by :cpp:func:`lv_label_set_text` will be "Arabic processed" but :cpp:func:`lv_label_set_text_static` won't.
+- Only displaying text is supported (e.g. on labels), i.e. text inputs (e.g. Text
+  Area) do not support this feature.
+- Static text (i.e. const) is not processed. E.g. text set by :cpp:func:`lv_label_set_text`
+  will be "Arabic processed" but :cpp:func:`lv_label_set_text_static` will not.
 - Text get functions (e.g. :cpp:func:`lv_label_get_text`) will return the processed text.
 
 .. _fonts_compressed:
@@ -228,13 +247,14 @@ Compressed fonts can be generated by
 - not passing the ``--no-compress`` flag to the offline converter (compression is applied by default)
 
 Compression is more effective with larger fonts and higher bpp. However,
-it's about 30% slower to render compressed fonts. Therefore, it's
+it's about 30% slower to render compressed fonts. Therefore, it is
 recommended to compress only the largest fonts of a user interface,
 because
 
 - they need the most memory
 - they can be compressed better
-- and probably they are used less frequently then the medium-sized fonts, so the performance cost is smaller.
+- and on the likelihood that they are used less frequently than the medium-sized
+  fonts, the performance cost will be smaller.
 
 Compressed fonts also support ``bpp=3``.
 
@@ -248,12 +268,13 @@ characters.
 - The offline converter generates kerning tables unless ``--no-kerning`` is
   specified.
 - FreeType integration does not currently support kerning.
-- The Tiny TTF font engine supports GPOS and Kern tables.
+- The Tiny TTF font engine supports GPOS (Glyph Positioning) and Kern tables.
 
 To configure kerning at runtime, use :cpp:func:`lv_font_set_kerning`.
 
-.. _add_font:
 
+
+.. _add_font:
 
 Adding a New Font
 *****************
@@ -270,12 +291,13 @@ There are several ways to add a new font to your project:
    fonts (Montserrat font and symbols) but in a different size and/or
    ranges, you can use the ``built_in_font_gen.py`` script in
    ``lvgl/scripts/built_in_font`` folder. (This requires Python and
-   ``lv_font_conv`` to be installed)
+   https://github.com/lvgl/lv_font_conv/ to be installed.)
 
 To declare a font in a file, use :cpp:expr:`LV_FONT_DECLARE(my_font_name)`.
 
 To make fonts globally available (like the built-in fonts), add them to
-:c:macro:`LV_FONT_CUSTOM_DECLARE` in *lv_conf.h*.
+:c:macro:`LV_FONT_CUSTOM_DECLARE` in ``lv_conf.h``.
+
 
 
 Adding New Symbols
@@ -285,7 +307,7 @@ The built-in symbols are created from the `FontAwesome <https://fontawesome.com/
 
 1. Search for a symbol on https://fontawesome.com. For example the
    `USB symbol <https://fontawesome.com/icons/usb?style=brands>`__. Copy its
-   Unicode ID which is ``0xf287`` in this case.
+   Unicode ID which is ``0xf287``.
 2. Open the `Online font converter <https://lvgl.io/tools/fontconverter>`__.
    Add `FontAwesome.woff <https://lvgl.io/assets/others/FontAwesome5-Solid+Brands+Regular.woff>`__.
 3. Set the parameters such as Name, Size, BPP. You'll use this name to
@@ -293,7 +315,7 @@ The built-in symbols are created from the `FontAwesome <https://fontawesome.com/
 4. Add the Unicode ID of the symbol to the range field. E.g.\ ``0xf287``
    for the USB symbol. More symbols can be enumerated with ``,``.
 5. Convert the font and copy the generated source code to your project.
-   Make sure to compile the .c file of your font.
+   Make sure to compile the ``.c`` file of your font.
 6. Declare the font using ``extern lv_font_t my_font_name;`` or simply
    use :cpp:expr:`LV_FONT_DECLARE(my_font_name)`.
 
@@ -302,12 +324,15 @@ The built-in symbols are created from the `FontAwesome <https://fontawesome.com/
 1. Convert the Unicode value to UTF8, for example on
    `this site <http://www.ltg.ed.ac.uk/~richard/utf-8.cgi?input=f287&mode=hex>`__.
    For ``0xf287`` the *Hex UTF-8 bytes* are ``EF 8A 87``.
-2. Create a ``define`` string from the UTF8 values: ``#define MY_USB_SYMBOL "\xEF\x8A\x87"``
+2. Create a ``#define`` string from the UTF8 values: ``#define MY_USB_SYMBOL "\xEF\x8A\x87"``
 3. Create a label and set the text. Eg. :cpp:expr:`lv_label_set_text(label, MY_USB_SYMBOL)`
 
-:note: :cpp:expr:`lv_label_set_text(label, MY_USB_SYMBOL)` searches for this
-       symbol in the font defined in ``style.text.font`` properties. To use the
-       symbol you may need to change it. Eg ``style.text.font = my_font_name``
+:note: :cpp:expr:`lv_label_set_text(label, MY_USB_SYMBOL)` searches for this symbol
+       in the font defined in the style's ``text.font`` property. To use the symbol
+       you will need to set the style's text font to use the generated font, e.g.
+       :cpp:expr:`lv_style_set_text_font(&my_style, &my_font_name)` or
+       :cpp:expr:`lv_obj_set_style_text_font(label, &my_font_name, 0)`.
+
 
 
 Loading a Font at Run-Time
@@ -332,6 +357,7 @@ Example
 
    /* Free the font if not required anymore */
    lv_binfont_destroy(my_font);
+
 
 
 Loading a Font from a Memory Buffer at Run-Time
@@ -374,10 +400,11 @@ Convert BDF to TTF
 ------------------
 
 BDF are bitmap fonts where fonts are not described in outlines but in pixels. BDF files can be used but
-they must be converted into the TTF format via mkttf. This tool uses potrace to generate outlines from
+they must be converted into the TTF format using ``mkttf``, which can be found
+in this GitHub repository:  https://github.com/Tblue/mkttf .  This tool uses potrace to generate outlines from
 the bitmap information. The bitmap itself will be embedded into the TTF as well. `lv_font_conv <https://github.com/lvgl/lv_font_conv/>`__ uses
-the embedded bitmap but it also needs the outlines. One could think you can use a fake MS Bitmap
-only sfnt (ttf) (TTF without outlines) created by fontforge but this will not work.
+the embedded bitmap but it also needs the outlines. One might think you can use a fake MS Bitmap
+only sfnt (ttf) (TTF without outlines) created by fontforge, but this will not work.
 
 Install imagemagick, python3, python3-fontforge and potrace
 
@@ -396,8 +423,8 @@ Clone mkttf
 Read the mkttf docs.
 
 Former versions of imagemagick needs the imagemagick call in front of convert, identify and so on.
-But newer versions don't. So you might probably change 2 lines in potrace-wrapper.sh.
-Open potrace-wrapper.sh and remove imagemagick from line 55 and line 64.
+But newer versions don't. So you might want to change 2 lines in ``potrace-wrapper.sh`` ---
+open ``potrace-wrapper.sh`` and remove imagemagick from line 55 and line 64:
 
 line 55
 
@@ -433,15 +460,16 @@ Example for a 12px font
     Saving SFD file...
     Done!
 
-The TTF TerminusMedium-001.000.ttf has been created from ./TerminusMedium-12-12.bdf.
+The TTF ``TerminusMedium-001.000.ttf`` will be created from ``./TerminusMedium-12-12.bdf``.
 
-Create font for lvgl
+To create a font for LVGL:
 
 .. code:: bash
 
     lv_font_conv --bpp 1 --size 12 --no-compress --font TerminusMedium-001.000.ttf --range 0x20-0x7e,0xa1-0xff --format lvgl -o terminus_1bpp_12px.c
 
-:note: use 1bpp because we don't use anti-aliasing. It doesn't look sharp on displays with a low resolution.
+:note: use 1-bpp because we don't use anti-aliasing. It doesn't look sharp on displays with a low resolution.
+
 
 
 Adding a New Font Engine
@@ -502,12 +530,12 @@ To add a new font engine, a custom :cpp:type:`lv_font_t` variable needs to be cr
    }
 
 
+
 Using Font Fallback
 *******************
 
-You can specify ``fallback`` in :cpp:type:`lv_font_t` to provide fallback to the
-font. When the font fails to find glyph to a letter, it will try to let
-font from ``fallback`` to handle.
+If the font in use does not have a glyph needed in a text-rendering task, you can
+specify a ``fallback`` font to be used in :cpp:type:`lv_font_t`.
 
 ``fallback`` can be chained, so it will try to solve until there is no ``fallback`` set.
 
@@ -519,6 +547,7 @@ font from ``fallback`` to handle.
    lv_font_t *droid_sans_fallback = my_font_load_function();
    /* So now we can display Roboto for supported characters while having wider characters set support */
    roboto->fallback = droid_sans_fallback;
+
 
 
 .. _fonts_api:
