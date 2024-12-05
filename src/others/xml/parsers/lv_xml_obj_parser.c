@@ -77,6 +77,8 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
             if(lv_streq("style_bg_image_tiled", prop_name)) lv_obj_set_style_bg_image_tiled(item, lv_xml_to_bool(value), selector);
             if(lv_streq("style_text_color", prop_name)) lv_obj_set_style_text_color(item, lv_xml_to_color(value), selector);
             if(lv_streq("style_text_font", prop_name)) lv_obj_set_style_text_font(item, lv_xml_get_font(value), selector);
+            if(lv_streq("style_layout", prop_name)) lv_obj_set_style_layout(item, lv_xml_layout_string_to_enum_value(value),
+                                                                                selector);
         }
     }
 }

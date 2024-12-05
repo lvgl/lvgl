@@ -108,6 +108,7 @@ void lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs)
         else if(lv_streq(name, "text_font")) lv_style_set_text_font(style, lv_xml_get_font(value));
         else if(lv_streq(name, "bg_image_src")) lv_style_set_bg_image_src(style, lv_xml_get_image(value));
         else if(lv_streq(name, "bg_image_tiled")) lv_style_set_bg_image_tiled(style, lv_xml_to_bool(value));
+        else if(lv_streq(name, "layout")) lv_style_set_layout(style, lv_xml_layout_string_to_enum_value(value));
         else {
             LV_LOG_WARN("%s style property is not supported", name);
         }

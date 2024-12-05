@@ -104,6 +104,16 @@ lv_flex_align_t lv_xml_flex_align_string_to_enum_value(const char * txt)
     return 0; /*Return 0 in lack of a better option. */
 }
 
+lv_layout_t lv_xml_layout_string_to_enum_value(const char * txt)
+{
+    if(lv_streq("none", txt)) return LV_LAYOUT_NONE;
+    if(lv_streq("flex", txt)) return LV_LAYOUT_FLEX;
+    if(lv_streq("grid", txt)) return LV_LAYOUT_GRID;
+
+    LV_LOG_WARN("%s is an unknown value for layout", txt);
+    return 0; /*Return 0 in lack of a better option. */
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

@@ -63,6 +63,14 @@ lv_flex_flow_t lv_xml_flex_flow_string_to_enum_value(const char * txt);
  */
 lv_flex_align_t lv_xml_flex_align_string_to_enum_value(const char * txt);
 
+
+/**
+ * Convert a layout string to enum
+ * @param txt       e.g. "flex"
+ * @return          the related enum, e.g. `LV_LAYOUT_FLEX`
+ */
+lv_layout_t lv_xml_layout_string_to_enum_value(const char * txt);
+
 /**********************
  *      MACROS
  **********************/
