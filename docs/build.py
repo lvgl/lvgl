@@ -335,10 +335,8 @@ def run():
             # Default to 'master'.
             branch = 'master'
 
-    urlpath = branch
-    gitcommit = branch
-    os.environ['LVGL_URLPATH'] = urlpath
-    os.environ['LVGL_GITCOMMIT'] = gitcommit
+    os.environ['LVGL_URLPATH'] = branch
+    os.environ['LVGL_GITCOMMIT'] = branch
 
     # ---------------------------------------------------------------------
     # Start doc-build process.
