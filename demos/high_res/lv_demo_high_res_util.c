@@ -288,7 +288,7 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * assets_path,
 
     lv_subject_init_int(&c->temperature_units_are_celsius, 1);
     c->ev_charging_bg_cont = NULL;
-    lv_subject_init_int(&c->ev_charging_progress, EV_CHARGING_RANGE_END * 88 / 100);
+    lv_subject_init_int(&c->ev_charging_progress, EV_CHARGING_RANGE_END * 0 / 100);
     lv_subject_init_int(&c->smart_meter_selected_bar, 4);
 
     c->top_margin_subjects_are_init = false;
