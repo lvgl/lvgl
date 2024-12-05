@@ -1473,7 +1473,7 @@ class XMLSearch(object):
 
 def announce(*args):
     args = ' '.join(repr(arg) for arg in args)
-    print(f'{os.path.basename(__file__)}:  ', args)
+    print(f'{os.path.basename(__file__)}: ', args)
 
 
 def run(project_path, temp_directory, *doc_paths):

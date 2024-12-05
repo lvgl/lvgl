@@ -324,6 +324,9 @@ def run():
     # If above failed (i.e. `branch` not valid), default to 'master'.
     if status != 0:
         branch = 'master'
+    elif branch == 'master':
+        # Expected in most cases.  Nothing to change.
+        pass
     else:
         # `branch` is valid.  Capture release version if in a 'release/' branch.
         if branch.startswith('release/'):
