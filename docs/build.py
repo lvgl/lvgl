@@ -191,7 +191,7 @@ def run():
     args = sys.argv[1:]
 
     for arg in args:
-        # We use chained `if-elif-else` instea of `match` for those on Linux
+        # We use chained `if-elif-else` instead of `match` for those on Linux
         # systems that will not have the required version 3.10 of Python yet.
         if arg == "clean":
             clean = True
