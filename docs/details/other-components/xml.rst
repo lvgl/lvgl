@@ -5,7 +5,7 @@ XML - Declarative UI
 ====================
 
 Introduction
-------------
+************
 
 LVGL is capable of loading UI elements written in XML.
 Although still under development, the basics are already functional, serving as a preview.
@@ -44,7 +44,7 @@ Limitations:
 - The documentation is not complete yet.
 
 Main Concept
-~~~~~~~~~~~~
+------------
 
 It's important to distinguish between widgets and components:
 
@@ -67,11 +67,13 @@ The main characteristics of components are:
 - Cannot have custom C code.
 - Can be loaded from XML at runtime as they describe only the visuals.
 
+
+
 Components
-----------
+**********
 
 Overview
-~~~~~~~~
+--------
 
 In light of the above, only components can be loaded from XML.
 An example of a ``my_button`` component looks like this:
@@ -100,9 +102,9 @@ An example of a ``my_button`` component looks like this:
 
 - ``<component>``: The root element.
 - ``<consts>``: Constants with ``int``, ``px``, ``string``, ``color``, or ``style`` types.
-Constants can later be referenced as ``#name``.
+  Constants can later be referenced as ``#name``.
 - ``<params>``: Parameters with ``int``, ``px``, ``string``, ``color``, or ``style`` types.
-Parameters can later be referenced as ``$name``.
+  Parameters can later be referenced as ``$name``.
 - ``<styles>``: ``<style>`` properties can be defined with names and properties.
 - ``<view>``: Describes how the component looks. Can reference constants, parameters, and styles.
 
@@ -115,9 +117,10 @@ Naming conventions:
 - ``params`` can be referenced with ``$``
 - ``consts`` can be referenced with ``#``
 - ``styles`` can be attached to states and/or parts like ``styles="red blue:pressed green:focused:scrollbar"``
-- Local styles can be used like  ``<lv_label style_text_color="0xff0000" style_text_color:checked="0x00ff00" ``
+- Local styles can be used like  ``<lv_label style_text_color="0xff0000" style_text_color:checked="0x00ff00"``
+
 Usage
-~~~~~
+-----
 
 Once a component is created (e.g., ``my_button``), it can be registered by calling either:
 
@@ -149,7 +152,7 @@ The last parameter can be ``NULL`` or an attribute list, like this:
     lv_obj_t * btn1 = lv_xml_create(lv_screen_active(), "my_button", my_button_attrs);
 
 Parameters
-~~~~~~~~~~
+----------
 
 It is possible to pass parameters to child components and widgets.
 These parameters can be set on a parent widget or provided by the user.
@@ -196,18 +199,20 @@ The following example demonstrates parameter chaining and the use of the
     };
     lv_xml_create(lv_screen_active(), "red_button", attrs);
 
+
+
 Widgets
--------
+*******
 
 Overview
-~~~~~~~~
+--------
 
 Widgets are written in C and compiled into the application.
 They can be referenced from components, and their API can be used via the exposed attributes
 (e.g., label text or slider value).
 
 Usage
-~~~~~
+-----
 
 To make the widgets accessible from XML, an XML parser needs to be registered for each widget.
 The XML parser for the slider looks like this:
@@ -222,11 +227,11 @@ The XML parser for the slider looks like this:
     }
 
     void lv_xml_label_apply(lv_xml_parser_state_t * state, const char ** attrs)
-	{
+    {
         void * item = lv_xml_state_get_item(state);
 
-	    /*Apply the common properties, e.g. width, height, styles flags etc*/
-	    lv_xml_obj_apply(state, attrs);
+        /*Apply the common properties, e.g. width, height, styles flags etc*/
+        lv_xml_obj_apply(state, attrs);
 
         /* Apply the common properties, e.g., width, height, styles, flags, etc. */
         lv_obj_xml_apply_attrs(state, item, attrs);
@@ -239,7 +244,7 @@ The XML parser for the slider looks like this:
             if(lv_streq("text", name)) lv_label_set_text(item, value);
             if(lv_streq("long_mode", name)) lv_label_set_long_mode(item, long_mode_text_to_enum_value(value));
         }
-	}
+    }
 
     /* Helper to convert the string to enum values */
     static lv_label_long_mode_t long_mode_text_to_enum_value(const char * txt)
@@ -252,7 +257,7 @@ The XML parser for the slider looks like this:
     }
 
 A widget XML process can be registered like
-:cpp:expr:`lv_xml_widget_register("lv_label", lv_xml_label_create, lv_xml_label_apply);`
+:cpp:expr:`lv_xml_widget_register("lv_label", lv_xml_label_create, lv_xml_label_apply)`
 
 After this, a widget can be created like this:
 
@@ -269,8 +274,10 @@ After this, a widget can be created like this:
 LVGL automatically registers its built-in widgets,
 so only custom widgets need to be registered manually.
 
+
+
 Images and Fonts
-----------------
+****************
 
 In an XML file, images and fonts can be referenced via a name like this:
 ``<lv_image src="image1" style_text_font="font1"/>``
@@ -290,12 +297,16 @@ The built-in fonts are automatically registered with names like
 The registration functions should be called after
 :cpp:expr:`lv_init()` but before :cpp:expr:`lv_xml_create(...)`.
 
+
+
 Example
--------
+*******
 
 .. include:: ../../examples/others/xml/index.rst
+
+
 
 .. _xml_api:
 
 API
----
+***
