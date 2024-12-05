@@ -1,4 +1,147 @@
 #!/usr/bin/env python3
+""" Generate LVGL documentation using Doxygen and Sphinx.
+
+The first version of this file (Apr 2021) discovered the name of
+the current branch (e.g. 'master', 'release/v8.4', etc.) to support
+different versions of the documentation by establishing the base URL
+(used in `conf.py` and in [Edit on GitHub] links), and then ran:
+
+- Doxygen (to generate LVGL API XML), then
+- Sphinx
+
+to generate the LVGL document tree.  Internally, Sphinx uses `breathe`
+(a Sphinx extension) to provide a bridge between Doxygen XML output and
+Sphinx documentation.  It also supported a command-line option `clean`
+to remove generated files before starting (eliminates orphan files,
+for docs that have moved or changed).
+
+Since then its duties have grown to include:
+
+- Using environment variables to convey branch names to several more
+  places where they are used in the docs-generating process (instead
+  of re-writing writing `conf.py` and a `header.rst` each time docs
+  were generated).  These are documented where they generated below.
+
+- Supporting additional command-line options.
+
+- Generating a temporary `./docs/lv_conf.h` for Doxygen to use
+  (config_builder.py).
+
+- Supporting multiple execution platforms (which then required tokenizing
+  Doxygen's INPUT path in `Doxyfile` and re-writing portions that used
+  `sed` to generate input or modify files).
+
+- Adding translation and API links (requiring generating docs in a
+  temporary directory so that the links could be programmatically
+  added to each document before Sphinx was run).
+
+- Generating EXAMPLES page + sub-examples where applicable to individual
+  documents, e.g. to widget-, style-, layout-pages, etc.
+
+- Building PDF via latex (when working).
+
+Command-Line Arguments
+----------------------
+Command-line arguments have been broken down to give the user the
+ability to control each individual major variation in behavior of
+this script.  These were added to speed up long doc-development
+tasks by shortening the turn-around time between doc modification
+and seeing the final .html results in a local development environment.
+Finally, this script can now be used in a way such that Sphinx will
+only modify changed documents, and reduce an average ~22-minute
+run time to a run time that is workable for rapidly repeating doc
+generation to see Sphinx formatting results quickly.
+
+Normal Usage
+------------
+This is the way this script is used for normal (full) docs generation.
+
+    $ python  build.py  skip_latex
+
+Docs-Dev Initial Docs Generation Usage
+--------------------------------------
+1.  Set `LVGL_FIXED_TEMP_DIR` environment variable to path to
+    the temporary directory you will use over and over during
+    document editing, without trailing directory separator.
+    Initially directory should not exist.
+
+2.  $ python  build.py  skip_latex  preserve  fixed_tmp_dir
+
+This takes typically ~22 minutes.
+
+Docs-Dev Update-Only Generation Usage
+-------------------------------------
+After the above has been run through once, you can thereafter
+run the following until docs-development task is complete.
+
+    $ python  build.py  skip_latex  docs_dev  update
+
+Generation time depends on the number of `.rst` files that
+have been updated:
+
++--------------+------------+---------------------------------+
+| Docs Changed | Time       | Typical Time to Browser Refresh |
++==============+============+=================================+
+|  0           |  6 seconds |             n/a                 |
++--------------+------------+---------------------------------+
+|  1           | 19 seconds |          12 seconds             |
++--------------+------------+---------------------------------+
+|  5           | 28 seconds |          21 seconds             |
++--------------+------------+---------------------------------+
+| 20           | 59 seconds |          52 seconds             |
++--------------+------------+---------------------------------+
+
+Argument Descriptions
+---------------------
+- skip_latex
+    The meaning of this argument has not changed:  it simply skips
+    attempting to generate Latex and subsequent PDF generation.
+- skip_api
+    Skips generating API pages (this saves about 70% of build time).
+    This is intended to be used only during doc development to speed up
+    turn-around time between doc modifications and seeing final results.
+- no_fresh_env
+    Excludes -E command-line argument to `sphinx-build`, which, when present,
+    forces it to generate a whole new environment (memory of what was built
+    previously, forcing a full rebuild).  "no_fresh_env" enables a rebuild
+    of only docs that got updated -- Sphinx's default behavior.
+- preserve (previously "develop")
+    Leaves temporary directory intact for docs development purposes.
+- fixed_tmp_dir
+    If (fixed_tmp_dir and 'LVGL_FIXED_TEMP_DIR' in `os.environ`),
+    then this script uses the value of that that environment variable
+    to populate `temp_directory` instead of the normal (randomly-named)
+    temporary directory.  This is important when getting `sphinx-build`
+    to ONLY rebuild updated documents, since changing the directory
+    from which they are generated (normally the randomly-named temp
+    dir) will force Sphinx to do a full-rebuild because it remembers
+    the doc paths from which the build was last performed.
+- skip_trans
+    Skips adding translation links.  This allows direct copying of
+    `.rst` files to `temp_directory` when they are updated to save time
+    during re-build.  Final build must not include this option so that
+    the translation links are added at the top of each intended page.
+- no_copy
+    Skips copying ./docs/ directory tree to `temp_directory`.
+    This is only honored if:
+    - fixed_tmp_dir == True, and
+    - the doc files were previously copied to the temporary directory
+      and thus are already present there.
+- docs_dev
+    This is a command-line shortcut to combining these command-line args:
+    - no_fresh_env
+    - preserve
+    - fixed_tmp_dir
+    - no_copy
+- update
+    When no_copy is active, check modification dates on `.rst` files
+    and re-copy the updated `./docs/` files to the temporary directory
+    that have later modification dates, thus updating what Sphinx uses
+    as input.
+    Warning:  this wipes out translation links and API-page links that
+    were added in the first pass, so should only be used for doc
+    development -- not for final doc generation.
+"""
 
 # ****************************************************************************
 # IMPORTANT: If you are getting a PDF-lexer error for an example, check
@@ -7,145 +150,6 @@
 # ****************************************************************************
 
 def run():
-    """ Generate LVGL documentation using Doxygen and Sphinx.
-
-    The first version of this file (Apr 2021) discovered the name of
-    the current branch (e.g. 'master', 'release/v8.4', etc.) to support
-    different versions of the documentation by establishing the base URL
-    (used in `conf.py` and in [Edit on GitHub] links), and then ran:
-
-    - Doxygen (to generate LVGL API XML), then
-    - Sphinx
-
-    to generate the LVGL document tree.  Internally, Sphinx uses `breathe`
-    (a Sphinx extension) to provide a bridge between Doxygen XML output and
-    Sphinx documentation.  It also supported a command-line option `clean`
-    to remove generated files before starting (eliminates orphan files,
-    for docs that have moved or changed).
-
-    Since then its duties have grown to include:
-
-    - Using environment variables to convey branch names to several more
-      places where they are used in the docs-generating process (instead
-      of re-writing writing `conf.py` and a `header.rst` each time docs
-      were generated).  These are documented where they generated below.
-
-    - Supporting additional command-line options.
-
-    - Generating a temporary `./docs/lv_conf.h` for Doxygen to use
-      (config_builder.py).
-
-    - Supporting multiple execution platforms (which then required tokenizing
-      Doxygen's INPUT path in `Doxyfile` and re-writing portions that used
-      `sed` to generate input or modify files).
-
-    - Adding translation and API links (requiring generating docs in a
-      temporary directory so that the links could be programmatically
-      added to each document before Sphinx was run).
-
-    - Generating EXAMPLES page + sub-examples where applicable to individual
-      documents, e.g. to widget-, style-, layout-pages, etc.
-
-    - Building PDF via latex (when working).
-
-    Normal Usage
-    ------------
-    This is the way this script is used for normal docs generation.
-
-        $ python  build.py  skip_latex
-
-    Docs-Dev Initial Docs Generation Usage
-    --------------------------------------
-    1.  Set `LVGL_FIXED_TEMP_DIR` environment variable to path to
-        the temporary directory you will use over and over during
-        document editing, without trailing directory separator.
-        Initially directory should not exist.
-
-    2.  $ python  build.py  skip_latex  preserve  fixed_tmp_dir
-
-    Docs-Dev Update-Only Generation Usage
-    -------------------------------------
-    After the above has been run through once (takes ~22 minutes)
-    you can thereafter run the following until docs-development
-    task is complete.  Generation time depends on the number of
-    `.rst` files that have been updated.
-
-        $ python  build.py  skip_latex  docs_dev  update
-
-    Command-Line Arguments
-    ----------------------
-    Command-line arguments have been broken down to give the user the
-    ability to control each individual major variation in behavior of
-    this script.  These were developed to speed up long doc-development
-    tasks by shortening the turn-around time between doc modification
-    and seeing the final .html results in a local development environment.
-    Finally, this script can now be used in a way such that Sphinx will
-    only modify changed documents, and reduce an average 22.5-minute
-    run time to the following on a modern medium-speed PC.
-
-    +--------------+------------+---------------------------------+
-    | Docs Changed | Time       | Typical Time to Browser Refresh |
-    +==============+============+=================================+
-    |  0           |  6 seconds |             n/a                 |
-    +--------------+------------+---------------------------------+
-    |  1           | 19 seconds |          12 seconds             |
-    +--------------+------------+---------------------------------+
-    |  5           | 28 seconds |          21 seconds             |
-    +--------------+------------+---------------------------------+
-    | 20           | 59 seconds |          52 seconds             |
-    +--------------+------------+---------------------------------+
-
-    Argument Descriptions
-    ---------------------
-    - skip_latex
-        The meaning of this argument has not changed:  it simply skips
-        attempting to generate Latex and subsequent PDF generation.
-    - skip_api
-        Skips generating API pages (this saves about 70% of build time).
-        This is intended to be used only during doc development to speed up
-        turn-around time between doc modifications and seeing final results.
-    - no_fresh_env
-        Excludes -E command-line argument to `sphinx-build`, which, when present,
-        forces it to generate a whole new environment (memory of what was built
-        previously, forcing a full rebuild).  "no_fresh_env" enables a rebuild
-        of only docs that got updated -- Sphinx's default behavior.
-    - preserve (previously "develop")
-        Leaves temporary directory intact for docs development purposes.
-    - fixed_tmp_dir
-        If (fixed_tmp_dir and 'LVGL_FIXED_TEMP_DIR' in `os.environ`),
-        then this script uses the value of that that environment variable
-        to populate `temp_directory` instead of the normal (randomly-named)
-        temporary directory.  This is important when getting `sphinx-build`
-        to ONLY rebuild updated documents, since changing the directory
-        from which they are generated (normally the randomly-named temp
-        dir) will force Sphinx to do a full-rebuild because it remembers
-        the doc paths from which the build was last performed.
-    - skip_trans
-        Skips adding translation links.  This allows direct copying of
-        `.rst` files to `temp_directory` when they are updated to save time
-        during re-build.  Final build must not include this option so that
-        the translation links are added at the top of each intended page.
-    - no_copy
-        Skips copying ./docs/ directory tree to `temp_directory`.
-        This is only honored if:
-        - fixed_tmp_dir == True, and
-        - the doc files were previously copied to the temporary directory
-          and thus are already present there.
-    - docs_dev
-        This is a command-line shortcut to combining these command-line args:
-        - no_fresh_env
-        - preserve
-        - fixed_tmp_dir
-        - no_copy
-    - update
-        When no_copy is active, check modification dates on `.rst` files
-        and re-copy the updated `./docs/` files to the temporary directory
-        that have later modification dates, thus updating what Sphinx uses
-        as input.
-        Warning:  this wipes out translation links and API-page links that
-        were added in the first pass, so should only be used for doc
-        development -- not for final doc generation.
-    """
     # Python Library Imports
     import sys
     import os
