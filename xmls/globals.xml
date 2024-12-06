@@ -1,5 +1,3 @@
-<const name="size_content" help="Involve all children"/>
-
 <api>
     <enumdef name="lv_style_state">
         <enum name="default" help="Some help"/>
@@ -41,4 +39,45 @@
             <enum name="space_between"  help=""/>
              <enum name="space_evenly"  help=""/>
     </enumdef>
+
+   	<styledef>
+	    <prop name="x" type="coords"/>
+	    <prop name="y" type="coords"/>
+	    <prop name="height" type="coords"/>
+	    <prop name="width" type="coords"/>
+	    <prop name="align" type="enum:lv_align"/>
+	    <prop name="bg_color" type="color"/>
+	    <prop name="bg_opa" type="int"/>
+	    <prop name="border_color" type="color"/>
+	    <prop name="border_width" type="int"/>
+	    <prop name="border_opa" type="int"/>
+	    <prop name="outline_color" type="color"/>
+	    <prop name="outline_width" type="int"/>
+	    <prop name="outline_opa" type="int"/>
+	    <prop name="outline_pad" type="int"/>
+	    <prop name="text_color" type="color"/>
+	    <prop name="text_font" type="font"/>
+	    <prop name="bg_image_src" type="image"/>
+	    <prop name="bg_image_tiled" type="bool"/>
+	    <prop name="radius" type="int"/>
+	    <prop name="pad_top" type="int"/>
+	    <prop name="pad_bottom" type="int"/>
+	    <prop name="pad_left" type="int"/>
+	    <prop name="pad_right" type="int"/>
+	    <prop name="pad_hor" type="int"/>
+	    <prop name="pad_ver" type="int"/>
+	    <prop name="pad_row" type="int"/>
+	    <prop name="pad_column" type="int"/>
+	    <prop name="margin_top" type="int"/>
+	    <prop name="margin_bottom" type="int"/>
+	    <prop name="margin_left" type="int"/>
+	    <prop name="margin_right" type="int"/>
+	    <prop name="margin_hor" type="int"/>
+	    <prop name="margin_ver" type="int"/>
+	    <prop name="layout" type="enum:lv_layout"/>
+	    <prop name="flex_flow" type="enum:lv_flex_flow"/>
+	    <prop name="flex_main_place" type="enum:lv_flex_align"/>
+	    <prop name="flex_cross_place" type="enum:lv_flex_align"/>
+	    <prop name="flex_track_place" type="enum:lv_flex_align"/>
+	</styledef>
 </api>
