@@ -38,7 +38,7 @@ Orientation and size
 --------------------
 
 - for orientation, width and height, simply set width and height style properties;
-- :cpp:expr:`lv_bar_set_orientation(slider, orientation)` to override orientation
+- :cpp:expr:`lv_bar_set_orientation(bar, orientation)` to override orientation
   caused by ``width`` and ``height``.  Valid values for ``orientation`` are:
 
   - :cpp:enumerator:`LV_BAR_ORIENTATION_AUTO`

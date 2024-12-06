@@ -383,17 +383,14 @@ Rotation
 
 LVGL supports rotation of the display in 90 degree increments.
 
-
 The orientation of the display can be changed with
-``lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0/90/180/270)``.
-LVGL will swap the horizontal and vertical resolutions internally
-according to the set degree. When changing the rotation
-
-When changing the rotation :cpp:enumerator:`LV_EVENT_SIZE_CHANGED` event is
-emitted (for any part of your system that has "subscribed" to this event) to
-In lack of hardware display rotation support
-:cpp:func:`lv_draw_sw_rotate` can be used to rotate the buffer in the
-:ref:`flush_callback`.
+:cpp:expr:`lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_xxx)` where ``xxx`` is
+0, 90, 180 or 270.  This will swap the horizontal and vertical resolutions internally
+according to the set degree, however it will not perform the actual rotation.
+When changing the rotation, the :cpp:enumerator:`LV_EVENT_SIZE_CHANGED` event is
+emitted to allow for hardware reconfiguration.  If your display panel and/or its
+driver chip(s) do not support rotation, :cpp:func:`lv_draw_sw_rotate` can be used to
+rotate the buffer in the :ref:`flush_callback` function.
 
 :cpp:expr:`lv_display_rotate_area(display, &area)` rotates the rendered area
 according to the current rotation settings of the display.
