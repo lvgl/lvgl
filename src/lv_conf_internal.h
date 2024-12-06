@@ -1824,11 +1824,11 @@
 
 /** Number of glyphs to cache in the built-in font cache.
  *  This can improve performance if the same text is drawn multiple times. */
-#ifndef LV_FONT_FMT_TXT_CACHE_GLYPH_CNT
-    #ifdef CONFIG_LV_FONT_FMT_TXT_CACHE_GLYPH_CNT
-        #define LV_FONT_FMT_TXT_CACHE_GLYPH_CNT CONFIG_LV_FONT_FMT_TXT_CACHE_GLYPH_CNT
+#ifndef LV_FONT_CACHE_GLYPH_CNT
+    #ifdef CONFIG_LV_FONT_CACHE_GLYPH_CNT
+        #define LV_FONT_CACHE_GLYPH_CNT CONFIG_LV_FONT_CACHE_GLYPH_CNT
     #else
-        #define LV_FONT_FMT_TXT_CACHE_GLYPH_CNT 0
+        #define LV_FONT_CACHE_GLYPH_CNT 0
     #endif
 #endif
 

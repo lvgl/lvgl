@@ -285,7 +285,7 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
         lv_vg_lite_path_drop(u, path);
     }
 
-#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
+#if LV_FONT_CACHE_GLYPH_CNT > 0
     /* Increment the cache reference count */
     lv_cache_entry_acquire_data(dsc->g->entry);
 

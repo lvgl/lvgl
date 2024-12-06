@@ -43,6 +43,6 @@
 
 /** Number of glyphs to cache in the built-in font cache.
  *  This can improve performance if the same text is drawn multiple times. */
-#define LV_FONT_FMT_TXT_CACHE_GLYPH_CNT 64
+#define LV_FONT_CACHE_GLYPH_CNT 64
 
 #endif /* LV_TEST_CONF_VG_LITE_H */

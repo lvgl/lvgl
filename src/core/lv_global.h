@@ -198,7 +198,7 @@ typedef struct _lv_global_t {
     lv_font_fmt_rle_t font_fmt_rle;
 #endif
 
-#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
+#if LV_FONT_CACHE_GLYPH_CNT > 0
     lv_cache_t * font_bitmap_cache;
 #endif
 

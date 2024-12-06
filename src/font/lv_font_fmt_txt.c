@@ -22,7 +22,7 @@
     #define font_rle LV_GLOBAL_DEFAULT()->font_fmt_rle
 #endif /*LV_USE_FONT_COMPRESSED*/
 
-#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
+#if LV_FONT_CACHE_GLYPH_CNT > 0
     #define font_bitmap_cache LV_GLOBAL_DEFAULT()->font_bitmap_cache
     #define font_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->font_draw_buf_handlers)
 #endif
@@ -64,11 +64,11 @@ static int kern_pair_16_compare(const void * ref, const void * element);
 static void * get_bitmap(const lv_font_fmt_txt_dsc_t * fdsc, const lv_font_fmt_txt_glyph_dsc_t * gdsc,
                          lv_draw_buf_t * draw_buf);
 
-#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
+#if LV_FONT_CACHE_GLYPH_CNT > 0
     static lv_cache_t * font_bitmap_cache_init(uint32_t cache_size);
     static void font_bitmap_cache_deinit(lv_cache_t * cache);
     static void * get_bitmap_cached(lv_font_glyph_dsc_t * g_dsc, const lv_font_fmt_txt_dsc_t * fdsc, uint32_t gid);
-#endif /*LV_FONT_FMT_TXT_CACHE_GLYPH_CNT*/
+#endif /*LV_FONT_CACHE_GLYPH_CNT*/
 
 /**********************
  *  STATIC VARIABLES
@@ -100,14 +100,14 @@ static const uint8_t opa2_table[4] = {0, 85, 170, 255};
 
 void lv_font_fmt_txt_init(void)
 {
-#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
-    font_bitmap_cache = font_bitmap_cache_init(LV_FONT_FMT_TXT_CACHE_GLYPH_CNT);
+#if LV_FONT_CACHE_GLYPH_CNT > 0
+    font_bitmap_cache = font_bitmap_cache_init(LV_FONT_CACHE_GLYPH_CNT);
 #endif
 }
 
 void lv_font_fmt_txt_deinit(void)
 {
-#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
+#if LV_FONT_CACHE_GLYPH_CNT > 0
     font_bitmap_cache_deinit(font_bitmap_cache);
     font_bitmap_cache = NULL;
 #endif
@@ -134,7 +134,7 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
     int32_t gsize = (int32_t) gdsc->box_w * gdsc->box_h;
     if(gsize == 0) return NULL;
 
-#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
+#if LV_FONT_CACHE_GLYPH_CNT > 0
     LV_UNUSED(draw_buf);
     return get_bitmap_cached(g_dsc, fdsc, gid);
 #else
@@ -145,7 +145,7 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
 void lv_font_release_glyph_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc)
 {
     LV_UNUSED(font);
-#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
+#if LV_FONT_CACHE_GLYPH_CNT > 0
     lv_cache_release(font_bitmap_cache, g_dsc->entry, NULL);
 #endif
     g_dsc->entry = NULL;
@@ -664,7 +664,7 @@ static void * get_bitmap(const lv_font_fmt_txt_dsc_t * fdsc, const lv_font_fmt_t
 #endif
 }
 
-#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
+#if LV_FONT_CACHE_GLYPH_CNT > 0
 
 /**
  * Get the glyph's bitmap from the cache.
@@ -792,4 +792,4 @@ static void font_bitmap_cache_deinit(lv_cache_t * cache)
     lv_cache_destroy(cache, NULL);
 }
 
-#endif /*LV_FONT_FMT_TXT_CACHE_GLYPH_CNT*/
+#endif /*LV_FONT_CACHE_GLYPH_CNT*/
