@@ -58,6 +58,8 @@ typedef enum {
  * GLOBAL PROTOTYPES
  **********************/
 
+#if LV_USE_OS != LV_OS_NONE
+
 /*----------------------------------------
  * These functions needs to be implemented
  * for specific operating systems
@@ -174,6 +176,14 @@ lv_result_t lv_lock_isr(void);
  * It is called internally in lv_timer_handler().
  */
 void lv_unlock(void);
+
+#else
+
+#define lv_lock() do{ } while(0)
+#define lv_lock_isr() do{ } while(0)
+#define lv_unlock() do{ } while(0)
+
+#endif /*LV_USE_OS != LV_OS_NONE*/
 
 /**********************
  *      MACROS
