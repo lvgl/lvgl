@@ -63,7 +63,7 @@ void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
         return;
     }
 
-#if LV_FONT_FMT_TXT_CACHE_GLYPH_CNT > 0
+#if LV_FONT_CACHE_GLYPH_CNT > 0
     /* Since the old font resource does not register the release_glyph function in the font structure,
      * it is processed here as a fallback to ensure forward compatibility.
      */
