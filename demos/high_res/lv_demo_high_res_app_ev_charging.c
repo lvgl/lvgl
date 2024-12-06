@@ -54,6 +54,7 @@ static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 static lv_obj_t * create_widget3_info(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const lv_image_dsc_t * img_dsc,
                                       const char * text, const char * unit);
 static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
+static void prepare_default_anim(lv_anim_t * a, int32_t start_v, lv_obj_t * base_obj);
 static void charging_status_box_clicked_cb(lv_event_t * e);
 
 /**********************
@@ -219,13 +220,11 @@ static void anim_exec_cb(void * var, int32_t v)
 static void anim_completed_cb(lv_anim_t * a)
 {
     lv_obj_t * base_obj = lv_anim_get_user_data(a);
-    lv_demo_high_res_ctx_t * c = lv_obj_get_user_data(base_obj);
-    lv_obj_t * bg_cont = c->ev_charging_bg_cont;
-    if(!bg_cont) return;
-    anim_state_t * anim_state = lv_obj_get_user_data(bg_cont);
-
-    lv_obj_set_style_bg_image_src(anim_state->widget3, c->imgs[IMG_EV_CHARGING_WIDGET3_1_BG], 0);
-    lv_label_set_text_static(anim_state->charging_status_label, start_charging_string);
+    lv_anim_t new_a;
+    prepare_default_anim(&new_a, 0, base_obj);
+    lv_anim_set_delay(&new_a, 1000);
+    lv_anim_set_early_apply(&new_a, false);
+    lv_anim_start(&new_a);
 }
 
 static void back_clicked_cb(lv_event_t * e)
@@ -554,6 +553,17 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     anim_state->driving_range_label = create_widget3_info(c, info_box, c->imgs[IMG_RANGE_ICON], "Driving\nRange", "km");
 }
 
+static void prepare_default_anim(lv_anim_t * a, int32_t start_v, lv_obj_t * base_obj)
+{
+    lv_anim_init(a);
+    lv_anim_set_values(a, start_v, EV_CHARGING_RANGE_END);
+    lv_anim_set_duration(a, (EV_CHARGING_RANGE_END - start_v) * 5);
+    lv_anim_set_exec_cb(a, anim_exec_cb);
+    lv_anim_set_completed_cb(a, anim_completed_cb);
+    lv_anim_set_var(a, base_obj);
+    lv_anim_set_user_data(a, base_obj);
+}
+
 static void charging_status_box_clicked_cb(lv_event_t * e)
 {
     lv_obj_t * bg_cont = lv_event_get_user_data(e);
@@ -576,13 +586,7 @@ static void charging_status_box_clicked_cb(lv_event_t * e)
         if(start_v >= EV_CHARGING_RANGE_END) start_v = 0;
 
         lv_anim_t a;
-        lv_anim_init(&a);
-        lv_anim_set_values(&a, start_v, EV_CHARGING_RANGE_END);
-        lv_anim_set_duration(&a, (EV_CHARGING_RANGE_END - start_v) * 5);
-        lv_anim_set_exec_cb(&a, anim_exec_cb);
-        lv_anim_set_completed_cb(&a, anim_completed_cb);
-        lv_anim_set_var(&a, base_obj);
-        lv_anim_set_user_data(&a, base_obj);
+        prepare_default_anim(&a, start_v, base_obj);
         lv_anim_start(&a);
     }
 }
