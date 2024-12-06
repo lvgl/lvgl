@@ -12,12 +12,12 @@ When enabled, there is also a "Quick-Access" panel on the left, which provides a
 convenient way to reach parts of the file system that are frequently accessed.
 Available "Quick-Access" destinations are:
 
+- File System,
 - HOME,
-- MUSIC,
-- PICTURES,
-- VIDEO,
-- DOCS, and
-- FS (file system).
+- Video,
+- Pictures,
+- Music, and
+- Documents.
 
 You specify what paths these lead to during ``lv_file_explorer``\ 's initialization.
 
@@ -34,6 +34,12 @@ event callback functions.  What happens next is up to the application designer.
 :c:macro:`LV_USE_TABLE` macro must be set to a non-zero value in ``lv_conf.h`` in
 order to use ``lv_file_explorer``, and and :c:macro:`LV_USE_LIST` must be set to a
 non-zero value to use the "Quick-Access" panel.
+
+.. note::
+
+    In order to use File Explorer, :ref:`overview_file_system` has to be set up and
+    know about all the drive letters you use when passing paths to File System
+    (described below).
 
 
 
@@ -71,16 +77,16 @@ The object hierarchy of a freshly-created File Explorer looks like this:
           (Flex-Flow COLUMN)                  (Flex-Flow COLUMN)            +-- ``docs_dir`` = NULL
       ---------------------------          -------------------------        +-- ``fs_dir`` = NULL
          |                |                    |               |            +-- ``current_path`` = [empty buffer]
-     ``Device List``      ``Places List``            ``Header``         ``File Table``      +-- ``sel_fn`` (selected file)
+     ``Device List``      ``Places List``            ``Header``         ``File Table``       +-- ``sel_fn`` (selected file)
      (grows to         (grows to           (14% of         with 1 column    +-- ``sort`` (default :cpp:enumerator:`LV_EXPLORER_SORT_NONE`)
     accommodate       accommodate          Browser Panel   (86% of Browser
     children)         children)            height)         Panel height)
      |                 |                       |
-     +-- ``File System``   +-- ``HOME`` (item)     ``Current Path Label``
-         (list item)   +-- ``Video`` (item)
-                       +-- ``Pictures`` (item)
-                       +-- ``Music`` (item)
-                       +-- ``Documents`` (item)
+     +-- ``File System``   +-- ``HOME`` (button)   ``Current Path Label``
+         (button)      +-- ``Video`` (button)
+                       +-- ``Pictures`` (button)
+                       +-- ``Music`` (button)
+                       +-- ``Documents`` (button)
 
 
 Accessing the Parts
