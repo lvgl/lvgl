@@ -53,14 +53,16 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
         const char * value = attrs[i + 1];
 
         if(lv_streq("x", name)) lv_obj_set_x(item, lv_xml_to_size(value));
-        if(lv_streq("y", name)) lv_obj_set_y(item, lv_xml_to_size(value));
-        if(lv_streq("width", name)) lv_obj_set_width(item, lv_xml_to_size(value));
-        if(lv_streq("height", name)) lv_obj_set_height(item, lv_xml_to_size(value));
-        if(lv_streq("align", name)) lv_obj_set_align(item, lv_xml_align_string_to_enum_value(value));
+        else if(lv_streq("y", name)) lv_obj_set_y(item, lv_xml_to_size(value));
+        else if(lv_streq("width", name)) lv_obj_set_width(item, lv_xml_to_size(value));
+        else if(lv_streq("height", name)) lv_obj_set_height(item, lv_xml_to_size(value));
+        else if(lv_streq("align", name)) lv_obj_set_align(item, lv_xml_align_string_to_enum_value(value));
+        else if(lv_streq("flex_flow", name)) lv_obj_set_flex_flow(item, lv_xml_flex_flow_string_to_enum_value(value));
+        else if(lv_streq("flex_grow", name)) lv_obj_set_flex_grow(item, lv_xml_atoi(value));
 
-        if(lv_streq("styles", name)) lv_xml_style_add_to_obj(state, item, value);
+        else if(lv_streq("styles", name)) lv_xml_style_add_to_obj(state, item, value);
 
-        if(lv_strlen(name) > 6 && lv_memcmp("style_", name, 6) == 0) {
+        else if(lv_strlen(name) > 6 && lv_memcmp("style_", name, 6) == 0) {
             char name_local[512];
             lv_strlcpy(name_local, name, sizeof(name_local));
 
@@ -105,6 +107,9 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
             else if(lv_streq("style_text_opa", prop_name)) lv_obj_set_style_text_opa(item, lv_xml_to_opa(value), selector);
             else if(lv_streq("style_layout", prop_name)) lv_obj_set_style_layout(item, lv_xml_layout_string_to_enum_value(value),
                                                                                      selector);
+            else if(lv_streq("style_flex_flow", prop_name)) lv_obj_set_style_flex_flow(item,
+                                                                                           lv_xml_flex_flow_string_to_enum_value(value),
+                                                                                           selector);
             else if(lv_streq("style_flex_main_place", prop_name)) lv_obj_set_style_flex_main_place(item,
                                                                                                        lv_xml_flex_align_string_to_enum_value(value), selector);
             else if(lv_streq("style_flex_cross_place", prop_name)) lv_obj_set_style_flex_cross_place(item,

@@ -131,6 +131,7 @@ void lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs)
         else if(lv_streq(name, "bg_image_src")) lv_style_set_bg_image_src(style, lv_xml_get_image(value));
         else if(lv_streq(name, "bg_image_tiled")) lv_style_set_bg_image_tiled(style, lv_xml_to_bool(value));
         else if(lv_streq(name, "layout")) lv_style_set_layout(style, lv_xml_layout_string_to_enum_value(value));
+        else if(lv_streq(name, "flex_flow")) lv_style_set_flex_flow(style, lv_xml_flex_flow_string_to_enum_value(value));
         else if(lv_streq(name, "flex_main_place")) lv_style_set_flex_main_place(style,
                                                                                     lv_xml_flex_align_string_to_enum_value(value));
         else if(lv_streq(name, "flex_cross_place")) lv_style_set_flex_cross_place(style,
