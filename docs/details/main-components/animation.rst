@@ -27,10 +27,10 @@ The main callback called during an Animation (when it is playing) is called an
 
 .. code-block:: c
 
-    void func(void * var, lv_anim_var_t value);
+    void func(void *var , int32_t value);
 
 This prototype makes it easy to use most of the LVGL *set* functions directly or via a trivial wrapper. It includes:
-  
+
   - most of the widget properties
   - functions that set :ref:`local style properties <style_local>`) directly on objects (needs a wrapper to set set the *selector*)
   - set properties on :cpp:type:`lv_style_t` objects (e.g. :ref:`shared styles <style_initialize>`)  (``lv_obj_report_style_change`` needs to be called to notify the widgets having the style)
@@ -268,8 +268,15 @@ Deleting Animations
 You should delete an Animation using :cpp:expr:`lv_anim_delete(var, func)` if one of
 these two conditions exists:
 
-- the object (variable) being animated is deleted or
+- the object (variable) being animated is deleted (and it is not a Widget) or
 - a running animation needs to be stopped before it is completed.
+
+.. note::
+
+    If the object (variable) being deleted is a type of Widget, the housekeeping code
+    involved in deleting it also deletes any running animations that are connected
+    with it.  So :cpp:expr:`lv_anim_delete(var, func)` only needs to be called if the
+    object being deleted is *not* one of the Widgets.
 
 If you kept a copy of the pointer returned by :cpp:func:`lv_anim_start` as
 ``running_anim``, you can delete the running animation like this:
