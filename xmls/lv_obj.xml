@@ -14,7 +14,6 @@ Example
 	    <prop name="align" type="enum:lv_align"/>
 	    <prop name="styles"  type="styles[]"/>
 
-   	<styledef>
 	    <prop name="style_x" type="coords"/>
 	    <prop name="style_y" type="coords"/>
 	    <prop name="style_height" type="coords"/>
