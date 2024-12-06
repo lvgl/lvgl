@@ -59,6 +59,18 @@ lv_color_t lv_xml_to_color(const char * str)
     return lv_color_hex(lv_xml_strtol(str, NULL, 16));
 }
 
+lv_opa_t lv_xml_to_opa(const char * str)
+{
+    int32_t v = lv_xml_atoi(str);
+    size_t len = lv_strlen(str);
+    if(str[len - 1] == '%') {
+        v = v * 255 / 100;
+    }
+
+    v = LV_CLAMP(0, v, 255);
+    return (lv_opa_t)v;
+}
+
 bool lv_xml_to_bool(const char * str)
 {
     return lv_streq(str, "false") ? false : true;

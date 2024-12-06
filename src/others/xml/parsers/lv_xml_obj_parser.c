@@ -68,17 +68,49 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
             const char * prop_name = lv_xml_style_string_process(name_local, &selector);
 
             if(lv_streq("style_radius", prop_name)) lv_obj_set_style_radius(item, lv_xml_atoi(value), selector);
-            if(lv_streq("style_bg_color", prop_name)) lv_obj_set_style_bg_color(item, lv_xml_to_color(value), selector);
-            if(lv_streq("style_bg_opa", prop_name)) lv_obj_set_style_bg_opa(item, lv_xml_atoi(value), selector);
-            if(lv_streq("style_border_color", prop_name)) lv_obj_set_style_border_color(item, lv_xml_to_color(value), selector);
-            if(lv_streq("style_border_opa", prop_name)) lv_obj_set_style_border_opa(item, lv_xml_atoi(value), selector);
-            if(lv_streq("style_border_width", prop_name)) lv_obj_set_style_border_width(item, lv_xml_atoi(value), selector);
-            if(lv_streq("style_bg_image_src", prop_name)) lv_obj_set_style_bg_image_src(item, lv_xml_get_image(value), selector);
-            if(lv_streq("style_bg_image_tiled", prop_name)) lv_obj_set_style_bg_image_tiled(item, lv_xml_to_bool(value), selector);
-            if(lv_streq("style_text_color", prop_name)) lv_obj_set_style_text_color(item, lv_xml_to_color(value), selector);
-            if(lv_streq("style_text_font", prop_name)) lv_obj_set_style_text_font(item, lv_xml_get_font(value), selector);
-            if(lv_streq("style_layout", prop_name)) lv_obj_set_style_layout(item, lv_xml_layout_string_to_enum_value(value),
-                                                                                selector);
+            else if(lv_streq("style_pad_left", prop_name)) lv_obj_set_style_pad_left(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_pad_right", prop_name)) lv_obj_set_style_pad_right(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_pad_top", prop_name)) lv_obj_set_style_pad_top(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_pad_bottom", prop_name)) lv_obj_set_style_pad_bottom(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_pad_hor", prop_name)) lv_obj_set_style_pad_hor(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_pad_ver", prop_name)) lv_obj_set_style_pad_ver(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_pad_all", prop_name)) lv_obj_set_style_pad_all(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_pad_row", prop_name)) lv_obj_set_style_pad_row(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_pad_column", prop_name)) lv_obj_set_style_pad_column(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_pad_gap", prop_name)) lv_obj_set_style_pad_gap(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_margin_left", prop_name)) lv_obj_set_style_margin_left(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_margin_right", prop_name)) lv_obj_set_style_margin_right(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_margin_top", prop_name)) lv_obj_set_style_margin_top(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_margin_bottom", prop_name)) lv_obj_set_style_margin_bottom(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_margin_hor", prop_name)) lv_obj_set_style_margin_hor(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_margin_ver", prop_name)) lv_obj_set_style_margin_ver(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_margin_all", prop_name)) lv_obj_set_style_margin_all(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_bg_color", prop_name)) lv_obj_set_style_bg_color(item, lv_xml_to_color(value), selector);
+            else if(lv_streq("style_bg_opa", prop_name)) lv_obj_set_style_bg_opa(item, lv_xml_to_opa(value), selector);
+            else if(lv_streq("style_border_color", prop_name)) lv_obj_set_style_border_color(item, lv_xml_to_color(value),
+                                                                                                 selector);
+            else if(lv_streq("style_border_opa", prop_name)) lv_obj_set_style_border_opa(item, lv_xml_to_opa(value), selector);
+            else if(lv_streq("style_border_width", prop_name)) lv_obj_set_style_border_width(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_outline_color", prop_name)) lv_obj_set_style_outline_color(item, lv_xml_to_color(value),
+                                                                                                   selector);
+            else if(lv_streq("style_outline_opa", prop_name)) lv_obj_set_style_outline_opa(item, lv_xml_to_opa(value), selector);
+            else if(lv_streq("style_outline_width", prop_name)) lv_obj_set_style_outline_width(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_outline_pad", prop_name)) lv_obj_set_style_outline_pad(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_bg_image_src", prop_name)) lv_obj_set_style_bg_image_src(item, lv_xml_get_image(value),
+                                                                                                 selector);
+            else if(lv_streq("style_bg_image_tiled", prop_name)) lv_obj_set_style_bg_image_tiled(item, lv_xml_to_bool(value),
+                                                                                                     selector);
+            else if(lv_streq("style_text_color", prop_name)) lv_obj_set_style_text_color(item, lv_xml_to_color(value), selector);
+            else if(lv_streq("style_text_font", prop_name)) lv_obj_set_style_text_font(item, lv_xml_get_font(value), selector);
+            else if(lv_streq("style_text_opa", prop_name)) lv_obj_set_style_text_opa(item, lv_xml_to_opa(value), selector);
+            else if(lv_streq("style_layout", prop_name)) lv_obj_set_style_layout(item, lv_xml_layout_string_to_enum_value(value),
+                                                                                     selector);
+            else if(lv_streq("style_flex_main_place", prop_name)) lv_obj_set_style_flex_main_place(item,
+                                                                                                       lv_xml_flex_align_string_to_enum_value(value), selector);
+            else if(lv_streq("style_flex_cross_place", prop_name)) lv_obj_set_style_flex_cross_place(item,
+                                                                                                         lv_xml_flex_align_string_to_enum_value(value), selector);
+            else if(lv_streq("style_flex_track_place", prop_name)) lv_obj_set_style_flex_track_place(item,
+                                                                                                         lv_xml_flex_align_string_to_enum_value(value), selector);
         }
     }
 }

@@ -28,6 +28,13 @@ int32_t lv_xml_atoi(const char * str);
 
 lv_color_t lv_xml_to_color(const char * str);
 
+/**
+ * Concert percentage or integer opacity value from string to integer.
+ * @param str   e.g. "70%" or 180
+ * @return      0..255
+ */
+lv_opa_t lv_xml_to_opa(const char * str);
+
 bool lv_xml_to_bool(const char * str);
 
 int32_t lv_xml_strtol(const char * str, char ** endptr, int32_t base);

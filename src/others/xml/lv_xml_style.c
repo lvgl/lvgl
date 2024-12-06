@@ -99,16 +99,46 @@ void lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs)
         if(lv_streq(name, "width")) lv_style_set_width(style, lv_xml_to_size(value));
         else if(lv_streq(name, "height")) lv_style_set_height(style, lv_xml_to_size(value));
         else if(lv_streq(name, "radius")) lv_style_set_radius(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "bg_opa")) lv_style_set_bg_opa(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "pad_left")) lv_style_set_pad_left(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "pad_right")) lv_style_set_pad_right(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "pad_top")) lv_style_set_pad_top(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "pad_bottom")) lv_style_set_pad_bottom(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "pad_hor")) lv_style_set_pad_hor(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "pad_ver")) lv_style_set_pad_ver(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "pad_all")) lv_style_set_pad_all(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "pad_row")) lv_style_set_pad_row(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "pad_column")) lv_style_set_pad_column(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "pad_gap")) lv_style_set_pad_gap(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "margin_left")) lv_style_set_margin_left(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "margin_right")) lv_style_set_margin_right(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "margin_top")) lv_style_set_margin_top(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "margin_bottom")) lv_style_set_margin_bottom(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "margin_hor")) lv_style_set_margin_hor(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "margin_ver")) lv_style_set_margin_ver(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "margin_all")) lv_style_set_margin_all(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "bg_opa")) lv_style_set_bg_opa(style, lv_xml_to_opa(value));
         else if(lv_streq(name, "bg_color")) lv_style_set_bg_color(style, lv_xml_to_color(value));
         else if(lv_streq(name, "border_color")) lv_style_set_border_color(style, lv_xml_to_color(value));
         else if(lv_streq(name, "border_width")) lv_style_set_border_width(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "border_opa")) lv_style_set_border_opa(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "border_opa")) lv_style_set_border_opa(style, lv_xml_to_opa(value));
+        else if(lv_streq(name, "outline_color")) lv_style_set_outline_color(style, lv_xml_to_color(value));
+        else if(lv_streq(name, "outline_width")) lv_style_set_outline_width(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "outline_opa")) lv_style_set_outline_opa(style, lv_xml_to_opa(value));
+        else if(lv_streq(name, "outline_pad")) lv_style_set_outline_pad(style, lv_xml_atoi(value));
         else if(lv_streq(name, "text_color")) lv_style_set_text_color(style, lv_xml_to_color(value));
         else if(lv_streq(name, "text_font")) lv_style_set_text_font(style, lv_xml_get_font(value));
+        else if(lv_streq(name, "text_opa")) lv_style_set_text_opa(style, lv_xml_to_opa(value));
         else if(lv_streq(name, "bg_image_src")) lv_style_set_bg_image_src(style, lv_xml_get_image(value));
         else if(lv_streq(name, "bg_image_tiled")) lv_style_set_bg_image_tiled(style, lv_xml_to_bool(value));
         else if(lv_streq(name, "layout")) lv_style_set_layout(style, lv_xml_layout_string_to_enum_value(value));
+        else if(lv_streq(name, "flex_main_place")) lv_style_set_flex_main_place(style,
+                                                                                    lv_xml_flex_align_string_to_enum_value(value));
+        else if(lv_streq(name, "flex_cross_place")) lv_style_set_flex_cross_place(style,
+                                                                                      lv_xml_flex_align_string_to_enum_value(value));
+        else if(lv_streq(name, "flex_track_place")) lv_style_set_flex_track_place(style,
+                                                                                      lv_xml_flex_align_string_to_enum_value(value));
+
+
         else {
             LV_LOG_WARN("%s style property is not supported", name);
         }
