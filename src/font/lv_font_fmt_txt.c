@@ -685,6 +685,7 @@ static void * get_bitmap_cached(lv_font_glyph_dsc_t * g_dsc, const lv_font_fmt_t
 
     if(!entry) {
         LV_LOG_TRACE("Glyph %d not found in cache", glyph_index);
+        LV_PROFILER_FONT_END;
         return NULL;
     }
 
@@ -704,6 +705,7 @@ static void * get_bitmap_cached(lv_font_glyph_dsc_t * g_dsc, const lv_font_fmt_t
 static bool font_bitmap_create_cb(font_bitmap_cache_data_t * data, void * user_data)
 {
     LV_UNUSED(user_data);
+    LV_PROFILER_FONT_BEGIN;
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &data->fdsc->glyph_dsc[data->glyph_index];
     lv_draw_buf_t * draw_buf = lv_draw_buf_create_ex(
                                    font_draw_buf_handlers,
@@ -712,11 +714,13 @@ static bool font_bitmap_create_cb(font_bitmap_cache_data_t * data, void * user_d
                                    LV_COLOR_FORMAT_A8,
                                    LV_STRIDE_AUTO);
     if(!draw_buf) {
+        LV_PROFILER_FONT_END;
         return false;
     }
 
     if(!get_bitmap(data->fdsc, gdsc, draw_buf)) {
         lv_draw_buf_destroy(draw_buf);
+        LV_PROFILER_FONT_END;
         return false;
     }
 
@@ -724,6 +728,7 @@ static bool font_bitmap_create_cb(font_bitmap_cache_data_t * data, void * user_d
                  data->glyph_index, draw_buf->header.w, draw_buf->header.h);
 
     data->draw_buf = draw_buf;
+    LV_PROFILER_FONT_END;
     return true;
 }
 
