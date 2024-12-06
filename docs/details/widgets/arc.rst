@@ -104,7 +104,7 @@ In other words, the angle and value settings are independent.  You should
 exclusively use one or the other of the two methods.  Mixing the two could
 result in unintended behavior.
 
-To make the arc non-adjustable, remove the style of the knob and make
+To make the arc non-adjustable, remove the style of the knob and
 make the Widget non-clickable:
 
 .. code-block:: c
