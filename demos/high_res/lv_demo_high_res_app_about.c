@@ -30,7 +30,7 @@ static void slide_deck_scrolled_cb(lv_event_t * e);
 static lv_obj_t * create_button(lv_obj_t * parent, const void * img_src, lv_demo_high_res_ctx_t * c);
 static void left_clicked_cb(lv_event_t * e);
 static void bg_cont_delete_cb(lv_event_t * e);
-static void advance_slides(lv_obj_t * slide_deck);
+static bool advance_slides(lv_obj_t * slide_deck);
 static void right_clicked_cb(lv_event_t * e);
 static void play_pause_timer_cb(lv_timer_t * t);
 static void play_pause_clicked_cb(lv_event_t * e);
@@ -236,7 +236,7 @@ static void bg_cont_delete_cb(lv_event_t * e)
     lv_timer_delete(play_pause_timer);
 }
 
-static void advance_slides(lv_obj_t * slide_deck)
+static bool advance_slides(lv_obj_t * slide_deck)
 {
     lv_obj_t * slide_deck_cont = lv_obj_get_parent(slide_deck);
     lv_area_t slide_deck_cont_area;
@@ -249,9 +249,10 @@ static void advance_slides(lv_obj_t * slide_deck)
         lv_obj_get_coords(slide, &slide_area);
         if(slide_area.x1 > slide_deck_cont_area.x1 && slide_area.x2 > slide_deck_cont_area.x2) {
             lv_obj_scroll_to_view_recursive(slide, LV_ANIM_ON);
-            break;
+            return true;
         }
     }
+    return false;
 }
 
 static void right_clicked_cb(lv_event_t * e)
@@ -263,7 +264,11 @@ static void right_clicked_cb(lv_event_t * e)
 static void play_pause_timer_cb(lv_timer_t * t)
 {
     lv_obj_t * slide_deck = lv_timer_get_user_data(t);
-    advance_slides(slide_deck);
+    bool scrolled = advance_slides(slide_deck);
+    if(!scrolled) {
+        lv_obj_t * first_slide = lv_obj_get_child(slide_deck, 0);
+        lv_obj_scroll_to_view_recursive(first_slide, LV_ANIM_ON);
+    }
 }
 
 static void play_pause_clicked_cb(lv_event_t * e)
