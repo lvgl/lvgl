@@ -1390,7 +1390,7 @@ menu "LVGL configuration"
 			default n
 			help
 				You won't be able to open URLs after enabling this feature.
-				Note that FFmpeg image decoder will always use lvgl file system. 
+				Note that FFmpeg image decoder will always use lvgl file system.
 	endmenu
 
 	menu "Others"
@@ -1591,7 +1591,8 @@ menu "LVGL configuration"
 			int "Font manager name max length"
 			depends on LV_USE_FONT_MANAGER
 			default 32
-
+		config LV_USE_XML
+			bool "Enable loading XML UIs runtime"
 		config LVGL_VERSION_MAJOR
 			int
 			default 9 # LVGL_VERSION_MAJOR

@@ -135,7 +135,7 @@ static void month_event_cb(lv_event_t * e)
     lv_calendar_date_t newd = *d;
     newd.month = sel + 1;
 
-    lv_calendar_set_showed_date(calendar, newd.year, newd.month);
+    lv_calendar_set_month_shown(calendar, newd.year, newd.month);
 }
 
 static void year_event_cb(lv_event_t * e)
@@ -157,7 +157,7 @@ static void year_event_cb(lv_event_t * e)
     lv_calendar_date_t newd = *d;
     newd.year = year - sel;
 
-    lv_calendar_set_showed_date(calendar, newd.year, newd.month);
+    lv_calendar_set_month_shown(calendar, newd.year, newd.month);
 }
 
 static void value_changed_event_cb(lv_event_t * e)

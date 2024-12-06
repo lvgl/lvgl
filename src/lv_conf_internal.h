@@ -3436,7 +3436,7 @@
 #endif
 #if LV_USE_FONT_MANAGER
 
-/*Font manager name max length*/
+/**Font manager name max length*/
 #ifndef LV_FONT_MANAGER_NAME_MAX_LEN
     #ifdef CONFIG_LV_FONT_MANAGER_NAME_MAX_LEN
         #define LV_FONT_MANAGER_NAME_MAX_LEN CONFIG_LV_FONT_MANAGER_NAME_MAX_LEN
@@ -3445,6 +3445,15 @@
     #endif
 #endif
 
+#endif
+
+/** Enable loading XML UIs runtime */
+#ifndef LV_USE_XML
+    #ifdef CONFIG_LV_USE_XML
+        #define LV_USE_XML CONFIG_LV_USE_XML
+    #else
+        #define LV_USE_XML	0
+    #endif
 #endif
 
 /*==================

@@ -1,0 +1,32 @@
+<!--
+Example
+<lv_arc mode="reverse" angles="100° 200°" bg_angles="30° 150° range="40 100" value="60"/>
+-->
+
+<widget>
+	<api>
+	    <enumdef name="lv_arc_mode" help="the mode">
+	        <enum name="normal" help="normal"/>
+	        <enum name="symmetrical" help="sym"/>
+	        <enum name="reverse" help="reverse"/>
+	    </enumdef>
+	    <prop name="angles" help="Start and end angles of the indicator">
+	        <param name ="start_angle" type="deg" help="The start angle"/>
+	        <param name ="end_angle" type="deg" help="The end angle"/>
+	    </prop>
+	    <prop name="bg_angles" help="Start and end angles of the background">
+	        <param name ="start_angle" type="deg" help="The start angle"/>
+	        <param name ="end_angle" type="deg" help="The end angle"/>
+	    </prop>
+	    <prop name="range" help="The range">
+	        <param name ="min" type="int" help="The min range"/>
+	        <param name ="max" type="int" help="The max range"/>
+	    </prop>
+	    <prop name="value" help="The current value">
+	        <param name="value" type="int"/>
+	    </prop>
+	    <prop name="mode" help="The mode">
+	        <param name="mode" type="enum:lv_arc_mode"/>
+	    </prop>
+	</api>
+</widget>

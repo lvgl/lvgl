@@ -1,14 +1,15 @@
 .. _lv_tabview:
 
-====================
-Tabview (lv_tabview)
-====================
+=====================
+Tab View (lv_tabview)
+=====================
+
 
 Overview
 ********
 
-The Tab view Widget can be used to organize content in tabs. The Tab
-view is built from other widgets:
+The Tab View Widget can be used to organize content in tabs. The Tab
+View is built from other Widgets:
 
 - Main container: :ref:`base_widget`
 - Tab buttons: an :ref:`base_widget` with :ref:`lv_button`
@@ -16,70 +17,77 @@ view is built from other widgets:
 - Content of the tabs: :ref:`base_widget`
 
 The tab buttons can be positioned on the top, bottom, left and right
-side of the Tab view.
+side of the Tab View.
 
 A new tab can be selected either by clicking on a tab button or by
 sliding horizontally on the content.
 
+
+
 .. _lv_tabview_parts_and_styles:
+
 
 Parts and Styles
 ****************
 
-There are no special parts on the Tab view but the :ref:`base_widget` and
-:ref:`lv_button` widgets are used to create the Tab view.
+There are no special parts on the Tab View but the :ref:`base_widget` and
+:ref:`lv_button` Widgets are used to create the Tab View.
+
+
 
 .. _lv_tabview_usage:
 
 Usage
 *****
 
-Create a Tab view
------------------
+Creating a Tab View
+-------------------
 
-:cpp:expr:`lv_tabview_create(parent)` creates a new empty Tab view.
+:cpp:expr:`lv_tabview_create(parent)` creates a new empty Tab View.
 
-Add tabs
---------
+Adding tabs
+-----------
 
 New tabs can be added with :cpp:expr:`lv_tabview_add_tab(tabview, "Tab name")`.
 This will return a pointer to a :ref:`base_widget` where
 the tab's content can be created.
 
-Rename tabs
------------
+Renaming tabs
+-------------
 
 A tab can be renamed with
 :cpp:expr:`lv_tabview_rename_tab(tabview, tab_id, "New Name")`.
 
-Change tab
-----------
+Navigating to a new tab
+-----------------------
 
 To select a new tab you can:
 
 - Click on its tab button
 - Slide horizontally
-- Use :cpp:expr:`lv_tabview_set_active(tabview, id, LV_ANIM_ON)` function
+- Use :cpp:expr:`lv_tabview_set_active(tabview, tab_id, LV_ANIM_ON / OFF)` function
 
 
-Set tab bar position
---------------------
+Setting tab bar position
+------------------------
 
 Using the :cpp:expr:`lv_tabview_set_tab_bar_position(tabview, LV_DIR_LEFT/RIGHT/TOP/BOTTOM)`
-the tab bar can be moved to any sides.
+the tab bar can be moved to any side.
 
-Set tab bar size
-----------------
+Setting tab bar size
+--------------------
 
 The size of the tab bar can be adjusted by :cpp:expr:`lv_tabview_set_tab_bar_size(tabview, size)`
-In case of vertical arrangement is means the height of the tab bar, and in horizontal
-arrangement it means the width.
+When tabs are on the top or bottom, this means the height of the tab bar, and when
+they are on the sides, it means the width.
 
-Get the parts
--------------
+Accessing the parts
+-------------------
 
-- :cpp:expr:`lv_tabview_get_content(tabview)` returns the container for tabs content
-- :cpp:expr:`lv_tabview_get_tab_bar(tabview)` returns the container for tabs buttons
+- :cpp:expr:`lv_tabview_get_content(tabview)` returns a pointer to the container for
+  tabs content (a :ref:`base_widget`)
+- :cpp:expr:`lv_tabview_get_tab_bar(tabview)` returns a pointer to the container for
+  tab buttons (a :ref:`base_widget`)
 
 
 
@@ -106,7 +114,7 @@ Keys
 ****
 
 Keys have effect only on the tab buttons.
-Add manually to a group if required.
+Programmatically add these buttons to a group if required.
 
 .. admonition::  Further Reading
 

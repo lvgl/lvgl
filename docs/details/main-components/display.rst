@@ -17,7 +17,7 @@ following for each display panel you want LVGL to use:
 - assign its :ref:`draw_buffers`.
 
 
-.. _multiple_dislays:
+.. _multiple_displays:
 
 How Many Displays Can LVGL Use?
 *******************************
@@ -52,9 +52,11 @@ it is representing, as well as other things relevant to its lifetime:
 - Resolution (width and height in pixels)
 - Color Depth (bits per pixel)
 - Color Format (how colors in pixels are laid out)
+- DPI (default is configured :c:macro:`LV_DPI_DEF` in ``lv_conf.h``, but can be
+  modified with :cpp:expr:`lv_display_set_dpi(disp, new_dpi)`).
 - 4 :ref:`screen_layers` automatically created with each display
 - All :ref:`screens` created in association with this display (and not yet deleted---only
-  one is dislayed at any given time)
+  one is displayed at any given time)
 - The :ref:`draw_buffers` assigned to it
 - The :ref:`flush_callback` function that moves pixels from :ref:`draw_buffers` to Display hardware
 - What areas of the display have been updated (made "dirty") so rendering logic can
@@ -155,9 +157,9 @@ If you added ``user_data`` to the Display, you can retrieve it in an event like 
 
 .. code-block:: c
 
-    lv_dislay_t  *display1;
+    lv_display_t  *display1;
     my_type_t    *my_user_data;
-    display1 = (lv_dislay_t *)lv_event_get_current_target(e);
+    display1 = (lv_display_t *)lv_event_get_current_target(e);
     my_user_data = lv_display_get_user_data(display1);
 
 The following events are sent:
@@ -197,7 +199,7 @@ To create a display for LVGL:
 
     lv_display_t * display1 = lv_display_create(hor_res, ver_res)
 
-You can create :ref:`multiple dislays <multiple_dislays>` with a different driver for
+You can create :ref:`multiple displays <multiple_displays>` with a different driver for
 each (see below).
 
 When an ``lv_display_t`` object is created, with it are created 4 Screens set up
@@ -215,7 +217,7 @@ Display remains the first one created.
 
 To set another :ref:`display` as the Default Display, call :cpp:func:`lv_display_set_default`.
 
-See :ref:`multiple_dislays` for more information about using multiple displays.
+See :ref:`multiple_displays` for more information about using multiple displays.
 
 For many ``lv_display_...()`` functions, passing NULL for the ``disp`` argument will
 cause the function to target the Default Display.  Check the API documentation for
@@ -317,7 +319,7 @@ An example looks like this:
 
         /* IMPORTANT!!!
          * Inform LVGL that flushing is complete so buffer can be modified again. */
-        lv_display_flush_ready(disp);
+        lv_display_flush_ready(display);
     }
 
 During system initialization, tell LVGL you want that function to copy pixels from
@@ -379,16 +381,17 @@ If a Flush-Wait Callback is not set, LVGL assumes that
 Rotation
 --------
 
-LVGL supports rotation of the display in 90 degree increments. You can
-select whether you would like software rotation or hardware rotation.
+LVGL supports rotation of the display in 90 degree increments.
+
 
 The orientation of the display can be changed with
 ``lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0/90/180/270)``.
 LVGL will swap the horizontal and vertical resolutions internally
-according to the set degree. When changing the rotation
-:cpp:enumerator:`LV_EVENT_SIZE_CHANGED` event is emitted (for any part of your system
-that has "subscribed" to this event) to allow reconfiguring of the hardware.
-In lack of hardware display rotation support
+according to the set degree, however will not perform the actual rotation.
+
+When changing the rotation :cpp:enumerator:`LV_EVENT_SIZE_CHANGED` event is
+emitted (for any part of your system that has "subscribed" to this event) to
+allow reconfiguring of the hardware. In lack of hardware display rotation support
 :cpp:func:`lv_draw_sw_rotate` can be used to rotate the buffer in the
 :ref:`flush_callback`.
 
@@ -403,6 +406,72 @@ The same is true for :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_FULL`.
 In the case of :cpp:enumerator:`LV_DISPLAY_RENDER_MODE_PARTIAL` the small rendered areas
 can be rotated on their own before flushing to the frame buffer.
 
+Below is an example for rotating when the rendering mode is
+:cpp:enumerator:`LV_DISPLAY_RENDER_MODE_PARTIAL` and the rotated image should be sent to a
+**display controller**.
+
+.. code-block:: c
+    /*Rotate a partially rendered area to another buffer and send it*/
+    void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
+    {
+        lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+        lv_area_t rotated_area;
+        if(rotation != LV_DISPLAY_ROTATION_0) {
+            lv_color_format_t cf = lv_display_get_color_format(disp);
+            /*Calculate the position of the rotated area*/
+            rotated_area = *area;
+            lv_display_rotate_area(disp, &rotated_area);
+            /*Calculate the source stride (bytes in a line) from the width of the area*/
+            uint32_t src_stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), cf);
+            /*Calculate the stride of the destination (rotated) area too*/
+            uint32_t dest_stride = lv_draw_buf_width_to_stride(lv_area_get_width(&rotated_area), cf);
+            /*Have a buffer to store the rotated area and perform the rotation*/
+            static uint8_t rotated_buf[500*1014];
+            int32_t src_w = lv_area_get_width(area);
+            int32_t src_h = lv_area_get_height(area);
+            lv_draw_sw_rotate(px_map, rotated_buf, src_w, src_h, src_stride, dest_stride, rotation, cf);
+            /*Use the rotated area and rotated buffer from now on*/
+            area = &rotated_area;
+            px_map = rotated_buf;
+        }
+        my_set_window(area->x1, area->y1, area->x2, area->y2);
+        my_send_colors(px_map);
+    }
+
+Below is an example for rotating when the rendering mode is
+:cpp:enumerator:`LV_DISPLAY_RENDER_MODE_PARTIAL` and the image can be rotated directly
+into a **frame buffer of the LCD peripheral**.
+
+.. code-block:: c
+    /*Rotate a partially rendered area to the frame buffer*/
+    void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
+    {
+        lv_color_format_t cf = lv_display_get_color_format(disp);
+        uint32_t px_size = lv_color_format_get_size(cf);
+        /*Calculate the position of the rotated area*/
+        lv_area_t rotated_area = *area;
+        lv_display_rotate_area(disp, &rotated_area);
+        /*Calculate the properties of the source buffer*/
+        int32_t src_w = lv_area_get_width(area);
+        int32_t src_h = lv_area_get_height(area);
+        uint32_t src_stride = lv_draw_buf_width_to_stride(src_w, cf);
+        /*Calculate the properties of the frame buffer*/
+        int32_t fb_stride = lv_draw_buf_width_to_stride(disp->hor_res, cf);
+        uint8_t * fb_start = my_fb_address;
+        fb_start += rotated_area.y1 * fb_stride + rotated_area.x1 * px_size;
+        lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+        if(rotation == LV_DISPLAY_ROTATION_0) {
+            int32_t y;
+            for(y = area->y1; y <= area->y2; y++) {
+                lv_memcpy(fb_start, px_map, src_stride);
+                px_map += src_stride;
+                fb_start += fb_stride;
+            }
+        }
+        else {
+            lv_draw_sw_rotate(px_map, fb_start, src_w, src_h, src_stride, fb_stride, rotation, cf);
+        }
+    }
 
 Color Format
 ------------
@@ -672,16 +741,11 @@ You can manually trigger an activity using
 :cpp:expr:`lv_display_trigger_activity(display1)`.  If ``display1`` is ``NULL``, the
 :ref:`default_display` will be used (**not all displays**).
 
-
-
-
 .. admonition::  Further Reading
 
     -  `lv_port_disp_template.c <https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_disp_template.c>`__
        for a template for your own driver.
     -  :ref:`Drawing <draw>` to learn more about how rendering works in LVGL.
-
-
 
 API
 ***

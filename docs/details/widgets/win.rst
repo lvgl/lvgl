@@ -4,58 +4,89 @@
 Window (lv_win)
 ===============
 
+
 Overview
 ********
 
-The Window is container-like Widget built from a header with title and
+The Window Widget is built from a header (like a title bar) with title and
 buttons and a content area.
+
+
 
 .. _lv_win_parts_and_styles:
 
 Parts and Styles
 ****************
 
-The Window is built from other widgets so you can check their
+The Window is built from other Widgets so you can check their
 documentation for details:
 
 - Background: :ref:`base_widget`
 - Header on the background: :ref:`base_widget`
 - Title on the header: :ref:`lv_label`
 - Buttons on the header: :ref:`lv_button`
-- Content area on the background: :ref:`base_widget`
+- Content Area on the background: :ref:`base_widget`
+
+
 
 .. _lv_win_usage:
 
 Usage
 *****
 
+
 Create a Window
 ---------------
 
-:cpp:expr:`lv_win_create(parent, header_height)` creates a Window with an empty
-header.
+:cpp:expr:`lv_win_create(parent)` creates a Window that is initially
+composed of the following Widget structure:
+
+- Background (a :ref:`base_widget`, the main window container), is set up to be a
+  Flex-Flow container that flows its contained Widgets vertically
+  (:cpp:enumerator:`LV_FLEX_FLOW_COLUMN`).
+
+- Header (like a title bar) is initially empty, and is a Flex-Flow container set up
+  to flow its contained Widgets horizontally (:cpp:enumerator:`LV_FLEX_FLOW_ROW`),
+  left to right.  The Header occupies the full width of the Background (its parent)
+  and the top approximately 1/2 inch (according to :c:macro:`LV_DPI_DEF`).
+
+- Content Area (a :ref:`base_widget`) occupies the full width of the Background (its
+  parent) the remainder of the available Background area below the Header.  It is
+  *not itself* a Flex-Flow container, but you can make it so if you wish.  See
+  :ref:`flex` for details.
+
 
 Title and buttons
 -----------------
 
-Any number of texts (but typically only one) can be added to the header
-with :cpp:expr:`lv_win_add_title(win, "The title")`.
+You can add Button and Label Widgets to the Header using these two functions.  They
+will be placed in the Header in left-to-right order as they are added.  These
+functions can be called in any order, any number of times.
 
-Control buttons can be added to the window's header with
-:cpp:expr:`lv_win_add_button(win, icon, button_width)`. ``icon`` can be any image
-source, and ``button_width`` is the width of the button.
+- :cpp:expr:`lv_win_add_title(win, "The title")` adds a Label to the header, with
+  long mode :c:enumerator:`LV_LABEL_LONG_DOT` so that if its text contents are wider
+  than the area it has, the text will be truncated with an ellipsis ("...") placed
+  at the end of the text.  It is set to be FLEX GROW 1, so if it is the only Label
+  in the header, it will occupy all available space after any Buttons are added.
+  If more than one label is added, each label will share that space equally unless
+  its FLEX GROW value is altered.  See :ref:`flex` for details about how this works.
+  Because of this, any buttons added after the last Label added will be "stacked"
+  on the far right of the Header.
 
-The title and the buttons will be added in the order the functions are
-called. So adding a button, a text and two other buttons will result in
-a button on the left, a title, and 2 buttons on the right. The width of
-the title is set to take all the remaining space on the header. In other
-words: it pushes to the right all the buttons that are added after the
-title.
+- :cpp:expr:`lv_win_add_button(win, icon, button_width)` adds a Button with the
+  specified width that occupies the full hight of the Header (its parent).  If
+  ``icon`` is not NULL, an image is created, centered on the button, using ``icon``
+  as its image source.  All valid image sources are supported, but a common source
+  to use is one of the ``LV_SYMBOL_...`` macros, such as :c:macro:`LV_SYMBOL_CLOSE`
+  to provide an "x" (close) symbol.  You get back a pointer to the Button created so
+  you can add an event callback with it and/or whatever else might be needed.
+
+
 
 .. _lv_win_get_parts:
 
-Get the parts
-*************
+Getting the parts
+*****************
 
 :cpp:expr:`lv_win_get_header(win)` returns a pointer to the header,
 :cpp:expr:`lv_win_get_content(win)` returns a pointer to the content container
@@ -69,7 +100,7 @@ Events
 ******
 
 No special events are sent by Window Widgets, however events can be added
-manually to the return value of :cpp:func:`lv_win_add_button`.
+to any Buttons added.
 
 .. admonition::  Further Reading
 

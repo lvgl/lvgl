@@ -8,7 +8,7 @@ void lv_example_calendar_2(void)
     lv_obj_align(calendar, LV_ALIGN_TOP_MID, 0, 0);
 
     lv_calendar_set_today_date(calendar, 2024, 03, 22);
-    lv_calendar_set_showed_date(calendar, 2024, 03);
+    lv_calendar_set_month_shown(calendar, 2024, 03);
 
 #if LV_USE_CALENDAR_HEADER_DROPDOWN
     lv_calendar_header_dropdown_create(calendar);
