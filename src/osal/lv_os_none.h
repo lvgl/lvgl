@@ -26,42 +26,6 @@ typedef int lv_mutex_t;
 typedef int lv_thread_t;
 typedef int lv_thread_sync_t;
 
-/* Since the compiler cannot guarantee to optimize empty function calls well
- * (-O3 optimization alone is not enough unless LTO optimization is enabled),
- * macros are used to force the removal of OS API calls in the absence of OS to ensure no performance loss.
- */
-
-#define lv_thread_init(thread, prio, callback, stack_size, user_data)   \
-    do {                                                                \
-        LV_UNUSED(thread);                                              \
-        LV_UNUSED(prio);                                                \
-        LV_UNUSED(callback);                                            \
-        LV_UNUSED(stack_size);                                          \
-        LV_UNUSED(user_data);                                           \
-    } while (0)
-
-#define lv_thread_delete(thread) LV_UNUSED(thread)
-
-#define lv_mutex_init(mutex) LV_UNUSED(mutex)
-
-#define lv_mutex_lock(mutex) LV_UNUSED(mutex)
-
-#define lv_mutex_lock_isr(mutex) LV_UNUSED(mutex)
-
-#define lv_mutex_unlock(mutex) LV_UNUSED(mutex)
-
-#define lv_mutex_delete(mutex) LV_UNUSED(mutex)
-
-#define lv_thread_sync_init(thread_sync) LV_UNUSED(thread_sync)
-
-#define lv_thread_sync_wait(thread_sync) LV_UNUSED(thread_sync)
-
-#define lv_thread_sync_signal(thread_sync) LV_UNUSED(thread_sync)
-
-#define lv_thread_sync_signal_isr(thread_sync) LV_UNUSED(thread_sync)
-
-#define lv_thread_sync_delete(thread_sync) LV_UNUSED(thread_sync)
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

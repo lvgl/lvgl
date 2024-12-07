@@ -9,7 +9,6 @@
 #include "../../lv_examples.h"
 
 #if LV_BUILD_EXAMPLES
-#if LV_USE_OS != LV_OS_NONE
 #include "../../../lvgl_private.h"
 
 /*********************
@@ -93,14 +92,5 @@ static void increment_thread_entry(void * user_data)
     }
 }
 
-#else
 
-void lv_example_osal(void)
-{
-    lv_obj_t * label = lv_label_create(lv_screen_active());
-    lv_label_set_text(label, "LV_USE_OS is not enabled");
-    lv_obj_center(label);
-}
-
-#endif /*LV_USE_OS*/
-#endif /*LV_BUILD_EXAMPLES*/
+#endif
