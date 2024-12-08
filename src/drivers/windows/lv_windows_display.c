@@ -119,16 +119,20 @@ int32_t lv_windows_dpi_to_physical(int32_t logical, int32_t dpi)
  *   STATIC FUNCTIONS
  **********************/
 
-static void __stdcall lv_windows_center_window(HWND hwnd)
+static int lv_windows_center_window(HWND hwnd)
 {
     RECT rect = {0};
-    GetWindowRect(hwnd, &rect);
+    if(!GetWindowRect(hwnd, &rect)) {
+        return 0;
+    }
 
     int windowWidth = rect.right - rect.left;
     int windowHeight = rect.bottom - rect.top;
 
     RECT screenRect = {0};
-    SystemParametersInfo(SPI_GETWORKAREA, 0, &screenRect, 0);
+    if(!SystemParametersInfo(SPI_GETWORKAREA, 0, &screenRect, 0)) {
+        return 0;
+    }
 
     int screenWidth = screenRect.right - screenRect.left;
     int screenHeight = screenRect.bottom - screenRect.top;
@@ -136,7 +140,11 @@ static void __stdcall lv_windows_center_window(HWND hwnd)
     int x = (screenWidth - windowWidth) / 2;
     int y = (screenHeight - windowHeight) / 2;
 
-    SetWindowPos(hwnd, NULL, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+    if(!SetWindowPos(hwnd, NULL, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE)) {
+        return 0;
+    }
+
+    return 1;
 }
 
 static unsigned int __stdcall lv_windows_display_thread_entrypoint(
@@ -182,6 +190,8 @@ static unsigned int __stdcall lv_windows_display_thread_entrypoint(
         return 0;
     }
 
+    LV_ASSERT(lv_windows_center_window(window_handle));
+
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 window_handle);
     if(!context) {
@@ -190,7 +200,6 @@ static unsigned int __stdcall lv_windows_display_thread_entrypoint(
 
     data->display = context->display_device_object;
 
-    lv_windows_center_window(window_handle);
     ShowWindow(window_handle, SW_SHOW);
     UpdateWindow(window_handle);
 
