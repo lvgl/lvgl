@@ -56,10 +56,10 @@ input, firing events, animations, etc.
 There are two ways to provide this information to LVGL:
 
 1.  Supply LVGL with a callback function to retrieve elapsed system milliseconds by
-    calling :cpp:expr:`lv_tick_set_cb(my_get_milliseconds_function)`.
-    :cpp:expr:`my_get_milliseconds_function()` needs to return the number of
-    milliseconds elapsed since system start up.  Many platforms have built-in
-    functions that can be used as they are.  For example:
+    calling :cpp:expr:`lv_tick_set_cb(my_get_milliseconds)`.
+    :cpp:expr:`my_get_milliseconds()` needs to return the number of milliseconds
+    elapsed since system start up.  Many platforms have built-in functions that can
+    be used as they are.  For example:
 
     - SDL:  ``lv_tick_set_cb(SDL_GetTicks);``
     - Arduino:  ``lv_tick_set_cb(my_tick_get_cb);``, where ``my_tick_get_cb`` is:
@@ -75,12 +75,43 @@ There are two ways to provide this information to LVGL:
     cannot be missed when the system is under high load.
 
     .. note::  :cpp:func:`lv_tick_inc` is only one of two LVGL functions that may be
-        called from an interrupt.  See the :ref:`threading` section to learn more.
+        called from an interrupt if writing to a ``uint32_t`` value is atomic on your
+        platform.  See below and the :ref:`threading` section to learn more.
 
-The ticks (milliseconds) should be independent from any other activities of the MCU.
+Either way, the writing of the ``uint32_t`` Tick value must be :ref:`atomic <atomic>`,
+which is usually the case with a 32- or 64-bit platform.  If you are using a 16-bit
+system (causing the update of the Tick value to not be atomic) and your platform uses
+the Harvard instruction set, you can set a function like this as the callback passed
+to :cpp:expr:`lv_tick_set_cb(my_get_milliseconds)`:
 
-For example this works, but LVGL's timing will be incorrect as the execution time of
-:c:func:`lv_timer_handler` is not considered:
+.. code-block:: c
+
+    /**
+     * @brief  Safe read from 'elapsed_power_on_time_in_ms'
+     */
+    uint32_t  my_get_milliseconds()
+    {
+        register uint32_t  u32result;
+        /* Disable priority 1-6 interrupts for 2 Fcys. */
+        __builtin_disi(2);
+        u32result = elapsed_power_on_time_in_ms;   /* Cost: 2 Fcys */
+            /* Generally looks like this in assembly:
+             *     mov   elapsed_power_on_time_in_ms, W0
+             *     mov   0x7898, W1
+             * requiring exactly 2 clock cycles.
+             * Now value is copied to register pair W0:W1
+             * where it can be written to any destination. */
+        return u32result;
+    }
+
+
+Reliability
+-----------
+Advancing the tick value should be done in such a way that its timing is reliable and
+not dependent on anything that consumes an unknown amount of time.  For an example of
+what *not* to do:  this can "seem" to work, but LVGL's timing will be incorrect
+because the execution time of :c:func:`lv_timer_handler` varies from call to call and
+thus the delay it introduces cannot be known.
 
 .. code-block:: c
 

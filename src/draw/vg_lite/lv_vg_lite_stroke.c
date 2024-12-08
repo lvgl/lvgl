@@ -24,16 +24,41 @@
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    /* stroke path */
-    lv_vg_lite_path_t * path;
 
-    /* stroke parameters */
-    float width;
-    lv_vector_stroke_cap_t cap;
-    lv_vector_stroke_join_t join;
-    uint16_t miter_limit;
-    lv_array_t dash_pattern;
+/**
+ * Since the key-value data structure of lv_cache is integrated, the kv data structure
+ * will be saved at the same time when the cache is successfully created.
+ * In order to pursue efficiency during the matching process, the primary key (lv) used for matching
+ * will not dup the dash_pattern secondary pointer, so when the creation is successful, dash_pattern needs
+ * to be dup to the child key (vg), so type is added here to distinguish where the real data of dash_pattern exists.
+ */
+typedef enum {
+    DASH_PATTERN_TYPE_LV,
+    DASH_PATTERN_TYPE_VG
+} dash_pattern_type_t;
+
+typedef struct {
+    dash_pattern_type_t dash_pattern_type;
+
+    struct {
+        /* path data */
+        lv_vg_lite_path_t * path;
+
+        /* stroke parameters */
+        float width;
+        lv_vector_stroke_cap_t cap;
+        lv_vector_stroke_join_t join;
+        uint16_t miter_limit;
+        lv_array_t dash_pattern;
+    } lv;
+
+    struct {
+        /* stroke path */
+        lv_vg_lite_path_t * path;
+
+        /* dash pattern, for comparison only */
+        lv_array_t dash_pattern;
+    } vg;
 } stroke_item_t;
 
 /**********************
@@ -124,21 +149,21 @@ lv_cache_entry_t * lv_vg_lite_stroke_get(struct _lv_draw_vg_lite_unit_t * unit,
     /* prepare search key */
     stroke_item_t search_key;
     lv_memzero(&search_key, sizeof(search_key));
-    search_key.cap = dsc->cap;
-    search_key.join = dsc->join;
-    search_key.width = dsc->width;
-    search_key.miter_limit = dsc->miter_limit;
+    search_key.lv.cap = dsc->cap;
+    search_key.lv.join = dsc->join;
+    search_key.lv.width = dsc->width;
+    search_key.lv.miter_limit = dsc->miter_limit;
 
     /* A one-time read-only array that only copies the pointer but not the content */
-    search_key.dash_pattern = dsc->dash_pattern;
-    search_key.path = path;
+    search_key.lv.dash_pattern = dsc->dash_pattern;
+    search_key.lv.path = path;
 
-    lv_cache_entry_t * cache_node_entry = lv_cache_acquire(unit->stroke_cache, &search_key, &search_key);
+    lv_cache_entry_t * cache_node_entry = lv_cache_acquire(unit->stroke_cache, &search_key, NULL);
     if(cache_node_entry) {
         return cache_node_entry;
     }
 
-    cache_node_entry = lv_cache_acquire_or_create(unit->stroke_cache, &search_key, &search_key);
+    cache_node_entry = lv_cache_acquire_or_create(unit->stroke_cache, &search_key, NULL);
     if(cache_node_entry == NULL) {
         LV_LOG_ERROR("stroke cache creating failed");
         return NULL;
@@ -153,7 +178,13 @@ struct _lv_vg_lite_path_t * lv_vg_lite_stroke_get_path(lv_cache_entry_t * cache_
 
     stroke_item_t * stroke_item = lv_cache_entry_get_data(cache_entry);
     LV_ASSERT_NULL(stroke_item);
-    return stroke_item->path;
+
+    if(lv_array_size(&stroke_item->vg.dash_pattern)) {
+        /* check if dash pattern must be duped */
+        LV_ASSERT(stroke_item->dash_pattern_type == DASH_PATTERN_TYPE_VG);
+    }
+
+    return stroke_item->vg.path;
 }
 
 void lv_vg_lite_stroke_drop(struct _lv_draw_vg_lite_unit_t * unit,
@@ -170,43 +201,49 @@ void lv_vg_lite_stroke_drop(struct _lv_draw_vg_lite_unit_t * unit,
 
 static bool stroke_create_cb(stroke_item_t * item, void * user_data)
 {
+    LV_UNUSED(user_data);
     LV_ASSERT_NULL(item);
 
-    stroke_item_t * src = user_data;
-    LV_ASSERT_NULL(src);
+    /* Check if stroke width is valid */
+    if(item->lv.width <= 0) {
+        LV_LOG_WARN("stroke width error: %f", item->lv.width);
+        return false;
+    }
 
-    lv_memzero(item, sizeof(stroke_item_t));
+    /* Reset the dash pattern type */
+    item->dash_pattern_type = DASH_PATTERN_TYPE_LV;
 
-    /* copy path */
-    item->path = lv_vg_lite_path_create(VG_LITE_FP32);
-    lv_vg_lite_path_append_path(item->path, src->path);
+    /* dup the path */
+    item->vg.path = lv_vg_lite_path_create(VG_LITE_FP32);
+    lv_vg_lite_path_append_path(item->vg.path, item->lv.path);
 
-    /* copy parameters */
-    item->cap = src->cap;
-    item->join = src->join;
-    item->width = src->width;
-    item->miter_limit = src->miter_limit;
-
-    /* copy dash pattern */
-    uint32_t size = lv_array_size(&src->dash_pattern);
+    /* dup the dash pattern */
+    vg_lite_float_t * vg_dash_pattern = NULL;
+    const uint32_t size = lv_array_size(&item->lv.dash_pattern);
     if(size) {
-        lv_array_init(&item->dash_pattern, size, sizeof(float));
-        lv_array_copy(&item->dash_pattern, &src->dash_pattern);
+        /* Only support float dash pattern */
+        LV_ASSERT(item->lv.dash_pattern.element_size == sizeof(float));
+        lv_array_init(&item->vg.dash_pattern, size, sizeof(float));
+        lv_array_copy(&item->vg.dash_pattern, &item->lv.dash_pattern);
+
+        /* mark dash pattern has been duped */
+        item->dash_pattern_type = DASH_PATTERN_TYPE_VG;
+        vg_dash_pattern = lv_array_front(&item->vg.dash_pattern);
     }
 
     /* update parameters */
-    vg_lite_path_t * vg_path = lv_vg_lite_path_get_path(item->path);
+    vg_lite_path_t * vg_path = lv_vg_lite_path_get_path(item->vg.path);
     LV_VG_LITE_CHECK_ERROR(vg_lite_set_path_type(vg_path, VG_LITE_DRAW_STROKE_PATH));
 
     vg_lite_error_t error = vg_lite_set_stroke(
                                 vg_path,
-                                lv_stroke_cap_to_vg(item->cap),
-                                lv_stroke_join_to_vg(item->join),
-                                item->width,
-                                item->miter_limit,
-                                lv_array_front(&item->dash_pattern),
+                                lv_stroke_cap_to_vg(item->lv.cap),
+                                lv_stroke_join_to_vg(item->lv.join),
+                                item->lv.width,
+                                item->lv.miter_limit,
+                                vg_dash_pattern,
                                 size,
-                                item->width / 2,
+                                item->lv.width / 2,
                                 0);
 
     if(error != VG_LITE_SUCCESS) {
@@ -242,21 +279,73 @@ static void stroke_free_cb(stroke_item_t * item, void * user_data)
     LV_UNUSED(user_data);
     LV_ASSERT_NULL(item);
 
-    lv_array_deinit(&item->dash_pattern);
-    lv_vg_lite_path_destroy(item->path);
-    lv_memzero(item, sizeof(stroke_item_t));
-}
-
-static lv_cache_compare_res_t path_compare(const vg_lite_path_t * lhs, const vg_lite_path_t * rhs)
-{
-    LV_ASSERT(lhs->format == VG_LITE_FP32);
-    LV_ASSERT(rhs->format == VG_LITE_FP32);
-
-    if(lhs->path_length != rhs->path_length) {
-        return lhs->path_length > rhs->path_length ? 1 : -1;
+    if(item->vg.path) {
+        lv_vg_lite_path_destroy(item->vg.path);
+        item->vg.path = NULL;
     }
 
-    int cmp_res = lv_memcmp(lhs->path, rhs->path, lhs->path_length);
+    if(item->dash_pattern_type == DASH_PATTERN_TYPE_VG) {
+        lv_array_deinit(&item->vg.dash_pattern);
+        item->dash_pattern_type = DASH_PATTERN_TYPE_LV;
+    }
+}
+
+static lv_cache_compare_res_t dash_pattern_compare(const stroke_item_t * lhs, const stroke_item_t * rhs)
+{
+    /* Select the dash pattern to compare */
+    const lv_array_t * lhs_dash_pattern = lhs->dash_pattern_type == DASH_PATTERN_TYPE_LV ?
+                                          &lhs->lv.dash_pattern :
+                                          &lhs->vg.dash_pattern;
+    const lv_array_t * rhs_dash_pattern = rhs->dash_pattern_type == DASH_PATTERN_TYPE_LV ?
+                                          &rhs->lv.dash_pattern :
+                                          &rhs->vg.dash_pattern;
+
+    const uint32_t lhs_dash_pattern_size = lv_array_size(lhs_dash_pattern);
+    const uint32_t rhs_dash_pattern_size = lv_array_size(rhs_dash_pattern);
+
+    if(lhs_dash_pattern_size != rhs_dash_pattern_size) {
+        return lhs_dash_pattern_size > rhs_dash_pattern_size ? 1 : -1;
+    }
+
+    if(lhs_dash_pattern_size == 0 && rhs_dash_pattern_size == 0) {
+        return 0;
+    }
+
+    /* Both dash pattern has the same size, compare them */
+    LV_ASSERT(lhs_dash_pattern->element_size == sizeof(float));
+    LV_ASSERT(rhs_dash_pattern->element_size == sizeof(float));
+
+    /* compare dash pattern data */
+    int cmp_res = lv_memcmp(
+                      lv_array_front(lhs_dash_pattern),
+                      lv_array_front(rhs_dash_pattern),
+                      lhs_dash_pattern_size * sizeof(float));
+
+    if(cmp_res != 0) {
+        return cmp_res > 0 ? 1 : -1;
+    }
+
+    return 0;
+}
+
+static lv_cache_compare_res_t path_compare(const stroke_item_t * lhs, const stroke_item_t * rhs)
+{
+    /* Give priority to using dup vg.path */
+    const vg_lite_path_t * lhs_path = lhs->vg.path ?
+                                      lv_vg_lite_path_get_path(lhs->vg.path) :
+                                      lv_vg_lite_path_get_path(lhs->lv.path);
+    const vg_lite_path_t * rhs_path = rhs->vg.path ?
+                                      lv_vg_lite_path_get_path(rhs->vg.path) :
+                                      lv_vg_lite_path_get_path(rhs->lv.path);
+
+    LV_ASSERT(lhs_path->format == VG_LITE_FP32);
+    LV_ASSERT(rhs_path->format == VG_LITE_FP32);
+
+    if(lhs_path->path_length != rhs_path->path_length) {
+        return lhs_path->path_length > rhs_path->path_length ? 1 : -1;
+    }
+
+    int cmp_res = lv_memcmp(lhs_path->path, rhs_path->path, lhs_path->path_length);
     if(cmp_res != 0) {
         return cmp_res > 0 ? 1 : -1;
     }
@@ -266,44 +355,28 @@ static lv_cache_compare_res_t path_compare(const vg_lite_path_t * lhs, const vg_
 
 static lv_cache_compare_res_t stroke_compare_cb(const stroke_item_t * lhs, const stroke_item_t * rhs)
 {
-    if(lhs->width != lhs->width) {
-        return lhs->width > lhs->width ? 1 : -1;
+    if(lhs->lv.width != rhs->lv.width) {
+        return lhs->lv.width > rhs->lv.width ? 1 : -1;
     }
 
-    if(lhs->cap != rhs->cap) {
-        return lhs->cap > rhs->cap ? 1 : -1;
+    if(lhs->lv.cap != rhs->lv.cap) {
+        return lhs->lv.cap > rhs->lv.cap ? 1 : -1;
     }
 
-    if(lhs->join != rhs->join) {
-        return lhs->join > rhs->join ? 1 : -1;
+    if(lhs->lv.join != rhs->lv.join) {
+        return lhs->lv.join > rhs->lv.join ? 1 : -1;
     }
 
-    if(lhs->miter_limit != rhs->miter_limit) {
-        return lhs->miter_limit > rhs->miter_limit ? 1 : -1;
+    if(lhs->lv.miter_limit != rhs->lv.miter_limit) {
+        return lhs->lv.miter_limit > rhs->lv.miter_limit ? 1 : -1;
     }
 
-    uint32_t lhs_dash_pattern_size = lv_array_size(&lhs->dash_pattern);
-    uint32_t rhs_dash_pattern_size = lv_array_size(&rhs->dash_pattern);
-
-    if(lhs_dash_pattern_size != rhs_dash_pattern_size) {
-        return lhs_dash_pattern_size > rhs_dash_pattern_size ? 1 : -1;
+    lv_cache_compare_res_t dash_pattern_res = dash_pattern_compare(lhs, rhs);
+    if(dash_pattern_res != 0) {
+        return dash_pattern_res;
     }
 
-    if(lhs_dash_pattern_size > 0 && rhs_dash_pattern_size > 0) {
-        LV_ASSERT(lhs->dash_pattern.element_size == sizeof(float));
-        LV_ASSERT(rhs->dash_pattern.element_size == sizeof(float));
-
-        const float * lhs_dash_pattern = lv_array_front(&lhs->dash_pattern);
-        const float * rhs_dash_pattern = lv_array_front(&rhs->dash_pattern);
-
-        /* compare dash pattern */
-        int cmp_res = lv_memcmp(lhs_dash_pattern, rhs_dash_pattern, lhs_dash_pattern_size * sizeof(float));
-        if(cmp_res != 0) {
-            return cmp_res > 0 ? 1 : -1;
-        }
-    }
-
-    return path_compare(lv_vg_lite_path_get_path(lhs->path), lv_vg_lite_path_get_path(rhs->path));
+    return path_compare(lhs, rhs);
 }
 
 #endif /*LV_USE_DRAW_VG_LITE && LV_USE_VECTOR_GRAPHIC*/
