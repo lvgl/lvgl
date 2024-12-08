@@ -20,8 +20,10 @@ Parts and Styles
 
 Similar to Button Matrix, the Keyboard Widget consist of 2 part:
 
-- :cpp:enumerator:`LV_PART_MAIN` The main part. Uses all the typical background properties
-- :cpp:enumerator:`LV_PART_ITEMS` The buttons. Also uses all typical background properties as well as *text* properties.
+- :cpp:enumerator:`LV_PART_MAIN` The main part. Uses the :ref:`typical background
+  style properties <typical bg props>`
+- :cpp:enumerator:`LV_PART_ITEMS` The buttons. Also uses the :ref:`typical background
+  style properties <typical bg props>` as well as *text* properties.
 
 
 .. _lv_keyboard_usage:
@@ -48,7 +50,7 @@ default mode is :cpp:enumerator:`LV_KEYBOARD_MODE_TEXT_UPPER`.
 Assign Text Area
 ----------------
 
-You can assign a :ref:`Text Area <lv_textarea>` Widget to the Keyboard to
+You can assign a :ref:`Text area <lv_textarea>` to the Keyboard to
 automatically put the clicked characters there. To assign the Text Area,
 use :cpp:expr:`lv_keyboard_set_textarea(kb, text_area)`.
 

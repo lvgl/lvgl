@@ -49,7 +49,7 @@ Once a Slider is created, it has:
 - default width of approximately 2 inches (according to configured value of :c:macro:`LV_DPI_DEF`),
 - default hight of approximately 1/10 inch (according to configured value of :c:macro:`LV_DPI_DEF`).
 
-To set a different value use:
+To set different values use:
 
 - :cpp:expr:`lv_slider_set_value(slider, new_value, LV_ANIM_ON/OFF)` (animation time
   is set by the styles' ``anim_time`` property);

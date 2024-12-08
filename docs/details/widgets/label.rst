@@ -16,7 +16,7 @@ A Label is the Widget used to display text.
 Parts and Styles
 ****************
 
-- :cpp:enumerator:`LV_PART_MAIN` Uses all the typical background and
+- :cpp:enumerator:`LV_PART_MAIN` Uses the :ref:`typical background <typical bg props>` and
   text properties. Padding values can be used to add space between
   the text and the edges of the Label's background.
 - :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar that is shown when the text is
@@ -125,7 +125,7 @@ Text selection
 If enabled by :c:macro:`LV_LABEL_TEXT_SELECTION` part of the text can be
 selected. It's similar to when you use your mouse on a PC to select
 text. The whole mechanism (click and select the text as you drag your
-finger/mouse) is implemented in :ref:`Text area <lv_textarea>` and
+finger/mouse) is implemented in :ref:`lv_textarea` and
 the Label Widget only allows programmatic text selection with
 :cpp:expr:`lv_label_get_text_selection_start(label, start_char_index)` and
 :cpp:expr:`lv_label_get_text_selection_end(label, end_char_index)`.

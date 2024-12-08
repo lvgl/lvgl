@@ -9,6 +9,10 @@ Overview
 ********
 
 Roller allows the end user to select an item from a list by scrolling it.
+The item in the middle is the selected item and normally stands out from
+the other items due to different styles applied to it.
+
+
 
 
 .. _lv_roller_parts_and_styles:
@@ -16,8 +20,8 @@ Roller allows the end user to select an item from a list by scrolling it.
 Parts and Styles
 ****************
 
--  :cpp:enumerator:`LV_PART_MAIN` The background of the Roller uses the
-   background- and text-style properties.
+-  :cpp:enumerator:`LV_PART_MAIN` The background of the roller uses the :ref:`typical
+   background <typical bg props>` and text style properties.
 
    - Style ``text_line_space`` adjusts the space between list items.
      Use :cpp:func:`lv_obj_set_style_text_line_space` to set this value.
@@ -30,6 +34,7 @@ Parts and Styles
 -  :cpp:enumerator:`LV_PART_SELECTED` The selected item (displayed in the  middle of
    the Roller).  Besides the typical background properties, it uses text style
    properties to change the appearance of the text of the selected item.
+
 
 
 .. _lv_roller_usage:

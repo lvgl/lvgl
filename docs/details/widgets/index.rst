@@ -30,7 +30,7 @@ Widgets
     roller
     scale
     slider
-    span
+    spangroup
     spinbox
     spinner
     switch
