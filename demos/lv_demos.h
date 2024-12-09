@@ -63,6 +63,10 @@ extern "C" {
 #include "ebike/lv_demo_ebike.h"
 #endif
 
+#if LV_USE_DEMO_SMARTWATCH
+#include "smartwatch/lv_demo_smartwatch.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
