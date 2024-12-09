@@ -1090,6 +1090,7 @@ static bool refr_check_obj_clip_overflow(lv_layer_t * layer, lv_obj_t * obj)
 static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 {
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
+    if(lv_obj_get_style_opa(obj, 0) < LV_OPA_MIN) return;
 
     lv_opa_t opa = lv_obj_get_style_opa_layered(obj, 0);
     if(opa < LV_OPA_MIN) return;
