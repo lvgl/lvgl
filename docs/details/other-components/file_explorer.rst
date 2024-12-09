@@ -43,6 +43,15 @@ non-zero value to use the "Quick-Access" panel.
 
 
 
+Prerequisites
+*************
+
+If you haven't already done so, you will need to learn about the LVGL :ref:`File
+System abstraction <overview_file_system>`, since it must be set up and be functional
+for File Explorer to work.
+
+
+
 .. _file_explorer_usage:
 
 Usage
