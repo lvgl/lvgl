@@ -58,6 +58,8 @@ typedef enum {
  * GLOBAL PROTOTYPES
  **********************/
 
+#if LV_USE_OS != LV_OS_NONE
+
 /*----------------------------------------
  * These functions needs to be implemented
  * for specific operating systems
@@ -174,6 +176,109 @@ lv_result_t lv_lock_isr(void);
  * It is called internally in lv_timer_handler().
  */
 void lv_unlock(void);
+
+#else
+
+/* Since compilation does not necessarily optimize cross-file empty functions well
+ * (-O3 optimization alone is not enough unless LTO optimization is enabled),
+ * In the absence of an operating system, use inline functions to help compile
+ * optimizations and avoid the call overhead of the OS API to ensure no performance penalty.
+ */
+
+static inline lv_result_t lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*callback)(void *),
+                                         size_t stack_size,
+                                         void * user_data)
+{
+    LV_UNUSED(thread);
+    LV_UNUSED(callback);
+    LV_UNUSED(prio);
+    LV_UNUSED(stack_size);
+    LV_UNUSED(user_data);
+    return LV_RESULT_INVALID;
+}
+
+static inline lv_result_t lv_thread_delete(lv_thread_t * thread)
+{
+    LV_UNUSED(thread);
+    return LV_RESULT_INVALID;
+}
+
+static inline lv_result_t lv_mutex_init(lv_mutex_t * mutex)
+{
+    LV_UNUSED(mutex);
+    return LV_RESULT_OK;
+}
+
+static inline lv_result_t lv_mutex_lock(lv_mutex_t * mutex)
+{
+    LV_UNUSED(mutex);
+    return LV_RESULT_OK;
+}
+
+static inline lv_result_t lv_mutex_lock_isr(lv_mutex_t * mutex)
+{
+    LV_UNUSED(mutex);
+    return LV_RESULT_OK;
+}
+
+static inline lv_result_t lv_mutex_unlock(lv_mutex_t * mutex)
+{
+    LV_UNUSED(mutex);
+    return LV_RESULT_OK;
+}
+
+static inline lv_result_t lv_mutex_delete(lv_mutex_t * mutex)
+{
+    LV_UNUSED(mutex);
+    return LV_RESULT_OK;
+}
+
+static inline lv_result_t lv_thread_sync_init(lv_thread_sync_t * sync)
+{
+    LV_UNUSED(sync);
+    return LV_RESULT_INVALID;
+}
+
+static inline lv_result_t lv_thread_sync_wait(lv_thread_sync_t * sync)
+{
+    LV_UNUSED(sync);
+    return LV_RESULT_INVALID;
+}
+
+static inline lv_result_t lv_thread_sync_signal(lv_thread_sync_t * sync)
+{
+    LV_UNUSED(sync);
+    return LV_RESULT_INVALID;
+}
+
+static inline lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * sync)
+{
+    LV_UNUSED(sync);
+    return LV_RESULT_INVALID;
+}
+
+static inline lv_result_t lv_thread_sync_delete(lv_thread_sync_t * sync)
+{
+    LV_UNUSED(sync);
+    return LV_RESULT_INVALID;
+}
+
+static inline void lv_lock(void)
+{
+    /*Do nothing*/
+}
+
+static inline lv_result_t lv_lock_isr(void)
+{
+    return LV_RESULT_OK;
+}
+
+static inline void lv_unlock(void)
+{
+    /*Do nothing*/
+}
+
+#endif /*LV_USE_OS != LV_OS_NONE*/
 
 /**********************
  *      MACROS

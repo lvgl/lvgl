@@ -7,7 +7,8 @@ Logging
 LVGL has a built-in *Log* module to inform the user about what is
 happening in the library.
 
-Log level
+
+Log Level
 *********
 
 To enable logging, set :c:macro:`LV_USE_LOG` in ``lv_conf.h`` and set
@@ -24,7 +25,7 @@ The events which have a higher level than the set log level will be logged
 as well. E.g. if you :c:macro:`LV_LOG_LEVEL_WARN`, errors will be also logged.
 
 
-Printing logs
+Printing Logs
 *************
 
 Logging with printf
@@ -53,14 +54,15 @@ For example:
 
    lv_log_register_print_cb(my_log_cb);
 
-Add logs
+
+Add Logs
 ********
 
 You can also use the log module via the
 ``LV_LOG_TRACE/INFO/WARN/ERROR/USER(text)`` or ``LV_LOG(text)``
 functions. Here:
 
--  ``LV_LOG_TRACE/INFO/WARN/ERROR/USER(text)`` append following information to your ``text``
+-  ``LV_LOG_TRACE/INFO/WARN/ERROR/USER(text)`` append the following information to your ``text``
 -  Log Level
 -  \__FILE\_\_
 -  \__LINE\_\_
