@@ -584,9 +584,12 @@ lv_text_align_t lv_obj_calculate_style_text_align(const lv_obj_t * obj, lv_part_
 
 lv_opa_t lv_obj_get_style_opa_recursive(const lv_obj_t * obj, lv_part_t part)
 {
-
+    LV_PROFILER_STYLE_BEGIN;
     lv_opa_t opa_obj = lv_obj_get_style_opa(obj, part);
-    if(opa_obj <= LV_OPA_MIN) return LV_OPA_TRANSP;
+    if(opa_obj <= LV_OPA_MIN) {
+        LV_PROFILER_STYLE_END;
+        return LV_OPA_TRANSP;
+    }
 
     lv_opa_t opa_final = LV_OPA_COVER;
     if(opa_obj < LV_OPA_MAX) {
@@ -602,7 +605,10 @@ lv_opa_t lv_obj_get_style_opa_recursive(const lv_obj_t * obj, lv_part_t part)
 
     while(obj) {
         opa_obj = lv_obj_get_style_opa(obj, part);
-        if(opa_obj <= LV_OPA_MIN) return LV_OPA_TRANSP;
+        if(opa_obj <= LV_OPA_MIN) {
+            LV_PROFILER_STYLE_END;
+            return LV_OPA_TRANSP;
+        }
         if(opa_obj < LV_OPA_MAX) {
             opa_final = LV_OPA_MIX2(opa_final, opa_obj);
         }
@@ -610,8 +616,17 @@ lv_opa_t lv_obj_get_style_opa_recursive(const lv_obj_t * obj, lv_part_t part)
         obj = lv_obj_get_parent(obj);
     }
 
-    if(opa_final <= LV_OPA_MIN) return LV_OPA_TRANSP;
-    if(opa_final >= LV_OPA_MAX) return LV_OPA_COVER;
+    if(opa_final <= LV_OPA_MIN) {
+        LV_PROFILER_STYLE_END;
+        return LV_OPA_TRANSP;
+    }
+
+    if(opa_final >= LV_OPA_MAX) {
+        LV_PROFILER_STYLE_END;
+        return LV_OPA_COVER;
+    }
+
+    LV_PROFILER_STYLE_END;
     return opa_final;
 }
 
