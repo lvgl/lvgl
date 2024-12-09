@@ -18,14 +18,14 @@
 #define DDLIST_ALIGN_CREATE_DEF(item)   \
     do {                                \
         ui->ctrl_pad.tab.align.ddlist_align_##item = \
-        ddlist_create(tab,                     \
-                      "Align "#item" place",   \
-                      "start\n"                \
-                      "end\n"                  \
-                      "center\n"               \
-                      "space evenly\n"         \
-                      "space around\n"         \
-                      "space between");        \
+                                                     ddlist_create(tab,                     \
+                                                                   "Align "#item" place",   \
+                                                                   "start\n"                \
+                                                                   "end\n"                  \
+                                                                   "center\n"               \
+                                                                   "space evenly\n"         \
+                                                                   "space around\n"         \
+                                                                   "space between");        \
     } while(0)
 
 /**********************
