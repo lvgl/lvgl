@@ -94,7 +94,7 @@ void lv_demo_high_res_app_smart_meter(lv_obj_t * base_obj)
 
     /* top margin */
 
-    lv_obj_t * top_margin = lv_demo_high_res_top_margin_create(base_obj, bg_cont, 0, true, c);
+    lv_obj_t * top_margin = lv_demo_high_res_top_margin_create(bg_cont, 0, true, c);
 
     /* app info */
 

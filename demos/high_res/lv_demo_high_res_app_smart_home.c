@@ -74,7 +74,7 @@ void lv_demo_high_res_app_smart_home(lv_obj_t * base_obj)
 
     /* top margin */
 
-    lv_demo_high_res_top_margin_create(base_obj, bg_cont,
+    lv_demo_high_res_top_margin_create(bg_cont,
                                        c->sz == &lv_demo_high_res_sizes_all[SIZE_SM] ? c->sz->gap[9] : c->sz->gap[10], true, c);
 
     /* app info */

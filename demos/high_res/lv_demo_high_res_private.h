@@ -222,7 +222,7 @@ void lv_demo_high_res_app_ev_charging(lv_obj_t * base_obj);
 void lv_demo_high_res_app_smart_meter(lv_obj_t * base_obj);
 void lv_demo_high_res_app_thermostat(lv_obj_t * base_obj);
 void lv_demo_high_res_app_about(lv_obj_t * base_obj);
-lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * base_obj, lv_obj_t * parent, int32_t pad_hor, bool show_time,
+lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * parent, int32_t pad_hor, bool show_time,
                                               lv_demo_high_res_ctx_t * c);
 void lv_demo_high_res_top_margin_deinit_subjects(lv_demo_high_res_ctx_t * c);
 

@@ -30,15 +30,17 @@
 static void logout_cb(lv_event_t * e);
 static lv_obj_t * create_icon(lv_obj_t * parent, lv_subject_t * subject, lv_image_dsc_t ** img_dsc_pair,
                               lv_demo_high_res_ctx_t * c);
+static void delete_modal_cb(lv_event_t * e);
 static void icon_clicked_cb(lv_event_t * e);
+static void sys_layer_clicked_cb(lv_event_t * e);
 static void wifi_ssid_ip_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
-static lv_obj_t * create_wifi(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c);
+static lv_obj_t * create_wifi(lv_obj_t * parent, lv_demo_high_res_ctx_t * c);
 static void wifi_icon_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
-static lv_obj_t * create_perfmon(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c);
+static lv_obj_t * create_perfmon(lv_obj_t * parent, lv_demo_high_res_ctx_t * c);
 #if LV_USE_PERF_MONITOR
     static void perfmon_data_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
-static lv_obj_t * create_settings(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c);
+static lv_obj_t * create_settings(lv_obj_t * parent, lv_demo_high_res_ctx_t * c);
 static lv_obj_t * create_setting_label_cont(lv_obj_t * parent, const char * text, lv_demo_high_res_ctx_t * c);
 static void setting_clicked_cb(lv_event_t * e);
 static void date_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
@@ -58,7 +60,7 @@ static void time_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * base_obj, lv_obj_t * parent, int32_t pad_hor, bool show_time,
+lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * parent, int32_t pad_hor, bool show_time,
                                               lv_demo_high_res_ctx_t * c)
 {
     if(!c->top_margin_subjects_are_init) {
@@ -100,23 +102,27 @@ lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * base_obj, lv_obj_t * pa
     lv_obj_t * wifi_icon = create_icon(top_margin_right_cluster, &c->top_margin_wifi_subject, NULL, c);
     lv_image_set_src(wifi_icon, c->imgs[IMG_WIFI_ICON]);
     lv_subject_add_observer_obj(&c->subject_groups.wifi.group, wifi_icon_observer_cb, wifi_icon, c);
-    lv_obj_t * wifi = create_wifi(base_obj, c);
+    lv_obj_t * wifi = create_wifi(lv_layer_sys(), c);
     lv_obj_bind_flag_if_eq(wifi, &c->top_margin_wifi_subject, LV_OBJ_FLAG_HIDDEN, 0);
+    lv_obj_add_event_cb(wifi_icon, delete_modal_cb, LV_EVENT_DELETE, wifi);
 
     lv_obj_t * health_icon = create_icon(top_margin_right_cluster, &c->top_margin_health_subject, &c->imgs[IMG_HEALTH_ICON],
                                          c);
     lv_image_set_src(health_icon, c->imgs[lv_subject_get_int(&c->top_margin_health_subject) ? IMG_HEALTH_ICON_BOLD :
                                           IMG_HEALTH_ICON]);
-    lv_obj_t * perfmon = create_perfmon(base_obj, c);
+    lv_obj_t * perfmon = create_perfmon(lv_layer_sys(), c);
     lv_obj_bind_flag_if_eq(perfmon, &c->top_margin_health_subject, LV_OBJ_FLAG_HIDDEN, 0);
+    lv_obj_add_event_cb(health_icon, delete_modal_cb, LV_EVENT_DELETE, perfmon);
 
     lv_obj_t * settings_icon = create_icon(top_margin_right_cluster, &c->top_margin_setting_subject,
                                            &c->imgs[IMG_SETTING_ICON], c);
     lv_image_set_src(settings_icon, c->imgs[lv_subject_get_int(&c->top_margin_setting_subject) ? IMG_SETTING_ICON_BOLD :
                                             IMG_SETTING_ICON]);
-    lv_obj_t * settings = create_settings(base_obj, c);
+    lv_obj_t * settings = create_settings(lv_layer_sys(), c);
     lv_obj_bind_flag_if_eq(settings, &c->top_margin_setting_subject, LV_OBJ_FLAG_HIDDEN, 0);
+    lv_obj_add_event_cb(settings_icon, delete_modal_cb, LV_EVENT_DELETE, settings);
 
+    lv_obj_update_layout(top_margin_right_cluster);
     lv_obj_align_to(wifi, wifi_icon, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
     lv_obj_align_to(perfmon, health_icon, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
     lv_obj_align_to(settings, settings_icon, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
@@ -155,6 +161,13 @@ static lv_obj_t * create_icon(lv_obj_t * parent, lv_subject_t * subject, lv_imag
     return icon;
 }
 
+static void delete_modal_cb(lv_event_t * e)
+{
+    if(lv_layer_sys() == NULL) return;
+    lv_obj_t * modal = lv_event_get_user_data(e);
+    lv_obj_delete(modal);
+}
+
 static void icon_clicked_cb(lv_event_t * e)
 {
     lv_obj_t * clicked_icon = lv_event_get_target_obj(e);
@@ -171,7 +184,20 @@ static void icon_clicked_cb(lv_event_t * e)
         int32_t value = icon == clicked_icon && !lv_subject_get_int(subject);
         lv_subject_set_int(subject, value);
         if(pair) lv_image_set_src(icon, pair[value]);
+        if(value) {
+            lv_obj_add_flag(lv_layer_sys(), LV_OBJ_FLAG_CLICKABLE);
+            lv_obj_add_event_cb(lv_layer_sys(), sys_layer_clicked_cb, LV_EVENT_CLICKED, clicked_icon);
+        }
     }
+}
+
+static void sys_layer_clicked_cb(lv_event_t * e)
+{
+    lv_obj_remove_event_cb(lv_layer_sys(), sys_layer_clicked_cb);
+    lv_obj_remove_flag(lv_layer_sys(), LV_OBJ_FLAG_CLICKABLE);
+
+    lv_obj_t * relevant_icon = lv_event_get_user_data(e);
+    lv_obj_send_event(relevant_icon, LV_EVENT_CLICKED, NULL);
 }
 
 static void wifi_ssid_ip_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
@@ -187,9 +213,9 @@ static void wifi_ssid_ip_observer_cb(lv_observer_t * observer, lv_subject_t * su
     }
 }
 
-static lv_obj_t * create_wifi(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c)
+static lv_obj_t * create_wifi(lv_obj_t * parent, lv_demo_high_res_ctx_t * c)
 {
-    lv_obj_t * settings = lv_obj_create(base_obj);
+    lv_obj_t * settings = lv_obj_create(parent);
     lv_obj_remove_style_all(settings);
     lv_obj_add_flag(settings, LV_OBJ_FLAG_FLOATING);
     lv_obj_set_style_bg_opa(settings, LV_OPA_COVER, 0);
@@ -223,9 +249,9 @@ static void wifi_icon_observer_cb(lv_observer_t * observer, lv_subject_t * subje
                          ? LV_OPA_COVER : LV_OPA_50, 0);
 }
 
-static lv_obj_t * create_perfmon(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c)
+static lv_obj_t * create_perfmon(lv_obj_t * parent, lv_demo_high_res_ctx_t * c)
 {
-    lv_obj_t * perfmon = lv_obj_create(base_obj);
+    lv_obj_t * perfmon = lv_obj_create(parent);
     lv_obj_add_flag(perfmon, LV_OBJ_FLAG_FLOATING);
 
     lv_obj_set_style_border_opa(perfmon, LV_OPA_TRANSP, 0);
@@ -281,9 +307,9 @@ static void perfmon_data_cb(lv_observer_t * observer, lv_subject_t * subject)
 }
 #endif
 
-static lv_obj_t * create_settings(lv_obj_t * base_obj, lv_demo_high_res_ctx_t * c)
+static lv_obj_t * create_settings(lv_obj_t * parent, lv_demo_high_res_ctx_t * c)
 {
-    lv_obj_t * settings = lv_obj_create(base_obj);
+    lv_obj_t * settings = lv_obj_create(parent);
     lv_obj_remove_style_all(settings);
     lv_obj_add_flag(settings, LV_OBJ_FLAG_FLOATING);
     lv_obj_set_style_bg_opa(settings, LV_OPA_COVER, 0);
