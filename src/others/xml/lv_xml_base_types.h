@@ -48,6 +48,12 @@ lv_align_t lv_xml_align_string_to_enum_value(const char * txt);
  */
 lv_dir_t lv_xml_dir_string_to_enum_value(const char * txt);
 
+/**
+ * Convert a text align string to enum
+ * @param txt       e.g. "left"
+ * @return          the related enum, e.g. `LV_TEXT_ALIGN_LEFT`
+ */
+lv_text_align_t lv_xml_text_align_string_to_enum_value(const char * txt);
 
 /**
  * Convert a flex flow string to enum

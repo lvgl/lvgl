@@ -224,15 +224,15 @@ static void process_const_element(lv_xml_parser_state_t * state, const char ** a
 
 static void process_prop_element(lv_xml_parser_state_t * state, const char ** attrs)
 {
-    lv_xml_param_t * cnst = lv_ll_ins_tail(&state->ctx.param_ll);
-    cnst->name = lv_strdup(lv_xml_get_value_of(attrs, "name"));
+    lv_xml_param_t * prop = lv_ll_ins_tail(&state->ctx.param_ll);
+    prop->name = lv_strdup(lv_xml_get_value_of(attrs, "name"));
     const char * def = lv_xml_get_value_of(attrs, "default");
-    if(def) cnst->def = lv_strdup(def);
-    else cnst->def = NULL;
+    if(def) prop->def = lv_strdup(def);
+    else prop->def = NULL;
 
     const char * type = lv_xml_get_value_of(attrs, "type");
     if(type == NULL) type = "compound"; /*If there in no type it means there are <param>s*/
-    cnst->type = lv_strdup(lv_xml_get_value_of(attrs, "type"));
+    prop->type = lv_strdup(type);
 }
 
 static void start_metadata_handler(void * user_data, const char * name, const char ** attrs)
@@ -245,6 +245,10 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
         const char * extends = lv_xml_get_value_of(attrs, "extends");
         if(extends == NULL) extends = "lv_obj";
         state->ctx.root_widget = lv_xml_widget_get_processor(extends);
+        if(state->ctx.root_widget == NULL) {
+            LV_LOG_WARN("No root widget");
+            state->ctx.root_widget = lv_xml_widget_get_processor("lv_obj");
+        }
     }
 
     if(lv_streq(name, "widget")) state->ctx.is_widget = 1;

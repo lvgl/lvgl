@@ -76,6 +76,17 @@ lv_dir_t lv_xml_dir_string_to_enum_value(const char * txt)
     return 0; /*Return 0 in lack of a better option. */
 }
 
+lv_text_align_t lv_xml_text_align_string_to_enum_value(const char * txt)
+{
+    if(lv_streq("left", txt)) return LV_TEXT_ALIGN_LEFT;
+    if(lv_streq("right", txt)) return LV_TEXT_ALIGN_RIGHT;
+    if(lv_streq("center", txt)) return LV_TEXT_ALIGN_CENTER;
+    if(lv_streq("auto", txt)) return LV_TEXT_ALIGN_AUTO;
+
+    LV_LOG_WARN("%s is an unknown value for text align", txt);
+    return 0; /*Return 0 in lack of a better option. */
+}
+
 lv_flex_flow_t lv_xml_flex_flow_string_to_enum_value(const char * txt)
 {
     if(lv_streq("column", txt)) return LV_FLEX_FLOW_COLUMN;

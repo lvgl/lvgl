@@ -46,9 +46,14 @@
 lv_state_t lv_xml_style_state_string_to_enum_value(const char * txt)
 {
     if(lv_streq("default", txt)) return LV_STATE_DEFAULT;
-    if(lv_streq("pressed", txt)) return LV_STATE_PRESSED;
-    if(lv_streq("checked", txt)) return LV_STATE_CHECKED;
-    if(lv_streq("scrolled", txt)) return LV_STATE_SCROLLED;
+    else if(lv_streq("pressed", txt)) return LV_STATE_PRESSED;
+    else if(lv_streq("checked", txt)) return LV_STATE_CHECKED;
+    else if(lv_streq("scrolled", txt)) return LV_STATE_SCROLLED;
+    else if(lv_streq("focused", txt)) return LV_STATE_FOCUSED;
+    else if(lv_streq("focus_key", txt)) return LV_STATE_FOCUS_KEY;
+    else if(lv_streq("edited", txt)) return LV_STATE_EDITED;
+    else if(lv_streq("hovered", txt)) return LV_STATE_HOVERED;
+    else if(lv_streq("disabled", txt)) return LV_STATE_DISABLED;
 
     return 0; /*Return 0 in lack of a better option. */
 }
@@ -56,9 +61,12 @@ lv_state_t lv_xml_style_state_string_to_enum_value(const char * txt)
 lv_part_t lv_xml_style_part_string_to_enum_value(const char * txt)
 {
     if(lv_streq("main", txt)) return LV_PART_MAIN;
-    if(lv_streq("scrollbar", txt)) return LV_PART_SCROLLBAR;
-    if(lv_streq("indicator", txt)) return LV_PART_INDICATOR;
-    if(lv_streq("knob", txt)) return LV_PART_KNOB;
+    else if(lv_streq("scrollbar", txt)) return LV_PART_SCROLLBAR;
+    else if(lv_streq("indicator", txt)) return LV_PART_INDICATOR;
+    else if(lv_streq("knob", txt)) return LV_PART_KNOB;
+    else if(lv_streq("selected", txt)) return LV_PART_SELECTED;
+    else if(lv_streq("items", txt)) return LV_PART_ITEMS;
+    else if(lv_streq("cursor", txt)) return LV_PART_CURSOR;
 
     return 0; /*Return 0 in lack of a better option. */
 }
@@ -128,6 +136,7 @@ void lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs)
         else if(lv_streq(name, "text_color")) lv_style_set_text_color(style, lv_xml_to_color(value));
         else if(lv_streq(name, "text_font")) lv_style_set_text_font(style, lv_xml_get_font(value));
         else if(lv_streq(name, "text_opa")) lv_style_set_text_opa(style, lv_xml_to_opa(value));
+        else if(lv_streq(name, "text_align")) lv_style_set_text_align(style, lv_xml_text_align_string_to_enum_value(value));
         else if(lv_streq(name, "bg_image_src")) lv_style_set_bg_image_src(style, lv_xml_get_image(value));
         else if(lv_streq(name, "bg_image_tiled")) lv_style_set_bg_image_tiled(style, lv_xml_to_bool(value));
         else if(lv_streq(name, "layout")) lv_style_set_layout(style, lv_xml_layout_string_to_enum_value(value));

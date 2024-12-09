@@ -1,6 +1,6 @@
 <!--
 Example
-<lv_obj width="100" add_flag="hidden"/>
+<lv_obj width="100" hidden="true"/>
  -->
 
 <widget>
@@ -18,6 +18,10 @@ Example
 	    <prop name="style_y" type="coords"/>
 	    <prop name="style_height" type="coords"/>
 	    <prop name="style_width" type="coords"/>
+	    <prop name="style_max_height" type="coords"/>
+	    <prop name="style_max_width" type="coords"/>
+	    <prop name="style_min_height" type="coords"/>
+	    <prop name="style_min_width" type="coords"/>
 	    <prop name="style_align" type="enum:lv_align"/>
 	    <prop name="style_bg_color" type="color"/>
 	    <prop name="style_bg_opa" type="int"/>
@@ -53,16 +57,28 @@ Example
 	    <prop name="style_flex_cross_place" type="enum:lv_flex_align"/>
 	    <prop name="style_flex_track_place" type="enum:lv_flex_align"/>
 
-	    <prop name="clickable">
-	    	<param name="value" type="bool"/>
-	   	</prop>
-
-	    <prop name="scrollable">
-	    	<param name="value" type="bool"/>
-	   	</prop>
-
-	    <prop name="checkable">
-	    	<param name="value" type="bool"/>
-	   	</prop>
+	    <prop name="hidden" type="bool"/>
+	    <prop name="clickable" type="bool"/>
+	    <prop name="click_focusable" type="bool"/>
+	    <prop name="checkable" type="bool"/>
+	    <prop name="scrollable" type="bool"/>
+	    <prop name="scroll_elastic" type="bool"/>
+	    <prop name="scroll_momentum" type="bool"/>
+	    <prop name="scroll_one" type="bool"/>
+	    <prop name="scroll_chain_hor" type="bool"/>
+	    <prop name="scroll_chain_ver" type="bool"/>
+	    <prop name="scroll_chain" type="bool"/>
+	    <prop name="scroll_on_focus" type="bool"/>
+	    <prop name="scroll_with_arrow" type="bool"/>
+	    <prop name="snappable" type="bool"/>
+	    <prop name="press_lock" type="bool"/>
+	    <prop name="event_bubble" type="bool"/>
+	    <prop name="gesture_bubble" type="bool"/>
+	    <prop name="adv_hittest" type="bool"/>
+	    <prop name="ignore_layout" type="bool"/>
+	    <prop name="floating" type="bool"/>
+	    <prop name="send_draw_task_events" type="bool"/>
+	    <prop name="overflow_visible" type="bool"/>
+	    <prop name="flex_in_new_track" type="bool"/>
 	</api>
 </widget>
