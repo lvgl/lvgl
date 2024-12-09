@@ -53,7 +53,7 @@ void lv_demo_smartwatch_notifications_load(lv_screen_load_anim_t anim_type, uint
  * @param message  the notification message preview
  * @param index position of the message that will be returned when clicked
  */
-void lv_demo_smartwatch_add_notification(int app_id, const char *message, int index);
+void lv_demo_smartwatch_add_notification(int app_id, const char * message, int index);
 
 /**
  * add a notification to the list
@@ -61,7 +61,7 @@ void lv_demo_smartwatch_add_notification(int app_id, const char *message, int in
  * @param message  the notification message content
  * @param time the notification time
  */
-void lv_demo_smartwatch_show_notification(int app_id, const char *message, const char *time);
+void lv_demo_smartwatch_show_notification(int app_id, const char * message, const char * time);
 
 /**
  * set the callback funtion when a notification is clicked

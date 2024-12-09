@@ -52,7 +52,7 @@ void lv_demo_smartwatch_qr_list_clear();
  * @param id    determines the icon and name of the qr from inbuilt list. Value (0-9)
  * @param link   link to be added as a qr code
  */
-void lv_demo_smartwatch_qr_list_add(uint8_t id, const char *link);
+void lv_demo_smartwatch_qr_list_add(uint8_t id, const char * link);
 
 
 /**********************

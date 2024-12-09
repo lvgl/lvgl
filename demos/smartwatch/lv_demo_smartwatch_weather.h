@@ -47,7 +47,7 @@ void lv_demo_smartwatch_weather_load(lv_screen_load_anim_t anim_type, uint32_t t
  * @param temp    current temp in °C
  * @param icon  weather icon to use (0-7)
  */
-void lv_demo_smartwatch_home_set_weather(int temp, const lv_img_dsc_t *icon);
+void lv_demo_smartwatch_home_set_weather(int temp, const lv_img_dsc_t * icon);
 
 /**
  * clear daily forecast list

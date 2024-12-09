@@ -24,28 +24,27 @@
 /**
  * app object details
  */
-typedef struct
-{
-    const char *name; /**< name of the app. Shown on the app list */
-    const lv_image_dsc_t *icon; /**< icon of the app. Shown on the app list */
-    lv_obj_t **main; /**< root object of the app */
+typedef struct {
+    const char * name; /**< name of the app. Shown on the app list */
+    const lv_image_dsc_t * icon; /**< icon of the app. Shown on the app list */
+    lv_obj_t ** main; /**< root object of the app */
 } app_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 static void create_screen_list();
-static void add_external_app(const char *app_name, int index, const void *img);
-static void add_app_list(const char *app_name, int index, const void *img);
+static void add_external_app(const char * app_name, int index, const void * img);
+static void add_app_list(const char * app_name, int index, const void * img);
 
-static void app_list_clicked_event_cb(lv_event_t *e);
-static void app_list_screen_events_cb(lv_event_t *e);
+static void app_list_clicked_event_cb(lv_event_t * e);
+static void app_list_screen_events_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_obj_t *app_list_screen;
-static lv_obj_t *app_list;
+static lv_obj_t * app_list_screen;
+static lv_obj_t * app_list;
 
 static app_t apps[MAX_APPS];
 static uint32_t num_apps;
@@ -58,10 +57,9 @@ static uint32_t num_apps;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_smartwatch_register_app_cb(const char *name, const lv_image_dsc_t *icon, lv_obj_t **entry)
+void lv_smartwatch_register_app_cb(const char * name, const lv_image_dsc_t * icon, lv_obj_t ** entry)
 {
-    if (num_apps >= MAX_APPS)
-    {
+    if(num_apps >= MAX_APPS) {
         return;
     }
     apps[num_apps].name = name;
@@ -87,37 +85,32 @@ void lv_smartwatch_app_close(void)
     lv_demo_smartwatch_list_load(LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0);
 }
 
-void lv_smartwatch_app_events_cb(lv_event_t *e)
+void lv_smartwatch_app_events_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t *target = lv_event_get_target(e);
-    if (event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT)
-    {
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT) {
         lv_demo_smartwatch_list_load(LV_SCR_LOAD_ANIM_OVER_RIGHT, 500, 0);
     }
 }
 
-void lv_smartwatch_external_app_cb(lv_event_t *e)
+void lv_smartwatch_external_app_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t *target = lv_event_get_target(e);
+    lv_obj_t * target = lv_event_get_target(e);
     int index = (int)(intptr_t)lv_event_get_user_data(e);
 
-    lv_disp_t *display = lv_display_get_default();
-    lv_obj_t *active_screen = lv_display_get_screen_active(display);
-    if (active_screen != app_list_screen)
-    {
+    lv_disp_t * display = lv_display_get_default();
+    lv_obj_t * active_screen = lv_display_get_screen_active(display);
+    if(active_screen != app_list_screen) {
         return;
     }
-    if (event_code == LV_EVENT_CLICKED)
-    {
-        if (index >= num_apps)
-        {
+    if(event_code == LV_EVENT_CLICKED) {
+        if(index >= num_apps) {
             lv_demo_smartwatch_show_dialog("App Error", "App list out of bounds");
             return;
         }
-        if (*apps[index].main == NULL)
-        {
+        if(*apps[index].main == NULL) {
             lv_demo_smartwatch_show_dialog("App Error", "Unable to load main object");
             return;
         }
@@ -130,46 +123,43 @@ void lv_smartwatch_external_app_cb(lv_event_t *e)
  *   STATIC FUNCTIONS
  **********************/
 
-static void app_list_clicked_event_cb(lv_event_t *e)
+static void app_list_clicked_event_cb(lv_event_t * e)
 {
-    lv_disp_t *display = lv_display_get_default();
-    lv_obj_t *active_screen = lv_display_get_screen_active(display);
-    if (active_screen != app_list_screen)
-    {
+    lv_disp_t * display = lv_display_get_default();
+    lv_obj_t * active_screen = lv_display_get_screen_active(display);
+    if(active_screen != app_list_screen) {
         return;
     }
     int index = (int)(intptr_t)lv_event_get_user_data(e);
     lv_smartwatch_set_load_app_list(true); /* flag was open from app list */
-    switch (index)
-    {
-    case 0:
-        lv_demo_smartwatch_notifications_load(LV_SCR_LOAD_ANIM_MOVE_LEFT, 500, 0);
-        break;
-    case 1:
-        lv_demo_smartwatch_weather_load(LV_SCR_LOAD_ANIM_MOVE_LEFT, 500, 0);
-        break;
-    case 2:
-        lv_demo_smartwatch_settings_load(LV_SCR_LOAD_ANIM_MOVE_LEFT, 500, 0);
-        break;
-    case 3:
-        lv_demo_smartwatch_qr_load(LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 500, 0);
-        break;
+    switch(index) {
+        case 0:
+            lv_demo_smartwatch_notifications_load(LV_SCR_LOAD_ANIM_MOVE_LEFT, 500, 0);
+            break;
+        case 1:
+            lv_demo_smartwatch_weather_load(LV_SCR_LOAD_ANIM_MOVE_LEFT, 500, 0);
+            break;
+        case 2:
+            lv_demo_smartwatch_settings_load(LV_SCR_LOAD_ANIM_MOVE_LEFT, 500, 0);
+            break;
+        case 3:
+            lv_demo_smartwatch_qr_load(LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 500, 0);
+            break;
     }
 }
 
-static void app_list_screen_events_cb(lv_event_t *e)
+static void app_list_screen_events_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t *target = lv_event_get_target(e);
-    if (event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT)
-    {
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT) {
         lv_demo_smartwatch_home_load(LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0);
     }
 }
 
-static void add_external_app(const char *app_name, int index, const void *img)
+static void add_external_app(const char * app_name, int index, const void * img)
 {
-    lv_obj_t *panel = lv_obj_create(app_list);
+    lv_obj_t * panel = lv_obj_create(app_list);
     lv_obj_set_width(panel, lv_pct(90));
     lv_obj_set_height(panel, 64);
     lv_obj_set_align(panel, LV_ALIGN_CENTER);
@@ -186,7 +176,7 @@ static void add_external_app(const char *app_name, int index, const void *img)
     lv_obj_set_style_pad_top(panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(panel, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_t *icon = lv_image_create(panel);
+    lv_obj_t * icon = lv_image_create(panel);
     lv_image_set_src(icon, img);
     lv_obj_set_width(icon, LV_SIZE_CONTENT);
     lv_obj_set_height(icon, LV_SIZE_CONTENT);
@@ -195,7 +185,7 @@ static void add_external_app(const char *app_name, int index, const void *img)
     lv_obj_remove_flag(icon, LV_OBJ_FLAG_SCROLLABLE);
     lv_image_set_scale(icon, 150);
 
-    lv_obj_t *label = lv_label_create(panel);
+    lv_obj_t * label = lv_label_create(panel);
     lv_obj_set_width(label, LV_SIZE_CONTENT);
     lv_obj_set_height(label, LV_SIZE_CONTENT);
     lv_obj_set_x(label, 60);
@@ -208,9 +198,9 @@ static void add_external_app(const char *app_name, int index, const void *img)
     lv_obj_add_event_cb(panel, lv_smartwatch_external_app_cb, LV_EVENT_CLICKED, (void *)(intptr_t)index);
 }
 
-static void add_app_list(const char *app_name, int index, const void *img)
+static void add_app_list(const char * app_name, int index, const void * img)
 {
-    lv_obj_t *panel = lv_obj_create(app_list);
+    lv_obj_t * panel = lv_obj_create(app_list);
     lv_obj_set_width(panel, lv_pct(90));
     lv_obj_set_height(panel, 64);
     lv_obj_set_align(panel, LV_ALIGN_CENTER);
@@ -227,7 +217,7 @@ static void add_app_list(const char *app_name, int index, const void *img)
     lv_obj_set_style_pad_top(panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(panel, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_t *icon = lv_image_create(panel);
+    lv_obj_t * icon = lv_image_create(panel);
     lv_image_set_src(icon, img);
     lv_obj_set_width(icon, LV_SIZE_CONTENT);
     lv_obj_set_height(icon, LV_SIZE_CONTENT);
@@ -236,7 +226,7 @@ static void add_app_list(const char *app_name, int index, const void *img)
     lv_obj_remove_flag(icon, LV_OBJ_FLAG_SCROLLABLE);
     lv_image_set_scale(icon, 150);
 
-    lv_obj_t *label = lv_label_create(panel);
+    lv_obj_t * label = lv_label_create(panel);
     lv_obj_set_width(label, LV_SIZE_CONTENT);
     lv_obj_set_height(label, LV_SIZE_CONTENT);
     lv_obj_set_x(label, 60);

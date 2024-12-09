@@ -31,23 +31,23 @@
  **********************/
 
 static void create_dialog_window();
-static void dialog_close_event_cb(lv_event_t *e);
+static void dialog_close_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 
-static lv_theme_t *theme_original;
+static lv_theme_t * theme_original;
 static bool circular_scroll;
 static bool load_app_list;
 
-static lv_obj_t *dialog_parent;
-static lv_obj_t *dialog_window;
-static lv_obj_t *dialog_panel;
-static lv_obj_t *dialog_title;
-static lv_obj_t *dialog_message;
-static lv_obj_t *dialog_close;
-static lv_obj_t *dialog_close_label;
+static lv_obj_t * dialog_parent;
+static lv_obj_t * dialog_window;
+static lv_obj_t * dialog_panel;
+static lv_obj_t * dialog_title;
+static lv_obj_t * dialog_message;
+static lv_obj_t * dialog_close;
+static lv_obj_t * dialog_close_label;
 
 /**********************
  *  GLOBAL VARIABLES
@@ -70,9 +70,10 @@ void lv_demo_smartwatch(void)
 {
 
     /*Use the simple the to make styling simpler*/
-    lv_display_t *display = lv_display_get_default();
+    lv_display_t * display = lv_display_get_default();
     theme_original = lv_display_get_theme(display);
-    lv_theme_t *theme = lv_theme_default_init(display, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED), true, LV_FONT_DEFAULT);
+    lv_theme_t * theme = lv_theme_default_init(display, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED),
+                                               true, LV_FONT_DEFAULT);
     lv_display_set_theme(display, theme);
 
     lv_smartwatch_set_circular_scroll(true);
@@ -102,13 +103,12 @@ void lv_demo_smartwatch(void)
     lv_demo_smartwatch_home_load(LV_SCR_LOAD_ANIM_FADE_IN, 500, 2500);
 }
 
-void lv_smartwatch_scroll_event(lv_event_t *e)
+void lv_smartwatch_scroll_event(lv_event_t * e)
 {
 
     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t *list = lv_event_get_target(e);
-    if (event_code == LV_EVENT_SCROLL)
-    {
+    lv_obj_t * list = lv_event_get_target(e);
+    if(event_code == LV_EVENT_SCROLL) {
         lv_area_t list_a;
         lv_obj_get_coords(list, &list_a);
         lv_coord_t list_y_center = list_a.y1 + lv_area_get_height(&list_a) / 2;
@@ -116,9 +116,8 @@ void lv_smartwatch_scroll_event(lv_event_t *e)
         lv_coord_t r = lv_obj_get_height(list) * 7 / 10;
         uint32_t i;
         uint32_t child_cnt = lv_obj_get_child_count(list);
-        for (i = 0; i < child_cnt; i++)
-        {
-            lv_obj_t *child = lv_obj_get_child(list, i);
+        for(i = 0; i < child_cnt; i++) {
+            lv_obj_t * child = lv_obj_get_child(list, i);
             lv_area_t child_a;
             lv_obj_get_coords(child, &child_a);
 
@@ -130,12 +129,10 @@ void lv_smartwatch_scroll_event(lv_event_t *e)
             /*Get the x of diff_y on a circle.*/
             lv_coord_t x;
             /*If diff_y is out of the circle use the last point of the circle (the radius)*/
-            if (diff_y >= r)
-            {
+            if(diff_y >= r) {
                 x = r;
             }
-            else
-            {
+            else {
                 /*Use Pythagoras theorem to get x from radius and y*/
                 uint32_t x_sqr = r * r - diff_y * diff_y;
                 lv_sqrt_res_t res;
@@ -153,10 +150,10 @@ void lv_smartwatch_scroll_event(lv_event_t *e)
     }
 }
 
-void lv_demo_smartwatch_show_dialog(const char *title, const char *message)
+void lv_demo_smartwatch_show_dialog(const char * title, const char * message)
 {
-    lv_disp_t *display = lv_display_get_default();
-    lv_obj_t *active_screen = lv_display_get_screen_active(display);
+    lv_disp_t * display = lv_display_get_default();
+    lv_obj_t * active_screen = lv_display_get_screen_active(display);
 
     /*  attach the dialog window to current active screen */
     lv_obj_set_parent(dialog_window, active_screen);
@@ -181,12 +178,11 @@ bool lv_smartwatch_get_load_app_list()
  *   STATIC FUNCTIONS
  **********************/
 
-static void dialog_close_event_cb(lv_event_t *e)
+static void dialog_close_event_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t *target = lv_event_get_target(e);
-    if (event_code == LV_EVENT_CLICKED)
-    {
+    lv_obj_t * target = lv_event_get_target(e);
+    if(event_code == LV_EVENT_CLICKED) {
         lv_obj_add_flag(dialog_window, LV_OBJ_FLAG_HIDDEN);
     }
 }
@@ -200,7 +196,7 @@ static void create_dialog_window()
     lv_obj_set_height(dialog_window, lv_pct(100));
     lv_obj_set_align(dialog_window, LV_ALIGN_CENTER);
     lv_obj_set_scrollbar_mode(dialog_window, LV_SCROLLBAR_MODE_OFF);
-    lv_obj_add_flag(dialog_window, LV_OBJ_FLAG_HIDDEN);           
+    lv_obj_add_flag(dialog_window, LV_OBJ_FLAG_HIDDEN);
     lv_obj_remove_flag(dialog_window, LV_OBJ_FLAG_GESTURE_BUBBLE); /* block gesture events when active */
     lv_obj_set_scroll_dir(dialog_window, LV_DIR_VER);
     lv_obj_set_style_radius(dialog_window, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -260,11 +256,11 @@ static void create_dialog_window()
     lv_obj_set_height(dialog_close, LV_SIZE_CONTENT);
     lv_obj_set_align(dialog_close, LV_ALIGN_BOTTOM_MID);
     lv_obj_add_flag(dialog_close, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
-    lv_obj_remove_flag(dialog_close, LV_OBJ_FLAG_SCROLLABLE);  
+    lv_obj_remove_flag(dialog_close, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_radius(dialog_close, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     dialog_close_label = lv_label_create(dialog_close);
-    lv_obj_set_width(dialog_close_label, LV_SIZE_CONTENT); 
+    lv_obj_set_width(dialog_close_label, LV_SIZE_CONTENT);
     lv_obj_set_height(dialog_close_label, LV_SIZE_CONTENT);
     lv_obj_set_align(dialog_close_label, LV_ALIGN_CENTER);
     lv_label_set_text(dialog_close_label, "Close");

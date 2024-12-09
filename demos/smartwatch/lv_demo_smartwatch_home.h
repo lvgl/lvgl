@@ -49,19 +49,20 @@ void lv_demo_smartwatch_home_load(lv_screen_load_anim_t anim_type, uint32_t time
  * @param watchface   pointer to main object of the watchface
  * @param seconds   pointer to analog seconds object. Used for smooth analog seconds animation
  */
-void lv_smartwatch_register_watchface_cb(const char *name, const lv_image_dsc_t *preview, lv_obj_t **watchface, lv_obj_t **seconds);
+void lv_smartwatch_register_watchface_cb(const char * name, const lv_image_dsc_t * preview, lv_obj_t ** watchface,
+                                         lv_obj_t ** seconds);
 
 /**
  * watchface selected callback
  * @param e event
  */
-void lv_smartwatch_face_selected_cb(lv_event_t *e);
+void lv_smartwatch_face_selected_cb(lv_event_t * e);
 
 /**
  * get pointer to the watchface root object
  * @return pointer to root object
  */
-lv_obj_t *lv_smartwatch_face_get_root();
+lv_obj_t * lv_smartwatch_face_get_root();
 
 /**
  * update the position of animated analog seconds
@@ -73,10 +74,10 @@ void lv_smartwatch_face_update_seconds(int second);
  * function to send watchface events
  * @param e event
  */
-void lv_smartwatch_watchface_events_cb(lv_event_t *e);
+void lv_smartwatch_watchface_events_cb(lv_event_t * e);
 
 /**
- * function to load watchface 
+ * function to load watchface
  * @param index position of the watchface
  * @return whether success or not (unsuccessful means watchface at index was not found)
  */
@@ -87,18 +88,19 @@ bool lv_smartwatch_watchface_load_face(uint16_t index);
  * @param temp    current temp in °C
  * @param icon  weather icon to use (0-7)
  */
-void lv_demo_smartwatch_home_set_weather(int temp, const lv_img_dsc_t *icon);
+void lv_demo_smartwatch_home_set_weather(int temp, const lv_img_dsc_t * icon);
 
 /**
  * update time on the default watchface
  * @param minute   minute
  * @param hour hour
- * @param am_pm 
+ * @param am_pm
  * @param date day of month
  * @param month
  * @param weekday
  */
-void lv_demo_smartwatch_home_set_time(int minute, int hour, const char *am_pm, int date, const char *month, const char *weekday);
+void lv_demo_smartwatch_home_set_time(int minute, int hour, const char * am_pm, int date, const char * month,
+                                      const char * weekday);
 
 /**********************
  *      MACROS

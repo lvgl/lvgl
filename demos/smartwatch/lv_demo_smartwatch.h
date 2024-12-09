@@ -33,7 +33,7 @@ extern "C"
 #error "LV_FONT_MONTSERRAT_48 text support is required. Enable it in lv_conf.h (LV_FONT_MONTSERRAT_48 1)"
 #endif
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < 144 * 1024
-    #warning "It's recommended to have at least 144kB RAM for the smartwatch demo"
+#warning "It's recommended to have at least 144kB RAM for the smartwatch demo"
 #endif
 
 /*********************
@@ -158,13 +158,13 @@ void lv_demo_smartwatch(void);
  * @param title    dialog title
  * @param message    dialog message
  */
-void lv_demo_smartwatch_show_dialog(const char *title, const char *message);
+void lv_demo_smartwatch_show_dialog(const char * title, const char * message);
 
 /**
  * get pointer to the watchface root object
  * @return pointer to root object
  */
-lv_obj_t *lv_smartwatch_face_get_root();
+lv_obj_t * lv_smartwatch_face_get_root();
 
 /**
  * update the position of animated analog seconds
@@ -176,7 +176,7 @@ void lv_smartwatch_face_update_seconds(int second);
  * function that handles animation of circular scrolling
  * @param e    event
  */
-void lv_smartwatch_scroll_event(lv_event_t *e);
+void lv_smartwatch_scroll_event(lv_event_t * e);
 
 /**
  * set whether to enable circular scroll on lists
@@ -210,7 +210,7 @@ void lv_smartwatch_app_close(void);
 void lv_demo_smartwatch_home_load(lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay);
 
 /**
- * function to load watchface 
+ * function to load watchface
  * @param index position of the watchface
  * @return whether success or not (unsuccessful means watchface at index was not found)
  */
@@ -220,18 +220,19 @@ bool lv_smartwatch_watchface_load_face(uint16_t index);
  * update time on the default watchface
  * @param minute   minute
  * @param hour hour
- * @param am_pm 
+ * @param am_pm
  * @param date day of month
  * @param month
  * @param weekday
  */
-void lv_demo_smartwatch_home_set_time(int minute, int hour, const char *am_pm, int date, const char *month, const char *weekday);
+void lv_demo_smartwatch_home_set_time(int minute, int hour, const char * am_pm, int date, const char * month,
+                                      const char * weekday);
 
 /**
  * function to send watchface events
  * @param e event
  */
-void lv_smartwatch_watchface_events_cb(lv_event_t *e);
+void lv_smartwatch_watchface_events_cb(lv_event_t * e);
 
 /**
  * Register external watchfaces
@@ -240,7 +241,8 @@ void lv_smartwatch_watchface_events_cb(lv_event_t *e);
  * @param watchface   pointer to main object of the watchface
  * @param seconds   pointer to analog seconds object. Used for smooth analog seconds animation
  */
-void lv_smartwatch_register_watchface_cb(const char *name, const lv_image_dsc_t *preview, lv_obj_t **watchface, lv_obj_t **seconds);
+void lv_smartwatch_register_watchface_cb(const char * name, const lv_image_dsc_t * preview, lv_obj_t ** watchface,
+                                         lv_obj_t ** seconds);
 
 /**
  * Register external apps
@@ -248,7 +250,7 @@ void lv_smartwatch_register_watchface_cb(const char *name, const lv_image_dsc_t 
  * @param icon    launcher icon of the app (64x64)
  * @param entry   pointer to main object of the app
  */
-void lv_smartwatch_register_app_cb(const char *name, const lv_image_dsc_t *icon, lv_obj_t **entry);
+void lv_smartwatch_register_app_cb(const char * name, const lv_image_dsc_t * icon, lv_obj_t ** entry);
 
 /**
  * load the app list screen
@@ -269,7 +271,7 @@ void lv_demo_smartwatch_clear_notifications();
  * @param message  the notification message preview
  * @param index position of the message that will be returned when clicked
  */
-void lv_demo_smartwatch_add_notification(int app_id, const char *message, int index);
+void lv_demo_smartwatch_add_notification(int app_id, const char * message, int index);
 
 /**
  * add a notification to the list
@@ -277,7 +279,7 @@ void lv_demo_smartwatch_add_notification(int app_id, const char *message, int in
  * @param message  the notification message content
  * @param time the notification time
  */
-void lv_demo_smartwatch_show_notification(int app_id, const char *message, const char *time);
+void lv_demo_smartwatch_show_notification(int app_id, const char * message, const char * time);
 
 /**
  * set the callback funtion when a notification is clicked
@@ -331,7 +333,7 @@ void lv_demo_smartwatch_set_music_control_cb(lv_smartwatch_music_control_cb_t cb
  * @param minute    last update minute of the weather
  * @param city  the current city of the weather
  */
-void lv_demo_smartwatch_set_weather(int temp, uint8_t icon, bool day, int hour, int minute, const char *city);
+void lv_demo_smartwatch_set_weather(int temp, uint8_t icon, bool day, int hour, int minute, const char * city);
 
 /**
  * clear daily forecast list
@@ -389,7 +391,7 @@ void lv_demo_smartwatch_qr_list_clear();
  * @param id    determines the icon and name of the qr from inbuilt list. Value (0-9)
  * @param link   link to be added as a qr code
  */
-void lv_demo_smartwatch_qr_list_add(uint8_t id, const char *link);
+void lv_demo_smartwatch_qr_list_add(uint8_t id, const char * link);
 
 /**
  * load the easter egg screen
@@ -409,7 +411,8 @@ void lv_demo_smartwatch_easter_egg_load(lv_screen_load_anim_t anim_type, uint32_
  * @param max max value for the slider
  * @return pointer to slider object
  */
-lv_obj_t *lv_smartwatch_settings_add_slider(uint16_t id, const char *name, const lv_img_dsc_t *img, int32_t value, int32_t min, int32_t max);
+lv_obj_t * lv_smartwatch_settings_add_slider(uint16_t id, const char * name, const lv_img_dsc_t * img, int32_t value,
+                                             int32_t min, int32_t max);
 
 /**
  * Add a toggle switch to the main settings list
@@ -419,7 +422,7 @@ lv_obj_t *lv_smartwatch_settings_add_slider(uint16_t id, const char *name, const
  * @param state default state for the switch
  * @return pointer to switch object
  */
-lv_obj_t *lv_smartwatch_settings_add_toggle(uint16_t id, const char *name, const lv_img_dsc_t *img, bool state);
+lv_obj_t * lv_smartwatch_settings_add_toggle(uint16_t id, const char * name, const lv_img_dsc_t * img, bool state);
 
 /**
  * Add a dropdowwn to the main settings list
@@ -429,7 +432,8 @@ lv_obj_t *lv_smartwatch_settings_add_toggle(uint16_t id, const char *name, const
  * @param options the dropdown options
  * @return pointer to dropdown object
  */
-lv_obj_t *lv_smartwatch_settings_add_dropdown(uint16_t id, const char *name, const lv_img_dsc_t *img, const char *options);
+lv_obj_t * lv_smartwatch_settings_add_dropdown(uint16_t id, const char * name, const lv_img_dsc_t * img,
+                                               const char * options);
 
 /**
  * Add a label to the main settings list
@@ -438,7 +442,7 @@ lv_obj_t *lv_smartwatch_settings_add_dropdown(uint16_t id, const char *name, con
  * @param img icon for the label
  * @return pointer to label object
  */
-lv_obj_t *lv_smartwatch_settings_add_label(uint16_t id, const char *name, const lv_img_dsc_t *img);
+lv_obj_t * lv_smartwatch_settings_add_label(uint16_t id, const char * name, const lv_img_dsc_t * img);
 
 
 /**********************
