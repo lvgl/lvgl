@@ -74,6 +74,8 @@ void lv_demo_smartwatch_weather_create(void)
 {
       create_screen_weather();
 
+
+      /* add demo weather parameters */
       lv_demo_smartwatch_set_weather(22, 0, true, 14, 24, "Nairobi");
 
       lv_demo_smartwatch_weather_daily_clear();

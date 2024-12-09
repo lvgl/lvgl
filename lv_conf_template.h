@@ -1266,6 +1266,9 @@
 	#define LV_DEMO_EBIKE_PORTRAIT  0    /*0: for 480x270..480x320, 1: for 480x800..720x1280*/
 #endif
 
+/* Smart watch demo */
+#define LV_USE_DEMO_SMARTWATCH      0
+
 /*--END OF LV_CONF_H--*/
 
 #endif /*LV_CONF_H*/

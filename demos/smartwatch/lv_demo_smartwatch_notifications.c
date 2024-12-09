@@ -76,6 +76,8 @@ void lv_demo_smartwatch_notifications_create(void)
 {
       create_screen_notifications();
 
+
+      /* add notifications demo */
       lv_demo_smartwatch_add_notification(3, "Sample Message test", 3);
       lv_demo_smartwatch_add_notification(0x0b, "Sample Message test", 0x0B);
       lv_demo_smartwatch_add_notification(8, "Sample Message test", 8);

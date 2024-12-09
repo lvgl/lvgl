@@ -4094,6 +4094,15 @@
 	#endif
 #endif
 
+/* Smart watch demo */
+#ifndef LV_USE_DEMO_SMARTWATCH
+    #ifdef CONFIG_LV_USE_DEMO_SMARTWATCH
+        #define LV_USE_DEMO_SMARTWATCH CONFIG_LV_USE_DEMO_SMARTWATCH
+    #else
+        #define LV_USE_DEMO_SMARTWATCH      0
+    #endif
+#endif
+
 
 
 /*----------------------------------

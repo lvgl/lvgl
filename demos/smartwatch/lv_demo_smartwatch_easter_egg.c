@@ -111,7 +111,8 @@ static void set_obj_random_pos_angle(lv_obj_t *obj)
             return;
       }
 
-      lv_coord_t x_target, y_target;
+      lv_coord_t x_target;
+      lv_coord_t y_target;
       uint64_t a_target;
       get_random_position(&x_target, &y_target, &a_target);
 
@@ -137,7 +138,8 @@ static void set_obj_pos_angle(lv_obj_t *obj, lv_coord_t x, lv_coord_t y, uint64_
  */
 static void animate_drift(lv_obj_t *img)
 {
-      lv_coord_t x_target, y_target;
+      lv_coord_t x_target;
+      lv_coord_t y_target;
       uint64_t a_target;
       get_random_position(&x_target, &y_target, &a_target);
 
