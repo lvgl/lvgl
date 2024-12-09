@@ -143,9 +143,6 @@ void lv_smartwatch_scroll_event(lv_event_t * e)
             /*Translate the item by the calculated X coordinate*/
             lv_obj_set_style_translate_x(child, circular_scroll ? x : 0, 0);
 
-            /* Use some opacity with larger translations */
-            // lv_opa_t opa = lv_map(x, 0, r, LV_OPA_TRANSP, LV_OPA_COVER);
-            // lv_obj_set_style_opa(child, LV_OPA_COVER - opa, 0);
         }
     }
 }

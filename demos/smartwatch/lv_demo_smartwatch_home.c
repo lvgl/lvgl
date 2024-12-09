@@ -126,7 +126,6 @@ void lv_smartwatch_watchface_events_cb(lv_event_t * e)
         if(active_screen != home_screen) {
             return;
         }
-        // home_screen = clock_screen;
         lv_screen_load_anim(face_select, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, false);
     }
 
@@ -260,7 +259,6 @@ static void lv_smartwatch_add_watchface(const char * name, const lv_image_dsc_t 
     lv_obj_set_height(ui_faceItem, 180);
     lv_obj_set_align(ui_faceItem, LV_ALIGN_CENTER);
     lv_obj_remove_flag(ui_faceItem, LV_OBJ_FLAG_SCROLLABLE);
-    // lv_obj_add_flag(ui_faceItem, LV_OBJ_FLAG_SNAPPABLE);
     lv_obj_remove_flag(ui_faceItem, LV_OBJ_FLAG_SCROLL_ONE);
     lv_obj_set_style_radius(ui_faceItem, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_faceItem, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -411,9 +409,7 @@ static void create_screen_home()
     lv_obj_set_align(face_select, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(face_select, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(face_select, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    // lv_obj_remove_flag(face_select, LV_OBJ_FLAG_SNAPPABLE);
     lv_obj_set_scrollbar_mode(face_select, LV_SCROLLBAR_MODE_OFF);
-    // lv_obj_set_scroll_snap_x(face_select, LV_SCROLL_SNAP_CENTER);
     lv_obj_set_style_radius(face_select, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(face_select, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(face_select, 255, LV_PART_MAIN | LV_STATE_DEFAULT);

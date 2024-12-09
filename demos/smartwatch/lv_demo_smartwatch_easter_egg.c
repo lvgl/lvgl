@@ -66,11 +66,6 @@ void lv_demo_smartwatch_easter_egg_create(void)
 
 void lv_demo_smartwatch_easter_egg_load(lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay)
 {
-    /* set random position and angle when screen loading */
-    // set_obj_random_pos_angle(lvgl_logo_black);
-    // set_obj_random_pos_angle(lvgl_logo_blue);
-    // set_obj_random_pos_angle(lvgl_logo_green);
-    // set_obj_random_pos_angle(lvgl_logo_red);
 
     /* set positions and angle on load */
     set_obj_pos_angle(lvgl_logo_black, -88, 88, 2700);
@@ -217,19 +212,15 @@ static void start_drift_animation()
     /* Create a timer for each image to trigger the drift animation repeatedly */
     drift_timer_black = lv_timer_create(drift_timer_cb, 3000, lvgl_logo_black);
     lv_timer_set_repeat_count(drift_timer_black, -1);
-    // drift_timer_cb(drift_timer_black); // Trigger first drift
 
     drift_timer_blue = lv_timer_create(drift_timer_cb, 3000, lvgl_logo_blue);
     lv_timer_set_repeat_count(drift_timer_blue, -1);
-    // drift_timer_cb(drift_timer_blue);
 
     drift_timer_green = lv_timer_create(drift_timer_cb, 3000, lvgl_logo_green);
     lv_timer_set_repeat_count(drift_timer_green, -1);
-    // drift_timer_cb(drift_timer_green);
 
     drift_timer_red = lv_timer_create(drift_timer_cb, 3000, lvgl_logo_red);
     lv_timer_set_repeat_count(drift_timer_red, -1);
-    // drift_timer_cb(drift_timer_red);
 }
 
 /**
