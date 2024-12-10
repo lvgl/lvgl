@@ -791,7 +791,7 @@
 /* File system interfaces for common APIs */
 
 /** Setting a default driver letter allows skipping the driver prefix in filepaths. */
-#define LV_FS_DEFAULT_DRIVE_LETTER '\0'
+#define LV_FS_DEFAULT_DRIVER_LETTER '\0'
 
 /** API for fopen, fread, etc. */
 #define LV_USE_FS_STDIO 0
@@ -939,7 +939,7 @@
 #if LV_USE_FFMPEG
     /** Dump input information to stderr */
     #define LV_FFMPEG_DUMP_FORMAT 0
-    /** Use lvgl file path in FFmpeg Player widget 
+    /** Use lvgl file path in FFmpeg Player widget
      *  You won't be able to open URLs after enabling this feature.
      *  Note that FFmpeg image decoder will always use lvgl file system. */
     #define LV_FFMPEG_PLAYER_USE_LV_FS 0
