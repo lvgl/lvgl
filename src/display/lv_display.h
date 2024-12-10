@@ -569,6 +569,24 @@ lv_draw_buf_t * lv_display_get_buf_active(lv_display_t * disp);
  */
 void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area);
 
+/**
+ * Get the size of the draw buffers
+ * @param disp      pointer to a display
+ * @return          the size of the draw buffer in bytes for valid display, 0 otherwise
+ */
+uint32_t lv_display_get_draw_buf_size(lv_display_t * disp);
+
+/**
+ * Get the size of the invalidated draw buffer. Can be used in the flush callback
+ * to get the number of bytes used in the current render buffer.
+ * @param disp      pointer to a display
+ * @param width     the width of the invalidated area
+ * @param height    the height of the invalidated area
+ * @return          the size of the invalidated draw buffer in bytes, not accounting for
+ *                  any preceeding palette information for a valid display, 0 otherwise
+ */
+uint32_t lv_display_get_invalidated_draw_buf_size(lv_display_t * disp, uint32_t width, uint32_t height);
+
 /**********************
  *      MACROS
  **********************/
