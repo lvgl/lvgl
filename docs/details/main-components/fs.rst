@@ -13,7 +13,7 @@ under :ref:`lv_fs_identifier_letters`.
 .. note::
 
     If you want to skip the drive-letter prefix in Unix-like paths, you can use the
-    :c:macro:`LV_FS_DEFAULT_DRIVE_LETTER` config parameter.
+    :c:macro:`LV_FS_DEFAULT_DRIVER_LETTER` config parameter.
 
 
 

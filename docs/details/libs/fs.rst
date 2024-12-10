@@ -33,10 +33,10 @@ files using that driver letter. E.g. ``"S:path/to/file.txt"``.
 Working with common prefixes
 """"""""""""""""""""""""""""
 
-A **default driver letter** can be set by ``LV_FS_DEFAULT_DRIVE_LETTER``,
+A **default driver letter** can be set by ``LV_FS_DEFAULT_DRIVER_LETTER``,
 which allows skipping the drive prefix in file paths.
 
-For example if ``LV_FS_DEFAULT_DRIVE_LETTER`` is set the ``'S'`` *"path/to/file.txt"* will mean *"S:path/to/file.txt"*.
+For example if ``LV_FS_DEFAULT_DRIVER_LETTER`` is set the ``'S'`` *"path/to/file.txt"* will mean *"S:path/to/file.txt"*.
 
 This feature is useful if you have only a single driver and don't want to bother with LVGL's driver layer in the file paths.
 It also helps to use a unified path with LVGL's file system and normal file systems.
