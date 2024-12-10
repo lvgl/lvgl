@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_demo_music_main.c
  *
  */

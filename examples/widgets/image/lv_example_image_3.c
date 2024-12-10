@@ -1,4 +1,4 @@
-﻿#include "../../lv_examples.h"
+#include "../../lv_examples.h"
 #if LV_USE_IMAGE && LV_BUILD_EXAMPLES
 
 static void set_angle(void * img, int32_t v)
