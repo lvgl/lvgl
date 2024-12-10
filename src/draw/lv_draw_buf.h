@@ -67,7 +67,7 @@ LV_EXPORT_CONST_INT(LV_STRIDE_AUTO);
 #define LV_DRAW_BUF_INIT_STATIC(name) \
     do { \
         lv_image_header_t * header = &name.header; \
-        lv_draw_buf_init(&name, header->w, header->h, header->cf, header->stride, buf_##name, sizeof(buf_##name)); \
+        lv_draw_buf_init(&name, header->w, header->h, (lv_color_format_t)header->cf, header->stride, buf_##name, sizeof(buf_##name)); \
         lv_draw_buf_set_flag(&name, LV_IMAGE_FLAGS_MODIFIABLE); \
     } while(0)
 
@@ -129,6 +129,9 @@ void lv_draw_buf_handlers_init(lv_draw_buf_handlers_t * handlers,
  * @return                  pointer to the struct of handlers
  */
 lv_draw_buf_handlers_t * lv_draw_buf_get_handlers(void);
+lv_draw_buf_handlers_t * lv_draw_buf_get_font_handlers(void);
+lv_draw_buf_handlers_t * lv_draw_buf_get_image_handlers(void);
+
 
 /**
  * Align the address of a buffer. The buffer needs to be large enough for the real data after alignment
@@ -304,7 +307,7 @@ lv_result_t lv_draw_buf_adjust_stride(lv_draw_buf_t * src, uint32_t stride);
  */
 lv_result_t lv_draw_buf_premultiply(lv_draw_buf_t * draw_buf);
 
-bool lv_draw_buf_has_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
+bool lv_draw_buf_has_flag(const lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
 
 void lv_draw_buf_set_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag);
 

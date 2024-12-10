@@ -38,12 +38,6 @@ struct lv_fs_path_ex_t {
     uint32_t size;
 };
 
-struct lv_fs_dir_t {
-    void * dir_d;
-    lv_fs_drv_t * drv;
-};
-
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

@@ -122,7 +122,7 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
         lv_display_set_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res,
                                LV_SDL_RENDER_MODE);
     }
-#else /*/*LV_USE_DRAW_SDL == 1*/
+#else /*LV_USE_DRAW_SDL == 1*/
     /*It will render directly to default Texture, so the buffer is not used, so just set something*/
     static lv_draw_buf_t draw_buf;
     static uint8_t dummy_buf; /*It won't be used as it will render to the SDL textures directly*/
@@ -166,7 +166,7 @@ lv_display_t * lv_sdl_get_disp_from_win_id(uint32_t win_id)
 
     while(disp) {
         lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-        if(SDL_GetWindowID(dsc->window) == win_id) {
+        if(dsc != NULL && SDL_GetWindowID(dsc->window) == win_id) {
             return disp;
         }
         disp = lv_display_get_next(disp);

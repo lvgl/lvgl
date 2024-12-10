@@ -16,6 +16,8 @@ extern "C" {
 
 #include "lv_draw_sw_mask.h"
 
+#if LV_DRAW_SW_COMPLEX
+
 /*********************
  *      DEFINES
  *********************/
@@ -145,6 +147,8 @@ void lv_draw_sw_mask_cleanup(void);
 /**********************
  *      MACROS
  **********************/
+
+#endif  /*LV_DRAW_SW_COMPLEX*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

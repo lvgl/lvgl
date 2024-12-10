@@ -15,7 +15,8 @@
 
 #include "lv_draw_pxp.h"
 
-#if LV_USE_DRAW_PXP
+#if LV_USE_PXP
+#if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
 #include "lv_pxp_cfg.h"
 #include "lv_pxp_utils.h"
 
@@ -82,6 +83,9 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u);
 
 void lv_draw_pxp_init(void)
 {
+    lv_pxp_init();
+
+#if LV_USE_DRAW_PXP
     lv_draw_buf_pxp_init_handlers();
 
     lv_draw_pxp_unit_t * draw_pxp_unit = lv_draw_create_unit(sizeof(lv_draw_pxp_unit_t));
@@ -89,11 +93,10 @@ void lv_draw_pxp_init(void)
     draw_pxp_unit->base_unit.dispatch_cb = _pxp_dispatch;
     draw_pxp_unit->base_unit.delete_cb = _pxp_delete;
 
-    lv_pxp_init();
-
 #if LV_USE_PXP_DRAW_THREAD
     lv_thread_init(&draw_pxp_unit->thread, LV_THREAD_PRIO_HIGH, _pxp_render_thread_cb, 2 * 1024, draw_pxp_unit);
 #endif
+#endif /*LV_USE_DRAW_PXP*/
 }
 
 void lv_draw_pxp_deinit(void)
@@ -107,19 +110,26 @@ void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width
 {
     lv_pxp_reset();
 
-    /* convert rotation angle */
+    /* Convert rotation angle
+     * To be in sync with CPU, the received angle is counterclockwise
+     * and the PXP constants are for clockwise rotation
+     *
+     *    counterclockwise          clockwise
+     * LV_DISPLAY_ROTATION_90  -> kPXP_Rotate270
+     * LV_DISPLAY_ROTATION_270 -> kPXP_Rotate90
+     */
     pxp_rotate_degree_t pxp_rotation;
     switch(rotation) {
         case LV_DISPLAY_ROTATION_0:
             pxp_rotation = kPXP_Rotate0;
             break;
-        case LV_DISPLAY_ROTATION_90:
+        case LV_DISPLAY_ROTATION_270:
             pxp_rotation = kPXP_Rotate90;
             break;
         case LV_DISPLAY_ROTATION_180:
             pxp_rotation = kPXP_Rotate180;
             break;
-        case LV_DISPLAY_ROTATION_270:
+        case LV_DISPLAY_ROTATION_90:
             pxp_rotation = kPXP_Rotate270;
             break;
         default:
@@ -159,7 +169,7 @@ void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
+#if LV_USE_DRAW_PXP
 static inline bool _pxp_src_cf_supported(lv_color_format_t cf)
 {
     bool is_cf_supported = false;
@@ -321,8 +331,7 @@ static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(t == NULL || t->preferred_draw_unit_id != DRAW_UNIT_ID_PXP)
         return LV_DRAW_UNIT_IDLE;
 
-    void * buf = lv_draw_layer_alloc_buf(layer);
-    if(buf == NULL)
+    if(lv_draw_layer_alloc_buf(layer) == NULL)
         return LV_DRAW_UNIT_IDLE;
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
@@ -484,5 +493,6 @@ static void _pxp_render_thread_cb(void * ptr)
     LV_LOG_INFO("Exit PXP draw thread.");
 }
 #endif
-
 #endif /*LV_USE_DRAW_PXP*/
+#endif /*LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP*/
+#endif /*LV_USE_PXP*/

@@ -1,4 +1,4 @@
-# Kconfig file for LVGL v9.2.0
+# Kconfig file for LVGL v9.2.2
 
 menu "LVGL configuration"
 
@@ -162,6 +162,15 @@ menu "LVGL configuration"
 			string "Custom OS include header"
 			default "stdint.h"
 			depends on LV_OS_CUSTOM
+
+        config LV_USE_FREERTOS_TASK_NOTIFY
+            bool "Use RTOS task with a direct notification for synchronization"
+            default y
+            depends on LV_OS_FREERTOS
+        help
+            Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
+            than unblocking a task using an intermediary object such as a binary semaphore.
+            RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
 	endmenu
 
 	menu "Rendering Configuration"
@@ -363,8 +372,18 @@ menu "LVGL configuration"
 			depends on LV_USE_DRAW_VGLITE
 			default n
 
+		config LV_USE_PXP
+		bool "Use NXP's PXP on iMX RTxxx platforms"
+		default n
+
 		config LV_USE_DRAW_PXP
-			bool "Use NXP's PXP on iMX RTxxx platforms"
+		bool "Use PXP for drawing"
+			depends on LV_USE_PXP
+			default y
+
+		config LV_USE_ROTATE_PXP
+			bool "Use PXP to rotate display"
+			depends on LV_USE_PXP
 			default n
 
 		config LV_USE_PXP_DRAW_THREAD
@@ -1364,7 +1383,7 @@ menu "LVGL configuration"
 		config LV_USE_MEM_MONITOR
 			bool "Show the used memory and the memory fragmentation"
 			default n
-			depends on LV_STDLIB_BUILTIN && LV_USE_SYSMON
+			depends on LV_USE_BUILTIN_MALLOC && LV_USE_SYSMON
 
 		choice
 			prompt "Memory monitor position"
@@ -1464,6 +1483,16 @@ menu "LVGL configuration"
 			default y
 			help
 				This can save some memory, but not much. After the quick access bar is created, it can be hidden by clicking the button at the top left corner of the browsing area, which is very useful for small screen devices.
+
+		config LVGL_VERSION_MAJOR
+			int
+			default 9 # LVGL_VERSION_MAJOR
+		config LVGL_VERSION_MINOR
+			int
+			default 2 # LVGL_VERSION_MINOR
+		config LVGL_VERSION_PATCH
+			int
+			default 2 # LVGL_VERSION_PATCH
 	endmenu
 
 	menu "Devices"

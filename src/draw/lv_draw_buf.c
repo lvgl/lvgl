@@ -83,6 +83,16 @@ lv_draw_buf_handlers_t * lv_draw_buf_get_handlers(void)
     return &default_handlers;
 }
 
+lv_draw_buf_handlers_t * lv_draw_buf_get_font_handlers(void)
+{
+    return &font_draw_buf_handlers;
+}
+
+lv_draw_buf_handlers_t * lv_draw_buf_get_image_handlers(void)
+{
+    return &image_cache_draw_buf_handlers;
+}
+
 uint32_t lv_draw_buf_width_to_stride(uint32_t w, lv_color_format_t color_format)
 {
     return lv_draw_buf_width_to_stride_ex(&default_handlers, w, color_format);
@@ -536,7 +546,7 @@ void lv_draw_buf_set_palette(lv_draw_buf_t * draw_buf, uint8_t index, lv_color32
     palette[index] = color;
 }
 
-bool lv_draw_buf_has_flag(lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
+bool lv_draw_buf_has_flag(const lv_draw_buf_t * draw_buf, lv_image_flags_t flag)
 {
     return draw_buf->header.flags & flag;
 }

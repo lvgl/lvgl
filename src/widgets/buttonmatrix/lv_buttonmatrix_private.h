@@ -30,7 +30,7 @@ extern "C" {
 /** Data of button matrix */
 struct lv_buttonmatrix_t {
     lv_obj_t obj;
-    const char ** map_p;                 /**< Pointer to the current map */
+    const char * const * map_p;          /**< Pointer to the current map */
     lv_area_t * button_areas;            /**< Array of areas of buttons */
     lv_buttonmatrix_ctrl_t * ctrl_bits;  /**< Array of control bytes */
     uint32_t btn_cnt;                    /**< Number of button in 'map_p'(Handled by the library) */

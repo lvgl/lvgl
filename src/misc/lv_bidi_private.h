@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 
 #include "lv_bidi.h"
+#if LV_USE_BIDI
 
 /*********************
  *      DEFINES
@@ -90,6 +91,8 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
 /**********************
  *      MACROS
  **********************/
+
+#endif /*LV_USE_BIDI*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

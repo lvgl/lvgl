@@ -442,7 +442,7 @@ int32_t lv_spangroup_get_expand_height(lv_obj_t * obj, int32_t width)
 
     /* coords of draw span-txt */
     lv_point_t txt_pos;
-    lv_point_set(&txt_pos, 0, indent); /* first line need add indent */
+    lv_point_set(&txt_pos, indent, 0); /* first line need add indent */
 
     lv_span_t * cur_span = lv_ll_get_head(&spans->child_ll);
     const char * cur_txt = cur_span->txt;

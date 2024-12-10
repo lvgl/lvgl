@@ -291,16 +291,14 @@ static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(t == NULL)
         return LV_DRAW_UNIT_IDLE;
 
-    if(lv_draw_get_unit_count() > 1) {
-        /* Let the SW unit to draw this task. */
-        if(t->preferred_draw_unit_id != DRAW_UNIT_ID_VGLITE)
+    if(t->preferred_draw_unit_id != DRAW_UNIT_ID_VGLITE) {
+        /* Let the preferred known unit to draw this task. */
+        if(t->preferred_draw_unit_id != LV_DRAW_UNIT_NONE) {
             return LV_DRAW_UNIT_IDLE;
-    }
-    else {
-        /* Fake unsupported tasks as ready. */
-        if(t->preferred_draw_unit_id != DRAW_UNIT_ID_VGLITE) {
+        }
+        else {
+            /* Fake unsupported tasks as ready. */
             t->state = LV_DRAW_TASK_STATE_READY;
-
             /* Request a new dispatching as it can get a new task. */
             lv_draw_dispatch_request();
 
@@ -308,8 +306,7 @@ static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         }
     }
 
-    void * buf = lv_draw_layer_alloc_buf(layer);
-    if(buf == NULL)
+    if(lv_draw_layer_alloc_buf(layer) == NULL)
         return LV_DRAW_UNIT_IDLE;
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
@@ -340,8 +337,12 @@ static int32_t _vglite_wait_for_finish(lv_draw_unit_t * draw_unit)
     lv_draw_vglite_unit_t * draw_vglite_unit = (lv_draw_vglite_unit_t *) draw_unit;
     draw_vglite_unit->wait_for_finish = true;
 
+    /* Signal draw unit to finish its tasks and return READY state after completion. */
     if(draw_vglite_unit->inited)
         lv_thread_sync_signal(&draw_vglite_unit->sync);
+
+    /* Wait for finish now. */
+    lv_draw_dispatch_wait_for_request();
 
     return 1;
 }

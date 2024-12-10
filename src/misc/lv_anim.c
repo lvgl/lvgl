@@ -138,7 +138,7 @@ uint32_t lv_anim_get_playtime(const lv_anim_t * a)
     if(repeat_cnt < 1) repeat_cnt = 1;
 
     uint32_t playtime = a->repeat_delay + a->duration + a->playback_delay + a->playback_duration;
-    playtime = playtime * a->repeat_cnt;
+    playtime = playtime * repeat_cnt;
     return playtime;
 }
 

@@ -179,8 +179,7 @@ void lv_draw_dispatch(void)
     while(disp) {
         lv_layer_t * layer = disp->layer_head;
         while(layer) {
-            /* If there are no tasks in the layer, skip it */
-            if(layer->draw_task_head && lv_draw_dispatch_layer(disp, layer))
+            if(lv_draw_dispatch_layer(disp, layer))
                 task_dispatched = true;
             layer = layer->next;
         }
@@ -311,6 +310,41 @@ uint32_t lv_draw_get_unit_count(void)
 lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id)
 {
     LV_PROFILER_BEGIN;
+
+    /* If there is only 1 draw unit the task can be consumed linearly as
+     * they are added in the correct order. However, it can happen that
+     * there is a `LV_DRAW_TASK_TYPE_LAYER` which can be blended only when
+     * all its tasks are ready. As other areas might be on top of that
+     * layer-to-blend don't skip it. Instead stop there, so that the
+     * draw tasks of that layer can be consumed and can be finished.
+     * After that this layer-to-blenf will have `LV_DRAW_TASK_STATE_QUEUED`
+     * so it can be blended normally.*/
+    if(_draw_info.unit_cnt <= 1) {
+        lv_draw_task_t * t = layer->draw_task_head;
+        while(t) {
+            /*Mark unsupported draw tasks as ready as no one else will consume them*/
+            if(t->state == LV_DRAW_TASK_STATE_QUEUED &&
+               t->preferred_draw_unit_id != LV_DRAW_UNIT_NONE &&
+               t->preferred_draw_unit_id != draw_unit_id) {
+                t->state = LV_DRAW_TASK_STATE_READY;
+            }
+            /*Not queued yet, leave this layer while the first task will be queued*/
+            else if(t->state != LV_DRAW_TASK_STATE_QUEUED) {
+                t = NULL;
+                break;
+            }
+            /*It's a supported and queued task, process it*/
+            else {
+                break;
+            }
+            t = t->next;
+        }
+        LV_PROFILER_END;
+        return t;
+    }
+
+    /*Handle the case of multiply draw units*/
+
     /*If the first task is screen sized, there cannot be independent areas*/
     if(layer->draw_task_head) {
         int32_t hor_res = lv_display_get_horizontal_resolution(lv_refr_get_disp_refreshing());

@@ -306,7 +306,7 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
     lv_state_t new_state = obj->state | state;
     if(obj->state != new_state) {
 
-        if(new_state & LV_STATE_DISABLED) {
+        if(new_state & ~obj->state & LV_STATE_DISABLED) {
             lv_indev_reset(NULL, obj);
         }
 

@@ -36,7 +36,9 @@ PXP accelerator
 Basic configuration:
 ^^^^^^^^^^^^^^^^^^^^
 
-- Select NXP PXP engine in "lv_conf.h": Set :c:macro:`LV_USE_DRAW_PXP` to `1`.
+- Select NXP PXP engine in "lv_conf.h": Set :c:macro:`LV_USE_PXP` to `1`.
+- In order to use PXP as a draw unit, select in "lv_conf.h": Set :c:macro:`LV_USE_DRAW_PXP` to `1`.
+- In order to use PXP to rotate the screen, select in "lv_conf.h": Set :c:macro:`LV_USE_ROTATE_PXP` to `1`.
 - Enable PXP asserts in "lv_conf.h": Set :c:macro: `LV_USE_PXP_ASSERT` to `1`.
   There are few PXP assertions that can stop the program execution in case the
   c:macro: `LV_ASSERT_HANDLER` is set to `while(1);` (Halt by default). Else,
@@ -48,16 +50,16 @@ Basic initialization:
 ^^^^^^^^^^^^^^^^^^^^^
 
 PXP draw initialization is done automatically in :cpp:func:`lv_init()` once the
-PXP is enabled, no user code is required:
+PXP is enabled as a draw unit or to rotate the screen, no user code is required:
 
 .. code:: c
 
-  #if LV_USE_DRAW_PXP
+  #if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
     lv_draw_pxp_init();
   #endif
 
 During PXP initialization, a new draw unit `lv_draw_pxp_unit_t` will be created
-with the additional callbacks:
+with the additional callbacks, if :c:macro:`LV_USE_DRAW_PXP` is set to `1`:
 
 .. code:: c
 
