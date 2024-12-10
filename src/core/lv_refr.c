@@ -99,6 +99,7 @@ void lv_refr_now(lv_display_t * disp)
 
 void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
 {
+    LV_PROFILER_REFR_BEGIN;
     lv_area_t clip_area_ori = layer->_clip_area;
     lv_area_t clip_coords_for_obj;
 
@@ -108,7 +109,10 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     int32_t ext_draw_size = lv_obj_get_ext_draw_size(obj);
     lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
 
-    if(!lv_area_intersect(&clip_coords_for_obj, &clip_area_ori, &obj_coords_ext)) return;
+    if(!lv_area_intersect(&clip_coords_for_obj, &clip_area_ori, &obj_coords_ext)) {
+        LV_PROFILER_REFR_END;
+        return;
+    }
     /*If the object is visible on the current clip area*/
     layer->_clip_area = clip_coords_for_obj;
 
@@ -252,6 +256,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     }
 
     layer->_clip_area = clip_area_ori;
+    LV_PROFILER_REFR_END;
 }
 
 void lv_inv_area(lv_display_t * disp, const lv_area_t * area_p)
@@ -1023,15 +1028,18 @@ static bool obj_get_matrix(lv_obj_t * obj, lv_matrix_t * matrix)
 
 static void refr_obj_matrix(lv_layer_t * layer, lv_obj_t * obj)
 {
+    LV_PROFILER_REFR_BEGIN;
     lv_matrix_t obj_matrix;
     if(!obj_get_matrix(obj, &obj_matrix)) {
         /* NOT draw if obj matrix is not available */
+        LV_PROFILER_REFR_END;
         return;
     }
 
     lv_matrix_t matrix_inv;
     if(!lv_matrix_inverse(&matrix_inv, &obj_matrix)) {
         /* NOT draw if matrix is not invertible */
+        LV_PROFILER_REFR_END;
         return;
     }
 
@@ -1060,6 +1068,7 @@ static void refr_obj_matrix(lv_layer_t * layer, lv_obj_t * obj)
     layer->matrix = ori_matrix;
     /* restore clip area */
     layer->_clip_area = clip_area_ori;
+    LV_PROFILER_REFR_END;
 }
 
 static bool refr_check_obj_clip_overflow(lv_layer_t * layer, lv_obj_t * obj)

@@ -1025,6 +1025,9 @@
 
     /*Enable cache profiler*/
     #define LV_PROFILER_CACHE 1
+
+    /*Enable event profiler*/
+    #define LV_PROFILER_EVENT 1
 #endif
 
 /** 1: Enable Monkey test */

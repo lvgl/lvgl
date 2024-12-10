@@ -322,7 +322,11 @@ static bool lv_timer_exec(lv_timer_t * timer)
         timer->last_run = lv_tick_get();
         LV_TRACE_TIMER("calling timer callback: %p", *((void **)&timer->timer_cb));
 
-        if(timer->timer_cb && original_repeat_count != 0) timer->timer_cb(timer);
+        if(timer->timer_cb && original_repeat_count != 0) {
+            LV_PROFILER_TIMER_BEGIN_TAG("timer_cb");
+            timer->timer_cb(timer);
+            LV_PROFILER_TIMER_END_TAG("timer_cb");
+        }
 
         if(!state.timer_deleted) {
             LV_TRACE_TIMER("timer callback %p finished", *((void **)&timer->timer_cb));

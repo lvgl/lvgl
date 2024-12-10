@@ -86,7 +86,9 @@ lv_result_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
 
     /*Call the actual event callback*/
     e->user_data = NULL;
+    LV_PROFILER_EVENT_BEGIN_TAG(lv_event_get_code_name(e->code));
     base->event_cb(base, e);
+    LV_PROFILER_EVENT_END_TAG(lv_event_get_code_name(e->code));
 
     lv_result_t res = LV_RESULT_OK;
     /*Stop if the object is deleted*/
