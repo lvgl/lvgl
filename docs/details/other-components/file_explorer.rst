@@ -123,14 +123,13 @@ left, while the ``Browser Panel`` appears on the right
 
 This panel is optional.  If you set :c:macro:`LV_FILE_EXPLORER_QUICK_ACCESS` to ``0``
 in ``lv_conf.h``, the ``Quick-Access Panel`` will not be created.  This saves only a
-little bit of memory.  After the quick access bar is created, it can be hidden by
-clicking the button at the top left corner of the browsing area, which is useful for
-small-screen devices.
+little bit of memory.
 
 Soon after the File Explorer is created, you typically use
 :cpp:expr:`lv_file_explorer_set_quick_access_path(explorer, LV_EXPLORER_XXX_DIR, "path")`
-to set the path that will be navigated to (i.e. of the quick access bar. The items of the quick access
-bar are fixed. Currently, there are the following items:
+to set the path that will be navigated to when the buttons in the ``Quick-Access Panel``
+are clicked, which is currently a fixed list.  The corresponding values you will need
+to pass as the 2nd argument are the following:
 
 -  :cpp:enumerator:`LV_EXPLORER_HOME_DIR`
 -  :cpp:enumerator:`LV_EXPLORER_MUSIC_DIR`
@@ -163,14 +162,25 @@ These are the possible sorting methods:
 Events
 ******
 
--  :cpp:enumerator:`LV_EVENT_READY` Sent when a directory is opened. You can customize
-   the sort.
--  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when an item (file) in the file list
-   is clicked.
+- :cpp:enumerator:`LV_EVENT_READY` Sent when a directory is opened, which can happen:
 
-You can use :cpp:func:`lv_file_explorer_get_cur_path` to get the current path
-and :cpp:func:`lv_file_explorer_get_sel_fn` to get the name of the currently
-selected file in the event processing function. For example:
+  - when the File Explorer is initially opened,
+  - after a user clicks on a ``Quick-Access Panel`` navigation button, and
+  - after the user clicks on a directory displayed in the ``Browser Panel``.
+
+  You can use it to, for example, customize the file sort.
+
+- :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent once when any item (file) in the
+  ``Brwoser Panel``\ 's file list is clicked.
+
+- :cpp:enumerator:`LV_EVENT_CLICKED` Sent twice when an item in the ``Browser Panel``
+  is clicked:  once as a result of the input-device :cpp:enumerator:`LV_EVENT_RELEASED`
+  event and a second as a result of the input device :cpp:enumerator:`LV_EVENT_CLICKED`
+  event.  This applies to files, directories, and the "< Back" item in the ``Browser Panel``.
+
+In these events you can use :cpp:func:`lv_file_explorer_get_current_path` to get the
+current path and :cpp:func:`lv_file_explorer_get_selected_file_name` to get the name
+of the currently selected file in the event processing function. For example:
 
 .. code-block:: c
 
@@ -180,8 +190,8 @@ selected file in the event processing function. For example:
        lv_obj_t * obj = lv_event_get_target(e);
 
        if(code == LV_EVENT_VALUE_CHANGED) {
-           char * cur_path =  lv_file_explorer_get_cur_path(widget);
-           char * sel_fn = lv_file_explorer_get_sel_fn(widget);
+           char * cur_path =  lv_file_explorer_get_current_path(widget);
+           char * sel_fn = lv_file_explorer_get_selected_file_name(widget);
            LV_LOG_USER("%s%s", cur_path, sel_fn);
        }
    }
