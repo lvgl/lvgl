@@ -40,6 +40,7 @@ Since then its duties have grown to include:
 
 - Building PDF via latex (when working).
 
+
 Command-Line Arguments
 ----------------------
 Command-line arguments have been broken down to give the user the
@@ -52,11 +53,13 @@ only modify changed documents, and reduce an average ~22-minute
 run time to a run time that is workable for rapidly repeating doc
 generation to see Sphinx formatting results quickly.
 
+
 Normal Usage
 ------------
 This is the way this script is used for normal (full) docs generation.
 
     $ python  build.py  skip_latex
+
 
 Docs-Dev Initial Docs Generation Usage
 --------------------------------------
@@ -68,6 +71,7 @@ Docs-Dev Initial Docs Generation Usage
 2.  $ python  build.py  skip_latex  preserve  fixed_tmp_dir
 
 This takes typically ~22 minutes.
+
 
 Docs-Dev Update-Only Generation Usage
 -------------------------------------
@@ -90,6 +94,21 @@ have been updated:
 +--------------+------------+---------------------------------+
 | 20           | 59 seconds |          52 seconds             |
 +--------------+------------+---------------------------------+
+
+
+Sphinx Doc-Regeneration Criteria
+--------------------------------
+Sphinx uses the following to determine what documents get updated:
+
+- source-doc modification date
+  - Change the modification date and `sphinx-build` will re-build it.
+
+- full (absolute) path to the source document, including its file name
+  - Change the path or filename and `sphinx-build` will re-build it.
+
+- whether the -E option is on the `sphinx-build` command line
+  - -E forces `sphinx-build` to do a full re-build.
+
 
 Argument Descriptions
 ---------------------
