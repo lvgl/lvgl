@@ -134,6 +134,10 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
             else if(lv_streq("style_margin_all", prop_name)) lv_obj_set_style_margin_all(item, lv_xml_atoi(value), selector);
             else if(lv_streq("style_bg_color", prop_name)) lv_obj_set_style_bg_color(item, lv_xml_to_color(value), selector);
             else if(lv_streq("style_bg_opa", prop_name)) lv_obj_set_style_bg_opa(item, lv_xml_to_opa(value), selector);
+            else if(lv_streq("style_bg_image_src", prop_name)) lv_obj_set_style_bg_image_src(item, lv_xml_get_image(value),
+                                                                                                 selector);
+            else if(lv_streq("style_bg_image_tiled", prop_name)) lv_obj_set_style_bg_image_tiled(item, lv_xml_to_bool(value),
+                                                                                                     selector);
             else if(lv_streq("style_border_color", prop_name)) lv_obj_set_style_border_color(item, lv_xml_to_color(value),
                                                                                                  selector);
             else if(lv_streq("style_border_opa", prop_name)) lv_obj_set_style_border_opa(item, lv_xml_to_opa(value), selector);
@@ -143,10 +147,17 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
             else if(lv_streq("style_outline_opa", prop_name)) lv_obj_set_style_outline_opa(item, lv_xml_to_opa(value), selector);
             else if(lv_streq("style_outline_width", prop_name)) lv_obj_set_style_outline_width(item, lv_xml_atoi(value), selector);
             else if(lv_streq("style_outline_pad", prop_name)) lv_obj_set_style_outline_pad(item, lv_xml_atoi(value), selector);
-            else if(lv_streq("style_bg_image_src", prop_name)) lv_obj_set_style_bg_image_src(item, lv_xml_get_image(value),
+
+            else if(lv_streq("style_shadow_width", prop_name)) lv_obj_set_style_shadow_width(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_shadow_color", prop_name)) lv_obj_set_style_shadow_color(item, lv_xml_to_color(value),
                                                                                                  selector);
-            else if(lv_streq("style_bg_image_tiled", prop_name)) lv_obj_set_style_bg_image_tiled(item, lv_xml_to_bool(value),
-                                                                                                     selector);
+            else if(lv_streq("style_shadow_offset_x", prop_name)) lv_obj_set_style_shadow_offset_x(item, lv_xml_atoi(value),
+                                                                                                       selector);
+            else if(lv_streq("style_shadow_offset_y", prop_name)) lv_obj_set_style_shadow_offset_y(item, lv_xml_atoi(value),
+                                                                                                       selector);
+            else if(lv_streq("style_shadow_spread", prop_name)) lv_obj_set_style_shadow_spread(item, lv_xml_atoi(value), selector);
+            else if(lv_streq("style_shadow_opa", prop_name)) lv_obj_set_style_shadow_opa(item, lv_xml_to_opa(value), selector);
+
             else if(lv_streq("style_text_color", prop_name)) lv_obj_set_style_text_color(item, lv_xml_to_color(value), selector);
             else if(lv_streq("style_text_font", prop_name)) lv_obj_set_style_text_font(item, lv_xml_get_font(value), selector);
             else if(lv_streq("style_text_opa", prop_name)) lv_obj_set_style_text_opa(item, lv_xml_to_opa(value), selector);

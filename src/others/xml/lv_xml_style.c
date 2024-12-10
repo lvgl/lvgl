@@ -126,6 +126,8 @@ void lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs)
         else if(lv_streq(name, "margin_all")) lv_style_set_margin_all(style, lv_xml_atoi(value));
         else if(lv_streq(name, "bg_opa")) lv_style_set_bg_opa(style, lv_xml_to_opa(value));
         else if(lv_streq(name, "bg_color")) lv_style_set_bg_color(style, lv_xml_to_color(value));
+        else if(lv_streq(name, "bg_image_src")) lv_style_set_bg_image_src(style, lv_xml_get_image(value));
+        else if(lv_streq(name, "bg_image_tiled")) lv_style_set_bg_image_tiled(style, lv_xml_to_bool(value));
         else if(lv_streq(name, "border_color")) lv_style_set_border_color(style, lv_xml_to_color(value));
         else if(lv_streq(name, "border_width")) lv_style_set_border_width(style, lv_xml_atoi(value));
         else if(lv_streq(name, "border_opa")) lv_style_set_border_opa(style, lv_xml_to_opa(value));
@@ -133,12 +135,17 @@ void lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs)
         else if(lv_streq(name, "outline_width")) lv_style_set_outline_width(style, lv_xml_atoi(value));
         else if(lv_streq(name, "outline_opa")) lv_style_set_outline_opa(style, lv_xml_to_opa(value));
         else if(lv_streq(name, "outline_pad")) lv_style_set_outline_pad(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "shadow_width")) lv_style_set_shadow_width(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "shadow_color")) lv_style_set_shadow_color(style, lv_xml_to_color(value));
+        else if(lv_streq(name, "shadow_offset_x")) lv_style_set_shadow_offset_x(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "shadow_offset_y")) lv_style_set_shadow_offset_y(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "shadow_spread")) lv_style_set_shadow_spread(style, lv_xml_atoi(value));
+        else if(lv_streq(name, "shadow_opa")) lv_style_set_shadow_opa(style, lv_xml_to_opa(value));
+
         else if(lv_streq(name, "text_color")) lv_style_set_text_color(style, lv_xml_to_color(value));
         else if(lv_streq(name, "text_font")) lv_style_set_text_font(style, lv_xml_get_font(value));
         else if(lv_streq(name, "text_opa")) lv_style_set_text_opa(style, lv_xml_to_opa(value));
         else if(lv_streq(name, "text_align")) lv_style_set_text_align(style, lv_xml_text_align_string_to_enum_value(value));
-        else if(lv_streq(name, "bg_image_src")) lv_style_set_bg_image_src(style, lv_xml_get_image(value));
-        else if(lv_streq(name, "bg_image_tiled")) lv_style_set_bg_image_tiled(style, lv_xml_to_bool(value));
         else if(lv_streq(name, "layout")) lv_style_set_layout(style, lv_xml_layout_string_to_enum_value(value));
         else if(lv_streq(name, "flex_flow")) lv_style_set_flex_flow(style, lv_xml_flex_flow_string_to_enum_value(value));
         else if(lv_streq(name, "flex_main_place")) lv_style_set_flex_main_place(style,

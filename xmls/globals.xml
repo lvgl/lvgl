@@ -39,6 +39,12 @@
             <enum name="space_between"  help=""/>
              <enum name="space_evenly"  help=""/>
     </enumdef>
+    <enumdef name="lv_text_align">
+            <enum name="center"         help=""/>
+            <enum name="left"    		help=""/>
+            <enum name="right"       		help=""/>
+            <enum name="auto"  	help=""/>
+    </enumdef>
 
    	<styledef>
 	    <prop name="x" type="coords"/>
@@ -46,8 +52,11 @@
 	    <prop name="height" type="coords"/>
 	    <prop name="width" type="coords"/>
 	    <prop name="align" type="enum:lv_align"/>
+	    <prop name="radius" type="int"/>
 	    <prop name="bg_color" type="color"/>
 	    <prop name="bg_opa" type="int"/>
+	    <prop name="bg_image_src" type="image"/>
+	    <prop name="bg_image_tiled" type="bool"/>
 	    <prop name="border_color" type="color"/>
 	    <prop name="border_width" type="int"/>
 	    <prop name="border_opa" type="int"/>
@@ -57,9 +66,13 @@
 	    <prop name="outline_pad" type="int"/>
 	    <prop name="text_color" type="color"/>
 	    <prop name="text_font" type="font"/>
-	    <prop name="bg_image_src" type="image"/>
-	    <prop name="bg_image_tiled" type="bool"/>
-	    <prop name="radius" type="int"/>
+	    <prop name="text_align" type="enum:lv_text_align"/>
+	    <prop name="shadow_width" type="int"/>
+	    <prop name="shadow_color" type="color"/>
+	    <prop name="shadow_opa" type="int"/>
+	    <prop name="shadow_offset_x" type="int"/>
+	    <prop name="shadow_offset_y" type="int"/>
+	    <prop name="shadow_spread" type="int"/>
 	    <prop name="pad_top" type="int"/>
 	    <prop name="pad_bottom" type="int"/>
 	    <prop name="pad_left" type="int"/>
