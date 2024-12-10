@@ -3907,15 +3907,6 @@
         #endif
     #endif
 #endif
-#if LV_UEFI_HEADERS_CUSTOM
-    #ifndef LV_UEFI_CUSTOM_INCLUDE_PATH
-        #ifdef CONFIG_LV_UEFI_CUSTOM_INCLUDE_PATH
-            #define LV_UEFI_CUSTOM_INCLUDE_PATH CONFIG_LV_UEFI_CUSTOM_INCLUDE_PATH
-        #else
-            #define LV_UEFI_CUSTOM_INCLUDE_PATH "myefi.h"   /**< Path to the custom UEFI header */
-        #endif
-    #endif
-#endif
 
 /** Use OpenGL to open window on PC and handle mouse and keyboard */
 #ifndef LV_USE_OPENGLES

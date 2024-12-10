@@ -1205,9 +1205,6 @@
     #define LV_USE_UEFI_INCLUDE "myefi.h"   /**< Header that hides the actual framework (EDK2, gnu-efi, ...) */
     #define LV_UEFI_USE_MEMORY_SERVICES 0   /**< Use the memory functions from the boot services table */
 #endif
-#if LV_UEFI_HEADERS_CUSTOM
-    #define LV_UEFI_CUSTOM_INCLUDE_PATH "myefi.h"   /**< Path to the custom UEFI header */
-#endif
 
 /** Use OpenGL to open window on PC and handle mouse and keyboard */
 #define LV_USE_OPENGLES   0
