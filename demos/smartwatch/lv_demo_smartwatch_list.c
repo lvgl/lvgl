@@ -60,6 +60,7 @@ static uint32_t num_apps;
 void lv_smartwatch_register_app_cb(const char * name, const lv_image_dsc_t * icon, lv_obj_t ** entry)
 {
     if(num_apps >= MAX_APPS) {
+        LV_LOG_WARN("Maximum apps reached. Cannot add more apps");
         return;
     }
     apps[num_apps].name = name;
@@ -103,14 +104,17 @@ void lv_smartwatch_external_app_cb(lv_event_t * e)
     lv_disp_t * display = lv_display_get_default();
     lv_obj_t * active_screen = lv_display_get_screen_active(display);
     if(active_screen != app_list_screen) {
+        /* event was triggered but the current screen is no longer active */
         return;
     }
     if(event_code == LV_EVENT_CLICKED) {
         if(index >= num_apps) {
+            LV_LOG_WARN("Clicked app out of bounds. Cannot launch app");
             lv_demo_smartwatch_show_dialog("App Error", "App list out of bounds");
             return;
         }
         if(*apps[index].main == NULL) {
+            LV_LOG_WARN("Main object of clicked app is null. Cannot launch app");
             lv_demo_smartwatch_show_dialog("App Error", "Unable to load main object");
             return;
         }
@@ -128,6 +132,7 @@ static void app_list_clicked_event_cb(lv_event_t * e)
     lv_disp_t * display = lv_display_get_default();
     lv_obj_t * active_screen = lv_display_get_screen_active(display);
     if(active_screen != app_list_screen) {
+        /* event was triggered but the current screen is no longer active */
         return;
     }
     int index = (int)(intptr_t)lv_event_get_user_data(e);

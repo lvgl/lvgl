@@ -102,6 +102,7 @@ static void get_random_position(lv_coord_t * x, lv_coord_t * y, uint64_t * a)
 static void set_obj_random_pos_angle(lv_obj_t * obj)
 {
     if(obj == NULL) {
+        LV_LOG_WARN("set_obj_random_pos_angle() object is null");
         return;
     }
 
@@ -118,6 +119,7 @@ static void set_obj_random_pos_angle(lv_obj_t * obj)
 static void set_obj_pos_angle(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, uint64_t a)
 {
     if(obj == NULL) {
+        LV_LOG_WARN("set_obj_pos_angle() object is null");
         return;
     }
     lv_obj_set_x(obj, x);
@@ -294,6 +296,7 @@ static void create_screen_event_cb(lv_event_t * e)
     lv_disp_t * display = lv_display_get_default();
     lv_obj_t * active_screen = lv_display_get_screen_active(display);
     if(active_screen != easter_egg_screen) {
+        /* event was triggered but the current screen is no longer active */
         return;
     }
 

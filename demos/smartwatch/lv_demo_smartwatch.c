@@ -177,11 +177,7 @@ bool lv_smartwatch_get_load_app_list()
 
 static void dialog_close_event_cb(lv_event_t * e)
 {
-    lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
-    if(event_code == LV_EVENT_CLICKED) {
-        lv_obj_add_flag(dialog_window, LV_OBJ_FLAG_HIDDEN);
-    }
+    lv_obj_add_flag(dialog_window, LV_OBJ_FLAG_HIDDEN);
 }
 
 static void create_dialog_window()
@@ -263,7 +259,7 @@ static void create_dialog_window()
     lv_label_set_text(dialog_close_label, "Close");
     lv_obj_set_style_text_font(dialog_close_label, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_add_event_cb(dialog_close, dialog_close_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(dialog_close, dialog_close_event_cb, LV_EVENT_CLICKED, NULL);
 }
 
 #endif /*LV_USE_DEMO_SMARTWATCH*/

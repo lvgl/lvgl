@@ -86,6 +86,8 @@ void lv_demo_smartwatch_qr_create(void)
     lv_demo_smartwatch_qr_list_add(8, "https://www.paypal.com/paypalme/biego");
 
 #else
+    LV_LOG_WARN("QR Code feature not enabled");
+
     lv_obj_t * info = lv_label_create(qr_panel);
     lv_obj_set_width(info, 180);
     lv_obj_set_height(info, LV_SIZE_CONTENT);
@@ -148,6 +150,8 @@ void lv_demo_smartwatch_qr_list_add(uint8_t id, const char * link)
     lv_obj_set_align(qr_label, LV_ALIGN_CENTER);
     lv_label_set_text(qr_label, qr_title_names[id % 9]);
     lv_obj_set_style_text_font(qr_label, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+#else
+    LV_LOG_WARN("QR Code not added, feature is not enabled");
 #endif
 }
 

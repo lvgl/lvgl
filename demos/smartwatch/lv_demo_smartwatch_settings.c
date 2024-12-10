@@ -291,6 +291,7 @@ static void settings_action_event_cb(lv_event_t * e)
     lv_disp_t * display = lv_display_get_default();
     lv_obj_t * active_screen = lv_display_get_screen_active(display);
     if(active_screen != settings_screen) {
+        /* event was triggered but the current screen is no longer active */
         return;
     }
 

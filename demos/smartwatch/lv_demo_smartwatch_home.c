@@ -37,7 +37,6 @@ static void create_screen_home();
 
 static void lv_smartwatch_add_watchface(const char * name, const lv_image_dsc_t * src, int index);
 static void clock_screen_event_cb(lv_event_t * e);
-static void update_timer_cb(lv_timer_t * timer);
 static void animate_analog_seconds(lv_obj_t * target);
 
 /**********************
@@ -78,6 +77,7 @@ void lv_smartwatch_register_watchface_cb(const char * name, const lv_image_dsc_t
                                          lv_obj_t ** seconds)
 {
     if(num_faces >= MAX_FACES) {
+        LV_LOG_WARN("Maximum watchfaces reached. Cannot add more watchfaces");
         return;
     }
     faces[num_faces].name = name;
@@ -124,6 +124,7 @@ void lv_smartwatch_watchface_events_cb(lv_event_t * e)
         lv_disp_t * display = lv_display_get_default();
         lv_obj_t * active_screen = lv_display_get_screen_active(display);
         if(active_screen != home_screen) {
+            /* event was triggered but the current screen is no longer active */
             return;
         }
         lv_screen_load_anim(face_select, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, false);
@@ -132,6 +133,7 @@ void lv_smartwatch_watchface_events_cb(lv_event_t * e)
     if(event_code == LV_EVENT_SCREEN_LOADED) {
         if(!first_load) {
             first_load = true;
+            /* run the analog seconds animation on first load */
             lv_smartwatch_face_update_seconds(0);
         }
 
@@ -145,11 +147,13 @@ void lv_smartwatch_face_selected_cb(lv_event_t * e)
     int index = (int)(intptr_t)lv_event_get_user_data(e);
 
     if(target == home_screen) {
+        /* the event might be trigerred after watchface has been selected, return immediately */
         return;
     }
 
     if(event_code == LV_EVENT_CLICKED) {
         if(index >= num_faces) {
+            LV_LOG_WARN("Selected watchface index exceeds available faces.");
             return;
         }
         lv_obj_scroll_to_view(lv_obj_get_child(face_select, index), LV_ANIM_OFF);
@@ -197,10 +201,12 @@ void lv_smartwatch_face_update_seconds(int second)
 bool lv_smartwatch_watchface_load_face(uint16_t index)
 {
     if(index >= num_faces) {
+        LV_LOG_WARN("Cannot load watchface. Selected watchface index exceeds available faces.");
         return false;
     }
 
     if(*faces[index].watchface == NULL) {
+        LV_LOG_WARN("Cannot load watchface, the object is null");
         return false;
     }
     lv_obj_scroll_to_view(lv_obj_get_child(face_select, index), LV_ANIM_OFF);
@@ -232,24 +238,6 @@ static void animate_analog_seconds(lv_obj_t * target)
 static void clock_screen_event_cb(lv_event_t * e)
 {
     lv_smartwatch_watchface_events_cb(e);
-
-    lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
-
-    if(event_code == LV_EVENT_SCREEN_LOADED) {
-
-    }
-    if(event_code == LV_EVENT_SCREEN_UNLOAD_START) {
-
-    }
-}
-
-static void update_timer_cb(lv_timer_t * timer)
-{
-    static int minute = 0;
-
-    lv_demo_smartwatch_home_set_time(minute, minute, "AM", 6, "Dec", "Friday");
-    minute++;
 }
 
 static void lv_smartwatch_add_watchface(const char * name, const lv_image_dsc_t * src, int index)

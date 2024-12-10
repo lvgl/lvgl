@@ -220,7 +220,6 @@ static void control_screen_create()
 
 static void control_screen_event_cb(lv_event_t * e)
 {
-
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_TOP) {
@@ -233,6 +232,7 @@ static void qr_button_event_cb(lv_event_t * e)
     lv_disp_t * display = lv_display_get_default();
     lv_obj_t * active_screen = lv_display_get_screen_active(display);
     if(active_screen != control_screen) {
+        /* event was triggered but the current screen is no longer active */
         return;
     }
     lv_event_code_t event_code = lv_event_get_code(e);
@@ -248,6 +248,7 @@ static void close_button_event_cb(lv_event_t * e)
     lv_disp_t * display = lv_display_get_default();
     lv_obj_t * active_screen = lv_display_get_screen_active(display);
     if(active_screen != control_screen) {
+        /* event was triggered but the current screen is no longer active */
         return;
     }
     lv_event_code_t event_code = lv_event_get_code(e);
@@ -262,6 +263,7 @@ static void settings_button_event_cb(lv_event_t * e)
     lv_disp_t * display = lv_display_get_default();
     lv_obj_t * active_screen = lv_display_get_screen_active(display);
     if(active_screen != control_screen) {
+        /* event was triggered but the current screen is no longer active */
         return;
     }
     lv_event_code_t event_code = lv_event_get_code(e);
@@ -276,6 +278,7 @@ static void control_music_events_cb(lv_event_t * e)
     lv_disp_t * display = lv_display_get_default();
     lv_obj_t * active_screen = lv_display_get_screen_active(display);
     if(active_screen != control_screen) {
+        /* event was triggered but the current screen is no longer active */
         return;
     }
     lv_event_code_t event_code = lv_event_get_code(e);

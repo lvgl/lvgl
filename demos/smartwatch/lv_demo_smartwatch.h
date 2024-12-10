@@ -33,7 +33,7 @@ extern "C"
 #error "LV_FONT_MONTSERRAT_48 text support is required. Enable it in lv_conf.h (LV_FONT_MONTSERRAT_48 1)"
 #endif
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < 144 * 1024
-#warning "It's recommended to have at least 144kB RAM for the smartwatch demo"
+#error "It's recommended to have at least 144kB RAM for the smartwatch demo, increase LV_MEM_SIZE"
 #endif
 
 /*********************
