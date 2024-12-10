@@ -60,28 +60,28 @@ Example
 	    <prop name="style_flex_cross_place" type="enum:lv_flex_align"/>
 	    <prop name="style_flex_track_place" type="enum:lv_flex_align"/>
 
-	    <prop name="hidden" type="bool"/>
-	    <prop name="clickable" type="bool"/>
-	    <prop name="click_focusable" type="bool"/>
-	    <prop name="checkable" type="bool"/>
-	    <prop name="scrollable" type="bool"/>
-	    <prop name="scroll_elastic" type="bool"/>
-	    <prop name="scroll_momentum" type="bool"/>
-	    <prop name="scroll_one" type="bool"/>
-	    <prop name="scroll_chain_hor" type="bool"/>
-	    <prop name="scroll_chain_ver" type="bool"/>
-	    <prop name="scroll_chain" type="bool"/>
-	    <prop name="scroll_on_focus" type="bool"/>
-	    <prop name="scroll_with_arrow" type="bool"/>
-	    <prop name="snappable" type="bool"/>
-	    <prop name="press_lock" type="bool"/>
-	    <prop name="event_bubble" type="bool"/>
-	    <prop name="gesture_bubble" type="bool"/>
-	    <prop name="adv_hittest" type="bool"/>
-	    <prop name="ignore_layout" type="bool"/>
-	    <prop name="floating" type="bool"/>
-	    <prop name="send_draw_task_events" type="bool"/>
-	    <prop name="overflow_visible" type="bool"/>
-	    <prop name="flex_in_new_track" type="bool"/>
+	    <prop name="hidden" type="flag:lv_obj_flag"/>
+	    <prop name="clickable" type="flag:lv_obj_flag"/>
+	    <prop name="click_focusable" type="flag:lv_obj_flag"/>
+	    <prop name="checkable" type="flag:lv_obj_flag"/>
+	    <prop name="scrollable" type="flag:lv_obj_flag"/>
+	    <prop name="scroll_elastic" type="flag:lv_obj_flag"/>
+	    <prop name="scroll_momentum" type="flag:lv_obj_flag"/>
+	    <prop name="scroll_one" type="flag:lv_obj_flag"/>
+	    <prop name="scroll_chain_hor" type="flag:lv_obj_flag"/>
+	    <prop name="scroll_chain_ver" type="flag:lv_obj_flag"/>
+	    <prop name="scroll_chain" type="flag:lv_obj_flag"/>
+	    <prop name="scroll_on_focus" type="flag:lv_obj_flag"/>
+	    <prop name="scroll_with_arrow" type="flag:lv_obj_flag"/>
+	    <prop name="snappable" type="flag:lv_obj_flag"/>
+	    <prop name="press_lock" type="flag:lv_obj_flag"/>
+	    <prop name="event_bubble" type="flag:lv_obj_flag"/>
+	    <prop name="gesture_bubble" type="flag:lv_obj_flag"/>
+	    <prop name="adv_hittest" type="flag:lv_obj_flag"/>
+	    <prop name="ignore_layout" type="flag:lv_obj_flag"/>
+	    <prop name="floating" type="flag:lv_obj_flag"/>
+	    <prop name="send_draw_task_events" type="flag:lv_obj_flag"/>
+	    <prop name="overflow_visible" type="flag:lv_obj_flag"/>
+	    <prop name="flex_in_new_track" type="flag:lv_obj_flag"/>
 	</api>
 </widget>
