@@ -2735,7 +2735,7 @@
     #endif
 #endif
 
-/** API for CreateFile, ReadFile, etc. */
+/** API for UEFI */
 #ifndef LV_USE_FS_UEFI
     #ifdef CONFIG_LV_USE_FS_UEFI
         #define LV_USE_FS_UEFI CONFIG_LV_USE_FS_UEFI
@@ -2748,7 +2748,7 @@
         #ifdef CONFIG_LV_FS_UEFI_LETTER
             #define LV_FS_UEFI_LETTER CONFIG_LV_FS_UEFI_LETTER
         #else
-            #define LV_FS_UEFI_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+            #define LV_FS_UEFI_LETTER '\0'          /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
         #endif
     #endif
 #endif
@@ -3888,30 +3888,31 @@
     #ifdef CONFIG_LV_USE_UEFI
         #define LV_USE_UEFI CONFIG_LV_USE_UEFI
     #else
-        #define LV_USE_UEFI    0
+        #define LV_USE_UEFI 0
     #endif
 #endif
 #if LV_USE_UEFI
     #ifndef LV_USE_UEFI_INCLUDE
-        #ifdef LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_USE_UEFI_INCLUDE
-                #define LV_USE_UEFI_INCLUDE  CONFIG_LV_USE_UEFI_INCLUDE
-            #else
-                #define LV_USE_UEFI_INCLUDE  "myefi.h"
-            #endif
+        #ifdef CONFIG_LV_USE_UEFI_INCLUDE
+            #define LV_USE_UEFI_INCLUDE CONFIG_LV_USE_UEFI_INCLUDE
         #else
-            #define LV_USE_UEFI_INCLUDE    "myefi.h"
+            #define LV_USE_UEFI_INCLUDE "myefi.h"   /**< Header that hides the actual framework (EDK2, gnu-efi, ...) */
         #endif
     #endif
     #ifndef LV_UEFI_USE_MEMORY_SERVICES
-        #ifdef LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_UEFI_USE_MEMORY_SERVICES
-                #define LV_UEFI_USE_MEMORY_SERVICES  CONFIG_LV_UEFI_USE_MEMORY_SERVICES
-            #else
-                #define LV_UEFI_USE_MEMORY_SERVICES  0
-            #endif
+        #ifdef CONFIG_LV_UEFI_USE_MEMORY_SERVICES
+            #define LV_UEFI_USE_MEMORY_SERVICES CONFIG_LV_UEFI_USE_MEMORY_SERVICES
         #else
-            #define LV_UEFI_USE_MEMORY_SERVICES    0
+            #define LV_UEFI_USE_MEMORY_SERVICES 0   /**< Use the memory functions from the boot services table */
+        #endif
+    #endif
+#endif
+#if LV_UEFI_HEADERS_CUSTOM
+    #ifndef LV_UEFI_CUSTOM_INCLUDE_PATH
+        #ifdef CONFIG_LV_UEFI_CUSTOM_INCLUDE_PATH
+            #define LV_UEFI_CUSTOM_INCLUDE_PATH CONFIG_LV_UEFI_CUSTOM_INCLUDE_PATH
+        #else
+            #define LV_UEFI_CUSTOM_INCLUDE_PATH "myefi.h"   /**< Path to the custom UEFI header */
         #endif
     #endif
 #endif
