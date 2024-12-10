@@ -54,8 +54,8 @@ typedef struct {
     NEMA_VG_PAINT_HANDLE paint;
     float * data;
     uint8_t * seg;
-    int data_size;
-    int seg_size;
+    uint32_t data_size;
+    uint32_t seg_size;
 } lv_nema_gfx_path_t;
 
 /**********************

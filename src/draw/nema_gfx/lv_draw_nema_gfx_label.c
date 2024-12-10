@@ -190,7 +190,7 @@ static void _draw_nema_gfx_outline(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc
 
 static void freetype_outline_event_cb(lv_event_t * e)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     lv_event_code_t code = lv_event_get_code(e);
     lv_freetype_outline_event_param_t * param = lv_event_get_param(e);
 
@@ -209,12 +209,12 @@ static void freetype_outline_event_cb(lv_event_t * e)
             LV_LOG_WARN("unknown event code: %d", code);
             break;
     }
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 static void lv_nema_gfx_outline_push(const lv_freetype_outline_event_param_t * param)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     lv_nema_gfx_path_t * outline = param->outline;
     LV_ASSERT_NULL(outline);
 
@@ -243,7 +243,7 @@ static void lv_nema_gfx_outline_push(const lv_freetype_outline_event_param_t * p
             LV_ASSERT(false);
             break;
     }
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 static void lv_nema_outline_event_alloc(const lv_freetype_outline_event_param_t * param)

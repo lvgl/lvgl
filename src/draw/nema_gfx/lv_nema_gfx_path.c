@@ -48,7 +48,7 @@ static int seg_point  = 0;
 
 lv_nema_gfx_path_t * lv_nema_gfx_path_create(void)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     lv_nema_gfx_path_t * nema_gfx_path = lv_malloc_zeroed(sizeof(lv_nema_gfx_path_t));
     LV_ASSERT_MALLOC(nema_gfx_path);
     nema_gfx_path->seg = NULL;
@@ -57,25 +57,25 @@ lv_nema_gfx_path_t * lv_nema_gfx_path_create(void)
     nema_gfx_path->data_size = 0;
     data_point = 0;
     seg_point  = 0;
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
     return nema_gfx_path;
 }
 
 void lv_nema_gfx_path_alloc(lv_nema_gfx_path_t * nema_gfx_path)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     nema_gfx_path->path = nema_vg_path_create();
     nema_gfx_path->paint = nema_vg_paint_create();
     nema_gfx_path->data = (float *) lv_malloc(nema_gfx_path->data_size * sizeof(float));
     LV_ASSERT_MALLOC(nema_gfx_path->data);
     nema_gfx_path->seg = (uint8_t *) lv_malloc(nema_gfx_path->seg_size * sizeof(uint8_t));
     LV_ASSERT_MALLOC(nema_gfx_path->seg);
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_nema_gfx_path_destroy(lv_nema_gfx_path_t * nema_gfx_path)
 {
-    LV_PROFILER_BEGIN;
+    LV_PROFILER_DRAW_BEGIN;
     LV_ASSERT_NULL(nema_gfx_path);
 
     if(nema_gfx_path->path != NULL) {
@@ -97,12 +97,14 @@ void lv_nema_gfx_path_destroy(lv_nema_gfx_path_t * nema_gfx_path)
         nema_gfx_path->seg = NULL;
     }
     lv_free(nema_gfx_path);
-    LV_PROFILER_END;
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_nema_gfx_path_move_to(lv_nema_gfx_path_t * path, float x, float y)
 {
     LV_ASSERT_NULL(path);
+    LV_ASSERT(path->data_size > data_point + 1);
+    LV_ASSERT(path->seg_size > seg_point);
     path->seg[seg_point++] = NEMA_VG_PRIM_MOVE;
     path->data[data_point++] = x;
     path->data[data_point++] = y;
@@ -111,6 +113,8 @@ void lv_nema_gfx_path_move_to(lv_nema_gfx_path_t * path, float x, float y)
 void lv_nema_gfx_path_line_to(lv_nema_gfx_path_t * path, float x, float y)
 {
     LV_ASSERT_NULL(path);
+    LV_ASSERT(path->data_size > data_point + 1);
+    LV_ASSERT(path->seg_size > seg_point);
     path->seg[seg_point++] = NEMA_VG_PRIM_LINE;
     path->data[data_point++] = x;
     path->data[data_point++] = y;
@@ -120,6 +124,8 @@ void lv_nema_gfx_path_line_to(lv_nema_gfx_path_t * path, float x, float y)
 void lv_nema_gfx_path_quad_to(lv_nema_gfx_path_t * path, float cx, float cy, float x, float y)
 {
     LV_ASSERT_NULL(path);
+    LV_ASSERT(path->data_size > data_point + 3);
+    LV_ASSERT(path->seg_size > seg_point);
     path->seg[seg_point++] = NEMA_VG_PRIM_BEZIER_QUAD;
     path->data[data_point++] = cx;
     path->data[data_point++] = cy;
@@ -130,6 +136,8 @@ void lv_nema_gfx_path_quad_to(lv_nema_gfx_path_t * path, float cx, float cy, flo
 void lv_nema_gfx_path_cubic_to(lv_nema_gfx_path_t * path, float cx1, float cy1, float cx2, float cy2, float x, float y)
 {
     LV_ASSERT_NULL(path);
+    LV_ASSERT(path->data_size > data_point + 5);
+    LV_ASSERT(path->seg_size > seg_point);
     path->seg[seg_point++] = NEMA_VG_PRIM_BEZIER_CUBIC;
     path->data[data_point++] = cx1;
     path->data[data_point++] = cy1;
