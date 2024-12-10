@@ -1,4 +1,4 @@
-﻿#if LV_BUILD_TEST
+#if LV_BUILD_TEST
 #include "../lvgl.h"
 #include "../../lvgl_private.h"
 
