@@ -1,6 +1,6 @@
 /**
  * @file lv_demo_smartwatch_list.c
- *
+ * App list screen layout & functions. Contains a list of apps that can be opened/launched.
  */
 
 /*********************
@@ -9,6 +9,7 @@
 #include "lv_demo_smartwatch.h"
 #if LV_USE_DEMO_SMARTWATCH
 
+#include "lv_demo_smartwatch_private.h"
 #include "lv_demo_smartwatch_list.h"
 
 /*********************
@@ -25,9 +26,9 @@
  * app object details
  */
 typedef struct {
-    const char * name; /**< name of the app. Shown on the app list */
-    const lv_image_dsc_t * icon; /**< icon of the app. Shown on the app list */
-    lv_obj_t ** main; /**< root object of the app */
+    const char * name;              /**< name of the app. Shown on the app list */
+    const lv_image_dsc_t * icon;    /**< icon of the app. Shown on the app list */
+    lv_obj_t ** main;               /**< root object of the app */
 } app_t;
 
 /**********************
@@ -57,7 +58,7 @@ static uint32_t num_apps;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_smartwatch_register_app_cb(const char * name, const lv_image_dsc_t * icon, lv_obj_t ** entry)
+void lv_demo_smartwatch_register_app_cb(const char * name, const lv_image_dsc_t * icon, lv_obj_t ** entry)
 {
     if(num_apps >= MAX_APPS) {
         LV_LOG_WARN("Maximum apps reached. Cannot add more apps");
@@ -81,12 +82,12 @@ void lv_demo_smartwatch_list_load(lv_screen_load_anim_t anim_type, uint32_t time
     lv_screen_load_anim(app_list_screen, anim_type, time, delay, false);
 }
 
-void lv_smartwatch_app_close(void)
+void lv_demo_smartwatch_app_close(void)
 {
     lv_demo_smartwatch_list_load(LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0);
 }
 
-void lv_smartwatch_app_events_cb(lv_event_t * e)
+void lv_demo_smartwatch_app_events_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
@@ -95,7 +96,7 @@ void lv_smartwatch_app_events_cb(lv_event_t * e)
     }
 }
 
-void lv_smartwatch_external_app_cb(lv_event_t * e)
+void lv_demo_smartwatch_external_app_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
@@ -136,7 +137,7 @@ static void app_list_clicked_event_cb(lv_event_t * e)
         return;
     }
     int index = (int)(intptr_t)lv_event_get_user_data(e);
-    lv_smartwatch_set_load_app_list(true); /* flag was open from app list */
+    lv_demo_smartwatch_set_load_app_list(true); /* flag was open from app list */
     switch(index) {
         case 0:
             lv_demo_smartwatch_notifications_load(LV_SCR_LOAD_ANIM_MOVE_LEFT, 500, 0);
@@ -200,7 +201,7 @@ static void add_external_app(const char * app_name, int index, const void * img)
     lv_label_set_long_mode(label, LV_LABEL_LONG_CLIP);
     lv_obj_set_style_text_font(label, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_add_event_cb(panel, lv_smartwatch_external_app_cb, LV_EVENT_CLICKED, (void *)(intptr_t)index);
+    lv_obj_add_event_cb(panel, lv_demo_smartwatch_external_app_cb, LV_EVENT_CLICKED, (void *)(intptr_t)index);
 }
 
 static void add_app_list(const char * app_name, int index, const void * img)
@@ -274,7 +275,7 @@ static void create_screen_list()
     add_app_list("QR Codes", 3, &img_qr_icon);
     add_app_list("Settings", 2, &img_general_settings_icon);
 
-    lv_obj_add_event_cb(app_list, lv_smartwatch_scroll_event, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(app_list, lv_demo_smartwatch_scroll_event, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(app_list_screen, app_list_screen_events_cb, LV_EVENT_ALL, NULL);
 }
 

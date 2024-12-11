@@ -1,6 +1,7 @@
 /**
  * @file lv_demo_smartwatch_weather.c
- *
+ * Weather screen layout & functions. Shows the current weather details as well as
+ * hourly and daily forecasts.
  */
 
 /*********************
@@ -9,6 +10,7 @@
 #include "lv_demo_smartwatch.h"
 #if LV_USE_DEMO_SMARTWATCH
 
+#include "lv_demo_smartwatch_private.h"
 #include "lv_demo_smartwatch_weather.h"
 
 /*********************
@@ -342,7 +344,7 @@ static void create_screen_weather()
     lv_label_set_text(info2,
                       "Weather information has not yet been synced. Connect the device to Chronos app to get weather info. Make sure to enable it in the app settings.");
 
-    lv_obj_add_event_cb(weather_forecast_daily, lv_smartwatch_scroll_event, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(weather_forecast_daily, lv_demo_smartwatch_scroll_event, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(weather_screen, weather_screen_event_cb, LV_EVENT_ALL, NULL);
 }
 
@@ -357,7 +359,7 @@ static void weather_screen_event_cb(lv_event_t * e)
             lv_obj_add_flag(weather_forecast_hourly, LV_OBJ_FLAG_HIDDEN);
         }
         else {
-            if(!lv_smartwatch_get_load_app_list()) {
+            if(!lv_demo_smartwatch_get_load_app_list()) {
                 lv_demo_smartwatch_home_load(LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 500, 0); // load home
             }
         }
@@ -369,7 +371,7 @@ static void weather_screen_event_cb(lv_event_t * e)
     }
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT) {
         if(!lv_obj_has_flag(weather_panel, LV_OBJ_FLAG_HIDDEN)) {
-            if(lv_smartwatch_get_load_app_list()) {
+            if(lv_demo_smartwatch_get_load_app_list()) {
                 lv_demo_smartwatch_list_load(LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0);
                 return;
             }

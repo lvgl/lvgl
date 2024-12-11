@@ -1,6 +1,6 @@
 /**
  * @file lv_demo_smartwatch.c
- *
+ * Smartwatch general functions.
  */
 
 /*********************
@@ -9,6 +9,7 @@
 #include "lv_demo_smartwatch.h"
 #if LV_USE_DEMO_SMARTWATCH
 
+#include "lv_demo_smartwatch_private.h"
 #include "lv_demo_smartwatch_home.h"
 #include "lv_demo_smartwatch_list.h"
 #include "lv_demo_smartwatch_notifications.h"
@@ -61,7 +62,7 @@ static lv_obj_t * dialog_close_label;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_smartwatch_set_circular_scroll(bool state)
+void lv_demo_smartwatch_set_circular_scroll(bool state)
 {
     circular_scroll = state;
 }
@@ -76,7 +77,7 @@ void lv_demo_smartwatch(void)
                                                true, LV_FONT_DEFAULT);
     lv_display_set_theme(display, theme);
 
-    lv_smartwatch_set_circular_scroll(true);
+    lv_demo_smartwatch_set_circular_scroll(true);
 
     lv_demo_smartwatch_home_create();
 
@@ -103,7 +104,7 @@ void lv_demo_smartwatch(void)
     lv_demo_smartwatch_home_load(LV_SCR_LOAD_ANIM_FADE_IN, 500, 2500);
 }
 
-void lv_smartwatch_scroll_event(lv_event_t * e)
+void lv_demo_smartwatch_scroll_event(lv_event_t * e)
 {
 
     lv_event_code_t event_code = lv_event_get_code(e);
@@ -161,12 +162,12 @@ void lv_demo_smartwatch_show_dialog(const char * title, const char * message)
     lv_obj_scroll_to_y(dialog_window, 0, LV_ANIM_ON);
 }
 
-void lv_smartwatch_set_load_app_list(bool state)
+void lv_demo_smartwatch_set_load_app_list(bool state)
 {
     load_app_list = state;
 }
 
-bool lv_smartwatch_get_load_app_list()
+bool lv_demo_smartwatch_get_load_app_list()
 {
     return load_app_list;
 }

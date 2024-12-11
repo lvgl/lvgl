@@ -35,9 +35,9 @@ extern "C" {
 void lv_demo_smartwatch_list_create(void);
 
 /**
- * load the app list screen
- * @param anim_type    screen load animation to use
- * @param time    animation time
+ * Load the app list screen
+ * @param anim_type screen load animation to use
+ * @param time      animation time
  * @param delay     delay time before loading the screen
  */
 void lv_demo_smartwatch_list_load(lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay);

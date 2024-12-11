@@ -1,6 +1,6 @@
 /**
  * @file lv_demo_smartwatch_easter_egg.c
- *
+ * Easter Egg screen - LVGL animated logo.
  */
 
 /*********************
@@ -9,9 +9,9 @@
 #include "lv_demo_smartwatch.h"
 #if LV_USE_DEMO_SMARTWATCH
 
+#include "lv_demo_smartwatch_private.h"
 #include "lv_demo_smartwatch_easter_egg.h"
-
-#include "misc/lv_timer_private.h"
+#include "../../lvgl_private.h"
 
 /*********************
  *      DEFINES

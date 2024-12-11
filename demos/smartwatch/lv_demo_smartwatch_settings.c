@@ -1,6 +1,6 @@
 /**
  * @file lv_demo_smartwatch_settings.c
- *
+ * Settings screen layout & functions. Contains basic settings for smartwatch.
  */
 
 /*********************
@@ -9,6 +9,7 @@
 #include "lv_demo_smartwatch.h"
 #if LV_USE_DEMO_SMARTWATCH
 
+#include "lv_demo_smartwatch_private.h"
 #include "lv_demo_smartwatch_settings.h"
 
 /*********************
@@ -63,7 +64,7 @@ void lv_demo_smartwatch_settings_load(lv_screen_load_anim_t anim_type, uint32_t 
     lv_screen_load_anim(settings_screen, anim_type, time, delay, false);
 }
 
-lv_obj_t * lv_smartwatch_settings_add_slider(uint16_t id, const char * name, const lv_img_dsc_t * img, int32_t value,
+lv_obj_t * lv_demo_smartwatch_settings_add_slider(uint16_t id, const char * name, const lv_img_dsc_t * img, int32_t value,
                                              int32_t min, int32_t max)
 {
     lv_obj_t * panel = lv_obj_create(settings_list);
@@ -117,7 +118,7 @@ lv_obj_t * lv_smartwatch_settings_add_slider(uint16_t id, const char * name, con
     return slider;
 }
 
-lv_obj_t * lv_smartwatch_settings_add_toggle(uint16_t id, const char * name, const lv_img_dsc_t * img, bool state)
+lv_obj_t * lv_demo_smartwatch_settings_add_toggle(uint16_t id, const char * name, const lv_img_dsc_t * img, bool state)
 {
     lv_obj_t * panel = lv_obj_create(settings_list);
     lv_obj_set_width(panel, 200);
@@ -173,7 +174,7 @@ lv_obj_t * lv_smartwatch_settings_add_toggle(uint16_t id, const char * name, con
     return toggle;
 }
 
-lv_obj_t * lv_smartwatch_settings_add_dropdown(uint16_t id, const char * name, const lv_img_dsc_t * img,
+lv_obj_t * lv_demo_smartwatch_settings_add_dropdown(uint16_t id, const char * name, const lv_img_dsc_t * img,
                                                const char * options)
 {
     lv_obj_t * panel = lv_obj_create(settings_list);
@@ -236,7 +237,7 @@ lv_obj_t * lv_smartwatch_settings_add_dropdown(uint16_t id, const char * name, c
     return dropdown;
 }
 
-lv_obj_t * lv_smartwatch_settings_add_label(uint16_t id, const char * name, const lv_img_dsc_t * img)
+lv_obj_t * lv_demo_smartwatch_settings_add_label(uint16_t id, const char * name, const lv_img_dsc_t * img)
 {
     lv_obj_t * panel = lv_obj_create(settings_list);
     lv_obj_set_width(panel, 200);
@@ -327,7 +328,7 @@ static void settings_action_event_cb(lv_event_t * e)
     /* handle actions for the inbuilt settings */
     switch(id) {
         case 0x0002:
-            lv_smartwatch_set_circular_scroll(lv_obj_has_state(target, LV_STATE_CHECKED));
+            lv_demo_smartwatch_set_circular_scroll(lv_obj_has_state(target, LV_STATE_CHECKED));
             break;
         case 0x0007:
             lv_demo_smartwatch_easter_egg_load(LV_SCR_LOAD_ANIM_FADE_ON, 500, 0);
@@ -373,16 +374,16 @@ static void create_screen_settings()
     lv_obj_set_style_pad_top(settings_list, 50, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(settings_list, 70, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_smartwatch_settings_add_slider(0x0001, "Screen Brightness", &img_brightness_icon, 50, 1, 255);
-    lv_smartwatch_settings_add_toggle(0x0002, "Circular Scroll", &img_scrolling_icon, true);
-    lv_smartwatch_settings_add_dropdown(0x0003, "Screen Timeout", &img_timeout_icon,
+    lv_demo_smartwatch_settings_add_slider(0x0001, "Screen Brightness", &img_brightness_icon, 50, 1, 255);
+    lv_demo_smartwatch_settings_add_toggle(0x0002, "Circular Scroll", &img_scrolling_icon, true);
+    lv_demo_smartwatch_settings_add_dropdown(0x0003, "Screen Timeout", &img_timeout_icon,
                                         "5 Seconds\n10 Seconds\n20 Seconds\n30 Seconds\nAlways On");
-    lv_smartwatch_settings_add_dropdown(0x0004, "Screen Rotation", &img_screen_rotate_icon, "Default\n90\n180\n270");
-    lv_smartwatch_settings_add_toggle(0x0005, "Show Alerts", &img_alert_icon, false);
-    about_label = lv_smartwatch_settings_add_label(0x0006, "LVGL Demo\nSmart Watch UI\n11:22:33:44:55:66", &img_info_icon);
-    lv_smartwatch_settings_add_label(0x0007, "Made with love\nin Kenya\nusing LVGL", &img_kenya_icon);
+    lv_demo_smartwatch_settings_add_dropdown(0x0004, "Screen Rotation", &img_screen_rotate_icon, "Default\n90\n180\n270");
+    lv_demo_smartwatch_settings_add_toggle(0x0005, "Show Alerts", &img_alert_icon, false);
+    about_label = lv_demo_smartwatch_settings_add_label(0x0006, "LVGL Demo\nSmart Watch UI\n11:22:33:44:55:66", &img_info_icon);
+    lv_demo_smartwatch_settings_add_label(0x0007, "Made with love\nin Kenya\nusing LVGL", &img_kenya_icon);
 
-    lv_obj_add_event_cb(settings_list, lv_smartwatch_scroll_event, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(settings_list, lv_demo_smartwatch_scroll_event, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(settings_screen, settings_screen_event_cb, LV_EVENT_ALL, NULL);
 }
 

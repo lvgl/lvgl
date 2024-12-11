@@ -1,6 +1,6 @@
 /**
  * @file lv_demo_smartwatch_control.c
- *
+ * Control screen layout & functions. Contains quick actions such as music controls.
  */
 
 /*********************
@@ -9,6 +9,7 @@
 #include "lv_demo_smartwatch.h"
 #if LV_USE_DEMO_SMARTWATCH
 
+#include "lv_demo_smartwatch_private.h"
 #include "lv_demo_smartwatch_control.h"
 
 /*********************
@@ -238,7 +239,7 @@ static void qr_button_event_cb(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
-        lv_smartwatch_set_load_app_list(false);
+        lv_demo_smartwatch_set_load_app_list(false);
         lv_demo_smartwatch_qr_load(LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 500, 0);
     }
 }

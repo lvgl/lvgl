@@ -35,36 +35,36 @@ extern "C" {
 void lv_demo_smartwatch_notifications_create(void);
 
 /**
- * clear the notification list
+ * Clear the notification list
  */
 void lv_demo_smartwatch_clear_notifications();
 
 /**
- * load the notifications screen
- * @param anim_type    screen load animation to use
- * @param time    animation time
- * @param delay     delay time before loading the screen
+ * Load the notifications screen
+ * @param anim_type     screen load animation to use
+ * @param time          animation time
+ * @param delay         delay time before loading the screen
  */
 void lv_demo_smartwatch_notifications_load(lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay);
 
 /**
- * add a notification to the list
- * @param app_id   id of the app sending the notification (sets icon from the inbuilt list)
- * @param message  the notification message preview
- * @param index position of the message that will be returned when clicked
+ * Add a notification to the list
+ * @param app_id    id of the app sending the notification (sets icon from the inbuilt icon list)
+ * @param message   the notification message preview
+ * @param index     position of the message that will be returned when clicked
  */
 void lv_demo_smartwatch_add_notification(int app_id, const char * message, int index);
 
 /**
- * add a notification to the list
- * @param app_id   id of the app sending the notification (sets icon from the inbuilt list)
- * @param message  the notification message content
- * @param time the notification time
+ * Show a specific notification when in the notification screen
+ * @param app_id    id of the app sending the notification (sets icon from the inbuilt icon list)
+ * @param message   the notification message content
+ * @param time      the notification time
  */
 void lv_demo_smartwatch_show_notification(int app_id, const char * message, const char * time);
 
 /**
- * set the callback funtion when a notification is clicked
+ * Set the callback funtion when a notification is clicked
  * @param cb callback function [user should call lv_demo_smartwatch_show_notification() to show the notification]
  */
 void lv_demo_smartwatch_set_notification_click_cb(lv_smartwatch_notification_click_cb_t cb);

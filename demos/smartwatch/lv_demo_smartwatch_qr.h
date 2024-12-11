@@ -35,22 +35,22 @@ extern "C" {
 void lv_demo_smartwatch_qr_create(void);
 
 /**
- * load the qr screen
- * @param anim_type    screen load animation to use
- * @param time    animation time
- * @param delay     delay time before loading the screen
+ * Load the qr screen
+ * @param anim_type     screen load animation to use
+ * @param time          animation time
+ * @param delay         delay time before loading the screen
  */
 void lv_demo_smartwatch_qr_load(lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay);
 
 /**
- * clear the qr codes in list
+ * Clear the qr codes in list
  */
 void lv_demo_smartwatch_qr_list_clear();
 
 /**
- * add qr codes to the list
- * @param id    determines the icon and name of the qr from inbuilt list. Value (0-9)
- * @param link   link to be added as a qr code
+ * Add qr codes to the list
+ * @param id        determines the icon and name of the qr from inbuilt list. Value (0-9)
+ * @param link      link to be added as a qr code
  */
 void lv_demo_smartwatch_qr_list_add(uint8_t id, const char * link);
 

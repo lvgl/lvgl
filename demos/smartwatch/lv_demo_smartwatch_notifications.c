@@ -1,6 +1,7 @@
 /**
  * @file lv_demo_smartwatch_notifications.c
- *
+ * Notifications screen layout & functions. Contains the list of available notifications
+ * as well as each individual notification when opened.
  */
 
 /*********************
@@ -9,6 +10,7 @@
 #include "lv_demo_smartwatch.h"
 #if LV_USE_DEMO_SMARTWATCH
 
+#include "lv_demo_smartwatch_private.h"
 #include "lv_demo_smartwatch_notifications.h"
 
 /*********************
@@ -239,13 +241,13 @@ static void notification_screen_events_cb(lv_event_t * e)
 
             lv_obj_remove_flag(message_list, LV_OBJ_FLAG_HIDDEN);
             lv_obj_add_flag(message_panel, LV_OBJ_FLAG_HIDDEN);
-            if(!lv_smartwatch_get_load_app_list()) {
+            if(!lv_demo_smartwatch_get_load_app_list()) {
                 lv_demo_smartwatch_home_load(LV_SCR_LOAD_ANIM_FADE_ON, 500, 0);
             }
         }
     }
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT) {
-        if(lv_smartwatch_get_load_app_list()) {
+        if(lv_demo_smartwatch_get_load_app_list()) {
             if(!lv_obj_has_flag(message_list, LV_OBJ_FLAG_HIDDEN)) {
                 lv_demo_smartwatch_list_load(LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0);
                 return;
@@ -336,7 +338,7 @@ static void create_screen_notifications()
     lv_label_set_text(empty_info, "The are no notifications currently, come back later");
     lv_obj_add_flag(empty_info, LV_OBJ_FLAG_HIDDEN);
 
-    lv_obj_add_event_cb(message_list, lv_smartwatch_scroll_event, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(message_list, lv_demo_smartwatch_scroll_event, LV_EVENT_ALL, NULL);
 
     lv_obj_add_event_cb(notification_screen, notification_screen_events_cb, LV_EVENT_ALL, NULL);
 }
