@@ -61,11 +61,11 @@ void lv_example_file_explorer_2(void)
     /* Note to Windows users:  the initial "C:" on these paths corresponds to
      * the value of `LV_FS_WIN32_LETTER` in `lv_conf.h`, and should not be
      * confused with the Windows/DOS drive letter.  It is an identifier that
-     * is used to enable LVGL to look up the appropriate driver for all registered
-     * file-system drivers.  `lv_fs_win32_init()` happens to use the identifier
-     * letter 'C' so "C:" is the driver-identifier-prefix used here.  The
-     * "C:" following that is indeed the Windows/DOS drive letter and is part
-     * of the actual path.
+     * is used to enable LVGL to look up the appropriate driver from a list of
+     * registered file-system drivers.  `lv_fs_win32_init()` happens to use the
+     * identifier letter 'C' so "C:" is the driver-identifier-prefix used here.
+     * The "C:" following that is indeed the Windows/DOS drive letter and is
+     * part of the actual path that gets passed to the OS-level functions.
      *
      * See https://docs.lvgl.io/master/details/main-components/fs.html for details.
      * File Explorer uses `lv_fs` internally, thus the required prefix in path strings.
