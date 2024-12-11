@@ -75,7 +75,7 @@ static bool first_load;
  **********************/
 
 void lv_demo_smartwatch_register_watchface_cb(const char * name, const lv_image_dsc_t * preview, lv_obj_t ** watchface,
-                                         lv_obj_t ** seconds)
+                                              lv_obj_t ** seconds)
 {
     if(num_faces >= MAX_FACES) {
         LV_LOG_WARN("Maximum watchfaces reached. Cannot add more watchfaces");

@@ -52,8 +52,9 @@ void lv_demo_smartwatch_settings_load(lv_screen_load_anim_t anim_type, uint32_t 
  * @param max       max value for the slider
  * @return pointer to slider object
  */
-lv_obj_t * lv_demo_smartwatch_settings_add_slider(uint16_t id, const char * name, const lv_img_dsc_t * img, int32_t value,
-                                             int32_t min, int32_t max);
+lv_obj_t * lv_demo_smartwatch_settings_add_slider(uint16_t id, const char * name, const lv_img_dsc_t * img,
+                                                  int32_t value,
+                                                  int32_t min, int32_t max);
 
 /**
  * Add a toggle switch to the main settings list
@@ -74,7 +75,7 @@ lv_obj_t * lv_demo_smartwatch_settings_add_toggle(uint16_t id, const char * name
  * @return pointer to dropdown object
  */
 lv_obj_t * lv_demo_smartwatch_settings_add_dropdown(uint16_t id, const char * name, const lv_img_dsc_t * img,
-                                               const char * options);
+                                                    const char * options);
 
 /**
  * Add a label to the main settings list

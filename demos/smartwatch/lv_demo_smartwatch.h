@@ -204,7 +204,7 @@ void lv_demo_smartwatch_face_events_cb(lv_event_t * e);
  * @param seconds       pointer to analog seconds object. Used for smooth analog seconds animation
  */
 void lv_demo_smartwatch_register_watchface_cb(const char * name, const lv_image_dsc_t * preview, lv_obj_t ** watchface,
-                                         lv_obj_t ** seconds);
+                                              lv_obj_t ** seconds);
 
 /**
  * Register external apps
@@ -316,8 +316,9 @@ void lv_demo_smartwatch_qr_list_add(uint8_t id, const char * link);
  * @param max       max value for the slider
  * @return pointer to slider object
  */
-lv_obj_t * lv_demo_smartwatch_settings_add_slider(uint16_t id, const char * name, const lv_img_dsc_t * img, int32_t value,
-                                             int32_t min, int32_t max);
+lv_obj_t * lv_demo_smartwatch_settings_add_slider(uint16_t id, const char * name, const lv_img_dsc_t * img,
+                                                  int32_t value,
+                                                  int32_t min, int32_t max);
 
 /**
  * Add a toggle switch to the main settings list
@@ -338,7 +339,7 @@ lv_obj_t * lv_demo_smartwatch_settings_add_toggle(uint16_t id, const char * name
  * @return pointer to dropdown object
  */
 lv_obj_t * lv_demo_smartwatch_settings_add_dropdown(uint16_t id, const char * name, const lv_img_dsc_t * img,
-                                               const char * options);
+                                                    const char * options);
 
 /**
  * Add a label to the main settings list

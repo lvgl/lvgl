@@ -50,7 +50,7 @@ void lv_demo_smartwatch_home_load(lv_screen_load_anim_t anim_type, uint32_t time
  * @param seconds   pointer to analog seconds object. Used for smooth analog seconds animation
  */
 void lv_demo_smartwatch_register_watchface_cb(const char * name, const lv_image_dsc_t * preview, lv_obj_t ** watchface,
-                                         lv_obj_t ** seconds);
+                                              lv_obj_t ** seconds);
 
 /**
  * Watchface selected callback
