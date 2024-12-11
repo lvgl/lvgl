@@ -203,8 +203,7 @@ path strings provided to ``lv_fs_...()`` functions.
 Do this by filling in the full path to the directory you wish his access to be
 limited to in the applicable ``LV_FS_xxx_PATH`` macro in ``lv_conf.h``.  Do not
 prefix the path with the driver-identifier letter, and do append a directory
-separator character at the end --- the File System logic takes care of that
-internally.
+separator character at the end.
 
 **Examples for Unix-like file systems:**
 
