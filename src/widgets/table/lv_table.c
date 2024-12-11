@@ -521,6 +521,8 @@ static void lv_table_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     table->row_h[0] = LV_DPI_DEF;
     table->cell_data = lv_realloc(table->cell_data, table->row_cnt * table->col_cnt * sizeof(lv_table_cell_t *));
     table->cell_data[0] = NULL;
+    table->row_act = LV_TABLE_CELL_NONE;
+    table->col_act = LV_TABLE_CELL_NONE;
 
     LV_TRACE_OBJ_CREATE("finished");
 }
