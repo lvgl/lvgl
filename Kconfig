@@ -1522,6 +1522,10 @@ menu "LVGL configuration"
 			bool "Enable cache profiler"
 			default y
 
+		config LV_PROFILER_EVENT
+			bool "Enable event profiler"
+			default y
+
 		endif # LV_USE_PROFILER
 
 		config LV_USE_MONKEY

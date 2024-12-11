@@ -93,6 +93,12 @@ void lv_draw_nema_gfx_init(void)
     lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = lv_draw_create_unit(sizeof(lv_draw_nema_gfx_unit_t));
     /*Initiallize NemaGFX*/
     nema_init();
+
+    draw_nema_gfx_unit->base_unit.dispatch_cb = nema_gfx_dispatch;
+    draw_nema_gfx_unit->base_unit.evaluate_cb = nema_gfx_evaluate;
+    draw_nema_gfx_unit->base_unit.delete_cb = nema_gfx_delete;
+    draw_nema_gfx_unit->base_unit.name = "NEMA_GFX";
+
 #if LV_USE_NEMA_VG
     /*Initiallize NemaVG */
     nema_vg_init(LV_NEMA_GFX_MAX_RESX, LV_NEMA_GFX_MAX_RESY);
@@ -100,11 +106,9 @@ void lv_draw_nema_gfx_init(void)
     draw_nema_gfx_unit->paint = nema_vg_paint_create();
     draw_nema_gfx_unit->gradient = nema_vg_grad_create();
     draw_nema_gfx_unit->path = nema_vg_path_create();
+    /*Initialize Freetype Support*/
+    lv_draw_nema_gfx_label_init(&(draw_nema_gfx_unit->base_unit));
 #endif
-    draw_nema_gfx_unit->base_unit.dispatch_cb = nema_gfx_dispatch;
-    draw_nema_gfx_unit->base_unit.evaluate_cb = nema_gfx_evaluate;
-    draw_nema_gfx_unit->base_unit.delete_cb = nema_gfx_delete;
-    draw_nema_gfx_unit->base_unit.name = "NEMA_GFX";
     /*Create GPU Command List*/
     draw_nema_gfx_unit->cl = nema_cl_create();
     /*Bind Command List*/

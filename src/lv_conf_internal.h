@@ -3285,6 +3285,19 @@
             #define LV_PROFILER_CACHE 1
         #endif
     #endif
+
+    /*Enable event profiler*/
+    #ifndef LV_PROFILER_EVENT
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_PROFILER_EVENT
+                #define LV_PROFILER_EVENT CONFIG_LV_PROFILER_EVENT
+            #else
+                #define LV_PROFILER_EVENT 0
+            #endif
+        #else
+            #define LV_PROFILER_EVENT 1
+        #endif
+    #endif
 #endif
 
 /** 1: Enable Monkey test */
