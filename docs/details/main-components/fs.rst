@@ -48,9 +48,10 @@ identifier character plus a colon (':').
 
     Do not confuse this with a Windows or DOS drive letter.
 
-Example:  let's use the letter 'Z' as the identifier character, and "path_to_file" as
-the path, then the path strings you pass to ``lv_fs_...()`` functions would look like
-this::
+**Example:**
+
+Let's use the letter 'Z' as the identifier character, and "path_to_file" as the path,
+then the path strings you pass to ``lv_fs_...()`` functions would look like this::
 
     "Z:path_to_file"
      ^ ^^^^^^^^^^^^
@@ -64,7 +65,7 @@ Note also that the path can be a relative path or a "rooted path" (beginning wit
 ``/``), though rooted paths are recommended since the driver does not yet provide a
 way to set the default directory.
 
-**Examples for a Unix-like file systems:**
+**Examples for Unix-like file systems:**
 
 - "Z:/etc/images/splash.png"
 - "Z:/etc/images/left_button.png"
@@ -183,6 +184,46 @@ If you use more than one, each associated identifier letter you use must be uniq
 
 
 
+Limiting Directory Access
+*************************
+
+If you are using one of the following file-system drivers:
+
+- :c:macro:`LV_USE_FS_STDIO`
+- :c:macro:`LV_USE_FS_POSIX`
+- :c:macro:`LV_USE_FS_WIN32`
+
+you will have a ``LV_FS_xxx_PATH`` macro available to you in ``lv_conf.h`` that you
+can use to provide a path that gets dynamically prefixed to the ``path_to_file``
+portion of of the path strings provided to ``lv_fs_...()`` functions when files and
+directories are opened.  This can be useful to limit directory access (e.g. when a
+portion of a path can be typed by an end user), or simply to reduce the length of the
+path strings provided to ``lv_fs_...()`` functions.
+
+Do this by filling in the full path to the directory you wish his access to be
+limited to in the applicable ``LV_FS_xxx_PATH`` macro in ``lv_conf.h``.  Do not
+prefix the path with the driver-identifier letter, and do append a directory
+separator character at the end --- the File System logic takes care of that
+internally.
+
+**Examples for Unix-like file systems:**
+
+.. code-block:: c
+
+    #define LV_FS_WIN32_PATH   "/home/users/me/"
+
+**Examples for Windows/DOS-like file systems:**
+
+.. code-block:: c
+
+    #define LV_FS_WIN32_PATH   "C:/Users/me/"
+
+Then in both cases, paths in the application get reduced to:
+
+- "Z:wip/proposal.txt"
+
+
+
 Usage Example
 *************
 
@@ -237,7 +278,7 @@ practice to insert a ``'/'`` in front of each directory name.
 
 
 
-Use drives for images
+Use Drives for Images
 *********************
 
 :ref:`Image <lv_image>` Widgets can be opened from files as well (besides
@@ -255,7 +296,7 @@ To use files in Image Widgets the following callbacks are required:
 
 .. _overview_file_system_cache:
 
-Optional file buffering/caching
+Optional File Buffering/Caching
 *******************************
 
 Files will buffer their reads if the corresponding ``LV_FS_*_CACHE_SIZE``
