@@ -7,7 +7,7 @@ File System (lv_fs_drv)
 LVGL has a "File system" abstraction module that enables you to attach
 any type of file system.  A file system is identified by an assigned
 identifier letter.  For example, if an SD card is associated with the letter
-``'S'``, a file can be reached using ``"S:path/to/file.txt"``.  See details
+``'S'``, a file can be reached using ``"S:/path/to/file.txt"``.  See details
 under :ref:`lv_fs_identifier_letters`.
 
 .. note::
@@ -38,8 +38,8 @@ the appropriate registered file-system driver for a given path.
 **How it Works:**
 
 You register a driver for your file system and assign it an identifier letter.  This
-letter must be in the range [A-Z] or the character '/'.  See :ref:`lv_fs_adding_a_driver`
-for how this is done.
+letter must be unique among all registered file-system drivers, and in the range [A-Z]
+or the character '/'.  See :ref:`lv_fs_adding_a_driver` for how this is done.
 
 Later, when using paths to files on your file system, you prefix the path with that
 identifier character plus a colon (':').
@@ -48,14 +48,21 @@ identifier character plus a colon (':').
 
     Do not confuse this with a Windows or DOS drive letter.
 
-For purposes of illustration, let's use the letter 'Z' as the identifier character,
-and "path/to/file" as the path, then the path strings you pass to ``lv_fs_...()``
-functions would look like this::
+Example:  let's use the letter 'Z' as the identifier character, and "path_to_file" as
+the path, then the path strings you pass to ``lv_fs_...()`` functions would look like
+this::
 
-    "Z:path/to/file"
+    "Z:path_to_file"
+     ^ ^^^^^^^^^^^^
+     |        |
+     |        +-- This part gets passed to the OS-level file-system functions.
+     |
+     +-- This part LVGL strips from path string, and uses it to find the appropriate
+         driver (i.e. set of functions) that apply to that file system.
 
 Note also that the path can be a relative path or a "rooted path" (beginning with
-``/``).
+``/``), though rooted paths are recommended since the driver does not yet provide a
+way to set the default directory.
 
 **Examples for a Unix-like file systems:**
 
