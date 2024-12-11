@@ -204,7 +204,7 @@ simulating a button press (although there are simpler ways to do this):
 
    /*Simulate the press of the first button (indexes start from zero)*/
    uint32_t btn_id = 0;
-   lv_event_send(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
+   lv_obj_send_event(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
 
 The same works for display and input devices with
 :cpp:expr:`lv_display_send_event(obj, <EVENT_CODE>, &some_data)` and
