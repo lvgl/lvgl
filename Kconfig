@@ -1200,7 +1200,7 @@ menu "LVGL configuration"
 	endmenu
 
 	menu "3rd Party Libraries"
-		config LV_FS_DEFAULT_DRIVE_LETTER
+		config LV_FS_DEFAULT_DRIVER_LETTER
 			int "Default drive letter (e.g. 65 for 'A')"
 			default 0
 			help
