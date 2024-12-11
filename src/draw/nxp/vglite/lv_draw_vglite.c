@@ -291,8 +291,12 @@ static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_vglite_unit_t * draw_vglite_unit = (lv_draw_vglite_unit_t *) draw_unit;
 
-    /* Return immediately if it's busy with draw task. */
-    if(draw_vglite_unit->task_act)
+    /* Return immediately if draw unit is busy. */
+    if(draw_vglite_unit->task_act
+#if LV_USE_VGLITE_DRAW_ASYNC
+       || draw_vglite_unit->wait_for_finish
+#endif
+      )
         return 0;
 
     /* Try to get an ready to draw. */
@@ -552,8 +556,8 @@ static void _vglite_render_thread_cb(void * ptr)
         while(u->task_act == NULL
 #if LV_USE_VGLITE_DRAW_ASYNC
               /*
-               * Wait for sync if _draw_task_buf is empty.
-               * The thread will have to run to complete any pending tasks.
+               * Wait for sync if wait_for_finish is triggered.
+               * The thread will have to run and mark as complete any pending tasks.
                */
               && !u->wait_for_finish
 #endif
@@ -577,7 +581,6 @@ static void _vglite_render_thread_cb(void * ptr)
         }
 #if LV_USE_VGLITE_DRAW_ASYNC
         if(u->wait_for_finish) {
-            u->wait_for_finish = false;
             vglite_wait_for_finish();
             _vglite_signal_all_task_ready();
         }
@@ -588,8 +591,16 @@ static void _vglite_render_thread_cb(void * ptr)
         /* Signal the ready state to dispatcher. */
         u->task_act->state = LV_DRAW_TASK_STATE_READY;
 #endif
-        /* Cleanup. */
+
+        /* Cleanup draw unit running condition. */
+#if LV_USE_VGLITE_DRAW_ASYNC
+        if(u->wait_for_finish)
+            u->wait_for_finish = false;
+        else
+            u->task_act = NULL;
+#else
         u->task_act = NULL;
+#endif
 
         /* The draw unit is free now. Request a new dispatching as it can get a new task. */
         lv_draw_dispatch_request();
