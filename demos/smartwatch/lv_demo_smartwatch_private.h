@@ -19,103 +19,87 @@ extern "C"
 
 #if LV_USE_DEMO_SMARTWATCH
 
-/*Testing of dependencies*/
-#if LV_FONT_MONTSERRAT_16 == 0
-#error "LV_FONT_MONTSERRAT_16 text support is required. Enable it in lv_conf.h (LV_FONT_MONTSERRAT_16 1)"
-#endif
-#if LV_FONT_MONTSERRAT_20 == 0
-#error "LV_FONT_MONTSERRAT_20 text support is required. Enable it in lv_conf.h (LV_FONT_MONTSERRAT_20 1)"
-#endif
-#if LV_FONT_MONTSERRAT_46 == 0
-#error "LV_FONT_MONTSERRAT_46 text support is required. Enable it in lv_conf.h (LV_FONT_MONTSERRAT_46 1)"
-#endif
-#if LV_FONT_MONTSERRAT_48 == 0
-#error "LV_FONT_MONTSERRAT_48 text support is required. Enable it in lv_conf.h (LV_FONT_MONTSERRAT_48 1)"
-#endif
-#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < 144 * 1024
-#error "It's recommended to have at least 144kB RAM for the smartwatch demo, increase LV_MEM_SIZE"
-#endif
 
 /*********************
  *      DEFINES
  *********************/
 
-LV_IMG_DECLARE(img_weather_day_0);          // assets\dy-0.png
-LV_IMG_DECLARE(img_weather_day_1);          // assets\dy-1.png
-LV_IMG_DECLARE(img_weather_day_2);          // assets\dy-2.png
-LV_IMG_DECLARE(img_weather_day_3);          // assets\dy-3.png
-LV_IMG_DECLARE(img_weather_day_4);          // assets\dy-4.png
-LV_IMG_DECLARE(img_weather_day_5);          // assets\dy-5.png
-LV_IMG_DECLARE(img_weather_day_6);          // assets\dy-6.png
-LV_IMG_DECLARE(img_weather_day_7);          // assets\dy-7.png
+LV_IMG_DECLARE(img_weather_day_0);          // assets/dy-0.png
+LV_IMG_DECLARE(img_weather_day_1);          // assets/dy-1.png
+LV_IMG_DECLARE(img_weather_day_2);          // assets/dy-2.png
+LV_IMG_DECLARE(img_weather_day_3);          // assets/dy-3.png
+LV_IMG_DECLARE(img_weather_day_4);          // assets/dy-4.png
+LV_IMG_DECLARE(img_weather_day_5);          // assets/dy-5.png
+LV_IMG_DECLARE(img_weather_day_6);          // assets/dy-6.png
+LV_IMG_DECLARE(img_weather_day_7);          // assets/dy-7.png
 
-LV_IMG_DECLARE(img_weather_night_0);        // assets\nt-0.png
-LV_IMG_DECLARE(img_weather_night_1);        // assets\nt-1.png
-LV_IMG_DECLARE(img_weather_night_2);        // assets\nt-2.png
-LV_IMG_DECLARE(img_weather_night_3);        // assets\nt-3.png
-LV_IMG_DECLARE(img_weather_night_4);        // assets\nt-4.png
-LV_IMG_DECLARE(img_weather_night_5);        // assets\nt-5.png
-LV_IMG_DECLARE(img_weather_night_6);        // assets\nt-6.png
-LV_IMG_DECLARE(img_weather_night_7);        // assets\nt-7.png
+LV_IMG_DECLARE(img_weather_night_0);        // assets/nt-0.png
+LV_IMG_DECLARE(img_weather_night_1);        // assets/nt-1.png
+LV_IMG_DECLARE(img_weather_night_2);        // assets/nt-2.png
+LV_IMG_DECLARE(img_weather_night_3);        // assets/nt-3.png
+LV_IMG_DECLARE(img_weather_night_4);        // assets/nt-4.png
+LV_IMG_DECLARE(img_weather_night_5);        // assets/nt-5.png
+LV_IMG_DECLARE(img_weather_night_6);        // assets/nt-6.png
+LV_IMG_DECLARE(img_weather_night_7);        // assets/nt-7.png
 
-LV_IMG_DECLARE(img_facebook_icon);          // assets\facebook.png
-LV_IMG_DECLARE(img_instagram_icon);         // assets\instagram.png
-LV_IMG_DECLARE(img_kakao_icon);             // assets\kakao.png
-LV_IMG_DECLARE(img_line_icon);              // assets\line.png
-LV_IMG_DECLARE(img_mail_icon);              // assets\mail.png
-LV_IMG_DECLARE(img_messenger_icon);         // assets\messenger.png
-LV_IMG_DECLARE(img_penguin_icon);           // assets\penguin.png
-LV_IMG_DECLARE(img_skype_icon);             // assets\skype.png
-LV_IMG_DECLARE(img_sms_icon);               // assets\sms.png
-LV_IMG_DECLARE(img_telegram_icon);          // assets\telegram.png
-LV_IMG_DECLARE(img_twitter_icon);           // assets\twitter.png
-LV_IMG_DECLARE(img_viber_icon);             // assets\viber.png
-LV_IMG_DECLARE(img_vkontakte_icon);         // assets\vkontakte.png
-LV_IMG_DECLARE(img_weibo_icon);             // assets\weibo.png
-LV_IMG_DECLARE(img_whatsapp_icon);          // assets\whatsapp.png
-LV_IMG_DECLARE(img_wechat_icon);            // assets\wechat.png
-LV_IMG_DECLARE(img_chrns_icon);             // assets\chrns.png
+LV_IMG_DECLARE(img_facebook_icon);          // assets/facebook.png
+LV_IMG_DECLARE(img_instagram_icon);         // assets/instagram.png
+LV_IMG_DECLARE(img_kakao_icon);             // assets/kakao.png
+LV_IMG_DECLARE(img_line_icon);              // assets/line.png
+LV_IMG_DECLARE(img_mail_icon);              // assets/mail.png
+LV_IMG_DECLARE(img_messenger_icon);         // assets/messenger.png
+LV_IMG_DECLARE(img_penguin_icon);           // assets/penguin.png
+LV_IMG_DECLARE(img_skype_icon);             // assets/skype.png
+LV_IMG_DECLARE(img_sms_icon);               // assets/sms.png
+LV_IMG_DECLARE(img_telegram_icon);          // assets/telegram.png
+LV_IMG_DECLARE(img_twitter_icon);           // assets/twitter.png
+LV_IMG_DECLARE(img_viber_icon);             // assets/viber.png
+LV_IMG_DECLARE(img_vkontakte_icon);         // assets/vkontakte.png
+LV_IMG_DECLARE(img_weibo_icon);             // assets/weibo.png
+LV_IMG_DECLARE(img_whatsapp_icon);          // assets/whatsapp.png
+LV_IMG_DECLARE(img_wechat_icon);            // assets/wechat.png
+LV_IMG_DECLARE(img_chrns_icon);             // assets/chrns.png
 
-LV_IMG_DECLARE(img_brightness_icon);        // assets\brightness.png
-LV_IMG_DECLARE(img_scrolling_icon);         // assets\scrolling.png
-LV_IMG_DECLARE(img_timeout_icon);           // assets\timeout.png
-LV_IMG_DECLARE(img_bat_icon);               // assets\bat.png
-LV_IMG_DECLARE(img_info_icon);              // assets\info.png
-LV_IMG_DECLARE(img_play_icon);              // assets\play.png
-LV_IMG_DECLARE(img_left_arrow_icon);        // assets\left-arrow.png
-LV_IMG_DECLARE(img_right_arrow_icon);       // assets\right-arrow.png
-LV_IMG_DECLARE(img_bt_icon);                // assets\bt.png
-LV_IMG_DECLARE(img_search_icon);            // assets\search.png
-LV_IMG_DECLARE(img_camera_icon);            // assets\camera.png
-LV_IMG_DECLARE(img_notify_icon);            // assets\notify.png
-LV_IMG_DECLARE(img_setting_icon);           // assets\setting.png
-LV_IMG_DECLARE(img_play_pause_g_icon);      // assets\play_pause_g.png
-LV_IMG_DECLARE(img_previous_g_icon);        // assets\previous_g.png
-LV_IMG_DECLARE(img_next_g_icon);            // assets\next_g.png
-LV_IMG_DECLARE(img_bluetooth_g_icon);       // assets\bluetooth_g.png
-LV_IMG_DECLARE(img_search_g_icon);          // assets\search_g.png
-LV_IMG_DECLARE(img_volupe_up_g_icon);       // assets\volupe_up_g.png
-LV_IMG_DECLARE(img_volume_down_g_icon);     // assets\volume_down_g.png
-LV_IMG_DECLARE(img_qr_icon);                // assets\qr_icon.png
-LV_IMG_DECLARE(img_twitter_x_icon);         // assets\twitter_x.png
-LV_IMG_DECLARE(img_battery_plugged_icon);   // assets\battery_plugged.png
-LV_IMG_DECLARE(img_ble_app_icon);           // assets\ble_app.png
-LV_IMG_DECLARE(img_battery_state_icon);     // assets\battery_state.png
-LV_IMG_DECLARE(img_answer_icon);            // assets\answer.png
-LV_IMG_DECLARE(img_app_info_icon);          // assets\app_info.png
-LV_IMG_DECLARE(img_smartwatch_icon);        // assets\smartwatch.png
-LV_IMG_DECLARE(img_vol_up_icon);            // assets\vol_up.png
-LV_IMG_DECLARE(img_vol_down_icon);          // assets\vol_down.png
-LV_IMG_DECLARE(img_pay_icon);               // assets\pay.png
-LV_IMG_DECLARE(img_web_icon);               // assets\web.png
-LV_IMG_DECLARE(img_kenya_icon);             // assets\kenya.png
-LV_IMG_DECLARE(img_lvgl_logo_icon);         // assets\lvgl_logo.png
+LV_IMG_DECLARE(img_brightness_icon);        // assets/brightness.png
+LV_IMG_DECLARE(img_scrolling_icon);         // assets/scrolling.png
+LV_IMG_DECLARE(img_timeout_icon);           // assets/timeout.png
+LV_IMG_DECLARE(img_bat_icon);               // assets/bat.png
+LV_IMG_DECLARE(img_info_icon);              // assets/info.png
+LV_IMG_DECLARE(img_play_icon);              // assets/play.png
+LV_IMG_DECLARE(img_left_arrow_icon);        // assets/left-arrow.png
+LV_IMG_DECLARE(img_right_arrow_icon);       // assets/right-arrow.png
+LV_IMG_DECLARE(img_bt_icon);                // assets/bt.png
+LV_IMG_DECLARE(img_search_icon);            // assets/search.png
+LV_IMG_DECLARE(img_camera_icon);            // assets/camera.png
+LV_IMG_DECLARE(img_notify_icon);            // assets/notify.png
+LV_IMG_DECLARE(img_setting_icon);           // assets/setting.png
+LV_IMG_DECLARE(img_play_pause_g_icon);      // assets/play_pause_g.png
+LV_IMG_DECLARE(img_previous_g_icon);        // assets/previous_g.png
+LV_IMG_DECLARE(img_next_g_icon);            // assets/next_g.png
+LV_IMG_DECLARE(img_bluetooth_g_icon);       // assets/bluetooth_g.png
+LV_IMG_DECLARE(img_search_g_icon);          // assets/search_g.png
+LV_IMG_DECLARE(img_volupe_up_g_icon);       // assets/volupe_up_g.png
+LV_IMG_DECLARE(img_volume_down_g_icon);     // assets/volume_down_g.png
+LV_IMG_DECLARE(img_qr_icon);                // assets/qr_icon.png
+LV_IMG_DECLARE(img_twitter_x_icon);         // assets/twitter_x.png
+LV_IMG_DECLARE(img_battery_plugged_icon);   // assets/battery_plugged.png
+LV_IMG_DECLARE(img_ble_app_icon);           // assets/ble_app.png
+LV_IMG_DECLARE(img_battery_state_icon);     // assets/battery_state.png
+LV_IMG_DECLARE(img_answer_icon);            // assets/answer.png
+LV_IMG_DECLARE(img_app_info_icon);          // assets/app_info.png
+LV_IMG_DECLARE(img_smartwatch_icon);        // assets/smartwatch.png
+LV_IMG_DECLARE(img_vol_up_icon);            // assets/vol_up.png
+LV_IMG_DECLARE(img_vol_down_icon);          // assets/vol_down.png
+LV_IMG_DECLARE(img_pay_icon);               // assets/pay.png
+LV_IMG_DECLARE(img_web_icon);               // assets/web.png
+LV_IMG_DECLARE(img_kenya_icon);             // assets/kenya.png
+LV_IMG_DECLARE(img_lvgl_logo_icon);         // assets/lvgl_logo.png
 LV_IMG_DECLARE(img_lvgl_logo_black_icon);   // assets/lvgl_logo_black.png
 LV_IMG_DECLARE(img_lvgl_logo_red_icon);     // assets/lvgl_logo_red.png
 LV_IMG_DECLARE(img_lvgl_logo_green_icon);   // assets/lvgl_logo_green.png
 LV_IMG_DECLARE(img_lvgl_logo_blue_icon);    // assets/lvgl_logo_blue.png
-LV_IMG_DECLARE(img_game_icon);              // assets\game_icon.png
-LV_IMG_DECLARE(img_language_icon);          // assets\language.png
+LV_IMG_DECLARE(img_game_icon);              // assets/game_icon.png
+LV_IMG_DECLARE(img_language_icon);          // assets/language.png
 LV_IMG_DECLARE(img_file_manager_icon);      // assets/file_manager.png
 LV_IMG_DECLARE(img_drive_icon);             // assets/drive.png
 LV_IMG_DECLARE(img_file_icon);              // assets/file.png
