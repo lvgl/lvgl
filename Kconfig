@@ -188,7 +188,6 @@ menu "LVGL configuration"
 
 		config LV_DRAW_TRANSFORM_USE_MATRIX
 			bool "Using matrix for transformations"
-			default n
 			depends on LV_USE_MATRIX
 			help
 				Requirements: The rendering engine needs to support 3x3 matrix transformations.
@@ -270,14 +269,12 @@ menu "LVGL configuration"
 
 		config LV_USE_DRAW_ARM2D_SYNC
 			bool "Enable Arm's 2D image processing library (Arm-2D) for all Cortex-M processors"
-			default n
 			depends on LV_USE_DRAW_SW
 			help
 				Must deploy arm-2d library to your project and add include PATH for "arm_2d.h".
 
 		config LV_USE_NATIVE_HELIUM_ASM
 			bool "Enable native helium assembly"
-			default n
 			depends on LV_USE_DRAW_SW
 			help
 				Disabling this allows arm2d to work on its own (for testing only)
@@ -292,7 +289,6 @@ menu "LVGL configuration"
 
 		config LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 			bool "Enable drawing complex gradients in software"
-			default n
 			depends on LV_USE_DRAW_SW
 			help
 				0: do not enable complex gradients
@@ -348,12 +344,10 @@ menu "LVGL configuration"
 
 		config LV_USE_DRAW_VGLITE
 			bool "Use NXP's VG-Lite GPU on iMX RTxxx platforms"
-			default n
 
 		config LV_USE_VGLITE_BLIT_SPLIT
 			bool "Enable blit quality degradation workaround recommended for screen's dimension > 352 pixels"
 			depends on LV_USE_DRAW_VGLITE
-			default n
 
 		config LV_USE_VGLITE_DRAW_THREAD
 			bool "Use additional draw thread for VG-Lite processing"
@@ -370,11 +364,9 @@ menu "LVGL configuration"
 		config LV_USE_VGLITE_ASSERT
 			bool "Enable VGLite asserts"
 			depends on LV_USE_DRAW_VGLITE
-			default n
 
 		config LV_USE_PXP
 		bool "Use NXP's PXP on iMX RTxxx platforms"
-		default n
 
 		config LV_USE_DRAW_PXP
 		bool "Use PXP for drawing"
@@ -384,7 +376,6 @@ menu "LVGL configuration"
 		config LV_USE_ROTATE_PXP
 			bool "Use PXP to rotate display"
 			depends on LV_USE_PXP
-			default n
 
 		config LV_USE_PXP_DRAW_THREAD
 			bool "Use additional draw thread for PXP processing"
@@ -394,31 +385,25 @@ menu "LVGL configuration"
 		config LV_USE_PXP_ASSERT
 			bool "Enable PXP asserts"
 			depends on LV_USE_DRAW_PXP
-			default n
 
 		config LV_USE_DRAW_DAVE2D
 			bool "Use Renesas Dave2D on RA platforms"
-			default n
 
 		config LV_USE_DRAW_SDL
 			bool "Draw using cached SDL textures"
-			default n
 			help
 				Uses SDL renderer API
 
 		config LV_USE_DRAW_VG_LITE
 			bool "Use VG-Lite GPU"
-			default n
 			select LV_USE_MATRIX
 
 		config LV_VG_LITE_USE_GPU_INIT
 			bool "Enable VG-Lite custom external 'gpu_init()' function"
-			default n
 			depends on LV_USE_DRAW_VG_LITE
 
 		config LV_VG_LITE_USE_ASSERT
 			bool "Enable VG-Lite assert"
-			default n
 			depends on LV_USE_DRAW_VG_LITE
 
 		config LV_VG_LITE_FLUSH_MAX_COUNT
@@ -430,7 +415,6 @@ menu "LVGL configuration"
 
 		config LV_VG_LITE_USE_BOX_SHADOW
 			bool "Enable border to simulate shadow"
-			default n
 			depends on LV_USE_DRAW_VG_LITE
 			help
 				which usually improves performance,
@@ -452,14 +436,12 @@ menu "LVGL configuration"
 
 		config LV_USE_VECTOR_GRAPHIC
 			bool "Use Vector Graphic APIs"
-			default n
 			select LV_USE_MATRIX
 			help
 				Enable drawing support vector graphic APIs.
 
 		config LV_USE_DRAW_DMA2D
 			bool "Use DMA2D on the supporting STM32 platforms"
-			default n
 			help
 				Accelerate blends, fills, image decoding, etc. with STM32 DMA2D.
 
@@ -470,7 +452,6 @@ menu "LVGL configuration"
 
 		config LV_USE_DRAW_DMA2D_INTERRUPT
 			bool "use the DMA2D transfer complete interrupt"
-			default n
 			depends on LV_USE_DRAW_DMA2D
 			help
 				if enabled, the user is required to call
@@ -479,7 +460,6 @@ menu "LVGL configuration"
 
 		config LV_USE_DRAW_OPENGLES
 			bool "Draw using cached OpenGLES textures"
-			default n
 			depends on LV_USE_OPENGLES
 	endmenu
 
@@ -673,13 +653,11 @@ menu "LVGL configuration"
 
 			config LV_OBJ_STYLE_CACHE
 				bool "Use cache to speed up getting object style properties"
-				default n
 				help
 					Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties
 
 			config LV_USE_OBJ_ID
 				bool "Add id field to obj"
-				default n
 
 			config LV_OBJ_ID_AUTO_ASSIGN
 				bool "Automatically assign an ID when obj is created"
@@ -688,16 +666,13 @@ menu "LVGL configuration"
 
 			config LV_USE_OBJ_ID_BUILTIN
 				bool "Use builtin method to deal with obj ID"
-				default n
 				depends on LV_USE_OBJ_ID
 
 			config LV_USE_OBJ_PROPERTY
 				bool "Use obj property set/get API"
-				default n
 
 			config LV_USE_OBJ_PROPERTY_NAME
 				bool "Use name to access property"
-				default n
 				depends on LV_USE_OBJ_PROPERTY
 				help
 					Add a name table to every widget class, so the property can be accessed by name.
@@ -705,7 +680,6 @@ menu "LVGL configuration"
 
 			config LV_USE_VG_LITE_THORVG
 				bool "VG-Lite Simulator"
-				default n
 				depends on LV_USE_THORVG
 				help
 					Use thorvg to simulate VG-Lite hardware behavior, it's useful
@@ -714,17 +688,14 @@ menu "LVGL configuration"
 
 			config LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
 				bool "Enable LVGL blend mode support"
-				default n
 				depends on LV_USE_VG_LITE_THORVG
 
 			config LV_VG_LITE_THORVG_YUV_SUPPORT
 				bool "Enable YUV color format support"
-				default n
 				depends on LV_USE_VG_LITE_THORVG
 
 			config LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
 				bool "Enable linear gradient extension support"
-				default n
 				depends on LV_USE_VG_LITE_THORVG
 
 			config LV_VG_LITE_THORVG_16PIXELS_ALIGN
@@ -739,7 +710,6 @@ menu "LVGL configuration"
 
 			config LV_VG_LITE_THORVG_THREAD_RENDER
 				bool "Enable multi-thread render"
-				default n
 				depends on LV_USE_VG_LITE_THORVG
 		endmenu
 	endmenu
@@ -759,16 +729,13 @@ menu "LVGL configuration"
 
 		config LV_USE_FLOAT
 			bool "Use float as lv_value_precise_t"
-			default n
 
 		config LV_USE_MATRIX
 			bool "Enable matrix support"
-			default n
 			select LV_USE_FLOAT
 
 		config LV_USE_PRIVATE_API
 			bool "Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default"
-			default n
 	endmenu
 
 	menu "Font Usage"
@@ -1094,7 +1061,6 @@ menu "LVGL configuration"
 			default y if !LV_CONF_MINIMAL
 		config LV_USE_LOTTIE
 			bool "Lottie"
-			default n
 			depends on LV_USE_VECTOR_GRAPHIC && (LV_USE_THORVG_INTERNAL || LV_USE_THORVG_EXTERNAL)
 			help
 				Enable Lottie animations. Requires LV_USE_VECTOR_GRAPHIC and LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL.
@@ -1309,7 +1275,6 @@ menu "LVGL configuration"
 
 		config LV_BIN_DECODER_RAM_LOAD
 			bool "Decode whole image to RAM for bin decoder"
-			default n
 
 		config LV_USE_SVG
 			bool "SVG library"
@@ -1332,7 +1297,6 @@ menu "LVGL configuration"
 			bool "FreeType library"
 		config LV_FREETYPE_USE_LVGL_PORT
 			bool "Let FreeType to use LVGL memory and file porting"
-			default n
 			depends on LV_USE_FREETYPE
 		config LV_FREETYPE_CACHE_FT_GLYPH_CNT
 			int "The maximum number of Glyph in count"
@@ -1341,10 +1305,8 @@ menu "LVGL configuration"
 
 		config LV_USE_TINY_TTF
 			bool "Enable Tiny TTF decoder"
-			default n
 		config LV_TINY_TTF_FILE_SUPPORT
 			bool "Enable loading Tiny TTF data from files"
-			default n
 			depends on LV_USE_TINY_TTF
 		config LV_TINY_TTF_CACHE_GLYPH_CNT
 			bool "Tiny ttf cache entries count"
@@ -1383,11 +1345,9 @@ menu "LVGL configuration"
 		config LV_FFMPEG_DUMP_FORMAT
 			bool "Dump format"
 			depends on LV_USE_FFMPEG
-			default n
 		config LV_FFMPEG_PLAYER_USE_LV_FS
 			bool "Use lvgl file path in FFmpeg Player widget"
 			depends on LV_USE_FFMPEG
-			default n
 			help
 				You won't be able to open URLs after enabling this feature.
 				Note that FFmpeg image decoder will always use lvgl file system.
@@ -1400,7 +1360,6 @@ menu "LVGL configuration"
 
 		config LV_USE_SYSMON
 			bool "Enable system monitor component"
-			default n
 
 		config LV_USE_PERF_MONITOR
 			bool "Show CPU usage and FPS count"
@@ -1434,11 +1393,9 @@ menu "LVGL configuration"
 		config LV_USE_PERF_MONITOR_LOG_MODE
 			bool "Prints performance data using log"
 			depends on LV_USE_PERF_MONITOR
-			default n
 
 		config LV_USE_MEM_MONITOR
 			bool "Show the used memory and the memory fragmentation"
-			default n
 			depends on LV_USE_BUILTIN_MALLOC && LV_USE_SYSMON
 
 		choice
@@ -1512,7 +1469,6 @@ menu "LVGL configuration"
 
 		config LV_PROFILER_STYLE
 			bool "Enable style profiler"
-			default n
 
 		config LV_PROFILER_TIMER
 			bool "Enable timer profiler"
@@ -1530,19 +1486,15 @@ menu "LVGL configuration"
 
 		config LV_USE_MONKEY
 			bool "Enable Monkey test"
-			default n
 
 		config LV_USE_GRIDNAV
 			bool "Enable grid navigation"
-			default n
 
 		config LV_USE_FRAGMENT
 			bool "Enable lv_obj fragment"
-			default n
 
 		config LV_USE_IMGFONT
 			bool "Support using images as font in label or span widgets"
-			default n
 
 		config LV_USE_OBSERVER
 			bool "Observer"
@@ -1550,11 +1502,9 @@ menu "LVGL configuration"
 
 		config LV_USE_IME_PINYIN
 			bool "Enable Pinyin input method"
-			default n
 		config LV_IME_PINYIN_USE_K9_MODE
 			bool "Enable Pinyin input method 9 key input mode"
 			depends on LV_USE_IME_PINYIN
-			default n
 		config LV_IME_PINYIN_K9_CAND_TEXT_NUM
 			int "Maximum number of candidate panels for 9-key input mode"
 			depends on LV_IME_PINYIN_USE_K9_MODE
@@ -1575,7 +1525,6 @@ menu "LVGL configuration"
 
 		config LV_USE_FILE_EXPLORER
 			bool "Enable file explorer"
-			default n
 		config LV_FILE_EXPLORER_PATH_MAX_LEN
 			int "Maximum length of path"
 			depends on LV_USE_FILE_EXPLORER
@@ -1590,7 +1539,6 @@ menu "LVGL configuration"
 		config LV_USE_FONT_MANAGER
 			bool "Enable freetype font manager"
 			depends on LV_USE_FREETYPE
-			default n
 		config LV_FONT_MANAGER_NAME_MAX_LEN
 			int "Font manager name max length"
 			depends on LV_USE_FONT_MANAGER
@@ -1611,7 +1559,6 @@ menu "LVGL configuration"
 	menu "Devices"
 		config LV_USE_SDL
 			bool "Use SDL to open window on PC and handle mouse and keyboard"
-			default n
 		config LV_SDL_INCLUDE_PATH
 			string "SDL include path"
 			depends on LV_USE_SDL
@@ -1666,7 +1613,6 @@ menu "LVGL configuration"
 		config LV_SDL_FULLSCREEN
 			bool "SDL fullscreen"
 			depends on LV_USE_SDL
-			default n
 
 		config LV_SDL_DIRECT_EXIT
 			bool "Exit the application when all SDL windows are closed"
@@ -1693,7 +1639,6 @@ menu "LVGL configuration"
 
 		config LV_USE_X11
 			bool "Use X11 window manager to open window on Linux PC and handle mouse and keyboard"
-			default n
 		config LV_X11_DOUBLE_BUFFER
 			bool "Use double buffers for lvgl rendering"
 			depends on LV_USE_X11
@@ -1726,23 +1671,18 @@ menu "LVGL configuration"
 
 		config LV_USE_WAYLAND
 			bool "Use the wayland client to open a window and handle inputs on Linux or BSD"
-			default n
 		config LV_WAYLAND_WINDOW_DECORATIONS
 			bool "Draw client side window decorations, only necessary on Mutter (GNOME)"
 			depends on LV_USE_WAYLAND
-			default n
 		config LV_WAYLAND_WL_SHELL
 			bool "Support the legacy wl_shell instead of the default XDG Shell protocol"
 			depends on LV_USE_WAYLAND
-			default n
 
 		config LV_USE_LINUX_FBDEV
 			bool "Use Linux framebuffer device"
-			default n
 		config LV_LINUX_FBDEV_BSD
 			bool "Use BSD flavored framebuffer device"
 			depends on LV_USE_LINUX_FBDEV
-			default n
 
 		choice
 			prompt "Framebuffer device render mode"
@@ -1798,27 +1738,22 @@ menu "LVGL configuration"
 
 		config LV_USE_NUTTX
 			bool "Use Nuttx to open window and handle touchscreen"
-			default n
 
 		config LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
 			bool "Use independent image heap"
 			depends on LV_USE_NUTTX
-			default n
 
 		config LV_USE_NUTTX_LIBUV
 			bool "Use uv loop to replace default timer loop and other fb/indev timers"
 			depends on LV_USE_NUTTX
-			default n
 
 		config LV_USE_NUTTX_CUSTOM_INIT
 			bool "Use Custom Nuttx init API to open window and handle touchscreen"
 			depends on LV_USE_NUTTX
-			default n
 
 		config LV_USE_NUTTX_LCD
 			bool "Use NuttX LCD device"
 			depends on LV_USE_NUTTX
-			default n
 
 		choice
 			prompt "NuttX LCD buffer size"
@@ -1851,7 +1786,6 @@ menu "LVGL configuration"
 		config LV_USE_NUTTX_TOUCHSCREEN
 			bool "Use NuttX touchscreen driver"
 			depends on LV_USE_NUTTX
-			default n
 
 		config LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
 			int "Touchscreen cursor size in pixels"
@@ -1862,45 +1796,35 @@ menu "LVGL configuration"
 
 		config LV_USE_LINUX_DRM
 			bool "Use Linux DRM device"
-			default n
 
 		config LV_USE_TFT_ESPI
 			bool "Use TFT_eSPI driver"
-			default n
 
 		config LV_USE_EVDEV
 			bool "Use evdev input driver"
-			default n
 
 		config LV_USE_LIBINPUT
 			bool "Use libinput input driver"
-			default n
 
 		config LV_LIBINPUT_BSD
 			bool "Use the BSD variant of the libinput input driver"
 			depends on LV_USE_LIBINPUT
-			default n
 
 		config LV_LIBINPUT_XKB
 			bool "Enable full keyboard support via XKB"
 			depends on LV_USE_LIBINPUT
-			default n
 
 		config LV_USE_ST7735
 			bool "Use ST7735 LCD driver"
-			default n
 
 		config LV_USE_ST7789
 			bool "Use ST7789 LCD driver"
-			default n
 
 		config LV_USE_ST7796
 			bool "Use ST7796 LCD driver"
-			default n
 
 		config LV_USE_ILI9341
 			bool "Use ILI9341 LCD driver"
-			default n
 
 		config LV_USE_GENERIC_MIPI
 			bool "Generic MIPI driver"
@@ -1908,34 +1832,27 @@ menu "LVGL configuration"
 
 		config LV_USE_RENESAS_GLCDC
 			bool "Use Renesas GLCDC driver"
-			default n
 
 		config LV_USE_ST_LTDC
 			bool "Driver for ST LTDC"
-			default n
 
 		config LV_ST_LTDC_USE_DMA2D_FLUSH
 			bool "Only used for created partial mode LTDC displays"
-			default n
 			depends on LV_USE_ST_LTDC && !LV_USE_DRAW_DMA2D
 
 		config LV_USE_WINDOWS
 			bool "Use LVGL Windows backend"
 			depends on LV_OS_WINDOWS
-			default n
 
 		config LV_USE_OPENGLES
 			bool "Use GLFW and OpenGL to open window on PC and handle mouse and keyboard"
-			default n
 
 		config LV_USE_OPENGLES_DEBUG
 			bool "Enable debug mode for OpenGL"
 			depends on LV_USE_OPENGLES
-			default n
 
 		config LV_USE_QNX
 			bool "Use a QNX Screen window as a display"
-			default n
 
 		config LV_QNX_BUF_COUNT
 			int
@@ -1952,15 +1869,12 @@ menu "LVGL configuration"
 	menu "Demos"
 		config LV_USE_DEMO_WIDGETS
 			bool "Show some widget"
-			default n
 
 		config LV_USE_DEMO_KEYPAD_AND_ENCODER
 			bool "Demonstrate the usage of encoder and keyboard"
-			default n
 
 		config LV_USE_DEMO_BENCHMARK
 			bool "Benchmark your system"
-			default n
 			select LV_FONT_MONTSERRAT_14
 			select LV_FONT_MONTSERRAT_20
 			select LV_FONT_MONTSERRAT_24
@@ -1968,54 +1882,41 @@ menu "LVGL configuration"
 			select LV_USE_DEMO_WIDGETS
 		config LV_USE_DEMO_RENDER
 			bool "Render test for each primitives. Requires at least 480x272 display"
-			default n
 
 		config LV_USE_DEMO_SCROLL
 			bool "Scroll settings test for LVGL"
-			default n
 
 		config LV_USE_DEMO_STRESS
 			bool "Stress test for LVGL"
-			default n
 
 		config LV_USE_DEMO_TRANSFORM
 			bool "Transform test for LVGL"
-			default n
 			depends on LV_FONT_MONTSERRAT_18
 
 		config LV_USE_DEMO_MUSIC
 			bool "Music player demo"
-			default n
 		config LV_DEMO_MUSIC_SQUARE
 			bool "Enable Square"
 			depends on LV_USE_DEMO_MUSIC
-			default n
 		config LV_DEMO_MUSIC_LANDSCAPE
 			bool "Enable Landscape"
 			depends on LV_USE_DEMO_MUSIC
-			default n
 		config LV_DEMO_MUSIC_ROUND
 			bool "Enable Round"
 			depends on LV_USE_DEMO_MUSIC
-			default n
 		config LV_DEMO_MUSIC_LARGE
 			bool "Enable Large"
 			depends on LV_USE_DEMO_MUSIC
-			default n
 		config LV_DEMO_MUSIC_AUTO_PLAY
 			bool "Enable Auto play"
 			depends on LV_USE_DEMO_MUSIC
-			default n
 
 		config LV_USE_DEMO_FLEX_LAYOUT
 			bool "Flex layout previewer"
-			default n
 		config LV_USE_DEMO_MULTILANG
 			bool "multi-language demo"
-			default n
 		config LV_USE_DEMO_VECTOR_GRAPHIC
 			bool "vector graphic demo"
-			default n
 			depends on LV_USE_VECTOR_GRAPHIC
 	endmenu
 
