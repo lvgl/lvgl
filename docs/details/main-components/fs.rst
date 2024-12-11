@@ -217,7 +217,8 @@ separator character at the end.
 
     #define LV_FS_WIN32_PATH   "C:/Users/me/"
 
-Then in both cases, paths in the application get reduced to:
+Then in both cases, path strings passed to ``lv_fs_...()`` functions in the
+application get reduced to:
 
 - "Z:wip/proposal.txt"
 
