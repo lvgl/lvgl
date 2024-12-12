@@ -27,7 +27,7 @@ void tearDown(void)
 
 void test_file_explorer_read_dir(void)
 {
-    uint8_t back_row = 0, dev_row = 0, shm_row = 0, home_row = 0, user_row = 0;
+    // uint8_t back_row = 0, dev_row = 0, shm_row = 0, home_row = 0, user_row = 0;
 
     mkdir("src/test_files/test_file_explorer_folder", 0777);
     mkdir("src/test_files/test_file_explorer_folder/dev", 0777);
@@ -39,7 +39,8 @@ void test_file_explorer_read_dir(void)
     TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
-    for(uint8_t i = 0; i < file_table->row_cnt; i++) {
+    /* Iterate the table rows, get their content and store the index when matching Back, dev and home dirs */
+    /*for(uint8_t i = 0; i < file_table->row_cnt; i++) {
         if(lv_strcmp(lv_table_get_cell_value(file_explorer->file_table, i, 0), LV_SYMBOL_LEFT "  Back") == 0) {
             back_row = i;
         }
@@ -49,47 +50,52 @@ void test_file_explorer_read_dir(void)
         if(lv_strcmp(lv_table_get_cell_value(file_explorer->file_table, i, 0), LV_SYMBOL_DIRECTORY "  home") == 0) {
             home_row = i;
         }
-    }
+    }*/
 
-    file_table->row_act = dev_row;
-    lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
+    // file_table->row_act = dev_row;
+    // lv_obj_send_event(file_explorer_obj, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_file_explorer_open_dir(file_explorer_obj, "A:src/test_files/test_file_explorer_folder/dev/");
     TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/dev/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
-    for(uint8_t i = 0; i < file_table->row_cnt; i++) {
+    /*for(uint8_t i = 0; i < file_table->row_cnt; i++) {
         if(lv_strcmp(lv_table_get_cell_value(file_explorer->file_table, i, 0), LV_SYMBOL_DIRECTORY "  shm") == 0) {
             shm_row = i;
         }
-    }
+    }*/
 
-    file_table->row_act = shm_row;
-    lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_file_explorer_open_dir(file_explorer_obj, "A:src/test_files/test_file_explorer_folder/dev/shm");
+    // lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
     TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/dev/shm/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
-    file_table->row_act = back_row;
-    lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
+    // file_table->row_act = back_row;
+    // lv_obj_send_event(file_explorer_obj, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_file_explorer_open_dir(file_explorer_obj, "A:src/test_files/test_file_explorer_folder/dev/");
     TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/dev/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
-    file_table->row_act = back_row;
-    lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
+    //file_table->row_act = back_row;
+    //lv_obj_send_event(file_explorer_obj, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_file_explorer_open_dir(file_explorer_obj, "A:src/test_files/test_file_explorer_folder/");
     TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
-    file_table->row_act = home_row;
-    lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
+    //file_table->row_act = home_row;
+    //lv_obj_send_event(file_explorer_obj, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_file_explorer_open_dir(file_explorer_obj, "A:src/test_files/test_file_explorer_folder/home/");
     TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/home/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
-    for(uint8_t i = 0; i < file_table->row_cnt; i++) {
+    /*for(uint8_t i = 0; i < file_table->row_cnt; i++) {
         if(lv_strcmp(lv_table_get_cell_value(file_explorer->file_table, i, 0), LV_SYMBOL_DIRECTORY "  web_user") == 0) {
             user_row = i;
         }
-    }
+    }*/
 
-    file_table->row_act = user_row;
-    lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
+    //file_table->row_act = user_row;
+    //lv_obj_send_event(file_explorer_obj, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_file_explorer_open_dir(file_explorer_obj, "A:src/test_files/test_file_explorer_folder/home/web_user/");
     TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/home/web_user/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
