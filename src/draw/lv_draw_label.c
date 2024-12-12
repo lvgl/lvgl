@@ -43,8 +43,6 @@ typedef unsigned char cmd_state_t;
  *  STATIC PROTOTYPES
  **********************/
 static uint8_t hex_char_to_num(char hex);
-static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
-                        const lv_font_t * font, uint32_t letter, lv_draw_glyph_cb_t cb);
 
 /**********************
  *  STATIC VARIABLES
@@ -61,6 +59,18 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+void lv_draw_letter_dsc_init(lv_draw_letter_dsc_t * dsc)
+{
+    lv_memzero(dsc, sizeof(lv_draw_letter_dsc_t));
+    dsc->opa = LV_OPA_COVER;
+    dsc->color = lv_color_black();
+    dsc->font = LV_FONT_DEFAULT;
+    dsc->rotation = 0;
+    dsc->scale_x = LV_SCALE_NONE;
+    dsc->scale_y = LV_SCALE_NONE;
+    dsc->base.dsc_size = sizeof(lv_draw_letter_dsc_t);
+}
 
 void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
 {
@@ -152,6 +162,42 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_character(lv_layer_t * layer, lv_draw_label_d
     dsc->text_local = 1;
 
     lv_draw_label(layer, dsc, &a);
+    LV_PROFILER_DRAW_END;
+}
+
+void LV_ATTRIBUTE_FAST_MEM lv_draw_letter(lv_layer_t * layer, lv_draw_letter_dsc_t * dsc, const lv_point_t * point)
+{
+    if(dsc->opa <= LV_OPA_MIN) return;
+    if(dsc->font == NULL) {
+        LV_LOG_WARN("dsc->font == NULL");
+        return;
+    }
+
+    const lv_font_t * font = dsc->font;
+
+    LV_PROFILER_DRAW_BEGIN;
+    lv_font_glyph_dsc_t g;
+    lv_font_get_glyph_dsc(font, &g, dsc->unicode, 0);
+
+    font = g.resolved_font ? g.resolved_font : dsc->font;
+
+    lv_area_t a;
+    a.x1 = point->x;
+    a.y1 = point->y;
+    a.x2 = a.x1 + g.adv_w;
+    a.y2 = a.y1 + lv_font_get_line_height(font);
+
+    dsc->pivot.x = g.adv_w / 2 ;
+    dsc->pivot.y = font->line_height - font->base_line;
+
+    lv_draw_task_t * t = lv_draw_add_task(layer, &a);
+
+    t->draw_dsc = lv_malloc(sizeof(*dsc));
+    LV_ASSERT_MALLOC(t->draw_dsc);
+    lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
+    t->type = LV_DRAW_TASK_TYPE_LETTER;
+
+    lv_draw_finalize_task_creation(layer, t);
     LV_PROFILER_DRAW_END;
 }
 
@@ -266,6 +312,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
     draw_letter_dsc.opa = dsc->opa;
     draw_letter_dsc.bg_coords = &bg_coords;
     draw_letter_dsc.color = dsc->color;
+    draw_letter_dsc.rotation = dsc->rotation;
 
     lv_draw_fill_dsc_t fill_dsc;
     lv_draw_fill_dsc_init(&fill_dsc);
@@ -432,7 +479,7 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
                 draw_letter_dsc.color = dsc->color;
             }
 
-            draw_letter(draw_unit, &draw_letter_dsc, &pos, font, letter, cb);
+            lv_draw_unit_draw_letter(draw_unit, &draw_letter_dsc, &pos, font, letter, cb);
 
             if(letter_w > 0) {
                 pos.x += letter_w + dsc->letter_space;
@@ -491,8 +538,9 @@ static uint8_t hex_char_to_num(char hex)
     if(hex >= 'a') hex -= 'a' - 'A'; /*Convert to upper case*/
     return 'A' <= hex && hex <= 'F' ? hex - 'A' + 10 : 0;
 }
-static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
-                        const lv_font_t * font, uint32_t letter, lv_draw_glyph_cb_t cb)
+
+void lv_draw_unit_draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
+                              const lv_font_t * font, uint32_t letter, lv_draw_glyph_cb_t cb)
 {
     lv_font_glyph_dsc_t g;
 
@@ -517,9 +565,11 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
     letter_coords.x2 = letter_coords.x1 + g.box_w - 1;
     letter_coords.y1 = pos->y + (font->line_height - font->base_line) - g.box_h - g.ofs_y;
     letter_coords.y2 = letter_coords.y1 + g.box_h - 1;
+    lv_area_move(&letter_coords, -dsc->pivot.x, -dsc->pivot.y);
 
     /*If the letter is completely out of mask don't draw it*/
     if(lv_area_is_out(&letter_coords, draw_unit->clip_area, 0) &&
+       dsc->bg_coords &&
        lv_area_is_out(dsc->bg_coords, draw_unit->clip_area, 0)) {
         LV_PROFILER_DRAW_END;
         return;
