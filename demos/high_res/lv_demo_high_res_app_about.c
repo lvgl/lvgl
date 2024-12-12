@@ -149,7 +149,7 @@ void lv_demo_high_res_app_about(lv_obj_t * base_obj)
 
     char buf[256];
     for(int32_t i = 1; ; i++) {
-        lv_snprintf(buf, sizeof(buf), "%s/%"PRId32".png", c->slides_path, i);
+        lv_snprintf(buf, sizeof(buf), "%s/Slide%"PRId32".png", c->slides_path, i);
         lv_fs_file_t file;
         res = lv_fs_open(&file, buf, LV_FS_MODE_RD);
         if(res != LV_FS_RES_OK) {
