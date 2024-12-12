@@ -331,10 +331,48 @@ static lv_freetype_outline_t outline_create(
         }
     }
 
+    FT_Outline_Funcs outline_funcs = {
+        .move_to = outline_move_to_cb,
+        .line_to = outline_line_to_cb,
+        .conic_to = outline_conic_to_cb,
+        .cubic_to = outline_cubic_to_cb,
+        .shift = 0,
+        .delta = 0
+    };
+
+
     lv_result_t res;
     lv_freetype_outline_event_param_t param;
-
     lv_memzero(&param, sizeof(param));
+
+    /*Calculate Total Segmenets Before decompose */
+    int32_t tag_size = face->glyph->outline.n_points;
+    int32_t segments = 0;
+    int32_t vectors = 0;
+
+    for(int j = 0; j < tag_size; j++) {
+        if((face->glyph->outline.tags[j] & 0x1) == 0x1) {
+            segments++;
+            vectors++;
+        }
+        else {
+            int jj = j + 1 < tag_size ? j + 1 : 0;
+            if(face->glyph->outline.tags[jj] & 0x1) {
+                vectors++;
+            }
+            else {
+                segments++;
+                vectors += 2;
+            }
+        }
+    }
+    /*Also for every contour we may have a line for close*/
+    segments += face->glyph->outline.n_contours;
+    vectors += face->glyph->outline.n_contours;
+
+    param.sizes.data_size = vectors * 2;
+    param.sizes.segments_size = segments;
+
     res = outline_send_event(ctx, LV_EVENT_CREATE, &param);
 
     lv_freetype_outline_t outline = param.outline;
@@ -344,15 +382,6 @@ static lv_freetype_outline_t outline_create(
         LV_PROFILER_FONT_END;
         return NULL;
     }
-
-    FT_Outline_Funcs outline_funcs = {
-        .move_to = outline_move_to_cb,
-        .line_to = outline_line_to_cb,
-        .conic_to = outline_conic_to_cb,
-        .cubic_to = outline_cubic_to_cb,
-        .shift = 0,
-        .delta = 0
-    };
 
     /* Run outline decompose again to fill outline data */
     error = FT_Outline_Decompose(&face->glyph->outline, &outline_funcs, outline);

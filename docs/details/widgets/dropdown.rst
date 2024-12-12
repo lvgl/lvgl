@@ -30,8 +30,8 @@ The Drop-Down List Widget is built from the elements: "button" and "list"
 Button
 ------
 
--  :cpp:enumerator:`LV_PART_MAIN` Background of button, uses the typical
-   background- and text-properties for its text.
+-  :cpp:enumerator:`LV_PART_MAIN` Background of button, uses the :ref:`typical
+   background <typical bg props>` and text style properties for its text.
 -  :cpp:enumerator:`LV_PART_INDICATOR` Typically an arrow symbol that can be an Image
    or text (e.g. :cpp:enumerator:`LV_SYMBOL`).
 
@@ -40,14 +40,15 @@ The button goes to :cpp:enumerator:`LV_STATE_CHECKED` when it's opened.
 List
 ----
 
--  :cpp:enumerator:`LV_PART_MAIN` The list itself; uses the typical background
-   properties. ``max_height`` can be used to limit the height of the
-   list.
+-  :cpp:enumerator:`LV_PART_MAIN` The list itself; uses the :ref:`typical background
+   style properties <typical bg props>`. ``max_height`` can be used to limit the
+   height of the list.
 -  :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar background, border, shadow
    properties and width (for its own width) and right padding for the
    spacing on the right.
 -  :cpp:enumerator:`LV_PART_SELECTED` Refers to the currently pressed, checked or
-   pressed+checked option.  Also uses the typical background properties.
+   pressed+checked option.  Also uses the :ref:`typical background style properties
+   <typical bg props>`.
 
 The list is shown/hidden on open/close. To add styles to it use
 :cpp:expr:`lv_dropdown_get_list(dropdown)` to get the list object.  Example:

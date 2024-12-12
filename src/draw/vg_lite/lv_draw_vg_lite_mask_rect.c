@@ -59,6 +59,34 @@ void lv_draw_vg_lite_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_re
      * ThorVG does not yet support simulating the VG_LITE_BLEND_DST_IN blend mode,
      * and uses software rendering to achieve this
      */
+    lv_layer_t * target_layer = draw_unit->target_layer;
+    const lv_area_t * buf_area = &target_layer->buf_area;
+    lv_area_t clear_area;
+
+    lv_draw_buf_t * draw_buf = target_layer->draw_buf;
+
+    /*Clear the top part*/
+    lv_area_set(&clear_area, draw_unit->clip_area->x1, draw_unit->clip_area->y1, draw_unit->clip_area->x2,
+                dsc->area.y1 - 1);
+    lv_area_move(&clear_area, -buf_area->x1, -buf_area->y1);
+    lv_draw_buf_clear(draw_buf, &clear_area);
+
+    /*Clear the bottom part*/
+    lv_area_set(&clear_area, draw_unit->clip_area->x1, dsc->area.y2 + 1, draw_unit->clip_area->x2,
+                draw_unit->clip_area->y2);
+    lv_area_move(&clear_area, -buf_area->x1, -buf_area->y1);
+    lv_draw_buf_clear(draw_buf, &clear_area);
+
+    /*Clear the left part*/
+    lv_area_set(&clear_area, draw_unit->clip_area->x1, dsc->area.y1, dsc->area.x1 - 1, dsc->area.y2);
+    lv_area_move(&clear_area, -buf_area->x1, -buf_area->y1);
+    lv_draw_buf_clear(draw_buf, &clear_area);
+
+    /*Clear the right part*/
+    lv_area_set(&clear_area, dsc->area.x2 + 1, dsc->area.y1, draw_unit->clip_area->x2, dsc->area.y2);
+    lv_area_move(&clear_area, -buf_area->x1, -buf_area->y1);
+    lv_draw_buf_clear(draw_buf, &clear_area);
+
     lv_draw_sw_mask_radius_param_t param;
     lv_draw_sw_mask_radius_init(&param, &dsc->area, dsc->radius, false);
 
@@ -74,7 +102,6 @@ void lv_draw_vg_lite_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_re
         lv_draw_sw_mask_res_t res = lv_draw_sw_mask_apply(masks, mask_buf, draw_area.x1, y, area_w);
         if(res == LV_DRAW_SW_MASK_RES_FULL_COVER) continue;
 
-        lv_layer_t * target_layer = draw_unit->target_layer;
         lv_color32_t * c32_buf = lv_draw_layer_go_to_xy(target_layer, draw_area.x1 - target_layer->buf_area.x1,
                                                         y - target_layer->buf_area.y1);
 
@@ -100,15 +127,20 @@ void lv_draw_vg_lite_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_re
     /* Using hardware rendering masks */
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
-    int32_t w = lv_area_get_width(&dsc->area);
-    int32_t h = lv_area_get_height(&dsc->area);
-
     lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
-    lv_vg_lite_path_set_bounding_box_area(path, &draw_area);
+    lv_vg_lite_path_set_bounding_box_area(path, draw_unit->clip_area);
 
-    /* Use rounded rectangles and normal rectangles of the same size to nest the cropped area */
-    lv_vg_lite_path_append_rect(path, dsc->area.x1, dsc->area.y1, w, h, dsc->radius);
-    lv_vg_lite_path_append_rect(path, dsc->area.x1, dsc->area.y1, w, h, 0);
+    /* Nesting cropping regions using rounded rectangles and normal rectangles */
+    lv_vg_lite_path_append_rect(
+        path,
+        dsc->area.x1, dsc->area.y1,
+        lv_area_get_width(&dsc->area), lv_area_get_height(&dsc->area),
+        dsc->radius);
+    lv_vg_lite_path_append_rect(
+        path,
+        draw_unit->clip_area->x1, draw_unit->clip_area->y1,
+        lv_area_get_width(draw_unit->clip_area), lv_area_get_height(draw_unit->clip_area),
+        0);
     lv_vg_lite_path_end(path);
 
     vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);

@@ -42,7 +42,7 @@ have a choice of several different types of units you can use.
                      :cpp:expr:`lv_pct(value)` converts ``value`` to a percentage.
                      E.g. :cpp:expr:`lv_obj_set_width(btn, lv_pct(50))`.  If you want
                      to avoid the overhead of the call to :cpp:func:`lv_pct`, you can
-                     also use the macro :c:macro:`LV_PCT(x)` to mean the same thing.
+                     also use the macro :cpp:expr:`LV_PCT(x)` to mean the same thing.
                      Note that when you use this feature, your value is *stored as a
                      percent* so that if/when the size of the parent container (or
                      other positioning factor) changes, this style value dynamically
@@ -57,7 +57,7 @@ have a choice of several different types of units you can use.
 
 :inches:             Specify size as 1/160-th portion of an inch as if it were pixels
                      on a 160-DPI display, even though a display may have a different
-                     DPI.  Use :cpp:expr:`lv_dpx(n)` or :c:macro:`LV_DPX(n)` to do
+                     DPI.  Use :cpp:expr:`lv_dpx(n)` or :cpp:expr:`LV_DPX(n)` to do
                      this.  Examples:
 
                      +----+-----+----------------------------+
@@ -84,11 +84,11 @@ Boxing Model
 LVGL follows CSS's `border-box <https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing>`__
 model. A Widget's "box" is built from the following parts:
 
-- bounding box: the width/height of the elements.
-- border width: the width of the border.
-- padding: space between the sides of the Widget and its children.
-- margin: space outside of the Widget (considered only by some layouts)
-- content: the content area which is the size of the bounding box reduced by the border width and padding.
+:bounding box:  the width/height of the elements.
+:border width:  the width of the border.
+:padding:       space between the sides of the Widget and its children.
+:margin:        space outside of the Widget (considered only by some layouts)
+:content:       the content area which is the size of the bounding box reduced by the border width and padding.
 
 .. image:: /misc/boxmodel.png
     :alt: The box models of LVGL: The content area is smaller than the bounding box with the padding and border width
@@ -391,6 +391,8 @@ position setting. However, to keep the LVGL API lean, only the most
 common coordinate setting features have a "simple" version and the more
 complex features can be used via styles.
 
+
+
 .. _coord_translation:
 
 Translation
@@ -458,6 +460,8 @@ even laid out Widgets' position can be translated.
 The translation actually moves the Widget. That means it makes the
 scrollbars and :c:macro:`LV_SIZE_CONTENT` sized Widgets react to the position
 change.
+
+
 
 .. _coord_transformation:
 

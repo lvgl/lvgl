@@ -48,6 +48,7 @@ lv_result_t lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*c
     thread->callback = callback;
     thread->user_data = user_data;
     pthread_create(&thread->thread, &attr, generic_callback, thread);
+    pthread_attr_destroy(&attr);
     return LV_RESULT_OK;
 }
 

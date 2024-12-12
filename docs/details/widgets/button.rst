@@ -21,8 +21,8 @@ Buttons, by default, differ from Base Widget in the following ways:
 Parts and Styles
 ****************
 
--  :cpp:enumerator:`LV_PART_MAIN` The background of the button; uses the typical
-   background style properties.
+-  :cpp:enumerator:`LV_PART_MAIN` The background of the button; uses the :ref:`typical
+   background style properties <typical bg props>`.
 
 .. _lv_button_usage:
 

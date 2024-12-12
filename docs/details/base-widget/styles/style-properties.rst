@@ -765,7 +765,7 @@ Properties to describe the outline. It's like a border but drawn outside of the 
 outline_width
 ~~~~~~~~~~~~~
 
-Set width of outline in pixels. 
+Set width of outline in pixels.
 
 .. raw:: html
 
@@ -1004,7 +1004,7 @@ Set gap between dashes in pixels. Note that dash works only on horizontal and ve
 line_rounded
 ~~~~~~~~~~~~
 
-Make end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending 
+Make end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending
 
 .. raw:: html
 
@@ -1065,7 +1065,7 @@ Set width (thickness) of arcs in pixels.
 arc_rounded
 ~~~~~~~~~~~
 
-Make end points of arcs rounded. `true`: rounded, `false`: perpendicular line ending 
+Make end points of arcs rounded. `true`: rounded, `false`: perpendicular line ending
 
 .. raw:: html
 
@@ -1154,7 +1154,7 @@ Set opacity of text. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transpar
 text_font
 ~~~~~~~~~
 
-Set font of text (a pointer `lv_font_t *`). 
+Set font of text (a pointer `lv_font_t *`).
 
 .. raw:: html
 
@@ -1327,7 +1327,7 @@ The intensity of mixing of color filter.
 anim
 ~~~~
 
-Animation template for Widget's animation. Should be a pointer to `lv_anim_t`. The animation parameters are widget specific, e.g. animation time could be the E.g. blink time of the cursor on the text area or scroll time of a roller. See Widgets' documentation to learn more.
+Animation template for Widget's animation. Should be a pointer to `lv_anim_t`. The animation parameters are widget specific, e.g. animation time could be the E.g. blink time of the cursor on the Text Area or scroll time of a roller. See Widgets' documentation to learn more.
 
 .. raw:: html
 
@@ -1341,7 +1341,7 @@ Animation template for Widget's animation. Should be a pointer to `lv_anim_t`. T
 anim_duration
 ~~~~~~~~~~~~~
 
-Animation duration in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See Widgets' documentation to learn more.
+Animation duration in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the Text Area or scroll time of a roller. See Widgets' documentation to learn more.
 
 .. raw:: html
 

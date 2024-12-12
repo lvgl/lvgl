@@ -8,10 +8,10 @@ Bar (lv_bar)
 Overview
 ********
 
-The bar Widget has a background and an indicator. The length of the
-indicator against the background indicates the bar's current value.
+The Bar Widget has a background and an indicator. The length of the
+indicator against the background indicates the Bar's current value.
 
-Both the start and end values of the bar can be set.  Changing the start value to a
+Both the start and end values of the Bar can be set.  Changing the start value to a
 value other than the minimum value in its range changes the start position of the indicator.
 
 
@@ -21,12 +21,12 @@ value other than the minimum value in its range changes the start position of th
 Parts and Styles
 ****************
 
--  :cpp:enumerator:`LV_PART_MAIN` The bar's background.  It uses the typical
-   background style properties. Adding padding makes the indicator
+-  :cpp:enumerator:`LV_PART_MAIN` The Bar's background.  It uses the :ref:`typical
+   background style properties <typical bg props>`. Adding padding makes the indicator
    smaller or larger. The ``anim_time`` style property sets the
    animation time if the values set with :cpp:enumerator:`LV_ANIM_ON`.
--  :cpp:enumerator:`LV_PART_INDICATOR` The bar's indicator; also uses all the typical
-   background properties.
+-  :cpp:enumerator:`LV_PART_INDICATOR` The Bar's indicator; also uses the :ref:`typical
+   background style properties <typical bg props>`.
 
 .. _lv_bar_usage:
 
@@ -37,7 +37,7 @@ Usage
 Orientation and size
 --------------------
 
-- for orientation, width and height, simply set width and height properties;
+- for orientation, width and height, simply set width and height style properties;
 - :cpp:expr:`lv_bar_set_orientation(bar, orientation)` to override orientation
   caused by ``width`` and ``height``.  Valid values for ``orientation`` are:
 
@@ -60,12 +60,13 @@ bottom to top in vertical mode. If the minimum value is greater than the maximum
 The new value in :cpp:func:`lv_bar_set_value` can be set with or without an
 animation depending on the last parameter (``LV_ANIM_ON/OFF``).
 
+
 Modes
 -----
 
-The bar can be one of the following modes:
+The Bar can be one of the following modes:
 
-- :cpp:enumerator:`LV_BAR_MODE_NORMAL` A normal bar as described above
+- :cpp:enumerator:`LV_BAR_MODE_NORMAL` A normal Bar as described above
 - :cpp:enumerator:`LV_BAR_MODE_SYMMETRICAL` Draws indicator from zero value to current value. Requires a negative
   minimum value and positive maximum value, e.g. [-100..100].
 - :cpp:enumerator:`LV_BAR_MODE_RANGE` Allows setting the start value as well with

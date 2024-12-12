@@ -17,12 +17,12 @@ Parts and Styles
 ****************
 
 -  :cpp:enumerator:`LV_PART_MAIN` Background of Checkbox and it uses
-   the text- and all the typical background-style properties.
+   the text and the :ref:`typical background style properties <typical bg props>`.
    ``pad_column`` adjusts spacing between tickbox and label
--  :cpp:enumerator:`LV_PART_INDICATOR` The "tick box" is a square that uses all the
-   typical background style properties. By default, its size is equal to
-   the height of the main part's font. Padding properties make the tick
-   box larger in the respective directions.
+-  :cpp:enumerator:`LV_PART_INDICATOR` The "tick box" is a square that uses the
+   :ref:`typical background style properties <typical bg props>`.  By default, its
+   size is equal to the height of the main part's font. Padding properties make the
+   tick box larger in the respective directions.
 
 The Checkbox is added to the default group (if one is set).
 

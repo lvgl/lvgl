@@ -171,7 +171,7 @@ bidirectional, BiDi) text rendering as well. Some examples:
 
 BiDi support is enabled by :c:macro:`LV_USE_BIDI` in *lv_conf.h*
 
-All texts have a base direction (LTR or RTL) which determines some
+All text has a base direction (LTR or RTL) which determines some
 rendering rules and the default alignment of the text (Left or Right).
 However, in LVGL, the base direction is not only applied to labels. It's
 a general property which can be set for every Widget. If not set then it
@@ -197,7 +197,7 @@ This list summarizes the effect of RTL base direction on Widgets:
 - ``lv_buttonmatrix``: Shows buttons from right to left
 - ``lv_list``: Shows icons on the right
 - ``lv_dropdown``: Aligns options to the right
-- The texts in ``lv_table``, ``lv_buttonmatrix``, ``lv_keyboard``, ``lv_tabview``, ``lv_dropdown``, ``lv_roller`` are "BiDi processed" to be displayed correctly
+- The text strings in ``lv_table``, ``lv_buttonmatrix``, ``lv_keyboard``, ``lv_tabview``, ``lv_dropdown``, ``lv_roller`` are "BiDi processed" to be displayed correctly
 
 Arabic and Persian support
 --------------------------
@@ -213,7 +213,7 @@ LVGL supports these rules if :c:macro:`LV_USE_ARABIC_PERSIAN_CHARS` is enabled.
 However, there are some limitations:
 
 - Only displaying text is supported (e.g. on labels), text inputs (e.g. text area) don't support this feature.
-- Static text (i.e. const) is not processed. E.g. texts set by :cpp:func:`lv_label_set_text` will be "Arabic processed" but :cpp:func:`lv_label_set_text_static` won't.
+- Static text (i.e. const) is not processed. E.g. text set by :cpp:func:`lv_label_set_text` will be "Arabic processed" but :cpp:func:`lv_label_set_text_static` won't.
 - Text get functions (e.g. :cpp:func:`lv_label_get_text`) will return the processed text.
 
 .. _fonts_compressed:

@@ -181,9 +181,12 @@ per label in RAM by setting that macro to equate to ``0``.)
 
 Any part of the text can be selected if enabled with
 :cpp:expr:`lv_textarea_set_text_selection(textarea, true)`.  This works much like
-when you select text on your PC with your mouse.  If you pass ``false`` to this
-function to disable text-selection, any text selected at the time of the call will be
-de-selected.
+when you select text on your PC by clicking and dragging with your mouse or other
+pointer input device.  If you pass ``false`` to this function to disable text
+selection, any text selected time of the call will be de-selected.
+
+Shift+click and keyboard-only text selection with Shift+Arrow keys is expected to
+be added in the future.
 
 If you need to programmatically deal with selected text, in addition to the
 :cpp:expr:`lv_textarea_set_text_selection(textarea, enable)` function, the following
