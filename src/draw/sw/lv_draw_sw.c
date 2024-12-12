@@ -175,6 +175,7 @@ void lv_draw_sw_init(void)
         draw_sw_unit->base_unit.evaluate_cb = evaluate;
         draw_sw_unit->idx = i;
         draw_sw_unit->base_unit.delete_cb = LV_USE_OS ? lv_draw_sw_delete : NULL;
+        draw_sw_unit->base_unit.name = "SW";
 
 #if LV_USE_OS
         lv_thread_init(&draw_sw_unit->thread, LV_THREAD_PRIO_HIGH, render_thread_cb, LV_DRAW_THREAD_STACK_SIZE, draw_sw_unit);
@@ -278,6 +279,35 @@ void lv_draw_sw_i1_invert(void * buf, uint32_t buf_size)
 
     for(i = 0; i < buf_size; ++i) {
         byte_buf[i] = ~byte_buf[i];
+    }
+}
+
+void lv_draw_sw_i1_convert_to_vtiled(const void * buf, uint32_t buf_size, uint32_t width, uint32_t height,
+                                     void * out_buf,
+                                     uint32_t out_buf_size, bool bit_order_lsb)
+{
+    LV_ASSERT(buf && out_buf);
+    LV_ASSERT(width % 8 == 0 && height % 8 == 0);
+    LV_ASSERT(buf_size == (width / 8) * height);
+    LV_ASSERT(out_buf_size >= buf_size);
+
+    lv_memset(out_buf, 0, out_buf_size);
+
+    const uint8_t * src_buf = (uint8_t *)buf;
+    uint8_t * dst_buf = (uint8_t *)out_buf;
+
+    for(uint32_t y = 0; y < height; y++) {
+        for(uint32_t x = 0; x < width; x++) {
+            uint32_t src_index = y * width + x;
+            uint32_t dst_index = x * height + y;
+            uint8_t bit = (src_buf[src_index / 8] >> (7 - (src_index % 8))) & 0x01;
+            if(bit_order_lsb) {
+                dst_buf[dst_index / 8] |= (bit << (dst_index % 8));
+            }
+            else {
+                dst_buf[dst_index / 8] |= (bit << (7 - (dst_index % 8)));
+            }
+        }
     }
 }
 
@@ -411,6 +441,10 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 
                 lv_color_format_t cf = draw_dsc->header.cf;
                 if(masked && (cf == LV_COLOR_FORMAT_A8 || cf == LV_COLOR_FORMAT_RGB565A8)) {
+                    return 0;
+                }
+
+                if(cf >= LV_COLOR_FORMAT_PROPRIETARY_START) {
                     return 0;
                 }
             }
@@ -553,14 +587,18 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
             draw_unit_tmp = draw_unit_tmp->next;
             idx++;
         }
-        lv_draw_rect_dsc_t rect_dsc;
-        lv_draw_rect_dsc_init(&rect_dsc);
-        rect_dsc.bg_color = lv_palette_main(idx % LV_PALETTE_LAST);
-        rect_dsc.border_color = rect_dsc.bg_color;
-        rect_dsc.bg_opa = LV_OPA_10;
-        rect_dsc.border_opa = LV_OPA_80;
-        rect_dsc.border_width = 1;
-        lv_draw_sw_fill((lv_draw_unit_t *)u, &rect_dsc, &draw_area);
+        lv_draw_fill_dsc_t fill_dsc;
+        lv_draw_fill_dsc_init(&fill_dsc);
+        fill_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
+        fill_dsc.opa = LV_OPA_10;
+        lv_draw_sw_fill((lv_draw_unit_t *)u, &fill_dsc, &draw_area);
+
+        lv_draw_border_dsc_t border_dsc;
+        lv_draw_border_dsc_init(&border_dsc);
+        border_dsc.color = lv_palette_main(idx % LV_PALETTE_LAST);
+        border_dsc.opa = LV_OPA_60;
+        border_dsc.width = 1;
+        lv_draw_sw_border((lv_draw_unit_t *)u, &border_dsc, &draw_area);
 
         lv_point_t txt_size;
         lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
@@ -571,9 +609,9 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
         txt_area.x2 = draw_area.x1 + txt_size.x - 1;
         txt_area.y2 = draw_area.y1 + txt_size.y - 1;
 
-        lv_draw_rect_dsc_init(&rect_dsc);
-        rect_dsc.bg_color = lv_color_white();
-        lv_draw_sw_fill((lv_draw_unit_t *)u, &rect_dsc, &txt_area);
+        lv_draw_fill_dsc_init(&fill_dsc);
+        fill_dsc.color = lv_color_white();
+        lv_draw_sw_fill((lv_draw_unit_t *)u, &fill_dsc, &txt_area);
 
         char buf[8];
         lv_snprintf(buf, sizeof(buf), "%d", idx);
@@ -619,9 +657,10 @@ static void rotate180_argb8888(const uint32_t * src, uint32_t * dst, int32_t wid
     }
 
     src_stride /= sizeof(uint32_t);
+    dest_stride /= sizeof(uint32_t);
 
     for(int32_t y = 0; y < height; ++y) {
-        int32_t dstIndex = (height - y - 1) * src_stride;
+        int32_t dstIndex = (height - y - 1) * dest_stride;
         int32_t srcIndex = y * src_stride;
         for(int32_t x = 0; x < width; ++x) {
             dst[dstIndex + width - x - 1] = src[srcIndex + x];

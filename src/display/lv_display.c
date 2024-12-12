@@ -77,6 +77,13 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->dpi              = LV_DPI_DEF;
     disp->color_format = LV_COLOR_FORMAT_NATIVE;
 
+
+#if defined(LV_DRAW_SW_DRAW_UNIT_CNT) && (LV_DRAW_SW_DRAW_UNIT_CNT != 0)
+    disp->tile_cnt = LV_DRAW_SW_DRAW_UNIT_CNT;
+#else
+    disp->tile_cnt = 1;
+#endif
+
     disp->layer_head = lv_malloc_zeroed(sizeof(lv_layer_t));
     LV_ASSERT_MALLOC(disp->layer_head);
     if(disp->layer_head == NULL) return NULL;
@@ -444,6 +451,31 @@ void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint3
     lv_display_set_render_mode(disp, render_mode);
 }
 
+void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size,
+                                        uint32_t stride, lv_display_render_mode_t render_mode)
+{
+    LV_ASSERT_MSG(buf1 != NULL, "Null buffer");
+    lv_color_format_t cf = lv_display_get_color_format(disp);
+    uint32_t w = lv_display_get_horizontal_resolution(disp);
+    uint32_t h = lv_display_get_vertical_resolution(disp);
+    LV_ASSERT_MSG(w != 0 && h != 0, "display resolution is 0");
+
+    if(render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+        /* for partial mode, we calculate the height based on the buf_size and stride */
+        h = buf_size / stride;
+        LV_ASSERT_MSG(h != 0, "the buffer is too small");
+    }
+    else {
+        LV_ASSERT_FORMAT_MSG(stride * h <= buf_size, "%s mode requires screen sized buffer(s)",
+                             render_mode == LV_DISPLAY_RENDER_MODE_FULL ? "FULL" : "DIRECT");
+    }
+
+    lv_draw_buf_init(&disp->_static_buf1, w, h, cf, stride, buf1, buf_size);
+    lv_draw_buf_init(&disp->_static_buf2, w, h, cf, stride, buf2, buf_size);
+    lv_display_set_draw_buffers(disp, &disp->_static_buf1, buf2 ? &disp->_static_buf2 : NULL);
+    lv_display_set_render_mode(disp, render_mode);
+}
+
 void lv_display_set_render_mode(lv_display_t * disp, lv_display_render_mode_t render_mode)
 {
     if(disp == NULL) disp = lv_display_get_default();
@@ -486,6 +518,24 @@ lv_color_format_t lv_display_get_color_format(lv_display_t * disp)
     if(disp == NULL) return LV_COLOR_FORMAT_UNKNOWN;
 
     return disp->color_format;
+}
+
+void lv_display_set_tile_cnt(lv_display_t * disp, uint32_t tile_cnt)
+{
+    LV_ASSERT_FORMAT_MSG(tile_cnt < 256, "tile_cnt must be smaller than 256 (%" LV_PRId32 " was used)", tile_cnt);
+
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return;
+
+    disp->tile_cnt = tile_cnt;
+}
+
+uint32_t lv_display_get_tile_cnt(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return 0;
+
+    return disp->tile_cnt;
 }
 
 void lv_display_set_antialiasing(lv_display_t * disp, bool en)
@@ -794,6 +844,17 @@ lv_result_t lv_display_send_event(lv_display_t * disp, lv_event_code_t code, voi
     if(res != LV_RESULT_OK) return res;
 
     return res;
+}
+
+lv_area_t * lv_event_get_invalidated_area(lv_event_t * e)
+{
+    if(e->code == LV_EVENT_INVALIDATE_AREA) {
+        return lv_event_get_param(e);
+    }
+    else {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return NULL;
+    }
 }
 
 void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation)

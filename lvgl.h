@@ -34,7 +34,9 @@ extern "C" {
 #include "src/misc/lv_rb.h"
 #include "src/misc/lv_utils.h"
 #include "src/misc/lv_iter.h"
-
+#include "src/misc/lv_circle_buf.h"
+#include "src/misc/lv_tree.h"
+  
 #include "src/tick/lv_tick.h"
 
 #include "src/core/lv_obj.h"
@@ -89,6 +91,7 @@ extern "C" {
 #include "src/others/observer/lv_observer.h"
 #include "src/others/ime/lv_ime_pinyin.h"
 #include "src/others/file_explorer/lv_file_explorer.h"
+#include "src/others/font_manager/lv_font_manager.h"
 
 #include "src/libs/barcode/lv_barcode.h"
 #include "src/libs/bin_decoder/lv_bin_decoder.h"
@@ -105,6 +108,8 @@ extern "C" {
 #include "src/libs/rlottie/lv_rlottie.h"
 #include "src/libs/ffmpeg/lv_ffmpeg.h"
 #include "src/libs/tiny_ttf/lv_tiny_ttf.h"
+#include "src/libs/svg/lv_svg.h"
+#include "src/libs/svg/lv_svg_render.h"
 
 #include "src/layouts/lv_layout.h"
 

@@ -309,11 +309,6 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
 
     lv_state_t new_state = obj->state | state;
     if(obj->state != new_state) {
-
-        if(new_state & LV_STATE_DISABLED) {
-            lv_indev_reset(NULL, obj);
-        }
-
         update_obj_state(obj, new_state);
     }
 }
@@ -540,6 +535,13 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
         }
 
         lv_event_remove_all(&obj->spec_attr->event_list);
+
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+        if(obj->spec_attr->matrix) {
+            lv_free(obj->spec_attr->matrix);
+            obj->spec_attr->matrix = NULL;
+        }
+#endif
 
         lv_free(obj->spec_attr);
         obj->spec_attr = NULL;

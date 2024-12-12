@@ -25,6 +25,15 @@ extern "C" {
 
 #include "display/tft_espi/lv_tft_espi.h"
 
+#include "display/lcd/lv_lcd_generic_mipi.h"
+#include "display/ili9341/lv_ili9341.h"
+#include "display/st7735/lv_st7735.h"
+#include "display/st7789/lv_st7789.h"
+#include "display/st7796/lv_st7796.h"
+
+#include "display/renesas_glcdc/lv_renesas_glcdc.h"
+#include "display/st_ltdc/lv_st_ltdc.h"
+
 #include "nuttx/lv_nuttx_entry.h"
 #include "nuttx/lv_nuttx_fbdev.h"
 #include "nuttx/lv_nuttx_touchscreen.h"

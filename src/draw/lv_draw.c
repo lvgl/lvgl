@@ -11,6 +11,7 @@
  *      INCLUDES
  *********************/
 #include "../misc/lv_area_private.h"
+#include "../misc/lv_assert.h"
 #include "lv_draw_private.h"
 #include "sw/lv_draw_sw.h"
 #include "../display/lv_display_private.h"
@@ -79,7 +80,7 @@ void lv_draw_deinit(void)
 void * lv_draw_create_unit(size_t size)
 {
     lv_draw_unit_t * new_unit = lv_malloc_zeroed(size);
-
+    LV_ASSERT_MALLOC(new_unit);
     new_unit->next = _draw_info.unit_head;
     _draw_info.unit_head = new_unit;
     _draw_info.unit_cnt++;
@@ -91,7 +92,7 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
 {
     LV_PROFILER_DRAW_BEGIN;
     lv_draw_task_t * new_task = lv_malloc_zeroed(sizeof(lv_draw_task_t));
-
+    LV_ASSERT_MALLOC(new_task);
     new_task->area = *coords;
     new_task->_real_area = *coords;
     new_task->clip_area = layer->_clip_area;
@@ -143,8 +144,13 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
             if(u->evaluate_cb) u->evaluate_cb(u, t);
             u = u->next;
         }
-
-        lv_draw_dispatch();
+        if(t->preferred_draw_unit_id == LV_DRAW_UNIT_NONE) {
+            LV_LOG_WARN("the draw task was not taken by any units");
+            t->state = LV_DRAW_TASK_STATE_READY;
+        }
+        else {
+            lv_draw_dispatch();
+        }
     }
     else {
         /*Let the draw units set their preference score*/
@@ -322,14 +328,8 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
     if(_draw_info.unit_cnt <= 1) {
         lv_draw_task_t * t = layer->draw_task_head;
         while(t) {
-            /*Mark unsupported draw tasks as ready as no one else will consume them*/
-            if(t->state == LV_DRAW_TASK_STATE_QUEUED &&
-               t->preferred_draw_unit_id != LV_DRAW_UNIT_NONE &&
-               t->preferred_draw_unit_id != draw_unit_id) {
-                t->state = LV_DRAW_TASK_STATE_READY;
-            }
             /*Not queued yet, leave this layer while the first task will be queued*/
-            else if(t->state != LV_DRAW_TASK_STATE_QUEUED) {
+            if(t->state != LV_DRAW_TASK_STATE_QUEUED) {
                 t = NULL;
                 break;
             }
@@ -398,7 +398,6 @@ uint32_t lv_draw_get_dependent_count(lv_draw_task_t * t_check)
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_display_t * disp = lv_refr_get_disp_refreshing();
     lv_layer_t * new_layer = lv_malloc_zeroed(sizeof(lv_layer_t));
     LV_ASSERT_MALLOC(new_layer);
     if(new_layer == NULL) {
@@ -406,28 +405,44 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
         return NULL;
     }
 
-    new_layer->parent = parent_layer;
-    new_layer->_clip_area = *area;
-    new_layer->buf_area = *area;
-    new_layer->phy_clip_area = *area;
-    new_layer->color_format = color_format;
-
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-    lv_matrix_identity(&new_layer->matrix);
-#endif
-
-    if(disp->layer_head) {
-        lv_layer_t * tail = disp->layer_head;
-        while(tail->next) tail = tail->next;
-        tail->next = new_layer;
-    }
-    else {
-        disp->layer_head = new_layer;
-    }
+    lv_draw_layer_init(new_layer, parent_layer, color_format, area);
 
     LV_PROFILER_DRAW_END;
     return new_layer;
 }
+
+void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_format_t color_format,
+                        const lv_area_t * area)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    LV_ASSERT_NULL(layer);
+    lv_memzero(layer, sizeof(lv_layer_t));
+    lv_display_t * disp = lv_refr_get_disp_refreshing();
+
+    layer->parent = parent_layer;
+    layer->_clip_area = *area;
+    layer->buf_area = *area;
+    layer->phy_clip_area = *area;
+    layer->color_format = color_format;
+
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    lv_matrix_identity(&layer->matrix);
+#endif
+
+    if(disp->layer_init) disp->layer_init(disp, layer);
+
+    if(disp->layer_head) {
+        lv_layer_t * tail = disp->layer_head;
+        while(tail->next) tail = tail->next;
+        tail->next = layer;
+    }
+    else {
+        disp->layer_head = layer;
+    }
+
+    LV_PROFILER_DRAW_END;
+}
+
 
 void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 {

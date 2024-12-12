@@ -1,4 +1,4 @@
-# Kconfig file for LVGL v9.2.0
+# Kconfig file for LVGL v9.3.0-dev
 
 menu "LVGL configuration"
 
@@ -162,6 +162,15 @@ menu "LVGL configuration"
 			string "Custom OS include header"
 			default "stdint.h"
 			depends on LV_OS_CUSTOM
+
+		config LV_USE_FREERTOS_TASK_NOTIFY
+			bool "Use RTOS task with a direct notification for synchronization"
+			default y
+			depends on LV_OS_FREERTOS
+		help
+			Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
+			than unblocking a task using an intermediary object such as a binary semaphore.
+			RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
 	endmenu
 
 	menu "Rendering Configuration"
@@ -363,8 +372,18 @@ menu "LVGL configuration"
 			depends on LV_USE_DRAW_VGLITE
 			default n
 
+		config LV_USE_PXP
+		bool "Use NXP's PXP on iMX RTxxx platforms"
+		default n
+
 		config LV_USE_DRAW_PXP
-			bool "Use NXP's PXP on iMX RTxxx platforms"
+		bool "Use PXP for drawing"
+			depends on LV_USE_PXP
+			default y
+
+		config LV_USE_ROTATE_PXP
+			bool "Use PXP to rotate display"
+			depends on LV_USE_PXP
 			default n
 
 		config LV_USE_PXP_DRAW_THREAD
@@ -457,6 +476,11 @@ menu "LVGL configuration"
 				if enabled, the user is required to call
 				`lv_draw_dma2d_transfer_complete_interrupt_handler`
 				upon receiving the DMA2D global interrupt
+
+		config LV_USE_DRAW_OPENGLES
+			bool "Draw using cached OpenGLES textures"
+			default n
+			depends on LV_USE_OPENGLES
 	endmenu
 
 	menu "Feature Configuration"
@@ -953,6 +977,10 @@ menu "LVGL configuration"
 			help
 				Minimum number of characters in a long word to put on a line after a break
 
+		config LV_TXT_COLOR_CMD
+			string "The control character to use for signalling text recoloring"
+			default "#"
+
 		config LV_USE_BIDI
 			bool "Support bidirectional texts"
 			help
@@ -1271,6 +1299,14 @@ menu "LVGL configuration"
 			bool "Decode whole image to RAM for bin decoder"
 			default n
 
+		config LV_USE_SVG
+			bool "SVG library"
+			depends on LV_USE_VECTOR_GRAPHIC
+
+		config LV_USE_SVG_ANIMATION
+			bool "SVG animation"
+			depends on LV_USE_SVG
+
 		config LV_USE_RLE
 			bool "LVGL's version of RLE compression method"
 
@@ -1542,7 +1578,7 @@ menu "LVGL configuration"
 			default 9 # LVGL_VERSION_MAJOR
 		config LVGL_VERSION_MINOR
 			int
-			default 2 # LVGL_VERSION_MINOR
+			default 3 # LVGL_VERSION_MINOR
 		config LVGL_VERSION_PATCH
 			int
 			default 0 # LVGL_VERSION_PATCH
@@ -1740,6 +1776,11 @@ menu "LVGL configuration"
 			bool "Use Nuttx to open window and handle touchscreen"
 			default n
 
+		config LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
+			bool "Use independent image heap"
+			depends on LV_USE_NUTTX
+			default n
+
 		config LV_USE_NUTTX_LIBUV
 			bool "Use uv loop to replace default timer loop and other fb/indev timers"
 			depends on LV_USE_NUTTX
@@ -1787,6 +1828,13 @@ menu "LVGL configuration"
 			bool "Use NuttX touchscreen driver"
 			depends on LV_USE_NUTTX
 			default n
+
+		config LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
+			int "Touchscreen cursor size in pixels"
+			depends on LV_USE_NUTTX_TOUCHSCREEN
+			default 0
+			help
+				Set to 0 to disable cursor, or set to a value greater than 0 to set the cursor size in pixels.
 
 		config LV_USE_LINUX_DRM
 			bool "Use Linux DRM device"
@@ -1838,6 +1886,15 @@ menu "LVGL configuration"
 			bool "Use Renesas GLCDC driver"
 			default n
 
+		config LV_USE_ST_LTDC
+			bool "Driver for ST LTDC"
+			default n
+
+		config LV_ST_LTDC_USE_DMA2D_FLUSH
+			bool "Only used for created partial mode LTDC displays"
+			default n
+			depends on LV_USE_ST_LTDC && !LV_USE_DRAW_DMA2D
+
 		config LV_USE_WINDOWS
 			bool "Use LVGL Windows backend"
 			depends on LV_OS_WINDOWS
@@ -1880,7 +1937,11 @@ menu "LVGL configuration"
 		config LV_USE_DEMO_BENCHMARK
 			bool "Benchmark your system"
 			default n
-			depends on LV_FONT_MONTSERRAT_14 && LV_FONT_MONTSERRAT_24 && LV_USE_DEMO_WIDGETS
+			select LV_FONT_MONTSERRAT_14
+			select LV_FONT_MONTSERRAT_20
+			select LV_FONT_MONTSERRAT_24
+			select LV_FONT_MONTSERRAT_26
+			select LV_USE_DEMO_WIDGETS
 		config LV_USE_DEMO_RENDER
 			bool "Render test for each primitives. Requires at least 480x272 display"
 			default n

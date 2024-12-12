@@ -381,6 +381,7 @@ void test_dropdown_render_2(void)
     lv_dropdown_open(dd2);
 
     lv_obj_t * dd3 = lv_dropdown_create(lv_screen_active());
+    lv_obj_set_height(dd3, 70);
     lv_dropdown_set_text(dd3, "Limit Down");
     lv_dropdown_set_options(dd3, "1aaaaaaaaaaaaaaaa\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15");
     lv_obj_align(dd3, LV_ALIGN_LEFT_MID, 300, -10);

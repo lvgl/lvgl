@@ -10,6 +10,7 @@
 #include "../layouts/lv_layout_private.h"
 #include "lv_obj_event_private.h"
 #include "lv_obj_draw_private.h"
+#include "lv_obj_style_private.h"
 #include "lv_obj_private.h"
 #include "../display/lv_display.h"
 #include "../display/lv_display_private.h"
@@ -33,6 +34,7 @@ static int32_t calc_content_width(lv_obj_t * obj);
 static int32_t calc_content_height(lv_obj_t * obj);
 static void layout_update_core(lv_obj_t * obj);
 static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p_count, bool inv);
+static bool is_transformed(const lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -624,8 +626,15 @@ void lv_obj_refr_pos(lv_obj_t * obj)
     /*Handle percentage value*/
     int32_t pw = lv_obj_get_content_width(parent);
     int32_t ph = lv_obj_get_content_height(parent);
-    if(LV_COORD_IS_PCT(x)) x = (pw * LV_COORD_GET_PCT(x)) / 100;
-    if(LV_COORD_IS_PCT(y)) y = (ph * LV_COORD_GET_PCT(y)) / 100;
+    if(LV_COORD_IS_PCT(x)) {
+        if(lv_obj_get_style_width(parent, 0) == LV_SIZE_CONTENT) x = 0; /*Avoid circular dependency*/
+        else x = (pw * LV_COORD_GET_PCT(x)) / 100;
+    }
+
+    if(LV_COORD_IS_PCT(y)) {
+        if(lv_obj_get_style_height(parent, 0) == LV_SIZE_CONTENT) y = 0; /*Avoid circular dependency*/
+        y = (ph * LV_COORD_GET_PCT(y)) / 100;
+    }
 
     /*Handle percentage value of translate*/
     int32_t tr_x = lv_obj_get_style_translate_x(obj, LV_PART_MAIN);
@@ -878,7 +887,12 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     /*The area is not on the object*/
     if(!lv_area_intersect(area, area, &obj_coords)) return false;
 
-    lv_obj_get_transformed_area(obj, area, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
+    if(!is_transformed(obj)) {
+        *area = obj_coords;
+    }
+    else {
+        lv_obj_get_transformed_area(obj, area, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
+    }
 
     /*Truncate recursively to the parents*/
     lv_obj_t * parent = lv_obj_get_parent(obj);
@@ -893,7 +907,12 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
             lv_area_increase(&parent_coords, parent_ext_size, parent_ext_size);
         }
 
-        lv_obj_get_transformed_area(parent, &parent_coords, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
+        if(!is_transformed(parent)) {
+            parent_coords = parent->coords;
+        }
+        else {
+            lv_obj_get_transformed_area(parent, &parent_coords, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
+        }
         if(!lv_area_intersect(area, area, &parent_coords)) return false;
 
         parent = lv_obj_get_parent(parent);
@@ -972,9 +991,94 @@ void lv_obj_center(lv_obj_t * obj)
     lv_obj_align(obj, LV_ALIGN_CENTER, 0, 0);
 }
 
+void lv_obj_set_transform(lv_obj_t * obj, const lv_matrix_t * matrix)
+{
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    if(!matrix) {
+        lv_obj_reset_transform(obj);
+        return;
+    }
+
+    lv_obj_allocate_spec_attr(obj);
+    if(!obj->spec_attr->matrix) {
+        obj->spec_attr->matrix = lv_malloc(sizeof(lv_matrix_t));;
+        LV_ASSERT_MALLOC(obj->spec_attr->matrix);
+    }
+
+    /* Invalidate the old area */
+    lv_obj_invalidate(obj);
+
+    /* Copy the matrix */
+    *obj->spec_attr->matrix = *matrix;
+
+    /* Matrix is set. Update the layer type */
+    lv_obj_update_layer_type(obj);
+
+    /* Invalidate the new area */
+    lv_obj_invalidate(obj);
+#else
+    LV_UNUSED(obj);
+    LV_UNUSED(matrix);
+    LV_LOG_WARN("Transform matrix is not used because LV_DRAW_TRANSFORM_USE_MATRIX is disabled");
+#endif
+}
+
+void lv_obj_reset_transform(lv_obj_t * obj)
+{
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(!obj->spec_attr) {
+        return;
+    }
+
+    if(!obj->spec_attr->matrix) {
+        return;
+    }
+
+    /* Invalidate the old area */
+    lv_obj_invalidate(obj);
+
+    /* Free the matrix */
+    lv_free(obj->spec_attr->matrix);
+    obj->spec_attr->matrix = NULL;
+
+    /* Matrix is cleared. Update the layer type */
+    lv_obj_update_layer_type(obj);
+
+    /* Invalidate the new area */
+    lv_obj_invalidate(obj);
+#else
+    LV_UNUSED(obj);
+#endif
+}
+
+const lv_matrix_t * lv_obj_get_transform(const lv_obj_t * obj)
+{
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(obj->spec_attr) {
+        return obj->spec_attr->matrix;
+    }
+#else
+    LV_UNUSED(obj);
+#endif
+    return NULL;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static bool is_transformed(const lv_obj_t * obj)
+{
+    while(obj) {
+        if(obj->spec_attr && obj->spec_attr->layer_type == LV_LAYER_TYPE_TRANSFORM) return true;
+        obj = obj->parent;
+    }
+    return false;
+}
 
 static int32_t calc_content_width(lv_obj_t * obj)
 {
@@ -1046,7 +1150,7 @@ static int32_t calc_content_width(lv_obj_t * obj)
                     default:
                         /* Consider other cases only if x=0 and use the width of the object.
                          * With x!=0 circular dependency could occur. */
-                        if(lv_obj_get_style_y(child, 0) == 0) {
+                        if(lv_obj_get_style_x(child, 0) == 0) {
                             child_res_tmp = lv_area_get_width(&child->coords) + space_left;
                             child_res_tmp += lv_obj_get_style_margin_right(child, LV_PART_MAIN);
                         }
@@ -1150,6 +1254,31 @@ static void layout_update_core(lv_obj_t * obj)
 
 static void transform_point_array(const lv_obj_t * obj, lv_point_t * p, size_t p_count, bool inv)
 {
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    const lv_matrix_t * obj_matrix = lv_obj_get_transform(obj);
+    if(obj_matrix) {
+        lv_matrix_t m;
+        lv_matrix_identity(&m);
+        lv_matrix_translate(&m, obj->coords.x1, obj->coords.y1);
+        lv_matrix_multiply(&m, obj_matrix);
+        lv_matrix_translate(&m, -obj->coords.x1, -obj->coords.y1);
+
+        if(inv) {
+            lv_matrix_t inv_m;
+            lv_matrix_inverse(&inv_m, &m);
+            m = inv_m;
+        }
+
+        for(size_t i = 0; i < p_count; i++) {
+            lv_point_precise_t p_precise = lv_point_to_precise(&p[i]);
+            lv_point_precise_t res = lv_matrix_transform_precise_point(&m, &p_precise);
+            p[i] = lv_point_from_precise(&res);
+        }
+
+        return;
+    }
+#endif /* LV_DRAW_TRANSFORM_USE_MATRIX */
+
     int32_t angle = lv_obj_get_style_transform_rotation(obj, 0);
     int32_t scale_x = lv_obj_get_style_transform_scale_x_safe(obj, 0);
     int32_t scale_y = lv_obj_get_style_transform_scale_y_safe(obj, 0);

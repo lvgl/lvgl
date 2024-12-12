@@ -45,8 +45,8 @@ extern "C" {
     do {                                                      \
         vg_lite_error_t error = expr;                         \
         if (LV_VG_LITE_IS_ERROR(error)) {                     \
-            LV_LOG_ERROR("Execute '" #expr "' error(%d): %s", \
-                         (int)error, lv_vg_lite_error_string(error));  \
+            LV_LOG_ERROR("Execute '" #expr "' error: %d", (int)error);  \
+            lv_vg_lite_error_dump_info(error);                \
             LV_VG_LITE_ASSERT(false);                         \
         }                                                     \
     } while (0)
@@ -80,6 +80,8 @@ struct _lv_draw_vg_lite_unit_t;
 /* Print info */
 
 void lv_vg_lite_dump_info(void);
+
+void lv_vg_lite_error_dump_info(vg_lite_error_t error);
 
 const char * lv_vg_lite_error_string(vg_lite_error_t error);
 

@@ -29,21 +29,21 @@ LV_EXPORT_CONST_INT(LV_BUTTONMATRIX_BUTTON_NONE);
  *      TYPEDEFS
  **********************/
 
-/** Type to store button control bits (disabled, hidden etc.)
- * The first 3 bits are used to store the width*/
+/** Type to store button control flags (disabled, hidden etc.)
+ *  The least-significant 4 bits are used to store button-width proportions in range [1..15]. */
 typedef enum {
-    LV_BUTTONMATRIX_CTRL_HIDDEN       = 0x0010, /**< Button hidden*/
-    LV_BUTTONMATRIX_CTRL_NO_REPEAT    = 0x0020, /**< Do not repeat press this button.*/
-    LV_BUTTONMATRIX_CTRL_DISABLED     = 0x0040, /**< Disable this button.*/
-    LV_BUTTONMATRIX_CTRL_CHECKABLE    = 0x0080, /**< The button can be toggled.*/
-    LV_BUTTONMATRIX_CTRL_CHECKED      = 0x0100, /**< Button is currently toggled (e.g. checked).*/
-    LV_BUTTONMATRIX_CTRL_CLICK_TRIG   = 0x0200, /**< 1: Send LV_EVENT_VALUE_CHANGE on CLICK, 0: Send LV_EVENT_VALUE_CHANGE on PRESS*/
-    LV_BUTTONMATRIX_CTRL_POPOVER      = 0x0400, /**< Show a popover when pressing this key*/
-    LV_BUTTONMATRIX_CTRL_RESERVED_1  = 0x0800, /**< Reserved for later use*/
-    LV_BUTTONMATRIX_CTRL_RESERVED_2  = 0x1000, /**< Reserved for later use*/
-    LV_BUTTONMATRIX_CTRL_RESERVED_3  = 0x2000, /**< Reserved for later use*/
-    LV_BUTTONMATRIX_CTRL_CUSTOM_1     = 0x4000, /**< Custom free to use flag*/
-    LV_BUTTONMATRIX_CTRL_CUSTOM_2     = 0x8000, /**< Custom free to use flag*/
+    LV_BUTTONMATRIX_CTRL_HIDDEN       = 0x0010, /**< Hides button; it continues to hold its space in layout. */
+    LV_BUTTONMATRIX_CTRL_NO_REPEAT    = 0x0020, /**< Do not emit LV_EVENT_LONG_PRESSED_REPEAT events while button is long-pressed. */
+    LV_BUTTONMATRIX_CTRL_DISABLED     = 0x0040, /**< Disables button like LV_STATE_DISABLED on normal Widgets. */
+    LV_BUTTONMATRIX_CTRL_CHECKABLE    = 0x0080, /**< Enable toggling of LV_STATE_CHECKED when clicked. */
+    LV_BUTTONMATRIX_CTRL_CHECKED      = 0x0100, /**< Make the button checked. It will use the :cpp:enumerator:`LV_STATE_CHECHKED` styles. */
+    LV_BUTTONMATRIX_CTRL_CLICK_TRIG   = 0x0200, /**< 1: Enables sending LV_EVENT_VALUE_CHANGE on CLICK, 0: sends LV_EVENT_VALUE_CHANGE on PRESS. */
+    LV_BUTTONMATRIX_CTRL_POPOVER      = 0x0400, /**< Show button text in a pop-over while being pressed. */
+    LV_BUTTONMATRIX_CTRL_RECOLOR      = 0x0800, /**< Enable text recoloring with `#color` */
+    LV_BUTTONMATRIX_CTRL_RESERVED_2   = 0x1000, /**< Reserved for later use */
+    LV_BUTTONMATRIX_CTRL_RESERVED_3   = 0x2000, /**< Reserved for later use */
+    LV_BUTTONMATRIX_CTRL_CUSTOM_1     = 0x4000, /**< Custom free-to-use flag */
+    LV_BUTTONMATRIX_CTRL_CUSTOM_2     = 0x8000, /**< Custom free-to-use flag */
 } lv_buttonmatrix_ctrl_t;
 
 typedef bool (*lv_buttonmatrix_button_draw_cb_t)(lv_obj_t * btnm, uint32_t btn_id, const lv_area_t * draw_area,

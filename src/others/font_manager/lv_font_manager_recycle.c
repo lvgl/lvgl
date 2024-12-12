@@ -101,7 +101,7 @@ lv_font_t * lv_font_manager_recycle_get_reuse(lv_font_manager_recycle_t * manage
         /* match font */
         if(lv_freetype_info_is_equal(ft_info, &recycle->ft_info)) {
             lv_font_t * font = recycle->font;
-            LV_LOG_INFO("found font: %p", font);
+            LV_LOG_INFO("found font: %p", (void *)font);
 
             /* remove reused font */
             lv_ll_remove(recycle_ll, recycle);

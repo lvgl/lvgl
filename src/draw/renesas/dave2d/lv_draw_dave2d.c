@@ -79,6 +79,7 @@ void lv_draw_dave2d_init(void)
     lv_draw_dave2d_unit_t * draw_dave2d_unit = lv_draw_create_unit(sizeof(lv_draw_dave2d_unit_t));
     draw_dave2d_unit->base_unit.dispatch_cb = lv_draw_dave2d_dispatch;
     draw_dave2d_unit->base_unit.evaluate_cb = _dave2d_evaluate;
+    draw_dave2d_unit->base_unit.name = "DAVE2D";
     draw_dave2d_unit->idx = DRAW_UNIT_ID_DAVE2D;
 
     result = lv_dave2d_init();
@@ -242,6 +243,11 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
             }
 
         case LV_DRAW_TASK_TYPE_IMAGE: {
+                lv_draw_image_dsc_t * dsc = t->draw_dsc;
+                if(dsc->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START) {
+                    ret = 0;
+                    break;
+                }
 #if USE_D2
                 t->preferred_draw_unit_id = DRAW_UNIT_ID_DAVE2D;
                 t->preference_score = 0;

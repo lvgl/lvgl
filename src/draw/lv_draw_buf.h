@@ -48,7 +48,7 @@ LV_EXPORT_CONST_INT(LV_STRIDE_AUTO);
  * For platform that needs special buffer alignment, call LV_DRAW_BUF_INIT_STATIC.
  */
 #define LV_DRAW_BUF_DEFINE_STATIC(name, _w, _h, _cf) \
-    static uint8_t buf_##name[LV_DRAW_BUF_SIZE(_w, _h, _cf)]; \
+    static LV_ATTRIBUTE_MEM_ALIGN uint8_t buf_##name[LV_DRAW_BUF_SIZE(_w, _h, _cf)]; \
     static lv_draw_buf_t name = { \
                                   .header = { \
                                               .magic = LV_IMAGE_HEADER_MAGIC, \
@@ -129,6 +129,9 @@ void lv_draw_buf_handlers_init(lv_draw_buf_handlers_t * handlers,
  * @return                  pointer to the struct of handlers
  */
 lv_draw_buf_handlers_t * lv_draw_buf_get_handlers(void);
+lv_draw_buf_handlers_t * lv_draw_buf_get_font_handlers(void);
+lv_draw_buf_handlers_t * lv_draw_buf_get_image_handlers(void);
+
 
 /**
  * Align the address of a buffer. The buffer needs to be large enough for the real data after alignment

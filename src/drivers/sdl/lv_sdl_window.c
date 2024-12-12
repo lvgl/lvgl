@@ -46,7 +46,7 @@ typedef struct {
     uint8_t * rotated_buf;
     size_t rotated_buf_size;
 #endif
-    uint8_t zoom;
+    float zoom;
     uint8_t ignore_size_chg;
 } lv_sdl_window_t;
 
@@ -87,6 +87,7 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
         SDL_StartTextInput();
         event_handler_timer = lv_timer_create(sdl_event_handler, 5, NULL);
         lv_tick_set_cb(SDL_GetTicks);
+        lv_delay_set_cb(SDL_Delay);
 
         inited = true;
     }
@@ -132,7 +133,6 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
     lv_display_set_render_mode(disp, LV_DISPLAY_RENDER_MODE_DIRECT);
 #endif /*LV_USE_DRAW_SDL == 0*/
     lv_display_add_event_cb(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
-
     /*Process the initial events*/
     sdl_event_handler(NULL);
 
@@ -145,7 +145,7 @@ void lv_sdl_window_set_resizeable(lv_display_t * disp, bool value)
     SDL_SetWindowResizable(dsc->window, value);
 }
 
-void lv_sdl_window_set_zoom(lv_display_t * disp, uint8_t zoom)
+void lv_sdl_window_set_zoom(lv_display_t * disp, float zoom)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     dsc->zoom = zoom;
@@ -153,7 +153,7 @@ void lv_sdl_window_set_zoom(lv_display_t * disp, uint8_t zoom)
     lv_refr_now(disp);
 }
 
-uint8_t lv_sdl_window_get_zoom(lv_display_t * disp)
+float lv_sdl_window_get_zoom(lv_display_t * disp)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     return dsc->zoom;
@@ -208,70 +208,43 @@ static inline int sdl_render_mode(void)
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
 #if LV_USE_DRAW_SDL == 0
-    lv_area_t rotated_area;
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     lv_color_format_t cf = lv_display_get_color_format(disp);
 
     if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        lv_display_rotation_t rotation = lv_display_get_rotation(disp);
+        lv_area_t rotated_area = *area;
+        lv_display_rotate_area(disp, &rotated_area);
+
+        int32_t px_map_w = lv_area_get_width(area);
+        int32_t px_map_h = lv_area_get_height(area);
+        uint32_t px_map_stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), cf);
         uint32_t px_size = lv_color_format_get_size(cf);
 
-        if(rotation != LV_DISPLAY_ROTATION_0) {
-            int32_t w = lv_area_get_width(area);
-            int32_t h = lv_area_get_height(area);
-            uint32_t w_stride = lv_draw_buf_width_to_stride(w, cf);
-            uint32_t h_stride = lv_draw_buf_width_to_stride(h, cf);
-            size_t buf_size = w * h * px_size;
+        int32_t fb_stride = lv_draw_buf_width_to_stride(disp->hor_res, cf);
+        uint8_t * fb_start = dsc->fb_act;
+        fb_start += rotated_area.y1 * fb_stride + rotated_area.x1 * px_size;
+        lv_display_rotation_t rotation = lv_display_get_rotation(disp);
 
-            /* (Re)allocate temporary buffer if needed */
-            if(!dsc->rotated_buf || dsc->rotated_buf_size != buf_size) {
-                dsc->rotated_buf = sdl_draw_buf_realloc_aligned(dsc->rotated_buf, buf_size);
-                dsc->rotated_buf_size = buf_size;
+        if(rotation == LV_DISPLAY_ROTATION_0) {
+            uint32_t px_map_line_bytes = lv_area_get_width(area) * px_size;
+
+            int32_t y;
+            for(y = area->y1; y <= area->y2; y++) {
+                lv_memcpy(fb_start, px_map, px_map_line_bytes);
+                px_map += px_map_stride;
+                fb_start += fb_stride;
             }
-
-            switch(rotation) {
-                case LV_DISPLAY_ROTATION_0:
-                    break;
-                case LV_DISPLAY_ROTATION_90:
-                    lv_draw_sw_rotate(px_map, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
-                    break;
-                case LV_DISPLAY_ROTATION_180:
-                    lv_draw_sw_rotate(px_map, dsc->rotated_buf, w, h, w_stride, w_stride, rotation, cf);
-                    break;
-                case LV_DISPLAY_ROTATION_270:
-                    lv_draw_sw_rotate(px_map, dsc->rotated_buf, w, h, w_stride, h_stride, rotation, cf);
-                    break;
-            }
-
-            px_map = dsc->rotated_buf;
-
-            rotated_area = *area;
-            lv_display_rotate_area(disp, &rotated_area);
-            area = &rotated_area;
         }
-
-        uint32_t px_map_stride = lv_draw_buf_width_to_stride(lv_area_get_width(area), cf);
-        uint32_t px_map_line_bytes = lv_area_get_width(area) * px_size;
-
-        uint8_t * fb_tmp = dsc->fb_act;
-        uint32_t fb_stride = disp->hor_res * px_size;
-        fb_tmp += area->y1 * fb_stride;
-        fb_tmp += area->x1 * px_size;
-
-        int32_t y;
-        for(y = area->y1; y <= area->y2; y++) {
-            lv_memcpy(fb_tmp, px_map, px_map_line_bytes);
-            px_map += px_map_stride;
-            fb_tmp += fb_stride;
+        else {
+            lv_draw_sw_rotate(px_map, fb_start, px_map_w, px_map_h, px_map_stride, fb_stride, rotation, cf);
         }
     }
 
-    /* TYPICALLY YOU DO NOT NEED THIS
-     * If it was the last part to refresh update the texture of the window.*/
     if(lv_display_flush_is_last(disp)) {
         if(sdl_render_mode() != LV_DISPLAY_RENDER_MODE_PARTIAL) {
             dsc->fb_act = px_map;
         }
+
         window_update(disp);
     }
 #else
@@ -316,7 +289,9 @@ static void sdl_event_handler(lv_timer_t * t)
                     break;
                 case SDL_WINDOWEVENT_RESIZED:
                     dsc->ignore_size_chg = 1;
-                    lv_display_set_resolution(disp, event.window.data1 / dsc->zoom, event.window.data2 / dsc->zoom);
+                    int32_t hres = (int32_t)((float)(event.window.data1) / dsc->zoom);
+                    int32_t vres = (int32_t)((float)(event.window.data2) / dsc->zoom);
+                    lv_display_set_resolution(disp, hres, vres);
                     dsc->ignore_size_chg = 0;
                     lv_refr_now(disp);
                     break;
@@ -341,18 +316,18 @@ static void sdl_event_handler(lv_timer_t * t)
 static void window_create(lv_display_t * disp)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
-    dsc->zoom = 1;
+    dsc->zoom = 1.0;
 
     int flag = SDL_WINDOW_RESIZABLE;
 #if LV_SDL_FULLSCREEN
     flag |= SDL_WINDOW_FULLSCREEN;
 #endif
 
-    int32_t hor_res = disp->hor_res;
-    int32_t ver_res = disp->ver_res;
+    int32_t hor_res = (int32_t)((float)(disp->hor_res) * dsc->zoom);
+    int32_t ver_res = (int32_t)((float)(disp->ver_res) * dsc->zoom);
     dsc->window = SDL_CreateWindow("LVGL Simulator",
                                    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                                   hor_res * dsc->zoom, ver_res * dsc->zoom, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
+                                   hor_res, ver_res, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
 
     dsc->renderer = SDL_CreateRenderer(dsc->window, -1,
                                        LV_SDL_ACCELERATED ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE);
@@ -366,7 +341,7 @@ static void window_create(lv_display_t * disp)
 #endif
 #endif /*LV_USE_DRAW_SDL == 0*/
     /*Some platforms (e.g. Emscripten) seem to require setting the size again */
-    SDL_SetWindowSize(dsc->window, hor_res * dsc->zoom, ver_res * dsc->zoom);
+    SDL_SetWindowSize(dsc->window, hor_res, ver_res);
 #if LV_USE_DRAW_SDL == 0
     texture_resize(disp);
 #endif /*LV_USE_DRAW_SDL == 0*/
@@ -460,7 +435,8 @@ static void res_chg_event_cb(lv_event_t * e)
 
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     if(dsc->ignore_size_chg == false) {
-        SDL_SetWindowSize(dsc->window, disp->hor_res * dsc->zoom, disp->ver_res * dsc->zoom);
+        SDL_SetWindowSize(dsc->window,
+                          (int)((float)(disp->hor_res)*dsc->zoom), (int)((float)(disp->ver_res)*dsc->zoom));
     }
 
 #if LV_USE_DRAW_SDL == 0

@@ -129,6 +129,14 @@ void lv_label_set_text_selection_start(lv_obj_t * obj, uint32_t index);
  */
 void lv_label_set_text_selection_end(lv_obj_t * obj, uint32_t index);
 
+/**
+ * Enable the recoloring by in-line commands
+ * @param obj           pointer to a label object
+ * @param en            true: enable recoloring, false: disable
+ * Example: "This is a #ff0000 red# word"
+ */
+void lv_label_set_recolor(lv_obj_t * obj, bool en);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -187,6 +195,13 @@ uint32_t lv_label_get_text_selection_start(const lv_obj_t * obj);
  * @return          selection end index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
  */
 uint32_t lv_label_get_text_selection_end(const lv_obj_t * obj);
+
+/**
+ * @brief Get the recoloring attribute
+ * @param obj       pointer to a label object.
+ * @return          true: recoloring is enabled, false: recoloring is disabled
+ */
+bool lv_label_get_recolor(const lv_obj_t * obj);
 
 /*=====================
  * Other functions

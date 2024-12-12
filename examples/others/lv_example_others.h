@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "file_explorer/lv_example_file_explorer.h"
+#include "font_manager/lv_example_font_manager.h"
 #include "fragment/lv_example_fragment.h"
 #include "gridnav/lv_example_gridnav.h"
 #include "ime/lv_example_ime_pinyin.h"

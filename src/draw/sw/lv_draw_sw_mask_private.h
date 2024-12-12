@@ -16,6 +16,8 @@ extern "C" {
 
 #include "lv_draw_sw_mask.h"
 
+#if LV_DRAW_SW_COMPLEX
+
 /*********************
  *      DEFINES
  *********************/
@@ -51,7 +53,7 @@ struct _lv_draw_sw_mask_line_param_t {
         lv_point_t p2;
 
         /*Which side to keep?*/
-        lv_draw_sw_mask_line_side_t side : 2;
+        lv_draw_sw_mask_line_side_t side : 3;
     } cfg;
 
     /** A point of the line */
@@ -145,6 +147,8 @@ void lv_draw_sw_mask_cleanup(void);
 /**********************
  *      MACROS
  **********************/
+
+#endif  /*LV_DRAW_SW_COMPLEX*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -358,6 +358,10 @@ void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_
                                  lv_style_selector_t selector)
 {
     LV_PROFILER_STYLE_BEGIN;
+
+    /*Stop running transitions wit this property */
+    trans_delete(obj, lv_obj_style_get_selector_part(selector), prop, NULL);
+
     lv_style_t * style = get_local_style(obj, selector);
     if(selector == LV_PART_MAIN && lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_TRANSFORM)) {
         lv_obj_invalidate(obj);
@@ -962,6 +966,9 @@ static void trans_anim_completed_cb(lv_anim_t * a)
 
 static lv_layer_type_t calculate_layer_type(lv_obj_t * obj)
 {
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    if(lv_obj_get_transform(obj) != NULL) return LV_LAYER_TYPE_TRANSFORM;
+#endif
     if(lv_obj_get_style_transform_rotation(obj, 0) != 0) return LV_LAYER_TYPE_TRANSFORM;
     if(lv_obj_get_style_transform_scale_x(obj, 0) != 256) return LV_LAYER_TYPE_TRANSFORM;
     if(lv_obj_get_style_transform_scale_y(obj, 0) != 256) return LV_LAYER_TYPE_TRANSFORM;

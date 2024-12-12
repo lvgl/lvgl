@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_draw_sw_gradient.c
  *
  */

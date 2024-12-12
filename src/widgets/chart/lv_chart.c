@@ -94,7 +94,7 @@ void lv_chart_set_type(lv_obj_t * obj, lv_chart_type_t type)
     if(type == LV_CHART_TYPE_SCATTER) {
         lv_chart_series_t * ser;
         LV_LL_READ_BACK(&chart->series_ll, ser) {
-            ser->x_points = lv_malloc(sizeof(lv_point_t) * chart->point_cnt);
+            ser->x_points = lv_malloc(sizeof(int32_t) * chart->point_cnt);
             LV_ASSERT_MALLOC(ser->x_points);
             if(ser->x_points == NULL) return;
         }
@@ -227,7 +227,12 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
     int32_t h = lv_obj_get_content_height(obj);
 
     if(chart->type == LV_CHART_TYPE_LINE) {
-        p_out->x = (w * id) / (chart->point_cnt - 1);
+        if(chart->point_cnt > 1) {
+            p_out->x = (w * id) / (chart->point_cnt - 1);
+        }
+        else {
+            p_out->x = 0;
+        }
     }
     else if(chart->type == LV_CHART_TYPE_SCATTER) {
         p_out->x = lv_map(ser->x_points[id], chart->xmin[ser->x_axis_sec], chart->xmax[ser->x_axis_sec], 0, w);
@@ -241,10 +246,16 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
 
         int32_t block_w = (w - ((chart->point_cnt - 1) * block_gap)) / chart->point_cnt;
 
-        p_out->x = (int32_t)((int32_t)(w - block_w) * id) / (chart->point_cnt - 1);
+        if(chart->point_cnt > 1) {
+            p_out->x = (int32_t)((int32_t)(w - block_w) * id) / (chart->point_cnt - 1);
+        }
+        else {
+            p_out->x = 0;
+        }
+
         lv_chart_series_t * ser_i = NULL;
         uint32_t ser_idx = 0;
-        LV_LL_READ_BACK(&chart->series_ll, ser_i) {
+        LV_LL_READ(&chart->series_ll, ser_i) {
             if(ser_i == ser) break;
             ser_idx++;
         }
@@ -1073,6 +1084,9 @@ static void draw_series_bar(lv_obj_t * obj, lv_layer_t * layer)
     int32_t y_tmp;
     lv_chart_series_t * ser;
     uint32_t ser_cnt = lv_ll_get_len(&chart->series_ll);
+    if(ser_cnt == 0) {
+        return;
+    }
     int32_t block_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);  /*Gap between the column on ~adjacent X*/
     int32_t block_w = (w - ((chart->point_cnt - 1) * block_gap)) / chart->point_cnt;
     int32_t ser_gap = lv_obj_get_style_pad_column(obj, LV_PART_ITEMS); /*Gap between the columns on the ~same X*/
@@ -1094,7 +1108,14 @@ static void draw_series_bar(lv_obj_t * obj, lv_layer_t * layer)
 
     /*Go through all points*/
     for(i = 0; i < chart->point_cnt; i++) {
-        int32_t x_act = (int32_t)((int32_t)(w - block_w) * i) / (chart->point_cnt - 1) + obj->coords.x1 + x_ofs;
+        int32_t x_act;
+        if(chart->point_cnt <= 1) {
+            x_act = obj->coords.x1 + x_ofs;
+        }
+        else {
+            x_act = (int32_t)((int32_t)(w - block_w) * i) / (chart->point_cnt - 1) + obj->coords.x1 + x_ofs;
+        }
+
         col_dsc.base.id2 = i;
         col_dsc.base.id1 = 0;
 

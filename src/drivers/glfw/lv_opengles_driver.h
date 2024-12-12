@@ -49,11 +49,21 @@ void lv_opengles_deinit(void);
  * @param texture        OpenGL texture ID
  * @param texture_area   the area in the window to render the texture in
  * @param opa            opacity to blend the texture with existing contents
- * @param disp_w         width of the window being rendered to
- * @param disp_h         height of the window being rendered to
+ * @param disp_w         width of the window/framebuffer being rendered to
+ * @param disp_h         height of the window/framebuffer being rendered to
  */
 void lv_opengles_render_texture(unsigned int texture, const lv_area_t * texture_area, lv_opa_t opa, int32_t disp_w,
-                                int32_t disp_h);
+                                int32_t disp_h, const lv_area_t * texture_clip_area, bool flip);
+
+/**
+ * Render a fill
+ * @param color          the color of the fill
+ * @param area           the area in the window to render the fill
+ * @param opa            opacity to blend the fill with existing contents
+ * @param disp_w         width of the window/framebuffer being rendered to
+ * @param disp_h         height of the window/framebuffer being rendered to
+ */
+void lv_opengles_render_fill(lv_color_t color, const lv_area_t * area, lv_opa_t opa, int32_t disp_w, int32_t disp_h);
 
 /**
  * Clear the window/display

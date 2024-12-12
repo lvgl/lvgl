@@ -1,24 +1,24 @@
 .. _changelog:
 
-Changelog
-=========
+Change Log
+==========
 
 `v9.2 <https://github.com/lvgl/lvgl/compare/v9.1.0...v9.2.0>`__ 26 August 2024
 ------------------------------------------------------------------------------
 
 It's huge release with many interesting updates:
 
-- Built-in `Wayland driver <https://docs.lvgl.io/master/integration/driver/wayland.html>`__
-- `OpenGL ES and GLFW driver <https://docs.lvgl.io/master/integration/driver/opengles.html>`__ with support for external textures
-- `Renesas GLCDC <https://docs.lvgl.io/master/integration/driver/display/renesas_glcdc.html>`__ driver
+- Built-in :ref:`Wayland driver <wayland_driver>`
+- :ref:`OpenGL ES and GLFW driver <opengl_es_driver>` with support for external textures
+- :ref:`renesas_glcdc` driver
 - L8 and I1 rendering support
 - Matrix transformations during rendering
-- New `file system interfaces <https://docs.lvgl.io/master/libs/fs.html>`__: LittleFS, ESP LittleFS, Arduino FS
+- New :ref:`file system interfaces <libs_filesystem>`: LittleFS, ESP LittleFS, Arduino FS
 - SDL renderer improvements (supporting all draw task types and improving speed)
-- Radial, Conic, and Skew `gradients supported <https://docs.lvgl.io/master/overview/style.html#metallic-knob-with-conic-gradient>`__ by software rendering and VG-Lite
-- `QNX <https://docs.lvgl.io/master/integration/os/qnx.html>`__ and `MQX <https://docs.lvgl.io/master/integration/os/mqx.html>`__ support
-- `Mouse hover handling <https://docs.lvgl.io/master/get-started/quick-overview.html>`__
-- `Lottie <https://docs.lvgl.io/master/widgets/lottie.html>`__ support
+- Radial, Conic, and Skew `gradients supported <https://docs.lvgl.io/master/details/base-widget/styles/style.html#metallic-knob-with-conic-gradient>`__ by software rendering and VG-Lite
+- :ref:`qnx` and :ref:`mqx` support
+- :ref:`Mouse hover handling <style_states>`
+- :ref:`lv_lottie` support
 - CI tests for UEFI builds
 
 And many smaller fixes and features
@@ -285,7 +285,7 @@ Fixes
 - **fix(sdl): handle if the window_id is not set correctly in SDL** `6194 <https://github.com/lvgl/lvgl/pull/6194>`__
 - **fix(drivers): drm driver not initialising with small screens** `6244 <https://github.com/lvgl/lvgl/pull/6244>`__
 - **fix(freetype): fix potential multi-threaded data conflicts** `6252 <https://github.com/lvgl/lvgl/pull/6252>`__
-- **fix(vglite): build issues ** `6245 <https://github.com/lvgl/lvgl/pull/6245>`__
+- **fix(vglite): build issues** `6245 <https://github.com/lvgl/lvgl/pull/6245>`__
 - **fix(canvas): lv_canvas_set_px for indexed images** `6226 <https://github.com/lvgl/lvgl/pull/6226>`__
 - **fix(snapshot): fix memleak in lv_snapshot** `6147 <https://github.com/lvgl/lvgl/pull/6147>`__
 - **fix(span): fix span incorrect max height calculation** `6243 <https://github.com/lvgl/lvgl/pull/6243>`__

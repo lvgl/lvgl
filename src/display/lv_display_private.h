@@ -91,6 +91,8 @@ struct _lv_display_t {
 
     lv_display_render_mode_t render_mode;
     uint32_t antialiasing : 1;       /**< 1: anti-aliasing is enabled on this display.*/
+    uint32_t tile_cnt     : 8;       /**< Divide the display buffer into these number of tiles */
+
 
     /** 1: The current screen rendering is in progress*/
     uint32_t rendering_in_progress : 1;

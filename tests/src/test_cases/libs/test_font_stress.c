@@ -4,7 +4,7 @@
 
 #include "unity/unity.h"
 
-#if LV_USE_FREETYPE
+#if LV_USE_FREETYPE && LV_USE_FONT_MANAGER
 
 #include "rnd_unicodes/lv_rnd_unicodes.h"
 
@@ -27,36 +27,36 @@ typedef struct {
     int font_cnt;
     int label_cnt;
     int loop_cnt;
-} lvx_font_stress_config_t;
+} font_stress_config_t;
 
-typedef struct {
+struct _font_stress_ctx_t;
+
+typedef lv_font_t * (*font_create_cb_t)(struct _font_stress_ctx_t * ctx,
+                                        const char * name,
+                                        lv_freetype_font_render_mode_t render_mode,
+                                        uint32_t size,
+                                        lv_freetype_font_style_t style);
+
+typedef void (*font_delete_cb_t)(struct _font_stress_ctx_t * ctx, lv_font_t * font);
+
+typedef struct _font_stress_ctx_t {
+    font_stress_config_t config;
     lv_obj_t * par;
     lv_obj_t ** label_arr;
-    lvx_font_stress_config_t config;
-} stress_test_ctx_t;
+    lv_font_manager_t * font_manager;
+    font_create_cb_t font_create_cb;
+    font_delete_cb_t font_delete_cb;
+} font_stress_ctx_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
-static void update_cb(void);
-
 /**********************
  *  STATIC VARIABLES
  **********************/
 
-static stress_test_ctx_t g_ctx = { 0 };
-static const char * font_name_arr[] = {
-    "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf",
-    "../src/libs/freetype/arial.ttf",
-    "../demos/multilang/assets/fonts/Montserrat-Bold.ttf",
-    "UNKNOWN_FONT_NAME"
-};
-static const uint16_t font_style[] = {
-    LV_FREETYPE_FONT_STYLE_NORMAL,
-    LV_FREETYPE_FONT_STYLE_ITALIC,
-    LV_FREETYPE_FONT_STYLE_BOLD,
-};
+static font_stress_ctx_t g_ctx = { 0 };
 
 /**********************
  *      MACROS
@@ -78,8 +78,15 @@ static const uint16_t font_style[] = {
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_obj_t * label_create(const char * font_name, lv_obj_t * par, int size, int x, int y)
+static lv_obj_t * font_stress_label_create(font_stress_ctx_t * ctx, const char * font_name, lv_obj_t * par, int size,
+                                           int x, int y)
 {
+    static const uint16_t font_style[] = {
+        LV_FREETYPE_FONT_STYLE_NORMAL,
+        LV_FREETYPE_FONT_STYLE_ITALIC,
+        LV_FREETYPE_FONT_STYLE_BOLD,
+    };
+
     uint32_t index = lv_rand(0, sizeof(font_style) / sizeof(uint16_t) - 1);
     uint32_t r = lv_rand(0, 0xFF);
     uint32_t g = lv_rand(0, 0xFF);
@@ -87,7 +94,7 @@ static lv_obj_t * label_create(const char * font_name, lv_obj_t * par, int size,
     lv_opa_t opa = lv_rand(0, LV_OPA_COVER);
     lv_color_t color = lv_color_make(r, g, b);
 
-    lv_font_t * font = lv_freetype_font_create(font_name, LV_FREETYPE_FONT_RENDER_MODE_BITMAP, size, font_style[index]);
+    lv_font_t * font = ctx->font_create_cb(ctx, font_name, LV_FREETYPE_FONT_RENDER_MODE_BITMAP, size, font_style[index]);
     if(!font) {
         return NULL;
     }
@@ -106,26 +113,28 @@ static lv_obj_t * label_create(const char * font_name, lv_obj_t * par, int size,
     lv_label_set_text(label, (char *)str);
     return label;
 }
-static void label_delete(lv_obj_t * label)
+
+static void font_stress_label_delete(font_stress_ctx_t * ctx, lv_obj_t * label)
 {
     const lv_font_t * font = lv_obj_get_style_text_font(label, 0);
-    LV_ASSERT_NULL(font);
-    lv_freetype_font_delete((lv_font_t *)font);
+    TEST_ASSERT_NOT_NULL(font);
     lv_obj_del(label);
+    ctx->font_delete_cb(ctx, (lv_font_t *)font);
 }
-static void label_delete_all(stress_test_ctx_t * ctx)
+
+static void font_stress_label_delete_all(font_stress_ctx_t * ctx)
 {
     for(int i = 0; i < ctx->config.label_cnt; i++) {
         lv_obj_t * label = ctx->label_arr[i];
         if(label) {
-            label_delete(label);
+            font_stress_label_delete(ctx, label);
             ctx->label_arr[i] = NULL;
         }
     }
 }
-static void update_cb(void)
+
+static void font_stress_update(font_stress_ctx_t * ctx)
 {
-    stress_test_ctx_t * ctx = &g_ctx;
     uint32_t label_index = lv_rand(0, ctx->config.label_cnt - 1);
     uint32_t font_index = lv_rand(0, ctx->config.font_cnt - 1);
     uint32_t font_size = lv_rand(0, MAX_FONT_SIZE);
@@ -134,13 +143,14 @@ static void update_cb(void)
 
     lv_obj_t * label = ctx->label_arr[label_index];
     if(label) {
-        label_delete(label);
+        font_stress_label_delete(ctx, label);
         ctx->label_arr[label_index] = NULL;
     }
     else {
         const char * pathname = ctx->config.font_name_arr[font_index];
-        LV_ASSERT_NULL(pathname);
-        label = label_create(
+        TEST_ASSERT_NOT_NULL(pathname);
+        label = font_stress_label_create(
+                    ctx,
                     pathname,
                     ctx->par,
                     (int)font_size,
@@ -150,37 +160,74 @@ static void update_cb(void)
     }
 }
 
+static lv_font_t * freetype_font_create_cb(font_stress_ctx_t * ctx,
+                                           const char * name,
+                                           lv_freetype_font_render_mode_t render_mode,
+                                           uint32_t size,
+                                           lv_freetype_font_style_t style)
+{
+    LV_UNUSED(ctx);
+    return lv_freetype_font_create(name, render_mode, size, style);
+}
+
+static void freetype_font_delete_cb(font_stress_ctx_t * ctx, lv_font_t * font)
+{
+    LV_UNUSED(ctx);
+    lv_freetype_font_delete(font);
+}
+
+static lv_font_t * font_manager_font_create_cb(font_stress_ctx_t * ctx,
+                                               const char * name,
+                                               lv_freetype_font_render_mode_t render_mode,
+                                               uint32_t size,
+                                               lv_freetype_font_style_t style)
+{
+    TEST_ASSERT_NOT_NULL(ctx->font_manager);
+    return lv_font_manager_create_font(ctx->font_manager, name, render_mode, size, style);
+}
+
+static void font_manager_font_delete_cb(font_stress_ctx_t * ctx, lv_font_t * font)
+{
+    TEST_ASSERT_NOT_NULL(ctx->font_manager);
+    lv_font_manager_delete_font(ctx->font_manager, font);
+}
+
 void setUp(void)
 {
     lv_freetype_init(LV_FREETYPE_CACHE_FT_GLYPH_CNT);
 
-    g_ctx.par = lv_scr_act();
-
-    g_ctx.config.loop_cnt = MAX_LOOP_CNT;
+    g_ctx.par = lv_screen_active();
     g_ctx.config.label_cnt = MAX_LABEL_CNT;
-    g_ctx.config.font_name_arr = font_name_arr;
-    g_ctx.config.font_cnt = sizeof(font_name_arr) / sizeof(font_name_arr[0]);
-
-    size_t arr_size = sizeof(lv_obj_t *) * g_ctx.config.label_cnt;
-    g_ctx.label_arr = lv_malloc(arr_size);
-    LV_ASSERT_MALLOC(g_ctx.label_arr);
-    lv_memzero(g_ctx.label_arr, arr_size);
-
-    lv_rand_set_seed(RND_START_SEED);
+    g_ctx.label_arr = lv_malloc_zeroed(sizeof(lv_obj_t *) * g_ctx.config.label_cnt);
+    TEST_ASSERT_NOT_NULL(g_ctx.label_arr);
 }
 
 void tearDown(void)
 {
-    label_delete_all(&g_ctx);
     lv_freetype_uninit();
-
     lv_free(g_ctx.label_arr);
+    g_ctx.label_arr = NULL;
 }
 
 void test_font_stress(void)
 {
+    lv_rand_set_seed(RND_START_SEED);
+
+    static const char * font_name_arr[] = {
+        "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf",
+        "../src/libs/freetype/arial.ttf",
+        "../demos/multilang/assets/fonts/Montserrat-Bold.ttf",
+        "UNKNOWN_FONT_NAME"
+    };
+
+    g_ctx.config.loop_cnt = MAX_LOOP_CNT;
+    g_ctx.config.font_name_arr = font_name_arr;
+    g_ctx.config.font_cnt = sizeof(font_name_arr) / sizeof(font_name_arr[0]);
+    g_ctx.font_create_cb = freetype_font_create_cb;
+    g_ctx.font_delete_cb = freetype_font_delete_cb;
+
     for(uint32_t i = 0; g_ctx.config.loop_cnt > 0; g_ctx.config.loop_cnt--) {
-        update_cb();
+        font_stress_update(&g_ctx);
         lv_refr_now(NULL);
 
         if(g_ctx.config.loop_cnt % CAPTURE_SKIP_FRAMES == 0) {
@@ -189,6 +236,57 @@ void test_font_stress(void)
             i++;
         }
     }
+
+    font_stress_label_delete_all(&g_ctx);
+}
+
+void test_font_manager_stress(void)
+{
+    lv_rand_set_seed(RND_START_SEED);
+
+    g_ctx.font_manager = lv_font_manager_create(2);
+    TEST_ASSERT_NOT_NULL(g_ctx.font_manager);
+    lv_font_manager_add_path_static(g_ctx.font_manager, "NotoSansSC-Regular",
+                                    "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf");
+    lv_font_manager_add_path_static(g_ctx.font_manager, "Arial", "../src/libs/freetype/arial.ttf");
+    lv_font_manager_add_path(g_ctx.font_manager, "Montserrat-Bold", "../demos/multilang/assets/fonts/Montserrat-Bold.ttf");
+    lv_font_manager_add_path(g_ctx.font_manager, "UNKNOWN", "UNKNOWN_FONT_PATH");
+
+    static const char * font_name_arr[] = {
+        "NotoSansSC-Regular,Arial",
+        "Arial",
+        "Montserrat-Bold",
+        "UNKNOWN"
+    };
+
+    g_ctx.config.loop_cnt = MAX_LOOP_CNT;
+    g_ctx.config.font_name_arr = font_name_arr;
+    g_ctx.config.font_cnt = sizeof(font_name_arr) / sizeof(font_name_arr[0]);
+    g_ctx.font_create_cb = font_manager_font_create_cb;
+    g_ctx.font_delete_cb = font_manager_font_delete_cb;
+
+    for(uint32_t i = 0; g_ctx.config.loop_cnt > 0; g_ctx.config.loop_cnt--) {
+        font_stress_update(&g_ctx);
+        lv_refr_now(NULL);
+
+        if(g_ctx.config.loop_cnt % CAPTURE_SKIP_FRAMES == 0) {
+            char buf[64];
+            TEST_FREETYPE_ASSERT_EQUAL_SCREENSHOT(i);
+            i++;
+        }
+    }
+
+    font_stress_label_delete_all(&g_ctx);
+
+    bool remove_ok = lv_font_manager_remove_path(g_ctx.font_manager, "Arial");
+    TEST_ASSERT_TRUE(remove_ok);
+
+    remove_ok = lv_font_manager_remove_path(g_ctx.font_manager, "UNKNOWN");
+    TEST_ASSERT_TRUE(remove_ok);
+
+    bool success = lv_font_manager_delete(g_ctx.font_manager);
+    TEST_ASSERT_TRUE(success);
+    g_ctx.font_manager = NULL;
 }
 
 #else
@@ -202,6 +300,10 @@ void tearDown(void)
 }
 
 void test_font_stress(void)
+{
+}
+
+void test_font_manager_stress(void)
 {
 }
 

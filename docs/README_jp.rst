@@ -75,16 +75,16 @@ Cライブラリ。(C++互換) -
 任意の(RT)OS、任意のMCU・MPU用にコンパイル可能。 -
 電子ペーパー、OLEDディスプレイ、TFTディスプレイ、白黒ディスプレイ、モニターに対応。
 `Porting
-Guide <https://docs-lvgl-io.translate.goog/master/porting/project.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+Guide <https://docs-lvgl-io.translate.goog/master/intro/add-lvgl-to-your-project/connecting_lvgl.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 - MITライセンスにより商用利用可能。 - システム要件：RAM 32KB、Flash
 128KB、フレームバッファ、レンダリング用に1/10以上のスクリーンサイズのバッファ。
 - OS、外部メモリ、GPUもサポート。
 
 **ウィジェット、スタイル、レイアウトなど** - 30以上の組み込み
-`ウィジェット <https://docs-lvgl-io.translate.goog/master/widgets/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__: ボタン、ラベル、スライダー、グラフ、キーボード、メーター、円弧、表など。
+`ウィジェット <https://docs-lvgl-io.translate.goog/master/details/widgets/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__: ボタン、ラベル、スライダー、グラフ、キーボード、メーター、円弧、表など。
 -
 ウィジェットの任意の部分を任意の状態にカスタマイズ可能な豊富なスタイルプロパティを備えた柔軟な
-`スタイルシステム <https://docs-lvgl-io.translate.goog/master/overview/style.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__\ 。
+`スタイルシステム <https://docs-lvgl-io.translate.goog/master/details/base-widget/styles/style.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__\ 。
 -
 `Flexbox <https://docs-lvgl-io.translate.goog/master/layouts/flex.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 および
@@ -98,9 +98,9 @@ Guide <https://docs-lvgl-io.translate.goog/master/porting/project.html?_x_tr_sl=
 アニメーション、アンチエイリアシング、不透明度、スムーズスクロール、シャドウ、画像変換などをサポートするレンダリングエンジン。
 -
 マウス、タッチパッド、キーパッド、キーボード、外部ボタン、エンコーダ等の
-`入力デバイス <https://docs-lvgl-io.translate.goog/master/porting/indev.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+`入力デバイス <https://docs-lvgl-io.translate.goog/master/details/main-components/indev.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 をサポート。 -
-`マルチディスプレイ <https://docs-lvgl-io.translate.goog/master/overview/display.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+`マルチディスプレイ <https://docs-lvgl-io.translate.goog/master/details/main-components/display.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 対応。
 
 **Binding と Build をサポート** - `MicroPython
@@ -108,9 +108,9 @@ Binding <https://blog-lvgl-io.translate.goog/2019-02-20/micropython-bindings?_x_
 が LVGL API を公開。 -
 カスタムビルドシステムは使用せず、プロジェクトの他のファイルをビルドするときに、LVGLをビルド可能。
 - Make と
-`CMake <https://docs-lvgl-io.translate.goog/master/get-started/platforms/cmake.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+`CMake <https://docs-lvgl-io.translate.goog/master/details/integration/building/cmake.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 が含まれており、すぐ使えるようにサポート。 -
-`PCのシミュレータで開発したUIコード <https://docs-lvgl-io.translate.goog/master/get-started/platforms/pc-simulator.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+`PCのシミュレータで開発したUIコード <https://docs-lvgl-io.translate.goog/master/details/integration/ide/pc-simulator.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 は、そのまま組込み用ハードウェアでも使用可能。 - `Emscripten
 port <https://github.com/lvgl/lv_web_emscripten>`__ :gb:
 によりC言語のUIコードをHTMLファイルに変換。
@@ -128,19 +128,19 @@ UI開発をよりシンプルかつ迅速にするための、ユーザーイン
 --------------------
 
 LVGL は以下で利用可能です。 - `Arduino
-library <https://docs-lvgl-io.translate.goog/master/get-started/platforms/arduino.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+library <https://docs-lvgl-io.translate.goog/master/details/entegration/framework/arduino.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 - `PlatformIO
 package <https://registry.platformio.org/libraries/lvgl/lvgl>`__ :gb: -
 `Zephyr
 library <https://docs-zephyrproject-org.translate.goog/latest/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 - `ESP32
-component <https://docs-lvgl-io.translate.goog/master/get-started/platforms/espressif.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+component <https://docs-lvgl-io.translate.goog/master/details/integration/chip/espressif.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 - `NXP MCUXpresso
 component <https://www-nxp-com.translate.goog/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 - `NuttX
-library <https://docs-lvgl-io.translate.goog/master/get-started/os/nuttx.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+library <https://docs-lvgl-io.translate.goog/master/details/integration/os/nuttx.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 - `RT-Thread
-RTOS <https://docs-lvgl-io.translate.goog/master/get-started/os/rt-thread.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+RTOS <https://docs-lvgl-io.translate.goog/master/details/integration/os/rt-thread.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
 - NXP MCUXpresso library - CMSIS-Pack
 
 :robot:
@@ -177,7 +177,7 @@ C code
 
    </summary>
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * btn = lv_button_create(lv_screen_active());                   /*Add a button to the current screen*/
    lv_obj_center(btn);                                             /*Set its position*/
@@ -212,7 +212,7 @@ MicroPython code \| Online Simulator :gb:
 
    </summary>
 
-.. code:: python
+.. code-block:: python
 
    def btn_event_cb(e):
      print("Clicked")
@@ -253,7 +253,7 @@ C code
 
    </summary>
 
-.. code:: c
+.. code-block:: c
 
 
    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_COLUMN);
@@ -297,7 +297,7 @@ MicroPython code \| Online Simulator :gb:
 
    </summary>
 
-.. code:: python
+.. code-block:: python
 
    def event_handler(e):
        code = e.get_code()
@@ -359,7 +359,7 @@ C code
 
    </summary>
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * slider = lv_slider_create(lv_screen_active());
    lv_slider_set_value(slider, 70, LV_ANIM_OFF);
@@ -386,7 +386,7 @@ C code
    /*Add the style sheet to the slider's INDICATOR part*/
    lv_obj_add_style(slider, &style_indicator, LV_PART_INDICATOR);
 
-   /*Add the same style to the KNOB part too and locally overwrite some properties*/
+   /*Add the same style to the KNOB part as well and locally overwrite some properties*/
    lv_obj_add_style(slider, &style_indicator, LV_PART_KNOB);
 
    lv_obj_set_style_outline_color(slider, lv_color_hex(0x0096FF), LV_PART_KNOB);
@@ -412,7 +412,7 @@ MicroPython code \| Online Simulator :gb:
 
    </summary>
 
-.. code:: python
+.. code-block:: python
 
    # Create a slider and add the style
    slider = lv.slider(lv.scr_act())
@@ -441,7 +441,7 @@ MicroPython code \| Online Simulator :gb:
    slider.add_style(style_indicator, lv.PART.INDICATOR)
    slider.add_style(style_indicator, lv.PART.KNOB)
 
-   # Add the same style to the KNOB part too and locally overwrite some properties
+   # Add the same style to the KNOB part as well and locally overwrite some properties
    slider.set_style_outline_color(lv.color_hex(0x0096FF), lv.PART.KNOB)
    slider.set_style_outline_width(3, lv.PART.KNOB)
    slider.set_style_outline_pad(-5, lv.PART.KNOB)
@@ -473,7 +473,7 @@ C code
 
    </summary>
 
-.. code:: c
+.. code-block:: c
 
    lv_obj_t * ltr_label = lv_label_create(lv_screen_active());
    lv_label_set_text(ltr_label, "In modern terminology, a microcontroller is similar to a system on a chip (SoC).");
@@ -513,7 +513,7 @@ MicroPython code \| Online Simulator :gb:
 
    </summary>
 
-.. code:: python
+.. code-block:: python
 
    ltr_label = lv.label(lv.scr_act())
    ltr_label.set_text("In modern terminology, a microcontroller is similar to a system on a chip (SoC).")
@@ -556,16 +556,16 @@ LVGLを使い始める時は、以下の順に進める事をおすすめしま�
    `Introduction <https://docs-lvgl-io.translate.goog/master/intro/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
    を読みましょう。 (5分間)
 3. LVGLの基本に慣れるため `Quick
-   overview <https://docs-lvgl-io.translate.goog/master/get-started/quick-overview.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+   overview <https://docs-lvgl-io.translate.goog/master/intro/basics.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
    を読みましょう。 (15分間)
 
 **LVGLを使ってみましょう**
 
-4. `シミュレータ <https://docs-lvgl-io.translate.goog/master/get-started/platforms/pc-simulator.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+4. `シミュレータ <https://docs-lvgl-io.translate.goog/master/details/integration/ide/pc-simulator.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
    をセットアップしましょう。 (10 minutes)
 5. `サンプルプログラム <https://github.com/lvgl/lvgl/tree/master/examples>`__
    :gb: を動かしてみましょう。
-6. `移植ガイド <https://docs-lvgl-io.translate.goog/master/porting/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+6. `移植ガイド <https://docs-lvgl-io.translate.goog/master/intro/add-lvgl-to-your-project/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
    を参考に、LVGLを開発ボードに移植してみましょう。すぐ使える形の
    `プロジェクト <https://github.com/lvgl?q=lv_port_>`__ :gb:
    も用意してあります。
@@ -573,10 +573,10 @@ LVGLを使い始める時は、以下の順に進める事をおすすめしま�
 **より詳しく体験してみましょう**
 
 7. ライブラリの理解を深めるため
-   `Overview <https://docs-lvgl-io.translate.goog/master/overview/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+   `Overview <https://docs-lvgl-io.translate.goog/master/details/main-components/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
    を読みましょう。 (2～3時間)
 8. ウィジェットの機能や使い方の詳細は
-   `Widgets <https://docs-lvgl-io.translate.goog/master/widgets/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
+   `Widgets <https://docs-lvgl-io.translate.goog/master/details/widgets/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja>`__
    でご確認ください。
 
 **助け合いましょう**
