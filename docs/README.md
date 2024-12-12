@@ -29,6 +29,7 @@ There are also some Python specific libraries that need to be installed. You can
 * sphinx-design
 * sphinx-rtd-dark-mode
 * typing-extensions
+* dirsync
 
 To install using the `requirements.txt` file use the following command:
 
