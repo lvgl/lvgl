@@ -2067,6 +2067,18 @@
     #endif
 #endif
 
+#ifndef LV_USE_ARC_LABEL
+    #ifdef LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_ARC_LABEL
+            #define LV_USE_ARC_LABEL CONFIG_LV_USE_ARC_LABEL
+        #else
+            #define LV_USE_ARC_LABEL 0
+        #endif
+    #else
+        #define LV_USE_ARC_LABEL  1
+    #endif
+#endif
+
 #ifndef LV_USE_BAR
     #ifdef LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_BAR
