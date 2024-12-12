@@ -64,7 +64,6 @@ static void init_fonts_md(lv_style_t * fonts);
 static void init_fonts_lg(lv_style_t * fonts);
 static void theme_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void free_ctx_event_cb(lv_event_t * e);
-static lv_image_dsc_t * image_preload(const void * src, lv_color_format_t cf);
 static void label_text_temperature_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 /**********************
@@ -261,7 +260,7 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * assets_path,
         int chars = lv_snprintf(path_buf, sizeof(path_buf), "%s/img_lv_demo_high_res_%s_%s.png",
                                 assets_path, image_details[i].name, size_prefix);
         LV_ASSERT(chars < (int)sizeof(path_buf));
-        c->imgs[i] = image_preload(path_buf, image_details[i].cf);
+        c->imgs[i] = lv_demo_high_res_image_preload(path_buf, image_details[i].cf);
     }
 
     for(uint32_t i = 0; i < STYLE_COLOR_COUNT; i++) {
@@ -392,6 +391,38 @@ void lv_demo_high_res_theme_observer_obj_bg_image_src_cb(lv_observer_t * observe
     }
 }
 
+lv_image_dsc_t * lv_demo_high_res_image_preload(const void * src, lv_color_format_t cf)
+{
+    lv_image_header_t header;
+    lv_result_t res = lv_image_decoder_get_info(src, &header);
+    if(res == LV_RESULT_INVALID) {
+        LV_LOG_WARN("Couldn't read the header info of source");
+        return NULL;
+    }
+
+    lv_draw_buf_t * dest;
+    dest = lv_draw_buf_create(header.w, header.h, cf, LV_STRIDE_AUTO);
+
+    lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
+    lv_canvas_set_draw_buf(canvas, dest);
+    lv_canvas_fill_bg(canvas, lv_color_hex3(0x000), LV_OPA_TRANSP);
+
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+
+    lv_draw_image_dsc_t dsc;
+    lv_draw_image_dsc_init(&dsc);
+    dsc.src = src;
+
+    lv_area_t coords = {0, 0, LV_MIN(header.w, dest->header.w) - 1, LV_MIN(header.h, dest->header.h) - 1};
+    lv_draw_image(&layer, &dsc, &coords);
+    lv_canvas_finish_layer(canvas, &layer);
+
+    lv_obj_delete(canvas);
+
+    return (lv_image_dsc_t *) dest;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -517,38 +548,6 @@ static void free_ctx_event_cb(lv_event_t * e)
     lv_free(c);
 
     lv_obj_set_user_data(base_obj, NULL);
-}
-
-static lv_image_dsc_t * image_preload(const void * src, lv_color_format_t cf)
-{
-    lv_image_header_t header;
-    lv_result_t res = lv_image_decoder_get_info(src, &header);
-    if(res == LV_RESULT_INVALID) {
-        LV_LOG_WARN("Couldn't read the header info of source");
-        return NULL;
-    }
-
-    lv_draw_buf_t * dest;
-    dest = lv_draw_buf_create(header.w, header.h, cf, LV_STRIDE_AUTO);
-
-    lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
-    lv_canvas_set_draw_buf(canvas, dest);
-    lv_canvas_fill_bg(canvas, lv_color_hex3(0x000), LV_OPA_TRANSP);
-
-    lv_layer_t layer;
-    lv_canvas_init_layer(canvas, &layer);
-
-    lv_draw_image_dsc_t dsc;
-    lv_draw_image_dsc_init(&dsc);
-    dsc.src = src;
-
-    lv_area_t coords = {0, 0, LV_MIN(header.w, dest->header.w) - 1, LV_MIN(header.h, dest->header.h) - 1};
-    lv_draw_image(&layer, &dsc, &coords);
-    lv_canvas_finish_layer(canvas, &layer);
-
-    lv_obj_delete(canvas);
-
-    return (lv_image_dsc_t *) dest;
 }
 
 static void label_text_temperature_cb(lv_observer_t * observer, lv_subject_t * subject)

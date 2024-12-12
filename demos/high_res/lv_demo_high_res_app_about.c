@@ -34,6 +34,7 @@ static bool advance_slides(lv_obj_t * slide_deck);
 static void right_clicked_cb(lv_event_t * e);
 static void play_pause_timer_cb(lv_timer_t * t);
 static void play_pause_clicked_cb(lv_event_t * e);
+static void slide_free_draw_buf_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -159,7 +160,9 @@ void lv_demo_high_res_app_about(lv_obj_t * base_obj)
         LV_ASSERT(res == LV_FS_RES_OK);
 
         slide = lv_image_create(slide_deck);
-        lv_image_set_src(slide, buf);
+        lv_image_dsc_t * loaded_draw_buf = lv_demo_high_res_image_preload(buf, LV_COLOR_FORMAT_NATIVE);
+        lv_image_set_src(slide, loaded_draw_buf);
+        lv_obj_add_event_cb(slide, slide_free_draw_buf_cb, LV_EVENT_DELETE, loaded_draw_buf);
     }
 
     slide = lv_obj_get_child(slide_deck, 0);
@@ -287,6 +290,12 @@ static void play_pause_clicked_cb(lv_event_t * e)
         lv_timer_reset(play_pause_timer);
         lv_timer_resume(play_pause_timer);
     }
+}
+
+static void slide_free_draw_buf_cb(lv_event_t * e)
+{
+    lv_image_dsc_t * loaded_draw_buf = lv_event_get_user_data(e);
+    lv_draw_buf_destroy((lv_draw_buf_t *)loaded_draw_buf);
 }
 
 #endif /*LV_USE_DEMO_HIGH_RES*/
