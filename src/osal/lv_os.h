@@ -35,6 +35,8 @@ extern "C" {
 #include "lv_windows.h"
 #elif LV_USE_OS == LV_OS_MQX
 #include "lv_mqx.h"
+#elif LV_USE_OS == LV_OS_SDL2
+#include "lv_sdl2.h"
 #elif LV_USE_OS == LV_OS_CUSTOM
 #include LV_OS_CUSTOM_INCLUDE
 #endif
