@@ -137,7 +137,7 @@ lv_draw_dma2d_output_cf_t lv_draw_dma2d_cf_to_dma2d_output_cf(lv_color_format_t 
     return LV_DRAW_DMA2D_OUTPUT_CF_RGB565;
 }
 
-uint32_t lv_draw_dma2d_color_to_dma2d_ocolr(lv_draw_dma2d_output_cf_t cf, lv_color_t color)
+uint32_t lv_draw_dma2d_color_to_dma2d_color(lv_draw_dma2d_output_cf_t cf, lv_color_t color)
 {
     switch(cf) {
         case LV_DRAW_DMA2D_OUTPUT_CF_ARGB8888:
