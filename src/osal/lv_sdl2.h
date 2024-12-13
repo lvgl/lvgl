@@ -14,7 +14,6 @@ extern "C" {
  *      INCLUDES
  *********************/
 #if LV_USE_OS == LV_OS_SDL2
-#define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
@@ -26,16 +25,16 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 typedef struct {
-    SDL_Thread *thread;
+    SDL_Thread * thread;
     void (*callback)(void *);
     void * user_data;
 } lv_thread_t;
 
-typedef SDL_mutex* lv_mutex_t;
+typedef SDL_mutex * lv_mutex_t;
 
 typedef struct {
-    SDL_mutex *mutex;
-    SDL_cond *cond;
+    SDL_mutex * mutex;
+    SDL_cond * cond;
     bool v;
 } lv_thread_sync_t;
 
