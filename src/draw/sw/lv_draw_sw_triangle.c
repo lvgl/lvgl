@@ -152,6 +152,7 @@ void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_
         lv_memset(mask_buf, 0xff, area_w);
         blend_dsc.mask_res = lv_draw_sw_mask_apply(masks, mask_buf, draw_area.x1, y, area_w);
         if(grad_dir == LV_GRAD_DIR_VER) {
+            LV_ASSERT_NULL(grad);
             blend_dsc.color = grad->color_map[y - tri_area.y1];
             blend_dsc.opa = grad->opa_map[y - tri_area.y1];
             if(dsc->bg_opa < LV_OPA_MAX) blend_dsc.opa = LV_OPA_MIX2(blend_dsc.opa, dsc->bg_opa);

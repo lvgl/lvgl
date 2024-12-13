@@ -157,6 +157,7 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
     lv_area_t round_area_2;
     if(dsc->rounded) {
         circle_mask = lv_malloc(width * width);
+        LV_ASSERT_MALLOC(circle_mask);
         lv_memset(circle_mask, 0xff, width * width);
         lv_area_t circle_area = {0, 0, width - 1, width - 1};
         lv_draw_sw_mask_radius_param_t circle_mask_param;
