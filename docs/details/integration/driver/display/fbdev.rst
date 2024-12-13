@@ -47,17 +47,21 @@ Common mistakes
 Default resolution issue
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-When the Linux kernel is loaded, it initializes various subsystems, including the framebuffer subsystem. The kernel detects the connected devices 
-during the boot process. If an HDMI display is connected, the kernel recognizes it through the HDMI interface. The kernel allocates a framebuffer, 
-which is a portion of RAM used to hold the image data for the display. This memory is used to store pixel data for rendering. With some screens, 
-a bad resolution can be set while configuring fbdev, resulting in having a bad resolution (visible and virtual). This happens when screen and the 
-board are connected with the HDMI, but the screen is not powered yet. Then if the board is powered up, the system will boot, and if the screen is 
-then powered up, it can happen that the fbdev resolution is bad.
+When the Linux kernel initializes, it sets up subsystems like the framebuffer 
+(fbdev) to manage display output. If an HDMI display is connected, the kernel 
+detects it and allocates a portion of RAM as the framebuffer, which holds the 
+pixel data for rendering images.
 
+However, a common issue arises when the display is not powered on during the 
+boot process. If the board is powered on before the screen, the kernel may 
+incorrectly configure the framebuffer resolution. As a result, both the visible 
+and virtual resolutions can be incorrect, leading to display problems.
 
+This issue often occurs with HDMI connections where the display is powered up 
+after the system has already booted.
 
 .. code-block::	
 	
-	fbset -fb /dev/fb0 # To check the resolution of fbdev
+	fbset -fb /dev/fb0 
 
 
