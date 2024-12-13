@@ -231,7 +231,7 @@ static void notification_clicked_event_cb(lv_event_t * e)
 static void notification_screen_events_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    
+
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_LEFT) {
         if(lv_obj_has_flag(message_list, LV_OBJ_FLAG_HIDDEN)) {
             lv_obj_remove_flag(message_list, LV_OBJ_FLAG_HIDDEN);

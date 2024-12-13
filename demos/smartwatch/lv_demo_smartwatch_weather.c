@@ -351,7 +351,7 @@ static void create_screen_weather(void)
 static void weather_screen_event_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    
+
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_BOTTOM) {
         if(!lv_obj_has_flag(weather_forecast_hourly, LV_OBJ_FLAG_HIDDEN)) {
             lv_obj_remove_flag(weather_panel, LV_OBJ_FLAG_HIDDEN);

@@ -189,7 +189,7 @@ static void qr_screen_create(void)
 static void qr_screen_event_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    
+
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_TOP) {
         if(lv_demo_smartwatch_get_load_app_list()) {
             lv_demo_smartwatch_list_load(LV_SCR_LOAD_ANIM_MOVE_TOP, 500, 0);

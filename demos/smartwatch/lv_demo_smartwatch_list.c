@@ -90,7 +90,7 @@ void lv_demo_smartwatch_app_close(void)
 void lv_demo_smartwatch_app_events_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    
+
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT) {
         lv_demo_smartwatch_list_load(LV_SCR_LOAD_ANIM_OVER_RIGHT, 500, 0);
     }
@@ -99,7 +99,7 @@ void lv_demo_smartwatch_app_events_cb(lv_event_t * e)
 void lv_demo_smartwatch_external_app_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    
+
     uint32_t index = (uint32_t)(intptr_t)lv_event_get_user_data(e);
 
     lv_disp_t * display = lv_display_get_default();
@@ -157,7 +157,7 @@ static void app_list_clicked_event_cb(lv_event_t * e)
 static void app_list_screen_events_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    
+
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT) {
         lv_demo_smartwatch_home_load(LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0);
     }
