@@ -6,7 +6,7 @@ FreeType support
 
 Interface to FreeType library to generate font bitmaps at run time.
 
-Detailed introduction: https://freetype.org/
+A detailed introduction can be found at: https://freetype.org/ .
 
 
 
