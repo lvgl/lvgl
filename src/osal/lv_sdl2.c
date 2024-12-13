@@ -45,7 +45,6 @@ lv_result_t lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*c
     thread->callback = callback;
     thread->user_data = user_data;
     thread->thread = SDL_CreateThreadWithStackSize(generic_callback, "LVGL", stack_size, thread);
-    printf("create thread %p\n", thread->thread);
     return LV_RESULT_OK;
 }
 
