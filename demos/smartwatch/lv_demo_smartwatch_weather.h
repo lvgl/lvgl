@@ -52,12 +52,12 @@ void lv_demo_smartwatch_home_set_weather(int temp, const lv_img_dsc_t * icon);
 /**
  * Clear daily forecast list
  */
-void lv_demo_smartwatch_weather_daily_clear();
+void lv_demo_smartwatch_weather_daily_clear(void);
 
 /**
  * Clear hourly forecast list
  */
-void lv_demo_smartwatch_weather_hourly_clear();
+void lv_demo_smartwatch_weather_hourly_clear(void);
 
 /**
  * Add daily forecast weather to the list

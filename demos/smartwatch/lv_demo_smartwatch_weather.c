@@ -24,7 +24,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void create_screen_weather();
+static void create_screen_weather(void);
 static void weather_screen_event_cb(lv_event_t * e);
 
 static void set_weather_icon(lv_obj_t * obj, uint8_t id, bool day);
@@ -110,12 +110,12 @@ void lv_demo_smartwatch_set_weather(int temp, uint8_t icon, bool day, int hour, 
     lv_demo_smartwatch_home_set_weather(temp, get_weather_icon(icon, day));
 }
 
-void lv_demo_smartwatch_weather_daily_clear()
+void lv_demo_smartwatch_weather_daily_clear(void)
 {
     lv_obj_clean(weather_forecast_daily);
 }
 
-void lv_demo_smartwatch_weather_hourly_clear()
+void lv_demo_smartwatch_weather_hourly_clear(void)
 {
     lv_obj_clean(weather_forecast_hourly);
 }
@@ -238,7 +238,7 @@ void lv_demo_smartwatch_weather_add_hourly(int hour, int id, int temp, int humid
  *   STATIC FUNCTIONS
  **********************/
 
-static void create_screen_weather()
+static void create_screen_weather(void)
 {
 
     weather_screen = lv_obj_create(NULL);
@@ -351,7 +351,7 @@ static void create_screen_weather()
 static void weather_screen_event_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
+    
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_BOTTOM) {
         if(!lv_obj_has_flag(weather_forecast_hourly, LV_OBJ_FLAG_HIDDEN)) {
             lv_obj_remove_flag(weather_panel, LV_OBJ_FLAG_HIDDEN);

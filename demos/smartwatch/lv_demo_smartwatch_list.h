@@ -45,7 +45,7 @@ void lv_demo_smartwatch_list_load(lv_screen_load_anim_t anim_type, uint32_t time
 /**
  * External apps call this function to return to the app list
  */
-void lv_smartwatch_app_close(void);
+void lv_demo_smartwatch_app_close(void);
 
 
 /**********************

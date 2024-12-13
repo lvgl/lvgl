@@ -87,7 +87,7 @@ lv_obj_t * lv_demo_smartwatch_settings_add_dropdown(uint16_t id, const char * na
 lv_obj_t * lv_demo_smartwatch_settings_add_label(uint16_t id, const char * name, const lv_img_dsc_t * img);
 
 /**
- * Set the callback funtion for settings actions
+ * Set the callback function for settings actions
  * @param cb callback function
  */
 void lv_demo_smartwatch_set_settings_actions_cb(lv_smartwatch_settings_change_cb_t cb);

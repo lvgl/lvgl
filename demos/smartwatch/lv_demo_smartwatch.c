@@ -31,7 +31,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void create_dialog_window();
+static void create_dialog_window(void);
 static void dialog_close_event_cb(lv_event_t * e);
 
 /**********************
@@ -97,7 +97,7 @@ void lv_demo_smartwatch(void)
 
     create_dialog_window();
 
-    /* load the logo screen imediately, more like a boot logo */
+    /* load the logo screen immediately, more like a boot logo */
     lv_demo_smartwatch_easter_egg_load(LV_SCR_LOAD_ANIM_FADE_IN, 0, 0);
 
     /* load the home screen after 2500ms */
@@ -167,7 +167,7 @@ void lv_demo_smartwatch_set_load_app_list(bool state)
     load_app_list = state;
 }
 
-bool lv_demo_smartwatch_get_load_app_list()
+bool lv_demo_smartwatch_get_load_app_list(void)
 {
     return load_app_list;
 }
@@ -181,7 +181,7 @@ static void dialog_close_event_cb(lv_event_t * e)
     lv_obj_add_flag(dialog_window, LV_OBJ_FLAG_HIDDEN);
 }
 
-static void create_dialog_window()
+static void create_dialog_window(void)
 {
     dialog_parent = lv_obj_create(NULL);
 

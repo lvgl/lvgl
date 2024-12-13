@@ -34,7 +34,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void create_screen_home();
+static void create_screen_home(void);
 
 static void lv_demo_smartwatch_add_watchface(const char * name, const lv_image_dsc_t * src, int index);
 static void clock_screen_event_cb(lv_event_t * e);
@@ -106,7 +106,7 @@ void lv_demo_smartwatch_home_load(lv_screen_load_anim_t anim_type, uint32_t time
 void lv_demo_smartwatch_face_events_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
+
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT) {
         lv_demo_smartwatch_set_load_app_list(false); /* flag was not open from app list */
         lv_demo_smartwatch_notifications_load(LV_SCR_LOAD_ANIM_OVER_RIGHT, 500, 0);
@@ -145,10 +145,10 @@ void lv_demo_smartwatch_face_selected_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
-    int index = (int)(intptr_t)lv_event_get_user_data(e);
+    uint32_t index = (uint32_t)(intptr_t)lv_event_get_user_data(e);
 
     if(target == home_screen) {
-        /* the event might be trigerred after watchface has been selected, return immediately */
+        /* the event might be triggered after watchface has been selected, return immediately */
         return;
     }
 
@@ -182,7 +182,7 @@ void lv_demo_smartwatch_home_set_time(int minute, int hour, const char * am_pm, 
     lv_label_set_text(am_pm_label, am_pm);
 }
 
-lv_obj_t * lv_demo_smartwatch_face_get_root()
+lv_obj_t * lv_demo_smartwatch_face_get_root(void)
 {
     return home_screen;
 }
@@ -191,7 +191,7 @@ void lv_demo_smartwatch_face_update_seconds(int second)
 {
     lv_anim_custom_delete(&seconds_animation, NULL);
 
-    for(int i = 0; i < num_faces; i++) {
+    for(int i = 0; (uint32_t)i < num_faces; i++) {
         if(faces[i].seconds != NULL) {
             lv_image_set_rotation(*faces[i].seconds, second * 60);
             animate_analog_seconds(*faces[i].seconds);
@@ -282,7 +282,7 @@ static void lv_demo_smartwatch_add_watchface(const char * name, const lv_image_d
     lv_obj_add_event_cb(ui_faceItem, lv_demo_smartwatch_face_selected_cb, LV_EVENT_ALL, (void *)(intptr_t)index);
 }
 
-static void create_screen_home()
+static void create_screen_home(void)
 {
     clock_screen = lv_obj_create(NULL);
     lv_obj_remove_flag(clock_screen, LV_OBJ_FLAG_SCROLLABLE);

@@ -31,7 +31,7 @@ typedef enum {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void create_screen_settings();
+static void create_screen_settings(void);
 static void settings_action_event_cb(lv_event_t * e);
 static void settings_screen_event_cb(lv_event_t * e);
 
@@ -40,7 +40,7 @@ static void settings_screen_event_cb(lv_event_t * e);
  **********************/
 static lv_obj_t * settings_screen;
 static lv_obj_t * settings_list;
-static lv_obj_t * settings_title;
+
 
 static lv_obj_t * about_label;
 
@@ -343,13 +343,13 @@ static void settings_action_event_cb(lv_event_t * e)
 static void settings_screen_event_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
+    
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT) {
         lv_demo_smartwatch_list_load(LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0);
     }
 }
 
-static void create_screen_settings()
+static void create_screen_settings(void)
 {
 
     settings_screen = lv_obj_create(NULL);

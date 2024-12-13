@@ -37,7 +37,7 @@ void lv_demo_smartwatch_notifications_create(void);
 /**
  * Clear the notification list
  */
-void lv_demo_smartwatch_clear_notifications();
+void lv_demo_smartwatch_clear_notifications(void);
 
 /**
  * Load the notifications screen

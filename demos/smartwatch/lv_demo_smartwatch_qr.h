@@ -45,7 +45,7 @@ void lv_demo_smartwatch_qr_load(lv_screen_load_anim_t anim_type, uint32_t time, 
 /**
  * Clear the qr codes in list
  */
-void lv_demo_smartwatch_qr_list_clear();
+void lv_demo_smartwatch_qr_list_clear(void);
 
 /**
  * Add qr codes to the list

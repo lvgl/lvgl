@@ -24,7 +24,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void qr_screen_create();
+static void qr_screen_create(void);
 static void qr_screen_event_cb(lv_event_t * e);
 
 /**********************
@@ -103,7 +103,7 @@ void lv_demo_smartwatch_qr_load(lv_screen_load_anim_t anim_type, uint32_t time, 
     lv_screen_load_anim(qr_screen, anim_type, time, delay, false);
 }
 
-void lv_demo_smartwatch_qr_list_clear()
+void lv_demo_smartwatch_qr_list_clear(void)
 {
     lv_obj_clean(qr_panel);
 }
@@ -159,7 +159,7 @@ void lv_demo_smartwatch_qr_list_add(uint8_t id, const char * link)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-static void qr_screen_create()
+static void qr_screen_create(void)
 {
     qr_screen = lv_obj_create(NULL);
     lv_obj_remove_flag(qr_screen, LV_OBJ_FLAG_SCROLLABLE);
@@ -189,7 +189,7 @@ static void qr_screen_create()
 static void qr_screen_event_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
+    
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_TOP) {
         if(lv_demo_smartwatch_get_load_app_list()) {
             lv_demo_smartwatch_list_load(LV_SCR_LOAD_ANIM_MOVE_TOP, 500, 0);

@@ -223,13 +223,13 @@ void lv_demo_smartwatch_set_load_app_list(bool state);
  * Get whether to load app list
  * @return state whether to load app list or not
  */
-bool lv_demo_smartwatch_get_load_app_list();
+bool lv_demo_smartwatch_get_load_app_list(void);
 
 /**
  * Get pointer to the watchface root object
  * @return pointer to root object
  */
-lv_obj_t * lv_demo_smartwatch_face_get_root();
+lv_obj_t * lv_demo_smartwatch_face_get_root(void);
 
 
 /**********************

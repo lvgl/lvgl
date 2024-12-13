@@ -24,7 +24,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void create_screen_notifications();
+static void create_screen_notifications(void);
 static void notification_screen_events_cb(lv_event_t * e);
 static void notification_clicked_event_cb(lv_event_t * e);
 
@@ -95,7 +95,7 @@ void lv_demo_smartwatch_notifications_load(lv_screen_load_anim_t anim_type, uint
     lv_screen_load_anim(notification_screen, anim_type, time, delay, false);
 }
 
-void lv_demo_smartwatch_clear_notifications()
+void lv_demo_smartwatch_clear_notifications(void)
 {
     lv_obj_set_parent(empty_info, empty_panel);
     lv_obj_clean(message_list);
@@ -231,7 +231,7 @@ static void notification_clicked_event_cb(lv_event_t * e)
 static void notification_screen_events_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
+    
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_LEFT) {
         if(lv_obj_has_flag(message_list, LV_OBJ_FLAG_HIDDEN)) {
             lv_obj_remove_flag(message_list, LV_OBJ_FLAG_HIDDEN);
@@ -266,7 +266,7 @@ static void notification_screen_events_cb(lv_event_t * e)
     }
 }
 
-static void create_screen_notifications()
+static void create_screen_notifications(void)
 {
 
     notification_screen = lv_obj_create(NULL);
