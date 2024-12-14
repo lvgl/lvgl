@@ -45,6 +45,10 @@ lv_result_t lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*c
     thread->callback = callback;
     thread->user_data = user_data;
     thread->thread = SDL_CreateThreadWithStackSize(generic_callback, "LVGL", stack_size, thread);
+    if(thread->thread == NULL) {
+        LV_LOG_ERROR("Error: %s", SDL_GetError());
+        return LV_RESULT_INVALID;
+    }
     return LV_RESULT_OK;
 }
 
@@ -53,7 +57,7 @@ lv_result_t lv_thread_delete(lv_thread_t * thread)
     int ret;
     SDL_WaitThread(thread->thread, &ret);
     if(ret != 0) {
-        LV_LOG_WARN("Error: %d", ret);
+        LV_LOG_ERROR("Error: %d", ret);
         return LV_RESULT_INVALID;
     }
 
@@ -65,7 +69,7 @@ lv_result_t lv_mutex_init(lv_mutex_t * mutex)
     *mutex = SDL_CreateMutex();
 
     if(*mutex == NULL) {
-        LV_LOG_WARN("Error: %s", SDL_GetError());
+        LV_LOG_ERROR("Error: %s", SDL_GetError());
         return LV_RESULT_INVALID;
     }
     else {
@@ -77,7 +81,7 @@ lv_result_t lv_mutex_lock(lv_mutex_t * mutex)
 {
     int ret = SDL_LockMutex(*mutex);
     if(ret) {
-        LV_LOG_WARN("Error: %d", ret);
+        LV_LOG_ERROR("Error: %d", ret);
         return LV_RESULT_INVALID;
     }
     else {
@@ -89,7 +93,7 @@ lv_result_t lv_mutex_lock_isr(lv_mutex_t * mutex)
 {
     int ret = SDL_LockMutex(*mutex);
     if(ret) {
-        LV_LOG_WARN("Error: %d", ret);
+        LV_LOG_ERROR("Error: %d", ret);
         return LV_RESULT_INVALID;
     }
     else {
@@ -101,7 +105,7 @@ lv_result_t lv_mutex_unlock(lv_mutex_t * mutex)
 {
     int ret = SDL_UnlockMutex(*mutex);
     if(ret) {
-        LV_LOG_WARN("Error: %d", ret);
+        LV_LOG_ERROR("Error: %d", ret);
         return LV_RESULT_INVALID;
     }
     else {
@@ -118,7 +122,15 @@ lv_result_t lv_mutex_delete(lv_mutex_t * mutex)
 lv_result_t lv_thread_sync_init(lv_thread_sync_t * sync)
 {
     sync->mutex = SDL_CreateMutex();
+    if(sync->mutex == NULL) {
+        LV_LOG_ERROR("Error: %s", SDL_GetError());
+        return LV_RESULT_INVALID;
+    }
     sync->cond = SDL_CreateCond();
+    if(sync->cond == NULL) {
+        LV_LOG_ERROR("Error: %s", SDL_GetError());
+        return LV_RESULT_INVALID;
+    }
     sync->v = false;
     return LV_RESULT_OK;
 }
