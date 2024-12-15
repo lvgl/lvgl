@@ -3756,6 +3756,21 @@
     #endif
 #endif
 
+#if LV_USE_LINUX_DRM
+
+    /* Use the MESA GBM library to allocate DMA buffers that can be
+     * shared across sub-systems and libraries using the Linux DMA-BUF API.
+     * The GBM library aims to provide a platform independent memory management system
+     * it supports the major GPU vendors - This option requires linking with libgbm */
+    #ifndef LV_LINUX_DRM_GBM_BUFFERS
+        #ifdef CONFIG_LV_LINUX_DRM_GBM_BUFFERS
+            #define LV_LINUX_DRM_GBM_BUFFERS CONFIG_LV_LINUX_DRM_GBM_BUFFERS
+        #else
+            #define LV_LINUX_DRM_GBM_BUFFERS 0
+        #endif
+    #endif
+#endif
+
 /** Interface for TFT_eSPI */
 #ifndef LV_USE_TFT_ESPI
     #ifdef CONFIG_LV_USE_TFT_ESPI
