@@ -61,7 +61,7 @@ static lv_obj_t * face_select;
 
 static watchface_t faces[MAX_FACES];
 static uint32_t num_faces;
-static int current_face_index;
+static uint32_t current_face_index;
 
 static lv_anim_t seconds_animation;
 static bool first_load;

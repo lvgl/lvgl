@@ -264,7 +264,6 @@ static void settings_button_event_cb(lv_event_t * e)
         return;
     }
     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_CLICKED) {
         lv_demo_smartwatch_settings_load(LV_SCR_LOAD_ANIM_FADE_IN, 500, 0);
     }

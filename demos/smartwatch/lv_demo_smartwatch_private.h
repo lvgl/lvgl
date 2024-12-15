@@ -122,12 +122,6 @@ LV_IMAGE_DECLARE(img_weather_app_icon);       /* assets/weather_app.png */
  *      TYPEDEFS
  **********************/
 
-typedef void (*lv_smartwatch_music_control_cb_t)(uint16_t);
-
-typedef void (*lv_smartwatch_notification_click_cb_t)(uint16_t);
-
-typedef void (*lv_smartwatch_settings_change_cb_t)(uint16_t, uint64_t);
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
