@@ -38,8 +38,10 @@ static void create_screen_list(void);
 static void add_external_app(const char * app_name, int index, const void * img);
 static void add_app_list(const char * app_name, int index, const void * img);
 
-static void app_list_clicked_event_cb(lv_event_t * e);
+
 static void app_list_screen_events_cb(lv_event_t * e);
+static void app_list_clicked_event_cb(lv_event_t * e);
+static void app_list_clicked_external_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -87,16 +89,12 @@ void lv_demo_smartwatch_app_close(void)
     lv_demo_smartwatch_list_load(LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0);
 }
 
-void lv_demo_smartwatch_app_events_cb(lv_event_t * e)
-{
-    lv_event_code_t event_code = lv_event_get_code(e);
 
-    if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT) {
-        lv_demo_smartwatch_list_load(LV_SCR_LOAD_ANIM_OVER_RIGHT, 500, 0);
-    }
-}
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
-void lv_demo_smartwatch_external_app_cb(lv_event_t * e)
+static void app_list_clicked_external_event_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
@@ -122,11 +120,6 @@ void lv_demo_smartwatch_external_app_cb(lv_event_t * e)
         lv_screen_load_anim(*apps[index].main, LV_SCR_LOAD_ANIM_MOVE_LEFT, 500, 0, false);
     }
 }
-
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
 
 static void app_list_clicked_event_cb(lv_event_t * e)
 {
@@ -201,7 +194,7 @@ static void add_external_app(const char * app_name, int index, const void * img)
     lv_label_set_long_mode(label, LV_LABEL_LONG_CLIP);
     lv_obj_set_style_text_font(label, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_add_event_cb(panel, lv_demo_smartwatch_external_app_cb, LV_EVENT_CLICKED, (void *)(intptr_t)index);
+    lv_obj_add_event_cb(panel, app_list_clicked_external_event_cb, LV_EVENT_CLICKED, (void *)(intptr_t)index);
 }
 
 static void add_app_list(const char * app_name, int index, const void * img)
