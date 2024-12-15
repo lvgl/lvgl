@@ -116,6 +116,7 @@
 #define LV_USE_DEMO_SCROLL      1
 #define LV_USE_DEMO_EBIKE       1
 #define LV_USE_DEMO_VECTOR_GRAPHIC  1
+#define LV_USE_DEMO_SMARTWATCH      1
 
 #define LV_USE_OBJ_ID           1
 #define LV_OBJ_ID_AUTO_ASSIGN    1
