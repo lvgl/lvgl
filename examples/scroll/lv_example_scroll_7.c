@@ -17,6 +17,10 @@ static lv_obj_t * load_item(lv_obj_t * parent, int32_t num)
 
 static void update_scroll(lv_obj_t * obj)
 {
+    bool is_already_in = (bool)(uintptr_t)lv_obj_get_user_data(obj);
+    if(is_already_in) return;
+    lv_obj_set_user_data(obj, (void *)(uintptr_t)true);
+
     int32_t top_num_original = top_num;
     int32_t bottom_num_original = bottom_num;
 
@@ -63,6 +67,8 @@ static void update_scroll(lv_obj_t * obj)
     if(bottom_num != bottom_num_original) {
         lv_label_set_text_fmt(low_label, "current smallest\nloaded value:\n%"PRId32, bottom_num);
     }
+
+    lv_obj_set_user_data(obj, (void *)(uintptr_t)false);
 }
 
 static void scroll_cb(lv_event_t * e)
