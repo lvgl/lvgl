@@ -750,6 +750,11 @@ menu "LVGL configuration"
 				bool "Enable multi-thread render"
 				default n
 				depends on LV_USE_VG_LITE_THORVG
+
+			config LV_USE_GESTURE_RECOGNITION
+				bool "Enable the multi-touch gesture recognition feature"
+				depends on LV_USE_FLOAT
+				default n
 		endmenu
 	endmenu
 
