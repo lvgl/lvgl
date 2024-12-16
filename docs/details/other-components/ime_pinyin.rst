@@ -57,9 +57,9 @@ Then, write a dictionary in the following format.
 Dictionary format
 -----------------
 
-The arrangement order of each pinyin syllable is very important. You
+The arrangement order of each pinyin syllable is very important. If you
 need to customize your own thesaurus according to the Hanyu Pinyin
-syllable table. You can read
+syllable table, you can read
 `here <https://baike.baidu.com/item/%E6%B1%89%E8%AF%AD%E6%8B%BC%E9%9F%B3%E9%9F%B3%E8%8A%82/9167981>`__
 to learn about the Hanyu Pinyin syllables and the syllable table.
 
