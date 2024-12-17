@@ -724,7 +724,6 @@ static void sort_by_file_kind(lv_obj_t * tb, int16_t lo, int16_t hi)
     int16_t lt = lo;
     int16_t i = lo + 1;
     int16_t gt = hi;
-    // const char * v = lv_table_get_cell_value(tb, lo, 1);
     lv_file_explorer_file_table_entry_data_t * v = lv_table_get_cell_user_data(tb, lo, 0);
     while(i <= gt) {
         lv_file_explorer_file_table_entry_data_t * x = lv_table_get_cell_user_data(tb, i, 0);
