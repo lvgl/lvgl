@@ -260,7 +260,10 @@ static void lv_vg_lite_path_append_data(lv_vg_lite_path_t * path, const void * d
     LV_ASSERT_NULL(path);
     LV_ASSERT_NULL(data);
 
-    if(path->base.path_length + len > path->mem_size) {
+    bool need_reallocated = false;
+
+    /*Calculate new mem size until match the contidion*/
+    while(path->base.path_length + len > path->mem_size) {
         if(path->mem_size == 0) {
             path->mem_size = LV_MAX(len, PATH_MEM_SIZE_MIN);
         }
@@ -268,6 +271,10 @@ static void lv_vg_lite_path_append_data(lv_vg_lite_path_t * path, const void * d
             /* Increase memory size by 1.5 times */
             path->mem_size = path->mem_size * 3 / 2;
         }
+        need_reallocated = true;
+    }
+
+    if(need_reallocated) {
         path->base.path = lv_realloc(path->base.path, path->mem_size);
         LV_ASSERT_MALLOC(path->base.path);
     }
