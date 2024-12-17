@@ -536,7 +536,7 @@ static void browser_file_event_handler(lv_event_t * e)
         }
 
         /* Navigate to the file path if this is a directory */
-        if(file_entry_user_data->file_kind == FILE_KIND_DIR) {
+        if(file_entry_user_data->file_kind == LV_FILE_EXPLORER_FILE_KIND_DIR) {
             lv_fs_dir_t dir;
             lv_fs_res_t res = lv_fs_dir_open(&dir, file_name);
             if(res == LV_FS_RES_OK) {
@@ -578,7 +578,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
     lv_table_set_cell_value(explorer->file_table, index++, 0, LV_SYMBOL_LEFT "  " LV_FILE_NAVIGATION_PARENT_DIR);
     file_entry_user_data = lv_malloc(sizeof(lv_file_explorer_file_table_entry_data_t));
     LV_ASSERT_MALLOC(file_entry_user_data);
-    file_entry_user_data->file_kind = FILE_KIND_DIR;
+    file_entry_user_data->file_kind = LV_FILE_EXPLORER_FILE_KIND_DIR;
     lv_table_set_cell_user_data(explorer->file_table, 0, 0, file_entry_user_data);
 
     while(1) {
@@ -602,16 +602,16 @@ static void show_dir(lv_obj_t * obj, const char * path)
            (is_end_with(fn, ".bmp") == true) || (is_end_with(fn, ".BMP") == true) || \
            (is_end_with(fn, ".gif") == true) || (is_end_with(fn, ".GIF") == true)) {
             lv_table_set_cell_value_fmt(explorer->file_table, index, 0, LV_SYMBOL_IMAGE "  %s", fn);
-            file_entry_user_data->file_kind = FILE_KIND_IMAGE;
+            file_entry_user_data->file_kind = LV_FILE_EXPLORER_FILE_KIND_IMAGE;
         }
         else if((is_end_with(fn, ".mp3") == true) || (is_end_with(fn, ".MP3") == true) || \
                 (is_end_with(fn, ".wav") == true) || (is_end_with(fn, ".WAV") == true)) {
             lv_table_set_cell_value_fmt(explorer->file_table, index, 0, LV_SYMBOL_AUDIO "  %s", fn);
-            file_entry_user_data->file_kind = FILE_KIND_AUDIO;
+            file_entry_user_data->file_kind = LV_FILE_EXPLORER_FILE_KIND_AUDIO;
         }
         else if((is_end_with(fn, ".mp4") == true) || (is_end_with(fn, ".MP4") == true)) {
             lv_table_set_cell_value_fmt(explorer->file_table, index, 0, LV_SYMBOL_VIDEO "  %s", fn);
-            file_entry_user_data->file_kind = FILE_KIND_VIDEO;
+            file_entry_user_data->file_kind = LV_FILE_EXPLORER_FILE_KIND_VIDEO;
         }
         else if((is_end_with(fn, ".") == true) || (is_end_with(fn, "..") == true)) {
             /*is dir*/
@@ -619,11 +619,11 @@ static void show_dir(lv_obj_t * obj, const char * path)
         }
         else if(fn[0] == '/') {/*is dir*/
             lv_table_set_cell_value_fmt(explorer->file_table, index, 0, LV_SYMBOL_DIRECTORY "  %s", fn + 1);
-            file_entry_user_data->file_kind = FILE_KIND_DIR;
+            file_entry_user_data->file_kind = LV_FILE_EXPLORER_FILE_KIND_DIR;
         }
         else {
             lv_table_set_cell_value_fmt(explorer->file_table, index, 0, LV_SYMBOL_FILE "  %s", fn);
-            file_entry_user_data->file_kind = FILE_KIND_FILE;
+            file_entry_user_data->file_kind = LV_FILE_EXPLORER_FILE_KIND_FILE;
         }
 
         lv_table_set_cell_user_data(explorer->file_table, index, 0, file_entry_user_data);
