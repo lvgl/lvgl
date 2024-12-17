@@ -90,12 +90,12 @@ void lv_demo_smartwatch_qr_create(void)
     LV_LOG_WARN("QR Code feature not enabled");
 
     lv_obj_t * info = lv_label_create(qr_panel);
-    lv_obj_set_width(info, 180);
+    lv_obj_set_width(info, lv_pct(75));
     lv_obj_set_height(info, LV_SIZE_CONTENT);
     lv_obj_set_align(info, LV_ALIGN_CENTER);
     lv_label_set_text(info, "QR feature is not enabled. Enable it in lv_conf.h (LV_USE_QRCODE 1)");
 
-#endif
+#endif /*LV_USE_QRCODE*/
 }
 
 void lv_demo_smartwatch_qr_load(lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay)
@@ -112,11 +112,11 @@ void lv_demo_smartwatch_qr_list_add(uint8_t id, const char * link)
 {
 #if LV_USE_QRCODE == 1
     qr_item = lv_obj_create(qr_panel);
-    lv_obj_set_width(qr_item, 200);
-    lv_obj_set_height(qr_item, 240);
+    lv_obj_set_width(qr_item, lv_pct(85));
+    lv_obj_set_height(qr_item, lv_pct(100));
     lv_obj_set_align(qr_item, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(qr_item, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(qr_item, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_flex_align(qr_item, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_remove_flag(qr_item, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(qr_item, LV_OBJ_FLAG_SNAPPABLE);
     lv_obj_remove_flag(qr_item, LV_OBJ_FLAG_SCROLL_ONE);
@@ -153,7 +153,7 @@ void lv_demo_smartwatch_qr_list_add(uint8_t id, const char * link)
     lv_obj_set_style_text_font(qr_label, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 #else
     LV_LOG_WARN("QR Code not added, feature is not enabled");
-#endif
+#endif /*LV_USE_QRCODE*/
 }
 
 /**********************

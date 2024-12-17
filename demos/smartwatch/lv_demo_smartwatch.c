@@ -178,11 +178,8 @@ bool lv_demo_smartwatch_get_load_app_list(void)
 
 static void dialog_close_event_cb(lv_event_t * e)
 {
-    lv_event_code_t event_code = lv_event_get_code(e);
-    if(event_code == LV_EVENT_CLICKED) {
-        lv_obj_add_flag(dialog_window, LV_OBJ_FLAG_HIDDEN);
-    }
-
+    LV_UNUSED(e);
+    lv_obj_add_flag(dialog_window, LV_OBJ_FLAG_HIDDEN);
 }
 
 static void create_dialog_window(void)
@@ -207,7 +204,7 @@ static void create_dialog_window(void)
     lv_obj_set_style_pad_bottom(dialog_window, 60, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     dialog_panel = lv_obj_create(dialog_window);
-    lv_obj_set_width(dialog_panel, 167);
+    lv_obj_set_width(dialog_panel, lv_pct(80));
     lv_obj_set_height(dialog_panel, LV_SIZE_CONTENT);
     lv_obj_set_x(dialog_panel, 0);
     lv_obj_set_y(dialog_panel, 60);
@@ -226,7 +223,7 @@ static void create_dialog_window(void)
     lv_obj_set_style_pad_bottom(dialog_panel, 8, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     dialog_title = lv_label_create(dialog_panel);
-    lv_obj_set_width(dialog_title, 140);
+    lv_obj_set_width(dialog_title, lv_pct(80));
     lv_obj_set_height(dialog_title, LV_SIZE_CONTENT);
     lv_obj_set_align(dialog_title, LV_ALIGN_TOP_MID);
     lv_label_set_long_mode(dialog_title, LV_LABEL_LONG_SCROLL_CIRCULAR);
@@ -243,14 +240,14 @@ static void create_dialog_window(void)
     lv_obj_set_style_pad_bottom(dialog_title, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     dialog_message = lv_label_create(dialog_panel);
-    lv_obj_set_width(dialog_message, 140);
+    lv_obj_set_width(dialog_message, lv_pct(80));
     lv_obj_set_height(dialog_message, LV_SIZE_CONTENT);
     lv_obj_set_align(dialog_message, LV_ALIGN_CENTER);
     lv_label_set_text(dialog_message, "Dialog message");
     lv_obj_set_style_text_font(dialog_message, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     dialog_close = lv_button_create(dialog_panel);
-    lv_obj_set_width(dialog_close, 100);
+    lv_obj_set_width(dialog_close, lv_pct(60));
     lv_obj_set_height(dialog_close, LV_SIZE_CONTENT);
     lv_obj_set_align(dialog_close, LV_ALIGN_BOTTOM_MID);
     lv_obj_add_flag(dialog_close, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
@@ -264,7 +261,7 @@ static void create_dialog_window(void)
     lv_label_set_text(dialog_close_label, "Close");
     lv_obj_set_style_text_font(dialog_close_label, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_add_event_cb(dialog_close, dialog_close_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(dialog_close, dialog_close_event_cb, LV_EVENT_CLICKED, NULL);
 }
 
 #endif /*LV_USE_DEMO_SMARTWATCH*/

@@ -123,9 +123,11 @@ void lv_demo_smartwatch_weather_hourly_clear(void)
 void lv_demo_smartwatch_weather_add_daily(int day, int temp, int id)
 {
     lv_obj_t * panel = lv_obj_create(weather_forecast_daily);
-    lv_obj_set_width(panel, 200);
+    lv_obj_set_width(panel, lv_pct(85));
     lv_obj_set_height(panel, 40);
     lv_obj_set_align(panel, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(panel, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(panel, LV_FLEX_ALIGN_SPACE_AROUND, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_remove_flag(panel, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_radius(panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(panel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -138,6 +140,16 @@ void lv_demo_smartwatch_weather_add_daily(int day, int temp, int id)
     lv_obj_set_style_pad_right(panel, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(panel, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_t * label_day = lv_label_create(panel);
+    lv_obj_set_width(label_day, 68);
+    lv_obj_set_height(label_day, LV_SIZE_CONTENT);
+    lv_obj_set_x(label_day, -56);
+    lv_obj_set_y(label_day, 3);
+    lv_obj_set_align(label_day, LV_ALIGN_CENTER);
+    lv_label_set_long_mode(label_day, LV_LABEL_LONG_CLIP);
+    lv_label_set_text(label_day, week_days[day % 7]);
+    lv_obj_set_style_text_font(label_day, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_t * icon = lv_image_create(panel);
     lv_obj_set_width(icon, LV_SIZE_CONTENT);
@@ -158,15 +170,6 @@ void lv_demo_smartwatch_weather_add_daily(int day, int temp, int id)
     lv_label_set_text_fmt(label, "%d°C", temp);
     lv_obj_set_style_text_font(label, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_t * label_day = lv_label_create(panel);
-    lv_obj_set_width(label_day, 68);
-    lv_obj_set_height(label_day, LV_SIZE_CONTENT);
-    lv_obj_set_x(label_day, -56);
-    lv_obj_set_y(label_day, 3);
-    lv_obj_set_align(label_day, LV_ALIGN_CENTER);
-    lv_label_set_long_mode(label_day, LV_LABEL_LONG_CLIP);
-    lv_label_set_text(label_day, week_days[day % 7]);
-    lv_obj_set_style_text_font(label_day, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
 }
 
 void lv_demo_smartwatch_weather_add_hourly(int hour, int id, int temp, int humidity, int wind, int uv, bool info)
