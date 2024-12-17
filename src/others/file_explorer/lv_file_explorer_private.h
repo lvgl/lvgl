@@ -52,11 +52,11 @@ struct _lv_file_explorer_t {
 };
 
 typedef enum {
-    FILE_KIND_DIR,
-    FILE_KIND_IMAGE,
-    FILE_KIND_AUDIO,
-    FILE_KIND_VIDEO,
-    FILE_KIND_FILE
+    LV_FILE_EXPLORER_FILE_KIND_DIR,
+    LV_FILE_EXPLORER_FILE_KIND_IMAGE,
+    LV_FILE_EXPLORER_FILE_KIND_AUDIO,
+    LV_FILE_EXPLORER_FILE_KIND_VIDEO,
+    LV_FILE_EXPLORER_FILE_KIND_FILE
 } lv_file_explorer_file_kind_t;
 
 typedef struct {
