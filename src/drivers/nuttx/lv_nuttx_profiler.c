@@ -19,6 +19,7 @@
  *      DEFINES
  *********************/
 
+#define TICK_PER_SEC_MAX 1000000000 /* 1GHz */
 #define TICK_TO_NSEC(tick) ((tick) * 1000 / cpu_freq)
 
 /**********************
@@ -36,6 +37,7 @@ static uint32_t cpu_freq = 0; /* MHz */
  **********************/
 
 static uint64_t tick_get_cb(void);
+static uint64_t tick_nsec_get_cb(void);
 static void flush_cb(const char * buf);
 
 /**********************
@@ -48,7 +50,8 @@ static void flush_cb(const char * buf);
 
 void lv_nuttx_profiler_init(void)
 {
-    cpu_freq = (uint32_t)up_perf_getfreq() / 1000000;
+    const uint32_t tick_per_sec = (uint32_t)up_perf_getfreq();
+    cpu_freq = tick_per_sec / 1000000;
     if(cpu_freq == 0) {
         LV_LOG_ERROR("Failed to get CPU frequency");
         return;
@@ -57,8 +60,18 @@ void lv_nuttx_profiler_init(void)
 
     lv_profiler_builtin_config_t config;
     lv_profiler_builtin_config_init(&config);
-    config.tick_per_sec = 1000000000; /* 1 sec = 1000000000 nsec */
-    config.tick_get_cb = tick_get_cb;
+
+    if(tick_per_sec <= TICK_PER_SEC_MAX) {
+        LV_LOG_USER("Use the original tick source directly");
+        config.tick_per_sec = tick_per_sec;
+        config.tick_get_cb = tick_get_cb;
+    }
+    else {
+        LV_LOG_USER("Use tick to nanosecond time source");
+        config.tick_per_sec = TICK_PER_SEC_MAX;
+        config.tick_get_cb = tick_nsec_get_cb;
+    }
+
     config.flush_cb = flush_cb;
     lv_profiler_builtin_init(&config);
 }
@@ -67,10 +80,9 @@ void lv_nuttx_profiler_init(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static uint64_t tick_get_cb(void)
+static inline uint32_t tick_get_elaps(void)
 {
     static uint32_t prev_tick = 0;
-    static uint64_t cur_tick_ns = 0;
     uint32_t act_time = up_perf_gettime();
     uint32_t elaps;
 
@@ -83,8 +95,20 @@ static uint64_t tick_get_cb(void)
         elaps += act_time;
     }
 
-    cur_tick_ns += TICK_TO_NSEC(elaps);
-    prev_tick = act_time;
+    return elaps;
+}
+
+static uint64_t tick_get_cb(void)
+{
+    static uint64_t cur_tick = 0;
+    cur_tick += tick_get_elaps();
+    return cur_tick;
+}
+
+static uint64_t tick_nsec_get_cb(void)
+{
+    static uint64_t cur_tick_ns = 0;
+    cur_tick_ns += TICK_TO_NSEC(tick_get_elaps());
     return cur_tick_ns;
 }
 
