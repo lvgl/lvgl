@@ -44,16 +44,16 @@ carries all the information required to:
 
 A Draw Task carries the following information:
 
-- type:  defines the drawing algorithm involved (e.g. line, fill, border, image,
-  label, arc, triangle, etc.)
-- area:  defines the rectangle involved where drawing will occur
-- transformation matrix:  if :c:macro:`LV_DRAW_TRANSFORM_USE_MATRIX` is configured to '1'
-- state:  waiting, queued, in progress, completed
-- drawing descriptor:  carries details of the drawing to be performed
-- preferred Draw Unit ID:  the ID of the Draw Unit that should take this task
-- preference score:  value describing the speed of the specified Draw Unit relative
-  to software rendering (more on this below)
-- next:  a link to the next drawing task in the list.
+:type:                    defines the drawing algorithm involved (e.g. line, fill, border, image,
+                          label, arc, triangle, etc.)
+:area:                    defines the rectangle involved where drawing will occur
+:transformation matrix:   if :c:macro:`LV_DRAW_TRANSFORM_USE_MATRIX` is configured to '1'
+:state:                   waiting, queued, in progress, completed
+:drawing descriptor:      carries details of the drawing to be performed
+:preferred Draw Unit ID:  the ID of the Draw Unit that should take this task
+:preference score:        value describing the speed of the specified Draw Unit relative
+                          to software rendering (more on this below)
+:next:                    a link to the next drawing task in the list.
 
 Draw Tasks are collected in a list and periodically dispatched to Draw Units.
 
