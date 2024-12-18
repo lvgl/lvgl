@@ -68,34 +68,43 @@ in ``lv_conf.h``.
 
 The object hierarchy of a freshly-created File Explorer looks like this:
 
-.. parsed-literal::
+- ``File Explorer``:  occupies full area of parent Widget, typically a Screen (Flex-Flow COLUMN)
 
-                                    ``File Explorer``
-              (occupies full area of parent Widget, typically a Screen)
-                                 (Flex-Flow COLUMN)
-                                          |
-                                      ``Container``
-                                 (Flex-Flow GROW 1)
-                        (occupies full area of File Explorer)
-       --------------------------------------------------------------------------
-                 |                                   |                      |
-      [only created if enabled]                      |                      +-- ``home_dir`` = NULL
-                 |                                   |                      +-- ``video_dir`` = NULL
-          ``Quick-Access Panel``                           |                      +-- ``pictures_dir`` = NULL
-        (left 22% of container)                 ``Browser Panel``                +-- ``music_dir`` = NULL
-          (Flex-Flow COLUMN)                  (Flex-Flow COLUMN)            +-- ``docs_dir`` = NULL
-      ---------------------------          -------------------------        +-- ``fs_dir`` = NULL
-         |                |                    |               |            +-- ``current_path`` = [empty buffer]
-     ``Device List``      ``Places List``            ``Header``         ``File Table``       +-- ``sel_fn`` (selected file)
-     (grows to         (grows to           (14% of         with 1 column    +-- ``sort`` (default :cpp:enumerator:`LV_EXPLORER_SORT_NONE`)
-    accommodate       accommodate          Browser Panel   (86% of Browser
-    children)         children)            height)         Panel height)
-     |                 |                       |
-     +-- ``File System``   +-- ``HOME`` (button)   ``Current Path Label``
-         (button)      +-- ``Video`` (button)
-                       +-- ``Pictures`` (button)
-                       +-- ``Music`` (button)
-                       +-- ``Documents`` (button)
+  - ``Container``:  occupies full area of File Explorer (Flex grow 1)
+
+    - ``Quick-Access Panel``:
+
+      - ``Device List``:  grows to accommodate children
+
+        - ``File System``:  button
+
+      - ``Places List``:  grows to accommodate children
+
+        - ``HOME``:  button
+        - ``Video``:  button
+        - ``Pictures``:  button
+        - ``Music``:  button
+        - ``Documents``:  button
+
+    - ``Browser Panel``:
+
+      - ``Header``:  14% of ``Browser Panel`` height
+
+        - ``Current Path``:  label
+
+      - ``File Table``:  with 1 column, 86% of ``Browser Panel`` height
+
+  - Fields:
+
+    - ``home_dir`` = NULL
+    - ``video_dir`` = NULL
+    - ``pictures_dir`` = NULL
+    - ``music_dir`` = NULL
+    - ``docs_dir`` = NULL
+    - ``fs_dir`` = NULL
+    - ``current_path`` = [empty buffer]
+    - ``sel_fn`` (selected file)
+    - ``sort`` (default :cpp:enumerator:`LV_EXPLORER_SORT_NONE`)
 
 
 Accessing the Parts
