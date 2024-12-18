@@ -121,9 +121,8 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
                 return LV_RESULT_INVALID;
             }
 
-            width = 1;
-            height = 1;
-            header->flags |= LV_IMAGE_FLAGS_AUTO_STRETCH;
+            width = 0;
+            height = 0;
         }
         else {
             const lv_image_dsc_t * img_dsc = src_data;
@@ -309,12 +308,14 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
     bool alloc_layer = false;
     lv_layer_t * target_layer = NULL;
     lv_draw_image_dsc_t layer_draw_dsc;
-    if(layer->color_format != LV_COLOR_FORMAT_ARGB8888) {
+    if(layer->color_format != LV_COLOR_FORMAT_ARGB8888 &&
+       layer->color_format != LV_COLOR_FORMAT_XRGB8888) {
         lv_area_t rc = {0, 0, lv_area_get_width(coords), lv_area_get_height(coords)};
         target_layer = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &rc);
 
         lv_draw_image_dsc_init(&layer_draw_dsc);
         layer_draw_dsc.src = target_layer;
+        layer_draw_dsc.header.flags |= LV_IMAGE_FLAGS_PREMULTIPLIED;
         alloc_layer = true;
     }
     else {

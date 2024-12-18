@@ -656,6 +656,16 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e)
             *s = LV_MAX(*s, a.y2 - h);
         }
     }
+    else if(code == LV_EVENT_SIZE_CHANGED) {
+        if(img->w == 0 || img->h == 0) {
+            img->w = lv_obj_get_width(obj);
+            img->h = lv_obj_get_height(obj);
+            update_align(obj);
+            if(img->rotation || img->scale_x != LV_SCALE_NONE || img->scale_y != LV_SCALE_NONE) {
+                lv_obj_refresh_ext_draw_size(obj);
+            }
+        }
+    }
     else if(code == LV_EVENT_HIT_TEST) {
         lv_hit_test_info_t * info = lv_event_get_param(e);
 

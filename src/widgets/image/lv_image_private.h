@@ -48,7 +48,6 @@ struct _lv_image_t {
     uint32_t blend_mode: 4; /**< Element of `lv_blend_mode_t`*/
 };
 
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
