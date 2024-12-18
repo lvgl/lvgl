@@ -89,6 +89,8 @@
 #define arm_2d_tile_copy                arm_2d_rgb16_tile_copy
 #define arm_2d_alpha_blending           arm_2d_rgb565_alpha_blending
 #define arm_2d_tile_copy_with_src_mask  arm_2d_rgb565_tile_copy_with_src_mask
+#define __arm_2d_impl_tile_copy_with_src_mask_and_opacity                       \
+    __arm_2d_impl_rgb565_tile_copy_with_src_mask_and_opacity
 #define arm_2d_color_t                  arm_2d_color_rgb565_t
 
 /* arm-2d direct mode apis */
@@ -128,6 +130,8 @@
 #define arm_2d_tile_copy                arm_2d_rgb32_tile_copy
 #define arm_2d_alpha_blending           arm_2d_cccn888_alpha_blending
 #define arm_2d_tile_copy_with_src_mask  arm_2d_cccn888_tile_copy_with_src_mask
+#define __arm_2d_impl_tile_copy_with_src_mask_and_opacity                       \
+    __arm_2d_impl_cccn888_tile_copy_with_src_mask_and_opacity
 #define arm_2d_color_t                  arm_2d_color_cccn888_t
 
 /* arm-2d direct mode apis */
@@ -415,19 +419,6 @@
  *  STATIC PROTOTYPES
  **********************/
 
-#if __ARM_2D_HAS_HW_ACC__
-static bool /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_arm2d_fill_colour(const arm_2d_tile_t * target_tile,
-                                                                  const arm_2d_region_t * region,
-                                                                  lv_color_t color,
-                                                                  lv_opa_t opa,
-                                                                  const arm_2d_tile_t * mask_tile);
-
-static bool /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_arm2d_tile_copy(const arm_2d_tile_t * target_tile,
-                                                                const arm_2d_region_t * region,
-                                                                arm_2d_tile_t * source_tile,
-                                                                lv_opa_t opa,
-                                                                arm_2d_tile_t * mask_tile);
-#else
 
 static void convert_cb(const lv_area_t * dest_area,
                        const void * src_buf,
@@ -455,7 +446,7 @@ static bool /* LV_ATTRIBUTE_FAST_MEM */ arm_2d_copy_normal(lv_color_t * dest_buf
                                                            lv_opa_t opa,
                                                            const lv_opa_t * mask,
                                                            lv_coord_t mask_stride);
-#endif
+
 
 static void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx,
                                                             const lv_draw_sw_blend_dsc_t * dsc);
@@ -489,9 +480,7 @@ void lv_draw_arm2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     arm2d_draw_ctx->blend = lv_draw_arm2d_blend;
     arm2d_draw_ctx->base_draw.wait_for_finish = lv_gpu_arm2d_wait_cb;
 
-#if !__ARM_2D_HAS_HW_ACC__
     arm2d_draw_ctx->base_draw.draw_img_decoded = lv_draw_arm2d_img_decoded;
-#endif
 
 }
 
@@ -503,180 +492,6 @@ void lv_draw_arm2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
 
 extern void test_flush(lv_color_t * color_p);
 
-#if __ARM_2D_HAS_HW_ACC__
-static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx,
-                                                      const lv_draw_sw_blend_dsc_t * dsc)
-{
-    const lv_opa_t * mask;
-    if(dsc->mask_buf == NULL) mask = NULL;
-    if(dsc->mask_buf && dsc->mask_res == LV_DRAW_MASK_RES_TRANSP) return;
-    else if(dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask = NULL;
-    else mask = dsc->mask_buf;
-
-    lv_area_t blend_area;
-    if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_ctx->clip_area)) {
-        return;
-    }
-
-    bool is_accelerated = false;
-
-    if(dsc->blend_mode == LV_BLEND_MODE_NORMAL
-       &&    lv_area_get_size(&blend_area) > 100) {
-
-        __PREPARE_TARGET_TILE__(blend_area);
-        __PREPARE_SOURCE_TILE__(dsc, blend_area);
-        __PREPARE_MASK_TILE__(dsc, blend_area, mask, false);
-
-        if(src_buf) {
-            is_accelerated = lv_draw_arm2d_tile_copy(
-                                 &target_tile,
-                                 &target_region,
-                                 &source_tile,
-                                 dsc->opa,
-                                 (NULL == mask) ? NULL : &mask_tile);
-        }
-        else {
-            is_accelerated = lv_draw_arm2d_fill_colour(
-                                 &target_tile,
-                                 &target_region,
-                                 dsc->color,
-                                 dsc->opa,
-                                 (NULL == mask) ? NULL : &mask_tile);
-        }
-    }
-
-    if(!is_accelerated) {
-        lv_draw_sw_blend_basic(draw_ctx, dsc);
-    }
-}
-
-static bool LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_fill_colour(const arm_2d_tile_t * target_tile,
-                                                            const arm_2d_region_t * region,
-                                                            lv_color_t color,
-                                                            lv_opa_t opa,
-                                                            const arm_2d_tile_t * mask_tile)
-{
-    arm_fsm_rt_t result = (arm_fsm_rt_t)ARM_2D_ERR_NONE;
-
-    if(NULL == mask_tile) {
-        if(opa >= LV_OPA_MAX) {
-            result = arm_2d_fill_colour(target_tile, region, color.full);
-        }
-        else {
-#if LV_COLOR_SCREEN_TRANSP
-            return false;
-#else
-            result = arm_2d_fill_colour_with_alpha(
-                         target_tile,
-                         region,
-            (arm_2d_color_t) {
-                color.full
-            },
-            opa);
-#endif
-        }
-    }
-    else {
-
-        if(opa >= LV_OPA_MAX) {
-            result = arm_2d_fill_colour_with_mask(
-                         target_tile,
-                         region,
-                         mask_tile,
-            (arm_2d_color_t) {
-                color.full
-            });
-        }
-        else {
-#if LV_COLOR_SCREEN_TRANSP
-            return false;
-#else
-            result = arm_2d_fill_colour_with_mask_and_opacity(
-                         target_tile,
-                         region,
-                         mask_tile,
-            (arm_2d_color_t) {
-                color.full
-            },
-            opa);
-#endif
-        }
-    }
-
-    if(result < 0) {
-        /* error detected */
-        return false;
-    }
-
-    return true;
-
-}
-
-static bool LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_tile_copy(const arm_2d_tile_t * target_tile,
-                                                          const arm_2d_region_t * region,
-                                                          arm_2d_tile_t * source_tile,
-                                                          lv_opa_t opa,
-                                                          arm_2d_tile_t * mask_tile)
-{
-    arm_fsm_rt_t result = (arm_fsm_rt_t)ARM_2D_ERR_NONE;
-
-    if(NULL == mask_tile) {
-        if(opa >= LV_OPA_MAX) {
-            result = arm_2d_tile_copy(source_tile,
-                                      target_tile,
-                                      region,
-                                      ARM_2D_CP_MODE_COPY);
-        }
-#if LV_COLOR_SCREEN_TRANSP
-        else {
-            return false;  /* not supported */
-        }
-#else
-        else {
-            result = arm_2d_alpha_blending(source_tile,
-                                           target_tile,
-                                           region,
-                                           opa);
-        }
-#endif
-    }
-    else {
-#if LV_COLOR_SCREEN_TRANSP
-        return false;       /* not support */
-#else
-
-        if(opa >= LV_OPA_MAX) {
-            result = arm_2d_tile_copy_with_src_mask(source_tile,
-                                                    mask_tile,
-                                                    target_tile,
-                                                    region,
-                                                    ARM_2D_CP_MODE_COPY);
-        }
-        else {
-            return false;
-        }
-#endif
-    }
-
-    if(result < 0) {
-        /* error detected */
-        return false;
-    }
-
-    return true;
-}
-
-static void lv_gpu_arm2d_wait_cb(lv_draw_ctx_t * draw_ctx)
-{
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-
-    arm_2d_op_wait_async(NULL);
-    if(disp->driver && disp->driver->wait_cb) {
-        disp->driver->wait_cb(disp->driver);
-    }
-    lv_draw_sw_wait_for_finish(draw_ctx);
-}
-#else
 
 static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx,
                                                       const lv_draw_sw_blend_dsc_t * dsc)
@@ -871,20 +686,15 @@ static bool LV_ATTRIBUTE_FAST_MEM arm_2d_copy_normal(lv_color_t * dest_buf,
         }
         /*Handle opa and mask values too*/
         else {
-            __arm_2d_impl_gray8_colour_filling_with_opacity((uint8_t *)mask,
-                                                            mask_stride,
-                                                            &copy_size,
-                                                            0x00,
-                                                            255 - opa);
-
-            __arm_2d_impl_src_msk_copy((color_int *)src_buf,
-                                       src_stride,
-                                       (uint8_t *)mask,
-                                       mask_stride,
-                                       &copy_size,
-                                       (color_int *)dest_buf,
-                                       dest_stride,
-                                       &copy_size);
+            __arm_2d_impl_tile_copy_with_src_mask_and_opacity((color_int *)src_buf,
+                                                              src_stride,
+                                                              (uint8_t *)mask,
+                                                              mask_stride,
+                                                              &copy_size,
+                                                              (color_int *)dest_buf,
+                                                              dest_stride,
+                                                              &copy_size,
+                                                              opa);
         }
     }
 
@@ -996,8 +806,8 @@ static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_
 
         if(cf == LV_IMG_CF_ALPHA_8BIT) {
             /* original code:
-               lv_color_fill(rgb_buf, draw_dsc->recolor, buf_size);
-             */
+                lv_color_fill(rgb_buf, draw_dsc->recolor, buf_size);
+                */
             arm_2d_size_t copy_size = {
                 .iWidth = buf_w,
                 .iHeight = buf_h,
@@ -1017,187 +827,141 @@ static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_
             if(LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED == cf)  {
                 /* copy with colour keying */
 
-                /* *INDENT-OFF* */
-                __RECOLOUR_WRAPPER(
+            /* *INDENT-OFF* */
+            __RECOLOUR_WRAPPER(
 
-                    lv_color_t chrome_key = LV_COLOR_CHROMA_KEY;
-                    /* calculate new chrome-key colour */
-                    if(draw_dsc->recolor_opa > LV_OPA_MIN) {
-                    __ARM_2D_PIXEL_BLENDING_OPA(
-                        (color_int *) & (draw_dsc->recolor.full),
-                        (color_int *) & (chrome_key.full),
-                        draw_dsc->recolor_opa
-                    );
-                    }
+                lv_color_t chrome_key = LV_COLOR_CHROMA_KEY;
+                /* calculate new chrome-key colour */
+                if(draw_dsc->recolor_opa > LV_OPA_MIN) {
+                __ARM_2D_PIXEL_BLENDING_OPA(
+                    (color_int *) & (draw_dsc->recolor.full),
+                    (color_int *) & (chrome_key.full),
+                    draw_dsc->recolor_opa
+                );
+                }
 
-                    __PREPARE_LL_ACCELERATION__();
+                __PREPARE_LL_ACCELERATION__();
 
-                    if(blend_dsc.opa >= LV_OPA_MAX) {
-                    __arm_2d_impl_cl_key_copy(
+                if(blend_dsc.opa >= LV_OPA_MAX) {
+                __arm_2d_impl_cl_key_copy(
+                    (color_int *)src_buf_tmp,
+                    src_stride,
+                    (color_int *)dest_buf,
+                    dest_stride,
+                    &copy_size,
+                    (color_int)chrome_key.full);
+                }
+                else {
+                    __arm_2d_impl_alpha_blending_colour_keying(
                         (color_int *)src_buf_tmp,
                         src_stride,
                         (color_int *)dest_buf,
                         dest_stride,
                         &copy_size,
+                        blend_dsc.opa,
                         (color_int)chrome_key.full);
-                    }
-                    else {
-                        __arm_2d_impl_alpha_blending_colour_keying(
-                            (color_int *)src_buf_tmp,
-                            src_stride,
-                            (color_int *)dest_buf,
-                            dest_stride,
-                            &copy_size,
-                            blend_dsc.opa,
-                            (color_int)chrome_key.full);
-                    }
-                    is_accelerated = true;
-                )
-                /* *INDENT-ON* */
+                }
+                is_accelerated = true;
+            )
+            /* *INDENT-ON* */
             }
             else if((LV_COLOR_DEPTH == 32)
                     &&     !mask_any
                     && (LV_IMG_CF_TRUE_COLOR_ALPHA == cf)) {
                 /* accelerate copy-with-source-masks-and-opacity */
 
-                /* *INDENT-OFF* */
-                __RECOLOUR_WRAPPER(
-                    __PREPARE_LL_ACCELERATION__();
+            /* *INDENT-OFF* */
+            __RECOLOUR_WRAPPER(
+                __PREPARE_LL_ACCELERATION__();
 
-                    uint8_t * mask_temp_buf = NULL;
-                    if(blend_dsc.opa < LV_OPA_MAX) {
-                        mask_temp_buf = lv_mem_buf_get(copy_size.iHeight * copy_size.iWidth);
-                        if(NULL == mask_temp_buf) {
-                            LV_LOG_WARN(
-                                "Failed to allocate memory for alpha mask,"
-                                " use normal route instead.");
-                            break;
-                        }
-                        lv_memset_00(mask_temp_buf, copy_size.iHeight * copy_size.iWidth);
+                uint8_t * mask_temp_buf = NULL;
+                if(blend_dsc.opa < LV_OPA_MAX) {
+                    __arm_2d_impl_ccca8888_tile_copy_to_cccn888_with_opacity(
+                        (uint32_t *)src_buf_tmp,
+                        src_stride,
+                        (uint32_t *)dest_buf,
+                        dest_stride,
+                        &copy_size,
+                        blend_dsc.opa);
+                }
+                else {
+                    __arm_2d_impl_ccca8888_to_cccn888(
+                        (uint32_t *)src_buf_tmp,
+                        src_stride,
+                        (uint32_t *)dest_buf,
+                        dest_stride,
+                        &copy_size);
+                }
 
-                        __arm_2d_impl_gray8_colour_filling_channel_mask_opacity(
-                            mask_temp_buf,
-                            src_stride,
-                            (uint32_t *)
-                            ((uintptr_t)src_buf_tmp + LV_IMG_PX_SIZE_ALPHA_BYTE - 1),
-                            src_stride,
-                            &copy_size,
-                            0xFF,
-                            blend_dsc.opa);
-
-                        __arm_2d_impl_src_msk_copy(
-                            (color_int *)src_buf_tmp,
-                            src_stride,
-                            mask_temp_buf,
-                            src_stride,
-                            &copy_size,
-                            (color_int *)dest_buf,
-                            dest_stride,
-                            &copy_size);
-
-                        lv_mem_buf_release(mask_temp_buf);
-                    }
-                    else {
-                        __arm_2d_impl_src_chn_msk_copy(
-                            (color_int *)src_buf_tmp,
-                            src_stride,
-                            (uint32_t *)
-                            ((uintptr_t)src_buf_tmp + LV_IMG_PX_SIZE_ALPHA_BYTE - 1),
-                            src_stride,
-                            &copy_size,
-                            (color_int *)dest_buf,
-                            dest_stride,
-                            &copy_size);
-                    }
-
-                    is_accelerated = true;
-                )
-                /* *INDENT-ON* */
+                is_accelerated = true;
+            )
+            /* *INDENT-ON* */
             }
             else if(!mask_any
                     && (LV_IMG_CF_RGB565A8 == cf)) {
                 /* accelerate copy-with-source-masks-and-opacity */
 
                 uint8_t * mask_after_rgb = src_buf + sizeof(lv_color_t) * src_w * src_h;
-                /* *INDENT-OFF* */
-                __RECOLOUR_WRAPPER(
-                    __PREPARE_LL_ACCELERATION__();
+            /* *INDENT-OFF* */
+            __RECOLOUR_WRAPPER(
+                __PREPARE_LL_ACCELERATION__();
 
-                    uint8_t * mask_temp_buf = NULL;
-                    if(blend_dsc.opa < LV_OPA_MAX) {
-                        mask_temp_buf = lv_mem_buf_get(copy_size.iHeight * copy_size.iWidth);
-                        if(NULL == mask_temp_buf) {
-                            LV_LOG_WARN(
-                                "Failed to allocate memory for alpha mask,"
-                                " use normal route instead.");
-                            break;
-                        }
-                        lv_memset_00(mask_temp_buf, copy_size.iHeight * copy_size.iWidth);
+                uint8_t * mask_temp_buf = NULL;
+                if(blend_dsc.opa < LV_OPA_MAX) {
+                    __arm_2d_impl_rgb565_tile_copy_with_src_mask_and_opacity(
+                        (uint16_t *)src_buf_tmp,
+                        src_stride,
+                        (uint8_t *)mask_after_rgb,
+                        src_stride,
+                        &copy_size,
+                        (uint16_t *)dest_buf,
+                        dest_stride,
+                        &copy_size,
+                        blend_dsc.opa);
+                }
+                else {
+                    __arm_2d_impl_src_msk_copy(
+                        (color_int *)src_buf_tmp,
+                        src_stride,
+                        mask_after_rgb,
+                        src_stride,
+                        &copy_size,
+                        (color_int *)dest_buf,
+                        dest_stride,
+                        &copy_size);
+                }
 
-                        __arm_2d_impl_gray8_colour_filling_mask_opacity(
-                            mask_temp_buf,
-                            src_stride,
-                            mask_after_rgb,
-                            src_stride,
-                            &copy_size,
-                            0xFF,
-                            blend_dsc.opa);
-
-                        __arm_2d_impl_src_msk_copy(
-                            (color_int *)src_buf_tmp,
-                            src_stride,
-                            mask_temp_buf,
-                            src_stride,
-                            &copy_size,
-                            (color_int *)dest_buf,
-                            dest_stride,
-                            &copy_size);
-
-                        lv_mem_buf_release(mask_temp_buf);
-                    }
-                    else {
-                        __arm_2d_impl_src_msk_copy(
-                            (color_int *)src_buf_tmp,
-                            src_stride,
-                            mask_after_rgb,
-                            src_stride,
-                            &copy_size,
-                            (color_int *)dest_buf,
-                            dest_stride,
-                            &copy_size);
-                    }
-
-                    is_accelerated = true;
-                )
-                /* *INDENT-ON* */
+                is_accelerated = true;
+            )
+            /* *INDENT-ON* */
             }
             else if(!mask_any && (cf == LV_IMG_CF_TRUE_COLOR)) {
                 /* accelerate copy-with-source-masks-and-opacity */
 
-                /* *INDENT-OFF* */
-                __RECOLOUR_WRAPPER(
-                    __PREPARE_LL_ACCELERATION__();
+            /* *INDENT-OFF* */
+            __RECOLOUR_WRAPPER(
+                __PREPARE_LL_ACCELERATION__();
 
-                    if(blend_dsc.opa >= LV_OPA_MAX) {
-                    __arm_2d_impl_copy(
+                if(blend_dsc.opa >= LV_OPA_MAX) {
+                __arm_2d_impl_copy(
+                    (color_int *)src_buf_tmp,
+                    src_stride,
+                    (color_int *)dest_buf,
+                    dest_stride,
+                    &copy_size);
+                }
+                else {
+                    __arm_2d_impl_alpha_blending(
                         (color_int *)src_buf_tmp,
                         src_stride,
                         (color_int *)dest_buf,
                         dest_stride,
-                        &copy_size);
-                    }
-                    else {
-                        __arm_2d_impl_alpha_blending(
-                            (color_int *)src_buf_tmp,
-                            src_stride,
-                            (color_int *)dest_buf,
-                            dest_stride,
-                            &copy_size,
-                            blend_dsc.opa);
-                    }
-                    is_accelerated = true;
-                )
-                /* *INDENT-ON* */
+                        &copy_size,
+                        blend_dsc.opa);
+                }
+                is_accelerated = true;
+            )
+            /* *INDENT-ON* */
             }
         }
         else if(!mask_any
@@ -1218,155 +982,153 @@ static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_
                ) {
 
             uint8_t * mask_after_rgb = src_buf + sizeof(lv_color_t) * src_w * src_h;
-            /* *INDENT-OFF* */
-            __RECOLOUR_WRAPPER(
-                /* accelerate transform without re-color */
+        /* *INDENT-OFF* */
+        __RECOLOUR_WRAPPER(
+            /* accelerate transform without re-color */
 
-                static arm_2d_tile_t target_tile_origin;
-                static arm_2d_tile_t target_tile;
-                arm_2d_region_t clip_region;
-                static arm_2d_region_t target_region;
+            static arm_2d_tile_t target_tile_origin;
+            static arm_2d_tile_t target_tile;
+            arm_2d_region_t clip_region;
+            static arm_2d_region_t target_region;
 
-                lv_color_t * dest_buf = draw_ctx->buf;
+            lv_color_t * dest_buf = draw_ctx->buf;
 
-                target_tile_origin = (arm_2d_tile_t) {
-                    .tRegion = {
-                        .tSize = {
-                            .iWidth = lv_area_get_width(draw_ctx->buf_area),
-                            .iHeight = lv_area_get_height(draw_ctx->buf_area),
-                        },
-                    },
-                    .tInfo.bIsRoot = true,
-                    .phwBuffer = (uint16_t *)draw_ctx->buf,
-                };
-
-                clip_region = (arm_2d_region_t) {
-                    .tLocation = {
-                        .iX = draw_ctx->clip_area->x1 - draw_ctx->buf_area->x1,
-                        .iY = draw_ctx->clip_area->y1 - draw_ctx->buf_area->y1,
-                    },
+            target_tile_origin = (arm_2d_tile_t) {
+                .tRegion = {
                     .tSize = {
-                        .iWidth = lv_area_get_width(draw_ctx->clip_area),
-                        .iHeight = lv_area_get_height(draw_ctx->clip_area),
+                        .iWidth = lv_area_get_width(draw_ctx->buf_area),
+                        .iHeight = lv_area_get_height(draw_ctx->buf_area),
                     },
-                };
+                },
+                .tInfo.bIsRoot = true,
+                .phwBuffer = (uint16_t *)draw_ctx->buf,
+            };
 
-                arm_2d_tile_generate_child(&target_tile_origin,
-                                           &clip_region,
-                                           &target_tile,
-                                           false);
+            clip_region = (arm_2d_region_t) {
+                .tLocation = {
+                    .iX = draw_ctx->clip_area->x1 - draw_ctx->buf_area->x1,
+                    .iY = draw_ctx->clip_area->y1 - draw_ctx->buf_area->y1,
+                },
+                .tSize = {
+                    .iWidth = lv_area_get_width(draw_ctx->clip_area),
+                    .iHeight = lv_area_get_height(draw_ctx->clip_area),
+                },
+            };
 
-                static arm_2d_tile_t source_tile;
+            arm_2d_tile_generate_child(&target_tile_origin,
+                                        &clip_region,
+                                        &target_tile,
+                                        false);
 
-                source_tile = (arm_2d_tile_t) {
-                    .tRegion = {
-                        .tSize = {
-                            .iWidth = src_w,
-                            .iHeight = src_h,
-                        },
+            static arm_2d_tile_t source_tile;
+
+            source_tile = (arm_2d_tile_t) {
+                .tRegion = {
+                    .tSize = {
+                        .iWidth = src_w,
+                        .iHeight = src_h,
                     },
-                    .tInfo.bIsRoot = true,
-                    .pchBuffer = (uint8_t *)src_buf,
-                };
+                },
+                .tInfo.bIsRoot = true,
+                .pchBuffer = (uint8_t *)src_buf,
+            };
 
-                static arm_2d_location_t source_center, target_center;
-                source_center.iX = draw_dsc->pivot.x;
-                source_center.iY = draw_dsc->pivot.y;
+            static arm_2d_location_t source_center, target_center;
+            source_center.iX = draw_dsc->pivot.x;
+            source_center.iY = draw_dsc->pivot.y;
 
-                if(LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED == cf) {
+            if(LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED == cf) {
 
-                    __ARM_2D_PREPARE_TRANS_AND_TARGET_REGION(
-                        arm_2d_tile_transform_with_opacity_prepare,
-                        &source_tile,
-                        source_center,
-                        ARM_2D_ANGLE((draw_dsc->angle / 10.0f)),
-                        draw_dsc->zoom / 256.0f,
-                        (color_int)LV_COLOR_CHROMA_KEY.full,
-                        blend_dsc.opa);
+                __ARM_2D_PREPARE_TRANS_AND_TARGET_REGION(
+                    arm_2d_tile_transform_with_opacity_prepare,
+                    &source_tile,
+                    source_center,
+                    ARM_2D_ANGLE((draw_dsc->angle / 10.0f)),
+                    draw_dsc->zoom / 256.0f,
+                    (color_int)LV_COLOR_CHROMA_KEY.full,
+                    blend_dsc.opa);
 
-                    arm_2d_tile_transform(
-                        &target_tile,
-                        &target_region,
-                        NULL
-                    );
-                    is_accelerated = true;
-                }
-    #if ARM_2D_VERISON >= 10103
-                else if (LV_IMG_CF_TRUE_COLOR == cf) {
-                    __ARM_2D_PREPARE_TRANS_AND_TARGET_REGION(
-                        arm_2d_tile_transform_only_with_opacity_prepare,
-                        &source_tile,
-                        source_center,
-                        ARM_2D_ANGLE((draw_dsc->angle / 10.0f)),
-                        draw_dsc->zoom / 256.0f,
-                        blend_dsc.opa);
+                arm_2d_tile_transform(
+                    &target_tile,
+                    &target_region,
+                    NULL
+                );
+                is_accelerated = true;
+            }
+            else if (LV_IMG_CF_TRUE_COLOR == cf) {
+                __ARM_2D_PREPARE_TRANS_AND_TARGET_REGION(
+                    arm_2d_tile_transform_only_with_opacity_prepare,
+                    &source_tile,
+                    source_center,
+                    ARM_2D_ANGLE((draw_dsc->angle / 10.0f)),
+                    draw_dsc->zoom / 256.0f,
+                    blend_dsc.opa);
 
-                    arm_2d_tile_transform(
-                        &target_tile,
-                        &target_region,
-                        NULL
-                    );
-                    is_accelerated = true;
-                }
-    #endif
-                else if (LV_IMG_CF_RGB565A8 == cf) {
-                    static arm_2d_tile_t mask_tile;
-                    mask_tile = source_tile;
+                arm_2d_tile_transform(
+                    &target_tile,
+                    &target_region,
+                    NULL
+                );
+                is_accelerated = true;
+            }
+            else if (LV_IMG_CF_RGB565A8 == cf) {
+                static arm_2d_tile_t mask_tile;
+                mask_tile = source_tile;
 
-                    mask_tile.tInfo.bHasEnforcedColour = true;
-                    mask_tile.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_GRAY8;
-                    mask_tile.pchBuffer = mask_after_rgb;
+                mask_tile.tInfo.bHasEnforcedColour = true;
+                mask_tile.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_GRAY8;
+                mask_tile.pchBuffer = mask_after_rgb;
 
-                    __ARM_2D_PREPARE_TRANS_AND_TARGET_REGION(
-                        arm_2d_tile_transform_with_src_mask_and_opacity_prepare,
-                        &source_tile,
-                        &mask_tile,
-                        source_center,
-                        ARM_2D_ANGLE((draw_dsc->angle / 10.0f)),
-                        draw_dsc->zoom / 256.0f,
-                        blend_dsc.opa
-                        );
-
-                    arm_2d_tile_transform(
-                        &target_tile,
-                        &target_region,
-                        NULL
+                __ARM_2D_PREPARE_TRANS_AND_TARGET_REGION(
+                    arm_2d_tile_transform_with_src_mask_and_opacity_prepare,
+                    &source_tile,
+                    &mask_tile,
+                    source_center,
+                    ARM_2D_ANGLE((draw_dsc->angle / 10.0f)),
+                    draw_dsc->zoom / 256.0f,
+                    blend_dsc.opa
                     );
 
-                    is_accelerated = true;
-                }
-    #if defined(__ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__)          \
-                &&  __ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__
-                else if((LV_IMG_CF_TRUE_COLOR_ALPHA == cf) &&
-                        (LV_COLOR_DEPTH == 32)) {
-                    static arm_2d_tile_t mask_tile;
-                    mask_tile = source_tile;
+                arm_2d_tile_transform(
+                    &target_tile,
+                    &target_region,
+                    NULL
+                );
 
-                    mask_tile.tInfo.bHasEnforcedColour = true;
-                    mask_tile.tInfo.tColourInfo.chScheme = ARM_2D_CHANNEL_8in32;
-                    mask_tile.pchBuffer += 3;
+                is_accelerated = true;
+            }
+#if defined(__ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__)          \
+            &&  __ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__
+            else if((LV_IMG_CF_TRUE_COLOR_ALPHA == cf) &&
+                    (LV_COLOR_DEPTH == 32)) {
+                static arm_2d_tile_t mask_tile;
+                mask_tile = source_tile;
 
-                    __ARM_2D_PREPARE_TRANS_AND_TARGET_REGION(
-                        arm_2d_tile_transform_with_src_mask_and_opacity_prepare,
-                        &source_tile,
-                        &mask_tile,
-                        source_center,
-                        ARM_2D_ANGLE((draw_dsc->angle / 10.0f)),
-                        draw_dsc->zoom / 256.0f,
-                        blend_dsc.opa
-                        );
+                mask_tile.tInfo.bHasEnforcedColour = true;
+                mask_tile.tInfo.tColourInfo.chScheme = ARM_2D_CHANNEL_8in32;
+                mask_tile.pchBuffer += 3;
 
-                    arm_2d_tile_transform(
-                        &target_tile,
-                        &target_region,
-                        NULL
+                __ARM_2D_PREPARE_TRANS_AND_TARGET_REGION(
+                    arm_2d_tile_transform_with_src_mask_and_opacity_prepare,
+                    &source_tile,
+                    &mask_tile,
+                    source_center,
+                    ARM_2D_ANGLE((draw_dsc->angle / 10.0f)),
+                    draw_dsc->zoom / 256.0f,
+                    blend_dsc.opa
                     );
 
-                    is_accelerated = true;
-                }
-    #endif
-            )
-            /* *INDENT-ON* */
+                arm_2d_tile_transform(
+                    &target_tile,
+                    &target_region,
+                    NULL
+                );
+
+                is_accelerated = true;
+            }
+#endif
+        )
+        /* *INDENT-ON* */
         }
 
         /* *INDENT-OFF* */
@@ -1444,7 +1206,6 @@ static void lv_gpu_arm2d_wait_cb(lv_draw_ctx_t * draw_ctx)
     lv_draw_sw_wait_for_finish(draw_ctx);
 }
 
-#endif
 
 /**********************
  *   STATIC FUNCTIONS
