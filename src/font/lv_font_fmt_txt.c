@@ -270,7 +270,7 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL) {
             const uint8_t * gid_ofs_8 = fdsc->cmaps[i].glyph_id_ofs_list;
-            if(0 == gid_ofs_8[rcp] && letter != fdsc->cmaps[i].range_start) continue;
+            if(gid_ofs_8[rcp] == 0 && letter != fdsc->cmaps[i].range_start) continue;
             glyph_id = fdsc->cmaps[i].glyph_id_start + gid_ofs_8[rcp];
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_TINY) {
