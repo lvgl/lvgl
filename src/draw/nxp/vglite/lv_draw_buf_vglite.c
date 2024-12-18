@@ -121,11 +121,11 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
 static uint32_t _width_to_stride(uint32_t w, lv_color_format_t cf)
 {
     uint8_t bits_per_pixel = lv_color_format_get_bpp(cf);
-    uint32_t width_bits = (w * bits_per_pixel + 7) & ~7;
+    uint32_t width_bits = LV_ROUND_UP(w * bits_per_pixel, 8);
     uint32_t width_bytes = width_bits / 8;
     uint8_t align_bytes = vglite_get_stride_alignment(cf);
 
-    return (width_bytes + align_bytes - 1) & ~(align_bytes - 1);
+    return LV_ROUND_UP(width_bytes, align_bytes);
 }
 
 #endif /*LV_USE_DRAW_VGLITE*/
