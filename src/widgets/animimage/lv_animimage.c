@@ -92,7 +92,7 @@ void lv_animimg_set_duration(lv_obj_t * obj, uint32_t duration)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     lv_anim_set_duration(&animimg->anim, duration);
-    lv_anim_set_playback_delay(&animimg->anim, duration);
+    lv_anim_set_reverse_delay(&animimg->anim, duration);
 }
 
 void lv_animimg_set_repeat_count(lv_obj_t * obj, uint32_t count)
