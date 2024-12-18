@@ -79,6 +79,7 @@
 	    <prop name="pad_right" type="int"/>
 	    <prop name="pad_hor" type="int"/>
 	    <prop name="pad_ver" type="int"/>
+	    <prop name="pad_all" type="int"/>
 	    <prop name="pad_row" type="int"/>
 	    <prop name="pad_column" type="int"/>
 	    <prop name="margin_top" type="int"/>
@@ -87,6 +88,7 @@
 	    <prop name="margin_right" type="int"/>
 	    <prop name="margin_hor" type="int"/>
 	    <prop name="margin_ver" type="int"/>
+   	    <prop name="margin_all" type="int"/>
 	    <prop name="layout" type="enum:lv_layout"/>
 	    <prop name="flex_flow" type="enum:lv_flex_flow"/>
 	    <prop name="flex_main_place" type="enum:lv_flex_align"/>

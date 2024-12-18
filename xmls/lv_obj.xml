@@ -46,6 +46,7 @@ Example
 	    <prop name="style_pad_right" type="int"/>
 	    <prop name="style_pad_hor" type="int"/>
 	    <prop name="style_pad_ver" type="int"/>
+	    <prop name="style_pad_all" type="int"/>
 	    <prop name="style_pad_row" type="int"/>
 	    <prop name="style_pad_column" type="int"/>
 	    <prop name="style_margin_top" type="int"/>
@@ -54,11 +55,15 @@ Example
 	    <prop name="style_margin_right" type="int"/>
 	    <prop name="style_margin_hor" type="int"/>
 	    <prop name="style_margin_ver" type="int"/>
+	    <prop name="style_margin_all" type="int"/>
 	    <prop name="style_layout" type="enum:lv_layout"/>
 	    <prop name="style_flex_flow" type="enum:lv_flex_flow"/>
 	    <prop name="style_flex_main_place" type="enum:lv_flex_align"/>
 	    <prop name="style_flex_cross_place" type="enum:lv_flex_align"/>
 	    <prop name="style_flex_track_place" type="enum:lv_flex_align"/>
+
+	    <prop name="flex_grow" type="int"/>
+	    <prop name="flex_flow" type="enum:lv_flex_flow"/>
 
 	    <prop name="hidden" type="flag:flag"/>
 	    <prop name="clickable" type="flag:flag"/>
