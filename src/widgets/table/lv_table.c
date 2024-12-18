@@ -521,6 +521,8 @@ static void lv_table_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     table->row_h[0] = LV_DPI_DEF;
     table->cell_data = lv_realloc(table->cell_data, table->row_cnt * table->col_cnt * sizeof(lv_table_cell_t *));
     table->cell_data[0] = NULL;
+    table->row_act = LV_TABLE_CELL_NONE;
+    table->col_act = LV_TABLE_CELL_NONE;
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -998,6 +1000,9 @@ static lv_result_t get_pressed_cell(lv_obj_t * obj, uint32_t * row, uint32_t * c
     lv_indev_get_point(lv_indev_active(), &p);
 
     int32_t tmp;
+    bool is_click_on_valid_column = false;
+    bool is_click_on_valid_row = false;
+
     if(col) {
         int32_t x = p.x + lv_obj_get_scroll_x(obj);
 
@@ -1013,7 +1018,10 @@ static lv_result_t get_pressed_cell(lv_obj_t * obj, uint32_t * row, uint32_t * c
         tmp = 0;
         for(*col = 0; *col < table->col_cnt; (*col)++) {
             tmp += table->col_w[*col];
-            if(x < tmp) break;
+            if(x < tmp) {
+                is_click_on_valid_column = true;
+                break;
+            }
         }
     }
 
@@ -1027,11 +1035,20 @@ static lv_result_t get_pressed_cell(lv_obj_t * obj, uint32_t * row, uint32_t * c
 
         for(*row = 0; *row < table->row_cnt; (*row)++) {
             tmp += table->row_h[*row];
-            if(y < tmp) break;
+            if(y < tmp) {
+                is_click_on_valid_row = true;
+                break;
+            }
         }
     }
 
-    return LV_RESULT_OK;
+    /* If the click was on valid column AND row then return valid result, return invalid otherwise */
+    lv_result_t result = LV_RESULT_INVALID;
+    if((is_click_on_valid_column) && (is_click_on_valid_row)) {
+        result = LV_RESULT_OK;
+    }
+
+    return result;
 }
 
 /* Returns number of bytes to allocate based on chars configuration */
