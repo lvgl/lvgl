@@ -525,7 +525,7 @@ void testStrokeFill(void)
     lv_svg_node_delete(svg_node_root);
 
     const char * svg_sf12 = \
-                           "<svg><g fill=\"rgba(255, 255, 255, 1.0)\"/></svg>";
+                            "<svg><g fill=\"rgba(255, 255, 255, 1.0)\"/></svg>";
     svg_node_root = lv_svg_load_data(svg_sf12, lv_strlen(svg_sf12));
     svg_node = LV_SVG_NODE_CHILD(svg_node_root, 0);
     c = (LV_ARRAY_GET(&svg_node->attrs, 0, lv_svg_attr_t))->value.uval;
@@ -533,7 +533,7 @@ void testStrokeFill(void)
     lv_svg_node_delete(svg_node_root);
 
     const char * svg_sf13 = \
-                           "<svg><g fill=\"rgba(255, 255, 255, 128)\"/></svg>";
+                            "<svg><g fill=\"rgba(255, 255, 255, 128)\"/></svg>";
     svg_node_root = lv_svg_load_data(svg_sf13, lv_strlen(svg_sf13));
     svg_node = LV_SVG_NODE_CHILD(svg_node_root, 0);
     c = (LV_ARRAY_GET(&svg_node->attrs, 0, lv_svg_attr_t))->value.uval;
