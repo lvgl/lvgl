@@ -67,6 +67,10 @@ void lv_vg_lite_path_set_quality(lv_vg_lite_path_t * path, vg_lite_quality_t qua
 
 vg_lite_path_t * lv_vg_lite_path_get_path(lv_vg_lite_path_t * path);
 
+void lv_vg_lite_path_reserve_space(lv_vg_lite_path_t * path, size_t len);
+
+void lv_vg_lite_path_append_data(lv_vg_lite_path_t * path, const void * data, size_t len);
+
 void lv_vg_lite_path_move_to(lv_vg_lite_path_t * path,
                              float x, float y);
 
