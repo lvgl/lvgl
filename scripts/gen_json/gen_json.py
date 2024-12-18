@@ -330,4 +330,4 @@ if __name__ == '__main__':
 
     DEVELOP = args.develop
 
-    run(args.output_path, args.lv_conf, args.output_path is None, args.target_header, args.filter_private, args.no_docstrings *extra_args)
+    run(args.output_path, args.lv_conf, args.output_path is None, args.target_header, args.filter_private, args.no_docstringsm, *extra_args)
