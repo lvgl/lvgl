@@ -10,7 +10,7 @@ Main Components
     display
     indev
     color
-    font
+    fonts/index
     image
     timer
     animation

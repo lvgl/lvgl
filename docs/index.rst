@@ -39,14 +39,14 @@ Details
 .. toctree::
     :maxdepth: 1
 
+    details/integration/index
     details/base-widget/index
     details/widgets/index
     details/main-components/index
     details/other-components/index
-    examples
-    details/debugging/index
-    details/integration/index
     details/libs/index
+    details/debugging/index
+    examples
     API/index
 
 
