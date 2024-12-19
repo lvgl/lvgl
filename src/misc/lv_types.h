@@ -87,6 +87,7 @@ typedef int32_t lv_value_precise_t;
  */
 
 typedef struct _lv_obj_t lv_obj_t;
+typedef struct _lv_obj_create_info_t lv_obj_create_info_t;
 
 typedef uint16_t lv_state_t;
 typedef uint32_t lv_part_t;
@@ -172,6 +173,7 @@ typedef struct _lv_cover_check_info_t lv_cover_check_info_t;
 typedef struct _lv_obj_spec_attr_t lv_obj_spec_attr_t;
 
 typedef struct _lv_image_t lv_image_t;
+typedef struct _lv_image_create_info_t lv_image_create_info_t;
 
 typedef struct _lv_animimg_t lv_animimg_t;
 

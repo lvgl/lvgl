@@ -77,11 +77,22 @@ enum {
  **********************/
 
 /**
+ * Create an image object with creation information
+ * @param parent pointer to an object, it will be the parent of the new image
+ * @param create_info   pointer to a creation information object.
+ * @return pointer to the created image
+ */
+lv_obj_t * lv_image_create_ex(lv_obj_t * parent, lv_image_create_info_t * create_info);
+
+/**
  * Create an image object
  * @param parent pointer to an object, it will be the parent of the new image
  * @return pointer to the created image
  */
-lv_obj_t * lv_image_create(lv_obj_t * parent);
+static inline lv_obj_t * lv_image_create(lv_obj_t * parent)
+{
+    return lv_image_create_ex(parent, NULL);
+}
 
 /*=====================
  * Setter functions

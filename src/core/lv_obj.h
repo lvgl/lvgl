@@ -222,11 +222,17 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_obj_class;
  **********************/
 
 /**
- * Create a base object (a rectangle)
- * @param parent    pointer to a parent object. If NULL then a screen will be created.
- * @return          pointer to the new object
+ * Create a base object (a rectangle) with creation information
+ * @param parent        pointer to a parent object. If NULL then a screen will be created.
+ * @param create_info   pointer to a creation information object.
+ * @return              pointer to the new object
  */
-lv_obj_t * lv_obj_create(lv_obj_t * parent);
+lv_obj_t * lv_obj_create_ex(lv_obj_t * parent, lv_obj_create_info_t * create_info);
+
+static inline lv_obj_t * lv_obj_create(lv_obj_t * parent)
+{
+    return lv_obj_create_ex(parent, NULL);
+}
 
 /*=====================
  * Setter functions

@@ -101,20 +101,30 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
     return obj;
 }
 
-void lv_obj_class_init_obj(lv_obj_t * obj)
+void lv_obj_class_init_obj_ex(lv_obj_t * obj, lv_obj_create_info_t * create_info)
 {
     if(obj == NULL) return;
 
     lv_obj_mark_layout_as_dirty(obj);
-    lv_obj_enable_style_refresh(false);
 
-    lv_theme_apply(obj);
-    lv_obj_construct(obj->class_p, obj);
+    static lv_obj_create_info_t def_create_info = { .use_theme = true };
+    if(create_info == NULL)
+        create_info = &def_create_info;
 
-    lv_obj_enable_style_refresh(true);
-    lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
+    if(create_info->use_theme) {
+        lv_obj_enable_style_refresh(false);
 
-    lv_obj_refresh_self_size(obj);
+        lv_theme_apply(obj);
+        lv_obj_construct(obj->class_p, obj);
+
+        lv_obj_enable_style_refresh(true);
+        lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
+        lv_obj_refresh_self_size(obj);
+    }
+    /*Create without theme*/
+    else {
+        lv_obj_construct(obj->class_p, obj);
+    }
 
     lv_group_t * def_group = lv_group_get_default();
     if(def_group && lv_obj_is_group_def(obj)) {

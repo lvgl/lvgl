@@ -55,7 +55,8 @@ typedef void (*lv_obj_class_event_cb_t)(lv_obj_class_t * class_p, lv_event_t * e
  */
 lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * parent);
 
-void lv_obj_class_init_obj(lv_obj_t * obj);
+void lv_obj_class_init_obj_ex(lv_obj_t * obj, lv_obj_create_info_t * create_info);
+#define lv_obj_class_init_obj(obj) lv_obj_class_init_obj_ex(obj, NULL)
 
 bool lv_obj_is_editable(lv_obj_t * obj);
 

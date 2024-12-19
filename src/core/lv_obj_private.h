@@ -75,6 +75,10 @@ struct _lv_obj_t {
     uint16_t is_deleting : 1;
 };
 
+struct _lv_obj_create_info_t {
+    /** whether to apply current display theme or not*/
+    bool use_theme;
+};
 
 /**********************
  * GLOBAL PROTOTYPES
