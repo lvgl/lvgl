@@ -229,6 +229,9 @@ typedef struct _lv_global_t {
     bool freertos_idle_task_running;
 #endif
 
+#if LV_USE_EVDEV
+    lv_evdev_discovery_t * evdev_discovery;
+#endif
 
     void * user_data;
 } lv_global_t;

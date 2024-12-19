@@ -47,6 +47,7 @@ extern "C" {
 #include "src/draw/sw/blend/lv_draw_sw_blend_private.h"
 #include "src/drivers/libinput/lv_xkb_private.h"
 #include "src/drivers/libinput/lv_libinput_private.h"
+#include "src/drivers/evdev/lv_evdev_private.h"
 #include "src/font/lv_font_fmt_txt_private.h"
 #include "src/themes/lv_theme_private.h"
 #include "src/core/lv_refr_private.h"

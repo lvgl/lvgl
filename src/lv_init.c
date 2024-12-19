@@ -70,6 +70,7 @@
 #if LV_USE_WINDOWS
     #include "drivers/windows/lv_windows_context.h"
 #endif
+#include "drivers/evdev/lv_evdev_private.h"
 
 /*********************
  *      DEFINES
@@ -386,6 +387,10 @@ void lv_deinit(void)
     lv_display_set_default(NULL);
 
     lv_cleanup_devices(LV_GLOBAL_DEFAULT());
+
+#if LV_USE_EVDEV
+    lv_evdev_deinit();
+#endif
 
 #if LV_USE_SPAN != 0
     lv_span_stack_deinit();
