@@ -135,8 +135,13 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
             lv_area_t coords_area = *coords;
             lv_area_move(&coords_area, -(coords->x1 - xpos), -(coords->y1 - ypos));
 
-            layer->_clip_area = coords_area;
-            decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, new_image_dsc);
+            lv_area_t clip_area = coords_area;
+            if(lv_area_intersect(&clip_area, &clip_area, &layer->_clip_area)) {
+                lv_area_t clip_area_ori = layer->_clip_area;
+                layer->_clip_area = clip_area;
+                decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, new_image_dsc);
+                layer->_clip_area = clip_area_ori;
+            }
         }
         lv_free(new_image_dsc);
     }

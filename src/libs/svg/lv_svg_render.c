@@ -1379,7 +1379,6 @@ static void _render_poly(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc,
 static void _render_group(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc, const lv_matrix_t * matrix)
 {
     lv_svg_render_group_t * group = (lv_svg_render_group_t *)obj;
-
     lv_matrix_t mtx;
     _setup_matrix(&mtx, dsc, obj);
 
