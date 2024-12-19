@@ -32,6 +32,9 @@ struct _lv_indev_t {
     /** Function pointer to read input device data.*/
     lv_indev_read_cb_t read_cb;
 
+    /** Function pointer to read input device data for the preprocessor.*/
+    lv_indev_read_preprocess_cb_t read_preprocess_cb;
+
     lv_indev_state_t state; /**< Current state of the input device.*/
     lv_indev_mode_t mode;
 

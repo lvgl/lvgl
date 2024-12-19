@@ -75,6 +75,9 @@ typedef struct {
 
 typedef void (*lv_indev_read_cb_t)(lv_indev_t * indev, lv_indev_data_t * data);
 
+/** Return true if the event has been processed and should not be further dispatched. Otherwise, return false. */
+typedef bool (*lv_indev_read_preprocess_cb_t)(lv_indev_t * indev, lv_indev_data_t * data);
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -140,6 +143,13 @@ void lv_indev_set_type(lv_indev_t * indev, lv_indev_type_t indev_type);
 void lv_indev_set_read_cb(lv_indev_t * indev,  lv_indev_read_cb_t read_cb);
 
 /**
+ * Set a preprocess callback function to read input device data to the indev
+ * @param indev pointer to an input device
+ * @param read_cb pointer to preprocess callback function to read input device data
+ */
+void lv_indev_set_read_preprocess_cb(lv_indev_t * indev,  lv_indev_read_preprocess_cb_t read_cb);
+
+/**
  * Set user data to the indev
  * @param indev pointer to an input device
  * @param user_data pointer to user data
@@ -201,6 +211,13 @@ lv_indev_type_t lv_indev_get_type(const lv_indev_t * indev);
  * @return Pointer to callback function to read input device data or NULL if indev is NULL
  */
 lv_indev_read_cb_t lv_indev_get_read_cb(lv_indev_t * indev);
+
+/**
+ * Get the preprocess callback function to read input device data to the indev
+ * @param indev pointer to an input device
+ * @return Pointer to preprocess callback function to read input device data or NULL if indev is NULL
+ */
+lv_indev_read_preprocess_cb_t lv_indev_get_read_preprocess_cb(lv_indev_t * indev);
 
 /**
  * Get the indev state
