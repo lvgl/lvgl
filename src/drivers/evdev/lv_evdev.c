@@ -13,7 +13,6 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
-#include <sys/inotify.h>
 #include <sys/types.h>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -22,6 +21,7 @@
     #include <dev/evdev/input.h>
 #else
     #include <linux/input.h>
+    #include <sys/inotify.h>
 #endif /*BSD*/
 #include "../../core/lv_global.h"
 #include "../../misc/lv_types.h"
@@ -67,12 +67,14 @@ typedef struct {
     bool deleting;
 } lv_evdev_t;
 
+#ifndef BSD
 struct _lv_evdev_discovery_t {
     lv_evdev_discovery_cb_t cb;
     void * cb_user_data;
     int inotify_fd;
     lv_timer_t * timer;
 };
+#endif
 
 /**********************
  *   STATIC FUNCTIONS
@@ -214,6 +216,7 @@ static void _evdev_indev_delete_cb(lv_event_t * e)
     lv_free(dsc);
 }
 
+#ifndef BSD
 static void _evdev_discovery_indev_try_create(const char * file_name)
 {
     if(lv_strlen(file_name) <= 5
@@ -261,6 +264,7 @@ static void _evdev_discovery_timer_cb(lv_timer_t * tim)
         lv_evdev_discovery_stop();
     }
 }
+#endif /*BSD*/
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -388,6 +392,7 @@ err_after_malloc:
 
 lv_result_t lv_evdev_discovery_start(lv_evdev_discovery_cb_t cb, void * user_data)
 {
+#ifndef BSD
     lv_evdev_discovery_t * ed = NULL;
     int inotify_fd = -1;
     DIR * dir = NULL;
@@ -452,10 +457,15 @@ err_out:
     lv_free(ed);
     evdev_discovery = NULL;
     return LV_RESULT_INVALID;
+
+#else /*BSD*/
+    return LV_RESULT_INVALID;
+#endif
 }
 
 lv_result_t lv_evdev_discovery_stop(void)
 {
+#ifndef BSD
     lv_evdev_discovery_t * ed = evdev_discovery;
     if(ed == NULL) return LV_RESULT_INVALID;
 
@@ -465,6 +475,9 @@ lv_result_t lv_evdev_discovery_stop(void)
 
     evdev_discovery = NULL;
     return LV_RESULT_OK;
+#else
+    return LV_RESULT_INVALID;
+#endif
 }
 
 void lv_evdev_set_swap_axes(lv_indev_t * indev, bool swap_axes)

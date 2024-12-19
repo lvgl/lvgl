@@ -50,7 +50,7 @@ lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path);
 /**
  * Begin automatically creating evdev indevs for all new and existing
  * evdev devices found in /dev/input/
- * @param cb         function to call when a new evdev indev is discovered
+ * @param cb         function to call when a new evdev indev is discovered, or `NULL`
  * @param user_data  parameter to pass to the callback
  * @return           the success or failure status. It will fail if it's
  *                   already running or resources could not be initialized.
