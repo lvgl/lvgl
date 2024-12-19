@@ -98,3 +98,5 @@ function which will be called when a new device is added.
         lv_evdev_discovery_start(discovery_cb, NULL);
         /* ... */
     }
+
+At the time of writing, this feature is not supported in BSD.
