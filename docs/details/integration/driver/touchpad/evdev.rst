@@ -55,3 +55,46 @@ You can use ``evtest`` to show data from that event source to see if it is actua
 Try:   
 
 ``$evtest /dev/input/event1`` replacing ``eventX`` with your event device from above.   
+
+Automatic input device discovery
+--------------------------------
+
+There is support for automatically finding and adding input devices in ``/dev/input/``. New devices will automatically be added
+when they are connected. To enable this feature, you can simply call :cpp:expr:`lv_evdev_discovery_start(NULL, NULL)`.
+
+You may want to react to a new device being added so that a cursor image can be applied, for example. You can provide a callback
+function which will be called when a new device is added.
+
+.. code-block:: c
+
+	#include "lvgl/src/core/lv_global.h"
+
+	static void indev_deleted_cb(lv_event_t * e)
+	{
+		if(LV_GLOBAL_DEFAULT()->deinit_in_progress) return;
+		lv_obj_t * cursor_obj = lv_event_get_user_data(e)
+		lv_obj_delete(cursor_obj);
+	}
+
+	static void discovery_cb(lv_indev_t * indev, lv_evdev_type_t type, void * user_data)
+	{
+		LV_LOG_USER("new '%s' device discovered",   type == LV_EVDEV_TYPE_REL ? "REL" :
+													type == LV_EVDEV_TYPE_ABS ? "ABS" :
+													type == LV_EVDEV_TYPE_KEY ? "KEY" :
+													"unknown");
+
+		if(type == LV_EVDEV_TYPE_REL) {
+			LV_IMAGE_DECLARE(mouse_cursor_icon);
+			lv_obj_t * cursor_obj = lv_image_create(lv_screen_active());
+			lv_image_set_src(cursor_obj, &mouse_cursor_icon);
+			lv_indev_set_cursor(indev, cursor_obj);
+			lv_indev_add_event_cb(indev, indev_deleted_cb, LV_EVENT_DELETE, cursor_obj);
+		}
+	}
+
+	int main()
+	{
+		/* ... */
+		lv_evdev_discovery_start(discovery_cb, NULL);
+		/* ... */
+	}
