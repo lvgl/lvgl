@@ -46,7 +46,7 @@ Examples of the latter are:  :cpp:expr:`lv_obj_set_x(widget, value)` or
 :cpp:expr:`lv_obj_set_width(widget, value)`.
 
 This makes it very convenient to apply to the appearance (and other attributes) of UI
-componenets.  But you can provide your own "set" functions, and so the application of
+components.  But you can provide your own "set" functions, and so the application of
 Animations is really limited only by your imagination.
 
 The number of Animations that can be playing at the same time for a given object with
@@ -210,7 +210,7 @@ directions using :cpp:expr:`lv_anim_set_reverse_delay(&anim_template, delay_in_m
 
 .. _animation_start:
 
-Starting an Amination
+Starting an Animation
 *********************
 
 After you have set up your :cpp:type:`lv_anim_t` object, it is important to realize

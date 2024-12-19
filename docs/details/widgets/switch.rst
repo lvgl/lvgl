@@ -55,7 +55,7 @@ programmatically.
 Change orientation
 ------------------
 
-Swith a Switch is created, its default orientation is
+With a Switch is created, its default orientation is
 :cpp:enumerator:`LV_SWITCH_ORIENTATION_AUTO`, which causes it to be oriented based
 on ``width`` and ``height``.  You can change this behavior using
 :cpp:expr:`lv_switch_set_orientation(widget, orientation)`.  Possible values for

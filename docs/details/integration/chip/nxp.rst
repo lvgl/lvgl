@@ -221,7 +221,7 @@ Basic initialization:
 ^^^^^^^^^^^^^^^^^^^^^
 
 Initialize VGLite GPU before calling :cpp:func:`lv_init()` by specifying the
-width/height of tessellation window. The default values for tesselation width
+width/height of tessellation window. The default values for tessellation width
 and height, and command buffer size are in the SDK file "vglite_support.h".
 
 .. code-block:: c
