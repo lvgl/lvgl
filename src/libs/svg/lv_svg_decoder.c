@@ -308,8 +308,7 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
     bool alloc_layer = false;
     lv_layer_t * target_layer = NULL;
     lv_draw_image_dsc_t layer_draw_dsc;
-    if(layer->color_format != LV_COLOR_FORMAT_ARGB8888 &&
-       layer->color_format != LV_COLOR_FORMAT_XRGB8888) {
+    if(layer->color_format != LV_COLOR_FORMAT_ARGB8888) {
         lv_area_t rc = {0, 0, lv_area_get_width(coords), lv_area_get_height(coords)};
         target_layer = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &rc);
 
