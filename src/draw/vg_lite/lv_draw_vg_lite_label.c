@@ -197,7 +197,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
 
     vg_lite_matrix_t matrix = u->global_matrix;
     vg_lite_translate(image_area.x1 + dsc->pivot.x, image_area.y1 + (dsc->g->box_h + dsc->g->ofs_y), &matrix);
-    vg_lite_rotate(dsc->rotation / 10.0, &matrix);
+    vg_lite_rotate(dsc->rotation / 10.0f, &matrix);
     vg_lite_translate(-dsc->pivot.x, -dsc->g->box_h - dsc->g->ofs_y, &matrix);
 
     vg_lite_buffer_t src_buf;
@@ -243,7 +243,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
         LV_VG_LITE_ASSERT_PATH(vg_lite_path);
 
         vg_lite_matrix_t path_matrix = u->global_matrix;
-        vg_lite_rotate(dsc->rotation / 10.0, &path_matrix);
+        vg_lite_rotate(dsc->rotation / 10.0f, &path_matrix);
         LV_VG_LITE_ASSERT_MATRIX(&path_matrix);
 
         LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw_pattern");
@@ -297,7 +297,7 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
     vg_lite_translate(pos.x - dsc->g->ofs_x + dsc->pivot.x, pos.y + dsc->g->box_h + dsc->g->ofs_y, &matrix);
-    vg_lite_rotate(dsc->rotation / 10.0, &matrix);
+    vg_lite_rotate(dsc->rotation / 10.0f, &matrix);
     vg_lite_translate(-dsc->pivot.x, 0, &matrix);
     vg_lite_scale(scale, scale, &matrix);
 
