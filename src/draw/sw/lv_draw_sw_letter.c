@@ -70,6 +70,11 @@ void lv_draw_sw_letter(lv_draw_unit_t * draw_unit, const lv_draw_letter_dsc_t * 
     },
     dsc->font, dsc->unicode, draw_letter_cb);
     LV_PROFILER_END;
+
+    if(glyph_dsc._draw_buf) {
+        lv_draw_buf_destroy(glyph_dsc._draw_buf);
+        glyph_dsc._draw_buf = NULL;
+    }
 }
 
 void lv_draw_sw_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)

@@ -22,7 +22,10 @@ static lv_obj_t * canvas_create(void)
 {
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
     lv_obj_set_size(canvas, 500, 360);
-    lv_canvas_set_draw_buf(canvas, lv_draw_buf_create(500, 500, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO));
+
+    lv_draw_buf_t * draw_buf = lv_draw_buf_create(500, 360, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
+    lv_draw_buf_clear(draw_buf, NULL);
+    lv_canvas_set_draw_buf(canvas, draw_buf);
 
     return canvas;
 }
@@ -51,7 +54,7 @@ void test_draw_sin_wave(void)
 
     for(int16_t i = 0; i < 30; i++) {
         const int32_t x = i * 10 + 20;
-        const int32_t y = (int32_t)(sin(i * M_PI / 10) * 40 + 150);
+        const int32_t y = (int32_t)(sin(i * M_PI / 10) * 40 + 80);
         letter_dsc.unicode = (uint32_t)string[i % string_len];
         lv_draw_letter(&layer, &letter_dsc, &(lv_point_t) {
             .x = x, .y = y
@@ -60,7 +63,7 @@ void test_draw_sin_wave(void)
 
     for(int16_t i = 0; i < 30; i++) {
         const int32_t x = i * 15 + 20;
-        const int32_t y = (int32_t)(sin(i * M_PI / 10) * 40 + 300);
+        const int32_t y = (int32_t)(sin(i * M_PI / 10) * 40 + 230);
         letter_dsc.unicode = (uint32_t)string[i % string_len];
         letter_dsc.rotation = (int32_t)(atan(cos(M_PI / 10 * i)) * 180 / M_PI) * 10;
         letter_dsc.color = lv_color_hsv_to_rgb(i * 10, 100, 100);
