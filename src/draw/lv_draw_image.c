@@ -129,11 +129,18 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
 
         if(decoder_dsc.decoder && decoder_dsc.decoder->custom_draw_cb) {
             lv_area_t draw_area = layer->buf_area;
-            int32_t xpos = coords->x1 - draw_area.x1;
-            int32_t ypos = coords->y1 - draw_area.y1;
-
             lv_area_t coords_area = *coords;
-            lv_area_move(&coords_area, -(coords->x1 - xpos), -(coords->y1 - ypos));
+
+            if(layer->parent) { /* child layer */
+                int32_t xpos = coords->x1 - draw_area.x1;
+                int32_t ypos = coords->y1 - draw_area.y1;
+
+                lv_area_move(&coords_area, -(coords->x1 - xpos), -(coords->y1 - ypos));
+                layer->_clip_area = coords_area;
+            }
+            else {
+                layer->_clip_area = draw_area;
+            }
 
             decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, new_image_dsc);
         }

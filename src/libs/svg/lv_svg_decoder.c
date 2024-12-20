@@ -310,7 +310,7 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
     lv_draw_image_dsc_t layer_draw_dsc;
     if(layer->color_format != LV_COLOR_FORMAT_ARGB8888 &&
        layer->color_format != LV_COLOR_FORMAT_XRGB8888) {
-        lv_area_t rc = {0, 0, lv_area_get_width(coords) - 1, lv_area_get_height(coords) - 1};
+        lv_area_t rc = {0, 0, lv_area_get_width(coords), lv_area_get_height(coords)};
         target_layer = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &rc);
 
         lv_draw_image_dsc_init(&layer_draw_dsc);
@@ -335,6 +335,7 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
 #else
     lv_matrix_translate(&matrix, coords->x1, coords->y1);
 #endif
+    ctx->current_dsc.scissor_area = *coords;
     if(image_dsc) {
         lv_matrix_translate(&matrix, image_dsc->pivot.x, image_dsc->pivot.y);
         lv_matrix_rotate(&matrix, image_dsc->rotation / 10.0f);
