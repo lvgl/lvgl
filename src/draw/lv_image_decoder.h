@@ -81,9 +81,10 @@ typedef void (*lv_image_decoder_close_f_t)(lv_image_decoder_t * decoder, lv_imag
  * @param dsc pointer to decoder descriptor
  * @param coords the coordinates of the image
  * @param draw_dsc the draw image descriptor
+ * @param clip_area the clip area of the image
  */
 typedef void (*lv_image_decoder_custom_draw_t)(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc,
-                                               const lv_area_t * coords, const lv_draw_image_dsc_t * draw_dsc);
+                                               const lv_area_t * coords, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * clip_area);
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

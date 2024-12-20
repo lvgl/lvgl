@@ -137,12 +137,13 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
 
                 lv_area_move(&coords_area, -(coords->x1 - xpos), -(coords->y1 - ypos));
                 layer->_clip_area = coords_area;
+                decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, new_image_dsc, &coords_area);
             }
             else {
                 layer->_clip_area = draw_area;
+                decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, new_image_dsc, NULL);
             }
 
-            decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, new_image_dsc);
         }
         lv_free(new_image_dsc);
     }

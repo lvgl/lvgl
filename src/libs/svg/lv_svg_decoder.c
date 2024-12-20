@@ -37,7 +37,7 @@ static uint8_t * alloc_file(const char * filename, uint32_t * size);
 static void svg_draw_buf_free(void * svg_buf);
 
 static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, const lv_area_t * coords,
-                     const lv_draw_image_dsc_t * draw_dsc);
+                     const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * clip_area);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -297,7 +297,7 @@ static void svg_draw_buf_free(void * svg_buf)
 }
 
 static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, const lv_area_t * coords,
-                     const lv_draw_image_dsc_t * image_dsc)
+                     const lv_draw_image_dsc_t * image_dsc, const lv_area_t * clip_area)
 {
     const lv_draw_buf_t * draw_buf = dsc->decoded;
     const lv_svg_render_obj_t * list = draw_buf->unaligned_data;
@@ -335,7 +335,9 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
 #else
     lv_matrix_translate(&matrix, coords->x1, coords->y1);
 #endif
-    ctx->current_dsc.scissor_area = *coords;
+    if(clip_area) {
+        ctx->current_dsc.scissor_area = *clip_area;
+    }
     if(image_dsc) {
         lv_matrix_translate(&matrix, image_dsc->pivot.x, image_dsc->pivot.y);
         lv_matrix_rotate(&matrix, image_dsc->rotation / 10.0f);
