@@ -5,7 +5,6 @@ import shutil
 import tempfile
 import json
 import subprocess
-import threading
 
 base_path = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, base_path)
@@ -21,50 +20,12 @@ import pycparser  # NOQA
 DEVELOP = False
 
 
-class STDOut:
-    def __init__(self):
-        self._stdout = sys.stdout
-        sys.__stdout__ = self
-        sys.stdout = self
-
-    def write(self, data):
-        pass
-
-    def __getattr__(self, item):
-        if item in self.__dict__:
-            return self.__dict__[item]
-
-        return getattr(self._stdout, item)
-
-    def reset(self):
-        sys.stdout = self._stdout
-
-
 temp_directory = tempfile.mkdtemp(suffix='.lvgl_json')
 
 
-def run(output_path, lvgl_config_path, output_to_stdout, target_header, filter_private, *compiler_args):
-    # stdout = STDOut()
+def run(output_path, lvgl_config_path, output_to_stdout, target_header, filter_private, no_docstrings, *compiler_args):
 
     pycparser_monkeypatch.FILTER_PRIVATE = filter_private
-
-    # The thread is to provide an indication that things are being processed.
-    # There are long periods where nothing gets output to the screen and this
-    # is to let the user know that it is still working.
-    if not output_to_stdout:
-        event = threading.Event()
-
-        def _do():
-            while not event.is_set():
-                event.wait(1)
-                sys.stdout.write('.')
-                sys.stdout.flush()
-
-            print()
-
-        t = threading.Thread(target=_do)
-        t.daemon = True
-        t.start()
 
     lvgl_path = project_path
     lvgl_src_path = os.path.join(lvgl_path, 'src')
@@ -218,11 +179,9 @@ def run(output_path, lvgl_config_path, output_to_stdout, target_header, filter_p
         cparser = pycparser.CParser()
         ast = cparser.parse(pp_data, target_header)
 
-        ast.setup_docs(temp_directory)
+        ast.setup_docs(no_docstrings, temp_directory)
 
         if not output_to_stdout and output_path is None:
-            # stdout.reset()
-
             if not DEVELOP:
                 shutil.rmtree(temp_directory)
 
@@ -240,17 +199,7 @@ def run(output_path, lvgl_config_path, output_to_stdout, target_header, filter_p
             with open(output_path, 'w') as f:
                 f.write(json.dumps(ast.to_dict(), indent=4))
 
-            # stdout.reset()
-
-        if not output_to_stdout:
-            event.set()  # NOQA
-            t.join()  # NOQA
     except Exception as err:
-        if not output_to_stdout:
-            event.set()  # NOQA
-            t.join()  # NOQA
-
-        print()
         try:
             print(cpp_cmd)  # NOQA
             print()
@@ -370,9 +319,15 @@ if __name__ == '__main__':
         help='Internal Use',
         action='store_true',
     )
+    parser.add_argument(
+        '--no-docstrings',
+        dest='no_docstrings',
+        help='Internal Use',
+        action='store_true',
+    )
 
     args, extra_args = parser.parse_known_args()
 
     DEVELOP = args.develop
 
-    run(args.output_path, args.lv_conf, args.output_path is None, args.target_header, args.filter_private, *extra_args)
+    run(args.output_path, args.lv_conf, args.output_path is None, args.target_header, args.filter_private, args.no_docstrings, *extra_args)
