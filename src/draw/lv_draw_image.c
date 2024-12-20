@@ -141,7 +141,10 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
             }
             else {
                 layer->_clip_area = draw_area;
-                decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, new_image_dsc, NULL);
+                lv_area_t clip_area = draw_area;
+                if(lv_area_intersect(&clip_area, &clip_area, &coords_area)) {
+                    decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, new_image_dsc, &clip_area);
+                }
             }
 
         }

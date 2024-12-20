@@ -334,10 +334,10 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
     }
 #else
     lv_matrix_translate(&matrix, coords->x1, coords->y1);
-#endif
     if(clip_area) {
         ctx->current_dsc.scissor_area = *clip_area;
     }
+#endif
     if(image_dsc) {
         lv_matrix_translate(&matrix, image_dsc->pivot.x, image_dsc->pivot.y);
         lv_matrix_rotate(&matrix, image_dsc->rotation / 10.0f);
