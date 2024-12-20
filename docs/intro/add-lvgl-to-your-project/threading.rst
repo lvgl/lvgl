@@ -175,7 +175,7 @@ MUTEX to protect LVGL data structures.
 
 Method 2:  Use a MUTEX
 ----------------------
-A MUTEX stands for "MUTually EXclusive" and is a synchronization primative that
+A MUTEX stands for "MUTually EXclusive" and is a synchronization primitive that
 protects the state of a system resource from being modified or accessed by multiple
 threads of execution at once.  In other words, it makes data so protected "appear"
 atomic (all threads using this data "see" it in a consistent state).  Most OSes
@@ -198,7 +198,7 @@ To be clear:  this must be done *both* by threads that READ from that resource, 
 threads that MODIFY that resource.
 
 If a MUTEX is used to protect LVGL data structures, that means *every* LVGL function
-call (or group of function calls) must be preceeded by #1, and followed by #2,
+call (or group of function calls) must be preceded by #1, and followed by #2,
 including calls to :cpp:func:`lv_timer_handler`.
 
 .. note::
