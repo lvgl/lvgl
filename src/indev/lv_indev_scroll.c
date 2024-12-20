@@ -346,11 +346,6 @@ lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev)
         if((scroll_dir & LV_DIR_TOP) == 0) up_en = false;
         if((scroll_dir & LV_DIR_BOTTOM) == 0) down_en = false;
 
-        /*The object is scrollable to a direction if its content overflow in that direction.
-         *If there are at least 2 snapable children always assume scrolling to
-         *allow scrolling to the other child even if the children are inside the parent*/
-        uint32_t snap_cnt = 0;
-
         /*Horizontal scroll*/
         int32_t sl = 0;
         int32_t sr = 0;
@@ -371,7 +366,6 @@ lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev)
         }
 
         /*Vertical scroll*/
-        snap_cnt = 0;
         int32_t st = 0;
         int32_t sb = 0;
         lv_scroll_snap_t snap_y = lv_obj_get_scroll_snap_y(obj_act);
@@ -389,7 +383,6 @@ lv_obj_t * lv_indev_find_scroll_obj(lv_indev_t * indev)
             st = has_start_snap ? 1 : -1;
             sb = has_end_snap ? 1 : -1;
         }
-
 
         /*If this object is scrollable into the current scroll direction then save it as a candidate.
          *It's important only to be scrollable on the current axis (hor/ver) because if the scroll
