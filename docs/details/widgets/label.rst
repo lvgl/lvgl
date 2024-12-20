@@ -125,9 +125,9 @@ Text recolor
 In the text, you can use commands to recolor parts of the text. 
 For example: ``Write a #ff0000 red# word``. This feature can be enabled 
 individually for each label by :cpp:expr:`lv_label_set_recolor(label, en)`
-function, recoloring is only supported when the text wrapped with 
-``##ff0000 ... #`` sintax is in one line, it is not supported in wrapped text, 
-see example ``Line wrap, recoloring and scrolling``.
+function. Recoloring is only supported when the text is wrapped with 
+``#ff0000 ... #`` syntax is in one line. It is not supported in wrapped text. 
+See example ``Line wrap, recoloring and scrolling``.
 
 .. _lv_label_text_selection:
 
