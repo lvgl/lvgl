@@ -306,7 +306,7 @@ void lv_obj_scroll_by_bounded(lv_obj_t * obj, int32_t dx, int32_t dy, lv_anim_en
 void lv_obj_scroll_by(lv_obj_t * obj, int32_t dx, int32_t dy, lv_anim_enable_t anim_en)
 {
     if(dx == 0 && dy == 0) return;
-    if(anim_en == LV_ANIM_ON) {
+    if(anim_en) {
         lv_display_t * d = lv_obj_get_display(obj);
         lv_anim_t a;
         lv_anim_init(&a);
@@ -801,7 +801,7 @@ static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_p
     if((scroll_dir & LV_DIR_TOP) == 0 && y_scroll < 0) y_scroll = 0;
     if((scroll_dir & LV_DIR_BOTTOM) == 0 && y_scroll > 0) y_scroll = 0;
 
-    scroll_value->x += anim_en == LV_ANIM_OFF ? 0 : x_scroll;
-    scroll_value->y += anim_en == LV_ANIM_OFF ? 0 : y_scroll;
+    scroll_value->x += anim_en ? x_scroll : 0;
+    scroll_value->y += anim_en ? y_scroll : 0;
     lv_obj_scroll_by(parent, x_scroll, y_scroll, anim_en);
 }
