@@ -80,10 +80,9 @@ LV_EXPORT_CONST_INT(LV_ANIM_PLAYTIME_INFINITE);
  **********************/
 
 /** Can be used to indicate if animations are enabled or disabled in a case*/
-typedef enum {
-    LV_ANIM_OFF,
-    LV_ANIM_ON,
-} lv_anim_enable_t;
+#define LV_ANIM_OFF false
+#define LV_ANIM_ON true
+typedef bool lv_anim_enable_t;
 
 /** Get the current value during an animation*/
 typedef int32_t (*lv_anim_path_cb_t)(const lv_anim_t *);
