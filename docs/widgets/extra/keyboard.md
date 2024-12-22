@@ -67,7 +67,7 @@ The keyboard has a **default event handler** callback called `lv_keyboard_def_ev
 Learn more about [Events](/overview/event).
 
 ## Keys
-- `LV_KEY_RIGHT/UP/LEFT/RIGHT` To navigate among the buttons and select one.
+- `LV_KEY_DOWN/UP/LEFT/RIGHT` To navigate among the buttons and select one.
 - `LV_KEY_ENTER` To press/release the selected button.
 
 Learn more about [Keys](/overview/indev).
