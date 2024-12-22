@@ -58,7 +58,7 @@ void test_array_resize(void)
     TEST_ASSERT_EQUAL_UINT32(LV_ARRAY_DEFAULT_CAPACITY, lv_array_size(&array));
     TEST_ASSERT_EQUAL_UINT32(12, lv_array_capacity(&array));
     lv_array_resize(&array, 6);
-    TEST_ASSERT_EQUAL_UINT32(4, lv_array_size(&array));
+    TEST_ASSERT_EQUAL_UINT32(LV_ARRAY_DEFAULT_CAPACITY, lv_array_size(&array));
     TEST_ASSERT_EQUAL_UINT32(6, lv_array_capacity(&array));
 }
 
