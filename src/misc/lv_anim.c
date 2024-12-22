@@ -361,11 +361,6 @@ void lv_anim_set_duration(lv_anim_t * a, uint32_t duration)
     a->duration = duration;
 }
 
-void lv_anim_set_time(lv_anim_t * a, uint32_t duration)
-{
-    lv_anim_set_duration(a, duration);
-}
-
 void lv_anim_set_delay(lv_anim_t * a, uint32_t delay)
 {
     a->act_time = -(int32_t)(delay);
