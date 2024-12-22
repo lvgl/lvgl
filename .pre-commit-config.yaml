@@ -26,6 +26,7 @@ repos:
           )
         exclude: |
           (?x)^(
+              demos/high_res/fonts/ |
               src/libs/ |
               src/lv_conf_internal.h |
               tests/test_images

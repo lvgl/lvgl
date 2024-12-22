@@ -149,13 +149,13 @@ bool lv_obj_is_layout_positioned(const lv_obj_t * obj);
 
 /**
  * Mark the object for layout update.
- * @param obj      pointer to an object whose children needs to be updated
+ * @param obj      pointer to an object whose children need to be updated
  */
 void lv_obj_mark_layout_as_dirty(lv_obj_t * obj);
 
 /**
  * Update the layout of an object.
- * @param obj      pointer to an object whose children needs to be updated
+ * @param obj      pointer to an object whose position and size needs to be updated
  */
 void lv_obj_update_layout(const lv_obj_t * obj);
 
