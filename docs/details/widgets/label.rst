@@ -117,6 +117,18 @@ this implementation detail is unnoticed. This is not the case with
 :cpp:func:`lv_label_set_text_static` must be writable if you plan to use
 :cpp:enumerator:`LV_LABEL_LONG_DOT`.
 
+.. _lv_label_text_recolor:
+
+Text recolor
+------------
+
+In the text, you can use commands to recolor parts of the text. 
+For example: ``Write a #ff0000 red# word``. This feature can be enabled 
+individually for each label by :cpp:expr:`lv_label_set_recolor(label, en)`
+function. In the context of word-wrapped text, any Recoloring started on a
+line will be terminated at the end of the line where the line is wrapped if it
+was not already terminated by an ending ``#`` in the text.
+
 .. _lv_label_text_selection:
 
 Text selection
