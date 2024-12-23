@@ -81,6 +81,15 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
 void lv_roller_set_selected(lv_obj_t * obj, uint32_t sel_opt, lv_anim_enable_t anim);
 
 /**
+ * Sets the given string as the selection on the roller. Does not alter the current selection on failure.
+ * @param obj               pointer to roller object
+ * @param sel_opt   pointer to the string you want to set as an option
+ * @param anim          LV_ANIM_ON: set with animation; LV_ANOM_OFF set immediately
+ * @return                  `true` if set successfully and `false` if the given string does not exist as an option in the roller
+ */
+bool lv_roller_set_selected_str(lv_obj_t * obj, const char * sel_opt, lv_anim_enable_t anim);
+
+/**
  * Set the height to show the given number of rows (options)
  * @param obj       pointer to a roller object
  * @param row_cnt   number of desired visible rows
@@ -105,16 +114,6 @@ uint32_t lv_roller_get_selected(const lv_obj_t * obj);
  * @param buf_size  size of `buf` in bytes. 0: to ignore it.
  */
 void lv_roller_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_size);
-
-
-/**
- * Sets the given string as the selection on the roller. Does not alter the current selection on failure.
- * @param obj               pointer to roller object
- * @param sel_opt   pointer to the string you want to set as an option
- * @param anim          LV_ANIM_ON: set with animation; LV_ANOM_OFF set immediately
- * @return                  `true` if set successfully and `false` if the given string does not exist as an option in the roller
- */
-bool lv_roller_set_selected_str(lv_obj_t * obj, const char * sel_opt, lv_anim_enable_t anim);
 
 /**
  * Get the options of a roller
