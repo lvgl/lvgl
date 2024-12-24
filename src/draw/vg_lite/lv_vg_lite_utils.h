@@ -33,8 +33,6 @@ extern "C" {
 
 #define LV_VG_LITE_IS_ERROR(err) (err > 0)
 
-#define VLC_GET_OP_CODE(ptr) (*((uint8_t*)ptr))
-
 #if LV_VG_LITE_USE_ASSERT
 #define LV_VG_LITE_ASSERT(expr) LV_ASSERT(expr)
 #else
