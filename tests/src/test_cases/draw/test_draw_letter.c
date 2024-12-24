@@ -1,7 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
 #include "../../lvgl_private.h"
-#include "math.h"
 
 #include "unity/unity.h"
 
@@ -52,24 +51,49 @@ void test_draw_sin_wave(void)
     letter_dsc.color = lv_color_hex(0xff0000);
     letter_dsc.font = &test_font_montserrat_ascii_4bpp;
 
-    for(int16_t i = 0; i < 30; i++) {
-        const int32_t x = i * 10 + 20;
-        const int32_t y = (int32_t)(sin(i * M_PI / 10) * 40 + 80);
-        letter_dsc.unicode = (uint32_t)string[i % string_len];
-        lv_draw_letter(&layer, &letter_dsc, &(lv_point_t) {
-            .x = x, .y = y
-        });
+    {
+#define CURVE1_X(t) (t * 2 + 20)
+#define CURVE1_Y(t) (lv_trigo_sin(t) * 40 / 32767 + 80)
+        int32_t pre_x = CURVE1_X(-1);
+        int32_t pre_y = CURVE1_Y(-1);
+
+        for(int16_t i = 0; i < 30; i++) {
+            const int32_t angle = i * 10;
+            const int32_t x = CURVE1_X(angle);
+            const int32_t y = CURVE1_Y(angle);
+            letter_dsc.unicode = (uint32_t)string[i % string_len];
+            letter_dsc.rotation = lv_atan2(y - pre_y, x - pre_x);
+            letter_dsc.rotation = (letter_dsc.rotation > 180 ? letter_dsc.rotation - 360 : letter_dsc.rotation) * 5;
+            lv_draw_letter(&layer, &letter_dsc, &(lv_point_t) {
+                .x = x, .y = y
+            });
+            LV_LOG_USER("%d", letter_dsc.rotation);
+            pre_x = x;
+            pre_y = y;
+        }
     }
 
-    for(int16_t i = 0; i < 30; i++) {
-        const int32_t x = i * 15 + 20;
-        const int32_t y = (int32_t)(sin(i * M_PI / 10) * 40 + 230);
-        letter_dsc.unicode = (uint32_t)string[i % string_len];
-        letter_dsc.rotation = (int32_t)(atan(cos(M_PI / 10 * i)) * 180 / M_PI) * 10;
-        letter_dsc.color = lv_color_hsv_to_rgb(i * 10, 100, 100);
-        lv_draw_letter(&layer, &letter_dsc, &(lv_point_t) {
-            .x = x, .y = y
-        });
+    {
+#define CURVE2_X(t) (t * 3 + 20)
+#define CURVE2_Y(t) (lv_trigo_sin((t) * 4) * 40 / 32767 + 230)
+
+        int32_t pre_x = CURVE2_X(-1);
+        int32_t pre_y = CURVE2_Y(-1);
+        for(int16_t i = 0; i < 30; i++) {
+            const int32_t angle = i * 5;
+            const int32_t x = CURVE2_X(angle);
+            const int32_t y = CURVE2_Y(angle);
+
+            letter_dsc.unicode = (uint32_t)string[i % string_len];
+            letter_dsc.rotation = lv_atan2(y - pre_y, x - pre_x) * 10;
+            letter_dsc.color = lv_color_hsv_to_rgb(i * 10, 100, 100);
+            lv_draw_letter(&layer, &letter_dsc, &(lv_point_t) {
+                .x = x, .y = y
+            });
+
+            pre_x = x;
+            pre_y = y;
+        }
     }
 
     lv_canvas_finish_layer(canvas, &layer);
