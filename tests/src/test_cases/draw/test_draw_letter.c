@@ -98,7 +98,9 @@ void test_draw_sin_wave(void)
 
     lv_canvas_finish_layer(canvas, &layer);
 
+#ifndef NON_AMD64_BUILD
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/letter_0.png");
+#endif
 
     canvas_destroy(canvas);
 }
