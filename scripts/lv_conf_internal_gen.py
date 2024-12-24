@@ -41,6 +41,9 @@ fout.write(
 #define LV_OS_SDL2          7
 #define LV_OS_CUSTOM        255
 
+#define LV_DRAW_BLEND_CUSTOM_NONE 0
+#define LV_DRAW_BLEND_CUSTOM_NEMA_GFX 1
+
 #define LV_STDLIB_BUILTIN           0
 #define LV_STDLIB_CLIB              1
 #define LV_STDLIB_MICROPYTHON       2

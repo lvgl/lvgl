@@ -148,9 +148,11 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
     int32_t src_stride = (src_cf >= LV_COLOR_FORMAT_NEMA_TSC_START && src_cf <= LV_COLOR_FORMAT_NEMA_TSC_END)
                          || img_dsc->header.stride == 0 ? -1 : (int32_t)img_dsc->header.stride;
 
+    int32_t stride = (dst_cf >= LV_COLOR_FORMAT_NEMA_TSC_START && dst_cf <= LV_COLOR_FORMAT_NEMA_TSC_END) ?
+                     -1 : lv_area_get_width(&(layer->buf_area)) * lv_color_format_get_size(dst_cf);
+
     nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(layer->draw_buf->data), lv_area_get_width(&(layer->buf_area)),
-                      lv_area_get_height(&(layer->buf_area)), dst_nema_cf,
-                      lv_area_get_width(&(layer->buf_area))*lv_color_format_get_size(dst_cf));
+                      lv_area_get_height(&(layer->buf_area)), dst_nema_cf, stride);
 
     nema_bind_src_tex((uintptr_t)(src_buf), tex_w, tex_h, src_nema_cf, src_stride,
                       dsc->antialias ? NEMA_FILTER_BL : NEMA_FILTER_PS);

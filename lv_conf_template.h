@@ -137,6 +137,12 @@
  * - Rendering engine needs to support 3x3 matrix transformations. */
 #define LV_DRAW_TRANSFORM_USE_MATRIX            0
 
+/** Selectively disable lv_draw_sw_blend function and use a custom one. Possible options:
+ * - LV_DRAW_BLEND_CUSTOM_NONE
+ * - LV_DRAW_BLEND_CUSTOM_NEMA_GFX */
+
+#define LV_DRAW_BLEND_CUSTOM LV_DRAW_BLEND_CUSTOM_NONE
+
 /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
  * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
  * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
@@ -232,6 +238,10 @@
         #define LV_NEMA_GFX_MAX_RESX 800
         #define LV_NEMA_GFX_MAX_RESY 600
     #endif
+
+    /* Selectively disable lv_draw_sw_blend function and use a custom one.
+     * Necessary if you use TSC formatted frame buffer. Possible options:
+     * - LV_DRAW_BLEND_CUSTOM LV_DRAW_NEMA_GFX_BLEND */
 #endif
 
 /** Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
