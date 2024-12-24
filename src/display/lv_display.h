@@ -583,7 +583,7 @@ uint32_t lv_display_get_draw_buf_size(lv_display_t * disp);
  * @param width     the width of the invalidated area
  * @param height    the height of the invalidated area
  * @return          the size of the invalidated draw buffer in bytes, not accounting for
- *                  any preceeding palette information for a valid display, 0 otherwise
+ *                  any preceding palette information for a valid display, 0 otherwise
  */
 uint32_t lv_display_get_invalidated_draw_buf_size(lv_display_t * disp, uint32_t width, uint32_t height);
 
