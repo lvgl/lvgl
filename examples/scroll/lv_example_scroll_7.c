@@ -5,6 +5,7 @@ static lv_obj_t * high_label;
 static lv_obj_t * low_label;
 static int32_t top_num;
 static int32_t bottom_num;
+static bool update_scroll_running = false;
 
 static lv_obj_t * load_item(lv_obj_t * parent, int32_t num)
 {
@@ -17,6 +18,12 @@ static lv_obj_t * load_item(lv_obj_t * parent, int32_t num)
 
 static void update_scroll(lv_obj_t * obj)
 {
+    /* do not re-enter this function when `lv_obj_scroll_by`
+     * triggers this callback again.
+     */
+    if(update_scroll_running) return;
+    update_scroll_running = true;
+
     int32_t top_num_original = top_num;
     int32_t bottom_num_original = bottom_num;
 
@@ -63,6 +70,8 @@ static void update_scroll(lv_obj_t * obj)
     if(bottom_num != bottom_num_original) {
         lv_label_set_text_fmt(low_label, "current smallest\nloaded value:\n%"PRId32, bottom_num);
     }
+
+    update_scroll_running = false;
 }
 
 static void scroll_cb(lv_event_t * e)
@@ -104,16 +113,10 @@ void lv_example_scroll_7(void)
     lv_label_set_text_static(low_label, "current smallest\nloaded value:");
     lv_obj_align(low_label, LV_ALIGN_BOTTOM_LEFT, 10, -10);
 
-    /* These counters hold the the highest/lowest number currently shown.
-     * Since no numbers are show yet, set them such that they will be
-     * correct after the first value is added.
-     * I.e., if a value is added at the top, `top_num` will be incremented
-     * and its new value (4) will be added to the top (`top_num`=4, `bottom_num`=4).
-     * If a value is added to the bottom, `bottom_num` will be decremented
-     * and its new value (3) will be added to the bottom (`top_num`=3, `bottom_num`=3).
-     */
+    load_item(obj, 3);
+    /* These counters hold the the highest/lowest number currently loaded. */
     top_num = 3;
-    bottom_num = 4;
+    bottom_num = 3;
 
     lv_obj_update_layout(obj);
     update_scroll(obj);

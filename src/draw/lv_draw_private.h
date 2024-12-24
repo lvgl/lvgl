@@ -178,7 +178,7 @@ struct _lv_draw_unit_t {
 typedef struct {
     lv_draw_unit_t * unit_head;
     uint32_t unit_cnt;
-    uint32_t used_memory_for_layers_kb;
+    uint32_t used_memory_for_layers; /* measured as bytes */
 #if LV_USE_OS
     lv_thread_sync_t sync;
 #else

@@ -255,12 +255,12 @@ void lv_vg_lite_path_set_quality(lv_vg_lite_path_t * path, vg_lite_quality_t qua
     path->base.quality = quality;
 }
 
-static void lv_vg_lite_path_append_data(lv_vg_lite_path_t * path, const void * data, size_t len)
+void lv_vg_lite_path_reserve_space(lv_vg_lite_path_t * path, size_t len)
 {
-    LV_ASSERT_NULL(path);
-    LV_ASSERT_NULL(data);
+    bool need_reallocated = false;
 
-    if(path->base.path_length + len > path->mem_size) {
+    /*Calculate new mem size until match the contidion*/
+    while(path->base.path_length + len > path->mem_size) {
         if(path->mem_size == 0) {
             path->mem_size = LV_MAX(len, PATH_MEM_SIZE_MIN);
         }
@@ -268,10 +268,22 @@ static void lv_vg_lite_path_append_data(lv_vg_lite_path_t * path, const void * d
             /* Increase memory size by 1.5 times */
             path->mem_size = path->mem_size * 3 / 2;
         }
-        path->base.path = lv_realloc(path->base.path, path->mem_size);
-        LV_ASSERT_MALLOC(path->base.path);
+        need_reallocated = true;
     }
 
+    if(!need_reallocated) {
+        return;
+    }
+
+    path->base.path = lv_realloc(path->base.path, path->mem_size);
+    LV_ASSERT_MALLOC(path->base.path);
+}
+
+void lv_vg_lite_path_append_data(lv_vg_lite_path_t * path, const void * data, size_t len)
+{
+    LV_ASSERT_NULL(path);
+    LV_ASSERT_NULL(data);
+    lv_vg_lite_path_reserve_space(path, len);
     lv_memcpy((uint8_t *)path->base.path + path->base.path_length, data, len);
     path->base.path_length += len;
 }

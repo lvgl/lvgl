@@ -32,7 +32,7 @@ extern "C" {
 /**
  * Run all benchmark scenes.
  *
- * On the summary end screen the values shall be interpreted according to the followings:
+ * On the summary end screen the values shall be interpreted according to the following:
  * - CPU usage:
  *    - If `LV_SYSMON_GET_IDLE` is not modified it's measured based on the time spent in
  *      `lv_timer_handler`.

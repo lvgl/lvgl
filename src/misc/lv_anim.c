@@ -137,7 +137,7 @@ uint32_t lv_anim_get_playtime(const lv_anim_t * a)
     uint32_t repeat_cnt = a->repeat_cnt;
     if(repeat_cnt < 1) repeat_cnt = 1;
 
-    uint32_t playtime = a->repeat_delay + a->duration + a->playback_delay + a->playback_duration;
+    uint32_t playtime = a->repeat_delay + a->duration + a->reverse_delay + a->reverse_duration;
     playtime = playtime * repeat_cnt;
     return playtime;
 }
@@ -408,19 +408,19 @@ void lv_anim_set_deleted_cb(lv_anim_t * a, lv_anim_deleted_cb_t deleted_cb)
     a->deleted_cb = deleted_cb;
 }
 
-void lv_anim_set_playback_duration(lv_anim_t * a, uint32_t duration)
+void lv_anim_set_reverse_duration(lv_anim_t * a, uint32_t duration)
 {
-    a->playback_duration = duration;
+    a->reverse_duration = duration;
 }
 
-void lv_anim_set_playback_time(lv_anim_t * a, uint32_t duration)
+void lv_anim_set_reverse_time(lv_anim_t * a, uint32_t duration)
 {
-    lv_anim_set_playback_duration(a, duration);
+    lv_anim_set_reverse_duration(a, duration);
 }
 
-void lv_anim_set_playback_delay(lv_anim_t * a, uint32_t delay)
+void lv_anim_set_reverse_delay(lv_anim_t * a, uint32_t delay)
 {
-    a->playback_delay = delay;
+    a->reverse_delay = delay;
 }
 
 void lv_anim_set_repeat_count(lv_anim_t * a, uint32_t cnt)
@@ -572,20 +572,20 @@ static void anim_timer(lv_timer_t * param)
 
 /**
  * Called when an animation is completed to do the necessary things
- * e.g. repeat, play back, delete etc.
+ * e.g. repeat, play in reverse, delete etc.
  * @param a pointer to an animation descriptor
  */
 static void anim_completed_handler(lv_anim_t * a)
 {
     /*In the end of a forward anim decrement repeat cnt.*/
-    if(a->playback_now == 0 && a->repeat_cnt > 0 && a->repeat_cnt != LV_ANIM_REPEAT_INFINITE) {
+    if(a->reverse_play_in_progress == 0 && a->repeat_cnt > 0 && a->repeat_cnt != LV_ANIM_REPEAT_INFINITE) {
         a->repeat_cnt--;
     }
 
-    /*Delete the animation if
-     * - no repeat left and no play back (simple one shot animation)
-     * - no repeat, play back is enabled and play back is ready*/
-    if(a->repeat_cnt == 0 && (a->playback_duration == 0 || a->playback_now == 1)) {
+    /*Delete animation if
+     * - no repeat left and no reverse play scheduled (simple one shot animation); or
+     * - no repeat, reverse play enabled (reverse_duration != 0) and reverse play is completed. */
+    if(a->repeat_cnt == 0 && (a->reverse_duration == 0 || a->reverse_play_in_progress == 1)) {
 
         /*Delete the animation from the list.
          * This way the `completed_cb` will see the animations like it's animation is already deleted*/
@@ -604,21 +604,21 @@ static void anim_completed_handler(lv_anim_t * a)
         int32_t over_time = 0;
         if(a->act_time > a->duration) over_time = a->act_time - a->duration;
         a->act_time = over_time - (int32_t)(a->repeat_delay);
-        /*Swap the start and end values in play back mode*/
-        if(a->playback_duration != 0) {
-            /*If now turning back use the 'playback_pause*/
-            if(a->playback_now == 0) a->act_time = -(int32_t)(a->playback_delay);
+        /*Swap start and end values in reverse-play mode*/
+        if(a->reverse_duration != 0) {
+            /*If now now playing in reverse, use the 'reverse_delay'.*/
+            if(a->reverse_play_in_progress == 0) a->act_time = -(int32_t)(a->reverse_delay);
 
-            /*Toggle the play back state*/
-            a->playback_now = a->playback_now == 0 ? 1 : 0;
+            /*Toggle reverse-play state*/
+            a->reverse_play_in_progress = a->reverse_play_in_progress == 0 ? 1 : 0;
             /*Swap the start and end values*/
             int32_t tmp    = a->start_value;
             a->start_value = a->end_value;
             a->end_value   = tmp;
-            /*Swap the time and playback_duration*/
+            /*Swap the time and reverse_duration*/
             tmp = a->duration;
-            a->duration = a->playback_duration;
-            a->playback_duration = tmp;
+            a->duration = a->reverse_duration;
+            a->reverse_duration = tmp;
         }
     }
 }
@@ -663,8 +663,8 @@ static uint32_t convert_speed_to_time(uint32_t speed_or_time, int32_t start, int
 static void resolve_time(lv_anim_t * a)
 {
     a->duration = convert_speed_to_time(a->duration, a->start_value, a->end_value);
-    a->playback_duration = convert_speed_to_time(a->playback_duration, a->start_value, a->end_value);
-    a->playback_delay = convert_speed_to_time(a->playback_delay, a->start_value, a->end_value);
+    a->reverse_duration = convert_speed_to_time(a->reverse_duration, a->start_value, a->end_value);
+    a->reverse_delay = convert_speed_to_time(a->reverse_delay, a->start_value, a->end_value);
     a->repeat_delay = convert_speed_to_time(a->repeat_delay, a->start_value, a->end_value);
 }
 

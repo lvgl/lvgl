@@ -309,8 +309,8 @@ void test_table_cell_select_should_not_allow_set_on_table_with_no_rows(void)
 
     lv_table_get_selected_cell(table, &selected_row, &selected_column);
 
-    TEST_ASSERT_EQUAL_UINT32(0, selected_row);
-    TEST_ASSERT_EQUAL_UINT32(0, selected_column);
+    TEST_ASSERT_EQUAL_UINT32(LV_TABLE_CELL_NONE, selected_row);
+    TEST_ASSERT_EQUAL_UINT32(LV_TABLE_CELL_NONE, selected_column);
 }
 
 #endif

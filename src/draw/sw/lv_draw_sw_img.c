@@ -388,6 +388,9 @@ static void recolor_only(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
     uint8_t * tmp_buf;
     int32_t buf_h;
     uint32_t buf_stride = blend_w * px_size;
+    if(buf_stride == 0) {
+        buf_stride = 1;
+    }
     buf_h = MAX_BUF_SIZE / buf_stride;
     if(buf_h > blend_h) buf_h = blend_h;
     tmp_buf = lv_malloc(buf_stride * buf_h);

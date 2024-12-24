@@ -39,12 +39,12 @@ void lv_example_flex_5(void)
 
     lv_anim_set_exec_cb(&a, row_gap_anim);
     lv_anim_set_duration(&a, 500);
-    lv_anim_set_playback_duration(&a, 500);
+    lv_anim_set_reverse_duration(&a, 500);
     lv_anim_start(&a);
 
     lv_anim_set_exec_cb(&a, column_gap_anim);
     lv_anim_set_duration(&a, 3000);
-    lv_anim_set_playback_duration(&a, 3000);
+    lv_anim_set_reverse_duration(&a, 3000);
     lv_anim_start(&a);
 }
 

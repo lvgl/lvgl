@@ -58,7 +58,7 @@ void view_create(lv_obj_t * par, view_t * ui)
     ui->root = obj_child_node_create(par, ui);
     lv_obj_set_size(ui->root, lv_pct(50), lv_pct(80));
 
-    /* mian ctrl_pad */
+    /* main ctrl_pad */
     lv_obj_t * obj = lv_obj_create(par);
     lv_obj_set_size(obj, lv_pct(40), lv_pct(80));
     lv_obj_set_style_pad_all(obj, 0, 0);

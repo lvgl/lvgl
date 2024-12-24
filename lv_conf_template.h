@@ -105,6 +105,7 @@
  * - LV_OS_RTTHREAD
  * - LV_OS_WINDOWS
  * - LV_OS_MQX
+ * - LV_OS_SDL2
  * - LV_OS_CUSTOM */
 #define LV_USE_OS   LV_OS_NONE
 
@@ -143,6 +144,12 @@
 
 /** The target buffer size for simple layer chunks. */
 #define LV_DRAW_LAYER_SIMPLE_BUF_SIZE    (24 * 1024)    /**< [bytes]*/
+
+/* Limit the max allocated memory for simple and transformed layers.
+ * It should be at least `LV_DRAW_LAYER_SIMPLE_BUF_SIZE` sized but if transformed layers are also used
+ * it should be enough to store the largest widget too (width x height x 4 area).
+ * Set it to 0 to have no limit. */
+#define LV_DRAW_LAYER_MAX_MEMORY 0  /**< No limit by default [bytes]*/
 
 /** Stack size of drawing thread.
  * NOTE: If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
@@ -1271,6 +1278,9 @@
 #if LV_USE_DEMO_EBIKE
 	#define LV_DEMO_EBIKE_PORTRAIT  0    /*0: for 480x270..480x320, 1: for 480x800..720x1280*/
 #endif
+
+/** High-resolution demo */
+#define LV_USE_DEMO_HIGH_RES        0
 
 /*--END OF LV_CONF_H--*/
 

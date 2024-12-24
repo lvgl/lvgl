@@ -47,7 +47,7 @@ Once a Slider is created, it has:
 - default range of [0..100],
 - horizontal orientation, with
 - default width of approximately 2 inches (according to configured value of :c:macro:`LV_DPI_DEF`),
-- default hight of approximately 1/10 inch (according to configured value of :c:macro:`LV_DPI_DEF`).
+- default height of approximately 1/10 inch (according to configured value of :c:macro:`LV_DPI_DEF`).
 
 To set different values use:
 
