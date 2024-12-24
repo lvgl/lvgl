@@ -346,8 +346,6 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
         if((point)->y > max_y) max_y = (point)->y;  \
     } while(0)
 
-#define VLC_SET_OP_CODE(ptr, op) (*((uint32_t*)ptr) = (op))
-
 #define COPY_POINT_NEXT()        \
     do {                         \
         CMP_BOUNDS(point);       \
@@ -371,30 +369,30 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
     for(uint32_t i = 0; i < op_size; i++) {
         switch(ops[i]) {
             case LV_VECTOR_PATH_OP_MOVE_TO: {
-                    VLC_SET_OP_CODE(path_data++, VLC_OP_MOVE);
+                    LV_VG_LITE_PATH_SET_OP_CODE(path_data++, uint32_t, VLC_OP_MOVE);
                     COPY_POINT_NEXT();
                 }
                 break;
             case LV_VECTOR_PATH_OP_LINE_TO: {
-                    VLC_SET_OP_CODE(path_data++, VLC_OP_LINE);
+                    LV_VG_LITE_PATH_SET_OP_CODE(path_data++, uint32_t, VLC_OP_LINE);
                     COPY_POINT_NEXT();
                 }
                 break;
             case LV_VECTOR_PATH_OP_QUAD_TO: {
-                    VLC_SET_OP_CODE(path_data++, VLC_OP_QUAD);
+                    LV_VG_LITE_PATH_SET_OP_CODE(path_data++, uint32_t, VLC_OP_QUAD);
                     COPY_POINT_NEXT();
                     COPY_POINT_NEXT();
                 }
                 break;
             case LV_VECTOR_PATH_OP_CUBIC_TO: {
-                    VLC_SET_OP_CODE(path_data++, VLC_OP_CUBIC);
+                    LV_VG_LITE_PATH_SET_OP_CODE(path_data++, uint32_t, VLC_OP_CUBIC);
                     COPY_POINT_NEXT();
                     COPY_POINT_NEXT();
                     COPY_POINT_NEXT();
                 }
                 break;
             case LV_VECTOR_PATH_OP_CLOSE: {
-                    VLC_SET_OP_CODE(path_data++, VLC_OP_CLOSE);
+                    LV_VG_LITE_PATH_SET_OP_CODE(path_data++, uint32_t, VLC_OP_CLOSE);
                 }
                 break;
             default:

@@ -1052,7 +1052,7 @@ bool lv_vg_lite_path_check(const vg_lite_path_t * path)
 
     while(cur < end) {
         /* get op code */
-        uint8_t op_code = VLC_GET_OP_CODE(cur);
+        uint8_t op_code = LV_VG_LITE_PATH_GET_OP_CODE(cur);
 
         /* get arguments length */
         uint8_t arg_len = lv_vg_lite_vlc_op_arg_len(op_code);
@@ -1076,7 +1076,7 @@ bool lv_vg_lite_path_check(const vg_lite_path_t * path)
         case VG_LITE_DRAW_FILL_PATH:
         case VG_LITE_DRAW_FILL_STROKE_PATH: {
                 /* Check end op code */
-                uint8_t end_op_code = VLC_GET_OP_CODE(end - fmt_len);
+                uint8_t end_op_code = LV_VG_LITE_PATH_GET_OP_CODE(end - fmt_len);
                 if(end_op_code != VLC_OP_END) {
                     LV_LOG_ERROR("%d (%s) -> is NOT VLC_OP_END", end_op_code, lv_vg_lite_vlc_op_string(end_op_code));
                     return false;
