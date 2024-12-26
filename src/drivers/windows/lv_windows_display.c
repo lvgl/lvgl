@@ -47,9 +47,7 @@ lv_display_t * lv_windows_create_display(
     int32_t ver_res,
     int32_t zoom_level,
     bool allow_dpi_override,
-    bool simulator_mode,
-    bool top_level,
-    bool frameless)
+    bool simulator_mode)
 {
     lv_windows_create_display_data_t data;
 
@@ -60,8 +58,6 @@ lv_display_t * lv_windows_create_display(
     data.zoom_level = zoom_level;
     data.allow_dpi_override = allow_dpi_override;
     data.simulator_mode = simulator_mode;
-    data.top_level = top_level;
-    data.frameless = frameless;
     data.mutex = CreateEventExW(NULL, NULL, 0, EVENT_ALL_ACCESS);
     data.display = NULL;
     if(!data.mutex) {
@@ -115,6 +111,42 @@ int32_t lv_windows_dpi_to_physical(int32_t logical, int32_t dpi)
     return MulDiv(logical, dpi, USER_DEFAULT_SCREEN_DPI);
 }
 
+void lv_windows_set_top_level(lv_display_t * display, bool top_level)
+{
+    HWND window_handle = lv_windows_get_display_window_handle(display);
+
+    LONG_PTR ex_style = GetWindowLongPtr(window_handle, GWL_EXSTYLE);
+    if(top_level) {
+        ex_style |= WS_EX_TOPMOST;
+        ex_style |= WS_EX_APPWINDOW;
+    }
+    else {
+        ex_style &= ~WS_EX_TOPMOST;
+    }
+
+    SetWindowLongPtr(window_handle, GWL_EXSTYLE, ex_style);
+    SetWindowPos(window_handle, top_level ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0,
+                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+}
+
+void lv_windows_set_frameless(lv_display_t * display, bool frameless)
+{
+    HWND window_handle = lv_windows_get_display_window_handle(display);
+
+    LONG_PTR style = GetWindowLongPtr(window_handle, GWL_STYLE);
+    if(frameless) {
+        style &= ~WS_OVERLAPPEDWINDOW;
+        style |= WS_POPUPWINDOW;
+    }
+    else {
+        style &= ~WS_POPUP;
+        style |= WS_OVERLAPPEDWINDOW;
+    }
+
+    SetWindowLongPtr(window_handle, GWL_STYLE, style);
+    SetWindowPos(window_handle, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -158,20 +190,7 @@ static unsigned int __stdcall lv_windows_display_thread_entrypoint(
         window_style &= ~(WS_SIZEBOX | WS_MAXIMIZEBOX | WS_THICKFRAME);
     }
 
-    if(data->frameless) {
-        window_style = WS_POPUPWINDOW;
-    }
-
-    // WS_EX_TOPMOST
-    // Makes the window always stay above other non-topmost windows. Even if the window loses focus, it remains on top.
-
-    // WS_EX_APPWINDOW
-    // Forces the window to appear in the taskbar. Typically used for top-level windows to ensure they are displayed in the taskbar.
-
     DWORD window_ex_style =  WS_EX_APPWINDOW;
-    if(data->top_level) {
-        window_ex_style |= WS_EX_TOPMOST;
-    }
 
     HWND window_handle = CreateWindowExW(
                              window_ex_style,
