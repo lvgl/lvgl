@@ -475,7 +475,8 @@ void test_dropdown_properties(void)
     TEST_ASSERT_EQUAL(2, lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_OPTION_COUNT).num);
 
     prop.id = LV_PROPERTY_DROPDOWN_SELECTED;
-    prop.num = 1;
+    prop.arg1.num = 1;
+    prop.arg2.enable = LV_ANIM_OFF;
     TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
     TEST_ASSERT_EQUAL_INT(1, lv_dropdown_get_selected(obj));
     TEST_ASSERT_EQUAL_INT(1, lv_obj_get_property(obj, LV_PROPERTY_DROPDOWN_SELECTED).num);
