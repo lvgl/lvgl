@@ -256,6 +256,13 @@ void lv_obj_scroll_to_view_recursive(lv_obj_t * obj, lv_anim_enable_t anim_en);
 bool lv_obj_is_scrolling(const lv_obj_t * obj);
 
 /**
+ * Stop scrolling the current object
+ *
+ * @param obj The object being scrolled
+ */
+void lv_obj_stop_scroll_anim(const lv_obj_t * obj);
+
+/**
  * Check children of `obj` and scroll `obj` to fulfill scroll_snap settings.
  * @param obj       Widget whose children need to be checked and snapped
  * @param anim_en   LV_ANIM_ON/OFF
