@@ -20,9 +20,9 @@ extern "C" {
 #include "../../misc/lv_event.h"
 #include LV_STDBOOL_INCLUDE
 
- /*********************
- *      DEFINES
- *********************/
+/*********************
+*      DEFINES
+*********************/
 
 #define LV_FREETYPE_F26DOT6_TO_INT(x)   ((x) >> 6)
 #define LV_FREETYPE_F26DOT6_TO_FLOAT(x) ((float)(x) / 64)
