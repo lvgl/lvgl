@@ -13,13 +13,14 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../lv_conf_internal.h"
+
+#if LV_USE_FREETYPE
+
 #include "../../misc/lv_types.h"
 #include "../../misc/lv_event.h"
 #include LV_STDBOOL_INCLUDE
 
-#if LV_USE_FREETYPE
-
-/*********************
+ /*********************
  *      DEFINES
  *********************/
 
