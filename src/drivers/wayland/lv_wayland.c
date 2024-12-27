@@ -245,7 +245,7 @@ struct window {
 };
 
 /*********************************
- *   STATIC VARIABLES and FUNTIONS
+ *   STATIC VARIABLES and FUNCTIONS
  *********************************/
 
 static struct application application;
@@ -2569,7 +2569,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
 
 #if LV_WAYLAND_WINDOW_DECORATIONS
 
-    /* Decorations are enabled, caculate the body size */
+    /* Decorations are enabled, calculate the body size */
     if(!application.opt_disable_decorations) {
         window_width = hor_res + (2 * BORDER_SIZE);
         window_height = ver_res + (TITLE_BAR_HEIGHT + (2 * BORDER_SIZE));
