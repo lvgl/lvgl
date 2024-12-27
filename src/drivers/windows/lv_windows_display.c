@@ -125,8 +125,14 @@ void lv_windows_set_top_level(lv_display_t * display, bool top_level)
     }
 
     SetWindowLongPtr(window_handle, GWL_EXSTYLE, ex_style);
-    SetWindowPos(window_handle, top_level ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0,
-                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+    SetWindowPos(
+        window_handle,
+        top_level ? HWND_TOPMOST : HWND_NOTOPMOST,
+        0,
+        0,
+        0,
+        0,
+        SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 }
 
 void lv_windows_set_frameless(lv_display_t * display, bool frameless)
@@ -144,35 +150,49 @@ void lv_windows_set_frameless(lv_display_t * display, bool frameless)
     }
 
     SetWindowLongPtr(window_handle, GWL_STYLE, style);
-    SetWindowPos(window_handle, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+    SetWindowPos(
+        window_handle,
+        NULL,
+        0,
+        0,
+        0,
+        0,
+        SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static int lv_windows_center_window(HWND hwnd)
+static int32_t lv_windows_center_window(HWND window_handle)
 {
     RECT rect = {0};
-    if(!GetWindowRect(hwnd, &rect)) {
+    if(!GetWindowRect(window_handle, &rect)) {
         return 0;
     }
 
-    int windowWidth = rect.right - rect.left;
-    int windowHeight = rect.bottom - rect.top;
+    int window_width = rect.right - rect.left;
+    int window_height = rect.bottom - rect.top;
 
-    RECT screenRect = {0};
-    if(!SystemParametersInfo(SPI_GETWORKAREA, 0, &screenRect, 0)) {
+    RECT screen_rect = {0};
+    if(!SystemParametersInfo(SPI_GETWORKAREA, 0, &screen_rect, 0)) {
         return 0;
     }
 
-    int screenWidth = screenRect.right - screenRect.left;
-    int screenHeight = screenRect.bottom - screenRect.top;
+    int screen_width = screen_rect.right - screen_rect.left;
+    int screen_height = screen_rect.bottom - screen_rect.top;
 
-    int x = (screenWidth - windowWidth) / 2;
-    int y = (screenHeight - windowHeight) / 2;
+    int x = (screen_width - window_width) / 2;
+    int y = (screen_height - window_height) / 2;
 
-    if(!SetWindowPos(hwnd, NULL, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE)) {
+    if(!SetWindowPos(
+           window_handle,
+           NULL,
+           x,
+           y,
+           0,
+           0,
+           SWP_NOZORDER | SWP_NOSIZE)) {
         return 0;
     }
 
@@ -190,10 +210,8 @@ static unsigned int __stdcall lv_windows_display_thread_entrypoint(
         window_style &= ~(WS_SIZEBOX | WS_MAXIMIZEBOX | WS_THICKFRAME);
     }
 
-    DWORD window_ex_style =  WS_EX_APPWINDOW;
-
     HWND window_handle = CreateWindowExW(
-                             window_ex_style,
+                             WS_EX_APPWINDOW,
                              L"LVGL.Window",
                              data->title,
                              window_style,

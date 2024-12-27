@@ -49,9 +49,9 @@ extern "C" {
  *                           Windows DPI scaling setting dynamically.
  * @param simulator_mode Create simulator mode display if true, or create
  *                       application mode display.
- * @param top_level Create a top-level window.
- * @param frameless Create a frameless window.
  * @return The created LVGL display object.
+ * @remark The display window is positioned at the center of the screen by
+ *         default to enhance user experience.
 */
 lv_display_t * lv_windows_create_display(
     const wchar_t * title,
