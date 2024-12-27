@@ -385,6 +385,22 @@ uint32_t lv_draw_get_dependent_count(lv_draw_task_t * t_check)
     return cnt;
 }
 
+void lv_layer_init(lv_layer_t * layer)
+{
+    LV_ASSERT_NULL(layer);
+    lv_memzero(layer, sizeof(lv_layer_t));
+    lv_layer_reset(layer);
+}
+
+void lv_layer_reset(lv_layer_t * layer)
+{
+    LV_ASSERT_NULL(layer);
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    lv_matrix_identity(&layer->matrix);
+#endif
+    layer->opa = LV_OPA_COVER;
+}
+
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
 {
     LV_PROFILER_DRAW_BEGIN;
@@ -405,8 +421,7 @@ void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_
                         const lv_area_t * area)
 {
     LV_PROFILER_DRAW_BEGIN;
-    LV_ASSERT_NULL(layer);
-    lv_memzero(layer, sizeof(lv_layer_t));
+    lv_layer_init(layer);
     lv_display_t * disp = lv_refr_get_disp_refreshing();
 
     layer->parent = parent_layer;
@@ -414,10 +429,6 @@ void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_
     layer->buf_area = *area;
     layer->phy_clip_area = *area;
     layer->color_format = color_format;
-
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-    lv_matrix_identity(&layer->matrix);
-#endif
 
     if(disp->layer_init) disp->layer_init(disp, layer);
 

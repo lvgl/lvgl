@@ -84,9 +84,10 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
     disp->tile_cnt = 1;
 #endif
 
-    disp->layer_head = lv_malloc_zeroed(sizeof(lv_layer_t));
+    disp->layer_head = lv_malloc(sizeof(lv_layer_t));
     LV_ASSERT_MALLOC(disp->layer_head);
     if(disp->layer_head == NULL) return NULL;
+    lv_layer_init(disp->layer_head);
 
     if(disp->layer_init) disp->layer_init(disp, disp->layer_head);
     disp->layer_head->buf_area.x1 = 0;
