@@ -112,7 +112,7 @@ uint32_t lv_nemagfx_blending_mode(lv_blend_mode_t lv_blend_mode);
  *
  * @param[in] gradient NemaGFX Gradient Buffer
  *
- * @param[in] lv_grad Gradient descripto
+ * @param[in] lv_grad Gradient descriptor
  *
  * @param[in] opa Descriptor's opacity
  *
