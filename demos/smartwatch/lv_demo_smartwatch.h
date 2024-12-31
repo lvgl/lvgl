@@ -68,6 +68,12 @@ void lv_demo_smartwatch(void);
 void lv_demo_smartwatch_show_dialog(const char * title, const char * message);
 
 /**
+ * Get pointer to the watchface root object
+ * @return pointer to root object
+ */
+lv_obj_t * lv_demo_smartwatch_face_get_root(void);
+
+/**
  * Update the position of animated analog seconds
  * @param second    the current seconds position
  */

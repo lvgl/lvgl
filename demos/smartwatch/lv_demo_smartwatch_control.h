@@ -47,6 +47,7 @@ void lv_demo_smartwatch_control_load(lv_screen_load_anim_t anim_type, uint32_t t
  * @param cb callback function
  */
 void lv_demo_smartwatch_set_music_control_cb(lv_smartwatch_music_control_cb_t cb);
+
 /**********************
  *      MACROS
  **********************/

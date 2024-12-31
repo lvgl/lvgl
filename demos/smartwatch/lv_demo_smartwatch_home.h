@@ -59,12 +59,6 @@ void lv_demo_smartwatch_register_watchface_cb(const char * name, const lv_image_
 void lv_demo_smartwatch_face_selected_cb(lv_event_t * e);
 
 /**
- * Get pointer to the watchface root object
- * @return pointer to root object
- */
-lv_obj_t * lv_demo_smartwatch_face_get_root(void);
-
-/**
  * Update the position of animated analog seconds
  * @param second    the current seconds position
  */
