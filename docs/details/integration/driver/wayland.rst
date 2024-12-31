@@ -62,7 +62,7 @@ An example simulator is available in this `repo <https://github.com/lvgl/lv_port
 Usage
 -----
 
-#. In ``main.c`` ``#incude "lv_drivers/wayland/wayland.h"``
+#. In ``main.c`` ``#include "lv_drivers/wayland/wayland.h"``
 #. Enable the Wayland driver in ``lv_conf.h`` with ``LV_USE_WAYLAND 1``
 
 #. ``LV_COLOR_DEPTH`` should be set either to ``32`` or ``16`` in ``lv_conf.h``

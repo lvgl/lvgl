@@ -245,7 +245,7 @@ struct window {
 };
 
 /*********************************
- *   STATIC VARIABLES and FUNTIONS
+ *   STATIC VARIABLES and FUNCTIONS
  *********************************/
 
 static struct application application;
@@ -2377,11 +2377,7 @@ static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
 
     struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
-    lv_indev_touch_data_t * touch;
-    bool is_active;
     lv_indev_gesture_recognizer_t * recognizer;
-    uint8_t touch_cnt;
-    uint8_t i;
 
     if(!window || window->closed) {
         return;
@@ -2389,7 +2385,6 @@ static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
 
     /* Collect touches if there are any - send them to the gesture recognizer */
     recognizer = &window->body->input.recognizer;
-    touch = &window->body->input.touches[0];
 
     LV_LOG_TRACE("collected touch events: %d", window->body->input.touch_event_cnt);
 
@@ -2574,7 +2569,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
 
 #if LV_WAYLAND_WINDOW_DECORATIONS
 
-    /* Decorations are enabled, caculate the body size */
+    /* Decorations are enabled, calculate the body size */
     if(!application.opt_disable_decorations) {
         window_width = hor_res + (2 * BORDER_SIZE);
         window_height = ver_res + (TITLE_BAR_HEIGHT + (2 * BORDER_SIZE));

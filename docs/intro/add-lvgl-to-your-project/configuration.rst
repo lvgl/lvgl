@@ -71,7 +71,7 @@ TODO:  Add all things related to ``lv_conf.h`` file and its contents.
 
 Multiple Instances of LVGL
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-It is possible to run multiple, independent isntances of LVGL.  To enable its
+It is possible to run multiple, independent instances of LVGL.  To enable its
 multi-instance feature, set :c:macro:`LV_GLOBAL_CUSTOM` in ``lv_conf.h``
 and provide a custom function to :cpp:func:`lv_global_default` using ``__thread`` or
 ``pthread_key_t``.  It will allow running multiple LVGL instances by storing LVGL's

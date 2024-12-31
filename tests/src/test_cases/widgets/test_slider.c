@@ -212,4 +212,50 @@ void test_slider_range_event_hit_test(void)
     TEST_ASSERT(info.res);
 }
 
+void test_slider_properties(void)
+{
+#if LV_USE_OBJ_PROPERTY
+    lv_obj_t * obj = lv_slider_create(lv_screen_active());
+    lv_property_t prop = { };
+
+    prop.id = LV_PROPERTY_SLIDER_RANGE;
+    prop.arg1.num = 10;
+    prop.arg2.num = 100;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_slider_get_min_value(obj), 10);
+    TEST_ASSERT_EQUAL_INT(lv_slider_get_max_value(obj), 100);
+    TEST_ASSERT_EQUAL_INT(10, lv_obj_get_property(obj, LV_PROPERTY_SLIDER_MIN_VALUE).num);
+    TEST_ASSERT_EQUAL_INT(100, lv_obj_get_property(obj, LV_PROPERTY_SLIDER_MAX_VALUE).num);
+
+    prop.id = LV_PROPERTY_SLIDER_VALUE;
+    prop.arg1.num = 50;
+    prop.arg2.enable = false;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(lv_slider_get_value(obj), 50);
+    TEST_ASSERT_EQUAL_INT(50, lv_obj_get_property(obj, LV_PROPERTY_SLIDER_VALUE).num);
+
+    prop.id = LV_PROPERTY_SLIDER_MODE;
+    prop.num = LV_SLIDER_MODE_RANGE;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(LV_SLIDER_MODE_RANGE, lv_obj_get_property(obj, LV_PROPERTY_SLIDER_MODE).num);
+
+    prop.id = LV_PROPERTY_SLIDER_LEFT_VALUE;
+    prop.arg1.num = 40;
+    prop.arg2.enable = false;
+    TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
+    TEST_ASSERT_EQUAL_INT(40, lv_slider_get_left_value(obj));
+    TEST_ASSERT_EQUAL_INT(40, lv_obj_get_property(obj, LV_PROPERTY_SLIDER_LEFT_VALUE).num);
+
+    prop.id = LV_PROPERTY_SLIDER_IS_DRAGGED;
+    TEST_ASSERT_FALSE(lv_slider_is_dragged(obj));
+    TEST_ASSERT_FALSE(lv_obj_get_property(obj, LV_PROPERTY_SLIDER_IS_DRAGGED).enable);
+
+    prop.id = LV_PROPERTY_SLIDER_IS_SYMMETRICAL;
+    TEST_ASSERT_FALSE(lv_slider_is_dragged(obj));
+    TEST_ASSERT_FALSE(lv_obj_get_property(obj, LV_PROPERTY_SLIDER_IS_SYMMETRICAL).enable);
+
+#endif
+}
+
+
 #endif

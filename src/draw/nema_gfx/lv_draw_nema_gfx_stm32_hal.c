@@ -99,7 +99,7 @@ int32_t nema_sys_init(void)
 
     /* Setup GPU2D Callback */
 #if (USE_HAL_GPU2D_REGISTER_CALLBACKS == 1)
-    /* Register Command List Comlete Callback */
+    /* Register Command List Complete Callback */
     HAL_GPU2D_RegisterCommandListCpltCallback(&hgpu2d, GPU2D_CommandListCpltCallback);
 #endif
 

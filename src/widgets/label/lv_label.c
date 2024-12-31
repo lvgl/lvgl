@@ -908,7 +908,7 @@ static void overwrite_anim_property(lv_anim_t * dest, const lv_anim_t * src, lv_
             dest->repeat_cnt = src->repeat_cnt;
             dest->repeat_delay = src->repeat_delay;
             dest->completed_cb = src->completed_cb;
-            dest->playback_delay = src->playback_delay;
+            dest->reverse_delay = src->reverse_delay;
             break;
         case LV_LABEL_LONG_MODE_SCROLL_CIRCULAR:
             /** If the dest animation is already running, overwrite is not allowed */
@@ -961,8 +961,8 @@ static void lv_label_refr_text(lv_obj_t * obj)
         lv_anim_init(&a);
         lv_anim_set_var(&a, obj);
         lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-        lv_anim_set_playback_delay(&a, LV_LABEL_SCROLL_DELAY);
-        lv_anim_set_repeat_delay(&a, a.playback_delay);
+        lv_anim_set_reverse_delay(&a, LV_LABEL_SCROLL_DELAY);
+        lv_anim_set_repeat_delay(&a, a.reverse_delay);
 
         bool hor_anim = false;
         if(size.x > lv_area_get_width(&txt_coords)) {
@@ -992,16 +992,16 @@ static void lv_label_refr_text(lv_obj_t * obj)
 
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_x_anim);
             int32_t act_time = 0;
-            bool playback_now = false;
+            bool reverse_play_in_progress = false;
             if(anim_cur) {
                 act_time = anim_cur->act_time;
-                playback_now = anim_cur->playback_now;
+                reverse_play_in_progress = anim_cur->reverse_play_in_progress;
             }
             if(act_time < a.duration) {
                 a.act_time = act_time;      /*To keep the old position*/
                 a.early_apply = 0;
-                if(playback_now) {
-                    a.playback_now = 1;
+                if(reverse_play_in_progress) {
+                    a.reverse_play_in_progress = 1;
                     /*Swap the start and end values*/
                     int32_t tmp;
                     tmp      = a.start_value;
@@ -1011,7 +1011,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             }
 
             lv_anim_set_duration(&a, anim_time);
-            lv_anim_set_playback_duration(&a, a.duration);
+            lv_anim_set_reverse_duration(&a, a.duration);
 
             /*If a template animation exists, overwrite some property*/
             if(anim_template)
@@ -1031,16 +1031,16 @@ static void lv_label_refr_text(lv_obj_t * obj)
 
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_y_anim);
             int32_t act_time = 0;
-            bool playback_now = false;
+            bool reverse_play_in_progress = false;
             if(anim_cur) {
                 act_time = anim_cur->act_time;
-                playback_now = anim_cur->playback_now;
+                reverse_play_in_progress = anim_cur->reverse_play_in_progress;
             }
             if(act_time < a.duration) {
                 a.act_time = act_time;      /*To keep the old position*/
                 a.early_apply = 0;
-                if(playback_now) {
-                    a.playback_now = 1;
+                if(reverse_play_in_progress) {
+                    a.reverse_play_in_progress = 1;
                     /*Swap the start and end values*/
                     int32_t tmp;
                     tmp      = a.start_value;
@@ -1050,7 +1050,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             }
 
             lv_anim_set_duration(&a, anim_time);
-            lv_anim_set_playback_duration(&a, a.duration);
+            lv_anim_set_reverse_duration(&a, a.duration);
 
             /*If a template animation exists, overwrite some property*/
             if(anim_template)

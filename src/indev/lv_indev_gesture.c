@@ -26,9 +26,9 @@
  *      DEFINES
  ********************/
 
-#define LV_GESTURE_PINCH_DOWN_THRESHOLD 0.75 /* Default value - start sending events when reached */
-#define LV_GESTURE_PINCH_UP_THRESHOLD 1.5 /* Default value - start sending events when reached */
-#define LV_GESTURE_PINCH_MAX_INITIAL_SCALE 2.5 /* Default value */
+#define LV_GESTURE_PINCH_DOWN_THRESHOLD 0.75f /* Default value - start sending events when reached */
+#define LV_GESTURE_PINCH_UP_THRESHOLD 1.5f /* Default value - start sending events when reached */
+#define LV_GESTURE_PINCH_MAX_INITIAL_SCALE 2.5f /* Default value */
 
 
 /********************
@@ -40,7 +40,6 @@
  ********************/
 
 static lv_indev_gesture_t * init_gesture_info(void);
-static void reset_gesture_info(lv_indev_gesture_t * info);
 static lv_indev_gesture_motion_t * get_motion(uint8_t id, lv_indev_gesture_t * info);
 static int8_t get_motion_idx(uint8_t id, lv_indev_gesture_t * info);
 static void process_touch_event(lv_indev_touch_data_t * touch, lv_indev_gesture_t * info);
@@ -64,7 +63,7 @@ static lv_indev_gesture_recognizer_t * lv_indev_get_gesture_recognizer(lv_event_
 void lv_indev_set_pinch_up_threshold(lv_indev_gesture_recognizer_t * recognizer, float threshold)
 {
     /* A up threshold MUST always be bigger than 1 */
-    LV_ASSERT(threshold > 1.0);
+    LV_ASSERT(threshold > 1.0f);
 
     if(recognizer->config == NULL) {
 
@@ -79,7 +78,7 @@ void lv_indev_set_pinch_up_threshold(lv_indev_gesture_recognizer_t * recognizer,
 void lv_indev_set_pinch_down_threshold(lv_indev_gesture_recognizer_t * recognizer, float threshold)
 {
     /* A down threshold MUST always be smaller than 1 */
-    LV_ASSERT(threshold < 1.0);
+    LV_ASSERT(threshold < 1.0f);
 
     if(recognizer->config == NULL) {
 
@@ -195,6 +194,9 @@ void lv_indev_set_gesture_data(lv_indev_data_t * data, lv_indev_gesture_recogniz
             data->gesture_type = LV_INDEV_GESTURE_PINCH;
             data->gesture_data = (void *) recognizer;
             break;
+
+        default:
+            break;
     }
 }
 
@@ -265,13 +267,13 @@ void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recognizer, l
                 if(r->info->scale > r->config->pinch_up_threshold ||
                    r->info->scale < r->config->pinch_down_threshold) {
 
-                    if(r->info->scale > 1.0) {
-                        r->scale = r->info->scale - (r->config->pinch_up_threshold - 1.0);
+                    if(r->info->scale > 1.0f) {
+                        r->scale = r->info->scale - (r->config->pinch_up_threshold - 1.0f);
 
                     }
-                    else if(r->info->scale < 1.0) {
+                    else if(r->info->scale < 1.0f) {
 
-                        r->scale = r->info->scale + (1.0 - r->config->pinch_down_threshold);
+                        r->scale = r->info->scale + (1.0f - r->config->pinch_down_threshold);
                     }
 
                     r->type = LV_INDEV_GESTURE_PINCH;
@@ -607,8 +609,8 @@ static void gesture_calculate_factors(lv_indev_gesture_t * gesture, int touch_po
     g->rotation = g->p_rotation + atan2f(b, a);
     g->scale = g->p_scale * sqrtf((a * a) + (b * b));
 
-    g->center.x = center_x;
-    g->center.y = center_y;
+    g->center.x = (int32_t)center_x;
+    g->center.y = (int32_t)center_y;
 
 }
 

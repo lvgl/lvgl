@@ -124,7 +124,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             lv_anim_set_duration(&a, LV_DEMO_STRESS_TIME_STEP * 2);
             lv_anim_set_exec_cb(&a, set_width_anim);
             lv_anim_set_values(&a, 100, 200);
-            lv_anim_set_playback_duration(&a, LV_DEMO_STRESS_TIME_STEP * 2);
+            lv_anim_set_reverse_duration(&a, LV_DEMO_STRESS_TIME_STEP * 2);
             lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
             lv_anim_start(&a);
 
@@ -227,7 +227,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             lv_anim_set_values(&a, 180, 400);
             lv_anim_set_duration(&a, LV_DEMO_STRESS_TIME_STEP * 2);
             lv_anim_set_delay(&a, LV_DEMO_STRESS_TIME_STEP + 25);
-            lv_anim_set_playback_duration(&a, LV_DEMO_STRESS_TIME_STEP * 5);
+            lv_anim_set_reverse_duration(&a, LV_DEMO_STRESS_TIME_STEP * 5);
             lv_anim_set_repeat_count(&a, 3);
             lv_anim_set_exec_cb(&a, arc_set_end_angle_anim);
             lv_anim_start(&a);

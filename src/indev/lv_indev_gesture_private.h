@@ -39,7 +39,7 @@ extern "C" {
 /* Represent the motion of a finger */
 struct lv_indev_gesture_motion {
     int8_t finger;                      /* The ID of the tracked finger */
-    lv_point_t start_point;             /* The coordinates where the DOWN event occured */
+    lv_point_t start_point;             /* The coordinates where the DOWN event occurred */
     lv_point_t point;                   /* The current coordinates */
     lv_indev_state_t state;             /* DEBUG: The state i.e PRESSED or RELEASED */
 };

@@ -145,7 +145,7 @@ RAM (e.g. for quick re-display again later).  Doing so:
 
 - requires more RAM, but
 - can save the time of repeatedly creating the Screen and its child Widgets;
-- can be handy when a Screen is complex and/or can be made the :ref:`active_screen` freqently.
+- can be handy when a Screen is complex and/or can be made the :ref:`active_screen` frequently.
 
 If multiple Screens are maintained in RAM simultaneously, it is up to the system
 designer as to how they are managed.

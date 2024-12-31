@@ -127,7 +127,7 @@ thus the delay it introduces cannot be known.
 Display Interface
 *****************
 LVGL needs to be supplied with knowledge about each display panel you want it to use.
-Specificially:
+Specifically:
 
 - its pixel format and size (:ref:`creating_a_display`),
 - where to render pixels for it (:ref:`draw_buffers`), and

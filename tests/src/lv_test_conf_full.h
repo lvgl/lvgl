@@ -70,6 +70,8 @@
 #define LV_USE_FS_MEMFS     1
 #define LV_FS_MEMFS_LETTER  'M'
 
+#define LV_FS_DEFAULT_DRIVE_LETTER 'A'
+
 #define LV_USE_MONKEY       1
 #define LV_USE_RLE          1
 #define LV_USE_LODEPNG      1
@@ -116,6 +118,7 @@
 #define LV_USE_DEMO_SCROLL      1
 #define LV_USE_DEMO_EBIKE       1
 #define LV_USE_DEMO_VECTOR_GRAPHIC  1
+#define LV_USE_DEMO_HIGH_RES    1
 #define LV_USE_DEMO_SMARTWATCH      1
 
 #define LV_USE_OBJ_ID           1
@@ -163,5 +166,7 @@
 #define LV_USE_FONT_MANAGER 1
 
 #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS    1
+
+#define LV_USE_GESTURE_RECOGNITION 1
 
 #endif /* LV_TEST_CONF_FULL_H */

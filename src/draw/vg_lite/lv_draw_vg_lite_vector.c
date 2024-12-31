@@ -346,51 +346,62 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
         if((point)->y > max_y) max_y = (point)->y;  \
     } while(0)
 
-    uint32_t pidx = 0;
-    lv_vector_path_op_t * op = lv_array_front(&src->ops);
-    uint32_t size = lv_array_size(&src->ops);
-    for(uint32_t i = 0; i < size; i++) {
-        switch(op[i]) {
+#define COPY_POINT_NEXT()        \
+    do {                         \
+        CMP_BOUNDS(point);       \
+        *path_data++ = point->x; \
+        *path_data++ = point->y; \
+        point++;                 \
+    } while(0)
+
+    const lv_vector_path_op_t * ops = lv_array_front(&src->ops);
+    const lv_fpoint_t * point = lv_array_front(&src->points);
+    const uint32_t op_size = lv_array_size(&src->ops);
+    const uint32_t point_size = lv_array_size(&src->points);
+    const uint32_t path_length = (op_size + point_size * 2) * sizeof(float);
+
+    /* Reserved memory for path data */
+    lv_vg_lite_path_reserve_space(dest, path_length);
+    vg_lite_path_t * vg_path = lv_vg_lite_path_get_path(dest);
+    vg_path->path_length = path_length;
+    float * path_data = vg_path->path;
+
+    for(uint32_t i = 0; i < op_size; i++) {
+        switch(ops[i]) {
             case LV_VECTOR_PATH_OP_MOVE_TO: {
-                    const lv_fpoint_t * pt = lv_array_at(&src->points, pidx);
-                    CMP_BOUNDS(pt);
-                    lv_vg_lite_path_move_to(dest, pt->x, pt->y);
-                    pidx += 1;
+                    LV_VG_LITE_PATH_SET_OP_CODE(path_data++, uint32_t, VLC_OP_MOVE);
+                    COPY_POINT_NEXT();
                 }
                 break;
             case LV_VECTOR_PATH_OP_LINE_TO: {
-                    const lv_fpoint_t * pt = lv_array_at(&src->points, pidx);
-                    CMP_BOUNDS(pt);
-                    lv_vg_lite_path_line_to(dest, pt->x, pt->y);
-                    pidx += 1;
+                    LV_VG_LITE_PATH_SET_OP_CODE(path_data++, uint32_t, VLC_OP_LINE);
+                    COPY_POINT_NEXT();
                 }
                 break;
             case LV_VECTOR_PATH_OP_QUAD_TO: {
-                    const lv_fpoint_t * pt1 = lv_array_at(&src->points, pidx);
-                    const lv_fpoint_t * pt2 = lv_array_at(&src->points, pidx + 1);
-                    CMP_BOUNDS(pt1);
-                    CMP_BOUNDS(pt2);
-                    lv_vg_lite_path_quad_to(dest, pt1->x, pt1->y, pt2->x, pt2->y);
-                    pidx += 2;
+                    LV_VG_LITE_PATH_SET_OP_CODE(path_data++, uint32_t, VLC_OP_QUAD);
+                    COPY_POINT_NEXT();
+                    COPY_POINT_NEXT();
                 }
                 break;
             case LV_VECTOR_PATH_OP_CUBIC_TO: {
-                    const lv_fpoint_t * pt1 = lv_array_at(&src->points, pidx);
-                    const lv_fpoint_t * pt2 = lv_array_at(&src->points, pidx + 1);
-                    const lv_fpoint_t * pt3 = lv_array_at(&src->points, pidx + 2);
-                    CMP_BOUNDS(pt1);
-                    CMP_BOUNDS(pt2);
-                    CMP_BOUNDS(pt3);
-                    lv_vg_lite_path_cubic_to(dest, pt1->x, pt1->y, pt2->x, pt2->y, pt3->x, pt3->y);
-                    pidx += 3;
+                    LV_VG_LITE_PATH_SET_OP_CODE(path_data++, uint32_t, VLC_OP_CUBIC);
+                    COPY_POINT_NEXT();
+                    COPY_POINT_NEXT();
+                    COPY_POINT_NEXT();
                 }
                 break;
             case LV_VECTOR_PATH_OP_CLOSE: {
-                    lv_vg_lite_path_close(dest);
+                    LV_VG_LITE_PATH_SET_OP_CODE(path_data++, uint32_t, VLC_OP_CLOSE);
                 }
+                break;
+            default:
+                LV_LOG_WARN("unknown op: %d", ops[i]);
                 break;
         }
     }
+
+    LV_ASSERT_MSG((lv_uintptr_t)path_data - (lv_uintptr_t)vg_path->path == path_length, "path length overflow");
 
     lv_vg_lite_path_set_bounding_box(dest, min_x, min_y, max_x, max_y);
     LV_PROFILER_DRAW_END;

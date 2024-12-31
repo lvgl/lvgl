@@ -46,6 +46,7 @@ static bool lv_text_is_arabic_vowel(uint16_t c);
 
 const ap_chars_map_t ap_chars_map[] = {
     /*{Key Offset, End, Beginning, Middle, Isolated, {conjunction}}*/
+    {0, 0xFE81, 0, 0, 0,  {0, 0}},      // أ
     {1, 0xFE84, -1, 0, -1,  {1, 0}},    // أ
     {2, 0xFE86, -1, 0, -1,  {1, 0}},    // ؤ
     {3, 0xFE88, -1, 0, -1,  {1, 0}},    // ﺇ

@@ -41,7 +41,7 @@ void lv_draw_dma2d_opaque_fill(lv_draw_dma2d_unit_t * u, void * first_pixel, int
 
     lv_draw_dma2d_output_cf_t output_cf = lv_draw_dma2d_cf_to_dma2d_output_cf(cf);
     uint32_t cf_size = LV_COLOR_FORMAT_GET_SIZE(cf);
-    uint32_t reg_to_mem_color = lv_draw_dma2d_color_to_dma2d_ocolr(output_cf, dsc->color);
+    uint32_t reg_to_mem_color = lv_draw_dma2d_color_to_dma2d_color(output_cf, dsc->color);
 
 #if LV_DRAW_DMA2D_CACHE
     lv_draw_dma2d_cache_area_t cache_area = {

@@ -36,7 +36,7 @@ static void lv_cleanup_task(lv_draw_task_t * t, lv_display_t * disp);
 
 static inline uint32_t get_layer_size_kb(uint32_t size_byte)
 {
-    return size_byte < 1024 ? 1 : size_byte >> 10;
+    return (size_byte + 1023) >> 10;
 }
 
 /**********************
@@ -448,6 +448,15 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
     int32_t h = lv_area_get_height(&layer->buf_area);
     uint32_t layer_size_byte = h * lv_draw_buf_width_to_stride(w, layer->color_format);
 
+#if LV_DRAW_LAYER_MAX_MEMORY > 0
+    /* Do not allocate the layer if the sum of allocated layer sizes
+     * will exceed `LV_DRAW_LAYER_MAX_MEMORY` */
+    if((_draw_info.used_memory_for_layers + layer_size_byte) > LV_DRAW_LAYER_MAX_MEMORY) {
+        LV_LOG_WARN("LV_DRAW_LAYER_MAX_MEMORY was reached when allocating the layer.");
+        return NULL;
+    }
+#endif
+
     layer->draw_buf = lv_draw_buf_create(w, h, layer->color_format, 0);
 
     if(layer->draw_buf == NULL) {
@@ -456,8 +465,8 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
         return NULL;
     }
 
-    _draw_info.used_memory_for_layers_kb += get_layer_size_kb(layer_size_byte);
-    LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB\n", _draw_info.used_memory_for_layers_kb);
+    _draw_info.used_memory_for_layers += layer_size_byte;
+    LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB", get_layer_size_kb(_draw_info.used_memory_for_layers));
 
     if(lv_color_format_has_alpha(layer->color_format)) {
         lv_draw_buf_clear(layer->draw_buf, NULL);
@@ -535,8 +544,14 @@ static void lv_cleanup_task(lv_draw_task_t * t, lv_display_t * disp)
             int32_t h = lv_area_get_height(&layer_drawn->buf_area);
             uint32_t layer_size_byte = h * layer_drawn->draw_buf->header.stride;
 
-            _draw_info.used_memory_for_layers_kb -= get_layer_size_kb(layer_size_byte);
-            LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB\n", _draw_info.used_memory_for_layers_kb);
+            if(_draw_info.used_memory_for_layers >= layer_size_byte) {
+                _draw_info.used_memory_for_layers -= layer_size_byte;
+            }
+            else {
+                _draw_info.used_memory_for_layers = 0;
+                LV_LOG_WARN("More layers were freed than allocated");
+            }
+            LV_LOG_INFO("Layer memory used: %" LV_PRIu32 " kB", get_layer_size_kb(_draw_info.used_memory_for_layers));
             lv_draw_buf_destroy(layer_drawn->draw_buf);
             layer_drawn->draw_buf = NULL;
         }

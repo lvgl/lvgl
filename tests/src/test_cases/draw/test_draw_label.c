@@ -33,14 +33,12 @@ static void all_labels_create(const char * name, lv_style_t * style)
     LV_FONT_DECLARE(test_font_montserrat_ascii_1bpp);
     LV_FONT_DECLARE(test_font_montserrat_ascii_2bpp);
     LV_FONT_DECLARE(test_font_montserrat_ascii_4bpp);
-    LV_FONT_DECLARE(test_font_montserrat_ascii_4bpp_compressed);
-    //    LV_FONT_DECLARE(test_font_montserrat_ascii_4bpp_subpx);
+    LV_FONT_DECLARE(test_font_montserrat_ascii_3bpp_compressed);
 
     label_create(&test_font_montserrat_ascii_1bpp, style, "1bpp font");
     label_create(&test_font_montserrat_ascii_2bpp, style, "2bpp font");
     label_create(&test_font_montserrat_ascii_4bpp, style, "4bpp font");
-    label_create(&test_font_montserrat_ascii_4bpp_compressed, style, "4bpp compressed font");
-    //    label_create(&test_font_montserrat_ascii_4bpp_subpx, style, "4bpp subpx font");
+    label_create(&test_font_montserrat_ascii_3bpp_compressed, style, "3bpp compressed font");
 
     char buf[64];
     lv_snprintf(buf, sizeof(buf), "draw/label_%s.png", name);

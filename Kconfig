@@ -202,6 +202,15 @@ menu "LVGL configuration"
 				it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
 				"Transformed layers" (if `transform_angle/zoom` are set) use larger buffers and can't be drawn in chunks.
 
+		config LV_DRAW_LAYER_MAX_MEMORY
+			int "The maximum amount of memory that can be used for layers"
+			default 0
+			help
+				Limit the max allocated memory for simple and transformed layers.
+				It should be at least `LV_DRAW_LAYER_SIMPLE_BUF_SIZE` sized but if transformed layers are also used
+				it should be enough to store the largest widget too (width x height x 4 area).
+				Set it to 0 to have no limit.
+
 		config LV_DRAW_THREAD_STACK_SIZE
 			int "Stack size of draw thread in bytes"
 			default 8192
@@ -741,6 +750,11 @@ menu "LVGL configuration"
 				bool "Enable multi-thread render"
 				default n
 				depends on LV_USE_VG_LITE_THORVG
+
+			config LV_USE_GESTURE_RECOGNITION
+				bool "Enable the multi-touch gesture recognition feature"
+				depends on LV_USE_FLOAT
+				default n
 		endmenu
 	endmenu
 
