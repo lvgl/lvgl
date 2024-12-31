@@ -545,7 +545,7 @@ static const lv_font_refer_node_t * lv_font_manager_get_freetype_font(lv_font_ma
         return refer_node;
     }
 
-    /* not fount refer_node, start to create font */
+    /* not found refer_node, start to create font */
 
     lv_font_t * font = lv_font_manager_create_font_warpper(manager, ft_info);
 
