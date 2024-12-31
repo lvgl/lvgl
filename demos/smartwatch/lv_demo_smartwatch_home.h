@@ -31,16 +31,9 @@ extern "C" {
 
 /**
  * Create the home page. Called only once.
+ * @param       parent  tileview object
  */
-void lv_demo_smartwatch_home_create(void);
-
-/**
- * Load the home screen
- * @param anim_type   screen load animation to use
- * @param time        animation time
- * @param delay       delay time before loading the screen
- */
-void lv_demo_smartwatch_home_load(lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay);
+void lv_demo_smartwatch_home_create(lv_obj_t * parent);
 
 /**
  * Register external watchfaces
@@ -57,12 +50,6 @@ void lv_demo_smartwatch_register_watchface_cb(const char * name, const lv_image_
  * @param e event
  */
 void lv_demo_smartwatch_face_selected_cb(lv_event_t * e);
-
-/**
- * Get pointer to the watchface root object
- * @return pointer to root object
- */
-lv_obj_t * lv_demo_smartwatch_face_get_root(void);
 
 /**
  * Update the position of animated analog seconds

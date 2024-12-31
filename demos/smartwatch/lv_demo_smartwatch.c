@@ -33,6 +33,7 @@
 
 static void create_dialog_window(void);
 static void dialog_close_event_cb(lv_event_t * e);
+static void lv_create_home_tile(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -42,6 +43,8 @@ static lv_theme_t * theme_original;
 static bool circular_scroll;
 static bool load_app_list;
 
+
+static lv_obj_t * home_tile;
 static lv_obj_t * dialog_parent;
 static lv_obj_t * dialog_window;
 static lv_obj_t * dialog_panel;
@@ -77,17 +80,20 @@ void lv_demo_smartwatch(void)
                                                true, LV_FONT_DEFAULT);
     lv_display_set_theme(display, theme);
 
+    lv_create_home_tile();
+
     lv_demo_smartwatch_set_circular_scroll(true);
 
-    lv_demo_smartwatch_home_create();
+    lv_demo_smartwatch_control_create(home_tile);
 
-    lv_demo_smartwatch_list_create();
+    lv_demo_smartwatch_home_create(home_tile);
+
+    lv_demo_smartwatch_list_create(home_tile);
+
 
     lv_demo_smartwatch_notifications_create();
 
     lv_demo_smartwatch_settings_create();
-
-    lv_demo_smartwatch_control_create();
 
     lv_demo_smartwatch_weather_create();
 
@@ -172,9 +178,28 @@ bool lv_demo_smartwatch_get_load_app_list(void)
     return load_app_list;
 }
 
+lv_obj_t * lv_demo_smartwatch_get_tileview(void)
+{
+    return home_tile;
+}
+
+void lv_demo_smartwatch_home_load(lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay)
+{
+    lv_screen_load_anim(home_tile, anim_type, time, delay, false);
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+static void lv_create_home_tile(void)
+{
+    home_tile = lv_tileview_create(NULL);
+    // lv_obj_remove_flag(home_tile, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_color(home_tile, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(home_tile, 55, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+}
 
 static void dialog_close_event_cb(lv_event_t * e)
 {

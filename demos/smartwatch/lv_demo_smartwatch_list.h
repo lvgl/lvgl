@@ -31,8 +31,9 @@ extern "C" {
 
 /**
  * Create the list page. Called only once.
+ * @param       parent  tileview object
  */
-void lv_demo_smartwatch_list_create(void);
+void lv_demo_smartwatch_list_create(lv_obj_t * parent);
 
 /**
  * Load the app list screen

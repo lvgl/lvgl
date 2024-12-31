@@ -43,7 +43,7 @@ static lv_obj_t * control_settings_button;
 static lv_obj_t * control_volume_up;
 static lv_obj_t * control_volume_down;
 static lv_obj_t * control_qr_button;
-static lv_obj_t * control_close_button;
+// static lv_obj_t * control_close_button;
 
 static lv_smartwatch_music_control_cb_t music_control_cb;
 
@@ -55,8 +55,14 @@ static lv_smartwatch_music_control_cb_t music_control_cb;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_demo_smartwatch_control_create(void)
+void lv_demo_smartwatch_control_create(lv_obj_t * parent)
 {
+    
+    control_screen = lv_tileview_add_tile(parent, 0, 0, LV_DIR_BOTTOM);
+    lv_obj_remove_flag(control_screen, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_color(control_screen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(control_screen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     control_screen_create();
 }
 
@@ -76,10 +82,10 @@ void lv_demo_smartwatch_set_music_control_cb(lv_smartwatch_music_control_cb_t cb
 
 static void control_screen_create(void)
 {
-    control_screen = lv_obj_create(NULL);
-    lv_obj_remove_flag(control_screen, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_bg_color(control_screen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(control_screen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    // control_screen = lv_obj_create(NULL);
+    // lv_obj_remove_flag(control_screen, LV_OBJ_FLAG_SCROLLABLE);
+    // lv_obj_set_style_bg_color(control_screen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    // lv_obj_set_style_bg_opa(control_screen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     control_music_play = lv_image_create(control_screen);
     lv_image_set_src(control_music_play, &img_play_icon);
@@ -194,17 +200,17 @@ static void control_screen_create(void)
     lv_obj_set_style_bg_color(control_qr_button, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_PRESSED);
     lv_obj_set_style_bg_opa(control_qr_button, 255, LV_PART_MAIN | LV_STATE_PRESSED);
 
-    control_close_button = lv_image_create(control_screen);
-    lv_image_set_src(control_close_button, &img_up_arrow_icon);
-    lv_obj_set_width(control_close_button, 100);
-    lv_obj_set_height(control_close_button, LV_SIZE_CONTENT);
-    lv_obj_set_y(control_close_button, -5);
-    lv_obj_set_align(control_close_button, LV_ALIGN_BOTTOM_MID);
-    lv_obj_add_flag(control_close_button, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_remove_flag(control_close_button, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_radius(control_close_button, 5, LV_PART_MAIN | LV_STATE_PRESSED);
-    lv_obj_set_style_bg_color(control_close_button, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_PRESSED);
-    lv_obj_set_style_bg_opa(control_close_button, 150, LV_PART_MAIN | LV_STATE_PRESSED);
+    // control_close_button = lv_image_create(control_screen);
+    // lv_image_set_src(control_close_button, &img_up_arrow_icon);
+    // lv_obj_set_width(control_close_button, 100);
+    // lv_obj_set_height(control_close_button, LV_SIZE_CONTENT);
+    // lv_obj_set_y(control_close_button, -5);
+    // lv_obj_set_align(control_close_button, LV_ALIGN_BOTTOM_MID);
+    // lv_obj_add_flag(control_close_button, LV_OBJ_FLAG_CLICKABLE);
+    // lv_obj_remove_flag(control_close_button, LV_OBJ_FLAG_SCROLLABLE);
+    // lv_obj_set_style_radius(control_close_button, 5, LV_PART_MAIN | LV_STATE_PRESSED);
+    // lv_obj_set_style_bg_color(control_close_button, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_PRESSED);
+    // lv_obj_set_style_bg_opa(control_close_button, 150, LV_PART_MAIN | LV_STATE_PRESSED);
 
     lv_obj_add_event_cb(control_music_play, control_music_events_cb, LV_EVENT_ALL, (void *)(intptr_t)0x9900);
     lv_obj_add_event_cb(control_music_previous, control_music_events_cb, LV_EVENT_ALL, (void *)(intptr_t)0x9D02);
@@ -214,7 +220,7 @@ static void control_screen_create(void)
 
     lv_obj_add_event_cb(control_settings_button, settings_button_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(control_qr_button, qr_button_event_cb, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(control_close_button, close_button_event_cb, LV_EVENT_ALL, NULL);
+    // lv_obj_add_event_cb(control_close_button, close_button_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(control_screen, control_screen_event_cb, LV_EVENT_ALL, NULL);
 }
 
@@ -230,7 +236,7 @@ static void qr_button_event_cb(lv_event_t * e)
 {
     lv_disp_t * display = lv_display_get_default();
     lv_obj_t * active_screen = lv_display_get_screen_active(display);
-    if(active_screen != control_screen) {
+    if(active_screen != lv_demo_smartwatch_get_tileview()) {
         /* event was triggered but the current screen is no longer active */
         return;
     }
@@ -245,7 +251,7 @@ static void close_button_event_cb(lv_event_t * e)
 {
     lv_disp_t * display = lv_display_get_default();
     lv_obj_t * active_screen = lv_display_get_screen_active(display);
-    if(active_screen != control_screen) {
+    if(active_screen != lv_demo_smartwatch_get_tileview()) {
         /* event was triggered but the current screen is no longer active */
         return;
     }
@@ -259,7 +265,7 @@ static void settings_button_event_cb(lv_event_t * e)
 {
     lv_disp_t * display = lv_display_get_default();
     lv_obj_t * active_screen = lv_display_get_screen_active(display);
-    if(active_screen != control_screen) {
+    if(active_screen != lv_demo_smartwatch_get_tileview()) {
         /* event was triggered but the current screen is no longer active */
         return;
     }
@@ -273,7 +279,7 @@ static void control_music_events_cb(lv_event_t * e)
 {
     lv_disp_t * display = lv_display_get_default();
     lv_obj_t * active_screen = lv_display_get_screen_active(display);
-    if(active_screen != control_screen) {
+    if(active_screen != lv_demo_smartwatch_get_tileview()) {
         /* event was triggered but the current screen is no longer active */
         return;
     }

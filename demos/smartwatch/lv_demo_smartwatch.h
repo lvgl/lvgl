@@ -68,6 +68,16 @@ void lv_demo_smartwatch(void);
 void lv_demo_smartwatch_show_dialog(const char * title, const char * message);
 
 /**
+ * Load the home screen
+ * @param anim_type   screen load animation to use
+ * @param time        animation time
+ * @param delay       delay time before loading the screen
+ */
+void lv_demo_smartwatch_home_load(lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay);
+
+lv_obj_t * lv_demo_smartwatch_get_tileview(void);
+
+/**
  * Update the position of animated analog seconds
  * @param second    the current seconds position
  */
@@ -112,6 +122,12 @@ void lv_demo_smartwatch_face_events_cb(lv_event_t * e);
  */
 void lv_demo_smartwatch_register_watchface_cb(const char * name, const lv_image_dsc_t * preview, lv_obj_t ** watchface,
                                               lv_obj_t ** seconds);
+
+/**
+ * Get pointer to the watchface root object
+ * @return pointer to root object
+ */
+lv_obj_t * lv_demo_smartwatch_face_get_root(void);
 
 /**
  * Register external apps

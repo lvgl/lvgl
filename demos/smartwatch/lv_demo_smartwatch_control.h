@@ -31,8 +31,9 @@ extern "C" {
 
 /**
  * Create the control page. Called only once.
+ * @param       parent  tileview object
  */
-void lv_demo_smartwatch_control_create(void);
+void lv_demo_smartwatch_control_create(lv_obj_t * parent);
 
 /**
  * Load the control panel screen

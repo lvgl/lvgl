@@ -73,20 +73,27 @@ void lv_demo_smartwatch_register_app_cb(const char * name, const lv_image_dsc_t 
     num_apps++;
 }
 
-void lv_demo_smartwatch_list_create(void)
+void lv_demo_smartwatch_list_create(lv_obj_t * parent)
 {
+
+    app_list_screen = lv_tileview_add_tile(parent, 1, 1, LV_DIR_LEFT);
+    lv_obj_remove_flag(app_list_screen, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_color(app_list_screen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(app_list_screen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     create_screen_list();
 
 }
 
 void lv_demo_smartwatch_list_load(lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay)
 {
-    lv_screen_load_anim(app_list_screen, anim_type, time, delay, false);
+    // lv_screen_load_anim(app_list_screen, anim_type, time, delay, false);
+    lv_demo_smartwatch_home_load(anim_type, time, delay);
 }
 
 void lv_demo_smartwatch_app_close(void)
 {
-    lv_demo_smartwatch_list_load(LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0);
+    lv_demo_smartwatch_home_load(LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0);
 }
 
 
@@ -102,7 +109,7 @@ static void app_list_clicked_external_event_cb(lv_event_t * e)
 
     lv_disp_t * display = lv_display_get_default();
     lv_obj_t * active_screen = lv_display_get_screen_active(display);
-    if(active_screen != app_list_screen) {
+    if(active_screen != lv_demo_smartwatch_get_tileview()) {
         /* event was triggered but the current screen is no longer active */
         return;
     }
@@ -125,7 +132,7 @@ static void app_list_clicked_event_cb(lv_event_t * e)
 {
     lv_disp_t * display = lv_display_get_default();
     lv_obj_t * active_screen = lv_display_get_screen_active(display);
-    if(active_screen != app_list_screen) {
+    if(active_screen != lv_demo_smartwatch_get_tileview()) {
         /* event was triggered but the current screen is no longer active */
         return;
     }
@@ -241,10 +248,10 @@ static void add_app_list(const char * app_name, int index, const void * img)
 static void create_screen_list(void)
 {
 
-    app_list_screen = lv_obj_create(NULL);
-    lv_obj_remove_flag(app_list_screen, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_bg_color(app_list_screen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(app_list_screen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    // app_list_screen = lv_obj_create(NULL);
+    // lv_obj_remove_flag(app_list_screen, LV_OBJ_FLAG_SCROLLABLE);
+    // lv_obj_set_style_bg_color(app_list_screen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    // lv_obj_set_style_bg_opa(app_list_screen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     app_list = lv_obj_create(app_list_screen);
     lv_obj_set_width(app_list, lv_pct(100));
