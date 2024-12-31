@@ -594,6 +594,15 @@
             #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS    0
         #endif
     #endif
+
+    /* Enable registering of custom SW draw handlers */
+    #ifndef LV_DRAW_SW_CUSTOM_BLEND_HANDLERS
+        #ifdef CONFIG_LV_DRAW_SW_CUSTOM_BLEND_HANDLERS
+            #define LV_DRAW_SW_CUSTOM_BLEND_HANDLERS CONFIG_LV_DRAW_SW_CUSTOM_BLEND_HANDLERS
+        #else
+            #define LV_DRAW_SW_CUSTOM_BLEND_HANDLERS  0
+        #endif
+    #endif
 #endif
 
 /*Use TSi's aka (Think Silicon) NemaGFX */
