@@ -1108,7 +1108,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
             int32_t act_time = anim_cur ? anim_cur->act_time : 0;
 
             /*To keep the old position when the label text is updated mid-scrolling*/
-            int32_t duration_resolved = lv_anim_resolve_speed(anim_time, start, end);
+            int32_t duration_resolved = lv_anim_resolve_speed(anim_time, a.start_value, a.end_value);
             if(act_time < duration_resolved) {
                 a.act_time = act_time;
             }
