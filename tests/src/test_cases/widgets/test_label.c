@@ -626,4 +626,41 @@ void test_label_with_recolor_cmd(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/label_recolor.png");
 }
 
+static void scroll_next_step(lv_obj_t * label1, lv_obj_t * label2, const char * text1, const char * text2, uint32_t idx)
+{
+    lv_label_set_text(label1, (idx % 2) == 0 ? text1 : text2);
+    lv_label_set_text(label2, (idx % 2) == 0 ? text1 : text2);
+    lv_test_wait(783); /*Use an odd delay*/
+
+    char buf[128];
+    lv_snprintf(buf, sizeof(buf), "widgets/label_scroll_%d.png", idx);
+    TEST_ASSERT_EQUAL_SCREENSHOT(buf);
+}
+
+void test_label_scroll_mid_update(void)
+{
+    lv_obj_clean(lv_screen_active());
+
+    const char * text1 = "This is a long text that we will update while scrolling";
+    const char * text2 = "THIS IS A LONG TEXT THAT WE WILL UPDATE WHILE SCROLLING";
+
+    lv_obj_t * label1 = lv_label_create(lv_screen_active());
+    lv_label_set_long_mode(label1, LV_LABEL_LONG_MODE_SCROLL);
+    lv_label_set_text(label1, text1),
+                      lv_obj_set_width(label1, 150);
+    lv_obj_set_pos(label1, 10, 10);
+
+    lv_obj_t * label2 = lv_label_create(lv_screen_active());
+    lv_label_set_long_mode(label2, LV_LABEL_LONG_MODE_SCROLL_CIRCULAR);
+    lv_label_set_text(label2, text1),
+                      lv_obj_set_width(label2, 150);
+    lv_obj_set_pos(label2, 10, 80);
+
+    uint32_t i;
+    for(i = 0; i < 15; i++) {
+        scroll_next_step(label1, label2, text1, text2, i);
+    }
+
+}
+
 #endif

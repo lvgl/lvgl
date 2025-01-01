@@ -902,7 +902,7 @@ static void overwrite_anim_property(lv_anim_t * dest, const lv_anim_t * src, lv_
 {
     switch(mode) {
         case LV_LABEL_LONG_MODE_SCROLL:
-            /** If the dest animation is already running, overwrite is not allowed */
+            /* If the dest animation is already running, overwrite is not allowed */
             if(dest->act_time <= 0)
                 dest->act_time = src->act_time;
             dest->repeat_cnt = src->repeat_cnt;
@@ -911,7 +911,7 @@ static void overwrite_anim_property(lv_anim_t * dest, const lv_anim_t * src, lv_
             dest->reverse_delay = src->reverse_delay;
             break;
         case LV_LABEL_LONG_MODE_SCROLL_CIRCULAR:
-            /** If the dest animation is already running, overwrite is not allowed */
+            /* If the dest animation is already running, overwrite is not allowed */
             if(dest->act_time <= 0)
                 dest->act_time = src->act_time;
             dest->repeat_cnt = src->repeat_cnt;
@@ -997,9 +997,11 @@ static void lv_label_refr_text(lv_obj_t * obj)
                 act_time = anim_cur->act_time;
                 reverse_play_in_progress = anim_cur->reverse_play_in_progress;
             }
-            if(act_time < a.duration) {
-                a.act_time = act_time;      /*To keep the old position*/
-                a.early_apply = 0;
+
+            int32_t duration_resolved = lv_anim_resolve_speed(anim_time, start, end);
+            /*To keep the old position*/
+            if(act_time < duration_resolved) {
+                a.act_time = act_time;
                 if(reverse_play_in_progress) {
                     a.reverse_play_in_progress = 1;
                     /*Swap the start and end values*/
@@ -1011,12 +1013,16 @@ static void lv_label_refr_text(lv_obj_t * obj)
             }
 
             lv_anim_set_duration(&a, anim_time);
-            lv_anim_set_reverse_duration(&a, a.duration);
+            lv_anim_set_reverse_duration(&a, anim_time);
 
             /*If a template animation exists, overwrite some property*/
             if(anim_template)
                 overwrite_anim_property(&a, anim_template, label->long_mode);
             lv_anim_start(&a);
+
+            /*If a delay is happening, apply the start value manually*/
+            if(act_time < 0) label->offset.x = start;
+
             hor_anim = true;
         }
         else {
@@ -1038,7 +1044,6 @@ static void lv_label_refr_text(lv_obj_t * obj)
             }
             if(act_time < a.duration) {
                 a.act_time = act_time;      /*To keep the old position*/
-                a.early_apply = 0;
                 if(reverse_play_in_progress) {
                     a.reverse_play_in_progress = 1;
                     /*Swap the start and end values*/
@@ -1050,11 +1055,12 @@ static void lv_label_refr_text(lv_obj_t * obj)
             }
 
             lv_anim_set_duration(&a, anim_time);
-            lv_anim_set_reverse_duration(&a, a.duration);
+            lv_anim_set_reverse_duration(&a, anim_time);
 
             /*If a template animation exists, overwrite some property*/
-            if(anim_template)
+            if(anim_template) {
                 overwrite_anim_property(&a, anim_template, label->long_mode);
+            }
             lv_anim_start(&a);
         }
         else {
@@ -1101,13 +1107,15 @@ static void lv_label_refr_text(lv_obj_t * obj)
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_x_anim);
             int32_t act_time = anim_cur ? anim_cur->act_time : 0;
 
+            /*To keep the old position when the label text is updated mid-scrolling*/
+            int32_t duration_resolved = lv_anim_resolve_speed(anim_time, start, end);
+            if(act_time < duration_resolved) {
+                a.act_time = act_time;
+            }
+
             /*If a template animation exists, overwrite some property*/
             if(anim_template) {
                 overwrite_anim_property(&a, anim_template, label->long_mode);
-            }
-            else if(act_time < a.duration) {
-                a.act_time = act_time;      /*To keep the old position when the label text is updated mid-scrolling*/
-                a.early_apply = 0;
             }
 
             lv_anim_start(&a);
@@ -1131,9 +1139,9 @@ static void lv_label_refr_text(lv_obj_t * obj)
             if(anim_template) {
                 overwrite_anim_property(&a, anim_template, label->long_mode);
             }
+            /*To keep the old position when the label text is updated mid-scrolling*/
             else if(act_time < a.duration) {
-                a.act_time = act_time;      /*To keep the old position when the label text is updated mid-scrolling*/
-                a.early_apply = 0;
+                a.act_time = act_time;
             }
 
             lv_anim_start(&a);
