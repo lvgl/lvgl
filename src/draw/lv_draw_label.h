@@ -74,16 +74,16 @@ typedef struct {
     lv_opa_t opa;
 
     /**The alignment of the text `LV_TEXT_ALIGN_LEFT/RIGHT/CENTER`*/
-    lv_text_align_t align : 3 ;
+    lv_text_align_t align;
 
     /**The base direction. Used when type setting Right-to-left (e.g. Arabic) texts*/
-    lv_base_dir_t bidi_dir : 3;
+    lv_base_dir_t bidi_dir;
 
     /**Text decoration, e.g. underline*/
     lv_text_decor_t decor : 3;
 
     /**Some flags to control type setting*/
-    lv_text_flag_t flag : 3;
+    lv_text_flag_t flag : 5;
 
     /**1: malloc a buffer and copy `text` there.
      * 0: `text` will be valid during rendering.*/

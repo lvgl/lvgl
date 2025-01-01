@@ -175,7 +175,6 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_label_ds
     draw_dsc->letter_space = lv_obj_get_style_text_letter_space(obj, part);
     draw_dsc->line_space = lv_obj_get_style_text_line_space(obj, part);
     draw_dsc->decor = lv_obj_get_style_text_decor(obj, part);
-    if(part != LV_PART_MAIN) draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
 
     draw_dsc->font = lv_obj_get_style_text_font(obj, part);
 
