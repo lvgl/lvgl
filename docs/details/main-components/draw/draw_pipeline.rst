@@ -1,16 +1,19 @@
-.. _draw:
+.. _draw_pipeline:
 
 ================
 Drawing Pipeline
 ================
 
+Overview
+--------
+
 LVGL has a flexible and extendable drawing pipeline.  You can hook it to do
 some rendering with a GPU or even completely replace the built-in
 software renderer.
 
+By using events, it's also possible to modify `draw_tasks` on insert new ones as LVGL renders the widgets.
 
-Overview
-********
+The followings describe the basics terminology and concept of rendering.
 
 Draw task
 ---------
@@ -25,6 +28,8 @@ Draw unit
 The draw tasks are collected in a list and periodically dispatched to draw units. A
 draw unit can a CPU core, a GPU, just a new rendering library for certain or all draw tasks,
 or basically anything that can draw somehow.
+
+As a reference draw unit take a look at `lv_draw_sw.c <https://github.com/lvgl/lvgl/blob/master/src/draw/sw/lv_draw_sw.c>`__
 
 Draw task evaluation
 --------------------
@@ -51,31 +56,31 @@ returns an available draw task. "Available draw task" means that, all the draw t
 are ready and it is assigned to the given draw unit.
 
 
-Layers
-------
-
-A layer is a buffer with a given area on which rendering happens. Each display has a "main" layer, but
-during rendering additional layers might be created internally to handle for example arbitrary widget transformations.
-
-
 Hierarchy of modules
 --------------------
 
 All these together looks like this
 
-- list of draw units
-- display(s)
+- the list of draw units is stpred in a separate list
+- display(s): Each display has a main layer and other layer might be create during rendering
 
-   - layer(s): Each display has its own list of layers
+   - layer(s): Each display has its own list of layers. Learn more at :refr:`draw_layers`.
 
       - draw tasks: Each layer has its own list of draw tasks
 
+Draw Events
+-----------
 
-References
-**********
+LVGL provides two ways to customize the rendering of any widgets:
+- Allow adding custom ``draw_task``s at various stages of rendering. The related event codes are:
 
-As a reference take a look at `lv_draw_sw.c <https://github.com/lvgl/lvgl/blob/master/src/draw/sw/lv_draw_sw.c>`__
+  - ``LV_EVENT_DRAW_MAIN_BEGIN``, ``LV_EVENT_DRAW_MAIN``, ``LV_EVENT_DRAW_MAIN_END``:
+    Called before, during, or after the widget is drawn. The built-in widget rendering usually happens in ``LV_EVENT_DRAW_MAIN``.
+  - ``LV_EVENT_DRAW_POST_BEGIN``, ``LV_EVENT_DRAW_POST``, ``LV_EVENT_DRAW_POST_END``:
+    Called before, during, or after all the children are rendered to add some overlay-like drawings. For example, scrollbars are rendered here.
 
-API
-***
+- Modify a ``draw_task`` created by a widget. For this, ``LV_EVENT_DRAW_TASK_ADDED`` can be used.
+  For performance reasons, this event is disabled by default and can be enabled by setting the
+  ``LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS`` flag.
+  A use case for this event is when you want to modify each bar of a bar chart.
 
