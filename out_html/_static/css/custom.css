@@ -1,0 +1,158 @@
+table, th, td {
+  border: 1px solid #bbb;
+  padding: 10px;
+}
+
+td {
+  text-align:center;
+}
+span.pre
+{
+  padding-right:8px;
+}
+
+span.pre:first-child
+{
+  padding-right:0px;
+}
+
+
+code.sig-name
+{
+  /*margin-left:8px;*/
+}
+
+.toggle .header {
+    display: block;
+    clear: both;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.toggle .header:before {
+   font-family: FontAwesome, "Lato","proxima-nova","Helvetica Neue",Arial,sans-serif;
+   content: "\f0da \00a0 Show ";
+   display: inline-block;
+   font-size: 1.1em;
+}
+
+.toggle .header.open:before {
+   content: "\f0d7 \00a0 Hide ";
+}
+
+.header p {
+    display: inline-block;
+    font-size: 1.1em;
+    margin-bottom: 8px;
+}
+
+.wy-side-nav-search {
+  background-color: #f5f5f5;
+}
+.wy-side-nav-search>div.version {
+  color: #333;
+  display: none; /*replaced by dropdown*/
+}
+
+
+.home-img {
+  width:32%;
+  transition: transform .3s ease-out;
+}
+
+.home-img:hover {
+  transform: translate(0, -10px);
+}
+
+/*Let `code` wrap*/
+.rst-content code, .rst-content tt, code {
+  white-space: normal;
+}
+
+.lv-example, .lv-example > iframe {
+  border: none;
+  outline: none;
+  padding: none;
+  display: block;
+  width: 320px;
+  height: 240px;
+  flex: none;
+  position: relative;
+}
+
+.lv-example > iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.lv-example-container {
+    display: flex;
+    padding-bottom: 16px;
+}
+.lv-example-description {
+    flex: 1 1 auto;
+    margin-left: 1rem;
+}
+
+.lv-example-link-button {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: #2980b9;
+    color: white;
+    margin: 0 4px;
+}
+.lv-example-link-button:hover {
+    color: white;
+    filter: brightness(120%);
+}
+
+.lv-example-link-button:visited {
+    color: white;
+}
+
+dl.cpp.unexpanded dd {
+    display: none;
+}
+
+.lv-api-expansion-button {
+    padding: 4px;
+}
+.lv-api-expansion-button::before {
+    font-family: FontAwesome, "Lato","proxima-nova","Helvetica Neue",Arial,sans-serif;
+    display: inline-block;
+    font-size: 1.1em;
+    cursor: pointer;
+}
+.unexpanded .lv-api-expansion-button::before {
+    content: "\f0da \00a0";
+}
+.expanded .lv-api-expansion-button::before {
+    content: "\f0d7 \00a0";
+}
+
+.wy-nav-content{
+    padding: 1.618em 3.236em;
+    height: 100%;
+    max-width: 1920px;
+    margin: auto
+}
+
+div.body {
+    min-width: 360px;
+    max-width: 1920px;
+}
+
+.cpp-expr {
+  font-family: SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,Courier,monospace;
+  color: #e74c3c;
+  padding: 2px 5px;
+  border: 1px solid #e1e4e5;
+  font-size: 75%;
+}
+
+/* This replaces a color present in `pygments.css` which is used to highlight
+ * function names.  It is too dark for DARK mode, and nearly black in LIGHT mode so it is
+ * difficult to tell that it is even highlighted.  This color override remedies both. */
+.highlight .nf { color: #2648ee } /* Name.Function */

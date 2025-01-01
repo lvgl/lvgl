@@ -1,0 +1,902 @@
+.. _examples:
+
+========
+Examples
+========
+
+Get Started
+###########
+
+A very simple *hello world* label
+*********************************
+
+.. lv_example:: get_started/lv_example_get_started_1
+
+A button with a label and react on click event
+**********************************************
+
+.. lv_example:: get_started/lv_example_get_started_2
+
+Create styles from scratch for buttons
+**************************************
+
+.. lv_example:: get_started/lv_example_get_started_3
+
+Create a slider and write its value on a label
+**********************************************
+
+.. lv_example:: get_started/lv_example_get_started_4
+
+Play with a simple horizontal gradient
+**************************************
+
+.. lv_example:: get_started/lv_example_grad_1
+
+Play with a linear (skew) gradient
+**********************************
+
+.. lv_example:: get_started/lv_example_grad_2
+
+Play with a radial gradient
+***************************
+
+.. lv_example:: get_started/lv_example_grad_3
+
+Play with a conical gradient
+****************************
+
+.. lv_example:: get_started/lv_example_grad_4
+
+Styles
+######
+
+Size styles
+***********
+
+.. lv_example:: styles/lv_example_style_1
+
+Background styles
+*****************
+
+.. lv_example:: styles/lv_example_style_2
+
+Border styles
+*************
+
+.. lv_example:: styles/lv_example_style_3
+
+Outline styles
+**************
+
+.. lv_example:: styles/lv_example_style_4
+
+Shadow styles
+*************
+
+.. lv_example:: styles/lv_example_style_5
+
+Image styles
+************
+
+.. lv_example:: styles/lv_example_style_6
+
+Arc styles
+**********
+
+.. lv_example:: styles/lv_example_style_7
+
+Text styles
+***********
+
+.. lv_example:: styles/lv_example_style_8
+
+Line styles
+***********
+
+.. lv_example:: styles/lv_example_style_9
+
+Transition
+**********
+
+.. lv_example:: styles/lv_example_style_10
+
+Using multiple styles
+*********************
+
+.. lv_example:: styles/lv_example_style_11
+
+Local styles
+************
+
+.. lv_example:: styles/lv_example_style_12
+
+Add styles to parts and states
+******************************
+
+.. lv_example:: styles/lv_example_style_13
+
+Extending the current theme
+***************************
+
+.. lv_example:: styles/lv_example_style_14
+
+Opacity and Transformations
+***************************
+
+.. lv_example:: styles/lv_example_style_15
+
+Metallic knob with conic gradient
+*********************************
+
+.. lv_example:: styles/lv_example_style_16
+
+Radial gradient as background
+*****************************
+
+.. lv_example:: styles/lv_example_style_17
+
+Gradients for button background
+*******************************
+
+.. lv_example:: styles/lv_example_style_18
+
+Animations
+##########
+
+Start animation on an event
+***************************
+
+.. lv_example:: anim/lv_example_anim_1
+
+Playback animation
+******************
+
+.. lv_example:: anim/lv_example_anim_2
+
+Cubic Bezier animation
+**********************
+
+.. lv_example:: anim/lv_example_anim_3
+
+Pause animation
+***************
+
+.. lv_example:: anim/lv_example_anim_4
+
+Animation timeline
+******************
+
+.. lv_example:: anim/lv_example_anim_timeline_1
+
+Events
+######
+
+Button click event
+******************
+
+.. lv_example:: event/lv_example_event_click
+
+Click streaks
+*************
+
+.. lv_example:: event/lv_example_event_streak
+
+Handle multiple events
+**********************
+
+.. lv_example:: event/lv_example_event_button
+
+Event bubbling
+**************
+
+.. lv_example:: event/lv_example_event_bubble
+
+Draw event
+**********
+
+.. lv_example:: event/lv_example_event_draw
+
+Layouts
+#######
+
+Flex
+****
+
+A simple row and a column layout with flexbox
+=============================================
+
+.. lv_example:: layouts/flex/lv_example_flex_1
+
+Arrange items in rows with wrap and even spacing
+================================================
+
+.. lv_example:: layouts/flex/lv_example_flex_2
+
+Demonstrate flex grow
+=====================
+
+.. lv_example:: layouts/flex/lv_example_flex_3
+
+Demonstrate flex grow.
+======================
+
+.. lv_example:: layouts/flex/lv_example_flex_4
+
+Demonstrate column and row gap style properties
+===============================================
+
+.. lv_example:: layouts/flex/lv_example_flex_5
+
+RTL base direction changes order of the items
+=============================================
+
+.. lv_example:: layouts/flex/lv_example_flex_6
+
+Grid
+****
+
+A simple grid
+=============
+
+.. lv_example:: layouts/grid/lv_example_grid_1
+
+Demonstrate cell placement and span
+===================================
+
+.. lv_example:: layouts/grid/lv_example_grid_2
+
+Demonstrate grid's -free unit-
+==============================
+
+.. lv_example:: layouts/grid/lv_example_grid_3
+
+Demonstrate track placement
+===========================
+
+.. lv_example:: layouts/grid/lv_example_grid_4
+
+Demonstrate column and row gap
+==============================
+
+.. lv_example:: layouts/grid/lv_example_grid_5
+
+Demonstrate RTL direction on grid
+=================================
+
+.. lv_example:: layouts/grid/lv_example_grid_6
+
+Scrolling
+#########
+
+Nested scrolling
+****************
+
+.. lv_example:: scroll/lv_example_scroll_1
+
+Snapping
+********
+
+.. lv_example:: scroll/lv_example_scroll_2
+
+Floating button
+***************
+
+.. lv_example:: scroll/lv_example_scroll_3
+
+Styling the scrollbars
+**********************
+
+.. lv_example:: scroll/lv_example_scroll_4
+
+Right to left scrolling
+***********************
+
+.. lv_example:: scroll/lv_example_scroll_5
+
+Translate on scroll
+*******************
+
+.. lv_example:: scroll/lv_example_scroll_6
+
+Infinite scrolling
+******************
+
+.. lv_example:: scroll/lv_example_scroll_7
+
+Widgets
+#######
+
+Base Widget
+***********
+
+Base objects with custom styles
+===============================
+
+.. lv_example:: widgets/obj/lv_example_obj_1
+
+Make an object draggable
+========================
+
+.. lv_example:: widgets/obj/lv_example_obj_2
+
+Transform object using a 3x3 matrix
+===================================
+
+.. lv_example:: widgets/obj/lv_example_obj_3
+
+Animation Image
+***************
+
+Simple Animation Image
+======================
+
+.. lv_example:: widgets/animimg/lv_example_animimg_1
+
+Arc
+***
+
+Simple Arc
+==========
+
+.. lv_example:: widgets/arc/lv_example_arc_1
+
+Loader with Arc
+===============
+
+.. lv_example:: widgets/arc/lv_example_arc_2
+
+Bar
+***
+
+Simple Bar
+==========
+
+.. lv_example:: widgets/bar/lv_example_bar_1
+
+Styling a bar
+=============
+
+.. lv_example:: widgets/bar/lv_example_bar_2
+
+Temperature meter
+=================
+
+.. lv_example:: widgets/bar/lv_example_bar_3
+
+Stripe pattern and range value
+==============================
+
+.. lv_example:: widgets/bar/lv_example_bar_4
+
+Bar with LTR and RTL base direction
+===================================
+
+.. lv_example:: widgets/bar/lv_example_bar_5
+
+Custom drawer to show the current value
+=======================================
+
+.. lv_example:: widgets/bar/lv_example_bar_6
+
+Bar with opposite direction
+===========================
+
+.. lv_example:: widgets/bar/lv_example_bar_7
+
+Button
+******
+
+Simple Buttons
+==============
+
+.. lv_example:: widgets/button/lv_example_button_1
+
+Styling buttons
+===============
+
+.. lv_example:: widgets/button/lv_example_button_2
+
+Gummy button
+============
+
+.. lv_example:: widgets/button/lv_example_button_3
+
+Button Matrix
+*************
+
+Simple Button matrix
+====================
+
+.. lv_example:: widgets/buttonmatrix/lv_example_buttonmatrix_1
+
+Custom buttons
+==============
+
+.. lv_example:: widgets/buttonmatrix/lv_example_buttonmatrix_2
+
+Pagination
+==========
+
+.. lv_example:: widgets/buttonmatrix/lv_example_buttonmatrix_3
+
+Calendar
+********
+
+Calendar with header
+====================
+
+.. lv_example:: widgets/calendar/lv_example_calendar_1
+
+Chinese calendar
+================
+
+.. lv_example:: widgets/calendar/lv_example_calendar_2
+
+Canvas
+******
+
+Drawing on the Canvas and rotate
+================================
+
+.. lv_example:: widgets/canvas/lv_example_canvas_1
+
+Transparent Canvas with chroma keying
+=====================================
+
+.. lv_example:: widgets/canvas/lv_example_canvas_2
+
+Draw a rectangle to the canvas
+==============================
+
+.. lv_example:: widgets/canvas/lv_example_canvas_3
+
+Draw a label to the canvas
+==========================
+
+.. lv_example:: widgets/canvas/lv_example_canvas_4
+
+Draw an arc to the canvas
+=========================
+
+.. lv_example:: widgets/canvas/lv_example_canvas_5
+
+Draw an image to the canvas
+===========================
+
+.. lv_example:: widgets/canvas/lv_example_canvas_6
+
+Draw a line to the canvas
+=========================
+
+.. lv_example:: widgets/canvas/lv_example_canvas_7
+
+Draw a vector graphic to the canvas
+===================================
+
+.. lv_example:: widgets/canvas/lv_example_canvas_8
+
+Draw Fancy Letter Effects
+=========================
+
+.. lv_example:: widgets/canvas/lv_example_canvas_9
+
+Draw Fancy Letter Effects 2
+===========================
+
+.. lv_example:: widgets/canvas/lv_example_canvas_10
+
+Chart
+*****
+
+Line Chart
+==========
+
+.. lv_example:: widgets/chart/lv_example_chart_1
+
+Axis ticks and labels with scrolling
+====================================
+
+.. lv_example:: widgets/chart/lv_example_chart_2
+
+Show the value of the pressed points
+====================================
+
+.. lv_example:: widgets/chart/lv_example_chart_3
+
+Recolor bars based on their value
+=================================
+
+.. lv_example:: widgets/chart/lv_example_chart_4
+
+Faded area line chart with custom division lines
+================================================
+
+.. lv_example:: widgets/chart/lv_example_chart_5
+
+Show cursor on the clicked point
+================================
+
+.. lv_example:: widgets/chart/lv_example_chart_6
+
+Scatter chart
+=============
+
+.. lv_example:: widgets/chart/lv_example_chart_7
+
+Circular line chart with gap
+============================
+
+.. lv_example:: widgets/chart/lv_example_chart_8
+
+Checkbox
+********
+
+Simple Checkboxes
+=================
+
+.. lv_example:: widgets/checkbox/lv_example_checkbox_1
+
+Checkboxes as radio buttons
+===========================
+
+.. lv_example:: widgets/checkbox/lv_example_checkbox_2
+
+Dropdown
+********
+
+Simple Drop down list
+=====================
+
+.. lv_example:: widgets/dropdown/lv_example_dropdown_1
+
+Drop down in four directions
+============================
+
+.. lv_example:: widgets/dropdown/lv_example_dropdown_2
+
+Menu
+====
+
+.. lv_example:: widgets/dropdown/lv_example_dropdown_3
+
+Image
+*****
+
+Image from variable and symbol
+==============================
+
+.. lv_example:: widgets/image/lv_example_image_1
+
+Image recoloring
+================
+
+.. lv_example:: widgets/image/lv_example_image_2
+
+Rotate and zoom
+===============
+
+.. lv_example:: widgets/image/lv_example_image_3
+
+Image offset and styling
+========================
+
+.. lv_example:: widgets/image/lv_example_image_4
+
+Image Button
+************
+
+Simple Image button
+===================
+
+.. lv_example:: widgets/imagebutton/lv_example_imagebutton_1
+
+Keyboard
+********
+
+Keyboard with text area
+=======================
+
+.. lv_example:: widgets/keyboard/lv_example_keyboard_1
+
+Keyboard with custom map
+========================
+
+.. lv_example:: widgets/keyboard/lv_example_keyboard_2
+
+Label
+*****
+
+Line wrap, recoloring and scrolling
+===================================
+
+.. lv_example:: widgets/label/lv_example_label_1
+
+Text shadow
+===========
+
+.. lv_example:: widgets/label/lv_example_label_2
+
+Show LTR, RTL and Chinese texts
+===============================
+
+.. lv_example:: widgets/label/lv_example_label_3
+
+Draw label with gradient color
+==============================
+
+.. lv_example:: widgets/label/lv_example_label_4
+
+Customize circular scrolling animation
+======================================
+
+.. lv_example:: widgets/label/lv_example_label_5
+
+LED
+***
+
+LED with custom style
+=====================
+
+.. lv_example:: widgets/led/lv_example_led_1
+
+Line
+****
+
+Simple Line
+===========
+
+.. lv_example:: widgets/line/lv_example_line_1
+
+List
+****
+
+Simple List
+===========
+
+.. lv_example:: widgets/list/lv_example_list_1
+
+Sorting a List using up and down buttons
+========================================
+
+.. lv_example:: widgets/list/lv_example_list_2
+
+Lottie
+******
+
+Load a Lottie animation from an array
+=====================================
+
+.. lv_example:: widgets/lottie/lv_example_lottie_1
+
+Load a Lottie animation from file
+=================================
+
+.. lv_example:: widgets/lottie/lv_example_lottie_2
+
+Menu
+****
+
+Simple Menu
+===========
+
+.. lv_example:: widgets/menu/lv_example_menu_1
+
+Simple Menu with root btn
+=========================
+
+.. lv_example:: widgets/menu/lv_example_menu_2
+
+Simple Menu with custom header
+==============================
+
+.. lv_example:: widgets/menu/lv_example_menu_3
+
+Simple Menu with floating btn to add new menu page
+==================================================
+
+.. lv_example:: widgets/menu/lv_example_menu_4
+
+Complex Menu
+============
+
+.. lv_example:: widgets/menu/lv_example_menu_5
+
+Message Box
+***********
+
+Simple Message box
+==================
+
+.. lv_example:: widgets/msgbox/lv_example_msgbox_1
+
+Scrolling and styled Message box
+================================
+
+.. lv_example:: widgets/msgbox/lv_example_msgbox_2
+
+Roller
+******
+
+Simple Roller
+=============
+
+.. lv_example:: widgets/roller/lv_example_roller_1
+
+Styling the roller
+==================
+
+.. lv_example:: widgets/roller/lv_example_roller_2
+
+add fade mask to roller
+=======================
+
+.. lv_example:: widgets/roller/lv_example_roller_3
+
+Scale
+*****
+
+A simple horizontal scale
+=========================
+
+.. lv_example:: widgets/scale/lv_example_scale_1
+
+An vertical scale with section and custom styling
+=================================================
+
+.. lv_example:: widgets/scale/lv_example_scale_2
+
+A simple round scale
+====================
+
+.. lv_example:: widgets/scale/lv_example_scale_3
+
+A round scale with section and custom styling
+=============================================
+
+.. lv_example:: widgets/scale/lv_example_scale_4
+
+A scale with section and custom styling
+=======================================
+
+.. lv_example:: widgets/scale/lv_example_scale_5
+
+A round scale with multiple needles, resembling a clock
+=======================================================
+
+.. lv_example:: widgets/scale/lv_example_scale_6
+
+Customizing scale major tick label color with `LV_EVENT_DRAW_TASK_ADDED` event
+==============================================================================
+
+.. lv_example:: widgets/scale/lv_example_scale_7
+
+A round scale with labels rotated and translated
+================================================
+
+.. lv_example:: widgets/scale/lv_example_scale_8
+
+A horizontal scale with labels rotated and translated
+=====================================================
+
+.. lv_example:: widgets/scale/lv_example_scale_9
+
+Slider
+******
+
+Simple Slider
+=============
+
+.. lv_example:: widgets/slider/lv_example_slider_1
+
+Slider with custom style
+========================
+
+.. lv_example:: widgets/slider/lv_example_slider_2
+
+Slider with extended drawer
+===========================
+
+.. lv_example:: widgets/slider/lv_example_slider_3
+
+Slider with opposite direction
+==============================
+
+.. lv_example:: widgets/slider/lv_example_slider_4
+
+Span
+****
+
+Span with custom styles
+=======================
+
+.. lv_example:: widgets/span/lv_example_span_1
+
+Spinbox
+*******
+
+Simple Spinbox
+==============
+
+.. lv_example:: widgets/spinbox/lv_example_spinbox_1
+
+Spinner
+*******
+
+Simple spinner
+==============
+
+.. lv_example:: widgets/spinner/lv_example_spinner_1
+
+Switch
+******
+
+Simple Switch
+=============
+
+.. lv_example:: widgets/switch/lv_example_switch_1
+
+Switch Orientation
+==================
+
+.. lv_example:: widgets/switch/lv_example_switch_2
+
+Table
+*****
+
+Simple table
+============
+
+.. lv_example:: widgets/table/lv_example_table_1
+
+Lightweighted list from table
+=============================
+
+.. lv_example:: widgets/table/lv_example_table_2
+
+Tabview
+*******
+
+Simple Tabview
+==============
+
+.. lv_example:: widgets/tabview/lv_example_tabview_1
+
+Tabs on the left, styling and no scrolling
+==========================================
+
+.. lv_example:: widgets/tabview/lv_example_tabview_2
+
+Textarea
+********
+
+Simple Text area
+================
+
+.. lv_example:: widgets/textarea/lv_example_textarea_1
+
+Text area with password field
+=============================
+
+.. lv_example:: widgets/textarea/lv_example_textarea_2
+
+Text auto-formatting
+====================
+
+.. lv_example:: widgets/textarea/lv_example_textarea_3
+
+Tileview
+********
+
+Tileview with content
+=====================
+
+.. lv_example:: widgets/tileview/lv_example_tileview_1
+
+Window
+******
+
+Simple window
+=============
+
+.. lv_example:: widgets/win/lv_example_win_1
+
