@@ -67,14 +67,14 @@ void lv_draw_vg_lite_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t *
 
     vg_lite_matrix_t matrix = u->global_matrix;
 
-    if(dsc->bg_grad.dir != LV_GRAD_DIR_NONE) {
+    if(dsc->grad.dir != LV_GRAD_DIR_NONE) {
 #if LV_USE_VECTOR_GRAPHIC
         lv_vg_lite_draw_grad_helper(
             u,
             &u->target_buffer,
             lv_vg_lite_path_get_path(path),
             &tri_area,
-            &dsc->bg_grad,
+            &dsc->grad,
             &matrix,
             VG_LITE_FILL_EVEN_ODD,
             VG_LITE_BLEND_SRC_OVER);

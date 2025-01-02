@@ -75,8 +75,9 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
 
     lv_draw_task_t * t = lv_draw_add_task(layer, coords);
 
-    t->draw_dsc = lv_malloc(sizeof(*dsc));
-    LV_ASSERT_MALLOC(t->draw_dsc);
+    lv_draw_image_dsc_t * new_image_dsc = lv_malloc(sizeof(*dsc));
+    LV_ASSERT_MALLOC(new_image_dsc);
+    t->draw_dsc = new_image_dsc;
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
     t->type = LV_DRAW_TASK_TYPE_LAYER;
     t->state = LV_DRAW_TASK_STATE_WAITING;
@@ -84,6 +85,11 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
     lv_image_buf_get_transformed_area(&t->_real_area, lv_area_get_width(coords), lv_area_get_height(coords),
                                       dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
     lv_area_move(&t->_real_area, coords->x1, coords->y1);
+
+    /*If the image_area is not set assume that it's the same as the rendering area */
+    if(new_image_dsc->image_area.x2 == LV_COORD_MIN) {
+        new_image_dsc->image_area = *coords;
+    }
 
     lv_layer_t * layer_to_draw = (lv_layer_t *)dsc->src;
     layer_to_draw->all_tasks_added = true;
@@ -180,6 +186,12 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
     }
 
 
+    /*If the image_area is not set assume that it's the same as the rendering area */
+    if(new_image_dsc->image_area.x2 == LV_COORD_MIN) {
+        new_image_dsc->image_area = *coords;
+    }
+
+    lv_draw_finalize_task_creation(layer, t);
     LV_PROFILER_DRAW_END;
 }
 

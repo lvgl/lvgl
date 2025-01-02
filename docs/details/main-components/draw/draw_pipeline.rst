@@ -7,80 +7,87 @@ Drawing Pipeline
 Overview
 --------
 
-LVGL has a flexible and extendable drawing pipeline.  You can hook it to do
-some rendering with a GPU or even completely replace the built-in
-software renderer.
+LVGL has a flexible and extendable drawing pipeline. You can use it to perform
+custom rendering with a GPU or even completely replace the built-in software
+renderer.
 
-By using events, it's also possible to modify `draw_tasks` on insert new ones as LVGL renders the widgets.
+Using events, it's also possible to modify `draw_tasks` or insert new ones as
+LVGL renders widgets.
 
-The followings describe the basics terminology and concept of rendering.
+The following sections describe the basic terminology and concepts of rendering.
 
-Draw task
+Draw Task
 ---------
 
+When functions like :cpp:expr:`lv_draw_rect`, :cpp:expr:`lv_draw_label`, or similar
+are called, LVGL creates a "draw task."
 
-When :cpp:expr:`lv_draw_rect`, :cpp:expr:`lv_draw_label` or similar functions are called
-LVGL creates a so called draw task.
-
-Draw unit
+Draw Unit
 ---------
 
-The draw tasks are collected in a list and periodically dispatched to draw units. A
-draw unit can a CPU core, a GPU, just a new rendering library for certain or all draw tasks,
-or basically anything that can draw somehow.
+The draw tasks are collected in a list and periodically dispatched to draw units.
+A draw unit can represent a CPU core, GPU, custom rendering library for specific
+tasks, or any entity capable of performing rendering.
 
-As a reference draw unit take a look at `lv_draw_sw.c <https://github.com/lvgl/lvgl/blob/master/src/draw/sw/lv_draw_sw.c>`__
+For a reference implementation of a draw unit, see
+`lv_draw_sw.c <https://github.com/lvgl/lvgl/blob/master/src/draw/sw/lv_draw_sw.c>`__.
 
-Draw task evaluation
+Draw Task Evaluation
 --------------------
 
-Different draw units might render slight different output for example for an image transformation or
-a gradient. If such a draw task were assigned to a different draw units, the screen might jitter a
-little bit. To resolve it each draw unit has an ``evaluate_cb`` which is called when a draw task is created.
-Based on the type and parameters of the draw task each draw unit can decide if it want to assign the
-draw task to itself. This way a certain type of draw task (e.g. rounded rectangle with horizontal
-gradient) will be always assigned to the same draw unit. It avoid the above mentioned issue of
-slight difference between draw units.
+Different draw units may render slightly different outputs (e.g., for image
+transformations or gradients). If a draw task is assigned to different draw
+units, the screen might jitter due to these differences.
 
+To address this, each draw unit has an ``evaluate_cb`` function, called when a
+draw task is created. Based on the task's type and parameters, each draw unit
+decides whether to assign the task to itself. This ensures specific types of
+draw tasks (e.g., rounded rectangles with horizontal gradients) are always
+assigned to the same draw unit, avoiding jitter.
 
 Dispatching
 -----------
 
-While collecting draw tasks LVGL frequently tries to dispatch the collected draw tasks to the draw units.
-This handles via the ``dispatch_cb`` of the draw units.
+While collecting draw tasks, LVGL frequently attempts to dispatch the tasks to
+available draw units. This is handled via the ``dispatch_cb`` function of each
+draw unit.
 
-If a draw unit is busy with another draw task, it just returns. However, it is available it can take a draw task.
+If a draw unit is busy, it simply returns. If available, it accepts a draw task.
 
-:cpp:expr:`lv_draw_get_next_available_task(layer, previous_task, draw_unit_id)` is a useful helper function which
-returns an available draw task. "Available draw task" means that, all the draw tasks which should be drawn under a draw task
-are ready and it is assigned to the given draw unit.
+The helper function :cpp:expr:`lv_draw_get_next_available_task(layer, previous_task, draw_unit_id)`
+returns an available draw task. An "available draw task" is one where all
+dependencies (tasks that should be drawn beneath it) are completed and the task
+is assigned to the given draw unit.
 
-
-Hierarchy of modules
+Hierarchy of Modules
 --------------------
 
-All these together looks like this
+The structure of the drawing pipeline is as follows:
 
-- the list of draw units is stpred in a separate list
-- display(s): Each display has a main layer and other layer might be create during rendering
-
-   - layer(s): Each display has its own list of layers. Learn more at :refr:`draw_layers`.
-
-      - draw tasks: Each layer has its own list of draw tasks
+- **Draw Units**: Stored in a separate list.
+- **Displays**: Each display has a main layer, and additional layers may be
+  created during rendering.
+  - **Layers**: Each display maintains a list of layers. See
+    :ref:`draw_layers` for more details.
+    - **Draw Tasks**: Each layer has its own list of draw tasks.
 
 Draw Events
 -----------
 
-LVGL provides two ways to customize the rendering of any widgets:
-- Allow adding custom ``draw_task``s at various stages of rendering. The related event codes are:
+LVGL provides two mechanisms to customize the rendering of widgets:
 
-  - ``LV_EVENT_DRAW_MAIN_BEGIN``, ``LV_EVENT_DRAW_MAIN``, ``LV_EVENT_DRAW_MAIN_END``:
-    Called before, during, or after the widget is drawn. The built-in widget rendering usually happens in ``LV_EVENT_DRAW_MAIN``.
-  - ``LV_EVENT_DRAW_POST_BEGIN``, ``LV_EVENT_DRAW_POST``, ``LV_EVENT_DRAW_POST_END``:
-    Called before, during, or after all the children are rendered to add some overlay-like drawings. For example, scrollbars are rendered here.
+1. **Adding Custom Draw Tasks**:
+   Add custom ``draw_task``s at different rendering stages. Related event codes:
 
-- Modify a ``draw_task`` created by a widget. For this, ``LV_EVENT_DRAW_TASK_ADDED`` can be used.
-  For performance reasons, this event is disabled by default and can be enabled by setting the
-  ``LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS`` flag.
-  A use case for this event is when you want to modify each bar of a bar chart.
+   - ``LV_EVENT_DRAW_MAIN_BEGIN``, ``LV_EVENT_DRAW_MAIN``, ``LV_EVENT_DRAW_MAIN_END``:
+     Triggered before, during, or after a widget is drawn. Built-in widget
+     rendering typically occurs in ``LV_EVENT_DRAW_MAIN``.
+   - ``LV_EVENT_DRAW_POST_BEGIN``, ``LV_EVENT_DRAW_POST``, ``LV_EVENT_DRAW_POST_END``:
+     Triggered before, during, or after all child widgets are rendered. Useful
+     for overlay-like drawings, such as scrollbars.
 
+2. **Modifying Existing Draw Tasks**:
+   Modify a ``draw_task`` created by a widget using the ``LV_EVENT_DRAW_TASK_ADDED``
+   event. For performance reasons, this event is disabled by default. Enable it
+   by setting the ``LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS`` flag.
+   A typical use case is modifying each bar in a bar chart.

@@ -82,7 +82,7 @@ typedef struct {
      * If the gradient is set (grad.dir!=LV_GRAD_DIR_NONE) it's ignored. */
     lv_color_t color;
 
-    /**Describe a gradient.*/
+    /**Describe a gradient. If `grad.dir` is not `LV_GRAD_DIR_NONE` `color` will be ignored*/
     lv_grad_dsc_t grad;
 } lv_draw_fill_dsc_t;
 

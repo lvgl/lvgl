@@ -259,7 +259,6 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_line_dsc_
     draw_dsc->round_start = lv_obj_get_style_line_rounded(obj, part);
     draw_dsc->round_end = draw_dsc->round_start;
 
-    if(part != LV_PART_MAIN) draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
     LV_PROFILER_DRAW_END;
 }
 

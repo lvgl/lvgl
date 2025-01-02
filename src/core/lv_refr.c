@@ -47,6 +47,7 @@ static void refr_configured_layer(lv_layer_t * layer);
 static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj);
 static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj);
 static void refr_obj(lv_layer_t * layer, lv_obj_t * obj);
+static void refr_children_with_clip_corner(lv_obj_t * obj, lv_layer_t * layer, int32_t radius);
 static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h);
 static void draw_buf_flush(lv_display_t * disp);
 static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
@@ -100,7 +101,6 @@ void lv_refr_now(lv_display_t * disp)
 void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
 {
     LV_PROFILER_REFR_BEGIN;
-    lv_area_t clip_area_ori = layer->_clip_area;
     lv_area_t clip_coords_for_obj;
 
     /*Truncate the clip area to `obj size + ext size` area*/
@@ -109,11 +109,13 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     int32_t ext_draw_size = lv_obj_get_ext_draw_size(obj);
     lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
 
-    if(!lv_area_intersect(&clip_coords_for_obj, &clip_area_ori, &obj_coords_ext)) {
+    if(!lv_area_intersect(&clip_coords_for_obj, &layer->_clip_area, &obj_coords_ext)) {
         LV_PROFILER_REFR_END;
         return;
     }
+
     /*If the object is visible on the current clip area*/
+    lv_area_t clip_area_ori = layer->_clip_area;
     layer->_clip_area = clip_coords_for_obj;
 
     lv_obj_send_event(obj, LV_EVENT_DRAW_MAIN_BEGIN, layer);
@@ -179,78 +181,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                 lv_obj_send_event(obj, LV_EVENT_DRAW_POST_END, layer);
             }
             else {
-                lv_layer_t * layer_children;
-                lv_draw_mask_rect_dsc_t mask_draw_dsc;
-                lv_draw_mask_rect_dsc_init(&mask_draw_dsc);
-                mask_draw_dsc.radius = radius;
-                mask_draw_dsc.area = obj->coords;
-
-                lv_draw_image_dsc_t img_draw_dsc;
-                lv_draw_image_dsc_init(&img_draw_dsc);
-
-                int32_t short_side = LV_MIN(lv_area_get_width(&obj->coords), lv_area_get_height(&obj->coords));
-                int32_t rout = LV_MIN(radius, short_side >> 1);
-
-                lv_area_t bottom = obj->coords;
-                bottom.y1 = bottom.y2 - rout + 1;
-                if(lv_area_intersect(&bottom, &bottom, &clip_area_ori)) {
-                    layer_children = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &bottom);
-
-                    for(i = 0; i < child_cnt; i++) {
-                        lv_obj_t * child = obj->spec_attr->children[i];
-                        refr_obj(layer_children, child);
-                    }
-
-                    /*If all the children are redrawn send 'post draw' draw*/
-                    lv_obj_send_event(obj, LV_EVENT_DRAW_POST_BEGIN, layer_children);
-                    lv_obj_send_event(obj, LV_EVENT_DRAW_POST, layer_children);
-                    lv_obj_send_event(obj, LV_EVENT_DRAW_POST_END, layer_children);
-
-                    lv_draw_mask_rect(layer_children, &mask_draw_dsc);
-
-                    img_draw_dsc.src = layer_children;
-                    lv_draw_layer(layer, &img_draw_dsc, &bottom);
-                }
-
-                lv_area_t top = obj->coords;
-                top.y2 = top.y1 + rout - 1;
-                if(lv_area_intersect(&top, &top, &clip_area_ori)) {
-                    layer_children = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &top);
-
-                    for(i = 0; i < child_cnt; i++) {
-                        lv_obj_t * child = obj->spec_attr->children[i];
-                        refr_obj(layer_children, child);
-                    }
-
-                    /*If all the children are redrawn send 'post draw' draw*/
-                    lv_obj_send_event(obj, LV_EVENT_DRAW_POST_BEGIN, layer_children);
-                    lv_obj_send_event(obj, LV_EVENT_DRAW_POST, layer_children);
-                    lv_obj_send_event(obj, LV_EVENT_DRAW_POST_END, layer_children);
-
-                    lv_draw_mask_rect(layer_children, &mask_draw_dsc);
-
-                    img_draw_dsc.src = layer_children;
-                    lv_draw_layer(layer, &img_draw_dsc, &top);
-
-                }
-
-                lv_area_t mid = obj->coords;
-                mid.y1 += rout;
-                mid.y2 -= rout;
-                if(lv_area_intersect(&mid, &mid, &clip_area_ori)) {
-                    layer->_clip_area = mid;
-                    for(i = 0; i < child_cnt; i++) {
-                        lv_obj_t * child = obj->spec_attr->children[i];
-                        refr_obj(layer, child);
-                    }
-
-                    /*If all the children are redrawn make 'post draw' draw*/
-                    lv_obj_send_event(obj, LV_EVENT_DRAW_POST_BEGIN, layer);
-                    lv_obj_send_event(obj, LV_EVENT_DRAW_POST, layer);
-                    lv_obj_send_event(obj, LV_EVENT_DRAW_POST_END, layer);
-
-                }
-
+                refr_children_with_clip_corner(obj, layer, radius);
             }
         }
     }
@@ -1204,6 +1135,75 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 
     /* Restore the original layer opa */
     layer->opa = layer_opa_ori;
+}
+
+static void refr_children_with_clip_corner(lv_obj_t * obj, lv_layer_t * layer, int32_t radius)
+{
+    lv_layer_t * layer_children;
+
+    lv_draw_image_dsc_t img_draw_dsc;
+    lv_draw_image_dsc_init(&img_draw_dsc);
+    img_draw_dsc.image_area = obj->coords;
+    img_draw_dsc.clip_radius = radius;
+
+    int32_t short_side = LV_MIN(lv_area_get_width(&obj->coords), lv_area_get_height(&obj->coords));
+    int32_t rout = LV_MIN(radius, short_side >> 1);
+    uint32_t child_cnt = lv_obj_get_child_count(obj);
+
+    uint32_t i;
+    lv_area_t bottom = obj->coords;
+    bottom.y1 = bottom.y2 - rout + 1;
+    if(lv_area_intersect(&bottom, &bottom, &layer->_clip_area)) {
+        layer_children = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &bottom);
+
+        for(i = 0; i < child_cnt; i++) {
+            lv_obj_t * child = obj->spec_attr->children[i];
+            refr_obj(layer_children, child);
+        }
+
+        /*If all the children are redrawn send 'post draw' draw*/
+        lv_obj_send_event(obj, LV_EVENT_DRAW_POST_BEGIN, layer_children);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_POST, layer_children);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_POST_END, layer_children);
+
+        img_draw_dsc.src = layer_children;
+        lv_draw_layer(layer, &img_draw_dsc, &bottom);
+    }
+
+    lv_area_t top = obj->coords;
+    top.y2 = top.y1 + rout - 1;
+    if(lv_area_intersect(&top, &top, &layer->_clip_area)) {
+        layer_children = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &top);
+
+        for(i = 0; i < child_cnt; i++) {
+            lv_obj_t * child = obj->spec_attr->children[i];
+            refr_obj(layer_children, child);
+        }
+
+        /*If all the children are redrawn send 'post draw' draw*/
+        lv_obj_send_event(obj, LV_EVENT_DRAW_POST_BEGIN, layer_children);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_POST, layer_children);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_POST_END, layer_children);
+
+        img_draw_dsc.src = layer_children;
+        lv_draw_layer(layer, &img_draw_dsc, &top);
+    }
+
+    lv_area_t mid = obj->coords;
+    mid.y1 += rout;
+    mid.y2 -= rout;
+    if(lv_area_intersect(&mid, &mid, &layer->_clip_area)) {
+        layer->_clip_area = mid;
+        for(i = 0; i < child_cnt; i++) {
+            lv_obj_t * child = obj->spec_attr->children[i];
+            refr_obj(layer, child);
+        }
+
+        /*If all the children are redrawn make 'post draw' draw*/
+        lv_obj_send_event(obj, LV_EVENT_DRAW_POST_BEGIN, layer);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_POST, layer);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_POST_END, layer);
+    }
 }
 
 static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)

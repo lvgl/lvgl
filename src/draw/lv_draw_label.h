@@ -34,6 +34,7 @@ typedef struct {
 
     /**The text to draw*/
     const char * text;
+
     /**The font to use. Fallback fonts are also handled.*/
     const lv_font_t * font;
 
@@ -70,7 +71,8 @@ typedef struct {
     /**The number of characters to render. 0: means render until reaching the `\0` termination.*/
     uint32_t text_length;
 
-    /**Opacity of the text*/
+    /**Opacity of the text in 0...255 range.
+     * LV_OPA_TRANSP, LV_OPA_10, LV_OPA_20, .. LV_OPA_COVER can be used as well*/
     lv_opa_t opa;
 
     /**The alignment of the text `LV_TEXT_ALIGN_LEFT/RIGHT/CENTER`*/

@@ -86,7 +86,8 @@ struct _lv_draw_image_dsc_t {
 
     /** Used to indicate the entire original, non-clipped area where the image is to be drawn.
      * This is important for:
-     *  1. Layer rendering, where it might happen that only a smaller area of the layer is rendered.
+     *  1. Layer rendering, where it might happen that only a smaller area of the layer is rendered and e.g.
+     *     `clip_radius` needs to know what the original image was.
      *  2. Tiled images, where the target draw area is larger than the image to be tiled.
      */
     lv_area_t image_area;
