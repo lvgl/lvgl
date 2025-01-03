@@ -40,8 +40,6 @@ typedef int dummy_t;    /* Make GCC on windows happy, avoid empty translation un
 #include <wayland-cursor.h>
 #include <xkbcommon/xkbcommon.h>
 
-#include "lvgl.h"
-
 #if !LV_WAYLAND_WL_SHELL
     #include "wayland_xdg_shell.h"
     #define LV_WAYLAND_XDG_SHELL 1
