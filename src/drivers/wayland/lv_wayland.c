@@ -2175,7 +2175,7 @@ static void _lv_wayland_flush(lv_display_t * disp, const lv_area_t * area, unsig
     int32_t hres;
     int32_t vres;
 
-    window = lv_display_get_user_data(disp);
+    window = lv_display_get_driver_data(disp);
     buf = window->body->pending_buffer;
     src_width = (area->x2 - area->x1 + 1);
     src_height = (area->y2 - area->y1 + 1);
@@ -2335,7 +2335,7 @@ static void _lv_wayland_handle_output(void)
 
 static void _lv_wayland_pointer_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
-    struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
+    struct window * window = lv_display_get_driver_data(lv_indev_get_display(drv));
 
     if(!window || window->closed) {
         return;
@@ -2348,7 +2348,7 @@ static void _lv_wayland_pointer_read(lv_indev_t * drv, lv_indev_data_t * data)
 
 static void _lv_wayland_pointeraxis_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
-    struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
+    struct window * window = lv_display_get_driver_data(lv_indev_get_display(drv));
 
     if(!window || window->closed) {
         return;
@@ -2362,7 +2362,7 @@ static void _lv_wayland_pointeraxis_read(lv_indev_t * drv, lv_indev_data_t * dat
 
 static void _lv_wayland_keyboard_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
-    struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
+    struct window * window = lv_display_get_driver_data(lv_indev_get_display(drv));
     if(!window || window->closed) {
         return;
     }
@@ -2376,7 +2376,7 @@ static void _lv_wayland_keyboard_read(lv_indev_t * drv, lv_indev_data_t * data)
 static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
 
-    struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
+    struct window * window = lv_display_get_driver_data(lv_indev_get_display(drv));
     lv_indev_gesture_recognizer_t * recognizer;
 
     if(!window || window->closed) {
@@ -2605,7 +2605,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     lv_display_set_draw_buffers(window->lv_disp, window->lv_disp_draw_buf, NULL);
     lv_display_set_render_mode(window->lv_disp, LV_DISPLAY_RENDER_MODE_PARTIAL);
     lv_display_set_flush_cb(window->lv_disp, _lv_wayland_flush);
-    lv_display_set_user_data(window->lv_disp, window);
+    lv_display_set_driver_data(window->lv_disp, window);
 
     /* Register input */
     window->lv_indev_pointer = lv_indev_create();
@@ -2657,7 +2657,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
  */
 void lv_wayland_window_close(lv_display_t * disp)
 {
-    struct window * window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_driver_data(disp);
     if(!window || window->closed) {
         return;
     }
@@ -2685,7 +2685,7 @@ bool lv_wayland_window_is_open(lv_display_t * disp)
         }
     }
     else {
-        window = lv_display_get_user_data(disp);
+        window = lv_display_get_driver_data(disp);
         open = (!window->closed);
     }
 
@@ -2700,7 +2700,7 @@ bool lv_wayland_window_is_open(lv_display_t * disp)
  */
 void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximized)
 {
-    struct window * window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_driver_data(disp);
     if(!window || window->closed) {
         return;
     }
@@ -2745,7 +2745,7 @@ void lv_wayland_window_set_maximized(lv_display_t * disp, bool maximized)
  */
 void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen)
 {
-    struct window * window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_driver_data(disp);
     if(!window || window->closed) {
         return;
     }
@@ -2793,7 +2793,7 @@ void lv_wayland_window_set_fullscreen(lv_display_t * disp, bool fullscreen)
  */
 lv_indev_t * lv_wayland_get_pointer(lv_display_t * disp)
 {
-    struct window * window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_driver_data(disp);
     if(!window) {
         return NULL;
     }
@@ -2807,7 +2807,7 @@ lv_indev_t * lv_wayland_get_pointer(lv_display_t * disp)
  */
 lv_indev_t * lv_wayland_get_pointeraxis(lv_display_t * disp)
 {
-    struct window * window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_driver_data(disp);
     if(!window) {
         return NULL;
     }
@@ -2821,7 +2821,7 @@ lv_indev_t * lv_wayland_get_pointeraxis(lv_display_t * disp)
  */
 lv_indev_t * lv_wayland_get_keyboard(lv_display_t * disp)
 {
-    struct window * window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_driver_data(disp);
     if(!window) {
         return NULL;
     }
@@ -2835,7 +2835,7 @@ lv_indev_t * lv_wayland_get_keyboard(lv_display_t * disp)
  */
 lv_indev_t * lv_wayland_get_touchscreen(lv_display_t * disp)
 {
-    struct window * window = lv_display_get_user_data(disp);
+    struct window * window = lv_display_get_driver_data(disp);
     if(!window) {
         return NULL;
     }
