@@ -1,12 +1,61 @@
 .. _draw_layers:
 
-================
+===========
 Draw Layers
-================
+===========
 
 A layer is a buffer with a specified area where rendering occurs. Each display
 has a "main" layer, but additional layers may be created internally during
 rendering to handle tasks such as widget transformations.
+
+Getting the current layer
+-------------------------
+
+The first parameter of the ``lv_draw_rect/label/etc`` functions is a layer.
+
+In most of the cases a layer is not created, but an existing layer is used
+to draw there.
+
+The draw API can be used in these cases and the current layer can be get differently in each case:
+
+1. **In draw events**:
+   In ``LV_EVENT_DRAW_MAIN/POST_BEGIN/...`` events the widget is being rendered to a
+   the layer of the display or an other temporal layer created earlier during rendering.
+   The current target layer can be get by :cpp:expr:`lv_event_get_layer(e)`.
+
+   It also possible to create new layers in these events but the previous layer is
+   also required as is will be parent layer in :cpp:expr:`lv_draw_layer`.
+
+2. **Modifying the created Draw Tasks**:
+   In :cpp:enumerator:`LV_EVENT_DRAW_TASK_ADDED` the draw tasks creatd by
+   ``lv_draw_rect/label/etc`` can be modified. It's not required to know the current
+   layer to modify a draw task. However, if something new also needs to be drawn with
+   ``lv_draw_rect/label/etc`` the current layer
+   is also required.
+
+   The current layer can be read from the ``base`` draw descriptor. For example:
+
+.. code-block:: c
+
+   /* In LV_EVENT_DRAW_TASK_ADDED */
+   lv_draw_task_t * t = lv_event_get_draw_task(e);
+   lv_draw_base_dsc_t * draw_dsc = lv_draw_task_get_draw_dsc(t);
+
+   lv_layer_t * current_layer = draw_dsc.layer;
+
+3. **Draw to the canvas widget**
+  The canvas itself doesn't store a layer, but one can be easily created and used like this:
+
+.. code-block:: c
+
+    /*Initialize a layer*/
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+
+    /*Draw something here*/
+
+    /*Wait until the rendering is ready*/
+    lv_canvas_finish_layer(canvas, &layer);
 
 Creating a New Layer
 --------------------
@@ -14,41 +63,39 @@ Creating a New Layer
 To create a new layer, use :cpp:func:`lv_draw_layer_create`:
 
 .. code-block:: c
+
    lv_area_t layer_area = {10, 10, 80, 50}; /* Area of the new layer */
    lv_layer_t * new_layer = lv_draw_layer_create(parent_layer, LV_COLOR_FORMAT_RGB565, &layer_area);
 
-Once the layer is created, draw tasks can be added to it.
-(See details in :ref:`draw_descriptors`.)
-
-.. code-block:: c
-    lv_draw_rect_dsc_t rect_draw_dsc;
-    lv_draw_rect_dsc_init(&rect_draw_dsc);
-    rect_draw_dsc.bg_color = lv_palette_main(LV_PALETTE_RED);
-    rect_draw_dsc.radius = 5;
-
-    lv_area_t rect_area = {15, 15, 70, 40};
-    lv_draw_rect(new_layer, &rect_draw_dsc, &rect_area);
+Once the layer is created, draw tasks can be added to it
+by using the :ref:`Draw API <draw_api>` and :ref:`Draw descriptors <draw_descriptors>`.
+Practically it means calling the ``lv_draw_rect/label/etc`` functions.
 
 Finally, the layer must be rendered to its parent layer. Since a layer behaves
 similarly to an image, it can be rendered the same way as images:
 
 .. code-block:: c
+
     lv_draw_image_dsc_t image_draw_dsc;
     lv_draw_image_dsc_init(&image_draw_dsc);
-    lv_draw_layer(new_layer, &image_draw_dsc, &layer_area);
+    image_draw_dsc.src = new_layer; /*The source image is the new layer*/
+    /*Draw the new layer to the parent layer*/
+    lv_draw_layer(parent_layer, &image_draw_dsc, &layer_area);
+
+Memory Considerations
+---------------------
 
 Layer Buffers
--------------
+^^^^^^^^^^^^^
 
 The buffer for a layer (where rendering occurs) is not allocated at creation.
 Instead, it is allocated by draw units when the first draw task is dispatched.
 
-**Memory Considerations**:
 Layer buffers can be large, so ensure sufficient heap memory or increase
 ``LV_MEM_SIZE`` in the configuration.
 
 Layer Types
------------
+^^^^^^^^^^^
 
 To save memory, LVGL can render certain types of layers in smaller chunks:
 
@@ -65,7 +112,7 @@ To save memory, LVGL can render certain types of layers in smaller chunks:
    a buffer large enough to render the entire transformed area without limits.
 
 Memory Limit for Layers
------------------------
+^^^^^^^^^^^^^^^^^^^^^^^
 
 The total memory available for layers at once is controlled by
 ``LV_DRAW_LAYER_MAX_MEMORY``. If set to `0`, there is no limit.
