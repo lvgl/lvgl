@@ -187,13 +187,14 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
 
     /* If clipping is not required, blit directly */
     if(lv_area_is_in(&image_area, u->base_unit.clip_area, false)) {
-        /* The image area is the coordinates relative to the image itself */
-        lv_area_t src_area = image_area;
-        lv_area_move(&src_area, -image_area.x1, -image_area.y1);
-
         /* rect is used to crop the pixel-aligned padding area */
-        vg_lite_rectangle_t rect;
-        lv_vg_lite_rect(&rect, &src_area);
+        vg_lite_rectangle_t rect = {
+            .x = 0,
+            .y = 0,
+            .width = lv_area_get_width(&image_area),
+            .height = lv_area_get_height(&image_area)
+        };
+
         LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_blit_rect");
         LV_VG_LITE_CHECK_ERROR(vg_lite_blit_rect(
                                    &u->target_buffer,

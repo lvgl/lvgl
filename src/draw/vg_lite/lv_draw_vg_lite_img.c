@@ -106,13 +106,13 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
 
     /* If clipping is not required, blit directly */
     if(lv_area_is_in(&image_tf_area, draw_unit->clip_area, false) && dsc->clip_radius <= 0) {
-        /* The image area is the coordinates relative to the image itself */
-        lv_area_t src_area = *coords;
-        lv_area_move(&src_area, -coords->x1, -coords->y1);
-
         /* rect is used to crop the pixel-aligned padding area */
-        vg_lite_rectangle_t rect;
-        lv_vg_lite_rect(&rect, &src_area);
+        vg_lite_rectangle_t rect = {
+            .x = 0,
+            .y = 0,
+            .width = lv_area_get_width(coords),
+            .height = lv_area_get_height(coords),
+        };
 
         LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_blit_rect");
         LV_VG_LITE_CHECK_ERROR(vg_lite_blit_rect(

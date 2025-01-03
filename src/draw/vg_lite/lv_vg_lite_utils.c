@@ -867,11 +867,6 @@ void lv_vg_lite_rect(vg_lite_rectangle_t * rect, const lv_area_t * area)
     rect->height = lv_area_get_height(area);
 }
 
-void lv_vg_lite_matrix(vg_lite_matrix_t * dest, const lv_matrix_t * src)
-{
-    lv_memcpy(dest, src, sizeof(lv_matrix_t));
-}
-
 uint32_t lv_vg_lite_get_palette_size(vg_lite_buffer_format_t format)
 {
     uint32_t size = 0;
@@ -1149,7 +1144,7 @@ void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_
     }
 
     /* Copy temporary matrix into result. */
-    lv_memcpy(matrix, &temp, sizeof(temp));
+    *matrix = temp;
 }
 
 bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix)
