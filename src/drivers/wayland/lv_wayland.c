@@ -248,6 +248,7 @@ struct window {
  *   STATIC VARIABLES and FUNCTIONS
  *********************************/
 
+bool is_wayland_inited = false;
 static struct application application;
 
 static void color_fill(void * pixels, lv_color_t color, uint32_t width, uint32_t height);
@@ -263,7 +264,6 @@ static struct graphic_object * create_graphic_obj(struct application * app, stru
 static uint32_t tick_get_cb(void);
 
 static void wayland_init(void);
-static void wayland_deinit(void);
 
 /**
  * The frame callback called when the compositor has finished rendering
@@ -1953,7 +1953,9 @@ static bool resize_window(struct window * window, int width, int height)
 
     bpp = lv_color_format_get_size(LV_COLOR_FORMAT_NATIVE);
 
-    /* Update size for newly allocated buffers */
+    /* Update size for newly allocated buffers and return if it is negative*/
+    if(((width * bpp) * height) * 2 < 0) return false;
+
     smm_resize(window->body->buffer_group, ((width * bpp) * height) * 2);
 
     window->body->width = width;
@@ -2007,10 +2009,9 @@ static bool resize_window(struct window * window, int width, int height)
         stride = lv_draw_buf_width_to_stride(width,
                                              lv_display_get_color_format(window->lv_disp));
 
-        window->lv_disp_draw_buf = lv_draw_buf_reshape(
-                                       window->lv_disp_draw_buf,
-                                       lv_display_get_color_format(window->lv_disp),
-                                       width, height / LVGL_DRAW_BUFFER_DIV, stride);
+        lv_draw_buf_reshape(window->lv_disp_draw_buf,
+                            lv_display_get_color_format(window->lv_disp),
+                            width, height / LVGL_DRAW_BUFFER_DIV, stride);
 
         lv_display_set_resolution(window->lv_disp, width, height);
 
@@ -2409,125 +2410,128 @@ static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
  */
 static void wayland_init(void)
 {
-    struct smm_events evs = {
-        NULL,
-        sme_new_pool,
-        sme_expand_pool,
-        sme_free_pool,
-        sme_new_buffer,
-        sme_init_buffer,
-        sme_free_buffer
-    };
+    if(is_wayland_inited != true){
+        struct smm_events evs = {
+            NULL,
+            sme_new_pool,
+            sme_expand_pool,
+            sme_free_pool,
+            sme_new_buffer,
+            sme_init_buffer,
+            sme_free_buffer
+        };
 
-    application.xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
-    LV_ASSERT_MSG(application.xdg_runtime_dir, "cannot get XDG_RUNTIME_DIR");
+        application.xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
+        LV_ASSERT_MSG(application.xdg_runtime_dir, "cannot get XDG_RUNTIME_DIR");
 
-    // Create XKB context
-    application.xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
-    LV_ASSERT_MSG(application.xkb_context, "failed to create XKB context");
-    if(application.xkb_context == NULL) {
-        return;
+        // Create XKB context
+        application.xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
+        LV_ASSERT_MSG(application.xkb_context, "failed to create XKB context");
+        if(application.xkb_context == NULL) {
+            return;
+        }
+
+        // Connect to Wayland display
+        application.display = wl_display_connect(NULL);
+        LV_ASSERT_MSG(application.display, "failed to connect to Wayland server");
+        if(application.display == NULL) {
+            return;
+        }
+
+        /* Add registry listener and wait for registry reception */
+        application.shm_format = SHM_FORMAT_UNKNOWN;
+        application.registry = wl_display_get_registry(application.display);
+        wl_registry_add_listener(application.registry, &registry_listener, &application);
+        wl_display_dispatch(application.display);
+        wl_display_roundtrip(application.display);
+
+        LV_ASSERT_MSG(application.compositor, "Wayland compositor not available");
+        if(application.compositor == NULL) {
+            return;
+        }
+
+        LV_ASSERT_MSG(application.shm, "Wayland SHM not available");
+        if(application.shm == NULL) {
+            return;
+        }
+
+        LV_ASSERT_MSG((application.shm_format != SHM_FORMAT_UNKNOWN), "WL_SHM_FORMAT not available");
+        if(application.shm_format == SHM_FORMAT_UNKNOWN) {
+            LV_LOG_TRACE("Unable to match a suitable SHM format for selected LVGL color depth");
+            return;
+        }
+
+        smm_init(&evs);
+        smm_setctx(&application);
+
+    #ifdef LV_WAYLAND_WINDOW_DECORATIONS
+        const char * env_disable_decorations = getenv("LV_WAYLAND_DISABLE_WINDOWDECORATION");
+        application.opt_disable_decorations = ((env_disable_decorations != NULL) &&
+                                            (env_disable_decorations[0] != '0'));
+    #endif
+
+        lv_ll_init(&application.window_ll, sizeof(struct window));
+
+        lv_tick_set_cb(tick_get_cb);
+
+        /* Used to wait for events when the window is minimized or hidden */
+        application.wayland_pfd.fd = wl_display_get_fd(application.display);
+        application.wayland_pfd.events = POLLIN;
+
+        is_wayland_inited = true;
     }
-
-    // Connect to Wayland display
-    application.display = wl_display_connect(NULL);
-    LV_ASSERT_MSG(application.display, "failed to connect to Wayland server");
-    if(application.display == NULL) {
-        return;
-    }
-
-    /* Add registry listener and wait for registry reception */
-    application.shm_format = SHM_FORMAT_UNKNOWN;
-    application.registry = wl_display_get_registry(application.display);
-    wl_registry_add_listener(application.registry, &registry_listener, &application);
-    wl_display_dispatch(application.display);
-    wl_display_roundtrip(application.display);
-
-    LV_ASSERT_MSG(application.compositor, "Wayland compositor not available");
-    if(application.compositor == NULL) {
-        return;
-    }
-
-    LV_ASSERT_MSG(application.shm, "Wayland SHM not available");
-    if(application.shm == NULL) {
-        return;
-    }
-
-    LV_ASSERT_MSG((application.shm_format != SHM_FORMAT_UNKNOWN), "WL_SHM_FORMAT not available");
-    if(application.shm_format == SHM_FORMAT_UNKNOWN) {
-        LV_LOG_TRACE("Unable to match a suitable SHM format for selected LVGL color depth");
-        return;
-    }
-
-    smm_init(&evs);
-    smm_setctx(&application);
-
-#ifdef LV_WAYLAND_WINDOW_DECORATIONS
-    const char * env_disable_decorations = getenv("LV_WAYLAND_DISABLE_WINDOWDECORATION");
-    application.opt_disable_decorations = ((env_disable_decorations != NULL) &&
-                                           (env_disable_decorations[0] != '0'));
-#endif
-
-    lv_ll_init(&application.window_ll, sizeof(struct window));
-
-    lv_tick_set_cb(tick_get_cb);
-
-    /* Used to wait for events when the window is minimized or hidden */
-    application.wayland_pfd.fd = wl_display_get_fd(application.display);
-    application.wayland_pfd.events = POLLIN;
-
 }
 
 /**
  * De-initialize Wayland driver
  */
-static void wayland_deinit(void)
-{
-    struct window * window = NULL;
-
-    LV_LL_READ(&application.window_ll, window) {
-        if(!window->closed) {
-            destroy_window(window);
-        }
-    }
-
-    smm_deinit();
-
-    if(application.shm) {
-        wl_shm_destroy(application.shm);
-    }
-
-#if LV_WAYLAND_XDG_SHELL
-    if(application.xdg_wm) {
-        xdg_wm_base_destroy(application.xdg_wm);
-    }
-#endif
-
-#if LV_WAYLAND_WL_SHELL
-    if(application.wl_shell) {
-        wl_shell_destroy(application.wl_shell);
-    }
-#endif
-
-    if(application.wl_seat) {
-        wl_seat_destroy(application.wl_seat);
-    }
-
-    if(application.subcompositor) {
-        wl_subcompositor_destroy(application.subcompositor);
-    }
-
-    if(application.compositor) {
-        wl_compositor_destroy(application.compositor);
-    }
-
-    wl_registry_destroy(application.registry);
-    wl_display_flush(application.display);
-    wl_display_disconnect(application.display);
-
-    lv_ll_clear(&application.window_ll);
-
-}
+// void lv_wayland_deinit(void)
+// {
+//     struct window * window = NULL;
+//
+//     LV_LL_READ(&application.window_ll, window) {
+//         if(!window->closed) {
+//             destroy_window(window);
+//         }
+//     }
+//
+//     smm_deinit();
+//
+//     if(application.shm) {
+//         wl_shm_destroy(application.shm);
+//     }
+//
+// #if LV_WAYLAND_XDG_SHELL
+//     if(application.xdg_wm) {
+//         xdg_wm_base_destroy(application.xdg_wm);
+//     }
+// #endif
+//
+// #if LV_WAYLAND_WL_SHELL
+//     if(application.wl_shell) {
+//         wl_shell_destroy(application.wl_shell);
+//     }
+// #endif
+//
+//     if(application.wl_seat) {
+//         wl_seat_destroy(application.wl_seat);
+//     }
+//
+//     if(application.subcompositor) {
+//         wl_subcompositor_destroy(application.subcompositor);
+//     }
+//
+//     if(application.compositor) {
+//         wl_compositor_destroy(application.compositor);
+//     }
+//
+//     wl_registry_destroy(application.registry);
+//     wl_display_flush(application.display);
+//     wl_display_disconnect(application.display);
+//
+//     lv_ll_clear(&application.window_ll);
+//
+// }
 
 static uint32_t tick_get_cb(void)
 {
@@ -2662,8 +2666,7 @@ void lv_wayland_window_close(lv_display_t * disp)
         return;
     }
     window->shall_close = true;
-    window->close_cb = NULL;
-    wayland_deinit();
+    // window->close_cb = NULL;
 }
 
 /**
@@ -2890,9 +2893,9 @@ bool lv_wayland_timer_handler(void)
         }
         else if(window->shall_close == true) {
 
-            /* Destroy graphical context and execute close_cb */
+            /*execute close_cb*/
             _lv_wayland_handle_output();
-            wayland_deinit();
+
             return false;
         }
     }
