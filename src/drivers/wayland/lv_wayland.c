@@ -2464,11 +2464,11 @@ static void wayland_init(void)
         smm_setctx(&application);
 
 
-    #ifdef LV_WAYLAND_WINDOW_DECORATIONS
+#ifdef LV_WAYLAND_WINDOW_DECORATIONS
         const char * env_disable_decorations = getenv("LV_WAYLAND_DISABLE_WINDOWDECORATION");
         application.opt_disable_decorations = ((env_disable_decorations != NULL) &&
-                                            (env_disable_decorations[0] != '0'));
-    #endif
+                                               (env_disable_decorations[0] != '0'));
+#endif
 
         lv_ll_init(&application.window_ll, sizeof(struct window));
 
