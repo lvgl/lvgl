@@ -67,27 +67,8 @@ The structure of the drawing pipeline is as follows:
 - **Draw Units**: Stored in a separate list.
 - **Displays**: Each display has a main layer, and additional layers may be
   created during rendering.
-  - **Layers**: Each display maintains a list of layers. See
+
+  - **Draw Layers**: Each display maintains a list of layers. See
     :ref:`draw_layers` for more details.
+
     - **Draw Tasks**: Each layer has its own list of draw tasks.
-
-Draw Events
------------
-
-LVGL provides two mechanisms to customize the rendering of widgets:
-
-1. **Adding Custom Draw Tasks**:
-   Add custom ``draw_task``s at different rendering stages. Related event codes:
-
-   - ``LV_EVENT_DRAW_MAIN_BEGIN``, ``LV_EVENT_DRAW_MAIN``, ``LV_EVENT_DRAW_MAIN_END``:
-     Triggered before, during, or after a widget is drawn. Built-in widget
-     rendering typically occurs in ``LV_EVENT_DRAW_MAIN``.
-   - ``LV_EVENT_DRAW_POST_BEGIN``, ``LV_EVENT_DRAW_POST``, ``LV_EVENT_DRAW_POST_END``:
-     Triggered before, during, or after all child widgets are rendered. Useful
-     for overlay-like drawings, such as scrollbars.
-
-2. **Modifying Existing Draw Tasks**:
-   Modify a ``draw_task`` created by a widget using the ``LV_EVENT_DRAW_TASK_ADDED``
-   event. For performance reasons, this event is disabled by default. Enable it
-   by setting the ``LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS`` flag.
-   A typical use case is modifying each bar in a bar chart.
