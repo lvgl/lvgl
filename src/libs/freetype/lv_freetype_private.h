@@ -15,12 +15,12 @@ extern "C" {
  *********************/
 
 #include "lv_freetype.h"
-#include "../../misc/cache/lv_cache.h"
-#include "../../misc/lv_ll.h"
-#include "../../font/lv_font.h"
 
 #if LV_USE_FREETYPE
 
+#include "../../misc/cache/lv_cache.h"
+#include "../../misc/lv_ll.h"
+#include "../../font/lv_font.h"
 #include "ft2build.h"
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
