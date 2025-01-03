@@ -158,7 +158,6 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
             lv_obj_send_event(obj, LV_EVENT_DRAW_POST_END, layer);
         }
         else {
-            lv_event_get_l
             layer->_clip_area = clip_coords_for_children;
             bool clip_corner = lv_obj_get_style_clip_corner(obj, LV_PART_MAIN);
 
