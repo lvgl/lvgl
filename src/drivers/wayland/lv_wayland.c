@@ -2411,7 +2411,7 @@ static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
 static void wayland_init(void)
 {
 
-    if(is_wayland_inited != true){
+    if(is_wayland_inited != true) {
         struct smm_events evs = {
             NULL,
             sme_new_pool,
