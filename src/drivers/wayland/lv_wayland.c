@@ -2410,6 +2410,7 @@ static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
  */
 static void wayland_init(void)
 {
+
     if(is_wayland_inited != true){
         struct smm_events evs = {
             NULL,
@@ -2463,6 +2464,7 @@ static void wayland_init(void)
 
         smm_init(&evs);
         smm_setctx(&application);
+
 
     #ifdef LV_WAYLAND_WINDOW_DECORATIONS
         const char * env_disable_decorations = getenv("LV_WAYLAND_DISABLE_WINDOWDECORATION");
