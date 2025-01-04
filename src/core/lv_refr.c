@@ -1103,18 +1103,16 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
     lv_opa_t opa = lv_obj_get_style_opa_layered(obj, 0);
     if(opa < LV_OPA_MIN) return;
 
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-    /*If the layer opa is full then use the matrix transform*/
-    if(opa >= LV_OPA_MAX && !refr_check_obj_clip_overflow(layer, obj)) {
-        refr_obj_matrix(layer, obj);
-        return;
-    }
-#endif /* LV_DRAW_TRANSFORM_USE_MATRIX */
-
     lv_layer_type_t layer_type = lv_obj_get_layer_type(obj);
     if(layer_type == LV_LAYER_TYPE_NONE) {
         lv_obj_redraw(layer, obj);
     }
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    /*If the layer opa is full then use the matrix transform*/
+    else if(opa >= LV_OPA_MAX && !refr_check_obj_clip_overflow(layer, obj)) {
+        refr_obj_matrix(layer, obj);
+    }
+#endif /* LV_DRAW_TRANSFORM_USE_MATRIX */
     else {
         lv_area_t layer_area_full;
         lv_area_t obj_draw_size;
