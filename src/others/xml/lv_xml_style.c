@@ -39,11 +39,16 @@
  *      MACROS
  **********************/
 
+/*Expands to e.g.
+  if(lv_streq(name, "height")) lv_style_set_height(style, lv_xml_to_size(value));
+ */
+#define SET_STYLE_IF(prop, value) if(lv_streq(name, #prop)) lv_style_set_##prop(style, value)
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_state_t lv_xml_style_state_string_to_enum_value(const char * txt)
+lv_state_t lv_xml_style_state_to_enum(const char * txt)
 {
     if(lv_streq("default", txt)) return LV_STATE_DEFAULT;
     else if(lv_streq("pressed", txt)) return LV_STATE_PRESSED;
@@ -58,7 +63,7 @@ lv_state_t lv_xml_style_state_string_to_enum_value(const char * txt)
     return 0; /*Return 0 in lack of a better option. */
 }
 
-lv_part_t lv_xml_style_part_string_to_enum_value(const char * txt)
+lv_part_t lv_xml_style_part_to_enum(const char * txt)
 {
     if(lv_streq("main", txt)) return LV_PART_MAIN;
     else if(lv_streq("scrollbar", txt)) return LV_PART_SCROLLBAR;
@@ -104,58 +109,125 @@ void lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs)
             }
         }
 
-        if(lv_streq(name, "width")) lv_style_set_width(style, lv_xml_to_size(value));
-        else if(lv_streq(name, "height")) lv_style_set_height(style, lv_xml_to_size(value));
-        else if(lv_streq(name, "radius")) lv_style_set_radius(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "pad_left")) lv_style_set_pad_left(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "pad_right")) lv_style_set_pad_right(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "pad_top")) lv_style_set_pad_top(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "pad_bottom")) lv_style_set_pad_bottom(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "pad_hor")) lv_style_set_pad_hor(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "pad_ver")) lv_style_set_pad_ver(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "pad_all")) lv_style_set_pad_all(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "pad_row")) lv_style_set_pad_row(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "pad_column")) lv_style_set_pad_column(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "pad_gap")) lv_style_set_pad_gap(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "margin_left")) lv_style_set_margin_left(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "margin_right")) lv_style_set_margin_right(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "margin_top")) lv_style_set_margin_top(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "margin_bottom")) lv_style_set_margin_bottom(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "margin_hor")) lv_style_set_margin_hor(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "margin_ver")) lv_style_set_margin_ver(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "margin_all")) lv_style_set_margin_all(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "bg_opa")) lv_style_set_bg_opa(style, lv_xml_to_opa(value));
-        else if(lv_streq(name, "bg_color")) lv_style_set_bg_color(style, lv_xml_to_color(value));
-        else if(lv_streq(name, "bg_image_src")) lv_style_set_bg_image_src(style, lv_xml_get_image(value));
-        else if(lv_streq(name, "bg_image_tiled")) lv_style_set_bg_image_tiled(style, lv_xml_to_bool(value));
-        else if(lv_streq(name, "border_color")) lv_style_set_border_color(style, lv_xml_to_color(value));
-        else if(lv_streq(name, "border_width")) lv_style_set_border_width(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "border_opa")) lv_style_set_border_opa(style, lv_xml_to_opa(value));
-        else if(lv_streq(name, "outline_color")) lv_style_set_outline_color(style, lv_xml_to_color(value));
-        else if(lv_streq(name, "outline_width")) lv_style_set_outline_width(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "outline_opa")) lv_style_set_outline_opa(style, lv_xml_to_opa(value));
-        else if(lv_streq(name, "outline_pad")) lv_style_set_outline_pad(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "shadow_width")) lv_style_set_shadow_width(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "shadow_color")) lv_style_set_shadow_color(style, lv_xml_to_color(value));
-        else if(lv_streq(name, "shadow_offset_x")) lv_style_set_shadow_offset_x(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "shadow_offset_y")) lv_style_set_shadow_offset_y(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "shadow_spread")) lv_style_set_shadow_spread(style, lv_xml_atoi(value));
-        else if(lv_streq(name, "shadow_opa")) lv_style_set_shadow_opa(style, lv_xml_to_opa(value));
 
-        else if(lv_streq(name, "text_color")) lv_style_set_text_color(style, lv_xml_to_color(value));
-        else if(lv_streq(name, "text_font")) lv_style_set_text_font(style, lv_xml_get_font(value));
-        else if(lv_streq(name, "text_opa")) lv_style_set_text_opa(style, lv_xml_to_opa(value));
-        else if(lv_streq(name, "text_align")) lv_style_set_text_align(style, lv_xml_text_align_string_to_enum_value(value));
-        else if(lv_streq(name, "layout")) lv_style_set_layout(style, lv_xml_layout_string_to_enum_value(value));
-        else if(lv_streq(name, "flex_flow")) lv_style_set_flex_flow(style, lv_xml_flex_flow_string_to_enum_value(value));
-        else if(lv_streq(name, "flex_main_place")) lv_style_set_flex_main_place(style,
-                                                                                    lv_xml_flex_align_string_to_enum_value(value));
-        else if(lv_streq(name, "flex_cross_place")) lv_style_set_flex_cross_place(style,
-                                                                                      lv_xml_flex_align_string_to_enum_value(value));
-        else if(lv_streq(name, "flex_track_place")) lv_style_set_flex_track_place(style,
-                                                                                      lv_xml_flex_align_string_to_enum_value(value));
+        SET_STYLE_IF(width, lv_xml_to_size(value));
+        else SET_STYLE_IF(height, lv_xml_to_size(value));
+        else SET_STYLE_IF(length, lv_xml_to_size(value));
+        else SET_STYLE_IF(radius, lv_xml_to_size(value));
 
+        else SET_STYLE_IF(pad_left, lv_xml_atoi(value));
+        else SET_STYLE_IF(pad_right, lv_xml_atoi(value));
+        else SET_STYLE_IF(pad_top, lv_xml_atoi(value));
+        else SET_STYLE_IF(pad_bottom, lv_xml_atoi(value));
+        else SET_STYLE_IF(pad_hor, lv_xml_atoi(value));
+        else SET_STYLE_IF(pad_ver, lv_xml_atoi(value));
+        else SET_STYLE_IF(pad_all, lv_xml_atoi(value));
+        else SET_STYLE_IF(pad_row, lv_xml_atoi(value));
+        else SET_STYLE_IF(pad_column, lv_xml_atoi(value));
+        else SET_STYLE_IF(pad_gap, lv_xml_atoi(value));
+        else SET_STYLE_IF(pad_radial, lv_xml_atoi(value));
 
+        else SET_STYLE_IF(margin_left, lv_xml_atoi(value));
+        else SET_STYLE_IF(margin_right, lv_xml_atoi(value));
+        else SET_STYLE_IF(margin_top, lv_xml_atoi(value));
+        else SET_STYLE_IF(margin_bottom, lv_xml_atoi(value));
+        else SET_STYLE_IF(margin_hor, lv_xml_atoi(value));
+        else SET_STYLE_IF(margin_ver, lv_xml_atoi(value));
+        else SET_STYLE_IF(margin_all, lv_xml_atoi(value));
+
+        else SET_STYLE_IF(base_dir, lv_xml_base_dir_to_enum(value));
+        else SET_STYLE_IF(clip_corner, lv_xml_to_bool(value));
+
+        else SET_STYLE_IF(bg_opa, lv_xml_to_opa(value));
+        else SET_STYLE_IF(bg_color, lv_xml_to_color(value));
+        else SET_STYLE_IF(bg_grad_dir, lv_xml_grad_dir_to_enum(value));
+        else SET_STYLE_IF(bg_grad_color, lv_xml_to_color(value));
+        else SET_STYLE_IF(bg_main_stop, lv_xml_atoi(value));
+        else SET_STYLE_IF(bg_grad_stop, lv_xml_atoi(value));
+
+        else SET_STYLE_IF(bg_image_src, lv_xml_get_image(value));
+        else SET_STYLE_IF(bg_image_tiled, lv_xml_to_bool(value));
+        else SET_STYLE_IF(bg_image_recolor, lv_xml_to_color(value));
+        else SET_STYLE_IF(bg_image_recolor_opa, lv_xml_to_opa(value));
+
+        else SET_STYLE_IF(border_color, lv_xml_to_color(value));
+        else SET_STYLE_IF(border_width, lv_xml_atoi(value));
+        else SET_STYLE_IF(border_opa, lv_xml_to_opa(value));
+        else SET_STYLE_IF(border_side, lv_xml_border_side_to_enum(value));
+        else SET_STYLE_IF(border_post, lv_xml_to_bool(value));
+
+        else SET_STYLE_IF(outline_color, lv_xml_to_color(value));
+        else SET_STYLE_IF(outline_width, lv_xml_atoi(value));
+        else SET_STYLE_IF(outline_opa, lv_xml_to_opa(value));
+        else SET_STYLE_IF(outline_pad, lv_xml_atoi(value));
+
+        else SET_STYLE_IF(shadow_width, lv_xml_atoi(value));
+        else SET_STYLE_IF(shadow_color, lv_xml_to_color(value));
+        else SET_STYLE_IF(shadow_offset_x, lv_xml_atoi(value));
+        else SET_STYLE_IF(shadow_offset_y, lv_xml_atoi(value));
+        else SET_STYLE_IF(shadow_spread, lv_xml_atoi(value));
+        else SET_STYLE_IF(shadow_opa, lv_xml_to_opa(value));
+
+        else SET_STYLE_IF(text_color, lv_xml_to_color(value));
+        else SET_STYLE_IF(text_font, lv_xml_get_font(value));
+        else SET_STYLE_IF(text_opa, lv_xml_to_opa(value));
+        else SET_STYLE_IF(text_align, lv_xml_text_align_to_enum(value));
+        else SET_STYLE_IF(text_letter_space, lv_xml_atoi(value));
+        else SET_STYLE_IF(text_line_space, lv_xml_atoi(value));
+        else SET_STYLE_IF(text_decor, lv_xml_text_decor_to_enum(value));
+
+        else SET_STYLE_IF(image_opa, lv_xml_to_opa(value));
+        else SET_STYLE_IF(image_recolor, lv_xml_to_color(value));
+        else SET_STYLE_IF(image_recolor_opa, lv_xml_to_opa(value));
+
+        else SET_STYLE_IF(line_color, lv_xml_to_color(value));
+        else SET_STYLE_IF(line_opa, lv_xml_to_opa(value));
+        else SET_STYLE_IF(line_width, lv_xml_atoi(value));
+        else SET_STYLE_IF(line_dash_width, lv_xml_atoi(value));
+        else SET_STYLE_IF(line_dash_gap, lv_xml_atoi(value));
+        else SET_STYLE_IF(line_rounded, lv_xml_to_bool(value));
+
+        else SET_STYLE_IF(arc_color, lv_xml_to_color(value));
+        else SET_STYLE_IF(arc_opa, lv_xml_to_opa(value));
+        else SET_STYLE_IF(arc_width, lv_xml_atoi(value));
+        else SET_STYLE_IF(arc_rounded, lv_xml_to_bool(value));
+        else SET_STYLE_IF(arc_image_src, lv_xml_get_image(value));
+
+        else SET_STYLE_IF(opa, lv_xml_to_opa(value));
+        else SET_STYLE_IF(opa_layered, lv_xml_to_opa(value));
+        else SET_STYLE_IF(color_filter_opa, lv_xml_to_opa(value));
+        else SET_STYLE_IF(anim_duration, lv_xml_atoi(value));
+        else SET_STYLE_IF(blend_mode, lv_xml_blend_mode_to_enum(value));
+        else SET_STYLE_IF(transform_width, lv_xml_atoi(value));
+        else SET_STYLE_IF(transform_height, lv_xml_atoi(value));
+        else SET_STYLE_IF(translate_x, lv_xml_atoi(value));
+        else SET_STYLE_IF(translate_y, lv_xml_atoi(value));
+        else SET_STYLE_IF(translate_radial, lv_xml_atoi(value));
+        else SET_STYLE_IF(transform_scale_x, lv_xml_atoi(value));
+        else SET_STYLE_IF(transform_scale_y, lv_xml_atoi(value));
+        else SET_STYLE_IF(transform_rotation, lv_xml_atoi(value));
+        else SET_STYLE_IF(transform_pivot_x, lv_xml_atoi(value));
+        else SET_STYLE_IF(transform_pivot_y, lv_xml_atoi(value));
+        else SET_STYLE_IF(transform_skew_x, lv_xml_atoi(value));
+        else SET_STYLE_IF(bitmap_mask_src, lv_xml_get_image(value));
+        else SET_STYLE_IF(rotary_sensitivity, lv_xml_atoi(value));
+
+        else SET_STYLE_IF(layout, lv_xml_layout_to_enum(value));
+
+        else SET_STYLE_IF(flex_flow, lv_xml_flex_flow_to_enum(value));
+        else SET_STYLE_IF(flex_grow, lv_xml_atoi(value));
+        else SET_STYLE_IF(flex_main_place, lv_xml_flex_align_to_enum(value));
+        else SET_STYLE_IF(flex_cross_place, lv_xml_flex_align_to_enum(value));
+        else SET_STYLE_IF(flex_track_place, lv_xml_flex_align_to_enum(value));
+
+        else SET_STYLE_IF(grid_column_align, lv_xml_grid_align_to_enum(value));
+        else SET_STYLE_IF(grid_row_align, lv_xml_grid_align_to_enum(value));
+        else SET_STYLE_IF(grid_cell_column_pos, lv_xml_atoi(value));
+        else SET_STYLE_IF(grid_cell_column_span, lv_xml_atoi(value));
+        else SET_STYLE_IF(grid_cell_x_align, lv_xml_grid_align_to_enum(value));
+        else SET_STYLE_IF(grid_cell_row_pos, lv_xml_atoi(value));
+        else SET_STYLE_IF(grid_cell_row_span, lv_xml_atoi(value));
+        else SET_STYLE_IF(grid_cell_y_align, lv_xml_grid_align_to_enum(value));
         else {
             LV_LOG_WARN("%s style property is not supported", name);
         }
@@ -170,8 +242,8 @@ const char * lv_xml_style_string_process(char * txt, lv_style_selector_t * selec
     char * selector_str = lv_xml_split_str(&txt, ':');
     while(selector_str != NULL) {
         /* Handle different states and parts */
-        *selector |= lv_xml_style_state_string_to_enum_value(selector_str);
-        *selector |= lv_xml_style_part_string_to_enum_value(selector_str);
+        *selector |= lv_xml_style_state_to_enum(selector_str);
+        *selector |= lv_xml_style_part_to_enum(selector_str);
 
         /* Move to the next token */
         selector_str = lv_xml_split_str(&txt, ':');
