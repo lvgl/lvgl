@@ -2668,7 +2668,7 @@ void lv_wayland_window_close(lv_display_t * disp)
         return;
     }
     window->shall_close = true;
-    // window->close_cb = NULL;
+    window->close_cb = NULL;
 }
 
 /**
