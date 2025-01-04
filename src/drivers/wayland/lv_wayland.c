@@ -1949,12 +1949,12 @@ static bool resize_window(struct window * window, int width, int height)
         width -= (2 * BORDER_SIZE);
         height -= (TITLE_BAR_HEIGHT + (2 * BORDER_SIZE));
     }
+    if(width <= 0 || height <= TITLE_BAR_HEIGHT) return false;
 #endif
 
     bpp = lv_color_format_get_size(LV_COLOR_FORMAT_NATIVE);
 
-    /* Update size for newly allocated buffers and return if it is negative*/
-    if(((width * bpp) * height) * 2 < 0) return false;
+    /* Update size for newly allocated buffers*/
 
     smm_resize(window->body->buffer_group, ((width * bpp) * height) * 2);
 
