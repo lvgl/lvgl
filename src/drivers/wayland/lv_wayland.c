@@ -1949,7 +1949,9 @@ static bool resize_window(struct window * window, int width, int height)
         width -= (2 * BORDER_SIZE);
         height -= (TITLE_BAR_HEIGHT + (2 * BORDER_SIZE));
     }
-    if(width <= 0 || height <= TITLE_BAR_HEIGHT)
+    if(width <= 0)
+        return false;
+    if(height <= TITLE_BAR_HEIGHT)
         return false;
 #endif
 
