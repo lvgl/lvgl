@@ -110,7 +110,6 @@ lv_base_dir_t lv_xml_base_dir_to_enum(const char * txt)
     return 0; /*Return 0 in lack of a better option. */
 }
 
-
 lv_text_align_t lv_xml_text_align_to_enum(const char * txt)
 {
     if(lv_streq("left", txt)) return LV_TEXT_ALIGN_LEFT;

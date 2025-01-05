@@ -244,10 +244,17 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
     if(lv_streq(name, "view")) {
         const char * extends = lv_xml_get_value_of(attrs, "extends");
         if(extends == NULL) extends = "lv_obj";
+
         state->ctx.root_widget = lv_xml_widget_get_processor(extends);
         if(state->ctx.root_widget == NULL) {
-            LV_LOG_WARN("No root widget");
-            state->ctx.root_widget = lv_xml_widget_get_processor("lv_obj");
+            lv_xml_component_ctx_t * extended_component = lv_xml_component_get_ctx(extends);
+            if(extended_component) {
+                state->ctx.root_widget = extended_component->root_widget;
+            }
+            else {
+                LV_LOG_WARN("The 'extend'ed widget is not found, using `lv_obj` as a fall back");
+                state->ctx.root_widget = lv_xml_widget_get_processor("lv_obj");
+            }
         }
     }
 
