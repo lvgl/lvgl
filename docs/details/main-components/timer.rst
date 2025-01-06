@@ -167,9 +167,6 @@ Some examples are:
 
 - you cannot delete a Widget because something else is still using it,
 - you don't want to block execution now, or
-- you detect the need to delete a Widget in a thread other than the thread making
-  LVGL calls (e.g. in a case where you are using a :ref:`Gateway Thread <Gateway
-  Thread>` to make all LVGL calls in a multi-threaded environment).
 
 For these cases,
 :cpp:expr:`lv_async_call(my_function, data_p)` can be used to call
