@@ -57,7 +57,7 @@ static lv_smartwatch_music_control_cb_t music_control_cb;
 
 void lv_demo_smartwatch_control_create(lv_obj_t * parent)
 {
-    
+
     control_screen = lv_tileview_add_tile(parent, 0, 0, LV_DIR_BOTTOM);
     lv_obj_remove_flag(control_screen, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_bg_color(control_screen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
