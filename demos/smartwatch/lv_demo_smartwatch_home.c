@@ -164,8 +164,10 @@ void lv_demo_smartwatch_face_selected_cb(lv_event_t * e)
         if(current_face_index != index) {
             current_face_index = index;
             // home_screen = *faces[index].watchface;
-            lv_obj_clean(home_screen);
-            lv_obj_set_parent(*faces[index].watchface, home_screen);
+
+            LV_LOG_WARN("Watchfaces cannot be changed in TileView");
+            // lv_obj_clean(home_screen);
+            // lv_obj_set_parent(*faces[index].watchface, home_screen);
         }
         lv_demo_smartwatch_home_load(LV_SCR_LOAD_ANIM_FADE_ON, 500, 0);
     }
