@@ -103,7 +103,7 @@ Draw Task Evaluation
 --------------------
 
 When each :ref:`Draw Task <draw tasks>` is created, each existing Draw Unit is
-"consulted" as to its "appropriateness" for the task.  It does this through a
+"consulted" as to its "appropriateness" for the task.  It does this through
 an "evaluation callback" function pointer (a.k.a. ``evaluate_cb``), which each Draw
 Unit sets (for itself) during its initialization.  Normally, that evaluation
 optionally examines the existing "preference score" for the task mentioned above,
