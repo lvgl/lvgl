@@ -19,7 +19,7 @@ tasks.  Alternatively, you might have access to a drawing library that performs
 certain types of drawing tasks with great efficiency.  To make it possible to utilize
 such facilities in the most efficient fashion, LVGL v9 and onwards implements a
 "Drawing Pipeline", like an assembly line, where decisions are made as to which
-drawing tasks drawing tasks (:ref:`Draw Tasks`) are given to which "logic entities"
+drawing tasks (:ref:`Draw Tasks`) are given to which "logic entities"
 (:ref:`Draw Units`) in order to be carried out.
 
 This Pipeline is designed so that it is both flexible and extendable.  As a
