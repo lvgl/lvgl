@@ -40,7 +40,7 @@ one or more Draw Tasks and pass them down the Drawing Pipeline.  Each Draw Task
 carries all the information required to:
 
 - compute which :ref:`Draw Unit <draw units>` should receive this task, and
-- give the Draw Unit all the details required accomplish the drawing task.
+- give the Draw Unit all the details required to accomplish the drawing task.
 
 A Draw Task carries the following information:
 
