@@ -26,6 +26,8 @@
 #include "parsers/lv_xml_slider_parser.h"
 #include "parsers/lv_xml_tabview_parser.h"
 #include "parsers/lv_xml_chart_parser.h"
+#include "parsers/lv_xml_table_parser.h"
+#include "parsers/lv_xml_dropdown_parser.h"
 #include "../../libs/expat/expat.h"
 #include "../../draw/lv_draw_image.h"
 
@@ -78,10 +80,16 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_chart", lv_xml_chart_create, lv_xml_chart_apply);
     lv_xml_widget_register("lv_chart-cursor", lv_xml_chart_cursor_create, lv_xml_chart_cursor_apply);
     lv_xml_widget_register("lv_chart-series", lv_xml_chart_series_create, lv_xml_chart_series_apply);
+    lv_xml_widget_register("lv_chart-axis", lv_xml_chart_axis_create, lv_xml_chart_axis_apply);
+    lv_xml_widget_register("lv_table", lv_xml_table_create, lv_xml_table_apply);
+    lv_xml_widget_register("lv_table-column", lv_xml_table_column_create, lv_xml_table_column_apply);
+    lv_xml_widget_register("lv_table-cell", lv_xml_table_cell_create, lv_xml_table_cell_apply);
+    lv_xml_widget_register("lv_dropdown", lv_xml_dropdown_create, lv_xml_dropdown_apply);
+    lv_xml_widget_register("lv_dropdown-list", lv_xml_dropdown_list_create, lv_xml_dropdown_list_apply);
 }
 
-lv_obj_t * lv_xml_create_from_ctx(lv_obj_t * parent, lv_xml_component_ctx_t * parent_ctx, lv_xml_component_ctx_t * ctx,
-                                  const char ** attrs)
+void * lv_xml_create_from_ctx(lv_obj_t * parent, lv_xml_component_ctx_t * parent_ctx, lv_xml_component_ctx_t * ctx,
+                              const char ** attrs)
 {
     /* Initialize the parser state */
     lv_xml_parser_state_t state;
@@ -119,7 +127,7 @@ lv_obj_t * lv_xml_create_from_ctx(lv_obj_t * parent, lv_xml_component_ctx_t * pa
     return state.view;
 }
 
-lv_obj_t * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs)
+void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs)
 {
     lv_obj_t * item = NULL;
 
