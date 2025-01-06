@@ -513,7 +513,7 @@ static resolved_path_t lv_fs_resolve_path(const char * path)
     bool has_drive_prefix = ('A' <= path[0]) && (path[0] <= 'Z') && (path[1] == ':');
 
     if(has_drive_prefix) {
-        resolved.drive_letter = path[0];
+        resolved.driver_letter = path[0];
         resolved.real_path = path + 2;
     }
     else {
