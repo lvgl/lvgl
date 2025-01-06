@@ -165,8 +165,8 @@ Asynchronous calls
 There are several cases in which you may not want to perform an action immediately.
 Some examples are:
 
-- you cannot delete a Widget because something else is still using it,
-- you don't want to block execution now, or
+- you cannot delete a Widget because something else is still using it, or
+- you don't want to block execution now.
 
 For these cases,
 :cpp:expr:`lv_async_call(my_function, data_p)` can be used to call
