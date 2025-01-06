@@ -517,7 +517,7 @@ static resolved_path_t lv_fs_resolve_path(const char * path)
         resolved.real_path = path + 2;
     }
     else {
-        resolved.drive_letter = LV_FS_DEFAULT_DRIVER_LETTER;
+        resolved.driver_letter = LV_FS_DEFAULT_DRIVER_LETTER;
         resolved.real_path = path;
     }
 # else /*Lean rules for backward compatibility*/
