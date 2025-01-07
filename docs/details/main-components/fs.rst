@@ -81,7 +81,7 @@ way to set the default directory.
 
 Reminder:  Note carefully that the prefixed "Z:" has nothing to do with the "C:" and
 "D:" Windows/DOS drive letters in 3 of the above examples, which are part of the path.
-It is used to look up the driver for that file system in the list of all file-system
+"Z:" is used to look up the driver for that file system in the list of all file-system
 drivers registered with LVGL.
 
 
