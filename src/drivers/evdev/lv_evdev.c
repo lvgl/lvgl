@@ -219,8 +219,7 @@ static void _evdev_indev_delete_cb(lv_event_t * e)
 #ifndef BSD
 static void _evdev_discovery_indev_try_create(const char * file_name)
 {
-    if(lv_strlen(file_name) <= 5
-       || 0 != lv_memcmp(file_name, "event", 5)) {
+    if(0 != lv_strncmp(file_name, "event", 5)) {
         return;
     }
 
