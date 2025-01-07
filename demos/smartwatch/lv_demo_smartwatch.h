@@ -233,7 +233,7 @@ void lv_demo_smartwatch_weather_add_daily(int day, int temp, int id);
 void lv_demo_smartwatch_weather_add_hourly(int hour, int id, int temp, int humidity, int wind, int uv, bool info);
 
 /**
- * Clear the qr codes in list
+ * Clear the qr codes in the list
  */
 void lv_demo_smartwatch_qr_list_clear(void);
 

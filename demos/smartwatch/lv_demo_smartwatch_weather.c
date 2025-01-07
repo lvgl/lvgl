@@ -53,14 +53,14 @@ static const lv_image_dsc_t * weather_day_icons[] = {
 };
 
 static const lv_image_dsc_t * weather_night_icons[] = {
-    &img_weather_night_0, // assets\nt-0.png
-    &img_weather_night_1, // assets\nt-1.png
-    &img_weather_night_2, // assets\nt-2.png
-    &img_weather_night_3, // assets\nt-3.png
-    &img_weather_night_4, // assets\nt-4.png
-    &img_weather_night_5, // assets\nt-5.png
-    &img_weather_night_6, // assets\nt-6.png
-    &img_weather_night_7, // assets\nt-7.png
+    &img_weather_night_0,
+    &img_weather_night_1,
+    &img_weather_night_2,
+    &img_weather_night_3,
+    &img_weather_night_4,
+    &img_weather_night_5,
+    &img_weather_night_6,
+    &img_weather_night_7,
 };
 
 static const char * week_days[7] = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
@@ -76,7 +76,6 @@ static const char * week_days[7] = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "S
 void lv_demo_smartwatch_weather_create(void)
 {
     create_screen_weather();
-
 
     /* add demo weather parameters */
     lv_demo_smartwatch_set_weather(22, 0, true, 14, 24, "Nairobi");

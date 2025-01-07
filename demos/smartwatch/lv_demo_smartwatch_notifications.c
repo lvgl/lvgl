@@ -79,10 +79,10 @@ void lv_demo_smartwatch_notifications_create(void)
     create_screen_notifications();
 
 
-    /* add notifications demo */
-    lv_demo_smartwatch_add_notification(3, "Sample Message test", 3);
-    lv_demo_smartwatch_add_notification(0x0b, "Sample Message test", 0x0B);
-    lv_demo_smartwatch_add_notification(8, "Sample Message test", 8);
+    /* add demo notifications */
+    lv_demo_smartwatch_add_notification(0x03, "Sample Message test", 0x03);
+    lv_demo_smartwatch_add_notification(0x0B, "Sample Message test", 0x0B);
+    lv_demo_smartwatch_add_notification(0x08, "Sample Message test", 0x08);
     lv_demo_smartwatch_add_notification(0x14, "Sample Message test", 0x14);
     lv_demo_smartwatch_add_notification(0x0A, "Sample Message test", 0x0A);
     lv_demo_smartwatch_add_notification(0x12, "Sample Message test", 0x12);

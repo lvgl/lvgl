@@ -45,9 +45,9 @@ static const lv_image_dsc_t * qr_image_icons[] = {
     &img_penguin_icon,
     &img_twitter_x_icon,
     &img_whatsapp_icon,
-    &img_wechat_pay_icon, // wechat pay
-    &img_alipay_icon,     // alipay
-    &img_paypal_icon,     // paypal
+    &img_wechat_pay_icon, /* wechat pay */
+    &img_alipay_icon,     /* alipay */
+    &img_paypal_icon,     /* paypal */
 };
 
 const char * qr_title_names[9] = {

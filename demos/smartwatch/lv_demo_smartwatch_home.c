@@ -136,7 +136,6 @@ void lv_demo_smartwatch_face_selected_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
-    uint32_t index = (uint32_t)(intptr_t)lv_event_get_user_data(e);
 
     if(target == lv_demo_smartwatch_get_tileview()) {
         /* the event might be triggered after watchface has been selected, return immediately */
@@ -144,8 +143,11 @@ void lv_demo_smartwatch_face_selected_cb(lv_event_t * e)
     }
 
     if(event_code == LV_EVENT_CLICKED) {
+        uint32_t index = (uint32_t)(intptr_t)lv_event_get_user_data(e);
+
         if(index >= num_faces) {
             LV_LOG_WARN("Selected watchface index exceeds available faces.");
+            lv_demo_smartwatch_load_home_watchface();
             return;
         }
         lv_obj_scroll_to_view(lv_obj_get_child(face_select, index), LV_ANIM_OFF);
@@ -230,7 +232,7 @@ bool lv_demo_smartwatch_face_load(uint16_t index)
 static void animate_analog_seconds(lv_obj_t * target)
 {
     lv_anim_init(&seconds_animation);
-    lv_anim_set_time(&seconds_animation, 60000);
+    lv_anim_set_duration(&seconds_animation, 60000);
     lv_anim_set_values(&seconds_animation, lv_image_get_rotation(target), lv_image_get_rotation(target) + 3600);
     lv_anim_set_var(&seconds_animation, target);
     lv_anim_set_exec_cb(&seconds_animation, (lv_anim_exec_xcb_t)lv_image_set_rotation);
@@ -245,43 +247,43 @@ static void clock_screen_event_cb(lv_event_t * e)
 
 static void lv_demo_smartwatch_add_watchface(const char * name, const lv_image_dsc_t * src, int index)
 {
-    lv_obj_t * ui_faceItem = lv_obj_create(face_select);
-    lv_obj_set_width(ui_faceItem, 160);
-    lv_obj_set_height(ui_faceItem, 180);
-    lv_obj_set_align(ui_faceItem, LV_ALIGN_CENTER);
-    lv_obj_remove_flag(ui_faceItem, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_remove_flag(ui_faceItem, LV_OBJ_FLAG_SCROLL_ONE);
-    lv_obj_set_style_radius(ui_faceItem, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui_faceItem, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_faceItem, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_width(ui_faceItem, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_color(ui_faceItem, lv_color_hex(0x142ABC), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_opa(ui_faceItem, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_width(ui_faceItem, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_pad(ui_faceItem, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_left(ui_faceItem, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui_faceItem, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui_faceItem, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui_faceItem, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_t * face_item = lv_obj_create(face_select);
+    lv_obj_set_width(face_item, 160);
+    lv_obj_set_height(face_item, 180);
+    lv_obj_set_align(face_item, LV_ALIGN_CENTER);
+    lv_obj_remove_flag(face_item, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(face_item, LV_OBJ_FLAG_SCROLL_ONE);
+    lv_obj_set_style_radius(face_item, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(face_item, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(face_item, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(face_item, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_color(face_item, lv_color_hex(0x142ABC), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_opa(face_item, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_width(face_item, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_outline_pad(face_item, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(face_item, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(face_item, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(face_item, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(face_item, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_t * ui_facePreview = lv_image_create(ui_faceItem);
-    lv_image_set_src(ui_facePreview, src);
-    lv_obj_set_width(ui_facePreview, LV_SIZE_CONTENT);
-    lv_obj_set_height(ui_facePreview, LV_SIZE_CONTENT);
-    lv_obj_set_align(ui_facePreview, LV_ALIGN_TOP_MID);
-    lv_obj_add_flag(ui_facePreview, LV_OBJ_FLAG_ADV_HITTEST);
-    lv_obj_remove_flag(ui_facePreview, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_t * face_preview = lv_image_create(face_item);
+    lv_image_set_src(face_preview, src);
+    lv_obj_set_width(face_preview, LV_SIZE_CONTENT);
+    lv_obj_set_height(face_preview, LV_SIZE_CONTENT);
+    lv_obj_set_align(face_preview, LV_ALIGN_TOP_MID);
+    lv_obj_add_flag(face_preview, LV_OBJ_FLAG_ADV_HITTEST);
+    lv_obj_remove_flag(face_preview, LV_OBJ_FLAG_SCROLLABLE);
 
-    lv_obj_t * ui_faceLabel = lv_label_create(ui_faceItem);
-    lv_obj_set_width(ui_faceLabel, 160);
-    lv_obj_set_height(ui_faceLabel, LV_SIZE_CONTENT);
-    lv_obj_set_align(ui_faceLabel, LV_ALIGN_BOTTOM_MID);
-    lv_label_set_long_mode(ui_faceLabel, LV_LABEL_LONG_DOT);
-    lv_label_set_text(ui_faceLabel, name);
-    lv_obj_set_style_text_align(ui_faceLabel, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_faceLabel, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_t * face_label = lv_label_create(face_item);
+    lv_obj_set_width(face_label, 160);
+    lv_obj_set_height(face_label, LV_SIZE_CONTENT);
+    lv_obj_set_align(face_label, LV_ALIGN_BOTTOM_MID);
+    lv_label_set_long_mode(face_label, LV_LABEL_LONG_DOT);
+    lv_label_set_text(face_label, name);
+    lv_obj_set_style_text_align(face_label, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(face_label, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_add_event_cb(ui_faceItem, lv_demo_smartwatch_face_selected_cb, LV_EVENT_ALL, (void *)(intptr_t)index);
+    lv_obj_add_event_cb(face_item, lv_demo_smartwatch_face_selected_cb, LV_EVENT_ALL, (void *)(intptr_t)index);
 }
 
 static void create_screen_home(void)

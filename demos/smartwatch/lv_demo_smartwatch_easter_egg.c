@@ -125,7 +125,7 @@ static void animate_drift(lv_obj_t * img)
     lv_anim_init(&anim_x);
     lv_anim_set_var(&anim_x, img);
     lv_anim_set_values(&anim_x, lv_obj_get_x_aligned(img), x_target);
-    lv_anim_set_time(&anim_x, 3000); // Random duration
+    lv_anim_set_duration(&anim_x, 3000);
     lv_anim_set_exec_cb(&anim_x, (lv_anim_exec_xcb_t)lv_obj_set_x);
     lv_anim_start(&anim_x);
 
@@ -133,7 +133,7 @@ static void animate_drift(lv_obj_t * img)
     lv_anim_init(&anim_y);
     lv_anim_set_var(&anim_y, img);
     lv_anim_set_values(&anim_y, lv_obj_get_y_aligned(img), y_target);
-    lv_anim_set_time(&anim_y, 3000);
+    lv_anim_set_duration(&anim_y, 3000);
     lv_anim_set_exec_cb(&anim_y, (lv_anim_exec_xcb_t)lv_obj_set_y);
     lv_anim_start(&anim_y);
 
@@ -141,7 +141,7 @@ static void animate_drift(lv_obj_t * img)
     lv_anim_init(&anim_a);
     lv_anim_set_var(&anim_a, img);
     lv_anim_set_values(&anim_a, lv_image_get_rotation(img), a_target);
-    lv_anim_set_time(&anim_a, 3000);
+    lv_anim_set_duration(&anim_a, 3000);
     lv_anim_set_exec_cb(&anim_a, (lv_anim_exec_xcb_t)lv_image_set_rotation);
     lv_anim_start(&anim_a);
 }
@@ -155,8 +155,8 @@ static void animate_back_to_center(lv_obj_t * img, uint32_t delay)
     lv_anim_t anim_x;
     lv_anim_init(&anim_x);
     lv_anim_set_var(&anim_x, img);
-    lv_anim_set_values(&anim_x, lv_obj_get_x_aligned(img), 0); // Center X
-    lv_anim_set_time(&anim_x, 1000);                           // Return gradually
+    lv_anim_set_values(&anim_x, lv_obj_get_x_aligned(img), 0);
+    lv_anim_set_duration(&anim_x, 1000);
     lv_anim_set_delay(&anim_x, delay);
     lv_anim_set_exec_cb(&anim_x, (lv_anim_exec_xcb_t)lv_obj_set_x);
     lv_anim_start(&anim_x);
@@ -164,8 +164,8 @@ static void animate_back_to_center(lv_obj_t * img, uint32_t delay)
     lv_anim_t anim_y;
     lv_anim_init(&anim_y);
     lv_anim_set_var(&anim_y, img);
-    lv_anim_set_values(&anim_y, lv_obj_get_y_aligned(img), 0); // Center Y
-    lv_anim_set_time(&anim_y, 1000);
+    lv_anim_set_values(&anim_y, lv_obj_get_y_aligned(img), 0);
+    lv_anim_set_duration(&anim_y, 1000);
     lv_anim_set_delay(&anim_y, delay);
     lv_anim_set_exec_cb(&anim_y, (lv_anim_exec_xcb_t)lv_obj_set_y);
     lv_anim_start(&anim_y);
@@ -173,8 +173,8 @@ static void animate_back_to_center(lv_obj_t * img, uint32_t delay)
     lv_anim_t anim_a;
     lv_anim_init(&anim_a);
     lv_anim_set_var(&anim_a, img);
-    lv_anim_set_values(&anim_a, lv_image_get_rotation(img), 0); // Center Y
-    lv_anim_set_time(&anim_a, 1000);
+    lv_anim_set_values(&anim_a, lv_image_get_rotation(img), 0);
+    lv_anim_set_duration(&anim_a, 1000);
     lv_anim_set_delay(&anim_a, delay);
     lv_anim_set_exec_cb(&anim_a, (lv_anim_exec_xcb_t)lv_image_set_rotation);
     lv_anim_start(&anim_a);
