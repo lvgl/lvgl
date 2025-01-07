@@ -17,10 +17,10 @@
 	        <enum name="custom_4"/>
 	    </enumdef>
 
-	    <prop name="row_cnt" help="">
+	    <prop name="row_conunt" help="">
 	    	<param name="cnt" type="int" help=""/>
 	    </prop>
-	    <prop name="column_cnt" help="">
+	    <prop name="column_conunt" help="">
 	    	<param name="cnt" type="int" help=""/>
 	    </prop>
 	    <prop name="selected cell" help="">

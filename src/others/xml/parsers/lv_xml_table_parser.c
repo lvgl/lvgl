@@ -56,8 +56,8 @@ void lv_xml_table_apply(lv_xml_parser_state_t * state, const char ** attrs)
         const char * name = attrs[i];
         const char * value = attrs[i + 1];
 
-        if(lv_streq("column_count", name)) lv_table_set_column_count(item, lv_xml_atoi(value));
-        else if(lv_streq("row_count", name)) lv_table_set_row_count(item, lv_xml_atoi(value));
+        if(lv_streq("column_conunt", name)) lv_table_set_column_count(item, lv_xml_atoi(value));
+        else if(lv_streq("row_conunt", name)) lv_table_set_row_count(item, lv_xml_atoi(value));
         else if(lv_streq("selected_cell", name)) {
 
             int32_t value1 = lv_xml_atoi_split(&value, ' ');
