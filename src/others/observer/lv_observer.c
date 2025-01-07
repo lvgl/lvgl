@@ -757,7 +757,7 @@ static void dropdown_value_changed_event_cb(lv_event_t * e)
 
 static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    lv_dropdown_set_selected(observer->target, subject->value.num);
+    lv_dropdown_set_selected(observer->target, subject->value.num, LV_ANIM_OFF);
 }
 
 #endif /*LV_USE_DROPDOWN*/

@@ -264,9 +264,9 @@ void pika_lvgl_dropdown_set_dir(PikaObj *self, int dir){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
     lv_dropdown_set_dir(lv_obj, dir);
 }
-void pika_lvgl_dropdown_set_selected(PikaObj *self, int sel_opt){
+void pika_lvgl_dropdown_set_selected(PikaObj *self, int sel_opt, int anim){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
-    lv_dropdown_set_selected(lv_obj, sel_opt);
+    lv_dropdown_set_selected(lv_obj, sel_opt, anim);
 }
 void pika_lvgl_dropdown_set_selected_highlight(PikaObj *self, int en){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");

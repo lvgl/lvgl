@@ -336,7 +336,7 @@ void lv_dropdown_clear_options(lv_obj_t * obj)
     if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
-void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt)
+void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt, lv_anim_enable_t anim)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -347,7 +347,7 @@ void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt)
     dropdown->sel_opt_id_orig = dropdown->sel_opt_id;
 
     if(dropdown->list) {
-        position_to_selected(obj, LV_ANIM_OFF);
+        position_to_selected(obj, anim);
     }
 
     lv_obj_invalidate(obj);
