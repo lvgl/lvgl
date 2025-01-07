@@ -192,11 +192,6 @@ void lv_anim_set_exec_cb(lv_anim_t * a, lv_anim_exec_xcb_t exec_cb);
 void lv_anim_set_duration(lv_anim_t * a, uint32_t duration);
 
 /**
- * Legacy `lv_anim_set_time` API will be removed soon, use `lv_anim_set_duration` instead.
- */
-void lv_anim_set_time(lv_anim_t * a, uint32_t duration);
-
-/**
  * Set a delay before starting the animation
  * @param a         pointer to an initialized `lv_anim_t` variable
  * @param delay     delay before the animation in milliseconds

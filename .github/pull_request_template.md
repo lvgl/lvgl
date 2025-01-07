@@ -1,4 +1,6 @@
-A clear and concise description of what the bug or new feature is.
+Fixes #xxxx <!-- E.g. Fixes #1234 to reference the fixed issue. Can be removed if there is no related issue -->
+
+<!-- A clear and concise description of what the bug or new feature is.-->
 
 ### Notes
 - Update the [Documentation](https://github.com/lvgl/lvgl/tree/master/docs) if needed.
