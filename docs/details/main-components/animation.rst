@@ -46,7 +46,7 @@ Examples of the latter are:  :cpp:expr:`lv_obj_set_x(widget, value)` or
 :cpp:expr:`lv_obj_set_width(widget, value)`.
 
 This makes it very convenient to apply to the appearance (and other attributes) of UI
-componenets.  But you can provide your own "set" functions, and so the application of
+components.  But you can provide your own "set" functions, and so the application of
 Animations is really limited only by your imagination.
 
 The number of Animations that can be playing at the same time for a given object with
@@ -115,10 +115,10 @@ To create an Animation, start by creating an Animation *template* in an
    lv_anim_set_start_cb(&anim_template, start_cb);
 
    /* When ready, play the Animation backward with this duration. Default is 0 (disabled) [ms] */
-   lv_anim_set_playback_duration(&anim_template, time);
+   lv_anim_set_reverse_duration(&anim_template, time);
 
-   /* Delay before playback. Default is 0 (disabled) [ms] */
-   lv_anim_set_playback_delay(&anim_template, delay);
+   /* Delay before reverse play. Default is 0 (disabled) [ms] */
+   lv_anim_set_reverse_delay(&anim_template, delay);
 
    /* Number of repetitions. Default is 1. LV_ANIM_REPEAT_INFINITE for infinite repetition */
    lv_anim_set_repeat_count(&anim_template, cnt);
@@ -201,16 +201,16 @@ Sometimes an Animation needs to play forward, and then play backwards, effective
 reversing course, animating from the ``end`` value back to the ``start`` value again.
 To do this, pass a non-zero value to this function to set the duration for the
 reverse portion of the Animation:
-:cpp:expr:`lv_anim_set_playback_duration(&anim_template, duration_in_ms)`.
+:cpp:expr:`lv_anim_set_reverse_duration(&anim_template, duration_in_ms)`.
 
 Optionally, you can also introduce a delay between the forward and backward
-directions using :cpp:expr:`lv_anim_set_playback_delay(&anim_template, delay_in_ms)`
+directions using :cpp:expr:`lv_anim_set_reverse_delay(&anim_template, delay_in_ms)`
 
 
 
 .. _animation_start:
 
-Starting an Amination
+Starting an Animation
 *********************
 
 After you have set up your :cpp:type:`lv_anim_t` object, it is important to realize
@@ -321,7 +321,7 @@ easy to create complex composite Animations.  To create and use an Animation Tim
     own copy of the contents of the Animation template, so if you do not need it
     later, its contents do not need to be preserved after this call.
 
-It supports forward and backward playback of the entire Animation group, using
+It supports forward and reverse play of the entire Animation group, using
 :cpp:expr:`lv_anim_timeline_set_reverse(timeline, reverse)`. Note that if you want to
 play in reverse from the end of the Timeline, you need to call
 :cpp:expr:`lv_anim_timeline_set_progress(timeline, LV_ANIM_TIMELINE_PROGRESS_MAX)`
@@ -337,7 +337,7 @@ Call :cpp:expr:`lv_anim_timeline_set_progress(timeline, progress)` function to s
 state of the Animation Timeline according to the ``progress`` value.  ``progress`` is
 a value between ``0`` and ``32767`` (:c:macro:`LV_ANIM_TIMELINE_PROGRESS_MAX`) to indicate the
 proportion of the Timeline that has "played".  Example:  a ``progress`` value of
-:cpp:expr:`LV_ANIM_TIMELINE_PROGRESS_MAX / 2` would set the Timeline playback to its
+:cpp:expr:`LV_ANIM_TIMELINE_PROGRESS_MAX / 2` would set the Timeline play to its
 half-way point.
 
 Call :cpp:expr:`lv_anim_timeline_get_playtime(timeline)` function to get the total

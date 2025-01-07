@@ -118,7 +118,7 @@ void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf,
 void lv_subject_copy_string(lv_subject_t * subject, const char * buf);
 
 /**
- * Print a formated string to a subject. It will notify all the observers as well.
+ * Print a formatted string to a subject. It will notify all the observers as well.
  * @param subject   pointer to the subject
  * @param format    the format string
  */

@@ -44,7 +44,7 @@ Set a buffer
 ------------
 
 In order to render the animation a buffer needs to be assigned to the Lottie Widget.
-The animations are rendered in ARGB8888 format, therefor the buffer's size should be equal to
+The animations are rendered in ARGB8888 format, therefore the buffer's size should be equal to
 ``target_width x target_height x 4`` bytes.
 
 To keep the buffer size and the animation size consistent,

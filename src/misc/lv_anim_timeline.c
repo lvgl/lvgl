@@ -109,7 +109,7 @@ uint32_t lv_anim_timeline_start(lv_anim_timeline_t * at)
     lv_anim_set_var(&a, at);
     lv_anim_set_exec_cb(&a, anim_timeline_exec_cb);
     lv_anim_set_values(&a, start, end);
-    lv_anim_set_time(&a, duration);
+    lv_anim_set_duration(&a, duration);
     lv_anim_set_path_cb(&a, anim_timeline_path_cb);
     lv_anim_set_repeat_count(&a, repeat);
     lv_anim_set_repeat_delay(&a, delay);

@@ -171,6 +171,7 @@ void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
     if(a == NULL) {
         uint8_t * buf = lv_draw_buf_goto_xy(draw_buf, 0, 0);
         lv_memzero(buf, header->h * stride);
+        lv_draw_buf_flush_cache(draw_buf, a);
         LV_PROFILER_DRAW_END;
         return;
     }
@@ -205,6 +206,7 @@ void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
         lv_memzero(buf, line_length);
         buf += stride;
     }
+    lv_draw_buf_flush_cache(draw_buf, a);
     LV_PROFILER_DRAW_END;
 }
 

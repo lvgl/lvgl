@@ -1345,32 +1345,85 @@ class XMLSearch(object):
         with open(os.path.join(temp_directory, 'Doxyfile'), 'wb') as f:
             f.write(data.encode('utf-8'))
 
-        status, br = subprocess.getstatusoutput("git branch")
+        # -----------------------------------------------------------------
+        # Populate LVGL_URLPATH and LVGL_GITCOMMIT environment variables:
+        #   - LVGL_URLPATH   <= 'master' or '8.4' '9.2' etc.
+        #   - LVGL_GITCOMMIT <= commit hash of HEAD.
+        # The previous version of this was populating LVGL_URLPATH with
+        # the multi-line list of all existing branches in the repository,
+        # which was not what was intended.
+        # -----------------------------------------------------------------
+        status, branch = subprocess.getstatusoutput("git branch --show-current")
         _, gitcommit = subprocess.getstatusoutput("git rev-parse HEAD")
-        br = re.sub(r'\* ', '', br)
 
-        urlpath = re.sub('release/', '', br)
+        # If above failed (i.e. `branch` not valid), default to 'master'.
+        if status != 0:
+            branch = 'master'
+        elif branch == 'master':
+            # Expected in most cases.  Nothing to change.
+            pass
+        else:
+            # `branch` is valid.  Capture release version if in a 'release/' branch.
+            if branch.startswith('release/'):
+                branch = branch[8:]
+            else:
+                # Default to 'master'.
+                branch = 'master'
 
-        os.environ['LVGL_URLPATH'] = urlpath
+        os.environ['LVGL_URLPATH'] = branch
         os.environ['LVGL_GITCOMMIT'] = gitcommit
 
-        p = subprocess.Popen(
-            f'cd "{temp_directory}" && doxygen Doxyfile',
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            shell=True
-        )
+        # ---------------------------------------------------------------------
+        # Provide a way to run an external command and abort build on error.
+        #
+        # This is necessary because when tempdir created by tempfile.mkdtemp()`
+        # is on a different drive, the "cd tmpdir && doxygen Doxyfile" syntax
+        # fails because of the different semantics of the `cd` command on
+        # Windows:  it doesn't change the default DRIVE if `cd` is executed
+        # from a different drive.  The result, when this is the case, is that
+        # Doxygen runs in the current working directory instead of in the
+        # temporary directory as was intended.
+        # ---------------------------------------------------------------------
+        def cmd(cmd_str, start_dir=None):
+            if start_dir is None:
+                start_dir = os.getcwd()
 
-        out, err = p.communicate()
-        if p.returncode:
-            if out:
-                sys.stdout.write(out)
-                sys.stdout.flush()
-            if err:
-                sys.stderr.write(err)
-                sys.stdout.flush()
+            saved_dir = os.getcwd()
+            os.chdir(start_dir)
 
-            sys.exit(p.returncode)
+            # This method of running Doxygen is used because if it
+            # succeeds, we do not want anything going to STDOUT.
+            # Running it via `os.system()` would send its output
+            # to STDOUT.
+            p = subprocess.Popen(
+                cmd_str,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                shell=True
+            )
+
+            out, err = p.communicate()
+            if p.returncode:
+                if out:
+                    # Note the `.decode("utf-8")` is required here
+                    # because `sys.stdout.write()` requires a string,
+                    # and `out` by itself is a byte array -- it causes
+                    # it to generate an exception and abort the script.
+                    sys.stdout.write(out.decode("utf-8"))
+                    sys.stdout.flush()
+                if err:
+                    sys.stderr.write(err.decode("utf-8"))
+                    sys.stdout.flush()
+
+                sys.exit(p.returncode)
+
+            # If execution arrived here, Doxygen exited with code 0.
+            os.chdir(saved_dir)
+
+        # -----------------------------------------------------------------
+        # Run Doxygen in temporary directory.
+        # -----------------------------------------------------------------
+        cmd('doxygen Doxyfile', temp_directory)
 
         xml_path = os.path.join(temp_directory, 'xml')
 
@@ -1418,6 +1471,11 @@ class XMLSearch(object):
         return defines.get(m_name, None)
 
 
+def announce(*args):
+    args = ' '.join(repr(arg) for arg in args)
+    print(f'{os.path.basename(__file__)}: ', args)
+
+
 def run(project_path, temp_directory, *doc_paths):
     """
     This function does 2 things:
@@ -1443,6 +1501,8 @@ def run(project_path, temp_directory, *doc_paths):
     api_path = os.path.join(base_path, 'API')
     lvgl_src_path = os.path.join(project_path, 'src')
 
+    announce("Generating API documentation .RST files...")
+
     if not os.path.exists(api_path):
         os.makedirs(api_path)
 
@@ -1463,6 +1523,8 @@ def run(project_path, temp_directory, *doc_paths):
     #    - unions,
     #    - typedefs,
     #    - functions.
+    announce("Building source-code symbol tables...")
+
     for compound in index:
         compound.attrib['name'] = compound[0].text.strip()
         if compound.attrib['kind'] in ('example', 'page', 'dir'):
@@ -1510,6 +1572,8 @@ def run(project_path, temp_directory, *doc_paths):
         )
 
     # For each directory entry in `doc_paths` array...
+    announce("Adding API-page hyperlinks to source docs...")
+
     for folder in doc_paths:
         # Fetch a list of '.rst' files excluding 'index.rst'.
         rst_files = list(

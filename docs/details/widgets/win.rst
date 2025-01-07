@@ -74,7 +74,7 @@ functions can be called in any order, any number of times.
   on the far right of the Header.
 
 - :cpp:expr:`lv_win_add_button(win, icon, button_width)` adds a Button with the
-  specified width that occupies the full hight of the Header (its parent).  If
+  specified width that occupies the full height of the Header (its parent).  If
   ``icon`` is not NULL, an image is created, centered on the button, using ``icon``
   as its image source.  All valid image sources are supported, but a common source
   to use is one of the ``LV_SYMBOL_...`` macros, such as :c:macro:`LV_SYMBOL_CLOSE`

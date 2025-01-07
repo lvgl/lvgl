@@ -21,7 +21,7 @@ All permutations of the below options are well supported.
 - single or double buffered
 - direct or partial render mode
 - OS and no OS
-- paralellized flushing with DMA2D (only for partial render mode)
+- parallelized flushing with DMA2D (only for partial render mode)
 
 If OS is enabled, a synchronization primitive will be used to
 give the thread a chance to yield to other threads while blocked,

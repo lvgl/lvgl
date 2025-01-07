@@ -37,9 +37,12 @@ extern "C" {
 #define LV_PROPERTY_TYPE_BOOL           11  /*int32_t type*/
 
 #define LV_PROPERTY_TYPE_SHIFT          28
-#define LV_PROPERTY_ID(clz, name, type, index)    LV_PROPERTY_## clz ##_##name = (LV_PROPERTY_## clz ##_START + (index)) | ((type) << LV_PROPERTY_TYPE_SHIFT)
+#define LV_PROPERTY_TYPE2_SHIFT         24
+#define LV_PROPERTY_ID(clz, name, type, index)          LV_PROPERTY_## clz ##_##name = (LV_PROPERTY_## clz ##_START + (index)) | ((type) << LV_PROPERTY_TYPE_SHIFT)
+#define LV_PROPERTY_ID2(clz, name, type, type2, index)  LV_PROPERTY_ID(clz, name, type, index) | ((type2) << LV_PROPERTY_TYPE2_SHIFT)
 
 #define LV_PROPERTY_ID_TYPE(id) ((id) >> LV_PROPERTY_TYPE_SHIFT)
+#define LV_PROPERTY_ID_TYPE2(id) ((id) >> LV_PROPERTY_TYPE_SHIFT)
 #define LV_PROPERTY_ID_INDEX(id) ((id) & 0xfffffff)
 
 /*Set properties from an array of lv_property_t*/
@@ -68,6 +71,8 @@ enum {
     LV_PROPERTY_TEXTAREA_START  = 0x0500, /* lv_textarea.c */
     LV_PROPERTY_ROLLER_START    = 0x0600, /* lv_roller.c */
     LV_PROPERTY_DROPDOWN_START  = 0x0700, /* lv_dropdown.c */
+    LV_PROPERTY_SLIDER_START    = 0x0800, /* lv_slider.c */
+    LV_PROPERTY_ANIMIMAGE_START = 0x0900, /* lv_animimage.c */
 
     /*Special ID, use it to extend ID and make sure it's unique and compile time determinant*/
     LV_PROPERTY_ID_BUILTIN_LAST = 0xffff, /*ID of 0x10000 ~ 0xfffffff is reserved for user*/
@@ -84,11 +89,13 @@ typedef struct {
     lv_prop_id_t id;
     union {
         int32_t num;                /**< Number integer number (opacity, enums, booleans or "normal" numbers)*/
+        uint32_t num_u;
         bool enable;                /**< booleans*/
         const void * ptr;           /**< Constant pointers  (font, cone text, etc)*/
         lv_color_t color;           /**< Colors*/
         lv_value_precise_t precise; /**< float or int for precise value*/
-        lv_point_t point;           /**< Point*/
+        lv_point_t point;           /**< Point, contains two int32_t.*/
+
         struct {
             /**
              * Note that place struct member `style` at first place is intended.
@@ -112,6 +119,21 @@ typedef struct {
              */
             lv_style_value_t style; /**< Make sure it's the first element in struct. */
             uint32_t selector;      /**< Style selector, lv_part_t | lv_state_t */
+        };
+
+        /**
+         * For some property like slider range, it contains two simple(4byte) value
+         * so we can use `arg1.num` and `arg2.num` to set the argument.
+         */
+        struct {
+            union {
+                int32_t num;
+                uint32_t num_u;
+                bool enable;
+                const void * ptr;
+                lv_color_t color;
+                lv_value_precise_t precise;
+            } arg1, arg2;
         };
     };
 } lv_property_t;

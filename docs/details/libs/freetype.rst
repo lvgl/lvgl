@@ -4,21 +4,27 @@
 FreeType support
 ================
 
-Interface to FreeType library to generate font bitmap at run time.
+Interface to FreeType library to generate font bitmaps at run time.
 
-Detailed introduction: https://www.freetype.org
+A detailed introduction can be found at: https://freetype.org/ .
+
+
 
 Add FreeType to your project
-----------------------------
+****************************
 
 First, Download FreeType from `here <https://sourceforge.net/projects/freetype/files/>`__.
+
+If you haven't already done so, now is a good time to get familiar with setting up
+and configuring this library.  The above website is a good place to start, as is the
+``README`` file in the top directory of the freetype project directory.
 
 There are two ways to use FreeType:
 
 For UNIX
-~~~~~~~~
+--------
 
-For UNIX systems, it is recommended to use the way of compiling and installing libraries.
+For UNIX systems, the following is recommended to compile and install FreeType libraries.
 
 - Enter the FreeType source code directory
 - ``make``
@@ -27,12 +33,16 @@ For UNIX systems, it is recommended to use the way of compiling and installing l
 - Link library: ``freetype`` (for GCC: ``-L/usr/local/lib -lfreetype``)
 
 For Embedded Devices
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
-For embedded devices, it is more recommended to use the FreeType
-configuration file provided by LVGL, which only includes the most
-commonly used functions, which is very meaningful for saving limited
-FLASH space.
+For embedded devices, it is recommended to use the FreeType
+configuration files provided by LVGL:
+
+- lvgl/src/libs/freetype/ftmodule.h
+- lvgl/src/libs/freetype/ftoption.h
+
+which only include the most commonly used modules and options, which is important to
+save limited FLASH space.
 
 -  Copy the FreeType source code to your project directory.
 -  Refer to the following ``Makefile`` for configuration:
@@ -60,10 +70,12 @@ FLASH space.
    FT_CSRCS += freetype/src/truetype/truetype.c
    CSRCS += $(FT_CSRCS)
 
+
+
 .. _freetype_usage:
 
 Usage
------
+*****
 
 Enable :c:macro:`LV_USE_FREETYPE` in ``lv_conf.h``.
 
@@ -75,18 +87,20 @@ By default, the FreeType extension doesn't use LVGL's file system. You
 can simply pass the path to the font as usual on your operating system
 or platform.
 
-If you want FreeType to use lvgl's memory allocation and file system
+If you want FreeType to use LVGL's memory allocation and file system
 interface, you can enable :c:macro:`LV_FREETYPE_USE_LVGL_PORT` in
-``lv_conf.h``, convenient for unified management.
+``lv_conf.h``, convenient for unified management.  If you do this, you will need
+to exclude the configured FreeType library's ``ftsystem.c`` file from being compiled,
+since LVGL's ``lv_ftsystem.c`` has custom versions of the functions defined therein.
 
 The font style supports *Italic* and **Bold** fonts processed by
-software, and can be set with reference to the following values:
+software, and can be set by using following values where style values are required:
 
 - :cpp:enumerator:`LV_FREETYPE_FONT_STYLE_NORMAL`: Default style.
 - :cpp:enumerator:`LV_FREETYPE_FONT_STYLE_ITALIC`: Italic style.
 - :cpp:enumerator:`LV_FREETYPE_FONT_STYLE_BOLD`:  Bold style.
 
-They can be combined.eg:
+These values can be combined, e.g.
 :cpp:expr:`LV_FREETYPE_FONT_STYLE_BOLD | LV_FREETYPE_FONT_STYLE_ITALIC`.
 
 The FreeType extension also supports colored bitmap glyphs such as emojis. Note
@@ -97,23 +111,29 @@ Use the :cpp:func:`lv_freetype_font_create` function to create a font. To
 delete a font, use :cpp:func:`lv_freetype_font_delete`. For more detailed usage,
 please refer to example code.
 
+
+
 .. _freetype_example:
 
 Examples
---------
+********
 
 .. include:: ../../examples/libs/freetype/index.rst
 
-Learn more
-----------
+
+
+Learn More
+**********
 
 -  FreeType`tutorial <https://www.freetype.org/freetype2/docs/tutorial/step1.html>`__
 -  LVGL's :ref:`add_font`
 
+
+
 .. _freetype_api:
 
 API
----
+***
 
 :ref:`ftoption_h`
 

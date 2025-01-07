@@ -201,11 +201,12 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
         if(src_type == LV_IMAGE_SRC_VARIABLE || src_type == LV_IMAGE_SRC_FILE) {
             res  = lv_image_decoder_get_info(dsc->bg_image_src, &header);
         }
-        else if(src_type == LV_IMAGE_SRC_UNKNOWN) {
-            res = LV_RESULT_INVALID;
-        }
         else {
             lv_memzero(&header, sizeof(header));
+
+            if(src_type == LV_IMAGE_SRC_UNKNOWN) {
+                res = LV_RESULT_INVALID;
+            }
         }
 
         if(res == LV_RESULT_OK) {

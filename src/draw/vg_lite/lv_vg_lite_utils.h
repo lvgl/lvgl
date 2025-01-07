@@ -33,8 +33,6 @@ extern "C" {
 
 #define LV_VG_LITE_IS_ERROR(err) (err > 0)
 
-#define VLC_GET_OP_CODE(ptr) (*((uint8_t*)ptr))
-
 #if LV_VG_LITE_USE_ASSERT
 #define LV_VG_LITE_ASSERT(expr) LV_ASSERT(expr)
 #else
@@ -147,7 +145,10 @@ vg_lite_color_t lv_vg_lite_color(lv_color_t color, lv_opa_t opa, bool pre_mul);
 
 void lv_vg_lite_rect(vg_lite_rectangle_t * rect, const lv_area_t * area);
 
-void lv_vg_lite_matrix(vg_lite_matrix_t * dest, const lv_matrix_t * src);
+static inline void lv_vg_lite_matrix(vg_lite_matrix_t * dest, const lv_matrix_t * src)
+{
+    *(lv_matrix_t *)dest = *src;
+}
 
 /* Param checker */
 

@@ -29,7 +29,7 @@ void test_gradient_vertical_misalignment(void)
     lv_anim_set_var(&a, obj);
     lv_anim_set_exec_cb(&a, obj_set_height_helper);
     lv_anim_set_duration(&a, 1000);
-    lv_anim_set_playback_duration(&a, 1000);
+    lv_anim_set_reverse_duration(&a, 1000);
     lv_anim_set_repeat_count(&a, 100);
     lv_anim_set_values(&a, 0, 300);
     lv_anim_start(&a);
