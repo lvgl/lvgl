@@ -45,7 +45,6 @@ static void animate_analog_seconds(lv_obj_t * target);
  **********************/
 static lv_obj_t * face_park;
 static lv_obj_t * home_panel;
-static lv_obj_t * home_screen;
 static lv_obj_t * clock_screen;
 static lv_obj_t * hour_label;
 static lv_obj_t * minute_label;
