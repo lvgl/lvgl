@@ -212,6 +212,7 @@ static void _evdev_indev_delete_cb(lv_event_t * e)
     lv_indev_t * indev = lv_event_get_target(e);
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
     LV_ASSERT_NULL(dsc);
+    lv_async_call_cancel(_evdev_async_delete_cb, indev);
     close(dsc->fd);
     lv_free(dsc);
 }
@@ -229,9 +230,21 @@ static void _evdev_discovery_indev_try_create(const char * file_name)
     lv_indev_t * indev = lv_evdev_create(LV_INDEV_TYPE_NONE, dev_path);
     if(indev == NULL) return;
 
+    lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
+
+    lv_indev_t * ex_indev = NULL;
+    while(NULL != (ex_indev = lv_indev_get_next(ex_indev))) {
+        if(ex_indev == indev || lv_indev_get_read_cb(ex_indev) != _evdev_read) continue;
+        lv_evdev_t * ex_dsc = lv_indev_get_driver_data(ex_indev);
+        if(!ex_dsc->deleting && dsc->st_dev == ex_dsc->st_dev && dsc->st_ino == ex_dsc->st_ino) {
+            /* an indev for this exact device instance already exists */
+            lv_indev_delete(indev);
+            return;
+        }
+    }
+
     lv_evdev_discovery_t * ed = evdev_discovery;
     if(ed->cb) {
-        lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
         ed->cb(indev, dsc->type, ed->cb_user_data);
     }
 }
@@ -288,16 +301,6 @@ lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path)
     }
     dsc->st_dev = sb.st_dev;
     dsc->st_ino = sb.st_ino;
-
-    lv_indev_t * ex_indev = NULL;
-    while((ex_indev = lv_indev_get_next(ex_indev))) {
-        if(lv_indev_get_read_cb(ex_indev) != _evdev_read) continue;
-        lv_evdev_t * ex_dsc = lv_indev_get_driver_data(ex_indev);
-        if(dsc->st_dev == ex_dsc->st_dev && dsc->st_ino == ex_dsc->st_ino) {
-            /* an indev for this exact device instance already exists */
-            goto err_after_open;
-        }
-    }
 
     if(indev_type == LV_INDEV_TYPE_NONE) {
         uint32_t rel_bits = 0;
