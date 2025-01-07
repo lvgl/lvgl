@@ -41,7 +41,6 @@ static void settings_screen_event_cb(lv_event_t * e);
 static lv_obj_t * settings_screen;
 static lv_obj_t * settings_list;
 
-
 static lv_obj_t * about_label;
 
 static lv_smartwatch_settings_change_cb_t settings_change_cb;
@@ -69,7 +68,7 @@ lv_obj_t * lv_demo_smartwatch_settings_add_slider(uint16_t id, const char * name
                                                   int32_t min, int32_t max)
 {
     lv_obj_t * panel = lv_obj_create(settings_list);
-    lv_obj_set_width(panel, 200);
+    lv_obj_set_width(panel, lv_pct(85));
     lv_obj_set_height(panel, 64);
     lv_obj_set_align(panel, LV_ALIGN_CENTER);
     lv_obj_remove_flag(panel, LV_OBJ_FLAG_SCROLLABLE);
@@ -122,7 +121,7 @@ lv_obj_t * lv_demo_smartwatch_settings_add_slider(uint16_t id, const char * name
 lv_obj_t * lv_demo_smartwatch_settings_add_toggle(uint16_t id, const char * name, const lv_img_dsc_t * img, bool state)
 {
     lv_obj_t * panel = lv_obj_create(settings_list);
-    lv_obj_set_width(panel, 200);
+    lv_obj_set_width(panel, lv_pct(85));
     lv_obj_set_height(panel, 64);
     lv_obj_set_align(panel, LV_ALIGN_CENTER);
     lv_obj_remove_flag(panel, LV_OBJ_FLAG_SCROLLABLE);
@@ -142,9 +141,7 @@ lv_obj_t * lv_demo_smartwatch_settings_add_toggle(uint16_t id, const char * name
     lv_image_set_src(icon, img);
     lv_obj_set_width(icon, LV_SIZE_CONTENT);
     lv_obj_set_height(icon, LV_SIZE_CONTENT);
-    lv_obj_set_x(icon, -74);
-    lv_obj_set_y(icon, 2);
-    lv_obj_set_align(icon, LV_ALIGN_CENTER);
+    lv_obj_set_align(icon, LV_ALIGN_LEFT_MID);
     lv_obj_add_flag(icon, LV_OBJ_FLAG_ADV_HITTEST);
     lv_obj_remove_flag(icon, LV_OBJ_FLAG_SCROLLABLE);
     lv_image_set_scale(icon, 150);
@@ -152,8 +149,9 @@ lv_obj_t * lv_demo_smartwatch_settings_add_toggle(uint16_t id, const char * name
     lv_obj_t * toggle = lv_switch_create(panel);
     lv_obj_set_width(toggle, 50);
     lv_obj_set_height(toggle, 25);
-    lv_obj_set_x(toggle, 57);
-    lv_obj_set_y(toggle, 29);
+    lv_obj_set_x(toggle, 65);
+    lv_obj_set_y(toggle, 12);
+    lv_obj_set_align(toggle, LV_ALIGN_LEFT_MID);
 
     if(state) {
         lv_obj_add_state(toggle, LV_STATE_CHECKED);
@@ -165,7 +163,7 @@ lv_obj_t * lv_demo_smartwatch_settings_add_toggle(uint16_t id, const char * name
     lv_obj_t * label = lv_label_create(panel);
     lv_obj_set_width(label, LV_SIZE_CONTENT);
     lv_obj_set_height(label, LV_SIZE_CONTENT);
-    lv_obj_set_x(label, 54);
+    lv_obj_set_x(label, 60);
     lv_obj_set_y(label, 3);
     lv_label_set_text(label, name);
 
@@ -179,7 +177,7 @@ lv_obj_t * lv_demo_smartwatch_settings_add_dropdown(uint16_t id, const char * na
                                                     const char * options)
 {
     lv_obj_t * panel = lv_obj_create(settings_list);
-    lv_obj_set_width(panel, 200);
+    lv_obj_set_width(panel, lv_pct(85));
     lv_obj_set_height(panel, 64);
     lv_obj_set_x(panel, 37);
     lv_obj_set_y(panel, 7);
@@ -201,9 +199,9 @@ lv_obj_t * lv_demo_smartwatch_settings_add_dropdown(uint16_t id, const char * na
     lv_dropdown_set_options(dropdown, options);
     lv_obj_set_width(dropdown, 120);
     lv_obj_set_height(dropdown, LV_SIZE_CONTENT);
-    lv_obj_set_x(dropdown, 20);
-    lv_obj_set_y(dropdown, 10);
-    lv_obj_set_align(dropdown, LV_ALIGN_CENTER);
+    lv_obj_set_x(dropdown, 65);
+    lv_obj_set_y(dropdown, 12);
+    lv_obj_set_align(dropdown, LV_ALIGN_LEFT_MID);
     lv_obj_add_flag(dropdown, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_obj_set_style_bg_color(dropdown, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(dropdown, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -218,9 +216,7 @@ lv_obj_t * lv_demo_smartwatch_settings_add_dropdown(uint16_t id, const char * na
     lv_image_set_src(icon, img);
     lv_obj_set_width(icon, LV_SIZE_CONTENT);
     lv_obj_set_height(icon, LV_SIZE_CONTENT);
-    lv_obj_set_x(icon, -74);
-    lv_obj_set_y(icon, 2);
-    lv_obj_set_align(icon, LV_ALIGN_CENTER);
+    lv_obj_set_align(icon, LV_ALIGN_LEFT_MID);
     lv_obj_add_flag(icon, LV_OBJ_FLAG_ADV_HITTEST);
     lv_obj_remove_flag(icon, LV_OBJ_FLAG_SCROLLABLE);
     lv_image_set_scale(icon, 150);
@@ -228,8 +224,8 @@ lv_obj_t * lv_demo_smartwatch_settings_add_dropdown(uint16_t id, const char * na
     lv_obj_t * label = lv_label_create(panel);
     lv_obj_set_width(label, LV_SIZE_CONTENT);
     lv_obj_set_height(label, LV_SIZE_CONTENT);
-    lv_obj_set_x(label, 61);
-    lv_obj_set_y(label, 0);
+    lv_obj_set_x(label, 60);
+    lv_obj_set_y(label, 3);
     lv_label_set_text(label, name);
 
     lv_obj_add_event_cb(dropdown, settings_action_event_cb, LV_EVENT_VALUE_CHANGED,
@@ -241,7 +237,7 @@ lv_obj_t * lv_demo_smartwatch_settings_add_dropdown(uint16_t id, const char * na
 lv_obj_t * lv_demo_smartwatch_settings_add_label(uint16_t id, const char * name, const lv_img_dsc_t * img)
 {
     lv_obj_t * panel = lv_obj_create(settings_list);
-    lv_obj_set_width(panel, 200);
+    lv_obj_set_width(panel, lv_pct(85));
     lv_obj_set_height(panel, LV_SIZE_CONTENT);
     lv_obj_set_align(panel, LV_ALIGN_CENTER);
     lv_obj_remove_flag(panel, LV_OBJ_FLAG_SCROLLABLE);

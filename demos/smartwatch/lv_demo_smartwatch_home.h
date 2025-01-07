@@ -36,6 +36,12 @@ extern "C" {
 void lv_demo_smartwatch_home_create(lv_obj_t * parent);
 
 /**
+ * Get the home tile object that holds the watchfaces
+ * @return pointer to the home tile object
+ */
+lv_obj_t * lv_demo_smartwatch_get_tile_home(void);
+
+/**
  * Register external watchfaces
  * @param name      name of the app
  * @param preview   preview image of the watchface (180x180)

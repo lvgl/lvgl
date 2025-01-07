@@ -32,8 +32,8 @@ extern "C"
 #if LV_FONT_MONTSERRAT_48 == 0
 #error "LV_FONT_MONTSERRAT_48 text support is required. Enable it in lv_conf.h (LV_FONT_MONTSERRAT_48 1)"
 #endif
-#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < 144 * 1024
-#error "It's recommended to have at least 144kB RAM for the smartwatch demo, increase LV_MEM_SIZE"
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < 150 * 1024
+#error "It's recommended to have at least 150kB RAM for the smartwatch demo, increase LV_MEM_SIZE"
 #endif
 
 /*********************
@@ -75,7 +75,18 @@ void lv_demo_smartwatch_show_dialog(const char * title, const char * message);
  */
 void lv_demo_smartwatch_home_load(lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay);
 
+
+/**
+ * Get the tileview object
+ * @return pointer to the tileview object
+ */
 lv_obj_t * lv_demo_smartwatch_get_tileview(void);
+
+/**
+ * Get the home tile object that holds the watchfaces
+ * @return pointer to the home tile object
+ */
+lv_obj_t * lv_demo_smartwatch_get_tile_home(void);
 
 /**
  * Update the position of animated analog seconds
@@ -89,11 +100,16 @@ void lv_demo_smartwatch_face_update_seconds(int second);
 void lv_demo_smartwatch_app_close(void);
 
 /**
- * function to load watchface
+ * Function to load watchface
  * @param index     position of the watchface
  * @return whether success or not (unsuccessful means watchface at index was not found)
  */
 bool lv_demo_smartwatch_face_load(uint16_t index);
+
+/**
+ * Load the home screen watchface view
+ */
+void lv_demo_smartwatch_load_home_watchface(void);
 
 /**
  * Update time on the default watchface
@@ -124,10 +140,10 @@ void lv_demo_smartwatch_register_watchface_cb(const char * name, const lv_image_
                                               lv_obj_t ** seconds);
 
 /**
- * Get pointer to the watchface root object
+ * Get pointer to the current watchface root object
  * @return pointer to root object
  */
-lv_obj_t * lv_demo_smartwatch_face_get_root(void);
+lv_obj_t * lv_demo_smartwatch_face_get_current(void);
 
 /**
  * Register external apps

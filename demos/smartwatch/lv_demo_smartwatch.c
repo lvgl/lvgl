@@ -34,6 +34,7 @@
 static void create_dialog_window(void);
 static void dialog_close_event_cb(lv_event_t * e);
 static void lv_create_home_tile(void);
+static void home_tileview_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -42,7 +43,7 @@ static void lv_create_home_tile(void);
 static lv_theme_t * theme_original;
 static bool circular_scroll;
 static bool load_app_list;
-
+static bool first_load;
 
 static lv_obj_t * home_tile;
 static lv_obj_t * dialog_parent;
@@ -160,8 +161,14 @@ void lv_demo_smartwatch_show_dialog(const char * title, const char * message)
     lv_disp_t * display = lv_display_get_default();
     lv_obj_t * active_screen = lv_display_get_screen_active(display);
 
-    /*  attach the dialog window to current active screen */
-    lv_obj_set_parent(dialog_window, active_screen);
+    if(active_screen == home_tile) {
+        /* attach the dialog window to the current active tile */
+        lv_obj_set_parent(dialog_window, lv_tileview_get_tile_active(home_tile));
+    }
+    else {
+        /*  attach the dialog window to current active screen */
+        lv_obj_set_parent(dialog_window, active_screen);
+    }
 
     lv_label_set_text(dialog_title, title);
     lv_label_set_text(dialog_message, message);
@@ -189,17 +196,67 @@ void lv_demo_smartwatch_home_load(lv_screen_load_anim_t anim_type, uint32_t time
     lv_screen_load_anim(home_tile, anim_type, time, delay, false);
 }
 
+void lv_demo_smartwatch_load_home_watchface(void)
+{
+    lv_disp_t * display = lv_display_get_default();
+    lv_obj_t * active_screen = lv_display_get_screen_active(display);
+    if(active_screen != home_tile) {
+        lv_screen_load_anim(home_tile, LV_SCR_LOAD_ANIM_FADE_IN, 500, 0, false);
+    }
+    if(lv_tileview_get_tile_active(home_tile) != lv_demo_smartwatch_get_tile_home()) {
+        lv_tileview_set_tile_by_index(home_tile, 0, 1, LV_ANIM_OFF);
+    }
+}
+
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void home_tileview_event_cb(lv_event_t * e)
+{
+
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        if(!first_load) {
+            first_load = true;
+            lv_demo_smartwatch_show_dialog("Welcome", "Start animate analog");
+            /* run the analog seconds animation on first load */
+            lv_demo_smartwatch_face_update_seconds(30);
+        }
+    }
+
+    if(lv_tileview_get_tile_active(home_tile) != lv_demo_smartwatch_get_tile_home()) {
+        LV_LOG_WARN("Currently not in the watchface tile");
+        return;
+    }
+    lv_disp_t * display = lv_display_get_default();
+    lv_obj_t * active_screen = lv_display_get_screen_active(display);
+    if(active_screen != home_tile) {
+        /* event was triggered but the current screen is no longer active */
+        return;
+    }
+
+    if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT) {
+        lv_demo_smartwatch_set_load_app_list(false); /* flag was not open from app list */
+        lv_demo_smartwatch_notifications_load(LV_SCR_LOAD_ANIM_OVER_RIGHT, 500, 0);
+    }
+
+    if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_TOP) {
+        lv_demo_smartwatch_set_load_app_list(false); /* flag was not open from app list */
+        lv_demo_smartwatch_weather_load(LV_SCR_LOAD_ANIM_MOVE_TOP, 500, 0);
+    }
+
+}
+
 static void lv_create_home_tile(void)
 {
     home_tile = lv_tileview_create(NULL);
-    // lv_obj_remove_flag(home_tile, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_scrollbar_mode(home_tile, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_style_bg_color(home_tile, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(home_tile, 55, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_add_event_cb(home_tile, home_tileview_event_cb, LV_EVENT_ALL, NULL);
 
 }
 
@@ -234,7 +291,7 @@ static void create_dialog_window(void)
     lv_obj_set_style_pad_bottom(dialog_window, 60, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     dialog_panel = lv_obj_create(dialog_window);
-    lv_obj_set_width(dialog_panel, 167);
+    lv_obj_set_width(dialog_panel, lv_pct(80));
     lv_obj_set_height(dialog_panel, LV_SIZE_CONTENT);
     lv_obj_set_x(dialog_panel, 0);
     lv_obj_set_y(dialog_panel, 60);
@@ -253,7 +310,7 @@ static void create_dialog_window(void)
     lv_obj_set_style_pad_bottom(dialog_panel, 8, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     dialog_title = lv_label_create(dialog_panel);
-    lv_obj_set_width(dialog_title, 140);
+    lv_obj_set_width(dialog_title, lv_pct(80));
     lv_obj_set_height(dialog_title, LV_SIZE_CONTENT);
     lv_obj_set_align(dialog_title, LV_ALIGN_TOP_MID);
     lv_label_set_long_mode(dialog_title, LV_LABEL_LONG_SCROLL_CIRCULAR);
@@ -270,14 +327,14 @@ static void create_dialog_window(void)
     lv_obj_set_style_pad_bottom(dialog_title, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     dialog_message = lv_label_create(dialog_panel);
-    lv_obj_set_width(dialog_message, 140);
+    lv_obj_set_width(dialog_message, lv_pct(80));
     lv_obj_set_height(dialog_message, LV_SIZE_CONTENT);
     lv_obj_set_align(dialog_message, LV_ALIGN_CENTER);
     lv_label_set_text(dialog_message, "Dialog message");
     lv_obj_set_style_text_font(dialog_message, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     dialog_close = lv_button_create(dialog_panel);
-    lv_obj_set_width(dialog_close, 100);
+    lv_obj_set_width(dialog_close, lv_pct(60));
     lv_obj_set_height(dialog_close, LV_SIZE_CONTENT);
     lv_obj_set_align(dialog_close, LV_ALIGN_BOTTOM_MID);
     lv_obj_add_flag(dialog_close, LV_OBJ_FLAG_SCROLL_ON_FOCUS);

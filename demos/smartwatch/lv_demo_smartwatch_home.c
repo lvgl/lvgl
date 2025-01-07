@@ -25,10 +25,10 @@
  * watchface object
  */
 typedef struct {
-    const char * name;              /**< name of the watchface, shown in the watchface selector */
+    const char * name;             /**< name of the watchface, shown in the watchface selector */
     const lv_image_dsc_t * preview; /**< preview of the watchface, shown in the watchface selector */
-    lv_obj_t ** watchface;          /**< pointer to watchface root object */
-    lv_obj_t ** seconds;            /**< pointer to analog seconds object in the watchface, used for smooth animation */
+    lv_obj_t ** watchface;         /**< pointer to watchface root object */
+    lv_obj_t ** seconds;           /**< pointer to analog seconds object in the watchface, used for smooth animation */
 } watchface_t;
 
 /**********************
@@ -43,6 +43,7 @@ static void animate_analog_seconds(lv_obj_t * target);
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_obj_t * face_park;
 static lv_obj_t * home_panel;
 static lv_obj_t * home_screen;
 static lv_obj_t * clock_screen;
@@ -65,7 +66,6 @@ static uint32_t num_faces;
 static uint32_t current_face_index;
 
 static lv_anim_t seconds_animation;
-static bool first_load;
 
 /**********************
  *      MACROS
@@ -98,13 +98,12 @@ void lv_demo_smartwatch_home_create(lv_obj_t * parent)
     lv_obj_set_style_bg_color(home_panel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(home_panel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    face_park = lv_obj_create(NULL); /* parent of inactive watchfaces */
+
     create_screen_home();
 
     lv_demo_smartwatch_register_watchface_cb("Default", &img_digital_preview, &clock_screen, NULL);
-
-    home_screen = clock_screen;
 }
-
 
 void lv_demo_smartwatch_face_events_cb(lv_event_t * e)
 {
@@ -114,16 +113,12 @@ void lv_demo_smartwatch_face_events_cb(lv_event_t * e)
         lv_demo_smartwatch_set_load_app_list(false); /* flag was not open from app list */
         lv_demo_smartwatch_notifications_load(LV_SCR_LOAD_ANIM_OVER_RIGHT, 500, 0);
     }
-    if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_LEFT) {
-        lv_demo_smartwatch_list_load(LV_SCR_LOAD_ANIM_MOVE_LEFT, 500, 0);
-    }
-    if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_BOTTOM) {
-        lv_demo_smartwatch_control_load(LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 500, 0);
-    }
+
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_TOP) {
         lv_demo_smartwatch_set_load_app_list(false); /* flag was not open from app list */
         lv_demo_smartwatch_weather_load(LV_SCR_LOAD_ANIM_MOVE_TOP, 500, 0);
     }
+
     if(event_code == LV_EVENT_LONG_PRESSED_REPEAT) {
         lv_disp_t * display = lv_display_get_default();
         lv_obj_t * active_screen = lv_display_get_screen_active(display);
@@ -134,14 +129,7 @@ void lv_demo_smartwatch_face_events_cb(lv_event_t * e)
         lv_screen_load_anim(face_select, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, false);
     }
 
-    if(event_code == LV_EVENT_SCREEN_LOADED) {
-        if(!first_load) {
-            first_load = true;
-            /* run the analog seconds animation on first load */
-            lv_demo_smartwatch_face_update_seconds(0);
-        }
 
-    }
 }
 
 void lv_demo_smartwatch_face_selected_cb(lv_event_t * e)
@@ -161,15 +149,8 @@ void lv_demo_smartwatch_face_selected_cb(lv_event_t * e)
             return;
         }
         lv_obj_scroll_to_view(lv_obj_get_child(face_select, index), LV_ANIM_OFF);
-        if(current_face_index != index) {
-            current_face_index = index;
-            // home_screen = *faces[index].watchface;
 
-            LV_LOG_WARN("Watchfaces cannot be changed in TileView");
-            // lv_obj_clean(home_screen);
-            // lv_obj_set_parent(*faces[index].watchface, home_screen);
-        }
-        lv_demo_smartwatch_home_load(LV_SCR_LOAD_ANIM_FADE_ON, 500, 0);
+        lv_demo_smartwatch_face_load(index);
     }
 }
 
@@ -189,9 +170,14 @@ void lv_demo_smartwatch_home_set_time(int minute, int hour, const char * am_pm, 
     lv_label_set_text(am_pm_label, am_pm);
 }
 
-lv_obj_t * lv_demo_smartwatch_face_get_root(void)
+lv_obj_t * lv_demo_smartwatch_get_tile_home(void)
 {
-    return home_screen;
+    return home_panel;
+}
+
+lv_obj_t * lv_demo_smartwatch_face_get_current(void)
+{
+    return lv_obj_get_child(home_panel, 0);
 }
 
 void lv_demo_smartwatch_face_update_seconds(int second)
@@ -220,10 +206,19 @@ bool lv_demo_smartwatch_face_load(uint16_t index)
     lv_obj_scroll_to_view(lv_obj_get_child(face_select, index), LV_ANIM_OFF);
     if(current_face_index != index) {
         current_face_index = index;
-        home_screen = *faces[index].watchface;
+
+        /* remove all objects in the home panel by assigning them a new parent */
+        for(uint32_t i = 0; i < lv_obj_get_child_count(home_panel); i++) {
+            lv_obj_t * current = lv_obj_get_child(home_panel, i);
+            if(current != NULL) {
+                lv_obj_set_parent(current, face_park);
+            }
+        }
+        /* set the selected watchface parent */
+        lv_obj_set_parent((lv_obj_t *)*faces[index].watchface, home_panel);
     }
 
-    lv_demo_smartwatch_home_load(LV_SCR_LOAD_ANIM_FADE_ON, 500, 0);
+    lv_demo_smartwatch_load_home_watchface();
 
     return true;
 }

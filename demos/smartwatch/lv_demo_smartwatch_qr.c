@@ -112,11 +112,11 @@ void lv_demo_smartwatch_qr_list_add(uint8_t id, const char * link)
 {
 #if LV_USE_QRCODE == 1
     qr_item = lv_obj_create(qr_panel);
-    lv_obj_set_width(qr_item, 200);
-    lv_obj_set_height(qr_item, 240);
+    lv_obj_set_width(qr_item, lv_pct(85));
+    lv_obj_set_height(qr_item, lv_pct(100));
     lv_obj_set_align(qr_item, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(qr_item, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(qr_item, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_flex_align(qr_item, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_remove_flag(qr_item, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(qr_item, LV_OBJ_FLAG_SNAPPABLE);
     lv_obj_remove_flag(qr_item, LV_OBJ_FLAG_SCROLL_ONE);
