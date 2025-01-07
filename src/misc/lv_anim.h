@@ -429,9 +429,9 @@ uint32_t lv_anim_speed(uint32_t speed);
 
 /**
  * Store the speed as a special value which can be used as time in animations.
- * It will be converted to time internally based on the start and end values
- * That is this the return value can be used as a constant with multiple animations
- * and let LVGL to convert the speed to time based on the actual values.
+ * It will be converted to time internally based on the start and end values.
+ * The return value can be used as a constant with multiple animations
+ * and let LVGL convert the speed to time based on the actual values.
  * @param speed         the speed of the animation in as unit / sec resolution in 0..10k range
  * @param min_time      the minimum time in 0..10k range
  * @param max_time      the maximum time in 0..10k range
