@@ -274,7 +274,7 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * assets_path,
     }
     c->sz->init_fonts_cb(c->fonts);
 
-    lv_subject_init_pointer(&c->th, (void *)&lv_demo_high_res_theme_light);
+    lv_subject_init_pointer(&c->th, (void *)&lv_demo_high_res_theme_dark);
     c->th.user_data = c;
     lv_subject_add_observer(&c->th, theme_observer_cb, c);
 
