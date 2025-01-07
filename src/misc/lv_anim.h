@@ -418,8 +418,8 @@ uint16_t lv_anim_count_running(void);
 /**
  * Store the speed as a special value which can be used as time in animations.
  * It will be converted to time internally based on the start and end values.
- * That is this the return value can be used as a constant with multiple animations
- * and let LVGL to convert the speed to time based on the actual values.
+ * The return value can be used as a constant with multiple animations
+ * and let LVGL convert the speed to time based on the actual values.
  * LIMITATION: the max time stored this way can be 10,000 ms.
  * @param speed         the speed of the animation in with unit / sec resolution in 0..10k range
  * @return              a special value which can be used as an animation time
