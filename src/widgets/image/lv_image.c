@@ -241,6 +241,7 @@ void lv_image_set_src(lv_obj_t * obj, const void * src)
         img->h        = header.h;
     }
     img->cf       = header.cf;
+    img->flags    = header.flags;
 
     lv_obj_refresh_self_size(obj);
 
@@ -657,7 +658,7 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
-        if(img->w == 0 || img->h == 0) {
+        if(img->align == LV_IMAGE_ALIGN_STRETCH && (img->flags & LV_IMAGE_FLAGS_AUTO_STRETCH)) {
             img->w = lv_obj_get_width(obj);
             img->h = lv_obj_get_height(obj);
             update_align(obj);

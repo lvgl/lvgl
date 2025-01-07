@@ -32,6 +32,7 @@
 
 typedef struct _lv_svg_render_obj {
     struct _lv_svg_render_obj * next;
+    lv_svg_tag_t tag;
     uint32_t flags;
     char * id;
     lv_vector_draw_dsc_t dsc;

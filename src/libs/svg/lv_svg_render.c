@@ -285,6 +285,8 @@ static void _set_viewport_attr(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t *
                     if(view->height > 0 && vals[3] > 0) {
                         scale_y = view->height / vals[3];
                     }
+                    view->width = scale_x * vals[2];
+                    view->height = scale_y * vals[3];
 
                     lv_matrix_scale(&obj->matrix, scale_x, scale_y);
                     lv_matrix_translate(&obj->matrix, -trans_x, -trans_y);
@@ -1021,6 +1023,7 @@ static void _copy_draw_dsc_from_ref(lv_vector_dsc_t * dsc, const lv_svg_render_o
 static void _set_render_attrs(lv_svg_render_obj_t * obj, const lv_svg_node_t * node,
                               struct _lv_svg_drawing_builder_state * state)
 {
+    obj->tag = node->type;
     if((node->type != LV_SVG_TAG_CONTENT) && node->xml_id) {
         obj->id = lv_strdup(node->xml_id);
     }
@@ -1673,6 +1676,15 @@ static void _render_span(const lv_svg_render_content_t * content, lv_vector_dsc_
 
 // get bounds functions
 
+static void _get_viewport_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
+{
+    lv_svg_render_viewport_t * viewport = (lv_svg_render_viewport_t *)obj;
+    area->x1 = 0;
+    area->y1 = 0;
+    area->x2 = (int32_t)roundf(viewport->width);
+    area->y2 = (int32_t)roundf(viewport->height);
+}
+
 static void _get_rect_bounds(const lv_svg_render_obj_t * obj, lv_area_t * area)
 {
     lv_svg_render_rect_t * rect = (lv_svg_render_rect_t *)obj;
@@ -1949,6 +1961,7 @@ static lv_svg_render_obj_t * _lv_svg_render_create(const lv_svg_node_t * node,
                 view->base.init = _init_viewport;
                 view->base.render = _render_viewport;
                 view->base.set_attr = _set_viewport_attr;
+                view->base.get_bounds = _get_viewport_bounds;
                 view->base.get_size = _get_viewport_size;
                 _set_render_attrs(LV_SVG_RENDER_OBJ(view), node, state);
                 return LV_SVG_RENDER_OBJ(view);
