@@ -266,6 +266,9 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
         int32_t col_w = (block_w - (ser_gap * (ser_cnt - 1))) / ser_cnt;
         p_out->x += col_w / 2;
     }
+    else {
+        p_out->x = 0;
+    }
 
     int32_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     p_out->x += lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
