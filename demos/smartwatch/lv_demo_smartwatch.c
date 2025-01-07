@@ -208,7 +208,6 @@ void lv_demo_smartwatch_load_home_watchface(void)
     }
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -220,7 +219,6 @@ static void home_tileview_event_cb(lv_event_t * e)
     if(event_code == LV_EVENT_SCREEN_LOADED) {
         if(!first_load) {
             first_load = true;
-            lv_demo_smartwatch_show_dialog("Welcome", "Start animate analog");
             /* run the analog seconds animation on first load */
             lv_demo_smartwatch_face_update_seconds(30);
         }
