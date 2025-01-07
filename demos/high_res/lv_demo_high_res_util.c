@@ -260,7 +260,7 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * assets_path,
         int chars = lv_snprintf(path_buf, sizeof(path_buf), "%s/img_lv_demo_high_res_%s_%s.png",
                                 assets_path, image_details[i].name, size_prefix);
         LV_ASSERT(chars < (int)sizeof(path_buf));
-        c->imgs[i] = lv_demo_high_res_image_preload(path_buf, image_details[i].cf);
+        c->imgs[i] = lv_demo_high_res_image_preload(path_buf, image_details[i].cf, LV_SCALE_NONE);
     }
 
     for(uint32_t i = 0; i < STYLE_COLOR_COUNT; i++) {
@@ -344,7 +344,7 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * assets_path,
 
         for(int32_t i = 1; ; i++) {
             char buf[256];
-            lv_snprintf(buf, sizeof(buf), "%s/Slide%"PRId32".png", slides_path, i);
+            lv_snprintf(buf, sizeof(buf), "%s/Slide%"LV_PRId32".png", slides_path, i);
             lv_fs_file_t file;
             fs_res = lv_fs_open(&file, buf, LV_FS_MODE_RD);
             if(fs_res != LV_FS_RES_OK) {
@@ -353,8 +353,20 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * assets_path,
             fs_res = lv_fs_close(&file);
             LV_ASSERT(fs_res == LV_FS_RES_OK);
 
-            lv_image_dsc_t * loaded_draw_buf = lv_demo_high_res_image_preload(buf, LV_COLOR_FORMAT_NATIVE);
+            lv_image_header_t header;
+            lv_result_t res = lv_image_decoder_get_info(buf, &header);
+            if(res == LV_RESULT_INVALID) {
+                LV_LOG_WARN("Couldn't read the header info of slide image");
+                continue;
+            }
+            /* the ratio of a slide's height to the display's height will be 9:16 */
+            int32_t scale = (9 * 256 * vres) / (16 * header.h);
+
+            lv_image_dsc_t * loaded_draw_buf = lv_demo_high_res_image_preload(buf, LV_COLOR_FORMAT_NATIVE, scale);
+            if(loaded_draw_buf == NULL) continue;
             lv_array_push_back(&c->about_slides_array, &loaded_draw_buf);
+
+            if(scale != LV_SCALE_NONE) LV_LOG_INFO("A slide was scaled by %"LV_PRId32" (256 means 1:1)", scale);
         }
     }
 
@@ -416,7 +428,7 @@ void lv_demo_high_res_theme_observer_obj_bg_image_src_cb(lv_observer_t * observe
     }
 }
 
-lv_image_dsc_t * lv_demo_high_res_image_preload(const void * src, lv_color_format_t cf)
+lv_image_dsc_t * lv_demo_high_res_image_preload(const void * src, lv_color_format_t cf, int32_t scale)
 {
     lv_image_header_t header;
     lv_result_t res = lv_image_decoder_get_info(src, &header);
@@ -426,7 +438,9 @@ lv_image_dsc_t * lv_demo_high_res_image_preload(const void * src, lv_color_forma
     }
 
     lv_draw_buf_t * dest;
-    dest = lv_draw_buf_create(header.w, header.h, cf, LV_STRIDE_AUTO);
+    int32_t dest_w = header.w * scale / 256;
+    int32_t dest_h = header.h * scale / 256;
+    dest = lv_draw_buf_create(dest_w, dest_h, cf, LV_STRIDE_AUTO);
 
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
     lv_canvas_set_draw_buf(canvas, dest);
@@ -438,8 +452,10 @@ lv_image_dsc_t * lv_demo_high_res_image_preload(const void * src, lv_color_forma
     lv_draw_image_dsc_t dsc;
     lv_draw_image_dsc_init(&dsc);
     dsc.src = src;
+    dsc.scale_x = scale;
+    dsc.scale_y = scale;
 
-    lv_area_t coords = {0, 0, LV_MIN(header.w, dest->header.w) - 1, LV_MIN(header.h, dest->header.h) - 1};
+    lv_area_t coords = {0, 0, header.w - 1, header.h - 1};
     lv_draw_image(&layer, &dsc, &coords);
     lv_canvas_finish_layer(canvas, &layer);
 
