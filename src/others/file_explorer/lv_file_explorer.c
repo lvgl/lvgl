@@ -502,11 +502,10 @@ static void browser_file_event_handler(lv_event_t * e)
         else {
             if(lv_strcmp(str_fn, "..") != 0) {
                 if(explorer->current_path[lv_strlen(explorer->current_path) - 1] != '/') {
-                lv_snprintf((char *)file_name, sizeof(file_name), "%s/%s", explorer->current_path, str_fn);
+                    lv_snprintf((char *)file_name, sizeof(file_name), "%s/%s", explorer->current_path, str_fn);
                 }
                 else {
-                lv_snprintf((char *)file_name, sizeof(file_name), "%s%s", explorer->current_path, str_fn);
-
+                    lv_snprintf((char *)file_name, sizeof(file_name), "%s%s", explorer->current_path, str_fn);
                 }
             }
         }
