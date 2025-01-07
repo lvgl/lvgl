@@ -165,19 +165,26 @@ Asynchronous calls
 There are several cases in which you may not want to perform an action immediately.
 Some examples are:
 
-- you cannot delete a Widget because something else is still using it, or
-- you don't want to block execution now.
+- you cannot delete a Widget because something else is still using it,
+- you don't want to block execution now, or
+- you detect the need to delete a Widget in a thread other than the thread making
+  LVGL calls (e.g. in a case where you are using a :ref:`Gateway Thread <Gateway
+  Thread>` to make all LVGL calls in a multi-threaded environment).
 
 For these cases,
-:cpp:expr:`lv_async_call(my_function, data_p)` can be used to call
-``my_function`` on the next invocation of :cpp:func:`lv_timer_handler`.  As a side
-effect, also ensures it is in a thread in which it is safe to make LVGL calls.
+:cpp:expr:`lv_async_call(my_function, data_p)` can be used to call ``my_function`` on
+the next invocation of :cpp:func:`lv_timer_handler`.  As a side effect, this also
+ensures it is called in a thread in which it is safe to make LVGL calls.
 ``data_p`` will be passed to the function when it's called. Note that only the data's
 pointer is saved, so whatever it is pointing to needs to remain valid until the
 function is called, so it can point to ``static``, global or dynamically allocated
 data. If you want to cancel an asynchronous call, call
 :cpp:expr:`lv_async_call_cancel(my_function, data_p)`, which will remove all
 asynchronous calls matching ``my_function`` and ``data_p``.
+
+Note that if :cpp:expr:`lv_async_call(my_function, data_p)` is called from a thread
+other than the one that normally makes LVGL calls, you are still obligated to protect
+the LVGL data structure using a MUTEX.
 
 For example:
 
@@ -196,7 +203,9 @@ For example:
    /* Do something with the Widget on the current screen */
 
    /* Delete screen on next call of `lv_timer_handler`, not right now. */
+   lv_lock();
    lv_async_call(my_screen_clean_up, lv_screen_active());
+   lv_unlock();
 
    /* The screen is still valid so you can do other things with it */
 
