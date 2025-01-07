@@ -201,6 +201,8 @@ typedef struct {
     lv_subject_t top_margin_setting_subject;
     lv_demo_high_res_api_t api;
     lv_demo_high_res_subject_groups_t subject_groups;
+    lv_array_t about_slides_array;
+    bool about_slides_dir_exists;
 } lv_demo_high_res_ctx_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_demo_high_res_theme_t lv_demo_high_res_theme_light;

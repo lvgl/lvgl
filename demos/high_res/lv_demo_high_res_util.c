@@ -333,6 +333,31 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * assets_path,
     lv_subject_init_group(&c->subject_groups.wifi.group, c->subject_groups.wifi.members,
                           ARRAY_LEN(c->subject_groups.wifi.members));
 
+    lv_array_init(&c->about_slides_array, 1, sizeof(lv_image_dsc_t *));
+    lv_fs_dir_t dir;
+    lv_fs_res_t fs_res = lv_fs_dir_open(&dir, slides_path);
+    if(fs_res == LV_FS_RES_OK) {
+        fs_res = lv_fs_dir_close(&dir);
+        LV_ASSERT(fs_res == LV_FS_RES_OK);
+
+        c->about_slides_dir_exists = true;
+
+        for(int32_t i = 1; ; i++) {
+            char buf[256];
+            lv_snprintf(buf, sizeof(buf), "%s/Slide%"PRId32".png", slides_path, i);
+            lv_fs_file_t file;
+            fs_res = lv_fs_open(&file, buf, LV_FS_MODE_RD);
+            if(fs_res != LV_FS_RES_OK) {
+                break;
+            }
+            fs_res = lv_fs_close(&file);
+            LV_ASSERT(fs_res == LV_FS_RES_OK);
+
+            lv_image_dsc_t * loaded_draw_buf = lv_demo_high_res_image_preload(buf, LV_COLOR_FORMAT_NATIVE);
+            lv_array_push_back(&c->about_slides_array, &loaded_draw_buf);
+        }
+    }
+
     return base_obj;
 }
 
@@ -544,6 +569,13 @@ static void free_ctx_event_cb(lv_event_t * e)
     for(uint32_t i = 0; i < sizeof(c->api.subjects) / sizeof(lv_subject_t); i++) {
         lv_subject_deinit(&subjects[i]);
     }
+
+    uint32_t about_slides_count = lv_array_size(&c->about_slides_array);
+    for(uint32_t i = 0; i < about_slides_count; i++) {
+        lv_image_dsc_t ** slide = lv_array_at(&c->about_slides_array, i);
+        lv_draw_buf_destroy((lv_draw_buf_t *) *slide);
+    }
+    lv_array_deinit(&c->about_slides_array);
 
     lv_free(c);
 
