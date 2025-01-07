@@ -77,7 +77,7 @@ typedef struct {
     drmModePropertyPtr plane_props[128];
     drmModePropertyPtr crtc_props[128];
     drmModePropertyPtr conn_props[128];
-    drm_buffer_t drm_bufs[2];
+    drm_buffer_t drm_bufs[BUFFER_CNT];
     drm_buffer_t * act_buf;
 } drm_dev_t;
 
@@ -181,6 +181,7 @@ static void drm_dmabuf_set_active_buf(lv_event_t * event)
             if(act_buf->unaligned_data == drm_dev->drm_bufs[i].map) {
                 drm_dev->act_buf = &drm_dev->drm_bufs[i];
                 LV_LOG_TRACE("Set active buffer idx: %d", i);
+                break;
             }
         }
 
@@ -240,7 +241,7 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
 
     /* Set the handler that is called before a redraw occurs to set the active buffer/plane
      * when GBM buffers are used the DMA_BUF_SYNC_START is issued there */
-    lv_display_add_event_cb(disp, drm_dmabuf_set_active_buf, LV_EVENT_REFR_REQUEST, drm_dev);
+    lv_display_add_event_cb(disp, drm_dmabuf_set_active_buf, LV_EVENT_REFR_START, drm_dev);
 
     if(width) {
         lv_display_set_dpi(disp, DIV_ROUND_UP(hor_res * 25400, width * 1000));
