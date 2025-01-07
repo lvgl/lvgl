@@ -443,7 +443,7 @@ uint32_t lv_anim_speed(uint32_t speed);
 uint32_t lv_anim_speed_clamped(uint32_t speed, uint32_t min_time, uint32_t max_time);
 
 /**
- * Resolve the speed create with `lv_anim_speed` or `lv_anim_speed_clamped`
+ * Resolve the speed (created with `lv_anim_speed` or `lv_anim_speed_clamped`) to time
  * based on start and end values.
  * @param speed     return values of `lv_anim_speed` or `lv_anim_speed_clamped`
  * @param start     the start value of the animation
