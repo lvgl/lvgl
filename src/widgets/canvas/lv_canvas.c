@@ -129,6 +129,7 @@ void lv_canvas_set_px(lv_obj_t * obj, int32_t x, int32_t y, lv_color_t color, lv
                 break;
             case LV_COLOR_FORMAT_I8:
                 /*Indexed8 format is a easy case, process and return.*/
+                shift = 0;
                 *data = c_int;
             default:
                 return;

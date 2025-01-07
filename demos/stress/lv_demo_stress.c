@@ -209,7 +209,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             obj = lv_dropdown_create(main_page);
             lv_dropdown_set_options(obj, "Zero\nOne\nTwo\nThree\nFour\nFive\nSix\nSeven\nEight");
             lv_dropdown_open(obj);
-            lv_dropdown_set_selected(obj, 2);
+            lv_dropdown_set_selected(obj, 2, LV_ANIM_ON);
             auto_delete(obj, LV_DEMO_STRESS_TIME_STEP * 3 + 11);
             break;
 
