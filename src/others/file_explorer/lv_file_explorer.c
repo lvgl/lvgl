@@ -502,8 +502,7 @@ static void browser_file_event_handler(lv_event_t * e)
         else {
             if(lv_strcmp(str_fn, "..") != 0) {
                 if(explorer->current_path[lv_strlen(explorer->current_path) - 1] != '/') {
-                    // strip_ext(explorer->current_path);
-                    lv_snprintf((char *)file_name, sizeof(file_name), "%s/%s", explorer->current_path, str_fn);
+                lv_snprintf((char *)file_name, sizeof(file_name), "%s/%s", explorer->current_path, str_fn);
                 }
                 else {
                 lv_snprintf((char *)file_name, sizeof(file_name), "%s%s", explorer->current_path, str_fn);
@@ -609,10 +608,12 @@ static void show_dir(lv_obj_t * obj, const char * path)
     lv_strlcpy(explorer->current_path, path, sizeof(explorer->current_path));
     lv_label_set_text_fmt(explorer->path_label, LV_SYMBOL_EYE_OPEN" %s", path);
 
-    // size_t current_path_len = lv_strlen(explorer->current_path);
-    // if((*((explorer->current_path) + current_path_len) != '/') && (current_path_len < LV_FILE_EXPLORER_PATH_MAX_LEN)) {
-    //     *((explorer->current_path) + current_path_len) = '/';
-    // }
+    /*
+    size_t current_path_len = lv_strlen(explorer->current_path);
+    if((*((explorer->current_path) + current_path_len) != '/') && (current_path_len < LV_FILE_EXPLORER_PATH_MAX_LEN)) {
+        *((explorer->current_path) + current_path_len) = '/';
+    }
+    */
 
 }
 
