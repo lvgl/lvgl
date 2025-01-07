@@ -420,7 +420,8 @@ void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc
     lv_color_format_t cf = draw_buf->header.cf;
 
     if(cf != LV_COLOR_FORMAT_ARGB8888 && \
-       cf != LV_COLOR_FORMAT_XRGB8888) {
+       cf != LV_COLOR_FORMAT_XRGB8888 && \
+       cf != LV_COLOR_FORMAT_A8) {
         LV_LOG_ERROR("unsupported layer color: %d", cf);
         return;
     }
@@ -430,10 +431,23 @@ void lv_draw_sw_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc
     int32_t height = lv_area_get_height(&layer->buf_area) - 1;
     uint32_t stride = draw_buf->header.stride;
     Tvg_Canvas * canvas = tvg_swcanvas_create();
-    tvg_swcanvas_set_target(canvas, buf, stride / 4, width, height, TVG_COLORSPACE_ARGB8888);
+
+    if (cf != LV_COLOR_FORMAT_A8) {
+        tvg_swcanvas_set_target(canvas, buf, stride / 4, width, height, TVG_COLORSPACE_ARGB8888);
+    } else {
+        tvg_swcanvas_set_target(canvas, buf, stride, width, height, TVG_COLORSPACE_A8);
+    }
 
     _tvg_rect rc;
+
+    /* Question: when rendering fonts the clip area should be the buffer */
+    /* Should a dedicated draw unit be created ? */
+#if 0
     lv_area_to_tvg(&rc, draw_unit->clip_area);
+#else
+    lv_area_to_tvg(&rc, &layer->_clip_area);
+#endif
+
     tvg_canvas_set_viewport(canvas, (int32_t)rc.x, (int32_t)rc.y, (int32_t)rc.w, (int32_t)rc.h);
 
     lv_ll_t * task_list = dsc->task_list;
