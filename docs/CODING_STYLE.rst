@@ -332,9 +332,9 @@ Various subsystems of LVGL can be enabled or disabled by setting a macro in
 ``lv_conf.h`` to 1 or 0 respectively.  The code files that contain the logic for
 those subsystems are often arranged so that there is an ``#if <enabling_macro_name>``
 directive near the top of the file, and its matching ``#endif`` is at the end of the
-file.  If you add such a subsystem to LVGL, whenever possible, the only ``#include``
-that should be above those conditional directives should be just enough to include
-the enabling/disabling macro.  Specifically:
+file.  If you add or modify such a subsystem in LVGL, whenever possible, the only
+``#include`` that should be above those conditional directives should be just enough
+to include the enabling/disabling macro.  Specifically:
 
 - in the ``.c`` file:  the ``#include`` that includes the header with the closest
   correspondence to that ``.c`` file
