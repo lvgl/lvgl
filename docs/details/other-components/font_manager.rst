@@ -4,13 +4,15 @@
 Font Manager
 ============
 
-Font Manager is a secondary encapsulation based on :ref:`freetype`, which
-facilitates upper-level applications to manage and use vector fonts. Currently
-supported functions include:
+Font Manager is a secondary encapsulation of :ref:`freetype`, which provides
+facilities for high-level applications to manage and use vector fonts.  Currently
+provided font-management functions includes:
 
 - Font resource reference counting (reduces repeated creation of font resources).
 - Font resource concatenation (font fallback).
-- Font resource recycling mechanism (buffers recently deleted font resources to reduce the time overhead of repeated creation).
+- Font resource recycling mechanism (buffers recently deleted font resources to
+  reduce the time overhead of repeated creation).
+
 
 
 .. _font_manager_usage:
@@ -18,22 +20,23 @@ supported functions include:
 Usage
 *****
 
-Enable :c:macro:`LIB_FREETYPE` and `LV_USE_FONT_MANAGER` in ``lv_conf.h``.
-
-Configure :c:macro:`LV_FONT_MANAGER_NAME_MAX_LEN` to set the maximum length of the font name.
+Enable FreeType and Font Manager in ``lv_conf.h`` by setting the
+:c:macro:`LV_USE_FREETYPE` and :c:macro:`LV_USE_FONT_MANAGER` macros to non-zero
+values, and configure :c:macro:`LV_FONT_MANAGER_NAME_MAX_LEN` to set the maximum
+length of the font name.
 
 Initialize Font Manager
 -----------------------
 
 Use :cpp:func:`lv_font_manager_create` to create a font manager, where the
 :cpp:func:`recycle_cache_size` parameter is used to set the number of font recycling
-caches,which can improve font creation efficiency.
+caches, which can improve font creation efficiency.
 
 Use :cpp:func:`lv_font_manager_add_path_static` to add a mapping between the font
 file path and the custom font name, so that the application can access the font
 resources more conveniently.  It should be noted that if the file path is not static
-(assigned from a local variable), please use :cpp:func:`lv_font_manager_add_path` to
-add the path.  This API will copy the path content to the internal management.
+(assigned from a local variable), use :cpp:func:`lv_font_manager_add_path` to
+add the path.  This function will make its own copy of the string.
 
 Use :cpp:func:`lv_font_manager_remove_path` to remove the font path mapping.
 
@@ -57,7 +60,7 @@ Create Font from Font Manager
 Use :cpp:func:`lv_font_manager_create_font` to create a font.  The parameters are
 basically the same as :cpp:func:`lv_freetype_font_create`.
 
-The :cpp:func:`font_family` parameter can be filled with the names of multiple fonts
+The ``font_family`` parameter can be filled with the names of multiple fonts
 (separated by ``,``) to achieve font concatenation (when the corresponding glyph is
 not found in a font file, it will automatically search from the next concatenated
 font).
@@ -81,11 +84,11 @@ font).
 Delete Font
 -----------
 
-Use :cpp:func:`lv_font_manager_delete_font` to delete the font.
-The font manager will mark the font resource as a recyclable font so that it can be
-quickly created next time.
+Use :cpp:func:`lv_font_manager_delete_font` to delete the font when it is no longer needed.
+The font manager will mark the font resource as a recyclable font so that it has the
+possibility of being more quickly created next time.
 
-Note that you need to delete the widget that references the font first, and then
+Note that you need to delete any Widgets that used the font first, and then
 delete the font to avoid accessing wild pointers.
 
 .. code-block:: c
@@ -102,7 +105,8 @@ Use :cpp:func:`lv_font_manager_delete` to destroy the entire font manager. It sh
 be noted that before destruction, it is necessary to ensure that the application has
 deleted all fonts using :cpp:func:`lv_font_manager_delete_font`.  The font manager
 will check the reference status of all allocated fonts.  If there are still fonts
-being referenced, the font manager will fail to destroy and return false.
+being referenced, the font manager will fail to be destroyed and the function will return false.
+
 
 
 .. _font_manager_example:
@@ -111,6 +115,8 @@ Example
 *******
 
 .. include:: ../../examples/others/font_manager/index.rst
+
+
 
 .. _font_manager_api:
 
