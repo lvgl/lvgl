@@ -66,6 +66,11 @@
     #endif
 #endif
 
+/* Renamed config backwards-compatibility */
+#if !defined(LV_FS_DEFAULT_DRIVER_LETTER) && defined(LV_FS_DEFAULT_DRIVE_LETTER)
+    #define LV_FS_DEFAULT_DRIVER_LETTER LV_FS_DEFAULT_DRIVE_LETTER
+#endif
+
 #ifdef CONFIG_LV_COLOR_DEPTH
     #define LV_KCONFIG_PRESENT
 #endif
