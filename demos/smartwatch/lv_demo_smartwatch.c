@@ -33,6 +33,8 @@
 
 static void create_dialog_window(void);
 static void dialog_close_event_cb(lv_event_t * e);
+static void lv_create_home_tile(void);
+static void home_tileview_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -41,7 +43,9 @@ static void dialog_close_event_cb(lv_event_t * e);
 static lv_theme_t * theme_original;
 static bool circular_scroll;
 static bool load_app_list;
+static bool first_load;
 
+static lv_obj_t * home_tile;
 static lv_obj_t * dialog_parent;
 static lv_obj_t * dialog_window;
 static lv_obj_t * dialog_panel;
@@ -77,17 +81,21 @@ void lv_demo_smartwatch(void)
                                                true, LV_FONT_DEFAULT);
     lv_display_set_theme(display, theme);
 
+    lv_create_home_tile();
+
     lv_demo_smartwatch_set_circular_scroll(true);
 
-    lv_demo_smartwatch_home_create();
+    lv_demo_smartwatch_control_create(home_tile);
 
-    lv_demo_smartwatch_list_create();
+    lv_demo_smartwatch_home_create(home_tile);
+
+    lv_demo_smartwatch_list_create(home_tile);
+
+    lv_tileview_set_tile_by_index(home_tile, 0, 1, LV_ANIM_OFF);
 
     lv_demo_smartwatch_notifications_create();
 
     lv_demo_smartwatch_settings_create();
-
-    lv_demo_smartwatch_control_create();
 
     lv_demo_smartwatch_weather_create();
 
@@ -153,8 +161,14 @@ void lv_demo_smartwatch_show_dialog(const char * title, const char * message)
     lv_disp_t * display = lv_display_get_default();
     lv_obj_t * active_screen = lv_display_get_screen_active(display);
 
-    /*  attach the dialog window to current active screen */
-    lv_obj_set_parent(dialog_window, active_screen);
+    if(active_screen == home_tile) {
+        /* attach the dialog window to the current active tile */
+        lv_obj_set_parent(dialog_window, lv_tileview_get_tile_active(home_tile));
+    }
+    else {
+        /*  attach the dialog window to current active screen */
+        lv_obj_set_parent(dialog_window, active_screen);
+    }
 
     lv_label_set_text(dialog_title, title);
     lv_label_set_text(dialog_message, message);
@@ -172,9 +186,79 @@ bool lv_demo_smartwatch_get_load_app_list(void)
     return load_app_list;
 }
 
+lv_obj_t * lv_demo_smartwatch_get_tileview(void)
+{
+    return home_tile;
+}
+
+void lv_demo_smartwatch_home_load(lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay)
+{
+    lv_screen_load_anim(home_tile, anim_type, time, delay, false);
+}
+
+void lv_demo_smartwatch_load_home_watchface(void)
+{
+    lv_disp_t * display = lv_display_get_default();
+    lv_obj_t * active_screen = lv_display_get_screen_active(display);
+    if(active_screen != home_tile) {
+        lv_screen_load_anim(home_tile, LV_SCR_LOAD_ANIM_FADE_IN, 500, 0, false);
+    }
+    if(lv_tileview_get_tile_active(home_tile) != lv_demo_smartwatch_get_tile_home()) {
+        lv_tileview_set_tile_by_index(home_tile, 0, 1, LV_ANIM_OFF);
+    }
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void home_tileview_event_cb(lv_event_t * e)
+{
+
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        if(!first_load) {
+            first_load = true;
+            lv_demo_smartwatch_show_dialog("Welcome", "Start animate analog");
+            /* run the analog seconds animation on first load */
+            lv_demo_smartwatch_face_update_seconds(30);
+        }
+    }
+
+    if(lv_tileview_get_tile_active(home_tile) != lv_demo_smartwatch_get_tile_home()) {
+        LV_LOG_WARN("Currently not in the watchface tile");
+        return;
+    }
+    lv_disp_t * display = lv_display_get_default();
+    lv_obj_t * active_screen = lv_display_get_screen_active(display);
+    if(active_screen != home_tile) {
+        /* event was triggered but the current screen is no longer active */
+        return;
+    }
+
+    if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT) {
+        lv_demo_smartwatch_set_load_app_list(false); /* flag was not open from app list */
+        lv_demo_smartwatch_notifications_load(LV_SCR_LOAD_ANIM_OVER_RIGHT, 500, 0);
+    }
+
+    if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_TOP) {
+        lv_demo_smartwatch_set_load_app_list(false); /* flag was not open from app list */
+        lv_demo_smartwatch_weather_load(LV_SCR_LOAD_ANIM_MOVE_TOP, 500, 0);
+    }
+
+}
+
+static void lv_create_home_tile(void)
+{
+    home_tile = lv_tileview_create(NULL);
+    lv_obj_set_scrollbar_mode(home_tile, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_style_bg_color(home_tile, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(home_tile, 55, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_add_event_cb(home_tile, home_tileview_event_cb, LV_EVENT_ALL, NULL);
+
+}
 
 static void dialog_close_event_cb(lv_event_t * e)
 {

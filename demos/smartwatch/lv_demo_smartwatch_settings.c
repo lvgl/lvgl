@@ -41,7 +41,6 @@ static void settings_screen_event_cb(lv_event_t * e);
 static lv_obj_t * settings_screen;
 static lv_obj_t * settings_list;
 
-
 static lv_obj_t * about_label;
 
 static lv_smartwatch_settings_change_cb_t settings_change_cb;
