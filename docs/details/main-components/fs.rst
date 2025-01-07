@@ -79,9 +79,10 @@ way to set the default directory.
 - "Z:C:/Users/Public/Documents/meeting_notes.txt"
 - "Z:D:/to_print.docx"
 
-Reminder:  Note carefully that the prefixed "Z:" has nothing to do with the
-Windows/DOS drive letter, which is part of the path.  It is used to look up the driver
-for that file system in the list of all file-system drivers registered with LVGL.
+Reminder:  Note carefully that the prefixed "Z:" has nothing to do with the "C:" and
+"D:" Windows/DOS drive letters in 3 of the above examples, which are part of the path.
+It is used to look up the driver for that file system in the list of all file-system
+drivers registered with LVGL.
 
 
 
