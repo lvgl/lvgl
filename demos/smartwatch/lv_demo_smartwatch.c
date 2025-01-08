@@ -494,6 +494,7 @@ static void lv_demo_obj_set_hidden(lv_obj_t * obj, bool state)
 
 static void hint_timer_cb(lv_timer_t * timer)
 {
+    LV_UNUSED(timer);
     lv_demo_obj_set_hidden(hint_panel, true);
 }
 
