@@ -782,12 +782,14 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
             int32_t w;
             if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) w = LV_COORD_MAX;
             else w = lv_obj_get_content_width(obj);
-            w = LV_MIN(w, lv_obj_get_style_max_width(obj, 0));
+            w = LV_MIN(w, lv_obj_get_style_max_width(obj, LV_PART_MAIN));
 
             uint32_t dot_begin = label->dot_begin;
             lv_label_revert_dots(obj);
             lv_text_get_size(&label->size_cache, label->text, font, letter_space, line_space, w, flag);
             lv_label_set_dots(obj, dot_begin);
+
+            label->size_cache.y = LV_MIN(label->size_cache.y, lv_obj_get_style_max_height(obj, LV_PART_MAIN));
 
             label->invalid_size_cache = false;
         }
