@@ -61,7 +61,8 @@ Drawing
 
 To set an individual pixel's color on the Canvas, use
 :cpp:expr:`lv_canvas_set_px(canvas, x, y, color, opa)`.  With indexed color formats
-(``LV_COLOR_FORMAT_I1/2/4/8``) pass the color index as the ``color`` argument.
+(``LV_COLOR_FORMAT_I1/2/4/8``) pass the color index as the ``color`` argument by using
+the *blue* channel in the ``color`` value, e.g. :cpp:expr:`lv_color_make(0, 0, index)`.
 
 :cpp:expr:`lv_canvas_fill_bg(canvas, lv_color_hex(0x00ff00), LV_OPA_50)` fills the whole
 Canvas to blue with 50% opacity. Note that if the current color format
