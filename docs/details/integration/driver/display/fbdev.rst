@@ -40,6 +40,15 @@ If your screen stays black or only draws partially, you can try enabling direct 
 you can activate a force refresh mode with ``lv_linux_fbdev_set_force_refresh(true)``. This usually has a performance impact though and shouldn't
 be enabled unless really needed.
 
+Hide the cursor
+---------------
+
+You may encounter a blinking cursor on the screen. The method to hide it 
+varies depending on the platform. For instance, here is how it can be done 
+on a Raspberry Pi:
+
+  1. Edit ``/boot/cmdline.txt`` file.
+  2. Add ``vt.global_cursor_default=0``.
 
 Common mistakes
 ---------------
@@ -60,8 +69,14 @@ and virtual resolutions can be incorrect, leading to display problems.
 This issue often occurs with HDMI connections where the display is powered up 
 after the system has already booted.
 
+The following command outputs the current settings of the specified framebuffer 
+device, such as resolution, pixel depth, and timings.
+
 .. code-block::	
 	
 	fbset -fb /dev/fb0 
 
+To prevent display-related issues, it is recommended to ensure all devices, 
+including the HDMI display, are connected and powered on before powering up 
+the board.
 
