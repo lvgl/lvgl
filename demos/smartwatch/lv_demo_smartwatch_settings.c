@@ -284,7 +284,7 @@ void lv_demo_smartwatch_set_settings_actions_cb(lv_smartwatch_settings_change_cb
 void lv_demo_smartwatch_set_default_scrollbar_mode(lv_scrollbar_mode_t mode)
 {
     lv_demo_smartwatch_set_scrollbar_mode(mode);
-    lv_dropdown_set_selected(scroll_mode, mode);
+    lv_dropdown_set_selected(scroll_mode, mode, LV_ANIM_OFF);
 }
 
 /**********************
