@@ -736,6 +736,19 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(code == LV_EVENT_PRESSED) {
         lv_obj_add_state(obj, LV_STATE_PRESSED);
     }
+    else if(code == LV_EVENT_PRESSING) {
+        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_DRAGABLE)) {
+            lv_indev_t * indev = lv_indev_active();
+            if(indev == NULL)  return;
+
+            lv_point_t vect;
+            lv_indev_get_vect(indev, &vect);
+
+            int32_t x = lv_obj_get_x_aligned(obj) + vect.x;
+            int32_t y = lv_obj_get_y_aligned(obj) + vect.y;
+            lv_obj_set_pos(obj, x, y);
+        }
+    }
     else if(code == LV_EVENT_RELEASED) {
         lv_obj_remove_state(obj, LV_STATE_PRESSED);
         void * param = lv_event_get_param(e);

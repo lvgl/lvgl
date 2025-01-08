@@ -142,4 +142,35 @@ void test_obj_flag_overflow_visible_1(void)
 
 }
 
+void test_obj_flag_dragable(void)
+{
+    lv_obj_t * obj;
+    obj = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(obj, 150, 100);
+
+    lv_obj_t * label = lv_label_create(obj);
+    lv_label_set_text(label, "Drag me");
+    lv_obj_center(label);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_DRAGABLE);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_flag_dragable1.png");
+
+    lv_test_mouse_press();
+    lv_test_indev_wait(50);
+    lv_test_mouse_move_to(75, 50);
+    lv_test_indev_wait(50);
+    lv_test_mouse_move_to(400, 240);
+    lv_test_indev_wait(50);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_flag_dragable2.png");
+
+    lv_test_mouse_move_to(600, 300);
+    lv_test_indev_wait(50);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_flag_dragable3.png");
+
+    lv_test_mouse_release();
+    lv_test_indev_wait(50);
+}
+
 #endif

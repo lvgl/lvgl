@@ -494,6 +494,7 @@ There are some Widget attributes which can be enabled/disabled by
 -  :cpp:enumerator:`LV_OBJ_FLAG_CLICKABLE` Make the Widget clickable by input devices
 -  :cpp:enumerator:`LV_OBJ_FLAG_CLICK_FOCUSABLE` Add focused state to the Widget when clicked
 -  :cpp:enumerator:`LV_OBJ_FLAG_CHECKABLE` Toggle checked state when the Widget is clicked
+-  :cpp:enumerator:`LV_OBJ_FLAG_DRAGABLE` Make the Widget draggable
 -  :cpp:enumerator:`LV_OBJ_FLAG_SCROLLABLE` Make the Widget scrollable
 -  :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_ELASTIC` Allow scrolling inside but with slower speed
 -  :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_MOMENTUM` Make the Widget scroll further when "thrown"
