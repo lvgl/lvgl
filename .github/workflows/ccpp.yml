@@ -44,7 +44,6 @@ jobs:
 
     name: Build ${{ matrix.build_option }} - ${{matrix.compiler }} - Windows
     runs-on: windows-2022
-    name: Build Windows GCC
     steps:
     - uses: actions/checkout@v4
     - if: matrix.compiler == 'gcc'
