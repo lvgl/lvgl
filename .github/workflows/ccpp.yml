@@ -11,6 +11,7 @@ jobs:
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
         # A valid option parameter to the cmake file.
         # See BUILD_OPTIONS in tests/CMakeLists.txt.
@@ -31,6 +32,7 @@ jobs:
 
   build-windows:
     strategy:
+      fail-fast: false
       matrix:
         # A valid option parameter to the cmake file.
         # See BUILD_OPTIONS in tests/CMakeLists.txt.
