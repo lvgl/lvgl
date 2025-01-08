@@ -232,6 +232,14 @@ static void _evdev_discovery_indev_try_create(const char * file_name)
 
     lv_evdev_t * dsc = lv_indev_get_driver_data(indev);
 
+    /* Compare this new evdev's unique identity with the already registered ones.
+     * If a match is found, it means the user has already added it and a duplicate
+     * should not be added automatically -- although it is valid for `lv_evdev_create`
+     * to be explicitly called with the same path by the user -- or an edge case
+     * has occurred where discoverey has just been started and a new device was
+     * connected between the creation of the inotify watcher and the initial full
+     * scan of the directory with `readdir`.
+     */
     lv_indev_t * ex_indev = NULL;
     while(NULL != (ex_indev = lv_indev_get_next(ex_indev))) {
         if(ex_indev == indev || lv_indev_get_read_cb(ex_indev) != _evdev_read) continue;
