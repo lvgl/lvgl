@@ -19,8 +19,16 @@
 /*********************
  *      DEFINES
  *********************/
+
+/**Perform linear animations in max 1024 steps. Used in `path_cb`s*/
 #define LV_ANIM_RESOLUTION 1024
+
+/**log2(LV_ANIM_RESOLUTION)*/
 #define LV_ANIM_RES_SHIFT 10
+
+/**In an anim. time this bit indicates that the value is speed, and not time*/
+#define LV_ANIM_SPEED_MASK 0x80000000
+
 #define state LV_GLOBAL_DEFAULT()->anim_state
 #define anim_ll_p &(state.anim_ll)
 
@@ -217,7 +225,7 @@ uint32_t lv_anim_speed_clamped(uint32_t speed, uint32_t min_time, uint32_t max_t
     min_time = (min_time + 5) / 10;
     max_time = (max_time + 5) / 10;
 
-    return 0x80000000 + (max_time << 20) + (min_time << 10) + speed;
+    return LV_ANIM_SPEED_MASK + (max_time << 20) + (min_time << 10) + speed;
 
 }
 
@@ -485,7 +493,7 @@ lv_anim_t * lv_anim_custom_get(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
 uint32_t lv_anim_resolve_speed(uint32_t speed_or_time, int32_t start, int32_t end)
 {
     /*It was a simple time*/
-    if((speed_or_time & 0x80000000) == 0) return speed_or_time;
+    if((speed_or_time & LV_ANIM_SPEED_MASK) == 0) return speed_or_time;
 
     uint32_t d    = LV_ABS(start - end);
     uint32_t speed = speed_or_time & 0x3FF;
