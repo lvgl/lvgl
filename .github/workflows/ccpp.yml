@@ -65,7 +65,7 @@ jobs:
     - name: Install prerequisites
       run: scripts\install-prerequisites.bat
     - name: Build
-      if: matrix.build_option != OPTIONS_NORMAL_8BIT
+      if: matrix.build_option != 'OPTIONS_NORMAL_8BIT'
       run: python tests/main.py --build-option=${{ matrix.build_option }} build
       env:
         CC: ${{ matrix.compiler }}
