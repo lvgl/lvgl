@@ -55,7 +55,7 @@
 
 void * LV_ATTRIBUTE_FAST_MEM lv_memcpy(void * dst, const void * src, size_t len)
 {
-    uint8_t * d8 = dst;
+    volatile uint8_t * d8 = dst;
     const uint8_t * s8 = src;
 
     /*Simplify for small memories*/
