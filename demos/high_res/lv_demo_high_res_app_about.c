@@ -108,6 +108,7 @@ void lv_demo_high_res_app_about(lv_obj_t * base_obj)
             lv_label_set_text_fmt(label, "Couldn't open the '%s' folder to load the images", c->slides_path);
         }
         lv_obj_center(label);
+        lv_obj_add_style(label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
         return;
     }
 
