@@ -36,8 +36,7 @@ jobs:
       matrix:
         # A valid option parameter to the cmake file.
         # See BUILD_OPTIONS in tests/CMakeLists.txt.
-        build_option: ['OPTIONS_NORMAL_8BIT',
-                       'OPTIONS_16BIT',
+        build_option: ['OPTIONS_16BIT',
                        'OPTIONS_24BIT',
                        'OPTIONS_FULL_32BIT',
                        'OPTIONS_VG_LITE']
@@ -67,7 +66,6 @@ jobs:
         ruby-version: 'mswin'
 
     - name: Build
-      if: matrix.build_option != 'OPTIONS_NORMAL_8BIT'
       run: python tests/main.py --build-option=${{ matrix.build_option }} build
       env:
         CC: ${{ matrix.compiler }}
