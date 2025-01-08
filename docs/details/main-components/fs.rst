@@ -26,7 +26,7 @@ Adding a driver
 Registering a driver
 --------------------
 
-To add a driver, a :cpp:type:`lv_fs_drv_t` needs to be initialized like below.
+To add a driver, a :cpp:type:`lv_fs_drv_t` needs to be initialized like the example below.
 The :cpp:type:`lv_fs_drv_t` needs to be static, global or dynamically allocated
 and not a local variable.
 
@@ -75,7 +75,7 @@ The prototype of ``open_cb`` looks like this:
 The return value is a pointer to a *file object* that describes the
 opened file or ``NULL`` if there were any issues (e.g. the file wasn't
 found). The returned file object will be passed to other file system
-related callbacks. (see below)
+related callbacks. (See below.)
 
 Other callbacks
 ---------------
@@ -88,8 +88,8 @@ like this:
    lv_fs_res_t (*write_cb)(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw);
 
 For ``file_p``, LVGL passes the return value of ``open_cb``, ``buf`` is
-the data to write, ``btw`` is the Bytes To Write, ``bw`` is the actually
-written bytes.
+the data to write, ``btw`` is the Bytes To Write, ``bw`` is the actual
+bytes written during the call.
 
 For a template of these callbacks see
 `lv_fs_template.c <https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_fs_template.c>`__.
@@ -135,7 +135,7 @@ practice to insert a ``'/'`` in front of each directory name.
            break;
        }
 
-       /* fn is empty, if not more files to read */
+       /* fn is empty, if no more files to read */
        if(strlen(fn) == 0) {
            break;
        }
@@ -151,7 +151,7 @@ Use drives for images
 :ref:`Image <lv_image>` Widgets can be opened from files as well (besides
 variables stored in the compiled program).
 
-To use files in image widgets the following callbacks are required:
+To use files in Image Widgets the following callbacks are required:
 
 - open
 - close
