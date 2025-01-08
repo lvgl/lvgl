@@ -38,8 +38,7 @@ jobs:
                        'OPTIONS_16BIT',
                        'OPTIONS_24BIT',
                        'OPTIONS_FULL_32BIT',
-                       'OPTIONS_VG_LITE',
-                       'OPTIONS_SDL']
+                       'OPTIONS_VG_LITE']
         compiler: [gcc, cl]
 
     name: Build ${{ matrix.build_option }} - ${{matrix.compiler }} - Windows
