@@ -47,6 +47,9 @@ jobs:
     runs-on: windows-2022
     steps:
     - uses: actions/checkout@v4
+    - name: Install prerequisites
+      run: scripts\install-prerequisites.bat
+
     - if: matrix.compiler == 'gcc'
       uses: ammaraskar/gcc-problem-matcher@master
 
@@ -63,8 +66,6 @@ jobs:
       with:
         ruby-version: 'mswin'
 
-    - name: Install prerequisites
-      run: scripts\install-prerequisites.bat
     - name: Build
       if: matrix.build_option != 'OPTIONS_NORMAL_8BIT'
       run: python tests/main.py --build-option=${{ matrix.build_option }} build
