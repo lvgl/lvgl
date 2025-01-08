@@ -276,8 +276,7 @@ static void create_screen_easter_egg(void)
 
 static void create_screen_event_cb(lv_event_t * e)
 {
-    lv_disp_t * display = lv_display_get_default();
-    lv_obj_t * active_screen = lv_display_get_screen_active(display);
+    lv_obj_t * active_screen = lv_screen_active();
     if(active_screen != easter_egg_screen) {
         /* event was triggered but the current screen is no longer active */
         return;

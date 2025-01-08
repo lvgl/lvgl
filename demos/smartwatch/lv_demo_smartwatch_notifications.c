@@ -37,33 +37,34 @@ static lv_smartwatch_notification_click_cb_t notification_click_cb;
  *  STATIC VARIABLES
  **********************/
 static lv_obj_t * notification_screen;
+static lv_obj_t * message_info_panel;
 static lv_obj_t * message_panel;
 static lv_obj_t * message_icon;
 static lv_obj_t * message_time;
 static lv_obj_t * message_content;
+static lv_obj_t * message_list_panel;
 static lv_obj_t * message_list;
 static lv_obj_t * empty_info;
-static lv_obj_t * empty_panel;
 
 static const lv_image_dsc_t * notification_icons[] = {
-    &img_sms_icon,       // SMS
-    &img_mail_icon,      // Mail
-    &img_penguin_icon,   // Penguin (QQ)
-    &img_skype_icon,     // Skype
-    &img_whatsapp_icon,  // WhatsApp
-    &img_mail_icon,      // Mail2
-    &img_line_icon,      // Line
-    &img_twitter_x_icon, // Twitter
-    &img_facebook_icon,  // Facebook
-    &img_messenger_icon, // Messenger
-    &img_instagram_icon, // Instagram
-    &img_weibo_icon,     // Weibo
-    &img_kakao_icon,     // Kakao
-    &img_viber_icon,     // Viber
-    &img_vkontakte_icon, // Vkontakte
-    &img_telegram_icon,  // Telegram
-    &img_chrns_icon,     // Chronos
-    &img_wechat_icon     // Wechat
+    &img_sms_icon,       /* SMS */
+    &img_mail_icon,      /* Mail */
+    &img_penguin_icon,   /* Penguin (QQ) */
+    &img_skype_icon,     /* Skype */
+    &img_whatsapp_icon,  /* WhatsApp */
+    &img_mail_icon,      /* Mail */
+    &img_line_icon,      /* Line */
+    &img_twitter_x_icon, /* Twitter */
+    &img_facebook_icon,  /* Facebook */
+    &img_messenger_icon, /* Messenger */
+    &img_instagram_icon, /* Instagram */
+    &img_weibo_icon,     /* Weibo */
+    &img_kakao_icon,     /* Kakao */
+    &img_viber_icon,     /* Viber */
+    &img_vkontakte_icon, /* Vkontakte */
+    &img_telegram_icon,  /* Telegram */
+    &img_chrns_icon,     /* Chronos */
+    &img_wechat_icon     /* Wechat */
 };
 
 /**********************
@@ -97,9 +98,7 @@ void lv_demo_smartwatch_notifications_load(lv_screen_load_anim_t anim_type, uint
 
 void lv_demo_smartwatch_clear_notifications(void)
 {
-    lv_obj_set_parent(empty_info, empty_panel);
     lv_obj_clean(message_list);
-    lv_obj_set_parent(empty_info, message_list);
     lv_obj_remove_flag(empty_info, LV_OBJ_FLAG_HIDDEN);
 }
 
@@ -151,6 +150,8 @@ void lv_demo_smartwatch_show_notification(int app_id, const char * message, cons
     lv_label_set_text(message_content, message);
     set_notification_icon(message_icon, app_id);
     lv_obj_scroll_to_y(message_panel, 0, LV_ANIM_ON);
+
+    lv_tileview_set_tile_by_index(notification_screen, 1, 0, LV_ANIM_ON);
 }
 
 void lv_demo_smartwatch_set_notification_click_cb(lv_smartwatch_notification_click_cb_t cb)
@@ -223,58 +224,71 @@ static void notification_clicked_event_cb(lv_event_t * e)
         /* test notification */
         lv_demo_smartwatch_show_notification(index, "Sample Message test", "12:45");
     }
-
-    lv_obj_add_flag(message_list, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_remove_flag(message_panel, LV_OBJ_FLAG_HIDDEN);
 }
 
 static void notification_screen_events_cb(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
+    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
+        lv_tileview_set_tile_by_index(notification_screen, 0, 0, LV_ANIM_OFF);
+
+        lv_obj_scroll_by(message_list, 0, 1, LV_ANIM_OFF);
+        lv_obj_scroll_by(message_list, 0, -1, LV_ANIM_OFF);
+
+        lv_obj_set_scrollbar_mode(notification_screen, lv_demo_smartwatch_get_scrollbar_mode());
+        lv_obj_set_scrollbar_mode(message_panel, lv_demo_smartwatch_get_scrollbar_mode());
+        lv_obj_set_scrollbar_mode(message_list, lv_demo_smartwatch_get_scrollbar_mode());
+
+    }
+
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_LEFT) {
-        if(lv_obj_has_flag(message_list, LV_OBJ_FLAG_HIDDEN)) {
-            lv_obj_remove_flag(message_list, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_add_flag(message_panel, LV_OBJ_FLAG_HIDDEN);
+        if(!lv_demo_smartwatch_get_load_app_list()) {
+            lv_demo_smartwatch_home_load(LV_SCR_LOAD_ANIM_OUT_LEFT, 500, 0);
         }
         else {
-
-            lv_obj_remove_flag(message_list, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_add_flag(message_panel, LV_OBJ_FLAG_HIDDEN);
-            if(!lv_demo_smartwatch_get_load_app_list()) {
-                lv_demo_smartwatch_home_load(LV_SCR_LOAD_ANIM_FADE_ON, 500, 0);
-            }
+            LV_LOG_WARN("Swipe right to exit");
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_LEFT);
         }
     }
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT) {
         if(lv_demo_smartwatch_get_load_app_list()) {
-            if(!lv_obj_has_flag(message_list, LV_OBJ_FLAG_HIDDEN)) {
-                lv_demo_smartwatch_list_load(LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0);
-                return;
-            }
+            lv_demo_smartwatch_list_load(LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0);
         }
-        lv_obj_add_flag(message_panel, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_remove_flag(message_list, LV_OBJ_FLAG_HIDDEN);
+        else {
+            LV_LOG_WARN("Swipe left to exit");
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_RIGHT);
+        }
     }
-    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
-        lv_obj_scroll_by(message_list, 0, 1, LV_ANIM_OFF);
-        lv_obj_scroll_by(message_list, 0, -1, LV_ANIM_OFF);
 
-        lv_obj_remove_flag(message_list, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_add_flag(message_panel, LV_OBJ_FLAG_HIDDEN);
-
+    if(event_code == LV_EVENT_GESTURE && (lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_TOP ||
+                                          lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_BOTTOM) &&
+       lv_tileview_get_tile_active(notification_screen) == message_list_panel) {
+        if(lv_demo_smartwatch_get_load_app_list()) {
+            LV_LOG_WARN("Swipe right to exit");
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_LEFT);
+        }
+        else {
+            LV_LOG_WARN("Swipe left to exit");
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_RIGHT);
+        }
     }
+
+
 }
 
 static void create_screen_notifications(void)
 {
 
-    notification_screen = lv_obj_create(NULL);
-    lv_obj_remove_flag(notification_screen, LV_OBJ_FLAG_SCROLLABLE);
+    notification_screen = lv_tileview_create(NULL);
     lv_obj_set_style_bg_color(notification_screen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(notification_screen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    message_panel = lv_obj_create(notification_screen);
+    message_info_panel = lv_tileview_add_tile(notification_screen, 1, 0, LV_DIR_LEFT);
+    lv_obj_set_width(message_info_panel, lv_pct(100));
+    lv_obj_set_height(message_info_panel, lv_pct(100));
+
+    message_panel = lv_obj_create(message_info_panel);
     lv_obj_set_width(message_panel, lv_pct(100));
     lv_obj_set_height(message_panel, lv_pct(100));
     lv_obj_set_align(message_panel, LV_ALIGN_TOP_MID);
@@ -311,13 +325,17 @@ static void create_screen_notifications(void)
     lv_obj_set_align(message_content, LV_ALIGN_CENTER);
     lv_label_set_text(message_content, "Download from Google Play to sync time and receive notifications");
 
-    message_list = lv_obj_create(notification_screen);
+    message_list_panel = lv_tileview_add_tile(notification_screen, 0, 0, LV_DIR_NONE);
+    lv_obj_set_width(message_list_panel, lv_pct(100));
+    lv_obj_set_height(message_list_panel, lv_pct(100));
+
+    message_list = lv_obj_create(message_list_panel);
+
     lv_obj_set_width(message_list, lv_pct(100));
     lv_obj_set_height(message_list, lv_pct(100));
     lv_obj_set_align(message_list, LV_ALIGN_TOP_MID);
     lv_obj_set_flex_flow(message_list, LV_FLEX_FLOW_COLUMN_REVERSE);
     lv_obj_set_flex_align(message_list, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_add_flag(message_list, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_scrollbar_mode(message_list, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_scroll_dir(message_list, LV_DIR_VER);
     lv_obj_set_style_radius(message_list, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -329,9 +347,7 @@ static void create_screen_notifications(void)
     lv_obj_set_style_pad_top(message_list, 50, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(message_list, 70, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    empty_panel = lv_obj_create(NULL);
-
-    empty_info = lv_label_create(message_list);
+    empty_info = lv_label_create(message_list_panel);
     lv_obj_set_width(empty_info, 180);
     lv_obj_set_height(empty_info, LV_SIZE_CONTENT);
     lv_obj_set_align(empty_info, LV_ALIGN_CENTER);

@@ -38,8 +38,12 @@ static lv_obj_t * weather_city;
 static lv_obj_t * weather_current_icon;
 static lv_obj_t * weather_current_temp;
 static lv_obj_t * weather_update_time;
+static lv_obj_t * weather_daily_panel;
+static lv_obj_t * weather_hourly_panel;
 static lv_obj_t * weather_forecast_daily;
 static lv_obj_t * weather_forecast_hourly;
+static lv_obj_t * info_daily;
+static lv_obj_t * info_hourly;
 
 static const lv_image_dsc_t * weather_day_icons[] = {
     &img_weather_day_0,
@@ -112,11 +116,13 @@ void lv_demo_smartwatch_set_weather(int temp, uint8_t icon, bool day, int hour, 
 void lv_demo_smartwatch_weather_daily_clear(void)
 {
     lv_obj_clean(weather_forecast_daily);
+    lv_obj_remove_flag(info_daily, LV_OBJ_FLAG_HIDDEN);
 }
 
 void lv_demo_smartwatch_weather_hourly_clear(void)
 {
     lv_obj_clean(weather_forecast_hourly);
+    lv_obj_remove_flag(info_hourly, LV_OBJ_FLAG_HIDDEN);
 }
 
 void lv_demo_smartwatch_weather_add_daily(int day, int temp, int id)
@@ -168,6 +174,8 @@ void lv_demo_smartwatch_weather_add_daily(int day, int temp, int id)
     lv_label_set_long_mode(label, LV_LABEL_LONG_CLIP);
     lv_label_set_text_fmt(label, "%d°C", temp);
     lv_obj_set_style_text_font(label, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_add_flag(info_daily, LV_OBJ_FLAG_HIDDEN);
 }
 
 void lv_demo_smartwatch_weather_add_hourly(int hour, int id, int temp, int humidity, int wind, int uv, bool info)
@@ -233,6 +241,8 @@ void lv_demo_smartwatch_weather_add_hourly(int hour, int id, int temp, int humid
     lv_obj_set_align(uv_label, LV_ALIGN_CENTER);
     lv_label_set_text_fmt(uv_label, info ? "UV" : "%d", uv);
     lv_obj_set_style_text_font(uv_label, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_add_flag(info_hourly, LV_OBJ_FLAG_HIDDEN);
 }
 
 /**********************
@@ -243,7 +253,7 @@ static void create_screen_weather(void)
 {
 
     weather_screen = lv_tileview_create(NULL);
-    lv_obj_set_scrollbar_mode(weather_screen, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_scrollbar_mode(weather_screen, LV_SCROLLBAR_MODE_AUTO);
     lv_obj_set_style_bg_color(weather_screen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(weather_screen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -296,7 +306,11 @@ static void create_screen_weather(void)
     lv_label_set_text(weather_update_time, "unavailable\n--:--");
     lv_obj_set_style_text_align(weather_update_time, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    weather_forecast_daily = lv_tileview_add_tile(weather_screen, 1, 0, LV_DIR_LEFT);
+    weather_daily_panel = lv_tileview_add_tile(weather_screen, 1, 0, LV_DIR_LEFT);
+    lv_obj_set_width(weather_daily_panel, lv_pct(100));
+    lv_obj_set_height(weather_daily_panel, lv_pct(100));
+
+    weather_forecast_daily = lv_obj_create(weather_daily_panel);
     lv_obj_set_width(weather_forecast_daily, lv_pct(100));
     lv_obj_set_height(weather_forecast_daily, lv_pct(100));
     lv_obj_set_align(weather_forecast_daily, LV_ALIGN_TOP_MID);
@@ -313,14 +327,18 @@ static void create_screen_weather(void)
     lv_obj_set_style_pad_top(weather_forecast_daily, 50, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(weather_forecast_daily, 100, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_t * info = lv_label_create(weather_forecast_daily);
-    lv_obj_set_width(info, 180);
-    lv_obj_set_height(info, LV_SIZE_CONTENT);
-    lv_obj_set_align(info, LV_ALIGN_CENTER);
-    lv_label_set_text(info,
+    info_daily = lv_label_create(weather_daily_panel);
+    lv_obj_set_width(info_daily, 180);
+    lv_obj_set_height(info_daily, LV_SIZE_CONTENT);
+    lv_obj_set_align(info_daily, LV_ALIGN_CENTER);
+    lv_label_set_text(info_daily,
                       "Weather information has not yet been synced. Connect the device to Chronos app to get weather info. Make sure to enable it in the app settings.");
 
-    weather_forecast_hourly = lv_tileview_add_tile(weather_screen, 0, 1, LV_DIR_TOP);
+    weather_hourly_panel = lv_tileview_add_tile(weather_screen, 0, 1, LV_DIR_TOP);
+    lv_obj_set_width(weather_hourly_panel, lv_pct(100));
+    lv_obj_set_height(weather_hourly_panel, lv_pct(100));
+
+    weather_forecast_hourly = lv_obj_create(weather_hourly_panel);
     lv_obj_set_width(weather_forecast_hourly, lv_pct(100));
     lv_obj_set_height(weather_forecast_hourly, lv_pct(100));
     lv_obj_set_align(weather_forecast_hourly, LV_ALIGN_CENTER);
@@ -338,11 +356,11 @@ static void create_screen_weather(void)
     lv_obj_set_style_pad_bottom(weather_forecast_hourly, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_pad_column(weather_forecast_hourly, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_t * info2 = lv_label_create(weather_forecast_hourly);
-    lv_obj_set_width(info2, 180);
-    lv_obj_set_height(info2, LV_SIZE_CONTENT);
-    lv_obj_set_align(info2, LV_ALIGN_CENTER);
-    lv_label_set_text(info2,
+    info_hourly = lv_label_create(weather_hourly_panel);
+    lv_obj_set_width(info_hourly, 180);
+    lv_obj_set_height(info_hourly, LV_SIZE_CONTENT);
+    lv_obj_set_align(info_hourly, LV_ALIGN_CENTER);
+    lv_label_set_text(info_hourly,
                       "Weather information has not yet been synced. Connect the device to Chronos app to get weather info. Make sure to enable it in the app settings.");
 
     lv_obj_add_event_cb(weather_forecast_daily, lv_demo_smartwatch_scroll_event, LV_EVENT_ALL, NULL);
@@ -352,22 +370,54 @@ static void create_screen_weather(void)
 static void weather_screen_event_cb(lv_event_t * e)
 {
 
-    if(lv_tileview_get_tile_active(weather_screen) != weather_panel) {
-        LV_LOG_WARN("Currently not in the weather home tile");
-        return;
-    }
-
     lv_event_code_t event_code = lv_event_get_code(e);
 
-    if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_BOTTOM) {
-        if(!lv_demo_smartwatch_get_load_app_list()) {
-            lv_demo_smartwatch_home_load(LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 500, 0);
+    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
+
+        lv_obj_scroll_by(weather_forecast_daily, 0, 1, LV_ANIM_OFF);
+        lv_obj_scroll_by(weather_forecast_daily, 0, -1, LV_ANIM_OFF);
+
+
+        lv_obj_set_scrollbar_mode(weather_screen, lv_demo_smartwatch_get_scrollbar_mode());
+        lv_obj_set_scrollbar_mode(weather_forecast_daily, lv_demo_smartwatch_get_scrollbar_mode());
+        lv_obj_set_scrollbar_mode(weather_forecast_hourly, lv_demo_smartwatch_get_scrollbar_mode());
+
+        lv_tileview_set_tile_by_index(weather_screen, 0, 0, LV_ANIM_OFF);
+
+    }
+
+
+    if(lv_tileview_get_tile_active(weather_screen) == weather_panel) {
+        if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_BOTTOM) {
+
+            if(!lv_demo_smartwatch_get_load_app_list()) {
+                lv_demo_smartwatch_home_load(LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 500, 0);
+            }
+            else {
+                LV_LOG_WARN("Swipe right to exit");
+                lv_demo_smartwatch_show_scroll_hint(LV_DIR_LEFT | LV_DIR_BOTTOM | LV_DIR_RIGHT);
+            }
+        }
+        if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT) {
+            if(lv_demo_smartwatch_get_load_app_list()) {
+                lv_demo_smartwatch_list_load(LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0);
+            }
+            else {
+                LV_LOG_WARN("Swipe down to exit");
+                lv_demo_smartwatch_show_scroll_hint(LV_DIR_TOP | LV_DIR_BOTTOM | LV_DIR_RIGHT);
+            }
         }
     }
-    if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT) {
-        if(lv_demo_smartwatch_get_load_app_list()) {
-            lv_demo_smartwatch_list_load(LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0);
-            return;
+
+    if(lv_tileview_get_tile_active(weather_screen) == weather_daily_panel) {
+        if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) != LV_DIR_RIGHT) {
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_LEFT);
+        }
+    }
+
+    if(lv_tileview_get_tile_active(weather_screen) == weather_hourly_panel) {
+        if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) != LV_DIR_BOTTOM) {
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_TOP);
         }
     }
 

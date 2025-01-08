@@ -32,9 +32,13 @@
  **********************/
 
 static void create_dialog_window(void);
+static void create_scroll_hints(void);
+static void lv_demo_obj_set_hidden(lv_obj_t * obj, bool state);
 static void dialog_close_event_cb(lv_event_t * e);
 static void lv_create_home_tile(void);
 static void home_tileview_event_cb(lv_event_t * e);
+
+static void hint_timer_cb(lv_timer_t * timer);
 
 /**********************
  *  STATIC VARIABLES
@@ -42,8 +46,10 @@ static void home_tileview_event_cb(lv_event_t * e);
 
 static lv_theme_t * theme_original;
 static bool circular_scroll;
+static bool show_scroll_hints;
 static bool load_app_list;
 static bool first_load;
+static lv_scrollbar_mode_t scrollbar_mode;
 
 static lv_obj_t * home_tile;
 static lv_obj_t * dialog_parent;
@@ -53,6 +59,13 @@ static lv_obj_t * dialog_title;
 static lv_obj_t * dialog_message;
 static lv_obj_t * dialog_close;
 static lv_obj_t * dialog_close_label;
+static lv_obj_t * hint_panel;
+static lv_obj_t * hint_up;
+static lv_obj_t * hint_down;
+static lv_obj_t * hint_left;
+static lv_obj_t * hint_right;
+
+static lv_timer_t * hint_timer = NULL;
 
 /**********************
  *  GLOBAL VARIABLES
@@ -65,11 +78,6 @@ static lv_obj_t * dialog_close_label;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-void lv_demo_smartwatch_set_circular_scroll(bool state)
-{
-    circular_scroll = state;
-}
 
 void lv_demo_smartwatch(void)
 {
@@ -104,6 +112,12 @@ void lv_demo_smartwatch(void)
     lv_demo_smartwatch_easter_egg_create();
 
     create_dialog_window();
+
+    create_scroll_hints();
+
+    lv_demo_smartwatch_set_default_scrollbar_mode(LV_SCROLLBAR_MODE_OFF);
+
+    lv_demo_smartwatch_set_scroll_hint(true);
 
     /* load the logo screen immediately, more like a boot logo */
     lv_demo_smartwatch_easter_egg_load(LV_SCR_LOAD_ANIM_FADE_IN, 0, 0);
@@ -158,12 +172,11 @@ void lv_demo_smartwatch_scroll_event(lv_event_t * e)
 
 void lv_demo_smartwatch_show_dialog(const char * title, const char * message)
 {
-    lv_disp_t * display = lv_display_get_default();
-    lv_obj_t * active_screen = lv_display_get_screen_active(display);
+    lv_obj_t * active_screen = lv_screen_active();
 
-    if(active_screen == home_tile) {
+    if(lv_obj_check_type(active_screen, &lv_tileview_class)) {
         /* attach the dialog window to the current active tile */
-        lv_obj_set_parent(dialog_window, lv_tileview_get_tile_active(home_tile));
+        lv_obj_set_parent(dialog_window, lv_tileview_get_tile_active(active_screen));
     }
     else {
         /*  attach the dialog window to current active screen */
@@ -198,8 +211,7 @@ void lv_demo_smartwatch_home_load(lv_screen_load_anim_t anim_type, uint32_t time
 
 void lv_demo_smartwatch_load_home_watchface(void)
 {
-    lv_disp_t * display = lv_display_get_default();
-    lv_obj_t * active_screen = lv_display_get_screen_active(display);
+    lv_obj_t * active_screen = lv_screen_active();
     if(active_screen != home_tile) {
         lv_screen_load_anim(home_tile, LV_SCR_LOAD_ANIM_FADE_IN, 500, 0, false);
     }
@@ -208,41 +220,111 @@ void lv_demo_smartwatch_load_home_watchface(void)
     }
 }
 
+lv_scrollbar_mode_t lv_demo_smartwatch_get_scrollbar_mode(void)
+{
+    return scrollbar_mode;
+}
+
+void lv_demo_smartwatch_set_scrollbar_mode(lv_scrollbar_mode_t mode)
+{
+    scrollbar_mode = mode;
+}
+
+void lv_demo_smartwatch_set_circular_scroll(bool state)
+{
+    circular_scroll = state;
+}
+
+void lv_demo_smartwatch_set_scroll_hint(bool state)
+{
+    show_scroll_hints = state;
+}
+
+void lv_demo_smartwatch_show_scroll_hint(lv_dir_t dir)
+{
+
+    if(!show_scroll_hints) {
+        /* scroll hints are disabled, make sure hint panel is hidden */
+        lv_demo_obj_set_hidden(hint_panel, true);
+        return;
+    }
+
+    lv_demo_obj_set_hidden(hint_up, (dir & LV_DIR_TOP) != LV_DIR_TOP);
+    lv_demo_obj_set_hidden(hint_down, (dir & LV_DIR_BOTTOM) != LV_DIR_BOTTOM);
+    lv_demo_obj_set_hidden(hint_left, (dir & LV_DIR_LEFT) != LV_DIR_LEFT);
+    lv_demo_obj_set_hidden(hint_right, (dir & LV_DIR_RIGHT) != LV_DIR_RIGHT);
+
+    lv_obj_t * active_screen = lv_screen_active();
+    if(lv_obj_check_type(active_screen, &lv_tileview_class)) {
+        /* attach the hint panel to the current active tile */
+        lv_obj_set_parent(hint_panel, lv_tileview_get_tile_active(active_screen));
+    }
+    else {
+        /*  attach the hint panel to current active screen */
+        lv_obj_set_parent(hint_panel, active_screen);
+    }
+
+    lv_demo_obj_set_hidden(hint_panel, dir == LV_DIR_NONE);
+
+    if(dir != LV_DIR_NONE) {
+        if(hint_timer != NULL) {
+            /* cancel the timer if already running */
+            lv_timer_delete(hint_timer);
+            hint_timer = NULL;
+        }
+        /* timer to hide hints after 2 seconds */
+        hint_timer = lv_timer_create(hint_timer_cb, 2000, NULL);
+        lv_timer_set_auto_delete(hint_timer, true);
+    }
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
 static void home_tileview_event_cb(lv_event_t * e)
 {
-
     lv_event_code_t event_code = lv_event_get_code(e);
     if(event_code == LV_EVENT_SCREEN_LOADED) {
         if(!first_load) {
             first_load = true;
             /* run the analog seconds animation on first load */
-            lv_demo_smartwatch_face_update_seconds(30);
+            lv_demo_smartwatch_face_update_seconds(0);
+            /* show the possible scroll directions hint */
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_ALL);
         }
     }
 
-    if(lv_tileview_get_tile_active(home_tile) != lv_demo_smartwatch_get_tile_home()) {
-        LV_LOG_WARN("Currently not in the watchface tile");
-        return;
-    }
-    lv_disp_t * display = lv_display_get_default();
-    lv_obj_t * active_screen = lv_display_get_screen_active(display);
-    if(active_screen != home_tile) {
-        /* event was triggered but the current screen is no longer active */
-        return;
+    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
+        lv_obj_set_scrollbar_mode(home_tile, lv_demo_smartwatch_get_scrollbar_mode());
+        lv_demo_smartwatch_app_list_loading();
     }
 
-    if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT) {
-        lv_demo_smartwatch_set_load_app_list(false); /* flag was not open from app list */
-        lv_demo_smartwatch_notifications_load(LV_SCR_LOAD_ANIM_OVER_RIGHT, 500, 0);
+    if(lv_tileview_get_tile_active(home_tile) == lv_demo_smartwatch_get_tile_home() && lv_screen_active() == home_tile) {
+
+        if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_RIGHT) {
+            lv_demo_smartwatch_set_load_app_list(false); /* flag was not open from app list */
+            lv_demo_smartwatch_notifications_load(LV_SCR_LOAD_ANIM_OVER_RIGHT, 500, 0);
+        }
+
+        if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_TOP) {
+            lv_demo_smartwatch_set_load_app_list(false); /* flag was not open from app list */
+            lv_demo_smartwatch_weather_load(LV_SCR_LOAD_ANIM_MOVE_TOP, 500, 0);
+        }
     }
 
-    if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_TOP) {
-        lv_demo_smartwatch_set_load_app_list(false); /* flag was not open from app list */
-        lv_demo_smartwatch_weather_load(LV_SCR_LOAD_ANIM_MOVE_TOP, 500, 0);
+    if(lv_tileview_get_tile_active(home_tile) == lv_demo_smartwatch_get_tile_control() && lv_screen_active() == home_tile) {
+        if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) != LV_DIR_TOP) {
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_BOTTOM);
+        }
+    }
+
+    if(lv_tileview_get_tile_active(home_tile) == lv_demo_smartwatch_get_tile_app_list() &&
+       lv_screen_active() == home_tile) {
+        if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) != LV_DIR_RIGHT) {
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_LEFT);
+        }
     }
 
 }
@@ -250,7 +332,7 @@ static void home_tileview_event_cb(lv_event_t * e)
 static void lv_create_home_tile(void)
 {
     home_tile = lv_tileview_create(NULL);
-    lv_obj_set_scrollbar_mode(home_tile, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_scrollbar_mode(home_tile, LV_SCROLLBAR_MODE_AUTO);
     lv_obj_set_style_bg_color(home_tile, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(home_tile, 55, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -344,6 +426,75 @@ static void create_dialog_window(void)
     lv_obj_set_style_text_font(dialog_close_label, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(dialog_close, dialog_close_event_cb, LV_EVENT_CLICKED, NULL);
+}
+
+static void create_scroll_hints(void)
+{
+    hint_panel = lv_obj_create(dialog_parent);
+
+    lv_obj_set_width(hint_panel, lv_pct(100));
+    lv_obj_set_height(hint_panel, lv_pct(100));
+    lv_obj_set_align(hint_panel, LV_ALIGN_CENTER);
+    lv_obj_add_flag(hint_panel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_remove_flag(hint_panel, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_set_style_radius(hint_panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(hint_panel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(hint_panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(hint_panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(hint_panel, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(hint_panel, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(hint_panel, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(hint_panel, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    hint_up = lv_image_create(hint_panel);
+    lv_image_set_src(hint_up, &img_up_arrow_icon);
+    lv_obj_set_width(hint_up, LV_SIZE_CONTENT);
+    lv_obj_set_height(hint_up, LV_SIZE_CONTENT);
+    lv_obj_set_align(hint_up, LV_ALIGN_TOP_MID);
+    lv_obj_remove_flag(hint_up, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(hint_up, LV_OBJ_FLAG_CLICKABLE);
+
+    hint_down = lv_image_create(hint_panel);
+    lv_image_set_src(hint_down, &img_up_arrow_icon);
+    lv_image_set_rotation(hint_down, 1800);
+    lv_obj_set_width(hint_down, LV_SIZE_CONTENT);
+    lv_obj_set_height(hint_down, LV_SIZE_CONTENT);
+    lv_obj_set_align(hint_down, LV_ALIGN_BOTTOM_MID);
+    lv_obj_remove_flag(hint_down, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(hint_down, LV_OBJ_FLAG_CLICKABLE);
+
+    hint_left = lv_image_create(hint_panel);
+    lv_image_set_src(hint_left, &img_up_arrow_icon);
+    lv_image_set_rotation(hint_left, 2700);
+    lv_obj_set_width(hint_left, LV_SIZE_CONTENT);
+    lv_obj_set_height(hint_left, LV_SIZE_CONTENT);
+    lv_obj_set_align(hint_left, LV_ALIGN_LEFT_MID);
+    lv_obj_remove_flag(hint_left, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(hint_left, LV_OBJ_FLAG_CLICKABLE);
+
+    hint_right = lv_image_create(hint_panel);
+    lv_image_set_src(hint_right, &img_up_arrow_icon);
+    lv_image_set_rotation(hint_right, 900);
+    lv_obj_set_width(hint_right, LV_SIZE_CONTENT);
+    lv_obj_set_height(hint_right, LV_SIZE_CONTENT);
+    lv_obj_set_align(hint_right, LV_ALIGN_RIGHT_MID);
+    lv_obj_remove_flag(hint_right, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(hint_right, LV_OBJ_FLAG_CLICKABLE);
+}
+
+static void lv_demo_obj_set_hidden(lv_obj_t * obj, bool state)
+{
+    if(state) {
+        lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
+    }
+    else {
+        lv_obj_remove_flag(obj, LV_OBJ_FLAG_HIDDEN);
+    }
+}
+
+static void hint_timer_cb(lv_timer_t * timer)
+{
+    lv_demo_obj_set_hidden(hint_panel, true);
 }
 
 #endif /*LV_USE_DEMO_SMARTWATCH*/

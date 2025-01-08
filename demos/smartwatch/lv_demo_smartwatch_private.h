@@ -202,10 +202,28 @@ void lv_demo_smartwatch_easter_egg_load(lv_screen_load_anim_t anim_type, uint32_
 void lv_demo_smartwatch_scroll_event(lv_event_t * e);
 
 /**
+ * Notify the app list that the screen is loading.
+ * This is used to set the circular scroll mode and scrollbar mode of the app list.
+ */
+void lv_demo_smartwatch_app_list_loading(void);
+
+/**
  * Set whether to enable circular scroll on lists
  * @param state    enable or disable
  */
 void lv_demo_smartwatch_set_circular_scroll(bool state);
+
+/**
+ * Get the scrollbar mode
+ * @return current scrollbar mode
+ */
+lv_scrollbar_mode_t lv_demo_smartwatch_get_scrollbar_mode(void);
+
+/**
+ * Set the scrollbar mode
+ * @param mode    scrollbar mode
+ */
+void lv_demo_smartwatch_set_scrollbar_mode(lv_scrollbar_mode_t mode);
 
 /**
  * Set whether to load app list
@@ -219,12 +237,19 @@ void lv_demo_smartwatch_set_load_app_list(bool state);
  */
 bool lv_demo_smartwatch_get_load_app_list(void);
 
-/**
- * Get pointer to the watchface root object
- * @return pointer to root object
- */
-lv_obj_t * lv_demo_smartwatch_face_get_root(void);
 
+/**
+ * Get the app list tile object
+ * @return pointer to the app list tile object
+ */
+lv_obj_t * lv_demo_smartwatch_get_tile_app_list(void);
+
+
+/**
+ * Get the controls tile object
+ * @return pointer to the controls tile object
+ */
+lv_obj_t * lv_demo_smartwatch_get_tile_control(void);
 
 /**********************
  *      MACROS

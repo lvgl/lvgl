@@ -198,6 +198,19 @@ static void qr_screen_event_cb(lv_event_t * e)
             lv_demo_smartwatch_home_load(LV_SCR_LOAD_ANIM_MOVE_TOP, 500, 0);
         }
     }
+
+    if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_BOTTOM) {
+        lv_demo_smartwatch_show_scroll_hint(LV_DIR_BOTTOM);
+    }
+
+    if(event_code == LV_EVENT_SCREEN_LOAD_START) {
+        lv_obj_set_scrollbar_mode(qr_panel, lv_demo_smartwatch_get_scrollbar_mode());
+
+        lv_obj_update_snap(qr_panel, LV_ANIM_OFF);
+
+        lv_demo_smartwatch_show_scroll_hint(LV_DIR_BOTTOM);
+
+    }
 }
 
 #endif /*LV_USE_DEMO_SMARTWATCH*/

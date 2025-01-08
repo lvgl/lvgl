@@ -72,6 +72,11 @@ void lv_demo_smartwatch_set_music_control_cb(lv_smartwatch_music_control_cb_t cb
     music_control_cb = cb;
 }
 
+lv_obj_t * lv_demo_smartwatch_get_tile_control(void)
+{
+    return control_screen;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -203,8 +208,7 @@ static void control_screen_create(void)
 
 static void qr_button_event_cb(lv_event_t * e)
 {
-    lv_disp_t * display = lv_display_get_default();
-    lv_obj_t * active_screen = lv_display_get_screen_active(display);
+    lv_obj_t * active_screen = lv_screen_active();
     if(active_screen != lv_demo_smartwatch_get_tileview()) {
         /* event was triggered but the current screen is no longer active */
         return;
@@ -218,8 +222,7 @@ static void qr_button_event_cb(lv_event_t * e)
 
 static void settings_button_event_cb(lv_event_t * e)
 {
-    lv_disp_t * display = lv_display_get_default();
-    lv_obj_t * active_screen = lv_display_get_screen_active(display);
+    lv_obj_t * active_screen = lv_screen_active();
     if(active_screen != lv_demo_smartwatch_get_tileview()) {
         /* event was triggered but the current screen is no longer active */
         return;
@@ -232,8 +235,7 @@ static void settings_button_event_cb(lv_event_t * e)
 
 static void control_music_events_cb(lv_event_t * e)
 {
-    lv_disp_t * display = lv_display_get_default();
-    lv_obj_t * active_screen = lv_display_get_screen_active(display);
+    lv_obj_t * active_screen = lv_screen_active();
     if(active_screen != lv_demo_smartwatch_get_tileview()) {
         /* event was triggered but the current screen is no longer active */
         return;

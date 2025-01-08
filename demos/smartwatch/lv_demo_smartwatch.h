@@ -288,6 +288,24 @@ lv_obj_t * lv_demo_smartwatch_settings_add_dropdown(uint16_t id, const char * na
  */
 lv_obj_t * lv_demo_smartwatch_settings_add_label(uint16_t id, const char * name, const lv_img_dsc_t * img);
 
+/**
+ * Set the default scrollbar mode for the smartwatch demo
+ * @param mode  scrollbar mode
+ */
+void lv_demo_smartwatch_set_default_scrollbar_mode(lv_scrollbar_mode_t mode);
+
+/**
+ * Show the scroll direction hint
+ * @param dir   direction of available scroll
+ */
+void lv_demo_smartwatch_show_scroll_hint(lv_dir_t dir);
+
+/**
+ * Set whether to show scroll hints
+ * @param state whether to show scroll hints
+ */
+void lv_demo_smartwatch_set_scroll_hint(bool state);
+
 /**********************
  * GLOBAL VARIABLES
  **********************/

@@ -93,6 +93,19 @@ void lv_demo_smartwatch_app_close(void)
     lv_demo_smartwatch_home_load(LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0);
 }
 
+void lv_demo_smartwatch_app_list_loading(void)
+{
+    lv_obj_scroll_by(app_list, 0, 1, LV_ANIM_OFF);
+    lv_obj_scroll_by(app_list, 0, -1, LV_ANIM_OFF);
+
+    lv_obj_set_scrollbar_mode(app_list, lv_demo_smartwatch_get_scrollbar_mode());
+}
+
+lv_obj_t * lv_demo_smartwatch_get_tile_app_list(void)
+{
+    return app_list_screen;
+}
+
 
 /**********************
  *   STATIC FUNCTIONS
@@ -104,8 +117,7 @@ static void app_list_clicked_external_event_cb(lv_event_t * e)
 
     uint32_t index = (uint32_t)(intptr_t)lv_event_get_user_data(e);
 
-    lv_disp_t * display = lv_display_get_default();
-    lv_obj_t * active_screen = lv_display_get_screen_active(display);
+    lv_obj_t * active_screen = lv_screen_active();
     if(active_screen != lv_demo_smartwatch_get_tileview()) {
         /* event was triggered but the current screen is no longer active */
         return;
@@ -127,8 +139,7 @@ static void app_list_clicked_external_event_cb(lv_event_t * e)
 
 static void app_list_clicked_event_cb(lv_event_t * e)
 {
-    lv_disp_t * display = lv_display_get_default();
-    lv_obj_t * active_screen = lv_display_get_screen_active(display);
+    lv_obj_t * active_screen = lv_screen_active();
     if(active_screen != lv_demo_smartwatch_get_tileview()) {
         /* event was triggered but the current screen is no longer active */
         return;
