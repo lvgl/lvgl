@@ -696,7 +696,8 @@ static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1, int32_
     return new_value;
 }
 
-static void lv_anim_pause_for_internal(lv_anim_t * a, uint32_t ms){
+static void lv_anim_pause_for_internal(lv_anim_t * a, uint32_t ms)
+{
 
     a->is_paused = true;
     a->pause_time = lv_tick_get();
