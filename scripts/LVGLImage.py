@@ -1079,22 +1079,13 @@ blue_thresh = [
 ]
 
 
-# Get 16bit closest color
-def closest_rb(c):
-    return c >> 3 << 3
-
-
-def closest_g(c):
-    return c >> 2 << 2
-
-
 def dither(x, y, r, g, b):
     treshold_id = ((y & 7) << 3) + (x & 7)
 
     return (
-        closest_rb(min(r + red_thresh[treshold_id], 0xff)) & 0b11111000,
-        closest_g(min(g + green_thresh[treshold_id], 0xff)) & 0b11111100,
-        closest_rb(min(b + blue_thresh[treshold_id], 0xff)) & 0b11111000
+        (min(r + red_thresh[treshold_id], 0xFF) >> 3) << 3,
+        (min(g + green_thresh[treshold_id], 0xFF) >> 2) << 2,
+        (min(b + blue_thresh[treshold_id], 0xFF) >> 3) << 3
     )
 
 
