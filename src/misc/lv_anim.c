@@ -93,6 +93,7 @@ void lv_anim_init(lv_anim_t * a)
 lv_anim_t * lv_anim_start(const lv_anim_t * a)
 {
     LV_TRACE_ANIM("begin");
+    LV_LOG_WARN("Anim start");
 
     /*Add the new animation to the animation linked list*/
     lv_anim_t * new_anim = lv_ll_ins_head(anim_ll_p);
@@ -104,6 +105,7 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
     if(a->var == a) new_anim->var = new_anim;
     new_anim->run_round = state.anim_run_round;
     new_anim->last_timer_run = lv_tick_get();
+    new_anim->is_paused = false;
 
     /*Set the start value*/
     if(new_anim->early_apply) {
@@ -499,6 +501,32 @@ uint32_t lv_anim_resolve_speed(uint32_t speed_or_time, int32_t start, int32_t en
     return LV_CLAMP(min_time * 10, time, max_time * 10);
 }
 
+bool lv_anim_is_paused(lv_anim_t * a){
+    return a->is_paused;
+}
+
+void lv_anim_pause(lv_anim_t * a){
+    lv_anim_pause_for(a, LV_ANIM_PAUSE_FOREVER);
+}
+
+void lv_anim_pause_for(lv_anim_t * a, uint32_t ms){
+    LV_LOG_WARN("A paused");
+    a->is_paused = true;
+    a->pause_time = lv_tick_get();
+    a->pause_duration = ms;
+}
+
+/**
+ * Unpauses the animation
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ */
+void lv_anim_unpause(lv_anim_t * a){
+
+   LV_LOG_WARN("A unpaused");
+   a->is_paused = false;
+   a->pause_duration = 0;
+}
+
 
 /**********************
  *   STATIC FUNCTIONS
@@ -519,9 +547,13 @@ static void anim_timer(lv_timer_t * param)
 
     while(a != NULL) {
         uint32_t elaps = lv_tick_elaps(a->last_timer_run);
-        a->act_time += elaps;
 
-        a->last_timer_run = lv_tick_get();
+        if (a->is_paused) {
+            a->is_paused = (lv_tick_get() - a->pause_time) < a->pause_duration;
+        }else{
+            a->act_time += elaps;
+            a->last_timer_run = lv_tick_get();
+        }
 
         /*It can be set by `lv_anim_delete()` typically in `end_cb`. If set then an animation delete
          * happened in `anim_completed_handler` which could make this linked list reading corrupt
@@ -529,7 +561,7 @@ static void anim_timer(lv_timer_t * param)
          */
         state.anim_list_changed = false;
 
-        if(a->run_round != state.anim_run_round) {
+        if(!a->is_paused && a->run_round != state.anim_run_round) {
             a->run_round = state.anim_run_round; /*The list readying might be reset so need to know which anim has run already*/
 
             /*The animation will run now for the first time. Call `start_cb`*/
@@ -572,6 +604,7 @@ static void anim_timer(lv_timer_t * param)
 
                     /*If the time is elapsed the animation is ready*/
                     if(a->act_time >= a->duration) {
+                        LV_LOG_WARN("A ended");
                         anim_completed_handler(a);
                     }
                 }
