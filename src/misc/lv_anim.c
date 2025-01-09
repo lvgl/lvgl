@@ -552,8 +552,8 @@ static void anim_timer(lv_timer_t * param)
             a->is_paused = (lv_tick_get() - a->pause_time) < a->pause_duration;
         }else{
             a->act_time += elaps;
-            a->last_timer_run = lv_tick_get();
         }
+        a->last_timer_run = lv_tick_get();
 
         /*It can be set by `lv_anim_delete()` typically in `end_cb`. If set then an animation delete
          * happened in `anim_completed_handler` which could make this linked list reading corrupt
