@@ -44,6 +44,7 @@ static void anim_mark_list_change(void);
 static void anim_completed_handler(lv_anim_t * a);
 static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
                                          int32_t y1, int32_t x2, int32_t y2);
+static void lv_anim_pause_for_internal(lv_anim_t * a, uint32_t ms);
 static void resolve_time(lv_anim_t * a);
 static bool remove_concurrent_anims(lv_anim_t * a_current);
 static void remove_anim(void * a);
@@ -502,24 +503,25 @@ uint32_t lv_anim_resolve_speed(uint32_t speed_or_time, int32_t start, int32_t en
 
 bool lv_anim_is_paused(lv_anim_t * a)
 {
+    LV_ASSERT_NULL(a);
     return a->is_paused;
 }
 
 void lv_anim_pause(lv_anim_t * a)
 {
-    lv_anim_pause_for(a, LV_ANIM_PAUSE_FOREVER);
+    LV_ASSERT_NULL(a);
+    lv_anim_pause_for_internal(a, LV_ANIM_PAUSE_FOREVER);
 }
 
 void lv_anim_pause_for(lv_anim_t * a, uint32_t ms)
 {
-    a->is_paused = true;
-    a->pause_time = lv_tick_get();
-    a->pause_duration = ms;
+    LV_ASSERT_NULL(a);
+    lv_anim_pause_for_internal(a, ms);
 }
 
 void lv_anim_resume(lv_anim_t * a)
 {
-
+    LV_ASSERT_NULL(a);
     a->is_paused = false;
     a->pause_duration = 0;
 }
@@ -692,6 +694,13 @@ static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1, int32_
     new_value += a->start_value;
 
     return new_value;
+}
+
+static void lv_anim_pause_for_internal(lv_anim_t * a, uint32_t ms){
+
+    a->is_paused = true;
+    a->pause_time = lv_tick_get();
+    a->pause_duration = ms;
 }
 
 static void resolve_time(lv_anim_t * a)
