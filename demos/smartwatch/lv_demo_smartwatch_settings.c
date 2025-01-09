@@ -353,7 +353,8 @@ static void settings_action_event_cb(lv_event_t * e)
 
     lv_obj_t * active_screen = lv_screen_active();
 
-    LV_LOG_WARN("Settings actions event triggered, settings screen %s, Manually triggered %s", active_screen == settings_screen ? "active" : "inactive", manual_trigger ? "yes" : "no");
+    LV_LOG_WARN("Settings actions event triggered, settings screen %s, Manually triggered %s",
+                active_screen == settings_screen ? "active" : "inactive", manual_trigger ? "yes" : "no");
 
     if(active_screen != settings_screen && !manual_trigger) {
         /* event was triggered but the current screen is no longer active */
