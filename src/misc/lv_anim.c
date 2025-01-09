@@ -516,11 +516,7 @@ void lv_anim_pause_for(lv_anim_t * a, uint32_t ms){
     a->pause_duration = ms;
 }
 
-/**
- * Unpauses the animation
- * @param a         pointer to an initialized `lv_anim_t` variable
- */
-void lv_anim_unpause(lv_anim_t * a){
+void lv_anim_resume(lv_anim_t * a){
 
    LV_LOG_WARN("A unpaused");
    a->is_paused = false;

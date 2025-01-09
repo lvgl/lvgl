@@ -203,17 +203,16 @@ void lv_anim_set_duration(lv_anim_t * a, uint32_t duration);
 void lv_anim_set_delay(lv_anim_t * a, uint32_t delay);
 
 /**
+ * Resumes a paused animation
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ */
+void lv_anim_resume(lv_anim_t * a);
+
+/**
  * Pauses the animation
  * @param a         pointer to an initialized `lv_anim_t` variable
  */
 void lv_anim_pause(lv_anim_t * a);
-
-/**
- * Check if the animation is paused
- * @param a         pointer to an initialized `lv_anim_t` variable
- * @return          true if the animation is paused else false
- */
-bool lv_anim_is_paused(lv_anim_t * a);
 
 /**
  * Pauses the animation for ms milliseconds
@@ -223,10 +222,11 @@ bool lv_anim_is_paused(lv_anim_t * a);
 void lv_anim_pause_for(lv_anim_t * a, uint32_t ms);
 
 /**
- * Unpauses the animation
+ * Check if the animation is paused
  * @param a         pointer to an initialized `lv_anim_t` variable
+ * @return          true if the animation is paused else false
  */
-void lv_anim_unpause(lv_anim_t * a);
+bool lv_anim_is_paused(lv_anim_t * a);
 
 /**
  * Set the start and end values of an animation
