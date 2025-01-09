@@ -1,5 +1,4 @@
 #include "../lv_examples.h"
-#include <src/misc/lv_timer.h>
 #include <src/misc/lv_types.h>
 #if LV_BUILD_EXAMPLES && LV_USE_SWITCH
 
