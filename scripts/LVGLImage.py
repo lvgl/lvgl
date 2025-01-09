@@ -1035,8 +1035,12 @@ class LVGLImage:
                     self.rgb565_dither and
                     cf in (ColorFormat.RGB565, ColorFormat.RGB565A8, ColorFormat.ARGB8565)
                 ):
-                    r, g, b = dither(x, y, r, g, b)
+                    treshold_id = ((y & 7) << 3) + (x & 7)
 
+                    r = (min(r + red_thresh[treshold_id], 0xFF) >> 3) << 3
+                    g = (min(g + green_thresh[treshold_id], 0xFF) >> 2) << 2
+                    b = (min(b + blue_thresh[treshold_id], 0xFF) >> 3) << 3
+                   
                 rawdata += pack(r, g, b, a)
 
         if cf == ColorFormat.RGB565A8:
@@ -1078,15 +1082,6 @@ blue_thresh = [
   1, 7, 3, 5, 0, 8, 2, 6
 ]
 
-
-def dither(x, y, r, g, b):
-    treshold_id = ((y & 7) << 3) + (x & 7)
-
-    return (
-        (min(r + red_thresh[treshold_id], 0xFF) >> 3) << 3,
-        (min(g + green_thresh[treshold_id], 0xFF) >> 2) << 2,
-        (min(b + blue_thresh[treshold_id], 0xFF) >> 3) << 3
-    )
 
 
 class RLEHeader:
