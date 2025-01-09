@@ -149,14 +149,16 @@ void lv_sysmon_show_memory(lv_display_t * disp)
         return;
     }
 
-    disp->mem_label = lv_sysmon_create(disp);
     if(disp->mem_label == NULL) {
-        LV_LOG_WARN("Couldn't create sysmon");
-        return;
-    }
+        disp->mem_label = lv_sysmon_create(disp);
+        if(disp->mem_label == NULL) {
+            LV_LOG_WARN("Couldn't create sysmon");
+            return;
+        }
 
-    lv_obj_align(disp->mem_label, LV_USE_MEM_MONITOR_POS, 0, 0);
-    lv_subject_add_observer_obj(&sysmon_mem.subject, mem_observer_cb, disp->mem_label, NULL);
+        lv_obj_align(disp->mem_label, LV_USE_MEM_MONITOR_POS, 0, 0);
+        lv_subject_add_observer_obj(&sysmon_mem.subject, mem_observer_cb, disp->mem_label, NULL);
+    }
 
     lv_obj_remove_flag(disp->mem_label, LV_OBJ_FLAG_HIDDEN);
 }
