@@ -2159,16 +2159,17 @@ static void destroy_window(struct window * window)
 
 static void _lv_wayland_flush(lv_display_t * disp, const lv_area_t * area, unsigned char * color_p)
 {
-    unsigned long offset;
     void * buf_base;
     struct wl_buffer * wl_buf;
-    uint32_t src_width;
-    uint32_t src_height;
+    int32_t src_width;
+    int32_t src_height;
     struct window * window;
+    struct application * app;
     smm_buffer_t * buf;
     struct wl_callback * cb;
     lv_display_rotation_t rot;
     uint8_t bpp;
+    int32_t x;
     int32_t y;
     int32_t w;
     int32_t h;
@@ -2176,9 +2177,10 @@ static void _lv_wayland_flush(lv_display_t * disp, const lv_area_t * area, unsig
     int32_t vres;
 
     window = lv_display_get_user_data(disp);
+    app = window->application;
     buf = window->body->pending_buffer;
-    src_width = (area->x2 - area->x1 + 1);
-    src_height = (area->y2 - area->y1 + 1);
+    src_width = lv_area_get_width(area);
+    src_height = lv_area_get_height(area);
     bpp = lv_color_format_get_size(LV_COLOR_FORMAT_NATIVE);
 
     rot = lv_display_get_rotation(disp);
@@ -2219,11 +2221,14 @@ static void _lv_wayland_flush(lv_display_t * disp, const lv_area_t * area, unsig
     }
 
     /* Modify specified area in buffer */
-    for(y = area->y1; y <= area->y2; y++) {
-        offset = ((area->x1 + (y * hres)) * bpp);
-        memcpy(((char *)buf_base) + offset,
-               color_p,
-               src_width * bpp);
+    for(y = 0; y < src_height; ++y) {
+        if(app->shm_format == WL_SHM_FORMAT_ARGB8888) {
+            for(x = 0; x < src_width; ++x) {
+                lv_color_premultiply((lv_color32_t *)color_p + x);
+            }
+        }
+        memcpy(((char *)buf_base) + ((((area->y1 + y) * hres) + area->x1) * bpp),
+               color_p, src_width * bpp);
         color_p += src_width * bpp;
     }
 
