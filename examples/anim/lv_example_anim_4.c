@@ -8,9 +8,10 @@ static void anim_x_cb(void * var, int32_t v)
     lv_obj_set_x(var, v);
 }
 
-static void timer_cb (lv_timer_t* timer){
+static void timer_cb(lv_timer_t * timer)
+{
 
-    lv_anim_t* anim = lv_timer_get_user_data(timer);
+    lv_anim_t * anim = lv_timer_get_user_data(timer);
     lv_anim_pause_for(anim, 1000);
     lv_timer_delete(timer);
 }
@@ -38,7 +39,7 @@ static void sw_event_cb(lv_event_t * e)
         lv_anim_set_exec_cb(&a, anim_x_cb);
         lv_anim_set_path_cb(&a, lv_anim_path_ease_in);
         lv_timer_create(timer_cb, 200, lv_anim_start(&a));
-        
+
     }
 
 }

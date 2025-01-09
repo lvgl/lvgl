@@ -501,26 +501,30 @@ uint32_t lv_anim_resolve_speed(uint32_t speed_or_time, int32_t start, int32_t en
     return LV_CLAMP(min_time * 10, time, max_time * 10);
 }
 
-bool lv_anim_is_paused(lv_anim_t * a){
+bool lv_anim_is_paused(lv_anim_t * a)
+{
     return a->is_paused;
 }
 
-void lv_anim_pause(lv_anim_t * a){
+void lv_anim_pause(lv_anim_t * a)
+{
     lv_anim_pause_for(a, LV_ANIM_PAUSE_FOREVER);
 }
 
-void lv_anim_pause_for(lv_anim_t * a, uint32_t ms){
+void lv_anim_pause_for(lv_anim_t * a, uint32_t ms)
+{
     LV_LOG_WARN("A paused");
     a->is_paused = true;
     a->pause_time = lv_tick_get();
     a->pause_duration = ms;
 }
 
-void lv_anim_resume(lv_anim_t * a){
+void lv_anim_resume(lv_anim_t * a)
+{
 
-   LV_LOG_WARN("A unpaused");
-   a->is_paused = false;
-   a->pause_duration = 0;
+    LV_LOG_WARN("A unpaused");
+    a->is_paused = false;
+    a->pause_duration = 0;
 }
 
 
@@ -544,9 +548,10 @@ static void anim_timer(lv_timer_t * param)
     while(a != NULL) {
         uint32_t elaps = lv_tick_elaps(a->last_timer_run);
 
-        if (a->is_paused) {
+        if(a->is_paused) {
             a->is_paused = (lv_tick_get() - a->pause_time) < a->pause_duration;
-        }else{
+        }
+        else {
             a->act_time += elaps;
         }
         a->last_timer_run = lv_tick_get();

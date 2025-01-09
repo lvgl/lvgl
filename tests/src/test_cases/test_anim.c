@@ -107,7 +107,7 @@ void test_anim_pause(void)
     TEST_ASSERT_EQUAL(39, var);
 
     lv_anim_pause(animation);
-    
+
     lv_test_wait(40);
     TEST_ASSERT_EQUAL(39, var);
 
