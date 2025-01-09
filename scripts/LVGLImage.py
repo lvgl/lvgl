@@ -1089,12 +1089,12 @@ def closest_g(c):
 
 
 def dither(x, y, r, g, b):
-    tresshold_id = ((y & 7) << 3) + (x & 7)
+    treshold_id = ((y & 7) << 3) + (x & 7)
 
     return (
-        closest_rb(min(r + red_thresh[tresshold_id], 0xff)) & 0b11111000,
-        closest_g(min(g + green_thresh[tresshold_id], 0xff)) & 0b11111100,
-        closest_rb(min(b + blue_thresh[tresshold_id], 0xff)) & 0b11111000
+        closest_rb(min(r + red_thresh[treshold_id], 0xff)) & 0b11111000,
+        closest_g(min(g + green_thresh[treshold_id], 0xff)) & 0b11111100,
+        closest_rb(min(b + blue_thresh[treshold_id], 0xff)) & 0b11111000
     )
 
 
