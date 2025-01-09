@@ -93,7 +93,6 @@ void lv_anim_init(lv_anim_t * a)
 lv_anim_t * lv_anim_start(const lv_anim_t * a)
 {
     LV_TRACE_ANIM("begin");
-    LV_LOG_WARN("Anim start");
 
     /*Add the new animation to the animation linked list*/
     lv_anim_t * new_anim = lv_ll_ins_head(anim_ll_p);
@@ -513,7 +512,6 @@ void lv_anim_pause(lv_anim_t * a)
 
 void lv_anim_pause_for(lv_anim_t * a, uint32_t ms)
 {
-    LV_LOG_WARN("A paused");
     a->is_paused = true;
     a->pause_time = lv_tick_get();
     a->pause_duration = ms;
@@ -522,7 +520,6 @@ void lv_anim_pause_for(lv_anim_t * a, uint32_t ms)
 void lv_anim_resume(lv_anim_t * a)
 {
 
-    LV_LOG_WARN("A unpaused");
     a->is_paused = false;
     a->pause_duration = 0;
 }
@@ -605,7 +602,6 @@ static void anim_timer(lv_timer_t * param)
 
                     /*If the time is elapsed the animation is ready*/
                     if(a->act_time >= a->duration) {
-                        LV_LOG_WARN("A ended");
                         anim_completed_handler(a);
                     }
                 }
