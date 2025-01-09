@@ -51,3 +51,9 @@ Draw a vector graphic to the canvas
 
 .. lv_example:: widgets/canvas/lv_example_canvas_8
   :language: c
+
+Draw Fancy Letter Effects
+----------------
+
+.. lv_example:: widgets/canvas/lv_example_canvas_9
+:language: c

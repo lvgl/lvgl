@@ -67,7 +67,6 @@ void test_draw_sin_wave(void)
             lv_draw_letter(&layer, &letter_dsc, &(lv_point_t) {
                 .x = x, .y = y
             });
-            LV_LOG_USER("%d", letter_dsc.rotation);
             pre_x = x;
             pre_y = y;
         }
