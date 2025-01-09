@@ -1,5 +1,4 @@
 #include "../lv_examples.h"
-#include <src/misc/lv_types.h>
 #if LV_BUILD_EXAMPLES && LV_USE_SWITCH
 
 static void anim_x_cb(void * var, int32_t v)
