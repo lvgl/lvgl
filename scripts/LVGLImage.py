@@ -497,6 +497,7 @@ class LVGLImage:
                  data: bytes = b'') -> None:
         self.stride = 0  # default no valid stride value
         self.premultiplied = False
+        self.rgb565_dither = False
         self.set_data(cf, w, h, data)
 
     def __repr__(self) -> str:
@@ -571,6 +572,9 @@ class LVGLImage:
 
         self.stride = stride
         self.data = bytearray(b''.join(data_out))
+
+    def set_rgb565_dither(self, value):
+        self.rgb565_dither = value
 
     def premultiply(self):
         """
@@ -996,6 +1000,7 @@ class LVGLImage:
                 color |= (g >> 2) << 5
                 color |= (b >> 3) << 0
                 return uint16_t(color)
+
         elif cf == ColorFormat.RGB565A8:
 
             def pack(r, g, b, a):
@@ -1017,20 +1022,80 @@ class LVGLImage:
         w, h, rows, _ = reader.asRGBA8()
         rawdata = bytearray()
         alpha = bytearray()
-        for row in rows:
+        for y, row in enumerate(rows):
             R = row[0::4]
             G = row[1::4]
             B = row[2::4]
             A = row[3::4]
-            for r, g, b, a in zip(R, G, B, A):
+            for x, (r, g, b, a) in enumerate(zip(R, G, B, A)):
                 if cf == ColorFormat.RGB565A8:
                     alpha += uint8_t(a)
+
+                if (
+                    self.rgb565_dither and
+                    cf in (ColorFormat.RGB565, ColorFormat.RGB565A8, ColorFormat.ARGB8565)
+                ):
+                    r, g, b = dither(x, y, r, g, b)
+
                 rawdata += pack(r, g, b, a)
 
         if cf == ColorFormat.RGB565A8:
             rawdata += alpha
 
         self.set_data(cf, w, h, rawdata)
+
+
+red_thresh = [
+  1, 7, 3, 5, 0, 8, 2, 6,
+  7, 1, 5, 3, 8, 0, 6, 2,
+  3, 5, 0, 8, 2, 6, 1, 7,
+  5, 3, 8, 0, 6, 2, 7, 1,
+  0, 8, 2, 6, 1, 7, 3, 5,
+  8, 0, 6, 2, 7, 1, 5, 3,
+  2, 6, 1, 7, 3, 5, 0, 8,
+  6, 2, 7, 1, 5, 3, 8, 0
+]
+
+green_thresh = [
+  1, 3, 2, 2, 3, 1, 2, 2,
+  2, 2, 0, 4, 2, 2, 4, 0,
+  3, 1, 2, 2, 1, 3, 2, 2,
+  2, 2, 4, 0, 2, 2, 0, 4,
+  1, 3, 2, 2, 3, 1, 2, 2,
+  2, 2, 0, 4, 2, 2, 4, 0,
+  3, 1, 2, 2, 1, 3, 2, 2,
+  2, 2, 4, 0, 2, 2, 0, 4
+]
+
+blue_thresh = [
+  5, 3, 8, 0, 6, 2, 7, 1,
+  3, 5, 0, 8, 2, 6, 1, 7,
+  8, 0, 6, 2, 7, 1, 5, 3,
+  0, 8, 2, 6, 1, 7, 3, 5,
+  6, 2, 7, 1, 5, 3, 8, 0,
+  2, 6, 1, 7, 3, 5, 0, 8,
+  7, 1, 5, 3, 8, 0, 6, 2,
+  1, 7, 3, 5, 0, 8, 2, 6
+]
+
+
+# Get 16bit closest color
+def closest_rb(c):
+    return c >> 3 << 3
+
+
+def closest_g(c):
+    return c >> 2 << 2
+
+
+def dither(x, y, r, g, b):
+    tresshold_id = ((y & 7) << 3) + (x & 7)
+
+    return (
+        closest_rb(min(r + red_thresh[tresshold_id], 0xff)) & 0b11111000,
+        closest_g(min(g + green_thresh[tresshold_id], 0xff)) & 0b11111100,
+        closest_rb(min(b + blue_thresh[tresshold_id], 0xff)) & 0b11111000
+    )
 
 
 class RLEHeader:
@@ -1212,7 +1277,8 @@ class PNGConverter:
                  align: int = 1,
                  premultiply: bool = False,
                  compress: CompressMethod = CompressMethod.NONE,
-                 keep_folder=True) -> None:
+                 keep_folder=True,
+                 rgb565_dither=False) -> None:
         self.files = files
         self.cf = cf
         self.ofmt = ofmt
@@ -1223,6 +1289,7 @@ class PNGConverter:
         self.premultiply = premultiply
         self.compress = compress
         self.background = background
+        self.rgb565_dither = rgb565_dither
 
     def _replace_ext(self, input, ext):
         if self.keep_folder:
@@ -1243,6 +1310,8 @@ class PNGConverter:
             else:
                 img = LVGLImage().from_png(f, self.cf, background=self.background)
                 img.adjust_stride(align=self.align)
+                img.set_rgb565_dither(self.rgb565_dither)
+
                 if self.premultiply:
                     img.premultiply()
                 output.append((f, img))
@@ -1274,6 +1343,9 @@ def main():
             "XRGB8888", "RGB565", "RGB565A8", "ARGB8565", "RGB888", "AUTO",
             "RAW", "RAW_ALPHA"
         ])
+
+    parser.add_argument('--rgb565dither', action='store_true',
+                        help="use dithering to correct banding in gradients", default=False)
 
     parser.add_argument('--premultiply', action='store_true',
                         help="pre-multiply color with alpha", default=False)
@@ -1334,7 +1406,8 @@ def main():
                              align=args.align,
                              premultiply=args.premultiply,
                              compress=compress,
-                             keep_folder=False)
+                             keep_folder=False,
+                             rgb565_dither=args.rgb565dither)
     output = converter.convert()
     for f, img in output:
         logging.info(f"len: {img.data_len} for {path.basename(f)} ")
