@@ -90,5 +90,34 @@ void test_anim_delete_custom(void)
     lv_test_wait(20);
     TEST_ASSERT_EQUAL(39, var);
 }
+void test_anim_pause(void)
+{
+    int32_t var;
+
+    /*Start an animation*/
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, &var);
+    lv_anim_set_values(&a, 0, 100);
+    lv_anim_set_exec_cb(&a, exec_cb);
+    lv_anim_set_duration(&a, 100);
+    lv_anim_t * animation = lv_anim_start(&a);
+
+    lv_test_wait(40);
+    TEST_ASSERT_EQUAL(39, var);
+
+    lv_anim_pause(animation);
+    
+    lv_test_wait(40);
+    TEST_ASSERT_EQUAL(39, var);
+
+    lv_anim_resume(animation);
+
+    lv_test_wait(20);
+    TEST_ASSERT_EQUAL(59, var);
+
+    lv_test_wait(41);
+    TEST_ASSERT_EQUAL(100, var);
+}
 
 #endif
