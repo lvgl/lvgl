@@ -7,18 +7,10 @@ Example
 
 <widget>
 	<api>
-	    <prop name="text" help="Show it instead of the selected options">
-	    	<param name="text" type="string" help=""/>
-	    </prop>
-	    <prop name="options" help="The options as a \n separated string">
-	    	<param name="text" type="string" help=""/>
-	    </prop>
-	    <prop name="selected" help="The index of the selected option">
-	    	<param name="idx" type="int" help=""/>
-	    </prop>
-	    <prop name="symbol" help="The symbol, usually a caret">
-	    	<param name="img_src" type="simg_src" help=""/>
-	    </prop>
+	    <prop name="text" type="string" help="Show it instead of the selected options"/>
+	    <prop name="options" type="string" help="The options as a \n separated string"/>
+	    <prop name="selected" type="int" help="The index of the selected option"/>
+	    <prop name="symbol" type="string" help="The symbol, usually a caret"/>
 	    <element name="list" access="get" help=""/>
 	</api>
 </widget>

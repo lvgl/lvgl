@@ -53,14 +53,14 @@ void lv_xml_style_add_to_obj(lv_xml_parser_state_t * state, lv_obj_t * obj, cons
  * @param txt       e.g. "pressed"
  * @return          the enum `LV_STATE_PRESSED`
  */
-lv_state_t lv_xml_style_state_string_to_enum_value(const char * txt);
+lv_state_t lv_xml_style_state_to_enum(const char * txt);
 
 /**
  * Convert a style part to enum
  * @param txt       e.g. "knob"
  * @return          the enum `LV_PART_KNOB`
  */
-lv_part_t lv_xml_style_part_string_to_enum_value(const char * txt);
+lv_part_t lv_xml_style_part_to_enum(const char * txt);
 
 /**
  * Decompose a string like `"style1:pressed:checked:knob"` to style name and selector
