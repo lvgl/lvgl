@@ -295,6 +295,42 @@ lv_obj_t * lv_demo_smartwatch_settings_add_label(uint16_t id, const char * name,
 void lv_demo_smartwatch_set_default_scrollbar_mode(lv_scrollbar_mode_t mode);
 
 /**
+ * Set the default brightness for the smartwatch demo settings
+ * @param brightness    default brightness value
+ */
+void lv_demo_smartwatch_set_default_brightness(uint8_t brightness);
+
+/**
+ * Set the default timeout for the smartwatch demo settings
+ * @param timeout   default timeout value (0-4)
+ */
+void lv_demo_smartwatch_set_default_timeout(uint8_t timeout);
+
+/**
+ * Set the default rotation for the smartwatch demo settings
+ * @param rotation  default rotation value (0-3)
+ */
+void lv_demo_smartwatch_set_default_rotation(uint8_t rotation);
+
+/**
+ * Set the default circular scroll for the smartwatch demo settings
+ * @param enabled   whether circular scroll is enabled
+ */
+void lv_demo_smartwatch_set_default_circular_scroll(bool enabled);
+
+/**
+ * Set the default alert state for the smartwatch demo settings
+ * @param enabled   whether alerts are enabled
+ */
+void lv_demo_smartwatch_set_default_alert_state(bool enabled);
+
+/**
+ * Set the default about info for the smartwatch demo settings
+ * @param info  about info text
+ */
+void lv_demo_smartwatch_set_default_about_info(const char * info);
+
+/**
  * Show the scroll direction hint
  * @param dir   direction of available scroll
  */
