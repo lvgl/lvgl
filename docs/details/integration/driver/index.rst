@@ -14,3 +14,4 @@ Drivers
     wayland
     windows
     X11
+    uefi

@@ -2749,6 +2749,24 @@
     #endif
 #endif
 
+/** API for UEFI */
+#ifndef LV_USE_FS_UEFI
+    #ifdef CONFIG_LV_USE_FS_UEFI
+        #define LV_USE_FS_UEFI CONFIG_LV_USE_FS_UEFI
+    #else
+        #define LV_USE_FS_UEFI 0
+    #endif
+#endif
+#if LV_USE_FS_UEFI
+    #ifndef LV_FS_UEFI_LETTER
+        #ifdef CONFIG_LV_FS_UEFI_LETTER
+            #define LV_FS_UEFI_LETTER CONFIG_LV_FS_UEFI_LETTER
+        #else
+            #define LV_FS_UEFI_LETTER '\0'          /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+        #endif
+    #endif
+#endif
+
 /** LODEPNG decoder library */
 #ifndef LV_USE_LODEPNG
     #ifdef CONFIG_LV_USE_LODEPNG
@@ -3898,6 +3916,31 @@
         #define LV_USE_WINDOWS CONFIG_LV_USE_WINDOWS
     #else
         #define LV_USE_WINDOWS    0
+    #endif
+#endif
+
+/** LVGL UEFI backend */
+#ifndef LV_USE_UEFI
+    #ifdef CONFIG_LV_USE_UEFI
+        #define LV_USE_UEFI CONFIG_LV_USE_UEFI
+    #else
+        #define LV_USE_UEFI 0
+    #endif
+#endif
+#if LV_USE_UEFI
+    #ifndef LV_USE_UEFI_INCLUDE
+        #ifdef CONFIG_LV_USE_UEFI_INCLUDE
+            #define LV_USE_UEFI_INCLUDE CONFIG_LV_USE_UEFI_INCLUDE
+        #else
+            #define LV_USE_UEFI_INCLUDE "myefi.h"   /**< Header that hides the actual framework (EDK2, gnu-efi, ...) */
+        #endif
+    #endif
+    #ifndef LV_UEFI_USE_MEMORY_SERVICES
+        #ifdef CONFIG_LV_UEFI_USE_MEMORY_SERVICES
+            #define LV_UEFI_USE_MEMORY_SERVICES CONFIG_LV_UEFI_USE_MEMORY_SERVICES
+        #else
+            #define LV_UEFI_USE_MEMORY_SERVICES 0   /**< Use the memory functions from the boot services table */
+        #endif
     #endif
 #endif
 
