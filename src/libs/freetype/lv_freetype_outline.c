@@ -345,7 +345,7 @@ static lv_freetype_outline_t outline_create(
     lv_freetype_outline_event_param_t param;
     lv_memzero(&param, sizeof(param));
 
-    /*Calculate Total Segmenets Before decompose */
+    /*Calculate Total Segments Before decompose */
     int32_t tag_size = face->glyph->outline.n_points;
     int32_t segments = 0;
     int32_t vectors = 0;

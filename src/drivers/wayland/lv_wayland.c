@@ -2489,6 +2489,9 @@ static void wayland_deinit(void)
         if(!window->closed) {
             destroy_window(window);
         }
+
+        lv_draw_buf_destroy(window->lv_disp_draw_buf);
+        lv_display_delete(window->lv_disp);
     }
 
     smm_deinit();
