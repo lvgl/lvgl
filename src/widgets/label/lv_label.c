@@ -320,6 +320,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
                 pos->x = lv_obj_get_content_width(obj) / 2;
                 break;
             default:
+                pos->x = 0;
                 break;
         }
         return;
