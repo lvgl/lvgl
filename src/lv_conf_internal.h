@@ -66,6 +66,11 @@
     #endif
 #endif
 
+/* Renamed config backwards-compatibility */
+#if !defined(LV_FS_DEFAULT_DRIVER_LETTER) && defined(LV_FS_DEFAULT_DRIVE_LETTER)
+    #define LV_FS_DEFAULT_DRIVER_LETTER LV_FS_DEFAULT_DRIVE_LETTER
+#endif
+
 #ifdef CONFIG_LV_COLOR_DEPTH
     #define LV_KCONFIG_PRESENT
 #endif
@@ -2520,11 +2525,11 @@
 /* File system interfaces for common APIs */
 
 /** Setting a default driver letter allows skipping the driver prefix in filepaths. */
-#ifndef LV_FS_DEFAULT_DRIVE_LETTER
-    #ifdef CONFIG_LV_FS_DEFAULT_DRIVE_LETTER
-        #define LV_FS_DEFAULT_DRIVE_LETTER CONFIG_LV_FS_DEFAULT_DRIVE_LETTER
+#ifndef LV_FS_DEFAULT_DRIVER_LETTER
+    #ifdef CONFIG_LV_FS_DEFAULT_DRIVER_LETTER
+        #define LV_FS_DEFAULT_DRIVER_LETTER CONFIG_LV_FS_DEFAULT_DRIVER_LETTER
     #else
-        #define LV_FS_DEFAULT_DRIVE_LETTER '\0'
+        #define LV_FS_DEFAULT_DRIVER_LETTER '\0'
     #endif
 #endif
 
@@ -3022,7 +3027,7 @@
             #define LV_FFMPEG_DUMP_FORMAT 0
         #endif
     #endif
-    /** Use lvgl file path in FFmpeg Player widget 
+    /** Use lvgl file path in FFmpeg Player widget
      *  You won't be able to open URLs after enabling this feature.
      *  Note that FFmpeg image decoder will always use lvgl file system. */
     #ifndef LV_FFMPEG_PLAYER_USE_LV_FS

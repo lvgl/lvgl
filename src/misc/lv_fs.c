@@ -18,8 +18,8 @@
  *      DEFINES
  *********************/
 
-#if LV_FS_DEFAULT_DRIVE_LETTER != '\0' && (LV_FS_DEFAULT_DRIVE_LETTER < 'A' || 'Z' < LV_FS_DEFAULT_DRIVE_LETTER)
-    #error "When enabled, LV_FS_DEFAULT_DRIVE_LETTER needs to be a capital ASCII letter (A-Z)"
+#if LV_FS_DEFAULT_DRIVER_LETTER != '\0' && (LV_FS_DEFAULT_DRIVER_LETTER < 'A' || 'Z' < LV_FS_DEFAULT_DRIVER_LETTER)
+    #error "When enabled, LV_FS_DEFAULT_DRIVER_LETTER needs to be a capital ASCII letter (A-Z)"
 #endif
 
 #define fsdrv_ll_p &(LV_GLOBAL_DEFAULT()->fsdrv_ll)
@@ -28,7 +28,7 @@
  *      TYPEDEFS
  **********************/
 typedef struct {
-    char drive_letter;
+    char driver_letter;
     const char * real_path;
 } resolved_path_t;
 
@@ -82,7 +82,7 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
 
     resolved_path_t resolved_path = lv_fs_resolve_path(path);
 
-    lv_fs_drv_t * drv = lv_fs_get_drv(resolved_path.drive_letter);
+    lv_fs_drv_t * drv = lv_fs_get_drv(resolved_path.driver_letter);
 
     if(drv == NULL) {
         LV_LOG_WARN("Can't open file (%s): unknown driver letter", path);
@@ -307,7 +307,7 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
 
     resolved_path_t resolved_path = lv_fs_resolve_path(path);
 
-    lv_fs_drv_t * drv = lv_fs_get_drv(resolved_path.drive_letter);
+    lv_fs_drv_t * drv = lv_fs_get_drv(resolved_path.driver_letter);
 
     if(drv == NULL) {
         return LV_FS_RES_NOT_EX;
@@ -509,19 +509,19 @@ static resolved_path_t lv_fs_resolve_path(const char * path)
 {
     resolved_path_t resolved;
 
-#if LV_FS_DEFAULT_DRIVE_LETTER != '\0' /*When using default drive letter, strict format (X:) is mandatory*/
+#if LV_FS_DEFAULT_DRIVER_LETTER != '\0' /*When using default drive letter, strict format (X:) is mandatory*/
     bool has_drive_prefix = ('A' <= path[0]) && (path[0] <= 'Z') && (path[1] == ':');
 
     if(has_drive_prefix) {
-        resolved.drive_letter = path[0];
+        resolved.driver_letter = path[0];
         resolved.real_path = path + 2;
     }
     else {
-        resolved.drive_letter = LV_FS_DEFAULT_DRIVE_LETTER;
+        resolved.driver_letter = LV_FS_DEFAULT_DRIVER_LETTER;
         resolved.real_path = path;
     }
 # else /*Lean rules for backward compatibility*/
-    resolved.drive_letter = path[0];
+    resolved.driver_letter = path[0];
 
     if(*path != '\0') {
         path++; /*Ignore the driver letter*/
