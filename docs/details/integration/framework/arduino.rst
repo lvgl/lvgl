@@ -9,6 +9,8 @@ your GUI. See the :ref:`requirements of LVGL <requirements>`.
 
 For example ESP32 is a good candidate to create UI's with LVGL.
 
+If you are using the Arduino GIGA Display Shield (docs `here <https://docs.arduino.cc/hardware/giga-display-shield>`__), use the `Arduino_H7_Video <https://github.com/arduino/ArduinoCore-mbed/tree/main/libraries/Arduino_H7_Video>`__ library, included in the Arduino Mbed OS board package (`here <https://github.com/arduino/ArduinoCore-mbed>`__), which provides built-in LVGL compatibility.
+
 Get the LVGL Arduino library
 ----------------------------
 
