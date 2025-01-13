@@ -201,6 +201,8 @@ typedef struct {
     lv_subject_t top_margin_setting_subject;
     lv_demo_high_res_api_t api;
     lv_demo_high_res_subject_groups_t subject_groups;
+    lv_array_t about_slides_array;
+    bool about_slides_dir_exists;
 } lv_demo_high_res_ctx_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_demo_high_res_theme_t lv_demo_high_res_theme_light;
@@ -231,7 +233,7 @@ lv_obj_t * lv_demo_high_res_simple_container_create(lv_obj_t * parent, bool vert
 void lv_demo_high_res_label_bind_temperature(lv_obj_t * label, lv_subject_t * subject, lv_demo_high_res_ctx_t * c);
 void lv_demo_high_res_theme_observer_image_src_cb(lv_observer_t * observer, lv_subject_t * subject);
 void lv_demo_high_res_theme_observer_obj_bg_image_src_cb(lv_observer_t * observer, lv_subject_t * subject);
-lv_image_dsc_t * lv_demo_high_res_image_preload(const void * src, lv_color_format_t cf);
+lv_image_dsc_t * lv_demo_high_res_image_preload(const void * src, lv_color_format_t cf, int32_t scale);
 
 /**********************
  *      MACROS

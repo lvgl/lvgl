@@ -13,15 +13,16 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../lv_conf_internal.h"
+
+#if LV_USE_FREETYPE
+
 #include "../../misc/lv_types.h"
 #include "../../misc/lv_event.h"
 #include LV_STDBOOL_INCLUDE
 
-#if LV_USE_FREETYPE
-
 /*********************
- *      DEFINES
- *********************/
+*      DEFINES
+*********************/
 
 #define LV_FREETYPE_F26DOT6_TO_INT(x)   ((x) >> 6)
 #define LV_FREETYPE_F26DOT6_TO_FLOAT(x) ((float)(x) / 64)

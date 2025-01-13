@@ -192,11 +192,6 @@ void lv_anim_set_exec_cb(lv_anim_t * a, lv_anim_exec_xcb_t exec_cb);
 void lv_anim_set_duration(lv_anim_t * a, uint32_t duration);
 
 /**
- * Legacy `lv_anim_set_time` API will be removed soon, use `lv_anim_set_duration` instead.
- */
-void lv_anim_set_time(lv_anim_t * a, uint32_t duration);
-
-/**
  * Set a delay before starting the animation
  * @param a         pointer to an initialized `lv_anim_t` variable
  * @param delay     delay before the animation in milliseconds
@@ -417,15 +412,21 @@ uint16_t lv_anim_count_running(void);
 
 /**
  * Store the speed as a special value which can be used as time in animations.
- * It will be converted to time internally based on the start and end values
+ * It will be converted to time internally based on the start and end values.
+ * The return value can be used as a constant with multiple animations
+ * and let LVGL convert the speed to time based on the actual values.
+ * LIMITATION: the max time stored this way can be 10,000 ms.
  * @param speed         the speed of the animation in with unit / sec resolution in 0..10k range
  * @return              a special value which can be used as an animation time
+ * @note                internally speed is stored as 10 unit/sec
  */
 uint32_t lv_anim_speed(uint32_t speed);
 
 /**
  * Store the speed as a special value which can be used as time in animations.
- * It will be converted to time internally based on the start and end values
+ * It will be converted to time internally based on the start and end values.
+ * The return value can be used as a constant with multiple animations
+ * and let LVGL convert the speed to time based on the actual values.
  * @param speed         the speed of the animation in as unit / sec resolution in 0..10k range
  * @param min_time      the minimum time in 0..10k range
  * @param max_time      the maximum time in 0..10k range
@@ -437,13 +438,27 @@ uint32_t lv_anim_speed(uint32_t speed);
 uint32_t lv_anim_speed_clamped(uint32_t speed, uint32_t min_time, uint32_t max_time);
 
 /**
+ * Resolve the speed (created with `lv_anim_speed` or `lv_anim_speed_clamped`) to time
+ * based on start and end values.
+ * @param speed     return values of `lv_anim_speed` or `lv_anim_speed_clamped`
+ * @param start     the start value of the animation
+ * @param end       the end value of the animation
+ * @return          the time required to get from `start` to `end` with the given `speed` setting
+ */
+uint32_t lv_anim_resolve_speed(uint32_t speed, int32_t start, int32_t end);
+
+/**
  * Calculate the time of an animation based on its speed, start and end values.
+ * It simpler than `lv_anim_speed` or `lv_anim_speed_clamped` as it converts
+ * speed, start, and end to a time immediately.
+ * As it's simpler there is no limit on the maximum time.
  * @param speed         the speed of the animation
  * @param start         the start value
  * @param end           the end value
  * @return              the time of the animation in milliseconds
  */
 uint32_t lv_anim_speed_to_time(uint32_t speed, int32_t start, int32_t end);
+
 
 /**
  * Manually refresh the state of the animations.

@@ -30,10 +30,10 @@ extern "C" {
 
 void lv_xml_init(void);
 
-lv_obj_t * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs);
+void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs);
 
-lv_obj_t * lv_xml_create_from_ctx(lv_obj_t * parent, lv_xml_component_ctx_t * parent_ctx, lv_xml_component_ctx_t * ctx,
-                                  const char ** attrs);
+void * lv_xml_create_from_ctx(lv_obj_t * parent, lv_xml_component_ctx_t * parent_ctx, lv_xml_component_ctx_t * ctx,
+                              const char ** attrs);
 
 lv_result_t lv_xml_register_font(const char * name, const lv_font_t * font);
 

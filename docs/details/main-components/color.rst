@@ -9,11 +9,13 @@ depth, creating colors from hex code, converting between color depths,
 mixing colors, etc.
 
 The type :cpp:type:`lv_color_t` is used to store a color in RGB888 format.
-This type and format is used in almost all APIs regardless to :cpp:expr:`LV_COLOR_DEPTH`.
+This type and format is used in almost all APIs regardless of :cpp:expr:`LV_COLOR_DEPTH`.
+
+
 
 .. _color_create:
 
-Creating colors
+Creating Colors
 ***************
 
 RGB
@@ -123,6 +125,8 @@ Built-in colors
 :cpp:func:`lv_color_white` and :cpp:func:`lv_color_black` return ``0xFFFFFF`` and
 ``0x000000`` respectively.
 
+
+
 .. _color_opacity:
 
 Opacity
@@ -135,12 +139,14 @@ Some special purpose defines are also introduced:
    completely transparent
 -  :cpp:enumerator:`LV_OPA_10` Value: 25, means the color covers only a little
 -  ``LV_OPA_20 ... OPA_80`` follow logically
--  :cpp:enumerator:`LV_OPA_90` Value: 229, means the color near completely covers
+-  :cpp:enumerator:`LV_OPA_90` Value: 229, means the color nearly completely covers
 -  :cpp:enumerator:`LV_OPA_COVER` Value: 255, means the color completely covers (full
    opacity)
 
 You can also use the ``LV_OPA_*`` defines in :cpp:func:`lv_color_mix` as a
 mixing *ratio*.
+
+
 
 .. _color_api:
 

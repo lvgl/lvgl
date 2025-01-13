@@ -828,7 +828,10 @@ static void draw_main(lv_event_t * e)
 
                 /*Align the content to the middle if not cropped*/
                 bool crop = ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP;
-                if(crop) txt_flags = LV_TEXT_FLAG_EXPAND;
+                if(crop) {
+                    txt_flags = LV_TEXT_FLAG_EXPAND;
+                    label_dsc_act.flag |= LV_TEXT_FLAG_EXPAND;
+                }
 
                 lv_text_get_size(&txt_size, table->cell_data[cell]->txt, label_dsc_def.font,
                                  label_dsc_act.letter_space, label_dsc_act.line_space,

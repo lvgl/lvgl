@@ -17,11 +17,10 @@
 	        <enum name="custom_4"/>
 	    </enumdef>
 
-
-	    <prop name="row_cnt" help="">
+	    <prop name="row_conunt" help="">
 	    	<param name="cnt" type="int" help=""/>
 	    </prop>
-	    <prop name="column_cnt" help="">
+	    <prop name="column_conunt" help="">
 	    	<param name="cnt" type="int" help=""/>
 	    </prop>
 	    <prop name="selected cell" help="">
@@ -39,12 +38,8 @@
 	    <element name="cell" access="set">
 	        <arg name="row" type="int" help=""/>
 	        <arg name="column" type="int" help=""/>
-	    	<prop name="value" help="">
-	    		<param name="text" type="string" help=""/>
-	    	</prop>
-	    	<prop name="ctrl" help="">
-	    		<param name="ctrl" type="enum:lv_table_cell_ctrl+" help=""/>
-	    	</prop>
+	    	<prop name="value"  type="string"  help=""/>
+	    	<prop name="ctrl" type="enum:lv_table_cell_ctrl+" help=""/>
 	    </element>
 	</api>
 </widget>

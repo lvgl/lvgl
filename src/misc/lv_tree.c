@@ -103,6 +103,7 @@ static lv_tree_node_t * _lv_tree_class_create_node(const lv_tree_class_t * class
 
 lv_tree_node_t * lv_tree_node_create(const lv_tree_class_t * class_p, lv_tree_node_t * parent)
 {
+    LV_ASSERT_NULL(class_p);
     lv_tree_node_t * node = _lv_tree_class_create_node(class_p, parent);
     LV_ASSERT_NULL(node);
     _lv_tree_node_construct(node->class_p, node);
@@ -184,4 +185,3 @@ bool lv_tree_walk(const lv_tree_node_t * node,
         return true;
     }
 }
-

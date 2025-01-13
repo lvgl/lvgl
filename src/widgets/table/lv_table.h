@@ -34,6 +34,7 @@ LV_EXPORT_CONST_INT(LV_TABLE_CELL_NONE);
  **********************/
 
 typedef enum {
+    LV_TABLE_CELL_CTRL_NONE        = 0 << 0,
     LV_TABLE_CELL_CTRL_MERGE_RIGHT = 1 << 0,
     LV_TABLE_CELL_CTRL_TEXT_CROP   = 1 << 1,
     LV_TABLE_CELL_CTRL_CUSTOM_1    = 1 << 4,
