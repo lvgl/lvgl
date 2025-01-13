@@ -9,6 +9,7 @@ void lv_example_xml_2(void)
         lv_obj_t * label = lv_label_create(lv_screen_active());
         lv_label_set_text(label, "Couldn't open the XML files.");
         lv_obj_center(label);
+        return;
     }
     lv_xml_component_register_from_file("A:lvgl/examples/others/xml/my_card.xml");
     lv_xml_component_register_from_file("A:lvgl/examples/others/xml/my_button.xml");

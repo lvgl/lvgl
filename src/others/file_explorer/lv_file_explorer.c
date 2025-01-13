@@ -406,11 +406,15 @@ static void init_style(lv_obj_t * obj)
     lv_style_set_border_width(&quick_access_list_button_style, 0);
     lv_style_set_bg_color(&quick_access_list_button_style, lv_color_hex(0xf2f1f6));
 
-    uint32_t i, j;
-    for(i = 0; i < lv_obj_get_child_count(explorer->quick_access_area); i++) {
+    uint32_t ch_cnt = lv_obj_get_child_count(explorer->quick_access_area);
+
+    for(uint32_t i = 0; i < ch_cnt; i++) {
         lv_obj_t * child = lv_obj_get_child(explorer->quick_access_area, i);
+
         if(lv_obj_check_type(child, &lv_list_class)) {
-            for(j = 0; j < lv_obj_get_child_count(child); j++) {
+            uint32_t list_ch_cnt = lv_obj_get_child_count(child);
+
+            for(uint32_t j = 0; j < list_ch_cnt; j++) {
                 lv_obj_t * list_child = lv_obj_get_child(child, j);
                 if(lv_obj_check_type(list_child, &lv_list_button_class)) {
                     lv_obj_add_style(list_child, &quick_access_list_button_style, 0);
@@ -564,13 +568,13 @@ static void show_dir(lv_obj_t * obj, const char * path)
     while(1) {
         res = lv_fs_dir_read(&dir, fn, sizeof(fn));
         if(res != LV_FS_RES_OK) {
-            LV_LOG_USER("Driver, file or directory is not exists %d!", res);
+            LV_LOG_USER("Driver, file or directory does not exist %d!", res);
             break;
         }
 
         /*fn is empty, if not more files to read*/
         if(lv_strlen(fn) == 0) {
-            LV_LOG_USER("Not more files to read!");
+            LV_LOG_USER("No more files to read!");
             break;
         }
 
@@ -706,8 +710,8 @@ static bool is_end_with(const char * str1, const char * str2)
     if(str1 == NULL || str2 == NULL)
         return false;
 
-    uint16_t len1 = lv_strlen(str1);
-    uint16_t len2 = lv_strlen(str2);
+    size_t len1 = lv_strlen(str1);
+    size_t len2 = lv_strlen(str2);
     if((len1 < len2) || (len1 == 0 || len2 == 0))
         return false;
 

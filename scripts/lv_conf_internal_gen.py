@@ -88,6 +88,11 @@ fout.write(
     #endif
 #endif
 
+/* Renamed config backwards-compatibility */
+#if !defined(LV_FS_DEFAULT_DRIVER_LETTER) && defined(LV_FS_DEFAULT_DRIVE_LETTER)
+    #define LV_FS_DEFAULT_DRIVER_LETTER LV_FS_DEFAULT_DRIVE_LETTER
+#endif
+
 #ifdef CONFIG_LV_COLOR_DEPTH
     #define LV_KCONFIG_PRESENT
 #endif
@@ -117,9 +122,9 @@ for line in fin.read().splitlines():
     indent = r[1]
 
     name = r[3]
-    name = re.sub('\(.*?\)', '', name, 1)    #remove parentheses from macros. E.g. MY_FUNC(5) -> MY_FUNC
+    name = re.sub(r'\(.*?\)', '', name, 1)    #remove parentheses from macros. E.g. MY_FUNC(5) -> MY_FUNC
 
-    line = re.sub('[\s]*', '', line, 1)
+    line = re.sub(r'[\s]*', '', line, 1)
 
     #If the value should be 1 (enabled) by default use a more complex structure for Kconfig checks because
     #if a not defined CONFIG_... value should be interpreted as 0 and not the LVGL default

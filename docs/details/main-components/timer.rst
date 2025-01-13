@@ -49,7 +49,7 @@ For example:
    void my_timer(lv_timer_t * timer)
    {
      /* Use the user_data */
-     uint32_t * user_data = timer->user_data;
+     uint32_t * user_data = lv_timer_get_user_data(timer);
      printf("my_timer called with user data: %d\n", *user_data);
 
      /* Do something with LVGL */

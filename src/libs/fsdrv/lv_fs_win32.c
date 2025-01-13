@@ -378,20 +378,23 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 
     lv_strcpy(handle->next_fn, "");
     handle->dir_p = FindFirstFileA(buf, &fdata);
-    do {
-        if(is_dots_name(fdata.cFileName)) {
-            continue;
-        }
-        else {
-            if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-                lv_snprintf(handle->next_fn, sizeof(handle->next_fn), "/%s", fdata.cFileName);
+
+    if(handle->dir_p != INVALID_HANDLE_VALUE) {
+        do {
+            if(is_dots_name(fdata.cFileName)) {
+                continue;
             }
             else {
-                lv_snprintf(handle->next_fn, sizeof(handle->next_fn), "%s", fdata.cFileName);
+                if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+                    lv_snprintf(handle->next_fn, sizeof(handle->next_fn), "/%s", fdata.cFileName);
+                }
+                else {
+                    lv_snprintf(handle->next_fn, sizeof(handle->next_fn), "%s", fdata.cFileName);
+                }
+                break;
             }
-            break;
-        }
-    } while(FindNextFileA(handle->dir_p, &fdata));
+        } while(FindNextFileA(handle->dir_p, &fdata));
+    }
 
     if(handle->dir_p == INVALID_HANDLE_VALUE) {
         lv_free(handle);
