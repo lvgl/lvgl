@@ -147,9 +147,9 @@ struct _lv_anim_t {
 
     /* Animation system use these - user shouldn't set */
     uint32_t last_timer_run;
-    bool is_paused;                           /**<Indicates that the animation is paused */
     uint32_t pause_time;                      /**<The time when the animation was paused*/
     uint32_t pause_duration;                  /**<The amount of the time the animation must stay paused for*/
+    uint8_t is_paused : 1;                    /**<Indicates that the animation is paused */
     uint8_t reverse_play_in_progress : 1;     /**< Reverse play is in progress */
     uint8_t run_round : 1;                    /**< When not equal to global.anim_state.anim_run_round (which toggles each
                                                * time animation timer executes), indicates this animation needs to be updated. */
