@@ -460,7 +460,7 @@ static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
 
     lv_obj_set_grid_cell(chart, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_START, 0, 1);
     lv_chart_set_type(chart, LV_CHART_TYPE_BAR);
-    lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 101);
+    lv_chart_set_axis_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 101);
     lv_chart_set_div_line_count(chart, 3, 0);
     lv_obj_set_style_line_opa(chart, LV_OPA_40, 0);
     lv_obj_set_style_line_color(chart, lv_color_black(), 0);
@@ -468,7 +468,7 @@ static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_style_line_dash_gap(chart, 1, 0);
     lv_chart_series_t * ser = lv_chart_add_series(chart, lv_color_white(), LV_CHART_AXIS_PRIMARY_Y);
     static const int32_t chart_values[] = {45, 14, 45, 52, 69, 52, 63};
-    lv_chart_set_ext_y_array(chart, ser, (int32_t *)chart_values);
+    lv_chart_set_series_ext_y_array(chart, ser, (int32_t *)chart_values);
     lv_chart_set_point_count(chart, sizeof(chart_values) / sizeof(*chart_values));
     lv_chart_refresh(chart);
 
@@ -565,7 +565,7 @@ static void widget3_chart_selected_day_observer_cb(lv_observer_t * observer, lv_
         lv_obj_add_event_cb(chart, widget3_chart_free_anim_values, LV_EVENT_DELETE, NULL);
 
         lv_chart_series_t * ser = lv_chart_get_series_next(chart, NULL);
-        lv_chart_set_ext_y_array(chart, ser, anim_values->current);
+        lv_chart_set_series_ext_y_array(chart, ser, anim_values->current);
     }
 
     lv_memcpy(anim_values->start, anim_values->current, sizeof(anim_values->current));
@@ -651,7 +651,7 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_style_pad_all(chart, 5, 0);
     lv_obj_set_grid_cell(chart, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_START, 0, 1);
     lv_chart_set_type(chart, LV_CHART_TYPE_BAR);
-    lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, -125, 125);
+    lv_chart_set_axis_range(chart, LV_CHART_AXIS_PRIMARY_Y, -125, 125);
     lv_chart_set_div_line_count(chart, 3, 0);
     lv_obj_set_style_line_opa(chart, LV_OPA_40, 0);
     lv_obj_set_style_line_color(chart, lv_color_black(), 0);
