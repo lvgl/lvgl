@@ -10,7 +10,7 @@ static void add_data(lv_timer_t * t)
 
     uint16_t p = lv_chart_get_point_count(chart);
     uint16_t s = lv_chart_get_x_start_point(chart, ser);
-    int32_t * a = lv_chart_get_y_array(chart, ser);
+    int32_t * a = lv_chart_get_series_y_array(chart, ser);
 
     a[(s + 1) % p] = LV_CHART_POINT_NONE;
     a[(s + 2) % p] = LV_CHART_POINT_NONE;

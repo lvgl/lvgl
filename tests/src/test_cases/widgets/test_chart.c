@@ -174,7 +174,7 @@ void test_draw_task_hooking(void)
     lv_chart_series_t * chart_set1 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_YELLOW), 0);
     lv_chart_series_t * chart_set2 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_GREEN), 0);
     lv_chart_series_t * chart_set3 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), 0);
-    lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 700);
+    lv_chart_set_axis_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 700);
 
     int32_t points[21] = {0, 31, 59, 81, 95, 100, 95, 81, 59, 31, 0, -31, -59, -81, -95, -100, -95, -81, -59, -31, 0};
 
