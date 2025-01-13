@@ -39,13 +39,13 @@
 	    	<param name="vdiv" type="int" help=""/>
 	    </prop>
 
-	    <element name="series" type="custom:chart_series" access="add">
+	    <element name="series" type="lv_chart_series" access="add">
 	        <arg name="color" type="color" help=""/>
 	        <arg name="axis" type="enum:lv_chart_axis+" help="The axis"/>
 	    	<prop name="values"  type="int[count]" help="set values from an array"/>
 	    </element>
 
-	    <element name="cursor" type="custom:chart_cursor" access="add">
+	    <element name="cursor" type="lv_chart_cursor" access="add">
 	        <arg name="color" type="color" arg="true"/>
 	        <arg name="dir" type="enum:lv_dir" arg="true"/>
 	    	<prop name="pos" help="position of the cursor">

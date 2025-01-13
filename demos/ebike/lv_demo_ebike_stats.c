@@ -435,16 +435,16 @@ static void chart_mode_observer_cb(lv_observer_t * observer, lv_subject_t * subj
 
     switch(lv_subject_get_int(&subject_mode)) {
         case MODE_AVG_SPEED:
-            lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 30);
-            lv_chart_set_ext_y_array(chart, ser, avg_speed_values);
+            lv_chart_set_axis_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 30);
+            lv_chart_set_series_ext_y_array(chart, ser, avg_speed_values);
             break;
         case MODE_TOP_SPEED:
-            lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 50);
-            lv_chart_set_ext_y_array(chart, ser, top_speed_values);
+            lv_chart_set_axis_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 50);
+            lv_chart_set_series_ext_y_array(chart, ser, top_speed_values);
             break;
         case MODE_DISTANCE:
-            lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 90);
-            lv_chart_set_ext_y_array(chart, ser, distance_values);
+            lv_chart_set_axis_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 90);
+            lv_chart_set_series_ext_y_array(chart, ser, distance_values);
             break;
         default:
             break;

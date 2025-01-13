@@ -80,6 +80,12 @@ extern "C" {
 #define _lv_inv_area lv_inv_area
 #define lv_chart_set_all_value lv_chart_set_all_values
 #define lv_calendar_set_showed_date lv_calendar_set_month_shown
+#define lv_chart_set_range lv_chart_set_axis_range
+#define lv_chart_set_value_by_id lv_chart_set_series_value_by_id
+#define lv_chart_get_x_array lv_chart_get_series_x_array
+#define lv_chart_get_y_array lv_chart_get_series_y_array
+#define lv_chart_set_ext_x_array lv_chart_set_series_ext_x_array
+#define lv_chart_set_ext_y_array lv_chart_set_series_ext_y_array
 
 #if defined(LV_FS_DEFAULT_DRIVE_LETTER)
 #warning LV_FS_DEFAULT_DRIVE_LETTER is deprecated. Rename to LV_FS_DEFAULT_DRIVER_LETTER
