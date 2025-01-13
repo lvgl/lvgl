@@ -248,7 +248,15 @@ void lv_indev_read(lv_indev_t * indev)
             indev->disp->last_activity_time = lv_tick_get();
         }
 
-        if(indev->type == LV_INDEV_TYPE_POINTER) {
+        if(indev->read_preprocess_cb && indev->read_preprocess_cb(indev, &data)) {
+            /*needn't care about long press event*/
+            if(indev->mode == LV_INDEV_MODE_EVENT && indev->read_timer && !lv_timer_get_paused(indev->read_timer)) {
+                lv_timer_pause(indev->read_timer);
+            }
+
+            continue_reading = data.continue_reading;
+        }
+        else if(indev->type == LV_INDEV_TYPE_POINTER) {
             indev_pointer_proc(indev, &data);
         }
         else if(indev->type == LV_INDEV_TYPE_KEYPAD) {
@@ -306,6 +314,13 @@ void lv_indev_set_read_cb(lv_indev_t * indev, lv_indev_read_cb_t read_cb)
     indev->read_cb = read_cb;
 }
 
+void lv_indev_set_read_preprocess_cb(lv_indev_t * indev, lv_indev_read_preprocess_cb_t read_preprocess_cb)
+{
+    if(indev == NULL) return;
+
+    indev->read_preprocess_cb = read_preprocess_cb;
+}
+
 void lv_indev_set_user_data(lv_indev_t * indev, void * user_data)
 {
     if(indev == NULL) return;
@@ -326,6 +341,16 @@ lv_indev_read_cb_t lv_indev_get_read_cb(lv_indev_t * indev)
     }
 
     return indev->read_cb;
+}
+
+lv_indev_read_preprocess_cb_t lv_indev_get_read_preprocess_cb(lv_indev_t * indev)
+{
+    if(!indev) {
+        LV_LOG_WARN("lv_indev_get_read_preprocess_cb: indev was NULL");
+        return NULL;
+    }
+
+    return indev->read_preprocess_cb;
 }
 
 lv_indev_type_t lv_indev_get_type(const lv_indev_t * indev)
