@@ -413,6 +413,11 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
 
     lv_draw_layer_init(new_layer, parent_layer, color_format, area);
 
+    /*Inherits transparency from parent*/
+    if(parent_layer) {
+        new_layer->opa = parent_layer->opa;
+    }
+
     LV_PROFILER_DRAW_END;
     return new_layer;
 }
