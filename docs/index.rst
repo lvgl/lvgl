@@ -62,3 +62,8 @@ Appendix
     ROADMAP
 
 
+.. toctree::
+    :hidden:
+
+    details/index
+    intro/index
