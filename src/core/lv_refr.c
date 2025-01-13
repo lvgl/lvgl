@@ -1098,10 +1098,13 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 {
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
 
+    /*If `opa_layered != LV_OPA_COVER` draw the widget on a new layer and blend that layer with the given opacity.*/
     const lv_opa_t opa_layered = lv_obj_get_style_opa_layered(obj, LV_PART_MAIN);
     if(opa_layered < LV_OPA_MIN) return;
 
     const lv_opa_t layer_opa_ori = layer->opa;
+
+    /*Normal `opa` (not layered) will just scale down `bg_opa`, `text_opa`, etc, in the upcoming drawings.*/
     const lv_opa_t opa_main = lv_obj_get_style_opa(obj, LV_PART_MAIN);
     if(opa_main < LV_OPA_MAX) {
         layer->opa = LV_OPA_MIX2(layer_opa_ori, opa_main);
