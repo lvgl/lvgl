@@ -58,7 +58,7 @@ void test_table_should_identify_cell_with_ctrl(void)
 
     TEST_ASSERT_FALSE(has_ctrl);
 
-    lv_table_add_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    lv_table_set_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
     has_ctrl = lv_table_has_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
     TEST_ASSERT_TRUE(has_ctrl);
 }
@@ -67,7 +67,7 @@ void test_table_should_clear_selected_cell_ctrl(void)
 {
     bool has_ctrl = false;
 
-    lv_table_add_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    lv_table_set_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
     has_ctrl = lv_table_has_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
     TEST_ASSERT_TRUE(has_ctrl);
 
@@ -80,7 +80,7 @@ void test_table_should_keep_not_selected_cell_ctrl(void)
 {
     bool has_ctrl = false;
 
-    lv_table_add_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT | LV_TABLE_CELL_CTRL_TEXT_CROP);
+    lv_table_set_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT | LV_TABLE_CELL_CTRL_TEXT_CROP);
 
     lv_table_clear_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
     has_ctrl = lv_table_has_cell_ctrl(table, 0, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
@@ -182,13 +182,13 @@ void test_table_rendering(void)
     lv_table_set_column_width(table, 1, 60);
     lv_table_set_column_width(table, 2, 100);
 
-    lv_table_add_cell_ctrl(table, 0, 1, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    lv_table_set_cell_ctrl(table, 0, 1, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
     lv_table_set_cell_value(table, 0, 1, "2 cells are merged");
 
-    lv_table_add_cell_ctrl(table, 1, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
-    lv_table_add_cell_ctrl(table, 1, 1, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
-    lv_table_add_cell_ctrl(table, 1, 2, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
-    lv_table_add_cell_ctrl(table, 1, 3, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    lv_table_set_cell_ctrl(table, 1, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    lv_table_set_cell_ctrl(table, 1, 1, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    lv_table_set_cell_ctrl(table, 1, 2, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    lv_table_set_cell_ctrl(table, 1, 3, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
     lv_table_set_cell_value(table, 1, 0, "5 cells are merged");
 
     uint32_t i;
@@ -199,7 +199,7 @@ void test_table_rendering(void)
     lv_table_set_cell_value_fmt(table, 2, 3, "Multi\nline text");
     lv_table_set_cell_value_fmt(table, 2, 4, "Very long text wrapped automatically");
 
-    lv_table_add_cell_ctrl(table, 4, 3, LV_TABLE_CELL_CTRL_TEXT_CROP);
+    lv_table_set_cell_ctrl(table, 4, 3, LV_TABLE_CELL_CTRL_TEXT_CROP);
     lv_table_set_cell_value_fmt(table, 4, 3, "crop crop crop crop crop crop crop crop ");
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/table_1.png");
