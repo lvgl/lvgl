@@ -19,15 +19,21 @@ def main():
     arg_parser.add_argument("--port-urls-path", default=os.path.join(os.path.dirname(__file__), "release_branch_updater_port_urls.txt"))
     arg_parser.add_argument("--lvgl-path", default=os.path.join(os.path.dirname(__file__), ".."))
     arg_parser.add_argument("--dry-run", action="store_true")
+    arg_parser.add_argument("--oldest-major", type=int)
     args = arg_parser.parse_args()
 
     port_clone_tmpdir = args.port_clone_tmpdir
     port_urls_path = args.port_urls_path
     lvgl_path = args.lvgl_path
     dry_run = args.dry_run
+    oldest_major = args.oldest_major
 
     lvgl_release_branches = get_release_branches(lvgl_path)
     print(LOG, "LVGL release branches:", ", ".join(fmt_release(br) for br in lvgl_release_branches) or "(none)")
+    if oldest_major is not None:
+        lvgl_release_branches = [br for br in lvgl_release_branches if br[0] >= oldest_major]
+        print(LOG, 'LVGL release branches after "oldest-major" filter:',
+              ", ".join(fmt_release(br) for br in lvgl_release_branches) or "(none)")
 
     with open(port_urls_path) as f:
         urls = f.read()

@@ -16,6 +16,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: lvgl
+          fetch-depth: 0   # fetch all
 
       - name: set git credentials
         run: |
@@ -23,4 +24,4 @@ jobs:
           git config user.email 'lvgl-bot@users.noreply.github.com'
 
       - name: run the script
-        run: python3 lvgl/scripts/release_branch_updater.py
+        run: python3 lvgl/scripts/release_branch_updater.py --oldest-major 9
