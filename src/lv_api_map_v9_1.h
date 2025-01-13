@@ -97,7 +97,6 @@ extern "C" {
 
 #endif /* defined(LV_FS_DEFAULT_DRIVE_LETTER) */
 
-
 #define LV_LABEL_LONG_WRAP             LV_LABEL_LONG_MODE_WRAP
 #define LV_LABEL_LONG_DOT              LV_LABEL_LONG_MODE_DOTS
 #define LV_LABEL_LONG_SCROLL           LV_LABEL_LONG_MODE_SCROLL
