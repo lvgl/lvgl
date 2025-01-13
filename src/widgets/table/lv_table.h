@@ -110,7 +110,7 @@ void lv_table_set_column_width(lv_obj_t * obj, uint32_t col_id, int32_t w);
  * @param col       id of the column [0 .. col_cnt -1]
  * @param ctrl      OR-ed values from ::lv_table_cell_ctrl_t
  */
-void lv_table_add_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl);
+void lv_table_set_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl);
 
 /**
  * Clear control bits of the cell.

@@ -123,7 +123,7 @@ void lv_xml_table_cell_apply(lv_xml_parser_state_t * state, const char ** attrs)
                 ctrl |= table_ctrl_to_enum(str);
             }
 
-            lv_table_add_cell_ctrl(table, row, column, ctrl);
+            lv_table_set_cell_ctrl(table, row, column, ctrl);
         }
     }
 }
