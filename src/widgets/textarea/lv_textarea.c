@@ -1398,6 +1398,7 @@ static void draw_placeholder(lv_event_t * e)
     if(txt[0] == '\0' && ta->placeholder_txt && ta->placeholder_txt[0] != 0) {
         lv_draw_label_dsc_t ph_dsc;
         lv_draw_label_dsc_init(&ph_dsc);
+        ph_dsc.base.layer = layer;
         lv_obj_init_draw_label_dsc(obj, LV_PART_TEXTAREA_PLACEHOLDER, &ph_dsc);
 
         if(ta->one_line) ph_dsc.flag |= LV_TEXT_FLAG_EXPAND;
@@ -1429,6 +1430,7 @@ static void draw_cursor(lv_event_t * e)
 
     lv_draw_rect_dsc_t cur_dsc;
     lv_draw_rect_dsc_init(&cur_dsc);
+    cur_dsc.base.layer = layer;
     lv_obj_init_draw_rect_dsc(obj, LV_PART_CURSOR, &cur_dsc);
 
     /*Draw he cursor according to the type*/
@@ -1457,6 +1459,7 @@ static void draw_cursor(lv_event_t * e)
     lv_color_t label_color = lv_obj_get_style_text_color(ta->label, 0);
     lv_draw_label_dsc_t cur_label_dsc;
     lv_draw_label_dsc_init(&cur_label_dsc);
+    cur_label_dsc.base.layer = layer;
     lv_obj_init_draw_label_dsc(obj, LV_PART_CURSOR, &cur_label_dsc);
     if(cur_dsc.bg_opa > LV_OPA_MIN || !lv_color_eq(cur_label_dsc.color, label_color)) {
         cur_label_dsc.text = letter_buf;

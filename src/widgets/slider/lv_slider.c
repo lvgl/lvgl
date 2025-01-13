@@ -393,6 +393,7 @@ static void draw_knob(lv_event_t * e)
     }
     lv_draw_rect_dsc_t knob_rect_dsc;
     lv_draw_rect_dsc_init(&knob_rect_dsc);
+    knob_rect_dsc.base.layer = layer;
     lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
     /* Update knob area with knob style */
     position_knob(obj, &knob_area, knob_size, is_horizontal);

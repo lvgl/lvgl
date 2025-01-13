@@ -519,6 +519,7 @@ static void draw_main(lv_event_t * e)
         get_sel_area(obj, &sel_area);
         lv_draw_rect_dsc_t sel_dsc;
         lv_draw_rect_dsc_init(&sel_dsc);
+        sel_dsc.base.layer = layer;
         lv_obj_init_draw_rect_dsc(obj, LV_PART_SELECTED, &sel_dsc);
         lv_draw_rect(layer, &sel_dsc, &sel_area);
     }
@@ -528,6 +529,7 @@ static void draw_main(lv_event_t * e)
 
         lv_draw_label_dsc_t label_dsc;
         lv_draw_label_dsc_init(&label_dsc);
+        label_dsc.base.layer = layer;
         lv_obj_init_draw_label_dsc(obj, LV_PART_SELECTED, &label_dsc);
 
         /*Redraw the text on the selected area*/
@@ -594,12 +596,12 @@ static void draw_label(lv_event_t * e)
      * and a lower (below the selected area)*/
     lv_obj_t * label_obj = lv_event_get_current_target(e);
     lv_obj_t * roller = lv_obj_get_parent(label_obj);
+    lv_layer_t * layer = lv_event_get_layer(e);
     lv_draw_label_dsc_t label_draw_dsc;
     lv_draw_label_dsc_init(&label_draw_dsc);
+    label_draw_dsc.base.layer = layer;
     lv_obj_init_draw_label_dsc(roller, LV_PART_MAIN, &label_draw_dsc);
     if(lv_label_get_recolor(label_obj)) label_draw_dsc.flag |= LV_TEXT_FLAG_RECOLOR;
-
-    lv_layer_t * layer = lv_event_get_layer(e);
 
     /*If the roller has shadow or outline it has some ext. draw size
      *therefore the label can overflow the roller's boundaries.
