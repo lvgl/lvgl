@@ -830,6 +830,8 @@ void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
     lv_area_copy(&area_tmp, area);
 
     if(!lv_obj_area_is_visible(obj, &area_tmp)) return;
+    lv_area_copy(&area_tmp, area);
+
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     /**
      * When using the global matrix, the vertex coordinates of clip_area lose precision after transformation,
