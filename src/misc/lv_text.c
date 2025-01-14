@@ -649,6 +649,12 @@ static uint32_t lv_text_utf8_next(const char * txt, uint32_t * i)
     uint32_t i_tmp = 0;
     if(i == NULL) i = &i_tmp;
 
+    /* Ensure the string is not null */
+    if(txt == NULL || *i >= lv_strlen(txt)) {
+        (*i)++;
+        return result;
+    }
+
     /*Normal ASCII*/
     if(LV_IS_ASCII(txt[*i])) {
         result = txt[*i];
