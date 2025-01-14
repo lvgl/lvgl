@@ -32,6 +32,7 @@ extern "C" {
 
 /**
  * Initialize the font cache.
+ * @param max_glyph_cnt maximum number of glyphs to be cached.
  */
 void lv_font_cache_init(uint32_t max_glyph_cnt);
 
