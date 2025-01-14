@@ -120,4 +120,51 @@ void test_anim_pause(void)
     TEST_ASSERT_EQUAL(100, var);
 }
 
+void test_anim_pause_for(void)
+{
+    int32_t var;
+
+    /*Start an animation*/
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, &var);
+    lv_anim_set_values(&a, 0, 100);
+    lv_anim_set_exec_cb(&a, exec_cb);
+    lv_anim_set_duration(&a, 100);
+    lv_anim_t * animation = lv_anim_start(&a);
+
+    lv_anim_pause_for(animation, 20);
+
+    lv_test_wait(40);
+
+    TEST_ASSERT_EQUAL(19, var);
+
+    lv_anim_pause_for(animation, 20);
+
+    lv_test_wait(40);
+    lv_test_wait(40);
+
+    TEST_ASSERT_EQUAL(79, var);
+}
+
+void test_anim_pause_for_resume(void)
+{
+    int32_t var;
+
+    /*Start an animation*/
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, &var);
+    lv_anim_set_values(&a, 0, 100);
+    lv_anim_set_exec_cb(&a, exec_cb);
+    lv_anim_set_duration(&a, 100);
+    lv_anim_t * animation = lv_anim_start(&a);
+
+    lv_anim_pause_for(animation, 40);
+
+    lv_test_wait(20);
+    lv_anim_resume(animation);
+
+    TEST_ASSERT_EQUAL(19, var);
+}
 #endif
