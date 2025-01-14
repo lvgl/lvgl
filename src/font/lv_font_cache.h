@@ -31,15 +31,21 @@ extern "C" {
  **********************/
 
 /**
- * Initialize the built-in fonts
+ * Initialize the font cache.
  */
 void lv_font_cache_init(uint32_t max_glyph_cnt);
 
 /**
- * Deinitialize the built-in fonts
+ * Deinitialize the font cache.
  */
 void lv_font_cache_deinit(void);
 
+/**
+ * Get a glyph bitmap from the font cache.
+ * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index and the format.
+ * @param draw_buf      a draw buffer that can be used to store the bitmap of the glyph, it's OK not to use it.
+ * @return pointer to the glyph's data.
+ */
 const void * lv_font_cache_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 
 /**

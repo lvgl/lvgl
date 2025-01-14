@@ -116,16 +116,12 @@ void lv_font_cache_release_glyph(const lv_font_t * font, lv_font_glyph_dsc_t * g
 static inline bool font_is_built_in(const lv_font_t * font)
 {
     LV_ASSERT_NULL(font);
+    /* Use function pointer to simply determine whether the current font is a built-in font,
+     * so that a dedicated ID can be added for identification.
+     */
     return font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt;
 }
 
-/**
- * Get the glyph's bitmap from the cache.
- * @param g_dsc the glyph descriptor
- * @param fdsc the font descriptor
- * @param glyph_index the index of the glyph in the font
- * @return pointer to the draw buffer
- */
 static void * get_bitmap_cached(lv_font_glyph_dsc_t * g_dsc, const lv_font_fmt_txt_dsc_t * fdsc, uint32_t glyph_index)
 {
     LV_PROFILER_FONT_BEGIN;
@@ -186,23 +182,12 @@ static bool font_bitmap_create_cb(font_bitmap_cache_data_t * data, void * user_d
     return true;
 }
 
-/**
- * Free a font bitmap cache entry.
- * @param data the font bitmap cache data
- * @param user_data unused
- */
 static void font_bitmap_free_cb(font_bitmap_cache_data_t * data, void * user_data)
 {
     LV_UNUSED(user_data);
     lv_draw_buf_destroy(data->draw_buf);
 }
 
-/**
- * Compare two font bitmap cache entries.
- * @param lhs the left operand
- * @param rhs the right operand
- * @return the result of comparison
- */
 static lv_cache_compare_res_t font_bitmap_compare_cb(const font_bitmap_cache_data_t * lhs,
                                                      const font_bitmap_cache_data_t * rhs)
 {
