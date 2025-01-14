@@ -143,7 +143,7 @@ lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char const * const title)
 
 lv_obj_t * lv_menu_cont_create(lv_obj_t * parent)
 {
-    LV_ASSERT_OBJ(parent, lv_menu_page_class);
+    LV_ASSERT_OBJ(parent, &lv_menu_page_class);
 
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_menu_cont_class, parent);
@@ -153,7 +153,7 @@ lv_obj_t * lv_menu_cont_create(lv_obj_t * parent)
 
 lv_obj_t * lv_menu_section_create(lv_obj_t * parent)
 {
-    LV_ASSERT_OBJ(parent, lv_menu_page_class);
+    LV_ASSERT_OBJ(parent, &lv_menu_page_class);
 
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_menu_section_class, parent);
