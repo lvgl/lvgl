@@ -82,6 +82,9 @@ void lv_font_cache_deinit(void)
 
 const void * lv_font_cache_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
+    LV_ASSERT_NULL(g_dsc);
+    LV_ASSERT_NULL(draw_buf);
+
     const lv_font_t * font = g_dsc->resolved_font;
     if(!font_is_built_in(font)) {
         /* If the font is not built-in, use the original function to get the bitmap */
@@ -103,6 +106,8 @@ const void * lv_font_cache_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw
 
 void lv_font_cache_release_glyph(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc)
 {
+    LV_ASSERT_NULL(font);
+    LV_ASSERT_NULL(g_dsc);
     LV_ASSERT_MSG(font_is_built_in(font), "Font cache can be released only for built-in fonts");
 
     lv_cache_release(font_bitmap_cache, g_dsc->entry, NULL);
@@ -115,7 +120,6 @@ void lv_font_cache_release_glyph(const lv_font_t * font, lv_font_glyph_dsc_t * g
 
 static inline bool font_is_built_in(const lv_font_t * font)
 {
-    LV_ASSERT_NULL(font);
     /* Use function pointer to simply determine whether the current font is a built-in font,
      * so that a dedicated ID can be added for identification.
      */
