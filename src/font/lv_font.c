@@ -8,7 +8,7 @@
  *********************/
 
 #include "lv_font.h"
-#include "lv_font_fmt_txt.h"
+#include "lv_font_cache.h"
 #include "../misc/lv_text_private.h"
 #include "../misc/lv_utils.h"
 #include "../misc/lv_log.h"
@@ -53,7 +53,12 @@ const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t
 {
     const lv_font_t * font_p = g_dsc->resolved_font;
     LV_ASSERT_NULL(font_p);
+#if LV_FONT_CACHE_GLYPH_CNT > 0
+    /* If the font cache is enabled, try to use it to get the glyph bitmap */
+    return lv_font_cache_get_glyph_bitmap(g_dsc, draw_buf);
+#else
     return font_p->get_glyph_bitmap(g_dsc, draw_buf);
+#endif
 }
 
 void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
@@ -73,9 +78,7 @@ void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
     /* Since the old font resource does not register the release_glyph function in the font structure,
      * it is processed here as a fallback to ensure forward compatibility.
      */
-    if(lv_font_fmt_txt_is_built_in(font)) {
-        lv_font_release_glyph_fmt_txt(font, g_dsc);
-    }
+    lv_font_cache_release_glyph(font, g_dsc);
 #endif
 }
 
