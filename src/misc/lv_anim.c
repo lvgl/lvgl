@@ -548,7 +548,14 @@ static void anim_timer(lv_timer_t * param)
         uint32_t elaps = lv_tick_elaps(a->last_timer_run);
 
         if(a->is_paused) {
-            a->is_paused = (lv_tick_get() - a->pause_time) < a->pause_duration;
+            const uint32_t time_paused = lv_tick_elaps(a->pause_time);
+            const bool is_pause_over = a->pause_duration != LV_ANIM_PAUSE_FOREVER && time_paused > a->pause_duration;
+
+            if(is_pause_over) {
+                const uint32_t pause_overrun = time_paused - a->pause_duration;
+                a->is_paused = false;
+                a->act_time += pause_overrun;
+            }
         }
         else {
             a->act_time += elaps;
