@@ -85,15 +85,18 @@ typedef void (*lv_demo_high_res_exit_cb_t)(lv_demo_high_res_api_t * api);
  * Start the High Resolution Demo on the default display, on the active screen.
  * This demo requires `LV_USE_DEMO_HIGH_RES` and `LV_FONT_FMT_TXT_LARGE`
  * to be enabled as well as a filesystem driver to be configured and the
- * `LV_FS_DEFAULT_DRIVE_LETTER` set. The display size should be
+ * `LV_FS_DEFAULT_DRIVER_LETTER` set. The display size should be
  * 800x480, 1280x720, or 1920x1080.
  * @param assets_path       Folder where the image assets are.
- *                          If `NULL`, "lvgl/demos/high_res/assets/" will be used.
+ *                          If `NULL`, "lvgl/demos/high_res/assets" will be used.
  * @param logo_path         A path to a logo to display in the bottom-left
  *                          of the home screen. If `NULL`, an LVGL logo is used.
  * @param slides_path       Folder where the "About" app slideshow slides are.
- *                          If `NULL`, "about_app_slides/" will be used.
- *                          The images should be named like 1.png, 2.png, etc.
+ *                          If `NULL`, "about_app_slides" will be used.
+ *                          The images should be named like Slide1.png, Slide2.png, etc.
+ *                          They will be scaled to nine sixteenths the height of the
+ *                          display. I.e., a slide will not be scaled if it is
+ *                          405 px high and the display is 720 px high.
  * @param exit_cb           A callback function which will be called when the
  *                          "logout" button is clicked, or `NULL` to do nothing.
  * @return                  A struct with subjects to control the UI
@@ -109,15 +112,18 @@ lv_demo_high_res_api_t * lv_demo_high_res(const char * assets_path,
  * Start the High Resolution Demo on the default display, on the active screen.
  * This demo requires `LV_USE_DEMO_HIGH_RES` and `LV_FONT_FMT_TXT_LARGE`
  * to be enabled as well as a filesystem driver to be configured and the
- * `LV_FS_DEFAULT_DRIVE_LETTER` set. The display size should be
+ * `LV_FS_DEFAULT_DRIVER_LETTER` set. The display size should be
  * 800x480, 1280x720, or 1920x1080.
  * @param assets_path       Folder where the image assets are.
- *                          If `NULL`, "lvgl/demos/high_res/assets/" will be used.
+ *                          If `NULL`, "lvgl/demos/high_res/assets" will be used.
  * @param logo_path         A path to a logo to display in the bottom-left
  *                          of the home screen. If `NULL`, an LVGL logo is used.
  * @param slides_path       Folder where the "About" app slideshow slides are.
- *                          If `NULL`, "about_app_slides/" will be used.
- *                          The images should be named like 1.png, 2.png, etc.
+ *                          If `NULL`, "about_app_slides" will be used.
+ *                          The images should be named like Slide1.png, Slide2.png, etc.
+ *                          They will be scaled to nine sixteenths the height of the
+ *                          display. I.e., a slide will not be scaled if it is
+ *                          405 px high and the display is 720 px high.
  */
 void lv_demo_high_res_api_example(const char * assets_path, const char * logo_path, const char * slides_path);
 

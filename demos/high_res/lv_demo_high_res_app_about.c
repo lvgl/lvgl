@@ -34,7 +34,6 @@ static bool advance_slides(lv_obj_t * slide_deck);
 static void right_clicked_cb(lv_event_t * e);
 static void play_pause_timer_cb(lv_timer_t * t);
 static void play_pause_clicked_cb(lv_event_t * e);
-static void slide_free_draw_buf_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -99,18 +98,19 @@ void lv_demo_high_res_app_about(lv_obj_t * base_obj)
 
     /* slides */
 
-    lv_fs_res_t res;
-
-    lv_fs_dir_t dir;
-    res = lv_fs_dir_open(&dir, c->slides_path);
-    if(res != LV_FS_RES_OK) {
+    if(lv_array_is_empty(&c->about_slides_array)) {
         lv_obj_t * label = lv_label_create(bg_cont);
-        lv_label_set_text_fmt(label, "Couldn't open the '%s' folder to load the images", c->slides_path);
+        if(c->about_slides_dir_exists) {
+            lv_label_set_text_fmt(label, "Couldn't find images named Slide1.png, Slide2.png, etc. in the '%s' folder",
+                                  c->slides_path);
+        }
+        else {
+            lv_label_set_text_fmt(label, "Couldn't open the '%s' folder to load the images", c->slides_path);
+        }
         lv_obj_center(label);
+        lv_obj_add_style(label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
         return;
     }
-    res = lv_fs_dir_close(&dir);
-    LV_ASSERT(res == LV_FS_RES_OK);
 
     lv_obj_t * slides_cont = lv_obj_create(bg_cont);
     lv_obj_remove_style_all(slides_cont);
@@ -148,21 +148,11 @@ void lv_demo_high_res_app_about(lv_obj_t * base_obj)
 
     lv_obj_t * slide;
 
-    char buf[256];
-    for(int32_t i = 1; ; i++) {
-        lv_snprintf(buf, sizeof(buf), "%s/Slide%"PRId32".png", c->slides_path, i);
-        lv_fs_file_t file;
-        res = lv_fs_open(&file, buf, LV_FS_MODE_RD);
-        if(res != LV_FS_RES_OK) {
-            break;
-        }
-        res = lv_fs_close(&file);
-        LV_ASSERT(res == LV_FS_RES_OK);
-
+    uint32_t about_slides_count = lv_array_size(&c->about_slides_array);
+    for(uint32_t i = 0; i < about_slides_count; i++) {
+        lv_image_dsc_t ** slide_src = lv_array_at(&c->about_slides_array, i);
         slide = lv_image_create(slide_deck);
-        lv_image_dsc_t * loaded_draw_buf = lv_demo_high_res_image_preload(buf, LV_COLOR_FORMAT_NATIVE);
-        lv_image_set_src(slide, loaded_draw_buf);
-        lv_obj_add_event_cb(slide, slide_free_draw_buf_cb, LV_EVENT_DELETE, loaded_draw_buf);
+        lv_image_set_src(slide, *slide_src);
     }
 
     slide = lv_obj_get_child(slide_deck, 0);
@@ -290,12 +280,6 @@ static void play_pause_clicked_cb(lv_event_t * e)
         lv_timer_reset(play_pause_timer);
         lv_timer_resume(play_pause_timer);
     }
-}
-
-static void slide_free_draw_buf_cb(lv_event_t * e)
-{
-    lv_image_dsc_t * loaded_draw_buf = lv_event_get_user_data(e);
-    lv_draw_buf_destroy((lv_draw_buf_t *)loaded_draw_buf);
 }
 
 #endif /*LV_USE_DEMO_HIGH_RES*/

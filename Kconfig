@@ -1200,7 +1200,7 @@ menu "LVGL configuration"
 	endmenu
 
 	menu "3rd Party Libraries"
-		config LV_FS_DEFAULT_DRIVE_LETTER
+		config LV_FS_DEFAULT_DRIVER_LETTER
 			int "Default drive letter (e.g. 65 for 'A')"
 			default 0
 			help
@@ -1298,6 +1298,13 @@ menu "LVGL configuration"
 		config LV_FS_ARDUINO_SD_PATH
 			string "Set the working directory"
 			depends on LV_USE_FS_ARDUINO_SD
+
+		config LV_USE_FS_UEFI
+			bool "File system on top of the UEFI EFI_SIMPLE_FILE_SYSTEM_PROTOCOL"
+		config LV_USE_FS_UEFI_LETTER
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			default 0
+			depends on LV_USE_FS_UEFI
 
 		config LV_USE_LODEPNG
 			bool "PNG decoder library"
@@ -1936,6 +1943,20 @@ menu "LVGL configuration"
 		config LV_USE_WINDOWS
 			bool "Use LVGL Windows backend"
 			depends on LV_OS_WINDOWS
+			default n
+
+		config LV_USE_UEFI
+			bool "Use LVGL UEFI backend"
+			default n
+
+		config LV_USE_UEFI_INCLUDE
+			string "Header that hides the actual framework (EDK2, gnu-efi, ...)"
+			depends on LV_USE_UEFI
+			default "myefi.h"
+
+		config LV_UEFI_USE_MEMORY_SERVICES
+			bool "Use the memory services from the boot services table"
+			depends on LV_USE_UEFI
 			default n
 
 		config LV_USE_OPENGLES
