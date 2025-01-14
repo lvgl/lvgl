@@ -240,6 +240,33 @@ static void notification_screen_events_cb(lv_event_t * e)
         lv_obj_set_scrollbar_mode(message_panel, lv_demo_smartwatch_get_scrollbar_mode());
         lv_obj_set_scrollbar_mode(message_list, lv_demo_smartwatch_get_scrollbar_mode());
 
+        if(lv_demo_smartwatch_get_load_app_list()) {
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_LEFT);
+        }
+        else {
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_RIGHT);
+        }
+
+    }
+
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        if(lv_tileview_get_tile_active(notification_screen) == message_list_panel) {
+
+            if(lv_demo_smartwatch_get_load_app_list()) {
+                lv_demo_smartwatch_show_scroll_hint(LV_DIR_LEFT);
+            }
+            else {
+                lv_demo_smartwatch_show_scroll_hint(LV_DIR_RIGHT);
+            }
+        }
+        else if(lv_tileview_get_tile_active(notification_screen) == message_info_panel) {
+            if(lv_demo_smartwatch_get_load_app_list()) {
+                lv_demo_smartwatch_show_scroll_hint(LV_DIR_LEFT);
+            }
+            else {
+                lv_demo_smartwatch_show_scroll_hint(LV_DIR_RIGHT | LV_DIR_LEFT);
+            }
+        }
     }
 
     if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_LEFT) {

@@ -38,7 +38,8 @@ static void dialog_close_event_cb(lv_event_t * e);
 static void lv_create_home_tile(void);
 static void home_tileview_event_cb(lv_event_t * e);
 
-static void hint_timer_cb(lv_timer_t * timer);
+static lv_anim_t * obj_set_opacity_anim(lv_obj_t * obj);
+static void anim_set_opacity_cb(lv_anim_t * a, int32_t v);
 
 /**********************
  *  STATIC VARIABLES
@@ -65,7 +66,10 @@ static lv_obj_t * hint_down;
 static lv_obj_t * hint_left;
 static lv_obj_t * hint_right;
 
-static lv_timer_t * hint_timer = NULL;
+static lv_anim_t * anim_up;
+static lv_anim_t * anim_down;
+static lv_anim_t * anim_left;
+static lv_anim_t * anim_right;
 
 /**********************
  *  GLOBAL VARIABLES
@@ -89,6 +93,10 @@ void lv_demo_smartwatch(void)
                                                true, LV_FONT_DEFAULT);
     lv_display_set_theme(display, theme);
 
+    create_dialog_window();
+
+    create_scroll_hints();
+
     lv_create_home_tile();
 
     lv_demo_smartwatch_set_circular_scroll(true);
@@ -111,13 +119,11 @@ void lv_demo_smartwatch(void)
 
     lv_demo_smartwatch_easter_egg_create();
 
-    create_dialog_window();
-
-    create_scroll_hints();
-
     lv_demo_smartwatch_set_default_scrollbar_mode(LV_SCROLLBAR_MODE_OFF);
 
-    lv_demo_smartwatch_set_scroll_hint(true);
+    lv_demo_smartwatch_set_default_hints_state(true);
+
+    lv_demo_smartwatch_set_default_brightness(100);
 
     /* load the logo screen immediately, more like a boot logo */
     lv_demo_smartwatch_easter_egg_load(LV_SCR_LOAD_ANIM_FADE_IN, 0, 0);
@@ -240,6 +246,11 @@ void lv_demo_smartwatch_set_scroll_hint(bool state)
     show_scroll_hints = state;
 }
 
+bool lv_demo_smartwatch_get_scroll_hint(void)
+{
+    return show_scroll_hints;
+}
+
 void lv_demo_smartwatch_show_scroll_hint(lv_dir_t dir)
 {
 
@@ -266,15 +277,24 @@ void lv_demo_smartwatch_show_scroll_hint(lv_dir_t dir)
 
     lv_demo_obj_set_hidden(hint_panel, dir == LV_DIR_NONE);
 
+
+    /* Delete animations if they exist*/
+    lv_anim_delete(hint_up, NULL);
+    lv_anim_delete(hint_down, NULL);
+    lv_anim_delete(hint_left, NULL);
+    lv_anim_delete(hint_right, NULL);
+
+    /* Set max opacity to make icons visible */
+    lv_obj_set_style_opa(hint_down, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_opa(hint_up, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_opa(hint_left, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_opa(hint_right, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     if(dir != LV_DIR_NONE) {
-        if(hint_timer != NULL) {
-            /* cancel the timer if already running */
-            lv_timer_delete(hint_timer);
-            hint_timer = NULL;
-        }
-        /* timer to hide hints after 2 seconds */
-        hint_timer = lv_timer_create(hint_timer_cb, 2000, NULL);
-        lv_timer_set_auto_delete(hint_timer, true);
+        anim_up = obj_set_opacity_anim(hint_up);
+        anim_down = obj_set_opacity_anim(hint_down);
+        anim_left = obj_set_opacity_anim(hint_left);
+        anim_right = obj_set_opacity_anim(hint_right);
     }
 }
 
@@ -291,14 +311,35 @@ static void home_tileview_event_cb(lv_event_t * e)
             first_load = true;
             /* run the analog seconds animation on first load */
             lv_demo_smartwatch_face_update_seconds(0);
-            /* show the possible scroll directions hint */
-            lv_demo_smartwatch_show_scroll_hint(LV_DIR_ALL);
+        }
+
+        /* show the possible scroll directions hint */
+        if(lv_tileview_get_tile_active(home_tile) == lv_demo_smartwatch_get_tile_home()) {
+            lv_demo_smartwatch_show_home_hint(true);
+        }
+        else if(lv_tileview_get_tile_active(home_tile) == lv_demo_smartwatch_get_tile_app_list()) {
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_LEFT);
+        }
+        else if(lv_tileview_get_tile_active(home_tile) == lv_demo_smartwatch_get_tile_control()) {
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_TOP | LV_DIR_BOTTOM);
         }
     }
 
     if(event_code == LV_EVENT_SCREEN_LOAD_START) {
         lv_obj_set_scrollbar_mode(home_tile, lv_demo_smartwatch_get_scrollbar_mode());
         lv_demo_smartwatch_app_list_loading();
+    }
+
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        if(lv_tileview_get_tile_active(home_tile) == lv_demo_smartwatch_get_tile_home()) {
+            lv_demo_smartwatch_show_home_hint(true);
+        }
+        else if(lv_tileview_get_tile_active(home_tile) == lv_demo_smartwatch_get_tile_app_list()) {
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_LEFT);
+        }
+        else if(lv_tileview_get_tile_active(home_tile) == lv_demo_smartwatch_get_tile_control()) {
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_TOP | LV_DIR_BOTTOM);
+        }
     }
 
     if(lv_tileview_get_tile_active(home_tile) == lv_demo_smartwatch_get_tile_home() && lv_screen_active() == home_tile) {
@@ -315,8 +356,11 @@ static void home_tileview_event_cb(lv_event_t * e)
     }
 
     if(lv_tileview_get_tile_active(home_tile) == lv_demo_smartwatch_get_tile_control() && lv_screen_active() == home_tile) {
-        if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) != LV_DIR_TOP) {
-            lv_demo_smartwatch_show_scroll_hint(LV_DIR_BOTTOM);
+        if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) == LV_DIR_BOTTOM) {
+            lv_demo_smartwatch_qr_load(LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 500, 0);
+        }
+        else if(event_code == LV_EVENT_GESTURE && lv_indev_get_gesture_dir(lv_indev_active()) != LV_DIR_TOP) {
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_TOP | LV_DIR_BOTTOM);
         }
     }
 
@@ -326,6 +370,7 @@ static void home_tileview_event_cb(lv_event_t * e)
             lv_demo_smartwatch_show_scroll_hint(LV_DIR_LEFT);
         }
     }
+
 
 }
 
@@ -516,10 +561,23 @@ static void lv_demo_obj_set_hidden(lv_obj_t * obj, bool state)
     }
 }
 
-static void hint_timer_cb(lv_timer_t * timer)
+static void anim_set_opacity_cb(lv_anim_t * a, int32_t v)
 {
-    LV_UNUSED(timer);
-    lv_demo_obj_set_hidden(hint_panel, true);
+    lv_obj_t * target = (lv_obj_t *)a->user_data;
+    lv_obj_set_style_opa(target, v, 0);
+}
+
+static lv_anim_t * obj_set_opacity_anim(lv_obj_t * obj)
+{
+    lv_anim_t anim_opa;
+    lv_anim_init(&anim_opa);
+    lv_anim_set_var(&anim_opa, obj);
+    lv_anim_set_values(&anim_opa, 255, 0);
+    lv_anim_set_duration(&anim_opa, 1000);
+    lv_anim_set_delay(&anim_opa, 1000);
+    lv_anim_set_user_data(&anim_opa, obj);
+    lv_anim_set_custom_exec_cb(&anim_opa, anim_set_opacity_cb);
+    return lv_anim_start(&anim_opa);
 }
 
 #endif /*LV_USE_DEMO_SMARTWATCH*/

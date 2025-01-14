@@ -117,6 +117,10 @@ LV_IMAGE_DECLARE(img_alert_icon);             /* assets/alert.png */
 LV_IMAGE_DECLARE(img_general_settings_icon);  /* assets/general_settings.png */
 LV_IMAGE_DECLARE(img_notifications_app_icon); /* assets/notifications_app.png */
 LV_IMAGE_DECLARE(img_weather_app_icon);       /* assets/weather_app.png */
+LV_IMAGE_DECLARE(img_note_icon);               /* assets/note.png */
+LV_IMAGE_DECLARE(img_application_icon);       /* assets/application.png */
+LV_IMAGE_DECLARE(img_cloud_icon);             /* assets/cloud.png */
+LV_IMAGE_DECLARE(img_chat_icon);              /* assets/chat.png */
 
 /**********************
  *      TYPEDEFS
@@ -250,6 +254,12 @@ lv_obj_t * lv_demo_smartwatch_get_tile_app_list(void);
  * @return pointer to the controls tile object
  */
 lv_obj_t * lv_demo_smartwatch_get_tile_control(void);
+
+/**
+ * Update the brightness slider in the controls screen
+ * @param value    new value of the slider
+ */
+void lv_demo_smartwatch_update_brightness_slider(uint8_t value);
 
 /**********************
  *      MACROS

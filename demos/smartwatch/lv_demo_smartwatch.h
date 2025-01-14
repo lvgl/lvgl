@@ -325,6 +325,18 @@ void lv_demo_smartwatch_set_default_circular_scroll(bool enabled);
 void lv_demo_smartwatch_set_default_alert_state(bool enabled);
 
 /**
+ * Set the default hints state for the smartwatch demo settings
+ * @param enabled   whether hints are enabled
+ */
+void lv_demo_smartwatch_set_default_hints_state(bool enabled);
+
+/**
+ * Get the hint state
+ * @return hint state
+ */
+bool lv_demo_smartwatch_get_scroll_hint(void);
+
+/**
  * Set the default about info for the smartwatch demo settings
  * @param info  about info text
  */
@@ -335,6 +347,12 @@ void lv_demo_smartwatch_set_default_about_info(const char * info);
  * @param dir   direction of available scroll
  */
 void lv_demo_smartwatch_show_scroll_hint(lv_dir_t dir);
+
+/**
+ * Show the scroll direction hint
+ * @param state whether to show the hint
+ */
+void lv_demo_smartwatch_show_home_hint(bool state);
 
 /**
  * Set whether to show scroll hints

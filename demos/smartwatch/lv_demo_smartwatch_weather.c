@@ -384,6 +384,31 @@ static void weather_screen_event_cb(lv_event_t * e)
 
         lv_tileview_set_tile_by_index(weather_screen, 0, 0, LV_ANIM_OFF);
 
+        if(lv_demo_smartwatch_get_load_app_list()) {
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_LEFT | LV_DIR_BOTTOM | LV_DIR_RIGHT);
+        }
+        else {
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_TOP | LV_DIR_BOTTOM | LV_DIR_RIGHT);
+        }
+
+    }
+
+    if(event_code == LV_EVENT_VALUE_CHANGED) {
+        if(lv_tileview_get_tile_active(weather_screen) == weather_panel) {
+            if(lv_demo_smartwatch_get_load_app_list()) {
+                lv_demo_smartwatch_show_scroll_hint(LV_DIR_LEFT | LV_DIR_BOTTOM | LV_DIR_RIGHT);
+            }
+            else {
+                lv_demo_smartwatch_show_scroll_hint(LV_DIR_TOP | LV_DIR_BOTTOM | LV_DIR_RIGHT);
+            }
+        }
+        else if(lv_tileview_get_tile_active(weather_screen) == weather_daily_panel) {
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_LEFT);
+        }
+        else if(lv_tileview_get_tile_active(weather_screen) == weather_hourly_panel) {
+            lv_demo_smartwatch_show_scroll_hint(LV_DIR_TOP);
+        }
+
     }
 
 

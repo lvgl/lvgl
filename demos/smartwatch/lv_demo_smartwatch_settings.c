@@ -48,6 +48,7 @@ static lv_obj_t * rotation_dropdown;
 static lv_obj_t * alerts_switch;
 static lv_obj_t * about_label;
 static lv_obj_t * scroll_mode;
+static lv_obj_t * hint_switch;
 static bool manual_trigger;
 
 static lv_smartwatch_settings_change_cb_t settings_change_cb;
@@ -290,6 +291,7 @@ void lv_demo_smartwatch_set_settings_actions_cb(lv_smartwatch_settings_change_cb
 void lv_demo_smartwatch_set_default_brightness(uint8_t brightness)
 {
     lv_slider_set_value(brightness_slider, brightness, LV_ANIM_OFF);
+    lv_demo_smartwatch_update_brightness_slider(brightness);
     manual_trigger = true;
     lv_obj_send_event(brightness_slider, LV_EVENT_VALUE_CHANGED, (void *)(intptr_t)((ST_SLIDER << 16) | 0x0001));
 }
@@ -332,6 +334,18 @@ void lv_demo_smartwatch_set_default_alert_state(bool enabled)
     lv_obj_send_event(alerts_switch, LV_EVENT_VALUE_CHANGED, (void *)(intptr_t)((ST_SWITCH << 16) | 0x0005));
 }
 
+void lv_demo_smartwatch_set_default_hints_state(bool enabled)
+{
+    if(enabled) {
+        lv_obj_add_state(hint_switch, LV_STATE_CHECKED);
+    }
+    else {
+        lv_obj_remove_state(hint_switch, LV_STATE_CHECKED);
+    }
+    manual_trigger = true;
+    lv_obj_send_event(hint_switch, LV_EVENT_VALUE_CHANGED, (void *)(intptr_t)((ST_SWITCH << 16) | 0x0009));
+}
+
 void lv_demo_smartwatch_set_default_scrollbar_mode(lv_scrollbar_mode_t mode)
 {
     lv_dropdown_set_selected(scroll_mode, mode, LV_ANIM_OFF);
@@ -362,8 +376,6 @@ static void settings_action_event_cb(lv_event_t * e)
         LV_LOG_WARN("Settings actions event triggered but the current screen is no longer active");
         return;
     }
-
-    manual_trigger = false;
 
     uint32_t data = (uint32_t)(intptr_t)lv_event_get_user_data(e);
     uint16_t id = (uint16_t)data;
@@ -396,6 +408,12 @@ static void settings_action_event_cb(lv_event_t * e)
 
     /* handle actions for the inbuilt settings */
     switch(id) {
+        case 0x0001:
+            if(!manual_trigger) {
+                /* Update the brightness slider in the control screen */
+                lv_demo_smartwatch_update_brightness_slider(value);
+            }
+            break;
         case 0x0002:
             lv_demo_smartwatch_set_circular_scroll(value);
             lv_obj_scroll_by(settings_list, 0, value ? 1 : -1, LV_ANIM_OFF);
@@ -407,11 +425,15 @@ static void settings_action_event_cb(lv_event_t * e)
             lv_demo_smartwatch_set_scrollbar_mode(value);
             lv_obj_set_scrollbar_mode(settings_list, lv_demo_smartwatch_get_scrollbar_mode());
             break;
+        case 0x0009:
+            lv_demo_smartwatch_set_scroll_hint(value);
+            break;
 
         default:
             break;
     }
 
+    manual_trigger = false;
 }
 
 static void settings_screen_event_cb(lv_event_t * e)
@@ -431,6 +453,10 @@ static void settings_screen_event_cb(lv_event_t * e)
         lv_obj_scroll_by(settings_list, 0, -1, LV_ANIM_OFF);
 
         lv_obj_set_scrollbar_mode(settings_list, lv_demo_smartwatch_get_scrollbar_mode());
+    }
+
+    if(event_code == LV_EVENT_SCREEN_LOADED) {
+        lv_demo_smartwatch_show_scroll_hint(LV_DIR_LEFT);
     }
 }
 
@@ -469,6 +495,7 @@ static void create_screen_settings(void)
                                                                 "5 Seconds\n10 Seconds\n20 Seconds\n30 Seconds\nAlways On");
     rotation_dropdown = lv_demo_smartwatch_settings_add_dropdown(0x0004, "Screen Rotation", &img_screen_rotate_icon,
                                                                  "Default\n90\n180\n270");
+    hint_switch = lv_demo_smartwatch_settings_add_toggle(0x0009, "Show Hints", &img_info_icon, false);
     alerts_switch = lv_demo_smartwatch_settings_add_toggle(0x0005, "Show Alerts", &img_alert_icon, false);
     about_label = lv_demo_smartwatch_settings_add_label(0x0006, "LVGL Demo\nSmart Watch UI\n11:22:33:44:55:66",
                                                         &img_info_icon);
