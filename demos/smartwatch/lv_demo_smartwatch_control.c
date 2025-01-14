@@ -217,7 +217,6 @@ static void brightness_slider_event_cb(lv_event_t * e)
         /* event was triggered but the current screen is no longer active */
         return;
     }
-    lv_event_code_t event_code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);
     int32_t value = lv_slider_get_value(target);
     lv_demo_smartwatch_set_default_brightness((uint8_t)value);
