@@ -1301,6 +1301,10 @@ static void indev_proc_press(lv_indev_t * indev)
 
         if(indev_act->wait_until_release) return;
 
+        if(indev->pointer.scroll_obj) {
+            lv_obj_stop_scroll_anim(indev->pointer.scroll_obj);
+        }
+
         lv_indev_scroll_handler(indev);
         if(indev_reset_check(indev)) return;
         indev_gesture(indev);
