@@ -22,11 +22,6 @@
     #define font_rle LV_GLOBAL_DEFAULT()->font_fmt_rle
 #endif /*LV_USE_FONT_COMPRESSED*/
 
-#if LV_FONT_CACHE_GLYPH_CNT > 0
-    #define font_bitmap_cache LV_GLOBAL_DEFAULT()->font_bitmap_cache
-    #define font_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->font_draw_buf_handlers)
-#endif
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -34,15 +29,6 @@ typedef struct {
     uint32_t gid_left;
     uint32_t gid_right;
 } kern_pair_ref_t;
-
-typedef struct {
-    /* key */
-    const lv_font_fmt_txt_dsc_t * fdsc;
-    uint32_t glyph_index;
-
-    /* value */
-    lv_draw_buf_t * draw_buf;
-} font_bitmap_cache_data_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -63,12 +49,6 @@ static int kern_pair_16_compare(const void * ref, const void * element);
 
 static void * get_bitmap(const lv_font_fmt_txt_dsc_t * fdsc, const lv_font_fmt_txt_glyph_dsc_t * gdsc,
                          lv_draw_buf_t * draw_buf);
-
-#if LV_FONT_CACHE_GLYPH_CNT > 0
-    static lv_cache_t * font_bitmap_cache_init(uint32_t cache_size);
-    static void font_bitmap_cache_deinit(lv_cache_t * cache);
-    static void * get_bitmap_cached(lv_font_glyph_dsc_t * g_dsc, const lv_font_fmt_txt_dsc_t * fdsc, uint32_t gid);
-#endif /*LV_FONT_CACHE_GLYPH_CNT*/
 
 /**********************
  *  STATIC VARIABLES
@@ -98,30 +78,10 @@ static const uint8_t opa2_table[4] = {0, 85, 170, 255};
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_font_fmt_txt_init(void)
-{
-#if LV_FONT_CACHE_GLYPH_CNT > 0
-    font_bitmap_cache = font_bitmap_cache_init(LV_FONT_CACHE_GLYPH_CNT);
-#endif
-}
-
-void lv_font_fmt_txt_deinit(void)
-{
-#if LV_FONT_CACHE_GLYPH_CNT > 0
-    font_bitmap_cache_deinit(font_bitmap_cache);
-    font_bitmap_cache = NULL;
-#endif
-}
-
-bool lv_font_fmt_txt_is_built_in(const lv_font_t * font)
-{
-    LV_ASSERT_NULL(font);
-    return font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt;
-}
-
 const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     const lv_font_t * font = g_dsc->resolved_font;
+    uint8_t * bitmap_out = draw_buf->data;
 
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
     uint32_t gid = g_dsc->gid.index;
@@ -134,21 +94,112 @@ const void * lv_font_get_bitmap_fmt_txt(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf
     int32_t gsize = (int32_t) gdsc->box_w * gdsc->box_h;
     if(gsize == 0) return NULL;
 
-#if LV_FONT_CACHE_GLYPH_CNT > 0
-    LV_UNUSED(draw_buf);
-    return get_bitmap_cached(g_dsc, fdsc, gid);
-#else
-    return get_bitmap(fdsc, gdsc, draw_buf);
-#endif
-}
+    bool byte_aligned = fdsc->bitmap_format == LV_FONT_FMT_PLAIN_ALIGNED;
 
-void lv_font_release_glyph_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * g_dsc)
-{
-    LV_UNUSED(font);
-#if LV_FONT_CACHE_GLYPH_CNT > 0
-    lv_cache_release(font_bitmap_cache, g_dsc->entry, NULL);
+    if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN || fdsc->bitmap_format == LV_FONT_FMT_PLAIN_ALIGNED) {
+        const uint8_t * bitmap_in = &fdsc->glyph_bitmap[gdsc->bitmap_index];
+        uint8_t * bitmap_out_tmp = bitmap_out;
+        int32_t i = 0;
+        int32_t x, y;
+        uint32_t stride = lv_draw_buf_width_to_stride(gdsc->box_w, LV_COLOR_FORMAT_A8);
+        if(fdsc->bpp == 1) {
+            for(y = 0; y < gdsc->box_h; y ++) {
+                for(x = 0; x < gdsc->box_w; x++, i++) {
+                    i = i & 0x7;
+                    if(i == 0) bitmap_out_tmp[x] = (*bitmap_in) & 0x80 ? 0xff : 0x00;
+                    else if(i == 1) bitmap_out_tmp[x] = (*bitmap_in) & 0x40 ? 0xff : 0x00;
+                    else if(i == 2) bitmap_out_tmp[x] = (*bitmap_in) & 0x20 ? 0xff : 0x00;
+                    else if(i == 3) bitmap_out_tmp[x] = (*bitmap_in) & 0x10 ? 0xff : 0x00;
+                    else if(i == 4) bitmap_out_tmp[x] = (*bitmap_in) & 0x08 ? 0xff : 0x00;
+                    else if(i == 5) bitmap_out_tmp[x] = (*bitmap_in) & 0x04 ? 0xff : 0x00;
+                    else if(i == 6) bitmap_out_tmp[x] = (*bitmap_in) & 0x02 ? 0xff : 0x00;
+                    else if(i == 7) {
+                        bitmap_out_tmp[x] = (*bitmap_in) & 0x01 ? 0xff : 0x00;
+                        bitmap_in++;
+                    }
+                }
+                /*Go to the next byte if stopped in the middle of a byte and
+                 *the next line is byte aligned*/
+                if(byte_aligned && i != 0) {
+                    i = 0;
+                    bitmap_in++;
+                }
+                bitmap_out_tmp += stride;
+            }
+        }
+        else if(fdsc->bpp == 2) {
+            for(y = 0; y < gdsc->box_h; y ++) {
+                for(x = 0; x < gdsc->box_w; x++, i++) {
+                    i = i & 0x3;
+                    if(i == 0) bitmap_out_tmp[x] = opa2_table[(*bitmap_in) >> 6];
+                    else if(i == 1) bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 4) & 0x3];
+                    else if(i == 2) bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 2) & 0x3];
+                    else if(i == 3) {
+                        bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 0) & 0x3];
+                        bitmap_in++;
+                    }
+                }
+
+                /*Go to the next byte if stopped in the middle of a byte and
+                 *the next line is byte aligned*/
+                if(byte_aligned && i != 0) {
+                    i = 0;
+                    bitmap_in++;
+                }
+
+                bitmap_out_tmp += stride;
+            }
+
+        }
+        else if(fdsc->bpp == 4) {
+            for(y = 0; y < gdsc->box_h; y ++) {
+                for(x = 0; x < gdsc->box_w; x++, i++) {
+                    i = i & 0x1;
+                    if(i == 0) {
+                        bitmap_out_tmp[x] = opa4_table[(*bitmap_in) >> 4];
+                    }
+                    else if(i == 1) {
+                        bitmap_out_tmp[x] = opa4_table[(*bitmap_in) & 0xF];
+                        bitmap_in++;
+                    }
+                }
+
+                /*Go to the next byte if stopped in the middle of a byte and
+                 *the next line is byte aligned*/
+                if(byte_aligned && i != 0) {
+                    i = 0;
+                    bitmap_in++;
+                }
+
+                bitmap_out_tmp += stride;
+            }
+        }
+        else if(fdsc->bpp == 8) {
+            for(y = 0; y < gdsc->box_h; y ++) {
+                for(x = 0; x < gdsc->box_w; x++, i++) {
+                    bitmap_out_tmp[x] = *bitmap_in;
+                    bitmap_in++;
+                }
+                bitmap_out_tmp += stride;
+            }
+        }
+        return draw_buf;
+    }
+    /*Handle compressed bitmap*/
+    else {
+#if LV_USE_FONT_COMPRESSED
+        bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED;
+        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], bitmap_out, gdsc->box_w, gdsc->box_h,
+                   (uint8_t)fdsc->bpp, prefilter);
+        return draw_buf;
+#else /*!LV_USE_FONT_COMPRESSED*/
+        LV_LOG_WARN("Compressed fonts is used but LV_USE_FONT_COMPRESSED is not enabled in lv_conf.h");
+        return NULL;
 #endif
-    g_dsc->entry = NULL;
+    }
+
+    /*If not returned earlier then the letter is not found in this font*/
+    return NULL;
 }
 
 bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
@@ -663,133 +714,3 @@ static void * get_bitmap(const lv_font_fmt_txt_dsc_t * fdsc, const lv_font_fmt_t
     return NULL;
 #endif
 }
-
-#if LV_FONT_CACHE_GLYPH_CNT > 0
-
-/**
- * Get the glyph's bitmap from the cache.
- * @param g_dsc the glyph descriptor
- * @param fdsc the font descriptor
- * @param glyph_index the index of the glyph in the font
- * @return pointer to the draw buffer
- */
-static void * get_bitmap_cached(lv_font_glyph_dsc_t * g_dsc, const lv_font_fmt_txt_dsc_t * fdsc, uint32_t glyph_index)
-{
-    LV_PROFILER_FONT_BEGIN;
-    font_bitmap_cache_data_t search_key = {
-        .fdsc = fdsc,
-        .glyph_index = glyph_index,
-    };
-
-    lv_cache_entry_t * entry = lv_cache_acquire_or_create(font_bitmap_cache, &search_key, NULL);
-
-    if(!entry) {
-        LV_LOG_TRACE("Glyph %d not found in cache", glyph_index);
-        LV_PROFILER_FONT_END;
-        return NULL;
-    }
-
-    g_dsc->entry = entry;
-    font_bitmap_cache_data_t * cache_node = lv_cache_entry_get_data(entry);
-
-    LV_PROFILER_FONT_END;
-    return cache_node->draw_buf;
-}
-
-/**
- * Create a cache for font bitmaps.
- * @param data the font bitmap cache data
- * @param user_data unused
- * @return true: create success, false: create failed
- */
-static bool font_bitmap_create_cb(font_bitmap_cache_data_t * data, void * user_data)
-{
-    LV_UNUSED(user_data);
-    LV_PROFILER_FONT_BEGIN;
-    const lv_font_fmt_txt_glyph_dsc_t * gdsc = &data->fdsc->glyph_dsc[data->glyph_index];
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create_ex(
-                                   font_draw_buf_handlers,
-                                   gdsc->box_w,
-                                   gdsc->box_h,
-                                   LV_COLOR_FORMAT_A8,
-                                   LV_STRIDE_AUTO);
-    if(!draw_buf) {
-        LV_PROFILER_FONT_END;
-        return false;
-    }
-
-    if(!get_bitmap(data->fdsc, gdsc, draw_buf)) {
-        lv_draw_buf_destroy(draw_buf);
-        LV_PROFILER_FONT_END;
-        return false;
-    }
-
-    LV_LOG_TRACE("Created font bitmap cache entry for glyph_index %d, size %dx%d",
-                 data->glyph_index, draw_buf->header.w, draw_buf->header.h);
-
-    data->draw_buf = draw_buf;
-    LV_PROFILER_FONT_END;
-    return true;
-}
-
-/**
- * Free a font bitmap cache entry.
- * @param data the font bitmap cache data
- * @param user_data unused
- */
-static void font_bitmap_free_cb(font_bitmap_cache_data_t * data, void * user_data)
-{
-    LV_UNUSED(user_data);
-    lv_draw_buf_destroy(data->draw_buf);
-}
-
-/**
- * Compare two font bitmap cache entries.
- * @param lhs the left operand
- * @param rhs the right operand
- * @return the result of comparison
- */
-static lv_cache_compare_res_t font_bitmap_compare_cb(const font_bitmap_cache_data_t * lhs,
-                                                     const font_bitmap_cache_data_t * rhs)
-{
-    if(lhs->glyph_index != rhs->glyph_index) {
-        return lhs->glyph_index > rhs->glyph_index ? 1 : -1;
-    }
-
-    if(lhs->fdsc != rhs->fdsc) {
-        return lhs->fdsc > rhs->fdsc ? 1 : -1;
-    }
-
-    return 0;
-}
-
-/**
- * Initialize the font bitmap cache.
- * @param cache_size the cache size in bytes
- * @return the initialized cache
- */
-static lv_cache_t * font_bitmap_cache_init(uint32_t cache_size)
-{
-    lv_cache_ops_t ops = {
-        .compare_cb = (lv_cache_compare_cb_t)font_bitmap_compare_cb,
-        .create_cb = (lv_cache_create_cb_t)font_bitmap_create_cb,
-        .free_cb = (lv_cache_free_cb_t)font_bitmap_free_cb,
-    };
-
-    lv_cache_t * cache = lv_cache_create(&lv_cache_class_lru_rb_count, sizeof(font_bitmap_cache_data_t),
-                                         cache_size, ops);
-    lv_cache_set_name(cache, "FONT_BITMAP");
-
-    return cache;
-}
-
-/**
- * Deinitialize the font bitmap cache.
- * @param cache the cache to deinitialize
- */
-static void font_bitmap_cache_deinit(lv_cache_t * cache)
-{
-    lv_cache_destroy(cache, NULL);
-}
-
-#endif /*LV_FONT_CACHE_GLYPH_CNT*/
