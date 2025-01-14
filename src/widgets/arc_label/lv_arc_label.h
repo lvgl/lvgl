@@ -17,8 +17,6 @@ extern "C" {
 
 #if LV_USE_ARC_LABEL != 0
 
-#include "../../core/lv_obj.h"
-
 /*********************
  *      DEFINES
  *********************/
@@ -33,10 +31,18 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
 typedef enum {
-    LV_ARC_LABEL_DIR_CLOCKWISE,
-    LV_ARC_LABEL_DIR_COUNTER_CLOCKWISE
+    LV_ARC_LABEL_DIR_CLOCKWISE = 0,
+    LV_ARC_LABEL_DIR_COUNTER_CLOCKWISE = 0
 } lv_arc_label_dir_t;
+
+typedef enum {
+    LV_ARC_LABEL_TEXT_ALIGN_DEFAULT = 0,
+    LV_ARC_LABEL_TEXT_ALIGN_LEADING = 1,
+    LV_ARC_LABEL_TEXT_ALIGN_CENTER = 2,
+    LV_ARC_LABEL_TEXT_ALIGN_TRAILING = 3,
+} lv_arc_label_text_align_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_arc_label_class;
 
@@ -143,10 +149,24 @@ void lv_arc_label_set_center_offset_x(lv_obj_t * obj, uint32_t x);
 
 /**
  * Set the center offset y for an arc label object.
- * @param obj      pointer to an arc label object
- * @param y        the y offset
+ * @param obj       pointer to an arc label object
+ * @param y         the y offset
  */
 void lv_arc_label_set_center_offset_y(lv_obj_t * obj, uint32_t y);
+
+/**
+ * Set the text vertical alignment for an arc label object.
+ * @param obj       pointer to an arc label object
+ * @param align     the vertical alignment
+ */
+void lv_arc_label_set_text_vertical_align(lv_obj_t * obj, lv_arc_label_text_align_t align);
+
+/**
+ * Set the text horizontal alignment for an arc label object.
+ * @param obj       pointer to an arc label object
+ * @param align     the horizontal alignment
+ */
+void lv_arc_label_set_text_horizontal_align(lv_obj_t * obj, lv_arc_label_text_align_t align);
 
 /*=====================
  * Getter functions
@@ -204,6 +224,19 @@ uint32_t lv_arc_label_get_center_offset_x(lv_obj_t * obj);
  */
 uint32_t lv_arc_label_get_center_offset_y(lv_obj_t * obj);
 
+/**
+ * Get the text vertical alignment for an arc label object.
+ * @param obj       pointer to an arc label object
+ * @return          the vertical alignment
+ */
+lv_arc_label_text_align_t lv_arc_label_get_text_vertical_align(lv_obj_t * obj);
+
+/**
+ * Get the text horizontal alignment for an arc label object.
+ * @param obj       pointer to an arc label object
+ * @return          the horizontal alignment
+ */
+lv_arc_label_text_align_t lv_arc_label_get_text_horizontal_align(lv_obj_t * obj);
 
 /*=====================
  * Other functions
