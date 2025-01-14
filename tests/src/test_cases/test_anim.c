@@ -165,6 +165,7 @@ void test_anim_pause_for_resume(void)
     lv_test_wait(20);
     lv_anim_resume(animation);
 
+    lv_test_wait(20);
     TEST_ASSERT_EQUAL(19, var);
 }
 #endif
