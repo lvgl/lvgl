@@ -60,12 +60,16 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_menu_main_header_cont_cl
 lv_obj_t * lv_menu_create(lv_obj_t * parent);
 
 /**
- * Create a menu page object
- * @param parent    pointer to menu object
+ * Create a menu page object.
+ *
+ * This call inserts the new page under menu->storage as its parent, which is itself a
+ * child of the menu, so the resulting object hierarchy is: menu => storage => new_page
+ * where `storage` is a Base Widget.
+ * @param menu      pointer to menu object.
  * @param title     pointer to text for title in header (NULL to not display title)
  * @return          pointer to the created menu page
  */
-lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char const * const title);
+lv_obj_t * lv_menu_page_create(lv_obj_t * menu, char const * const title);
 
 /**
  * Create a menu cont object

@@ -124,12 +124,12 @@ lv_obj_t * lv_menu_create(lv_obj_t * parent)
     return obj;
 }
 
-lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char const * const title)
+lv_obj_t * lv_menu_page_create(lv_obj_t * menu, char const * const title)
 {
     LV_ASSERT_OBJ(parent, MY_CLASS);
 
     LV_LOG_INFO("begin");
-    lv_obj_t * obj = lv_obj_class_create_obj(&lv_menu_page_class, parent);
+    lv_obj_t * obj = lv_obj_class_create_obj(&lv_menu_page_class, menu);
     lv_obj_class_init_obj(obj);
 
     lv_menu_page_t * page = (lv_menu_page_t *)obj;
