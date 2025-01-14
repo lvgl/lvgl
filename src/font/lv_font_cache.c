@@ -83,7 +83,6 @@ void lv_font_cache_deinit(void)
 const void * lv_font_cache_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     LV_ASSERT_NULL(g_dsc);
-    LV_ASSERT_NULL(draw_buf);
 
     const lv_font_t * font = g_dsc->resolved_font;
     if(!font_is_built_in(font)) {
