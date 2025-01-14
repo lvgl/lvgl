@@ -229,6 +229,24 @@ void lv_arc_label_set_center_offset_y(lv_obj_t * obj, uint32_t y)
     lv_obj_invalidate(obj);
 }
 
+void lv_arc_label_set_text_vertical_align(lv_obj_t * obj, lv_arc_label_text_align_t align)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_arc_label_t * arc = (lv_arc_label_t *)obj;
+
+    arc->text_align_v = align;
+    lv_obj_invalidate(obj);
+}
+
+void lv_arc_label_set_text_horizontal_align(lv_obj_t * obj, lv_arc_label_text_align_t align)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_arc_label_t * arc = (lv_arc_label_t *)obj;
+
+    arc->text_align_h = align;
+    lv_obj_invalidate(obj);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -274,6 +292,18 @@ uint32_t lv_arc_label_get_center_offset_y(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return ((lv_arc_label_t *) obj)->center_offset.y;
+}
+
+lv_arc_label_text_align_t lv_arc_label_get_text_vertical_align(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    return ((lv_arc_label_t *) obj)->text_align_v;
+}
+
+lv_arc_label_text_align_t lv_arc_label_get_text_horizontal_align(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    return ((lv_arc_label_t *) obj)->text_align_h;
 }
 
 /*=====================
@@ -338,7 +368,23 @@ static void arc_label_draw_main(lv_event_t * e)
     const lv_color_t color = lv_obj_get_style_text_color(obj, LV_PART_MAIN);
     const lv_opa_t opa = lv_obj_get_style_text_opa(obj, LV_PART_MAIN);
 
+    const int32_t line_height = font->line_height;
+    const int32_t base_line = font->base_line;
     int32_t arc_r = arc_label->radius;
+
+    switch(arc_label->text_align_v) {
+        case LV_ARC_LABEL_TEXT_ALIGN_LEADING:
+            arc_r -= line_height - base_line;
+            break;
+        case LV_ARC_LABEL_TEXT_ALIGN_CENTER:
+            arc_r -= line_height / 2 - base_line;
+            break;
+        case LV_ARC_LABEL_TEXT_ALIGN_TRAILING:
+            arc_r -= -base_line;
+            break;
+        default:
+            break;
+    }
 
     uint32_t word_i = 0;
     uint32_t processed_word_count = 0;
@@ -357,8 +403,9 @@ static void arc_label_draw_main(lv_event_t * e)
             }
         }
 
-        lv_value_precise_t curr_angle = arc_label->angle_start + (arc_label->dir == LV_ARC_LABEL_DIR_CLOCKWISE ? angle_start :
-                                                                  -angle_start);
+        const lv_value_precise_t curr_angle = arc_label->angle_start + (arc_label->dir == LV_ARC_LABEL_DIR_CLOCKWISE ?
+                                                                        angle_start :
+                                                                        -angle_start);
 
         const lv_value_precise_t x = lv_trigo_cos(curr_angle) * arc_r / (lv_value_precise_t)32767;
         const lv_value_precise_t y = lv_trigo_sin(curr_angle) * arc_r / (lv_value_precise_t)32767;

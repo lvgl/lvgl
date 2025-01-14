@@ -14,9 +14,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../core/lv_obj_private.h"
-#include "lv_arc_label.h"
 
 #if LV_USE_ARC_LABEL != 0
+#include "lv_arc_label.h"
 
 /*********************
  *      DEFINES
@@ -54,6 +54,8 @@ struct _lv_arc_label_t {
     uint32_t radius;
     lv_point_t center_offset;
     lv_arc_label_dir_t dir;
+    lv_arc_label_text_align_t text_align_v; /**< Vertical text alignment */
+    lv_arc_label_text_align_t text_align_h; /**< Horizontal text alignment */
     uint8_t static_txt : 1;             /**< Flag to indicate the text is static */
     uint8_t recolor    : 1;             /**< Enable in-line letter re-coloring */
 };
