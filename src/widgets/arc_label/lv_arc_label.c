@@ -35,6 +35,8 @@
 static void lv_arc_label_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void arc_label_draw_main(lv_event_t * e);
 static void lv_arc_label_event(const lv_obj_class_t * class_p, lv_event_t * e);
+static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_font_t * font, uint32_t radius,
+                                                    const lv_value_precise_t angle_size);
 
 /**********************
  *  STATIC VARIABLES
@@ -371,6 +373,7 @@ static void arc_label_draw_main(lv_event_t * e)
     const int32_t line_height = font->line_height;
     const int32_t base_line = font->base_line;
     int32_t arc_r = arc_label->radius;
+    lv_value_precise_t angle_start = 0;
 
     switch(arc_label->text_align_v) {
         case LV_ARC_LABEL_TEXT_ALIGN_LEADING:
@@ -386,10 +389,25 @@ static void arc_label_draw_main(lv_event_t * e)
             break;
     }
 
+    switch(arc_label->text_align_h) {
+        case LV_ARC_LABEL_TEXT_ALIGN_LEADING:
+            angle_start = 0;
+            break;
+        case LV_ARC_LABEL_TEXT_ALIGN_CENTER:
+            angle_start = (arc_label->angle_size - calc_arc_text_total_angle(arc_label->text, font, arc_r,
+                                                                             arc_label->angle_size)) / 2;
+            break;
+        case LV_ARC_LABEL_TEXT_ALIGN_TRAILING:
+            angle_start = arc_label->angle_size - calc_arc_text_total_angle(arc_label->text, font, arc_r, arc_label->angle_size);
+            break;
+        default:
+            break;
+    }
+
     uint32_t word_i = 0;
     uint32_t processed_word_count = 0;
     lv_value_precise_t prev_letter_w = 0;
-    for(lv_value_precise_t angle_start = 0; angle_start < arc_label->angle_size;) {
+    while(angle_start <= arc_label->angle_size) {
         uint32_t letter;
         uint32_t letter_next;
         lv_text_encoded_letter_next_2(arc_label->text, &letter, &letter_next, &word_i);
@@ -398,7 +416,7 @@ static void arc_label_draw_main(lv_event_t * e)
         if(processed_word_count > 0) {
             const lv_value_precise_t angle_offset = (prev_letter_w + letter_w) * 180 / 3.141592653589f / arc_r / 2;
             angle_start += angle_offset;
-            if(angle_start > arc_label->angle_size - letter_w / 2) {
+            if(angle_start > arc_label->angle_size) {
                 break;
             }
         }
@@ -432,7 +450,7 @@ static void arc_label_draw_main(lv_event_t * e)
         prev_letter_w = letter_w;
         processed_word_count++;
 
-#if DEBUG
+#if 1
         lv_draw_line_dsc_t line_dsc;
         lv_draw_line_dsc_init(&line_dsc);
         line_dsc.color = lv_color_make(0x11, 0x45, 0x14);
@@ -450,6 +468,43 @@ static void arc_label_draw_main(lv_event_t * e)
         lv_draw_line(layer, &line_dsc);
 #endif
     }
+}
+
+static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_font_t * font, uint32_t radius,
+                                                    const lv_value_precise_t angle_size)
+{
+    uint32_t word_i = 0;
+    uint32_t processed_letter_count = 0;
+    lv_value_precise_t prev_letter_w = 0;
+    const lv_value_precise_t angle_size_in_arc_length = angle_size * 3.141592653589f / 180 * radius;
+    lv_value_precise_t total_angle_in_arc_length = 0;
+    while(total_angle_in_arc_length < angle_size_in_arc_length) {
+        if(total_angle_in_arc_length > angle_size_in_arc_length) {
+            break;
+        }
+
+        uint32_t letter;
+        uint32_t letter_next;
+        lv_text_encoded_letter_next_2(text, &letter, &letter_next, &word_i);
+        const lv_value_precise_t letter_w = lv_font_get_glyph_width(font, letter, letter_next);
+
+        if(processed_letter_count == 0) {
+            processed_letter_count++;
+            continue;
+        }
+        const lv_value_precise_t angle_offset = (prev_letter_w + letter_w) / 2.0;
+
+        total_angle_in_arc_length += angle_offset;
+
+        if(letter == 0) {
+            break;
+        }
+
+        prev_letter_w = letter_w;
+        processed_letter_count++;
+    }
+
+    return total_angle_in_arc_length * 180 / 3.141592653589f / radius;
 }
 
 #endif
