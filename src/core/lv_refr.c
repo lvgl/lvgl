@@ -1325,8 +1325,8 @@ static void wait_for_flushing(lv_display_t * disp)
     if(disp->flush_wait_cb) {
         if(disp->flushing) {
             disp->flush_wait_cb(disp);
+            disp->flushing = 0;
         }
-        disp->flushing = 0;
     }
     else {
         while(disp->flushing);
