@@ -110,6 +110,7 @@ struct _lv_font_t {
     int32_t base_line;           /**< Base line measured from the bottom of the line_height*/
     uint8_t subpx   : 2;            /**< An element of `lv_font_subpx_t`*/
     uint8_t kerning : 1;            /**< An element of `lv_font_kerning_t`*/
+    uint8_t static_bitmap: 1;       /**< The font has a static bitmap, it's can be used directly without caching*/
 
     int8_t underline_position;      /**< Distance between the top of the underline and base line (< 0 means below the base line)*/
     int8_t underline_thickness;     /**< Thickness of the underline*/
@@ -179,6 +180,17 @@ void lv_font_set_kerning(lv_font_t * font, lv_font_kerning_t kerning);
  * @return  return      pointer to the default font
  */
 const lv_font_t * lv_font_get_default(void);
+
+/**
+ * Check if a font has a static bitmap
+ * @param font    pointer to a font
+ * @return true: the font has a static bitmap
+ */
+static inline bool lv_font_has_static_bitmap(lv_font_t * font)
+{
+    LV_ASSERT_NULL(font);
+    return font->static_bitmap;
+}
 
 /**********************
  *      MACROS
