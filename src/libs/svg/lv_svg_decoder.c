@@ -96,7 +96,7 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
 
     if(src_type == LV_IMAGE_SRC_FILE || src_type == LV_IMAGE_SRC_VARIABLE) {
         const void * src_data = src->src;
-        uint8_t buf[16];
+        uint8_t * buf = NULL;
 
         if(src_type == LV_IMAGE_SRC_FILE) {
             /*Support only "*.svg" files*/
@@ -106,24 +106,54 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
 
             uint32_t rn;
             lv_fs_res_t res;
-            res = lv_fs_read(&src->file, buf, sizeof(buf), &rn);
+            buf = (uint8_t *)lv_zalloc(256);
+            LV_ASSERT_NULL(buf);
+            /* read 256 bytes for searching svg header */
+            res = lv_fs_read(&src->file, buf, 256, &rn);
             if(res != LV_FS_RES_OK) {
                 LV_LOG_WARN("can't open %s", (char *)src_data);
-                return LV_RESULT_INVALID;
-            }
-
-            if(rn != sizeof(buf)) {
-                LV_LOG_WARN("failed to read %s header, just %u bytes", (char *)src_data, rn);
+                lv_free(buf);
                 return LV_RESULT_INVALID;
             }
 
             if(!valid_svg_data(buf, rn)) {
+                lv_free(buf);
                 return LV_RESULT_INVALID;
             }
 
             width = LV_DPI_DEF;
             height = LV_DPI_DEF;
-            header->flags |= LV_IMAGE_FLAGS_AUTO_STRETCH;
+
+            uint8_t * svg_start = NULL;
+            uint8_t * svg_end = NULL;
+            uint8_t * ptr = buf;
+            uint8_t * ptr_end = buf + 255;
+            while(ptr < ptr_end) {
+                if(*ptr == '<') {
+                    if(lv_strncmp((char *)(ptr + 1), "svg", 3) == 0) {
+                        svg_start = ptr;
+                    }
+                }
+                if(svg_start && (*ptr == '>')) {
+                    svg_end = ptr;
+                    break;
+                }
+                ptr++;
+            }
+
+            if(svg_start && svg_end) {
+                lv_svg_node_t * svg_doc = lv_svg_load_data((char *)svg_start, svg_end - svg_start);
+                lv_svg_render_obj_t * svg_header = lv_svg_render_create(svg_doc);
+                if(svg_header->tag == LV_SVG_TAG_SVG) {
+                    lv_area_t bounds;
+                    svg_header->get_bounds(svg_header, &bounds);
+                    width = lv_area_get_width(&bounds) - 1;
+                    height = lv_area_get_height(&bounds) - 1;
+                }
+                lv_svg_render_delete(svg_header);
+                lv_svg_node_delete(svg_doc);
+            }
+            lv_free(buf);
         }
         else {
             const lv_image_dsc_t * img_dsc = src_data;

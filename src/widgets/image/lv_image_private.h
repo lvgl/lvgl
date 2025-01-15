@@ -46,7 +46,6 @@ struct _lv_image_t {
     uint32_t antialias : 1; /**< Apply anti-aliasing in transformations (rotate, zoom)*/
     uint32_t align: 4;      /**< Image size mode when image size and object size is different. See lv_image_align_t*/
     uint32_t blend_mode: 4; /**< Element of `lv_blend_mode_t`*/
-    uint32_t flags: 16;     /**< Image flags, see `lv_image_flags_t`*/
 };
 
 /**********************

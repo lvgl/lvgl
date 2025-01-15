@@ -231,17 +231,9 @@ void lv_image_set_src(lv_obj_t * obj, const void * src)
     }
 
     img->src_type = src_type;
-    if(header.flags & LV_IMAGE_FLAGS_AUTO_STRETCH) {
-        lv_obj_update_layout(obj);  /*Be sure the object's size is calculated*/
-        img->w         = lv_obj_get_width(obj);
-        img->h         = lv_obj_get_height(obj);
-    }
-    else {
-        img->w        = header.w;
-        img->h        = header.h;
-    }
+    img->w        = header.w;
+    img->h        = header.h;
     img->cf       = header.cf;
-    img->flags    = header.flags;
 
     lv_obj_refresh_self_size(obj);
 
@@ -658,9 +650,7 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
-        if(img->align == LV_IMAGE_ALIGN_STRETCH && (img->flags & LV_IMAGE_FLAGS_AUTO_STRETCH)) {
-            img->w = lv_obj_get_width(obj);
-            img->h = lv_obj_get_height(obj);
+        if(img->align == LV_IMAGE_ALIGN_STRETCH) {
             update_align(obj);
             if(img->rotation || img->scale_x != LV_SCALE_NONE || img->scale_y != LV_SCALE_NONE) {
                 lv_obj_refresh_ext_draw_size(obj);
