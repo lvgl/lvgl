@@ -37,7 +37,8 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*callback)(void *), size_t stack_size,
+lv_result_t lv_thread_init(lv_thread_t * thread, const char * const name, lv_thread_prio_t prio,
+                           void (*callback)(void *), size_t stack_size,
                            void * user_data)
 {
     TASK_TEMPLATE_STRUCT task_template;
@@ -47,7 +48,7 @@ lv_result_t lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*c
     task_template.TASK_ADDRESS = (TASK_FPTR)callback;
     task_template.TASK_STACKSIZE = stack_size;
     task_template.TASK_PRIORITY = _sched_get_min_priority(0) - prio;
-    task_template.TASK_NAME = "lvglDraw";
+    task_template.TASK_NAME = name;
     task_template.CREATION_PARAMETER = (uint32_t)user_data;
 
     *thread = _task_create(0, 0, (uint32_t)&task_template);

@@ -69,7 +69,8 @@ void lv_draw_dma2d_init(void)
 #if LV_DRAW_DMA2D_ASYNC
     g_unit = draw_dma2d_unit;
 
-    lv_result_t res = lv_thread_init(&draw_dma2d_unit->thread, LV_THREAD_PRIO_HIGH, thread_cb, 2 * 1024, draw_dma2d_unit);
+    lv_result_t res = lv_thread_init(&draw_dma2d_unit->thread, "dma2d", LV_THREAD_PRIO_HIGH, thread_cb, 2 * 1024,
+                                     draw_dma2d_unit);
     LV_ASSERT(res == LV_RESULT_OK);
 #endif
 
