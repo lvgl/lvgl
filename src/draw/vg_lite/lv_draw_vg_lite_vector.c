@@ -246,7 +246,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                                                &pattern_matrix,
                                                blend,
                                                VG_LITE_PATTERN_COLOR,
-                                               vg_color,
+                                               0,
                                                recolor,
                                                VG_LITE_FILTER_BI_LINEAR));
                     LV_PROFILER_DRAW_END_TAG("vg_lite_draw_pattern");
