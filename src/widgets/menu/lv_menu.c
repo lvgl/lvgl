@@ -126,7 +126,7 @@ lv_obj_t * lv_menu_create(lv_obj_t * parent)
 
 lv_obj_t * lv_menu_page_create(lv_obj_t * menu, char const * const title)
 {
-    LV_ASSERT_OBJ(parent, MY_CLASS);
+    LV_ASSERT_OBJ(menu, MY_CLASS);
 
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_menu_page_class, menu);
