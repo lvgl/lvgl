@@ -573,9 +573,6 @@ class LVGLImage:
         self.stride = stride
         self.data = bytearray(b''.join(data_out))
 
-    def set_rgb565_dither(self, value):
-        self.rgb565_dither = value
-
     def premultiply(self):
         """
         Pre-multiply image RGB data with alpha, set corresponding image header flags
@@ -842,13 +839,15 @@ class LVGLImage:
     def from_png(self,
                  filename: str,
                  cf: ColorFormat = None,
-                 background: int = 0x00_00_00):
+                 background: int = 0x00_00_00,
+                 rgb565_dither=False):
         """
         Create lvgl image from png file.
         If cf is none, used I1/2/4/8 based on palette size
         """
 
         self.background = background
+        self.rgb565_dither = rgb565_dither
 
         if cf is None:  # guess cf from filename
             # split filename string and match with ColorFormat to check
@@ -1037,10 +1036,10 @@ class LVGLImage:
                 ):
                     treshold_id = ((y & 7) << 3) + (x & 7)
 
-                    r = (min(r + red_thresh[treshold_id], 0xFF) >> 3) << 3
-                    g = (min(g + green_thresh[treshold_id], 0xFF) >> 2) << 2
-                    b = (min(b + blue_thresh[treshold_id], 0xFF) >> 3) << 3
-                   
+                    r = min(r + red_thresh[treshold_id], 0xFF) & 0xF8
+                    g = min(g + green_thresh[treshold_id], 0xFF) & 0xFC
+                    b = min(b + blue_thresh[treshold_id], 0xFF) & 0xF8
+
                 rawdata += pack(r, g, b, a)
 
         if cf == ColorFormat.RGB565A8:
@@ -1081,7 +1080,6 @@ blue_thresh = [
   7, 1, 5, 3, 8, 0, 6, 2,
   1, 7, 3, 5, 0, 8, 2, 6
 ]
-
 
 
 class RLEHeader:
@@ -1294,9 +1292,8 @@ class PNGConverter:
                 img = RAWImage().from_file(f, self.cf)
                 img.to_c_array(self._replace_ext(f, ".c"))
             else:
-                img = LVGLImage().from_png(f, self.cf, background=self.background)
+                img = LVGLImage().from_png(f, self.cf, background=self.background, rgb565_dither=self.rgb565_dither)
                 img.adjust_stride(align=self.align)
-                img.set_rgb565_dither(self.rgb565_dither)
 
                 if self.premultiply:
                     img.premultiply()
@@ -1406,7 +1403,8 @@ def test():
     f = "pngs/cogwheel.RGB565A8.png"
     img = LVGLImage().from_png(f,
                                cf=ColorFormat.ARGB8565,
-                               background=0xFF_FF_00)
+                               background=0xFF_FF_00,
+                               rgb565_dither=True)
     img.adjust_stride(align=16)
     img.premultiply()
     img.to_bin("output/cogwheel.ARGB8565.bin")
