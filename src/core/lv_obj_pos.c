@@ -830,8 +830,6 @@ void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
     lv_area_copy(&area_tmp, area);
 
     if(!lv_obj_area_is_visible(obj, &area_tmp)) return;
-    lv_area_copy(&area_tmp, area);
-
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     /**
      * When using the global matrix, the vertex coordinates of clip_area lose precision after transformation,
@@ -889,10 +887,7 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     /*The area is not on the object*/
     if(!lv_area_intersect(area, area, &obj_coords)) return false;
 
-    if(!is_transformed(obj)) {
-        *area = obj_coords;
-    }
-    else {
+    if(is_transformed(obj)) {
         lv_obj_get_transformed_area(obj, area, LV_OBJ_POINT_TRANSFORM_FLAG_RECURSIVE);
     }
 
