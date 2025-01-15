@@ -113,7 +113,6 @@ static void lv_menu_value_changed_event_cb(lv_event_t * e);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-bool lv_menu_item_back_button_is_root(lv_obj_t * menu, lv_obj_t * obj);
 void lv_menu_clear_history(lv_obj_t * obj);
 
 lv_obj_t * lv_menu_create(lv_obj_t * parent)
