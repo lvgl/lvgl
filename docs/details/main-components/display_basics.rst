@@ -1,12 +1,16 @@
 .. _display_basics:
 
-======
-Basics
-======
+..
+    Note:  there is no title on this file by design.  This is to allow the
+    .. toctree:: directive that includes this file to provide the "title".
 
+==============
+Display Basics
+==============
 
 What is a Display?
 ******************
+
 In LVGL, an *lv_display_t* (not to be confused with a :ref:`Screen <screens>`) is a
 data type that represents a single display panel --- the hardware that displays
 LVGL-rendered pixels on your device.  During system initialization, you must do the
@@ -17,10 +21,12 @@ following for each display panel you want LVGL to use:
 - assign its :ref:`draw_buffers`.
 
 
+
 .. _multiple_displays:
 
 How Many Displays Can LVGL Use?
 *******************************
+
 LVGL can use any number of displays.  It is only limited by available RAM and MCU time.
 
 Why would you want multi-display support?  Here are some examples:
@@ -36,16 +42,11 @@ If you set up LVGL to use more than one display, be aware that some functions us
 
 
 
-.. _display_features:
-
-Display Features
-****************
-
-
 .. _display_attributes:
 
 Attributes
-----------
+**********
+
 Once created, a Display object remembers the characteristics of the display hardware
 it is representing, as well as other things relevant to its lifetime:
 
@@ -64,10 +65,11 @@ it is representing, as well as other things relevant to its lifetime:
 - Optional custom pointer as :ref:`display_user_data`
 
 
+
 .. _screen_layers:
 
 Screen Layers
--------------
+*************
 
 When an ``lv_display_t`` object is created, 4 permanent :ref:`screens` that
 facilitate layering are created and attached to it.
@@ -109,7 +111,7 @@ To set a Screen you create to be the :ref:`active_screen`, call
 .. _layers_top_and_sys:
 
 Top and System Layers
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 LVGL uses the Top Layer and System Layer two empower you to ensure that certain
 :ref:`widgets` are *always* on top of other layers.
@@ -139,7 +141,7 @@ absorb all user clicks and acts as a modal Widget.
 .. _layers_bottom:
 
 Bottom Layer
-~~~~~~~~~~~~
+------------
 
 Similar to the Top- and System Layers, the Bottom Layer is also the full size of the
 Display, but it is located below the :ref:`active_screen`.  It's visible only if the
@@ -149,8 +151,8 @@ Active Screen's background opacity is < 255.
 
 .. _display_events:
 
-Display Events
-**************
+Events
+******
 
 :cpp:expr:`lv_display_add_event_cb(disp, event_cb, LV_EVENT_..., user_data)` adds
 an event handler to a display.
@@ -166,28 +168,14 @@ If you added ``user_data`` to the Display, you can retrieve it in an event like 
 
 The following events are sent:
 
-- :cpp:enumerator:`LV_EVENT_INVALIDATE_AREA` An area is invalidated (marked for redraw).
-  :cpp:expr:`lv_event_get_param(e)` returns a pointer to an :cpp:struct:`lv_area_t`
-  variable with the coordinates of the area to be invalidated. The area can
-  be freely modified if needed to adopt it the special requirement of the
-  display. Usually needed with monochrome displays to invalidate ``N x 8``
-  rows or columns at once.
-- :cpp:enumerator:`LV_EVENT_REFR_REQUEST`: Sent when something happened that requires redraw.
-- :cpp:enumerator:`LV_EVENT_REFR_START`: Sent when a refreshing cycle starts. Sent even if there is nothing to redraw.
-- :cpp:enumerator:`LV_EVENT_REFR_READY`: Sent when refreshing is ready (after rendering and calling the :ref:`flush_callback`). Sent even if no redraw happened.
-- :cpp:enumerator:`LV_EVENT_RENDER_START`: Sent when rendering starts.
-- :cpp:enumerator:`LV_EVENT_RENDER_READY`: Sent when rendering is ready (before calling the :ref:`flush_callback`)
-- :cpp:enumerator:`LV_EVENT_FLUSH_START`: Sent before the :ref:`flush_callback` is called.
-- :cpp:enumerator:`LV_EVENT_FLUSH_READY`: Sent when the :ref:`flush_callback` returned.
-- :cpp:enumerator:`LV_EVENT_RESOLUTION_CHANGED`: Sent when the resolution changes due
-  to :cpp:func:`lv_display_set_resolution` or :cpp:func:`lv_display_set_rotation`.
+.. include:: display_events_list.txt
 
 
 
 .. _display_setup:
 
-Display Setup
-*************
+Setup
+*****
 
 
 .. _creating_a_display:
