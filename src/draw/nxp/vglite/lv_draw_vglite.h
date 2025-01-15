@@ -24,8 +24,14 @@ extern "C" {
 
 #if LV_USE_DRAW_VGLITE
 #include "../../lv_draw_private.h"
-#include "../../sw/lv_draw_sw_private.h"
+#include "../../../display/lv_display_private.h"
 #include "../../../misc/lv_area_private.h"
+
+#include "../../lv_draw_triangle.h"
+#include "../../lv_draw_label.h"
+#include "../../lv_draw_image.h"
+#include "../../lv_draw_line.h"
+#include "../../lv_draw_arc.h"
 
 /*********************
  *      DEFINES
