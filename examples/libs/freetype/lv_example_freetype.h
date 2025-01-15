@@ -27,6 +27,7 @@ extern "C" {
  **********************/
 void lv_example_freetype_1(void);
 void lv_example_freetype_2(void);
+void lv_example_freetype_2_vector_font(void);
 
 /**********************
  *      MACROS

@@ -8,6 +8,39 @@
     #define PATH_PREFIX "../"
 #endif
 
+/*
+ * Load a vector font
+ * The only difference is the mode that freetype uses to render
+ * ThorVG needs to be enabled, LV_USE_VECTOR_GRAPHICS=1
+ */
+void lv_example_freetype_2_vector_font(void)
+{
+    lv_font_t * font = lv_freetype_font_create(PATH_PREFIX "lvgl/examples/libs/freetype/Lato-Regular.ttf",
+                                               LV_FREETYPE_FONT_RENDER_MODE_OUTLINE,
+                                               40,
+                                               LV_FREETYPE_FONT_STYLE_NORMAL);
+
+    if(!font) {
+        LV_LOG_ERROR("freetype font create failed.");
+        return;
+    }
+
+    /*Create style with the new font*/
+    static lv_style_t style;
+    lv_style_init(&style);
+    lv_style_set_text_font(&style, font);
+    lv_style_set_text_align(&style, LV_TEXT_ALIGN_CENTER);
+    lv_style_set_text_color(&style, lv_color_hex(0xFF0000));
+    lv_style_set_text_opa(&style, LV_OPA_20);
+
+
+    /*Create a label with the new style*/
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_obj_add_style(label, &style, 0);
+    lv_label_set_text(label, "Hello world\nI'm a font created with FreeType");
+    lv_obj_center(label);
+}
+
 /**
  * Load a font with FreeType
  */
