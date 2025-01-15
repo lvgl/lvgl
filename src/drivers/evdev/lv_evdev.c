@@ -72,6 +72,7 @@ struct _lv_evdev_discovery_t {
     lv_evdev_discovery_cb_t cb;
     void * cb_user_data;
     int inotify_fd;
+    bool inotify_watch_active;
     lv_timer_t * timer;
 };
 #endif
@@ -257,10 +258,48 @@ static void _evdev_discovery_indev_try_create(const char * file_name)
     }
 }
 
+static bool _evdev_discovery_inotify_try_init_watcher(int inotify_fd)
+{
+    int inotify_wd = inotify_add_watch(inotify_fd, EVDEV_DISCOVERY_PATH, IN_CREATE);
+    if(inotify_wd == -1) {
+        if(errno != ENOENT) {
+            LV_LOG_ERROR("inotify_add_watch failed: %s", strerror(errno));
+        }
+        return false;
+    }
+
+    DIR * dir = opendir(EVDEV_DISCOVERY_PATH);
+    if(dir == NULL) {
+        if(errno != ENOENT) {
+            LV_LOG_ERROR("opendir failed: %s", strerror(errno));
+        }
+        inotify_rm_watch(inotify_fd, inotify_wd);
+        return false;
+    }
+    while(1) {
+        struct dirent * dirent = readdir(dir);
+        if(dirent == NULL) break; /* only possible error is EBADF, so no errno check needed */
+        _evdev_discovery_indev_try_create(dirent->d_name);
+        if(evdev_discovery == NULL) {
+            /* was stopped by the callback. cleanup was already done */
+            closedir(dir);
+            return false;
+        }
+    }
+    closedir(dir);
+
+    return true;
+}
+
 static void _evdev_discovery_timer_cb(lv_timer_t * tim)
 {
     lv_evdev_discovery_t * ed = evdev_discovery;
     LV_ASSERT_NULL(ed);
+
+    if(!ed->inotify_watch_active) {
+        ed->inotify_watch_active = _evdev_discovery_inotify_try_init_watcher(ed->inotify_fd);
+        return;
+    }
 
     union {
         struct inotify_event in_ev;
@@ -273,9 +312,17 @@ static void _evdev_discovery_timer_cb(lv_timer_t * tim)
             in_data_buf_p < in_data.buf + br;
             in_data_buf_p += sizeof(struct inotify_event) + in_ev_p->len) {
             in_ev_p = (struct inotify_event *)in_data_buf_p;
+            if(in_ev_p->mask & IN_IGNORED) {
+                /* /dev/input/ was deleted because the last device was removed.
+                 * The watch was removed implicitly. It will try to be
+                 * recreated the next time the timer runs.
+                 */
+                ed->inotify_watch_active = false;
+                return;
+            }
             if(!(in_ev_p->mask & IN_ISDIR) && in_ev_p->len) {
                 _evdev_discovery_indev_try_create(in_ev_p->name);
-                if(evdev_discovery == NULL) return;
+                if(evdev_discovery == NULL) return; /* was stopped by the callback */
             }
         }
     }
@@ -405,7 +452,6 @@ lv_result_t lv_evdev_discovery_start(lv_evdev_discovery_cb_t cb, void * user_dat
 #ifndef BSD
     lv_evdev_discovery_t * ed = NULL;
     int inotify_fd = -1;
-    DIR * dir = NULL;
     lv_timer_t * timer = NULL;
 
     ed = lv_malloc_zeroed(sizeof(lv_evdev_discovery_t));
@@ -423,36 +469,8 @@ lv_result_t lv_evdev_discovery_start(lv_evdev_discovery_cb_t cb, void * user_dat
     }
     ed->inotify_fd = inotify_fd;
 
-    int inotify_wd = inotify_add_watch(inotify_fd, EVDEV_DISCOVERY_PATH, IN_CREATE);
-    if(inotify_wd == -1) {
-        LV_LOG_ERROR("inotify_add_watch failed: %s", strerror(errno));
-        goto err_out;
-    }
-
-    dir = opendir(EVDEV_DISCOVERY_PATH);
-    if(dir == NULL) {
-        LV_LOG_ERROR("opendir failed: %s", strerror(errno));
-        goto err_out;
-    }
-    while(1) {
-        errno = 0; /* error detection strategy suggested by manpage */
-        struct dirent * dirent = readdir(dir);
-        if(dirent == NULL) {
-            if(errno != 0) {
-                LV_LOG_ERROR("readdir failed: %s", strerror(errno));
-                goto err_out;
-            }
-            break;
-        }
-        _evdev_discovery_indev_try_create(dirent->d_name);
-        if(evdev_discovery == NULL) {
-            /* was stopped by the callback. cleanup was already done */
-            closedir(dir);
-            return LV_RESULT_OK;
-        }
-    }
-    closedir(dir);
-    dir = NULL;
+    ed->inotify_watch_active = _evdev_discovery_inotify_try_init_watcher(inotify_fd);
+    if(evdev_discovery == NULL) return LV_RESULT_OK; /* was stopped by the callback. cleanup was already done */
 
     timer = lv_timer_create(_evdev_discovery_timer_cb, LV_DEF_REFR_PERIOD, NULL);
     if(timer == NULL) goto err_out;
@@ -462,7 +480,6 @@ lv_result_t lv_evdev_discovery_start(lv_evdev_discovery_cb_t cb, void * user_dat
 
 err_out:
     if(timer != NULL) lv_timer_delete(timer);
-    if(dir != NULL) closedir(dir);
     if(inotify_fd != -1) close(inotify_fd);
     lv_free(ed);
     evdev_discovery = NULL;
