@@ -147,7 +147,7 @@ static inline bool _vglite_src_cf_supported(lv_color_format_t cf)
         case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_RGB565:
 #if CHIPID == 0x555
-        case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_ARGB8565:
         case LV_COLOR_FORMAT_RGB888:
 #endif
         case LV_COLOR_FORMAT_ARGB8888:
@@ -172,7 +172,7 @@ static inline bool _vglite_dest_cf_supported(lv_color_format_t cf)
 #endif
         case LV_COLOR_FORMAT_RGB565:
 #if CHIPID == 0x555
-        case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_ARGB8565:
         case LV_COLOR_FORMAT_RGB888:
 #endif
         case LV_COLOR_FORMAT_ARGB8888:
