@@ -1159,7 +1159,7 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->pointer.act_point.x = x;
     i->pointer.act_point.y = y;
 
-    if(data->state == LV_INDEV_STATE_PRESSED){
+    if(data->state == LV_INDEV_STATE_PRESSED) {
         indev_proc_press(i);
     }
     else {
