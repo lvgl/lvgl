@@ -61,6 +61,19 @@ const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t
 #endif
 }
 
+lv_result_t lv_font_get_glyph_raw_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+{
+    LV_ASSERT_NULL(g_dsc);
+    LV_ASSERT_NULL(draw_buf);
+    const lv_font_t * font_p = g_dsc->resolved_font;
+
+    if(!font_p->static_bitmap) {
+        return LV_RESULT_INVALID;
+    }
+
+    return font_p->get_glyph_bitmap(g_dsc, draw_buf) ? LV_RESULT_OK : LV_RESULT_INVALID;
+}
+
 void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
 {
     const lv_font_t * font = g_dsc->resolved_font;
