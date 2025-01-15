@@ -838,6 +838,7 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
     uint32_t rn;
     decoder_data_t * decoder_data = dsc->user_data;
     uint8_t bpp = lv_color_format_get_bpp(dsc->header.cf);
+    LV_ASSERT(bpp != 0);
     uint32_t w = (dsc->header.stride * 8) / bpp;
     uint32_t buf_stride = (w * 8 + 7) >> 3; /*stride for img_data*/
     uint32_t buf_len = w * dsc->header.h; /*always decode to A8 format*/
