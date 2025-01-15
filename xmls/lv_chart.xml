@@ -42,9 +42,7 @@
 	    <element name="series" type="custom:chart_series" access="add">
 	        <arg name="color" type="color" help=""/>
 	        <arg name="axis" type="enum:lv_chart_axis+" help="The axis"/>
-	    	<prop name="values" help="set values from an array">
-	    		<param name="values" type="int[count]" help="the values as an array"/>
-	    	</prop>
+	    	<prop name="values"  type="int[count]" help="set values from an array"/>
 	    </element>
 
 	    <element name="cursor" type="custom:chart_cursor" access="add">

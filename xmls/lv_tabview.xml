@@ -9,16 +9,12 @@ Example
 
 <widget>
 	<api>
-	    <prop name="active" help="Set the current tab">
-	    	<param name="idx" type="int" help="zero based index of the tab to select"/>
-	    </prop>
-	    <prop name="tab_bar_position" type="dir">
-	    	<param name="idx" type="dir(top bottom left right)" help=""/>
-	    </prop>
+	    <prop name="active" type="int" help="Zero based index of the tab to select"/>
+	    <prop name="tab_bar_position" type="dir(top bottom left right)" help=""/>
 	    <element name="tab_bar" type="obj" access="get">
 	    </element>
 	    <element name="tab" type="obj" access="add">
-	        <arg name="text" type="string" arg="true"/>
+	        <arg name="text" type="string"/>
 	    </element>
 	</api>
 </widget>

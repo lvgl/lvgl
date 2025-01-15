@@ -131,6 +131,8 @@ lv_draw_dma2d_output_cf_t lv_draw_dma2d_cf_to_dma2d_output_cf(lv_color_format_t 
             return LV_DRAW_DMA2D_OUTPUT_CF_RGB888;
         case LV_COLOR_FORMAT_RGB565:
             return LV_DRAW_DMA2D_OUTPUT_CF_RGB565;
+        case LV_COLOR_FORMAT_ARGB1555:
+            return LV_DRAW_DMA2D_OUTPUT_CF_ARGB1555;
         default:
             LV_ASSERT_MSG(false, "unsupported output color format");
     }
@@ -310,7 +312,8 @@ static int32_t evaluate_cb(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
                      && (dsc->header.cf == LV_COLOR_FORMAT_ARGB8888
                          || dsc->header.cf == LV_COLOR_FORMAT_XRGB8888
                          || dsc->header.cf == LV_COLOR_FORMAT_RGB888
-                         || dsc->header.cf == LV_COLOR_FORMAT_RGB565)
+                         || dsc->header.cf == LV_COLOR_FORMAT_RGB565
+                         || dsc->header.cf == LV_COLOR_FORMAT_ARGB1555)
                      && (dsc->base.layer->color_format == LV_COLOR_FORMAT_ARGB8888
                          || dsc->base.layer->color_format == LV_COLOR_FORMAT_XRGB8888
                          || dsc->base.layer->color_format == LV_COLOR_FORMAT_RGB888

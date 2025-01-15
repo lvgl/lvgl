@@ -19,8 +19,16 @@
 /*********************
  *      DEFINES
  *********************/
+
+/**Perform linear animations in max 1024 steps. Used in `path_cb`s*/
 #define LV_ANIM_RESOLUTION 1024
+
+/**log2(LV_ANIM_RESOLUTION)*/
 #define LV_ANIM_RES_SHIFT 10
+
+/**In an anim. time this bit indicates that the value is speed, and not time*/
+#define LV_ANIM_SPEED_MASK 0x80000000
+
 #define state LV_GLOBAL_DEFAULT()->anim_state
 #define anim_ll_p &(state.anim_ll)
 
@@ -36,7 +44,6 @@ static void anim_mark_list_change(void);
 static void anim_completed_handler(lv_anim_t * a);
 static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
                                          int32_t y1, int32_t x2, int32_t y2);
-static uint32_t convert_speed_to_time(uint32_t speed, int32_t start, int32_t end);
 static void resolve_time(lv_anim_t * a);
 static bool remove_concurrent_anims(lv_anim_t * a_current);
 static void remove_anim(void * a);
@@ -218,7 +225,7 @@ uint32_t lv_anim_speed_clamped(uint32_t speed, uint32_t min_time, uint32_t max_t
     min_time = (min_time + 5) / 10;
     max_time = (max_time + 5) / 10;
 
-    return 0x80000000 + (max_time << 20) + (min_time << 10) + speed;
+    return LV_ANIM_SPEED_MASK + (max_time << 20) + (min_time << 10) + speed;
 
 }
 
@@ -478,9 +485,25 @@ lv_anim_t * lv_anim_custom_get(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
     return lv_anim_get(a ? a->var : NULL, (lv_anim_exec_xcb_t)exec_cb);
 }
 
+uint32_t lv_anim_resolve_speed(uint32_t speed_or_time, int32_t start, int32_t end)
+{
+    /*It was a simple time*/
+    if((speed_or_time & LV_ANIM_SPEED_MASK) == 0) return speed_or_time;
+
+    uint32_t d    = LV_ABS(start - end);
+    uint32_t speed = speed_or_time & 0x3FF;
+    uint32_t time = (d * 100) / speed; /*Speed is in 10 units per sec*/
+    uint32_t max_time = (speed_or_time >> 20) & 0x3FF;
+    uint32_t min_time = (speed_or_time >> 10) & 0x3FF;
+
+    return LV_CLAMP(min_time * 10, time, max_time * 10);
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
 /**
  * Periodically handle the animations.
  * @param param unused
@@ -641,26 +664,12 @@ static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1, int32_
     return new_value;
 }
 
-static uint32_t convert_speed_to_time(uint32_t speed_or_time, int32_t start, int32_t end)
-{
-    /*It was a simple time*/
-    if((speed_or_time & 0x80000000) == 0) return speed_or_time;
-
-    uint32_t d    = LV_ABS(start - end);
-    uint32_t speed = speed_or_time & 0x3FF;
-    uint32_t time = (d * 100) / speed; /*Speed is in 10 units per sec*/
-    uint32_t max_time = (speed_or_time >> 20) & 0x3FF;
-    uint32_t min_time = (speed_or_time >> 10) & 0x3FF;
-
-    return LV_CLAMP(min_time * 10, time, max_time * 10);
-}
-
 static void resolve_time(lv_anim_t * a)
 {
-    a->duration = convert_speed_to_time(a->duration, a->start_value, a->end_value);
-    a->reverse_duration = convert_speed_to_time(a->reverse_duration, a->start_value, a->end_value);
-    a->reverse_delay = convert_speed_to_time(a->reverse_delay, a->start_value, a->end_value);
-    a->repeat_delay = convert_speed_to_time(a->repeat_delay, a->start_value, a->end_value);
+    a->duration = lv_anim_resolve_speed(a->duration, a->start_value, a->end_value);
+    a->reverse_duration = lv_anim_resolve_speed(a->reverse_duration, a->start_value, a->end_value);
+    a->reverse_delay = lv_anim_resolve_speed(a->reverse_delay, a->start_value, a->end_value);
+    a->repeat_delay = lv_anim_resolve_speed(a->repeat_delay, a->start_value, a->end_value);
 }
 
 /**

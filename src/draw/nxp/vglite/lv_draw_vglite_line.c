@@ -124,9 +124,6 @@ static void _vglite_draw_line(const lv_point_t * point1, const lv_point_t * poin
     lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
 
-    vg_lite_matrix_t matrix;
-    vg_lite_identity(&matrix);
-
     /*** Draw line ***/
     VGLITE_CHECK_ERROR(vg_lite_set_draw_path_type(&path, VG_LITE_DRAW_STROKE_PATH));
 
@@ -135,7 +132,7 @@ static void _vglite_draw_line(const lv_point_t * point1, const lv_point_t * poin
 
     VGLITE_CHECK_ERROR(vg_lite_update_stroke(&path));
 
-    VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, vgblend, vgcol));
+    VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, NULL, vgblend, vgcol));
 
     vglite_run();
 

@@ -1,16 +1,18 @@
 .. _coding-style:
 
-Coding style
+============
+Coding Style
 ============
 
-File template
--------------
+File Template
+*************
 
 Use `misc/lv_templ.c <https://github.com/lvgl/lvgl/blob/master/src/misc/lv_templ.c>`__
 and `misc/lv_templ.h <https://github.com/lvgl/lvgl/blob/master/src/misc/lv_templ.h>`__
 
-Naming conventions
-------------------
+
+Naming Conventions
+******************
 
 -  Words are separated by '\_'
 -  In variable and function names use only lower case letters
@@ -48,8 +50,10 @@ Naming conventions
 
    -  Avoid adding new abbreviations
 
-Coding guide
-------------
+
+Coding Guide
+************
+
 -  Editor:
 
    -  Set editor to use 4 spaces for tab indentations (instead of tab characters).
@@ -70,8 +74,10 @@ Coding guide
    -  Variables in a file (outside functions) are always *static*.
    -  Do not use global variables (use functions to set/get static variables).
 
+
 Comments
---------
+********
+
 Before every function prototype in ``.h`` files, include a Doxygen-formatted comment
 like this:
 
@@ -136,7 +142,7 @@ comment, such as a struct member, use ``/**<`` like this:
 
 
 Doxygen Comment Specifics
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 Doxygen is the first program in a chain that generates the online LVGL API
 documentation from the files in the LVGL repository.  Doxygen detects files it should
 pay attention to by them having a ``@file`` command inside a Doxygen comment.  Doxygen
@@ -227,7 +233,7 @@ illustrating most of the Doxygen commands used in LVGL.
 
 
 Supported Doxygen Commands
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 -  ``@file``
    tells Doxygen to parse this file and also supplies documentation about
    the file itself when applicable (everything following it in the same comment).
@@ -252,9 +258,8 @@ Supported Doxygen Commands
    information about a topic can be found elsewhere.
 
 
-
 API Conventions
-----------------------
+***************
 
 To support the auto-generation of bindings, the LVGL C API must
 follow some coding conventions:
@@ -285,7 +290,7 @@ To learn more refer to the documentation of `MicroPython <integration/bindings/m
 
 
 Formatting
-----------
+**********
 
 Here is example to show bracket placement and use of white space:
 
@@ -319,8 +324,31 @@ Here is example to show bracket placement and use of white space:
 You can use **astyle** to format the code. Run ``code-format.py`` from
 the ``scripts`` folder.
 
+
+Includes
+********
+
+Various subsystems of LVGL can be enabled or disabled by setting a macro in
+``lv_conf.h`` to 1 or 0 respectively.  The code files that contain the logic for
+those subsystems are often arranged so that there is an ``#if <ENABLING_MACRO_NAME>``
+directive near the top of the file, and its matching ``#endif`` is at the end of the
+file.  If you add or modify such a subsystem in LVGL, whenever possible, the only
+``#include`` that should be above those conditional directives should be just enough
+to include the enabling/disabling macro.  Specifically:
+
+- in the ``.c`` file:  the ``#include`` that includes the header with the closest
+  correspondence to that ``.c`` file
+
+- in the mated ``.h`` file:  ``#include "lv_conf_internal.h"``
+
+which, itself includes ``lv_conf.h``.  See examples at
+`lv_freetype.c <https://github.com/lvgl/lvgl/blob/master/src/libs/freetype/lv_freetype.c>`__,
+`lv_freetype_private.h <https://github.com/lvgl/lvgl/blob/master/src/libs/freetype/lv_freetype_private.h>`__ and
+`lv_freetype.h <https://github.com/lvgl/lvgl/blob/master/src/libs/freetype/lv_freetype.h>`__.
+
+
 pre-commit
-----------
+**********
 
 `pre-commit <https://pre-commit.com/>`__ is a multi-language package
 manager for pre-commit hooks. See the `installation
@@ -337,8 +365,9 @@ with:
 
 now ``pre-commit`` will run automatically on ``git commit``!
 
+
 Hooks
------
+*****
 
 The ``format-source`` local hook (see ``.pre-commit-config.yaml``) runs
 **astyle** on all the staged source and header files (that are not
@@ -349,8 +378,9 @@ need to add the change to the staging area and run ``git commit`` again.
 The ``trailing-whitespace`` hook fixes trailing whitespaces on all of
 the files.
 
+
 Skipping hooks
---------------
+**************
 
 If you want to skip any particular hook you can do so with:
 
@@ -358,8 +388,9 @@ If you want to skip any particular hook you can do so with:
 
    SKIP=name-of-the-hook git commit
 
+
 Testing hooks
--------------
+*************
 
 It is not necessary to do a commit to test the hooks, you can test hooks
 by adding the files into the staging area and run:
@@ -367,3 +398,4 @@ by adding the files into the staging area and run:
 .. code:: console
 
    pre-commit run name-of-the-hook
+

@@ -27,7 +27,6 @@ extern "C" {
 void * lv_xml_obj_create(lv_xml_parser_state_t * state, const char ** attrs);
 void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs);
 
-
 /**********************
  *      MACROS
  **********************/

@@ -4,85 +4,192 @@
 File Explorer
 =============
 
-``lv_file_explorer`` provides an API to browse the contents of the file
-system. ``lv_file_explorer`` only provides the file browsing function,
-but does not provide the actual file operation function. In other words,
-you can't click a picture file to open and view the picture like a PC.
-``lv_file_explorer`` will tell you the full path and name of the
-currently clicked file. The file operation function needs to be
-implemented by the user.
+``lv_file_explorer`` provides a UI enabling the end user to browse the contents of a
+file system.  Its main area is called the "Browsing Area" and provides the list of
+files contained in the currently-viewed directory.
 
-The file list in ``lv_file_explorer`` is based on
-:ref:`lv_table`, and the quick access bar is based on
-:ref:`lv_list`. Therefore, care should be taken to ensure
-that :ref:`lv_table` and :ref:`lv_list` are
-enabled.
+When enabled, there is also a "Quick-Access" panel on the left, which provides a
+convenient way to reach parts of the file system that are frequently accessed.
+Available "Quick-Access" destinations are:
+
+- File System,
+- HOME,
+- Video,
+- Pictures,
+- Music, and
+- Documents.
+
+You specify what paths these lead to during ``lv_file_explorer``\ 's initialization.
+
+``lv_file_explorer`` only provides the file browsing and events caused by user
+activity (e.g. clicking a file), but does not provide the actual file operations.
+Client code must hook various events and decide what to do when they are emitted
+(e.g. a click or double-click on a file).  The actions taken might to open the file,
+display it, send it to some other part of the application, etc..
+``lv_file_explorer`` passes the full path and name of file that was clicked to the
+event callback functions.  What happens next is up to the application designer.
+
+``lv_file_explorer`` uses the :ref:`lv_table` Widget for the "Browsing Area", and the
+:ref:`lv_list` Widget for the "Quick-Access" panel when it is enabled.  Thus,
+:c:macro:`LV_USE_TABLE` macro must be set to a non-zero value in ``lv_conf.h`` in
+order to use ``lv_file_explorer``, and and :c:macro:`LV_USE_LIST` must be set to a
+non-zero value to use the "Quick-Access" panel.
+
+.. note::
+
+    In order to use File Explorer, :ref:`overview_file_system` has to be set up and
+    know about all the drive letters you use when passing paths to File System
+    (described below).
+
+
+
+Prerequisites
+*************
+
+If you haven't already done so, you will need to learn about the LVGL :ref:`File
+System abstraction <overview_file_system>`, since it must be set up and be functional
+for File Explorer to work.
+
+
 
 .. _file_explorer_usage:
 
 Usage
------
+*****
 
-Enable :c:macro:`LV_USE_FILE_EXPLORER` in ``lv_conf.h``.
+Set :c:macro:`LV_USE_FILE_EXPLORER` to a non-zero value in ``lv_conf.h``.
 
-First use :cpp:expr:`lv_file_explorer_create(lv_screen_active())` to create a file
-explorer, The default size is the screen size. After that, you can
-customize the style like widget.
+First use :cpp:expr:`lv_file_explorer_create(lv_screen_active())` to create a File
+Explorer.  The default size is the screen size.  After that, you can
+customize the style like any Widget.
 
-Quick access
-~~~~~~~~~~~~
+The size of the ``current_path`` buffer is set by :c:macro:`LV_FILE_EXPLORER_PATH_MAX_LEN`
+in ``lv_conf.h``.
 
-The quick access bar is optional. You can turn off
-:c:macro:`LV_FILE_EXPLORER_QUICK_ACCESS` in ``lv_conf.h`` so that the quick
-access bar will not be created. This can save some memory, but not much.
-After the quick access bar is created, it can be hidden by clicking the
-button at the top left corner of the browsing area, which is very useful
-for small screen devices.
+The object hierarchy of a freshly-created File Explorer looks like this:
 
-You can use
-:cpp:expr:`lv_file_explorer_set_quick_access_path(file_explorer, LV_FILE_EXPLORER_QA_XX, "path")`
-to set the path of the quick access bar. The items of the quick access
-bar are fixed. Currently, there are the following items:
+- ``File Explorer``:  occupies full area of parent Widget, typically a Screen (Flex-Flow COLUMN)
 
--  :cpp:enumerator:`LV_FILE_EXPLORER_QA_HOME`
--  :cpp:enumerator:`LV_FILE_EXPLORER_QA_MUSIC`
--  :cpp:enumerator:`LV_FILE_EXPLORER_QA_PICTURES`
--  :cpp:enumerator:`LV_FILE_EXPLORER_QA_VIDEO`
--  :cpp:enumerator:`LV_FILE_EXPLORER_QA_DOCS`
--  :cpp:enumerator:`LV_FILE_EXPLORER_QA_MNT`
--  :cpp:enumerator:`LV_FILE_EXPLORER_QA_FS`
+  - ``Container``:  occupies full area of File Explorer (Flex grow 1)
+
+    - ``Quick-Access Panel``:
+
+      - ``Device List``:  grows to accommodate children
+
+        - ``File System``:  button
+
+      - ``Places List``:  grows to accommodate children
+
+        - ``HOME``:  button
+        - ``Video``:  button
+        - ``Pictures``:  button
+        - ``Music``:  button
+        - ``Documents``:  button
+
+    - ``Browser Panel``:
+
+      - ``Header``:  14% of ``Browser Panel`` height
+
+        - ``Current Path``:  label
+
+      - ``File Table``:  with 1 column, 86% of ``Browser Panel`` height
+
+  - Fields:
+
+    - ``home_dir`` = NULL
+    - ``video_dir`` = NULL
+    - ``pictures_dir`` = NULL
+    - ``music_dir`` = NULL
+    - ``docs_dir`` = NULL
+    - ``fs_dir`` = NULL
+    - ``current_path`` = [empty buffer]
+    - ``sel_fn`` (selected file)
+    - ``sort`` (default :cpp:enumerator:`LV_EXPLORER_SORT_NONE`)
+
+
+Accessing the Parts
+-------------------
+
+This list of functions provides access to the parts shown in diagram above:
+
+- :cpp:expr:`lv_file_explorer_get_selected_file_name(explorer)`  (pointer
+  to NUL-terminated string containing file-path user selected; typically used inside
+  an :cpp:enumerator:`LV_EVENT_CLICKED` event)
+- :cpp:expr:`lv_file_explorer_get_current_path(explorer)` (pointer to ``current_path`` ``char`` buffer)
+- :cpp:expr:`lv_file_explorer_get_file_table(explorer)`  (pointer to ``File Table`` :ref:`lv_table` Widget)
+- :cpp:expr:`lv_file_explorer_get_header(explorer)`  (pointer to ``Header`` :ref:`base_widget` Widget)
+- :cpp:expr:`lv_file_explorer_get_path_label(explorer)`  (pointer to ``Current Path Label`` :ref:`lv_label` Widget)
+- :cpp:expr:`lv_file_explorer_get_quick_access_area(explorer)`  (pointer to ``Quick-Access Panel`` :ref:`base_widget`)
+- :cpp:expr:`lv_file_explorer_get_places_list(explorer)`    (pointer to ``Places List`` :ref:`lv_list` Widget)
+- :cpp:expr:`lv_file_explorer_get_device_list(explorer)`    (pointer to ``Device List`` :ref:`lv_list` Widget)
+
+
+Quick-Access Panel
+------------------
+
+The ``Quick-Access Panel`` behaves like a typical navigation panel and appears on the
+left, while the ``Browser Panel`` appears on the right
+
+This panel is optional.  If you set :c:macro:`LV_FILE_EXPLORER_QUICK_ACCESS` to ``0``
+in ``lv_conf.h``, the ``Quick-Access Panel`` will not be created.  This saves only a
+little bit of memory.
+
+Soon after the File Explorer is created, you typically use
+:cpp:expr:`lv_file_explorer_set_quick_access_path(explorer, LV_EXPLORER_XXX_DIR, "path")`
+to set the path that will be navigated to when the buttons in the ``Quick-Access Panel``
+are clicked, which is currently a fixed list.  The corresponding values you will need
+to pass as the 2nd argument are the following:
+
+-  :cpp:enumerator:`LV_EXPLORER_HOME_DIR`
+-  :cpp:enumerator:`LV_EXPLORER_MUSIC_DIR`
+-  :cpp:enumerator:`LV_EXPLORER_PICTURES_DIR`
+-  :cpp:enumerator:`LV_EXPLORER_VIDEO_DIR`
+-  :cpp:enumerator:`LV_EXPLORER_DOCS_DIR`
+-  :cpp:enumerator:`LV_EXPLORER_FS_DIR`
+
 
 .. _file_explorer_sort:
 
 Sort
-~~~~
+----
 
 You can use
-:cpp:expr:`lv_file_explorer_set_sort(file_explorer, LV_EXPLORER_SORT_XX)` to set
-sorting method.
+:cpp:expr:`lv_file_explorer_set_sort(explorer, LV_EXPLORER_SORT_XX)` to set
+the sorting method.
 
-There are the following sorting methods:
+These are the possible sorting methods:
 
--  :cpp:enumerator:`LV_EXPLORER_SORT_NONE`
+-  :cpp:enumerator:`LV_EXPLORER_SORT_NONE` (default)
 -  :cpp:enumerator:`LV_EXPLORER_SORT_KIND`
 
-You can customize the sorting. Before custom sort, please set the
-default sorting to :cpp:enumerator:`LV_EXPLORER_SORT_NONE`. The default is
-:cpp:enumerator:`LV_EXPLORER_SORT_NONE`.
+:cpp:expr:`lv_file_explorer_get_sort(explorer)` returns the current sorting method.
+
+
 
 .. _file_explorer_events:
 
 Events
-------
+******
 
--  :cpp:enumerator:`LV_EVENT_READY` Sent when a directory is opened. You can customize
-   the sort.
--  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent when an item (file) in the file list
-   is clicked.
+- :cpp:enumerator:`LV_EVENT_READY` Sent when a directory is opened, which can happen:
 
-You can use :cpp:func:`lv_file_explorer_get_cur_path` to get the current path
-and :cpp:func:`lv_file_explorer_get_sel_fn` to get the name of the currently
-selected file in the event processing function. For example:
+  - when the File Explorer is initially opened,
+  - after a user clicks on a ``Quick-Access Panel`` navigation button, and
+  - after the user clicks on a directory displayed in the ``Browser Panel``.
+
+  You can use it to, for example, customize the file sort.
+
+- :cpp:enumerator:`LV_EVENT_VALUE_CHANGED` Sent once when any item (file) in the
+  ``Brwoser Panel``\ 's file list is clicked.
+
+- :cpp:enumerator:`LV_EVENT_CLICKED` Sent twice when an item in the ``Browser Panel``
+  is clicked:  once as a result of the input-device :cpp:enumerator:`LV_EVENT_RELEASED`
+  event and a second as a result of the input device :cpp:enumerator:`LV_EVENT_CLICKED`
+  event.  This applies to files, directories, and the "< Back" item in the ``Browser Panel``.
+
+In these events you can use :cpp:func:`lv_file_explorer_get_current_path` to get the
+current path and :cpp:func:`lv_file_explorer_get_selected_file_name` to get the name
+of the currently selected file in the event processing function. For example:
 
 .. code-block:: c
 
@@ -92,8 +199,8 @@ selected file in the event processing function. For example:
        lv_obj_t * obj = lv_event_get_target(e);
 
        if(code == LV_EVENT_VALUE_CHANGED) {
-           char * cur_path =  lv_file_explorer_get_cur_path(widget);
-           char * sel_fn = lv_file_explorer_get_sel_fn(widget);
+           char * cur_path =  lv_file_explorer_get_current_path(widget);
+           char * sel_fn = lv_file_explorer_get_selected_file_name(widget);
            LV_LOG_USER("%s%s", cur_path, sel_fn);
        }
    }
@@ -101,15 +208,19 @@ selected file in the event processing function. For example:
 You can also save the obtained **path** and **file** name into an array
 through functions such as :cpp:func:`strcpy` and :cpp:func:`strcat` for later use.
 
+
+
 .. _file_explorer_example:
 
 Example
--------
+*******
 
 .. include:: ../../examples/others/file_explorer/index.rst
+
+
 
 .. _file_explorer_api:
 
 API
----
+***
 

@@ -195,4 +195,4 @@ The process is described in details below, using ``SPIFFS`` as demonstration.
       CONFIG_PARTITION_TABLE_CUSTOM=y
       CONFIG_LV_USE_FS_STDIO=y
       CONFIG_LV_FS_STDIO_LETTER=65
-      CONFIG_LV_LV_FS_DEFAULT_DRIVE_LETTER=65
+      CONFIG_LV_FS_DEFAULT_DRIVER_LETTER=65

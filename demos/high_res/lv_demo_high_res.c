@@ -10,7 +10,7 @@
 #include "lv_demo_high_res_private.h"
 #if LV_USE_DEMO_HIGH_RES
 
-#if LV_FS_DEFAULT_DRIVE_LETTER == '\0'
+#if LV_FS_DEFAULT_DRIVER_LETTER == '\0'
     #error set a default drive letter (and enable an FS driver) for the high res demo
 #endif
 

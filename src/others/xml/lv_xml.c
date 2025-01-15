@@ -26,6 +26,8 @@
 #include "parsers/lv_xml_slider_parser.h"
 #include "parsers/lv_xml_tabview_parser.h"
 #include "parsers/lv_xml_chart_parser.h"
+#include "parsers/lv_xml_table_parser.h"
+#include "parsers/lv_xml_dropdown_parser.h"
 #include "../../libs/expat/expat.h"
 #include "../../draw/lv_draw_image.h"
 
@@ -42,6 +44,7 @@
  **********************/
 static void view_start_element_handler(void * user_data, const char * name, const char ** attrs);
 static void view_end_element_handler(void * user_data, const char * name);
+static void register_builtin_fonts(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -62,23 +65,9 @@ void lv_xml_init(void)
     lv_ll_init(&font_ll, sizeof(lv_xml_font_t));
     lv_ll_init(&image_ll, sizeof(lv_xml_image_t));
 
-#if LV_FONT_MONTSERRAT_14
-    lv_xml_register_font("lv_montserrat_14", &lv_font_montserrat_14);
-#endif
-
-#if LV_FONT_MONTSERRAT_16
-    lv_xml_register_font("lv_montserrat_16", &lv_font_montserrat_16);
-#endif
-
-#if LV_FONT_MONTSERRAT_18
-    lv_xml_register_font("lv_montserrat_18", &lv_font_montserrat_18);
-#endif
-
-#if LV_FONT_MONTSERRAT_20
-    lv_xml_register_font("lv_montserrat_20", &lv_font_montserrat_20);
-#endif
-
     lv_xml_component_init();
+
+    register_builtin_fonts();
 
     lv_xml_widget_register("lv_obj", lv_xml_obj_create, lv_xml_obj_apply);
     lv_xml_widget_register("lv_button", lv_xml_button_create, lv_xml_button_apply);
@@ -91,10 +80,16 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_chart", lv_xml_chart_create, lv_xml_chart_apply);
     lv_xml_widget_register("lv_chart-cursor", lv_xml_chart_cursor_create, lv_xml_chart_cursor_apply);
     lv_xml_widget_register("lv_chart-series", lv_xml_chart_series_create, lv_xml_chart_series_apply);
+    lv_xml_widget_register("lv_chart-axis", lv_xml_chart_axis_create, lv_xml_chart_axis_apply);
+    lv_xml_widget_register("lv_table", lv_xml_table_create, lv_xml_table_apply);
+    lv_xml_widget_register("lv_table-column", lv_xml_table_column_create, lv_xml_table_column_apply);
+    lv_xml_widget_register("lv_table-cell", lv_xml_table_cell_create, lv_xml_table_cell_apply);
+    lv_xml_widget_register("lv_dropdown", lv_xml_dropdown_create, lv_xml_dropdown_apply);
+    lv_xml_widget_register("lv_dropdown-list", lv_xml_dropdown_list_create, lv_xml_dropdown_list_apply);
 }
 
-lv_obj_t * lv_xml_create_from_ctx(lv_obj_t * parent, lv_xml_component_ctx_t * parent_ctx, lv_xml_component_ctx_t * ctx,
-                                  const char ** attrs)
+void * lv_xml_create_from_ctx(lv_obj_t * parent, lv_xml_component_ctx_t * parent_ctx, lv_xml_component_ctx_t * ctx,
+                              const char ** attrs)
 {
     /* Initialize the parser state */
     lv_xml_parser_state_t state;
@@ -132,7 +127,7 @@ lv_obj_t * lv_xml_create_from_ctx(lv_obj_t * parent, lv_xml_component_ctx_t * pa
     return state.view;
 }
 
-lv_obj_t * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs)
+void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs)
 {
     lv_obj_t * item = NULL;
 
@@ -345,7 +340,7 @@ static void view_start_element_handler(void * user_data, const char * name, cons
          *now it has the button theme styles. However if it were a real widget
          *it had e.g. `my_widget_class` so the button's theme wouldn't apply on it.
          *Removing the style will ensure a better preview*/
-        if(state->ctx.is_widget) lv_obj_remove_style_all(item);
+        if(state->ctx.is_widget && is_view) lv_obj_remove_style_all(item);
 
         /*Apply the attributes from e.g. `<lv_slider value="30" x="20">`*/
         if(item) {
@@ -384,6 +379,110 @@ static void view_end_element_handler(void * user_data, const char * name)
         lv_ll_remove(&state->parent_ll, current_parent);
         lv_free(current_parent);
     }
+}
+
+
+static void register_builtin_fonts(void)
+{
+#if LV_FONT_MONTSERRAT_8
+    lv_xml_register_font("lv_montserrat_8", &lv_font_montserrat_8);
+#endif
+
+#if LV_FONT_MONTSERRAT_10
+    lv_xml_register_font("lv_montserrat_10", &lv_font_montserrat_10);
+#endif
+
+#if LV_FONT_MONTSERRAT_12
+    lv_xml_register_font("lv_montserrat_12", &lv_font_montserrat_12);
+#endif
+
+#if LV_FONT_MONTSERRAT_14
+    lv_xml_register_font("lv_montserrat_14", &lv_font_montserrat_14);
+#endif
+
+#if LV_FONT_MONTSERRAT_16
+    lv_xml_register_font("lv_montserrat_16", &lv_font_montserrat_16);
+#endif
+
+#if LV_FONT_MONTSERRAT_18
+    lv_xml_register_font("lv_montserrat_18", &lv_font_montserrat_18);
+#endif
+
+#if LV_FONT_MONTSERRAT_20
+    lv_xml_register_font("lv_montserrat_20", &lv_font_montserrat_20);
+#endif
+
+#if LV_FONT_MONTSERRAT_22
+    lv_xml_register_font("lv_montserrat_22", &lv_font_montserrat_22);
+#endif
+
+#if LV_FONT_MONTSERRAT_24
+    lv_xml_register_font("lv_montserrat_24", &lv_font_montserrat_24);
+#endif
+
+#if LV_FONT_MONTSERRAT_26
+    lv_xml_register_font("lv_montserrat_26", &lv_font_montserrat_26);
+#endif
+
+#if LV_FONT_MONTSERRAT_28
+    lv_xml_register_font("lv_montserrat_28", &lv_font_montserrat_28);
+#endif
+
+#if LV_FONT_MONTSERRAT_30
+    lv_xml_register_font("lv_montserrat_30", &lv_font_montserrat_30);
+#endif
+
+#if LV_FONT_MONTSERRAT_32
+    lv_xml_register_font("lv_montserrat_32", &lv_font_montserrat_32);
+#endif
+
+#if LV_FONT_MONTSERRAT_34
+    lv_xml_register_font("lv_montserrat_34", &lv_font_montserrat_34);
+#endif
+
+#if LV_FONT_MONTSERRAT_36
+    lv_xml_register_font("lv_montserrat_36", &lv_font_montserrat_36);
+#endif
+
+#if LV_FONT_MONTSERRAT_38
+    lv_xml_register_font("lv_montserrat_38", &lv_font_montserrat_38);
+#endif
+
+#if LV_FONT_MONTSERRAT_40
+    lv_xml_register_font("lv_montserrat_40", &lv_font_montserrat_40);
+#endif
+
+#if LV_FONT_MONTSERRAT_42
+    lv_xml_register_font("lv_montserrat_42", &lv_font_montserrat_42);
+#endif
+
+#if LV_FONT_MONTSERRAT_44
+    lv_xml_register_font("lv_montserrat_44", &lv_font_montserrat_44);
+#endif
+
+#if LV_FONT_MONTSERRAT_46
+    lv_xml_register_font("lv_montserrat_46", &lv_font_montserrat_46);
+#endif
+
+#if LV_FONT_MONTSERRAT_48
+    lv_xml_register_font("lv_montserrat_48", &lv_font_montserrat_48);
+#endif
+
+#if LV_FONT_UNSCII_8
+    lv_xml_register_font("lv_unscii_8", &lv_font_unscii_8);
+#endif
+
+#if LV_FONT_UNSCII_16
+    lv_xml_register_font("lv_unscii_16", &lv_font_unscii_16);
+#endif
+
+#if LV_FONT_SIMSUN_16_CJK
+    lv_xml_register_font("lv_simsun_cjk_16", &lv_font_simsun_16_cjk);
+#endif
+
+#if LV_FONT_DEJAVU_16_PERSIAN_HEBREW
+    lv_xml_register_font("lv_font_dejavu_16_persian_hebrew", &lv_font_dejavu_16_persian_hebrew);
+#endif
 }
 
 #endif /* LV_USE_XML */

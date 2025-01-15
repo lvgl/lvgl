@@ -442,6 +442,12 @@ bool lv_obj_is_scrolling(const lv_obj_t * obj)
     return false;
 }
 
+void lv_obj_stop_scroll_anim(const lv_obj_t * obj)
+{
+    lv_anim_delete((lv_obj_t *)obj, scroll_y_anim);
+    lv_anim_delete((lv_obj_t *)obj, scroll_x_anim);
+}
+
 void lv_obj_update_snap(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     lv_obj_update_layout(obj);
