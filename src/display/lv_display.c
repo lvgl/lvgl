@@ -963,6 +963,49 @@ void lv_display_delete_refr_timer(lv_display_t * disp)
     disp->refr_timer = NULL;
 }
 
+lv_result_t lv_display_send_vsync_event(lv_display_t * disp, void * param)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp) return LV_RESULT_INVALID;
+
+    if(disp->vsync_count > 0)
+        return lv_display_send_event(disp, LV_EVENT_VSYNC, param);
+
+    return LV_RESULT_INVALID;
+}
+
+bool lv_display_register_vsync_event(lv_display_t * disp, lv_event_cb_t event_cb, void * user_data)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp) return false;
+
+    lv_display_add_event_cb(disp, event_cb, LV_EVENT_VSYNC, user_data);
+
+    /*only send once*/
+    if(disp->vsync_count == 0)
+        lv_display_send_event(disp, LV_EVENT_VSYNC_REQUEST, disp);
+
+    disp->vsync_count++;
+    return true;
+}
+
+bool lv_display_unregister_vsync_event(lv_display_t * disp, lv_event_cb_t event_cb, void * user_data)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp) return false;
+
+    uint32_t removed_count = lv_display_remove_event_cb_with_user_data(disp, event_cb, user_data);
+    if(removed_count == 0)
+        return false;
+
+    disp->vsync_count -= removed_count;
+    /*only send once*/
+    if(disp->vsync_count == 0)
+        lv_display_send_event(disp, LV_EVENT_VSYNC_REQUEST, NULL);
+
+    return true;
+}
+
 void lv_display_set_user_data(lv_display_t * disp, void * user_data)
 {
     if(!disp) disp = lv_display_get_default();
