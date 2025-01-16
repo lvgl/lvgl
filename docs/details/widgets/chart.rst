@@ -186,7 +186,7 @@ When adding a data series to a SCATTER chart, bit-wise OR your selected Y axis
 If you wish to have the chart use your own Y-value array instead of the one provided,
 you can do so with
 
-    :cpp:expr:`lv_chart_set_ext_y_array(chart, series, value_array)`.
+    :cpp:expr:`lv_chart_set_series_ext_y_array(chart, series, value_array)`.
 
 You are responsible for ensuring the array you provide contains at least
 ``chart->point_cnt`` elements in it.
@@ -204,13 +204,13 @@ allocated.
     for more information about these functions.
 
 A pointer to the Y-value array of a series can be obtained with
-:cpp:expr:`lv_chart_get_y_array(chart, series)`.  This is true whether you are using
+:cpp:expr:`lv_chart_get_series_y_array(chart, series)`.  This is true whether you are using
 the provided Y-value array or provided your own.
 
 For SCATTER-type charts,
 
-- :cpp:expr:`lv_chart_set_ext_x_array(chart, series, value_array)` and
-- :cpp:expr:`lv_chart_get_x_array(chart, series)`
+- :cpp:expr:`lv_chart_set_series_ext_x_array(chart, series, value_array)` and
+- :cpp:expr:`lv_chart_get_series_x_array(chart, series)`
 
 can be used as well.
 
@@ -221,7 +221,7 @@ You have several options to set the Y-values for a data series:
 
 1. Set the values programmatically in the array like ``ser1->points[3] = 7`` and refresh the
    chart with :cpp:expr:`lv_chart_refresh(chart)`.
-2. Use :cpp:expr:`lv_chart_set_value_by_id(chart, series, id, value)` where ``id`` is
+2. Use :cpp:expr:`lv_chart_set_series_value_by_id(chart, series, id, value)` where ``id`` is
    the zero-based index of the point you wish to update.
 3. Use :cpp:expr:`lv_chart_set_next_value(chart, series, value)`.
    (See `Update modes`_ below.)
@@ -232,7 +232,7 @@ that point, column, or scatter-point.
 
 For SCATTER-type charts,
 
-- :cpp:expr:`lv_chart_set_value_by_id2(chart, series, id, x_value, y_value)` and
+- :cpp:expr:`lv_chart_set_series_value_by_id2(chart, series, id, x_value, y_value)` and
 - :cpp:expr:`lv_chart_set_next_value2(chart, series, x_value, y_value)`
 
 can be used as well.
@@ -274,7 +274,7 @@ Vertical range
 --------------
 
 You can specify the minimum and maximum values in Y-direction with
-:cpp:expr:`lv_chart_set_range(chart, axis, min, max)`. ``axis`` can be
+:cpp:expr:`lv_chart_set_axis_range(chart, axis, min, max)`. ``axis`` can be
 :cpp:enumerator:`LV_CHART_AXIS_PRIMARY_Y` (left Y axis) or
 :cpp:enumerator:`LV_CHART_AXIS_SECONDARY_Y` (right Y axis).
 

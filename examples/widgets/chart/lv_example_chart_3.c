@@ -24,7 +24,7 @@ static void event_cb(lv_event_t * e)
             lv_point_t p;
             lv_chart_get_point_pos_by_id(chart, ser, id, &p);
 
-            int32_t * y_array = lv_chart_get_y_array(chart, ser);
+            int32_t * y_array = lv_chart_get_series_y_array(chart, ser);
             int32_t value = y_array[id];
 
             /*Draw a rectangle above the clicked point*/
