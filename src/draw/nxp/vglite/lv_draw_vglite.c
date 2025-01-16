@@ -118,7 +118,7 @@ void lv_draw_vglite_init(void)
     draw_vglite_unit->base_unit.name = "NXP_VGLITE";
 
 #if LV_USE_VGLITE_DRAW_THREAD
-    lv_thread_init(&draw_vglite_unit->thread, "vglitedraw", LV_THREAD_PRIO_HIGHEST, _vglite_render_thread_cb, 2 * 1024,
+    lv_thread_init(&draw_vglite_unit->thread, "vglitedraw", LV_THREAD_PRIO_HIGHEST, _vglite_render_thread_cb, 4 * 1024,
                    draw_vglite_unit);
 #endif
 }
