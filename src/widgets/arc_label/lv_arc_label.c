@@ -19,7 +19,11 @@
 #include "../../misc/lv_text_private.h"
 
 #if LV_USE_FLOAT
-#include <math.h>
+    #include <math.h>
+#endif
+
+#ifndef  M_PI
+    #define M_PI 3.14159265358979323846
 #endif
 
 /*********************
@@ -350,12 +354,8 @@ static void lv_arc_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     const lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_current_target(e);
 
-    if((code == LV_EVENT_STYLE_CHANGED) || (code == LV_EVENT_SIZE_CHANGED)) {
-        // lv_label_refr_text(obj);
-    }
-    else if(code == LV_EVENT_DRAW_MAIN) {
+    if(code == LV_EVENT_DRAW_MAIN) {
         arc_label_draw_main(e);
     }
 }
@@ -411,29 +411,28 @@ static void arc_label_draw_main(lv_event_t * e)
     uint32_t word_i = 0;
     uint32_t processed_word_count = 0;
     lv_value_precise_t prev_letter_w = 0;
-    while(angle_start <= arc_label->angle_size) {
+    lv_value_precise_t total_arc_length = arc_label->angle_size * M_PI / 180 * arc_r;
+    lv_value_precise_t curr_total_arc_length = angle_start * M_PI / 180 * arc_r;
+    while(curr_total_arc_length <= total_arc_length) {
         uint32_t letter;
         uint32_t letter_next;
         lv_text_encoded_letter_next_2(arc_label->text, &letter, &letter_next, &word_i);
         const lv_value_precise_t letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
         if(processed_word_count > 0) {
-            const lv_value_precise_t angle_offset = (prev_letter_w + letter_w) * 180 / 3.141592653589f / arc_r / 2;
-            angle_start += angle_offset;
-            if(angle_start > arc_label->angle_size) {
-                break;
-            }
+            const lv_value_precise_t arc_offset = (prev_letter_w + letter_w) / (lv_value_precise_t)2;
+            curr_total_arc_length += arc_offset;
         }
 
         const lv_value_precise_t curr_angle = arc_label->angle_start + (arc_label->dir == LV_ARC_LABEL_DIR_CLOCKWISE ?
-                                                                        angle_start :
-                                                                        -angle_start);
+                                                                        curr_total_arc_length :
+                                                                        -curr_total_arc_length) * 180 / M_PI / arc_r;
 #if LV_USE_FLOAT
         const lv_value_precise_t x = cos(curr_angle * M_PI / 180) * arc_r;
         const lv_value_precise_t y = sin(curr_angle * M_PI / 180) * arc_r;
 #else
-        const lv_value_precise_t x = lv_trigo_cos(curr_angle) * arc_r / (lv_value_precise_t)32767;
-        const lv_value_precise_t y = lv_trigo_sin(curr_angle) * arc_r / (lv_value_precise_t)32767;
+        const lv_value_precise_t x = lv_trigo_cos(curr_angle) * arc_r / 32767;
+        const lv_value_precise_t y = lv_trigo_sin(curr_angle) * arc_r / 32767;
 #endif
 
         lv_point_t point = {
@@ -484,10 +483,10 @@ static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_
     uint32_t word_i = 0;
     uint32_t processed_letter_count = 0;
     lv_value_precise_t prev_letter_w = 0;
-    const lv_value_precise_t angle_size_in_arc_length = angle_size * 3.141592653589f / 180 * radius;
-    lv_value_precise_t total_angle_in_arc_length = 0;
-    while(total_angle_in_arc_length < angle_size_in_arc_length) {
-        if(total_angle_in_arc_length > angle_size_in_arc_length) {
+    const lv_value_precise_t angle_size_in_arc_length = angle_size * M_PI / 180 * radius;
+    lv_value_precise_t total_arc_length = 0;
+    while(total_arc_length < angle_size_in_arc_length) {
+        if(total_arc_length > angle_size_in_arc_length) {
             break;
         }
 
@@ -500,9 +499,9 @@ static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_
             processed_letter_count++;
             continue;
         }
-        const lv_value_precise_t angle_offset = (prev_letter_w + letter_w) / 2.0;
+        const lv_value_precise_t arc_offset = (prev_letter_w + letter_w) / (lv_value_precise_t)2;
 
-        total_angle_in_arc_length += angle_offset;
+        total_arc_length += arc_offset;
 
         if(letter == 0) {
             break;
@@ -512,7 +511,7 @@ static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_
         processed_letter_count++;
     }
 
-    return total_angle_in_arc_length * 180 / 3.141592653589f / radius;
+    return total_arc_length * 180 / M_PI / radius;
 }
 
 #endif
