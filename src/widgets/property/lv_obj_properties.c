@@ -14,7 +14,7 @@
  * Generated code from properties.py
  */
 /* *INDENT-OFF* */
-const lv_property_name_t lv_obj_property_names[73] = {
+const lv_property_name_t lv_obj_property_names[74] = {
     {"align",                  LV_PROPERTY_OBJ_ALIGN,},
     {"child_count",            LV_PROPERTY_OBJ_CHILD_COUNT,},
     {"content_height",         LV_PROPERTY_OBJ_CONTENT_HEIGHT,},
@@ -26,6 +26,7 @@ const lv_property_name_t lv_obj_property_names[73] = {
     {"flag_checkable",         LV_PROPERTY_OBJ_FLAG_CHECKABLE,},
     {"flag_click_focusable",   LV_PROPERTY_OBJ_FLAG_CLICK_FOCUSABLE,},
     {"flag_clickable",         LV_PROPERTY_OBJ_FLAG_CLICKABLE,},
+    {"flag_dragable",          LV_PROPERTY_OBJ_FLAG_DRAGABLE,},
     {"flag_end",               LV_PROPERTY_OBJ_FLAG_END,},
     {"flag_event_bubble",      LV_PROPERTY_OBJ_FLAG_EVENT_BUBBLE,},
     {"flag_flex_in_new_track", LV_PROPERTY_OBJ_FLAG_FLEX_IN_NEW_TRACK,},
