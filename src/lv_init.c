@@ -73,7 +73,9 @@
 #if LV_USE_UEFI
     #include "drivers/uefi/lv_uefi_context.h"
 #endif
-#include "drivers/evdev/lv_evdev_private.h"
+#if LV_USE_EVDEV
+    #include "drivers/evdev/lv_evdev_private.h"
+#endif
 
 /*********************
  *      DEFINES
