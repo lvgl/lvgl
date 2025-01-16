@@ -110,7 +110,7 @@ jobs:
       if: matrix.build_config == '32bit build'
       run: echo "NON_AMD64_BUILD=1" >> $GITHUB_ENV
     - name: Run tests
-      run: python tests/main.py test
+      run: python tests/main.py --report --update-image test
     - name: Archive screenshot errors
       if: failure()
       uses: actions/upload-artifact@v4
