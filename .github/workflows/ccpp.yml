@@ -37,6 +37,8 @@ jobs:
         python-version: '3.12'
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
+    - name: Install pngquant
+      run:  scripts/install_pngquant.sh
     - name: Building ${{ matrix.build_option }}
       run: python tests/main.py --build-option=${{ matrix.build_option }} build --auto-clean
 
@@ -115,6 +117,8 @@ jobs:
         python-version: '3.12'
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
+    - name: Install pngquant
+      run: scripts/install_pngquant.sh
     - name: Fix kernel mmap rnd bits
       # Asan in llvm 14 provided in ubuntu 22.04 is incompatible with
       # high-entropy ASLR in much newer kernels that GitHub runners are
