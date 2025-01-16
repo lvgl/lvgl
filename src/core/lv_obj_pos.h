@@ -149,13 +149,13 @@ bool lv_obj_is_layout_positioned(const lv_obj_t * obj);
 
 /**
  * Mark the object for layout update.
- * @param obj      pointer to an object whose children needs to be updated
+ * @param obj      pointer to an object whose children need to be updated
  */
 void lv_obj_mark_layout_as_dirty(lv_obj_t * obj);
 
 /**
  * Update the layout of an object.
- * @param obj      pointer to an object whose children needs to be updated
+ * @param obj      pointer to an object whose position and size needs to be updated
  */
 void lv_obj_update_layout(const lv_obj_t * obj);
 
@@ -198,7 +198,7 @@ void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, in
 void lv_obj_center(lv_obj_t * obj);
 
 /**
- * Set the transfrom matrix of an object
+ * Set the transform matrix of an object
  * @param obj       pointer to an object
  * @param matrix    pointer to a matrix to set
  * @note `LV_DRAW_TRANSFORM_USE_MATRIX` needs to be enabled.
@@ -206,7 +206,7 @@ void lv_obj_center(lv_obj_t * obj);
 void lv_obj_set_transform(lv_obj_t * obj, const lv_matrix_t * matrix);
 
 /**
- * Reset the transfrom matrix of an object to identity matrix
+ * Reset the transform matrix of an object to identity matrix
  * @param obj       pointer to an object
  * @note `LV_DRAW_TRANSFORM_USE_MATRIX` needs to be enabled.
  */

@@ -21,7 +21,7 @@ All permutations of the below options are well supported.
 - single or double buffered
 - direct or partial render mode
 - OS and no OS
-- paralellized flushing with DMA2D (only for partial render mode)
+- parallelized flushing with DMA2D (only for partial render mode)
 
 If OS is enabled, a synchronization primitive will be used to
 give the thread a chance to yield to other threads while blocked,
@@ -102,6 +102,10 @@ DMA2D
 partial buffers in parallel with other LVGL tasks, whether or not OS is
 enabled. If the display is not partial, then there is no need to enable this
 option.
+
+Additionally it is possible to mix layers that have color format on
+:c:macro:`LV_COLOR_FORMAT_ARGB1555` on top of :c:macro:`LV_COLOR_FORMAT_RGB565`
+layers using the DMA2D.
 
 It must not be enabled at the same time as :c:macro:`LV_USE_DRAW_DMA2D`.
 See the :ref:`DMA2D support <dma2d>`.

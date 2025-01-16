@@ -85,7 +85,7 @@ void lv_tree_node_delete(lv_tree_node_t * node);
  * @param bcb callback function to call before visiting a node
  * @param acb callback function to call after visiting a node
  * @param user_data user data to pass to the callback functions
- * @return true: traversal is finished; false: traversal breaked
+ * @return true: traversal is finished; false: traversal broken
  */
 bool lv_tree_walk(const lv_tree_node_t * node,
                   lv_tree_walk_mode_t mode,

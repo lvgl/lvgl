@@ -70,6 +70,9 @@
 #if LV_USE_WINDOWS
     #include "drivers/windows/lv_windows_context.h"
 #endif
+#if LV_USE_UEFI
+    #include "drivers/uefi/lv_uefi_context.h"
+#endif
 #include "drivers/evdev/lv_evdev_private.h"
 
 /*********************
@@ -248,6 +251,10 @@ void lv_init(void)
     lv_windows_platform_init();
 #endif
 
+#if LV_USE_UEFI
+    lv_uefi_platform_init();
+#endif
+
     lv_obj_style_init();
 
     /*Initialize the screen refresh system*/
@@ -331,6 +338,10 @@ void lv_init(void)
 
 #if LV_USE_FS_ARDUINO_SD
     lv_fs_arduino_sd_init();
+#endif
+
+#if LV_USE_FS_UEFI
+    lv_fs_uefi_init();
 #endif
 
 #if LV_USE_LODEPNG
@@ -417,6 +428,10 @@ void lv_deinit(void)
     lv_refr_deinit();
 
     lv_obj_style_deinit();
+
+#if LV_USE_UEFI
+    lv_uefi_platform_deinit();
+#endif
 
 #if LV_USE_PXP
 #if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP

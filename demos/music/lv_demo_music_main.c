@@ -360,7 +360,7 @@ void lv_demo_music_resume(void)
     lv_anim_set_exec_cb(&a, spectrum_anim_cb);
     lv_anim_set_var(&a, spectrum_obj);
     lv_anim_set_duration(&a, ((spectrum_len - spectrum_i) * 1000) / 30);
-    lv_anim_set_playback_duration(&a, 0);
+    lv_anim_set_reverse_duration(&a, 0);
     lv_anim_set_completed_cb(&a, spectrum_end_cb);
     lv_anim_start(&a);
 

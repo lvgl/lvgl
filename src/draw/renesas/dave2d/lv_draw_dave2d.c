@@ -99,7 +99,8 @@ void lv_draw_dave2d_init(void)
     lv_ll_init(&_ll_Dave2D_Tasks, 4);
 
 #if LV_USE_OS
-    lv_thread_init(&draw_dave2d_unit->thread, LV_THREAD_PRIO_HIGH, _dave2d_render_thread_cb, 8 * 1024, draw_dave2d_unit);
+    lv_thread_init(&draw_dave2d_unit->thread, "dave2d", LV_THREAD_PRIO_HIGH, _dave2d_render_thread_cb, 8 * 1024,
+                   draw_dave2d_unit);
 #endif
 
 }
@@ -250,7 +251,7 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * dsc = t->draw_dsc;
-                if(dsc->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START) {
+                if((dsc->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START) || (dsc->header.cf == LV_COLOR_FORMAT_RGB888)) {
                     ret = 0;
                     break;
                 }

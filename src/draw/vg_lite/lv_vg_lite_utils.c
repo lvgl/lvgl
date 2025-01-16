@@ -867,11 +867,6 @@ void lv_vg_lite_rect(vg_lite_rectangle_t * rect, const lv_area_t * area)
     rect->height = lv_area_get_height(area);
 }
 
-void lv_vg_lite_matrix(vg_lite_matrix_t * dest, const lv_matrix_t * src)
-{
-    lv_memcpy(dest, src, sizeof(lv_matrix_t));
-}
-
 uint32_t lv_vg_lite_get_palette_size(vg_lite_buffer_format_t format)
 {
     uint32_t size = 0;
@@ -1052,7 +1047,7 @@ bool lv_vg_lite_path_check(const vg_lite_path_t * path)
 
     while(cur < end) {
         /* get op code */
-        uint8_t op_code = VLC_GET_OP_CODE(cur);
+        uint8_t op_code = LV_VG_LITE_PATH_GET_OP_CODE(cur);
 
         /* get arguments length */
         uint8_t arg_len = lv_vg_lite_vlc_op_arg_len(op_code);
@@ -1076,7 +1071,7 @@ bool lv_vg_lite_path_check(const vg_lite_path_t * path)
         case VG_LITE_DRAW_FILL_PATH:
         case VG_LITE_DRAW_FILL_STROKE_PATH: {
                 /* Check end op code */
-                uint8_t end_op_code = VLC_GET_OP_CODE(end - fmt_len);
+                uint8_t end_op_code = LV_VG_LITE_PATH_GET_OP_CODE(end - fmt_len);
                 if(end_op_code != VLC_OP_END) {
                     LV_LOG_ERROR("%d (%s) -> is NOT VLC_OP_END", end_op_code, lv_vg_lite_vlc_op_string(end_op_code));
                     return false;
@@ -1149,7 +1144,7 @@ void lv_vg_lite_matrix_multiply(vg_lite_matrix_t * matrix, const vg_lite_matrix_
     }
 
     /* Copy temporary matrix into result. */
-    lv_memcpy(matrix, &temp, sizeof(temp));
+    *matrix = temp;
 }
 
 bool lv_vg_lite_matrix_inverse(vg_lite_matrix_t * result, const vg_lite_matrix_t * matrix)

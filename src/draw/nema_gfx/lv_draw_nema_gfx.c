@@ -91,7 +91,7 @@ static int32_t nema_gfx_delete(lv_draw_unit_t * draw_unit);
 void lv_draw_nema_gfx_init(void)
 {
     lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = lv_draw_create_unit(sizeof(lv_draw_nema_gfx_unit_t));
-    /*Initiallize NemaGFX*/
+    /*Initialize NemaGFX*/
     nema_init();
 
     draw_nema_gfx_unit->base_unit.dispatch_cb = nema_gfx_dispatch;
@@ -100,7 +100,7 @@ void lv_draw_nema_gfx_init(void)
     draw_nema_gfx_unit->base_unit.name = "NEMA_GFX";
 
 #if LV_USE_NEMA_VG
-    /*Initiallize NemaVG */
+    /*Initialize NemaVG */
     nema_vg_init(LV_NEMA_GFX_MAX_RESX, LV_NEMA_GFX_MAX_RESY);
     /* Allocate VG Buffers*/
     draw_nema_gfx_unit->paint = nema_vg_paint_create();
@@ -116,7 +116,7 @@ void lv_draw_nema_gfx_init(void)
 
 
 #if LV_USE_OS
-    lv_thread_init(&draw_nema_gfx_unit->thread, LV_THREAD_PRIO_HIGH, nema_gfx_render_thread_cb, 2 * 1024,
+    lv_thread_init(&draw_nema_gfx_unit->thread, "nemagfx", LV_THREAD_PRIO_HIGH, nema_gfx_render_thread_cb, 2 * 1024,
                    draw_nema_gfx_unit);
 #endif
 }

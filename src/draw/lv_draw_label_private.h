@@ -50,6 +50,8 @@ struct _lv_draw_glyph_dsc_t {
     lv_font_glyph_dsc_t * g;
     lv_color_t color;
     lv_opa_t opa;
+    int32_t rotation;
+    lv_point_t pivot;          /**< Rotation pivot point associated with total glyph including line_height */
     lv_draw_buf_t * _draw_buf; /**< a shared draw buf for get_bitmap, do not use it directly, use glyph_data instead */
 };
 

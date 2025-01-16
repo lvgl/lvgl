@@ -92,7 +92,7 @@ Update mode
 Chart layers
 ------------
 When a chart is drawn, certain things appear on top of other things, in this
-oder, from back to front:
+order, from back to front:
 
 - The chart's background (with optional division lines)
 - Each data series:

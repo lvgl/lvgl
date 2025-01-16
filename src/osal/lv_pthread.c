@@ -38,9 +38,11 @@ static void * generic_callback(void * user_data);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*callback)(void *), size_t stack_size,
+lv_result_t lv_thread_init(lv_thread_t * thread, const char * const name, lv_thread_prio_t prio,
+                           void (*callback)(void *), size_t stack_size,
                            void * user_data)
 {
+    LV_UNUSED(name);
     LV_UNUSED(prio);
     pthread_attr_t attr;
     pthread_attr_init(&attr);

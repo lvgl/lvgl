@@ -3,35 +3,61 @@
 
 void lv_example_xml_1(void)
 {
-    lv_xml_component_register_from_file("A:lvgl/examples/others/xml/my_h3.xml");
-    lv_xml_component_register_from_file("A:lvgl/examples/others/xml/my_card.xml");
-    lv_xml_component_register_from_file("A:lvgl/examples/others/xml/my_button.xml");
-    lv_xml_component_register_from_file("A:lvgl/examples/others/xml/view.xml");
+    /*A red button created from builti-in LVGL widgets
+     *It has an API parameter too to change its text.*/
+    const char * red_button_xml =
+        "<component>"
+        "  <api>"
+        "    <prop name=\"button_text\" type=\"string\" default=\"None\"/>"
+        "  </api>"
+        "  <view extends=\"lv_button\" radius=\"0\" style_bg_color=\"0xa91500\">"
+        "    <lv_label text=\"$button_text\" align=\"center\"/>"
+        "  </view>"
+        "</component>";
 
-    lv_obj_t * obj = lv_xml_create(lv_screen_active(), "view", NULL);
-    lv_obj_set_pos(obj, 10, 10);
+    /*The card is just an lv_obj where a label and two red buttons are used.
+     * Its API allow setting a title (label test) and the action (the text of a button)*/
+    const char * card_xml =
+        "<component>"
+        "  <api>"
+        "    <prop name=\"title\" type=\"string\" default=\"Hello world\"/>"
+        "    <prop name=\"action\" type=\"string\"/>"
+        "  </api>"
+        "  <view width=\"200\" height=\"content\">"
+        "    <lv_label text=\"$title\" align=\"top_mid\"/>"
+        "    <red_button y=\"20\" align=\"top_left\" button_text=\"Cancel\"/>"
+        "    <red_button y=\"20\" align=\"top_right\" button_text=\"$action\"/>"
+        "  </view>"
+        "</component>";
 
-    const char * my_button_attrs[] = {
-        "x", "10",
-        "y", "-10",
-        "align", "bottom_left",
-        "btn_text", "New button",
+    /* Motor card is a special case of a card where the title and action are already set*/
+    const char * motor_card_xml =
+        "<component>"
+        "  <view extends=\"card\" title=\"Motor start?\" action=\"Start\">"
+        "  </view>"
+        "</component>";
+
+    /*Register all the custom components*/
+    lv_xml_component_register_from_data("red_button", red_button_xml);
+    lv_xml_component_register_from_data("card", card_xml);
+    lv_xml_component_register_from_data("motor_card", motor_card_xml);
+
+    lv_obj_t * card;
+    /*Create a card with the default values*/
+    card = lv_xml_create(lv_screen_active(), "card", NULL);
+
+    /*Create a motor card too. The returned value can be adjusted freely*/
+    card = lv_xml_create(lv_screen_active(), "motor_card", NULL);
+    lv_obj_set_y(card, 90);
+
+    /*Pass properties to a card*/
+    const char * attrs[] = {
+        "y", "180",
+        "action", "Apply",
+        "title", "New title",
         NULL, NULL,
     };
+    card = lv_xml_create(lv_screen_active(), "card", attrs);
 
-    lv_xml_component_unregister("my_button");
-
-    lv_xml_create(lv_screen_active(), "my_button", my_button_attrs);
-
-    const char * slider_attrs[] = {
-        "x", "200",
-        "y", "-15",
-        "align", "bottom_left",
-        "value", "30",
-        NULL, NULL,
-    };
-
-    lv_obj_t * slider = lv_xml_create(lv_screen_active(), "lv_slider", slider_attrs);
-    lv_obj_set_width(slider, 100);
 }
 #endif

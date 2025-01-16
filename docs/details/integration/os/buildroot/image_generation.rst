@@ -110,7 +110,7 @@ Let's modify the configuration with ``menuconfig``.
 
 Change these configurations: 
 
-    - Sytem host name to ``lvgl-buildroot`` under ``system_configuration > System hostname``.
+    - System host name to ``lvgl-buildroot`` under ``system_configuration > System hostname``.
     - Root password to ``lvgl-buildroot``  under ``system_configuration > Root password``.
     - Enable SSH in ``target-packages > Networking applications > openssh``
 

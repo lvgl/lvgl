@@ -587,6 +587,18 @@ static inline void lv_style_set_pad_gap(lv_style_t * style, int32_t value)
     lv_style_set_pad_column(style, value);
 }
 
+static inline void lv_style_set_margin_hor(lv_style_t * style, int32_t value)
+{
+    lv_style_set_margin_left(style, value);
+    lv_style_set_margin_right(style, value);
+}
+
+static inline void lv_style_set_margin_ver(lv_style_t * style, int32_t value)
+{
+    lv_style_set_margin_top(style, value);
+    lv_style_set_margin_bottom(style, value);
+}
+
 static inline void lv_style_set_margin_all(lv_style_t * style, int32_t value)
 {
     lv_style_set_margin_left(style, value);

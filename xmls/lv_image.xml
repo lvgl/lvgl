@@ -1,0 +1,35 @@
+<!--
+Example
+<lv_image src="logo" scale="300" rotate="30"/>
+-->
+
+<widget>
+	<api>
+		<enumdef name="lv_image_align" help="">
+
+		    <enum name="default" help=""/>
+		    <enum name="top_left" help=""/>
+		    <enum name="top_mid" help=""/>
+		    <enum name="top_right" help=""/>
+		    <enum name="bottom_left" help=""/>
+		    <enum name="bottom_mid" help=""/>
+		    <enum name="bottom_right" help=""/>
+		    <enum name="left_mid" help=""/>
+		    <enum name="right_mid" help=""/>
+		    <enum name="center" help=""/>
+		    <enum name="auto_transform" help=""/>
+		    <enum name="stretch" help=""/>
+		    <enum name="tile" help=""/>
+		</enumdef>
+
+	    <prop name="src" type="image" help=""/>
+	    <prop name="inner_align" type="enum:lv_image_align" help=""/>
+	    <prop name="rotation" type="int" help=""/>
+	    <prop name="scale_x" type="int" help=""/>
+	    <prop name="scale_y" type="int" help=""/>
+	    <prop name="pivot" help="">
+	    	<param name="pivot_x" type="int" help=""/>
+	    	<param name="pivot_y" type="int" help=""/>
+	    </prop>
+	</api>
+</widget>

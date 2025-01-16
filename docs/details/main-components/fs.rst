@@ -4,14 +4,18 @@
 File System (lv_fs_drv)
 =======================
 
-LVGL has a 'File system' abstraction module that enables you to attach
-any type of file system. A file system is identified by an assigned
-drive letter. For example, if an SD card is associated with the letter
-``'S'``, a file can be reached using ``"S:path/to/file.txt"``.
+LVGL has a "File system" abstraction module that enables you to attach
+any type of file system.  A file system is identified by an assigned
+identifier letter.  For example, if an SD card is associated with the letter
+``'S'``, a file can be reached using ``"S:/path/to/file.txt"``.  See details
+under :ref:`lv_fs_identifier_letters`.
 
 .. note::
 
-	If you want to skip the drive prefix from the path, you can use the :c:macro:`LV_FS_DEFAULT_DRIVE_LETTER` config parameter.
+    If you want to skip the drive-letter prefix in Unix-like paths, you can use the
+    :c:macro:`LV_FS_DEFAULT_DRIVER_LETTER` config parameter.
+
+
 
 Ready-to-use drivers
 ********************
@@ -20,15 +24,80 @@ LVGL contains prepared drivers for the API of POSIX, standard C,
 Windows, and `FATFS <http://elm-chan.org/fsw/ff/00index_e.html>`__.
 Learn more :ref:`here <libs_filesystem>`.
 
-Adding a driver
+
+
+.. _lv_fs_identifier_letters:
+
+Identifier Letters
+*********************
+
+As mentioned above, a file system is identified by an assigned identifier letter.
+This identifier is merely a way for the LVGL File System abtraction logic to look up
+the appropriate registered file-system driver for a given path.
+
+**How it Works:**
+
+You register a driver for your file system and assign it an identifier letter.  This
+letter must be unique among all registered file-system drivers, and in the range [A-Z]
+or the character '/'.  See :ref:`lv_fs_adding_a_driver` for how this is done.
+
+Later, when using paths to files on your file system, you prefix the path with that
+identifier character plus a colon (':').
+
+.. note::
+
+    Do not confuse this with a Windows or DOS drive letter.
+
+**Example:**
+
+Let's use the letter 'Z' as the identifier character, and "path_to_file" as the path,
+then the path strings you pass to ``lv_fs_...()`` functions would look like this::
+
+    "Z:path_to_file"
+     ^ ^^^^^^^^^^^^
+     |        |
+     |        +-- This part gets passed to the OS-level file-system functions.
+     |
+     +-- This part LVGL strips from path string, and uses it to find the appropriate
+         driver (i.e. set of functions) that apply to that file system.
+
+Note also that the path can be a relative path or a "rooted path" (beginning with
+``/``), though rooted paths are recommended since the driver does not yet provide a
+way to set the default directory.
+
+**Examples for Unix-like file systems:**
+
+- "Z:/etc/images/splash.png"
+- "Z:/etc/images/left_button.png"
+- "Z:/etc/images/right_button.png"
+- "Z:/home/users/me/wip/proposal.txt"
+
+**Examples for Windows/DOS-like file systems:**
+
+- "Z:C:/Users/me/wip/proposal.txt"
+- "Z:/Users/me/wip/proposal.txt"  (if the default drive is known to be C:)
+- "Z:C:/Users/Public/Documents/meeting_notes.txt"
+- "Z:D:/to_print.docx"
+
+Reminder:  Note carefully that the prefixed "Z:" has nothing to do with the "C:" and
+"D:" Windows/DOS drive letters in 3 of the above examples, which are part of the path.
+"Z:" is used to look up the driver for that file system in the list of all file-system
+drivers registered with LVGL.
+
+
+
+.. _lv_fs_adding_a_driver:
+
+Adding a Driver
 ***************
 
 Registering a driver
 --------------------
 
-To add a driver, a :cpp:type:`lv_fs_drv_t` needs to be initialized like below.
-The :cpp:type:`lv_fs_drv_t` needs to be static, global or dynamically allocated
-and not a local variable.
+To add a driver, a :cpp:type:`lv_fs_drv_t` object needs to be initialized and
+registered in a way similar to the code below.  The :cpp:type:`lv_fs_drv_t` variable
+needs to be static, global or dynamically allocated and not a local variable, since
+its contents need to remain valid as long as the driver is in use.
 
 .. code-block:: c
 
@@ -61,7 +130,7 @@ Implementing the callbacks
 --------------------------
 
 Open callback
-^^^^^^^^^^^^^
+~~~~~~~~~~~~~
 
 The prototype of ``open_cb`` looks like this:
 
@@ -75,7 +144,7 @@ The prototype of ``open_cb`` looks like this:
 The return value is a pointer to a *file object* that describes the
 opened file or ``NULL`` if there were any issues (e.g. the file wasn't
 found). The returned file object will be passed to other file system
-related callbacks. (see below)
+related callbacks. (See below.)
 
 Other callbacks
 ---------------
@@ -88,13 +157,75 @@ like this:
    lv_fs_res_t (*write_cb)(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw);
 
 For ``file_p``, LVGL passes the return value of ``open_cb``, ``buf`` is
-the data to write, ``btw`` is the Bytes To Write, ``bw`` is the actually
-written bytes.
+the data to write, ``btw`` is the number of "bytes to write", ``bw`` is the number of
+"bytes written" (written to during the function call).
 
-For a template of these callbacks see
+For a list of prototypes for these callbacks see
 `lv_fs_template.c <https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_fs_template.c>`__.
+This file also provides a template for new file-system drivers you can use if the
+one you need is not already provided.
 
-Usage example
+Drivers that come with LVGL
+---------------------------
+
+As of this writing, the list of already-available file-system drivers can be enabled
+by setting one or more of the following macros to a non-zero value in ``lv_conf.h``.
+The drivers are as implied by the macro names.
+
+If you use more than one, each associated identifier letter you use must be unique.
+
+- :c:macro:`LV_USE_FS_FATFS`
+- :c:macro:`LV_USE_FS_STDIO`
+- :c:macro:`LV_USE_FS_POSIX`
+- :c:macro:`LV_USE_FS_WIN32`
+- :c:macro:`LV_USE_FS_MEMFS`
+- :c:macro:`LV_USE_FS_LITTLEFS`
+- :c:macro:`LV_USE_FS_ARDUINO_ESP_LITTLEFS`
+- :c:macro:`LV_USE_FS_ARDUINO_SD`
+
+
+
+Limiting Directory Access
+*************************
+
+If you are using one of the following file-system drivers:
+
+- :c:macro:`LV_USE_FS_STDIO`
+- :c:macro:`LV_USE_FS_POSIX`
+- :c:macro:`LV_USE_FS_WIN32`
+
+you will have a ``LV_FS_xxx_PATH`` macro available to you in ``lv_conf.h`` that you
+can use to provide a path that gets dynamically prefixed to the ``path_to_file``
+portion of of the path strings provided to ``lv_fs_...()`` functions when files and
+directories are opened.  This can be useful to limit directory access (e.g. when a
+portion of a path can be typed by an end user), or simply to reduce the length of the
+path strings provided to ``lv_fs_...()`` functions.
+
+Do this by filling in the full path to the directory you wish his access to be
+limited to in the applicable ``LV_FS_xxx_PATH`` macro in ``lv_conf.h``.  Do not
+prefix the path with the driver-identifier letter, and do append a directory
+separator character at the end.
+
+**Examples for Unix-like file systems:**
+
+.. code-block:: c
+
+    #define LV_FS_WIN32_PATH   "/home/users/me/"
+
+**Examples for Windows/DOS-like file systems:**
+
+.. code-block:: c
+
+    #define LV_FS_WIN32_PATH   "C:/Users/me/"
+
+Then in both cases, path strings passed to ``lv_fs_...()`` functions in the
+application get reduced to:
+
+- "Z:wip/proposal.txt"
+
+
+
+Usage Example
 *************
 
 The example below shows how to read from a file:
@@ -113,8 +244,9 @@ The example below shows how to read from a file:
 
    lv_fs_close(&f);
 
-The mode in :cpp:func:`lv_fs_open` can be :cpp:enumerator:`LV_FS_MODE_WR` to open for writes
-only or :cpp:enumerator:`LV_FS_MODE_RD` ``|`` :cpp:enumerator:`LV_FS_MODE_WR` for both
+The mode in :cpp:func:`lv_fs_open` can be :cpp:enumerator:`LV_FS_MODE_WR` to open for
+writes only, :cpp:enumerator:`LV_FS_MODE_RD` for reads only, or
+:cpp:enumerator:`LV_FS_MODE_RD` ``|`` :cpp:enumerator:`LV_FS_MODE_WR` for both.
 
 This example shows how to read a directory's content. It's up to the
 driver how to mark directories in the result but it can be a good
@@ -135,7 +267,7 @@ practice to insert a ``'/'`` in front of each directory name.
            break;
        }
 
-       /* fn is empty, if not more files to read */
+       /* fn is empty if there are no more files to read. */
        if(strlen(fn) == 0) {
            break;
        }
@@ -145,13 +277,15 @@ practice to insert a ``'/'`` in front of each directory name.
 
    lv_fs_dir_close(&dir);
 
-Use drives for images
+
+
+Use Drives for Images
 *********************
 
 :ref:`Image <lv_image>` Widgets can be opened from files as well (besides
 variables stored in the compiled program).
 
-To use files in image widgets the following callbacks are required:
+To use files in Image Widgets the following callbacks are required:
 
 - open
 - close
@@ -159,9 +293,11 @@ To use files in image widgets the following callbacks are required:
 - seek
 - tell
 
+
+
 .. _overview_file_system_cache:
 
-Optional file buffering/caching
+Optional File Buffering/Caching
 *******************************
 
 Files will buffer their reads if the corresponding ``LV_FS_*_CACHE_SIZE``
@@ -247,6 +383,8 @@ to determine where the end of the file is.
 ------------------------------------------------------
 
 The driver's ``tell`` will not actually be called.
+
+
 
 .. _overview_file_system_api:
 

@@ -25,9 +25,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if LV_USE_STDLIB_STRING != LV_STDLIB_CLIB
-    static bool lv_xml_is_digit(char c, int base);
-#endif
+static bool is_digit(char c, int base);
 
 /**********************
  *  STATIC VARIABLES
@@ -59,29 +57,26 @@ lv_color_t lv_xml_to_color(const char * str)
     return lv_color_hex(lv_xml_strtol(str, NULL, 16));
 }
 
+lv_opa_t lv_xml_to_opa(const char * str)
+{
+    int32_t v = lv_xml_atoi(str);
+    size_t len = lv_strlen(str);
+    if(str[len - 1] == '%') {
+        v = v * 255 / 100;
+    }
+
+    v = LV_CLAMP(0, v, 255);
+    return (lv_opa_t)v;
+}
+
 bool lv_xml_to_bool(const char * str)
 {
     return lv_streq(str, "false") ? false : true;
 }
 
-
-#if LV_USE_STDLIB_STRING == LV_STDLIB_CLIB
-int32_t lv_xml_atoi(const char * str)
+int32_t lv_xml_atoi_split(const char ** str, char delimiter)
 {
-    return atoi(str);
-}
-
-
-int32_t lv_xml_strtol(const char * str, char ** endptr, int32_t base)
-{
-    return strtol(str, endptr, base);
-}
-
-#else /*LV_USE_STDLIB_STRING == LV_STDLIB_CLIB*/
-
-int32_t lv_xml_atoi(const char * str)
-{
-    const char * s = str;
+    const char * s = *str;
     int32_t result = 0;
     int sign = 1;
 
@@ -98,24 +93,32 @@ int32_t lv_xml_atoi(const char * str)
     }
 
     /* Convert the string*/
-    while(*s) {
+    while(*s != delimiter) {
         if(*s >= '0' && *s <= '9') {
             int32_t digit = *s - '0';
-
-            /* Check for overflow before it happens */
-            if(result > (INT_MAX - digit) / 10) {
-                return (sign == 1) ? INT_MAX : INT_MIN; // Return limits on overflow
-            }
 
             result = result * 10 + digit;
             s++;
         }
         else {
-            break; // Non-digit character
+            break; /* Non-digit character */
         }
     }
 
-    return result * sign;
+    result = result * sign;
+
+    if(*s != '\0') s++; /*Skip the delimiter*/
+    *str = s;
+    return result;
+
+}
+
+
+int32_t lv_xml_atoi(const char * str)
+{
+
+    return lv_xml_atoi_split(&str, '\0');
+
 }
 
 int32_t lv_xml_strtol(const char * str, char ** endptr, int32_t base)
@@ -157,7 +160,7 @@ int32_t lv_xml_strtol(const char * str, char ** endptr, int32_t base)
     while(*s) {
         int32_t digit;
 
-        if(lv_xml_is_digit(*s, base)) {
+        if(is_digit(*s, base)) {
             if(*s >= '0' && *s <= '9') {
                 digit = *s - '0';
             }
@@ -168,7 +171,7 @@ int32_t lv_xml_strtol(const char * str, char ** endptr, int32_t base)
                 digit = *s - 'A' + 10;
             }
             else {
-                /* This should not happen due to lv_xml_is_digit check*/
+                /* This should not happen due to is_digit check*/
                 break;
             }
 
@@ -191,8 +194,6 @@ int32_t lv_xml_strtol(const char * str, char ** endptr, int32_t base)
 
     return result * sign;
 }
-
-#endif /*LV_USE_STDLIB_STRING == LV_STDLIB_CLIB*/
 
 char * lv_xml_split_str(char ** src, char delimiter)
 {
@@ -221,8 +222,7 @@ char * lv_xml_split_str(char ** src, char delimiter)
  *   STATIC FUNCTIONS
  **********************/
 
-#if LV_USE_STDLIB_STRING != LV_STDLIB_CLIB
-static bool lv_xml_is_digit(char c, int base)
+static bool is_digit(char c, int base)
 {
     if(base <= 10) {
         return (c >= '0' && c < '0' + base);
@@ -232,6 +232,5 @@ static bool lv_xml_is_digit(char c, int base)
     }
 }
 
-#endif /*LV_USE_STDLIB_STRING == LV_STDLIB_CLIB*/
 
 #endif /* LV_USE_XML */

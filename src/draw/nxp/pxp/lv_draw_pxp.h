@@ -24,7 +24,8 @@ extern "C" {
 
 #if LV_USE_PXP
 #if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
-#include "../../sw/lv_draw_sw_private.h"
+#include "../../lv_draw_private.h"
+#include "../../../display/lv_display_private.h"
 #include "../../../misc/lv_area_private.h"
 
 /*********************
@@ -35,7 +36,16 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef lv_draw_sw_unit_t lv_draw_pxp_unit_t;
+typedef struct lv_draw_pxp_unit_t {
+    lv_draw_unit_t base_unit;
+    lv_draw_task_t * task_act;
+#if LV_USE_OS
+    lv_thread_sync_t sync;
+    lv_thread_t thread;
+    volatile bool inited;
+    volatile bool exit_status;
+#endif
+} lv_draw_pxp_unit_t;
 
 /**********************
  * GLOBAL PROTOTYPES

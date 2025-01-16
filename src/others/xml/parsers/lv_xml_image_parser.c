@@ -23,6 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static lv_image_align_t image_align_to_enum(const char * txt);
 
 /**********************
  *  STATIC VARIABLES
@@ -49,40 +50,9 @@ void * lv_xml_image_create(lv_xml_parser_state_t * state, const char ** attrs)
     return item;
 }
 
-void lv_xml_check_file(const char * filepath)
-{
-    lv_fs_file_t f;
-    lv_fs_res_t res = lv_fs_open(&f, filepath, LV_FS_MODE_RD);
-
-    if(res == LV_FS_RES_OK) {
-        uint32_t size;
-        uint8_t buffer[10];
-        lv_fs_read(&f, buffer, 0, &size);
-
-        lv_fs_seek(&f, 0, LV_FS_SEEK_END);
-        lv_fs_tell(&f, &size);
-        LV_LOG_USER("File %s exists (%u bytes)", filepath, size);
-
-
-        lv_fs_close(&f);
-
-        lv_image_header_t info;
-        lv_image_decoder_get_info(filepath, &info);
-        LV_LOG_USER("Image info: %d x %d, %d color", info.w, info.h, info.cf);
-    }
-    else {
-        LV_LOG_ERROR("Failed to open file: %s", filepath);
-    }
-}
-
 void lv_xml_image_apply(lv_xml_parser_state_t * state, const char ** attrs)
 {
     void * item = lv_xml_state_get_item(state);
-
-    if(item == NULL) {
-        LV_LOG_ERROR("Failed to get image");
-        return;
-    }
 
     lv_xml_obj_apply(state, attrs); /*Apply the common properties, e.g. width, height, styles flags etc*/
 
@@ -90,15 +60,15 @@ void lv_xml_image_apply(lv_xml_parser_state_t * state, const char ** attrs)
         const char * name = attrs[i];
         const char * value = attrs[i + 1];
 
-        if(lv_streq("src", name)) {
-            const void * img_src = lv_xml_get_image(value);
-            if(img_src == NULL) {
-                LV_LOG_WARN("Failed to get image source for '%s'", value);
-                return;
-            }
-
-            lv_image_set_src(item, (const char *)img_src);
-
+        if(lv_streq("src", name)) lv_image_set_src(item, lv_xml_get_image(value));
+        if(lv_streq("inner_align", name)) lv_image_set_inner_align(item, image_align_to_enum(value));
+        if(lv_streq("rotation", name)) lv_image_set_rotation(item, lv_xml_atoi(value));
+        if(lv_streq("scale_x", name)) lv_image_set_scale_x(item, lv_xml_atoi(value));
+        if(lv_streq("scale_y", name)) lv_image_set_scale_y(item, lv_xml_atoi(value));
+        if(lv_streq("pivot", name)) {
+            int32_t x = lv_xml_atoi_split(&value, ' ');
+            int32_t y = lv_xml_atoi_split(&value, ' ');
+            lv_image_set_pivot(item, x, y);
         }
 
     }
@@ -108,5 +78,24 @@ void lv_xml_image_apply(lv_xml_parser_state_t * state, const char ** attrs)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static lv_image_align_t image_align_to_enum(const char * txt)
+{
+    if(lv_streq("top_left", txt)) return LV_IMAGE_ALIGN_TOP_LEFT;
+    if(lv_streq("top_mid", txt)) return LV_IMAGE_ALIGN_TOP_MID;
+    if(lv_streq("top_right", txt)) return LV_IMAGE_ALIGN_TOP_RIGHT;
+    if(lv_streq("bottom_left", txt)) return LV_IMAGE_ALIGN_BOTTOM_LEFT;
+    if(lv_streq("bottom_mid", txt)) return LV_IMAGE_ALIGN_BOTTOM_MID;
+    if(lv_streq("bottom_right", txt)) return LV_IMAGE_ALIGN_BOTTOM_RIGHT;
+    if(lv_streq("right_mid", txt)) return LV_IMAGE_ALIGN_RIGHT_MID;
+    if(lv_streq("left_mid", txt)) return LV_IMAGE_ALIGN_LEFT_MID;
+    if(lv_streq("center", txt)) return LV_IMAGE_ALIGN_CENTER;
+    if(lv_streq("stretch", txt)) return LV_IMAGE_ALIGN_STRETCH;
+    if(lv_streq("tile", txt)) return LV_IMAGE_ALIGN_TILE;
+
+    LV_LOG_WARN("%s is an unknown value for image align", txt);
+    return 0; /*Return 0 in lack of a better option. */
+}
+
 
 #endif /* LV_USE_XML */

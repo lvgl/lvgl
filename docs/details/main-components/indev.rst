@@ -187,7 +187,7 @@ and ``gesture_type`` fields of the structure ``lv_indev_data_t``
    /* An array that stores the collected touch events */
    static lv_indev_touch_data_t touches[10];
 
-   /* A counter that needs to be incremented each time a touch event is recieved */
+   /* A counter that needs to be incremented each time a touch event is received */
    static uint8_t touch_cnt;
 
    static void touch_read_callback(lv_indev_t * drv, lv_indev_data_t * data)

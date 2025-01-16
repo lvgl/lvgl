@@ -25,6 +25,7 @@ extern "C" {
 
 #define LV_ANIM_REPEAT_INFINITE      0xFFFFFFFF
 #define LV_ANIM_PLAYTIME_INFINITE    0xFFFFFFFF
+#define LV_ANIM_PAUSE_FOREVER        0xFFFFFFFF
 
 /*
  * Macros used to set cubic-bezier anim parameter.
@@ -80,10 +81,9 @@ LV_EXPORT_CONST_INT(LV_ANIM_PLAYTIME_INFINITE);
  **********************/
 
 /** Can be used to indicate if animations are enabled or disabled in a case*/
-typedef enum {
-    LV_ANIM_OFF,
-    LV_ANIM_ON,
-} lv_anim_enable_t;
+#define LV_ANIM_OFF false
+#define LV_ANIM_ON true
+typedef bool lv_anim_enable_t;
 
 /** Get the current value during an animation*/
 typedef int32_t (*lv_anim_path_cb_t)(const lv_anim_t *);
@@ -122,35 +122,39 @@ typedef struct {
 
 /** Describes an animation*/
 struct _lv_anim_t {
-    void * var;                               /**< Variable to animate*/
-    lv_anim_exec_xcb_t exec_cb;               /**< Function to execute to animate*/
+    void * var;                               /**< Variable (Widget or other user-provided object) to animate */
+    lv_anim_exec_xcb_t exec_cb;               /**< Function to execute to animate */
     lv_anim_custom_exec_cb_t custom_exec_cb;  /**< Function to execute to animate,
-                                               * same purpose as exec_cb but different parameters*/
-    lv_anim_start_cb_t start_cb;              /**< Call it when the animation is starts (considering `delay`)*/
-    lv_anim_completed_cb_t completed_cb;      /**< Call it when the animation is fully completed*/
-    lv_anim_deleted_cb_t deleted_cb;          /**< Call it when the animation is deleted*/
-    lv_anim_get_value_cb_t get_value_cb;      /**< Get the current value in relative mode*/
-    void * user_data;                         /**< Custom user data*/
-    lv_anim_path_cb_t path_cb;                /**< Describe the path (curve) of animations*/
-    int32_t start_value;                      /**< Start value*/
-    int32_t current_value;                    /**< Current value*/
-    int32_t end_value;                        /**< End value*/
-    int32_t duration;                         /**< Animation time in ms*/
-    int32_t act_time;                         /**< Current time in animation. Set to negative to make delay.*/
-    uint32_t playback_delay;                  /**< Wait before play back*/
-    uint32_t playback_duration;               /**< Duration of playback animation*/
-    uint32_t repeat_delay;                    /**< Wait before repeat*/
-    uint32_t repeat_cnt;                      /**< Repeat count for the animation*/
+                                               * same purpose as exec_cb but different parameters */
+    lv_anim_start_cb_t start_cb;              /**< Call it when animation is starts (considering `delay`) */
+    lv_anim_completed_cb_t completed_cb;      /**< Call it when animation is fully completed */
+    lv_anim_deleted_cb_t deleted_cb;          /**< Call it when animation is deleted */
+    lv_anim_get_value_cb_t get_value_cb;      /**< Get current value in relative mode */
+    void * user_data;                         /**< Custom user data */
+    lv_anim_path_cb_t path_cb;                /**< Provides path (curve) of animation */
+    int32_t start_value;                      /**< Start value */
+    int32_t current_value;                    /**< Current value */
+    int32_t end_value;                        /**< End value */
+    int32_t duration;                         /**< Animation duration in ms */
+    int32_t act_time;                         /**< Ms elapsed since animation started. Set to negative to make delay. */
+    uint32_t reverse_delay;                   /**< Wait (in ms) after forward play ends and before reverse play begins. */
+    uint32_t reverse_duration;                /**< Reverse animation duration in ms */
+    uint32_t repeat_delay;                    /**< Wait before repeating */
+    uint32_t repeat_cnt;                      /**< Repeat count for animation */
     union _lv_anim_path_para_t {
-        lv_anim_bezier3_para_t bezier3;       /**< Parameter used when path is custom_bezier*/
+        lv_anim_bezier3_para_t bezier3;       /**< Parameter used when path is custom_bezier */
     } parameter;
 
     /* Animation system use these - user shouldn't set */
     uint32_t last_timer_run;
-    uint8_t playback_now : 1;     /**< Play back is in progress*/
-    uint8_t run_round : 1;        /**< Indicates the animation has run in this round*/
-    uint8_t start_cb_called : 1;  /**< Indicates that the `start_cb` was already called*/
-    uint8_t early_apply  : 1;     /**< 1: Apply start value immediately even is there is `delay`*/
+    uint32_t pause_time;                      /**<The time when the animation was paused*/
+    uint32_t pause_duration;                  /**<The amount of the time the animation must stay paused for*/
+    uint8_t is_paused : 1;                    /**<Indicates that the animation is paused */
+    uint8_t reverse_play_in_progress : 1;     /**< Reverse play is in progress */
+    uint8_t run_round : 1;                    /**< When not equal to global.anim_state.anim_run_round (which toggles each
+                                               * time animation timer executes), indicates this animation needs to be updated. */
+    uint8_t start_cb_called : 1;              /**< Indicates that `start_cb` was already called */
+    uint8_t early_apply  : 1;                 /**< 1: Apply start value immediately even is there is a `delay` */
 };
 
 /**********************
@@ -192,16 +196,37 @@ void lv_anim_set_exec_cb(lv_anim_t * a, lv_anim_exec_xcb_t exec_cb);
 void lv_anim_set_duration(lv_anim_t * a, uint32_t duration);
 
 /**
- * Legacy `lv_anim_set_time` API will be removed soon, use `lv_anim_set_duration` instead.
- */
-void lv_anim_set_time(lv_anim_t * a, uint32_t duration);
-
-/**
  * Set a delay before starting the animation
  * @param a         pointer to an initialized `lv_anim_t` variable
  * @param delay     delay before the animation in milliseconds
  */
 void lv_anim_set_delay(lv_anim_t * a, uint32_t delay);
+
+/**
+ * Resumes a paused animation
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ */
+void lv_anim_resume(lv_anim_t * a);
+
+/**
+ * Pauses the animation
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ */
+void lv_anim_pause(lv_anim_t * a);
+
+/**
+ * Pauses the animation for ms milliseconds
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ * @param ms        the pause time in milliseconds
+ */
+void lv_anim_pause_for(lv_anim_t * a, uint32_t ms);
+
+/**
+ * Check if the animation is paused
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ * @return          true if the animation is paused else false
+ */
+bool lv_anim_is_paused(lv_anim_t * a);
 
 /**
  * Set the start and end values of an animation
@@ -262,19 +287,19 @@ void lv_anim_set_deleted_cb(lv_anim_t * a, lv_anim_deleted_cb_t deleted_cb);
  * @param a         pointer to an initialized `lv_anim_t` variable
  * @param duration  duration of playback animation in milliseconds. 0: disable playback
  */
-void lv_anim_set_playback_duration(lv_anim_t * a, uint32_t duration);
+void lv_anim_set_reverse_duration(lv_anim_t * a, uint32_t duration);
 
 /**
- * Legacy `lv_anim_set_playback_time` API will be removed soon, use `lv_anim_set_playback_duration` instead.
+ * Legacy `lv_anim_set_reverse_time` API will be removed soon, use `lv_anim_set_reverse_duration` instead.
  */
-void lv_anim_set_playback_time(lv_anim_t * a, uint32_t duration);
+void lv_anim_set_reverse_time(lv_anim_t * a, uint32_t duration);
 
 /**
  * Make the animation to play back to when the forward direction is ready
  * @param a         pointer to an initialized `lv_anim_t` variable
  * @param delay     delay in milliseconds before starting the playback animation.
  */
-void lv_anim_set_playback_delay(lv_anim_t * a, uint32_t delay);
+void lv_anim_set_reverse_delay(lv_anim_t * a, uint32_t delay);
 
 /**
  * Make the animation repeat itself.
@@ -417,15 +442,21 @@ uint16_t lv_anim_count_running(void);
 
 /**
  * Store the speed as a special value which can be used as time in animations.
- * It will be converted to time internally based on the start and end values
+ * It will be converted to time internally based on the start and end values.
+ * The return value can be used as a constant with multiple animations
+ * and let LVGL convert the speed to time based on the actual values.
+ * LIMITATION: the max time stored this way can be 10,000 ms.
  * @param speed         the speed of the animation in with unit / sec resolution in 0..10k range
  * @return              a special value which can be used as an animation time
+ * @note                internally speed is stored as 10 unit/sec
  */
 uint32_t lv_anim_speed(uint32_t speed);
 
 /**
  * Store the speed as a special value which can be used as time in animations.
- * It will be converted to time internally based on the start and end values
+ * It will be converted to time internally based on the start and end values.
+ * The return value can be used as a constant with multiple animations
+ * and let LVGL convert the speed to time based on the actual values.
  * @param speed         the speed of the animation in as unit / sec resolution in 0..10k range
  * @param min_time      the minimum time in 0..10k range
  * @param max_time      the maximum time in 0..10k range
@@ -437,13 +468,27 @@ uint32_t lv_anim_speed(uint32_t speed);
 uint32_t lv_anim_speed_clamped(uint32_t speed, uint32_t min_time, uint32_t max_time);
 
 /**
+ * Resolve the speed (created with `lv_anim_speed` or `lv_anim_speed_clamped`) to time
+ * based on start and end values.
+ * @param speed     return values of `lv_anim_speed` or `lv_anim_speed_clamped`
+ * @param start     the start value of the animation
+ * @param end       the end value of the animation
+ * @return          the time required to get from `start` to `end` with the given `speed` setting
+ */
+uint32_t lv_anim_resolve_speed(uint32_t speed, int32_t start, int32_t end);
+
+/**
  * Calculate the time of an animation based on its speed, start and end values.
+ * It simpler than `lv_anim_speed` or `lv_anim_speed_clamped` as it converts
+ * speed, start, and end to a time immediately.
+ * As it's simpler there is no limit on the maximum time.
  * @param speed         the speed of the animation
  * @param start         the start value
  * @param end           the end value
  * @return              the time of the animation in milliseconds
  */
 uint32_t lv_anim_speed_to_time(uint32_t speed, int32_t start, int32_t end);
+
 
 /**
  * Manually refresh the state of the animations.

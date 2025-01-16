@@ -51,6 +51,8 @@ void test_file_explorer_read_dir(void)
         }
     }
 
+    /* Since the default table->col_act = LV_TABLE_CELL_NONE, it is necessary to specify file_table->col_act = 0 */
+    file_table->col_act = 0;
     file_table->row_act = dev_row;
     lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
     TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/dev/",

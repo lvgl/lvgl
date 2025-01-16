@@ -503,7 +503,7 @@ Compile (do_compile)
    This is a optional steps, executes if compilation is available.
 
    If there are any compilation steps, then these steps are define in
-   do_compile() funtion of bitbake.
+   do_compile() function of bitbake.
 
    Like in the previous task, this is handle by ``inherit cmake``.
 
@@ -583,10 +583,10 @@ To generate an SDK of the environment, run the following command:
 
     bitbake core-image-base -c populate_sdk
 
-This will create a sript ``build/tmp/deploy/sdk/
+This will create a script ``build/tmp/deploy/sdk/
 poky-glibc-x86_64-core-image-base-cortexa53-raspberrypi3-64-toolchain-5.0.4.
 sh``. This script allows you to install the SDK where you prefer. Here is the
-execution output of the scrips
+execution output of the script
 
 .. code-block:: bash
 
@@ -652,7 +652,7 @@ directory tree should look like the following
 Create a recipe
 ===============
 
-Following this structure, create  a folder containing the recipies to build 1
+Following this structure, create a folder containing the recipes to build 1
 or multiple applications using lvgl
 
 .. code-block::

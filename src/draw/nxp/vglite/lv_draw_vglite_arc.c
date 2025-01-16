@@ -672,11 +672,8 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
     lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
 
-    vg_lite_matrix_t matrix;
-    vg_lite_identity(&matrix);
-
     /*** Draw arc ***/
-    VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol));
+    VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
 
     vglite_run();
 
