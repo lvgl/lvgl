@@ -133,11 +133,8 @@ static void _vglite_fill(const lv_area_t * dest_area, const lv_draw_fill_dsc_t *
                                              (vg_lite_float_t) dest_area->x1, (vg_lite_float_t) dest_area->y1,
                                              ((vg_lite_float_t) dest_area->x2) + 1.0f, ((vg_lite_float_t) dest_area->y2) + 1.0f));
 
-        vg_lite_matrix_t matrix;
-        vg_lite_identity(&matrix);
-
         /*Draw rectangle*/
-        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol));
+        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
 
         vglite_run();
 
@@ -167,9 +164,6 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
     VGLITE_CHECK_ERROR(vg_lite_init_path(&path, VG_LITE_S32, path_quality, path_data_size, path_data,
                                          (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
                                          ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
-
-    vg_lite_matrix_t matrix;
-    vg_lite_identity(&matrix);
 
     /*** Init Color ***/
     lv_color32_t col32 = lv_color_to_32(dsc->color, opa);
@@ -219,11 +213,11 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
             vg_lite_scale((float)width / 256.0f, 1.0f, grad_matrix);
         }
 
-        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, &gradient,
+        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, NULL, &gradient,
                                                  VG_LITE_BLEND_SRC_OVER));
     }
     else {
-        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol));
+        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
     }
 
     vglite_run();

@@ -131,9 +131,6 @@ static void _vglite_draw_border(const lv_area_t * coords, const lv_area_t * clip
     lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
 
-    vg_lite_matrix_t matrix;
-    vg_lite_identity(&matrix);
-
     int32_t line_width = dsc->width;
     lv_border_side_t border_side = dsc->side;
 
@@ -190,7 +187,7 @@ static void _vglite_draw_border(const lv_area_t * coords, const lv_area_t * clip
 
     VGLITE_CHECK_ERROR(vg_lite_update_stroke(&path));
 
-    VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol));
+    VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
 
     vglite_run();
 

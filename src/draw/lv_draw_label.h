@@ -44,6 +44,7 @@ typedef struct {
     int32_t letter_space;
     int32_t ofs_x;
     int32_t ofs_y;
+    int32_t rotation;
     lv_opa_t opa;
     lv_base_dir_t bidi_dir;
     lv_text_align_t align;
@@ -61,6 +62,25 @@ typedef struct {
     uint8_t text_static : 1;
     lv_draw_label_hint_t * hint;
 } lv_draw_label_dsc_t;
+
+typedef struct {
+    lv_draw_dsc_base_t base;
+
+    uint32_t unicode;
+    const lv_font_t * font;
+    lv_color_t color;
+
+    int32_t rotation;
+    int32_t scale_x;
+    int32_t scale_y;
+    int32_t skew_x;
+    int32_t skew_y;
+    lv_point_t pivot;
+
+    lv_opa_t opa;
+    lv_text_decor_t decor : 3;
+    lv_blend_mode_t blend_mode : 3;
+} lv_draw_letter_dsc_t;
 
 /**
  * Passed as a parameter to `lv_draw_label_iterate_characters` to
@@ -80,6 +100,8 @@ typedef void(*lv_draw_glyph_cb_t)(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_letter_dsc_init(lv_draw_letter_dsc_t * dsc);
 
 /**
  * Initialize a label draw descriptor
@@ -121,6 +143,15 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_character(lv_layer_t * layer, lv_draw_l
                                                    const lv_point_t * point, uint32_t unicode_letter);
 
 /**
+ * Draw a single letter
+ * @param layer          pointer to a layer
+ * @param dsc            pointer to draw descriptor
+ * @param point          position of the label
+ */
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_letter(lv_layer_t * layer, lv_draw_letter_dsc_t * dsc,
+                                                const lv_point_t * point);
+
+/**
  * Should be used during rendering the characters to get the position and other
  * parameters of the characters
  * @param draw_unit     pointer to a draw unit
@@ -130,6 +161,25 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_character(lv_layer_t * layer, lv_draw_l
  */
 void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,
                                       const lv_area_t * coords, lv_draw_glyph_cb_t cb);
+
+/**
+ * @brief Draw a single letter using the provided draw unit, glyph descriptor, position, font, and callback.
+ *
+ * This function is responsible for rendering a single character from a text string,
+ * applying the necessary styling described by the glyph descriptor (`dsc`). It handles
+ * the retrieval of the glyph's description, checks its visibility within the clipping area,
+ * and invokes the callback (`cb`) to render the glyph at the specified position (`pos`)
+ * using the given font (`font`).
+ *
+ * @param draw_unit     Pointer to the drawing unit handling the rendering context.
+ * @param dsc           Pointer to the descriptor containing styling for the glyph to be drawn.
+ * @param pos           Pointer to the point coordinates where the letter should be drawn.
+ * @param font          Pointer to the font containing the glyph.
+ * @param letter        The Unicode code point of the letter to be drawn.
+ * @param cb            Callback function to execute the actual rendering of the glyph.
+ */
+void lv_draw_unit_draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
+                              const lv_font_t * font, uint32_t letter, lv_draw_glyph_cb_t cb);
 
 /***********************
  * GLOBAL VARIABLES

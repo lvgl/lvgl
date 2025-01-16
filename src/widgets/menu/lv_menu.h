@@ -69,21 +69,21 @@ lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char const * const title);
 
 /**
  * Create a menu cont object
- * @param parent    pointer to an object, it will be the parent of the new menu cont object
+ * @param parent    pointer to a menu page object, it will be the parent of the new menu cont object
  * @return          pointer to the created menu cont
  */
 lv_obj_t * lv_menu_cont_create(lv_obj_t * parent);
 
 /**
  * Create a menu section object
- * @param parent    pointer to an object, it will be the parent of the new menu section object
+ * @param parent    pointer to a menu page object, it will be the parent of the new menu section object
  * @return          pointer to the created menu section
  */
 lv_obj_t * lv_menu_section_create(lv_obj_t * parent);
 
 /**
  * Create a menu separator object
- * @param parent    pointer to an object, it will be the parent of the new menu separator object
+ * @param parent    pointer to a menu page object, it will be the parent of the new menu separator object
  * @return          pointer to the created menu separator
  */
 lv_obj_t * lv_menu_separator_create(lv_obj_t * parent);

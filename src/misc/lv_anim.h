@@ -25,6 +25,7 @@ extern "C" {
 
 #define LV_ANIM_REPEAT_INFINITE      0xFFFFFFFF
 #define LV_ANIM_PLAYTIME_INFINITE    0xFFFFFFFF
+#define LV_ANIM_PAUSE_FOREVER        0xFFFFFFFF
 
 /*
  * Macros used to set cubic-bezier anim parameter.
@@ -146,6 +147,9 @@ struct _lv_anim_t {
 
     /* Animation system use these - user shouldn't set */
     uint32_t last_timer_run;
+    uint32_t pause_time;                      /**<The time when the animation was paused*/
+    uint32_t pause_duration;                  /**<The amount of the time the animation must stay paused for*/
+    uint8_t is_paused : 1;                    /**<Indicates that the animation is paused */
     uint8_t reverse_play_in_progress : 1;     /**< Reverse play is in progress */
     uint8_t run_round : 1;                    /**< When not equal to global.anim_state.anim_run_round (which toggles each
                                                * time animation timer executes), indicates this animation needs to be updated. */
@@ -197,6 +201,32 @@ void lv_anim_set_duration(lv_anim_t * a, uint32_t duration);
  * @param delay     delay before the animation in milliseconds
  */
 void lv_anim_set_delay(lv_anim_t * a, uint32_t delay);
+
+/**
+ * Resumes a paused animation
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ */
+void lv_anim_resume(lv_anim_t * a);
+
+/**
+ * Pauses the animation
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ */
+void lv_anim_pause(lv_anim_t * a);
+
+/**
+ * Pauses the animation for ms milliseconds
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ * @param ms        the pause time in milliseconds
+ */
+void lv_anim_pause_for(lv_anim_t * a, uint32_t ms);
+
+/**
+ * Check if the animation is paused
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ * @return          true if the animation is paused else false
+ */
+bool lv_anim_is_paused(lv_anim_t * a);
 
 /**
  * Set the start and end values of an animation

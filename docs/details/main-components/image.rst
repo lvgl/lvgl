@@ -188,27 +188,28 @@ and attach them to LVGL via the *Image decoder* interface.
 
 An image decoder consists of 4 callbacks:
 
-- **info** get some basic info about the image (width, height and color format).
-- **open** open an image:
-    - store a decoded image
-    - set it to ``NULL`` to indicate the image can be read line-by-line.
-- **get_area** if *open* didn't fully open an image this function should give back part of image as decoded data.
-- **close** close an opened image, free the allocated resources.
+:info:     get some basic info about the image (width, height and color format).
+:open:     open an image:
+           - store a decoded image
+           - set it to ``NULL`` to indicate the image can be read line-by-line.
+:get_area: if *open* didn't fully open an image this function should give back part of image as decoded data.
+:close:    close an opened image, free the allocated resources.
 
 You can add any number of image decoders. When an image needs to be
 drawn, the library will try all the registered image decoders until it
 finds one which can open the image, i.e. one which knows that format.
 
 The following formats are understood by the built-in decoder:
-- ``LV_COLOR_FORMAT_I1``
-- ``LV_COLOR_FORMAT_I2``
-- ``LV_COLOR_FORMAT_I4``
-- ``LV_COLOR_FORMAT_I8``
-- ``LV_COLOR_FORMAT_RGB888``
-- ``LV_COLOR_FORMAT_XRGB8888``
-- ``LV_COLOR_FORMAT_ARGB8888``
-- ``LV_COLOR_FORMAT_RGB565``
-- ``LV_COLOR_FORMAT_RGB565A8``
+
+- :cpp:enumerator:`LV_COLOR_FORMAT_I1`
+- :cpp:enumerator:`LV_COLOR_FORMAT_I2`
+- :cpp:enumerator:`LV_COLOR_FORMAT_I4`
+- :cpp:enumerator:`LV_COLOR_FORMAT_I8`
+- :cpp:enumerator:`LV_COLOR_FORMAT_RGB888`
+- :cpp:enumerator:`LV_COLOR_FORMAT_XRGB8888`
+- :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888`
+- :cpp:enumerator:`LV_COLOR_FORMAT_RGB565`
+- :cpp:enumerator:`LV_COLOR_FORMAT_RGB565A8`
 
 
 Custom image formats
@@ -230,8 +231,8 @@ library. In other words, the image decoder must decode the *Raw* images
 to *True color* according to the format described in the :ref:`overview_image_color_formats` section.
 
 
-Register an image decoder
--------------------------
+Registering an image decoder
+----------------------------
 
 Here's an example of getting LVGL to work with PNG images.
 

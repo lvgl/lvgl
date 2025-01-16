@@ -75,7 +75,7 @@ handle the supported draw tasks.
 .. code-block:: c
 
     #if LV_USE_PXP_DRAW_THREAD
-        lv_thread_init(&draw_pxp_unit->thread, LV_THREAD_PRIO_HIGH, _pxp_render_thread_cb, 2 * 1024, draw_pxp_unit);
+        lv_thread_init(&draw_pxp_unit->thread, "pxpdraw", LV_THREAD_PRIO_HIGH, _pxp_render_thread_cb, 2 * 1024, draw_pxp_unit);
     #endif
 
 If `LV_USE_PXP_DRAW_THREAD` is not defined, then no additional draw thread will be created
@@ -274,7 +274,7 @@ handle the supported draw tasks.
 .. code-block:: c
 
     #if LV_USE_VGLITE_DRAW_THREAD
-        lv_thread_init(&draw_vglite_unit->thread, LV_THREAD_PRIO_HIGH, _vglite_render_thread_cb, 2 * 1024, draw_vglite_unit);
+        lv_thread_init(&draw_vglite_unit->thread, "vglitedraw", LV_THREAD_PRIO_HIGH, _vglite_render_thread_cb, 2 * 1024, draw_vglite_unit);
     #endif
 
 If `LV_USE_VGLITE_DRAW_THREAD` is not defined, then no additional draw thread will be created

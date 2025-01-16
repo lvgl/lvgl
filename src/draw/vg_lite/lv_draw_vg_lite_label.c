@@ -19,6 +19,7 @@
 #include "lv_vg_lite_utils.h"
 #include "lv_vg_lite_path.h"
 #include "lv_draw_vg_lite_type.h"
+#include <float.h>
 
 /*********************
  *      DEFINES
@@ -80,6 +81,32 @@ void lv_draw_vg_lite_label_init(lv_draw_unit_t * draw_unit)
 #endif /* LV_USE_FREETYPE */
 }
 
+void lv_draw_vg_lite_letter(lv_draw_unit_t * draw_unit, const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords)
+{
+    if(dsc->opa <= LV_OPA_MIN)
+        return;
+
+    lv_draw_glyph_dsc_t glyph_dsc;
+    lv_draw_glyph_dsc_init(&glyph_dsc);
+    glyph_dsc.opa = dsc->opa;
+    glyph_dsc.bg_coords = NULL;
+    glyph_dsc.color = dsc->color;
+    glyph_dsc.rotation = dsc->rotation;
+    glyph_dsc.pivot = dsc->pivot;
+
+    LV_PROFILER_BEGIN;
+    lv_draw_unit_draw_letter(draw_unit, &glyph_dsc, &(lv_point_t) {
+        .x = coords->x1, .y = coords->y1
+    },
+    dsc->font, dsc->unicode, draw_letter_cb);
+    LV_PROFILER_END;
+
+    if(glyph_dsc._draw_buf) {
+        lv_draw_buf_destroy(glyph_dsc._draw_buf);
+        glyph_dsc._draw_buf = NULL;
+    }
+}
+
 void lv_draw_vg_lite_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,
                            const lv_area_t * coords)
 {
@@ -128,6 +155,7 @@ static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * gly
                     lv_draw_image_dsc_init(&image_dsc);
                     image_dsc.opa = glyph_draw_dsc->opa;
                     image_dsc.src = glyph_draw_dsc->glyph_data;
+                    image_dsc.rotation = glyph_draw_dsc->rotation;
                     lv_draw_vg_lite_img(draw_unit, &image_dsc, glyph_draw_dsc->letter_coords, false);
                 }
                 break;
@@ -170,17 +198,26 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
 
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_area_t image_area = *dsc->letter_coords;
+    const lv_area_t image_area = *dsc->letter_coords;
 
     vg_lite_matrix_t matrix = u->global_matrix;
-    vg_lite_translate(image_area.x1, image_area.y1, &matrix);
+
+    const bool is_rotated = dsc->rotation % 3600 != 0;
+
+    if(!is_rotated) {
+        vg_lite_translate(image_area.x1, image_area.y1, &matrix);
+    }
+    else {
+        vg_lite_translate(image_area.x1 + dsc->pivot.x, image_area.y1 + (dsc->g->box_h + dsc->g->ofs_y), &matrix);
+        vg_lite_rotate(dsc->rotation / 10.0f, &matrix);
+        vg_lite_translate(-dsc->pivot.x, -dsc->g->box_h - dsc->g->ofs_y, &matrix);
+    }
 
     vg_lite_buffer_t src_buf;
     const lv_draw_buf_t * draw_buf = dsc->glyph_data;
     lv_vg_lite_buffer_from_draw_buf(&src_buf, draw_buf);
 
-    vg_lite_color_t color;
-    color = lv_vg_lite_color(dsc->color, dsc->opa, true);
+    const vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa, true);
 
     LV_VG_LITE_ASSERT_SRC_BUFFER(&src_buf);
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
@@ -220,6 +257,7 @@ static void draw_letter_bitmap(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_d
         LV_VG_LITE_ASSERT_PATH(vg_lite_path);
 
         vg_lite_matrix_t path_matrix = u->global_matrix;
+        if(is_rotated) vg_lite_rotate(dsc->rotation / 10.0f, &path_matrix);
         LV_VG_LITE_ASSERT_MATRIX(&path_matrix);
 
         LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw_pattern");
@@ -265,32 +303,61 @@ static void draw_letter_outline(lv_draw_vg_lite_unit_t * u, const lv_draw_glyph_
     path_clip_area.y2++;
 
     lv_vg_lite_path_t * outline = (lv_vg_lite_path_t *)dsc->glyph_data;
-    lv_point_t pos = {dsc->letter_coords->x1, dsc->letter_coords->y1};
+    const lv_point_t pos = {dsc->letter_coords->x1, dsc->letter_coords->y1};
     /* scale size */
-    float scale = FT_F26DOT6_TO_PATH_SCALE(lv_freetype_outline_get_scale(dsc->g->resolved_font));
+    const float scale = FT_F26DOT6_TO_PATH_SCALE(lv_freetype_outline_get_scale(dsc->g->resolved_font));
+    const bool is_rotated = dsc->rotation % 3600 != 0;
 
     /* calc convert matrix */
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
-    vg_lite_translate(pos.x - dsc->g->ofs_x, pos.y + dsc->g->box_h + dsc->g->ofs_y, &matrix);
-    vg_lite_scale(scale, scale, &matrix);
 
-    /* calc inverse matrix */
-    vg_lite_matrix_t result;
-    if(!lv_vg_lite_matrix_inverse(&result, &matrix)) {
-        LV_LOG_ERROR("no inverse matrix");
-        LV_PROFILER_DRAW_END;
-        return;
+    if(!is_rotated) {
+        vg_lite_translate(pos.x - dsc->g->ofs_x, pos.y + dsc->g->box_h + dsc->g->ofs_y, &matrix);
+        vg_lite_scale(scale, scale, &matrix);
+    }
+    else {
+        vg_lite_translate(pos.x - dsc->g->ofs_x + dsc->pivot.x, pos.y + dsc->g->box_h + dsc->g->ofs_y, &matrix);
+        vg_lite_rotate(dsc->rotation / 10.0f, &matrix);
+        vg_lite_translate(-dsc->pivot.x, 0, &matrix);
+        vg_lite_scale(scale, scale, &matrix);
     }
 
-    lv_point_precise_t p1 = { path_clip_area.x1, path_clip_area.y1 };
-    lv_point_precise_t p1_res = lv_vg_lite_matrix_transform_point(&result, &p1);
+    if(vg_lite_query_feature(gcFEATURE_BIT_VG_SCISSOR)) {
+        /* set scissor area */
+        lv_vg_lite_set_scissor_area(u->base_unit.clip_area);
 
-    lv_point_precise_t p2 = { path_clip_area.x2, path_clip_area.y2 };
-    lv_point_precise_t p2_res = lv_vg_lite_matrix_transform_point(&result, &p2);
+        /* no bounding box */
+        lv_vg_lite_path_set_bounding_box(outline,
+                                         (float)PATH_COORD_MIN, (float)PATH_COORD_MIN,
+                                         (float)PATH_COORD_MAX, (float)PATH_COORD_MAX);
+    }
+    else {
+        if(is_rotated) {
+            LV_LOG_WARN("clip may be incorrect when vg_lite_query_feature(gcFEATURE_BIT_VG_SCISSOR) is false");
+        }
 
-    /* Since the font uses Cartesian coordinates, the y coordinates need to be reversed */
-    lv_vg_lite_path_set_bounding_box(outline, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
+        /* calc inverse matrix */
+        vg_lite_matrix_t result;
+        if(!lv_vg_lite_matrix_inverse(&result, &matrix)) {
+            LV_LOG_ERROR("no inverse matrix");
+            LV_PROFILER_DRAW_END;
+            return;
+        }
+
+        const lv_point_precise_t p1 = { path_clip_area.x1, path_clip_area.y1 };
+        const lv_point_precise_t p1_res = lv_vg_lite_matrix_transform_point(&result, &p1);
+
+        const lv_point_precise_t p2 = { path_clip_area.x2, path_clip_area.y2 };
+        const lv_point_precise_t p2_res = lv_vg_lite_matrix_transform_point(&result, &p2);
+
+        /* Since the font uses Cartesian coordinates, the y coordinates need to be reversed */
+        if(is_rotated)
+            lv_vg_lite_path_set_bounding_box(outline,
+                                             (float)PATH_COORD_MIN, (float)PATH_COORD_MIN,
+                                             (float)PATH_COORD_MAX, (float)PATH_COORD_MAX);
+        else lv_vg_lite_path_set_bounding_box(outline, p1_res.x, p2_res.y, p2_res.x, p1_res.y);
+    }
 
     /* matrix for drawing, different from matrix for calculating the bounding box */
     vg_lite_matrix_t draw_matrix = u->global_matrix;
