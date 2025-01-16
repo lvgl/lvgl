@@ -136,16 +136,16 @@ static bool defer_init(void)
     struct mallinfo info  = mm_mallinfo(ctx->heap);
     ctx->heap_size = info.arena;
 
-    LV_LOG_USER("heap info:");
-    LV_LOG_USER("  heap: %p", ctx->heap);
-    LV_LOG_USER("  mem: %p", ctx->mem);
-    LV_LOG_USER("  mem_size: %" LV_PRIu32, ctx->mem_size);
-    LV_LOG_USER("  arena: %d", info.arena);
-    LV_LOG_USER("  ordblks: %d", info.ordblks);
-    LV_LOG_USER("  aordblks: %d", info.aordblks);
-    LV_LOG_USER("  mxordblk: %d", info.mxordblk);
-    LV_LOG_USER("  uordblks: %d", info.uordblks);
-    LV_LOG_USER("  fordblks: %d", info.fordblks);
+    LV_LOG_INFO("heap info:");
+    LV_LOG_INFO("  heap: %p", ctx->heap);
+    LV_LOG_INFO("  mem: %p", ctx->mem);
+    LV_LOG_INFO("  mem_size: %" LV_PRIu32, ctx->mem_size);
+    LV_LOG_INFO("  arena: %d", info.arena);
+    LV_LOG_INFO("  ordblks: %d", info.ordblks);
+    LV_LOG_INFO("  aordblks: %d", info.aordblks);
+    LV_LOG_INFO("  mxordblk: %d", info.mxordblk);
+    LV_LOG_INFO("  uordblks: %d", info.uordblks);
+    LV_LOG_INFO("  fordblks: %d", info.fordblks);
 
     ctx->initialized = true;
     return true;

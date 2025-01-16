@@ -295,7 +295,7 @@ static void check_stack_size(void)
 {
     pthread_t tid = pthread_self();
     ssize_t stack_size = pthread_get_stacksize_np(tid);
-    LV_LOG_USER("tid: %d, Stack size : %zd", (int)tid, stack_size);
+    LV_LOG_INFO("tid: %d, Stack size : %zd", (int)tid, stack_size);
 
     if(stack_size < LV_NUTTX_MIN_STACK_SIZE) {
         LV_LOG_ERROR("Stack size is too small. Please increase it to %d bytes or more.",

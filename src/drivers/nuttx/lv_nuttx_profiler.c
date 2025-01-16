@@ -53,7 +53,7 @@ void lv_nuttx_profiler_init(void)
         LV_LOG_ERROR("Failed to get CPU frequency");
         return;
     }
-    LV_LOG_USER("CPU frequency: %" LV_PRIu32 " MHz", cpu_freq);
+    LV_LOG_INFO("CPU frequency: %" LV_PRIu32 " MHz", cpu_freq);
 
     lv_profiler_builtin_config_t config;
     lv_profiler_builtin_config_init(&config);
