@@ -82,7 +82,7 @@ static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * b
  *      MACROS
  **********************/
 
-#define I1_LUM_THRESHOLD 127
+#define I1_LUM_THRESHOLD LV_DRAW_SW_I1_LUM_THRESHOLD
 
 #ifndef LV_DRAW_SW_I1_BLEND_NORMAL_TO_I1
     #define LV_DRAW_SW_I1_BLEND_NORMAL_TO_I1(...)                    LV_RESULT_INVALID
