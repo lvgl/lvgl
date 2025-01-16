@@ -44,7 +44,7 @@ static void lv_arc_label_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
 static void arc_label_draw_main(lv_event_t * e);
 static void lv_arc_label_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_font_t * font, uint32_t radius,
-                                                    const lv_value_precise_t angle_size);
+                                                    const lv_value_precise_t angle_size, int32_t letter_space);
 
 /**********************
  *  STATIC VARIABLES
@@ -373,6 +373,7 @@ static void arc_label_draw_main(lv_event_t * e)
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     const lv_color_t color = lv_obj_get_style_text_color(obj, LV_PART_MAIN);
     const lv_opa_t opa = lv_obj_get_style_text_opa(obj, LV_PART_MAIN);
+    const int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
 
     const int32_t line_height = font->line_height;
     const int32_t base_line = font->base_line;
@@ -398,11 +399,12 @@ static void arc_label_draw_main(lv_event_t * e)
             angle_start = 0;
             break;
         case LV_ARC_LABEL_TEXT_ALIGN_CENTER:
-            angle_start = (arc_label->angle_size - calc_arc_text_total_angle(arc_label->text, font, arc_r,
-                                                                             arc_label->angle_size)) / 2;
+            angle_start = (arc_label->angle_size - calc_arc_text_total_angle(arc_label->text, font, arc_r, arc_label->angle_size,
+                                                                             letter_space)) / 2;
             break;
         case LV_ARC_LABEL_TEXT_ALIGN_TRAILING:
-            angle_start = arc_label->angle_size - calc_arc_text_total_angle(arc_label->text, font, arc_r, arc_label->angle_size);
+            angle_start = arc_label->angle_size - calc_arc_text_total_angle(arc_label->text, font, arc_r, arc_label->angle_size,
+                                                                            letter_space);
             break;
         default:
             break;
@@ -420,7 +422,7 @@ static void arc_label_draw_main(lv_event_t * e)
         const lv_value_precise_t letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
         if(processed_word_count > 0) {
-            const lv_value_precise_t arc_offset = (prev_letter_w + letter_w) / (lv_value_precise_t)2;
+            const lv_value_precise_t arc_offset = (prev_letter_w + letter_w + letter_space) / (lv_value_precise_t)2;
             curr_total_arc_length += arc_offset;
         }
 
@@ -477,8 +479,8 @@ static void arc_label_draw_main(lv_event_t * e)
     }
 }
 
-static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_font_t * font, uint32_t radius,
-                                                    const lv_value_precise_t angle_size)
+static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_font_t * font, const uint32_t radius,
+                                                    const lv_value_precise_t angle_size, const int32_t letter_space)
 {
     uint32_t word_i = 0;
     uint32_t processed_letter_count = 0;
@@ -499,7 +501,7 @@ static lv_value_precise_t calc_arc_text_total_angle(const char * text, const lv_
             processed_letter_count++;
             continue;
         }
-        const lv_value_precise_t arc_offset = (prev_letter_w + letter_w) / (lv_value_precise_t)2;
+        const lv_value_precise_t arc_offset = (prev_letter_w + letter_w + letter_space) / (lv_value_precise_t)2;
 
         total_arc_length += arc_offset;
 
