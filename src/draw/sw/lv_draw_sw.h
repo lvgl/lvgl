@@ -81,6 +81,8 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
 void lv_draw_sw_image(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
                       const lv_area_t * coords);
 
+void lv_draw_sw_letter(lv_draw_unit_t * draw_unit, const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords);
+
 /**
  * Draw a label with SW render.
  * @param draw_unit     pointer to a draw unit

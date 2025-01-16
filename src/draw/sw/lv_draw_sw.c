@@ -261,6 +261,9 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
             lv_draw_sw_box_shadow((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
+        case LV_DRAW_TASK_TYPE_LETTER:
+            lv_draw_sw_letter((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
+            break;
         case LV_DRAW_TASK_TYPE_LABEL:
             lv_draw_sw_label((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
