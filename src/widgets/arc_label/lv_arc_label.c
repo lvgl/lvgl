@@ -32,6 +32,8 @@
 
 #define MY_CLASS (&lv_arc_label_class)
 
+#define LV_ARC_LABEL_DEBUG 0
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -394,13 +396,17 @@ static void arc_label_draw_main(lv_event_t * e)
             break;
     }
 
+    const int32_t offset = arc_label->offset;
+    const int32_t angle_offset = offset / M_PI * 180 / arc_r;
+
     switch(arc_label->text_align_h) {
         case LV_ARC_LABEL_TEXT_ALIGN_LEADING:
-            angle_start = 0;
+            angle_start = angle_offset;
             break;
         case LV_ARC_LABEL_TEXT_ALIGN_CENTER:
-            angle_start = (arc_label->angle_size - calc_arc_text_total_angle(arc_label->text, font, arc_r, arc_label->angle_size,
-                                                                             letter_space)) / 2;
+            angle_start = (arc_label->angle_size + angle_offset - calc_arc_text_total_angle(arc_label->text, font, arc_r,
+                                                                                            arc_label->angle_size,
+                                                                                            letter_space)) / 2;
             break;
         case LV_ARC_LABEL_TEXT_ALIGN_TRAILING:
             angle_start = arc_label->angle_size - calc_arc_text_total_angle(arc_label->text, font, arc_r, arc_label->angle_size,
@@ -424,11 +430,13 @@ static void arc_label_draw_main(lv_event_t * e)
         if(processed_word_count > 0) {
             const lv_value_precise_t arc_offset = (prev_letter_w + letter_w + letter_space) / (lv_value_precise_t)2;
             curr_total_arc_length += arc_offset;
+            if(curr_total_arc_length > total_arc_length) {
+                break;
+            }
         }
 
         const lv_value_precise_t curr_angle = arc_label->angle_start + (arc_label->dir == LV_ARC_LABEL_DIR_CLOCKWISE ?
-                                                                        curr_total_arc_length :
-                                                                        -curr_total_arc_length) * 180 / M_PI / arc_r;
+                                                                        curr_total_arc_length : -curr_total_arc_length) * 180 / M_PI / arc_r;
 #if LV_USE_FLOAT
         const lv_value_precise_t x = cos(curr_angle * M_PI / 180) * arc_r;
         const lv_value_precise_t y = sin(curr_angle * M_PI / 180) * arc_r;
@@ -459,7 +467,7 @@ static void arc_label_draw_main(lv_event_t * e)
         prev_letter_w = letter_w;
         processed_word_count++;
 
-#if DEBUG
+#if LV_ARC_LABEL_DEBUG
         lv_draw_line_dsc_t line_dsc;
         lv_draw_line_dsc_init(&line_dsc);
         line_dsc.color = lv_color_make(0x11, 0x45, 0x14);
