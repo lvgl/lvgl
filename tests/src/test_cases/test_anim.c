@@ -118,6 +118,8 @@ void test_anim_pause(void)
 
     lv_test_wait(41);
     TEST_ASSERT_EQUAL(100, var);
+
+    lv_anim_delete(&var, exec_cb);
 }
 
 void test_anim_pause_for(void)
@@ -145,6 +147,8 @@ void test_anim_pause_for(void)
     lv_test_wait(40);
 
     TEST_ASSERT_EQUAL(79, var);
+
+    lv_anim_delete(&var, exec_cb);
 }
 
 void test_anim_pause_for_resume(void)
@@ -167,5 +171,7 @@ void test_anim_pause_for_resume(void)
 
     lv_test_wait(20);
     TEST_ASSERT_EQUAL(19, var);
+
+    lv_anim_delete(&var, exec_cb);
 }
 #endif
