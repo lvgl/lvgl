@@ -337,7 +337,12 @@ void lv_draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_
 #if LV_USE_BIDI
         char * bidi_txt = lv_malloc(line_end - line_start + 1);
         LV_ASSERT_MALLOC(bidi_txt);
-        lv_bidi_process_paragraph(dsc->text + line_start, bidi_txt, line_end - line_start, base_dir, NULL, 0);
+        if(dsc->is_bidi) {
+            lv_memcpy(bidi_txt, &dsc->text[line_start], (size_t)line_end - line_start);
+        }
+        else {
+            lv_bidi_process_paragraph(dsc->text + line_start, bidi_txt, line_end - line_start, base_dir, NULL, 0);
+        }
 #else
         const char * bidi_txt = dsc->text + line_start;
 #endif

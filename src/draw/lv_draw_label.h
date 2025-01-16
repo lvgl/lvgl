@@ -47,6 +47,7 @@ typedef struct {
     int32_t rotation;
     lv_opa_t opa;
     lv_base_dir_t bidi_dir;
+    bool is_bidi;
     lv_text_align_t align;
     lv_text_flag_t flag;
     lv_text_decor_t decor : 3;
