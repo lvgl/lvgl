@@ -31,11 +31,11 @@ getting Widget properties, it is designed so minimize that additional CPU overhe
 What is a Widget Property?
 **************************
 
-A Widget's properties are a superset of its :ref:`styles` plus additional properties
+A Widget's properties are the combined set of :ref:`styles` plus additional properties
 that are unique to each type of Widget, that determine what the Widget looks like and
 how it behaves.  Examples:  size, position, color, are properties of all Widgets
-whereas text, long-mode, selection-start, selection-end, and font are properties
-unique to Label Widgets.  A Widget's :ref:`local styles <style_local>` are also valid
+whereas text, long-mode, selection-start, and selection-end, are properties unique to
+Label Widgets.  A Widget's :ref:`local styles <style_local>` are also valid
 properties in this context.
 
 The non-style Widget properties available for a given Widget are implemented at the
