@@ -1,40 +1,45 @@
-.. _obj_property:
+.. _widget_property:
 
 =================
 Widget Properties
 =================
 
-Use of Widget Properties feature of LVGL is entirely optional.  Using it consumes
-more program space and more CPU overhead while setting and getting Widget properties,
-but may be helpful if you are developing a wrapper layer for other modules like
-Micropython, Lua, or for an external animation engine.
+Widget Properties provides a way to greatly reduce the size of the interface between
+LVGL and whatever logic layer is just above it, to get and set the most important
+properties of Widgets.  It's intended use is to:
 
-Use of the property-name-lookup feature also makes possible creating a UI from an
-externally-stored text file without modifying firmware.
+- simplify (decreasing development time) writing bindings for LVGL in another
+  language, such as:
+
+    - Micropython,
+    - Lua,
+    - Python,
+    - Perl,
+    - .NET
+
+- make it possible to control the UI (or parts of it, e.g. animation) via external
+  input, without modifying firmware, such as:
+
+    - an external text file (YAML, JSON, XML, custom)
+    - any external input source (e.g. serial)
+
+While using it consumes more program space and more CPU overhead while setting and
+getting Widget properties, it is designed so minimize that additional CPU overhead.
 
 
 
 What is a Widget Property?
 **************************
 
-A Widget's properties are a superset of its styles plus additional properties that
-are unique to each type of Widget.  In all cases, properties determine what the
-Widget looks like and how it behaves.  Examples:  size, position, color, font, etc.
-are properties of a Widget.  A Widget's local styles are also valid properties in
-this context.
+A Widget's properties are a superset of its :ref:`styles` plus additional properties
+that are unique to each type of Widget, that determine what the Widget looks like and
+how it behaves.  Examples:  size, position, color, are properties of all Widgets
+whereas text, long-mode, selection-start, selection-end, and font are properties
+unique to Label Widgets.  A Widget's :ref:`local styles <style_local>` are also valid
+properties in this context.
 
-The properties available for any given Widget that can be used by this feature of
-LVGL are:
-
-- the styles of that Widget, as defined in ``lv_style_properties.c`` and
-  ``lv_style_properties.h``, as well as
-
-- additional properties unique to that Widget, such as TEXT, LONG_MODE,
-  SELECTION_START and SELECTION_END for Label Widgets.
-
-Not every property is set-able and not every property is get-able.  The non-style
-Widget properties available for a given Widget are implemented at the top of that
-Widget's primary ``.c`` file as a ``const`` id-to-function-pointer lookup
+The non-style Widget properties available for a given Widget are implemented at the
+top of that Widget's primary ``.c`` file as a ``const`` id-to-function-pointer lookup
 array, like this example for the Label Widget:
 
 .. code:: c
@@ -64,13 +69,17 @@ array, like this example for the Label Widget:
     };
     #endif
 
-Looking at this array, you can see which non-style properties are available using
-this fature, and whether "setting" and/or "getting" is available for each.  (Function
-pointers are provided in the array when that type of operation is available.)
+This array is attached to the ``properties`` field of the Widget's class, so all
+Widgets of the same type share the same id-to-function-pointer lookup array.
+
+Some properties are read-only.  When this is the case, only the ``getter`` field in
+the corresponding array element will be initialized with a function pointer.
+Example:  an object's child-Widget count or scroll position must be controlled via
+other types of input, but their values are readable through this API.
 
 
 
-.. _obj_property_usage:
+.. _widget_property_usage:
 
 Usage
 *****
@@ -78,20 +87,18 @@ Usage
 By default, this feature of LVGL is turned off.  It can be turned on by configuring
 :c:macro:`LV_USE_OBJ_PROPERTY` to ``1`` in ``lv_conf.h``.
 
-The 2 functions that then become available (looking up the relevant function pointer
-and then calling it) are:
+The 3 functions that then become available are:
 
 .. code:: c
 
-    v_result_t      lv_obj_set_property(lv_obj_t * widget, const lv_property_t * value);
-    lv_property_t   lv_obj_get_property(lv_obj_t * widget, lv_prop_id_t id);
-
+    v_result_t     lv_obj_set_property(lv_obj_t * widget, const lv_property_t * value);
+    lv_property_t  lv_obj_get_property(lv_obj_t * widget, lv_prop_id_t id);
 
 A ``lv_property_t`` is a paired ID and value, and a ``lv_prop_id_t`` is just an ID.
 
 .. code:: c
 
-    lv_result_t     lv_obj_set_properties(lv_obj_t * obj, const lv_property_t * value, uint32_t count);
+    lv_result_t    lv_obj_set_properties(lv_obj_t * widget, const lv_property_t * value, uint32_t count);
 
 can be used to set multiple properties where ``value`` will point to an array of
 ``lv_property_t`` objects defining what is to be set.  The following is an example
@@ -108,8 +115,11 @@ of such an array:
         { .id = LV_STYLE_BG_COLOR, .color = (lv_color_t){.red = 0x11, .green = 0x22, .blue = 0x33}, },
     }
 
+Alternately, :cpp:expr:`lv_obj_set_property(widget, value)` could be called inside
+a loop.
 
-.. _obj_property_id:
+
+.. _widget_property_id:
 
 Property ID
 -----------
@@ -119,10 +129,12 @@ defined in the primary ``.h`` file for the Widget in question.  Because the actu
 names are "assembled" by a preprocessor string-concatenation macro and are thus
 hard to visualize, you can also find the names in the Widget's primary ``.c`` file in
 the ``properties[]`` array initializing the ``.id`` fields in the array.  For example,
-``LV_PROPERTY_LABEL_TEXT`` is one found in ``lv_label.c``.
+``LV_PROPERTY_LABEL_TEXT`` is one found in ``lv_label.c``, and the properties
+available to all Widgets are found near the top of the ``lv_obj.c`` file.
 
 That array is attached to the Widget's class, enabling "getter" and "setter" functions
 to be looked up for each type of Widget where Widget properties has been implemented.
+(Note:  this is done internally so you don't have to.)
 
 If the property you need to set or get using this API is not implemented yet, you can
 add your own Widget property ID following same rules and using helper macro
@@ -136,7 +148,7 @@ Note that :cpp:type:`lv_style_prop_t` (enumerator values beginning with ``LV_STY
 are also valid property IDs, and can be used to set or get a Widget's style values.
 
 
-.. _obj_property_value:
+.. _widget_property_value:
 
 Property Value
 --------------
@@ -144,7 +156,7 @@ Property Value
 :cpp:type:`lv_property_t` is a struct that begins with an ``id`` field whose meaning
 is the same as property ID described above, paired with a value, which is a union of
 all possible property types including integer, pointer and color.  The value field is
-also capable of carrying the different values for styles.
+also capable of carrying the different value types for styles.
 
 
 Name Lookup
@@ -155,9 +167,9 @@ following functions to look up property IDs by passing property name (a string):
 
 .. code:: c
 
-    lv_prop_id_t     lv_obj_property_get_id(const lv_obj_t * obj, const char * name);
-    lv_prop_id_t     lv_obj_class_property_get_id(const lv_obj_class_t * clz, const char * name);
-    lv_prop_id_t     lv_style_property_get_id(const char * name);
+    lv_prop_id_t  lv_obj_property_get_id(const lv_obj_t * widget, const char * name);
+    lv_prop_id_t  lv_obj_class_property_get_id(const lv_obj_class_t * clz, const char * name);
+    lv_prop_id_t  lv_style_property_get_id(const char * name);
 
 .. note::
 
@@ -167,13 +179,21 @@ following functions to look up property IDs by passing property name (a string):
     These functions use binary searches in an alphabetically-ordered name list, so
     they are somewhat faster than a mere sequential search.
 
+You can tell which names are available by looking in the ``.c`` files in the
+``./src/widgets/property/`` directory.  Note that to support binary name searches,
+these arrays are generated so that they are guaranteed to be in alphabetical order.
+Do not edit these files.
+
 
 
 Additional Notes
 ****************
 
-For pointer type of property value, which typically points to a specific struct, it still needs
-additional code to convert values from dict, table, etc. to a C struct before setting to Widget.
+For the ``lv_property_t * value`` argument of the :cpp:func:`lv_obj_set_property`
+function, the language used to call that function (e.g. in a static or
+dynamically-loaded library) may need additional code to convert values from their
+local data type (e.g. dict, table, etc.) to a C struct before passing it to the
+:cpp:func:`lv_obj_set_property` function.
 
 
 
