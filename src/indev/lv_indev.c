@@ -1259,12 +1259,19 @@ static void indev_proc_press(lv_indev_t * indev)
             indev->pointer.vect.x         = 0;
             indev->pointer.vect.y         = 0;
 
-            const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
-            if(is_enabled) {
-                if(indev->pointer.last_hovered != indev_obj_act) {
-                    if(send_event(LV_EVENT_HOVER_OVER, indev_act) == LV_RESULT_INVALID) return;
+            
+            /* If the indev was already in a pressed state it means that we got dragged here 
+             * so we shouldn't send any hover nor pressed events for a new object since the
+             * originally pressed object didn't get released
+             */
+            if(indev->prev_state != LV_INDEV_STATE_PRESSED) {
+                const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+                if(is_enabled) {
+                    if(indev->pointer.last_hovered != indev_obj_act) {
+                        if(send_event(LV_EVENT_HOVER_OVER, indev_act) == LV_RESULT_INVALID) return;
+                    }
+                    if(send_event(LV_EVENT_PRESSED, indev_act) == LV_RESULT_INVALID) return;
                 }
-                if(send_event(LV_EVENT_PRESSED, indev_act) == LV_RESULT_INVALID) return;
             }
 
             if(indev_act->wait_until_release) return;
