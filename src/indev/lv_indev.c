@@ -1259,8 +1259,8 @@ static void indev_proc_press(lv_indev_t * indev)
             indev->pointer.vect.x         = 0;
             indev->pointer.vect.y         = 0;
 
-            
-            /* If the indev was already in a pressed state it means that we got dragged here 
+
+            /* If the indev was already in a pressed state it means that we got dragged here
              * so we shouldn't send any hover nor pressed events for a new object since the
              * originally pressed object didn't get released
              */
