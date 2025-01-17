@@ -23,6 +23,7 @@
 #include <drm_fourcc.h>
 
 #include "../../../stdlib/lv_sprintf.h"
+#include "../../../draw/lv_draw_buf.h"
 
 #if LV_LINUX_DRM_GBM_BUFFERS
 
@@ -168,7 +169,6 @@ static void drm_dmabuf_set_active_buf(lv_event_t * event)
     drm_dev_t * drm_dev;
     lv_display_t * disp;
     lv_draw_buf_t * act_buf;
-    int res;
     int i;
 
     disp = (lv_display_t *) lv_event_get_current_target(event);
@@ -190,6 +190,7 @@ static void drm_dmabuf_set_active_buf(lv_event_t * event)
 
         struct dma_buf_sync sync_req;
         sync_req.flags = DMA_BUF_SYNC_START | DMA_BUF_SYNC_RW;
+        int res;
 
         if((res = ioctl(drm_dev->act_buf->handle, DMA_BUF_IOCTL_SYNC, &sync_req)) != 0) {
             LV_LOG_ERROR("Failed to start DMA-BUF R/W SYNC res: %d", res);
