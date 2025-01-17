@@ -379,22 +379,25 @@ static void arc_label_draw_main(lv_event_t * e)
 
     const int32_t line_height = font->line_height;
     const int32_t base_line = font->base_line;
+    int32_t arc_r_delta = 0;
     int32_t arc_r = arc_label->radius;
     lv_value_precise_t angle_start = 0;
 
     switch(arc_label->text_align_v) {
         case LV_ARC_LABEL_TEXT_ALIGN_LEADING:
-            arc_r -= line_height - base_line;
+            arc_r_delta = line_height - base_line;
             break;
         case LV_ARC_LABEL_TEXT_ALIGN_CENTER:
-            arc_r -= line_height / 2 - base_line;
+            arc_r_delta = line_height / 2 - base_line;
             break;
         case LV_ARC_LABEL_TEXT_ALIGN_TRAILING:
-            arc_r -= -base_line;
+            arc_r_delta = -base_line;
             break;
         default:
             break;
     }
+
+    arc_r += arc_label->dir == LV_ARC_LABEL_DIR_CLOCKWISE ? -arc_r_delta : arc_r_delta;
 
     const int32_t offset = arc_label->offset;
     const int32_t angle_offset = offset / M_PI * 180 / arc_r;
@@ -436,7 +439,8 @@ static void arc_label_draw_main(lv_event_t * e)
         }
 
         const lv_value_precise_t curr_angle = arc_label->angle_start + (arc_label->dir == LV_ARC_LABEL_DIR_CLOCKWISE ?
-                                                                        curr_total_arc_length : -curr_total_arc_length) * 180 / M_PI / arc_r;
+                                                                        curr_total_arc_length : total_arc_length - curr_total_arc_length) * 180 / M_PI / arc_r;
+
 #if LV_USE_FLOAT
         const lv_value_precise_t x = cos(curr_angle * M_PI / 180) * arc_r;
         const lv_value_precise_t y = sin(curr_angle * M_PI / 180) * arc_r;
@@ -455,7 +459,8 @@ static void arc_label_draw_main(lv_event_t * e)
         dsc.font = font;
         dsc.color = color;
         dsc.opa = opa;
-        dsc.rotation = (curr_angle + 90) * 10;
+        if(arc_label->dir == LV_ARC_LABEL_DIR_CLOCKWISE) dsc.rotation = (curr_angle + 90) * 10;
+        else dsc.rotation = (curr_angle - 90) * 10;
 
         dsc.unicode = letter;
         if(dsc.unicode == 0) {
