@@ -34,7 +34,7 @@ extern "C" {
 
 typedef enum {
     LV_ARC_LABEL_DIR_CLOCKWISE = 0,
-    LV_ARC_LABEL_DIR_COUNTER_CLOCKWISE = 0
+    LV_ARC_LABEL_DIR_COUNTER_CLOCKWISE = 1
 } lv_arc_label_dir_t;
 
 typedef enum {
