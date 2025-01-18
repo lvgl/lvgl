@@ -78,6 +78,14 @@ const char * lv_xml_style_string_process(char * txt, lv_style_selector_t * selec
  */
 lv_xml_style_t * lv_xml_get_style_by_name(lv_xml_component_ctx_t * ctx, const char * name);
 
+/**
+ * Get a gradient descriptor defined for a component
+ * @param ctx   component context where the gradient should be found
+ * @param name  name of the gradient
+ * @return      a gradient descriptor
+ */
+lv_grad_dsc_t * lv_xml_component_get_grad(lv_xml_component_ctx_t * ctx, const char * name);
+
 /**********************
  *      MACROS
  **********************/

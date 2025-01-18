@@ -10,7 +10,6 @@
 	</styles>
 
 	<view extends="lv_obj" width="280" height="content" style_bg_color="#light_blue">
-		<lv_label text="Hello"/>
 		<my_card title="Card 1"
 				 y="0"
 				 btn_rel_style="btn_style"
