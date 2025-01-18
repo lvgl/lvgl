@@ -58,8 +58,8 @@ typedef struct {
 /** A descriptor of a gradient. */
 typedef struct {
     lv_grad_stop_t   stops[LV_GRADIENT_MAX_STOPS];  /**< A gradient stop array */
-    uint8_t              stops_count;                   /**< The number of used stops in the array */
-    lv_grad_dir_t        dir : 4;                       /**< The gradient direction.
+    uint8_t          stops_count;                   /**< The number of used stops in the array */
+    lv_grad_dir_t    dir : 4;                       /**< The gradient direction.
                                                          * Any of LV_GRAD_DIR_NONE, LV_GRAD_DIR_VER, LV_GRAD_DIR_HOR,
                                                          * LV_GRAD_TYPE_LINEAR, LV_GRAD_TYPE_RADIAL, LV_GRAD_TYPE_CONICAL */
     lv_grad_extend_t     extend : 3;                    /**< Behaviour outside the defined range.

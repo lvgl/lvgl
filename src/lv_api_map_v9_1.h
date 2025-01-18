@@ -104,13 +104,13 @@ extern "C" {
 #define LV_LABEL_LONG_SCROLL_CIRCULAR  LV_LABEL_LONG_MODE_SCROLL_CIRCULAR
 #define LV_LABEL_LONG_CLIP             LV_LABEL_LONG_MODE_CLIP
 
-#define lv_anim_set_time lv_anim_set_duration
-#define lv_anim_set_playback_time lv_anim_set_reverse_duration
-#define lv_anim_set_playback_delay lv_anim_set_reverse_delay
-#define lv_anim_set_playback_duration lv_anim_set_reverse_duration
+#define lv_anim_set_time                lv_anim_set_duration
+#define lv_anim_set_playback_time       lv_anim_set_reverse_duration
+#define lv_anim_set_playback_delay      lv_anim_set_reverse_delay
+#define lv_anim_set_playback_duration   lv_anim_set_reverse_duration
 
-#define lv_gradient_init_stops lv_grad_init_stops
-#define lv_gradient_stop_t lv_gradient_stop_t
+#define lv_gradient_init_stops  lv_grad_init_stops
+#define lv_gradient_stop_t      lv_grad_stop_t
 
 #define lv_spangroup_new_span lv_spangroup_add_span
 #define lv_spangroup_refr_mode lv_spangroup_refresh

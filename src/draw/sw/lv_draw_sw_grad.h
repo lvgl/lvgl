@@ -64,6 +64,7 @@ void lv_draw_sw_grad_cleanup(lv_draw_sw_grad_calc_t * grad);
 /**
  * Calculate constants from the given parameters that are used during rendering
  * @param dsc      gradient descriptor
+ * @param coords    the area where to draw the gradient
  */
 void lv_draw_sw_grad_linear_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords);
 
@@ -87,7 +88,8 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_grad_linear_get_line(lv_grad_dsc_t *
 
 /**
  * Calculate constants from the given parameters that are used during rendering
- * @param dsc      gradient descriptor
+ * @param dsc       gradient descriptor
+ * @param coords    the area where to draw the gradient
  */
 void lv_draw_sw_grad_radial_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords);
 
@@ -112,6 +114,7 @@ void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_grad_radial_get_line(lv_grad_dsc_t *
 /**
  * Calculate constants from the given parameters that are used during rendering
  * @param dsc      gradient descriptor
+ * @param coords    the area where to draw the gradient
  */
 void lv_draw_sw_grad_conical_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords);
 
