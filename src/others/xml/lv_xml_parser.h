@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../misc/lv_types.h"
+#include "../../misc/lv_style.h"
 #if LV_USE_XML
 
 #include "lv_xml_component.h"
@@ -31,6 +32,8 @@ typedef enum {
     LV_XML_PARSER_SECTION_NONE,
     LV_XML_PARSER_SECTION_API,
     LV_XML_PARSER_SECTION_CONSTS,
+    LV_XML_PARSER_SECTION_GRAD,
+    LV_XML_PARSER_SECTION_GRAD_STOP,
     LV_XML_PARSER_SECTION_STYLES,
     LV_XML_PARSER_SECTION_VIEW
 } lv_xml_parser_section_t;
@@ -56,6 +59,11 @@ typedef struct {
     const char * def;
     const char * type;
 } lv_xml_param_t;
+
+typedef struct {
+    const char * name;
+    lv_grad_dsc_t grad_dsc;
+} lv_xml_grad_t;
 
 /**********************
  * GLOBAL PROTOTYPES

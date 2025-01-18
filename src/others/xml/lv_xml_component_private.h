@@ -30,6 +30,7 @@ struct _lv_xml_component_ctx_t {
     lv_ll_t style_ll;
     lv_ll_t const_ll;
     lv_ll_t param_ll;
+    lv_ll_t gradient_ll;
     const char * view_def;
     struct _lv_widget_processor_t * root_widget;
     uint32_t is_widget : 1;                         /*1: not component but widget registered as a component for preview*/
