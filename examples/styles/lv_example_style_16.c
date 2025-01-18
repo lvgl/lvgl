@@ -47,7 +47,7 @@ void lv_example_style_16(void)
     /*First define a color gradient. In this example we use a gray color map with random values.*/
     static lv_grad_dsc_t grad;
 
-    lv_gradient_init_stops(&grad, grad_colors, NULL, NULL, sizeof(grad_colors) / sizeof(lv_color_t));
+    lv_grad_init_stops(&grad, grad_colors, NULL, NULL, sizeof(grad_colors) / sizeof(lv_color_t));
 
     /*Make a conical gradient with the center in the middle of the object*/
 #if LV_GRADIENT_MAX_STOPS >= 8

@@ -21,6 +21,7 @@ extern "C" {
 #include "lv_types.h"
 #include "lv_assert.h"
 #include "lv_bidi.h"
+#include "lv_grad.h"
 #include "../layouts/lv_layout.h"
 
 /*********************
@@ -68,6 +69,16 @@ LV_EXPORT_CONST_INT(LV_SCALE_NONE);
 
 #define LV_STYLE_CONST_PROPS_END { .prop = LV_STYLE_PROP_INV, .value = { .num = 0 } }
 
+#if LV_GRADIENT_MAX_STOPS < 2
+#error LVGL needs at least 2 stops for gradients. Please increase the LV_GRADIENT_MAX_STOPS
+#endif
+
+#define LV_GRAD_LEFT    LV_PCT(0)
+#define LV_GRAD_RIGHT   LV_PCT(100)
+#define LV_GRAD_TOP     LV_PCT(0)
+#define LV_GRAD_BOTTOM  LV_PCT(100)
+#define LV_GRAD_CENTER  LV_PCT(50)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -105,71 +116,6 @@ typedef enum {
     LV_BORDER_SIDE_FULL     = 0x0F,
     LV_BORDER_SIDE_INTERNAL = 0x10, /**< FOR matrix-like objects (e.g. Button matrix)*/
 } lv_border_side_t;
-
-/**
- * The direction of the gradient.
- */
-typedef enum {
-    LV_GRAD_DIR_NONE,       /**< No gradient (the `grad_color` property is ignored)*/
-    LV_GRAD_DIR_VER,        /**< Simple vertical (top to bottom) gradient*/
-    LV_GRAD_DIR_HOR,        /**< Simple horizontal (left to right) gradient*/
-    LV_GRAD_DIR_LINEAR,     /**< Linear gradient defined by start and end points. Can be at any angle.*/
-    LV_GRAD_DIR_RADIAL,     /**< Radial gradient defined by start and end circles*/
-    LV_GRAD_DIR_CONICAL,    /**< Conical gradient defined by center point, start and end angles*/
-} lv_grad_dir_t;
-
-/**
- * Gradient behavior outside the defined range.
-*/
-typedef enum {
-    LV_GRAD_EXTEND_PAD,     /**< Repeat the same color*/
-    LV_GRAD_EXTEND_REPEAT,  /**< Repeat the pattern*/
-    LV_GRAD_EXTEND_REFLECT, /**< Repeat the pattern mirrored*/
-} lv_grad_extend_t;
-
-/** A gradient stop definition.
- *  This matches a color and a position in a virtual 0-255 scale.
- */
-typedef struct {
-    lv_color_t color;   /**< The stop color */
-    lv_opa_t   opa;     /**< The opacity of the color*/
-    uint8_t    frac;    /**< The stop position in 1/255 unit */
-} lv_gradient_stop_t;
-
-/** A descriptor of a gradient. */
-typedef struct {
-    lv_gradient_stop_t   stops[LV_GRADIENT_MAX_STOPS];  /**< A gradient stop array */
-    uint8_t              stops_count;                   /**< The number of used stops in the array */
-    lv_grad_dir_t        dir : 4;                       /**< The gradient direction.
-                                                         * Any of LV_GRAD_DIR_NONE, LV_GRAD_DIR_VER, LV_GRAD_DIR_HOR,
-                                                         * LV_GRAD_TYPE_LINEAR, LV_GRAD_TYPE_RADIAL, LV_GRAD_TYPE_CONICAL */
-    lv_grad_extend_t     extend : 3;                    /**< Behaviour outside the defined range.
-                                                         * LV_GRAD_EXTEND_NONE, LV_GRAD_EXTEND_PAD, LV_GRAD_EXTEND_REPEAT, LV_GRAD_EXTEND_REFLECT */
-#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
-    union {
-        /*Linear gradient parameters*/
-        struct {
-            lv_point_t  start;                          /**< Linear gradient vector start point */
-            lv_point_t  end;                            /**< Linear gradient vector end point */
-        } linear;
-        /*Radial gradient parameters*/
-        struct {
-            lv_point_t  focal;                          /**< Center of the focal (starting) circle in local coordinates */
-            /* (can be the same as the ending circle to create concentric circles) */
-            lv_point_t  focal_extent;                   /**< Point on the circle (can be the same as the center) */
-            lv_point_t  end;                            /**< Center of the ending circle in local coordinates */
-            lv_point_t  end_extent;                     /**< Point on the circle determining the radius of the gradient */
-        } radial;
-        /*Conical gradient parameters*/
-        struct {
-            lv_point_t  center;                         /**< Conical gradient center point */
-            int16_t     start_angle;                    /**< Start angle 0..3600 */
-            int16_t     end_angle;                      /**< End angle 0..3600 */
-        } conical;
-    } params;
-    void * state;
-#endif
-} lv_grad_dsc_t;
 
 /**
  * A common type to handle all the property types in the same way.

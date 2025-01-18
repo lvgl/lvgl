@@ -1,12 +1,12 @@
 /**
- * @file lv_draw_sw_gradient.c
+ * @file lv_draw_sw_grad.c
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_sw_gradient_private.h"
+#include "lv_draw_sw_grad.h"
 #if LV_USE_DRAW_SW
 
 #include "../../misc/lv_types.h"
@@ -46,7 +46,7 @@ typedef struct {
     int32_t bpy;
     int32_t bc;
     lv_area_t clip_area;
-    lv_grad_t * cgrad;  /*256 element cache buffer containing the gradient color map*/
+    lv_draw_sw_grad_calc_t * cgrad;  /*256 element cache buffer containing the gradient color map*/
 } lv_grad_radial_state_t;
 
 typedef struct {
@@ -54,7 +54,7 @@ typedef struct {
     int32_t a;
     int32_t b;
     int32_t c;
-    lv_grad_t * cgrad; /*256 element cache buffer containing the gradient color map*/
+    lv_draw_sw_grad_calc_t * cgrad; /*256 element cache buffer containing the gradient color map*/
 } lv_grad_linear_state_t;
 
 typedef struct {
@@ -64,7 +64,7 @@ typedef struct {
     int32_t a;
     int32_t da;
     int32_t inv_da;
-    lv_grad_t * cgrad; /*256 element cache buffer containing the gradient color map*/
+    lv_draw_sw_grad_calc_t * cgrad; /*256 element cache buffer containing the gradient color map*/
 } lv_grad_conical_state_t;
 
 #endif
@@ -72,8 +72,8 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-typedef lv_result_t (*op_cache_t)(lv_grad_t * c, void * ctx);
-static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, int32_t w, int32_t h);
+typedef lv_result_t (*op_cache_t)(lv_draw_sw_grad_calc_t * c, void * ctx);
+static lv_draw_sw_grad_calc_t * allocate_item(const lv_grad_dsc_t * g, int32_t w, int32_t h);
 
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
@@ -89,7 +89,7 @@ static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, int32_t w, int32_t h);
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, int32_t w, int32_t h)
+static lv_draw_sw_grad_calc_t * allocate_item(const lv_grad_dsc_t * g, int32_t w, int32_t h)
 {
     int32_t size;
     switch(g->dir) {
@@ -106,8 +106,9 @@ static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, int32_t w, int32_t h)
             size = 64;
     }
 
-    size_t req_size = ALIGN(sizeof(lv_grad_t)) + ALIGN(size * sizeof(lv_color_t)) + ALIGN(size * sizeof(lv_opa_t));
-    lv_grad_t * item  = lv_malloc(req_size);
+    size_t req_size = ALIGN(sizeof(lv_draw_sw_grad_calc_t)) + ALIGN(size * sizeof(lv_color_t)) + ALIGN(size * sizeof(
+                                                                                                           lv_opa_t));
+    lv_draw_sw_grad_calc_t * item  = lv_malloc(req_size);
     LV_ASSERT_MALLOC(item);
     if(item == NULL) return NULL;
 
@@ -141,13 +142,13 @@ static inline int32_t extend_w(int32_t w, lv_grad_extend_t extend)
  *     FUNCTIONS
  **********************/
 
-lv_grad_t * lv_gradient_get(const lv_grad_dsc_t * g, int32_t w, int32_t h)
+lv_draw_sw_grad_calc_t * lv_draw_sw_grad_get(const lv_grad_dsc_t * g, int32_t w, int32_t h)
 {
     /* No gradient, no cache */
     if(g->dir == LV_GRAD_DIR_NONE) return NULL;
 
     /* Step 1: Search cache for the given key */
-    lv_grad_t * item = allocate_item(g, w, h);
+    lv_draw_sw_grad_calc_t * item = allocate_item(g, w, h);
     if(item == NULL) {
         LV_LOG_WARN("Failed to allocate item for the gradient");
         return item;
@@ -156,15 +157,15 @@ lv_grad_t * lv_gradient_get(const lv_grad_dsc_t * g, int32_t w, int32_t h)
     /* Step 3: Fill it with the gradient, as expected */
     uint32_t i;
     for(i = 0; i < item->size; i++) {
-        lv_gradient_color_calculate(g, item->size, i, &item->color_map[i], &item->opa_map[i]);
+        lv_draw_sw_grad_color_calculate(g, item->size, i, &item->color_map[i], &item->opa_map[i]);
     }
     return item;
 }
 
-void LV_ATTRIBUTE_FAST_MEM lv_gradient_color_calculate(const lv_grad_dsc_t * dsc, int32_t range,
-                                                       int32_t frac, lv_grad_color_t * color_out, lv_opa_t * opa_out)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_grad_color_calculate(const lv_grad_dsc_t * dsc, int32_t range,
+                                                           int32_t frac, lv_color_t * color_out, lv_opa_t * opa_out)
 {
-    lv_grad_color_t tmp;
+    lv_color_t tmp;
     /*Clip out-of-bounds first*/
     int32_t min = (dsc->stops[0].frac * range) >> 8;
     if(frac <= min) {
@@ -214,22 +215,11 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_color_calculate(const lv_grad_dsc_t * dsc
     *opa_out = LV_UDIV255(dsc->stops[found_i].opa * mix   + dsc->stops[found_i - 1].opa * imix);
 }
 
-void lv_gradient_cleanup(lv_grad_t * grad)
+void lv_draw_sw_grad_cleanup(lv_draw_sw_grad_calc_t * grad)
 {
     lv_free(grad);
 }
 
-void lv_gradient_init_stops(lv_grad_dsc_t * grad, const lv_color_t colors[], const lv_opa_t opa[],
-                            const uint8_t fracs[], int num_stops)
-{
-    LV_ASSERT(num_stops <= LV_GRADIENT_MAX_STOPS);
-    grad->stops_count = num_stops;
-    for(int i = 0; i < num_stops; i++) {
-        grad->stops[i].color = colors[i];
-        grad->stops[i].opa = opa != NULL ? opa[i] : LV_OPA_COVER;
-        grad->stops[i].frac = fracs != NULL ? fracs[i] : 255 * i / (num_stops - 1);
-    }
-}
 
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
 
@@ -277,7 +267,7 @@ void lv_gradient_init_stops(lv_grad_dsc_t * grad, const lv_color_t colors[], con
 
 */
 
-void lv_gradient_radial_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_sw_grad_radial_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
 {
     lv_point_t start = dsc->params.radial.focal;
     lv_point_t end = dsc->params.radial.end;
@@ -305,7 +295,7 @@ void lv_gradient_radial_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
     LV_ASSERT(r_end != 0);
 
     /* Create gradient color map */
-    state->cgrad = lv_gradient_get(dsc, 256, 0);
+    state->cgrad = lv_draw_sw_grad_get(dsc, 256, 0);
 
     state->x0 = start.x;
     state->y0 = start.y;
@@ -347,23 +337,23 @@ void lv_gradient_radial_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
     }
 }
 
-void lv_gradient_radial_cleanup(lv_grad_dsc_t * dsc)
+void lv_draw_sw_grad_radial_cleanup(lv_grad_dsc_t * dsc)
 {
     lv_grad_radial_state_t * state = dsc->state;
     if(state == NULL)
         return;
     if(state->cgrad)
-        lv_gradient_cleanup(state->cgrad);
+        lv_draw_sw_grad_cleanup(state->cgrad);
     lv_free(state);
 }
 
-void LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_line(lv_grad_dsc_t * dsc, int32_t xp, int32_t yp,
-                                                       int32_t width, lv_grad_t * result)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_grad_radial_get_line(lv_grad_dsc_t * dsc, int32_t xp, int32_t yp,
+                                                           int32_t width, lv_draw_sw_grad_calc_t * result)
 {
     lv_grad_radial_state_t * state = (lv_grad_radial_state_t *)dsc->state;
     lv_color_t * buf = result->color_map;
     lv_opa_t * opa = result->opa_map;
-    lv_grad_t * grad = state->cgrad;
+    lv_draw_sw_grad_calc_t * grad = state->cgrad;
 
     int32_t w;  /* the result: this is an offset into the 256 element gradient color table */
     int32_t b, db, c, dc;
@@ -466,7 +456,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_radial_get_line(lv_grad_dsc_t * dsc, int3
 
 */
 
-void lv_gradient_linear_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_sw_grad_linear_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
 {
     lv_point_t start = dsc->params.linear.start;
     lv_point_t end = dsc->params.linear.end;
@@ -474,7 +464,7 @@ void lv_gradient_linear_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
     dsc->state = state;
 
     /* Create gradient color map */
-    state->cgrad = lv_gradient_get(dsc, 256, 0);
+    state->cgrad = lv_draw_sw_grad_get(dsc, 256, 0);
 
     /* Convert from percentage coordinates */
     int32_t wdt = lv_area_get_width(coords);
@@ -490,12 +480,13 @@ void lv_gradient_linear_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
     int32_t dy = end.y - start.y;
 
     int32_t l2 = lv_sqr(dx) + lv_sqr(dy);
+    if(l2 == 0) l2 = 1;
     state->a = (dx << 16) / l2;
     state->b = (dy << 16) / l2;
     state->c = ((start.x * dx + start.y * dy) << 16) / l2;
 }
 
-void lv_gradient_linear_cleanup(lv_grad_dsc_t * dsc)
+void lv_draw_sw_grad_linear_cleanup(lv_grad_dsc_t * dsc)
 {
     lv_grad_linear_state_t * state = dsc->state;
     if(state == NULL)
@@ -505,13 +496,13 @@ void lv_gradient_linear_cleanup(lv_grad_dsc_t * dsc)
     lv_free(state);
 }
 
-void LV_ATTRIBUTE_FAST_MEM lv_gradient_linear_get_line(lv_grad_dsc_t * dsc, int32_t xp, int32_t yp,
-                                                       int32_t width, lv_grad_t * result)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_grad_linear_get_line(lv_grad_dsc_t * dsc, int32_t xp, int32_t yp,
+                                                           int32_t width, lv_draw_sw_grad_calc_t * result)
 {
     lv_grad_linear_state_t * state = (lv_grad_linear_state_t *)dsc->state;
     lv_color_t * buf = result->color_map;
     lv_opa_t * opa = result->opa_map;
-    lv_grad_t * grad = state->cgrad;
+    lv_draw_sw_grad_calc_t * grad = state->cgrad;
 
     int32_t w;  /* the result: this is an offset into the 256 element gradient color table */
     int32_t x, d;
@@ -539,7 +530,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_linear_get_line(lv_grad_dsc_t * dsc, int3
         w is the unknown variable
 */
 
-void lv_gradient_conical_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_sw_grad_conical_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
 {
     lv_point_t c0 = dsc->params.conical.center;
     int32_t alpha = dsc->params.conical.start_angle % 360;
@@ -548,7 +539,7 @@ void lv_gradient_conical_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
     dsc->state = state;
 
     /* Create gradient color map */
-    state->cgrad = lv_gradient_get(dsc, 256, 0);
+    state->cgrad = lv_draw_sw_grad_get(dsc, 256, 0);
 
     /* Convert from percentage coordinates */
     int32_t wdt = lv_area_get_width(coords);
@@ -567,7 +558,7 @@ void lv_gradient_conical_setup(lv_grad_dsc_t * dsc, const lv_area_t * coords)
     state->inv_da = (1 << 16) / (beta - alpha);
 }
 
-void lv_gradient_conical_cleanup(lv_grad_dsc_t * dsc)
+void lv_draw_sw_grad_conical_cleanup(lv_grad_dsc_t * dsc)
 {
     lv_grad_conical_state_t * state = dsc->state;
     if(state == NULL)
@@ -577,13 +568,13 @@ void lv_gradient_conical_cleanup(lv_grad_dsc_t * dsc)
     lv_free(state);
 }
 
-void LV_ATTRIBUTE_FAST_MEM lv_gradient_conical_get_line(lv_grad_dsc_t * dsc, int32_t xp, int32_t yp,
-                                                        int32_t width, lv_grad_t * result)
+void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_grad_conical_get_line(lv_grad_dsc_t * dsc, int32_t xp, int32_t yp,
+                                                            int32_t width, lv_draw_sw_grad_calc_t * result)
 {
     lv_grad_conical_state_t * state = (lv_grad_conical_state_t *)dsc->state;
     lv_color_t * buf = result->color_map;
     lv_opa_t * opa = result->opa_map;
-    lv_grad_t * grad = state->cgrad;
+    lv_draw_sw_grad_calc_t * grad = state->cgrad;
 
     int32_t w;  /* the result: this is an offset into the 256 element gradient color table */
     int32_t dx = xp - state->x0;
@@ -616,51 +607,6 @@ void LV_ATTRIBUTE_FAST_MEM lv_gradient_conical_get_line(lv_grad_dsc_t * dsc, int
             dx++;
         }
     }
-}
-
-void lv_grad_linear_init(lv_grad_dsc_t * dsc, int32_t from_x, int32_t from_y, int32_t to_x, int32_t to_y,
-                         lv_grad_extend_t extend)
-{
-    dsc->dir = LV_GRAD_DIR_LINEAR;
-    dsc->params.linear.start.x = from_x;
-    dsc->params.linear.start.y = from_y;
-    dsc->params.linear.end.x = to_x;
-    dsc->params.linear.end.y = to_y;
-    dsc->extend = extend;
-}
-
-void lv_grad_radial_init(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_y, int32_t to_x, int32_t to_y,
-                         lv_grad_extend_t extend)
-{
-    dsc->dir = LV_GRAD_DIR_RADIAL;
-    dsc->params.radial.focal.x = center_x;
-    dsc->params.radial.focal.y = center_y;
-    dsc->params.radial.focal_extent.x = center_x;
-    dsc->params.radial.focal_extent.y = center_y;
-    dsc->params.radial.end.x = center_x;
-    dsc->params.radial.end.y = center_y;
-    dsc->params.radial.end_extent.x = to_x;
-    dsc->params.radial.end_extent.y = to_y;
-    dsc->extend = extend;
-}
-
-void lv_grad_conical_init(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_y, int32_t start_angle,
-                          int32_t end_angle, lv_grad_extend_t extend)
-{
-    dsc->dir = LV_GRAD_DIR_CONICAL;
-    dsc->params.conical.center.x = center_x;
-    dsc->params.conical.center.y = center_y;
-    dsc->params.conical.start_angle = start_angle;
-    dsc->params.conical.end_angle = end_angle;
-    dsc->extend = extend;
-}
-
-void lv_grad_radial_set_focal(lv_grad_dsc_t * dsc, int32_t center_x, int32_t center_y, int32_t radius)
-{
-    dsc->params.radial.focal.x = center_x;
-    dsc->params.radial.focal.y = center_y;
-    dsc->params.radial.focal_extent.x = center_x + radius;
-    dsc->params.radial.focal_extent.y = center_y;
 }
 
 #endif /* LV_USE_DRAW_SW_COMPLEX_GRADIENTS */

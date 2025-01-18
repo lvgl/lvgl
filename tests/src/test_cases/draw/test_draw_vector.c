@@ -48,7 +48,7 @@ static void draw_shapes(lv_layer_t * layer)
     lv_vector_dsc_identity(ctx);
     lv_vector_dsc_translate(ctx, 0, 150);
 
-    lv_gradient_stop_t stops[2];
+    lv_grad_stop_t stops[2];
     lv_memzero(stops, sizeof(stops));
     stops[0].color = lv_color_hex(0xffffff);
     stops[0].opa = LV_OPA_COVER;
@@ -210,7 +210,7 @@ static void draw_lines(lv_layer_t * layer)
     lv_vector_path_clear(path);
     lv_vector_path_append_rect(path, &rect1, 0, 0);
 
-    lv_gradient_stop_t stops[2];
+    lv_grad_stop_t stops[2];
     lv_memzero(stops, sizeof(stops));
     stops[0].color = lv_color_hex(0xff0000);
     stops[0].opa = LV_OPA_COVER;

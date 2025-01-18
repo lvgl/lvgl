@@ -240,7 +240,7 @@ bool lv_vg_lite_draw_grad_helper(
 
     grad.style = LV_VECTOR_GRADIENT_STYLE_LINEAR;
     grad.stops_count = grad_dsc->stops_count;
-    lv_memcpy(grad.stops, grad_dsc->stops, sizeof(lv_gradient_stop_t) * grad_dsc->stops_count);
+    lv_memcpy(grad.stops, grad_dsc->stops, sizeof(lv_grad_stop_t) * grad_dsc->stops_count);
 
     /*convert to spread mode*/
 #if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
@@ -673,7 +673,7 @@ static lv_cache_compare_res_t grad_compare_cb(const grad_item_t * lhs, const gra
     }
 
     int cmp_res = lv_memcmp(lhs->lv.stops, rhs->lv.stops,
-                            sizeof(lv_gradient_stop_t) * lhs->lv.stops_count);
+                            sizeof(lv_grad_stop_t) * lhs->lv.stops_count);
     if(cmp_res != 0) {
         return cmp_res > 0 ? 1 : -1;
     }
