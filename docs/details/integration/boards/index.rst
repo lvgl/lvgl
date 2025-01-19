@@ -6,3 +6,4 @@ Boards
     :maxdepth: 2
 
     toradex
+    riverdi
