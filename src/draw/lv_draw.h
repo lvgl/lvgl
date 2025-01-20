@@ -98,6 +98,9 @@ struct _lv_layer_t  {
     lv_matrix_t matrix;
 #endif
 
+    /** Opacity of the layer */
+    lv_opa_t opa;
+
     /** Linked list of draw tasks */
     lv_draw_task_t * draw_task_head;
 
@@ -210,6 +213,18 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
  * @return          number of tasks depending on `t_check`
  */
 uint32_t lv_draw_get_dependent_count(lv_draw_task_t * t_check);
+
+/**
+ * Initialize a layer
+ * @param layer pointer to a layer to initialize
+ */
+void lv_layer_init(lv_layer_t * layer);
+
+/**
+ * Reset the layer to a drawable state
+ * @param layer pointer to a layer to reset
+ */
+void lv_layer_reset(lv_layer_t * layer);
 
 /**
  * Create (allocate) a new layer on a parent layer

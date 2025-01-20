@@ -829,6 +829,7 @@ static void draw_main(lv_event_t * e)
 #endif
 
     label_draw_dsc.flag = flag;
+    label_draw_dsc.base.layer = layer;
     lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_draw_dsc);
     lv_bidi_calculate_align(&label_draw_dsc.align, &label_draw_dsc.bidi_dir, label->text);
 

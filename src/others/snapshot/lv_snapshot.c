@@ -109,7 +109,7 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
     lv_area_increase(&snapshot_area, ext_size, ext_size);
 
     lv_layer_t layer;
-    lv_memzero(&layer, sizeof(layer));
+    lv_layer_init(&layer);
 
     layer.draw_buf = draw_buf;
     layer.buf_area.x1 = snapshot_area.x1;
@@ -119,9 +119,6 @@ lv_result_t lv_snapshot_take_to_draw_buf(lv_obj_t * obj, lv_color_format_t cf, l
     layer.color_format = cf;
     layer._clip_area = snapshot_area;
     layer.phy_clip_area = snapshot_area;
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-    lv_matrix_identity(&layer.matrix);
-#endif
 
     lv_display_t * disp_old = lv_refr_get_disp_refreshing();
     lv_display_t * disp_new = lv_obj_get_display(obj);
