@@ -10,44 +10,37 @@
 static void lv_proc_get_delta(uint32_t now_s, int now_ms, uint32_t original_s,
                               int original_ms, uint32_t * delta_s, int * delta_ms);
 
+static int lv_proc_get_uptime(uint32_t * now_s, int * now_ms, uint32_t * idle_s, int * idle_ms);
+
 static uint32_t last_uptime_s, last_idletime_s;
 static int last_uptime_ms, last_idletime_ms;
 
 uint32_t lv_os_get_idle_percent(void)
 {
-    FILE * fp = fopen(LV_UPTIME_MONITOR_FILE, "r");
-
-    if(!fp) {
-        LV_LOG_WARN("Failed to open " LV_UPTIME_MONITOR_FILE);
-        return UINT_MAX;
-    }
-    // UINT32_MAX seconds > 136 years
-    uint32_t uptime_s, idletime_s;
-
-    // Range is [0:100[
-    int uptime_ms, idletime_ms;
-
-    int err = fscanf(fp,
-                     "%" PRIu32 ".%d"
-                     " %" PRIu32 ".%d",
-                     &uptime_s, &uptime_ms, &idletime_s, &idletime_ms);
-
-    fclose(fp);
-    if(err != 4) {
-        LV_LOG_WARN("Failed to parse " LV_UPTIME_MONITOR_FILE);
-        return UINT_MAX;
-    }
 
     uint32_t delta_uptime_s, delta_idletime_s;
     int delta_uptime_ms, delta_idletime_ms;
+    {
 
-    /* Calculate the delta first to avoid overflowing */
-    lv_proc_get_delta(uptime_s, uptime_ms, last_uptime_s,
-                      last_uptime_ms, &delta_uptime_s, &delta_uptime_ms);
+        // UINT32_MAX seconds > 136 years
+        uint32_t uptime_s, idletime_s;
+        // Range is [0: 99[
+        int uptime_ms, idletime_ms;
 
-    lv_proc_get_delta(idletime_s, idletime_ms, last_idletime_s,
-                      last_idletime_ms, &delta_idletime_s,
-                      &delta_idletime_ms);
+        int err = lv_proc_get_duration(&uptime_s, &uptime_ms, &idletime_s, &idletime_ms);
+
+        if(err < 0) {
+            return UINT_MAX;
+        }
+
+        /* Calculate the delta first to avoid overflowing */
+        lv_proc_get_delta(uptime_s, uptime_ms, last_uptime_s,
+                          last_uptime_ms, &delta_uptime_s, &delta_uptime_ms);
+
+        lv_proc_get_delta(idletime_s, idletime_ms, last_idletime_s,
+                          last_idletime_ms, &delta_idletime_s,
+                          &delta_idletime_ms);
+    }
 
     /* From here onwards, there's no risk of overflowing as long as we call this function regularly */
 
@@ -78,6 +71,29 @@ static void lv_proc_get_delta(uint32_t now_s, int now_ms, uint32_t original_s,
     if(*delta_ms < 0) {
         *delta_s -= 1;
         *delta_ms += 100;
+    }
+}
+
+static int lv_proc_get_uptime(uint32_t * now_s, int * now_ms, uint32_t * idle_s, int * idle_ms)
+{
+
+    FILE * fp = fopen(LV_UPTIME_MONITOR_FILE, "r");
+
+    if(!fp) {
+        LV_LOG_WARN("Failed to open " LV_UPTIME_MONITOR_FILE);
+        return -1;
+    }
+
+    int err = fscanf(fp,
+                     "%" PRIu32 ".%d"
+                     " %" PRIu32 ".%d",
+                     &uptime_s, &uptime_ms, &idletime_s, &idletime_ms);
+
+    fclose(fp);
+
+    if(err != 4) {
+        LV_LOG_WARN("Failed to parse " LV_UPTIME_MONITOR_FILE);
+        return -1;
     }
 }
 
