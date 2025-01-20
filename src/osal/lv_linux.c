@@ -85,7 +85,7 @@ static int lv_proc_get_uptime(uint32_t * active_s, int * active_ms, uint32_t * i
     FILE * fp = fopen(LV_UPTIME_MONITOR_FILE, "r");
 
     if(!fp) {
-        LV_LOG_WARN("Failed to open " LV_UPTIME_MONITOR_FILE);
+        LV_LOG_ERROR("Failed to open " LV_UPTIME_MONITOR_FILE);
         return -1;
     }
 
@@ -97,7 +97,7 @@ static int lv_proc_get_uptime(uint32_t * active_s, int * active_ms, uint32_t * i
     fclose(fp);
 
     if(err != 4) {
-        LV_LOG_WARN("Failed to parse " LV_UPTIME_MONITOR_FILE);
+        LV_LOG_ERROR("Failed to parse " LV_UPTIME_MONITOR_FILE);
         return -1;
     }
     return 0;
