@@ -18,40 +18,40 @@ static int last_uptime_ms, last_idletime_ms;
 uint32_t lv_os_get_idle_percent(void)
 {
 
-    uint32_t delta_uptime_s, delta_idletime_s;
-    int delta_uptime_ms, delta_idletime_ms;
+    uint32_t delta_active_s, delta_idle_s;
+    int delta_active_ms, delta_idle_ms;
     {
 
         // UINT32_MAX seconds > 136 years
-        uint32_t uptime_s, idletime_s;
+        uint32_t active_s, idletime_s;
         // Range is [0: 99[
-        int uptime_ms, idletime_ms;
+        int active_ms, idletime_ms;
 
-        int err = lv_proc_get_uptime(&uptime_s, &uptime_ms, &idletime_s, &idletime_ms);
+        int err = lv_proc_get_uptime(&active_s, &active_ms, &idletime_s, &idletime_ms);
 
         if(err < 0) {
             return UINT_MAX;
         }
 
         /* Calculate the delta first to avoid overflowing */
-        lv_proc_get_delta(uptime_s, uptime_ms, last_uptime_s,
-                          last_uptime_ms, &delta_uptime_s, &delta_uptime_ms);
+        lv_proc_get_delta(active_s, active_ms, last_uptime_s,
+                          last_uptime_ms, &delta_active_s, &delta_active_ms);
 
         lv_proc_get_delta(idletime_s, idletime_ms, last_idletime_s,
-                          last_idletime_ms, &delta_idletime_s,
-                          &delta_idletime_ms);
+                          last_idletime_ms, &delta_idle_s,
+                          &delta_idle_ms);
+
+        /* Update for next call */
+        last_uptime_s = active_s;
+        last_uptime_ms = active_ms;
+        last_idletime_s = idletime_s;
+        last_idletime_ms = idletime_ms;
     }
 
     /* From here onwards, there's no risk of overflowing as long as we call this function regularly */
 
-    /* Update for next call */
-    last_uptime_s = uptime_s;
-    last_uptime_ms = uptime_ms;
-    last_idletime_s = idletime_s;
-    last_idletime_ms = idletime_ms;
-
-    uint32_t total_ms = delta_uptime_ms + delta_idletime_ms;
-    uint32_t total_s = delta_uptime_s + delta_idletime_s;
+    uint32_t total_ms = delta_active_ms + delta_idle_ms;
+    uint32_t total_s = delta_active_s + delta_idle_s;
 
     if(total_ms >= 100) {
         total_s += 1;
@@ -64,7 +64,7 @@ uint32_t lv_os_get_idle_percent(void)
         return 0;
     }
 
-    return ((delta_idletime_s * 100 + delta_idletime_ms) * 100) / total;
+    return ((delta_idle_s * 100 + delta_idle_ms) * 100) / total;
 }
 
 static void lv_proc_get_delta(uint32_t now_s, int now_ms, uint32_t original_s,
@@ -79,7 +79,7 @@ static void lv_proc_get_delta(uint32_t now_s, int now_ms, uint32_t original_s,
     }
 }
 
-static int lv_proc_get_uptime(uint32_t * now_s, int * now_ms, uint32_t * idle_s, int * idle_ms)
+static int lv_proc_get_uptime(uint32_t * active_s, int * active_ms, uint32_t * idle_s, int * idle_ms)
 {
 
     FILE * fp = fopen(LV_UPTIME_MONITOR_FILE, "r");
@@ -92,7 +92,7 @@ static int lv_proc_get_uptime(uint32_t * now_s, int * now_ms, uint32_t * idle_s,
     int err = fscanf(fp,
                      "%" PRIu32 ".%d"
                      " %" PRIu32 ".%d",
-                     &uptime_s, &uptime_ms, &idletime_s, &idletime_ms);
+                     active_s, active_ms, idle_s, idle_ms);
 
     fclose(fp);
 
