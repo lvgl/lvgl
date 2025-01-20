@@ -100,6 +100,7 @@ static int lv_proc_get_uptime(uint32_t * active_s, int * active_ms, uint32_t * i
         LV_LOG_WARN("Failed to parse " LV_UPTIME_MONITOR_FILE);
         return -1;
     }
+    return 0;
 }
 
 #endif
