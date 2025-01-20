@@ -27,7 +27,7 @@ uint32_t lv_os_get_idle_percent(void)
         // Range is [0: 99[
         int uptime_ms, idletime_ms;
 
-        int err = lv_proc_get_duration(&uptime_s, &uptime_ms, &idletime_s, &idletime_ms);
+        int err = lv_proc_get_uptime(&uptime_s, &uptime_ms, &idletime_s, &idletime_ms);
 
         if(err < 0) {
             return UINT_MAX;
