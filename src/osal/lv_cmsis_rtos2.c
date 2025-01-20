@@ -17,6 +17,7 @@
 #if LV_USE_OS == LV_OS_CMSIS_RTOS2
 
 #include "../misc/lv_log.h"
+#include "../misc/lv_timer.h"
 
 /*********************
  *      DEFINES
@@ -188,6 +189,11 @@ lv_result_t lv_thread_sync_delete(lv_thread_sync_t * sync)
     }
 
     return LV_RESULT_OK;
+}
+
+uint32_t lv_os_get_idle_percent(void)
+{
+    return lv_timer_get_idle();
 }
 
 /**********************

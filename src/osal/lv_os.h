@@ -60,6 +60,12 @@ typedef enum {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Set it for `LV_SYSMON_GET_IDLE` to show the CPU usage
+ * @return the idle percentage since the last call
+ */
+uint32_t lv_os_get_idle_percent(void);
+
 #if LV_USE_OS != LV_OS_NONE
 
 /*----------------------------------------
