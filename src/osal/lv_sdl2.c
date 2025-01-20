@@ -169,6 +169,13 @@ lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * sync)
     return LV_RESULT_INVALID;
 }
 
+#ifndef __linux__
+uint32_t lv_os_get_idle_percent(void)
+{
+    return lv_timer_get_idle();
+}
+#endif
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

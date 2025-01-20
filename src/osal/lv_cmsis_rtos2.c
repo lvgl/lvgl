@@ -190,6 +190,11 @@ lv_result_t lv_thread_sync_delete(lv_thread_sync_t * sync)
     return LV_RESULT_OK;
 }
 
+uint32_t lv_os_get_idle_percent(void)
+{
+    return lv_timer_get_idle();
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
