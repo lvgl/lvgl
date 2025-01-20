@@ -11,6 +11,7 @@
 #if LV_USE_OS == LV_OS_RTTHREAD
 
 #include "../misc/lv_log.h"
+#include "../misc/lv_timer.h"
 
 /*********************
  *      DEFINES

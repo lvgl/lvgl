@@ -13,6 +13,10 @@
 #include <errno.h>
 #include "../misc/lv_log.h"
 
+#ifndef __linux__
+    #include "../misc/lv_timer.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/

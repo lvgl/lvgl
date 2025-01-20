@@ -11,6 +11,7 @@
 #if LV_USE_OS == LV_OS_MQX
 
 #include "../misc/lv_log.h"
+#include "../misc/lv_timer.h"
 #include "../stdlib/lv_string.h"
 
 /*********************
