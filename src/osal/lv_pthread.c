@@ -10,9 +10,6 @@
 
 #if LV_USE_OS == LV_OS_PTHREAD
 
-#include <stdio.h>
-#include <inttypes.h>
-#include <limits.h>
 #include "../misc/lv_log.h"
 
 #ifndef __linux__
