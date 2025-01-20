@@ -2,6 +2,7 @@
 #ifdef __linux__
 
 #include "../misc/lv_log.h"
+#include "lv_os.h"
 #include <stdio.h>
 
 #define LV_UPTIME_MONITOR_FILE "/proc/uptime"
