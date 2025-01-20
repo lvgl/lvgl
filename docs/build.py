@@ -160,6 +160,10 @@ Argument Descriptions
     Warning:  this wipes out translation links and API-page links that
     were added in the first pass, so should only be used for doc
     development -- not for final doc generation.
+- help
+    Print usage note and exit with status 0.
+
+Unrecognized arguments print error message, usage note, and exit with status 1.
 """
 
 # ****************************************************************************
@@ -168,6 +172,32 @@ Argument Descriptions
 #            is allowed!!! Ask me how long it took me to figure this out.
 # ****************************************************************************
 
+def print_usage_note():
+    print('Usage:')
+    print('  $ python build.py [optional_arg ...]')
+    print()
+    print('  where `optional_arg` can be any of these:')
+    print('    skip_latex   :  do not attempt latex => PDF generation')
+    print('    skip_api     :  do not generate API doc pages and links (saves 70% build time)')
+    print('    no_fresh_env :  do not include -E option on "sphinx-build" command line')
+    print('    preserve     :  do not delete temp directory files after doc generation')
+    print('    fixed_tmp_dir:  use LVGL_FIXED_TEMP_DIR env var for temp directory path')
+    print('    skip_trans   :  do not add translated-doc links')
+    print('    no_copy      :  Skips copying ./docs/ directory tree to temp directory')
+    print('    docs_dev     :  shorthand for "no_fresh_env  preserve  fixed_tmp_dir  no_copy"')
+    print('    update       :  recursively copy updated ./docs/ files to temp directory')
+    print()
+    print('Normal usage:')
+    print('  python build.py  skip_latex')
+    print()
+    print('For doc development:')
+    print('--------------------')
+    print('To generate initial "base" files and HTML docs with API pages and links:')
+    print('  1.  set LVGL_FIXED_TEMP_DIR to desired temp-dir path (no trailing dir separator)')
+    print('  2.  $ python build.py  skip_latex  preserve  fixed_tmp_dir')
+    print()
+    print('To generate subsequent updates (e.g. after editing an .rst file):')
+    print('  python build.py  skip_latex  docs_dev  update')
 
 def run():
     # Python Library Imports
@@ -236,8 +266,13 @@ def run():
             docs_dev = True
         elif arg == 'update':
             update = True
+        elif arg == 'help':
+            print_usage_note()
+            exit(0)
         else:
             print(f'Argument [{arg}] not recognized.')
+            print()
+            print_usage_note()
             exit(1)
 
     # Arg ramifications:
@@ -651,9 +686,6 @@ def run():
     t4 = datetime.now()
     print('Total run time:   ' + str(t4 - t1))
     print('Output path:     ', html_dst_path)
-    print()
-    print('Note:  warnings about `/details/index.rst` and `/intro/index.rst`')
-    print('       "not being in any toctree" are expected and intentional.')
     print()
     print('Finished.')
 
