@@ -353,6 +353,10 @@ typedef struct _lv_xml_component_ctx_t lv_xml_component_ctx_t;
 
 typedef struct _lv_xml_parser_state_t lv_xml_parser_state_t;
 
+#if LV_USE_EVDEV
+typedef struct _lv_evdev_discovery_t lv_evdev_discovery_t;
+#endif
+
 #endif /*__ASSEMBLY__*/
 
 /**********************

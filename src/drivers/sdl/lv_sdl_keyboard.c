@@ -118,7 +118,7 @@ void lv_sdl_keyboard_handler(SDL_Event * event)
     /*Find a suitable indev*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
-        if(lv_indev_get_type(indev) == LV_INDEV_TYPE_KEYPAD) {
+        if(lv_indev_get_read_cb(indev) == sdl_keyboard_read) {
             /*If disp is NULL for any reason use the first indev with the correct type*/
             if(disp == NULL || lv_indev_get_display(indev) == disp) break;
         }
