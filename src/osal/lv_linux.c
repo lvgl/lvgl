@@ -2,7 +2,6 @@
 #ifdef __linux__
 
 #include "../misc/lv_log.h"
-#include "lv_os.h"
 #include <stdio.h>
 
 #define LV_UPTIME_MONITOR_FILE "/proc/uptime"
@@ -31,7 +30,12 @@ uint32_t lv_os_get_idle_percent(void)
                      "%" PRIu32 ".%d"
                      " %" PRIu32 ".%d",
                      &uptime_s, &uptime_ms, &idletime_s, &idletime_ms);
+    
     fclose(fp);
+    if(err != 4){
+        LV_LOG_WARN("Failed to parse " LV_UPTIME_MONITOR_FILE);
+        return UINT_MAX;
+    }
 
     uint32_t delta_uptime_s, delta_idletime_s;
     int delta_uptime_ms, delta_idletime_ms;
