@@ -81,7 +81,9 @@ extern "C" {
 #define lv_chart_set_all_value lv_chart_set_all_values
 #define lv_calendar_set_showed_date lv_calendar_set_month_shown
 
+#ifndef LV_FS_DEFAULT_DRIVE_LETTER
 #define LV_FS_DEFAULT_DRIVE_LETTER     LV_FS_DEFAULT_DRIVER_LETTER
+#endif
 
 #define LV_LABEL_LONG_WRAP             LV_LABEL_LONG_MODE_WRAP
 #define LV_LABEL_LONG_DOT              LV_LABEL_LONG_MODE_DOTS
