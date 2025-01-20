@@ -181,15 +181,11 @@ lv_result_t lv_lock_isr(void);
  */
 void lv_unlock(void);
 
-#if LV_USE_OS == LV_OS_FREERTOS || LV_USE_OS == LV_OS_PTHREAD
-
 /**
  * Set it for `LV_SYSMON_GET_IDLE` to show the CPU usage
  * @return the idle percentage since the last call
  */
 uint32_t lv_os_get_idle_percent(void);
-
-#endif /* LV_USE_OS == LV_OS_FREERTOS || LV_USE_OS == LV_OS_PTHREAD */
 
 #else
 
