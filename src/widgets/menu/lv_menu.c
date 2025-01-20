@@ -113,7 +113,6 @@ static void lv_menu_value_changed_event_cb(lv_event_t * e);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-bool lv_menu_item_back_button_is_root(lv_obj_t * menu, lv_obj_t * obj);
 void lv_menu_clear_history(lv_obj_t * obj);
 
 lv_obj_t * lv_menu_create(lv_obj_t * parent)
@@ -124,12 +123,12 @@ lv_obj_t * lv_menu_create(lv_obj_t * parent)
     return obj;
 }
 
-lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char const * const title)
+lv_obj_t * lv_menu_page_create(lv_obj_t * menu, char const * const title)
 {
-    LV_ASSERT_OBJ(parent, MY_CLASS);
+    LV_ASSERT_OBJ(menu, MY_CLASS);
 
     LV_LOG_INFO("begin");
-    lv_obj_t * obj = lv_obj_class_create_obj(&lv_menu_page_class, parent);
+    lv_obj_t * obj = lv_obj_class_create_obj(&lv_menu_page_class, menu);
     lv_obj_class_init_obj(obj);
 
     lv_menu_page_t * page = (lv_menu_page_t *)obj;

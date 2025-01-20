@@ -8,8 +8,9 @@ Menu (lv_menu)
 Overview
 ********
 
-The Menu Widget can be used to easily create multi-level menus. It
-handles the traversal between Pages automatically.
+The Menu Widget can be used to create multi-level menus that automatically handle
+navigation among menu levels, and enable its user to capture page navigation and
+click events.
 
 
 .. _lv_menu_parts_and_styles:
@@ -31,6 +32,7 @@ The Menu Widget is built from the following Widgets:
 - Sidebar Page: :cpp:type:`lv_menu_page`
 
 
+
 .. _lv_menu_usage:
 
 Usage
@@ -41,12 +43,25 @@ Create a Menu
 
 :cpp:expr:`lv_menu_create(parent)` creates a new empty Menu.
 
+This creates a Menu Widget with this object hierarchy:
+
+    - Menu: :cpp:type:`lv_menu_t`
+        - Hidden Sub-Page Storage: :cpp:type:`lv_obj_t`
+        - Main container: :cpp:var:`lv_menu_main_cont_class`
+            - Main header: :cpp:var:`lv_menu_main_header_cont_class`
+                - Back button: :ref:`lv_button`
+                    - Back button icon: :ref:`lv_image`
+                - Main header title: :ref:`lv_label` (default hidden)
+
+Note that no sidebar is created.  You can create one later if you wish.
+
+
 Header mode
 -----------
 
 The following header modes exist:
 
-- :cpp:enumerator:`LV_MENU_HEADER_TOP_FIXED` Header is positioned at the top.
+- :cpp:enumerator:`LV_MENU_HEADER_TOP_FIXED` Header is positioned at the top.  (default)
 - :cpp:enumerator:`LV_MENU_HEADER_TOP_UNFIXED` Header is positioned at the top and can be scrolled out of view.
 - :cpp:enumerator:`LV_MENU_HEADER_BOTTOM_FIXED` Header is positioned at the bottom.
 
@@ -57,7 +72,7 @@ Root back button mode
 
 The following root back button modes exist:
 
-- :cpp:enumerator:`LV_MENU_ROOT_BACK_BTN_DISABLED`
+- :cpp:enumerator:`LV_MENU_ROOT_BACK_BTN_DISABLED`  (default)
 - :cpp:enumerator:`LV_MENU_ROOT_BACK_BTN_ENABLED`
 
 You can set root back button modes with
