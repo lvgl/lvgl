@@ -36,7 +36,7 @@ uint32_t lv_os_get_idle_percent(void)
     uint32_t delta_uptime_s, delta_idletime_s;
     int delta_uptime_ms, delta_idletime_ms;
 
-    // Calculate the delta first to avoid overflowing
+    /* Calculate the delta first to avoid overflowing */
     lv_proc_get_delta(uptime_s, uptime_ms, last_uptime_s,
                       last_uptime_ms, &delta_uptime_s, &delta_uptime_ms);
 
@@ -44,7 +44,7 @@ uint32_t lv_os_get_idle_percent(void)
                       last_idletime_ms, &delta_idletime_s,
                       &delta_idletime_ms);
 
-    /* From here onwards, there's no risk as long as we call this function regularly */
+    /* From here onwards, there's no risk of overflowing as long as we call this function regularly */
 
     /* Update for next call */
     last_uptime_s = uptime_s;
