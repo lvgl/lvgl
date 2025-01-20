@@ -240,7 +240,7 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
     lv_draw_task_t * task = u->task_act;
 
     lv_layer_t dest_layer;
-    lv_memzero(&dest_layer, sizeof(dest_layer));
+    lv_layer_init(&dest_layer);
 
     int32_t texture_w = lv_area_get_width(&task->_real_area);
     int32_t texture_h = lv_area_get_height(&task->_real_area);

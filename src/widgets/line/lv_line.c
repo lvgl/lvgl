@@ -236,6 +236,7 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         lv_draw_line_dsc_t line_dsc;
         lv_draw_line_dsc_init(&line_dsc);
+        line_dsc.base.layer = layer;
         lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
 
         /*Read all points and draw the lines*/

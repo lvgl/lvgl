@@ -24,7 +24,8 @@ extern "C" {
 
 #if LV_USE_PXP
 #if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
-#include "../../sw/lv_draw_sw_private.h"
+#include "../../lv_draw_private.h"
+#include "../../../display/lv_display_private.h"
 #include "../../../misc/lv_area_private.h"
 
 /*********************

@@ -46,11 +46,13 @@ static unsigned __stdcall thread_start_routine(void * parameter);
 
 lv_result_t lv_thread_init(
     lv_thread_t * thread,
+    const char * const name,
     lv_thread_prio_t prio,
     void (*callback)(void *),
     size_t stack_size,
     void * user_data)
 {
+    LV_UNUSED(name);
     if(!thread) {
         return LV_RESULT_INVALID;
     }

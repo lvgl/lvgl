@@ -147,9 +147,11 @@ static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(code == LV_EVENT_DRAW_MAIN) {
         /*Make darker colors in a temporary style according to the brightness*/
         lv_led_t * led = (lv_led_t *)obj;
+        lv_layer_t * layer = lv_event_get_layer(e);
 
         lv_draw_rect_dsc_t rect_dsc;
         lv_draw_rect_dsc_init(&rect_dsc);
+        rect_dsc.base.layer = layer;
         lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &rect_dsc);
 
         /*Use the original colors brightness to modify color->led*/
@@ -176,8 +178,6 @@ static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e)
                                 (LV_LED_BRIGHT_MAX - LV_LED_BRIGHT_MIN);
         rect_dsc.shadow_spread = ((led->bright - LV_LED_BRIGHT_MIN) * rect_dsc.shadow_spread) /
                                  (LV_LED_BRIGHT_MAX - LV_LED_BRIGHT_MIN);
-
-        lv_layer_t * layer = lv_event_get_layer(e);
 
         lv_draw_rect(layer, &rect_dsc, &obj->coords);
     }

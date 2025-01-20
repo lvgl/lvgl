@@ -126,6 +126,8 @@ lv_obj_t * lv_menu_create(lv_obj_t * parent)
 
 lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char const * const title)
 {
+    LV_ASSERT_OBJ(parent, MY_CLASS);
+
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_menu_page_class, parent);
     lv_obj_class_init_obj(obj);
@@ -141,6 +143,8 @@ lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char const * const title)
 
 lv_obj_t * lv_menu_cont_create(lv_obj_t * parent)
 {
+    LV_ASSERT_OBJ(parent, &lv_menu_page_class);
+
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_menu_cont_class, parent);
     lv_obj_class_init_obj(obj);
@@ -149,6 +153,8 @@ lv_obj_t * lv_menu_cont_create(lv_obj_t * parent)
 
 lv_obj_t * lv_menu_section_create(lv_obj_t * parent)
 {
+    LV_ASSERT_OBJ(parent, &lv_menu_page_class);
+
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_menu_section_class, parent);
     lv_obj_class_init_obj(obj);
@@ -157,6 +163,8 @@ lv_obj_t * lv_menu_section_create(lv_obj_t * parent)
 
 lv_obj_t * lv_menu_separator_create(lv_obj_t * parent)
 {
+    LV_ASSERT_OBJ(parent, &lv_menu_page_class);
+
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_menu_separator_class, parent);
     lv_obj_class_init_obj(obj);
@@ -389,6 +397,8 @@ void lv_menu_set_load_page_event(lv_obj_t * menu, lv_obj_t * obj, lv_obj_t * pag
 
 void lv_menu_set_page_title(lv_obj_t * page_obj, char const * const title)
 {
+    LV_ASSERT_OBJ(page_obj, &lv_menu_page_class);
+
     LV_LOG_INFO("begin");
     lv_menu_page_t * page = (lv_menu_page_t *)page_obj;
 
@@ -414,6 +424,8 @@ void lv_menu_set_page_title(lv_obj_t * page_obj, char const * const title)
 
 void lv_menu_set_page_title_static(lv_obj_t * page_obj, char const * const title)
 {
+    LV_ASSERT_OBJ(page_obj, &lv_menu_page_class);
+
     LV_LOG_INFO("begin");
     lv_menu_page_t * page = (lv_menu_page_t *)page_obj;
 

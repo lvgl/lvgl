@@ -25,20 +25,6 @@
  *      DEFINES
  *********************/
 
-#if LV_USE_VG_LITE_THORVG
-    /**
-    * It is found that thorvg cannot handle large coordinates well.
-    * When the coordinates are larger than 4096, the calculation of tvgSwRle module will overflow in 32-bit system.
-    * So we use FLT_MAX and FLT_MIN to write the mark to bounding_box to tell vg_lite_tvg not to add clip path to the current path.
-    */
-    #define PATH_COORD_MAX FLT_MAX
-    #define PATH_COORD_MIN FLT_MIN
-#else
-    /*  18 bits is enough to represent the coordinates of path bounding box */
-    #define PATH_COORD_MAX (1 << 18)
-    #define PATH_COORD_MIN (-PATH_COORD_MAX)
-#endif
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -260,7 +246,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                                                &pattern_matrix,
                                                blend,
                                                VG_LITE_PATTERN_COLOR,
-                                               vg_color,
+                                               0,
                                                recolor,
                                                VG_LITE_FILTER_BI_LINEAR));
                     LV_PROFILER_DRAW_END_TAG("vg_lite_draw_pattern");

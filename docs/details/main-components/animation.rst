@@ -293,6 +293,18 @@ This function returns a Boolean value indicating whether any *live, running*
 Animations were deleted.
 
 
+.. _animation_pause:
+
+Pausing Animations
+******************
+
+If you kept a copy of the pointer returned by :cpp:func:`lv_anim_start`,
+you can pause the running animation using :cpp:expr:`lv_anim_pause(animation)` and then resume it
+using :cpp:expr:`lv_anim_resume(animation)`.
+
+:cpp:expr:`lv_anim_pause_for(animation, milliseconds)`
+is also available if you wish for the animation to resume automatically after.
+
 
 .. _animations_timeline:
 

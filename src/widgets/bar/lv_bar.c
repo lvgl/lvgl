@@ -469,6 +469,7 @@ static void draw_indic(lv_event_t * e)
 
     lv_draw_rect_dsc_t draw_rect_dsc;
     lv_draw_rect_dsc_init(&draw_rect_dsc);
+    draw_rect_dsc.base.layer = layer;
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_rect_dsc);
 
     int32_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
