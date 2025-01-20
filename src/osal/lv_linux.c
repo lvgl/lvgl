@@ -22,9 +22,9 @@ uint32_t lv_os_get_idle_percent(void)
     int delta_active_ms, delta_idle_ms;
     {
 
-        // UINT32_MAX seconds > 136 years
+        /* UINT32_MAX seconds > 136 years */
         uint32_t active_s, idletime_s;
-        // Range is [0: 99[
+        /* Range is [0: 99[ */
         int active_ms, idletime_ms;
 
         int err = lv_proc_get_uptime(&active_s, &active_ms, &idletime_s, &idletime_ms);
