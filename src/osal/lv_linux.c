@@ -58,8 +58,13 @@ uint32_t lv_os_get_idle_percent(void)
         total_ms -= 100;
     }
 
-    return ((delta_idletime_s * 100 + delta_idletime_ms) * 100) /
-           (total_s * 100 + total_ms);
+    const uint32_t total = total_s * 100 + total_ms;
+
+    if(total == 0) {
+        return 0;
+    }
+
+    return ((delta_idletime_s * 100 + delta_idletime_ms) * 100) / total;
 }
 
 static void lv_proc_get_delta(uint32_t now_s, int now_ms, uint32_t original_s,
