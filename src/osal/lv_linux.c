@@ -14,7 +14,7 @@ static int last_uptime_ms, last_idletime_ms;
 
 uint32_t lv_os_get_idle_percent(void)
 {
-    FILE *fp = fopen(LV_UPTIME_MONITOR_FILE, "r");
+    FILE * fp = fopen(LV_UPTIME_MONITOR_FILE, "r");
 
     if(!fp) {
         LV_LOG_WARN("Failed to open " LV_UPTIME_MONITOR_FILE);
@@ -30,9 +30,9 @@ uint32_t lv_os_get_idle_percent(void)
                      "%" PRIu32 ".%d"
                      " %" PRIu32 ".%d",
                      &uptime_s, &uptime_ms, &idletime_s, &idletime_ms);
-    
+
     fclose(fp);
-    if(err != 4){
+    if(err != 4) {
         LV_LOG_WARN("Failed to parse " LV_UPTIME_MONITOR_FILE);
         return UINT_MAX;
     }
