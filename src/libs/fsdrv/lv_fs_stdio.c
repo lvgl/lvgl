@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "../../../lvgl.h"
-#if LV_USE_FS_STDIO != '\0'
+#if LV_USE_FS_STDIO
 
 #include <stdio.h>
 #ifndef WIN32
