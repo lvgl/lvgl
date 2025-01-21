@@ -98,7 +98,7 @@ Features supported:
 ^^^^^^^^^^^^^^^^^^^
 
 Several drawing features in LVGL can be offloaded to the PXP engine. The CPU is
-available for other operations while the PXP is running. RTOS is required to
+available for other operations while the PXP is running. A RTOS is required to
 block the LVGL drawing thread and switch to another task or suspend the CPU for
 power savings.
 
@@ -120,7 +120,7 @@ Supported draw tasks are available in "src/draw/nxp/pxp/lv_draw_pxp.c":
             break;
     }
 
-Additional, the screen rotation can be handled by the PXP:
+Additionally, the screen rotation can be handled by the PXP:
 
 .. code-block::c
 
@@ -140,7 +140,7 @@ Additional, the screen rotation can be handled by the PXP:
 Known limitations:
 ^^^^^^^^^^^^^^^^^^
 
-- PXP can only rotate at 90x angles.
+- PXP can only rotate the frames in angles that are multiple of 90 degrees.
 - Rotation is not supported for images unaligned to blocks of 16x16 pixels. PXP
   is set to process 16x16 blocks to optimize the system for memory bandwidth and
   image processing time. The output engine essentially truncates any output
@@ -183,8 +183,8 @@ PXP default configuration:
 
 - Implementation depends on multiple OS-specific functions. The struct
   :cpp:struct:`pxp_cfg_t` with callback pointers is used as a parameter for the
-  :cpp:func:`lv_pxp_init()` function. Default implementation for FreeRTOS and
-  bare metal is provided in lv_pxp_osa.c.
+  :cpp:func:`lv_pxp_init()` function. Default implementation for
+  FreeRTOS in lv_pxp_osa.c.
 
    - :cpp:func:`pxp_interrupt_init()`: Initialize PXP interrupt (HW setup,
      OS setup)
@@ -199,7 +199,7 @@ VGLite accelerator
 ~~~~~~~~~~~~~~~~~~
 
 Extra drawing features in LVGL can be handled by the VGLite engine. The
-CPU is available for other operations while the VGLite is running. An
+CPU is available for other operations while the VGLite is running. A
 RTOS is required to block the LVGL drawing thread and switch to another
 task or suspend the CPU for power savings.
 
