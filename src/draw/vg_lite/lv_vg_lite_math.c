@@ -39,12 +39,12 @@
 
 float math_fast_inv_sqrtf(float number)
 {
-    int32_t i;
-    float x2, y;
     const float threehalfs = 1.5f;
 
-    x2 = number * 0.5f;
-    y = number;
+    int32_t i = 0;
+    float x2 = number * 0.5f;
+    float y = number;
+
     i = *(int32_t *)&y; /* evil floating point bit level hacking */
     i = 0x5f3759df /* floating-point representation of an approximation of {\sqrt {2^{127}}}} see https://en.wikipedia.org/wiki/Fast_inverse_square_root. */
         - (i >>
