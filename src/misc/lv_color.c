@@ -51,13 +51,20 @@ uint8_t lv_color_format_get_bpp(lv_color_format_t cf)
             return 2;
         case LV_COLOR_FORMAT_I4:
         case LV_COLOR_FORMAT_A4:
+        case LV_COLOR_FORMAT_NEMA_TSC4:
             return 4;
+        case LV_COLOR_FORMAT_NEMA_TSC6:
+        case LV_COLOR_FORMAT_NEMA_TSC6A:
+        case LV_COLOR_FORMAT_NEMA_TSC6AP:
+            return 6;
         case LV_COLOR_FORMAT_L8:
         case LV_COLOR_FORMAT_A8:
         case LV_COLOR_FORMAT_I8:
         case LV_COLOR_FORMAT_ARGB2222:
             return 8;
-
+        case LV_COLOR_FORMAT_NEMA_TSC12:
+        case LV_COLOR_FORMAT_NEMA_TSC12A:
+            return 12;
         case LV_COLOR_FORMAT_RGB565A8:
         case LV_COLOR_FORMAT_RGB565:
         case LV_COLOR_FORMAT_YUY2:

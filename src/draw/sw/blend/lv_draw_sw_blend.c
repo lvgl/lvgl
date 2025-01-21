@@ -10,6 +10,9 @@
 #include "lv_draw_sw_blend_private.h"
 #include "../../lv_draw_private.h"
 #include "../lv_draw_sw.h"
+
+#if LV_DRAW_BLEND_CUSTOM == LV_DRAW_BLEND_CUSTOM_NONE
+
 #if LV_DRAW_SW_SUPPORT_L8
     #include "lv_draw_sw_blend_to_l8.h"
 #endif
@@ -226,5 +229,7 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+#endif
 
 #endif
