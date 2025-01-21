@@ -2052,6 +2052,8 @@ menu "LVGL configuration"
 			bool "vector graphic demo"
 			default n
 			depends on LV_USE_VECTOR_GRAPHIC
+		config LV_USE_DEMO_SMARTWATCH
+			bool "Smartwatch demo"
 	endmenu
 
 endmenu
