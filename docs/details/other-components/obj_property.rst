@@ -138,15 +138,20 @@ to be looked up for each type of Widget where Widget properties has been impleme
 
 If the property you need to set or get using this API is not implemented yet, you can
 add your own Widget property ID following same rules and using one of two helper
-macros in the ``enum`` in the Widget's primary ``.h`` file:
+macros in the ``enum`` in the Widget's primary ``.h`` file.  In both cases, the
+"assembled" value is a 32-bit value:
 
-- :c:macro:`LV_PROPERTY_ID` (for single values -- see :ref:`Single Values` below)`
-- :c:macro:`LV_PROPERTY_ID2` (for paired values -- see :ref:`Paired Values` below)`
+- :c:macro:`LV_PROPERTY_ID` (for single values -- see :ref:`Single Values` below)`;
+  bits ``<31:28>`` contain the property's value type and bits ``<27:0>`` contain the
+  property ID.
+- :c:macro:`LV_PROPERTY_ID2` (for paired values -- see :ref:`Paired Values` below)`;
+  bits ``<31:28>`` contain the type for the property's 1st value, bits ``<27:24>``
+  contain the type for the 2nd value, and bits ``<23:0>`` contain the property ID.
 
 Just make sure the ID is unique across all Widgets.
 
-The "assembled" identifer is a 32-bit value.  The highest 4 bits contain the
-property's value type.  The lower 28 bits is the property ID.
+The "assembled" identifer is a 32-bit value.  For values "assembled" using
+:c:macro:`LV_PROPERTY_ID`,
 
 Note that :cpp:type:`lv_style_prop_t` (enumerator values beginning with ``LV_PROPERTY_STYLE_...``)
 are also valid property IDs, and can be used to set or get a Widget's style values.
