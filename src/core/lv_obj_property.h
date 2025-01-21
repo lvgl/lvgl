@@ -88,13 +88,13 @@ struct _lv_property_name_t {
 typedef struct {
     lv_prop_id_t id;
     union {
-        int32_t num;                /**< Number integer number (opacity, enums, booleans or "normal" numbers)*/
-        uint32_t num_u;
-        bool enable;                /**< booleans*/
-        const void * ptr;           /**< Constant pointers  (font, cone text, etc)*/
-        lv_color_t color;           /**< Colors*/
-        lv_value_precise_t precise; /**< float or int for precise value*/
-        lv_point_t point;           /**< Point, contains two int32_t.*/
+        int32_t num;                /**< Signed integer number (enums or "normal" numbers)*/
+        uint32_t num_u;             /**< Unsigned integer number (opacity, Booleans)  */
+        bool enable;                /**< Booleans */
+        const void * ptr;           /**< Constant pointers  (font, cone text, etc.) */
+        lv_color_t color;           /**< Colors */
+        lv_value_precise_t precise; /**< float or int for precise value */
+        lv_point_t point;           /**< Point, contains two int32_t */
 
         struct {
             /**
@@ -122,7 +122,7 @@ typedef struct {
         };
 
         /**
-         * For some property like slider range, it contains two simple(4byte) value
+         * For some properties like slider range, it contains two simple (4-byte) values
          * so we can use `arg1.num` and `arg2.num` to set the argument.
          */
         struct {

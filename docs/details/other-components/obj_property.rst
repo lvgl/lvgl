@@ -91,7 +91,7 @@ The 3 functions that then become available are:
 
 .. code:: c
 
-    v_result_t     lv_obj_set_property(lv_obj_t * widget, const lv_property_t * value);
+    lv_result_t    lv_obj_set_property(lv_obj_t * widget, const lv_property_t * value);
     lv_property_t  lv_obj_get_property(lv_obj_t * widget, lv_prop_id_t id);
 
 A ``lv_property_t`` is a paired ID and value, and a ``lv_prop_id_t`` is just an ID.
@@ -137,14 +137,18 @@ to be looked up for each type of Widget where Widget properties has been impleme
 (Note:  this is done internally so you don't have to.)
 
 If the property you need to set or get using this API is not implemented yet, you can
-add your own Widget property ID following same rules and using helper macro
-:c:macro:`LV_PROPERTY_ID` in the ``enum`` in the Widget's primary ``.h`` file.
+add your own Widget property ID following same rules and using one of two helper
+macros in the ``enum`` in the Widget's primary ``.h`` file:
+
+- :c:macro:`LV_PROPERTY_ID` (for single values -- see :ref:`Single Values` below)`
+- :c:macro:`LV_PROPERTY_ID2` (for paired values -- see :ref:`Paired Values` below)`
+
 Just make sure the ID is unique across all Widgets.
 
 The "assembled" identifer is a 32-bit value.  The highest 4 bits contain the
 property's value type.  The lower 28 bits is the property ID.
 
-Note that :cpp:type:`lv_style_prop_t` (enumerator values beginning with ``LV_STYLE_...``)
+Note that :cpp:type:`lv_style_prop_t` (enumerator values beginning with ``LV_PROPERTY_STYLE_...``)
 are also valid property IDs, and can be used to set or get a Widget's style values.
 
 
@@ -155,8 +159,79 @@ Property Value
 
 :cpp:type:`lv_property_t` is a struct that begins with an ``id`` field whose meaning
 is the same as property ID described above, paired with a value, which is a union of
-all possible property types including integer, pointer and color.  The value field is
-also capable of carrying the different value types for styles.
+all possible property types including integer, pointer and color.  The ``value``
+field is also capable of carrying the different value types for styles.  It does this
+by being a union of all the different types that might be needed.  The list of
+"union-ed" fields at this writing are:
+
+.. _single values:
+
+Single Values
+~~~~~~~~~~~~~
+
+.. code-block:: c
+
+    int32_t             num;      /**< Signed integer number (enums or "normal" numbers) */
+    uint32_t            num_u;    /**< Unsigned integer number (opacity, Booleans) */
+    bool                enable;   /**< Booleans */
+    const void        * ptr;      /**< Constant pointers  (font, cone text, etc.) */
+    lv_color_t          color;    /**< Colors */
+    lv_value_precise_t  precise;  /**< float or int for precise value */
+    lv_point_t          point;    /**< Point, contains two int32_t */
+
+.. _paired values:
+
+Paired Values
+~~~~~~~~~~~~~
+
+.. code-block:: c
+
+    struct {
+        /**
+         * Note that place struct member `style` at first place is intended.
+         * `style` shares same memory with `num`, `ptr`, `color`.
+         * So we set the style value directly without using `prop.style.num`.
+         *
+         * E.g.
+         *
+         * static const lv_property_t obj_pos_x = {
+         *      .id = LV_PROPERTY_STYLE_X,
+         *      .num = 123,
+         *      .selector = LV_STATE_PRESSED,
+         * }
+         *
+         * instead of:
+         * static const lv_property_t obj_pos_x = {
+         *      .id = LV_PROPERTY_STYLE_X,
+         *      .style.num = 123, // note this line.
+         *      .selector = LV_STATE_PRESSED,
+         * }
+         */
+        lv_style_value_t  style;     /**< Make sure it's the first element in struct. */
+        uint32_t          selector;  /**< Style selector, lv_part_t | lv_state_t */
+    };
+
+    /**
+     * For some properties like slider range, it contains two simple (4-byte) values
+     * so we can use `arg1.num` and `arg2.num` to set the argument.
+     */
+    struct {
+        union {
+            int32_t             num;
+            uint32_t            num_u;
+            bool                enable;
+            const void        * ptr;
+            lv_color_t          color;
+            lv_value_precise_t  precise;
+        } arg1, arg2;
+    };
+
+You can find the current :cpp:type:`lv_property_t` struct the
+`lv_obj_property.h <https://github.com/lvgl/lvgl/blob/master/src/core/lv_obj_property.h>`__ file.
+
+.. code-block:: c
+
+
 
 
 Name Lookup
