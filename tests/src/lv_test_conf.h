@@ -120,6 +120,8 @@ typedef void * lv_user_data_t;
 #define  LV_DPI_DEF         130
 #endif
 
+#define LV_DRAW_SW_CUSTOM_BLEND_HANDLERS 1
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

@@ -33,6 +33,27 @@ extern "C" {
  **********************/
 
 /**
+ * Blend a color to a buffer
+ * @param dsc pointer to a fill descriptor
+ */
+typedef void (*lv_draw_sw_blend_color_handler_t)(lv_draw_sw_blend_fill_dsc_t * dsc);
+
+/**
+ * Blend an image to a buffer
+ * @param dsc pointer to an image blend descriptor
+ */
+typedef void (*lv_draw_sw_blend_image_handler_t)(lv_draw_sw_blend_image_dsc_t * dsc);
+
+/**
+ * Handler to blend colors and images
+ */
+typedef struct {
+    lv_color_format_t dest_cf;
+    lv_draw_sw_blend_color_handler_t color_blend_handler;
+    lv_draw_sw_blend_image_handler_t image_blend_handler;
+} lv_draw_sw_blend_handler_t;
+
+/**
  * Call the blend function of the `layer`.
  * @param draw_unit     pointer to a draw unit
  * @param dsc           pointer to an initialized blend descriptor

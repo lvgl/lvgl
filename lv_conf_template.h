@@ -211,6 +211,9 @@
 
     /** Enable drawing complex gradients in software: linear at an angle, radial or conical */
     #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS    0
+
+    /* Enable registering of custom SW draw handlers */
+    #define LV_DRAW_SW_CUSTOM_BLEND_HANDLERS  0
 #endif
 
 /*Use TSi's aka (Think Silicon) NemaGFX */

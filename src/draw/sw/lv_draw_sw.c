@@ -93,6 +93,10 @@ void lv_draw_sw_init(void)
 #if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
     tvg_engine_init(TVG_ENGINE_SW, 0);
 #endif
+
+#if LV_DRAW_SW_CUSTOM_BLEND_HANDLERS
+    lv_ll_init(&LV_GLOBAL_DEFAULT()->draw_sw_blend_handler_ll, sizeof(lv_draw_sw_blend_handler_t));
+#endif
 }
 
 void lv_draw_sw_deinit(void)
@@ -343,5 +347,60 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
 #endif
     LV_PROFILER_DRAW_END;
 }
+
+#if LV_DRAW_SW_CUSTOM_BLEND_HANDLERS
+bool lv_draw_sw_register_blend_handler(lv_draw_sw_blend_handler_t * handler)
+{
+    lv_draw_sw_blend_handler_t * existing_handler = NULL;
+    lv_draw_sw_blend_handler_t * new_handler = NULL;
+
+    // Check if a handler is already registered for the color format
+    LV_LL_READ(&LV_GLOBAL_DEFAULT()->draw_sw_blend_handler_ll, existing_handler) {
+        if(existing_handler->dest_cf == handler->dest_cf) {
+            new_handler = existing_handler;
+            break;
+        }
+    }
+
+    if(new_handler == NULL) {
+        new_handler = lv_ll_ins_head(&LV_GLOBAL_DEFAULT()->draw_sw_blend_handler_ll);
+        if(new_handler == NULL) {
+            LV_ASSERT_MALLOC(new_handler);
+            return false;
+        }
+    }
+
+    lv_memcpy(new_handler, handler, sizeof(lv_draw_sw_blend_handler_t));
+    return true;
+}
+
+bool lv_draw_sw_unregister_blend_handler(lv_color_format_t cf)
+{
+    lv_draw_sw_blend_handler_t * handler;
+
+    LV_LL_READ(&LV_GLOBAL_DEFAULT()->draw_sw_blend_handler_ll, handler) {
+        if(handler->dest_cf == cf) {
+            lv_ll_remove(&LV_GLOBAL_DEFAULT()->draw_sw_blend_handler_ll, handler);
+            lv_free(handler);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+lv_draw_sw_blend_handler_t * lv_draw_sw_get_blend_handler(lv_color_format_t cf)
+{
+    lv_draw_sw_blend_handler_t * handler;
+
+    LV_LL_READ(&LV_GLOBAL_DEFAULT()->draw_sw_blend_handler_ll, handler) {
+        if(handler->dest_cf == cf) {
+            return handler;
+        }
+    }
+
+    return NULL;
+}
+#endif
 
 #endif /*LV_USE_DRAW_SW*/
