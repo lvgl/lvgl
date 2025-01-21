@@ -742,6 +742,7 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
         indev_proc_release(i);
     }
 
+    i->prev_state = i->state;
     i->pointer.last_point.x = i->pointer.act_point.x;
     i->pointer.last_point.y = i->pointer.act_point.y;
 }
@@ -1158,8 +1159,14 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->pointer.act_point.x = x;
     i->pointer.act_point.y = y;
 
-    if(data->state == LV_INDEV_STATE_PRESSED) indev_proc_press(i);
-    else indev_proc_release(i);
+    if(data->state == LV_INDEV_STATE_PRESSED) {
+        indev_proc_press(i);
+    }
+    else {
+        indev_proc_release(i);
+    }
+
+    i->prev_state = i->state;
 
     if(indev_reset_check(i)) return;
 
@@ -1210,6 +1217,7 @@ static void indev_proc_press(lv_indev_t * indev)
     if(indev_obj_act != indev->pointer.act_obj) {
         indev->pointer.last_point.x = indev->pointer.act_point.x;
         indev->pointer.last_point.y = indev->pointer.act_point.y;
+        indev->pointer.pressed = indev->prev_state == LV_INDEV_STATE_RELEASED;
 
         /*Without `LV_OBJ_FLAG_PRESS_LOCK` new widget can be found while pressing.*/
         if(indev->pointer.last_hovered && indev->pointer.last_hovered != indev_obj_act) {
@@ -1251,12 +1259,19 @@ static void indev_proc_press(lv_indev_t * indev)
             indev->pointer.vect.x         = 0;
             indev->pointer.vect.y         = 0;
 
-            const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
-            if(is_enabled) {
-                if(indev->pointer.last_hovered != indev_obj_act) {
-                    if(send_event(LV_EVENT_HOVER_OVER, indev_act) == LV_RESULT_INVALID) return;
+
+            /* If the indev was already in a pressed state it means that we got dragged here
+             * so we shouldn't send any hover nor pressed events for a new object since the
+             * originally pressed object didn't get released
+             */
+            if(indev->prev_state != LV_INDEV_STATE_PRESSED) {
+                const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+                if(is_enabled) {
+                    if(indev->pointer.last_hovered != indev_obj_act) {
+                        if(send_event(LV_EVENT_HOVER_OVER, indev_act) == LV_RESULT_INVALID) return;
+                    }
+                    if(send_event(LV_EVENT_PRESSED, indev_act) == LV_RESULT_INVALID) return;
                 }
-                if(send_event(LV_EVENT_PRESSED, indev_act) == LV_RESULT_INVALID) return;
             }
 
             if(indev_act->wait_until_release) return;
@@ -1402,10 +1417,12 @@ static void indev_proc_release(lv_indev_t * indev)
 
         if(is_enabled) {
             if(scroll_obj == NULL) {
-                if(indev->long_pr_sent == 0) {
-                    if(indev_proc_short_click(indev) == LV_RESULT_INVALID) return;
+                if(indev->pointer.pressed) {
+                    if(indev->long_pr_sent == 0) {
+                        if(indev_proc_short_click(indev) == LV_RESULT_INVALID) return;
+                    }
+                    if(send_event(LV_EVENT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
                 }
-                if(send_event(LV_EVENT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
             }
             else {
                 lv_obj_send_event(scroll_obj, LV_EVENT_SCROLL_THROW_BEGIN, indev_act);
