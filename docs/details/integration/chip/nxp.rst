@@ -20,7 +20,7 @@ Creating new project with LVGL
 
 `Download an SDK for a supported board <https://www.nxp.com/design/software/embedded-software/littlevgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY?&tid=vanLITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY>`__
 today and get started with your next GUI application. It comes fully configured
-with LVGL (and with PXP/VGLite support if the modules are present), no
+with LVGL (and with PXP/VGLite/G2D support if the modules are present), no
 additional integration work is required.
 
 HW acceleration for NXP iMX RT platforms
@@ -30,6 +30,13 @@ Depending on the RT platform used, the acceleration can be done by NXP PXP
 (PiXel Pipeline) and/or the Verisilicon GPU through an API named VGLite. Each
 accelerator has its own context that allows them to be used individually as well
 simultaneously (in LVGL multithreading mode).
+
+HW acceleration for NXP iMX platforms
+----------------------------------------
+
+On MPU platforms, the acceleration can be done (hardware independent) by NXP G2D
+library. This accelerator has its own context that allows them to be used
+individually as well simultaneously with the CPU (in LVGL multithreading mode).
 
 PXP accelerator
 ~~~~~~~~~~~~~~~
@@ -327,7 +334,7 @@ is available for other operations while the GPU is running. RTOS is required to
 block the LVGL drawing thread and switch to another task or suspend the CPU for
 power savings.
 
-Supported draw tasks are available in "src/draw/nxp/pxp/lv_draw_vglite.c":
+Supported draw tasks are available in "src/draw/nxp/vglite/lv_draw_vglite.c":
 
 .. code-block:: c
 
@@ -408,3 +415,122 @@ Project setup:
    - "src/draw/nxp/vglite/lv_vglite_matrix.c": set vglite matrix
    - "src/draw/nxp/vglite/lv_vglite_path.c": create vglite path data
    - "src/draw/nxp/vglite/lv_vglite_utils.c": function helpers
+
+G2D accelerator
+~~~~~~~~~~~~~~~
+Basic configuration:
+^^^^^^^^^^^^^^^^^^^^
+
+- Select NXP G2D engine in "lv_conf.h": Set :c:macro:`LV_USE_G2D` to `1`.
+- In order to use G2D as a draw unit, select in "lv_conf.h": Set :c:macro:`LV_USE_DRAW_G2D` to `1`.
+- Enable G2D asserts in "lv_conf.h": Set :c:macro: `LV_USE_G2D_ASSERT` to `1`.
+  There are few G2D assertions that can stop the program execution in case the
+  c:macro: `LV_ASSERT_HANDLER` is set to `while(1);` (Halt by default). Else,
+  there will be logged just an error message via `LV_LOG_ERROR`.
+
+Basic initialization:
+^^^^^^^^^^^^^^^^^^^^^
+
+G2D draw initialization is done automatically in :cpp:func:`lv_init()` once the
+G2D is enabled as a draw unit , no user code is required:
+
+.. code:: c
+
+  #if LV_USE_DRAW_G2D
+    lv_draw_g2d_init();
+  #endif
+
+During G2D initialization, a new draw unit `lv_draw_g2d_unit_t` will be created
+with the additional callbacks, if :c:macro:`LV_USE_DRAW_G2D` is set to `1`:
+
+.. code:: c
+
+    lv_draw_g2d_unit_t * draw_g2d_unit = lv_draw_create_unit(sizeof(lv_draw_g2d_unit_t));
+    draw_g2d_unit->base_unit.evaluate_cb = _g2d_evaluate;
+    draw_g2d_unit->base_unit.dispatch_cb = _g2d_dispatch;
+    draw_g2d_unit->base_unit.delete_cb = _g2d_delete;
+
+and an addition thread `_g2d_render_thread_cb()` will be spawned in order to
+handle the supported draw tasks.
+
+.. code:: c
+
+  #if LV_USE_G2D_DRAW_THREAD
+    lv_thread_init(&draw_g2d_unit->thread, LV_THREAD_PRIO_HIGH, _g2d_render_thread_cb, 2 * 1024, draw_g2d_unit);
+  #endif
+
+If `LV_USE_G2D_DRAW_THREAD` is not defined, then no additional draw thread will be created
+and the G2D drawing task will get executed on the same LVGL main thread.
+
+`_g2d_evaluate()` will get called after each task is being created and will
+analyze if the task is supported by G2D or not. If it is supported, then an
+preferred score and the draw unit id will be set to the task. An `score` equal
+to `100` is the default CPU score. Smaller score means that G2D is capable of
+drawing it faster.
+
+`_g2d_dispatch()` is the G2D dispatcher callback, it will take a ready to draw
+task (having the `DRAW_UNIT_ID_G2D` set) and will pass the task to the G2D draw
+unit for processing.
+
+`_g2d_delete()` will cleanup the G2D draw unit.
+
+Features supported:
+^^^^^^^^^^^^^^^^^^^
+
+Several drawing features in LVGL can be offloaded to the G2D engine. The CPU is
+available for other operations while the G2D is running. Linux OS is required to
+block the LVGL drawing thread and switch to another task or suspend the CPU for
+power savings.
+
+Supported draw tasks are available in "src/draw/nx/g2d/lv_draw_g2d.c":
+
+.. code:: c
+
+    switch(t->type) {
+        case LV_DRAW_TASK_TYPE_FILL:
+            lv_draw_g2d_fill(u, t->draw_dsc, &t->area);
+            break;
+        case LV_DRAW_TASK_TYPE_IMAGE:
+            lv_draw_g2d_img(u, t->draw_dsc, &t->area);
+            break;
+        default:
+            break;
+    }
+
+- Fill area with color (w/o radius, w/o gradient) + optional opacity.
+- Blit source image ARGB8888 over destination.
+  ARGB8888 + optional opacity.
+- Scale  source image ARGB8888.
+
+Known limitations:
+^^^^^^^^^^^^^^^^^^
+
+- G2D/PXP can only rotate at 90x angles.
+- Rotation is not supported for images unaligned to blocks of 16x16 pixels. G2D/PXP
+  is set to process 16x16 blocks to optimize the system for memory bandwidth and
+  image processing time. The output engine essentially truncates any output
+  pixels after the desired number of pixels has been written. When rotating a
+  source image and the output is not divisible by the block size, the incorrect
+  pixels could be truncated and the final output image can look shifted.
+- Recolor or transformation for images w/ opacity or alpha channel can't be
+  obtained in a single G2D/PXP pipeline configuration. Two or multiple steps would
+  be required.
+- Buffer address must be aligned to 64 bytes: set :c:macro:`LV_DRAW_BUF_ALIGN`
+  to `64` in "lv_conf.h".
+  No stride alignment is required: set :c:macro:`LV_DRAW_BUF_STRIDE_ALIGN` to
+  `1` in "lv_conf.h".
+
+Project setup:
+^^^^^^^^^^^^^^
+
+- Add G2D related source files (and corresponding headers if available) to
+  project:
+
+   - "src/draw/nxp/g2d/lv_draw_buf_g2d.c": draw buffer callbacks
+   - "src/draw/nxp/g2d/lv_draw_g2d_fill.c": fill area
+   - "src/draw/nxp/g2d/lv_draw_g2d_img.c": blit image (w/ optional recolor or
+   transformation)
+   - "src/draw/nxp/g2d/lv_draw_g2d.c": draw unit initialization
+   - "src/draw/nxp/g2d/lv_draw_g2d_buf_map.c": hash map for g2d buffers
+   - "src/draw/nxp/g2d/lv_g2d_utils.c": function helpers
+
