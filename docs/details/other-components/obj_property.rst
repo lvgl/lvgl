@@ -262,7 +262,9 @@ following functions to look up property IDs by passing property name (a string):
 You can tell which names are available by looking in the ``.c`` files in the
 ``./src/widgets/property/`` directory.  Note that to support binary name searches,
 these arrays are generated so that they are guaranteed to be in alphabetical order.
-Do not edit these files.
+If you need to add a property that is not present, add it in the ``enum`` near the
+top of the Widget's primary ``.h`` file, and re-generate these lists using
+``./scripts/properties.py`` to preserve the alphabetical ordering.
 
 
 
