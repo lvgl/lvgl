@@ -51,7 +51,6 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
 void lv_draw_vg_lite_init(void)
 {
 #if LV_VG_LITE_USE_GPU_INIT
@@ -115,9 +114,10 @@ static bool check_arc_is_supported(const lv_draw_arc_dsc_t * dsc)
 static void draw_execute(lv_draw_vg_lite_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
-    lv_draw_unit_t * draw_unit = (lv_draw_unit_t *)u;
+    lv_layer_t * layer = t->target_layer;
 
-    lv_layer_t * layer = u->base_unit.target_layer;
+    /* remember draw unit for access to unit's context */
+    t->draw_unit = (lv_draw_unit_t *)u;
 
     lv_vg_lite_buffer_from_draw_buf(&u->target_buffer, layer->draw_buf);
 
@@ -144,41 +144,41 @@ static void draw_execute(lv_draw_vg_lite_unit_t * u)
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_LETTER:
-            lv_draw_vg_lite_letter(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_letter(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LABEL:
-            lv_draw_vg_lite_label(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_label(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_vg_lite_fill(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_fill(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_BORDER:
-            lv_draw_vg_lite_border(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_border(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
-            lv_draw_vg_lite_box_shadow(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_box_shadow(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_vg_lite_img(draw_unit, t->draw_dsc, &t->area, false);
+            lv_draw_vg_lite_img(t, t->draw_dsc, &t->area, false);
             break;
         case LV_DRAW_TASK_TYPE_ARC:
-            lv_draw_vg_lite_arc(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_arc(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LINE:
-            lv_draw_vg_lite_line(draw_unit, t->draw_dsc);
+            lv_draw_vg_lite_line(t, t->draw_dsc);
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
-            lv_draw_vg_lite_layer(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_layer(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_TRIANGLE:
-            lv_draw_vg_lite_triangle(draw_unit, t->draw_dsc);
+            lv_draw_vg_lite_triangle(t, t->draw_dsc);
             break;
         case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
-            lv_draw_vg_lite_mask_rect(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_vg_lite_mask_rect(t, t->draw_dsc, &t->area);
             break;
 #if LV_USE_VECTOR_GRAPHIC
         case LV_DRAW_TASK_TYPE_VECTOR:
-            lv_draw_vg_lite_vector(draw_unit, t->draw_dsc);
+            lv_draw_vg_lite_vector(t, t->draw_dsc);
             break;
 #endif
         default:
@@ -217,8 +217,6 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     }
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    u->base_unit.target_layer = layer;
-    u->base_unit.clip_area = &t->clip_area;
     u->task_act = t;
 
     draw_execute(u);

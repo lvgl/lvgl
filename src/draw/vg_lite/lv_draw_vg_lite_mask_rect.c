@@ -41,14 +41,13 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-void lv_draw_vg_lite_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_rect_dsc_t * dsc,
+void lv_draw_vg_lite_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t * dsc,
                                const lv_area_t * coords)
 {
     LV_UNUSED(coords);
-
     lv_area_t draw_area;
-    if(!lv_area_intersect(&draw_area, &dsc->area, draw_unit->clip_area)) {
+
+    if(!lv_area_intersect(&draw_area, &dsc->area, &t->clip_area)) {
         return;
     }
 
@@ -59,31 +58,31 @@ void lv_draw_vg_lite_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_re
      * ThorVG does not yet support simulating the VG_LITE_BLEND_DST_IN blend mode,
      * and uses software rendering to achieve this
      */
-    lv_layer_t * target_layer = draw_unit->target_layer;
+    lv_layer_t * target_layer = t->target_layer;
     const lv_area_t * buf_area = &target_layer->buf_area;
     lv_area_t clear_area;
 
     lv_draw_buf_t * draw_buf = target_layer->draw_buf;
 
     /*Clear the top part*/
-    lv_area_set(&clear_area, draw_unit->clip_area->x1, draw_unit->clip_area->y1, draw_unit->clip_area->x2,
+    lv_area_set(&clear_area, t->clip_area.x1, t->clip_area.y1, t->clip_area.x2,
                 dsc->area.y1 - 1);
     lv_area_move(&clear_area, -buf_area->x1, -buf_area->y1);
     lv_draw_buf_clear(draw_buf, &clear_area);
 
     /*Clear the bottom part*/
-    lv_area_set(&clear_area, draw_unit->clip_area->x1, dsc->area.y2 + 1, draw_unit->clip_area->x2,
-                draw_unit->clip_area->y2);
+    lv_area_set(&clear_area, t->clip_area.x1, dsc->area.y2 + 1, t->clip_area.x2,
+                t->clip_area.y2);
     lv_area_move(&clear_area, -buf_area->x1, -buf_area->y1);
     lv_draw_buf_clear(draw_buf, &clear_area);
 
     /*Clear the left part*/
-    lv_area_set(&clear_area, draw_unit->clip_area->x1, dsc->area.y1, dsc->area.x1 - 1, dsc->area.y2);
+    lv_area_set(&clear_area, t->clip_area.x1, dsc->area.y1, dsc->area.x1 - 1, dsc->area.y2);
     lv_area_move(&clear_area, -buf_area->x1, -buf_area->y1);
     lv_draw_buf_clear(draw_buf, &clear_area);
 
     /*Clear the right part*/
-    lv_area_set(&clear_area, dsc->area.x2 + 1, dsc->area.y1, draw_unit->clip_area->x2, dsc->area.y2);
+    lv_area_set(&clear_area, dsc->area.x2 + 1, dsc->area.y1, t->clip_area.x2, dsc->area.y2);
     lv_area_move(&clear_area, -buf_area->x1, -buf_area->y1);
     lv_draw_buf_clear(draw_buf, &clear_area);
 
@@ -124,11 +123,10 @@ void lv_draw_vg_lite_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_re
     lv_free(mask_buf);
     lv_draw_sw_mask_free_param(&param);
 #else
-    /* Using hardware rendering masks */
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
 
     lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
-    lv_vg_lite_path_set_bounding_box_area(path, draw_unit->clip_area);
+    lv_vg_lite_path_set_bounding_box_area(path, &t->clip_area);
 
     /* Nesting cropping regions using rounded rectangles and normal rectangles */
     lv_vg_lite_path_append_rect(
@@ -138,8 +136,8 @@ void lv_draw_vg_lite_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_re
         dsc->radius);
     lv_vg_lite_path_append_rect(
         path,
-        draw_unit->clip_area->x1, draw_unit->clip_area->y1,
-        lv_area_get_width(draw_unit->clip_area), lv_area_get_height(draw_unit->clip_area),
+        t->clip_area.x1, t->clip_area.y1,
+        lv_area_get_width(&t->clip_area), lv_area_get_height(&t->clip_area),
         0);
     lv_vg_lite_path_end(path);
 

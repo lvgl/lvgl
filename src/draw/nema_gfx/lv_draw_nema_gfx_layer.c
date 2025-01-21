@@ -40,7 +40,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_nema_gfx_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
+void lv_draw_nema_gfx_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
 {
     lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
 
@@ -51,7 +51,7 @@ void lv_draw_nema_gfx_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_
     lv_draw_image_dsc_t new_draw_dsc = *draw_dsc;
     new_draw_dsc.src = layer_to_draw->draw_buf;
 
-    lv_draw_nema_gfx_img(draw_unit, &new_draw_dsc, coords);
+    lv_draw_nema_gfx_img(t, &new_draw_dsc, coords);
 }
 
 #endif /*LV_USE_NEMA_GFX*/

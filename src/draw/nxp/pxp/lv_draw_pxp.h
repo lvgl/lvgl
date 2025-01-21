@@ -62,13 +62,13 @@ void lv_draw_pxp_rotate(const void * src_buf, void * dest_buf, int32_t src_width
 #if LV_USE_DRAW_PXP
 void lv_draw_buf_pxp_init_handlers(void);
 
-void lv_draw_pxp_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
+void lv_draw_pxp_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc,
                       const lv_area_t * coords);
 
-void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc,
+void lv_draw_pxp_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
                      const lv_area_t * coords);
 
-void lv_draw_pxp_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+void lv_draw_pxp_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                        const lv_area_t * coords);
 
 /**********************

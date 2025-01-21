@@ -287,34 +287,35 @@ static int32_t nema_gfx_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 static void nema_gfx_execute_drawing(lv_draw_nema_gfx_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
-    lv_draw_unit_t * draw_unit = (lv_draw_unit_t *)u;
+    /* remember draw unit for access to unit's context */
+    t->draw_unit = (lv_draw_unit_t *)u;
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_nema_gfx_fill(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_nema_gfx_fill(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_nema_gfx_img(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_nema_gfx_img(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_TRIANGLE:
-            lv_draw_nema_gfx_triangle(draw_unit, t->draw_dsc);
+            lv_draw_nema_gfx_triangle(t, t->draw_dsc);
             break;
         case LV_DRAW_TASK_TYPE_LABEL:
-            lv_draw_nema_gfx_label(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_nema_gfx_label(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
-            lv_draw_nema_gfx_layer(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_nema_gfx_layer(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LINE:
-            lv_draw_nema_gfx_line(draw_unit, t->draw_dsc);
+            lv_draw_nema_gfx_line(t, t->draw_dsc);
             break;
 #if LV_USE_NEMA_VG
         case LV_DRAW_TASK_TYPE_ARC:
-            lv_draw_nema_gfx_arc(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_nema_gfx_arc(t, t->draw_dsc, &t->area);
             break;
 #endif
         case LV_DRAW_TASK_TYPE_BORDER:
-            lv_draw_nema_gfx_border(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_nema_gfx_border(t, t->draw_dsc, &t->area);
             break;
         default:
             break;

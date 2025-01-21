@@ -360,15 +360,13 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     }
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    draw_dma2d_unit->base_unit.target_layer = layer;
-    draw_dma2d_unit->base_unit.clip_area = &t->clip_area;
     draw_dma2d_unit->task_act = t;
 
     if(t->type == LV_DRAW_TASK_TYPE_FILL) {
         lv_draw_fill_dsc_t * dsc = t->draw_dsc;
         const lv_area_t * coords = &t->area;
         lv_area_t clipped_coords;
-        if(!lv_area_intersect(&clipped_coords, coords, draw_dma2d_unit->base_unit.clip_area)) {
+        if(!lv_area_intersect(&clipped_coords, coords, &t->clip_area)) {
             return LV_DRAW_UNIT_IDLE;
         }
 
@@ -377,14 +375,14 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
                                              clipped_coords.y1 - layer->buf_area.y1);
 
         if(dsc->opa >= LV_OPA_MAX) {
-            lv_draw_dma2d_opaque_fill(draw_dma2d_unit,
+            lv_draw_dma2d_opaque_fill(t,
                                       dest,
                                       lv_area_get_width(&clipped_coords),
                                       lv_area_get_height(&clipped_coords),
                                       lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), dsc->base.layer->color_format));
         }
         else {
-            lv_draw_dma2d_fill(draw_dma2d_unit,
+            lv_draw_dma2d_fill(t,
                                dest,
                                lv_area_get_width(&clipped_coords),
                                lv_area_get_height(&clipped_coords),
@@ -395,7 +393,7 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         lv_draw_image_dsc_t * dsc = t->draw_dsc;
         const lv_area_t * coords = &t->area;
         lv_area_t clipped_coords;
-        if(!lv_area_intersect(&clipped_coords, coords, draw_dma2d_unit->base_unit.clip_area)) {
+        if(!lv_area_intersect(&clipped_coords, coords, &t->clip_area)) {
             return LV_DRAW_UNIT_IDLE;
         }
 
@@ -405,14 +403,14 @@ static int32_t dispatch_cb(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 
         if(dsc->opa >= LV_OPA_MAX) {
             lv_draw_dma2d_opaque_image(
-                draw_dma2d_unit,
+                t,
                 dest,
                 &clipped_coords,
                 lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), dsc->base.layer->color_format));
         }
         else {
             lv_draw_dma2d_image(
-                draw_dma2d_unit,
+                t,
                 dest,
                 &clipped_coords,
                 lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), dsc->base.layer->color_format));

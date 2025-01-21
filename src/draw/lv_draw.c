@@ -80,8 +80,11 @@ void * lv_draw_create_unit(size_t size)
     lv_draw_unit_t * new_unit = lv_malloc_zeroed(size);
     LV_ASSERT_MALLOC(new_unit);
     new_unit->next = _draw_info.unit_head;
+
     _draw_info.unit_head = new_unit;
     _draw_info.unit_cnt++;
+
+    new_unit->idx = _draw_info.unit_cnt;
 
     return new_unit;
 }
@@ -93,6 +96,7 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
     LV_ASSERT_MALLOC(new_task);
     new_task->area = *coords;
     new_task->_real_area = *coords;
+    new_task->target_layer = layer;
     new_task->clip_area = layer->_clip_area;
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     new_task->matrix = layer->matrix;

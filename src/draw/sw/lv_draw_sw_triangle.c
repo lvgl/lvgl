@@ -44,7 +44,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_t * dsc)
+void lv_draw_sw_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
 {
 #if LV_DRAW_SW_COMPLEX
     lv_area_t tri_area;
@@ -55,7 +55,7 @@ void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_
 
     bool is_common;
     lv_area_t draw_area;
-    is_common = lv_area_intersect(&draw_area, &tri_area, draw_unit->clip_area);
+    is_common = lv_area_intersect(&draw_area, &tri_area, &t->clip_area);
     if(!is_common) return;
 
     lv_point_t p[3];
@@ -175,7 +175,7 @@ void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_
                 }
             }
         }
-        lv_draw_sw_blend(draw_unit, &blend_dsc);
+        lv_draw_sw_blend(t, &blend_dsc);
     }
 
     lv_free(mask_buf);

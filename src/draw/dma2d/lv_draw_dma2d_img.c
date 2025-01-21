@@ -34,13 +34,13 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_dma2d_opaque_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixel, lv_area_t * clipped_coords,
+void lv_draw_dma2d_opaque_image(lv_draw_task_t * t, void * dest_first_pixel, lv_area_t * clipped_coords,
                                 int32_t dest_stride)
 {
     int32_t w = lv_area_get_width(clipped_coords);
     int32_t h = lv_area_get_height(clipped_coords);
 
-    lv_draw_image_dsc_t * dsc = u->task_act->draw_dsc;
+    lv_draw_image_dsc_t * dsc = t->draw_dsc;
     lv_color_format_t output_cf = dsc->base.layer->color_format;
     lv_color_format_t image_cf = dsc->header.cf;
 
@@ -120,13 +120,13 @@ void lv_draw_dma2d_opaque_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixe
     lv_draw_dma2d_configure_and_start_transfer(&conf);
 }
 
-void lv_draw_dma2d_image(lv_draw_dma2d_unit_t * u, void * dest_first_pixel, lv_area_t * clipped_coords,
+void lv_draw_dma2d_image(lv_draw_task_t * t, void * dest_first_pixel, lv_area_t * clipped_coords,
                          int32_t dest_stride)
 {
     int32_t w = lv_area_get_width(clipped_coords);
     int32_t h = lv_area_get_height(clipped_coords);
 
-    lv_draw_image_dsc_t * dsc = u->task_act->draw_dsc;
+    lv_draw_image_dsc_t * dsc = t->draw_dsc;
     lv_color_format_t output_cf = dsc->base.layer->color_format;
     lv_color_format_t image_cf = dsc->header.cf;
     lv_opa_t opa = dsc->opa;

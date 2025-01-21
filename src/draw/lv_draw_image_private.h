@@ -42,23 +42,23 @@ struct _lv_draw_image_sup_t {
 /**
  * Can be used by draw units to handle the decoding and
  * prepare everything for the actual image rendering
- * @param draw_unit     pointer to a draw unit
+ * @param t             pointer to a draw task
  * @param draw_dsc      the draw descriptor of the image
  * @param coords        the absolute coordinates of the image
  * @param draw_core_cb  a callback to perform the actual rendering
  */
-void lv_draw_image_normal_helper(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+void lv_draw_image_normal_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                  const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb);
 
 /**
  * Can be used by draw units for TILED images to handle the decoding and
  * prepare everything for the actual image rendering
- * @param draw_unit     pointer to a draw unit
+ * @param t             pointer to a draw task
  * @param draw_dsc      the draw descriptor of the image
  * @param coords        the absolute coordinates of the image
  * @param draw_core_cb  a callback to perform the actual rendering
  */
-void lv_draw_image_tiled_helper(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+void lv_draw_image_tiled_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                 const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb);
 
 /**

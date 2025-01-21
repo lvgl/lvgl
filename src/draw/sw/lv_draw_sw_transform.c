@@ -95,11 +95,10 @@ static void transform_l8_to_al88(const uint8_t * src, int32_t src_w, int32_t src
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_area, const void * src_buf,
+void lv_draw_sw_transform(const lv_area_t * dest_area, const void * src_buf,
                           int32_t src_w, int32_t src_h, int32_t src_stride,
                           const lv_draw_image_dsc_t * draw_dsc, const lv_draw_image_sup_t * sup, lv_color_format_t src_cf, void * dest_buf)
 {
-    LV_UNUSED(draw_unit);
     LV_UNUSED(sup);
 
     point_transform_dsc_t tr_dsc;

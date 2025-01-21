@@ -73,15 +73,15 @@ typedef unsigned char cmd_state_t;
  *  STATIC PROTOTYPES
  **********************/
 
-static void _draw_nema_gfx_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * glyph_draw_dsc,
+static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                                   lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area);
 
-static void _draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,
+static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,
                                            const lv_area_t * coords);
 
 static inline uint8_t _bpp_nema_gfx_format(lv_draw_glyph_dsc_t * glyph_draw_dsc);
 
-static void _draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
+static void _draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
                          const lv_font_t * font, uint32_t letter);
 
 static uint8_t hex_char_to_num(char hex);
@@ -92,7 +92,7 @@ static bool is_raw_bitmap;
 
     #include "lv_nema_gfx_path.h"
 
-    static void _draw_nema_gfx_outline(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * glyph_draw_dsc);
+    static void _draw_nema_gfx_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc);
 
     static void freetype_outline_event_cb(lv_event_t * e);
 
@@ -114,14 +114,14 @@ void lv_draw_nema_gfx_label_init(lv_draw_unit_t * draw_unit)
 #endif /* LV_USE_FREETYPE */
 }
 
-void lv_draw_nema_gfx_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_nema_gfx_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->opa <= LV_OPA_MIN) return;
 
     lv_layer_t * layer = draw_unit->target_layer;
 
     lv_area_t clip_area;
-    lv_area_copy(&clip_area, draw_unit->clip_area);
+    lv_area_copy(&clip_area, &t->clip_area);
     lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_color_format_t dst_cf = layer->draw_buf->header.cf;
@@ -135,7 +135,7 @@ void lv_draw_nema_gfx_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_
 
     _draw_label_iterate_characters(draw_unit, dsc, coords);
 
-    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)draw_unit;
+    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)t->draw_unit;
     nema_cl_submit(&(draw_nema_gfx_unit->cl));
     nema_cl_wait(&(draw_nema_gfx_unit->cl));
 }
@@ -145,14 +145,14 @@ void lv_draw_nema_gfx_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_
  **********************/
 #if LV_USE_FREETYPE && LV_USE_NEMA_VG
 
-static void _draw_nema_gfx_outline(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * glyph_draw_dsc)
+static void _draw_nema_gfx_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc)
 {
 
     lv_area_t blend_area;
-    if(!_lv_area_intersect(&blend_area, glyph_draw_dsc->letter_coords, draw_unit->clip_area))
+    if(!_lv_area_intersect(&blend_area, glyph_draw_dsc->letter_coords, &t->clip_area))
         return;
 
-    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)draw_unit;
+    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)t->draw_unit;
 
     lv_nema_gfx_path_t * nema_gfx_path = (lv_nema_gfx_path_t *)glyph_draw_dsc->glyph_data;
 
@@ -290,7 +290,7 @@ static inline uint8_t _bpp_nema_gfx_format(lv_draw_glyph_dsc_t * glyph_draw_dsc)
     }
 }
 
-static void _draw_nema_gfx_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * glyph_draw_dsc,
+static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                                   lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area)
 {
     if(glyph_draw_dsc) {
@@ -314,7 +314,7 @@ static void _draw_nema_gfx_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_
             lv_layer_t * layer = draw_unit->target_layer;
 
             lv_area_t blend_area;
-            if(!lv_area_intersect(&blend_area, glyph_draw_dsc->letter_coords, draw_unit->clip_area))
+            if(!lv_area_intersect(&blend_area, glyph_draw_dsc->letter_coords, &t->clip_area))
                 return;
             lv_area_move(&blend_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
@@ -392,14 +392,14 @@ static inline void _set_color_blend(uint32_t color, uint8_t alpha)
     }
 }
 
-static void _draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc,
+static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,
                                            const lv_area_t * coords)
 {
     const lv_font_t * font = dsc->font;
     int32_t w;
 
     lv_area_t clipped_area;
-    bool clip_ok = lv_area_intersect(&clipped_area, coords, draw_unit->clip_area);
+    bool clip_ok = lv_area_intersect(&clipped_area, coords, &t->clip_area);
     if(!clip_ok) return;
 
     lv_text_align_t align = dsc->align;
@@ -457,7 +457,7 @@ static void _draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_
                                                            w, NULL, dsc->flag);
 
     /*Go the first visible line*/
-    while(pos.y + line_height_font < draw_unit->clip_area->y1) {
+    while(pos.y + line_height_font < t->clip_area->y1) {
         /*Go to next line*/
         line_start = line_end;
         line_end += lv_text_get_next_line(&dsc->text[line_start], remaining_len, font, dsc->letter_space, w, NULL, dsc->flag);
@@ -733,7 +733,7 @@ static void _draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_
         /*Go the next line position*/
         pos.y += line_height;
 
-        if(pos.y > draw_unit->clip_area->y2) break;
+        if(pos.y > t->clip_area->y2) break;
     }
 
     if(draw_letter_dsc._draw_buf) lv_draw_buf_destroy(draw_letter_dsc._draw_buf);
@@ -741,7 +741,7 @@ static void _draw_label_iterate_characters(lv_draw_unit_t * draw_unit, const lv_
     LV_ASSERT_MEM_INTEGRITY();
 }
 
-static void _draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
+static void _draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const lv_point_t * pos,
                          const lv_font_t * font, uint32_t letter)
 {
     lv_font_glyph_dsc_t g;
@@ -769,8 +769,8 @@ static void _draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc, 
     letter_coords.y2 = letter_coords.y1 + g.box_h - 1;
 
     /*If the letter is completely out of mask don't draw it*/
-    if(lv_area_is_out(&letter_coords, draw_unit->clip_area, 0) &&
-       lv_area_is_out(dsc->bg_coords, draw_unit->clip_area, 0)) {
+    if(lv_area_is_out(&letter_coords, &t->clip_area, 0) &&
+       lv_area_is_out(dsc->bg_coords, &t->clip_area, 0)) {
         LV_PROFILER_DRAW_END;
         return;
     }

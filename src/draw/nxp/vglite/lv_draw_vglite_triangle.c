@@ -57,14 +57,14 @@ static void _vglite_draw_triangle(const lv_area_t * coords, const lv_area_t * cl
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_t * dsc)
+void lv_draw_vglite_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
 {
     if(dsc->bg_opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
-    lv_layer_t * layer = draw_unit->target_layer;
+    lv_layer_t * layer = t->target_layer;
     lv_area_t clip_area;
-    lv_area_copy(&clip_area, draw_unit->clip_area);
+    lv_area_copy(&clip_area, &t->clip_area);
     lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t coords;
