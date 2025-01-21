@@ -34,10 +34,12 @@
 static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check);
 static void lv_cleanup_task(lv_draw_task_t * t, lv_display_t * disp);
 
+#if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
 static inline uint32_t get_layer_size_kb(uint32_t size_byte)
 {
     return (size_byte + 1023) >> 10;
 }
+#endif
 
 /**********************
  *  STATIC VARIABLES
