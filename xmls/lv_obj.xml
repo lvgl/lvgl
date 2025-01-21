@@ -9,6 +9,7 @@ Example
 	    <prop name="store" type="bool"/>
 	    <prop name="x" type="coords"/>
 	    <prop name="y" type="coords"/>
+	    <prop name="id" type="string"/>
 	    <prop name="height" type="coords"/>
 	    <prop name="width" type="coords"/>
 	    <prop name="align" type="enum:lv_align"/>
