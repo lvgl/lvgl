@@ -371,10 +371,10 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
 
     Tvg_Paint * obj = tvg_shape_new();
 
-    if(!path) {  /*clear*/
-        _tvg_rect rc;
-        lv_area_to_tvg(&rc, &dsc->scissor_area);
+    _tvg_rect rc;
+    lv_area_to_tvg(&rc, &dsc->scissor_area);
 
+    if(!path) {  /*clear*/
         _tvg_color c;
         lv_color_to_tvg(&c, &dsc->fill_dsc.color, dsc->fill_dsc.opa);
 
@@ -388,6 +388,8 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
         tvg_shape_set_fill_color(obj, c.r, c.g, c.b, c.a);
     }
     else {
+        tvg_canvas_set_viewport(canvas, (int32_t)rc.x, (int32_t)rc.y, (int32_t)rc.w, (int32_t)rc.h);
+
         Tvg_Matrix mtx;
         lv_matrix_to_tvg(&mtx, &dsc->matrix);
         _set_paint_matrix(obj, &mtx);

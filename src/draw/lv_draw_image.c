@@ -118,15 +118,51 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
         return;
     }
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords);
-    t->draw_dsc = new_image_dsc;
-    t->type = LV_DRAW_TASK_TYPE_IMAGE;
+    if(new_image_dsc->header.flags & LV_IMAGE_FLAGS_CUSTOM_DRAW) {
+        lv_image_decoder_dsc_t decoder_dsc;
+        res = lv_image_decoder_open(&decoder_dsc, new_image_dsc->src, NULL);
+        if(res != LV_RESULT_OK) {
+            LV_LOG_ERROR("Failed to open image");
+            LV_PROFILER_DRAW_END;
+            return;
+        }
 
-    lv_image_buf_get_transformed_area(&t->_real_area, lv_area_get_width(coords), lv_area_get_height(coords),
-                                      dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
-    lv_area_move(&t->_real_area, coords->x1, coords->y1);
+        if(decoder_dsc.decoder && decoder_dsc.decoder->custom_draw_cb) {
+            lv_area_t draw_area = layer->buf_area;
+            lv_area_t coords_area = *coords;
 
-    lv_draw_finalize_task_creation(layer, t);
+            if(layer->parent) { /* child layer */
+                int32_t xpos = coords->x1 - draw_area.x1;
+                int32_t ypos = coords->y1 - draw_area.y1;
+
+                lv_area_move(&coords_area, -(coords->x1 - xpos), -(coords->y1 - ypos));
+                layer->_clip_area = coords_area;
+                decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, new_image_dsc, &coords_area);
+            }
+            else {
+                layer->_clip_area = draw_area;
+                lv_area_t clip_area = draw_area;
+                if(lv_area_intersect(&clip_area, &clip_area, &coords_area)) {
+                    decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, new_image_dsc, &clip_area);
+                }
+            }
+
+        }
+        lv_free(new_image_dsc);
+    }
+    else {
+
+        lv_draw_task_t * t = lv_draw_add_task(layer, coords);
+        t->draw_dsc = new_image_dsc;
+        t->type = LV_DRAW_TASK_TYPE_IMAGE;
+
+        lv_image_buf_get_transformed_area(&t->_real_area, lv_area_get_width(coords), lv_area_get_height(coords),
+                                          dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
+        lv_area_move(&t->_real_area, coords->x1, coords->y1);
+
+        lv_draw_finalize_task_creation(layer, t);
+    }
+
     LV_PROFILER_DRAW_END;
 }
 

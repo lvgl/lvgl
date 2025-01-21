@@ -32,6 +32,7 @@
 
 typedef struct _lv_svg_render_obj {
     struct _lv_svg_render_obj * next;
+    lv_svg_tag_t tag;
     uint32_t flags;
     char * id;
     lv_vector_draw_dsc_t dsc;
@@ -48,6 +49,7 @@ typedef struct _lv_svg_render_obj {
     void (*render)(const struct _lv_svg_render_obj * obj, lv_vector_dsc_t * dsc, const lv_matrix_t * matrix);
     void (*set_attr)(struct _lv_svg_render_obj * obj, lv_vector_draw_dsc_t * dsc, const lv_svg_attr_t * attr);
     void (*get_bounds)(const struct _lv_svg_render_obj * obj, lv_area_t * area);
+    void (*get_size)(const struct _lv_svg_render_obj * obj, uint32_t * size);
     void (*destroy)(struct _lv_svg_render_obj * obj);
 } lv_svg_render_obj_t;
 
@@ -78,6 +80,13 @@ lv_svg_render_obj_t * lv_svg_render_create(const lv_svg_node_t * svg_doc);
  * @param render pointer to the SVG render object to delete
  */
 void lv_svg_render_delete(lv_svg_render_obj_t * render);
+
+/**
+ * @brief Get size of render objects
+ * @param render pointer to the SVG render object
+ * @return the bytes of SVG render objects
+ */
+uint32_t lv_svg_render_get_size(const lv_svg_render_obj_t * render);
 
 /**
  * @brief Render an SVG object to a vector graphics
