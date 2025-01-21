@@ -111,9 +111,93 @@ int32_t lv_windows_dpi_to_physical(int32_t logical, int32_t dpi)
     return MulDiv(logical, dpi, USER_DEFAULT_SCREEN_DPI);
 }
 
+void lv_windows_set_top_level(lv_display_t * display, bool top_level)
+{
+    HWND window_handle = lv_windows_get_display_window_handle(display);
+
+    LONG_PTR ex_style = GetWindowLongPtr(window_handle, GWL_EXSTYLE);
+    if(top_level) {
+        ex_style |= WS_EX_TOPMOST;
+        ex_style |= WS_EX_APPWINDOW;
+    }
+    else {
+        ex_style &= ~WS_EX_TOPMOST;
+    }
+
+    SetWindowLongPtr(window_handle, GWL_EXSTYLE, ex_style);
+    SetWindowPos(
+        window_handle,
+        top_level ? HWND_TOPMOST : HWND_NOTOPMOST,
+        0,
+        0,
+        0,
+        0,
+        SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+}
+
+void lv_windows_set_frameless(lv_display_t * display, bool frameless)
+{
+    HWND window_handle = lv_windows_get_display_window_handle(display);
+
+    LONG_PTR style = GetWindowLongPtr(window_handle, GWL_STYLE);
+    if(frameless) {
+        style &= ~WS_OVERLAPPEDWINDOW;
+        style |= WS_POPUPWINDOW;
+    }
+    else {
+        style &= ~WS_POPUP;
+        style |= WS_OVERLAPPEDWINDOW;
+    }
+
+    SetWindowLongPtr(window_handle, GWL_STYLE, style);
+    SetWindowPos(
+        window_handle,
+        NULL,
+        0,
+        0,
+        0,
+        0,
+        SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static int32_t lv_windows_center_window(HWND window_handle)
+{
+    RECT rect = {0};
+    if(!GetWindowRect(window_handle, &rect)) {
+        return 0;
+    }
+
+    int window_width = rect.right - rect.left;
+    int window_height = rect.bottom - rect.top;
+
+    RECT screen_rect = {0};
+    if(!SystemParametersInfo(SPI_GETWORKAREA, 0, &screen_rect, 0)) {
+        return 0;
+    }
+
+    int screen_width = screen_rect.right - screen_rect.left;
+    int screen_height = screen_rect.bottom - screen_rect.top;
+
+    int x = (screen_width - window_width) / 2;
+    int y = (screen_height - window_height) / 2;
+
+    if(!SetWindowPos(
+           window_handle,
+           NULL,
+           x,
+           y,
+           0,
+           0,
+           SWP_NOZORDER | SWP_NOSIZE)) {
+        return 0;
+    }
+
+    return 1;
+}
 
 static unsigned int __stdcall lv_windows_display_thread_entrypoint(
     void * parameter)
@@ -127,11 +211,11 @@ static unsigned int __stdcall lv_windows_display_thread_entrypoint(
     }
 
     HWND window_handle = CreateWindowExW(
-                             WS_EX_CLIENTEDGE,
+                             WS_EX_APPWINDOW,
                              L"LVGL.Window",
                              data->title,
                              window_style,
-                             CW_USEDEFAULT,
+                             0,
                              0,
                              data->hor_res,
                              data->ver_res,
@@ -142,6 +226,8 @@ static unsigned int __stdcall lv_windows_display_thread_entrypoint(
     if(!window_handle) {
         return 0;
     }
+
+    LV_ASSERT(lv_windows_center_window(window_handle));
 
     lv_windows_window_context_t * context = lv_windows_get_window_context(
                                                 window_handle);

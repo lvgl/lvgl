@@ -73,6 +73,8 @@ Usage
         int32_t zoom_level = 100;
         bool allow_dpi_override = false;
         bool simulator_mode = false;
+        bool frameless = false;
+        bool top_level = false;
         lv_display_t* display = lv_windows_create_display(
             L"LVGL Display Window",
             800,
@@ -84,6 +86,9 @@ Usage
         {
             return -1;
         }
+
+        lv_windows_set_frameless(display, frameless);
+        lv_windows_set_top_level(display, top_level);
 
         lv_lock();
 
