@@ -500,6 +500,16 @@
         #endif
     #endif
 
+    /* The threshold of the luminance to consider a pixel as
+     * active in indexed color format */
+    #ifndef LV_DRAW_SW_I1_LUM_THRESHOLD
+        #ifdef CONFIG_LV_DRAW_SW_I1_LUM_THRESHOLD
+            #define LV_DRAW_SW_I1_LUM_THRESHOLD CONFIG_LV_DRAW_SW_I1_LUM_THRESHOLD
+        #else
+            #define LV_DRAW_SW_I1_LUM_THRESHOLD 127
+        #endif
+    #endif
+
     /** Set number of draw units.
      *  - > 1 requires operating system to be enabled in `LV_USE_OS`.
      *  - > 1 means multiple threads will render the screen in parallel. */
