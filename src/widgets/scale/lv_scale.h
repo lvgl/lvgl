@@ -197,13 +197,14 @@ void lv_scale_set_draw_ticks_on_top(lv_obj_t * obj, bool en);
 
 /**
  * Add a Section to specified Scale.  Section will not be drawn until
- * a valid range is set for it using `lv_scale_section_set_range()`.
+ * a valid range is set for it using `lv_scale_set_section_range()`.
  * @param obj       pointer to Scale Widget
  * @return          pointer to new Section
  */
 lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj);
 
 /**
+ * DEPRECATED, use lv_scale_set_section_rangeinstead.
  * Set range for specified Scale Section
  * @param section       pointer to Section
  * @param range_min     Section new minimum value
@@ -212,12 +213,46 @@ lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj);
 void lv_scale_section_set_range(lv_scale_section_t * section, int32_t min, int32_t max);
 
 /**
+ * Set the range of a scale section
+ * @param scale         pointer to scale
+ * @param section       pointer to section
+ * @param range_min     section new minimum value
+ * @param range_max     section new maximum value
+ */
+void lv_scale_set_section_range(lv_obj_t * scale, lv_scale_section_t * section, int32_t min, int32_t max);
+
+/**
+ * DEPRECATED, use lv_scale_set_section_style_main/indicator/items instead.
  * Set style for specified part of Section.
  * @param section             pointer to Section
  * @param part                the part of the Scale the style will apply to, e.g. LV_PART_INDICATOR
  * @param section_part_style  pointer to style to apply
  */
 void lv_scale_section_set_style(lv_scale_section_t * section, lv_part_t part, lv_style_t * section_part_style);
+
+/**
+ * Set the style of the line on a section.
+ * @param scale         pointer to scale
+ * @param section       pointer to section
+ * @param style         point to a style
+ */
+void lv_scale_set_section_style_main(lv_obj_t * scale, lv_scale_section_t * section, const lv_style_t * style);
+
+/**
+ * Set the style of the major ticks and label on a section.
+ * @param scale         pointer to scale
+ * @param section       pointer to section
+ * @param style         point to a style
+ */
+void lv_scale_set_section_style_indicator(lv_obj_t * scale, lv_scale_section_t * section, const lv_style_t * style);
+
+/**
+ * Set the style of the minor ticks on a section.
+ * @param scale         pointer to scale
+ * @param section       pointer to section
+ * @param style         point to a style
+ */
+void lv_scale_set_section_style_items(lv_obj_t * scale, lv_scale_section_t * section, const lv_style_t * style);
 
 /*=====================
  * Getter functions

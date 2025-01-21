@@ -106,13 +106,13 @@ extern "C" {
 
 #define lv_anim_set_playback_delay lv_anim_set_reverse_delay
 #define lv_anim_set_playback_duration lv_anim_set_reverse_duration
-
-/**********************
- * DEPRECATED FUNCTIONS
- **********************/
-
 #define lv_anim_set_time lv_anim_set_duration
 #define lv_anim_set_playback_time lv_anim_set_reverse_duration
+
+#define lv_spangroup_new_span lv_spangroup_add_span
+#define lv_spangroup_refr_mode lv_spangroup_refresh
+
+#define lv_slider_set_left_value lv_slider_set_start_value
 
 #ifdef __cplusplus
 } /*extern "C"*/

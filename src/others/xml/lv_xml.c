@@ -23,11 +23,15 @@
 #include "parsers/lv_xml_button_parser.h"
 #include "parsers/lv_xml_label_parser.h"
 #include "parsers/lv_xml_image_parser.h"
+#include "parsers/lv_xml_bar_parser.h"
 #include "parsers/lv_xml_slider_parser.h"
 #include "parsers/lv_xml_tabview_parser.h"
 #include "parsers/lv_xml_chart_parser.h"
 #include "parsers/lv_xml_table_parser.h"
 #include "parsers/lv_xml_dropdown_parser.h"
+#include "parsers/lv_xml_roller_parser.h"
+#include "parsers/lv_xml_scale_parser.h"
+#include "parsers/lv_xml_spangroup_parser.h"
 #include "../../libs/expat/expat.h"
 #include "../../draw/lv_draw_image.h"
 
@@ -73,6 +77,7 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_button", lv_xml_button_create, lv_xml_button_apply);
     lv_xml_widget_register("lv_label", lv_xml_label_create, lv_xml_label_apply);
     lv_xml_widget_register("lv_image", lv_xml_image_create, lv_xml_image_apply);
+    lv_xml_widget_register("lv_bar", lv_xml_bar_create, lv_xml_bar_apply);
     lv_xml_widget_register("lv_slider", lv_xml_slider_create, lv_xml_slider_apply);
     lv_xml_widget_register("lv_tabview", lv_xml_tabview_create, lv_xml_tabview_apply);
     lv_xml_widget_register("lv_tabview-tab_bar", lv_xml_tabview_tab_bar_create, lv_xml_tabview_tab_bar_apply);
@@ -86,6 +91,11 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_table-cell", lv_xml_table_cell_create, lv_xml_table_cell_apply);
     lv_xml_widget_register("lv_dropdown", lv_xml_dropdown_create, lv_xml_dropdown_apply);
     lv_xml_widget_register("lv_dropdown-list", lv_xml_dropdown_list_create, lv_xml_dropdown_list_apply);
+    lv_xml_widget_register("lv_roller", lv_xml_roller_create, lv_xml_roller_apply);
+    lv_xml_widget_register("lv_scale", lv_xml_scale_create, lv_xml_scale_apply);
+    lv_xml_widget_register("lv_scale-section", lv_xml_scale_section_create, lv_xml_scale_section_apply);
+    lv_xml_widget_register("lv_spangroup", lv_xml_spangroup_create, lv_xml_spangroup_apply);
+    lv_xml_widget_register("lv_spangroup-span", lv_xml_spangroup_span_create, lv_xml_spangroup_span_apply);
 }
 
 void * lv_xml_create_from_ctx(lv_obj_t * parent, lv_xml_component_ctx_t * parent_ctx, lv_xml_component_ctx_t * ctx,
@@ -356,7 +366,7 @@ static void view_start_element_handler(void * user_data, const char * name, cons
 
     /* If it isn't a component either then it is unknown */
     if(item == NULL) {
-        LV_LOG_WARN("'%s' in not a known widget, element, or component", name);
+        LV_LOG_WARN("'%s' is not a known widget, element, or component", name);
         return;
     }
 

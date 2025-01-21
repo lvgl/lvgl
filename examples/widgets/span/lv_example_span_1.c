@@ -35,24 +35,24 @@ void lv_example_span_1(void)
     lv_spangroup_set_indent(spans, 20);
     lv_spangroup_set_mode(spans, LV_SPAN_MODE_BREAK);
 
-    lv_span_t * span = lv_spangroup_new_span(spans);
+    lv_span_t * span = lv_spangroup_add_span(spans);
     lv_span_set_text(span, "China is a beautiful country.");
     lv_style_set_text_color(lv_span_get_style(span), lv_palette_main(LV_PALETTE_RED));
     lv_style_set_text_decor(lv_span_get_style(span), LV_TEXT_DECOR_UNDERLINE);
     lv_style_set_text_opa(lv_span_get_style(span), LV_OPA_50);
 
-    span = lv_spangroup_new_span(spans);
+    span = lv_spangroup_add_span(spans);
     lv_span_set_text_static(span, "good good study, day day up.");
 #if LV_FONT_MONTSERRAT_24
     lv_style_set_text_font(lv_span_get_style(span),  &lv_font_montserrat_24);
 #endif
     lv_style_set_text_color(lv_span_get_style(span), lv_palette_main(LV_PALETTE_GREEN));
 
-    span = lv_spangroup_new_span(spans);
+    span = lv_spangroup_add_span(spans);
     lv_span_set_text_static(span, "LVGL is an open-source graphics library.");
     lv_style_set_text_color(lv_span_get_style(span), lv_palette_main(LV_PALETTE_BLUE));
 
-    span = lv_spangroup_new_span(spans);
+    span = lv_spangroup_add_span(spans);
     lv_span_set_text_static(span, "the boy no name.");
     lv_style_set_text_color(lv_span_get_style(span), lv_palette_main(LV_PALETTE_GREEN));
 #if LV_FONT_MONTSERRAT_20
@@ -60,11 +60,11 @@ void lv_example_span_1(void)
 #endif
     lv_style_set_text_decor(lv_span_get_style(span), LV_TEXT_DECOR_UNDERLINE);
 
-    span = lv_spangroup_new_span(spans);
+    span = lv_spangroup_add_span(spans);
     lv_span_set_text(span, "I have a dream that hope to come true.");
     lv_style_set_text_decor(lv_span_get_style(span), LV_TEXT_DECOR_STRIKETHROUGH);
 
-    lv_spangroup_refr_mode(spans);
+    lv_spangroup_refresh(spans);
 
     lv_obj_add_event_cb(spans, click_event_cb, LV_EVENT_CLICKED, NULL);
 }

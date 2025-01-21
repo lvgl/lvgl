@@ -829,21 +829,16 @@ static void analytics_create(lv_obj_t * parent)
 
     lv_scale_section_t * section;
     section = lv_scale_add_section(scale3);
-    lv_scale_section_set_range(section, 0, 20);
-    lv_scale_section_set_style(section, LV_PART_MAIN, &scale3_section1_main_style);
-    lv_scale_section_set_style(section, LV_PART_INDICATOR, &scale3_section1_indicator_style);
-    lv_scale_section_set_style(section, LV_PART_ITEMS, &scale3_section1_tick_style);
-    section = lv_scale_add_section(scale3);
-    lv_scale_section_set_range(section, 20, 40);
-    lv_scale_section_set_style(section, LV_PART_MAIN, &scale3_section2_main_style);
-    lv_scale_section_set_style(section, LV_PART_INDICATOR, &scale3_section2_indicator_style);
-    lv_scale_section_set_style(section, LV_PART_ITEMS, &scale3_section2_tick_style);
+    lv_scale_set_section_range(scale3, section, 0, 20);
+    lv_scale_set_section_style_main(scale3, section, &scale3_section2_main_style);
+    lv_scale_set_section_style_indicator(scale3, section, &scale3_section2_indicator_style);
+    lv_scale_set_section_style_items(scale3, section, &scale3_section2_tick_style);
 
     section = lv_scale_add_section(scale3);
-    lv_scale_section_set_range(section, 40, 60);
-    lv_scale_section_set_style(section, LV_PART_MAIN, &scale3_section3_main_style);
-    lv_scale_section_set_style(section, LV_PART_INDICATOR, &scale3_section3_indicator_style);
-    lv_scale_section_set_style(section, LV_PART_ITEMS, &scale3_section3_tick_style);
+    lv_scale_set_section_range(scale3, section, 40, 60);
+    lv_scale_set_section_style_main(scale3, section, &scale3_section3_main_style);
+    lv_scale_set_section_style_indicator(scale3, section, &scale3_section3_indicator_style);
+    lv_scale_set_section_style_items(scale3, section, &scale3_section3_tick_style);
 
     LV_IMAGE_DECLARE(img_demo_widgets_needle);
     scale3_needle = lv_image_create(scale3);

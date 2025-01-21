@@ -15,47 +15,28 @@
 	        <enum name="round_outer" help=""/>
 	    </enumdef>
 
-	    <prop name="mode" help="">
-	    	<param name="mode" type="enum:lv_scale_mode" help=""/>
-	    </prop>
-	    <prop name="total_tick_count" help="">
-	    	<param name="cnt" type="int" help=""/>
-	    </prop>
-	    <prop name="major_tick_every" help="">
-	    	<param name="cnt" type="int" help=""/>
-	    </prop>
-	    <prop name="label_show" help="">
-	    	<param name="en" type="bool" help=""/>
-	    </prop>
+	    <prop name="mode" type="enum:lv_scale_mode" help=""/>
+	    <prop name="total_tick_count" type="int" help=""/>
+	    <prop name="major_tick_every" type="int" help=""/>
+	    <prop name="label_show" type="bool" help=""/>
 	    <prop name="range" help="">
 	    	<param name="range_min" type="int" help=""/>
 	    	<param name="range_max" type="int" help=""/>
 	    </prop>
-	    <prop name="angle_range" help="">
-	    	<param name="range" type="deg" help=""/>
-	    </prop>
-	    <prop name="rotation" help="">
-	    	<param name="rotation" type="deg" help=""/>
-	    </prop>
-	    <prop name="text_src" help="">
-	    	<param name="texts" type="string[NULL]" help=""/>
-	    </prop>
-	    <prop name="post_draw" help="">
-	    	<param name="en" type="bool" help=""/>
-	    </prop>
-	    <prop name="draw_ticks_on_top" help="">
-	    	<param name="en" type="bool" help=""/>
-	    </prop>
+	    <prop name="angle_range" type="deg" help=""/>
+	    <prop name="rotation" type="deg" help=""/>
+	    <prop name="text_src" type="string[NULL]" help=""/>
+	    <prop name="post_draw" type="bool" help=""/>
+	    <prop name="draw_ticks_on_top" type="bool" help=""/>
 
-	    <element name="section" type="custom:scale_section" access="add">
+	    <element name="section" type="lv_scale_section" access="add">
 	    	<prop name="range" help="">
 	    		<param name="int" type="minor_range" help=""/>
 	    		<param name="int" type="major_range" help=""/>
 	    	</prop>
-	    	<prop name="style" help="">
-	    		<param name="part" type="part" help=""/>
-	    		<param name="style" type="style" help=""/>
-	    	</prop>
+	    	<prop name="style_main" type="style" help=""/>
+	    	<prop name="style_indicator" type="style" help=""/>
+	    	<prop name="style_items" type="style" help=""/>
 	    </element>
 	</api>
 </widget>
