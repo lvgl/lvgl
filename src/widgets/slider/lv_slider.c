@@ -59,7 +59,7 @@ static const lv_property_ops_t properties[] = {
     },
     {
         .id = LV_PROPERTY_SLIDER_LEFT_VALUE,
-        .setter = lv_slider_set_left_value,
+        .setter = lv_slider_set_start_value,
         .getter = lv_slider_get_left_value,
     },
     {
@@ -145,7 +145,7 @@ void lv_slider_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
     lv_bar_set_value(obj, value, anim);
 }
 
-void lv_slider_set_left_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
+void lv_slider_set_start_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim)
 {
     lv_bar_set_start_value(obj, value, anim);
 }
@@ -338,11 +338,11 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
             if(!slider->left_knob_focus) lv_slider_set_value(obj, lv_slider_get_value(obj) + 1, LV_ANIM_ON);
-            else lv_slider_set_left_value(obj, lv_slider_get_left_value(obj) + 1, LV_ANIM_ON);
+            else lv_slider_set_start_value(obj, lv_slider_get_left_value(obj) + 1, LV_ANIM_ON);
         }
         else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
             if(!slider->left_knob_focus) lv_slider_set_value(obj, lv_slider_get_value(obj) - 1, LV_ANIM_ON);
-            else lv_slider_set_left_value(obj, lv_slider_get_left_value(obj) - 1, LV_ANIM_ON);
+            else lv_slider_set_start_value(obj, lv_slider_get_left_value(obj) - 1, LV_ANIM_ON);
         }
         else {
             return;
@@ -355,7 +355,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         int32_t r = lv_event_get_rotary_diff(e);
 
         if(!slider->left_knob_focus) lv_slider_set_value(obj, lv_slider_get_value(obj) + r, LV_ANIM_ON);
-        else lv_slider_set_left_value(obj, lv_slider_get_left_value(obj) + 1, LV_ANIM_ON);
+        else lv_slider_set_start_value(obj, lv_slider_get_left_value(obj) + 1, LV_ANIM_ON);
 
         res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
         if(res != LV_RESULT_OK) return;

@@ -1,0 +1,21 @@
+<!--
+Example
+<lv_roller options="'a\nb\nc\nd' infinite" selected="2 true" visible_row_count="3"/>
+ -->
+
+<widget>
+	<api>
+	    <enumdef name="lv_roller_mode">
+	        <enum name="normal" help=""/>
+	        <enum name="infinite" help=""/>
+	    </enumdef>
+	    <prop name="options" type="int">
+	    	<param name="values" type="string"/>
+	    	<param name="mode" type="enum:lv_roller_mode"/>
+	    </prop>
+
+	    <prop name="selected" type="int" help=""/>
+
+	    <prop name="visible_row_count" type="int" help=""/>
+	</api>
+</widget>

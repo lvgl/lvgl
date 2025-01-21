@@ -51,24 +51,24 @@ static void test_with_attrs(const char * name)
     lv_xml_create(scr, name, attrs_3);
 
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("xml/lv_slider.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("xml/lv_bar.png");
 }
 
-void test_xml_slider_widget(void)
+void test_xml_bar_widget(void)
 {
-    test_with_attrs("lv_slider");
+    test_with_attrs("lv_bar");
 }
 
-void test_xml_slider_component(void)
+void test_xml_bar_component(void)
 {
     const char * xml = "<component>"
-                       "<view extends=\"lv_slider\">"
+                       "<view extends=\"lv_bar\">"
                        "</view>"
                        "</component>";
 
-    lv_xml_component_register_from_data("slider_test", xml);
+    lv_xml_component_register_from_data("bar_test", xml);
 
-    test_with_attrs("slider_test");
+    test_with_attrs("bar_test");
 }
 
 #endif

@@ -117,10 +117,10 @@ void test_scale_render_example_2(void)
 
         lv_scale_section_t * section = lv_scale_add_section(scale);
         /* Configure section styles */
-        lv_scale_section_set_range(section, 75, 100);
-        lv_scale_section_set_style(section, LV_PART_INDICATOR, &section_label_style);
-        lv_scale_section_set_style(section, LV_PART_ITEMS, &section_minor_tick_style);
-        lv_scale_section_set_style(section, LV_PART_MAIN, &section_main_line_style);
+        lv_scale_set_section_range(scale, section, 75, 100);
+        lv_scale_set_section_style_indicator(scale, section, &section_label_style);
+        lv_scale_set_section_style_items(scale, section, &section_minor_tick_style);
+        lv_scale_set_section_style_main(scale, section, &section_main_line_style);
 
         lv_obj_set_style_bg_color(scale, lv_palette_main(LV_PALETTE_BLUE_GREY), 0);
         lv_obj_set_style_bg_opa(scale, LV_OPA_50, 0);
@@ -234,10 +234,10 @@ void test_scale_render_example_4(void)
 
     /* Configure section styles */
     lv_scale_section_t * section = lv_scale_add_section(scale);
-    lv_scale_section_set_range(section, 75, 100);
-    lv_scale_section_set_style(section, LV_PART_INDICATOR, &section_label_style);
-    lv_scale_section_set_style(section, LV_PART_ITEMS, &section_minor_tick_style);
-    lv_scale_section_set_style(section, LV_PART_MAIN, &section_main_line_style);
+    lv_scale_set_section_range(scale, section, 75, 100);
+    lv_scale_set_section_style_indicator(scale, section, &section_label_style);
+    lv_scale_set_section_style_items(scale, section, &section_minor_tick_style);
+    lv_scale_set_section_style_main(scale, section, &section_main_line_style);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/scale_4.png");
 }
@@ -321,16 +321,16 @@ void test_scale_set_style(void)
 
     /* Configure section styles */
     lv_scale_section_t * section = lv_scale_add_section(scale);
-    lv_scale_section_set_range(section, 75, 100);
+    lv_scale_set_section_range(scale, section, 75, 100);
 
-    lv_scale_section_set_style(section, LV_PART_MAIN, &section_main_line_style);
+    lv_scale_set_section_style_main(scale, section, &section_main_line_style);
     TEST_ASSERT_NOT_NULL(section->main_style);
     TEST_ASSERT_NULL(section->indicator_style);
     TEST_ASSERT_NULL(section->items_style);
 
     TEST_ASSERT_EQUAL(section->main_style, &section_main_line_style);
 
-    lv_scale_section_set_style(section, LV_PART_INDICATOR, &section_label_style);
+    lv_scale_set_section_style_indicator(scale, section, &section_label_style);
     TEST_ASSERT_NOT_NULL(section->main_style);
     TEST_ASSERT_NOT_NULL(section->indicator_style);
     TEST_ASSERT_NULL(section->items_style);
@@ -338,7 +338,7 @@ void test_scale_set_style(void)
     TEST_ASSERT_EQUAL(section->main_style, &section_main_line_style);
     TEST_ASSERT_EQUAL(section->indicator_style, &section_label_style);
 
-    lv_scale_section_set_style(section, LV_PART_ITEMS, &section_minor_tick_style);
+    lv_scale_set_section_style_items(scale, section, &section_minor_tick_style);
     TEST_ASSERT_NOT_NULL(section->main_style);
     TEST_ASSERT_NOT_NULL(section->indicator_style);
     TEST_ASSERT_NOT_NULL(section->items_style);
@@ -346,22 +346,6 @@ void test_scale_set_style(void)
     TEST_ASSERT_EQUAL(section->main_style, &section_main_line_style);
     TEST_ASSERT_EQUAL(section->indicator_style, &section_label_style);
     TEST_ASSERT_EQUAL(section->items_style, &section_minor_tick_style);
-
-    /* Invalid part */
-    lv_scale_section_set_style(section, LV_PART_CURSOR, &section_minor_tick_style);
-    TEST_ASSERT_NOT_NULL(section->main_style);
-    TEST_ASSERT_NOT_NULL(section->indicator_style);
-    TEST_ASSERT_NOT_NULL(section->items_style);
-
-    TEST_ASSERT_EQUAL(section->main_style, &section_main_line_style);
-    TEST_ASSERT_EQUAL(section->indicator_style, &section_label_style);
-    TEST_ASSERT_EQUAL(section->items_style, &section_minor_tick_style);
-
-    /* NULL section */
-    lv_scale_section_t * null_section = NULL;
-
-    lv_scale_section_set_range(null_section, 75, 100);
-    lv_scale_section_set_style(null_section, LV_PART_MAIN, &section_main_line_style);
 }
 
 /* The scale internally counts the number of custom labels until it finds the NULL sentinel */

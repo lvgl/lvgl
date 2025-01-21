@@ -283,9 +283,9 @@ static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_t * total_spent_span = lv_spangroup_create(spent_box);
     lv_obj_add_style(total_spent_span, &c->fonts[FONT_LABEL_XS], 0);
     lv_obj_add_style(total_spent_span, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    lv_span_t * total_spent_amount = lv_spangroup_new_span(total_spent_span);
+    lv_span_t * total_spent_amount = lv_spangroup_add_span(total_spent_span);
     anim_state->spent_span_small = total_spent_amount;
-    lv_span_t * total_spent_label = lv_spangroup_new_span(total_spent_span);
+    lv_span_t * total_spent_label = lv_spangroup_add_span(total_spent_span);
     lv_span_set_text_static(total_spent_label, "Total spent");
     lv_style_set_text_opa(&total_spent_label->style, LV_OPA_40);
 
@@ -313,9 +313,9 @@ static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_t * gas_equivalent_span = lv_spangroup_create(spent_box);
     lv_obj_add_style(gas_equivalent_span, &c->fonts[FONT_LABEL_XS], 0);
     lv_obj_add_style(gas_equivalent_span, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    lv_span_t * gas_equivalent_amount = lv_spangroup_new_span(gas_equivalent_span);
+    lv_span_t * gas_equivalent_amount = lv_spangroup_add_span(gas_equivalent_span);
     lv_span_set_text_static(gas_equivalent_amount, "$340 - ");
-    lv_span_t * gas_equivalent_label = lv_spangroup_new_span(gas_equivalent_span);
+    lv_span_t * gas_equivalent_label = lv_spangroup_add_span(gas_equivalent_span);
     lv_span_set_text_static(gas_equivalent_label, "Gas Equivalent");
     lv_style_set_text_opa(&gas_equivalent_label->style, LV_OPA_40);
 }

@@ -28,12 +28,18 @@ extern "C" {
  **********************/
 
 struct _lv_scale_section_t {
-    lv_style_t * main_style;               /**< Style to use for MAIN part(s) of scale
-                                            *   when it falls within this section's range */
-    lv_style_t * indicator_style;          /**< Style to use for INDICATOR part(s) of scale
-                                            *   when it falls within this section's range */
-    lv_style_t * items_style;              /**< Style to use for ITEMS part(s) of scale
-                                            *   when it falls within this section's range */
+    /** Style to use for MAIN part(s) of scale
+      * when it falls within this section's range */
+    const lv_style_t * main_style;
+
+    /** Style to use for INDICATOR part(s) of scale
+      * when it falls within this section's range */
+    const lv_style_t * indicator_style;
+
+    /** Style to use for ITEMS part(s) of scale
+      * when it falls within this section's range */
+    const lv_style_t * items_style;
+
     int32_t range_min;                     /**< Scale parts with value >= this value will be drawn using applicable style. */
     int32_t range_max;                     /**< Scale parts with value <= this value will be drawn using applicable style. */
     uint32_t first_tick_idx_in_section;    /**< Internal (set during drawing): Tick index of first tick that falls within
