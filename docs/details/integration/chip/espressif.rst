@@ -84,7 +84,7 @@ To add a display or touch driver to your project, use a command like:
 Using the File System under ESP-IDF
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-ESP-IDF uses the standard C functions (``fopen``, ``fread``) in all storage related APIs.
+ESP-IDF uses the standard C file operation functions (``fopen``, ``fread``) in all its storage related APIs.
 This allows seamless interoperability with LVGL when enabling the :c:macro:`LV_USE_FS_STDIO` configuration.
 The process is described in details below, using ``SPIFFS`` as demonstration.
 
