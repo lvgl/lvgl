@@ -281,11 +281,10 @@ static void perf_update_timer_cb(lv_timer_t * t)
 
 static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    lv_obj_t * label = lv_observer_get_target(observer);
     const lv_sysmon_perf_info_t * perf = lv_subject_get_pointer(subject);
 
 #if LV_USE_PERF_MONITOR_LOG_MODE
-    LV_UNUSED(label);
+    LV_UNUSED(observer);
     LV_LOG("sysmon: "
            "%" LV_PRIu32 " FPS (refr_cnt: %" LV_PRIu32 " | redraw_cnt: %" LV_PRIu32"), "
            "refr %" LV_PRIu32 "ms (render %" LV_PRIu32 "ms | flush %" LV_PRIu32 "ms), "
@@ -294,6 +293,7 @@ static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
            perf->calculated.refr_avg_time, perf->calculated.render_avg_time, perf->calculated.flush_avg_time,
            perf->calculated.cpu);
 #else
+    lv_obj_t * label = lv_observer_get_target(observer);
     lv_label_set_text_fmt(
         label,
         "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU\n"
