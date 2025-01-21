@@ -830,6 +830,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
     if(lv_area_is_in(area_p, &obj->coords, 0) == false) return NULL;
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return NULL;
     if(lv_obj_get_layer_type(obj) != LV_LAYER_TYPE_NONE) return NULL;
+    if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return NULL;
 
     /*If this object is fully cover the draw area then check the children too*/
     lv_cover_check_info_t info;
