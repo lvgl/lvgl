@@ -184,13 +184,6 @@ Single Values
     lv_value_precise_t  precise;  /**< float or int for precise value */
     lv_point_t          point;    /**< Point, contains two int32_t */
 
-.. _paired values:
-
-Paired Values
-~~~~~~~~~~~~~
-
-.. code-block:: c
-
     struct {
         /**
          * Note that place struct member `style` at first place is intended.
@@ -215,6 +208,13 @@ Paired Values
         lv_style_value_t  style;     /**< Make sure it's the first element in struct. */
         uint32_t          selector;  /**< Style selector, lv_part_t | lv_state_t */
     };
+
+.. _paired values:
+
+Paired Values
+~~~~~~~~~~~~~
+
+.. code-block:: c
 
     /**
      * For some properties like slider range, it contains two simple (4-byte) values
