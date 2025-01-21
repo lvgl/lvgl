@@ -944,6 +944,12 @@ menu "LVGL configuration"
 				but with > 10,000 characters if you see issues probably you
 				need to enable it.
 
+		config LV_FONT_CACHE_GLYPH_CNT
+			int "Number of glyphs to cache in the built-in font cache."
+			default 0
+			help
+				This can improve performance if the same text is drawn multiple times.
+
 		config LV_USE_FONT_COMPRESSED
 			bool "Sets support for compressed fonts"
 

@@ -576,6 +576,10 @@ void lv_draw_unit_draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * 
     }
 
     if(g.resolved_font) {
+#if LV_FONT_CACHE_GLYPH_CNT == 0
+        /* When using the font cache, there is no need to use a temporary buffer to store converted font images.
+         * The font cache will manage the cache lifecycle by itself to minimize copying and image conversion.
+         */
         lv_draw_buf_t * draw_buf = NULL;
         if(LV_FONT_GLYPH_FORMAT_NONE < g.format && g.format < LV_FONT_GLYPH_FORMAT_IMAGE) {
             /*Only check draw buf for bitmap glyph*/
@@ -591,6 +595,7 @@ void lv_draw_unit_draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * 
                 dsc->_draw_buf = draw_buf;
             }
         }
+#endif
 
         dsc->format = g.format;
     }

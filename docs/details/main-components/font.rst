@@ -61,6 +61,13 @@ To test it try
 If all works well, a '\ |check|\ ' character should be displayed.
 
 
+Font caching
+************
+
+Setting :c:macro:`LV_FONT_CACHE_GLYPH_CNT` to set the maximum number of font caches generally increases the efficiency of drawing duplicate text,
+but incurs some memory overhead, the memory footprint of a font glpyh is the width*height(or stride*height when there is a need for stride alignment) of a bitmap.
+If the value is set to 0, caching is disabled.
+
 Typesetting
 ***********
 

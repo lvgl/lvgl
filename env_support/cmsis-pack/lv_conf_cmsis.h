@@ -576,6 +576,10 @@
  *  A compiler error will be triggered if a font needs it. */
 #define LV_FONT_FMT_TXT_LARGE 0
 
+/** Number of glyphs to cache in the built-in font cache.
+ *  This can improve performance if the same text is drawn multiple times. */
+#define LV_FONT_CACHE_GLYPH_CNT 0
+
 /** Enables/disables support for compressed fonts. */
 #define LV_USE_FONT_COMPRESSED 0
 

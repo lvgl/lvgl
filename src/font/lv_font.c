@@ -8,6 +8,7 @@
  *********************/
 
 #include "lv_font.h"
+#include "lv_font_cache.h"
 #include "../misc/lv_text_private.h"
 #include "../misc/lv_utils.h"
 #include "../misc/lv_log.h"
@@ -46,16 +47,46 @@ const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t
 {
     const lv_font_t * font_p = g_dsc->resolved_font;
     LV_ASSERT_NULL(font_p);
+#if LV_FONT_CACHE_GLYPH_CNT > 0
+    /* If the font cache is enabled, try to use it to get the glyph bitmap */
+    return lv_font_cache_get_glyph_bitmap(g_dsc, draw_buf);
+#else
     return font_p->get_glyph_bitmap(g_dsc, draw_buf);
+#endif
+}
+
+lv_result_t lv_font_get_glyph_raw_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+{
+    LV_ASSERT_NULL(g_dsc);
+    LV_ASSERT_NULL(draw_buf);
+    const lv_font_t * font_p = g_dsc->resolved_font;
+
+    if(!font_p->static_bitmap) {
+        return LV_RESULT_INVALID;
+    }
+
+    return font_p->get_glyph_bitmap(g_dsc, draw_buf) ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
 void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
 {
     const lv_font_t * font = g_dsc->resolved_font;
 
-    if(font != NULL && font->release_glyph) {
-        font->release_glyph(font, g_dsc);
+    if(!font) {
+        return;
     }
+
+    if(font->release_glyph) {
+        font->release_glyph(font, g_dsc);
+        return;
+    }
+
+#if LV_FONT_CACHE_GLYPH_CNT > 0
+    /* Since the old font resource does not register the release_glyph function in the font structure,
+     * it is processed here as a fallback to ensure forward compatibility.
+     */
+    lv_font_cache_release_glyph(font, g_dsc);
+#endif
 }
 
 bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_out, uint32_t letter,
@@ -71,8 +102,7 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
 
     const lv_font_t * f = font_p;
 
-    dsc_out->resolved_font = NULL;
-    dsc_out->req_raw_bitmap = 0;
+    lv_memzero(dsc_out, sizeof(lv_font_glyph_dsc_t));
 
     while(f) {
         bool found = f->get_glyph_dsc(f, dsc_out, letter, f->kerning == LV_FONT_KERNING_NONE ? 0 : letter_next);
