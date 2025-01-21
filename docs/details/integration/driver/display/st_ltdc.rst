@@ -1,3 +1,5 @@
+.. _stm32 ltdc driver:
+
 =================
 STM32 LTDC Driver
 =================
