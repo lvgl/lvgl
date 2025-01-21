@@ -231,7 +231,7 @@ Paired Values
         } arg1, arg2;
     };
 
-You can find the current :cpp:type:`lv_property_t` struct the
+You can find the current :cpp:type:`lv_property_t` struct in the
 `lv_obj_property.h <https://github.com/lvgl/lvgl/blob/master/src/core/lv_obj_property.h>`__ file.
 
 .. code-block:: c
