@@ -89,24 +89,22 @@ By default, this feature of LVGL is turned off.  It can be turned on by configur
 
 The 3 functions that then become available are:
 
-.. code:: c
+- :cpp:type:`lv_result_t`  :cpp:expr:`lv_obj_set_property(widget, lv_property_t * value)`
+  Sets specified property of Widget.
+- :cpp:type:`lv_property_t`  :cpp:expr:`lv_obj_get_property(widget, lv_prop_id_t id)`
+  Reads property value from Widget.
+- :cpp:type:`lv_result_t`  :cpp:expr:`lv_obj_set_properties(widget, lv_property_t * values, count)`
+  Sets multiple Widget properties from an array of :cpp:type:`lv_property_t`.
 
-    lv_result_t    lv_obj_set_property(lv_obj_t * widget, const lv_property_t * value);
-    lv_property_t  lv_obj_get_property(lv_obj_t * widget, lv_prop_id_t id);
+An ``lv_prop_id_t`` is a :ref:`widget_property_id`, whereas an ``lv_property_t`` is a
+struct that pairs a :ref:`widget_property_id` with a :ref:`widget_property_value`.
 
-A ``lv_property_t`` is a paired ID and value, and a ``lv_prop_id_t`` is just an ID.
-
-.. code:: c
-
-    lv_result_t    lv_obj_set_properties(lv_obj_t * widget, const lv_property_t * value, uint32_t count);
-
-can be used to set multiple properties where ``value`` will point to an array of
-``lv_property_t`` objects defining what is to be set.  The following is an example
-of such an array:
+The following is an example of an array that could be used as the ``values`` argument
+in :cpp:func:`lv_obj_set_properties`:
 
 .. code-block:: c
 
-    lv_property_t props[] = {
+    lv_property_t values[] = {
         { .id = LV_PROPERTY_IMAGE_SRC, .ptr = &img_demo_widgets_avatar, },
         { .id = LV_PROPERTY_IMAGE_PIVOT, .ptr = &pivot_50, },
         { .id = LV_PROPERTY_IMAGE_SCALE, .num = 128, },
@@ -115,8 +113,8 @@ of such an array:
         { .id = LV_STYLE_BG_COLOR, .color = (lv_color_t){.red = 0x11, .green = 0x22, .blue = 0x33}, },
     }
 
-Alternately, :cpp:expr:`lv_obj_set_property(widget, value)` could be called inside
-a loop.
+Alternately, :cpp:expr:`lv_obj_set_property(widget, value)` could be called using
+this array's individual ``value`` elements inside a loop.
 
 
 .. _widget_property_id:
@@ -149,9 +147,6 @@ macros in the ``enum`` in the Widget's primary ``.h`` file.  In both cases, the
   contain the type for the 2nd value, and bits ``<23:0>`` contain the property ID.
 
 Just make sure the ID is unique across all Widgets.
-
-The "assembled" identifer is a 32-bit value.  For values "assembled" using
-:c:macro:`LV_PROPERTY_ID`,
 
 Note that :cpp:type:`lv_style_prop_t` (enumerator values beginning with ``LV_PROPERTY_STYLE_...``)
 are also valid property IDs, and can be used to set or get a Widget's style values.
@@ -234,37 +229,37 @@ Paired Values
 You can find the current :cpp:type:`lv_property_t` struct in the
 `lv_obj_property.h <https://github.com/lvgl/lvgl/blob/master/src/core/lv_obj_property.h>`__ file.
 
-.. code-block:: c
 
-
-
-
-Name Lookup
------------
+Property ID Lookup by Name
+--------------------------
 
 Setting configuration macro :c:macro:`LV_USE_OBJ_PROPERTY_NAME` to ``1`` enables the
 following functions to look up property IDs by passing property name (a string):
 
-.. code:: c
+- :cpp:expr:`lv_obj_property_get_id(widget, name)`
+  Gets property ID by recursively searching for ``name`` in Widget's class hierarchy,
+  and if still not found, then searches style properties.
 
-    lv_prop_id_t  lv_obj_property_get_id(const lv_obj_t * widget, const char * name);
-    lv_prop_id_t  lv_obj_class_property_get_id(const lv_obj_class_t * clz, const char * name);
-    lv_prop_id_t  lv_style_property_get_id(const char * name);
+- :cpp:expr:`lv_obj_class_property_get_id(class_p, name)`
+  Gets property ID by doing a non-recursive search for ``name`` directly in Widget
+  class properties.
 
-.. note::
+- :cpp:expr:`lv_style_property_get_id(name)`
+  Gets style property ID by name.
 
-    The 1st function uses the 2nd function, and if the name is not found in THAT
-    list, then it uses the 3rd function to attempt to find it.  The 3rd function uses
-    the name-to-id lookup array in ``lv_style_properties.c::lv_style_property_names[]``.
-    These functions use binary searches in an alphabetically-ordered name list, so
-    they are somewhat faster than a mere sequential search.
+The latter two functions are useful when you already know ``name`` is among the
+properties of a specific Widget class, or is a style name, since a property name may
+exist in both lists.  Because of the search sequence in
+:cpp:expr:`lv_obj_property_get_id(widget, name)`, if a name does exist in both lists,
+then using this function forces the name in the Widget's class hierarchy properties
+to have precedence over the style name.
 
 You can tell which names are available by looking in the ``.c`` files in the
 ``./src/widgets/property/`` directory.  Note that to support binary name searches,
 these arrays are generated so that they are guaranteed to be in alphabetical order.
-If you need to add a property that is not present, add it in the ``enum`` near the
-top of the Widget's primary ``.h`` file, and re-generate these lists using
-``./scripts/properties.py`` to preserve the alphabetical ordering.
+If you need to add a property that is not present, it is recommended to add it in the
+``enum`` near the top of the Widget's primary ``.h`` file, and re-generate these
+lists using ``./scripts/properties.py`` to ensure alphabetical ordering is preserved.
 
 
 
