@@ -32,6 +32,7 @@
 #include "parsers/lv_xml_roller_parser.h"
 #include "parsers/lv_xml_scale_parser.h"
 #include "parsers/lv_xml_spangroup_parser.h"
+#include "parsers/lv_xml_event_parser.h"
 #include "../../libs/expat/expat.h"
 #include "../../draw/lv_draw_image.h"
 
@@ -55,6 +56,7 @@ static void register_builtin_fonts(void);
  **********************/
 static lv_ll_t font_ll;
 static lv_ll_t image_ll;
+static lv_ll_t event_cb_ll;
 
 /**********************
  *      MACROS
@@ -68,6 +70,7 @@ void lv_xml_init(void)
 {
     lv_ll_init(&font_ll, sizeof(lv_xml_font_t));
     lv_ll_init(&image_ll, sizeof(lv_xml_image_t));
+    lv_ll_init(&event_cb_ll, sizeof(lv_xml_event_cb_t));
 
     lv_xml_component_init();
 
@@ -96,6 +99,8 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_scale-section", lv_xml_scale_section_create, lv_xml_scale_section_apply);
     lv_xml_widget_register("lv_spangroup", lv_xml_spangroup_create, lv_xml_spangroup_apply);
     lv_xml_widget_register("lv_spangroup-span", lv_xml_spangroup_span_create, lv_xml_spangroup_span_apply);
+
+    lv_xml_widget_register("lv_event-call_function", lv_xml_event_call_function_create, lv_xml_event_call_function_apply);
 }
 
 void * lv_xml_create_from_ctx(lv_obj_t * parent, lv_xml_component_ctx_t * parent_ctx, lv_xml_component_ctx_t * ctx,
@@ -182,7 +187,8 @@ const lv_font_t * lv_xml_get_font(const char * name)
         if(lv_streq(f->name, name)) return f->font;
     }
 
-    return NULL;
+    LV_LOG_WARN("No font was found with name \"%s\". Using LV_FONT_DEFAULT instead.", name);
+    return LV_FONT_DEFAULT;
 }
 
 lv_result_t lv_xml_register_image(const char * name, const void * src)
@@ -206,6 +212,28 @@ const void * lv_xml_get_image(const char * name)
         if(lv_streq(img->name, name)) return img->src;
     }
 
+    LV_LOG_WARN("No image was found with name \"%s\"", name);
+    return NULL;
+}
+
+lv_result_t lv_xml_register_event_cb(const char * name, lv_event_cb_t cb)
+{
+    lv_xml_event_cb_t * e = lv_ll_ins_head(&event_cb_ll);
+    e->name = lv_strdup(name);
+    e->cb = cb;
+
+    return LV_RESULT_OK;
+}
+
+
+lv_event_cb_t lv_xml_get_event_cb(const char * name)
+{
+    lv_xml_event_cb_t * e;
+    LV_LL_READ(&event_cb_ll, e) {
+        if(lv_streq(e->name, name)) return e->cb;
+    }
+
+    LV_LOG_WARN("No event_cb was found with name \"%s\"", name);
     return NULL;
 }
 

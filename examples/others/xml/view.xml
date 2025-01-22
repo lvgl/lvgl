@@ -12,6 +12,10 @@
 	</styles>
 
 	<view extends="lv_obj" width="280" height="240" style_bg_color="#light_blue">
-		<lv_roller options="'a&0x30;b\nc\nd' infinite" selected="2 true" visible_row_count="3"/>
+		<lv_button>
+			<lv_label text="Click me"/>
+			<lv_event-call_function trigger="clicked" callback="print" user_data="Hello"/>
+			<lv_event-call_function trigger="clicked" callback="print" user_data="World"/>
+		</lv_button>
 	</view>
 </component>
