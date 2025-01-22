@@ -49,22 +49,6 @@ struct _lv_xml_parser_state_t {
     lv_xml_parser_section_t section;
 };
 
-typedef struct {
-    const char * name;
-    const char * value;
-} lv_xml_const_t;
-
-typedef struct {
-    const char * name;
-    const char * def;
-    const char * type;
-} lv_xml_param_t;
-
-typedef struct {
-    const char * name;
-    lv_grad_dsc_t grad_dsc;
-} lv_xml_grad_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
