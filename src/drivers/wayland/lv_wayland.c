@@ -195,7 +195,8 @@ struct application {
 
 struct window {
     lv_display_t * lv_disp;
-    lv_draw_buf_t * lv_disp_draw_buf;
+    lv_draw_buf_t * lv_disp_draw_buf1;
+    lv_draw_buf_t * lv_disp_draw_buf2;
 
     lv_indev_t * lv_indev_pointer;
     lv_indev_t * lv_indev_pointeraxis;
@@ -2007,10 +2008,15 @@ static bool resize_window(struct window * window, int width, int height)
         stride = lv_draw_buf_width_to_stride(width,
                                              lv_display_get_color_format(window->lv_disp));
 
-        window->lv_disp_draw_buf = lv_draw_buf_reshape(
-                                       window->lv_disp_draw_buf,
-                                       lv_display_get_color_format(window->lv_disp),
-                                       width, height / LVGL_DRAW_BUFFER_DIV, stride);
+        window->lv_disp_draw_buf1 = lv_draw_buf_reshape(
+                                        window->lv_disp_draw_buf1,
+                                        lv_display_get_color_format(window->lv_disp),
+                                        width, height, stride);
+
+        window->lv_disp_draw_buf2 = lv_draw_buf_reshape(
+                                        window->lv_disp_draw_buf2,
+                                        lv_display_get_color_format(window->lv_disp),
+                                        width, height, stride);
 
         lv_display_set_resolution(window->lv_disp, width, height);
 
@@ -2495,7 +2501,8 @@ static void wayland_deinit(void)
             destroy_window(window);
         }
 
-        lv_draw_buf_destroy(window->lv_disp_draw_buf);
+        lv_draw_buf_destroy(window->lv_disp_draw_buf1);
+        lv_draw_buf_destroy(window->lv_disp_draw_buf2);
         lv_display_delete(window->lv_disp);
     }
 
@@ -2603,15 +2610,20 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
     stride = lv_draw_buf_width_to_stride(hor_res,
                                          lv_display_get_color_format(window->lv_disp));
 
-    window->lv_disp_draw_buf = lv_draw_buf_create(
-                                   hor_res,
-                                   ver_res / LVGL_DRAW_BUFFER_DIV,
-                                   lv_display_get_color_format(window->lv_disp),
-                                   stride);
+    window->lv_disp_draw_buf1 = lv_draw_buf_create(
+                                    hor_res,
+                                    ver_res,
+                                    lv_display_get_color_format(window->lv_disp),
+                                    stride);
+    window->lv_disp_draw_buf2 = lv_draw_buf_create(
+                                    hor_res,
+                                    ver_res,
+                                    lv_display_get_color_format(window->lv_disp),
+                                    stride);
 
 
-    lv_display_set_draw_buffers(window->lv_disp, window->lv_disp_draw_buf, NULL);
-    lv_display_set_render_mode(window->lv_disp, LV_DISPLAY_RENDER_MODE_PARTIAL);
+    lv_display_set_draw_buffers(window->lv_disp, window->lv_disp_draw_buf1, window->lv_disp_draw_buf2);
+    lv_display_set_render_mode(window->lv_disp, LV_DISPLAY_RENDER_MODE_FULL);
     lv_display_set_flush_cb(window->lv_disp, _lv_wayland_flush);
     lv_display_set_user_data(window->lv_disp, window);
 
