@@ -1037,8 +1037,7 @@ static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
                 continue;
             }
 
-            /*Don't draw the first point. A second point is also required to draw the line*/
-            if(i != 0) {
+            if(i != 0) { /*Don't draw line *to* the first point.*/
                 lv_area_t point_area;
                 point_area.x1 = (int32_t)line_dsc.p1.x - point_w;
                 point_area.x2 = (int32_t)line_dsc.p1.x + point_w;
@@ -1046,10 +1045,10 @@ static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
                 point_area.y2 = (int32_t)line_dsc.p1.y + point_h;
 
                 if(ser->y_points[p_prev] != LV_CHART_POINT_NONE && ser->y_points[p_act] != LV_CHART_POINT_NONE) {
-                    line_dsc.base.id2 = i;
+                    line_dsc.base.id2 = i - 1;
                     lv_draw_line(layer, &line_dsc);
                     if(point_w && point_h) {
-                        point_dsc_default.base.id2 = i;
+                        point_dsc_default.base.id2 = i - 1;
                         lv_draw_rect(layer, &point_dsc_default, &point_area);
                     }
                 }
@@ -1058,7 +1057,7 @@ static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
             }
 
             /*Draw the last point*/
-            if(i == chart->point_cnt) {
+            if(i == chart->point_cnt - 1) {
 
                 if(ser->y_points[p_act] != LV_CHART_POINT_NONE) {
                     lv_area_t point_area;
