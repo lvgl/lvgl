@@ -1053,7 +1053,7 @@ static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
             }
 
             /*Draw the last point*/
-            if(i == chart->point_cnt) {
+            if(i == chart->point_cnt - 1) {
 
                 if(ser->y_points[p_act] != LV_CHART_POINT_NONE) {
                     lv_area_t point_area;
