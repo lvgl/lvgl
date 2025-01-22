@@ -164,7 +164,7 @@ task will be created.
   draw task.
 
 Gradients
-^^^^^^^^^
+---------
 
 The ``grad`` field of the fill descriptor (or :cpp:expr:`lv_grad_dsc_t` in
 general) supports:
@@ -175,10 +175,9 @@ general) supports:
 - Radial
 - Conic
 
-TODO:
+gradient types.
 
-- Gradients with multiple stops
-- Detailed descriptions of each type
+The followings shows some example gradients.
 
 .. lv_example:: styles/lv_example_style_2
   :language: c
@@ -191,6 +190,83 @@ TODO:
 
 .. lv_example:: styles/lv_example_style_18
   :language: c
+
+For each gradient types multiple color and opacity values can be assigned. These are called
+"stops". The maximum number of stops is limited to :cpp:macro:`LV_GRADIENT_MAX_STOPS`.
+
+The gradient is basically a transitions of colors and opacities between the stops.
+
+Besides just setting the color and opacity of each stop its also possible to set
+where they start relative to the whole gradient area.
+
+For example with 3 stops it can be set like this:
+
+- 10% red: 0..10% fully red
+- 60% green: 10..60% transition from red to green, 60% is fully green
+- 65% blue: fast transition from green to blue between 60%..65%. After 65% fully blue.
+
+The position of the stops are called fractions or offset and
+They are 8 bit values where 0 is 0% and 255 is 100% of the whole gradient area.
+
+:cpp:expr:`lv_gradient_init_stops(grad_dsc, colors, opas, fracs, cnt)` initializes
+a gradient descriptor with stops containing the color, opacity and fraction of each stop.
+
+.. code-block:: c
+
+    static const lv_color_t colors[2] = {
+        LV_COLOR_MAKE(0xe8, 0xe8, 0xe8),
+        LV_COLOR_MAKE(0x79, 0x79, 0x79),
+    };
+
+    static const lv_opa_t opas[2] = {
+        170,
+        255,
+    };
+
+    static const uint8_t fracs[2] = {
+        170,
+        255,
+    };
+
+   lv_gradient_init_stops(&grad, colors, opas, fracs, sizeof(colors) / sizeof(lv_color_t));
+
+If the opacity array is ``NULL`` 255 will be sued for each stop. If the fractions array is `NULL`
+the colors will be distributed evenly. For example with 3 colors: 0%, 50%, 100%
+
+
+Horizontal and Vertical gradients
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The simplest and usually fasted gradient types are the horizontal and vertical
+gradients.
+
+After initializing the stops with :cpp:expr:`lv_gradient_init_stops` call
+either :cpp:expr:`lv_grad_horizontal_init(&grad_dsc)` or :cpp:expr:`lv_grad_vertical_init(&grad_dsc)`
+to get horizontal or vertical gradient descriptor.
+
+.. lv_example:: grad/lv_example_grad_1
+  :language: c
+
+Linear gradients
+^^^^^^^^^^^^^^^^
+
+The liniear (or skew) gradinet are similar to horizontal or vertical gradient but the
+angle of the gradient can be adjusted.
+
+The linear gradient will be rendered alogn a line defined by 2 points.
+
+
+After initializing the stops with :cpp:expr:`lv_gradient_init_stops` call
+either :cpp:expr:`lv_grad_horizontal_init(&grad_dsc)` or :cpp:expr:`lv_grad_vertical_init(&grad_dsc)`
+to get horizontal or vertical gradient descriptor.
+
+.. lv_example:: grad/lv_example_grad_1
+  :language: c
+
+lv_grad_extend_t extend)
+
+
+
 
 Border Draw Descriptor
 -----------------------
