@@ -67,8 +67,6 @@ static void free_cb(void * draw_buf);
 void lv_nuttx_image_cache_init(bool use_independent_image_heap)
 {
     lv_draw_buf_handlers_t * handlers = image_cache_draw_buf_handlers;
-    handlers->buf_malloc_cb = malloc_cb;
-    handlers->buf_free_cb = free_cb;
 
     ctx = lv_malloc_zeroed(sizeof(lv_nuttx_ctx_image_cache_t));
     LV_ASSERT_MALLOC(ctx);
