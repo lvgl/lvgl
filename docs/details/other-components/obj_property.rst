@@ -236,15 +236,15 @@ Property ID Lookup by Name
 Setting configuration macro :c:macro:`LV_USE_OBJ_PROPERTY_NAME` to ``1`` enables the
 following functions to look up property IDs by passing property name (a string):
 
-- :cpp:expr:`lv_obj_property_get_id(widget, name)`
+- :cpp:type:`lv_prop_id_t` :cpp:expr:`lv_obj_property_get_id(widget, name)`
   Gets property ID by recursively searching for ``name`` in Widget's class hierarchy,
   and if still not found, then searches style properties.
 
-- :cpp:expr:`lv_obj_class_property_get_id(class_p, name)`
+- :cpp:type:`lv_prop_id_t` :cpp:expr:`lv_obj_class_property_get_id(class_p, name)`
   Gets property ID by doing a non-recursive search for ``name`` directly in Widget
   class properties.
 
-- :cpp:expr:`lv_style_property_get_id(name)`
+- :cpp:type:`lv_prop_id_t` :cpp:expr:`lv_style_property_get_id(name)`
   Gets style property ID by name.
 
 The latter two functions are useful when you already know ``name`` is among the
