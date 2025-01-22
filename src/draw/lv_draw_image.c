@@ -14,6 +14,7 @@
 #include "../misc/lv_log.h"
 #include "../misc/lv_math.h"
 #include "../core/lv_refr.h"
+#include "../core/lv_obj_private.h"
 #include "../stdlib/lv_mem.h"
 #include "../stdlib/lv_string.h"
 
@@ -131,6 +132,7 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
             lv_area_t draw_area = layer->buf_area;
             lv_area_t coords_area = *coords;
 
+            lv_area_t obj_area = dsc->base.obj->coords;
             if(layer->parent) { /* child layer */
                 int32_t xpos = coords->x1 - draw_area.x1;
                 int32_t ypos = coords->y1 - draw_area.y1;
@@ -140,10 +142,16 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
                 decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, new_image_dsc, &coords_area);
             }
             else {
-                layer->_clip_area = draw_area;
                 lv_area_t clip_area = draw_area;
                 if(lv_area_intersect(&clip_area, &clip_area, &coords_area)) {
-                    decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, new_image_dsc, &clip_area);
+
+                    lv_image_buf_get_transformed_area(&coords_area, lv_area_get_width(coords), lv_area_get_height(coords),
+                                                      dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
+                    lv_area_move(&coords_area, coords->x1, coords->y1);
+
+                    if(lv_area_intersect(&clip_area, &clip_area, &obj_area)) {
+                        decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, new_image_dsc, &clip_area);
+                    }
                 }
             }
 

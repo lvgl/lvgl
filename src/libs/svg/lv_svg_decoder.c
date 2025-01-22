@@ -369,6 +369,13 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
     }
 #endif
     if(image_dsc) {
+        lv_area_t layer_clip_area = target_layer->_clip_area;
+        int32_t off_x = (lv_area_get_width(&layer_clip_area) - image_dsc->header.w - 1) / 2;
+        int32_t off_y = (lv_area_get_height(&layer_clip_area) - image_dsc->header.h - 1) / 2;
+
+        if(image_dsc->pivot.x != 0 || image_dsc->pivot.y != 0) {
+            lv_matrix_translate(&matrix, off_x, off_y);
+        }
         lv_matrix_translate(&matrix, image_dsc->pivot.x, image_dsc->pivot.y);
         lv_matrix_rotate(&matrix, image_dsc->rotation / 10.0f);
         lv_matrix_scale(&matrix, image_dsc->scale_x / 255.0f, image_dsc->scale_y / 255.0f);
