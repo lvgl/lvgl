@@ -335,7 +335,6 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
 
     LV_PROFILER_DRAW_BEGIN;
 
-#if LV_USE_SVG_DECODER_RASTERIZED
     bool alloc_layer = false;
     lv_layer_t * target_layer = NULL;
     lv_draw_image_dsc_t layer_draw_dsc;
@@ -351,23 +350,18 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
     else {
         target_layer = (lv_layer_t *)layer;
     }
-#else
-    lv_layer_t * target_layer = (lv_layer_t *)layer;
-#endif
 
     lv_vector_dsc_t * ctx = lv_vector_dsc_create(target_layer);
     lv_matrix_t matrix;
     lv_matrix_identity(&matrix);
-#if LV_USE_SVG_DECODER_RASTERIZED
+    lv_area_t real_clip = *clip_area;
     if(!alloc_layer) {
         lv_matrix_translate(&matrix, coords->x1, coords->y1);
     }
-#else
-    lv_matrix_translate(&matrix, coords->x1, coords->y1);
-    if(clip_area) {
-        ctx->current_dsc.scissor_area = *clip_area;
+    else {
+        lv_area_move(&real_clip, -coords->x1, -coords->y1);
     }
-#endif
+    ctx->current_dsc.scissor_area = real_clip;
     if(image_dsc) {
         lv_area_t layer_clip_area = target_layer->_clip_area;
         int32_t off_x = (lv_area_get_width(&layer_clip_area) - image_dsc->header.w - 1) / 2;
@@ -386,11 +380,9 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
     lv_draw_vector(ctx);
     lv_vector_dsc_delete(ctx);
 
-#if LV_USE_SVG_DECODER_RASTERIZED
     if(alloc_layer) {
         lv_draw_layer(layer, &layer_draw_dsc, coords);
     }
-#endif
     LV_PROFILER_DRAW_END;
 }
 
