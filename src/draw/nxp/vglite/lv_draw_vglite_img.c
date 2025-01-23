@@ -412,6 +412,9 @@ static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * 
     VGLITE_CHECK_ERROR(vg_lite_draw_pattern(dst_vgbuf, &path, VG_LITE_FILL_NON_ZERO, NULL,
                                             src_vgbuf, &vgmatrix, vgblend, VG_LITE_PATTERN_REPEAT,
                                             0, vgcol, filter));
+    vglite_run();
+
+    VGLITE_CHECK_ERROR(vg_lite_clear_path(&path));
 }
 
 static vg_lite_color_t _vglite_recolor(const lv_draw_image_dsc_t * dsc)
