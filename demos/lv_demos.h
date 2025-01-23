@@ -67,6 +67,10 @@ extern "C" {
 #include "high_res/lv_demo_high_res.h"
 #endif
 
+#if LV_USE_DEMO_SMARTWATCH
+#include "smartwatch/lv_demo_smartwatch.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/

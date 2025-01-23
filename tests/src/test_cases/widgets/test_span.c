@@ -479,4 +479,23 @@ void test_spangroup_get_span_coords(void)
 }
 #endif
 
+void test_spangroup_set_right_align_on_overflow(void)
+{
+    active_screen = lv_screen_active();
+    spangroup = lv_spangroup_create(active_screen);
+
+    lv_obj_set_style_outline_width(spangroup, 1, 0);
+
+    lv_obj_set_width(spangroup, 180);
+    lv_obj_set_height(spangroup, 20);
+
+    lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_RIGHT);
+
+    lv_span_t * span = lv_spangroup_new_span(spangroup);
+    lv_span_set_text_static(span, "China is a beautiful country.");
+    lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_ELLIPSIS);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_10.png");
+}
+
 #endif
