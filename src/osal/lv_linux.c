@@ -7,30 +7,30 @@
 
 #define LV_UPTIME_MONITOR_FILE "/proc/uptime"
 
-static void lv_proc_get_delta(uint32_t now_s, int now_ms, uint32_t original_s,
-                              int original_ms, uint32_t * delta_s, int * delta_ms);
+static void lv_proc_get_delta(uint32_t now_s, int32_t now_ms, uint32_t original_s,
+                              int32_t original_ms, uint32_t * delta_s, int32_t * delta_ms);
 
-static int lv_proc_get_uptime(uint32_t * now_s, int * now_ms, uint32_t * idle_s, int * idle_ms);
+static lv_result_t lv_proc_get_uptime(uint32_t * now_s, int32_t * now_ms, uint32_t * idle_s, int32_t * idle_ms);
 
 static uint32_t last_uptime_s, last_idletime_s;
-static int last_uptime_ms, last_idletime_ms;
+static int32_t last_uptime_ms, last_idletime_ms;
 
 uint32_t lv_os_get_idle_percent(void)
 {
 
     uint32_t delta_active_s, delta_idle_s;
-    int delta_active_ms, delta_idle_ms;
+    int32_t delta_active_ms, delta_idle_ms;
     {
 
         /* UINT32_MAX seconds > 136 years */
         uint32_t active_s, idletime_s;
         /* Range is [0: 99[ */
-        int active_ms, idletime_ms;
+        int32_t active_ms, idletime_ms;
 
         int err = lv_proc_get_uptime(&active_s, &active_ms, &idletime_s, &idletime_ms);
 
         if(err < 0) {
-            return UINT_MAX;
+            return UINT32_MAX;
         }
 
         /* Calculate the delta first to avoid overflowing */
@@ -67,8 +67,8 @@ uint32_t lv_os_get_idle_percent(void)
     return ((delta_idle_s * 100 + delta_idle_ms) * 100) / total;
 }
 
-static void lv_proc_get_delta(uint32_t now_s, int now_ms, uint32_t original_s,
-                              int original_ms, uint32_t * delta_s, int * delta_ms)
+static void lv_proc_get_delta(uint32_t now_s, int32_t now_ms, uint32_t original_s,
+                              int32_t original_ms, uint32_t * delta_s, int * delta_ms)
 {
     *delta_s = now_s - original_s;
     *delta_ms = now_ms - original_ms;
@@ -79,7 +79,7 @@ static void lv_proc_get_delta(uint32_t now_s, int now_ms, uint32_t original_s,
     }
 }
 
-static int lv_proc_get_uptime(uint32_t * active_s, int * active_ms, uint32_t * idle_s, int * idle_ms)
+static lv_result_t lv_proc_get_uptime(uint32_t * active_s, int32_t * active_ms, uint32_t * idle_s, int32_t * idle_ms)
 {
 
     FILE * fp = fopen(LV_UPTIME_MONITOR_FILE, "r");
