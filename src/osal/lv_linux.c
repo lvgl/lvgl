@@ -84,7 +84,7 @@ uint32_t lv_os_get_idle_percent(void)
 
 static lv_result_t lv_proc_get_uptime(uint32_t * active, uint32_t * idle)
 {
-    FILE *fp = fopen(LV_UPTIME_MONITOR_FILE, "r");
+    FILE * fp = fopen(LV_UPTIME_MONITOR_FILE, "r");
 
     if(!fp) {
         LV_LOG_ERROR("Failed to open " LV_UPTIME_MONITOR_FILE);
