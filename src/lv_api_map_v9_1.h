@@ -81,6 +81,12 @@ extern "C" {
 #define lv_chart_set_all_value lv_chart_set_all_values
 #define lv_calendar_set_showed_date lv_calendar_set_month_shown
 
+
+#if !defined(LV_FS_DEFAULT_DRIVER_LETTER) && defined(LV_FS_DEFAULT_DRIVE_LETTER)
+#define LV_FS_DEFAULT_DRIVER_LETTER LV_FS_DEFAULT_DRIVE_LETTER
+#warning LV_FS_DEFAULT_DRIVE_LETTER is deprecated. Rename to LV_FS_DEFAULT_DRIVER_LETTER
+#endif
+
 #ifndef LV_FS_DEFAULT_DRIVE_LETTER
 #define LV_FS_DEFAULT_DRIVE_LETTER     LV_FS_DEFAULT_DRIVER_LETTER
 #endif
