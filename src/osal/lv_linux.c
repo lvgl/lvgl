@@ -1,3 +1,13 @@
+/**
+ * @file lv_linux.c
+ *
+ */
+
+/*********************
+ *      INCLUDES
+ *********************/
+
+
 #include "lv_os.h"
 
 #if LV_USE_OS != LV_OS_NONE && defined(__linux__)
@@ -5,15 +15,42 @@
 #include "../misc/lv_log.h"
 #include <stdio.h>
 
+/*********************
+ *      DEFINES
+ *********************/
+
 #define LV_UPTIME_MONITOR_FILE "/proc/uptime"
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
 
 static void lv_proc_get_delta(uint32_t now_s, int32_t now_ms, uint32_t original_s,
                               int32_t original_ms, uint32_t * delta_s, int32_t * delta_ms);
 
 static lv_result_t lv_proc_get_uptime(uint32_t * now_s, int32_t * now_ms, uint32_t * idle_s, int32_t * idle_ms);
 
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+
 static uint32_t last_uptime_s, last_idletime_s;
 static int32_t last_uptime_ms, last_idletime_ms;
+
+
+/**********************
+ *      MACROS
+ **********************/
+
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
+
+
 
 uint32_t lv_os_get_idle_percent(void)
 {
@@ -66,6 +103,10 @@ uint32_t lv_os_get_idle_percent(void)
 
     return ((delta_idle_s * 100 + delta_idle_ms) * 100) / total;
 }
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 static void lv_proc_get_delta(uint32_t now_s, int32_t now_ms, uint32_t original_s,
                               int32_t original_ms, uint32_t * delta_s, int * delta_ms)
