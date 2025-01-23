@@ -27,9 +27,9 @@ uint32_t lv_os_get_idle_percent(void)
         /* Range is [0: 99[ */
         int32_t active_ms, idletime_ms;
 
-        int err = lv_proc_get_uptime(&active_s, &active_ms, &idletime_s, &idletime_ms);
+        lv_result_t err = lv_proc_get_uptime(&active_s, &active_ms, &idletime_s, &idletime_ms);
 
-        if(err < 0) {
+        if(err == LV_RESULT_INVALID) {
             return UINT32_MAX;
         }
 
@@ -86,7 +86,7 @@ static lv_result_t lv_proc_get_uptime(uint32_t * active_s, int32_t * active_ms, 
 
     if(!fp) {
         LV_LOG_ERROR("Failed to open " LV_UPTIME_MONITOR_FILE);
-        return -1;
+        return LV_RESULT_INVALID;
     }
 
     int err = fscanf(fp,
@@ -98,9 +98,9 @@ static lv_result_t lv_proc_get_uptime(uint32_t * active_s, int32_t * active_ms, 
 
     if(err != 4) {
         LV_LOG_ERROR("Failed to parse " LV_UPTIME_MONITOR_FILE);
-        return -1;
+        return LV_RESULT_INVALID;
     }
-    return 0;
+    return LV_RESULT_OK;
 }
 
 #endif
