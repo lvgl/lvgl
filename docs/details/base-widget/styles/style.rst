@@ -1,10 +1,10 @@
-.. _style_details:
+.. _styles_overview:
 
-=============
-Style Details
-=============
+===============
+Styles Overview
+===============
 
-Styles are used to set the appearance of Widgets.  Styles in lvgl are
+Styles are used to set the appearance of Widgets.  Styles in LVGL are
 heavily inspired by CSS. The concept in a nutshell is that a
 style is an :cpp:type:`lv_style_t` variable which can hold properties like
 border width, font, text color and so on. It's similar to a ``class`` in CSS.
