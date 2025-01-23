@@ -155,7 +155,7 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
         return;
 
     /*** Init path ***/
-    int32_t path_data[RECT_PATH_DATA_MAX_SIZE];
+    int32_t path_data[RECT_PATH_DATA_MAX_SIZE] = {0};
     uint32_t path_data_size;
     vglite_create_rect_path_data(path_data, &path_data_size, radius, coords);
     vg_lite_quality_t path_quality = dsc->radius > 0 ? VG_LITE_HIGH : VG_LITE_MEDIUM;
