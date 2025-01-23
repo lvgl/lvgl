@@ -32,7 +32,8 @@ Currently supported features:
 - Constants are working for widget and style properties
 - Parameters can be defined and passed and used for components
 - Basic built in widgets (label, slider, bar, button, etc)
-- Style sheets and local styles that can be assigned to parts and states support the basic style properties
+- Style sheets and :ref:`local styles <style_local>` that can be assigned to parts
+  and states support the basic style properties
 
 Limitations:
 
