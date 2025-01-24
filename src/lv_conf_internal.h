@@ -1793,6 +1793,15 @@
     #endif
 #endif
 
+/*Path to font file which is used in benchmark test*/
+#ifndef LV_TEST_FONT_PATH
+    #ifdef CONFIG_LV_TEST_FONT_PATH
+        #define LV_TEST_FONT_PATH CONFIG_LV_TEST_FONT_PATH
+    #else
+        #define LV_TEST_FONT_PATH "./lvgl/tests/src/test_files/fonts/noto/NotoSansSC-Regular.ttf"
+    #endif
+#endif
+
 /*=================
  *  TEXT SETTINGS
  *=================*/

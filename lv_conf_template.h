@@ -599,6 +599,9 @@
 /** Enable drawing placeholders when glyph dsc is not found. */
 #define LV_USE_FONT_PLACEHOLDER 1
 
+/*Path to font file which is used in benchmark test*/
+#define LV_TEST_FONT_PATH "./lvgl/tests/src/test_files/fonts/noto/NotoSansSC-Regular.ttf"
+
 /*=================
  *  TEXT SETTINGS
  *=================*/
