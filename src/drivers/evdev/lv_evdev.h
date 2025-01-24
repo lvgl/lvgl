@@ -19,6 +19,23 @@ extern "C" {
 #if LV_USE_EVDEV
 
 /**********************
+ *      TYPEDEFS
+ **********************/
+
+typedef enum {
+    LV_EVDEV_TYPE_REL,   /**< mice */
+    LV_EVDEV_TYPE_ABS,   /**< touch screens, mousepads */
+    LV_EVDEV_TYPE_KEY    /**< keyboards, keypads, buttons */
+} lv_evdev_type_t;
+
+/**
+ * @param indev      the indev created for the newly discovered evdev
+ * @param type       the type of the evdev
+ * @param user_data  a custom parameter
+ */
+typedef void (*lv_evdev_discovery_cb_t)(lv_indev_t * indev, lv_evdev_type_t type, void * user_data);
+
+/**********************
  * GLOBAL PROTOTYPES
  **********************/
 
@@ -29,6 +46,23 @@ extern "C" {
  * @return pointer to input device or NULL if opening failed
  */
 lv_indev_t * lv_evdev_create(lv_indev_type_t indev_type, const char * dev_path);
+
+/**
+ * Begin automatically creating evdev indevs for all new and existing
+ * evdev devices found in /dev/input/
+ * @param cb         function to call when a new evdev indev is discovered, or `NULL`
+ * @param user_data  parameter to pass to the callback
+ * @return           the success or failure status. It will fail if it's
+ *                   already running or resources could not be initialized.
+ */
+lv_result_t lv_evdev_discovery_start(lv_evdev_discovery_cb_t cb, void * user_data);
+
+/**
+ * Stop automatically creating evdev indevs. Safe to call from the
+ * discovery callback.
+ * @return  the success or failure status. It will fail if it's already running.
+ */
+lv_result_t lv_evdev_discovery_stop(void);
 
 /**
  * Set whether coordinates of pointer device should be swapped. Defaults to
