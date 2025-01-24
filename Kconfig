@@ -956,6 +956,10 @@ menu "LVGL configuration"
 		config LV_USE_FONT_PLACEHOLDER
 			bool "Enable drawing placeholders when glyph dsc is not found"
 			default y
+
+		config LV_TEST_FONT_PATH
+			string "Path to font file which is used in benchmark test"
+			default "./lvgl/tests/src/test_files/fonts/noto/NotoSansSC-Regular.ttf"
 	endmenu
 
 	menu "Text Settings"
