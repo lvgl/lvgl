@@ -123,7 +123,7 @@ static lv_result_t lv_read_proc_stat(lv_proc_stat_t * result)
 }
 static uint32_t lv_proc_stat_get_total(const lv_proc_stat_t * p)
 {
-    size_t sum = 0;
+    uint32_t sum = 0;
     for(size_t i = 0; i < LV_PROC_STAT_PARAMS_LEN; ++i) {
         sum += p->buffer[i];
     }
