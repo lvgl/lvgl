@@ -65,8 +65,6 @@ uint32_t lv_os_get_idle_percent(void)
 {
     lv_proc_stat_t proc_stat;
     {
-        uint32_t active, idle;
-
         lv_result_t err = lv_read_proc_stat(&proc_stat);
 
         if(err == LV_RESULT_INVALID) {
