@@ -22,22 +22,36 @@
 
 #define LV_PROC_STAT_VAR_FORMAT        " %" PRIu32
 #define LV_PROC_STAT_IGNORE_VAR_FORMAT " %*" PRIu32
+#define LV_PROC_STAT_PARAMS_LEN        7
 
 /**********************
  *      TYPEDEFS
  **********************/
+typedef union {
+    struct {
+        /*
+         *  We ignore the iowait column as it's not reliable
+         *  We ignore the guest and guest_nice columns because they're accounted
+         *   for in user and nice respectively
+         */
+        uint32_t user, nice, system, /*iowait,*/ idle, irq, softirq,
+                 steal /*, guest, guest_nice*/;
+    } fields;
+    uint32_t buffer[LV_PROC_STAT_PARAMS_LEN];
+} lv_proc_stat_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_result_t lv_proc_get_uptime(uint32_t * active, uint32_t * idle);
+static lv_result_t lv_read_proc_stat(lv_proc_stat_t * result);
+static uint32_t lv_proc_stat_get_total(const lv_proc_stat_t * p);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 
-static uint32_t last_active, last_idle;
+static lv_proc_stat_t last_proc_stat;
 
 /**********************
  *      MACROS
@@ -49,61 +63,73 @@ static uint32_t last_active, last_idle;
 
 uint32_t lv_os_get_idle_percent(void)
 {
-    uint32_t delta_active, delta_idle;
+    lv_proc_stat_t proc_stat;
     {
         uint32_t active, idle;
 
-        lv_result_t err = lv_proc_get_uptime(&active, &idle);
+        lv_result_t err = lv_read_proc_stat(&proc_stat);
 
         if(err == LV_RESULT_INVALID) {
             return UINT32_MAX;
         }
 
-        delta_active = active - last_active;
-        delta_idle = idle - last_idle;
-
-        /* Update for next call */
-        last_active = active;
-        last_idle = idle;
+        for(size_t i = 0; i < LV_PROC_STAT_PARAMS_LEN; ++i) {
+            uint32_t delta =
+                proc_stat.buffer[i] - last_proc_stat.buffer[i];
+            /* Update old for next call*/
+            last_proc_stat.buffer[i] = proc_stat.buffer[i];
+            /* Store delta in new */
+            proc_stat.buffer[i] = delta;
+        }
     }
 
     /* From here onwards, there's no risk of overflowing as long as we call this function regularly */
-
-    const uint32_t total = delta_active + delta_idle;
+    const uint32_t total = lv_proc_stat_get_total(&proc_stat);
 
     if(total == 0) {
         return 0;
     }
 
-    return (delta_idle * 100) / total;
+    return (proc_stat.fields.idle * 100) / total;
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_result_t lv_proc_get_uptime(uint32_t * active, uint32_t * idle)
+static lv_result_t lv_read_proc_stat(lv_proc_stat_t * result)
 {
-    FILE * fp = fopen(LV_UPTIME_MONITOR_FILE, "r");
+    FILE *fp = fopen(LV_UPTIME_MONITOR_FILE, "r");
 
     if(!fp) {
         LV_LOG_ERROR("Failed to open " LV_UPTIME_MONITOR_FILE);
         return LV_RESULT_INVALID;
     }
+    const char * fmt = "cpu " LV_PROC_STAT_VAR_FORMAT LV_PROC_STAT_VAR_FORMAT
+                       LV_PROC_STAT_VAR_FORMAT LV_PROC_STAT_VAR_FORMAT
+                       LV_PROC_STAT_IGNORE_VAR_FORMAT LV_PROC_STAT_VAR_FORMAT
+                       LV_PROC_STAT_VAR_FORMAT LV_PROC_STAT_VAR_FORMAT;
 
-    int err = fscanf(
-                  fp,
-                  "cpu " LV_PROC_STAT_VAR_FORMAT LV_PROC_STAT_IGNORE_VAR_FORMAT
-                  LV_PROC_STAT_IGNORE_VAR_FORMAT LV_PROC_STAT_VAR_FORMAT,
-                  active, idle);
+    int err = fscanf(fp, fmt, &result->fields.user, &result->fields.nice,
+                     &result->fields.system, &result->fields.idle,
+                     &result->fields.irq, &result->fields.softirq,
+                     &result->fields.steal);
 
     fclose(fp);
 
-    if(err != 2) {
+    if(err != LV_PROC_STAT_PARAMS_LEN) {
         LV_LOG_ERROR("Failed to parse " LV_UPTIME_MONITOR_FILE);
         return LV_RESULT_INVALID;
     }
     return LV_RESULT_OK;
+}
+static uint32_t lv_proc_stat_get_total(const lv_proc_stat_t * p)
+{
+    size_t sum = 0;
+    for(size_t i = 0; i < LV_PROC_STAT_PARAMS_LEN; ++i) {
+        sum += p->buffer[i];
+    }
+    return sum;
 }
 
 #endif
