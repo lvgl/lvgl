@@ -2054,6 +2054,10 @@ menu "LVGL configuration"
 			depends on LV_USE_VECTOR_GRAPHIC
 		config LV_USE_DEMO_SMARTWATCH
 			bool "Smartwatch demo"
+		config LV_USE_DEMO_EBIKE
+			bool "Ebike demo"
+		config LV_USE_DEMO_HIGH_RES
+			bool "High resolution demo"
 	endmenu
 
 endmenu
