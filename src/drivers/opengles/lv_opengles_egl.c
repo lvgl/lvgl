@@ -38,6 +38,9 @@ struct _lv_opengles_window_t {
     int32_t hor_res;
     int32_t ver_res;
     lv_ll_t textures;
+    lv_opengles_egl_window_cb_t pre;
+    lv_opengles_egl_window_cb_t post1;
+    lv_opengles_egl_window_cb_t post2;
 };
 
 struct _lv_opengles_window_texture_t {
@@ -81,7 +84,10 @@ static EGLint const attribute_list[] = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_opengles_window_t * lv_opengles_egl_window_create(int32_t hor_res, int32_t ver_res, void * native_window_handle)
+lv_opengles_window_t * lv_opengles_egl_window_create(int32_t hor_res, int32_t ver_res, void * native_window_handle,
+                                                     lv_opengles_egl_window_cb_t pre,
+                                                     lv_opengles_egl_window_cb_t post1,
+                                                     lv_opengles_egl_window_cb_t post2)
 {
     if(lv_egl_init() == LV_RESULT_INVALID) {
         return NULL;
@@ -105,12 +111,26 @@ lv_opengles_window_t * lv_opengles_egl_window_create(int32_t hor_res, int32_t ve
     window->hor_res = hor_res;
     window->ver_res = ver_res;
     lv_ll_init(&window->textures, sizeof(lv_opengles_window_texture_t));
+    window->pre = pre;
+    window->post1 = post1;
+    window->post2 = post2;
 
     lv_egl_timer_init();
     eglMakeCurrent(egl_display, window->surface, window->surface, egl_context);
     lv_opengles_init();
 
     return window;
+}
+
+void * lv_opengles_egl_window_get_surface(lv_opengles_window_t * window)
+{
+    return (void *)(uintptr_t)window->surface;
+}
+
+void * lv_opengles_egl_window_get_display(lv_opengles_window_t * window)
+{
+    LV_UNUSED(window);
+    return (void *)(uintptr_t)egl_display;
 }
 
 void lv_opengles_window_delete(lv_opengles_window_t * window)
@@ -225,6 +245,9 @@ static void window_update_handler(lv_timer_t * t)
 
     /* render each window */
     LV_LL_READ(&egl_window_ll, window) {
+
+        if(window->pre) window->pre(window);
+
         eglMakeCurrent(egl_display, window->surface, window->surface, egl_context);
         lv_opengles_viewport(0, 0, window->hor_res, window->ver_res);
         lv_opengles_render_clear();
@@ -248,8 +271,12 @@ static void window_update_handler(lv_timer_t * t)
 #endif
         }
 
+        if(window->post1) window->post1(window);
+
         /* Swap front and back buffers */
         eglSwapBuffers(egl_display, window->surface);
+
+        if(window->post2) window->post2(window);
     }
 }
 

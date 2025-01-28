@@ -27,6 +27,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef void (*lv_opengles_egl_window_cb_t)(lv_opengles_window_t * window);
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -38,7 +40,13 @@ extern "C" {
  * @param native_window_handle  a handle to a native window for the platform
  * @return                      the new EGL OpenGL window handle
  */
-lv_opengles_window_t * lv_opengles_egl_window_create(int32_t hor_res, int32_t ver_res, void * native_window_handle);
+lv_opengles_window_t * lv_opengles_egl_window_create(int32_t hor_res, int32_t ver_res, void * native_window_handle,
+                                                     lv_opengles_egl_window_cb_t pre,
+                                                     lv_opengles_egl_window_cb_t post1,
+                                                     lv_opengles_egl_window_cb_t post2);
+
+void * lv_opengles_egl_window_get_surface(lv_opengles_window_t * window);
+void * lv_opengles_egl_window_get_display(lv_opengles_window_t * window);
 
 /**********************
  *      MACROS
