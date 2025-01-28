@@ -88,7 +88,7 @@ Download the latest stable version of the `J-Link Software <https://www.segger.c
 Its installation path will be needed later.
 
 Clone the ``alif_m55-lvgl`` Project
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: shell
 
