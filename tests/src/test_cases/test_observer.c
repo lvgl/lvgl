@@ -442,16 +442,43 @@ void test_observer_obj_flag_lt(void)
     TEST_ASSERT_EQUAL(true, lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN));
 }
 
-void test_observer_obj_state(void)
+void test_observer_obj_state_invalid_subject(void)
 {
+    typedef lv_observer_t* (*lv_obj_bind_state_fn)(lv_obj_t *, lv_subject_t *, lv_state_t, int32_t);
+
+    static const lv_obj_bind_state_fn fns[] = {
+        lv_obj_bind_state_if_eq,
+        lv_obj_bind_state_if_not_eq,
+        lv_obj_bind_state_if_ge,
+        lv_obj_bind_state_if_gt,
+        lv_obj_bind_state_if_lt,
+        lv_obj_bind_state_if_le,
+    };
+    lv_subject_t invalid_subjects[4];
+
+    char buf1[30];
+    char buf2[30];
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
 
-    /*Can bind only to int*/
-    static lv_subject_t subject_wrong;
-    lv_subject_init_pointer(&subject_wrong, NULL);
-    lv_observer_t * observer = lv_obj_bind_state_if_eq(obj, &subject_wrong, LV_STATE_CHECKED, 5);
-    TEST_ASSERT_EQUAL_PTR(NULL, observer);
+    const size_t fns_size = sizeof(fns) / sizeof(fns[0]);
+    const size_t subjects_size = sizeof(invalid_subjects) / sizeof(invalid_subjects[0]);
 
+    /* Can only bind to int */
+    lv_subject_init_pointer(&invalid_subjects[0], NULL);
+    lv_subject_init_string(&invalid_subjects[1], buf1, buf2, 30, "test");
+    lv_subject_init_color(&invalid_subjects[2], (lv_color_t){0, 0, 0});
+    lv_subject_init_group(&invalid_subjects[3], (lv_subject_t**) invalid_subjects, 3);
+
+    for(size_t i = 0; i < fns_size; ++i) {
+        for(size_t j = 0; j < subjects_size; ++j) {
+            TEST_ASSERT_EQUAL_PTR(NULL, fns[i](obj, &invalid_subjects[i], LV_STATE_CHECKED, 5));
+        }
+    }
+}
+
+void test_observer_obj_state_eq(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
     static lv_subject_t subject;
     lv_subject_init_int(&subject, 1);
 
@@ -471,6 +498,80 @@ void test_observer_obj_state(void)
     lv_subject_set_int(&subject, 10);
     TEST_ASSERT_EQUAL(false, lv_obj_has_state(obj, LV_STATE_CHECKED));
     TEST_ASSERT_EQUAL(false, lv_obj_has_state(obj, LV_STATE_DISABLED));
+}
+
+void test_observer_obj_state_gt(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 1);
+
+    lv_obj_bind_state_if_gt(obj, &subject, LV_STATE_CHECKED, 5);
+    /*Should be applied immediately*/
+    TEST_ASSERT_EQUAL(false, lv_obj_has_state(obj, LV_STATE_CHECKED));
+
+    lv_subject_set_int(&subject, 6);
+    TEST_ASSERT_EQUAL(true, lv_obj_has_state(obj, LV_STATE_CHECKED));
+
+    lv_subject_set_int(&subject, 5);
+    TEST_ASSERT_EQUAL(false, lv_obj_has_state(obj, LV_STATE_CHECKED));
+
+    lv_subject_set_int(&subject, 7);
+    TEST_ASSERT_EQUAL(true, lv_obj_has_state(obj, LV_STATE_CHECKED));
+}
+
+void test_observer_obj_state_ge(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 1);
+
+    lv_obj_bind_state_if_ge(obj, &subject, LV_STATE_CHECKED, 5);
+    /*Should be applied immediately*/
+    TEST_ASSERT_EQUAL(false, lv_obj_has_state(obj, LV_STATE_CHECKED));
+
+    lv_subject_set_int(&subject, 6);
+    TEST_ASSERT_EQUAL(true, lv_obj_has_state(obj, LV_STATE_CHECKED));
+
+    lv_subject_set_int(&subject, 4);
+    TEST_ASSERT_EQUAL(false, lv_obj_has_state(obj, LV_STATE_CHECKED));
+
+    lv_subject_set_int(&subject, 5);
+    TEST_ASSERT_EQUAL(true, lv_obj_has_state(obj, LV_STATE_CHECKED));
+}
+
+void test_observer_obj_state_le(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 1);
+
+    lv_obj_bind_state_if_le(obj, &subject, LV_STATE_CHECKED, 5);
+    /*Should be applied immediately*/
+    TEST_ASSERT_EQUAL(true, lv_obj_has_state(obj, LV_STATE_CHECKED));
+
+    lv_subject_set_int(&subject, 6);
+    TEST_ASSERT_EQUAL(false, lv_obj_has_state(obj, LV_STATE_CHECKED));
+
+    lv_subject_set_int(&subject, 4);
+    TEST_ASSERT_EQUAL(true, lv_obj_has_state(obj, LV_STATE_CHECKED));
+}
+
+void test_observer_obj_state_lt(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 1);
+
+    lv_obj_bind_state_if_lt(obj, &subject, LV_STATE_CHECKED, 5);
+    /*Should be applied immediately*/
+    TEST_ASSERT_EQUAL(true, lv_obj_has_state(obj, LV_STATE_CHECKED));
+
+    lv_subject_set_int(&subject, 5);
+    TEST_ASSERT_EQUAL(false, lv_obj_has_state(obj, LV_STATE_CHECKED));
+
+    lv_subject_set_int(&subject, 4);
+    TEST_ASSERT_EQUAL(true, lv_obj_has_state(obj, LV_STATE_CHECKED));
 }
 
 void test_observer_button_checked(void)
