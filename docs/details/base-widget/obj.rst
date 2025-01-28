@@ -476,8 +476,8 @@ leave the other states untouched) use
 values can be used as well. E.g.
 :cpp:expr:`lv_obj_add_state(widget, part, LV_STATE_PRESSED | LV_PRESSED_CHECKED)`.
 
-To learn more about the states read the related section of the
-:ref:`Style overview <styles>`.
+To learn more about the states, read the related section of
+:ref:`styles_overview`.
 
 
 
