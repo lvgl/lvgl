@@ -38,6 +38,8 @@ static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subjec
 static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_value_changed_event_cb(lv_event_t * e);
 
+static void lv_subject_notify_if_changed(lv_subject_t * subject);
+
 #if LV_USE_LABEL
     static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
@@ -92,7 +94,7 @@ void lv_subject_set_int(lv_subject_t * subject, int32_t value)
 
     subject->prev_value.num = subject->value.num;
     subject->value.num = value;
-    lv_subject_notify(subject);
+    lv_subject_notify_if_changed(subject);
 }
 
 int32_t lv_subject_get_int(lv_subject_t * subject)
@@ -143,8 +145,7 @@ void lv_subject_copy_string(lv_subject_t * subject, const char * buf)
 
     lv_strlcpy((char *)subject->value.pointer, buf, subject->size);
 
-    lv_subject_notify(subject);
-
+    lv_subject_notify_if_changed(subject);
 }
 
 void lv_subject_snprintf(lv_subject_t * subject, const char * format, ...)
@@ -166,7 +167,7 @@ void lv_subject_snprintf(lv_subject_t * subject, const char * format, ...)
     LV_UNUSED(ret);
     va_end(va);
 
-    lv_subject_notify(subject);
+    lv_subject_notify_if_changed(subject);
 }
 
 const char * lv_subject_get_string(lv_subject_t * subject)
@@ -207,7 +208,7 @@ void lv_subject_set_pointer(lv_subject_t * subject, void * ptr)
 
     subject->prev_value.pointer = subject->value.pointer;
     subject->value.pointer = ptr;
-    lv_subject_notify(subject);
+    lv_subject_notify_if_changed(subject);
 }
 
 const void * lv_subject_get_pointer(lv_subject_t * subject)
@@ -248,7 +249,7 @@ void lv_subject_set_color(lv_subject_t * subject, lv_color_t color)
 
     subject->prev_value.color = subject->value.color;
     subject->value.color = color;
-    lv_subject_notify(subject);
+    lv_subject_notify_if_changed(subject);
 }
 
 lv_color_t lv_subject_get_color(lv_subject_t * subject)
@@ -759,6 +760,37 @@ static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * 
 {
     lv_dropdown_set_selected(observer->target, subject->value.num, LV_ANIM_OFF);
 }
+
+static void lv_subject_notify_if_changed(lv_subject_t * subject)
+{
+
+    switch(subject->type) {
+        case LV_SUBJECT_TYPE_INVALID :
+        case LV_SUBJECT_TYPE_NONE :
+            return;
+        case LV_SUBJECT_TYPE_INT :
+            if(subject->value.num != subject->prev_value.num) {
+                lv_subject_notify(subject);
+            }
+            break;
+        case LV_SUBJECT_TYPE_GROUP :
+        case LV_SUBJECT_TYPE_POINTER :
+            //Always notify as we don't know how to compare this
+            lv_subject_notify(subject);
+            break;
+        case LV_SUBJECT_TYPE_COLOR  :
+            if(!lv_color_eq(subject->value.color, subject->prev_value.color)) {
+                lv_subject_notify(subject);
+            }
+            break;
+        case LV_SUBJECT_TYPE_STRING:
+            if(!lv_strcmp(subject->value.pointer, subject->prev_value.pointer)) {
+                lv_subject_notify(subject);
+            }
+            break;
+    }
+}
+
 
 #endif /*LV_USE_DROPDOWN*/
 
