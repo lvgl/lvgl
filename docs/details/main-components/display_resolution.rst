@@ -1,8 +1,8 @@
 .. _display_resolution:
 
-==========
-Resolution
-==========
+===================
+Changing Resolution
+===================
 
 To set the resolution of the display after creation use
 :cpp:expr:`lv_display_set_resolution(display, hor_res, ver_res)`

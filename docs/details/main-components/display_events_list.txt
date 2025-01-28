@@ -3,7 +3,7 @@
     Note:  this is used in full in 2 places currently.  Thus, it is placed
     here so its source is only in one place and will be fully duplicated
     where it is used:
-    - display_basics.rst
+    - display_events.rst
     - event.rst
 
 - :cpp:enumerator:`LV_EVENT_INVALIDATE_AREA` An area is invalidated (marked for redraw).

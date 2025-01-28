@@ -387,7 +387,7 @@ attached to it.
 
 1, 3 and 4 are independent of the :ref:`active_screen` and they will be shown (if
 they contain anything that is visible) regardless of which screen is the Active
-Screen.  See :ref:`screen_layers` for more information.
+Screen.  See :ref:`display_screen_layers` for more information.
 
 
 .. _transparent_screens:

@@ -9,10 +9,9 @@ things:
 
 1.  for Widgets, the :ref:`layers_creation` creates a natural layering of Widgets;
 2.  in the context of pixel rendering (drawing), there are :ref:`draw_layers`;
-3.  permanent :ref:`screen_layers` are part of each :ref:`display` object, and
-    are covered :ref:`here <screen_layers>`
+3.  permanent :ref:`display_screen_layers` are part of each :ref:`display` object.
 
-#1 and #2 are covered below.
+#1 and #2 are covered below.  #3 is covered in :ref:`display_screen_layers`.
 
 
 

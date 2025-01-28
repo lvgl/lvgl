@@ -15,6 +15,8 @@ executed
 at that
 interval
 
+
+
 .. _display_decoupling_refresh_timer:
 
 Decoupling the Display Refresh Timer
