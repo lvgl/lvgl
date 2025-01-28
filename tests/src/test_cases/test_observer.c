@@ -303,34 +303,37 @@ void test_observer_group(void)
     lv_subject_set_int(&subject_sub2, 20);
     TEST_ASSERT_EQUAL(3, group_observer_called);
 }
-typedef lv_observer_t (*lv_obj_bind_flag_fn)(lv_obj_t *, lv_subject_t *, lv_obj_flag_t, int32_t);
-static const lv_obj_bind_flag_fn fns[] = {
-    lv_obj_bind_state_if_eq,
-    lv_obj_bind_state_if_not_eq,
-    lv_obj_bind_state_if_ge,
-    lv_obj_bind_state_if_gt,
-    lv_obj_bind_state_if_lt,
-    lv_obj_bind_state_if_le,
-};
 
 void test_observer_obj_flag_invalid_subject(void)
 {
-    const lv_subject_t invalid_subjects[4];
 
+    typedef lv_observer_t* (*lv_obj_bind_flag_fn)(lv_obj_t *, lv_subject_t *, lv_obj_flag_t, int32_t);
+    static const lv_obj_bind_flag_fn fns[] = {
+        lv_obj_bind_flag_if_eq,
+        lv_obj_bind_flag_if_not_eq,
+        lv_obj_bind_flag_if_ge,
+        lv_obj_bind_flag_if_gt,
+        lv_obj_bind_flag_if_lt,
+        lv_obj_bind_flag_if_le,
+    };
+    lv_subject_t invalid_subjects[4];
+
+    char buf1[30];
+    char buf2[30];
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
 
     const size_t fns_size = sizeof(fns) / sizeof(fns[0]);
     const size_t subjects_size = sizeof(invalid_subjects) / sizeof(invalid_subjects[0]);
 
     /* Can only bind to int */
-    lv_subject_init_pointer(&invalid_subjects[0]);
-    lv_subject_init_string(&invalid_subjects[1]);
-    lv_subject_init_color(&invalid_subjects[2]);
-    lv_subject_init_group(&invalid_subjects[3]);
+    lv_subject_init_pointer(&invalid_subjects[0], NULL);
+    lv_subject_init_string(&invalid_subjects[1], buf1, buf2, 30, "test");
+    lv_subject_init_color(&invalid_subjects[2], (lv_color_t){0, 0, 0});
+    lv_subject_init_group(&invalid_subjects[3], (lv_subject_t**) invalid_subjects, 3);
 
     for(size_t i = 0; i < fns_size; ++i) {
         for(size_t j = 0; j < subjects_size; ++j) {
-            TEST_ASSERT_EQUAL_PTR(NULL, fns[i](obj, &subjects[i], LV_STATE_CHECKED, 5));
+            TEST_ASSERT_EQUAL_PTR(NULL, fns[i](obj, &invalid_subjects[i], LV_STATE_CHECKED, 5));
         }
     }
 }
