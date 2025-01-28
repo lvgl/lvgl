@@ -26,7 +26,7 @@ static void observer_basic(lv_observer_t * observer, lv_subject_t * subject)
 {
     LV_UNUSED(observer);
     LV_UNUSED(subject);
-    obverser_called++;
+    observer_called++;
 }
 
 static void observer_int(lv_observer_t * observer, lv_subject_t * subject)
