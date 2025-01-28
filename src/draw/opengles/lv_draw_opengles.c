@@ -11,11 +11,10 @@
 #if LV_USE_DRAW_OPENGLES
 #include "../lv_draw_private.h"
 #include "../../misc/cache/lv_cache_entry_private.h"
-#include "../../drivers/glfw/lv_opengles_debug.h"
-#include "../../drivers/glfw/lv_opengles_texture.h"
-#include "../../drivers/glfw/lv_opengles_driver.h"
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "../../drivers/opengles/lv_opengles_debug.h"
+#include "../../drivers/opengles/lv_opengles_texture.h"
+#include "../../drivers/opengles/lv_opengles_driver.h"
+#include "../../drivers/opengles/lv_opengles_private.h"
 #include "../../draw/lv_draw_label.h"
 #include "../../draw/lv_draw_rect.h"
 #include "../../draw/lv_draw_arc.h"

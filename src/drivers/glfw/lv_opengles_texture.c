@@ -11,10 +11,11 @@
 #if LV_USE_OPENGLES
 
 #include "lv_opengles_debug.h"
+#include "lv_opengles_private.h"
+
 #include "../../display/lv_display_private.h"
+
 #include <stdlib.h>
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 
 /*********************
  *      DEFINES

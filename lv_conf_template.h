@@ -1299,6 +1299,11 @@
 #define LV_USE_OPENGLES   0
 #if LV_USE_OPENGLES
     #define LV_USE_OPENGLES_DEBUG        1    /**< Enable or disable debug for opengles */
+
+    /** Select which OpenGL API to use. Possible options:
+     * - LV_OPENGLES_API_GLFW
+     * - LV_OPENGLES_API_EGL */
+    #define LV_USE_OPENGLES_API LV_OPENGLES_API_GLFW
 #endif
 
 /** QNX Screen display and input drivers */
