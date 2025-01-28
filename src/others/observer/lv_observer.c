@@ -531,7 +531,7 @@ lv_observer_t * lv_obj_bind_state_if_le(lv_obj_t * obj, lv_subject_t * subject, 
 
     /* a <= b == !(a > b) */
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, true,
-                                                  FLAG_COND_GE);
+                                                  FLAG_COND_GT);
     return observable;
 }
 
