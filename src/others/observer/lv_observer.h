@@ -317,6 +317,47 @@ lv_observer_t * lv_obj_bind_flag_if_not_eq(lv_obj_t * obj, lv_subject_t * subjec
                                            int32_t ref_value);
 
 /**
+ * Set an object flag if an integer subject's value is greater than a reference value, clear the flag otherwise
+ * @param obj           pointer to an object
+ * @param subject       pointer to a subject
+ * @param flag          flag to set or clear (e.g. `LV_OBJ_FLAG_HIDDEN`)
+ * @param ref_value     reference value to compare the subject's value with
+ * @return              pointer to the created observer
+ */
+lv_observer_t * lv_obj_bind_flag_if_gt(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value);
+
+/**
+ * Set an object flag if an integer subject's value is greater or equal than a reference value, clear the flag otherwise
+ * @param obj           pointer to an object
+ * @param subject       pointer to a subject
+ * @param flag          flag to set or clear (e.g. `LV_OBJ_FLAG_HIDDEN`)
+ * @param ref_value     reference value to compare the subject's value with
+ * @return              pointer to the created observer
+ */
+lv_observer_t * lv_obj_bind_flag_if_ge(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value);
+
+/**
+ * Set an object flag if an integer subject's value is less than a reference value, clear the flag otherwise
+ * @param obj           pointer to an object
+ * @param subject       pointer to a subject
+ * @param flag          flag to set or clear (e.g. `LV_OBJ_FLAG_HIDDEN`)
+ * @param ref_value     reference value to compare the subject's value with
+ * @return              pointer to the created observer
+ */
+lv_observer_t * lv_obj_bind_flag_if_lt(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value);
+
+/**
+ * Set an object flag if an integer subject's value is less or equal than a reference value, clear the flag otherwise
+ * @param obj           pointer to an object
+ * @param subject       pointer to a subject
+ * @param flag          flag to set or clear (e.g. `LV_OBJ_FLAG_HIDDEN`)
+ * @param ref_value     reference value to compare the subject's value with
+ * @return              pointer to the created observer
+ */
+lv_observer_t * lv_obj_bind_flag_if_le(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value);
+
+
+/**
  * Set an object state if an integer subject's value is equal to a reference value, clear the flag otherwise
  * @param obj           pointer to an object
  * @param subject       pointer to a subject
@@ -336,6 +377,46 @@ lv_observer_t * lv_obj_bind_state_if_eq(lv_obj_t * obj, lv_subject_t * subject, 
  */
 lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state,
                                             int32_t ref_value);
+
+/**
+ * Set an object state if an integer subject's value is greater than a reference value, clear the flag otherwise
+ * @param obj           pointer to an object
+ * @param subject       pointer to a subject
+ * @param state         state to set or clear (e.g. `LV_STATE_CHECKED`)
+ * @param ref_value     reference value to compare the subject's value with
+ * @return              pointer to the created observer
+ */
+lv_observer_t * lv_obj_bind_state_if_gt(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value);
+
+/**
+ * Set an object state if an integer subject's value is greater or equal than a reference value, clear the flag otherwise
+ * @param obj           pointer to an object
+ * @param subject       pointer to a subject
+ * @param state         state to set or clear (e.g. `LV_STATE_CHECKED`)
+ * @param ref_value     reference value to compare the subject's value with
+ * @return              pointer to the created observer
+ */
+lv_observer_t * lv_obj_bind_state_if_ge(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value);
+
+/**
+ * Set an object state if an integer subject's value is less than a reference value, clear the flag otherwise
+ * @param obj           pointer to an object
+ * @param subject       pointer to a subject
+ * @param state         state to set or clear (e.g. `LV_STATE_CHECKED`)
+ * @param ref_value     reference value to compare the subject's value with
+ * @return              pointer to the created observer
+ */
+lv_observer_t * lv_obj_bind_state_if_lt(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value);
+
+/**
+ * Set an object state if an integer subject's value is less or equal than a reference value, clear the flag otherwise
+ * @param obj           pointer to an object
+ * @param subject       pointer to a subject
+ * @param state         state to set or clear (e.g. `LV_STATE_CHECKED`)
+ * @param ref_value     reference value to compare the subject's value with
+ * @return              pointer to the created observer
+ */
+lv_observer_t * lv_obj_bind_state_if_le(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value);
 
 /**
  * Set an integer subject to 1 when an object is checked and set it 0 when unchecked.

@@ -21,10 +21,17 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef enum {
+    FLAG_COND_EQ = 0,
+    FLAG_COND_GT = 1,
+    FLAG_COND_GE = 2
+} flag_cond_t;
+
 typedef struct {
     uint32_t flag;
     lv_subject_value_t value;
-    uint32_t inv    : 1;
+    uint32_t inv     : 1;
+    flag_cond_t cond : 2;
 } flag_and_cond_t;
 
 /**********************
@@ -33,7 +40,7 @@ typedef struct {
 static void unsubscribe_on_delete_cb(lv_event_t * e);
 static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject);
 static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, lv_observer_cb_t cb, uint32_t flag,
-                                        int32_t ref_value, bool inv);
+                                        int32_t ref_value, bool inv, flag_cond_t cond);
 static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_value_changed_event_cb(lv_event_t * e);
@@ -442,32 +449,97 @@ void lv_subject_notify(lv_subject_t * subject)
 
 lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
 {
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false);
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false, FLAG_COND_EQ);
     return observable;
 }
 
 lv_observer_t * lv_obj_bind_flag_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag,
                                            int32_t ref_value)
 {
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, true);
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, true, FLAG_COND_EQ);
     return observable;
+}
+lv_observer_t * lv_obj_bind_flag_if_gt(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
+{
+
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false, FLAG_COND_GT);
+    return observable;
+}
+
+lv_observer_t * lv_obj_bind_flag_if_ge(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
+{
+
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false, FLAG_COND_GE);
+    return observable;
+}
+
+lv_observer_t * lv_obj_bind_flag_if_lt(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
+{
+    /* a < b == !(a >= b) */
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, true, FLAG_COND_GE);
+    return observable;
+}
+
+lv_observer_t * lv_obj_bind_flag_if_le(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
+{
+    /* a <= b == !(a > b) */
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, true, FLAG_COND_GT);
+    return observable;
+
 }
 
 lv_observer_t * lv_obj_bind_state_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
 {
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, false);
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, false,
+                                                  FLAG_COND_EQ);
     return observable;
 }
 
 lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
 {
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, true);
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, true,
+                                                  FLAG_COND_EQ);
     return observable;
 }
 
+lv_observer_t * lv_obj_bind_state_if_gt(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
+{
+
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, false,
+                                                  FLAG_COND_GT);
+    return observable;
+}
+
+lv_observer_t * lv_obj_bind_state_if_ge(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
+{
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, false,
+                                                  FLAG_COND_GE);
+    return observable;
+}
+
+lv_observer_t * lv_obj_bind_state_if_lt(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
+{
+    /* a < b == !(a >= b) */
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, true,
+                                                  FLAG_COND_GE);
+    return observable;
+
+}
+
+lv_observer_t * lv_obj_bind_state_if_le(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
+{
+
+    /* a <= b == !(a > b) */
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, true,
+                                                  FLAG_COND_GE);
+    return observable;
+}
+
+
 lv_observer_t * lv_obj_bind_checked(lv_obj_t * obj, lv_subject_t * subject)
 {
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, LV_STATE_CHECKED, 1, false);
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, LV_STATE_CHECKED, 1, false,
+                                                  FLAG_COND_EQ);
     lv_obj_add_event_cb(obj, obj_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
     return observable;
 }
@@ -604,7 +676,7 @@ static void unsubscribe_on_delete_cb(lv_event_t * e)
 }
 
 static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, lv_observer_cb_t cb, uint32_t flag,
-                                        int32_t ref_value, bool inv)
+                                        int32_t ref_value, bool inv, flag_cond_t cond)
 {
     LV_ASSERT_NULL(subject);
     LV_ASSERT_NULL(obj);
@@ -623,6 +695,7 @@ static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, 
     p->flag = flag;
     p->value.num = ref_value;
     p->inv = inv;
+    p->cond = cond;
 
     lv_observer_t * observable = lv_subject_add_observer_obj(subject, cb, obj, p);
     observable->auto_free_user_data = 1;
@@ -633,7 +706,18 @@ static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subjec
 {
     flag_and_cond_t * p = observer->user_data;
 
-    bool res = subject->value.num == p->value.num;
+    bool res;
+    switch(p->cond) {
+        case FLAG_COND_EQ:
+            res = subject->value.num == p->value.num;
+            break;
+        case FLAG_COND_GT:
+            res = subject->value.num > p->value.num;
+            break;
+        case FLAG_COND_GE:
+            res = subject->value.num > p->value.num;
+            break;
+    }
     if(p->inv) res = !res;
 
     if(res) {
@@ -648,7 +732,18 @@ static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subje
 {
     flag_and_cond_t * p = observer->user_data;
 
-    bool res = subject->value.num == p->value.num;
+    bool res;
+    switch(p->cond) {
+        case FLAG_COND_EQ:
+            res = subject->value.num == p->value.num;
+            break;
+        case FLAG_COND_GT:
+            res = subject->value.num > p->value.num;
+            break;
+        case FLAG_COND_GE:
+            res = subject->value.num > p->value.num;
+            break;
+    }
     if(p->inv) res = !res;
 
     if(res) {
