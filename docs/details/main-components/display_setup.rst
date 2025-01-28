@@ -1,8 +1,8 @@
 .. _display_setup:
 
-========================
-Setting Up Your Displays
-========================
+==========================
+Setting Up Your Display(s)
+==========================
 
 During system initialization, you must do the following for each physical display
 panel you want LVGL to use:
