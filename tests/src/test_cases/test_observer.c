@@ -5,8 +5,11 @@
 #include "unity/unity.h"
 #include "lv_test_indev.h"
 
+static uint32_t observer_called = 0;
+
 void setUp(void)
 {
+    observer_called = 0;
     /* Function run before every test */
 }
 
@@ -18,6 +21,13 @@ void tearDown(void)
 
 static int32_t prev_v;
 static int32_t current_v;
+
+static void observer_basic(lv_observer_t * observer, lv_subject_t * subject)
+{
+    LV_UNUSED(observer);
+    LV_UNUSED(subject);
+    obverser_called++;
+}
 
 static void observer_int(lv_observer_t * observer, lv_subject_t * subject)
 {
@@ -52,29 +62,45 @@ void test_observer_int(void)
 {
     static lv_subject_t subject;
     lv_subject_init_int(&subject, 5);
+    lv_observer_t * basic_observer = lv_subject_add_observer(&subject, observer_basic, NULL);
+
     TEST_ASSERT_EQUAL(5, lv_subject_get_int(&subject));
     TEST_ASSERT_EQUAL(5, lv_subject_get_previous_int(&subject));
+    TEST_ASSERT_EQUAL(1, observer_called);
 
     lv_subject_set_int(&subject, 10);
     TEST_ASSERT_EQUAL(10, lv_subject_get_int(&subject));
     TEST_ASSERT_EQUAL(5, lv_subject_get_previous_int(&subject));
+    TEST_ASSERT_EQUAL(2, observer_called);
 
     lv_subject_set_int(&subject, 15);
     TEST_ASSERT_EQUAL(15, lv_subject_get_int(&subject));
     TEST_ASSERT_EQUAL(10, lv_subject_get_previous_int(&subject));
+    TEST_ASSERT_EQUAL(3, observer_called);
+
+    /* Observer shouldn't be called if value is the same */
+    lv_subject_set_int(&subject, 15);
+    TEST_ASSERT_EQUAL(15, lv_subject_get_int(&subject));
+    TEST_ASSERT_EQUAL(15, lv_subject_get_previous_int(&subject));
+    TEST_ASSERT_EQUAL(3, observer_called);
 
     /*Ignore incorrect types*/
     lv_subject_set_pointer(&subject, NULL);
     TEST_ASSERT_EQUAL(15, lv_subject_get_int(&subject));
-    TEST_ASSERT_EQUAL(10, lv_subject_get_previous_int(&subject));
+    TEST_ASSERT_EQUAL(15, lv_subject_get_previous_int(&subject));
+    TEST_ASSERT_EQUAL(3, observer_called);
 
     lv_subject_set_color(&subject, lv_color_black());
     TEST_ASSERT_EQUAL(15, lv_subject_get_int(&subject));
-    TEST_ASSERT_EQUAL(10, lv_subject_get_previous_int(&subject));
+    TEST_ASSERT_EQUAL(15, lv_subject_get_previous_int(&subject));
+    TEST_ASSERT_EQUAL(3, observer_called);
 
     lv_subject_copy_string(&subject, "hello");
     TEST_ASSERT_EQUAL(15, lv_subject_get_int(&subject));
-    TEST_ASSERT_EQUAL(10, lv_subject_get_previous_int(&subject));
+    TEST_ASSERT_EQUAL(15, lv_subject_get_previous_int(&subject));
+    TEST_ASSERT_EQUAL(3, observer_called);
+
+    lv_observer_remove(basic_observer);
 }
 
 void test_observer_string(void)
@@ -83,24 +109,44 @@ void test_observer_string(void)
     char buf_previous[32];
     lv_subject_t subject;
     lv_subject_init_string(&subject, buf_current, buf_previous, sizeof(buf_current), "hello");
+
+    lv_observer_t * basic_observer = lv_subject_add_observer(&subject, observer_basic, NULL);
+
     TEST_ASSERT_EQUAL_STRING("hello", lv_subject_get_string(&subject));
     TEST_ASSERT_EQUAL_STRING("hello", lv_subject_get_previous_string(&subject));
+    TEST_ASSERT_EQUAL(1, observer_called);
 
     lv_subject_copy_string(&subject, "my name is John");
     TEST_ASSERT_EQUAL_STRING("my name is John", lv_subject_get_string(&subject));
     TEST_ASSERT_EQUAL_STRING("hello", lv_subject_get_previous_string(&subject));
+    TEST_ASSERT_EQUAL(2, observer_called);
 
     lv_subject_copy_string(&subject, "how are you?");
     TEST_ASSERT_EQUAL_STRING("how are you?", lv_subject_get_string(&subject));
     TEST_ASSERT_EQUAL_STRING("my name is John", lv_subject_get_previous_string(&subject));
+    TEST_ASSERT_EQUAL(3, observer_called);
+
+    /* Observer shouldn't be called with same value */
+    lv_subject_copy_string(&subject, "how are you?");
+    TEST_ASSERT_EQUAL_STRING("how are you?", lv_subject_get_string(&subject));
+    TEST_ASSERT_EQUAL_STRING("how are you?", lv_subject_get_previous_string(&subject));
+    TEST_ASSERT_EQUAL(3, observer_called);
 
     lv_subject_snprintf(&subject, "I ate %d pizzas", 10);
     TEST_ASSERT_EQUAL_STRING("I ate 10 pizzas", lv_subject_get_string(&subject));
     TEST_ASSERT_EQUAL_STRING("how are you?", lv_subject_get_previous_string(&subject));
+    TEST_ASSERT_EQUAL(4, observer_called);
 
     lv_subject_snprintf(&subject, "%d: %s", 1, "Coding is fun !");
     TEST_ASSERT_EQUAL_STRING("1: Coding is fun !", lv_subject_get_string(&subject));
     TEST_ASSERT_EQUAL_STRING("I ate 10 pizzas", lv_subject_get_previous_string(&subject));
+    TEST_ASSERT_EQUAL(5, observer_called);
+
+    /* Observer shouldn't be called with same value */
+    lv_subject_snprintf(&subject, "%d: %s", 1, "Coding is fun !");
+    TEST_ASSERT_EQUAL_STRING("1: Coding is fun !", lv_subject_get_string(&subject));
+    TEST_ASSERT_EQUAL_STRING("1: Coding is fun !", lv_subject_get_previous_string(&subject));
+    TEST_ASSERT_EQUAL(5, observer_called);
 
 
 
@@ -108,55 +154,78 @@ void test_observer_string(void)
     lv_subject_copy_string(&subject, "text to be clipped to 32 chars.this should be clipped");
     TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars.", lv_subject_get_string(&subject));
     TEST_ASSERT_EQUAL_STRING("1: Coding is fun !", lv_subject_get_previous_string(&subject));
+    TEST_ASSERT_EQUAL(6, observer_called);
 
     /*Check if the previous string is clipped correctly*/
     lv_subject_copy_string(&subject, "a");
     TEST_ASSERT_EQUAL_STRING("a", lv_subject_get_string(&subject));
     TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars.", lv_subject_get_previous_string(&subject));
+    TEST_ASSERT_EQUAL(7, observer_called);
 
     /*Ignore incorrect types*/
     lv_subject_set_pointer(&subject, NULL);
     TEST_ASSERT_EQUAL_STRING("a", lv_subject_get_string(&subject));
     TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars.", lv_subject_get_previous_string(&subject));
+    TEST_ASSERT_EQUAL(7, observer_called);
 
     lv_subject_set_color(&subject, lv_color_black());
     TEST_ASSERT_EQUAL_STRING("a", lv_subject_get_string(&subject));
     TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars.", lv_subject_get_previous_string(&subject));
+    TEST_ASSERT_EQUAL(7, observer_called);
 
     lv_subject_set_int(&subject, 10);
     TEST_ASSERT_EQUAL_STRING("a", lv_subject_get_string(&subject));
     TEST_ASSERT_EQUAL_STRING("text to be clipped to 32 chars.", lv_subject_get_previous_string(&subject));
+    TEST_ASSERT_EQUAL(7, observer_called);
+    lv_observer_remove(basic_observer);
 }
 
 void test_observer_pointer(void)
 {
     static int32_t a[3] = {0};
     static lv_subject_t subject;
+    lv_observer_t * basic_observer = lv_subject_add_observer(&subject, observer_basic, NULL);
 
     lv_subject_init_pointer(&subject, &a[0]);
     TEST_ASSERT_EQUAL_PTR(&a[0], lv_subject_get_pointer(&subject));
     TEST_ASSERT_EQUAL_PTR(&a[0], lv_subject_get_previous_pointer(&subject));
+    TEST_ASSERT_EQUAL(1, observer_called);
 
     lv_subject_set_pointer(&subject, &a[1]);
     TEST_ASSERT_EQUAL_PTR(&a[1], lv_subject_get_pointer(&subject));
     TEST_ASSERT_EQUAL_PTR(&a[0], lv_subject_get_previous_pointer(&subject));
+    TEST_ASSERT_EQUAL(2, observer_called);
 
     lv_subject_set_pointer(&subject, &a[2]);
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(&subject));
     TEST_ASSERT_EQUAL_PTR(&a[1], lv_subject_get_previous_pointer(&subject));
+    TEST_ASSERT_EQUAL(3, observer_called);
+
+    /*
+     * Even if pointer is the same, the observer should still get called as we shouldn't assume
+     * what the pointer is indicating
+     */
+    lv_subject_set_pointer(&subject, &a[2]);
+    TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(&subject));
+    TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_previous_pointer(&subject));
+    TEST_ASSERT_EQUAL(4, observer_called);
 
     /*Ignore incorrect types*/
     lv_subject_set_int(&subject, 10);
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(&subject));
     TEST_ASSERT_EQUAL_PTR(&a[1], lv_subject_get_previous_pointer(&subject));
+    TEST_ASSERT_EQUAL(4, observer_called);
 
     lv_subject_set_color(&subject, lv_color_black());
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(&subject));
     TEST_ASSERT_EQUAL_PTR(&a[1], lv_subject_get_previous_pointer(&subject));
+    TEST_ASSERT_EQUAL(4, observer_called);
 
     lv_subject_copy_string(&subject, "hello");
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(&subject));
     TEST_ASSERT_EQUAL_PTR(&a[1], lv_subject_get_previous_pointer(&subject));
+    TEST_ASSERT_EQUAL(4, observer_called);
+    lv_observer_remove(basic_observer);
 }
 
 void test_observer_color(void)
@@ -164,16 +233,26 @@ void test_observer_color(void)
     static lv_subject_t subject;
 
     lv_subject_init_color(&subject, lv_color_hex3(0x123));
+    lv_observer_t * basic_observer = lv_subject_add_observer(&subject, observer_basic, NULL);
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0x123), lv_subject_get_color(&subject));
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0x123), lv_subject_get_previous_color(&subject));
+    TEST_ASSERT_EQUAL(1, observer_called);
 
     lv_subject_set_color(&subject, lv_color_hex3(0x456));
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0x456), lv_subject_get_color(&subject));
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0x123), lv_subject_get_previous_color(&subject));
+    TEST_ASSERT_EQUAL(2, observer_called);
 
     lv_subject_set_color(&subject, lv_color_hex3(0xabc));
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc), lv_subject_get_color(&subject));
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0x456), lv_subject_get_previous_color(&subject));
+    TEST_ASSERT_EQUAL(3, observer_called);
+
+    /* Observer shouldn't be called if value is the same */
+    lv_subject_set_color(&subject, lv_color_hex3(0xabc));
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc), lv_subject_get_color(&subject));
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc), lv_subject_get_previous_color(&subject));
+    TEST_ASSERT_EQUAL(3, observer_called);
 
     /*Ignore incorrect types*/
     lv_subject_set_pointer(&subject, NULL);
