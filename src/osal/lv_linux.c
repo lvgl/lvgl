@@ -34,7 +34,7 @@ typedef union {
          *  We ignore the guest and guest_nice columns because they're accounted
          *   for in user and nice respectively
          */
-        uint32_t user, nice, system, /*iowait,*/ idle, irq, softirq,
+        uint32_t user, nice, system, idle, /*iowait,*/ irq, softirq,
                  steal /*, guest, guest_nice*/;
     } fields;
     uint32_t buffer[LV_PROC_STAT_PARAMS_LEN];
