@@ -23,9 +23,7 @@ extern "C" {
 #elif LV_USE_OPENGLES_API == LV_OPENGLES_API_EGL
 #include <EGL/egl.h>
 #include <GLES/gl.h>
-
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <GLES3/gl3.h>
 #endif
 
 /*********************
