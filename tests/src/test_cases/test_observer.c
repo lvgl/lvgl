@@ -474,7 +474,7 @@ void test_observer_obj_flag_lt(void)
     static lv_subject_t subject;
     lv_subject_init_int(&subject, 7);
 
-    lv_obj_bind_flag_if_le(obj, &subject, LV_OBJ_FLAG_HIDDEN, 5);
+    lv_obj_bind_flag_if_lt(obj, &subject, LV_OBJ_FLAG_HIDDEN, 5);
     /*Should be applied immediately*/
     TEST_ASSERT_EQUAL(false, lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN));
 
