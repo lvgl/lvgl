@@ -338,10 +338,15 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
     bool alloc_layer = false;
     lv_layer_t * target_layer = NULL;
     lv_draw_image_dsc_t layer_draw_dsc;
-    if(layer->color_format != LV_COLOR_FORMAT_ARGB8888) {
-        lv_area_t rc = {0, 0, lv_area_get_width(coords), lv_area_get_height(coords)};
-        target_layer = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &rc);
 
+    if(layer->color_format != LV_COLOR_FORMAT_ARGB8888) {
+        lv_area_t rc = {0, 0, lv_area_get_width(coords) - 1, lv_area_get_height(coords) - 1};
+        target_layer = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &rc);
+        LV_ASSERT_MALLOC(target_layer);
+        if(target_layer == NULL) {
+        	LV_LOG_WARN("Couldn't allocate layer for the SVG rendering");
+        	return;
+        }
         lv_draw_image_dsc_init(&layer_draw_dsc);
         layer_draw_dsc.src = target_layer;
         layer_draw_dsc.header.flags |= LV_IMAGE_FLAGS_PREMULTIPLIED;
@@ -372,7 +377,7 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
         }
         lv_matrix_translate(&matrix, image_dsc->pivot.x, image_dsc->pivot.y);
         lv_matrix_rotate(&matrix, image_dsc->rotation / 10.0f);
-        lv_matrix_scale(&matrix, image_dsc->scale_x / 255.0f, image_dsc->scale_y / 255.0f);
+        lv_matrix_scale(&matrix, image_dsc->scale_x / 256.0f, image_dsc->scale_y / 256.0f);
         lv_matrix_translate(&matrix, -image_dsc->pivot.x, -image_dsc->pivot.y);
     }
     lv_vector_dsc_set_transform(ctx, &matrix);
