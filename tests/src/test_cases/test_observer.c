@@ -374,8 +374,7 @@ void test_observer_obj_flag_invalid_subject(void)
     lv_subject_init_color(&invalid_subjects[2], (lv_color_t) {
         0, 0, 0
     });
-    lv_subject_init_group(&invalid_subjects[3],
-                          (lv_subject_t **)invalid_subjects, 3);
+    lv_subject_init_group(&invalid_subjects[3], NULL, 0);
 
     for(size_t i = 0; i < fns_size; ++i) {
         for(size_t j = 0; j < subjects_size; ++j) {
@@ -516,7 +515,7 @@ void test_observer_obj_state_invalid_subject(void)
         0, 0, 0
     });
     lv_subject_init_group(&invalid_subjects[3],
-                          (lv_subject_t **)invalid_subjects, 3);
+                          NULL, 0);
 
     for(size_t i = 0; i < fns_size; ++i) {
         for(size_t j = 0; j < subjects_size; ++j) {
