@@ -379,7 +379,7 @@ void test_observer_obj_flag_invalid_subject(void)
     for(size_t i = 0; i < fns_size; ++i) {
         for(size_t j = 0; j < subjects_size; ++j) {
             TEST_ASSERT_EQUAL_PTR(NULL,
-                                  fns[i](obj, &invalid_subjects[i],
+                                  fns[i](obj, &invalid_subjects[j],
                                          LV_OBJ_FLAG_HIDDEN, 5));
         }
     }
@@ -520,7 +520,7 @@ void test_observer_obj_state_invalid_subject(void)
     for(size_t i = 0; i < fns_size; ++i) {
         for(size_t j = 0; j < subjects_size; ++j) {
             TEST_ASSERT_EQUAL_PTR(
-                NULL, fns[i](obj, &invalid_subjects[i], 0, 5));
+                NULL, fns[i](obj, &invalid_subjects[j], 0, 5));
         }
     }
 }
