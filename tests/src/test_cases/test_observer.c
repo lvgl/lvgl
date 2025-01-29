@@ -1,4 +1,3 @@
-#define LV_BUILD_TEST 1
 #if LV_BUILD_TEST == 1
 #include "../lvgl.h"
 #include "../../lvgl_private.h"
