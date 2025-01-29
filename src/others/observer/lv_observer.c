@@ -870,7 +870,7 @@ static void lv_subject_notify_if_changed(lv_subject_t * subject)
             break;
         case LV_SUBJECT_TYPE_GROUP :
         case LV_SUBJECT_TYPE_POINTER :
-            //Always notify as we don't know how to compare this
+            /* Always notify as we don't know how to compare this */
             lv_subject_notify(subject);
             break;
         case LV_SUBJECT_TYPE_COLOR  :
