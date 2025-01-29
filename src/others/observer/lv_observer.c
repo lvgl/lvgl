@@ -715,7 +715,7 @@ static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subjec
             res = subject->value.num > p->value.num;
             break;
         case FLAG_COND_GE:
-            res = subject->value.num > p->value.num;
+            res = subject->value.num >= p->value.num;
             break;
     }
     if(p->inv) res = !res;
@@ -741,7 +741,7 @@ static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subje
             res = subject->value.num > p->value.num;
             break;
         case FLAG_COND_GE:
-            res = subject->value.num > p->value.num;
+            res = subject->value.num >= p->value.num;
             break;
     }
     if(p->inv) res = !res;
