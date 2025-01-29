@@ -352,7 +352,7 @@ void test_observer_group(void)
 
 void test_observer_obj_flag_invalid_subject(void)
 {
-    typedef lv_observer_t *(*lv_obj_bind_flag_fn)(
+    typedef lv_observer_t * (*lv_obj_bind_flag_fn)(
         lv_obj_t *, lv_subject_t *, lv_obj_flag_t, int32_t);
     static const lv_obj_bind_flag_fn fns[] = {
         lv_obj_bind_flag_if_eq, lv_obj_bind_flag_if_not_eq,
@@ -492,7 +492,7 @@ void test_observer_obj_flag_lt(void)
 
 void test_observer_obj_state_invalid_subject(void)
 {
-    typedef lv_observer_t *(*lv_obj_bind_state_fn)(
+    typedef lv_observer_t * (*lv_obj_bind_state_fn)(
         lv_obj_t *, lv_subject_t *, lv_state_t, int32_t);
 
     static const lv_obj_bind_state_fn fns[] = {
