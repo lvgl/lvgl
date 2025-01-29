@@ -292,19 +292,19 @@ void test_observer_color(void)
     lv_subject_set_pointer(&subject, NULL);
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc),
                             lv_subject_get_color(&subject));
-    TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0x456),
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc),
                             lv_subject_get_previous_color(&subject));
 
     lv_subject_set_int(&subject, 10);
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc),
                             lv_subject_get_color(&subject));
-    TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0x456),
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc),
                             lv_subject_get_previous_color(&subject));
 
     lv_subject_copy_string(&subject, "hello");
     TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc),
                             lv_subject_get_color(&subject));
-    TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0x456),
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex3(0xabc),
                             lv_subject_get_previous_color(&subject));
     lv_observer_remove(basic_observer);
 }
