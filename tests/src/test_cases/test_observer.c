@@ -208,23 +208,23 @@ void test_observer_pointer(void)
 {
     static int32_t a[3] = { 0 };
     static lv_subject_t subject;
+    lv_subject_init_pointer(&subject, &a[0]);
+
     lv_observer_t * basic_observer =
         lv_subject_add_observer(&subject, observer_basic, NULL);
 
-    lv_subject_init_pointer(&subject, &a[0]);
     TEST_ASSERT_EQUAL_PTR(&a[0], lv_subject_get_pointer(&subject));
     TEST_ASSERT_EQUAL_PTR(&a[0], lv_subject_get_previous_pointer(&subject));
-    TEST_ASSERT_EQUAL(1, observer_called);
 
     lv_subject_set_pointer(&subject, &a[1]);
     TEST_ASSERT_EQUAL_PTR(&a[1], lv_subject_get_pointer(&subject));
     TEST_ASSERT_EQUAL_PTR(&a[0], lv_subject_get_previous_pointer(&subject));
-    TEST_ASSERT_EQUAL(2, observer_called);
+    TEST_ASSERT_EQUAL(1, observer_called);
 
     lv_subject_set_pointer(&subject, &a[2]);
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(&subject));
     TEST_ASSERT_EQUAL_PTR(&a[1], lv_subject_get_previous_pointer(&subject));
-    TEST_ASSERT_EQUAL(3, observer_called);
+    TEST_ASSERT_EQUAL(2, observer_called);
 
     /*
      * Even if pointer is the same, the observer should still get called as we shouldn't assume
@@ -233,23 +233,23 @@ void test_observer_pointer(void)
     lv_subject_set_pointer(&subject, &a[2]);
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(&subject));
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_previous_pointer(&subject));
-    TEST_ASSERT_EQUAL(4, observer_called);
+    TEST_ASSERT_EQUAL(3, observer_called);
 
     /*Ignore incorrect types*/
     lv_subject_set_int(&subject, 10);
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(&subject));
     TEST_ASSERT_EQUAL_PTR(&a[1], lv_subject_get_previous_pointer(&subject));
-    TEST_ASSERT_EQUAL(4, observer_called);
+    TEST_ASSERT_EQUAL(3, observer_called);
 
     lv_subject_set_color(&subject, lv_color_black());
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(&subject));
     TEST_ASSERT_EQUAL_PTR(&a[1], lv_subject_get_previous_pointer(&subject));
-    TEST_ASSERT_EQUAL(4, observer_called);
+    TEST_ASSERT_EQUAL(3, observer_called);
 
     lv_subject_copy_string(&subject, "hello");
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(&subject));
     TEST_ASSERT_EQUAL_PTR(&a[1], lv_subject_get_previous_pointer(&subject));
-    TEST_ASSERT_EQUAL(4, observer_called);
+    TEST_ASSERT_EQUAL(3, observer_called);
     lv_observer_remove(basic_observer);
 }
 
