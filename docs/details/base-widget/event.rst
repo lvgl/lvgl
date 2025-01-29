@@ -185,7 +185,7 @@ Other Events
 Display Events
 --------------
 
-.. include:: ../main-components/display_events_list.txt
+.. include:: ../main-components/display/display_events_list.txt
 
 
 Custom Events

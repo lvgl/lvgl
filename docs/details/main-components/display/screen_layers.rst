@@ -81,3 +81,9 @@ Bottom Layer
 Similar to the Top- and System Layers, the Bottom Layer is also the full size of the
 Display, but it is located below the :ref:`active_screen`.  It's visible only if the
 Active Screen's background opacity is < 255.
+
+
+.. admonition::  Further Reading
+
+    :ref:`transparent_screens`.
+
