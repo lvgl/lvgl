@@ -706,7 +706,8 @@ static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subjec
 {
     flag_and_cond_t * p = observer->user_data;
 
-    bool res;
+    /* Initializing this keeps some compilers happy */
+    bool res = false;
     switch(p->cond) {
         case FLAG_COND_EQ:
             res = subject->value.num == p->value.num;
@@ -732,7 +733,8 @@ static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subje
 {
     flag_and_cond_t * p = observer->user_data;
 
-    bool res;
+    /* Initializing this keeps some compilers happy */
+    bool res = false;
     switch(p->cond) {
         case FLAG_COND_EQ:
             res = subject->value.num == p->value.num;
