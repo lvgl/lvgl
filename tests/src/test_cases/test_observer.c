@@ -358,10 +358,10 @@ void test_observer_obj_flag_invalid_subject(void)
         lv_obj_bind_flag_if_ge, lv_obj_bind_flag_if_gt,
         lv_obj_bind_flag_if_lt, lv_obj_bind_flag_if_le,
     };
-    lv_subject_t invalid_subjects[4];
+    static lv_subject_t invalid_subjects[4];
 
-    char buf1[30];
-    char buf2[30];
+    static char buf1[30];
+    static char buf2[30];
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
 
     const size_t fns_size = sizeof(fns) / sizeof(fns[0]);
@@ -499,10 +499,10 @@ void test_observer_obj_state_invalid_subject(void)
         lv_obj_bind_state_if_ge, lv_obj_bind_state_if_gt,
         lv_obj_bind_state_if_lt, lv_obj_bind_state_if_le,
     };
-    lv_subject_t invalid_subjects[4];
+    static lv_subject_t invalid_subjects[4];
 
-    char buf1[30];
-    char buf2[30];
+    static char buf1[30];
+    static char buf2[30];
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
 
     const size_t fns_size = sizeof(fns) / sizeof(fns[0]);
