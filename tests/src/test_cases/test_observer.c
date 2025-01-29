@@ -240,17 +240,17 @@ void test_observer_pointer(void)
     /*Ignore incorrect types*/
     lv_subject_set_int(&subject, 10);
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(&subject));
-    TEST_ASSERT_EQUAL_PTR(&a[1], lv_subject_get_previous_pointer(&subject));
+    TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_previous_pointer(&subject));
     TEST_ASSERT_EQUAL(4, observer_called);
 
     lv_subject_set_color(&subject, lv_color_black());
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(&subject));
-    TEST_ASSERT_EQUAL_PTR(&a[1], lv_subject_get_previous_pointer(&subject));
+    TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_previous_pointer(&subject));
     TEST_ASSERT_EQUAL(4, observer_called);
 
     lv_subject_copy_string(&subject, "hello");
     TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_pointer(&subject));
-    TEST_ASSERT_EQUAL_PTR(&a[1], lv_subject_get_previous_pointer(&subject));
+    TEST_ASSERT_EQUAL_PTR(&a[2], lv_subject_get_previous_pointer(&subject));
     TEST_ASSERT_EQUAL(4, observer_called);
     lv_observer_remove(basic_observer);
 }
