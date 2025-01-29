@@ -879,7 +879,7 @@ static void lv_subject_notify_if_changed(lv_subject_t * subject)
             }
             break;
         case LV_SUBJECT_TYPE_STRING:
-            if(!lv_strcmp(subject->value.pointer, subject->prev_value.pointer)) {
+            if(lv_strcmp(subject->value.pointer, subject->prev_value.pointer)) {
                 lv_subject_notify(subject);
             }
             break;
