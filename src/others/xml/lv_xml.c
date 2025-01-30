@@ -151,7 +151,7 @@ void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs)
     }
 
     /* If it isn't a component either then it is unknown */
-    LV_LOG_WARN("'%s' in not a known widget, element, or component", name);
+    LV_LOG_WARN("'%s' is not a known widget, element, or component", name);
     return NULL;
 }
 
