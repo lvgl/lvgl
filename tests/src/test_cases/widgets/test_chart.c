@@ -193,4 +193,23 @@ void test_draw_task_hooking(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/chart_bar_draw_hook.png");
 }
 
+void test_chart_scatter(void)
+{
+    lv_obj_center(chart);
+    lv_obj_set_size(chart, LV_PCT(100), LV_PCT(100));
+
+    lv_chart_set_type(chart, LV_CHART_TYPE_SCATTER);
+
+    lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_X, 50, 100);
+    lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 10, 20);
+
+    lv_chart_set_point_count(chart, 3);
+    lv_chart_series_t * ser = lv_chart_add_series(chart, red_color, LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_set_next_value2(chart, ser, 50, 10);
+    lv_chart_set_next_value2(chart, ser, 75, 12);
+    lv_chart_set_next_value2(chart, ser, 100, 20);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/chart_scatter.png");
+}
+
 #endif
