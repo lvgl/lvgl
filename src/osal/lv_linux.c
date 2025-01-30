@@ -25,6 +25,8 @@
 #define LV_PROC_STAT_VAR_FORMAT        " %" PRIu32
 #define LV_PROC_STAT_IGNORE_VAR_FORMAT " %*" PRIu32
 
+#define last_proc_stat LV_GLOBAL_DEFAULT()->linux_last_proc_stat
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -43,8 +45,6 @@ static uint32_t lv_proc_stat_get_total(const lv_proc_stat_t * p);
 /**********************
  *      MACROS
  **********************/
-
-#define last_proc_stat LV_GLOBAL_DEFAULT()->linux_last_proc_stat
 
 /**********************
  *   GLOBAL FUNCTIONS
