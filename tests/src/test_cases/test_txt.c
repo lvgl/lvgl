@@ -142,27 +142,27 @@ void test_txt_next_line_should_handle_empty_string(void)
 void test_lv_text_encoded_letter_next_2_should_handle_null_pointer(void)
 {
     const char * txt = NULL;
-    uint32_t letter = 0, letter_next = 0, ofs = 0;
+    uint32_t letter = 100, letter_next = 101, ofs = 0;
 
     lv_text_encoded_letter_next_2(txt, &letter, &letter_next, &ofs);
 
     /* Expect both letter and letter_next to be 0 because the input string is NULL */
     TEST_ASSERT_EQUAL_UINT32(0, letter);
     TEST_ASSERT_EQUAL_UINT32(0, letter_next);
-    TEST_ASSERT_EQUAL_UINT32(1, ofs);
+    TEST_ASSERT_EQUAL_UINT32(0, ofs);
 }
 
 void test_lv_text_encoded_letter_next_2_should_handle_empty_string(void)
 {
     const char * txt = "";
-    uint32_t letter = 0, letter_next = 0, ofs = 0;
+    uint32_t letter = 100, letter_next = 101, ofs = 0;
 
     lv_text_encoded_letter_next_2(txt, &letter, &letter_next, &ofs);
 
     /* Expect both letter and letter_next to be 0 because the input string is empty */
     TEST_ASSERT_EQUAL_UINT32(0, letter);
     TEST_ASSERT_EQUAL_UINT32(0, letter_next);
-    TEST_ASSERT_EQUAL_UINT32(1, ofs);
+    TEST_ASSERT_EQUAL_UINT32(0, ofs);
 }
 
 void test_lv_text_encoded_letter_next_2_should_handle_single_ascii_character(void)
