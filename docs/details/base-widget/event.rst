@@ -156,6 +156,16 @@ Drawing Events
 -  :cpp:enumerator:`LV_EVENT_DRAW_POST_END`: Finishing the post draw phase (when all children are drawn)
 -  :cpp:enumerator:`LV_EVENT_DRAW_TASK_ADDED`: Adding a draw task
 
+.. attention::
+
+    In drawing-event callback functions, it is important to note that the rendering
+    sequence has already begun, and during this period, making changes to the Widget
+    that causes any part of it to be invalidated (i.e. causes its appearance to
+    change) is not permitted.  This includes modifying the Widget's flags, states,
+    color, opacity, coordinates, padding, etc..  If you attempt to do so, LVGL will
+    generate an assertion failure with a message indicating that invalidating an
+    ``area`` is not allowed during rendering.
+
 Special Events
 --------------
 
