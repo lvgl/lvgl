@@ -31,7 +31,7 @@ typedef struct {
     uint32_t flag;
     lv_subject_value_t value;
     uint32_t inv     : 1;
-    flag_cond_t cond : 2;
+    flag_cond_t cond : 3;
 } flag_and_cond_t;
 
 /**********************
