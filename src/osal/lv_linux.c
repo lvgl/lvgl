@@ -11,7 +11,9 @@
 
 #if LV_USE_OS != LV_OS_NONE && defined(__linux__)
 
+#include "../core/lv_global.h"
 #include "../misc/lv_log.h"
+#include "lv_linux_private.h"
 #include <stdio.h>
 
 /*********************
@@ -22,23 +24,10 @@
 
 #define LV_PROC_STAT_VAR_FORMAT        " %" PRIu32
 #define LV_PROC_STAT_IGNORE_VAR_FORMAT " %*" PRIu32
-#define LV_PROC_STAT_PARAMS_LEN        7
 
 /**********************
  *      TYPEDEFS
  **********************/
-typedef union {
-    struct {
-        /*
-         *  We ignore the iowait column as it's not reliable
-         *  We ignore the guest and guest_nice columns because they're accounted
-         *   for in user and nice respectively
-         */
-        uint32_t user, nice, system, idle, /*iowait,*/ irq, softirq,
-                 steal /*, guest, guest_nice*/;
-    } fields;
-    uint32_t buffer[LV_PROC_STAT_PARAMS_LEN];
-} lv_proc_stat_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -51,11 +40,11 @@ static uint32_t lv_proc_stat_get_total(const lv_proc_stat_t * p);
  *  STATIC VARIABLES
  **********************/
 
-static lv_proc_stat_t last_proc_stat;
-
 /**********************
  *      MACROS
  **********************/
+
+#define last_proc_stat LV_GLOBAL_DEFAULT()->linux_last_proc_stat
 
 /**********************
  *   GLOBAL FUNCTIONS
