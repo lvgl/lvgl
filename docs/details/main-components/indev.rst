@@ -319,7 +319,7 @@ a Widget to the group use :cpp:expr:`lv_group_add_obj(g, widget)`.
 Once a Widget has been added to a group, you can find out what group it is in
 using :cpp:expr:`lv_obj_get_group(widget)`.
 
-To find out if a Widget in a group has focus, call :cpp:expr:`lv_obj_is_focused(widget)`.
+To find out if a Widget in a group has focus, call :cpp:expr:`lv_obj_has_state(widget,LV_STATE_FOCUSED)`.
 If the Widget is not part of a group, this function will return ``false``.
 
 To associate a group with an input device use :cpp:expr:`lv_indev_set_group(indev, g)`.
