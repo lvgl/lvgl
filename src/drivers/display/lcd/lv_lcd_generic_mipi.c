@@ -280,7 +280,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     size_t len = (x_end - x_start) * (y_end - y_start) * lv_color_format_get_size(lv_display_get_color_format(disp));
     send_color(drv, LV_LCD_CMD_WRITE_MEMORY_START, px_map, len);
 
-    lv_display_flush_ready();
+    lv_display_flush_ready(disp);
 }
 
 /**
