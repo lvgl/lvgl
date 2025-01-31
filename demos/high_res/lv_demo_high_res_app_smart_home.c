@@ -33,6 +33,7 @@ static void charging_arc_observer(lv_observer_t * observer, lv_subject_t * subje
 static void charging_percent_label_observer(lv_observer_t * observer, lv_subject_t * subject);
 static void charging_time_until_full_label_observer(lv_observer_t * observer, lv_subject_t * subject);
 static void create_widget_charging(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
+static void handle_locked_value(lv_obj_t * slider, bool locked);
 static void widget2_slider_released_cb(lv_event_t * e);
 static void widget2_slider_locked_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
@@ -267,19 +268,25 @@ static void create_widget_charging(lv_demo_high_res_ctx_t * c, lv_obj_t * widget
     lv_obj_set_width(time_to_full_label, LV_PCT(100));
 }
 
+static void handle_locked_value(lv_obj_t * slider, bool locked)
+{
+    lv_slider_set_value(slider, locked ? 100 : 0, LV_ANIM_ON);
+    lv_obj_update_flag(slider, LV_OBJ_FLAG_CLICKABLE, !locked);
+}
+
 static void widget2_slider_released_cb(lv_event_t * e)
 {
     lv_obj_t * slider = lv_event_get_target_obj(e);
     lv_demo_high_res_ctx_t * c = lv_event_get_user_data(e);
-    lv_subject_set_int(&c->api.subjects.locked, lv_slider_get_value(slider) >= 100);
+    bool locked = lv_slider_get_value(slider) >= 100;
+    handle_locked_value(slider, locked);
+    lv_subject_set_int(&c->api.subjects.locked, locked);
 }
-
 static void widget2_slider_locked_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * slider = lv_observer_get_target_obj(observer);
     bool locked = lv_subject_get_int(subject);
-    lv_slider_set_value(slider, locked ? 100 : 0, LV_ANIM_ON);
-    lv_obj_update_flag(slider, LV_OBJ_FLAG_CLICKABLE, !locked);
+    handle_locked_value(slider, locked);
 }
 
 static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
