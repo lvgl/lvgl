@@ -684,6 +684,7 @@ static void slider_draw_end_cb(lv_event_t * e)
 
 static void slider_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
+    LV_UNUSED(subject);
     lv_obj_t * slider = lv_observer_get_target_obj(observer);
     lv_obj_t * slider_img = lv_obj_get_child(slider, 0);
     lv_image_dsc_t ** pair = lv_observer_get_user_data(observer);
@@ -693,6 +694,7 @@ static void slider_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 
 static void slider_label_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
+    LV_UNUSED(subject);
     lv_obj_t * slider = lv_observer_get_target_obj(observer);
     lv_obj_t * label_box = lv_observer_get_user_data(observer);
     int32_t selected = lv_slider_get_value(slider);
@@ -745,7 +747,7 @@ static lv_obj_t * create_slider(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, c
 
     static const char * const texts[4] = {"OFF", "LOW", "MIDDLE", "HIGH"};
     for(int32_t i = 0; i < 4; i++) {
-        lv_obj_t * label = lv_label_create(label_box);
+        label = lv_label_create(label_box);
         lv_obj_add_style(label, &c->fonts[FONT_LABEL_XS], 0);
         lv_obj_add_style(label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
         lv_label_set_text_static(label, texts[i]);
