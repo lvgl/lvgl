@@ -28,6 +28,7 @@ static void locked_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 static void locked_timer_cb(lv_timer_t * t);
 static void delete_timer_cb(lv_event_t * e);
 static void clock_timer_cb(lv_timer_t * t);
+static void door_timer_cb(lv_timer_t * t);
 
 /**********************
  *  STATIC VARIABLES
@@ -55,6 +56,12 @@ void lv_demo_high_res_api_example(const char * assets_path, const char * logo_pa
     lv_subject_set_int(&api->subjects.thermostat_target_temperature, 25 * 10); /* 25 degrees C */
     lv_subject_set_pointer(&api->subjects.wifi_ssid, "my home Wi-Fi network");
     lv_subject_set_pointer(&api->subjects.wifi_ip, "192.168.1.1");
+    lv_subject_set_int(&api->subjects.door, 0); /* tell the UI the door is closed */
+    lv_subject_set_int(&api->subjects.lightbulb_matter, 0); /* 0 or 1 */
+    lv_subject_set_int(&api->subjects.lightbulb_zigbee, 1); /* 0 or 1 */
+    lv_subject_set_int(&api->subjects.fan_matter, 0); /* 0-3 */
+    lv_subject_set_int(&api->subjects.fan_zigbee, 0); /* 0 or 1*/
+    lv_subject_set_int(&api->subjects.air_purifier, 3); /* 0-3 */
 
     lv_subject_add_observer(&api->subjects.music_play, output_subject_observer_cb, (void *)"music_play");
     lv_subject_add_observer(&api->subjects.locked, output_subject_observer_cb, (void *)"locked");
@@ -67,6 +74,12 @@ void lv_demo_high_res_api_example(const char * assets_path, const char * logo_pa
                             (void *)"thermostat_fan_speed");
     lv_subject_add_observer(&api->subjects.thermostat_target_temperature, output_subject_observer_cb,
                             (void *)"thermostat_target_temperature");
+    lv_subject_add_observer(&api->subjects.door, output_subject_observer_cb, (void *)"door");
+    lv_subject_add_observer(&api->subjects.lightbulb_matter, output_subject_observer_cb, (void *)"Matter lightbulb");
+    lv_subject_add_observer(&api->subjects.lightbulb_zigbee, output_subject_observer_cb, (void *)"Zigbee lightbulb");
+    lv_subject_add_observer(&api->subjects.fan_matter, output_subject_observer_cb, (void *)"Matter fan");
+    lv_subject_add_observer(&api->subjects.fan_zigbee, output_subject_observer_cb, (void *)"Zigbee fan");
+    lv_subject_add_observer(&api->subjects.air_purifier, output_subject_observer_cb, (void *)"air purifier");
 
     /* unlock after being locked for 3 seconds */
     lv_timer_t * locked_timer = lv_timer_create_basic();
@@ -76,6 +89,10 @@ void lv_demo_high_res_api_example(const char * assets_path, const char * logo_pa
     /* slowly increment the time */
     lv_timer_t * clock_timer = lv_timer_create(clock_timer_cb, 10000, api);
     lv_obj_add_event_cb(api->base_obj, delete_timer_cb, LV_EVENT_DELETE, clock_timer);
+
+    /* simulate the door opening and closing */
+    lv_timer_t * door_timer = lv_timer_create(door_timer_cb, 3000, api);
+    lv_obj_add_event_cb(api->base_obj, delete_timer_cb, LV_EVENT_DELETE, door_timer);
 }
 
 /**********************
@@ -135,6 +152,12 @@ static void clock_timer_cb(lv_timer_t * t)
         lv_subject_set_int(&api->subjects.hour, hour);
     }
     lv_subject_set_int(&api->subjects.minute, minutes);
+}
+
+static void door_timer_cb(lv_timer_t * t)
+{
+    lv_demo_high_res_api_t * api = lv_timer_get_user_data(t);
+    lv_subject_set_int(&api->subjects.door, !lv_subject_get_int(&api->subjects.door));
 }
 
 #endif /*LV_USE_DEMO_HIGH_RES*/
