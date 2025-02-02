@@ -23,7 +23,7 @@ if(CONFIG_LV_DRAW_SW_SUPPORT_RGB888 OR LV_DRAW_SW_SUPPORT_XRGB8888)
 endif()
 
 # Create the main static library for this directory
-add_library(lvgl_draw_sw_blend STATIC ${SOURCE_FILES})
+add_library(lvgl_draw_sw_blend OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory
 target_include_directories(lvgl_draw_sw_blend PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

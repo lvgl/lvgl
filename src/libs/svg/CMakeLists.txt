@@ -6,7 +6,7 @@ set(LVGL_LIBS_SVG_SOURCES
 )
 
 # Create the main static library for this directory
-add_library(lvgl_libs_svg STATIC ${LVGL_LIBS_SVG_SOURCES})
+add_library(lvgl_libs_svg OBJECT ${LVGL_LIBS_SVG_SOURCES})
 
 # Add the current directory as an include directory
 target_include_directories(lvgl_libs_svg PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

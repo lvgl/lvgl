@@ -3,7 +3,7 @@ set(SOURCE_FILES
 )
 
 # Create the main static library for this directory
-add_library(lvgl_stdlib STATIC ${SOURCE_FILES})
+add_library(lvgl_stdlib OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory
 target_include_directories(lvgl_stdlib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

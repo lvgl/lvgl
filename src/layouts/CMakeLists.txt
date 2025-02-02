@@ -3,7 +3,7 @@ set(LVGL_LAYOUT_SOURCES
 )
 
 # Create the main static library for this directory
-add_library(lvgl_layout STATIC ${LVGL_LAYOUT_SOURCES})
+add_library(lvgl_layout OBJECT ${LVGL_LAYOUT_SOURCES})
 
 # Add the current directory as an include directory
 target_include_directories(lvgl_layout PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

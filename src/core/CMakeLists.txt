@@ -21,7 +21,7 @@ if(CONFIG_LV_USE_OBJ_PROPERTY)
 endif()
 
 # Create the main static library for this directory
-add_library(lvgl_core STATIC ${LVGL_CORE_SOURCES})
+add_library(lvgl_core OBJECT ${LVGL_CORE_SOURCES})
 
 # Add the current directory as an include directory
 target_include_directories(lvgl_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

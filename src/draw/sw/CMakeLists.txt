@@ -25,7 +25,7 @@ if(CONFIG_LV_USE_VECTOR_GRAPHIC AND CONFIG_LV_USE_THORVG)
 endif()
 
 # Create the main static library for this directory
-add_library(lvgl_draw_sw STATIC ${SOURCE_FILES})
+add_library(lvgl_draw_sw OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory
 target_include_directories(lvgl_draw_sw PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
