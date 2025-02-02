@@ -20,7 +20,9 @@ elseif(ZEPHYR_BASE)
 elseif(MICROPY_DIR)
   include(${CMAKE_CURRENT_LIST_DIR}/env_support/cmake/micropython.cmake)
 else()
-  include(${CMAKE_CURRENT_LIST_DIR}/env_support/cmake/custom.cmake)
+  include(cmake/top.cmake)
+  add_subdirectory(src)
+  add_subdirectory(libs)
 endif()
 
 #[[
