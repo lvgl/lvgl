@@ -43,7 +43,7 @@ if(NOT SOURCE_FILES)
 	list(APPEND SOURCE_FILES ${CMAKE_CURRENT_BINARY_DIR}/empty.c)
 endif()
 
-add_library(lvgl_drivers OBJECT ${SOURCE_FILES})
+add_library(lvgl_drivers STATIC ${SOURCE_FILES})
 
 # Add each subdirectory and link its library
 foreach(subdir ${SUBDIRS})

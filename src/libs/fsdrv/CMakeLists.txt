@@ -38,7 +38,7 @@ endif()
 
 if(NOT "${SOURCE_FILES}" STREQUAL "")
     # Create the object library for this directory
-    add_library(lvgl_libs_fsdrv OBJECT ${SOURCE_FILES})
+    add_library(lvgl_libs_fsdrv STATIC ${SOURCE_FILES})
     
     # Add the current directory as an include directory
     target_include_directories(lvgl_libs_fsdrv PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

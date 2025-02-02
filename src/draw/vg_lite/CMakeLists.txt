@@ -19,7 +19,7 @@ set(SOURCE_FILES lv_vg_lite_pending.c
 	lv_draw_vg_lite_vector.c
 	lv_vg_lite_math.c)
 # Create the object library for this directory
-add_library(lvgl_draw_vg_lite OBJECT ${SOURCE_FILES})
+add_library(lvgl_draw_vg_lite STATIC ${SOURCE_FILES})
 
 # Add the current directory as an include directory
 target_include_directories(lvgl_draw_vg_lite PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

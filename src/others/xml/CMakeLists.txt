@@ -7,7 +7,7 @@ set(SOURCE_FILES lv_xml_parser.c
 	lv_xml_utils.c)
 
 # Create the object library for this directory
-add_library(lvgl_others_xml OBJECT ${SOURCE_FILES})
+add_library(lvgl_others_xml STATIC ${SOURCE_FILES})
 
 # Add the current directory as an include directory
 target_include_directories(lvgl_others_xml PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

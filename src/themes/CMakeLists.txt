@@ -1,7 +1,7 @@
 set(SOURCE_FILES lv_theme.c)
 
 # Create the object library for this directory
-add_library(lvgl_themes OBJECT ${SOURCE_FILES})
+add_library(lvgl_themes STATIC ${SOURCE_FILES})
 
 # Add the current directory as an include directory
 target_include_directories(lvgl_themes PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

@@ -49,9 +49,17 @@ if(CONFIG_LV_USE_XML)
 endif()
 
 
+set(SOURCE_FILES)
+
+if(NOT SOURCE_FILES)
+	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/empty.c "")
+	list(APPEND SOURCE_FILES ${CMAKE_CURRENT_BINARY_DIR}/empty.c)
+endif()
+
+add_library(lvgl_others STATIC ${SOURCE_FILES})
+
 # Add each subdirectory and link its library
 foreach(subdir ${SUBDIRS})
-	add_subdirectory(${subdir})
-	# Hacky way to append target objs directly to the parent library
-	target_sources(lvgl PRIVATE $<TARGET_OBJECTS:lvgl_others_${subdir}>)
+    add_subdirectory(${subdir})
+    target_link_libraries(lvgl_others PRIVATE lvgl_others_${subdir})
 endforeach()

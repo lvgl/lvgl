@@ -23,16 +23,16 @@ if(CONFIG_LV_DRAW_SW_SUPPORT_RGB888 OR LV_DRAW_SW_SUPPORT_XRGB8888)
 endif()
 
 # Create the object library for this directory
-add_library(lvgl_draw_sw_blend OBJECT ${SOURCE_FILES})
+add_library(lvgl_draw_sw_blend STATIC ${SOURCE_FILES})
 
 # Add the current directory as an include directory
 target_include_directories(lvgl_draw_sw_blend PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 
-set(SUBDIRS helium neon arm2d)
+set(SUBDIRS helium neon)
 
 # Add each subdirectory and link its library
 foreach(subdir ${SUBDIRS})
    add_subdirectory(${subdir})
-   target_link_libraries(lvgl_draw_sw_blend PRIVATE ${subdir})
+   target_link_libraries(lvgl_draw_sw_blend PRIVATE lvgl_draw_sw_blend_${subdir})
 endforeach()
