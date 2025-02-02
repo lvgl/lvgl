@@ -24,7 +24,7 @@ if(CONFIG_LV_USE_VECTOR_GRAPHIC AND CONFIG_LV_USE_THORVG)
 	list(APPEND SOURCE_FILES lv_draw_sw_vector.c)
 endif()
 
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_draw_sw OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory

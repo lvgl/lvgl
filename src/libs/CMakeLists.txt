@@ -73,5 +73,5 @@ add_library(lvgl_libs INTERFACE)
 # Add each subdirectory and link its library
 foreach(subdir ${SUBDIRS})
     add_subdirectory(${subdir})
-    target_link_libraries(lvgl_libs INTERFACE ${subdir})
+    target_link_libraries(lvgl_libs INTERFACE lvgl_libs_${subdir})
 endforeach()

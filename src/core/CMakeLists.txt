@@ -20,7 +20,7 @@ if(CONFIG_LV_USE_OBJ_PROPERTY)
     list(APPEND LVGL_CORE_SOURCES lv_obj_property.c)
 endif()
 
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_core OBJECT ${LVGL_CORE_SOURCES})
 
 # Add the current directory as an include directory

@@ -36,11 +36,17 @@ if(CONFIG_LV_USE_OPENGLES)
 	list(APPEND SUBDIRS glfw)
 endif()
 
+set(SOURCE_FILES)
 
-add_library(lvgl_drivers INTERFACE)
+if(NOT SOURCE_FILES)
+	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/empty.c "")
+	list(APPEND SOURCE_FILES ${CMAKE_CURRENT_BINARY_DIR}/empty.c)
+endif()
+
+add_library(lvgl_drivers OBJECT ${SOURCE_FILES})
 
 # Add each subdirectory and link its library
 foreach(subdir ${SUBDIRS})
-	add_subdirectory(${subdir})
-	target_link_libraries(lvgl_drivers INTERFACE ${subdir})
+    add_subdirectory(${subdir})
+    target_link_libraries(lvgl_drivers PRIVATE lvgl_drivers_${subdir})
 endforeach()

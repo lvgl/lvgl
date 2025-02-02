@@ -8,13 +8,13 @@ set(SOURCE_FILES lv_image_decoder.c
 		lv_draw.c
 		lv_draw_image.c
 		lv_draw_label.c
-		)
+)
 
 if(CONFIG_LV_USE_VECTOR_GRAPHIC)
 	list(APPEND SOURCE_FILES lv_draw_vector.c)
 endif()
 
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_draw OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory
@@ -49,5 +49,5 @@ endif()
 # Add each subdirectory and link its library
 foreach(subdir ${SUBDIRS})
    add_subdirectory(${subdir})
-   target_link_libraries(lvgl_draw PRIVATE ${subdir})
+   target_link_libraries(lvgl_draw PRIVATE lvgl_draw_${subdir})
 endforeach()

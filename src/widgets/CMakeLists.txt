@@ -136,10 +136,9 @@ if(CONFIG_LV_USE_PROPERTY)
 	list(APPEND SUBDIRS property)
 endif()
 
-add_library(lvgl_widgets INTERFACE)
-
 # Add each subdirectory and link its library
 foreach(subdir ${SUBDIRS})
 	add_subdirectory(${subdir})
-	target_link_libraries(lvgl_widgets INTERFACE ${subdir})
+	# Hacky way to append target objs directly to the parent library
+	target_sources(lvgl PRIVATE $<TARGET_OBJECTS:lvgl_widget_${subdir}>)
 endforeach()

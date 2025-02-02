@@ -2,7 +2,7 @@ set(LVGL_LIBS_LIBPNG_SOURCES
     lv_libpng.c
 )
 
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_libs_libpng OBJECT ${LVGL_LIBS_LIBPNG_SOURCES})
 
 # Add the current directory as an include directory

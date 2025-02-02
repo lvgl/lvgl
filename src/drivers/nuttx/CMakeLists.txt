@@ -6,7 +6,7 @@ lv_nuttx_touchscreen.c
 lv_nuttx_libuv.c
 lv_nuttx_profiler.c
 lv_nuttx_image_cache.c)
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_drivers_nuttx OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory

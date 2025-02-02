@@ -23,7 +23,7 @@ if(CONFIG_LV_USE_DRAW_PXP OR CONFIG_LV_USE_ROTATE_PXP)
 	list(APPEND SOURCE_FILES lv_draw_pxp_utils.c)
 endif()
 
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_draw_nxp_pxp OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory

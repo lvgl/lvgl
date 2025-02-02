@@ -1,13 +1,12 @@
 set(SOURCE_FILES lv_theme.c)
 
-# Create the main static library for this directory
-add_library(lvgl_theme OBJECT ${SOURCE_FILES})
+# Create the object library for this directory
+add_library(lvgl_themes OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory
-target_include_directories(lvgl_theme_simple PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(lvgl_themes PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(SUBDIRS)
-
 
 if(CONFIG_LV_USE_THEME_DEFAULT)
     list(APPEND SUBDIRS default)
@@ -24,5 +23,5 @@ endif()
 # Add each subdirectory and link its library
 foreach(subdir ${SUBDIRS})
     add_subdirectory(${subdir})
-    target_link_libraries(lvgl_theme PRIVATE ${subdir})
+    target_link_libraries(lvgl_themes PRIVATE lvgl_theme_${subdir})
 endforeach()

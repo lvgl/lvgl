@@ -5,7 +5,7 @@ set(LVGL_LIBS_SVG_SOURCES
     lv_svg_token.c
 )
 
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_libs_svg OBJECT ${LVGL_LIBS_SVG_SOURCES})
 
 # Add the current directory as an include directory

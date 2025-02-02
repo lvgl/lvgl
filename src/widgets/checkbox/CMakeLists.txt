@@ -1,5 +1,5 @@
 set(SOURCE_FILES lv_checkbox.c)
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_widget_checkbox OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory

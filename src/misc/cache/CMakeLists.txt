@@ -6,8 +6,8 @@ set(SOURCE_FILES
     lv_image_header_cache.c
 )
 
-# Create the main static library for this directory
-add_library(lvgl_cache OBJECT ${SOURCE_FILES})
+# Create the object library for this directory
+add_library(lvgl_misc_cache OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory
-target_include_directories(lvgl_cache PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(lvgl_misc_cache PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

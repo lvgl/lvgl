@@ -18,7 +18,7 @@ set(SOURCE_FILES lv_vg_lite_pending.c
 	lv_draw_vg_lite_triangle.c
 	lv_draw_vg_lite_vector.c
 	lv_vg_lite_math.c)
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_draw_vg_lite OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory

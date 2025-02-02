@@ -10,7 +10,7 @@ set(SOURCE_FILES lv_draw_nema_gfx_stm32_hal.c
 	lv_draw_nema_gfx_layer.c
 	lv_draw_nema_gfx_line.c
 	lv_draw_nema_gfx_triangle.c)
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_draw_nema_gfx OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory

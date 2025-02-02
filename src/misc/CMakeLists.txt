@@ -44,8 +44,11 @@ if(CONFIG_LV_USE_ARABIC_PERSIAN_CHARS)
 endif()
 
 
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_misc OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory
 target_include_directories(lvgl_misc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+add_subdirectory(cache)
+target_link_libraries(lvgl_misc PRIVATE lvgl_misc_cache)

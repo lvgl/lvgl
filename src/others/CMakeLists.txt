@@ -12,7 +12,7 @@ if(CONFIG_LV_USE_GRIDNAV)
 	list(APPEND SUBDIRS gridnav)
 endif()
 
-if(CONFIG_LV_USE_IME)
+if(CONFIG_LV_USE_IME_PINYIN)
 	list(APPEND SUBDIRS ime)
 endif()
 
@@ -48,19 +48,10 @@ if(CONFIG_LV_USE_XML)
 	list(APPEND SUBDIRS xml)
 endif()
 
-if(CONFIG_LV_USE_CMAKELISTS.TXT)
-	list(APPEND SUBDIRS CMakeLists.txt)
-endif()
-
-if(CONFIG_LV_USE_MAIN.PY)
-	list(APPEND SUBDIRS main.py)
-endif()
-
-
-add_library(lvgl_others INTERFACE)
 
 # Add each subdirectory and link its library
 foreach(subdir ${SUBDIRS})
-    add_subdirectory(${subdir})
-    target_link_libraries(lvgl_others INTERFACE ${subdir})
+	add_subdirectory(${subdir})
+	# Hacky way to append target objs directly to the parent library
+	target_sources(lvgl PRIVATE $<TARGET_OBJECTS:lvgl_others_${subdir}>)
 endforeach()

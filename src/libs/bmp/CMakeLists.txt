@@ -2,7 +2,7 @@ set(LVGL_LIBS_BMP_SOURCES
     lv_bmp.c
 )
 
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_libs_bmp OBJECT ${LVGL_LIBS_BMP_SOURCES})
 
 # Add the current directory as an include directory

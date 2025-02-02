@@ -36,8 +36,8 @@ if(CONFIG_LV_USE_FS_WIN32)
     list(APPEND SOURCE_FILES lv_fs_win32.c)
 endif()
 
-if(NOT ${SOURCE_FILES} STREQUAL "")
-    # Create the main static library for this directory
+if(NOT "${SOURCE_FILES}" STREQUAL "")
+    # Create the object library for this directory
     add_library(lvgl_libs_fsdrv OBJECT ${SOURCE_FILES})
     
     # Add the current directory as an include directory

@@ -1,6 +1,6 @@
 set(SOURCE_FILES lv_wayland_smm.c
 lv_wayland.c)
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_drivers_wayland OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory

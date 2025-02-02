@@ -2,7 +2,7 @@ set(SOURCE_FILES
     lv_mem.c
 )
 
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_stdlib OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory
@@ -15,8 +15,12 @@ set(SUBDIRS
     rtthread
 )
 
+if(CONFIG_LV_USE_UEFI)
+    list(APPEND SUBDIRS uefi)
+endif()
+
 # Add each subdirectory and link its library to lvgl
 foreach(subdir ${SUBDIRS})
     add_subdirectory(${subdir})
-    target_link_libraries(lvgl_stdlib PRIVATE ${subdir})
+    target_link_libraries(lvgl_stdlib PRIVATE lvgl_stdlib_${subdir})
 endforeach()

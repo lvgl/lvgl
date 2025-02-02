@@ -15,8 +15,10 @@ if(CONFIG_LV_USE_BUILTIN_SPRINTF)
     list(APPEND SOURCE_FILES lv_sprintf_builtin.c)
 endif()
 
-# Create the main static library for this directory
-add_library(lvgl_stdlib_builtin OBJECT ${SOURCE_FILES})
-
-# Add the current directory as an include directory
-target_include_directories(lvgl_stdlib_builtin PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+if(NOT "${SOURCE_FILES}" STREQUAL "")
+    # Create the object library for this directory
+    add_library(lvgl_stdlib_builtin OBJECT ${SOURCE_FILES})
+    
+    # Add the current directory as an include directory
+    target_include_directories(lvgl_stdlib_builtin PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+endif()

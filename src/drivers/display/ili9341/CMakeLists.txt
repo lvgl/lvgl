@@ -1,8 +1,15 @@
+set(SOURCE_FILES)
 if(CONFIG_LV_USE_ILI9341)
-	set(SOURCE_FILES lv_ili9341.c)
-	# Create the main static library for this directory
-	add_library(lvgl_drivers_display_ili9341 OBJECT ${SOURCE_FILES})
-	
-	# Add the current directory as an include directory
-	target_include_directories(lvgl_drivers_display_ili9341 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+	list(APPEND SOURCE_FILES lv_ili9341.c)
 endif()
+
+if(NOT SOURCE_FILES)
+	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/empty.c "")
+	list(APPEND SOURCE_FILES ${CMAKE_CURRENT_BINARY_DIR}/empty.c)
+endif()
+
+# Create the object library for this directory
+add_library(lvgl_drivers_display_ili9341 OBJECT ${SOURCE_FILES})
+
+# Add the current directory as an include directory
+target_include_directories(lvgl_drivers_display_ili9341 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

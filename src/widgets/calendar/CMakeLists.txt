@@ -12,7 +12,7 @@ if(CONFIG_LV_USE_CALENDAR_HEADER_DROPDOWN)
 	list(APPEND SUBDIRS lv_calendar_header_dropwdown.c)
 endif()
 
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_widget_calendar OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory

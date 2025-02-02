@@ -2,7 +2,7 @@ set(LVGL_LAYOUT_FLEX_SOURCES
     lv_flex.c
 )
 
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_layout_flex OBJECT ${LVGL_LAYOUT_FLEX_SOURCES})
 
 # Add the current directory as an include directory

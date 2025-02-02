@@ -13,7 +13,7 @@ set(SOURCE_FILES
 	lv_draw_vglite_line.c
 	lv_draw_vglite_triangle.c
 	lv_vglite_utils.c)
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_draw_nxp_vglite OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory

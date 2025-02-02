@@ -121,8 +121,8 @@ if(CONFIG_LV_FONT_FMT_TXT)
 endif()
 
 
-# Create the main static library for this directory
-add_library(lvgl_fonts OBJECT ${SOURCE_FILES})
+# Create the object library for this directory
+add_library(lvgl_font OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory
-target_include_directories(lvgl_fonts PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(lvgl_font PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

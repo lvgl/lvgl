@@ -1,6 +1,6 @@
 set(SOURCE_FILES lv_theme_mono.c)
 
-# Create the main static library for this directory
+# Create the object library for this directory
 add_library(lvgl_theme_mono OBJECT ${SOURCE_FILES})
 
 # Add the current directory as an include directory
