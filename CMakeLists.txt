@@ -22,21 +22,23 @@ elseif(MICROPY_DIR)
 else()
   include(cmake/top.cmake)
   add_subdirectory(libs)
-endif()
   add_subdirectory(src)
-file(GLOB_RECURSE DEMO_SOURCES ${LVGL_ROOT_DIR}/demos/*.c)
-    add_library(lvgl_demos ${DEMO_SOURCES})
-    add_library(lvgl::demos ALIAS lvgl_demos)
+  add_subdirectory(demos)
+  add_subdirectory(examples)
 
-file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
+
+    file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
     add_library(lvgl_examples ${EXAMPLE_SOURCES})
     add_library(lvgl::examples ALIAS lvgl_examples)
 
     target_include_directories(lvgl_examples SYSTEM PUBLIC ${LVGL_ROOT_DIR}/examples)
     target_link_libraries(lvgl_examples PUBLIC lvgl)
 
+  if(CONFIG_LV_USE_DEMOS)
     target_include_directories(lvgl_demos SYSTEM PUBLIC ${LVGL_ROOT_DIR}/demos)
     target_link_libraries(lvgl_demos PUBLIC lvgl)
+  endif()
+endif()
 
 #[[
     unfortunately CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS does not work for global data. 
