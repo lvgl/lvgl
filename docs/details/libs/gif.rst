@@ -4,7 +4,7 @@
 GIF Decoder
 ===========
 
-GIF Decoder is an LVGL extension that enables you to use GIF images in your LVGL UI.
+**GIF Decoder** is an LVGL extension that enables you to use GIF images in your LVGL UI.
 
 For a detailed introduction, see:  https://github.com/lecram/gifdec .
 
