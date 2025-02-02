@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_linux_fbdev.h"
-/*#if LV_USE_LINUX_FBDEV*/
+#if LV_USE_LINUX_FBDEV
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -18,9 +18,6 @@
 #include <sys/ioctl.h>
 #include <time.h>
 
-#define LV_LINUX_FBDEV_RENDER_MODE 1
-#define LV_LINUX_FBDEV_BUFFER_SIZE 1000
-#define LV_LINUX_FBDEV_BUFFER_COUNT 2
 #if LV_LINUX_FBDEV_BSD
     #include <sys/fcntl.h>
     #include <sys/consio.h>
@@ -359,4 +356,4 @@ static uint32_t tick_get_cb(void)
     return time_ms;
 }
 
-//#endif /*LV_USE_LINUX_FBDEV*/
+#endif /*LV_USE_LINUX_FBDEV*/
