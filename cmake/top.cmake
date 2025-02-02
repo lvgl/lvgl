@@ -1,6 +1,6 @@
 set(PROJECT_ROOT ${CMAKE_SOURCE_DIR})
 set(KCONFIG_ROOT ${CMAKE_SOURCE_DIR}/Kconfig)
-set(AUTOCONF_H ${CMAKE_CURRENT_BINARY_DIR}/kconfig/include/generated/autoconf.h)
+set(AUTOCONF_H ${CMAKE_CURRENT_BINARY_DIR}/autoconf.h)
 set(DOTCONFIG ${CMAKE_SOURCE_DIR}/.config)
 
 # Re-configure (Re-execute all CMakeLists.txt code) when autoconf.h changes
