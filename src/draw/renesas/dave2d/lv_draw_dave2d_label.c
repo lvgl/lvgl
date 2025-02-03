@@ -4,22 +4,20 @@
 #include "../../lv_draw_label_private.h"
 #include "../../../misc/lv_area_private.h"
 
-static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * glyph_draw_dsc,
+static void lv_draw_dave2d_draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                                           lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area);
 
 static lv_draw_dave2d_unit_t * unit = NULL;
 
-void lv_draw_dave2d_label(lv_draw_dave2d_unit_t * u, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_dave2d_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    unit = u;
-
-    lv_draw_label_iterate_characters(&u->base_unit, dsc, coords, lv_draw_dave2d_draw_letter_cb);
+    lv_draw_label_iterate_characters(t, dsc, coords, lv_draw_dave2d_draw_letter_cb);
 
 }
 
-static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_t * glyph_draw_dsc,
+static void lv_draw_dave2d_draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                                           lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area)
 {
 
@@ -31,13 +29,14 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
     int32_t y;
 
     letter_coords = *glyph_draw_dsc->letter_coords;
+    lv_draw_vg_lite_unit_t * unit = (lv_draw_vg_lite_unit_t *)t->draw_unit;
 
     bool is_common;
-    is_common = lv_area_intersect(&clip_area, glyph_draw_dsc->letter_coords, u->clip_area);
+    is_common = lv_area_intersect(&clip_area, glyph_draw_dsc->letter_coords, &t->clip_area);
     if(!is_common) return;
 
-    x = 0 - unit->base_unit.target_layer->buf_area.x1;
-    y = 0 - unit->base_unit.target_layer->buf_area.y1;
+    x = 0 - t->target_layer->buf_area.x1;
+    y = 0 - t->target_layer->buf_area.y1;
 
     lv_area_move(&clip_area, x, y);
     lv_area_move(&letter_coords, x, y);
@@ -56,7 +55,7 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
     // Generate render operations
     //
 
-    d2_framebuffer_from_layer(unit->d2_handle, unit->base_unit.target_layer);
+    d2_framebuffer_from_layer(unit->d2_handle, t->target_layer);
 
     current_fillmode = d2_getfillmode(unit->d2_handle);
 
@@ -74,7 +73,7 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
                     border_draw_dsc.color = glyph_draw_dsc->color;
                     border_draw_dsc.width = 1;
                     //lv_draw_sw_border(u, &border_draw_dsc, glyph_draw_dsc->bg_coords);
-                    lv_draw_dave2d_border(unit, &border_draw_dsc, glyph_draw_dsc->bg_coords);
+                    lv_draw_dave2d_border(t, &border_draw_dsc, glyph_draw_dsc->bg_coords);
 #endif
                 }
                 break;
@@ -134,7 +133,7 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
                     img_dsc.scale_y = LV_SCALE_NONE;
                     img_dsc.opa = glyph_draw_dsc->opa;
                     img_dsc.src = glyph_draw_dsc->glyph_data;
-                    //lv_draw_sw_image(draw_unit, &img_dsc, glyph_draw_dsc->letter_coords);
+                    //lv_draw_sw_image(t, &img_dsc, glyph_draw_dsc->letter_coords);
 #endif
                 }
                 break;
@@ -153,7 +152,7 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_unit_t * u, lv_draw_glyph_dsc_
 
     if(fill_draw_dsc && fill_area) {
         //lv_draw_sw_fill(u, fill_draw_dsc, fill_area);
-        lv_draw_dave2d_fill(unit, fill_draw_dsc, fill_area);
+        lv_draw_dave2d_fill(t, fill_draw_dsc, fill_area);
     }
 
 #if LV_USE_OS

@@ -1041,6 +1041,12 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
             uint32_t i;
             for(i = 0; i < item_cnt; i++) {
                 lv_snippet_t * pinfo = lv_get_snippet(i);
+                if(ellipsis_valid && i == item_cnt - 1) {
+                    uint32_t n_ofs = 0;
+                    lv_text_get_snippet(pinfo->txt, pinfo->font, pinfo->letter_space, max_width - txts_w,
+                                        LV_TEXT_FLAG_BREAK_ALL, &pinfo->txt_w, &n_ofs);
+                    pinfo->bytes = n_ofs;
+                }
                 txts_w = txts_w + pinfo->txt_w;
             }
             txts_w -= lv_get_snippet(item_cnt - 1)->letter_space;

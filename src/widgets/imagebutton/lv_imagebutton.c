@@ -205,6 +205,7 @@ static void draw_main(lv_event_t * e)
 
     lv_draw_image_dsc_t img_dsc;
     lv_draw_image_dsc_init(&img_dsc);
+    img_dsc.base.layer = layer;
     lv_obj_init_draw_image_dsc(obj, LV_PART_MAIN, &img_dsc);
 
     lv_area_t coords_part;

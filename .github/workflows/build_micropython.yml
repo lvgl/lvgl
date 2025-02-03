@@ -4,6 +4,12 @@ on:
   push:
   pull_request:
 
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+# Ensure that only one commit will be running tests at a time on each PR
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }} 
+  cancel-in-progress: true
+
 jobs:
   build:
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
@@ -53,7 +59,7 @@ jobs:
     # STM32 & RPi Pico port
     - name: arm-none-eabi-gcc
       if: matrix.port == 'stm32' || matrix.port == 'rp2'
-      uses: carlosperate/arm-none-eabi-gcc-action@v1.9.1
+      uses: carlosperate/arm-none-eabi-gcc-action@v1.10.0
       with:
         release: '9-2019-q4' # The arm-none-eabi-gcc release to use.
     - name: Build STM32 port

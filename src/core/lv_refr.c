@@ -761,9 +761,7 @@ static void refr_configured_layer(lv_layer_t * layer)
 {
     LV_PROFILER_REFR_BEGIN;
 
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-    lv_matrix_identity(&layer->matrix);
-#endif
+    lv_layer_reset(layer);
 
     /* In single buffered mode wait here until the buffer is freed.
      * Else we would draw into the buffer while it's still being transferred to the display*/
@@ -832,6 +830,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
     if(lv_area_is_in(area_p, &obj->coords, 0) == false) return NULL;
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return NULL;
     if(lv_obj_get_layer_type(obj) != LV_LAYER_TYPE_NONE) return NULL;
+    if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) return NULL;
 
     /*If this object is fully cover the draw area then check the children too*/
     lv_cover_check_info_t info;
@@ -1100,8 +1099,17 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 {
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
 
-    lv_opa_t opa = lv_obj_get_style_opa_layered(obj, 0);
-    if(opa < LV_OPA_MIN) return;
+    /*If `opa_layered != LV_OPA_COVER` draw the widget on a new layer and blend that layer with the given opacity.*/
+    const lv_opa_t opa_layered = lv_obj_get_style_opa_layered(obj, LV_PART_MAIN);
+    if(opa_layered < LV_OPA_MIN) return;
+
+    const lv_opa_t layer_opa_ori = layer->opa;
+
+    /*Normal `opa` (not layered) will just scale down `bg_opa`, `text_opa`, etc, in the upcoming drawings.*/
+    const lv_opa_t opa_main = lv_obj_get_style_opa(obj, LV_PART_MAIN);
+    if(opa_main < LV_OPA_MAX) {
+        layer->opa = LV_OPA_MIX2(layer_opa_ori, opa_main);
+    }
 
     lv_layer_type_t layer_type = lv_obj_get_layer_type(obj);
     if(layer_type == LV_LAYER_TYPE_NONE) {
@@ -1109,7 +1117,7 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
     }
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     /*If the layer opa is full then use the matrix transform*/
-    else if(opa >= LV_OPA_MAX && !refr_check_obj_clip_overflow(layer, obj)) {
+    else if(opa_layered >= LV_OPA_MAX && !refr_check_obj_clip_overflow(layer, obj)) {
         refr_obj_matrix(layer, obj);
     }
 #endif /* LV_DRAW_TRANSFORM_USE_MATRIX */
@@ -1170,7 +1178,7 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
             layer_draw_dsc.pivot.x = obj->coords.x1 + pivot.x - new_layer->buf_area.x1;
             layer_draw_dsc.pivot.y = obj->coords.y1 + pivot.y - new_layer->buf_area.y1;
 
-            layer_draw_dsc.opa = opa;
+            layer_draw_dsc.opa = opa_layered;
             layer_draw_dsc.rotation = lv_obj_get_style_transform_rotation(obj, 0);
             while(layer_draw_dsc.rotation > 3600) layer_draw_dsc.rotation -= 3600;
             while(layer_draw_dsc.rotation < 0) layer_draw_dsc.rotation += 3600;
@@ -1189,6 +1197,9 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
             layer_area_act.y1 = layer_area_act.y2 + 1;
         }
     }
+
+    /* Restore the original layer opa */
+    layer->opa = layer_opa_ori;
 }
 
 static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)

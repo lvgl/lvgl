@@ -25,10 +25,11 @@ There are also some Python specific libraries that need to be installed. You can
 * sphinxcontrib-jsmath
 * sphinxcontrib-qthelp
 * sphinxcontrib-serializinghtml
-* sphinxcontrib-mermaid
+* sphinxcontrib-mermaid==0.9.2
 * sphinx-design
 * sphinx-rtd-dark-mode
 * typing-extensions
+* sphinx-reredirects
 * dirsync
 
 To install using the `requirements.txt` file use the following command:

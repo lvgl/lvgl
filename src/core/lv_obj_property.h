@@ -88,13 +88,13 @@ struct _lv_property_name_t {
 typedef struct {
     lv_prop_id_t id;
     union {
-        int32_t num;                /**< Number integer number (opacity, enums, booleans or "normal" numbers)*/
-        uint32_t num_u;
-        bool enable;                /**< booleans*/
-        const void * ptr;           /**< Constant pointers  (font, cone text, etc)*/
-        lv_color_t color;           /**< Colors*/
-        lv_value_precise_t precise; /**< float or int for precise value*/
-        lv_point_t point;           /**< Point, contains two int32_t.*/
+        int32_t num;                /**< Signed integer number (enums or "normal" numbers)*/
+        uint32_t num_u;             /**< Unsigned integer number (opacity, Booleans)  */
+        bool enable;                /**< Booleans */
+        const void * ptr;           /**< Constant pointers  (font, cone text, etc.) */
+        lv_color_t color;           /**< Colors */
+        lv_value_precise_t precise; /**< float or int for precise value */
+        lv_point_t point;           /**< Point, contains two int32_t */
 
         struct {
             /**
@@ -122,7 +122,7 @@ typedef struct {
         };
 
         /**
-         * For some property like slider range, it contains two simple(4byte) value
+         * For some properties like slider range, it contains two simple (4-byte) values
          * so we can use `arg1.num` and `arg2.num` to set the argument.
          */
         struct {
@@ -154,19 +154,19 @@ typedef struct {
  *====================*/
 
 /**
- * Set widget property.
- * @param obj       pointer to an object
- * @param value     The property value to set
- * @return          return LV_RESULT_OK if success
+ * Set Widget property.
+ * @param obj       pointer to Widget
+ * @param value     property value to set
+ * @return          return LV_RESULT_OK if call succeeded
  */
 lv_result_t lv_obj_set_property(lv_obj_t * obj, const lv_property_t * value);
 
 /**
- * Set multiple widget properties. Helper `LV_OBJ_SET_PROPERTY_ARRAY` can be used for constant property array.
- * @param obj       pointer to an object
- * @param value     The property value array to set
- * @param count     The count of the property value array
- * @return          return LV_RESULT_OK if success
+ * Set multiple Widget properties. Helper `LV_OBJ_SET_PROPERTY_ARRAY` can be used for constant property array.
+ * @param obj       pointer to Widget
+ * @param value     property value array to set
+ * @param count     number of array elements
+ * @return          return LV_RESULT_OK if call succeeded
  */
 lv_result_t lv_obj_set_properties(lv_obj_t * obj, const lv_property_t * value, uint32_t count);
 
@@ -175,41 +175,44 @@ lv_result_t lv_obj_set_properties(lv_obj_t * obj, const lv_property_t * value, u
  *====================*/
 
 /**
- * Read property value from object.
- * If id is a style property, the style selector is default to 0.
- * @param obj       pointer to an object
- * @param id        ID of which property to read
- * @return          return the property value read. The returned property ID is set to `LV_PROPERTY_ID_INVALID` if failed.
+ * Read property value from Widget.
+ * If id is a style property.  Style selector is 0 by default.
+ * @param obj       pointer to Widget
+ * @param id        ID of property to read
+ * @return          return property value read. The returned property ID is set to `LV_PROPERTY_ID_INVALID` if read failed.
  */
 lv_property_t lv_obj_get_property(lv_obj_t * obj, lv_prop_id_t id);
 
 /**
- * Read a style property value from object
- * @param obj       pointer to an object
+ * Read style property value from Widget
+ * @param obj       pointer to Widget
  * @param id        ID of style property
- * @param selector  selector for the style property.
- * @return          return the property value read. The returned property ID is set to `LV_PROPERTY_ID_INVALID` if failed.
+ * @param selector  selector for style property
+ * @return          return property value read. The returned property ID is set to `LV_PROPERTY_ID_INVALID` if read failed.
  */
 lv_property_t lv_obj_get_style_property(lv_obj_t * obj, lv_prop_id_t id, uint32_t selector);
 
 /**
- * Get the property ID by name recursively to base classes. Requires to enable `LV_USE_OBJ_PROPERTY_NAME`.
- * @param obj       pointer to an object that has specified property or base class has.
+ * Get property ID by recursively searching for name in Widget's class hierarchy, and
+ * if still not found, then search style properties.
+ * Requires to enabling `LV_USE_OBJ_PROPERTY_NAME`.
+ * @param obj       pointer to Widget whose class and base-class hierarchy are to be searched.
  * @param name      property name
  * @return          property ID found or `LV_PROPERTY_ID_INVALID` if not found.
  */
 lv_prop_id_t lv_obj_property_get_id(const lv_obj_t * obj, const char * name);
 
 /**
- * Get the property ID by name without check base class recursively. Requires to enable `LV_USE_OBJ_PROPERTY_NAME`.
- * @param clz       pointer to an object class that has specified property or base class has.
+ * Get property ID by doing a non-recursive search for name directly in Widget class properties.
+ * Requires enabling `LV_USE_OBJ_PROPERTY_NAME`.
+ * @param clz       pointer to Widget class that has specified property.
  * @param name      property name
  * @return          property ID found or `LV_PROPERTY_ID_INVALID` if not found.
  */
 lv_prop_id_t lv_obj_class_property_get_id(const lv_obj_class_t * clz, const char * name);
 
 /**
- * Get the style property ID by name. Requires to enable `LV_USE_OBJ_PROPERTY_NAME`.
+ * Get style property ID by name. Requires enabling `LV_USE_OBJ_PROPERTY_NAME`.
  * @param name      property name
  * @return          property ID found or `LV_PROPERTY_ID_INVALID` if not found.
  */

@@ -96,7 +96,7 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc,
+void lv_draw_vglite_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc,
                         const lv_area_t * coords)
 {
     LV_UNUSED(coords);
@@ -108,11 +108,11 @@ void lv_draw_vglite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * ds
     if(dsc->start_angle == dsc->end_angle)
         return;
 
-    lv_layer_t * layer = draw_unit->target_layer;
+    lv_layer_t * layer = t->target_layer;
     lv_point_t center = {dsc->center.x - layer->buf_area.x1, dsc->center.y - layer->buf_area.y1};
 
     lv_area_t clip_area;
-    lv_area_copy(&clip_area, draw_unit->clip_area);
+    lv_area_copy(&clip_area, &t->clip_area);
     lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     _vglite_draw_arc(&center, &clip_area, dsc);
@@ -672,11 +672,8 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
     lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
 
-    vg_lite_matrix_t matrix;
-    vg_lite_identity(&matrix);
-
     /*** Draw arc ***/
-    VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol));
+    VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
 
     vglite_run();
 

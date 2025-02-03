@@ -38,10 +38,11 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*callback)(void *), size_t stack_size,
+lv_result_t lv_thread_init(lv_thread_t * thread, const char * const name, lv_thread_prio_t prio,
+                           void (*callback)(void *), size_t stack_size,
                            void * user_data)
 {
-    thread->thread = rt_thread_create("thread",
+    thread->thread = rt_thread_create(name,
                                       callback,
                                       user_data,
                                       stack_size,

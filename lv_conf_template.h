@@ -180,6 +180,10 @@
     #define LV_DRAW_SW_SUPPORT_A8           1
     #define LV_DRAW_SW_SUPPORT_I1           1
 
+    /* The threshold of the luminance to consider a pixel as
+     * active in indexed color format */
+    #define LV_DRAW_SW_I1_LUM_THRESHOLD 127
+
     /** Set number of draw units.
      *  - > 1 requires operating system to be enabled in `LV_USE_OS`.
      *  - > 1 means multiple threads will render the screen in parallel. */
@@ -1181,6 +1185,15 @@
 /** Driver for /dev/dri/card */
 #define LV_USE_LINUX_DRM        0
 
+#if LV_USE_LINUX_DRM
+
+    /* Use the MESA GBM library to allocate DMA buffers that can be
+     * shared across sub-systems and libraries using the Linux DMA-BUF API.
+     * The GBM library aims to provide a platform independent memory management system
+     * it supports the major GPU vendors - This option requires linking with libgbm */
+    #define LV_LINUX_DRM_GBM_BUFFERS 0
+#endif
+
 /** Interface for TFT_eSPI */
 #define LV_USE_TFT_ESPI         0
 
@@ -1301,6 +1314,9 @@
 
 /** High-resolution demo */
 #define LV_USE_DEMO_HIGH_RES        0
+
+/* Smart watch demo */
+#define LV_USE_DEMO_SMARTWATCH      0
 
 /*--END OF LV_CONF_H--*/
 

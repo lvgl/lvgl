@@ -4,6 +4,13 @@ on:
     branches:
     - master
     - 'release/*'
+
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+# Ensure that only one commit will be running tests at a time on each PR
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }} 
+  cancel-in-progress: true
+
 env:
   EM_VERSION: 2.0.4
   EM_CACHE_FOLDER: 'emsdk-cache'
@@ -65,7 +72,7 @@ jobs:
           echo "::set-output name=VERSION_NAME::$(scripts/find_version.sh)"
         id: version
       - name: Deploy to subfolder
-        uses: JamesIves/github-pages-deploy-action@v4.7.1
+        uses: JamesIves/github-pages-deploy-action@v4.7.2
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
           repository-name: lvgl/docs
@@ -77,7 +84,7 @@ jobs:
           single-commit: true
       - name: Deploy to master
         if: github.ref == 'refs/heads/master'
-        uses: JamesIves/github-pages-deploy-action@v4.7.1
+        uses: JamesIves/github-pages-deploy-action@v4.7.2
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
           repository-name: lvgl/docs

@@ -73,6 +73,9 @@
 #if LV_USE_UEFI
     #include "drivers/uefi/lv_uefi_context.h"
 #endif
+#if LV_USE_EVDEV
+    #include "drivers/evdev/lv_evdev_private.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -397,6 +400,10 @@ void lv_deinit(void)
     lv_display_set_default(NULL);
 
     lv_cleanup_devices(LV_GLOBAL_DEFAULT());
+
+#if LV_USE_EVDEV
+    lv_evdev_deinit();
+#endif
 
 #if LV_USE_SPAN != 0
     lv_span_stack_deinit();

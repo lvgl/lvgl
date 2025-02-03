@@ -34,10 +34,12 @@
 static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check);
 static void lv_cleanup_task(lv_draw_task_t * t, lv_display_t * disp);
 
+#if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
 static inline uint32_t get_layer_size_kb(uint32_t size_byte)
 {
     return (size_byte + 1023) >> 10;
 }
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -80,8 +82,11 @@ void * lv_draw_create_unit(size_t size)
     lv_draw_unit_t * new_unit = lv_malloc_zeroed(size);
     LV_ASSERT_MALLOC(new_unit);
     new_unit->next = _draw_info.unit_head;
+
     _draw_info.unit_head = new_unit;
     _draw_info.unit_cnt++;
+
+    new_unit->idx = _draw_info.unit_cnt;
 
     return new_unit;
 }
@@ -93,6 +98,7 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
     LV_ASSERT_MALLOC(new_task);
     new_task->area = *coords;
     new_task->_real_area = *coords;
+    new_task->target_layer = layer;
     new_task->clip_area = layer->_clip_area;
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     new_task->matrix = layer->matrix;
@@ -385,6 +391,22 @@ uint32_t lv_draw_get_dependent_count(lv_draw_task_t * t_check)
     return cnt;
 }
 
+void lv_layer_init(lv_layer_t * layer)
+{
+    LV_ASSERT_NULL(layer);
+    lv_memzero(layer, sizeof(lv_layer_t));
+    lv_layer_reset(layer);
+}
+
+void lv_layer_reset(lv_layer_t * layer)
+{
+    LV_ASSERT_NULL(layer);
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    lv_matrix_identity(&layer->matrix);
+#endif
+    layer->opa = LV_OPA_COVER;
+}
+
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
 {
     LV_PROFILER_DRAW_BEGIN;
@@ -397,6 +419,11 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
 
     lv_draw_layer_init(new_layer, parent_layer, color_format, area);
 
+    /*Inherits transparency from parent*/
+    if(parent_layer) {
+        new_layer->opa = parent_layer->opa;
+    }
+
     LV_PROFILER_DRAW_END;
     return new_layer;
 }
@@ -405,8 +432,7 @@ void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_
                         const lv_area_t * area)
 {
     LV_PROFILER_DRAW_BEGIN;
-    LV_ASSERT_NULL(layer);
-    lv_memzero(layer, sizeof(lv_layer_t));
+    lv_layer_init(layer);
     lv_display_t * disp = lv_refr_get_disp_refreshing();
 
     layer->parent = parent_layer;
@@ -414,10 +440,6 @@ void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_
     layer->buf_area = *area;
     layer->phy_clip_area = *area;
     layer->color_format = color_format;
-
-#if LV_DRAW_TRANSFORM_USE_MATRIX
-    lv_matrix_identity(&layer->matrix);
-#endif
 
     if(disp->layer_init) disp->layer_init(disp, layer);
 

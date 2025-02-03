@@ -693,7 +693,9 @@ static void draw_main(lv_event_t * e)
     obj->state = LV_STATE_DEFAULT;
     obj->skip_trans = 1;
     lv_draw_rect_dsc_init(&draw_rect_dsc_def);
+    draw_rect_dsc_def.base.layer = layer;
     lv_draw_label_dsc_init(&draw_label_dsc_def);
+    draw_label_dsc_def.base.layer = layer;
     lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &draw_rect_dsc_def);
     lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &draw_label_dsc_def);
     obj->skip_trans = 0;
@@ -746,7 +748,9 @@ static void draw_main(lv_event_t * e)
             obj->state = btn_state;
             obj->skip_trans = 1;
             lv_draw_rect_dsc_init(&draw_rect_dsc_act);
+            draw_rect_dsc_act.base.layer = layer;
             lv_draw_label_dsc_init(&draw_label_dsc_act);
+            draw_label_dsc_act.base.layer = layer;
             lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &draw_rect_dsc_act);
             lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &draw_label_dsc_act);
             obj->state = state_ori;

@@ -40,7 +40,6 @@ struct _lv_draw_sw_unit_t {
     volatile bool inited;
     volatile bool exit_status;
 #endif
-    uint32_t idx;
 };
 
 #if LV_DRAW_SW_SHADOW_CACHE_SIZE

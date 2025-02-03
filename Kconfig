@@ -269,6 +269,12 @@ menu "LVGL configuration"
 			default y
 			depends on LV_USE_DRAW_SW
 
+		config LV_DRAW_SW_I1_LUM_THRESHOLD
+			int "Luminance threshold for a pixel to be active"
+			default 127
+			range 0 254
+			depends on LV_DRAW_SW_SUPPORT_I1
+
 		config LV_DRAW_SW_DRAW_UNIT_CNT
 			int "Number of draw units"
 			default 1
@@ -2052,6 +2058,12 @@ menu "LVGL configuration"
 			bool "vector graphic demo"
 			default n
 			depends on LV_USE_VECTOR_GRAPHIC
+		config LV_USE_DEMO_SMARTWATCH
+			bool "Smartwatch demo"
+		config LV_USE_DEMO_EBIKE
+			bool "Ebike demo"
+		config LV_USE_DEMO_HIGH_RES
+			bool "High resolution demo"
 	endmenu
 
 endmenu

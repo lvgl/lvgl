@@ -41,9 +41,9 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void _draw_nema_gfx_tile(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+static void _draw_nema_gfx_tile(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
-static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
+static void _draw_nema_gfx_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords);
 
 static uint32_t lv_nemagfx_mask_cf_to_nema(lv_color_format_t cf);
 
@@ -51,7 +51,7 @@ static uint32_t lv_nemagfx_mask_cf_to_nema(lv_color_format_t cf);
  *  STATIC FUNCTIONS
  **********************/
 
-static void _draw_nema_gfx_tile(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+static void _draw_nema_gfx_tile(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
 
     lv_image_decoder_dsc_t decoder_dsc;
@@ -76,11 +76,11 @@ static void _draw_nema_gfx_tile(lv_draw_unit_t * draw_unit, const lv_draw_image_
 
     int32_t tile_x_start = tile_area.x1;
 
-    while(tile_area.y1 <= draw_unit->clip_area->y2) {
-        while(tile_area.x1 <= draw_unit->clip_area->x2) {
+    while(tile_area.y1 <= t->clip_area->y2) {
+        while(tile_area.x1 <= t->clip_area->x2) {
 
             lv_area_t clipped_img_area;
-            if(lv_area_intersect(&clipped_img_area, &tile_area, draw_unit->clip_area)) {
+            if(lv_area_intersect(&clipped_img_area, &tile_area, &t->clip_area)) {
                 _draw_nema_gfx_img(draw_unit, dsc, &tile_area);
             }
 
@@ -97,24 +97,24 @@ static void _draw_nema_gfx_tile(lv_draw_unit_t * draw_unit, const lv_draw_image_
     lv_image_decoder_close(&decoder_dsc);
 }
 
-static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+static void _draw_nema_gfx_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)draw_unit;
+    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)t->draw_unit;
 
-    lv_layer_t * layer = draw_unit->target_layer;
+    lv_layer_t * layer = t->target_layer;
     const lv_image_dsc_t * img_dsc = dsc->src;
 
     bool masked = dsc->bitmap_mask_src != NULL;
 
     lv_area_t blend_area;
     /*Let's get the blend area which is the intersection of the area to fill and the clip area.*/
-    if(!lv_area_intersect(&blend_area, coords, draw_unit->clip_area))
+    if(!lv_area_intersect(&blend_area, coords, &t->clip_area))
         return; /*Fully clipped, nothing to do*/
 
     lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, draw_unit->clip_area);
+    lv_area_copy(&rel_clip_area, &t->clip_area);
     lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     bool has_transform = (dsc->rotation != 0 || dsc->scale_x != LV_SCALE_NONE || dsc->scale_y != LV_SCALE_NONE);
@@ -262,14 +262,14 @@ static uint32_t lv_nemagfx_mask_cf_to_nema(lv_color_format_t cf)
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_nema_gfx_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
 
     if(!dsc->tile) {
-        _draw_nema_gfx_img(draw_unit, dsc, coords);
+        _draw_nema_gfx_img(t, dsc, coords);
     }
     else {
-        _draw_nema_gfx_tile(draw_unit, dsc, coords);
+        _draw_nema_gfx_tile(t, dsc, coords);
     }
 
 }

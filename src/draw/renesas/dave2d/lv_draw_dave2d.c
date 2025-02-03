@@ -99,7 +99,8 @@ void lv_draw_dave2d_init(void)
     lv_ll_init(&_ll_Dave2D_Tasks, 4);
 
 #if LV_USE_OS
-    lv_thread_init(&draw_dave2d_unit->thread, LV_THREAD_PRIO_HIGH, _dave2d_render_thread_cb, 8 * 1024, draw_dave2d_unit);
+    lv_thread_init(&draw_dave2d_unit->thread, "dave2d", LV_THREAD_PRIO_HIGH, _dave2d_render_thread_cb, 8 * 1024,
+                   draw_dave2d_unit);
 #endif
 
 }
@@ -250,7 +251,7 @@ static int32_t _dave2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_image_dsc_t * dsc = t->draw_dsc;
-                if(dsc->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START) {
+                if((dsc->header.cf >= LV_COLOR_FORMAT_PROPRIETARY_START) || (dsc->header.cf == LV_COLOR_FORMAT_RGB888)) {
                     ret = 0;
                     break;
                 }
@@ -396,8 +397,6 @@ static int32_t lv_draw_dave2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
 #endif
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    draw_dave2d_unit->base_unit.target_layer = layer;
-    draw_dave2d_unit->base_unit.clip_area = &t->clip_area;
     draw_dave2d_unit->task_act = t;
 
 #if LV_USE_OS
@@ -448,14 +447,17 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
     /*Render the draw task*/
     lv_draw_task_t * t = u->task_act;
 
+    /* remember draw unit for access to unit's context */
+    t->draw_unit = (lv_draw_unit_t *)u;
+
 #if defined(RENESAS_CORTEX_M85)
 #if (BSP_CFG_DCACHE_ENABLED)
-    lv_layer_t * layer = u->base_unit.target_layer;
+    lv_layer_t * layer = t->target_layer;
     lv_area_t clipped_area;
     int32_t x;
     int32_t y;
 
-    lv_area_intersect(&clipped_area,  &t->area, u->base_unit.clip_area);
+    lv_area_intersect(&clipped_area,  &t->area, &t->clip_area);
 
     x = 0 - u->base_unit.target_layer->buf_area.x1;
     y = 0 - u->base_unit.target_layer->buf_area.y1;
@@ -469,39 +471,39 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_dave2d_fill(u, t->draw_dsc, &t->area);
+            lv_draw_dave2d_fill(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_BORDER:
-            lv_draw_dave2d_border(u, t->draw_dsc, &t->area);
+            lv_draw_dave2d_border(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
-            //lv_draw_dave2d_box_shadow(u, t->draw_dsc, &t->area);
+            //lv_draw_dave2d_box_shadow(t, t->draw_dsc, &t->area);
             break;
 #if 0
         case LV_DRAW_TASK_TYPE_BG_IMG:
-            //lv_draw_dave2d_bg_image(u, t->draw_dsc, &t->area);
+            //lv_draw_dave2d_bg_image(t, t->draw_dsc, &t->area);
             break;
 #endif
         case LV_DRAW_TASK_TYPE_LABEL:
-            lv_draw_dave2d_label(u, t->draw_dsc, &t->area);
+            lv_draw_dave2d_label(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_dave2d_image(u, t->draw_dsc, &t->area);
+            lv_draw_dave2d_image(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LINE:
-            lv_draw_dave2d_line(u, t->draw_dsc);
+            lv_draw_dave2d_line(t, t->draw_dsc);
             break;
         case LV_DRAW_TASK_TYPE_ARC:
-            lv_draw_dave2d_arc(u, t->draw_dsc, &t->area);
+            lv_draw_dave2d_arc(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_TRIANGLE:
-            lv_draw_dave2d_triangle(u, t->draw_dsc);
+            lv_draw_dave2d_triangle(t, t->draw_dsc);
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
-            //lv_draw_dave2d_layer(u, t->draw_dsc, &t->area);
+            //lv_draw_dave2d_layer(t, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
-            //lv_draw_dave2d_mask_rect(u, t->draw_dsc, &t->area);
+            //lv_draw_dave2d_mask_rect(t, t->draw_dsc, &t->area);
             break;
         default:
             break;

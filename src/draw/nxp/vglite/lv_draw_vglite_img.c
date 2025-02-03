@@ -125,13 +125,13 @@ static vg_lite_color_t _vglite_recolor(const lv_draw_image_dsc_t * dsc);
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc,
+void lv_draw_vglite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
                         const lv_area_t * coords)
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
-    lv_layer_t * layer = draw_unit->target_layer;
+    lv_layer_t * layer = t->target_layer;
     const lv_image_dsc_t * img_dsc = dsc->src;
 
     lv_area_t relative_coords;
@@ -139,7 +139,7 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
     lv_area_move(&relative_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t clip_area;
-    lv_area_copy(&clip_area, draw_unit->clip_area);
+    lv_area_copy(&clip_area, &t->clip_area);
     lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t blend_area;
@@ -389,10 +389,6 @@ static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * 
                                          (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
                                          ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
-    /* Path Matrix */
-    vg_lite_matrix_t path_matrix;
-    vg_lite_identity(&path_matrix);
-
     /* Pattern Image */
     vg_lite_buffer_t * src_vgbuf = vglite_get_src_buf();
     src_vgbuf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
@@ -413,7 +409,7 @@ static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * 
     vg_lite_filter_t filter = has_transform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
 
     /* Draw Pattern */
-    VGLITE_CHECK_ERROR(vg_lite_draw_pattern(dst_vgbuf, &path, VG_LITE_FILL_NON_ZERO, &path_matrix,
+    VGLITE_CHECK_ERROR(vg_lite_draw_pattern(dst_vgbuf, &path, VG_LITE_FILL_NON_ZERO, NULL,
                                             src_vgbuf, &vgmatrix, vgblend, VG_LITE_PATTERN_REPEAT,
                                             0, vgcol, filter));
 }

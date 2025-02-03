@@ -39,13 +39,13 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_draw_nema_gfx_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_nema_gfx_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)draw_unit;
+    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)t->draw_unit;
 
-    lv_layer_t * layer = draw_unit->target_layer;
+    lv_layer_t * layer = t->target_layer;
     lv_area_t rel_coords;
     lv_area_copy(&rel_coords, coords);
     lv_area_move(&rel_coords, -layer->buf_area.x1, -layer->buf_area.y1);

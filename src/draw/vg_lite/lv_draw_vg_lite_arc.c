@@ -51,14 +51,13 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-void lv_draw_vg_lite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc,
+void lv_draw_vg_lite_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc,
                          const lv_area_t * coords)
 {
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
 
     lv_area_t clip_area;
-    if(!lv_area_intersect(&clip_area, coords, draw_unit->clip_area)) {
+    if(!lv_area_intersect(&clip_area, coords, &t->clip_area)) {
         /*Fully clipped, nothing to do*/
         return;
     }

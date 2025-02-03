@@ -752,6 +752,7 @@ static void draw_image(lv_event_t * e)
         if(img->src_type == LV_IMAGE_SRC_FILE || img->src_type == LV_IMAGE_SRC_VARIABLE) {
             lv_draw_image_dsc_t draw_dsc;
             lv_draw_image_dsc_init(&draw_dsc);
+            draw_dsc.base.layer = layer;
             lv_obj_init_draw_image_dsc(obj, LV_PART_MAIN, &draw_dsc);
 
             lv_area_t clip_area_ori = layer->_clip_area;
@@ -798,6 +799,7 @@ static void draw_image(lv_event_t * e)
         else if(img->src_type == LV_IMAGE_SRC_SYMBOL) {
             lv_draw_label_dsc_t label_dsc;
             lv_draw_label_dsc_init(&label_dsc);
+            label_dsc.base.layer = layer;
             lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
             label_dsc.text = img->src;
             lv_draw_label(layer, &label_dsc, &obj->coords);

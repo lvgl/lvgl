@@ -1,0 +1,33 @@
+name: Port repo release update
+
+on:
+  push:
+    branches:
+      - 'release/v*' # on release branches
+  workflow_dispatch: # allow manual triggering
+
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+# Ensure that only one commit will be running tests at a time on each push
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }} 
+  cancel-in-progress: true
+
+jobs:
+  run-release-branch-updater:
+    if: github.repository == 'lvgl/lvgl'
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout LVGL
+        uses: actions/checkout@v4
+        with:
+          path: lvgl
+          fetch-depth: 0   # fetch all
+
+      - name: set git credentials
+        run: |
+          git config user.name 'lvgl-bot'
+          git config user.email 'lvgl-bot@users.noreply.github.com'
+
+      - name: run the script
+        run: python3 lvgl/scripts/release_branch_updater.py --oldest-major 9
