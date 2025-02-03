@@ -1,4 +1,4 @@
-.. _overview_file_system:
+.. _file_system:
 
 =======================
 File System (lv_fs_drv)
