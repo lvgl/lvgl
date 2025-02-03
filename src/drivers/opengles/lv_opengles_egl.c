@@ -76,6 +76,11 @@ static EGLint const attribute_list[] = {
     EGL_NONE
 };
 
+static EGLint const context_attribute_list[] = {
+    EGL_CONTEXT_CLIENT_VERSION, 2,
+    EGL_NONE
+};
+
 /**********************
  *      MACROS
  **********************/
@@ -217,7 +222,7 @@ static lv_result_t lv_egl_init(void)
     }
 
     /* create an EGL rendering context */
-    egl_context = eglCreateContext(egl_display, egl_config, EGL_NO_CONTEXT, NULL);
+    egl_context = eglCreateContext(egl_display, egl_config, EGL_NO_CONTEXT, context_attribute_list);
     if(egl_context == EGL_NO_CONTEXT) {
         LV_LOG_ERROR("eglCreateContext failed.");
         eglTerminate(egl_display);
