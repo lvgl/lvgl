@@ -197,7 +197,7 @@ void lv_opengles_render_clear(void)
 
 void lv_opengles_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
 {
-    glViewport(x, y, w, h);
+    GL_CALL(glViewport(x, y, w, h));
 }
 
 /**********************
@@ -261,8 +261,8 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
 
 static void lv_opengles_enable_blending(void)
 {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    GL_CALL(glEnable(GL_BLEND));
+    GL_CALL(glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA));
 }
 
 static void lv_opengles_vertex_buffer_init(const void * data, unsigned int size)
