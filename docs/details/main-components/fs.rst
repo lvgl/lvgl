@@ -17,7 +17,7 @@ under :ref:`lv_fs_identifier_letters`.
 
 
 
-Ready-to-use drivers
+Ready-to-Use Drivers
 ********************
 
 LVGL contains prepared drivers for the API of POSIX, standard C,
@@ -29,7 +29,7 @@ Learn more :ref:`here <libs_filesystem>`.
 .. _lv_fs_identifier_letters:
 
 Identifier Letters
-*********************
+******************
 
 As mentioned above, a file system is identified by an assigned identifier letter.
 This identifier is merely a way for the LVGL File System abtraction logic to look up
