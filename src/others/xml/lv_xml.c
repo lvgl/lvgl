@@ -31,6 +31,7 @@
 #include "parsers/lv_xml_dropdown_parser.h"
 #include "parsers/lv_xml_roller_parser.h"
 #include "parsers/lv_xml_scale_parser.h"
+#include "parsers/lv_xml_buttonmatrix_parser.h"
 #include "parsers/lv_xml_spangroup_parser.h"
 #include "parsers/lv_xml_event_parser.h"
 #include "../../libs/expat/expat.h"
@@ -99,6 +100,7 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_scale-section", lv_xml_scale_section_create, lv_xml_scale_section_apply);
     lv_xml_widget_register("lv_spangroup", lv_xml_spangroup_create, lv_xml_spangroup_apply);
     lv_xml_widget_register("lv_spangroup-span", lv_xml_spangroup_span_create, lv_xml_spangroup_span_apply);
+    lv_xml_widget_register("lv_buttonmatrix", lv_xml_buttonmatrix_create, lv_xml_buttonmatrix_apply);
 
     lv_xml_widget_register("lv_event-call_function", lv_xml_event_call_function_create, lv_xml_event_call_function_apply);
 }

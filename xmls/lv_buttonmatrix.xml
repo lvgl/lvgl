@@ -29,18 +29,18 @@ Example
 			<enum name="checked"     help="Button is currently toggled (e.g. checked)."/>
 			<enum name="click_trig"  help="1: Send LV_EVENT_VALUE_CHANGE on CLICK, 0: Send LV_EVENT_VALUE_CHANGE on PRESS"/>
 			<enum name="popover"     help="Show a popover when pressing this key"/>
+			<enum name="recolor"     help="Enable text recoloring with `#color`"/>
 			<enum name="reserved_1"  help="Reserved for later use"/>
 			<enum name="reserved_2"  help="Reserved for later use"/>
-			<enum name="reserved_3"  help="Reserved for later use"/>
 			<enum name="custom_1"    help="Custom free to use flag"/>
 			<enum name="custom_2"    help="Custom free to use flag"/>
 		</enumdef>
 
-	    <prop name="map" help="">
-	    	<param name="map"  type="string[NULL]" />
-	    </prop>
-	    <prop name="ctrl_map" help="">
-	    	<param name="map"  type="enum:lv_buttonmatrix_ctrl[]+" />
-	   	</prop>
+	    <prop name="map"  type="string[NULL]" help=""/>
+	    <prop name="ctrl_map" type="enum:lv_buttonmatrix_ctrl[]+" help=""/>
+	    <prop name="one_checked" type="bool" help=""/>
+	    <prop name="selected_button" type="int" help=""/>
+
+
 	</api>
 </widget>
