@@ -7,6 +7,7 @@ add_library(lvgl STATIC ${SOURCE_FILES})
 
 # Add the current directory as an include directory
 target_include_directories(lvgl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(lvgl PUBLIC ${AUTO_CONF_DIR})
 
 set(SUBDIRS 
     core
