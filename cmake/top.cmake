@@ -11,3 +11,4 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${AUTOCONF_H})
 
 include(cmake/extensions.cmake)
 include(cmake/kconfig.cmake)
+add_compile_definitions(LV_CONF_KCONFIG_EXTERNAL_INCLUDE="${AUTOCONF_H}")
