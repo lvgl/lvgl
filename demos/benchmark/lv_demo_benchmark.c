@@ -52,6 +52,20 @@
 #define LV_TEST_FONT_STRING_2 "No one shall be subjected to arbitrary arrest, detention or exile. Everyone is entitled in full equality to a fair and public hearing by an independent and impartial tribunal, in the determination of his rights and obligations and of any criminal charge against him. No one shall be subjected to arbitrary interference with his privacy, family, home or correspondence, nor to attacks upon his honour and reputation. Everyone has the right to the protection of the law against such interference or attacks."
 #define LV_TEST_FONT_SIZE 24
 
+#if LV_USE_FREETYPE == 0
+    #if LV_USE_TINY_TTF == 0
+        #define ENABLE_TTF 0
+    #else
+        #if LV_TINY_TTF_FILE_SUPPORT == 0
+            #error "LV_TINY_TTF_FILE_SUPPORT needs to be enabled for the benchmark"
+        #else
+            #define ENABLE_TTF 1
+        #endif
+    #endif
+#else
+    #define ENABLE_TTF 1
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -66,7 +80,7 @@ typedef struct benchmark_context {
 
 typedef struct scene_dsc {
     const char * name;
-    void (* create_cb)(benchmark_context_t *);
+    void (*create_cb)(benchmark_context_t *);
     uint32_t scene_time;
     uint32_t cpu_avg_usage;
     uint32_t fps_avg;
@@ -99,6 +113,8 @@ static void color_anim(lv_obj_t * obj);
 static void arc_anim(lv_obj_t * obj, benchmark_context_t * context);
 
 static lv_obj_t * card_create(void);
+
+#if ENABLE_TTF
 static void span_text_create(lv_font_t * font);
 
 static void span_text_bitmap_cb(benchmark_context_t * context)
@@ -130,6 +146,7 @@ static void ttf_text_outline_cb(benchmark_context_t * context)
     lv_label_set_text(label, LV_TEST_FONT_STRING_2);
     lv_obj_set_width(label, lv_pct(100));
 }
+#endif
 
 static void empty_screen_cb(benchmark_context_t * context)
 {
@@ -521,10 +538,12 @@ static scene_dsc_t scenes[] = {
     {.name = "Screen sized text",          .scene_time = 5000,  .create_cb = screen_sized_text_cb},
     {.name = "Multiple arcs",              .scene_time = 3000,  .create_cb = multiple_arcs_cb},
 
+#if ENABLE_TTF
     {.name = "Span text(bitmap)",          .scene_time = 3000,  .create_cb = span_text_bitmap_cb},
     {.name = "Span text(outline)",         .scene_time = 3000,  .create_cb = span_text_outline_cb},
     {.name = "TTF text(bitmap)",           .scene_time = 3000,  .create_cb = ttf_text_bitmap_cb},
     {.name = "TTF text(outline)",          .scene_time = 3000,  .create_cb = ttf_text_outline_cb},
+#endif
 
     {.name = "Containers",                 .scene_time = 3000,  .create_cb = containers_cb},
     {.name = "Containers with overlay",    .scene_time = 3000,  .create_cb = containers_with_overlay_cb},
@@ -549,20 +568,33 @@ static scene_dsc_t scenes[] = {
 
 static void benchmark_context_init(benchmark_context_t * context)
 {
-    context->font_bitmap = lv_freetype_font_create(LV_TEST_FONT_PATH,
-                                                   LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
-                                                   LV_TEST_FONT_SIZE,
-                                                   LV_FREETYPE_FONT_STYLE_NORMAL);
-    if(context->font_bitmap == NULL) {
-        LV_LOG_ERROR("freetype font creation failed!");
-    }
-    context->font_outline = lv_freetype_font_create(LV_TEST_FONT_PATH,
-                                                    LV_FREETYPE_FONT_RENDER_MODE_OUTLINE,
+#if ENABLE_TTF
+    #if LV_USE_FREETYPE
+        context->font_bitmap = lv_freetype_font_create(LV_TEST_FONT_PATH,
+                                                    LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
                                                     LV_TEST_FONT_SIZE,
                                                     LV_FREETYPE_FONT_STYLE_NORMAL);
-    if(context->font_bitmap == NULL) {
-        LV_LOG_ERROR("freetype font creation failed!");
-    }
+        if(context->font_bitmap == NULL) {
+            LV_LOG_ERROR("freetype font creation failed!");
+        }
+        context->font_outline = lv_freetype_font_create(LV_TEST_FONT_PATH,
+                                                        LV_FREETYPE_FONT_RENDER_MODE_OUTLINE,
+                                                        LV_TEST_FONT_SIZE,
+                                                        LV_FREETYPE_FONT_STYLE_NORMAL);
+        if(context->font_bitmap == NULL) {
+            LV_LOG_ERROR("freetype font creation failed!");
+        }
+    #else
+        context->font_bitmap = lv_tiny_ttf_create_file("A:" LV_TEST_FONT_PATH, LV_TEST_FONT_SIZE);
+        if(context->font_bitmap == NULL) {
+            LV_LOG_ERROR("freetype font creation failed!");
+        }
+        context->font_outline = lv_tiny_ttf_create_file("A:" LV_TEST_FONT_PATH, LV_TEST_FONT_SIZE);
+        if(context->font_bitmap == NULL) {
+            LV_LOG_ERROR("freetype font creation failed!");
+        }
+    #endif
+#endif
     context->scene_act = 0;
     context->label_perf = lv_label_create(lv_layer_top());
     lv_obj_set_style_bg_opa(context->label_perf, LV_OPA_COVER, 0);
@@ -576,12 +608,23 @@ static void benchmark_context_init(benchmark_context_t * context)
 
 static void benchmark_context_deinit(benchmark_context_t * context)
 {
-    if(context->font_bitmap != NULL) {
-        lv_freetype_font_delete(context->font_bitmap);
-    }
-    if(context->font_outline != NULL) {
-        lv_freetype_font_delete(context->font_outline);
-    }
+#if ENABLE_TTF
+    #if LV_USE_FREETYPE
+        if(context->font_bitmap != NULL) {
+            lv_freetype_font_delete(context->font_bitmap);
+        }
+        if(context->font_outline != NULL) {
+            lv_freetype_font_delete(context->font_outline);
+        }
+    #else
+        if(context->font_bitmap != NULL) {
+            lv_tiny_ttf_destroy(context->font_bitmap);
+        }
+        if(context->font_outline != NULL) {
+            lv_tiny_ttf_destroy(context->font_outline);
+        }
+    #endif
+#endif
     lv_obj_delete(context->label_perf);
 }
 
@@ -945,6 +988,7 @@ static lv_obj_t * card_create(void)
     return panel;
 }
 
+#if ENABLE_TTF
 static void span_text_create(lv_font_t * font)
 {
     lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
@@ -969,6 +1013,7 @@ static void span_text_create(lv_font_t * font)
         lv_style_set_text_font(lv_span_get_style(span), font);
     }
 }
+#endif
 
 static void rnd_reset(benchmark_context_t * context)
 {
