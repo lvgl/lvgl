@@ -23,7 +23,7 @@ static int32_t get_content_height(lv_obj_t * cont)
            + lv_obj_get_style_pad_bottom(cont, LV_PART_MAIN);
 }
 
-static void cont_scroll_event_cb(lv_event_t * e) 
+static void cont_scroll_event_cb(lv_event_t * e)
 {
     static bool is_adjusting = false;
     lv_obj_t * cont = lv_event_get_target(e);
