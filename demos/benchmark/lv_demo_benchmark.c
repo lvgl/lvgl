@@ -585,9 +585,9 @@ static void benchmark_context_init(benchmark_context_t * context)
 #if ENABLE_TTF
 #if LV_USE_FREETYPE
     context->font_bitmap = lv_freetype_font_create(LV_TEST_FONT_PATH,
-                                                LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
-                                                LV_TEST_FONT_SIZE,
-                                                LV_FREETYPE_FONT_STYLE_NORMAL);
+                                                   LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
+                                                   LV_TEST_FONT_SIZE,
+                                                   LV_FREETYPE_FONT_STYLE_NORMAL);
     if(context->font_bitmap == NULL) {
         LV_LOG_ERROR("freetype font creation failed!");
     }
