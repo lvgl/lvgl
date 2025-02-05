@@ -51,11 +51,6 @@ static void cont_scroll_event_cb(lv_event_t * e)
     }
 }
 
-static void item_click_event_cb(lv_event_t * e)
-{
-    int id = (int)lv_event_get_user_data(e);
-    LV_LOG_USER("click id = %d", id);
-}
 
 void lv_example_scroll_8(void)
 {
@@ -75,7 +70,6 @@ void lv_example_scroll_8(void)
     for(int i = 0; i < 10; i++) {
         lv_obj_t * item = lv_button_create(cont);
         lv_obj_set_size(item, LV_PCT(100), ITEM_HEIGHT);      // Full width, fixed height
-        lv_obj_add_event_cb(item, item_click_event_cb, LV_EVENT_SHORT_CLICKED, (void*)(i+1)); // Pass ID
 
         lv_obj_t * label = lv_label_create(item);
         lv_label_set_text_fmt(label, "Item %"LV_PRIu32, i + 1);
