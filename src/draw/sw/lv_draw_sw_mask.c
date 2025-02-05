@@ -1093,6 +1093,7 @@ static void circ_calc_aa4(lv_draw_sw_mask_radius_circle_dsc_t * c, int32_t radiu
 
     const size_t cir_xy_size = (radius + 1) * 2 * 2 * sizeof(int32_t);
     int32_t * cir_x = lv_malloc_zeroed(cir_xy_size);
+    LV_ASSERT_MALLOC(cir_x);
     int32_t * cir_y = &cir_x[(radius + 1) * 2];
 
     uint32_t y_8th_cnt = 0;
