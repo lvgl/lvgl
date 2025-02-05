@@ -143,14 +143,36 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
         }
 
         if(decoder_dsc.decoder && decoder_dsc.decoder->custom_draw_cb) {
-            lv_area_t transformed_area;
-            lv_image_buf_get_transformed_area(&transformed_area, lv_area_get_width(image_coords), lv_area_get_height(image_coords),
-                                              dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
+            lv_area_t draw_area = layer->buf_area;
+            lv_area_t coords_area = *image_coords;
 
-            lv_area_move(&transformed_area, image_coords->x1, image_coords->y1);
-            lv_area_t clip_area;
-            if(lv_area_intersect(&clip_area, &layer->_clip_area, &transformed_area)) {
-                decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, image_coords, new_image_dsc, &clip_area);
+            lv_area_t obj_area = dsc->base.obj->coords;
+            if(layer->parent) { /* child layer */
+                if(lv_area_intersect(&coords_area, &coords_area, &obj_area)) {
+                    int32_t xpos = image_coords->x1 - draw_area.x1;
+                    int32_t ypos = image_coords->y1 - draw_area.y1;
+
+                    lv_area_move(&coords_area, -(image_coords->x1 - xpos), -(image_coords->y1 - ypos));
+                    layer->_clip_area = coords_area;
+                    decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, new_image_dsc, &coords_area);
+                }
+            }
+            else {
+                lv_area_t clip_area = draw_area;
+                if(lv_area_intersect(&clip_area, &clip_area, &coords_area)) {
+
+                    lv_image_buf_get_transformed_area(&coords_area, lv_area_get_width(image_coords), lv_area_get_height(image_coords),
+                                                      dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
+                    lv_area_move(&coords_area, image_coords->x1, image_coords->y1);
+
+                    lv_image_buf_get_transformed_area(&clip_area, lv_area_get_width(image_coords), lv_area_get_height(image_coords),
+                                                      dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
+                    lv_area_move(&clip_area, image_coords->x1, image_coords->y1);
+
+                    if(lv_area_intersect(&clip_area, &clip_area, &obj_area)) {
+                        decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, new_image_dsc, &clip_area);
+                    }
+                }
             }
 
         }
