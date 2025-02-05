@@ -66,6 +66,20 @@
     #define ENABLE_TTF 1
 #endif
 
+#if LV_USE_FREETYPE == 0
+    #if LV_USE_TINY_TTF == 0
+        #define ENABLE_TTF 0
+    #else
+        #if LV_TINY_TTF_FILE_SUPPORT == 0
+            #error "LV_TINY_TTF_FILE_SUPPORT needs to be enabled for the benchmark"
+        #else
+            #define ENABLE_TTF 1
+        #endif
+    #endif
+#else
+    #define ENABLE_TTF 1
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -569,31 +583,31 @@ static scene_dsc_t scenes[] = {
 static void benchmark_context_init(benchmark_context_t * context)
 {
 #if ENABLE_TTF
-    #if LV_USE_FREETYPE
-        context->font_bitmap = lv_freetype_font_create(LV_TEST_FONT_PATH,
-                                                    LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
+#if LV_USE_FREETYPE
+    context->font_bitmap = lv_freetype_font_create(LV_TEST_FONT_PATH,
+                                                LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
+                                                LV_TEST_FONT_SIZE,
+                                                LV_FREETYPE_FONT_STYLE_NORMAL);
+    if(context->font_bitmap == NULL) {
+        LV_LOG_ERROR("freetype font creation failed!");
+    }
+    context->font_outline = lv_freetype_font_create(LV_TEST_FONT_PATH,
+                                                    LV_FREETYPE_FONT_RENDER_MODE_OUTLINE,
                                                     LV_TEST_FONT_SIZE,
                                                     LV_FREETYPE_FONT_STYLE_NORMAL);
-        if(context->font_bitmap == NULL) {
-            LV_LOG_ERROR("freetype font creation failed!");
-        }
-        context->font_outline = lv_freetype_font_create(LV_TEST_FONT_PATH,
-                                                        LV_FREETYPE_FONT_RENDER_MODE_OUTLINE,
-                                                        LV_TEST_FONT_SIZE,
-                                                        LV_FREETYPE_FONT_STYLE_NORMAL);
-        if(context->font_bitmap == NULL) {
-            LV_LOG_ERROR("freetype font creation failed!");
-        }
-    #else
-        context->font_bitmap = lv_tiny_ttf_create_file("A:" LV_TEST_FONT_PATH, LV_TEST_FONT_SIZE);
-        if(context->font_bitmap == NULL) {
-            LV_LOG_ERROR("freetype font creation failed!");
-        }
-        context->font_outline = lv_tiny_ttf_create_file("A:" LV_TEST_FONT_PATH, LV_TEST_FONT_SIZE);
-        if(context->font_bitmap == NULL) {
-            LV_LOG_ERROR("freetype font creation failed!");
-        }
-    #endif
+    if(context->font_bitmap == NULL) {
+        LV_LOG_ERROR("freetype font creation failed!");
+    }
+#else
+    context->font_bitmap = lv_tiny_ttf_create_file("A:" LV_TEST_FONT_PATH, LV_TEST_FONT_SIZE);
+    if(context->font_bitmap == NULL) {
+        LV_LOG_ERROR("freetype font creation failed!");
+    }
+    context->font_outline = lv_tiny_ttf_create_file("A:" LV_TEST_FONT_PATH, LV_TEST_FONT_SIZE);
+    if(context->font_bitmap == NULL) {
+        LV_LOG_ERROR("freetype font creation failed!");
+    }
+#endif
 #endif
     context->scene_act = 0;
     context->label_perf = lv_label_create(lv_layer_top());
@@ -609,21 +623,21 @@ static void benchmark_context_init(benchmark_context_t * context)
 static void benchmark_context_deinit(benchmark_context_t * context)
 {
 #if ENABLE_TTF
-    #if LV_USE_FREETYPE
-        if(context->font_bitmap != NULL) {
-            lv_freetype_font_delete(context->font_bitmap);
-        }
-        if(context->font_outline != NULL) {
-            lv_freetype_font_delete(context->font_outline);
-        }
-    #else
-        if(context->font_bitmap != NULL) {
-            lv_tiny_ttf_destroy(context->font_bitmap);
-        }
-        if(context->font_outline != NULL) {
-            lv_tiny_ttf_destroy(context->font_outline);
-        }
-    #endif
+#if LV_USE_FREETYPE
+    if(context->font_bitmap != NULL) {
+        lv_freetype_font_delete(context->font_bitmap);
+    }
+    if(context->font_outline != NULL) {
+        lv_freetype_font_delete(context->font_outline);
+    }
+#else
+    if(context->font_bitmap != NULL) {
+        lv_tiny_ttf_destroy(context->font_bitmap);
+    }
+    if(context->font_outline != NULL) {
+        lv_tiny_ttf_destroy(context->font_outline);
+    }
+#endif
 #endif
     lv_obj_delete(context->label_perf);
 }
