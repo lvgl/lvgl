@@ -143,7 +143,6 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
         }
 
         if(decoder_dsc.decoder && decoder_dsc.decoder->custom_draw_cb) {
-            lv_area_t coords_area = *image_coords;
             lv_area_t transformed_area;
             lv_image_buf_get_transformed_area(&transformed_area, lv_area_get_width(image_coords), lv_area_get_height(image_coords),
                                               dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
