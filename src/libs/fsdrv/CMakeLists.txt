@@ -36,10 +36,13 @@ if(CONFIG_LV_USE_FS_WIN32)
     list(APPEND SOURCE_FILES lv_fs_win32.c)
 endif()
 
-if(NOT "${SOURCE_FILES}" STREQUAL "")
-    # Create the object library for this directory
-    add_library(lvgl_libs_fsdrv STATIC ${SOURCE_FILES})
-    
-    # Add the current directory as an include directory
-    target_include_directories(lvgl_libs_fsdrv PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+if(NOT SOURCE_FILES)
+	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/empty.c "")
+	list(APPEND SOURCE_FILES ${CMAKE_CURRENT_BINARY_DIR}/empty.c)
 endif()
+
+# Create the object library for this directory
+add_library(lvgl_libs_fsdrv STATIC ${SOURCE_FILES})
+    
+# Add the current directory as an include directory
+target_include_directories(lvgl_libs_fsdrv PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
