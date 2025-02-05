@@ -1,18 +1,18 @@
+execute_process(
+  COMMAND ${PYTHON_EXECUTABLE}
+  ${LVGL_ROOT_DIR}/scripts/kconfig.py
+  ${LVGL_ROOT_DIR}/Kconfig
+  ${OUTPUT_DOTCONFIG}
+  ${AUTOCONF_H}
+  ${KCONFIG_LIST_OUT}
+  ${DOTCONFIG}
+  WORKING_DIRECTORY ${LVGL_ROOT_DIR}
+  # The working directory is set to the app dir such that the user
+  # can use relative paths in CONF_FILE, e.g. CONF_FILE=nrf5.conf
+  RESULT_VARIABLE ret
+  )
+if(NOT "${ret}" STREQUAL "0")
+  message(FATAL_ERROR "command failed with return code: ${ret}")
+endif()
+
 import_kconfig(CONFIG_ ${DOTCONFIG} keys)
-
-set(CONFIG_HEADER "${CMAKE_BINARY_DIR}/config.h")
-
-# Create the header file content
-file(WRITE ${AUTOCONF_H} "/* Auto-generated config.h */\n")
-
-foreach(key ${keys})
-    string(REPLACE "CONFIG_" "" stripped_key ${key})
-    set(value ${${key}})
-    if("${value}" STREQUAL "y")
-        set(value 1)
-    elseif("${value}" STREQUAL "n")
-        set(value 0)
-    endif()
-
-    file(APPEND ${AUTOCONF_H} "#define ${stripped_key} ${${value}}\n")
-endforeach()
