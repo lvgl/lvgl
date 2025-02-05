@@ -66,20 +66,6 @@
     #define ENABLE_TTF 1
 #endif
 
-#if LV_USE_FREETYPE == 0
-    #if LV_USE_TINY_TTF == 0
-        #define ENABLE_TTF 0
-    #else
-        #if LV_TINY_TTF_FILE_SUPPORT == 0
-            #error "LV_TINY_TTF_FILE_SUPPORT needs to be enabled for the benchmark"
-        #else
-            #define ENABLE_TTF 1
-        #endif
-    #endif
-#else
-    #define ENABLE_TTF 1
-#endif
-
 /**********************
  *      TYPEDEFS
  **********************/
