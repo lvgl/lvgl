@@ -344,8 +344,8 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
         target_layer = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &rc);
         LV_ASSERT_MALLOC(target_layer);
         if(target_layer == NULL) {
-        	LV_LOG_WARN("Couldn't allocate layer for the SVG rendering");
-        	return;
+            LV_LOG_WARN("Couldn't allocate layer for the SVG rendering");
+            return;
         }
         lv_draw_image_dsc_init(&layer_draw_dsc);
         layer_draw_dsc.src = target_layer;

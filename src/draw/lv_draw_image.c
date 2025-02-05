@@ -120,7 +120,7 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
     }
 
     /*Typical case, draw the image as bitmap*/
-    if(!new_image_dsc->header.flags & LV_IMAGE_FLAGS_CUSTOM_DRAW) {
+    if(!(new_image_dsc->header.flags & LV_IMAGE_FLAGS_CUSTOM_DRAW)) {
         lv_draw_task_t * t = lv_draw_add_task(layer, image_coords);
         t->draw_dsc = new_image_dsc;
         t->type = LV_DRAW_TASK_TYPE_IMAGE;
