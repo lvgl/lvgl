@@ -4,11 +4,11 @@
 Arduino SD
 ==========
 
-Enables reading and writing on SD cards.
-Once an SD memory card is connected to the SPI interface of the Arduino or Genuino board you can create files
-and read/write on them. You can also move through directories on the SD card..
+Enables reading from and writing to SD cards.
+Once an SD memory card is connected to the SPI interface of the Arduino or Genuino board, you can create files
+and read from, and write to them.  You can also move through directories on the SD card.
 
-Detailed introduction:
+For a detailed introduction, see:
 
 - https://www.arduino.cc/reference/en/libraries/sd/
 

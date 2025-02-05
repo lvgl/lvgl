@@ -66,11 +66,6 @@
     #endif
 #endif
 
-/* Renamed config backwards-compatibility */
-#if !defined(LV_FS_DEFAULT_DRIVER_LETTER) && defined(LV_FS_DEFAULT_DRIVE_LETTER)
-    #define LV_FS_DEFAULT_DRIVER_LETTER LV_FS_DEFAULT_DRIVE_LETTER
-#endif
-
 #ifdef CONFIG_LV_COLOR_DEPTH
     #define LV_KCONFIG_PRESENT
 #endif
@@ -497,6 +492,16 @@
             #endif
         #else
             #define LV_DRAW_SW_SUPPORT_I1           1
+        #endif
+    #endif
+
+    /* The threshold of the luminance to consider a pixel as
+     * active in indexed color format */
+    #ifndef LV_DRAW_SW_I1_LUM_THRESHOLD
+        #ifdef CONFIG_LV_DRAW_SW_I1_LUM_THRESHOLD
+            #define LV_DRAW_SW_I1_LUM_THRESHOLD CONFIG_LV_DRAW_SW_I1_LUM_THRESHOLD
+        #else
+            #define LV_DRAW_SW_I1_LUM_THRESHOLD 127
         #endif
     #endif
 
@@ -3790,6 +3795,21 @@
         #define LV_USE_LINUX_DRM CONFIG_LV_USE_LINUX_DRM
     #else
         #define LV_USE_LINUX_DRM        0
+    #endif
+#endif
+
+#if LV_USE_LINUX_DRM
+
+    /* Use the MESA GBM library to allocate DMA buffers that can be
+     * shared across sub-systems and libraries using the Linux DMA-BUF API.
+     * The GBM library aims to provide a platform independent memory management system
+     * it supports the major GPU vendors - This option requires linking with libgbm */
+    #ifndef LV_LINUX_DRM_GBM_BUFFERS
+        #ifdef CONFIG_LV_LINUX_DRM_GBM_BUFFERS
+            #define LV_LINUX_DRM_GBM_BUFFERS CONFIG_LV_LINUX_DRM_GBM_BUFFERS
+        #else
+            #define LV_LINUX_DRM_GBM_BUFFERS 0
+        #endif
     #endif
 #endif
 

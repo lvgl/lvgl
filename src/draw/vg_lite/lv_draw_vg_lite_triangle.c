@@ -40,8 +40,7 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-void lv_draw_vg_lite_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_t * dsc)
+void lv_draw_vg_lite_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
 {
     lv_area_t tri_area;
     tri_area.x1 = (int32_t)LV_MIN3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
@@ -51,12 +50,12 @@ void lv_draw_vg_lite_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle
 
     bool is_common;
     lv_area_t clip_area;
-    is_common = lv_area_intersect(&clip_area, &tri_area, draw_unit->clip_area);
+    is_common = lv_area_intersect(&clip_area, &tri_area, &t->clip_area);
     if(!is_common) return;
 
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
 
     lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
     lv_vg_lite_path_set_bounding_box_area(path, &clip_area);

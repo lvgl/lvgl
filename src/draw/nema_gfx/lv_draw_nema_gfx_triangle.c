@@ -39,16 +39,16 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_draw_nema_gfx_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_t * dsc)
+void lv_draw_nema_gfx_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
 {
     if(dsc->bg_opa <= LV_OPA_MIN) return;
 
-    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)draw_unit;
+    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)t->draw_unit;
 
-    lv_layer_t * layer = draw_unit->target_layer;
+    lv_layer_t * layer = t->target_layer;
 
     lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, draw_unit->clip_area);
+    lv_area_copy(&rel_clip_area, &t->clip_area);
     lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t coords;

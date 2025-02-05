@@ -42,9 +42,10 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc)
+void lv_draw_vg_lite_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
 {
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
+
     float p1_x = dsc->p1.x;
     float p1_y = dsc->p1.y;
     float p2_x = dsc->p2.x;
@@ -61,13 +62,11 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
     rel_clip_area.y1 = (int32_t)(LV_MIN(p1_y, p2_y) - half_w);
     rel_clip_area.y2 = (int32_t)(LV_MAX(p1_y, p2_y) + half_w);
 
-    if(!lv_area_intersect(&rel_clip_area, &rel_clip_area, draw_unit->clip_area)) {
+    if(!lv_area_intersect(&rel_clip_area, &rel_clip_area, &t->clip_area)) {
         return; /*Fully clipped, nothing to do*/
     }
 
     LV_PROFILER_DRAW_BEGIN;
-
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     int32_t dash_width = dsc->dash_width;
     int32_t dash_gap = dsc->dash_gap;

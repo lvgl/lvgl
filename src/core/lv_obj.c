@@ -285,10 +285,8 @@ void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
     if(f & LV_OBJ_FLAG_HIDDEN) {
         lv_obj_invalidate(obj);
-        if(lv_obj_is_layout_positioned(obj)) {
-            lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
-            lv_obj_mark_layout_as_dirty(obj);
-        }
+        lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
+        lv_obj_mark_layout_as_dirty(obj);
     }
 
     if((was_on_layout != lv_obj_is_layout_positioned(obj)) || (f & (LV_OBJ_FLAG_LAYOUT_1 |  LV_OBJ_FLAG_LAYOUT_2))) {

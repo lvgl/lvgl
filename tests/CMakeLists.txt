@@ -206,6 +206,7 @@ if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
         -Wno-double-promotion
         -Wno-unreachable-code
         -Wno-gnu-zero-variadic-macro-arguments
+        -Wunused-function
 	-Wno-overlength-strings
     )
 else()

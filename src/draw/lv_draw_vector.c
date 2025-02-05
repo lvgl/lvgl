@@ -228,10 +228,10 @@ void lv_vector_path_get_bounding(const lv_vector_path_t * path, lv_area_t * area
         if(p[i].y > y2) y2 = p[i].y;
     }
 
-    area->x1 = (int32_t)x1;
-    area->y1 = (int32_t)y1;
-    area->x2 = (int32_t)x2;
-    area->y2 = (int32_t)y2;
+    area->x1 = lroundf(x1);
+    area->y1 = lroundf(y1);
+    area->x2 = lroundf(x2);
+    area->y2 = lroundf(y2);
 }
 
 void lv_vector_path_append_rect(lv_vector_path_t * path, const lv_area_t * rect, float rx, float ry)

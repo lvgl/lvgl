@@ -30,7 +30,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void img_decode_and_draw(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+static void img_decode_and_draw(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                 lv_image_decoder_dsc_t * decoder_dsc, lv_area_t * relative_decoded_area,
                                 const lv_area_t * img_area, const lv_area_t * clipped_img_area,
                                 lv_draw_image_core_cb draw_core_cb);
@@ -179,7 +179,7 @@ lv_image_src_t lv_image_src_get_type(const void * src)
     }
 }
 
-void lv_draw_image_normal_helper(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+void lv_draw_image_normal_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                  const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb)
 {
     if(draw_core_cb == NULL) {
@@ -203,7 +203,7 @@ void lv_draw_image_normal_helper(lv_draw_unit_t * draw_unit, const lv_draw_image
     }
 
     lv_area_t clipped_img_area;
-    if(!lv_area_intersect(&clipped_img_area, &draw_area, draw_unit->clip_area)) {
+    if(!lv_area_intersect(&clipped_img_area, &draw_area, &t->clip_area)) {
         return;
     }
 
@@ -214,12 +214,12 @@ void lv_draw_image_normal_helper(lv_draw_unit_t * draw_unit, const lv_draw_image
         return;
     }
 
-    img_decode_and_draw(draw_unit, draw_dsc, &decoder_dsc, NULL, coords, &clipped_img_area, draw_core_cb);
+    img_decode_and_draw(t, draw_dsc, &decoder_dsc, NULL, coords, &clipped_img_area, draw_core_cb);
 
     lv_image_decoder_close(&decoder_dsc);
 }
 
-void lv_draw_image_tiled_helper(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+void lv_draw_image_tiled_helper(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                 const lv_area_t * coords, lv_draw_image_core_cb draw_core_cb)
 {
     if(draw_core_cb == NULL) {
@@ -261,7 +261,7 @@ void lv_draw_image_tiled_helper(lv_draw_unit_t * draw_unit, const lv_draw_image_
 
             lv_area_t clipped_img_area;
             if(lv_area_intersect(&clipped_img_area, &tile_area, coords)) {
-                img_decode_and_draw(draw_unit, draw_dsc, &decoder_dsc, &relative_decoded_area, &tile_area, &clipped_img_area,
+                img_decode_and_draw(t, draw_dsc, &decoder_dsc, &relative_decoded_area, &tile_area, &clipped_img_area,
                                     draw_core_cb);
             }
 
@@ -309,7 +309,7 @@ void lv_image_buf_get_transformed_area(lv_area_t * res, int32_t w, int32_t h, in
  *   STATIC FUNCTIONS
  **********************/
 
-static void img_decode_and_draw(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+static void img_decode_and_draw(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                 lv_image_decoder_dsc_t * decoder_dsc, lv_area_t * relative_decoded_area,
                                 const lv_area_t * img_area, const lv_area_t * clipped_img_area,
                                 lv_draw_image_core_cb draw_core_cb)
@@ -321,7 +321,7 @@ static void img_decode_and_draw(lv_draw_unit_t * draw_unit, const lv_draw_image_
 
     /*The whole image is available, just draw it*/
     if(decoder_dsc->decoded && (relative_decoded_area == NULL || relative_decoded_area->x1 == LV_COORD_MIN)) {
-        draw_core_cb(draw_unit, draw_dsc, decoder_dsc, &sup, img_area, clipped_img_area);
+        draw_core_cb(t, draw_dsc, decoder_dsc, &sup, img_area, clipped_img_area);
     }
     /*Draw in smaller pieces*/
     else {
@@ -344,7 +344,7 @@ static void img_decode_and_draw(lv_draw_unit_t * draw_unit, const lv_draw_image_
                 /*Limit draw area to the current decoded area and draw the image*/
                 lv_area_t clipped_img_area_sub;
                 if(lv_area_intersect(&clipped_img_area_sub, clipped_img_area, &absolute_decoded_area)) {
-                    draw_core_cb(draw_unit, draw_dsc, decoder_dsc, &sup,
+                    draw_core_cb(t, draw_dsc, decoder_dsc, &sup,
                                  &absolute_decoded_area, &clipped_img_area_sub);
                 }
             }

@@ -44,11 +44,10 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc,
+void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
                          const lv_area_t * coords, bool no_cache)
 {
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
 
     /* The coordinates passed in by coords are not transformed,
      * so the transformed area needs to be calculated once.
@@ -65,7 +64,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
     lv_area_move(&image_tf_area, coords->x1, coords->y1);
 
     lv_area_t clip_area;
-    if(!lv_area_intersect(&clip_area, &image_tf_area, draw_unit->clip_area)) {
+    if(!lv_area_intersect(&clip_area, &image_tf_area, &t->clip_area)) {
         /*Fully clipped, nothing to do*/
         return;
     }
@@ -105,7 +104,7 @@ void lv_draw_vg_lite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t *
     vg_lite_filter_t filter = no_transform ? VG_LITE_FILTER_POINT : VG_LITE_FILTER_BI_LINEAR;
 
     /* If clipping is not required, blit directly */
-    if(lv_area_is_in(&image_tf_area, draw_unit->clip_area, false) && dsc->clip_radius <= 0) {
+    if(lv_area_is_in(&image_tf_area, &t->clip_area, false) && dsc->clip_radius <= 0) {
         /* rect is used to crop the pixel-aligned padding area */
         vg_lite_rectangle_t rect = {
             .x = 0,
