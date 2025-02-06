@@ -76,8 +76,8 @@ static void _draw_nema_gfx_tile(lv_draw_task_t * t, const lv_draw_image_dsc_t * 
 
     int32_t tile_x_start = tile_area.x1;
 
-    while(tile_area.y1 <= t->clip_area->y2) {
-        while(tile_area.x1 <= t->clip_area->x2) {
+    while(tile_area.y1 <= t->clip_area.y2) {
+        while(tile_area.x1 <= t->clip_area.x2) {
 
             lv_area_t clipped_img_area;
             if(lv_area_intersect(&clipped_img_area, &tile_area, &t->clip_area)) {

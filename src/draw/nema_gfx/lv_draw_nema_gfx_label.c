@@ -457,7 +457,7 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
                                                            w, NULL, dsc->flag);
 
     /*Go the first visible line*/
-    while(pos.y + line_height_font < t->clip_area->y1) {
+    while(pos.y + line_height_font < t->clip_area.y1) {
         /*Go to next line*/
         line_start = line_end;
         line_end += lv_text_get_next_line(&dsc->text[line_start], remaining_len, font, dsc->letter_space, w, NULL, dsc->flag);
@@ -733,7 +733,7 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
         /*Go the next line position*/
         pos.y += line_height;
 
-        if(pos.y > t->clip_area->y2) break;
+        if(pos.y > t->clip_area.y2) break;
     }
 
     if(draw_letter_dsc._draw_buf) lv_draw_buf_destroy(draw_letter_dsc._draw_buf);
