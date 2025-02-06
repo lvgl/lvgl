@@ -204,7 +204,7 @@ lv_color_t lv_subject_get_previous_color(lv_subject_t * subject);
                              updated, Observers of `group_subject` will be notified.
  * @param list_len       number of elements in `list[]`
  */
-void lv_subject_init_group(lv_subject_t * subject, lv_subject_t * list[], uint32_t list_len);
+void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], uint32_t list_len);
 
 /**
  * Remove all Observers from a Subject and free allocated memory, and delete

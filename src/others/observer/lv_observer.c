@@ -279,18 +279,18 @@ lv_color_t lv_subject_get_previous_color(lv_subject_t * subject)
     return subject->prev_value.color;
 }
 
-void lv_subject_init_group(lv_subject_t * subject, lv_subject_t * list[], uint32_t list_len)
+void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], uint32_t list_len)
 {
-    subject->type = LV_SUBJECT_TYPE_GROUP;
-    subject->size = list_len;
-    lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
-    subject->value.pointer = list;
+    group_subject->type = LV_SUBJECT_TYPE_GROUP;
+    group_subject->size = list_len;
+    lv_ll_init(&(group_subject->subs_ll), sizeof(lv_observer_t));
+    group_subject->value.pointer = list;
 
-    /* bind all subjects to this subject */
+    /* Bind all list[] subjects to `group_subject`. */
     uint32_t i;
     for(i = 0; i < list_len; i++) {
-        /*If a subject in the group changes notify the group itself*/
-        lv_subject_add_observer(list[i], group_notify_cb, subject);
+        /* If a subject in `list[]` changes, notify `group_subject`. */
+        lv_subject_add_observer(list[i], group_notify_cb, group_subject);
     }
 }
 
