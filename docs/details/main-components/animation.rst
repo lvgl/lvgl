@@ -192,7 +192,7 @@ you can set it like this:
 
 
 
-.. _animation_direction
+.. _animation_direction:
 
 Animating in Both Directions
 ****************************
