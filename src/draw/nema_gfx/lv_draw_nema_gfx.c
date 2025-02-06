@@ -263,8 +263,8 @@ static int32_t nema_gfx_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return LV_DRAW_UNIT_IDLE;
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    draw_nema_gfx_unit->base_unit.target_layer = layer;
-    draw_nema_gfx_unit->base_unit.clip_area = &t->clip_area;
+    t->target_layer = layer;
+    lv_area_copy(&t->clip_area, &layer->_clip_area);
     draw_nema_gfx_unit->task_act = t;
 
 #if LV_USE_OS

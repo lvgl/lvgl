@@ -118,7 +118,7 @@ void lv_draw_nema_gfx_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,
 {
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    lv_layer_t * layer = draw_unit->target_layer;
+    lv_layer_t * layer = t->target_layer;
 
     lv_area_t clip_area;
     lv_area_copy(&clip_area, &t->clip_area);
@@ -311,7 +311,7 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
             if(glyph_draw_dsc->opa <= LV_OPA_MIN)
                 return;
 
-            lv_layer_t * layer = draw_unit->target_layer;
+            lv_layer_t * layer = t->target_layer;
 
             lv_area_t blend_area;
             if(!lv_area_intersect(&blend_area, glyph_draw_dsc->letter_coords, &t->clip_area))
