@@ -4,10 +4,12 @@
 FreeType Support
 ================
 
+**FreeType** is a freely available software library to render fonts.
+
 The LVGL FreeType extension is an interface to the FreeType library, enabling you to
 generate font bitmaps at run time from most vector- and bitmap-font file formats.
 
-A detailed introduction can be found at:  https://freetype.org/ .
+For a detailed introduction, see:  https://freetype.org/ .
 
 
 

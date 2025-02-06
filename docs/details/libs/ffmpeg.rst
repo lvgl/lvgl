@@ -4,7 +4,9 @@
 FFmpeg Support
 ==============
 
-FFmpeg is an LVGL extension that interfaces with the official FFmpeg library to help
+**FFmpeg** is a complete, cross-platform solution to record, convert and stream audio and video.
+
+The FFmpeg is an LVGL extension that interfaces with the official FFmpeg library to help
 you add platform-independent recording, converting and streaming audio and video into
 your LVGL UI.
 

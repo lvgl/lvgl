@@ -4,7 +4,9 @@
 littlefs
 ========
 
-littlefs is a little fail-safe filesystem designed for microcontrollers.
+**littlefs** is a little fail-safe filesystem library designed for microcontrollers.
+
+The lv_fs_littlefs extension is an interface to the littlefs library.
 
 For a detailed introduction, see:  https://github.com/littlefs-project/littlefs .
 
