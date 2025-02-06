@@ -52,13 +52,13 @@ typedef union {
  */
 typedef struct {
     lv_ll_t subs_ll;                     /**< Subscribers */
-    uint32_t type                 :  4;  /**< One of the LV_SUBJECT_TYPE_... values */
-    uint32_t size                 : 24;  /**< String buffer size or group length */
     lv_subject_value_t value;            /**< Current value */
     lv_subject_value_t prev_value;       /**< Previous value */
+    void * user_data;                    /**< Additional parameter, can be used freely by user */
+    uint32_t type                 :  4;  /**< One of the LV_SUBJECT_TYPE_... values */
+    uint32_t size                 : 24;  /**< String buffer size or group length */
     uint32_t notify_restart_query :  1;  /**< If an Observer was deleted during notifcation,
                                           * start notifying from the beginning. */
-    void * user_data;                    /**< Additional parameter, can be used freely by user */
 } lv_subject_t;
 
 /**
