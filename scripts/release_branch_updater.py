@@ -82,7 +82,7 @@ def main():
             # the closest minor of the same major.
             if port_branch in port_release_branches:
                 print(LOG, "... this port has a matching release branch.")
-                subprocess.check_call(("git", "-C", port_clone_tmpdir, "branch", "--track",
+                subprocess.run(("git", "-C", port_clone_tmpdir, "branch", "--track",
                                        fmt_release(port_branch),
                                        f"origin/{fmt_release(port_branch)}"))
             elif port_branch != port_default_branch:
