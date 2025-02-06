@@ -160,7 +160,7 @@ Drawing Events
 
     In drawing-event callback functions the rendering
     sequence has already begun, and during this period, making changes to any
-    Widget's attributes, styles, or creating/deleting  widgets.  If you attempt to do so, 
+    Widget's attributes, styles, or creating/deleting  widgets is forbidden.  If you attempt to do so, 
     LVGL will generate an assertion failure with a message 
     indicating that invalidating an area is not allowed during rendering.
 
