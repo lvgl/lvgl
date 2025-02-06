@@ -150,7 +150,7 @@ void test_slider_normal_mode_should_leave_edit_mode_if_released(void)
 void test_ranged_mode_adjust_with_encoder(void)
 {
     lv_slider_set_value(sliderRangeMode, 90, LV_ANIM_OFF);
-    lv_slider_set_left_value(sliderRangeMode, 10, LV_ANIM_OFF);
+    lv_slider_set_start_value(sliderRangeMode, 10, LV_ANIM_OFF);
 
     /* Setup group and encoder indev */
     lv_group_add_obj(g, sliderRangeMode);

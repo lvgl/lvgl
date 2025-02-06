@@ -32,7 +32,7 @@ jobs:
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
     - name: Building ${{ matrix.build_option }}
-      run: python tests/main.py --build-option=${{ matrix.build_option }} build
+      run: python tests/main.py --build-option=${{ matrix.build_option }} build --auto-clean
 
   build-windows-GCC:
     runs-on: windows-2022
@@ -104,7 +104,7 @@ jobs:
       if: matrix.build_config == '32bit build'
       run: echo "NON_AMD64_BUILD=1" >> $GITHUB_ENV
     - name: Run tests
-      run: python tests/main.py --report --update-image test
+      run: python tests/main.py --report --update-image test --auto-clean
     - name: Archive screenshot errors
       if: failure()
       uses: actions/upload-artifact@v4

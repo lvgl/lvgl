@@ -40,6 +40,11 @@ typedef struct {
     const void * src;
 } lv_xml_image_t;
 
+typedef struct {
+    const char * name;
+    lv_event_cb_t cb;
+} lv_xml_event_cb_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES

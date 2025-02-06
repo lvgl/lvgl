@@ -1,6 +1,6 @@
 <!--
 Example
-<lv_bar mode="symmetrical" angles="100° 200°" bg_angles="30° 150° range="40 100" value="60"/>
+<lv_bar mode="symmetrical" range="-40 100" value="60"/>
 -->
 
 <widget>
@@ -27,12 +27,13 @@ Example
 	    	<param name ="animated" type="bool" help="Set the value with animation" optional="true" default="false"/>
 	   	</prop>
 
-	    <prop name="mode" help="The mode">
-	    	<param name="mode" type="enum:lv_bar_mode"/>
+	    <prop name="start_value" help="The current left value in case of range mode">
+	    	<param name ="value" type="int" help="The current value"/>
+	    	<param name ="animated" type="bool" help="Set the value with animation" optional="true" default="false"/>
 	   	</prop>
 
-	    <prop name="orientation" help="Orientation">
-	    	<param name="mode" type="enum:lv_bar_orientation"/>
-	   	</prop>
+	    <prop name="mode" type="enum:lv_bar_mode"/>
+
+	    <prop name="orientation"  type="enum:lv_bar_orientation"/>
 	</api>
 </widget>

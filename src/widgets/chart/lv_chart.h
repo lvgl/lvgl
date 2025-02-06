@@ -92,7 +92,7 @@ void lv_chart_set_point_count(lv_obj_t * obj, uint32_t cnt);
  * @param min       minimum value of the y axis
  * @param max       maximum value of the y axis
  */
-void lv_chart_set_range(lv_obj_t * obj, lv_chart_axis_t axis, int32_t min, int32_t max);
+void lv_chart_set_axis_range(lv_obj_t * obj, lv_chart_axis_t axis, int32_t min, int32_t max);
 
 /**
  * Set update mode of the chart object. Affects
@@ -276,13 +276,33 @@ void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, int32_t va
 void lv_chart_set_next_value2(lv_obj_t * obj, lv_chart_series_t * ser, int32_t x_value, int32_t y_value);
 
 /**
+ * Same as `lv_chart_set_next_value` but set the values from an array
+ * @param obj           pointer to chart object
+ * @param ser           pointer to a data series on 'chart'
+ * @param values        the new values to set
+ * @param values_cnt    number of items in `values`
+ */
+void lv_chart_set_series_values(lv_obj_t * obj, lv_chart_series_t * ser, const int32_t values[], size_t values_cnt);
+
+/**
+ * Same as `lv_chart_set_next_value2` but set the values from an array
+ * @param obj           pointer to chart object
+ * @param ser           pointer to a data series on 'chart'
+ * @param x_values      the new values to set on the X axis
+ * @param y_values      the new values to set o nthe Y axis
+ * @param values_cnt    number of items in `x_values` and `y_values`
+ */
+void lv_chart_set_series_values2(lv_obj_t * obj, lv_chart_series_t * ser, const int32_t x_values[],
+                                 const int32_t y_values[], size_t values_cnt);
+
+/**
  * Set an individual point's y value of a chart's series directly based on its index
  * @param obj     pointer to a chart object
  * @param ser     pointer to a data series on 'chart'
  * @param id      the index of the x point in the array
  * @param value   value to assign to array point
  */
-void lv_chart_set_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, int32_t value);
+void lv_chart_set_series_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, int32_t value);
 
 /**
  * Set an individual point's x and y value of a chart's series directly based on its index
@@ -293,8 +313,8 @@ void lv_chart_set_value_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t 
  * @param x_value   the new X value of the next data
  * @param y_value   the new Y value of the next data
  */
-void lv_chart_set_value_by_id2(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, int32_t x_value,
-                               int32_t y_value);
+void lv_chart_set_series_value_by_id2(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, int32_t x_value,
+                                      int32_t y_value);
 
 /**
  * Set an external array for the y data points to use for the chart
@@ -303,7 +323,7 @@ void lv_chart_set_value_by_id2(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t
  * @param ser       pointer to a data series on 'chart'
  * @param array     external array of points for chart
  */
-void lv_chart_set_ext_y_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t array[]);
+void lv_chart_set_series_ext_y_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t array[]);
 
 /**
  * Set an external array for the x data points to use for the chart
@@ -312,7 +332,7 @@ void lv_chart_set_ext_y_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t a
  * @param ser       pointer to a data series on 'chart'
  * @param array     external array of points for chart
  */
-void lv_chart_set_ext_x_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t array[]);
+void lv_chart_set_series_ext_x_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t array[]);
 
 /**
  * Get the array of y values of a series
@@ -320,7 +340,7 @@ void lv_chart_set_ext_x_array(lv_obj_t * obj, lv_chart_series_t * ser, int32_t a
  * @param ser   pointer to a data series on 'chart'
  * @return      the array of values with 'point_count' elements
  */
-int32_t * lv_chart_get_y_array(const lv_obj_t * obj, lv_chart_series_t * ser);
+int32_t * lv_chart_get_series_y_array(const lv_obj_t * obj, lv_chart_series_t * ser);
 
 /**
  * Get the array of x values of a series
@@ -328,7 +348,7 @@ int32_t * lv_chart_get_y_array(const lv_obj_t * obj, lv_chart_series_t * ser);
  * @param ser   pointer to a data series on 'chart'
  * @return      the array of values with 'point_count' elements
  */
-int32_t * lv_chart_get_x_array(const lv_obj_t * obj, lv_chart_series_t * ser);
+int32_t * lv_chart_get_series_x_array(const lv_obj_t * obj, lv_chart_series_t * ser);
 
 /**
  * Get the index of the currently pressed point. It's the same for every series.

@@ -29,7 +29,6 @@ extern "C" {
 
 struct _lv_span_t {
     char * txt;                /**<  a pointer to display text */
-    lv_obj_t * spangroup;      /**<  a pointer to spangroup */
     lv_style_t style;          /**<  display text style */
     uint32_t static_flag : 1;  /**<  the text is static flag */
 
@@ -45,7 +44,6 @@ struct _lv_spangroup_t {
     int32_t cache_w;        /**<  the cache automatically calculates the width */
     int32_t cache_h;        /**<  similar cache_w */
     lv_ll_t  child_ll;
-    uint32_t mode : 2;      /**<  details see lv_span_mode_t */
     uint32_t overflow : 1;  /**<  details see lv_span_overflow_t */
     uint32_t refresh : 1;   /**<  the spangroup need refresh cache_w and cache_h */
 };
