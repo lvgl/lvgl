@@ -7,11 +7,11 @@ Rlottie Player
 .. warning::
    Rlottie is deprecated.  Consider using the :ref:`lv_lottie` Widget instead.
 
-Rlottie allows playing Lottie animations in LVGL.  It was taken from
-`lv_rlottie <https://github.com/ValentiWorkLearning/lv_rlottie>`__.
-
-LVGL provides the interface to `Samsung/rlottie <https://github.com/Samsung/rlottie>`__ library's C
-API.  The actual Lottie player is not part of LVGL, it needs to be built separately.
+The `Rlottie animation player for LVGL <https://github.com/ValentiWorkLearning/lv_rlottie>`__
+is a 3rd-party extension for LVGL that allows playing Lottie animations in LVGL.
+It provides an interface to `Samsung/rlottie <https://github.com/Samsung/rlottie>`__
+library's C API.  This Lottie player is not part of LVGL; it needs to be built
+separately.
 
 
 

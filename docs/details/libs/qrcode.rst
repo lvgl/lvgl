@@ -4,9 +4,12 @@
 QR Code
 =======
 
-The QR Code extension enables you to generate QR Codes with LVGL.  It uses
-`QR-Code-generator <https://github.com/nayuki/QR-Code-generator>`__ by
-`nayuki <https://github.com/nayuki>`__.
+The `QR-Code-generator library <https://github.com/nayuki/QR-Code-generator>`__ by
+`nayuki <https://github.com/nayuki>`__ is a 3rd-party library that generates QR-Code
+bitmaps.
+
+The lv_qrcode LVGL extension is an interface to that library that implements a custom
+Widget that generates and displays QR Codes using that library.
 
 
 

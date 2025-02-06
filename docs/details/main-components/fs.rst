@@ -295,7 +295,7 @@ To use files in Image Widgets the following callbacks are required:
 
 
 
-.. _overview_file_system_cache:
+.. _file_system_cache:
 
 Optional File Buffering/Caching
 *******************************
@@ -386,7 +386,7 @@ The driver's ``tell`` will not actually be called.
 
 
 
-.. _overview_file_system_api:
+.. _file_system_api:
 
 API
 ***

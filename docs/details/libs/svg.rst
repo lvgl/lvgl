@@ -4,7 +4,8 @@
 SVG Support
 ===========
 
-This extension provides Scalable Vector Graphics (SVG) Tiny 1.2 support in LVGL.
+The lv_svg extension provides makes it possible to use SVG images in your LVGL UI using the
+`Scalable Vector Graphics (SVG) Tiny 1.2 Specification <https://www.w3.org/TR/SVGTiny12/>`__.
 
 For a detailed introduction, see:  https://www.w3.org/TR/SVGTiny12/
 
