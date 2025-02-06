@@ -130,7 +130,7 @@ int8_t lv_area_diff(lv_area_t res_p[], const lv_area_t * a1_p, const lv_area_t *
         n.x1 = a1_p->x1;
         n.y1 = a1_p->y1;
         n.x2 = a1_p->x2;
-        n.y2 = a1_p->y1 + th;
+        n.y2 = a1_p->y1 + th - 1;
         res_p[res_c++] = n;
     }
 
@@ -138,7 +138,7 @@ int8_t lv_area_diff(lv_area_t res_p[], const lv_area_t * a1_p, const lv_area_t *
     int32_t bh = a1_h - (a2_p->y2 - a1_p->y1);
     if(bh > 0 && a2_p->y2 < a1_p->y2) {
         n.x1 = a1_p->x1;
-        n.y1 = a2_p->y2;
+        n.y1 = a2_p->y2 + 1;
         n.x2 = a1_p->x2;
         n.y2 = a2_p->y2 + bh;
         res_p[res_c++] = n;
@@ -154,7 +154,7 @@ int8_t lv_area_diff(lv_area_t res_p[], const lv_area_t * a1_p, const lv_area_t *
     if(lw > 0 && sh > 0) {
         n.x1 = a1_p->x1;
         n.y1 = y1;
-        n.x2 = a1_p->x1 + lw;
+        n.x2 = a1_p->x1 + lw - 1;
         n.y2 = y1 + sh;
         res_p[res_c++] = n;
     }
@@ -162,7 +162,7 @@ int8_t lv_area_diff(lv_area_t res_p[], const lv_area_t * a1_p, const lv_area_t *
     /*Compute the right rectangle*/
     int32_t rw = a1_w - (a2_p->x2 - a1_p->x1);
     if(rw > 0) {
-        n.x1 = a2_p->x2;
+        n.x1 = a2_p->x2 + 1;
         n.y1 = y1;
         n.x2 = a2_p->x2 + rw;
         n.y2 = y1 + sh;
