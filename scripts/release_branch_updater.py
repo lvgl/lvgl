@@ -108,7 +108,7 @@ def main():
                                        fmt_release(port_branch),   # new branch name
                                        fmt_release(create_from)))  # start point
 
-                if res.exit_code != 0: continue
+                if res.returncode != 0: continue
 
                 port_release_branches.append(port_branch)
                 port_release_branches.sort()
