@@ -157,6 +157,7 @@ static lv_buttonmatrix_ctrl_t ctrl_text_to_enum_value(const char * txt)
     if(lv_streq("checked", txt)) return LV_BUTTONMATRIX_CTRL_CHECKED;
     if(lv_streq("click_trig", txt)) return LV_BUTTONMATRIX_CTRL_CLICK_TRIG;
     if(lv_streq("popover", txt)) return LV_BUTTONMATRIX_CTRL_POPOVER;
+    if(lv_streq("recolor", txt)) return LV_BUTTONMATRIX_CTRL_RECOLOR;
     if(lv_streq("reserved_1", txt)) return LV_BUTTONMATRIX_CTRL_RESERVED_1;
     if(lv_streq("reserved_2", txt)) return LV_BUTTONMATRIX_CTRL_RESERVED_2;
     if(lv_streq("custom_1", txt)) return LV_BUTTONMATRIX_CTRL_CUSTOM_1;

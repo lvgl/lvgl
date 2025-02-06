@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_BUTTONMATRIX_XML_PARSER_H
-#define LV_BUTTONMATRIX_XML_PARSER_H
+#ifndef LV_XML_BUTTONMATRIX_PARSER_H
+#define LV_XML_BUTTONMATRIX_PARSER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,4 +38,4 @@ void lv_xml_buttonmatrix_apply(lv_xml_parser_state_t * state, const char ** attr
 } /*extern "C"*/
 #endif
 
-#endif /*LV_BUTTONMATRIX_XML_PARSE_H*/
+#endif /*LV_XML_BUTTONMATRIX_PARSE_H*/
