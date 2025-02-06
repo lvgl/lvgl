@@ -118,7 +118,7 @@ def main():
             subprocess.check_call(("git", "-C", port_clone_tmpdir, "checkout", fmt_release(port_branch)))
 
             # update the submodule in the port if it exists
-            out = subprocess.check_output(("git", "-C", port_clone_tmpdir, "config", "--file",
+            out = subprocess.run(("git", "-C", port_clone_tmpdir, "config", "--file",
                                            ".gitmodules", "--get-regexp", "path"))
             port_lvgl_submodule_path = next((
                 line.partition("lvgl.path ")[2]
