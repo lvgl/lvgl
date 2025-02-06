@@ -54,7 +54,10 @@ const char * lv_xml_get_value_of(const char ** attrs, const char * name)
 
 lv_color_t lv_xml_to_color(const char * str)
 {
-    return lv_color_hex(lv_xml_strtol(str, NULL, 16));
+    /*fff, #fff, 0xfff*/
+    if(lv_strlen(str) <= 5) return lv_color_hex3(lv_xml_strtol(str, NULL, 16));
+    /*ffffff, #ffffff, 0xffffff*/
+    else return lv_color_hex(lv_xml_strtol(str, NULL, 16));
 }
 
 lv_opa_t lv_xml_to_opa(const char * str)

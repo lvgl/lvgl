@@ -1,3 +1,4 @@
+
 #if LV_BUILD_TEST
 #include "../lvgl.h"
 
@@ -23,6 +24,8 @@ void test_xml_chart_with_attrs(void)
         "height", "100",
         "type", "bar",
         "point_count", "8",
+        "style_length:indicator", "10",
+        "style_transform_rotation:indicator", "300",
         NULL, NULL,
     };
 

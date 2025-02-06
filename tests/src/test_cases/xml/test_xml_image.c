@@ -14,7 +14,7 @@ void tearDown(void)
     lv_obj_clean(lv_screen_active());
 }
 
-void test_xml_tabview_with_attrs(void)
+void test_xml_image_with_attrs(void)
 {
     LV_IMAGE_DECLARE(test_img_lvgl_logo_png);
     lv_xml_register_image("logo", &test_img_lvgl_logo_png);

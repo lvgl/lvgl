@@ -194,6 +194,8 @@ lv_blend_mode_t lv_xml_blend_mode_to_enum(const char * txt)
     LV_LOG_WARN("%s is an unknown value for blend_mode", txt);
     return 0; /*Return 0 in lack of a better option. */
 }
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

@@ -55,8 +55,23 @@ void lv_xml_slider_apply(lv_xml_parser_state_t * state, const char ** attrs)
         const char * name = attrs[i];
         const char * value = attrs[i + 1];
 
-        if(lv_streq("value", name)) lv_slider_set_value(item, lv_xml_atoi(value), LV_ANIM_OFF);
-        if(lv_streq("left_value", name)) lv_slider_set_left_value(item, lv_xml_atoi(value), LV_ANIM_OFF);
+        if(lv_streq("value", name)) {
+            char buf[64];
+            lv_strlcpy(buf, value, sizeof(buf));
+            char * buf_p = buf;
+            int32_t v1 = lv_xml_atoi(lv_xml_split_str(&buf_p, ' '));
+            bool v2 = lv_xml_to_bool(buf_p);
+            lv_bar_set_value(item, v1, v2);
+        }
+        if(lv_streq("start_value", name)) {
+            char buf[64];
+            lv_strlcpy(buf, value, sizeof(buf));
+            char * buf_p = buf;
+            int32_t v1 = lv_xml_atoi(lv_xml_split_str(&buf_p, ' '));
+            bool v2 = lv_xml_to_bool(buf_p);
+            lv_bar_set_start_value(item, v1, v2);
+        }
+
         if(lv_streq("orientation", name)) lv_slider_set_orientation(item, orentation_text_to_enum_value(value));
         if(lv_streq("mode", name)) lv_slider_set_mode(item, mode_text_to_enum_value(value));
         if(lv_streq("range_min", name)) lv_slider_set_range(item, lv_xml_atoi(value), lv_slider_get_max_value(item));

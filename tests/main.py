@@ -236,6 +236,8 @@ if __name__ == "__main__":
                         help='select test suite to run')
     parser.add_argument('--update-image', action='store_true', default=False,
                         help='Update test image using LVGLImage.py script')
+    parser.add_argument('--auto-clean', action='store_true', default=False,
+                        help='Automatically clean build directories')
 
     args = parser.parse_args()
 
@@ -262,6 +264,10 @@ if __name__ == "__main__":
                 run_tests(options_name, args.test_suite)
             except subprocess.CalledProcessError as e:
                 sys.exit(e.returncode)
+        if args.auto_clean:
+            build_dir = get_build_dir(options_name)
+            print("Removing " + build_dir)
+            shutil. rmtree(build_dir)
 
     if args.report:
         generate_code_coverage_report()

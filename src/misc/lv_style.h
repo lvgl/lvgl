@@ -399,6 +399,20 @@ void lv_style_init(lv_style_t * style);
 void lv_style_reset(lv_style_t * style);
 
 /**
+ * Copy all properties of a style to an other.
+ * It has the same affect callying the same `lv_set_style_...`
+ * functions on both styles.
+ * It means new memory will be allocated to store the properties in
+ * the destination style.
+ * After the copy the destination style is fully independent of the source
+ * and source can removed without affecting the destination style.
+ * @param dst   the destination to copy into (can not the a constant style)
+ * @param src   the source style to copy from.
+ */
+void lv_style_copy(lv_style_t * dst, const lv_style_t * src);
+
+
+/**
  * Check if a style is constant
  * @param style     pointer to a style
  * @return          true: the style is constant
@@ -408,6 +422,7 @@ static inline bool lv_style_is_const(const lv_style_t * style)
     if(style->prop_cnt == 255) return true;
     return false;
 }
+
 
 /**
  * Register a new style property for custom usage

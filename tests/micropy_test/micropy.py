@@ -178,7 +178,7 @@ def create_ui():
 
     chart_y_array = [10, 25, 50, 40, 30, 35, 60, 65, 70, 75]
 
-    chart.set_ext_y_array(series, chart_y_array)
+    chart.set_series_ext_y_array(series, chart_y_array)
 
     # Add custom observer callback
     chart_type_subject.add_observer_obj(

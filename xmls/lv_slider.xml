@@ -20,6 +20,11 @@ Example
 	    	<param name="anim" type="bool" default="false"/>
 	    </prop>
 
+	    <prop name="start_value" type="int">
+	    	<param name="range_min" type="int"/>
+	    	<param name="anim" type="bool" default="false"/>
+	    </prop>
+
 	    <prop name="mode" type="enum:lv_slider_mode">
 	    	<param name="range_min" type="int"/>
 	    </prop>

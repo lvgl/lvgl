@@ -91,16 +91,16 @@ void lv_demo_high_res_home(lv_obj_t * base_obj)
     lv_obj_t * date = lv_spangroup_create(date_and_time);
     lv_obj_add_style(date, &c->fonts[FONT_HEADING_MD], 0);
     lv_obj_add_style(date, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    lv_spangroup_new_span(date);
-    lv_span_t * day_and_month = lv_spangroup_new_span(date);
+    lv_spangroup_add_span(date);
+    lv_span_t * day_and_month = lv_spangroup_add_span(date);
     lv_subject_add_observer_obj(&c->th, theme_observer_accent_span_cb, date, day_and_month);
     lv_subject_add_observer_obj(&c->subject_groups.date.group, date_observer_cb, date, c);
 
     lv_obj_t * time = lv_spangroup_create(date_and_time);
     lv_obj_add_style(time, &c->fonts[FONT_HEADING_XXL], 0);
     lv_obj_add_style(time, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    lv_spangroup_new_span(time);
-    lv_span_t * minute = lv_spangroup_new_span(time);
+    lv_spangroup_add_span(time);
+    lv_span_t * minute = lv_spangroup_add_span(time);
     lv_subject_add_observer_obj(&c->th, theme_observer_accent_span_cb, time, minute);
     lv_subject_add_observer_obj(&c->subject_groups.time.group, time_observer_cb, time, c);
 

@@ -198,6 +198,36 @@ void lv_style_reset(lv_style_t * style)
 #endif
 }
 
+
+void lv_style_copy(lv_style_t * dst, const lv_style_t * src)
+{
+    if(lv_style_is_const(dst)) {
+        LV_LOG_WARN("The destination can not be a constant style");
+        return;
+    }
+
+    lv_style_reset(dst);
+
+    /*Source is empty*/
+    if(src->values_and_props == NULL) return;
+    if(src->prop_cnt == 0) return;
+
+    int32_t i;
+    if(lv_style_is_const(src)) {
+        lv_style_const_prop_t * props_and_values = (lv_style_const_prop_t *)src->values_and_props;
+        for(i = 0; props_and_values[i].prop != LV_STYLE_PROP_INV; i++) {
+            lv_style_set_prop(dst, props_and_values[i].prop, props_and_values[i].value);
+        }
+    }
+    else {
+        lv_style_prop_t * props = (lv_style_prop_t *)src->values_and_props + src->prop_cnt * sizeof(lv_style_value_t);
+        lv_style_value_t * values = (lv_style_value_t *)src->values_and_props;
+        for(i = 0; i < src->prop_cnt; i++) {
+            lv_style_set_prop(dst, props[i], values[i]);
+        }
+    }
+}
+
 lv_style_prop_t lv_style_register_prop(uint8_t flag)
 {
     if(lv_style_custom_prop_flag_lookup_table == NULL) {

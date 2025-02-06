@@ -144,6 +144,7 @@ void lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs)
         else SET_STYLE_IF(bg_grad_color, lv_xml_to_color(value));
         else SET_STYLE_IF(bg_main_stop, lv_xml_atoi(value));
         else SET_STYLE_IF(bg_grad_stop, lv_xml_atoi(value));
+        else SET_STYLE_IF(bg_grad, lv_xml_component_get_grad(ctx, value));
 
         else SET_STYLE_IF(bg_image_src, lv_xml_get_image(value));
         else SET_STYLE_IF(bg_image_tiled, lv_xml_to_bool(value));
@@ -228,6 +229,8 @@ void lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs)
         else SET_STYLE_IF(grid_cell_row_pos, lv_xml_atoi(value));
         else SET_STYLE_IF(grid_cell_row_span, lv_xml_atoi(value));
         else SET_STYLE_IF(grid_cell_y_align, lv_xml_grid_align_to_enum(value));
+
+
         else {
             LV_LOG_WARN("%s style property is not supported", name);
         }
@@ -314,6 +317,17 @@ lv_xml_style_t * lv_xml_get_style_by_name(lv_xml_component_ctx_t * ctx, const ch
 
     return NULL;
 }
+
+lv_grad_dsc_t * lv_xml_component_get_grad(lv_xml_component_ctx_t * ctx, const char * name)
+{
+    lv_xml_grad_t * d;
+    LV_LL_READ(&ctx->gradient_ll, d) {
+        if(lv_streq(d->name, name)) return &d->grad_dsc;
+    }
+
+    return NULL;
+}
+
 
 /**********************
  *   STATIC FUNCTIONS

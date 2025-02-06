@@ -155,7 +155,7 @@ void lv_xml_chart_axis_apply(lv_xml_parser_state_t * state, const char ** attrs)
         if(lv_streq("range", name)) {
             int32_t min_val = lv_xml_atoi_split(&value, ' ');
             int32_t max_val = lv_xml_atoi_split(&value, ' ');
-            lv_chart_set_range(chart, axis, min_val, max_val);
+            lv_chart_set_axis_range(chart, axis, min_val, max_val);
         }
     }
 }

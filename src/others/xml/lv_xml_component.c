@@ -191,13 +191,42 @@ lv_result_t lv_xml_component_unregister(const char * name)
 
     lv_free((char *)ctx->name);
     lv_free((char *)ctx->view_def);
+
+    lv_xml_const_t * cnst;
+    LV_LL_READ(&ctx->const_ll, cnst) {
+        lv_free((char *)cnst->name);
+        lv_free((char *)cnst->value);
+    }
+    lv_ll_clear(&ctx->const_ll);
+
+    lv_xml_param_t * param;
+    LV_LL_READ(&ctx->param_ll, param) {
+        lv_free((char *)param->name);
+        lv_free((char *)param->def);
+        lv_free((char *)param->type);
+    }
     lv_ll_clear(&ctx->param_ll);
+
+
+    lv_xml_style_t * style;
+    LV_LL_READ(&ctx->style_ll, style) {
+        lv_free((char *)style->name);
+        lv_free((char *)style->long_name);
+        lv_style_reset(&style->style);
+    }
     lv_ll_clear(&ctx->style_ll);
+
+
+    lv_xml_grad_t * grad;
+    LV_LL_READ(&ctx->gradient_ll, grad) {
+        lv_free((char *)grad->name);
+    }
+    lv_ll_clear(&ctx->gradient_ll);
+
     lv_free(ctx);
 
     return LV_RESULT_OK;
 }
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -222,6 +251,161 @@ static void process_const_element(lv_xml_parser_state_t * state, const char ** a
     cnst->value = lv_strdup(value);
 }
 
+static void process_grad_element(lv_xml_parser_state_t * state, const char * tag_name, const char ** attrs)
+{
+
+    lv_xml_grad_t * grad = lv_ll_ins_tail(&state->ctx.gradient_ll);
+    grad->name = lv_strdup(lv_xml_get_value_of(attrs, "name"));
+    lv_grad_dsc_t * dsc = &grad->grad_dsc;
+    lv_memzero(dsc, sizeof(lv_grad_dsc_t));
+    dsc->extend = LV_GRAD_EXTEND_PAD;
+
+    if(lv_streq(tag_name, "linear_gradient")) {
+        dsc->dir = LV_GRAD_DIR_LINEAR;
+        char buf[64];
+        char * buf_p = buf;
+        const char * start = lv_xml_get_value_of(attrs, "start");
+        lv_strlcpy(buf, start, sizeof(buf));
+        dsc->params.linear.start.x = lv_xml_to_size(lv_xml_split_str(&buf_p, ' '));
+        dsc->params.linear.start.y = lv_xml_to_size(buf_p);
+
+        buf_p = buf;
+        const char * end = lv_xml_get_value_of(attrs, "end");
+        lv_strlcpy(buf, end, sizeof(buf));
+        dsc->params.linear.end.x = lv_xml_to_size(lv_xml_split_str(&buf_p, ' '));
+        dsc->params.linear.end.y = lv_xml_to_size(buf_p);
+    }
+    else if(lv_streq(tag_name, "radial_gradient")) {
+        dsc->dir = LV_GRAD_DIR_RADIAL;
+        char buf[64];
+        char * buf_p = buf;
+        const char * center = lv_xml_get_value_of(attrs, "center");
+        if(center) {
+            lv_strlcpy(buf, center, sizeof(buf));
+            dsc->params.radial.end.x = lv_xml_to_size(lv_xml_split_str(&buf_p, ' '));
+            dsc->params.radial.end.y = lv_xml_to_size(buf_p);
+        }
+        else {
+            dsc->params.radial.end.x = lv_pct(50);
+            dsc->params.radial.end.y = lv_pct(50);
+        }
+        buf_p = buf;
+        const char * center_edge = lv_xml_get_value_of(attrs, "edge");
+        if(center_edge) {
+            lv_strlcpy(buf, center_edge, sizeof(buf));
+            dsc->params.radial.end_extent.x = lv_xml_to_size(lv_xml_split_str(&buf_p, ' '));
+            dsc->params.radial.end_extent.y = lv_xml_to_size(buf_p);
+        }
+        else {
+            dsc->params.radial.end_extent.x = lv_pct(100);
+            dsc->params.radial.end_extent.y = lv_pct(100);
+        }
+
+        buf_p = buf;
+        const char * center_radius = lv_xml_get_value_of(attrs, "radius");
+        if(center_radius) {
+            int32_t r = lv_xml_atoi(center_radius);
+            lv_strlcpy(buf, center_edge, sizeof(buf));
+            dsc->params.radial.end_extent.x = dsc->params.radial.end.x + r;
+            dsc->params.radial.end_extent.y = dsc->params.radial.end.y;
+        }
+
+        buf_p = buf;
+        const char * focal = lv_xml_get_value_of(attrs, "focal_center");
+        if(focal) {
+            lv_strlcpy(buf, focal, sizeof(buf));
+            dsc->params.radial.focal.x = lv_xml_to_size(lv_xml_split_str(&buf_p, ' '));
+            dsc->params.radial.focal.y = lv_xml_to_size(buf_p);
+        }
+        else {
+            dsc->params.radial.focal.x = dsc->params.radial.end.x;
+            dsc->params.radial.focal.y = dsc->params.radial.end.y;
+        }
+
+        buf_p = buf;
+        const char * focal_edge = lv_xml_get_value_of(attrs, "focal_edge");
+        if(focal_edge) {
+            lv_strlcpy(buf, focal_edge, sizeof(buf));
+            dsc->params.radial.focal_extent.x = lv_xml_to_size(lv_xml_split_str(&buf_p, ' '));
+            dsc->params.radial.focal_extent.y = lv_xml_to_size(buf_p);
+        }
+        else {
+            dsc->params.radial.focal_extent.x = dsc->params.radial.focal.x;
+            dsc->params.radial.focal_extent.y = dsc->params.radial.focal.y;
+        }
+
+        buf_p = buf;
+        const char * focal_radius = lv_xml_get_value_of(attrs, "focal_radius");
+        if(focal_radius) {
+            int32_t r = lv_xml_atoi(center_radius);
+            lv_strlcpy(buf, center_edge, sizeof(buf));
+            dsc->params.radial.focal_extent.x = dsc->params.radial.focal.x + r;
+            dsc->params.radial.focal_extent.y = dsc->params.radial.focal.y;
+        }
+
+    }
+
+    else if(lv_streq(tag_name, "conical_gradient")) {
+        dsc->dir = LV_GRAD_DIR_CONICAL;
+        char buf[64];
+        char * buf_p = buf;
+        const char * center = lv_xml_get_value_of(attrs, "center");
+        if(center) {
+            lv_strlcpy(buf, center, sizeof(buf));
+            dsc->params.conical.center.x = lv_xml_to_size(lv_xml_split_str(&buf_p, ' '));
+            dsc->params.conical.center.y = lv_xml_to_size(buf_p);
+        }
+        else {
+            dsc->params.conical.center.x = lv_pct(50);
+            dsc->params.conical.center.y = lv_pct(50);
+        }
+        buf_p = buf;
+        const char * angle = lv_xml_get_value_of(attrs, "angle");
+        if(angle) {
+            lv_strlcpy(buf, angle, sizeof(buf));
+            dsc->params.conical.start_angle = lv_xml_atoi(lv_xml_split_str(&buf_p, ' '));
+            dsc->params.conical.end_angle = lv_xml_atoi(buf_p);
+        }
+        else {
+            dsc->params.conical.start_angle = 0;
+            dsc->params.conical.end_angle = 360;
+        }
+    }
+    else if(lv_streq(tag_name, "horizontal_gradient")) {
+        dsc->dir = LV_GRAD_DIR_HOR;
+    }
+    else if(lv_streq(tag_name, "vertical_gradient")) {
+        dsc->dir = LV_GRAD_DIR_VER;
+    }
+    else {
+        LV_LOG_WARN("Unknown gradient type: %s", tag_name);
+    }
+}
+
+
+static void process_grad_stop_element(lv_xml_parser_state_t * state, const char ** attrs)
+{
+    /*Add the stop to the last gradient*/
+    lv_xml_grad_t * grad = lv_ll_get_tail(&state->ctx.gradient_ll);
+    lv_grad_dsc_t * dsc = &grad->grad_dsc;
+
+    uint32_t idx = dsc->stops_count;
+    if(idx == LV_GRADIENT_MAX_STOPS) {
+        LV_LOG_WARN("Too many gradient stops. Incresase LV_GRADIENT_MAX_STOPS");
+        return;
+    }
+    const char * color_value = lv_xml_get_value_of(attrs, "color");
+    const char * opa_value = lv_xml_get_value_of(attrs, "opa");
+    const char * offset_value = lv_xml_get_value_of(attrs, "offset");
+
+    dsc->stops[idx].color = color_value ? lv_xml_to_color(color_value) : lv_color_black();
+    dsc->stops[idx].opa = opa_value ? lv_xml_to_opa(opa_value) : LV_OPA_COVER;
+    dsc->stops[idx].frac = offset_value ? lv_xml_to_opa(offset_value) : (uint8_t)((int32_t)idx * 255 /
+                                                                                  (LV_GRADIENT_MAX_STOPS - 1));
+
+    dsc->stops_count++;
+}
+
 static void process_prop_element(lv_xml_parser_state_t * state, const char ** attrs)
 {
     lv_xml_param_t * prop = lv_ll_ins_tail(&state->ctx.param_ll);
@@ -234,6 +418,7 @@ static void process_prop_element(lv_xml_parser_state_t * state, const char ** at
     if(type == NULL) type = "compound"; /*If there in no type it means there are <param>s*/
     prop->type = lv_strdup(type);
 }
+
 
 static void start_metadata_handler(void * user_data, const char * name, const char ** attrs)
 {
@@ -260,22 +445,29 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
 
     if(lv_streq(name, "widget")) state->ctx.is_widget = 1;
 
-    if(old_section != state->section) return;   /*Ignore the section opening, e.g. <styles>*/
 
     /* Process elements based on current context */
     switch(state->section) {
         case LV_XML_PARSER_SECTION_API:
+            if(old_section != state->section) return;   /*Ignore the section opening, e.g. <api>*/
             process_prop_element(state, attrs);
             break;
 
         case LV_XML_PARSER_SECTION_CONSTS:
+            if(old_section != state->section) return;   /*Ignore the section opening, e.g. <consts>*/
             process_const_element(state, attrs);
+            break;
+        case LV_XML_PARSER_SECTION_GRAD:
+            if(old_section != state->section) return;   /*Ignore the section opening, e.g. <gradients>*/
+            process_grad_element(state, name, attrs);
+            break;
+        case LV_XML_PARSER_SECTION_GRAD_STOP:
+            process_grad_stop_element(state, attrs);
             break;
 
         case LV_XML_PARSER_SECTION_STYLES:
-            if(lv_streq(name, "style")) {
-                lv_xml_style_register(&state->ctx, attrs);
-            }
+            if(old_section != state->section) return;   /*Ignore the section opening, e.g. <styles>*/
+            lv_xml_style_register(&state->ctx, attrs);
             break;
 
         default:
