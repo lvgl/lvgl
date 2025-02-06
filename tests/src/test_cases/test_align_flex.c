@@ -81,7 +81,6 @@ void test_align(void)
 /*See https://github.com/lvgl/lvgl/issues/7035*/
 void test_wrap_grow_min_width(void)
 {
-
     lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
 
@@ -105,5 +104,71 @@ void test_wrap_grow_min_width(void)
     }
     TEST_ASSERT_EQUAL_SCREENSHOT("flex_wrap_grow_min_width.png");
 }
+
+
+static lv_obj_t  * cont_row_5_create(void)
+{
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
+    lv_obj_set_size(cont, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_center(cont);
+
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+
+    for(int i = 0; i < 5; i++) {
+        lv_obj_t * btn = lv_button_create(cont);
+        lv_obj_set_size(btn, 40, 60);
+
+        lv_obj_t * label = lv_label_create(btn);
+        lv_label_set_text_fmt(label, "%d", i);
+        lv_obj_center(label);
+    }
+
+    return cont;
+}
+
+static void hide(lv_obj_t * cont, uint32_t idx)
+{
+    lv_obj_add_flag(lv_obj_get_child(cont, idx), LV_OBJ_FLAG_HIDDEN);
+}
+
+void test_flex_hide_items(void)
+{
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_COLUMN_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
+
+    lv_obj_t * cont;
+    cont = cont_row_5_create();
+
+    cont = cont_row_5_create();
+    hide(cont, 0);
+
+    cont = cont_row_5_create();
+    hide(cont, 0);
+    hide(cont, 1);
+
+    cont = cont_row_5_create();
+    hide(cont, 4);
+
+    cont = cont_row_5_create();
+    hide(cont, 3);
+    hide(cont, 4);
+
+    cont = cont_row_5_create();
+    hide(cont, 0);
+    hide(cont, 1);
+    hide(cont, 3);
+    hide(cont, 4);
+
+    cont = cont_row_5_create();
+    hide(cont, 1);
+    hide(cont, 3);
+
+    cont = cont_row_5_create();
+    hide(cont, 0);
+    hide(cont, 4);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("flex_hide_items.png");
+}
+
 
 #endif
