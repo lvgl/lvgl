@@ -294,10 +294,9 @@ LV_FONT_CUSTOM_DECLARE
 #endif
 
 /**
- * Just a wrapper around LV_FONT_DEFAULT because it might be more convenient to use a function in some cases
- * @return  pointer to LV_FONT_DEFAULT
+ * Set to LV_FONT_DEFAULT as macros might not be available in bindings or other places
  */
-const lv_font_t * lv_font_default(void);
+extern const lv_font_t * const lv_font_default;
 
 #ifdef __cplusplus
 } /*extern "C"*/

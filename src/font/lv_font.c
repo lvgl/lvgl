@@ -31,6 +31,12 @@
  **********************/
 
 /**********************
+ *  GLOBAL VARIABLES
+ **********************/
+
+const lv_font_t * const lv_font_default = LV_FONT_DEFAULT;
+
+/**********************
  * GLOBAL PROTOTYPES
  **********************/
 
