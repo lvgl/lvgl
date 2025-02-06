@@ -1,1 +1,4 @@
 https://github.com/lvgl/lv_port_linux
+https://github.com/lvgl/lv_port_pc_eclipse
+https://github.com/lvgl/lv_port_pc_vscode
+https://github.com/lvgl/lv_nuttx
