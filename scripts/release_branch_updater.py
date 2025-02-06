@@ -192,7 +192,7 @@ def main():
                               + (" lv_conf.h." if port_lv_conf_h_was_updated else "")
                              )
                 print(LOG, f"commit message: '{commit_msg}'")
-                subprocess.check_call(("git", "-C", port_clone_tmpdir, "commit", "-m", commit_msg))
+                subprocess.check_call(("git", "-C", port_clone_tmpdir, "commit", "--allow-empty", "-m", commit_msg))
                 if dry_run:
                     print(LOG, "this is a dry run so nothing will be pushed")
                 else:
