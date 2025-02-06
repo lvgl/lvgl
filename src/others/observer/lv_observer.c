@@ -606,7 +606,6 @@ lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 #endif /*LV_USE_SLIDER*/
 
 #if LV_USE_ROLLER
-
 lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
     LV_ASSERT_NULL(subject);
@@ -621,12 +620,10 @@ lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, roller_value_observer_cb, obj, NULL);
     return observer;
-
 }
 #endif /*LV_USE_ROLLER*/
 
 #if LV_USE_DROPDOWN
-
 lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
     LV_ASSERT_NULL(subject);
@@ -641,9 +638,7 @@ lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, dropdown_value_observer_cb, obj, NULL);
     return observer;
-
 }
-
 #endif /*LV_USE_DROPDOWN*/
 
 lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer)
