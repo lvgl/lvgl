@@ -357,7 +357,7 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
         lv_obj_add_event_cb(obj, unsubscribe_on_delete_cb, LV_EVENT_DELETE, observer);
     }
 
-    /* update object immediately */
+    /* Update Observer immediately. */
     if(observer->cb) observer->cb(observer, subject);
 
     return observer;
@@ -382,7 +382,7 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
     observer->user_data = user_data;
     observer->target = target;
 
-    /* update object immediately */
+    /* Update Observer immediately. */
     if(observer->cb) observer->cb(observer, subject);
 
     return observer;
