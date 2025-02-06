@@ -104,9 +104,11 @@ def main():
 
                 print(LOG, f"... creating the new branch {fmt_release(port_branch)} "
                                              f"from {fmt_release(create_from)}")
-                subprocess.check_call(("git", "-C", port_clone_tmpdir, "branch",
+                res = subprocess.run(("git", "-C", port_clone_tmpdir, "branch",
                                        fmt_release(port_branch),   # new branch name
                                        fmt_release(create_from)))  # start point
+
+                if res.exit_code != 0: continue
 
                 port_release_branches.append(port_branch)
                 port_release_branches.sort()
