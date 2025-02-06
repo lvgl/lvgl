@@ -131,7 +131,7 @@ void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf,
     if(prev_buf) lv_strlcpy(prev_buf, value, size);
 
     subject->type = LV_SUBJECT_TYPE_STRING;
-    subject->size = size;
+    subject->size = (uint32_t)size;
     subject->value.pointer = buf;
     subject->prev_value.pointer = prev_buf;
 
@@ -162,7 +162,7 @@ void lv_subject_snprintf(lv_subject_t * subject, const char * format, ...)
         return;
     }
 
-    if(subject->size < 1) return;
+    if(subject->size < 1U) return;
 
     if(subject->prev_value.pointer) {
         lv_strlcpy((char *)subject->prev_value.pointer, subject->value.pointer, subject->size);
@@ -319,7 +319,7 @@ lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t inde
         return NULL;
     }
 
-    if(index >= subject->size)  return NULL;
+    if(index >= (int32_t)subject->size)  return NULL;
 
     return ((lv_subject_t **)(subject->value.pointer))[index];
 }
