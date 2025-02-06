@@ -7,6 +7,9 @@
  *      INCLUDES
  *********************/
 #include "lv_demo_benchmark.h"
+#include <src/core/lv_obj_pos.h>
+#include <src/core/lv_obj_style_gen.h>
+#include <src/misc/lv_area.h>
 
 #if LV_USE_DEMO_BENCHMARK
 
@@ -34,6 +37,15 @@
     #warning "It's recommended to have at least 128kB RAM for the benchmark"
 #endif
 
+#if LV_USE_TINY_TTF
+    #if LV_TINY_TTF_FILE_SUPPORT == 0
+        #pragma message("WARNING: You choose to test tinyTTF, but LV_TINY_TTF_FILE_SUPPORT is not enabled. TinyTTF will not be tested.")
+        #define TEST_TINY_TTF 0
+    #else
+        #define TEST_TINY_TTF 1
+    #endif
+#endif
+
 #include "../../lvgl_private.h"
 
 /**********************
@@ -47,24 +59,9 @@
 #define FALL_HEIGHT     80
 #define PAD_BASIC       8
 
-
-#define LV_TEST_FONT_STRING_1 "法律之前人人平等,并有权享受法律的平等保护,不受任何歧视。人人有权享受平等保护,以免受违反本宣言的任何歧视行为以及煽动这种歧视的任何行为之害"
-#define LV_TEST_FONT_STRING_2 "No one shall be subjected to arbitrary arrest, detention or exile. Everyone is entitled in full equality to a fair and public hearing by an independent and impartial tribunal, in the determination of his rights and obligations and of any criminal charge against him. No one shall be subjected to arbitrary interference with his privacy, family, home or correspondence, nor to attacks upon his honour and reputation. Everyone has the right to the protection of the law against such interference or attacks."
+#define LV_TEST_FONT_STRING_CHINESE "法律之前人人平等,并有权享受法律的平等保护,不受任何歧视。人人有权享受平等保护,以免受违反本宣言的任何歧视行为以及煽动这种歧视的任何行为之害。"
+#define LV_TEST_FONT_STRING_ENGLISH "No one shall be subjected to arbitrary arrest, detention or exile. Everyone is entitled in full equality to a fair and public hearing by an independent and impartial tribunal, in the determination of his rights and obligations and of any criminal charge against him. No one shall be subjected to arbitrary interference with his privacy, family, home or correspondence, nor to attacks upon his honour and reputation. Everyone has the right to the protection of the law against such interference or attacks."
 #define LV_TEST_FONT_SIZE 24
-
-#if LV_USE_FREETYPE == 0
-    #if LV_USE_TINY_TTF == 0
-        #define ENABLE_TTF 0
-    #else
-        #if LV_TINY_TTF_FILE_SUPPORT == 0
-            #error "LV_TINY_TTF_FILE_SUPPORT needs to be enabled for the benchmark"
-        #else
-            #define ENABLE_TTF 1
-        #endif
-    #endif
-#else
-    #define ENABLE_TTF 1
-#endif
 
 /**********************
  *      TYPEDEFS
@@ -73,6 +70,7 @@
 typedef struct benchmark_context {
     lv_font_t * font_bitmap;
     lv_font_t * font_outline;
+    lv_font_t * font_tinyttf;
     lv_obj_t * label_perf;
     uint32_t scene_act;
     uint32_t rnd_act;
@@ -103,28 +101,43 @@ static void next_scene_timer_cb(lv_timer_t * timer);
 static void summary_create(void);
 
 static void rnd_reset(benchmark_context_t * context);
-static int32_t rnd_next(int32_t min, int32_t max, benchmark_context_t * context);
+static int32_t rnd_next(benchmark_context_t * context, int32_t min, int32_t max);
 static void shake_anim_y_cb(void * var, int32_t v);
-static void fall_anim(lv_obj_t * obj, int32_t y_max, benchmark_context_t * context);
+static void fall_anim(benchmark_context_t * context, lv_obj_t * obj, int32_t y_max);
 static void scroll_anim(lv_obj_t * obj, int32_t y_max);
 static void scroll_anim_y_cb(void * var, int32_t v);
 static void color_anim_cb(void * var, int32_t v);
 static void color_anim(lv_obj_t * obj);
-static void arc_anim(lv_obj_t * obj, benchmark_context_t * context);
+static void arc_anim(benchmark_context_t * context, lv_obj_t * obj);
 
 static lv_obj_t * card_create(void);
 
-#if ENABLE_TTF
-static void span_text_create(lv_font_t * font);
+#if LV_USE_FREETYPE
+static void span_text_add(lv_obj_t * spans, lv_font_t * font, const char * text);
 
 static void span_text_bitmap_cb(benchmark_context_t * context)
 {
-    span_text_create(context->font_bitmap);
+    lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
+    lv_obj_center(spans);
+    lv_obj_set_width(spans, lv_display_get_horizontal_resolution(NULL));
+    lv_obj_set_style_text_align(spans, LV_TEXT_ALIGN_LEFT, 0);
+    lv_spangroup_set_overflow(spans, LV_SPAN_OVERFLOW_CLIP);
+    lv_spangroup_set_mode(spans, LV_SPAN_MODE_BREAK);
+
+    span_text_add(spans, context->font_bitmap, LV_TEST_FONT_STRING_CHINESE);
 }
 
 static void span_text_outline_cb(benchmark_context_t * context)
 {
-    span_text_create(context->font_outline);
+    lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
+    lv_obj_center(spans);
+    lv_obj_set_width(spans, lv_display_get_horizontal_resolution(NULL));
+    lv_obj_set_style_text_align(spans, LV_TEXT_ALIGN_LEFT, 0);
+    lv_spangroup_set_overflow(spans, LV_SPAN_OVERFLOW_CLIP);
+    lv_spangroup_set_mode(spans, LV_SPAN_MODE_BREAK);
+
+    span_text_add(spans, context->font_bitmap, LV_TEST_FONT_STRING_CHINESE);
+    span_text_add(spans, context->font_outline, LV_TEST_FONT_STRING_ENGLISH);
 }
 
 static void ttf_text_bitmap_cb(benchmark_context_t * context)
@@ -133,7 +146,7 @@ static void ttf_text_bitmap_cb(benchmark_context_t * context)
     if(context->font_bitmap) {
         lv_obj_set_style_text_font(label, context->font_bitmap, 0);
     }
-    lv_label_set_text(label, LV_TEST_FONT_STRING_1);
+    lv_label_set_text(label, LV_TEST_FONT_STRING_CHINESE);
     lv_obj_set_width(label, lv_pct(100));
 }
 
@@ -143,7 +156,31 @@ static void ttf_text_outline_cb(benchmark_context_t * context)
     if(context->font_outline) {
         lv_obj_set_style_text_font(label, context->font_outline, 0);
     }
-    lv_label_set_text(label, LV_TEST_FONT_STRING_2);
+    lv_label_set_text(label, LV_TEST_FONT_STRING_ENGLISH);
+    lv_obj_set_width(label, lv_pct(100));
+}
+#endif
+
+#if TEST_TINY_TTF
+static void tiny_ttf_span_text_cb(benchmark_context_t * context)
+{
+    lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
+    lv_obj_center(spans);
+    lv_obj_set_width(spans, lv_display_get_horizontal_resolution(NULL));
+    lv_obj_set_style_text_align(spans, LV_TEXT_ALIGN_LEFT, 0);
+    lv_spangroup_set_overflow(spans, LV_SPAN_OVERFLOW_CLIP);
+    lv_spangroup_set_mode(spans, LV_SPAN_MODE_BREAK);
+
+    span_text_add(spans, context->font_tinyttf, LV_TEST_FONT_STRING_CHINESE);
+}
+
+static void tiny_ttf_text_cb(benchmark_context_t * context)
+{
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    if(context->font_tinyttf) {
+        lv_obj_set_style_text_font(label, context->font_tinyttf, 0);
+    }
+    lv_label_set_text(label, LV_TEST_FONT_STRING_ENGLISH);
     lv_obj_set_width(label, lv_pct(100));
 }
 #endif
@@ -157,13 +194,13 @@ static void empty_screen_cb(benchmark_context_t * context)
 static void moving_wallpaper_cb(benchmark_context_t * context)
 {
     lv_obj_set_style_pad_all(lv_screen_active(), 0, 0);
-    LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_argb);
+    LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_rgb);
 
-    lv_obj_t * img = lv_img_create(lv_screen_active());
+    lv_obj_t * img = lv_image_create(lv_screen_active());
     lv_obj_set_size(img, lv_pct(150), lv_pct(150));
-    lv_image_set_src(img, &img_benchmark_lvgl_logo_argb);
+    lv_image_set_src(img, &img_benchmark_lvgl_logo_rgb);
     lv_image_set_inner_align(img, LV_IMAGE_ALIGN_TILE);
-    fall_anim(img, - lv_display_get_vertical_resolution(NULL) / 3, context);
+    fall_anim(context, img, - lv_display_get_vertical_resolution(NULL) / 3);
 }
 
 static void single_rectangle_cb(benchmark_context_t * context)
@@ -204,7 +241,7 @@ static void multiple_rgb_images_cb(benchmark_context_t * context)
     lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_SPACE_EVENLY);
     lv_obj_set_style_pad_bottom(scr, FALL_HEIGHT + PAD_BASIC, 0);
 
-    LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_argb);
+    LV_IMAGE_DECLARE(img_benchmark_lvgl_logo_rgb);
     int32_t hor_cnt = ((int32_t)lv_obj_get_content_width(scr)) / 160;
     int32_t ver_cnt = ((int32_t)lv_obj_get_content_height(scr)) / 160;
 
@@ -216,10 +253,10 @@ static void multiple_rgb_images_cb(benchmark_context_t * context)
         int32_t x;
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * obj = lv_image_create(lv_screen_active());
-            lv_image_set_src(obj, &img_benchmark_lvgl_logo_argb);
+            lv_image_set_src(obj, &img_benchmark_lvgl_logo_rgb);
             if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
 
-            fall_anim(obj, 80, context);
+            fall_anim(context, obj, 80);
         }
     }
 }
@@ -246,7 +283,7 @@ static void multiple_argb_images_cb(benchmark_context_t * context)
             lv_image_set_src(obj, &img_benchmark_lvgl_logo_argb);
             if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
 
-            fall_anim(obj, 80, context);
+            fall_anim(context, obj, 80);
         }
     }
 }
@@ -274,7 +311,7 @@ static void rotated_argb_image_cb(benchmark_context_t * context)
             if(x == 0) lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
 
             lv_image_set_rotation(obj, lv_rand(100, 3500));
-            fall_anim(obj, 80, context);
+            fall_anim(context, obj, 80);
         }
     }
 }
@@ -374,7 +411,7 @@ static void multiple_arcs_cb(benchmark_context_t * context)
             lv_obj_set_style_arc_width(obj, 10, LV_PART_INDICATOR);
             lv_obj_set_style_arc_rounded(obj, false, LV_PART_INDICATOR);
             lv_obj_set_style_arc_color(obj, lv_color_hex3(lv_rand(0x00f, 0xff0)), LV_PART_INDICATOR);
-            arc_anim(obj, context);
+            arc_anim(context, obj);
         }
     }
 }
@@ -398,7 +435,7 @@ static void containers_cb(benchmark_context_t * context)
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * card = card_create();
             if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
-            fall_anim(card, 30, context);
+            fall_anim(context, card, 30);
         }
     }
 }
@@ -422,7 +459,7 @@ static void containers_with_overlay_cb(benchmark_context_t * context)
         for(x = 0; x < hor_cnt; x++) {
             lv_obj_t * card = card_create();
             if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
-            fall_anim(card, 30, context);
+            fall_anim(context, card, 30);
         }
     }
 
@@ -450,7 +487,7 @@ static void containers_with_opa_cb(benchmark_context_t * context)
             lv_obj_t * card = card_create();
             if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
             lv_obj_set_style_opa(card, LV_OPA_50, 0);
-            fall_anim(card, 30, context);
+            fall_anim(context, card, 30);
         }
     }
 }
@@ -475,7 +512,7 @@ static void containers_with_opa_layer_cb(benchmark_context_t * context)
             lv_obj_t * card = card_create();
             lv_obj_set_style_opa_layered(card, LV_OPA_50, 0);
             if(x == 0) lv_obj_add_flag(card, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
-            fall_anim(card, 30, context);
+            fall_anim(context, card, 30);
         }
     }
 }
@@ -538,11 +575,16 @@ static scene_dsc_t scenes[] = {
     {.name = "Screen sized text",          .scene_time = 5000,  .create_cb = screen_sized_text_cb},
     {.name = "Multiple arcs",              .scene_time = 3000,  .create_cb = multiple_arcs_cb},
 
-#if ENABLE_TTF
+#if LV_USE_FREETYPE
     {.name = "Span text(bitmap)",          .scene_time = 3000,  .create_cb = span_text_bitmap_cb},
     {.name = "Span text(outline)",         .scene_time = 3000,  .create_cb = span_text_outline_cb},
     {.name = "TTF text(bitmap)",           .scene_time = 3000,  .create_cb = ttf_text_bitmap_cb},
     {.name = "TTF text(outline)",          .scene_time = 3000,  .create_cb = ttf_text_outline_cb},
+#endif
+
+#if TEST_TINY_TTF
+    {.name = "TinyTTF span text",          .scene_time = 3000,  .create_cb = tiny_ttf_span_text_cb},
+    {.name = "TinyTTF text",               .scene_time = 3000,  .create_cb = tiny_ttf_text_cb},
 #endif
 
     {.name = "Containers",                 .scene_time = 3000,  .create_cb = containers_cb},
@@ -566,9 +608,10 @@ static scene_dsc_t scenes[] = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-static void benchmark_context_init(benchmark_context_t * context)
+static benchmark_context_t * benchmark_context_init(void)
 {
-#if ENABLE_TTF
+    benchmark_context_t * context = (benchmark_context_t *)lv_malloc_zeroed(sizeof(benchmark_context_t));
+    LV_ASSERT_NULL(context);
 #if LV_USE_FREETYPE
     context->font_bitmap = lv_freetype_font_create(LV_TEST_FONT_PATH,
                                                    LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
@@ -584,16 +627,12 @@ static void benchmark_context_init(benchmark_context_t * context)
     if(context->font_bitmap == NULL) {
         LV_LOG_ERROR("freetype font creation failed!");
     }
-#else
-    context->font_bitmap = lv_tiny_ttf_create_file("A:" LV_TEST_FONT_PATH, LV_TEST_FONT_SIZE);
-    if(context->font_bitmap == NULL) {
-        LV_LOG_ERROR("freetype font creation failed!");
-    }
-    context->font_outline = lv_tiny_ttf_create_file("A:" LV_TEST_FONT_PATH, LV_TEST_FONT_SIZE);
-    if(context->font_bitmap == NULL) {
-        LV_LOG_ERROR("freetype font creation failed!");
-    }
 #endif
+#if TEST_TINY_TTF
+    context->font_tinyttf = lv_tiny_ttf_create_file("A:" LV_TEST_FONT_PATH, LV_TEST_FONT_SIZE);
+    if(context->font_bitmap == NULL) {
+        LV_LOG_ERROR("freetype font creation failed!");
+    }
 #endif
     context->scene_act = 0;
     context->label_perf = lv_label_create(lv_layer_top());
@@ -604,35 +643,27 @@ static void benchmark_context_init(benchmark_context_t * context)
 #if LV_USE_PERF_MONITOR_LOG_MODE
     lv_obj_add_flag(context->label_perf, LV_OBJ_FLAG_HIDDEN);
 #endif
+    return context;
 }
 
 static void benchmark_context_deinit(benchmark_context_t * context)
 {
-#if ENABLE_TTF
-#if LV_USE_FREETYPE
     if(context->font_bitmap != NULL) {
         lv_freetype_font_delete(context->font_bitmap);
     }
     if(context->font_outline != NULL) {
         lv_freetype_font_delete(context->font_outline);
     }
-#else
     if(context->font_bitmap != NULL) {
-        lv_tiny_ttf_destroy(context->font_bitmap);
+        lv_tiny_ttf_destroy(context->font_tinyttf);
     }
-    if(context->font_outline != NULL) {
-        lv_tiny_ttf_destroy(context->font_outline);
-    }
-#endif
-#endif
     lv_obj_delete(context->label_perf);
+    lv_free(context);
 }
 
 void lv_demo_benchmark(void)
 {
-    benchmark_context_t * context = (benchmark_context_t *)lv_malloc(sizeof(benchmark_context_t));
-    LV_ASSERT_NULL(context);
-    benchmark_context_init(context);
+    benchmark_context_t * context = benchmark_context_init();
 
     lv_obj_t * scr = lv_screen_active();
     lv_obj_remove_style_all(scr);
@@ -694,7 +725,6 @@ static void next_scene_timer_cb(lv_timer_t * timer)
     load_scene(context);
     if(scenes[context->scene_act].scene_time == 0) {
         benchmark_context_deinit(context);
-        lv_free(context);
         lv_timer_delete(timer);
         summary_create();
     }
@@ -707,8 +737,7 @@ static void next_scene_timer_cb(lv_timer_t * timer)
 static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     const lv_sysmon_perf_info_t * info = lv_subject_get_pointer(subject);
-    lv_obj_t * label = lv_observer_get_target(observer);
-    benchmark_context_t * context = (benchmark_context_t *)(observer->user_data);
+    benchmark_context_t * context = lv_observer_get_user_data(observer);
 
     char scene_name[64];
     if(scenes[context->scene_act].name[0] != '\0') {
@@ -728,8 +757,6 @@ static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * sub
                           info->calculated.fps, info->calculated.cpu,
                           info->calculated.render_avg_time + info->calculated.flush_avg_time,
                           info->calculated.render_avg_time, info->calculated.flush_avg_time);
-#else
-    LV_UNUSED(observer);
 #endif
 
     /*Ignore the first call as it contains data from the previous scene*/
@@ -902,10 +929,10 @@ static void arc_anim_cb(void * var, int32_t v)
     lv_arc_set_value(var, v);
 }
 
-static void arc_anim(lv_obj_t * obj, benchmark_context_t * context)
+static void arc_anim(benchmark_context_t * context, lv_obj_t * obj)
 {
-    uint32_t t1 = rnd_next(1000, 3000, context);
-    uint32_t t2 = rnd_next(1000, 3000, context);
+    uint32_t t1 = rnd_next(context, 1000, 3000);
+    uint32_t t2 = rnd_next(context, 1000, 3000);
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_exec_cb(&a, arc_anim_cb);
@@ -942,10 +969,10 @@ static void shake_anim_y_cb(void * var, int32_t v)
     lv_obj_set_style_translate_y(var, v, 0);
 }
 
-static void fall_anim(lv_obj_t * obj, int32_t y_max, benchmark_context_t * context)
+static void fall_anim(benchmark_context_t * context, lv_obj_t * obj, int32_t y_max)
 {
-    uint32_t t1 = rnd_next(300, 3000, context);
-    uint32_t t2 = rnd_next(300, 3000, context);
+    uint32_t t1 = rnd_next(context, 300, 3000);
+    uint32_t t2 = rnd_next(context, 300, 3000);
 
     lv_anim_t a;
     lv_anim_init(&a);
@@ -964,10 +991,10 @@ static lv_obj_t * card_create(void)
     lv_obj_set_size(panel, 270, 120);
     lv_obj_set_style_pad_all(panel, 8, 0);
 
-    LV_IMG_DECLARE(img_transform_avatar_15);
+    LV_IMAGE_DECLARE(img_benchmark_avatar);
     lv_obj_t * child = lv_image_create(panel);
     lv_obj_align(child, LV_ALIGN_LEFT_MID, 0, 0);
-    lv_image_set_src(child, &img_transform_avatar_15);
+    lv_image_set_src(child, &img_benchmark_avatar);
 
     child = lv_label_create(panel);
     lv_label_set_text_static(child, "John Smith");
@@ -988,27 +1015,11 @@ static lv_obj_t * card_create(void)
     return panel;
 }
 
-#if ENABLE_TTF
-static void span_text_create(lv_font_t * font)
+#if LV_USE_FREETYPE || TEST_TINY_TTF
+static void span_text_add(lv_obj_t * spans, lv_font_t * font, const char * text)
 {
-    lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
-    lv_obj_center(spans);
-    lv_obj_set_width(spans, lv_display_get_horizontal_resolution(NULL));
-
-    lv_spangroup_set_align(spans, LV_TEXT_ALIGN_LEFT);
-    lv_spangroup_set_overflow(spans, LV_SPAN_OVERFLOW_CLIP);
-    lv_spangroup_set_mode(spans, LV_SPAN_MODE_BREAK);
-
     lv_span_t * span = lv_spangroup_new_span(spans);
-    lv_span_set_text(span, LV_TEST_FONT_STRING_1);
-    lv_style_set_text_color(lv_span_get_style(span), lv_palette_main(LV_PALETTE_RED));
-    if(font) {
-        lv_style_set_text_font(lv_span_get_style(span), font);
-    }
-
-    span = lv_spangroup_new_span(spans);
-    lv_span_set_text(span, LV_TEST_FONT_STRING_2);
-    lv_style_set_text_color(lv_span_get_style(span), lv_palette_main(LV_PALETTE_BLUE));
+    lv_span_set_text(span, text);
     if(font) {
         lv_style_set_text_font(lv_span_get_style(span), font);
     }
@@ -1020,7 +1031,7 @@ static void rnd_reset(benchmark_context_t * context)
     context->rnd_act = 0;
 }
 
-static int32_t rnd_next(int32_t min, int32_t max, benchmark_context_t * context)
+static int32_t rnd_next(benchmark_context_t * context, int32_t min, int32_t max)
 {
     static const uint32_t rnd_map[] = {
         0xbd13204f, 0x67d8167f, 0x20211c99, 0xb0a7cc05,

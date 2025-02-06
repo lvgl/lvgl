@@ -956,10 +956,6 @@ menu "LVGL configuration"
 		config LV_USE_FONT_PLACEHOLDER
 			bool "Enable drawing placeholders when glyph dsc is not found"
 			default y
-
-		config LV_TEST_FONT_PATH
-			string "Path to font file which is used in benchmark test"
-			default "./lvgl/tests/src/test_files/fonts/noto/NotoSansSC-Regular.ttf"
 	endmenu
 
 	menu "Text Settings"
@@ -2011,6 +2007,12 @@ menu "LVGL configuration"
 			select LV_FONT_MONTSERRAT_24
 			select LV_FONT_MONTSERRAT_26
 			select LV_USE_DEMO_WIDGETS
+
+		config LV_DEMO_BENCHMARK_FREETYPE_FONT_PATH
+			string "Path to font file which is used in benchmark test"
+			default "./lvgl/tests/src/test_files/fonts/noto/NotoSansSC-Regular.ttf"
+			depends on LV_USE_DEMO_BENCHMARK && (LV_USE_FREETYPE || LV_USE_TINY_TTF)
+
 		config LV_USE_DEMO_RENDER
 			bool "Render test for each primitives. Requires at least 480x272 display"
 			default n
