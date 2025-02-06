@@ -300,11 +300,6 @@ void lv_subject_deinit(lv_subject_t * subject)
     while(observer) {
         lv_observer_t * observer_next = lv_ll_get_next(&subject->subs_ll, observer);
 
-        if(observer->for_obj) {
-            lv_obj_remove_event_cb(observer->target, unsubscribe_on_delete_cb);
-            lv_obj_remove_event_cb_with_user_data(observer->target, NULL, subject);
-        }
-
         lv_observer_remove(observer);
         observer = observer_next;
     }
@@ -393,6 +388,11 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
 void lv_observer_remove(lv_observer_t * observer)
 {
     LV_ASSERT_NULL(observer);
+
+    if(observer->for_obj && observer->target) {
+        lv_obj_remove_event_cb(observer->target, unsubscribe_on_delete_cb);
+        lv_obj_remove_event_cb_with_user_data(observer->target, NULL, observer->subject);
+    }
 
     observer->subject->notify_restart_query = 1;
 

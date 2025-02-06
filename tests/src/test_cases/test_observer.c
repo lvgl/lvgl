@@ -59,6 +59,27 @@ void test_observer_add_remove(void)
     TEST_ASSERT_EQUAL_PTR(NULL, observer); /*The observer must be NULL*/
 }
 
+void test_object_observer_add_remove(void)
+{
+
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 1);
+
+    lv_observer_t * observer = lv_obj_bind_flag_if_eq(obj, &subject, LV_OBJ_FLAG_HIDDEN, 5);
+
+    TEST_ASSERT_EQUAL(false, lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN));
+    lv_subject_set_int(&subject, 5);
+    TEST_ASSERT_EQUAL(true, lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN));
+    lv_observer_remove(observer);
+    lv_subject_set_int(&subject, 1);
+
+    /* This shouldn't get updated */
+    TEST_ASSERT_EQUAL(true, lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN));
+    lv_obj_clean(obj);
+    /* We shouldn't crash here */
+}
+
 void test_observer_int(void)
 {
     static lv_subject_t subject;
