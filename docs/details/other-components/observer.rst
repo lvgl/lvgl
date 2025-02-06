@@ -9,19 +9,46 @@ Observer
 Overview
 ********
 
-The ``lv_observer`` module implements a standard `Observer pattern <https://en.wikipedia.org/wiki/Observer_pattern>`__.
+.. _observer pattern:  https://en.wikipedia.org/wiki/Observer_pattern
 
-It consists of:
+The ``lv_observer`` module is an implemention of the `Observer Pattern`_.
 
-- **subjects**: each containing a value
-- **observers**: attached to subjects to be notified on value change
+This implementation consists of:
 
+:Subjects:   (in global memory or heap) are "logic packages", each containing the
+             value being "observed" and its type (integer (``int32_t``), a string, a
+             pointer, an :cpp:type:`lv_color_t`, or a group);
+
+:Observers:  (zero or more per Subject, always dynamically-allocated) are always
+             attached to exactly one Subject, and provide user-defined notifications
+             each the time Subject's value changes.
+
+A Subject and its Observers can be used in various ways:
+
+1.  Simply subscribe to a Subject and get notified when the Subject's value changes.
+
+2.  Subscribe to a group Subject (connects a group of Subjects) to get notified when
+    any of the Subjects' values change in the group.
+
+3.  Bind Widgets to Subjects to automatically match the Widget's value with the
+    Subject (e.g. a Label's text or an Arc's value).
+
+
+
+.. _observer_usage:
+
+Usage
+*****
+
+Using Observer first requires :c:macro:`LV_USE_OBSERVER` be configured to ``1``.
+(It is ``1`` by default, and can be set to ``0`` to save some program space if you
+will not be using Observer.)
 
 A typical use case looks like this:
 
 .. code-block:: c
 
-    //It's a global variable
+    // Any typical global variable
     lv_subject_t my_subject;
 
     /*-------
@@ -32,7 +59,7 @@ A typical use case looks like this:
 
     void main(void)
     {
-        //Initialize the subject as integer with the default value of 10
+        // Initialize Subject as integer with the default value of 10.
         lv_subject_init_int(&my_subject, 10);
 
         some_module_init();
@@ -44,7 +71,7 @@ A typical use case looks like this:
 
     extern lv_subject_t some_subject;
 
-    //Will be called when the related subject's value changes
+    // Will be called when Subject's value changes
     static void some_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
     {
         int32_t v = lv_subject_get_int(subject);
@@ -53,7 +80,7 @@ A typical use case looks like this:
 
     void some_module_init(void)
     {
-        //Subscribe to a subject
+        // Subscribe to Subject as an Observer.
         lv_subject_add_observer(&some_subject, some_observer_cb, NULL);
     }
 
@@ -65,80 +92,106 @@ A typical use case looks like this:
 
     void some_event(void)
     {
-        //Set the subject's value to 30. It will notify `some_observer_cb`
+        // The below call sets Subject's value to 30 and notifies current Observers.
         lv_subject_set_int(&some_subject, 30);
     }
+
 
 
 .. _observer_subject:
 
 Subject
-*******
+-------
 
-Subject initialization
-----------------------
+Subject Initialization
+~~~~~~~~~~~~~~~~~~~~~~
 
-Subjects have to be static or global :cpp:type:`lv_subject_t` type variables.
+Subjects have to be static or global variables, or dynamically-allocated
+:cpp:type:`lv_subject_t` objects.  Reason:  their content must remain valid through
+the life of the Subject.
 
-To initialize a subject use ``lv_subject_init_<type>(&subject, params, init_value)``.
-The following initializations exist for types:
+To initialize a Subject use ``lv_subject_init_<type>(&subject, params, init_value)``.
+The following initialization functions exist, one for each of the Subject types:
 
-- **Integer** ``void lv_subject_init_int(lv_subject_t * subject, int32_t value)``
-- **String** ``void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value)``
-- **Pointer**  ``void lv_subject_init_pointer(lv_subject_t * subject, void * value)``
-- **Color** ``void lv_subject_init_color(lv_subject_t * subject, lv_color_t color)``
-- **Group** ``void lv_subject_init_group(lv_subject_t * subject, lv_subject_t * list[], uint32_t list_len)``
-
-
-Set subject value
------------------
-
-The following functions can be used to set a subject's value:
-
-- **Integer** ``void lv_subject_set_int(lv_subject_t * subject, int32_t value)``
-- **String** ``void lv_subject_copy_string(lv_subject_t * subject, char * buf)``
-- **Pointer**  ``void lv_subject_set_pointer(lv_subject_t * subject, void * ptr)``
-- **Color** ``void lv_subject_set_color(lv_subject_t * subject, lv_color_t color)``
-
-Get subject's value
--------------------
-
-The following functions can be used to get a subject's value:
+:Integer: void :cpp:expr:`lv_subject_init_int(subject, int_value)`
+:String:  void :cpp:expr:`lv_subject_init_string(subject, buf, prev_buf, buf_size, initial_string)`
+:Pointer: void :cpp:expr:`lv_subject_init_pointer(subject, ptr)`
+:Color:   void :cpp:expr:`lv_subject_init_color(subject, color)`
+:Group:   void :cpp:expr:`lv_subject_init_group(group_subject, subject_list[], count)`
 
 
-- **Integer** ``int32_t lv_subject_get_int(lv_subject_t * subject)``
-- **String** ``const char * lv_subject_get_string(lv_subject_t * subject)``
-- **Pointer**  ``const void * lv_subject_get_pointer(lv_subject_t * subject)``
-- **Color** ``lv_color_t lv_subject_get_color(lv_subject_t * subject)``
+Setting a Subject's Value
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following functions are used to update a Subject's value:
+
+:Integer: void :cpp:expr:`lv_subject_set_int(subject, int_value)`
+:String:  void :cpp:expr:`lv_subject_copy_string(subject, buf)`
+:Pointer: void :cpp:expr:`lv_subject_set_pointer(subject, ptr)`
+:Color:   void :cpp:expr:`lv_subject_set_color(subject, color)`
+
+At the end of each of these calls, if the new value differs from the previous value,
+a notification is sent to all current Observers.
 
 
-Get subject's previous value
-----------------------------
+Getting a Subject's Value
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The following functions can be used to get a subject's previous value:
+The following functions are used to get a Subject's current value:
 
 
-- **Integer** ``int32_t lv_subject_get_previous_int(lv_subject_t * subject)``
-- **String** ``const char * lv_subject_get_previous_string(lv_subject_t * subject)``
-- **Pointer** ``const void * lv_subject_get_previous_pointer(lv_subject_t * subject)``
-- **Color** ``lv_color_t lv_subject_get_previous_color(lv_subject_t * subject)``
+:Integer: int32_t      :cpp:expr:`lv_subject_get_int(subject)`
+:String:  const char * :cpp:expr:`lv_subject_get_string(subject)`
+:Pointer: const void * :cpp:expr:`lv_subject_get_pointer(subject)`
+:Color:   lv_color_t   :cpp:expr:`lv_subject_get_color(subject)`
+
+
+Getting a Subject's Previous Value
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following functions are used to get a Subject's previous value:
+
+
+:Integer: int32_t      :cpp:expr:`lv_subject_get_previous_int(subject)`
+:String:  const char * :cpp:expr:`lv_subject_get_previous_string(subject)`
+:Pointer: const void * :cpp:expr:`lv_subject_get_previous_pointer(subject)`
+:Color:   lv_color_t   :cpp:expr:`lv_subject_get_previous_color(subject)`
+
+
 
 .. _observer_observer:
 
 Observer
-********
-
-Subscribe to a subject
-----------------------
-
-To subscribe to a subject the following function can be used:
-
-.. code-block:: c
-
-    lv_observer_t * observer = lv_subject_add_observer(&some_subject, some_observer_cb, user_data);
+--------
 
 
-Where the observer callback should look like this:
+Subscribing to a Subject
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The action of subscribing to a Subject:
+
+- dynamically allocates an Observer object,
+- attaches it to the Subject,
+- performs an initial notification to the Observer (allowing the Observer to
+  update itself with the Subject's current value), and
+- returns a pointer to the newly-created Observer.
+
+Thereafter the Observer will receive a notification each time the Subject's value
+changes, as long as that Observer remains attached (subscribed) to that Subject.
+
+Notifications are performed by calling the callback function provided when
+subscribing to the Subject.
+
+To subscribe to a Subject one of the ``lv_subject_add_observer...()`` functions are
+used.  Alternately, if you want to bind a Subject's value to a Widget's property, one
+of the ``lv_<widget_type>_bind_...()`` functions can be used.  The former are covered
+below.  The latter are covered in the :ref:`observer_widget_binding` section.
+
+For the most basic use case, subscribe to a Subject by using the following function:
+
+    lv_observer_t * observer =  :cpp:expr:`lv_subject_add_observer(&some_subject, some_observer_cb, user_data)`
+
+where the Observer's notification callback should look like this:
 
 .. code-block:: c
 
@@ -147,79 +200,131 @@ Where the observer callback should look like this:
         ...
     }
 
+This function returns a pointer to the newly-created Observer.
 
-It's also possible to save a target widget when subscribing to a subject.
-In this case when widget is deleted, it will automatically unsubscribe from the subject.
+When using this method of subscribing, it is the responsibility of the user to call
+:cpp:expr:`lv_observer_remove(observer)` when the Observer is no longer needed, which
+both unsubscribes it from the Subject and deletes it from the LVGL heap.
 
-In the observer callback :cpp:expr:`lv_observer_get_target(observer)` can be used to get the saved widget.
+Subscribing While Associating Observer with a Non-Widget Object
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: c
+The function subscribes to a Subject additionally associates the Observer with a
+pointer to any type of object, a copy of which is saved in the Observer's ``target``
+field.  This function should be used when the pointer *does not* point to a Widget.
 
-    lv_observer_t * observer = lv_subject_add_observer_obj(&some_subject, some_observer_cb, widget, user_data);
+    lv_observer_t * observer =  :cpp:expr:`lv_subject_add_observer_with_target(&some_subject, some_observer_cb, some_pointer, user_data)`
+
+A copy of the passed pointer can be retrieved by calling
+:cpp:expr:`lv_observer_get_target(observer)`, e.g. inside the callback function.
+
+When using this method of subscribing, it is the responsibility of the user to call
+:cpp:expr:`lv_observer_remove(observer)` when the Observer is no longer needed, which
+both unsubscribes it from the Subject and deletes it from the LVGL heap.
+
+Subscribing While Associating Observer with a Widget
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The function below assocates a Widget with an Observer while subscribing to a
+Subject.  A copy of the pointer to that Widget is saved in the Observer's ``target``
+field.  This works exactly like the above method except that when the Widget is
+deleted, the Observer thus created will be automatically unsubscribed from the
+Subject and deleted from the LVGL heap.  Note this is different from
+:ref:`observer_widget_binding`.
+
+    lv_observer_t * observer =  :cpp:expr:`lv_subject_add_observer_obj(&some_subject, some_observer_cb, widget, user_data)`
+
+Any number of Observers can be created and be associated with a Widget this way.
+
+A copy of the pointer to the Widget can be retrieved by calling
+:cpp:expr:`lv_observer_get_target_obj(observer)`, e.g. inside the callback function.
+Note that this function returns the stored pointer as a ``lv_obj_t *`` type, as
+opposed to the ``void *`` type returned by
+:cpp:expr:`lv_observer_get_target_obj(observer)`.
+(:cpp:expr:`lv_observer_get_target(observer)` can still be used if you need that
+pointer as a ``void *`` type for any reason, but in practice, this would be rare.)
+
+**Important:**
+
+When using this method of subscribing to a Subject:
+
+- :cpp:expr:`lv_observer_remove(observer)` must *never* be called.
+
+The Observer MUST ONLY BE unsubscribed and deleted by:
+
+- If Widget needs to be deleted, simply delete the Widget, which will automatically
+  remove the Observer from the Subject.
+- If Widget does NOT need to be deleted:
+
+    - :cpp:expr:`lv_obj_remove_from_subject(widget, subject)` which will delete all
+      Observers associated with ``widget``, or
+    - :cpp:expr:`lv_subject_deinit(subject)`, which gracefully disconnects ``subject``
+      from all associated Observers and Widget events.
 
 
-In more generic case any pointer can be saved a target:
+Unsubscribing from a Subject
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block:: c
+To unsubscribe a normal Observer or one associated with a non-Widget object, use
+:cpp:expr:`lv_observer_remove(observer)`, where ``observer`` is the return value from
+either the :cpp:func:`lv_subject_add_observer()` or
+:cpp:func:`lv_subject_add_observer_with_target()` functions.
 
-    lv_observer_t * observer = lv_subject_add_observer_with_target(&some_subject, some_observer_cb, some_pointer, user_data);
+To unsubscribe an Observer created through :cpp:func:`lv_subject_add_observer_obj()`,
+use :cpp:expr:`lv_obj_remove_from_subject(widget, subject)`.  ``subject`` can be NULL
+to unsubscribe the Widget from all associated Subjects.
+
+To unsubscribe all Observers from a Subject that were subscribed using any method
+(including :ref:`observer_widget_binding` covered below), use
+:cpp:expr:`lv_subject_deinit(subject)`.
 
 
-
-Unsubscribe from a subject
---------------------------
-
-.. code-block:: c
-
-    /* `observer` is the return value of `lv_subject_add_observer*` */
-    lv_observer_remove(observer);
-
-To unsubscribe a widget from a given or all subject use:
-
-.. code-block:: c
-
-    lv_obj_remove_from_subject(widget, subject); /* `subject` can be NULL to unsubscribe from all */
 
 .. _observer_subject_groups:
 
-Subject groups
-**************
+Subject Groups
+--------------
 
-There are cases when a subject changes and the value of some other subjects are also required by the observer.
-As a practical example imagine an instrument which measures either voltage or current.
-To display the measured value on a label 3 things are required:
+When something in your system relies on more than one value (i.e. it needs to be
+notified when any of a SET of two or more values changes), it can be made an
+Observer of a Subject Group.
 
-1. What do we measure (current or voltage)?
+Let us consider an example of an instrument which measures either voltage or current.
+To display the measured value on a label, 3 things are required:
+
+1. What is being measured (current or voltage)?
 2. What is the measured value?
-3. What is the range or unit (mV, V, mA, A)?
+3. What is the range or unit ("mV", "V", "mA", "A")?
 
-When any of these 3 parameters changes the label needs to be updated,
-and it needs to know all 3 parameters to compose its text.
+When any of these 3 input values change, the label needs to be updated, and it needs
+to know all 3 values to compose its text.
 
-To handle this you can create an array from some existing subjects and pass
-this array as a parameter when you initialize a subject with group type.
+To handle this you can create an array from the addresses of all the Subjects that
+are relied upon, and pass that array as a parameter when you initialize a Subject
+with GROUP type.
 
 .. code-block:: c
 
     static lv_subject_t * subject_list[3] = {&subject_1, &subject_2, &subject_3};
-    lv_subject_init_group(&subject_all, subject_list, 3);  /*The last parameter is the number of elements */
+    lv_subject_init_group(&subject_all, subject_list, 3);  /* Last argument is number of elements. */
 
-You can add observers to subject groups in the regular way.
-The trick is that when any element of the group is notified the subject group will be notified as well.
+Observers are then added to Subject Groups (e.g. ``subject_all``) in the usual way.
+When this is done, a change to the value of any of the Subjects in the group triggers
+a notification to all Observers subscribed to the Subject Group (e.g. ``subject_all``).
 
-The above Voltage/Current measurement example looks like this in the practice:
+As an example, the above scenario with Voltage/Current measurement might look like this:
 
 .. code-block:: c
 
     lv_obj_t * label = lv_label_create(lv_screen_active());
 
-    lv_subject_t subject_mode;  //Voltage or Current
-    lv_subject_t subject_value; //Measured value
-    lv_subject_t subject_unit;  //The unit
-    lv_subject_t subject_all;   //It will be the subject group
-    lv_subject_t * subject_list[3] = {&subject_mode, &subject_value, &subject_unit};  //The elements of the group
+    lv_subject_t subject_mode;  // Voltage or Current
+    lv_subject_t subject_value; // Measured value
+    lv_subject_t subject_unit;  // The unit
+    lv_subject_t subject_all;   // Subject group that connects the above 3 Subjects
+    lv_subject_t * subject_list[3] = {&subject_mode, &subject_value, &subject_unit};  // The elements of the group
 
-    lv_subject_init_int(&subject_mode, 0); //Let's say 0 is Voltage, 1 is Current
+    lv_subject_init_int(&subject_mode, 0); // Let's say 0 is Voltage, 1 is Current
     lv_subject_init_int(&subject_value, 0);
     lv_subject_init_pointer(&subject_unit, "V");
     lv_subject_init_group(&subject_all, subject_list, 3);
@@ -243,98 +348,225 @@ The above Voltage/Current measurement example looks like this in the practice:
     }
 
 
+
 .. _observer_widget_binding:
 
-Widget binding
-**************
+Widget Binding
+--------------
 
-Base Widget
------------
+The following methods of subscribing to an integer-type Subject associate the
+Observer with ONE of a Widget's properties as thought that property itself were the
+Observer.  Any of the following Widget properties can be thus bound to an Subject's
+integer value:
 
-Set a Widget flag if an integer subject's value is equal to a reference value, clear the flag otherwise
+- flag (or OR-ed combination of flags) from from the ``LV_OBJ_FLAG_...`` enumeration values;
+- state (or OR-ed combination of states) from the ``LV_STATE_...`` enumeration values;
+- text value for Label Widgets;
+- integer value for these Widget types:
 
-.. code-block:: c
+    - Arc
+    - Drop-Down
+    - Roller
+    - Slider
 
-    observer = lv_obj_bind_flag_if_eq(widget, &subject, LV_OBJ_FLAG_*, ref_value);
+Any number of Observers can be created for a single Widget, each bound to ONE of
+the above properties.
 
-Set a Widget flag if an integer subject's value is not equal to a reference value, clear the flag otherwise
+For all of the ``lv_..._bind_...()`` functions covered below, they are similar to
+:cpp:expr:`lv_subject_add_observer_obj(&some_subject, some_observer_cb, widget, user_data)`
+in that they create an Observer and associates the Widget with it.  What is different
+is that updates to the Widget's property thus bound are handled internally -- the
+user *does not supply callback functions* for any of these subscribing methods -- the
+callback methods are supplied by the Observer subsystem.
 
-.. code-block:: c
+.. warning::
 
-    observer = lv_obj_bind_flag_if_not_eq(widget, &subject, LV_OBJ_FLAG_*, ref_value);
+    In all cases, the Observer is unsubscribed from the Subject and deleted from the
+    LVGL heap when the Widget is deleted.  :cpp:expr:`lv_observer_remove(observer)`
+    must *never* be called when using the ``lv_..._bind_...()`` functions, but
+    :cpp:expr:`lv_subject_deinit(subject)` and
+    :cpp:expr:`lv_obj_remove_from_subject(widget, subject)` may both be used since
+    they both gracefully de-couple the Observer from the Widget before deleting the
+    Observer.
 
-Set a Widget state if an integer subject's value is equal to a reference value, clear the flag otherwise
+.. note::
 
-.. code-block:: c
-
-    observer = lv_obj_bind_state_if_eq(widget, &subject, LV_STATE_*, ref_value);
-
-Set a Widget state if an integer subject's value is not equal to a reference value, clear the flag otherwise
-
-.. code-block:: c
-
-    observer = lv_obj_bind_state_if_not_eq(widget, &subject, LV_STATE_*, ref_value);
-
-Set an integer subject to 1 when a Widget is checked and set it 0 when unchecked.
-
-.. code-block:: c
-
-    observer = lv_obj_bind_checked(widget, &subject);
-
-Label
------
-
-Bind an integer, string, or pointer (pointing to a string) subject to a label.
-An optional format string can be added with 1 format specifier (e.g. ``"%d °C"``)
-If the format string is ``NULL`` the value will be used directly. In this case on string and pointer type subjects can be used.
-
-.. code-block:: c
-
-    observer = lv_label_bind_text(widget, &subject, format_string);
+    While the examples below show saving a reference to the created Observer objects
+    for the various ``lv_..._bind_...()`` functions, it is not necessary to do so
+    unless you need them for some purpose, because the created Observer objects will
+    be automatically deleted when the Widget is deleted.
 
 
-Arc
----
+Any Widget Type
+~~~~~~~~~~~~~~~
 
-Bind an integer subject to an arc's value.
+Flags
+^^^^^
 
-.. code-block:: c
+The following methods of subscribing to an integer Subject affect a Widget's flag (or
+OR-ed combination of flags).  When the subscribing occurs, and each time the
+Subject's value is changed thereafter, the Subject's value is compared with the
+specified reference value, and the specified flag(s) is (are):
 
-    observer = lv_arc_bind_value(widget, &subject);
+- SET when the Subject's integer value fulfills the indicated condition, and
+- CLEARED otherwise.
 
-Slider
-------
+Here are the functions that carry out this method of subscribing to a Subject.  The
+``flags`` argument can contain a single, or bit-wise OR-ed combination of any of the
+``LV_OBJ_FLAG_...`` enumeration values.
 
-Bind an integer subject to a slider's value
+:equal:                  :cpp:expr:`lv_obj_bind_flag_if_eq(widget, &subject, flags, ref_value)`
+:not equal:              :cpp:expr:`lv_obj_bind_flag_if_not_eq(widget, &subject, flags, ref_value)`
+:greater than:           :cpp:expr:`lv_obj_bind_flag_if_gt(widget, &subject, flags, ref_value)`
+:greater than or equal:  :cpp:expr:`lv_obj_bind_flag_if_ge(widget, &subject, flags, ref_value)`
+:less than:              :cpp:expr:`lv_obj_bind_flag_if_lt(widget, &subject, flags, ref_value)`
+:less than or equal:     :cpp:expr:`lv_obj_bind_flag_if_le(widget, &subject, flags, ref_value)`
 
-.. code-block:: c
+States
+^^^^^^
 
-    observer = lv_slider_bind_value(widget, &subject);
+The following methods of subscribing to an integer Subject affect a Widget's states
+(or OR-ed combination of states).  When the subscribing occurs, and each time the
+Subject's value is changed thereafter, the Subject's value is compared with the
+specified reference value, and the specified state(s) is (are):
 
-Roller
-------
+- SET when the Subject's integer value fulfills the indicated condition, and
+- CLEARED otherwise.
 
-Bind an integer subject to a roller's value
+Here are the functions that carry out this method of subscribing to a Subject.  The
+``states`` argument can contain a single, or bit-wise OR-ed combination of any of the
+``LV_STATE_...`` enumeration values.
 
-.. code-block:: c
+:equal:                  :cpp:expr:`lv_obj_bind_state_if_eq(widget, &subject, states, ref_value)`
+:not equal:              :cpp:expr:`lv_obj_bind_state_if_not_eq(widget, &subject, states, ref_value)`
+:greater than:           :cpp:expr:`lv_obj_bind_state_if_gt(widget, &subject, states, ref_value)`
+:greater than or equal:  :cpp:expr:`lv_obj_bind_state_if_ge(widget, &subject, states, ref_value)`
+:less than:              :cpp:expr:`lv_obj_bind_state_if_lt(widget, &subject, states, ref_value)`
+:less than or equal:     :cpp:expr:`lv_obj_bind_state_if_le(widget, &subject, states, ref_value)`
 
-    observer = lv_roller_bind_value(widget, &subject);
+Checked State
+^^^^^^^^^^^^^
+
+The following method of subscribing to an integer Subject affects a Widget's
+:cpp:enumerator:`LV_STATE_CHECKED` state.  When the subscribing occurs, and each time
+the Subject's value is changed thereafter, the Subject's value is compared to a
+reference value of ``0``, and the :cpp:enumerator:`LV_STATE_CHECKED` state is:
+
+- CLEARED when the Subject's value is 0, and
+- SET when the Subject's integer value is non-zero.
+
+Note that this is a two-way binding (Subject <===> Widget) so direct (or
+programmatic) interaction with the Widget that causes its
+:cpp:enumerator:`LV_STATE_CHECKED` state to be SET or CLEARED also causes the
+Subject's value to be set to ``1`` or ``0`` respectively.
+
+- :cpp:expr:`lv_obj_bind_checked(widget, &subject)`
 
 
-Drop-down
----------
-Bind an integer subject to a drop-down's value
+Label Widgets
+~~~~~~~~~~~~~
 
-.. code-block:: c
+.. |deg|    unicode:: U+000B0 .. DEGREE SIGN
 
-    observer = lv_dropdown_bind_value(widget, &subject);
+This method of subscribing to an integer Subject affects a Label Widget's
+``text``.  The Subject can be an STRING, POINTER or INTEGER type.
+
+When the subscribing occurs, and each time the Subject's value is changed thereafter,
+the Subject's value is used to update the Label's text as follows:
+
+:string Subject:    Subject's string is used to directly update the Label's text.
+
+:pointer Subject:   If NULL is passed as the ``format_string`` argument when
+                    subscribing, the Subject's pointer value is assumed to point to a
+                    NUL-terminated string. and is used to directly update the Label's
+                    text.  See :ref:`observer_format_string` for other options.
+
+:integer Subject:   Subject's integer value is used with the ``format_string`` argument.
+                    See See :ref:`observer_format_string` for details.
+
+Note that this is a one-way binding (Subject ===> Widget).
+
+- :cpp:expr:`lv_label_bind_text(label, &subject, format_string)`
+
+.. _observer_format_string:
+
+The ``format_string`` Argument
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``format_string`` argument is optional and if provided, must contain exactly 1
+printf-like format specifier and be one of the following:
+
+:string or pointer Subject:  "%s" to format the new pointer value as a string or "%p"
+                             to format the pointer as a pointer (typically the
+                             pointer's address value is spelled out with 4, 8 or 16
+                             hexadecimal characters depending on the platform).
+
+:integer Subject:            "%d" format specifier (``"%" PRIdxx`` --- a
+                             cross-platform equivalent where ``xx`` can be ``8``,
+                             ``16``, ``32`` or ``64``, depending on the platform).
+
+If NULL is passed for the ``format_string`` argument:
+
+:string or pointer Subject:  Updates expect the pointer to point to a NUL-terminated string.
+
+:integer Subject:            The Label will display an empty string (i.e. nothing).
+
+**Example:**  "%d |deg|\C"
+
+
+Arc Widgets
+~~~~~~~~~~~
+
+This method of subscribing to an integer Subject affects an Arc Widget's integer
+value directly.  Note that this is a two-way binding (Subject <===> Widget) so an end
+user's direct interaction with the Arc Widget updates the Subject's value and vice
+versa.  (Requires :c:macro:`LV_USE_ARC` to be configured to ``1``.)
+
+- :cpp:expr:`lv_arc_bind_value(arc, &subject)`
+
+
+Slider Widgets
+~~~~~~~~~~~~~~
+
+This method of subscribing to an integer Subject affects a Slider Widget's integer
+value directly.  Note that this is a two-way binding (Subject <===> Widget) so an end
+user's direct interaction with the Slider Widget updates the Subject's value and vice
+versa.  (Requires :c:macro:`LV_USE_SLIDER` to be configured to ``1``.)
+
+- :cpp:expr:`lv_slider_bind_value(slider, &subject)`
+
+
+Roller Widgets
+~~~~~~~~~~~~~~
+
+This method of subscribing to an integer Subject affects a Roller Widget's integer
+value directly.  Note that this is a two-way binding (Subject <===> Widget) so an end
+user's direct interaction with the Slider Widget updates the Subject's value and vice
+versa.  (Requires :c:macro:`LV_USE_ROLLER` to be configured to ``1``.)
+
+- :cpp:expr:`lv_roller_bind_value(roller, &subject)`
+
+
+Drop-Down Widgets
+~~~~~~~~~~~~~~~~~
+
+This method of subscribing to an integer Subject affects a Drop-Down Widget's integer
+value directly.  Note that this is a two-way binding (Subject <===> Widget) so an end
+user's direct interaction with the Drop-Down Widget updates the Subject's value and
+vice versa.  (Requires :c:macro:`LV_USE_DROPDOWN` to be configured to ``1``.)
+
+- :cpp:expr:`lv_dropdown_bind_value(dropdown, &subject)`
+
+
 
 .. _observer_example:
 
-Example
-*******
+Examples
+********
 
 .. include:: ../../examples/others/observer/index.rst
+
+
 
 .. _observer_api:
 
