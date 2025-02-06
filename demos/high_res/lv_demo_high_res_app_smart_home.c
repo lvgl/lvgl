@@ -14,6 +14,7 @@
 #include "../../src/widgets/label/lv_label.h"
 #include "../../src/widgets/slider/lv_slider.h"
 #include "../../src/widgets/arc/lv_arc.h"
+#include "../../src/widgets/switch/lv_switch.h"
 
 /*********************
  *      DEFINES
@@ -33,12 +34,29 @@ static void charging_arc_observer(lv_observer_t * observer, lv_subject_t * subje
 static void charging_percent_label_observer(lv_observer_t * observer, lv_subject_t * subject);
 static void charging_time_until_full_label_observer(lv_observer_t * observer, lv_subject_t * subject);
 static void create_widget_charging(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
+static void handle_locked_value(lv_obj_t * slider, bool locked);
 static void widget2_slider_released_cb(lv_event_t * e);
 static void widget2_slider_locked_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 static void widget3_play_pause_clicked_cb(lv_event_t * e);
 static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 static void create_widget4(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
+static void door_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static lv_obj_t * create_widget5_door(lv_demo_high_res_ctx_t * c, lv_obj_t * parent);
+static void switch_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static lv_obj_t * create_switch(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, lv_image_dsc_t ** img_dsc_pair,
+                                lv_subject_t * subject);
+static lv_obj_t * create_lightbulbs_switch_with_label(lv_demo_high_res_ctx_t * c, lv_obj_t * parent,
+                                                      const char * label_text, lv_subject_t * subject);
+static lv_obj_t * create_widget5_lightbulbs(lv_demo_high_res_ctx_t * c, lv_obj_t * parent);
+static lv_obj_t * create_widget5_zigbee_fan(lv_demo_high_res_ctx_t * c, lv_obj_t * parent);
+static void slider_draw_start_cb(lv_event_t * e);
+static void slider_draw_end_cb(lv_event_t * e);
+static void slider_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void slider_label_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static lv_obj_t * create_slider(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const char * label_text,
+                                lv_image_dsc_t ** img_dsc_pair, lv_subject_t * subject);
+static void create_widget5(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets);
 
 /**********************
  *  STATIC VARIABLES
@@ -74,14 +92,14 @@ void lv_demo_high_res_app_smart_home(lv_obj_t * base_obj)
 
     /* top margin */
 
-    lv_demo_high_res_top_margin_create(bg_cont,
-                                       c->sz == &lv_demo_high_res_sizes_all[SIZE_SM] ? c->sz->gap[9] : c->sz->gap[10], true, c);
+    lv_obj_t * top_margin = lv_demo_high_res_top_margin_create(bg_cont,
+                                                               c->sz == &lv_demo_high_res_sizes_all[SIZE_SM] ? c->sz->gap[9] : c->sz->gap[10], true, c);
 
     /* app info */
 
     lv_obj_t * app_info = lv_demo_high_res_simple_container_create(bg_cont, true, c->sz->gap[4], LV_FLEX_ALIGN_START);
-    lv_obj_set_style_pad_top(app_info, c->sz->gap[10], 0);
-    lv_obj_set_style_pad_left(app_info, c->sz->gap[10], 0);
+    lv_obj_add_flag(app_info, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_obj_align_to(app_info, top_margin, LV_ALIGN_OUT_BOTTOM_LEFT, c->sz->gap[10], c->sz->gap[10]);
 
     lv_obj_t * back = lv_demo_high_res_simple_container_create(app_info, false, c->sz->gap[2], LV_FLEX_ALIGN_CENTER);
     lv_obj_add_event_cb(back, back_clicked_cb, LV_EVENT_CLICKED, NULL);
@@ -120,6 +138,10 @@ void lv_demo_high_res_app_smart_home(lv_obj_t * base_obj)
     create_widget2(c, widgets);
     create_widget3(c, widgets);
     create_widget4(c, widgets);
+    create_widget5(c, widgets);
+
+    /* bring app info to top so the back button can be clicked */
+    lv_obj_move_to_index(app_info, -1);
 }
 
 /**********************
@@ -267,19 +289,25 @@ static void create_widget_charging(lv_demo_high_res_ctx_t * c, lv_obj_t * widget
     lv_obj_set_width(time_to_full_label, LV_PCT(100));
 }
 
+static void handle_locked_value(lv_obj_t * slider, bool locked)
+{
+    lv_slider_set_value(slider, locked ? 100 : 0, LV_ANIM_ON);
+    lv_obj_update_flag(slider, LV_OBJ_FLAG_CLICKABLE, !locked);
+}
+
 static void widget2_slider_released_cb(lv_event_t * e)
 {
     lv_obj_t * slider = lv_event_get_target_obj(e);
     lv_demo_high_res_ctx_t * c = lv_event_get_user_data(e);
-    lv_subject_set_int(&c->api.subjects.locked, lv_slider_get_value(slider) >= 100);
+    bool locked = lv_slider_get_value(slider) >= 100;
+    handle_locked_value(slider, locked);
+    lv_subject_set_int(&c->api.subjects.locked, locked);
 }
-
 static void widget2_slider_locked_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * slider = lv_observer_get_target_obj(observer);
     bool locked = lv_subject_get_int(subject);
-    lv_slider_set_value(slider, locked ? 100 : 0, LV_ANIM_ON);
-    lv_obj_update_flag(slider, LV_OBJ_FLAG_CLICKABLE, !locked);
+    handle_locked_value(slider, locked);
 }
 
 static void create_widget2(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
@@ -479,6 +507,300 @@ static void create_widget4(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_t * slider_lamp_img = lv_image_create(slider);
     lv_image_set_src(slider_lamp_img, c->imgs[IMG_LAMP]);
     lv_obj_align(slider_lamp_img, LV_ALIGN_LEFT_MID, 8, 0);
+}
+
+static void door_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_demo_high_res_ctx_t * c = lv_observer_get_user_data(observer);
+    lv_obj_t * door_box = lv_observer_get_target_obj(observer);
+    lv_obj_t * icon = lv_obj_get_child(door_box, 0);
+    lv_obj_t * label = lv_obj_get_child(door_box, 1);
+    bool door_is_open = lv_subject_get_int(subject);
+    lv_obj_set_style_bg_opa(door_box, door_is_open ? LV_OPA_60 : LV_OPA_20, 0);
+    lv_image_set_src(icon, c->imgs[door_is_open ? IMG_DOOR_1 : IMG_DOOR]);
+    lv_obj_set_style_bg_opa(icon, door_is_open ? LV_OPA_COVER : LV_OPA_40, 0);
+    lv_label_set_text_static(label, door_is_open ? "Door open" : "Door closed");
+}
+
+static lv_obj_t * create_widget5_door(lv_demo_high_res_ctx_t * c, lv_obj_t * parent)
+{
+    lv_obj_t * door_box = lv_obj_create(parent);
+    lv_obj_remove_style_all(door_box);
+    lv_obj_set_size(door_box, c->sz->indicator_width, c->sz->indicator_height);
+    lv_obj_set_flex_flow(door_box, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(door_box, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_row(door_box, 0, 0);
+    lv_obj_set_style_bg_color(door_box, lv_color_white(), 0);
+    lv_obj_set_style_radius(door_box, c->sz->gap[3], 0);
+    lv_obj_set_style_pad_ver(door_box, c->sz->gap[5], 0);
+
+    lv_obj_t * icon = lv_image_create(door_box);
+    lv_image_set_inner_align(icon, LV_IMAGE_ALIGN_CENTER);
+    lv_obj_set_size(icon, c->sz->icon[ICON_XL], c->sz->icon[ICON_XL]);
+    lv_obj_set_style_bg_color(icon, lv_color_white(), 0);
+    lv_obj_set_style_radius(icon, LV_COORD_MAX, 0);
+    lv_obj_set_style_shadow_width(icon, 50, 0);
+    lv_obj_set_style_shadow_opa(icon, 15 * 255 / 100, 0);
+    lv_obj_add_flag(icon, LV_OBJ_FLAG_EVENT_BUBBLE);
+
+    lv_obj_t * label = lv_label_create(door_box);
+    lv_obj_add_style(label, &c->fonts[FONT_LABEL_SM], 0);
+    lv_obj_add_style(label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+
+    lv_subject_add_observer_obj(&c->api.subjects.door, door_observer_cb, door_box, c);
+
+    return door_box;
+}
+
+static void switch_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * sw = lv_observer_get_target_obj(observer);
+    lv_image_dsc_t ** pair = lv_observer_get_user_data(observer);
+    bool is_on = lv_subject_get_int(subject);
+    lv_obj_set_style_bg_image_src(sw, pair[is_on], LV_PART_KNOB);
+}
+
+static lv_obj_t * create_switch(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, lv_image_dsc_t ** img_dsc_pair,
+                                lv_subject_t * subject)
+{
+    lv_obj_t * sw = lv_switch_create(parent);
+    lv_obj_set_size(sw, c->sz->slider_width * 2, c->sz->slider_width);
+    lv_obj_set_style_pad_all(sw, 0, LV_PART_KNOB);
+    lv_obj_set_style_bg_color(sw, lv_color_hex(0xCAF0A2), LV_PART_INDICATOR | LV_STATE_CHECKED);
+    lv_obj_set_style_bg_color(sw, lv_color_white(), 0);
+    lv_obj_set_style_bg_opa(sw, LV_OPA_30, 0);
+    lv_obj_set_style_shadow_width(sw, 25, LV_PART_KNOB);
+    lv_obj_set_style_shadow_opa(sw, 15 * 255 / 100, LV_PART_KNOB);
+
+    lv_obj_bind_checked(sw, subject);
+    lv_subject_add_observer_obj(subject, switch_observer_cb, sw, img_dsc_pair);
+
+    return sw;
+}
+
+static lv_obj_t * create_lightbulbs_switch_with_label(lv_demo_high_res_ctx_t * c, lv_obj_t * parent,
+                                                      const char * label_text, lv_subject_t * subject)
+{
+    lv_obj_t * box = lv_demo_high_res_simple_container_create(parent, true, c->sz->gap[3], LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t * label = lv_label_create(box);
+    lv_obj_add_style(label, &c->fonts[FONT_LABEL_XS], 0);
+    lv_obj_add_style(label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+    lv_obj_set_style_text_opa(label, LV_OPA_50, 0);
+    lv_label_set_text_static(label, label_text);
+
+    create_switch(c, box, &c->imgs[IMG_LAMP2], subject);
+
+    return box;
+}
+
+static lv_obj_t * create_widget5_lightbulbs(lv_demo_high_res_ctx_t * c, lv_obj_t * parent)
+{
+    lv_obj_t * lightbulbs_box = lv_obj_create(parent);
+    lv_obj_remove_style_all(lightbulbs_box);
+    lv_obj_set_height(lightbulbs_box, c->sz->indicator_height);
+    lv_obj_set_flex_flow(lightbulbs_box, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(lightbulbs_box, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_row(lightbulbs_box, 0, 0);
+    lv_obj_set_style_bg_color(lightbulbs_box, lv_color_white(), 0);
+    lv_obj_set_style_bg_opa(lightbulbs_box, LV_OPA_20, 0);
+    lv_obj_set_style_radius(lightbulbs_box, c->sz->gap[3], 0);
+    lv_obj_set_style_pad_ver(lightbulbs_box, c->sz->gap[5], 0);
+
+    lv_obj_t * switch_box = lv_demo_high_res_simple_container_create(lightbulbs_box, false, c->sz->gap[7],
+                                                                     LV_FLEX_ALIGN_END);
+    create_lightbulbs_switch_with_label(c, switch_box, "MATTER", &c->api.subjects.lightbulb_matter);
+    create_lightbulbs_switch_with_label(c, switch_box, "ZIGBEE", &c->api.subjects.lightbulb_zigbee);
+
+    lv_obj_t * label = lv_label_create(lightbulbs_box);
+    lv_obj_add_style(label, &c->fonts[FONT_LABEL_SM], 0);
+    lv_obj_add_style(label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+    lv_label_set_text_static(label, "Lightbulbs Sensors");
+
+    return lightbulbs_box;
+}
+
+static lv_obj_t * create_widget5_zigbee_fan(lv_demo_high_res_ctx_t * c, lv_obj_t * parent)
+{
+    lv_obj_t * box = lv_demo_high_res_simple_container_create(parent, true, c->sz->gap[9], LV_FLEX_ALIGN_END);
+    lv_obj_set_style_pad_top(box, c->sz->gap[5], 0);
+
+    lv_obj_t * label = lv_label_create(box);
+    lv_obj_add_style(label, &c->fonts[FONT_LABEL_SM], 0);
+    lv_obj_add_style(label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+    lv_label_set_text_static(label, "Zigbee Fan");
+
+    create_switch(c, box, &c->imgs[IMG_FAN2], &c->api.subjects.fan_zigbee);
+
+    return box;
+}
+
+static void slider_draw_start_cb(lv_event_t * e)
+{
+    lv_obj_t * slider = lv_event_get_target_obj(e);
+    lv_area_t indic_area;
+    lv_obj_get_coords(slider, &indic_area);
+    int32_t indic_w = lv_area_get_width(&indic_area);
+    int32_t indic_h = lv_area_get_height(&indic_area);
+    lv_draw_rect_dsc_t rect_dsc;
+    lv_draw_rect_dsc_init(&rect_dsc);
+    lv_area_t rect_area;
+    lv_layer_t * layer = lv_event_get_layer(e);
+
+    /* draw the ticks */
+    lv_area_set(&rect_area, 0, 0, 1, indic_h / 4);
+    rect_dsc.bg_opa = LV_OPA_40;
+
+    for(int32_t i = 1; i <= 3; i++) {
+        lv_area_set_width(&indic_area, indic_w * i / 3);
+        int32_t offset_from_right = -indic_h * i / 4;
+        lv_area_align(&indic_area, &rect_area, LV_ALIGN_RIGHT_MID, offset_from_right, 0);
+        lv_draw_rect(layer, &rect_dsc, &rect_area);
+    }
+}
+
+static void slider_draw_end_cb(lv_event_t * e)
+{
+    lv_obj_t * slider = lv_event_get_target_obj(e);
+    if(lv_slider_get_value(slider) == 0) {
+        /* Add a rectangle for the off state instead of no indicator
+         * showing at all.
+         */
+        lv_draw_rect_dsc_t rect_dsc;
+        lv_draw_rect_dsc_init(&rect_dsc);
+        rect_dsc.radius = lv_obj_get_style_radius(slider, LV_PART_INDICATOR);
+
+        lv_area_t rect_area;
+        lv_obj_get_coords(slider, &rect_area);
+        int32_t indic_h = lv_area_get_height(&rect_area);
+        lv_area_set_width(&rect_area, indic_h * 5 / 4);
+
+        lv_layer_t * layer = lv_event_get_layer(e);
+        lv_draw_rect(layer, &rect_dsc, &rect_area);
+
+        rect_dsc.radius = 0;
+    }
+}
+
+static void slider_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    LV_UNUSED(subject);
+    lv_obj_t * slider = lv_observer_get_target_obj(observer);
+    lv_obj_t * slider_img = lv_obj_get_child(slider, 0);
+    lv_image_dsc_t ** pair = lv_observer_get_user_data(observer);
+    bool is_on = lv_slider_get_value(slider) > 0;
+    lv_image_set_src(slider_img, pair[is_on]);
+}
+
+static void slider_label_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    LV_UNUSED(subject);
+    lv_obj_t * slider = lv_observer_get_target_obj(observer);
+    lv_obj_t * label_box = lv_observer_get_user_data(observer);
+    int32_t selected = lv_slider_get_value(slider);
+    for(int32_t i = 0; i < 4; i++) {
+        lv_obj_t * label = lv_obj_get_child(label_box, i);
+        lv_obj_set_style_opa(label, i == selected ? LV_OPA_100 : LV_OPA_50, 0);
+    }
+}
+
+static lv_obj_t * create_slider(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const char * label_text,
+                                lv_image_dsc_t ** img_dsc_pair, lv_subject_t * subject)
+{
+    lv_obj_t * box = lv_demo_high_res_simple_container_create(parent, true, c->sz->gap[9], LV_FLEX_ALIGN_START);
+    lv_obj_set_style_pad_top(box, c->sz->gap[5], 0);
+
+    lv_obj_t * label = lv_label_create(box);
+    lv_obj_add_style(label, &c->fonts[FONT_LABEL_SM], 0);
+    lv_obj_add_style(label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+    lv_label_set_text_static(label, label_text);
+
+    lv_obj_t * slider = lv_slider_create(box);
+    lv_obj_set_size(slider, LV_PCT(100), c->sz->slider_width);
+    lv_slider_set_range(slider, 0, 3);
+    lv_obj_set_style_bg_color(slider, lv_color_white(), 0);
+    lv_obj_set_style_bg_opa(slider, 30, 0);
+    lv_obj_set_style_bg_color(slider, lv_color_white(), LV_PART_INDICATOR);
+    lv_obj_set_style_radius(slider, c->sz->gap[4], 0);
+    lv_obj_set_style_radius(slider, c->sz->gap[4], LV_PART_INDICATOR);
+    lv_obj_set_style_bg_color(slider, lv_color_black(), LV_PART_KNOB);
+    lv_obj_set_style_pad_right(slider, -(c->sz->slider_width - 6) / 2 - 8, LV_PART_KNOB);
+    lv_obj_set_style_pad_left(slider, -(c->sz->slider_width - 6) / 2 + 8, LV_PART_KNOB);
+    lv_obj_set_style_pad_ver(slider, -(c->sz->slider_width - 12) / 2, LV_PART_KNOB);
+    lv_obj_add_event_cb(slider, slider_draw_start_cb, LV_EVENT_DRAW_MAIN_BEGIN, NULL);
+    lv_obj_add_event_cb(slider, slider_draw_end_cb, LV_EVENT_DRAW_MAIN_END, NULL);
+
+    lv_obj_t * slider_img = lv_image_create(slider);
+    lv_obj_align(slider_img, LV_ALIGN_LEFT_MID, 8, 0);
+
+    lv_slider_bind_value(slider, subject);
+    lv_subject_add_observer_obj(subject, slider_observer_cb, slider, img_dsc_pair);
+
+    lv_obj_t * label_box = lv_demo_high_res_simple_container_create(box, false, 0, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_width(label_box, LV_PCT(100));
+    lv_obj_set_flex_align(label_box, LV_FLEX_ALIGN_SPACE_AROUND, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_add_flag(label_box, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_style_value_t font;
+    lv_style_get_prop(&c->fonts[FONT_LABEL_XS], LV_STYLE_TEXT_FONT, &font);
+    int32_t offset = lv_font_get_line_height(font.ptr) + c->sz->slider_width * 13 / 40;
+    lv_obj_align_to(label_box, slider, LV_ALIGN_OUT_TOP_MID, 0, -offset);
+
+    static const char * const texts[4] = {"OFF", "LOW", "MIDDLE", "HIGH"};
+    for(int32_t i = 0; i < 4; i++) {
+        label = lv_label_create(label_box);
+        lv_obj_add_style(label, &c->fonts[FONT_LABEL_XS], 0);
+        lv_obj_add_style(label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+        lv_label_set_text_static(label, texts[i]);
+    }
+
+    lv_subject_add_observer_obj(subject, slider_label_observer_cb, slider, label_box);
+
+    return box;
+}
+
+static void create_widget5(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
+{
+    lv_obj_t * widget = lv_obj_create(widgets);
+    lv_obj_remove_style_all(widget);
+    lv_obj_set_size(widget, c->imgs[IMG_LIGHT_WIDGET5_BG]->header.w, c->imgs[IMG_LIGHT_WIDGET5_BG]->header.h);
+    lv_subject_add_observer_obj(&c->th, lv_demo_high_res_theme_observer_obj_bg_image_src_cb, widget,
+                                &c->imgs[IMG_LIGHT_WIDGET5_BG]);
+    lv_obj_set_style_pad_all(widget, c->sz->gap[7], 0);
+    lv_obj_set_flex_flow(widget, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(widget, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+
+    lv_obj_t * title_label = lv_label_create(widget);
+    lv_label_set_text_static(title_label, "Sensor Controls");
+    lv_obj_add_style(title_label, &c->fonts[FONT_LABEL_MD], 0);
+    lv_obj_add_style(title_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+
+    lv_obj_t * cluster_1 = lv_obj_create(widget);
+    lv_obj_remove_style_all(cluster_1);
+    lv_obj_set_size(cluster_1, LV_PCT(100), LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(cluster_1, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cluster_1, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_column(cluster_1, c->sz->gap[9], 0);
+
+    create_widget5_door(c, cluster_1);
+
+    lv_obj_t * lightbulbs_box = create_widget5_lightbulbs(c, cluster_1);
+    lv_obj_set_flex_grow(lightbulbs_box, 1);
+
+    lv_obj_t * cluster_2 = lv_obj_create(widget);
+    lv_obj_remove_style_all(cluster_2);
+    lv_obj_set_size(cluster_2, LV_PCT(100), LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(cluster_2, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cluster_2, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_END);
+    lv_obj_set_style_pad_column(cluster_2, c->sz->gap[10], 0);
+
+    lv_obj_t * matter_fan_box = create_slider(c, cluster_2, "Matter Fan", &c->imgs[IMG_FAN2], &c->api.subjects.fan_matter);
+    lv_obj_set_flex_grow(matter_fan_box, 1);
+
+    create_widget5_zigbee_fan(c, cluster_2);
+
+    lv_obj_t * air_purifier_box = create_slider(c, widget, "Air Purifier", &c->imgs[IMG_WIND],
+                                                &c->api.subjects.air_purifier);
+    lv_obj_set_width(air_purifier_box, LV_PCT(100));
 }
 
 #endif /*LV_USE_DEMO_HIGH_RES*/

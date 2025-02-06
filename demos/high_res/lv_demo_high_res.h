@@ -48,6 +48,8 @@ typedef struct {
         lv_subject_t wifi_ssid;
         /* pointer: wifi local IP address string, e.g. "192.168.1.1" (or `NULL` for offline)           */
         lv_subject_t wifi_ip;
+        /* int:     boolean 0 for door closed, 1 for door open                                         */
+        lv_subject_t door;
 
         /* output subjects */
         /* int:     boolean 0 for music paused, 1 for music playing                                    */
@@ -62,6 +64,16 @@ typedef struct {
         lv_subject_t main_light_temperature;
         /* int:     a value 0-100 of the smart home light intensity slider                             */
         lv_subject_t main_light_intensity;
+        /* int:     boolean 0 for off, 1 for on of the Matter lightbulb                                */
+        lv_subject_t lightbulb_matter;
+        /* int:     boolean 0 for off, 1 for on of the Zigbee lightbulb                                */
+        lv_subject_t lightbulb_zigbee;
+        /* int:     a value 0-3 of the smart home Matter fan slider                                    */
+        lv_subject_t fan_matter;
+        /* int:     boolean 0 for off, 1 for on of the Zigbee fan                                      */
+        lv_subject_t fan_zigbee;
+        /* int:     a value 0-3 of the smart home air purifier slider                                  */
+        lv_subject_t air_purifier;
         /* int:     a value 0-100 of the thermostat fan speed slider                                   */
         lv_subject_t thermostat_fan_speed;
         /* int:     a value 150-300 in tenths of a degree C, e.g. 225 (for 22.5 degrees celsius)       */

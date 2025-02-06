@@ -37,17 +37,23 @@ enum {
     IMG_ARROW_LEFT,
     IMG_BACKWARD_ICON,
     IMG_COLD_ICON,
+    IMG_DOOR,
+    IMG_DOOR_1,
     IMG_DRY_ICON,
     IMG_ENERGY_ICON,
     IMG_EV_CHARGING_APP_ICON,
     IMG_EV_CHARGING_WIDGET3_1_BG,
     IMG_EV_CHARGING_WIDGET3_BG,
     IMG_FAN,
+    IMG_FAN2,
+    IMG_FAN2_1,
     IMG_FORWARD_ICON,
     IMG_HEALTH_ICON,
     IMG_HEALTH_ICON_BOLD,
     IMG_HEAT_ICON,
     IMG_LAMP,
+    IMG_LAMP2,
+    IMG_LAMP2_1,
     IMG_LOGOUT_ICON,
     IMG_MAIN_LIGHT_SLIDER,
     IMG_MINUS,
@@ -71,6 +77,8 @@ enum {
     IMG_VOLUME,
     IMG_WEATHER,
     IMG_WIFI_ICON,
+    IMG_WIND,
+    IMG_WIND_1,
     IMG_LIGHT_BG_ABOUT,
     IMG_DARK_BG_ABOUT,
     IMG_LIGHT_BG_EV_CHARGING,
@@ -164,6 +172,8 @@ typedef struct {
     int32_t health_panel_width;
     int32_t settings_panel_width;
     int32_t home_bottom_margin_height;
+    int32_t indicator_width;
+    int32_t indicator_height;
     void (*init_fonts_cb)(lv_style_t * fonts);
 } lv_demo_high_res_sizes_t;
 
