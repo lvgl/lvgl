@@ -320,6 +320,7 @@ lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t inde
     }
 
     if(index >= (int32_t)subject->size)  return NULL;
+    if(index < 0)  return NULL;
 
     return ((lv_subject_t **)(subject->value.pointer))[index];
 }
