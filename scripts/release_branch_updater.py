@@ -47,11 +47,11 @@ def main():
     for url in urls:
         print(LOG, "working with port:", url)
 
-        subprocess.check_call(("git", "clone", url, port_clone_tmpdir))
-
         if dry_run:
             port_clone_tmpdir = url[len("https://github.com/lvgl/"): ]
             print("port_clone_tmpdir: " + port_clone_tmpdir)
+
+        subprocess.check_call(("git", "clone", url, port_clone_tmpdir))
 
         port_release_branches, port_default_branch = get_release_branches(port_clone_tmpdir)
         print(LOG, "port release branches:", ", ".join(fmt_release(br) for br in port_release_branches) or "(none)")
