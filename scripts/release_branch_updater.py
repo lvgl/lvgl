@@ -49,6 +49,10 @@ def main():
 
         subprocess.check_call(("git", "clone", url, port_clone_tmpdir))
 
+        if dry_run:
+            port_clone_tmpdir = url[len("https://github.com/lvgl/"): ]
+            print("port_clone_tmpdir: " + port_clone_tmpdir)
+
         port_release_branches, port_default_branch = get_release_branches(port_clone_tmpdir)
         print(LOG, "port release branches:", ", ".join(fmt_release(br) for br in port_release_branches) or "(none)")
         print(LOG, "port default branch:", port_default_branch if port_default_branch is not None else "(none)")
@@ -198,7 +202,8 @@ def main():
             else:
                 print(LOG, "nothing to push for this release. it is up to date.")
 
-        shutil.rmtree(port_clone_tmpdir)
+        if not dry_run:
+            shutil.rmtree(port_clone_tmpdir)
 
         print(LOG, "port update complete:", url)
 
