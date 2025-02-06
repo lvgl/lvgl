@@ -417,6 +417,10 @@ void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
             }
         }
     }
+    /* Gracefully de-couple `subject` from Widget by deleting any existing
+     * `LV_EVENT_VALUE_CHANGED` event associated with `subject` in case
+     * one of the `..._bind_value()` functions was used. */
+    lv_obj_remove_event_cb_with_user_data(obj, NULL, subject);
 }
 
 void * lv_observer_get_target(lv_observer_t * observer)
