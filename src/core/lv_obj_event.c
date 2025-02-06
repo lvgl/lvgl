@@ -161,7 +161,7 @@ uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t eve
 
     for(i = event_cnt - 1; i >= 0; i--) {
         lv_event_dsc_t * dsc = lv_obj_get_event_dsc(obj, i);
-        if(dsc && dsc->cb == event_cb && dsc->user_data == user_data) {
+        if(dsc && (event_cb == NULL || dsc->cb == event_cb) && dsc->user_data == user_data) {
             lv_obj_remove_event(obj, i);
             removed_count ++;
         }
