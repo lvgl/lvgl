@@ -133,7 +133,7 @@ void lv_draw_nema_gfx_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,
 
     nema_set_clip(clip_area.x1, clip_area.y1, lv_area_get_width(&clip_area), lv_area_get_height(&clip_area));
 
-    _draw_label_iterate_characters(draw_unit, dsc, coords);
+    _draw_label_iterate_characters(t, dsc, coords);
 
     lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)t->draw_unit;
     nema_cl_submit(&(draw_nema_gfx_unit->cl));
@@ -302,7 +302,7 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
             border_draw_dsc.opa = glyph_draw_dsc->opa;
             border_draw_dsc.color = glyph_draw_dsc->color;
             border_draw_dsc.width = 1;
-            lv_draw_nema_gfx_border(draw_unit, &border_draw_dsc, glyph_draw_dsc->bg_coords);
+            lv_draw_nema_gfx_border(t, &border_draw_dsc, glyph_draw_dsc->bg_coords);
 #endif
         }
         else if(glyph_draw_dsc->format >= LV_FONT_GLYPH_FORMAT_A1 &&
@@ -374,7 +374,7 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
     }
 
     if(fill_draw_dsc && fill_area) {
-        lv_draw_nema_gfx_fill(draw_unit, fill_draw_dsc, fill_area);
+        lv_draw_nema_gfx_fill(t, fill_draw_dsc, fill_area);
     }
 
 }
@@ -653,7 +653,7 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
                     fill_area.y2 = fill_area.y1 + underline_width - 1;
 
                     fill_dsc.color = dsc->color;
-                    lv_draw_nema_gfx_fill(draw_unit, &fill_dsc, &fill_area);
+                    lv_draw_nema_gfx_fill(t, &fill_dsc, &fill_area);
                 }
                 if(dsc->decor & LV_TEXT_DECOR_STRIKETHROUGH) {
                     lv_area_t fill_area;
@@ -663,7 +663,7 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
                     fill_area.y2 = fill_area.y1 + underline_width - 1;
 
                     fill_dsc.color = dsc->color;
-                    lv_draw_nema_gfx_fill(draw_unit, &fill_dsc, &fill_area);
+                    lv_draw_nema_gfx_fill(t, &fill_dsc, &fill_area);
                 }
             }
 
@@ -672,7 +672,7 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
                && logical_char_pos >= sel_start && logical_char_pos < sel_end) {
                 draw_letter_dsc.color = dsc->sel_color;
                 fill_dsc.color = dsc->sel_bg_color;
-                lv_draw_nema_gfx_fill(draw_unit, &fill_dsc, &bg_coords);
+                lv_draw_nema_gfx_fill(t, &fill_dsc, &bg_coords);
                 cur_state = 0 ;
                 blend_alpha = dsc_sel_col32.alpha;
                 blend_color = nema_dsc_sel_color;
@@ -697,7 +697,7 @@ static void _draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_lab
                 prev_state = cur_state;
             }
 
-            _draw_letter(draw_unit, &draw_letter_dsc, &pos, font, letter);
+            _draw_letter(t, &draw_letter_dsc, &pos, font, letter);
 
             if(letter_w > 0) {
                 pos.x += letter_w + dsc->letter_space;
@@ -812,7 +812,7 @@ static void _draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const l
 
     dsc->letter_coords = &letter_coords;
     dsc->g = &g;
-    _draw_nema_gfx_letter(draw_unit, dsc, NULL, NULL);
+    _draw_nema_gfx_letter(t, dsc, NULL, NULL);
 
     lv_font_glyph_release_draw_data(&g);
 
