@@ -4,63 +4,75 @@
 
 Synopsis
 --------
-    - $ python build.py                   # Print usage note and exit with status 0.
-    - $ python build.py help              # Print usage note and exit with status 0.
-    - $ python build.py unrecognized_arg  # Print error message, usage note, and exit with status 1.
-    - $ python build.py html              # Build HTML output.
-    - $ python build.py latex             # Build Latex/PDF output.
-    - $ python build.py html latex        # Build both.
-    - $ python build.py clean             # Remove all generated files.
-    - $ python build.py clean_tmp         # Remove temporary directory (forcing regeneration).
-    - $ python build.py clean_html        # Remove generated HTML files.
-    - $ python build.py clean_latex       # Remove generated Latex files.
+    - $ python build.py html [ skip_api ] [ fresh_env ]
+    - $ python build.py latex [ skip_api ] [ fresh_env ]
+    - $ python build.py html latex [ skip_api ] [ fresh_env ]
+    - $ python build.py clean
+    - $ python build.py clean_tmp
+    - $ python build.py clean_html
+    - $ python build.py clean_latex
 
 
 Description
 -----------
     Source files are copied to a temporary directory and modified there before
-    generation occurs.  If a full rebuild is being done (e.g. after a `clean`)
+    doc generation occurs.  If a full rebuild is being done (e.g. after a `clean`)
     Doxygen is run on LVGL's source files to generate intermediate API information
-    in XML format, example documents are generated, and API documents are generated
-    for Breathe's consumption.  From there, Sphinx with Breathe extension uses
-    the resulting set of source files to generate the desired output.
+    in XML format, example documents are generated, API documents are generated
+    for Breathe's consumption, and API links are added to the end of some documents.
+    From there, Sphinx with Breathe extension uses the resulting set of source
+    files to generate the desired output.
+
+    It is only during this first build that the `skip_api` option has meaning.
+    After the first build, no further actions is taken regarding API pages since
+    they are not regenerated after the first build.
 
     The temporary directory has a fixed location (overridable by
     `LVGL_DOC_BUILD_TEMP_DIR` environment variable) and by default this
     script attempts to rebuild only those documents whose path, name or
     modification date has changed since the last build.
 
-    A full rebuild will be done any time:
+    Caution:
 
-    - the temporary directory doesn't exist or is empty,
+    The document build meant for end-user consumption should ONLY be done after a
+    `clean` unless you know that no API documentation and no code examples have changed.
+
+    A `sphinx-build` will do a full doc rebuild any time:
+
+    - the temporary directory doesn't exist or is empty (since the new files in
+      the temporary directory will have have modification times after the generated
+      HTML or Latex files, even if nothing changed),
     - the targeted output directory doesn't exist or is empty, or
     - Sphinx determines that a full rebuild is necessary.  This happens when:
-        - temporary directory path (Sphinx's source directory) has changed,
+        - temporary directory (Sphinx's source-file path) has changed,
         - `conf.py` modification date has changed, or
-        - `fresh_env` argument is included (runs Sphinx with -E option).
+        - `fresh_env` argument is included (runs `sphinx-build` with -E option).
 
     Typical run time:
 
-    Full:  22.5 min
-    skip_api:  1.9 min
+    Full build:  22.5 min
+    skip_api  :   1.9 min  (applies to first build only)
 
 Options
 -------
     help
         Print usage note and exit with status 0.
 
-    html
+    html [ skip_api ] [ fresh_env ]
         Build HTML output.
+        `skip_api` only has effect on first build after a `clean` or `clean_tmp`.
 
-    latex
+    latex [ skip_api ] [ fresh_env ]
         Build Latex/PDF output (on hold pending removal of non-ASCII characters from input files).
+        `skip_api` only has effect on first build after a `clean` or `clean_tmp`.
 
-    skip_api
-        Skip generating API pages and links (saves about 91% of build time).
-        This is intended to be used only during doc development to speed up
-        turn-around time between doc modifications and seeing final results.
+    skip_api (with `html` and/or `latex` options)
+        On first build after a `clean`, this causes preparation of the contents of the temporary
+        directory to skip generating API pages and links (saving about 91% of build time).
+        This is intended to be used only during doc development to speed up turn-around time
+        between doc modifications and seeing final results.
 
-    fresh_env
+    fresh_env (with `html` and/or `latex` options)
         Run `sphinx-build` with -E command-line argument, which makes it regenerate its
         "environment" (memory of what was built previously, forcing a full rebuild).
 
@@ -81,24 +93,11 @@ Options
 
 Python Package Requirements
 ---------------------------
-    - Sphinx
-    - breathe
-    - imagesize
-    - importlib-metadata
-    - sphinx-rtd-theme
-    - sphinx-sitemap
-    - sphinxcontrib-applehelp
-    - sphinxcontrib-devhelp
-    - sphinxcontrib-htmlhelp
-    - sphinxcontrib-jsmath
-    - sphinxcontrib-qthelp
-    - sphinxcontrib-serializinghtml
-    - sphinxcontrib-mermaid
-    - sphinx-design
-    - sphinx-rtd-dark-mode
-    - typing-extensions
-    - sphinx-reredirects
-    - dirsync
+    The list of Python package requirements are in `requirements.txt`.
+
+    Install them by:
+
+    $ pip install -r requirements.txt
 
 
 History
@@ -192,15 +191,13 @@ def print_usage_note():
     print('  $ python build.py [optional_arg ...]')
     print()
     print('  where `optional_arg` can be any of these:')
-    print('    help        :  Print usage note and exit with status 0.')
-    print('    html        :  Generate HTML output.')
-    print('    latex       :  Generate Latex/PDF output (on hold pending removal of non-ASCII chars from input files).')
-    print('    skip_api    :  Skip generating API doc pages and links (saves 70% build time).')
-    print('    fresh_env   :  Run "sphinx-build" with -E command-line option.')
-    print('    clean       :  Remove all generated files including temporary directory.')
-    print('    clean_tmp   :  Remove temporary directory.')
-    print('    clean_html  :  Remove HTML output directory.')
-    print('    clean_latex :  Remove Latex output directory.')
+    print('    html [ skip_api ] [ fresh_env ]')
+    print('    latex  [ skip_api ] [ fresh_env ]')
+    print('    clean')
+    print('    clean_tmp')
+    print('    clean_html')
+    print('    clean_latex')
+    print('    help')
 
 # -------------------------------------------------------------------------
 # Remove directory `tgt_dir`.
@@ -520,7 +517,7 @@ def run():
         doc_files_copied = True
 
     # ---------------------------------------------------------------------
-    # Build Example docs, API docs, and API links.
+    # Build Example docs, Doxygen output, API docs, and API links.
     # ---------------------------------------------------------------------
     if doc_files_copied:
         t1 = datetime.now()
