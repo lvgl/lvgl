@@ -169,8 +169,6 @@ struct application {
     struct xdg_wm_base * xdg_wm;
 #endif
 
-    const char * xdg_runtime_dir;
-
 #ifdef LV_WAYLAND_WINDOW_DECORATIONS
     bool opt_disable_decorations;
 #endif
@@ -2419,9 +2417,6 @@ static void wayland_init(void)
         sme_init_buffer,
         sme_free_buffer
     };
-
-    application.xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
-    LV_ASSERT_MSG(application.xdg_runtime_dir, "cannot get XDG_RUNTIME_DIR");
 
     // Create XKB context
     application.xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
