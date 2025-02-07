@@ -136,7 +136,7 @@ static void span_text_outline_cb(benchmark_context_t * context)
     lv_spangroup_set_overflow(spans, LV_SPAN_OVERFLOW_CLIP);
     lv_spangroup_set_mode(spans, LV_SPAN_MODE_BREAK);
 
-    span_text_add(spans, context->font_bitmap, LV_TEST_FONT_STRING_CHINESE);
+    span_text_add(spans, context->font_outline, LV_TEST_FONT_STRING_CHINESE);
     span_text_add(spans, context->font_outline, LV_TEST_FONT_STRING_ENGLISH);
 }
 
@@ -624,14 +624,14 @@ static benchmark_context_t * benchmark_context_init(void)
                                                     LV_FREETYPE_FONT_RENDER_MODE_OUTLINE,
                                                     LV_TEST_FONT_SIZE,
                                                     LV_FREETYPE_FONT_STYLE_NORMAL);
-    if(context->font_bitmap == NULL) {
+    if(context->font_outline == NULL) {
         LV_LOG_ERROR("freetype font creation failed!");
     }
 #endif
 #if TEST_TINY_TTF
     context->font_tinyttf = lv_tiny_ttf_create_file("A:" LV_TEST_FONT_PATH, LV_TEST_FONT_SIZE);
-    if(context->font_bitmap == NULL) {
-        LV_LOG_ERROR("freetype font creation failed!");
+    if(context->font_tinyttf == NULL) {
+        LV_LOG_ERROR("TinyTTF font creation failed!");
     }
 #endif
     context->scene_act = 0;
@@ -648,15 +648,19 @@ static benchmark_context_t * benchmark_context_init(void)
 
 static void benchmark_context_deinit(benchmark_context_t * context)
 {
+#if LV_USE_FREETYPE
     if(context->font_bitmap != NULL) {
         lv_freetype_font_delete(context->font_bitmap);
     }
     if(context->font_outline != NULL) {
         lv_freetype_font_delete(context->font_outline);
     }
+#endif
+#if TEST_TINY_TTF
     if(context->font_bitmap != NULL) {
         lv_tiny_ttf_destroy(context->font_tinyttf);
     }
+#endif
     lv_obj_delete(context->label_perf);
     lv_free(context);
 }
@@ -718,7 +722,7 @@ static void load_scene(benchmark_context_t * context)
 
 static void next_scene_timer_cb(lv_timer_t * timer)
 {
-    benchmark_context_t * context = (benchmark_context_t *)timer->user_data;
+    benchmark_context_t * context = lv_timer_get_user_data(timer);
 
     context->scene_act++;
 
