@@ -127,13 +127,13 @@ int32_t lv_obj_get_scroll_y(const lv_obj_t * obj)
     return -obj->spec_attr->scroll.y;
 }
 
-int32_t lv_obj_get_scroll_top(lv_obj_t * obj)
+int32_t lv_obj_get_scroll_top(const lv_obj_t * obj)
 {
     if(obj->spec_attr == NULL) return 0;
     return -obj->spec_attr->scroll.y;
 }
 
-int32_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
+int32_t lv_obj_get_scroll_bottom(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -141,7 +141,7 @@ int32_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
-        lv_obj_t * child = obj->spec_attr->children[i];
+        const lv_obj_t * child = obj->spec_attr->children[i];
         if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
 
         int32_t tmp_y = child->coords.y2 + lv_obj_get_style_margin_bottom(child, LV_PART_MAIN);
@@ -161,7 +161,7 @@ int32_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
     return LV_MAX(child_res, self_h);
 }
 
-int32_t lv_obj_get_scroll_left(lv_obj_t * obj)
+int32_t lv_obj_get_scroll_left(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -182,7 +182,7 @@ int32_t lv_obj_get_scroll_left(lv_obj_t * obj)
     int32_t x1 = LV_COORD_MAX;
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
-        lv_obj_t * child = obj->spec_attr->children[i];
+        const lv_obj_t * child = obj->spec_attr->children[i];
         if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
 
         int32_t tmp_x = child->coords.x1 - lv_obj_get_style_margin_left(child, LV_PART_MAIN);
@@ -204,7 +204,7 @@ int32_t lv_obj_get_scroll_left(lv_obj_t * obj)
     return LV_MAX(child_res, self_w);
 }
 
-int32_t lv_obj_get_scroll_right(lv_obj_t * obj)
+int32_t lv_obj_get_scroll_right(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -220,7 +220,7 @@ int32_t lv_obj_get_scroll_right(lv_obj_t * obj)
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_count(obj);
     for(i = 0; i < child_cnt; i++) {
-        lv_obj_t * child = obj->spec_attr->children[i];
+        const lv_obj_t * child = obj->spec_attr->children[i];
         if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
 
         int32_t tmp_x = child->coords.x2 + lv_obj_get_style_margin_right(child, LV_PART_MAIN);
