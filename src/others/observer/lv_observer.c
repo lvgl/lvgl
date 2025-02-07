@@ -390,7 +390,7 @@ void lv_observer_remove(lv_observer_t * observer)
     LV_ASSERT_NULL(observer);
 
     if(observer->for_obj && observer->target) {
-        lv_obj_remove_event_cb(observer->target, unsubscribe_on_delete_cb);
+        lv_obj_remove_event_cb_with_user_data(observer->target, unsubscribe_on_delete_cb, observer);
         lv_obj_remove_event_cb_with_user_data(observer->target, NULL, observer->subject);
     }
 
