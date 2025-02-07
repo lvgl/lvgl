@@ -76,7 +76,7 @@ void test_object_observer_add_remove(void)
 
     /* This shouldn't get updated */
     TEST_ASSERT_EQUAL(true, lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN));
-    lv_obj_clean(obj);
+    lv_obj_delete(obj);
     /* We shouldn't crash here */
 }
 
