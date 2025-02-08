@@ -609,15 +609,24 @@ static benchmark_context_t * benchmark_context_init(void)
 {
     benchmark_context_t * context = (benchmark_context_t *)lv_malloc_zeroed(sizeof(benchmark_context_t));
     LV_ASSERT_NULL(context);
+    lv_fs_drv_t ** drv = lv_ll_get_head(&(LV_GLOBAL_DEFAULT()->fsdrv_ll));
+
 #if LV_USE_FREETYPE
-    context->font_bitmap = lv_freetype_font_create(LV_TEST_FONT_PATH,
+    char FREETYPE_FULL_PATH[128];
+#if LV_FREETYPE_USE_LVGL_PORT
+    lv_snprintf(FREETYPE_FULL_PATH, sizeof(FREETYPE_FULL_PATH), "%c:%s", (*drv)->letter, LV_DEMO_BENCHMARK_FONT_PATH);
+#else
+    lv_snprintf(FREETYPE_FULL_PATH, sizeof(FREETYPE_FULL_PATH), "./%s", LV_DEMO_BENCHMARK_FONT_PATH);
+    #define FREETYPE_PATH_PREFIX "./"
+#endif
+    context->font_bitmap = lv_freetype_font_create(FREETYPE_FULL_PATH,
                                                    LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
                                                    LV_TEST_FONT_SIZE,
                                                    LV_FREETYPE_FONT_STYLE_NORMAL);
     if(context->font_bitmap == NULL) {
         LV_LOG_ERROR("freetype font creation failed!");
     }
-    context->font_outline = lv_freetype_font_create(LV_TEST_FONT_PATH,
+    context->font_outline = lv_freetype_font_create(FREETYPE_FULL_PATH,
                                                     LV_FREETYPE_FONT_RENDER_MODE_OUTLINE,
                                                     LV_TEST_FONT_SIZE,
                                                     LV_FREETYPE_FONT_STYLE_NORMAL);
@@ -625,8 +634,11 @@ static benchmark_context_t * benchmark_context_init(void)
         LV_LOG_ERROR("freetype font creation failed!");
     }
 #endif
+
 #if TEST_TINY_TTF
-    context->font_tinyttf = lv_tiny_ttf_create_file("A:" LV_TEST_FONT_PATH, LV_TEST_FONT_SIZE);
+    char TINYTTF_FULL_PATH[128];
+    lv_snprintf(TINYTTF_FULL_PATH, sizeof(TINYTTF_FULL_PATH), "%c:%s", (*drv)->letter, LV_DEMO_BENCHMARK_FONT_PATH);
+    context->font_tinyttf = lv_tiny_ttf_create_file(TINYTTF_FULL_PATH, LV_TEST_FONT_SIZE);
     if(context->font_tinyttf == NULL) {
         LV_LOG_ERROR("TinyTTF font creation failed!");
     }
