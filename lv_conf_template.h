@@ -113,12 +113,12 @@
     #define LV_OS_CUSTOM_INCLUDE <stdint.h>
 #endif
 #if LV_USE_OS == LV_OS_FREERTOS
-	/*
-	 * Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
-	 * than unblocking a task using an intermediary object such as a binary semaphore.
-	 * RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
-	 */
-	#define LV_USE_FREERTOS_TASK_NOTIFY 1
+    /*
+     * Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
+     * than unblocking a task using an intermediary object such as a binary semaphore.
+     * RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
+     */
+    #define LV_USE_FREERTOS_TASK_NOTIFY 1
 #endif
 
 /*========================
@@ -538,7 +538,7 @@
 #define LV_USE_MATRIX           0
 
 /** Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default */
-#define LV_USE_PRIVATE_API		0
+#define LV_USE_PRIVATE_API      0
 
 /*==================
  *   FONT USAGE
@@ -1102,7 +1102,7 @@
 #endif
 
 /** Enable loading XML UIs runtime */
-#define LV_USE_XML	0
+#define LV_USE_XML    0
 
 /*==================
  * DEVICES
@@ -1297,9 +1297,9 @@
 #define LV_USE_DEMO_VECTOR_GRAPHIC  0
 
 /*E-bike demo with Lottie animations (if LV_USE_LOTTIE is enabled)*/
-#define LV_USE_DEMO_EBIKE			0
+#define LV_USE_DEMO_EBIKE           0
 #if LV_USE_DEMO_EBIKE
-	#define LV_DEMO_EBIKE_PORTRAIT  0    /*0: for 480x270..480x320, 1: for 480x800..720x1280*/
+    #define LV_DEMO_EBIKE_PORTRAIT  0    /*0: for 480x270..480x320, 1: for 480x800..720x1280*/
 #endif
 
 /** High-resolution demo */
