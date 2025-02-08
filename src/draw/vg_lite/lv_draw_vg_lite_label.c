@@ -76,11 +76,11 @@ static void bitmap_cache_release_cb(void * entry, void * user_data);
 
 void lv_draw_vg_lite_label_init(struct _lv_draw_vg_lite_unit_t * u)
 {
+    LV_ASSERT_NULL(u);
+
 #if LV_USE_FREETYPE
     /*Set up the freetype outline event*/
     lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, u);
-#else
-    LV_UNUSED(u);
 #endif /* LV_USE_FREETYPE */
 
     u->bitmap_font_pending = lv_vg_lite_pending_create(sizeof(lv_font_glyph_dsc_t), 8);
