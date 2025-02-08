@@ -96,25 +96,30 @@ const void * lv_font_cache_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw
     if(!gid) return NULL;
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
-    void * glyph_bitmap = (void *)&fdsc->glyph_bitmap[gdsc->bitmap_index];
+    void * raw_glyph_bitmap = (void *)&fdsc->glyph_bitmap[gdsc->bitmap_index];
 
-    if(g_dsc->req_raw_bitmap) return glyph_bitmap;
+    if(g_dsc->req_raw_bitmap) return raw_glyph_bitmap;
 
     int32_t gsize = (int32_t) gdsc->box_w * gdsc->box_h;
     if(gsize == 0) return NULL;
 
     /* If the alignment, stride, and color format is correct, bypass the cache */
     if(g_dsc->format == LV_FONT_GLYPH_FORMAT_A8
-       && glyph_bitmap == lv_draw_buf_align_ex(font_draw_buf_handlers, glyph_bitmap, LV_COLOR_FORMAT_A8)
-       && lv_draw_buf_width_to_stride(g_dsc->box_w, LV_COLOR_FORMAT_A8) == g_dsc->box_w * sizeof(uint8_t)) {
+       && raw_glyph_bitmap == lv_draw_buf_align(raw_glyph_bitmap, LV_COLOR_FORMAT_A8)
+       && g_dsc->box_w == lv_draw_buf_width_to_stride(g_dsc->box_w, LV_COLOR_FORMAT_A8)) {
+
+        const uint32_t a8_stride = gdsc->box_w * sizeof(uint8_t);
+
+        /* Use the static bitmap draw buffer to avoid memory allocation */
         lv_draw_buf_init(
             &font_static_bitmap_draw_buf,
             g_dsc->box_w,
             g_dsc->box_h,
             LV_COLOR_FORMAT_A8,
-            g_dsc->box_w,
-            glyph_bitmap,
-            g_dsc->box_w * g_dsc->box_h * sizeof(uint8_t));
+            a8_stride,
+            raw_glyph_bitmap,
+            a8_stride * g_dsc->box_h);
+
         return &font_static_bitmap_draw_buf;
     }
 
@@ -171,12 +176,6 @@ static void * get_bitmap_cached(lv_font_glyph_dsc_t * g_dsc, const lv_font_fmt_t
     return cache_node->draw_buf;
 }
 
-/**
- * Create a cache for font bitmaps.
- * @param data the font bitmap cache data
- * @param user_data unused
- * @return true: create success, false: create failed
- */
 static bool font_bitmap_create_cb(font_bitmap_cache_data_t * data, void * user_data)
 {
     LV_PROFILER_FONT_BEGIN;
