@@ -123,9 +123,11 @@ void lv_font_cache_release_glyph(const lv_font_t * font, lv_font_glyph_dsc_t * g
 
 static inline bool font_is_built_in(const lv_font_t * font)
 {
-    /* Use function pointer to simply determine whether the current font is a built-in font,
-     * so that a dedicated ID can be added for identification.
-     */
+    if(font->static_bitmap) {
+        return true;
+    }
+
+    /* Use function pointer to simply determine whether the current font is a built-in font */
     return font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt;
 }
 
