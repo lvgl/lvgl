@@ -134,13 +134,13 @@ struct _lv_font_t {
 const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 
 /**
- * Get the raw bitmap of a font.
+ * Get the static bitmap of a font.
  * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index and the format.
  * @param draw_buf      a draw buffer that can be used to store the bitmap of the glyph, it's OK not to use it.
- * @return LV_RES_OK: the raw bitmap is successfully loaded into `draw_buf`.
+ * @return LV_RES_OK: the static bitmap is successfully loaded into `draw_buf`.
  *         LV_RES_INV: the font doesn't have a raw bitmap.
  */
-lv_result_t lv_font_get_glyph_raw_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
+lv_result_t lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 
 /**
  * Get the descriptor of a glyph

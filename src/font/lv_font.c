@@ -61,7 +61,7 @@ const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t
 #endif
 }
 
-lv_result_t lv_font_get_glyph_raw_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
+lv_result_t lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
 {
     LV_ASSERT_NULL(g_dsc);
     LV_ASSERT_NULL(draw_buf);
