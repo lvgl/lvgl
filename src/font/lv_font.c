@@ -67,7 +67,7 @@ lv_result_t lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw
     LV_ASSERT_NULL(draw_buf);
     const lv_font_t * font_p = g_dsc->resolved_font;
 
-    if(!font_p->static_bitmap) {
+    if(!lv_font_has_static_bitmap(font_p)) {
         return LV_RESULT_INVALID;
     }
 
