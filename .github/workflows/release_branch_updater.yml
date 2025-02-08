@@ -27,8 +27,8 @@ jobs:
 
       - name: set git credentials
         run: |
-          git config user.name 'lvgl-bot'
-          git config user.email 'lvgl-bot@users.noreply.github.com'
+          git config --global user.name 'lvgl-bot'
+          git config --global user.email 'lvgl-bot@users.noreply.github.com'
 
       - name: run the script
         run: python3 lvgl/scripts/release_branch_updater.py --oldest-major 9
