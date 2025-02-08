@@ -617,7 +617,6 @@ static benchmark_context_t * benchmark_context_init(void)
     lv_snprintf(FREETYPE_FULL_PATH, sizeof(FREETYPE_FULL_PATH), "%c:%s", (*drv)->letter, LV_DEMO_BENCHMARK_FONT_PATH);
 #else
     lv_snprintf(FREETYPE_FULL_PATH, sizeof(FREETYPE_FULL_PATH), "./%s", LV_DEMO_BENCHMARK_FONT_PATH);
-    #define FREETYPE_PATH_PREFIX "./"
 #endif
     context->font_bitmap = lv_freetype_font_create(FREETYPE_FULL_PATH,
                                                    LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
