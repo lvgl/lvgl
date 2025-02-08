@@ -20,6 +20,7 @@
 
 #define font_bitmap_cache LV_GLOBAL_DEFAULT()->font_bitmap_cache
 #define font_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->font_draw_buf_handlers)
+#define font_static_bitmap_draw_buf (LV_GLOBAL_DEFAULT()->font_static_bitmap_draw_buf)
 
 /**********************
  *      TYPEDEFS
@@ -95,10 +96,27 @@ const void * lv_font_cache_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw
     if(!gid) return NULL;
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
-    if(g_dsc->req_raw_bitmap) return &fdsc->glyph_bitmap[gdsc->bitmap_index];
+    void * glyph_bitmap = (void *)&fdsc->glyph_bitmap[gdsc->bitmap_index];
+
+    if(g_dsc->req_raw_bitmap) return glyph_bitmap;
 
     int32_t gsize = (int32_t) gdsc->box_w * gdsc->box_h;
     if(gsize == 0) return NULL;
+
+    /* If the alignment, stride, and color format is correct, bypass the cache */
+    if(g_dsc->format == LV_FONT_GLYPH_FORMAT_A8
+       && glyph_bitmap == lv_draw_buf_align_ex(font_draw_buf_handlers, glyph_bitmap, LV_COLOR_FORMAT_A8)
+       && lv_draw_buf_width_to_stride(g_dsc->box_w, LV_COLOR_FORMAT_A8) == g_dsc->box_w * sizeof(uint8_t)) {
+        lv_draw_buf_init(
+            &font_static_bitmap_draw_buf,
+            g_dsc->box_w,
+            g_dsc->box_h,
+            LV_COLOR_FORMAT_A8,
+            g_dsc->box_w,
+            glyph_bitmap,
+            g_dsc->box_w * g_dsc->box_h * sizeof(uint8_t));
+        return &font_static_bitmap_draw_buf;
+    }
 
     return get_bitmap_cached(g_dsc, fdsc, gid);
 }
@@ -108,8 +126,7 @@ void lv_font_cache_release_glyph(const lv_font_t * font, lv_font_glyph_dsc_t * g
     LV_ASSERT_NULL(font);
     LV_ASSERT_NULL(g_dsc);
 
-    if(!font_is_built_in(font)) {
-        /*Font cache can be released only for built-in fonts*/
+    if(!g_dsc->entry) {
         return;
     }
 
@@ -123,7 +140,7 @@ void lv_font_cache_release_glyph(const lv_font_t * font, lv_font_glyph_dsc_t * g
 
 static inline bool font_is_built_in(const lv_font_t * font)
 {
-    if(font->static_bitmap) {
+    if(lv_font_has_static_bitmap(font)) {
         return true;
     }
 

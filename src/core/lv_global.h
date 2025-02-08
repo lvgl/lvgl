@@ -200,6 +200,7 @@ typedef struct _lv_global_t {
 
 #if LV_FONT_CACHE_GLYPH_CNT > 0
     lv_cache_t * font_bitmap_cache;
+    lv_draw_buf_t font_static_bitmap_draw_buf;
 #endif
 
 #if LV_USE_SPAN != 0

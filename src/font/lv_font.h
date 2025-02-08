@@ -195,7 +195,7 @@ const lv_font_t * lv_font_get_default(void);
  * @param font    pointer to a font
  * @return true: the font has a static bitmap
  */
-static inline bool lv_font_has_static_bitmap(lv_font_t * font)
+static inline bool lv_font_has_static_bitmap(const lv_font_t * font)
 {
     LV_ASSERT_NULL(font);
     return font->static_bitmap;

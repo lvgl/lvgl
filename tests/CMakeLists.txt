@@ -295,6 +295,7 @@ add_library(test_common
         src/test_assets/test_font_montserrat_ascii_1bpp.c
         src/test_assets/test_font_montserrat_ascii_2bpp.c
         src/test_assets/test_font_montserrat_ascii_4bpp.c
+        src/test_assets/test_font_montserrat_ascii_8bpp.c
         src/test_assets/test_font_montserrat_ascii_3bpp_compressed.c
         src/test_assets/test_font_1_bin.c
         src/test_assets/test_font_2_bin.c
