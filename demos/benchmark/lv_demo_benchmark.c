@@ -616,12 +616,14 @@ static benchmark_context_t * benchmark_context_init(void)
     lv_fs_drv_t ** drv = lv_ll_get_head(&(LV_GLOBAL_DEFAULT()->fsdrv_ll));
 
 #if LV_USE_FREETYPE
-    char FREETYPE_FULL_PATH[lv_strlen(LV_DEMO_BENCHMARK_FONT_PATH) + 3];
+    unsigned int freetype_font_full_path_length = lv_strlen(LV_DEMO_BENCHMARK_FONT_PATH) + 3;
+    char * FREETYPE_FULL_PATH = lv_malloc_zeroed(freetype_font_full_path_length);
+    LV_ASSERT_NULL(FREETYPE_FULL_PATH);
 #if LV_FREETYPE_USE_LVGL_PORT
     lv_snprintf(FREETYPE_FULL_PATH, sizeof(FREETYPE_FULL_PATH), "%c:%s", (*drv)->letter, LV_DEMO_BENCHMARK_FONT_PATH);
 #else
     LV_UNUSED(drv);
-    lv_snprintf(FREETYPE_FULL_PATH, sizeof(FREETYPE_FULL_PATH), "./%s", LV_DEMO_BENCHMARK_FONT_PATH);
+    lv_snprintf(FREETYPE_FULL_PATH, freetype_font_full_path_length, "./%s", LV_DEMO_BENCHMARK_FONT_PATH);
 #endif
     context->font_bitmap = lv_freetype_font_create(FREETYPE_FULL_PATH,
                                                    LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
@@ -637,15 +639,19 @@ static benchmark_context_t * benchmark_context_init(void)
     if(context->font_outline == NULL) {
         LV_LOG_ERROR("freetype font creation failed!");
     }
+    lv_free(FREETYPE_FULL_PATH);
 #endif
 
 #if TEST_TINY_TTF
-    char TINYTTF_FULL_PATH[lv_strlen(LV_DEMO_BENCHMARK_FONT_PATH) + 3];
-    lv_snprintf(TINYTTF_FULL_PATH, sizeof(TINYTTF_FULL_PATH), "%c:%s", (*drv)->letter, LV_DEMO_BENCHMARK_FONT_PATH);
+    unsigned int tinyttf_font_full_path_length = lv_strlen(LV_DEMO_BENCHMARK_FONT_PATH) + 3;
+    char * TINYTTF_FULL_PATH = lv_malloc_zeroed(tinyttf_font_full_path_length);
+    LV_ASSERT_NULL(TINYTTF_FULL_PATH);
+    lv_snprintf(TINYTTF_FULL_PATH, tinyttf_font_full_path_length, "%c:%s", (*drv)->letter, LV_DEMO_BENCHMARK_FONT_PATH);
     context->font_tinyttf = lv_tiny_ttf_create_file(TINYTTF_FULL_PATH, LV_TEST_FONT_SIZE);
     if(context->font_tinyttf == NULL) {
         LV_LOG_ERROR("TinyTTF font creation failed!");
     }
+    lv_free(TINYTTF_FULL_PATH);
 #endif
     context->scene_act = 0;
     context->label_perf = lv_label_create(lv_layer_top());
