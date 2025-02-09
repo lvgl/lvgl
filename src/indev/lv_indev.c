@@ -695,14 +695,21 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->pointer.last_raw_point.x = data->point.x;
     i->pointer.last_raw_point.y = data->point.y;
 
-    if(disp->rotation == LV_DISPLAY_ROTATION_180 || disp->rotation == LV_DISPLAY_ROTATION_270) {
-        data->point.x = disp->hor_res - data->point.x - 1;
-        data->point.y = disp->ver_res - data->point.y - 1;
-    }
-    if(disp->rotation == LV_DISPLAY_ROTATION_90 || disp->rotation == LV_DISPLAY_ROTATION_270) {
-        int32_t tmp = data->point.y;
-        data->point.y = data->point.x;
-        data->point.x = disp->ver_res - tmp - 1;
+    switch (disp->rotation) {
+        case LV_DISPLAY_ROTATION_90:
+            data->point.x = data->point.y;
+            data->point.y = disp->hor_res - 1 - i->pointer.last_raw_point.x; 
+            break;
+
+        case LV_DISPLAY_ROTATION_180:
+            data->point.x = disp->hor_res - 1 - data->point.x;
+            data->point.y = disp->ver_res - 1 - data->point.y;        
+            break;
+
+        case LV_DISPLAY_ROTATION_270:
+            data->point.x = disp->ver_res - 1 - data->point.y;
+            data->point.y = i->pointer.last_raw_point.x;        
+            break;
     }
 
     /*Simple sanity check*/
