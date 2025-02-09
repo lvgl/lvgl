@@ -695,7 +695,7 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->pointer.last_raw_point.x = data->point.x;
     i->pointer.last_raw_point.y = data->point.y;
 
-    switch (disp->rotation) {
+    switch(disp->rotation) {
         case LV_DISPLAY_ROTATION_90:
             data->point.x = data->point.y;
             data->point.y = disp->hor_res - 1 - i->pointer.last_raw_point.x; 
