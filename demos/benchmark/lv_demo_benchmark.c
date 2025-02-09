@@ -65,9 +65,13 @@
  **********************/
 
 typedef struct benchmark_context {
+#if LV_USE_FREETYPE
     lv_font_t * font_bitmap;
     lv_font_t * font_outline;
+#endif
+#if TEST_TINY_TTF
     lv_font_t * font_tinyttf;
+#endif
     lv_obj_t * label_perf;
     uint32_t scene_act;
     uint32_t rnd_act;
@@ -612,7 +616,7 @@ static benchmark_context_t * benchmark_context_init(void)
     lv_fs_drv_t ** drv = lv_ll_get_head(&(LV_GLOBAL_DEFAULT()->fsdrv_ll));
 
 #if LV_USE_FREETYPE
-    char FREETYPE_FULL_PATH[128];
+    char FREETYPE_FULL_PATH[lv_strlen(LV_DEMO_BENCHMARK_FONT_PATH) + 3];
 #if LV_FREETYPE_USE_LVGL_PORT
     lv_snprintf(FREETYPE_FULL_PATH, sizeof(FREETYPE_FULL_PATH), "%c:%s", (*drv)->letter, LV_DEMO_BENCHMARK_FONT_PATH);
 #else
@@ -636,7 +640,7 @@ static benchmark_context_t * benchmark_context_init(void)
 #endif
 
 #if TEST_TINY_TTF
-    char TINYTTF_FULL_PATH[128];
+    char TINYTTF_FULL_PATH[lv_strlen(LV_DEMO_BENCHMARK_FONT_PATH) + 3];
     lv_snprintf(TINYTTF_FULL_PATH, sizeof(TINYTTF_FULL_PATH), "%c:%s", (*drv)->letter, LV_DEMO_BENCHMARK_FONT_PATH);
     context->font_tinyttf = lv_tiny_ttf_create_file(TINYTTF_FULL_PATH, LV_TEST_FONT_SIZE);
     if(context->font_tinyttf == NULL) {
@@ -666,7 +670,7 @@ static void benchmark_context_deinit(benchmark_context_t * context)
     }
 #endif
 #if TEST_TINY_TTF
-    if(context->font_bitmap != NULL) {
+    if(context->font_tinyttf != NULL) {
         lv_tiny_ttf_destroy(context->font_tinyttf);
     }
 #endif
