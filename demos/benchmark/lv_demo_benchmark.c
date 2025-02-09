@@ -619,12 +619,12 @@ static benchmark_context_t * benchmark_context_init(void)
     unsigned int freetype_font_full_path_length = lv_strlen(LV_DEMO_BENCHMARK_FONT_PATH) + 3;
     char * FREETYPE_FULL_PATH = lv_malloc_zeroed(freetype_font_full_path_length);
 #if LV_FREETYPE_USE_LVGL_PORT
-    if (FREETYPE_FULL_PATH) {
+    if(FREETYPE_FULL_PATH) {
         lv_snprintf(FREETYPE_FULL_PATH, freetype_font_full_path_length, "%c:%s", (*drv)->letter, LV_DEMO_BENCHMARK_FONT_PATH);
     }
 #else
     LV_UNUSED(drv);
-    if (FREETYPE_FULL_PATH) {
+    if(FREETYPE_FULL_PATH) {
         lv_snprintf(FREETYPE_FULL_PATH, freetype_font_full_path_length, "./%s", LV_DEMO_BENCHMARK_FONT_PATH);
     }
 #endif
@@ -642,7 +642,7 @@ static benchmark_context_t * benchmark_context_init(void)
     if(context->font_outline == NULL) {
         LV_LOG_ERROR("freetype font creation failed!");
     }
-    if (FREETYPE_FULL_PATH) {
+    if(FREETYPE_FULL_PATH) {
         lv_free(FREETYPE_FULL_PATH);
     }
 #endif
@@ -650,7 +650,7 @@ static benchmark_context_t * benchmark_context_init(void)
 #if TEST_TINY_TTF
     unsigned int tinyttf_font_full_path_length = lv_strlen(LV_DEMO_BENCHMARK_FONT_PATH) + 3;
     char * TINYTTF_FULL_PATH = lv_malloc_zeroed(tinyttf_font_full_path_length);
-    if (TINYTTF_FULL_PATH) {
+    if(TINYTTF_FULL_PATH) {
         lv_snprintf(TINYTTF_FULL_PATH, tinyttf_font_full_path_length, "%c:%s", (*drv)->letter, LV_DEMO_BENCHMARK_FONT_PATH);
     }
     context->font_tinyttf = lv_tiny_ttf_create_file(TINYTTF_FULL_PATH, LV_TEST_FONT_SIZE);
