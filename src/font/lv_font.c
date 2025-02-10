@@ -146,9 +146,10 @@ int32_t lv_font_get_line_height(const lv_font_t * font)
     return font->line_height;
 }
 
-const lv_font_t * lv_font_default(void)
+
+const lv_font_t * lv_font_get_default(void)
 {
-    return LV_FONT_DEFAULT;
+    return lv_font_default;
 }
 
 /**********************

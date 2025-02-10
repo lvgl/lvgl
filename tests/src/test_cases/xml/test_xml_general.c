@@ -271,6 +271,9 @@ void test_xml_image_and_font(void)
     lv_xml_register_image("test_img1", &img_render_lvgl_logo_l8);
     lv_xml_register_image("test_img2", &img_render_lvgl_logo_rgb565);
 
+    lv_xml_register_font("lv_montserrat_16", &lv_font_montserrat_16);
+    lv_xml_register_font("lv_montserrat_18", &lv_font_montserrat_18);
+
     lv_xml_component_register_from_data("btn", btn_xml);
 
     lv_obj_t * btn;

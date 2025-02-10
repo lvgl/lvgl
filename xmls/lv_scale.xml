@@ -1,6 +1,6 @@
 <!--
 <lv_scale total_tick_count="30">
-	<lv_scale-section column="2" range="30 40" style="indicator style1"/>
+	<lv_scale-section column="2" range="30 40" style_indicator="scale_style"/>
 </lv_scale>
 -->
 

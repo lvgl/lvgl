@@ -174,6 +174,12 @@ int32_t lv_font_get_line_height(const lv_font_t * font);
  */
 void lv_font_set_kerning(lv_font_t * font, lv_font_kerning_t kerning);
 
+/**
+ * Get the default font, defined by LV_FONT_DEFAULT
+ * @return  return      pointer to the default font
+ */
+const lv_font_t * lv_font_get_default(void);
+
 /**********************
  *      MACROS
  **********************/
