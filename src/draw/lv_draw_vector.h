@@ -16,6 +16,7 @@ extern "C" {
 #include "../misc/lv_array.h"
 #include "../misc/lv_matrix.h"
 #include "lv_draw_image.h"
+#include "../core/lv_obj_private.h"
 
 #if LV_USE_VECTOR_GRAPHIC
 
@@ -458,6 +459,13 @@ void lv_vector_dsc_translate(lv_vector_dsc_t * dsc, float tx, float ty);
 void lv_vector_dsc_skew(lv_vector_dsc_t * dsc, float skew_x, float skew_y);
 
 /**
+ * Set the draw buffer that is used for partial rendering
+ * @param dsc           pointer to a vector graphic descriptor
+ * @param path          pointer to a path
+ */
+void lv_vector_dsc_set_draw_buf(lv_vector_dsc_t * dsc, lv_draw_buf_t * buf);
+
+/**
  * Add a graphic path to the draw list
  * @param dsc           pointer to a vector graphic descriptor
  * @param path          pointer to a path
@@ -472,10 +480,25 @@ void lv_vector_dsc_add_path(lv_vector_dsc_t * dsc, const lv_vector_path_t * path
 void lv_vector_clear_area(lv_vector_dsc_t * dsc, const lv_area_t * rect);
 
 /**
+ * sets the color of shape before blending it in
+ * @param dsc           pointer to the vector graphic descriptor
+ * @param blend_color   the color to apply on the shape
+ */
+void lv_vector_dsc_set_blend_color(lv_vector_dsc_t * dsc, lv_color_t blend_color);
+
+/**
  * Draw all the vector graphic paths
  * @param dsc           pointer to a vector graphic descriptor
  */
 void lv_draw_vector(lv_vector_dsc_t * dsc);
+
+/**
+ * Parial rendering of the vector graphic paths within the bounds of an object
+ * before calling, be sure to set a draw buffer on the vector graphic descriptor
+ * @param dsc           pointer to a vector graphic descriptor
+ * @param obj           pointer to the object containing the layer on which the paths will be drawn
+ */
+void lv_draw_vector_partial(lv_vector_dsc_t * dsc, lv_obj_t * obj);
 
 /* Traverser for task list */
 typedef void (*vector_draw_task_cb)(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc);

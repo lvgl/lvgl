@@ -79,14 +79,30 @@ struct _lv_vector_draw_dsc_t {
 
 struct _lv_draw_vector_task_dsc_t {
     lv_draw_dsc_base_t base;
-    lv_ll_t * task_list; /*draw task list.*/
+    lv_ll_t * task_list;            /*draw task list.*/
+    lv_draw_buf_t * draw_buf;       /*draw buffer that used for partial rendering*/
+    lv_color_t * blend_color;       /*when A8 is used all paths are blended to one color*/
+
+    /*used for partial rendering - it is a delta
+     *between y1 of the lv_obj_t containing the paths and y1 of the clip area*/
+    int32_t obj_offset_y;
+
+    /*used for partial rendering - it is a delta
+     *between x1 of the lv_obj_t containing the paths and x1 of the clip area*/
+    int32_t obj_offset_x;
+
+    /* partial rendering - width of the object containing the path the stride
+     * calculated based on the object width not the clip area */
+    int32_t obj_width;
 };
 
 struct _lv_vector_dsc_t {
     lv_layer_t * layer;
     lv_vector_draw_dsc_t current_dsc;
+    lv_color_t blend_color;
     /* private data */
     lv_draw_vector_task_dsc_t tasks;
+    lv_draw_buf_t * draw_buf;
 };
 
 
@@ -94,7 +110,10 @@ struct _lv_vector_dsc_t {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * data);
+/* Execute a callback for each task/path */
+void lv_vector_for_each_task_ex(lv_ll_t * task_list, vector_draw_task_cb cb, void * data);
+
+void lv_vector_destroy_tasks(lv_ll_t * task_list);
 
 /**********************
  *      MACROS

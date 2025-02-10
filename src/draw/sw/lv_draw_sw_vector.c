@@ -9,6 +9,8 @@
 #include "../lv_image_decoder_private.h"
 #include "../lv_draw_vector_private.h"
 #include "../lv_draw_private.h"
+#include "../../misc/lv_area_private.h"
+#include "blend/lv_draw_sw_blend_private.h"
 #include "lv_draw_sw.h"
 
 #if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
@@ -40,17 +42,39 @@ typedef struct {
     uint8_t a;
 } _tvg_color;
 
+typedef struct {
+    Tvg_Canvas * canvas;
+    lv_draw_buf_t * canvas_buf;
+    int32_t offset_y;
+} canvas_ctx_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
+static void draw_partial(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc);
+static canvas_ctx_t * init_canvas_ctx(void);
+static void add_path_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
+static canvas_ctx_t * canvas_ctx;
 
 /**********************
  *      MACROS
  **********************/
+
+static canvas_ctx_t * init_canvas_ctx(void)
+{
+    canvas_ctx_t * ctx;
+
+    ctx = lv_malloc(sizeof(canvas_ctx_t));
+    LV_ASSERT_NULL(ctx);
+
+    ctx->canvas = tvg_swcanvas_create();
+    return ctx;
+}
 
 static void lv_area_to_tvg(_tvg_rect * rect, const lv_area_t * area)
 {
@@ -81,8 +105,13 @@ static void lv_matrix_to_tvg(Tvg_Matrix * tm, const lv_matrix_t * m)
     tm->e33 = m->m[2][2];
 }
 
-static void _set_paint_matrix(Tvg_Paint * obj, const Tvg_Matrix * m)
+static void _set_paint_matrix(Tvg_Paint * obj, Tvg_Matrix * m)
 {
+    if(canvas_ctx->offset_y != 0) {
+        /*Apply a transform on the shape when performing partial rendering*/
+        m->e23 += canvas_ctx->offset_y;
+    }
+
     tvg_paint_set_transform(obj, m);
 }
 
@@ -307,7 +336,8 @@ static void _set_paint_fill_pattern(Tvg_Paint * obj, Tvg_Canvas * canvas, const 
 
     Tvg_Matrix mtx;
     lv_matrix_to_tvg(&mtx, m);
-    tvg_paint_set_transform(img, &mtx);
+
+    _set_paint_matrix(img, &mtx);
     tvg_canvas_push(canvas, img);
     lv_image_decoder_close(&decoder_dsc);
 }
@@ -365,13 +395,15 @@ static void _set_paint_blend_mode(Tvg_Paint * obj, lv_vector_blend_t blend)
     tvg_paint_set_blend_method(obj, lv_blend_to_tvg(blend));
 }
 
-static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc)
+static void add_path_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc)
 {
-    Tvg_Canvas * canvas = (Tvg_Canvas *)ctx;
+    canvas_ctx_t * c_ctx = (canvas_ctx_t *)ctx;
+    Tvg_Canvas * canvas = (Tvg_Canvas *)c_ctx->canvas;
 
     Tvg_Paint * obj = tvg_shape_new();
 
-    if(!path) {  /*clear*/
+    if(path == NULL) {
+        /*clear*/
         _tvg_rect rc;
         lv_area_to_tvg(&rc, &dsc->scissor_area);
 
@@ -383,6 +415,7 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
             0.0f, 1.0f, 0.0f,
             0.0f, 0.0f, 1.0f,
         };
+
         _set_paint_matrix(obj, &mtx);
         tvg_shape_append_rect(obj, rc.x, rc.y, rc.w, rc.h, 0, 0);
         tvg_shape_set_fill_color(obj, c.r, c.g, c.b, c.a);
@@ -390,8 +423,8 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
     else {
         Tvg_Matrix mtx;
         lv_matrix_to_tvg(&mtx, &dsc->matrix);
-        _set_paint_matrix(obj, &mtx);
 
+        _set_paint_matrix(obj, &mtx);
         _set_paint_shape(obj, path);
 
         _set_paint_fill(obj, canvas, &dsc->fill_dsc, &dsc->matrix);
@@ -402,13 +435,154 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
     tvg_canvas_push(canvas, obj);
 }
 
+/**
+ * Perform partial rendering of the vector paths - used on memory constrainted devices.
+ * The paths are removed from the canvas and added again with a vertical offset applied
+ *
+ * NOTE: an attempt was made to move the tvg viewport instead but it didn't work as it requires
+ * a full size buffer as the target
+ */
+static void draw_partial(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc)
+{
+
+    Tvg_Canvas * canvas;
+    lv_area_t area;
+    Tvg_Colorspace tvg_cf = TVG_COLORSPACE_ARGB8888;
+    int tvg_stride;
+
+    canvas_ctx->canvas_buf = dsc->draw_buf;
+    canvas = canvas_ctx->canvas;
+    area = t->clip_area;
+
+    int32_t width = lv_area_get_width(&area);
+    int32_t height = lv_area_get_height(&area);
+    int cf = dsc->draw_buf->header.cf;
+    uint32_t stride = lv_draw_buf_width_to_stride(dsc->obj_width, dsc->draw_buf->header.cf);
+    tvg_stride = stride;
+
+    switch(cf) {
+        case LV_COLOR_FORMAT_A8:
+            /**
+             * A8 is currently not officially supported by ThorVG
+             * Works with simple shapes - much faster than ARGB8888
+             */
+            tvg_cf = TVG_COLORSPACE_GRAYSCALE;
+            break;
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            tvg_cf = TVG_COLORSPACE_ARGB8888;
+            tvg_stride = width;
+            break;
+        default:
+            break;
+    }
+
+    LV_ASSERT_NULL(dsc->draw_buf);
+    int32_t cnt = -1;
+    int32_t buf_h = 0;
+
+    if(dsc->draw_buf->data_size / (stride * height) >= 1) {
+        /**
+         * If the requested area fits in the draw buffer
+         * rendering will take place in one go
+         */
+        buf_h = height;
+        cnt = 1;
+    }
+    else {
+        /*Multiple passes*/
+        buf_h = (dsc->draw_buf->data_size / stride);
+        cnt = (height / buf_h) + (height % buf_h == 0 ? 0 : 1);
+    }
+
+    /*Sanity checking*/
+    LV_ASSERT(cnt > 0 && buf_h > 0);
+
+    lv_memset(dsc->draw_buf->data, 0, stride * buf_h);
+    tvg_swcanvas_set_target(canvas, (uint32_t *) dsc->draw_buf->data,
+                            tvg_stride, dsc->obj_width, buf_h, tvg_cf);
+
+    tvg_canvas_set_viewport(canvas, dsc->obj_offset_x, 0, width, buf_h);
+
+    canvas_ctx->offset_y = dsc->obj_offset_y * -1;
+
+    for(int32_t i = 0; i < cnt; i++) {
+
+        uint32_t cur_height = buf_h;
+        lv_area_t blend_area;
+
+        if(i == cnt - 1 && height > buf_h && height % buf_h != 0) {
+            cur_height = height % buf_h;
+        }
+
+        lv_vector_for_each_task_ex(dsc->task_list, add_path_cb, canvas_ctx);
+
+        if(tvg_canvas_draw(canvas) == TVG_RESULT_SUCCESS) {
+            tvg_canvas_sync(canvas);
+        }
+
+        lv_memcpy(&blend_area, &area, sizeof(lv_area_t));
+        blend_area.y2 = blend_area.y1 + cur_height - 1;
+
+        tvg_canvas_clear(canvas, true);
+        canvas_ctx->offset_y -= cur_height;
+
+        if(cf == LV_COLOR_FORMAT_A8) {
+
+            lv_draw_sw_blend_dsc_t blend_dsc;
+            lv_memzero(&blend_dsc, sizeof(blend_dsc));
+            lv_memcpy(&blend_dsc.color, dsc->blend_color, sizeof(lv_color_t));
+            blend_dsc.opa = LV_OPA_100;
+            blend_dsc.mask_buf = dsc->draw_buf->data;
+            blend_dsc.mask_stride = stride;
+            blend_dsc.mask_area = &blend_area;
+            blend_dsc.blend_area = &blend_area;
+            blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
+
+            lv_draw_sw_blend(t, &blend_dsc);
+
+        }
+        else if(cf == LV_COLOR_FORMAT_ARGB8888 || cf == LV_COLOR_FORMAT_XRGB8888) {
+
+            lv_draw_image_dsc_t img_dsc;
+            lv_draw_image_dsc_init(&img_dsc);
+            img_dsc.rotation = 0;
+            img_dsc.scale_x = LV_SCALE_NONE;
+            img_dsc.opa = LV_OPA_100;
+            img_dsc.src = dsc->draw_buf;
+
+            lv_draw_sw_image(t, &img_dsc, &blend_area);
+        }
+
+        area.y1 += cur_height;
+        lv_memset(dsc->draw_buf->data, 0x0, stride * cur_height);
+    }
+
+    lv_vector_destroy_tasks(dsc->task_list);
+}
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
 void lv_draw_sw_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc)
 {
+    Tvg_Canvas * canvas;
+
     if(dsc->task_list == NULL)
         return;
+
+    if(canvas_ctx == NULL) {
+        /*Create the canvas on the first call*/
+        canvas_ctx = init_canvas_ctx();
+    }
+
+    canvas = canvas_ctx->canvas;
+
+    if(dsc->draw_buf != NULL) {
+        /*If there is a draw buf - do partial rendering*/
+        draw_partial(t, dsc);
+        return;
+    }
 
     lv_layer_t * layer = dsc->base.layer;
     lv_draw_buf_t * draw_buf = layer->draw_buf;
@@ -427,7 +601,6 @@ void lv_draw_sw_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc
     int32_t width = lv_area_get_width(&layer->buf_area) - 1;
     int32_t height = lv_area_get_height(&layer->buf_area) - 1;
     uint32_t stride = draw_buf->header.stride;
-    Tvg_Canvas * canvas = tvg_swcanvas_create();
     tvg_swcanvas_set_target(canvas, buf, stride / 4, width, height, TVG_COLORSPACE_ARGB8888);
 
     _tvg_rect rc;
@@ -435,13 +608,14 @@ void lv_draw_sw_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc
     tvg_canvas_set_viewport(canvas, (int32_t)rc.x, (int32_t)rc.y, (int32_t)rc.w, (int32_t)rc.h);
 
     lv_ll_t * task_list = dsc->task_list;
-    lv_vector_for_each_destroy_tasks(task_list, _task_draw_cb, canvas);
+    lv_vector_for_each_task_ex(task_list, add_path_cb, canvas_ctx);
 
     if(tvg_canvas_draw(canvas) == TVG_RESULT_SUCCESS) {
         tvg_canvas_sync(canvas);
     }
 
-    tvg_canvas_destroy(canvas);
+    tvg_canvas_clear(canvas, true);
+    lv_vector_destroy_tasks(dsc->task_list);
 }
 
 /**********************

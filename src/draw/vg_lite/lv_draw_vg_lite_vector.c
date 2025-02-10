@@ -65,7 +65,8 @@ void lv_draw_vg_lite_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t 
     lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
 
     LV_PROFILER_DRAW_BEGIN;
-    lv_vector_for_each_destroy_tasks(dsc->task_list, task_draw_cb, u);
+    lv_vector_for_each_task_ex(dsc->task_list, task_draw_cb, u);
+    lv_vector_destroy_tasks(dsc->task_list);
     LV_PROFILER_DRAW_END;
 }
 

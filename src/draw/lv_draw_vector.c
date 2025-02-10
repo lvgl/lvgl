@@ -502,7 +502,7 @@ void lv_vector_dsc_delete(lv_vector_dsc_t * dsc)
 {
     if(dsc->tasks.task_list) {
         lv_ll_t * task_list = dsc->tasks.task_list;
-        lv_vector_for_each_destroy_tasks(task_list, NULL, NULL);
+        lv_vector_destroy_tasks(task_list);
         dsc->tasks.task_list = NULL;
     }
     lv_array_deinit(&(dsc->current_dsc.stroke_dsc.dash_pattern));
@@ -736,6 +736,67 @@ void lv_vector_clear_area(lv_vector_dsc_t * dsc, const lv_area_t * rect)
     lv_area_copy(&(new_task->dsc.scissor_area), rect);
 }
 
+
+void lv_vector_dsc_set_draw_buf(lv_vector_dsc_t * dsc, lv_draw_buf_t * buf)
+{
+
+    LV_ASSERT_NULL(dsc);
+    LV_ASSERT_NULL(buf);
+
+    /* Format check */
+    lv_color_format_t cf = buf->header.cf;
+
+    switch(cf) {
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_A8:
+            break;
+        default:
+            LV_LOG_ERROR("unsupported layer color: %d", cf);
+            return;
+    }
+
+    dsc->draw_buf = buf;
+}
+
+void lv_draw_vector_partial(lv_vector_dsc_t * dsc, lv_obj_t * obj)
+{
+    lv_area_t obj_area;
+    lv_area_t drawing_area;
+    lv_draw_vector_task_dsc_t * draw_vector_task;
+    lv_layer_t * layer;
+
+    if(!dsc->tasks.task_list || obj == NULL) {
+        return;
+    }
+
+    layer = dsc->layer;
+
+    lv_obj_get_coords(obj, &obj_area);
+    if(lv_area_intersect(&drawing_area, &obj_area, &layer->_clip_area) == false) {
+        /*Clip area does not intersect with the object containing the graphics*/
+        return;
+    }
+
+    lv_area_set_width(&drawing_area, lv_area_get_width(&obj_area));
+
+    lv_draw_task_t * t = lv_draw_add_task(layer, &drawing_area);
+    t->type = LV_DRAW_TASK_TYPE_VECTOR;
+    t->draw_dsc = lv_malloc(sizeof(lv_draw_vector_task_dsc_t));
+    lv_memcpy(t->draw_dsc, &(dsc->tasks), sizeof(lv_draw_vector_task_dsc_t));
+
+    draw_vector_task = (lv_draw_vector_task_dsc_t *) t->draw_dsc;
+    draw_vector_task->draw_buf = dsc->draw_buf;
+    draw_vector_task->blend_color = &dsc->blend_color;
+
+    draw_vector_task->obj_offset_y = drawing_area.y1 - obj_area.y1;
+    draw_vector_task->obj_offset_x = drawing_area.x1 - obj_area.x1;
+    draw_vector_task->obj_width = lv_area_get_width(&obj_area);
+
+    lv_draw_finalize_task_creation(layer, t);
+    dsc->tasks.task_list = NULL;
+}
+
 void lv_draw_vector(lv_vector_dsc_t * dsc)
 {
     if(!dsc->tasks.task_list) {
@@ -778,7 +839,42 @@ void lv_vector_dsc_skew(lv_vector_dsc_t * dsc, float skew_x, float skew_y)
     lv_matrix_skew(&(dsc->current_dsc.matrix), skew_x, skew_y);
 }
 
-void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * data)
+void lv_vector_dsc_set_blend_color(lv_vector_dsc_t * dsc, lv_color_t blend_color)
+{
+    if(dsc == NULL) {
+        return;
+    }
+
+    if(dsc->draw_buf == NULL) {
+        LV_LOG_ERROR("A draw buffer must be assigned to the vector descriptor to perform blending");
+        return;
+    }
+
+    if(dsc->draw_buf->header.cf != LV_COLOR_FORMAT_A8) {
+        LV_LOG_ERROR("Re-coloring of the shape during blending is only possible with an A8 buffer");
+        return;
+    }
+
+    lv_memcpy(&dsc->blend_color, &blend_color, sizeof(lv_color_t));
+
+}
+
+void lv_vector_for_each_task_ex(lv_ll_t * task_list, vector_draw_task_cb cb, void * data)
+{
+    lv_vector_draw_task * task = lv_ll_get_head(task_list);
+    lv_vector_draw_task * next_task = NULL;
+
+    while(task != NULL) {
+        if(cb) {
+            cb(data, task->path, &(task->dsc));
+        }
+
+        next_task = lv_ll_get_next(task_list, task);
+        task = next_task;
+    }
+}
+
+void lv_vector_destroy_tasks(lv_ll_t * task_list)
 {
     lv_vector_draw_task * task = lv_ll_get_head(task_list);
     lv_vector_draw_task * next_task = NULL;
@@ -787,18 +883,14 @@ void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb c
         next_task = lv_ll_get_next(task_list, task);
         lv_ll_remove(task_list, task);
 
-        if(cb) {
-            cb(data, task->path, &(task->dsc));
-        }
-
         if(task->path) {
             lv_vector_path_delete(task->path);
         }
         lv_array_deinit(&(task->dsc.stroke_dsc.dash_pattern));
-
         lv_free(task);
         task = next_task;
     }
     lv_free(task_list);
 }
+
 #endif /* LV_USE_VECTOR_GRAPHIC */
