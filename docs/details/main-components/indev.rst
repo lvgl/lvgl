@@ -217,7 +217,7 @@ Handling touch events
 Touch events are handled like any other event. First, setup a listener for the ``LV_EVENT_GESTURE`` event type by defining and setting the callback function.
 
 The state or scale of the pinch gesture can be retrieved by
-calling the ``lv_event_get_pinch_scale`` and ``lv_indev_get_gesture_state`` from within the 
+calling the ``lv_event_get_pinch_scale`` and ``lv_indev_get_gesture_state`` from within the
 callback.
 
 An example of such an application is available in
@@ -319,8 +319,9 @@ a Widget to the group use :cpp:expr:`lv_group_add_obj(g, widget)`.
 Once a Widget has been added to a group, you can find out what group it is in
 using :cpp:expr:`lv_obj_get_group(widget)`.
 
-To find out if a Widget in a group has focus, call :cpp:expr:`lv_obj_is_focused(widget)`.
-If the Widget is not part of a group, this function will return ``false``.
+To find out what Widget in a group has focus, if any, call
+:cpp:expr:`lv_group_get_focused(group)`.  If a Widget in that group has focus, it
+will return a pointer to it, otherwise it will return NULL.
 
 To associate a group with an input device use :cpp:expr:`lv_indev_set_group(indev, g)`.
 

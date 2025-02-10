@@ -160,6 +160,7 @@ static void send_color(lv_lcd_generic_mipi_driver_t * drv, uint8_t cmd, uint8_t 
 {
     uint8_t cmdbuf = cmd;       /* MIPI uses 8 bit commands */
     drv->send_color(drv->disp, &cmdbuf, 1, param, param_size);
+    /* note: LVGL waits for your callback to call `lv_display_flush_ready` to know when the transfer has finished. */
 }
 
 /**

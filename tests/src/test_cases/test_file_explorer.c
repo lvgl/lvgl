@@ -54,7 +54,7 @@ void test_file_explorer_read_dir(void)
     /* Since the default table->col_act = LV_TABLE_CELL_NONE, it is necessary to specify file_table->col_act = 0 */
     file_table->col_act = 0;
     file_table->row_act = dev_row;
-    lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(file_explorer->file_table, LV_EVENT_CLICKED, NULL);
     TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/dev/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
@@ -65,22 +65,22 @@ void test_file_explorer_read_dir(void)
     }
 
     file_table->row_act = shm_row;
-    lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(file_explorer->file_table, LV_EVENT_CLICKED, NULL);
     TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/dev/shm/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
     file_table->row_act = back_row;
-    lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(file_explorer->file_table, LV_EVENT_CLICKED, NULL);
     TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/dev/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
     file_table->row_act = back_row;
-    lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(file_explorer->file_table, LV_EVENT_CLICKED, NULL);
     TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
     file_table->row_act = home_row;
-    lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(file_explorer->file_table, LV_EVENT_CLICKED, NULL);
     TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/home/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
@@ -91,7 +91,7 @@ void test_file_explorer_read_dir(void)
     }
 
     file_table->row_act = user_row;
-    lv_obj_send_event(file_explorer->file_table, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(file_explorer->file_table, LV_EVENT_CLICKED, NULL);
     TEST_ASSERT_EQUAL_STRING("A:src/test_files/test_file_explorer_folder/home/web_user/",
                              lv_file_explorer_get_current_path(file_explorer_obj));
 
