@@ -40,6 +40,14 @@ void lv_demo_vector_graphic_buffered(void);
  */
 void lv_demo_vector_graphic_not_buffered(void);
 
+/**
+ * Draw many vector based shapes and paths to a partial draw buffer.
+ * The buffer is then blended in
+ * it is used on devices that don't have much RAM or
+ * if color format of the display is not XRGB8888/ARGB8888
+ */
+void lv_demo_vector_graphic_partially_buffered(void);
+
 /**********************
  *      MACROS
  **********************/

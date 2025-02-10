@@ -23,6 +23,21 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+static int is_partially_buffered = 0;
+static lv_draw_buf_t * draw_buf;
+lv_obj_t * demo_container;
+
+/**********************
+ *      MACROS
+ **********************/
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 static void draw_pattern(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
 {
     lv_vector_path_clear(path);
@@ -228,12 +243,24 @@ static void draw_vector(lv_layer_t * layer)
 
     draw_shapes(ctx, path);
     draw_lines(ctx, path);
-    draw_pattern(ctx, path);
+    if(is_partially_buffered == 0) {
+        /*TODO: Currently not supported in partial mode*/
+        draw_pattern(ctx, path);
+    }
     draw_radial_gradient(ctx, path);
     draw_gradient(ctx, path);
     draw_blend(ctx, path);
     draw_arc(ctx, path);
-    lv_draw_vector(ctx); // submit draw
+
+    if(is_partially_buffered == 1) {
+        lv_vector_dsc_set_draw_buf(ctx, draw_buf);
+        lv_draw_vector_partial(ctx, demo_container);
+
+    }
+    else {
+        lv_draw_vector(ctx); // submit draw
+    }
+
     lv_vector_path_delete(path);
     lv_vector_dsc_delete(ctx);
 }
@@ -241,7 +268,7 @@ static void draw_vector(lv_layer_t * layer)
 static void delete_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
-    lv_draw_buf_t * draw_buf = lv_canvas_get_draw_buf(obj);
+    draw_buf = lv_canvas_get_draw_buf(obj);
     lv_draw_buf_destroy(draw_buf);
 }
 
@@ -251,14 +278,6 @@ static void event_cb(lv_event_t * e)
 
     draw_vector(layer);
 }
-
-/**********************
- *  STATIC VARIABLES
- **********************/
-
-/**********************
- *      MACROS
- **********************/
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -271,7 +290,7 @@ void lv_demo_vector_graphic_not_buffered(void)
 
 void lv_demo_vector_graphic_buffered(void)
 {
-    lv_draw_buf_t * draw_buf = lv_draw_buf_create(WIDTH, HEIGHT, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
+    draw_buf = lv_draw_buf_create(WIDTH, HEIGHT, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
     lv_draw_buf_clear(draw_buf, NULL);
 
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
@@ -285,9 +304,23 @@ void lv_demo_vector_graphic_buffered(void)
     lv_canvas_finish_layer(canvas, &layer);
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
+void lv_demo_vector_graphic_partially_buffered(void)
+{
+
+    demo_container = lv_obj_create(lv_screen_active());
+
+    lv_obj_set_size(demo_container, WIDTH, HEIGHT);
+    lv_obj_set_pos(demo_container, 0, 0);
+
+    is_partially_buffered = 1;
+
+    draw_buf = lv_draw_buf_create(WIDTH, HEIGHT / 10, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
+    lv_draw_buf_clear(draw_buf, NULL);
+
+    lv_obj_add_event_cb(demo_container, event_cb, LV_EVENT_DRAW_MAIN, NULL);
+
+}
+
 #else
 
 void lv_demo_vector_graphic_not_buffered(void)
