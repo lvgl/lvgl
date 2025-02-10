@@ -52,9 +52,9 @@
 #define FALL_HEIGHT     80
 #define PAD_BASIC       8
 
-#define LV_TEST_FONT_STRING_CHINESE "法律之前人人平等,并有权享受法律的平等保护,不受任何歧视。人人有权享受平等保护,以免受违反本宣言的任何歧视行为以及煽动这种歧视的任何行为之害。"
+#define LV_TEST_FONT_STRING_CHINESE "这是一个普通的测试文本，用于测试基本的显示功能。这里包含了常见的词汇和句式结构，适合测试基本的文本渲染效果。"
 
-#define LV_TEST_FONT_STRING_ENGLISH "No one shall be subjected to arbitrary arrest, detention or exile. Everyone is entitled in full equality to a fair and public hearing by an independent and impartial tribunal, in the determination of his rights and obligations and of any criminal charge against him. No one shall be subjected to arbitrary interference with his privacy, family, home or correspondence, nor to attacks upon his honour and reputation. Everyone has the right to the protection of the law against such interference or attacks."
+#define LV_TEST_FONT_STRING_ENGLISH "This is an ordinary test text used to test basic display functionality. It includes common vocabulary and sentence structures, making it suitable for testing basic text rendering effects."
 
 #define LV_TEST_FONT_SIZE 24
 
@@ -107,19 +107,17 @@ static void arc_anim(benchmark_context_t * context, lv_obj_t * obj);
 
 static lv_obj_t * card_create(void);
 
-static void span_text_add(lv_obj_t * spans, lv_font_t * font, const char * text);
+static void spans_init(lv_obj_t * spans);
+static void spans_text_add(lv_obj_t * spans, const lv_font_t * font, const char * text);
 
 #if LV_USE_FREETYPE
 static void freetype_span_text_bitmap_cb(benchmark_context_t * context)
 {
     lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
-    lv_obj_center(spans);
-    lv_obj_set_width(spans, lv_display_get_horizontal_resolution(NULL));
-    lv_obj_set_style_text_align(spans, LV_TEXT_ALIGN_LEFT, 0);
-    lv_spangroup_set_overflow(spans, LV_SPAN_OVERFLOW_CLIP);
-    lv_spangroup_set_mode(spans, LV_SPAN_MODE_BREAK);
+    spans_init(spans);
 
-    span_text_add(spans, context->freetype_font_bitmap, LV_TEST_FONT_STRING_CHINESE);
+    spans_text_add(spans, context->freetype_font_bitmap, LV_TEST_FONT_STRING_CHINESE);
+    spans_text_add(spans, context->freetype_font_bitmap, LV_TEST_FONT_STRING_ENGLISH);
 
     fall_anim(context, spans, - lv_display_get_vertical_resolution(NULL) / 3);
 }
@@ -127,14 +125,10 @@ static void freetype_span_text_bitmap_cb(benchmark_context_t * context)
 static void freetype_span_text_outline_cb(benchmark_context_t * context)
 {
     lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
-    lv_obj_center(spans);
-    lv_obj_set_width(spans, lv_display_get_horizontal_resolution(NULL));
-    lv_obj_set_style_text_align(spans, LV_TEXT_ALIGN_LEFT, 0);
-    lv_spangroup_set_overflow(spans, LV_SPAN_OVERFLOW_CLIP);
-    lv_spangroup_set_mode(spans, LV_SPAN_MODE_BREAK);
+    spans_init(spans);
 
-    span_text_add(spans, context->freetype_font_outline, LV_TEST_FONT_STRING_CHINESE);
-    span_text_add(spans, context->freetype_font_outline, LV_TEST_FONT_STRING_ENGLISH);
+    spans_text_add(spans, context->freetype_font_outline, LV_TEST_FONT_STRING_CHINESE);
+    spans_text_add(spans, context->freetype_font_outline, LV_TEST_FONT_STRING_ENGLISH);
 
     fall_anim(context, spans, - lv_display_get_vertical_resolution(NULL) / 3);
 }
@@ -145,7 +139,7 @@ static void freetype_label_text_bitmap_cb(benchmark_context_t * context)
     if(context->freetype_font_bitmap) {
         lv_obj_set_style_text_font(label, context->freetype_font_bitmap, 0);
     }
-    lv_label_set_text(label, LV_TEST_FONT_STRING_CHINESE);
+    lv_label_set_text(label, LV_TEST_FONT_STRING_CHINESE LV_TEST_FONT_STRING_ENGLISH);
     lv_obj_set_width(label, lv_pct(100));
 
     fall_anim(context, label, - lv_display_get_vertical_resolution(NULL) / 3);
@@ -157,7 +151,7 @@ static void freetype_label_text_outline_cb(benchmark_context_t * context)
     if(context->freetype_font_outline) {
         lv_obj_set_style_text_font(label, context->freetype_font_outline, 0);
     }
-    lv_label_set_text(label, LV_TEST_FONT_STRING_ENGLISH);
+    lv_label_set_text(label, LV_TEST_FONT_STRING_CHINESE LV_TEST_FONT_STRING_ENGLISH);
     lv_obj_set_width(label, lv_pct(100));
 
     fall_anim(context, label, - lv_display_get_vertical_resolution(NULL) / 3);
@@ -168,13 +162,10 @@ static void freetype_label_text_outline_cb(benchmark_context_t * context)
 static void span_tiny_ttf_text_cb(benchmark_context_t * context)
 {
     lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
-    lv_obj_center(spans);
-    lv_obj_set_width(spans, lv_display_get_horizontal_resolution(NULL));
-    lv_obj_set_style_text_align(spans, LV_TEXT_ALIGN_LEFT, 0);
-    lv_spangroup_set_overflow(spans, LV_SPAN_OVERFLOW_CLIP);
-    lv_spangroup_set_mode(spans, LV_SPAN_MODE_BREAK);
+    spans_init(spans);
 
-    span_text_add(spans, context->tinyttf_font, LV_TEST_FONT_STRING_CHINESE);
+    spans_text_add(spans, context->tinyttf_font, LV_TEST_FONT_STRING_CHINESE);
+    spans_text_add(spans, context->tinyttf_font, LV_TEST_FONT_STRING_ENGLISH);
 
     fall_anim(context, spans, - lv_display_get_vertical_resolution(NULL) / 3);
 }
@@ -191,6 +182,15 @@ static void label_tiny_ttf_text_cb(benchmark_context_t * context)
     fall_anim(context, label, - lv_display_get_vertical_resolution(NULL) / 3);
 }
 #endif
+
+static void span_text_cb(benchmark_context_t * context){
+    lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
+    spans_init(spans);
+    spans_text_add(spans, &lv_font_montserrat_26, LV_TEST_FONT_STRING_ENGLISH);
+    spans_text_add(spans, &lv_font_montserrat_20, LV_TEST_FONT_STRING_ENGLISH);
+
+    fall_anim(context, spans, - lv_display_get_vertical_resolution(NULL) / 3);
+}
 
 static void empty_screen_cb(benchmark_context_t * context)
 {
@@ -582,6 +582,7 @@ static scene_dsc_t scenes[] = {
     {.name = "Screen sized text",             .scene_time = 5000,  .create_cb = screen_sized_text_cb},
     {.name = "Multiple arcs",                 .scene_time = 3000,  .create_cb = multiple_arcs_cb},
 
+    {.name = "Span text",                     .scene_time = 3000,  .create_cb = span_text_cb},
 #if LV_USE_FREETYPE
     {.name = "FreeType span text(bitmap)",   .scene_time = 3000,  .create_cb = freetype_span_text_bitmap_cb},
     {.name = "FreeType span text(outline)",  .scene_time = 3000,  .create_cb = freetype_span_text_outline_cb},
@@ -1032,7 +1033,15 @@ static lv_obj_t * card_create(void)
 }
 
 #if LV_USE_FREETYPE || LV_USE_TINY_TTF
-static void span_text_add(lv_obj_t * spans, lv_font_t * font, const char * text)
+static void spans_init(lv_obj_t * spans){
+    lv_obj_center(spans);
+    lv_obj_set_width(spans, lv_display_get_horizontal_resolution(NULL));
+    lv_obj_set_style_text_align(spans, LV_TEXT_ALIGN_LEFT, 0);
+    lv_spangroup_set_overflow(spans, LV_SPAN_OVERFLOW_CLIP);
+    lv_spangroup_set_mode(spans, LV_SPAN_MODE_BREAK);
+}
+
+static void spans_text_add(lv_obj_t * spans, const lv_font_t * font, const char * text)
 {
     lv_span_t * span = lv_spangroup_new_span(spans);
     lv_span_set_text(span, text);
