@@ -1266,17 +1266,10 @@
 
 #if LV_USE_DEMO_BENCHMARK
     /** Path to FreeType font file which is used in benchmark test */
-<<<<<<< HEAD
-    #define LV_DEMO_BENCHMARK_FREETYPE_FONT_PATH "./lvgl/tests/src/test_files/fonts/noto/NotoSansSC-Regular.ttf"
-
-    /** "Path to TinyTTF font file which is used in benchmark test" */
-    #define LV_DEMO_BENCHMARK_TINY_TTF_FONT_PATH "A:lvgl/tests/src/test_files/fonts/noto/NotoSansSC-Regular.ttf"
-=======
     #define LV_DEMO_BENCHMARK_FREETYPE_FONT_PATH "./lvgl/demos/benchmark/assets/NotoSansSC-Regular.ttf"
 
     /** "Path to TinyTTF font file which is used in benchmark test" */
     #define LV_DEMO_BENCHMARK_TINY_TTF_FONT_PATH "A:lvgl/demos/benchmark/assets/NotoSansSC-Regular.ttf"
->>>>>>> bd96d0d97 (Add span text testcase, which does not rely on FreeType of TinyTTF.)
 #endif
 
 /** Render test for each primitive.

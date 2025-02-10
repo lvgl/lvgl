@@ -182,7 +182,8 @@ static void label_tiny_ttf_text_cb(benchmark_context_t * context)
 }
 #endif
 
-static void span_text_cb(benchmark_context_t * context){
+static void span_text_cb(benchmark_context_t * context)
+{
     lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
     spans_init(spans);
     spans_text_add(spans, &lv_font_montserrat_26, LV_TEST_FONT_STRING_ENGLISH);
@@ -1032,7 +1033,8 @@ static lv_obj_t * card_create(void)
 }
 
 #if LV_USE_FREETYPE || LV_USE_TINY_TTF
-static void spans_init(lv_obj_t * spans){
+static void spans_init(lv_obj_t * spans)
+{
     lv_obj_center(spans);
     lv_obj_set_width(spans, lv_display_get_horizontal_resolution(NULL));
     lv_obj_set_style_text_align(spans, LV_TEXT_ALIGN_LEFT, 0);

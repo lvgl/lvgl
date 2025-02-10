@@ -2010,20 +2010,12 @@ menu "LVGL configuration"
 
 		config LV_DEMO_BENCHMARK_FREETYPE_FONT_PATH
 			string "Path to FreeType font file which is used in benchmark test"
-<<<<<<< HEAD
-			default "./lvgl/tests/src/test_files/fonts/noto/NotoSansSC-Regular.ttf"
-=======
 			default "./lvgl/demos/benchmark/assets/NotoSansSC-Regular.ttf"
->>>>>>> bd96d0d97 (Add span text testcase, which does not rely on FreeType of TinyTTF.)
 			depends on LV_USE_DEMO_BENCHMARK && LV_USE_FREETYPE
 
 		config LV_DEMO_BENCHMARK_TINY_TTF_FONT_PATH
 			string "Path to TinyTTF font file which is used in benchmark test"
-<<<<<<< HEAD
-			default "A:lvgl/tests/src/test_files/fonts/noto/NotoSansSC-Regular.ttf"
-=======
 			default "A:lvgl/demos/benchmark/assets/NotoSansSC-Regular.ttf"
->>>>>>> bd96d0d97 (Add span text testcase, which does not rely on FreeType of TinyTTF.)
 			depends on LV_USE_DEMO_BENCHMARK && LV_USE_TINY_TTF && LV_TINY_TTF_FILE_SUPPORT
 
 		config LV_USE_DEMO_RENDER
