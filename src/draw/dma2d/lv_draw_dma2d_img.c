@@ -61,6 +61,7 @@ void lv_draw_dma2d_opaque_image(lv_draw_task_t * t, void * dest_first_pixel, lv_
         .height = h,
         .stride = dest_stride
     };
+    lv_draw_dma2d_unit_t * u = (lv_draw_dma2d_unit_t *) t->draw_unit;
     lv_memcpy(&u->writing_area, &dest_area, sizeof(lv_draw_dma2d_cache_area_t));
     if(lv_color_format_has_alpha(image_cf)) {
         /* make sure the background area DMA2D is blending is up-to-date in main memory */
@@ -148,6 +149,7 @@ void lv_draw_dma2d_image(lv_draw_task_t * t, void * dest_first_pixel, lv_area_t 
         .height = h,
         .stride = dest_stride
     };
+    lv_draw_dma2d_unit_t * u = (lv_draw_dma2d_unit_t *) t->draw_unit;
     lv_memcpy(&u->writing_area, &dest_area, sizeof(lv_draw_dma2d_cache_area_t));
     /* make sure the background area DMA2D is blending is up-to-date in main memory */
     lv_draw_dma2d_clean_cache(&dest_area);
