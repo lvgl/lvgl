@@ -159,7 +159,7 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
                           dsc->antialias ? NEMA_FILTER_BL : NEMA_FILTER_PS);
     }
     else {
-        nema_bind_lut_tex((uintptr_t)((uint8_t*)src_buf + LV_COLOR_INDEXED_PALETTE_SIZE(src_cf) * 4), tex_w, tex_h,
+        nema_bind_lut_tex((uintptr_t)((uint8_t *)src_buf + LV_COLOR_INDEXED_PALETTE_SIZE(src_cf) * 4), tex_w, tex_h,
                           lv_palette_cf_to_nema(src_cf), src_stride, NEMA_FILTER_PS, (uintptr_t)(src_buf), NEMA_BGRA8888);
         blending_mode |= NEMA_BLOP_LUT;
     }
