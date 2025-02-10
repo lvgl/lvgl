@@ -2008,10 +2008,15 @@ menu "LVGL configuration"
 			select LV_FONT_MONTSERRAT_26
 			select LV_USE_DEMO_WIDGETS
 
-		config LV_DEMO_BENCHMARK_FONT_PATH
-			string "Path to font file which is used in benchmark test"
-			default "lvgl/tests/src/test_files/fonts/noto/NotoSansSC-Regular.ttf"
-			depends on LV_USE_DEMO_BENCHMARK && (LV_USE_FREETYPE || LV_USE_TINY_TTF)
+		config LV_DEMO_BENCHMARK_FREETYPE_FONT_PATH
+			string "Path to FreeType font file which is used in benchmark test"
+			default "./lvgl/tests/src/test_files/fonts/noto/NotoSansSC-Regular.ttf"
+			depends on LV_USE_DEMO_BENCHMARK && LV_USE_FREETYPE
+
+		config LV_DEMO_BENCHMARK_TINY_TTF_FONT_PATH
+			string "Path to TinyTTF font file which is used in benchmark test"
+			default "A:lvgl/tests/src/test_files/fonts/noto/NotoSansSC-Regular.ttf"
+			depends on LV_USE_DEMO_BENCHMARK && LV_USE_TINY_TTF && LV_TINY_TTF_FILE_SUPPORT
 
 		config LV_USE_DEMO_RENDER
 			bool "Render test for each primitives. Requires at least 480x272 display"

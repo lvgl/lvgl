@@ -1798,15 +1798,6 @@
     #endif
 #endif
 
-/*Path to font file which is used in benchmark test*/
-#ifndef LV_DEMO_BENCHMARK_FONT_PATH
-    #ifdef CONFIG_LV_DEMO_BENCHMARK_FONT_PATH
-        #define LV_DEMO_BENCHMARK_FONT_PATH CONFIG_LV_DEMO_BENCHMARK_FONT_PATH
-    #else
-        #define LV_DEMO_BENCHMARK_FONT_PATH "lvgl/tests/src/test_files/fonts/noto/NotoSansSC-Regular.ttf"
-    #endif
-#endif
-
 /*=================
  *  TEXT SETTINGS
  *=================*/
@@ -4067,6 +4058,26 @@
         #define LV_USE_DEMO_BENCHMARK CONFIG_LV_USE_DEMO_BENCHMARK
     #else
         #define LV_USE_DEMO_BENCHMARK 0
+    #endif
+#endif
+
+#if LV_USE_DEMO_BENCHMARK
+    /** Path to FreeType font file which is used in benchmark test */
+    #ifndef LV_DEMO_BENCHMARK_FREETYPE_FONT_PATH
+        #ifdef CONFIG_LV_DEMO_BENCHMARK_FREETYPE_FONT_PATH
+            #define LV_DEMO_BENCHMARK_FREETYPE_FONT_PATH CONFIG_LV_DEMO_BENCHMARK_FREETYPE_FONT_PATH
+        #else
+            #define LV_DEMO_BENCHMARK_FREETYPE_FONT_PATH "./lvgl/tests/src/test_files/fonts/noto/NotoSansSC-Regular.ttf"
+        #endif
+    #endif
+
+    /** "Path to TinyTTF font file which is used in benchmark test" */
+    #ifndef LV_DEMO_BENCHMARK_TINY_TTF_FONT_PATH
+        #ifdef CONFIG_LV_DEMO_BENCHMARK_TINY_TTF_FONT_PATH
+            #define LV_DEMO_BENCHMARK_TINY_TTF_FONT_PATH CONFIG_LV_DEMO_BENCHMARK_TINY_TTF_FONT_PATH
+        #else
+            #define LV_DEMO_BENCHMARK_TINY_TTF_FONT_PATH "A:lvgl/tests/src/test_files/fonts/noto/NotoSansSC-Regular.ttf"
+        #endif
     #endif
 #endif
 

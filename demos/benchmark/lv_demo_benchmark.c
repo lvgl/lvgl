@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_demo_benchmark.h"
+#include <sys/_types/_null.h>
 
 #if LV_USE_DEMO_BENCHMARK
 
@@ -34,13 +35,8 @@
     #warning "It's recommended to have at least 128kB RAM for the benchmark"
 #endif
 
-#if LV_USE_TINY_TTF
-    #if LV_TINY_TTF_FILE_SUPPORT == 0
-        #pragma message("WARNING: You choose to test tinyTTF, but LV_TINY_TTF_FILE_SUPPORT is not enabled. TinyTTF will not be tested.")
-        #define TEST_TINY_TTF 0
-    #else
-        #define TEST_TINY_TTF 1
-    #endif
+#if LV_USE_SPAN == 0
+    #error "LV_USE_SPAN needs to be enabled"
 #endif
 
 #include "../../lvgl_private.h"
@@ -57,7 +53,9 @@
 #define PAD_BASIC       8
 
 #define LV_TEST_FONT_STRING_CHINESE "法律之前人人平等,并有权享受法律的平等保护,不受任何歧视。人人有权享受平等保护,以免受违反本宣言的任何歧视行为以及煽动这种歧视的任何行为之害。"
+
 #define LV_TEST_FONT_STRING_ENGLISH "No one shall be subjected to arbitrary arrest, detention or exile. Everyone is entitled in full equality to a fair and public hearing by an independent and impartial tribunal, in the determination of his rights and obligations and of any criminal charge against him. No one shall be subjected to arbitrary interference with his privacy, family, home or correspondence, nor to attacks upon his honour and reputation. Everyone has the right to the protection of the law against such interference or attacks."
+
 #define LV_TEST_FONT_SIZE 24
 
 /**********************
@@ -65,13 +63,9 @@
  **********************/
 
 typedef struct benchmark_context {
-#if LV_USE_FREETYPE
-    lv_font_t * font_bitmap;
-    lv_font_t * font_outline;
-#endif
-#if TEST_TINY_TTF
-    lv_font_t * font_tinyttf;
-#endif
+    lv_font_t * freetype_font_bitmap;
+    lv_font_t * freetype_font_outline;
+    lv_font_t * tinyttf_font;
     lv_obj_t * label_perf;
     uint32_t scene_act;
     uint32_t rnd_act;
@@ -113,10 +107,10 @@ static void arc_anim(benchmark_context_t * context, lv_obj_t * obj);
 
 static lv_obj_t * card_create(void);
 
-#if LV_USE_FREETYPE
 static void span_text_add(lv_obj_t * spans, lv_font_t * font, const char * text);
 
-static void span_text_bitmap_cb(benchmark_context_t * context)
+#if LV_USE_FREETYPE
+static void freetype_span_text_bitmap_cb(benchmark_context_t * context)
 {
     lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
     lv_obj_center(spans);
@@ -125,10 +119,12 @@ static void span_text_bitmap_cb(benchmark_context_t * context)
     lv_spangroup_set_overflow(spans, LV_SPAN_OVERFLOW_CLIP);
     lv_spangroup_set_mode(spans, LV_SPAN_MODE_BREAK);
 
-    span_text_add(spans, context->font_bitmap, LV_TEST_FONT_STRING_CHINESE);
+    span_text_add(spans, context->freetype_font_bitmap, LV_TEST_FONT_STRING_CHINESE);
+
+    fall_anim(context, spans, - lv_display_get_vertical_resolution(NULL) / 3);
 }
 
-static void span_text_outline_cb(benchmark_context_t * context)
+static void freetype_span_text_outline_cb(benchmark_context_t * context)
 {
     lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
     lv_obj_center(spans);
@@ -137,33 +133,39 @@ static void span_text_outline_cb(benchmark_context_t * context)
     lv_spangroup_set_overflow(spans, LV_SPAN_OVERFLOW_CLIP);
     lv_spangroup_set_mode(spans, LV_SPAN_MODE_BREAK);
 
-    span_text_add(spans, context->font_outline, LV_TEST_FONT_STRING_CHINESE);
-    span_text_add(spans, context->font_outline, LV_TEST_FONT_STRING_ENGLISH);
+    span_text_add(spans, context->freetype_font_outline, LV_TEST_FONT_STRING_CHINESE);
+    span_text_add(spans, context->freetype_font_outline, LV_TEST_FONT_STRING_ENGLISH);
+
+    fall_anim(context, spans, - lv_display_get_vertical_resolution(NULL) / 3);
 }
 
-static void ttf_text_bitmap_cb(benchmark_context_t * context)
+static void freetype_label_text_bitmap_cb(benchmark_context_t * context)
 {
     lv_obj_t * label = lv_label_create(lv_screen_active());
-    if(context->font_bitmap) {
-        lv_obj_set_style_text_font(label, context->font_bitmap, 0);
+    if(context->freetype_font_bitmap) {
+        lv_obj_set_style_text_font(label, context->freetype_font_bitmap, 0);
     }
     lv_label_set_text(label, LV_TEST_FONT_STRING_CHINESE);
     lv_obj_set_width(label, lv_pct(100));
+
+    fall_anim(context, label, - lv_display_get_vertical_resolution(NULL) / 3);
 }
 
-static void ttf_text_outline_cb(benchmark_context_t * context)
+static void freetype_label_text_outline_cb(benchmark_context_t * context)
 {
     lv_obj_t * label = lv_label_create(lv_screen_active());
-    if(context->font_outline) {
-        lv_obj_set_style_text_font(label, context->font_outline, 0);
+    if(context->freetype_font_outline) {
+        lv_obj_set_style_text_font(label, context->freetype_font_outline, 0);
     }
     lv_label_set_text(label, LV_TEST_FONT_STRING_ENGLISH);
     lv_obj_set_width(label, lv_pct(100));
+
+    fall_anim(context, label, - lv_display_get_vertical_resolution(NULL) / 3);
 }
 #endif
 
-#if TEST_TINY_TTF
-static void tiny_ttf_span_text_cb(benchmark_context_t * context)
+#if LV_USE_TINY_TTF && LV_TINY_TTF_FILE_SUPPORT
+static void span_tiny_ttf_text_cb(benchmark_context_t * context)
 {
     lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
     lv_obj_center(spans);
@@ -172,17 +174,21 @@ static void tiny_ttf_span_text_cb(benchmark_context_t * context)
     lv_spangroup_set_overflow(spans, LV_SPAN_OVERFLOW_CLIP);
     lv_spangroup_set_mode(spans, LV_SPAN_MODE_BREAK);
 
-    span_text_add(spans, context->font_tinyttf, LV_TEST_FONT_STRING_CHINESE);
+    span_text_add(spans, context->tinyttf_font, LV_TEST_FONT_STRING_CHINESE);
+
+    fall_anim(context, spans, - lv_display_get_vertical_resolution(NULL) / 3);
 }
 
-static void tiny_ttf_text_cb(benchmark_context_t * context)
+static void label_tiny_ttf_text_cb(benchmark_context_t * context)
 {
     lv_obj_t * label = lv_label_create(lv_screen_active());
-    if(context->font_tinyttf) {
-        lv_obj_set_style_text_font(label, context->font_tinyttf, 0);
+    if(context->tinyttf_font) {
+        lv_obj_set_style_text_font(label, context->tinyttf_font, 0);
     }
     lv_label_set_text(label, LV_TEST_FONT_STRING_ENGLISH);
     lv_obj_set_width(label, lv_pct(100));
+
+    fall_anim(context, label, - lv_display_get_vertical_resolution(NULL) / 3);
 }
 #endif
 
@@ -565,36 +571,36 @@ static void widgets_demo_cb(benchmark_context_t * context)
  **********************/
 
 static scene_dsc_t scenes[] = {
-    {.name = "Empty screen",               .scene_time = 3000,  .create_cb = empty_screen_cb},
-    {.name = "Moving wallpaper",           .scene_time = 3000,  .create_cb = moving_wallpaper_cb},
-    {.name = "Single rectangle",           .scene_time = 3000,  .create_cb = single_rectangle_cb},
-    {.name = "Multiple rectangles",        .scene_time = 3000,  .create_cb = multiple_rectangles_cb},
-    {.name = "Multiple RGB images",        .scene_time = 3000,  .create_cb = multiple_rgb_images_cb},
-    {.name = "Multiple ARGB images",       .scene_time = 3000,  .create_cb = multiple_argb_images_cb},
-    {.name = "Rotated ARGB images",        .scene_time = 3000,  .create_cb = rotated_argb_image_cb},
-    {.name = "Multiple labels",            .scene_time = 3000,  .create_cb = multiple_labels_cb},
-    {.name = "Screen sized text",          .scene_time = 5000,  .create_cb = screen_sized_text_cb},
-    {.name = "Multiple arcs",              .scene_time = 3000,  .create_cb = multiple_arcs_cb},
+    {.name = "Empty screen",                  .scene_time = 3000,  .create_cb = empty_screen_cb},
+    {.name = "Moving wallpaper",              .scene_time = 3000,  .create_cb = moving_wallpaper_cb},
+    {.name = "Single rectangle",              .scene_time = 3000,  .create_cb = single_rectangle_cb},
+    {.name = "Multiple rectangles",           .scene_time = 3000,  .create_cb = multiple_rectangles_cb},
+    {.name = "Multiple RGB images",           .scene_time = 3000,  .create_cb = multiple_rgb_images_cb},
+    {.name = "Multiple ARGB images",          .scene_time = 3000,  .create_cb = multiple_argb_images_cb},
+    {.name = "Rotated ARGB images",           .scene_time = 3000,  .create_cb = rotated_argb_image_cb},
+    {.name = "Multiple labels",               .scene_time = 3000,  .create_cb = multiple_labels_cb},
+    {.name = "Screen sized text",             .scene_time = 5000,  .create_cb = screen_sized_text_cb},
+    {.name = "Multiple arcs",                 .scene_time = 3000,  .create_cb = multiple_arcs_cb},
 
 #if LV_USE_FREETYPE
-    {.name = "Span text(bitmap)",          .scene_time = 3000,  .create_cb = span_text_bitmap_cb},
-    {.name = "Span text(outline)",         .scene_time = 3000,  .create_cb = span_text_outline_cb},
-    {.name = "TTF text(bitmap)",           .scene_time = 3000,  .create_cb = ttf_text_bitmap_cb},
-    {.name = "TTF text(outline)",          .scene_time = 3000,  .create_cb = ttf_text_outline_cb},
+    {.name = "FreeType span text(bitmap)",   .scene_time = 3000,  .create_cb = freetype_span_text_bitmap_cb},
+    {.name = "FreeType span text(outline)",  .scene_time = 3000,  .create_cb = freetype_span_text_outline_cb},
+    {.name = "FreeType label text(bitmap)",  .scene_time = 3000,  .create_cb = freetype_label_text_bitmap_cb},
+    {.name = "FreeType label text(outline)", .scene_time = 3000,  .create_cb = freetype_label_text_outline_cb},
 #endif
 
-#if TEST_TINY_TTF
-    {.name = "TinyTTF span text",          .scene_time = 3000,  .create_cb = tiny_ttf_span_text_cb},
-    {.name = "TinyTTF text",               .scene_time = 3000,  .create_cb = tiny_ttf_text_cb},
+#if LV_USE_TINY_TTF && LV_TINY_TTF_FILE_SUPPORT
+    {.name = "TinyTTF span text",            .scene_time = 3000,  .create_cb = span_tiny_ttf_text_cb},
+    {.name = "TinyTTF text",                 .scene_time = 3000,  .create_cb = label_tiny_ttf_text_cb},
 #endif
 
-    {.name = "Containers",                 .scene_time = 3000,  .create_cb = containers_cb},
-    {.name = "Containers with overlay",    .scene_time = 3000,  .create_cb = containers_with_overlay_cb},
-    {.name = "Containers with opa",        .scene_time = 3000,  .create_cb = containers_with_opa_cb},
-    {.name = "Containers with opa_layer",  .scene_time = 3000,  .create_cb = containers_with_opa_layer_cb},
-    {.name = "Containers with scrolling",  .scene_time = 5000,  .create_cb = containers_with_scrolling_cb},
+    {.name = "Containers",                   .scene_time = 3000,  .create_cb = containers_cb},
+    {.name = "Containers with overlay",      .scene_time = 3000,  .create_cb = containers_with_overlay_cb},
+    {.name = "Containers with opa",          .scene_time = 3000,  .create_cb = containers_with_opa_cb},
+    {.name = "Containers with opa_layer",    .scene_time = 3000,  .create_cb = containers_with_opa_layer_cb},
+    {.name = "Containers with scrolling",    .scene_time = 5000,  .create_cb = containers_with_scrolling_cb},
 
-    {.name = "Widgets demo",               .scene_time = 20000, .create_cb = widgets_demo_cb},
+    {.name = "Widgets demo",                 .scene_time = 20000, .create_cb = widgets_demo_cb},
 
     {.name = "", .create_cb = NULL}
 };
@@ -609,60 +615,35 @@ static scene_dsc_t scenes[] = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-static benchmark_context_t * benchmark_context_init(void)
+static benchmark_context_t * benchmark_context_create(void)
 {
-    benchmark_context_t * context = (benchmark_context_t *)lv_malloc_zeroed(sizeof(benchmark_context_t));
-    LV_ASSERT_NULL(context);
-    lv_fs_drv_t ** drv = lv_ll_get_head(&(LV_GLOBAL_DEFAULT()->fsdrv_ll));
+    benchmark_context_t * context = lv_malloc_zeroed(sizeof(benchmark_context_t));
+    LV_ASSERT_MALLOC(context);
 
 #if LV_USE_FREETYPE
-    unsigned int freetype_font_full_path_length = lv_strlen(LV_DEMO_BENCHMARK_FONT_PATH) + 3;
-    char * FREETYPE_FULL_PATH = lv_malloc_zeroed(freetype_font_full_path_length);
-#if LV_FREETYPE_USE_LVGL_PORT
-    if(FREETYPE_FULL_PATH) {
-        lv_snprintf(FREETYPE_FULL_PATH, freetype_font_full_path_length, "%c:%s", (*drv)->letter, LV_DEMO_BENCHMARK_FONT_PATH);
+    context->freetype_font_bitmap = lv_freetype_font_create(LV_DEMO_BENCHMARK_FREETYPE_FONT_PATH,
+                                                            LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
+                                                            LV_TEST_FONT_SIZE,
+                                                            LV_FREETYPE_FONT_STYLE_NORMAL);
+    if(context->freetype_font_bitmap == NULL) {
+        LV_LOG_ERROR("FreeType font creation failed! Path: " LV_DEMO_BENCHMARK_FREETYPE_FONT_PATH);
     }
-#else
-    LV_UNUSED(drv);
-    if(FREETYPE_FULL_PATH) {
-        lv_snprintf(FREETYPE_FULL_PATH, freetype_font_full_path_length, "./%s", LV_DEMO_BENCHMARK_FONT_PATH);
-    }
-#endif
-    context->font_bitmap = lv_freetype_font_create(FREETYPE_FULL_PATH,
-                                                   LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
-                                                   LV_TEST_FONT_SIZE,
-                                                   LV_FREETYPE_FONT_STYLE_NORMAL);
-    if(context->font_bitmap == NULL) {
-        LV_LOG_ERROR("freetype font creation failed!");
-    }
-    context->font_outline = lv_freetype_font_create(FREETYPE_FULL_PATH,
-                                                    LV_FREETYPE_FONT_RENDER_MODE_OUTLINE,
-                                                    LV_TEST_FONT_SIZE,
-                                                    LV_FREETYPE_FONT_STYLE_NORMAL);
-    if(context->font_outline == NULL) {
-        LV_LOG_ERROR("freetype font creation failed!");
-    }
-    if(FREETYPE_FULL_PATH) {
-        lv_free(FREETYPE_FULL_PATH);
+    context->freetype_font_outline = lv_freetype_font_create(LV_DEMO_BENCHMARK_FREETYPE_FONT_PATH,
+                                                             LV_FREETYPE_FONT_RENDER_MODE_OUTLINE,
+                                                             LV_TEST_FONT_SIZE,
+                                                             LV_FREETYPE_FONT_STYLE_NORMAL);
+    if(context->freetype_font_outline == NULL) {
+        LV_LOG_ERROR("FreeType font creation failed! Path: " LV_DEMO_BENCHMARK_FREETYPE_FONT_PATH);
     }
 #endif
 
-#if TEST_TINY_TTF
-    unsigned int tinyttf_font_full_path_length = lv_strlen(LV_DEMO_BENCHMARK_FONT_PATH) + 3;
-    char * TINYTTF_FULL_PATH = lv_malloc_zeroed(tinyttf_font_full_path_length);
-    if(TINYTTF_FULL_PATH) {
-        lv_snprintf(TINYTTF_FULL_PATH, tinyttf_font_full_path_length, "%c:%s", (*drv)->letter, LV_DEMO_BENCHMARK_FONT_PATH);
-    }
-    context->font_tinyttf = lv_tiny_ttf_create_file(TINYTTF_FULL_PATH, LV_TEST_FONT_SIZE);
-    if(context->font_tinyttf == NULL) {
-        LV_LOG_ERROR("TinyTTF font creation failed!");
-    }
-    if(TINYTTF_FULL_PATH) {
-        lv_free(TINYTTF_FULL_PATH);
+#if LV_USE_TINY_TTF && LV_TINY_TTF_FILE_SUPPORT
+    context->tinyttf_font = lv_tiny_ttf_create_file(LV_DEMO_BENCHMARK_TINY_TTF_FONT_PATH, LV_TEST_FONT_SIZE);
+    if(context->tinyttf_font == NULL) {
+        LV_LOG_ERROR("TinyTTF font creation failed! Path: " LV_DEMO_BENCHMARK_TINY_TTF_FONT_PATH);
     }
 #endif
 
-    context->scene_act = 0;
     context->label_perf = lv_label_create(lv_layer_top());
     lv_obj_set_style_bg_opa(context->label_perf, LV_OPA_COVER, 0);
     lv_obj_set_style_bg_color(context->label_perf, lv_color_white(), 0);
@@ -674,19 +655,22 @@ static benchmark_context_t * benchmark_context_init(void)
     return context;
 }
 
-static void benchmark_context_deinit(benchmark_context_t * context)
+static void benchmark_context_delete(benchmark_context_t * context)
 {
 #if LV_USE_FREETYPE
-    if(context->font_bitmap != NULL) {
-        lv_freetype_font_delete(context->font_bitmap);
+    if(context->freetype_font_bitmap) {
+        lv_freetype_font_delete(context->freetype_font_bitmap);
+        context->freetype_font_bitmap = NULL;
     }
-    if(context->font_outline != NULL) {
-        lv_freetype_font_delete(context->font_outline);
+    if(context->freetype_font_outline) {
+        lv_freetype_font_delete(context->freetype_font_outline);
+        context->freetype_font_outline = NULL;
     }
 #endif
-#if TEST_TINY_TTF
-    if(context->font_tinyttf != NULL) {
-        lv_tiny_ttf_destroy(context->font_tinyttf);
+#if LV_USE_TINY_TTF
+    if(context->tinyttf_font) {
+        lv_tiny_ttf_destroy(context->tinyttf_font);
+        context->tinyttf_font = NULL;
     }
 #endif
     lv_obj_delete(context->label_perf);
@@ -695,7 +679,7 @@ static void benchmark_context_deinit(benchmark_context_t * context)
 
 void lv_demo_benchmark(void)
 {
-    benchmark_context_t * context = benchmark_context_init();
+    benchmark_context_t * context = benchmark_context_create();
 
     lv_obj_t * scr = lv_screen_active();
     lv_obj_remove_style_all(scr);
@@ -756,7 +740,7 @@ static void next_scene_timer_cb(lv_timer_t * timer)
 
     load_scene(context);
     if(scenes[context->scene_act].scene_time == 0) {
-        benchmark_context_deinit(context);
+        benchmark_context_delete(context);
         lv_timer_delete(timer);
         summary_create();
     }
@@ -1047,7 +1031,7 @@ static lv_obj_t * card_create(void)
     return panel;
 }
 
-#if LV_USE_FREETYPE || TEST_TINY_TTF
+#if LV_USE_FREETYPE || LV_USE_TINY_TTF
 static void span_text_add(lv_obj_t * spans, lv_font_t * font, const char * text)
 {
     lv_span_t * span = lv_spangroup_new_span(spans);
