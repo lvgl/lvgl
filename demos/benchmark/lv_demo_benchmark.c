@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_demo_benchmark.h"
-#include <sys/_types/_null.h>
 
 #if LV_USE_DEMO_BENCHMARK
 
