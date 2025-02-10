@@ -1,21 +1,25 @@
 <component>
 	<consts>
 		<color name="light_blue" value="0xbbbbff"/>
-		<color name="dark_blue" value="0x44F"/>
+		<color name="dark_blue" value="0x000080"/>
 	</consts>
 
 	<styles>
-		<style name="red" bg_color="0x007" bg_opa="150"
-		text_color="0xf00" text_letter_space="10"/>
-		<style name="blue" bg_color="bbf"
-		text_color="0x008" text_font="lv_montserrat_48"/>
+		<style name="btn_style" bg_color="#dark_blue" bg_opa="150"/>
+		<style name="btn_pr_style" bg_opa="255"/>
 	</styles>
 
-	<view extends="lv_obj" width="280" height="240" style_bg_color="#light_blue">
-		<lv_button>
-			<lv_label text="Click me"/>
-			<lv_event-call_function trigger="clicked" callback="print" user_data="Hello"/>
-			<lv_event-call_function trigger="clicked" callback="print" user_data="World"/>
-		</lv_button>
+	<view extends="lv_obj" width="280" height="content" style_bg_color="#light_blue">
+		<lv_label text="Hello"/>
+		<my_card title="Card 1"
+				 y="0"
+				 btn_rel_style="btn_style"
+				 btn_pr_style="btn_pr_style"/>
+
+		<my_card y="85"
+				 bg_color="0xffaaaa"
+				 action="Apply"
+				 btn_rel_style="btn_style"
+				 btn_pr_style="btn_pr_style"/>
 	</view>
 </component>
