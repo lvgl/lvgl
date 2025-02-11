@@ -46,7 +46,7 @@ Description
     - the targeted output directory doesn't exist or is empty, or
     - Sphinx determines that a full rebuild is necessary.  This happens when:
         - temporary directory (Sphinx's source-file path) has changed,
-        - the command line used has changed,
+        - any options on the `sphinx-build` command line have changed,
         - `conf.py` modification date has changed, or
         - `fresh_env` argument is included (runs `sphinx-build` with -E option).
 
@@ -192,8 +192,9 @@ def print_usage_note():
     print('  $ python build.py [optional_arg ...]')
     print()
     print('  where `optional_arg` can be any of these:')
-    print('    html [ skip_api ] [ fresh_env ]')
-    print('    latex  [ skip_api ] [ fresh_env ]')
+    print('    html  [ skip_api ] [ fresh_env ]')
+    print('    latex [ skip_api ] [ fresh_env ]')
+    print('    temp  [ skip_api ]')
     print('    clean')
     print('    clean_temp')
     print('    clean_html')
@@ -310,6 +311,7 @@ def run():
     clean_temp = False
     clean_html = False
     clean_latex = False
+    clean_all = False
     build_html = False
     build_latex = False
     build_temp = False
@@ -330,17 +332,18 @@ def run():
         if arg == 'help':
             print_usage_note()
             exit(0)
+        elif arg == "temp":
+            build_temp = True
         elif arg == "html":
             build_html = True
         elif arg == "latex":
             build_latex = True
-        elif arg == "temp":
-            build_temp = True
         elif arg == 'skip_api':
             skip_api = True
         elif arg == 'fresh_env':
             fresh_sphinx_env = True
         elif arg == "clean":
+            clean_all = True
             clean_temp = True
             clean_html = True
             clean_latex = True
@@ -368,11 +371,11 @@ def run():
     project_path = os.path.abspath(os.path.join(base_path, '..'))
     examples_path = os.path.join(project_path, 'examples')
     lvgl_src_path = os.path.join(project_path, 'src')
-    latex_output_path_stub = os.path.join(base_path, cfg_output_dir)
-    latex_output_path = os.path.join(base_path, cfg_output_dir, 'latex')
+    output_path = os.path.join(base_path, cfg_output_dir)
+    html_output_path = os.path.join(output_path, 'html')
+    latex_output_path = os.path.join(output_path, 'latex')
     pdf_src_file = os.path.join(latex_output_path, cfg_pdf_filename)
     pdf_dst_file = os.path.join(base_path, cfg_pdf_filename)
-    html_dst_path = os.path.join(base_path, cfg_output_dir)
     version_source_path = os.path.join(project_path, 'lv_version.h')
 
     # Establish temporary directory.  The presence of environment variable
@@ -399,19 +402,30 @@ def run():
     os.chdir(base_path)
 
     # ---------------------------------------------------------------------
-    # Clean?  If so, clean and exit (like `make clean`).
+    # Clean?  If so, clean (like `make clean`), but do not exit.
     # ---------------------------------------------------------------------
-    if clean_temp:
-        remove_dir(temp_directory)
+    some_cleaning_to_be_done = clean_temp or clean_html or clean_latex or clean_all \
+        or (os.path.isdir(temp_directory) and build_temp)
 
-    if clean_html:
-        remove_dir(html_dst_path)
+    if some_cleaning_to_be_done:
+        print("****************")
+        print("Cleaning...")
+        print("****************")
 
-    if clean_latex:
-        remove_dir(latex_output_path)
+        if clean_temp:
+            remove_dir(temp_directory)
 
-    if os.path.isdir(temp_directory) and build_temp:
-        remove_dir(temp_directory)
+        if clean_html:
+            remove_dir(html_output_path)
+
+        if clean_latex:
+            remove_dir(latex_output_path)
+
+        if clean_all:
+            remove_dir(output_path)
+
+        if os.path.isdir(temp_directory) and build_temp:
+            remove_dir(temp_directory)
 
     # ---------------------------------------------------------------------
     # Populate LVGL_URLPATH and LVGL_GITCOMMIT environment variables:
@@ -470,23 +484,18 @@ def run():
     os.environ['LVGL_GITCOMMIT'] = branch
 
     # ---------------------------------------------------------------------
-    # Start doc-build process.
-    # ---------------------------------------------------------------------
-    print()
-    print("****************")
-    print("Building")
-    print("****************")
-
-    # ---------------------------------------------------------------------
     # Copy files to 'temp_directory' where they will be edited (translation
     # link(s) and API links) before being used to generate new docs.
     # ---------------------------------------------------------------------
-    doc_files_copied = False
     # dirsync `exclude_list` = list of regex patterns to exclude.
     exclude_list = [r'lv_conf\.h', r'^tmp.*', r'^output.*']
 
     if temp_dir_contents_exists(temp_directory):
         # We are just doing an update of the temp_directory contents.
+        print("****************")
+        print("Updating temp directory...")
+        print("****************")
+
         exclude_list.append(r'examples.*')
         options = {
             'verbose': True,   # Report files copied.
@@ -499,12 +508,16 @@ def run():
         # action == 'update' means DO NOT copy files when they do not already exist in tgt dir.
         dirsync.sync('.', temp_directory, 'sync', **options)
         dirsync.sync(examples_path, os.path.join(temp_directory, 'examples'), 'sync', **options)
-    else:
+    elif build_temp or build_html or build_latex:
         # We are having to create the temp_directory contents by copying.
-        method = 1
+        print("****************")
+        print("Building temp directory...")
+        print("****************")
+
+        copy_method = 1
 
         # Both of these methods work.
-        if method == 0:
+        if copy_method == 0:
             # --------- Method 0:
             ignore_func = shutil.ignore_patterns('tmp*', 'output*')
             print('Copying docs...')
@@ -524,12 +537,9 @@ def run():
             print('Copying examples...')
             dirsync.sync(examples_path, os.path.join(temp_directory, 'examples'), 'sync', **options)
 
-        doc_files_copied = True
-
-    # ---------------------------------------------------------------------
-    # Build Example docs, Doxygen output, API docs, and API links.
-    # ---------------------------------------------------------------------
-    if doc_files_copied:
+        # -----------------------------------------------------------------
+        # Build Example docs, Doxygen output, API docs, and API links.
+        # -----------------------------------------------------------------
         t1 = datetime.now()
 
         # Build local lv_conf.h from lv_conf_template.h for this build only.
@@ -617,6 +627,9 @@ def run():
         print("Skipping Latex build.")
     else:
         t1 = datetime.now()
+        print("****************")
+        print("Building Latex output...")
+        print("****************")
 
         # Remove PDF link so PDF does not have a link to itself.
         index_path = os.path.join(temp_directory, 'index.rst')
@@ -636,12 +649,15 @@ def run():
         # PDF download link in the PDF
         # cmd("cp -f " + lang +"/latex/LVGL.pdf LVGL.pdf | true")
         src = temp_directory
-        dst = latex_output_path_stub
+        dst = output_path
         cpu = os.cpu_count()
         cmd_line = f'sphinx-build -M latex "{src}" "{dst}" -j {cpu}'
         cmd(cmd_line)
 
         # Generate PDF.
+        print("****************")
+        print("Building PDF...")
+        print("****************")
         cmd_line = 'latexmk -pdf "LVGL.tex"'
         cmd(cmd_line, latex_output_path, True)
 
@@ -666,6 +682,9 @@ def run():
         print("Skipping HTML build.")
     else:
         t1 = datetime.now()
+        print("****************")
+        print("Building HTML output...")
+        print("****************")
 
         # Note:  While it can be done (e.g. if one needs to set a stop point
         # in Sphinx code for development purposes), it is NOT a good idea to
@@ -688,7 +707,7 @@ def run():
 
         ver = get_version(version_source_path)
         src = html_src_path
-        dst = html_dst_path
+        dst = output_path
         cpu = os.cpu_count()
         cmd_line = f'sphinx-build -M html "{src}" "{dst}" -D version="{ver}" {env_opt} -j {cpu}'
         cmd(cmd_line)
