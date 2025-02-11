@@ -233,7 +233,7 @@ static bool stroke_create_cb(stroke_item_t * item, void * user_data)
 
     /* update parameters */
     vg_lite_path_t * vg_path = lv_vg_lite_path_get_path(item->vg.path);
-    LV_VG_LITE_CHECK_ERROR(vg_lite_set_path_type(vg_path, VG_LITE_DRAW_STROKE_PATH));
+    LV_VG_LITE_CHECK_ERROR(vg_lite_set_path_type(vg_path, VG_LITE_DRAW_STROKE_PATH), {});
 
     vg_lite_error_t error = vg_lite_set_stroke(
                                 vg_path,

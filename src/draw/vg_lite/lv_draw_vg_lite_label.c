@@ -221,9 +221,6 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
 
     const vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa, true);
 
-    LV_VG_LITE_ASSERT_SRC_BUFFER(&src_buf);
-    LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
-
     /* If clipping is not required, blit directly */
     if(lv_area_is_in(&image_area, &t->clip_area, false)) {
         /* rect is used to crop the pixel-aligned padding area */
@@ -234,16 +231,14 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
             .height = lv_area_get_height(&image_area)
         };
 
-        LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_blit_rect");
-        LV_VG_LITE_CHECK_ERROR(vg_lite_blit_rect(
-                                   &u->target_buffer,
-                                   &src_buf,
-                                   &rect,
-                                   &matrix,
-                                   VG_LITE_BLEND_SRC_OVER,
-                                   color,
-                                   VG_LITE_FILTER_LINEAR));
-        LV_PROFILER_DRAW_END_TAG("vg_lite_blit_rect");
+        lv_vg_lite_blit_rect(
+            &u->target_buffer,
+            &src_buf,
+            &rect,
+            &matrix,
+            VG_LITE_BLEND_SRC_OVER,
+            color,
+            VG_LITE_FILTER_LINEAR);
     }
     else {
         lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_S16);
@@ -256,26 +251,22 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
         lv_vg_lite_path_end(path);
 
         vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
-        LV_VG_LITE_ASSERT_PATH(vg_lite_path);
 
         vg_lite_matrix_t path_matrix = u->global_matrix;
         if(is_rotated) vg_lite_rotate(dsc->rotation / 10.0f, &path_matrix);
-        LV_VG_LITE_ASSERT_MATRIX(&path_matrix);
 
-        LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw_pattern");
-        LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
-                                   &u->target_buffer,
-                                   vg_lite_path,
-                                   VG_LITE_FILL_EVEN_ODD,
-                                   &path_matrix,
-                                   &src_buf,
-                                   &matrix,
-                                   VG_LITE_BLEND_SRC_OVER,
-                                   VG_LITE_PATTERN_COLOR,
-                                   0,
-                                   color,
-                                   VG_LITE_FILTER_LINEAR));
-        LV_PROFILER_DRAW_END_TAG("vg_lite_draw_pattern");
+        lv_vg_lite_draw_pattern(
+            &u->target_buffer,
+            vg_lite_path,
+            VG_LITE_FILL_EVEN_ODD,
+            &path_matrix,
+            &src_buf,
+            &matrix,
+            VG_LITE_BLEND_SRC_OVER,
+            VG_LITE_PATTERN_COLOR,
+            0,
+            color,
+            VG_LITE_FILTER_LINEAR);
 
         lv_vg_lite_path_drop(u, path);
     }
@@ -368,15 +359,13 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
 
     vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(outline);
 
-    LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
-    LV_VG_LITE_ASSERT_PATH(vg_lite_path);
-    LV_VG_LITE_ASSERT_MATRIX(&draw_matrix);
-
-    LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw");
-    LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
-                               &u->target_buffer, vg_lite_path, VG_LITE_FILL_NON_ZERO,
-                               &draw_matrix, VG_LITE_BLEND_SRC_OVER, lv_vg_lite_color(dsc->color, dsc->opa, true)));
-    LV_PROFILER_DRAW_END_TAG("vg_lite_draw");
+    lv_vg_lite_draw(
+        &u->target_buffer,
+        vg_lite_path,
+        VG_LITE_FILL_NON_ZERO,
+        &draw_matrix,
+        VG_LITE_BLEND_SRC_OVER,
+        lv_vg_lite_color(dsc->color, dsc->opa, true));
 
     LV_PROFILER_DRAW_END;
 }
