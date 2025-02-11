@@ -85,6 +85,8 @@ void lv_draw_vg_lite_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc
     if(dsc->opa <= LV_OPA_MIN)
         return;
 
+    LV_PROFILER_DRAW_BEGIN;
+
     lv_draw_glyph_dsc_t glyph_dsc;
     lv_draw_glyph_dsc_init(&glyph_dsc);
     glyph_dsc.opa = dsc->opa;
@@ -93,17 +95,17 @@ void lv_draw_vg_lite_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc
     glyph_dsc.rotation = dsc->rotation;
     glyph_dsc.pivot = dsc->pivot;
 
-    LV_PROFILER_BEGIN;
     lv_draw_unit_draw_letter(t, &glyph_dsc, &(lv_point_t) {
         .x = coords->x1, .y = coords->y1
     },
     dsc->font, dsc->unicode, draw_letter_cb);
-    LV_PROFILER_END;
 
     if(glyph_dsc._draw_buf) {
         lv_draw_buf_destroy(glyph_dsc._draw_buf);
         glyph_dsc._draw_buf = NULL;
     }
+
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_draw_vg_lite_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,

@@ -287,22 +287,22 @@
     #endif
 #endif
 #if LV_USE_OS == LV_OS_FREERTOS
-	/*
-	 * Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
-	 * than unblocking a task using an intermediary object such as a binary semaphore.
-	 * RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
-	 */
-	#ifndef LV_USE_FREERTOS_TASK_NOTIFY
-	    #ifdef LV_KCONFIG_PRESENT
-	        #ifdef CONFIG_LV_USE_FREERTOS_TASK_NOTIFY
-	            #define LV_USE_FREERTOS_TASK_NOTIFY CONFIG_LV_USE_FREERTOS_TASK_NOTIFY
-	        #else
-	            #define LV_USE_FREERTOS_TASK_NOTIFY 0
-	        #endif
-	    #else
-	        #define LV_USE_FREERTOS_TASK_NOTIFY 1
-	    #endif
-	#endif
+    /*
+     * Unblocking an RTOS task with a direct notification is 45% faster and uses less RAM
+     * than unblocking a task using an intermediary object such as a binary semaphore.
+     * RTOS task notifications can only be used when there is only one task that can be the recipient of the event.
+     */
+    #ifndef LV_USE_FREERTOS_TASK_NOTIFY
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_FREERTOS_TASK_NOTIFY
+                #define LV_USE_FREERTOS_TASK_NOTIFY CONFIG_LV_USE_FREERTOS_TASK_NOTIFY
+            #else
+                #define LV_USE_FREERTOS_TASK_NOTIFY 0
+            #endif
+        #else
+            #define LV_USE_FREERTOS_TASK_NOTIFY 1
+        #endif
+    #endif
 #endif
 
 /*========================
@@ -1550,7 +1550,7 @@
     #ifdef CONFIG_LV_USE_PRIVATE_API
         #define LV_USE_PRIVATE_API CONFIG_LV_USE_PRIVATE_API
     #else
-        #define LV_USE_PRIVATE_API		0
+        #define LV_USE_PRIVATE_API      0
     #endif
 #endif
 
@@ -3526,7 +3526,7 @@
     #ifdef CONFIG_LV_USE_XML
         #define LV_USE_XML CONFIG_LV_USE_XML
     #else
-        #define LV_USE_XML	0
+        #define LV_USE_XML    0
     #endif
 #endif
 
@@ -4195,17 +4195,17 @@
     #ifdef CONFIG_LV_USE_DEMO_EBIKE
         #define LV_USE_DEMO_EBIKE CONFIG_LV_USE_DEMO_EBIKE
     #else
-        #define LV_USE_DEMO_EBIKE			0
+        #define LV_USE_DEMO_EBIKE           0
     #endif
 #endif
 #if LV_USE_DEMO_EBIKE
-	#ifndef LV_DEMO_EBIKE_PORTRAIT
-	    #ifdef CONFIG_LV_DEMO_EBIKE_PORTRAIT
-	        #define LV_DEMO_EBIKE_PORTRAIT CONFIG_LV_DEMO_EBIKE_PORTRAIT
-	    #else
-	        #define LV_DEMO_EBIKE_PORTRAIT  0    /*0: for 480x270..480x320, 1: for 480x800..720x1280*/
-	    #endif
-	#endif
+    #ifndef LV_DEMO_EBIKE_PORTRAIT
+        #ifdef CONFIG_LV_DEMO_EBIKE_PORTRAIT
+            #define LV_DEMO_EBIKE_PORTRAIT CONFIG_LV_DEMO_EBIKE_PORTRAIT
+        #else
+            #define LV_DEMO_EBIKE_PORTRAIT  0    /*0: for 480x270..480x320, 1: for 480x800..720x1280*/
+        #endif
+    #endif
 #endif
 
 /** High-resolution demo */

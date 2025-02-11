@@ -48,7 +48,6 @@ static void lv_spangroup_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
 static void lv_spangroup_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_spangroup_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_main(lv_event_t * e);
-static void refresh_self_size(lv_obj_t * obj);
 
 static const lv_font_t * lv_span_get_style_text_font(lv_obj_t * par, lv_span_t * span);
 static int32_t lv_span_get_style_text_letter_space(lv_obj_t * par, lv_span_t * span);
@@ -115,7 +114,7 @@ lv_obj_t * lv_spangroup_create(lv_obj_t * par)
     return obj;
 }
 
-lv_span_t * lv_spangroup_new_span(lv_obj_t * obj)
+lv_span_t * lv_spangroup_add_span(lv_obj_t * obj)
 {
     if(obj == NULL) {
         return NULL;
@@ -129,9 +128,8 @@ lv_span_t * lv_spangroup_new_span(lv_obj_t * obj)
     lv_style_init(&span->style);
     span->txt = (char *)"";
     span->static_flag = 1;
-    span->spangroup = obj;
 
-    refresh_self_size(obj);
+    lv_spangroup_refresh(obj);
 
     return span;
 }
@@ -159,7 +157,7 @@ void lv_spangroup_delete_span(lv_obj_t * obj, lv_span_t * span)
         }
     }
 
-    refresh_self_size(obj);
+    lv_spangroup_refresh(obj);
 }
 
 /*=====================
@@ -187,8 +185,12 @@ void lv_span_set_text(lv_span_t * span, const char * text)
 
     span->static_flag = 0;
     lv_memcpy(span->txt, text, text_alloc_len);
+}
 
-    refresh_self_size(span->spangroup);
+void lv_spangroup_set_span_text(lv_obj_t * obj, lv_span_t * span, const char * text)
+{
+    lv_span_set_text(span, text);
+    lv_spangroup_refresh(obj);
 }
 
 void lv_span_set_text_static(lv_span_t * span, const char * text)
@@ -203,12 +205,28 @@ void lv_span_set_text_static(lv_span_t * span, const char * text)
     }
     span->static_flag = 1;
     span->txt = (char *)text;
+}
 
-    refresh_self_size(span->spangroup);
+void lv_spangroup_set_span_text_static(lv_obj_t * obj, lv_span_t * span, const char * text)
+{
+    lv_span_set_text_static(span, text);
+    lv_spangroup_refresh(obj);
+}
+
+void lv_spangroup_set_span_style(lv_obj_t * obj, lv_span_t * span, const lv_style_t * style)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(span);
+
+    lv_style_copy(&span->style, style);
+
+    lv_spangroup_refresh(obj);
 }
 
 void lv_spangroup_set_align(lv_obj_t * obj, lv_text_align_t align)
 {
+    LV_LOG_WARN("DEPRECATED. Use the text_align style property instead");
+
     lv_obj_set_style_text_align(obj, align, LV_PART_MAIN);
 }
 
@@ -230,18 +248,38 @@ void lv_spangroup_set_indent(lv_obj_t * obj, int32_t indent)
 
     spans->indent = indent;
 
-    refresh_self_size(obj);
+    lv_spangroup_refresh(obj);
 }
 
 void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
 {
+    LV_LOG_WARN("DEPRECATED, set the width to LV_SIZE_CONTENT or fixed value to control expanding/wrapping");
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_spangroup_t * spans = (lv_spangroup_t *)obj;
 
     if(mode >= LV_SPAN_MODE_LAST) return;
 
-    spans->mode = mode;
-    lv_spangroup_refr_mode(obj);
+    if(mode == LV_SPAN_MODE_EXPAND) {
+        lv_obj_set_width(obj, LV_SIZE_CONTENT);
+        lv_obj_set_height(obj, LV_SIZE_CONTENT);
+    }
+    else if(mode == LV_SPAN_MODE_BREAK) {
+        if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
+            lv_obj_set_width(obj, 100);
+        }
+        lv_obj_set_height(obj, LV_SIZE_CONTENT);
+    }
+    else if(mode == LV_SPAN_MODE_FIXED) {
+        /* use this mode, The user needs to set the size. */
+        /* This is just to prevent an infinite loop. */
+        if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
+            lv_obj_set_width(obj, 100);
+        }
+        if(lv_obj_get_style_height(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
+            lv_obj_set_content_height(obj, 100);
+        }
+    }
+
+    lv_spangroup_refresh(obj);
 }
 
 void lv_spangroup_set_max_lines(lv_obj_t * obj, int32_t lines)
@@ -249,7 +287,8 @@ void lv_spangroup_set_max_lines(lv_obj_t * obj, int32_t lines)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     spans->lines = lines;
-    lv_spangroup_refr_mode(obj);
+
+    lv_spangroup_refresh(obj);
 }
 
 /*=====================
@@ -338,8 +377,19 @@ int32_t lv_spangroup_get_indent(lv_obj_t * obj)
 lv_span_mode_t lv_spangroup_get_mode(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_spangroup_t * spans = (lv_spangroup_t *)obj;
-    return spans->mode;
+
+    if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
+        return LV_SPAN_MODE_EXPAND;
+    }
+
+    /*Width is fixed for the following cases*/
+    else if(lv_obj_get_style_height(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
+        return LV_SPAN_MODE_BREAK;
+    }
+    /*Both fixed*/
+    else {
+        return LV_SPAN_MODE_FIXED;
+    }
 }
 
 int32_t lv_spangroup_get_max_lines(lv_obj_t * obj)
@@ -349,39 +399,6 @@ int32_t lv_spangroup_get_max_lines(lv_obj_t * obj)
     return spans->lines;
 }
 
-void lv_spangroup_refr_mode(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_spangroup_t * spans = (lv_spangroup_t *)obj;
-
-    if(spans->mode == LV_SPAN_MODE_EXPAND) {
-        lv_obj_set_width(obj, LV_SIZE_CONTENT);
-        lv_obj_set_height(obj, LV_SIZE_CONTENT);
-    }
-    else if(spans->mode == LV_SPAN_MODE_BREAK) {
-        if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
-            lv_obj_set_width(obj, 100);
-        }
-        lv_obj_set_height(obj, LV_SIZE_CONTENT);
-    }
-    else if(spans->mode == LV_SPAN_MODE_FIXED) {
-        /* use this mode, The user needs to set the size. */
-        /* This is just to prevent an infinite loop. */
-        if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
-            lv_obj_set_width(obj, 100);
-        }
-        if(lv_obj_get_style_height(obj, LV_PART_MAIN) == LV_SIZE_CONTENT) {
-            int32_t width = lv_obj_get_style_width(obj, LV_PART_MAIN);
-            if(LV_COORD_IS_PCT(width)) {
-                width = 100;
-            }
-            int32_t height = lv_spangroup_get_expand_height(obj, width);
-            lv_obj_set_content_height(obj, height);
-        }
-    }
-
-    refresh_self_size(obj);
-}
 
 int32_t lv_spangroup_get_max_line_height(lv_obj_t * obj)
 {
@@ -618,6 +635,19 @@ lv_span_t * lv_spangroup_get_span_by_point(lv_obj_t * obj, const lv_point_t * p)
     return NULL;
 }
 
+
+/*=====================
+ * Other functions
+ *====================*/
+
+void lv_spangroup_refresh(lv_obj_t * obj)
+{
+    lv_spangroup_t * spans = (lv_spangroup_t *)obj;
+    spans->refresh = 1;
+    lv_obj_invalidate(obj);
+    lv_obj_refresh_self_size(obj);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -629,7 +659,6 @@ static void lv_spangroup_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
     lv_ll_init(&spans->child_ll, sizeof(lv_span_t));
     spans->indent = 0;
     spans->lines = -1;
-    spans->mode = LV_SPAN_MODE_EXPAND;
     spans->overflow = LV_SPAN_OVERFLOW_CLIP;
     spans->cache_w = 0;
     spans->cache_h = 0;
@@ -668,17 +697,18 @@ static void lv_spangroup_event(const lv_obj_class_t * class_p, lv_event_t * e)
         draw_main(e);
     }
     else if(code == LV_EVENT_STYLE_CHANGED) {
-        refresh_self_size(obj);
+        lv_spangroup_refresh(obj);
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
-        refresh_self_size(obj);
+        lv_spangroup_refresh(obj);
     }
     else if(code == LV_EVENT_GET_SELF_SIZE) {
         int32_t width = 0;
         int32_t height = 0;
         lv_point_t * self_size = lv_event_get_param(e);
 
-        if(spans->mode == LV_SPAN_MODE_EXPAND) {
+        lv_span_mode_t mode = lv_spangroup_get_mode(obj);
+        if(mode == LV_SPAN_MODE_EXPAND) {
             if(spans->refresh) {
                 spans->cache_w = (int32_t)lv_spangroup_get_expand_width(obj, 0);
                 spans->cache_h = lv_spangroup_get_max_line_height(obj);
@@ -687,7 +717,7 @@ static void lv_spangroup_event(const lv_obj_class_t * class_p, lv_event_t * e)
             width = spans->cache_w;
             height = spans->cache_h;
         }
-        else if(spans->mode == LV_SPAN_MODE_BREAK) {
+        else if(mode == LV_SPAN_MODE_BREAK) {
             width = lv_obj_get_content_width(obj);
             if(self_size->y >= 0) {
                 if(width != spans->cache_w || spans->refresh) {
@@ -701,7 +731,7 @@ static void lv_spangroup_event(const lv_obj_class_t * class_p, lv_event_t * e)
                 }
             }
         }
-        else if(spans->mode == LV_SPAN_MODE_FIXED) {
+        else if(mode == LV_SPAN_MODE_FIXED) {
             width =  self_size->x >= 0 ? lv_obj_get_content_width(obj) : 0;
             height = self_size->y >= 0 ? lv_obj_get_content_height(obj) : 0;
         }
@@ -870,7 +900,7 @@ static int32_t convert_indent_pct(lv_obj_t * obj, int32_t width)
 
     int32_t indent = spans->indent;
     if(LV_COORD_IS_PCT(spans->indent)) {
-        if(spans->mode == LV_SPAN_MODE_EXPAND) {
+        if(lv_spangroup_get_mode(obj) == LV_SPAN_MODE_EXPAND) {
             indent = 0;
         }
         else {
@@ -1130,14 +1160,6 @@ Next_line_init:
         max_w = max_width;
     }
     layer->_clip_area = clip_area_ori;
-}
-
-static void refresh_self_size(lv_obj_t * obj)
-{
-    lv_spangroup_t * spans = (lv_spangroup_t *)obj;
-    spans->refresh = 1;
-    lv_obj_invalidate(obj);
-    lv_obj_refresh_self_size(obj);
 }
 
 static lv_span_coords_t make_span_coords(const lv_span_t * prev_span, const lv_span_t * curr_span, const int32_t width,

@@ -39,7 +39,11 @@
 /**********************
  *      DEFINES
  **********************/
-#define HEADER_HEIGHT   48
+#if LV_USE_PERF_MONITOR_LOG_MODE == 1
+    #define HEADER_HEIGHT   0
+#else
+    #define HEADER_HEIGHT   48
+#endif
 #define FALL_HEIGHT     80
 #define PAD_BASIC       8
 
@@ -512,6 +516,9 @@ void lv_demo_benchmark(void)
 #if LV_USE_PERF_MONITOR
     lv_display_t * disp = lv_display_get_default();
     lv_subject_add_observer_obj(&disp->perf_sysmon_backend.subject, sysmon_perf_observer_cb, title, NULL);
+#if LV_USE_PERF_MONITOR_LOG_MODE
+    lv_obj_add_flag(title, LV_OBJ_FLAG_HIDDEN);
+#endif
 #else
     lv_label_set_text(title, "LV_USE_PERF_MONITOR is not enabled");
 #endif
@@ -565,9 +572,8 @@ static void next_scene_timer_cb(lv_timer_t * timer)
 static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     const lv_sysmon_perf_info_t * info = lv_subject_get_pointer(subject);
-    lv_obj_t * label = lv_observer_get_target(observer);
-
     char scene_name[64];
+
     if(scenes[scene_act].name[0] != '\0') {
         lv_snprintf(scene_name, sizeof(scene_name), "%s: ", scenes[scene_act].name);
     }
@@ -575,6 +581,8 @@ static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * sub
         scene_name[0] = '\0';
     }
 
+#if !LV_USE_PERF_MONITOR_LOG_MODE
+    lv_obj_t * label = lv_observer_get_target(observer);
     lv_label_set_text_fmt(label,
                           "%s"
                           "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU\n"
@@ -583,6 +591,9 @@ static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * sub
                           info->calculated.fps, info->calculated.cpu,
                           info->calculated.render_avg_time + info->calculated.flush_avg_time,
                           info->calculated.render_avg_time, info->calculated.flush_avg_time);
+#else
+    LV_UNUSED(observer);
+#endif
 
     /*Ignore the first call as it contains data from the previous scene*/
     if(scenes[scene_act].measurement_cnt != 0) {

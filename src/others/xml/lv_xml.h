@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../misc/lv_types.h"
+#include "../../misc/lv_event.h"
 #if LV_USE_XML
 
 /*********************
@@ -43,6 +44,10 @@ lv_result_t lv_xml_register_image(const char * name, const void * src);
 
 const void * lv_xml_get_image(const char * name);
 
+
+lv_result_t lv_xml_register_event_cb(const char * name, lv_event_cb_t cb);
+
+lv_event_cb_t lv_xml_get_event_cb(const char * name);
 
 /**********************
  *      MACROS

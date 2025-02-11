@@ -101,6 +101,8 @@ const lv_demo_high_res_sizes_t lv_demo_high_res_sizes_all[SIZE_COUNT] = {
         .health_panel_width = 133,
         .settings_panel_width = 179,
         .home_bottom_margin_height = 53,
+        .indicator_width = 94,
+        .indicator_height = 85,
         .init_fonts_cb = init_fonts_sm
     },
     {
@@ -119,6 +121,8 @@ const lv_demo_high_res_sizes_t lv_demo_high_res_sizes_all[SIZE_COUNT] = {
         .health_panel_width = 200,
         .settings_panel_width = 268,
         .home_bottom_margin_height = 80,
+        .indicator_width = 141,
+        .indicator_height = 128,
         .init_fonts_cb = init_fonts_md
     },
     {
@@ -137,6 +141,8 @@ const lv_demo_high_res_sizes_t lv_demo_high_res_sizes_all[SIZE_COUNT] = {
         .health_panel_width = 300,
         .settings_panel_width = 402,
         .home_bottom_margin_height = 120,
+        .indicator_width = 212,
+        .indicator_height = 192,
         .init_fonts_cb = init_fonts_lg
     }
 };
@@ -193,17 +199,23 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * assets_path,
         {"arrow_left", LV_COLOR_FORMAT_ARGB8888},
         {"backward_icon", LV_COLOR_FORMAT_ARGB8888},
         {"cold_icon", LV_COLOR_FORMAT_ARGB8888},
+        {"door", LV_COLOR_FORMAT_ARGB8888},
+        {"door_1", LV_COLOR_FORMAT_ARGB8888},
         {"dry_icon", LV_COLOR_FORMAT_ARGB8888},
         {"energy_icon", LV_COLOR_FORMAT_ARGB8888},
         {"ev_charging_app_icon", LV_COLOR_FORMAT_ARGB8888},
         {"ev_charging_widget3_1_bg", LV_COLOR_FORMAT_ARGB8888},
         {"ev_charging_widget3_bg", LV_COLOR_FORMAT_ARGB8888},
         {"fan", LV_COLOR_FORMAT_ARGB8888},
+        {"fan2", LV_COLOR_FORMAT_ARGB8888},
+        {"fan2_1", LV_COLOR_FORMAT_ARGB8888},
         {"forward_icon", LV_COLOR_FORMAT_ARGB8888},
         {"health_icon", LV_COLOR_FORMAT_ARGB8888},
         {"health_icon_bold", LV_COLOR_FORMAT_ARGB8888},
         {"heat_icon", LV_COLOR_FORMAT_ARGB8888},
         {"lamp", LV_COLOR_FORMAT_ARGB8888},
+        {"lamp2", LV_COLOR_FORMAT_ARGB8888},
+        {"lamp2_1", LV_COLOR_FORMAT_ARGB8888},
         {"logout_icon", LV_COLOR_FORMAT_ARGB8888},
         {"main_light_slider", LV_COLOR_FORMAT_ARGB8888},
         {"minus", LV_COLOR_FORMAT_ARGB8888},
@@ -227,6 +239,8 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * assets_path,
         {"volume", LV_COLOR_FORMAT_ARGB8888},
         {"weather", LV_COLOR_FORMAT_ARGB8888},
         {"wifi_icon", LV_COLOR_FORMAT_ARGB8888},
+        {"wind", LV_COLOR_FORMAT_ARGB8888},
+        {"wind_1", LV_COLOR_FORMAT_ARGB8888},
         {"light_bg_about", LV_COLOR_FORMAT_NATIVE},
         {"dark_bg_about", LV_COLOR_FORMAT_NATIVE},
         {"light_bg_ev_charging", LV_COLOR_FORMAT_NATIVE},
@@ -304,6 +318,7 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * assets_path,
     lv_subject_init_int(&c->api.subjects.temperature_indoor, 225); /* tenths of a degree */
     lv_subject_init_pointer(&c->api.subjects.wifi_ssid, NULL);
     lv_subject_init_pointer(&c->api.subjects.wifi_ip, NULL);
+    lv_subject_init_int(&c->api.subjects.door, 0);
 
     /* output subjects */
     lv_subject_init_int(&c->api.subjects.music_play, 1);
@@ -313,6 +328,11 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * assets_path,
     lv_subject_init_int(&c->api.subjects.volume, 63);
     lv_subject_init_int(&c->api.subjects.main_light_temperature, 4000);
     lv_subject_init_int(&c->api.subjects.main_light_intensity, 52);
+    lv_subject_init_int(&c->api.subjects.lightbulb_matter, 0);
+    lv_subject_init_int(&c->api.subjects.lightbulb_zigbee, 1);
+    lv_subject_init_int(&c->api.subjects.fan_matter, 0);
+    lv_subject_init_int(&c->api.subjects.fan_zigbee, 0);
+    lv_subject_init_int(&c->api.subjects.air_purifier, 3);
     lv_subject_init_int(&c->api.subjects.thermostat_fan_speed, 40);
     lv_subject_init_int(&c->api.subjects.thermostat_target_temperature, 240); /* tenths of a degree */
 

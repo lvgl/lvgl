@@ -18,6 +18,7 @@ extern "C" {
 
 #include "lv_xml_utils.h"
 #include "../../misc/lv_ll.h"
+#include "../../misc/lv_style.h"
 
 /**********************
  *      TYPEDEFS
@@ -30,11 +31,28 @@ struct _lv_xml_component_ctx_t {
     lv_ll_t style_ll;
     lv_ll_t const_ll;
     lv_ll_t param_ll;
+    lv_ll_t gradient_ll;
     const char * view_def;
     struct _lv_widget_processor_t * root_widget;
     uint32_t is_widget : 1;                         /*1: not component but widget registered as a component for preview*/
     struct _lv_xml_component_ctx_t * next;
 };
+
+typedef struct {
+    const char * name;
+    const char * value;
+} lv_xml_const_t;
+
+typedef struct {
+    const char * name;
+    const char * def;
+    const char * type;
+} lv_xml_param_t;
+
+typedef struct {
+    const char * name;
+    lv_grad_dsc_t grad_dsc;
+} lv_xml_grad_t;
 
 /**********************
  * GLOBAL PROTOTYPES

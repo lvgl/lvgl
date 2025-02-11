@@ -85,7 +85,7 @@ void lv_slider_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim);
  * @param value     new value
  * @param anim      LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
-void lv_slider_set_left_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim);
+void lv_slider_set_start_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim);
 
 /**
  * Set minimum and the maximum values of a bar

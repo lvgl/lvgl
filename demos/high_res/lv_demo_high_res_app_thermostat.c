@@ -183,7 +183,7 @@ static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_style_pad_all(chart, 0, 0);
     lv_obj_set_grid_cell(chart, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_START, 0, 1);
     lv_chart_set_type(chart, LV_CHART_TYPE_BAR);
-    lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 109);
+    lv_chart_set_axis_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 109);
     lv_chart_set_div_line_count(chart, 3, 0);
     lv_obj_set_style_line_opa(chart, LV_OPA_40, 0);
     lv_obj_set_style_line_color(chart, lv_color_black(), 0);
@@ -191,7 +191,7 @@ static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_set_style_line_dash_gap(chart, 1, 0);
     lv_chart_series_t * ser = lv_chart_add_series(chart, lv_color_white(), LV_CHART_AXIS_PRIMARY_Y);
     static const int32_t chart_values[] = {14, 95, 52, 34, 52, 83, 19};
-    lv_chart_set_ext_y_array(chart, ser, (int32_t *)chart_values);
+    lv_chart_set_series_ext_y_array(chart, ser, (int32_t *)chart_values);
     lv_chart_set_point_count(chart, sizeof(chart_values) / sizeof(*chart_values));
     lv_chart_refresh(chart);
 
@@ -398,11 +398,10 @@ static lv_obj_t * create_widget3_setting(lv_demo_high_res_ctx_t * c, lv_obj_t * 
 {
     lv_obj_t * setting = lv_obj_create(parent);
     lv_obj_remove_style_all(setting);
-    lv_obj_set_height(setting, LV_SIZE_CONTENT);
+    lv_obj_set_size(setting, c->sz->indicator_width, c->sz->indicator_height);
     lv_obj_set_flex_flow(setting, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(setting, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_row(setting, c->sz->gap[5], 0);
-    lv_obj_set_flex_grow(setting, 1);
+    lv_obj_set_flex_align(setting, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_row(setting, 0, 0);
     lv_obj_set_style_bg_color(setting, lv_color_white(), 0);
     lv_obj_set_style_bg_opa(setting, active ? LV_OPA_60 : LV_OPA_20, 0);
     lv_obj_set_style_radius(setting, c->sz->gap[3], 0);
@@ -569,8 +568,12 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_add_style(current_temperature_label, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_obj_set_style_text_align(current_temperature_label, LV_TEXT_ALIGN_CENTER, 0);
 
-    lv_obj_t * setting_box = lv_demo_high_res_simple_container_create(widget, false, c->sz->gap[5], LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_width(setting_box, LV_PCT(100));
+    lv_obj_t * setting_box = lv_obj_create(widget);
+    lv_obj_remove_style_all(setting_box);
+    lv_obj_set_size(setting_box, LV_PCT(100), LV_SIZE_CONTENT);
+    lv_obj_set_flex_flow(setting_box, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(setting_box, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_column(setting_box, 0, 0);
     lv_obj_t * setting1 = create_widget3_setting(c, setting_box, c->imgs[IMG_COLD_ICON], "Cold", true);
     lv_obj_t * setting2 = create_widget3_setting(c, setting_box, c->imgs[IMG_DRY_ICON], "Dry", false);
     lv_obj_t * setting3 = create_widget3_setting(c, setting_box, c->imgs[IMG_HEAT_ICON], "Heat", false);

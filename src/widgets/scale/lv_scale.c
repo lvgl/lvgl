@@ -51,10 +51,10 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
 static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc, lv_point_t * tick_point,
                                    lv_area_t * label_coords);
 static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
-                                                 lv_style_t * indicator_section_style);
-static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, lv_style_t * section_style,
+                                                 const lv_style_t * indicator_section_style);
+static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, const lv_style_t * section_style,
                                       lv_part_t part);
-static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc, lv_style_t * section_style);
+static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc, const lv_style_t * section_style);
 /* Helpers */
 static void scale_find_section_tick_idx(lv_obj_t * obj);
 static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const uint32_t tick_idx,
@@ -350,6 +350,18 @@ lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
     return section;
 }
 
+
+void lv_scale_set_section_range(lv_obj_t * scale, lv_scale_section_t * section, int32_t min, int32_t max)
+{
+    LV_ASSERT_OBJ(scale, MY_CLASS);
+    LV_ASSERT_NULL(section);
+
+    section->range_min = min;
+    section->range_max = max;
+
+    lv_obj_invalidate(scale);
+}
+
 void lv_scale_section_set_range(lv_scale_section_t * section, int32_t min, int32_t max)
 {
     if(NULL == section) return;
@@ -358,8 +370,38 @@ void lv_scale_section_set_range(lv_scale_section_t * section, int32_t min, int32
     section->range_max = max;
 }
 
+
+void lv_scale_set_section_style_main(lv_obj_t * scale, lv_scale_section_t * section, const lv_style_t * style)
+{
+    LV_ASSERT_OBJ(scale, MY_CLASS);
+    LV_ASSERT_NULL(section);
+
+    section->main_style = style;
+    lv_obj_invalidate(scale);
+}
+
+void lv_scale_set_section_style_indicator(lv_obj_t * scale, lv_scale_section_t * section, const lv_style_t * style)
+{
+    LV_ASSERT_OBJ(scale, MY_CLASS);
+    LV_ASSERT_NULL(section);
+
+    section->indicator_style = style;
+    lv_obj_invalidate(scale);
+}
+
+void lv_scale_set_section_style_items(lv_obj_t * scale, lv_scale_section_t * section, const lv_style_t * style)
+{
+    LV_ASSERT_OBJ(scale, MY_CLASS);
+    LV_ASSERT_NULL(section);
+
+    section->items_style = style;
+    lv_obj_invalidate(scale);
+}
+
 void lv_scale_section_set_style(lv_scale_section_t * section, lv_part_t part, lv_style_t * section_part_style)
 {
+    LV_LOG_WARN("Deprecated, use lv_scale_set_section_style_main/indicator/items instead");
+
     if(NULL == section) return;
 
     switch(part) {
@@ -1232,7 +1274,7 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
  * @param items_section_style  pointer to indicator section style
  * @param part      line part, example: LV_PART_INDICATOR, LV_PART_ITEMS, LV_PART_MAIN
  */
-static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, lv_style_t * section_style,
+static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, const lv_style_t * section_style,
                                       lv_part_t part)
 {
     if(section_style) {
@@ -1282,7 +1324,7 @@ static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_
  * @param arc_dsc  pointer to arc descriptor
  * @param items_section_style  pointer to indicator section style
  */
-static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc, lv_style_t * section_style)
+static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc, const lv_style_t * section_style)
 {
     if(section_style) {
         lv_style_value_t value;
@@ -1352,7 +1394,7 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
  * @param items_section_style  pointer to indicator section style
  */
 static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
-                                                 lv_style_t * indicator_section_style)
+                                                 const lv_style_t * indicator_section_style)
 {
     if(indicator_section_style) {
         lv_style_value_t value;
@@ -1579,7 +1621,7 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
 
         /* This can also apply when
          * (tick_idx == section->first_tick_idx_in_section) when the
-         * beginning and ending vlues of the range are the same. */
+         * beginning and ending values of the range are the same. */
         if(tick_idx == section->last_tick_idx_in_section) {
             if(section->last_tick_idx_is_major) {
                 tmp_width = major_tick_dsc->width;
