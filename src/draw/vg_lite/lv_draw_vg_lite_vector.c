@@ -20,6 +20,7 @@
 #include "lv_vg_lite_grad.h"
 #include "lv_vg_lite_stroke.h"
 #include <float.h>
+#include <math.h>
 
 /*********************
  *      DEFINES
@@ -390,7 +391,8 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
 
     LV_ASSERT_MSG((lv_uintptr_t)path_data - (lv_uintptr_t)vg_path->path == path_length, "path length overflow");
 
-    lv_vg_lite_path_set_bounding_box(dest, min_x, min_y, max_x, max_y);
+    lv_vg_lite_path_set_bounding_box(dest, lroundf(min_x), lroundf(min_y),
+                                     lroundf(max_x), lroundf(max_y));
     LV_PROFILER_DRAW_END;
 }
 
