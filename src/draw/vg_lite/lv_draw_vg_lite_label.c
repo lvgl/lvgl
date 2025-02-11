@@ -250,14 +250,12 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
         lv_vg_lite_path_set_bounding_box_area(path, &clip_area);
         lv_vg_lite_path_end(path);
 
-        vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
-
         vg_lite_matrix_t path_matrix = u->global_matrix;
         if(is_rotated) vg_lite_rotate(dsc->rotation / 10.0f, &path_matrix);
 
         lv_vg_lite_draw_pattern(
             &u->target_buffer,
-            vg_lite_path,
+            lv_vg_lite_path_get_path(path),
             VG_LITE_FILL_EVEN_ODD,
             &path_matrix,
             &src_buf,
@@ -357,11 +355,9 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
     vg_lite_matrix_t draw_matrix = u->global_matrix;
     lv_vg_lite_matrix_multiply(&draw_matrix, &matrix);
 
-    vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(outline);
-
     lv_vg_lite_draw(
         &u->target_buffer,
-        vg_lite_path,
+        lv_vg_lite_path_get_path(outline),
         VG_LITE_FILL_NON_ZERO,
         &draw_matrix,
         VG_LITE_BLEND_SRC_OVER,

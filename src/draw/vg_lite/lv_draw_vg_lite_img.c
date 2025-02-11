@@ -147,12 +147,11 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
         lv_vg_lite_path_set_bounding_box_area(path, &clip_area);
         lv_vg_lite_path_end(path);
 
-        vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
         vg_lite_matrix_t path_matrix = u->global_matrix;
 
         lv_vg_lite_draw_pattern(
             &u->target_buffer,
-            vg_lite_path,
+            lv_vg_lite_path_get_path(path),
             VG_LITE_FILL_EVEN_ODD,
             &path_matrix,
             &src_buf,

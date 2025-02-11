@@ -283,7 +283,8 @@ static inline void lv_vg_lite_blit_rect(vg_lite_buffer_t * target,
     {
         lv_vg_lite_buffer_dump_info(target);
         lv_vg_lite_buffer_dump_info(source);
-        LV_LOG_ERROR("rect: X%d Y%d W%d H%d", rect->x, rect->y, rect->width, rect->height);
+        LV_LOG_ERROR("rect: X%d Y%d W%d H%d",
+                     (int)rect->x, (int)rect->y, (int)rect->width, (int)rect->height);
         lv_vg_lite_matrix_dump_info(matrix);
         LV_LOG_ERROR("blend: 0x%X", (int)blend);
         lv_vg_lite_color_dump_info(color);

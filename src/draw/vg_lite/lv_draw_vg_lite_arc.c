@@ -157,7 +157,6 @@ void lv_draw_vg_lite_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc,
     }
 
     lv_vg_lite_path_end(path);
-    vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
 
     vg_lite_matrix_t matrix = u->global_matrix;
 
@@ -182,7 +181,7 @@ void lv_draw_vg_lite_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc,
 
             lv_vg_lite_draw_pattern(
                 &u->target_buffer,
-                vg_lite_path,
+                lv_vg_lite_path_get_path(path),
                 fill,
                 &path_matrix,
                 &src_buf,
@@ -200,7 +199,7 @@ void lv_draw_vg_lite_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc,
         /* normal color fill */
         lv_vg_lite_draw(
             &u->target_buffer,
-            vg_lite_path,
+            lv_vg_lite_path_get_path(path),
             fill,
             &matrix,
             VG_LITE_BLEND_SRC_OVER,

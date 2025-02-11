@@ -67,14 +67,12 @@ void lv_draw_vg_lite_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, co
                                 dsc->radius);
     lv_vg_lite_path_end(path);
 
-    vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
-
     if(dsc->grad.dir != LV_GRAD_DIR_NONE) {
 #if LV_USE_VECTOR_GRAPHIC
         lv_vg_lite_draw_grad_helper(
             u,
             &u->target_buffer,
-            vg_lite_path,
+            lv_vg_lite_path_get_path(path),
             coords,
             &dsc->grad,
             &matrix,
@@ -88,7 +86,7 @@ void lv_draw_vg_lite_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, co
         /* normal fill */
         lv_vg_lite_draw(
             &u->target_buffer,
-            vg_lite_path,
+            lv_vg_lite_path_get_path(path),
             VG_LITE_FILL_EVEN_ODD,
             &matrix,
             VG_LITE_BLEND_SRC_OVER,

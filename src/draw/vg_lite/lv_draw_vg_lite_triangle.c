@@ -65,7 +65,6 @@ void lv_draw_vg_lite_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t *
     lv_vg_lite_path_close(path);
     lv_vg_lite_path_end(path);
 
-    vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
     vg_lite_matrix_t matrix = u->global_matrix;
 
     if(dsc->bg_grad.dir != LV_GRAD_DIR_NONE) {
@@ -73,7 +72,7 @@ void lv_draw_vg_lite_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t *
         lv_vg_lite_draw_grad_helper(
             u,
             &u->target_buffer,
-            vg_lite_path,
+            lv_vg_lite_path_get_path(path),
             &tri_area,
             &dsc->bg_grad,
             &matrix,
@@ -86,7 +85,7 @@ void lv_draw_vg_lite_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t *
     else { /* normal fill */
         lv_vg_lite_draw(
             &u->target_buffer,
-            vg_lite_path,
+            lv_vg_lite_path_get_path(path),
             VG_LITE_FILL_EVEN_ODD,
             &matrix,
             VG_LITE_BLEND_SRC_OVER,
