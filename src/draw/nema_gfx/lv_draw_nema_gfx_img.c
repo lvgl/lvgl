@@ -47,8 +47,6 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
 
 static uint32_t lv_nemagfx_mask_cf_to_nema(lv_color_format_t cf);
 
-static uint32_t lv_palette_cf_to_nema(lv_color_format_t cf);
-
 /**********************
  *  STATIC FUNCTIONS
  **********************/
@@ -160,7 +158,7 @@ static void _draw_nema_gfx_img(lv_draw_unit_t * draw_unit, const lv_draw_image_d
     }
     else {
         nema_bind_lut_tex((uintptr_t)((uint8_t *)src_buf + LV_COLOR_INDEXED_PALETTE_SIZE(src_cf) * 4), tex_w, tex_h,
-                          lv_palette_cf_to_nema(src_cf), src_stride, NEMA_FILTER_PS, (uintptr_t)(src_buf), NEMA_BGRA8888);
+                          src_nema_cf, src_stride, NEMA_FILTER_PS, (uintptr_t)(src_buf), NEMA_BGRA8888);
         blending_mode |= NEMA_BLOP_LUT;
     }
 
@@ -264,23 +262,6 @@ static uint32_t lv_nemagfx_mask_cf_to_nema(lv_color_format_t cf)
     }
 
     return NEMA_A8;
-}
-
-static uint32_t lv_palette_cf_to_nema(lv_color_format_t cf)
-{
-    switch(cf) {
-        case LV_COLOR_FORMAT_I1:
-            return NEMA_L1;
-        case LV_COLOR_FORMAT_I2:
-            return NEMA_L2;
-        case LV_COLOR_FORMAT_I4:
-            return NEMA_L4;
-        case LV_COLOR_FORMAT_I8:
-        default:
-            break;
-    }
-
-    return NEMA_L8;
 }
 
 /**********************
