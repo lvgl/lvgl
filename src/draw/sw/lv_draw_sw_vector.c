@@ -41,7 +41,7 @@ typedef struct {
 } _tvg_color;
 
 typedef struct {
-    Tvg_Canvas * canvas; 
+    Tvg_Canvas * canvas;
     int32_t partial_y_offset;
 } _tvg_draw_state;
 /**********************
@@ -60,8 +60,8 @@ static void lv_area_to_tvg(_tvg_rect * rect, const lv_area_t * area)
 {
     rect->x = area->x1;
     rect->y = area->y1;
-    rect->w = lv_area_get_width(area) - 1;
-    rect->h = lv_area_get_height(area) - 1;
+    rect->w = lv_area_get_width(area);
+    rect->h = lv_area_get_height(area);
 }
 
 static void lv_color_to_tvg(_tvg_color * color, const lv_color32_t * c, lv_opa_t opa)
