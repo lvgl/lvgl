@@ -87,11 +87,11 @@ void lv_draw_nema_gfx_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, c
             nema_set_blend_fill(NEMA_BL_SRC);
         }
 
-        if(radius > 0.f){
-            if(isCircle){
+        if(radius > 0.f) {
+            if(isCircle) {
                 nema_fill_circle_aa(rel_coords.x1 + coords_bg_w / 2, rel_coords.y1 + coords_bg_h / 2, radius, bg_color);
             }
-            else{
+            else {
                 nema_fill_rounded_rect_aa(rel_coords.x1, rel_coords.y1, coords_bg_w, coords_bg_h, radius, bg_color);
             }
         }
