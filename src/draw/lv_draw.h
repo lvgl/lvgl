@@ -101,6 +101,9 @@ struct _lv_layer_t  {
     /** Opacity of the layer */
     lv_opa_t opa;
 
+    /** Partial y offset */
+    int32_t partial_y_offset;
+
     /** Linked list of draw tasks */
     lv_draw_task_t * draw_task_head;
 

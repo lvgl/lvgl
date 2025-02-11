@@ -335,42 +335,14 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
 
     LV_PROFILER_DRAW_BEGIN;
 
-    bool alloc_layer = false;
-    lv_layer_t * target_layer = NULL;
-    lv_draw_image_dsc_t layer_draw_dsc;
-
-    if(layer->color_format != LV_COLOR_FORMAT_ARGB8888) {
-        lv_area_t rc = {0, 0, lv_area_get_width(coords) - 1, lv_area_get_height(coords) - 1};
-        target_layer = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &rc);
-        LV_ASSERT_MALLOC(target_layer);
-        if(target_layer == NULL) {
-            LV_LOG_WARN("Couldn't allocate layer for the SVG rendering");
-            return;
-        }
-        lv_draw_image_dsc_init(&layer_draw_dsc);
-        layer_draw_dsc.src = target_layer;
-        layer_draw_dsc.header.flags |= LV_IMAGE_FLAGS_PREMULTIPLIED;
-        alloc_layer = true;
-    }
-    else {
-        target_layer = (lv_layer_t *)layer;
-    }
-
-    lv_vector_dsc_t * ctx = lv_vector_dsc_create(target_layer);
+    lv_vector_dsc_t * ctx = lv_vector_dsc_create(layer);
     lv_matrix_t matrix;
     lv_matrix_identity(&matrix);
-    lv_area_t real_clip = *clip_area;
-    if(!alloc_layer) {
-        lv_matrix_translate(&matrix, coords->x1, coords->y1);
-    }
-    else {
-        lv_area_move(&real_clip, -coords->x1, -coords->y1);
-    }
-    ctx->current_dsc.scissor_area = real_clip;
+    lv_matrix_translate(&matrix, coords->x1, coords->y1);
+    ctx->current_dsc.scissor_area = *clip_area;
     if(image_dsc) {
-        lv_area_t layer_clip_area = target_layer->_clip_area;
-        int32_t off_x = (lv_area_get_width(&layer_clip_area) - image_dsc->header.w - 1) / 2;
-        int32_t off_y = (lv_area_get_height(&layer_clip_area) - image_dsc->header.h - 1) / 2;
+        int32_t off_x = (lv_area_get_width(coords) - image_dsc->header.w - 1) / 2;
+        int32_t off_y = (lv_area_get_height(coords) - image_dsc->header.h - 1) / 2;
 
         if(image_dsc->pivot.x != 0 || image_dsc->pivot.y != 0) {
             lv_matrix_translate(&matrix, off_x, off_y);
@@ -385,9 +357,6 @@ static void svg_draw(lv_layer_t * layer, const lv_image_decoder_dsc_t * dsc, con
     lv_draw_vector(ctx);
     lv_vector_dsc_delete(ctx);
 
-    if(alloc_layer) {
-        lv_draw_layer(layer, &layer_draw_dsc, coords);
-    }
     LV_PROFILER_DRAW_END;
 }
 

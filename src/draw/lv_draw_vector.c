@@ -689,10 +689,10 @@ void lv_vector_dsc_set_stroke_gradient_color_stops(lv_vector_dsc_t * dsc, const 
 /* draw functions */
 void lv_vector_dsc_add_path(lv_vector_dsc_t * dsc, const lv_vector_path_t * path)
 {
-    lv_area_t rect;
-    if(!lv_area_intersect(&rect, &(dsc->layer->_clip_area), &(dsc->current_dsc.scissor_area))) {
-        return;
-    }
+   // lv_area_t rect;
+   // if(!lv_area_intersect(&rect, &(dsc->layer->_clip_area), &(dsc->current_dsc.scissor_area))) {
+   //     return;
+   // }
 
     if(dsc->current_dsc.fill_dsc.opa == 0
        && dsc->current_dsc.stroke_dsc.opa == 0) {
@@ -712,15 +712,15 @@ void lv_vector_dsc_add_path(lv_vector_dsc_t * dsc, const lv_vector_path_t * path
 
     _copy_draw_dsc(&(new_task->dsc), &(dsc->current_dsc));
     lv_vector_path_copy(new_task->path, path);
-    new_task->dsc.scissor_area = rect;
+   // new_task->dsc.scissor_area = rect;
 }
 
 void lv_vector_clear_area(lv_vector_dsc_t * dsc, const lv_area_t * rect)
 {
-    lv_area_t r;
-    if(!lv_area_intersect(&r, &(dsc->layer->_clip_area), &(dsc->current_dsc.scissor_area))) {
-        return;
-    }
+    //lv_area_t r;
+    //if(!lv_area_intersect(&r, &(dsc->layer->_clip_area), &(dsc->current_dsc.scissor_area))) {
+    //    return;
+    //}
 
     if(!dsc->tasks.task_list) {
         dsc->tasks.task_list = lv_malloc(sizeof(lv_ll_t));
