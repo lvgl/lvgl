@@ -215,7 +215,7 @@ def remove_dir(tgt_dir):
 # -------------------------------------------------------------------------
 # Run external command and abort build on error.
 # -------------------------------------------------------------------------
-def cmd(s, start_dir=None):
+def cmd(s, start_dir=None, exit_on_error=True):
     if start_dir is None:
         start_dir = os.getcwd()
 
@@ -227,7 +227,7 @@ def cmd(s, start_dir=None):
     result = os.system(s)
     os.chdir(saved_dir)
 
-    if result != 0:
+    if result != 0 and exit_on_error:
         print("Exiting build due to previous error.")
         sys.exit(result)
 
@@ -368,7 +368,8 @@ def run():
     project_path = os.path.abspath(os.path.join(base_path, '..'))
     examples_path = os.path.join(project_path, 'examples')
     lvgl_src_path = os.path.join(project_path, 'src')
-    latex_output_path = os.path.join(base_path, cfg_output_dir)
+    latex_output_path_stub = os.path.join(base_path, cfg_output_dir)
+    latex_output_path = os.path.join(base_path, cfg_output_dir, 'latex')
     pdf_src_file = os.path.join(latex_output_path, cfg_pdf_filename)
     pdf_dst_file = os.path.join(base_path, cfg_pdf_filename)
     html_dst_path = os.path.join(base_path, cfg_output_dir)
@@ -635,14 +636,14 @@ def run():
         # PDF download link in the PDF
         # cmd("cp -f " + lang +"/latex/LVGL.pdf LVGL.pdf | true")
         src = temp_directory
-        dst = latex_output_path
+        dst = latex_output_path_stub
         cpu = os.cpu_count()
         cmd_line = f'sphinx-build -M latex "{src}" "{dst}" -j {cpu}'
         cmd(cmd_line)
 
         # Generate PDF.
         cmd_line = 'latexmk -pdf "LVGL.tex"'
-        cmd(cmd_line, latex_output_path)
+        cmd(cmd_line, latex_output_path, True)
 
         # Copy the result PDF to the main directory to make
         # it available for the HTML build.
