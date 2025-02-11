@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """ build.py -- Generate LVGL documentation using Doxygen and Sphinx + Breathe.
 
-
 Synopsis
 --------
-    - $ python build.py html [ skip_api ] [ fresh_env ]
+    - $ python build.py html  [ skip_api ] [ fresh_env ]
     - $ python build.py latex [ skip_api ] [ fresh_env ]
-    - $ python build.py html latex [ skip_api ] [ fresh_env ]
+    - $ python build.py temp  [ skip_api ]
     - $ python build.py clean
-    - $ python build.py clean_tmp
+    - $ python build.py clean_temp
     - $ python build.py clean_html
     - $ python build.py clean_latex
 
+    Build Arguments and Clean Arguments can be used one at a time
+    or be freely mixed and combined.
 
 Description
 -----------
@@ -40,11 +41,12 @@ Description
     A `sphinx-build` will do a full doc rebuild any time:
 
     - the temporary directory doesn't exist or is empty (since the new files in
-      the temporary directory will have have modification times after the generated
+      the temporary directory will have modification times after the generated
       HTML or Latex files, even if nothing changed),
     - the targeted output directory doesn't exist or is empty, or
     - Sphinx determines that a full rebuild is necessary.  This happens when:
         - temporary directory (Sphinx's source-file path) has changed,
+        - the command line used has changed,
         - `conf.py` modification date has changed, or
         - `fresh_env` argument is included (runs `sphinx-build` with -E option).
 
@@ -60,17 +62,22 @@ Options
 
     html [ skip_api ] [ fresh_env ]
         Build HTML output.
-        `skip_api` only has effect on first build after a `clean` or `clean_tmp`.
+        `skip_api` only has effect on first build after a `clean` or `clean_temp`.
 
     latex [ skip_api ] [ fresh_env ]
         Build Latex/PDF output (on hold pending removal of non-ASCII characters from input files).
-        `skip_api` only has effect on first build after a `clean` or `clean_tmp`.
+        `skip_api` only has effect on first build after a `clean` or `clean_temp`.
 
-    skip_api (with `html` and/or `latex` options)
-        On first build after a `clean`, this causes preparation of the contents of the temporary
-        directory to skip generating API pages and links (saving about 91% of build time).
-        This is intended to be used only during doc development to speed up turn-around time
-        between doc modifications and seeing final results.
+    temp [ skip_api ]
+        Generate temporary directory contents (ready to build output formats).
+        If they already exist, they are removed and re-generated.
+
+    skip_api (with `html` and/or `latex` and/or `temp` options)
+        Skip API pages and links when temp directory contents are being generated
+        (saving about 91% of build time).  Note: they are not thereafter regenerated
+        unless requested by `temp` argument or the temp directory does not exist.
+        This is intended to be used only during doc development to speed up
+        turn-around time between doc modifications and seeing final results.
 
     fresh_env (with `html` and/or `latex` options)
         Run `sphinx-build` with -E command-line argument, which makes it regenerate its
@@ -79,7 +86,7 @@ Options
     clean
         Remove all generated files.
 
-    clean_tmp
+    clean_temp
         Remove temporary directory.
 
     clean_html
@@ -90,7 +97,6 @@ Options
 
     Unrecognized arguments print error message, usage note, and exit with status 1.
 
-
 Python Package Requirements
 ---------------------------
     The list of Python package requirements are in `requirements.txt`.
@@ -98,7 +104,6 @@ Python Package Requirements
     Install them by:
 
     $ pip install -r requirements.txt
-
 
 History
 -------
@@ -153,21 +158,6 @@ History
 #              -- @kdschlosser
 # ****************************************************************************
 
-# -------------------------------------------------------------------------
-# Configuration
-# -------------------------------------------------------------------------
-# All of these are relative paths from the ./docs/ directory.
-cfg_temp_dir = 'tmp'
-cfg_html_output_dir = 'output/html'
-cfg_latex_output_dir = 'output/latex'
-cfg_pdf_output_dir = 'output/pdf'
-
-# Filename generated in `cfg_latex_output_dir` and copied to `cfg_pdf_output_dir`.
-cfg_pdf_filename = 'LVGL.pdf'
-
-# -------------------------------------------------------------------------
-# Imports
-# -------------------------------------------------------------------------
 # Python Library
 import sys
 import os
@@ -184,6 +174,17 @@ import config_builder
 import add_translation
 
 # -------------------------------------------------------------------------
+# Configuration
+# -------------------------------------------------------------------------
+# These are relative paths from the ./docs/ directory.
+cfg_temp_dir = 'tmp'
+cfg_output_dir = 'output'
+
+# Filename generated in `cfg_latex_output_dir` and copied to `cfg_pdf_output_dir`.
+cfg_pdf_filename = 'LVGL.pdf'
+
+
+# -------------------------------------------------------------------------
 # Print usage note.
 # -------------------------------------------------------------------------
 def print_usage_note():
@@ -194,10 +195,11 @@ def print_usage_note():
     print('    html [ skip_api ] [ fresh_env ]')
     print('    latex  [ skip_api ] [ fresh_env ]')
     print('    clean')
-    print('    clean_tmp')
+    print('    clean_temp')
     print('    clean_html')
     print('    clean_latex')
     print('    help')
+
 
 # -------------------------------------------------------------------------
 # Remove directory `tgt_dir`.
@@ -208,6 +210,7 @@ def remove_dir(tgt_dir):
         shutil.rmtree(tgt_dir)
     else:
         print(f'{tgt_dir} already removed...')
+
 
 # -------------------------------------------------------------------------
 # Run external command and abort build on error.
@@ -227,6 +230,7 @@ def cmd(s, start_dir=None):
     if result != 0:
         print("Exiting build due to previous error.")
         sys.exit(result)
+
 
 # -------------------------------------------------------------------------
 # Build and return LVGL version string from `lv_version.h`.  Updated to be
@@ -259,6 +263,7 @@ def get_version(_verfile):
 
     return f'{major}.{minor}'
 
+
 # -------------------------------------------------------------------------
 # Provide answer to question:  Can we have reasonable confidence that
 # the contents of `temp_directory` already exists?
@@ -288,6 +293,7 @@ def temp_dir_contents_exists(_tmpdir):
 
     return result
 
+
 # -------------------------------------------------------------------------
 # Perform doc-build function(s) requested.
 # -------------------------------------------------------------------------
@@ -301,11 +307,12 @@ def run():
     # This saves a huge amount of time during long document projects.
     # ---------------------------------------------------------------------
     # Set defaults.
-    clean_tmp = False
+    clean_temp = False
     clean_html = False
     clean_latex = False
     build_html = False
     build_latex = False
+    build_temp = False
     skip_api = False
     fresh_sphinx_env = False
     args = sys.argv[1:]
@@ -327,16 +334,18 @@ def run():
             build_html = True
         elif arg == "latex":
             build_latex = True
+        elif arg == "temp":
+            build_temp = True
         elif arg == 'skip_api':
             skip_api = True
         elif arg == 'fresh_env':
             fresh_sphinx_env = True
         elif arg == "clean":
-            clean_tmp = True
+            clean_temp = True
             clean_html = True
             clean_latex = True
-        elif arg == "clean_tmp":
-            clean_tmp = True
+        elif arg == "clean_temp":
+            clean_temp = True
         elif arg == "clean_html":
             clean_html = True
         elif arg == "clean_latex":
@@ -359,17 +368,17 @@ def run():
     project_path = os.path.abspath(os.path.join(base_path, '..'))
     examples_path = os.path.join(project_path, 'examples')
     lvgl_src_path = os.path.join(project_path, 'src')
-    latex_output_path = os.path.join(base_path, cfg_latex_output_dir)
+    latex_output_path = os.path.join(base_path, cfg_output_dir)
     pdf_src_file = os.path.join(latex_output_path, cfg_pdf_filename)
-    pdf_dst_file = os.path.join(base_path, cfg_pdf_output_dir, cfg_pdf_filename)
-    html_dst_path = os.path.join(base_path, cfg_html_output_dir)
+    pdf_dst_file = os.path.join(base_path, cfg_pdf_filename)
+    html_dst_path = os.path.join(base_path, cfg_output_dir)
     version_source_path = os.path.join(project_path, 'lv_version.h')
 
     # Establish temporary directory.  The presence of environment variable
     # `LVGL_DOC_BUILD_TEMP_DIR` overrides default in `cfg_temp_dir`.
     #
     # Temporary directory is used as Sphinx source directory -- some source
-    # files are edited, some are fully generated).  Adding translation
+    # files are edited, some are fully generated.  Adding translation
     # links can be done with by adding temp in:
     # - ./docs/add_translation.py, and
     # - ./docs/_ext/link_roles.py.
@@ -391,17 +400,17 @@ def run():
     # ---------------------------------------------------------------------
     # Clean?  If so, clean and exit (like `make clean`).
     # ---------------------------------------------------------------------
-    if clean_tmp or clean_html or clean_latex:
-        if clean_tmp:
-            remove_dir(temp_directory)
+    if clean_temp:
+        remove_dir(temp_directory)
 
-        if clean_html:
-            remove_dir(html_dst_path)
+    if clean_html:
+        remove_dir(html_dst_path)
 
-        if clean_latex:
-            remove_dir(latex_output_path)
+    if clean_latex:
+        remove_dir(latex_output_path)
 
-        exit(0)
+    if os.path.isdir(temp_directory) and build_temp:
+        remove_dir(temp_directory)
 
     # ---------------------------------------------------------------------
     # Populate LVGL_URLPATH and LVGL_GITCOMMIT environment variables:
@@ -502,7 +511,7 @@ def run():
             print('Copying examples...')
             shutil.copytree(examples_path, os.path.join(temp_directory, 'examples'), dirs_exist_ok=True)
         else:
-            #--------- Method 1:
+            # --------- Method 1:
             options = {
                'create': True,    # Create directories if they don't exist.
                'exclude': exclude_list
@@ -628,7 +637,7 @@ def run():
         src = temp_directory
         dst = latex_output_path
         cpu = os.cpu_count()
-        cmd_line = f'sphinx-build -b latex "{src}" "{dst}" -j {cpu}'
+        cmd_line = f'sphinx-build -M latex "{src}" "{dst}" -j {cpu}'
         cmd(cmd_line)
 
         # Generate PDF.
@@ -646,9 +655,8 @@ def run():
             f.write(index_data.encode('utf-8'))
 
         t2 = datetime.now()
-        print('Latex generation run time:  ' + str(t2 - t1))
-        print('Latex output path:  ', latex_output_path)
-        print('PDF output path:  ', pdf_dst_file)
+        print('PDF               :  ' + pdf_dst_file)
+        print('Latex gen run time:  ' + str(t2 - t1))
 
     # ---------------------------------------------------------------------
     # Build HTML
@@ -681,11 +689,10 @@ def run():
         src = html_src_path
         dst = html_dst_path
         cpu = os.cpu_count()
-        cmd_line = f'sphinx-build -b html "{src}" "{dst}" -D version="{ver}" {env_opt} -j {cpu}'
+        cmd_line = f'sphinx-build -M html "{src}" "{dst}" -D version="{ver}" {env_opt} -j {cpu}'
         cmd(cmd_line)
         t2 = datetime.now()
-        print('HTML generation run time:  ' + str(t2 - t1))
-        print('HTML output path:  ', html_dst_path)
+        print('HTML gen time :  ' + str(t2 - t1))
 
     # ---------------------------------------------------------------------
     # Remove temporary `lv_conf.h` created for this build.
@@ -697,7 +704,7 @@ def run():
     # Indicate results.
     # ---------------------------------------------------------------------
     t_end = datetime.now()
-    print('Total run time:   ' + str(t_end - t0))
+    print('Total run time:  ' + str(t_end - t0))
     print()
     print('Note:  warnings about `/details/index.rst` and `/intro/index.rst`')
     print('       "not being in any toctree" are expected and intentional.')

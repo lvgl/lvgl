@@ -1,20 +1,12 @@
-.. Comment:
-    This is the code that `./docs/_ext/link_roles.py` was applying to the target `.rst` files:
-    :link_to_translation:`zh_CN:[中文]`
-    Since around November 2024, the number of files with this link code was reduced
-    to just `./docs/index.rst`.  To "un-break" the Latex/PDF generation, non-ASCII
-    characters have to be removed from the `.rst` files.  These are some notes needed
-    to get that done for the link below.  The byte sequence of the below 2 Chinese ideographs is:
-    e4 b8 ad e6 96 87.
-    I believe these are two 3-byte UTF-8 characters.
-    This needs to be changed to a manual link to this Unicode characters using two
-    .. |symbolname| unicode:: U+0xxxx .. CHINESE XXX CHARACTER
-    directives, and link to this URL:  https://lvgl.100ask.net/master/index.html .
-    Until then, the below is a manually-installed external link to the top-level
-    Chinese translation page for the LVGL documentation.
-    End of comment.
+.. raw:: html
 
-`[中文] <https://lvgl.100ask.net/master/index.html>`__
+    <p style="text-align: right;">
+        <a class="reference external" href="https://lvgl.100ask.net/master/index.html">
+            [&#x04E2D;&#x02F42;] Chinese Translation
+        </a>
+    </p>
+
+.. _lvgl_landing_page:
 
 ===========================================
 LVGL:  Light and Versatile Graphics Library
