@@ -1265,7 +1265,12 @@ void lv_vg_lite_set_scissor_area(const lv_area_t * area)
                                area->x1,
                                area->y1,
                                area->x2 + 1,
-                               area->y2 + 1), {});
+                               area->y2 + 1),
+                           /* Error handler */
+    {
+        LV_LOG_ERROR("area: %d, %d, %d, %d",
+                     (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2);
+    });
     LV_PROFILER_DRAW_END;
 }
 
@@ -1277,7 +1282,11 @@ void lv_vg_lite_disable_scissor(void)
                                0,
                                0,
                                LV_HOR_RES,
-                               LV_VER_RES), {});
+                               LV_VER_RES),
+                           /* Error handler */
+    {
+        LV_LOG_ERROR("hor_res: %d, ver_res: %d", (int)LV_HOR_RES, (int)LV_VER_RES);
+    });
     LV_PROFILER_DRAW_END;
 }
 
