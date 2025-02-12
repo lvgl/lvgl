@@ -39,7 +39,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static inline bool font_is_built_in(const lv_font_t * font);
+static inline bool has_static_bitmap(const lv_font_t * font);
 static void * get_bitmap_cached(lv_font_glyph_dsc_t * g_dsc, const lv_font_fmt_txt_dsc_t * fdsc, uint32_t gid);
 static bool font_bitmap_create_cb(font_bitmap_cache_data_t * data, void * user_data);
 static void font_bitmap_free_cb(font_bitmap_cache_data_t * data, void * user_data);
@@ -86,7 +86,7 @@ const void * lv_font_cache_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw
     LV_ASSERT_NULL(g_dsc);
 
     const lv_font_t * font = g_dsc->resolved_font;
-    if(!font_is_built_in(font)) {
+    if(!has_static_bitmap(font)) {
         /* If the font is not built-in, use the original function to get the bitmap */
         return font->get_glyph_bitmap(g_dsc, draw_buf);
     }
@@ -143,7 +143,7 @@ void lv_font_cache_release_glyph(const lv_font_t * font, lv_font_glyph_dsc_t * g
  *   STATIC FUNCTIONS
  **********************/
 
-static inline bool font_is_built_in(const lv_font_t * font)
+static inline bool has_static_bitmap(const lv_font_t * font)
 {
     if(lv_font_has_static_bitmap(font)) {
         return true;
