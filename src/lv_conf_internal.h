@@ -2529,7 +2529,9 @@
 
 /* File system interfaces for common APIs */
 
-/** Setting a default driver letter allows skipping the driver prefix in filepaths. */
+/** Setting a default driver letter allows skipping the driver prefix in filepaths.
+ *  Documentation about how to use the below driver-identifier letters can be found at
+ *  https://docs.lvgl.io/master/details/main-components/fs.html#lv-fs-identifier-letters . */
 #ifndef LV_FS_DEFAULT_DRIVER_LETTER
     #ifdef CONFIG_LV_FS_DEFAULT_DRIVER_LETTER
         #define LV_FS_DEFAULT_DRIVER_LETTER CONFIG_LV_FS_DEFAULT_DRIVER_LETTER
@@ -2551,7 +2553,7 @@
         #ifdef CONFIG_LV_FS_STDIO_LETTER
             #define LV_FS_STDIO_LETTER CONFIG_LV_FS_STDIO_LETTER
         #else
-            #define LV_FS_STDIO_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+            #define LV_FS_STDIO_LETTER '\0'     /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
         #endif
     #endif
     #ifndef LV_FS_STDIO_PATH
@@ -2583,7 +2585,7 @@
         #ifdef CONFIG_LV_FS_POSIX_LETTER
             #define LV_FS_POSIX_LETTER CONFIG_LV_FS_POSIX_LETTER
         #else
-            #define LV_FS_POSIX_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+            #define LV_FS_POSIX_LETTER '\0'     /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
         #endif
     #endif
     #ifndef LV_FS_POSIX_PATH
@@ -2615,7 +2617,7 @@
         #ifdef CONFIG_LV_FS_WIN32_LETTER
             #define LV_FS_WIN32_LETTER CONFIG_LV_FS_WIN32_LETTER
         #else
-            #define LV_FS_WIN32_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+            #define LV_FS_WIN32_LETTER '\0'     /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
         #endif
     #endif
     #ifndef LV_FS_WIN32_PATH
@@ -2647,7 +2649,7 @@
         #ifdef CONFIG_LV_FS_FATFS_LETTER
             #define LV_FS_FATFS_LETTER CONFIG_LV_FS_FATFS_LETTER
         #else
-            #define LV_FS_FATFS_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+            #define LV_FS_FATFS_LETTER '\0'     /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
         #endif
     #endif
     #ifndef LV_FS_FATFS_PATH
@@ -2679,7 +2681,7 @@
         #ifdef CONFIG_LV_FS_MEMFS_LETTER
             #define LV_FS_MEMFS_LETTER CONFIG_LV_FS_MEMFS_LETTER
         #else
-            #define LV_FS_MEMFS_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+            #define LV_FS_MEMFS_LETTER '\0'     /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
         #endif
     #endif
 #endif
@@ -2697,14 +2699,14 @@
         #ifdef CONFIG_LV_FS_LITTLEFS_LETTER
             #define LV_FS_LITTLEFS_LETTER CONFIG_LV_FS_LITTLEFS_LETTER
         #else
-            #define LV_FS_LITTLEFS_LETTER '\0'  /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+            #define LV_FS_LITTLEFS_LETTER '\0'  /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
         #endif
     #endif
     #ifndef LV_FS_LITTLEFS_PATH
         #ifdef CONFIG_LV_FS_LITTLEFS_PATH
             #define LV_FS_LITTLEFS_PATH CONFIG_LV_FS_LITTLEFS_PATH
         #else
-            #define LV_FS_LITTLEFS_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
+            #define LV_FS_LITTLEFS_PATH ""      /**< Set the working directory. File/directory paths will be appended to it. */
         #endif
     #endif
 #endif
@@ -2722,14 +2724,14 @@
         #ifdef CONFIG_LV_FS_ARDUINO_ESP_LITTLEFS_LETTER
             #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER CONFIG_LV_FS_ARDUINO_ESP_LITTLEFS_LETTER
         #else
-            #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+            #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER '\0'  /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
         #endif
     #endif
     #ifndef LV_FS_ARDUINO_ESP_LITTLEFS_PATH
         #ifdef CONFIG_LV_FS_ARDUINO_ESP_LITTLEFS_PATH
             #define LV_FS_ARDUINO_ESP_LITTLEFS_PATH CONFIG_LV_FS_ARDUINO_ESP_LITTLEFS_PATH
         #else
-            #define LV_FS_ARDUINO_ESP_LITTLEFS_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
+            #define LV_FS_ARDUINO_ESP_LITTLEFS_PATH ""      /**< Set the working directory. File/directory paths will be appended to it. */
         #endif
     #endif
 #endif
@@ -2747,14 +2749,14 @@
         #ifdef CONFIG_LV_FS_ARDUINO_SD_LETTER
             #define LV_FS_ARDUINO_SD_LETTER CONFIG_LV_FS_ARDUINO_SD_LETTER
         #else
-            #define LV_FS_ARDUINO_SD_LETTER '\0'          /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+            #define LV_FS_ARDUINO_SD_LETTER '\0'  /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
         #endif
     #endif
     #ifndef LV_FS_ARDUINO_SD_PATH
         #ifdef CONFIG_LV_FS_ARDUINO_SD_PATH
             #define LV_FS_ARDUINO_SD_PATH CONFIG_LV_FS_ARDUINO_SD_PATH
         #else
-            #define LV_FS_ARDUINO_SD_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
+            #define LV_FS_ARDUINO_SD_PATH ""      /**< Set the working directory. File/directory paths will be appended to it. */
         #endif
     #endif
 #endif
@@ -2772,7 +2774,7 @@
         #ifdef CONFIG_LV_FS_UEFI_LETTER
             #define LV_FS_UEFI_LETTER CONFIG_LV_FS_UEFI_LETTER
         #else
-            #define LV_FS_UEFI_LETTER '\0'          /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+            #define LV_FS_UEFI_LETTER '\0'      /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
         #endif
     #endif
 #endif
