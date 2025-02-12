@@ -23,7 +23,7 @@ Ways to Contribute
 ******************
 
 - **Spread the Word**: Share your LVGL experience with friends or on social media to boost its visibility.
-- **Star LVGL**   Give us a star on `GitHub <https://github.com/lvgl/lvgl>`__ ! It helps a lot to make LVGL more appealing for newcomers.
+- **Star LVGL**   Give us a star on `GitHub <https://github.com/lvgl/lvgl>`__! It helps a lot to make LVGL more appealing for newcomers.
 - **Report a Bug**: Open a `GitHub Issue <https://github.com/lvgl/lvgl/issues>`__ if something is not working.
 - **Join Our** `Forum <https://forum.lvgl.io/>`__ : Meet fellow developers and discuss questions.
 - **Tell Us Your Ideas**: If you feel something is missing from LVGL, we would love to hear about it in a `GitHub Issue <https://github.com/lvgl/lvgl/issues>`__
