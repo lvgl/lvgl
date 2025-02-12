@@ -152,8 +152,15 @@ static void _draw_nema_gfx_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * d
                       lv_area_get_height(&(layer->buf_area)), dst_nema_cf,
                       lv_area_get_width(&(layer->buf_area))*lv_color_format_get_size(dst_cf));
 
-    nema_bind_src_tex((uintptr_t)(src_buf), tex_w, tex_h, src_nema_cf, src_stride,
-                      dsc->antialias ? NEMA_FILTER_BL : NEMA_FILTER_PS);
+    if(!LV_COLOR_FORMAT_IS_INDEXED(src_cf)) {
+        nema_bind_src_tex((uintptr_t)(src_buf), tex_w, tex_h, src_nema_cf, src_stride,
+                          dsc->antialias ? NEMA_FILTER_BL : NEMA_FILTER_PS);
+    }
+    else {
+        nema_bind_lut_tex((uintptr_t)((uint8_t *)src_buf + LV_COLOR_INDEXED_PALETTE_SIZE(src_cf) * 4), tex_w, tex_h,
+                          src_nema_cf, src_stride, NEMA_FILTER_PS, (uintptr_t)(src_buf), NEMA_BGRA8888);
+        blending_mode |= NEMA_BLOP_LUT;
+    }
 
     /*Guard for previous NemaGFX Version*/
 #ifdef NEMA_BLOP_RECOLOR

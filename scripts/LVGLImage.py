@@ -498,6 +498,7 @@ class LVGLImage:
         self.stride = 0  # default no valid stride value
         self.premultiplied = False
         self.rgb565_dither = False
+        self.nema_gfx = False
         self.set_data(cf, w, h, data)
 
     def __repr__(self) -> str:
@@ -840,7 +841,8 @@ class LVGLImage:
                  filename: str,
                  cf: ColorFormat = None,
                  background: int = 0x00_00_00,
-                 rgb565_dither=False):
+                 rgb565_dither=False,
+                 nema_gfx=False):
         """
         Create lvgl image from png file.
         If cf is none, used I1/2/4/8 based on palette size
@@ -848,6 +850,7 @@ class LVGLImage:
 
         self.background = background
         self.rgb565_dither = rgb565_dither
+        self.nema_gfx = nema_gfx
 
         if cf is None:  # guess cf from filename
             # split filename string and match with ColorFormat to check
@@ -881,7 +884,7 @@ class LVGLImage:
         w, h, rows, metadata = reader.read()
 
         # to preserve original palette data only convert the image if needed. For this
-        # check if image has a palette and the requested palette size equals the existing one 
+        # check if image has a palette and the requested palette size equals the existing one
         if not 'palette' in metadata or not auto_cf and len(metadata['palette']) !=  2 ** cf.bpp:
             # reread and convert file
             reader = png.Reader(
@@ -918,6 +921,8 @@ class LVGLImage:
         # pack data if not in I8 format
         if cf == ColorFormat.I8:
             for e in rows:
+                if self.nema_gfx:
+                    e = bytearray((x >> 4) | ((x & 0x0F) << 4) for x in e)
                 rawdata += e
         else:
             for e in png.pack_rows(rows, cf.bpp):
@@ -1262,7 +1267,8 @@ class PNGConverter:
                  premultiply: bool = False,
                  compress: CompressMethod = CompressMethod.NONE,
                  keep_folder=True,
-                 rgb565_dither=False) -> None:
+                 rgb565_dither=False,
+                 nema_gfx=False) -> None:
         self.files = files
         self.cf = cf
         self.ofmt = ofmt
@@ -1274,6 +1280,7 @@ class PNGConverter:
         self.compress = compress
         self.background = background
         self.rgb565_dither = rgb565_dither
+        self.nema_gfx = nema_gfx
 
     def _replace_ext(self, input, ext):
         if self.keep_folder:
@@ -1292,7 +1299,7 @@ class PNGConverter:
                 img = RAWImage().from_file(f, self.cf)
                 img.to_c_array(self._replace_ext(f, ".c"))
             else:
-                img = LVGLImage().from_png(f, self.cf, background=self.background, rgb565_dither=self.rgb565_dither)
+                img = LVGLImage().from_png(f, self.cf, background=self.background, rgb565_dither=self.rgb565_dither, nema_gfx=self.nema_gfx)
                 img.adjust_stride(align=self.align)
 
                 if self.premultiply:
@@ -1350,6 +1357,8 @@ def main():
                         type=lambda x: int(x, 0),
                         metavar='color',
                         nargs='?')
+    parser.add_argument('--nemagfx', action='store_true',
+                    help="export color palette for I8 images in a format compatible with NEMA accelerator", default=False)
     parser.add_argument('-o',
                         '--output',
                         default="./output",
@@ -1390,7 +1399,8 @@ def main():
                              premultiply=args.premultiply,
                              compress=compress,
                              keep_folder=False,
-                             rgb565_dither=args.rgb565dither)
+                             rgb565_dither=args.rgb565dither,
+                             nema_gfx=args.nemagfx)
     output = converter.convert()
     for f, img in output:
         logging.info(f"len: {img.data_len} for {path.basename(f)} ")
