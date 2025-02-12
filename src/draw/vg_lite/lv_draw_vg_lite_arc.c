@@ -157,13 +157,8 @@ void lv_draw_vg_lite_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc,
     }
 
     lv_vg_lite_path_end(path);
-    vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
 
     vg_lite_matrix_t matrix = u->global_matrix;
-
-    LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
-    LV_VG_LITE_ASSERT_PATH(vg_lite_path);
-    LV_VG_LITE_ASSERT_MATRIX(&matrix);
 
     if(dsc->img_src) {
         vg_lite_buffer_t src_buf;
@@ -184,38 +179,31 @@ void lv_draw_vg_lite_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc,
             float img_half_h = decoder_dsc.decoded->header.h / 2.0f;
             vg_lite_translate(cx - img_half_w, cy - img_half_h, &matrix);
 
-            LV_VG_LITE_ASSERT_MATRIX(&matrix);
-            LV_VG_LITE_ASSERT_MATRIX(&path_matrix);
-            LV_VG_LITE_ASSERT_SRC_BUFFER(&src_buf);
+            lv_vg_lite_draw_pattern(
+                &u->target_buffer,
+                lv_vg_lite_path_get_path(path),
+                fill,
+                &path_matrix,
+                &src_buf,
+                &matrix,
+                VG_LITE_BLEND_SRC_OVER,
+                VG_LITE_PATTERN_COLOR,
+                0,
+                img_color,
+                VG_LITE_FILTER_BI_LINEAR);
 
-            LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw_pattern");
-            LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
-                                       &u->target_buffer,
-                                       vg_lite_path,
-                                       fill,
-                                       &path_matrix,
-                                       &src_buf,
-                                       &matrix,
-                                       VG_LITE_BLEND_SRC_OVER,
-                                       VG_LITE_PATTERN_COLOR,
-                                       0,
-                                       img_color,
-                                       VG_LITE_FILTER_BI_LINEAR));
-            LV_PROFILER_DRAW_END_TAG("vg_lite_draw_pattern");
             lv_vg_lite_pending_add(u->image_dsc_pending, &decoder_dsc);
         }
     }
     else {
         /* normal color fill */
-        LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw");
-        LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
-                                   &u->target_buffer,
-                                   vg_lite_path,
-                                   fill,
-                                   &matrix,
-                                   VG_LITE_BLEND_SRC_OVER,
-                                   lv_vg_lite_color(dsc->color, dsc->opa, true)));
-        LV_PROFILER_DRAW_END_TAG("vg_lite_draw");
+        lv_vg_lite_draw(
+            &u->target_buffer,
+            lv_vg_lite_path_get_path(path),
+            fill,
+            &matrix,
+            VG_LITE_BLEND_SRC_OVER,
+            lv_vg_lite_color(dsc->color, dsc->opa, true));
     }
 
     lv_vg_lite_path_drop(u, path);

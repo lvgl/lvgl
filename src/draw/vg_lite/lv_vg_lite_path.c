@@ -112,7 +112,7 @@ void lv_vg_lite_path_destroy(lv_vg_lite_path_t * path)
         path->base.path = NULL;
 
         /* clear remaining path data */
-        LV_VG_LITE_CHECK_ERROR(vg_lite_clear_path(&path->base));
+        LV_VG_LITE_CHECK_ERROR(vg_lite_clear_path(&path->base), {});
     }
     lv_free(path);
     LV_PROFILER_DRAW_END;
