@@ -141,24 +141,16 @@ void lv_draw_vg_lite_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t
         0);
     lv_vg_lite_path_end(path);
 
-    vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
-
     vg_lite_matrix_t matrix = u->global_matrix;
 
-    LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
-    LV_VG_LITE_ASSERT_PATH(vg_lite_path);
-    LV_VG_LITE_ASSERT_MATRIX(&matrix);
-
     /* Use VG_LITE_BLEND_DST_IN (Sa * D) blending mode to make the corners transparent */
-    LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw");
-    LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
-                               &u->target_buffer,
-                               vg_lite_path,
-                               VG_LITE_FILL_EVEN_ODD,
-                               &matrix,
-                               VG_LITE_BLEND_DST_IN,
-                               0));
-    LV_PROFILER_DRAW_END_TAG("vg_lite_draw");
+    lv_vg_lite_draw(
+        &u->target_buffer,
+        lv_vg_lite_path_get_path(path),
+        VG_LITE_FILL_EVEN_ODD,
+        &matrix,
+        VG_LITE_BLEND_DST_IN,
+        0);
 
     lv_vg_lite_path_drop(u, path);
 #endif /*LV_USE_VG_LITE_THORVG*/
