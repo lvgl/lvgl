@@ -95,7 +95,7 @@ void lv_draw_nema_gfx_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, c
                 nema_fill_rounded_rect_aa(rel_coords.x1, rel_coords.y1, coords_bg_w, coords_bg_h, radius, bg_color);
             }
         }
-        
+
         else
             nema_fill_rect(rel_coords.x1, rel_coords.y1, coords_bg_w, coords_bg_h, bg_color);
     }
