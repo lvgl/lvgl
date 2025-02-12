@@ -181,7 +181,7 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
 
 static lv_result_t svg_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
-    LV_UNUSED(decoder); /*Unused*/
+    LV_UNUSED(decoder);
     LV_PROFILER_DECODER_BEGIN_TAG("lv_svg_decoder_open");
 
     uint8_t * svg_data = NULL;
@@ -261,7 +261,7 @@ static lv_result_t svg_decoder_open(lv_image_decoder_t * decoder, lv_image_decod
 
 static void svg_decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
-    LV_UNUSED(decoder); /*Unused*/
+    LV_UNUSED(decoder);
 
     if(dsc->args.no_cache ||
        !lv_image_cache_is_enabled()) lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
