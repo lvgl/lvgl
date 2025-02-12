@@ -86,7 +86,7 @@ const void * lv_font_cache_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw
     LV_ASSERT_NULL(g_dsc);
 
     const lv_font_t * font = g_dsc->resolved_font;
-    if(!has_static_bitmap(font)) {
+    if(draw_buf || !has_static_bitmap(font)) {
         /* If the font is not built-in, use the original function to get the bitmap */
         return font->get_glyph_bitmap(g_dsc, draw_buf);
     }
