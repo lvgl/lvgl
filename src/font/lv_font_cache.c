@@ -86,21 +86,25 @@ const void * lv_font_cache_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw
     LV_ASSERT_NULL(g_dsc);
 
     const lv_font_t * font = g_dsc->resolved_font;
+
+    /**
+     * If the font image buffer is provided externally, or it is not a built-in font,
+     * use the original function to get the bitmap.
+     */
     if(draw_buf || !has_static_bitmap(font)) {
-        /* If the font is not built-in, use the original function to get the bitmap */
         return font->get_glyph_bitmap(g_dsc, draw_buf);
     }
 
-    lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
-    uint32_t gid = g_dsc->gid.index;
+    const lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
+    const uint32_t gid = g_dsc->gid.index;
     if(!gid) return NULL;
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
-    void * raw_glyph_bitmap = (void *)&fdsc->glyph_bitmap[gdsc->bitmap_index];
+    const uint8_t * raw_glyph_bitmap = &fdsc->glyph_bitmap[gdsc->bitmap_index];
 
     if(g_dsc->req_raw_bitmap) return raw_glyph_bitmap;
 
-    int32_t gsize = (int32_t) gdsc->box_w * gdsc->box_h;
+    const uint32_t gsize = gdsc->box_w * gdsc->box_h;
     if(gsize == 0) return NULL;
 
     /**
@@ -110,7 +114,7 @@ const void * lv_font_cache_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw
 #if LV_USE_OS == LV_OS_NONE
     /* If the alignment, stride, and color format is correct, bypass the cache */
     if((g_dsc->format == LV_FONT_GLYPH_FORMAT_A8 || g_dsc->format == LV_FONT_GLYPH_FORMAT_A8_ALIGNED)
-       && raw_glyph_bitmap == lv_draw_buf_align(raw_glyph_bitmap, LV_COLOR_FORMAT_A8)
+       && raw_glyph_bitmap == lv_draw_buf_align((void *)raw_glyph_bitmap, LV_COLOR_FORMAT_A8)
        && g_dsc->box_w == lv_draw_buf_width_to_stride(g_dsc->box_w, LV_COLOR_FORMAT_A8)) {
 
         const uint32_t a8_stride = gdsc->box_w * sizeof(uint8_t);
@@ -122,7 +126,7 @@ const void * lv_font_cache_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw
             g_dsc->box_h,
             LV_COLOR_FORMAT_A8,
             a8_stride,
-            raw_glyph_bitmap,
+            (void *)raw_glyph_bitmap,
             a8_stride * g_dsc->box_h);
 
         return &font_static_bitmap_draw_buf;
