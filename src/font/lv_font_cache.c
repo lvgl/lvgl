@@ -103,6 +103,11 @@ const void * lv_font_cache_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw
     int32_t gsize = (int32_t) gdsc->box_w * gdsc->box_h;
     if(gsize == 0) return NULL;
 
+    /**
+     * To prevent multithreaded access to the font_static_bitmap_draw_buf global variable,
+     * only non-OS mode is supported
+     */
+#if LV_USE_OS == LV_OS_NONE
     /* If the alignment, stride, and color format is correct, bypass the cache */
     if(g_dsc->format == LV_FONT_GLYPH_FORMAT_A8
        && raw_glyph_bitmap == lv_draw_buf_align(raw_glyph_bitmap, LV_COLOR_FORMAT_A8)
@@ -122,6 +127,7 @@ const void * lv_font_cache_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw
 
         return &font_static_bitmap_draw_buf;
     }
+#endif
 
     return get_bitmap_cached(g_dsc, fdsc, gid);
 }
