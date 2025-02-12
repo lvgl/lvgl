@@ -36,6 +36,7 @@
 
 #if LV_USE_NEMA_GFX
 #include "../../misc/lv_utils.h"
+#include "../../misc/lv_bidi_private.h"
 #include "../../misc/lv_text_private.h"
 #include "../../lvgl.h"
 #include "../../libs/freetype/lv_freetype_private.h"
