@@ -70,7 +70,7 @@ void lv_draw_nema_gfx_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, c
 
     int32_t coords_bg_w = lv_area_get_width(&rel_coords);
     int32_t coords_bg_h = lv_area_get_height(&rel_coords);
-    bool isCircle = ((dsc->radius == LV_RADIUS_CIRCLE) && (coords_bg_h == coords_bg_w)); 
+    bool is_circle = ((dsc->radius == LV_RADIUS_CIRCLE) && (coords_bg_h == coords_bg_w));
     int32_t short_side = LV_MIN(coords_bg_w, coords_bg_h);
     int32_t radius = LV_MIN(dsc->radius, short_side >> 1);
 
@@ -88,7 +88,7 @@ void lv_draw_nema_gfx_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, c
         }
 
         if(radius > 0.f) {
-            if(isCircle) {
+            if(is_circle) {
                 nema_fill_circle_aa(rel_coords.x1 + coords_bg_w / 2, rel_coords.y1 + coords_bg_h / 2, radius, bg_color);
             }
             else {
