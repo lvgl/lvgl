@@ -145,6 +145,9 @@ void test_anim_pause_for(void)
     lv_test_wait(40);
 
     TEST_ASSERT_EQUAL(79, var);
+
+    /*Delete the animation to avoid accessing it after return*/
+    lv_anim_delete(&var, exec_cb);
 }
 
 void test_anim_pause_for_resume(void)

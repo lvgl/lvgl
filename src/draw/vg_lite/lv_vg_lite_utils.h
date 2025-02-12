@@ -31,20 +31,19 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define LV_VG_LITE_IS_ERROR(err) (err > 0)
-
 #if LV_VG_LITE_USE_ASSERT
 #define LV_VG_LITE_ASSERT(expr) LV_ASSERT(expr)
 #else
 #define LV_VG_LITE_ASSERT(expr)
 #endif
 
-#define LV_VG_LITE_CHECK_ERROR(expr)                          \
+#define LV_VG_LITE_CHECK_ERROR(expr, error_handler)           \
     do {                                                      \
         vg_lite_error_t error = expr;                         \
-        if (LV_VG_LITE_IS_ERROR(error)) {                     \
+        if (error != VG_LITE_SUCCESS) {                       \
             LV_LOG_ERROR("Execute '" #expr "' error: %d", (int)error);  \
             lv_vg_lite_error_dump_info(error);                \
+            error_handler;                                    \
             LV_VG_LITE_ASSERT(false);                         \
         }                                                     \
     } while (0)
@@ -96,6 +95,8 @@ void lv_vg_lite_stroke_dump_info(const vg_lite_stroke_t * stroke);
 void lv_vg_lite_buffer_dump_info(const vg_lite_buffer_t * buffer);
 
 void lv_vg_lite_matrix_dump_info(const vg_lite_matrix_t * matrix);
+
+void lv_vg_lite_color_dump_info(const vg_lite_color_t color);
 
 bool lv_vg_lite_is_dest_cf_supported(lv_color_format_t cf);
 
@@ -177,6 +178,120 @@ void lv_vg_lite_disable_scissor(void);
 void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u);
 
 void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u);
+
+static inline void lv_vg_lite_draw(vg_lite_buffer_t * target,
+                                   vg_lite_path_t * path,
+                                   vg_lite_fill_t fill_rule,
+                                   vg_lite_matrix_t * matrix,
+                                   vg_lite_blend_t blend,
+                                   vg_lite_color_t color)
+{
+    LV_VG_LITE_ASSERT_DEST_BUFFER(target);
+    LV_VG_LITE_ASSERT_PATH(path);
+    LV_VG_LITE_ASSERT_MATRIX(matrix);
+
+    LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw");
+    LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
+                               target,
+                               path,
+                               fill_rule,
+                               matrix,
+                               blend,
+                               color),
+                           /*Error handler*/
+    {
+        lv_vg_lite_buffer_dump_info(target);
+        lv_vg_lite_path_dump_info(path);
+        LV_LOG_ERROR("fill_rule: 0x%X,", (int)fill_rule);
+        lv_vg_lite_matrix_dump_info(matrix);
+        LV_LOG_ERROR("blend: 0x%X,", (int)blend);
+        lv_vg_lite_color_dump_info(color);
+    });
+    LV_PROFILER_DRAW_END_TAG("vg_lite_draw");
+}
+
+static inline void lv_vg_lite_draw_pattern(vg_lite_buffer_t * target,
+                                           vg_lite_path_t * path,
+                                           vg_lite_fill_t fill_rule,
+                                           vg_lite_matrix_t * path_matrix,
+                                           vg_lite_buffer_t * pattern_image,
+                                           vg_lite_matrix_t * pattern_matrix,
+                                           vg_lite_blend_t blend,
+                                           vg_lite_pattern_mode_t pattern_mode,
+                                           vg_lite_color_t pattern_color,
+                                           vg_lite_color_t color,
+                                           vg_lite_filter_t filter)
+{
+    LV_VG_LITE_ASSERT_DEST_BUFFER(target);
+    LV_VG_LITE_ASSERT_PATH(path);
+    LV_VG_LITE_ASSERT_MATRIX(path_matrix);
+    LV_VG_LITE_ASSERT_SRC_BUFFER(pattern_image);
+    LV_VG_LITE_ASSERT_MATRIX(pattern_matrix);
+
+    LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw_pattern");
+    LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
+                               target,
+                               path,
+                               fill_rule,
+                               path_matrix,
+                               pattern_image,
+                               pattern_matrix,
+                               blend,
+                               pattern_mode,
+                               pattern_color,
+                               color,
+                               filter),
+                           /*Error handler*/
+    {
+        lv_vg_lite_buffer_dump_info(target);
+        lv_vg_lite_path_dump_info(path);
+        LV_LOG_ERROR("fill_rule: 0x%X,", (int)fill_rule);
+        lv_vg_lite_matrix_dump_info(path_matrix);
+        lv_vg_lite_buffer_dump_info(pattern_image);
+        lv_vg_lite_matrix_dump_info(pattern_matrix);
+        LV_LOG_ERROR("blend: 0x%X,", (int)blend);
+        LV_LOG_ERROR("pattern_mode: 0x%X,", (int)pattern_mode);
+        lv_vg_lite_color_dump_info(pattern_color);
+        lv_vg_lite_color_dump_info(color);
+        LV_LOG_ERROR("filter: 0x%X,", (int)filter);
+    });
+    LV_PROFILER_DRAW_END_TAG("vg_lite_draw_pattern");
+}
+
+static inline void lv_vg_lite_blit_rect(vg_lite_buffer_t * target,
+                                        vg_lite_buffer_t * source,
+                                        vg_lite_rectangle_t * rect,
+                                        vg_lite_matrix_t * matrix,
+                                        vg_lite_blend_t blend,
+                                        vg_lite_color_t color,
+                                        vg_lite_filter_t filter)
+{
+    LV_VG_LITE_ASSERT_DEST_BUFFER(target);
+    LV_VG_LITE_ASSERT_SRC_BUFFER(source);
+    LV_VG_LITE_ASSERT_MATRIX(matrix);
+
+    LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_blit_rect");
+    LV_VG_LITE_CHECK_ERROR(vg_lite_blit_rect(
+                               target,
+                               source,
+                               rect,
+                               matrix,
+                               blend,
+                               color,
+                               filter),
+                           /*Error handler*/
+    {
+        lv_vg_lite_buffer_dump_info(target);
+        lv_vg_lite_buffer_dump_info(source);
+        LV_LOG_ERROR("rect: X%d Y%d W%d H%d",
+                     (int)rect->x, (int)rect->y, (int)rect->width, (int)rect->height);
+        lv_vg_lite_matrix_dump_info(matrix);
+        LV_LOG_ERROR("blend: 0x%X", (int)blend);
+        lv_vg_lite_color_dump_info(color);
+        LV_LOG_ERROR("filter: 0x%X", (int)filter);
+    });
+    LV_PROFILER_DRAW_END_TAG("vg_lite_blit_rect");
+}
 
 /**********************
  *      MACROS

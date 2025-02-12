@@ -16,6 +16,22 @@ if sys.version_info < (3,6,0):
   print("Python >=3.6 is required", file=sys.stderr)
   exit(1)
 
+def check_for_tabs(file_path):
+    errors = []
+    with open(file_path, 'r') as file:
+        for line_number, line in enumerate(file, 1):
+            if '\t' in line:
+                errors.append(f" {file_path}:{line_number}")
+
+    if errors:
+        print(f"Tabs found in the following files:", file=sys.stderr)
+        for error in errors:
+            print(error, file=sys.stderr)
+        print("Please replace tabs with spaces.", file=sys.stderr)
+        exit(1)
+
+check_for_tabs(LV_CONF_TEMPLATE)
+
 fin = open(LV_CONF_TEMPLATE)
 fout = open(LV_CONF_INTERNAL, "w", newline='')
 
