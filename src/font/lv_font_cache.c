@@ -109,7 +109,7 @@ const void * lv_font_cache_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw
      */
 #if LV_USE_OS == LV_OS_NONE
     /* If the alignment, stride, and color format is correct, bypass the cache */
-    if(g_dsc->format == LV_FONT_GLYPH_FORMAT_A8
+    if((g_dsc->format == LV_FONT_GLYPH_FORMAT_A8 || g_dsc->format == LV_FONT_GLYPH_FORMAT_A8_ALIGNED)
        && raw_glyph_bitmap == lv_draw_buf_align(raw_glyph_bitmap, LV_COLOR_FORMAT_A8)
        && g_dsc->box_w == lv_draw_buf_width_to_stride(g_dsc->box_w, LV_COLOR_FORMAT_A8)) {
 
