@@ -1622,6 +1622,11 @@ menu "LVGL configuration"
 			int "Font manager name max length"
 			depends on LV_USE_FONT_MANAGER
 			default 32
+		config LV_USE_TEST
+			bool "Enable emulated input devices, time emulation, and screenshot compares."
+		config LV_USE_TEST_SCREENSHOT_COMPARE
+			bool "Enable `lv_test_screenshot_compare`. Requires libpng and a few MB of extra RAM."
+			depends on LV_USE_TEST
 		config LV_USE_XML
 			bool "Enable loading XML UIs runtime"
 		config LVGL_VERSION_MAJOR

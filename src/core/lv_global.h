@@ -53,6 +53,7 @@ extern "C" {
 #include "../draw/sw/lv_draw_sw_mask_private.h"
 #include "../stdlib/builtin/lv_tlsf_private.h"
 #include "../others/sysmon/lv_sysmon_private.h"
+#include "../others/test/lv_test_private.h"
 #include "../layouts/lv_layout_private.h"
 
 /*********************
@@ -220,6 +221,10 @@ typedef struct _lv_global_t {
 #if LV_USE_OBJ_ID_BUILTIN
     void * objid_array;
     uint32_t objid_count;
+#endif
+
+#if LV_USE_TEST
+    lv_test_state_t test_state;
 #endif
 
 #if LV_USE_NUTTX
