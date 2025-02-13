@@ -49,7 +49,7 @@ static void timer_cb(lv_timer_t * timer)
     counter++;
 }
 
-void lv_example_canvas_10(void)
+void lv_example_canvas_11(void)
 {
     /*Create a buffer for the canvas*/
     LV_DRAW_BUF_DEFINE_STATIC(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);
