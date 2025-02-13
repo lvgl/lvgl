@@ -429,7 +429,7 @@ int32_t lv_text_get_width_with_flags(const char * txt, uint32_t length, const lv
     lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
 
     if(length != 0) {
-        while(i < length) {
+        while(txt[i] != '\0' && i < length) {
             uint32_t letter;
             uint32_t letter_next;
             lv_text_encoded_letter_next_2(txt, &letter, &letter_next, &i);
@@ -648,6 +648,11 @@ static uint32_t lv_text_utf8_next(const char * txt, uint32_t * i)
     /*Dummy 'i' pointer is required*/
     uint32_t i_tmp = 0;
     if(i == NULL) i = &i_tmp;
+
+    /* Ensure the string is not null */
+    if(txt == NULL || txt[*i] == '\0') {
+        return result;
+    }
 
     /*Normal ASCII*/
     if(LV_IS_ASCII(txt[*i])) {
