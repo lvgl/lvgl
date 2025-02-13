@@ -64,9 +64,11 @@ static void _vglite_draw_letter(const lv_area_t * mask_area, lv_color_t color, l
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,
-                          const lv_area_t * coords)
+void lv_draw_vglite_label(lv_draw_task_t * t)
 {
+	const lv_draw_label_dsc_t * dsc = t->draw_dsc;
+	const lv_area_t * coords = &t->area;
+
     if(dsc->opa <= LV_OPA_MIN) return;
 
     lv_draw_label_iterate_characters(t, dsc, coords, _draw_vglite_letter);
@@ -91,7 +93,9 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
                     border_draw_dsc.opa = glyph_draw_dsc->opa;
                     border_draw_dsc.color = glyph_draw_dsc->color;
                     border_draw_dsc.width = 1;
-                    lv_draw_vglite_border(t, &border_draw_dsc, glyph_draw_dsc->bg_coords);
+                    t->draw_dsc = &border_draw_dsc;
+                    t->area = *glyph_draw_dsc->bg_coords;
+                    lv_draw_vglite_border(t);
 #endif
                 }
                 break;
@@ -148,7 +152,9 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     }
 
     if(fill_draw_dsc && fill_area) {
-        lv_draw_vglite_fill(t, fill_draw_dsc, fill_area);
+        t->draw_dsc = fill_draw_dsc;
+        t->area = *fill_area;
+        lv_draw_vglite_fill(t);
     }
 }
 

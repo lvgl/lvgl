@@ -84,9 +84,11 @@ static void _border_set_scissoring(const lv_area_t * coords, int32_t line_width,
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_border(lv_draw_task_t * t, const lv_draw_border_dsc_t * dsc,
-                           const lv_area_t * coords)
+void lv_draw_vglite_border(lv_draw_task_t * t)
 {
+    const lv_draw_border_dsc_t * dsc = t->draw_dsc;
+    const lv_area_t * coords = &t->area;
+
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
     if(dsc->width == 0)

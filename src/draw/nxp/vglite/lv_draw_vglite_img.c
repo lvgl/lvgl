@@ -125,9 +125,11 @@ static vg_lite_color_t _vglite_recolor(const lv_draw_image_dsc_t * dsc);
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
-                        const lv_area_t * coords)
+void lv_draw_vglite_img(lv_draw_task_t * t)
 {
+    const lv_draw_image_dsc_t * dsc = t->draw_dsc;
+    const lv_area_t * coords = &t->area;
+
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
