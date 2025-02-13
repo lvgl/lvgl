@@ -794,13 +794,15 @@
 
 /* File system interfaces for common APIs */
 
-/** Setting a default driver letter allows skipping the driver prefix in filepaths. */
+/** Setting a default driver letter allows skipping the driver prefix in filepaths.
+ *  Documentation about how to use the below driver-identifier letters can be found at
+ *  https://docs.lvgl.io/master/details/main-components/fs.html#lv-fs-identifier-letters . */
 #define LV_FS_DEFAULT_DRIVER_LETTER '\0'
 
 /** API for fopen, fread, etc. */
 #define LV_USE_FS_STDIO 0
 #if LV_USE_FS_STDIO
-    #define LV_FS_STDIO_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+    #define LV_FS_STDIO_LETTER '\0'     /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
     #define LV_FS_STDIO_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
     #define LV_FS_STDIO_CACHE_SIZE 0    /**< >0 to cache this number of bytes in lv_fs_read() */
 #endif
@@ -808,7 +810,7 @@
 /** API for open, read, etc. */
 #define LV_USE_FS_POSIX 0
 #if LV_USE_FS_POSIX
-    #define LV_FS_POSIX_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+    #define LV_FS_POSIX_LETTER '\0'     /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
     #define LV_FS_POSIX_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
     #define LV_FS_POSIX_CACHE_SIZE 0    /**< >0 to cache this number of bytes in lv_fs_read() */
 #endif
@@ -816,7 +818,7 @@
 /** API for CreateFile, ReadFile, etc. */
 #define LV_USE_FS_WIN32 0
 #if LV_USE_FS_WIN32
-    #define LV_FS_WIN32_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+    #define LV_FS_WIN32_LETTER '\0'     /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
     #define LV_FS_WIN32_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
     #define LV_FS_WIN32_CACHE_SIZE 0    /**< >0 to cache this number of bytes in lv_fs_read() */
 #endif
@@ -824,7 +826,7 @@
 /** API for FATFS (needs to be added separately). Uses f_open, f_read, etc. */
 #define LV_USE_FS_FATFS 0
 #if LV_USE_FS_FATFS
-    #define LV_FS_FATFS_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+    #define LV_FS_FATFS_LETTER '\0'     /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
     #define LV_FS_FATFS_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
     #define LV_FS_FATFS_CACHE_SIZE 0    /**< >0 to cache this number of bytes in lv_fs_read() */
 #endif
@@ -832,34 +834,34 @@
 /** API for memory-mapped file access. */
 #define LV_USE_FS_MEMFS 0
 #if LV_USE_FS_MEMFS
-    #define LV_FS_MEMFS_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+    #define LV_FS_MEMFS_LETTER '\0'     /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
 #endif
 
 /** API for LittleFs. */
 #define LV_USE_FS_LITTLEFS 0
 #if LV_USE_FS_LITTLEFS
-    #define LV_FS_LITTLEFS_LETTER '\0'  /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
-    #define LV_FS_LITTLEFS_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
+    #define LV_FS_LITTLEFS_LETTER '\0'  /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
+    #define LV_FS_LITTLEFS_PATH ""      /**< Set the working directory. File/directory paths will be appended to it. */
 #endif
 
 /** API for Arduino LittleFs. */
 #define LV_USE_FS_ARDUINO_ESP_LITTLEFS 0
 #if LV_USE_FS_ARDUINO_ESP_LITTLEFS
-    #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER '\0'     /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
-    #define LV_FS_ARDUINO_ESP_LITTLEFS_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
+    #define LV_FS_ARDUINO_ESP_LITTLEFS_LETTER '\0'  /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
+    #define LV_FS_ARDUINO_ESP_LITTLEFS_PATH ""      /**< Set the working directory. File/directory paths will be appended to it. */
 #endif
 
 /** API for Arduino Sd. */
 #define LV_USE_FS_ARDUINO_SD 0
 #if LV_USE_FS_ARDUINO_SD
-    #define LV_FS_ARDUINO_SD_LETTER '\0'          /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
-    #define LV_FS_ARDUINO_SD_PATH ""         /**< Set the working directory. File/directory paths will be appended to it. */
+    #define LV_FS_ARDUINO_SD_LETTER '\0'  /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
+    #define LV_FS_ARDUINO_SD_PATH ""      /**< Set the working directory. File/directory paths will be appended to it. */
 #endif
 
 /** API for UEFI */
 #define LV_USE_FS_UEFI 0
 #if LV_USE_FS_UEFI
-    #define LV_FS_UEFI_LETTER '\0'          /**< Set an upper cased letter on which the drive will accessible (e.g. 'A') */
+    #define LV_FS_UEFI_LETTER '\0'      /**< Set an upper-case driver-identifier letter for this driver (e.g. 'A'). */
 #endif
 
 /** LODEPNG decoder library */

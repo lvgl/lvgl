@@ -34,8 +34,8 @@ struct _lv_vector_path_t {
 
 struct _lv_vector_gradient_t {
     lv_vector_gradient_style_t style;
-    lv_gradient_stop_t   stops[LV_GRADIENT_MAX_STOPS];  /**< A gradient stop array */
-    uint16_t             stops_count;                   /**< The number of used stops in the array */
+    lv_grad_stop_t   stops[LV_GRADIENT_MAX_STOPS];  /**< A gradient stop array */
+    uint16_t         stops_count;                   /**< The number of used stops in the array */
     float x1;
     float y1;
     float x2;

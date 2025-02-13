@@ -41,7 +41,6 @@ extern "C" {
 #include "src/draw/lv_draw_vector_private.h"
 #include "src/draw/lv_draw_buf_private.h"
 #include "src/draw/lv_draw_mask_private.h"
-#include "src/draw/sw/lv_draw_sw_gradient_private.h"
 #include "src/draw/sw/lv_draw_sw_private.h"
 #include "src/draw/sw/lv_draw_sw_mask_private.h"
 #include "src/draw/sw/blend/lv_draw_sw_blend_private.h"
