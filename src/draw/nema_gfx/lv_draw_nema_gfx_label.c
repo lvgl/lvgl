@@ -129,7 +129,7 @@ void lv_draw_nema_gfx_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,
     uint32_t dst_nema_cf = lv_nemagfx_cf_to_nema(dst_cf);
 
     int32_t stride = (dst_cf >= LV_COLOR_FORMAT_NEMA_TSC_START && dst_cf <= LV_COLOR_FORMAT_NEMA_TSC_END) ?
-                    -1 : lv_area_get_width(&(layer->buf_area))*lv_color_format_get_size(dst_cf);
+                     -1 : lv_area_get_width(&(layer->buf_area)) * lv_color_format_get_size(dst_cf);
 
     nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(layer->draw_buf->data), lv_area_get_width(&(layer->buf_area)),
                       lv_area_get_height(&(layer->buf_area)), dst_nema_cf, stride);
@@ -330,7 +330,7 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
             lv_area_copy(&rel_coords, &blend_area);
             lv_area_move(&rel_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
-            int32_t x,y,w,h;
+            int32_t x, y, w, h;
 
             /*Read the static font*/
             if(is_raw_bitmap) {
@@ -364,8 +364,9 @@ static void _draw_nema_gfx_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyp
                 nema_raster_rect(x, y, w, h);
             }
             else {
-                nema_bind_src_tex((uintptr_t)(mask_buf), lv_area_get_width(&mask_area),lv_area_get_height(&mask_area), src_cf, lv_area_get_width(&mask_area),
-                                   NEMA_FILTER_BL);
+                nema_bind_src_tex((uintptr_t)(mask_buf), lv_area_get_width(&mask_area), lv_area_get_height(&mask_area), src_cf,
+                                  lv_area_get_width(&mask_area),
+                                  NEMA_FILTER_BL);
                 nema_blit_rect(x, y, w, h);
                 lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)t->draw_unit;
                 nema_cl_submit(&(draw_nema_gfx_unit->cl));
@@ -819,12 +820,12 @@ static void _draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const l
         /* Performance Optimization for lv_font_fmt_txt_dsc_t fonts, always request raw bitmaps */
         /*Exception for w*h >= 2046*/
         is_raw_bitmap = false;
-        if(g.box_h * g.box_w <= 2046){
+        if(g.box_h * g.box_w <= 2046) {
             g.req_raw_bitmap = 1;
-        if(font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
-            lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
-            if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
-                is_raw_bitmap = true;
+            if(font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
+                lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
+                if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
+                    is_raw_bitmap = true;
                 }
             }
         }

@@ -66,7 +66,7 @@ void lv_draw_nema_gfx_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc, c
 
     /* the stride should be computed internally for NEMA_TSC images and images missing a stride value */
     int32_t stride = (dst_cf >= LV_COLOR_FORMAT_NEMA_TSC_START && dst_cf <= LV_COLOR_FORMAT_NEMA_TSC_END) ?
-                    -1 : lv_area_get_width(&(layer->buf_area))*lv_color_format_get_size(dst_cf);
+                     -1 : lv_area_get_width(&(layer->buf_area)) * lv_color_format_get_size(dst_cf);
 
     nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(layer->draw_buf->data), lv_area_get_width(&(layer->buf_area)),
                       lv_area_get_height(&(layer->buf_area)), dst_nema_cf, stride);
