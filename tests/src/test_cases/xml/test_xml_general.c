@@ -35,12 +35,16 @@ void test_xml_widget_direct_create(void)
         "range_max", "100",
         "mode", "symmetrical",
         "value", "50",
+        "name", "my_slider",
         NULL, NULL,
     };
 
     slider = lv_xml_create(lv_screen_active(), "lv_slider", attrs);
     lv_obj_set_pos(slider, 10, 200);
-
+#if LV_USE_OBJ_NAME
+    lv_obj_t * same_slider = lv_obj_get_child_by_name(lv_screen_active(), "my_slider");
+    TEST_ASSERT_EQUAL_PTR(slider, same_slider);
+#endif
     TEST_ASSERT_EQUAL_SCREENSHOT("xml/widget_create_1.png");
 }
 

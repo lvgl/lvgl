@@ -196,28 +196,28 @@ void test_obj_get_by_name(void)
 
     lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW);
 
-    lv_obj_t * cont1 = lv_obj_create(lv_screen_active());
-    lv_obj_set_name_static(cont1, "first_static");
-    lv_obj_set_name(cont1, "first_non_static");
-    lv_obj_set_name_static(cont1, "first");
+    lv_obj_t * cont0 = lv_obj_create(lv_screen_active());
+    lv_obj_set_name_static(cont0, "zero_static");
+    lv_obj_set_name(cont0, "zero_non_static");
+    lv_obj_set_name_static(cont0, "zero");
 
+    lv_obj_t * cont1 = lv_obj_create(lv_screen_active());
+    lv_obj_set_flex_flow(cont1, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_name(cont1, "first_non_static");
+    lv_obj_set_name(cont1, "first");
     lv_obj_t * cont2 = lv_obj_create(lv_screen_active());
-    lv_obj_set_flex_flow(cont2, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_name(cont2, "second_non_static");
-    lv_obj_set_name(cont2, "second");
     lv_obj_t * cont3 = lv_obj_create(lv_screen_active());
-    lv_obj_t * cont4 = lv_obj_create(lv_screen_active());
-    lv_obj_set_name_static(cont4, "forth_static");
-    lv_obj_set_name_static(cont4, "forth");
+    lv_obj_set_name_static(cont3, "third_static");
+    lv_obj_set_name_static(cont3, "third");
 
     lv_obj_t * root_label = lv_label_create(lv_screen_active());
     lv_label_set_text(root_label, "Root");
     lv_obj_set_name(root_label, "my_label");
 
-    lv_slider_create(cont2);
+    lv_slider_create(cont1);
 
-    lv_obj_t * btn = lv_button_create(cont2);
-    lv_switch_create(cont2);
+    lv_obj_t * btn = lv_button_create(cont1);
+    lv_switch_create(cont1);
 
     lv_obj_t * hello_label = lv_label_create(btn);
     lv_label_set_text(hello_label, "Hello");
@@ -230,28 +230,28 @@ void test_obj_get_by_name(void)
      * Get by name
      *------------*/
 
-    found_obj = lv_obj_get_child_by_name(lv_screen_active(), "second");
-    TEST_ASSERT_EQUAL(cont2, found_obj);
+    found_obj = lv_obj_get_child_by_name(lv_screen_active(), "first");
+    TEST_ASSERT_EQUAL(cont1, found_obj);
 
-    found_obj = lv_obj_get_child_by_name(lv_screen_active(), "lv_obj_3");
-    TEST_ASSERT_EQUAL(cont3, found_obj);
+    found_obj = lv_obj_get_child_by_name(lv_screen_active(), "lv_obj_2");
+    TEST_ASSERT_EQUAL(cont2, found_obj);
 
     found_obj = lv_obj_get_child_by_name(lv_screen_active(), "fifth");
     TEST_ASSERT_EQUAL(NULL, found_obj);
 
-    found_obj = lv_obj_get_child_by_name(lv_screen_active(), "second/lv_button_1/my_label");
+    found_obj = lv_obj_get_child_by_name(lv_screen_active(), "first/lv_button_0/my_label");
     TEST_ASSERT_EQUAL(hello_label, found_obj);
 
     /*"hello" label doesn't have children*/
-    found_obj = lv_obj_get_child_by_name(lv_screen_active(), "second/lv_button_1/my_label/no_child");
+    found_obj = lv_obj_get_child_by_name(lv_screen_active(), "first/lv_button_0/my_label/no_child");
     TEST_ASSERT_EQUAL(NULL, found_obj);
 
     /*Non existing child*/
-    found_obj = lv_obj_get_child_by_name(lv_screen_active(), "second/lv_button_1/other_label");
+    found_obj = lv_obj_get_child_by_name(lv_screen_active(), "first/lv_button_0/other_label");
     TEST_ASSERT_EQUAL(NULL, found_obj);
 
     /*Extra slash*/
-    found_obj = lv_obj_get_child_by_name(lv_screen_active(), "second//lv_button_1/other_label");
+    found_obj = lv_obj_get_child_by_name(lv_screen_active(), "first//lv_button_0/other_label");
     TEST_ASSERT_EQUAL(NULL, found_obj);
 
     /*Empty*/
@@ -262,13 +262,13 @@ void test_obj_get_by_name(void)
      * Find by name
      *------------*/
 
-    found_obj = lv_obj_find_by_name(lv_screen_active(), "lv_obj_3");
-    TEST_ASSERT_EQUAL(cont3, found_obj);
+    found_obj = lv_obj_find_by_name(lv_screen_active(), "lv_obj_2");
+    TEST_ASSERT_EQUAL(cont2, found_obj);
 
     found_obj = lv_obj_find_by_name(lv_screen_active(), "my_label");
     TEST_ASSERT_EQUAL(root_label, found_obj);
 
-    found_obj = lv_obj_find_by_name(cont2, "my_label");
+    found_obj = lv_obj_find_by_name(cont1, "my_label");
     TEST_ASSERT_EQUAL(hello_label, found_obj);
 }
 

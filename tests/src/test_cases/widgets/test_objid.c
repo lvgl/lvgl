@@ -37,8 +37,8 @@ void test_obj_id_get_child(void)
     lv_obj_set_id(child, (void *)(lv_uintptr_t)1);
     lv_obj_set_id(grandchild, (void *)(lv_uintptr_t)2);
 
-    TEST_ASSERT_EQUAL_PTR(child, lv_obj_get_child_by_id(NULL, (void *)(lv_uintptr_t)1));
-    TEST_ASSERT_EQUAL_PTR(grandchild, lv_obj_get_child_by_id(NULL, (void *)(lv_uintptr_t)2));
+    TEST_ASSERT_EQUAL_PTR(child, lv_obj_find_by_id(NULL, (void *)(lv_uintptr_t)1));
+    TEST_ASSERT_EQUAL_PTR(grandchild, lv_obj_find_by_id(NULL, (void *)(lv_uintptr_t)2));
 }
 
 #endif
