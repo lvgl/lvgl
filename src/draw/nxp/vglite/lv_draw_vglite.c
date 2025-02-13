@@ -417,28 +417,28 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_LABEL:
-            lv_draw_vglite_label(t, t->draw_dsc, &t->area);
+            lv_draw_vglite_label(t);
             break;
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_vglite_fill(t, t->draw_dsc, &t->area);
+            lv_draw_vglite_fill(t);
             break;
         case LV_DRAW_TASK_TYPE_BORDER:
-            lv_draw_vglite_border(t, t->draw_dsc, &t->area);
+            lv_draw_vglite_border(t);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_vglite_img(t, t->draw_dsc, &t->area);
+            lv_draw_vglite_img(t);
             break;
         case LV_DRAW_TASK_TYPE_ARC:
-            lv_draw_vglite_arc(t, t->draw_dsc, &t->area);
+            lv_draw_vglite_arc(t);
             break;
         case LV_DRAW_TASK_TYPE_LINE:
-            lv_draw_vglite_line(t, t->draw_dsc);
+            lv_draw_vglite_line(t);
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
-            lv_draw_vglite_layer(t, t->draw_dsc, &t->area);
+            lv_draw_vglite_layer(t);
             break;
         case LV_DRAW_TASK_TYPE_TRIANGLE:
-            lv_draw_vglite_triangle(t, t->draw_dsc);
+            lv_draw_vglite_triangle(t);
             break;
         default:
             break;
