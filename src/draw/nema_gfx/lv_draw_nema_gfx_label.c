@@ -48,6 +48,7 @@
 #define LABEL_RECOLOR_PAR_LENGTH 6
 #define LV_LABEL_HINT_UPDATE_TH 1024 /*Update the "hint" if the label's y coordinates have changed more then this*/
 #define FT_F26DOT6_SHIFT 6
+#define NEMA_COORD_LIMIT 2046
 
 #define font_draw_buf_handlers &(LV_GLOBAL_DEFAULT()->font_draw_buf_handlers)
 
@@ -818,9 +819,9 @@ static void _draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  const l
         }
 
         /* Performance Optimization for lv_font_fmt_txt_dsc_t fonts, always request raw bitmaps */
-        /*Exception for w*h >= 2046*/
+        /*Exception for w*h >= NEMA_COORD_LIMIT due to HW limitation on data handling*/
         is_raw_bitmap = false;
-        if(g.box_h * g.box_w <= 2046) {
+        if(g.box_h * g.box_w <= NEMA_COORD_LIMIT) {
             g.req_raw_bitmap = 1;
             if(font->get_glyph_bitmap == lv_font_get_bitmap_fmt_txt) {
                 lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
