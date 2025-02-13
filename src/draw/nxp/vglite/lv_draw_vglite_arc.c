@@ -96,10 +96,9 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc,
-                        const lv_area_t * coords)
+void lv_draw_vglite_arc(lv_draw_task_t * t)
 {
-    LV_UNUSED(coords);
+    const lv_draw_arc_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;

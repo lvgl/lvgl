@@ -55,8 +55,10 @@ static void _vglite_draw_line(const lv_point_t * point1, const lv_point_t * poin
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
+void lv_draw_vglite_line(lv_draw_task_t * t)
 {
+    const lv_draw_line_dsc_t * dsc = &t->draw_dsc;
+
     if(dsc->width == 0)
         return;
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)

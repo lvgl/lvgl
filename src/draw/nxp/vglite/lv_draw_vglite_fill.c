@@ -66,9 +66,11 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc,
-                         const lv_area_t * coords)
+void lv_draw_vglite_fill(lv_draw_task_t * t)
 {
+    const lv_draw_fill_dsc_t * dsc = t->draw_dsc;
+    const lv_area_t * coords = &t->area;
+
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
