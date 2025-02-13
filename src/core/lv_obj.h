@@ -407,7 +407,7 @@ void * lv_obj_get_id(const lv_obj_t * obj);
  * @param id        the id of the child object
  * @return          pointer to the child object or NULL if not found
  */
-lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, const void * id);
+lv_obj_t * lv_obj_find_by_id(const lv_obj_t * obj, const void * id);
 
 /**
  * Assign id to object if not previously assigned.

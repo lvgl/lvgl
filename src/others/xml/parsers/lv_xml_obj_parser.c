@@ -57,7 +57,9 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
     for(int i = 0; attrs[i]; i += 2) {
         const char * name = attrs[i];
         const char * value = attrs[i + 1];
-
+#if LV_USE_OBJ_NAME
+        if(lv_streq("name", name)) lv_obj_set_name(item, value);
+#endif
         if(lv_streq("x", name)) lv_obj_set_x(item, lv_xml_to_size(value));
         else if(lv_streq("y", name)) lv_obj_set_y(item, lv_xml_to_size(value));
         else if(lv_streq("width", name)) lv_obj_set_width(item, lv_xml_to_size(value));

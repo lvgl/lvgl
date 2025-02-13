@@ -436,7 +436,7 @@ void * lv_obj_get_id(const lv_obj_t * obj)
     return obj->id;
 }
 
-lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, const void * id)
+lv_obj_t * lv_obj_find_by_id(const lv_obj_t * obj, const void * id)
 {
     LV_LOG_WARN("DEPRECATED: IDs are used only to print the widget trees. To find a widget use obj_name");
 
@@ -453,7 +453,7 @@ lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, const void * id)
     /*Search children*/
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
-        lv_obj_t * found = lv_obj_get_child_by_id(child, id);
+        lv_obj_t * found = lv_obj_find_by_id(child, id);
         if(found != NULL) return found;
     }
 

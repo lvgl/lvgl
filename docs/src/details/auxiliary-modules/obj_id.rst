@@ -24,7 +24,7 @@ Once enabled, several things change:
 - these two API functions become available:
 
   - :cpp:expr:`lv_obj_get_id(widget)`,
-  - :cpp:expr:`lv_obj_get_child_by_id(widget, id)`;
+  - :cpp:expr:`lv_obj_find_by_id(widget, id)`;
 
 - several more Widget-ID-related API functions become available if
   :c:macro:`LV_USE_OBJ_ID_BUILTIN` is non-zero (more on this below);
@@ -182,7 +182,7 @@ state of the Widget Tree when :cpp:expr:`lv_obj_dump_tree(widget)` was called.
 
 For example, if a pointer to a deleted Widget is stored in a Timer's
 :cpp:expr:`timer->user_data` field when the timer event callback is called, attempted
-use of that pointer will likly cause a crash because the pointer is not valid any
+use of that pointer will likely cause a crash because the pointer is not valid any
 more.  However, a timely dump of the Widget Tree right before that point will show
 that the Widget no longer exists.
 
@@ -190,7 +190,7 @@ that the Widget no longer exists.
 Find child by ID
 ----------------
 
-:cpp:expr:`lv_obj_get_child_by_id(widget, id)` will perform a recursive walk through
+:cpp:expr:`lv_obj_find_by_id(widget, id)` will perform a recursive walk through
 ``widget``\ 's children and return the first child encountered having the given ID.
 
 
