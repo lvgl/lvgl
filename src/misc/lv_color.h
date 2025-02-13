@@ -69,10 +69,16 @@ enum {
                                             (cf) == LV_COLOR_FORMAT_A2 ? 2 :        \
                                             (cf) == LV_COLOR_FORMAT_I4 ? 4 :        \
                                             (cf) == LV_COLOR_FORMAT_A4 ? 4 :        \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC4 ? 4 : \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC6 ? 6 : \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC6A ? 6 : \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC6AP ? 6 : \
                                             (cf) == LV_COLOR_FORMAT_L8 ? 8 :        \
                                             (cf) == LV_COLOR_FORMAT_A8 ? 8 :        \
                                             (cf) == LV_COLOR_FORMAT_I8 ? 8 :        \
                                             (cf) == LV_COLOR_FORMAT_ARGB2222 ? 8 :  \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC12 ? 12 : \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC12A ? 12 : \
                                             (cf) == LV_COLOR_FORMAT_AL88 ? 16 :     \
                                             (cf) == LV_COLOR_FORMAT_RGB565 ? 16 :   \
                                             (cf) == LV_COLOR_FORMAT_RGB565A8 ? 16 : \

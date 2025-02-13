@@ -76,6 +76,8 @@ static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * ta
 
 static int32_t nema_gfx_delete(lv_draw_unit_t * draw_unit);
 
+static int32_t nema_gfx_wait_for_finish(lv_draw_unit_t * draw_unit);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -91,16 +93,17 @@ static int32_t nema_gfx_delete(lv_draw_unit_t * draw_unit);
 void lv_draw_nema_gfx_init(void)
 {
     lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = lv_draw_create_unit(sizeof(lv_draw_nema_gfx_unit_t));
-    /*Initialize NemaGFX*/
+    /*Initiallize NemaGFX*/
     nema_init();
 
     draw_nema_gfx_unit->base_unit.dispatch_cb = nema_gfx_dispatch;
     draw_nema_gfx_unit->base_unit.evaluate_cb = nema_gfx_evaluate;
     draw_nema_gfx_unit->base_unit.delete_cb = nema_gfx_delete;
+    draw_nema_gfx_unit->base_unit.wait_for_finish_cb = nema_gfx_wait_for_finish;
     draw_nema_gfx_unit->base_unit.name = "NEMA_GFX";
 
 #if LV_USE_NEMA_VG
-    /*Initialize NemaVG */
+    /*Initiallize NemaVG */
     nema_vg_init(LV_NEMA_GFX_MAX_RESX, LV_NEMA_GFX_MAX_RESY);
     /* Allocate VG Buffers*/
     draw_nema_gfx_unit->paint = nema_vg_paint_create();
@@ -129,6 +132,14 @@ void lv_draw_nema_gfx_deinit(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static int32_t nema_gfx_wait_for_finish(lv_draw_unit_t * draw_unit)
+{
+    lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)draw_unit;
+    nema_cl_submit(&(draw_nema_gfx_unit->cl));
+    nema_cl_wait(&(draw_nema_gfx_unit->cl));
+	return 1;
+}
 
 static int32_t nema_gfx_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
 {
