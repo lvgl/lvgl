@@ -25,6 +25,7 @@ extern "C" {
 #include "scroll/lv_example_scroll.h"
 #include "styles/lv_example_style.h"
 #include "widgets/lv_example_widgets.h"
+#include "grad/lv_example_grad.h"
 
 /*********************
  *      DEFINES

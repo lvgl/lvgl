@@ -571,7 +571,7 @@ void lv_vector_dsc_set_fill_gradient_spread(lv_vector_dsc_t * dsc, lv_vector_gra
     dsc->current_dsc.fill_dsc.gradient.spread = spread;
 }
 
-void lv_vector_dsc_set_fill_gradient_color_stops(lv_vector_dsc_t * dsc, const lv_gradient_stop_t * stops,
+void lv_vector_dsc_set_fill_gradient_color_stops(lv_vector_dsc_t * dsc, const lv_grad_stop_t * stops,
                                                  uint16_t count)
 {
     if(count > LV_GRADIENT_MAX_STOPS) {
@@ -579,7 +579,7 @@ void lv_vector_dsc_set_fill_gradient_color_stops(lv_vector_dsc_t * dsc, const lv
         count = LV_GRADIENT_MAX_STOPS;
     }
 
-    lv_memcpy(&(dsc->current_dsc.fill_dsc.gradient.stops), stops, sizeof(lv_gradient_stop_t) * count);
+    lv_memcpy(&(dsc->current_dsc.fill_dsc.gradient.stops), stops, sizeof(lv_grad_stop_t) * count);
     dsc->current_dsc.fill_dsc.gradient.stops_count = count;
 }
 
@@ -674,7 +674,7 @@ void lv_vector_dsc_set_stroke_gradient_spread(lv_vector_dsc_t * dsc, lv_vector_g
     dsc->current_dsc.stroke_dsc.gradient.spread = spread;
 }
 
-void lv_vector_dsc_set_stroke_gradient_color_stops(lv_vector_dsc_t * dsc, const lv_gradient_stop_t * stops,
+void lv_vector_dsc_set_stroke_gradient_color_stops(lv_vector_dsc_t * dsc, const lv_grad_stop_t * stops,
                                                    uint16_t count)
 {
     if(count > LV_GRADIENT_MAX_STOPS) {
@@ -682,7 +682,7 @@ void lv_vector_dsc_set_stroke_gradient_color_stops(lv_vector_dsc_t * dsc, const 
         count = LV_GRADIENT_MAX_STOPS;
     }
 
-    lv_memcpy(&(dsc->current_dsc.stroke_dsc.gradient.stops), stops, sizeof(lv_gradient_stop_t) * count);
+    lv_memcpy(&(dsc->current_dsc.stroke_dsc.gradient.stops), stops, sizeof(lv_grad_stop_t) * count);
     dsc->current_dsc.stroke_dsc.gradient.stops_count = count;
 }
 

@@ -18,7 +18,7 @@ void lv_example_style_18(void)
     static lv_grad_dsc_t linear_gradient_dsc;     /*NOTE: the gradient descriptor must be static or global variable!*/
 
     lv_style_init(&style_with_linear_gradient_bg);
-    lv_gradient_init_stops(&linear_gradient_dsc, grad_colors, NULL, NULL, sizeof(grad_colors) / sizeof(lv_color_t));
+    lv_grad_init_stops(&linear_gradient_dsc, grad_colors, NULL, NULL, sizeof(grad_colors) / sizeof(lv_color_t));
     lv_grad_linear_init(&linear_gradient_dsc, lv_pct(0), lv_pct(0), lv_pct(20), lv_pct(100), LV_GRAD_EXTEND_REFLECT);
     lv_style_set_bg_grad(&style_with_linear_gradient_bg, &linear_gradient_dsc);
     lv_style_set_bg_opa(&style_with_linear_gradient_bg, LV_OPA_COVER);
@@ -28,7 +28,7 @@ void lv_example_style_18(void)
     static lv_grad_dsc_t radial_gradient_dsc;     /*NOTE: the gradient descriptor must be static or global variable!*/
 
     lv_style_init(&style_with_radial_gradient_bg);
-    lv_gradient_init_stops(&radial_gradient_dsc, grad_colors, NULL, NULL, sizeof(grad_colors) / sizeof(lv_color_t));
+    lv_grad_init_stops(&radial_gradient_dsc, grad_colors, NULL, NULL, sizeof(grad_colors) / sizeof(lv_color_t));
     lv_grad_radial_init(&radial_gradient_dsc, lv_pct(30), lv_pct(30), lv_pct(100), lv_pct(100), LV_GRAD_EXTEND_REFLECT);
     lv_style_set_bg_grad(&style_with_radial_gradient_bg, &radial_gradient_dsc);
     lv_style_set_bg_opa(&style_with_radial_gradient_bg, LV_OPA_COVER);

@@ -509,7 +509,7 @@ static resolved_path_t lv_fs_resolve_path(const char * path)
 {
     resolved_path_t resolved;
 
-#if LV_FS_DEFAULT_DRIVER_LETTER != '\0' /*When using default drive letter, strict format (X:) is mandatory*/
+#if LV_FS_DEFAULT_DRIVER_LETTER != '\0' /* When using default driver-identifier letter, strict format (X:) is mandatory */
     bool has_drive_prefix = ('A' <= path[0]) && (path[0] <= 'Z') && (path[1] == ':');
 
     if(has_drive_prefix) {
