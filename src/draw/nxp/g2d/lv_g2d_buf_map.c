@@ -34,20 +34,7 @@ static lv_map_item_t * _map_create_item(void * key, struct g2d_buf * value);
 
 static void _map_free_item(lv_map_item_t * item);
 
-void _handle_collision(unsigned long index, lv_map_item_t * item);
-
-lv_list_t * _list_alloc(void);
-
-lv_list_t * _list_push(lv_list_t * list, lv_map_item_t * item);
-
-lv_list_t * _list_pop(lv_list_t * list);
-
-void _list_free(lv_list_t * list);
-
-lv_list_t ** _create_overflow_list(void);
-
-void _free_overflow_list(void);
-
+static void _handle_collision(unsigned long index, lv_map_item_t * item);
 
 /**********************
  *  STATIC VARIABLES
@@ -69,23 +56,29 @@ void g2d_create_buf_map(void)
     table->size = LV_G2D_HASH_TABLE_SIZE;
     table->count = 0;
     table->items = (lv_map_item_t **) lv_malloc_zeroed(table->size * sizeof(lv_map_item_t *));
+    table->overflow_list = (lv_array_t **) lv_malloc_zeroed(table->size * sizeof(lv_array_t *));
 
-    for(int i = 0; i < table->size; i++)
+    for(int i = 0; i < table->size; i++) {
         table->items[i] = NULL;
-
-    table->overflow_list = _create_overflow_list();
+        table->overflow_list[i] = NULL;
+    }
 }
 
 void g2d_free_buf_map(void)
 {
     for(int i = 0; i < table->size; i++) {
+        if(table->overflow_list[i]) {
+            lv_array_deinit(table->overflow_list[i]);
+            lv_free(table->overflow_list[i]);
+        }
+
         lv_map_item_t * item = table->items[i];
         if(item != NULL)
             _map_free_item(item);
     }
 
-    _free_overflow_list();
     lv_free(table->items);
+    lv_free(table->overflow_list);
     lv_free(table);
 }
 
@@ -126,18 +119,23 @@ struct g2d_buf * g2d_search_buf_map(void * key)
 {
     int index = _map_hash_function(key);
     lv_map_item_t * item = table->items[index];
-    lv_list_t * head = table->overflow_list[index];
+    lv_array_t * list = (lv_array_t *)table->overflow_list[index];
 
-    if(item != NULL) {
+    if(item == NULL)
+        return NULL;
+
+    if(item->key == key)
+        return item->value;
+
+    if(list == NULL)
+        return NULL;
+
+    for(uint32_t i = 0; i < lv_array_size(list); i++) {
+        item = (lv_map_item_t *)lv_array_at(list, i);
         if(item->key == key)
             return item->value;
-
-        if(head == NULL)
-            return NULL;
-
-        item = head->item;
-        head = head->next;
     }
+
     return NULL;
 }
 
@@ -146,54 +144,26 @@ void g2d_free_item(void * key)
     /* Delete an item from the table. */
     int index = _map_hash_function(key);
     lv_map_item_t * item = table->items[index];
-    lv_list_t * head = table->overflow_list[index];
+    lv_array_t * list = (lv_array_t *)table->overflow_list[index];
 
     if(item == NULL) {
         return;
     }
-    else if(head == NULL && item->key == key) {
+    else if(list == NULL && item->key == key) {
         /* No collision chain, just remove item. */
         table->items[index] = NULL;
         _map_free_item(item);
         table->count--;
         return;
     }
-    else if(head != NULL) {
+    else if(list != NULL) {
         /* Collision chain exists. */
-        if(item->key == key) {
-            /* Remove this item and set the head as the new item. */
-            _map_free_item(item);
-            lv_list_t * node = head;
-            head = head->next;
-            node->next = NULL;
-            table->items[index] = _map_create_item(node->item->key, node->item->value);
-            _list_free(node);
-            table->overflow_list[index] = head;
-            return;
-        }
-
-        lv_list_t * curr = head;
-        lv_list_t * prev = NULL;
-
-        while(curr) {
-            if(curr->item->key == key) {
-                if(prev == NULL) {
-                    /* First element of the chain. */
-                    _list_free(head);
-                    table->overflow_list[index] = NULL;
-                    return;
-                }
-                else {
-                    /* Somewhere in the chain. */
-                    prev->next = curr->next;
-                    curr->next = NULL;
-                    _list_free(curr);
-                    table->overflow_list[index] = head;
-                    return;
-                }
+        for(uint32_t i = 0; i < lv_array_size(list); i++) {
+            item = (lv_map_item_t *)lv_array_at(list, i);
+            if(item->key == key) {
+                lv_array_remove(list, i);
+                return;
             }
-            curr = curr->next;
-            prev = curr;
         }
     }
 }
@@ -205,6 +175,13 @@ void g2d_print_table(void)
     for(int i = 0; i < table->size; i++) {
         if(table->items[i]) {
             LV_LOG("Index:%d, Key:%p, Value:%p\n", i, table->items[i] -> key, table->items[i]->value);
+            if(table->overflow_list[i]) {
+                for(int j = 0 ; j < lv_array_size(table->overflow_list[i]); j++) {
+                    lv_map_item_t * item = (lv_map_item_t *)lv_array_at(table->overflow_list[i], j);
+                    LV_LOG("Index:%d, Key:%p, Value:%p\n", i, item -> key, item->value);
+                }
+
+            }
         }
     }
 
@@ -215,7 +192,7 @@ void g2d_print_table(void)
  *   STATIC FUNCTIONS
  **********************/
 
-unsigned long _map_hash_function(void * ptr)
+static unsigned long _map_hash_function(void * ptr)
 {
     unsigned long i = 0;
     char str[64];
@@ -228,25 +205,33 @@ unsigned long _map_hash_function(void * ptr)
     return i % LV_G2D_HASH_TABLE_SIZE;
 }
 
-void _handle_collision(unsigned long index, lv_map_item_t * item)
+static void _handle_collision(unsigned long index, lv_map_item_t * item)
 {
-    lv_list_t * head = table->overflow_list[index];
-
-    if(head == NULL) {
+    if(table->overflow_list[index] == NULL) {
         /* Create the list. */
-        head = _list_alloc();
-        head->item = item;
-        table->overflow_list[index] = head;
+        lv_array_t * list = (lv_array_t *) lv_malloc(sizeof(lv_array_t));;
+        lv_array_init(list, LV_ARRAY_DEFAULT_CAPACITY, sizeof(lv_map_item_t));
+        lv_array_push_back(list, item);
+        table->overflow_list[index] = list;
         return;
     }
     else {
+        lv_array_t * list = (lv_array_t *)table->overflow_list[index];
+        for(int i = 0; i < lv_array_size(list); i++) {
+            lv_map_item_t * it = (lv_map_item_t *)lv_array_at(list, i);
+            if(it->key == item->key) {
+                /* Key exists, update value. */
+                it->value = item->value;
+                return;
+            }
+        }
         /* Insert to the list. */
-        table->overflow_list[index] = _list_push(head, item);
+        lv_array_push_back(table->overflow_list[index], item);
         return;
     }
 }
 
-lv_map_item_t * _map_create_item(void * key, struct g2d_buf * value)
+static lv_map_item_t * _map_create_item(void * key, struct g2d_buf * value)
 {
     lv_map_item_t * item = (lv_map_item_t *) lv_malloc(sizeof(lv_map_item_t));
     G2D_ASSERT_MSG(item, "Failed to alloc item.");
@@ -255,7 +240,7 @@ lv_map_item_t * _map_create_item(void * key, struct g2d_buf * value)
     return item;
 }
 
-void _map_free_item(lv_map_item_t * item)
+static void _map_free_item(lv_map_item_t * item)
 {
     /* Also free the g2d_buf. */
     lv_free(item->key);
@@ -264,88 +249,6 @@ void _map_free_item(lv_map_item_t * item)
     item->value = NULL;
     lv_free(item);
     item = NULL;
-}
-
-lv_list_t * _list_alloc(void)
-{
-    lv_list_t * list = (lv_list_t *) lv_malloc(sizeof(lv_list_t));
-    G2D_ASSERT_MSG(list, "Failed to alloc list.");
-    return list;
-}
-
-lv_list_t * _list_push(lv_list_t * list, lv_map_item_t * item)
-{
-    /* Insert item in list. */
-    if(!list) {
-        /* If the list is empty, add its first element. */
-        lv_list_t * head = _list_alloc();
-        head->item = item;
-        head->next = NULL;
-        list = head;
-        return list;
-    }
-
-    lv_list_t * temp = list;
-
-    while(temp->next)
-        temp = temp->next;
-
-    lv_list_t * node = _list_alloc();
-    node->item = item;
-    node->next = NULL;
-    temp->next = node;
-    return list;
-}
-
-lv_list_t * _list_pop(lv_list_t * list)
-{
-    /* Remove the head of list. */
-    if(!list)
-        return NULL;
-
-    lv_list_t * temp = list;
-    list = list->next;
-    temp->next = NULL;
-    lv_free(temp->item->key);
-    g2d_free(temp->item->value);
-    temp->item->key = NULL;
-    temp->item->value = NULL;
-    lv_free(temp->item);
-    temp->item = NULL;
-    lv_free(temp);
-    temp = NULL;
-
-    return list;
-}
-
-void _list_free(lv_list_t * list)
-{
-    while(list) {
-        list = _list_pop(list);
-    }
-}
-
-lv_list_t ** _create_overflow_list(void)
-{
-    /* Create overflow list, an array of list. */
-    lv_list_t ** lists = (lv_list_t **) lv_malloc_zeroed(table->size * sizeof(lv_list_t *));
-
-    for(int i = 0; i < table->size; i++)
-        lists[i] = NULL;
-
-    return lists;
-}
-
-void _free_overflow_list(void)
-{
-    /* Free all lists. */
-    lv_list_t ** lists = table->overflow_list;
-
-    for(int i = 0; i < table->size; i++)
-        _list_free(lists[i]);
-
-    lv_free(lists);
-    lists = NULL;
 }
 
 #endif /*LV_USE_DRAW_G2D*/

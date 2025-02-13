@@ -25,6 +25,7 @@ extern "C" {
 
 #if LV_USE_DRAW_G2D
 
+#include "../../../misc/lv_array.h"
 #include <string.h>
 
 /*********************
@@ -42,16 +43,11 @@ typedef struct lv_map_item {
     struct g2d_buf * value;
 } lv_map_item_t;
 
-/* Linked list for collision handling. */
-typedef struct lv_list {
-    lv_map_item_t * item;
-    struct lv_list * next;
-} lv_list_t;
-
 /*Buf map definition. */
 typedef struct lv_buf_map {
     lv_map_item_t ** items;
-    lv_list_t ** overflow_list;
+    lv_array_t ** overflow_list;
+
     int size;
     int count;
 } lv_buf_map_t;
