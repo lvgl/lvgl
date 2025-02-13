@@ -16,6 +16,7 @@ void tearDown(void)
     /* Function run after every test */
     lv_obj_clean(lv_screen_active());
 }
+
 void test_dropdown_create_delete(void)
 {
     lv_dropdown_create(lv_screen_active());

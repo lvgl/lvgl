@@ -463,6 +463,9 @@
 /** Add `id` field to `lv_obj_t` */
 #define LV_USE_OBJ_ID           0
 
+/**  Enable support widget names*/
+#define LV_USE_OBJ_NAME         0
+
 /** Automatically assign an ID when obj is created */
 #define LV_OBJ_ID_AUTO_ASSIGN   LV_USE_OBJ_ID
 

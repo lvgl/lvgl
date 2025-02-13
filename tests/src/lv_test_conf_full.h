@@ -125,6 +125,8 @@
 #define LV_OBJ_ID_AUTO_ASSIGN    1
 #define LV_USE_OBJ_ID_BUILTIN   1
 
+#define LV_USE_OBJ_NAME         1
+
 #define LV_CACHE_DEF_SIZE       (10 * 1024 * 1024)
 
 #ifndef LV_USE_LINUX_DRM
