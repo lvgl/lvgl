@@ -57,7 +57,7 @@ const lv_obj_class_t lv_chart_class = {
     .height_def = LV_DPI_DEF * 2,
     .instance_size = sizeof(lv_chart_t),
     .base_class = &lv_obj_class,
-    .name = "chart",
+    .name = "lv_chart",
 };
 
 /**********************

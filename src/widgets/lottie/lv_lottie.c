@@ -47,7 +47,7 @@ const lv_obj_class_t lv_lottie_class = {
     .height_def = LV_DPI_DEF,
     .instance_size = sizeof(lv_lottie_t),
     .base_class = &lv_canvas_class,
-    .name = "lottie",
+    .name = "lv_lottie",
 };
 
 /**********************

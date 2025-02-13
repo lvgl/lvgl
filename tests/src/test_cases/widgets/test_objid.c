@@ -11,11 +11,11 @@ void test_obj_id_should_match_class_name(void)
     lv_obj_t * obj = lv_obj_create(NULL);
     lv_obj_stringify_id(obj, buf, sizeof(buf));
 
-    TEST_ASSERT_TRUE(strncmp("obj", buf, strlen("obj")) == 0);
+    TEST_ASSERT_TRUE(strncmp("lv_obj", buf, strlen("lv_obj")) == 0);
 
     lv_obj_t * img = lv_image_create(NULL);
     lv_obj_stringify_id(img, buf, sizeof(buf));
-    TEST_ASSERT_TRUE(strncmp("image", buf, strlen("image")) == 0);
+    TEST_ASSERT_TRUE(strncmp("lv_image", buf, strlen("lv_image")) == 0);
 }
 
 void test_obj_id_should_grow_by_one(void)

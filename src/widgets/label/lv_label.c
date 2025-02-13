@@ -95,7 +95,7 @@ const lv_obj_class_t lv_label_class = {
     .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_label_t),
     .base_class = &lv_obj_class,
-    .name = "label",
+    .name = "lv_label",
 #if LV_USE_OBJ_PROPERTY
     .prop_index_start = LV_PROPERTY_LABEL_START,
     .prop_index_end = LV_PROPERTY_LABEL_END,

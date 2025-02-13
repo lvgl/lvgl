@@ -78,7 +78,7 @@ const lv_obj_class_t lv_scale_class  = {
     .instance_size = sizeof(lv_scale_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .base_class = &lv_obj_class,
-    .name = "scale",
+    .name = "lv_scale",
 };
 
 /**********************
