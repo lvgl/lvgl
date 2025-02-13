@@ -7,6 +7,13 @@
  *      INCLUDES
  *********************/
 #include "lv_demo_benchmark.h"
+#include <src/core/lv_obj.h>
+#include <src/core/lv_obj_pos.h>
+#include <src/core/lv_obj_style_gen.h>
+#include <src/display/lv_display.h>
+#include <src/layouts/flex/lv_flex.h>
+#include <src/misc/lv_area.h>
+#include <src/misc/lv_text.h>
 
 #if LV_USE_DEMO_BENCHMARK
 
@@ -112,6 +119,8 @@ static void spans_text_add(lv_obj_t * spans, const lv_font_t * font, const char 
 #if LV_USE_FREETYPE
 static void freetype_span_text_bitmap_cb(benchmark_context_t * context)
 {
+    lv_obj_set_layout(lv_screen_active(), 0);
+
     lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
     spans_init(spans);
 
@@ -123,6 +132,8 @@ static void freetype_span_text_bitmap_cb(benchmark_context_t * context)
 
 static void freetype_span_text_outline_cb(benchmark_context_t * context)
 {
+    lv_obj_set_layout(lv_screen_active(), 0);
+
     lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
     spans_init(spans);
 
@@ -134,24 +145,30 @@ static void freetype_span_text_outline_cb(benchmark_context_t * context)
 
 static void freetype_label_text_bitmap_cb(benchmark_context_t * context)
 {
+    lv_obj_set_layout(lv_screen_active(), 0);
+
     lv_obj_t * label = lv_label_create(lv_screen_active());
     if(context->freetype_font_bitmap) {
         lv_obj_set_style_text_font(label, context->freetype_font_bitmap, 0);
     }
     lv_label_set_text(label, LV_TEST_FONT_STRING_CHINESE LV_TEST_FONT_STRING_ENGLISH);
     lv_obj_set_width(label, lv_pct(100));
+    lv_obj_set_style_y(label, lv_display_get_vertical_resolution(NULL) / 6, 0);
 
     fall_anim(context, label, - lv_display_get_vertical_resolution(NULL) / 3);
 }
 
 static void freetype_label_text_outline_cb(benchmark_context_t * context)
 {
+    lv_obj_set_layout(lv_screen_active(), 0);
+
     lv_obj_t * label = lv_label_create(lv_screen_active());
     if(context->freetype_font_outline) {
         lv_obj_set_style_text_font(label, context->freetype_font_outline, 0);
     }
     lv_label_set_text(label, LV_TEST_FONT_STRING_CHINESE LV_TEST_FONT_STRING_ENGLISH);
     lv_obj_set_width(label, lv_pct(100));
+    lv_obj_set_style_y(label, lv_display_get_vertical_resolution(NULL) / 6, 0);
 
     fall_anim(context, label, - lv_display_get_vertical_resolution(NULL) / 3);
 }
@@ -160,6 +177,8 @@ static void freetype_label_text_outline_cb(benchmark_context_t * context)
 #if LV_USE_TINY_TTF && LV_TINY_TTF_FILE_SUPPORT
 static void span_tiny_ttf_text_cb(benchmark_context_t * context)
 {
+    lv_obj_set_layout(lv_screen_active(), 0);
+
     lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
     spans_init(spans);
 
@@ -171,12 +190,15 @@ static void span_tiny_ttf_text_cb(benchmark_context_t * context)
 
 static void label_tiny_ttf_text_cb(benchmark_context_t * context)
 {
+    lv_obj_set_layout(lv_screen_active(), 0);
+
     lv_obj_t * label = lv_label_create(lv_screen_active());
     if(context->tinyttf_font) {
         lv_obj_set_style_text_font(label, context->tinyttf_font, 0);
     }
     lv_label_set_text(label, LV_TEST_FONT_STRING_ENGLISH);
-    lv_obj_set_width(label, lv_pct(100));
+    lv_obj_set_width(label, LV_PCT(100));
+    lv_obj_set_style_y(label, lv_display_get_vertical_resolution(NULL) / 6, 0);
 
     fall_anim(context, label, - lv_display_get_vertical_resolution(NULL) / 3);
 }
@@ -184,6 +206,8 @@ static void label_tiny_ttf_text_cb(benchmark_context_t * context)
 
 static void span_text_cb(benchmark_context_t * context)
 {
+    lv_obj_set_layout(lv_screen_active(), 0);
+
     lv_obj_t * spans = lv_spangroup_create(lv_screen_active());
     spans_init(spans);
     spans_text_add(spans, &lv_font_montserrat_26, LV_TEST_FONT_STRING_ENGLISH);
@@ -592,7 +616,7 @@ static scene_dsc_t scenes[] = {
 
 #if LV_USE_TINY_TTF && LV_TINY_TTF_FILE_SUPPORT
     {.name = "TinyTTF span text",            .scene_time = 3000,  .create_cb = span_tiny_ttf_text_cb},
-    {.name = "TinyTTF text",                 .scene_time = 3000,  .create_cb = label_tiny_ttf_text_cb},
+    {.name = "TinyTTF label text",           .scene_time = 3000,  .create_cb = label_tiny_ttf_text_cb},
 #endif
 
     {.name = "Containers",                   .scene_time = 3000,  .create_cb = containers_cb},
@@ -1035,11 +1059,10 @@ static lv_obj_t * card_create(void)
 #if LV_USE_FREETYPE || LV_USE_TINY_TTF
 static void spans_init(lv_obj_t * spans)
 {
-    lv_obj_center(spans);
-    lv_obj_set_width(spans, lv_display_get_horizontal_resolution(NULL));
+    lv_obj_set_width(spans, LV_PCT(100));
     lv_obj_set_style_text_align(spans, LV_TEXT_ALIGN_LEFT, 0);
     lv_spangroup_set_overflow(spans, LV_SPAN_OVERFLOW_CLIP);
-    lv_spangroup_set_mode(spans, LV_SPAN_MODE_BREAK);
+    lv_obj_set_style_y(spans, lv_display_get_vertical_resolution(NULL) / 6, 0);
 }
 
 static void spans_text_add(lv_obj_t * spans, const lv_font_t * font, const char * text)
