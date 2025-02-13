@@ -58,24 +58,24 @@ void lv_draw_sw_mask_rect(lv_draw_task_t * t, const lv_draw_mask_rect_dsc_t * ds
 
     if(dsc->keep_outside == 0) {
         /*Clear the top part*/
-        lv_area_set(&clear_area, draw_unit->clip_area->x1, draw_unit->clip_area->y1, draw_unit->clip_area->x2,
+        lv_area_set(&clear_area, t->clip_area.x1, t->clip_area.y1, t->clip_area.x2,
                     dsc->area.y1 - 1);
         lv_area_move(&clear_area, -buf_area->x1, -buf_area->y1);
         lv_draw_buf_clear(draw_buf, &clear_area);
 
         /*Clear the bottom part*/
-        lv_area_set(&clear_area, draw_unit->clip_area->x1, dsc->area.y2 + 1, draw_unit->clip_area->x2,
-                    draw_unit->clip_area->y2);
+        lv_area_set(&clear_area, t->clip_area.x1, dsc->area.y2 + 1, t->clip_area.x2,
+                    t->clip_area.y2);
         lv_area_move(&clear_area, -buf_area->x1, -buf_area->y1);
         lv_draw_buf_clear(draw_buf, &clear_area);
 
         /*Clear the left part*/
-        lv_area_set(&clear_area, draw_unit->clip_area->x1, dsc->area.y1, dsc->area.x1 - 1, dsc->area.y2);
+        lv_area_set(&clear_area, t->clip_area.x1, dsc->area.y1, dsc->area.x1 - 1, dsc->area.y2);
         lv_area_move(&clear_area, -buf_area->x1, -buf_area->y1);
         lv_draw_buf_clear(draw_buf, &clear_area);
 
         /*Clear the right part*/
-        lv_area_set(&clear_area, dsc->area.x2 + 1, dsc->area.y1, draw_unit->clip_area->x2, dsc->area.y2);
+        lv_area_set(&clear_area, dsc->area.x2 + 1, dsc->area.y1, t->clip_area.x2, dsc->area.y2);
         lv_area_move(&clear_area, -buf_area->x1, -buf_area->y1);
         lv_draw_buf_clear(draw_buf, &clear_area);
     }
