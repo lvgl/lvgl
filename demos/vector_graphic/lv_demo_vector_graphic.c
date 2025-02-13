@@ -58,7 +58,7 @@ static void draw_gradient(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
     lv_vector_path_quad_to(path, &pts[1], &pts[2]);
     lv_vector_path_close(path);
 
-    lv_gradient_stop_t stops[2];
+    lv_grad_stop_t stops[2];
     lv_memzero(stops, sizeof(stops));
     stops[0].color = lv_color_hex(0xff0000);
     stops[0].opa = LV_OPA_COVER;
@@ -90,7 +90,7 @@ static void draw_radial_gradient(lv_vector_dsc_t * ctx, lv_vector_path_t * path)
     lv_vector_path_line_to(path, &pts[3]);
     lv_vector_path_close(path);
 
-    lv_gradient_stop_t stops[2];
+    lv_grad_stop_t stops[2];
     lv_memzero(stops, sizeof(stops));
     stops[0].color = lv_color_hex(0xff0000);
     stops[0].opa = LV_OPA_COVER;

@@ -13,19 +13,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-ubuntu:
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
         # A valid option parameter to the cmake file.
         # See BUILD_OPTIONS in tests/CMakeLists.txt.
-        build_option: ['OPTIONS_16BIT',
+        build_option: ['OPTIONS_NORMAL_8BIT',
+                       'OPTIONS_16BIT',
                        'OPTIONS_24BIT',
                        'OPTIONS_FULL_32BIT',
                        'OPTIONS_VG_LITE',
                        'OPTIONS_SDL']
-    name: Build ${{ matrix.build_option }}
+    name: Build ${{ matrix.build_option }} - Ubuntu
     steps:
     - uses: actions/checkout@v4
     - uses: ammaraskar/gcc-problem-matcher@master
@@ -34,36 +36,42 @@ jobs:
     - name: Building ${{ matrix.build_option }}
       run: python tests/main.py --build-option=${{ matrix.build_option }} build --auto-clean
 
-  build-windows-GCC:
-    runs-on: windows-2022
-    name: Build Windows GCC
-    steps:
-    - uses: actions/checkout@v4
-    - uses: ammaraskar/gcc-problem-matcher@master
-    - name: Install prerequisites
-      run: scripts\install-prerequisites.bat
-    - name: Build
-      run: python tests/main.py build
-      env:
-        CC: gcc
+  build-windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        # A valid option parameter to the cmake file.
+        # See BUILD_OPTIONS in tests/CMakeLists.txt.
+        build_option: ['OPTIONS_16BIT',
+                       'OPTIONS_24BIT',
+                       'OPTIONS_FULL_32BIT',
+                       'OPTIONS_VG_LITE']
+        compiler: [gcc, cl]
 
-  build-windows-MSVC:
+    name: Build ${{ matrix.build_option }} - ${{matrix.compiler }} - Windows
     runs-on: windows-2022
-    name: Build Windows MSVC
     steps:
     - uses: actions/checkout@v4
     - name: Install prerequisites
       run: scripts\install-prerequisites.bat
-    - uses: ilammy/msvc-dev-cmd@v1
+
+    - if: matrix.compiler == 'gcc'
+      uses: ammaraskar/gcc-problem-matcher@master
+
+    - if: matrix.compiler == 'cl'
+      uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: x64
-    - uses: ruby/setup-ruby@v1
+
+    - if: matrix.compiler == 'cl'
+      uses: ruby/setup-ruby@v1
       with:
         ruby-version: 'mswin'
+
     - name: Build
-      run: python tests/main.py build
+      run: python tests/main.py --build-option=${{ matrix.build_option }} build
       env:
-        CC: cl
+        CC: ${{ matrix.compiler }}
 
   build-esp32s3:
     runs-on: ubuntu-22.04
