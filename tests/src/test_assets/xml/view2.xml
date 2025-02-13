@@ -1,0 +1,35 @@
+<component>
+	<consts>
+		<color name="light_blue" value="0xbbbbff"/>
+		<color name="dark_blue" value="0x000080"/>
+	</consts>
+
+	<styles>
+		<style name="red" text_color="0xff0000" text_opa="150"/>
+		<style name="blue" text_color="#dark_blue" text_font="lv_montserrat_30"/>
+		<style name="scale_main" bg_opa="50%" pad_all="32" radius="8"/>
+		<style name="scale_indic" length="20" />
+		<style name="scale_sectoion_indic" text_color="#00ff00" line_width="6"/>
+	</styles>
+
+	<view  width="700" height="470" style_bg_color="#light_blue" flex_flow="column_wrap">
+        <lv_buttonmatrix map="'1' '2' '\n' '3'" ctrl_map="checked|width_3 none disabled" width="200"/>
+        <lv_spangroup>
+	        <lv_spangroup-span text="hello" style="red"/>
+	        <lv_spangroup-span text="world" style="blue"/>
+        </lv_spangroup>
+
+        <lv_scale total_tick_count="31" show_label="true" major_tick_every="6"
+        		  range="10 110" width="300"
+        		  styles="scale_main scale_indic:indicator">
+	        <lv_scale-section range="30 60" style_indicator="scale_sectoion_indic"/>
+        </lv_scale>
+
+        <lv_table column_conunt="4" style_border_side:items="full">
+	        <lv_table-column column="1" width="30px"/>
+	        <lv_table-column column="3" width="20px"/>
+	        <lv_table-cell row="2" column="1" value="hello hello hello hello" ctrl="text_crop|merge_right"/>
+	        <lv_table-cell row="3" column="0" value="world"/>
+        </lv_table>
+	</view>
+</component>

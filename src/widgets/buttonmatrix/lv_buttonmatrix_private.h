@@ -36,7 +36,8 @@ struct _lv_buttonmatrix_t {
     uint32_t btn_cnt;                    /**< Number of button in 'map_p'(Handled by the library) */
     uint32_t row_cnt;                    /**< Number of rows in 'map_p'(Handled by the library) */
     uint32_t btn_id_sel;                 /**< Index of the active button (being pressed/released etc) or LV_BUTTONMATRIX_BUTTON_NONE */
-    uint32_t one_check : 1;              /**< Single button toggled at once */
+    uint32_t one_check : 1;              /**< 1: Single button toggled at once */
+    uint32_t auto_free_map : 1;          /**< 1: Automatically free the map when the widget is deleted */
 };
 
 
