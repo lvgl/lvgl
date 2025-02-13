@@ -7,13 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_demo_benchmark.h"
-#include <src/core/lv_obj.h>
-#include <src/core/lv_obj_pos.h>
-#include <src/core/lv_obj_style_gen.h>
-#include <src/display/lv_display.h>
-#include <src/layouts/flex/lv_flex.h>
-#include <src/misc/lv_area.h>
-#include <src/misc/lv_text.h>
 
 #if LV_USE_DEMO_BENCHMARK
 
