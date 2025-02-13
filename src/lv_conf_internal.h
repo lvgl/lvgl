@@ -1314,6 +1314,15 @@
     #endif
 #endif
 
+/**  Enable support widget names*/
+#ifndef LV_USE_OBJ_NAME
+    #ifdef CONFIG_LV_USE_OBJ_NAME
+        #define LV_USE_OBJ_NAME CONFIG_LV_USE_OBJ_NAME
+    #else
+        #define LV_USE_OBJ_NAME         0
+    #endif
+#endif
+
 /** Automatically assign an ID when obj is created */
 #ifndef LV_OBJ_ID_AUTO_ASSIGN
     #ifdef CONFIG_LV_OBJ_ID_AUTO_ASSIGN

@@ -187,7 +187,7 @@ const lv_obj_class_t lv_obj_class = {
     .group_def = LV_OBJ_CLASS_GROUP_DEF_FALSE,
     .instance_size = (sizeof(lv_obj_t)),
     .base_class = NULL,
-    .name = "obj",
+    .name = "lv_obj",
 #if LV_USE_OBJ_PROPERTY
     .prop_index_start = LV_PROPERTY_OBJ_START,
     .prop_index_end = LV_PROPERTY_OBJ_END,
@@ -438,6 +438,8 @@ void * lv_obj_get_id(const lv_obj_t * obj)
 
 lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, const void * id)
 {
+    LV_LOG_WARN("DEPRECATED: IDs are used only to print the widget trees. To find a widget use obj_name");
+
     if(obj == NULL) obj = lv_display_get_screen_active(NULL);
     if(obj == NULL) return NULL;
 
@@ -533,6 +535,11 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
         }
 
         lv_event_remove_all(&obj->spec_attr->event_list);
+#if LV_USE_OBJ_NAME
+        if(obj->spec_attr->name && !obj->spec_attr->name_static) {
+            lv_free((void *)obj->spec_attr->name);
+        }
+#endif
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
         if(obj->spec_attr->matrix) {

@@ -716,6 +716,10 @@ menu "LVGL configuration"
 				bool "Add id field to obj"
 				default n
 
+			config LV_USE_OBJ_NAME
+				bool "Enable support widget names"
+				default n
+
 			config LV_OBJ_ID_AUTO_ASSIGN
 				bool "Automatically assign an ID when obj is created"
 				default y
