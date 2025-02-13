@@ -48,7 +48,7 @@ struct LoadModule
     LoadModule(FileType type) : type(type) {}
     virtual ~LoadModule()
     {
-        if (pathcache) free(hashpath);
+        if (pathcache) lv_free(hashpath);
     }
 
     virtual bool open(const string& path) { return false; }

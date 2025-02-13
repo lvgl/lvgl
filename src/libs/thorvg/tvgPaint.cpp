@@ -366,7 +366,7 @@ void Paint::Impl::reset()
 
     if (compData) {
         if (P(compData->target)->unref() == 0) delete(compData->target);
-        free(compData);
+        lv_free(compData);
         compData = nullptr;
     }
 

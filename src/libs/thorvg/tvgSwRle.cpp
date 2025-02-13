@@ -359,10 +359,11 @@ static void _horizLine(RleWorker& rw, SwCoord x, SwCoord y, SwCoord area, SwCoor
         auto newSize = (rle->size > 0) ? (rle->size * 2) : 256;
         if (rle->alloc < newSize) {
             rle->alloc = newSize;
-            rle->spans = static_cast<SwSpan*>(realloc(rle->spans, rle->alloc * sizeof(SwSpan)));
+            rle->spans = static_cast<SwSpan*>(lv_realloc(rle->spans, rle->alloc * sizeof(SwSpan)));
+            LV_ASSERT_MALLOC(rle->spans);
         }
     }
-        
+
     //Clip x range
     SwCoord xOver = 0;
     if (x + aCount >= rw.cellMax.x) xOver -= (x + aCount - rw.cellMax.x);
@@ -842,7 +843,7 @@ static SwSpan* _intersectSpansRect(const SwBBox *bbox, const SwRle *targetRle, S
 
 void _replaceClipSpan(SwRle *rle, SwSpan* clippedSpans, uint32_t size)
 {
-    free(rle->spans);
+    lv_free(rle->spans);
     rle->spans = clippedSpans;
     rle->size = rle->alloc = size;
 }
@@ -880,7 +881,10 @@ SwRle* rleRender(SwRle* rle, const SwOutline* outline, const SwBBox& renderRegio
     rw.bandShoot = 0;
     rw.antiAlias = antiAlias;
 
-    if (!rle) rw.rle = reinterpret_cast<SwRle*>(calloc(1, sizeof(SwRle)));
+    if (!rle) {
+    	rw.rle = reinterpret_cast<SwRle*>(lv_zalloc(sizeof(SwRle)));
+        LV_ASSERT_MALLOC(rw.rle);
+    }
     else rw.rle = rle;
 
     //Generate RLE
@@ -966,7 +970,7 @@ SwRle* rleRender(SwRle* rle, const SwOutline* outline, const SwBBox& renderRegio
     return rw.rle;
 
 error:
-    free(rw.rle);
+    lv_free(rw.rle);
     return nullptr;
 }
 
@@ -976,8 +980,10 @@ SwRle* rleRender(const SwBBox* bbox)
     auto width = static_cast<uint16_t>(bbox->max.x - bbox->min.x);
     auto height = static_cast<uint16_t>(bbox->max.y - bbox->min.y);
 
-    auto rle = static_cast<SwRle*>(malloc(sizeof(SwRle)));
-    rle->spans = static_cast<SwSpan*>(malloc(sizeof(SwSpan) * height));
+    auto rle = static_cast<SwRle*>(lv_malloc(sizeof(SwRle)));
+    LV_ASSERT_MALLOC(rle);
+    rle->spans = static_cast<SwSpan*>(lv_malloc(sizeof(SwSpan) * height));
+    LV_ASSERT_MALLOC(rle->spans);
     rle->size = height;
     rle->alloc = height;
 
@@ -1003,8 +1009,8 @@ void rleReset(SwRle* rle)
 void rleFree(SwRle* rle)
 {
     if (!rle) return;
-    if (rle->spans) free(rle->spans);
-    free(rle);
+    if (rle->spans) lv_free(rle->spans);
+    lv_free(rle);
 }
 
 
@@ -1012,7 +1018,8 @@ void rleClip(SwRle *rle, const SwRle *clip)
 {
     if (rle->size == 0 || clip->size == 0) return;
     auto spanCnt = rle->size > clip->size ? rle->size : clip->size;
-    auto spans = static_cast<SwSpan*>(malloc(sizeof(SwSpan) * (spanCnt)));
+    auto spans = static_cast<SwSpan*>(lv_malloc(sizeof(SwSpan) * (spanCnt)));
+    LV_ASSERT_MALLOC(spans);
     auto spansEnd = _intersectSpansRegion(clip, rle, spans, spanCnt);
 
     _replaceClipSpan(rle, spans, spansEnd - spans);
@@ -1024,7 +1031,8 @@ void rleClip(SwRle *rle, const SwRle *clip)
 void rleClip(SwRle *rle, const SwBBox* clip)
 {
     if (rle->size == 0) return;
-    auto spans = static_cast<SwSpan*>(malloc(sizeof(SwSpan) * (rle->size)));
+    auto spans = static_cast<SwSpan*>(lv_malloc(sizeof(SwSpan) * (rle->size)));
+    LV_ASSERT_MALLOC(spans);
     auto spansEnd = _intersectSpansRect(clip, rle, spans, rle->size);
 
     _replaceClipSpan(rle, spans, spansEnd - spans);
