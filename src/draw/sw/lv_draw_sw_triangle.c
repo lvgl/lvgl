@@ -18,7 +18,7 @@
 #include "../../misc/lv_color.h"
 #include "../../stdlib/lv_string.h"
 #include "../lv_draw_triangle_private.h"
-#include "lv_draw_sw_gradient_private.h"
+#include "lv_draw_sw_grad.h"
 
 /*********************
  *      DEFINES
@@ -136,7 +136,8 @@ void lv_draw_sw_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
 
     lv_grad_dir_t grad_dir = dsc->bg_grad.dir;
 
-    lv_grad_t * grad = lv_gradient_get(&dsc->bg_grad, lv_area_get_width(&tri_area), lv_area_get_height(&tri_area));
+    lv_draw_sw_grad_calc_t * grad = lv_draw_sw_grad_get(&dsc->bg_grad, lv_area_get_width(&tri_area),
+                                                        lv_area_get_height(&tri_area));
     lv_opa_t * grad_opa_map = NULL;
     if(grad && grad_dir == LV_GRAD_DIR_HOR) {
         blend_dsc.src_area = &blend_area;
@@ -184,7 +185,7 @@ void lv_draw_sw_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
     lv_draw_sw_mask_free_param(&mask_right);
 
     if(grad) {
-        lv_gradient_cleanup(grad);
+        lv_draw_sw_grad_cleanup(grad);
     }
 
 #else

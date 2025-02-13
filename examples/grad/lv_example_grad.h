@@ -1,10 +1,10 @@
 /**
- * @file lv_draw_sw_gradient_private.h
+ * @file lv_example_grad.h
  *
  */
 
-#ifndef LV_DRAW_SW_GRADIENT_PRIVATE_H
-#define LV_DRAW_SW_GRADIENT_PRIVATE_H
+#ifndef LV_EXAMPLE_GRAD_H
+#define LV_EXAMPLE_GRAD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,10 +14,6 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_draw_sw_gradient.h"
-
-#if LV_USE_DRAW_SW
-
 /*********************
  *      DEFINES
  *********************/
@@ -26,25 +22,20 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_grad_t {
-    lv_color_t   *  color_map;
-    lv_opa_t   *  opa_map;
-    uint32_t size;
-};
-
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void lv_example_grad_1(void);
+void lv_example_grad_2(void);
+void lv_example_grad_3(void);
+void lv_example_grad_4(void);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif /* LV_USE_DRAW_SW */
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_SW_GRADIENT_PRIVATE_H*/
+#endif /*LV_EXAMPLE_GRAD_H*/
