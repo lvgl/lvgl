@@ -89,7 +89,7 @@ void lv_draw_vg_lite_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t *
             VG_LITE_FILL_EVEN_ODD,
             &matrix,
             VG_LITE_BLEND_SRC_OVER,
-            lv_vg_lite_color(dsc->bg_color, dsc->bg_opa, true));
+            lv_vg_lite_color(dsc->color, dsc->opa, true));
     }
 
     lv_vg_lite_path_drop(u, path);
