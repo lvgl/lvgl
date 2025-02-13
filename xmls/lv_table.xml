@@ -1,5 +1,5 @@
 <!--
-<lv_table col_cnt="4">
+<lv_table column_conunt="4">
 	<lv_table-column column="2" width="30px"/>
 	<lv_table-cell row="2" column="1" value="hello" ctrl="text_crop merge_right"/>
 	<lv_table-cell row="3" column="0" value="world"/>

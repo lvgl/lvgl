@@ -19,7 +19,7 @@ static void timer_cb(lv_timer_t * timer)
     lv_draw_letter_dsc_t letter_dsc;
     lv_draw_letter_dsc_init(&letter_dsc);
     letter_dsc.color = lv_color_hex(0xff0000);
-    letter_dsc.font = lv_font_default();
+    letter_dsc.font = lv_font_get_default();
 
     {
 #define CURVE2_X(t) (t * 2 + 10)

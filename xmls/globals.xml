@@ -11,8 +11,15 @@
         <enum name="knob" help="Some help"/>
     </enumdef>
     <enumdef name="lv_align">
+        <enum name="default" help="Some help"/>
         <enum name="top_left" help="Some help"/>
+        <enum name="top_mid" help="Some help"/>
+        <enum name="top_right" help="Some help"/>
+        <enum name="bottom_left" help="Some help"/>
+        <enum name="bottom_mid" help="Some help"/>
         <enum name="bottom_right" help="Some help"/>
+        <enum name="left_mid" help="Some help"/>
+        <enum name="right_mid" help="Some help"/>
         <enum name="center" help="Some help"/>
     </enumdef>
     <enumdef name="lv_dir">
@@ -21,6 +28,11 @@
         <enum name="bottom" help="Some help"/>
         <enum name="left" help="Some help"/>
         <enum name="right" help="Some help"/>
+    </enumdef>
+    <enumdef name="lv_layout">
+        <enum name="none" help="Some help"/>
+        <enum name="flex" help="Some help"/>
+        <enum name="grid" help="Some help"/>
     </enumdef>
     <enumdef name="lv_flex_flow">
             <enum name="row"            		help="In a row"/>

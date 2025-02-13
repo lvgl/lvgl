@@ -260,7 +260,7 @@ static void process_grad_element(lv_xml_parser_state_t * state, const char * tag
     lv_memzero(dsc, sizeof(lv_grad_dsc_t));
     dsc->extend = LV_GRAD_EXTEND_PAD;
 
-    if(lv_streq(tag_name, "linear_gradient")) {
+    if(lv_streq(tag_name, "linear")) {
         dsc->dir = LV_GRAD_DIR_LINEAR;
         char buf[64];
         char * buf_p = buf;
@@ -275,7 +275,7 @@ static void process_grad_element(lv_xml_parser_state_t * state, const char * tag
         dsc->params.linear.end.x = lv_xml_to_size(lv_xml_split_str(&buf_p, ' '));
         dsc->params.linear.end.y = lv_xml_to_size(buf_p);
     }
-    else if(lv_streq(tag_name, "radial_gradient")) {
+    else if(lv_streq(tag_name, "radial")) {
         dsc->dir = LV_GRAD_DIR_RADIAL;
         char buf[64];
         char * buf_p = buf;
@@ -345,7 +345,7 @@ static void process_grad_element(lv_xml_parser_state_t * state, const char * tag
 
     }
 
-    else if(lv_streq(tag_name, "conical_gradient")) {
+    else if(lv_streq(tag_name, "conical")) {
         dsc->dir = LV_GRAD_DIR_CONICAL;
         char buf[64];
         char * buf_p = buf;
@@ -371,10 +371,10 @@ static void process_grad_element(lv_xml_parser_state_t * state, const char * tag
             dsc->params.conical.end_angle = 360;
         }
     }
-    else if(lv_streq(tag_name, "horizontal_gradient")) {
+    else if(lv_streq(tag_name, "horizontal")) {
         dsc->dir = LV_GRAD_DIR_HOR;
     }
-    else if(lv_streq(tag_name, "vertical_gradient")) {
+    else if(lv_streq(tag_name, "vertical")) {
         dsc->dir = LV_GRAD_DIR_VER;
     }
     else {
