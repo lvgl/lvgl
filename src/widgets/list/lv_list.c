@@ -34,21 +34,21 @@ const lv_obj_class_t lv_list_class = {
     .base_class = &lv_obj_class,
     .width_def = (LV_DPI_DEF * 3) / 2,
     .height_def = LV_DPI_DEF * 2,
-    .name = "list",
+    .name = "lv_list",
 };
 
 const lv_obj_class_t lv_list_button_class = {
     .base_class = &lv_button_class,
     .width_def = LV_PCT(100),
     .height_def = LV_SIZE_CONTENT,
-    .name = "list-btn",
+    .name = "lv_list_button",
 };
 
 const lv_obj_class_t lv_list_text_class = {
     .base_class = &lv_label_class,
     .width_def = LV_PCT(100),
     .height_def = LV_SIZE_CONTENT,
-    .name = "list-text",
+    .name = "lv_list_text",
 };
 
 /**********************

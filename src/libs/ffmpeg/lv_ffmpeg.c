@@ -107,7 +107,7 @@ const lv_obj_class_t lv_ffmpeg_player_class = {
     .destructor_cb = lv_ffmpeg_player_destructor,
     .instance_size = sizeof(lv_ffmpeg_player_t),
     .base_class = &lv_image_class,
-    .name = "ffmpeg-player",
+    .name = "lv_ffmpeg_player",
 };
 
 /**********************

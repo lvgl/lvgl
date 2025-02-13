@@ -49,7 +49,7 @@ const lv_obj_class_t lv_imagebutton_class = {
     .instance_size = sizeof(lv_imagebutton_t),
     .constructor_cb = lv_imagebutton_constructor,
     .event_cb = lv_imagebutton_event,
-    .name = "imagebutton",
+    .name = "lv_imagebutton",
 };
 
 /**********************

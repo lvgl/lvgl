@@ -110,7 +110,7 @@ const lv_obj_class_t lv_image_class = {
     .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_image_t),
     .base_class = &lv_obj_class,
-    .name = "image",
+    .name = "lv_image",
 #if LV_USE_OBJ_PROPERTY
     .prop_index_start = LV_PROPERTY_IMAGE_START,
     .prop_index_end = LV_PROPERTY_IMAGE_END,

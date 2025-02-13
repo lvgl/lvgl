@@ -44,7 +44,7 @@ const lv_obj_class_t lv_menu_class = {
     .width_def = (LV_DPI_DEF * 3) / 2,
     .height_def = LV_DPI_DEF * 2,
     .instance_size = sizeof(lv_menu_t),
-    .name = "menu",
+    .name = "lv_menu",
 };
 const lv_obj_class_t lv_menu_page_class = {
     .constructor_cb = lv_menu_page_constructor,
@@ -53,7 +53,7 @@ const lv_obj_class_t lv_menu_page_class = {
     .width_def = LV_PCT(100),
     .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_menu_page_t),
-    .name = "menu-page",
+    .name = "lv_menu_page",
 };
 
 const lv_obj_class_t lv_menu_cont_class = {
@@ -61,7 +61,7 @@ const lv_obj_class_t lv_menu_cont_class = {
     .base_class = &lv_obj_class,
     .width_def = LV_PCT(100),
     .height_def = LV_SIZE_CONTENT,
-    .name = "menu-cont",
+    .name = "lv_menu_cont",
 };
 
 const lv_obj_class_t lv_menu_section_class = {
@@ -69,14 +69,14 @@ const lv_obj_class_t lv_menu_section_class = {
     .base_class = &lv_obj_class,
     .width_def = LV_PCT(100),
     .height_def = LV_SIZE_CONTENT,
-    .name = "menu-section",
+    .name = "lv_menu_section",
 };
 
 const lv_obj_class_t lv_menu_separator_class = {
     .base_class = &lv_obj_class,
     .width_def = LV_SIZE_CONTENT,
     .height_def = LV_SIZE_CONTENT,
-    .name = "menu-separator",
+    .name = "lv_menu_separator",
 };
 
 const lv_obj_class_t lv_menu_sidebar_cont_class = {

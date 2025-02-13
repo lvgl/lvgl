@@ -33,7 +33,7 @@ const lv_obj_class_t lv_win_class = {
     .height_def = LV_PCT(100),
     .base_class = &lv_obj_class,
     .instance_size = sizeof(lv_win_t),
-    .name = "win",
+    .name = "lv_win",
 };
 /**********************
  *      MACROS
