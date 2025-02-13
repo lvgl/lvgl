@@ -3,7 +3,6 @@
 #include "../../lvgl_private.h"
 
 #include "unity/unity.h"
-#include "lv_test_indev.h"
 
 /* This function runs before each test */
 void setUp(void);
@@ -210,12 +209,12 @@ void test_arc_click_sustained_from_start_to_end_does_not_set_value_to_max(void)
     /* Click close to start angle */
     event_cnt = 0;
     lv_test_mouse_release();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
     lv_test_mouse_move_to(376, 285);
     lv_test_mouse_press();
-    lv_test_indev_wait(500);
+    lv_test_wait(500);
     lv_test_mouse_release();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     TEST_ASSERT_EQUAL_UINT32(1, event_cnt);
     TEST_ASSERT_EQUAL_INT32(lv_arc_get_min_value(arc), lv_arc_get_value(arc));
@@ -224,14 +223,14 @@ void test_arc_click_sustained_from_start_to_end_does_not_set_value_to_max(void)
     event_cnt = 0;
 
     lv_test_mouse_release();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
     lv_test_mouse_move_to(376, 285);
     lv_test_mouse_press();
-    lv_test_indev_wait(500);
+    lv_test_wait(500);
     lv_test_mouse_move_to(415, 281);
-    lv_test_indev_wait(500);
+    lv_test_wait(500);
     lv_test_mouse_release();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     TEST_ASSERT_EQUAL_UINT32(1, event_cnt);
     TEST_ASSERT_EQUAL_INT32(lv_arc_get_min_value(arc), lv_arc_get_value(arc));
@@ -269,12 +268,12 @@ void test_two_overlapping_arcs_can_be_interacted_independently(void)
 
     // Click on the position of the first arc (center)
     lv_test_mouse_release();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
     lv_test_mouse_move_to(400, 195);
     lv_test_mouse_press();
-    lv_test_indev_wait(500);
+    lv_test_wait(500);
     lv_test_mouse_release();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     // Verify that the event callback was called for the first arc
     TEST_ASSERT_EQUAL_UINT32(0, event_cnt);
@@ -282,12 +281,12 @@ void test_two_overlapping_arcs_can_be_interacted_independently(void)
 
     // click on the position of the second arc (center)
     lv_test_mouse_release();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
     lv_test_mouse_move_to(400, 285);
     lv_test_mouse_press();
-    lv_test_indev_wait(500);
+    lv_test_wait(500);
     lv_test_mouse_release();
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     // Verify that the event callback was called for the second arc
     TEST_ASSERT_EQUAL_UINT32(1, event_cnt);

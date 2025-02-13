@@ -3550,6 +3550,27 @@
 
 #endif
 
+/** Enable emulated input devices, time emulation, and screenshot compares. */
+#ifndef LV_USE_TEST
+    #ifdef CONFIG_LV_USE_TEST
+        #define LV_USE_TEST CONFIG_LV_USE_TEST
+    #else
+        #define LV_USE_TEST 0
+    #endif
+#endif
+#if LV_USE_TEST
+
+/** Enable `lv_test_screenshot_compare`.
+ * Requires libpng and a few MB of extra RAM. */
+#ifndef LV_USE_TEST_SCREENSHOT_COMPARE
+    #ifdef CONFIG_LV_USE_TEST_SCREENSHOT_COMPARE
+        #define LV_USE_TEST_SCREENSHOT_COMPARE CONFIG_LV_USE_TEST_SCREENSHOT_COMPARE
+    #else
+        #define LV_USE_TEST_SCREENSHOT_COMPARE 0
+    #endif
+#endif
+#endif /*LV_USE_TEST*/
+
 /** Enable loading XML UIs runtime */
 #ifndef LV_USE_XML
     #ifdef CONFIG_LV_USE_XML
