@@ -141,20 +141,28 @@ change.
 
 Some examples:
 
-- fix(image): update size when a new source is set
+.. code-block:: text
 
-- fix(bar): fix memory leak
+    fix(image): update size when a new source is set
 
-  The animations weren't deleted in the destructor.
+.. code-block:: text
 
-  Fixes: #1234
+    fix(bar): fix memory leak
 
-- feat: add span widget
+    The animations weren't deleted in the destructor.
 
-  | The span widget allows mixing different font sizes, colors and styles.
-  | It's similar to HTML <span>
+    Fixes: #1234
 
-- docs(porting): fix typo
+.. code-block:: text
+
+    feat: add span widget
+
+    The span widget allows mixing different font sizes, colors and styles.
+    It's similar to HTML <span>
+
+.. code-block:: text
+
+    docs(porting): fix typo
 
 
 
