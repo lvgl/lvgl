@@ -121,6 +121,8 @@ typedef struct _lv_image_decoder_t lv_image_decoder_t;
 
 typedef struct _lv_image_decoder_dsc_t lv_image_decoder_dsc_t;
 
+typedef struct _lv_draw_image_dsc_t lv_draw_image_dsc_t;
+
 typedef struct _lv_fragment_t lv_fragment_t;
 typedef struct _lv_fragment_class_t lv_fragment_class_t;
 typedef struct _lv_fragment_managed_states_t lv_fragment_managed_states_t;

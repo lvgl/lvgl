@@ -18,6 +18,9 @@
     #include "../../libs/thorvg/thorvg_capi.h"
 #endif
 #include "../../stdlib/lv_string.h"
+#include "blend/lv_draw_sw_blend_private.h"
+#include "blend/lv_draw_sw_blend_to_rgb565.h"
+#include "blend/lv_draw_sw_blend_to_rgb888.h"
 
 /*********************
  *      DEFINES
@@ -40,6 +43,10 @@ typedef struct {
     uint8_t a;
 } _tvg_color;
 
+typedef struct {
+    Tvg_Canvas * canvas;
+    int32_t partial_y_offset;
+} _tvg_draw_state;
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -56,8 +63,8 @@ static void lv_area_to_tvg(_tvg_rect * rect, const lv_area_t * area)
 {
     rect->x = area->x1;
     rect->y = area->y1;
-    rect->w = lv_area_get_width(area) - 1;
-    rect->h = lv_area_get_height(area) - 1;
+    rect->w = lv_area_get_width(area);
+    rect->h = lv_area_get_height(area);
 }
 
 static void lv_color_to_tvg(_tvg_color * color, const lv_color32_t * c, lv_opa_t opa)
@@ -365,16 +372,56 @@ static void _set_paint_blend_mode(Tvg_Paint * obj, lv_vector_blend_t blend)
     tvg_paint_set_blend_method(obj, lv_blend_to_tvg(blend));
 }
 
+static void _blend_draw_buf(lv_draw_buf_t * draw_buf, const lv_area_t * dst_area, const lv_draw_buf_t * new_buf,
+                            const lv_area_t * src_area)
+{
+    lv_draw_sw_blend_image_dsc_t fill_dsc;
+    fill_dsc.dest_w = src_area->x2;
+    fill_dsc.dest_h = src_area->y2;
+    fill_dsc.dest_stride = draw_buf->header.stride;
+    fill_dsc.dest_buf = draw_buf->data;
+
+    fill_dsc.opa = LV_OPA_100;
+    fill_dsc.blend_mode = LV_BLEND_MODE_NORMAL;
+    fill_dsc.src_stride = new_buf->header.stride;
+    fill_dsc.src_color_format = new_buf->header.cf;
+    fill_dsc.src_buf = new_buf->data;
+
+    fill_dsc.mask_buf = NULL;
+    fill_dsc.mask_stride = 0;
+
+    fill_dsc.relative_area = *dst_area;
+    fill_dsc.src_area  = *src_area;
+
+    switch(draw_buf->header.cf) {
+#if LV_DRAW_SW_SUPPORT_RGB565
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_RGB565A8:
+            lv_draw_sw_blend_image_to_rgb565(&fill_dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB888
+        case LV_COLOR_FORMAT_RGB888:
+            lv_draw_sw_blend_image_to_rgb888(&fill_dsc, 3);
+            break;
+#endif
+        default:
+            break;
+    }
+}
+
 static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vector_draw_dsc_t * dsc)
 {
-    Tvg_Canvas * canvas = (Tvg_Canvas *)ctx;
+    _tvg_draw_state * state = (_tvg_draw_state *)ctx;
+    Tvg_Canvas * canvas = (Tvg_Canvas *)state->canvas;
 
     Tvg_Paint * obj = tvg_shape_new();
 
-    if(!path) {  /*clear*/
-        _tvg_rect rc;
-        lv_area_to_tvg(&rc, &dsc->scissor_area);
+    int32_t y_offset = state->partial_y_offset;
+    _tvg_rect rc;
+    lv_area_to_tvg(&rc, &dsc->scissor_area);
 
+    if(!path) {  /*clear*/
         _tvg_color c;
         lv_color_to_tvg(&c, &dsc->fill_dsc.color, dsc->fill_dsc.opa);
 
@@ -384,12 +431,16 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
             0.0f, 0.0f, 1.0f,
         };
         _set_paint_matrix(obj, &mtx);
+        mtx.e23 -= (float)(y_offset);
         tvg_shape_append_rect(obj, rc.x, rc.y, rc.w, rc.h, 0, 0);
         tvg_shape_set_fill_color(obj, c.r, c.g, c.b, c.a);
     }
     else {
+        tvg_canvas_set_viewport(canvas, (int32_t)rc.x, (int32_t)(rc.y - y_offset), (int32_t)rc.w, (int32_t)rc.h);
+
         Tvg_Matrix mtx;
         lv_matrix_to_tvg(&mtx, &dsc->matrix);
+        mtx.e23 -= (float)(y_offset);
         _set_paint_matrix(obj, &mtx);
 
         _set_paint_shape(obj, path);
@@ -398,7 +449,6 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
         _set_paint_stroke(obj, &dsc->stroke_dsc);
         _set_paint_blend_mode(obj, dsc->blend_mode);
     }
-
     tvg_canvas_push(canvas, obj);
 }
 
@@ -415,30 +465,45 @@ void lv_draw_sw_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc
     if(draw_buf == NULL)
         return;
 
+    void * buf = draw_buf->data;
+    int32_t width = lv_area_get_width(&layer->buf_area);
+    int32_t height = lv_area_get_height(&layer->buf_area);
+    uint32_t stride = draw_buf->header.stride;
+
     lv_color_format_t cf = draw_buf->header.cf;
+
+    bool allow_buffer = false;
+    lv_draw_buf_t * new_buf = NULL;
 
     if(cf != LV_COLOR_FORMAT_ARGB8888 && \
        cf != LV_COLOR_FORMAT_XRGB8888) {
-        LV_LOG_ERROR("unsupported layer color: %d", cf);
-        return;
+        allow_buffer = true;
+        new_buf = lv_draw_buf_create(width, height, LV_COLOR_FORMAT_ARGB8888, LV_STRIDE_AUTO);
+        lv_draw_buf_clear(new_buf, NULL);
+        buf = new_buf->data;
+        stride = new_buf->header.stride;
     }
 
-    void * buf = draw_buf->data;
-    int32_t width = lv_area_get_width(&layer->buf_area) - 1;
-    int32_t height = lv_area_get_height(&layer->buf_area) - 1;
-    uint32_t stride = draw_buf->header.stride;
     Tvg_Canvas * canvas = tvg_swcanvas_create();
     tvg_swcanvas_set_target(canvas, buf, stride / 4, width, height, TVG_COLORSPACE_ARGB8888);
 
     _tvg_rect rc;
     lv_area_to_tvg(&rc, &t->clip_area);
-    tvg_canvas_set_viewport(canvas, (int32_t)rc.x, (int32_t)rc.y, (int32_t)rc.w, (int32_t)rc.h);
+    tvg_canvas_set_viewport(canvas, (int32_t)rc.x, (int32_t)(rc.y - layer->partial_y_offset), (int32_t)rc.w, (int32_t)rc.h);
+
+    _tvg_draw_state state = {canvas, layer->partial_y_offset};
 
     lv_ll_t * task_list = dsc->task_list;
-    lv_vector_for_each_destroy_tasks(task_list, _task_draw_cb, canvas);
+    lv_vector_for_each_destroy_tasks(task_list, _task_draw_cb, &state);
 
     if(tvg_canvas_draw(canvas) == TVG_RESULT_SUCCESS) {
         tvg_canvas_sync(canvas);
+    }
+
+    if(allow_buffer) {
+        lv_area_t src_area = {0, 0, width, height};
+        _blend_draw_buf(draw_buf, &layer->buf_area, new_buf, &src_area);
+        lv_draw_buf_destroy(new_buf);
     }
 
     tvg_canvas_destroy(canvas);
