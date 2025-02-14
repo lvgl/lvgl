@@ -32,6 +32,7 @@ extern "C" {
 #include "../../lv_draw_image.h"
 #include "../../lv_draw_line.h"
 #include "../../lv_draw_arc.h"
+#include "vg_lite.h"
 
 /*********************
  *      DEFINES
@@ -41,9 +42,14 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct vglite_draw_task {
+    lv_draw_task_t * t;
+    vg_lite_path_t * path;
+} vglite_draw_task_t;
+
 typedef struct lv_draw_vglite_unit {
     lv_draw_unit_t base_unit;
-    lv_draw_task_t * task_act;
+    vglite_draw_task_t * task_act;
 #if LV_USE_OS
     lv_thread_sync_t sync;
     lv_thread_t thread;
@@ -65,21 +71,21 @@ void lv_draw_vglite_init(void);
 
 void lv_draw_vglite_deinit(void);
 
-void lv_draw_vglite_arc(lv_draw_task_t * t);
+void lv_draw_vglite_arc(vglite_draw_task_t * vglite_task);
 
-void lv_draw_vglite_border(lv_draw_task_t * t);
+void lv_draw_vglite_border(vglite_draw_task_t * vglite_task);
 
-void lv_draw_vglite_fill(lv_draw_task_t * t);
+void lv_draw_vglite_fill(vglite_draw_task_t * vglite_task);
 
-void lv_draw_vglite_img(lv_draw_task_t * t);
+void lv_draw_vglite_img(vglite_draw_task_t * vglite_task);
 
-void lv_draw_vglite_label(lv_draw_task_t * t);
+void lv_draw_vglite_label(vglite_draw_task_t * vglite_task);
 
-void lv_draw_vglite_layer(lv_draw_task_t * t);
+void lv_draw_vglite_layer(vglite_draw_task_t * vglite_task);
 
-void lv_draw_vglite_line(lv_draw_task_t * t);
+void lv_draw_vglite_line(vglite_draw_task_t * vglite_task);
 
-void lv_draw_vglite_triangle(lv_draw_task_t * t);
+void lv_draw_vglite_triangle(vglite_draw_task_t * vglite_task);
 
 /**********************
  *      MACROS

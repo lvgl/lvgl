@@ -42,7 +42,8 @@
  * @param[in] dsc Description of the triangle
  *
  */
-static void _vglite_draw_triangle(const lv_area_t * coords, const lv_area_t * clip_area,
+static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_area_t * coords,
+                                  const lv_area_t * clip_area,
                                   const lv_draw_triangle_dsc_t * dsc);
 
 /**********************
@@ -57,16 +58,16 @@ static void _vglite_draw_triangle(const lv_area_t * coords, const lv_area_t * cl
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_triangle(lv_draw_task_t * t)
+void lv_draw_vglite_triangle(vglite_draw_task_t * vglite_task)
 {
-    const lv_draw_triangle_dsc_t * dsc = t->draw_dsc;
+    const lv_draw_triangle_dsc_t * dsc = vglite_task->t->draw_dsc;
 
     if(dsc->bg_opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
-    lv_layer_t * layer = t->target_layer;
+    lv_layer_t * layer = vglite_task->t->target_layer;
     lv_area_t clip_area;
-    lv_area_copy(&clip_area, &t->clip_area);
+    lv_area_copy(&clip_area, &vglite_task->t->clip_area);
     lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t coords;
@@ -81,14 +82,15 @@ void lv_draw_vglite_triangle(lv_draw_task_t * t)
     if(!lv_area_intersect(&clipped_coords, &coords, &clip_area))
         return; /* Fully clipped, nothing to do */
 
-    _vglite_draw_triangle(&coords, &clip_area, dsc);
+    _vglite_draw_triangle(vglite_task, &coords, &clip_area, dsc);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void _vglite_draw_triangle(const lv_area_t * coords, const lv_area_t * clip_area,
+static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_area_t * coords,
+                                  const lv_area_t * clip_area,
                                   const lv_draw_triangle_dsc_t * dsc)
 {
     vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
@@ -111,8 +113,10 @@ static void _vglite_draw_triangle(const lv_area_t * coords, const lv_area_t * cl
         VLC_OP_END
     };
 
-    vg_lite_path_t path;
-    VGLITE_CHECK_ERROR(vg_lite_init_path(&path, VG_LITE_S32, VG_LITE_HIGH, sizeof(triangle_path), triangle_path,
+    vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
+    LV_ASSERT(path != NULL);
+    vglite_task->path = path;
+    VGLITE_CHECK_ERROR(vg_lite_init_path(path, VG_LITE_S32, VG_LITE_HIGH, sizeof(triangle_path), triangle_path,
                                          (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
                                          ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
@@ -163,16 +167,14 @@ static void _vglite_draw_triangle(const lv_area_t * coords, const lv_area_t * cl
             vg_lite_scale((float)width / 256.0f, 1.0f, grad_matrix);
         }
 
-        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, NULL, &gradient,
+        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(vgbuf, path, VG_LITE_FILL_EVEN_ODD, NULL, &gradient,
                                                  VG_LITE_BLEND_SRC_OVER));
     }
     else {
-        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
     }
 
     vglite_run();
-
-    VGLITE_CHECK_ERROR(vg_lite_clear_path(&path));
 
     if(has_gradient)
         VGLITE_CHECK_ERROR(vg_lite_clear_grad(&gradient));

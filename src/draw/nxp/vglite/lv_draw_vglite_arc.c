@@ -81,8 +81,8 @@ typedef struct _cubic_cont_pt {
  * @param[in] dsc Arc description structure (width, rounded ending, opacity)
  *
  */
-static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_area,
-                             const lv_draw_arc_dsc_t * dsc);
+static void _vglite_draw_arc(vglite_draw_task_t * vglite_task, const lv_point_t * center,
+                             const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -96,8 +96,9 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_arc(lv_draw_task_t * t)
+void lv_draw_vglite_arc(vglite_draw_task_t * vglite_task)
 {
+    lv_draw_task_t * t = vglite_task->t;
     const lv_draw_arc_dsc_t * dsc = t->draw_dsc;
 
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
@@ -114,7 +115,7 @@ void lv_draw_vglite_arc(lv_draw_task_t * t)
     lv_area_copy(&clip_area, &t->clip_area);
     lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
-    _vglite_draw_arc(&center, &clip_area, dsc);
+    _vglite_draw_arc(vglite_task, &center, &clip_area, dsc);
 }
 
 /**********************
@@ -558,10 +559,12 @@ static void _add_arc_path(int32_t * arc_path, int * pidx, int32_t radius,
     }
 }
 
-static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_area,
-                             const lv_draw_arc_dsc_t * dsc)
+static void _vglite_draw_arc(vglite_draw_task_t * vglite_task, const lv_point_t * center,
+                             const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc)
 {
-    vg_lite_path_t path;
+    vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
+    LV_ASSERT(path != NULL);
+    vglite_task->path = path;
     uint16_t start_angle = dsc->start_angle;
     uint16_t end_angle = dsc->end_angle;
 
@@ -664,7 +667,7 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
 
     arc_path[pidx++] = VLC_OP_END;
 
-    VGLITE_CHECK_ERROR(vg_lite_init_path(&path, VG_LITE_S32, VG_LITE_HIGH, (uint32_t)pidx * sizeof(int32_t), arc_path,
+    VGLITE_CHECK_ERROR(vg_lite_init_path(path, VG_LITE_S32, VG_LITE_HIGH, (uint32_t)pidx * sizeof(int32_t), arc_path,
                                          (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
                                          ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
@@ -672,11 +675,9 @@ static void _vglite_draw_arc(const lv_point_t * center, const lv_area_t * clip_a
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
 
     /*** Draw arc ***/
-    VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+    VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
 
     vglite_run();
-
-    VGLITE_CHECK_ERROR(vg_lite_clear_path(&path));
 }
 
 #endif /*LV_USE_DRAW_VGLITE*/

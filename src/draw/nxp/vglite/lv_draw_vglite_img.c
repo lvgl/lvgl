@@ -99,7 +99,8 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
  * @param[in] dsc Image descriptor
  *
  */
-static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * coords,
+static void _vglite_draw_pattern(vglite_draw_task_t * vglite_task, const lv_area_t * clip_area,
+                                 const lv_area_t * coords,
                                  const lv_draw_image_dsc_t * dsc);
 
 /**
@@ -125,15 +126,15 @@ static vg_lite_color_t _vglite_recolor(const lv_draw_image_dsc_t * dsc);
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_img(lv_draw_task_t * t)
+void lv_draw_vglite_img(vglite_draw_task_t * vglite_task)
 {
-    const lv_draw_image_dsc_t * dsc = t->draw_dsc;
-    const lv_area_t * coords = &t->area;
+    const lv_draw_image_dsc_t * dsc = vglite_task->t->draw_dsc;
+    const lv_area_t * coords = &vglite_task->t->area;
 
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
-    lv_layer_t * layer = t->target_layer;
+    lv_layer_t * layer = vglite_task->t->target_layer;
     const lv_image_dsc_t * img_dsc = dsc->src;
 
     lv_area_t relative_coords;
@@ -141,7 +142,7 @@ void lv_draw_vglite_img(lv_draw_task_t * t)
     lv_area_move(&relative_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t clip_area;
-    lv_area_copy(&clip_area, &t->clip_area);
+    lv_area_copy(&clip_area, &vglite_task->t->clip_area);
     lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t blend_area;
@@ -177,7 +178,7 @@ void lv_draw_vglite_img(lv_draw_task_t * t)
     vglite_set_transformation_matrix(&blend_area, dsc);
     bool is_tiled = dsc->tile;
     if(is_tiled)
-        _vglite_draw_pattern(&clip_area, &relative_coords, dsc);
+        _vglite_draw_pattern(vglite_task, &clip_area, &relative_coords, dsc);
     else
         _vglite_blit(&src_area, dsc);
 #endif /*LV_USE_VGLITE_BLIT_SPLIT*/
@@ -374,7 +375,8 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
 }
 #endif /*LV_USE_VGLITE_BLIT_SPLIT*/
 
-static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * coords,
+static void _vglite_draw_pattern(vglite_draw_task_t * vglite_task, const lv_area_t * clip_area,
+                                 const lv_area_t * coords,
                                  const lv_draw_image_dsc_t * dsc)
 {
     /* Target buffer */
@@ -386,8 +388,10 @@ static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * 
     vglite_create_rect_path_data(path_data, &path_data_size, dsc->clip_radius, coords);
     vg_lite_quality_t path_quality = VG_LITE_MEDIUM;
 
-    vg_lite_path_t path;
-    VGLITE_CHECK_ERROR(vg_lite_init_path(&path, VG_LITE_S32, path_quality, path_data_size, path_data,
+    vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
+    LV_ASSERT(path != NULL);
+    vglite_task->path = path;
+    VGLITE_CHECK_ERROR(vg_lite_init_path(path, VG_LITE_S32, path_quality, path_data_size, path_data,
                                          (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
                                          ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
@@ -411,12 +415,10 @@ static void _vglite_draw_pattern(const lv_area_t * clip_area, const lv_area_t * 
     vg_lite_filter_t filter = has_transform ? VG_LITE_FILTER_BI_LINEAR : VG_LITE_FILTER_POINT;
 
     /* Draw Pattern */
-    VGLITE_CHECK_ERROR(vg_lite_draw_pattern(dst_vgbuf, &path, VG_LITE_FILL_NON_ZERO, NULL,
+    VGLITE_CHECK_ERROR(vg_lite_draw_pattern(dst_vgbuf, path, VG_LITE_FILL_NON_ZERO, NULL,
                                             src_vgbuf, &vgmatrix, vgblend, VG_LITE_PATTERN_REPEAT,
                                             0, vgcol, filter));
     vglite_run();
-
-    VGLITE_CHECK_ERROR(vg_lite_clear_path(&path));
 }
 
 static vg_lite_color_t _vglite_recolor(const lv_draw_image_dsc_t * dsc)

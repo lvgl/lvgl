@@ -64,14 +64,14 @@ static void _vglite_draw_letter(const lv_area_t * mask_area, lv_color_t color, l
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_label(lv_draw_task_t * t)
+void lv_draw_vglite_label(vglite_draw_task_t * vglite_task)
 {
-	const lv_draw_label_dsc_t * dsc = t->draw_dsc;
-	const lv_area_t * coords = &t->area;
+    const lv_draw_label_dsc_t * dsc = vglite_task->t->draw_dsc;
+    const lv_area_t * coords = &vglite_task->t->area;
 
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    lv_draw_label_iterate_characters(t, dsc, coords, _draw_vglite_letter);
+    lv_draw_label_iterate_characters(vglite_task->t, dsc, coords, _draw_vglite_letter);
 }
 
 /**********************
@@ -88,14 +88,30 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
             case LV_FONT_GLYPH_FORMAT_NONE: {
 #if LV_USE_FONT_PLACEHOLDER
                     /* Draw a placeholder rectangle*/
+                    vglite_draw_task_t * vglite_task = lv_malloc_zeroed(sizeof(vglite_draw_task_t));
+                    LV_ASSERT(vglite_task != NULL);
+
                     lv_draw_border_dsc_t border_draw_dsc;
+
                     lv_draw_border_dsc_init(&border_draw_dsc);
                     border_draw_dsc.opa = glyph_draw_dsc->opa;
                     border_draw_dsc.color = glyph_draw_dsc->color;
                     border_draw_dsc.width = 1;
-                    t->draw_dsc = &border_draw_dsc;
-                    t->area = *glyph_draw_dsc->bg_coords;
-                    lv_draw_vglite_border(t);
+
+                    vglite_task->t = t;
+                    vglite_task->t->draw_dsc = &border_draw_dsc;
+                    vglite_task->t->area = *glyph_draw_dsc->bg_coords;
+
+                    lv_draw_vglite_border(vglite_task);
+
+                    /** Cleanup for vglite_task */
+                    vg_lite_finish();
+                    if(vglite_task->path) {
+                        vg_lite_clear_path(vglite_task->path);
+                        lv_free(vglite_task->path_data);
+                        lv_free(vglite_task->path);
+                    }
+                    lv_free(vglite_task);
 #endif
                 }
                 break;
@@ -138,11 +154,34 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
             case LV_FONT_GLYPH_FORMAT_IMAGE: {
 #if LV_USE_IMGFONT
                     glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                    vglite_draw_task_t * vglite_task = lv_malloc_zeroed(sizeof(vglite_draw_task_t));
+                    LV_ASSERT(vglite_task != NULL);
+
                     lv_draw_image_dsc_t img_dsc;
                     lv_draw_image_dsc_init(&img_dsc);
                     img_dsc.opa = glyph_draw_dsc->opa;
                     img_dsc.src = glyph_draw_dsc->glyph_data;
-                    lv_draw_vglite_img(draw_unit, &img_dsc, glyph_draw_dsc->letter_coords);
+
+                    void * old_dsc = t->draw_dsc;
+                    lv_area_t old_area = t->area;
+
+                    t->draw_dsc = &img_dsc;
+                    t->area = *glyph_draw_dsc->letter_coords;
+                    vglite_task->t = t;
+
+                    lv_draw_vglite_img(vglite_task);
+
+                    /** Cleanup for vglite_task */
+                    vg_lite_finish();
+                    if(vglite_task->path) {
+                        vg_lite_clear_path(vglite_task->path);
+                        lv_free(vglite_task->path_data);
+                        lv_free(vglite_task->path);
+                    }
+                    lv_free(vglite_task);
+
+                    t->draw_dsc = old_dsc;
+                    t->area = old_area;
 #endif
                 }
                 break;
@@ -152,9 +191,27 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     }
 
     if(fill_draw_dsc && fill_area) {
+        vglite_draw_task_t * vglite_task = lv_malloc_zeroed(sizeof(vglite_draw_task_t));
+        LV_ASSERT(vglite_task != NULL);
+
         t->draw_dsc = fill_draw_dsc;
         t->area = *fill_area;
-        lv_draw_vglite_fill(t);
+        vglite_task->t = t;
+
+        lv_draw_vglite_fill(vglite_task);
+
+        /** Cleanup for vglite_task */
+        vg_lite_finish();
+        if(vglite_task->path) {
+            vg_lite_clear_path(vglite_task->path);
+            lv_free(vglite_task->path_data);
+            lv_free(vglite_task->path);
+        }
+        if(vglite_task->gradient) {
+            vg_lite_clear_grad(vglite_task->gradient);
+            lv_free(vglite_task->gradient);
+        }
+        lv_free(vglite_task);
     }
 }
 
