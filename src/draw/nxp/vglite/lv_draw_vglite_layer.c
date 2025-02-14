@@ -46,7 +46,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_layer(lv_draw_task_t * t)
+void lv_draw_vglite_layer(vglite_draw_task_t * vglite_task)
 {
     lv_draw_image_dsc_t * draw_dsc = vglite_task->t->draw_dsc;
     const lv_area_t * coords = &vglite_task->t->area;

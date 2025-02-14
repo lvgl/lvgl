@@ -39,10 +39,10 @@
 /**
  * Structure of pending vglite draw task
  */
-typedef struct _vglite_draw_task_t {
-    lv_draw_task_t * task;
+typedef struct _vglite_flush_task {
+    vglite_draw_task_t * task;
     bool flushed;
-} vglite_draw_tasks_t;
+} vglite_flush_task_t;
 #endif
 
 /**********************
@@ -91,7 +91,7 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u);
     * Two indexes, _head and _tail, are used to signal the beginning
     * and the end of the valid tasks that are pending.
     */
-    static vglite_draw_tasks_t _draw_task_buf[VGLITE_TASK_BUF_SIZE];
+    static vglite_flush_task_t _draw_task_buf[VGLITE_TASK_BUF_SIZE];
     static volatile int _head = 0;
     static volatile int _tail = 0;
 #endif
@@ -319,11 +319,15 @@ static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
             return 1;
         }
     }
+    vglite_draw_task_t * vglite_task = lv_malloc_zeroed(sizeof(vglite_draw_task_t));
+    LV_ASSERT(vglite_task != NULL);
+
+    vglite_task->t = t;
 
     if(lv_draw_layer_alloc_buf(layer) == NULL)
         return LV_DRAW_UNIT_IDLE;
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    draw_vglite_unit->task_act = t;
+    draw_vglite_unit->task_act = vglite_task;
 
 #if LV_USE_VGLITE_DRAW_THREAD
     /* Let the render thread work. */
@@ -382,8 +386,8 @@ static int32_t _vglite_delete(lv_draw_unit_t * draw_unit)
 
 static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
 {
-    lv_draw_task_t * t = u->task_act;
-    lv_layer_t * layer = t->target_layer;
+    vglite_draw_task_t * vglite_task = u->task_act;
+    lv_layer_t * layer = vglite_task->t->target_layer;
     lv_draw_buf_t * draw_buf = layer->draw_buf;
 
     /* Set target buffer */
@@ -391,11 +395,11 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
                         draw_buf->header.cf);
 
     lv_area_t clip_area;
-    lv_area_copy(&clip_area, &t->clip_area);
+    lv_area_copy(&clip_area, &vglite_task->t->clip_area);
     lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t draw_area;
-    lv_area_copy(&draw_area, &t->area);
+    lv_area_copy(&draw_area, &vglite_task->t->area);
     lv_area_move(&draw_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     if(!lv_area_intersect(&draw_area, &draw_area, &clip_area))
@@ -406,39 +410,39 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
 
 #if LV_USE_PARALLEL_DRAW_DEBUG
     /* remember draw unit for debug purposes */
-    t->draw_unit = &u->base_unit;
+    vglite_task->t->draw_unit = &u->base_unit;
 #endif
 
     /* Set scissor area, excluding the split blit case */
 #if LV_USE_VGLITE_BLIT_SPLIT
-    if(t->type != LV_DRAW_TASK_TYPE_IMAGE || t->type != LV_DRAW_TASK_TYPE_LAYER)
+    if(vglite_task->t->type != LV_DRAW_TASK_TYPE_IMAGE || vglite_task->t->type != LV_DRAW_TASK_TYPE_LAYER)
 #endif
         vglite_set_scissor(&clip_area);
 
-    switch(t->type) {
+    switch(vglite_task->t->type) {
         case LV_DRAW_TASK_TYPE_LABEL:
-            lv_draw_vglite_label(t);
+            lv_draw_vglite_label(vglite_task);
             break;
         case LV_DRAW_TASK_TYPE_FILL:
-            lv_draw_vglite_fill(t);
+            lv_draw_vglite_fill(vglite_task);
             break;
         case LV_DRAW_TASK_TYPE_BORDER:
-            lv_draw_vglite_border(t);
+            lv_draw_vglite_border(vglite_task);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_vglite_img(t);
+            lv_draw_vglite_img(vglite_task);
             break;
         case LV_DRAW_TASK_TYPE_ARC:
-            lv_draw_vglite_arc(t);
+            lv_draw_vglite_arc(vglite_task);
             break;
         case LV_DRAW_TASK_TYPE_LINE:
-            lv_draw_vglite_line(t);
+            lv_draw_vglite_line(vglite_task);
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
-            lv_draw_vglite_layer(t);
+            lv_draw_vglite_layer(vglite_task);
             break;
         case LV_DRAW_TASK_TYPE_TRIANGLE:
-            lv_draw_vglite_triangle(t);
+            lv_draw_vglite_triangle(vglite_task);
             break;
         default:
             break;
@@ -449,9 +453,9 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
 
 #if LV_USE_PARALLEL_DRAW_DEBUG
     /*Layers manage it for themselves*/
-    if(t->type != LV_DRAW_TASK_TYPE_LAYER) {
+    if(vglite_task->t->type != LV_DRAW_TASK_TYPE_LAYER) {
         lv_area_t draw_area;
-        if(!lv_area_intersect(&draw_area, &t->area, &t->clip_area))
+        if(!lv_area_intersect(&draw_area, &vglite_task->t->area, &vglite_task->t->clip_area))
             return;
 
         int32_t idx = u->base_unit.idx;
@@ -463,7 +467,7 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
         rect_dsc.bg_opa = LV_OPA_10;
         rect_dsc.border_opa = LV_OPA_80;
         rect_dsc.border_width = 1;
-        lv_draw_sw_fill(t, &rect_dsc, &draw_area);
+        lv_draw_sw_fill(vglite_task->t, &rect_dsc, &draw_area);
 
         lv_point_t txt_size;
         lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
@@ -476,7 +480,7 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
 
         lv_draw_rect_dsc_init(&rect_dsc);
         rect_dsc.bg_color = lv_color_white();
-        lv_draw_sw_fill(t, &rect_dsc, &txt_area);
+        lv_draw_sw_fill(vglite_task->t, &rect_dsc, &txt_area);
 
         char buf[8];
         lv_snprintf(buf, sizeof(buf), "%d", idx);
@@ -484,13 +488,13 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
         lv_draw_label_dsc_init(&label_dsc);
         label_dsc.color = lv_color_black();
         label_dsc.text = buf;
-        lv_draw_sw_label(t, &label_dsc, &txt_area);
+        lv_draw_sw_label(vglite_task->t, &label_dsc, &txt_area);
     }
 #endif
 }
 
 #if LV_USE_VGLITE_DRAW_ASYNC
-static inline void _vglite_queue_task(lv_draw_task_t * task)
+static inline void _vglite_queue_task(vglite_draw_task_t * task)
 {
     VGLITE_ASSERT_MSG(((_tail + 1) % VGLITE_TASK_BUF_SIZE) != _head, "VGLite task buffer full.");
 
@@ -499,12 +503,16 @@ static inline void _vglite_queue_task(lv_draw_task_t * task)
     _tail = (_tail + 1) % VGLITE_TASK_BUF_SIZE;
 }
 
-static inline void _vglite_signal_task_ready(lv_draw_task_t * task)
+static inline void _vglite_signal_task_ready(vglite_draw_task_t * task)
 {
     /* Signal the ready state to dispatcher. */
-    task->state = LV_DRAW_TASK_STATE_READY;
+    task->t->state = LV_DRAW_TASK_STATE_READY;
     _head = (_head + 1) % VGLITE_TASK_BUF_SIZE;
-
+    if(task->path != NULL) {
+        vg_lite_clear_path(task->path);
+        lv_free(task->path);
+    }
+    lv_free(task);
     /* No need to cleanup the tasks in buffer as we advance with the _head. */
 }
 
@@ -513,7 +521,7 @@ static inline void _vglite_signal_all_task_ready(void)
     int end = (_head <= _tail) ? _tail : _tail + VGLITE_TASK_BUF_SIZE;
 
     for(int i = _head; i < end; i++) {
-        lv_draw_task_t * task = _draw_task_buf[i % VGLITE_TASK_BUF_SIZE].task;
+        vglite_draw_task_t * task = _draw_task_buf[i % VGLITE_TASK_BUF_SIZE].task;
 
         _vglite_signal_task_ready(task);
     }
@@ -526,7 +534,7 @@ static inline void _vglite_signal_flushed_task_ready(void)
 
         for(int i = _head; i < end; i++) {
             if(_draw_task_buf[i % VGLITE_TASK_BUF_SIZE].flushed) {
-                lv_draw_task_t * task = _draw_task_buf[i % VGLITE_TASK_BUF_SIZE].task;
+                vglite_draw_task_t * task = _draw_task_buf[i % VGLITE_TASK_BUF_SIZE].task;
 
                 _vglite_signal_task_ready(task);
 

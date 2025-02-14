@@ -41,7 +41,8 @@
  * @param[in] dsc Description of the area to fill (color, opa)
  *
  */
-static void _vglite_fill(const lv_area_t * dest_area, const lv_draw_fill_dsc_t * dsc);
+static void _vglite_fill(vglite_draw_task_t * task, const lv_area_t * dest_area,
+                         const lv_draw_fill_dsc_t * dsc);
 
 /**
  * Draw rectangle background with effects (rounded corners, gradient)
@@ -51,8 +52,8 @@ static void _vglite_fill(const lv_area_t * dest_area, const lv_draw_fill_dsc_t *
  * @param[in] dsc Description of the rectangle background
  *
  */
-static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_area,
-                              const lv_draw_fill_dsc_t * dsc);
+static void _vglite_draw_rect(vglite_draw_task_t * task, const lv_area_t * coords,
+                              const lv_area_t * clip_area, const lv_draw_fill_dsc_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -66,21 +67,21 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_fill(lv_draw_task_t * t)
+void lv_draw_vglite_fill(vglite_draw_task_t * vglite_task)
 {
-    const lv_draw_fill_dsc_t * dsc = t->draw_dsc;
-    const lv_area_t * coords = &t->area;
+    const lv_draw_fill_dsc_t * dsc = vglite_task->t->draw_dsc;
+    const lv_area_t * coords = &vglite_task->t->area;
 
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
-    lv_layer_t * layer = t->target_layer;
+    lv_layer_t * layer = vglite_task->t->target_layer;
     lv_area_t relative_coords;
     lv_area_copy(&relative_coords, coords);
     lv_area_move(&relative_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t clip_area;
-    lv_area_copy(&clip_area, &t->clip_area);
+    lv_area_copy(&clip_area, &vglite_task->t->clip_area);
     lv_area_move(&clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t clipped_coords;
@@ -91,16 +92,17 @@ void lv_draw_vglite_fill(lv_draw_task_t * t)
      * Most simple case: just a plain rectangle (no radius, no gradient)
      */
     if((dsc->radius == 0) && (dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE))
-        _vglite_fill(&clipped_coords, dsc);
+        _vglite_fill(vglite_task, &clipped_coords, dsc);
     else
-        _vglite_draw_rect(&relative_coords, &clip_area, dsc);
+        _vglite_draw_rect(vglite_task, &relative_coords, &clip_area, dsc);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void _vglite_fill(const lv_area_t * dest_area, const lv_draw_fill_dsc_t * dsc)
+static void _vglite_fill(vglite_draw_task_t * vglite_task, const lv_area_t * dest_area,
+                         const lv_draw_fill_dsc_t * dsc)
 {
     vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
 
@@ -121,7 +123,9 @@ static void _vglite_fill(const lv_area_t * dest_area, const lv_draw_fill_dsc_t *
     }
     else {   /*fill with transparency*/
 
-        vg_lite_path_t path;
+        vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
+        LV_ASSERT(path != NULL);
+        vglite_task->path = path;
         int32_t path_data[] = { /*VG rectangular path*/
             VLC_OP_MOVE, dest_area->x1,  dest_area->y1,
             VLC_OP_LINE, dest_area->x2 + 1,  dest_area->y1,
@@ -131,21 +135,19 @@ static void _vglite_fill(const lv_area_t * dest_area, const lv_draw_fill_dsc_t *
             VLC_OP_END
         };
 
-        VGLITE_CHECK_ERROR(vg_lite_init_path(&path, VG_LITE_S32, VG_LITE_MEDIUM, sizeof(path_data), path_data,
+        VGLITE_CHECK_ERROR(vg_lite_init_path(path, VG_LITE_S32, VG_LITE_MEDIUM, sizeof(path_data), path_data,
                                              (vg_lite_float_t) dest_area->x1, (vg_lite_float_t) dest_area->y1,
                                              ((vg_lite_float_t) dest_area->x2) + 1.0f, ((vg_lite_float_t) dest_area->y2) + 1.0f));
 
         /*Draw rectangle*/
-        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
 
         vglite_run();
-
-        VGLITE_CHECK_ERROR(vg_lite_clear_path(&path));
     }
 }
 
-static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_area,
-                              const lv_draw_fill_dsc_t * dsc)
+static void _vglite_draw_rect(vglite_draw_task_t * vglite_task, const lv_area_t * coords,
+                              const lv_area_t * clip_area, const lv_draw_fill_dsc_t * dsc)
 {
     int32_t width = lv_area_get_width(coords);
     int32_t height = lv_area_get_height(coords);
@@ -162,8 +164,10 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
     vglite_create_rect_path_data(path_data, &path_data_size, radius, coords);
     vg_lite_quality_t path_quality = dsc->radius > 0 ? VG_LITE_HIGH : VG_LITE_MEDIUM;
 
-    vg_lite_path_t path;
-    VGLITE_CHECK_ERROR(vg_lite_init_path(&path, VG_LITE_S32, path_quality, path_data_size, path_data,
+    vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
+    LV_ASSERT(path != NULL);
+    vglite_task->path = path;
+    VGLITE_CHECK_ERROR(vg_lite_init_path(path, VG_LITE_S32, path_quality, path_data_size, path_data,
                                          (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
                                          ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
@@ -215,16 +219,14 @@ static void _vglite_draw_rect(const lv_area_t * coords, const lv_area_t * clip_a
             vg_lite_scale((float)width / 256.0f, 1.0f, grad_matrix);
         }
 
-        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, NULL, &gradient,
+        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(vgbuf, path, VG_LITE_FILL_EVEN_ODD, NULL, &gradient,
                                                  VG_LITE_BLEND_SRC_OVER));
     }
     else {
-        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
     }
 
     vglite_run();
-
-    VGLITE_CHECK_ERROR(vg_lite_clear_path(&path));
 
     if(has_gradient)
         VGLITE_CHECK_ERROR(vg_lite_clear_grad(&gradient));
