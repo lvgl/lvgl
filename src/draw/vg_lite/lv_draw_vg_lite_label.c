@@ -163,6 +163,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
 
 #if LV_USE_FONT_PLACEHOLDER
             case LV_FONT_GLYPH_FORMAT_NONE: {
+                    if(glyph_draw_dsc->bg_coords == NULL) break;
                     /* Draw a placeholder rectangle*/
                     lv_draw_border_dsc_t border_draw_dsc;
                     lv_draw_border_dsc_init(&border_draw_dsc);
