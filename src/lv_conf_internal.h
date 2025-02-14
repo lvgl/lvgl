@@ -3074,7 +3074,7 @@
         #ifdef CONFIG_LV_SYSMON_GET_IDLE
             #define LV_SYSMON_GET_IDLE CONFIG_LV_SYSMON_GET_IDLE
         #else
-            #define LV_SYSMON_GET_IDLE lv_timer_get_idle
+            #define LV_SYSMON_GET_IDLE lv_os_get_idle_percent
         #endif
     #endif
 
