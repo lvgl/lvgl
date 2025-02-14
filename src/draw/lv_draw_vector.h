@@ -278,18 +278,18 @@ void lv_vector_dsc_set_fill_opa(lv_vector_dsc_t * dsc, lv_opa_t opa);
 void lv_vector_dsc_set_fill_rule(lv_vector_dsc_t * dsc, lv_vector_fill_t rule);
 
 /**
+ * Set the fill units for descriptor
+ * @param dsc              pointer to a vector graphic descriptor
+ * @param units            the units to be set in lv_vector_fill_units_t format
+ */
+void lv_vector_dsc_set_fill_units(lv_vector_dsc_t * dsc, const lv_vector_fill_units_t units);
+
+/**
  * Set fill image for descriptor
  * @param dsc              pointer to a vector graphic descriptor
  * @param img_dsc          pointer to a `lv_draw_image_dsc_t` variable
  */
 void lv_vector_dsc_set_fill_image(lv_vector_dsc_t * dsc, const lv_draw_image_dsc_t * img_dsc);
-
-/**
- * Set the coordinate system of the fill image
- * @param dsc              pointer to a vector graphic descriptor
- * @param units            the coordinate system to be set in lv_vector_fill_units_t format
- */
-void lv_vector_dsc_set_fill_pattern_units(lv_vector_dsc_t * dsc, const lv_vector_fill_units_t units);
 
 /**
  * Set fill linear gradient for descriptor

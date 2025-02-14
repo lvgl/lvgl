@@ -541,15 +541,15 @@ void lv_vector_dsc_set_fill_rule(lv_vector_dsc_t * dsc, lv_vector_fill_t rule)
     dsc->current_dsc.fill_dsc.fill_rule = rule;
 }
 
+void lv_vector_dsc_set_fill_units(lv_vector_dsc_t * dsc, const lv_vector_fill_units_t units)
+{
+    dsc->current_dsc.fill_dsc.fill_units = units;
+}
+
 void lv_vector_dsc_set_fill_image(lv_vector_dsc_t * dsc, const lv_draw_image_dsc_t * img_dsc)
 {
     dsc->current_dsc.fill_dsc.style = LV_VECTOR_DRAW_STYLE_PATTERN;
     lv_memcpy(&(dsc->current_dsc.fill_dsc.img_dsc), img_dsc, sizeof(lv_draw_image_dsc_t));
-}
-
-void lv_vector_dsc_set_fill_pattern_units(lv_vector_dsc_t * dsc, const lv_vector_fill_units_t units)
-{
-    dsc->current_dsc.fill_dsc.pattern_units = units;
 }
 
 void lv_vector_dsc_set_fill_linear_gradient(lv_vector_dsc_t * dsc, float x1, float y1, float x2, float y2)

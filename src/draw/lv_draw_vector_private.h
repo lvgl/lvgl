@@ -51,7 +51,7 @@ struct _lv_vector_fill_dsc_t {
     lv_color32_t color;
     lv_opa_t opa;
     lv_vector_fill_t fill_rule;
-    lv_vector_fill_units_t pattern_units;
+    lv_vector_fill_units_t fill_units;
     lv_draw_image_dsc_t img_dsc;
     lv_vector_gradient_t gradient;
     lv_matrix_t matrix;

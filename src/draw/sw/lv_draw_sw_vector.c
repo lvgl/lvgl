@@ -332,7 +332,7 @@ static void _set_paint_fill(Tvg_Paint * obj, Tvg_Canvas * canvas, const lv_vecto
     else if(dsc->style == LV_VECTOR_DRAW_STYLE_PATTERN) {
         lv_matrix_t imx;
 
-        if(dsc->pattern_units == LV_VECTOR_FILL_UNITS_OBJECT_BOUNDING_BOX) {
+        if(dsc->fill_units == LV_VECTOR_FILL_UNITS_OBJECT_BOUNDING_BOX) {
             /* Convert to object bounding box coordinates */
             imx = *matrix;
 

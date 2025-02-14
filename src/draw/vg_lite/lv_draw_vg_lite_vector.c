@@ -231,7 +231,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                     /* Calculate pattern matrix. Should start from path bond box, and also apply fill matrix. */
                     lv_matrix_t m = dsc->matrix;
 
-                    if(dsc->fill_dsc.pattern_units == LV_VECTOR_FILL_UNITS_OBJECT_BOUNDING_BOX) {
+                    if(dsc->fill_dsc.fill_units == LV_VECTOR_FILL_UNITS_OBJECT_BOUNDING_BOX) {
                         /* Convert to object bounding box coordinates */
                         lv_matrix_translate(&m, min_x, min_y);
                     }
