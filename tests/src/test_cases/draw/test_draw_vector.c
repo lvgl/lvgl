@@ -128,6 +128,22 @@ static void draw_shapes(lv_layer_t * layer)
     lv_vector_path_append_arc(path, &p, 50, 45, 45, true);
     lv_vector_dsc_add_path(ctx, path); // draw a path
 
+    /* Test image filling with absolute coordinates */
+    lv_vector_dsc_identity(ctx);
+    lv_vector_dsc_set_fill_pattern_utils(ctx, LV_VECTOR_FILL_UTILES_USER_SPACE_ON_USE);
+    lv_vector_dsc_set_fill_image(ctx, &img_dsc);
+    lv_vector_dsc_set_fill_opa(ctx, LV_OPA_50);
+    lv_vector_dsc_set_stroke_opa(ctx, LV_OPA_TRANSP);
+    lv_matrix_identity(&mt);
+    lv_matrix_translate(&mt, 50, 350);
+    lv_vector_dsc_set_fill_transform(ctx, &mt);
+
+    lv_vector_path_clear(path);
+    /* Aligned with translate. Image resolution is 100x100, cropped to 50% of width and height */
+    lv_area_t img_area = {50, 350, 50 + 50, 350 + 50};
+    lv_vector_path_append_rect(path, &img_area, 0, 0);
+    lv_vector_dsc_add_path(ctx, path);
+
     lv_draw_vector(ctx);
     lv_vector_path_delete(path);
     lv_vector_dsc_delete(ctx);

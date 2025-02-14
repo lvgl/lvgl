@@ -230,7 +230,12 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                 if(lv_vg_lite_buffer_open_image(&image_buffer, &decoder_dsc, dsc->fill_dsc.img_dsc.src, false, true)) {
                     /* Calculate pattern matrix. Should start from path bond box, and also apply fill matrix. */
                     lv_matrix_t m = dsc->matrix;
-                    lv_matrix_translate(&m, min_x, min_y);
+
+                    if(dsc->fill_dsc.pattern_utils == LV_VECTOR_FILL_UTILES_OBJECT_BOUDING_BOX) {
+                        /* Convert to object bounding box coordinates */
+                        lv_matrix_translate(&m, min_x, min_y);
+                    }
+
                     lv_matrix_multiply(&m, &dsc->fill_dsc.matrix);
 
                     vg_lite_matrix_t pattern_matrix;

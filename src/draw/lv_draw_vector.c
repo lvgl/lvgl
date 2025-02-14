@@ -547,6 +547,11 @@ void lv_vector_dsc_set_fill_image(lv_vector_dsc_t * dsc, const lv_draw_image_dsc
     lv_memcpy(&(dsc->current_dsc.fill_dsc.img_dsc), img_dsc, sizeof(lv_draw_image_dsc_t));
 }
 
+void lv_vector_dsc_set_fill_pattern_utils(lv_vector_dsc_t * dsc, const lv_vector_fill_utils_t utils)
+{
+    dsc->current_dsc.fill_dsc.pattern_utils = utils;
+}
+
 void lv_vector_dsc_set_fill_linear_gradient(lv_vector_dsc_t * dsc, float x1, float y1, float x2, float y2)
 {
     dsc->current_dsc.fill_dsc.style = LV_VECTOR_DRAW_STYLE_GRADIENT;

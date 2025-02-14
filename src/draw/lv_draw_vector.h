@@ -86,6 +86,11 @@ typedef enum {
     LV_VECTOR_GRADIENT_STYLE_RADIAL,
 } lv_vector_gradient_style_t;
 
+typedef enum {
+    LV_VECTOR_FILL_UTILES_OBJECT_BOUDING_BOX = 0,
+    LV_VECTOR_FILL_UTILES_USER_SPACE_ON_USE,
+} lv_vector_fill_utils_t;
+
 struct _lv_fpoint_t {
     float x;
     float y;
@@ -278,6 +283,13 @@ void lv_vector_dsc_set_fill_rule(lv_vector_dsc_t * dsc, lv_vector_fill_t rule);
  * @param img_dsc          pointer to a `lv_draw_image_dsc_t` variable
  */
 void lv_vector_dsc_set_fill_image(lv_vector_dsc_t * dsc, const lv_draw_image_dsc_t * img_dsc);
+
+/**
+ * Set the coordinate system of the fill image
+ * @param dsc              pointer to a vector graphic descriptor
+ * @param utils            the coordinate system to be set in lv_vector_fill_utils_t format
+ */
+void lv_vector_dsc_set_fill_pattern_utils(lv_vector_dsc_t * dsc, const lv_vector_fill_utils_t utils);
 
 /**
  * Set fill linear gradient for descriptor
