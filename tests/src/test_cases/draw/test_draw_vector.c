@@ -130,7 +130,7 @@ static void draw_shapes(lv_layer_t * layer)
 
     /* Test image filling with absolute coordinates */
     lv_vector_dsc_identity(ctx);
-    lv_vector_dsc_set_fill_pattern_utils(ctx, LV_VECTOR_FILL_UTILES_USER_SPACE_ON_USE);
+    lv_vector_dsc_set_fill_pattern_units(ctx, LV_VECTOR_FILL_UNITS_USER_SPACE_ON_USE);
     lv_vector_dsc_set_fill_image(ctx, &img_dsc);
     lv_vector_dsc_set_fill_opa(ctx, LV_OPA_50);
     lv_vector_dsc_set_stroke_opa(ctx, LV_OPA_TRANSP);

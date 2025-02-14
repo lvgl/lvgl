@@ -87,9 +87,9 @@ typedef enum {
 } lv_vector_gradient_style_t;
 
 typedef enum {
-    LV_VECTOR_FILL_UTILES_OBJECT_BOUDING_BOX = 0,
-    LV_VECTOR_FILL_UTILES_USER_SPACE_ON_USE,
-} lv_vector_fill_utils_t;
+    LV_VECTOR_FILL_UNITS_OBJECT_BOUNDING_BOX = 0,
+    LV_VECTOR_FILL_UNITS_USER_SPACE_ON_USE,
+} lv_vector_fill_units_t;
 
 struct _lv_fpoint_t {
     float x;
@@ -287,9 +287,9 @@ void lv_vector_dsc_set_fill_image(lv_vector_dsc_t * dsc, const lv_draw_image_dsc
 /**
  * Set the coordinate system of the fill image
  * @param dsc              pointer to a vector graphic descriptor
- * @param utils            the coordinate system to be set in lv_vector_fill_utils_t format
+ * @param units            the coordinate system to be set in lv_vector_fill_units_t format
  */
-void lv_vector_dsc_set_fill_pattern_utils(lv_vector_dsc_t * dsc, const lv_vector_fill_utils_t utils);
+void lv_vector_dsc_set_fill_pattern_units(lv_vector_dsc_t * dsc, const lv_vector_fill_units_t units);
 
 /**
  * Set fill linear gradient for descriptor
