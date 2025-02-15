@@ -2758,7 +2758,7 @@ static stbtt_int32 stbtt__GetGlyphGPOSInfoAdvance(const stbtt_fontinfo * info, i
     if(ttUSHORT(data, 2 + info->gpos) != 0) return 0;  // Minor version 0
 
     lookupListOffset = ttUSHORT(data, 8 + info->gpos);
-    lookupList = lookupListOffset;
+    lookupList = info->gpos + lookupListOffset;
     lookupCount = ttUSHORT(data, lookupList);
 
     for(i = 0; i < lookupCount; ++i) {
@@ -2876,7 +2876,7 @@ STBTT_DEF int stbtt_KernTableCheck(const stbtt_fontinfo * info)
         if(ttUSHORT(data, 2 + info->gpos) != 0) return 0;  // Minor version 0
 
         lookupListOffset = ttUSHORT(data, 8 + info->gpos);
-        lookupList = lookupListOffset;
+        lookupList = info->gpos + lookupListOffset;
         lookupCount = ttUSHORT(data, lookupList);
 
         for(i = 0; i < lookupCount; ++i) {
