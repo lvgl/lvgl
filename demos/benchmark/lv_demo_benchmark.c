@@ -1049,7 +1049,6 @@ static lv_obj_t * card_create(void)
     return panel;
 }
 
-#if LV_USE_FREETYPE || LV_USE_TINY_TTF
 static void spans_init(lv_obj_t * spans)
 {
     lv_obj_set_width(spans, LV_PCT(100));
@@ -1066,7 +1065,6 @@ static void spans_text_add(lv_obj_t * spans, const lv_font_t * font, const char 
         lv_style_set_text_font(lv_span_get_style(span), font);
     }
 }
-#endif
 
 static void rnd_reset(benchmark_context_t * context)
 {
