@@ -230,7 +230,7 @@ void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recognizer, l
         process_touch_event(touch, r->info);
         touches++;
 
-        LV_LOG_TRACE("processed touch ev: %d finger id: %d state: %d x: %d y: %d finger_cnt: %d",
+        LV_LOG_TRACE("processed touch ev: %d finger id: %d state: %d x: %" LV_PRId32 " y: %" LV_PRId32 " finger_cnt: %d",
                      i, touch->id, touch->state, touch->point.x, touch->point.y, r->info->finger_cnt);
     }
 
