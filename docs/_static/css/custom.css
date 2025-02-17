@@ -157,7 +157,7 @@ div.body {
  * .highlight .nf -- function names
  * .highlight .nl -- code labels
  * .descname  .n  -- API documentation function names
- * All 3 were created by lightening the `pygments.css` colors without changing their
+ * The first 2 were created by lightening the `pygments.css` colors without changing their
  * angle on the color wheel.  The added "conditional" also limits this change to
  * DARK MODE only instead of both light and dark modes.
  */
