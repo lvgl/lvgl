@@ -1,5 +1,7 @@
 .. _renesas:
 
+.. |sup2|   unicode:: U+000B2 .. SUPERSCRIPT TWO
+
 =======
 Renesas
 =======
@@ -98,7 +100,7 @@ Get started with the Renesas ecosystem
 
 .. dropdown:: RA Family
 
-    - The official IDE of Renesas is called e² studio. As it's Eclipse-based, it runs on Windows, Linux, and Mac as well.
+    - The official IDE of Renesas is called e\ |sup2| studio. As it's Eclipse-based, it runs on Windows, Linux, and Mac as well.
       The RA family requires the latest version with FSP 5.3. It can be downloaded `here <https://www.renesas.com/us/en/software-tool/flexible-software-package-fsp>`__.
     - JLink is used for debugging, it can be downloaded `here <https://www.segger.com/downloads/jlink/>`__.
     - Clone the ready-to-use repository for your selected board:
@@ -109,7 +111,7 @@ Get started with the Renesas ecosystem
 
 
         Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
-    - Open e² studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Existing projects into workspace``
+    - Open e\ |sup2| studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Existing projects into workspace``
     - Browse the cloned folder and press ``Finish``.
     - Double click on ``configuration.xml``. This will activate the `Configuration Window`.
 
@@ -139,7 +141,7 @@ Get started with the Renesas ecosystem
 
 .. dropdown:: RX Family
 
-    - The official IDE of Renesas is called e² studio. As it's Eclipse-based, it runs on Windows, Linux, and Mac as well.
+    - The official IDE of Renesas is called e\ |sup2| studio. As it's Eclipse-based, it runs on Windows, Linux, and Mac as well.
       It can be downloaded `here <https://www.renesas.com/us/en/software-tool/e-studio>`__.
     - Download and install the required driver for the debugger
 
@@ -150,7 +152,7 @@ Get started with the Renesas ecosystem
     - RX72 requires an external compiler for the RXv3 core. A free and open-source version is available
       `here <https://llvm-gcc-renesas.com/rx-download-toolchains/>`__ after a registration.
 
-      The compiler must be activated in e² studio:
+      The compiler must be activated in e\ |sup2| studio:
 
       - Go to go to ``Help`` -> ``Add Renesas Toolchains``
       - Press the ``Add...`` button
@@ -170,7 +172,7 @@ Get started with the Renesas ecosystem
 
       Downloading the `.zip` from GitHub doesn't work as it doesn't download the submodules.
 
-    - Open e² studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Existing projects into workspace``
+    - Open e\ |sup2| studio, go to ``File`` -> ``Import project`` and select ``General`` / ``Existing projects into workspace``
     - Select the cloned folder and press ``Finish``.
     - Double click on ``RX72N_EnVision_LVGL.scfg``. This will activate the `Configuration Window`.
 

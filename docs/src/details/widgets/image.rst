@@ -1,5 +1,7 @@
 .. _lv_image:
 
+.. |deg|    unicode:: U+000B0 .. DEGREE SIGN
+
 ================
 Image (lv_image)
 ================
@@ -128,7 +130,7 @@ set the horizontal and vertical scaling independently.  They can be different va
 
 To rotate the image use :cpp:expr:`lv_image_set_rotation(img, angle_x10)`.
 The ``angle_x10`` argument is an ``int32_t`` containing the angle (in degrees)
-multiplied by 10.  This gives 0.1-degree resolution.  Example:  458 means 45.8°.
+multiplied by 10.  This gives 0.1-degree resolution.  Example:  458 means 45.8\ |deg|\ .
 
 By default, the pivot point of the rotation is the center of the image.
 This can be changed with :cpp:expr:`lv_image_set_pivot(img, pivot_x, pivot_y)` where

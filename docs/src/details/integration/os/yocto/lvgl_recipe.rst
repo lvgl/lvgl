@@ -200,11 +200,11 @@ There are some key folders:
     -  **images**: it contains the images that can be flashed or deployed to
        the target device. Files like the Linux kernel, root filesystem (e.g., .
        ext4, .tar.gz, .squashfs), bootloaders (e.g., U-Boot), and other
-       bootable images for the device are found here. t’s organized by the
+       bootable images for the device are found here. t's organized by the
        machine (or target board) for which the image was built.
     -  **rmp/deb/ipk**: These folders contain the individual software packages
        generated during the build, in the specified package format (RPM, DEB,
-       or IPK). These packages are typically created when you’re building your
+       or IPK). These packages are typically created when you're building your
        Yocto project with package management support enabled. These can later
        be installed on the target device using package management tools
     -  **sdk**: This subdirectory contains Software Development Kits (SDKs)
