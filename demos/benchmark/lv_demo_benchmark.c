@@ -633,7 +633,7 @@ static scene_dsc_t scenes[] = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-static benchmark_context_t * benchmark_context_create(void)
+static benchmark_context_t * benchmark_context_init(void)
 {
     benchmark_context_t * context = lv_malloc_zeroed(sizeof(benchmark_context_t));
     LV_ASSERT_MALLOC(context);
@@ -673,7 +673,7 @@ static benchmark_context_t * benchmark_context_create(void)
     return context;
 }
 
-static void benchmark_context_delete(benchmark_context_t * context)
+static void benchmark_context_deinit(benchmark_context_t * context)
 {
 #if LV_USE_FREETYPE
     if(context->freetype_font_bitmap) {
@@ -697,7 +697,7 @@ static void benchmark_context_delete(benchmark_context_t * context)
 
 void lv_demo_benchmark(void)
 {
-    benchmark_context_t * context = benchmark_context_create();
+    benchmark_context_t * context = benchmark_context_init();
 
     lv_obj_t * scr = lv_screen_active();
     lv_obj_remove_style_all(scr);
@@ -758,7 +758,7 @@ static void next_scene_timer_cb(lv_timer_t * timer)
 
     load_scene(context);
     if(scenes[context->scene_act].scene_time == 0) {
-        benchmark_context_delete(context);
+        benchmark_context_deinit(context);
         lv_timer_delete(timer);
         summary_create();
     }
