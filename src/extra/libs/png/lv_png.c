@@ -16,6 +16,11 @@
 /*********************
  *      DEFINES
  *********************/
+#ifdef LODEPNG_COMPILE_ALLOCATORS
+#define lv_png_free(ptr) lv_mem_free((ptr))
+#else
+#define lv_png_free(ptr) lodepng_free((ptr))
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -172,10 +177,10 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
 
             /*Decode the loaded image in ARGB8888 */
             error = lodepng_decode32(&img_data, &png_width, &png_height, png_data, png_data_size);
-            lodepng_free(png_data); /*Free the loaded file*/
+            lv_png_free(png_data); /*Free the loaded file*/
             if(error) {
                 if(img_data != NULL) {
-                    lodepng_free(img_data);
+                    lv_png_free(img_data);
                 }
                 LV_LOG_WARN("error %" LV_PRIu32 ": %s\n", error, lodepng_error_text(error));
                 return LV_RES_INV;
@@ -198,7 +203,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
 
         if(error) {
             if(img_data != NULL) {
-                lodepng_free(img_data);
+                lv_png_free(img_data);
             }
             return LV_RES_INV;
         }
@@ -220,7 +225,7 @@ static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc
 {
     LV_UNUSED(decoder); /*Unused*/
     if(dsc->img_data) {
-        lodepng_free((uint8_t *)dsc->img_data);
+        lv_png_free((uint8_t *)dsc->img_data);
         dsc->img_data = NULL;
     }
 }
