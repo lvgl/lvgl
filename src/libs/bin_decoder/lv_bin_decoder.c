@@ -1149,10 +1149,14 @@ static lv_result_t decompress_image(lv_image_decoder_dsc_t * dsc, const lv_image
 #if LV_USE_LZ4
         const char * input = (const char *)compressed->data;
         char * output = (char *)img_data;
-        int len;
-        len = LZ4_decompress_safe(input, output, input_len, out_len);
-        if(len < 0 || (uint32_t)len != compressed->decompressed_size) {
-            LV_LOG_WARN("Decompress failed: %" LV_PRId32 ", got: %" LV_PRId32, out_len, len);
+        uint32_t len = 0;
+        int ret = LZ4_decompress_safe(input, output, (int)input_len, (int)out_len);
+        if(ret >= 0) {
+            // Cast is safe because of the above check
+            len = (uint32_t)ret;
+        }
+        if(len != compressed->decompressed_size) {
+            LV_LOG_WARN("Decompress failed: %" LV_PRIu32 ", got: %" LV_PRIu32, out_len, len);
             lv_draw_buf_destroy(decompressed);
             return LV_RESULT_INVALID;
         }
