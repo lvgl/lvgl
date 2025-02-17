@@ -152,8 +152,8 @@ div.body {
   font-size: 75%;
 }
 
-/* These replace a color present in `pygments.css` which is used to highlight function
- * and label names.  These are too dark to be readlable in DARK mode.  They include:
+/* These replace colors present in `pygments.css` which is used in code highlighting.
+ * These are too dark to be readlable in DARK mode.  They include:
  * .highlight .nf -- function names
  * .highlight .nl -- code labels
  * .descname  .n  -- API documentation function names
