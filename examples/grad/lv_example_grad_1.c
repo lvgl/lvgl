@@ -21,17 +21,21 @@ static void frac_1_event_cb(lv_event_t * e)
 {
     lv_style_t * style = lv_event_get_user_data(e);
     lv_style_value_t v;
-    lv_style_get_prop(style, LV_STYLE_BG_GRAD, &v);
-    lv_grad_dsc_t * dsc = (lv_grad_dsc_t *)v.ptr;
+    if(lv_style_get_prop(style, LV_STYLE_BG_GRAD, &v) != LV_STYLE_RES_FOUND) {
+        LV_LOG_WARN("style prop not found");
+    }
+    else {
+        lv_grad_dsc_t * dsc = (lv_grad_dsc_t *)v.ptr;
 
-    lv_point_t p;
-    position_bullet(e, &p);
+        lv_point_t p;
+        position_bullet(e, &p);
 
-    lv_obj_t * bullet = lv_event_get_target(e);
-    lv_obj_t * parent = lv_obj_get_parent(bullet);
-    dsc->stops[0].frac = LV_CLAMP(0, p.x * 255 / lv_obj_get_width(parent), 255);
+        lv_obj_t * bullet = lv_event_get_target(e);
+        lv_obj_t * parent = lv_obj_get_parent(bullet);
+        dsc->stops[0].frac = LV_CLAMP(0, p.x * 255 / lv_obj_get_width(parent), 255);
 
-    lv_obj_invalidate(parent);
+        lv_obj_invalidate(parent);
+    }
 }
 
 static void frac_2_event_cb(lv_event_t * e)
