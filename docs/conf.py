@@ -391,7 +391,7 @@ redirects = {
     "overview/debugging/log":                     "../../details/debugging/log.html"                                ,
     "overview/debugging/profiler":                "../../details/debugging/profiler.html"                           ,
     "overview/debugging/vg_lite_tvg":             "../../details/debugging/vg_lite_tvg.html"                        ,
-    "overview/display":                           "../details/main-components/display.html"                         ,
+    "overview/display":                           "../details/main-components/display/index.html"                   ,
     "overview/event":                             "../details/base-widget/event.html"                               ,
     "overview/font":                              "../details/main-components/font.html"                            ,
     "overview/fs":                                "../details/main-components/fs.html"                              ,
