@@ -191,6 +191,14 @@ size_t lv_strlen(const char * str)
     return i;
 }
 
+size_t lv_strnlen(const char * str, size_t max_len)
+{
+    size_t i = 0;
+    while(i < max_len && str[i]) i++;
+
+    return i;
+}
+
 size_t lv_strlcpy(char * dst, const char * src, size_t dst_size)
 {
     size_t i = 0;
@@ -255,6 +263,17 @@ char * lv_strdup(const char * src)
     if(dst == NULL) return NULL;
 
     lv_memcpy(dst, src, len); /*memcpy is faster than strncpy when length is known*/
+    return dst;
+}
+
+char * lv_strndup(const char * src, size_t max_len)
+{
+    size_t len = lv_strnlen(src, max_len);
+    char * dst = lv_malloc(len + 1);
+    if(dst == NULL) return NULL;
+
+    lv_memcpy(dst, src, len);
+    dst[len] = '\0';
     return dst;
 }
 

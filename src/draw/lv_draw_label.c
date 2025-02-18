@@ -118,7 +118,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_label(lv_layer_t * layer, const lv_draw_label
     /*The text is stored in a local variable so malloc memory for it*/
     if(dsc->text_local) {
         lv_draw_label_dsc_t * new_dsc = t->draw_dsc;
-        new_dsc->text = lv_strdup(dsc->text);
+        new_dsc->text = lv_strndup(dsc->text, dsc->text_length);
+        LV_ASSERT_MALLOC(new_dsc->text);
     }
 
     lv_draw_finalize_task_creation(layer, t);

@@ -116,10 +116,9 @@ lv_display_t * lv_linux_fbdev_create(void)
 
 void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 {
-    char * devname = lv_malloc(lv_strlen(file) + 1);
+    char * devname = lv_strdup(file);
     LV_ASSERT_MALLOC(devname);
     if(devname == NULL) return;
-    lv_strcpy(devname, file);
 
     lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
     dsc->devname = devname;
