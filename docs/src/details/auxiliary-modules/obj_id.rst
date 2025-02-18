@@ -190,7 +190,8 @@ that the Widget no longer exists.
 Find child by ID
 ----------------
 
+.. warning::
+  ``lv_obj_find_by_id(widget, id)`` is deprecated. To find a widget use ``obj_name``.
+
 :cpp:expr:`lv_obj_find_by_id(widget, id)` will perform a recursive walk through
 ``widget``\ 's children and return the first child encountered having the given ID.
-
-
