@@ -33,6 +33,9 @@ from sphinx.builders.html import StandaloneHTMLBuilder
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
+#
+# As of 6-Jan-2025, `link_roles` is being commented out because it is being
+# replaced by a manually-installed translation link in ./docs/index.rst.
 extensions = [
     'sphinx_rtd_theme',
     'sphinx.ext.autodoc',
@@ -43,7 +46,7 @@ extensions = [
     'lv_example',
     'sphinx_design',
     'sphinx_rtd_dark_mode',
-    'link_roles',
+    # 'link_roles',
     'sphinxcontrib.mermaid',
     'sphinx_reredirects'
 ]

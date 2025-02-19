@@ -1,8 +1,8 @@
 .. _reference:
 
-=========
-Reference
-=========
+=======
+Details
+=======
 
 .. toctree::
     :maxdepth: 2
