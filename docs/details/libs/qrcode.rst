@@ -8,8 +8,8 @@ The `QR-Code-generator library <https://github.com/nayuki/QR-Code-generator>`__ 
 `nayuki <https://github.com/nayuki>`__ is a 3rd-party library that generates QR-Code
 bitmaps.
 
-The lv_qrcode LVGL extension is an interface to that library that implements a custom
-Widget that generates and displays QR Codes using that library.
+The lv_qrcode LVGL extension is an interface to that library which implements a custom
+Widget that generates and displays QR Codes using the library.
 
 
 
