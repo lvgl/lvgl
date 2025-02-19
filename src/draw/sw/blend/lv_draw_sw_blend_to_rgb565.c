@@ -496,7 +496,7 @@ static void LV_ATTRIBUTE_FAST_MEM i1_image_blend(lv_draw_sw_blend_image_dsc_t * 
                               (((dest_buf_u16[dest_x] & 0x1F) * (l8_to_rgb565(chan_val) & 0x1F)) >> 5);
                         break;
                     case LV_BLEND_MODE_DIFFERENCE:
-                        // Difference blending mode
+                        /*Difference blending mode*/
                         res = (LV_ABS(dest_buf_u16[dest_x] - l8_to_rgb565(chan_val)));
                         break;
                     default:

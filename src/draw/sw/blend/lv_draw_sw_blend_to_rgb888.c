@@ -923,9 +923,9 @@ static inline void LV_ATTRIBUTE_FAST_MEM blend_non_normal_pixel(uint8_t * dest, 
             res[2] = (dest[2] * src.red) >> 8;
             break;
         case LV_BLEND_MODE_DIFFERENCE:
-            res[0] = LV_ABS(dest[0] - src.blue);
-            res[1] = LV_ABS(dest[1] - src.green);
-            res[2] = LV_ABS(dest[2] - src.red);
+            res[0] = LV_ABS((int16_t)dest[0] - src.blue);
+            res[1] = LV_ABS((int16_t)dest[1] - src.green);
+            res[2] = LV_ABS((int16_t)dest[2] - src.red);
             break;
         default:
             LV_LOG_WARN("Not supported blend mode: %d", mode);
