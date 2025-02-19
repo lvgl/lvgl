@@ -38,13 +38,23 @@ To install using the `requirements.txt` file use the following command:
 
 Once you have all of the requirements installed you are ready to build the documentation.  Use the following command:
 
-    python build.py skip_latex clean
+    python build.py html
 
 You may have to use the following command if you are on a Unix like OS
 
-    python3 build.py skip_latex clean
+    python3 build.py html
 
-The documentation will be output into `./out_html/` in the root directory for LVGL.
+The documentation will be output into `./docs/output/html/`.
+
+If the list of document source files has changed:
+
+    python build.py clean html
+
+To see a list of options available:
+
+    python build.py
+
+Read the docstring for `build.py` for detailed documentation on each option.
 
 
 ## For Developers
