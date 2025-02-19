@@ -93,7 +93,7 @@ An RLE image binary can be directly generated from another image using script
 
    ./scripts/LVGLImage.py --ofmt BIN --cf I8 --compress RLE cogwheel.png
 
-This will decompress ``cogwheel.pgn``, and then re-compress it using RLE and write
+This will decompress ``cogwheel.png``, and then re-compress it using RLE and write
 the output to ``./output/cogwheel.bin``.
 
 
