@@ -1020,6 +1020,7 @@ static inline void LV_ATTRIBUTE_FAST_MEM blend_non_normal_pixel(lv_color16a_t * 
             break;
         case LV_BLEND_MODE_DIFFERENCE:
             res.lumi = LV_ABS(dest->lumi - src.lumi);
+            break;
         default:
             LV_LOG_WARN("Not supported blend mode: %d", mode);
             return;
