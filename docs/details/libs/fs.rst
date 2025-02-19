@@ -38,7 +38,9 @@ driver identifier letter ``'S'``:
 :Windows-like absolute path:  ``"S:C:/path/to/file.txt"``
 
 Do not confuse the driver-identifier letter with the Windows/DOS/FAT "drive letter",
-which is part of the path passed to the OS-level functions.
+which is part of the path passed to the OS-level functions.  For more details, see
+:ref:`lv_fs_identifier_letters`.
+
 :ref:`Cached reading <file_system_cache>` is also supported if ``LV_FS_..._CACHE_SIZE`` is set to
 a non-zero value.
 
