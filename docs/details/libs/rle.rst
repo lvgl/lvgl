@@ -31,7 +31,7 @@ Theory
 ******
 
 The RLE algorithm is a simple compression algorithm that is based on the fact that
-the for many adjacent pixels, the color is the same.  The algorithm simply counts how
+for many adjacent pixels, the color is the same.  The algorithm simply counts how
 many repeated pixels with the same color there are, and stores the count value and
 the color value.  If the up-coming pixels are not repeated, it stores the non-repeat
 count value and original color values.  For more details, the script used to compress
