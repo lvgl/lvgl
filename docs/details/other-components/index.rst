@@ -18,4 +18,4 @@ Other Components
     obj_property
     observer
     snapshot
-    xml
+    xml/index

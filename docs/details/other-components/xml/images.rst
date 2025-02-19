@@ -25,9 +25,9 @@ Usage
 			<convert path="raw/avatar.svg" width="100px" color_format="L8"/>
 		</file>
 
-		<data name="logo" src_path="logo1.png">
+		<data name="logo" src_path="logo1.png" color-format="rgb565" memory="RAM2">
 			<convert path="https://foo.com/image.png" width="50%" height="80%"
-			color_format="RGB565" memory="RAM2"/>
+			color_format="RGB565"/>
 		</data>
 	</images>
 
