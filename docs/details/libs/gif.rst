@@ -1,49 +1,54 @@
 .. _gif:
 
 ===========
-GIF decoder
+GIF Decoder
 ===========
 
-Allow using GIF images in LVGL.
+**GIF Decoder** is an LVGL extension that enables you to use GIF images in your LVGL UI.
 
-Detailed introduction: https://github.com/lecram/gifdec
+For a detailed introduction, see:  https://github.com/lecram/gifdec .
 
-When enabled in ``lv_conf.h`` with :c:macro:`LV_USE_GIF`
+
+
+Usage
+*****
+
+Once enabled in ``lv_conf.h`` by setting :c:macro:`LV_USE_GIF` to ``1``,
 :cpp:expr:`lv_gif_create(parent)` can be used to create a gif widget.
 
 :cpp:expr:`lv_gif_set_src(widget, src)` works very similarly to :cpp:func:`lv_image_set_src`.
-As source, it also accepts images as variables (:c:struct:`lv_image_dsc_t`) or
-files.
+As source, it also accepts images as variables (:c:struct:`lv_image_dsc_t`) or files.
 
-Convert GIF files to C array
-----------------------------
+Converting GIF Files to C Arrays
+--------------------------------
 
-To convert a GIF file to byte values array use `LVGL's online
+To convert a GIF file to an array of bytes, use `LVGL's online
 converter <https://lvgl.io/tools/imageconverter>`__. Select "Raw" color
 format and "C array" Output format.
 
-Use GIF images from file
-------------------------
+Using GIF Images from Files
+---------------------------
 
-For example:
+Example:
 
 .. code-block:: c
 
    lv_gif_set_src(widget, "S:path/to/example.gif");
 
 Note that, a file system driver needs to be registered to open images
-from files. Read more about it :ref:`overview_file_system` or just
-enable one in ``lv_conf.h`` with ``LV_USE_FS_...``
+from files.  To do so, follow the instructions in :ref:`file_system`.
 
-Memory requirements
+Memory Requirements
 -------------------
 
-To decode and display a GIF animation the following amount of RAM is
-required:
+To decode and display a GIF animation the following amount of RAM (in bytes) is
+required for each of the following color depths:
 
-- :c:macro:`LV_COLOR_DEPTH` ``8``: 3 x image width x image height
-- :c:macro:`LV_COLOR_DEPTH` ``16``: 4 x image width x image height
-- :c:macro:`LV_COLOR_DEPTH` ``32``: 5 x image width x image height
+.. |times|  unicode:: U+000D7 .. MULTIPLICATION SIGN
+
+- :c:macro:`LV_COLOR_DEPTH` ``8``: 3 |times| image width |times| image height
+- :c:macro:`LV_COLOR_DEPTH` ``16``: 4 |times| image width |times| image height
+- :c:macro:`LV_COLOR_DEPTH` ``32``: 5 |times| image width |times| image height
 
 .. _gif_example:
 
