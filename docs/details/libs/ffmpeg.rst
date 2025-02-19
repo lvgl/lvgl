@@ -33,7 +33,7 @@ Download the FFmpeg library from `its official download page
 Adding FFmpeg to Your Project
 *****************************
 
-To use the ``FFmpeg`` library to your project, you will need to link against these
+To use the ``FFmpeg`` library in your project, you will need to link against these
 libraries:
 
 :libavformat:   part of FFmpeg library
