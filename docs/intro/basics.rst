@@ -138,7 +138,7 @@ when the Screen is the :ref:`active_screen`.  If you want to delete the current 
 as you load a new one, call :cpp:func:`lv_screen_load_anim` and pass ``true`` for the
 ``auto_del`` argument.  If you want to keep the current Screen in RAM when you load a
 new Screen, pass ``false`` for the ``auto_del`` argument, or call
-:cpp:func:`lv_screen_active` to load the new screen.
+:cpp:func:`lv_screen_load` to load the new screen.
 
 A system designer is free to keep any number of Screens (and their child Widgets) in
 RAM (e.g. for quick re-display again later).  Doing so:
@@ -159,7 +159,7 @@ Widgets are created by calling functions that look like this::
 
     lv_<type>_create(parent)
 
-The call will return an :cpp:type:`lv_obj_t` ``*`` pointer that can be used later to
+The call will return an :cpp:expr:`lv_obj_t *` pointer that can be used later to
 reference the Widget to set its attributes.
 
 For example:
