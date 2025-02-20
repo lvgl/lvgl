@@ -190,8 +190,8 @@ html_js_files = [
     'js/include_html.js'
 ]
 
-html_favicon = 'favicon.png'
-html_logo = 'logo_lvgl.png'
+html_favicon = '_static/images/favicon.png'
+html_logo = '_static/images/logo_lvgl.png'
 
 # -- Options for HTMLHelp output ------------------------------------------
 

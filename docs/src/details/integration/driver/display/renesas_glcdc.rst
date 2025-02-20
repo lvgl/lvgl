@@ -7,7 +7,7 @@ Renesas GLCDC
 Overview
 --------
 
-.. image:: /misc/renesas/glcdc.png
+.. image:: /_static/images/renesas/glcdc.png
     :alt: Architectural overview of Renesas GLCDC
     :align: center
 

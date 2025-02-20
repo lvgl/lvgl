@@ -40,7 +40,7 @@ Supported boards
 .. list-table::
    :widths: 10 30 30 30
 
-   * - 
+   * -
      - **EK-RA8D1**
      - **EK-RA6M3G**
      - **RX72N Envision Kit**
@@ -49,25 +49,25 @@ Supported boards
      - 120MHz, Arm Cortex-M4 core
      - 240MHz, Renesas RXv3 core
    * - Memory
-     - 
+     -
          | 1MB internal, 64MB external SDRAM
          | 2MB internal, 64MB External Octo-SPI Flash
-     - 
+     -
          | 640kB internal SRAM
          | 2MB internal, 32MB external QSPI Flash
-     - 
+     -
          | 1MB internal SRAM
          | 4MB internal, 32MB external QSPI Flash
    * - Display
-     - 
+     -
          | 4.5”
          | 480x854
          | 2-lane MIPI
-     - 
+     -
          | 4.3”
          | 480x272
          | Parallel RGB565
-     - 
+     -
          | 4.3”
          | 480x272
          | Parallel RGB565
@@ -93,7 +93,7 @@ Supported boards
 Get started with the Renesas ecosystem
 --------------------------------------
 
-.. |img_debug_btn| image:: /misc/renesas/debug_btn.png
+.. |img_debug_btn| image:: /_static/images/renesas/debug_btn.png
    :alt: Debug button
 
 .. dropdown:: RA Family
@@ -118,7 +118,7 @@ Get started with the Renesas ecosystem
 
       Press ``Generate Project Content`` in the top right corner.
 
-      .. image:: /misc/renesas/generate.png
+      .. image:: /_static/images/renesas/generate.png
          :alt: Code generation with FSP
 
     - Build the project by pressing ``Ctrl`` + ``Alt`` + ``B``
@@ -126,12 +126,12 @@ Get started with the Renesas ecosystem
 
       - ``R7FA8D1BH`` for EK-RA8D1
 
-        .. image:: /misc/renesas/debug_ra8.png
+        .. image:: /_static/images/renesas/debug_ra8.png
            :alt: Debugger parameters for RA8
 
       - ``R7FA6M3AH`` for EK-RA6M3G
 
-        .. image:: /misc/renesas/debug_ra6.png
+        .. image:: /_static/images/renesas/debug_ra6.png
             :alt: Debugger parameters for RA6
 
    .. note::
@@ -158,7 +158,7 @@ Get started with the Renesas ecosystem
 
       <br/>
 
-      .. image:: /misc/renesas/toolchains.png
+      .. image:: /_static/images/renesas/toolchains.png
          :alt: Toolchains
 
     - Clone the ready-to-use `lv_port_renesas_rx72n-envision-kit <https://github.com/lvgl/lv_port_renesas_rx72n-envision-kit.git>`__ repository:
@@ -179,14 +179,14 @@ Get started with the Renesas ecosystem
 
       Press ``Generate Code`` in the top right corner.
 
-      .. image:: /misc/renesas/generate_smc.png
+      .. image:: /_static/images/renesas/generate_smc.png
          :alt: Code generation with SMC
 
     - Build the project by pressing ``Ctrl`` + ``Alt`` + ``B``
     - Click the Debug button (|img_debug_btn|). If prompted with `Debug Configurations`, on the `Debugger` tab select the ``E2 Lite``
       as `Debug hardware` and ``R5F572NN`` as `Target Device`:
 
-      .. image:: /misc/renesas/debug_rx72.png
+      .. image:: /_static/images/renesas/debug_rx72.png
          :alt: Debugger parameters for RX72
 
     .. note::

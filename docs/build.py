@@ -177,8 +177,11 @@ import add_translation
 # Configuration
 # -------------------------------------------------------------------------
 # These are relative paths from the ./docs/ directory.
+cfg_src_dir = 'src'
 cfg_temp_dir = 'tmp'
-cfg_output_dir = 'output'
+cfg_output_dir = 'build'
+cfg_lv_conf_file = 'lv_conf.h'
+cfg_examples_dir = 'examples'
 
 # Filename generated in `cfg_latex_output_dir` and copied to `cfg_pdf_output_dir`.
 cfg_pdf_filename = 'LVGL.pdf'
@@ -288,7 +291,7 @@ def temp_dir_contents_exists(_tmpdir):
         c7 = os.path.isdir(temp_path)
         temp_path = os.path.join(_tmpdir, 'intro')
         c8 = os.path.isdir(temp_path)
-        temp_path = os.path.join(_tmpdir, 'examples')
+        temp_path = os.path.join(_tmpdir, cfg_examples_dir)
         c9 = os.path.isdir(temp_path)
         result = c2 and c3 and c4 and c5 and c6 and c7 and c8 and c9
 
@@ -369,7 +372,7 @@ def run():
     # ---------------------------------------------------------------------
     base_path = os.path.abspath(os.path.dirname(__file__))
     project_path = os.path.abspath(os.path.join(base_path, '..'))
-    examples_path = os.path.join(project_path, 'examples')
+    examples_path = os.path.join(project_path, cfg_examples_dir)
     lvgl_src_path = os.path.join(project_path, 'src')
     output_path = os.path.join(base_path, cfg_output_dir)
     html_output_path = os.path.join(output_path, 'html')
@@ -393,8 +396,8 @@ def run():
     else:
         temp_directory = os.path.join(base_path, cfg_temp_dir)
 
-    html_src_path = temp_directory
     print(f'Temporary directory:  [{temp_directory}]')
+    lv_conf_path = os.path.join(temp_directory, cfg_lv_conf_file)
 
     # ---------------------------------------------------------------------
     # Change to script directory for consistency.
@@ -506,8 +509,8 @@ def run():
         }
         # action == 'sync' means copy files even when they do not already exist in tgt dir.
         # action == 'update' means DO NOT copy files when they do not already exist in tgt dir.
-        dirsync.sync('.', temp_directory, 'sync', **options)
-        dirsync.sync(examples_path, os.path.join(temp_directory, 'examples'), 'sync', **options)
+        dirsync.sync(cfg_src_dir, temp_directory, 'sync', **options)
+        dirsync.sync(examples_path, os.path.join(temp_directory, cfg_examples_dir), 'sync', **options)
     elif build_temp or build_html or build_latex:
         # We are having to create the temp_directory contents by copying.
         print("****************")
@@ -521,9 +524,9 @@ def run():
             # --------- Method 0:
             ignore_func = shutil.ignore_patterns('tmp*', 'output*')
             print('Copying docs...')
-            shutil.copytree('.', temp_directory, ignore=ignore_func, dirs_exist_ok=True)
+            shutil.copytree(cfg_src_dir, temp_directory, ignore=ignore_func, dirs_exist_ok=True)
             print('Copying examples...')
-            shutil.copytree(examples_path, os.path.join(temp_directory, 'examples'), dirs_exist_ok=True)
+            shutil.copytree(examples_path, os.path.join(temp_directory, cfg_examples_dir), dirs_exist_ok=True)
         else:
             # --------- Method 1:
             options = {
@@ -533,24 +536,24 @@ def run():
             # action == 'sync' means copy files even when they do not already exist in tgt dir.
             # action == 'update' means DO NOT copy files when they do not already exist in tgt dir.
             print('Copying docs...')
-            dirsync.sync('.', temp_directory, 'sync', **options)
+            dirsync.sync(cfg_src_dir, temp_directory, 'sync', **options)
             print('Copying examples...')
-            dirsync.sync(examples_path, os.path.join(temp_directory, 'examples'), 'sync', **options)
+            dirsync.sync(examples_path, os.path.join(temp_directory, cfg_examples_dir), 'sync', **options)
 
         # -----------------------------------------------------------------
         # Build Example docs, Doxygen output, API docs, and API links.
         # -----------------------------------------------------------------
         t1 = datetime.now()
 
-        # Build local lv_conf.h from lv_conf_template.h for this build only.
-        config_builder.run()
+        # Build <temp_directory>/lv_conf.h from lv_conf_template.h for this build only.
+        config_builder.run(lv_conf_path)
 
         # Replace tokens in Doxyfile in 'temp_directory' with data from this run.
-        with open(os.path.join(temp_directory, 'Doxyfile'), 'rb') as f:
+        with open(os.path.join(base_path, 'Doxyfile'), 'rb') as f:
             data = f.read().decode('utf-8')
 
-        data = data.replace('<<LV_CONF_PATH>>', os.path.join(base_path, 'lv_conf.h'))
-        data = data.replace('<<SRC>>', '"{0}"'.format(lvgl_src_path))
+        data = data.replace('<<LV_CONF_PATH>>', lv_conf_path)
+        data = data.replace('<<SRC>>', f'"{lvgl_src_path}"')
 
         with open(os.path.join(temp_directory, 'Doxyfile'), 'wb') as f:
             f.write(data.encode('utf-8'))
@@ -672,8 +675,8 @@ def run():
             f.write(index_data.encode('utf-8'))
 
         t2 = datetime.now()
-        print('PDF               :  ' + pdf_dst_file)
-        print('Latex gen run time:  ' + str(t2 - t1))
+        print('PDF           :  ' + pdf_dst_file)
+        print('Latex gen time:  ' + str(t2 - t1))
 
     # ---------------------------------------------------------------------
     # Build HTML
@@ -706,19 +709,13 @@ def run():
             env_opt = ''
 
         ver = get_version(version_source_path)
-        src = html_src_path
+        src = temp_directory
         dst = output_path
         cpu = os.cpu_count()
         cmd_line = f'sphinx-build -M html "{src}" "{dst}" -D version="{ver}" {env_opt} -j {cpu}'
         cmd(cmd_line)
         t2 = datetime.now()
         print('HTML gen time :  ' + str(t2 - t1))
-
-    # ---------------------------------------------------------------------
-    # Remove temporary `lv_conf.h` created for this build.
-    # Do this even when `lv_conf.h` was not generated in case a prior run got interrupted.
-    # ---------------------------------------------------------------------
-    config_builder.cleanup()
 
     # ---------------------------------------------------------------------
     # Indicate results.

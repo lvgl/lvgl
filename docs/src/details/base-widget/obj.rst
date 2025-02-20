@@ -156,7 +156,7 @@ Moving together
 If the position of a parent changes, the children will move along with
 it. Therefore, all positions are relative to the parent.
 
-.. image:: /misc/par_child1.png
+.. image:: /_static/images/par_child1.png
 
 .. code-block:: c
 
@@ -168,7 +168,7 @@ it. Therefore, all positions are relative to the parent.
 
 Modify the position of the parent:
 
-.. image:: /misc/par_child2.png
+.. image:: /_static/images/par_child2.png
 
 .. code-block:: c
 
@@ -183,7 +183,7 @@ Visibility only on the parent
 If a child is partially or fully outside its parent then the parts
 outside will not be visible.
 
-.. image:: /misc/par_child3.png
+.. image:: /_static/images/par_child3.png
 
 .. code-block:: c
 

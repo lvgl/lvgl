@@ -66,7 +66,7 @@ jobs:
       - name: Build docs
         run: docs/build.py html
       - name: Remove .doctrees
-        run: rm -rf docs/output/html/.doctrees
+        run: rm -rf docs/build/html/.doctrees
       - name: Retrieve version
         run: |
           echo "::set-output name=VERSION_NAME::$(scripts/find_version.sh)"
@@ -77,7 +77,7 @@ jobs:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
           repository-name: lvgl/docs
           branch: gh-pages # The branch the action should deploy to.
-          folder: docs/output/html  # The folder the action should deploy.
+          folder: docs/build/html  # The folder the action should deploy.
           target-folder: ${{ steps.version.outputs.VERSION_NAME }}
           git-config-name: lvgl-bot
           git-config-email: lvgl-bot@users.noreply.github.com
@@ -89,7 +89,7 @@ jobs:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
           repository-name: lvgl/docs
           branch: gh-pages # The branch the action should deploy to.
-          folder: docs/output/html  # The folder the action should deploy.
+          folder: docs/build/html  # The folder the action should deploy.
           target-folder: master
           git-config-name: lvgl-bot
           git-config-email: lvgl-bot@users.noreply.github.com

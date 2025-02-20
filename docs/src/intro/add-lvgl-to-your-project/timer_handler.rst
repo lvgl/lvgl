@@ -10,7 +10,7 @@ periodically in one of the following:
 - *while(1)* of *main()* function, or
 - an OS task periodically.  (See :ref:`lvgl_and_threads`.)
 
-.. image:: /misc/intro_data_flow.png
+.. image:: /_static/images/intro_data_flow.png
    :scale: 75 %
    :alt:  LVGL Data Flow
    :align:  center

@@ -17,7 +17,7 @@ How does it do this?
 Overview of LVGL's Data Flow
 ****************************
 
-.. figure:: /misc/intro_data_flow.png
+.. figure:: /_static/images/intro_data_flow.png
     :scale: 75 %
     :alt:  LVGL Data Flow
     :align:  center

@@ -90,7 +90,7 @@ model. A Widget's "box" is built from the following parts:
 :margin:        space outside of the Widget (considered only by some layouts)
 :content:       the content area which is the size of the bounding box reduced by the border width and padding.
 
-.. image:: /misc/boxmodel.png
+.. image:: /_static/images/boxmodel.png
     :alt: The box models of LVGL: The content area is smaller than the bounding box with the padding and border width
 
 The border is drawn inside the bounding box. Inside the border LVGL
@@ -285,7 +285,7 @@ the aligned widget if the reference widget later moves.
 
 The following illustration shows the meaning of each "anchor" mentioned above.
 
-.. image:: /misc/align.png
+.. image:: /_static/images/align.png
 
 
 

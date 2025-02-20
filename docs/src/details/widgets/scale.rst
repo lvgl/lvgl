@@ -25,7 +25,7 @@ The Scale Widget has the following three parts:
 - :cpp:enumerator:`LV_PART_INDICATOR` Major ticks and their labels (if enabled) ---
   the green major ticks and pink labels in example image.
 
-.. image:: /misc/scale.png
+.. image:: /_static/images/scale.png
 
 .. _lv_scale_usage:
 
@@ -76,11 +76,11 @@ reversed by passing ``false`` instead.)
 
 Example with with ticks and labels drawn *under* the main line (default):
 
-.. image:: /misc/scale_ticks_below.png
+.. image:: /_static/images/scale_ticks_below.png
 
 Example with ticks and labels drawn *on top of* the main line:
 
-.. image:: /misc/scale_ticks_on_top.png
+.. image:: /_static/images/scale_ticks_on_top.png
 
 
 Configuring ticks

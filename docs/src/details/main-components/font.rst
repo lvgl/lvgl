@@ -145,7 +145,7 @@ font.
 
 .. _fonts_symbols:
 
-.. image:: /misc/symbols.png
+.. image:: /_static/images/symbols.png
 
 The symbols can be used singly as:
 
@@ -182,7 +182,7 @@ Right-to-Left (RTL for short) direction.
 LVGL not only supports RTL text but supports mixed (a.k.a.
 bidirectional, BiDi) text rendering as well. Some examples:
 
-.. image:: /misc/bidi.png
+.. image:: /_static/images/bidi.png
 
 BiDi support is enabled by setting :c:macro:`LV_USE_BIDI` to a non-zero value in ``lv_conf.h``.
 

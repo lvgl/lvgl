@@ -27,7 +27,7 @@ then another button named button2. Then button1 (along with its child
 Widget(s)) will be in the background and can be covered by button2 and
 its children.
 
-.. image:: /misc/layers.png
+.. image:: /_static/images/layers.png
 
 .. code-block:: c
 

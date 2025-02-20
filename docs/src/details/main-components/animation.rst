@@ -362,7 +362,7 @@ Call :cpp:expr:`lv_anim_timeline_delete(timeline)` function to delete the Animat
 **Note**: If you need to delete a Widget during Animation, be sure to delete the
 Animation Timeline before deleting the Widget. Otherwise, the program may crash or behave abnormally.
 
-.. image:: /misc/anim-timeline.png
+.. image:: /_static/images/anim-timeline.png
 
 .. _animations_example:
 

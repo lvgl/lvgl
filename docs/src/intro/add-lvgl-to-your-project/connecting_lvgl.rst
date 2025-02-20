@@ -48,7 +48,7 @@ LVGL needs awareness of what time it is (i.e. elapsed time in milliseconds) for
 all of its tasks for which time is a factor:  refreshing displays, reading user
 input, firing events, animations, etc.
 
-.. image:: /misc/intro_data_flow.png
+.. image:: /_static/images/intro_data_flow.png
    :scale: 75 %
    :alt:  LVGL Data Flow
    :align:  center

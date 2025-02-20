@@ -158,7 +158,7 @@ Performance analysis
 
 If the log parsing is successful, you will see the following screen:
 
-.. image:: /misc/perfetto_ui.png
+.. image:: /_static/images/perfetto_ui.png
 
 In the Perfetto UI, use the :kbd:`A` or :kbd:`D` keys to pan the timeline horizontally
 and the :kbd:`W` or :kbd:`S` keys to zoom in or out on the timeline.
