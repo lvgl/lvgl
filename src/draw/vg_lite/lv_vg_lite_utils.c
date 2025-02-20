@@ -1315,6 +1315,14 @@ void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
 #endif
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_flush(), {});
+
+    /* Rremove all old caches reference and swap new caches reference */
+    if(u->grad_pending) {
+        lv_vg_lite_pending_swap(u->grad_pending);
+    }
+
+    lv_vg_lite_pending_swap(u->image_dsc_pending);
+
     u->flush_count = 0;
     LV_PROFILER_DRAW_END;
 }
