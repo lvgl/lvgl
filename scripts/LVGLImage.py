@@ -349,13 +349,15 @@ uint8_t {varname}_map[] = {{
 }};
 
 const lv_image_dsc_t {varname} = {{
-  .header.magic = LV_IMAGE_HEADER_MAGIC,
-  .header.cf = LV_COLOR_FORMAT_{cf.name},
-  .header.flags = {flags},
-  .header.w = {w},
-  .header.h = {h},
-  .header.stride = {stride},
-  .header.reserved_2 = 0,
+  .header = {{
+    .magic = LV_IMAGE_HEADER_MAGIC,
+    .cf = LV_COLOR_FORMAT_{cf.name},
+    .flags = {flags},
+    .w = {w},
+    .h = {h},
+    .stride = {stride},
+    .reserved_2 = 0,
+  }},
   .data_size = sizeof({varname}_map),
   .data = {varname}_map,
   .reserved = NULL,
