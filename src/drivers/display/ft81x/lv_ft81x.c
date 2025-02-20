@@ -178,9 +178,9 @@ static lv_result_t initialize(lv_display_t * disp, const lv_ft81x_parameters_t *
                      0x80); /* enable the DISP signal to the LCD panel, it is set to output in REG_GPIO_DIR by default */
     lv_ft81x_write_8(disp, REG_PCLK, params->pclk); /* now start clocking data to the LCD panel */
 
-    assert(lv_ft81x_read_16(disp, REG_CMD_READ) != 0xfff);
+    LV_ASSERT(lv_ft81x_read_16(disp, REG_CMD_READ) != 0xfff);
 
-    assert(0 == lv_ft81x_read_16(disp, REG_CMD_WRITE));
+    LV_ASSERT(0 == lv_ft81x_read_16(disp, REG_CMD_WRITE));
 
 
     lv_ft81x_cmd_list_t cmd_list;
@@ -228,7 +228,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 {
     lv_ft81x_driver_data_t * drv = lv_display_get_driver_data(disp);
 
-    uint32_t hor_res = lv_display_get_horizontal_resolution(disp);
+    int32_t hor_res = lv_display_get_horizontal_resolution(disp);
     uint32_t disp_row_bytes = hor_res * 2;
 
     uint32_t address = disp_row_bytes * area->y1 + area->x1 * 2;
