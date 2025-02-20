@@ -87,7 +87,8 @@ static inline uint16_t swap_bytes_16(uint16_t x);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t * lv_ft81x_create(const lv_ft81x_parameters_t * params, void * partial_buf, uint32_t buf_size, lv_ft81x_spi_cb_t spi_cb, void * user_data)
+lv_display_t * lv_ft81x_create(const lv_ft81x_parameters_t * params, void * partial_buf, uint32_t buf_size,
+                               lv_ft81x_spi_cb_t spi_cb, void * user_data)
 {
     lv_display_t * disp = lv_display_create(params->hor_res, params->ver_res);
 
@@ -151,33 +152,35 @@ static lv_result_t initialize(lv_display_t * disp, const lv_ft81x_parameters_t *
 
     lv_ft81x_write_8(disp, REG_PWM_DUTY, 0x80);
 
-	lv_ft81x_write_16(disp, REG_HSIZE,   params->hor_res);   /* active display width */
-	lv_ft81x_write_16(disp, REG_HCYCLE,  params->hcycle);  /* total number of clocks per line, incl front/back porch */
-	lv_ft81x_write_16(disp, REG_HOFFSET, params->hoffset); /* start of active line */
-	lv_ft81x_write_16(disp, REG_HSYNC0,  params->hsync0);  /* start of horizontal sync pulse */
-	lv_ft81x_write_16(disp, REG_HSYNC1,  params->hsync1);  /* end of horizontal sync pulse */
-	lv_ft81x_write_16(disp, REG_VSIZE,   params->ver_res);   /* active display height */
-	lv_ft81x_write_16(disp, REG_VCYCLE,  params->vcycle);  /* total number of lines per screen, including pre/post */
-	lv_ft81x_write_16(disp, REG_VOFFSET, params->voffset); /* start of active screen */
-	lv_ft81x_write_16(disp, REG_VSYNC0,  params->vsync0);  /* start of vertical sync pulse */
-	lv_ft81x_write_16(disp, REG_VSYNC1,  params->vsync1);  /* end of vertical sync pulse */
-	lv_ft81x_write_8(disp, REG_SWIZZLE,  params->swizzle); /* FT8xx output to LCD - pin order */
-	lv_ft81x_write_8(disp, REG_PCLK_POL, params->pclkpol); /* LCD data is clocked in on this PCLK edge */
-	lv_ft81x_write_8(disp, REG_CSPREAD,	 params->cspread); /* helps with noise, when set to 1 fewer signals are changed simultaneously, reset-default: 1 */
+    lv_ft81x_write_16(disp, REG_HSIZE,   params->hor_res);   /* active display width */
+    lv_ft81x_write_16(disp, REG_HCYCLE,  params->hcycle);  /* total number of clocks per line, incl front/back porch */
+    lv_ft81x_write_16(disp, REG_HOFFSET, params->hoffset); /* start of active line */
+    lv_ft81x_write_16(disp, REG_HSYNC0,  params->hsync0);  /* start of horizontal sync pulse */
+    lv_ft81x_write_16(disp, REG_HSYNC1,  params->hsync1);  /* end of horizontal sync pulse */
+    lv_ft81x_write_16(disp, REG_VSIZE,   params->ver_res);   /* active display height */
+    lv_ft81x_write_16(disp, REG_VCYCLE,  params->vcycle);  /* total number of lines per screen, including pre/post */
+    lv_ft81x_write_16(disp, REG_VOFFSET, params->voffset); /* start of active screen */
+    lv_ft81x_write_16(disp, REG_VSYNC0,  params->vsync0);  /* start of vertical sync pulse */
+    lv_ft81x_write_16(disp, REG_VSYNC1,  params->vsync1);  /* end of vertical sync pulse */
+    lv_ft81x_write_8(disp, REG_SWIZZLE,  params->swizzle); /* FT8xx output to LCD - pin order */
+    lv_ft81x_write_8(disp, REG_PCLK_POL, params->pclkpol); /* LCD data is clocked in on this PCLK edge */
+    lv_ft81x_write_8(disp, REG_CSPREAD,
+                     params->cspread); /* helps with noise, when set to 1 fewer signals are changed simultaneously, reset-default: 1 */
 
-	/* write a basic display-list to get things started */
-	lv_ft81x_write_32(disp, EVE_RAM_DL, DL_CLEAR_RGB);
-	lv_ft81x_write_32(disp, EVE_RAM_DL + 4, (DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG));
-	lv_ft81x_write_32(disp, EVE_RAM_DL + 8, DL_DISPLAY);	/* end of display list */
-	lv_ft81x_write_32(disp, REG_DLSWAP, EVE_DLSWAP_FRAME);
+    /* write a basic display-list to get things started */
+    lv_ft81x_write_32(disp, EVE_RAM_DL, DL_CLEAR_RGB);
+    lv_ft81x_write_32(disp, EVE_RAM_DL + 4, (DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG));
+    lv_ft81x_write_32(disp, EVE_RAM_DL + 8, DL_DISPLAY);    /* end of display list */
+    lv_ft81x_write_32(disp, REG_DLSWAP, EVE_DLSWAP_FRAME);
 
-	/* nothing is being displayed yet... the pixel clock is still 0x00 */
-	lv_ft81x_write_8(disp, REG_GPIO, 0x80); /* enable the DISP signal to the LCD panel, it is set to output in REG_GPIO_DIR by default */
-	lv_ft81x_write_8(disp, REG_PCLK, params->pclk); /* now start clocking data to the LCD panel */
+    /* nothing is being displayed yet... the pixel clock is still 0x00 */
+    lv_ft81x_write_8(disp, REG_GPIO,
+                     0x80); /* enable the DISP signal to the LCD panel, it is set to output in REG_GPIO_DIR by default */
+    lv_ft81x_write_8(disp, REG_PCLK, params->pclk); /* now start clocking data to the LCD panel */
 
     assert(lv_ft81x_read_16(disp, REG_CMD_READ) != 0xfff);
 
-	assert(0 == lv_ft81x_read_16(disp, REG_CMD_WRITE));
+    assert(0 == lv_ft81x_read_16(disp, REG_CMD_WRITE));
 
 
     lv_ft81x_cmd_list_t cmd_list;
@@ -196,7 +199,7 @@ static lv_result_t initialize(lv_display_t * disp, const lv_ft81x_parameters_t *
     lv_ft81x_cmd_list_add_32(disp, &cmd_list, DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG);
 
     lv_ft81x_cmd_list_add_32(disp, &cmd_list, TAG(0));
-    
+
     lv_ft81x_cmd_list_add_32(disp, &cmd_list, TAG(20));
     lv_ft81x_cmd_list_add_32(disp, &cmd_list, CMD_SETBITMAP);
     lv_ft81x_cmd_list_add_32(disp, &cmd_list, 0); /* address */
@@ -224,13 +227,13 @@ static lv_result_t initialize(lv_display_t * disp, const lv_ft81x_parameters_t *
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
     lv_ft81x_driver_data_t * drv = lv_display_get_driver_data(disp);
-    
+
     uint32_t hor_res = lv_display_get_horizontal_resolution(disp);
     uint32_t disp_row_bytes = hor_res * 2;
-    
+
     uint32_t address = disp_row_bytes * area->y1 + area->x1 * 2;
     uint8_t encoded_address[3];
-    
+
     if(lv_area_get_width(area) == hor_res) {
         lv_ft81x_encode_write_address(encoded_address, address);
         drv->spi_cb(disp, LV_FT81X_SPI_OPERATION_CS_ASSERT, NULL, 0);
@@ -380,7 +383,7 @@ static void lv_ft81x_cmd_list_send(lv_display_t * disp, lv_ft81x_cmd_list_t * cm
     drv->spi_cb(disp, LV_FT81X_SPI_OPERATION_CS_ASSERT, NULL, 0);
     drv->spi_cb(disp, LV_FT81X_SPI_OPERATION_SEND, cmd_list->buf, cmd_list->buf_len);
     drv->spi_cb(disp, LV_FT81X_SPI_OPERATION_CS_DEASSERT, NULL, 0);
-	lv_ft81x_write_16(disp, REG_CMD_WRITE, drv->cmd_offset);
+    lv_ft81x_write_16(disp, REG_CMD_WRITE, drv->cmd_offset);
 }
 
 static void lv_ft81x_encode_read_address(void * dst_4_bytes, uint32_t address)
@@ -397,8 +400,14 @@ static void lv_ft81x_encode_write_address(void * dst_3_bytes, uint32_t address)
 
 static inline uint32_t swap_bytes_32(uint32_t x)
 {
-    union {uint32_t u32; uint8_t u8[4];} y;
-    union {uint32_t u32; uint8_t u8[4];} x2;
+    union {
+        uint32_t u32;
+        uint8_t u8[4];
+    } y;
+    union {
+        uint32_t u32;
+        uint8_t u8[4];
+    } x2;
     x2.u32 = x;
     y.u8[0] = x2.u8[3];
     y.u8[1] = x2.u8[2];
@@ -409,8 +418,14 @@ static inline uint32_t swap_bytes_32(uint32_t x)
 
 static inline uint16_t swap_bytes_16(uint16_t x)
 {
-    union {uint16_t u16; uint8_t u8[2];} y;
-    union {uint16_t u16; uint8_t u8[2];} x2;
+    union {
+        uint16_t u16;
+        uint8_t u8[2];
+    } y;
+    union {
+        uint16_t u16;
+        uint8_t u8[2];
+    } x2;
     x2.u16 = x;
     y.u8[0] = x2.u8[1];
     y.u8[1] = x2.u8[0];

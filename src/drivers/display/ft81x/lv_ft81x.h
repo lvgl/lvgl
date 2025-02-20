@@ -70,7 +70,8 @@ typedef void (*lv_ft81x_spi_cb_t)(lv_display_t * disp, lv_ft81x_spi_operation op
  * @param user_data   use `lv_ft81x_get_user_data` to get this pointer inside the SPI callback
  * @return pointer to the display
  */
-lv_display_t * lv_ft81x_create(const lv_ft81x_parameters_t * params, void * partial_buf, uint32_t buf_size, lv_ft81x_spi_cb_t spi_cb, void * user_data);
+lv_display_t * lv_ft81x_create(const lv_ft81x_parameters_t * params, void * partial_buf, uint32_t buf_size,
+                               lv_ft81x_spi_cb_t spi_cb, void * user_data);
 
 /**
  * Get the `user_data` parameter that was passed to `lv_ft81x_create`. Useful in the SPI callback.
