@@ -592,7 +592,7 @@ static void gesture_calculate_factors(lv_indev_gesture_t * gesture, int touch_po
 
     /* translation */
     g->delta_x = g->p_delta_x + (center_x - g->center.x);
-    g->delta_y = g->p_delta_x + (center_y - g->center.y);
+    g->delta_y = g->p_delta_y + (center_y - g->center.y);
 
     /* rotation & scaling */
     for(i = 0; i < touch_points_nb; i++) {

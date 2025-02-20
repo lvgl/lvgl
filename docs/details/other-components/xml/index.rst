@@ -1,8 +1,8 @@
 .. _others:
 
-================
-Other Components
-================
+====================
+XML - Declarative UI
+====================
 
 .. toctree::
     :maxdepth: 1

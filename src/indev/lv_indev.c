@@ -1756,29 +1756,29 @@ static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj)
         if(obj == NULL || indev->pointer.last_pressed == obj) {
             indev->pointer.last_pressed = NULL;
         }
-        if(obj == NULL || indev->pointer.act_obj == obj) {
-            if(indev->pointer.act_obj) {
-                /* Avoid recursive calls */
-                act_obj = indev->pointer.act_obj;
-                indev->pointer.act_obj = NULL;
-                lv_obj_send_event(act_obj, LV_EVENT_INDEV_RESET, indev);
-                lv_indev_send_event(indev, LV_EVENT_INDEV_RESET, act_obj);
-                act_obj = NULL;
-            }
+
+        if(indev->pointer.act_obj) {
+            /* Avoid recursive calls */
+            act_obj = indev->pointer.act_obj;
+            indev->pointer.act_obj = NULL;
+            lv_obj_send_event(act_obj, LV_EVENT_INDEV_RESET, indev);
+            lv_indev_send_event(indev, LV_EVENT_INDEV_RESET, act_obj);
+            act_obj = NULL;
         }
+
         if(obj == NULL || indev->pointer.last_obj == obj) {
             indev->pointer.last_obj = NULL;
         }
-        if(obj == NULL || indev->pointer.scroll_obj == obj) {
-            if(indev->pointer.scroll_obj) {
-                /* Avoid recursive calls */
-                scroll_obj = indev->pointer.scroll_obj;
-                indev->pointer.scroll_obj = NULL;
-                lv_obj_send_event(scroll_obj, LV_EVENT_INDEV_RESET, indev);
-                lv_indev_send_event(indev, LV_EVENT_INDEV_RESET, act_obj);
-                scroll_obj = NULL;
-            }
+
+        if(indev->pointer.scroll_obj) {
+            /* Avoid recursive calls */
+            scroll_obj = indev->pointer.scroll_obj;
+            indev->pointer.scroll_obj = NULL;
+            lv_obj_send_event(scroll_obj, LV_EVENT_INDEV_RESET, indev);
+            lv_indev_send_event(indev, LV_EVENT_INDEV_RESET, scroll_obj);
+            scroll_obj = NULL;
         }
+
         if(obj == NULL || indev->pointer.last_hovered == obj) {
             indev->pointer.last_hovered = NULL;
         }

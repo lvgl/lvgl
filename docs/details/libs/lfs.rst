@@ -1,23 +1,28 @@
 .. _lfs:
 
-==============
+========
 littlefs
-==============
+========
 
-littlefs is a little fail-safe filesystem designed for microcontrollers.
+**littlefs** is a little fail-safe filesystem library designed for microcontrollers.
 
-Detailed introduction: https://github.com/littlefs-project/littlefs
+The lv_fs_littlefs extension is an interface to the littlefs library.
+
+For a detailed introduction, see:  https://github.com/littlefs-project/littlefs .
+
 
 
 Usage
------
+*****
 
-Enable :c:macro:`LV_USE_FS_LITTLEFS` and define a :c:macro:`LV_FS_LITTLEFS_LETTER` in ``lv_conf.h``.
+Set :c:macro:`LV_USE_FS_LITTLEFS` in ``lv_conf.h`` to ``1`` and define an upper-case
+letter (as a C character type) for :c:macro:`LV_FS_LITTLEFS_LETTER` in the range
+['A'..'Z'].
 
-When enabled :c:macro:`lv_littlefs_set_handler` can be used to set up a mount point.
+When enabled :cpp:func:`lv_littlefs_set_handler` can be used to set up a mount point.
 
 Example
--------
+*******
 
 .. code-block:: c
 
@@ -55,6 +60,9 @@ Example
 
 
 API
----
+***
 
+:ref:`lv_fsdrv_h`
+
+See also:  `lvgl/src/libs/fsdrv/lv_fs_littlefs.c <https://github.com/lvgl/lvgl/blob/master/src/libs/fsdrv/lv_fs_littlefs.c>`__
 

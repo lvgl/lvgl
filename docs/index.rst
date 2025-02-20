@@ -1,6 +1,17 @@
+.. raw:: html
+
+    <p style="text-align: right;">
+        <a class="reference external" href="https://lvgl.100ask.net/master/index.html">
+            [&#x04E2D;&#x02F42;] Chinese Translation
+        </a>
+    </p>
+
+.. _lvgl_landing_page:
+
 ===========================================
 LVGL:  Light and Versatile Graphics Library
 ===========================================
+
 Create beautiful UIs for any MCU, MPU and display type.
 *******************************************************
 

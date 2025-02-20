@@ -86,6 +86,11 @@ typedef enum {
     LV_VECTOR_GRADIENT_STYLE_RADIAL,
 } lv_vector_gradient_style_t;
 
+typedef enum {
+    LV_VECTOR_FILL_UNITS_OBJECT_BOUNDING_BOX = 0, /** Relative coordinates relative to the object bounding box. */
+    LV_VECTOR_FILL_UNITS_USER_SPACE_ON_USE, /** Absolute coordinates relative to the layer's coordinate system */
+} lv_vector_fill_units_t;
+
 struct _lv_fpoint_t {
     float x;
     float y;
@@ -271,6 +276,15 @@ void lv_vector_dsc_set_fill_opa(lv_vector_dsc_t * dsc, lv_opa_t opa);
  * @param rule             the fill rule to be set in lv_vector_fill_t format
  */
 void lv_vector_dsc_set_fill_rule(lv_vector_dsc_t * dsc, lv_vector_fill_t rule);
+
+/**
+ * Set the fill units for descriptor.
+ * @param dsc              pointer to a vector graphic descriptor
+ * @param units            the units to be set in lv_vector_fill_units_t format
+ * @note The units can be either relative to the object bounding box or absolute in user space.
+ *       This API specifically affects the drawing position of the fill image and does not impact other elements.
+ */
+void lv_vector_dsc_set_fill_units(lv_vector_dsc_t * dsc, const lv_vector_fill_units_t units);
 
 /**
  * Set fill image for descriptor

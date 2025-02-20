@@ -1834,7 +1834,7 @@ menu "LVGL configuration"
 
 		config LV_USE_NUTTX_LIBUV
 			bool "Use uv loop to replace default timer loop and other fb/indev timers"
-			depends on LV_USE_NUTTX
+			depends on LV_USE_NUTTX && LIBUV
 			default n
 
 		config LV_USE_NUTTX_CUSTOM_INIT

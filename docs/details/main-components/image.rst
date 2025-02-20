@@ -47,7 +47,7 @@ registered in LVGL to make file operations. You can add an interface to
 a standard file system (FAT32 on SD card) or you create your simple file
 system to read data from an SPI Flash memory. In every case, a *Drive*
 is just an abstraction to read and/or write data to memory. See the
-:ref:`File system <overview_file_system>` section to learn more.
+:ref:`File system <file_system>` section to learn more.
 
 Images stored as files are not linked into the resulting executable, and
 must be read into RAM before being drawn. As a result, they are not as

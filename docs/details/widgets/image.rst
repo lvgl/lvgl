@@ -48,7 +48,7 @@ To use external files, you also need to convert the image files using
 the online converter tool, but select the binary output
 format. You also need to use LVGL's file system module and register a
 driver with some functions for basic file operations.  See
-:ref:`File system <overview_file_system>` to learn more.  Then set the translated
+:ref:`File system <file_system>` to learn more.  Then set the translated
 image as the image source with :cpp:expr:`lv_image_set_src(img, "S:folder1/my_img.bin")`.
 
 You can also set a symbol as an image source similar to a :ref:`Labels <lv_label>`. In

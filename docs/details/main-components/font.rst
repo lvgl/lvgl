@@ -343,7 +343,7 @@ to have a special binary format. (Not TTF or WOFF). Use
 `lv_font_conv <https://github.com/lvgl/lv_font_conv/>`__ with the
 ``--format bin`` option to generate an LVGL compatible font file.
 
-:note: To load a font :ref:`LVGL's filesystem <overview_file_system>`
+:note: To load a font :ref:`LVGL's filesystem <file_system>`
        needs to be enabled and a driver must be added.
 
 Example

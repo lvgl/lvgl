@@ -1,17 +1,26 @@
 .. _ffmpeg:
 
 ==============
-FFmpeg support
+FFmpeg Support
 ==============
 
-A complete, cross-platform solution to record, convert and stream audio and video.
+**FFmpeg** is a complete, cross-platform solution to record, convert and stream audio and video.
 
-Detailed introduction: https://www.ffmpeg.org
+The FFmpeg is an LVGL extension that interfaces with the official FFmpeg library to help
+you add platform-independent recording, converting and streaming audio and video into
+your LVGL UI.
 
-Install FFmpeg
---------------
+The set-up steps below are for Linux, but they can be adapted for other platforms.
 
-Download first FFmpeg from `here <https://www.ffmpeg.org/download.html>`__, then install it:
+For a detailed introduction, see:  https://www.ffmpeg.org
+
+
+
+Installing FFmpeg
+*****************
+
+Download the FFmpeg library from `its official download page
+<https://www.ffmpeg.org/download.html>`__, then install it:
 
 .. code-block:: shell
 
@@ -19,39 +28,65 @@ Download first FFmpeg from `here <https://www.ffmpeg.org/download.html>`__, then
     make
     sudo make install
 
-Add FFmpeg to your project
---------------------------
 
--  Add library: ``FFmpeg`` (for GCC: ``-lavformat -lavcodec -lavutil -lswscale -lm -lz -lpthread``)
+
+Adding FFmpeg to Your Project
+*****************************
+
+To use the ``FFmpeg`` library in your project, you will need to link against these
+libraries:
+
+:libavformat:   part of FFmpeg library
+:libavcodec:    part of FFmpeg library
+:libavutil:     part of FFmpeg library
+:libswscale:    part of FFmpeg library
+:libm:
+:libz:
+:libpthread:
+
+If you are using GCC-based toolchain, this can be taken care of by adding the
+following command-line options:
+
+.. code-block:: shell
+
+    -lavformat -lavcodec -lavutil -lswscale -lm -lz -lpthread
+
+
 
 .. _ffmpeg_usage:
 
 Usage
------
+*****
 
-Enable :c:macro:`LV_USE_FFMPEG` in ``lv_conf.h``.
+Set the :c:macro:`LV_USE_FFMPEG` in ``lv_conf.h`` to ``1``.
 
-See the examples below.
+Also set :c:macro:`LV_FFMPEG_PLAYER_USE_LV_FS` in ``lv_conf.h`` to ``1`` if you want
+to integrate the LVGL :ref:`file_system` extension into FFmpeg.
 
-:note: Enable :c:macro:`LV_FFMPEG_PLAYER_USE_LV_FS` in ``lv_conf.h`` if you want to integrate the lvgl file system into FFmpeg.
+See the examples below for how to correctly use this library.
+
 
 
 .. _ffmpeg_example:
 
 Events
-------
+******
 
 - :cpp:enumerator:`LV_EVENT_READY` Sent when playback is complete and auto-restart is not enabled.
 
 Learn more about :ref:`events`.
 
-Example
--------
+
+
+Examples
+********
 
 .. include:: ../../examples/libs/ffmpeg/index.rst
+
+
 
 .. _ffmpeg_api:
 
 API
----
+***
 
