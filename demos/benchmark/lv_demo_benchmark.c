@@ -51,16 +51,6 @@
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    const char * name;
-    void (*create_cb)(void);
-    uint32_t scene_time;
-    uint32_t cpu_avg_usage;
-    uint32_t fps_avg;
-    uint32_t render_avg_time;
-    uint32_t flush_avg_time;
-    uint32_t measurement_cnt;
-} scene_dsc_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -73,8 +63,11 @@ static void next_scene_timer_cb(lv_timer_t * timer);
     static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 #endif
 
-static void summary_create(void);
 
+static void summary_create(lv_demo_benchmark_summary_t * summary);
+
+
+static void table_draw_task_event_cb(lv_event_t * e);
 static void rnd_reset(void);
 static int32_t rnd_next(int32_t min, int32_t max);
 static lv_color_t rnd_color(void);
@@ -456,7 +449,7 @@ static void widgets_demo_cb(void)
  *  STATIC VARIABLES
  **********************/
 
-static scene_dsc_t scenes[] = {
+static lv_demo_benchmark_scene_dsc_t scenes[] = {
     {.name = "Empty screen",               .scene_time = 3000, .create_cb = empty_screen_cb},
     {.name = "Moving wallpaper",           .scene_time = 3000, .create_cb = moving_wallpaper_cb},
     {.name = "Single rectangle",           .scene_time = 3000, .create_cb = single_rectangle_cb},
@@ -481,6 +474,7 @@ static scene_dsc_t scenes[] = {
 
 static uint32_t scene_act;
 static uint32_t rnd_act;
+static lv_demo_benchmark_on_end_cb_t on_demo_end_cb;
 
 /**********************
  *      MACROS
@@ -524,6 +518,98 @@ void lv_demo_benchmark(void)
 #endif
 }
 
+void lv_demo_benchmark_set_end_cb(lv_demo_benchmark_on_end_cb_t cb)
+{
+    on_demo_end_cb = cb;
+}
+
+void lv_demo_benchmark_summary_display(const lv_demo_benchmark_summary_t * summary)
+{
+    LV_ASSERT_NULL(summary)
+    lv_obj_clean(lv_screen_active());
+    lv_obj_set_style_pad_hor(lv_screen_active(), 0, 0);
+    lv_obj_t * table = lv_table_create(lv_screen_active());
+    lv_obj_set_width(table, lv_pct(100));
+    lv_obj_set_style_max_height(table, lv_pct(100), 0);
+    lv_obj_add_flag(table, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    lv_obj_set_style_text_color(table, lv_palette_darken(LV_PALETTE_BLUE_GREY, 2), LV_PART_ITEMS);
+    lv_obj_set_style_border_color(table, lv_palette_darken(LV_PALETTE_BLUE_GREY, 2), LV_PART_ITEMS);
+    lv_obj_add_event_cb(table, table_draw_task_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+
+    lv_table_set_cell_value(table, 0, 0, "Name");
+    lv_table_set_cell_value(table, 0, 1, "Avg. CPU");
+    lv_table_set_cell_value(table, 0, 2, "Avg. FPS");
+    lv_table_set_cell_value(table, 0, 3, "Avg. time (render + flush)");
+    /* csv log */
+    LV_LOG("Benchmark Summary (%d.%d.%d %s)\r\n",
+           LVGL_VERSION_MAJOR,
+           LVGL_VERSION_MINOR,
+           LVGL_VERSION_PATCH,
+           LVGL_VERSION_INFO);
+    LV_LOG("Name, Avg. CPU, Avg. FPS, Avg. time, render time, flush time\r\n");
+
+    lv_obj_update_layout(table);
+    const int32_t col_w = lv_obj_get_content_width(table) / 4;
+
+    lv_table_set_column_width(table, 0, col_w);
+    lv_table_set_column_width(table, 1, col_w);
+    lv_table_set_column_width(table, 2, col_w);
+    lv_table_set_column_width(table, 3, col_w);
+
+    for(size_t i = 0; scenes[i].create_cb; i++) {
+        lv_table_set_cell_value(table, i + 2, 0, scenes[i].name);
+
+        if(scenes[i].measurement_cnt == 0) {
+            lv_table_set_cell_value(table, i + 2, 1, "N/A");
+            lv_table_set_cell_value(table, i + 2, 2, "N/A");
+            lv_table_set_cell_value(table, i + 2, 3, "N/A");
+        }
+        else {
+            const int32_t cnt = scenes[i].measurement_cnt;
+            lv_table_set_cell_value_fmt(table, i + 2, 1, "%"LV_PRIu32" %%", scenes[i].cpu_avg_usage / cnt);
+            lv_table_set_cell_value_fmt(table, i + 2, 2, "%"LV_PRIu32" FPS", scenes[i].fps_avg / cnt);
+
+            const uint32_t render_time = scenes[i].render_avg_time / cnt;
+            const uint32_t flush_time = scenes[i].flush_avg_time / cnt;
+            const uint32_t total_time =  render_time + flush_time;
+            lv_table_set_cell_value_fmt(table, i + 2, 3, "%"LV_PRIu32" ms (%"LV_PRIu32" + %"LV_PRIu32")",
+                                        total_time, render_time, flush_time);
+
+            /* csv log */
+            LV_LOG("%s, %"LV_PRIu32"%%, %"LV_PRIu32", %"LV_PRIu32", %"LV_PRIu32", %"LV_PRIu32"\r\n",
+                   scenes[i].name,
+                   scenes[i].cpu_avg_usage / cnt,
+                   scenes[i].fps_avg / cnt,
+                   render_time + flush_time,
+                   render_time,
+                   flush_time);
+        }
+    }
+
+    lv_table_set_cell_value(table, 1, 0, "All scenes avg.");
+    if(summary->valid_scene_cnt < 1) {
+        lv_table_set_cell_value(table, 1, 1, "N/A");
+        lv_table_set_cell_value(table, 1, 2, "N/A");
+        lv_table_set_cell_value(table, 1, 3, "N/A");
+    }
+    else {
+        lv_table_set_cell_value_fmt(table, 1, 1, "%"LV_PRIu32" %%", summary->total_avg_cpu / summary->valid_scene_cnt);
+        lv_table_set_cell_value_fmt(table, 1, 2, "%"LV_PRIu32" FPS", summary->total_avg_fps / summary->valid_scene_cnt);
+
+        const uint32_t render_time = summary->total_avg_render_time / summary->valid_scene_cnt;
+        const uint32_t flush_time = summary->total_avg_flush_time / summary->valid_scene_cnt;
+        const uint32_t total_time = render_time + flush_time;
+        lv_table_set_cell_value_fmt(table, 1, 3, "%"LV_PRIu32" ms (%"LV_PRIu32" + %"LV_PRIu32")",
+                                    total_time, render_time, flush_time);
+        /* csv log */
+        LV_LOG("All scenes avg.,%"LV_PRIu32"%%, %"LV_PRIu32", %"LV_PRIu32", %"LV_PRIu32", %"LV_PRIu32"\r\n",
+               summary->total_avg_cpu / summary->valid_scene_cnt,
+               summary->total_avg_fps / summary->valid_scene_cnt,
+               total_time,
+               render_time, flush_time);
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -560,8 +646,21 @@ static void next_scene_timer_cb(lv_timer_t * timer)
 
     load_scene(scene_act);
     if(scenes[scene_act].scene_time == 0) {
+        lv_demo_benchmark_summary_t summary;
+
         lv_timer_delete(timer);
-        summary_create();
+        summary_create(&summary);
+        /*
+         * Don't display the summary if the user sets a callback function
+         * He can always call this function himself inside the callback
+         */
+        if(on_demo_end_cb) {
+            on_demo_end_cb(&summary);
+        }
+        else {
+            lv_demo_benchmark_summary_display(&summary);
+        }
+
     }
     else {
         lv_timer_set_period(timer, scenes[scene_act].scene_time);
@@ -639,105 +738,26 @@ static void table_draw_task_event_cb(lv_event_t * e)
 
 }
 
-static void summary_create(void)
+static void summary_create(lv_demo_benchmark_summary_t * summary)
 {
-    lv_obj_clean(lv_screen_active());
-    lv_obj_set_style_pad_hor(lv_screen_active(), 0, 0);
-    lv_obj_t * table = lv_table_create(lv_screen_active());
-    lv_obj_set_width(table, lv_pct(100));
-    lv_obj_set_style_max_height(table, lv_pct(100), 0);
-    lv_obj_add_flag(table, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
-    lv_obj_set_style_text_color(table, lv_palette_darken(LV_PALETTE_BLUE_GREY, 2), LV_PART_ITEMS);
-    lv_obj_set_style_border_color(table, lv_palette_darken(LV_PALETTE_BLUE_GREY, 2), LV_PART_ITEMS);
-    lv_obj_add_event_cb(table, table_draw_task_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_memset(summary, 0, sizeof(*summary));
 
-    lv_table_set_cell_value(table, 0, 0, "Name");
-    lv_table_set_cell_value(table, 0, 1, "Avg. CPU");
-    lv_table_set_cell_value(table, 0, 2, "Avg. FPS");
-    lv_table_set_cell_value(table, 0, 3, "Avg. time (render + flush)");
+    summary->scenes = scenes;
 
-    /* csv log */
-    LV_LOG("Benchmark Summary (%d.%d.%d %s)\r\n",
-           LVGL_VERSION_MAJOR,
-           LVGL_VERSION_MINOR,
-           LVGL_VERSION_PATCH,
-           LVGL_VERSION_INFO);
-    LV_LOG("Name, Avg. CPU, Avg. FPS, Avg. time, render time, flush time\r\n");
-
-    lv_obj_update_layout(table);
-    int32_t col_w = lv_obj_get_content_width(table) / 4;
-
-    lv_table_set_column_width(table, 0, col_w);
-    lv_table_set_column_width(table, 1, col_w);
-    lv_table_set_column_width(table, 2, col_w);
-    lv_table_set_column_width(table, 3, col_w);
-
-    uint32_t i;
-    int32_t total_avg_fps = 0;
-    int32_t total_avg_cpu = 0;
-    int32_t total_avg_render_time = 0;
-    int32_t total_avg_flush_time = 0;
-    int32_t valid_scene_cnt = 0;
-    for(i = 0; scenes[i].create_cb; i++) {
-        lv_table_set_cell_value(table, i + 2, 0, scenes[i].name);
-
+    for(size_t i = 0; scenes[i].create_cb; i++) {
         /*the first measurement was ignored as it contains data from the previous scene*/
-        if(scenes[i].measurement_cnt <= 1) {
-            lv_table_set_cell_value(table, i + 2, 1, "N/A");
-            lv_table_set_cell_value(table, i + 2, 2, "N/A");
-            lv_table_set_cell_value(table, i + 2, 3, "N/A");
+        if(scenes[i].measurement_cnt > 1) {
+            const int32_t cnt = --scenes[i].measurement_cnt;
+            summary->valid_scene_cnt++;
+            summary->total_avg_cpu += scenes[i].cpu_avg_usage / cnt;
+            summary->total_avg_fps += scenes[i].fps_avg / cnt;
+            summary->total_avg_render_time += scenes[i].render_avg_time / cnt;
+            summary->total_avg_flush_time += scenes[i].flush_avg_time / cnt;
         }
-        else {
-            int32_t cnt = scenes[i].measurement_cnt - 1;
-            lv_table_set_cell_value_fmt(table, i + 2, 1, "%"LV_PRIu32" %%", scenes[i].cpu_avg_usage / cnt);
-            lv_table_set_cell_value_fmt(table, i + 2, 2, "%"LV_PRIu32" FPS", scenes[i].fps_avg / cnt);
-
-            uint32_t render_time = scenes[i].render_avg_time / cnt;
-            uint32_t flush_time = scenes[i].flush_avg_time / cnt;
-            lv_table_set_cell_value_fmt(table, i + 2, 3, "%"LV_PRIu32" ms (%"LV_PRIu32" + %"LV_PRIu32")",
-                                        render_time + flush_time, render_time, flush_time);
-
-            /* csv log */
-            LV_LOG("%s, %"LV_PRIu32"%%, %"LV_PRIu32", %"LV_PRIu32", %"LV_PRIu32", %"LV_PRIu32"\r\n",
-                   scenes[i].name,
-                   scenes[i].cpu_avg_usage / cnt,
-                   scenes[i].fps_avg / cnt,
-                   render_time + flush_time,
-                   render_time,
-                   flush_time);
-
-            valid_scene_cnt++;
-            total_avg_cpu += scenes[i].cpu_avg_usage / cnt;
-            total_avg_fps += scenes[i].fps_avg / cnt;
-            total_avg_render_time += scenes[i].render_avg_time / cnt;
-            total_avg_flush_time += scenes[i].flush_avg_time / cnt;
-        }
-    }
-
-    /*Add the average*/
-    lv_table_set_cell_value(table, 1, 0, "All scenes avg.");
-    if(valid_scene_cnt < 1) {
-        lv_table_set_cell_value(table, 1, 1, "N/A");
-        lv_table_set_cell_value(table, 1, 2, "N/A");
-        lv_table_set_cell_value(table, 1, 3, "N/A");
-    }
-    else {
-        lv_table_set_cell_value_fmt(table, 1, 1, "%"LV_PRIu32" %%", total_avg_cpu / valid_scene_cnt);
-        lv_table_set_cell_value_fmt(table, 1, 2, "%"LV_PRIu32" FPS", total_avg_fps / valid_scene_cnt);
-
-        uint32_t render_time = total_avg_render_time / valid_scene_cnt;
-        uint32_t flush_time = total_avg_flush_time / valid_scene_cnt;
-        lv_table_set_cell_value_fmt(table, 1, 3, "%"LV_PRIu32" ms (%"LV_PRIu32" + %"LV_PRIu32")",
-                                    render_time + flush_time, render_time, flush_time);
-        /* csv log */
-        LV_LOG("All scenes avg.,%"LV_PRIu32"%%, %"LV_PRIu32", %"LV_PRIu32", %"LV_PRIu32", %"LV_PRIu32"\r\n",
-               total_avg_cpu / valid_scene_cnt,
-               total_avg_fps / valid_scene_cnt,
-               render_time + flush_time,
-               render_time,
-               flush_time);
     }
 }
+
+
 
 /*----------------
  * SCENE HELPERS
