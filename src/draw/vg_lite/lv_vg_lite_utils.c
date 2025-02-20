@@ -1293,25 +1293,6 @@ void lv_vg_lite_disable_scissor(void)
     LV_PROFILER_DRAW_END;
 }
 
-static void lv_vg_lite_clear_all_pending(struct _lv_draw_vg_lite_unit_t * u)
-{
-    LV_ASSERT_NULL(u);
-    LV_PROFILER_DRAW_BEGIN;
-
-    /* Clear all gradient caches reference */
-    if(u->grad_pending) {
-        lv_vg_lite_pending_remove_all(u->grad_pending);
-    }
-
-    /* Clear image decoder dsc reference */
-    lv_vg_lite_pending_remove_all(u->image_dsc_pending);
-
-    /* Clear bitmap font dsc reference */
-    lv_vg_lite_pending_remove_all(u->bitmap_font_pending);
-
-    LV_PROFILER_DRAW_END;
-}
-
 void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
 {
     LV_ASSERT_NULL(u);
@@ -1334,11 +1315,6 @@ void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
         LV_PROFILER_DRAW_END;
         return;
     }
-
-    /* When the GPU is in idle state, it means that the GPU is not accessing
-     * any resources and the cache reference state can be released.
-     */
-    lv_vg_lite_clear_all_pending(u);
 #endif
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_flush(), {});
@@ -1361,7 +1337,16 @@ void lv_vg_lite_finish(struct _lv_draw_vg_lite_unit_t * u)
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_finish(), {});
 
-    lv_vg_lite_clear_all_pending(u);
+    /* Clear all gradient caches reference */
+    if(u->grad_pending) {
+        lv_vg_lite_pending_remove_all(u->grad_pending);
+    }
+
+    /* Clear image decoder dsc reference */
+    lv_vg_lite_pending_remove_all(u->image_dsc_pending);
+
+    /* Clear bitmap font dsc reference */
+    lv_vg_lite_pending_remove_all(u->bitmap_font_pending);
 
     u->flush_count = 0;
     u->letter_count = 0;
