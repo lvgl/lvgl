@@ -55,13 +55,28 @@ typedef enum {
     LV_FT81X_SPI_OPERATION_RECEIVE
 } lv_ft81x_spi_operation;
 
-typedef void (*lv_ft81x_spi_cb_t)(lv_display_t * disp, lv_ft81x_spi_operation operation, uint8_t * data, uint32_t length);
+typedef void (*lv_ft81x_spi_cb_t)(lv_display_t * disp, lv_ft81x_spi_operation operation, void * data, uint32_t length);
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_display_t * lv_ft81x_create(const lv_ft81x_parameters_t * params, lv_ft81x_spi_cb_t spi_cb, void * user_data);
+/**
+ * Create a framebuffer-based ft81x driver display.
+ * @param params      pointer to a struct of display panel properties. does not need to be static.
+ * @param partial_buf a single partial buffer
+ * @param buf_size    size of the partial buffer
+ * @param spi_cb      a callback called by the driver to perform SPI operations
+ * @param user_data   use `lv_ft81x_get_user_data` to get this pointer inside the SPI callback
+ * @return pointer to the display
+ */
+lv_display_t * lv_ft81x_create(const lv_ft81x_parameters_t * params, void * partial_buf, uint32_t buf_size, lv_ft81x_spi_cb_t spi_cb, void * user_data);
+
+/**
+ * Get the `user_data` parameter that was passed to `lv_ft81x_create`. Useful in the SPI callback.
+ * @param disp      pointer to the ft81x display
+ * @return          the `user_data` pointer
+ */
 void * lv_ft81x_get_user_data(lv_display_t * disp);
 
 /**********************
