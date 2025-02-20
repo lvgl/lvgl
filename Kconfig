@@ -1946,6 +1946,10 @@ menu "LVGL configuration"
 			default n
 			depends on LV_USE_ST_LTDC && !LV_USE_DRAW_DMA2D
 
+		config LV_USE_FT81X
+			bool "Use ft81x EVE driver"
+			default n
+
 		config LV_USE_WINDOWS
 			bool "Use LVGL Windows backend"
 			depends on LV_OS_WINDOWS

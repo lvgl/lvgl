@@ -1224,6 +1224,8 @@
     #define LV_ST_LTDC_USE_DMA2D_FLUSH 0
 #endif
 
+#define LV_USE_FT81X      0
+
 /** LVGL Windows backend */
 #define LV_USE_WINDOWS    0
 
