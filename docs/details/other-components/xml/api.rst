@@ -58,7 +58,7 @@ A practical example is setting the current tab of a tab view, which cannot be se
 This feature is not supported yet.
 
 ``<enumdef>``
-************
+*************
 
 Can be used only for widgets.
 
