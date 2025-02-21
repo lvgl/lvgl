@@ -1369,7 +1369,7 @@ An initialized ``lv_style_transition_dsc_t`` to describe a transition.
 blend_mode
 ~~~~~~~~~~
 
-Describes how to blend the colors to the background. Possible values are `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE/MULTIPLY`
+Describes how to blend the colors to the background. Possible values are `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE/MULTIPLY/DIFFERENCE`
 
 .. raw:: html
 
