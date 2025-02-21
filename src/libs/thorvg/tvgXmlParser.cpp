@@ -301,7 +301,8 @@ bool isIgnoreUnsupportedLogElements(TVG_UNUSED const char* tagName)
 bool simpleXmlParseAttributes(const char* buf, unsigned bufLength, simpleXMLAttributeCb func, const void* data)
 {
     const char *itr = buf, *itrEnd = buf + bufLength;
-    char* tmpBuf = (char*)malloc(bufLength + 1);
+    char* tmpBuf = (char*)lv_malloc(bufLength + 1);
+    LV_ASSERT_MALLOC(tmpBuf);
 
     if (!buf || !func || !tmpBuf) goto error;
 
@@ -366,11 +367,11 @@ bool simpleXmlParseAttributes(const char* buf, unsigned bufLength, simpleXMLAttr
     }
 
 success:
-    free(tmpBuf);
+    lv_free(tmpBuf);
     return true;
 
 error:
-    free(tmpBuf);
+    lv_free(tmpBuf);
     return false;
 }
 
@@ -564,7 +565,7 @@ const char* simpleXmlParseCSSAttribute(const char* buf, unsigned bufLength, char
         if (*p == '.') break;
     }
 
-    if (p == itr) *tag = strdup("all");
+    if (p == itr) *tag = lv_strdup("all");
     else *tag = strDuplicate(itr, p - itr);
 
     if (p == itrEnd) *name = nullptr;

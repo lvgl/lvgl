@@ -177,7 +177,7 @@ struct LottieGlyph
     ~LottieGlyph()
     {
         for (auto p = children.begin(); p < children.end(); ++p) delete(*p);
-        free(code);
+        lv_free(code);
     }
 };
 
@@ -229,9 +229,9 @@ struct LottieFont
     ~LottieFont()
     {
         for (auto c = chars.begin(); c < chars.end(); ++c) delete(*c);
-        free(style);
-        free(family);
-        free(name);
+        lv_free(style);
+        lv_free(family);
+        lv_free(name);
     }
 
     Array<LottieGlyph*> chars;
@@ -247,10 +247,10 @@ struct LottieMarker
     char* name = nullptr;
     float time = 0.0f;
     float duration = 0.0f;
-    
+
     ~LottieMarker()
     {
-        free(name);
+    	lv_free(name);
     }
 };
 
@@ -500,7 +500,7 @@ struct LottieTransform : LottieObject
 };
 
 
-struct LottieSolid : LottieObject 
+struct LottieSolid : LottieObject
 {
     LottieColor color = RGB24{255, 255, 255};
     LottieOpacity opacity = 255;
@@ -836,7 +836,7 @@ struct LottieSlot
 
     ~LottieSlot()
     {
-        free(sid);
+    	lv_free(sid);
         if (!overridden) return;
         for (auto pair = pairs.begin(); pair < pairs.end(); ++pair) {
             delete(pair->prop);
