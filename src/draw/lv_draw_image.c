@@ -125,6 +125,11 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
         return;
     }
 
+    /*If the image_area is not set assume that it's the same as the rendering area */
+    if(new_image_dsc->image_area.x2 == LV_COORD_MIN) {
+        new_image_dsc->image_area = *image_coords;
+    }
+
     /*Typical case, draw the image as bitmap*/
     if(!(new_image_dsc->header.flags & LV_IMAGE_FLAGS_CUSTOM_DRAW)) {
         lv_draw_task_t * t = lv_draw_add_task(layer, image_coords);
@@ -185,13 +190,6 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
         lv_free(new_image_dsc);
     }
 
-
-    /*If the image_area is not set assume that it's the same as the rendering area */
-    if(new_image_dsc->image_area.x2 == LV_COORD_MIN) {
-        new_image_dsc->image_area = *coords;
-    }
-
-    lv_draw_finalize_task_creation(layer, t);
     LV_PROFILER_DRAW_END;
 }
 
