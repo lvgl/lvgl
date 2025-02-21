@@ -29,7 +29,7 @@ void lv_example_slider_3(void)
 static void slider_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = (lv_obj_t *)lv_event_get_target(e);
 
     /*Provide some extra space for the value*/
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
