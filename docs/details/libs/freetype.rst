@@ -30,7 +30,7 @@ There are two ways to use FreeType:
 For UNIX
 --------
 
-For UNIX systems, the following is recommended to compile and install FreeType libraries.
+For UNIX-like systems, the following is recommended to compile and install FreeType libraries.
 
 - Enter the FreeType source code directory
 - ``make``
@@ -124,6 +124,22 @@ please refer to the example code below.
     - `FreeType tutorial <https://www.freetype.org/freetype2/docs/tutorial/step1.html>`__
     - LVGL's :ref:`add_font`
 
+Rendering vector fonts is supported with VGLite or ThorVG,
+when using vector fonts with ThorVG, it is possible to set a letter outline of a different color.
+
+This is achieved by setting the style attributes with the
+:cpp:func:`lv_style_set_text_outline_width` and :cpp:func:`lv_style_set_text_outline_color` functions
+
+You will have to account for the increased width and height of letter due to the added letter outline,
+to avoid letters overlapping space them out using :cpp:func:`lv_style_set_text_letter_space`
+
+To use vector fonts with ThorVG, you will have to enable ``LV_USE_VECTOR_GRAPHICS`` in ``lv_conf.h``
+
+.. note::
+
+   This feature is currently experimental, there are clipping issues especially when using large font sizes.
+
+See the :cpp:func:`lv_example_freetype_2_vector_font` function for a usage example
 
 
 .. _freetype_example:

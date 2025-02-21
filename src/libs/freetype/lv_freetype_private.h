@@ -28,6 +28,7 @@ extern "C" {
 #include FT_SIZES_H
 #include FT_IMAGE_H
 #include FT_OUTLINE_H
+#include FT_STROKER_H
 
 /*********************
  *      DEFINES
@@ -119,6 +120,7 @@ typedef struct _lv_freetype_font_dsc_t {
     lv_freetype_cache_node_t * cache_node;
     lv_cache_entry_t * cache_node_entry;
     FTC_FaceID face_id;
+    uint32_t outline_stroke_width;
 } lv_freetype_font_dsc_t;
 
 /**********************

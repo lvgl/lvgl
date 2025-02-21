@@ -315,6 +315,11 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
     draw_letter_dsc.color = dsc->color;
     draw_letter_dsc.rotation = dsc->rotation;
 
+    /* Set letter outline stroke attributes */
+    draw_letter_dsc.outline_stroke_width = dsc->outline_stroke_width;
+    draw_letter_dsc.outline_stroke_opa = dsc->outline_stroke_opa;
+    draw_letter_dsc.outline_stroke_color = dsc->outline_stroke_color;
+
     lv_draw_fill_dsc_t fill_dsc;
     lv_draw_fill_dsc_init(&fill_dsc);
     fill_dsc.opa = dsc->opa;
@@ -609,6 +614,14 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
         }
 
         dsc->format = g.format;
+
+        if(g.format == LV_FONT_GLYPH_FORMAT_VECTOR) {
+
+            /*Load the outline of the glyph, even if the function says bitmap*/
+            g.outline_stroke_width = dsc->outline_stroke_width;
+            dsc->glyph_data = (void *) lv_font_get_glyph_bitmap(&g, draw_buf);
+            dsc->format = dsc->glyph_data ? g.format : LV_FONT_GLYPH_FORMAT_NONE;
+        }
     }
     else {
         dsc->format = LV_FONT_GLYPH_FORMAT_NONE;
