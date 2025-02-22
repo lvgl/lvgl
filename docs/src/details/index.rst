@@ -7,10 +7,10 @@ Details
 .. toctree::
     :maxdepth: 2
 
-    base-widget/index
+    generic-widget-features/index
     widgets/index
-    main-components/index
-    other-components/index
+    main-modules/index
+    auxiliary-modules/index
     ../examples
     debugging/index
     integration/index

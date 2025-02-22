@@ -1,12 +1,20 @@
+.. _getting_started:
+
+===============
+Getting Started
+===============
+
+
+
 .. _lvgl_basics:
 
-===========
 LVGL Basics
-===========
+***********
 
 LVGL (Light and Versatile Graphics Library) is a free and open-source graphics
 library providing everything you need to create an embedded GUI with easy-to-use
-graphical elements, beautiful visual effects, and a low memory footprint.
+mobile-phone-like graphical elements, beautiful visual effects, and a low memory
+footprint.
 
 How does it do this?
 
@@ -423,10 +431,24 @@ LVGL can even be used with :ref:`micropython`.
 
 
 
-.. _going_deeper:
+.. _basic_examples:
 
-Going Deeper
-*************
+Basic Examples
+**************
+
+Below are several basic examples.  They include the application code that produces
+the Widget Tree needed to make LVGL render the examples shown.  Each example assumes
+a LVGL has undergone normal initialization, meaning that a ``lv_display_t`` object
+was created and therefore has an :ref:`active_screen`.
+
+.. include:: ../examples/get_started/index.rst
+
+
+
+.. _whats_next:
+
+What's Next?
+************
 
 There are several good ways ways to gain deeper knowledge of LVGL.  Here is one
 recommended order of documents to read and things to play with while you are
@@ -450,19 +472,5 @@ advancing your knowledge:
 .. _ready-to-use projects:  https://github.com/lvgl?q=lv_port_&type=&language=
 .. _forum:                  https://forum.lvgl.io/
 
-
-
-.. _basics_examples:
-
-Basic Examples
-**************
-
-Below are several basic examples.  They include the application code that produces
-the Widget Tree needed to make LVGL render the examples shown.  Each example assumes
-a LVGL has undergone normal initialization, meaning that a ``lv_display_t`` object
-was created and therefore has an :ref:`active_screen`.
-
-
-.. include:: ../examples/get_started/index.rst
 
 
