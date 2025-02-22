@@ -19,6 +19,9 @@
 #define LV_OS_SDL2          7
 #define LV_OS_CUSTOM        255
 
+#define LV_DRAW_BLEND_CUSTOM_NONE 0
+#define LV_DRAW_BLEND_CUSTOM_NEMA_GFX 1
+
 #define LV_STDLIB_BUILTIN           0
 #define LV_STDLIB_CLIB              1
 #define LV_STDLIB_MICROPYTHON       2
@@ -337,6 +340,18 @@
         #define LV_DRAW_TRANSFORM_USE_MATRIX CONFIG_LV_DRAW_TRANSFORM_USE_MATRIX
     #else
         #define LV_DRAW_TRANSFORM_USE_MATRIX            0
+    #endif
+#endif
+
+/** Selectively disable lv_draw_sw_blend function and use a custom one. Possible options:
+ * - LV_DRAW_BLEND_CUSTOM_NONE
+ * - LV_DRAW_BLEND_CUSTOM_NEMA_GFX */
+
+#ifndef LV_DRAW_BLEND_CUSTOM
+    #ifdef CONFIG_LV_DRAW_BLEND_CUSTOM
+        #define LV_DRAW_BLEND_CUSTOM CONFIG_LV_DRAW_BLEND_CUSTOM
+    #else
+        #define LV_DRAW_BLEND_CUSTOM LV_DRAW_BLEND_CUSTOM_NONE
     #endif
 #endif
 
@@ -661,6 +676,10 @@
             #endif
         #endif
     #endif
+
+    /* Selectively disable lv_draw_sw_blend function and use a custom one.
+     * Necessary if you use TSC formatted frame buffer. Possible options:
+     * - LV_DRAW_BLEND_CUSTOM LV_DRAW_NEMA_GFX_BLEND */
 #endif
 
 /** Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
