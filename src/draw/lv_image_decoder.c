@@ -335,14 +335,11 @@ static lv_image_decoder_t * image_decoder_get_info(lv_image_decoder_dsc_t * dsc,
     }
 
     /*Search the decoders*/
-    lv_image_decoder_t * decoder_prev = NULL;
     LV_LL_READ(img_decoder_ll_p, decoder) {
         /*Info and Open callbacks are required*/
         if(decoder->info_cb && decoder->open_cb) {
             lv_fs_seek(&dsc->file, 0, LV_FS_SEEK_SET);
             lv_result_t res = decoder->info_cb(decoder, dsc, header);
-
-            if(decoder_prev) LV_LOG_TRACE("Can't open image with decoder %s. Trying next decoder.", decoder_prev->name);
 
             if(res == LV_RESULT_OK) {
                 if(header->stride == 0) {
@@ -351,8 +348,9 @@ static lv_image_decoder_t * image_decoder_get_info(lv_image_decoder_dsc_t * dsc,
                 }
                 break;
             }
-
-            decoder_prev = decoder;
+            else {
+                LV_LOG_TRACE("Can't open image with decoder %s. Trying next decoder.", decoder->name);
+            }
         }
     }
 
