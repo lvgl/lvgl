@@ -45,8 +45,8 @@ Application's Job
 -----------------
 
 After initialization, the application's job is merely to create Widget Trees when
-they are needed, manage events those Widgets generate (by way of user interaction
-and other things), and delete them when they are no longer needed.  LVGL takes care
+they are needed, manage events those Widgets generate (through user interactions
+and similar), and delete them when they are no longer needed.  LVGL takes care
 of the rest.
 
 
