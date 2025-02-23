@@ -7,6 +7,7 @@ Widgets
 .. toctree::
     :maxdepth: 1
 
+    base_widget
     animimg
     arc
     bar

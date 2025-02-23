@@ -625,13 +625,13 @@ def run(args):
                 project_dir,
                 intermediate_dir,
                 os.path.join(intermediate_dir, 'intro'),
-                os.path.join(intermediate_dir, 'intro', 'add-lvgl-to-your-project'),
                 os.path.join(intermediate_dir, 'details'),
-                os.path.join(intermediate_dir, 'details', 'base-widget'),
-                os.path.join(intermediate_dir, 'details', 'base-widget', 'layouts'),
-                os.path.join(intermediate_dir, 'details', 'base-widget', 'styles'),
+                os.path.join(intermediate_dir, 'details', 'generic-widget-features'),
+                os.path.join(intermediate_dir, 'details', 'generic-widget-features', 'layouts'),
+                os.path.join(intermediate_dir, 'details', 'generic-widget-features', 'styles'),
                 os.path.join(intermediate_dir, 'details', 'debugging'),
                 os.path.join(intermediate_dir, 'details', 'integration'),
+                os.path.join(intermediate_dir, 'details', 'integration', 'adding-lvgl-to-your-project'),
                 os.path.join(intermediate_dir, 'details', 'integration', 'bindings'),
                 os.path.join(intermediate_dir, 'details', 'integration', 'building'),
                 os.path.join(intermediate_dir, 'details', 'integration', 'chip'),
@@ -644,10 +644,10 @@ def run(args):
                 os.path.join(intermediate_dir, 'details', 'integration', 'os', 'yocto'),
                 os.path.join(intermediate_dir, 'details', 'integration', 'renderers'),
                 os.path.join(intermediate_dir, 'details', 'libs'),
-                os.path.join(intermediate_dir, 'details', 'main-components'),
-                # Note:  details/main-components/display omitted intentionally,
+                os.path.join(intermediate_dir, 'details', 'main-modules'),
+                # Note:  details/main-modules/display omitted intentionally,
                 # since API links for those .RST files have been added manually.
-                os.path.join(intermediate_dir, 'details', 'other-components'),
+                os.path.join(intermediate_dir, 'details', 'auxiliary-modules'),
                 os.path.join(intermediate_dir, 'details', 'widgets')
             )
 
