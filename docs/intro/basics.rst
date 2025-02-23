@@ -67,7 +67,7 @@ between two terms that you will hereafter see frequently:
 - A **Display** or **Display Panel** is the physical hardware displaying the pixels.
 - A :ref:`display` object is an object in RAM that represents a **Display** meant
   to be used by LVGL.
-- A **Screen** is the "root" Widget in the Widget Trees mentioned above, and are
+- A **Screen** is the "root" Widget in the Widget Trees mentioned above, and is
   "attached to" a particular :ref:`display`.
 
 
