@@ -29,7 +29,7 @@ Overview of LVGL's Data Flow
 You create one :ref:`display` for each physical display panel, create
 :ref:`basics_screen_widgets` on them, add :ref:`basics_widgets` onto those Screens.
 To handle touch, mouse, keypad, etc., you :ref:`create an Input Device <indev_creation>`
-for each.  The :ref:`tick_interface` tells LVGL what time is it.  :ref:`timer_handler`
+for each.  The :ref:`tick_interface` tells LVGL what time it is.  :ref:`timer_handler`
 drives LVGL's timers which, in turn, perform all of LVGL's time-related tasks:
 
 - periodically refreshes displays,
