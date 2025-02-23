@@ -9,10 +9,10 @@ The following details apply to all types of Widgets.
 .. toctree::
     :maxdepth:  3
 
-    obj
-    coord
-    layer
+    basics
+    coordinates
+    layers
     styles/index
-    event
+    events
     layouts/index
-    scroll
+    scrolling
