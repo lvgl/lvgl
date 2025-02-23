@@ -100,9 +100,9 @@ See :ref:`active_screen` for more information.
 
 Widgets
 -------
-After LVGL is initialized (see :ref:`initializing_lvgl`), to create an interactive
-user interface, an application next creates a tree of Widgets that LVGL can render to
-the associated display, and with which the user can interact.
+After LVGL is initialized (see :ref:`initializing_lvgl`), an application creates a
+tree of Widgets that LVGL can render to the associated display, to create an 
+interactive user interface with which the user can interact.
 
 Widgets are "intelligent" LVGL graphical elements such as :ref:`Base Widgets
 <base_widget_overview>` (simple rectangles and :ref:`screens`), Buttons, Labels,
@@ -111,16 +111,16 @@ list.
 
 To build this Widget Tree, the application first acquires a pointer to a Screen Widget.
 A system designer is free to use the default Screen created with the :ref:`display`
-and/or create his own.  To create a new Screen Widget, simply create a Widget passing
+and/or create his own.  To create a new Screen Widget, simply create a Widget with
 NULL as the parent argument.  Technically, this can be any type of Widget, but in
 most cases it is a :ref:`base_widget_overview`.  (An example of another type of
 Widget being used as a Screen is an :ref:`lv_image` Widget to supply an image for the
 background.)
 
-The application then adds Widgets to this Screen as children in the tree.  Widgets
-are automatically added as children to their parent Widgets at time of creation ---
+The application then adds Widgets to this Screen which are children in it's tree.  
+Widgets are automatically added as children to their parent Widgets at time of creation ---
 the Widget's parent is passed as the first argument to the function that creates
-the Widget.  After being so added, we say that the parent Widget "contains" the
+the Widget.  After being added, we say that the parent Widget "contains" the
 child Widget.
 
 Any Widget can contain other Widgets.  For example, if you want a Button to have
@@ -144,7 +144,7 @@ A system designer is free to keep any number of Screens (and their child Widgets
 RAM (e.g. for quick re-display again later).  Doing so:
 
 - requires more RAM, but
-- can save the time of repeatedly creating the Screen and its child Widgets;
+- avoids repeatedly creating the Screen and its child Widgets;
 - can be handy when a Screen is complex and/or can be made the :ref:`active_screen` frequently.
 
 If multiple Screens are maintained in RAM simultaneously, it is up to the system
@@ -196,7 +196,7 @@ For example:
 
     lv_slider_set_value(slider1, 70, LV_ANIM_ON);
 
-To see the full API visit the documentation of the Widget in question under
+To see the full API visit the documentation of the Widget in question at
 :ref:`widgets` or study its related header file in the source code, e.g.
 
 - lvgl/src/widgets/slider/lv_slider.h
@@ -240,8 +240,8 @@ A callback is assigned like this:
 
 :cpp:enumerator:`LV_EVENT_ALL` can be used instead of :cpp:enumerator:`LV_EVENT_CLICKED`
 to invoke the callback for all events.  (Beware:  there are a LOT of events!  This can
-be handy for debugging or learning what events occur for a given Widget, or indeed
-if the application needs to process all events for some reason.)
+be handy for debugging or learning what events occur for a given Widget, or
+if for some reason, the application needs to process all events.)
 
 Event callbacks receive the argument :cpp:expr:`lv_event_t * e` containing the
 current event code and other event-related information.  The current event code can
@@ -286,7 +286,7 @@ Widgets can be in a combination of the following states:
 - :cpp:enumerator:`LV_STATE_CHECKED`: Toggled or checked state
 - :cpp:enumerator:`LV_STATE_FOCUSED`: Focused via keypad or encoder or clicked via touchpad/mouse
 - :cpp:enumerator:`LV_STATE_FOCUS_KEY`: Focused via keypad or encoder but not via touchpad/mouse
-- :cpp:enumerator:`LV_STATE_EDITED`: Edit by an encoder
+- :cpp:enumerator:`LV_STATE_EDITED`: Edited by an encoder
 - :cpp:enumerator:`LV_STATE_HOVERED`: Hovered by mouse
 - :cpp:enumerator:`LV_STATE_PRESSED`: Being pressed
 - :cpp:enumerator:`LV_STATE_SCROLLED`: Being scrolled
