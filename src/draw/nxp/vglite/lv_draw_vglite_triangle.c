@@ -124,11 +124,16 @@ static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_are
     lv_color32_t col32 = lv_color_to_32(dsc->bg_color, dsc->bg_opa);
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
 
-    vg_lite_linear_gradient_t gradient;
+    vg_lite_linear_gradient_t * gradient;
+
     bool has_gradient = (dsc->bg_grad.dir != (lv_grad_dir_t)LV_GRAD_DIR_NONE);
 
     /* Init Gradient*/
     if(has_gradient) {
+        gradient = lv_malloc_zeroed(sizeof(vg_lite_linear_gradient_t));
+        LV_ASSERT(gradient != NULL);
+        vglite_task->gradient = gradient;
+
         vg_lite_matrix_t * grad_matrix;
 
         vg_lite_uint32_t colors[LV_GRADIENT_MAX_STOPS];
@@ -147,15 +152,13 @@ static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_are
             colors[i] = vglite_get_color(col32[i], true);
         }
 
-        lv_memzero(&gradient, sizeof(vg_lite_linear_gradient_t));
+        VGLITE_CHECK_ERROR(vg_lite_init_grad(gradient));
 
-        VGLITE_CHECK_ERROR(vg_lite_init_grad(&gradient));
+        VGLITE_CHECK_ERROR(vg_lite_set_grad(gradient, cnt, colors, stops));
 
-        VGLITE_CHECK_ERROR(vg_lite_set_grad(&gradient, cnt, colors, stops));
+        VGLITE_CHECK_ERROR(vg_lite_update_grad(gradient));
 
-        VGLITE_CHECK_ERROR(vg_lite_update_grad(&gradient));
-
-        grad_matrix = vg_lite_get_grad_matrix(&gradient);
+        grad_matrix = vg_lite_get_grad_matrix(gradient);
         vg_lite_identity(grad_matrix);
         vg_lite_translate((float)coords->x1, (float)coords->y1, grad_matrix);
 
@@ -167,7 +170,7 @@ static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_are
             vg_lite_scale((float)width / 256.0f, 1.0f, grad_matrix);
         }
 
-        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(vgbuf, path, VG_LITE_FILL_EVEN_ODD, NULL, &gradient,
+        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(vgbuf, path, VG_LITE_FILL_EVEN_ODD, NULL, gradient,
                                                  VG_LITE_BLEND_SRC_OVER));
     }
     else {
@@ -175,9 +178,6 @@ static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_are
     }
 
     vglite_run();
-
-    if(has_gradient)
-        VGLITE_CHECK_ERROR(vg_lite_clear_grad(&gradient));
 }
 
 #endif /*LV_USE_DRAW_VGLITE*/
