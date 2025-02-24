@@ -1,19 +1,21 @@
+==========
 PikaScript
 ==========
 
 
-What is PikaScript ?
---------------------
+What is PikaScript?
+*******************
 
 `PikaScript <https://github.com/pikasTech/pikascript>`__ is a Python interpreter designed specifically for
 microcontrollers, and it supports a subset of the common Python3 syntax.
 
-It's lighter, requiring only 32k of code space and 4k of RAM, which means it can run on stm32f103c8 (blue-pill)
-or even stm32g030c8, on the other hand, you can leave valuable space for more material or larger buffer areas.
+It's lighter than MicroPython, requiring only 32k of code space and 4k of RAM, which
+means it can run on stm32f103c8 (blue-pill) or even stm32g030c8.  On the other hand,
+you can leave valuable space for more material or larger buffer areas.
 
 It is simpler, out of the box, runs with no porting and configuration at all, does not depend on OS or file
 system, has good support for popular IDEs for Windows platforms like Keil, IAR, RT-Thread-Studio, and of course,
-supports linux-gcc development platforms.
+supports Linux gcc development platforms.
 
 It's smarter, with a unique C module mechanism that allows you to generate bindings automatically by simply
 writing the API for the C module in Python, and you don't need to deal with the headache of writing any macros
@@ -24,23 +26,24 @@ of your arguments .
 --------------
 
 
-Why PikaScript + LVGL ?
------------------------
+Why PikaScript + LVGL?
+**********************
 
-- PikaScript now supports the main features of LVGL8, and these APIs are fully compatible with MicroPython!
-  This means that you can continue to use already written code from MicroPython, and then use less code space and RAM.
-- Enjoy detailed code hints down to the parameter type for a better programming experience
-- Use a more convenient IDE, such as vs-based simulation projects
+- PikaScript now supports the main features of LVGL8, and these APIs are fully compatible with MicroPython.
+  This means that you can continue to use already written code from MicroPython, but use less code space and RAM.
+- Enjoy detailed code hints down to the parameter type for a better programming experience.
+- Use a more convenient IDE, such as Visual-Studio-based simulation projects.
 
 
-So how does it look like?
--------------------------
+What Does It Look Like?
+***********************
 
-Here are some examples of lvgl that PikaScript can already run, they are mainly from the lvgl documentation examples
+Here are some examples of using LVGL that PikaScript can already run. They are mainly
+from the LVGL documentation examples.
 
 
 LV_ARC
-~~~~~~
+------
 
 .. code-block:: python
 
@@ -57,7 +60,7 @@ LV_ARC
 
 
 LV_BAR
-~~~~~~
+------
 
 .. code-block:: python
 
@@ -73,7 +76,7 @@ LV_BAR
 
 
 LV_BTN
-~~~~~~
+------
 
 .. code-block:: python
 
@@ -103,7 +106,7 @@ LV_BTN
 
 
 LV_CHECKBOX
-~~~~~~~~~~~
+-----------
 
 .. code-block:: python
 
@@ -132,12 +135,12 @@ LV_CHECKBOX
 --------------
 
 
-How does it work?
------------------
+How Does It Work?
+*****************
 
-PikaScript has a unique C module smart binding tool
+PikaScript has a unique C module smart binding tool.
 
-Just write the Python interface in pika_lvgl.pyi (.pyi is the python interface file)
+Just write the Python interface in pika_lvgl.pyi (.pyi is a Python interface file)
 
 .. code-block:: python
 
@@ -169,7 +172,7 @@ in the module_class_method format, without any additional work, and all binding 
 
 
 To use the module, just ``import pika_lvgl`` and the precompiler will automatically scan main.py and bind the
-``pika_lvgl`` module
+``pika_lvgl`` module.
 
 .. code-block:: shell
 
@@ -183,7 +186,7 @@ To use the module, just ``import pika_lvgl`` and the precompiler will automatica
        binding pika_lvgl.pyi...
 
 
-The precompiler is written in Rust, runs on windows and linux, and is completely open source.
+The precompiler is written in Rust, runs on Windows and Linux, and is completely open source.
 
 In addition to binding C modules, the precompiler compiles Python scripts to bytecode in the PC, reducing the
 size of the script and increasing its speed.
@@ -192,7 +195,7 @@ size of the script and increasing its speed.
 --------------
 
 
-How can I use it?
------------------
+How Can I Use It?
+*****************
 
-The simulation repo on vs is available on https://github.com/pikasTech/lv_pikascript
+The simulation repository for Visual Studio is available at https://github.com/pikasTech/lv_pikascript .
