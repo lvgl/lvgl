@@ -8,7 +8,7 @@ static lv_chart_cursor_t * cursor;
 static void value_changed_event_cb(lv_event_t * e)
 {
     static int32_t last_id = -1;
-    lv_obj_t * obj = (lv_obj_t *)lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
 
     last_id = lv_chart_get_pressed_point(obj);
     if(last_id != LV_CHART_POINT_NONE) {

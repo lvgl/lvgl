@@ -3,14 +3,14 @@
 
 static void textarea_event_handler(lv_event_t * e)
 {
-    lv_obj_t * ta = (lv_obj_t *)lv_event_get_target(e);
+    lv_obj_t * ta = lv_event_get_target_obj(e);
     LV_UNUSED(ta);
     LV_LOG_USER("Enter was pressed. The current text is: %s", lv_textarea_get_text(ta));
 }
 
 static void btnm_event_handler(lv_event_t * e)
 {
-    lv_obj_t * obj = (lv_obj_t *)lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
     lv_obj_t * ta = (lv_obj_t *)lv_event_get_user_data(e);
     const char * txt = lv_buttonmatrix_get_button_text(obj, lv_buttonmatrix_get_selected_button(obj));
 

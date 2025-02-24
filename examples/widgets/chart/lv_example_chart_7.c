@@ -6,7 +6,7 @@ static void draw_event_cb(lv_event_t * e)
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
     lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t *)lv_draw_task_get_draw_dsc(draw_task);
     if(base_dsc->part == LV_PART_INDICATOR) {
-        lv_obj_t * obj = (lv_obj_t *)lv_event_get_target(e);
+        lv_obj_t * obj = lv_event_get_target_obj(e);
         lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
         lv_draw_rect_dsc_t * rect_draw_dsc = (lv_draw_rect_dsc_t *)lv_draw_task_get_draw_dsc(draw_task);
         uint32_t cnt = lv_chart_get_point_count(obj);

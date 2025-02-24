@@ -5,7 +5,7 @@
 
 static void draw_event_cb(lv_event_t * e)
 {
-    lv_obj_t * obj = (lv_obj_t *)lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
 
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
     lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t *)lv_draw_task_get_draw_dsc(draw_task);
@@ -47,7 +47,7 @@ static void draw_event_cb(lv_event_t * e)
 
 static void change_event_cb(lv_event_t * e)
 {
-    lv_obj_t * obj = (lv_obj_t *)lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
     uint32_t col;
     uint32_t row;
     lv_table_get_selected_cell(obj, &row, &col);

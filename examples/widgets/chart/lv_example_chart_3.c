@@ -4,7 +4,7 @@
 static void event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * chart = (lv_obj_t *)lv_event_get_target(e);
+    lv_obj_t * chart = lv_event_get_target_obj(e);
 
     if(code == LV_EVENT_VALUE_CHANGED) {
         lv_obj_invalidate(chart);

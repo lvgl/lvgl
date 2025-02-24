@@ -50,7 +50,7 @@ static void draw_event_cb(lv_event_t * e)
 
 static void add_faded_area(lv_event_t * e)
 {
-    lv_obj_t * obj = (lv_obj_t *)lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
     lv_area_t coords;
     lv_obj_get_coords(obj, &coords);
 

@@ -13,7 +13,7 @@ static void draw_event_cb(lv_event_t * e)
 
     lv_draw_fill_dsc_t * fill_dsc = lv_draw_task_get_fill_dsc(draw_task);
     if(fill_dsc) {
-        lv_obj_t * chart = (lv_obj_t *)lv_event_get_target(e);
+        lv_obj_t * chart = lv_event_get_target_obj(e);
         int32_t * y_array = lv_chart_get_series_y_array(chart, lv_chart_get_series_next(chart, NULL));
         int32_t v = y_array[base_dsc->id2];
 

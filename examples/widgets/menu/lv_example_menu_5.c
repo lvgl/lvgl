@@ -112,7 +112,7 @@ void lv_example_menu_5(void)
 
 static void back_event_handler(lv_event_t * e)
 {
-    lv_obj_t * obj = (lv_obj_t *)lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
     lv_obj_t * menu = (lv_obj_t *)lv_event_get_user_data(e);
 
     if(lv_menu_back_button_is_root(menu, obj)) {
@@ -127,7 +127,7 @@ static void switch_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * menu = (lv_obj_t *)lv_event_get_user_data(e);
-    lv_obj_t * obj = (lv_obj_t *)lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
     if(code == LV_EVENT_VALUE_CHANGED) {
         if(lv_obj_has_state(obj, LV_STATE_CHECKED)) {
             lv_menu_set_page(menu, NULL);
