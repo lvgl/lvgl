@@ -45,6 +45,7 @@ extern "C" {
 typedef struct vglite_draw_task {
     lv_draw_task_t * t;
     vg_lite_path_t * path;
+    vg_lite_linear_gradient_t * gradient;
 } vglite_draw_task_t;
 
 typedef struct lv_draw_vglite_unit {
