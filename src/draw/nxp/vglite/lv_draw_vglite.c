@@ -264,11 +264,12 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 #if LV_USE_VGLITE_BLIT_SPLIT
                 bool has_transform = (draw_dsc->rotation != 0 || draw_dsc->scale_x != LV_SCALE_NONE ||
                                       draw_dsc->scale_y != LV_SCALE_NONE);
+                bool is_tiled = draw_dsc->tile;
 #endif
 
                 if((!_vglite_src_cf_supported(img_dsc->header.cf))
 #if LV_USE_VGLITE_BLIT_SPLIT
-                   || has_transform
+                   || has_transform || is_tiled
 #endif
                    || (!vglite_src_buf_aligned(img_dsc->data, img_dsc->header.stride, img_dsc->header.cf))
                   )
