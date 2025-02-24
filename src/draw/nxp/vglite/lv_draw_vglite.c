@@ -503,16 +503,26 @@ static inline void _vglite_queue_task(vglite_draw_task_t * task)
     _tail = (_tail + 1) % VGLITE_TASK_BUF_SIZE;
 }
 
+static inline void _vglite_cleanup_task(vglite_draw_task_t * task)
+{
+    if(task->path != NULL) {
+        vg_lite_clear_path(task->path);
+        lv_free(task->path);
+    }
+    if(task->gradient != NULL) {
+        vg_lite_clear_grad(task->gradient);
+        lv_free(task->gradient);
+    }
+    lv_free(task);
+}
+
 static inline void _vglite_signal_task_ready(vglite_draw_task_t * task)
 {
     /* Signal the ready state to dispatcher. */
     task->t->state = LV_DRAW_TASK_STATE_READY;
     _head = (_head + 1) % VGLITE_TASK_BUF_SIZE;
-    if(task->path != NULL) {
-        vg_lite_clear_path(task->path);
-        lv_free(task->path);
-    }
-    lv_free(task);
+
+    _vglite_cleanup_task(task);
     /* No need to cleanup the tasks in buffer as we advance with the _head. */
 }
 
