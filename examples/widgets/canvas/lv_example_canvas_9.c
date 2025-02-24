@@ -10,7 +10,7 @@ static void timer_cb(lv_timer_t * timer)
     const char * string = "lol~ I'm wavvvvvvving~>>>";
     const int16_t string_len = lv_strlen(string);
 
-    lv_obj_t * canvas = lv_timer_get_user_data(timer);
+    lv_obj_t * canvas = (lv_obj_t *)lv_timer_get_user_data(timer);
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
 
@@ -31,13 +31,12 @@ static void timer_cb(lv_timer_t * timer)
             const int32_t angle = i * 5;
             const int32_t x = CURVE2_X(angle);
             const int32_t y = CURVE2_Y(angle + counter / 2);
+            const lv_point_t point = { .x = x, .y = y };
 
             letter_dsc.unicode = (uint32_t)string[i % string_len];
             letter_dsc.rotation = lv_atan2(y - pre_y, x - pre_x) * 10;
             letter_dsc.color = lv_color_hsv_to_rgb(i * 10, 100, 100);
-            lv_draw_letter(&layer, &letter_dsc, &(lv_point_t) {
-                .x = x, .y = y
-            });
+            lv_draw_letter(&layer, &letter_dsc, &point);
 
             pre_x = x;
             pre_y = y;

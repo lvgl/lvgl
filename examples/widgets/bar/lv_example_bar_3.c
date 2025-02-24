@@ -3,7 +3,7 @@
 
 static void set_temp(void * bar, int32_t temp)
 {
-    lv_bar_set_value(bar, temp, LV_ANIM_ON);
+    lv_bar_set_value((lv_obj_t *)bar, temp, LV_ANIM_ON);
 }
 
 /**

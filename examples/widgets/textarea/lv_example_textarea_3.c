@@ -28,7 +28,7 @@ void lv_example_textarea_3(void)
 
 static void ta_event_cb(lv_event_t * e)
 {
-    lv_obj_t * ta = lv_event_get_target(e);
+    lv_obj_t * ta = lv_event_get_target_obj(e);
     const char * txt = lv_textarea_get_text(ta);
     if(txt[0] >= '0' && txt[0] <= '9' &&
        txt[1] >= '0' && txt[1] <= '9' &&

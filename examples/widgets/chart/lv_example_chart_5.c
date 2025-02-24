@@ -36,7 +36,7 @@ void lv_example_chart_5(void)
 static void draw_event_cb(lv_event_t * e)
 {
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
+    lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t *)lv_draw_task_get_draw_dsc(draw_task);
 
     if(base_dsc->part == LV_PART_ITEMS && lv_draw_task_get_type(draw_task) == LV_DRAW_TASK_TYPE_LINE) {
         add_faded_area(e);
@@ -50,18 +50,18 @@ static void draw_event_cb(lv_event_t * e)
 
 static void add_faded_area(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
     lv_area_t coords;
     lv_obj_get_coords(obj, &coords);
 
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
+    lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t *)lv_draw_task_get_draw_dsc(draw_task);
 
     const lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
     lv_color_t ser_color = lv_chart_get_series_color(obj, ser);
 
     /*Draw a triangle below the line witch some opacity gradient*/
-    lv_draw_line_dsc_t * draw_line_dsc = lv_draw_task_get_draw_dsc(draw_task);
+    lv_draw_line_dsc_t * draw_line_dsc = (lv_draw_line_dsc_t *)lv_draw_task_get_draw_dsc(draw_task);
     lv_draw_triangle_dsc_t tri_dsc;
 
     lv_draw_triangle_dsc_init(&tri_dsc);
@@ -107,8 +107,8 @@ static void add_faded_area(lv_event_t * e)
 static void hook_division_lines(lv_event_t * e)
 {
     lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
-    lv_draw_dsc_base_t * base_dsc = lv_draw_task_get_draw_dsc(draw_task);
-    lv_draw_line_dsc_t * line_dsc = lv_draw_task_get_draw_dsc(draw_task);
+    lv_draw_dsc_base_t * base_dsc = (lv_draw_dsc_base_t *)lv_draw_task_get_draw_dsc(draw_task);
+    lv_draw_line_dsc_t * line_dsc = (lv_draw_line_dsc_t *)lv_draw_task_get_draw_dsc(draw_task);
 
     /*Vertical line*/
     if(line_dsc->p1.x == line_dsc->p2.x) {
