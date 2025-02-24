@@ -3,7 +3,7 @@
 
 ## Building
 
-Building the documentation easy.  Here are the requirements:
+Building the documentation is easy.  Here are the requirements:
 
 * Doxygen
 * Python >= 3.10
