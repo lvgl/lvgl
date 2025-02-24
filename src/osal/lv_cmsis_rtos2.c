@@ -17,6 +17,7 @@
 #if LV_USE_OS == LV_OS_CMSIS_RTOS2
 
 #include "../misc/lv_log.h"
+#include "../misc/lv_timer.h"
 
 /*********************
  *      DEFINES
@@ -42,9 +43,11 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_result_t lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*callback)(void *), size_t stack_size,
+lv_result_t lv_thread_init(lv_thread_t * thread, const char * const name, lv_thread_prio_t prio,
+                           void (*callback)(void *), size_t stack_size,
                            void * user_data)
 {
+    LV_UNUSED(name);
     static const osPriority_t prio_map[] = {
         [LV_THREAD_PRIO_LOWEST] = osPriorityLow,
         [LV_THREAD_PRIO_LOW] = osPriorityBelowNormal,
@@ -186,6 +189,11 @@ lv_result_t lv_thread_sync_delete(lv_thread_sync_t * sync)
     }
 
     return LV_RESULT_OK;
+}
+
+uint32_t lv_os_get_idle_percent(void)
+{
+    return lv_timer_get_idle();
 }
 
 /**********************

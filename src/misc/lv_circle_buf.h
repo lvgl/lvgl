@@ -170,7 +170,7 @@ lv_result_t lv_circle_buf_peek(const lv_circle_buf_t * circle_buf, void * data);
 /**
  * Peek a value at an index
  * @param circle_buf pointer to buffer
- * @param index the index of the value to peek， if the index is greater than the size of the buffer, it will return looply.
+ * @param index the index of the value to peek, if the index is greater than the size of the buffer, it will return looply.
  * @param data pointer to a variable to store the peeked value
  * @return LV_RESULT_OK: the value is peeked; LV_RESULT_INVALID: the value is not peeked
  */

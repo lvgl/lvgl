@@ -336,7 +336,7 @@ void lv_dropdown_clear_options(lv_obj_t * obj)
     if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
-void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt)
+void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt, lv_anim_enable_t anim)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -347,7 +347,7 @@ void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt)
     dropdown->sel_opt_id_orig = dropdown->sel_opt_id;
 
     if(dropdown->list) {
-        position_to_selected(obj, LV_ANIM_OFF);
+        position_to_selected(obj, anim);
     }
 
     lv_obj_invalidate(obj);
@@ -865,6 +865,7 @@ static void draw_main(lv_event_t * e)
 
     lv_draw_label_dsc_t symbol_dsc;
     lv_draw_label_dsc_init(&symbol_dsc);
+    symbol_dsc.base.layer = layer;
     lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &symbol_dsc);
 
     /*If no text specified use the selected option*/
@@ -923,6 +924,7 @@ static void draw_main(lv_event_t * e)
         else {
             lv_draw_image_dsc_t img_dsc;
             lv_draw_image_dsc_init(&img_dsc);
+            img_dsc.base.layer = layer;
             lv_obj_init_draw_image_dsc(obj, LV_PART_INDICATOR, &img_dsc);
             lv_point_set(&img_dsc.pivot, symbol_w / 2, symbol_h / 2);
             img_dsc.rotation = lv_obj_get_style_transform_rotation(obj, LV_PART_INDICATOR);
@@ -933,6 +935,7 @@ static void draw_main(lv_event_t * e)
 
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
+    label_dsc.base.layer = layer;
     lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
 
     lv_point_t size;
@@ -1033,6 +1036,7 @@ static void draw_box(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint32_t id, l
 
     lv_draw_rect_dsc_t sel_rect;
     lv_draw_rect_dsc_init(&sel_rect);
+    sel_rect.base.layer = layer;
     lv_obj_init_draw_rect_dsc(list_obj,  LV_PART_SELECTED, &sel_rect);
     lv_draw_rect(layer, &sel_rect, &rect_area);
 
@@ -1055,6 +1059,7 @@ static void draw_box_label(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint32_t
 
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
+    label_dsc.base.layer = layer;
     lv_obj_init_draw_label_dsc(list_obj, LV_PART_SELECTED, &label_dsc);
 
     label_dsc.line_space = lv_obj_get_style_text_line_space(list_obj,

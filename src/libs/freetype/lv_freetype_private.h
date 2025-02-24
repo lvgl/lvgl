@@ -15,12 +15,12 @@ extern "C" {
  *********************/
 
 #include "lv_freetype.h"
-#include "../../misc/cache/lv_cache.h"
-#include "../../misc/lv_ll.h"
-#include "../../font/lv_font.h"
 
 #if LV_USE_FREETYPE
 
+#include "../../misc/cache/lv_cache.h"
+#include "../../misc/lv_ll.h"
+#include "../../font/lv_font.h"
 #include "ft2build.h"
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
@@ -65,12 +65,18 @@ struct _lv_freetype_outline_vector_t {
     int32_t y;
 };
 
+typedef struct {
+    int32_t segments_size;
+    int32_t data_size;
+} lv_freetype_outline_sizes_t;
+
 struct _lv_freetype_outline_event_param_t {
     lv_freetype_outline_t outline;
     lv_freetype_outline_type_t type;
     lv_freetype_outline_vector_t to;
     lv_freetype_outline_vector_t control1;
     lv_freetype_outline_vector_t control2;
+    lv_freetype_outline_sizes_t sizes;
 };
 
 

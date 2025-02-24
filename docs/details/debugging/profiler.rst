@@ -45,12 +45,13 @@ To enable the profiler, set :c:macro:`LV_USE_PROFILER` in ``lv_conf.h`` and conf
         #include <sys/syscall.h>
         #include <sys/types.h>
         #include <time.h>
+        #include <unistd.h>
 
-        static uint32_t my_get_tick_us_cb(void)
+        static uint64_t my_get_tick_cb(void)
         {
             struct timespec ts;
             clock_gettime(CLOCK_MONOTONIC, &ts);
-            return ts.tv_sec * 1000000 + ts.tv_nsec / 1000;
+            return ts.tv_sec * 1000000000 + ts.tv_nsec;
         }
 
         static int my_get_tid_cb(void)
@@ -69,8 +70,8 @@ To enable the profiler, set :c:macro:`LV_USE_PROFILER` in ``lv_conf.h`` and conf
         {
             lv_profiler_builtin_config_t config;
             lv_profiler_builtin_config_init(&config);
-            config.tick_per_sec = 1000000; /* One second is equal to 1000000 microseconds */
-            config.tick_get_cb = my_get_tick_us_cb;
+            config.tick_per_sec = 1000000000; /* One second is equal to 1000000000 nanoseconds */
+            config.tick_get_cb = my_get_tick_cb;
             config.tid_get_cb = my_get_tid_cb;
             config.cpu_get_cb = my_get_cpu_cb;
             lv_profiler_builtin_init(&config);
@@ -80,12 +81,18 @@ To enable the profiler, set :c:macro:`LV_USE_PROFILER` in ``lv_conf.h`` and conf
 
     .. code-block:: c
 
+        static uint64_t my_get_tick_cb(void)
+        {
+            /* Use the microsecond time stamp provided by Arduino */
+            return micros();
+        }
+
         void my_profiler_init(void)
         {
             lv_profiler_builtin_config_t config;
             lv_profiler_builtin_config_init(&config);
             config.tick_per_sec = 1000000; /* One second is equal to 1000000 microseconds */
-            config.tick_get_cb = micros; /* Use the microsecond time stamp provided by Arduino */
+            config.tick_get_cb = my_get_tick_cb;
             lv_profiler_builtin_init(&config);
         }
 

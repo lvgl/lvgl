@@ -86,7 +86,9 @@ lv_result_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
 
     /*Call the actual event callback*/
     e->user_data = NULL;
+    LV_PROFILER_EVENT_BEGIN_TAG(lv_event_code_get_name(e->code));
     base->event_cb(base, e);
+    LV_PROFILER_EVENT_END_TAG(lv_event_code_get_name(e->code));
 
     lv_result_t res = LV_RESULT_OK;
     /*Stop if the object is deleted*/
@@ -159,7 +161,7 @@ uint32_t lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t eve
 
     for(i = event_cnt - 1; i >= 0; i--) {
         lv_event_dsc_t * dsc = lv_obj_get_event_dsc(obj, i);
-        if(dsc && dsc->cb == event_cb && dsc->user_data == user_data) {
+        if(dsc && (event_cb == NULL || dsc->cb == event_cb) && dsc->user_data == user_data) {
             lv_obj_remove_event(obj, i);
             removed_count ++;
         }

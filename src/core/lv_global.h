@@ -35,6 +35,10 @@ extern "C" {
 #include "../font/lv_font_fmt_txt_private.h"
 #endif
 
+#if LV_USE_OS != LV_OS_NONE && defined(__linux__)
+#include "../osal/lv_linux_private.h"
+#endif
+
 #include "../tick/lv_tick.h"
 #include "../layouts/lv_layout.h"
 
@@ -169,6 +173,10 @@ typedef struct _lv_global_t {
     lv_fs_drv_t win32_fs_drv;
 #endif
 
+#if LV_USE_FS_UEFI
+    lv_fs_drv_t uefi_fs_drv;
+#endif
+
 #if LV_USE_FS_LITTLEFS
     lv_fs_drv_t littlefs_fs_drv;
 #endif
@@ -220,6 +228,9 @@ typedef struct _lv_global_t {
 
 #if LV_USE_OS != LV_OS_NONE
     lv_mutex_t lv_general_mutex;
+#if defined(__linux__)
+    lv_proc_stat_t linux_last_proc_stat;
+#endif
 #endif
 
 #if LV_USE_OS == LV_OS_FREERTOS
@@ -229,6 +240,9 @@ typedef struct _lv_global_t {
     bool freertos_idle_task_running;
 #endif
 
+#if LV_USE_EVDEV
+    lv_evdev_discovery_t * evdev_discovery;
+#endif
 
     void * user_data;
 } lv_global_t;

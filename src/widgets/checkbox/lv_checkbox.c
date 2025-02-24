@@ -237,6 +237,7 @@ static void lv_checkbox_draw(lv_event_t * e)
 
     lv_draw_rect_dsc_t indic_dsc;
     lv_draw_rect_dsc_init(&indic_dsc);
+    indic_dsc.base.layer = layer;
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &indic_dsc);
     lv_area_t marker_area;
     if(is_rtl) {
@@ -264,6 +265,7 @@ static void lv_checkbox_draw(lv_event_t * e)
 
     lv_draw_label_dsc_t txt_dsc;
     lv_draw_label_dsc_init(&txt_dsc);
+    txt_dsc.base.layer = layer;
     lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &txt_dsc);
     txt_dsc.text = cb->txt;
 

@@ -53,17 +53,17 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t * blend_dsc)
+void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * blend_dsc)
 {
     /*Do not draw transparent things*/
     if(blend_dsc->opa <= LV_OPA_MIN) return;
     if(blend_dsc->mask_buf && blend_dsc->mask_res == LV_DRAW_SW_MASK_RES_TRANSP) return;
 
     lv_area_t blend_area;
-    if(!lv_area_intersect(&blend_area, blend_dsc->blend_area, draw_unit->clip_area)) return;
+    if(!lv_area_intersect(&blend_area, blend_dsc->blend_area, &t->clip_area)) return;
 
     LV_PROFILER_DRAW_BEGIN;
-    lv_layer_t * layer = draw_unit->target_layer;
+    lv_layer_t * layer = t->target_layer;
     uint32_t layer_stride_byte = layer->draw_buf->header.stride;
 
     if(blend_dsc->src_buf == NULL) {
@@ -73,6 +73,7 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
         fill_dsc.dest_stride = layer_stride_byte;
         fill_dsc.opa = blend_dsc->opa;
         fill_dsc.color = blend_dsc->color;
+        fill_dsc.mask_stride = 0;
 
         if(blend_dsc->mask_buf == NULL) fill_dsc.mask_buf = NULL;
         else if(blend_dsc->mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) fill_dsc.mask_buf = NULL;
@@ -155,7 +156,7 @@ void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t *
         src_buf += image_dsc.src_stride * (blend_area.y1 - blend_dsc->src_area->y1);
         src_buf += ((blend_area.x1 - blend_dsc->src_area->x1) * src_px_size) >> 3;
         image_dsc.src_buf = src_buf;
-
+        image_dsc.mask_stride = 0;
 
         if(blend_dsc->mask_buf == NULL) image_dsc.mask_buf = NULL;
         else if(blend_dsc->mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) image_dsc.mask_buf = NULL;

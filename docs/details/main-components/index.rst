@@ -7,7 +7,7 @@ Main Components
 .. toctree::
     :maxdepth: 2
 
-    display
+    display/index
     indev
     color
     font

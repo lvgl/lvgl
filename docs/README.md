@@ -25,10 +25,12 @@ There are also some Python specific libraries that need to be installed. You can
 * sphinxcontrib-jsmath
 * sphinxcontrib-qthelp
 * sphinxcontrib-serializinghtml
-* sphinxcontrib-mermaid
+* sphinxcontrib-mermaid==0.9.2
 * sphinx-design
 * sphinx-rtd-dark-mode
 * typing-extensions
+* sphinx-reredirects
+* dirsync
 
 To install using the `requirements.txt` file use the following command:
 
@@ -263,7 +265,7 @@ Arguments that are expressions (more than one word), or contain non-alphanumeric
     :cpp:expr:`lv_obj_set_layout(*widget, LV_LAYOUT_FLEX)`             <== asterisk
     :cpp:expr:`lv_obj_set_layout((lv_obj_t *)widget, LV_LAYOUT_FLEX)`  <== cast
     :cpp:expr:`lv_obj_set_layout(&widget, LV_LAYOUT_FLEX);`            <== ampersand & semicolon
-    :cpp:expr:`lv_obj_set_layout(widget, ...)`                         <== lone elipsis
+    :cpp:expr:`lv_obj_set_layout(widget, ...)`                         <== lone ellipsis
 
 For such examples, simply use reStructuredText literal markup like this:
 

@@ -178,7 +178,7 @@ def create_ui():
 
     chart_y_array = [10, 25, 50, 40, 30, 35, 60, 65, 70, 75]
 
-    chart.set_ext_y_array(series, chart_y_array)
+    chart.set_series_ext_y_array(series, chart_y_array)
 
     # Add custom observer callback
     chart_type_subject.add_observer_obj(
@@ -252,7 +252,7 @@ def create_ui():
     a.set_var(btn1)
     a.set_values(lv.OPA.COVER, lv.OPA._50)
     a.set_custom_exec_cb(lambda _, v: opa_anim_cb(btn1, v))  # Pass a callback
-    a.set_time(300)
+    a.set_duration(300)
     a.set_path_cb(lv.anim_t.path_ease_out)
     a.start()
 
@@ -268,7 +268,7 @@ def create_ui():
     a.set_values(lv.OPA.COVER, lv.OPA._50)
     a.set_custom_exec_cb(lambda _, v: opa_anim_cb(btn4, v))  # Pass a callback
     a.set_path_cb(lv.anim_t.path_ease_out)
-    a.set_time(300)
+    a.set_duration(300)
     a.set_repeat_count(lv.ANIM_REPEAT_INFINITE)
     a.start()
 

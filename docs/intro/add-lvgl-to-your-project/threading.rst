@@ -16,12 +16,12 @@ Thread
     In "bare-metal" implementations (i.e. no OS), threads include:
 
     - the main thread executing a while(1) loop that runs the system, and
-    - interrupts.
+    - interrupt service routines (ISRs).
 
     When running under an OS, threads include:
 
     - each task (or process),
-    - interrupts, and
+    - ISRs, and
     - advanced OSes can have multiple "execution threads" within a processes.
 
 .. _atomic operation:
@@ -93,8 +93,9 @@ before any other LVGL function is started.
 
     These two LVGL functions may be called from any thread:
 
-    - :cpp:func:`lv_tick_inc` (see :ref:`tick_interface` for more information) and
-    - :cpp:func:`lv_display_flush_ready` (see :ref:`flush_callback` for more information)
+    - :cpp:func:`lv_tick_inc` (if writing to a ``uint32_t`` is atomic on your
+      platform; see :ref:`tick_interface` for more information) and
+    - :cpp:func:`lv_display_flush_ready` (:ref:`flush_callback` for more information)
 
     The reason this is okay is that the LVGL data changed by them is :ref:`atomic <atomic>`.
 
@@ -103,6 +104,14 @@ before any other LVGL function is started.
     (or an :ref:`LVGL Timer <timer>` you create) can read from and take action.
 
     If you are using an OS, there are a few other options.  See below.
+
+
+Ensuring Time Updates are Atomic
+--------------------------------
+For LVGL's time-related tasks to be reliable, the time updates via the Tick Interface
+must be reliable and the Tick Value must appear :ref:`atomic <atomic>` to LVGL.  See
+:ref:`tick_interface` for details.
+
 
 
 .. _tasks:
@@ -166,7 +175,7 @@ MUTEX to protect LVGL data structures.
 
 Method 2:  Use a MUTEX
 ----------------------
-A MUTEX stands for "MUTually EXclusive" and is a synchronization primative that
+A MUTEX stands for "MUTually EXclusive" and is a synchronization primitive that
 protects the state of a system resource from being modified or accessed by multiple
 threads of execution at once.  In other words, it makes data so protected "appear"
 atomic (all threads using this data "see" it in a consistent state).  Most OSes
@@ -189,7 +198,7 @@ To be clear:  this must be done *both* by threads that READ from that resource, 
 threads that MODIFY that resource.
 
 If a MUTEX is used to protect LVGL data structures, that means *every* LVGL function
-call (or group of function calls) must be preceeded by #1, and followed by #2,
+call (or group of function calls) must be preceded by #1, and followed by #2,
 including calls to :cpp:func:`lv_timer_handler`.
 
 .. note::

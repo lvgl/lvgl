@@ -1,0 +1,19 @@
+<!--
+Example
+<lv_dropdown options="option1\noption2" dir="left">
+	<lv_dropdown-list style="red"/>
+</lv_dropdown>
+-->
+
+<widget>
+	<api>
+	    <prop name="text" type="string" help="Show it instead of the selected options"/>
+	    <prop name="options" type="string" help="The options as a \n separated string"/>
+	    <prop name="selected" help="The index of the selected option">
+	    	<param name="selected" type="int" help="The index of the selected option"/>
+	    	<param name="anim" type="bool" help="Move to the option with animation" default="false"/>
+	    </prop>
+	    <prop name="symbol" type="string" help="The symbol, usually a caret"/>
+	    <element name="list" access="get" type="lv_obj" help=""/>
+	</api>
+</widget>

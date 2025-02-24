@@ -359,7 +359,7 @@ void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_
 {
     LV_PROFILER_STYLE_BEGIN;
 
-    /*Stop running transitions wit this property */
+    /*Stop running transitions with this property */
     trans_delete(obj, lv_obj_style_get_selector_part(selector), prop, NULL);
 
     lv_style_t * style = get_local_style(obj, selector);
@@ -584,9 +584,12 @@ lv_text_align_t lv_obj_calculate_style_text_align(const lv_obj_t * obj, lv_part_
 
 lv_opa_t lv_obj_get_style_opa_recursive(const lv_obj_t * obj, lv_part_t part)
 {
-
+    LV_PROFILER_STYLE_BEGIN;
     lv_opa_t opa_obj = lv_obj_get_style_opa(obj, part);
-    if(opa_obj <= LV_OPA_MIN) return LV_OPA_TRANSP;
+    if(opa_obj <= LV_OPA_MIN) {
+        LV_PROFILER_STYLE_END;
+        return LV_OPA_TRANSP;
+    }
 
     lv_opa_t opa_final = LV_OPA_COVER;
     if(opa_obj < LV_OPA_MAX) {
@@ -602,7 +605,10 @@ lv_opa_t lv_obj_get_style_opa_recursive(const lv_obj_t * obj, lv_part_t part)
 
     while(obj) {
         opa_obj = lv_obj_get_style_opa(obj, part);
-        if(opa_obj <= LV_OPA_MIN) return LV_OPA_TRANSP;
+        if(opa_obj <= LV_OPA_MIN) {
+            LV_PROFILER_STYLE_END;
+            return LV_OPA_TRANSP;
+        }
         if(opa_obj < LV_OPA_MAX) {
             opa_final = LV_OPA_MIX2(opa_final, opa_obj);
         }
@@ -610,8 +616,17 @@ lv_opa_t lv_obj_get_style_opa_recursive(const lv_obj_t * obj, lv_part_t part)
         obj = lv_obj_get_parent(obj);
     }
 
-    if(opa_final <= LV_OPA_MIN) return LV_OPA_TRANSP;
-    if(opa_final >= LV_OPA_MAX) return LV_OPA_COVER;
+    if(opa_final <= LV_OPA_MIN) {
+        LV_PROFILER_STYLE_END;
+        return LV_OPA_TRANSP;
+    }
+
+    if(opa_final >= LV_OPA_MAX) {
+        LV_PROFILER_STYLE_END;
+        return LV_OPA_COVER;
+    }
+
+    LV_PROFILER_STYLE_END;
     return opa_final;
 }
 
@@ -659,7 +674,7 @@ static lv_style_t * get_local_style(lv_obj_t * obj, lv_style_selector_t selector
     }
 
     lv_memzero(&obj->styles[i], sizeof(lv_obj_style_t));
-    obj->styles[i].style = lv_malloc(sizeof(lv_style_t));
+    obj->styles[i].style = lv_malloc_zeroed(sizeof(lv_style_t));
     lv_style_init((lv_style_t *)obj->styles[i].style);
 
     obj->styles[i].is_local = 1;

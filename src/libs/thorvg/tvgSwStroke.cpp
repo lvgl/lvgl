@@ -61,8 +61,10 @@ static void _growBorder(SwStrokeBorder* border, uint32_t newPts)
     while (maxCur < maxNew)
         maxCur += (maxCur >> 1) + 16;
     //OPTIMIZE: use mempool!
-    border->pts = static_cast<SwPoint*>(realloc(border->pts, maxCur * sizeof(SwPoint)));
-    border->tags = static_cast<uint8_t*>(realloc(border->tags, maxCur * sizeof(uint8_t)));
+    border->pts = static_cast<SwPoint*>(lv_realloc(border->pts, maxCur * sizeof(SwPoint)));
+    LV_ASSERT_MALLOC(border->pts);
+    border->tags = static_cast<uint8_t*>(lv_realloc(border->tags, maxCur * sizeof(uint8_t)));
+    LV_ASSERT_MALLOC(border->tags);
     border->maxPts = maxCur;
 }
 
@@ -806,15 +808,15 @@ void strokeFree(SwStroke* stroke)
     if (!stroke) return;
 
     //free borders
-    if (stroke->borders[0].pts) free(stroke->borders[0].pts);
-    if (stroke->borders[0].tags) free(stroke->borders[0].tags);
-    if (stroke->borders[1].pts) free(stroke->borders[1].pts);
-    if (stroke->borders[1].tags) free(stroke->borders[1].tags);
+    if (stroke->borders[0].pts) lv_free(stroke->borders[0].pts);
+    if (stroke->borders[0].tags) lv_free(stroke->borders[0].tags);
+    if (stroke->borders[1].pts) lv_free(stroke->borders[1].pts);
+    if (stroke->borders[1].tags) lv_free(stroke->borders[1].tags);
 
     fillFree(stroke->fill);
     stroke->fill = nullptr;
 
-    free(stroke);
+    lv_free(stroke);
 }
 
 

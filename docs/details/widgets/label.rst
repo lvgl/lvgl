@@ -16,7 +16,7 @@ A Label is the Widget used to display text.
 Parts and Styles
 ****************
 
-- :cpp:enumerator:`LV_PART_MAIN` Uses all the typical background and
+- :cpp:enumerator:`LV_PART_MAIN` Uses the :ref:`typical background <typical bg props>` and
   text properties. Padding values can be used to add space between
   the text and the edges of the Label's background.
 - :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar that is shown when the text is
@@ -117,6 +117,18 @@ this implementation detail is unnoticed. This is not the case with
 :cpp:func:`lv_label_set_text_static` must be writable if you plan to use
 :cpp:enumerator:`LV_LABEL_LONG_DOT`.
 
+.. _lv_label_text_recolor:
+
+Text recolor
+------------
+
+In the text, you can use commands to recolor parts of the text. 
+For example: ``Write a #ff0000 red# word``. This feature can be enabled 
+individually for each label by :cpp:expr:`lv_label_set_recolor(label, en)`
+function. In the context of word-wrapped text, any Recoloring started on a
+line will be terminated at the end of the line where the line is wrapped if it
+was not already terminated by an ending ``#`` in the text.
+
 .. _lv_label_text_selection:
 
 Text selection
@@ -125,7 +137,7 @@ Text selection
 If enabled by :c:macro:`LV_LABEL_TEXT_SELECTION` part of the text can be
 selected. It's similar to when you use your mouse on a PC to select
 text. The whole mechanism (click and select the text as you drag your
-finger/mouse) is implemented in :ref:`Text area <lv_textarea>` and
+finger/mouse) is implemented in :ref:`lv_textarea` and
 the Label Widget only allows programmatic text selection with
 :cpp:expr:`lv_label_get_text_selection_start(label, start_char_index)` and
 :cpp:expr:`lv_label_get_text_selection_end(label, end_char_index)`.

@@ -70,9 +70,9 @@ void lv_example_scale_5(void)
 
     /* Configure section styles */
     lv_scale_section_t * section = lv_scale_add_section(scale);
-    lv_scale_section_set_range(section, 25, 30);
-    lv_scale_section_set_style(section, LV_PART_INDICATOR, &section_label_style);
-    lv_scale_section_set_style(section, LV_PART_ITEMS, &section_minor_tick_style);
+    lv_scale_set_section_range(scale, section, 25, 30);
+    lv_scale_set_section_style_indicator(scale, section, &section_label_style);
+    lv_scale_set_section_style_items(scale, section, &section_minor_tick_style);
 }
 
 #endif

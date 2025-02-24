@@ -386,36 +386,8 @@ attached to it.
 4.  System Layer
 
 1, 3 and 4 are independent of the :ref:`active_screen` and they will be shown (if
-they contain anything that is visible) regardless of which screen is the Active
-Screen.  See :ref:`screen_layers` for more information.
-
-
-.. _transparent_screens:
-
-Transparent Screens
--------------------
-
-Usually, the opacity of the Screen is :cpp:enumerator:`LV_OPA_COVER` to provide a
-solid background for its children. If this is not the case (opacity <
-100%) the display's ``bottom_layer`` will be visible.  If the bottom layer's
-opacity is also not :cpp:enumerator:`LV_OPA_COVER` LVGL will have no solid background
-to draw.
-
-This configuration (transparent Screen) could be useful to create, for example,
-on-screen display (OSD) menus where a video is played on a different hardware layer
-of the display panel, and a menu is overlaid on a higher layer.
-
-To properly render a UI on a transparent Screen the Display's color format needs to
-be set to one with an alpha channel (for example LV_COLOR_FORMAT_ARGB8888).
-
-In summary, to enable transparent screens and displays for OSD menu-like UIs:
-
-- Set the screen's ``bg_opa`` to transparent:
-  :cpp:expr:`lv_obj_set_style_bg_opa(lv_screen_active(), LV_OPA_TRANSP, LV_PART_MAIN)`
-- Set the bottom layer's ``bg_opa`` to transparent:
-  :cpp:expr:`lv_obj_set_style_bg_opa(lv_layer_bottom(), LV_OPA_TRANSP, LV_PART_MAIN)`
-- Set a color format with alpha channel. E.g.
-  :cpp:expr:`lv_display_set_color_format(disp, LV_COLOR_FORMAT_ARGB8888)`
+they contain anything that is visible) regardless of which screen is the Active Screen.
+See :ref:`display_screen_layers` and :ref:`transparent_screens` for more information.
 
 
 
@@ -476,8 +448,8 @@ leave the other states untouched) use
 values can be used as well. E.g.
 :cpp:expr:`lv_obj_add_state(widget, part, LV_STATE_PRESSED | LV_PRESSED_CHECKED)`.
 
-To learn more about the states read the related section of the
-:ref:`Style overview <styles>`.
+To learn more about the states, read the related section of
+:ref:`styles_overview`.
 
 
 

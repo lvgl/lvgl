@@ -1,3 +1,5 @@
+.. _stm32 ltdc driver:
+
 =================
 STM32 LTDC Driver
 =================
@@ -21,7 +23,7 @@ All permutations of the below options are well supported.
 - single or double buffered
 - direct or partial render mode
 - OS and no OS
-- paralellized flushing with DMA2D (only for partial render mode)
+- parallelized flushing with DMA2D (only for partial render mode)
 
 If OS is enabled, a synchronization primitive will be used to
 give the thread a chance to yield to other threads while blocked,
@@ -81,6 +83,20 @@ Providing a second partial buffer can improve CPU utilization and increase
 performance compared to
 a single buffer if :c:macro:`LV_ST_LTDC_USE_DMA2D_FLUSH` is enabled.
 
+Display Rotation
+****************
+
+The driver supports display rotation with
+:cpp:expr:`lv_display_set_rotation(disp, rotation)` where rotation is one of
+:cpp:enumerator:`LV_DISP_ROTATION_90`, :cpp:enumerator:`LV_DISP_ROTATION_180`,
+or :cpp:enumerator:`LV_DISP_ROTATION_270`. The rotation is initially
+:cpp:enumerator:`LV_DISP_ROTATION_0`.
+
+The rotation is done in software and only works if the display was
+created using :cpp:func:`lv_st_ltdc_create_partial`.
+:c:macro:`LV_ST_LTDC_USE_DMA2D_FLUSH` will be have no effect if rotation
+is used.
+
 DMA2D
 *****
 
@@ -88,6 +104,10 @@ DMA2D
 partial buffers in parallel with other LVGL tasks, whether or not OS is
 enabled. If the display is not partial, then there is no need to enable this
 option.
+
+Additionally it is possible to mix layers that have color format on
+:c:macro:`LV_COLOR_FORMAT_ARGB1555` on top of :c:macro:`LV_COLOR_FORMAT_RGB565`
+layers using the DMA2D.
 
 It must not be enabled at the same time as :c:macro:`LV_USE_DRAW_DMA2D`.
 See the :ref:`DMA2D support <dma2d>`.

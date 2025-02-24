@@ -649,6 +649,14 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e)
             *s = LV_MAX(*s, a.y2 - h);
         }
     }
+    else if(code == LV_EVENT_SIZE_CHANGED) {
+        if(img->align == LV_IMAGE_ALIGN_STRETCH) {
+            update_align(obj);
+            if(img->rotation || img->scale_x != LV_SCALE_NONE || img->scale_y != LV_SCALE_NONE) {
+                lv_obj_refresh_ext_draw_size(obj);
+            }
+        }
+    }
     else if(code == LV_EVENT_HIT_TEST) {
         lv_hit_test_info_t * info = lv_event_get_param(e);
 
@@ -752,6 +760,7 @@ static void draw_image(lv_event_t * e)
         if(img->src_type == LV_IMAGE_SRC_FILE || img->src_type == LV_IMAGE_SRC_VARIABLE) {
             lv_draw_image_dsc_t draw_dsc;
             lv_draw_image_dsc_init(&draw_dsc);
+            draw_dsc.base.layer = layer;
             lv_obj_init_draw_image_dsc(obj, LV_PART_MAIN, &draw_dsc);
 
             lv_area_t clip_area_ori = layer->_clip_area;
@@ -793,11 +802,11 @@ static void draw_image(lv_event_t * e)
 
             lv_draw_image(layer, &draw_dsc, &coords);
             layer->_clip_area = clip_area_ori;
-
         }
         else if(img->src_type == LV_IMAGE_SRC_SYMBOL) {
             lv_draw_label_dsc_t label_dsc;
             lv_draw_label_dsc_init(&label_dsc);
+            label_dsc.base.layer = layer;
             lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
             label_dsc.text = img->src;
             lv_draw_label(layer, &label_dsc, &obj->coords);
@@ -855,6 +864,7 @@ static void update_align(lv_obj_t * obj)
         lv_image_set_rotation(obj, 0);
         lv_image_set_pivot(obj, 0, 0);
         if(img->w != 0 && img->h != 0) {
+            lv_obj_update_layout(obj);
             int32_t scale_x = lv_obj_get_width(obj) * LV_SCALE_NONE / img->w;
             int32_t scale_y = lv_obj_get_height(obj) * LV_SCALE_NONE / img->h;
             scale_update(obj, scale_x, scale_y);
@@ -864,7 +874,6 @@ static void update_align(lv_obj_t * obj)
         lv_image_set_rotation(obj, 0);
         lv_image_set_pivot(obj, 0, 0);
         scale_update(obj, LV_SCALE_NONE, LV_SCALE_NONE);
-
     }
 }
 

@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_demo_widgets.h"
-#include "../../src/lvgl_private.h"
+#include "../../lvgl_private.h"
 
 #if LV_USE_DEMO_WIDGETS
 
@@ -235,7 +235,7 @@ void lv_demo_widgets_start_slideshow(void)
     lv_anim_init(&a);
     lv_anim_set_exec_cb(&a, scroll_anim_y_cb);
     lv_anim_set_duration(&a, t);
-    lv_anim_set_playback_duration(&a, t);
+    lv_anim_set_reverse_duration(&a, t);
     lv_anim_set_values(&a, 0, v);
     lv_anim_set_var(&a, tab);
     lv_anim_set_completed_cb(&a, slideshow_anim_completed_cb);
@@ -262,7 +262,7 @@ static void profile_create(lv_obj_t * parent)
     lv_obj_t * dsc = lv_label_create(panel1);
     lv_obj_add_style(dsc, &style_text_muted, 0);
     lv_label_set_text_static(dsc, "This is a short description of me. Take a look at my profile!");
-    lv_label_set_long_mode(dsc, LV_LABEL_LONG_WRAP);
+    lv_label_set_long_mode(dsc, LV_LABEL_LONG_MODE_WRAP);
 
     lv_obj_t * email_icn = lv_label_create(panel1);
     lv_obj_add_style(email_icn, &style_icon, 0);
@@ -701,7 +701,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
     lv_anim_set_var(&a, arc);
     lv_anim_set_duration(&a, 4100);
-    lv_anim_set_playback_duration(&a, 2700);
+    lv_anim_set_reverse_duration(&a, 2700);
     lv_anim_start(&a);
 
     arc = lv_arc_create(scale1);
@@ -717,7 +717,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
     lv_anim_set_var(&a, arc);
     lv_anim_set_duration(&a, 2600);
-    lv_anim_set_playback_duration(&a, 3200);
+    lv_anim_set_reverse_duration(&a, 3200);
     lv_anim_start(&a);
 
     arc = lv_arc_create(scale1);
@@ -733,7 +733,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
     lv_anim_set_var(&a, arc);
     lv_anim_set_duration(&a, 2800);
-    lv_anim_set_playback_duration(&a, 1800);
+    lv_anim_set_reverse_duration(&a, 1800);
     lv_anim_start(&a);
 
     /*Scale 2*/
@@ -829,21 +829,16 @@ static void analytics_create(lv_obj_t * parent)
 
     lv_scale_section_t * section;
     section = lv_scale_add_section(scale3);
-    lv_scale_section_set_range(section, 0, 20);
-    lv_scale_section_set_style(section, LV_PART_MAIN, &scale3_section1_main_style);
-    lv_scale_section_set_style(section, LV_PART_INDICATOR, &scale3_section1_indicator_style);
-    lv_scale_section_set_style(section, LV_PART_ITEMS, &scale3_section1_tick_style);
-    section = lv_scale_add_section(scale3);
-    lv_scale_section_set_range(section, 20, 40);
-    lv_scale_section_set_style(section, LV_PART_MAIN, &scale3_section2_main_style);
-    lv_scale_section_set_style(section, LV_PART_INDICATOR, &scale3_section2_indicator_style);
-    lv_scale_section_set_style(section, LV_PART_ITEMS, &scale3_section2_tick_style);
+    lv_scale_set_section_range(scale3, section, 0, 20);
+    lv_scale_set_section_style_main(scale3, section, &scale3_section2_main_style);
+    lv_scale_set_section_style_indicator(scale3, section, &scale3_section2_indicator_style);
+    lv_scale_set_section_style_items(scale3, section, &scale3_section2_tick_style);
 
     section = lv_scale_add_section(scale3);
-    lv_scale_section_set_range(section, 40, 60);
-    lv_scale_section_set_style(section, LV_PART_MAIN, &scale3_section3_main_style);
-    lv_scale_section_set_style(section, LV_PART_INDICATOR, &scale3_section3_indicator_style);
-    lv_scale_section_set_style(section, LV_PART_ITEMS, &scale3_section3_tick_style);
+    lv_scale_set_section_range(scale3, section, 40, 60);
+    lv_scale_set_section_style_main(scale3, section, &scale3_section3_main_style);
+    lv_scale_set_section_style_indicator(scale3, section, &scale3_section3_indicator_style);
+    lv_scale_set_section_style_items(scale3, section, &scale3_section3_tick_style);
 
     LV_IMAGE_DECLARE(img_demo_widgets_needle);
     scale3_needle = lv_image_create(scale3);
@@ -864,7 +859,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_anim_set_exec_cb(&a, scale3_anim_cb);
     lv_anim_set_var(&a, scale3);
     lv_anim_set_duration(&a, 4100);
-    lv_anim_set_playback_duration(&a, 800);
+    lv_anim_set_reverse_duration(&a, 800);
     lv_anim_start(&a);
 
     lv_obj_align(scale3_mbps_label, LV_ALIGN_TOP_MID, 10, lv_pct(55));
@@ -1505,7 +1500,7 @@ static void chart_event_cb(lv_event_t * e)
             }
 
             char buf[8];
-            lv_snprintf(buf, sizeof(buf), "%"LV_PRId32, lv_chart_get_y_array(obj, (lv_chart_series_t *)ser)[base_dsc->id2]);
+            lv_snprintf(buf, sizeof(buf), "%"LV_PRId32, lv_chart_get_series_y_array(obj, (lv_chart_series_t *)ser)[base_dsc->id2]);
 
             lv_point_t text_size;
             lv_text_get_size(&text_size, buf, font_normal, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
@@ -1673,7 +1668,7 @@ static void slideshow_anim_completed_cb(lv_anim_t * a_old)
     lv_anim_init(&a);
     lv_anim_set_exec_cb(&a, scroll_anim_y_cb);
     lv_anim_set_duration(&a, t);
-    lv_anim_set_playback_duration(&a, t);
+    lv_anim_set_reverse_duration(&a, t);
     lv_anim_set_values(&a, 0, v);
     lv_anim_set_var(&a, tab);
     lv_anim_set_completed_cb(&a, slideshow_anim_completed_cb);

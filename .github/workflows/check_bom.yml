@@ -1,0 +1,49 @@
+name: BOM Check
+
+on:
+  push:
+  pull_request:
+
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+# Ensure that only one commit will be running tests at a time on each PR
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }} 
+  cancel-in-progress: true
+
+jobs:
+  bom-check:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: UTF-8 BOM
+        run: |
+          grep -oarlE -m 1 --include="*.c" --include="*.h" --include="*.rst" --include="*.txt" --include="*.mk" --include="*.py" --include="*.cmake" --include="Makefile" $'\xEF\xBB\xBF' . | while read -r line; do
+            a=$(head -c 3 "$line")
+            if [ "${a}" = $'\xEF\xBB\xBF' ]; then
+              echo "${line}" && exit 1
+            fi
+          done
+
+      - name: UTF-16LE BOM
+        run: |
+          grep -oarlE -m 1 --include="*.c" --include="*.h" --include="*.rst" --include="*.txt" --include="*.mk" --include="*.py" --include="*.cmake" --include="Makefile" $'\xFF\xFE' . | while read -r line; do
+            a=$(head -c 3 "$line")
+            if [ "${a}" = $'\xFF\xFE' ]; then
+              echo "${line}" && exit 1
+            fi
+          done
+
+      - name: UTF-16BE BOM
+        run: |
+          grep -oarlE -m 1 --include="*.c" --include="*.h" --include="*.rst" --include="*.txt" --include="*.mk" --include="*.py" --include="*.cmake" --include="Makefile" $'\xFE\xFF' . | while read -r line; do
+            a=$(head -c 3 "$line")
+            if [ "${a}" = $'\xFE\xFF' ]; then
+              echo "${line}" && exit 1
+            fi
+          done

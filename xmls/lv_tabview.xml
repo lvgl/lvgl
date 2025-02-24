@@ -1,0 +1,20 @@
+<!--
+Example
+<lv_tabview active="3">
+	<lv_tabview-tab text="First">
+		<lv_button/>
+	</lv_tabview-tab/>
+</lv_tabview>
+ -->
+
+<widget>
+	<api>
+	    <prop name="active" type="int" help="Zero based index of the tab to select"/>
+	    <prop name="tab_bar_position" type="dir(top bottom left right)" help=""/>
+	    <element name="tab_bar" type="obj" access="get">
+	    </element>
+	    <element name="tab" type="lv_obj" access="add">
+	        <arg name="text" type="string"/>
+	    </element>
+	</api>
+</widget>

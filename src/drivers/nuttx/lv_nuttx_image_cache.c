@@ -44,6 +44,11 @@ typedef struct {
 
     lv_draw_buf_malloc_cb malloc_cb;
     lv_draw_buf_free_cb free_cb;
+
+#if LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP
+    lv_draw_buf_malloc_cb malloc_cb_default;
+    lv_draw_buf_free_cb free_cb_default;
+#endif
 } lv_nuttx_ctx_image_cache_t;
 /**********************
  *  STATIC PROTOTYPES
@@ -67,8 +72,6 @@ static void free_cb(void * draw_buf);
 void lv_nuttx_image_cache_init(bool use_independent_image_heap)
 {
     lv_draw_buf_handlers_t * handlers = image_cache_draw_buf_handlers;
-    handlers->buf_malloc_cb = malloc_cb;
-    handlers->buf_free_cb = free_cb;
 
     ctx = lv_malloc_zeroed(sizeof(lv_nuttx_ctx_image_cache_t));
     LV_ASSERT_MALLOC(ctx);
@@ -78,6 +81,15 @@ void lv_nuttx_image_cache_init(bool use_independent_image_heap)
 
     handlers->buf_malloc_cb = malloc_cb;
     handlers->buf_free_cb = free_cb;
+
+#if LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP
+    handlers = lv_draw_buf_get_handlers();
+    ctx->malloc_cb_default = handlers->buf_malloc_cb;
+    ctx->free_cb_default = handlers->buf_free_cb;
+
+    handlers->buf_malloc_cb = malloc_cb;
+    handlers->buf_free_cb = free_cb;
+#endif
 
     ctx->initialized = false;
     ctx->independent_image_heap = use_independent_image_heap;
@@ -95,6 +107,13 @@ FREE_CONTEXT:
     lv_draw_buf_handlers_t * handlers = image_cache_draw_buf_handlers;
     handlers->buf_malloc_cb = ctx->malloc_cb;
     handlers->buf_free_cb = ctx->free_cb;
+
+#if LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP
+    handlers = lv_draw_buf_get_handlers();
+    handlers->buf_malloc_cb = ctx->malloc_cb_default;
+    handlers->buf_free_cb = ctx->free_cb_default;
+#endif
+
     lv_free(ctx);
 
     ctx = NULL;

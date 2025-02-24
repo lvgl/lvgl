@@ -21,10 +21,17 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef enum {
+    FLAG_COND_EQ = 0,
+    FLAG_COND_GT = 1,
+    FLAG_COND_GE = 2
+} flag_cond_t;
+
 typedef struct {
     uint32_t flag;
     lv_subject_value_t value;
-    uint32_t inv    : 1;
+    uint32_t inv     : 1;
+    flag_cond_t cond : 3;
 } flag_and_cond_t;
 
 /**********************
@@ -33,10 +40,12 @@ typedef struct {
 static void unsubscribe_on_delete_cb(lv_event_t * e);
 static void group_notify_cb(lv_observer_t * observer, lv_subject_t * subject);
 static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, lv_observer_cb_t cb, uint32_t flag,
-                                        int32_t ref_value, bool inv);
+                                        int32_t ref_value, bool inv, flag_cond_t cond);
 static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static void obj_value_changed_event_cb(lv_event_t * e);
+
+static void lv_subject_notify_if_changed(lv_subject_t * subject);
 
 #if LV_USE_LABEL
     static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
@@ -92,7 +101,7 @@ void lv_subject_set_int(lv_subject_t * subject, int32_t value)
 
     subject->prev_value.num = subject->value.num;
     subject->value.num = value;
-    lv_subject_notify(subject);
+    lv_subject_notify_if_changed(subject);
 }
 
 int32_t lv_subject_get_int(lv_subject_t * subject)
@@ -122,7 +131,7 @@ void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf,
     if(prev_buf) lv_strlcpy(prev_buf, value, size);
 
     subject->type = LV_SUBJECT_TYPE_STRING;
-    subject->size = size;
+    subject->size = (uint32_t)size;
     subject->value.pointer = buf;
     subject->prev_value.pointer = prev_buf;
 
@@ -143,8 +152,7 @@ void lv_subject_copy_string(lv_subject_t * subject, const char * buf)
 
     lv_strlcpy((char *)subject->value.pointer, buf, subject->size);
 
-    lv_subject_notify(subject);
-
+    lv_subject_notify_if_changed(subject);
 }
 
 void lv_subject_snprintf(lv_subject_t * subject, const char * format, ...)
@@ -154,7 +162,7 @@ void lv_subject_snprintf(lv_subject_t * subject, const char * format, ...)
         return;
     }
 
-    if(subject->size < 1) return;
+    if(subject->size < 1U) return;
 
     if(subject->prev_value.pointer) {
         lv_strlcpy((char *)subject->prev_value.pointer, subject->value.pointer, subject->size);
@@ -166,7 +174,7 @@ void lv_subject_snprintf(lv_subject_t * subject, const char * format, ...)
     LV_UNUSED(ret);
     va_end(va);
 
-    lv_subject_notify(subject);
+    lv_subject_notify_if_changed(subject);
 }
 
 const char * lv_subject_get_string(lv_subject_t * subject)
@@ -207,7 +215,7 @@ void lv_subject_set_pointer(lv_subject_t * subject, void * ptr)
 
     subject->prev_value.pointer = subject->value.pointer;
     subject->value.pointer = ptr;
-    lv_subject_notify(subject);
+    lv_subject_notify_if_changed(subject);
 }
 
 const void * lv_subject_get_pointer(lv_subject_t * subject)
@@ -248,7 +256,7 @@ void lv_subject_set_color(lv_subject_t * subject, lv_color_t color)
 
     subject->prev_value.color = subject->value.color;
     subject->value.color = color;
-    lv_subject_notify(subject);
+    lv_subject_notify_if_changed(subject);
 }
 
 lv_color_t lv_subject_get_color(lv_subject_t * subject)
@@ -271,18 +279,18 @@ lv_color_t lv_subject_get_previous_color(lv_subject_t * subject)
     return subject->prev_value.color;
 }
 
-void lv_subject_init_group(lv_subject_t * subject, lv_subject_t * list[], uint32_t list_len)
+void lv_subject_init_group(lv_subject_t * group_subject, lv_subject_t * list[], uint32_t list_len)
 {
-    subject->type = LV_SUBJECT_TYPE_GROUP;
-    subject->size = list_len;
-    lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
-    subject->value.pointer = list;
+    group_subject->type = LV_SUBJECT_TYPE_GROUP;
+    group_subject->size = list_len;
+    lv_ll_init(&(group_subject->subs_ll), sizeof(lv_observer_t));
+    group_subject->value.pointer = list;
 
-    /* bind all subjects to this subject */
+    /* Bind all list[] subjects to `group_subject`. */
     uint32_t i;
     for(i = 0; i < list_len; i++) {
-        /*If a subject in the group changes notify the group itself*/
-        lv_subject_add_observer(list[i], group_notify_cb, subject);
+        /* If a subject in `list[]` changes, notify `group_subject`. */
+        lv_subject_add_observer(list[i], group_notify_cb, group_subject);
     }
 }
 
@@ -311,7 +319,8 @@ lv_subject_t * lv_subject_get_group_element(lv_subject_t * subject, int32_t inde
         return NULL;
     }
 
-    if(index >= subject->size)  return NULL;
+    if(index >= (int32_t)subject->size)  return NULL;
+    if(index < 0)  return NULL;
 
     return ((lv_subject_t **)(subject->value.pointer))[index];
 }
@@ -349,7 +358,7 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
         lv_obj_add_event_cb(obj, unsubscribe_on_delete_cb, LV_EVENT_DELETE, observer);
     }
 
-    /* update object immediately */
+    /* Update Observer immediately. */
     if(observer->cb) observer->cb(observer, subject);
 
     return observer;
@@ -374,7 +383,7 @@ lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_o
     observer->user_data = user_data;
     observer->target = target;
 
-    /* update object immediately */
+    /* Update Observer immediately. */
     if(observer->cb) observer->cb(observer, subject);
 
     return observer;
@@ -409,6 +418,10 @@ void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
             }
         }
     }
+    /* Gracefully de-couple `subject` from Widget by deleting any existing
+     * `LV_EVENT_VALUE_CHANGED` event associated with `subject` in case
+     * one of the `..._bind_value()` functions was used. */
+    lv_obj_remove_event_cb_with_user_data(obj, NULL, subject);
 }
 
 void * lv_observer_get_target(lv_observer_t * observer)
@@ -441,32 +454,97 @@ void lv_subject_notify(lv_subject_t * subject)
 
 lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
 {
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false);
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false, FLAG_COND_EQ);
     return observable;
 }
 
 lv_observer_t * lv_obj_bind_flag_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag,
                                            int32_t ref_value)
 {
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, true);
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, true, FLAG_COND_EQ);
     return observable;
+}
+lv_observer_t * lv_obj_bind_flag_if_gt(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
+{
+
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false, FLAG_COND_GT);
+    return observable;
+}
+
+lv_observer_t * lv_obj_bind_flag_if_ge(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
+{
+
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false, FLAG_COND_GE);
+    return observable;
+}
+
+lv_observer_t * lv_obj_bind_flag_if_lt(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
+{
+    /* a < b == !(a >= b) */
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, true, FLAG_COND_GE);
+    return observable;
+}
+
+lv_observer_t * lv_obj_bind_flag_if_le(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
+{
+    /* a <= b == !(a > b) */
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, true, FLAG_COND_GT);
+    return observable;
+
 }
 
 lv_observer_t * lv_obj_bind_state_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
 {
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, false);
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, false,
+                                                  FLAG_COND_EQ);
     return observable;
 }
 
 lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
 {
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, true);
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, true,
+                                                  FLAG_COND_EQ);
     return observable;
 }
 
+lv_observer_t * lv_obj_bind_state_if_gt(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
+{
+
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, false,
+                                                  FLAG_COND_GT);
+    return observable;
+}
+
+lv_observer_t * lv_obj_bind_state_if_ge(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
+{
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, false,
+                                                  FLAG_COND_GE);
+    return observable;
+}
+
+lv_observer_t * lv_obj_bind_state_if_lt(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
+{
+    /* a < b == !(a >= b) */
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, true,
+                                                  FLAG_COND_GE);
+    return observable;
+
+}
+
+lv_observer_t * lv_obj_bind_state_if_le(lv_obj_t * obj, lv_subject_t * subject, lv_state_t state, int32_t ref_value)
+{
+
+    /* a <= b == !(a > b) */
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, state, ref_value, true,
+                                                  FLAG_COND_GT);
+    return observable;
+}
+
+
 lv_observer_t * lv_obj_bind_checked(lv_obj_t * obj, lv_subject_t * subject)
 {
-    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, LV_STATE_CHECKED, 1, false);
+    lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_state_observer_cb, LV_STATE_CHECKED, 0, true,
+                                                  FLAG_COND_EQ);
     lv_obj_add_event_cb(obj, obj_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
     return observable;
 }
@@ -533,7 +611,6 @@ lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 #endif /*LV_USE_SLIDER*/
 
 #if LV_USE_ROLLER
-
 lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
     LV_ASSERT_NULL(subject);
@@ -548,12 +625,10 @@ lv_observer_t * lv_roller_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, roller_value_observer_cb, obj, NULL);
     return observer;
-
 }
 #endif /*LV_USE_ROLLER*/
 
 #if LV_USE_DROPDOWN
-
 lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
     LV_ASSERT_NULL(subject);
@@ -568,9 +643,7 @@ lv_observer_t * lv_dropdown_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 
     lv_observer_t * observer = lv_subject_add_observer_obj(subject, dropdown_value_observer_cb, obj, NULL);
     return observer;
-
 }
-
 #endif /*LV_USE_DROPDOWN*/
 
 lv_obj_t * lv_observer_get_target_obj(lv_observer_t * observer)
@@ -603,7 +676,7 @@ static void unsubscribe_on_delete_cb(lv_event_t * e)
 }
 
 static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, lv_observer_cb_t cb, uint32_t flag,
-                                        int32_t ref_value, bool inv)
+                                        int32_t ref_value, bool inv, flag_cond_t cond)
 {
     LV_ASSERT_NULL(subject);
     LV_ASSERT_NULL(obj);
@@ -622,6 +695,7 @@ static lv_observer_t * bind_to_bitfield(lv_subject_t * subject, lv_obj_t * obj, 
     p->flag = flag;
     p->value.num = ref_value;
     p->inv = inv;
+    p->cond = cond;
 
     lv_observer_t * observable = lv_subject_add_observer_obj(subject, cb, obj, p);
     observable->auto_free_user_data = 1;
@@ -632,7 +706,19 @@ static void obj_flag_observer_cb(lv_observer_t * observer, lv_subject_t * subjec
 {
     flag_and_cond_t * p = observer->user_data;
 
-    bool res = subject->value.num == p->value.num;
+    /* Initializing this keeps some compilers happy */
+    bool res = false;
+    switch(p->cond) {
+        case FLAG_COND_EQ:
+            res = subject->value.num == p->value.num;
+            break;
+        case FLAG_COND_GT:
+            res = subject->value.num > p->value.num;
+            break;
+        case FLAG_COND_GE:
+            res = subject->value.num >= p->value.num;
+            break;
+    }
     if(p->inv) res = !res;
 
     if(res) {
@@ -647,7 +733,19 @@ static void obj_state_observer_cb(lv_observer_t * observer, lv_subject_t * subje
 {
     flag_and_cond_t * p = observer->user_data;
 
-    bool res = subject->value.num == p->value.num;
+    /* Initializing this keeps some compilers happy */
+    bool res = false;
+    switch(p->cond) {
+        case FLAG_COND_EQ:
+            res = subject->value.num == p->value.num;
+            break;
+        case FLAG_COND_GT:
+            res = subject->value.num > p->value.num;
+            break;
+        case FLAG_COND_GE:
+            res = subject->value.num >= p->value.num;
+            break;
+    }
     if(p->inv) res = !res;
 
     if(res) {
@@ -757,8 +855,40 @@ static void dropdown_value_changed_event_cb(lv_event_t * e)
 
 static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    lv_dropdown_set_selected(observer->target, subject->value.num);
+    lv_dropdown_set_selected(observer->target, subject->value.num, LV_ANIM_OFF);
 }
+
+static void lv_subject_notify_if_changed(lv_subject_t * subject)
+{
+
+    switch(subject->type) {
+        case LV_SUBJECT_TYPE_INVALID :
+        case LV_SUBJECT_TYPE_NONE :
+            return;
+        case LV_SUBJECT_TYPE_INT :
+            if(subject->value.num != subject->prev_value.num) {
+                lv_subject_notify(subject);
+            }
+            break;
+        case LV_SUBJECT_TYPE_GROUP :
+        case LV_SUBJECT_TYPE_POINTER :
+            /* Always notify as we don't know how to compare this */
+            lv_subject_notify(subject);
+            break;
+        case LV_SUBJECT_TYPE_COLOR  :
+            if(!lv_color_eq(subject->value.color, subject->prev_value.color)) {
+                lv_subject_notify(subject);
+            }
+            break;
+        case LV_SUBJECT_TYPE_STRING:
+            if(!subject->prev_value.pointer ||
+               lv_strcmp(subject->value.pointer, subject->prev_value.pointer)) {
+                lv_subject_notify(subject);
+            }
+            break;
+    }
+}
+
 
 #endif /*LV_USE_DROPDOWN*/
 

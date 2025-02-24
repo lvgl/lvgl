@@ -1,0 +1,64 @@
+<!--
+<lv_chart type="bar" point_count="30">
+	<lv_chart-series color="0xff0000" axis="primary_y" values="10, 20, 10, 33"/>
+	<lv_chart-series color="0x00ff00" axis="secondary_y" values="1, 5, 4 8"/>
+	<lv_chart-cursor color="0x0000ff" dir="right" pos="30, 70"/>
+	<lv_chart-axis name="primary_y" range="10, 40"/>
+</lv_chart>
+ -->
+
+<widget>
+	<api>
+	    <enumdef name="lv_chart_type" help="Type of the chart">
+	        <enum name="none"/>
+	        <enum name="line"/>
+	        <enum name="bar"/>
+	        <enum name="scatter"/>
+	    </enumdef>
+
+	    <enumdef name="lv_chart_update_mode" help="The update mode">
+	        <enum name="shift"/>
+	        <enum name="circular"/>
+	    </enumdef>
+
+	    <enumdef name="lv_chart_axis" help="The axis">
+	        <enum name="primary_x"/>
+	        <enum name="primary_y"/>
+	        <enum name="secondary_x"/>
+	        <enum name="secondary_y"/>
+	    </enumdef>
+
+	    <prop name="point_count" help="">
+	    	<param name="count" type="int" help=""/>
+	    </prop>
+	    <prop name="update_mode" help="">
+	    	<param name="mode" type="enum:lv_chart_chart_update_mode" help=""/>
+	    </prop>
+	    <prop name="div_line_count" help="">
+	    	<param name="hdiv" type="int" help=""/>
+	    	<param name="vdiv" type="int" help=""/>
+	    </prop>
+
+	    <element name="series" type="lv_chart_series" access="add">
+	        <arg name="color" type="color" help=""/>
+	        <arg name="axis" type="enum:lv_chart_axis+" help="The axis"/>
+	    	<prop name="values"  type="int[count]" help="set values from an array"/>
+	    </element>
+
+	    <element name="cursor" type="lv_chart_cursor" access="add">
+	        <arg name="color" type="color" arg="true"/>
+	        <arg name="dir" type="enum:lv_dir" arg="true"/>
+	    	<prop name="pos" help="position of the cursor">
+	    		<param name="point" type="point" help="the point"/>
+	   		</prop>
+	    </element>
+
+	    <element name="axis" access="set">
+	    	<arg name="axis" type="enum:lv_chart_axis"/>
+	    	<prop name="range">
+	    		<param name="min" type="int" help="the min value"/>
+	    		<param name="max" type="int" help="the max value"/>
+	    	</prop>
+	    </element>
+	</api>
+</widget>

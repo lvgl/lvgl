@@ -254,6 +254,7 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
     int32_t item_id = item_start_id;
     int32_t grow_min_size_sum = 0;
     lv_obj_t * item = lv_obj_get_child(cont, item_id);
+    bool first_item = true;
     while(item) {
         if(item_id != item_start_id && lv_obj_has_flag(item, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK)) break;
 
@@ -296,11 +297,12 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
             else {
                 int32_t item_size = get_main_size(item);
                 int32_t req_size = item_size;
-                if(item_id != item_start_id) req_size += item_gap; /*No gap before the first item*/
+                if(!first_item) req_size += item_gap; /*No gap before the first item*/
                 if(f->wrap && t->track_fix_main_size + grow_min_size_sum + req_size > max_main_size) break;
                 t->track_fix_main_size += req_size;
             }
 
+            first_item = false;
             t->track_cross_size = LV_MAX(get_cross_size(item), t->track_cross_size);
             t->item_cnt++;
         }

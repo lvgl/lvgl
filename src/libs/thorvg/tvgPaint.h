@@ -90,7 +90,7 @@ namespace tvg
         {
             if (compData) {
                 if (P(compData->target)->unref() == 0) delete(compData->target);
-                free(compData);
+                lv_free(compData);
             }
             if (clipper && P(clipper)->unref() == 0) delete(clipper);
             if (renderer && (renderer->unref() == 0)) delete(renderer);
@@ -151,13 +151,14 @@ namespace tvg
                 }
                 //Reset scenario
                 if (!target && method == CompositeMethod::None) {
-                    free(compData);
+                	lv_free(compData);
                     compData = nullptr;
                     return true;
                 }
             } else {
                 if (!target && method == CompositeMethod::None) return true;
-                compData = static_cast<Composite*>(calloc(1, sizeof(Composite)));
+                compData = static_cast<Composite*>(lv_zalloc(sizeof(Composite)));
+                LV_ASSERT_MALLOC(compData);
             }
             P(target)->ref();
             compData->target = target;

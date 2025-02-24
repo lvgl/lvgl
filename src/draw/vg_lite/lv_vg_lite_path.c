@@ -32,6 +32,9 @@
     case VLC_OP_##OP:           \
     return (LEN)
 
+#define PATH_CURRENT_PTR(PATH) ((uint8_t*)(PATH)->base.path + (PATH)->base.path_length)
+#define PATH_LENGTH_INC(PATH, LENGTH) ((PATH)->base.path_length += (LENGTH))
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -91,7 +94,7 @@ lv_vg_lite_path_t * lv_vg_lite_path_create(vg_lite_format_t data_format)
     LV_ASSERT(vg_lite_init_path(
                   &path->base,
                   data_format,
-                  VG_LITE_MEDIUM,
+                  VG_LITE_HIGH,
                   0,
                   NULL,
                   0, 0, 0, 0)
@@ -109,7 +112,7 @@ void lv_vg_lite_path_destroy(lv_vg_lite_path_t * path)
         path->base.path = NULL;
 
         /* clear remaining path data */
-        LV_VG_LITE_CHECK_ERROR(vg_lite_clear_path(&path->base));
+        LV_VG_LITE_CHECK_ERROR(vg_lite_clear_path(&path->base), {});
     }
     lv_free(path);
     LV_PROFILER_DRAW_END;
@@ -139,7 +142,7 @@ void lv_vg_lite_path_reset(lv_vg_lite_path_t * path, vg_lite_format_t data_forma
     LV_ASSERT_NULL(path);
     path->base.path_length = 0;
     path->base.format = data_format;
-    path->base.quality = VG_LITE_MEDIUM;
+    path->base.quality = VG_LITE_HIGH;
     path->base.path_type = VG_LITE_DRAW_ZERO;
     path->format_len = lv_vg_lite_path_format_len(data_format);
     path->has_transform = false;
@@ -255,12 +258,12 @@ void lv_vg_lite_path_set_quality(lv_vg_lite_path_t * path, vg_lite_quality_t qua
     path->base.quality = quality;
 }
 
-static void lv_vg_lite_path_append_data(lv_vg_lite_path_t * path, const void * data, size_t len)
+void lv_vg_lite_path_reserve_space(lv_vg_lite_path_t * path, size_t len)
 {
-    LV_ASSERT_NULL(path);
-    LV_ASSERT_NULL(data);
+    bool need_reallocated = false;
 
-    if(path->base.path_length + len > path->mem_size) {
+    /*Calculate new mem size until match the contidion*/
+    while(path->base.path_length + len > path->mem_size) {
         if(path->mem_size == 0) {
             path->mem_size = LV_MAX(len, PATH_MEM_SIZE_MIN);
         }
@@ -268,20 +271,50 @@ static void lv_vg_lite_path_append_data(lv_vg_lite_path_t * path, const void * d
             /* Increase memory size by 1.5 times */
             path->mem_size = path->mem_size * 3 / 2;
         }
-        path->base.path = lv_realloc(path->base.path, path->mem_size);
-        LV_ASSERT_MALLOC(path->base.path);
+        need_reallocated = true;
     }
 
-    lv_memcpy((uint8_t *)path->base.path + path->base.path_length, data, len);
-    path->base.path_length += len;
+    if(!need_reallocated) {
+        return;
+    }
+
+    path->base.path = lv_realloc(path->base.path, path->mem_size);
+    LV_ASSERT_MALLOC(path->base.path);
 }
 
-static void lv_vg_lite_path_append_op(lv_vg_lite_path_t * path, uint32_t op)
+static inline void lv_vg_lite_path_append_data(lv_vg_lite_path_t * path, const void * data, size_t len)
 {
-    lv_vg_lite_path_append_data(path, &op, path->format_len);
+    LV_ASSERT_NULL(path);
+    LV_ASSERT_NULL(data);
+    lv_vg_lite_path_reserve_space(path, len);
+    lv_memcpy(PATH_CURRENT_PTR(path), data, len);
+    PATH_LENGTH_INC(path, len);
 }
 
-static void lv_vg_lite_path_append_point(lv_vg_lite_path_t * path, float x, float y)
+static inline void lv_vg_lite_path_append_op(lv_vg_lite_path_t * path, uint32_t op)
+{
+    void * ptr = PATH_CURRENT_PTR(path);
+    switch(path->base.format) {
+        case VG_LITE_FP32:
+        case VG_LITE_S32:
+            LV_VG_LITE_PATH_SET_OP_CODE(ptr, uint32_t, op);
+            PATH_LENGTH_INC(path, sizeof(uint32_t));
+            break;
+        case VG_LITE_S16:
+            LV_VG_LITE_PATH_SET_OP_CODE(ptr, uint16_t, op);
+            PATH_LENGTH_INC(path, sizeof(uint16_t));
+            break;
+        case VG_LITE_S8:
+            LV_VG_LITE_PATH_SET_OP_CODE(ptr, uint8_t, op);
+            PATH_LENGTH_INC(path, sizeof(uint8_t));
+            break;
+        default:
+            LV_ASSERT_FORMAT_MSG(false, "Invalid format: %d", path->base.format);
+            break;
+    }
+}
+
+static inline void lv_vg_lite_path_append_point(lv_vg_lite_path_t * path, float x, float y)
 {
     if(path->has_transform) {
         LV_VG_LITE_ASSERT_MATRIX(&path->matrix);
@@ -292,22 +325,39 @@ static void lv_vg_lite_path_append_point(lv_vg_lite_path_t * path, float x, floa
         y = ori_x * path->matrix.m[1][0] + ori_y * path->matrix.m[1][1] + path->matrix.m[1][2];
     }
 
-    if(path->base.format == VG_LITE_FP32) {
-        lv_vg_lite_path_append_data(path, &x, sizeof(x));
-        lv_vg_lite_path_append_data(path, &y, sizeof(y));
-        return;
-    }
+#define PATH_APPEND_POINT_DATA(X, Y, TYPE)       \
+    do {                                         \
+        TYPE * data = ptr;                       \
+        *data++ = (TYPE)(X);                     \
+        *data++ = (TYPE)(Y);                     \
+        PATH_LENGTH_INC(path, sizeof(TYPE) * 2); \
+    } while(0)
 
-    int32_t ix = (int32_t)(x);
-    int32_t iy = (int32_t)(y);
-    lv_vg_lite_path_append_data(path, &ix, path->format_len);
-    lv_vg_lite_path_append_data(path, &iy, path->format_len);
+    void * ptr = PATH_CURRENT_PTR(path);
+    switch(path->base.format) {
+        case VG_LITE_FP32:
+            PATH_APPEND_POINT_DATA(x, y, float);
+            break;
+        case VG_LITE_S32:
+            PATH_APPEND_POINT_DATA(x, y, int32_t);
+            break;
+        case VG_LITE_S16:
+            PATH_APPEND_POINT_DATA(x, y, int16_t);
+            break;
+        case VG_LITE_S8:
+            PATH_APPEND_POINT_DATA(x, y, int8_t);
+            break;
+        default:
+            LV_ASSERT_FORMAT_MSG(false, "Invalid format: %d", path->base.format);
+            break;
+    }
 }
 
 void lv_vg_lite_path_move_to(lv_vg_lite_path_t * path,
                              float x, float y)
 {
     LV_ASSERT_NULL(path);
+    lv_vg_lite_path_reserve_space(path, (1 + 2) * path->format_len);
     lv_vg_lite_path_append_op(path, VLC_OP_MOVE);
     lv_vg_lite_path_append_point(path, x, y);
 }
@@ -316,6 +366,7 @@ void lv_vg_lite_path_line_to(lv_vg_lite_path_t * path,
                              float x, float y)
 {
     LV_ASSERT_NULL(path);
+    lv_vg_lite_path_reserve_space(path, (1 + 2) * path->format_len);
     lv_vg_lite_path_append_op(path, VLC_OP_LINE);
     lv_vg_lite_path_append_point(path, x, y);
 }
@@ -325,6 +376,7 @@ void lv_vg_lite_path_quad_to(lv_vg_lite_path_t * path,
                              float x, float y)
 {
     LV_ASSERT_NULL(path);
+    lv_vg_lite_path_reserve_space(path, (1 + 4) * path->format_len);
     lv_vg_lite_path_append_op(path, VLC_OP_QUAD);
     lv_vg_lite_path_append_point(path, cx, cy);
     lv_vg_lite_path_append_point(path, x, y);
@@ -336,6 +388,7 @@ void lv_vg_lite_path_cubic_to(lv_vg_lite_path_t * path,
                               float x, float y)
 {
     LV_ASSERT_NULL(path);
+    lv_vg_lite_path_reserve_space(path, (1 + 6) * path->format_len);
     lv_vg_lite_path_append_op(path, VLC_OP_CUBIC);
     lv_vg_lite_path_append_point(path, cx1, cy1);
     lv_vg_lite_path_append_point(path, cx2, cy2);
@@ -345,12 +398,14 @@ void lv_vg_lite_path_cubic_to(lv_vg_lite_path_t * path,
 void lv_vg_lite_path_close(lv_vg_lite_path_t * path)
 {
     LV_ASSERT_NULL(path);
+    lv_vg_lite_path_reserve_space(path, 1 * path->format_len);
     lv_vg_lite_path_append_op(path, VLC_OP_CLOSE);
 }
 
 void lv_vg_lite_path_end(lv_vg_lite_path_t * path)
 {
     LV_ASSERT_NULL(path);
+    lv_vg_lite_path_reserve_space(path, 1 * path->format_len);
     lv_vg_lite_path_append_op(path, VLC_OP_END);
     path->base.add_end = 1;
 }
@@ -558,31 +613,29 @@ uint8_t lv_vg_lite_vlc_op_arg_len(uint8_t vlc_op)
             VLC_OP_ARG_LEN(LCWARC, 5);
             VLC_OP_ARG_LEN(LCWARC_REL, 5);
         default:
+            LV_ASSERT_FORMAT_MSG(false, "Invalid op code: %d", vlc_op);
             break;
     }
 
-    LV_LOG_ERROR("UNKNOW_VLC_OP: 0x%x", vlc_op);
-    LV_ASSERT(false);
     return 0;
 }
 
 uint8_t lv_vg_lite_path_format_len(vg_lite_format_t format)
 {
     switch(format) {
-        case VG_LITE_S8:
-            return 1;
-        case VG_LITE_S16:
-            return 2;
-        case VG_LITE_S32:
-            return 4;
         case VG_LITE_FP32:
-            return 4;
+            return sizeof(float);
+        case VG_LITE_S32:
+            return sizeof(int32_t);
+        case VG_LITE_S16:
+            return sizeof(int16_t);
+        case VG_LITE_S8:
+            return sizeof(int8_t);
         default:
+            LV_ASSERT_FORMAT_MSG(false, "Invalid format: %d", format);
             break;
     }
 
-    LV_LOG_ERROR("UNKNOW_FORMAT: %d", format);
-    LV_ASSERT(false);
     return 0;
 }
 
@@ -598,7 +651,7 @@ void lv_vg_lite_path_for_each_data(const vg_lite_path_t * path, lv_vg_lite_path_
 
     while(cur < end) {
         /* get op code */
-        uint8_t op_code = VLC_GET_OP_CODE(cur);
+        uint8_t op_code = LV_VG_LITE_PATH_GET_OP_CODE(cur);
 
         /* get arguments length */
         uint8_t arg_len = lv_vg_lite_vlc_op_arg_len(op_code);
@@ -622,8 +675,7 @@ void lv_vg_lite_path_for_each_data(const vg_lite_path_t * path, lv_vg_lite_path_
                     tmp_data[i] = *((float *)cur);
                     break;
                 default:
-                    LV_LOG_ERROR("UNKNOW_FORMAT(%d)", path->format);
-                    LV_ASSERT(false);
+                    LV_ASSERT_FORMAT_MSG(false, "Invalid format: %d", path->format);
                     break;
             }
 

@@ -174,7 +174,7 @@ void test_draw_task_hooking(void)
     lv_chart_series_t * chart_set1 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_YELLOW), 0);
     lv_chart_series_t * chart_set2 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_GREEN), 0);
     lv_chart_series_t * chart_set3 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), 0);
-    lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 700);
+    lv_chart_set_axis_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 700);
 
     int32_t points[21] = {0, 31, 59, 81, 95, 100, 95, 81, 59, 31, 0, -31, -59, -81, -95, -100, -95, -81, -59, -31, 0};
 
@@ -191,6 +191,25 @@ void test_draw_task_hooking(void)
 
     lv_chart_set_type(chart, LV_CHART_TYPE_BAR);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/chart_bar_draw_hook.png");
+}
+
+void test_chart_scatter(void)
+{
+    lv_obj_center(chart);
+    lv_obj_set_size(chart, LV_PCT(100), LV_PCT(100));
+
+    lv_chart_set_type(chart, LV_CHART_TYPE_SCATTER);
+
+    lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_X, 50, 100);
+    lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 10, 20);
+
+    lv_chart_set_point_count(chart, 3);
+    lv_chart_series_t * ser = lv_chart_add_series(chart, red_color, LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_set_next_value2(chart, ser, 50, 10);
+    lv_chart_set_next_value2(chart, ser, 75, 12);
+    lv_chart_set_next_value2(chart, ser, 100, 20);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/chart_scatter.png");
 }
 
 #endif

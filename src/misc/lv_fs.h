@@ -119,7 +119,7 @@ void lv_fs_drv_register(lv_fs_drv_t * drv);
 
 /**
  * Give a pointer to a driver from its letter
- * @param letter    the driver letter
+ * @param letter    the driver-identifier letter
  * @return          pointer to a driver or NULL if not found
  */
 lv_fs_drv_t * lv_fs_get_drv(char letter);
@@ -144,7 +144,7 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
 /**
  * Make a path object for the memory-mapped file compatible with the file system interface
  * @param path      path to a lv_fs_path_ex object
- * @param letter    the letter of the driver. E.g. `LV_FS_MEMFS_LETTER`
+ * @param letter    the identifier letter of the driver. E.g. `LV_FS_MEMFS_LETTER`
  * @param buf       address of the memory buffer
  * @param size      size of the memory buffer in bytes
  */

@@ -23,7 +23,7 @@ A round scale with section and custom styling
   :language: c
 
 A scale with section and custom styling
-"""""""""""""""""""""""""""""""""""""""
+---------------------------------------
 
 .. lv_example:: widgets/scale/lv_example_scale_5
   :language: c
@@ -35,19 +35,19 @@ A round scale with multiple needles, resembling a clock
   :language: c
 
 Customizing scale major tick label color with `LV_EVENT_DRAW_TASK_ADDED` event
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+------------------------------------------------------------------------------
 
 .. lv_example:: widgets/scale/lv_example_scale_7
   :language: c
 
 A round scale with labels rotated and translated
-""""""""""""""""""""""""""""""""""""""""""""""""
+------------------------------------------------
 
 .. lv_example:: widgets/scale/lv_example_scale_8
   :language: c
 
 A horizontal scale with labels rotated and translated
-"""""""""""""""""""""""""""""""""""""""""""""""""""""
+-----------------------------------------------------
 
 .. lv_example:: widgets/scale/lv_example_scale_9
   :language: c

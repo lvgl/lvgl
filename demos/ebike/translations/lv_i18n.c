@@ -1,5 +1,5 @@
 #include "./lv_i18n.h"
-#include "../../../src/stdlib/lv_string.h"
+#include "../../../lvgl.h"
 
 #if LV_USE_DEMO_EBIKE
 

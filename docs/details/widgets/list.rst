@@ -19,7 +19,8 @@ Parts and Styles
 
 **Background**
 
-- :cpp:enumerator:`LV_PART_MAIN` The main part of the List that uses all the typical background properties
+- :cpp:enumerator:`LV_PART_MAIN` The main part of the List that uses the
+  :ref:`typical background style properties <typical bg props>`.
 - :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar. See :ref:`base_widget`
   documentation for details.
 

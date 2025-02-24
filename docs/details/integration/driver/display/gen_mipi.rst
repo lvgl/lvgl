@@ -118,6 +118,12 @@ Example
 	static void my_lcd_send_color(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
 	{
 		...
+
+		/* This must be called to signal that the transfer has finished.
+		 * It is typically called in a "DMA transfer complete" callback
+		 * long after `my_lcd_send_color` has returned.
+		 */
+		lv_display_flush_ready(disp);
 	}
 
 	int main(int argc, char ** argv)

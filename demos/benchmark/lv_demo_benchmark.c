@@ -34,16 +34,16 @@
     #warning "It's recommended to have at least 128kB RAM for the benchmark"
 #endif
 
-#include "../../src/core/lv_global.h"
-
-#if LV_USE_PERF_MONITOR
-    #include "../../src/display/lv_display_private.h"
-#endif
+#include "../../lvgl_private.h"
 
 /**********************
  *      DEFINES
  **********************/
-#define HEADER_HEIGHT   48
+#if LV_USE_PERF_MONITOR_LOG_MODE == 1
+    #define HEADER_HEIGHT   0
+#else
+    #define HEADER_HEIGHT   48
+#endif
 #define FALL_HEIGHT     80
 #define PAD_BASIC       8
 
@@ -516,6 +516,9 @@ void lv_demo_benchmark(void)
 #if LV_USE_PERF_MONITOR
     lv_display_t * disp = lv_display_get_default();
     lv_subject_add_observer_obj(&disp->perf_sysmon_backend.subject, sysmon_perf_observer_cb, title, NULL);
+#if LV_USE_PERF_MONITOR_LOG_MODE
+    lv_obj_add_flag(title, LV_OBJ_FLAG_HIDDEN);
+#endif
 #else
     lv_label_set_text(title, "LV_USE_PERF_MONITOR is not enabled");
 #endif
@@ -569,9 +572,8 @@ static void next_scene_timer_cb(lv_timer_t * timer)
 static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     const lv_sysmon_perf_info_t * info = lv_subject_get_pointer(subject);
-    lv_obj_t * label = lv_observer_get_target(observer);
-
     char scene_name[64];
+
     if(scenes[scene_act].name[0] != '\0') {
         lv_snprintf(scene_name, sizeof(scene_name), "%s: ", scenes[scene_act].name);
     }
@@ -579,6 +581,8 @@ static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * sub
         scene_name[0] = '\0';
     }
 
+#if !LV_USE_PERF_MONITOR_LOG_MODE
+    lv_obj_t * label = lv_observer_get_target(observer);
     lv_label_set_text_fmt(label,
                           "%s"
                           "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU\n"
@@ -587,6 +591,9 @@ static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * sub
                           info->calculated.fps, info->calculated.cpu,
                           info->calculated.render_avg_time + info->calculated.flush_avg_time,
                           info->calculated.render_avg_time, info->calculated.flush_avg_time);
+#else
+    LV_UNUSED(observer);
+#endif
 
     /*Ignore the first call as it contains data from the previous scene*/
     if(scenes[scene_act].measurement_cnt != 0) {
@@ -770,7 +777,7 @@ static void arc_anim(lv_obj_t * obj)
     lv_anim_set_exec_cb(&a, arc_anim_cb);
     lv_anim_set_values(&a, 0, 100);
     lv_anim_set_duration(&a, t1);
-    lv_anim_set_playback_duration(&a, t2);
+    lv_anim_set_reverse_duration(&a, t2);
     lv_anim_set_var(&a, obj);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
     lv_anim_start(&a);
@@ -791,7 +798,7 @@ static void scroll_anim(lv_obj_t * obj, int32_t y_max)
     lv_anim_set_exec_cb(&a, scroll_anim_y_cb);
     lv_anim_set_values(&a, 0, y_max);
     lv_anim_set_duration(&a, t);
-    lv_anim_set_playback_duration(&a, t);
+    lv_anim_set_reverse_duration(&a, t);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
     lv_anim_start(&a);
 
@@ -812,7 +819,7 @@ static void fall_anim(lv_obj_t * obj, int32_t y_max)
     lv_anim_set_exec_cb(&a, shake_anim_y_cb);
     lv_anim_set_values(&a, 0, y_max);
     lv_anim_set_duration(&a, t1);
-    lv_anim_set_playback_duration(&a, t2);
+    lv_anim_set_reverse_duration(&a, t2);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
     lv_anim_start(&a);
 }

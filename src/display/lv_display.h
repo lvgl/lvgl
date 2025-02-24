@@ -569,6 +569,24 @@ lv_draw_buf_t * lv_display_get_buf_active(lv_display_t * disp);
  */
 void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area);
 
+/**
+ * Get the size of the draw buffers
+ * @param disp      pointer to a display
+ * @return          the size of the draw buffer in bytes for valid display, 0 otherwise
+ */
+uint32_t lv_display_get_draw_buf_size(lv_display_t * disp);
+
+/**
+ * Get the size of the invalidated draw buffer. Can be used in the flush callback
+ * to get the number of bytes used in the current render buffer.
+ * @param disp      pointer to a display
+ * @param width     the width of the invalidated area
+ * @param height    the height of the invalidated area
+ * @return          the size of the invalidated draw buffer in bytes, not accounting for
+ *                  any preceding palette information for a valid display, 0 otherwise
+ */
+uint32_t lv_display_get_invalidated_draw_buf_size(lv_display_t * disp, uint32_t width, uint32_t height);
+
 /**********************
  *      MACROS
  **********************/
@@ -593,32 +611,37 @@ void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area);
 #endif
 
 /**
+ * See `lv_dpx()` and `lv_display_dpx()`.
  * Same as Android's DIP. (Different name is chosen to avoid mistype between LV_DPI and LV_DIP)
- * 1 dip is 1 px on a 160 DPI screen
- * 1 dip is 2 px on a 320 DPI screen
- * https://stackoverflow.com/questions/2025282/what-is-the-difference-between-px-dip-dp-and-sp
+ *
+ * - 40 dip is 40 px on a 160 DPI screen (distance = 1/4 inch).
+ * - 40 dip is 80 px on a 320 DPI screen (distance still = 1/4 inch).
+ *
+ * @sa https://stackoverflow.com/questions/2025282/what-is-the-difference-between-px-dip-dp-and-sp
  */
 #define LV_DPX_CALC(dpi, n)   ((n) == 0 ? 0 :LV_MAX((( (dpi) * (n) + 80) / 160), 1)) /*+80 for rounding*/
 #define LV_DPX(n)   LV_DPX_CALC(lv_display_get_dpi(NULL), n)
 
 /**
- * Scale the given number of pixels (a distance or size) relative to a 160 DPI display
- * considering the DPI of the default display.
- * It ensures that e.g. `lv_dpx(100)` will have the same physical size regardless to the
- * DPI of the display.
- * @param n     the number of pixels to scale
- * @return      `n x current_dpi/160`
+ * For default display, computes the number of pixels (a distance or size) as if the
+ * display had 160 DPI.  This allows you to specify 1/160-th fractions of an inch to
+ * get real distance on the display that will be consistent regardless of its current
+ * DPI.  It ensures `lv_dpx(100)`, for example, will have the same physical size
+ * regardless to the DPI of the display.
+ * @param n     number of 1/160-th-inch units to compute with
+ * @return      number of pixels to use to make that distance
  */
 int32_t lv_dpx(int32_t n);
 
 /**
- * Scale the given number of pixels (a distance or size) relative to a 160 DPI display
- * considering the DPI of the given display.
- * It ensures that e.g. `lv_dpx(100)` will have the same physical size regardless to the
- * DPI of the display.
- * @param disp   a display whose dpi should be considered
- * @param n     the number of pixels to scale
- * @return      `n x current_dpi/160`
+ * For specified display, computes the number of pixels (a distance or size) as if the
+ * display had 160 DPI.  This allows you to specify 1/160-th fractions of an inch to
+ * get real distance on the display that will be consistent regardless of its current
+ * DPI.  It ensures `lv_dpx(100)`, for example, will have the same physical size
+ * regardless to the DPI of the display.
+ * @param disp  pointer to display whose dpi should be considered
+ * @param n     number of 1/160-th-inch units to compute with
+ * @return      number of pixels to use to make that distance
  */
 int32_t lv_display_dpx(const lv_display_t * disp, int32_t n);
 

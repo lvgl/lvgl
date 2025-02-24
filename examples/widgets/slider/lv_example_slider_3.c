@@ -20,7 +20,7 @@ void lv_example_slider_3(void)
     lv_slider_set_mode(slider, LV_SLIDER_MODE_RANGE);
     lv_slider_set_range(slider, MIN_VALUE, MAX_VALUE);
     lv_slider_set_value(slider, 70, LV_ANIM_OFF);
-    lv_slider_set_left_value(slider, 20, LV_ANIM_OFF);
+    lv_slider_set_start_value(slider, 20, LV_ANIM_OFF);
 
     lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_refresh_ext_draw_size(slider);

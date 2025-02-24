@@ -1,0 +1,46 @@
+<!--
+Example
+<lv_buttonmatrix map="'1' '2' '\n' '3'" ctrl_map="checked|width_3 none disabled"/>
+-->
+
+<widget>
+	<api>
+		<enumdef name="lv_buttonamtrix_ctrl" multi="true" help="control flags for the buttons">
+			<enum name="none"      help="No special control"/>
+			<enum name="width_1"   help="Relative width is 1 in its row"/>
+			<enum name="width_2"   help="Relative width is 2 in its row"/>
+			<enum name="width_3"   help="Relative width is 3 in its row"/>
+			<enum name="width_4"   help="Relative width is 4 in its row"/>
+			<enum name="width_5"   help="Relative width is 5 in its row"/>
+			<enum name="width_6"   help="Relative width is 6 in its row"/>
+			<enum name="width_7"   help="Relative width is 7 in its row"/>
+			<enum name="width_8"   help="Relative width is 8 in its row"/>
+			<enum name="width_9"   help="Relative width is 9 in its row"/>
+			<enum name="width_10"   help="Relative width is 10 in its row"/>
+			<enum name="width_11"   help="Relative width is 11 in its row"/>
+			<enum name="width_12"   help="Relative width is 12 in its row"/>
+			<enum name="width_13"   help="Relative width is 13 in its row"/>
+			<enum name="width_14"   help="Relative width is 14 in its row"/>
+			<enum name="width_15"   help="Relative width is 15 in its row"/>
+			<enum name="hidden"      help="Button hidden"/>
+			<enum name="no_repeat"   help="Do not repeat press this button."/>
+			<enum name="disabled"    help="Disable this button."/>
+			<enum name="checkable"   help="The button can be toggled."/>
+			<enum name="checked"     help="Button is currently toggled (e.g. checked)."/>
+			<enum name="click_trig"  help="1: Send LV_EVENT_VALUE_CHANGE on CLICK, 0: Send LV_EVENT_VALUE_CHANGE on PRESS"/>
+			<enum name="popover"     help="Show a popover when pressing this key"/>
+			<enum name="recolor"     help="Enable text recoloring with `#color`"/>
+			<enum name="reserved_1"  help="Reserved for later use"/>
+			<enum name="reserved_2"  help="Reserved for later use"/>
+			<enum name="custom_1"    help="Custom free to use flag"/>
+			<enum name="custom_2"    help="Custom free to use flag"/>
+		</enumdef>
+
+	    <prop name="map"  type="string[NULL]" help=""/>
+	    <prop name="ctrl_map" type="enum:lv_buttonmatrix_ctrl[]+" help=""/>
+	    <prop name="one_checked" type="bool" help=""/>
+	    <prop name="selected_button" type="int" help=""/>
+
+
+	</api>
+</widget>

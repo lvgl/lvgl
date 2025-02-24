@@ -497,6 +497,8 @@ class LVGLImage:
                  data: bytes = b'') -> None:
         self.stride = 0  # default no valid stride value
         self.premultiplied = False
+        self.rgb565_dither = False
+        self.nema_gfx = False
         self.set_data(cf, w, h, data)
 
     def __repr__(self) -> str:
@@ -838,13 +840,17 @@ class LVGLImage:
     def from_png(self,
                  filename: str,
                  cf: ColorFormat = None,
-                 background: int = 0x00_00_00):
+                 background: int = 0x00_00_00,
+                 rgb565_dither=False,
+                 nema_gfx=False):
         """
         Create lvgl image from png file.
         If cf is none, used I1/2/4/8 based on palette size
         """
 
         self.background = background
+        self.rgb565_dither = rgb565_dither
+        self.nema_gfx = nema_gfx
 
         if cf is None:  # guess cf from filename
             # split filename string and match with ColorFormat to check
@@ -872,9 +878,19 @@ class LVGLImage:
     def _png_to_indexed(self, cf: ColorFormat, filename: str):
         # convert to palette mode
         auto_cf = cf is None
-        reader = png.Reader(
-            bytes=PngQuant(256 if auto_cf else cf.ncolors).convert(filename))
-        w, h, rows, _ = reader.read()
+
+        # read the image data to get the metadata
+        reader = png.Reader(filename=filename)
+        w, h, rows, metadata = reader.read()
+
+        # to preserve original palette data only convert the image if needed. For this
+        # check if image has a palette and the requested palette size equals the existing one
+        if not 'palette' in metadata or not auto_cf and len(metadata['palette']) !=  2 ** cf.bpp:
+            # reread and convert file
+            reader = png.Reader(
+                bytes=PngQuant(256 if auto_cf else cf.ncolors).convert(filename))
+            w, h, rows, _ = reader.read()
+
         palette = reader.palette(alpha="force")  # always return alpha
 
         palette_len = len(palette)
@@ -905,6 +921,8 @@ class LVGLImage:
         # pack data if not in I8 format
         if cf == ColorFormat.I8:
             for e in rows:
+                if self.nema_gfx:
+                    e = bytearray((x >> 4) | ((x & 0x0F) << 4) for x in e)
                 rawdata += e
         else:
             for e in png.pack_rows(rows, cf.bpp):
@@ -986,6 +1004,7 @@ class LVGLImage:
                 color |= (g >> 2) << 5
                 color |= (b >> 3) << 0
                 return uint16_t(color)
+
         elif cf == ColorFormat.RGB565A8:
 
             def pack(r, g, b, a):
@@ -1007,20 +1026,65 @@ class LVGLImage:
         w, h, rows, _ = reader.asRGBA8()
         rawdata = bytearray()
         alpha = bytearray()
-        for row in rows:
+        for y, row in enumerate(rows):
             R = row[0::4]
             G = row[1::4]
             B = row[2::4]
             A = row[3::4]
-            for r, g, b, a in zip(R, G, B, A):
+            for x, (r, g, b, a) in enumerate(zip(R, G, B, A)):
                 if cf == ColorFormat.RGB565A8:
                     alpha += uint8_t(a)
+
+                if (
+                    self.rgb565_dither and
+                    cf in (ColorFormat.RGB565, ColorFormat.RGB565A8, ColorFormat.ARGB8565)
+                ):
+                    treshold_id = ((y & 7) << 3) + (x & 7)
+
+                    r = min(r + red_thresh[treshold_id], 0xFF) & 0xF8
+                    g = min(g + green_thresh[treshold_id], 0xFF) & 0xFC
+                    b = min(b + blue_thresh[treshold_id], 0xFF) & 0xF8
+
                 rawdata += pack(r, g, b, a)
 
         if cf == ColorFormat.RGB565A8:
             rawdata += alpha
 
         self.set_data(cf, w, h, rawdata)
+
+
+red_thresh = [
+  1, 7, 3, 5, 0, 8, 2, 6,
+  7, 1, 5, 3, 8, 0, 6, 2,
+  3, 5, 0, 8, 2, 6, 1, 7,
+  5, 3, 8, 0, 6, 2, 7, 1,
+  0, 8, 2, 6, 1, 7, 3, 5,
+  8, 0, 6, 2, 7, 1, 5, 3,
+  2, 6, 1, 7, 3, 5, 0, 8,
+  6, 2, 7, 1, 5, 3, 8, 0
+]
+
+green_thresh = [
+  1, 3, 2, 2, 3, 1, 2, 2,
+  2, 2, 0, 4, 2, 2, 4, 0,
+  3, 1, 2, 2, 1, 3, 2, 2,
+  2, 2, 4, 0, 2, 2, 0, 4,
+  1, 3, 2, 2, 3, 1, 2, 2,
+  2, 2, 0, 4, 2, 2, 4, 0,
+  3, 1, 2, 2, 1, 3, 2, 2,
+  2, 2, 4, 0, 2, 2, 0, 4
+]
+
+blue_thresh = [
+  5, 3, 8, 0, 6, 2, 7, 1,
+  3, 5, 0, 8, 2, 6, 1, 7,
+  8, 0, 6, 2, 7, 1, 5, 3,
+  0, 8, 2, 6, 1, 7, 3, 5,
+  6, 2, 7, 1, 5, 3, 8, 0,
+  2, 6, 1, 7, 3, 5, 0, 8,
+  7, 1, 5, 3, 8, 0, 6, 2,
+  1, 7, 3, 5, 0, 8, 2, 6
+]
 
 
 class RLEHeader:
@@ -1202,7 +1266,9 @@ class PNGConverter:
                  align: int = 1,
                  premultiply: bool = False,
                  compress: CompressMethod = CompressMethod.NONE,
-                 keep_folder=True) -> None:
+                 keep_folder=True,
+                 rgb565_dither=False,
+                 nema_gfx=False) -> None:
         self.files = files
         self.cf = cf
         self.ofmt = ofmt
@@ -1213,6 +1279,8 @@ class PNGConverter:
         self.premultiply = premultiply
         self.compress = compress
         self.background = background
+        self.rgb565_dither = rgb565_dither
+        self.nema_gfx = nema_gfx
 
     def _replace_ext(self, input, ext):
         if self.keep_folder:
@@ -1231,8 +1299,9 @@ class PNGConverter:
                 img = RAWImage().from_file(f, self.cf)
                 img.to_c_array(self._replace_ext(f, ".c"))
             else:
-                img = LVGLImage().from_png(f, self.cf, background=self.background)
+                img = LVGLImage().from_png(f, self.cf, background=self.background, rgb565_dither=self.rgb565_dither, nema_gfx=self.nema_gfx)
                 img.adjust_stride(align=self.align)
+
                 if self.premultiply:
                     img.premultiply()
                 output.append((f, img))
@@ -1265,6 +1334,9 @@ def main():
             "RAW", "RAW_ALPHA"
         ])
 
+    parser.add_argument('--rgb565dither', action='store_true',
+                        help="use dithering to correct banding in gradients", default=False)
+
     parser.add_argument('--premultiply', action='store_true',
                         help="pre-multiply color with alpha", default=False)
 
@@ -1285,6 +1357,8 @@ def main():
                         type=lambda x: int(x, 0),
                         metavar='color',
                         nargs='?')
+    parser.add_argument('--nemagfx', action='store_true',
+                    help="export color palette for I8 images in a format compatible with NEMA accelerator", default=False)
     parser.add_argument('-o',
                         '--output',
                         default="./output",
@@ -1324,7 +1398,9 @@ def main():
                              align=args.align,
                              premultiply=args.premultiply,
                              compress=compress,
-                             keep_folder=False)
+                             keep_folder=False,
+                             rgb565_dither=args.rgb565dither,
+                             nema_gfx=args.nemagfx)
     output = converter.convert()
     for f, img in output:
         logging.info(f"len: {img.data_len} for {path.basename(f)} ")
@@ -1337,7 +1413,8 @@ def test():
     f = "pngs/cogwheel.RGB565A8.png"
     img = LVGLImage().from_png(f,
                                cf=ColorFormat.ARGB8565,
-                               background=0xFF_FF_00)
+                               background=0xFF_FF_00,
+                               rgb565_dither=True)
     img.adjust_stride(align=16)
     img.premultiply()
     img.to_bin("output/cogwheel.ARGB8565.bin")

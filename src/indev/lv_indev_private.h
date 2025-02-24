@@ -15,6 +15,8 @@ extern "C" {
  *********************/
 #include "lv_indev.h"
 #include "../misc/lv_anim.h"
+#include "lv_indev_scroll.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -31,6 +33,7 @@ struct _lv_indev_t {
     lv_indev_read_cb_t read_cb;
 
     lv_indev_state_t state; /**< Current state of the input device.*/
+    lv_indev_state_t prev_state; /**< Previous state of the input device.*/
     lv_indev_mode_t mode;
 
     /*Flags*/
@@ -99,6 +102,7 @@ struct _lv_indev_t {
         uint8_t gesture_dir : 4;
         uint8_t gesture_sent : 1;
         uint8_t press_moved : 1;
+        uint8_t pressed : 1;
     } pointer;
     struct {
         /*Keypad data*/

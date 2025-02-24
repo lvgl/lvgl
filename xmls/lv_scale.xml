@@ -1,0 +1,42 @@
+<!--
+<lv_scale total_tick_count="30">
+	<lv_scale-section column="2" range="30 40" style_indicator="scale_style"/>
+</lv_scale>
+-->
+
+<widget>
+	<api>
+	    <enumdef name="lv_scale_mode" help="">
+	        <enum name="horizontal_top" help=""/>
+	        <enum name="horizontal_bottom" help=""/>
+	        <enum name="vertical_top" help=""/>
+	        <enum name="vertical_bottom" help=""/>
+	        <enum name="round_inner" help=""/>
+	        <enum name="round_outer" help=""/>
+	    </enumdef>
+
+	    <prop name="mode" type="enum:lv_scale_mode" help=""/>
+	    <prop name="total_tick_count" type="int" help=""/>
+	    <prop name="major_tick_every" type="int" help=""/>
+	    <prop name="label_show" type="bool" help=""/>
+	    <prop name="range" help="">
+	    	<param name="range_min" type="int" help=""/>
+	    	<param name="range_max" type="int" help=""/>
+	    </prop>
+	    <prop name="angle_range" type="deg" help=""/>
+	    <prop name="rotation" type="deg" help=""/>
+	    <prop name="text_src" type="string[NULL]" help=""/>
+	    <prop name="post_draw" type="bool" help=""/>
+	    <prop name="draw_ticks_on_top" type="bool" help=""/>
+
+	    <element name="section" type="lv_scale_section" access="add">
+	    	<prop name="range" help="">
+	    		<param name="int" type="minor_range" help=""/>
+	    		<param name="int" type="major_range" help=""/>
+	    	</prop>
+	    	<prop name="style_main" type="style" help=""/>
+	    	<prop name="style_indicator" type="style" help=""/>
+	    	<prop name="style_items" type="style" help=""/>
+	    </element>
+	</api>
+</widget>

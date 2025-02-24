@@ -250,6 +250,108 @@ void lv_event_mark_deleted(void * target)
     }
 }
 
+const char * lv_event_code_get_name(lv_event_code_t code)
+{
+    /*Remove the preprocess flag*/
+    code &= ~LV_EVENT_PREPROCESS;
+
+#define ENUM_CASE(x) case LV_##x: return #x
+
+    switch(code) {
+            ENUM_CASE(EVENT_ALL);
+
+            /** Input device events*/
+            ENUM_CASE(EVENT_PRESSED);
+            ENUM_CASE(EVENT_PRESSING);
+            ENUM_CASE(EVENT_PRESS_LOST);
+            ENUM_CASE(EVENT_SHORT_CLICKED);
+            ENUM_CASE(EVENT_SINGLE_CLICKED);
+            ENUM_CASE(EVENT_DOUBLE_CLICKED);
+            ENUM_CASE(EVENT_TRIPLE_CLICKED);
+            ENUM_CASE(EVENT_LONG_PRESSED);
+            ENUM_CASE(EVENT_LONG_PRESSED_REPEAT);
+            ENUM_CASE(EVENT_CLICKED);
+            ENUM_CASE(EVENT_RELEASED);
+            ENUM_CASE(EVENT_SCROLL_BEGIN);
+            ENUM_CASE(EVENT_SCROLL_THROW_BEGIN);
+            ENUM_CASE(EVENT_SCROLL_END);
+            ENUM_CASE(EVENT_SCROLL);
+            ENUM_CASE(EVENT_GESTURE);
+            ENUM_CASE(EVENT_KEY);
+            ENUM_CASE(EVENT_ROTARY);
+            ENUM_CASE(EVENT_FOCUSED);
+            ENUM_CASE(EVENT_DEFOCUSED);
+            ENUM_CASE(EVENT_LEAVE);
+            ENUM_CASE(EVENT_HIT_TEST);
+            ENUM_CASE(EVENT_INDEV_RESET);
+            ENUM_CASE(EVENT_HOVER_OVER);
+            ENUM_CASE(EVENT_HOVER_LEAVE);
+
+            /** Drawing events*/
+            ENUM_CASE(EVENT_COVER_CHECK);
+            ENUM_CASE(EVENT_REFR_EXT_DRAW_SIZE);
+            ENUM_CASE(EVENT_DRAW_MAIN_BEGIN);
+            ENUM_CASE(EVENT_DRAW_MAIN);
+            ENUM_CASE(EVENT_DRAW_MAIN_END);
+            ENUM_CASE(EVENT_DRAW_POST_BEGIN);
+            ENUM_CASE(EVENT_DRAW_POST);
+            ENUM_CASE(EVENT_DRAW_POST_END);
+            ENUM_CASE(EVENT_DRAW_TASK_ADDED);
+
+            /** Special events*/
+            ENUM_CASE(EVENT_VALUE_CHANGED);
+            ENUM_CASE(EVENT_INSERT);
+            ENUM_CASE(EVENT_REFRESH);
+            ENUM_CASE(EVENT_READY);
+            ENUM_CASE(EVENT_CANCEL);
+
+            /** Other events*/
+            ENUM_CASE(EVENT_CREATE);
+            ENUM_CASE(EVENT_DELETE);
+            ENUM_CASE(EVENT_CHILD_CHANGED);
+            ENUM_CASE(EVENT_CHILD_CREATED);
+            ENUM_CASE(EVENT_CHILD_DELETED);
+            ENUM_CASE(EVENT_SCREEN_UNLOAD_START);
+            ENUM_CASE(EVENT_SCREEN_LOAD_START);
+            ENUM_CASE(EVENT_SCREEN_LOADED);
+            ENUM_CASE(EVENT_SCREEN_UNLOADED);
+            ENUM_CASE(EVENT_SIZE_CHANGED);
+            ENUM_CASE(EVENT_STYLE_CHANGED);
+            ENUM_CASE(EVENT_LAYOUT_CHANGED);
+            ENUM_CASE(EVENT_GET_SELF_SIZE);
+
+            /** Events of optional LVGL components*/
+            ENUM_CASE(EVENT_INVALIDATE_AREA);
+            ENUM_CASE(EVENT_RESOLUTION_CHANGED);
+            ENUM_CASE(EVENT_COLOR_FORMAT_CHANGED);
+            ENUM_CASE(EVENT_REFR_REQUEST);
+            ENUM_CASE(EVENT_REFR_START);
+            ENUM_CASE(EVENT_REFR_READY);
+            ENUM_CASE(EVENT_RENDER_START);
+            ENUM_CASE(EVENT_RENDER_READY);
+            ENUM_CASE(EVENT_FLUSH_START);
+            ENUM_CASE(EVENT_FLUSH_FINISH);
+            ENUM_CASE(EVENT_FLUSH_WAIT_START);
+            ENUM_CASE(EVENT_FLUSH_WAIT_FINISH);
+
+            ENUM_CASE(EVENT_VSYNC);
+
+        /* Special event flags */
+        case LV_EVENT_LAST:
+        case LV_EVENT_PREPROCESS:
+        case LV_EVENT_MARKED_DELETING:
+            break;
+
+            /* Note that default is not added here because when adding new event code,
+             * if forget to add case, the compiler will automatically report a warning.
+             */
+    }
+
+#undef ENUM_CASE
+
+    return "EVENT_UNKNOWN";
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

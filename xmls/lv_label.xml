@@ -1,0 +1,27 @@
+<!--
+Example
+<lv_label text="Hello"/>
+-->
+
+<widget>
+	<api>
+	    <enumdef name="lv_label_long_mode">
+	        <enum name="wrap" help=""/>
+	        <enum name="scroll" help=""/>
+	        <enum name="scroll_circular" help=""/>
+	        <enum name="clip" help=""/>
+	        <enum name="dots" help=""/>
+	    </enumdef>
+
+	    <prop name="text">
+	    	<param name="text" type="string" />
+	   	</prop>
+	    <prop name="text_fmt">
+	    	<param name="fmt" type="string" />
+	    	<param name="params" type="arglist" />
+	   	</prop>
+	    <prop name="long_mode">
+	    	<param name="mode" type="enum:lv_label_long_mode" />
+	   	</prop>
+	</api>
+</widget>

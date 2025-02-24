@@ -131,7 +131,8 @@ static int _gaussianInit(int* kernel, float sigma, int level)
 
 bool effectGaussianPrepare(RenderEffectGaussian* params)
 {
-    auto data = (SwGaussianBlur*)malloc(sizeof(SwGaussianBlur));
+    auto data = (SwGaussianBlur*)lv_malloc(sizeof(SwGaussianBlur));
+    LV_ASSERT_MALLOC(data);
 
     //compute box kernel sizes
     data->level = int(SwGaussianBlur::MAX_LEVEL * ((params->quality - 1) * 0.01f)) + 1;
@@ -140,7 +141,7 @@ bool effectGaussianPrepare(RenderEffectGaussian* params)
     //skip, if the parameters are invalid.
     if (extends == 0) {
         params->invalid = true;
-        free(data);
+        lv_free(data);
         return false;
     }
 

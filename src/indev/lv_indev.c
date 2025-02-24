@@ -742,6 +742,7 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
         indev_proc_release(i);
     }
 
+    i->prev_state = i->state;
     i->pointer.last_point.x = i->pointer.act_point.x;
     i->pointer.last_point.y = i->pointer.act_point.y;
 }
@@ -1158,8 +1159,14 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->pointer.act_point.x = x;
     i->pointer.act_point.y = y;
 
-    if(data->state == LV_INDEV_STATE_PRESSED) indev_proc_press(i);
-    else indev_proc_release(i);
+    if(data->state == LV_INDEV_STATE_PRESSED) {
+        indev_proc_press(i);
+    }
+    else {
+        indev_proc_release(i);
+    }
+
+    i->prev_state = i->state;
 
     if(indev_reset_check(i)) return;
 
@@ -1210,6 +1217,7 @@ static void indev_proc_press(lv_indev_t * indev)
     if(indev_obj_act != indev->pointer.act_obj) {
         indev->pointer.last_point.x = indev->pointer.act_point.x;
         indev->pointer.last_point.y = indev->pointer.act_point.y;
+        indev->pointer.pressed = indev->prev_state == LV_INDEV_STATE_RELEASED;
 
         /*Without `LV_OBJ_FLAG_PRESS_LOCK` new widget can be found while pressing.*/
         if(indev->pointer.last_hovered && indev->pointer.last_hovered != indev_obj_act) {
@@ -1251,12 +1259,19 @@ static void indev_proc_press(lv_indev_t * indev)
             indev->pointer.vect.x         = 0;
             indev->pointer.vect.y         = 0;
 
-            const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
-            if(is_enabled) {
-                if(indev->pointer.last_hovered != indev_obj_act) {
-                    if(send_event(LV_EVENT_HOVER_OVER, indev_act) == LV_RESULT_INVALID) return;
+
+            /* If the indev was already in a pressed state it means that we got dragged here
+             * so we shouldn't send any hover nor pressed events for a new object since the
+             * originally pressed object didn't get released
+             */
+            if(indev->prev_state != LV_INDEV_STATE_PRESSED) {
+                const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+                if(is_enabled) {
+                    if(indev->pointer.last_hovered != indev_obj_act) {
+                        if(send_event(LV_EVENT_HOVER_OVER, indev_act) == LV_RESULT_INVALID) return;
+                    }
+                    if(send_event(LV_EVENT_PRESSED, indev_act) == LV_RESULT_INVALID) return;
                 }
-                if(send_event(LV_EVENT_PRESSED, indev_act) == LV_RESULT_INVALID) return;
             }
 
             if(indev_act->wait_until_release) return;
@@ -1300,6 +1315,10 @@ static void indev_proc_press(lv_indev_t * indev)
 
 
         if(indev_act->wait_until_release) return;
+
+        if(indev->pointer.scroll_obj) {
+            lv_obj_stop_scroll_anim(indev->pointer.scroll_obj);
+        }
 
         lv_indev_scroll_handler(indev);
         if(indev_reset_check(indev)) return;
@@ -1363,7 +1382,10 @@ static void indev_proc_release(lv_indev_t * indev)
 
     if(indev->wait_until_release) {
         lv_obj_send_event(indev->pointer.act_obj, LV_EVENT_PRESS_LOST, indev_act);
-        if(indev_reset_check(indev)) return;
+        if(indev_reset_check(indev)) {
+            indev->wait_until_release = 0;
+            return;
+        }
 
         indev->pointer.act_obj  = NULL;
         indev->pointer.last_obj = NULL;
@@ -1398,10 +1420,12 @@ static void indev_proc_release(lv_indev_t * indev)
 
         if(is_enabled) {
             if(scroll_obj == NULL) {
-                if(indev->long_pr_sent == 0) {
-                    if(indev_proc_short_click(indev) == LV_RESULT_INVALID) return;
+                if(indev->pointer.pressed) {
+                    if(indev->long_pr_sent == 0) {
+                        if(indev_proc_short_click(indev) == LV_RESULT_INVALID) return;
+                    }
+                    if(send_event(LV_EVENT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
                 }
-                if(send_event(LV_EVENT_CLICKED, indev_act) == LV_RESULT_INVALID) return;
             }
             else {
                 lv_obj_send_event(scroll_obj, LV_EVENT_SCROLL_THROW_BEGIN, indev_act);
@@ -1732,29 +1756,29 @@ static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj)
         if(obj == NULL || indev->pointer.last_pressed == obj) {
             indev->pointer.last_pressed = NULL;
         }
-        if(obj == NULL || indev->pointer.act_obj == obj) {
-            if(indev->pointer.act_obj) {
-                /* Avoid recursive calls */
-                act_obj = indev->pointer.act_obj;
-                indev->pointer.act_obj = NULL;
-                lv_obj_send_event(act_obj, LV_EVENT_INDEV_RESET, indev);
-                lv_indev_send_event(indev, LV_EVENT_INDEV_RESET, act_obj);
-                act_obj = NULL;
-            }
+
+        if(indev->pointer.act_obj) {
+            /* Avoid recursive calls */
+            act_obj = indev->pointer.act_obj;
+            indev->pointer.act_obj = NULL;
+            lv_obj_send_event(act_obj, LV_EVENT_INDEV_RESET, indev);
+            lv_indev_send_event(indev, LV_EVENT_INDEV_RESET, act_obj);
+            act_obj = NULL;
         }
+
         if(obj == NULL || indev->pointer.last_obj == obj) {
             indev->pointer.last_obj = NULL;
         }
-        if(obj == NULL || indev->pointer.scroll_obj == obj) {
-            if(indev->pointer.scroll_obj) {
-                /* Avoid recursive calls */
-                scroll_obj = indev->pointer.scroll_obj;
-                indev->pointer.scroll_obj = NULL;
-                lv_obj_send_event(scroll_obj, LV_EVENT_INDEV_RESET, indev);
-                lv_indev_send_event(indev, LV_EVENT_INDEV_RESET, act_obj);
-                scroll_obj = NULL;
-            }
+
+        if(indev->pointer.scroll_obj) {
+            /* Avoid recursive calls */
+            scroll_obj = indev->pointer.scroll_obj;
+            indev->pointer.scroll_obj = NULL;
+            lv_obj_send_event(scroll_obj, LV_EVENT_INDEV_RESET, indev);
+            lv_indev_send_event(indev, LV_EVENT_INDEV_RESET, scroll_obj);
+            scroll_obj = NULL;
         }
+
         if(obj == NULL || indev->pointer.last_hovered == obj) {
             indev->pointer.last_hovered = NULL;
         }

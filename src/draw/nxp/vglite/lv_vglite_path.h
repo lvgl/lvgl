@@ -22,7 +22,8 @@ extern "C" {
 #include "../../../lv_conf_internal.h"
 
 #if LV_USE_DRAW_VGLITE
-#include "../../sw/lv_draw_sw.h"
+#include "../../lv_draw.h"
+#include "../../lv_draw_triangle.h"
 
 /*********************
  *      DEFINES

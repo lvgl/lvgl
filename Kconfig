@@ -202,6 +202,15 @@ menu "LVGL configuration"
 				it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
 				"Transformed layers" (if `transform_angle/zoom` are set) use larger buffers and can't be drawn in chunks.
 
+		config LV_DRAW_LAYER_MAX_MEMORY
+			int "The maximum amount of memory that can be used for layers"
+			default 0
+			help
+				Limit the max allocated memory for simple and transformed layers.
+				It should be at least `LV_DRAW_LAYER_SIMPLE_BUF_SIZE` sized but if transformed layers are also used
+				it should be enough to store the largest widget too (width x height x 4 area).
+				Set it to 0 to have no limit.
+
 		config LV_DRAW_THREAD_STACK_SIZE
 			int "Stack size of draw thread in bytes"
 			default 8192
@@ -259,6 +268,12 @@ menu "LVGL configuration"
 			bool "Enable support for I1 color format"
 			default y
 			depends on LV_USE_DRAW_SW
+
+		config LV_DRAW_SW_I1_LUM_THRESHOLD
+			int "Luminance threshold for a pixel to be active"
+			default 127
+			range 0 254
+			depends on LV_DRAW_SW_SUPPORT_I1
 
 		config LV_DRAW_SW_DRAW_UNIT_CNT
 			int "Number of draw units"
@@ -741,6 +756,11 @@ menu "LVGL configuration"
 				bool "Enable multi-thread render"
 				default n
 				depends on LV_USE_VG_LITE_THORVG
+
+			config LV_USE_GESTURE_RECOGNITION
+				bool "Enable the multi-touch gesture recognition feature"
+				depends on LV_USE_FLOAT
+				default n
 		endmenu
 	endmenu
 
@@ -1186,7 +1206,7 @@ menu "LVGL configuration"
 	endmenu
 
 	menu "3rd Party Libraries"
-		config LV_FS_DEFAULT_DRIVE_LETTER
+		config LV_FS_DEFAULT_DRIVER_LETTER
 			int "Default drive letter (e.g. 65 for 'A')"
 			default 0
 			help
@@ -1284,6 +1304,13 @@ menu "LVGL configuration"
 		config LV_FS_ARDUINO_SD_PATH
 			string "Set the working directory"
 			depends on LV_USE_FS_ARDUINO_SD
+
+		config LV_USE_FS_UEFI
+			bool "File system on top of the UEFI EFI_SIMPLE_FILE_SYSTEM_PROTOCOL"
+		config LV_USE_FS_UEFI_LETTER
+			int "Set an upper cased letter on which the drive will accessible (e.g. 65 for 'A')"
+			default 0
+			depends on LV_USE_FS_UEFI
 
 		config LV_USE_LODEPNG
 			bool "PNG decoder library"
@@ -1390,7 +1417,7 @@ menu "LVGL configuration"
 			default n
 			help
 				You won't be able to open URLs after enabling this feature.
-				Note that FFmpeg image decoder will always use lvgl file system. 
+				Note that FFmpeg image decoder will always use lvgl file system.
 	endmenu
 
 	menu "Others"
@@ -1522,6 +1549,10 @@ menu "LVGL configuration"
 			bool "Enable cache profiler"
 			default y
 
+		config LV_PROFILER_EVENT
+			bool "Enable event profiler"
+			default y
+
 		endif # LV_USE_PROFILER
 
 		config LV_USE_MONKEY
@@ -1591,7 +1622,8 @@ menu "LVGL configuration"
 			int "Font manager name max length"
 			depends on LV_USE_FONT_MANAGER
 			default 32
-
+		config LV_USE_XML
+			bool "Enable loading XML UIs runtime"
 		config LVGL_VERSION_MAJOR
 			int
 			default 9 # LVGL_VERSION_MAJOR
@@ -1800,9 +1832,14 @@ menu "LVGL configuration"
 			depends on LV_USE_NUTTX
 			default n
 
+		config LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP
+			bool "Use independent image heap for default draw buffer"
+			depends on LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
+			default n
+
 		config LV_USE_NUTTX_LIBUV
 			bool "Use uv loop to replace default timer loop and other fb/indev timers"
-			depends on LV_USE_NUTTX
+			depends on LV_USE_NUTTX && LIBUV
 			default n
 
 		config LV_USE_NUTTX_CUSTOM_INIT
@@ -1919,6 +1956,20 @@ menu "LVGL configuration"
 			depends on LV_OS_WINDOWS
 			default n
 
+		config LV_USE_UEFI
+			bool "Use LVGL UEFI backend"
+			default n
+
+		config LV_USE_UEFI_INCLUDE
+			string "Header that hides the actual framework (EDK2, gnu-efi, ...)"
+			depends on LV_USE_UEFI
+			default "myefi.h"
+
+		config LV_UEFI_USE_MEMORY_SERVICES
+			bool "Use the memory services from the boot services table"
+			depends on LV_USE_UEFI
+			default n
+
 		config LV_USE_OPENGLES
 			bool "Use GLFW and OpenGL to open window on PC and handle mouse and keyboard"
 			default n
@@ -2012,6 +2063,12 @@ menu "LVGL configuration"
 			bool "vector graphic demo"
 			default n
 			depends on LV_USE_VECTOR_GRAPHIC
+		config LV_USE_DEMO_SMARTWATCH
+			bool "Smartwatch demo"
+		config LV_USE_DEMO_EBIKE
+			bool "Ebike demo"
+		config LV_USE_DEMO_HIGH_RES
+			bool "High resolution demo"
 	endmenu
 
 endmenu

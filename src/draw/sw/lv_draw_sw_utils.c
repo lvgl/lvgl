@@ -126,6 +126,26 @@ static void rotate270_l8(const uint8_t * src, uint8_t * dst, int32_t src_width, 
  *   GLOBAL FUNCTIONS
  **********************/
 
+void lv_draw_sw_i1_to_argb8888(const void * buf_i1, void * buf_argb8888, uint32_t width, uint32_t height,
+                               uint32_t buf_i1_stride, uint32_t buf_argb8888_stride, uint32_t index0_color, uint32_t index1_color)
+{
+    /*Extract the bits of I1 px_map and convert them to ARGB8888*/
+    const uint8_t * src = buf_i1;
+    uint32_t * dst = buf_argb8888;
+    uint32_t i1_row_byte_count = width / 8;
+    for(uint32_t row = 0; row < height; row++) {
+        uint32_t * dst_p = dst;
+        for(uint32_t i = 0; i < i1_row_byte_count; i++) {
+            /*From MSB to LSB (pixel 0 to pixel 7 in a byte)*/
+            for(int32_t bit = 7; bit >= 0; bit--) {
+                *dst_p++ = ((src[i] >> bit) & 1) ? index1_color : index0_color;
+            }
+        }
+        src += buf_i1_stride;
+        dst += buf_argb8888_stride / 4;
+    }
+}
+
 void lv_draw_sw_rgb565_swap(void * buf, uint32_t buf_size_px)
 {
     if(LV_DRAW_SW_RGB565_SWAP(buf, buf_size_px) == LV_RESULT_OK) return;
@@ -197,7 +217,7 @@ void lv_draw_sw_i1_convert_to_vtiled(const void * buf, uint32_t buf_size, uint32
 {
     LV_ASSERT(buf && out_buf);
     LV_ASSERT(width % 8 == 0 && height % 8 == 0);
-    LV_ASSERT(buf_size == (width / 8) * height);
+    LV_ASSERT(buf_size >= (width / 8) * height);
     LV_ASSERT(out_buf_size >= buf_size);
 
     lv_memset(out_buf, 0, out_buf_size);

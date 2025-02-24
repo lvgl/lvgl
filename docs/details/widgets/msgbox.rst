@@ -5,7 +5,6 @@ Message Box (lv_msgbox)
 =======================
 
 
-
 Overview
 ********
 
@@ -48,7 +47,7 @@ Create a message box
 
 :cpp:expr:`lv_msgbox_create(parent)` creates a message box.
 If ``parent`` is ``NULL`` the message box will be modal, and will use the
-:ref:`default_display`'s Top :ref:`Layer <screen_layers>` as a parent.
+:ref:`default_display`'s Top :ref:`Layer <display_screen_layers>` as a parent.
 
 
 Adding buttons
@@ -107,8 +106,8 @@ the next call to ``lv_timer_handler`` instead of immediately.
 Events
 ******
 
-No special events are sent by this Widget, though its parts can send events.
-See their documentation for details:  :ref:`lv_button` and :ref:`lv_label`.
+No special events are sent by Message Box Widgets.
+See these Widgets' documentation for details:  :ref:`lv_button` and :ref:`lv_label`.
 
 .. admonition::  Further Reading
 
@@ -123,7 +122,7 @@ See their documentation for details:  :ref:`lv_button` and :ref:`lv_label`.
 Keys
 ****
 
-No *Keys* are processed by Msgbox Widgets.
+No *Keys* are processed by Message Box Widgets.
 
 .. admonition::  Further Reading
 

@@ -22,7 +22,7 @@ void lv_example_style_17(void)
     /*First define a color gradient. In this example we use a purple to black color map.*/
     static lv_grad_dsc_t grad;
 
-    lv_gradient_init_stops(&grad, grad_colors, NULL, NULL, sizeof(grad_colors) / sizeof(lv_color_t));
+    lv_grad_init_stops(&grad, grad_colors, NULL, NULL, sizeof(grad_colors) / sizeof(lv_color_t));
 
     /*Make a radial gradient with the center in the middle of the object, extending to the farthest corner*/
     lv_grad_radial_init(&grad, LV_GRAD_CENTER, LV_GRAD_CENTER, LV_GRAD_RIGHT, LV_GRAD_BOTTOM, LV_GRAD_EXTEND_PAD);
@@ -44,7 +44,7 @@ void lv_example_style_17(void)
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_obj_set_width(label, LV_PCT(80));
     lv_label_set_text(label, "LV_USE_DRAW_SW_COMPLEX_GRADIENTS is not enabled");
-    lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_label_set_long_mode(label, LV_LABEL_LONG_MODE_SCROLL_CIRCULAR);
     lv_obj_center(label);
 }
 

@@ -42,30 +42,26 @@ void lv_os_init(void)
 #endif /*LV_USE_OS != LV_OS_NONE*/
 }
 
+#if LV_USE_OS != LV_OS_NONE
+
 void lv_lock(void)
 {
-#if LV_USE_OS != LV_OS_NONE
     lv_mutex_lock(&lv_general_mutex);
-#endif /*LV_USE_OS != LV_OS_NONE*/
 }
 
 lv_result_t lv_lock_isr(void)
 {
-#if LV_USE_OS != LV_OS_NONE
     return lv_mutex_lock_isr(&lv_general_mutex);
-#else /*LV_USE_OS != LV_OS_NONE*/
-    return LV_RESULT_OK;
-#endif /*LV_USE_OS != LV_OS_NONE*/
 }
 
 void lv_unlock(void)
 {
-#if LV_USE_OS != LV_OS_NONE
     lv_mutex_unlock(&lv_general_mutex);
-#endif /*LV_USE_OS != LV_OS_NONE*/
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
+
+#endif /*LV_USE_OS != LV_OS_NONE*/

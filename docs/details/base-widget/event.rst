@@ -156,6 +156,14 @@ Drawing Events
 -  :cpp:enumerator:`LV_EVENT_DRAW_POST_END`: Finishing the post draw phase (when all children are drawn)
 -  :cpp:enumerator:`LV_EVENT_DRAW_TASK_ADDED`: Adding a draw task
 
+.. attention::
+
+    In drawing-event callback functions the rendering
+    sequence has already begun, and during this period, making changes to any
+    Widget's attributes, styles, or creating/deleting  widgets is forbidden.  If you attempt to do so, 
+    LVGL will generate an assertion failure with a message 
+    indicating that invalidating an area is not allowed during rendering.
+
 Special Events
 --------------
 
@@ -185,16 +193,7 @@ Other Events
 Display Events
 --------------
 
--  :cpp:enumerator:`LV_EVENT_INVALIDATE_AREA`
--  :cpp:enumerator:`LV_EVENT_RESOLUTION_CHANGED`
--  :cpp:enumerator:`LV_EVENT_COLOR_FORMAT_CHANGED`
--  :cpp:enumerator:`LV_EVENT_REFR_REQUEST`
--  :cpp:enumerator:`LV_EVENT_REFR_START`
--  :cpp:enumerator:`LV_EVENT_REFR_READY`
--  :cpp:enumerator:`LV_EVENT_RENDER_START`
--  :cpp:enumerator:`LV_EVENT_RENDER_READY`
--  :cpp:enumerator:`LV_EVENT_FLUSH_START`
--  :cpp:enumerator:`LV_EVENT_FLUSH_FINISH`
+.. include:: ../main-components/display/display_events_list.txt
 
 
 Custom Events

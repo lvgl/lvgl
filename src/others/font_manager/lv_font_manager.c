@@ -390,15 +390,11 @@ static void lv_font_manager_add_path_core(lv_font_manager_t * manager, const cha
         font_path->path = (char *)path;
     }
     else {
-        uint32_t name_len = lv_strlen(name) + 1;
-        font_path->name = lv_malloc(name_len);
+        font_path->name = lv_strdup(name);
         LV_ASSERT_MALLOC(font_path->name);
-        lv_memcpy(font_path->name, name, name_len);
 
-        uint32_t path_len = lv_strlen(path) + 1;
-        font_path->path = lv_malloc(path_len);
+        font_path->path = lv_strdup(path);
         LV_ASSERT_MALLOC(font_path->path);
-        lv_memcpy(font_path->path, path, path_len);
     }
 
     LV_LOG_INFO("name: %s, path: %s add success", name, path);
@@ -545,7 +541,7 @@ static const lv_font_refer_node_t * lv_font_manager_get_freetype_font(lv_font_ma
         return refer_node;
     }
 
-    /* not fount refer_node, start to create font */
+    /* not found refer_node, start to create font */
 
     lv_font_t * font = lv_font_manager_create_font_warpper(manager, ft_info);
 

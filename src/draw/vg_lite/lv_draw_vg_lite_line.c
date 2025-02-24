@@ -42,9 +42,10 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc)
+void lv_draw_vg_lite_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
 {
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
+
     float p1_x = dsc->p1.x;
     float p1_y = dsc->p1.y;
     float p2_x = dsc->p2.x;
@@ -61,13 +62,11 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
     rel_clip_area.y1 = (int32_t)(LV_MIN(p1_y, p2_y) - half_w);
     rel_clip_area.y2 = (int32_t)(LV_MAX(p1_y, p2_y) + half_w);
 
-    if(!lv_area_intersect(&rel_clip_area, &rel_clip_area, draw_unit->clip_area)) {
+    if(!lv_area_intersect(&rel_clip_area, &rel_clip_area, &t->clip_area)) {
         return; /*Fully clipped, nothing to do*/
     }
 
     LV_PROFILER_DRAW_BEGIN;
-
-    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)draw_unit;
 
     int32_t dash_width = dsc->dash_width;
     int32_t dash_gap = dsc->dash_gap;
@@ -87,7 +86,6 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
     }
 
     lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_FP32);
-    lv_vg_lite_path_set_quality(path, VG_LITE_MEDIUM);
     lv_vg_lite_path_set_bounding_box_area(path, &rel_clip_area);
 
     /* head point */
@@ -182,23 +180,13 @@ void lv_draw_vg_lite_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t *
 
     vg_lite_matrix_t matrix = u->global_matrix;
 
-    vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa, true);
-
-    vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
-
-    LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
-    LV_VG_LITE_ASSERT_PATH(vg_lite_path);
-    LV_VG_LITE_ASSERT_MATRIX(&matrix);
-
-    LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw");
-    LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
-                               &u->target_buffer,
-                               vg_lite_path,
-                               VG_LITE_FILL_EVEN_ODD,
-                               &matrix,
-                               VG_LITE_BLEND_SRC_OVER,
-                               color));
-    LV_PROFILER_DRAW_END_TAG("vg_lite_draw");
+    lv_vg_lite_draw(
+        &u->target_buffer,
+        lv_vg_lite_path_get_path(path),
+        VG_LITE_FILL_EVEN_ODD,
+        &matrix,
+        VG_LITE_BLEND_SRC_OVER,
+        lv_vg_lite_color(dsc->color, dsc->opa, true));
 
     lv_vg_lite_path_drop(u, path);
 

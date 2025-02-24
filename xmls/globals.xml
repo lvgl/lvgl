@@ -1,0 +1,225 @@
+<api>
+    <enumdef name="lv_style_state">
+        <enum name="default" help="Some help"/>
+        <enum name="pressed" help="Some help"/>
+        <enum name="checked" help="Some help"/>
+    </enumdef>
+    <enumdef name="lv_style_part">
+        <enum name="main" help="Some help"/>
+        <enum name="scrollbar" help="Some help"/>
+        <enum name="indicator" help="Some help"/>
+        <enum name="knob" help="Some help"/>
+    </enumdef>
+    <enumdef name="lv_align">
+        <enum name="default" help="Some help"/>
+        <enum name="top_left" help="Some help"/>
+        <enum name="top_mid" help="Some help"/>
+        <enum name="top_right" help="Some help"/>
+        <enum name="bottom_left" help="Some help"/>
+        <enum name="bottom_mid" help="Some help"/>
+        <enum name="bottom_right" help="Some help"/>
+        <enum name="left_mid" help="Some help"/>
+        <enum name="right_mid" help="Some help"/>
+        <enum name="center" help="Some help"/>
+    </enumdef>
+    <enumdef name="lv_dir">
+        <enum name="none" help="Some help"/>
+        <enum name="top" help="Some help"/>
+        <enum name="bottom" help="Some help"/>
+        <enum name="left" help="Some help"/>
+        <enum name="right" help="Some help"/>
+    </enumdef>
+    <enumdef name="lv_layout">
+        <enum name="none" help="Some help"/>
+        <enum name="flex" help="Some help"/>
+        <enum name="grid" help="Some help"/>
+    </enumdef>
+    <enumdef name="lv_flex_flow">
+            <enum name="row"            		help="In a row"/>
+            <enum name="row_wrap"       		help="In rows and wrap"/>
+            <enum name="row_reverse"    		help="In a row with reverse"/>
+            <enum name="row_wrap_reverse"   	help="In rows with wrap and reverse"/>
+            <enum name="column"         		help="In a column"/>
+            <enum name="column_wrap"    		help="In columns and wrap"/>
+            <enum name="column_reverse"         help="In a column with reverse"/>
+            <enum name="column_wrap_reverse"    help="In columns with wrap and reverse"/>
+    </enumdef>
+    <enumdef name="lv_flex_align">
+            <enum name="center"         help=""/>
+            <enum name="start"    		help=""/>
+            <enum name="end"       		help=""/>
+            <enum name="space_around"  	help=""/>
+            <enum name="space_between"  help=""/>
+             <enum name="space_evenly"  help=""/>
+    </enumdef>
+    <enumdef name="lv_grid_align">
+            <enum name="center"         help=""/>
+            <enum name="start"    		help=""/>
+            <enum name="end"       		help=""/>
+            <enum name="stretch"       		help=""/>
+            <enum name="space_around"  	help=""/>
+            <enum name="space_between"  help=""/>
+             <enum name="space_evenly"  help=""/>
+    </enumdef>
+    <enumdef name="lv_text_align">
+            <enum name="center"         help=""/>
+            <enum name="left"    		help=""/>
+            <enum name="right"       		help=""/>
+            <enum name="auto"  	help=""/>
+    </enumdef>
+    <enumdef name="lv_text_decor">
+            <enum name="none"         	help=""/>
+            <enum name="underline"    	help=""/>
+            <enum name="strikethrough"  help=""/>
+    </enumdef>
+    <enumdef name="lv_blend_mode">
+            <enum name="normal"         help=""/>
+            <enum name="additive"    	help=""/>
+            <enum name="subtractive"  	help=""/>
+            <enum name="multiply"  	  	help=""/>
+            <enum name="difference"  	help=""/>
+    </enumdef>
+    <enumdef name="lv_base_dir">
+            <enum name="ltr"    help=""/>
+            <enum name="rtl"    help=""/>
+            <enum name="auto"  	help=""/>
+    </enumdef>
+    <enumdef name="lv_grad_dir">
+            <enum name="none"  	help=""/>
+            <enum name="hor"    help=""/>
+            <enum name="ver"    help=""/>
+    </enumdef>
+    <enumdef name="lv_border_side">
+            <enum name="none"  		help=""/>
+            <enum name="left"    	help=""/>
+            <enum name="right"    	help=""/>
+            <enum name="top"    	help=""/>
+            <enum name="bottom"    	help=""/>
+            <enum name="full"    	help=""/>
+    </enumdef>
+
+   	<styledef>
+	    <prop name="x" type="coords"/>
+	    <prop name="y" type="coords"/>
+	    <prop name="height" type="coords"/>
+	    <prop name="width" type="coords"/>
+	    <prop name="length" type="coords"/>
+
+	    <prop name="pad_top" type="int"/>
+	    <prop name="pad_bottom" type="int"/>
+	    <prop name="pad_left" type="int"/>
+	    <prop name="pad_right" type="int"/>
+	    <prop name="pad_hor" type="int"/>
+	    <prop name="pad_ver" type="int"/>
+	    <prop name="pad_all" type="int"/>
+	    <prop name="pad_row" type="int"/>
+	    <prop name="pad_column" type="int"/>
+	    <prop name="pad_radial" type="int"/>
+	    <prop name="pad_radial" type="int"/>
+	    <prop name="margin_top" type="int"/>
+	    <prop name="margin_bottom" type="int"/>
+	    <prop name="margin_left" type="int"/>
+	    <prop name="margin_right" type="int"/>
+	    <prop name="margin_hor" type="int"/>
+	    <prop name="margin_ver" type="int"/>
+   	    <prop name="margin_all" type="int"/>
+
+	    <prop name="radius" type="int"/>
+   	    <prop name="radial_offset" type="int"/>
+	    <prop name="align" type="enum:lv_align"/>
+   	    <prop name="clip_corner" type="bool"/>
+	    <prop name="base_dir" type="enum:lv_base_dir"/>
+
+	    <prop name="bg_color" type="color"/>
+	    <prop name="bg_opa" type="int"/>
+	    <prop name="bg_grad_dir" type="enum:lv_grad_dir"/>
+	    <prop name="bg_main_stop" type="int"/>
+	    <prop name="bg_grad_stop" type="int"/>
+	    <prop name="bg_grad_color" type="color"/>
+
+	    <prop name="bg_image_src" type="image"/>
+	    <prop name="bg_image_tiled" type="bool"/>
+	    <prop name="bg_image_recolor" type="color"/>
+	    <prop name="bg_image_recolor_opa" type="int"/>
+
+	    <prop name="border_color" type="color"/>
+	    <prop name="border_width" type="int"/>
+	    <prop name="border_opa" type="int"/>
+	    <prop name="border_side" type="enum:lv_border_side"/>
+	    <prop name="border_post" type="bool"/>
+
+	    <prop name="outline_color" type="color"/>
+	    <prop name="outline_width" type="int"/>
+	    <prop name="outline_opa" type="int"/>
+	    <prop name="outline_pad" type="int"/>
+
+	    <prop name="shadow_width" type="int"/>
+	    <prop name="shadow_color" type="color"/>
+	    <prop name="shadow_opa" type="int"/>
+	    <prop name="shadow_offset_x" type="int"/>
+	    <prop name="shadow_offset_y" type="int"/>
+	    <prop name="shadow_spread" type="int"/>
+
+	    <prop name="text_color" type="color"/>
+	    <prop name="text_opa" type="int"/>
+	    <prop name="text_font" type="font"/>
+	    <prop name="text_align" type="enum:lv_text_align"/>
+	    <prop name="text_letter_space" type="int"/>
+	    <prop name="text_line_space" type="int"/>
+	    <prop name="text_decor" type="enum:lv_text_decor"/>
+
+	    <prop name="image_opa" type="int"/>
+	    <prop name="image_recolor" type="color"/>
+	    <prop name="image_recolor_opa" type="int"/>
+
+	    <prop name="line_width" type="int"/>
+	    <prop name="line_color" type="color"/>
+	    <prop name="line_opa" type="int"/>
+	    <prop name="line_dash_width" type="int"/>
+	    <prop name="line_dash_gap" type="int"/>
+	    <prop name="line_rounded" type="bool"/>
+
+	    <prop name="arc_width" type="int"/>
+	    <prop name="arc_color" type="color"/>
+	    <prop name="arc_opa" type="int"/>
+	    <prop name="arc_rounded" type="bool"/>
+	    <prop name="arc_image_src" type="image"/>
+
+	    <prop name="layout" type="enum:lv_layout"/>
+
+	    <prop name="flex_flow" type="enum:lv_flex_flow"/>
+	    <prop name="flex_main_place" type="enum:lv_flex_align"/>
+	    <prop name="flex_cross_place" type="enum:lv_flex_align"/>
+	    <prop name="flex_track_place" type="enum:lv_flex_align"/>
+	    <prop name="flex_grow" type="int"/>
+
+	    <prop name="grid_column_align" type="enum:lv_grid_align"/>
+	    <prop name="grid_row_align" type="enum:lv_grid_align"/>
+	    <prop name="grid_cell_column_pos" type="int"/>
+	    <prop name="grid_cell_column_span" type="int"/>
+	    <prop name="grid_cell_x_align" type="enum:lv_grid_align"/>
+	    <prop name="grid_cell_row_pos" type="int"/>
+	    <prop name="grid_cell_row_span" type="int"/>
+	    <prop name="grid_cell_y_align" type="enum:lv_grid_align"/>
+
+	    <prop name="opa" type="int"/>
+	    <prop name="opa_layered" type="int"/>
+	    <prop name="color_filter_opa" type="int"/>
+	    <prop name="anim_duration" type="int"/>
+	    <prop name="blend_mode" type="enum:lv_blend_mode"/>
+	    <prop name="transform_width" type="int"/>
+	    <prop name="transform_height" type="int"/>
+	    <prop name="translate_x" type="int"/>
+	    <prop name="translate_y" type="int"/>
+	    <prop name="translate_radial" type="int"/>
+	    <prop name="transform_scale_x" type="int"/>
+	    <prop name="transform_scale_y" type="int"/>
+	    <prop name="transform_rotation" type="int"/>
+	    <prop name="transform_pivot_x" type="int"/>
+	    <prop name="transform_pivot_y" type="int"/>
+	    <prop name="transform_skew_x" type="int"/>
+	    <prop name="transform_skew_y" type="int"/>
+	    <prop name="bitmap_mask_src" type="image"/>
+	    <prop name="rotary_sensitivity" type="int"/>
+	</styledef>
+</api>

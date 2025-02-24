@@ -20,8 +20,7 @@
  *********************/
 #include "../../lv_examples.h"
 
-#if LV_USE_GESTURE_RECOGNITION && \
-    LV_USE_FLOAT
+#if LV_USE_GESTURE_RECOGNITION && LV_BUILD_EXAMPLES
 
 /*********************
  *      DEFINES
@@ -67,7 +66,6 @@ static float label_y;
  */
 void lv_example_gestures(void)
 {
-    lv_obj_t * rectangle;
     lv_obj_t * root_view;
 
     label_width = RECT_INIT_WIDTH;
@@ -127,7 +125,7 @@ static void label_scale(lv_event_t * gesture_event)
         initial_w = -1;
         initial_h = -1;
 
-        LV_LOG_TRACE("label end scale: %g %d\n", scale, state);
+        LV_LOG_USER("label end scale: %g, state: %d", scale, state);
         return;
     }
 
@@ -137,10 +135,10 @@ static void label_scale(lv_event_t * gesture_event)
 
         /* Pinch gesture has been recognized - this is the first event in a series of recognized events */
         /* The scaling is applied relative to the original width/height of the rectangle */
-        initial_w = label_width;
-        initial_h = label_height;
+        initial_w = (int)label_width;
+        initial_h = (int)label_height;
 
-        LV_LOG_TRACE("label start scale: %g\n", scale);
+        LV_LOG_USER("label start scale: %g", scale);
     }
 
     /* The gesture has started or is on-going */
@@ -156,8 +154,8 @@ static void label_scale(lv_event_t * gesture_event)
     label_x = center_pnt.x - label_width / 2;
     label_y = center_pnt.y - label_height / 2;
 
-    LV_LOG_TRACE("label scale: %g label x: %g label y: %g w: %g h: %g\n",
-                 scale, label_x, label_y, label_width, label_height);
+    LV_LOG_USER("label scale: %g label x: %g label y: %g w: %g h: %g",
+                scale, label_x, label_y, label_width, label_height);
 
     /* Update position and size */
     lv_style_set_width(&label_style, (int)label_width);
@@ -185,7 +183,7 @@ static void label_move(lv_event_t * event)
         return;
     }
 
-    LV_LOG_TRACE("label move %p x: %d y: %d\n", event, pnt.x, pnt.y);
+    LV_LOG_USER("label move x: %d, y: %d", pnt.x, pnt.y);
 
     label_x = pnt.x - label_width / 2;
     label_y = pnt.y - label_height / 2;

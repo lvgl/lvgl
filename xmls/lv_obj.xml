@@ -1,0 +1,92 @@
+<!--
+Example
+<lv_obj width="100" hidden="true"/>
+ -->
+
+<widget>
+	<api>
+	    <prop name="name" type="string"/>
+	    <prop name="store" type="bool"/>
+	    <prop name="x" type="coords"/>
+	    <prop name="y" type="coords"/>
+	    <prop name="height" type="coords"/>
+	    <prop name="width" type="coords"/>
+	    <prop name="align" type="enum:lv_align"/>
+	    <prop name="styles"  type="styles[]"/>
+
+	    <prop name="style_x" type="coords"/>
+	    <prop name="style_y" type="coords"/>
+	    <prop name="style_height" type="coords"/>
+	    <prop name="style_width" type="coords"/>
+	    <prop name="style_align" type="enum:lv_align"/>
+	    <prop name="style_radius" type="int"/>
+	    <prop name="style_bg_color" type="color"/>
+	    <prop name="style_bg_opa" type="int"/>
+	    <prop name="style_bg_image_src" type="image"/>
+	    <prop name="style_bg_image_tiled" type="bool"/>
+	    <prop name="style_border_color" type="color"/>
+	    <prop name="style_border_width" type="int"/>
+	    <prop name="style_border_opa" type="int"/>
+	    <prop name="style_outline_color" type="color"/>
+	    <prop name="style_outline_width" type="int"/>
+	    <prop name="style_outline_opa" type="int"/>
+	    <prop name="style_outline_pad" type="int"/>
+	    <prop name="style_text_color" type="color"/>
+	    <prop name="style_text_font" type="font"/>
+	    <prop name="style_text_align" type="enum:lv_text_align"/>
+	    <prop name="style_shadow_width" type="int"/>
+	    <prop name="style_shadow_color" type="color"/>
+	    <prop name="style_shadow_opa" type="int"/>
+	    <prop name="style_shadow_offset_x" type="int"/>
+	    <prop name="style_shadow_offset_y" type="int"/>
+	    <prop name="style_shadow_spread" type="int"/>
+	    <prop name="style_pad_top" type="int"/>
+	    <prop name="style_pad_bottom" type="int"/>
+	    <prop name="style_pad_left" type="int"/>
+	    <prop name="style_pad_right" type="int"/>
+	    <prop name="style_pad_hor" type="int"/>
+	    <prop name="style_pad_ver" type="int"/>
+	    <prop name="style_pad_all" type="int"/>
+	    <prop name="style_pad_row" type="int"/>
+	    <prop name="style_pad_column" type="int"/>
+	    <prop name="style_margin_top" type="int"/>
+	    <prop name="style_margin_bottom" type="int"/>
+	    <prop name="style_margin_left" type="int"/>
+	    <prop name="style_margin_right" type="int"/>
+	    <prop name="style_margin_hor" type="int"/>
+	    <prop name="style_margin_ver" type="int"/>
+	    <prop name="style_margin_all" type="int"/>
+	    <prop name="style_layout" type="enum:lv_layout"/>
+	    <prop name="style_flex_flow" type="enum:lv_flex_flow"/>
+	    <prop name="style_flex_main_place" type="enum:lv_flex_align"/>
+	    <prop name="style_flex_cross_place" type="enum:lv_flex_align"/>
+	    <prop name="style_flex_track_place" type="enum:lv_flex_align"/>
+
+	    <prop name="flex_grow" type="int"/>
+	    <prop name="flex_flow" type="enum:lv_flex_flow"/>
+
+	    <prop name="hidden" type="flag:flag"/>
+	    <prop name="clickable" type="flag:flag"/>
+	    <prop name="click_focusable" type="flag:flag"/>
+	    <prop name="checkable" type="flag:flag"/>
+	    <prop name="scrollable" type="flag:flag"/>
+	    <prop name="scroll_elastic" type="flag:flag"/>
+	    <prop name="scroll_momentum" type="flag:flag"/>
+	    <prop name="scroll_one" type="flag:flag"/>
+	    <prop name="scroll_chain_hor" type="flag:flag"/>
+	    <prop name="scroll_chain_ver" type="flag:flag"/>
+	    <prop name="scroll_chain" type="flag:flag"/>
+	    <prop name="scroll_on_focus" type="flag:flag"/>
+	    <prop name="scroll_with_arrow" type="flag:flag"/>
+	    <prop name="snappable" type="flag:flag"/>
+	    <prop name="press_lock" type="flag:flag"/>
+	    <prop name="event_bubble" type="flag:flag"/>
+	    <prop name="gesture_bubble" type="flag:flag"/>
+	    <prop name="adv_hittest" type="flag:flag"/>
+	    <prop name="ignore_layout" type="flag:flag"/>
+	    <prop name="floating" type="flag:flag"/>
+	    <prop name="send_draw_task_events" type="flag:flag"/>
+	    <prop name="overflow_visible" type="flag:flag"/>
+	    <prop name="flex_in_new_track" type="flag:flag"/>
+	</api>
+</widget>

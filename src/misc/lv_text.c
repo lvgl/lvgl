@@ -195,7 +195,7 @@ bool lv_text_is_cmd(lv_text_cmd_state_t * state, uint32_t c)
  * @param max_width max width of the text (break the lines to fit this size). Set COORD_MAX to avoid line breaks
  * @param flags settings for the text from 'txt_flag_type' enum
  * @param[out] word_w_ptr width (in pixels) of the parsed word. May be NULL.
- * @param cmd_state Pointer to a lv_text_cmd_state_t variable which stored the current state of command proocessing
+ * @param cmd_state Pointer to a lv_text_cmd_state_t variable which stored the current state of command processing
  * @return the index of the first char of the next word (in byte index not letter index. With UTF-8 they are different)
  */
 static uint32_t lv_text_get_next_word(const char * txt, const lv_font_t * font,
@@ -429,7 +429,7 @@ int32_t lv_text_get_width_with_flags(const char * txt, uint32_t length, const lv
     lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
 
     if(length != 0) {
-        while(i < length) {
+        while(txt[i] != '\0' && i < length) {
             uint32_t letter;
             uint32_t letter_next;
             lv_text_encoded_letter_next_2(txt, &letter, &letter_next, &i);
@@ -648,6 +648,11 @@ static uint32_t lv_text_utf8_next(const char * txt, uint32_t * i)
     /*Dummy 'i' pointer is required*/
     uint32_t i_tmp = 0;
     if(i == NULL) i = &i_tmp;
+
+    /* Ensure the string is not null */
+    if(txt == NULL || txt[*i] == '\0') {
+        return result;
+    }
 
     /*Normal ASCII*/
     if(LV_IS_ASCII(txt[*i])) {

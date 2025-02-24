@@ -16,6 +16,22 @@ if sys.version_info < (3,6,0):
   print("Python >=3.6 is required", file=sys.stderr)
   exit(1)
 
+def check_for_tabs(file_path):
+    errors = []
+    with open(file_path, 'r') as file:
+        for line_number, line in enumerate(file, 1):
+            if '\t' in line:
+                errors.append(f" {file_path}:{line_number}")
+
+    if errors:
+        print(f"Tabs found in the following files:", file=sys.stderr)
+        for error in errors:
+            print(error, file=sys.stderr)
+        print("Please replace tabs with spaces.", file=sys.stderr)
+        exit(1)
+
+check_for_tabs(LV_CONF_TEMPLATE)
+
 fin = open(LV_CONF_TEMPLATE)
 fout = open(LV_CONF_INTERNAL, "w", newline='')
 
@@ -38,6 +54,7 @@ fout.write(
 #define LV_OS_RTTHREAD      4
 #define LV_OS_WINDOWS       5
 #define LV_OS_MQX           6
+#define LV_OS_SDL2          7
 #define LV_OS_CUSTOM        255
 
 #define LV_STDLIB_BUILTIN           0
@@ -116,9 +133,9 @@ for line in fin.read().splitlines():
     indent = r[1]
 
     name = r[3]
-    name = re.sub('\(.*?\)', '', name, 1)    #remove parentheses from macros. E.g. MY_FUNC(5) -> MY_FUNC
+    name = re.sub(r'\(.*?\)', '', name, 1)    #remove parentheses from macros. E.g. MY_FUNC(5) -> MY_FUNC
 
-    line = re.sub('[\s]*', '', line, 1)
+    line = re.sub(r'[\s]*', '', line, 1)
 
     #If the value should be 1 (enabled) by default use a more complex structure for Kconfig checks because
     #if a not defined CONFIG_... value should be interpreted as 0 and not the LVGL default
@@ -167,6 +184,9 @@ r'''
 /*----------------------------------
  * End of parsing lv_conf_template.h
  -----------------------------------*/
+
+/*Fix inconsistent name*/
+#define LV_USE_ANIMIMAGE LV_USE_ANIMIMG
 
 #ifndef __ASSEMBLY__
 LV_EXPORT_CONST_INT(LV_DPI_DEF);

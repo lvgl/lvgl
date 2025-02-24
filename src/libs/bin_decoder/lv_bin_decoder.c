@@ -275,13 +275,20 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             }
         }
         else if(LV_COLOR_FORMAT_IS_ALPHA_ONLY(cf)) {
-            /*Alpha only image will need decoder data to store pointer to decoded image, to free it when decoder closes*/
-            decoder_data_t * decoder_data = get_decoder_data(dsc);
-            if(decoder_data == NULL) {
-                return LV_RESULT_INVALID;
+            if(cf == LV_COLOR_FORMAT_A8) {
+                res = LV_RESULT_OK;
+                use_directly = true;
+                dsc->decoded = (lv_draw_buf_t *)image;
             }
+            else {
+                /*Alpha only image will need decoder data to store pointer to decoded image, to free it when decoder closes*/
+                decoder_data_t * decoder_data = get_decoder_data(dsc);
+                if(decoder_data == NULL) {
+                    return LV_RESULT_INVALID;
+                }
 
-            res = decode_alpha_only(decoder, dsc);
+                res = decode_alpha_only(decoder, dsc);
+            }
         }
         else {
             /*In case of uncompressed formats the image stored in the ROM/RAM.
@@ -831,6 +838,12 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
     uint32_t rn;
     decoder_data_t * decoder_data = dsc->user_data;
     uint8_t bpp = lv_color_format_get_bpp(dsc->header.cf);
+
+    if(bpp == 0) {
+        LV_LOG_ERROR("Error color format: %d", dsc->header.cf);
+        return LV_RESULT_INVALID;
+    }
+
     uint32_t w = (dsc->header.stride * 8) / bpp;
     uint32_t buf_stride = (w * 8 + 7) >> 3; /*stride for img_data*/
     uint32_t buf_len = w * dsc->header.h; /*always decode to A8 format*/

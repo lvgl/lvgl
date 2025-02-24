@@ -105,17 +105,19 @@ void lv_sysmon_show_performance(lv_display_t * disp)
         return;
     }
 
-    disp->perf_label = lv_sysmon_create(disp);
     if(disp->perf_label == NULL) {
-        LV_LOG_WARN("Couldn't create sysmon");
-        return;
-    }
+        disp->perf_label = lv_sysmon_create(disp);
+        if(disp->perf_label == NULL) {
+            LV_LOG_WARN("Couldn't create sysmon");
+            return;
+        }
 
-    lv_subject_init_pointer(&disp->perf_sysmon_backend.subject, &disp->perf_sysmon_info);
-    lv_obj_align(disp->perf_label, LV_USE_PERF_MONITOR_POS, 0, 0);
-    lv_subject_add_observer_obj(&disp->perf_sysmon_backend.subject, perf_observer_cb, disp->perf_label, NULL);
-    disp->perf_sysmon_backend.timer = lv_timer_create(perf_update_timer_cb, LV_SYSMON_REFR_PERIOD_DEF, disp);
-    lv_display_add_event_cb(disp, perf_monitor_disp_event_cb, LV_EVENT_ALL, NULL);
+        lv_subject_init_pointer(&disp->perf_sysmon_backend.subject, &disp->perf_sysmon_info);
+        lv_obj_align(disp->perf_label, LV_USE_PERF_MONITOR_POS, 0, 0);
+        lv_subject_add_observer_obj(&disp->perf_sysmon_backend.subject, perf_observer_cb, disp->perf_label, NULL);
+        disp->perf_sysmon_backend.timer = lv_timer_create(perf_update_timer_cb, LV_SYSMON_REFR_PERIOD_DEF, disp);
+        lv_display_add_event_cb(disp, perf_monitor_disp_event_cb, LV_EVENT_ALL, NULL);
+    }
 
 #if LV_USE_PERF_MONITOR_LOG_MODE
     lv_obj_add_flag(disp->perf_label, LV_OBJ_FLAG_HIDDEN);
@@ -147,14 +149,16 @@ void lv_sysmon_show_memory(lv_display_t * disp)
         return;
     }
 
-    disp->mem_label = lv_sysmon_create(disp);
     if(disp->mem_label == NULL) {
-        LV_LOG_WARN("Couldn't create sysmon");
-        return;
-    }
+        disp->mem_label = lv_sysmon_create(disp);
+        if(disp->mem_label == NULL) {
+            LV_LOG_WARN("Couldn't create sysmon");
+            return;
+        }
 
-    lv_obj_align(disp->mem_label, LV_USE_MEM_MONITOR_POS, 0, 0);
-    lv_subject_add_observer_obj(&sysmon_mem.subject, mem_observer_cb, disp->mem_label, NULL);
+        lv_obj_align(disp->mem_label, LV_USE_MEM_MONITOR_POS, 0, 0);
+        lv_subject_add_observer_obj(&sysmon_mem.subject, mem_observer_cb, disp->mem_label, NULL);
+    }
 
     lv_obj_remove_flag(disp->mem_label, LV_OBJ_FLAG_HIDDEN);
 }
@@ -240,7 +244,7 @@ static void perf_update_timer_cb(lv_timer_t * t)
 
     uint32_t time_since_last_report = lv_tick_elaps(info->measured.last_report_timestamp);
     lv_timer_t * disp_refr_timer = lv_display_get_refr_timer(NULL);
-    uint32_t disp_refr_period = disp_refr_timer->period;
+    uint32_t disp_refr_period = disp_refr_timer ? disp_refr_timer->period : LV_DEF_REFR_PERIOD;
 
     info->calculated.fps = info->measured.refr_interval_sum ? (1000 * info->measured.refr_cnt / time_since_last_report) : 0;
     info->calculated.fps = LV_MIN(info->calculated.fps,
@@ -277,11 +281,10 @@ static void perf_update_timer_cb(lv_timer_t * t)
 
 static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    lv_obj_t * label = lv_observer_get_target(observer);
     const lv_sysmon_perf_info_t * perf = lv_subject_get_pointer(subject);
 
 #if LV_USE_PERF_MONITOR_LOG_MODE
-    LV_UNUSED(label);
+    LV_UNUSED(observer);
     LV_LOG("sysmon: "
            "%" LV_PRIu32 " FPS (refr_cnt: %" LV_PRIu32 " | redraw_cnt: %" LV_PRIu32"), "
            "refr %" LV_PRIu32 "ms (render %" LV_PRIu32 "ms | flush %" LV_PRIu32 "ms), "
@@ -290,6 +293,7 @@ static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
            perf->calculated.refr_avg_time, perf->calculated.render_avg_time, perf->calculated.flush_avg_time,
            perf->calculated.cpu);
 #else
+    lv_obj_t * label = lv_observer_get_target(observer);
     lv_label_set_text_fmt(
         label,
         "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU\n"

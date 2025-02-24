@@ -20,24 +20,11 @@
 #include "lv_vg_lite_grad.h"
 #include "lv_vg_lite_stroke.h"
 #include <float.h>
+#include <math.h>
 
 /*********************
  *      DEFINES
  *********************/
-
-#if LV_USE_VG_LITE_THORVG
-    /**
-    * It is found that thorvg cannot handle large coordinates well.
-    * When the coordinates are larger than 4096, the calculation of tvgSwRle module will overflow in 32-bit system.
-    * So we use FLT_MAX and FLT_MIN to write the mark to bounding_box to tell vg_lite_tvg not to add clip path to the current path.
-    */
-    #define PATH_COORD_MAX FLT_MAX
-    #define PATH_COORD_MIN FLT_MIN
-#else
-    /*  18 bits is enough to represent the coordinates of path bounding box */
-    #define PATH_COORD_MAX (1 << 18)
-    #define PATH_COORD_MIN (-PATH_COORD_MAX)
-#endif
 
 /**********************
  *      TYPEDEFS
@@ -67,8 +54,7 @@ static vg_lite_fill_t lv_fill_to_vg(lv_vector_fill_t fill_rule);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-void lv_draw_vg_lite_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_task_dsc_t * dsc)
+void lv_draw_vg_lite_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc)
 {
     if(dsc->task_list == NULL)
         return;
@@ -77,8 +63,10 @@ void lv_draw_vg_lite_vector(lv_draw_unit_t * draw_unit, const lv_draw_vector_tas
     if(layer->draw_buf == NULL)
         return;
 
+    lv_draw_vg_lite_unit_t * u = (lv_draw_vg_lite_unit_t *)t->draw_unit;
+
     LV_PROFILER_DRAW_BEGIN;
-    lv_vector_for_each_destroy_tasks(dsc->task_list, task_draw_cb, draw_unit);
+    lv_vector_for_each_destroy_tasks(dsc->task_list, task_draw_cb, u);
     LV_PROFILER_DRAW_END;
 }
 
@@ -110,7 +98,11 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
         vg_lite_rectangle_t rect;
         lv_vg_lite_rect(&rect, &dsc->scissor_area);
         LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_clear");
-        LV_VG_LITE_CHECK_ERROR(vg_lite_clear(&u->target_buffer, &rect, c));
+        LV_VG_LITE_CHECK_ERROR(vg_lite_clear(&u->target_buffer, &rect, c), {
+            lv_vg_lite_buffer_dump_info(&u->target_buffer);
+            LV_LOG_ERROR("rect: X%d Y%d W%d H%d", rect.x, rect.y, rect.width, rect.height);
+            lv_vg_lite_color_dump_info(c);
+        });
         LV_PROFILER_DRAW_END_TAG("vg_lite_clear");
         LV_PROFILER_DRAW_END;
         return;
@@ -171,7 +163,7 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
         vg_lite_path_t * vg_path = lv_vg_lite_path_get_path(stroke_path);
 
         /* set stroke params */
-        LV_VG_LITE_CHECK_ERROR(vg_lite_set_path_type(vg_path, path_type));
+        LV_VG_LITE_CHECK_ERROR(vg_lite_set_path_type(vg_path, path_type), {});
         vg_path->stroke_color = lv_color32_to_vg(dsc->stroke_dsc.color, dsc->stroke_dsc.opa);
         vg_path->quality = ori_vg_path->quality;
         lv_memcpy(vg_path->bounding_box, ori_vg_path->bounding_box, sizeof(ori_vg_path->bounding_box));
@@ -222,15 +214,13 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     switch(dsc->fill_dsc.style) {
         case LV_VECTOR_DRAW_STYLE_SOLID: {
                 /* normal draw shape */
-                LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw");
-                LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
-                                           &u->target_buffer,
-                                           vg_path,
-                                           fill,
-                                           &matrix,
-                                           blend,
-                                           vg_color));
-                LV_PROFILER_DRAW_END_TAG("vg_lite_draw");
+                lv_vg_lite_draw(
+                    &u->target_buffer,
+                    vg_path,
+                    fill,
+                    &matrix,
+                    blend,
+                    vg_color);
             }
             break;
         case LV_VECTOR_DRAW_STYLE_PATTERN: {
@@ -240,7 +230,12 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
                 if(lv_vg_lite_buffer_open_image(&image_buffer, &decoder_dsc, dsc->fill_dsc.img_dsc.src, false, true)) {
                     /* Calculate pattern matrix. Should start from path bond box, and also apply fill matrix. */
                     lv_matrix_t m = dsc->matrix;
-                    lv_matrix_translate(&m, min_x, min_y);
+
+                    if(dsc->fill_dsc.fill_units == LV_VECTOR_FILL_UNITS_OBJECT_BOUNDING_BOX) {
+                        /* Convert to object bounding box coordinates */
+                        lv_matrix_translate(&m, min_x, min_y);
+                    }
+
                     lv_matrix_multiply(&m, &dsc->fill_dsc.matrix);
 
                     vg_lite_matrix_t pattern_matrix;
@@ -248,22 +243,18 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
 
                     vg_lite_color_t recolor = lv_vg_lite_image_recolor(&image_buffer, &dsc->fill_dsc.img_dsc);
 
-                    LV_VG_LITE_ASSERT_MATRIX(&pattern_matrix);
-
-                    LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw_pattern");
-                    LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
-                                               &u->target_buffer,
-                                               vg_path,
-                                               fill,
-                                               &matrix,
-                                               &image_buffer,
-                                               &pattern_matrix,
-                                               blend,
-                                               VG_LITE_PATTERN_COLOR,
-                                               vg_color,
-                                               recolor,
-                                               VG_LITE_FILTER_BI_LINEAR));
-                    LV_PROFILER_DRAW_END_TAG("vg_lite_draw_pattern");
+                    lv_vg_lite_draw_pattern(
+                        &u->target_buffer,
+                        vg_path,
+                        fill,
+                        &matrix,
+                        &image_buffer,
+                        &pattern_matrix,
+                        blend,
+                        VG_LITE_PATTERN_COLOR,
+                        0,
+                        recolor,
+                        VG_LITE_FILTER_BI_LINEAR);
 
                     lv_vg_lite_pending_add(u->image_dsc_pending, &decoder_dsc);
                 }
@@ -346,53 +337,65 @@ static void lv_path_to_vg(lv_vg_lite_path_t * dest, const lv_vector_path_t * src
         if((point)->y > max_y) max_y = (point)->y;  \
     } while(0)
 
-    uint32_t pidx = 0;
-    lv_vector_path_op_t * op = lv_array_front(&src->ops);
-    uint32_t size = lv_array_size(&src->ops);
-    for(uint32_t i = 0; i < size; i++) {
-        switch(op[i]) {
+#define COPY_POINT_NEXT()        \
+    do {                         \
+        CMP_BOUNDS(point);       \
+        *path_data++ = point->x; \
+        *path_data++ = point->y; \
+        point++;                 \
+    } while(0)
+
+    const lv_vector_path_op_t * ops = lv_array_front(&src->ops);
+    const lv_fpoint_t * point = lv_array_front(&src->points);
+    const uint32_t op_size = lv_array_size(&src->ops);
+    const uint32_t point_size = lv_array_size(&src->points);
+    const uint32_t path_length = (op_size + point_size * 2) * sizeof(float);
+
+    /* Reserved memory for path data */
+    lv_vg_lite_path_reserve_space(dest, path_length);
+    vg_lite_path_t * vg_path = lv_vg_lite_path_get_path(dest);
+    vg_path->path_length = path_length;
+    float * path_data = vg_path->path;
+
+    for(uint32_t i = 0; i < op_size; i++) {
+        switch(ops[i]) {
             case LV_VECTOR_PATH_OP_MOVE_TO: {
-                    const lv_fpoint_t * pt = lv_array_at(&src->points, pidx);
-                    CMP_BOUNDS(pt);
-                    lv_vg_lite_path_move_to(dest, pt->x, pt->y);
-                    pidx += 1;
+                    LV_VG_LITE_PATH_SET_OP_CODE(path_data++, uint32_t, VLC_OP_MOVE);
+                    COPY_POINT_NEXT();
                 }
                 break;
             case LV_VECTOR_PATH_OP_LINE_TO: {
-                    const lv_fpoint_t * pt = lv_array_at(&src->points, pidx);
-                    CMP_BOUNDS(pt);
-                    lv_vg_lite_path_line_to(dest, pt->x, pt->y);
-                    pidx += 1;
+                    LV_VG_LITE_PATH_SET_OP_CODE(path_data++, uint32_t, VLC_OP_LINE);
+                    COPY_POINT_NEXT();
                 }
                 break;
             case LV_VECTOR_PATH_OP_QUAD_TO: {
-                    const lv_fpoint_t * pt1 = lv_array_at(&src->points, pidx);
-                    const lv_fpoint_t * pt2 = lv_array_at(&src->points, pidx + 1);
-                    CMP_BOUNDS(pt1);
-                    CMP_BOUNDS(pt2);
-                    lv_vg_lite_path_quad_to(dest, pt1->x, pt1->y, pt2->x, pt2->y);
-                    pidx += 2;
+                    LV_VG_LITE_PATH_SET_OP_CODE(path_data++, uint32_t, VLC_OP_QUAD);
+                    COPY_POINT_NEXT();
+                    COPY_POINT_NEXT();
                 }
                 break;
             case LV_VECTOR_PATH_OP_CUBIC_TO: {
-                    const lv_fpoint_t * pt1 = lv_array_at(&src->points, pidx);
-                    const lv_fpoint_t * pt2 = lv_array_at(&src->points, pidx + 1);
-                    const lv_fpoint_t * pt3 = lv_array_at(&src->points, pidx + 2);
-                    CMP_BOUNDS(pt1);
-                    CMP_BOUNDS(pt2);
-                    CMP_BOUNDS(pt3);
-                    lv_vg_lite_path_cubic_to(dest, pt1->x, pt1->y, pt2->x, pt2->y, pt3->x, pt3->y);
-                    pidx += 3;
+                    LV_VG_LITE_PATH_SET_OP_CODE(path_data++, uint32_t, VLC_OP_CUBIC);
+                    COPY_POINT_NEXT();
+                    COPY_POINT_NEXT();
+                    COPY_POINT_NEXT();
                 }
                 break;
             case LV_VECTOR_PATH_OP_CLOSE: {
-                    lv_vg_lite_path_close(dest);
+                    LV_VG_LITE_PATH_SET_OP_CODE(path_data++, uint32_t, VLC_OP_CLOSE);
                 }
+                break;
+            default:
+                LV_LOG_WARN("unknown op: %d", ops[i]);
                 break;
         }
     }
 
-    lv_vg_lite_path_set_bounding_box(dest, min_x, min_y, max_x, max_y);
+    LV_ASSERT_MSG((lv_uintptr_t)path_data - (lv_uintptr_t)vg_path->path == path_length, "path length overflow");
+
+    lv_vg_lite_path_set_bounding_box(dest, lroundf(min_x), lroundf(min_y),
+                                     lroundf(max_x), lroundf(max_y));
     LV_PROFILER_DRAW_END;
 }
 

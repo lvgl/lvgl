@@ -4,6 +4,13 @@ on:
     branches:
     - master
     - 'release/*'
+
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+# Ensure that only one commit will be running tests at a time on each PR
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
 env:
   EM_VERSION: 2.0.4
   EM_CACHE_FOLDER: 'emsdk-cache'
@@ -57,32 +64,32 @@ jobs:
       - name: Build examples (with cache)
         run: scripts/build_html_examples.sh
       - name: Build docs
-        run: docs/build.py skip_latex
+        run: docs/build.py html
       - name: Remove .doctrees
-        run: rm -rf out_html/.doctrees
+        run: rm -rf docs/output/html/.doctrees
       - name: Retrieve version
         run: |
           echo "::set-output name=VERSION_NAME::$(scripts/find_version.sh)"
         id: version
       - name: Deploy to subfolder
-        uses: JamesIves/github-pages-deploy-action@v4.6.8
+        uses: JamesIves/github-pages-deploy-action@v4.7.2
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
           repository-name: lvgl/docs
           branch: gh-pages # The branch the action should deploy to.
-          folder: out_html  # The folder the action should deploy.
+          folder: docs/output/html  # The folder the action should deploy.
           target-folder: ${{ steps.version.outputs.VERSION_NAME }}
           git-config-name: lvgl-bot
           git-config-email: lvgl-bot@users.noreply.github.com
           single-commit: true
       - name: Deploy to master
         if: github.ref == 'refs/heads/master'
-        uses: JamesIves/github-pages-deploy-action@v4.6.8
+        uses: JamesIves/github-pages-deploy-action@v4.7.2
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
           repository-name: lvgl/docs
           branch: gh-pages # The branch the action should deploy to.
-          folder: out_html  # The folder the action should deploy.
+          folder: docs/output/html  # The folder the action should deploy.
           target-folder: master
           git-config-name: lvgl-bot
           git-config-email: lvgl-bot@users.noreply.github.com

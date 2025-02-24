@@ -31,9 +31,11 @@ Parts and Styles
 The calendar Widget uses the :ref:`Button Matrix <lv_buttonmatrix>`
 Widget under the hood to arrange the days into a matrix.
 
-- :cpp:enumerator:`LV_PART_MAIN` Calendar background. Uses all the background-related style properties.
-- :cpp:enumerator:`LV_PART_ITEMS` Refers to dates and day names. Button matrix control flags are set to differentiate the
-  buttons and a custom drawer event is added modify the properties of the buttons as follows:
+- :cpp:enumerator:`LV_PART_MAIN` Calendar background. Uses the :ref:`typical
+  background style properties <typical bg props>`.
+- :cpp:enumerator:`LV_PART_ITEMS` Refers to dates and day names. Button matrix
+  control flags are set to differentiate the buttons and a custom drawer event is
+  added to modify the properties of the buttons as follows:
 
   - day names have no border, no background and are drawn with a gray color
   - days of the previous and next month have the :cpp:enumerator:`LV_BUTTONMATRIX_CTRL_DISABLED` flag

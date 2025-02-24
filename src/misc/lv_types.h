@@ -121,6 +121,8 @@ typedef struct _lv_image_decoder_t lv_image_decoder_t;
 
 typedef struct _lv_image_decoder_dsc_t lv_image_decoder_dsc_t;
 
+typedef struct _lv_draw_image_dsc_t lv_draw_image_dsc_t;
+
 typedef struct _lv_fragment_t lv_fragment_t;
 typedef struct _lv_fragment_class_t lv_fragment_class_t;
 typedef struct _lv_fragment_managed_states_t lv_fragment_managed_states_t;
@@ -150,8 +152,6 @@ typedef struct _lv_image_cache_data_t lv_image_cache_data_t;
 typedef struct _lv_image_header_cache_data_t lv_image_header_cache_data_t;
 
 typedef struct _lv_draw_mask_t lv_draw_mask_t;
-
-typedef struct _lv_grad_t lv_grad_t;
 
 typedef struct _lv_draw_label_hint_t lv_draw_label_hint_t;
 
@@ -347,6 +347,15 @@ typedef struct _lv_sysmon_perf_info_t lv_sysmon_perf_info_t;
 #endif /*LV_USE_PERF_MONITOR*/
 
 #endif /*LV_USE_SYSMON*/
+
+
+typedef struct _lv_xml_component_ctx_t lv_xml_component_ctx_t;
+
+typedef struct _lv_xml_parser_state_t lv_xml_parser_state_t;
+
+#if LV_USE_EVDEV
+typedef struct _lv_evdev_discovery_t lv_evdev_discovery_t;
+#endif
 
 #endif /*__ASSEMBLY__*/
 

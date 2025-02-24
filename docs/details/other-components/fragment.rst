@@ -18,19 +18,21 @@ Such concept also has some similarities to `UiViewController on
 iOS <https://developer.apple.com/documentation/uikit/uiviewcontroller>`__.
 
 Fragment Manager is a manager holding references to fragments attached
-to it, and has an internal stack to achieve navigation. You can use
-fragment manager to build navigation stack, or multi pane application
+to it, and has an internal stack to achieve forward and backwards navigation. You can use
+fragment manager to build a navigation stack, or a multi-pane application
 easily.
+
+
 
 .. _fragment_usage:
 
 Usage
------
+*****
 
 Enable :c:macro:`LV_USE_FRAGMENT` in ``lv_conf.h``.
 
 Create Fragment Class
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 .. code-block:: c
 
@@ -51,7 +53,7 @@ Create Fragment Class
    };
 
 Use ``lv_fragment_manager``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 .. code-block:: c
 
@@ -61,7 +63,7 @@ Use ``lv_fragment_manager``
    lv_fragment_manager_replace(manager, &sample_cls, init_argument);
 
 Fragment Based Navigation
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 .. code-block:: c
 
@@ -73,14 +75,18 @@ Fragment Based Navigation
    /* Remove the top most fragment from the stack, and bring back previous one. */
    lv_fragment_manager_pop(manager);
 
+
+
 .. _fragment_example:
 
 Example
--------
+*******
 
 .. include:: ../../examples/others/fragment/index.rst
+
+
 
 .. _fragment_api:
 
 API
----
+***

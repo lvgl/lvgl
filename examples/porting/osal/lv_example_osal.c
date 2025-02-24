@@ -9,7 +9,7 @@
 #include "../../lv_examples.h"
 
 #if LV_BUILD_EXAMPLES
-#include "../../../src/osal/lv_os.h"
+#include "../../../lvgl_private.h"
 
 /*********************
  *      DEFINES
@@ -51,7 +51,8 @@ void lv_example_osal(void)
         LV_LOG_ERROR("Error initializing thread sync");
     }
 
-    if(lv_thread_init(&increment_thread, LV_THREAD_PRIO_MID, increment_thread_entry, 2048, NULL) != LV_RESULT_OK) {
+    if(lv_thread_init(&increment_thread, "inc_th", LV_THREAD_PRIO_MID, increment_thread_entry, 2048,
+                      NULL) != LV_RESULT_OK) {
         LV_LOG_ERROR("Error initializing thread");
     }
 }

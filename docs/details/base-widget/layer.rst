@@ -9,10 +9,9 @@ things:
 
 1.  for Widgets, the :ref:`layers_creation` creates a natural layering of Widgets;
 2.  in the context of pixel rendering (drawing), there are :ref:`draw_layers`;
-3.  permanent :ref:`screen_layers` are part of each :ref:`display` object, and
-    are covered :ref:`here <screen_layers>`
+3.  permanent :ref:`display_screen_layers` are part of each :ref:`display` object.
 
-#1 and #2 are covered below.
+#1 and #2 are covered below.  #3 is covered in :ref:`display_screen_layers`.
 
 
 
@@ -33,22 +32,21 @@ its children.
 .. code-block:: c
 
    /* Create a screen */
-   lv_obj_t * scr = lv_obj_create(NULL, NULL);
+   lv_obj_t * scr = lv_obj_create(NULL);
    lv_screen_load(scr);          /* Load the screen */
 
    /* Create 2 buttons */
-   lv_obj_t * btn1 = lv_button_create(scr, NULL);     /* Create a button on the screen */
-   lv_button_set_fit(btn1, true, true);               /* Enable automatically setting the size according to content */
-   lv_obj_set_pos(btn1, 60, 40);                      /* Set the position of the button */
+   lv_obj_t * btn1 = lv_button_create(scr);     /* Create the first button on the screen */
+   lv_obj_set_pos(btn1, 60, 40);                      /* Set the position of the first button */
 
-   lv_obj_t * btn2 = lv_button_create(scr, btn1);     /* Copy the first button */
-   lv_obj_set_pos(btn2, 180, 80);                     /* Set the position of the button */
+   lv_obj_t * btn2 = lv_button_create(scr);     /* Create the second button on the screen */
+   lv_obj_set_pos(btn2, 180, 80);                     /* Set the position of the second button */
 
    /* Add labels to the buttons */
-   lv_obj_t * label1 = lv_label_create(btn1, NULL);   /* Create a label on the first button */
+   lv_obj_t * label1 = lv_label_create(btn1);   /* Create a label on the first button */
    lv_label_set_text(label1, "Button 1");             /* Set the text of the label */
 
-   lv_obj_t * label2 = lv_label_create(btn2, NULL);   /* Create a label on the second button */
+   lv_obj_t * label2 = lv_label_create(btn2);   /* Create a label on the second button */
    lv_label_set_text(label2, "Button 2");             /* Set the text of the label */
 
    /* Delete the second label */

@@ -139,7 +139,7 @@ int32_t lv_obj_get_scroll_y(const lv_obj_t * obj);
  * @param obj       pointer to scrollable container Widget
  * @return          pixels Widget can be scrolled down before its top edge appears
  */
-int32_t lv_obj_get_scroll_top(lv_obj_t * obj);
+int32_t lv_obj_get_scroll_top(const lv_obj_t * obj);
 
 /**
  * Number of pixels a scrollable container Widget can be scrolled up
@@ -149,7 +149,7 @@ int32_t lv_obj_get_scroll_top(lv_obj_t * obj);
  * @param obj       pointer to scrollable container Widget
  * @return          pixels Widget can be scrolled up before its bottom edge appears
  */
-int32_t lv_obj_get_scroll_bottom(lv_obj_t * obj);
+int32_t lv_obj_get_scroll_bottom(const lv_obj_t * obj);
 
 /**
  * Number of pixels a scrollable container Widget can be scrolled right
@@ -159,7 +159,7 @@ int32_t lv_obj_get_scroll_bottom(lv_obj_t * obj);
  * @param obj       pointer to scrollable container Widget
  * @return          pixels Widget can be scrolled right before its left edge appears
  */
-int32_t lv_obj_get_scroll_left(lv_obj_t * obj);
+int32_t lv_obj_get_scroll_left(const lv_obj_t * obj);
 
 /**
  * Number of pixels a scrollable container Widget can be scrolled left
@@ -169,7 +169,7 @@ int32_t lv_obj_get_scroll_left(lv_obj_t * obj);
  * @param obj       pointer to scrollable container Widget
  * @return          pixels Widget can be scrolled left before its right edge appears
  */
-int32_t lv_obj_get_scroll_right(lv_obj_t * obj);
+int32_t lv_obj_get_scroll_right(const lv_obj_t * obj);
 
 /**
  * Get the X and Y coordinates where the scrolling will end for Widget if a scrolling animation is in progress.
@@ -254,6 +254,13 @@ void lv_obj_scroll_to_view_recursive(lv_obj_t * obj, lv_anim_enable_t anim_en);
  * @return      true: `obj` is being scrolled
  */
 bool lv_obj_is_scrolling(const lv_obj_t * obj);
+
+/**
+ * Stop scrolling the current object
+ *
+ * @param obj The object being scrolled
+ */
+void lv_obj_stop_scroll_anim(const lv_obj_t * obj);
 
 /**
  * Check children of `obj` and scroll `obj` to fulfill scroll_snap settings.

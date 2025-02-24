@@ -22,14 +22,31 @@ extern "C" {
  *      DEFINES
  *********************/
 
-typedef struct _lv_vg_lite_path_t lv_vg_lite_path_t;
-typedef struct _lv_draw_vg_lite_unit_t lv_draw_vg_lite_unit_t;
+#if LV_USE_VG_LITE_THORVG
+/**
+* It is found that thorvg cannot handle large coordinates well.
+* When the coordinates are larger than 4096, the calculation of tvgSwRle module will overflow in 32-bit system.
+* So we use FLT_MAX and FLT_MIN to write the mark to bounding_box to tell vg_lite_tvg not to add clip path to the current path.
+*/
+#define PATH_COORD_MAX FLT_MAX
+#define PATH_COORD_MIN FLT_MIN
+#else
+/*  18 bits is enough to represent the coordinates of path bounding box */
+#define PATH_COORD_MAX (1 << 18)
+#define PATH_COORD_MIN (-PATH_COORD_MAX)
+#endif
 
-typedef void (*lv_vg_lite_path_iter_cb_t)(void * user_data, uint8_t op_code, const float * data, uint32_t len);
+#define LV_VG_LITE_PATH_SET_OP_CODE(PTR, TYPE, OP_CODE) (*((TYPE*)PTR) = (OP_CODE))
+#define LV_VG_LITE_PATH_GET_OP_CODE(PTR) (*((uint8_t*)PTR))
 
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef struct _lv_vg_lite_path_t lv_vg_lite_path_t;
+typedef struct _lv_draw_vg_lite_unit_t lv_draw_vg_lite_unit_t;
+
+typedef void (*lv_vg_lite_path_iter_cb_t)(void * user_data, uint8_t op_code, const float * data, uint32_t len);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -66,6 +83,8 @@ void lv_vg_lite_path_set_transform(lv_vg_lite_path_t * path, const vg_lite_matri
 void lv_vg_lite_path_set_quality(lv_vg_lite_path_t * path, vg_lite_quality_t quality);
 
 vg_lite_path_t * lv_vg_lite_path_get_path(lv_vg_lite_path_t * path);
+
+void lv_vg_lite_path_reserve_space(lv_vg_lite_path_t * path, size_t len);
 
 void lv_vg_lite_path_move_to(lv_vg_lite_path_t * path,
                              float x, float y);

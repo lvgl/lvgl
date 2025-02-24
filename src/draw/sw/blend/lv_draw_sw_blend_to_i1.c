@@ -82,7 +82,7 @@ static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * b
  *      MACROS
  **********************/
 
-#define I1_LUM_THRESHOLD 127
+#define I1_LUM_THRESHOLD LV_DRAW_SW_I1_LUM_THRESHOLD
 
 #ifndef LV_DRAW_SW_I1_BLEND_NORMAL_TO_I1
     #define LV_DRAW_SW_I1_BLEND_NORMAL_TO_I1(...)                    LV_RESULT_INVALID
@@ -1065,6 +1065,9 @@ static inline void LV_ATTRIBUTE_FAST_MEM blend_non_normal_pixel(uint8_t * dest_b
             break;
         case LV_BLEND_MODE_MULTIPLY:
             res = (dest_lumi * src_lumi) >> 8;
+            break;
+        case LV_BLEND_MODE_DIFFERENCE:
+            res = LV_ABS(dest_lumi - src_lumi);
             break;
         default:
             LV_LOG_WARN("Not supported blend mode: %d", mode);

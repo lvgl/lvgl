@@ -26,7 +26,7 @@ extern "C" {
  *      MACROS
  **********************/
 
-typedef struct _lv_draw_image_dsc_t {
+struct _lv_draw_image_dsc_t {
     lv_draw_dsc_base_t base;
 
     const void * src;
@@ -59,18 +59,18 @@ typedef struct _lv_draw_image_dsc_t {
     int32_t clip_radius;
 
     const lv_image_dsc_t * bitmap_mask_src;
-} lv_draw_image_dsc_t;
+};
 
 /**
  * PErform the actual rendering of a decoded image
- * @param draw_unit         pointer to a draw unit
+ * @param t                 pointer to a draw task
  * @param draw_dsc          the draw descriptor of the image
  * @param decoder_dsc       pointer to the decoded image's descriptor
  * @param sup               supplementary data
  * @param img_coords        the absolute coordinates of the image
  * @param clipped_img_area  the absolute clip coordinates
  */
-typedef void (*lv_draw_image_core_cb)(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+typedef void (*lv_draw_image_core_cb)(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_dsc,
                                       const lv_image_decoder_dsc_t * decoder_dsc, lv_draw_image_sup_t * sup,
                                       const lv_area_t * img_coords, const lv_area_t * clipped_img_area);
 

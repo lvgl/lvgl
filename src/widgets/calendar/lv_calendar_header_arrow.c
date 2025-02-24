@@ -86,7 +86,7 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_remove_flag(mo_prev, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     lv_obj_t * label = lv_label_create(obj);
-    lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_label_set_long_mode(label, LV_LABEL_LONG_MODE_SCROLL_CIRCULAR);
     lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_flex_grow(label, 1);
 

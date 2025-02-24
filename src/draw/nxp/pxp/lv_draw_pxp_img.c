@@ -61,13 +61,13 @@ static void _pxp_blit(uint8_t * dest_buf, const lv_area_t * dest_area, int32_t d
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc,
+void lv_draw_pxp_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
                      const lv_area_t * coords)
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
-    lv_layer_t * layer = draw_unit->target_layer;
+    lv_layer_t * layer = t->target_layer;
     lv_draw_buf_t * draw_buf = layer->draw_buf;
     const lv_image_dsc_t * img_dsc = dsc->src;
 
@@ -76,7 +76,7 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc
     lv_area_move(&rel_coords, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, draw_unit->clip_area);
+    lv_area_copy(&rel_clip_area, &t->clip_area);
     lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t blend_area;
@@ -91,8 +91,8 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc
     lv_area_t src_area;
     src_area.x1 = blend_area.x1 - (coords->x1 - layer->buf_area.x1);
     src_area.y1 = blend_area.y1 - (coords->y1 - layer->buf_area.y1);
-    src_area.x2 = src_area.x1 + lv_area_get_width(coords) - 1;
-    src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
+    src_area.x2 = src_area.x1 + lv_area_get_width(&blend_area) - 1;
+    src_area.y2 = src_area.y1 + lv_area_get_height(&blend_area) - 1;
     int32_t src_stride = img_dsc->header.stride;
     lv_color_format_t src_cf = img_dsc->header.cf;
 

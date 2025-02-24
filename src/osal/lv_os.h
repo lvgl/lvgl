@@ -35,6 +35,8 @@ extern "C" {
 #include "lv_windows.h"
 #elif LV_USE_OS == LV_OS_MQX
 #include "lv_mqx.h"
+#elif LV_USE_OS == LV_OS_SDL2
+#include "lv_sdl2.h"
 #elif LV_USE_OS == LV_OS_CUSTOM
 #include LV_OS_CUSTOM_INCLUDE
 #endif
@@ -58,6 +60,14 @@ typedef enum {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Set it for `LV_SYSMON_GET_IDLE` to show the CPU usage
+ * @return the idle percentage since the last call
+ */
+uint32_t lv_os_get_idle_percent(void);
+
+#if LV_USE_OS != LV_OS_NONE
+
 /*----------------------------------------
  * These functions needs to be implemented
  * for specific operating systems
@@ -66,13 +76,15 @@ typedef enum {
 /**
  * Create a new thread
  * @param thread        a variable in which the thread will be stored
+ * @param name          the name of the thread
  * @param prio          priority of the thread
  * @param callback      function of the thread
  * @param stack_size    stack size in bytes
  * @param user_data     arbitrary data, will be available in the callback
  * @return              LV_RESULT_OK: success; LV_RESULT_INVALID: failure
  */
-lv_result_t lv_thread_init(lv_thread_t * thread, lv_thread_prio_t prio, void (*callback)(void *), size_t stack_size,
+lv_result_t lv_thread_init(lv_thread_t * thread, const char * const name,
+                           lv_thread_prio_t prio, void (*callback)(void *), size_t stack_size,
                            void * user_data);
 
 /**
@@ -174,6 +186,109 @@ lv_result_t lv_lock_isr(void);
  * It is called internally in lv_timer_handler().
  */
 void lv_unlock(void);
+
+#else
+
+/* Since compilation does not necessarily optimize cross-file empty functions well
+ * (-O3 optimization alone is not enough unless LTO optimization is enabled),
+ * In the absence of an operating system, use inline functions to help compile
+ * optimizations and avoid the call overhead of the OS API to ensure no performance penalty.
+ */
+
+static inline lv_result_t lv_thread_init(lv_thread_t * thread, const char * const name, lv_thread_prio_t prio,
+                                         void (*callback)(void *), size_t stack_size, void * user_data)
+{
+    LV_UNUSED(thread);
+    LV_UNUSED(name);
+    LV_UNUSED(callback);
+    LV_UNUSED(prio);
+    LV_UNUSED(stack_size);
+    LV_UNUSED(user_data);
+    return LV_RESULT_INVALID;
+}
+
+static inline lv_result_t lv_thread_delete(lv_thread_t * thread)
+{
+    LV_UNUSED(thread);
+    return LV_RESULT_INVALID;
+}
+
+static inline lv_result_t lv_mutex_init(lv_mutex_t * mutex)
+{
+    LV_UNUSED(mutex);
+    return LV_RESULT_OK;
+}
+
+static inline lv_result_t lv_mutex_lock(lv_mutex_t * mutex)
+{
+    LV_UNUSED(mutex);
+    return LV_RESULT_OK;
+}
+
+static inline lv_result_t lv_mutex_lock_isr(lv_mutex_t * mutex)
+{
+    LV_UNUSED(mutex);
+    return LV_RESULT_OK;
+}
+
+static inline lv_result_t lv_mutex_unlock(lv_mutex_t * mutex)
+{
+    LV_UNUSED(mutex);
+    return LV_RESULT_OK;
+}
+
+static inline lv_result_t lv_mutex_delete(lv_mutex_t * mutex)
+{
+    LV_UNUSED(mutex);
+    return LV_RESULT_OK;
+}
+
+static inline lv_result_t lv_thread_sync_init(lv_thread_sync_t * sync)
+{
+    LV_UNUSED(sync);
+    return LV_RESULT_INVALID;
+}
+
+static inline lv_result_t lv_thread_sync_wait(lv_thread_sync_t * sync)
+{
+    LV_UNUSED(sync);
+    return LV_RESULT_INVALID;
+}
+
+static inline lv_result_t lv_thread_sync_signal(lv_thread_sync_t * sync)
+{
+    LV_UNUSED(sync);
+    return LV_RESULT_INVALID;
+}
+
+static inline lv_result_t lv_thread_sync_signal_isr(lv_thread_sync_t * sync)
+{
+    LV_UNUSED(sync);
+    return LV_RESULT_INVALID;
+}
+
+static inline lv_result_t lv_thread_sync_delete(lv_thread_sync_t * sync)
+{
+    LV_UNUSED(sync);
+    return LV_RESULT_INVALID;
+}
+
+static inline void lv_lock(void)
+{
+    /*Do nothing*/
+}
+
+static inline lv_result_t lv_lock_isr(void)
+{
+    return LV_RESULT_OK;
+}
+
+static inline void lv_unlock(void)
+{
+    /*Do nothing*/
+}
+
+#endif /*LV_USE_OS != LV_OS_NONE*/
 
 /**********************
  *      MACROS
