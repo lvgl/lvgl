@@ -240,7 +240,13 @@ void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_sele
         }
 
         obj->style_cnt--;
-        obj->styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
+        if (obj->style_cnt) {
+            obj->styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(lv_obj_style_t));
+        }
+        else {
+            lv_free(obj->styles);
+            obj->styles = NULL;
+        }
 
         deleted = true;
         /*The style from the current `i` index is removed, so `i` points to the next style.
