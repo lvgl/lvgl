@@ -7,11 +7,16 @@ Details
 .. toctree::
     :maxdepth: 2
 
-    generic-widget-features/index
+    ../examples
+    integration/index
+    common-widget-features/index
     widgets/index
     main-modules/index
     auxiliary-modules/index
-    ../examples
-    debugging/index
-    integration/index
     libs/index
+    debugging/index
+    ../CONTRIBUTING
+    ../CODING_STYLE
+    ../CHANGELOG
+    ../API/index
+    ../ROADMAP

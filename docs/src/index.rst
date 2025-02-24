@@ -57,7 +57,7 @@ Details
 
     examples
     details/integration/index
-    details/generic-widget-features/index
+    details/common-widget-features/index
     details/widgets/index
     details/main-modules/index
     details/auxiliary-modules/index
