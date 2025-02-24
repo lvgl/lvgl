@@ -31,7 +31,7 @@ static void timer_cb(lv_timer_t * timer)
             const int32_t angle = i * 5;
             const int32_t x = CURVE2_X(angle);
             const int32_t y = CURVE2_Y(angle + 30, counter / 2);
-            lv_point_t point = { .x = x, .y = y };
+            const lv_point_t point = { .x = x, .y = y };
 
             letter_dsc.unicode = (uint32_t)string[i % string_len];
             letter_dsc.rotation = lv_atan2(y - pre_y, x - pre_x) * 10;
