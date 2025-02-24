@@ -171,7 +171,10 @@ from datetime import datetime
 import example_list
 import doc_builder
 import config_builder
-from lvgl_version import lvgl_version
+_ = os.path.abspath(os.path.dirname(__file__))
+docs_src_dir = os.path.join(_, 'src')
+sys.path.insert(0, docs_src_dir)
+from lvgl_version import lvgl_version #NoQA
 
 # Not Currently Used
 # (Code is kept in case we want to re-implement it later.)
