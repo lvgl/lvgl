@@ -95,18 +95,22 @@ typedef enum {
     LV_EVENT_GET_SELF_SIZE,       /**< Get internal size of a widget */
 
     /** Events of optional LVGL components */
-    LV_EVENT_INVALIDATE_AREA,
-    LV_EVENT_RESOLUTION_CHANGED,
-    LV_EVENT_COLOR_FORMAT_CHANGED,
-    LV_EVENT_REFR_REQUEST,
-    LV_EVENT_REFR_START,
-    LV_EVENT_REFR_READY,
-    LV_EVENT_RENDER_START,
-    LV_EVENT_RENDER_READY,
-    LV_EVENT_FLUSH_START,
-    LV_EVENT_FLUSH_FINISH,
-    LV_EVENT_FLUSH_WAIT_START,
-    LV_EVENT_FLUSH_WAIT_FINISH,
+    LV_EVENT_INVALIDATE_AREA,     /**< An area is invalidated (marked for redraw). `lv_event_get_param(e)`
+                                   * returns a pointer to an `lv_area_t` object with the coordinates of the
+                                   * area to be invalidated.  The area can be freely modified if needed to
+                                   * adapt it a special requirement of the display. Usually needed with
+                                   * monochrome displays to invalidate `N x 8` rows or columns in one pass. */
+    LV_EVENT_RESOLUTION_CHANGED,  /**< Sent when the resolution changes due to `lv_display_set_resolution()` or `lv_display_set_rotation()`. */
+    LV_EVENT_COLOR_FORMAT_CHANGED,/**< Sent as a result of any call to `lv_display_set_color_format()`. */
+    LV_EVENT_REFR_REQUEST,        /**< Sent when something happened that requires redraw. */
+    LV_EVENT_REFR_START,          /**< Sent before a refreshing cycle starts. Sent even if there is nothing to redraw. */
+    LV_EVENT_REFR_READY,          /**< Sent when refreshing has been completed (after rendering and calling flush callback). Sent even if no redraw happened. */
+    LV_EVENT_RENDER_START,        /**< Sent just before rendering begins. */
+    LV_EVENT_RENDER_READY,        /**< Sent after rendering has been completed (before calling flush callback) */
+    LV_EVENT_FLUSH_START,         /**< Sent before flush callback is called. */
+    LV_EVENT_FLUSH_FINISH,        /**< Sent after flush callback call has returned. */
+    LV_EVENT_FLUSH_WAIT_START,    /**<  */
+    LV_EVENT_FLUSH_WAIT_FINISH,   /**<  */
 
     LV_EVENT_VSYNC,
 

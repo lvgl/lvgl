@@ -230,7 +230,7 @@ void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recognizer, l
         process_touch_event(touch, r->info);
         touches++;
 
-        LV_LOG_TRACE("processed touch ev: %d finger id: %d state: %d x: %d y: %d finger_cnt: %d",
+        LV_LOG_TRACE("processed touch ev: %d finger id: %d state: %d x: %" LV_PRId32 " y: %" LV_PRId32 " finger_cnt: %d",
                      i, touch->id, touch->state, touch->point.x, touch->point.y, r->info->finger_cnt);
     }
 
@@ -592,7 +592,7 @@ static void gesture_calculate_factors(lv_indev_gesture_t * gesture, int touch_po
 
     /* translation */
     g->delta_x = g->p_delta_x + (center_x - g->center.x);
-    g->delta_y = g->p_delta_x + (center_y - g->center.y);
+    g->delta_y = g->p_delta_y + (center_y - g->center.y);
 
     /* rotation & scaling */
     for(i = 0; i < touch_points_nb; i++) {

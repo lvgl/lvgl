@@ -25,9 +25,9 @@ Usage
 			<convert path="raw/avatar.svg" width="100px" color_format="L8"/>
 		</file>
 
-		<data name="logo" src_path="logo1.png">
+		<data name="logo" src_path="logo1.png" color-format="rgb565" memory="RAM2">
 			<convert path="https://foo.com/image.png" width="50%" height="80%"
-			color_format="RGB565" memory="RAM2"/>
+			color_format="RGB565"/>
 		</data>
 	</images>
 
@@ -38,7 +38,7 @@ In both cases in the exported C code global ``const void * <image_name>`` variab
 initialization function of the component library (e.g. ``my_lib_init_gen()``) either the path or
 the pointer to the converted :cpp:expr:`lv_image_dsc_t` pointers are assigned to that variable.
 
-In :cpp:expr:`lv_image_set_src(image, <image_name>)` is used
+In :cpp:expr:`lv_image_set_src(image, image_name)` is used
 instead of the path or :cpp:expr:`lv_image_dsc_t` pointer directly.
 
 

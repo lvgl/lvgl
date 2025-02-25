@@ -288,6 +288,7 @@ add_library(test_common
         src/test_assets/test_img_cogwheel_rgb565a8.c
         src/test_assets/test_img_cogwheel_xrgb8888.c
         src/test_assets/test_img_cogwheel_argb8888.c
+        src/test_assets/test_img_svg.c
         src/test_assets/test_font_1.c
         src/test_assets/test_font_2.c
         src/test_assets/test_font_3.c

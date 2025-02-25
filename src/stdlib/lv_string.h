@@ -76,11 +76,20 @@ static inline void lv_memzero(void * dst, size_t len)
 }
 
 /**
- * @brief Computes the length of the string str up to, but not including the terminating null character.
+ * @brief Computes the length of the string str up to (but not including) the terminating null character.
  * @param str Pointer to the null-terminated byte string to be examined.
  * @return The length of the string in bytes.
  */
 size_t lv_strlen(const char * str);
+
+/**
+ * @brief Computes the length of the string str up to (but not including) the terminating null character,
+ *        or the given maximum length.
+ * @param str Pointer to byte string that is null-terminated or at least max_len bytes long.
+ * @param max_len Maximum number of characters to examine.
+ * @return The length of the string in bytes.
+ */
+size_t lv_strnlen(const char * str, size_t max_len);
 
 /**
  * @brief Copies up to dst_size-1 (non-null) characters from src to dst. A null terminator is always added.
@@ -145,6 +154,15 @@ static inline bool lv_streq(const char * s1, const char * s2)
  * @return A pointer to the new allocated string. NULL if failed.
  */
 char * lv_strdup(const char * src);
+
+/**
+ * @brief Duplicate a string by allocating a new one and copying the content
+ *        up to the end or the specified maximum length, whichever comes first.
+ * @param src Pointer to the source of data to be copied.
+ * @param max_len Maximum number of characters to be copied.
+ * @return Pointer to a newly allocated null-terminated string. NULL if failed.
+ */
+char * lv_strndup(const char * src, size_t max_len);
 
 /**
  * @brief Copies the string pointed to by src, including the terminating null character,

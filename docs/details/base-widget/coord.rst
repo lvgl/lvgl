@@ -72,7 +72,7 @@ have a choice of several different types of units you can use.
                      | 80 | 130 | 66 pixels to make 1/2 inch |
                      +----+-----+----------------------------+
 
-                     See DPI under :ref:`display_features`.
+                     See DPI under :ref:`display_attributes`.
 
 
 

@@ -76,7 +76,7 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
  * Set the selected option
  * @param obj       pointer to a roller object
  * @param sel_opt   index of the selected option (0 ... number of option - 1);
- * @param anim   LV_ANIM_ON: set with animation; LV_ANOM_OFF set immediately
+ * @param anim   LV_ANIM_ON: set with animation; LV_ANIM_OFF set immediately
  */
 void lv_roller_set_selected(lv_obj_t * obj, uint32_t sel_opt, lv_anim_enable_t anim);
 
@@ -84,7 +84,7 @@ void lv_roller_set_selected(lv_obj_t * obj, uint32_t sel_opt, lv_anim_enable_t a
  * Sets the given string as the selection on the roller. Does not alter the current selection on failure.
  * @param obj               pointer to roller object
  * @param sel_opt   pointer to the string you want to set as an option
- * @param anim          LV_ANIM_ON: set with animation; LV_ANOM_OFF set immediately
+ * @param anim          LV_ANIM_ON: set with animation; LV_ANIM_OFF set immediately
  * @return                  `true` if set successfully and `false` if the given string does not exist as an option in the roller
  */
 bool lv_roller_set_selected_str(lv_obj_t * obj, const char * sel_opt, lv_anim_enable_t anim);

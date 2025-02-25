@@ -99,6 +99,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
         switch(glyph_draw_dsc->format) {
             case LV_FONT_GLYPH_FORMAT_NONE: {
 #if LV_USE_FONT_PLACEHOLDER
+                    if(glyph_draw_dsc->bg_coords == NULL) break;
                     /* Draw a placeholder rectangle*/
                     lv_draw_border_dsc_t border_draw_dsc;
                     lv_draw_border_dsc_init(&border_draw_dsc);

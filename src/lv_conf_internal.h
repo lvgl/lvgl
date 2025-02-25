@@ -3074,7 +3074,7 @@
         #ifdef CONFIG_LV_SYSMON_GET_IDLE
             #define LV_SYSMON_GET_IDLE CONFIG_LV_SYSMON_GET_IDLE
         #else
-            #define LV_SYSMON_GET_IDLE lv_timer_get_idle
+            #define LV_SYSMON_GET_IDLE lv_os_get_idle_percent
         #endif
     #endif
 
@@ -3727,6 +3727,15 @@
             #define LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP CONFIG_LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
         #else
             #define LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP 0
+        #endif
+    #endif
+
+    /** Use independent image heap for default draw buffer */
+    #ifndef LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP
+        #ifdef CONFIG_LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP
+            #define LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP CONFIG_LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP
+        #else
+            #define LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP    0
         #endif
     #endif
 

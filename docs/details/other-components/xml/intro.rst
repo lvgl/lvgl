@@ -16,10 +16,10 @@ features like:
 - Online preview for collaboration and testing
 - Figma integration to easily reimplement the designs
 
-``warning``
+.. warning::
 
-The UI Editor and the XML loader are still under development and not production ready.
-Consider them as an open beta, or experimental features.
+	The UI Editor and the XML loader are still under development and not production ready.
+	Consider them as an open beta, or experimental features.
 
 Describing the UI in XML in a declarative manner offers several advantages:
 

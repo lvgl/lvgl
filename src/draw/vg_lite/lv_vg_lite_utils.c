@@ -850,7 +850,10 @@ bool lv_vg_lite_buffer_open_image(vg_lite_buffer_t * buffer, lv_image_decoder_ds
     args.stride_align = true;
     args.use_indexed = true;
     args.no_cache = no_cache;
-    args.flush_cache = true;
+
+    /** For images output by the GPU itself (such as draw layer),
+     *  there is no need to flush the cache */
+    args.flush_cache = !no_cache;
 
     lv_result_t res = lv_image_decoder_open(decoder_dsc, src, &args);
     if(res != LV_RESULT_OK) {
@@ -1315,6 +1318,14 @@ void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
 #endif
 
     LV_VG_LITE_CHECK_ERROR(vg_lite_flush(), {});
+
+    /* Rremove all old caches reference and swap new caches reference */
+    if(u->grad_pending) {
+        lv_vg_lite_pending_swap(u->grad_pending);
+    }
+
+    lv_vg_lite_pending_swap(u->image_dsc_pending);
+
     u->flush_count = 0;
     LV_PROFILER_DRAW_END;
 }

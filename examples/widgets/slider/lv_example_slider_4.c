@@ -24,7 +24,7 @@ void lv_example_slider_4(void)
 
 static void slider_event_cb(lv_event_t * e)
 {
-    lv_obj_t * slider = lv_event_get_target(e);
+    lv_obj_t * slider = lv_event_get_target_obj(e);
     char buf[8];
     lv_snprintf(buf, sizeof(buf), "%d%%", (int)lv_slider_get_value(slider));
     lv_label_set_text(slider_label, buf);

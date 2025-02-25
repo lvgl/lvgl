@@ -56,6 +56,11 @@ typedef enum _lvimage_flags_t {
     LV_IMAGE_FLAGS_MODIFIABLE       = 0x0020,
 
     /**
+     * The image has custom drawing methods.
+     */
+    LV_IMAGE_FLAGS_CUSTOM_DRAW      = 0x0040,
+
+    /**
      * Flags reserved for user, lvgl won't use these bits.
      */
     LV_IMAGE_FLAGS_USER1            = 0x0100,
