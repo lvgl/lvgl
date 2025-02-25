@@ -62,6 +62,10 @@ property will be used. Typically this means the property with
 :cpp:enumerator:`LV_STATE_DEFAULT` is used.˛ If the property is not set even for the
 default state the default value will be used. (See later)
 
+Since :cpp:enumerator:`LV_PART_MAIN` and :cpp:enumerator:`LV_STATE_DEFAULT` both
+have zero values, you can simply pass ``0`` as the ``selector`` argument instead of
+``LV_PART_MAIN | LV_STATE_DEFAULT`` as a shortcut when adding styles to an object.
+
 What does the "best matching state's property" mean?
 ----------------------------------------------------
 States have a precedence which is shown by their value (see in the above list).
@@ -170,14 +174,15 @@ Widgets can be composed of *parts* which may each have their own styles.
 
 The following predefined parts exist in LVGL:
 
-- :cpp:enumerator:`LV_PART_MAIN`: A background like rectangle
-- :cpp:enumerator:`LV_PART_SCROLLBAR`: The scrollbar(s)
-- :cpp:enumerator:`LV_PART_INDICATOR`: Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox
-- :cpp:enumerator:`LV_PART_KNOB`: Like a handle to grab to adjust a value
-- :cpp:enumerator:`LV_PART_SELECTED`: Indicate the currently selected option or section
-- :cpp:enumerator:`LV_PART_ITEMS`: Used if the widget has multiple similar elements (e.g. table cells)
-- :cpp:enumerator:`LV_PART_CURSOR`: Mark a specific place e.g. Text Area's or chart's cursor
-- :cpp:enumerator:`LV_PART_CUSTOM_FIRST`: Custom part identifiers can be added starting from here.
+- :cpp:enumerator:`LV_PART_MAIN`: (0x000000) A background like rectangle
+- :cpp:enumerator:`LV_PART_SCROLLBAR`: (0x010000) The scrollbar(s)
+- :cpp:enumerator:`LV_PART_INDICATOR`: (0x020000) Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox
+- :cpp:enumerator:`LV_PART_KNOB`: (0x030000) Like a handle to grab to adjust a value
+- :cpp:enumerator:`LV_PART_SELECTED`: (0x040000) Indicate the currently selected option or section
+- :cpp:enumerator:`LV_PART_ITEMS`: (0x050000) Used if the widget has multiple similar elements (e.g. table cells)
+- :cpp:enumerator:`LV_PART_CURSOR`: (0x060000) Mark a specific place e.g. Text Area's or chart's cursor
+- :cpp:enumerator:`LV_PART_CUSTOM_FIRST`: (0x080000) Custom part identifiers can be added starting from here.
+- :cpp:enumerator:`LV_PART_ANY`: (0x0F0000) Special value can be used in some functions to target all parts.
 
 For example a :ref:`Slider <lv_slider>` has three parts:
 
@@ -187,6 +192,10 @@ For example a :ref:`Slider <lv_slider>` has three parts:
 
 This means all three parts of the slider can have their own styles. See
 later how to add styles to Widgets and parts.
+
+Since :cpp:enumerator:`LV_PART_MAIN` and :cpp:enumerator:`LV_STATE_DEFAULT` both
+have zero values, you can simply pass ``0`` as the ``selector`` argument instead of
+``LV_PART_MAIN | LV_STATE_DEFAULT`` as a shortcut when adding styles to an object.
 
 
 

@@ -33,18 +33,20 @@ Overview of LVGL's Data Flow
 
     Overview of LVGL Data Flow
 
+You :ref:`add LVGL to your project <adding_lvgl_to_your_project>`, provide it with
+inputs and the method for pixels to flow to the display panel(s), connect the
+:ref:`tick_interface` so LVGL can tell what time is it, periodically call
+:ref:`timer_handler`, build one or more :ref:`Widget Trees <widget_overview>` for
+LVGL to render the interactive UI,  and let LVGL do the rest.
 
-You create one :ref:`display` for each physical display panel, create
-:ref:`basics_screen_widgets` on them, add :ref:`basics_widgets` onto those Screens.
-To handle touch, mouse, keypad, etc., you :ref:`create an Input Device <indev_creation>`
-for each.  The :ref:`tick_interface` tells LVGL what time is it.  :ref:`timer_handler`
-drives LVGL's timers which, in turn, perform all of LVGL's time-related tasks:
+The :ref:`timer_handler` function drives LVGL's timers which, in turn, perform a
+number of periodic tasks:
 
-- periodically refreshes displays,
-- reads input devices,
-- fires events,
-- runs any animations, and
-- runs user-created timers.
+- refresh display(s),
+- read input devices,
+- fire events based on user input (and other things),
+- run any animations, and
+- run user-created timers.
 
 
 .. _applications_job:
@@ -52,10 +54,10 @@ drives LVGL's timers which, in turn, perform all of LVGL's time-related tasks:
 Application's Job
 -----------------
 
-After initialization, the application's job is merely to create Widget Trees when
-they are needed, manage events those Widgets generate (by way of user interaction
-and other things), and delete them when they are no longer needed.  LVGL takes care
-of the rest.
+After initialization, the application's job is merely to create :ref:`Widget Trees
+<widget_overview>` when they are needed, manage events those Widgets generate (by way
+of user interaction and other things), and delete them when they are no longer
+needed.  LVGL takes care of the rest.
 
 
 
@@ -73,10 +75,9 @@ Before we get into any details about Widgets, let us first clarify the differenc
 between two terms that you will hereafter see frequently:
 
 - A **Display** or **Display Panel** is the physical hardware displaying the pixels.
-- A :ref:`display` object is an object in RAM that represents a **Display** meant
-  to be used by LVGL.
-- A **Screen** is the "root" Widget in the Widget Trees mentioned above, and are
-  "attached to" a particular :ref:`display`.
+- A :ref:`display` object is an object in RAM that represents a **Display** LVGL will render to.
+- A **Screen** is the "root" Widget in the :ref:`Widget Trees <widget_overview>`
+  mentioned above, and are "attached to" a particular :ref:`display`.
 
 
 Default Display
@@ -91,8 +92,8 @@ See :ref:`default_display` for more information.
 Screen Widgets
 --------------
 In this documentation, the term "Screen Widget" is frequently shortened to just
-"Screen".  But it is important to understand that a "Screen" is simply any
-:ref:`Widget <widgets>` created without a parent --- the "root" of each Widget Tree.
+"Screen".  A "Screen" is simply any :ref:`Widget <widgets>` created without a parent
+--- the "root" of each Widget Tree.
 
 See :ref:`screens` for more details.
 
@@ -104,7 +105,7 @@ The Active Screen is the screen (and its child Widgets) currently being displaye
 See :ref:`active_screen` for more information.
 
 
-.. _basics_widgets:
+.. _widget_overview:
 
 Widgets
 -------
@@ -113,16 +114,15 @@ user interface, an application next creates a tree of Widgets that LVGL can rend
 the associated display, and with which the user can interact.
 
 Widgets are "intelligent" LVGL graphical elements such as :ref:`Base Widget
-<base_widget>` (simple rectangles and :ref:`screens`), Buttons, Labels,
-Checkboxes, Switches, Sliders, Charts, etc.  Go to :ref:`widgets` to see the full
-list.
+<base_widget>` (simple rectangles and :ref:`screens`), Buttons, Labels, Checkboxes,
+Switches, Sliders, Charts, etc.  See :ref:`widgets` to see the full list.
 
 To build this Widget Tree, the application first acquires a pointer to a Screen Widget.
-A system designer is free to use the default Screen created with the :ref:`display`
-and/or create his own.  To create a new Screen Widget, simply create a Widget passing
+You are free to use the default Screen created with the :ref:`display` and/or
+create your own.  To create a new Screen Widget, simply create a Widget passing
 NULL as the parent argument.  Technically, this can be any type of Widget, but in
-most cases it is a :ref:`base_widget`.  (An example of another type of
-Widget being used as a Screen is an :ref:`lv_image` Widget to supply an image for the
+most cases it is a :ref:`base_widget`.  (An example of another type of Widget
+sometimes used as a Screen is an :ref:`lv_image` Widget to supply an image for the
 background.)
 
 The application then adds Widgets to this Screen as children in the tree.  Widgets
@@ -145,18 +145,18 @@ Screens (and their child Widgets) can be created and deleted at any time *except
 when the Screen is the :ref:`active_screen`.  If you want to delete the current Screen
 as you load a new one, call :cpp:func:`lv_screen_load_anim` and pass ``true`` for the
 ``auto_del`` argument.  If you want to keep the current Screen in RAM when you load a
-new Screen, pass ``false`` for the ``auto_del`` argument, or call
-:cpp:func:`lv_screen_load` to load the new screen.
+new Screen, pass ``false`` instead, or call :cpp:func:`lv_screen_load` to load the
+new screen.
 
-A system designer is free to keep any number of Screens (and their child Widgets) in
+You are free to keep any number of Screens (and their child Widgets) in
 RAM (e.g. for quick re-display again later).  Doing so:
 
 - requires more RAM, but
-- can save the time of repeatedly creating the Screen and its child Widgets;
+- can avoid repeatedly creating the Screen and its child Widgets;
 - can be handy when a Screen is complex and/or can be made the :ref:`active_screen` frequently.
 
-If multiple Screens are maintained in RAM simultaneously, it is up to the system
-designer as to how they are managed.
+If multiple Screens are maintained in RAM simultaneously, it is up to you how they
+are managed.
 
 
 .. _basics_creating_widgets:
@@ -170,7 +170,7 @@ Widgets are created by calling functions that look like this::
 The call will return an :cpp:expr:`lv_obj_t *` pointer that can be used later to
 reference the Widget to set its attributes.
 
-For example:
+Example:
 
 .. code-block:: c
 
@@ -185,7 +185,7 @@ Attributes common to all Widgets are set by functions that look like this::
 
     lv_obj_set_<attribute_name>(widget, <value>)
 
-For example:
+Example:
 
 .. code-block:: c
 
@@ -193,19 +193,21 @@ For example:
     lv_obj_set_y(slider1, 10);
     lv_obj_set_size(slider1, 200, 50);
 
+All such functions are covered in :ref:`common_widget_features`.
+
 Along with these attributes, widgets can have type-specific attributes which are
 set by functions that look like this::
 
     lv_<type>_set_<attribute_name>(widget, <value>)
 
-For example:
+Example:
 
 .. code-block:: c
 
     lv_slider_set_value(slider1, 70, LV_ANIM_ON);
 
-To see the full API visit the documentation of the Widget in question under
-:ref:`widgets` or study its related header file in the source code, e.g.
+To see the full API for any Widget, see its documentation under :ref:`widgets`, study
+its related header file in the source code, e.g.
 
 - lvgl/src/widgets/slider/lv_slider.h
 
@@ -230,8 +232,8 @@ Events
 ------
 
 Events are used to inform the application that something has happened with a Widget.
-You can assign one or more callbacks to a Widget which will be called when the
-Widget is clicked, released, dragged, being deleted, etc.
+You can assign one or more callbacks to a Widget which will be called when the Widget
+is clicked, released, dragged, being deleted, etc.
 
 A callback is assigned like this:
 
@@ -263,9 +265,9 @@ The Widget that triggered the event can be retrieved with:
 
 .. code-block:: c
 
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * widget = lv_event_get_target(e);
 
-To learn all features of the events go to the :ref:`events` section.
+Learn all about Events in the :ref:`events` section.
 
 
 .. _basics_parts:
@@ -278,7 +280,8 @@ has only one part called :cpp:enumerator:`LV_PART_MAIN`. However, a
 :ref:`lv_slider` has :cpp:enumerator:`LV_PART_MAIN`, :cpp:enumerator:`LV_PART_INDICATOR`
 and :cpp:enumerator:`LV_PART_KNOB`.
 
-By using parts you can apply different styles to sub-elements of a widget.  (See below.)
+By using parts you can apply different :ref:`styles <basics_styles>` to sub-elements
+of a widget.
 
 Read the Widget's documentation to learn which parts it uses.
 
@@ -301,7 +304,7 @@ Widgets can be in a combination of the following states:
 - :cpp:enumerator:`LV_STATE_DISABLED`: Disabled
 
 For example, if you press a Widget it will automatically go to the
-:cpp:enumerator:`LV_STATE_FOCUSED` and :cpp:enumerator:`LV_STATE_PRESSED` states and when you
+:cpp:enumerator:`LV_STATE_FOCUSED` and :cpp:enumerator:`LV_STATE_PRESSED` states.  When you
 release it the :cpp:enumerator:`LV_STATE_PRESSED` state will be removed while the
 :cpp:enumerator:`LV_STATE_FOCUSED` state remains active.
 
@@ -309,7 +312,7 @@ To check if a Widget is in a given state use
 :cpp:expr:`lv_obj_has_state(widget, LV_STATE_...)`. It will return ``true`` if the
 Widget is currently in that state.
 
-To manually add or remove states use:
+To programmatically add or remove states use:
 
 .. code-block:: c
 
@@ -327,7 +330,7 @@ width, font, etc. that describe the appearance of Widgets.
 
 Styles are carried in :cpp:struct:`lv_style_t` objects.  Only their pointer is saved
 in the Widgets so they need to be defined as static or global variables.  Before
-using a style it needs to be initialized with :cpp:expr:`lv_style_init(&style1)`.
+using a style it needs to be initialized with ``lv_style_init(&style1)``.
 After that, properties can be added to configure the style.  For example:
 
 .. code-block:: c
@@ -340,42 +343,6 @@ After that, properties can be added to configure the style.  For example:
 See :ref:`style_properties_overview` for more details.
 
 See :ref:`style_properties` to see the full list.
-
-Styles are assigned using the OR-ed combination of a Widget's part and
-state. For example to use this style on the slider's indicator when the
-slider is pressed:
-
-.. code-block:: c
-
-    lv_obj_add_style(slider1, &style1, LV_PART_INDICATOR | LV_STATE_PRESSED);
-
-If the *part* is :cpp:enumerator:`LV_PART_MAIN` it can be omitted:
-
-.. code-block:: c
-
-    lv_obj_add_style(btn1, &style1, LV_STATE_PRESSED); /* Equal to LV_PART_MAIN | LV_STATE_PRESSED */
-
-Similarly, :cpp:enumerator:`LV_STATE_DEFAULT` can be omitted:
-
-.. code-block:: c
-
-   lv_obj_add_style(slider1, &style1, LV_PART_INDICATOR); /* Equal to LV_PART_INDICATOR | LV_STATE_DEFAULT */
-
-For :cpp:enumerator:`LV_STATE_DEFAULT` | :cpp:enumerator:`LV_PART_MAIN` simply pass ``0``:
-
-.. code-block:: c
-
-   lv_obj_add_style(btn1, &style1, 0); /* Equal to LV_PART_MAIN | LV_STATE_DEFAULT */
-
-Styles can be cascaded (similarly to CSS). This means you can add more
-styles to a part of a Widget. For example ``style_btn`` can set a
-default button appearance, and ``style_btn_red`` can overwrite the
-background color to make the button red:
-
-.. code-block:: c
-
-   lv_obj_add_style(btn1, &style_btn, 0);
-   lv_obj_add_style(btn1, &style1_btn_red, 0);
 
 If a property is not set for the current state, the style with
 :cpp:enumerator:`LV_STATE_DEFAULT` will be used. A default value is used if the
@@ -393,7 +360,7 @@ style which resides inside the Widget and is used only by that Widget:
 
     lv_obj_set_style_bg_color(slider1, lv_color_hex(0x2080bb), LV_PART_INDICATOR | LV_STATE_PRESSED);
 
-To learn all the features of styles see :ref:`styles`.
+See :ref:`styles` for full details.
 
 
 .. _basics_themes:
@@ -401,10 +368,10 @@ To learn all the features of styles see :ref:`styles`.
 Themes
 ------
 
-Themes are the default styles for Widgets. Styles from a theme are
+Themes are a set of default styles for Widgets. Styles from an active theme are
 applied automatically when Widgets are created.
 
-The theme for your application is a compile time configuration set in
+The theme for your application is a compile time configuration setting in
 ``lv_conf.h``.
 
 
@@ -460,7 +427,7 @@ advancing your knowledge:
 3. If not already done, read the :ref:`lvgl_basics` (above).  (15 minutes)
 4. Set up an LVGL :ref:`simulator`.  (10 minutes)
 5. Have a look at some :ref:`examples` and their code.
-6. Add LVGL to your project.  See :ref:`adding_lvgl_to_your_project` or check out
+6. :ref:`Add LVGL to your project <adding_lvgl_to_your_project>` or check out
    the `ready-to-use Projects`_.
 7. Read the :ref:`main_modules` pages to get a better understanding of the library. (2-3 hours)
 8. Skim the documentation of :ref:`widgets` to see what is available.

@@ -63,6 +63,14 @@ Details
     details/auxiliary-modules/index
     details/libs/index
     details/debugging/index
+
+
+Appendix
+--------
+
+.. toctree::
+    :maxdepth: 1
+
     contributing/index
     CHANGELOG
     API/index
