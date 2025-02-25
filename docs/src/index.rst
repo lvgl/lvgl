@@ -63,8 +63,7 @@ Details
     details/auxiliary-modules/index
     details/libs/index
     details/debugging/index
-    CONTRIBUTING
-    CODING_STYLE
+    contributing/index
     CHANGELOG
     API/index
     ROADMAP

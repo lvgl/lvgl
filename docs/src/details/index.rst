@@ -15,8 +15,7 @@ Details
     auxiliary-modules/index
     libs/index
     debugging/index
-    ../CONTRIBUTING
-    ../CODING_STYLE
+    ../contributing/index
     ../CHANGELOG
     ../API/index
     ../ROADMAP

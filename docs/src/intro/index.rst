@@ -1,5 +1,6 @@
 .. _intro-page:
 
+============
 Introduction
 ============
 

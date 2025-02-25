@@ -244,31 +244,29 @@ def cmd(s, start_dir=None, exit_on_error=True):
         sys.exit(result)
 
 
-def intermediate_dir_contents_exists(_tmpdir):
+def intermediate_dir_contents_exists(_intdir):
     """Provide answer to question:  Can we have reasonable confidence that
     the contents of `intermediate_directory` already exists?
     """
     result = False
-    c1 = os.path.isdir(_tmpdir)
+    c1 = os.path.isdir(_intdir)
 
     if c1:
-        temp_path = os.path.join(_tmpdir, 'CHANGELOG.rst')
+        temp_path = os.path.join(_intdir, 'CHANGELOG.rst')
         c2 = os.path.exists(temp_path)
-        temp_path = os.path.join(_tmpdir, 'CODING_STYLE.rst')
-        c3 = os.path.exists(temp_path)
-        temp_path = os.path.join(_tmpdir, 'CONTRIBUTING.rst')
-        c4 = os.path.exists(temp_path)
-        temp_path = os.path.join(_tmpdir, '_ext')
+        temp_path = os.path.join(_intdir, '_ext')
+        c3 = os.path.isdir(temp_path)
+        temp_path = os.path.join(_intdir, '_static')
+        c4 = os.path.isdir(temp_path)
+        temp_path = os.path.join(_intdir, 'details')
         c5 = os.path.isdir(temp_path)
-        temp_path = os.path.join(_tmpdir, '_static')
+        temp_path = os.path.join(_intdir, 'intro')
         c6 = os.path.isdir(temp_path)
-        temp_path = os.path.join(_tmpdir, 'details')
+        temp_path = os.path.join(_intdir, 'contributing')
         c7 = os.path.isdir(temp_path)
-        temp_path = os.path.join(_tmpdir, 'intro')
+        temp_path = os.path.join(_intdir, cfg_examples_dir)
         c8 = os.path.isdir(temp_path)
-        temp_path = os.path.join(_tmpdir, cfg_examples_dir)
-        c9 = os.path.isdir(temp_path)
-        result = c2 and c3 and c4 and c5 and c6 and c7 and c8 and c9
+        result = c2 and c3 and c4 and c5 and c6 and c7 and c8
 
     return result
 
