@@ -28,6 +28,10 @@
  **********************/
 
 static inline lv_opa_t get_layer_opa(const lv_obj_t * obj, lv_part_t part, const lv_draw_dsc_base_t * base_dsc);
+static inline lv_color_t color_mix_layer_filter(const lv_obj_t * obj, lv_part_t part,
+                                                const lv_draw_dsc_base_t * base_dsc, lv_color_t color);
+static inline lv_color32_t recolor_mix_layer_filter(lv_obj_t * obj, lv_part_t part, const lv_draw_dsc_base_t * base_dsc,
+                                                    lv_color32_t recolor);
 
 /**********************
  *  STATIC VARIABLES
@@ -65,7 +69,8 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_
     if(draw_dsc->bg_opa != LV_OPA_TRANSP) {
         draw_dsc->bg_opa = lv_obj_get_style_bg_opa(obj, part);
         if(draw_dsc->bg_opa > LV_OPA_MIN) {
-            draw_dsc->bg_color = lv_obj_get_style_bg_color_filtered(obj, part);
+            lv_color_t bg_color = lv_obj_get_style_bg_color(obj, part);
+            draw_dsc->bg_color = color_mix_layer_filter(obj, part, &draw_dsc->base, bg_color);
             const lv_grad_dsc_t * grad = lv_obj_get_style_bg_grad(obj, part);
             if(grad && grad->dir != LV_GRAD_DIR_NONE) {
                 lv_memcpy(&draw_dsc->bg_grad, grad, sizeof(*grad));
@@ -73,8 +78,9 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_
             else {
                 draw_dsc->bg_grad.dir = lv_obj_get_style_bg_grad_dir(obj, part);
                 if(draw_dsc->bg_grad.dir != LV_GRAD_DIR_NONE) {
-                    draw_dsc->bg_grad.stops[0].color = lv_obj_get_style_bg_color_filtered(obj, part);
-                    draw_dsc->bg_grad.stops[1].color = lv_obj_get_style_bg_grad_color_filtered(obj, part);
+                    lv_color_t bg_gard_color = lv_obj_get_style_bg_grad_color(obj, part);
+                    draw_dsc->bg_grad.stops[0].color = color_mix_layer_filter(obj, part, &draw_dsc->base, bg_color);
+                    draw_dsc->bg_grad.stops[1].color = color_mix_layer_filter(obj, part, &draw_dsc->base, bg_gard_color);
                     draw_dsc->bg_grad.stops[0].frac = lv_obj_get_style_bg_main_stop(obj, part);
                     draw_dsc->bg_grad.stops[1].frac = lv_obj_get_style_bg_grad_stop(obj, part);
                     draw_dsc->bg_grad.stops[0].opa = lv_obj_get_style_bg_main_opa(obj, part);
@@ -90,7 +96,8 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_
             draw_dsc->border_opa = lv_obj_get_style_border_opa(obj, part);
             if(draw_dsc->border_opa > LV_OPA_MIN) {
                 draw_dsc->border_side = lv_obj_get_style_border_side(obj, part);
-                draw_dsc->border_color = lv_obj_get_style_border_color_filtered(obj, part);
+                lv_color_t border_color = lv_obj_get_style_border_color(obj, part);
+                draw_dsc->border_color = color_mix_layer_filter(obj, part, &draw_dsc->base, border_color);
             }
         }
     }
@@ -101,7 +108,8 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_
             draw_dsc->outline_opa = lv_obj_get_style_outline_opa(obj, part);
             if(draw_dsc->outline_opa > LV_OPA_MIN) {
                 draw_dsc->outline_pad = lv_obj_get_style_outline_pad(obj, part);
-                draw_dsc->outline_color = lv_obj_get_style_outline_color_filtered(obj, part);
+                lv_color_t outline_color = lv_obj_get_style_outline_color(obj, part);
+                draw_dsc->outline_color = color_mix_layer_filter(obj, part, &draw_dsc->base, outline_color);
             }
         }
     }
@@ -116,8 +124,14 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_
                     draw_dsc->bg_image_recolor = lv_obj_get_style_text_color_filtered(obj, part);
                 }
                 else {
-                    draw_dsc->bg_image_recolor = lv_obj_get_style_bg_image_recolor_filtered(obj, part);
-                    draw_dsc->bg_image_recolor_opa = lv_obj_get_style_bg_image_recolor_opa(obj, part);
+                    lv_opa_t bg_image_recolor_opa = lv_obj_get_style_bg_image_recolor_opa(obj, part);
+                    lv_color_t bg_image_recolor = lv_obj_get_style_bg_image_recolor(obj, part);
+                    lv_color32_t recolor = lv_color_to_32(bg_image_recolor, bg_image_recolor_opa);
+                    recolor = recolor_mix_layer_filter(obj, part, &draw_dsc->base, recolor);
+                    draw_dsc->bg_image_recolor_opa = recolor.alpha;
+                    draw_dsc->bg_image_recolor = (lv_color_t) {
+                        .red = recolor.red, .green = recolor.green, .blue = recolor.blue
+                    };
                     draw_dsc->bg_image_tiled = lv_obj_get_style_bg_image_tiled(obj, part);
                 }
             }
@@ -133,7 +147,8 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_rect_dsc_
                     draw_dsc->shadow_offset_x = lv_obj_get_style_shadow_offset_x(obj, part);
                     draw_dsc->shadow_offset_y = lv_obj_get_style_shadow_offset_y(obj, part);
                     draw_dsc->shadow_spread = lv_obj_get_style_shadow_spread(obj, part);
-                    draw_dsc->shadow_color = lv_obj_get_style_shadow_color_filtered(obj, part);
+                    lv_color_t shadow_color = lv_obj_get_style_shadow_color(obj, part);
+                    draw_dsc->shadow_color = color_mix_layer_filter(obj, part, &draw_dsc->base, shadow_color);
                 }
             }
         }
@@ -171,7 +186,8 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_label_ds
         return;
     }
 
-    draw_dsc->color = lv_obj_get_style_text_color_filtered(obj, part);
+    lv_color_t text_color = lv_obj_get_style_text_color(obj, part);
+    draw_dsc->color = color_mix_layer_filter(obj, part, &draw_dsc->base, text_color);
     draw_dsc->letter_space = lv_obj_get_style_text_letter_space(obj, part);
     draw_dsc->line_space = lv_obj_get_style_text_line_space(obj, part);
     draw_dsc->decor = lv_obj_get_style_text_decor(obj, part);
@@ -215,8 +231,14 @@ void lv_obj_init_draw_image_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_image_ds
     draw_dsc->pivot.x = lv_area_get_width(&obj->coords) / 2;
     draw_dsc->pivot.y = lv_area_get_height(&obj->coords) / 2;
 
-    draw_dsc->recolor_opa = lv_obj_get_style_image_recolor_opa(obj, part);
-    draw_dsc->recolor = lv_obj_get_style_image_recolor_filtered(obj, part);
+    lv_opa_t image_recolor_opa = lv_obj_get_style_image_recolor_opa(obj, part);
+    lv_color_t image_recolor = lv_obj_get_style_image_recolor(obj, part);
+    lv_color32_t recolor = lv_color_to_32(image_recolor, image_recolor_opa);
+    recolor = recolor_mix_layer_filter(obj, part, &draw_dsc->base, recolor);
+    draw_dsc->recolor_opa = recolor.alpha;
+    draw_dsc->recolor = (lv_color_t) {
+        .red = recolor.red, .green = recolor.green, .blue = recolor.blue
+    };
 
     if(part != LV_PART_MAIN) draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
 
@@ -250,7 +272,8 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_line_dsc_
         return;
     }
 
-    draw_dsc->color = lv_obj_get_style_line_color_filtered(obj, part);
+    lv_color_t line_color = lv_obj_get_style_line_color(obj, part);
+    draw_dsc->color = color_mix_layer_filter(obj, part, &draw_dsc->base, line_color);
 
     draw_dsc->dash_width = lv_obj_get_style_line_dash_width(obj, part);
     if(draw_dsc->dash_width) {
@@ -291,7 +314,8 @@ void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, lv_part_t part, lv_draw_arc_dsc_t 
         return;
     }
 
-    draw_dsc->color = lv_obj_get_style_arc_color_filtered(obj, part);
+    lv_color_t arc_color = lv_obj_get_style_arc_color(obj, part);
+    draw_dsc->color = color_mix_layer_filter(obj, part, &draw_dsc->base, arc_color);
     draw_dsc->img_src = lv_obj_get_style_arc_image_src(obj, part);
 
     draw_dsc->rounded = lv_obj_get_style_arc_rounded(obj, part);
@@ -384,4 +408,29 @@ static inline lv_opa_t get_layer_opa(const lv_obj_t * obj, lv_part_t part, const
 
     /* fallback to old recursive style opa */
     return lv_obj_get_style_opa_recursive(obj, part);
+}
+
+static inline lv_color_t color_mix_layer_filter(const lv_obj_t * obj, lv_part_t part,
+                                                const lv_draw_dsc_base_t * base_dsc, lv_color_t color)
+{
+    if(base_dsc->layer) {
+        return lv_color_mix_color32(base_dsc->layer->color_filter, color);
+    }
+
+    return lv_color_mix_color32(lv_obj_get_style_color_filter_recursive(obj, part), color);
+}
+
+static inline lv_color32_t recolor_mix_layer_filter(lv_obj_t * obj, lv_part_t part, const lv_draw_dsc_base_t * base_dsc,
+                                                    lv_color32_t recolor)
+{
+    lv_color32_t color_filter;
+
+    if(base_dsc->layer) {
+        color_filter = base_dsc->layer->color_filter;
+    }
+    else {
+        color_filter = lv_obj_get_style_color_filter_recursive(obj, part);
+    }
+
+    return recolor.alpha > LV_OPA_TRANSP ? lv_color_over32(color_filter, recolor) : color_filter;
 }

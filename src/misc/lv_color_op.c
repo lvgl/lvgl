@@ -58,6 +58,34 @@ lv_color32_t lv_color_mix32(lv_color32_t fg, lv_color32_t bg)
     return bg;
 }
 
+lv_color_t lv_color_mix_color32(lv_color32_t fg, lv_color_t bg)
+{
+    lv_color_t ret;
+
+    ret.red = LV_UDIV255((uint16_t)fg.red * fg.alpha + bg.red * (255 - fg.alpha) + LV_COLOR_MIX_ROUND_OFS);
+    ret.green = LV_UDIV255((uint16_t)fg.green * fg.alpha + bg.green * (255 - fg.alpha) + LV_COLOR_MIX_ROUND_OFS);
+    ret.blue = LV_UDIV255((uint16_t)fg.blue * fg.alpha + bg.blue * (255 - fg.alpha) + LV_COLOR_MIX_ROUND_OFS);
+    return ret;
+}
+
+lv_color32_t lv_color_over32(lv_color32_t fg, lv_color32_t bg)
+{
+    lv_color_premultiply(&fg);
+    lv_color_premultiply(&bg);
+
+    uint8_t alpha = fg.alpha + (((uint32_t)bg.alpha * (255 - fg.alpha)) >> 8);
+    if(alpha == LV_OPA_TRANSP) {
+        return lv_color32_make(0, 0, 0, 0);
+    }
+
+    uint8_t red = LV_MIN(((uint32_t)(fg.red << 8) + (uint32_t)bg.red * (255 - fg.alpha)) / alpha, UINT8_MAX);
+    uint8_t green = LV_MIN((((uint32_t)fg.green << 8) + (uint32_t)bg.green * (255 - fg.alpha)) / alpha, UINT8_MAX);
+    uint8_t blue = LV_MIN((((uint32_t)fg.blue << 8) + (uint32_t)bg.blue * (255 - fg.alpha)) / alpha, UINT8_MAX);
+
+
+    return lv_color32_make(red, green, blue, alpha);
+}
+
 uint8_t lv_color_brightness(lv_color_t c)
 {
     uint16_t bright = (uint16_t)(3u * c.red + c.green + 4u * c.blue);
