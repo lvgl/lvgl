@@ -1,8 +1,8 @@
 .. _widgets:
 
-=======
-Widgets
-=======
+===========
+All Widgets
+===========
 
 .. toctree::
     :maxdepth: 1

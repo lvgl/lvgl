@@ -33,6 +33,9 @@ Description
     script attempts to rebuild only those documents whose path, name or
     modification date has changed since the last build.
 
+    The output directory also has a fixed location (overridable by
+    `LVGL_DOC_BUILD_OUTPUT_DIR` environment variable).
+
     Caution:
 
     The document build meant for end-user consumption should ONLY be done after a
@@ -174,7 +177,7 @@ import config_builder
 _ = os.path.abspath(os.path.dirname(__file__))
 docs_src_dir = os.path.join(_, 'src')
 sys.path.insert(0, docs_src_dir)
-from lvgl_version import lvgl_version #NoQA
+from lvgl_version import lvgl_version  # NoQA
 
 # Not Currently Used
 # (Code is kept in case we want to re-implement it later.)
@@ -184,10 +187,11 @@ from lvgl_version import lvgl_version #NoQA
 # Configuration
 # -------------------------------------------------------------------------
 # These are relative paths from the ./docs/ directory.
+cfg_project_dir = '..'
 cfg_src_dir = 'src'
-cfg_output_dir = 'build'
 cfg_examples_dir = 'examples'
 cfg_default_intermediate_dir = 'intermediate'
+cfg_default_output_dir = 'build'
 cfg_static_dir = '_static'
 cfg_downloads_dir = 'downloads'
 cfg_lv_conf_filename = 'lv_conf.h'
@@ -195,7 +199,7 @@ cfg_lv_version_filename = 'lv_version.h'
 cfg_doxyfile_filename = 'Doxyfile'
 cfg_top_index_filename = 'index.rst'
 
-# Filename generated in `cfg_latex_output_dir` and copied to `cfg_pdf_output_dir`.
+# Filename generated in `latex_output_dir` and copied to `pdf_output_dir`.
 cfg_pdf_filename = 'LVGL.pdf'
 
 
@@ -244,27 +248,27 @@ def cmd(s, start_dir=None, exit_on_error=True):
         sys.exit(result)
 
 
-def intermediate_dir_contents_exists(_intdir):
+def intermediate_dir_contents_exists(dir):
     """Provide answer to question:  Can we have reasonable confidence that
     the contents of `intermediate_directory` already exists?
     """
     result = False
-    c1 = os.path.isdir(_intdir)
+    c1 = os.path.isdir(dir)
 
     if c1:
-        temp_path = os.path.join(_intdir, 'CHANGELOG.rst')
+        temp_path = os.path.join(dir, 'CHANGELOG.rst')
         c2 = os.path.exists(temp_path)
-        temp_path = os.path.join(_intdir, '_ext')
+        temp_path = os.path.join(dir, '_ext')
         c3 = os.path.isdir(temp_path)
-        temp_path = os.path.join(_intdir, '_static')
+        temp_path = os.path.join(dir, '_static')
         c4 = os.path.isdir(temp_path)
-        temp_path = os.path.join(_intdir, 'details')
+        temp_path = os.path.join(dir, 'details')
         c5 = os.path.isdir(temp_path)
-        temp_path = os.path.join(_intdir, 'intro')
+        temp_path = os.path.join(dir, 'intro')
         c6 = os.path.isdir(temp_path)
-        temp_path = os.path.join(_intdir, 'contributing')
+        temp_path = os.path.join(dir, 'contributing')
         c7 = os.path.isdir(temp_path)
-        temp_path = os.path.join(_intdir, cfg_examples_dir)
+        temp_path = os.path.join(dir, cfg_examples_dir)
         c8 = os.path.isdir(temp_path)
         result = c2 and c3 and c4 and c5 and c6 and c7 and c8
 
@@ -377,19 +381,12 @@ def run(args):
     # _dir      = path leading to a directory         (absolute or relative)
     # ---------------------------------------------------------------------
     base_dir = os.path.abspath(os.path.dirname(__file__))
-    project_dir = os.path.abspath(os.path.join(base_dir, '..'))
+    project_dir = os.path.abspath(os.path.join(base_dir, cfg_project_dir))
     examples_dir = os.path.join(project_dir, cfg_examples_dir)
     lvgl_src_dir = os.path.join(project_dir, 'src')
-    output_dir = os.path.join(base_dir, cfg_output_dir)
-    html_output_dir = os.path.join(output_dir, 'html')
-    latex_output_dir = os.path.join(output_dir, 'latex')
-    pdf_output_dir = os.path.join(output_dir, 'pdf')
-    pdf_src_file = os.path.join(latex_output_dir, cfg_pdf_filename)
-    pdf_dst_file = os.path.join(pdf_output_dir, cfg_pdf_filename)
-    version_src_file = os.path.join(project_dir, cfg_lv_version_filename)
 
     # Establish intermediate directory.  The presence of environment variable
-    # `LVGL_DOC_BUILD_INTERMEDIATE_DIR` overrides default in `cfg_intermediate_dir`.
+    # `LVGL_DOC_BUILD_INTERMEDIATE_DIR` overrides default in `cfg_default_intermediate_dir`.
     if 'LVGL_DOC_BUILD_INTERMEDIATE_DIR' in os.environ:
         intermediate_dir = os.environ['LVGL_DOC_BUILD_INTERMEDIATE_DIR']
     else:
@@ -405,6 +402,20 @@ def run(args):
     sphinx_path_sep = '/'
     pdf_relative_file = cfg_static_dir + sphinx_path_sep + cfg_downloads_dir + sphinx_path_sep + cfg_pdf_filename
     pdf_link_ref_str = f'PDF Version: :download:`{cfg_pdf_filename} <{pdf_relative_file}>`'
+
+    # Establish build directory.  The presence of environment variable
+    # `LVGL_DOC_BUILD_OUTPUT_DIR` overrides default in `cfg_default_output_dir`.
+    if 'LVGL_DOC_BUILD_OUTPUT_DIR' in os.environ:
+        output_dir = os.environ['LVGL_DOC_BUILD_OUTPUT_DIR']
+    else:
+        output_dir = os.path.join(base_dir, cfg_default_output_dir)
+
+    html_output_dir = os.path.join(output_dir, 'html')
+    latex_output_dir = os.path.join(output_dir, 'latex')
+    pdf_output_dir = os.path.join(output_dir, 'pdf')
+    pdf_src_file = os.path.join(latex_output_dir, cfg_pdf_filename)
+    pdf_dst_file = os.path.join(pdf_output_dir, cfg_pdf_filename)
+    version_src_file = os.path.join(project_dir, cfg_lv_version_filename)
 
     # Special stuff for right-aligning PDF download link.
     # Note: this needs to be embedded in a <div> tag because the
@@ -426,10 +437,11 @@ def run(args):
         + os.linesep
 
     # ---------------------------------------------------------------------
-    # Change to script directory for consistency.
+    # Change to script directory for consistent run-time environment.
     # ---------------------------------------------------------------------
     os.chdir(base_dir)
     print(f'Intermediate dir:  [{intermediate_dir}]')
+    print(f'Output dir      :  [{output_dir}]')
     print(f'Running from    :  [{base_dir}]')
 
     # ---------------------------------------------------------------------
@@ -519,7 +531,9 @@ def run(args):
     # link(s) and API links) before being used to generate new docs.
     # ---------------------------------------------------------------------
     # dirsync `exclude_list` = list of regex patterns to exclude.
-    exclude_list = [r'lv_conf\.h', r'^tmp.*', r'^output.*']
+    intermediate_re = r'^' + cfg_default_intermediate_dir + r'.*'
+    output_re = r'^' + cfg_default_output_dir + r'.*'
+    exclude_list = [r'lv_conf\.h', r'^__pycache__.*', intermediate_re, output_re]
 
     if intermediate_dir_contents_exists(intermediate_dir):
         # We are just doing an update of the intermediate_dir contents.
@@ -558,8 +572,8 @@ def run(args):
         else:
             # --------- Method 1:
             options = {
-               'create': True,    # Create directories if they don't exist.
-               'exclude': exclude_list
+                'create': True,    # Create directories if they don't exist.
+                'exclude': exclude_list
             }
             # action == 'sync' means copy files even when they do not already exist in tgt dir.
             # action == 'update' means DO NOT copy files when they do not already exist in tgt dir.
@@ -627,9 +641,9 @@ def run(args):
                 intermediate_dir,
                 os.path.join(intermediate_dir, 'intro'),
                 os.path.join(intermediate_dir, 'details'),
-                os.path.join(intermediate_dir, 'details', 'generic-widget-features'),
-                os.path.join(intermediate_dir, 'details', 'generic-widget-features', 'layouts'),
-                os.path.join(intermediate_dir, 'details', 'generic-widget-features', 'styles'),
+                os.path.join(intermediate_dir, 'details', 'common-widget-features'),
+                os.path.join(intermediate_dir, 'details', 'common-widget-features', 'layouts'),
+                os.path.join(intermediate_dir, 'details', 'common-widget-features', 'styles'),
                 os.path.join(intermediate_dir, 'details', 'debugging'),
                 os.path.join(intermediate_dir, 'details', 'integration'),
                 os.path.join(intermediate_dir, 'details', 'integration', 'adding-lvgl-to-your-project'),
@@ -693,21 +707,11 @@ def run(args):
         cmd_line = 'latexmk -pdf "LVGL.tex"'
         cmd(cmd_line, latex_output_dir, False)
 
-        # Copy resulting PDF to its output directory.
+        # Move resulting PDF to its output directory.
         if not os.path.exists(pdf_output_dir):
             os.makedirs(pdf_output_dir)
 
-        shutil.copyfile(pdf_src_file, pdf_dst_file)
-
-        # Copy resulting PDF to intermediate directory to make
-        # it available for the HTML build (Sphinx copies it to
-        # its HTML output so it ends up on the webserver where it
-        # can be downloaded).
-        if not os.path.exists(pdf_intermediate_dst_dir):
-            os.makedirs(pdf_intermediate_dst_dir)
-
-        shutil.move(pdf_src_file, pdf_intermediate_dst_file)
-
+        shutil.move(pdf_src_file, pdf_dst_file)
         t2 = datetime.now()
         print('PDF           :  ' + pdf_dst_file)
         print('Latex gen time:  ' + str(t2 - t1))
@@ -722,6 +726,17 @@ def run(args):
         print("****************")
         print("Building HTML output...")
         print("****************")
+
+        # If PDF is present in build directory, copy it to
+        # intermediate directory for use by HTML build.
+        # (Sphinx copies it to its HTML output, so it ends
+        # up on the webserver where it can be downloaded).
+        if os.path.isfile(pdf_dst_file):
+            # Create _static/download/ directory if needed.
+            if not os.path.exists(pdf_intermediate_dst_dir):
+                os.makedirs(pdf_intermediate_dst_dir)
+
+            shutil.copyfile(pdf_dst_file, pdf_intermediate_dst_file)
 
         # If PDF is present, ensure there is a link to it in the top
         # index.rst so HTML build will have it.
