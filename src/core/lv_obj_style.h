@@ -307,6 +307,22 @@ static inline int32_t lv_obj_get_style_transform_scale_y_safe(const lv_obj_t * o
  */
 lv_opa_t lv_obj_get_style_opa_recursive(const lv_obj_t * obj, lv_part_t part);
 
+/**
+ * Get the `color_filter` style property and convert to lv_color32_t
+ * @param obj       the object whose opacity should be get
+ * @param part      the part whose opacity should be get.
+ * @return          the converted color32
+ */
+lv_color32_t lv_obj_get_style_color_filter_resolved(const lv_obj_t * obj, lv_part_t part);
+
+/**
+ * Get the `color_filter` style property from all parents and convert to lv_color32_t
+ * @param obj       the object whose opacity should be get
+ * @param part      the part whose opacity should be get.
+ * @return          the final color_filter considering the parent too
+ */
+lv_color32_t lv_obj_get_style_color_filter_recursive(const lv_obj_t * obj, lv_part_t part);
+
 /**********************
  *      MACROS
  **********************/
