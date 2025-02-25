@@ -1,23 +1,29 @@
 .. _freetype:
 
 ================
-FreeType support
+FreeType Support
 ================
 
-Interface to FreeType library to generate font bitmaps at run time.
+**FreeType** is a freely available software library to render fonts.
 
-A detailed introduction can be found at: https://freetype.org/ .
+The LVGL FreeType extension is an interface to the FreeType library, enabling you to
+generate font bitmaps at run time from most vector- and bitmap-font file formats.
+
+For a detailed introduction, see:  https://freetype.org/ .
 
 
 
-Add FreeType to your project
-****************************
+Adding FreeType to Your Project
+*******************************
 
-First, Download FreeType from `here <https://sourceforge.net/projects/freetype/files/>`__.
+First, Download FreeType from the ``freetype2`` folder (and optionally ``freetype-docs``
+and ``freetype-demos``) from its `official repository
+<https://sourceforge.net/projects/freetype/files/>`__.  (The latest version is
+recommended.)
 
 If you haven't already done so, now is a good time to get familiar with setting up
 and configuring this library.  The above website is a good place to start, as is the
-``README`` file in the top directory of the freetype project directory.
+``README`` file in the top directory of the version you downloaded.
 
 There are two ways to use FreeType:
 
@@ -30,7 +36,7 @@ For UNIX systems, the following is recommended to compile and install FreeType l
 - ``make``
 - ``sudo make install``
 - Add include path: ``/usr/include/freetype2`` (for GCC: ``-I/usr/include/freetype2 -L/usr/local/lib``)
-- Link library: ``freetype`` (for GCC: ``-L/usr/local/lib -lfreetype``)
+- Link against library: ``freetype`` (for GCC: ``-L/usr/local/lib -lfreetype``)
 
 For Embedded Devices
 --------------------
@@ -77,7 +83,7 @@ save limited FLASH space.
 Usage
 *****
 
-Enable :c:macro:`LV_USE_FREETYPE` in ``lv_conf.h``.
+Set :c:macro:`LV_USE_FREETYPE` in ``lv_conf.h`` to ``1``.
 
 Cache configuration:
 
@@ -109,7 +115,14 @@ rendered. An example on how to draw a colored bitmap glyph is shown below.
 
 Use the :cpp:func:`lv_freetype_font_create` function to create a font. To
 delete a font, use :cpp:func:`lv_freetype_font_delete`. For more detailed usage,
-please refer to example code.
+please refer to the example code below.
+
+
+
+.. admonition::  Further Reading
+
+    - `FreeType tutorial <https://www.freetype.org/freetype2/docs/tutorial/step1.html>`__
+    - LVGL's :ref:`add_font`
 
 
 
@@ -119,14 +132,6 @@ Examples
 ********
 
 .. include:: ../../examples/libs/freetype/index.rst
-
-
-
-Learn More
-**********
-
--  FreeType`tutorial <https://www.freetype.org/freetype2/docs/tutorial/step1.html>`__
--  LVGL's :ref:`add_font`
 
 
 

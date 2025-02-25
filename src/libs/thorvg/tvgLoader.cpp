@@ -309,7 +309,7 @@ LoadModule* LoaderMgr::loader(const string& path, bool* invalid)
     if (auto loader = _findByPath(path)) {
         if (loader->open(path)) {
             if (allowCache) {
-                loader->hashpath = strdup(path.c_str());
+                loader->hashpath = lv_strdup(path.c_str());
                 loader->pathcache = true;
                 {
                     ScopedLock lock(key);
@@ -325,7 +325,7 @@ LoadModule* LoaderMgr::loader(const string& path, bool* invalid)
         if (auto loader = _find(static_cast<FileType>(i))) {
             if (loader->open(path)) {
                 if (allowCache) {
-                    loader->hashpath = strdup(path.c_str());
+                    loader->hashpath = lv_strdup(path.c_str());
                     loader->pathcache = true;
                     {
                         ScopedLock lock(key);
@@ -448,7 +448,7 @@ LoadModule* LoaderMgr::loader(const char* name, const char* data, uint32_t size,
     //function is dedicated for ttf loader (the only supported font loader)
     auto loader = new TtfLoader;
     if (loader->open(data, size, copy)) {
-        loader->hashpath = strdup(name);
+        loader->hashpath = lv_strdup(name);
         loader->pathcache = true;
         ScopedLock lock(key);
         _activeLoaders.back(loader);

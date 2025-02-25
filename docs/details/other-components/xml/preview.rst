@@ -33,8 +33,15 @@ Example
 
 .. code-block:: xml
 
-	<previews>
-		<preview name="small_dark" width="200" height="100" style_bg_color="0x333" style_pad_all="32"/>
-		<preview name="centered" width="200" height="100" flex="row center"/>
-		<preview name="large_light" width="1980" height="1080" style_bg_color="0xeeeeee"/>
-	</previews>
+  <component>
+    <previews>
+      <preview name="small_dark" width="content" height="100" style_bg_color="0x333" style_pad_all="32"/>
+      <preview name="centered" width="200" height="100" flex="row center"/>
+      <preview name="large_light" width="1980" height="1080" style_bg_color="0xeeeeee"/>
+    </previews>
+
+    <view>
+       ...
+    </view>
+
+  </component>

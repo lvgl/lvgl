@@ -74,7 +74,7 @@ struct RenderContext
     ~RenderContext()
     {
         PP(propagator)->unref();
-        free(transform);
+        lv_free(transform);
         delete(roundness);
         delete(offsetPath);
     }

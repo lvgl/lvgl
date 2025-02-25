@@ -136,6 +136,15 @@ void lv_free(void * data)
     lv_free_core(data);
 }
 
+void * lv_reallocf(void * data_p, size_t new_size)
+{
+    void * new = lv_realloc(data_p, new_size);
+    if(!new) {
+        lv_free(data_p);
+    }
+    return new;
+}
+
 void * lv_realloc(void * data_p, size_t new_size)
 {
     LV_TRACE_MEM("reallocating %p with %lu size", data_p, (unsigned long)new_size);

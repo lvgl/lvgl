@@ -47,7 +47,7 @@ Create a message box
 
 :cpp:expr:`lv_msgbox_create(parent)` creates a message box.
 If ``parent`` is ``NULL`` the message box will be modal, and will use the
-:ref:`default_display`'s Top :ref:`Layer <screen_layers>` as a parent.
+:ref:`default_display`'s Top :ref:`Layer <display_screen_layers>` as a parent.
 
 
 Adding buttons

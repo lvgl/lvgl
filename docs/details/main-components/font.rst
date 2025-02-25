@@ -343,7 +343,7 @@ to have a special binary format. (Not TTF or WOFF). Use
 `lv_font_conv <https://github.com/lvgl/lv_font_conv/>`__ with the
 ``--format bin`` option to generate an LVGL compatible font file.
 
-:note: To load a font :ref:`LVGL's filesystem <overview_file_system>`
+:note: To load a font :ref:`LVGL's filesystem <file_system>`
        needs to be enabled and a driver must be added.
 
 Example
@@ -367,7 +367,7 @@ Loading a Font from a Memory Buffer at Run-Time
 This function may be useful to load a font from an external file system, which is not
 supported by LVGL. The font needs to be in the same format as if it were loaded from a file.
 
-:note: To load a font from a buffer :ref:`LVGL's filesystem <overview_file_system>`
+:note: To load a font from a buffer :ref:`LVGL's filesystem <file_system>`
        needs to be enabled and the MEMFS driver must be added.
 
 Example

@@ -1,8 +1,8 @@
-.. _others:
+.. _xml_component:
 
-================
-Other Components
-================
+====================
+XML - Declarative UI
+====================
 
 .. toctree::
     :maxdepth: 1
@@ -26,4 +26,6 @@ Other Components
     events
     subjects
     animations
+
+    translations
 

@@ -2,31 +2,18 @@
 JavaScript
 ==========
 
-With `lv_binding_js <https://github.com/lvgl/lv_binding_js>`__ you can write lvgl with JavaScript.
+With `lv_binding_js <https://github.com/lvgl/lv_binding_js>`__ you can use LVGL from within JavaScript.
 
-It uses React's virtual DOM concept to manipulate lvgl UI components, providing a familiar React-like
+It uses React's virtual DOM concept to manipulate LVGL UI components, providing a familiar React-like
 experience to users.
 
 **Code**
 
 **Code Running on Real Device**
 
-Table of Contents
------------------
-
-- `Features <#features>`__
-- `Demo <#demo>`__
-- `Building <#building>`__
-- `Components <#components>`__
-- `Font <#font>`__
-- `Animation <#animation>`__
-- `Style <#style>`__
-- `JSAPI <#jsapi>`__
-- `Thanks <#thanks>`__
-
 
 Features
---------
+********
 
 - Support all lvgl built-in components
 - Fully support lvgl flex and grid style
@@ -36,34 +23,33 @@ Features
 
 
 Demo
-----
+****
 
 See the `demo <https://github.com/lvgl/lv_binding_js/tree/master/demo>`__ folder
 
 
 Building
---------
+********
 
 The following are developer notes on how to build lvgljs on your native platform. They are not complete guides,
 but include notes on the necessary libraries, compile flags, etc.
 
 
 lvgljs
-~~~~~~
+------
 
-- `ubuntu build Notes for sdl simulator <https://github.com/lvgl/lv_binding_js/blob/master/doc/build/build-ubuntu-arm.md>`__
-- `macos x86 build Notes for sdl simulator <https://github.com/lvgl/lv_binding_js/blob/master/doc/build/build-macos-x86-simulator.md>`__
-- `ubuntu build Notes for platform arm <https://github.com/lvgl/lv_binding_js/blob/master/doc/build/build-ubuntu-x86-simulator.md>`__
+- `Build Notes for embedded Linux device <https://github.com/lvgl/lv_binding_js/blob/master/doc/build/build-device.md>`__
+- `Build Notes for SDL Simulator (Linux and macOS) <https://github.com/lvgl/lv_binding_js/blob/master/doc/build/build-simulator.md>`__
 
 
 JS Bundle
-~~~~~~~~~
+---------
 
 - `JS Bundle build Notes <https://github.com/lvgl/lv_binding_js/blob/master/doc/build/js-bundle.md>`__
 
 
 Components
-----------
+**********
 
 - `View <https://github.com/lvgl/lv_binding_js/blob/master/doc/component/View.md>`__
 - `Image <https://github.com/lvgl/lv_binding_js/blob/master/doc/component/Image.md>`__
@@ -83,19 +69,19 @@ Components
 
 
 Font
-----
+****
 
 - `Builtin-Symbol <https://github.com/lvgl/lv_binding_js/blob/master/doc/Symbol/symbol.md>`__
 
 
 Animation
----------
+*********
 
 - `Animation <https://github.com/lvgl/lv_binding_js/blob/master/doc/animate/animate.md>`__
 
 
 Style
------
+*****
 
 .. include::https://github.com/lvgl/lv_binding_js/blob/master/doc/style/position-size-layout.md
 
@@ -117,7 +103,7 @@ Style
 
 
 JSAPI
------
+*****
 
 - `network <https://github.com/lvgl/lv_binding_js/blob/master/doc/jsapi/network.md>`__
 - `filesystem <https://github.com/lvgl/lv_binding_js/blob/master/doc/jsapi/fs.md>`__
@@ -125,9 +111,9 @@ JSAPI
 
 
 Thanks
-------
+******
 
-lvgljs depends on following excellent work
+**lvgljs** depends on following excellent work:
 
 - `lvgl <https://github.com/lvgl/lvgl>`__: Create beautiful UIs for any MCU, MPU and display type
 - `QuickJS <https://bellard.org/quickjs/>`__: JavaScript engine

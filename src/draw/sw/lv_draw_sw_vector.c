@@ -330,13 +330,22 @@ static void _set_paint_fill(Tvg_Paint * obj, Tvg_Canvas * canvas, const lv_vecto
         tvg_shape_set_fill_color(obj, c.r, c.g, c.b, c.a);
     }
     else if(dsc->style == LV_VECTOR_DRAW_STYLE_PATTERN) {
-        float x, y, w, h;
-        tvg_paint_get_bounds(obj, &x, &y, &w, &h, false);
-
         lv_matrix_t imx;
-        lv_memcpy(&imx, matrix, sizeof(lv_matrix_t));
-        lv_matrix_translate(&imx, x, y);
-        lv_matrix_multiply(&imx, &dsc->matrix);
+
+        if(dsc->fill_units == LV_VECTOR_FILL_UNITS_OBJECT_BOUNDING_BOX) {
+            /* Convert to object bounding box coordinates */
+            imx = *matrix;
+
+            float x, y, w, h;
+            tvg_paint_get_bounds(obj, &x, &y, &w, &h, false);
+            lv_matrix_translate(&imx, x, y);
+            lv_matrix_multiply(&imx, &dsc->matrix);
+        }
+        else {
+            /* Copy fill matrix directly, no need to convert */
+            imx = dsc->matrix;
+        }
+
         _set_paint_fill_pattern(obj, canvas, &dsc->img_dsc, &imx);
     }
     else if(dsc->style == LV_VECTOR_DRAW_STYLE_GRADIENT) {
@@ -485,7 +494,7 @@ void lv_draw_sw_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc
     }
 
     Tvg_Canvas * canvas = tvg_swcanvas_create();
-    tvg_swcanvas_set_target(canvas, buf, stride / 4, width, height, TVG_COLORSPACE_ARGB8888);
+    tvg_swcanvas_set_target(canvas, buf, stride / 4, width, height, TVG_COLORSPACE_ARGB8888S);
 
     _tvg_rect rc;
     lv_area_to_tvg(&rc, &t->clip_area);

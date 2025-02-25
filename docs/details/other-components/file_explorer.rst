@@ -37,7 +37,7 @@ non-zero value to use the "Quick-Access" panel.
 
 .. note::
 
-    In order to use File Explorer, :ref:`overview_file_system` has to be set up and
+    In order to use File Explorer, :ref:`file_system` has to be set up and
     know about all the drive letters you use when passing paths to File System
     (described below).
 
@@ -47,7 +47,7 @@ Prerequisites
 *************
 
 If you haven't already done so, you will need to learn about the LVGL :ref:`File
-System abstraction <overview_file_system>`, since it must be set up and be functional
+System abstraction <file_system>`, since it must be set up and be functional
 for File Explorer to work.
 
 

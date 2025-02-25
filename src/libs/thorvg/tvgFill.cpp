@@ -103,7 +103,8 @@ Result Fill::colorStops(const ColorStop* colorStops, uint32_t cnt) noexcept
     }
 
     if (pImpl->cnt != cnt) {
-        pImpl->colorStops = static_cast<ColorStop*>(realloc(pImpl->colorStops, cnt * sizeof(ColorStop)));
+        pImpl->colorStops = static_cast<ColorStop*>(lv_realloc(pImpl->colorStops, cnt * sizeof(ColorStop)));
+        LV_ASSERT_MALLOC(pImpl->colorStops);
     }
 
     pImpl->cnt = cnt;
@@ -138,7 +139,8 @@ FillSpread Fill::spread() const noexcept
 Result Fill::transform(const Matrix& m) noexcept
 {
     if (!pImpl->transform) {
-        pImpl->transform = static_cast<Matrix*>(malloc(sizeof(Matrix)));
+        pImpl->transform = static_cast<Matrix*>(lv_malloc(sizeof(Matrix)));
+        LV_ASSERT_MALLOC(pImpl->transform);
     }
     *pImpl->transform = m;
     return Result::Success;

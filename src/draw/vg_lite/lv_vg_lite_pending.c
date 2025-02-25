@@ -20,7 +20,9 @@
  **********************/
 
 struct _lv_vg_lite_pending_t {
-    lv_array_t objs;
+    lv_array_t * arr_act;
+    lv_array_t arr_1;
+    lv_array_t arr_2;
     lv_vg_lite_pending_free_cb_t free_cb;
     void * user_data;
 };
@@ -45,7 +47,9 @@ lv_vg_lite_pending_t * lv_vg_lite_pending_create(size_t obj_size, uint32_t capac
 {
     lv_vg_lite_pending_t * pending = lv_malloc_zeroed(sizeof(lv_vg_lite_pending_t));
     LV_ASSERT_MALLOC(pending);
-    lv_array_init(&pending->objs, capacity_default, obj_size);
+    lv_array_init(&pending->arr_1, capacity_default, obj_size);
+    lv_array_init(&pending->arr_2, capacity_default, obj_size);
+    pending->arr_act = &pending->arr_1;
     return pending;
 }
 
@@ -53,7 +57,8 @@ void lv_vg_lite_pending_destroy(lv_vg_lite_pending_t * pending)
 {
     LV_ASSERT_NULL(pending);
     lv_vg_lite_pending_remove_all(pending);
-    lv_array_deinit(&pending->objs);
+    lv_array_deinit(&pending->arr_1);
+    lv_array_deinit(&pending->arr_2);
     lv_memzero(pending, sizeof(lv_vg_lite_pending_t));
     lv_free(pending);
 }
@@ -71,7 +76,7 @@ void lv_vg_lite_pending_add(lv_vg_lite_pending_t * pending, void * obj)
 {
     LV_ASSERT_NULL(pending);
     LV_ASSERT_NULL(obj);
-    lv_array_push_back(&pending->objs, obj);
+    lv_array_push_back(pending->arr_act, obj);
 }
 
 void lv_vg_lite_pending_remove_all(lv_vg_lite_pending_t * pending)
@@ -79,17 +84,23 @@ void lv_vg_lite_pending_remove_all(lv_vg_lite_pending_t * pending)
     LV_ASSERT_NULL(pending);
     LV_ASSERT_NULL(pending->free_cb);
 
-    uint32_t size = lv_array_size(&pending->objs);
+    uint32_t size = lv_array_size(pending->arr_act);
     if(size == 0) {
         return;
     }
 
     /* remove all the pending objects */
     for(uint32_t i = 0; i < size; i++) {
-        pending->free_cb(lv_array_at(&pending->objs, i), pending->user_data);
+        pending->free_cb(lv_array_at(pending->arr_act, i), pending->user_data);
     }
 
-    lv_array_clear(&pending->objs);
+    lv_array_clear(pending->arr_act);
+}
+
+void lv_vg_lite_pending_swap(lv_vg_lite_pending_t * pending)
+{
+    lv_vg_lite_pending_remove_all(pending);
+    pending->arr_act = (pending->arr_act == &pending->arr_1) ? &pending->arr_2 : &pending->arr_1;
 }
 
 /**********************
