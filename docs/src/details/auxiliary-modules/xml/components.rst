@@ -5,7 +5,7 @@ Components
 ==========
 
 Overview
---------
+********
 
 ``<component>`` can have ``<consts>``, ``<api>``, ``<styles>``, and ``<view>`` tags inside.
 
@@ -14,8 +14,10 @@ Unlike widgets (which are always compiled into the application), components can 
 1. Be loaded at runtime from XML.
 2. Be exported to C code.
 
-Usage from exported code
-------------------------
+
+
+Usage from Exported Code
+************************
 
 From each component XML file, a C and H file is exported with a single function inside:
 
@@ -30,11 +32,13 @@ If the user needs to access or modify values dynamically, it is recommended to u
 
 The user can also call these ``_create_`` functions at any time from the application code.
 
+
+
 Usage from XML
---------------
+**************
 
 Registration
-^^^^^^^^^^^^
+------------
 
 Once a component is created (e.g., ``my_button``), it can be registered by calling either:
 
@@ -47,7 +51,7 @@ This is required to make LVGL recognize the component by name.
 When loaded from a file, the file name is used as the component name.
 
 Instantiation
-^^^^^^^^^^^^^
+-------------
 
 After registration, a new instance of any registered component can be created with:
 
@@ -72,8 +76,10 @@ The last parameter can be ``NULL`` or an attribute list, like this:
 
     lv_obj_t * btn1 = lv_xml_create(lv_screen_active(), "my_button", my_button_attrs);
 
+
+
 Parameters
-----------
+**********
 
 The properties of child elements can be adjusted, such as:
 
@@ -127,10 +133,14 @@ The following example demonstrates parameter passing and the use of the
     };
     lv_xml_create(lv_screen_active(), "red_button", attrs);
 
+
+
 Example
 *******
 
-.. include:: ../../examples/others/xml/index.rst
+.. include:: ../../../examples/others/xml/index.rst
+
+
 
 API
 ***
