@@ -1,8 +1,8 @@
-.. _add_lvgl_to_your_project:
+.. _adding_lvgl_to_your_project:
 
-========================
-Add LVGL to Your Project
-========================
+===========================
+Adding LVGL to Your Project
+===========================
 
 
 .. toctree::

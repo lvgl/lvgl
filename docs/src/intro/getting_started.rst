@@ -460,9 +460,9 @@ advancing your knowledge:
 3. If not already done, read the :ref:`lvgl_basics` (above).  (15 minutes)
 4. Set up an LVGL :ref:`simulator`.  (10 minutes)
 5. Have a look at some :ref:`examples` and their code.
-6. Add LVGL to your project.  See :ref:`add_lvgl_to_your_project` or check out
+6. Add LVGL to your project.  See :ref:`adding_lvgl_to_your_project` or check out
    the `ready-to-use Projects`_.
-7. Read the :ref:`main_components` pages to get a better understanding of the library. (2-3 hours)
+7. Read the :ref:`main_modules` pages to get a better understanding of the library. (2-3 hours)
 8. Skim the documentation of :ref:`widgets` to see what is available.
 9. If you have questions go to the `Forum`_.
 10. Read the :ref:`contributing` guide to see how you can help to improve LVGL. (15 minutes)

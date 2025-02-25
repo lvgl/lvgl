@@ -1,8 +1,8 @@
-.. _main_components:
+.. _main_modules:
 
-===============
-Main Components
-===============
+============
+Main Modules
+============
 
 .. toctree::
     :maxdepth: 2

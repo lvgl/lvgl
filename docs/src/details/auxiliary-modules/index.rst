@@ -1,8 +1,8 @@
-.. _others:
+.. _auxiliary_modules:
 
-================
-Other Components
-================
+=================
+Auxiliary Modules
+=================
 
 .. toctree::
     :maxdepth: 1

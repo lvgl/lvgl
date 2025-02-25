@@ -20,7 +20,7 @@ Including LVGL in a Project
   ensuring that the LVGL directory is listed.
 
 Now that the source files are included in your project, follow the instructions to
-:ref:`add_lvgl_to_your_project` and to create the ``lv_conf.h`` file, and
+:ref:`adding_lvgl_to_your_project` and to create the ``lv_conf.h`` file, and
 initialise the display.
 
 

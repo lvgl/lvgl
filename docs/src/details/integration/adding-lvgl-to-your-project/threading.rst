@@ -148,7 +148,7 @@ Using this method, creation, modification and deletion of all Widgets and other
 LVGL resources (i.e. all LVGL function calls excluding the :ref:`exceptions
 <os_exception>` mentioned above) are called by that thread.  That means
 that thread is also the ONLY caller of :cpp:func:`lv_timer_handler`.  (See
-:ref:`add_lvgl_to_your_project` for more information.)
+:ref:`adding_lvgl_to_your_project` for more information.)
 
 This ensures LVGL's data structures "appear" atomic_ (all threads using this data
 "see" it in a consistent state) by the fact that no other threads are "viewing" those
