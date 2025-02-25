@@ -725,10 +725,6 @@ def run():
     # ---------------------------------------------------------------------
     t_end = datetime.now()
     print('Total run time:  ' + str(t_end - t0))
-    print()
-    print('Note:  warnings about `/details/index.rst` and `/intro/index.rst`')
-    print('       "not being in any toctree" are expected and intentional.')
-    print()
     print('Done.')
 
 

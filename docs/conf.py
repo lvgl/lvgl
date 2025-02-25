@@ -132,7 +132,7 @@ html_theme_options = {
     # Toc options
     'sticky_navigation': True,
     'navigation_depth': 4,
-    'includehidden': True,
+    'includehidden': False,
     'titles_only': False,
 
     'collapse_navigation': False,
@@ -251,7 +251,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     (master_doc, 'lvgl', 'LVGL Documentation ' + version,
-     [author], 1)
+     [author], 3)
 ]
 
 

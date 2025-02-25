@@ -10,10 +10,7 @@ Default Refresh Behavior
 Normally the dirty (a.k.a invalid) areas are checked and redrawn in
 every :c:macro:`LV_DEF_REFR_PERIOD` milliseconds (set in ``lv_conf.h``).
 This happens as a result of a refresh :ref:`timer` created that gets created when
-the display is created
-executed
-at that
-interval
+the display is created, and is executed at that interval.
 
 
 
@@ -42,10 +39,10 @@ You can do this in the following way:
    lv_display_refr_timer(NULL);
 
 If you have multiple displays call :cpp:expr:`lv_display_set_default(display1)` to
-select the display to refresh before :cpp:expr:`_lv_display_refr_timer(NULL)`.
+select the display to refresh before :cpp:expr:`lv_display_refr_timer(NULL)`.
 
 
-.. note:: :cpp:func:`lv_timer_handler` and :cpp:func:`_lv_display_refr_timer` must not run at the same time.
+.. note:: :cpp:func:`lv_timer_handler` and :cpp:func:`lv_display_refr_timer` must not run at the same time.
 
 
 If the performance monitor is enabled, the value of :c:macro:`LV_DEF_REFR_PERIOD` needs to be set to be
