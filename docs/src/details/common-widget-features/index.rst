@@ -1,8 +1,8 @@
-.. _base_widget_overview:
+.. _common_widget_features:
 
-===========
-Base Widget
-===========
+======================
+Common Widget Features
+======================
 
 The following details apply to all types of Widgets.
 
