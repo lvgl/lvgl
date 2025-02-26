@@ -169,7 +169,7 @@ static void _vglite_draw_border(vglite_draw_task_t * vglite_task, const lv_area_
                                 const lv_area_t * clip_area, const lv_draw_border_dsc_t * dsc)
 {
     int32_t radius = dsc->radius;
-    vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
+    vg_lite_buffer_t * buf = vglite_get_dest_buf();
 
     if(radius < 0)
         return;
@@ -217,10 +217,10 @@ static void _vglite_draw_border(vglite_draw_task_t * vglite_task, const lv_area_
         if(has_vg_mask_feat) {
             /*** Enable scissor and apply scissor rects ***/
             VGLITE_CHECK_ERROR(vg_lite_enable_scissor());
-            VGLITE_CHECK_ERROR(vg_lite_scissor_rects(vgbuf, scissoring_rects.num_rect, scissoring_rects.rect));
+            VGLITE_CHECK_ERROR(vg_lite_scissor_rects(buf, scissoring_rects.num_rect, scissoring_rects.rect));
 
             /*** Draw border ***/
-            VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+            VGLITE_CHECK_ERROR(vg_lite_draw(buf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
 
             /*** Disable scissor ***/
             VGLITE_CHECK_ERROR(vg_lite_disable_scissor());
@@ -230,13 +230,13 @@ static void _vglite_draw_border(vglite_draw_task_t * vglite_task, const lv_area_
                 VGLITE_CHECK_ERROR(vg_lite_set_scissor(scissoring_rects.rect[i].x, scissoring_rects.rect[i].y,
                                                        scissoring_rects.rect[i].x + scissoring_rects.rect[i].width,
                                                        scissoring_rects.rect[i].y + scissoring_rects.rect[i].height));
-                VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+                VGLITE_CHECK_ERROR(vg_lite_draw(buf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
             }
         }
     }
     else {
         /*** Draw border ***/
-        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+        VGLITE_CHECK_ERROR(vg_lite_draw(buf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
     }
 
     vglite_run();
