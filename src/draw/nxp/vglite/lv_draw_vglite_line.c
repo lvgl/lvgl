@@ -94,7 +94,7 @@ static void _vglite_draw_line(vglite_draw_task_t * vglite_task, const lv_point_t
     vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
     LV_ASSERT(path != NULL);
     vglite_task->path = path;
-    vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
+    vg_lite_buffer_t * dest_buf = vglite_get_dest_buf();
     vg_lite_cap_style_t cap_style = (dsc->round_start || dsc->round_end) ? VG_LITE_CAP_ROUND : VG_LITE_CAP_BUTT;
     vg_lite_join_style_t join_style = (dsc->round_start || dsc->round_end) ? VG_LITE_JOIN_ROUND : VG_LITE_JOIN_MITER;
 
@@ -136,7 +136,7 @@ static void _vglite_draw_line(vglite_draw_task_t * vglite_task, const lv_point_t
 
     VGLITE_CHECK_ERROR(vg_lite_update_stroke(path));
 
-    VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, path, VG_LITE_FILL_NON_ZERO, NULL, vgblend, vgcol));
+    VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_NON_ZERO, NULL, vgblend, vgcol));
 
     vglite_run();
 }

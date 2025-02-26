@@ -104,7 +104,7 @@ void lv_draw_vglite_fill(vglite_draw_task_t * vglite_task)
 static void _vglite_fill(vglite_draw_task_t * vglite_task, const lv_area_t * dest_area,
                          const lv_draw_fill_dsc_t * dsc)
 {
-    vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
+    vg_lite_buffer_t * dest_buf = vglite_get_dest_buf();
 
     lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
@@ -117,7 +117,7 @@ static void _vglite_fill(vglite_draw_task_t * vglite_task, const lv_area_t * des
             .height = lv_area_get_height(dest_area)
         };
 
-        VGLITE_CHECK_ERROR(vg_lite_clear(vgbuf, &rect, vgcol));
+        VGLITE_CHECK_ERROR(vg_lite_clear(dest_buf, &rect, vgcol));
 
         vglite_run();
     }
@@ -140,7 +140,7 @@ static void _vglite_fill(vglite_draw_task_t * vglite_task, const lv_area_t * des
                                              ((vg_lite_float_t) dest_area->x2) + 1.0f, ((vg_lite_float_t) dest_area->y2) + 1.0f));
 
         /*Draw rectangle*/
-        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+        VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
 
         vglite_run();
     }
@@ -153,7 +153,7 @@ static void _vglite_draw_rect(vglite_draw_task_t * vglite_task, const lv_area_t 
     int32_t height = lv_area_get_height(coords);
     int32_t radius = dsc->radius;
     lv_opa_t opa = dsc->opa;
-    vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
+    vg_lite_buffer_t * dest_buf = vglite_get_dest_buf();
 
     if(dsc->radius < 0)
         return;
@@ -221,11 +221,11 @@ static void _vglite_draw_rect(vglite_draw_task_t * vglite_task, const lv_area_t 
             vg_lite_scale((float)width / 256.0f, 1.0f, grad_matrix);
         }
 
-        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(vgbuf, path, VG_LITE_FILL_EVEN_ODD, NULL, gradient,
+        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(dest_buf, path, VG_LITE_FILL_EVEN_ODD, NULL, gradient,
                                                  VG_LITE_BLEND_SRC_OVER));
     }
     else {
-        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+        VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
     }
 
     vglite_run();

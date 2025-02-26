@@ -93,7 +93,7 @@ static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_are
                                   const lv_area_t * clip_area,
                                   const lv_draw_triangle_dsc_t * dsc)
 {
-    vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
+    vg_lite_buffer_t * dest_buf = vglite_get_dest_buf();
 
     lv_area_t tri_area;
     tri_area.x1 = (int32_t)LV_MIN3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
@@ -170,11 +170,11 @@ static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_are
             vg_lite_scale((float)width / 256.0f, 1.0f, grad_matrix);
         }
 
-        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(vgbuf, path, VG_LITE_FILL_EVEN_ODD, NULL, gradient,
+        VGLITE_CHECK_ERROR(vg_lite_draw_gradient(dest_buf, path, VG_LITE_FILL_EVEN_ODD, NULL, gradient,
                                                  VG_LITE_BLEND_SRC_OVER));
     }
     else {
-        VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+        VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_EVEN_ODD, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
     }
 
     vglite_run();
