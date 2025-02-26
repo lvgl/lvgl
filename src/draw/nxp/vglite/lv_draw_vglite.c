@@ -49,6 +49,8 @@ typedef struct _vglite_flush_task {
  *  STATIC PROTOTYPES
  **********************/
 
+static inline void _vglite_cleanup_task(vglite_draw_task_t * task);
+
 /*
  * Evaluate a task and set the score and preferred VGLite draw unit.
  * Return 1 if task is preferred, 0 otherwise (task is not supported).
@@ -337,7 +339,8 @@ static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 #else
     _vglite_execute_drawing(draw_vglite_unit);
 
-    draw_vglite_unit->task_act->state = LV_DRAW_TASK_STATE_READY;
+    draw_vglite_unit->task_act->t->state = LV_DRAW_TASK_STATE_READY;
+    _vglite_cleanup_task(draw_vglite_unit->task_act);
     draw_vglite_unit->task_act = NULL;
 
     /* The draw unit is free now. Request a new dispatching as it can get a new task. */
