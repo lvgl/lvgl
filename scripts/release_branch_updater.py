@@ -13,6 +13,8 @@ import sys
 LOG = "[release_branch_updater.py]"
 
 def git_repository(repository: str, token: str):
+    if not token:
+        return f"https://{repository}"
     return f"https://{token}@{repository}"
 
 def main():
