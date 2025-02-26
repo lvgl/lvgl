@@ -31,4 +31,6 @@ jobs:
           git config --global user.email 'lvgl-bot@users.noreply.github.com'
 
       - name: run the script
-        run: python3 lvgl/scripts/release_branch_updater.py --oldest-major 9
+        with:
+          GITHUB_TOKEN: ${{ secrets.PORT_RELEASER_GITHUB_TOKEN }}
+        run: python3 lvgl/scripts/release_branch_updater.py --oldest-major 9 --github_token "$GITHUB_TOKEN"
