@@ -1,0 +1,11 @@
+output/
+tmp/
+xml/
+API/
+api_doc
+doxygen_html
+env
+examples.md
+examples.rst
+LVGL.pdf
+_static/built_lv_examples

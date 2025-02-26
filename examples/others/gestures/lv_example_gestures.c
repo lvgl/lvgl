@@ -183,7 +183,7 @@ static void label_move(lv_event_t * event)
         return;
     }
 
-    LV_LOG_USER("label move x: %d, y: %d", pnt.x, pnt.y);
+    LV_LOG_USER("label move x: %" LV_PRId32 ", y: %" LV_PRId32, pnt.x, pnt.y);
 
     label_x = pnt.x - label_width / 2;
     label_y = pnt.y - label_height / 2;

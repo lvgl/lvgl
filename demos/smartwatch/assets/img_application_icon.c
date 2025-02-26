@@ -34,6 +34,6 @@ const lv_img_dsc_t img_application_icon = {
    .header.w = 24,
    .header.h = 24,
    .data_size = sizeof(img_application_icon_data),
-   .header.cf = LV_COLOR_FORMAT_NATIVE_WITH_ALPHA,
+   .header.cf = LV_COLOR_FORMAT_RGB565A8,
    .data = img_application_icon_data};
 

@@ -109,8 +109,8 @@ typedef enum {
     LV_EVENT_RENDER_READY,        /**< Sent after rendering has been completed (before calling flush callback) */
     LV_EVENT_FLUSH_START,         /**< Sent before flush callback is called. */
     LV_EVENT_FLUSH_FINISH,        /**< Sent after flush callback call has returned. */
-    LV_EVENT_FLUSH_WAIT_START,    /**<  */
-    LV_EVENT_FLUSH_WAIT_FINISH,   /**<  */
+    LV_EVENT_FLUSH_WAIT_START,    /**< Sent before flush wait callback is called. */
+    LV_EVENT_FLUSH_WAIT_FINISH,   /**< Sent after flush wait callback call has returned. */
 
     LV_EVENT_VSYNC,
 
