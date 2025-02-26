@@ -17,7 +17,7 @@ static int32_t get_content_width(lv_obj_t * cont)
     int32_t pad_column = lv_obj_get_style_pad_column(cont, LV_PART_MAIN); // 列间距
     int total = lv_obj_get_child_count(cont);
 
-    for(int i = 0; i < total; i++) { 
+    for(int i = 0; i < total; i++) {
         w += lv_obj_get_width(lv_obj_get_child(cont, i));
         if(i < total - 1) w += pad_column;
     }
