@@ -10,7 +10,7 @@ About Toradex
 *************
 
 Toradex specializes in manufacturing high-quality embedded computing solutions
-based on microprocessor units (MPUs). These boards and modules are designed to
+based on System on Module units (SoMs). These boards and modules are designed to
 meet the needs of industrial and commercial applications, offering reliability,
 longevity, and scalability. Leveraging industry-standard frameworks like Yocto
 Project, Toradex enables customers to create tailored embedded systems with
