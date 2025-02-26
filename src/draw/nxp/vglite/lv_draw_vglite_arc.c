@@ -573,7 +573,7 @@ static void _vglite_draw_arc(vglite_draw_task_t * vglite_task, const lv_point_t 
         end_angle += 360;
 
     bool donut = ((end_angle - start_angle) % 360 == 0) ? true : false;
-    vg_lite_buffer_t * vgbuf = vglite_get_dest_buf();
+    vg_lite_buffer_t * dest_buf = vglite_get_dest_buf();
 
     int32_t arc_path[ARC_PATH_DATA_MAX_SIZE] = {0};
     lv_memzero(arc_path, sizeof(arc_path));
@@ -675,7 +675,7 @@ static void _vglite_draw_arc(vglite_draw_task_t * vglite_task, const lv_point_t 
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
 
     /*** Draw arc ***/
-    VGLITE_CHECK_ERROR(vg_lite_draw(vgbuf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
+    VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
 
     vglite_run();
 }

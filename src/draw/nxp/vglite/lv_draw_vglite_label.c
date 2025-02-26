@@ -140,10 +140,10 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
                     mask_area.x2 = mask_width - 1;
                     mask_area.y2 = mask_height - 1;
 
-                    /* Set src_vgbuf structure. */
+                    /* Set src_buf structure. */
                     vglite_set_src_buf(mask_buf, mask_width, mask_height, mask_stride, LV_COLOR_FORMAT_A8);
 
-                    /* Set vgmatrix. */
+                    /* Set matrix. */
                     vglite_set_translation_matrix(&blend_area);
 
                     lv_draw_buf_invalidate_cache(draw_buf, &mask_area);
@@ -217,11 +217,11 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
 
 static void _vglite_draw_letter(const lv_area_t * mask_area, lv_color_t color, lv_opa_t opa)
 {
-    vg_lite_buffer_t * dst_vgbuf = vglite_get_dest_buf();
-    vg_lite_buffer_t * mask_vgbuf = vglite_get_src_buf();
+    vg_lite_buffer_t * dest_buf = vglite_get_dest_buf();
+    vg_lite_buffer_t * mask_buf = vglite_get_src_buf();
 
-    mask_vgbuf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
-    mask_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
+    mask_buf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+    mask_buf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
 
     vg_lite_rectangle_t rect = {
         .x = (vg_lite_int32_t)mask_area->x1,
@@ -233,10 +233,10 @@ static void _vglite_draw_letter(const lv_area_t * mask_area, lv_color_t color, l
     lv_color32_t col32 = lv_color_to_32(color, opa);
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
 
-    vg_lite_matrix_t * vgmatrix = vglite_get_matrix();
+    vg_lite_matrix_t * matrix = vglite_get_matrix();
 
     /*Blit with font color as paint color*/
-    VGLITE_CHECK_ERROR(vg_lite_blit_rect(dst_vgbuf, mask_vgbuf, &rect, vgmatrix, VG_LITE_BLEND_SRC_OVER, vgcol,
+    VGLITE_CHECK_ERROR(vg_lite_blit_rect(dest_buf, mask_buf, &rect, matrix, VG_LITE_BLEND_SRC_OVER, vgcol,
                                          VG_LITE_FILTER_POINT));
 
     vglite_run();
