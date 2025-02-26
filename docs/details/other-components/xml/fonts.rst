@@ -32,14 +32,18 @@ In ``<styles>`` and ``<view>``, fonts can be referenced by their name, e.g.,
 The tag name determines how the font is loaded. Currently, only ``tinyttf as_file="true"`` is supported.
 
 - ``bin``:
+
   - If ``as_file="true"``: Converts the font file to ``bin`` (see `lv_font_conv`)
     which will be loaded by ``lv_binfont_create()``.
   - If ``as_file="false"`` (default): On export, the font file will be converted to a C array LVGL font
     that can be used directly by LVGL.
+
 - ``tinyttf``:
+
   - If ``as_file="true"``: Can be loaded directly by ``lv_tiny_ttf_create_file()``.
   - If ``as_file="false"`` (default): The font file will be converted to a raw C array on export
     that will be loaded by ``lv_tiny_ttf_create_data()``.
+
 - ``freetype``: The file can be loaded directly by ``lv_freetype_font_create()``.
 
 For simplicity, if ``as_file="false"``, fonts will be loaded as files in the preview.
@@ -65,7 +69,12 @@ Exported Code
 When C code is exported, global ``const lv_font_t * <font_name>`` variables are created, and in the
 initialization function of the component library (e.g., ``my_lib_init_gen()``), the actual font is assigned.
 
-In :cpp:expr:`lv_style_set_text_font(&style1, <font_name>)`, the created font is referenced.
+.. Note:  :cpp:expr: role cannot be used here because it doesn't know how to parse
+   the ampersand and angle brackets.  An alternate approach could be to make the
+   arguments "style1_p, font_name", but leaving the ampersand there seems more
+   appropriate due to that IS the normal way to pass a style as an argument.
+
+In ``lv_style_set_text_font(&style1, <font_name>)``, the created font is referenced.
 
 Constants
 ---------

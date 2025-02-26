@@ -1,258 +1,273 @@
-Output API as JSON data
+.. _output_api_as_json_data:
+
+=======================
+Output API as JSON Data
 =======================
 
-We have written a script that will read the header files in LVGL and outputs a more friendly JSON format for the API.
-This is done so that bindings that generate code automatically will have an easy way to collect the needed information
-without having to reinvent the wheel. The JSON data format has already made libraries for reading the format for just
-about every programming language out there.
+As of 20-Jun-2024, LVGL comes packaged with a Python script
+(``./scripts/gen_json/gen_json.py``) that reads the header files in LVGL and outputs
+a more friendly JSON format for the API.  This is done so that bindings that generate
+code automatically will have an easy way to collect the needed information without
+having to reinvent the wheel.  JSON format was chosen because there are libraries for
+reading JSON data in almost every programming language.
 
-The script in order to run does have some requirements.
+
+
+Requirements
+************
 
 - Python >= 3.10
-- Pycparser >= 2.21: Python Library for reading the preprocessor ouotput from the C compiler
-- PyMSVC >= 0.4.0: Python library is using MSVC Compiler
-- C compiler, gcc for Linux, clang for OSX and MSVC for Windows
-- Doxygen: used to read the docstrings from the header files.
+- Pycparser >= 2.22: Python Library for reading C preprocessor output
+- PyMSVC >= 0.4.0: Python library for using the MSVC Compiler
+- A C compiler:  gcc for Linux, clang for OSX and MSVC for Windows
+- Doxygen:  used to read Doxygen comments (the API documentation) from the header files.
 
 
-There are several options when running the script. They are as follows
 
-- `--output-path`: output directory for JSON file. If one is not supplied then it will be output stdout
-- `--lvgl-config`: path to lv_conf.h (including file name), if this is not set then a config file will be
-  generated that has most common things turned on
-- `--develop`: leaves the temporary folder in place.
+Usage
+*****
 
+Command-Line Options
+--------------------
 
-to use the script
+- ``--output-path``:  output directory for JSON file.  If one is not supplied then it
+  will be output to stdout.
+- ``--lvgl-config``:  path to lv_conf.h (including file name).  If this is not set then
+  a config file will be generated that has the most common LVGL options turned on.
+- ``--develop``:  leaves the files generated in the temporary folder in place.
+
+Examples
+--------
+
+Normal usage:
 
 .. code-block:: shell
 
-    python /scripts/gen_json/gen_json.py --output-path=json/output/directory --lvgl-config=path/to/lv_conf.h
+    python ./scripts/gen_json/gen_json.py --output-path=json/output/directory --lvgl-config=path/to/lv_conf.h
 
-
-or if you want to run a subprocess from inside of a generation script and read the output from stdout
+If you want to run a subprocess from inside of a generation script and read the output from stdout:
 
 .. code-block:: shell
 
-    python /scripts/gen_json/gen_json.py --lvgl-config=path/to/lv_conf.h
+    python ./scripts/gen_json/gen_json.py --lvgl-config=path/to/lv_conf.h
 
+Output Data
+-----------
 
-The JSON data is broken apart into a couple of main categories.
+The contents of the output file is a large JSON object (``{...}``) with the following
+key/value pairs (these are the keys):
 
-- enums
-- functions
-- function_pointers
-- structures
-- unions
-- variables
-- typedefs
-- forward_decls
-- macros
+.. parsed-literal::
 
-Those categories are the element names undert the root of the JSON data.
-The value for each categry is an array of JSON elements. There is a bit of
-nesting with the elements in the arrays and I have created "json_types" that
-will allow you to identify exactly what you are dealing with.
+    {
+        "enums"            : [...],
+        "functions"        : [...],
+        "function_pointers": [...],
+        "structures"       : [...],
+        "unions"           : [...],
+        "variables"        : [...],
+        "typedefs"         : [...],
+        "forward_decls"    : [...],
+        "macros"           : [...]
+    }
 
-The different "json_types" are as follows:
+As you can see, the value of each of these elements is an array.  The elements in
+each array are JSON objects, each with a structure unique to the type indicated by
+the parent element name (e.g. "enums", "functions", etc.).
+
+A key/value pair has been added to each object (key = "json_type") to make it possible
+to pass an object to a generic function and have each object know its own type through
+this field.  The possible "json_type" values are:
 
 - ``"array"``: The array type is used to identify arrays.
 
-  Available JSON fields:
-    - ``"dim"``: number of items in the array
+  Fields:
+    - ``"dim"``: number of items in array
     - ``"quals"``: array of qualifiers, IE "const"
     - ``"type"``: This may or may not be available.
-    - ``"name"``: the name of the data type
+    - ``"name"``: name of data type
 
 
 - ``"field"``: This type is used to describe fields in structures and unions.
-  It is used in the ``"fields"`` array of the ``"struct"`` and ``"union"`` JSON types.
+  It is used in the ``"fields"`` array of the ``"struct"`` and ``"union"`` types
+  covered below.
 
-  Available JSON fields:
-    - ``"name"``: The name of the field.
-    - ``"type"``: This contains the type information for the field. Check the
-      ``"json_type"`` to know what type you are dealing with.
-    - ``"bitsize"``: The number of bits the field has or ``null``
-      if there is no bit size defined
-    - ``"docstring"``: you should know what this is.
-
-
-- ``"arg"``: Used to describe an argument/parameter in a function or a function pointer.
-
-  Available JSON fields:
-    - ``"name"``: The name of the argument/parameter.
-    - ``"type"``: This contains the type information for the field. Check the
-      ``"json_type"`` to know what type you are dealing with.
-    - ``"docstring"``: you should know what this is.
-    - ``"quals"``: array of qualifiers, IE "const"
+  Fields:
+    - ``"name"``: field name
+    - ``"type"``: data type
+      ``"json_type"`` carries object type (e.g. "enum", "function", etc.) identifying the top-level group it comes from
+    - ``"bitsize"``: The number of bits for bit-fields, or ``null`` for normal field types.
+    - ``"docstring"``: string containing Doxygen-extracted documentation
 
 
-- ``"forward_decl"``: Describes a forward declaration.There are structures in
+- ``"arg"``: Describes a function argument
+
+  Fields:
+    - ``"name"``: argument name
+    - ``"type"``: data type
+      ``"json_type"`` carries object type (e.g. "enum", "function", etc.) identifying the top-level group it comes from.
+    - ``"docstring"``: string containing Doxygen-extracted documentation
+    - ``"quals"``: array of any qualifiers present, e.g. "const"
+
+
+- ``"forward_decl"``: Describes a forward declaration.  There are structures in
   LVGL that are considered to be private and that is what these desccribe.
 
-  Available JSON fields:
-    - ``"name"``: The name of the formard declaration.
-    - ``"type"``: This contains the type information for the field. Check the
-      ``"json_type"`` to know what type you are dealing with.
-    - ``"docstring"``: you should know what this is.
-    - ``"quals"``: array of qualifiers, IE "const"
+  Fields:
+    - ``"name"``: name of forward declaration
+    - ``"type"``: data type
+      ``"json_type"`` carries object type (e.g. "enum", "function", etc.) identifying the top-level group it comes from.
+    - ``"docstring"``: string containing Doxygen-extracted documentation
+    - ``"quals"``: array of any qualifiers present, e.g. "const"
 
 
-- ``"function_pointer"``: Describes a function pointer. These are used when
+- ``"function_pointer"``: Describes a function pointer.  These are used when
   registering callback functions in LVGL.
 
-  Available JSON fields:
-    - ``"name"``: The name of the function pointer.
-    - ``"type"``: This contains the return type information for the function pointer.
-    - ``"docstring"``: you should know what this is.
-    - ``"args"``: array of ``"arg"`` Widgets. This describes the function arguments/parameters.
-    - ``"quals"``: array of qualifiers, IE "const"
+  Fields:
+    - ``"name"``: name of function pointer
+    - ``"type"``: function return type
+    - ``"docstring"``: string containing Doxygen-extracted documentation
+    - ``"args"``: array of ``"arg"`` objects described above
+    - ``"quals"``: array of any qualifiers present, e.g. "const"
 
 
 - ``"variable"``: Describes a global variable.
 
-  Available JSON fields:
-    - ``"name"``: The name of the variable.
-    - ``"type"``: This contains the type information for the field. Check the
-      ``"json_type"`` to know what type you are dealing with.
-    - ``"docstring"``: you should know what this is.
-    - ``"quals"``: array of qualifiers, IE "const"
-    - ``"storage"``: array of storage classifiers, IE "extern"
+  Fields:
+    - ``"name"``: variable name
+    - ``"type"``: data type
+      ``"json_type"`` carries object type (e.g. "enum", "function", etc.) identifying the top-level group it comes from.
+    - ``"docstring"``: string containing Doxygen-extracted documentation
+    - ``"quals"``: array of any qualifiers present, e.g. "const"
+    - ``"storage"``: array of any storage-class specifiers present (e.g. "auto", "static", "extern", etc.)
 
 
-- ``"special_type"``:  Currently only used to describe an ellipsis argument
-  for a function.
+- ``"special_type"``:  Currently only used to describe an ellipsis argument of a function.
 
-  Available JSON fields:
-    - ``"name"``: will always be "ellipsis".
-
-
-- ``"primitive_type"``: This is a base type. There or no other types beneith this.
-  This tells you that the type is a basic or primitive C type.
-  IE: struct, union, int, unsigned int, etc...
-
-  Available JSON fields:
-    - ``"name"``: The name of the primitive type.
+  Fields:
+    - ``"name"``: always "ellipsis"
 
 
-- ``"enum"``: Describes a grouping of enumeration items/members.
+- ``"primitive_type"``: Data type that does not begin with ``"lv_"`` and end with
+  ``"_t"``.  Compare to ``"lvgl_type"``  This includes struct, union, integral types
+  (e.g. int, unsigned int), etc..
 
-  Available JSON fields:
-    - ``"name"``: The name of the enumeration group/type.
-    - ``"type"``: This contains the type information for the enumeration group.
-      This is always going to be an "int" type. Make sure you do not use this
-      type as the type for the members of this enumeration group. Check the
-      enumeration members type to get the correct type.
-    - ``"docstring"``: you should know what this is.
-    - ``"members"``: array of ``"enum_member"`` Widgets
+  Fields:
+    - ``"name"``: name of primitive type
 
 
-- ``"enum_member"``: Describes an enumeration item/member. Only found under
-  the ``"members"`` field of an ``"enum"`` JSON type
+- ``"enum"``: C enumerations
 
-  Available JSON fields:
-    - ``"name"``: The name of the enumeration.
-    - ``"type"``: This contains the type information for the enum member.
-      This gets a bit tricky because the type specified in here is not always
-      going to be an "int". It will usually point to an lvgl type and the type
-      of the lvgl type can be found in the ``"typedefs"`` section.
-    - ``"docstring"``: you should know what this is.
-    - ``"value"``: the enumeration member/item's value
+  Fields:
+    - ``"name"``: If enumeration is the result of a ``typedef``, this field carries
+      the type name defined.  Example:  ``lv_align_t``.  (Not always available.)
+    - ``"type"``: type of enumerators (always "int")
+    - ``"docstring"``: string containing Doxygen-extracted documentation
+    - ``"members"``: array of ``"enum_member"`` objects
 
 
-- ``"lvgl_type"``: This is a base type. There or no other types beneith this.
-  This tells you that the type is an LVGL data type.
+- ``"enum_member"``: enumerator (enumeration value).  This "json_type" is only found
+  in the ``"members"`` array of an ``"enum"`` object
 
-  Available JSON fields:
-    - ``"name"``: The name of the type.
-    - ``"quals"``: array of qualifiers, IE "const
+  Fields:
+    - ``"name"``: enumerator name
+    - ``"type"``: If enumeration is the result of a ``typedef``, this field carries
+      the type name defined.  Example:  ``lv_align_t``.
+    - ``"docstring"``: string containing Doxygen-extracted documentation
+    - ``"value"``: enumerator value
 
 
-- ``"struct"``: Describes a structure
+- ``"lvgl_type"``: Data type defined in LVGL (begins with ``"lv_"`` and ends with ``"_t"``.
 
-  Available JSON fields:
-    - ``"name"``: The name of the structure.
-    - ``"type"``: This contains the primitive type information for the structure.
-    - ``"docstring"``: you should know what this is.
+  Fields:
+    - ``"name"``: type name
+    - ``"quals"``: array of any qualifiers present, e.g. "const"
+
+
+- ``"struct"``: C struct
+
+  Fields:
+    - ``"name"``: struct name (data type if defined by ``typedef``)
+    - ``"type"``: a "primitive_type" object {"name": "struct", "json_type": "primitive_type"}.  (See definition above.)
+    - ``"docstring"``: string containing Doxygen-extracted documentation
+    - ``"fields"``: array of ``"field"`` objects (See definition above.)
+    - ``"quals"``: array of any qualifiers present, e.g. "const"
+
+
+- ``"union"``: C union
+
+  Fields:
+    - ``"name"``: union name (data type if defined by ``typedef``)
+    - ``"type"``: a "primitive_type" object {"name": "union", "json_type": "primitive_type"}.  (See definition above.)
+    - ``"docstring"``: string containing Doxygen-extracted documentation
     - ``"fields"``: array of ``"field"`` elements.
-    - ``"quals"``: array of qualifiers, IE "const"
+    - ``"quals"``: array of any qualifiers present, e.g. "const"
 
 
-- ``"union"``: Describes a union
-
-  Available JSON fields:
-    - ``"name"``: The name of the union.
-    - ``"type"``: This contains the primitive type information for the union.
-    - ``"docstring"``: you should know what this is.
-    - ``"fields"``: array of ``"field"`` elements.
-    - ``"quals"``: array of qualifiers, IE "const"
-
-
-- ``"macro"``: describes a macro. There is limited information that can be
+- ``"macro"``: C macro.  There is limited information that can be
   collected about macros and in most cases a binding will need to have these
-  statically added to a binding. It is more for collecting the docstrings than
+  statically added to a binding.  It is more for collecting the docstrings than
   anything else.
 
-  Available JSON fields:
-    - ``"name"``: The name of the macro.
-    - ``"docstring"``: you should know what this is.
+  Fields:
+    - ``"name"``: macro name
+    - ``"docstring"``: string containing Doxygen-extracted documentation
 
 
 - ``"ret_type"``: return type from a function. This is only going to be seen in the ``"type"``
   element of a ``"function"`` type.
 
-  Available JSON fields:
-    - ``"type"``: This contains the type information for the field. Check the
-      ``"json_type"`` to know what type you are dealing with.
-    - ``"docstring"``: you should know what this is.
+  Fields:
+    - ``"type"``: data type
+      ``"json_type"`` carries object type (e.g. "enum", "function", etc.) identifying the top-level group it comes from.
+    - ``"docstring"``: string containing Doxygen-extracted documentation
 
 
-- ``"function"``: Describes a function.
+- ``"function"``: C function
 
-  Available JSON fields:
-    - ``"name"``: The name of the function.
-    - ``"type"``: This contains the type information for the return value.
-    - ``"docstring"``: you should know what this is.
-    - ``"args"``: array of ``"arg"`` json types. This describes the function arguments/parameters.
+  Fields:
+    - ``"name"``: function name
+    - ``"type"``: A "ret_type" object.  (See definition above.)
+    - ``"docstring"``: string containing Doxygen-extracted documentation
+    - ``"args"``: array of ``"arg"`` json types.  (See definition above.)
 
 
-- ``"stdlib_type"``: This is a base type, meaning that there are no more
-  type levels beneith this. This tells us that the type is from the C stdlib.
+- ``"stdlib_type"``:  C integral type (int, unsigned int, float, etc.)
 
-  Available JSON fields:
-    - ``"name"``: The name of the type.
-    - ``"quals"``: array of qualifiers, IE "const
+  Fields:
+    - ``"name"``: type name
+    - ``"quals"``: array of any qualifiers present, e.g. "const"
 
 
 - ``"unknown_type"``: This should not be seen. If it is then there needs to be
   an adjustment made to the script. Please open an issue and let us know if you see this type.
 
-  Available JSON fields:
-    - ``"name"``: The name of the type.
-    - ``"quals"``: array of qualifiers, IE "const
+  Fields:
+    - ``"name"``: type name
+    - ``"quals"``: array of any qualifiers present, e.g. "const"
 
 
-- ``"pointer"``: This is a wrapper object to let you know that the type you
-  are dealing with is a pointer
+- ``"pointer"``: C pointer
 
-  Available JSON fields:
-    - ``"type"``: This contains the type information for the pointer. Check the
-      ``"json_type"`` to know what type you are dealing with.
-    - ``"quals"``: array of qualifiers, IE "const", may or may not be available.
-
-
-- ``"typedef"``: type definitions. I will explain more on this below.
-
-  Available JSON fields:
-    - ``"name"``: The name of the typedef.
-    - ``"type"``: This contains the type information for the field. Check the
-      ``"json_type"`` to know what type you are dealing with.
-    - ``"docstring"``: you should know what this is.
-    - ``"quals"``: array of qualifiers, IE "const"
+  Fields:
+    - ``"type"``: pointer type
+      ``"json_type"`` carries object type (e.g. "enum", "function", etc.) identifying the top-level group it comes from.
+    - ``"quals"``: array of any qualifiers present, e.g. "const"
 
 
+- ``"typedef"``: C type definition
 
-Here is an example of what the output will look like.
+  Fields:
+    - ``"name"``: type name (e.g. ``lv_part_t``)
+    - ``"type"``: a "primitive_type" object {"name": "uint32_t", "json_type": "stdlib_type"}.  (See definition above.)
+      ``"json_type"`` carries object type (e.g. "enum", "function", etc.) identifying the top-level group it comes from.
+    - ``"docstring"``: string containing Doxygen-extracted documentation
+    - ``"quals"``: array of any qualifiers present, e.g. "const"
+
+
+
+Here is a shortened example of what the output looks like.
 
 .. code-block:: json
 

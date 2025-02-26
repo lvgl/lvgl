@@ -57,8 +57,7 @@
  * http://marknelson.us/1989/10/01/lzw-data-compression/
  */
 #include "config.h"
-
-
+#include "thorvg.h"
 
 #include <string>
 #include <memory.h>
@@ -112,7 +111,8 @@ struct BitStreamWriter
 
     uint8_t* allocBytes(const int bytesWanted, uint8_t * oldPtr, const int oldSize)
     {
-        auto newMemory = static_cast<uint8_t *>(malloc(bytesWanted));
+        auto newMemory = static_cast<uint8_t *>(lv_malloc(bytesWanted));
+        LV_ASSERT_MALLOC(newMemory);
         memset(newMemory, 0, bytesWanted);
 
         if (oldPtr) {
@@ -349,7 +349,8 @@ uint8_t* lzwDecode(const uint8_t* compressed, uint32_t compressedSizeBytes, uint
     int firstByte = 0;
     int bytesDecoded = 0;
     int codeBitsWidth = StartBits;
-    auto uncompressed = (uint8_t*) malloc(sizeof(uint8_t) * uncompressedSizeBytes);
+    auto uncompressed = (uint8_t*) lv_malloc(sizeof(uint8_t) * uncompressedSizeBytes);
+    LV_ASSERT_MALLOC(uncompressed);
     auto ptr = uncompressed;
 
     /* We'll reconstruct the dictionary based on the bit stream codes.
@@ -445,7 +446,8 @@ size_t b64Decode(const char* encoded, const size_t len, char** decoded)
     if (!decoded || !encoded || len == 0) return 0;
 
     auto reserved = 3 * (1 + (len >> 2)) + 1;
-    auto output = static_cast<char*>(malloc(reserved * sizeof(char)));
+    auto output = static_cast<char*>(lv_malloc(reserved * sizeof(char)));
+    LV_ASSERT_MALLOC(output);
     if (!output) return 0;
     output[reserved - 1] = '\0';
 

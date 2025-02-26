@@ -1,4 +1,4 @@
-.. _others:
+.. _xml_component:
 
 ====================
 XML - Declarative UI
@@ -26,4 +26,6 @@ XML - Declarative UI
     events
     subjects
     animations
+
+    translations
 
