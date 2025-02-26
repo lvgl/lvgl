@@ -99,8 +99,8 @@ void lv_vg_lite_pending_remove_all(lv_vg_lite_pending_t * pending)
 
 void lv_vg_lite_pending_swap(lv_vg_lite_pending_t * pending)
 {
-    lv_vg_lite_pending_remove_all(pending);
     pending->arr_act = (pending->arr_act == &pending->arr_1) ? &pending->arr_2 : &pending->arr_1;
+    lv_vg_lite_pending_remove_all(pending);
 }
 
 /**********************
