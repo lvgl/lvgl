@@ -26,7 +26,7 @@ static int32_t get_content_width(lv_obj_t * cont)
 }
 
 /* Scroll event callback for row layout */
-static void cont_row_scroll_event_cb(lv_event_t * e) 
+static void cont_row_scroll_event_cb(lv_event_t * e)
 {
     static bool is_adjusting = false;
     lv_obj_t * cont = lv_event_get_current_target_obj(e);
