@@ -12,6 +12,9 @@ import sys
 
 LOG = "[release_branch_updater.py]"
 
+def git_repository(repository: str, token: str):
+    return f"https://{token}@{repository}"
+
 def main():
 
     arg_parser = argparse.ArgumentParser()
@@ -20,6 +23,8 @@ def main():
     arg_parser.add_argument("--lvgl-path", default=os.path.join(os.path.dirname(__file__), ".."))
     arg_parser.add_argument("--dry-run", action="store_true")
     arg_parser.add_argument("--oldest-major", type=int)
+    arg_parser.add_argument("--github-token", type=str)
+
     args = arg_parser.parse_args()
 
     port_clone_tmpdir = args.port_clone_tmpdir
@@ -51,7 +56,13 @@ def main():
             port_clone_tmpdir = url[len("https://github.com/lvgl/"): ]
             print("port_clone_tmpdir: " + port_clone_tmpdir)
 
-        subprocess.run(("git", "clone", url, port_clone_tmpdir))
+        # It's very important to not leak the github_token here
+        # So make sure the stdout and stderr are piped here
+        subprocess.run(("git", "clone",
+                        git_repository(url.replace("https://", ""), args.github_token),
+                        port_clone_tmpdir),
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE)
 
         port_release_branches, port_default_branch = get_release_branches(port_clone_tmpdir)
         print(LOG, "port release branches:", ", ".join(fmt_release(br) for br in port_release_branches) or "(none)")
