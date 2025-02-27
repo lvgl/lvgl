@@ -413,7 +413,7 @@ static inline lv_opa_t get_layer_opa(const lv_obj_t * obj, lv_part_t part, const
 static inline lv_color_t color_mix_layer_filter(const lv_obj_t * obj, lv_part_t part,
                                                 const lv_draw_dsc_base_t * base_dsc, lv_color_t color)
 {
-    if(base_dsc->layer) {
+    if(base_dsc->layer && part == LV_PART_MAIN) {
         return lv_color_mix_color32(base_dsc->layer->color_filter, color);
     }
 
@@ -425,12 +425,20 @@ static inline lv_color32_t recolor_mix_layer_filter(lv_obj_t * obj, lv_part_t pa
 {
     lv_color32_t color_filter;
 
-    if(base_dsc->layer) {
+    if(base_dsc->layer && part == LV_PART_MAIN) {
         color_filter = base_dsc->layer->color_filter;
     }
     else {
         color_filter = lv_obj_get_style_color_filter_recursive(obj, part);
     }
 
-    return recolor.alpha > LV_OPA_TRANSP ? lv_color_over32(color_filter, recolor) : color_filter;
+    if(recolor.alpha > LV_OPA_TRANSP && color_filter.alpha > LV_OPA_TRANSP) {
+        return lv_color_over32(color_filter, recolor);
+    }
+    else if(color_filter.alpha > LV_OPA_TRANSP) {
+        return color_filter;
+    }
+    else {
+        return recolor;
+    }
 }
