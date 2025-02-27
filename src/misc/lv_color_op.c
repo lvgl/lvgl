@@ -52,9 +52,9 @@ lv_color32_t lv_color_mix32(lv_color32_t fg, lv_color32_t bg)
     if(fg.alpha <= LV_OPA_MIN) {
         return bg;
     }
-    bg.red = (uint32_t)((uint32_t)fg.red * fg.alpha + (uint32_t)bg.red * (255 - fg.alpha)) >> 8;
-    bg.green = (uint32_t)((uint32_t)fg.green * fg.alpha + (uint32_t)bg.green * (255 - fg.alpha)) >> 8;
-    bg.blue = (uint32_t)((uint32_t)fg.blue * fg.alpha + (uint32_t)bg.blue * (255 - fg.alpha)) >> 8;
+    bg.red = LV_UDIV255((uint32_t)((uint32_t)fg.red * fg.alpha + (uint32_t)bg.red * (255 - fg.alpha)));
+    bg.green = LV_UDIV255((uint32_t)((uint32_t)fg.green * fg.alpha + (uint32_t)bg.green * (255 - fg.alpha)));
+    bg.blue = LV_UDIV255((uint32_t)((uint32_t)fg.blue * fg.alpha + (uint32_t)bg.blue * (255 - fg.alpha)));
     return bg;
 }
 
