@@ -200,8 +200,8 @@ def main():
                     print(LOG, "this is a dry run so nothing will be pushed")
                 else:
                     subprocess.check_call(("git", "-C", port_clone_tmpdir, "push",
-                                           *(("-u", "origin") if port_does_not_have_the_branch else ()),
-                                           fmt_release(port_branch),
+                                           *(("-u",) if port_does_not_have_the_branch else ()),
+                                           "origin", fmt_release(port_branch),
                                           ))
                     print(LOG, "the changes were pushed.")
             else:
