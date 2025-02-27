@@ -102,6 +102,8 @@ void lv_draw_dma2d_deinit(void)
     RCC->AHB1ENR &= ~RCC_AHB1ENR_DMA2DEN;
 #elif defined(STM32H7)
     RCC->AHB3ENR &= ~RCC_AHB3ENR_DMA2DEN;
+#elif defined(STM32H7RS)
+    RCC->AHB5ENR &= ~RCC_AHB5ENR_DMA2DEN;
 #endif
 
 #if LV_DRAW_DMA2D_ASYNC
