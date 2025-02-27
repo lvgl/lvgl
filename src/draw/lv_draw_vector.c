@@ -412,6 +412,11 @@ void lv_vector_path_append_arc(lv_vector_path_t * path, const lv_fpoint_t * c, f
             start.x + cx, start.y + cy
         });
     }
+    else {
+        lv_vector_path_move_to(path, &(lv_fpoint_t) {
+            start.x + cx, start.y + cy
+        });
+    }
 
     for(int i = 0; i < n_curves; ++i) {
         float end_angle = start_angle + ((i != n_curves - 1) ? MATH_HALF_PI * sweep_sign : fract);
