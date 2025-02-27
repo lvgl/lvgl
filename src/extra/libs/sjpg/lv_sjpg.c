@@ -872,6 +872,7 @@ static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc
                 lv_fs_close(&(sjpeg->io.lv_file));
             }
             lv_sjpg_cleanup(sjpeg);
+            dsc->user_data = NULL;
             break;
 
         case LV_IMG_SRC_VARIABLE:
@@ -892,11 +893,23 @@ static int is_jpg(const uint8_t * raw_data, size_t len)
 
 static void lv_sjpg_free(SJPEG * sjpeg)
 {
-    if(sjpeg->frame_cache) lv_mem_free(sjpeg->frame_cache);
+    if(sjpeg->frame_cache) {
+        lv_mem_free(sjpeg->frame_cache);
+        sjpeg->frame_cache = NULL;
+    }
     if(sjpeg->frame_base_array) lv_mem_free(sjpeg->frame_base_array);
-    if(sjpeg->frame_base_offset) lv_mem_free(sjpeg->frame_base_offset);
-    if(sjpeg->tjpeg_jd) lv_mem_free(sjpeg->tjpeg_jd);
-    if(sjpeg->workb) lv_mem_free(sjpeg->workb);
+    if(sjpeg->frame_base_offset) {
+        lv_mem_free(sjpeg->frame_base_offset);
+        sjpeg->frame_base_offset = NULL;
+    }
+    if(sjpeg->tjpeg_jd) {
+        lv_mem_free(sjpeg->tjpeg_jd);
+        sjpeg->tjpeg_jd = NULL;
+    }
+    if(sjpeg->workb) {
+        lv_mem_free(sjpeg->workb);
+        sjpeg->workb = NULL;
+    }
 }
 
 static void lv_sjpg_cleanup(SJPEG * sjpeg)
