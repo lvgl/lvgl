@@ -58,7 +58,7 @@ A practical example is setting the current tab of a tab view, which cannot be se
 This feature is not supported yet.
 
 ``<enumdef>``
-************
+*************
 
 Can be used only for widgets.
 
@@ -153,7 +153,7 @@ In a view it can be used like this:
 
 	<!-- complex_widget.xml -->
 	<view>
-		<lv_label text="Title"
+		<lv_label text="Title"/>
 		<my_widget width="100px" y="40px">
 			<my_widget-indicator name="indic1" color="0xff0000" max_value="120" value="30"/>
 		</my_widget>

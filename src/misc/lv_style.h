@@ -91,6 +91,7 @@ typedef enum {
     LV_BLEND_MODE_ADDITIVE,   /**< Add the respective color channels*/
     LV_BLEND_MODE_SUBTRACTIVE,/**< Subtract the foreground from the background*/
     LV_BLEND_MODE_MULTIPLY,   /**< Multiply the foreground and background*/
+    LV_BLEND_MODE_DIFFERENCE, /**< Absolute difference between foreground and background*/
 } lv_blend_mode_t;
 
 /**

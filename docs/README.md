@@ -3,15 +3,17 @@
 
 ## Building
 
-Building the documentation is pretty easy to do but it does have some requirements that have to be filled prior to building them.
-
-Here are the requirements:
+Building the documentation is easy.  Here are the requirements:
 
 * Doxygen
 * Python >= 3.10
 * C compiler (gcc, msvc, clang, etc...)
 
-There are also some Python specific libraries that need to be installed. You can either install these individually or you can use pip to read the requirements file to install everything that is needed for Python.
+Once Python is installed
+
+    pip install -r requirements.txt
+
+will install all the prerequisite packages:
 
 * Sphinx
 * breathe
@@ -32,26 +34,34 @@ There are also some Python specific libraries that need to be installed. You can
 * sphinx-reredirects
 * dirsync
 
-To install using the `requirements.txt` file use the following command:
+Now you are ready to build the documentation:
 
-    pip install -r requirements.txt
+    python build.py html
 
-Once you have all of the requirements installed you are ready to build the documentation.  Use the following command:
+or if you are on a Unix like OS:
 
-    python build.py skip_latex clean
+    python3 build.py html
 
-You may have to use the following command if you are on a Unix like OS
+Intermediate files are prepared in `./docs/intermediate/` and the final documentation will appear in `./docs/build/html/`.
 
-    python3 build.py skip_latex clean
+If the list of document source files has changed (names or paths):
 
-The documentation will be output into `./out_html/` in the root directory for LVGL.
+    python build.py clean html
+
+Will remove the old intermediate and build files and regenerate new ones matching the new structure.
+
+To see a list of options available:
+
+    python build.py
+
+Read the docstring for `build.py` for detailed documentation on each option.
 
 
 ## For Developers
 
-The most important thing that has to be done when contributing to LVGL is ***EVERYTHING MUST BE DOCUMENTED***.
+One of our firm policies is ***EVERYTHING MUST BE DOCUMENTED***.
 
-The below are some rules to follow when updating any of the `.rst` files located in the `./docs/` directory and any of it's subdirectories.
+The below are some rules to follow when updating any of the `.rst` files located in the `./docs/src/` directory tree.
 
 
 ### What to Name Your `.rst` File

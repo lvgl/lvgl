@@ -586,7 +586,8 @@ static void lv_obj_draw(lv_event_t * e)
         }
 
         if(lv_obj_get_style_bg_grad_dir(obj, 0) != LV_GRAD_DIR_NONE) {
-            if(lv_obj_get_style_bg_grad_opa(obj, 0) < LV_OPA_MAX) {
+            if(lv_obj_get_style_bg_grad_opa(obj, 0) < LV_OPA_MAX ||
+               lv_obj_get_style_bg_main_opa(obj, 0) < LV_OPA_MAX) {
                 info->res = LV_COVER_RES_NOT_COVER;
                 return;
             }

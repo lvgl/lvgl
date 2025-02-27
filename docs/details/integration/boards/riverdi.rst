@@ -45,10 +45,10 @@ display. See the :ref:`LTDC <stm32 ltdc driver>` driver docs
 for more info and how to customize its use.
 
 
-Single Board Computer Displays
+Single-Board Computer Displays
 ******************************
 
-The Single Board Computer Displays are ready to use with
+The Single-Board Computer Displays are ready to use with
 :ref:`Toradex <toradex>` Dahlia and Mallow carrier boards. In fact,
 those carrier boards are compatible with all 34-pin Riverdi
 MIPI-DSI displays.
