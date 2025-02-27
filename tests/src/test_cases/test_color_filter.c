@@ -54,6 +54,7 @@ void test_func_1(void)
 
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_style_radius(obj, 0, 0);
     lv_obj_center(obj);
     lv_obj_set_style_color_filter_dsc(obj, &darken_dsc, 0);
     lv_obj_set_style_color_filter_opa(obj, LV_OPA_50, 0);
