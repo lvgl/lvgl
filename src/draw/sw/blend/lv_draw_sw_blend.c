@@ -41,6 +41,14 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static inline void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_color(lv_color_format_t layer_cf,
+                                                                      lv_draw_sw_blend_fill_dsc_t * fill_dsc);
+
+static inline void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_blend_image(lv_color_format_t layer_cf,
+                                                                      lv_draw_sw_blend_image_dsc_t * image_dsc);
+
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -66,6 +74,13 @@ void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * blend_d
     lv_layer_t * layer = t->target_layer;
     uint32_t layer_stride_byte = layer->draw_buf->header.stride;
 
+    lv_draw_sw_blend_handler_t handler = lv_draw_sw_get_blend_handler(layer->color_format);
+    if(handler) {
+        handler(t, blend_dsc);
+        LV_PROFILER_DRAW_END;
+        return;
+    }
+
     if(blend_dsc->src_buf == NULL) {
         lv_draw_sw_blend_fill_dsc_t fill_dsc;
         fill_dsc.dest_w = lv_area_get_width(&blend_area);
@@ -90,45 +105,7 @@ void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * blend_d
                                  (blend_area.x1 - blend_dsc->mask_area->x1);
         }
 
-        switch(layer->color_format) {
-#if LV_DRAW_SW_SUPPORT_RGB565
-            case LV_COLOR_FORMAT_RGB565:
-                lv_draw_sw_blend_color_to_rgb565(&fill_dsc);
-                break;
-#endif
-#if LV_DRAW_SW_SUPPORT_ARGB8888
-            case LV_COLOR_FORMAT_ARGB8888:
-                lv_draw_sw_blend_color_to_argb8888(&fill_dsc);
-                break;
-#endif
-#if LV_DRAW_SW_SUPPORT_RGB888
-            case LV_COLOR_FORMAT_RGB888:
-                lv_draw_sw_blend_color_to_rgb888(&fill_dsc, 3);
-                break;
-#endif
-#if LV_DRAW_SW_SUPPORT_XRGB8888
-            case LV_COLOR_FORMAT_XRGB8888:
-                lv_draw_sw_blend_color_to_rgb888(&fill_dsc, 4);
-                break;
-#endif
-#if LV_DRAW_SW_SUPPORT_L8
-            case LV_COLOR_FORMAT_L8:
-                lv_draw_sw_blend_color_to_l8(&fill_dsc);
-                break;
-#endif
-#if LV_DRAW_SW_SUPPORT_AL88
-            case LV_COLOR_FORMAT_AL88:
-                lv_draw_sw_blend_color_to_al88(&fill_dsc);
-                break;
-#endif
-#if LV_DRAW_SW_SUPPORT_I1
-            case LV_COLOR_FORMAT_I1:
-                lv_draw_sw_blend_color_to_i1(&fill_dsc);
-                break;
-#endif
-            default:
-                break;
-        }
+        lv_draw_sw_blend_color(layer->color_format, &fill_dsc);
     }
     else {
         if(!lv_area_intersect(&blend_area, &blend_area, blend_dsc->src_area)) {
@@ -179,46 +156,7 @@ void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * blend_d
         image_dsc.dest_buf = lv_draw_layer_go_to_xy(layer, blend_area.x1 - layer->buf_area.x1,
                                                     blend_area.y1 - layer->buf_area.y1);
 
-        switch(layer->color_format) {
-#if LV_DRAW_SW_SUPPORT_RGB565
-            case LV_COLOR_FORMAT_RGB565:
-            case LV_COLOR_FORMAT_RGB565A8:
-                lv_draw_sw_blend_image_to_rgb565(&image_dsc);
-                break;
-#endif
-#if LV_DRAW_SW_SUPPORT_ARGB8888
-            case LV_COLOR_FORMAT_ARGB8888:
-                lv_draw_sw_blend_image_to_argb8888(&image_dsc);
-                break;
-#endif
-#if LV_DRAW_SW_SUPPORT_RGB888
-            case LV_COLOR_FORMAT_RGB888:
-                lv_draw_sw_blend_image_to_rgb888(&image_dsc, 3);
-                break;
-#endif
-#if LV_DRAW_SW_SUPPORT_XRGB8888
-            case LV_COLOR_FORMAT_XRGB8888:
-                lv_draw_sw_blend_image_to_rgb888(&image_dsc, 4);
-                break;
-#endif
-#if LV_DRAW_SW_SUPPORT_L8
-            case LV_COLOR_FORMAT_L8:
-                lv_draw_sw_blend_image_to_l8(&image_dsc);
-                break;
-#endif
-#if LV_DRAW_SW_SUPPORT_AL88
-            case LV_COLOR_FORMAT_AL88:
-                lv_draw_sw_blend_image_to_al88(&image_dsc);
-                break;
-#endif
-#if LV_DRAW_SW_SUPPORT_I1
-            case LV_COLOR_FORMAT_I1:
-                lv_draw_sw_blend_image_to_i1(&image_dsc);
-                break;
-#endif
-            default:
-                break;
-        }
+        lv_draw_sw_blend_image(layer->color_format, &image_dsc);
     }
     LV_PROFILER_DRAW_END;
 }
@@ -226,5 +164,94 @@ void lv_draw_sw_blend(lv_draw_task_t * t, const lv_draw_sw_blend_dsc_t * blend_d
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static inline void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color(lv_color_format_t layer_cf,
+                                                                lv_draw_sw_blend_fill_dsc_t * fill_dsc)
+{
+    switch(layer_cf) {
+#if LV_DRAW_SW_SUPPORT_RGB565
+        case LV_COLOR_FORMAT_RGB565:
+            lv_draw_sw_blend_color_to_rgb565(fill_dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888
+        case LV_COLOR_FORMAT_ARGB8888:
+            lv_draw_sw_blend_color_to_argb8888(fill_dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB888
+        case LV_COLOR_FORMAT_RGB888:
+            lv_draw_sw_blend_color_to_rgb888(fill_dsc, 3);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_XRGB8888
+        case LV_COLOR_FORMAT_XRGB8888:
+            lv_draw_sw_blend_color_to_rgb888(fill_dsc, 4);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_L8
+        case LV_COLOR_FORMAT_L8:
+            lv_draw_sw_blend_color_to_l8(fill_dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_AL88
+        case LV_COLOR_FORMAT_AL88:
+            lv_draw_sw_blend_color_to_al88(fill_dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_I1
+        case LV_COLOR_FORMAT_I1:
+            lv_draw_sw_blend_color_to_i1(fill_dsc);
+            break;
+#endif
+        default:
+            break;
+    }
+}
+
+static inline void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image(lv_color_format_t layer_cf,
+                                                                lv_draw_sw_blend_image_dsc_t * image_dsc)
+{
+    switch(layer_cf) {
+#if LV_DRAW_SW_SUPPORT_RGB565
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_RGB565A8:
+            lv_draw_sw_blend_image_to_rgb565(image_dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888
+        case LV_COLOR_FORMAT_ARGB8888:
+            lv_draw_sw_blend_image_to_argb8888(image_dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_RGB888
+        case LV_COLOR_FORMAT_RGB888:
+            lv_draw_sw_blend_image_to_rgb888(image_dsc, 3);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_XRGB8888
+        case LV_COLOR_FORMAT_XRGB8888:
+            lv_draw_sw_blend_image_to_rgb888(image_dsc, 4);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_L8
+        case LV_COLOR_FORMAT_L8:
+            lv_draw_sw_blend_image_to_l8(image_dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_AL88
+        case LV_COLOR_FORMAT_AL88:
+            lv_draw_sw_blend_image_to_al88(image_dsc);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_I1
+        case LV_COLOR_FORMAT_I1:
+            lv_draw_sw_blend_image_to_i1(image_dsc);
+            break;
+#endif
+        default:
+            break;
+    }
+}
 
 #endif

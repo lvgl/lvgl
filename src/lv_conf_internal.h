@@ -604,6 +604,7 @@
             #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS    0
         #endif
     #endif
+
 #endif
 
 /*Use TSi's aka (Think Silicon) NemaGFX */
