@@ -407,6 +407,12 @@ void lv_observer_remove(lv_observer_t * observer)
 void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
 {
     LV_ASSERT_NULL(obj);
+    /*
+     * Look for the observer that connects `obj` and `subject`
+     * Since the obj is associated with the subject,
+     *  the `obj` will have the `unsubscribe_on_delete_cb` event associated with it
+     * This event will the have the `observer` which will contain its `subject`
+     */
     int32_t i;
     int32_t event_cnt = (int32_t)(obj->spec_attr ? lv_event_get_count(&obj->spec_attr->event_list) : 0);
     for(i = event_cnt - 1; i >= 0; i--) {
@@ -414,8 +420,8 @@ void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
         if(event_dsc->cb == unsubscribe_on_delete_cb) {
             lv_observer_t * observer = event_dsc->user_data;
             if(subject == NULL || subject == observer->subject) {
+                /* lv_observer_remove handles the deletion of the 2 possible event callbacks */
                 lv_observer_remove(observer);
-                lv_obj_remove_event(obj, i);
             }
         }
     }
