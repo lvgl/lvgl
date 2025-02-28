@@ -15,4 +15,4 @@ Main Components
     timer
     animation
     fs
-    draw
+    draw/index

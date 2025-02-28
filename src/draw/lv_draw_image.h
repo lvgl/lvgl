@@ -29,35 +29,71 @@ extern "C" {
 struct _lv_draw_image_dsc_t {
     lv_draw_dsc_base_t base;
 
+    /**The image source: pointer to `lv_image_dsc_t` or a path to a file*/
     const void * src;
+
+    /**The header of the image. Initialized internally in `lv_draw_image` */
     lv_image_header_t header;
 
+    /**Clip the corner of the image with this radius. Use `LV_RADIUS_CIRCLE` for max. radius */
+    int32_t clip_radius;
+
+    /**The rotation of the image in 0.1 degree unit. E.g. 234 means 23.4° */
     int32_t rotation;
+
+    /**Horizontal scale (zoom) of the image.
+     * 256 (LV_SCALE_NONE): means no zoom, 512 double size, 128 half size.*/
     int32_t scale_x;
+
+    /**Same as `scale_y` but vertically*/
     int32_t scale_y;
+
+    /**Parallelogram like transformation of the image horizontally in 0.1 degree unit. E.g. 456 means 45.6°.*/
     int32_t skew_x;
+
+    /**Same as `skew_x` but vertically*/
     int32_t skew_y;
+
+    /**The pivot point of transformation (scale and rotation).
+     * 0;0 is the top left corner of the image. Can be outside of the image too.*/
     lv_point_t pivot;
 
+    /**Mix this color to the images. In case of `LV_COLOR_FORMAT_A8` it will be the color of the visible pixels*/
     lv_color_t recolor;
+
+    /**The intensity of recoloring. 0 means, no recolor, 255 means full cover (transparent pixels remain transparent)*/
     lv_opa_t recolor_opa;
 
+    /**Opacity in 0...255 range.
+     * LV_OPA_TRANSP, LV_OPA_10, LV_OPA_20, .. LV_OPA_COVER can be used as well*/
     lv_opa_t opa;
+
+    /**Describes how to blend the pixels of the image to the background.
+     * See `lv_blend_mode_t` for more details.
+     */
     lv_blend_mode_t blend_mode : 3;
 
+    /**1: perform the transformation with anti-alaising */
     uint16_t antialias          : 1;
+
+    /**If the image is smaller than the `image_area` field of `lv_draw_image_dsc_t`
+     * tile the image (repeat is both horizontally and vertically) to fill the
+     * `image_area` area*/
     uint16_t tile               : 1;
+
+    /**Used internally to store some information about the palette or the color of A8 images*/
     lv_draw_image_sup_t * sup;
 
     /** Used to indicate the entire original, non-clipped area where the image is to be drawn.
      * This is important for:
-     *  1. Layer rendering, where it might happen that only a smaller area of the layer is rendered.
+     *  1. Layer rendering, where it might happen that only a smaller area of the layer is rendered and e.g.
+     *     `clip_radius` needs to know what the original image was.
      *  2. Tiled images, where the target draw area is larger than the image to be tiled.
      */
     lv_area_t image_area;
 
-    int32_t clip_radius;
-
+    /**Pointer to an A8 or L8 image descriptor to mask the image with.
+     * The mask is always center aligned. */
     const lv_image_dsc_t * bitmap_mask_src;
 };
 
@@ -105,7 +141,7 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
 /**
  * Create a draw task to blend a layer to another layer
  * @param layer         pointer to a layer
- * @param dsc           pointer to an initialized draw descriptor
+ * @param dsc           pointer to an initialized draw descriptor. `src` must be set to the layer to blend
  * @param coords        the coordinates of the layer.
  * @note                `coords` can be small than the total widget area from which the layer is created
  *                      (if only a part of the widget was rendered to a layer)
