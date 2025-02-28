@@ -1326,6 +1326,8 @@ void lv_vg_lite_flush(struct _lv_draw_vg_lite_unit_t * u)
 
     lv_vg_lite_pending_swap(u->image_dsc_pending);
 
+    lv_vg_lite_pending_swap(u->bitmap_font_pending);
+
     u->flush_count = 0;
     LV_PROFILER_DRAW_END;
 }
