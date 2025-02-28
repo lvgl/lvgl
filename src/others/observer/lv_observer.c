@@ -406,6 +406,7 @@ void lv_observer_remove(lv_observer_t * observer)
 
 void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
 {
+    LV_ASSERT_NULL(obj);
     int32_t i;
     int32_t event_cnt = (int32_t)(obj->spec_attr ? lv_event_get_count(&obj->spec_attr->event_list) : 0);
     for(i = event_cnt - 1; i >= 0; i--) {
