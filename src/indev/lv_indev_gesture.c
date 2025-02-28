@@ -66,9 +66,8 @@ void lv_indev_set_pinch_up_threshold(lv_indev_gesture_recognizer_t * recognizer,
     LV_ASSERT(threshold > 1.0f);
 
     if(recognizer->config == NULL) {
-
-        recognizer->config = lv_malloc(sizeof(lv_indev_gesture_configuration_t));
-        LV_ASSERT(recognizer->config != NULL);
+        recognizer->config = lv_malloc_zeroed(sizeof(lv_indev_gesture_configuration_t));
+        LV_ASSERT_MALLOC(recognizer->config);
         recognizer->config->pinch_down_threshold = LV_GESTURE_PINCH_DOWN_THRESHOLD;
     }
 
@@ -81,9 +80,8 @@ void lv_indev_set_pinch_down_threshold(lv_indev_gesture_recognizer_t * recognize
     LV_ASSERT(threshold < 1.0f);
 
     if(recognizer->config == NULL) {
-
-        recognizer->config = lv_malloc(sizeof(lv_indev_gesture_configuration_t));
-        LV_ASSERT(recognizer->config != NULL);
+        recognizer->config = lv_malloc_zeroed(sizeof(lv_indev_gesture_configuration_t));
+        LV_ASSERT_MALLOC(recognizer->config);
         recognizer->config->pinch_up_threshold = LV_GESTURE_PINCH_UP_THRESHOLD;
     }
 
@@ -116,7 +114,6 @@ bool lv_indev_recognizer_is_active(lv_indev_gesture_recognizer_t * recognizer)
 float lv_event_get_pinch_scale(lv_event_t * gesture_event)
 {
     lv_indev_gesture_recognizer_t * recognizer;
-
     if((recognizer = lv_indev_get_gesture_recognizer(gesture_event)) == NULL) {
         return 0.0f;
     }
@@ -134,13 +131,11 @@ void lv_indev_get_gesture_center_point(lv_indev_gesture_recognizer_t * recognize
 
     point->x = recognizer->info->center.x;
     point->y = recognizer->info->center.y;
-
 }
 
 lv_indev_gesture_state_t lv_event_get_gesture_state(lv_event_t * gesture_event)
 {
     lv_indev_gesture_recognizer_t * recognizer;
-
     if((recognizer = lv_indev_get_gesture_recognizer(gesture_event)) == NULL) {
         return LV_INDEV_GESTURE_STATE_NONE;
     }
@@ -175,7 +170,6 @@ void lv_indev_set_gesture_data(lv_indev_data_t * data, lv_indev_gesture_recogniz
 
     if(is_active == false) {
         data->state = LV_INDEV_STATE_RELEASED;
-
     }
     else {
         data->state = LV_INDEV_STATE_PRESSED;
@@ -215,9 +209,8 @@ void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recognizer, l
 
     if(r->config == NULL) {
         LV_LOG_TRACE("init gesture configuration - set defaults");
-        r->config = lv_malloc(sizeof(lv_indev_gesture_configuration_t));
-
-        LV_ASSERT(r->config != NULL);
+        r->config = lv_malloc_zeroed(sizeof(lv_indev_gesture_configuration_t));
+        LV_ASSERT_MALLOC(r->config);
 
         r->config->pinch_up_threshold = LV_GESTURE_PINCH_UP_THRESHOLD;
         r->config->pinch_down_threshold = LV_GESTURE_PINCH_DOWN_THRESHOLD;
@@ -225,7 +218,6 @@ void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recognizer, l
 
     /* Process collected touch events */
     for(i = 0; i < touch_cnt; i++) {
-
         touch = touches;
         process_touch_event(touch, r->info);
         touches++;
@@ -236,9 +228,7 @@ void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recognizer, l
 
     LV_LOG_TRACE("Current finger count: %d state: %d", r->info->finger_cnt, r->state);
 
-
     if(r->info->finger_cnt == 2) {
-
         switch(r->state) {
             case LV_INDEV_GESTURE_STATE_ENDED:
             case LV_INDEV_GESTURE_STATE_CANCELED:
@@ -262,7 +252,7 @@ void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recognizer, l
                     break;
                 }
 
-                LV_ASSERT(r->config != NULL);
+                LV_ASSERT_NULL(r->config);
 
                 if(r->info->scale > r->config->pinch_up_threshold ||
                    r->info->scale < r->config->pinch_down_threshold) {
@@ -284,10 +274,8 @@ void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recognizer, l
             default:
                 LV_ASSERT_MSG(true, "invalid gesture recognizer state");
         }
-
     }
     else {
-
         switch(r->state) {
             case LV_INDEV_GESTURE_STATE_RECOGNIZED:
                 /* Gesture has ended */
@@ -340,21 +328,22 @@ lv_indev_gesture_recognizer_t * lv_indev_get_gesture_recognizer(lv_event_t * ges
  */
 static void reset_recognizer(lv_indev_gesture_recognizer_t * recognizer)
 {
-    size_t motion_arr_sz;
+    uint8_t finger_cnt;
     lv_indev_gesture_t * info;
     lv_indev_gesture_configuration_t * conf;
 
     if(recognizer == NULL) return;
 
+    finger_cnt = recognizer->info->finger_cnt;
     info = recognizer->info;
     conf = recognizer->config;
 
     /* Set everything to zero but preserve the motion descriptors,
      * which are located at the start of the lv_indev_gesture_t struct */
-    motion_arr_sz = sizeof(lv_indev_gesture_motion_t) * LV_GESTURE_MAX_POINTS;
-    lv_memset(info + motion_arr_sz, 0, sizeof(lv_indev_gesture_t) - motion_arr_sz);
-    lv_memset(recognizer, 0, sizeof(lv_indev_gesture_recognizer_t));
+    lv_memzero((uint8_t *)info + sizeof(info->motions), sizeof(lv_indev_gesture_t) - sizeof(info->motions));
+    lv_memzero(recognizer, sizeof(lv_indev_gesture_recognizer_t));
 
+    info->finger_cnt = finger_cnt;
     recognizer->scale = info->scale = 1;
     recognizer->info = info;
     recognizer->config = conf;
@@ -369,10 +358,9 @@ static lv_indev_gesture_t * init_gesture_info(void)
     lv_indev_gesture_t * info;
     uint8_t i;
 
-    info = lv_malloc(sizeof(lv_indev_gesture_t));
-    LV_ASSERT_NULL(info);
+    info = lv_malloc_zeroed(sizeof(lv_indev_gesture_t));
+    LV_ASSERT_MALLOC(info);
 
-    lv_memset(info, 0, sizeof(lv_indev_gesture_t));
     info->scale = 1;
 
     for(i = 0; i < LV_GESTURE_MAX_POINTS; i++) {
@@ -399,7 +387,6 @@ static lv_indev_gesture_motion_t * get_motion(uint8_t id, lv_indev_gesture_t * i
     }
 
     return NULL;
-
 }
 
 /**
@@ -419,7 +406,6 @@ static int8_t get_motion_idx(uint8_t id, lv_indev_gesture_t * info)
     }
 
     return -1;
-
 }
 
 /**
@@ -432,13 +418,12 @@ static void process_touch_event(lv_indev_touch_data_t * touch, lv_indev_gesture_
     lv_indev_gesture_t * g = info;
     lv_indev_gesture_motion_t * motion;
     int8_t motion_idx;
-    uint8_t len;
+    int8_t len;
 
     motion_idx = get_motion_idx(touch->id, g);
 
     if(motion_idx == -1 && touch->state == LV_INDEV_STATE_PRESSED)  {
-
-        if(g->finger_cnt == LV_GESTURE_MAX_POINTS) {
+        if(g->finger_cnt >= LV_GESTURE_MAX_POINTS) {
             /* Skip touch */
             return;
         }
@@ -453,41 +438,45 @@ static void process_touch_event(lv_indev_touch_data_t * touch, lv_indev_gesture_
         motion->state = touch->state;
 
         g->finger_cnt++;
-
     }
     else if(motion_idx >= 0 && touch->state == LV_INDEV_STATE_RELEASED) {
-
         if(motion_idx == g->finger_cnt - 1) {
 
             /* Mark last item as un-used */
             motion = get_motion(touch->id, g);
             motion->finger = -1;
             motion->state = touch->state;
-
         }
         else {
 
             /* Move back by one */
             len = (g->finger_cnt - 1) - motion_idx;
-            lv_memmove(g->motions + motion_idx,
-                       g->motions + motion_idx + 1,
-                       sizeof(lv_indev_gesture_motion_t) * len);
 
-            g->motions[g->finger_cnt - 1].finger = -1;
+            if(len > 0) {
+                lv_memmove(g->motions + motion_idx,
+                           g->motions + motion_idx + 1,
+                           sizeof(lv_indev_gesture_motion_t) * len);
+            }
+
+            if(g->finger_cnt > 0) {
+                g->motions[g->finger_cnt - 1].finger = -1;
+            }
 
             LV_ASSERT(g->motions[motion_idx + 1].finger == -1);
-
         }
-        g->finger_cnt--;
 
+        if(g->finger_cnt > 0) {
+            g->finger_cnt--;
+        }
+        else {
+            g->finger_cnt = 0;
+        }
     }
     else if(motion_idx >= 0) {
-
         motion = get_motion(touch->id, g);
         motion->point.x = touch->point.x;
         motion->point.y = touch->point.y;
         motion->state = touch->state;
-
     }
     else {
         LV_LOG_TRACE("Ignore extra touch id: %d", touch->id);
@@ -525,7 +514,6 @@ static void gesture_update_center_point(lv_indev_gesture_t * gesture, int touch_
             x += motion->point.x;
             y += motion->point.y;
             touch_cnt++;
-
         }
         else {
             break;
@@ -536,7 +524,6 @@ static void gesture_update_center_point(lv_indev_gesture_t * gesture, int touch_
     g->center.y = y / touch_cnt;
 
     for(i = 0; i < touch_points_nb; i++) {
-
         motion = &g->motions[i];
         if(motion->finger >= 0) {
             delta_x[i] = motion->point.x - g->center.x;
@@ -545,7 +532,6 @@ static void gesture_update_center_point(lv_indev_gesture_t * gesture, int touch_
         }
     }
     for(i = 0; i < touch_points_nb; i++) {
-
         motion = &g->motions[i];
         if(motion->finger >= 0) {
             g->scale_factors_x[i] = delta_x[i] / scale_factor;
@@ -580,7 +566,6 @@ static void gesture_calculate_factors(lv_indev_gesture_t * gesture, int touch_po
             center_x += motion->point.x;
             center_y += motion->point.y;
             touch_cnt++;
-
         }
         else {
             break;
@@ -611,7 +596,6 @@ static void gesture_calculate_factors(lv_indev_gesture_t * gesture, int touch_po
 
     g->center.x = (int32_t)center_x;
     g->center.y = (int32_t)center_y;
-
 }
 
 #endif /* LV_USE_GESTURE_RECOGNITION */
