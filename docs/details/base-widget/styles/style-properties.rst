@@ -1221,6 +1221,48 @@ Set how to align the lines of the text. Note that it doesn't align the Widget it
   <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
   </ul>
 
+text_outline_stroke_color
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sets the color of letter outline stroke.
+
+.. raw:: html
+
+  <ul>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0x000000`</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> Yes</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  </ul>
+
+text_outline_stroke_width
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Set the letter outline stroke width in pixels.
+
+.. raw:: html
+
+  <ul>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> Yes</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> Yes</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  </ul>
+
+text_outline_stroke_opa
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Set the opacity of the letter outline stroke. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
+
+.. raw:: html
+
+  <ul>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_COVER`</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> Yes</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+  <li style='display:inline-block; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+  </ul>
+
 Miscellaneous
 -------------
 

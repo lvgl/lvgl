@@ -18,6 +18,8 @@ extern "C" {
 
 #include "../../misc/lv_types.h"
 #include "../../misc/lv_event.h"
+#include "../../misc/lv_color.h"
+
 #include LV_STDBOOL_INCLUDE
 
 /*********************
@@ -56,6 +58,7 @@ typedef enum {
     LV_FREETYPE_OUTLINE_LINE_TO,
     LV_FREETYPE_OUTLINE_CUBIC_TO,
     LV_FREETYPE_OUTLINE_CONIC_TO,
+    LV_FREETYPE_OUTLINE_BORDER_START,     /* When line width > 0 the border glyph is drawn after the regular glyph */
 } lv_freetype_outline_type_t;
 
 /**********************
@@ -83,7 +86,6 @@ void lv_freetype_uninit(void);
  */
 lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_render_mode_t render_mode, uint32_t size,
                                     lv_freetype_font_style_t style);
-
 /**
  * Delete a freetype font.
  * @param font freetype font to be deleted.
