@@ -15,7 +15,7 @@ jobs:
           submodules: "recursive"
 
       - name: Upload component to component registry
-        uses: espressif/upload-components-ci-action@v1
+        uses: espressif/upload-components-ci-action@v2
         with:
           name: "lvgl"
           version: ${{ github.ref_name }}
