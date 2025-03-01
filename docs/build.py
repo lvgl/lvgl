@@ -172,7 +172,7 @@ from datetime import datetime
 
 # LVGL Custom
 import example_list
-import doc_builder
+import api_doc_builder
 import config_builder
 _ = os.path.abspath(os.path.dirname(__file__))
 docs_src_dir = os.path.join(_, 'src')
@@ -188,7 +188,8 @@ from lvgl_version import lvgl_version  # NoQA
 # -------------------------------------------------------------------------
 # These are relative paths from the ./docs/ directory.
 cfg_project_dir = '..'
-cfg_src_dir = 'src'
+cfg_lvgl_src_dir = 'src'
+cfg_doc_src_dir = 'src'
 cfg_examples_dir = 'examples'
 cfg_default_intermediate_dir = 'intermediate'
 cfg_default_output_dir = 'build'
@@ -230,7 +231,7 @@ def remove_dir(tgt_dir):
         print(f'{tgt_dir} already removed...')
 
 
-def cmd(s, start_dir=None, exit_on_error=True):
+def cmd(cmd_str, start_dir=None, exit_on_error=True):
     """Run external command and abort build on error."""
     if start_dir is None:
         start_dir = os.getcwd()
@@ -238,9 +239,9 @@ def cmd(s, start_dir=None, exit_on_error=True):
     saved_dir = os.getcwd()
     os.chdir(start_dir)
     print("")
-    print(s)
+    print(cmd_str)
     print("-------------------------------------")
-    result = os.system(s)
+    result = os.system(cmd_str)
     os.chdir(saved_dir)
 
     if result != 0 and exit_on_error:
@@ -383,7 +384,7 @@ def run(args):
     base_dir = os.path.abspath(os.path.dirname(__file__))
     project_dir = os.path.abspath(os.path.join(base_dir, cfg_project_dir))
     examples_dir = os.path.join(project_dir, cfg_examples_dir)
-    lvgl_src_dir = os.path.join(project_dir, 'src')
+    lvgl_src_dir = os.path.join(project_dir, cfg_lvgl_src_dir)
 
     # Establish intermediate directory.  The presence of environment variable
     # `LVGL_DOC_BUILD_INTERMEDIATE_DIR` overrides default in `cfg_default_intermediate_dir`.
@@ -483,7 +484,7 @@ def run(args):
     #       - generated search window
     #       - establishing canonical page for search engines
     #   - `link_roles.py` to generate translation links
-    #   - `doc_builder.py` to generate links to API pages
+    #   - `doxygen_xml.py` to generate links to API pages
     #
     # LVGL_GITCOMMIT is used by:
     #   - `conf.py` => html_context['github_version'] for
@@ -527,8 +528,7 @@ def run(args):
     os.environ['LVGL_GITCOMMIT'] = branch
 
     # ---------------------------------------------------------------------
-    # Copy files to 'intermediate_dir' where they will be edited (translation
-    # link(s) and API links) before being used to generate new docs.
+    # Prep `intermediate_dir` to become the `sphinx-build` source dir.
     # ---------------------------------------------------------------------
     # dirsync `exclude_list` = list of regex patterns to exclude.
     intermediate_re = r'^' + cfg_default_intermediate_dir + r'.*'
@@ -551,7 +551,7 @@ def run(args):
         }
         # action == 'sync' means copy files even when they do not already exist in tgt dir.
         # action == 'update' means DO NOT copy files when they do not already exist in tgt dir.
-        dirsync.sync(cfg_src_dir, intermediate_dir, 'sync', **options)
+        dirsync.sync(cfg_doc_src_dir, intermediate_dir, 'sync', **options)
         dirsync.sync(examples_dir, os.path.join(intermediate_dir, cfg_examples_dir), 'sync', **options)
     elif build_intermediate or build_html or build_latex:
         # We are having to create the intermediate_dir contents by copying.
@@ -559,6 +559,7 @@ def run(args):
         print("Building intermediate directory...")
         print("****************")
 
+        t1 = datetime.now()
         copy_method = 1
 
         # Both of these methods work.
@@ -566,7 +567,7 @@ def run(args):
             # --------- Method 0:
             ignore_func = shutil.ignore_patterns('tmp*', 'output*')
             print('Copying docs...')
-            shutil.copytree(cfg_src_dir, intermediate_dir, ignore=ignore_func, dirs_exist_ok=True)
+            shutil.copytree(cfg_doc_src_dir, intermediate_dir, ignore=ignore_func, dirs_exist_ok=True)
             print('Copying examples...')
             shutil.copytree(examples_dir, os.path.join(intermediate_dir, cfg_examples_dir), dirs_exist_ok=True)
         else:
@@ -578,30 +579,19 @@ def run(args):
             # action == 'sync' means copy files even when they do not already exist in tgt dir.
             # action == 'update' means DO NOT copy files when they do not already exist in tgt dir.
             print('Copying docs...')
-            dirsync.sync(cfg_src_dir, intermediate_dir, 'sync', **options)
+            dirsync.sync(cfg_doc_src_dir, intermediate_dir, 'sync', **options)
             print('Copying examples...')
             dirsync.sync(examples_dir, os.path.join(intermediate_dir, cfg_examples_dir), 'sync', **options)
 
         # -----------------------------------------------------------------
-        # Build Example docs, Doxygen output, API docs, and API links.
+        # Build <intermediate_dir>/lv_conf.h from lv_conf_template.h.
         # -----------------------------------------------------------------
-        t1 = datetime.now()
-
-        # Build <intermediate_dir>/lv_conf.h from lv_conf_template.h for this build only.
         config_builder.run(lv_conf_file)
 
+        # -----------------------------------------------------------------
         # Copy `lv_version.h` into intermediate directory.
+        # -----------------------------------------------------------------
         shutil.copyfile(version_src_file, version_dst_file)
-
-        # Replace tokens in Doxyfile in 'intermediate_dir' with data from this run.
-        with open(doxyfile_src_file, 'rb') as f:
-            data = f.read().decode('utf-8')
-
-        data = data.replace('<<LV_CONF_PATH>>', lv_conf_file)
-        data = data.replace('<<SRC>>', f'"{lvgl_src_dir}"')
-
-        with open(doxyfile_dst_file, 'wb') as f:
-            f.write(data.encode('utf-8'))
 
         # -----------------------------------------------------------------
         # Generate examples pages.  Include sub-pages pages that get included
@@ -622,23 +612,26 @@ def run(args):
         #     print("Adding translation links...")
         #     add_translation.exec(intermediate_dir)
 
-        # ---------------------------------------------------------------------
-        # Generate API pages and links thereto.
-        # ---------------------------------------------------------------------
         if skip_api:
             print("Skipping API generation as requested.")
         else:
-            print("Running Doxygen...")
-            cmd('doxygen Doxyfile', intermediate_dir)
-
+            # -------------------------------------------------------------
+            # Generate API pages and links thereto.
+            # -------------------------------------------------------------
             print("API page and link processing...")
-            doc_builder.EMIT_WARNINGS = False
+            api_doc_builder.EMIT_WARNINGS = False
 
-            # Create .RST files for API pages, plus
-            # add API hyperlinks to .RST files in the directories in passed array.
-            doc_builder.run(
-                project_dir,
+            # api_doc_builder.run() => doxy_xml_parser.DoxygenXmlParser() now:
+            # - preps and runs Doxygen generating XML,
+            # - loads generated XML.
+            # Then api_doc_builder.run():
+            # - creates .RST files for API pages, and
+            # - adds API hyperlinks to .RST files in the directories in passed array.
+            api_doc_builder.run(
+                lvgl_src_dir,
                 intermediate_dir,
+                cfg_doxyfile_filename,
+                False,
                 os.path.join(intermediate_dir, 'intro'),
                 os.path.join(intermediate_dir, 'details'),
                 os.path.join(intermediate_dir, 'details', 'common-widget-features'),

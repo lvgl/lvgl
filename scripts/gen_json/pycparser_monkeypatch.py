@@ -571,7 +571,7 @@ class FileAST(c_ast.FileAST):
         super().__init__(*args, **kwargs)
         self._parent = None
 
-    def setup_docs(self, no_docstrings, temp_directory):  # NOQA
+    def setup_docs(self, no_docstrings, lvgl_src_dir, intermediate_dir, doxyfile_filename, silent=False):  # NOQA
         global get_enum_item_docs
         global get_enum_docs
         global get_func_docs
@@ -601,22 +601,37 @@ class FileAST(c_ast.FileAST):
             get_macros = dummy_list
 
         else:
-            import doc_builder  # NOQA
+            import doxy_xml_parser  # NOQA
 
-            doc_builder.EMIT_WARNINGS = False
-            # doc_builder.DOXYGEN_OUTPUT = False
+            doxy_xml_parser.EMIT_WARNINGS = False
+            # doxy_xml_parser.DOXYGEN_OUTPUT = False
 
-            docs = doc_builder.XMLSearch(temp_directory)
+            # Instantiating a doxy_xml_parser.DoxygenXmlParser object:
+            # - runs Doxygen in `temp_directory`
+            # - loads XML into `doxy_xml.index` as a `xml.etree.ElementTree`
+            # - builds these dictionaries as direct children of `doxy_xml`:
+            #   = doxy_xml.defines     dictionary of doxy_xml_parser.DEFINE objects
+            #   = doxy_xml.enums       dictionary of doxy_xml_parser.ENUM objects
+            #   = doxy_xml.variables   dictionary of doxy_xml_parser.VARIABLE objects
+            #   = doxy_xml.namespaces  dictionary of doxy_xml_parser.NAMESPACE objects
+            #   = doxy_xml.structures  dictionary of doxy_xml_parser.STRUCT objects
+            #   = doxy_xml.typedefs    dictionary of doxy_xml_parser.TYPEDEF objects
+            #   = doxy_xml.functions   dictionary of doxy_xml_parser.FUNCTION objects
+            #   = doxy_xml.groups      dictionary of doxy_xml_parser.GROUP objects
+            #   = doxy_xml.files       dictionary of doxy_xml_parser.FILE objects
+            #   = doxy_xml.classes     dictionary of doxy_xml_parser.CLASS objects
+            doxy_xml = doxy_xml_parser.DoxygenXmlParser(
+                lvgl_src_dir, intermediate_dir, doxyfile_filename, silent)
 
-            get_enum_item_docs = docs.get_enum_item
-            get_enum_docs = docs.get_enum
-            get_func_docs = docs.get_function
-            get_var_docs = docs.get_variable
-            get_union_docs = docs.get_union
-            get_struct_docs = docs.get_structure
-            get_typedef_docs = docs.get_typedef
-            get_macro_docs = docs.get_macro
-            get_macros = docs.get_macros
+            get_enum_item_docs = doxy_xml.get_enum_item
+            get_enum_docs = doxy_xml.get_enum
+            get_func_docs = doxy_xml.get_function
+            get_var_docs = doxy_xml.get_variable
+            get_union_docs = doxy_xml.get_union
+            get_struct_docs = doxy_xml.get_structure
+            get_typedef_docs = doxy_xml.get_typedef
+            get_macro_docs = doxy_xml.get_macro
+            get_macros = doxy_xml.get_macros
 
     @property
     def name(self):
