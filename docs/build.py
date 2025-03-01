@@ -233,20 +233,23 @@ def remove_dir(tgt_dir):
 
 def cmd(cmd_str, start_dir=None, exit_on_error=True):
     """Run external command and abort build on error."""
-    if start_dir is None:
-        start_dir = os.getcwd()
+    saved_dir = None
 
-    saved_dir = os.getcwd()
-    os.chdir(start_dir)
+    if start_dir is not None:
+        saved_dir = os.getcwd()
+        os.chdir(start_dir)
+
     print("")
     print(cmd_str)
     print("-------------------------------------")
-    result = os.system(cmd_str)
-    os.chdir(saved_dir)
+    return_code = os.system(cmd_str)
 
-    if result != 0 and exit_on_error:
+    if saved_dir is not None:
+        os.chdir(saved_dir)
+
+    if return_code != 0 and exit_on_error:
         print("Exiting build due to previous error.")
-        sys.exit(result)
+        sys.exit(return_code)
 
 
 def intermediate_dir_contents_exists(dir):

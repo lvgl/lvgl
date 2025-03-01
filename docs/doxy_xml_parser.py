@@ -1260,11 +1260,11 @@ class DoxygenXmlParser(object):
         # temporary directory as was intended.
         # ---------------------------------------------------------------------
         def cmd(cmd_str, start_dir=None, exit_on_error=True):
-            if start_dir is None:
-                start_dir = os.getcwd()
+            saved_dir = None
 
-            saved_dir = os.getcwd()
-            os.chdir(start_dir)
+            if start_dir is not None:
+                saved_dir = os.getcwd()
+                os.chdir(start_dir)
 
             if run_silent:
                 # This method of running Doxygen is used because if it
@@ -1279,7 +1279,6 @@ class DoxygenXmlParser(object):
                 )
 
                 out, err = p.communicate()
-                os.chdir(saved_dir)
                 if p.returncode:
                     if out:
                         # Note the `.decode("utf-8")` is required here
@@ -1299,11 +1298,13 @@ class DoxygenXmlParser(object):
                 print(cmd_str)
                 print("-------------------------------------")
                 return_code = os.system(cmd_str)
-                os.chdir(saved_dir)
 
                 if return_code != 0 and exit_on_error:
                     print(f'Exiting due to error [{return_code}] running [{cmd_str}].')
                     sys.exit(return_code)
+
+            if saved_dir is not None:
+                os.chdir(saved_dir)
 
 
         # -----------------------------------------------------------------
