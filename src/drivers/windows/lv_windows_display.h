@@ -50,6 +50,8 @@ extern "C" {
  * @param simulator_mode Create simulator mode display if true, or create
  *                       application mode display.
  * @return The created LVGL display object.
+ * @remark The display window is positioned at the center of the screen by
+ *         default to enhance user experience.
 */
 lv_display_t * lv_windows_create_display(
     const wchar_t * title,
@@ -113,6 +115,34 @@ int32_t lv_windows_dpi_to_logical(int32_t physical, int32_t dpi);
  *         Windows applications.
 */
 int32_t lv_windows_dpi_to_physical(int32_t logical, int32_t dpi);
+
+/**
+ * @brief Set the window to be a top-level or normal window.
+ * @param display The specific LVGL display object.
+ * @param top_level If true, sets the window as a top-level window;
+ *                  otherwise, restores it to a normal window.
+ * @remark A top-level window is placed above all non-top-level windows
+ *         and typically used for dialogs or notifications.
+ *         This function uses Windows API to adjust the `WS_EX_TOPMOST`
+ *         and `WS_EX_APPWINDOW` extended styles of the window.
+ * @note Ensure that the LVGL display object is initialized properly
+ *       before calling this function.
+ */
+void lv_windows_set_top_level(lv_display_t * display, bool top_level);
+
+/**
+ * @brief Set the window to be frameless or restore the default frame.
+ * @param display The specific LVGL display object.
+ * @param frameless If true, removes the window's frame (including
+ *                  title bar and borders); otherwise, restores the
+ *                  default frame.
+ * @remark This function modifies the `WS_OVERLAPPEDWINDOW` and `WS_POPUPWINDOW`
+ *         styles of the window using the Windows API.
+ *         A frameless window is often used for splash screens or custom-styled windows.
+ * @note Adjusting the frameless property may affect the user's ability to resize,
+ *       move, or close the window using standard system controls.
+ */
+void lv_windows_set_frameless(lv_display_t * display, bool frameless);
 
 /**********************
  *      MACROS
