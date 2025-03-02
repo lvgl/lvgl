@@ -174,10 +174,7 @@ from datetime import datetime
 import example_list
 import api_doc_builder
 import config_builder
-_ = os.path.abspath(os.path.dirname(__file__))
-docs_src_dir = os.path.join(_, 'src')
-sys.path.insert(0, docs_src_dir)
-from lvgl_version import lvgl_version  # NoQA
+from src.lvgl_version import lvgl_version
 
 # Not Currently Used
 # (Code is kept in case we want to re-implement it later.)
@@ -252,7 +249,7 @@ def cmd(cmd_str, start_dir=None, exit_on_error=True):
         saved_dir = os.getcwd()
         os.chdir(start_dir)
 
-    announce(f'Running [{cmd_str}]]...')
+    announce(f'Running [{cmd_str}] in [{os.getcwd()}]...')
     return_code = os.system(cmd_str)
 
     if saved_dir is not None:
@@ -635,7 +632,7 @@ def run(args):
             announce("API page and link processing...")
             api_doc_builder.EMIT_WARNINGS = False
 
-            # api_doc_builder.run() => doxy_xml_parser.DoxygenXmlParser() now:
+            # api_doc_builder.run() => doxy_xml_parser.DoxygenXml() now:
             # - preps and runs Doxygen generating XML,
             # - loads generated XML.
             # Then api_doc_builder.run():
@@ -644,7 +641,7 @@ def run(args):
             api_doc_builder.run(
                 lvgl_src_dir,
                 intermediate_dir,
-                cfg_doxyfile_filename,
+                doxyfile_src_file,
                 False,
                 os.path.join(intermediate_dir, 'intro'),
                 os.path.join(intermediate_dir, 'details'),

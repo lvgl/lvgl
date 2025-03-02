@@ -1,14 +1,12 @@
 """api_doc_builder.py  Create and provide links to API pages in LVGL doc build.
 
-Uses DoxyXmlParser class in doxyxmlparser.py to make available:
+Uses DoxygenXml class in doxygen_xml.py to make available:
 
 - Doxygen output, and
 - Doxygen-documented symbols from the C code.
 """
 import os
-import doxy_xml_parser
-import sys
-from xml.etree import ElementTree
+import doxygen_xml
 
 html_files = {}
 EMIT_WARNINGS = True
@@ -171,7 +169,7 @@ def announce(*args):
     print(f'{os.path.basename(__file__)}: ', ' '.join(_args))
 
 
-def run(lvgl_src_dir, intermediate_dir, doxyfile_filename, silent=False, *doc_paths):
+def run(lvgl_src_dir, intermediate_dir, doxyfile_src_file, silent=False, *doc_paths):
     """
     This function does 2 things:
     1.  Generates .RST files for the LVGL header files that will have API
@@ -183,21 +181,20 @@ def run(lvgl_src_dir, intermediate_dir, doxyfile_filename, silent=False, *doc_pa
 
     :param lvgl_src_dir:       platform-appropriate path to LVGL src directory
     :param intermediate_dir:   platform-appropriate path to temp dir being operated on
-    :param doxyfile_filename:  doxygen configuration filename (no path)
+    :param doxyfile_src_file:  full path to src doxygen configuration file
     :param silent:             suppress action announcements?
     :param doc_paths:          list of platform-appropriate paths to find source .RST files.
-    :return:  n/a
     """
-    doxy_xml_parser.EMIT_WARNINGS = EMIT_WARNINGS
+    doxygen_xml.EMIT_WARNINGS = EMIT_WARNINGS
 
     # - Generate Doxyfile replacing tokens,
     # - run Doxygen generating XML,
     # - load the XML from Doxygen output,
-    xml_parser = doxy_xml_parser.DoxygenXmlParser(lvgl_src_dir,
-                                                  intermediate_dir,
-                                                  doxyfile_filename,
-                                                  silent
-                                                  )
+    xml_parser = doxygen_xml.DoxygenXml(lvgl_src_dir,
+                                        intermediate_dir,
+                                        doxyfile_src_file,
+                                        silent
+                                        )
 
     announce("Generating API documentation .RST files...")
     api_path = os.path.join(intermediate_dir, 'API')
@@ -235,14 +232,14 @@ def run(lvgl_src_dir, intermediate_dir, doxyfile_filename, silent=False, *doc_pa
             #  ('lv_draw_sw_blend_to_i1', 'draw\\sw\\blend\\lv_draw_sw_blend_to_i1.html'),
             #  etc.}
             for container in (
-                doxy_xml_parser.defines,
-                doxy_xml_parser.enums,
-                doxy_xml_parser.variables,
-                doxy_xml_parser.namespaces,
-                doxy_xml_parser.structures,
-                doxy_xml_parser.unions,
-                doxy_xml_parser.typedefs,
-                doxy_xml_parser.functions
+                doxygen_xml.defines,
+                doxygen_xml.enums,
+                doxygen_xml.variables,
+                doxygen_xml.namespaces,
+                doxygen_xml.structures,
+                doxygen_xml.unions,
+                doxygen_xml.typedefs,
+                doxygen_xml.functions
             ):
                 for n, o in container.items():
                     get_includes(stem, n, o, html_includes)
@@ -285,4 +282,3 @@ def run(lvgl_src_dir, intermediate_dir, doxyfile_filename, silent=False, *doc_pa
 
                 with open(path, 'wb') as f:
                     f.write(data.encode('utf-8'))
-

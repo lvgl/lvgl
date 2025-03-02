@@ -178,9 +178,10 @@ def run(output_path, lv_conf_file, output_to_stdout, target_header, filter_priva
 
         cparser = pycparser.CParser()
         ast = cparser.parse(pp_data, target_header)
+        doxyfile_src_file = os.path.join(docs_path, doxyfile_filename)
 
         ast.setup_docs(no_docstrings, lvgl_src_dir,
-                       intermediate_dir, doxyfile_filename, output_to_stdout)
+                       intermediate_dir, doxyfile_src_file, output_to_stdout)
 
         if not output_to_stdout and output_path is None:
             if not DEVELOP:

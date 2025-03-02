@@ -118,16 +118,16 @@ REPEAT_BRIEF           = YES
 # the entity):The $name class, The $name widget, The $name file, is, provides,
 # specifies, contains, represents, a, an and the.
 
-ABBREVIATE_BRIEF       = "The $name class" \
-                         "The $name widget" \
-                         "The $name file" \
-                         is \
-                         provides \
-                         specifies \
-                         contains \
-                         represents \
-                         a \
-                         an \
+ABBREVIATE_BRIEF       = "The $name class"   \
+                         "The $name widget"  \
+                         "The $name file"    \
+                         is                  \
+                         provides            \
+                         specifies           \
+                         contains            \
+                         represents          \
+                         a                   \
+                         an                  \
                          the
 
 # If the ALWAYS_DETAILED_SEC and REPEAT_BRIEF tags are both set to YES then
@@ -815,11 +815,11 @@ INPUT_ENCODING         = UTF-8
 # *.m, *.markdown, *.md, *.mm, *.dox, *.py, *.pyw, *.f90, *.f95, *.f03, *.f08,
 # *.f, *.for, *.tcl, *.vhd, *.vhdl, *.ucf and *.qsf.
 
-FILE_PATTERNS          = *.h \
-                         *.hh \
-                         *.hxx \
-                         *.hpp \
-                         *.h++ \
+FILE_PATTERNS          = *.h    \
+                         *.hh   \
+                         *.hxx  \
+                         *.hpp  \
+                         *.h++
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
@@ -850,14 +850,14 @@ EXCLUDE_SYMLINKS       = NO
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = */libs/barcode/code*     \
-                         */libs/freetype/ft*      \
-                         */libs/gif/gif*          \
-                         */libs/lodepng/lode*     \
-                         */libs/qrcode/qr*        \
-                         */libs/thorvg/*          \
-                         */libs/tiny_ttf/stb*     \
-                         */libs/tjpgd/tjp*        \
+EXCLUDE_PATTERNS       = */libs/barcode/code*      \
+                         */libs/freetype/ft*       \
+                         */libs/gif/gif*           \
+                         */libs/lodepng/lode*      \
+                         */libs/qrcode/qr*         \
+                         */libs/thorvg/*           \
+                         */libs/tiny_ttf/stb*      \
+                         */libs/tjpgd/tjp*         \
                          */others/vg_lite_tvg/vg*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names

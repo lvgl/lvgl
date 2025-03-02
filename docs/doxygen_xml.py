@@ -1,6 +1,6 @@
-"""doxy_xml_parser.py
+"""doxygen_xml.py
 
-DoxygenXmlParser is the primary class defined herein, and is used by:
+DoxygenXml is the primary class defined herein, and is used by:
 
 - ./docs/build.py to
   - slurp in Doxygen XML output and use it to:
@@ -153,6 +153,7 @@ Additional dictionaries:
 import os
 import sys
 from xml.etree import ElementTree
+import doxygen_config
 
 EMIT_WARNINGS = True
 DOXYGEN_OUTPUT = True
@@ -266,7 +267,7 @@ def load_xml(fle):
         d = f.read().decode('utf-8')
 
     # This code is to correct a bug in Doxygen. That bug incorrectly parses
-    # a typedef and it causes an error to occur building the docs. The Error
+    # a typedef, and it causes an error to occur building the docs. The Error
     # doesn't stop the documentation from being generated, I just don't want
     # to see the ugly red output.
     #
@@ -1043,6 +1044,7 @@ class DEFINE(object):
 
         if parent is not None:
             root = load_xml(parent.refid)
+            memberdef = []
 
             for compounddef in root:
                 if compounddef.attrib['id'] != parent.refid:
@@ -1243,14 +1245,14 @@ class CLASS(object):
                 cls(self, **member.attrib)
 
 
-class DoxygenXmlParser(object):
-    """Opens and parses a Doxygen-generated `index.xml` file and makes it
-    available in this module as a set of dictionaries, documented at the
-    top of this file.
+class DoxygenXml(object):
+    """Opens, parses and loads a Doxygen-generated `index.xml` file
+    and makes it available as a set of dictionary attributes of this
+    module, documented at the top of this file and named below in
+    `global` statements.
     """
 
-    def __init__(self, lvgl_src_dir, intermediate_dir, doxyfile_filename, silent=False):
-        global xml_path
+    def __init__(self, lvgl_src_dir, intermediate_dir, doxyfile_src_file, silent=False):
         global defines
         global enums
         global variables
@@ -1261,6 +1263,8 @@ class DoxygenXmlParser(object):
         global groups
         global files
         global classes
+
+        global xml_path
         global silent_running
 
         import subprocess
@@ -1268,12 +1272,12 @@ class DoxygenXmlParser(object):
 
         silent_running = silent
         base_dir = os.path.abspath(os.path.dirname(__file__))
-        doxyfile_src_file = os.path.join(base_dir, doxyfile_filename)
-        doxyfile_dst_file = os.path.join(intermediate_dir, doxyfile_filename)
+        doxyfile_filename = str(os.path.split(doxyfile_src_file)[1])
+        doxyfile_dst_file = str(os.path.join(intermediate_dir, doxyfile_filename))
         lv_conf_file = os.path.join(intermediate_dir, 'lv_conf.h')
         xml_path = os.path.join(intermediate_dir, 'xml')
 
-        # In case DoxygenXmlParser() is ever instantiated twice in 1 session,
+        # In case DoxygenXml() is ever instantiated twice in 1 session,
         # clear these dictionaries before they are (re-)populated below.
         defines = {}
         enums = {}
@@ -1286,16 +1290,34 @@ class DoxygenXmlParser(object):
         files = {}
         classes = {}
 
-        # Generate Doxyfile into intermediate_dir replacing tokens with
-        # values from this run.
-        with open(doxyfile_src_file, 'rb') as f:
-            data = f.read().decode('utf-8')
+        # Generate Doxyfile into `intermediate_dir`
+        # replacing tokens with values for this run.
+        #
+        # 1. Load from Doxyfile
+        cfg = doxygen_config.DoxygenConfig()
+        cfg.load(doxyfile_src_file)
 
-        data = data.replace('<<LV_CONF_PATH>>', lv_conf_file)
-        data = data.replace('<<SRC>>', f'"{lvgl_src_dir}"')
+        # 2. Update cfg.
+        temp = cfg.value('PREDEFINED')
+        temp = temp.replace('<<LV_CONF_PATH>>', lv_conf_file)
+        cfg.set('PREDEFINED', temp)
 
-        with open(doxyfile_dst_file, 'wb') as f:
-            f.write(data.encode('utf-8'))
+        temp = cfg.value('INPUT')
+        temp = temp.replace('<<SRC>>', f'"{lvgl_src_dir}"')
+        cfg.set('INPUT', temp)
+
+        # 3. Store it.
+        cfg.save(doxyfile_dst_file)
+
+        # Original code:
+        # with open(doxyfile_src_file, 'rb') as f:
+        #     data = f.read().decode('utf-8')
+        #
+        # data = data.replace('<<LV_CONF_PATH>>', lv_conf_file)
+        # data = data.replace('<<SRC>>', f'"{lvgl_src_dir}"')
+        #
+        # with open(doxyfile_dst_file, 'wb') as f:
+        #     f.write(data.encode('utf-8'))
 
         # ---------------------------------------------------------------------
         # Provide a way to run an external command and abort build on error.
@@ -1343,7 +1365,7 @@ class DoxygenXmlParser(object):
                     if exit_on_error:
                         sys.exit(p.returncode)
             else:
-                announce(f'Running [{cmd_str}]]...')
+                announce(f'Running [{cmd_str}] in [{os.getcwd()}]...')
                 return_code = os.system(cmd_str)
 
                 if return_code != 0 and exit_on_error:
@@ -1352,7 +1374,6 @@ class DoxygenXmlParser(object):
 
             if saved_dir is not None:
                 os.chdir(saved_dir)
-
 
         # -----------------------------------------------------------------
         # Run Doxygen in temporary directory.
@@ -1421,6 +1442,7 @@ class DoxygenXmlParser(object):
                 **compound.attrib
             )
 
+
     def get_macros(self):
         return list(defines.values())
 
@@ -1450,5 +1472,3 @@ class DoxygenXmlParser(object):
 
     def get_macro(self, m_name):
         return defines.get(m_name, None)
-
-
