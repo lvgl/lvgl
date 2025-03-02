@@ -188,9 +188,13 @@ unions = {}      # appears to be non-functional at this time
 
 # Module-Global Variables
 xml_path = ''
+silent_running = False
 
 
 def announce(*args):
+    if silent_running:
+        return
+
     _args = []
 
     for arg in args:
@@ -295,6 +299,29 @@ def get_type(node):
             return gt(child)
 
 
+def build_define(element):
+    define = None
+
+    if element.text:
+        define = element.text.strip()
+
+    for item in element:
+        ds = build_define(item)
+        if ds:
+            if define:
+                define += ' ' + ds
+            else:
+                define = ds.strip()
+
+    if element.tail:
+        if define:
+            define += ' ' + element.tail.strip()
+        else:
+            define = element.tail.strip()
+
+    return define
+
+
 class STRUCT_FIELD(object):
 
     def __init__(self, name, _type, description, file_name, line_no):
@@ -320,6 +347,8 @@ class STRUCT(object):
 '''
 
     def __init__(self, parent, refid, name, **_):
+        global structures
+
         if name in structures:
             self.__dict__.update(structures[name].__dict__)
         else:
@@ -453,6 +482,8 @@ class VARIABLE(object):
 '''
 
     def __init__(self, parent, refid, name, **_):
+        global variables
+
         if name in variables:
             self.__dict__.update(variables[name].__dict__)
         else:
@@ -514,6 +545,8 @@ class NAMESPACE(object):
 '''
 
     def __init__(self, parent, refid, name, **_):
+        global namespaces
+
         if name in namespaces:
             self.__dict__.update(namespaces[name].__dict__)
         else:
@@ -570,15 +603,6 @@ class NAMESPACE(object):
         return self.template.format(name=self.name)
 
 
-class FUNC_ARG(object):
-    """<compound kind="?"><member ...> elements in Doxygen `index.xml`"""
-
-    def __init__(self, name, _type):
-        self.name = name
-        self.type = _type
-        self.description = None
-
-
 class GROUP(object):
     """<compound kind="group"> elements in Doxygen `index.xml`"""
     template = '''\
@@ -587,6 +611,8 @@ class GROUP(object):
 '''
 
     def __init__(self, parent, refid, name, **_):
+        global groups
+
         if name in groups:
             self.__dict__.update(functions[name].__dict__)
         else:
@@ -600,6 +626,15 @@ class GROUP(object):
         return self.template.format(name=self.name)
 
 
+class FUNC_ARG(object):
+    """<compound kind="?"><member ...> elements in Doxygen `index.xml`"""
+
+    def __init__(self, name, _type):
+        self.name = name
+        self.type = _type
+        self.description = None
+
+
 class FUNCTION(object):
     """<compound kind="file" ...>
         <member ... kind="function"> elements in Doxygen `index.xml`"""
@@ -609,6 +644,8 @@ class FUNCTION(object):
 '''
 
     def __init__(self, parent, refid, name, **_):
+        global functions
+
         if name in functions:
             self.__dict__.update(functions[name].__dict__)
         else:
@@ -785,6 +822,8 @@ class FILE(object):
     """<compound kind="file"> elements in Doxygen `index.xml`"""
 
     def __init__(self, _, refid, name, node, **__):
+        global files
+
         if name in files:
             self.__dict__.update(files[name].__dict__)
             return
@@ -819,6 +858,27 @@ class FILE(object):
                 cls(self, **member.attrib)
 
 
+class ENUMVALUE(object):
+    """<compound kind="file"...>
+        <member kind="enum"...>
+        <member kind="enumvalue"> elements in Doxygen `index.xml`"""
+    template = '''\
+.. doxygenenumvalue:: {name}
+   :project: lvgl
+'''
+
+    def __init__(self, parent, refid, name, **_):
+        self.parent = parent
+        self.refid = refid
+        self.name = name
+        self.description = None
+        self.file_name = None
+        self.line_no = None
+
+    def __str__(self):
+        return self.template.format(name=self.name)
+
+
 class ENUM(object):
     """<compound kind="file"...>
         <member kind="enum"...> elements in Doxygen `index.xml`"""
@@ -828,6 +888,8 @@ class ENUM(object):
 '''
 
     def __init__(self, parent, refid, name, **_):
+        global enums
+
         if name in enums:
             self.__dict__.update(enums[name].__dict__)
         else:
@@ -954,29 +1016,6 @@ class ENUM(object):
         return '\n'.join(template)
 
 
-def build_define(element):
-    define = None
-
-    if element.text:
-        define = element.text.strip()
-
-    for item in element:
-        ds = build_define(item)
-        if ds:
-            if define:
-                define += ' ' + ds
-            else:
-                define = ds.strip()
-
-    if element.tail:
-        if define:
-            define += ' ' + element.tail.strip()
-        else:
-            define = element.tail.strip()
-
-    return define
-
-
 class DEFINE(object):
     """<compound kind="file"...>
         <member kind="define"...> elements in Doxygen `index.xml`"""
@@ -986,6 +1025,8 @@ class DEFINE(object):
 '''
 
     def __init__(self, parent, refid, name, **_):
+        global defines
+
         if name in defines:
             self.__dict__.update(defines[name].__dict__)
         else:
@@ -1017,8 +1058,8 @@ class DEFINE(object):
                     for memberdef in child:
                         if memberdef.attrib['id'] == refid:
                             break
-                    else:
-                        continue
+                        else:
+                            continue
 
                     break
                 else:
@@ -1062,27 +1103,6 @@ class DEFINE(object):
         return self.template.format(name=self.name)
 
 
-class ENUMVALUE(object):
-    """<compound kind="file"...>
-        <member kind="enum"...>
-        <member kind="enumvalue"> elements in Doxygen `index.xml`"""
-    template = '''\
-.. doxygenenumvalue:: {name}
-   :project: lvgl
-'''
-
-    def __init__(self, parent, refid, name, **_):
-        self.parent = parent
-        self.refid = refid
-        self.name = name
-        self.description = None
-        self.file_name = None
-        self.line_no = None
-
-    def __str__(self):
-        return self.template.format(name=self.name)
-
-
 class TYPEDEF(object):
     template = '''\
 .. doxygentypedef:: {name}
@@ -1090,6 +1110,8 @@ class TYPEDEF(object):
 '''
 
     def __init__(self, parent, refid, name, **_):
+        global typedefs
+
         if name in typedefs:
             self.__dict__.update(typedefs[name].__dict__)
         else:
@@ -1191,6 +1213,8 @@ class CLASS(object):
         <member ... kind="class"> elements in Doxygen `index.xml`"""
 
     def __init__(self, _, refid, name, node, **__):
+        global classes
+
         if name in classes:
             self.__dict__.update(classes[name].__dict__)
             return
@@ -1227,15 +1251,40 @@ class DoxygenXmlParser(object):
 
     def __init__(self, lvgl_src_dir, intermediate_dir, doxyfile_filename, silent=False):
         global xml_path
+        global defines
+        global enums
+        global variables
+        global namespaces
+        global structures
+        global typedefs
+        global functions
+        global groups
+        global files
+        global classes
+        global silent_running
+
         import subprocess
         import sys
 
-        run_silent = silent
+        silent_running = silent
         base_dir = os.path.abspath(os.path.dirname(__file__))
         doxyfile_src_file = os.path.join(base_dir, doxyfile_filename)
         doxyfile_dst_file = os.path.join(intermediate_dir, doxyfile_filename)
         lv_conf_file = os.path.join(intermediate_dir, 'lv_conf.h')
         xml_path = os.path.join(intermediate_dir, 'xml')
+
+        # In case DoxygenXmlParser() is ever instantiated twice in 1 session,
+        # clear these dictionaries before they are (re-)populated below.
+        defines = {}
+        enums = {}
+        variables = {}
+        namespaces = {}
+        structures = {}
+        typedefs = {}
+        functions = {}
+        groups = {}
+        files = {}
+        classes = {}
 
         # Generate Doxyfile into intermediate_dir replacing tokens with
         # values from this run.
@@ -1266,7 +1315,7 @@ class DoxygenXmlParser(object):
                 saved_dir = os.getcwd()
                 os.chdir(start_dir)
 
-            if run_silent:
+            if silent_running:
                 # This method of running Doxygen is used because if it
                 # succeeds, we do not want anything going to STDOUT.
                 # Running it via `os.system()` would send its output
@@ -1294,9 +1343,7 @@ class DoxygenXmlParser(object):
                     if exit_on_error:
                         sys.exit(p.returncode)
             else:
-                print("")
-                print(cmd_str)
-                print("-------------------------------------")
+                announce(f'Running [{cmd_str}]]...')
                 return_code = os.system(cmd_str)
 
                 if return_code != 0 and exit_on_error:
@@ -1323,7 +1370,7 @@ class DoxygenXmlParser(object):
         #     namespaces,  structures,  typedefs,
         #     functions,   unions,      groups,
         #     files,       classes.
-        if not run_silent:
+        if not silent_running:
             announce("Building source-code symbol tables...")
 
         for compound in self.index_xml:
