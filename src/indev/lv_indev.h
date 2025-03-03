@@ -54,6 +54,7 @@ typedef enum {
     LV_INDEV_GESTURE_PINCH,
     LV_INDEV_GESTURE_SWIPE,
     LV_INDEV_GESTURE_ROTATE,
+    LV_INDEV_GESTURE_TWO_FINGERS_SWIPE,
     LV_INDEV_GESTURE_SCROLL,            /* Used with scrollwheels */
     LV_INDEV_GESTURE_CNT,               /* Total number of gestures types */
 } lv_indev_gesture_type_t;
@@ -68,8 +69,8 @@ typedef struct {
     lv_indev_state_t state; /**< LV_INDEV_STATE_RELEASED or LV_INDEV_STATE_PRESSED*/
     bool continue_reading;  /**< If set to true, the read callback is invoked again, unless the device is in event-driven mode*/
 
-    lv_indev_gesture_type_t gesture_type;
-    void * gesture_data;
+    lv_indev_gesture_type_t gesture_type[LV_INDEV_GESTURE_CNT]; /* Current gesture types, per gesture */
+    void * gesture_data[LV_INDEV_GESTURE_CNT]; /* Used to store data per gesture */
 
 } lv_indev_data_t;
 

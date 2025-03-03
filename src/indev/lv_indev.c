@@ -729,8 +729,10 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->pointer.act_point.y = data->point.y;
     i->pointer.diff = data->enc_diff;
 
-    i->gesture_type = data->gesture_type;
-    i->gesture_data = data->gesture_data;
+    for(int gest = 0; gest < LV_INDEV_GESTURE_CNT; gest++) {
+        i->gesture_type[gest] = data->gesture_type[gest];
+        i->gesture_data[gest] = data->gesture_data[gest];
+    }
 
     /*Process the diff first as scrolling will be processed in indev_proc_release*/
     indev_proc_pointer_diff(i);
@@ -1296,17 +1298,25 @@ static void indev_proc_press(lv_indev_t * indev)
         indev->pointer.press_moved = 1;
     }
 
-    /* Send a gesture event to a potential indev cb callback, even if no object was found */
-    if(indev->gesture_type != LV_INDEV_GESTURE_NONE) {
-        lv_indev_send_event(indev, LV_EVENT_GESTURE, indev_act);
+    for(int i = 0; i < LV_INDEV_GESTURE_CNT; i++) {
+        /* Send a gesture event to a potential indev cb callback, even if no object was found */
+        if(indev->gesture_type[i] != LV_INDEV_GESTURE_NONE) {
+            indev->cur_gesture = (lv_indev_gesture_type_t) i;
+            lv_indev_send_event(indev, LV_EVENT_GESTURE, indev_act);
+            break;
+        }
     }
 
     if(indev_obj_act) {
         const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
-        if(indev->gesture_type != LV_INDEV_GESTURE_NONE) {
-            /* NOTE: hardcoded to pinch for now */
-            if(send_event(LV_EVENT_GESTURE, indev_act) == LV_RESULT_INVALID) return;
+        for(int i = 0; i < LV_INDEV_GESTURE_CNT; i++) {
+
+            if(indev->gesture_type[i] != LV_INDEV_GESTURE_NONE) {
+                indev->cur_gesture = (lv_indev_gesture_type_t) i;
+                if(send_event(LV_EVENT_GESTURE, indev_act) == LV_RESULT_INVALID) return;
+                break;
+            }
         }
 
         if(is_enabled) {
@@ -1401,8 +1411,13 @@ static void indev_proc_release(lv_indev_t * indev)
     }
 
     /* Send a gesture event to a potential indev cb callback, even if no object was found */
-    if(indev->gesture_type != LV_INDEV_GESTURE_NONE) {
-        lv_indev_send_event(indev, LV_EVENT_GESTURE, indev_act);
+    for(int i = 0; i < LV_INDEV_GESTURE_CNT; i++) {
+
+        if(indev->gesture_type[i] != LV_INDEV_GESTURE_NONE) {
+            indev_act->cur_gesture = (lv_indev_gesture_type_t) i;
+            lv_indev_send_event(indev, LV_EVENT_GESTURE, indev_act);
+            break;
+        }
     }
 
     if(indev_obj_act) {
@@ -1410,8 +1425,12 @@ static void indev_proc_release(lv_indev_t * indev)
 
         const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
-        if(is_enabled && indev->gesture_type != LV_INDEV_GESTURE_NONE) {
-            if(send_event(LV_EVENT_GESTURE, indev_act) == LV_RESULT_INVALID) return;
+        for(int i = 0; i < LV_INDEV_GESTURE_CNT; i++) {
+            if(is_enabled && indev->gesture_type[i] != LV_INDEV_GESTURE_NONE) {
+                indev_act->cur_gesture = (lv_indev_gesture_type_t) i;
+                if(send_event(LV_EVENT_GESTURE, indev_act) == LV_RESULT_INVALID) return;
+                break;
+            }
         }
 
         if(is_enabled) {
