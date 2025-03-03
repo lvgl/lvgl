@@ -26,6 +26,7 @@
 #ifndef _TVG_ARRAY_H_
 #define _TVG_ARRAY_H_
 
+#include "tvgCommon.h"
 #include <memory.h>
 #include <cstdint>
 #include <cstdlib>
