@@ -55,7 +55,6 @@ static const lv_font_t * lv_span_get_style_text_font(lv_obj_t * par, lv_span_t *
 static int32_t lv_span_get_style_text_letter_space(lv_obj_t * par, lv_span_t * span);
 static lv_color_t lv_span_get_style_text_color(lv_obj_t * par, lv_span_t * span);
 static lv_opa_t lv_span_get_style_text_opa(lv_obj_t * par, lv_span_t * span);
-static lv_blend_mode_t lv_span_get_style_text_blend_mode(lv_obj_t * par, lv_span_t * span);
 static int32_t lv_span_get_style_text_decor(lv_obj_t * par, lv_span_t * span);
 
 static inline void span_text_check(const char ** text);
@@ -880,20 +879,6 @@ static lv_opa_t lv_span_get_style_text_opa(lv_obj_t * par, lv_span_t * span)
     return opa;
 }
 
-static lv_blend_mode_t lv_span_get_style_text_blend_mode(lv_obj_t * par, lv_span_t * span)
-{
-    lv_blend_mode_t mode;
-    lv_style_value_t value;
-    lv_style_res_t res = lv_style_get_prop(&span->style, LV_STYLE_BLEND_MODE, &value);
-    if(res != LV_STYLE_RES_FOUND) {
-        mode = (lv_blend_mode_t)lv_obj_get_style_blend_mode(par, LV_PART_MAIN);
-    }
-    else {
-        mode = (lv_blend_mode_t)value.num;
-    }
-    return mode;
-}
-
 static int32_t lv_span_get_style_text_decor(lv_obj_t * par, lv_span_t * span)
 {
     int32_t decor;
@@ -1183,7 +1168,6 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
             label_draw_dsc.color = lv_span_get_style_text_color(obj, pinfo->span);
             label_draw_dsc.opa = lv_span_get_style_text_opa(obj, pinfo->span);
             label_draw_dsc.font = lv_span_get_style_text_font(obj, pinfo->span);
-            label_draw_dsc.blend_mode = lv_span_get_style_text_blend_mode(obj, pinfo->span);
             if(obj_opa < LV_OPA_MAX) {
                 label_draw_dsc.opa = LV_OPA_MIX2(label_draw_dsc.opa, obj_opa);
             }
