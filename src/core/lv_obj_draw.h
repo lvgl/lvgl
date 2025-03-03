@@ -19,6 +19,7 @@ extern "C" {
 #include "../draw/lv_draw_image.h"
 #include "../draw/lv_draw_line.h"
 #include "../draw/lv_draw_arc.h"
+#include "../draw/lv_draw_triangle.h"
 
 /*********************
  *      DEFINES
@@ -28,9 +29,23 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+/** Store the type of layer required to render a widget.*/
 typedef enum {
+    /**No layer is needed. */
     LV_LAYER_TYPE_NONE,
+
+    /**Simple layer means that the layer can be rendered in chunks.
+     * For example with opa_layered = 140 it's possible to render only 10 lines
+     * from the layer. When it's ready go the the next 10 lines.
+     * It avoids large memory allocations for the layer buffer.
+     * The buffer size for a chunk can be set by `LV_DRAW_LAYER_SIMPLE_BUF_SIZE` in lv_conf.h.*/
     LV_LAYER_TYPE_SIMPLE,
+
+    /**The widget is transformed and cannot be rendered in chunks.
+     * It's because - due to the transformations -  pixel outside of
+     * a given area will also contribute to the final image.
+     * In this case there is no limitation on the buffer size.
+     * LVGL will allocate as large buffer as needed to render the transformed area.*/
     LV_LAYER_TYPE_TRANSFORM,
 } lv_layer_type_t;
 
