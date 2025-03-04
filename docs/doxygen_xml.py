@@ -193,7 +193,7 @@ import os
 import sys
 from xml.etree import ElementTree
 import doxygen_config
-from announce import *
+from announce import announce_start, announce_finish, announce_set_silent_mode
 
 EMIT_WARNINGS = True
 DOXYGEN_OUTPUT = True

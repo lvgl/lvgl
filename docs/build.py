@@ -175,6 +175,7 @@ import example_list
 import api_doc_builder
 import config_builder
 from src.lvgl_version import lvgl_version
+from announce import announce
 
 # Not Currently Used
 # (Code is kept in case we want to re-implement it later.)
@@ -219,26 +220,13 @@ def print_usage_note():
     print('    help')
 
 
-def announce(*args):
-    _args = []
-
-    for arg in args:
-        # Avoid the single quotes `repr()` puts around strings.
-        if type(arg) is str:
-            _args.append(arg)
-        else:
-            _args.append(repr(arg))
-
-    print(f'{os.path.basename(__file__)}: ', ' '.join(_args))
-
-
 def remove_dir(tgt_dir):
     """Remove directory `tgt_dir`."""
     if os.path.isdir(tgt_dir):
-        announce(f'Removing {tgt_dir}...')
+        announce(__file__, f'Removing {tgt_dir}...')
         shutil.rmtree(tgt_dir)
     else:
-        announce(f'{tgt_dir} already removed...')
+        announce(__file__, f'{tgt_dir} already removed...')
 
 
 def cmd(cmd_str, start_dir=None, exit_on_error=True):
@@ -249,14 +237,14 @@ def cmd(cmd_str, start_dir=None, exit_on_error=True):
         saved_dir = os.getcwd()
         os.chdir(start_dir)
 
-    announce(f'Running [{cmd_str}] in [{os.getcwd()}]...')
+    announce(__file__, f'Running [{cmd_str}] in [{os.getcwd()}]...')
     return_code = os.system(cmd_str)
 
     if saved_dir is not None:
         os.chdir(saved_dir)
 
     if return_code != 0 and exit_on_error:
-        announce("Exiting build due to previous error.")
+        announce(__file__, "Exiting build due to previous error.")
         sys.exit(return_code)
 
 
@@ -305,7 +293,7 @@ def run(args):
 
     def print_setting(setting_name, val):
         """Print one setting; used for debugging."""
-        announce(f'{setting_name:18} = [{val}]')
+        announce(__file__, f'{setting_name:18} = [{val}]')
 
     def print_settings(and_exit):
         """Print all settings and optionally exit; used for debugging."""
@@ -373,7 +361,7 @@ def run(args):
     # fully regenerated, even if not changed.
     # Note:  Sphinx runs in ./docs/, but uses `intermediate_dir` for input.
     if fresh_sphinx_env:
-        announce("Force-regenerating all files...")
+        announce(__file__, "Force-regenerating all files...")
         env_opt = '-E'
     else:
         env_opt = ''
@@ -452,9 +440,9 @@ def run(args):
     # Change to script directory for consistent run-time environment.
     # ---------------------------------------------------------------------
     os.chdir(base_dir)
-    announce(f'Intermediate dir:  [{intermediate_dir}]')
-    announce(f'Output dir      :  [{output_dir}]')
-    announce(f'Running from    :  [{base_dir}]')
+    announce(__file__, f'Intermediate dir:  [{intermediate_dir}]')
+    announce(__file__, f'Output dir      :  [{output_dir}]')
+    announce(__file__, f'Running from    :  [{base_dir}]')
 
     # ---------------------------------------------------------------------
     # Clean?  If so, clean (like `make clean`), but do not exit.
@@ -463,9 +451,9 @@ def run(args):
         or clean_all or (os.path.isdir(intermediate_dir) and build_intermediate)
 
     if some_cleaning_to_be_done:
-        announce("****************")
-        announce("Cleaning...")
-        announce("****************")
+        announce(__file__, "****************")
+        announce(__file__, "Cleaning...")
+        announce(__file__, "****************")
 
         if clean_intermediate:
             remove_dir(intermediate_dir)
@@ -548,9 +536,9 @@ def run(args):
 
     if intermediate_dir_contents_exists(intermediate_dir):
         # We are just doing an update of the intermediate_dir contents.
-        announce("****************")
-        announce("Updating intermediate directory...")
-        announce("****************")
+        announce("__file__, ****************")
+        announce("__file__, Updating intermediate directory...")
+        announce("__file__, ****************")
 
         exclude_list.append(r'examples.*')
         options = {
@@ -566,9 +554,9 @@ def run(args):
         dirsync.sync(examples_dir, os.path.join(intermediate_dir, cfg_examples_dir), 'sync', **options)
     elif build_intermediate or build_html or build_latex:
         # We are having to create the intermediate_dir contents by copying.
-        announce("****************")
-        announce("Building intermediate directory...")
-        announce("****************")
+        announce(__file__, "****************")
+        announce(__file__, "Building intermediate directory...")
+        announce(__file__, "****************")
 
         t1 = datetime.now()
         copy_method = 1
@@ -577,9 +565,9 @@ def run(args):
         if copy_method == 0:
             # --------- Method 0:
             ignore_func = shutil.ignore_patterns('tmp*', 'output*')
-            announce('Copying docs...')
+            announce(__file__, 'Copying docs...')
             shutil.copytree(cfg_doc_src_dir, intermediate_dir, ignore=ignore_func, dirs_exist_ok=True)
-            announce('Copying examples...')
+            announce(__file__, 'Copying examples...')
             shutil.copytree(examples_dir, os.path.join(intermediate_dir, cfg_examples_dir), dirs_exist_ok=True)
         else:
             # --------- Method 1:
@@ -589,9 +577,9 @@ def run(args):
             }
             # action == 'sync' means copy files even when they do not already exist in tgt dir.
             # action == 'update' means DO NOT copy files when they do not already exist in tgt dir.
-            announce('Copying docs...')
+            announce(__file__, 'Copying docs...')
             dirsync.sync(cfg_doc_src_dir, intermediate_dir, 'sync', **options)
-            announce('Copying examples...')
+            announce(__file__, 'Copying examples...')
             dirsync.sync(examples_dir, os.path.join(intermediate_dir, cfg_examples_dir), 'sync', **options)
 
         # -----------------------------------------------------------------
@@ -608,7 +596,7 @@ def run(args):
         # Generate examples pages.  Include sub-pages pages that get included
         # in individual documents where applicable.
         # -----------------------------------------------------------------
-        announce("Generating examples...")
+        announce(__file__, "Generating examples...")
         example_list.exec(intermediate_dir)
 
         # -----------------------------------------------------------------
@@ -618,18 +606,18 @@ def run(args):
         # -----------------------------------------------------------------
         # Original code:
         # if True:
-        #     announce("Skipping adding translation links.")
+        #     announce(__file__, "Skipping adding translation links.")
         # else:
-        #     announce("Adding translation links...")
+        #     announce(__file__, "Adding translation links...")
         #     add_translation.exec(intermediate_dir)
 
         if skip_api:
-            announce("Skipping API generation as requested.")
+            announce(__file__, "Skipping API generation as requested.")
         else:
             # -------------------------------------------------------------
             # Generate API pages and links thereto.
             # -------------------------------------------------------------
-            announce("API page and link processing...")
+            announce(__file__, "API page and link processing...")
             api_doc_builder.EMIT_WARNINGS = False
 
             # api_doc_builder.run() => doxy_xml_parser.DoxygenXml() now:
@@ -671,18 +659,18 @@ def run(args):
             )
 
         t2 = datetime.now()
-        announce('Example/API run time:  ' + str(t2 - t1))
+        announce(__file__, 'Example/API run time:  ' + str(t2 - t1))
 
     # ---------------------------------------------------------------------
     # Build PDF
     # ---------------------------------------------------------------------
     if not build_latex:
-        announce("Skipping Latex build.")
+        announce(__file__, "Skipping Latex build.")
     else:
         t1 = datetime.now()
-        announce("****************")
-        announce("Building Latex output...")
-        announce("****************")
+        announce(__file__, "****************")
+        announce(__file__, "Building Latex output...")
+        announce(__file__, "****************")
 
         # If PDF link is present in top index.rst, remove it so PDF
         # does not have a link to itself.
@@ -705,9 +693,9 @@ def run(args):
         cmd(cmd_line)
 
         # Generate PDF.
-        announce("****************")
-        announce("Building PDF...")
-        announce("****************")
+        announce(__file__, "****************")
+        announce(__file__, "Building PDF...")
+        announce(__file__, "****************")
         cmd_line = 'latexmk -pdf "LVGL.tex"'
         cmd(cmd_line, latex_output_dir, False)
 
@@ -717,19 +705,19 @@ def run(args):
 
         shutil.move(pdf_src_file, pdf_dst_file)
         t2 = datetime.now()
-        announce('PDF           :  ' + pdf_dst_file)
-        announce('Latex gen time:  ' + str(t2 - t1))
+        announce(__file__, 'PDF           :  ' + pdf_dst_file)
+        announce(__file__, 'Latex gen time:  ' + str(t2 - t1))
 
     # ---------------------------------------------------------------------
     # Build HTML
     # ---------------------------------------------------------------------
     if not build_html:
-        announce("Skipping HTML build.")
+        announce(__file__, "Skipping HTML build.")
     else:
         t1 = datetime.now()
-        announce("****************")
-        announce("Building HTML output...")
-        announce("****************")
+        announce(__file__, "****************")
+        announce(__file__, "Building HTML output...")
+        announce(__file__, "****************")
 
         # If PDF is present in build directory, copy it to
         # intermediate directory for use by HTML build.
@@ -776,14 +764,14 @@ def run(args):
         cmd_line = f'sphinx-build -M html "{src}" "{dst}" -D version="{ver}" {env_opt} -j {cpu}'
         cmd(cmd_line)
         t2 = datetime.now()
-        announce('HTML gen time :  ' + str(t2 - t1))
+        announce(__file__, 'HTML gen time :  ' + str(t2 - t1))
 
     # ---------------------------------------------------------------------
     # Indicate results.
     # ---------------------------------------------------------------------
     t_end = datetime.now()
-    announce('Total run time:  ' + str(t_end - t0))
-    announce('Done.')
+    announce(__file__, 'Total run time:  ' + str(t_end - t0))
+    announce(__file__, 'Done.')
 
 
 if __name__ == '__main__':
