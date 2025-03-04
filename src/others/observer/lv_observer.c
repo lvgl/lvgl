@@ -764,6 +764,37 @@ static void obj_value_changed_event_cb(lv_event_t * e)
     lv_subject_set_int(subject, lv_obj_has_state(obj, LV_STATE_CHECKED));
 }
 
+static void lv_subject_notify_if_changed(lv_subject_t * subject)
+{
+
+    switch(subject->type) {
+        case LV_SUBJECT_TYPE_INVALID :
+        case LV_SUBJECT_TYPE_NONE :
+            return;
+        case LV_SUBJECT_TYPE_INT :
+            if(subject->value.num != subject->prev_value.num) {
+                lv_subject_notify(subject);
+            }
+            break;
+        case LV_SUBJECT_TYPE_GROUP :
+        case LV_SUBJECT_TYPE_POINTER :
+            /* Always notify as we don't know how to compare this */
+            lv_subject_notify(subject);
+            break;
+        case LV_SUBJECT_TYPE_COLOR  :
+            if(!lv_color_eq(subject->value.color, subject->prev_value.color)) {
+                lv_subject_notify(subject);
+            }
+            break;
+        case LV_SUBJECT_TYPE_STRING:
+            if(!subject->prev_value.pointer ||
+               lv_strcmp(subject->value.pointer, subject->prev_value.pointer)) {
+                lv_subject_notify(subject);
+            }
+            break;
+    }
+}
+
 #if LV_USE_LABEL
 
 static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
@@ -857,38 +888,6 @@ static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * 
 {
     lv_dropdown_set_selected(observer->target, subject->value.num, LV_ANIM_OFF);
 }
-
-static void lv_subject_notify_if_changed(lv_subject_t * subject)
-{
-
-    switch(subject->type) {
-        case LV_SUBJECT_TYPE_INVALID :
-        case LV_SUBJECT_TYPE_NONE :
-            return;
-        case LV_SUBJECT_TYPE_INT :
-            if(subject->value.num != subject->prev_value.num) {
-                lv_subject_notify(subject);
-            }
-            break;
-        case LV_SUBJECT_TYPE_GROUP :
-        case LV_SUBJECT_TYPE_POINTER :
-            /* Always notify as we don't know how to compare this */
-            lv_subject_notify(subject);
-            break;
-        case LV_SUBJECT_TYPE_COLOR  :
-            if(!lv_color_eq(subject->value.color, subject->prev_value.color)) {
-                lv_subject_notify(subject);
-            }
-            break;
-        case LV_SUBJECT_TYPE_STRING:
-            if(!subject->prev_value.pointer ||
-               lv_strcmp(subject->value.pointer, subject->prev_value.pointer)) {
-                lv_subject_notify(subject);
-            }
-            break;
-    }
-}
-
 
 #endif /*LV_USE_DROPDOWN*/
 
