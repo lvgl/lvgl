@@ -280,15 +280,18 @@
 #endif
 
 /** Use NXP's G2D on MPU platforms. */
-#define LV_USE_DRAW_G2D 0
+#define LV_USE_G2D 0
 
-#if LV_USE_DRAW_G2D
-    /** Maximum number of buffers that can be stored for G2D draw unit.
-     *  Includes the frame buffers and assets. */
-    #define LV_G2D_HASH_TABLE_SIZE 50
+#if LV_USE_G2D
+    /** Use G2D for drawing.*/
+    #define LV_USE_DRAW_G2D 1
 
     /** Use G2D to rotate display.*/
     #define LV_USE_ROTATE_G2D 0
+
+    /** Maximum number of buffers that can be stored for G2D draw unit.
+     *  Includes the frame buffers and assets. */
+    #define LV_G2D_HASH_TABLE_SIZE 50
 
     #if LV_USE_OS
         /** Use additional draw thread for G2D processing.*/

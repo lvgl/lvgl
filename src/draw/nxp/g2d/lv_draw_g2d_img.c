@@ -15,6 +15,7 @@
 
 #include "lv_draw_g2d.h"
 
+#if LV_USE_G2D
 #if LV_USE_DRAW_G2D
 #include <stdlib.h>
 #include <math.h>
@@ -222,3 +223,4 @@ static void _g2d_blit(void * g2d_handle, struct g2d_buf * dst_buf, struct g2d_su
     g2d_disable(g2d_handle, G2D_BLEND);
 }
 #endif /*LV_USE_DRAW_G2D*/
+#endif /*LV_USE_G2D*/

@@ -11,6 +11,7 @@
 
 #include "lv_draw_g2d.h"
 
+#if LV_USE_G2D
 #if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
 #include "../../../misc/lv_area_private.h"
 #include "g2d.h"
@@ -400,3 +401,4 @@ static void _g2d_render_thread_cb(void * ptr)
 #endif
 
 #endif /*LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D*/
+#endif /*LV_USE_G2D*/

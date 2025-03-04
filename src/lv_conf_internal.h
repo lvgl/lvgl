@@ -781,22 +781,25 @@
 #endif
 
 /** Use NXP's G2D on MPU platforms. */
-#ifndef LV_USE_DRAW_G2D
-    #ifdef CONFIG_LV_USE_DRAW_G2D
-        #define LV_USE_DRAW_G2D CONFIG_LV_USE_DRAW_G2D
+#ifndef LV_USE_G2D
+    #ifdef CONFIG_LV_USE_G2D
+        #define LV_USE_G2D CONFIG_LV_USE_G2D
     #else
-        #define LV_USE_DRAW_G2D 0
+        #define LV_USE_G2D 0
     #endif
 #endif
 
-#if LV_USE_DRAW_G2D
-    /** Maximum number of buffers that can be stored for G2D draw unit.
-     *  Includes the frame buffers and assets. */
-    #ifndef LV_G2D_HASH_TABLE_SIZE
-        #ifdef CONFIG_LV_G2D_HASH_TABLE_SIZE
-            #define LV_G2D_HASH_TABLE_SIZE CONFIG_LV_G2D_HASH_TABLE_SIZE
+#if LV_USE_G2D
+    /** Use G2D for drawing.*/
+    #ifndef LV_USE_DRAW_G2D
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_DRAW_G2D
+                #define LV_USE_DRAW_G2D CONFIG_LV_USE_DRAW_G2D
+            #else
+                #define LV_USE_DRAW_G2D 0
+            #endif
         #else
-            #define LV_G2D_HASH_TABLE_SIZE 50
+            #define LV_USE_DRAW_G2D 1
         #endif
     #endif
 
@@ -806,6 +809,16 @@
             #define LV_USE_ROTATE_G2D CONFIG_LV_USE_ROTATE_G2D
         #else
             #define LV_USE_ROTATE_G2D 0
+        #endif
+    #endif
+
+    /** Maximum number of buffers that can be stored for G2D draw unit.
+     *  Includes the frame buffers and assets. */
+    #ifndef LV_G2D_HASH_TABLE_SIZE
+        #ifdef CONFIG_LV_G2D_HASH_TABLE_SIZE
+            #define LV_G2D_HASH_TABLE_SIZE CONFIG_LV_G2D_HASH_TABLE_SIZE
+        #else
+            #define LV_G2D_HASH_TABLE_SIZE 50
         #endif
     #endif
 

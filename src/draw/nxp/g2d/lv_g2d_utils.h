@@ -21,6 +21,7 @@ extern "C" {
  *********************/
 #include "../../../lv_conf_internal.h"
 
+#if LV_USE_G2D
 #if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
 #include "../../sw/lv_draw_sw_private.h"
 
@@ -65,3 +66,4 @@ uint32_t g2d_rgba_to_u32(lv_color_t color);
 #endif
 
 #endif /*LV_G2D_UTILS_H*/
+#endif /*LV_USE_G2D*/

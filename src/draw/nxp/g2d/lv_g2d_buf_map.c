@@ -11,6 +11,7 @@
 
 #include "lv_g2d_buf_map.h"
 
+#if LV_USE_G2D
 #if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
 #include <stdio.h>
 #include "lv_g2d_utils.h"
@@ -252,3 +253,4 @@ static void _map_free_item(lv_map_item_t * item)
 }
 
 #endif /*LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D*/
+#endif /*LV_USE_G2D*/
