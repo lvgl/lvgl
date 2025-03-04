@@ -7,6 +7,7 @@ Uses DoxygenXml class in doxygen_xml.py to make available:
 """
 import os
 import doxygen_xml
+from announce import announce
 
 html_files = {}
 EMIT_WARNINGS = True
@@ -156,19 +157,6 @@ def get_includes(name1, name2, obj, includes):
     includes.add((header_file, html_files[header_file]))
 
 
-def announce(*args):
-    _args = []
-
-    for arg in args:
-        # Avoid the single quotes `repr()` puts around strings.
-        if type(arg) is str:
-            _args.append(arg)
-        else:
-            _args.append(repr(arg))
-
-    print(f'{os.path.basename(__file__)}: ', ' '.join(_args))
-
-
 def run(lvgl_src_dir, intermediate_dir, doxyfile_src_file, silent=False, *doc_paths):
     """
     This function does 2 things:
@@ -196,7 +184,7 @@ def run(lvgl_src_dir, intermediate_dir, doxyfile_src_file, silent=False, *doc_pa
                                         silent
                                         )
 
-    announce("Generating API documentation .RST files...")
+    announce(__file__, "Generating API documentation .RST files...")
     api_path = os.path.join(intermediate_dir, 'API')
     if not os.path.isdir(api_path):
         os.makedirs(api_path)
@@ -208,7 +196,7 @@ def run(lvgl_src_dir, intermediate_dir, doxyfile_src_file, silent=False, *doc_pa
     # For each directory entry in `doc_paths` array...
     # - add API hyperlinks to .RST files in the directories in passed array.
     # ---------------------------------------------------------------------
-    announce("Adding API-page hyperlinks to source docs...")
+    announce(__file__, "Adding API-page hyperlinks to source docs...")
 
     for folder in doc_paths:
         # Fetch a list of '.rst' files excluding 'index.rst'.
