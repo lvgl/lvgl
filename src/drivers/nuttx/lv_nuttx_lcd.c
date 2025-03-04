@@ -138,12 +138,16 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area_p,
                      uint8_t * color_p)
 {
     lv_nuttx_lcd_t * lcd = disp->driver_data;
+    lv_color_format_t cf = lv_display_get_color_format(disp);
+    uint8_t bpp = lv_color_format_get_bpp(cf);
 
     lcd->area.row_start = area_p->y1;
     lcd->area.row_end = area_p->y2;
     lcd->area.col_start = area_p->x1;
     lcd->area.col_end = area_p->x2;
-    lcd->area.data = (uint8_t *)color_p;
+    lcd->area.stride = (lcd->area.col_end - lcd->area.col_start + 1) * bpp / 8;
+    lcd->area.data = (uint8_t *)color_p + (LV_COLOR_FORMAT_IS_INDEXED(cf) ?
+                                           LV_COLOR_INDEXED_PALETTE_SIZE(cf) * 4 : 0);
     ioctl(lcd->fd, LCDDEVIO_PUTAREA, (unsigned long) & (lcd->area));
     lv_display_flush_ready(disp);
 }
@@ -165,14 +169,22 @@ static lv_display_t * lcd_init(int fd, int hor_res, int ver_res)
         return NULL;
     }
 
-    uint32_t px_size = lv_color_format_get_size(lv_display_get_color_format(disp));
+    lv_color_format_t cf = lv_display_get_color_format(disp);
+    uint8_t bpp = lv_color_format_get_bpp(cf);
+
 #if LV_NUTTX_LCD_BUFFER_COUNT > 0
-    uint32_t buf_size = hor_res * ver_res * px_size;
+    uint32_t buf_size = hor_res * ver_res * bpp / 8;
     lv_display_render_mode_t render_mode = LV_DISPLAY_RENDER_MODE_FULL;
 #else
-    uint32_t buf_size = hor_res * LV_NUTTX_LCD_BUFFER_SIZE * px_size;
+    uint32_t buf_size = hor_res * LV_NUTTX_LCD_BUFFER_SIZE * bpp / 8;
     lv_display_render_mode_t render_mode = LV_DISPLAY_RENDER_MODE_PARTIAL;
 #endif
+
+    /* Draw buffers of indexed colors are prepended by color palette. */
+
+    if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
+        buf_size += LV_COLOR_INDEXED_PALETTE_SIZE(cf) * 4;
+    }
 
     draw_buf = lv_malloc(buf_size);
     if(draw_buf == NULL) {
