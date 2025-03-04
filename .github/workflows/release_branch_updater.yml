@@ -35,4 +35,4 @@ jobs:
       - name: run the script
         env:
           GITHUB_TOKEN: ${{ secrets.PORT_RELEASER_GITHUB_TOKEN }}
-        run: python3 lvgl/scripts/release_branch_updater.py --oldest-major 9 --github_token "$GITHUB_TOKEN"
+        run: python3 lvgl/scripts/release_branch_updater.py --oldest-major 9 --github-token "$GITHUB_TOKEN"
