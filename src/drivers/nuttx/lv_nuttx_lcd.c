@@ -138,12 +138,15 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area_p,
                      uint8_t * color_p)
 {
     lv_nuttx_lcd_t * lcd = disp->driver_data;
+    lv_color_format_t cf = lv_display_get_color_format(disp);
 
     lcd->area.row_start = area_p->y1;
     lcd->area.row_end = area_p->y2;
     lcd->area.col_start = area_p->x1;
     lcd->area.col_end = area_p->x2;
-    lcd->area.data = (uint8_t *)color_p;
+    lcd->area.stride = lv_draw_buf_width_to_stride(lcd->area.col_end - lcd->area.col_start + 1, cf);
+    lcd->area.data = (uint8_t *)color_p + (LV_COLOR_FORMAT_IS_INDEXED(cf) ?
+                                           LV_COLOR_INDEXED_PALETTE_SIZE(cf) * 4 : 0);
     ioctl(lcd->fd, LCDDEVIO_PUTAREA, (unsigned long) & (lcd->area));
     lv_display_flush_ready(disp);
 }
