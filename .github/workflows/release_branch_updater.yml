@@ -1,8 +1,6 @@
 name: Port repo release update
 
 on:
-  pull_request:
-    branches: [ master ]
   push:
     branches:
       - master
