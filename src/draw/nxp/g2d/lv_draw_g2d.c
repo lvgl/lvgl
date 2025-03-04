@@ -11,10 +11,11 @@
 
 #include "lv_draw_g2d.h"
 
-#if LV_USE_DRAW_G2D
+#if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
 #include "../../../misc/lv_area_private.h"
 #include "g2d.h"
 #include "lv_g2d_buf_map.h"
+#include "lv_g2d_utils.h"
 
 /*********************
  *      DEFINES
@@ -57,6 +58,8 @@ static void _g2d_execute_drawing(lv_draw_g2d_unit_t * u);
  *  STATIC VARIABLES
  **********************/
 
+void * g2d_handle;
+
 /**********************
  *      MACROS
  **********************/
@@ -74,7 +77,7 @@ void lv_draw_g2d_init(void)
     draw_g2d_unit->base_unit.dispatch_cb = _g2d_dispatch;
     draw_g2d_unit->base_unit.delete_cb = _g2d_delete;
     g2d_create_buf_map();
-    if(g2d_open(&draw_g2d_unit->g2d_handle)) {
+    if(g2d_open(&g2d_handle)) {
         LV_LOG_ERROR("g2d_open fail.\n");
     }
 #if LV_USE_G2D_DRAW_THREAD
@@ -85,6 +88,88 @@ void lv_draw_g2d_init(void)
 void lv_draw_g2d_deinit(void)
 {
     g2d_free_buf_map();
+}
+
+void lv_draw_g2d_rotate(const void * src_buf, void * dest_buf, int32_t src_width, int32_t src_height,
+                        int32_t src_stride, int32_t dest_stride, lv_display_rotation_t rotation,
+                        lv_color_format_t cf)
+{
+    /* convert rotation angle */
+    enum g2d_rotation g2d_rotation;
+    switch(rotation) {
+        case LV_DISPLAY_ROTATION_0:
+            g2d_rotation = G2D_ROTATION_0;
+            break;
+        // LVGL's 90-degree rotation corresponds to G2D's 270-degree rotation (coordinate system difference)
+        case LV_DISPLAY_ROTATION_90:
+            g2d_rotation = G2D_ROTATION_270;
+            break;
+        case LV_DISPLAY_ROTATION_180:
+            g2d_rotation = G2D_ROTATION_180;
+            break;
+        // LVGL's 270-degree rotation corresponds to G2D's 90-degree rotation (coordinate system difference)
+        case LV_DISPLAY_ROTATION_270:
+            g2d_rotation = G2D_ROTATION_90;
+            break;
+        default:
+            g2d_rotation = G2D_ROTATION_0;
+            break;
+    }
+
+    struct g2d_surface src_surf;
+    lv_memset(&src_surf, 0, sizeof(struct g2d_surface));
+
+    src_surf.left      = 0;
+    src_surf.top       = 0;
+    src_surf.right     = src_width;
+    src_surf.bottom    = src_height;
+    src_surf.stride    = src_stride / lv_color_format_get_size(cf);
+    src_surf.width     = src_width;
+    src_surf.height    = src_height;
+    src_surf.format    = g2d_get_buf_format(cf);
+    src_surf.rot       = G2D_ROTATION_0; // G2D_FLIP_H or G2D_FLIP_V
+
+    struct g2d_buf * src_g2d_buf = g2d_alloc(src_stride * src_height, 0);
+    G2D_ASSERT_MSG(src_g2d_buf, "Failed to alloc source buffer.");
+    lv_memcpy(src_g2d_buf->buf_vaddr, src_buf, src_stride * src_height);
+    src_surf.planes[0] = src_g2d_buf->buf_paddr;
+
+    struct g2d_surface dst_surf;
+    lv_memset(&dst_surf, 0, sizeof(struct g2d_surface));
+
+    dst_surf.left      = 0;
+    dst_surf.top       = 0;
+
+    if(rotation == LV_DISPLAY_ROTATION_90 || rotation == LV_DISPLAY_ROTATION_270) {
+        dst_surf.right = src_height;
+        dst_surf.bottom = src_width;
+        dst_surf.width = src_height;
+        dst_surf.height = src_width;
+    }
+    else {
+        dst_surf.right = src_width;
+        dst_surf.bottom = src_height;
+        dst_surf.width = src_width;
+        dst_surf.height = src_height;
+    }
+
+    dst_surf.stride    = dest_stride / lv_color_format_get_size(cf);
+    dst_surf.format    = g2d_get_buf_format(cf);
+    dst_surf.rot       = g2d_rotation;
+
+    struct g2d_buf * dst_g2d_buf = g2d_alloc(dest_stride * dst_surf.height, 0);
+    G2D_ASSERT_MSG(dst_g2d_buf, "Failed to alloc destination buffer.");
+    dst_surf.planes[0] = dst_g2d_buf->buf_paddr;
+
+    g2d_blit(g2d_handle, &src_surf, &dst_surf);
+    g2d_finish(g2d_handle);
+
+    g2d_cache_op(dst_g2d_buf, G2D_CACHE_FLUSH);
+
+    lv_memcpy(dest_buf, dst_g2d_buf->buf_vaddr, dest_stride * dst_surf.height);
+
+    g2d_free(src_g2d_buf);
+    g2d_free(dst_g2d_buf);
 }
 
 /**********************
@@ -236,7 +321,7 @@ static int32_t _g2d_delete(lv_draw_unit_t * draw_unit)
 
     res = lv_thread_delete(&draw_g2d_unit->thread);
 #endif
-    g2d_close(draw_g2d_unit->g2d_handle);
+    g2d_close(g2d_handle);
 
     return res;
 }
@@ -314,4 +399,4 @@ static void _g2d_render_thread_cb(void * ptr)
 }
 #endif
 
-#endif /*LV_USE_DRAW_G2D*/
+#endif /*LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D*/

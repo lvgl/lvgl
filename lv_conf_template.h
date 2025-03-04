@@ -287,6 +287,9 @@
      *  Includes the frame buffers and assets. */
     #define LV_G2D_HASH_TABLE_SIZE 50
 
+    /** Use G2D to rotate display.*/
+    #define LV_USE_ROTATE_G2D 0
+
     #if LV_USE_OS
         /** Use additional draw thread for G2D processing.*/
         #define LV_USE_G2D_DRAW_THREAD 1

@@ -15,7 +15,7 @@
 
 #include "lv_g2d_utils.h"
 
-#if LV_USE_DRAW_G2D
+#if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
 #include"g2d.h"
 #include "lv_draw_g2d.h"
 
@@ -87,4 +87,4 @@ uint32_t g2d_rgba_to_u32(lv_color_t color)
 *   STATIC FUNCTIONS
 **********************/
 
-#endif /*LV_USE_DRAW_G2D*/
+#endif /*LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D*/

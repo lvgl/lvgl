@@ -800,6 +800,15 @@
         #endif
     #endif
 
+    /** Use G2D to rotate display.*/
+    #ifndef LV_USE_ROTATE_G2D
+        #ifdef CONFIG_LV_USE_ROTATE_G2D
+            #define LV_USE_ROTATE_G2D CONFIG_LV_USE_ROTATE_G2D
+        #else
+            #define LV_USE_ROTATE_G2D 0
+        #endif
+    #endif
+
     #if LV_USE_OS
         /** Use additional draw thread for G2D processing.*/
         #ifndef LV_USE_G2D_DRAW_THREAD

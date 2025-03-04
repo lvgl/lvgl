@@ -15,7 +15,7 @@
 
 #include "lv_draw_g2d.h"
 
-#if LV_USE_DRAW_G2D
+#if LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D
 #include <stdlib.h>
 #include "g2d.h"
 #include "../../../misc/lv_area_private.h"
@@ -48,6 +48,8 @@ static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * bu
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+extern void * g2d_handle;
 
 /**********************
  *      MACROS
@@ -99,12 +101,12 @@ void lv_draw_g2d_fill(lv_draw_task_t * t)
         struct g2d_surface * src_surf = lv_malloc(sizeof(struct g2d_surface));
         G2D_ASSERT_MSG(src_surf, "Failed to alloc source surface.");
         _g2d_set_src_surf(src_surf, tmp_buf, &blend_area, stride, dsc->color, dsc->opa);
-        _g2d_fill_with_opa(u->g2d_handle, dst_buf, dst_surf, tmp_buf, src_surf);
+        _g2d_fill_with_opa(g2d_handle, dst_buf, dst_surf, tmp_buf, src_surf);
         g2d_free(tmp_buf);
         lv_free(src_surf);
     }
     else {
-        _g2d_fill(u->g2d_handle, dst_buf, dst_surf);
+        _g2d_fill(g2d_handle, dst_buf, dst_surf);
     }
 
     lv_free(dst_surf);
@@ -186,4 +188,4 @@ static void _g2d_fill(void * g2d_handle, struct g2d_buf * dst_buf, struct g2d_su
     g2d_finish(g2d_handle);
 }
 
-#endif /*LV_USE_DRAW_G2D*/
+#endif /*LV_USE_DRAW_G2D || LV_USE_ROTATE_G2D*/

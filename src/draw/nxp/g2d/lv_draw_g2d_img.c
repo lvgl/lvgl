@@ -55,6 +55,8 @@ static void _g2d_blit(void * g2d_handle, struct g2d_buf * dst_buf, struct g2d_su
  *      MACROS
  **********************/
 
+extern void * g2d_handle;
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -113,7 +115,7 @@ void lv_draw_g2d_img(lv_draw_task_t * t)
     _g2d_set_src_surf(src_surf, src_buf, &src_area, src_stride, src_cf, dsc->opa);
     _g2d_set_dst_surf(dst_surf, dst_buf, &blend_area, dest_stride, dest_cf, dsc);
 
-    _g2d_blit(u->g2d_handle, dst_buf, dst_surf, src_buf, src_surf);
+    _g2d_blit(g2d_handle, dst_buf, dst_surf, src_buf, src_surf);
 
     lv_free(src_surf);
     lv_free(dst_surf);
