@@ -1323,17 +1323,15 @@ class DoxygenXml(object):
         cfg.load(doxyfile_src_file)
 
         # 2. Update cfg.
-        temp = cfg.value('PREDEFINED')
-        temp = temp.replace('<<LV_CONF_PATH>>', lv_conf_file)
-        cfg.set('PREDEFINED', temp)
+        cfg.set('OUTPUT_DIRECTORY', '.')
+        cfg.set('INPUT', lvgl_src_dir)
+        cfg.set('GENERATE_HTML', 'YES')
+        cfg.set('HTML_OUTPUT', 'doxygen_html')
+        cfg.set('GENERATE_XML', 'YES')
+        cfg.set('XML_OUTPUT', "xml")
+        cfg.set('PREDEFINED', f'DOXYGEN LV_CONF_PATH="{lv_conf_file}"')
 
-        temp = cfg.value('INPUT')
-        temp = temp.replace('<<SRC>>', f'"{lvgl_src_dir}"')
-        cfg.set('INPUT', temp)
-
-        cfg.set('GENERATE_HTML', 'NO')
-
-        # 3. Store it.
+        # 3. Store it into intermediate directory.
         cfg.save(doxyfile_dst_file)
 
         # Original code:
