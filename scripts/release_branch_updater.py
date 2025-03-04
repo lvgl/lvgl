@@ -35,6 +35,9 @@ def main():
     dry_run = args.dry_run
     oldest_major = args.oldest_major
 
+    if not args.github_token and not dry_run:
+        print(LOG, "Warning: No github token was provided for this production run. Continuing anyway...")
+
     lvgl_release_branches, lvgl_default_branch = get_release_branches(lvgl_path)
     print(LOG, "LVGL release branches:", ", ".join(fmt_release(br) for br in lvgl_release_branches) or "(none)")
     assert lvgl_default_branch is not None
