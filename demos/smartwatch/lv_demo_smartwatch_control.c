@@ -1,6 +1,5 @@
 /**
  * @file lv_demo_smartwatch_control.c
- * Control screen layout & functions. Contains quick actions such as music controls.
  */
 
 /*********************
@@ -16,6 +15,21 @@
  *      DEFINES
  *********************/
 
+LV_IMAGE_DECLARE(image_mute_icon);
+LV_IMAGE_DECLARE(image_dnd_icon);
+LV_IMAGE_DECLARE(image_flashlight_icon);
+LV_IMAGE_DECLARE(image_flight_icon);
+LV_IMAGE_DECLARE(image_cellular_icon);
+LV_IMAGE_DECLARE(image_repeat_icon);
+LV_IMAGE_DECLARE(image_night_icon);
+LV_IMAGE_DECLARE(image_brightness_icon);
+LV_IMAGE_DECLARE(image_video_icon);
+LV_IMAGE_DECLARE(image_battery_icon);
+LV_IMAGE_DECLARE(image_wifi_icon);
+LV_IMAGE_DECLARE(image_silence_icon);
+LV_IMAGE_DECLARE(image_bluetooth_icon);
+LV_IMAGE_DECLARE(image_qr_icon);
+LV_IMAGE_DECLARE(image_settings_icon);
 /**********************
  *      TYPEDEFS
  **********************/
@@ -23,24 +37,32 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void control_screen_create(void);
-
-static void control_music_events_cb(lv_event_t * e);
-static void brightness_slider_event_cb(lv_event_t * e);
+static void control_screen_events(lv_event_t * e);
+static void scroll_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 static lv_obj_t * control_screen;
-static lv_obj_t * control_music_play;
-static lv_obj_t * control_music_previous;
-static lv_obj_t * control_music_next;
-static lv_obj_t * control_bluetooth_icon;
-static lv_obj_t * control_volume_up;
-static lv_obj_t * control_volume_down;
-static lv_obj_t * control_brightness;
-static lv_obj_t * control_brightness_icon;
-static lv_smartwatch_music_control_cb_t music_control_cb;
+
+
+static lv_image_dsc_t * control_icons[] = {
+    &image_mute_icon,
+    &image_dnd_icon,
+    &image_flashlight_icon,
+    &image_flight_icon,
+    &image_cellular_icon,
+    &image_repeat_icon,
+    &image_night_icon,
+    &image_brightness_icon,
+    &image_video_icon,
+    &image_battery_icon,
+    &image_wifi_icon,
+    &image_silence_icon,
+    &image_bluetooth_icon,
+    &image_qr_icon,
+    &image_settings_icon
+};
 
 /**********************
  *      MACROS
@@ -50,194 +72,164 @@ static lv_smartwatch_music_control_cb_t music_control_cb;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_demo_smartwatch_control_create(lv_obj_t * parent)
+void lv_demo_smartwatch_control_create(void)
 {
 
-    control_screen = lv_tileview_add_tile(parent, 0, 0, LV_DIR_BOTTOM);
-    lv_obj_remove_flag(control_screen, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_bg_color(control_screen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(control_screen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    static bool inited = false;
+    static lv_style_t main_style;
 
-    control_screen_create();
+    if(!inited) {
+        lv_style_init(&main_style);
+        lv_style_set_text_color(&main_style, lv_color_white());
+        lv_style_set_bg_color(&main_style, lv_color_hex(0xff4a4a4a));
+        lv_style_set_bg_opa(&main_style, LV_OPA_100);
+        lv_style_set_clip_corner(&main_style, true);
+        lv_style_set_radius(&main_style, LV_RADIUS_CIRCLE);
+        lv_style_set_translate_y(&main_style, -384);
+
+        lv_style_set_layout(&main_style, LV_LAYOUT_FLEX);
+        lv_style_set_flex_flow(&main_style, LV_FLEX_FLOW_COLUMN);
+        lv_style_set_flex_main_place(&main_style, LV_FLEX_ALIGN_START);
+        lv_style_set_flex_cross_place(&main_style, LV_FLEX_ALIGN_CENTER);
+        lv_style_set_flex_track_place(&main_style, LV_FLEX_ALIGN_CENTER);
+        lv_style_set_pad_top(&main_style, 80);
+        lv_style_set_pad_bottom(&main_style, 0);
+        lv_style_set_pad_row(&main_style, 20);
+    }
+
+    control_screen = lv_obj_create(lv_screen_active());
+    lv_obj_remove_style_all(control_screen);
+    lv_obj_add_style(control_screen, &main_style, 0);
+    lv_obj_set_size(control_screen, lv_pct(100), lv_pct(100));
+    lv_obj_set_scroll_dir(control_screen, LV_DIR_VER);
+    lv_obj_set_scroll_snap_y(control_screen, LV_SCROLL_SNAP_START);
+    lv_obj_remove_flag(control_screen, LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_EVENT_BUBBLE);
+
+    lv_obj_add_event_cb(control_screen, control_screen_events, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(control_screen, scroll_event_cb, LV_EVENT_SCROLL, NULL);
+
+
+    /* Create the 5 row containers */
+    for(uint32_t i = 0; i < 5; i++) {
+        lv_obj_t * inner_cont = lv_obj_create(control_screen);
+        lv_obj_remove_style_all(inner_cont);
+        lv_obj_set_size(inner_cont, 345, 102);
+
+        lv_obj_set_flex_flow(inner_cont, LV_FLEX_FLOW_ROW);
+        lv_obj_set_flex_align(inner_cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+        lv_obj_add_flag(inner_cont, LV_OBJ_FLAG_SNAPPABLE);
+        lv_obj_add_flag(inner_cont, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+
+
+        /* Add 3 buttons to each row container */
+        for(uint32_t j = 0; j < 3; j++) {
+            lv_obj_t * item = lv_obj_create(inner_cont);
+            lv_obj_remove_style_all(item);
+            lv_obj_set_size(item, 102, 102);
+
+            lv_obj_set_style_bg_color(item, lv_color_hex(0xffffffff), 0);
+            lv_obj_set_style_bg_opa(item, 46, 0);
+            lv_obj_set_style_radius(item, 50, 0);
+            lv_obj_set_style_bg_color(item, lv_color_hex(0xff438bff), LV_PART_MAIN | LV_STATE_CHECKED);
+            lv_obj_set_style_bg_opa(item, 255, LV_PART_MAIN | LV_STATE_CHECKED);
+            lv_obj_add_flag(item, LV_OBJ_FLAG_CHECKABLE);
+
+            lv_obj_t * image = lv_image_create(item);
+            lv_image_set_src(image, control_icons[(i * 3) + j]);
+            lv_obj_set_align(image, LV_ALIGN_CENTER);
+            lv_obj_remove_flag(image, LV_OBJ_FLAG_CLICKABLE);
+        }
+    }
+
+    lv_obj_update_snap(control_screen, LV_ANIM_ON);
+    lv_obj_scroll_by(control_screen, 0, -1, LV_ANIM_ON);
+
 }
 
-void lv_demo_smartwatch_control_load(lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay)
-{
-    lv_screen_load_anim(control_screen, anim_type, time, delay, false);
-}
 
-void lv_demo_smartwatch_set_music_control_cb(lv_smartwatch_music_control_cb_t cb)
+lv_obj_t * lv_demo_smartwatch_get_control_screen(void)
 {
-    music_control_cb = cb;
-}
-
-lv_obj_t * lv_demo_smartwatch_get_tile_control(void)
-{
+    if(!control_screen) {
+        lv_demo_smartwatch_control_create();
+    }
     return control_screen;
 }
 
-void lv_demo_smartwatch_update_brightness_slider(uint8_t value)
-{
-    lv_slider_set_value(control_brightness, value, LV_ANIM_OFF);
-}
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void control_screen_create(void)
+static void control_screen_events(lv_event_t * e)
 {
-    control_music_play = lv_image_create(control_screen);
-    lv_image_set_src(control_music_play, &img_play_icon);
-    lv_obj_set_width(control_music_play, LV_SIZE_CONTENT);
-    lv_obj_set_height(control_music_play, LV_SIZE_CONTENT);
-    lv_obj_set_align(control_music_play, LV_ALIGN_CENTER);
-    lv_obj_add_flag(control_music_play, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_remove_flag(control_music_play, LV_OBJ_FLAG_SCROLLABLE);
-    lv_image_set_scale(control_music_play, 200);
-    lv_obj_set_style_radius(control_music_play, 5, LV_PART_MAIN | LV_STATE_PRESSED);
-    lv_obj_set_style_bg_color(control_music_play, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_PRESSED);
-    lv_obj_set_style_bg_opa(control_music_play, 255, LV_PART_MAIN | LV_STATE_PRESSED);
-
-    control_music_previous = lv_image_create(control_screen);
-    lv_image_set_src(control_music_previous, &img_left_arrow_icon);
-    lv_obj_set_width(control_music_previous, LV_SIZE_CONTENT);
-    lv_obj_set_height(control_music_previous, LV_SIZE_CONTENT);
-    lv_obj_set_x(control_music_previous, -75);
-    lv_obj_set_y(control_music_previous, 0);
-    lv_obj_set_align(control_music_previous, LV_ALIGN_CENTER);
-    lv_obj_add_flag(control_music_previous, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_remove_flag(control_music_previous, LV_OBJ_FLAG_SCROLLABLE);
-    lv_image_set_scale(control_music_previous, 200);
-    lv_obj_set_style_radius(control_music_previous, 5, LV_PART_MAIN | LV_STATE_PRESSED);
-    lv_obj_set_style_bg_color(control_music_previous, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_PRESSED);
-    lv_obj_set_style_bg_opa(control_music_previous, 255, LV_PART_MAIN | LV_STATE_PRESSED);
-
-    control_music_next = lv_image_create(control_screen);
-    lv_image_set_src(control_music_next, &img_right_arrow_icon);
-    lv_obj_set_width(control_music_next, LV_SIZE_CONTENT);
-    lv_obj_set_height(control_music_next, LV_SIZE_CONTENT);
-    lv_obj_set_x(control_music_next, 75);
-    lv_obj_set_y(control_music_next, 0);
-    lv_obj_set_align(control_music_next, LV_ALIGN_CENTER);
-    lv_obj_add_flag(control_music_next, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_remove_flag(control_music_next, LV_OBJ_FLAG_SCROLLABLE);
-    lv_image_set_scale(control_music_next, 200);
-    lv_obj_set_style_radius(control_music_next, 5, LV_PART_MAIN | LV_STATE_PRESSED);
-    lv_obj_set_style_bg_color(control_music_next, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_PRESSED);
-    lv_obj_set_style_bg_opa(control_music_next, 255, LV_PART_MAIN | LV_STATE_PRESSED);
-
-    control_bluetooth_icon = lv_image_create(control_screen);
-    lv_image_set_src(control_bluetooth_icon, &img_bluetooth_g_icon);
-    lv_obj_set_width(control_bluetooth_icon, LV_SIZE_CONTENT);
-    lv_obj_set_height(control_bluetooth_icon, LV_SIZE_CONTENT);
-    lv_obj_set_x(control_bluetooth_icon, 0);
-    lv_obj_set_y(control_bluetooth_icon, -100);
-    lv_obj_set_align(control_bluetooth_icon, LV_ALIGN_CENTER);
-    lv_obj_add_state(control_bluetooth_icon, LV_STATE_CHECKED);
-    lv_obj_add_flag(control_bluetooth_icon, LV_OBJ_FLAG_CHECKABLE);
-    lv_obj_remove_flag(control_bluetooth_icon, LV_OBJ_FLAG_SCROLLABLE);
-    lv_image_set_scale(control_bluetooth_icon, 200);
-    lv_obj_set_style_image_recolor(control_bluetooth_icon, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_CHECKED);
-    lv_obj_set_style_image_recolor_opa(control_bluetooth_icon, 230, LV_PART_MAIN | LV_STATE_CHECKED);
-    lv_obj_set_style_radius(control_bluetooth_icon, 5, LV_PART_MAIN | LV_STATE_PRESSED);
-    lv_obj_set_style_bg_color(control_bluetooth_icon, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_PRESSED);
-    lv_obj_set_style_bg_opa(control_bluetooth_icon, 255, LV_PART_MAIN | LV_STATE_PRESSED);
-
-    control_brightness = lv_slider_create(control_screen);
-    lv_slider_set_range(control_brightness, 1, 255);
-    lv_slider_set_value(control_brightness, 50, LV_ANIM_OFF);
-    lv_obj_set_width(control_brightness, 150);
-    lv_obj_set_height(control_brightness, 30);
-    lv_obj_set_x(control_brightness, 0);
-    lv_obj_set_y(control_brightness, -60);
-    lv_obj_set_align(control_brightness, LV_ALIGN_CENTER);
-    lv_obj_set_style_radius(control_brightness, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(control_brightness, lv_color_hex(0x4E4E4E), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(control_brightness, 150, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(control_brightness, 10, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(control_brightness, lv_color_hex(0xFFFFFF), LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(control_brightness, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(control_brightness, lv_color_hex(0xFFFFFF), LV_PART_KNOB | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(control_brightness, 0, LV_PART_KNOB | LV_STATE_DEFAULT);
-
-    control_brightness_icon = lv_image_create(control_brightness);
-    lv_image_set_src(control_brightness_icon, &img_brightness_icon);
-    lv_image_set_scale(control_brightness_icon, 100);
-    lv_obj_set_width(control_brightness_icon, 40);
-    lv_obj_set_height(control_brightness_icon, 30);
-    lv_obj_set_align(control_brightness_icon, LV_ALIGN_LEFT_MID);
-    lv_obj_remove_flag(control_brightness_icon, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_blend_mode(control_brightness_icon, LV_BLEND_MODE_MULTIPLY, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_image_recolor(control_brightness_icon, lv_color_hex(0x777777), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_image_recolor_opa(control_brightness_icon, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    control_volume_up = lv_image_create(control_screen);
-    lv_image_set_src(control_volume_up, &img_vol_down_icon);
-    lv_obj_set_width(control_volume_up, LV_SIZE_CONTENT);
-    lv_obj_set_height(control_volume_up, LV_SIZE_CONTENT);
-    lv_obj_set_x(control_volume_up, 40);
-    lv_obj_set_y(control_volume_up, 60);
-    lv_obj_set_align(control_volume_up, LV_ALIGN_CENTER);
-    lv_obj_add_flag(control_volume_up, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_remove_flag(control_volume_up, LV_OBJ_FLAG_SCROLLABLE);
-    lv_image_set_scale(control_volume_up, 200);
-    lv_obj_set_style_radius(control_volume_up, 5, LV_PART_MAIN | LV_STATE_PRESSED);
-    lv_obj_set_style_bg_color(control_volume_up, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_PRESSED);
-    lv_obj_set_style_bg_opa(control_volume_up, 255, LV_PART_MAIN | LV_STATE_PRESSED);
-
-    control_volume_down = lv_image_create(control_screen);
-    lv_image_set_src(control_volume_down, &img_vol_up_icon);
-    lv_obj_set_width(control_volume_down, LV_SIZE_CONTENT);
-    lv_obj_set_height(control_volume_down, LV_SIZE_CONTENT);
-    lv_obj_set_x(control_volume_down, -40);
-    lv_obj_set_y(control_volume_down, 60);
-    lv_obj_set_align(control_volume_down, LV_ALIGN_CENTER);
-    lv_obj_add_flag(control_volume_down, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_remove_flag(control_volume_down, LV_OBJ_FLAG_SCROLLABLE);
-    lv_image_set_scale(control_volume_down, 200);
-    lv_obj_set_style_radius(control_volume_down, 5, LV_PART_MAIN | LV_STATE_PRESSED);
-    lv_obj_set_style_bg_color(control_volume_down, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_PRESSED);
-    lv_obj_set_style_bg_opa(control_volume_down, 255, LV_PART_MAIN | LV_STATE_PRESSED);
-
-    lv_obj_add_event_cb(control_music_play, control_music_events_cb, LV_EVENT_ALL, (void *)(intptr_t)0x9900);
-    lv_obj_add_event_cb(control_music_previous, control_music_events_cb, LV_EVENT_ALL, (void *)(intptr_t)0x9D02);
-    lv_obj_add_event_cb(control_music_next, control_music_events_cb, LV_EVENT_ALL, (void *)(intptr_t)0x9D03);
-    lv_obj_add_event_cb(control_volume_up, control_music_events_cb, LV_EVENT_ALL, (void *)(intptr_t)0x99A1);
-    lv_obj_add_event_cb(control_volume_down, control_music_events_cb, LV_EVENT_ALL, (void *)(intptr_t)0x99A2);
-
-    lv_obj_add_event_cb(control_brightness, brightness_slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
-
-}
-
-static void brightness_slider_event_cb(lv_event_t * e)
-{
-    lv_obj_t * active_screen = lv_screen_active();
-    if(active_screen != lv_demo_smartwatch_get_tileview()) {
-        /* event was triggered but the current screen is no longer active */
-        return;
-    }
-    lv_obj_t * target = lv_event_get_target(e);
-    int32_t value = lv_slider_get_value(target);
-    lv_demo_smartwatch_set_default_brightness((uint8_t)value);
-}
-
-static void control_music_events_cb(lv_event_t * e)
-{
-    lv_obj_t * active_screen = lv_screen_active();
-    if(active_screen != lv_demo_smartwatch_get_tileview()) {
-        /* event was triggered but the current screen is no longer active */
-        return;
-    }
     lv_event_code_t event_code = lv_event_get_code(e);
-    if(event_code == LV_EVENT_CLICKED) {
-        uint16_t code = (uint16_t)(intptr_t)lv_event_get_user_data(e);
 
-        /* send actions to user callback if defined */
-        if(music_control_cb != NULL) {
-            music_control_cb(code);
+    if(event_code == LV_EVENT_GESTURE) {
+        lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
+
+        if(dir == LV_DIR_LEFT) {
+            ui_animate_y(lv_demo_smartwatch_get_control_screen(), -384, 1000, 0);
+            animate_arc(arc_cont, ARC_EXPAND_UP, 700, 300);
+            ui_anim_opa(arc, 255, 500, 500);
+        }
+
+    }
+    if(event_code == LV_EVENT_LONG_PRESSED) {
+        ui_animate_y(lv_demo_smartwatch_get_control_screen(), -384, 1000, 0);
+        animate_arc(arc_cont, ARC_EXPAND_UP, 700, 300);
+        ui_anim_opa(arc, 255, 500, 500);
+    }
+}
+
+static void scroll_event_cb(lv_event_t * e)
+{
+    lv_obj_t * cont = (lv_obj_t *)lv_event_get_target(e);
+
+    lv_area_t cont_a;
+    lv_obj_get_coords(cont, &cont_a);
+    int32_t cont_y_center = cont_a.y1 + lv_area_get_height(&cont_a) / 2;
+
+    int32_t r = lv_obj_get_height(cont) * 7 / 10;
+    int32_t h = lv_obj_get_height(cont) / 2;
+    uint32_t i;
+    uint32_t child_cnt = lv_obj_get_child_count(cont);
+    for(i = 0; i < child_cnt; i++) {
+        lv_obj_t * child = lv_obj_get_child(cont, i);
+        lv_area_t child_a;
+        lv_obj_get_coords(child, &child_a);
+
+        int32_t child_y_center = child_a.y1 + lv_area_get_height(&child_a) / 2;
+
+        int32_t diff_y = child_y_center - cont_y_center;
+        diff_y = LV_ABS(diff_y);
+
+        /* Smallest size default parameters */
+        int32_t icon_size = 82; /* Full size is 102 */
+        int32_t cont_width = 262; /* Full size is 345 */
+        int32_t img_scale = 208; /* Full size is 256 */
+
+        /*If diff_y is within the circle calculate size */
+        if(diff_y < r) {
+            /* Calculate sizes the based on diff_y and radius */
+            icon_size = 82 + (20 * lv_pow(lv_trigo_cos((90 * diff_y) / r), 2) / LV_TRIGO_SIN_MAX / LV_TRIGO_SIN_MAX);
+            cont_width = 262 + (83 * lv_pow(lv_trigo_cos((90 * diff_y) / r), 2) / LV_TRIGO_SIN_MAX / LV_TRIGO_SIN_MAX);
+            img_scale = 208 + (48 * lv_pow(lv_trigo_cos((90 * diff_y) / r), 2) / LV_TRIGO_SIN_MAX / LV_TRIGO_SIN_MAX);
+
+        }
+        /* Adjust the width of the container */
+        lv_obj_set_width(child, cont_width);
+
+        for(uint32_t c = 0; c < lv_obj_get_child_count(child); c++) {
+            lv_obj_t * grand = lv_obj_get_child(child, c);
+            /* Adjust the size of icon container */
+            lv_obj_set_size(grand, icon_size, icon_size);
+
+            /* Adjust the scale of the image inside the icon container */
+            lv_image_set_scale(lv_obj_get_child(grand, 0), img_scale);
         }
     }
 }
+
+
 
 #endif /*LV_USE_DEMO_SMARTWATCH*/

@@ -1,10 +1,10 @@
 /**
- * @file lv_demo_smartwatch_weather.h
+ * @file lv_demo_smartwatch_sports.h
  *
  */
 
-#ifndef LV_DEMO_SMARTWATCH_WEATHER_H
-#define LV_DEMO_SMARTWATCH_WEATHER_H
+#ifndef LV_DEMO_SMARTWATCH_SPORTS_H
+#define LV_DEMO_SMARTWATCH_SPORTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,11 +30,11 @@ extern "C" {
  **********************/
 
 /**
- * Create the weather page. Called only once.
+ * Create the sports page. Called only once.
  */
-void lv_demo_smartwatch_weather_create(void);
+void lv_demo_smartwatch_sports_create(void);
 
-lv_obj_t * lv_demo_smartwatch_get_weather_screen(void);
+lv_obj_t * lv_demo_smartwatch_get_sports_screen(void);
 
 /**********************
  *      MACROS
