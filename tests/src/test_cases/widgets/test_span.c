@@ -498,7 +498,25 @@ void test_spangroup_set_right_align_on_overflow(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_10.png");
 }
 
-void test_spangroup_rtl_mode(void)
+void test_spangroup_rtl_mode_set_default_align(void)
+{
+    const char * message = "مرحبا بكم في LVGL.";
+
+    active_screen = lv_screen_active();
+    spangroup = lv_spangroup_create(active_screen);
+
+    lv_obj_set_style_outline_width(spangroup, 1, 0);
+    lv_obj_set_style_text_font(spangroup, &lv_font_dejavu_16_persian_hebrew, 0);
+    lv_obj_set_style_base_dir(spangroup, LV_BASE_DIR_RTL, 0);
+    lv_obj_set_size(spangroup, 300, lv_font_dejavu_16_persian_hebrew.line_height);
+
+    lv_span_t * span = lv_spangroup_new_span(spangroup);
+    lv_span_set_text_static(span, message);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_11.png");
+}
+
+void test_spangroup_rtl_mode_set_left_align(void)
 {
     const char * message = "مرحبا بكم في LVGL.";
 
@@ -514,7 +532,26 @@ void test_spangroup_rtl_mode(void)
     lv_span_t * span = lv_spangroup_new_span(spangroup);
     lv_span_set_text_static(span, message);
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_11.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_12.png");
+}
+
+void test_spangroup_rtl_mode_set_center_align(void)
+{
+    const char * message = "مرحبا بكم في LVGL.";
+
+    active_screen = lv_screen_active();
+    spangroup = lv_spangroup_create(active_screen);
+
+    lv_obj_set_style_outline_width(spangroup, 1, 0);
+    lv_obj_set_style_text_font(spangroup, &lv_font_dejavu_16_persian_hebrew, 0);
+    lv_obj_set_style_base_dir(spangroup, LV_BASE_DIR_RTL, 0);
+    lv_obj_set_size(spangroup, 300, lv_font_dejavu_16_persian_hebrew.line_height);
+    lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_CENTER);
+
+    lv_span_t * span = lv_spangroup_new_span(spangroup);
+    lv_span_set_text_static(span, message);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/span_13.png");
 }
 
 #endif
