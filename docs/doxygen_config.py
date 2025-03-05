@@ -37,11 +37,11 @@ Usage:
     # 3. Update it.
     if ok_to_proceed:
         temp = cfg.value('PREDEFINED')
-        temp = temp.replace('<<LV_CONF_PATH>>', lv_conf_file)
+        temp = temp.replace('<<CONFIG_PATH>>', config_file)
         cfg.set('PREDEFINED', temp)
 
         temp = cfg.value('INPUT')
-        temp = temp.replace('<<SRC>>', f'"{lvgl_src_dir}"')
+        temp = temp.replace('<<SRC>>', f'"{pjt_src_dir}"')
         cfg.set('INPUT', temp)
 
     # 4. Save it.
@@ -90,7 +90,8 @@ Design Differences from `doxygen-python-interface`:
 
       ``doxygen-python-interface`` did not save the comments so an
       "edit in place" of a Doxyfile could be catastrophic if the
-      comments were needed as they often are in production scenarios.
+      comments were needed in the source Doxyfile as they often are
+      in production scenarios.
 
     - The ``save()`` method has an optional ``bare`` argument (default False)
       that can be used to save a "bare" version of the Doxyfile options,
@@ -108,13 +109,17 @@ Design Differences from `doxygen-python-interface`:
 
         PREDEFINED             = USE_LIST USE_TABLE USE_CHART
 
-        PREDEFINED             = DOXYGEN LV_CONF_PATH="/path with spaces/to/lv_conf.h"
+        PREDEFINED             = DOXYGEN CONFIG_PATH="/path with spaces/to/config.h"
 
         PREDEFINED             = DOXYGEN \
-                                 LV_CONF_PATH="/path with spaces/to/lv_conf.h"
+                                 CONFIG_PATH="/path with spaces/to/config.h"
 
       These are all valid values for the PREDEFINED option and
-      MUST NOT have quotes around any of them!
+      MUST NOT have quotes around any of them!  Can you imagine the havoc
+      that would result if a Python module meant to handle Doxygen Doxyfiles
+      altered Doxygen configuration items like this?
+
+        PREDEFINED             = "USE_LIST USE_TABLE USE_CHART"
 
       Thus, it is up to the user to know when values he is changing
       have space(s) AND ALSO need quotes and take appropriate measures
@@ -130,8 +135,9 @@ Design Differences from `doxygen-python-interface`:
       control on retaining valid Doxygen options.
 
       It is an error to attempt to set a value with an option name
-      that does not exist in the configuration.  A NameError
-      exception is raised if it is attempted.
+      that does not exist in the configuration.  A NameError exception
+      is raised if it is attempted.  Attempting to read the value of
+      an option name that does not exist returns the value ``None``.
 
       While Doxygen options change from time to time, it is up to the
       end user to use ``doxygen -u Doxyfile`` to keep his input
@@ -174,8 +180,8 @@ The Philosophy of Removing Quotation Marks Is Not Workable for Doxygen:
     strong argument for not tampering with quotation marks at all
     when importing values.  The strongest reasons are:
 
-    -   Doxygen can and does accept values like this where the value
-        of an option can be a list:
+    -   Doxygen can and does accept values like this where the value of
+        an option can be a list.  Doxygen sees this as 2 separate values:
 
             "abc def" "ghi jkl"
 

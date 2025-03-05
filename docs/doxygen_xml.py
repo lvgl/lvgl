@@ -191,6 +191,7 @@ Additional dictionaries:
 """
 import os
 import sys
+import subprocess
 from xml.etree import ElementTree
 import doxygen_config
 from announce import *
@@ -229,7 +230,63 @@ unions = {}      # appears to be non-functional at this time
 
 # Module-Global Variables
 xml_path = ''
-silent_running = False
+
+
+def run_ext_cmd(cmd_str: str, start_dir: str = None, quiet: bool = False, exit_on_error: bool = True):
+    """
+    Run external command `cmd_str` (possibly silently) in directory
+    `start_dir` (if provided), and optionally abort execution on error.
+
+    :param cmd_str:        String to pass to OS.
+    :param start_dir:      Directory to start in, or `None` to run in "cwd".
+    :param quiet:          Should STDOUT and STDERR be suppressed?
+    :param exit_on_error:  Should this function abort execution on
+                             a non-zero exit status?
+    :return:               n/a
+    """
+    saved_dir = None
+
+    if start_dir is not None:
+        saved_dir = os.getcwd()
+        os.chdir(start_dir)
+
+    if quiet:
+        # This method of running Doxygen is used because we do not
+        # want anything going to STDOUT.  Running it via `os.system()`
+        # would send its output to STDOUT.
+        p = subprocess.Popen(
+            cmd_str,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=True
+        )
+
+        out, err = p.communicate()
+
+        if p.returncode:
+            if out:
+                # Note the `.decode("utf-8")` is required because
+                # `sys.stdout.write()` requires a string, and `out` is
+                # a byte array; generates an exception if passed alone.
+                sys.stdout.write(out.decode("utf-8"))
+                sys.stdout.flush()
+            if err:
+                sys.stderr.write(err.decode("utf-8"))
+                sys.stdout.flush()
+
+            if exit_on_error:
+                sys.exit(p.returncode)
+    else:
+        announce_start(__file__, f'Running [{cmd_str}] in [{os.getcwd()}]...')
+        return_code = os.system(cmd_str)
+        announce_finish()
+
+        if return_code != 0 and exit_on_error:
+            print(f'Exiting due to error [{return_code}] running [{cmd_str}].')
+            sys.exit(return_code)
+
+    if saved_dir is not None:
+        os.chdir(saved_dir)
 
 
 def warn(warning_type, *args):
@@ -284,7 +341,7 @@ def read_as_xml(d):
         return None
 
 
-def load_xml(fle):
+def load_xml_as_etree(fle):
     fle = os.path.join(xml_path, fle + '.xml')
 
     with open(fle, 'rb') as f:
@@ -390,7 +447,7 @@ class STRUCT(object):
             self.line_no = None
 
         if parent and refid:
-            root = load_xml(refid)
+            root = load_xml_as_etree(refid)
 
             for compounddef in root:
                 if compounddef.attrib['id'] != self.refid:
@@ -522,7 +579,7 @@ class VARIABLE(object):
             self.line_no = None
 
         if parent is not None:
-            root = load_xml(parent.refid)
+            root = load_xml_as_etree(parent.refid)
 
             for compounddef in root:
                 if compounddef.attrib['id'] != parent.refid:
@@ -689,7 +746,7 @@ class FUNCTION(object):
             self.void_return = False
 
         if parent is not None:
-            root = load_xml(parent.refid)
+            root = load_xml_as_etree(parent.refid)
 
             for compounddef in root:
                 if compounddef.attrib['id'] != parent.refid:
@@ -930,7 +987,7 @@ class ENUM(object):
             self.line_no = None
 
         if parent is not None:
-            root = load_xml(parent.refid)
+            root = load_xml_as_etree(parent.refid)
 
             for compounddef in root:
                 if compounddef.attrib['id'] != parent.refid:
@@ -1067,7 +1124,7 @@ class DEFINE(object):
             self.initializer = None
 
         if parent is not None:
-            root = load_xml(parent.refid)
+            root = load_xml_as_etree(parent.refid)
             memberdef = []
 
             for compounddef in root:
@@ -1153,7 +1210,7 @@ class TYPEDEF(object):
             self.line_no = None
 
         if parent is not None:
-            root = load_xml(parent.refid)
+            root = load_xml_as_etree(parent.refid)
 
             for compounddef in root:
                 if compounddef.attrib['id'] != parent.refid:
@@ -1276,7 +1333,16 @@ class DoxygenXml(object):
     `global` statements.
     """
 
-    def __init__(self, lvgl_src_dir, intermediate_dir, doxyfile_src_file, silent=False):
+    def __init__(self, lvgl_src_dir, intermediate_dir, doxyfile_src_file, silent_mode=False):
+        """
+        - Prepare and run Doxygen, generating XML output.
+        - Load that XML output, and use it to populate
+        :param lvgl_src_dir:
+        :param intermediate_dir:
+        :param doxyfile_src_file:
+        :param silent_mode:
+        """
+        # Dictionaries to Be Populated:
         global defines
         global enums
         global variables
@@ -1287,15 +1353,11 @@ class DoxygenXml(object):
         global groups
         global files
         global classes
+        global unions
 
         global xml_path
-        global silent_running
 
-        import subprocess
-        import sys
-
-        silent_running = silent
-        announce_set_silent_mode(silent)
+        announce_set_silent_mode(silent_mode)
         base_dir = os.path.abspath(os.path.dirname(__file__))
         doxyfile_filename = str(os.path.split(doxyfile_src_file)[1])
         doxyfile_dst_file = str(os.path.join(intermediate_dir, doxyfile_filename))
@@ -1315,99 +1377,44 @@ class DoxygenXml(object):
         files.clear()
         classes.clear()
 
-        # Generate Doxyfile into `intermediate_dir`
-        # replacing tokens with values for this run.
-        #
+        # -----------------------------------------------------------------
+        # Prep and run Doxygen
+        # -----------------------------------------------------------------
+        # Generate Doxyfile into `intermediate_dir` replacing certain
+        # config options for this run.
         # 1. Load from Doxyfile
         cfg = doxygen_config.DoxygenConfig()
         cfg.load(doxyfile_src_file)
-
         # 2. Update cfg.
         cfg.set('OUTPUT_DIRECTORY', '.')
         cfg.set('INPUT', lvgl_src_dir)
-        cfg.set('GENERATE_HTML', 'NO')
-        cfg.set('HTML_OUTPUT', 'doxygen_html')
         cfg.set('GENERATE_XML', 'YES')
         cfg.set('XML_OUTPUT', "xml")
+        cfg.set('GENERATE_HTML', 'NO')
+        cfg.set('HTML_OUTPUT', 'doxygen_html')
         cfg.set('PREDEFINED', f'DOXYGEN LV_CONF_PATH="{lv_conf_file}"')
-
+        cfg.set('GENERATE_DOCSET', 'NO')
+        cfg.set('GENERATE_HTMLHELP', 'NO')
+        cfg.set('GENERATE_CHI', 'NO')
+        cfg.set('GENERATE_QHP', 'NO')
+        cfg.set('GENERATE_ECLIPSEHELP', 'NO')
+        cfg.set('GENERATE_', 'NO')
+        cfg.set('GENERATE_LATEX', 'NO')
+        cfg.set('GENERATE_RTF', 'NO')
+        cfg.set('GENERATE_MAN', 'NO')
+        cfg.set('GENERATE_XML', 'NO')
+        cfg.set('GENERATE_DOCBOOK', 'NO')
+        cfg.set('GENERATE_PERLMOD', 'NO')
         # 3. Store it into intermediate directory.
         cfg.save(doxyfile_dst_file)
 
-        # Original code:
-        # with open(doxyfile_src_file, 'rb') as f:
-        #     data = f.read().decode('utf-8')
-        #
-        # data = data.replace('<<LV_CONF_PATH>>', lv_conf_file)
-        # data = data.replace('<<SRC>>', f'"{lvgl_src_dir}"')
-        #
-        # with open(doxyfile_dst_file, 'wb') as f:
-        #     f.write(data.encode('utf-8'))
-
-        # ---------------------------------------------------------------------
-        # Provide a way to run an external command and abort build on error.
-        #
-        # This is necessary because when tempdir created by tempfile.mkdtemp()`
-        # is on a different drive, the "cd tmpdir && doxygen Doxyfile" syntax
-        # fails because of the different semantics of the `cd` command on
-        # Windows:  it doesn't change the default DRIVE if `cd` is executed
-        # from a different drive.  The result, when this is the case, is that
-        # Doxygen runs in the current working directory instead of in the
-        # temporary directory as was intended.
-        # ---------------------------------------------------------------------
-        def cmd(cmd_str, start_dir=None, exit_on_error=True):
-            saved_dir = None
-
-            if start_dir is not None:
-                saved_dir = os.getcwd()
-                os.chdir(start_dir)
-
-            if silent_running:
-                # This method of running Doxygen is used because if it
-                # succeeds, we do not want anything going to STDOUT.
-                # Running it via `os.system()` would send its output
-                # to STDOUT.
-                p = subprocess.Popen(
-                    cmd_str,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    shell=True
-                )
-
-                out, err = p.communicate()
-                if p.returncode:
-                    if out:
-                        # Note the `.decode("utf-8")` is required here
-                        # because `sys.stdout.write()` requires a string,
-                        # and `out` by itself is a byte array -- it causes
-                        # it to generate an exception and abort the script.
-                        sys.stdout.write(out.decode("utf-8"))
-                        sys.stdout.flush()
-                    if err:
-                        sys.stderr.write(err.decode("utf-8"))
-                        sys.stdout.flush()
-
-                    if exit_on_error:
-                        sys.exit(p.returncode)
-            else:
-                announce_start(__file__, f'Running [{cmd_str}] in [{os.getcwd()}]...')
-                return_code = os.system(cmd_str)
-                announce_finish()
-
-                if return_code != 0 and exit_on_error:
-                    print(f'Exiting due to error [{return_code}] running [{cmd_str}].')
-                    sys.exit(return_code)
-
-            if saved_dir is not None:
-                os.chdir(saved_dir)
+        # Run Doxygen in intermediate directory.
+        run_ext_cmd('doxygen Doxyfile', intermediate_dir, quiet=silent_mode)
 
         # -----------------------------------------------------------------
-        # Run Doxygen in temporary directory.
+        # Load root of Doxygen output (index.xml) as an `xml.etree.ElementTree`.
         # -----------------------------------------------------------------
-        cmd('doxygen Doxyfile', intermediate_dir)
-
-        # Load index.xml -- core of what was generated by Doxygen.
-        self.index_xml = load_xml('index')
+        self.index_xml_etree = load_xml_as_etree('index')
 
         # Populate these dictionaries.
         #     Keys  :  C-code-element names (str) found by Doxygen.
@@ -1417,53 +1424,47 @@ class DoxygenXml(object):
         #     namespaces,  structures,  typedefs,
         #     functions,   unions,      groups,
         #     files,       classes.
-        announce_start(__file__, "Building source-code symbol tables...")
+        announce_start(__file__, "Building source-code symbol dictionaries...")
         module_namespace = globals()
 
-        for compound in self.index_xml:
+        for compound in self.index_xml_etree:
             # Here we will encounter these "kind" in the index.xml
             # <compound> elements: dir, file, page, struct, union.
             compound.attrib['name'] = compound[0].text.strip()
 
-            # Filter out dir, page, example
-            if compound.attrib['kind'] in ('example', 'page', 'dir'):
-                continue
-
-            # Adjusting code to be less obfuscated.  Original code:
-            # globals()[compound.attrib['kind'].upper()](
-            #     None,
-            #     node=compound,
-            #     **compound.attrib
-            # )
-            class_name = compound.attrib['kind'].upper()
-            class_obj = module_namespace[class_name]
-            class_obj(None, node=compound, **compound.attrib)
-
-            # Additional data:  the call above instantiates the class, but
-            # doesn't store the resulting object anywhere, since each class'
-            # __init__() function adds the object the appropriate dictionary
-            # (each one was clear()-ed above), and uses the arguments it
-            # gets to "build out" additional structure and/or populate
-            # additional dictionaries based on content.  Each class names
-            # args it needs by having arg names that match the needed
-            # keywords from the `**compound.attrib` set and accepts the
-            # unused keyword args in the `**_` parameter at the end.
-            #
-            # FILE populates the files dict plus the following dicts:
-            #   - defines
-            #   - enums with children:
-            #       - ENUMVALUEs
-            #   - variables
-            #   - typedefs
-            #   - functions with children:
-            #       - FUNC_ARGs
-            # STRUCT populates the structures dict plus the following children:
-            #   - STRUCT_FIELDs
-            #
-            # and possibly namespaces, groups and classes if
-            # they are present in `index.xml`.
+            # Filter out dir, page, example.
+            if compound.attrib['kind'] not in ('example', 'page', 'dir'):
+                class_name = compound.attrib['kind'].upper()
+                class_obj = module_namespace[class_name]
+                _ = class_obj(None, node=compound, **compound.attrib)
 
         announce_finish()
+
+        # Additional data:  the above instantiates the class, but doesn't
+        # store the resulting object anywhere, since each class' __init__()
+        # function adds the new object to the appropriate dictionary,
+        # and uses the arguments it gets to "build out" additional
+        # structure and/or populate additional dictionaries based on
+        # content.  Each class __init__() function specifies args it
+        # in its parameter list.  They match needed key values in the
+        # `**compound.attrib` dictionary.  The remaining (unused)
+        # keys in that dictionary are accepted in the `**_` parameter
+        # at the end of the parameter list.
+        #
+        # FILE class populates `files` dict plus:
+        #   - `defines` dictionary
+        #   - `enums` dictionary with children:
+        #       - ENUMVALUEs
+        #   - `variables` dictionary
+        #   - `typedefs` dictionary
+        #   - `functions` dictionary with children:
+        #       - FUNC_ARGs
+        # STRUCT class populates the `structures` dictionary with children:
+        #   - STRUCT_FIELDs
+        #
+        # and possibly `namespaces`, `groups` and `classes` if
+        # they are present in `index.xml`.
+
 
     def get_macros(self):
         global defines

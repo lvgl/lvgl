@@ -42,7 +42,7 @@ or if you are on a Unix like OS:
 
     python3 build.py html
 
-Intermediate files are prepared in `./docs/intermediate/` and the final documentation will appear in `./docs/build/html/`.
+Intermediate files are prepared in `./docs/intermediate/` and the final documentation will appear in `./docs/build/html/`.  (Both of these directories can be overridden using environment variables.  See documentation in `build.py` for details.)
 
 If the list of document source files has changed (names or paths):
 
@@ -66,13 +66,36 @@ The below are some rules to follow when updating any of the `.rst` files located
 
 ### What to Name Your `.rst` File
 
-The documentation-generation logic uses the stem of the file name (i.e. "event" from file name "event.rst") and compares this with code-element names found by Doxygen.  If a match is found, then it appends hyperlinks to the API pages that contain those code elements (names of macros, enum/struct/union types, variables, namespaces, typedefs and functions).
+The directory structure under the `./docs/src/` directory, and the filenames of the `.rst` files govern the eventual URLs that are generated in the HTML output.  These directories are organized so as to reflect the nature of the content.  Example:  the `.rst` files under `./docs/src/intro` contain introductory material—detailed reference material would not go there, but instead in an appropriate subdirectory of `./docs/src/details/`.  It is expected that the content and location of any new documents added would be in alignment with this directory structure, and placed and named according to their content.  Additionally, to be linked into the eventual generated documentation, the stem of the new filename would need to appear in at least one (normally *only one*) `.. toctree::` directive, normally in an `index.rst` file in the directory where it will appear in the table of contents (TOC).
 
-If this is appropriate for the .RST file you are creating, ensure the stem of the file name matches the beginning part of the code-element name you want it to be associated with.
+Other than that, there are no restrictions on filenames.  Previous linking of filenames to generated API links has been removed and replaced by a better scheme.  For sake of illustration, let's say you are creating (or enhancing) documentation related to the `lv_scale_t` data type (one of the LVGL Widgets):  if you want the doc-build logic to generate appropriate links to LVGL API pages, place an API section at the end of your document (it must be at the end) like this:
 
-If this is *not* appropriate for the .RST file you are creating, ensure the stem of the file name DOES NOT match any code-element names found in the LVGL header files under the ./src/ directory.
+```rst
+API
+***
+```
 
-In alignment with the above, use a file name stem that is appropriate to the topic being covered.
+and then, if you want the API-link-generation logic to generate hyperlinks to API pages based on an ***exact, case-sensitive string match*** with specific C symbols, follow it with a reStructuredText comment using this syntax:
+
+```rst
+.. API exact: lv_scale_t, lv_scale_create
+```
+
+What follows the colon is a comma-separated list of exact C symbols documented somewhere in the `lvgl/src/` directory.
+
+If you instead want the API-link-generation logic to simply include links to code that ***contains a specific string* ** use this syntax instead:
+
+```rst
+.. API contains: lv_scale, lv_obj_set_style
+```
+
+You can also manually link to API pages, in which case the API-link-generation logic will see that you have already added links and will not repeat them.
+
+```rst
+:ref:`lv_scale_h`
+```
+
+Note that there are no spaces and no periods in the above link reference.  The naming of this reference (`lv_scale_h`) will generate a hyperlink to the documentation extracted by Doxygen from the `lvgl/src/widgets/scale/lv_scale.h` file.
 
 
 ### Text Format
@@ -234,7 +257,7 @@ To create a bulleted list, do the following:
       lines to align with item text like this.
     - If you want to include a code block under a list item,
       it must be intended to align with the list item like this:
-
+    
       .. code-block: python
                                  <=== blank line here is important
           # this is some code
@@ -285,5 +308,4 @@ For such examples, simply use reStructuredText literal markup like this:
     ``lv_obj_set_layout((lv_obj_t *)widget, LV_LAYOUT_FLEX)``
     ``lv_obj_set_layout(&widget, LV_LAYOUT_FLEX);``
     ``lv_obj_set_layout(widget, ...)``
-
 
