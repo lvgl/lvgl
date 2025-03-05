@@ -65,7 +65,7 @@ kind="dir"
       ------------
       <compounddef id="<refid_from_above" kind="dir">
         <compoundname>full_path_of_dir_wo_trailing_slash</compoundname>
-        <innerdir refid="stem_of_xml_file_containing_dir_details">E:/Dev/Clients/WGA/lvgl/vwheeler63/lvgl/src/widgets/animimage</innerdir>
+        <innerdir refid="stem_of_xml_file_containing_dir_details">subdirectory_path</innerdir>
         ... (list <innerdir> elements --- one for each subdirectory in directory)
         ...
         <innerfile refid="stem_of_xml_file_containing_file_details">filename</innerfile>
@@ -193,7 +193,7 @@ import os
 import sys
 from xml.etree import ElementTree
 import doxygen_config
-from announce import announce_start, announce_finish, announce_set_silent_mode
+from announce import *
 
 EMIT_WARNINGS = True
 DOXYGEN_OUTPUT = True
@@ -1325,7 +1325,7 @@ class DoxygenXml(object):
         # 2. Update cfg.
         cfg.set('OUTPUT_DIRECTORY', '.')
         cfg.set('INPUT', lvgl_src_dir)
-        cfg.set('GENERATE_HTML', 'YES')
+        cfg.set('GENERATE_HTML', 'NO')
         cfg.set('HTML_OUTPUT', 'doxygen_html')
         cfg.set('GENERATE_XML', 'YES')
         cfg.set('XML_OUTPUT', "xml")
@@ -1465,33 +1465,41 @@ class DoxygenXml(object):
 
         announce_finish()
 
-
     def get_macros(self):
+        global defines
         return list(defines.values())
 
     def get_enum_item(self, e_name):
+        global enums
         for enum, obj in enums.items():
             for enum_item in obj.members:
                 if enum_item.name == e_name:
                     return enum_item
 
     def get_enum(self, e_name):
+        global enums
         return enums.get(e_name, None)
 
     def get_function(self, f_name):
+        global functions
         return functions.get(f_name, None)
 
     def get_variable(self, v_name):
+        global variables
         return variables.get(v_name, None)
 
     def get_union(self, u_name):
+        global unions
         return unions.get(u_name, None)
 
     def get_structure(self, s_name):
+        global structures
         return structures.get(s_name, None)
 
     def get_typedef(self, t_name):
+        global typedefs
         return typedefs.get(t_name, None)
 
     def get_macro(self, m_name):
+        global defines
         return defines.get(m_name, None)

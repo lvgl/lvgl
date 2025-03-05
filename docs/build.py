@@ -175,7 +175,7 @@ import example_list
 import api_doc_builder
 import config_builder
 from src.lvgl_version import lvgl_version
-from announce import announce
+from announce import *
 
 # Not Currently Used
 # (Code is kept in case we want to re-implement it later.)

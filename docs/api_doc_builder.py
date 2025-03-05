@@ -7,90 +7,133 @@ Uses DoxygenXml class in doxygen_xml.py to make available:
 """
 import os
 import doxygen_xml
-from announce import announce
+from announce import *
 
 html_files = {}
 EMIT_WARNINGS = True
+section_line_char = '='
 
 
-def iter_src(n, p, _src_dir, _api_path):
-    if p:
-        out_path = os.path.join(_api_path, p)
-        src_path = os.path.join(_src_dir, p)
-    else:
-        out_path = _api_path
-        src_path = _src_dir
+def _create_rst_files_for_dir(a_src_root_len: int, a_src_dir_bep, h_files: [str], sub_dirs: [str], a_out_root):
+    """Create the .rst files for `a_src_dir_bep` now that we have
+    the lists of eligible files and directories.
 
-    index_file = None
-    folders = []
+    :param a_src_root_len:  Length of source-root path
+    :param a_src_dir_bep:   Source directory being processed
+    :param h_files:         List of eligible .H files
+    :param sub_dirs:        List of eligible subdirectories
+    :param a_out_root:      Output root directory (used for building paths)
+    :return:                n/a
+    """
+    indent = '    '
+    sub_path = a_src_dir_bep[a_src_root_len:]
+    out_dir = str(os.path.join(a_out_root, sub_path))
 
-    for file in os.listdir(src_path):
-        if 'private' in file:
-            continue
+    # Ensure dir exists.  Multiple dirs MAY have to be created
+    # since top-level dirs are not guaranteed to produce .rst files
+    # until later in sequence.
+    if not os.path.isdir(out_dir):
+        os.makedirs(out_dir)
 
-        if os.path.isdir(os.path.join(src_path, file)):
-            folders.append((file, os.path.join(p, file)))
-            continue
+    # Make a quick adjustment when we are finishing off with
+    # the top-level directory.
+    if len(sub_path) == 0 and out_dir.endswith(os.sep):
+        # Trim trailing slash from `out_dir`.
+        out_dir = out_dir[:-1]
 
-        if not file.endswith('.h'):
-            continue
+    # index.rst
+    with open(os.path.join(out_dir, 'index.rst'), 'w') as f:
+        subdir_stem = os.path.split(out_dir)[-1]
+        section_line = (section_line_char * len(subdir_stem)) + '\n'
+        f.write(section_line)
+        f.write(subdir_stem + '\n')
+        f.write(section_line)
+        f.write('\n')
+        f.write('.. toctree::\n    :maxdepth: 2\n\n')
 
-        if not os.path.exists(out_path):
-            os.makedirs(out_path)
+        for h_file in h_files:
+            filename = os.path.basename(h_file)
+            stem = os.path.splitext(filename)[0]
+            f.write(indent + stem + '\n')
 
-        if index_file is None:
-            index_file = open(os.path.join(out_path, 'index.rst'), 'w')
-            if n:
-                index_file.write('=' * len(n))
-                index_file.write('\n' + n + '\n')
-                index_file.write('=' * len(n))
-                index_file.write('\n\n\n')
+        for sub_dir in sub_dirs:
+            stem = os.path.split(sub_dir)[-1]
+            f.write(indent + stem + '/index\n')
 
-            index_file.write('.. toctree::\n    :maxdepth: 2\n\n')
-
-        name = os.path.splitext(file)[0]
-        index_file.write('    ' + name + '\n')
-
-        rst_file = os.path.join(out_path, name + '.rst')
-        html_file = os.path.join(p, name + '.html')
-        html_files[name] = html_file
+    # One .rst file per h_file
+    for h_file in h_files:
+        filename = os.path.basename(h_file)
+        stem = os.path.splitext(filename)[0]
+        rst_file = os.path.join(out_dir, stem + '.rst')
+        html_file = os.path.join(sub_path, stem + '.html')
+        html_files[stem] = html_file
 
         with open(rst_file, 'w') as f:
-            f.write('.. _{0}_h:'.format(name))
-            f.write('\n\n')
-            f.write('=' * len(file))
+            f.write(f'.. _{stem}_h:\n\n')
+            section_line = (section_line_char * len(filename)) + '\n'
+            f.write(section_line)
+            f.write(filename + '\n')
+            f.write(section_line)
             f.write('\n')
-            f.write(file)
-            f.write('\n')
-            f.write('=' * len(file))
-            f.write('\n\n\n')
+            f.write('.. doxygenfile:: ' + filename + '\n')
+            f.write('    :project: lvgl\n\n')
 
-            f.write('.. doxygenfile:: ' + file)
-            f.write('\n')
-            f.write('    :project: lvgl')
-            f.write('\n\n')
 
-    for name, folder in folders:
-        if iter_src(name, folder, _src_dir, _api_path):
-            if index_file is None:
-                index_file = open(os.path.join(out_path, 'index.rst'), 'w')
+def _recursively_create_api_rst_files(a_depth, a_src_root_len, a_src_dir_bep, a_out_root) -> int:
+    """
+    Process all .H files in directory then recursively process subdirs.
+    After this, generate index.rst:
+        - each .RST file corresponding with an .H file
+        - each subdir/index corresponding with a subdir
+          that contained (directly or indirectly) any .H files.
 
-                if n:
-                    index_file.write('=' * len(n))
-                    index_file.write('\n' + n + '\n')
-                    index_file.write('=' * len(n))
-                    index_file.write('\n\n\n')
+    :param a_depth:         Only used for testing/debugging
+    :param a_src_root_len:  Length of source-root path
+    :param a_src_dir_bep:   Source directory being processed
+    :param a_out_root:      Output root directory (used to build output paths)
+    :return:                Number of .H files encountered.
+                            This is for the caller to know whether that
+                            directory recursively had any .H files in it
+                            to know whether it should be included at the
+                            higher level `index.rst`.
+    """
+    h_files = []
+    sub_dirs = []
+    sub_dirs_w_h_files = []
 
-                index_file.write('.. toctree::\n    :maxdepth: 2\n\n')
+    # For each "thing" found in `a_src_dir_bep`, build lists:
+    # `sub_dirs` and `h_files`.
+    for dir_item in os.listdir(a_src_dir_bep):
+        if 'private' not in dir_item:
+            path_bep = os.path.join(a_src_dir_bep, dir_item)
+            if os.path.isdir(path_bep):
+                sub_dirs.append(path_bep)         # Add to sub-dir list.
+            else:
+                if dir_item.lower().endswith('.h'):
+                    eligible = (dir_item in doxygen_xml.files)
+                    if eligible:
+                        h_files.append(path_bep)  # Add to .H file list.
 
-            index_file.write('    ' + os.path.split(folder)[-1] + '/index\n')
+    # For each subdir...
+    for sub_dir in sub_dirs:
+        found_count = _recursively_create_api_rst_files(a_depth + 1, a_src_root_len, sub_dir, a_out_root)
 
-    if index_file is not None:
-        index_file.write('\n')
-        index_file.close()
-        return True
+        if found_count > 0:
+            sub_dirs_w_h_files.append(sub_dir)
 
-    return False
+    # Now that we have all files and dirs in list...
+    h_file_count = len(h_files) + len(sub_dirs_w_h_files)
+
+    if h_file_count > 0:
+        # Create index.rst plus .RST files for any direct .H files in dir.
+        _create_rst_files_for_dir(a_src_root_len, a_src_dir_bep, h_files, sub_dirs_w_h_files, a_out_root)
+
+    return h_file_count
+
+
+def create_api_rst_files(a_src_root, a_out_root):
+    src_root_len = len(a_src_root) + 1
+    _recursively_create_api_rst_files(0, src_root_len, a_src_root, a_out_root)
 
 
 def clean_name(nme):
@@ -184,13 +227,11 @@ def run(lvgl_src_dir, intermediate_dir, doxyfile_src_file, silent=False, *doc_pa
                                         silent
                                         )
 
+    # Generate .RST files for API pages.
     announce(__file__, "Generating API documentation .RST files...")
     api_path = os.path.join(intermediate_dir, 'API')
-    if not os.path.isdir(api_path):
-        os.makedirs(api_path)
-
-    # Generate .RST files for API pages.
-    iter_src('API', '', lvgl_src_dir, api_path)
+    create_api_rst_files(lvgl_src_dir, api_path)
+    # create_api_rst_files_orig('API', '', lvgl_src_dir, api_path)
 
     # ---------------------------------------------------------------------
     # For each directory entry in `doc_paths` array...

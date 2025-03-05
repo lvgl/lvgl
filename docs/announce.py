@@ -25,6 +25,7 @@ It is the designer's intention that:
 import os
 import datetime
 
+__all__ = ('announce', 'announce_start', 'announce_finish', 'announce_set_silent_mode')
 _announce_start_time: datetime.datetime
 _announce_silent_mode: bool = False
 
