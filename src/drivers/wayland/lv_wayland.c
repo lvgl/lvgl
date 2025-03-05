@@ -2841,9 +2841,10 @@ lv_indev_t * lv_wayland_get_touchscreen(lv_display_t * disp)
 /**
  * Wayland specific timer handler (use in place of LVGL lv_timer_handler)
  */
-bool lv_wayland_timer_handler(void)
+uint32_t lv_wayland_timer_handler(void)
 {
     struct window * window;
+    uint32_t idle_time;
 
     /* Wayland input handling - it will also trigger the frame done handler */
     _lv_wayland_handle_input();
@@ -2887,7 +2888,7 @@ bool lv_wayland_timer_handler(void)
     }
 
     /* LVGL handling */
-    lv_timer_handler();
+    idle_time = lv_timer_handler(); /*Returns the time to the next timer execution*/
 
     /* Wayland output handling */
     _lv_wayland_handle_output();
@@ -2903,7 +2904,7 @@ bool lv_wayland_timer_handler(void)
         }
     }
 
-    return true;
+    return idle_time;
 }
 
 #endif /* LV_USE_WAYLAND */
