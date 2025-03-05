@@ -151,6 +151,10 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
             case LV_FONT_GLYPH_FORMAT_A4_ALIGNED:
             case LV_FONT_GLYPH_FORMAT_A8_ALIGNED: {
                     glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                    if(!glyph_draw_dsc->glyph_data) {
+                        return;
+                    }
+
                     draw_letter_bitmap(t, glyph_draw_dsc);
                 }
                 break;
@@ -159,6 +163,10 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
             case LV_FONT_GLYPH_FORMAT_VECTOR: {
                     if(lv_freetype_is_outline_font(glyph_draw_dsc->g->resolved_font)) {
                         glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                        if(!glyph_draw_dsc->glyph_data) {
+                            return;
+                        }
+
                         draw_letter_outline(t, glyph_draw_dsc);
                     }
                 }
@@ -167,6 +175,10 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
 
             case LV_FONT_GLYPH_FORMAT_IMAGE: {
                     glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                    if(!glyph_draw_dsc->glyph_data) {
+                        return;
+                    }
+
                     lv_draw_image_dsc_t image_dsc;
                     lv_draw_image_dsc_init(&image_dsc);
                     image_dsc.opa = glyph_draw_dsc->opa;

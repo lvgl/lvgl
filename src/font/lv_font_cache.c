@@ -137,10 +137,6 @@ void lv_font_cache_release_glyph(const lv_font_t * font, lv_font_glyph_dsc_t * g
     LV_ASSERT_NULL(font);
     LV_ASSERT_NULL(g_dsc);
 
-    if(!g_dsc->entry) {
-        return;
-    }
-
     lv_cache_release(font_bitmap_cache, g_dsc->entry, NULL);
     g_dsc->entry = NULL;
 }
