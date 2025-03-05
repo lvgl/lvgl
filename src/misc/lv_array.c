@@ -212,41 +212,6 @@ lv_result_t lv_array_assign(lv_array_t * array, uint32_t index, const void * val
     return LV_RESULT_OK;
 }
 
-uint32_t lv_array_size(const lv_array_t * array)
-{
-    return array->size;
-}
-
-uint32_t lv_array_capacity(const lv_array_t * array)
-{
-    return array->capacity;
-}
-
-bool lv_array_is_empty(const lv_array_t * array)
-{
-    return array->size == 0;
-}
-
-bool lv_array_is_full(const lv_array_t * array)
-{
-    return array->size == array->capacity;
-}
-
-void lv_array_clear(lv_array_t * array)
-{
-    array->size = 0;
-}
-
-void * lv_array_front(const lv_array_t * array)
-{
-    return lv_array_at(array, 0);
-}
-
-void * lv_array_back(const lv_array_t * array)
-{
-    return lv_array_at(array, lv_array_size(array) - 1);
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
