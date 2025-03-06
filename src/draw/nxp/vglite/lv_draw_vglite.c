@@ -507,6 +507,9 @@ static inline void _vglite_cleanup_task(vglite_draw_task_t * task)
         vg_lite_clear_grad(task->gradient);
         lv_free(task->gradient);
     }
+    if(task->path_data != NULL)
+        lv_free(task->path_data);
+
     lv_free(task);
 }
 
