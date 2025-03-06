@@ -23,5 +23,9 @@ Example
 	    <prop name="long_mode">
 	    	<param name="mode" type="enum:lv_label_long_mode" />
 	   	</prop>
+	    <prop name="bind_text">
+	    	<param name="subject" type="subject" />
+	    	<param name="string" type="fmt" default="NULL"/>
+	   	</prop>
 	</api>
 </widget>

@@ -28,5 +28,8 @@ Example
 	    <prop name="mode" type="enum:lv_slider_mode">
 	    	<param name="range_min" type="int"/>
 	    </prop>
+	    <prop name="bind_value">
+	    	<param name="subject" type="subject" />
+	   	</prop>
 	</api>
 </widget>
