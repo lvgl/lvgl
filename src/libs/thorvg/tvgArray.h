@@ -29,6 +29,7 @@
 #include <memory.h>
 #include <cstdint>
 #include <cstdlib>
+#include "tvgCommon.h"
 
 namespace tvg
 {
