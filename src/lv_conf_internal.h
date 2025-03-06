@@ -3992,6 +3992,14 @@
     #endif
 #endif
 
+#ifndef LV_USE_FT81X
+    #ifdef CONFIG_LV_USE_FT81X
+        #define LV_USE_FT81X CONFIG_LV_USE_FT81X
+    #else
+        #define LV_USE_FT81X      0
+    #endif
+#endif
+
 /** LVGL Windows backend */
 #ifndef LV_USE_WINDOWS
     #ifdef CONFIG_LV_USE_WINDOWS
