@@ -100,6 +100,11 @@ static const void * freetype_get_glyph_bitmap_cb(lv_font_glyph_dsc_t * g_dsc, lv
     };
 
     lv_cache_entry_t * entry = lv_cache_acquire_or_create(cache, &search_key, dsc);
+    if(entry == NULL) {
+        LV_LOG_ERROR("glyph bitmap lookup failed for glyph_index = 0x%" LV_PRIx32, (uint32_t)glyph_index);
+        LV_PROFILER_FONT_END;
+        return NULL;
+    }
 
     g_dsc->entry = entry;
     lv_freetype_image_cache_data_t * cache_node = lv_cache_entry_get_data(entry);
