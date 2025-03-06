@@ -89,6 +89,26 @@ void lv_draw_vglite_triangle(vglite_draw_task_t * vglite_task)
  *   STATIC FUNCTIONS
  **********************/
 
+static void _vglite_set_triangle(uint32_t * path_data, uint32_t * path_data_size, const lv_point_precise_t * p)
+{
+    uint32_t pidx = 0;
+    path_data[pidx++] = VLC_OP_MOVE;
+    path_data[pidx++] = p[0].x;
+    path_data[pidx++] = p[0].y;
+    path_data[pidx++] = VLC_OP_LINE;
+    path_data[pidx++] = p[1].x;
+    path_data[pidx++] = p[1].y;
+    path_data[pidx++] = VLC_OP_LINE;
+    path_data[pidx++] = p[2].x;
+    path_data[pidx++] = p[2].y;
+    path_data[pidx++] = VLC_OP_LINE;
+    path_data[pidx++] = p[0].x;
+    path_data[pidx++] = p[0].y;
+    path_data[pidx++] = VLC_OP_END;
+
+    *path_data_size = pidx * sizeof(int32_t);
+}
+
 static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_area_t * coords,
                                   const lv_area_t * clip_area,
                                   const lv_draw_triangle_dsc_t * dsc)
@@ -105,18 +125,17 @@ static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_are
     uint32_t height = lv_area_get_height(&tri_area);
 
     /* Init path */
-    int32_t triangle_path[] = { /*VG line path*/
-        VLC_OP_MOVE, dsc->p[0].x, dsc->p[0].y,
-        VLC_OP_LINE, dsc->p[1].x, dsc->p[1].y,
-        VLC_OP_LINE, dsc->p[2].x, dsc->p[2].y,
-        VLC_OP_LINE, dsc->p[0].x, dsc->p[0].y,
-        VLC_OP_END
-    };
+    uint32_t path_data_size;
+    int32_t * triangle_path = lv_malloc_zeroed(13 * sizeof(int32_t));
+    LV_ASSERT(triangle_path != NULL);
+    vglite_task->path_data = triangle_path;
+    _vglite_set_triangle(triangle_path, &path_data_size, dsc->p);
+
 
     vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
     LV_ASSERT(path != NULL);
     vglite_task->path = path;
-    VGLITE_CHECK_ERROR(vg_lite_init_path(path, VG_LITE_S32, VG_LITE_HIGH, sizeof(triangle_path), triangle_path,
+    VGLITE_CHECK_ERROR(vg_lite_init_path(path, VG_LITE_S32, VG_LITE_HIGH, path_data_size, triangle_path,
                                          (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
                                          ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
