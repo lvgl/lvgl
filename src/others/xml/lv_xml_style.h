@@ -38,7 +38,7 @@ typedef struct _lv_xml_style_t {
  * @param ctx       add styles here. (Constants should be already added as style properties might use them)
  * @param attrs     list of attribute names and values
  */
-void lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs);
+lv_result_t lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs);
 
 /**
  * Add the styles to an object. Handles multiple styles and selectors too.
