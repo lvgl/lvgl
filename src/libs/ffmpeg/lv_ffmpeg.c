@@ -774,6 +774,7 @@ static void ffmpeg_close_src_ctx(struct ffmpeg_context_s * ffmpeg_ctx)
 {
     avcodec_free_context(&(ffmpeg_ctx->video_dec_ctx));
     avformat_close_input(&(ffmpeg_ctx->fmt_ctx));
+    av_packet_free(&ffmpeg_ctx->pkt);
     av_frame_free(&(ffmpeg_ctx->frame));
     if(ffmpeg_ctx->video_src_data[0] != NULL) {
         av_free(ffmpeg_ctx->video_src_data[0]);
