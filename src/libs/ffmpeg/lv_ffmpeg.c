@@ -178,13 +178,17 @@ lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
     uint32_t data_size = 0;
 
     data_size = width * height * 4;
+    uint8_t * data = ffmpeg_get_image_data(player->ffmpeg_ctx);
+    lv_color_format_t cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
+    uint32_t stride = width * lv_color_format_get_size(cf);
+    lv_memzero(data, stride * height);
 
     player->imgdsc.header.w = width;
     player->imgdsc.header.h = height;
     player->imgdsc.data_size = data_size;
-    player->imgdsc.header.cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
-    player->imgdsc.header.stride = width * lv_color_format_get_size(player->imgdsc.header.cf);
-    player->imgdsc.data = ffmpeg_get_image_data(player->ffmpeg_ctx);
+    player->imgdsc.header.cf = cf;
+    player->imgdsc.header.stride = stride;
+    player->imgdsc.data = data;
 
     lv_image_set_src(&player->img.obj, &(player->imgdsc));
 
