@@ -51,7 +51,7 @@ Our team is ready to help you with graphics design, UI implementation and consul
 
 **Widgets, Styles, Layouts and more**
   - 30+ built-in [Widgets](https://docs.lvgl.io/master/details/widgets/index.html):  Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table and many more.
-  - Flexible [Style system](https://docs.lvgl.io/master/details/common-widget-features/styles/index.html) with  ~100 style properties to customize any part of the widgets in any state.
+  - Flexible [Style system](https://docs.lvgl.io/master/details/common-widget-features/styles/style.html) with  ~100 style properties to customize any part of the widgets in any state.
   - [Flexbox](https://docs.lvgl.io/master/details/common-widget-features/layouts/flex.html) and [Grid](https://docs.lvgl.io/master/details/common-widget-features/layouts/grid.html)-like layouts engines to automatically size and position the widgets in a responsive way.
   - Texts are rendered with UTF-8 encoding supporting CJK, Thai, Hindi, Arabic, Persian writing systems.
   - Word wrapping, kerning, text scrolling, sub-pixel rendering, Pinyin-IME Chinese input, Emojis in texts.

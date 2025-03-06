@@ -54,26 +54,26 @@ LVGL LLC では、グラフィックデザイン、UI実装、コンサルティ
 **フリー & 移植可能**
   - 外部依存関係がなく、完全に移植可能な Cライブラリ。(C++互換)
   - 任意の(RT)OS、任意のMCU・MPU用にコンパイル可能。
-  - 電子ペーパー、OLEDディスプレイ、TFTディスプレイ、白黒ディスプレイ、モニターに対応。 [Porting Guide](https://docs-lvgl-io.translate.goog/master/porting/project.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)
+  - 電子ペーパー、OLEDディスプレイ、TFTディスプレイ、白黒ディスプレイ、モニターに対応。 [Porting Guide](https://docs.lvgl.io/master/details/integration/adding-lvgl-to-your-project/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)
   - MITライセンスにより商用利用可能。
   - システム要件：RAM 32KB、Flash 128KB、フレームバッファ、レンダリング用に1/10以上のスクリーンサイズのバッファ。
   - OS、外部メモリ、GPUもサポート。
 
 **ウィジェット、スタイル、レイアウトなど**
-  - 30以上の組み込み [ウィジェット](https://docs-lvgl-io.translate.goog/master/widgets/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja): ボタン、ラベル、スライダー、グラフ、キーボード、メーター、円弧、表など。
-  - ウィジェットの任意の部分を任意の状態にカスタマイズ可能な豊富なスタイルプロパティを備えた柔軟な [スタイルシステム](https://docs-lvgl-io.translate.goog/master/overview/styles.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)。
-  - [Flexbox](https://docs-lvgl-io.translate.goog/master/layouts/flex.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) および [グリッド](https://docs-lvgl-io.translate.goog/master/layouts/grid.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) 風のレイアウトエンジンにより、ウィジェットのサイズと位置を自動的に設定。
+  - 30以上の組み込み [ウィジェット](https://docs-lvgl-io.translate.goog/master/details/widgets/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja): ボタン、ラベル、スライダー、グラフ、キーボード、メーター、円弧、表など。
+  - ウィジェットの任意の部分を任意の状態にカスタマイズ可能な豊富なスタイルプロパティを備えた柔軟な [スタイルシステム](https://docs-lvgl-io.translate.goog/master/details/common-widget-features/styles/style.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)。
+  - [Flexbox](https://docs-lvgl-io.translate.goog/master/details/common-widget-features/layouts/flex.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) および [グリッド](https://docs-lvgl-io.translate.goog/master/details/common-widget-features/layouts/grid.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) 風のレイアウトエンジンにより、ウィジェットのサイズと位置を自動的に設定。
   - テキスト表示(UTF-8対応)は、中国語、日本語、韓国語、タイ語、ヒンディー語、アラビア語、ペルシア語をサポート。
   - ワードラッピング、カーニング、テキストスクロール、サブピクセルレンダリング、ピンイン-IME中国語入力、テキスト中の絵文字に対応。
   - アニメーション、アンチエイリアシング、不透明度、スムーズスクロール、シャドウ、画像変換などをサポートするレンダリングエンジン。
-  - マウス、タッチパッド、キーパッド、キーボード、外部ボタン、エンコーダ等の [入力デバイス](https://docs-lvgl-io.translate.goog/master/porting/indev.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) をサポート。
-  - [マルチディスプレイ](https://docs-lvgl-io.translate.goog/master/overview/display.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) 対応。
+  - マウス、タッチパッド、キーパッド、キーボード、外部ボタン、エンコーダ等の [入力デバイス](https://docs-lvgl-io.translate.goog/master/details/integration/adding-lvgl-to-your-project/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) をサポート。
+  - [マルチディスプレイ](https://docs-lvgl-io.translate.goog/master/details/main-modules/display/overview.html#how-many-displays-can-lvgl-use?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) 対応。
 
 **Binding と Build をサポート**
   - [MicroPython Binding](https://blog-lvgl-io.translate.goog/2019-02-20/micropython-bindings?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) が LVGL API を公開。
   - カスタムビルドシステムは使用せず、プロジェクトの他のファイルをビルドするときに、LVGLをビルド可能。
-  - Make と [CMake](https://docs-lvgl-io.translate.goog/master/get-started/platforms/cmake.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) が含まれており、すぐ使えるようにサポート。
-  - [PCのシミュレータで開発したUIコード](https://docs-lvgl-io.translate.goog/master/get-started/platforms/pc-simulator.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) は、そのまま組込み用ハードウェアでも使用可能。
+  - Make と [CMake](https://docs-lvgl-io.translate.goog/master/details/integration/building/cmake.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) が含まれており、すぐ使えるようにサポート。
+  - [PCのシミュレータで開発したUIコード](https://docs-lvgl-io.translate.goog/master/details/integration/ide/pc-simulator.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) は、そのまま組込み用ハードウェアでも使用可能。
   - [Emscripten port](https://github.com/lvgl/lv_web_emscripten) :gb: によりC言語のUIコードをHTMLファイルに変換。
 
 **ドキュメント, ツール, 技術サービス**
@@ -83,13 +83,13 @@ LVGL LLC では、グラフィックデザイン、UI実装、コンサルティ
 
 ## :package: パッケージ
 LVGL は以下で利用可能です。
-- [Arduino library](https://docs-lvgl-io.translate.goog/master/get-started/platforms/arduino.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)
+- [Arduino library](https://docs-lvgl-io.translate.goog/master/details/integration/framework/arduino.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)
 - [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl) :gb:
 - [Zephyr library](https://docs-zephyrproject-org.translate.goog/latest/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)
-- [ESP32 component](https://docs-lvgl-io.translate.goog/master/get-started/platforms/espressif.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)
+- [ESP32 component](https://docs-lvgl-io.translate.goog/master/details/integration/chip/espressif.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)
 - [NXP MCUXpresso component](https://www-nxp-com.translate.goog/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)
-- [NuttX library](https://docs-lvgl-io.translate.goog/master/get-started/os/nuttx.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)
-- [RT-Thread RTOS](https://docs-lvgl-io.translate.goog/master/get-started/os/rt-thread.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)
+- [NuttX library](https://docs-lvgl-io.translate.goog/master/details/integration/os/nuttx.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)
+- [RT-Thread RTOS](https://docs-lvgl-io.translate.goog/master/details/integration/os/rt-thread.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)
 - NXP MCUXpresso library
 - CMSIS-Pack
 
@@ -376,23 +376,23 @@ LVGLを使い始める時は、以下の順に進める事をおすすめしま�
 
   1. LVGLの動きを [オンラインデモ](https://lvgl-io.translate.goog/demos?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) で確認しましょう。 (3分間)
   2. ドキュメントの [Introduction](https://docs-lvgl-io.translate.goog/master/intro/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) を読みましょう。 (5分間)
-  3. LVGLの基本に慣れるため [Quick overview](https://docs-lvgl-io.translate.goog/master/get-started/quick-overview.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) を読みましょう。 (15分間)
+  3. LVGLの基本に慣れるため [Quick overview](https://docs-lvgl-io.translate.goog/master/intro/getting_started.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) を読みましょう。 (15分間)
 
 **LVGLを使ってみましょう**
 
-  4. [シミュレータ](https://docs-lvgl-io.translate.goog/master/get-started/platforms/pc-simulator.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) をセットアップしましょう。 (10 minutes)
+  4. [シミュレータ](https://docs-lvgl-io.translate.goog/master/details/integration/ide/pc-simulator.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) をセットアップしましょう。 (10 minutes)
   5. [サンプルプログラム](https://github.com/lvgl/lvgl/tree/master/examples) :gb: を動かしてみましょう。
-  6. [移植ガイド](https://docs-lvgl-io.translate.goog/master/porting/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) を参考に、LVGLを開発ボードに移植してみましょう。すぐ使える形の [プロジェクト](https://github.com/lvgl?q=lv_port_) :gb: も用意してあります。
+  6. [移植ガイド](https://docs-lvgl-io.translate.goog/master/details/integration/adding-lvgl-to-your-project/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) を参考に、LVGLを開発ボードに移植してみましょう。すぐ使える形の [プロジェクト](https://github.com/lvgl?q=lv_port_) :gb: も用意してあります。
 
 **より詳しく体験してみましょう**
 
-  7. ライブラリの理解を深めるため [Overview](https://docs-lvgl-io.translate.goog/master/overview/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) を読みましょう。 (2～3時間)
-  8. ウィジェットの機能や使い方の詳細は [Widgets](https://docs-lvgl-io.translate.goog/master/widgets/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) でご確認ください。
+  7. ライブラリの理解を深めるため [Overview](https://docs-lvgl-io.translate.goog/master/intro/getting_started.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) を読みましょう。 (2～3時間)
+  8. ウィジェットの機能や使い方の詳細は [Widgets](https://docs-lvgl-io.translate.goog/master/details/widgets/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) でご確認ください。
 
 **助け合いましょう**
 
   9. 質問がある場合は [Forum](http://forum.lvgl.io/) :gb: で質問して下さい。
-  10. LVGLの改善への協力は大歓迎です。詳細は [Contributing  guide](https://docs-lvgl-io.translate.goog/master/CONTRIBUTING.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) をご覧ください。 (15分間)
+  10. LVGLの改善への協力は大歓迎です。詳細は [Contributing  guide](https://docs-lvgl-io.translate.goog/master/contributing/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) をご覧ください。 (15分間)
 
 **さらに理解を深めましょう**
 
@@ -425,7 +425,7 @@ LVGLはオープンプロジェクトであり、協力は大歓迎です。
  - ドキュメントの改善
  - バグの修正
 
-協力方法の詳細については、ドキュメントの [Contributing section](https://docs-lvgl-io.translate.goog/master/CONTRIBUTING.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) をご覧ください。
+協力方法の詳細については、ドキュメントの [Contributing section](https://docs-lvgl-io.translate.goog/master/contributing/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) をご覧ください。
 
 すでに 300人以上がLVGLに足跡を残しています。いっしょに活動しましょう! :slightly_smiling_face:
 

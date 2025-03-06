@@ -62,14 +62,14 @@ RAM å’Œ 128 KB Flashã€C ç¼–è¯‘å™¨ã€å¸§ç¼“å†�
 
 **æŽ§ä»¶ã€æ ·å¼ã€å¸ƒå±€ç­‰**<br>
 -  30+ å†…ç½® [æŽ§ä»¶](https://docs.lvgl.io/master/details/widgets/index.html):  Â æŒ‰é’®ã€æ ‡ç­¾ã€æ»‘å—ã€å›¾è¡¨ã€é”®ç›˜ã€ä»ªè¡¨ã€å¼§å½¢ã€è¡¨æ ¼ç­‰ç­‰ã€‚
--  çµæ´»çš„ [æ ·å¼ç³»ç»Ÿ](https://docs.lvgl.io/master/details/base-widget/styles/style.html) æ”¯æŒçº¦ 100 ä¸ªæ ·å¼å±žæ€§ï¼Œå¯åœ¨ä»»ä½•çŠ¶æ€ä¸‹è‡ªå®šä¹‰æŽ§ä»¶çš„ä»»ä½•éƒ¨åˆ†ã€‚
--  [Flex å¸ƒå±€](https://docs.lvgl.io/master/details/base-widget/layouts/flex.html) å’Œ
-   [Grid å¸ƒå±€](https://docs.lvgl.io/master/details/base-widget/layouts/grid.html)
+-  çµæ´»çš„ [æ ·å¼ç³»ç»Ÿ](https://docs.lvgl.io/master/details/common-widget-features/styles/style.html) æ”¯æŒçº¦ 100 ä¸ªæ ·å¼å±žæ€§ï¼Œå¯åœ¨ä»»ä½•çŠ¶æ€ä¸‹è‡ªå®šä¹‰æŽ§ä»¶çš„ä»»ä½•éƒ¨åˆ†ã€‚
+-  [Flex å¸ƒå±€](https://docs.lvgl.io/master/details/common-widget-features/layouts/flex.html) å’Œ
+   [Grid å¸ƒå±€](https://docs.lvgl.io/master/details/common-widget-features/layouts/grid.html)
    å¯ä»¥å“åº”å¼è‡ªåŠ¨è°ƒæ•´æŽ§ä»¶çš„å¤§å°å’Œä½ç½®ã€‚
 -  æ–‡æœ¬æ”¯æŒ UTF-8 ç¼–ç ï¼Œæ”¯æŒ CJKã€æ³°è¯­ã€å°åœ°è¯­ã€é˜¿æ‹‰ä¼¯è¯­å’Œæ³¢æ–¯è¯­ä¹¦å†™ç³»ç»Ÿã€‚
 -  æ”¯æŒè‡ªåŠ¨æ¢è¡Œã€å­—è·è°ƒæ•´ã€æ–‡æœ¬æ»šåŠ¨ã€äºšåƒç´ æ¸²æŸ“ã€æ‹¼éŸ³è¾“å…¥æ³•ã€æ–‡æœ¬è¡¨æƒ…ç¬¦å·ã€‚
 -  æ¸²æŸ“å¼•æ“Žæ”¯æŒåŠ¨ç”»ã€æŠ—é”¯é½¿ã€ä¸é€æ˜Žåº¦ã€å¹³æ»‘æ»šåŠ¨ã€é˜´å½±ã€å›¾å½¢å˜æ¢ç­‰ã€‚
--  æ”¯æŒé¼ æ ‡ã€è§¦æ‘¸æ¿ã€å°é”®ç›˜ã€é”®ç›˜ã€å¤–éƒ¨æŒ‰é’®ã€ç¼–ç å™¨ [è¾“å…¥è®¾å¤‡](https://docs.lvgl.io/master/details/main-components/indev.html) ã€‚
+-  æ”¯æŒé¼ æ ‡ã€è§¦æ‘¸æ¿ã€å°é”®ç›˜ã€é”®ç›˜ã€å¤–éƒ¨æŒ‰é’®ã€ç¼–ç å™¨ [è¾“å…¥è®¾å¤‡](https://docs.lvgl.io/master/details/main-modules/indev.html) ã€‚
 -  æ”¯æŒ [å¤šæ˜¾ç¤ºå™¨](https://docs.lvgl.io/master/details/main-modules/display/overview.html#how-many-displays-can-lvgl-use) ã€‚
 
 **ç»‘å®šå’Œæž„å»ºæ”¯æŒ**<br>
@@ -77,7 +77,7 @@ RAM å’Œ 128 KB Flashã€C ç¼–è¯‘å™¨ã€å¸§ç¼“å†�
 -  [PikaScript ç»‘å®š](https://blog.lvgl.io/2022-08-24/pikascript-and-lvgl) åœ¨ MCU ä¸Šçš„æ›´è½»æ›´ç®€å•çš„ Python ç‰ˆæœ¬
 -  æœªä½¿ç”¨è‡ªå®šä¹‰ç”Ÿæˆç³»ç»Ÿã€‚æ‚¨å¯ä»¥åœ¨æž„å»ºé¡¹ç›®çš„å…¶ä»–æ–‡ä»¶æ—¶æž„å»º LVGLã€‚
 -  æ”¯æŒå¼€ç®±å³ç”¨çš„ Make å’Œ [CMake](https://docs.lvgl.io/master/details/integration/building/cmake.html)  ç¼–è¯‘ç³»ç»Ÿã€‚
--  æ”¯æŒåœ¨ [PC ä¸Šå¼€å‘](https://docs.lvgl.io/master/integration/ide/pc-simulator.html) ï¼Œå¹¶å¯ä»¥åœ¨åµŒå…¥å¼ç¡¬ä»¶ä¸Šä½¿ç”¨ç›¸åŒçš„ UI ä»£ç ã€‚
+-  æ”¯æŒåœ¨ [PC ä¸Šå¼€å‘](https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html) ï¼Œå¹¶å¯ä»¥åœ¨åµŒå…¥å¼ç¡¬ä»¶ä¸Šä½¿ç”¨ç›¸åŒçš„ UI ä»£ç ã€‚
 -  æ”¯æŒä½¿ç”¨æˆ‘ä»¬çš„ [Emscripten ç§»æ¤](https://github.com/lvgl/lv_web_emscripten)  ä»Žè€Œå°† C å†™çš„ UI ä»£ç è½¬æ¢ä¸º HTML æ–‡ä»¶ã€‚
 
 **æ–‡æ¡£ã€å·¥å…·å’ŒæœåŠ¡**<br>
@@ -106,7 +106,7 @@ RAM å’Œ 128 KB Flashã€C ç¼–è¯‘å™¨ã€å¸§ç¼“å†�
 
 **æ”¯æŒ LVGL çš„ä¸ªäºº**<br>
 <a href="https://opencollective.com/lvgl">
-  ![Backers of LVGL](image:: https://opencollective.com/lvgl/individuals.svg?width=600)
+  ![Backers of LVGL](https://contrib.rocks/image?repo=lvgl/lvgl&max=48)
 </a>
 
 
@@ -114,13 +114,13 @@ RAM å’Œ 128 KB Flashã€C ç¼–è¯‘å™¨ã€å¸§ç¼“å†�
 
 LVGL å¯ç”¨äºŽä»¥ä¸‹å‡ ç§ï¼š
 
--  [Arduino library](https://docs.lvgl.io/master/integration/framework/arduino.html)
+-  [Arduino library](https://docs.lvgl.io/master/details/integration/framework/arduino.html)
 -  [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
--  [Zephyr library](https://docs.lvgl.io/master/integration/os/zephyr.html)
+-  [Zephyr library](https://docs.lvgl.io/master/details/integration/os/zephyr.html)
 -  [ESP-IDF(ESP32) component](https://components.espressif.com/components/lvgl/lvgl)
 -  [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
--  [NuttX library](https://docs.lvgl.io/master/integration/os/nuttx.html)
--  [RT-Thread RTOS](https://docs.lvgl.io/master/integration/os/rt-thread.html)
+-  [NuttX library](https://docs.lvgl.io/master/details/integration/os/nuttx.html)
+-  [RT-Thread RTOS](https://docs.lvgl.io/master/details/integration/os/rt-thread.html)
 -  CMSIS-Pack
 -  [RIOT OS package](https://doc.riot-os.org/group__pkg__lvgl.html#details)
 
@@ -444,26 +444,25 @@ LVGL å¯ç”¨äºŽä»¥ä¸‹å‡ ç§ï¼š
 
 **ç†Ÿæ‚‰ LVGL**
 
-1. æŸ¥çœ‹\ `åœ¨çº¿æ¼”ç¤º <https://lvgl.io/demos>`__\ ï¼Œäº†è§£ LVGL çš„å®žé™…æ“ä½œï¼ˆ3 åˆ†é’Ÿï¼‰
-2. é˜…è¯»\ `æ–‡æ¡£ <https://docs.lvgl.io/master/intro/index.html>`__\ çš„ç®€ä»‹é¡µï¼ˆ5 åˆ†é’Ÿï¼‰
-3. ç†Ÿæ‚‰\ `å¿«é€Ÿæ¦‚è§ˆ <https://docs.lvgl.io/master/intro/basics.html>`__
-   é¡µé¢ä¸Šçš„åŸºæœ¬çŸ¥è¯†ï¼ˆ15 åˆ†é’Ÿï¼‰
+1. æŸ¥çœ‹ [åœ¨çº¿æ¼”ç¤º](https://lvgl.io/demos) ï¼Œäº†è§£ LVGL çš„å®žé™…æ“ä½œï¼ˆ3 åˆ†é’Ÿï¼‰
+2. é˜…è¯» [æ–‡æ¡£](https://docs.lvgl.io/master/intro/index.html) çš„ç®€ä»‹é¡µï¼ˆ5 åˆ†é’Ÿï¼‰
+3. ç†Ÿæ‚‰ [å¿«é€Ÿæ¦‚è§ˆ](https://docs.lvgl.io/master/intro/getting_started.html) é¡µé¢ä¸Šçš„åŸºæœ¬çŸ¥è¯†ï¼ˆ15 åˆ†é’Ÿï¼‰
 
 **å¼€å§‹ä½¿ç”¨ LVGL**
 
-4. è®¾ç½®\ `æ¨¡æ‹Ÿå™¨ <https://docs.lvgl.io/master/integration/ide/pc-simulator.html#simulator>`__  ï¼ˆ10 åˆ†é’Ÿï¼‰
-5. å°è¯•ä¸€äº›\ `ç¤ºä¾‹ <https://github.com/lvgl/lvgl/tree/master/examples>`__
-6. å°†LVGLç«¯å£è¿žæŽ¥åˆ°çº¿è·¯æ¿ã€‚è¯·å‚é˜…\ `ç§»æ¤ <https://docs.lvgl.io/master/intro/add-lvgl-to-your-project/index.html>`__\ æŒ‡å—ï¼Œæˆ–æŸ¥çœ‹çŽ°æˆçš„\ `é¡¹ç›® <https://github.com/lvgl?q=lv_port_>`__
+4. è®¾ç½® [æ¨¡æ‹Ÿå™¨](https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html) ï¼ˆ10 åˆ†é’Ÿï¼‰
+5. å°è¯•ä¸€äº› [ç¤ºä¾‹](https://github.com/lvgl/lvgl/tree/master/examples)
+6. å°†LVGLç«¯å£è¿žæŽ¥åˆ°çº¿è·¯æ¿ã€‚è¯·å‚é˜… [ç§»æ¤](https://docs.lvgl.io/master/details/integration/adding-lvgl-to-your-project/index.html) æŒ‡å—ï¼Œæˆ–æŸ¥çœ‹çŽ°æˆçš„ [é¡¹ç›®](https://github.com/lvgl?q=lv_port_)
 
 **æˆä¸ºä¸“ä¸šäººå£«**
 
-7. é˜…è¯»\ `æ¦‚è¿° <https://docs.lvgl.io/master/details/main-components/index.html>`__\ é¡µé¢ä»¥æ›´å¥½åœ°äº†è§£å›¾ä¹¦é¦†ï¼ˆ2-3 å°æ—¶ï¼‰
-8. æŸ¥çœ‹\ `æŽ§ä»¶ <https://docs.lvgl.io/master/details/widgets/index.html>`__\ çš„æ–‡æ¡£ä»¥æŸ¥çœ‹å…¶åŠŸèƒ½å’Œç”¨æ³•
+7. é˜…è¯» [æ¦‚è¿°](https://docs.lvgl.io/master/details/main-modules/index.html) é¡µé¢ä»¥æ›´å¥½åœ°äº†è§£å›¾ä¹¦é¦†ï¼ˆ2-3 å°æ—¶ï¼‰
+8. æŸ¥çœ‹ [æŽ§ä»¶](https://docs.lvgl.io/master/details/widgets/index.html) çš„æ–‡æ¡£ä»¥æŸ¥çœ‹å…¶åŠŸèƒ½å’Œç”¨æ³•
 
 **èŽ·å¾—å¸®åŠ©å¹¶å¸®åŠ©ä»–äºº**
 
-9.  å¦‚æžœæ‚¨æœ‰é—®é¢˜ï¼Œè¯·è®¿é—®\ `è®ºå› <http://forum.lvgl.io/>`__
-10. é˜…è¯»\ `è´¡çŒ® <https://docs.lvgl.io/master/CONTRIBUTING.html>`__\ æŒ‡å—ï¼Œäº†è§£å¦‚ä½•å¸®åŠ©æé«˜ LVGLï¼ˆ15 åˆ†é’Ÿï¼‰
+9.  å¦‚æžœæ‚¨æœ‰é—®é¢˜ï¼Œè¯·è®¿é—® [è®ºå›](http://forum.lvgl.io/)
+10. é˜…è¯» [è´¡çŒ®](https://docs.lvgl.io/master/contributing/index.html) æŒ‡å—ï¼Œäº†è§£å¦‚ä½•å¸®åŠ©æé«˜ LVGLï¼ˆ15 åˆ†é’Ÿï¼‰
 
 
 ## :handshake: ðŸ¤ æœåŠ¡
@@ -488,7 +487,7 @@ LVGL å¯ç”¨äºŽä»¥ä¸‹å‡ ç§ï¼š
 
 LVGL æ˜¯ä¸€ä¸ªå¼€æ”¾çš„é¡¹ç›®ï¼Œæˆ‘ä»¬éžå¸¸æ¬¢è¿Žæ‚¨çš„è´¡çŒ®ã€‚æœ‰å¾ˆå¤šæ–¹æ³•å¯ä»¥å¸®åŠ©æ‚¨ï¼Œä»Žç®€å•åœ°è°ˆè®ºæ‚¨çš„é¡¹ç›®ï¼Œåˆ°ç¼–å†™ç¤ºä¾‹ã€æ”¹è¿›æ–‡æ¡£ã€ä¿®å¤é”™è¯¯ï¼Œç”šè‡³åœ¨ LVGL ç»„ç»‡ä¸‹æ‰˜ç®¡æ‚¨è‡ªå·±çš„é¡¹ç›®ã€‚
 
-æœ‰å…³è´¡çŒ®çš„è¯¦ç»†è¯´æ˜Žï¼Œè¯·è®¿é—®æ–‡ä»¶çš„ [è´¡çŒ®](https://docs.lvgl.io/master/CONTRIBUTING.html) éƒ¨åˆ†ã€‚
+æœ‰å…³è´¡çŒ®çš„è¯¦ç»†è¯´æ˜Žï¼Œè¯·è®¿é—®æ–‡ä»¶çš„ [è´¡çŒ®](https://docs.lvgl.io/master/contributing/index.html) éƒ¨åˆ†ã€‚
 
 å·²ç»æœ‰ 300 å¤šäººåœ¨ LVGL ç•™ä¸‹äº†ç—•è¿¹ã€‚æœŸå¾…ä½ æˆä¸ºä»–ä»¬ä¸­çš„ä¸€å‘˜ï¼å¹¶åœ¨ä¸‹åˆ—è´¡çŒ®è€…ä¸­çœ‹åˆ°ä½ ï¼ ðŸ™‚
 :slightly_smiling_face:
