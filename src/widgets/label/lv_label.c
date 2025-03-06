@@ -848,7 +848,12 @@ static void draw_main(lv_event_t * e)
         lv_text_get_size(&size, label->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
                          LV_COORD_MAX, flag);
         if(size.x > lv_area_get_width(&txt_coords)) {
+#if LV_USE_BIDI
+            const lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
+            label_draw_dsc.align = base_dir == LV_BASE_DIR_RTL ? LV_TEXT_ALIGN_RIGHT : LV_TEXT_ALIGN_LEFT;
+#else
             label_draw_dsc.align = LV_TEXT_ALIGN_LEFT;
+#endif
         }
     }
 
