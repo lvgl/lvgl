@@ -182,7 +182,10 @@ static void _vglite_draw_border(vglite_draw_task_t * vglite_task, const lv_area_
     vg_lite_join_style_t join_style = (radius) ? VG_LITE_JOIN_ROUND : VG_LITE_JOIN_MITER;
 
     /*** Init path ***/
-    int32_t path_data[RECT_PATH_DATA_MAX_SIZE] = {0};
+    int32_t * path_data = lv_malloc_zeroed(RECT_PATH_DATA_MAX_SIZE * sizeof(int32_t));
+    LV_ASSERT(path_data != NULL);
+    vglite_task->path_data = path_data;
+
     uint32_t path_data_size;
     vglite_create_rect_path_data(path_data, &path_data_size, radius, coords);
     vg_lite_quality_t path_quality = radius > 0 ? VG_LITE_HIGH : VG_LITE_MEDIUM;

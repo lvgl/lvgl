@@ -383,7 +383,10 @@ static void _vglite_draw_pattern(vglite_draw_task_t * vglite_task, const lv_area
     vg_lite_buffer_t * dest_buf = vglite_get_dest_buf();
 
     /* Path to draw */
-    int32_t path_data[RECT_PATH_DATA_MAX_SIZE] = {0};
+    int32_t * path_data = lv_malloc_zeroed(RECT_PATH_DATA_MAX_SIZE * sizeof(int32_t));
+    LV_ASSERT(path_data != NULL);
+    vglite_task->path_data = path_data;
+
     uint32_t path_data_size;
     vglite_create_rect_path_data(path_data, &path_data_size, dsc->clip_radius, coords);
     vg_lite_quality_t path_quality = VG_LITE_MEDIUM;
