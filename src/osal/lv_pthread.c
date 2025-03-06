@@ -87,8 +87,12 @@ lv_result_t lv_mutex_init(lv_mutex_t * mutex)
     }
 }
 
+static uint32_t cnt = 0;
+
 lv_result_t lv_mutex_lock(lv_mutex_t * mutex)
 {
+    //  cnt++;
+    //  if(cnt % 1000 == 0) printf("%d\n", cnt);
     int ret = pthread_mutex_lock(mutex);
     if(ret) {
         LV_LOG_WARN("Error: %d", ret);
@@ -139,6 +143,9 @@ lv_result_t lv_thread_sync_init(lv_thread_sync_t * sync)
 
 lv_result_t lv_thread_sync_wait(lv_thread_sync_t * sync)
 {
+
+    cnt++;
+    if(cnt % 1000 == 0) printf("%d\n", cnt);
     pthread_mutex_lock(&sync->mutex);
     while(!sync->v) {
         pthread_cond_wait(&sync->cond, &sync->mutex);
