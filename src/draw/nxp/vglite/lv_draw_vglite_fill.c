@@ -101,6 +101,29 @@ void lv_draw_vglite_fill(vglite_draw_task_t * vglite_task)
  *   STATIC FUNCTIONS
  **********************/
 
+static uint32_t _vglite_set_rectangle(uint32_t * path_data, uint32_t * path_data_size, const lv_area_t * dest_area)
+{
+    uint32_t pidx = 0;
+    path_data[pidx++] = VLC_OP_MOVE;
+    path_data[pidx++] = dest_area->x1;
+    path_data[pidx++] = dest_area->y1;
+    path_data[pidx++] = VLC_OP_LINE;
+    path_data[pidx++] = dest_area->x2 + 1;
+    path_data[pidx++] = dest_area->y1;
+    path_data[pidx++] = VLC_OP_LINE;
+    path_data[pidx++] = dest_area->x2 + 1;
+    path_data[pidx++] = dest_area->y2 + 1;
+    path_data[pidx++] = VLC_OP_LINE;
+    path_data[pidx++] = dest_area->x1;
+    path_data[pidx++] = dest_area->y2 + 1;
+    path_data[pidx++] = VLC_OP_LINE;
+    path_data[pidx++] = dest_area->x1;
+    path_data[pidx++] = dest_area->y1;
+    path_data[pidx] = VLC_OP_END;
+
+    *path_data_size = pidx * sizeof(int32_t);
+}
+
 static void _vglite_fill(vglite_draw_task_t * vglite_task, const lv_area_t * dest_area,
                          const lv_draw_fill_dsc_t * dsc)
 {
@@ -126,16 +149,14 @@ static void _vglite_fill(vglite_draw_task_t * vglite_task, const lv_area_t * des
         vg_lite_path_t * path = lv_malloc_zeroed(sizeof(vg_lite_path_t));
         LV_ASSERT(path != NULL);
         vglite_task->path = path;
-        int32_t path_data[] = { /*VG rectangular path*/
-            VLC_OP_MOVE, dest_area->x1,  dest_area->y1,
-            VLC_OP_LINE, dest_area->x2 + 1,  dest_area->y1,
-            VLC_OP_LINE, dest_area->x2 + 1,  dest_area->y2 + 1,
-            VLC_OP_LINE, dest_area->x1,  dest_area->y2 + 1,
-            VLC_OP_LINE, dest_area->x1,  dest_area->y1,
-            VLC_OP_END
-        };
 
-        VGLITE_CHECK_ERROR(vg_lite_init_path(path, VG_LITE_S32, VG_LITE_MEDIUM, sizeof(path_data), path_data,
+        uint32_t path_data_size;
+        int32_t * path_data = lv_malloc_zeroed(16 * sizeof(int32_t));
+        LV_ASSERT(path_data != NULL);
+        vglite_task->path_data = path_data;
+        _vglite_set_rectangle(path_data, &path_data_size, dest_area);
+
+        VGLITE_CHECK_ERROR(vg_lite_init_path(path, VG_LITE_S32, VG_LITE_MEDIUM, path_data_size, path_data,
                                              (vg_lite_float_t) dest_area->x1, (vg_lite_float_t) dest_area->y1,
                                              ((vg_lite_float_t) dest_area->x2) + 1.0f, ((vg_lite_float_t) dest_area->y2) + 1.0f));
 
@@ -159,7 +180,10 @@ static void _vglite_draw_rect(vglite_draw_task_t * vglite_task, const lv_area_t 
         return;
 
     /*** Init path ***/
-    int32_t path_data[RECT_PATH_DATA_MAX_SIZE] = {0};
+    int32_t * path_data = lv_malloc_zeroed(RECT_PATH_DATA_MAX_SIZE * sizeof(int32_t));
+    LV_ASSERT(path_data != NULL);
+    vglite_task->path_data = path_data;
+
     uint32_t path_data_size;
     vglite_create_rect_path_data(path_data, &path_data_size, radius, coords);
     vg_lite_quality_t path_quality = dsc->radius > 0 ? VG_LITE_HIGH : VG_LITE_MEDIUM;
