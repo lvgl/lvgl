@@ -129,8 +129,6 @@ LVGL está disponível para:
 
 Veja como criar um botão com um evento de clique em C e MicroPython. Para mais exemplos, veja a pasta [examples](https://github.com/lvgl/lvgl/tree/master/examples).
 
-![LVGL button with label example](https://github.com/lvgl/lvgl/raw/master/docs/misc/btn_example.png)
-
 ### Botão com evento de clique
 
 ![Botão LVGL com exemplo de rótulo (label)](https://github.com/kisvegabor/test/raw/master/readme_example_2.gif)
