@@ -341,7 +341,7 @@ def read_as_xml(d):
         return None
 
 
-def load_xml_as_etree(fle):
+def load_xml_etree(fle):
     fle = os.path.join(xml_path, fle + '.xml')
 
     with open(fle, 'rb') as f:
@@ -447,7 +447,7 @@ class STRUCT(object):
             self.line_no = None
 
         if parent and refid:
-            root = load_xml_as_etree(refid)
+            root = load_xml_etree(refid)
 
             for compounddef in root:
                 if compounddef.attrib['id'] != self.refid:
@@ -579,7 +579,7 @@ class VARIABLE(object):
             self.line_no = None
 
         if parent is not None:
-            root = load_xml_as_etree(parent.refid)
+            root = load_xml_etree(parent.refid)
 
             for compounddef in root:
                 if compounddef.attrib['id'] != parent.refid:
@@ -746,7 +746,7 @@ class FUNCTION(object):
             self.void_return = False
 
         if parent is not None:
-            root = load_xml_as_etree(parent.refid)
+            root = load_xml_etree(parent.refid)
 
             for compounddef in root:
                 if compounddef.attrib['id'] != parent.refid:
@@ -987,7 +987,7 @@ class ENUM(object):
             self.line_no = None
 
         if parent is not None:
-            root = load_xml_as_etree(parent.refid)
+            root = load_xml_etree(parent.refid)
 
             for compounddef in root:
                 if compounddef.attrib['id'] != parent.refid:
@@ -1124,7 +1124,7 @@ class DEFINE(object):
             self.initializer = None
 
         if parent is not None:
-            root = load_xml_as_etree(parent.refid)
+            root = load_xml_etree(parent.refid)
             memberdef = []
 
             for compounddef in root:
@@ -1210,7 +1210,7 @@ class TYPEDEF(object):
             self.line_no = None
 
         if parent is not None:
-            root = load_xml_as_etree(parent.refid)
+            root = load_xml_etree(parent.refid)
 
             for compounddef in root:
                 if compounddef.attrib['id'] != parent.refid:
@@ -1333,7 +1333,7 @@ class DoxygenXml(object):
     `global` statements.
     """
 
-    def __init__(self, lvgl_src_dir, intermediate_dir, doxyfile_src_file, silent_mode=False):
+    def __init__(self, lvgl_src_dir, intermediate_dir, doxyfile_src_file, silent_mode=False, doxy_tagfile=''):
         """
         - Prepare and run Doxygen, generating XML output.
         - Load that XML output, and use it to populate
@@ -1393,18 +1393,22 @@ class DoxygenXml(object):
         cfg.set('GENERATE_HTML', 'NO')
         cfg.set('HTML_OUTPUT', 'doxygen_html')
         cfg.set('PREDEFINED', f'DOXYGEN LV_CONF_PATH="{lv_conf_file}"')
+        cfg.set('QUIET', 'NO')
         cfg.set('GENERATE_DOCSET', 'NO')
         cfg.set('GENERATE_HTMLHELP', 'NO')
         cfg.set('GENERATE_CHI', 'NO')
         cfg.set('GENERATE_QHP', 'NO')
         cfg.set('GENERATE_ECLIPSEHELP', 'NO')
-        cfg.set('GENERATE_', 'NO')
         cfg.set('GENERATE_LATEX', 'NO')
         cfg.set('GENERATE_RTF', 'NO')
         cfg.set('GENERATE_MAN', 'NO')
-        cfg.set('GENERATE_XML', 'NO')
         cfg.set('GENERATE_DOCBOOK', 'NO')
         cfg.set('GENERATE_PERLMOD', 'NO')
+
+        # Include TAGFILES if requested.
+        if len(doxy_tagfile) > 0:
+            cfg.set('GENERATE_TAGFILE', doxy_tagfile)
+
         # 3. Store it into intermediate directory.
         cfg.save(doxyfile_dst_file)
 
@@ -1414,7 +1418,7 @@ class DoxygenXml(object):
         # -----------------------------------------------------------------
         # Load root of Doxygen output (index.xml) as an `xml.etree.ElementTree`.
         # -----------------------------------------------------------------
-        self.index_xml_etree = load_xml_as_etree('index')
+        self.index_xml_etree = load_xml_etree('index')
 
         # Populate these dictionaries.
         #     Keys  :  C-code-element names (str) found by Doxygen.
