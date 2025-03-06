@@ -33,6 +33,8 @@
 #include "parsers/lv_xml_scale_parser.h"
 #include "parsers/lv_xml_buttonmatrix_parser.h"
 #include "parsers/lv_xml_spangroup_parser.h"
+#include "parsers/lv_xml_textarea_parser.h"
+#include "parsers/lv_xml_keyboard_parser.h"
 #include "parsers/lv_xml_event_parser.h"
 #include "../../libs/expat/expat.h"
 #include "../../draw/lv_draw_image.h"
@@ -54,9 +56,6 @@ static void view_end_element_handler(void * user_data, const char * name);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_ll_t font_ll;
-static lv_ll_t image_ll;
-static lv_ll_t event_cb_ll;
 
 /**********************
  *      MACROS
@@ -68,13 +67,9 @@ static lv_ll_t event_cb_ll;
 
 void lv_xml_init(void)
 {
-    lv_ll_init(&font_ll, sizeof(lv_xml_font_t));
-    lv_ll_init(&image_ll, sizeof(lv_xml_image_t));
-    lv_ll_init(&event_cb_ll, sizeof(lv_xml_event_cb_t));
-
-    lv_xml_register_font("lv_font_default", lv_font_default);
-
     lv_xml_component_init();
+
+    lv_xml_register_font(NULL, "lv_font_default", lv_font_default);
 
     lv_xml_widget_register("lv_obj", lv_xml_obj_create, lv_xml_obj_apply);
     lv_xml_widget_register("lv_button", lv_xml_button_create, lv_xml_button_apply);
@@ -100,6 +95,8 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_spangroup", lv_xml_spangroup_create, lv_xml_spangroup_apply);
     lv_xml_widget_register("lv_spangroup-span", lv_xml_spangroup_span_create, lv_xml_spangroup_span_apply);
     lv_xml_widget_register("lv_buttonmatrix", lv_xml_buttonmatrix_create, lv_xml_buttonmatrix_apply);
+    lv_xml_widget_register("lv_textarea", lv_xml_textarea_create, lv_xml_textarea_apply);
+    lv_xml_widget_register("lv_keyboard", lv_xml_keyboard_create, lv_xml_keyboard_apply);
 
     lv_xml_widget_register("lv_event-call_function", lv_xml_event_call_function_create, lv_xml_event_call_function_apply);
 }
@@ -153,6 +150,7 @@ void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs)
         lv_xml_parser_state_t state;
         lv_xml_parser_state_init(&state);
         state.parent = parent;
+        state.ctx.name = "";
         state.item = p->create_cb(&state, attrs);
         if(attrs) {
             p->apply_cb(&state, attrs);
@@ -172,29 +170,137 @@ void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs)
 }
 
 
-lv_result_t lv_xml_register_font(const char * name, const lv_font_t * font)
+lv_result_t lv_xml_register_font(lv_xml_component_ctx_t * ctx, const char * name, const lv_font_t * font)
 {
-    lv_xml_font_t * f = lv_ll_ins_head(&font_ll);
+    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
+    if(ctx == NULL) {
+        LV_LOG_WARN("No component found to register font `%s`", name);
+        return LV_RESULT_INVALID;
+    }
+
+    lv_xml_font_t * f = lv_ll_ins_head(&ctx->font_ll);
     f->name = lv_strdup(name);
     f->font = font;
 
     return LV_RESULT_OK;
 }
 
-const lv_font_t * lv_xml_get_font(const char * name)
+const lv_font_t * lv_xml_get_font(lv_xml_component_ctx_t * ctx, const char * name)
 {
     lv_xml_font_t * f;
-    LV_LL_READ(&font_ll, f) {
-        if(lv_streq(f->name, name)) return f->font;
+    if(ctx) {
+        LV_LL_READ(&ctx->font_ll, f) {
+            if(lv_streq(f->name, name)) return f->font;
+        }
+    }
+
+    /*If not found in the component check the global space*/
+    if(!lv_streq(ctx->name, "globals")) {
+        ctx = lv_xml_component_get_ctx("globals");
+        if(ctx) {
+            LV_LL_READ(&ctx->font_ll, f) {
+                if(lv_streq(f->name, name)) return f->font;
+            }
+        }
     }
 
     LV_LOG_WARN("No font was found with name \"%s\". Using LV_FONT_DEFAULT instead.", name);
-    return LV_FONT_DEFAULT;
+    return lv_font_get_default();
 }
 
-lv_result_t lv_xml_register_image(const char * name, const void * src)
+lv_result_t lv_xml_register_subject(lv_xml_component_ctx_t * ctx, const char * name, lv_subject_t * subject)
 {
-    lv_xml_image_t * img = lv_ll_ins_head(&image_ll);
+    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
+    if(ctx == NULL) {
+        LV_LOG_WARN("No component found to register subject `%s`", name);
+        return LV_RESULT_INVALID;
+    }
+
+    lv_xml_subject_t * s = lv_ll_ins_head(&ctx->subjects_ll);
+    s->name = lv_strdup(name);
+    s->subject = subject;
+
+    return LV_RESULT_OK;
+}
+
+lv_subject_t * lv_xml_get_subject(lv_xml_component_ctx_t * ctx, const char * name)
+{
+    lv_xml_subject_t * s;
+    if(ctx) {
+        LV_LL_READ(&ctx->subjects_ll, s) {
+            if(lv_streq(s->name, name)) return s->subject;
+        }
+    }
+
+    /*If not found in the component check the global space*/
+    if(!lv_streq(ctx->name, "globals")) {
+        ctx = lv_xml_component_get_ctx("globals");
+        if(ctx) {
+            LV_LL_READ(&ctx->subjects_ll, s) {
+                if(lv_streq(s->name, name)) return s->subject;
+            }
+        }
+    }
+
+    LV_LOG_WARN("No subject was found with name \"%s\".", name);
+    return NULL;
+}
+
+lv_result_t lv_xml_register_const(lv_xml_component_ctx_t * ctx, const char * name, const char * value)
+{
+    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
+    if(ctx == NULL) {
+        LV_LOG_WARN("No component found to register constant `%s`", name);
+        return LV_RESULT_INVALID;
+    }
+
+    lv_xml_const_t * cnst;
+    cnst = lv_ll_ins_head(&ctx->const_ll);
+
+    cnst->name = lv_strdup(name);
+    cnst->value = lv_strdup(value);
+
+    return LV_RESULT_OK;
+}
+
+const char * lv_xml_get_const(lv_xml_component_ctx_t * ctx, const char * name)
+{
+
+    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
+    if(ctx == NULL) return LV_RESULT_INVALID;
+
+    lv_xml_const_t * cnst;
+    if(ctx) {
+        LV_LL_READ(&ctx->const_ll, cnst) {
+            if(lv_streq(cnst->name, name)) return cnst->value;
+        }
+    }
+
+    /*If not found in the component check the global space*/
+    if(!lv_streq(ctx->name, "globals")) {
+        ctx = lv_xml_component_get_ctx("globals");
+        if(ctx) {
+            LV_LL_READ(&ctx->const_ll, cnst) {
+                if(lv_streq(cnst->name, name)) return cnst->value;
+            }
+        }
+    }
+
+
+    LV_LOG_WARN("No constant was found with name \"%s\".", name);
+    return NULL;
+}
+
+
+lv_result_t lv_xml_register_image(lv_xml_component_ctx_t * ctx, const char * name, const void * src)
+{
+    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
+    if(ctx == NULL) {
+        LV_LOG_WARN("No component found to register image `%s`", name);
+        return LV_RESULT_INVALID;
+    }
+
+    lv_xml_image_t * img = lv_ll_ins_head(&ctx->image_ll);
     img->name = lv_strdup(name);
     if(lv_image_src_get_type(src) == LV_IMAGE_SRC_FILE) {
         img->src = lv_strdup(src);
@@ -206,20 +312,41 @@ lv_result_t lv_xml_register_image(const char * name, const void * src)
     return LV_RESULT_OK;
 }
 
-const void * lv_xml_get_image(const char * name)
+const void * lv_xml_get_image(lv_xml_component_ctx_t * ctx, const char * name)
 {
+    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
+    if(ctx == NULL) return LV_RESULT_INVALID;
+
     lv_xml_image_t * img;
-    LV_LL_READ(&image_ll, img) {
-        if(lv_streq(img->name, name)) return img->src;
+    if(ctx) {
+        LV_LL_READ(&ctx->image_ll, img) {
+            if(lv_streq(img->name, name)) return img->src;
+        }
+    }
+
+    /*If not found in the component check the global space*/
+    if(!lv_streq(ctx->name, "globals")) {
+        ctx = lv_xml_component_get_ctx("globals");
+        if(ctx) {
+            LV_LL_READ(&ctx->image_ll, img) {
+                if(lv_streq(img->name, name)) return img->src;
+            }
+        }
     }
 
     LV_LOG_WARN("No image was found with name \"%s\"", name);
     return NULL;
 }
 
-lv_result_t lv_xml_register_event_cb(const char * name, lv_event_cb_t cb)
+lv_result_t lv_xml_register_event_cb(lv_xml_component_ctx_t * ctx, const char * name, lv_event_cb_t cb)
 {
-    lv_xml_event_cb_t * e = lv_ll_ins_head(&event_cb_ll);
+    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
+    if(ctx == NULL) {
+        LV_LOG_WARN("No component found to register event `%s`", name);
+        return LV_RESULT_INVALID;
+    }
+
+    lv_xml_event_cb_t * e = lv_ll_ins_head(&ctx->event_ll);
     e->name = lv_strdup(name);
     e->cb = cb;
 
@@ -227,14 +354,29 @@ lv_result_t lv_xml_register_event_cb(const char * name, lv_event_cb_t cb)
 }
 
 
-lv_event_cb_t lv_xml_get_event_cb(const char * name)
+lv_event_cb_t lv_xml_get_event_cb(lv_xml_component_ctx_t * ctx, const char * name)
 {
+    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
+    if(ctx == NULL) return LV_RESULT_INVALID;
+
     lv_xml_event_cb_t * e;
-    LV_LL_READ(&event_cb_ll, e) {
-        if(lv_streq(e->name, name)) return e->cb;
+    if(ctx) {
+        LV_LL_READ(&ctx->event_ll, e) {
+            if(lv_streq(e->name, name)) return e->cb;
+        }
     }
 
-    LV_LOG_WARN("No event_cb was found with name \"%s\"", name);
+    /*If not found in the component check the global space*/
+    if(!lv_streq(ctx->name, "globals")) {
+        ctx = lv_xml_component_get_ctx("globals");
+        if(ctx) {
+            LV_LL_READ(&ctx->event_ll, e) {
+                if(lv_streq(e->name, name)) return e->cb;
+            }
+        }
+    }
+
+    LV_LOG_WARN("No event was found with name \"%s\"", name);
     return NULL;
 }
 
@@ -315,16 +457,12 @@ static void resolve_consts(const char ** item_attrs, lv_xml_component_ctx_t * ct
         if(value[0] == '#') {
             const char * value_clean = &value[1];
 
-            lv_xml_const_t * c;
-            LV_LL_READ(&ctx->const_ll, c) {
-                if(lv_streq(c->name, value_clean)) {
-                    item_attrs[i + 1] = c->value;
-                    break;
-                }
+            const char * const_value = lv_xml_get_const(ctx, value_clean);
+            if(const_value) {
+                item_attrs[i + 1] = const_value;
             }
-
             /*If the const attribute is not provide don't set it*/
-            if(c == NULL) {
+            else {
                 item_attrs[i] = "";
                 item_attrs[i + 1] = "";
             }
