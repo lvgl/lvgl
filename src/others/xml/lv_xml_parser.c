@@ -42,11 +42,8 @@
 void lv_xml_parser_state_init(lv_xml_parser_state_t * state)
 {
     lv_memzero(state, sizeof(lv_xml_parser_state_t));
-    lv_ll_init(&state->ctx.style_ll, sizeof(lv_xml_style_t));
-    lv_ll_init(&state->ctx.const_ll, sizeof(lv_xml_const_t));
-    lv_ll_init(&state->ctx.param_ll, sizeof(lv_xml_param_t));
-    lv_ll_init(&state->ctx.gradient_ll, sizeof(lv_xml_grad_t));
     lv_ll_init(&state->parent_ll, sizeof(lv_obj_t *));
+    lv_xml_component_ctx_init(&state->ctx);
 }
 
 void lv_xml_parser_start_section(lv_xml_parser_state_t * state, const char * name)
@@ -70,6 +67,10 @@ void lv_xml_parser_start_section(lv_xml_parser_state_t * state, const char * nam
     }
     else if(lv_streq(name, "styles")) {
         state->section = LV_XML_PARSER_SECTION_STYLES;
+        return;
+    }
+    else if(lv_streq(name, "subjects")) {
+        state->section = LV_XML_PARSER_SECTION_SUBJECTS;
         return;
     }
     else if(lv_streq(name, "view")) {
