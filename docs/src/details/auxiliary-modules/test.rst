@@ -1,8 +1,8 @@
 .. _test:
 
-====
-Test
-====
+==========
+UI Testing
+==========
 
 Overview
 ********
@@ -121,7 +121,7 @@ Please refer to ``lv_test_indev.h`` for the list of supported input device emula
 Screenshot Comparison
 ---------------------
 
-:cpp:expr:`bool lv_test_screenshot_compare(const char * fn_ref)` is a useful function
+``bool lv_test_screenshot_compare(const char * fn_ref)`` is a useful function
 to compare the content of the emulated display with reference PNG images.
 
 The screenshot comparison uses `libpng`, so it needs to be linked to LVGL when this feature is required.
