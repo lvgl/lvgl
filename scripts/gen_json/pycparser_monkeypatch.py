@@ -620,8 +620,10 @@ class FileAST(c_ast.FileAST):
             #   = doxygen_xml.groups      dictionary of doxygen_xml.GROUP objects
             #   = doxygen_xml.files       dictionary of doxygen_xml.FILE objects
             #   = doxygen_xml.classes     dictionary of doxygen_xml.CLASS objects
-            doxygen_xml = doxygen_xml.DoxygenXml(
-                lvgl_src_dir, intermediate_dir, doxyfile_src_file, silent)
+            doxygen_xml = doxygen_xml.DoxygenXml(lvgl_src_dir,
+                                                 intermediate_dir,
+                                                 doxyfile_src_file,
+                                                 silent_mode=True)
 
             get_enum_item_docs = doxygen_xml.get_enum_item
             get_enum_docs = doxygen_xml.get_enum

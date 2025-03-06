@@ -44,11 +44,11 @@ It uses all the other classes, and is used by:
 
 Each <compound> element has a 'kind' attribute that is one of the following:
 
-    - dir        (unused)
-    - file
-    - page       (unused)
     - struct
     - union
+    - file
+    - page       (unused)
+    - dir        (unused)
 
 The contents of the <member> elements differ based on the "kind" of
 <compound> element they are contained by.
@@ -82,7 +82,22 @@ kind="dir"
 
 kind="file"
 
-    - <member> sub-elements represent C
+    - <member> sub-elements can have `kind` attributes:
+        - define
+        - enum
+            - enumvalue has refid that begins with containing enum's refid
+        - variable
+        - function
+        - typedef
+
+
+kind="page"
+kind="struct"
+
+    - <member> sub-elements can have `kind` attributes:
+        - variable
+
+kind="union"
 
     - define
     - dir        (unused)
@@ -182,11 +197,6 @@ Additional dictionaries:
     'files': {'lv_global.h': <doxygen_xml.FILE object at 0x000001FB5D864E00>,
               'lv_group.h': <doxygen_xml.FILE object at 0x000001FB5D1EFD40>,
               'lv_group_private.h': <doxygen_xml.FILE object at 0x000001FB5D0D7DD0>,...}
-
-    'html_files': {'lvgl': 'lvgl.html',
-                   'lv_api_map_v8': 'lv_api_map_v8.html',
-                   'lv_api_map_v9_0': 'lv_api_map_v9_0.html',
-                   'lv_api_map_v9_1': 'lv_api_map_v9_1.html',...}
 
 """
 import os
@@ -1333,7 +1343,12 @@ class DoxygenXml(object):
     `global` statements.
     """
 
-    def __init__(self, lvgl_src_dir, intermediate_dir, doxyfile_src_file, silent_mode=False, doxy_tagfile=''):
+    def __init__(self,
+                 lvgl_src_dir: str,
+                 intermediate_dir: str,
+                 doxyfile_src_file: str,
+                 silent_mode=False,
+                 doxy_tagfile=''):
         """
         - Prepare and run Doxygen, generating XML output.
         - Load that XML output, and use it to populate
@@ -1376,6 +1391,7 @@ class DoxygenXml(object):
         groups.clear()
         files.clear()
         classes.clear()
+        unions.clear()
 
         # -----------------------------------------------------------------
         # Prep and run Doxygen

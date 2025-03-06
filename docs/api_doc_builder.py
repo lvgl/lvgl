@@ -4,6 +4,13 @@ Uses DoxygenXml class in doxygen_xml.py to make available:
 
 - Doxygen output, and
 - Doxygen-documented symbols from the C code.
+
+Example 'html_files'content:
+{'lvgl': 'lvgl.html',
+ 'lv_api_map_v8': 'lv_api_map_v8.html',
+ 'lv_api_map_v9_0': 'lv_api_map_v9_0.html',
+ 'lv_api_map_v9_1': 'lv_api_map_v9_1.html',...}
+
 """
 import os
 import doxygen_xml
@@ -14,7 +21,11 @@ EMIT_WARNINGS = True
 section_line_char = '='
 
 
-def _create_rst_files_for_dir(src_root_dir_len: int, src_dir_bep, h_files: [str], sub_dirs_w_h_files: [str], out_root_dir: str):
+def _create_rst_files_for_dir(src_root_dir_len: int,
+                              src_dir_bep: str,
+                              eligible_h_files: [str],
+                              sub_dirs_w_h_files: [str],
+                              out_root_dir: str):
     """
     - Generate an `index.rst` file and add the header to it.
     - Create one `.rst` file for each `.h` file in `h_files` list.
@@ -24,8 +35,8 @@ def _create_rst_files_for_dir(src_root_dir_len: int, src_dir_bep, h_files: [str]
 
     :param src_root_dir_len:    Length of source-root path string, used with `out_root_dir` to build paths
     :param src_dir_bep:         directory currently *being processed*
-    :param h_files:             eligible `.h` files directly contained in `src_dir_bep`
-    :param sub_dirs_w_h_files:  list of subdirectories that contained eligible `.h` files
+    :param eligible_h_files:    eligible `.h` files directly contained in `src_dir_bep`
+    :param sub_dirs_w_h_files:  list of subdirs that contained eligible `.h` files
     :param out_root_dir:        root of output directory, used with to build paths.
     :return:                    n/a
     """
@@ -52,10 +63,11 @@ def _create_rst_files_for_dir(src_root_dir_len: int, src_dir_bep, h_files: [str]
         f.write(section_line)
         f.write(subdir_stem + '\n')
         f.write(section_line)
-        f.write('\n')
+        # TODO: reduce below to 1 newline after testing.
+        f.write('\n\n')
         f.write('.. toctree::\n    :maxdepth: 2\n\n')
 
-        for h_file in h_files:
+        for h_file in eligible_h_files:
             filename = os.path.basename(h_file)
             stem = os.path.splitext(filename)[0]
             f.write(indent + stem + '\n')
@@ -64,8 +76,11 @@ def _create_rst_files_for_dir(src_root_dir_len: int, src_dir_bep, h_files: [str]
             stem = os.path.split(sub_dir)[-1]
             f.write(indent + stem + '/index\n')
 
+        # TODO: remove below after testing.
+        f.write('\n')
+
     # One .rst file per h_file
-    for h_file in h_files:
+    for h_file in eligible_h_files:
         filename = os.path.basename(h_file)
         stem = os.path.splitext(filename)[0]
         rst_file = os.path.join(out_dir, stem + '.rst')
@@ -78,26 +93,43 @@ def _create_rst_files_for_dir(src_root_dir_len: int, src_dir_bep, h_files: [str]
             f.write(section_line)
             f.write(filename + '\n')
             f.write(section_line)
-            f.write('\n')
+            # TODO: reduce below to 1 newline after testing.
+            f.write('\n\n')
             f.write(f'.. doxygenfile:: {filename}\n')
             f.write('    :project: lvgl\n\n')
 
 
-def _recursively_create_api_rst_files(depth: int, src_root_len: int, src_dir_bep: str, out_root_dir: str) -> int:
+def _recursively_create_api_rst_files(depth: int,
+                                      src_root_len: int,
+                                      src_dir_bep: str,
+                                      out_root_dir: str) -> int:
     """
+    Create `.rst` files for `src_dir_bep` directory and recursively
+    for subdirectories below it.
+
+    Eligible
+        An `.h` file is eligible if Doxygen generated documentation for it.
+        The `EXCLUDE_PATTERNS` Doxygen configuration value can cause
+        Doxygen to skip certain files and directories, in which case,
+        the `.h` files skipped ARE NOT eligible.
+
     Whether a subdirectory is eligible to be included in an `index.rst`
     file depends upon whether any eligible `.h` files were recursively
     found within it.  And that isn't known until this function finishes
-    processing a directory and returns the number of `.h` files found.
-    Thus, the steps taken within are:
+    processing a directory and returns the number of eligible `.h` files
+    found.  Thus, the steps taken within are:
 
     - Discover all eligible `.h` files directly contained in `src_dir_bep`.
     - Recursively do the same for each subdirectory, adding the returned
-      count of `.h` files to the sum (`h_file_count`).
+      count of eligible `.h` files to the sum (`h_file_count`).
     - If `h_file_count > 0`:
         - call _create_rst_files_for_dir() to generate appropriate
           `.rst` files for this directory.
     - Return `h_file_count`.
+
+    Once we have accumulated this information, then we can generate
+    all the `.rst` files for the current directory without any further
+    directory-tree walking.
 
     :param depth:         Only used for testing/debugging
     :param src_root_len:  Length of source-root path
@@ -109,13 +141,13 @@ def _recursively_create_api_rst_files(depth: int, src_root_len: int, src_dir_bep
                           to know whether it should be included at the
                           higher level `index.rst`.
     """
-    h_files = []
+    eligible_h_files = []
     sub_dirs = []
-    sub_dirs_w_h_files = []
+    sub_dirs_w_eligible_h_files = []
     h_file_count = 0
 
     # For each "thing" found in `src_dir_bep`, build lists:
-    # `sub_dirs_w_h_files` and `h_files`.
+    # `sub_dirs_w_eligible_h_files` and `eligible_h_files`.
     for dir_item in os.listdir(src_dir_bep):
         if 'private' not in dir_item:
             path_bep = os.path.join(src_dir_bep, dir_item)
@@ -125,20 +157,24 @@ def _recursively_create_api_rst_files(depth: int, src_root_len: int, src_dir_bep
                 if dir_item.lower().endswith('.h'):
                     eligible = (dir_item in doxygen_xml.files)
                     if eligible:
-                        h_files.append(path_bep)  # Add to .H file list.
+                        eligible_h_files.append(path_bep)  # Add to .H file list.
                         h_file_count += 1
 
     # For each subdir...
     for sub_dir in sub_dirs:
-        subdir_h_file_count = _recursively_create_api_rst_files(depth + 1, src_root_len, sub_dir, out_root_dir)
+        subdir_eligible_h_file_count = \
+            _recursively_create_api_rst_files(depth + 1,
+                                              src_root_len,
+                                              sub_dir,
+                                              out_root_dir)
 
-        if subdir_h_file_count > 0:
-            sub_dirs_w_h_files.append(sub_dir)
-            h_file_count += subdir_h_file_count
+        if subdir_eligible_h_file_count > 0:
+            sub_dirs_w_eligible_h_files.append(sub_dir)
+            h_file_count += subdir_eligible_h_file_count
 
     if h_file_count > 0:
         # Create index.rst plus .RST files for any direct .H files in dir.
-        _create_rst_files_for_dir(src_root_len, src_dir_bep, h_files, sub_dirs_w_h_files, out_root_dir)
+        _create_rst_files_for_dir(src_root_len, src_dir_bep, eligible_h_files, sub_dirs_w_eligible_h_files, out_root_dir)
 
     return h_file_count
 
@@ -222,7 +258,7 @@ def get_includes(name1, name2, obj, includes):
     includes.add((header_file, html_files[header_file]))
 
 
-def run(lvgl_src_dir, intermediate_dir, doxyfile_src_file, silent=False, *doc_paths):
+def build_api_docs(lvgl_src_dir, intermediate_dir, doxyfile_src_file, *doc_paths):
     """
     This function does 2 things:
     1.  Generates .RST files for the LVGL header files that will have API
@@ -235,7 +271,6 @@ def run(lvgl_src_dir, intermediate_dir, doxyfile_src_file, silent=False, *doc_pa
     :param lvgl_src_dir:       platform-appropriate path to LVGL src directory
     :param intermediate_dir:   platform-appropriate path to temp dir being operated on
     :param doxyfile_src_file:  full path to src doxygen configuration file
-    :param silent:             suppress action announcements?
     :param doc_paths:          list of platform-appropriate paths to find source .RST files.
     """
     # ---------------------------------------------------------------------
@@ -248,7 +283,7 @@ def run(lvgl_src_dir, intermediate_dir, doxyfile_src_file, silent=False, *doc_pa
     xml_parser = doxygen_xml.DoxygenXml(lvgl_src_dir,
                                         intermediate_dir,
                                         doxyfile_src_file,
-                                        silent
+                                        silent_mode=False
                                         )
 
     # ---------------------------------------------------------------------
