@@ -8,7 +8,6 @@
  *********************/
 
 #include "lv_font.h"
-#include "lv_font_cache.h"
 #include "../misc/lv_text_private.h"
 #include "../misc/lv_utils.h"
 #include "../misc/lv_log.h"
@@ -53,25 +52,7 @@ const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t
 {
     const lv_font_t * font_p = g_dsc->resolved_font;
     LV_ASSERT_NULL(font_p);
-#if LV_FONT_CACHE_GLYPH_CNT > 0
-    /* If the font cache is enabled, try to use it to get the glyph bitmap */
-    return lv_font_cache_get_glyph_bitmap(g_dsc, draw_buf);
-#else
     return font_p->get_glyph_bitmap(g_dsc, draw_buf);
-#endif
-}
-
-lv_result_t lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf)
-{
-    LV_ASSERT_NULL(g_dsc);
-    LV_ASSERT_NULL(draw_buf);
-    const lv_font_t * font_p = g_dsc->resolved_font;
-
-    if(!lv_font_has_static_bitmap(font_p)) {
-        return LV_RESULT_INVALID;
-    }
-
-    return font_p->get_glyph_bitmap(g_dsc, draw_buf) ? LV_RESULT_OK : LV_RESULT_INVALID;
 }
 
 void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
@@ -83,21 +64,9 @@ void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
 
     const lv_font_t * font = g_dsc->resolved_font;
 
-    if(!font) {
-        return;
-    }
-
-    if(font->release_glyph) {
+    if(font != NULL && font->release_glyph) {
         font->release_glyph(font, g_dsc);
-        return;
     }
-
-#if LV_FONT_CACHE_GLYPH_CNT > 0
-    /* Since the old font resource does not register the release_glyph function in the font structure,
-     * it is processed here as a fallback to ensure forward compatibility.
-     */
-    lv_font_cache_release_glyph(font, g_dsc);
-#endif
 }
 
 bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_out, uint32_t letter,

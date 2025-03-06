@@ -110,7 +110,6 @@ struct _lv_font_t {
     int32_t base_line;           /**< Base line measured from the bottom of the line_height*/
     uint8_t subpx   : 2;            /**< An element of `lv_font_subpx_t`*/
     uint8_t kerning : 1;            /**< An element of `lv_font_kerning_t`*/
-    uint8_t static_bitmap: 1;       /**< The font has a static bitmap, it's can be used directly without caching*/
 
     int8_t underline_position;      /**< Distance between the top of the underline and base line (< 0 means below the base line)*/
     int8_t underline_thickness;     /**< Thickness of the underline*/
@@ -132,15 +131,6 @@ struct _lv_font_t {
  * @return pointer to the glyph's data. It can be a draw buffer for bitmap fonts or an image source for imgfonts.
  */
 const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
-
-/**
- * Get the static bitmap of a font.
- * @param g_dsc         the glyph descriptor including which font to use, which supply the glyph_index and the format.
- * @param draw_buf      a draw buffer that can be used to store the bitmap of the glyph, it's OK not to use it.
- * @return LV_RES_OK: the static bitmap is successfully loaded into `draw_buf`.
- *         LV_RES_INV: the font doesn't have a raw bitmap.
- */
-lv_result_t lv_font_get_glyph_static_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
 
 /**
  * Get the descriptor of a glyph
@@ -189,17 +179,6 @@ void lv_font_set_kerning(lv_font_t * font, lv_font_kerning_t kerning);
  * @return  return      pointer to the default font
  */
 const lv_font_t * lv_font_get_default(void);
-
-/**
- * Check if a font has a static bitmap
- * @param font    pointer to a font
- * @return true: the font has a static bitmap
- */
-static inline bool lv_font_has_static_bitmap(const lv_font_t * font)
-{
-    LV_ASSERT_NULL(font);
-    return font->static_bitmap;
-}
 
 /**********************
  *      MACROS

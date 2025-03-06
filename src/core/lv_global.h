@@ -198,11 +198,6 @@ typedef struct _lv_global_t {
     lv_font_fmt_rle_t font_fmt_rle;
 #endif
 
-#if LV_FONT_CACHE_GLYPH_CNT > 0
-    lv_cache_t * font_bitmap_cache;
-    lv_draw_buf_t font_static_bitmap_draw_buf;
-#endif
-
 #if LV_USE_SPAN != 0
     struct _snippet_stack * span_snippet_stack;
 #endif

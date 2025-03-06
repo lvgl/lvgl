@@ -18,7 +18,6 @@
 #include "core/lv_global.h"
 #include "core/lv_obj.h"
 #include "display/lv_display_private.h"
-#include "font/lv_font_cache.h"
 #include "indev/lv_indev_private.h"
 #include "layouts/lv_layout_private.h"
 #include "libs/bin_decoder/lv_bin_decoder.h"
@@ -213,10 +212,6 @@ void lv_init(void)
     lv_anim_core_init();
 
     lv_group_init();
-
-#if LV_FONT_CACHE_GLYPH_CNT > 0
-    lv_font_cache_init(LV_FONT_CACHE_GLYPH_CNT);
-#endif
 
 #if LV_USE_FREETYPE
     /* Since the drawing unit needs to register the freetype event,
@@ -427,10 +422,6 @@ void lv_deinit(void)
 
 #if LV_USE_SPAN != 0
     lv_span_stack_deinit();
-#endif
-
-#if LV_FONT_CACHE_GLYPH_CNT > 0
-    lv_font_cache_deinit();
 #endif
 
 #if LV_USE_FREETYPE
