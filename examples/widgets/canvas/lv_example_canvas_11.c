@@ -10,7 +10,7 @@ static void timer_cb(lv_timer_t * timer)
     const char * string = "windstorrrrrrrrrrrrrrrrm~>>>";
     const int16_t string_len = lv_strlen(string);
 
-    lv_obj_t * canvas = lv_timer_get_user_data(timer);
+    lv_obj_t * canvas = (lv_obj_t *) lv_timer_get_user_data(timer);
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
 
