@@ -114,12 +114,25 @@ struct _lv_layer_t  {
 };
 
 typedef struct {
+    /**The widget for which draw descriptor was created */
     lv_obj_t * obj;
+
+    /**The widget part for which draw descriptor was created */
     lv_part_t part;
+
+    /**A widget type specific ID (e.g. table row index). See the docs of the given widget.*/
     uint32_t id1;
+
+    /**A widget type specific ID (e.g. table column index). See the docs of the given widget.*/
     uint32_t id2;
+
+    /**The target layer */
     lv_layer_t * layer;
+
+    /**Size of the specific draw descriptor into which this base descriptor is embedded*/
     size_t dsc_size;
+
+    /**Any custom user data*/
     void * user_data;
 } lv_draw_dsc_base_t;
 
