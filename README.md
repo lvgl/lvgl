@@ -88,7 +88,7 @@ If someone implements or fixes an issue labeled as [Sponsored](https://github.co
 [![Sponsors of LVGL](https://opencollective.com/lvgl/organizations.svg?width=600)](https://opencollective.com/lvgl)
 
 **Individuals supporting LVGL**<br>
-[![Backers of LVGL](https://opencollective.com/lvgl/individuals.svg?width=600)](https://opencollective.com/lvgl)
+[![Backers of LVGL](https://contrib.rocks/image?repo=lvgl/lvgl&max=48)](https://opencollective.com/lvgl)
 
 ## :package: Packages
 LVGL is available as:
