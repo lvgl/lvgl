@@ -62,7 +62,7 @@ Nossa equipe está pronta para ajudá-lo com design gráfico, implementação de
 
   - Uma biblioteca C totalmente portátil (compatível com C++) sem dependências externas.
   - Pode ser compilado para qualquer display MCU ou MPU, e qualquer sistema operacional de tempo real (RT-OS).
-  - Suporta monitores monocromáticos, ePaper, OLED ou TFT. [Guia de portabilidade](https://docs.lvgl.io/master/porting/project.html)
+  - Suporta monitores monocromáticos, ePaper, OLED ou TFT. [Guia de portabilidade](https://docs.lvgl.io/master/details/integration/adding-lvgl-to-your-project/index.html)
   - Distribuído sob a licença do MIT, para que você também possa usá-lo facilmente em projetos comerciais.
   - Precisa de apenas 32 kB de RAM e 128 kB de Flash, um frame buffer e pelo menos uma tela de tamanho 1/10 para renderização.
   - Sistemas operacionais, memória externa e GPU são suportados, mas não obrigatórios.
@@ -82,13 +82,13 @@ Nossa equipe está pronta para ajudá-lo com design gráfico, implementação de
 
   - Exposição da API do LVGL com o [Micropython](https://blog.lvgl.io/2019-02-20/micropython-bindings)
   - Nenhum sistema de compilação personalizado é usado. Você pode construir o LVGL enquanto constrói os outros arquivos do seu projeto.
-  - O suporte para Make e [CMake](https://docs.lvgl.io/master/get-started/platforms/cmake.html) já vem incluído.
-  - [Desenvolva no PC](https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html) e use o mesmo código de interface do usuário em hardwares incorporados (embedded hardware).
+  - O suporte para Make e [CMake](https://docs.lvgl.io/master/details/integration/building/cmake.html) já vem incluído.
+  - [Desenvolva no PC](https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html) e use o mesmo código de interface do usuário em hardwares incorporados (embedded hardware).
   - Converta o código C para um arquivo HTML com o [Emscripten port](https://github.com/lvgl/lv_web_emscripten).
 
 **Documentação, ferramentas e serviços**
 
-  - Documentação detalhada com [+100 exemplos simples](https://docs.lvgl.io/master/index.html)
+  - Documentação detalhada com [+100 exemplos simples](https://docs.lvgl.io/master/examples.html)
   - [SquareLine Studio](https://squareline.io) - Um software editor UI profissional e fácil de usar, para acelerar e simplificar o desenvolvimento da interface do usuário.
   - [Serviços](https://lvgl.io/services) como design de UI, implementação e consultoria para tornar o desenvolvimento de UI mais simples e rápido.
 
@@ -109,19 +109,19 @@ Se alguém implementar ou corrigir um problema rotulado como [Patrocinado](https
 [![Patrocinadores do LVGL](https://opencollective.com/lvgl/organizations.svg?width=600)](https://opencollective.com/lvgl)
 
 **Pessoas que apoiam o projeto LVGL**<br>
-[![Backers of LVGL](https://opencollective.com/lvgl/individuals.svg?width=600)](https://opencollective.com/lvgl)
+[![Backers of LVGL](https://contrib.rocks/image?repo=lvgl/lvgl&max=48)](https://opencollective.com/lvgl)
 
 ## :package: Pacotes
 
 LVGL está disponível para:
 
-- [Arduino library](https://docs.lvgl.io/master/get-started/platforms/arduino.html)
+- [Arduino library](https://docs.lvgl.io/master/details/integration/framework/arduino.html)
 - [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
 - [Zephyr library](https://docs.zephyrproject.org/latest/kconfig.html#CONFIG_LVGL)
-- [ESP32 component](https://docs.lvgl.io/master/get-started/platforms/espressif.html)
+- [ESP32 component](https://docs.lvgl.io/master/details/integration/chip/espressif.html)
 - [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
-- [NuttX library](https://docs.lvgl.io/master/get-started/os/nuttx.html)
-- [RT-Thread RTOS](https://docs.lvgl.io/master/get-started/os/rt-thread.html)
+- [NuttX library](https://docs.lvgl.io/master/details/integration/os/nuttx.html)
+- [RT-Thread RTOS](https://docs.lvgl.io/master/details/integration/os/rt-thread.html)
 - NXP MCUXpresso library
 - CMSIS-Pack
 
@@ -406,23 +406,23 @@ Esta lista irá guiá-lo para começar com o LVGL passo a passo.
 
   1. Confira as [demos on-line](https://lvgl.io/demos) para ver o LVGL em ação (~3 minutos)
   2. Leia a página de [introdução](https://docs.lvgl.io/master/intro/index.html) da documentação (~5 minutos)
-  3. Familiarize-se com o básico na página de [visão geral rápida](https://docs.lvgl.io/master/get-started/quick-overview.html) (~15 minutos)
+  3. Familiarize-se com o básico na página de [visão geral rápida](https://docs.lvgl.io/master/intro/getting_started.html) (~15 minutos)
 
 **Começando a usar o LVGL**
 
-  4. Configure um [simulador](https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html) (~10 minutos)
+  4. Configure um [simulador](https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html) (~10 minutos)
   5. Experimente alguns [exemplos](https://github.com/lvgl/lvgl/tree/master/examples)
-  6. Porte o LVGL para uma placa. Veja o guia [portando o LVGL](https://docs.lvgl.io/master/porting/index.html) ou veja um projeto pronto para usar em [projetos](https://github.com/lvgl?q=lv_port_)
+  6. Porte o LVGL para uma placa. Veja o guia [portando o LVGL](https://docs.lvgl.io/master/details/integration/adding-lvgl-to-your-project/index.html) ou veja um projeto pronto para usar em [projetos](https://github.com/lvgl?q=lv_port_)
 
 **Torne-se um profissional**
 
-  7. Leia a página [visão geral](https://docs.lvgl.io/master/overview/index.html) para entender melhor a biblioteca (~2-3 horas)
-  8. Verifique a documentação dos [widgets](https://docs.lvgl.io/master/widgets/index.html) para ver seus recursos e usabilidade
+  7. Leia a página [visão geral](https://docs.lvgl.io/master/intro/getting_started.html) para entender melhor a biblioteca (~2-3 horas)
+  8. Verifique a documentação dos [widgets](https://docs.lvgl.io/master/details/widgets/index.html) para ver seus recursos e usabilidade
 
 **Obtenha ajuda e ajude outras pessoas**
 
   9. Se você tiver dúvidas, acesse o [Fórum](http://forum.lvgl.io)
-  10. Leia o guia de [contribuição](https://docs.lvgl.io/master/CONTRIBUTING.html) para ver como você pode ajudar a melhorar o LVGL (~15 minutos)
+  10. Leia o guia de [contribuição](https://docs.lvgl.io/master/contributing/index.html) para ver como você pode ajudar a melhorar o LVGL (~15 minutos)
 
 **E mais**
 
@@ -444,7 +444,7 @@ Confira nossas [demonstrações](https://lvgl.io/demos) como referência. Para o
 ## :star2: Contribuindo
 O LVGL é um projeto aberto e sua contribuição é muito bem-vinda. Há muitas maneiras de contribuir, desde simplesmente falando sobre seu projeto, escrevendo exemplos, melhorando a documentação, corrigindo bugs até hospedar seu próprio projeto sob a organização LVGL.
 
-Para obter uma descrição detalhada das oportunidades de contribuição, visite a página de [contribuição](https://docs.lvgl.io/master/CONTRIBUTING.html) da documentação.
+Para obter uma descrição detalhada das oportunidades de contribuição, visite a página de [contribuição](https://docs.lvgl.io/master/contributing/index.html) da documentação.
 
 Mais de 300 pessoas já deixaram sua impressão digital no LVGL. Seja um deles! Veja o seu aqui! :slightly_smiling_face:
 
