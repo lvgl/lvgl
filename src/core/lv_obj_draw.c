@@ -379,7 +379,12 @@ static inline lv_opa_t get_layer_opa(const lv_obj_t * obj, lv_part_t part, const
 {
     if(base_dsc->layer) {
         /* Accessing the layer opa directly is faster than using get style opa recursive */
-        return base_dsc->layer->opa;
+        if(part == LV_PART_MAIN) {
+            return base_dsc->layer->opa;
+        }
+        else {
+            return LV_OPA_MIX2(base_dsc->layer->opa, lv_obj_get_style_opa(obj, part));
+        }
     }
 
     /* fallback to old recursive style opa */
