@@ -18,4 +18,5 @@ Auxiliary Modules
     obj_property
     observer
     snapshot
+    test
     xml/index
