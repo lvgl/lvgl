@@ -35,117 +35,94 @@
 
 [中文宣传单](./flyers/LVGL-Chinese-Flyer.pdf)
 
-#### 目录
-- [概况与总览](#概况与总览)
-  - [特性](#特性)
-  - [硬件要求](#硬件要求)
-  - [已经支持的平台](#已经支持的平台)
-- [如何入门](#如何入门)
-- [例程](#例程)
-  - [C](#c)
-  - [MicroPython](#micropython)
-- [服务](#服务)
-- [如何向社区贡献](#如何向社区贡献)
 
-## 概况与总览
-### 特性
-* 丰富且强大的模块化[图形组件](https://docs.lvgl.io/master/widgets/index.html)：按钮 (buttons)、图表 (charts)、列表 (lists)、滑动条 (sliders)、图片 (images) 等
-* 高级的图形引擎：动画、抗锯齿、透明度、平滑滚动、图层混合等效果
-* 支持多种[输入设备](https://docs.lvgl.io/master/overview/indev.html)：触摸屏、 键盘、编码器、按键等
-* 支持[多显示设备](https://docs.lvgl.io/master/overview/display.html)
-* 不依赖特定的硬件平台，可以在任何显示屏上运行
-* 配置可裁剪（最低资源占用：64 kB Flash，16 kB RAM）
-* 基于UTF-8的多语种支持，例如中文、日文、韩文、阿拉伯文等
-* 可以通过[类CSS](https://docs.lvgl.io/master/overview/styles.html)的方式来设计、布局图形界面（例如：[Flex](https://docs.lvgl.io/master/layouts/flex.html)、[Grid](https://docs.lvgl.io/master/layouts/grid.html)）
-* 支持操作系统、外置内存、以及硬件加速（LVGL已内建支持STM32 DMA2D、SWM341 DMA2D、NXP PXP和VGLite）
-* 即便仅有[单缓冲区(frame buffer)](https://docs.lvgl.io/master/porting/display.html)的情况下，也可保证渲染如丝般顺滑
-* 全部由C编写完成，并支持C++调用
-* 支持MicroPython编程，参见：[LVGL API in MicroPython](https://blog.lvgl.io/2019-02-20/micropython-bindings)
-* 支持[模拟器](https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html)仿真，可以无硬件依托进行开发
-* 丰富详实的[例程](https://github.com/lvgl/lvgl/tree/master/examples)
-* 详尽的[文档](http://docs.lvgl.io/)以及API参考手册，可线上查阅或可下载为PDF格式
+## :ledger: ðŸ“’ æ¦‚å†µä¸Žæ€»è§ˆ
 
-### 硬件要求
+**æˆç†Ÿä¸”çŸ¥å**<br>
+LVGL æ˜¯æœ€æµè¡Œçš„å…è´¹å¼€æºåµŒå…¥å¼å›¾å½¢åº“ï¼Œå¯ä»¥ä¸ºä»»ä½• MCUã€MPU å’Œæ˜¾ç¤ºç±»åž‹åˆ›å»ºæ¼‚äº®çš„ UIã€‚å®ƒå¾—åˆ°äº†è¡Œä¸šé¢†å…ˆä¾›åº”å•†å’Œé¡¹ç›®çš„æ”¯æŒï¼Œå¦‚ Armã€STM32ã€NXPã€Espressifã€Nuvotonã€Arduinoã€RT-Threadã€Zephyrã€NuttXã€Adafruit ç­‰ã€‚
 
-<table>
-  <tr>
-    <td> <strong>要求</strong> </td>
-    <td><strong>最低要求</strong></td>
-    <td><strong>建议要求</strong></td>
-  </tr>
-  <tr>
-    <td><strong>架构</strong></td>
-    <td colspan="2">16、32、64位微控制器或微处理器</td>
-  </tr>
-  <tr>
-    <td> <strong>时钟</strong></td>
-    <td> &gt; 16 MHz</td>
-    <td> &gt; 48 MHz</td>
-  </tr>
+**åŠŸèƒ½ä¸°å¯Œ**<br>
+å®ƒæ‹¥æœ‰åˆ›å»ºçŽ°ä»£ç¾Žè§‚ GUI çš„æ‰€æœ‰åŠŸèƒ½ï¼š30 å¤šä¸ªå†…ç½®æŽ§ä»¶ã€å¼ºå¤§çš„æ ·å¼ç³»ç»Ÿã€Web å¯å‘çš„å¸ƒå±€ç®¡ç†å™¨å’Œæ”¯æŒå¤šç§è¯­è¨€çš„æŽ’ç‰ˆç³»ç»Ÿã€‚è¦å°† LVGL é›†æˆåˆ°æ‚¨çš„å¹³å°ä¸­ï¼Œæ‚¨åªéœ€è¦è‡³å°‘ 32 KB
+RAM å’Œ 128 KB Flashã€C ç¼–è¯‘å™¨ã€å¸§ç¼“å†²åŒºå’Œè‡³å°‘ 1/10 å±å¹•å¤§å°çš„æ¸²æŸ“ç¼“å†²åŒºã€‚
 
-  <tr>
-    <td> <strong>Flash/ROM</strong></td>
-    <td> &gt; 64 kB </td>
-    <td> &gt; 180 kB</td>
-  </tr>
-
-  <tr>
-    <td> <strong>Static RAM</strong></td>
-    <td> &gt; 16 kB </td>
-    <td> &gt; 48 kB</td>
-  </tr>
-
-  <tr>
-    <td> <strong>Draw buffer</strong></td>
-    <td> &gt; 1 &times; <em>hor. res.</em> pixels </td>
-    <td> &gt; 1/10屏幕大小 </td>
-  </tr>
-
-  <tr>
-    <td> <strong>编译器</strong></td>
-    <td colspan="2"> C99或更新 </td>
-  </tr>
-</table>
-
-*注意：资源占用情况与具体硬件平台、编译器等因素有关，上表中仅给出参考值*
-
-### 已经支持的平台
-LVGL本身并不依赖特定的硬件平台，任何满足LVGL硬件配置要求的微控制器均可运行LVGL。
-如下仅列举其中一部分:
-
-- NXP: Kinetis, LPC, iMX, iMX RT
-- STM32F1, STM32F3, STM32F4, STM32F7, STM32L4, STM32L5, STM32H7
-- Microchip dsPIC33, PIC24, PIC32MX, PIC32MZ
-- [Linux frame buffer](https://blog.lvgl.io/2018-01-03/linux_fb) (/dev/fb)
-- [Raspberry Pi](http://www.vk3erw.com/index.php/16-software/63-raspberry-pi-official-7-touchscreen-and-littlevgl)
-- [Espressif ESP32](https://github.com/lvgl/lv_port_esp32)
-- [Infineon Aurix](https://github.com/lvgl/lv_port_aurix)
-- Nordic NRF52 Bluetooth modules
-- Quectel modems
-- [SYNWIT SWM341](https://www.synwit.cn/)
-
-LVGL也支持：
-- [Arduino library](https://docs.lvgl.io/master/get-started/platforms/arduino.html)
-- [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
-- [Zephyr library](https://docs.zephyrproject.org/latest/kconfig.html#CONFIG_LVGL)
-- [ESP32 component](https://docs.lvgl.io/master/get-started/platforms/espressif.html)
-- [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
-- [NuttX library](https://docs.lvgl.io/master/get-started/os/nuttx.html)
-- [RT-Thread RTOS](https://www.rt-thread.org/document/site/#/rt-thread-version/rt-thread-standard/packages-manual/lvgl-docs/introduction)
+**æœåŠ¡**<br>
+æˆ‘ä»¬çš„å›¢é˜Ÿéšæ—¶å‡†å¤‡ä¸ºæ‚¨æä¾›å›¾å½¢è®¾è®¡ã€UI å®žçŽ°å’Œå’¨è¯¢æœåŠ¡ã€‚å¦‚æžœæ‚¨åœ¨å¼€å‘ä¸‹ä¸€ä¸ª GUI é¡¹ç›®æ—¶éœ€è¦ä¸€äº›æ”¯æŒï¼Œè¯·ä¸Žæˆ‘ä»¬è”ç³»ã€‚
 
 
-## 如何入门
-请按照如下顺序来学习LVGL：
-1. 使用[网页在线例程](https://lvgl.io/demos)来体验LVGL（3分钟）
-2. 阅读文档[简介](https://docs.lvgl.io/master/intro/index.html)章节来初步了解LVGL（5分钟）
-3. 再来阅读一下文档快速[快速概览](https://docs.lvgl.io/master/get-started/quick-overview.html)章节来了解LVGL的基本知识（15分钟）
-4. 学习如何使用[模拟器](https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html)来在电脑上仿真LVGL（10分钟）
-5. 试着动手实践一些[例程](https://github.com/lvgl/lvgl/tree/master/examples)
-6. 参考[移植指南](https://docs.lvgl.io/master/porting/index.html)尝试将LVGL移植到一块开发板上，LVGL也已经提供了一些移植好的[工程](https://github.com/lvgl?q=lv_port_)
-7. 仔细阅读文档[总览](https://docs.lvgl.io/master/overview/index.html)章节来更加深入的了解和熟悉LVGL（2-3小时）
-8. 浏览文档[组件(Widgets)](https://docs.lvgl.io/master/widgets/index.html)章节来了解如何使用它们
-9. 如果你有问题可以到LVGL[论坛](http://forum.lvgl.io/)提问
-10. 阅读文档[如何向社区贡献](https://docs.lvgl.io/master/CONTRIBUTING.html)章节来看看你能帮LVGL社区做些什么，以促进LVGL软件质量的不断提高（15分钟）
+## :rocket: ðŸš€ ç‰¹æ€§
+
+**å…è´¹å’Œå¯ç§»æ¤æ€§**<br>
+-  ä¸€ä¸ªå®Œå…¨å¯ç§»æ¤çš„ Cï¼ˆC++ å…¼å®¹ï¼‰åº“ï¼Œæ²¡æœ‰å¤–éƒ¨ä¾èµ–å…³ç³»ã€‚
+-  å¯ä»¥ç¼–è¯‘åˆ°ä»»ä½• MCU æˆ– MPUï¼Œä½¿ç”¨ä»»ä½• RTOS æˆ–è€…æ“ä½œç³»ç»Ÿã€‚
+-  æ”¯æŒå•è‰²ã€ePaperã€OLEDã€TFT æ˜¾ç¤ºå™¨æˆ–è€…æ¨¡æ‹Ÿå™¨ã€‚
+   [ç§»æ¤æŒ‡å—](https://docs.lvgl.io/master/details/integration/adding-lvgl-to-your-project/index.html)
+-  è¯¥é¡¹ç›®ä½¿ç”¨ MIT è®¸å¯è¯ï¼Œå› æ­¤æ‚¨å¯ä»¥åœ¨å•†ä¸šé¡¹ç›®ä¸­è½»æ¾ä½¿ç”¨å®ƒã€‚
+-  ä»…éœ€ 32 KB RAM å’Œ 128 KB Flashï¼Œä¸€ä¸ªå¸§ç¼“å†²åŒºï¼Œä»¥åŠè‡³å°‘ 1/10 å±å¹•å¤§å°çš„æ¸²æŸ“ç¼“å†²åŒºã€‚
+-  æ”¯æŒä½¿ç”¨å¯é€‰çš„æ“ä½œç³»ç»Ÿã€å¤–éƒ¨å­˜å‚¨å™¨å’Œ GPUã€‚
+
+**æŽ§ä»¶ã€æ ·å¼ã€å¸ƒå±€ç­‰**<br>
+-  30+ å†…ç½® [æŽ§ä»¶](https://docs.lvgl.io/master/details/widgets/index.html):  Â æŒ‰é’®ã€æ ‡ç­¾ã€æ»‘å—ã€å›¾è¡¨ã€é”®ç›˜ã€ä»ªè¡¨ã€å¼§å½¢ã€è¡¨æ ¼ç­‰ç­‰ã€‚
+-  çµæ´»çš„ [æ ·å¼ç³»ç»Ÿ](https://docs.lvgl.io/master/details/base-widget/styles/style.html) æ”¯æŒçº¦ 100 ä¸ªæ ·å¼å±žæ€§ï¼Œå¯åœ¨ä»»ä½•çŠ¶æ€ä¸‹è‡ªå®šä¹‰æŽ§ä»¶çš„ä»»ä½•éƒ¨åˆ†ã€‚
+-  [Flex å¸ƒå±€](https://docs.lvgl.io/master/details/base-widget/layouts/flex.html) å’Œ
+   [Grid å¸ƒå±€](https://docs.lvgl.io/master/details/base-widget/layouts/grid.html)
+   å¯ä»¥å“åº”å¼è‡ªåŠ¨è°ƒæ•´æŽ§ä»¶çš„å¤§å°å’Œä½ç½®ã€‚
+-  æ–‡æœ¬æ”¯æŒ UTF-8 ç¼–ç ï¼Œæ”¯æŒ CJKã€æ³°è¯­ã€å°åœ°è¯­ã€é˜¿æ‹‰ä¼¯è¯­å’Œæ³¢æ–¯è¯­ä¹¦å†™ç³»ç»Ÿã€‚
+-  æ”¯æŒè‡ªåŠ¨æ¢è¡Œã€å­—è·è°ƒæ•´ã€æ–‡æœ¬æ»šåŠ¨ã€äºšåƒç´ æ¸²æŸ“ã€æ‹¼éŸ³è¾“å…¥æ³•ã€æ–‡æœ¬è¡¨æƒ…ç¬¦å·ã€‚
+-  æ¸²æŸ“å¼•æ“Žæ”¯æŒåŠ¨ç”»ã€æŠ—é”¯é½¿ã€ä¸é€æ˜Žåº¦ã€å¹³æ»‘æ»šåŠ¨ã€é˜´å½±ã€å›¾å½¢å˜æ¢ç­‰ã€‚
+-  æ”¯æŒé¼ æ ‡ã€è§¦æ‘¸æ¿ã€å°é”®ç›˜ã€é”®ç›˜ã€å¤–éƒ¨æŒ‰é’®ã€ç¼–ç å™¨ [è¾“å…¥è®¾å¤‡](https://docs.lvgl.io/master/details/main-components/indev.html) ã€‚
+-  æ”¯æŒ [å¤šæ˜¾ç¤ºå™¨](https://docs.lvgl.io/master/details/main-modules/display/overview.html#how-many-displays-can-lvgl-use) ã€‚
+
+**ç»‘å®šå’Œæž„å»ºæ”¯æŒ**<br>
+-  [MicroPython ç»‘å®š](https://blog.lvgl.io/2019-02-20/micropython-bindings) å…¬å¼€ LVGLçš„API
+-  [PikaScript ç»‘å®š](https://blog.lvgl.io/2022-08-24/pikascript-and-lvgl) åœ¨ MCU ä¸Šçš„æ›´è½»æ›´ç®€å•çš„ Python ç‰ˆæœ¬
+-  æœªä½¿ç”¨è‡ªå®šä¹‰ç”Ÿæˆç³»ç»Ÿã€‚æ‚¨å¯ä»¥åœ¨æž„å»ºé¡¹ç›®çš„å…¶ä»–æ–‡ä»¶æ—¶æž„å»º LVGLã€‚
+-  æ”¯æŒå¼€ç®±å³ç”¨çš„ Make å’Œ [CMake](https://docs.lvgl.io/master/details/integration/building/cmake.html)  ç¼–è¯‘ç³»ç»Ÿã€‚
+-  æ”¯æŒåœ¨ [PC ä¸Šå¼€å‘](https://docs.lvgl.io/master/integration/ide/pc-simulator.html) ï¼Œå¹¶å¯ä»¥åœ¨åµŒå…¥å¼ç¡¬ä»¶ä¸Šä½¿ç”¨ç›¸åŒçš„ UI ä»£ç ã€‚
+-  æ”¯æŒä½¿ç”¨æˆ‘ä»¬çš„ [Emscripten ç§»æ¤](https://github.com/lvgl/lv_web_emscripten)  ä»Žè€Œå°† C å†™çš„ UI ä»£ç è½¬æ¢ä¸º HTML æ–‡ä»¶ã€‚
+
+**æ–‡æ¡£ã€å·¥å…·å’ŒæœåŠ¡**<br>
+-  åŒ…å« [100 å¤šä¸ªç®€å•ç¤ºä¾‹](https://docs.lvgl.io/master/index.html) çš„è¯¦ç»† [æ–‡æ¡£](https://docs.lvgl.io/)
+-  [æœåŠ¡](https://lvgl.io/services)
+   å¦‚ç”¨æˆ·ç•Œé¢è®¾è®¡ã€å®žæ–½å’Œå’¨è¯¢ï¼Œä½¿ UI å¼€å‘æ›´ç®€å•ã€æ›´å¿«ã€‚
+
+
+## :heart: â¤ï¸ èµžåŠ©
+
+å¦‚æžœ LVGL ä¸ºæ‚¨èŠ‚çœäº†å¤§é‡æ—¶é—´å’Œé‡‘é’±ï¼Œæˆ–è€…æ‚¨åªæ˜¯åœ¨ä½¿ç”¨å®ƒæ—¶çŽ©å¾—å¾ˆå¼€å¿ƒï¼Œè¯·è€ƒè™‘ [æ”¯æŒå®ƒçš„å¼€å‘](https://github.com/sponsors/lvgl) ã€‚
+
+**æˆ‘ä»¬å¦‚ä½•ä½¿ç”¨æèµ ï¼Ÿ**<br>
+æˆ‘ä»¬çš„ç›®æ ‡æ˜¯ä¸º LVGL åšå¾—æœ€å¤šçš„äººæä¾›ç»æµŽè¡¥å¿ã€‚è¿™æ„å‘³ç€ä¸ä»…ç»´æŠ¤äººå‘˜ï¼Œè€Œä¸”ä»»ä½•å®žçŽ°ä¼Ÿå¤§åŠŸèƒ½çš„äººéƒ½åº”è¯¥ä»Žç´¯ç§¯çš„èµ„é‡‘ä¸­èŽ·å¾—æŠ¥é…¬ã€‚æˆ‘ä»¬ç”¨ææ¬¾æ¥æ”¯ä»˜æœåŠ¡å™¨å’Œç›¸å…³æœåŠ¡ç­‰è¿è¥æˆæœ¬ã€‚
+
+**å¦‚ä½•æèµ ï¼Ÿ**<br>
+æˆ‘ä»¬ä½¿ç”¨ [GitHub Sponsors](https://github.com/sponsors/lvgl) ï¼Œæ‚¨å¯ä»¥è½»æ¾å‘é€ä¸€æ¬¡æ€§æˆ–å®šæœŸææ¬¾ã€‚æ‚¨è¿˜å¯ä»¥ä»¥é€æ˜Žçš„æ–¹å¼æŸ¥çœ‹æˆ‘ä»¬çš„æ‰€æœ‰è´¹ç”¨ã€‚
+
+**å¦‚ä½•ä»Žæ‚¨çš„è´¡çŒ®ä¸­èŽ·å–æŠ¥é…¬ï¼Ÿ**<br>
+å¦‚æžœæœ‰äººå®žæ–½æˆ–ä¿®å¤äº†ä¸€ä¸ªæ ‡è®°ä¸º [èµžåŠ©](https://github.com/lvgl/lvgl/labels/Sponsored) çš„é—®é¢˜ï¼Œä»–æˆ–å¥¹å°†èŽ·å¾—è¯¥å·¥ä½œçš„æŠ¥é…¬ã€‚æˆ‘ä»¬ä¼°è®¡é—®é¢˜æ‰€éœ€çš„æ—¶é—´ã€å¤æ‚æ€§å’Œé‡è¦æ€§ï¼Œå¹¶æ®æ­¤è®¾å®šä»·æ ¼ã€‚ç›´æŽ¥è¯„è®ºä¸€ä¸ªèµžåŠ©çš„é—®é¢˜ï¼Œè¯´â€œå—¨ï¼Œæˆ‘æƒ³å¤„ç†å®ƒã€‚è¿™å°±æ˜¯æˆ‘è®¡åˆ’ä¿®å¤/å®žæ–½å®ƒçš„æ–¹å¼â€¦â€ã€‚å½“ç»´æŠ¤äººå‘˜æ‰¹å‡†å¹¶åˆå¹¶å·¥ä½œæ—¶ï¼Œå°±è®¤ä¸ºå®ƒå·²ç»å‡†å¤‡å¥½äº†ã€‚ä¹‹åŽï¼Œæ‚¨å¯ä»¥åœ¨ [opencollective.com](https://opencollective.com/lvgl)  ä¸Šæäº¤å¹¶æ”¯ä»˜è´¹ç”¨ï¼Œå‡ å¤©åŽæ‚¨å°†æ”¶åˆ°ä»˜æ¬¾ã€‚
+
+**æ”¯æŒ LVGL çš„ç»„ç»‡**<br>
+<a href="https://opencollective.com/lvgl">
+  ![Sponsors of LVGL](https://opencollective.com/lvgl/organizations.svg?width=600)
+</a>
+
+**æ”¯æŒ LVGL çš„ä¸ªäºº**<br>
+<a href="https://opencollective.com/lvgl">
+  ![Backers of LVGL](image:: https://opencollective.com/lvgl/individuals.svg?width=600)
+</a>
+
+
+## :package: ðŸ“¦ æ”¯æŒåŒ…
+
+LVGL å¯ç”¨äºŽä»¥ä¸‹å‡ ç§ï¼š
+
+-  [Arduino library](https://docs.lvgl.io/master/integration/framework/arduino.html)
+-  [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
+-  [Zephyr library](https://docs.lvgl.io/master/integration/os/zephyr.html)
+-  [ESP-IDF(ESP32) component](https://components.espressif.com/components/lvgl/lvgl)
+-  [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
+-  [NuttX library](https://docs.lvgl.io/master/integration/os/nuttx.html)
+-  [RT-Thread RTOS](https://docs.lvgl.io/master/integration/os/rt-thread.html)
+-  CMSIS-Pack
+-  [RIOT OS package](https://doc.riot-os.org/group__pkg__lvgl.html#details)
 
 
 ## :robot: ðŸ¤– ç¤ºä¾‹
