@@ -55,7 +55,7 @@ const lv_obj_class_t lv_calendar_class = {
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_calendar_t),
     .base_class = &lv_obj_class,
-    .name = "calendar",
+    .name = "lv_calendar",
 };
 
 static const char * day_names_def[7] = LV_CALENDAR_DEFAULT_DAY_NAMES;

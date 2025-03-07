@@ -41,7 +41,7 @@ const lv_obj_class_t lv_rlottie_class = {
     .destructor_cb = lv_rlottie_destructor,
     .instance_size = sizeof(lv_rlottie_t),
     .base_class = &lv_image_class,
-    .name = "rlottie",
+    .name = "lv_rlottie",
 };
 
 typedef struct {

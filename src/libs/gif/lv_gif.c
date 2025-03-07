@@ -39,7 +39,7 @@ const lv_obj_class_t lv_gif_class = {
     .destructor_cb = lv_gif_destructor,
     .instance_size = sizeof(lv_gif_t),
     .base_class = &lv_image_class,
-    .name = "gif",
+    .name = "lv_gif",
 };
 
 /**********************

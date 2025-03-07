@@ -3,7 +3,6 @@
 #include "../../lvgl_private.h"
 
 #include "unity/unity.h"
-#include "lv_test_indev.h"
 
 static uint32_t observer_called = 0;
 
@@ -771,11 +770,11 @@ void test_observer_arc_value(void)
 
     lv_obj_update_layout(obj);
     lv_test_mouse_release();
-    lv_test_indev_wait(100);
+    lv_test_wait(100);
 
     lv_test_mouse_move_to(65, 10);
     lv_test_mouse_press();
-    lv_test_indev_wait(100);
+    lv_test_wait(100);
     lv_test_mouse_release();
 
     TEST_ASSERT_EQUAL(50, lv_arc_get_value(obj));
@@ -797,15 +796,15 @@ void test_observer_slider_value(void)
 
     lv_obj_update_layout(obj);
     lv_test_mouse_release();
-    lv_test_indev_wait(100);
+    lv_test_wait(100);
 
     lv_test_mouse_move_to(65, 10);
     lv_test_mouse_press();
-    lv_test_indev_wait(100);
+    lv_test_wait(100);
 
     lv_test_mouse_move_to(75, 10);
     lv_test_mouse_press();
-    lv_test_indev_wait(100);
+    lv_test_wait(100);
     lv_test_mouse_release();
 
     TEST_ASSERT_EQUAL(29, lv_slider_get_value(obj));

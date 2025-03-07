@@ -3,7 +3,6 @@
 #include "../../lvgl_private.h"
 
 #include "unity/unity.h"
-#include "lv_test_indev.h"
 
 LV_IMAGE_DECLARE(test_animimg001);
 LV_IMAGE_DECLARE(test_animimg002);

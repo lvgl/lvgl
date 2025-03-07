@@ -716,6 +716,10 @@ menu "LVGL configuration"
 				bool "Add id field to obj"
 				default n
 
+			config LV_USE_OBJ_NAME
+				bool "Enable support widget names"
+				default n
+
 			config LV_OBJ_ID_AUTO_ASSIGN
 				bool "Automatically assign an ID when obj is created"
 				default y
@@ -1642,6 +1646,11 @@ menu "LVGL configuration"
 			int "Font manager name max length"
 			depends on LV_USE_FONT_MANAGER
 			default 32
+		config LV_USE_TEST
+			bool "Enable emulated input devices, time emulation, and screenshot compares."
+		config LV_USE_TEST_SCREENSHOT_COMPARE
+			bool "Enable `lv_test_screenshot_compare`. Requires libpng and a few MB of extra RAM."
+			depends on LV_USE_TEST
 		config LV_USE_XML
 			bool "Enable loading XML UIs runtime"
 		config LVGL_VERSION_MAJOR

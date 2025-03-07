@@ -73,7 +73,7 @@ const lv_obj_class_t lv_animimg_class = {
     .constructor_cb = lv_animimg_constructor,
     .instance_size = sizeof(lv_animimg_t),
     .base_class = &lv_image_class,
-    .name = "animimg",
+    .name = "lv_animimg",
 #if LV_USE_OBJ_PROPERTY
     .prop_index_start = LV_PROPERTY_ANIMIMAGE_START,
     .prop_index_end = LV_PROPERTY_ANIMIMAGE_END,

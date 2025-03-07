@@ -14,13 +14,16 @@ jobs:
   build:
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
     name: Build ${{ matrix.port }} port
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     continue-on-error: true
     strategy:
       matrix:
-        port: ['unix', 'esp32', 'stm32', 'rp2']
+        port: ['unix', 'stm32', 'rp2']
     steps:
     - uses: ammaraskar/gcc-problem-matcher@master
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
     - name: Install Dependencies
       run: |
         sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu `lsb_release -sc` main universe restricted multiverse"
@@ -34,7 +37,7 @@ jobs:
     - name: Initialize lv_bindings submodule
       run: git submodule update --init --recursive lib/lv_bindings
     - name: Update ${{ matrix.port }} port submodules
-      if: matrix.port != 'esp32' && matrix.port != 'rp2'
+      if:  matrix.port != 'rp2'
       run: make -C ports/${{ matrix.port }} DEBUG=1 USER_C_MODULES=../../lib/lv_bindings/bindings.cmake submodules
     - name: Checkout LVGL submodule
       working-directory: ./lib/lv_bindings/lvgl
@@ -45,16 +48,6 @@ jobs:
         git submodule update --init --recursive
     - name: Build mpy-cross
       run: make -j $(nproc) -C mpy-cross
-
-    # ESP32 port
-    - name: Setup ESP-IDF
-      if: matrix.port == 'esp32'
-      run: |
-        source tools/ci.sh && ci_esp32_idf44_setup
-    - name: Build ESP32 port
-      if: matrix.port == 'esp32'
-      run: |
-        source tools/ci.sh && ci_esp32_build
 
     # STM32 & RPi Pico port
     - name: arm-none-eabi-gcc
@@ -84,6 +77,51 @@ jobs:
         export XDG_RUNTIME_DIR=/tmp
         python3 lib/lv_bindings/lvgl/tests/micropy_test/__init__.py --artifact-path=lib/lv_bindings/lvgl/tests/micropy_test/artifacts --mpy-path=ports/unix/build-standard/micropython
 
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-artifacts
+        path: lib/lv_bindings/lvgl/tests/micropy_test/artifacts
+
+  build-esp32:
+    runs-on: ubuntu-22.04
+    name: Build esp32 port
+    continue-on-error: true
+    steps:
+    - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Install Dependencies
+      run: |
+        sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu `lsb_release -sc` main universe restricted multiverse"
+        sudo apt-get update -y -qq
+        sudo apt-get install libsdl2-dev parallel libfreetype-dev librlottie-dev libavformat-dev libavcodec-dev libswscale-dev libavutil-dev doxygen
+        python3 -m pip install pycparser
+    - name: Clone lv_micropython
+      run: |
+        git clone https://github.com/lvgl/lv_micropython.git .
+        git checkout master
+    - name: Initialize lv_bindings submodule
+      run: git submodule update --init --recursive lib/lv_bindings
+    - name: Update ${{ matrix.port }} port submodules
+      run: make -C ports/esp32 DEBUG=1 USER_C_MODULES=../../lib/lv_bindings/bindings.cmake submodules
+    - name: Checkout LVGL submodule
+      working-directory: ./lib/lv_bindings/lvgl
+      run: |
+        git fetch --force ${{ github.event.repository.html_url }} "+refs/heads/*:refs/remotes/origin/*"
+        git fetch --force ${{ github.event.repository.html_url }} "+refs/pull/*:refs/remotes/origin/pr/*"
+        git checkout ${{ github.sha }} || git checkout ${{ github.event.pull_request.head.sha }}
+        git submodule update --init --recursive
+    - name: Build mpy-cross
+      run: make -j $(nproc) -C mpy-cross
+    - name: Setup ESP-IDF
+      run: |
+        source tools/ci.sh && ci_esp32_idf44_setup
+    - name: Build ESP32 port
+      run: |
+        source tools/ci.sh && ci_esp32_build
+    - name: Install requirements for the test
+      run: |
+        python3 -m pip install pillow
+        mkdir lib/lv_bindings/lvgl/tests/micropy_test/artifacts
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:

@@ -95,7 +95,7 @@ const lv_obj_class_t lv_label_class = {
     .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_label_t),
     .base_class = &lv_obj_class,
-    .name = "label",
+    .name = "lv_label",
 #if LV_USE_OBJ_PROPERTY
     .prop_index_start = LV_PROPERTY_LABEL_START,
     .prop_index_end = LV_PROPERTY_LABEL_END,
@@ -1004,18 +1004,17 @@ static void lv_label_refr_text(lv_obj_t * obj)
 
             int32_t duration_resolved = lv_anim_resolve_speed(anim_time, start, end);
             /*To keep the old position*/
-            if(act_time < duration_resolved) {
-                a.act_time = act_time;
-                if(reverse_play_in_progress) {
-                    a.reverse_play_in_progress = 1;
-                    /*Swap the start and end values*/
-                    int32_t tmp;
-                    tmp      = a.start_value;
-                    a.start_value = a.end_value;
-                    a.end_value   = tmp;
-                }
-            }
+            if(act_time > duration_resolved) act_time = duration_resolved;
 
+            a.act_time = act_time;
+            if(reverse_play_in_progress) {
+                a.reverse_play_in_progress = 1;
+                /*Swap the start and end values*/
+                int32_t tmp;
+                tmp      = a.start_value;
+                a.start_value = a.end_value;
+                a.end_value   = tmp;
+            }
             lv_anim_set_duration(&a, anim_time);
             lv_anim_set_reverse_duration(&a, anim_time);
 
@@ -1046,16 +1045,15 @@ static void lv_label_refr_text(lv_obj_t * obj)
                 act_time = anim_cur->act_time;
                 reverse_play_in_progress = anim_cur->reverse_play_in_progress;
             }
-            if(act_time < a.duration) {
-                a.act_time = act_time;      /*To keep the old position*/
-                if(reverse_play_in_progress) {
-                    a.reverse_play_in_progress = 1;
-                    /*Swap the start and end values*/
-                    int32_t tmp;
-                    tmp      = a.start_value;
-                    a.start_value = a.end_value;
-                    a.end_value   = tmp;
-                }
+            if(act_time > a.duration) act_time = a.duration;
+            a.act_time = act_time;      /*To keep the old position*/
+            if(reverse_play_in_progress) {
+                a.reverse_play_in_progress = 1;
+                /*Swap the start and end values*/
+                int32_t tmp;
+                tmp      = a.start_value;
+                a.start_value = a.end_value;
+                a.end_value   = tmp;
             }
 
             lv_anim_set_duration(&a, anim_time);

@@ -42,7 +42,7 @@ const lv_obj_class_t lv_line_class = {
     .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_line_t),
     .base_class = &lv_obj_class,
-    .name = "line",
+    .name = "lv_line",
 };
 
 /**********************

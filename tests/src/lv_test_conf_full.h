@@ -104,6 +104,8 @@
 #define LV_PROFILER_INCLUDE     "lv_profiler_builtin.h"
 #define LV_USE_GRIDNAV          1
 #define LV_USE_XML              1
+#define LV_USE_TEST             1
+#define LV_USE_TEST_SCREENSHOT_COMPARE  1
 
 #define LV_BUILD_EXAMPLES       1
 #define LV_USE_DEMO_WIDGETS     1
@@ -124,6 +126,8 @@
 #define LV_USE_OBJ_ID           1
 #define LV_OBJ_ID_AUTO_ASSIGN    1
 #define LV_USE_OBJ_ID_BUILTIN   1
+
+#define LV_USE_OBJ_NAME         1
 
 #define LV_CACHE_DEF_SIZE       (10 * 1024 * 1024)
 

@@ -4,9 +4,6 @@
 
 #include "unity/unity.h"
 
-#include "lv_test_helpers.h"
-#include "lv_test_indev.h"
-
 void test_checkbox_creation_successful(void);
 void test_checkbox_should_call_event_handler_on_click_when_enabled(void);
 void test_checkbox_should_have_default_text_when_created(void);

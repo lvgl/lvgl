@@ -62,6 +62,9 @@ Set the :c:macro:`LV_USE_FFMPEG` in ``lv_conf.h`` to ``1``.
 
 Also set :c:macro:`LV_FFMPEG_PLAYER_USE_LV_FS` in ``lv_conf.h`` to ``1`` if you want
 to integrate the LVGL :ref:`file_system` extension into FFmpeg.
+This library can load videos and images. The LVGL file system
+will always be used when an image is loaded with :cpp:func:`lv_image_set_src`
+regardless of the value of :c:macro:`LV_FFMPEG_PLAYER_USE_LV_FS`.
 
 See the examples below for how to correctly use this library.
 

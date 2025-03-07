@@ -35,7 +35,9 @@ struct _lv_obj_spec_attr_t {
     lv_matrix_t * matrix;           /**< The transform matrix*/
 #endif
     lv_event_list_t event_list;
-
+#if LV_USE_OBJ_NAME
+    const char * name;              /**< Pointer to the name */
+#endif
     lv_point_t scroll;              /**< The current X/Y scroll offset*/
 
     int32_t ext_click_pad;          /**< Extra click padding in all direction*/
@@ -47,6 +49,7 @@ struct _lv_obj_spec_attr_t {
     uint16_t scroll_snap_y : 2;     /**< Where to align the snappable children vertically*/
     uint16_t scroll_dir : 4;        /**< The allowed scroll direction(s), see `lv_dir_t`*/
     uint16_t layer_type : 2;        /**< Cache the layer type here. Element of lv_intermediate_layer_type_t */
+    uint16_t name_static : 1;        /**< 1: `name` was not dynamically allocated */
 };
 
 struct _lv_obj_t {

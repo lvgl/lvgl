@@ -125,17 +125,20 @@ elseif (OPTIONS_TEST_SYSHEAP)
     filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
+    add_definitions(-DREF_IMGS_PATH="ref_imgs/")
 elseif (OPTIONS_TEST_DEFHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_DEFHEAP})
     filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
+    add_definitions(-DREF_IMGS_PATH="ref_imgs/")
 elseif (OPTIONS_TEST_MEMORYCHECK)
     # sanitizer is disabled because valgrind uses LD_PRELOAD and the
     # sanitizer lib needs to load first
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
     set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
     set (ENABLE_TESTS ON)
+    add_definitions(-DREF_IMGS_PATH="ref_imgs/")
 elseif (OPTIONS_TEST_VG_LITE)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_VG_LITE} -DLVGL_CI_USING_SYS_HEAP ${SANITIZE_AND_COVERAGE_OPTIONS})
     filter_compiler_options (C TEST_LIBS ${SANITIZE_AND_COVERAGE_OPTIONS})
@@ -276,9 +279,7 @@ file(GLOB_RECURSE TEST_IMAGES_SRC ${LVGL_TEST_DIR}/test_images/*.c)
 
 add_library(test_common
     STATIC
-        src/lv_test_indev.c
         src/lv_test_init.c
-        src/lv_test_helpers.c
         src/test_assets/test_animimg001.c
         src/test_assets/test_animimg002.c
         src/test_assets/test_animimg003.c
@@ -311,7 +312,6 @@ add_library(test_common
         src/test_assets/test_imagebutton_right.c
         src/test_assets/test_music_button_play.c
         src/test_assets/test_lottie_approve.c
-        unity/unity_support.c
         unity/unity.c
         ${TEST_IMAGES_SRC}
 )

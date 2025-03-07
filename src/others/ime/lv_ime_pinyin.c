@@ -58,7 +58,7 @@ const lv_obj_class_t lv_ime_pinyin_class = {
     .group_def      = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size  = sizeof(lv_ime_pinyin_t),
     .base_class     = &lv_obj_class,
-    .name = "ime-pinyin",
+    .name = "lv_ime_pinyin",
 };
 
 #if LV_IME_PINYIN_USE_K9_MODE
