@@ -141,16 +141,18 @@ void lv_demo_smartwatch_weather_create(void)
     lv_obj_t * image = lv_image_create(card);
     lv_image_set_src(image, &image_pressure_scale);
     lv_obj_set_style_align(image, LV_ALIGN_CENTER, 0);
+    lv_obj_set_y(image, 5);
 
     LV_FONT_DECLARE(font_inter_bold_32);
     lv_obj_t * pressure = lv_label_create(card);
     lv_label_set_text(pressure, "1013");
+    lv_obj_set_y(pressure, 5);
     lv_obj_set_style_align(pressure, LV_ALIGN_CENTER, 0);
     lv_obj_set_style_text_font(pressure, &font_inter_bold_32, 0);
 
     LV_FONT_DECLARE(font_inter_regular_24);
     pressure = lv_label_create(card);
-    lv_obj_set_pos(pressure, 0, 25);
+    lv_obj_set_pos(pressure, 0, 35);
     lv_label_set_text(pressure, "hPa");
     lv_obj_set_style_align(pressure, LV_ALIGN_CENTER, 0);
     lv_obj_set_style_text_font(pressure, &font_inter_regular_24, 0);

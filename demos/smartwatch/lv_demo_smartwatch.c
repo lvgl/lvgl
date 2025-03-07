@@ -20,6 +20,9 @@
  *      DEFINES
  *********************/
 
+#define MASK_WIDTH 200
+#define MASK_HEIGHT 130
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -42,6 +45,17 @@ static void opa_anim(void * var, int32_t v);
 
 static void home_screen_events(lv_event_t * e);
 
+static void generate_mask(lv_draw_buf_t * mask, int32_t w, int32_t h, const char * txt);
+
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+static lv_theme_t * theme_original;
+static lv_obj_t * home_screen;
+static lv_obj_t * label_hour;
+static lv_obj_t * label_minute;
+
+static lv_anim_t rotate;
 
 static uint32_t arc_colors[] = {
 
@@ -59,14 +73,6 @@ static uint32_t arc_colors[] = {
     0xEB0F13, /* Red */
     0xD50059, /* Garnet */
 };
-
-/**********************
- *  STATIC VARIABLES
- **********************/
-static lv_theme_t * theme_original;
-static lv_obj_t * home_screen;
-
-static lv_anim_t rotate;
 
 /**********************
  *  GLOBAL VARIABLES
@@ -123,18 +129,36 @@ void lv_demo_smartwatch(void)
     lv_obj_t * image = lv_image_create(home_screen);
     lv_image_set_src(image, &image_arcoiris_background);
 
-    LV_FONT_DECLARE(font_roboto_serif_bold_164);
-    lv_obj_t * label = lv_label_create(home_screen);
-    lv_label_set_text(label, "23");
-    lv_obj_set_y(label, -172);
-    lv_obj_set_align(label, LV_ALIGN_BOTTOM_MID);
-    lv_obj_set_style_text_font(label, &font_roboto_serif_bold_164, 0);
+    /* Create the mask of a text by drawing it to a canvas*/
+    LV_DRAW_BUF_DEFINE_STATIC(mask_hour, MASK_WIDTH, MASK_HEIGHT, LV_COLOR_FORMAT_L8);
+    LV_DRAW_BUF_INIT_STATIC(mask_hour);
+    generate_mask(&mask_hour, MASK_WIDTH, MASK_HEIGHT, "23");
 
-    label = lv_label_create(home_screen);
-    lv_label_set_text(label, "57");
-    lv_obj_set_align(label, LV_ALIGN_TOP_MID);
-    lv_obj_set_y(label, 172);
-    lv_obj_set_style_text_font(label, &font_roboto_serif_bold_164, 0);
+    label_hour = lv_obj_create(home_screen);
+    lv_obj_set_y(label_hour, -60);
+    lv_obj_set_align(label_hour, LV_ALIGN_CENTER);
+    lv_obj_set_size(label_hour, MASK_WIDTH, MASK_HEIGHT);
+    lv_obj_set_style_bg_color(label_hour, lv_color_hex(0x222222), 0);
+    lv_obj_set_style_bg_opa(label_hour, 255, 0);
+    lv_obj_set_style_bg_grad_color(label_hour, lv_color_hex(0xFFFFFF), 0);
+    lv_obj_set_style_bg_grad_stop(label_hour, 155, 0);
+    lv_obj_set_style_bg_grad_dir(label_hour, LV_GRAD_DIR_VER, 0);
+    lv_obj_set_style_bitmap_mask_src(label_hour, &mask_hour, 0);
+
+    LV_DRAW_BUF_DEFINE_STATIC(mask_minute, MASK_WIDTH, MASK_HEIGHT, LV_COLOR_FORMAT_L8);
+    LV_DRAW_BUF_INIT_STATIC(mask_minute);
+    generate_mask(&mask_minute, MASK_WIDTH, MASK_HEIGHT, "17");
+
+    label_minute = lv_obj_create(home_screen);
+    lv_obj_set_align(label_minute, LV_ALIGN_CENTER);
+    lv_obj_set_y(label_minute, 70);
+    lv_obj_set_size(label_minute, MASK_WIDTH, MASK_HEIGHT);
+    lv_obj_set_style_bg_color(label_minute, lv_color_hex(0x333333), 0);
+    lv_obj_set_style_bg_opa(label_minute, 255, 0);
+    lv_obj_set_style_bg_grad_stop(label_minute, 155, 0);
+    lv_obj_set_style_bg_grad_color(label_minute, lv_color_hex(0xFFFFFF), 0);
+    lv_obj_set_style_bg_grad_dir(label_minute, LV_GRAD_DIR_VER, 0);
+    lv_obj_set_style_bitmap_mask_src(label_minute, &mask_minute, 0);
 
     lv_obj_t * date_cont = lv_obj_create(home_screen);
     lv_obj_remove_style_all(date_cont);
@@ -142,7 +166,7 @@ void lv_demo_smartwatch(void)
     lv_obj_set_flex_flow(date_cont, LV_FLEX_FLOW_COLUMN);
 
     LV_FONT_DECLARE(font_inter_regular_24);
-    label = lv_label_create(date_cont);
+    lv_obj_t * label = lv_label_create(date_cont);
     lv_label_set_text(label, "07/12");
     lv_obj_set_style_text_letter_space(label, 1, 0);
     lv_obj_set_style_text_font(label, &font_inter_regular_24, 0);
@@ -228,9 +252,6 @@ void lv_demo_smartwatch(void)
     lv_anim_set_repeat_count(&rotate, LV_ANIM_REPEAT_INFINITE);
     lv_anim_start(&rotate);
 
-
-
-
 }
 
 
@@ -312,6 +333,38 @@ void ui_anim_opa(lv_obj_t * obj, lv_opa_t opa, int32_t duration, int32_t delay)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+
+
+static void generate_mask(lv_draw_buf_t * mask, int32_t w, int32_t h, const char * txt)
+{
+    /*Create a "8 bit alpha" canvas and clear it*/
+    lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
+    lv_canvas_set_draw_buf(canvas, mask);
+    lv_canvas_fill_bg(canvas, lv_color_black(), LV_OPA_TRANSP);
+
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+
+    LV_FONT_DECLARE(font_roboto_serif_bold_164);
+
+    /*Draw a label to the canvas. The result "image" will be used as mask*/
+    lv_draw_label_dsc_t label_dsc;
+    lv_draw_label_dsc_init(&label_dsc);
+    label_dsc.color = lv_color_white();
+    label_dsc.align = LV_TEXT_ALIGN_CENTER;
+    label_dsc.text = txt;
+    label_dsc.ofs_y = -25;
+    label_dsc.font = &font_roboto_serif_bold_164;
+    lv_area_t a = {0, 0, w - 1, h - 1};
+    lv_draw_label(&layer, &label_dsc, &a);
+
+    lv_canvas_finish_layer(canvas, &layer);
+
+    lv_obj_delete(canvas);
+}
+
+
 
 static void translate_x_anim(void * var, int32_t v)
 {

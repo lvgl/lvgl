@@ -24,13 +24,18 @@
  **********************/
 
 static void health_screen_events(lv_event_t * e);
+static void button_click_event(lv_event_t * e);
+
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 static lv_obj_t * health_screen;
 
-
+static lv_obj_t * ecg_cont;
+static lv_obj_t * heart_bg_2;
+static lv_obj_t * heart_icon;
+static lv_obj_t * image_button;
 /**********************
  *      MACROS
  **********************/
@@ -77,7 +82,7 @@ void lv_demo_smartwatch_health_create(void)
     lv_obj_remove_flag(heart_bg_1, LV_OBJ_FLAG_SCROLLABLE);
 
     LV_IMAGE_DECLARE(image_heart_bg_small);
-    lv_obj_t * heart_bg_2 = lv_image_create(health_screen);
+    heart_bg_2 = lv_image_create(health_screen);
     lv_image_set_src(heart_bg_2, &image_heart_bg_small);
     lv_obj_set_x(heart_bg_2, 0);
     lv_obj_set_y(heart_bg_2, -23);
@@ -85,7 +90,7 @@ void lv_demo_smartwatch_health_create(void)
     lv_obj_add_flag(heart_bg_2, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_remove_flag(heart_bg_2, LV_OBJ_FLAG_SCROLLABLE);
 
-    lv_obj_t * ecg_cont = lv_obj_create(health_screen);
+    ecg_cont = lv_obj_create(health_screen);
     lv_obj_remove_style_all(ecg_cont);
     lv_obj_set_width(ecg_cont, 384);
     lv_obj_set_height(ecg_cont, LV_SIZE_CONTENT);
@@ -126,7 +131,7 @@ void lv_demo_smartwatch_health_create(void)
     lv_label_set_text(label, "Current");
     lv_obj_set_style_text_font(label, &font_space_grotesk_regular_23, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_t *text_cont = lv_obj_create(info_cont);
+    lv_obj_t * text_cont = lv_obj_create(info_cont);
     lv_obj_remove_style_all(text_cont);
     lv_obj_set_width(text_cont, 185);
     lv_obj_set_height(text_cont, 71);
@@ -159,26 +164,26 @@ void lv_demo_smartwatch_health_create(void)
     lv_label_set_text(label, "49bpm, 3 min ago");
     lv_obj_set_style_text_font(label, &font_space_grotesk_regular_23, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    LV_IMAGE_DECLARE(image_health_on);
-    image = lv_image_create(health_screen);
-    lv_image_set_src(image, &image_health_on);
-    lv_obj_set_width(image, LV_SIZE_CONTENT);
-    lv_obj_set_height(image, LV_SIZE_CONTENT);
-    lv_obj_set_x(image, 270);
-    lv_obj_set_y(image, 191);
-    lv_obj_add_flag(image, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_remove_flag(image, LV_OBJ_FLAG_SCROLLABLE);
+    LV_IMAGE_DECLARE(image_health_off);
+    image_button = lv_image_create(health_screen);
+    lv_image_set_src(image_button, &image_health_off);
+    lv_obj_set_width(image_button, LV_SIZE_CONTENT);
+    lv_obj_set_height(image_button, LV_SIZE_CONTENT);
+    lv_obj_set_x(image_button, 270);
+    lv_obj_set_y(image_button, 191);
+    lv_obj_add_flag(image_button, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(image_button, LV_OBJ_FLAG_SCROLLABLE);
 
     LV_IMAGE_DECLARE(image_heart_icon);
-    image = lv_image_create(health_screen);
-    lv_image_set_src(image, &image_heart_icon);
-    lv_obj_set_width(image, LV_SIZE_CONTENT);
-    lv_obj_set_height(image, LV_SIZE_CONTENT);
-    lv_obj_set_x(image, 0);
-    lv_obj_set_y(image, -30);
-    lv_obj_set_align(image, LV_ALIGN_CENTER);
-    lv_obj_add_flag(image, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_remove_flag(image, LV_OBJ_FLAG_SCROLLABLE);
+    heart_icon = lv_image_create(health_screen);
+    lv_image_set_src(heart_icon, &image_heart_icon);
+    lv_obj_set_width(heart_icon, LV_SIZE_CONTENT);
+    lv_obj_set_height(heart_icon, LV_SIZE_CONTENT);
+    lv_obj_set_x(heart_icon, 0);
+    lv_obj_set_y(heart_icon, -30);
+    lv_obj_set_align(heart_icon, LV_ALIGN_CENTER);
+    lv_obj_add_flag(heart_icon, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(heart_icon, LV_OBJ_FLAG_SCROLLABLE);
 
     lv_obj_t * click_cont = lv_obj_create(health_screen);
     lv_obj_remove_style_all(click_cont);
@@ -188,15 +193,16 @@ void lv_demo_smartwatch_health_create(void)
     lv_obj_set_y(click_cont, 37);
     lv_obj_set_align(click_cont, LV_ALIGN_CENTER);
     lv_obj_remove_flag(click_cont, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_event_cb(click_cont, button_click_event, LV_EVENT_CLICKED, NULL);
 
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_duration(&a, 500);
-    lv_anim_set_var(&a, image);
+    lv_anim_set_var(&a, heart_icon);
     lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_image_set_scale);
     lv_anim_set_values(&a, 256, 320);
-    lv_anim_set_path_cb( &a, lv_anim_path_ease_in);
-    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE );
+    lv_anim_set_path_cb(&a, lv_anim_path_ease_in);
+    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
     lv_anim_start(&a);
 
 
@@ -213,6 +219,25 @@ lv_obj_t * lv_demo_smartwatch_get_health_screen(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+
+static void button_click_event(lv_event_t * e)
+{
+    LV_IMAGE_DECLARE(image_health_on);
+    LV_IMAGE_DECLARE(image_health_off);
+    if(lv_obj_has_flag(ecg_cont, LV_OBJ_FLAG_HIDDEN)) {
+        lv_obj_remove_flag(ecg_cont, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(heart_bg_2, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(heart_icon, LV_OBJ_FLAG_HIDDEN);
+        lv_image_set_src(image_button, &image_health_on);
+    }
+    else {
+        lv_obj_add_flag(ecg_cont, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_remove_flag(heart_bg_2, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_remove_flag(heart_icon, LV_OBJ_FLAG_HIDDEN);
+        lv_image_set_src(image_button, &image_health_off);
+    }
+}
 
 static void health_screen_events(lv_event_t * e)
 {
