@@ -204,6 +204,8 @@ void setUp(void)
 
 void tearDown(void)
 {
+    font_stress_label_delete_all(&g_ctx);
+
     lv_freetype_uninit();
     lv_free(g_ctx.label_arr);
     g_ctx.label_arr = NULL;
