@@ -323,7 +323,7 @@ static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return 0;
 
     /* Try to get an ready to draw. */
-    lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_PXP);
+    lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_PXP);
 
     if(t == NULL || t->preferred_draw_unit_id != DRAW_UNIT_ID_PXP)
         return LV_DRAW_UNIT_IDLE;

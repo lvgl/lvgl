@@ -31,14 +31,22 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_draw_sw_unit_t {
-    lv_draw_unit_t base_unit;
+typedef struct {
     lv_draw_task_t * task_act;
-#if LV_USE_OS
-    lv_thread_sync_t sync;
     lv_thread_t thread;
+    lv_thread_sync_t sync;
+    lv_draw_unit_t * draw_unit;
+    uint32_t idx;
     volatile bool inited;
     volatile bool exit_status;
+} lv_draw_sw_thread_dsc_t;
+
+struct _lv_draw_sw_unit_t {
+    lv_draw_unit_t base_unit;
+#if LV_USE_OS
+    lv_draw_sw_thread_dsc_t thread_dscs[LV_DRAW_SW_DRAW_UNIT_CNT];
+#else
+    lv_draw_task_t * task_act;
 #endif
 };
 

@@ -32,7 +32,8 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check);
-static void lv_cleanup_task(lv_draw_task_t * t, lv_display_t * disp);
+static void cleanup_task(lv_draw_task_t * t, lv_display_t * disp);
+static lv_draw_task_t * get_first_available_task(lv_layer_t * layer);
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
 static inline uint32_t get_layer_size_kb(uint32_t size_byte)
@@ -231,7 +232,7 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
     while(t) {
         t_next = t->next;
         if(t->state == LV_DRAW_TASK_STATE_READY) {
-            lv_cleanup_task(t, disp);
+            cleanup_task(t, disp);
             if(t_prev != NULL)
                 t_prev->next = t_next;
             else
@@ -309,37 +310,20 @@ uint32_t lv_draw_get_unit_count(void)
     return _draw_info.unit_cnt;
 }
 
+lv_draw_task_t * lv_draw_get_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id)
+{
+    if(_draw_info.unit_cnt == 1) {
+        return get_first_available_task(layer);
+    }
+    else {
+        return lv_draw_get_next_available_task(layer, t_prev, draw_unit_id);
+    }
+}
+
 lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id)
 {
     LV_PROFILER_DRAW_BEGIN;
 
-    /* If there is only 1 draw unit the task can be consumed linearly as
-     * they are added in the correct order. However, it can happen that
-     * there is a `LV_DRAW_TASK_TYPE_LAYER` which can be blended only when
-     * all its tasks are ready. As other areas might be on top of that
-     * layer-to-blend don't skip it. Instead stop there, so that the
-     * draw tasks of that layer can be consumed and can be finished.
-     * After that this layer-to-blenf will have `LV_DRAW_TASK_STATE_QUEUED`
-     * so it can be blended normally.*/
-    if(_draw_info.unit_cnt <= 1) {
-        lv_draw_task_t * t = layer->draw_task_head;
-        while(t) {
-            /*Not queued yet, leave this layer while the first task will be queued*/
-            if(t->state != LV_DRAW_TASK_STATE_QUEUED) {
-                t = NULL;
-                break;
-            }
-            /*It's a supported and queued task, process it*/
-            else {
-                break;
-            }
-            t = t->next;
-        }
-        LV_PROFILER_DRAW_END;
-        return t;
-    }
-
-    /*Handle the case of multiply draw units*/
 
     /*If the first task is screen sized, there cannot be independent areas*/
     if(layer->draw_task_head) {
@@ -554,7 +538,7 @@ static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check)
  * @param t         pointer to a draw task
  * @param disp      pointer to a display on which the task was drawn
  */
-static void lv_cleanup_task(lv_draw_task_t * t, lv_display_t * disp)
+static void cleanup_task(lv_draw_task_t * t, lv_display_t * disp)
 {
     LV_PROFILER_DRAW_BEGIN;
     /*If it was layer drawing free the layer too*/
@@ -606,4 +590,33 @@ static void lv_cleanup_task(lv_draw_task_t * t, lv_display_t * disp)
     lv_free(t->draw_dsc);
     lv_free(t);
     LV_PROFILER_DRAW_END;
+}
+
+static lv_draw_task_t * get_first_available_task(lv_layer_t * layer)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    /* If there is only 1 draw unit the task can be consumed linearly as
+     * they are added in the correct order. However, it can happen that
+     * there is a `LV_DRAW_TASK_TYPE_LAYER` which can be blended only when
+     * all its tasks are ready. As other areas might be on top of that
+     * layer-to-blend don't skip it. Instead stop there, so that the
+     * draw tasks of that layer can be consumed and can be finished.
+     * After that this layer-to-blenf will have `LV_DRAW_TASK_STATE_QUEUED`
+     * so it can be blended normally.*/
+    lv_draw_task_t * t = layer->draw_task_head;
+    while(t) {
+        /*Not queued yet, leave this layer while the first task is queued*/
+        if(t->state != LV_DRAW_TASK_STATE_QUEUED) {
+            t = NULL;
+            break;
+        }
+        /*It's a supported and queued task, process it*/
+        else {
+            break;
+        }
+        t = t->next;
+    }
+
+    LV_PROFILER_DRAW_END;
+    return t;
 }
