@@ -442,7 +442,7 @@ int32_t lv_scale_get_major_tick_every(lv_obj_t * obj)
     return scale->major_tick_every;
 }
 
-lv_scale_mode_t lv_scale_get_rotation(lv_obj_t * obj)
+int32_t lv_scale_get_rotation(lv_obj_t * obj)
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
     return scale->rotation;
