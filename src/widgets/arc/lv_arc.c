@@ -517,7 +517,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         const lv_value_precise_t tolerance_deg = (360 * lv_dpx(50U)) / circumference;
         const uint32_t min_close_prev = (uint32_t) arc->min_close;
 
-        const bool is_angle_within_bg_bounds = lv_arc_angle_within_bg_bounds(obj, angle, tolerance_deg);
+        bool is_angle_within_bg_bounds = lv_arc_angle_within_bg_bounds(obj, angle, tolerance_deg);
         if(!is_angle_within_bg_bounds) {
             return;
         }
@@ -967,6 +967,12 @@ static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const lv_value_precise
     lv_arc_t * arc = (lv_arc_t *)obj;
 
     lv_value_precise_t bounds_angle = arc->bg_angle_end - arc->bg_angle_start;
+
+    if(arc->bg_angle_end + tolerance_deg > 360) {
+        arc->in_out = CLICK_INSIDE_BG_ANGLES;
+        arc->min_close = CLICK_CLOSER_TO_MIN_END;
+        return true;
+    }
 
     /* ensure the angle is in the range [0, 360) */
     while(bounds_angle < 0) bounds_angle += 360;
