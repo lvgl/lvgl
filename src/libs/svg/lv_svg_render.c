@@ -1287,7 +1287,7 @@ static void _render_rect(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc,
     else if(rect->ry > 0 && rect->rx == 0) rect->rx = rect->ry;
 
     lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
-    lv_area_t rc = {(int32_t)rect->x, (int32_t)rect->y, (int32_t)(rect->x + rect->width), (int32_t)(rect->y + rect->height)};
+    lv_area_t rc = {(int32_t)rect->x, (int32_t)rect->y, (int32_t)(rect->x + rect->width - 1), (int32_t)(rect->y + rect->height - 1)};
     lv_vector_path_append_rect(path, &rc, rect->rx, rect->ry);
 
     _copy_draw_dsc_from_ref(dsc, obj);
@@ -1417,7 +1417,7 @@ static void _render_image(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc
     }
 
     lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
-    lv_area_t rc = {(int32_t)image->x, (int32_t)image->y, (int32_t)(image->x + image->width), (int32_t)(image->y + image->height)};
+    lv_area_t rc = {(int32_t)image->x, (int32_t)image->y, (int32_t)(image->x + image->width - 1), (int32_t)(image->y + image->height - 1)};
     lv_vector_path_append_rect(path, &rc, 0, 0);
 
     lv_matrix_t mtx;
