@@ -7,3 +7,4 @@ Boards
 
     toradex
     riverdi
+    viewe
