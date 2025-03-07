@@ -86,9 +86,15 @@ lv_event_dsc_t * lv_obj_get_event_dsc(lv_obj_t * obj, uint32_t index);
 
 bool lv_obj_remove_event(lv_obj_t * obj, uint32_t index);
 
-bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb);
-
 bool lv_obj_remove_event_dsc(lv_obj_t * obj, lv_event_dsc_t * dsc);
+
+/**
+ * Remove an event_cb from an object
+ * @param obj           pointer to a obj
+ * @param event_cb      the event_cb of the event to remove
+ * @return              the count of the event removed
+ */
+uint32_t lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb);
 
 /**
  * Remove an event_cb with user_data
