@@ -9,6 +9,8 @@ void lv_example_ffmpeg_2(void)
 {
     /*birds.mp4 is downloaded from http://www.videezy.com (Free Stock Footage by Videezy!)
      *https://www.videezy.com/abstract/44864-silhouettes-of-birds-over-the-sunset*/
+    /*It will use the LVGL filesystem abstraction (not the OS filesystem)
+     *if `LV_FFMPEG_PLAYER_USE_LV_FS` is set.*/
     lv_obj_t * player = lv_ffmpeg_player_create(lv_screen_active());
     lv_ffmpeg_player_set_src(player, "./lvgl/examples/libs/ffmpeg/birds.mp4");
     lv_ffmpeg_player_set_auto_restart(player, true);
