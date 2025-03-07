@@ -480,11 +480,13 @@ void lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t p
 lv_style_value_t lv_obj_style_apply_color_filter(const lv_obj_t * obj, lv_part_t part, lv_style_value_t v)
 {
     if(obj == NULL) return v;
-    const lv_color_filter_dsc_t * f = lv_obj_get_style_color_filter_dsc(obj, part);
-    if(f && f->filter_cb) {
-        lv_opa_t f_opa = lv_obj_get_style_color_filter_opa(obj, part);
-        if(f_opa != 0) v.color = f->filter_cb(f, v.color, f_opa);
-    }
+
+    lv_color32_t color = lv_obj_get_style_color_filter_recursive(obj, part);
+
+    if(color.alpha == LV_OPA_TRANSP) return v;
+
+    v.color = lv_color_mix_color32(color, v.color);
+
     return v;
 }
 
@@ -638,6 +640,40 @@ void lv_obj_update_layer_type(lv_obj_t * obj)
         lv_obj_allocate_spec_attr(obj);
         obj->spec_attr->layer_type = layer_type;
     }
+}
+
+
+lv_color32_t lv_obj_get_style_color_filter_resolved(const lv_obj_t * obj, lv_part_t part)
+{
+    const lv_color_filter_dsc_t * f = lv_obj_get_style_color_filter_dsc(obj, part);
+    if(f && f->filter_cb) {
+        lv_opa_t opa = lv_obj_get_style_color_filter_opa(obj, part);
+        lv_color_t color = f->filter_cb(f, lv_color_black(), LV_OPA_COVER);
+        return lv_color_to_32(color, opa);
+    }
+
+    return  lv_color32_make(0, 0, 0, 0);
+}
+
+lv_color32_t lv_obj_get_style_color_filter_recursive(const lv_obj_t * obj, lv_part_t part)
+{
+    lv_color32_t color = lv_obj_get_style_color_filter_resolved(obj, part);
+
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+
+    while(parent != NULL) {
+        lv_color32_t parent_color = lv_obj_get_style_color_filter_resolved(parent, part);
+        if(color.alpha > LV_OPA_TRANSP) {
+            color = lv_color_mix32(parent_color, color);
+        }
+        else if(parent_color.alpha > LV_OPA_TRANSP) {
+            color = parent_color;
+        }
+
+        parent = lv_obj_get_parent(parent);
+    }
+
+    return color;
 }
 
 /**********************

@@ -58,6 +58,37 @@ lv_color32_t lv_color_mix32(lv_color32_t fg, lv_color32_t bg)
     return bg;
 }
 
+lv_color_t lv_color_mix_color32(lv_color32_t fg, lv_color_t bg)
+{
+    lv_color_t ret;
+
+    ret.red = LV_UDIV255((uint16_t)fg.red * fg.alpha + bg.red * (255 - fg.alpha) + LV_COLOR_MIX_ROUND_OFS);
+    ret.green = LV_UDIV255((uint16_t)fg.green * fg.alpha + bg.green * (255 - fg.alpha) + LV_COLOR_MIX_ROUND_OFS);
+    ret.blue = LV_UDIV255((uint16_t)fg.blue * fg.alpha + bg.blue * (255 - fg.alpha) + LV_COLOR_MIX_ROUND_OFS);
+    return ret;
+}
+
+lv_color32_t lv_color_over32(lv_color32_t fg, lv_color32_t bg)
+{
+    if(fg.alpha >= LV_OPA_MAX || bg.alpha <= LV_OPA_MIN) {
+        return fg;
+    }
+    else if(fg.alpha <= LV_OPA_MIN) {
+        return bg;
+    }
+    else if(bg.alpha == 255) {
+        return lv_color_mix32(fg, bg);
+    }
+
+    lv_opa_t res_alpha  = 255 - LV_OPA_MIX2(255 - fg.alpha, 255 - bg.alpha);
+    lv_opa_t ratio = (uint32_t)((uint32_t)fg.alpha * 255) / res_alpha;
+    fg.alpha = ratio;
+    lv_color32_t res = lv_color_mix32(fg, bg);
+    res.alpha = res_alpha;
+
+    return res;
+}
+
 uint8_t lv_color_brightness(lv_color_t c)
 {
     uint16_t bright = (uint16_t)(3u * c.red + c.green + 4u * c.blue);
