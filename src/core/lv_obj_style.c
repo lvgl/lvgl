@@ -97,7 +97,7 @@ void lv_obj_style_deinit(void)
 
 void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
 {
-    LV_ASSERT(obj->style_cnt < UINT16_MAX - 1);
+    LV_ASSERT(obj->style_cnt < 511);
 
     trans_delete(obj, selector, LV_STYLE_PROP_ANY, NULL);
 
