@@ -209,6 +209,7 @@ static void x11_disp_delete_evt_cb(lv_event_t * e)
     XUnmapWindow(xd->hdr.display, xd->window);
     XDestroyWindow(xd->hdr.display, xd->window);
     XFlush(xd->hdr.display);
+    XCloseDisplay(xd->hdr.display);
 
     lv_free(xd);
 #if LV_X11_DIRECT_EXIT
