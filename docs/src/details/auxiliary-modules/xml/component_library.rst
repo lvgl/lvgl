@@ -57,15 +57,34 @@ A typical structure for a component library looks like this:
 Visibility
 **********
 
-A component library can use images, fonts, components, widgets, etc., from other component libraries.
-It is the user's responsibility to avoid naming conflicts by prefixing names. For example, all
-data belonging to the LVGL core component library is prefixed by ``lv_`` (e.g., ``lv_label``, ``lv_montserrat_22``).
+The content of all ``globals.xml`` files is part of a common global scope, and
+any components, widgets, or screens can use data from there.
 
-A custom component can be prefixed with ``watch_``, ``small_``, ``light_``, or anything else that the developer finds appropriate.
+Styles, constants, and other data defined in the XML file of components, widgets, or screens
+are local to the given file.
+
+In this sense, there are two namespaces:
+
+1. **Local namespace** in the given XML file of components, widgets, and screens.
+2. **Global namespace** created from the data in all ``globals.xml`` files.
+
+The referenced names are always checked first in the local namespace.
+If not found there, the global namespace is also checked.
+
+The defined components, widgets, and screens are part of the global namespace, meaning
+there cannot be two ``mybutton`` components.
+
+All data belonging to the LVGL core component library is prefixed by ``lv_``
+(e.g., ``lv_label``, ``lv_font_default``).
+
+A custom component can be prefixed with ``watch_``, ``small_``, ``light_``, or
+anything else that the developer finds appropriate.
+
 LVGL's UI editor will show an error if there is a naming conflict.
 
-globals.xml
-***********
+
+``globals.xml``
+***************
 
 A ``globals.xml`` file should be created in each component library.
 The definitions in it do not belong to any specific widget but are available throughout the entire UI, widgets, and all XML files.
