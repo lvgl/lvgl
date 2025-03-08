@@ -634,7 +634,7 @@ static void dump_tree_core(lv_obj_t * obj, int32_t depth)
 #endif
 
     /*id of `obj0` is an invalid id for builtin id*/
-    LV_LOG_USER("%*sparent:%p, obj:%p, id:%s;", 2 * depth, "", (void *)(obj ? obj->parent : NULL), (void *)obj, id);
+    LV_LOG_USER("%*sobj:%p, id:%s;", 2 * depth, "", (void *)obj, id);
 #endif /*LV_USE_LOG*/
 
     if(obj && obj->spec_attr && obj->spec_attr->child_cnt) {
