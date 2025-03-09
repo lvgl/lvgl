@@ -1090,6 +1090,13 @@ class ENUMVALUE(object):
         self.file_name = None
         self.line_no = None
 
+        if parent is not None:
+            if parent.file_name is not None:
+                self.file_name = parent.file_name
+            elif hasattr(parent, 'parent') and parent.parent is not None:
+                if parent.parent.name is not None:
+                    self.file_name = parent.parent.name
+
     def __str__(self):
         return self.template.format(name=self.name)
 
