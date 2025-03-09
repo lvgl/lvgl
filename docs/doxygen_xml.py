@@ -570,7 +570,14 @@ class STRUCT(object):
             self.file_name = None
             self.line_no = None
 
-        if parent and refid:
+        # Prior to 9-Mar-2025, the code below was never executing since this
+        # __init__() was never called with a `parent` value other than `None`.
+        # Reason:  `kind="struct"` only occurs in `index.xml` as a top-level
+        # entry, and not as a child element of `kind="file"` as do <sectiondef>
+        # elements with kind = define, var, enum and func.
+        # Original code:
+        # if parent and refid:
+        if refid:
             root = load_xml_etree(refid)
 
             for compounddef in root:
@@ -597,6 +604,7 @@ class STRUCT(object):
                             file_name = None
                             line_no = None
 
+                            # For each struct member...
                             for element in memberdef:
                                 if element.tag == 'location':
                                     file_name = element.attrib['file']
@@ -1098,6 +1106,8 @@ class ENUM(object):
         global enums
 
         if name in enums:
+            # This happens when `name` is `None`, for example.
+            # This is true for unnamed enumerations.
             self.__dict__.update(enums[name].__dict__)
         else:
 
