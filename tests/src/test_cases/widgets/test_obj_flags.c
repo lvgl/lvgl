@@ -87,7 +87,6 @@ void test_obj_flag_overflow_visible_1(void)
     TEST_ASSERT_EQUAL_UINT32(1, cnt_1);
     TEST_ASSERT_EQUAL_UINT32(2, cnt_2);
 
-    // lv_obj_add_state(btn_2, LV_STATE_PRESSED);
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/obj_flag_overflow_visible_1_1.png");
 
     /*Test if the overflowing parts are rendered correctly after scrolling too*/
