@@ -58,14 +58,15 @@ lv_color32_t lv_color_mix32(lv_color32_t fg, lv_color32_t bg)
     return bg;
 }
 
-lv_color_t lv_color_mix_color32(lv_color32_t fg, lv_color_t bg)
+uint8_t lv_color_brightness(lv_color_t c)
 {
-    lv_color_t ret;
+    uint16_t bright = (uint16_t)(3u * c.red + c.green + 4u * c.blue);
+    return (uint8_t)(bright >> 3);
+}
 
-    ret.red = LV_UDIV255((uint16_t)fg.red * fg.alpha + bg.red * (255 - fg.alpha) + LV_COLOR_MIX_ROUND_OFS);
-    ret.green = LV_UDIV255((uint16_t)fg.green * fg.alpha + bg.green * (255 - fg.alpha) + LV_COLOR_MIX_ROUND_OFS);
-    ret.blue = LV_UDIV255((uint16_t)fg.blue * fg.alpha + bg.blue * (255 - fg.alpha) + LV_COLOR_MIX_ROUND_OFS);
-    return ret;
+void lv_color_filter_dsc_init(lv_color_filter_dsc_t * dsc, lv_color_filter_cb_t cb)
+{
+    dsc->filter_cb = cb;
 }
 
 lv_color32_t lv_color_over32(lv_color32_t fg, lv_color32_t bg)
@@ -87,17 +88,6 @@ lv_color32_t lv_color_over32(lv_color32_t fg, lv_color32_t bg)
     res.alpha = res_alpha;
 
     return res;
-}
-
-uint8_t lv_color_brightness(lv_color_t c)
-{
-    uint16_t bright = (uint16_t)(3u * c.red + c.green + 4u * c.blue);
-    return (uint8_t)(bright >> 3);
-}
-
-void lv_color_filter_dsc_init(lv_color_filter_dsc_t * dsc, lv_color_filter_cb_t cb)
-{
-    dsc->filter_cb = cb;
 }
 
 /**********************

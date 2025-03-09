@@ -82,7 +82,7 @@ bool lv_obj_replace_style(lv_obj_t * obj, const lv_style_t * old_style, const lv
  *
  * lv_obj_remove_style(obj, NULL, LV_PART_MAIN | LV_STATE_ANY); //Remove all styles from the main part
  *
- * lv_obj_remove_style(obj, NULL, LV_PART_ANY | LV_STATE_ANY); //Remove all styles
+ * lv_obj_remove_style(obj, NULL, LV_3_ANY | LV_STATE_ANY); //Remove all styles
  * @endcode
  */
 void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
@@ -307,21 +307,24 @@ static inline int32_t lv_obj_get_style_transform_scale_y_safe(const lv_obj_t * o
  */
 lv_opa_t lv_obj_get_style_opa_recursive(const lv_obj_t * obj, lv_part_t part);
 
-/**
- * Get the `color_filter` style property and convert to lv_color32_t
- * @param obj       the object whose opacity should be get
- * @param part      the part whose opacity should be get.
- * @return          the converted color32
- */
-lv_color32_t lv_obj_get_style_color_filter_resolved(const lv_obj_t * obj, lv_part_t part);
 
 /**
- * Get the `color_filter` style property from all parents and convert to lv_color32_t
- * @param obj       the object whose opacity should be get
- * @param part      the part whose opacity should be get.
- * @return          the final color_filter considering the parent too
+ * Apply recolor effect to the input color based on the object's style properties.
+ * @param obj       the target object containing recolor style properties
+ * @param part      the part to retrieve recolor styles.
+ * @param color     the original color to be modified
+ * @return          the blended color after applying recolor and opacity
  */
-lv_color32_t lv_obj_get_style_color_filter_recursive(const lv_obj_t * obj, lv_part_t part);
+lv_color32_t lv_obj_style_apply_recolor(const lv_obj_t * obj, lv_part_t part, lv_color32_t color);
+
+/**
+ * Get the `recolor` style property from all parents and blend them recursively.
+ * @param obj       the object whose recolor value should be retrieved
+ * @param part      the target part to check. Non-MAIN parts will also consider
+ *                  the `recolor` value from the MAIN part during calculation
+ * @return          the final blended recolor value combining all parent's recolor values
+ */
+lv_color32_t lv_obj_get_style_recolor_recursive(const lv_obj_t * obj, lv_part_t part);
 
 /**********************
  *      MACROS

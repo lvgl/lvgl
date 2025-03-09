@@ -876,18 +876,18 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
     if(top_obj == NULL) top_obj = lv_display_get_screen_active(disp_refr);
     if(top_obj == NULL) return;  /*Shouldn't happen*/
 
+    LV_PROFILER_REFR_BEGIN;
     /*Draw the 'younger' sibling objects because they can be on top_obj*/
     lv_obj_t * parent;
     lv_obj_t * border_p = top_obj;
 
     parent = lv_obj_get_parent(top_obj);
 
-    /*Calculate the color_filter before the parent*/
+    /*Calculate the recolor before the parent*/
     if(parent) {
-        layer->color_filter = lv_obj_get_style_color_filter_recursive(parent, LV_PART_MAIN);
+        layer->recolor = lv_obj_get_style_recolor_recursive(parent, LV_PART_MAIN);
     }
 
-    LV_PROFILER_REFR_BEGIN;
     /*Refresh the top object and its children*/
     refr_obj(layer, top_obj);
 
@@ -1113,7 +1113,7 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
     if(opa_layered < LV_OPA_MIN) return;
 
     const lv_opa_t layer_opa_ori = layer->opa;
-    const lv_color32_t layer_color_filter_ori = layer->color_filter;
+    const lv_color32_t layer_recolor = layer->recolor;
 
     /*Normal `opa` (not layered) will just scale down `bg_opa`, `text_opa`, etc, in the upcoming drawings.*/
     const lv_opa_t opa_main = lv_obj_get_style_opa(obj, LV_PART_MAIN);
@@ -1121,10 +1121,7 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
         layer->opa = LV_OPA_MIX2(layer_opa_ori, opa_main);
     }
 
-    /*Store color_filter in the layer*/
-    lv_color32_t color = lv_obj_get_style_color_filter_resolved(obj, LV_PART_MAIN);
-    if(color.alpha > LV_OPA_TRANSP)
-        layer->color_filter = lv_color_over32(layer->color_filter, color);
+    layer->recolor = lv_obj_style_apply_recolor(obj, LV_PART_MAIN, layer->recolor);
 
     lv_layer_type_t layer_type = lv_obj_get_layer_type(obj);
     if(layer_type == LV_LAYER_TYPE_NONE) {
@@ -1213,9 +1210,9 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
         }
     }
 
-    /* Restore the original layer opa and layer color_filter*/
+    /* Restore the original layer opa and recolor */
     layer->opa = layer_opa_ori;
-    layer->color_filter = layer_color_filter_ori;
+    layer->recolor = layer_recolor;
 }
 
 static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)

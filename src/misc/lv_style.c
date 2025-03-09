@@ -129,14 +129,16 @@ const uint8_t lv_style_builtin_prop_flag_lookup_table[LV_STYLE_NUM_BUILT_IN_PROP
     [LV_STYLE_CLIP_CORNER] = 0,
     [LV_STYLE_OPA] = 0,
     [LV_STYLE_OPA_LAYERED] =               LV_STYLE_PROP_FLAG_LAYER_UPDATE,
-    [LV_STYLE_COLOR_FILTER_DSC] = 0,
-    [LV_STYLE_COLOR_FILTER_OPA] = 0,
+    [LV_STYLE_COLOR_FILTER_DSC] =          LV_STYLE_PROP_FLAG_INHERITABLE,
+    [LV_STYLE_COLOR_FILTER_OPA] =          LV_STYLE_PROP_FLAG_INHERITABLE,
     [LV_STYLE_ANIM_DURATION] = 0,
     [LV_STYLE_TRANSITION] = 0,
     [LV_STYLE_BLEND_MODE] =                LV_STYLE_PROP_FLAG_LAYER_UPDATE,
     [LV_STYLE_LAYOUT] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_BASE_DIR] =                  LV_STYLE_PROP_FLAG_INHERITABLE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_BITMAP_MASK_SRC] =           LV_STYLE_PROP_FLAG_LAYER_UPDATE,
+    [LV_STYLE_RECOLOR] = 0,
+    [LV_STYLE_RECOLOR_OPA] = 0,
 
 #if LV_USE_FLEX
     [LV_STYLE_FLEX_FLOW] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
@@ -415,6 +417,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
         case LV_STYLE_LINE_COLOR:
         case LV_STYLE_TEXT_COLOR:
         case LV_STYLE_IMAGE_RECOLOR:
+        case LV_STYLE_RECOLOR:
             return (lv_style_value_t) {
                 .color = black
             };
