@@ -435,7 +435,7 @@ def _add_hyperlinks_to_eligible_files(intermediate_dir: str,
             if links_added_count > 0:
                 total_links_added_count += links_added_count
                 total_eligible_doc_count += 1
-                announce(__file__, f'Eligible doc: [{rst_file}].')
+                # announce(__file__, f'Eligible doc: [{rst_file}].')
 
         announce(__file__, f'Docs eligible for API hyperlinks: {total_eligible_doc_count:>4}')
         announce(__file__, f'API hyperlinks added            : {total_links_added_count:>4}')
@@ -556,8 +556,7 @@ def _create_rst_files_for_dir(src_root_dir_len: int,
         f.write(section_line)
         f.write(subdir_stem + '\n')
         f.write(section_line)
-        # TODO: reduce below to 1 newline after testing.
-        f.write('\n\n')
+        f.write('\n')
         f.write('.. toctree::\n    :maxdepth: 2\n\n')
 
         for h_file in eligible_h_files:
@@ -568,9 +567,6 @@ def _create_rst_files_for_dir(src_root_dir_len: int,
         for sub_dir in sub_dirs_w_h_files:
             stem = os.path.split(sub_dir)[-1]
             f.write(indent + stem + '/index\n')
-
-        # TODO: remove below after testing.
-        f.write('\n')
 
     # One .rst file per h_file
     for h_file in eligible_h_files:
@@ -586,8 +582,7 @@ def _create_rst_files_for_dir(src_root_dir_len: int,
             f.write(section_line)
             f.write(filename + '\n')
             f.write(section_line)
-            # TODO: reduce below to 1 newline after testing.
-            f.write('\n\n')
+            f.write('\n')
             f.write(f'.. doxygenfile:: {filename}\n')
             f.write('    :project: lvgl\n\n')
 
