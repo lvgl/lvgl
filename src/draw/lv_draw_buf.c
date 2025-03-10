@@ -397,6 +397,28 @@ lv_draw_buf_t * lv_draw_buf_reshape(lv_draw_buf_t * draw_buf, lv_color_format_t 
     return draw_buf;
 }
 
+lv_draw_buf_t * lv_draw_buf_resize(lv_draw_buf_t * draw_buf, lv_color_format_t cf, uint32_t w, uint32_t h,
+                                   uint32_t stride)
+{
+    if(draw_buf == NULL) return NULL;
+
+    /*If color format is unknown, keep using the original color format.*/
+    if(cf == LV_COLOR_FORMAT_UNKNOWN) cf = draw_buf->header.cf;
+    if(stride == 0) stride = lv_draw_buf_width_to_stride(w, cf);
+
+    uint32_t size = _calculate_draw_buf_size(w, h, cf, stride);
+
+    if(size == draw_buf->data_size) {
+        return draw_buf;
+    }
+
+    lv_draw_buf_destroy(draw_buf);
+
+    draw_buf = lv_draw_buf_create(w, h, cf, stride);
+
+    return draw_buf;
+}
+
 void lv_draw_buf_destroy(lv_draw_buf_t * draw_buf)
 {
     LV_ASSERT_NULL(draw_buf);

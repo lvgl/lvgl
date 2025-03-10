@@ -1996,16 +1996,16 @@ static bool resize_window(struct window * window, int width, int height)
                                              lv_display_get_color_format(window->lv_disp));
 
 #if LV_WAYLAND_BUF_COUNT == 1
-        window->lv_disp_draw_buf = lv_draw_buf_reshape(
+        window->lv_disp_draw_buf = lv_draw_buf_resize(
                                        window->lv_disp_draw_buf,
                                        lv_display_get_color_format(window->lv_disp),
                                        width, height / LVGL_DRAW_BUFFER_DIV, stride);
 #else
-        window->lv_disp_draw_buf1 = lv_draw_buf_reshape(
+        window->lv_disp_draw_buf1 = lv_draw_buf_resize(
                                         window->lv_disp_draw_buf1,
                                         lv_display_get_color_format(window->lv_disp),
                                         width, height, stride);
-        window->lv_disp_draw_buf2 = lv_draw_buf_reshape(
+        window->lv_disp_draw_buf2 = lv_draw_buf_resize(
                                         window->lv_disp_draw_buf2,
                                         lv_display_get_color_format(window->lv_disp),
                                         width, height, stride);
