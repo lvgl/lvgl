@@ -459,8 +459,8 @@ static void execute_drawing(lv_draw_dave2d_unit_t * u)
 
     lv_area_intersect(&clipped_area,  &t->area, &t->clip_area);
 
-    x = 0 - u->base_unit.target_layer->buf_area.x1;
-    y = 0 - u->base_unit.target_layer->buf_area.y1;
+    x = 0 - t->target_layer->buf_area.x1;
+    y = 0 - t->target_layer->buf_area.y1;
 
     lv_area_move(&clipped_area, x, y);
 
