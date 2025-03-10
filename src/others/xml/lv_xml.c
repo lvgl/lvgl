@@ -195,7 +195,7 @@ const lv_font_t * lv_xml_get_font(lv_xml_component_ctx_t * ctx, const char * nam
     }
 
     /*If not found in the component check the global space*/
-    if(!lv_streq(ctx->name, "globals")) {
+    if(ctx == NULL || !lv_streq(ctx->name, "globals")) {
         ctx = lv_xml_component_get_ctx("globals");
         if(ctx) {
             LV_LL_READ(&ctx->font_ll, f) {
@@ -233,7 +233,7 @@ lv_subject_t * lv_xml_get_subject(lv_xml_component_ctx_t * ctx, const char * nam
     }
 
     /*If not found in the component check the global space*/
-    if(!lv_streq(ctx->name, "globals")) {
+    if(ctx == NULL || !lv_streq(ctx->name, "globals")) {
         ctx = lv_xml_component_get_ctx("globals");
         if(ctx) {
             LV_LL_READ(&ctx->subjects_ll, s) {
@@ -277,7 +277,7 @@ const char * lv_xml_get_const(lv_xml_component_ctx_t * ctx, const char * name)
     }
 
     /*If not found in the component check the global space*/
-    if(!lv_streq(ctx->name, "globals")) {
+    if(ctx == NULL || !lv_streq(ctx->name, "globals")) {
         ctx = lv_xml_component_get_ctx("globals");
         if(ctx) {
             LV_LL_READ(&ctx->const_ll, cnst) {
@@ -325,7 +325,7 @@ const void * lv_xml_get_image(lv_xml_component_ctx_t * ctx, const char * name)
     }
 
     /*If not found in the component check the global space*/
-    if(!lv_streq(ctx->name, "globals")) {
+    if(ctx == NULL || !lv_streq(ctx->name, "globals")) {
         ctx = lv_xml_component_get_ctx("globals");
         if(ctx) {
             LV_LL_READ(&ctx->image_ll, img) {
@@ -367,7 +367,7 @@ lv_event_cb_t lv_xml_get_event_cb(lv_xml_component_ctx_t * ctx, const char * nam
     }
 
     /*If not found in the component check the global space*/
-    if(!lv_streq(ctx->name, "globals")) {
+    if(ctx == NULL || !lv_streq(ctx->name, "globals")) {
         ctx = lv_xml_component_get_ctx("globals");
         if(ctx) {
             LV_LL_READ(&ctx->event_ll, e) {

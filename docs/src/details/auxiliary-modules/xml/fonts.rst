@@ -29,7 +29,7 @@ In ``<styles>`` and ``<view>``, fonts can be referenced by their name, e.g.,
 
     <style name="style1" text_font="medium"/>
 
-The tag name determines how the font is loaded. Currently, only ``tinyttf as_file="true"`` is supported.
+The tag name determines how the font is loaded. Currently, only ``tiny_ttf as_file="true"`` is supported.
 
 - ``bin``:
 
@@ -38,7 +38,7 @@ The tag name determines how the font is loaded. Currently, only ``tinyttf as_fil
   - If ``as_file="false"`` (default): On export, the font file will be converted to a C array LVGL font
     that can be used directly by LVGL.
 
-- ``tinyttf``:
+- ``tiny_ttf``:
 
   - If ``as_file="true"``: Can be loaded directly by ``lv_tiny_ttf_create_file()``.
   - If ``as_file="false"`` (default): The font file will be converted to a raw C array on export
