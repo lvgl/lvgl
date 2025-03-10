@@ -152,8 +152,6 @@ def _conditionally_add_hyperlink(obj, genned_links: set, exclude_set: set):
 
 def _add_startswith_matches(symbols: [str], genned_link_set, editor_link_set):
     for symbol in symbols:
-        if symbol == 'ime_pinyin':
-            stop_point = 1
         for symbol_dict in _symbol_dict_list:
             for key in symbol_dict:
                 if key is None:
@@ -220,7 +218,6 @@ def _process_end_of_eligible_doc(b: str, rst_file: str) -> (str, str, int):
     :return:   Tuple: (new_B, C, links_added_count)
     """
     # 3.  Initialize:
-    links_added_count = 0
     editor_link_set = set()
     genned_link_set = set()
     c = ''
@@ -400,7 +397,7 @@ def _build_local_symbol_dictionaries():
 
 
 def _add_hyperlinks_to_eligible_files(intermediate_dir: str,
-                                      test: bool,
+                                      new_algorithm: bool,
                                       *doc_rel_paths: [str]):
     """
     Add applicable hyperlinks to eligible docs found joining
@@ -413,7 +410,7 @@ def _add_hyperlinks_to_eligible_files(intermediate_dir: str,
                                 walk to find docs eligible for API hyperlinks.
     :return:
     """
-    if test:
+    if new_algorithm:
         # Populate local symbol dictionary set with
         # symbols WITHOUT any '_' prefixes.
         _build_local_symbol_dictionaries()
@@ -532,7 +529,7 @@ def _create_rst_files_for_dir(src_root_dir_len: int,
     :param src_root_dir_len:    Length of source-root path string, used with `out_root_dir` to build paths
     :param src_dir_bep:         directory currently *being processed*
     :param eligible_h_files:    eligible `.h` files directly contained in `src_dir_bep`
-    :param sub_dirs_w_h_files:  list of subdirs that contained eligible `.h` files
+    :param sub_dirs_w_h_files:  list of sub-dirs that contained eligible `.h` files
     :param out_root_dir:        root of output directory, used with to build paths.
     :return:                    n/a
     """
@@ -673,7 +670,11 @@ def _recursively_create_api_rst_files(depth: int,
 
     if h_file_count > 0:
         # Create index.rst plus .RST files for any direct .H files in dir.
-        _create_rst_files_for_dir(src_root_len, src_dir_bep, eligible_h_files, sub_dirs_w_eligible_h_files, out_root_dir)
+        _create_rst_files_for_dir(src_root_len,
+                                  src_dir_bep,
+                                  eligible_h_files,
+                                  sub_dirs_w_eligible_h_files,
+                                  out_root_dir)
 
     return h_file_count
 
