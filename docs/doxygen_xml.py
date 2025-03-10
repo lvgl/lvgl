@@ -348,9 +348,7 @@ functions = {}   # dictionary of doxygen_xml.FUNCTION objects
 groups = {}      # dictionary of doxygen_xml.GROUP objects
 files = {}       # dictionary of doxygen_xml.FILE objects
 classes = {}     # dictionary of doxygen_xml.CLASS objects
-
-# Additional Dictionaries
-unions = {}      # appears to be non-functional at this time
+unions = {}      # appears to be unused at this time (unions => structures dict).
 
 # Module-Global Variables
 xml_path = ''
@@ -1039,6 +1037,9 @@ class FILE(object):
     def __init__(self, _, refid, name, node, **__):
         global files
 
+        if name.endswith('lv_types.h'):
+            return
+
         if name in files:
             self.__dict__.update(files[name].__dict__)
             return
@@ -1535,13 +1536,12 @@ class DoxygenXml(object):
         cfg.load(doxyfile_src_file)
         # 2. Update cfg.
         cfg.set('OUTPUT_DIRECTORY', '.')
-        cfg.set('INPUT', lvgl_src_dir)
-        cfg.set('GENERATE_XML', 'YES')
         cfg.set('XML_OUTPUT', "xml")
-        cfg.set('GENERATE_HTML', 'NO')
         cfg.set('HTML_OUTPUT', 'doxygen_html')
+        cfg.set('INPUT', lvgl_src_dir)
         cfg.set('PREDEFINED', f'DOXYGEN LV_CONF_PATH="{lv_conf_file}"')
         cfg.set('QUIET', 'YES')
+        cfg.set('GENERATE_HTML', 'NO')
         cfg.set('GENERATE_DOCSET', 'NO')
         cfg.set('GENERATE_HTMLHELP', 'NO')
         cfg.set('GENERATE_CHI', 'NO')
@@ -1550,14 +1550,15 @@ class DoxygenXml(object):
         cfg.set('GENERATE_LATEX', 'NO')
         cfg.set('GENERATE_RTF', 'NO')
         cfg.set('GENERATE_MAN', 'NO')
+        cfg.set('GENERATE_XML', 'YES')
         cfg.set('GENERATE_DOCBOOK', 'NO')
         cfg.set('GENERATE_PERLMOD', 'NO')
 
         # Include TAGFILES if requested.
-        if len(doxy_tagfile) > 0:
+        if doxy_tagfile:
             cfg.set('GENERATE_TAGFILE', doxy_tagfile)
 
-        # 3. Store it into intermediate directory.
+        # 3. Store it for use by Doxygen in intermediate directory.
         cfg.save(doxyfile_dst_file)
 
         # Run Doxygen in intermediate directory.
@@ -1566,7 +1567,7 @@ class DoxygenXml(object):
         # -----------------------------------------------------------------
         # Load root of Doxygen output (index.xml) as an `xml.etree.ElementTree`.
         # -----------------------------------------------------------------
-        self.index_xml_etree = load_xml_etree('index')
+        index_xml_etree = load_xml_etree('index')
 
         # Populate these dictionaries.
         #     Keys  :  C-code-element names (str) found by Doxygen.
@@ -1579,7 +1580,7 @@ class DoxygenXml(object):
         announce_start(__file__, "Building source-code symbol dictionaries...")
         module_namespace = globals()
 
-        for compound in self.index_xml_etree:
+        for compound in index_xml_etree:
             # Here we will encounter these "kind" in the index.xml
             # <compound> elements: dir, file, page, struct, union.
             compound.attrib['name'] = compound[0].text.strip()
