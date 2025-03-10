@@ -84,6 +84,8 @@ static int shader_location[] = { 0, 0, 0, 0, 0, 0 };
 static const char * vertex_shader =
     "#version 300 es\n"
     "\n"
+    "precision mediump float;\n"
+    "\n"
     "in vec4 position;\n"
     "in vec2 texCoord;\n"
     "\n"
@@ -95,19 +97,19 @@ static const char * vertex_shader =
     "{\n"
     "    gl_Position = vec4((u_VertexTransform * vec3(position.xy, 1)).xy, position.zw);\n"
     "    v_TexCoord = texCoord;\n"
-    "};\n";
+    "}\n";
 
 static const char * fragment_shader =
     "#version 300 es\n"
     "\n"
     "precision lowp float;\n"
     "\n"
-    "layout(location = 0) out vec4 color;\n"
+    "out vec4 color;\n"
     "\n"
     "in vec2 v_TexCoord;\n"
     "\n"
     "uniform sampler2D u_Texture;\n"
-    "uniform int u_ColorDepth;\n"
+    "uniform float u_ColorDepth;\n"
     "uniform float u_Opa;\n"
     "uniform bool u_IsFill;\n"
     "uniform vec3 u_FillColor;\n"
@@ -116,18 +118,18 @@ static const char * fragment_shader =
     "{\n"
     "    vec4 texColor;\n"
     "    if (u_IsFill) {\n"
-    "        texColor = vec4(u_FillColor, 1.0f);\n"
+    "        texColor = vec4(u_FillColor, 1.0);\n"
     "    } else {\n"
     "        texColor = texture(u_Texture, v_TexCoord);\n"
     "    }\n"
-    "    if (u_ColorDepth == 8) {\n"
+    "    if (abs(u_ColorDepth - 8.0) < 0.1) {\n"
     "        float gray = texColor.r;\n"
     "        color = vec4(gray, gray, gray, u_Opa);\n"
     "    } else {\n"
     "        float combinedAlpha = texColor.a * u_Opa;\n"
     "        color = vec4(texColor.rgb * combinedAlpha, combinedAlpha);\n"
     "    }\n"
-    "};\n";
+    "}\n";
 
 /**********************
  *      MACROS
@@ -249,7 +251,7 @@ static void lv_opengles_render_internal(unsigned int texture, const lv_area_t * 
     }
 
     lv_opengles_shader_bind();
-    lv_opengles_shader_set_uniform1i("u_ColorDepth", LV_COLOR_DEPTH);
+    lv_opengles_shader_set_uniform1f("u_ColorDepth", LV_COLOR_DEPTH);
     lv_opengles_shader_set_uniform1i("u_Texture", 0);
     lv_opengles_shader_set_uniformmatrix3fv("u_VertexTransform", 1, true, matrix);
     lv_opengles_shader_set_uniform1f("u_Opa", (float)opa / (float)LV_OPA_100);
