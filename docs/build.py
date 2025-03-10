@@ -536,9 +536,9 @@ def run(args):
 
     if intermediate_dir_contents_exists(intermediate_dir):
         # We are just doing an update of the intermediate_dir contents.
-        announce("__file__, ****************")
-        announce("__file__, Updating intermediate directory...")
-        announce("__file__, ****************")
+        announce(__file__, "****************")
+        announce(__file__, "Updating intermediate directory...")
+        announce(__file__, "****************")
 
         exclude_list.append(r'examples.*')
         options = {
@@ -626,37 +626,11 @@ def run(args):
             # Then api_doc_builder.run():
             # - creates .RST files for API pages, and
             # - adds API hyperlinks to .RST files in the directories in passed array.
-            api_doc_builder.run(
-                lvgl_src_dir,
-                intermediate_dir,
-                doxyfile_src_file,
-                False,
-                os.path.join(intermediate_dir, 'intro'),
-                os.path.join(intermediate_dir, 'details'),
-                os.path.join(intermediate_dir, 'details', 'common-widget-features'),
-                os.path.join(intermediate_dir, 'details', 'common-widget-features', 'layouts'),
-                os.path.join(intermediate_dir, 'details', 'common-widget-features', 'styles'),
-                os.path.join(intermediate_dir, 'details', 'debugging'),
-                os.path.join(intermediate_dir, 'details', 'integration'),
-                os.path.join(intermediate_dir, 'details', 'integration', 'adding-lvgl-to-your-project'),
-                os.path.join(intermediate_dir, 'details', 'integration', 'bindings'),
-                os.path.join(intermediate_dir, 'details', 'integration', 'building'),
-                os.path.join(intermediate_dir, 'details', 'integration', 'chip'),
-                os.path.join(intermediate_dir, 'details', 'integration', 'driver'),
-                os.path.join(intermediate_dir, 'details', 'integration', 'driver', 'display'),
-                os.path.join(intermediate_dir, 'details', 'integration', 'driver', 'touchpad'),
-                os.path.join(intermediate_dir, 'details', 'integration', 'framework'),
-                os.path.join(intermediate_dir, 'details', 'integration', 'ide'),
-                os.path.join(intermediate_dir, 'details', 'integration', 'os'),
-                os.path.join(intermediate_dir, 'details', 'integration', 'os', 'yocto'),
-                os.path.join(intermediate_dir, 'details', 'integration', 'renderers'),
-                os.path.join(intermediate_dir, 'details', 'libs'),
-                os.path.join(intermediate_dir, 'details', 'main-modules'),
-                # Note:  details/main-modules/display omitted intentionally,
-                # since API links for those .RST files have been added manually.
-                os.path.join(intermediate_dir, 'details', 'auxiliary-modules'),
-                os.path.join(intermediate_dir, 'details', 'widgets')
-            )
+            api_doc_builder.build_api_docs(lvgl_src_dir,
+                                           intermediate_dir,
+                                           doxyfile_src_file,
+                                           'details'
+                                           )
 
         t2 = datetime.now()
         announce(__file__, 'Example/API run time:  ' + str(t2 - t1))
