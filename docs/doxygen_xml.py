@@ -1069,6 +1069,7 @@ class FILE(object):
         self.refid = refid
         self.name = name
         self.header_file = os.path.splitext(name)[0]
+        self.types_contained = set()
 
         enums_ = []
 
@@ -1076,7 +1077,9 @@ class FILE(object):
             if member.tag != 'member':
                 continue
 
-            cls = globals()[member.attrib['kind'].upper()]
+            cls_name = member.attrib['kind'].upper()
+            self.types_contained.add(cls_name)
+            cls = globals()[cls_name]
             if cls == ENUM:
                 if member[0].text:
                     member.attrib['name'] = member[0].text.strip()
