@@ -81,9 +81,9 @@ and then, if you want the API-link-generation logic to generate hyperlinks to AP
 .. API equals: lv_scale_t, lv_scale_create
 ```
 
-What follows the colon is a comma-separated list of exact C symbols documented somewhere in the `lvgl/src/` directory.
+What follows the colon is a comma- or space-separated list of exact C symbols documented somewhere in the `lvgl/src/` directory.  If the list is long, it can be wrapped to subsequent lines, though continuation lines must be all indented at the same level.  The list ends with the first blank line after this pseudo-directive.
 
-If you instead want the API-link-generation logic to simply include links to code that ***starts with a specific string*** use this syntax instead:
+If you instead want the API-link-generation logic to simply include links to code that ***starts with a specific string*** use this syntax instead.  The format of the list is the same as for `.. API equals:`:
 
 ```rst
 .. API startswith: lv_scale, lv_obj_set_style
@@ -95,7 +95,7 @@ You can also manually link to API pages, in which case the API-link-generation l
 :ref:`lv_scale_h`
 ```
 
-Note that there are no spaces and no periods in the above link reference.  The naming of this reference (`lv_scale_h`) will generate a hyperlink to the documentation extracted by Doxygen from the `lvgl/src/widgets/scale/lv_scale.h` file.
+Note that the period before the `h` is replaced with an underscore (`_`).  The naming of this reference (`lv_scale_h`) will generate a hyperlink to the documentation extracted by Doxygen from the `lvgl/src/widgets/scale/lv_scale.h` file.
 
 
 ### Text Format
@@ -257,7 +257,7 @@ To create a bulleted list, do the following:
       lines to align with item text like this.
     - If you want to include a code block under a list item,
       it must be intended to align with the list item like this:
-
+    
       .. code-block: python
                                  <=== blank line here is important
           # this is some code
