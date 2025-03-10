@@ -163,6 +163,6 @@ A ``globals.xml`` file of a component library can look like this:
     </images>
 
     <fonts>
-      <tinyttf name="big" src="A:/fonts/arial.ttf" size="28"/>
+      <tiny_ttf name="big" src="A:/fonts/arial.ttf" size="28"/>
     </fonts>
   </globals>

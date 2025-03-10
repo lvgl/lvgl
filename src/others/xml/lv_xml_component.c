@@ -9,6 +9,7 @@
 #include "lv_xml_component.h"
 #if LV_USE_XML
 
+#include "../../lvgl.h"
 #include "lv_xml_component_private.h"
 #include "lv_xml_private.h"
 #include "lv_xml_parser.h"
@@ -34,6 +35,8 @@
 static void start_metadata_handler(void * user_data, const char * name, const char ** attrs);
 static void end_metadata_handler(void * user_data, const char * name);
 static void process_const_element(lv_xml_parser_state_t * state, const char ** attrs);
+static void process_font_element(lv_xml_parser_state_t * state, const char * type, const char ** attrs);
+static void process_image_element(lv_xml_parser_state_t * state, const char * type, const char ** attrs);
 static void process_prop_element(lv_xml_parser_state_t * state, const char ** attrs);
 static char * extract_view_content(const char * xml_definition);
 
@@ -242,6 +245,19 @@ lv_result_t lv_xml_component_unregister(const char * name)
     lv_ll_clear(&ctx->param_ll);
 
 
+    lv_xml_font_t * font;
+    LV_LL_READ(&ctx->font_ll, font) {
+        lv_free((char *)font->name);
+    }
+    lv_ll_clear(&ctx->image_ll);
+
+    lv_xml_image_t * image;
+    LV_LL_READ(&ctx->image_ll, image) {
+        lv_free((char *)image->name);
+        lv_free((char *)image->src);
+    }
+    lv_ll_clear(&ctx->image_ll);
+
     lv_xml_style_t * style;
     LV_LL_READ(&ctx->style_ll, style) {
         lv_free((char *)style->name);
@@ -294,6 +310,97 @@ static void process_const_element(lv_xml_parser_state_t * state, const char ** a
     lv_xml_register_const(&state->ctx, name, value);
 }
 
+static void process_font_element(lv_xml_parser_state_t * state, const char * type, const char ** attrs)
+{
+    const char * name = lv_xml_get_value_of(attrs, "name");
+    if(name == NULL) {
+        LV_LOG_WARN("'name' is missing from a font");
+        return;
+    }
+
+    const char * src_path = lv_xml_get_value_of(attrs, "src_path");
+    if(src_path == NULL) {
+        LV_LOG_WARN("'src_path' is missing from a `%s` font", name);
+        return;
+    }
+
+    const char * as_file = lv_xml_get_value_of(attrs, "as_file");
+    if(as_file == NULL || as_file == false) {
+        LV_LOG_INFO("Ignore non-file based font `%s`", name);
+        return;
+    }
+
+    /*E.g. <tiny_ttf name="inter_xl" src_path="fonts/Inter-SemiBold.ttf" size="22"/> */
+    if(lv_streq(type, "tiny_ttf")) {
+        const char * size = lv_xml_get_value_of(attrs, "size");
+        if(size == NULL) {
+            LV_LOG_WARN("'size' is missing from a `%s` tiny_ttf font", name);
+            return;
+        }
+#if LV_TINY_TTF_FILE_SUPPORT
+        lv_font_t * font = lv_tiny_ttf_create_file(src_path, lv_xml_atoi(size));
+        if(font == NULL) {
+            LV_LOG_WARN("Couldn't load  `%s` tiny_ttf font", name);
+            return;
+        }
+        lv_result_t res = lv_xml_register_font(&state->ctx, name, font);
+        if(res == LV_RESULT_INVALID) {
+            LV_LOG_WARN("Failed to register `%s` tiny_ttf font", name);
+            return;
+        }
+
+        lv_xml_font_t * f = lv_ll_get_head(&state->ctx.font_ll);
+        f->font_destroy_cb = lv_tiny_ttf_destroy;
+
+#else
+        LV_LOG_WARN("LV_TINY_TTF_FILE_SUPPORT is not enabled for `%s` font", name);
+
+#endif
+    }
+    else if(lv_streq(type, "bin")) {
+        lv_font_t * font = lv_binfont_create(src_path);
+        if(font == NULL) {
+            LV_LOG_WARN("Couldn't load `%s` bin font", name);
+            return;
+        }
+
+        lv_result_t res = lv_xml_register_font(&state->ctx, name, font);
+        if(res == LV_RESULT_INVALID) {
+            LV_LOG_WARN("Failed to register `%s` bin font", name);
+            return;
+        }
+
+        lv_xml_font_t * f = lv_ll_get_head(&state->ctx.font_ll);
+        f->font_destroy_cb = lv_binfont_destroy;
+    }
+    else {
+        LV_LOG_WARN("`%s` is a not supported font type", type);
+    }
+}
+
+static void process_image_element(lv_xml_parser_state_t * state, const char * type, const char ** attrs)
+{
+    const char * name = lv_xml_get_value_of(attrs, "name");
+    if(name == NULL) {
+        LV_LOG_WARN("'name' is missing from a font");
+        return;
+    }
+
+    const char * src_path = lv_xml_get_value_of(attrs, "src_path");
+    if(src_path == NULL) {
+        LV_LOG_WARN("'src_path' is missing from a `%s` font", name);
+        return;
+    }
+
+    /* E.g. <file name="avatar" src_path="avatar1.png">*/
+    if(lv_streq(type, "file")) {
+        lv_xml_register_image(&state->ctx, name, src_path);
+    }
+    else {
+        LV_LOG_INFO("Ignore non-file image `%s`", name);
+    }
+}
+
 static void process_subject_element(lv_xml_parser_state_t * state, const char * type, const char ** attrs)
 {
     const char * name = lv_xml_get_value_of(attrs, "name");
@@ -309,7 +416,6 @@ static void process_subject_element(lv_xml_parser_state_t * state, const char * 
     }
 
     lv_subject_t * subject = lv_malloc(sizeof(lv_subject_t));
-
 
     if(lv_streq(type, "int")) lv_subject_init_int(subject, lv_xml_atoi(value));
     else if(lv_streq(type, "color")) lv_subject_init_color(subject, lv_xml_to_color(value));
@@ -539,6 +645,14 @@ static void start_metadata_handler(void * user_data, const char * name, const ch
         case LV_XML_PARSER_SECTION_STYLES:
             if(old_section != state->section) return;   /*Ignore the section opening, e.g. <styles>*/
             lv_xml_style_register(&state->ctx, attrs);
+            break;
+        case LV_XML_PARSER_SECTION_FONTS:
+            if(old_section != state->section) return;   /*Ignore the section opening, e.g. <styles>*/
+            process_font_element(state, name, attrs);
+            break;
+        case LV_XML_PARSER_SECTION_IMAGES:
+            if(old_section != state->section) return;   /*Ignore the section opening, e.g. <styles>*/
+            process_image_element(state, name, attrs);
             break;
 
         case LV_XML_PARSER_SECTION_SUBJECTS:

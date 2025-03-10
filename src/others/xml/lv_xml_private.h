@@ -33,6 +33,7 @@ extern "C" {
 typedef struct {
     const char * name;
     const lv_font_t * font;
+    void (*font_destroy_cb)(lv_font_t *);
 } lv_xml_font_t;
 
 typedef struct {
