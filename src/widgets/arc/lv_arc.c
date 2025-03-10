@@ -435,7 +435,7 @@ static void lv_arc_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN | LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_ext_click_area(obj, LV_DPI_DEF / 10);
+    //lv_obj_set_ext_click_area(obj, LV_DPI_DEF / 10);
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -514,7 +514,8 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         while(angle >= 360) angle -= 360;
 
         const uint32_t circumference = (uint32_t)((2U * r * 314U) / 100U);  /* Equivalent to: 2r * 3.14, avoiding floats */
-        const lv_value_precise_t tolerance_deg = (360 * lv_dpx(50U)) / circumference;
+        const int32_t tolerance = 1U; //lv_dpx(50U);
+        const lv_value_precise_t tolerance_deg = (360 * tolerance) / circumference;
         const uint32_t min_close_prev = (uint32_t) arc->min_close;
 
         bool is_angle_within_bg_bounds = lv_arc_angle_within_bg_bounds(obj, angle, tolerance_deg);
@@ -669,7 +670,8 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         while(angle >= 360) angle -= 360;
 
         const uint32_t circumference = (uint32_t)((2U * r * 314U) / 100U);  /* Equivalent to: 2r * 3.14, avoiding floats */
-        const lv_value_precise_t tolerance_deg = (360 * lv_dpx(50U)) / circumference;
+        const int32_t tolerance = 1U; // lv_dpx(50U);
+        const lv_value_precise_t tolerance_deg = (360 * tolerance) / circumference;
 
         /* Check if the angle is outside the drawn background arc */
         const bool is_angle_within_bg_bounds = lv_arc_angle_within_bg_bounds(obj, angle, tolerance_deg);
