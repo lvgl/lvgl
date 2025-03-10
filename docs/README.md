@@ -78,15 +78,15 @@ API
 and then, if you want the API-link-generation logic to generate hyperlinks to API pages based on an ***exact, case-sensitive string match*** with specific C symbols, follow it with a reStructuredText comment using this syntax:
 
 ```rst
-.. API exact: lv_scale_t, lv_scale_create
+.. API equals: lv_scale_t, lv_scale_create
 ```
 
 What follows the colon is a comma-separated list of exact C symbols documented somewhere in the `lvgl/src/` directory.
 
-If you instead want the API-link-generation logic to simply include links to code that ***contains a specific string* ** use this syntax instead:
+If you instead want the API-link-generation logic to simply include links to code that ***starts with a specific string*** use this syntax instead:
 
 ```rst
-.. API contains: lv_scale, lv_obj_set_style
+.. API startswith: lv_scale, lv_obj_set_style
 ```
 
 You can also manually link to API pages, in which case the API-link-generation logic will see that you have already added links and will not repeat them.
@@ -257,7 +257,7 @@ To create a bulleted list, do the following:
       lines to align with item text like this.
     - If you want to include a code block under a list item,
       it must be intended to align with the list item like this:
-    
+
       .. code-block: python
                                  <=== blank line here is important
           # this is some code
