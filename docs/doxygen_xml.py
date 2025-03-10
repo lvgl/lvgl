@@ -553,21 +553,40 @@ class STRUCT(object):
 
     def __init__(self, parent, refid, name, **_):
         global structures
+        global unions
 
-        if name in structures:
-            self.__dict__.update(structures[name].__dict__)
+        if type(self) is UNION:
+            # UNION inherits from STRUCT.
+            if name in unions:
+                self.__dict__.update(unions[name].__dict__)
+            else:
+                unions[name] = self
+                self.parent = parent
+                self.refid = refid
+                self.name = name
+                self.types = set()
+                self._deps = None
+                self.header_file = ''
+                self.description = None
+                self.fields = []
+                self.file_name = None
+                self.line_no = None
         else:
-            structures[name] = self
-            self.parent = parent
-            self.refid = refid
-            self.name = name
-            self.types = set()
-            self._deps = None
-            self.header_file = ''
-            self.description = None
-            self.fields = []
-            self.file_name = None
-            self.line_no = None
+            # STRUCT type
+            if name in structures:
+                self.__dict__.update(structures[name].__dict__)
+            else:
+                structures[name] = self
+                self.parent = parent
+                self.refid = refid
+                self.name = name
+                self.types = set()
+                self._deps = None
+                self.header_file = ''
+                self.description = None
+                self.fields = []
+                self.file_name = None
+                self.line_no = None
 
         # Prior to 9-Mar-2025, the code below was never executing since this
         # __init__() was never called with a `parent` value other than `None`.
