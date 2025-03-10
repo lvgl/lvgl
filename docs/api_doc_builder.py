@@ -26,13 +26,13 @@ section_line_char = '='
 # at the end including all \r\n's.  This will match UP TO:
 # - the next non-blank character (could be many blank lines), or
 # - to the end of the file, whichever comes first.
-_re_api_section_sep = re.compile(r'(?m)^API *\r?\n^\*\*\*\s*')
+_re_api_section_sep = re.compile(r'(?mi)^API *\r?\n^\*\*\*\s*')
 
 # Regex to identify '.. API equals: lv_obj_t, lv_array_t' directives.
-_re_api_equals = re.compile(r'(?m)^\s*\.\.\s+API\s+equals:\s*([\w,\s]+)\r\n\s*', flags=re.IGNORECASE)
+_re_api_equals = re.compile(r'(?mi)^\s*\.\.\s+API\s+equals:\s*([\w,\s]+)\r\n\s*')
 
 # Regex to identify '.. API startswith: lv_obj, lv_array' directives.
-_re_api_startswith = re.compile(r'(?m)^\s*\.\.\s+API\s+startswith:\s*([\w,\s]+)\r\n\s*', flags=re.IGNORECASE)
+_re_api_startswith = re.compile(r'(?mi)^\s*\.\.\s+API\s+startswith:\s*([\w,\s]+)\r\n\s*')
 
 # Regex to match comma and whitespace list-item separators on multiple lines.
 _re_multi_line_comma_sep = re.compile(r'(?m)[,\s]+')
