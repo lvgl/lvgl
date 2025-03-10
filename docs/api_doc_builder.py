@@ -1,25 +1,21 @@
-"""api_doc_builder.py  Create and provide links to API pages in LVGL doc build.
+"""api_doc_builder.py
 
-Uses DoxygenXml class in doxygen_xml.py to make available:
+Create and provide links to API pages in LVGL doc build.
 
-- Doxygen output, and
-- Doxygen-documented symbols from the C code.
+Uses doxygen_xml.py module to:
 
-Example 'html_files'content:
-{'lvgl': 'lvgl.html',
- 'lv_api_map_v8': 'lv_api_map_v8.html',
- 'lv_api_map_v9_0': 'lv_api_map_v9_0.html',
- 'lv_api_map_v9_1': 'lv_api_map_v9_1.html',...}
-
+- Prep and run Doxygen
+- make Doxygen XML output available, and
+- make Doxygen-documented symbols from the C code available.
 """
 import os
 import re
 import doxygen_xml
 from announce import *
 
-html_files = {}
+old_html_files = {}
 EMIT_WARNINGS = True
-section_line_char = '='
+rst_section_line_char = '='
 
 # Multi-line match ``API + newline + \*\*\* + whitespace``.
 # NB:  the ``\s*`` at the end forces the regex to match the whitespace
@@ -65,7 +61,7 @@ _symbol_dict_list = [
 ]
 
 
-def clean_name(nme):
+def old_clean_name(nme):
     """Strip beginning "_lv" and ending "_t"."""
     # Handle error:
     #     AttributeError: 'NoneType' object has no attribute 'startswith'
@@ -89,7 +85,7 @@ def clean_name(nme):
 # After removing leading '_lv_', 'lv_' and trailing '_t' from `obj_name`,
 # do the remaining first N "sections" of `obj_name` match `item_name`
 # (case sensitive)?
-def is_name_match(item_name, obj_name):
+def old_is_name_match(item_name, obj_name):
     # Handle error:
     #     AttributeError: 'NoneType' object has no attribute 'split'
     if obj_name is None:
@@ -108,10 +104,10 @@ def is_name_match(item_name, obj_name):
     return item_name == obj_name
 
 
-def get_includes(name1, name2, obj, includes):
-    name2 = clean_name(name2)
+def old_get_includes(name1, name2, obj, includes):
+    name2 = old_clean_name(name2)
 
-    if not is_name_match(name1, name2):
+    if not old_is_name_match(name1, name2):
         return
 
     if obj.parent is not None and hasattr(obj.parent, 'header_file'):
@@ -124,34 +120,43 @@ def get_includes(name1, name2, obj, includes):
     if not header_file:
         return
 
-    if header_file not in html_files:
+    if header_file not in old_html_files:
         return
 
-    includes.add((header_file, html_files[header_file]))
+    includes.add((header_file, old_html_files[header_file]))
 
 
-def _conditionally_add_hyperlink(obj, genned_links: set, exclude_set: set):
+def _conditionally_add_hyperlink(obj, genned_link_set: set, exclude_set: set):
     """
     Add hyperlink names to `link_set` if:
     - not in `exclude_set`, and
     - not already in `link_set`.
-    :param obj:           "thing" from dictionary with matching symbol.
-                            These are objects instantiated from classes
-                            in `doxygen_xml` module such as
-                            STRUCT, FUNCTION, DEFINE, ENUMVALUE, etc.
-    :param genned_links:  Set in which to accumulate link names
-    :param exclude_set:   Set with link names not to add to `link_set`
+    :param obj:              "thing" from dictionary with matching symbol.
+                               These are objects instantiated from classes
+                               in `doxygen_xml` module such as
+                               STRUCT, FUNCTION, DEFINE, ENUMVALUE, etc.
+    :param genned_link_set:  Set in which to accumulate link names
+    :param exclude_set:      Set with link names not to add to `link_set`
     :return:
     """
     if obj.file_name is not None:
         link_name = os.path.basename(obj.file_name).replace('.', '_')
-        if link_name not in genned_links:
+        if link_name not in genned_link_set:
             if link_name not in exclude_set:
-                genned_links.add(link_name)
+                genned_link_set.add(link_name)
 
 
-def _add_startswith_matches(symbols: [str], genned_link_set, editor_link_set):
-    for symbol in symbols:
+def _add_startswith_matches(strings: [str], genned_link_set, editor_link_set):
+    """
+    Add set of hyperlinks to `genned_link_set` that are not already in
+    `editor_link_set`, for C symbols that start with strings in `strings`.
+
+    :param strings:          List of strings to match against
+    :param genned_link_set:  Generated link set
+    :param editor_link_set:  Hyperlinks added by editor
+    :return:                 n/a
+    """
+    for partial_symbol in strings:
         for symbol_dict in _symbol_dict_list:
             for key in symbol_dict:
                 if key is None:
@@ -160,15 +165,24 @@ def _add_startswith_matches(symbols: [str], genned_link_set, editor_link_set):
                     # enumvalue has a `file_name` field.
                     enum_values_list = symbol_dict[None].members
                     for enum_val in enum_values_list:
-                        if enum_val.name.startswith(symbol):
+                        if enum_val.name.startswith(partial_symbol):
                             _conditionally_add_hyperlink(enum_val, genned_link_set, editor_link_set)
                 else:
-                    if key.startswith(symbol):
+                    if key.startswith(partial_symbol):
                         obj = symbol_dict[key]
                         _conditionally_add_hyperlink(obj, genned_link_set, editor_link_set)
 
 
 def _add_exact_matches(symbols: [str], genned_link_set, editor_link_set):
+    """
+    Add set of hyperlinks to `genned_link_set` that are not already in
+    `editor_link_set`, for exact C symbol matches.
+
+    :param symbols:          List of C symbols to match against
+    :param genned_link_set:  Generated link set
+    :param editor_link_set:  Hyperlinks added by editor
+    :return:                 n/a
+    """
     for symbol in symbols:
         for symbol_dict in _symbol_dict_list:
             if symbol in symbol_dict:
@@ -193,23 +207,23 @@ def _process_end_of_eligible_doc(b: str, rst_file: str) -> (str, str, int):
         - links_added_count = 0
         - editor_link_set = set()
         - genned_link_set = set()
-        - C = ''
+        - C = ''    # string for generated hyperlinks
     4.  Remove `_auto_gen_sep` and everything after it:
         - new_B = B.split(_auto_gen_sep, 1)[0]
     5.  With `new_B, add any editor-added hyperlinks to set:
         `editor_link_set`.
-    6.  If `_re_api_equals` present:
+    6.  If `_re_api_equals` match present:
         - build list of symbols
         - compute list of hyperlinks from symbols
         - add hyperlinks to `genned_link_set` if not in `editor_link_set`.
-    7.  If `_re_api_startswith` present:
+    7.  If `_re_api_startswith` match present:
         - build list of symbols
         - compute list of hyperlinks from symbols
         - add hyperlinks to `genned_link_set` if not in `editor_link_set`.
     8.  Lacking either of the above custom directives, use the lower-case
         stem of the filename and prefix it with "lv_" and try an
-        "API startswith" with it.
-    9.  If len(editor_link_set) > 0 or len(genned_link_set) > 0:
+        "API startswith" search with it.
+    9.  If len(genned_link_set) > 0:
         - `C` = _auto_gen_sep + '\n\n' + `genned_link_set`
           (with a blank line between each).
     10. Return tuple: (new_B, C, links_added_count).
@@ -285,7 +299,8 @@ def _process_one_file(rst_file: str):
         An `.rst` file is eligible if it contains an API section at
         its end.  This can happen also in `index.rst` files when
         they head a single subject for which an API section is
-        appropriate there and not in the sub-docs.
+        appropriate there and not in the sub-docs.  So `index.rst`
+        files are included, whereas they were not included previously.
 
     Algorithm:
     ----------
@@ -309,7 +324,7 @@ def _process_one_file(rst_file: str):
 
     C.  Lacking any of the above custom directives, use the lower-case
         stem of the filename and prefix it with "lv_" and try an
-        "API startswith" with it.
+        "API startswith" search with it.
 
     Any hyperlinks added by this routine are prefixed with the
     reStructuredText comment defined by the `_auto_gen_sep`
@@ -326,10 +341,9 @@ def _process_one_file(rst_file: str):
 
     Steps to Implement:
     -------------------
-    This is the sequence of actions that accomplish the above:
     0.  links_added_count = 0
     1.  Determine if eligible.
-        - If not, skip to step 11.
+        - If not, skip to step 12.
         - If so, continue.
     2.  Split doc into 2 parts:
         A.  beginning through API section heading and subsequent
@@ -352,11 +366,11 @@ def _process_one_file(rst_file: str):
             announce(__file__, f'Error: UnicodeDecodeError in [{rst_file}].')
             raise
 
-    match = _re_api_section_sep.search(rst_contents)
+    eligible_match = _re_api_section_sep.search(rst_contents)
 
-    if match is not None:
+    if eligible_match is not None:
         # Eligible (API section found).
-        i = match.end()
+        i = eligible_match.end()
         # Split just after the API section heading + whitespace.
         a = rst_contents[:i]
         b = rst_contents[i:]
@@ -372,6 +386,15 @@ def _process_one_file(rst_file: str):
 
 
 def _build_one_local_dictionary(local_dict, remote_dict):
+    """
+    Remove '_' prefix in symbols beginning with '_lv' to make
+    symbols like `lv_obj_t` actually connect with the struct
+    in `lv_obj_private.h`, and not the typedef in `lv_types.h`.
+
+    :param local_dict:   Local (adjusted) symbol dictionary
+    :param remote_dict:  Dictionary from `doxygen_xml` module
+    :return:             n/a
+    """
     for symbol in remote_dict:
         # Note:  symbol `None` is actually a valid symbol in the
         # `enums` dictionary, containing all enumvalue symbols
@@ -386,6 +409,13 @@ def _build_one_local_dictionary(local_dict, remote_dict):
 
 
 def _build_local_symbol_dictionaries():
+    """
+    Build "work-around" dictionaries so that a symbol like `lv_obj_t`
+    actually connects with the struct in `lv_obj_private.h`, and not
+    the typedef in `lv_types.h`.
+
+    :return:  n/a
+    """
     _build_one_local_dictionary(_defines, doxygen_xml.defines)
     _build_one_local_dictionary(_enums, doxygen_xml.enums)
     _build_one_local_dictionary(_variables, doxygen_xml.variables)
@@ -406,7 +436,7 @@ def _add_hyperlinks_to_eligible_files(intermediate_dir: str,
     See API-link algorithm documented under `_process_one_file()`.
 
     :param intermediate_dir:  Top directory where hyperlinks are to be added.
-    :param doc_rel_paths:     List of relative paths from `intermediate_dir` to
+    :param doc_rel_paths:     Tuple of relative paths from `intermediate_dir` to
                                 walk to find docs eligible for API hyperlinks.
     :return:
     """
@@ -472,7 +502,7 @@ def _add_hyperlinks_to_eligible_files(intermediate_dir: str,
                     doxygen_xml.functions
                 ):
                     for key, obj in symbol_dict.items():
-                        get_includes(stem, key, obj, html_includes)
+                        old_get_includes(stem, key, obj, html_includes)
 
                 if html_includes:
                     # Convert `html_includes` set to a list of strings containing the
@@ -516,35 +546,35 @@ def _add_hyperlinks_to_eligible_files(intermediate_dir: str,
 
 def _create_rst_files_for_dir(src_root_dir_len: int,
                               src_dir_bep: str,
-                              eligible_h_files: [str],
-                              sub_dirs_w_h_files: [str],
+                              elig_h_files: [str],
+                              elig_sub_dirs: [str],
                               out_root_dir: str):
     """
-    - Generate an `index.rst` file and add the header to it.
-    - Create one `.rst` file for each `.h` file in `h_files` list.
-      Add reference to created `.rst` file in `index.rst`.
-    - For each subdir in `sub_dirs_w_h_files`:
-        - add a reference "sub_dir_name/index" in `index.rst`.
+    - Create `index.rst` file and add its top section.
+    - For each file in `elig_h_files`:
+      - Create one `.rst` file.
+      - Add reference to it in `index.rst`.
+    - For each subdir in `elig_sub_dirs`:
+        - add reference "sub_dir_name/index" in `index.rst`.
 
-    :param src_root_dir_len:    Length of source-root path string, used with `out_root_dir` to build paths
-    :param src_dir_bep:         directory currently *being processed*
-    :param eligible_h_files:    eligible `.h` files directly contained in `src_dir_bep`
-    :param sub_dirs_w_h_files:  list of sub-dirs that contained eligible `.h` files
-    :param out_root_dir:        root of output directory, used with to build paths.
-    :return:                    n/a
+    :param src_root_dir_len:  Length of source-root path string, used with `out_root_dir` to build paths
+    :param src_dir_bep:       Directory currently *being processed*
+    :param elig_h_files:      Eligible `.h` files directly contained in `src_dir_bep`
+    :param elig_sub_dirs:     List of sub-dirs that contained eligible `.h` files
+    :param out_root_dir:      Root of output directory, used with to build paths.
+    :return:                  n/a
     """
     indent = '    '
     sub_path = src_dir_bep[src_root_dir_len:]
     out_dir = str(os.path.join(out_root_dir, sub_path))
 
     # Ensure dir exists.  Multiple dirs MAY have to be created
-    # since top-level dirs are not guaranteed to produce .rst files
-    # until later in sequence.
+    # since `.rst` files are created in bottom-up sequence.
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
 
-    # Make a quick adjustment when we are finishing off with
-    # the top-level directory.
+    # For top-level directory only... (the last index.rst created,
+    # since they are created in bottom-up sequence)
     if len(sub_path) == 0 and out_dir.endswith(os.sep):
         # Trim trailing slash from `out_dir`.
         out_dir = out_dir[:-1]
@@ -552,37 +582,42 @@ def _create_rst_files_for_dir(src_root_dir_len: int,
     # index.rst
     with open(os.path.join(out_dir, 'index.rst'), 'w') as f:
         subdir_stem = os.path.split(out_dir)[-1]
-        section_line = (section_line_char * len(subdir_stem)) + '\n'
+        section_line = (rst_section_line_char * len(subdir_stem)) + '\n'
         f.write(section_line)
         f.write(subdir_stem + '\n')
         f.write(section_line)
         f.write('\n')
         f.write('.. toctree::\n    :maxdepth: 2\n\n')
 
-        for h_file in eligible_h_files:
+        # One entry per `.rst` file
+        for h_file in elig_h_files:
             filename = os.path.basename(h_file)
             stem = os.path.splitext(filename)[0]
             f.write(indent + stem + '\n')
 
-        for sub_dir in sub_dirs_w_h_files:
+        # One entry per eligible subdirectory.
+        for sub_dir in elig_sub_dirs:
             stem = os.path.split(sub_dir)[-1]
             f.write(indent + stem + '/index\n')
 
     # One .rst file per h_file
-    for h_file in eligible_h_files:
+    for h_file in elig_h_files:
         filename = os.path.basename(h_file)
         stem = os.path.splitext(filename)[0]
         rst_file = os.path.join(out_dir, stem + '.rst')
         html_file = os.path.join(sub_path, stem + '.html')
-        html_files[stem] = html_file
+        old_html_files[stem] = html_file
 
         with open(rst_file, 'w') as f:
+            # Sphinx link target.
             f.write(f'.. _{stem}_h:\n\n')
-            section_line = (section_line_char * len(filename)) + '\n'
+            # Doc title.
+            section_line = (rst_section_line_char * len(filename)) + '\n'
             f.write(section_line)
             f.write(filename + '\n')
             f.write(section_line)
             f.write('\n')
+            # Content for `breathe`.
             f.write(f'.. doxygenfile:: {filename}\n')
             f.write('    :project: lvgl\n\n')
 
@@ -592,8 +627,8 @@ def _recursively_create_api_rst_files(depth: int,
                                       src_dir_bep: str,
                                       out_root_dir: str) -> int:
     """
-    Create `.rst` files for `src_dir_bep` directory and recursively
-    for subdirectories below it.
+    Create `.rst` files for the eligible `.h` found in `src_dir_bep` and
+    recursively for subdirectories below it.  ("bep" = being processed.)
 
     Eligible
         An `.h` file is eligible if Doxygen generated documentation for it.
@@ -604,16 +639,16 @@ def _recursively_create_api_rst_files(depth: int,
     Whether a subdirectory is eligible to be included in an `index.rst`
     file depends upon whether any eligible `.h` files were recursively
     found within it.  And that isn't known until this function finishes
-    processing a directory and returns the number of eligible `.h` files
-    found.  Thus, the steps taken within are:
+    (recursively) processing a directory and returns the number of
+    eligible `.h` files found.  Thus, the steps taken within are:
 
     - Discover all eligible `.h` files directly contained in `src_dir_bep`.
     - Recursively do the same for each subdirectory, adding the returned
-      count of eligible `.h` files to the sum (`h_file_count`).
-    - If `h_file_count > 0`:
+      count of eligible `.h` files to the sum (`elig_h_file_count`).
+    - If `elig_h_file_count > 0`:
         - call _create_rst_files_for_dir() to generate appropriate
           `.rst` files for this directory.
-    - Return `h_file_count`.
+    - Return `elig_h_file_count`.
 
     Once we have accumulated this information, then we can generate
     all the `.rst` files for the current directory without any further
@@ -623,19 +658,18 @@ def _recursively_create_api_rst_files(depth: int,
     :param src_root_len:  Length of source-root path
     :param src_dir_bep:   Source directory *being processed*
     :param out_root_dir:  Output root directory (used to build output paths)
-    :return:              Number of .H files encountered.
-                          This is for the caller to know whether that
-                          directory recursively had any .H files in it
-                          to know whether it should be included at the
-                          higher level `index.rst`.
+    :return:              Number of `.h` files encountered (so caller knows
+                            whether that directory recursively held any
+                            eligible `.h` files, to know whether to include
+                            "subdir/index" in caller's local `index.rst` file).
     """
-    eligible_h_files = []
+    elig_h_files = []
     sub_dirs = []
-    sub_dirs_w_eligible_h_files = []
-    h_file_count = 0
+    elig_sub_dirs = []
+    elig_h_file_count = 0
 
     # For each "thing" found in `src_dir_bep`, build lists:
-    # `sub_dirs_w_eligible_h_files` and `eligible_h_files`.
+    # `elig_sub_dirs` and `elig_h_files`.
     # By design change, we are including files with 'private'
     # in their names.  Reason:  advanced users who need to use
     # the structs defined within will need the documentation
@@ -648,8 +682,8 @@ def _recursively_create_api_rst_files(depth: int,
             if dir_item.lower().endswith('.h'):
                 eligible = (dir_item in doxygen_xml.files)
                 if eligible:
-                    eligible_h_files.append(path_bep)  # Add to .H file list.
-                    h_file_count += 1
+                    elig_h_files.append(path_bep)  # Add to .H file list.
+                    elig_h_file_count += 1
 
     # For each subdir...
     for sub_dir in sub_dirs:
@@ -660,44 +694,45 @@ def _recursively_create_api_rst_files(depth: int,
                                               out_root_dir)
 
         if subdir_eligible_h_file_count > 0:
-            sub_dirs_w_eligible_h_files.append(sub_dir)
-            h_file_count += subdir_eligible_h_file_count
+            elig_sub_dirs.append(sub_dir)
+            elig_h_file_count += subdir_eligible_h_file_count
 
-    if h_file_count > 0:
+    if elig_h_file_count > 0:
         # Create index.rst plus .RST files for any direct .H files in dir.
         _create_rst_files_for_dir(src_root_len,
                                   src_dir_bep,
-                                  eligible_h_files,
-                                  sub_dirs_w_eligible_h_files,
+                                  elig_h_files,
+                                  elig_sub_dirs,
                                   out_root_dir)
 
-    return h_file_count
+    return elig_h_file_count
 
 
-def create_api_rst_files(a_src_root: str, a_out_root: str):
+def create_api_rst_files(src_root_dir: str, out_root_dir: str):
     """
     Create `.rst` files for API pages based on the `.h` files found
     in a tree-walk of `a_src_root` and the current contents of the
     `doxygen_xml.files` dictionary (used to filter out `.h` files that
     Doxygen generated no documentation for).  Output the `.rst` files
     into `out_root_dir` mirroring the `a_src_root` directory structure.
-    :param a_src_root:  root source directory to walk
-    :param a_out_root:  output directory
-    :return:            n/a
+
+    :param src_root_dir:  root source directory to walk
+    :param out_root_dir:  output directory
+    :return:              n/a
     """
-    src_root_len = len(a_src_root) + 1
-    _recursively_create_api_rst_files(0, src_root_len, a_src_root, a_out_root)
+    src_root_len = len(src_root_dir) + 1
+    _recursively_create_api_rst_files(0, src_root_len, src_root_dir, out_root_dir)
 
 
 def build_api_docs(lvgl_src_dir, intermediate_dir, doxyfile_src_file, *doc_rel_paths):
     """
-    This function does 2 things:
-    1.  Generates .RST files for the LVGL header files that will have API
-        pages generated for them.  It places these in <tmp_dir>/API/...
-        following the <project_path>/src/ directory structure.
-    2.  Add Sphinx hyperlinks to the end of source .RST files found
-        in the `doc_rel_paths` array directories, whose file-name stems
-        match code-element names found by Doxygen.
+    - Prep and run Doxygen, outputting XML.
+    - Load that XML in a form that can quickly tie C symbols to the
+      source files they came from.
+    - Generate API page `.rst` files for source files Doxygen generated
+      documentation for.
+    - Add hyperlinks to these API pages for `.rst` files in `*doc_rel_paths`
+      that are eligible.
 
     :param lvgl_src_dir:       Path to LVGL src directory
     :param intermediate_dir:   Path to intermediate dir being built

@@ -1,4 +1,5 @@
 """doxygen_xml.py
+
 Python Interface to Doxygen XML Output
 
 DoxygenXml is the primary class defined herein.
@@ -99,8 +100,8 @@ kind="file"
         that looks like this:
 
             "lv__obj_8h_1a8ec0fe9743c5c015162d64df591cd719"
-             \\__________________________________________/
-             \\_______/            |
+            /____________________________________________/
+            /_________/            |
                 |                  +-- ``id`` attribute of applicable item
                 |
                 +-- stem of `.xml` filename containing details
@@ -154,9 +155,9 @@ lv__obj_8h.xml has this format:
           <memberdef kind="function" id="refid from index.xml" ...>
           ...List of all functions in file.
         </sectiondef>
-        <briefdescription>      \file \brief description
+        <briefdescription>      @file @brief description
         </briefdescription>
-        <detaileddescription>   \file detailed description
+        <detaileddescription>   @file detailed description
         </detaileddescription>
         <programlisting>        Only included if XML_PROGRAMLISTING = YES.
           <codeline lineno="1">...</codeline>
@@ -178,10 +179,10 @@ kind="dir"
     - If sorted alphabetically, they form a sequence that can be
       used to create something:
       E:
-      E:\Dev
-      E:\Dev\lvgl
-      E:\Dev\lvgl\lvgl
-      E:\Dev\lvgl\lvgl\src
+      E:/Dev
+      E:/Dev/lvgl
+      E:/Dev/lvgl/lvgl
+      E:/Dev/lvgl/lvgl/src
       etc.
     - refid="..." contains the stem of another `.xml` file that
       contains more information on the directory, including any

@@ -629,7 +629,8 @@ def run(args):
             api_doc_builder.build_api_docs(lvgl_src_dir,
                                            intermediate_dir,
                                            doxyfile_src_file,
-                                           'details'
+                                           'details',
+                                           'intro'
                                            )
 
         t2 = datetime.now()
