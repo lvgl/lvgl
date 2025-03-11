@@ -168,7 +168,6 @@ static void _g2d_fill_with_opa(void * g2d_handle, struct g2d_buf * dst_buf, stru
     g2d_cache_op(src_buf, G2D_CACHE_FLUSH);
 
     g2d_clear(g2d_handle, src_surf);
-    g2d_flush(g2d_handle);
 
     g2d_enable(g2d_handle, G2D_BLEND);
     g2d_enable(g2d_handle, G2D_GLOBAL_ALPHA);
@@ -181,7 +180,6 @@ static void _g2d_fill_with_opa(void * g2d_handle, struct g2d_buf * dst_buf, stru
 static void _g2d_fill(void * g2d_handle, struct g2d_buf * dst_buf, struct g2d_surface * dst_surf)
 {
     g2d_clear(g2d_handle, dst_surf);
-    g2d_flush(g2d_handle);
 
     g2d_finish(g2d_handle);
 }
