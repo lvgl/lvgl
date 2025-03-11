@@ -58,7 +58,7 @@ void lv_draw_buf_init_handlers(void)
 
 void lv_draw_buf_init_with_default_handlers(lv_draw_buf_handlers_t * handlers)
 {
-    lv_draw_buf_handlers_init(handlers, buf_malloc, buf_free, buf_align, NULL, NULL, width_to_stride);
+    lv_draw_buf_handlers_init(handlers, buf_malloc, buf_free, buf_align, NULL, NULL, width_to_stride, NULL);
 }
 
 void lv_draw_buf_handlers_init(lv_draw_buf_handlers_t * handlers,
@@ -67,7 +67,8 @@ void lv_draw_buf_handlers_init(lv_draw_buf_handlers_t * handlers,
                                lv_draw_buf_align_cb align_pointer_cb,
                                lv_draw_buf_cache_operation_cb invalidate_cache_cb,
                                lv_draw_buf_cache_operation_cb flush_cache_cb,
-                               lv_draw_buf_width_to_stride_cb width_to_stride_cb)
+                               lv_draw_buf_width_to_stride_cb width_to_stride_cb,
+                               lv_draw_buf_get_fd_cb get_buf_fd_cb)
 {
     lv_memzero(handlers, sizeof(lv_draw_buf_handlers_t));
     handlers->buf_malloc_cb = buf_malloc_cb;
@@ -76,6 +77,7 @@ void lv_draw_buf_handlers_init(lv_draw_buf_handlers_t * handlers,
     handlers->invalidate_cache_cb = invalidate_cache_cb;
     handlers->flush_cache_cb = flush_cache_cb;
     handlers->width_to_stride_cb = width_to_stride_cb;
+    handlers->get_buf_fd_cb = get_buf_fd_cb;
 }
 
 lv_draw_buf_handlers_t * lv_draw_buf_get_handlers(void)
@@ -136,6 +138,19 @@ void lv_draw_buf_invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_
 
     handlers->invalidate_cache_cb(draw_buf, area);
     LV_PROFILER_DRAW_END;
+}
+
+uint32_t lv_draw_buf_get_fd(const lv_draw_buf_t * draw_buf)
+{
+    LV_ASSERT_NULL(draw_buf);
+    LV_ASSERT_NULL(draw_buf->handlers);
+
+    const lv_draw_buf_handlers_t * handlers = draw_buf->handlers;
+    if(!handlers->get_buf_fd_cb) {
+        return 0;
+    }
+
+    return handlers->get_buf_fd_cb(draw_buf);
 }
 
 void lv_draw_buf_flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
