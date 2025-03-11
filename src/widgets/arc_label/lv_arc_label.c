@@ -389,6 +389,13 @@ static void arc_label_draw_main(lv_event_t * e)
     int32_t arc_r = arc_label->radius;
     lv_value_precise_t angle_start = 0;
 
+    if(arc_r == LV_SIZE_CONTENT) arc_r = LV_PCT(100);
+    if(LV_COORD_IS_PCT(arc_r)) {
+        const int32_t width = lv_area_get_width(&coords);
+        const int32_t height = lv_area_get_height(&coords);
+        arc_r = lv_pct_to_px(arc_r, LV_MIN(width, height)) / 2;
+    }
+
     switch(arc_label->text_align_v) {
         case LV_ARC_LABEL_TEXT_ALIGN_LEADING:
             arc_r_delta = line_height - base_line;
