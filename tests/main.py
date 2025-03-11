@@ -93,6 +93,30 @@ def gen_wayland_protocols(clean):
             os.path.join(wayland_dir, "wayland_xdg_shell.c.original"),
         ])
 
+        subprocess.check_call(['wayland-scanner',
+            'client-header',
+            os.path.join(wayland_protocols_dir, "unstable/linux-dmabuf/linux-dmabuf-unstable-v1.xml"),
+            os.path.join(wayland_dir, "linux-dmabuf-unstable-v1-client-protocol.h.original"),
+        ])
+
+        subprocess.check_call(['wayland-scanner',
+            'private-code',
+            os.path.join(wayland_protocols_dir, "unstable/linux-dmabuf/linux-dmabuf-unstable-v1.xml"),
+            os.path.join(wayland_dir, "linux-dmabuf-unstable-v1-protocol.c.original"),
+        ])
+
+        subprocess.check_call(['wayland-scanner',
+            'client-header',
+            os.path.join(wayland_protocols_dir, "unstable/linux-explicit-synchronization/linux-explicit-synchronization-unstable-v1.xml"),
+            os.path.join(wayland_dir, "linux-explicit-synchronization-unstable-v1-client-protocol.h.original"),
+        ])
+
+        subprocess.check_call(['wayland-scanner',
+            'private-code',
+            os.path.join(wayland_protocols_dir, "unstable/linux-explicit-synchronization/linux-explicit-synchronization-unstable-v1.xml"),
+            os.path.join(wayland_dir, "linux-explicit-synchronization-unstable-v1-protocol.c.original"),
+        ])
+
         # Insert guards
         with open(os.path.join(wayland_dir, "wayland_xdg_shell.h"), "w") as outfile:
             subprocess.check_call(['sed','-e', "1i #if LV_BUILD_TEST", '-e', '$a #endif',
