@@ -18,6 +18,7 @@
 #if LV_USE_DRAW_G2D
 #include "../../lv_draw_buf_private.h"
 #include "g2d.h"
+#include "g2dExt.h"
 #include "lv_g2d_buf_map.h"
 #include "lv_g2d_utils.h"
 
@@ -40,6 +41,8 @@ static void _buf_free(void * buf);
 
 static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area);
 
+static uint32_t _get_buf_fd(const lv_draw_buf_t * draw_buf);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -59,6 +62,7 @@ void lv_draw_buf_g2d_init_handlers(void)
     handlers->buf_malloc_cb = _buf_malloc;
     handlers->buf_free_cb = _buf_free;
     handlers->invalidate_cache_cb = _invalidate_cache;
+    handlers->get_buf_fd_cb = _get_buf_fd;
 }
 
 /**********************
@@ -90,4 +94,10 @@ static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * 
     g2d_cache_op(buf, G2D_CACHE_FLUSH);
 }
 
+static uint32_t _get_buf_fd(const lv_draw_buf_t * draw_buf)
+{
+    struct g2d_buf * buf = g2d_search_buf_map(draw_buf->data);
+    G2D_ASSERT_MSG(buf, "Failed to find buffer in map.");
+    return g2d_buf_export_fd(buf);
+}
 #endif /*LV_USE_DRAW_G2D*/
