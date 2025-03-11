@@ -1,6 +1,6 @@
-=======
+=====
 Viewe
-=======
+=====
 
 `Viewe <https://viewedisplay.com/>`__ is a high-tech enterprise specializing
 in comprehensive display solutions, including display panels, touch interfaces, 
@@ -22,14 +22,14 @@ industry.
  - Arduino Display
 
 UART Smart Displays
-***********************
+*******************
 
 The Viewe UART Smart Displays are a series of displays that use 
 ESP32 microcontrollers and have IO interface for connecting to 
 peripherals.
 
 lv_port_viewe_7_espidf
------------------------
+----------------------
 
 `lv_port_viewe_7_espidf <https://github.com/lvgl/lv_port_viewe_7_espidf>`
 is a port repo of LVGL which supports Viewe ESP32 S3 Smart Display 7.0
