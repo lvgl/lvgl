@@ -56,20 +56,12 @@ void lv_demo_smartwatch_weather_create(void)
         lv_style_init(&main_style);
         lv_style_set_text_color(&main_style, lv_color_white());
         lv_style_set_text_opa(&main_style, LV_OPA_100);
-        lv_style_set_bg_color(&main_style, lv_color_hex(0x306bb6));
+        lv_style_set_bg_color(&main_style, lv_color_hex(0x316bb6));
         lv_style_set_bg_opa(&main_style, LV_OPA_100);
         lv_style_set_clip_corner(&main_style, true);
         lv_style_set_radius(&main_style, LV_RADIUS_CIRCLE);
         lv_style_set_translate_x(&main_style, 384);
 
-        lv_style_set_layout(&main_style, LV_LAYOUT_FLEX);
-        lv_style_set_flex_flow(&main_style, LV_FLEX_FLOW_COLUMN);
-        lv_style_set_flex_main_place(&main_style, LV_FLEX_ALIGN_START);
-        lv_style_set_flex_cross_place(&main_style, LV_FLEX_ALIGN_CENTER);
-        lv_style_set_flex_track_place(&main_style, LV_FLEX_ALIGN_CENTER);
-        lv_style_set_pad_top(&main_style, 40);
-        lv_style_set_pad_bottom(&main_style, 64);
-        lv_style_set_pad_row(&main_style, 20);
     }
 
     weather_screen = lv_obj_create(lv_screen_active());
@@ -82,18 +74,37 @@ void lv_demo_smartwatch_weather_create(void)
 
     lv_obj_add_event_cb(weather_screen, weather_screen_events, LV_EVENT_ALL, NULL);
 
+    LV_IMAGE_DECLARE(image_weather_bg);
+    lv_obj_t * background = lv_image_create(weather_screen);
+    lv_obj_set_pos(background, 0, 0);
+    lv_obj_set_size(background, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_image_set_src(background, &image_weather_bg);
+
+    LV_FONT_DECLARE(font_inter_regular_28);
+    lv_obj_t * label = lv_label_create(weather_screen);
+    lv_label_set_text(label, "13:37");
+    lv_obj_set_align(label, LV_ALIGN_TOP_MID);
+    lv_obj_set_y(label, 30);
+    lv_obj_set_style_text_font(label, &font_inter_regular_28, 0);
+
+    lv_obj_t * main_cont = lv_obj_create(weather_screen);
+    lv_obj_remove_style_all(main_cont);
+    lv_obj_set_size(main_cont, 384, LV_SIZE_CONTENT);
+    lv_obj_set_layout(main_cont, LV_LAYOUT_FLEX);
+    lv_obj_set_scroll_dir(main_cont, LV_DIR_VER);
+    lv_obj_set_flex_flow(main_cont, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(main_cont, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_top(main_cont, 40, 0);
+    lv_obj_set_style_pad_bottom(main_cont, 64, 0);
+    lv_obj_set_style_pad_row(main_cont, 20, 0);
+
     /* Weather details container */
-    lv_obj_t * cont = lv_obj_create(weather_screen);
+    lv_obj_t * cont = lv_obj_create(main_cont);
     lv_obj_remove_style_all(cont);
     lv_obj_set_size(cont, 384, 335);
     lv_obj_set_layout(cont, LV_LAYOUT_FLEX);
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    LV_FONT_DECLARE(font_inter_regular_28);
-    lv_obj_t * label = lv_label_create(cont);
-    lv_label_set_text(label, "13:37");
-    lv_obj_set_style_text_font(label, &font_inter_regular_28, 0);
 
     LV_FONT_DECLARE(font_inter_bold_28);
     label = lv_label_create(cont);
@@ -108,7 +119,7 @@ void lv_demo_smartwatch_weather_create(void)
     lv_obj_t * text_cont = lv_obj_create(cont);
     lv_obj_remove_style_all(text_cont);
     lv_obj_set_size(text_cont, 334, 50);
-    lv_obj_set_style_pad_column(text_cont, 20, 0);
+    lv_obj_set_style_pad_column(text_cont, 5, 0);
     lv_obj_set_layout(text_cont, LV_LAYOUT_FLEX);
     lv_obj_set_flex_flow(text_cont, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(text_cont, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
@@ -119,12 +130,12 @@ void lv_demo_smartwatch_weather_create(void)
 
     label = lv_label_create(text_cont);
     lv_label_set_text(label, "Min. 07°");
-    lv_obj_set_style_text_color(label, lv_color_hex(0xffffffff), 0);
+    lv_obj_set_style_text_color(label, lv_color_hex(0x94d4fd), 0);
     lv_obj_set_style_text_font(label, &font_inter_regular_28, 0);
 
 
     /* Info cards container */
-    lv_obj_t * cont_cards = lv_obj_create(weather_screen);
+    lv_obj_t * cont_cards = lv_obj_create(main_cont);
     lv_obj_remove_style_all(cont_cards);
     lv_obj_set_size(cont_cards, 385, LV_SIZE_CONTENT);
     lv_obj_set_layout(cont_cards, LV_LAYOUT_FLEX);
@@ -210,7 +221,7 @@ void lv_demo_smartwatch_weather_create(void)
 
 
     /* Today's forecast container */
-    lv_obj_t * panel = create_forecast_container(weather_screen, "Today's Forecast");
+    lv_obj_t * panel = create_forecast_container(main_cont, "Today's Forecast");
 
     /* Add the hourly forecast */
     LV_IMAGE_DECLARE(image_sunshine_icon);
@@ -219,7 +230,7 @@ void lv_demo_smartwatch_weather_create(void)
     }
 
     /* 10 days forecast container */
-    panel = create_forecast_container(weather_screen, "10 Days Forecast");
+    panel = create_forecast_container(main_cont, "10 Days Forecast");
     /* Add the weekly forecast*/
     for(int32_t i = 0; i < 10; i++) {
         add_weekly_forecast(panel, "Mon", &image_sunshine_icon, 5 + i, 17 + i);
@@ -227,8 +238,8 @@ void lv_demo_smartwatch_weather_create(void)
 
     /* Update time label */
     LV_FONT_DECLARE(font_inter_light_24);
-    label = lv_label_create(weather_screen);
-    lv_label_set_text(label, "Update Today\nat 12 pm");
+    label = lv_label_create(main_cont);
+    lv_label_set_text(label, "Updated Today\nat 12 pm");
     lv_obj_set_style_text_font(label, &font_inter_light_24, 0);
     lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
 

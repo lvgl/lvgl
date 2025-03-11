@@ -21,7 +21,8 @@ LV_IMAGE_DECLARE(image_album_cover_3);
 LV_IMAGE_DECLARE(image_album_cover_4);
 
 #define MUSIC_OBJECTS 4
-#define RADIUS 78
+#define RADIUS_SMALL 40
+#define RADIUS_LARGE 78
 
 /**********************
  *      TYPEDEFS
@@ -50,9 +51,13 @@ static void music_play_event_cb(lv_event_t * e);
 static void music_next_event_cb(lv_event_t * e);
 static void music_previous_event_cb(lv_event_t * e);
 static void drag_event_handler(lv_event_t * e);
+
 static void music_rotation_cb(void * var, int32_t v);
 static void animate_rotation(int32_t angle);
 static void rotate_objects(int32_t angle);
+static void rotation_complete_cb(lv_anim_t * a);
+static void radius_animation_cb(void * var, int32_t v);
+static void animate_radius(int32_t target);
 
 /**********************
  *  STATIC VARIABLES
@@ -69,6 +74,8 @@ static lv_obj_t * cont_info;
 static lv_obj_t * label_artist;
 static lv_obj_t * label_track;
 static lv_obj_t * image_volume;
+
+static int32_t radius = RADIUS_SMALL;
 
 static music_info_t music_list[] = {
     {0x36A1C7, &image_album_cover_1, "Jeff Black", "Wired"},
@@ -116,6 +123,7 @@ void lv_demo_smartwatch_music_create(void)
     lv_obj_set_size(music_screen, lv_pct(100), lv_pct(100));
     lv_obj_set_scrollbar_mode(music_screen, LV_SCROLLBAR_MODE_OFF);
     lv_obj_remove_flag(music_screen, LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_EVENT_BUBBLE);
+    lv_obj_add_flag(music_screen, LV_OBJ_FLAG_CLICKABLE);
 
     lv_obj_add_event_cb(music_screen, music_screen_events, LV_EVENT_ALL, NULL);
 
@@ -135,7 +143,7 @@ void lv_demo_smartwatch_music_create(void)
     lv_obj_set_height(arc_volume, 350);
     lv_obj_set_align(arc_volume, LV_ALIGN_CENTER);
     lv_arc_set_value(arc_volume, 50);
-    lv_arc_set_bg_angles(arc_volume, 335, 25);
+    lv_arc_set_bg_angles(arc_volume, 345, 25);
     lv_arc_set_mode(arc_volume, LV_ARC_MODE_REVERSE);
     lv_obj_set_style_arc_width(arc_volume, 12, 0);
     lv_obj_set_style_arc_color(arc_volume, lv_color_hex(0xBBBBBB), 0);
@@ -230,7 +238,7 @@ void lv_demo_smartwatch_music_create(void)
     lv_obj_set_y(image_cont, 66);
     lv_obj_set_align(image_cont, LV_ALIGN_TOP_MID);
     lv_obj_remove_flag(image_cont, LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_EVENT_BUBBLE);
-    lv_obj_add_flag(image_cont, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_flag(image_cont, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_CLICK_FOCUSABLE);
     lv_obj_add_event_cb(image_cont, drag_event_handler, LV_EVENT_ALL, NULL);
 
     for(int i = 0; i < MUSIC_OBJECTS;  i++) {
@@ -300,11 +308,11 @@ static void rotate_objects(int32_t angle)
 {
     for(int i = 0; i < MUSIC_OBJECTS; i++) {
         objects[i].position = (objects[i].position + angle) % 360;
-        int x = (lv_trigo_cos(objects[i].position) * RADIUS) / LV_TRIGO_SIN_MAX;
-        int y = (lv_trigo_sin(objects[i].position) * RADIUS) / LV_TRIGO_SIN_MAX;
+        int x = (lv_trigo_cos(objects[i].position) * radius) / LV_TRIGO_SIN_MAX;
+        int y = (lv_trigo_sin(objects[i].position) * radius) / LV_TRIGO_SIN_MAX;
 
         /* Here we use y variable as the z-index */
-        if(y > RADIUS / 2) {
+        if(y > radius / 2) {
             lv_obj_move_foreground(objects[i].obj);
 
             lv_label_set_text(label_artist, music_list[i].artist);
@@ -312,11 +320,14 @@ static void rotate_objects(int32_t angle)
             lv_obj_set_style_bg_color(music_screen, lv_color_hex(music_list[i].color), 0);
 
         }
-        else if(y < -RADIUS / 2) {
+        else if(y < -radius / 2) {
             lv_obj_move_background(objects[i].obj);
         }
 
-        lv_image_set_scale(objects[i].obj, lv_map(y, -RADIUS, RADIUS, 128, 256));
+        int32_t small = lv_map(radius, RADIUS_SMALL, RADIUS_LARGE, 128, 156);
+        int32_t large = lv_map(radius, RADIUS_SMALL, RADIUS_LARGE, 240, 256);
+
+        lv_image_set_scale(objects[i].obj, lv_map(y, -radius, radius, small, large));
         lv_obj_set_x(objects[i].obj, x);
     }
 
@@ -330,6 +341,42 @@ static void music_rotation_cb(void * var, int32_t v)
     rotate_objects(delta);
 }
 
+static void radius_animation_cb(void * var, int32_t v)
+{
+    radius = v;
+    rotate_objects(0);
+}
+
+static void animate_radius(int32_t target)
+{
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, NULL);
+    lv_anim_set_exec_cb(&a, radius_animation_cb);
+    lv_anim_set_values(&a, radius, target);
+    lv_anim_set_duration(&a, 500);
+    lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
+    lv_anim_start(&a);
+}
+
+static void rotation_complete_cb(lv_anim_t * a)
+{
+    int32_t end_angle = objects[0].position;
+
+    if(end_angle % 90 != 0) {
+        /* Animation completed but angle was not multiple of 90 */
+        LV_LOG_WARN("end angle: %d", end_angle);
+
+        /* Compute the nearest 90-degree target */
+        int32_t nearest_angle = (end_angle + (end_angle >= 0 ? 45 : -45)) / 90 * 90;
+
+        /* Calculate delta to nearest 90-degree */
+        int32_t angle = nearest_angle - end_angle;
+
+        animate_rotation(angle);
+    }
+}
+
 static void animate_rotation(int32_t angle)
 {
     last_angle = 0;
@@ -337,6 +384,7 @@ static void animate_rotation(int32_t angle)
     lv_anim_init(&a);
     lv_anim_set_var(&a, NULL);
     lv_anim_set_exec_cb(&a, music_rotation_cb);
+    lv_anim_set_completed_cb(&a, rotation_complete_cb);
     lv_anim_set_values(&a, 0, angle);
     lv_anim_set_duration(&a, 500);
     lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
@@ -357,7 +405,7 @@ static void music_previous_event_cb(lv_event_t * e)
 
 static void music_play_event_cb(lv_event_t * e)
 {
-    static bool playing = false;
+    static bool playing = true;
     playing = !playing;
 
     if(playing) {
@@ -375,6 +423,14 @@ static void drag_event_handler(lv_event_t * e)
 
     if(code == LV_EVENT_PRESSED) {
     }
+
+    if(code == LV_EVENT_FOCUSED) {
+        animate_radius(RADIUS_LARGE);
+    }
+    if(code == LV_EVENT_DEFOCUSED) {
+        animate_radius(RADIUS_SMALL);
+    }
+
 
     if(code == LV_EVENT_PRESSING) {
         lv_indev_t * indev = lv_event_get_indev(e);

@@ -174,6 +174,12 @@ void lv_demo_smartwatch_health_create(void)
     lv_obj_add_flag(image_button, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_remove_flag(image_button, LV_OBJ_FLAG_SCROLLABLE);
 
+
+    // extern uint8_t lottie_heart_beat[];
+    // extern size_t lottie_heart_beat_size;
+    // heart_icon = lv_lottie_create(health_screen);
+    // lv_lottie_set_src_data(heart_icon, lottie_heart_beat, lottie_heart_beat_size);
+
     LV_IMAGE_DECLARE(image_heart_icon);
     heart_icon = lv_image_create(health_screen);
     lv_image_set_src(heart_icon, &image_heart_icon);
@@ -184,6 +190,16 @@ void lv_demo_smartwatch_health_create(void)
     lv_obj_set_align(heart_icon, LV_ALIGN_CENTER);
     lv_obj_add_flag(heart_icon, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_remove_flag(heart_icon, LV_OBJ_FLAG_SCROLLABLE);
+    // #if LV_DRAW_BUF_ALIGN == 4 && LV_DRAW_BUF_STRIDE_ALIGN == 1
+    //     /*If there are no special requirements, just declare a buffer
+    //       x4 because the Lottie is rendered in ARGB8888 format*/
+    //     static uint8_t buf[364 * 364 * 4];
+    //     lv_lottie_set_buffer(heart_icon, 364, 364, buf);
+    // #else
+    //     /*For GPUs and special alignment/strid setting use a draw_buf instead*/
+    //     LV_DRAW_BUF_DEFINE(draw_buf, 64, 64, LV_COLOR_FORMAT_ARGB8888);
+    //     lv_lottie_set_draw_buf(heart_icon, &draw_buf);
+    // #endif
 
     lv_obj_t * click_cont = lv_obj_create(health_screen);
     lv_obj_remove_style_all(click_cont);

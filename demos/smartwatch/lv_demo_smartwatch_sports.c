@@ -87,6 +87,7 @@ void lv_demo_smartwatch_sports_create(void)
     lv_obj_set_style_arc_color(arc_steps, lv_color_hex(0x2F1C25), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(arc_steps, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(arc_steps, 23, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_remove_flag(arc_steps, LV_OBJ_FLAG_CLICKABLE);
 
     lv_obj_set_style_arc_color(arc_steps, lv_color_hex(0xF697C4), LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(arc_steps, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
@@ -105,6 +106,7 @@ void lv_demo_smartwatch_sports_create(void)
     lv_obj_set_style_arc_color(arc_distance, lv_color_hex(0x0E301A), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(arc_distance, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(arc_distance, 23, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_remove_flag(arc_distance, LV_OBJ_FLAG_CLICKABLE);
 
     lv_obj_set_style_arc_color(arc_distance, lv_color_hex(0x4CFE8D), LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(arc_distance, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
@@ -123,6 +125,7 @@ void lv_demo_smartwatch_sports_create(void)
     lv_obj_set_style_arc_color(arc_calories, lv_color_hex(0x112E2E), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(arc_calories, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_width(arc_calories, 23, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_remove_flag(arc_calories, LV_OBJ_FLAG_CLICKABLE);
 
     lv_obj_set_style_arc_color(arc_calories, lv_color_hex(0x5CF2F1), LV_PART_INDICATOR | LV_STATE_DEFAULT);
     lv_obj_set_style_arc_opa(arc_calories, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
