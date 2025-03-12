@@ -115,20 +115,35 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
 
     /*Update dsc with buffered events*/
     struct input_event in = { 0 };
+    // https://www.kernel.org/doc/Documentation/input/event-codes.txt
+    // https://manpages.ubuntu.com/manpages/trusty/man1/evtest.1.html
+    // evtest can be run from the command line to see these raw input device events
     while(read(dsc->fd, &in, sizeof(in)) > 0) {
-        if(in.type == EV_REL) {
+        // data->continue_reading is used if multiple events are in the buffer right now
+        // due to rapid clicks/presses/taps, and we need to process their state changes
+        // individually so that they aren't ignored.
+        // This is especially important to track at low framerates.
+        if(in.type == EV_REL) { // Axis change, such as a pointer moving in the X or Y direction
             if(in.code == REL_X) dsc->root_x += in.value;
             else if(in.code == REL_Y) dsc->root_y += in.value;
         }
-        else if(in.type == EV_ABS) {
+        else if(in.type == EV_ABS) { // Absolute axis change, such as a touchscreen press.
             if(in.code == ABS_X || in.code == ABS_MT_POSITION_X) dsc->root_x = in.value;
             else if(in.code == ABS_Y || in.code == ABS_MT_POSITION_Y) dsc->root_y = in.value;
             else if(in.code == ABS_MT_TRACKING_ID) {
-                if(in.value == -1) dsc->state = LV_INDEV_STATE_RELEASED;
-                else if(in.value == 0) dsc->state = LV_INDEV_STATE_PRESSED;
+                if(in.value == -1) {
+                    dsc->state = LV_INDEV_STATE_RELEASED;
+                    data->continue_reading = true;
+                    break;
+                }
+                else if(in.value == 0) {
+                    dsc->state = LV_INDEV_STATE_PRESSED;
+                    data->continue_reading = true;
+                    break;
+                }
             }
         }
-        else if(in.type == EV_KEY) {
+        else if(in.type == EV_KEY) { // Button state change, such as a mouse click or key press
             if(in.code == BTN_MOUSE || in.code == BTN_TOUCH) {
                 if(in.value == 0) dsc->state = LV_INDEV_STATE_RELEASED;
                 else if(in.value == 1) dsc->state = LV_INDEV_STATE_PRESSED;
@@ -137,7 +152,7 @@ static void _evdev_read(lv_indev_t * indev, lv_indev_data_t * data)
                 dsc->key = _evdev_process_key(in.code);
                 if(dsc->key) {
                     dsc->state = in.value ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
-                    data->continue_reading = true; /*Keep following events in buffer for now*/
+                    data->continue_reading = true;
                     break;
                 }
             }
