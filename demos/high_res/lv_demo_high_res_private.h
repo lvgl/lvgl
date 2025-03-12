@@ -206,6 +206,9 @@ typedef struct {
     lv_subject_t ev_charging_progress;
     lv_subject_t smart_meter_selected_bar;
     bool top_margin_subjects_are_init;
+    bool wifi_connect_ui_active;
+    char * wifi_ssid_tmp;
+    char * wifi_password_tmp;
     lv_subject_t top_margin_wifi_subject;
     lv_subject_t top_margin_health_subject;
     lv_subject_t top_margin_setting_subject;
