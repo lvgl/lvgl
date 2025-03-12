@@ -322,6 +322,7 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * assets_path,
 
     /* output subjects */
     lv_subject_init_int(&c->api.subjects.music_play, 1);
+    lv_subject_init_pointer(&c->api.subjects.wifi_password, NULL);
 
     /* input+output subjects */
     lv_subject_init_int(&c->api.subjects.locked, 0);
@@ -612,6 +613,9 @@ static void free_ctx_event_cb(lv_event_t * e)
         lv_draw_buf_destroy((lv_draw_buf_t *) *slide);
     }
     lv_array_deinit(&c->about_slides_array);
+
+    lv_free(c->wifi_ssid_tmp);
+    lv_free(c->wifi_password_tmp);
 
     lv_free(c);
 
