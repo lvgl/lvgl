@@ -667,6 +667,10 @@ menu "LVGL configuration"
         config LV_USE_FONT_PLACEHOLDER
             bool "Enable drawing placeholders when glyph dsc is not found."
             default y
+
+        config LV_USE_FONT_DYNAMIC_LOAD
+            bool "Enable dynamic glyph bitmap loading with font_loader"
+            default n
     endmenu
 
     menu "Text Settings"
