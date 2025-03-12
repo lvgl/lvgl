@@ -10,8 +10,6 @@
 #include "lv_demo_high_res.h"
 #if LV_USE_DEMO_HIGH_RES
 
-#include <stdlib.h>
-
 /*********************
  *      DEFINES
  *********************/
