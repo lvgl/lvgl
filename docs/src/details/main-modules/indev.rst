@@ -161,25 +161,44 @@ Multi-touch gestures
 
 LVGL has the ability to recognize multi-touch gestures, when a gesture
 is detected a ``LV_EVENT_GESTURE`` is passed to the object on which the
-gesture occurred. Currently, only the pinch gesture is supported
-more gesture types will be implemented soon.
+gesture occurred. Currently, these multi-touch gestures are supported:
+
+- Two fingers pinch (up and down)
+- Two fingers rotation
+- Two fingers swipe (infinite)
 
 To enable the multi-touch gesture recognition set the
 ``LV_USE_GESTURE_RECOGNITION`` option in the ``lv_conf.h`` file.
 
-Touch event collection
-~~~~~~~~~~~~~~~~~~~~~~
+Currently, the system sends the events if the gestures are in one of the following states:
 
-The driver or application collects touch events until the indev read callback
-is called. It is the responsibility of the driver to call
-the gesture recognition function of the appropriate type. For example
-to recognise pinch gestures call ``lv_indev_gesture_detect_pinch``.
+- ``LV_INDEV_GESTURE_STATE_RECOGNIZED``: The gesture has been recognized and is now active.
+- ``LV_INDEV_GESTURE_STATE_ENDED``: The gesture has ended.
 
-After calling the gesture detection function, it's necessary to call
-the ``lv_indev_set_gesture_data`` function to set the ``gesture_data``
-and ``gesture_type`` fields of the structure ``lv_indev_data_t``
 
-.. code-block::
+Multi-touch gestures overview
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To recognize multi touch gestures, recognizers are used. The structure ``lv_indev_t`` contains
+an array of recognizers, one per gesture type. These recognizers are initialized internally by ``lv_indev_create`` by calling
+``lv_indev_gesture_init_recognizers`` after the indev device is created. The the recognizers can then be configured to
+modify the gestures thresholds. These thresholds are used to be able to recognize the gesture only after the threshold
+have been reached. They can be set-up like this:
+
+- ``lv_indev_set_pinch_up_threshold(lv_indev_t * indev, float threshold)``: Set the pinch up (zoom in) threshold in pixels.
+- ``lv_indev_set_pinch_down_threshold(lv_indev_t * indev, float threshold)``: Set the pinch down (zoom out) threshold in pixels.
+- ``lv_indev_set_rotation_rad_threshold(lv_indev_t * indev, float threshold)``: Set the rotation angle threshold in radians.
+
+The recognizers can then be updated to recognize the gestures by calling ``lv_indev_gesture_recognizers_update``.
+This must be done in the user defined indev ``read_cb``. This will iterate over the recognizers and stop once it detects a
+recognized or ended gesture. For now only one multi-touch gesture can be recognized/ended at a time.
+
+Once the recognizers are updated, calling ``lv_indev_gesture_recognizers_set_data`` will update the ``lv_indev_data_t`` structure.
+It is meant to be done in the indev ``read_cb``. This allows the future ``lv_event_t`` to eb filled with multi-touch gesture info.
+
+Here is an example of the ``read_cb``:
+
+.. code-block:: c
 
    /* The recognizer keeps the state of the gesture */
    static lv_indev_gesture_recognizer_t recognizer;
@@ -194,34 +213,146 @@ and ``gesture_type`` fields of the structure ``lv_indev_data_t``
    {
 
         lv_indev_touch_data_t * touch;
-        uint8_t i;
 
-
-        touch = &touches[0];
-        lv_indev_gesture_detect_pinch(recognizer, &touches[0],
-                                      touch_cnt);
+        lv_indev_update_recognizers(drv, &touches[0], touch_cnt);
 
         touch_cnt = 0;
 
         /* Set the gesture information, before returning to LVGL */
-        lv_indev_set_gesture_data(data, recognizer);
+        lv_indev_gesture_recognizers_set_data(drv, data);
 
    }
 
-A touch event is represented by the ``lv_indev_touch_data_t`` structure, the fields
-being 1:1 compatible with events emitted by the `libinput <https://wayland.freedesktop.org/libinput/doc/latest/>`_ library
+The user is in charge of collecting the necessary touches events from the driver until the indev ``read_cb`` is called.
+It must then convert the specific driver input to ``lv_indev_touch_data_t`` to be processed by the ``read_cb`` at a later point.
+Here is an example using ``libinput``:
 
-Handling touch events
-~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: c
 
-Touch events are handled like any other event. First, setup a listener for the ``LV_EVENT_GESTURE`` event type by defining and setting the callback function.
+  /**
+  * @brief Convert the libinput to lvgl's representation of touch event
+  * @param ev a pointer to the lib input event
+  */
+  static void touch_event_queue_add(struct libinput_event *ev)
+  {
+      struct libinput_event_touch *touch_ev;
+      lv_indev_touch_data_t *cur;
+      lv_indev_touch_data_t *t;
+      uint32_t time;
+      int i;
+      int id;
+      int type;
 
-The state or scale of the pinch gesture can be retrieved by
-calling the ``lv_event_get_pinch_scale`` and ``lv_indev_get_gesture_state`` from within the
-callback.
+      type = libinput_event_get_type(ev);
+      touch_ev = libinput_event_get_touch_event(ev);
+      id = libinput_event_touch_get_slot(touch_ev);
+      time = libinput_event_touch_get_time(touch_ev);
 
-An example of such an application is available in
-the source tree ``examples/others/gestures/lv_example_gestures.c``
+      /* Get the last event for contact point */
+      t = &touches[0];
+      cur = NULL;
+
+      for (i = 0; i < touch_cnt; i++) {
+          if (t->id == id) {
+              cur = t;
+          }
+          t++;
+      }
+
+      if (cur != NULL && cur->timestamp == time) {
+          /* Previous event has the same timestamp - ignore duplicate event */
+          return;
+      }
+
+      if (cur == NULL ||
+              type == LIBINPUT_EVENT_TOUCH_UP ||
+              type == LIBINPUT_EVENT_TOUCH_DOWN) {
+
+          /* create new event */
+          cur = &touches[touch_cnt];
+          touch_cnt++;
+      }
+
+      switch (type) {
+          case LIBINPUT_EVENT_TOUCH_DOWN:
+          case LIBINPUT_EVENT_TOUCH_MOTION:
+
+              cur->point.x = (int) libinput_event_touch_get_x_transformed(touch_ev, SCREEN_WIDTH);
+              cur->point.y = (int) libinput_event_touch_get_y_transformed(touch_ev, SCREEN_HEIGHT);
+              cur->state = LV_INDEV_STATE_PRESSED;
+              break;
+
+          case LIBINPUT_EVENT_TOUCH_UP:
+
+              cur->state = LV_INDEV_STATE_RELEASED;
+              cur->point.x = 0;
+              cur->point.y = 0;
+              break;
+      }
+
+      cur->timestamp = time;
+      cur->id = id;
+  }
+
+  /**
+  * @brief Filter out libinput events that are not related to touches
+  * @param ev a pointer to the lib input event
+  */
+  static void process_libinput_event(struct libinput_event *ev)
+  {
+      int type;
+
+      type = libinput_event_get_type(ev);
+
+      switch (type) {
+          case LIBINPUT_EVENT_TOUCH_MOTION:
+          case LIBINPUT_EVENT_TOUCH_DOWN:
+          case LIBINPUT_EVENT_TOUCH_UP:
+              /* Filter only touch events */
+              touch_event_queue_add(ev);
+              break;
+          default:
+              /* Skip an unrelated libinput event */
+              return;
+      }
+  }
+
+
+From this setup, the user can now register events callbacks to react to ``LV_EVENT_GESTURE``.
+
+.. note::
+  A touch event is represented by the ``lv_indev_touch_data_t`` structure, the fields
+  being 1:1 compatible with events emitted by the `libinput <https://wayland.freedesktop.org/libinput/doc/latest/>`_ library
+
+
+Handling multi-touch gesture events
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once a gesture is recognized or ended, a ``LV_EVENT_GESTURE`` is sent. The user can the use these functions to
+gather more information about the gesture:
+
+- ``lv_event_get_gesture_type(lv_event_t * gesture_event)``: Get the type of the gesture. To be
+used to check which multi-touch gesture is currently reported.
+- ``lv_indev_gesture_state_t lv_event_get_gesture_state(lv_event_t * gesture_event, lv_indev_gesture_type_t type)``: Get the
+state of the gesture. It can be one of those:
+
+  - ``LV_INDEV_GESTURE_STATE_NONE``: The gesture is not active.
+  - ``LV_INDEV_GESTURE_STATE_RECOGNIZED``: The gesture is recognized and can be used.
+  - ``LV_INDEV_GESTURE_STATE_ENDED``: The gesture ended.
+
+These functions allow the user to confirm the gesture is the expected one and that it is in a usable state.
+The user can then request the gestures values with the following functions:
+
+- ``lv_event_get_pinch_scale(lv_event_t * gesture_event)``: Get the pinch scale. Only relevant for pinch gesture.
+- ``lv_event_get_rotation(lv_event_t * gesture_event)``: Get the rotation in radians. Only relevant for rotation gesture.
+- ``lv_event_get_two_fingers_swipe_distance(lv_event_t * gesture_event)``: Get the distance in pixels from the gesture staring center.
+  Only relevant for two fingers swipe gesture.
+- ``lv_event_get_two_fingers_swipe_dir(lv_event_t * gesture_event)``: Get the direction from the starting center. Only relevant for
+  two fingers swipe gesture.
+
+This allow the user to react to the gestures and to use the gestures values. An example of such an application is available in
+the source tree ``examples/others/gestures/lv_example_gestures.c``.
+
 
 Keypad or Keyboard
 ------------------
