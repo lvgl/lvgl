@@ -284,10 +284,6 @@ static void sports_screen_events(lv_event_t * e)
         }
 
     }
-    if(event_code == LV_EVENT_FOCUSED) {
-        LV_LOG_WARN("Screen focused");
-    }
-
 }
 
 #endif /*LV_USE_DEMO_SMARTWATCH*/

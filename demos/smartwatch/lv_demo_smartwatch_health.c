@@ -32,7 +32,7 @@ static void button_click_event(lv_event_t * e);
  **********************/
 static lv_obj_t * health_screen;
 
-static lv_obj_t * ecg_cont;
+static lv_obj_t * lottie_ecg;
 static lv_obj_t * heart_bg_2;
 static lv_obj_t * heart_icon;
 static lv_obj_t * image_button;
@@ -90,25 +90,28 @@ void lv_demo_smartwatch_health_create(void)
     lv_obj_add_flag(heart_bg_2, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_remove_flag(heart_bg_2, LV_OBJ_FLAG_SCROLLABLE);
 
-    ecg_cont = lv_obj_create(health_screen);
-    lv_obj_remove_style_all(ecg_cont);
-    lv_obj_set_width(ecg_cont, 384);
-    lv_obj_set_height(ecg_cont, LV_SIZE_CONTENT);
-    lv_obj_set_x(ecg_cont, 0);
-    lv_obj_set_y(ecg_cont, -60);
-    lv_obj_set_align(ecg_cont, LV_ALIGN_CENTER);
-    lv_obj_remove_flag(ecg_cont, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_add_flag(ecg_cont, LV_OBJ_FLAG_HIDDEN);
+    extern uint8_t lottie_ecg_wave[];
+    extern size_t lottie_ecg_wave_size;
+    lottie_ecg = lv_lottie_create(health_screen);
+    lv_lottie_set_src_data(lottie_ecg, lottie_ecg_wave, lottie_ecg_wave_size);
+    lv_obj_remove_style_all(lottie_ecg);
+    lv_obj_set_size(lottie_ecg, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_x(lottie_ecg, 0);
+    lv_obj_set_y(lottie_ecg, -60);
+    lv_obj_set_align(lottie_ecg, LV_ALIGN_CENTER);
+    lv_obj_remove_flag(lottie_ecg, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(lottie_ecg, LV_OBJ_FLAG_HIDDEN);
+#if LV_DRAW_BUF_ALIGN == 4 && LV_DRAW_BUF_STRIDE_ALIGN == 1
+    /*If there are no special requirements, just declare a buffer
+        x4 because the Lottie is rendered in ARGB8888 format*/
+    static uint8_t ecg_buf[410 * 176 * 4];
+    lv_lottie_set_buffer(lottie_ecg, 410, 176, ecg_buf);
+#else
+    /*For GPUs and special alignment/strid setting use a draw_buf instead*/
+    LV_DRAW_BUF_DEFINE(draw_buf, 64, 64, LV_COLOR_FORMAT_ARGB8888);
+    lv_lottie_set_draw_buf(lottie_ecg, &draw_buf);
+#endif
 
-    LV_IMAGE_DECLARE(image_ecg);
-    lv_obj_t * image = lv_image_create(ecg_cont);
-    lv_image_set_src(image, &image_ecg);
-    lv_obj_set_width(image, 818);
-    lv_obj_set_height(image, LV_SIZE_CONTENT);
-    lv_obj_set_align(image, LV_ALIGN_LEFT_MID);
-    lv_obj_add_flag(image, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_remove_flag(image, LV_OBJ_FLAG_SCROLLABLE);
-    lv_image_set_inner_align(image, LV_IMAGE_ALIGN_TILE);
 
     LV_FONT_DECLARE(font_space_grotesk_regular_28);
     lv_obj_t * label = lv_label_create(health_screen);
@@ -175,31 +178,26 @@ void lv_demo_smartwatch_health_create(void)
     lv_obj_remove_flag(image_button, LV_OBJ_FLAG_SCROLLABLE);
 
 
-    // extern uint8_t lottie_heart_beat[];
-    // extern size_t lottie_heart_beat_size;
-    // heart_icon = lv_lottie_create(health_screen);
-    // lv_lottie_set_src_data(heart_icon, lottie_heart_beat, lottie_heart_beat_size);
-
-    LV_IMAGE_DECLARE(image_heart_icon);
-    heart_icon = lv_image_create(health_screen);
-    lv_image_set_src(heart_icon, &image_heart_icon);
-    lv_obj_set_width(heart_icon, LV_SIZE_CONTENT);
-    lv_obj_set_height(heart_icon, LV_SIZE_CONTENT);
+    extern uint8_t lottie_heart_small[];
+    extern size_t lottie_heart_small_size;
+    heart_icon = lv_lottie_create(health_screen);
+    lv_lottie_set_src_data(heart_icon, lottie_heart_small, lottie_heart_small_size);
+    lv_obj_set_size(heart_icon, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_x(heart_icon, 0);
     lv_obj_set_y(heart_icon, -30);
     lv_obj_set_align(heart_icon, LV_ALIGN_CENTER);
     lv_obj_add_flag(heart_icon, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_remove_flag(heart_icon, LV_OBJ_FLAG_SCROLLABLE);
-    // #if LV_DRAW_BUF_ALIGN == 4 && LV_DRAW_BUF_STRIDE_ALIGN == 1
-    //     /*If there are no special requirements, just declare a buffer
-    //       x4 because the Lottie is rendered in ARGB8888 format*/
-    //     static uint8_t buf[364 * 364 * 4];
-    //     lv_lottie_set_buffer(heart_icon, 364, 364, buf);
-    // #else
-    //     /*For GPUs and special alignment/strid setting use a draw_buf instead*/
-    //     LV_DRAW_BUF_DEFINE(draw_buf, 64, 64, LV_COLOR_FORMAT_ARGB8888);
-    //     lv_lottie_set_draw_buf(heart_icon, &draw_buf);
-    // #endif
+#if LV_DRAW_BUF_ALIGN == 4 && LV_DRAW_BUF_STRIDE_ALIGN == 1
+    /*If there are no special requirements, just declare a buffer
+        x4 because the Lottie is rendered in ARGB8888 format*/
+    static uint8_t heart_buf[90 * 77 * 4];
+    lv_lottie_set_buffer(heart_icon, 90, 77, heart_buf);
+#else
+    /*For GPUs and special alignment/strid setting use a draw_buf instead*/
+    LV_DRAW_BUF_DEFINE(draw_buf, 64, 64, LV_COLOR_FORMAT_ARGB8888);
+    lv_lottie_set_draw_buf(heart_icon, &draw_buf);
+#endif
 
     lv_obj_t * click_cont = lv_obj_create(health_screen);
     lv_obj_remove_style_all(click_cont);
@@ -210,17 +208,6 @@ void lv_demo_smartwatch_health_create(void)
     lv_obj_set_align(click_cont, LV_ALIGN_CENTER);
     lv_obj_remove_flag(click_cont, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_event_cb(click_cont, button_click_event, LV_EVENT_CLICKED, NULL);
-
-    lv_anim_t a;
-    lv_anim_init(&a);
-    lv_anim_set_duration(&a, 500);
-    lv_anim_set_var(&a, heart_icon);
-    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_image_set_scale);
-    lv_anim_set_values(&a, 256, 320);
-    lv_anim_set_path_cb(&a, lv_anim_path_ease_in);
-    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-    lv_anim_start(&a);
-
 
 }
 
@@ -241,14 +228,14 @@ static void button_click_event(lv_event_t * e)
 {
     LV_IMAGE_DECLARE(image_health_on);
     LV_IMAGE_DECLARE(image_health_off);
-    if(lv_obj_has_flag(ecg_cont, LV_OBJ_FLAG_HIDDEN)) {
-        lv_obj_remove_flag(ecg_cont, LV_OBJ_FLAG_HIDDEN);
+    if(lv_obj_has_flag(lottie_ecg, LV_OBJ_FLAG_HIDDEN)) {
+        lv_obj_remove_flag(lottie_ecg, LV_OBJ_FLAG_HIDDEN);
         lv_obj_add_flag(heart_bg_2, LV_OBJ_FLAG_HIDDEN);
         lv_obj_add_flag(heart_icon, LV_OBJ_FLAG_HIDDEN);
         lv_image_set_src(image_button, &image_health_on);
     }
     else {
-        lv_obj_add_flag(ecg_cont, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(lottie_ecg, LV_OBJ_FLAG_HIDDEN);
         lv_obj_remove_flag(heart_bg_2, LV_OBJ_FLAG_HIDDEN);
         lv_obj_remove_flag(heart_icon, LV_OBJ_FLAG_HIDDEN);
         lv_image_set_src(image_button, &image_health_off);

@@ -111,8 +111,36 @@ void lv_demo_smartwatch_weather_create(void)
     lv_label_set_text(label, "Budapest");
     lv_obj_set_style_text_font(label, &font_inter_regular_28, 0);
 
+    lv_obj_t * temp_cont = lv_obj_create(cont);
+    lv_obj_remove_style_all(temp_cont);
+    lv_obj_set_size(temp_cont, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_style_pad_column(temp_cont, 5, 0);
+    lv_obj_set_layout(temp_cont, LV_LAYOUT_FLEX);
+    lv_obj_set_flex_flow(temp_cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(temp_cont, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    extern uint8_t lottie_sun_cloud[];
+    extern size_t lottie_sun_cloud_size;
+    lv_obj_t * sun_icon = lv_lottie_create(temp_cont);
+    lv_lottie_set_src_data(sun_icon, lottie_sun_cloud, lottie_sun_cloud_size);
+    lv_obj_set_size(sun_icon, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_align(sun_icon, LV_ALIGN_CENTER);
+    lv_obj_add_flag(sun_icon, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(sun_icon, LV_OBJ_FLAG_SCROLLABLE);
+#if LV_DRAW_BUF_ALIGN == 4 && LV_DRAW_BUF_STRIDE_ALIGN == 1
+    /*If there are no special requirements, just declare a buffer
+        x4 because the Lottie is rendered in ARGB8888 format*/
+    static uint8_t sun_buf[100 * 89 * 4];
+    lv_lottie_set_buffer(sun_icon, 100, 89, sun_buf);
+#else
+    /*For GPUs and special alignment/strid setting use a draw_buf instead*/
+    LV_DRAW_BUF_DEFINE(draw_buf, 64, 64, LV_COLOR_FORMAT_ARGB8888);
+    lv_lottie_set_draw_buf(sun_icon, &draw_buf);
+#endif
+
+
     LV_FONT_DECLARE(font_inter_light_124);
-    label = lv_label_create(cont);
+    label = lv_label_create(temp_cont);
     lv_label_set_text(label, "12°");
     lv_obj_set_style_text_font(label, &font_inter_light_124, 0);
 
