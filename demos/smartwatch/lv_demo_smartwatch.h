@@ -58,7 +58,7 @@ void animate_arc(lv_obj_t * obj, arc_animation_t animation, int32_t duration, in
  **********************/
 
 extern lv_obj_t * arc_cont;
-extern lv_obj_t * arc;
+extern lv_obj_t * main_arc;
 extern lv_obj_t * overlay;
 /**********************
  *      MACROS

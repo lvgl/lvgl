@@ -79,7 +79,7 @@ static uint32_t arc_colors[] = {
  **********************/
 
 lv_obj_t * arc_cont;
-lv_obj_t * arc;
+lv_obj_t * main_arc;
 lv_obj_t * overlay;
 
 /**********************
@@ -228,24 +228,24 @@ void lv_demo_smartwatch(void)
 
 
     /* The rotating arc */
-    arc = lv_arc_create(lv_screen_active());
-    lv_obj_remove_style_all(arc);
-    lv_obj_set_size(arc, 384, 384);
-    lv_obj_set_align(arc, LV_ALIGN_CENTER);
-    lv_arc_set_bg_start_angle(arc, 0);
-    lv_arc_set_bg_end_angle(arc, 45);
-    lv_arc_set_rotation(arc, 0);
-    lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_CLICK_FOCUSABLE);
-    lv_obj_set_style_arc_width(arc, 192, 0);
-    lv_obj_set_style_arc_rounded(arc, false, 0);
-    lv_obj_set_style_arc_color(arc, lv_color_white(), 0);
-    lv_obj_set_style_arc_opa(arc, 255, 0);
-    lv_obj_set_style_blend_mode(arc, LV_BLEND_MODE_DIFFERENCE, 0);
-    lv_obj_set_style_opa(arc, 255, 0);
+    main_arc = lv_arc_create(lv_screen_active());
+    lv_obj_remove_style_all(main_arc);
+    lv_obj_set_size(main_arc, 384, 384);
+    lv_obj_set_align(main_arc, LV_ALIGN_CENTER);
+    lv_arc_set_bg_start_angle(main_arc, 0);
+    lv_arc_set_bg_end_angle(main_arc, 45);
+    lv_arc_set_rotation(main_arc, 0);
+    lv_obj_remove_flag(main_arc, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_CLICK_FOCUSABLE);
+    lv_obj_set_style_arc_width(main_arc, 192, 0);
+    lv_obj_set_style_arc_rounded(main_arc, false, 0);
+    lv_obj_set_style_arc_color(main_arc, lv_color_white(), 0);
+    lv_obj_set_style_arc_opa(main_arc, 255, 0);
+    lv_obj_set_style_blend_mode(main_arc, LV_BLEND_MODE_DIFFERENCE, 0);
+    lv_obj_set_style_opa(main_arc, 255, 0);
 
     /* Animate the rotating arc */
     lv_anim_init(&rotate);
-    lv_anim_set_var(&rotate, arc);
+    lv_anim_set_var(&rotate, main_arc);
     lv_anim_set_values(&rotate, 0, 360);
     lv_anim_set_duration(&rotate, 30000);
     lv_anim_set_exec_cb(&rotate, rotate_image);
@@ -469,13 +469,13 @@ static void home_screen_events(lv_event_t * e)
         if(dir == LV_DIR_BOTTOM) {
             ui_animate_y(lv_demo_smartwatch_get_control_screen(), 0, 800, 200);
             animate_arc(arc_cont, ARC_SHRINK_DOWN, 1000, 0);
-            ui_anim_opa(arc, 0, 700, 0);
+            ui_anim_opa(main_arc, 0, 700, 0);
 
         }
         if(dir == LV_DIR_LEFT) {
             ui_animate_x_from(lv_demo_smartwatch_get_weather_screen(), 384, 0, 800, 200);
             animate_arc(arc_cont, ARC_SHRINK_LEFT, 1000, 0);
-            ui_anim_opa(arc, 0, 700, 0);
+            ui_anim_opa(main_arc, 0, 700, 0);
         }
     }
 }

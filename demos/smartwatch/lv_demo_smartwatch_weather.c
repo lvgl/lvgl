@@ -409,7 +409,7 @@ static void weather_screen_events(lv_event_t * e)
         if(dir == LV_DIR_RIGHT) {
             ui_animate_x(lv_demo_smartwatch_get_weather_screen(), 384, 1000, 0);
             animate_arc(arc_cont, ARC_EXPAND_RIGHT, 700, 300);
-            ui_anim_opa(arc, 255, 500, 500);
+            ui_anim_opa(main_arc, 255, 500, 500);
             ui_anim_opa(overlay, 0, 100, 0);
         }
 
