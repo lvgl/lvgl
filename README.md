@@ -44,20 +44,20 @@ Our team is ready to help you with graphics design, UI implementation and consul
 **Free and Portable**
   - A fully portable C (C++ compatible) library with no external dependencies.
   - Can be compiled to any MCU or MPU, with any (RT)OS.
-  - Supports monochrome, ePaper, OLED or TFT displays, or even monitors. [Displays](https://docs.lvgl.io/master/details/main-components/display.html)
+  - Supports monochrome, ePaper, OLED or TFT displays, or even monitors. [Displays](https://docs.lvgl.io/master/details/main-modules/display/index.html)
   - Distributed under the MIT license, so you can easily use it in commercial projects too.
   - Needs only 32kB RAM and 128 kB Flash, a frame buffer, and at least an 1/10 screen sized buffer for rendering.
   - OS, External memory and GPU are supported but not required.
 
 **Widgets, Styles, Layouts and more**
   - 30+ built-in [Widgets](https://docs.lvgl.io/master/details/widgets/index.html):  Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table and many more.
-  - Flexible [Style system](https://docs.lvgl.io/master/details/base-widget/styles/style.html) with  ~100 style properties to customize any part of the widgets in any state.
-  - [Flexbox](https://docs.lvgl.io/master/details/base-widget/layouts/flex.html) and [Grid](https://docs.lvgl.io/master/details/base-widget/layouts/grid.html)-like layouts engines to automatically size and position the widgets in a responsive way.
+  - Flexible [Style system](https://docs.lvgl.io/master/details/common-widget-features/styles/style.html) with  ~100 style properties to customize any part of the widgets in any state.
+  - [Flexbox](https://docs.lvgl.io/master/details/common-widget-features/layouts/flex.html) and [Grid](https://docs.lvgl.io/master/details/common-widget-features/layouts/grid.html)-like layouts engines to automatically size and position the widgets in a responsive way.
   - Texts are rendered with UTF-8 encoding supporting CJK, Thai, Hindi, Arabic, Persian writing systems.
   - Word wrapping, kerning, text scrolling, sub-pixel rendering, Pinyin-IME Chinese input, Emojis in texts.
   - Rendering engine supporting animations, anti-aliasing, opacity, smooth scrolling, shadows, image transformation, etc  
-  - Supports Mouse, Touchpad, Keypad, Keyboard, External buttons, Encoder [Input devices](https://docs.lvgl.io/master/details/main-components/indev.html).
-  - [Multiple display](https://docs.lvgl.io/master/details/main-components/display.html#how-many-displays-can-lvgl-use) support.
+  - Supports Mouse, Touchpad, Keypad, Keyboard, External buttons, Encoder [Input devices](https://docs.lvgl.io/master/details/main-modules/indev.html).
+  - [Multiple display](https://docs.lvgl.io/master/details/main-modules/display/overview.html#how-many-displays-can-lvgl-use) support.
 
 **Binding and Build Support**
   - [MicroPython Binding](https://blog.lvgl.io/2019-02-20/micropython-bindings) exposes LVGL API
@@ -88,7 +88,7 @@ If someone implements or fixes an issue labeled as [Sponsored](https://github.co
 [![Sponsors of LVGL](https://opencollective.com/lvgl/organizations.svg?width=600)](https://opencollective.com/lvgl)
 
 **Individuals supporting LVGL**<br>
-[![Backers of LVGL](https://opencollective.com/lvgl/individuals.svg?width=600)](https://opencollective.com/lvgl)
+[![Backers of LVGL](https://contrib.rocks/image?repo=lvgl/lvgl&max=48)](https://opencollective.com/lvgl)
 
 ## :package: Packages
 LVGL is available as:
