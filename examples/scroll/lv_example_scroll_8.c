@@ -15,9 +15,9 @@ static int32_t get_content_width(lv_obj_t * cont)
 {
     int32_t w = 0;
     int32_t pad_column = lv_obj_get_style_pad_column(cont, LV_PART_MAIN); // 列间距
-    int total = lv_obj_get_child_count(cont);
+    int32_t total = (int32_t)lv_obj_get_child_count(cont);
 
-    for(int i = 0; i < total; i++) {
+    for(int32_t i = 0; i < total; i++) {
         w += lv_obj_get_width(lv_obj_get_child(cont, i));
         if(i < total - 1) w += pad_column;
     }
@@ -41,13 +41,13 @@ static void cont_row_scroll_event_cb(lv_event_t * e)
         const int32_t item_width = ITEM_SIZE;
 
         if(scroll_x <= 0) {
-            lv_obj_t * last_child = lv_obj_get_child(cont, lv_obj_get_child_count(cont) - 1);
+            lv_obj_t * last_child = lv_obj_get_child(cont, (int32_t)(lv_obj_get_child_count(cont) - 1));
             lv_obj_move_to_index(last_child, 0);
             lv_obj_scroll_to_x(cont, scroll_x + item_width, LV_ANIM_OFF);
         }
         else if(scroll_x > content_w - cont_w) {
             lv_obj_t * first_child = lv_obj_get_child(cont, 0);
-            lv_obj_move_to_index(first_child, lv_obj_get_child_count(cont) - 1);
+            lv_obj_move_to_index(first_child, (int32_t)(lv_obj_get_child_count(cont) - 1));
             lv_obj_scroll_to_x(cont, scroll_x - item_width, LV_ANIM_OFF);
         }
         is_adjusting = false;
@@ -59,7 +59,7 @@ static int32_t get_content_height(lv_obj_t * cont)
 {
     int32_t h = 0;
     int32_t pad_row = lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
-    int total = lv_obj_get_child_count(cont);
+    int32_t total = (int32_t)lv_obj_get_child_count(cont);
 
     for(int i = 0; i < total; i++) {
         h += lv_obj_get_height(lv_obj_get_child(cont, i));
@@ -85,13 +85,13 @@ static void cont_col_scroll_event_cb(lv_event_t * e)
         const int32_t item_height = ITEM_SIZE;
 
         if(scroll_y <= 0) {
-            lv_obj_t * last_child = lv_obj_get_child(cont, lv_obj_get_child_count(cont) - 1);
+            lv_obj_t * last_child = lv_obj_get_child(cont, (int32_t)(lv_obj_get_child_count(cont) - 1));
             lv_obj_move_to_index(last_child, 0);
             lv_obj_scroll_to_y(cont, scroll_y + item_height, LV_ANIM_OFF);
         }
         else if(scroll_y > content_h - cont_h) {
             lv_obj_t * first_child = lv_obj_get_child(cont, 0);
-            lv_obj_move_to_index(first_child, lv_obj_get_child_count(cont) - 1);
+            lv_obj_move_to_index(first_child, (int32_t)(lv_obj_get_child_count(cont) - 1));
             lv_obj_scroll_to_y(cont, scroll_y - item_height, LV_ANIM_OFF);
         }
         is_adjusting = false;

@@ -20,7 +20,7 @@ static void draw_event_cb(lv_event_t * e)
                 lv_palette_main(LV_PALETTE_BLUE),
                 lv_palette_main(LV_PALETTE_PURPLE),
             };
-            uint8_t major_tick = lv_scale_get_major_tick_every(obj);
+            uint32_t major_tick = lv_scale_get_major_tick_every(obj);
             label_draw_dsc->color = color_idx[base_dsc->id1 / major_tick];
 
             /*Free the previously allocated text if needed*/
@@ -29,7 +29,7 @@ static void draw_event_cb(lv_event_t * e)
             /*Malloc the text and set text_local as 1 to make LVGL automatically free the text.
              * (Local texts are malloc'd internally by LVGL. Mimic this behavior here too)*/
             char tmp_buffer[20] = {0}; /* Big enough buffer */
-            lv_snprintf(tmp_buffer, sizeof(tmp_buffer), "%.1f", base_dsc->id2 * 1.0f);
+            lv_snprintf(tmp_buffer, sizeof(tmp_buffer), "%.1f", (double)base_dsc->id2);
             label_draw_dsc->text = lv_strdup(tmp_buffer);
             label_draw_dsc->text_local = 1;
 
