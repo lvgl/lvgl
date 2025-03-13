@@ -45,7 +45,6 @@ typedef struct {
  **********************/
 
 static void music_screen_events(lv_event_t * e);
-static void scroll_event_cb(lv_event_t * e);
 
 static void music_play_event_cb(lv_event_t * e);
 static void music_next_event_cb(lv_event_t * e);
@@ -363,6 +362,8 @@ static void animate_radius(int32_t target)
 
 static void rotation_complete_cb(lv_anim_t * a)
 {
+    LV_UNUSED(a);
+    
     int32_t end_angle = objects[0].position;
 
     if(end_angle % 90 != 0) {

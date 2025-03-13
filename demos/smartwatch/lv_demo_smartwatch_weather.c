@@ -106,7 +106,6 @@ void lv_demo_smartwatch_weather_create(void)
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-    LV_FONT_DECLARE(font_inter_bold_28);
     label = lv_label_create(cont);
     lv_label_set_text(label, "Budapest");
     lv_obj_set_style_text_font(label, &font_inter_regular_28, 0);
