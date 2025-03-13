@@ -296,7 +296,7 @@ void lv_indev_gesture_detect_pinch(lv_indev_gesture_recognizer_t * recognizer, l
         process_touch_event(touch, r->info);
         touches++;
 
-        LV_LOG_TRACE("processed touch ev: %d finger id: %d state: %d x: %" LV_PRId32 "  y: %" LV_PRId32 "  finger_cnt: %d",
+        LV_LOG_TRACE("processed touch ev: %d finger id: %d state: %d x: %" LV_PRId32 " y: %" LV_PRId32 " finger_cnt: %d",
                      i, touch->id, touch->state, touch->point.x, touch->point.y, r->info->finger_cnt);
     }
 
@@ -384,7 +384,7 @@ void lv_indev_gesture_detect_rotation(lv_indev_gesture_recognizer_t * recognizer
         process_touch_event(touch, r->info);
         touches++;
 
-        LV_LOG_TRACE("processed touch ev: %d finger id: %d state: %d x: %" LV_PRId32 "  y: %" LV_PRId32 "  finger_cnt: %d",
+        LV_LOG_TRACE("processed touch ev: %d finger id: %d state: %d x: %" LV_PRId32 " y: %" LV_PRId32 " finger_cnt: %d",
                      i, touch->id, touch->state, touch->point.x, touch->point.y, r->info->finger_cnt);
     }
 
@@ -472,7 +472,7 @@ void lv_indev_gesture_detect_two_fingers_swipe(lv_indev_gesture_recognizer_t * r
         process_touch_event(touch, r->info);
         touches++;
 
-        LV_LOG_TRACE("processed touch ev: %d finger id: %d state: %d x: %" LV_PRId32 "  y: %" LV_PRId32 "  finger_cnt: %d",
+        LV_LOG_TRACE("processed touch ev: %d finger id: %d state: %d x: %" LV_PRId32 " y: %" LV_PRId32 " finger_cnt: %d",
                      i, touch->id, touch->state, touch->point.x, touch->point.y, r->info->finger_cnt);
     }
 
@@ -554,7 +554,6 @@ void lv_indev_gesture_recognizers_update(lv_indev_t * indev, lv_indev_touch_data
 
                 /* Then reset the recognizers which did not repport RECONIZED or ENDED */
                 if(((lv_indev_gesture_type_t)i) != type) {
-
                     reset_recognizer(&indev->recognizers[i]);
                 }
             }
@@ -566,9 +565,7 @@ void lv_indev_gesture_recognizers_update(lv_indev_t * indev, lv_indev_touch_data
         /* Otherwise call all recognizer functions, and stop as soon as one recognizer *
         * reports the state RECOGNIZED or ENDED */
         for(int i = 0; i < LV_INDEV_GESTURE_CNT; i++) {
-
             if(indev->recognizers[i].recog_fn != NULL) {
-
                 indev->recognizers[i].recog_fn(&indev->recognizers[i], &touches[0], touch_cnt);
 
                 /* If the new state is RECOGNIZED or ENDED */
@@ -577,13 +574,10 @@ void lv_indev_gesture_recognizers_update(lv_indev_t * indev, lv_indev_touch_data
 
                     /* Reset the others registered recognizers */
                     for(int j = 0; j < LV_INDEV_GESTURE_CNT; j++) {
-
                         if(j != i && indev->recognizers[j].recog_fn != NULL) {
-
                             reset_recognizer(&indev->recognizers[j]);
                         }
                     }
-
                     break;
                 }
             }
@@ -603,14 +597,11 @@ void lv_indev_gesture_recognizers_set_data(lv_indev_t * indev, lv_indev_data_t *
     else {
         /* Otherwise, set data from all initialized recognizer */
         for(int i = 0; i < LV_INDEV_GESTURE_CNT; i++) {
-
             if(indev->recognizers[i].recog_fn != NULL) {
-
                 lv_indev_set_gesture_data(data, &indev->recognizers[i], i);
             }
         }
     }
-
 }
 
 
@@ -626,16 +617,13 @@ void lv_indev_gesture_recognizers_set_data(lv_indev_t * indev, lv_indev_data_t *
  */
 static lv_dir_t calculate_swipe_dir(lv_indev_gesture_recognizer_t * recognizer)
 {
-
     float abs_x = LV_ABS(recognizer->info->delta_x);
     float abs_y = LV_ABS(recognizer->info->delta_y);
 
     if(abs_x > abs_y) {
-
         return recognizer->info->delta_x > 0 ? LV_DIR_RIGHT : LV_DIR_LEFT;
     }
     else {
-
         return recognizer->info->delta_y > 0 ? LV_DIR_BOTTOM : LV_DIR_TOP;
     }
 }
@@ -687,14 +675,7 @@ static void reset_recognizer(lv_indev_gesture_recognizer_t * recognizer)
     recognizer->config = conf;
     recognizer->recog_fn = recog_fn;
 
-    recognizer->scale = 1;
-    recognizer->rotation = 0.0;
-
-    recognizer->info->rotation = 0.0;
-    recognizer->info->p_rotation = 0.0;
-    recognizer->info->scale = 1.0;
-    recognizer->info->delta_x = 0.0;
-    recognizer->info->delta_y = 0.0;
+    recognizer->scale = recognizer->info->scale = 1.0;
     recognizer->info->finger_cnt = finger_cnt;
 
     recognizer->state = LV_INDEV_GESTURE_STATE_NONE;
@@ -775,7 +756,7 @@ static void process_touch_event(lv_indev_touch_data_t * touch, lv_indev_gesture_
 
     motion_idx = get_motion_idx(touch->id, g);
 
-    if(motion_idx == -1 && touch->state == LV_INDEV_STATE_PRESSED)  {
+    if(motion_idx == -1 && touch->state == LV_INDEV_STATE_PRESSED) {
         if(g->finger_cnt >= LV_GESTURE_MAX_POINTS) {
             /* Skip touch */
             return;
@@ -958,7 +939,6 @@ static void gesture_calculate_factors(lv_indev_gesture_t * gesture, int touch_po
  */
 static lv_indev_gesture_type_t get_first_recognized_or_ended_gesture(lv_indev_t * indev)
 {
-
     for(int i = 0; i < LV_INDEV_GESTURE_CNT; i++) {
         if(indev->recognizers[i].state == LV_INDEV_GESTURE_STATE_RECOGNIZED ||
            indev->recognizers[i].state == LV_INDEV_GESTURE_STATE_ENDED)
