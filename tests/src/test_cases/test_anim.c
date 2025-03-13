@@ -172,10 +172,10 @@ void test_anim_pause_for_resume(void)
     TEST_ASSERT_EQUAL(19, var);
 }
 
-static void event_cb(lv_event_t* e)
+static void event_cb(lv_event_t * e)
 {
-    lv_obj_t* obj = lv_event_get_target_obj(e);
-    int* var = lv_event_get_user_data(e);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
+    int * var = lv_event_get_user_data(e);
     lv_anim_delete(obj, NULL);
     *var += 1;
 }
@@ -183,7 +183,7 @@ static void event_cb(lv_event_t* e)
 void test_scroll_anim_delete(void)
 {
     int var = 0;
-    lv_obj_t* obj = lv_obj_create(lv_screen_active());
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_add_event_cb(obj, event_cb, LV_EVENT_SCROLL_END, &var);
     lv_obj_scroll_by(obj, 0, 100, LV_ANIM_ON);
     lv_test_wait(20);
