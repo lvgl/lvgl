@@ -307,8 +307,8 @@ static void rotate_objects(int32_t angle)
 {
     for(int i = 0; i < MUSIC_OBJECTS; i++) {
         objects[i].position = (objects[i].position + angle) % 360;
-        int x = (lv_trigo_cos(objects[i].position) * radius) / LV_TRIGO_SIN_MAX;
-        int y = (lv_trigo_sin(objects[i].position) * radius) / LV_TRIGO_SIN_MAX;
+        int32_t x = (lv_trigo_cos(objects[i].position) * radius) / LV_TRIGO_SIN_MAX;
+        int32_t y = (lv_trigo_sin(objects[i].position) * radius) / LV_TRIGO_SIN_MAX;
 
         /* Here we use y variable as the z-index */
         if(y > radius / 2) {
