@@ -46,7 +46,7 @@ static void scroll_event_cb(lv_event_t * e);
 static lv_obj_t * control_screen;
 
 
-static lv_image_dsc_t * control_icons[] = {
+static const lv_image_dsc_t * control_icons[] = {
     &image_mute_icon,
     &image_dnd_icon,
     &image_flashlight_icon,
@@ -190,7 +190,6 @@ static void scroll_event_cb(lv_event_t * e)
     int32_t cont_y_center = cont_a.y1 + lv_area_get_height(&cont_a) / 2;
 
     int32_t r = lv_obj_get_height(cont) * 7 / 10;
-    int32_t h = lv_obj_get_height(cont) / 2;
     uint32_t i;
     uint32_t child_cnt = lv_obj_get_child_count(cont);
     for(i = 0; i < child_cnt; i++) {

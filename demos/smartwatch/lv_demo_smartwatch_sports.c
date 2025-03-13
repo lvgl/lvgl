@@ -253,6 +253,7 @@ lv_obj_t * lv_demo_smartwatch_get_sports_screen(void)
 
 static void animate_arcs(void * var, int32_t v)
 {
+    LV_UNUSED(var);
     int bar_value = v > 100 ? 100 : v;  // Bars take up to 100
     int arc_value = v > 100 ? v - 100 : 0;  // Arcs take the remaining (if any)
 

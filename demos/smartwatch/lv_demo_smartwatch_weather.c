@@ -134,8 +134,8 @@ void lv_demo_smartwatch_weather_create(void)
     lv_lottie_set_buffer(sun_icon, 100, 89, sun_buf);
 #else
     /*For GPUs and special alignment/strid setting use a draw_buf instead*/
-    LV_DRAW_BUF_DEFINE(draw_buf, 64, 64, LV_COLOR_FORMAT_ARGB8888);
-    lv_lottie_set_draw_buf(sun_icon, &draw_buf);
+    LV_DRAW_BUF_DEFINE(sun_buf, 64, 64, LV_COLOR_FORMAT_ARGB8888);
+    lv_lottie_set_draw_buf(sun_icon, &sun_buf);
 #endif
 
 

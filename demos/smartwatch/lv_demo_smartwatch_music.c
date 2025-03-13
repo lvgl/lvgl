@@ -336,6 +336,7 @@ static void rotate_objects(int32_t angle)
 
 static void music_rotation_cb(void * var, int32_t v)
 {
+    LV_UNUSED(var);
     int32_t delta = v - last_angle;  /* Compute the difference from the last step */
     last_angle = v;  /* Update last_angle for the next call */
     rotate_objects(delta);
@@ -343,6 +344,7 @@ static void music_rotation_cb(void * var, int32_t v)
 
 static void radius_animation_cb(void * var, int32_t v)
 {
+    LV_UNUSED(var);
     radius = v;
     rotate_objects(0);
 }
@@ -393,18 +395,21 @@ static void animate_rotation(int32_t angle)
 
 static void music_next_event_cb(lv_event_t * e)
 {
+    LV_UNUSED(e);
     /* Move forward by 90 degrees */
     animate_rotation(90);
 }
 
 static void music_previous_event_cb(lv_event_t * e)
 {
+    LV_UNUSED(e);
     /* Move backward by 90 degrees */
     animate_rotation(-90);
 }
 
 static void music_play_event_cb(lv_event_t * e)
 {
+    LV_UNUSED(e);
     static bool playing = true;
     playing = !playing;
 

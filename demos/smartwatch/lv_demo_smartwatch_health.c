@@ -108,8 +108,8 @@ void lv_demo_smartwatch_health_create(void)
     lv_lottie_set_buffer(lottie_ecg, 410, 176, ecg_buf);
 #else
     /*For GPUs and special alignment/strid setting use a draw_buf instead*/
-    LV_DRAW_BUF_DEFINE(draw_buf, 64, 64, LV_COLOR_FORMAT_ARGB8888);
-    lv_lottie_set_draw_buf(lottie_ecg, &draw_buf);
+    LV_DRAW_BUF_DEFINE(ecg_buf, 64, 64, LV_COLOR_FORMAT_ARGB8888);
+    lv_lottie_set_draw_buf(lottie_ecg, &ecg_buf);
 #endif
 
 
@@ -195,8 +195,8 @@ void lv_demo_smartwatch_health_create(void)
     lv_lottie_set_buffer(heart_icon, 90, 77, heart_buf);
 #else
     /*For GPUs and special alignment/strid setting use a draw_buf instead*/
-    LV_DRAW_BUF_DEFINE(draw_buf, 64, 64, LV_COLOR_FORMAT_ARGB8888);
-    lv_lottie_set_draw_buf(heart_icon, &draw_buf);
+    LV_DRAW_BUF_DEFINE(heart_buf, 64, 64, LV_COLOR_FORMAT_ARGB8888);
+    lv_lottie_set_draw_buf(heart_icon, &heart_buf);
 #endif
 
     lv_obj_t * click_cont = lv_obj_create(health_screen);
@@ -226,6 +226,7 @@ lv_obj_t * lv_demo_smartwatch_get_health_screen(void)
 
 static void button_click_event(lv_event_t * e)
 {
+    LV_UNUSED(e);
     LV_IMAGE_DECLARE(image_health_on);
     LV_IMAGE_DECLARE(image_health_off);
     if(lv_obj_has_flag(lottie_ecg, LV_OBJ_FLAG_HIDDEN)) {
