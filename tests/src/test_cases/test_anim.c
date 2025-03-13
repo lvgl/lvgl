@@ -14,6 +14,7 @@ void tearDown(void)
 {
     /* Function run after every test */
     lv_obj_clean(lv_screen_active());
+    lv_anim_delete_all();
 }
 
 static void exec_cb(void * var, int32_t v)
