@@ -355,8 +355,10 @@ const lv_image_dsc_t {varname} = {{
   .header.w = {w},
   .header.h = {h},
   .header.stride = {stride},
+  .header.reserved_2 = 0,
   .data_size = sizeof({varname}_map),
   .data = {varname}_map,
+  .reserved = NULL,
 }};
 
 '''
