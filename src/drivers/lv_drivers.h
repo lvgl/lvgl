@@ -33,6 +33,7 @@ extern "C" {
 
 #include "display/renesas_glcdc/lv_renesas_glcdc.h"
 #include "display/st_ltdc/lv_st_ltdc.h"
+#include "display/ft81x/lv_ft81x.h"
 
 #include "nuttx/lv_nuttx_entry.h"
 #include "nuttx/lv_nuttx_fbdev.h"
