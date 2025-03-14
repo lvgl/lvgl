@@ -1065,6 +1065,14 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
     int32_t major_len = 0;
     int32_t radial_offset = 0;
 
+    LV_ASSERT_MSG((scale->mode == LV_SCALE_MODE_HORIZONTAL_TOP) ||
+                  (scale->mode == LV_SCALE_MODE_HORIZONTAL_BOTTOM) ||
+                  (scale->mode == LV_SCALE_MODE_VERTICAL_LEFT) ||
+                  (scale->mode == LV_SCALE_MODE_VERTICAL_RIGHT) ||
+                  (scale->mode == LV_SCALE_MODE_ROUND_INNER) ||
+                  (scale->mode == LV_SCALE_MODE_ROUND_OUTER),
+                  "unknown value for scale mode");
+
     if(is_major_tick) {
         major_len = lv_obj_get_style_length(obj, LV_PART_INDICATOR);
         radial_offset = lv_obj_get_style_radial_offset(obj, LV_PART_INDICATOR);
