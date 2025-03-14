@@ -7,11 +7,11 @@
  */
 void lv_example_lottie_1(void)
 {
-    extern const uint8_t rain[];
-    extern const size_t rain_size;
+    extern const uint8_t lv_example_lottie_approve[];
+    extern const size_t lv_example_lottie_approve_size;
 
     lv_obj_t * lottie = lv_lottie_create(lv_screen_active());
-    lv_lottie_set_src_data(lottie, rain, rain_size);
+    lv_lottie_set_src_data(lottie, lv_example_lottie_approve, lv_example_lottie_approve_size);
 
 #if LV_DRAW_BUF_ALIGN == 4 && LV_DRAW_BUF_STRIDE_ALIGN == 1
     /*If there are no special requirements, just declare a buffer
