@@ -15,7 +15,7 @@ if "%LVGL_DOC_BUILD_INTERMEDIATE_DIR%" == "" (
 	set SOURCEDIR=%LVGL_DOC_BUILD_INTERMEDIATE_DIR%
 )
 if "%SPHINXOPTS%" == "" (
-    rem python get_lvgl_version.py >_version_temp.txt
+    rem python ./src/lvgl_version.py >_version_temp.txt
     rem set /p VER=<_version_temp.txt
     rem del _version_temp.txt
     for /F %%v in ('python lvgl_version.py') do set VER=%%v
