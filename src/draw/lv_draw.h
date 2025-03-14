@@ -101,6 +101,9 @@ struct _lv_layer_t  {
     /** Opacity of the layer */
     lv_opa_t opa;
 
+    /*Recolor of the layer*/
+    lv_color32_t recolor;
+
     /** Partial y offset */
     int32_t partial_y_offset;
 

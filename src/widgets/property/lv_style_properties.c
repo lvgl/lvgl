@@ -14,7 +14,7 @@
  * Generated code from properties.py
  */
 /* *INDENT-OFF* */
-const lv_property_name_t lv_style_property_names[115] = {
+const lv_property_name_t lv_style_property_names[117] = {
     {"align",                  LV_PROPERTY_STYLE_ALIGN,},
     {"anim",                   LV_PROPERTY_STYLE_ANIM,},
     {"anim_duration",          LV_PROPERTY_STYLE_ANIM_DURATION,},
@@ -100,6 +100,8 @@ const lv_property_name_t lv_style_property_names[115] = {
     {"prop_inv",               LV_PROPERTY_STYLE_PROP_INV,},
     {"radial_offset",          LV_PROPERTY_STYLE_RADIAL_OFFSET,},
     {"radius",                 LV_PROPERTY_STYLE_RADIUS,},
+    {"recolor",                LV_PROPERTY_STYLE_RECOLOR,},
+    {"recolor_opa",            LV_PROPERTY_STYLE_RECOLOR_OPA,},
     {"rotary_sensitivity",     LV_PROPERTY_STYLE_ROTARY_SENSITIVITY,},
     {"shadow_color",           LV_PROPERTY_STYLE_SHADOW_COLOR,},
     {"shadow_offset_x",        LV_PROPERTY_STYLE_SHADOW_OFFSET_X,},
