@@ -57,6 +57,11 @@ const void * lv_font_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t
 
 void lv_font_glyph_release_draw_data(lv_font_glyph_dsc_t * g_dsc)
 {
+    LV_ASSERT_NULL(g_dsc);
+    if(!g_dsc->entry) {
+        return;
+    }
+
     const lv_font_t * font = g_dsc->resolved_font;
 
     if(font != NULL && font->release_glyph) {
@@ -77,8 +82,7 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
 
     const lv_font_t * f = font_p;
 
-    dsc_out->resolved_font = NULL;
-    dsc_out->req_raw_bitmap = 0;
+    lv_memzero(dsc_out, sizeof(lv_font_glyph_dsc_t));
 
     while(f) {
         bool found = f->get_glyph_dsc(f, dsc_out, letter, f->kerning == LV_FONT_KERNING_NONE ? 0 : letter_next);
