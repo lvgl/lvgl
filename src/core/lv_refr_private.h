@@ -58,12 +58,6 @@ lv_display_t * lv_refr_get_disp_refreshing(void);
  */
 void lv_refr_set_disp_refreshing(lv_display_t * disp);
 
-/**
- * Called periodically to handle the refreshing
- * @param timer pointer to the timer itself
- */
-void lv_display_refr_timer(lv_timer_t * timer);
-
 /**********************
  *      MACROS
  **********************/
