@@ -24,7 +24,7 @@ void lv_example_grid_3(void)
 
     lv_obj_t * label;
     lv_obj_t * obj;
-    uint32_t i;
+    uint8_t i;
     for(i = 0; i < 9; i++) {
         uint8_t col = i % 3;
         uint8_t row = i / 3;

@@ -2,7 +2,7 @@
 
 #if LV_BUILD_EXAMPLES
 
-static uint32_t size = 0;
+static int32_t size = 0;
 static bool size_dec = false;
 
 static void timer_cb(lv_timer_t * timer)

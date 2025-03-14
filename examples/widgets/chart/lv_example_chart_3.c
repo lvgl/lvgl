@@ -14,7 +14,7 @@ static void event_cb(lv_event_t * e)
         *s = LV_MAX(*s, 20);
     }
     else if(code == LV_EVENT_DRAW_POST_END) {
-        int32_t id = lv_chart_get_pressed_point(chart);
+        uint32_t id = lv_chart_get_pressed_point(chart);
         if(id == LV_CHART_POINT_NONE) return;
 
         LV_LOG_USER("Selected point %d", (int)id);
@@ -89,8 +89,8 @@ void lv_example_chart_3(void)
     lv_chart_series_t * ser2 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_GREEN), LV_CHART_AXIS_PRIMARY_Y);
     uint32_t i;
     for(i = 0; i < 10; i++) {
-        lv_chart_set_next_value(chart, ser1, lv_rand(60, 90));
-        lv_chart_set_next_value(chart, ser2, lv_rand(10, 40));
+        lv_chart_set_next_value(chart, ser1, (int32_t)lv_rand(60, 90));
+        lv_chart_set_next_value(chart, ser2, (int32_t)lv_rand(10, 40));
     }
 }
 

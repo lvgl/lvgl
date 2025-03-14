@@ -6,9 +6,9 @@
 
 static void timer_cb(lv_timer_t * timer)
 {
-    static int32_t counter = 0;
+    static int16_t counter = 0;
     const char * string = "lol~ I'm wavvvvvvving~>>>";
-    const int16_t string_len = lv_strlen(string);
+    const int16_t string_len = (int16_t)lv_strlen(string);
 
     lv_obj_t * canvas = (lv_obj_t *)lv_timer_get_user_data(timer);
     lv_layer_t layer;
@@ -28,7 +28,7 @@ static void timer_cb(lv_timer_t * timer)
         int32_t pre_x = CURVE2_X(-1);
         int32_t pre_y = CURVE2_Y(-1);
         for(int16_t i = 0; i < string_len; i++) {
-            const int32_t angle = i * 5;
+            const int16_t angle = (int16_t)(i * 5);
             const int32_t x = CURVE2_X(angle);
             const int32_t y = CURVE2_Y(angle + counter / 2);
             const lv_point_t point = { .x = x, .y = y };

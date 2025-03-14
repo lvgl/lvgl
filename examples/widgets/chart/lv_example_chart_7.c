@@ -12,7 +12,7 @@ static void draw_event_cb(lv_event_t * e)
         uint32_t cnt = lv_chart_get_point_count(obj);
 
         /*Make older value more transparent*/
-        rect_draw_dsc->bg_opa = (LV_OPA_COVER * base_dsc->id2) / (cnt - 1);
+        rect_draw_dsc->bg_opa = (lv_opa_t)((LV_OPA_COVER * base_dsc->id2) / (cnt - 1));
 
         /*Make smaller values blue, higher values red*/
         int32_t * x_array = lv_chart_get_series_x_array(obj, ser);
@@ -20,8 +20,8 @@ static void draw_event_cb(lv_event_t * e)
         /*dsc->id is the tells drawing order, but we need the ID of the point being drawn.*/
         uint32_t start_point = lv_chart_get_x_start_point(obj, ser);
         uint32_t p_act = (start_point + base_dsc->id2) % cnt; /*Consider start point to get the index of the array*/
-        lv_opa_t x_opa = (x_array[p_act] * LV_OPA_50) / 200;
-        lv_opa_t y_opa = (y_array[p_act] * LV_OPA_50) / 1000;
+        lv_opa_t x_opa = (lv_opa_t)((x_array[p_act] * LV_OPA_50) / 200);
+        lv_opa_t y_opa = (lv_opa_t)((y_array[p_act] * LV_OPA_50) / 1000);
 
         rect_draw_dsc->bg_color = lv_color_mix(lv_palette_main(LV_PALETTE_RED),
                                                lv_palette_main(LV_PALETTE_BLUE),
@@ -32,7 +32,8 @@ static void draw_event_cb(lv_event_t * e)
 static void add_data(lv_timer_t * timer)
 {
     lv_obj_t * chart = (lv_obj_t *)lv_timer_get_user_data(timer);
-    lv_chart_set_next_value2(chart, lv_chart_get_series_next(chart, NULL), lv_rand(0, 200), lv_rand(0, 1000));
+    lv_chart_set_next_value2(chart, lv_chart_get_series_next(chart, NULL), (int32_t)lv_rand(0, 200),
+                             (int32_t)lv_rand(0, 1000));
 }
 
 /**
@@ -57,7 +58,7 @@ void lv_example_chart_7(void)
     lv_chart_series_t * ser = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
     uint32_t i;
     for(i = 0; i < 50; i++) {
-        lv_chart_set_next_value2(chart, ser, lv_rand(0, 200), lv_rand(0, 1000));
+        lv_chart_set_next_value2(chart, ser, (int32_t)lv_rand(0, 200), (int32_t)lv_rand(0, 1000));
     }
 
     lv_timer_create(add_data, 100, chart);
