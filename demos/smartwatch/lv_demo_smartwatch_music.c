@@ -323,10 +323,10 @@ static void rotate_objects(int32_t angle)
             lv_obj_move_background(objects[i].obj);
         }
 
-        int32_t small = lv_map(radius, RADIUS_SMALL, RADIUS_LARGE, 128, 156);
-        int32_t large = lv_map(radius, RADIUS_SMALL, RADIUS_LARGE, 240, 256);
+        int32_t min_scale = lv_map(radius, RADIUS_SMALL, RADIUS_LARGE, 128, 156);
+        int32_t max_scale = lv_map(radius, RADIUS_SMALL, RADIUS_LARGE, 240, 256);
 
-        lv_image_set_scale(objects[i].obj, lv_map(y, -radius, radius, small, large));
+        lv_image_set_scale(objects[i].obj, lv_map(y, -radius, radius, min_scale, max_scale));
         lv_obj_set_x(objects[i].obj, x);
     }
 

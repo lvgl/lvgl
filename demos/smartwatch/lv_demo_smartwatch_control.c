@@ -210,9 +210,9 @@ static void scroll_event_cb(lv_event_t * e)
         /*If diff_y is within the circle calculate size */
         if(diff_y < r) {
             /* Calculate sizes the based on diff_y and radius */
-            icon_size = (int32_t) (82 + (20 * lv_pow(lv_trigo_cos((90 * diff_y) / r), 2) / LV_TRIGO_SIN_MAX / LV_TRIGO_SIN_MAX));
-            cont_width = (int32_t) (262 + (83 * lv_pow(lv_trigo_cos((90 * diff_y) / r), 2) / LV_TRIGO_SIN_MAX / LV_TRIGO_SIN_MAX));
-            img_scale = (int32_t) (208 + (48 * lv_pow(lv_trigo_cos((90 * diff_y) / r), 2) / LV_TRIGO_SIN_MAX / LV_TRIGO_SIN_MAX));
+            icon_size = (int32_t)(82 + (20 * lv_pow(lv_trigo_cos((90 * diff_y) / r), 2) / LV_TRIGO_SIN_MAX / LV_TRIGO_SIN_MAX));
+            cont_width = (int32_t)(262 + (83 * lv_pow(lv_trigo_cos((90 * diff_y) / r), 2) / LV_TRIGO_SIN_MAX / LV_TRIGO_SIN_MAX));
+            img_scale = (int32_t)(208 + (48 * lv_pow(lv_trigo_cos((90 * diff_y) / r), 2) / LV_TRIGO_SIN_MAX / LV_TRIGO_SIN_MAX));
 
         }
         /* Adjust the width of the container */
