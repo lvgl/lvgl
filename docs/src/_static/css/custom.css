@@ -1,3 +1,17 @@
+/* Connect FontAwesome file with FontAwesome family name.
+ * Supplements fontawesome.min.css.  Without this, the codes
+ * like `fa-github` don't work in the Furo theme as they did
+ * with RTD theme. */
+@font-face {
+  font-family: FontAwesome;
+  src: url("../fonts/fontawesome-webfont.woff2")
+}
+.fa {
+  font-family: FontAwesome, "Lato","proxima-nova","Helvetica Neue",Arial,sans-serif;
+  cursor: pointer;
+}
+
+
 table, th, td {
   border: 1px solid #bbb;
   padding: 10px;
@@ -54,12 +68,11 @@ code.sig-name
   display: none; /*replaced by dropdown*/
 }
 
-
+/* Large "button" images on landing page */
 .home-img {
   width:32%;
   transition: transform .3s ease-out;
 }
-
 .home-img:hover {
   transform: translate(0, -10px);
 }
@@ -126,10 +139,10 @@ dl.cpp.unexpanded dd {
     cursor: pointer;
 }
 .unexpanded .lv-api-expansion-button::before {
-    content: "\f0da \00a0";
+    content: "\f0da \00a0";   /* \f0da = right caret, \00a0 = non-breaking space */
 }
 .expanded .lv-api-expansion-button::before {
-    content: "\f0d7 \00a0";
+    content: "\f0d7 \00a0";   /* \f0d7 = down caret, \00a0 = non-breaking space */
 }
 
 .wy-nav-content{

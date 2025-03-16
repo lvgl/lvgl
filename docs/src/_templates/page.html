@@ -1,18 +1,30 @@
 {% extends "!page.html" %}
 
+{# Including jquery.js here is needed for the Furo theme.  RTD theme included it automatically. #}
+{%- block extrahead -%}
+{{ super() }}
+<script type="text/javascript" src="https://docs.lvgl.io/master/_static/jquery.js"></script>
+<!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+{% endblock %}
+
+
 {% block footer %}
+
+{# This "call" to super() here is needed because Furo theme has content in "block footer" which RTD
+   theme did not have.  Without it, this "block footer" section wipes out all parent versions. #}
+{{ super() }}
 
 <style>
   .wy-side-nav-search > div[role="search"] {
     color: black;
   }
 </style>
- <script type="text/javascript">
+<script type="text/javascript">
     $(document).ready(function() {
         $(".toggle > *").hide();
         $(".toggle .header").show();
         $(".toggle .header").click(function() {
-            $(this).parent().children().not(".header").toggle(400);
+            $(this).parent().children().not(".header").toggle(300);
             $(this).parent().children(".header").toggleClass("open");
         })
     });

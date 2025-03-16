@@ -93,10 +93,11 @@ Appendix
    entries in the top-level navigation tree.  (This is the only toctree directive
    with the :hidden: attribute.)
 
-.. toctree::
-    :hidden:
+.. Commenting out the below
+    .. toctree::
+        :hidden:
 
-    intro/index
-    details/index
+        intro/index
+        details/index
 
 

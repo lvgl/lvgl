@@ -20,6 +20,8 @@
 import os
 import sys
 import re
+# Import StandaloneHTMLBuilder so that the list
+# `StandaloneHTMLBuilder.supported_image_types` can be set below.
 from sphinx.builders.html import StandaloneHTMLBuilder
 
 base_path = os.path.abspath(os.path.dirname(__file__))
@@ -44,15 +46,17 @@ from lvgl_version import lvgl_version #NoQA
 # As of 6-Jan-2025, `link_roles` is being commented out because it is being
 # replaced by a manually-installed translation link in ./docs/index.rst.
 extensions = [
-    'sphinx_rtd_theme',
     'sphinx.ext.autodoc',
+    'sphinx.ext.extlinks',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
+    'sphinx.ext.viewcode',      # Eye icon at top of page to view page source code on GitHub.
+    'sphinx_copybutton',        # Copy-to-clipboard button in code blocks & code examples.
     'breathe',
     'sphinx_sitemap',
     'lv_example',
     'sphinx_design',
-    'sphinx_rtd_dark_mode',
+    'sphinx_inline_tabs',
     # 'link_roles',
     'sphinxcontrib.mermaid',
     'sphinx_reredirects'
@@ -80,7 +84,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'LVGL'
-copyright = '2024-2025, LVGL Kft'
+copyright = '2021-%Y, LVGL Kft'
 author = 'LVGL Community'
 
 
@@ -109,11 +113,12 @@ language = 'en'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'doxygen_html', 'Thumbs.db', '.DS_Store',
-                    'README.md', 'README_*', 'lv_examples', 'out_html', 'env', '_ext', 'examples']
+exclude_patterns = ['build', 'doxygen', 'intermediate', 'doxygen_html', 'Thumbs.db', '.DS_Store',
+                    'README.md', 'README_*', 'lv_examples', 'env', '_ext', 'examples']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
+pygments_dark_style = 'github-dark'
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
@@ -124,7 +129,7 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'furo'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -136,21 +141,23 @@ html_theme = 'sphinx_rtd_theme'
 # preserved by commenting it out in case it is ever needed again.
 
 html_theme_options = {
-    # 'display_version': True,
-    'prev_next_buttons_location': 'both',
-    'style_external_links': False,
-    # 'vcs_pageview_mode': '',
-    # 'style_nav_header_background': 'white',
-    # Toc options
-    'sticky_navigation': True,
-    'navigation_depth': 4,
-    'includehidden': False,
-    'titles_only': False,
-
-    'collapse_navigation': False,
-    'logo_only': True,
+    # "announcement": "<em>Important</em> announcement!",
+    "sidebar_hide_name": True,      # True when the logo carries project name
+    "top_of_page_buttons": ["view"],
+    # The below 3 direct the "top_of_page_buttons" to github for view and edit buttons.
+    "source_repository": "https://github.com/lvgl/lvgl/",
+    "source_branch": "master",
+    "source_directory": "docs/src/",
 }
 
+html_theme_options["footer_icons"] = [
+    {
+        "name": "GitHub",
+        "url": "https://github.com/lvgl/lvgl",
+        "html": '<i class="fa fa-brands fa-solid fa-github fa-3x"></i>',
+        "class": "",
+    },
+]
 
 # For site map generation
 if "LVGL_URLPATH" not in os.environ:
@@ -171,12 +178,13 @@ if "LVGL_GITCOMMIT" not in os.environ:
 
 _git_commit_ref = os.getenv('LVGL_GITCOMMIT')
 
+# This helps the theme know where to look for "View Source on GitHub" link.
 html_context = {
     'github_version': _git_commit_ref,
     'github_user': 'lvgl',
     'github_repo': 'lvgl',
     'display_github': True,
-    'conf_py_path': '/docs/'
+    'conf_py_path': '/docs/src/',
 }
 
 
@@ -190,12 +198,13 @@ html_static_path = ['_static']
 #
 # This is required for the alabaster theme
 # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
-html_sidebars = {
-    '**': [
-        'relations.html',  # needs 'show_related': True theme option to display
-        'searchbox.html',
-    ]
-}
+# 10-Mar-2025 16:21 -- commented out for Furo theme.
+# html_sidebars = {
+#     '**': [
+#         'relations.html',  # needs 'show_related': True theme option to display
+#         'searchbox.html',
+#     ]
+# }
 
 html_js_files = [
     'js/custom.js',
@@ -488,7 +497,9 @@ def setup(app):
     #         'enable_auto_toc_tree': 'True',
     #         }, True)
     # app.add_transform(AutoStructify)
-    app.add_css_file('css/custom.css')
     app.add_css_file('css/fontawesome.min.css')
+    app.add_css_file('css/solid.min.css')
+    app.add_css_file('css/brands.min.css')
+    app.add_css_file('css/custom.css')
 
 
