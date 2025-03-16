@@ -59,7 +59,7 @@ typedef struct {
  **********************/
 static inline int sdl_render_mode(void);
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
-static void window_create(lv_display_t * disp);
+static void window_create(lv_display_t * disp, uint8_t flag, uint8_t display);
 static void window_update(lv_display_t * disp);
 #if LV_USE_DRAW_SDL == 0
     static void texture_resize(lv_display_t * disp);
@@ -84,7 +84,7 @@ static lv_timer_t * event_handler_timer;
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
+lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res, uint8_t flag, uint8_t display_num)
 {
     if(!inited) {
         SDL_Init(SDL_INIT_VIDEO);
@@ -107,7 +107,7 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
     }
     lv_display_add_event_cb(disp, release_disp_cb, LV_EVENT_DELETE, disp);
     lv_display_set_driver_data(disp, dsc);
-    window_create(disp);
+    window_create(disp, flag, display_num);
 
     lv_display_set_flush_cb(disp, flush_cb);
 
@@ -340,12 +340,12 @@ static void sdl_event_handler(lv_timer_t * t)
     }
 }
 
-static void window_create(lv_display_t * disp)
+static void window_create(lv_display_t * disp, uint8_t flag, uint8_t display)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     dsc->zoom = 1.0;
 
-    int flag = SDL_WINDOW_RESIZABLE;
+    flag |= SDL_WINDOW_RESIZABLE;
 #if LV_SDL_FULLSCREEN
     flag |= SDL_WINDOW_FULLSCREEN;
 #endif
@@ -353,8 +353,8 @@ static void window_create(lv_display_t * disp)
     int32_t hor_res = (int32_t)((float)(disp->hor_res) * dsc->zoom);
     int32_t ver_res = (int32_t)((float)(disp->ver_res) * dsc->zoom);
     dsc->window = SDL_CreateWindow("LVGL Simulator",
-                                   SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                                   hor_res, ver_res, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
+                                   SDL_WINDOWPOS_UNDEFINED_DISPLAY(display), SDL_WINDOWPOS_UNDEFINED_DISPLAY(display),
+                                   hor_res * dsc->zoom, ver_res * dsc->zoom, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
 
     dsc->renderer = SDL_CreateRenderer(dsc->window, -1,
                                        LV_SDL_ACCELERATED ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE);
