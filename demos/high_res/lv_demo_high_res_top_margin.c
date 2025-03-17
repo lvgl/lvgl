@@ -16,6 +16,7 @@
 #include "../../src/widgets/keyboard/lv_keyboard.h"
 #include "../../src/widgets/textarea/lv_textarea.h"
 #include "../../src/display/lv_display_private.h"
+#include "../../src/widgets/span/lv_span_private.h"
 
 /*********************
  *      DEFINES
@@ -209,22 +210,17 @@ static void sys_layer_clicked_cb(lv_event_t * e)
 
 static void wifi_ssid_ip_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    lv_obj_t * label = lv_observer_get_target_obj(observer);
-    const char * ssid_ip = lv_observer_get_user_data(observer);
+    lv_obj_t * spangroup = lv_observer_get_target_obj(observer);
+    lv_span_t * span = lv_observer_get_user_data(observer);
     const char * ssid_ip_value = lv_subject_get_pointer(subject);
-    if(ssid_ip_value) {
-        lv_label_set_text_fmt(label, "%s: %s", ssid_ip, ssid_ip_value);
-    }
-    else {
-        lv_label_set_text_fmt(label, "%s: (offline)", ssid_ip);
-    }
+    lv_spangroup_set_span_text(spangroup, span, ssid_ip_value ? ssid_ip_value : "(offline)");
 }
 
 static void wifi_button_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
     lv_obj_t * label = lv_observer_get_target_obj(observer);
     const char * ssid_ip_value = lv_subject_get_pointer(subject);
-    lv_label_set_text_static(label, ssid_ip_value ? "Disconnect" : "Enter Details");
+    lv_label_set_text_static(label, ssid_ip_value ? "Disconnect" : "Connect");
 }
 
 static void wifi_button_clicked_cb(lv_event_t * e)
@@ -324,23 +320,31 @@ static lv_obj_t * create_wifi(lv_obj_t * parent, lv_demo_high_res_ctx_t * c)
     lv_obj_t * cont = lv_demo_high_res_simple_container_create(settings, true, c->sz->gap[4], LV_FLEX_ALIGN_START);
     lv_obj_set_width(cont, LV_PCT(100));
 
-    lv_obj_t * ssid = lv_label_create(cont);
+    lv_obj_t * ssid = lv_spangroup_create(cont);
     lv_obj_add_style(ssid, &c->fonts[FONT_LABEL_XS], 0);
     lv_obj_add_style(ssid, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    lv_subject_add_observer_obj(&c->api.subjects.wifi_ssid, wifi_ssid_ip_observer_cb, ssid, (void *)"SSID");
-    lv_obj_t * ip = lv_label_create(cont);
+    lv_span_set_text_static(lv_spangroup_add_span(ssid), "SSID: ");
+    lv_span_t * ssid_value = lv_spangroup_add_span(ssid);
+    lv_style_set_opa(&ssid_value->style, LV_OPA_40);
+    lv_subject_add_observer_obj(&c->api.subjects.wifi_ssid, wifi_ssid_ip_observer_cb, ssid, ssid_value);
+
+    lv_obj_t * ip = lv_spangroup_create(cont);
     lv_obj_add_style(ip, &c->fonts[FONT_LABEL_XS], 0);
     lv_obj_add_style(ip, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    lv_subject_add_observer_obj(&c->api.subjects.wifi_ip, wifi_ssid_ip_observer_cb, ip, (void *)"IP");
+    lv_span_set_text_static(lv_spangroup_add_span(ip), "IP Address: ");
+    lv_span_t * ip_value = lv_spangroup_add_span(ip);
+    lv_style_set_opa(&ip_value->style, LV_OPA_40);
+    lv_subject_add_observer_obj(&c->api.subjects.wifi_ip, wifi_ssid_ip_observer_cb, ip, ip_value);
 
     lv_obj_t * btn = lv_label_create(cont);
-    lv_obj_add_style(btn, &c->fonts[FONT_LABEL_XS], 0);
-    lv_obj_add_style(btn, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
+    lv_obj_add_style(btn, &c->fonts[FONT_LABEL_SM], 0);
+    lv_obj_set_style_text_color(btn, lv_color_white(), 0);
     lv_obj_set_style_text_align(btn, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_width(btn, LV_PCT(100));
-    lv_obj_set_style_border_color(btn, lv_color_hex(0x808080), 0);
-    lv_obj_set_style_border_width(btn, 2, 0);
-    lv_obj_set_style_radius(btn, c->sz->gap[2], 0);
+    lv_obj_set_style_radius(btn, LV_COORD_MAX, 0);
+    lv_obj_set_style_pad_ver(btn, c->sz->gap[4], 0);
+    lv_obj_set_style_bg_opa(btn, LV_OPA_COVER, 0);
+    lv_obj_add_style(btn, &c->styles[STYLE_COLOR_ACCENT][STYLE_TYPE_OBJ], 0);
     lv_subject_add_observer_obj(&c->api.subjects.wifi_ssid, wifi_button_observer_cb, btn, NULL);
     lv_obj_add_event_cb(btn, wifi_button_clicked_cb, LV_EVENT_CLICKED, c);
     lv_obj_add_flag(btn, LV_OBJ_FLAG_CLICKABLE);
