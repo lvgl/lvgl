@@ -486,6 +486,10 @@ lv_style_value_t lv_obj_style_apply_color_filter(const lv_obj_t * obj, lv_part_t
         lv_opa_t f_opa = lv_obj_get_style_color_filter_opa(obj, part);
         if(f_opa != 0) v.color = f->filter_cb(f, v.color, f_opa);
     }
+#else
+    LV_UNUSED(obj);
+    LV_UNUSED(part);
+    LV_UNUSED(v);
 #endif
     return v;
 }

@@ -1137,7 +1137,7 @@
 #define LV_USE_XML    0
 
 /*1: Enable color filter style*/
-#define LV_USE_COLOR_FILTER     1
+#define LV_USE_COLOR_FILTER     0
 /*==================
  * DEVICES
  *==================*/

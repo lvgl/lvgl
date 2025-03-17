@@ -3591,14 +3591,10 @@
 
 /*1: Enable color filter style*/
 #ifndef LV_USE_COLOR_FILTER
-    #ifdef LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_COLOR_FILTER
-            #define LV_USE_COLOR_FILTER CONFIG_LV_USE_COLOR_FILTER
-        #else
-            #define LV_USE_COLOR_FILTER 0
-        #endif
+    #ifdef CONFIG_LV_USE_COLOR_FILTER
+        #define LV_USE_COLOR_FILTER CONFIG_LV_USE_COLOR_FILTER
     #else
-        #define LV_USE_COLOR_FILTER     1
+        #define LV_USE_COLOR_FILTER     0
     #endif
 #endif
 /*==================
