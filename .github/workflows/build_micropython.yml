@@ -34,7 +34,7 @@ jobs:
       run: |
         git clone https://github.com/lvgl/lv_micropython.git .
         git checkout master
-    - name: Initialize lv_bindings submodule
+    - name: Initialize LVGL bindings submodule
       run: git submodule update --init --recursive user_modules/lv_binding_micropython
     - name: Update ${{ matrix.port }} port submodules
       if:  matrix.port != 'rp2'
@@ -57,7 +57,7 @@ jobs:
         release: '9-2019-q4' # The arm-none-eabi-gcc release to use.
     - name: Build STM32 port
       if: matrix.port == 'stm32'
-      run: make -j $(nproc) -C ports/stm32 BOARD=STM32F7DISC
+      run: make -j $(nproc) -C ports/stm32 BOARD=STM32F7DISC USER_C_MODULES=../../user_modules/lv_binding_micropython/micropython.cmake
     - name: Build Raspberry Pi PICO port
       if: matrix.port == 'rp2'
       run: |
