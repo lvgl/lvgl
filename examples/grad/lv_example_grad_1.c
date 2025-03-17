@@ -32,7 +32,7 @@ static void frac_1_event_cb(lv_event_t * e)
 
         lv_obj_t * bullet = lv_event_get_target(e);
         lv_obj_t * parent = lv_obj_get_parent(bullet);
-        dsc->stops[0].frac = LV_CLAMP(0, p.x * 255 / lv_obj_get_width(parent), 255);
+        dsc->stops[0].frac = (uint8_t)LV_CLAMP(0, p.x * 255 / lv_obj_get_width(parent), 255);
 
         lv_obj_invalidate(parent);
     }
@@ -54,7 +54,7 @@ static void frac_2_event_cb(lv_event_t * e)
         lv_obj_t * bullet = lv_event_get_target(e);
         lv_obj_t * parent = lv_obj_get_parent(bullet);
 
-        dsc->stops[1].frac = LV_CLAMP(0, p.x * 255 / lv_obj_get_width(parent), 255);
+        dsc->stops[1].frac = (uint8_t)LV_CLAMP(0, p.x * 255 / lv_obj_get_width(parent), 255);
         lv_obj_invalidate(parent);
     }
 }
