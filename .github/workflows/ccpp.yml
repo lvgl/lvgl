@@ -57,7 +57,11 @@ jobs:
     name: Build ${{ matrix.build_option }} - ${{matrix.compiler }} - Windows
     runs-on: windows-2022
     steps:
+    - name: patch freetype vcpkg URL
+      run: (Get-Content C:\vcpkg\ports\freetype\portfile.cmake) -replace 'freedesktop.org', 'com' | Out-File -encoding ASCII C:\vcpkg\ports\freetype\portfile.cmake
+
     - uses: actions/checkout@v4
+
     - name: Install prerequisites
       run: scripts\install-prerequisites.bat
 
