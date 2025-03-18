@@ -106,13 +106,22 @@ static inline bool _g2d_dest_cf_supported(lv_color_format_t cf)
     return is_cf_supported;
 }
 
-static inline bool _g2d_src_cf_supported(lv_color_format_t cf)
+static inline bool _g2d_src_cf_supported(lv_draw_unit_t * drawunit, lv_color_format_t cf)
 {
     bool is_cf_supported = false;
 
     switch(cf) {
         case LV_COLOR_FORMAT_ARGB8888:
             is_cf_supported = true;
+            break;
+        case LV_COLOR_FORMAT_RGB565: {
+                int32_t hw_pxp = 0;
+                lv_draw_g2d_unit_t * u = (lv_draw_g2d_unit_t *)drawunit;
+                g2d_query_hardware(u->g2d_handle, G2D_HARDWARE_PXP, &hw_pxp);
+                if(!hw_pxp) {
+                    is_cf_supported = true;
+                }
+            }
             break;
         default:
             break;
@@ -170,7 +179,7 @@ static int32_t _g2d_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 const lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
 
-                if(!_g2d_src_cf_supported(draw_dsc->header.cf))
+                if(!_g2d_src_cf_supported(u, draw_dsc->header.cf))
                     return 0;
 
                 if(!_g2d_draw_img_supported(draw_dsc))
