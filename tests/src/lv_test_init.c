@@ -24,6 +24,10 @@ void lv_test_init(void)
     lv_test_display_create(HOR_RES, VER_RES);
     lv_test_indev_create_all();
 
+#if LV_USE_GESTURE_RECOGNITION
+    lv_test_indev_gesture_create();
+#endif
+
 #if LV_USE_SYSMON
 #if LV_USE_MEM_MONITOR
     lv_sysmon_hide_memory(NULL);
