@@ -1,0 +1,205 @@
+{"log":"Found existing rootfs image in /persistence/rootfs.fat.virt32.\r\n","stream":"stdout","time":"2025-03-14T20:32:14.707303831Z"}
+{"log":"Found existing filesystem image in /persistence/sdcard.img.virt32.\r\n","stream":"stdout","time":"2025-03-14T20:32:14.713651764Z"}
+{"log":"Platform is virt32\r\n","stream":"stdout","time":"2025-03-14T20:32:14.716038006Z"}
+{"log":"Starting Release build\r\n","stream":"stdout","time":"2025-03-14T20:32:14.717227898Z"}
+{"log":"Not searching for unused variables given on the command line.\r\n","stream":"stdout","time":"2025-03-14T20:32:14.745430299Z"}
+{"log":"\u001b[0mSystem is unknown to cmake, create:\r\n","stream":"stdout","time":"2025-03-14T20:32:14.748807599Z"}
+{"log":"Platform/SO3_usr to use this system, please post your config file on discourse.cmake.org so it can be added to cmake\u001b[0m\r\n","stream":"stdout","time":"2025-03-14T20:32:14.74881708Z"}
+{"log":"\u001b[0mYour CMakeCache.txt file was copied to CopyOfCMakeCache.txt. Please post that file on discourse.cmake.org.\u001b[0m\r\n","stream":"stdout","time":"2025-03-14T20:32:14.749184826Z"}
+{"log":"-- Configuring done (0.1s)\r\n","stream":"stdout","time":"2025-03-14T20:32:14.847438284Z"}
+{"log":"-- Generating done (0.3s)\r\n","stream":"stdout","time":"2025-03-14T20:32:15.176738283Z"}
+{"log":"-- Build files have been written to: /so3/usr/build\r\n","stream":"stdout","time":"2025-03-14T20:32:15.177012138Z"}
+{"log":"[  0%] Built target slv\r\n","stream":"stdout","time":"2025-03-14T20:32:15.230938018Z"}
+{"log":"[ 16%] Built target c\r\n","stream":"stdout","time":"2025-03-14T20:32:15.259557577Z"}
+{"log":"[ 16%] \u001b[32m\u001b[1mLinking C executable sh.elf\u001b[0m\r\n","stream":"stdout","time":"2025-03-14T20:32:15.273128278Z"}
+{"log":"[ 16%] \u001b[32m\u001b[1mLinking C executable ls.elf\u001b[0m\r\n","stream":"stdout","time":"2025-03-14T20:32:15.273371483Z"}
+{"log":"[ 16%] \u001b[32m\u001b[1mLinking C executable mydev_test.elf\u001b[0m\r\n","stream":"stdout","time":"2025-03-14T20:32:15.273527115Z"}
+{"log":"[ 17%] \u001b[32m\u001b[1mLinking C executable time.elf\u001b[0m\r\n","stream":"stdout","time":"2025-03-14T20:32:15.273681218Z"}
+{"log":"[ 17%] \u001b[32m\u001b[1mLinking C executable ping.elf\u001b[0m\r\n","stream":"stdout","time":"2025-03-14T20:32:15.274979851Z"}
+{"log":"[ 17%] \u001b[32m\u001b[1mLinking C executable more.elf\u001b[0m\r\n","stream":"stdout","time":"2025-03-14T20:32:15.275235356Z"}
+{"log":"arm-none-eabi-ld: warning: mydev_test.elf has a LOAD segment with RWX permissions\r\n","stream":"stdout","time":"2025-03-14T20:32:15.286865573Z"}
+{"log":"arm-none-eabi-ld: warning: time.elf has a LOAD segment with RWX permissions\r\n","stream":"stdout","time":"2025-03-14T20:32:15.287133237Z"}
+{"log":"arm-none-eabi-ld: warning: ls.elf has a LOAD segment with RWX permissions\r\n","stream":"stdout","time":"2025-03-14T20:32:15.287408832Z"}
+{"log":"arm-none-eabi-ld: warning: more.elf has a LOAD segment with RWX permissions\r\n","stream":"stdout","time":"2025-03-14T20:32:15.288070604Z"}
+{"log":"arm-none-eabi-ld: warning: ping.elf has a LOAD segment with RWX permissions\r\n","stream":"stdout","time":"2025-03-14T20:32:15.288727656Z"}
+{"log":"arm-none-eabi-ld: warning: sh.elf has a LOAD segment with RWX permissions\r\n","stream":"stdout","time":"2025-03-14T20:32:15.289373017Z"}
+{"log":"[ 17%] Built target time.elf\r\n","stream":"stdout","time":"2025-03-14T20:32:15.294744583Z"}
+{"log":"[ 17%] Built target mydev_test.elf\r\n","stream":"stdout","time":"2025-03-14T20:32:15.295257472Z"}
+{"log":"[ 17%] Built target ls.elf\r\n","stream":"stdout","time":"2025-03-14T20:32:15.295839172Z"}
+{"log":"[ 17%] Built target more.elf\r\n","stream":"stdout","time":"2025-03-14T20:32:15.295856623Z"}
+{"log":"[ 18%] Built target ping.elf\r\n","stream":"stdout","time":"2025-03-14T20:32:15.296507264Z"}
+{"log":"[ 18%] Built target sh.elf\r\n","stream":"stdout","time":"2025-03-14T20:32:15.29684107Z"}
+{"log":"[ 51%] Built target lvgl\r\n","stream":"stdout","time":"2025-03-14T20:32:15.679676932Z"}
+{"log":"[ 55%] Built target lvgl_thorvg\r\n","stream":"stdout","time":"2025-03-14T20:32:15.700285078Z"}
+{"log":"[ 74%] Built target lvgl_examples\r\n","stream":"stdout","time":"2025-03-14T20:32:16.438310259Z"}
+{"log":"[ 99%] Built target lvgl_demos\r\n","stream":"stdout","time":"2025-03-14T20:32:16.548772835Z"}
+{"log":"[ 99%] \u001b[32m\u001b[1mLinking C executable lvgl_benchmark.elf\u001b[0m\r\n","stream":"stdout","time":"2025-03-14T20:32:16.567263714Z"}
+{"log":"[100%] \u001b[32m\u001b[1mLinking C executable lvgl_demo.elf\u001b[0m\r\n","stream":"stdout","time":"2025-03-14T20:32:16.567286834Z"}
+{"log":"[100%] \u001b[32m\u001b[1mLinking C executable lvgl_perf.elf\u001b[0m\r\n","stream":"stdout","time":"2025-03-14T20:32:16.568622548Z"}
+{"log":"arm-none-eabi-ld: warning: lvgl_perf.elf has a LOAD segment with RWX permissions\r\n","stream":"stdout","time":"2025-03-14T20:32:16.596923961Z"}
+{"log":"arm-none-eabi-ld: warning: lvgl_benchmark.elf has a LOAD segment with RWX permissions\r\n","stream":"stdout","time":"2025-03-14T20:32:16.599814023Z"}
+{"log":"arm-none-eabi-ld: warning: lvgl_demo.elf has a LOAD segment with RWX permissions\r\n","stream":"stdout","time":"2025-03-14T20:32:16.599829503Z"}
+{"log":"[100%] Built target lvgl_perf.elf\r\n","stream":"stdout","time":"2025-03-14T20:32:16.611878347Z"}
+{"log":"[100%] Built target lvgl_benchmark.elf\r\n","stream":"stdout","time":"2025-03-14T20:32:16.61540439Z"}
+{"log":"[100%] Built target lvgl_demo.elf\r\n","stream":"stdout","time":"2025-03-14T20:32:16.615420571Z"}
+{"log":"/so3/usr\r\n","stream":"stdout","time":"2025-03-14T20:32:16.624743276Z"}
+{"log":"Installing out\r\n","stream":"stdout","time":"2025-03-14T20:32:16.625245525Z"}
+{"log":"Installing \r\n","stream":"stdout","time":"2025-03-14T20:32:16.625911907Z"}
+{"log":"FIT description: Kernel and rootfs components for virt32 environment\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931786439Z"}
+{"log":"Created:         Fri Mar 14 20:32:16 2025\r\n","stream":"stdout","time":"2025-03-14T20:32:16.93183975Z"}
+{"log":" Image 0 (so3)\r\n","stream":"stdout","time":"2025-03-14T20:32:16.93184516Z"}
+{"log":"  Description:  SO3 OS kernel\r\n","stream":"stdout","time":"2025-03-14T20:32:16.9318507Z"}
+{"log":"  Created:      Fri Mar 14 20:32:16 2025\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931855601Z"}
+{"log":"  Type:         Kernel Image\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931860341Z"}
+{"log":"  Compression:  uncompressed\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931864181Z"}
+{"log":"  Data Size:    233544 Bytes = 228.07 KiB = 0.22 MiB\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931867961Z"}
+{"log":"  Architecture: ARM\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931871821Z"}
+{"log":"  OS:           Linux\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931875611Z"}
+{"log":"  Load Address: 0x41008000\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931880061Z"}
+{"log":"  Entry Point:  0x41008000\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931884561Z"}
+{"log":" Image 1 (lvperf_fdt)\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931888791Z"}
+{"log":"  Description:  Flattened Device Tree blob\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931893221Z"}
+{"log":"  Created:      Fri Mar 14 20:32:16 2025\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931897651Z"}
+{"log":"  Type:         Flat Device Tree\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931902121Z"}
+{"log":"  Compression:  uncompressed\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931905941Z"}
+{"log":"  Data Size:    1454 Bytes = 1.42 KiB = 0.00 MiB\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931910192Z"}
+{"log":"  Architecture: ARM\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931914132Z"}
+{"log":"  Load Address: 0x44a00000\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931917882Z"}
+{"log":" Image 2 (ramfs)\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931921612Z"}
+{"log":"  Description:  SO3 environment minimal rootfs\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931925382Z"}
+{"log":"  Created:      Fri Mar 14 20:32:16 2025\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931931202Z"}
+{"log":"  Type:         RAMDisk Image\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931941882Z"}
+{"log":"  Compression:  uncompressed\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931949552Z"}
+{"log":"  Data Size:    17825792 Bytes = 17408.00 KiB = 17.00 MiB\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931969373Z"}
+{"log":"  Architecture: ARM\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931974473Z"}
+{"log":"  OS:           Linux\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931979023Z"}
+{"log":"  Load Address: 0x44c00000\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931982833Z"}
+{"log":"  Entry Point:  unavailable\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931986583Z"}
+{"log":" Default Configuration: 'so3_lvperf_ramfs'\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931990363Z"}
+{"log":" Configuration 0 (so3_lvperf_ramfs)\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931994313Z"}
+{"log":"  Description:  SO3 kernel image including device tree\r\n","stream":"stdout","time":"2025-03-14T20:32:16.931998103Z"}
+{"log":"  Kernel:       so3\r\n","stream":"stdout","time":"2025-03-14T20:32:16.932001933Z"}
+{"log":"  Init Ramdisk: ramfs\r\n","stream":"stdout","time":"2025-03-14T20:32:16.932005693Z"}
+{"log":"  FDT:          lvperf_fdt\r\n","stream":"stdout","time":"2025-03-14T20:32:16.932009463Z"}
+{"log":"\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.141214715Z"}
+{"log":"\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.141238796Z"}
+{"log":"U-Boot 2022.04 (Mar 12 2025 - 21:28:47 +0000)\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.141320337Z"}
+{"log":"\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.141343368Z"}
+{"log":"DRAM:  1 GiB\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.142811464Z"}
+{"log":"Core:  42 devices, 11 uclasses, devicetree: board\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.187948537Z"}
+{"log":"Flash: 64 MiB\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.360854793Z"}
+{"log":"Loading Environment from Flash... *** Warning - bad CRC, using default environment\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.364120671Z"}
+{"log":"\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.364133852Z"}
+{"log":"In:    pl011@9000000\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.369442616Z"}
+{"log":"Out:   pl011@9000000\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.369521737Z"}
+{"log":"Err:   pl011@9000000\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.369630069Z"}
+{"log":"Net:   No ethernet found.\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.375946722Z"}
+{"log":"Hit any key to stop autoboot:  0 \r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.377595221Z"}
+{"log":"99 bytes read in 0 ms\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.38541157Z"}
+{"log":"## Warning: defaulting to text format\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.38593644Z"}
+{"log":"## Info: input data size = 734 = 0x2DE\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.386195084Z"}
+{"log":"18062712 bytes read in 6 ms (2.8 GiB/s)\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.397864982Z"}
+{"log":"## Loading kernel from FIT Image at 70000000 ...\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.398653806Z"}
+{"log":"   Using 'so3_lvperf_ramfs' configuration\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.399347568Z"}
+{"log":"   Verifying Hash Integrity ... OK\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.399790356Z"}
+{"log":"   Trying 'so3' kernel subimage\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.400054021Z"}
+{"log":"     Description:  SO3 OS kernel\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.400250634Z"}
+{"log":"     Created:      2025-03-14  20:32:16 UTC\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.400707812Z"}
+{"log":"     Type:         Kernel Image\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.400981297Z"}
+{"log":"     Compression:  uncompressed\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.40115414Z"}
+{"log":"     Data Start:   0x700000cc\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.401441475Z"}
+{"log":"     Data Size:    233544 Bytes = 228.1 KiB\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.401621409Z"}
+{"log":"     Architecture: ARM\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.401834352Z"}
+{"log":"     OS:           Linux\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.401982385Z"}
+{"log":"     Load Address: 0x41008000\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.40225652Z"}
+{"log":"     Entry Point:  0x41008000\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.402359142Z"}
+{"log":"   Verifying Hash Integrity ... OK\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.402934512Z"}
+{"log":"## Loading ramdisk from FIT Image at 70000000 ...\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.403726946Z"}
+{"log":"   Using 'so3_lvperf_ramfs' configuration\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.404009111Z"}
+{"log":"   Verifying Hash Integrity ... OK\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.404358757Z"}
+{"log":"   Trying 'ramfs' ramdisk subimage\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.40451006Z"}
+{"log":"     Description:  SO3 environment minimal rootfs\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.404692053Z"}
+{"log":"     Created:      2025-03-14  20:32:16 UTC\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.404854176Z"}
+{"log":"     Type:         RAMDisk Image\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.404994809Z"}
+{"log":"     Compression:  uncompressed\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.405112601Z"}
+{"log":"     Data Start:   0x70039808\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.405224613Z"}
+{"log":"     Data Size:    17825792 Bytes = 17 MiB\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.405373045Z"}
+{"log":"     Architecture: ARM\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.405475037Z"}
+{"log":"     OS:           Linux\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.405540908Z"}
+{"log":"     Load Address: 0x44c00000\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.40564666Z"}
+{"log":"     Entry Point:  unavailable\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.405794883Z"}
+{"log":"   Verifying Hash Integrity ... OK\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.406170159Z"}
+{"log":"   Loading ramdisk from 0x70039808 to 0x44c00000\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.406457395Z"}
+{"log":"## Loading fdt from FIT Image at 70000000 ...\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.417841727Z"}
+{"log":"   Using 'so3_lvperf_ramfs' configuration\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.418055241Z"}
+{"log":"   Verifying Hash Integrity ... OK\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.418439928Z"}
+{"log":"   Trying 'lvperf_fdt' fdt subimage\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.41857305Z"}
+{"log":"     Description:  Flattened Device Tree blob\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.418728843Z"}
+{"log":"     Created:      2025-03-14  20:32:16 UTC\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.418925947Z"}
+{"log":"     Type:         Flat Device Tree\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.419084659Z"}
+{"log":"     Compression:  uncompressed\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.419173371Z"}
+{"log":"     Data Start:   0x700391c8\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.419289543Z"}
+{"log":"     Data Size:    1454 Bytes = 1.4 KiB\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.419426266Z"}
+{"log":"     Architecture: ARM\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.419506947Z"}
+{"log":"     Load Address: 0x44a00000\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.419641259Z"}
+{"log":"   Verifying Hash Integrity ... OK\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.420025906Z"}
+{"log":"   Loading fdt from 0x700391c8 to 0x44a00000\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.420210119Z"}
+{"log":"   Booting using the fdt blob at 0x44a00000\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.420773569Z"}
+{"log":"   Loading Kernel Image\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.42136626Z"}
+{"log":"   Using Device Tree in place at 44a00000, end 44a035ad\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.422625712Z"}
+{"log":"\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.424265281Z"}
+{"log":"Starting kernel ...\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.424312452Z"}
+{"log":"\r\r\n","stream":"stdout","time":"2025-03-14T20:32:17.424321252Z"}
+{"log":"setup_arch: CPU control register (CR) = c5387d\r\n","stream":"stdout","time":"2025-03-14T20:32:17.429470984Z"}
+{"log":"\r\n","stream":"stdout","time":"2025-03-14T20:32:17.429544555Z"}
+{"log":"\r\n","stream":"stdout","time":"2025-03-14T20:32:17.429552336Z"}
+{"log":"********** Smart Object Oriented SO3 Operating System **********\r\n","stream":"stdout","time":"2025-03-14T20:32:17.429699368Z"}
+{"log":"Copyright (c) 2014-2023 REDS Institute, HEIG-VD, Yverdon\r\n","stream":"stdout","time":"2025-03-14T20:32:17.429856331Z"}
+{"log":"Version 2023.6.0\r\n","stream":"stdout","time":"2025-03-14T20:32:17.429931402Z"}
+{"log":"\r\n","stream":"stdout","time":"2025-03-14T20:32:17.429942853Z"}
+{"log":"\r\n","stream":"stdout","time":"2025-03-14T20:32:17.429949053Z"}
+{"log":"\r\n","stream":"stdout","time":"2025-03-14T20:32:17.429958813Z"}
+{"log":"Now bootstraping the kernel ...\r\n","stream":"stdout","time":"2025-03-14T20:32:17.430034164Z"}
+{"log":"SO3: allocating a kernel heap of 33554404 bytes at address c0044000.\r\n","stream":"stdout","time":"2025-03-14T20:32:17.673343683Z"}
+{"log":"memory_init: Device tree virt addr: c3a00000\r\n","stream":"stdout","time":"2025-03-14T20:32:17.673549157Z"}
+{"log":"memory_init: relocating the device tree from 0xc3a00000 to 0xc21a4000 (size of 4224 bytes)\r\n","stream":"stdout","time":"2025-03-14T20:32:17.673910253Z"}
+{"log":"SO3 Memory information:\r\n","stream":"stdout","time":"2025-03-14T20:32:17.674259929Z"}
+{"log":"  - Memory size : 536870912 bytes\r\n","stream":"stdout","time":"2025-03-14T20:32:17.674530184Z"}
+{"log":"  - Available pages: 122458 (1de5a)\r\n","stream":"stdout","time":"2025-03-14T20:32:17.674673837Z"}
+{"log":"  - Kernel size without frame table is: 35282944 (0x21a6000) bytes, 33 MB / 0x21a6 PFNs\r\n","stream":"stdout","time":"2025-03-14T20:32:17.675009963Z"}
+{"log":"  - Kernel size including frame table is: 36265984 (0x2296000) bytes, 34 MB / 0x2296 PFNs\r\n","stream":"stdout","time":"2025-03-14T20:32:17.677971645Z"}
+{"log":"  - Number of available page frames: 0x1de5a\r\n","stream":"stdout","time":"2025-03-14T20:32:17.678144519Z"}
+{"log":"  - Frame table size is: 979664 bytes meaning 240 (0xf0) page frames\r\n","stream":"stdout","time":"2025-03-14T20:32:17.678424433Z"}
+{"log":"  - Page frame number of the first available page: 0x431a6\r\n","stream":"stdout","time":"2025-03-14T20:32:17.678619197Z"}
+{"log":"so3: rootfs in RAM detected (ramdev enabled) with size of 17825792 bytes...\r\n","stream":"stdout","time":"2025-03-14T20:32:17.68218061Z"}
+{"log":"calibrate_delay: calibrating...done. jiffies_ref = a2be8\r\n","stream":"stdout","time":"2025-03-14T20:32:17.704849544Z"}
+{"log":"SO3: starting the initial process ...\r\n","stream":"stdout","time":"2025-03-14T20:32:17.712134853Z"}
+{"log":"\r\n","stream":"stdout","time":"2025-03-14T20:32:17.712146014Z"}
+{"log":"\r\n","stream":"stdout","time":"2025-03-14T20:32:17.712150624Z"}
+{"log":"Starting LVGL Benchmark\r\n","stream":"stdout","time":"2025-03-14T20:32:17.816299617Z"}
+{"log":"Warning: The guest is now late by 0.0 to 1.0 seconds\r\n","stream":"stdout","time":"2025-03-14T20:32:19.129030996Z"}
+{"log":"Warning: The guest is now late by 1.0 to 2.0 seconds\r\n","stream":"stdout","time":"2025-03-14T20:32:40.699491404Z"}
+{"log":"Warning: The guest is now late by 2.0 to 3.0 seconds\r\n","stream":"stdout","time":"2025-03-14T20:33:02.966355127Z"}
+{"log":"Warning: The guest is now late by 3.0 to 4.0 seconds\r\n","stream":"stdout","time":"2025-03-14T20:33:30.06251689Z"}
+{"log":"Warning: The guest is now late by 4.0 to 5.0 seconds\r\n","stream":"stdout","time":"2025-03-14T20:33:38.253535255Z"}
+{"log":"Warning: The guest is now late by 5.0 to 6.0 seconds\r\n","stream":"stdout","time":"2025-03-14T20:33:51.010250882Z"}
+{"log":"Benchmark Summary (9.3.0 dev)\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.855785347Z"}
+{"log":"Name, Avg. CPU, Avg. FPS, Avg. time, render time, flush time\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.855997881Z"}
+{"log":"Empty screen, 11%, 25, 0, 0, 0\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.857828373Z"}
+{"log":"Moving wallpaper, 2%, 25, 0, 0, 0\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.858455924Z"}
+{"log":"Single rectangle, 0%, 25, 0, 0, 0\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.859125276Z"}
+{"log":"Multiple rectangles, 0%, 25, 0, 0, 0\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.859847899Z"}
+{"log":"Multiple RGB images, 0%, 25, 0, 0, 0\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.860658884Z"}
+{"log":"Multiple ARGB images, 23%, 25, 1, 1, 0\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.86156999Z"}
+{"log":"Rotated ARGB images, 48%, 24, 20, 20, 0\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.862511197Z"}
+{"log":"Multiple labels, 3%, 25, 0, 0, 0\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.863549175Z"}
+{"log":"Screen sized text, 30%, 24, 11, 11, 0\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.864642275Z"}
+{"log":"Multiple arcs, 18%, 24, 7, 7, 0\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.865801475Z"}
+{"log":"Containers, 3%, 25, 0, 0, 0\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.867039657Z"}
+{"log":"Containers with overlay, 88%, 21, 44, 44, 0\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.868379231Z"}
+{"log":"Containers with opa, 10%, 24, 3, 3, 0\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.869736765Z"}
+{"log":"Containers with opa_layer, 22%, 24, 8, 8, 0\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.871269383Z"}
+{"log":"Containers with scrolling, 25%, 25, 10, 10, 0\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.872899952Z"}
+{"log":"Widgets demo, 34%, 25, 13, 13, 0\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.874447759Z"}
+{"log":"All scenes avg.,19%, 24, 7, 7, 0\r\r\n","stream":"stdout","time":"2025-03-14T20:33:57.875031879Z"}
+{"log":"LVGL Benchmark Over\r\n","stream":"stdout","time":"2025-03-14T20:33:57.933458479Z"}
