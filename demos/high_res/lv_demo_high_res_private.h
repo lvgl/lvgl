@@ -118,6 +118,8 @@ enum {
     STYLE_TYPE_OBJ = 0,
     STYLE_TYPE_TEXT,
     STYLE_TYPE_A8_IMG,
+    STYLE_TYPE_TEXTAREA,
+    STYLE_TYPE_TEXTAREA_CURSOR,
     STYLE_TYPE_COUNT
 };
 
@@ -169,7 +171,6 @@ typedef struct {
     int32_t small_chart_height;
     int32_t large_chart_height;
     int32_t card_radius;
-    int32_t health_panel_width;
     int32_t settings_panel_width;
     int32_t home_bottom_margin_height;
     int32_t indicator_width;

@@ -10,6 +10,10 @@
 #include "lv_demo_high_res.h"
 #if LV_USE_DEMO_HIGH_RES
 
+#if 0
+    #include <stdlib.h>
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -55,7 +59,7 @@ void lv_demo_high_res_api_example(const char * assets_path, const char * logo_pa
     lv_subject_set_int(&api->subjects.temperature_outdoor, 16 * 10); /* 16 degrees C */
     lv_subject_set_int(&api->subjects.main_light_temperature, 4500); /* 4500 degrees K */
     lv_subject_set_int(&api->subjects.thermostat_target_temperature, 25 * 10); /* 25 degrees C */
-    lv_subject_set_pointer(&api->subjects.wifi_ssid, "my home Wi-Fi network");
+    lv_subject_set_pointer(&api->subjects.wifi_ssid, "Home Wi-Fi");
     lv_subject_set_pointer(&api->subjects.wifi_ip, "192.168.1.1");
     lv_subject_set_int(&api->subjects.door, 0); /* tell the UI the door is closed */
     lv_subject_set_int(&api->subjects.lightbulb_matter, 0); /* 0 or 1 */
@@ -184,19 +188,27 @@ static void wifi_ssid_observer_cb(lv_observer_t * observer, lv_subject_t * subje
         if(exit_status == 0) {
             LV_LOG_USER("Successfully connected to the WiFi network.");
 
-            /* TODO: get the IP address using popen("hostname -I") */
+            /* TODO: get the IP address using popen("hostname -I") or similar */
             const char * ip = "(IP unknown)";
             lv_subject_set_pointer(&api->subjects.wifi_ip, (void *) ip);
 
-            /* remove this, if not desired */
+#if 0
             LV_LOG_USER("This functionality will now be disabled for the remainder of the demo.");
             lv_observer_remove(observer);
+#endif
         }
         else {
             LV_LOG_USER("Could not connect to the WiFi network. Exit status: %d", exit_status);
 
             lv_subject_set_pointer(subject, NULL);
         }
+    }
+    else if(!ssid) {
+        /* optional TODO: perform disconnect if connected */
+    }
+#else
+    if(ssid && password) {
+        lv_subject_set_pointer(&api->subjects.wifi_ip, "10.0.2.15");
     }
 #endif
 }
