@@ -98,8 +98,7 @@ const lv_demo_high_res_sizes_t lv_demo_high_res_sizes_all[SIZE_COUNT] = {
         .small_chart_height = 67,
         .large_chart_height = 167,
         .card_radius = 12,
-        .health_panel_width = 133,
-        .settings_panel_width = 179,
+        .settings_panel_width = 133,
         .home_bottom_margin_height = 53,
         .indicator_width = 94,
         .indicator_height = 85,
@@ -118,8 +117,7 @@ const lv_demo_high_res_sizes_t lv_demo_high_res_sizes_all[SIZE_COUNT] = {
         .small_chart_height = 100,
         .large_chart_height = 250,
         .card_radius = 18,
-        .health_panel_width = 200,
-        .settings_panel_width = 268,
+        .settings_panel_width = 200,
         .home_bottom_margin_height = 80,
         .indicator_width = 141,
         .indicator_height = 128,
@@ -138,8 +136,7 @@ const lv_demo_high_res_sizes_t lv_demo_high_res_sizes_all[SIZE_COUNT] = {
         .small_chart_height = 150,
         .large_chart_height = 375,
         .card_radius = 27,
-        .health_panel_width = 300,
-        .settings_panel_width = 402,
+        .settings_panel_width = 300,
         .home_bottom_margin_height = 120,
         .indicator_width = 212,
         .indicator_height = 192,
@@ -281,6 +278,9 @@ lv_obj_t * lv_demo_high_res_base_obj_create(const char * assets_path,
         for(uint32_t j = 0; j < STYLE_TYPE_COUNT; j++) {
             lv_style_init(&c->styles[i][j]);
         }
+    }
+    for(uint32_t i = 0; i < STYLE_COLOR_COUNT; i++) {
+        lv_style_set_image_recolor_opa(&c->styles[i][STYLE_TYPE_A8_IMG], LV_OPA_COVER);
     }
 
     for(uint32_t i = 0; i < FONT_COUNT; i++) {
@@ -557,8 +557,11 @@ static void theme_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
         lv_style_set_text_color(&c->styles[i][STYLE_TYPE_TEXT], color_inv);
         lv_style_set_line_color(&c->styles[i][STYLE_TYPE_TEXT], color_inv);
 
-        lv_style_set_image_recolor_opa(&c->styles[i][STYLE_TYPE_A8_IMG], LV_OPA_COVER);
         lv_style_set_image_recolor(&c->styles[i][STYLE_TYPE_A8_IMG], color_inv);
+
+        lv_style_set_bg_color(&c->styles[i][STYLE_TYPE_TEXTAREA], color_inv);
+        lv_style_set_text_color(&c->styles[i][STYLE_TYPE_TEXTAREA], color_inv);
+        lv_style_set_border_color(&c->styles[i][STYLE_TYPE_TEXTAREA_CURSOR], color_inv);
     }
 
     for(uint32_t i = 0; i < STYLE_COLOR_COUNT; i++) {
