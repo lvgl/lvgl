@@ -1,0 +1,162 @@
+name: Emulated Performance Test
+
+on:
+  push:
+    branches: 'master'
+  pull_request:
+    branches: 'master'
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }} 
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check_scripts:
+    runs-on: ubuntu-24.04
+    name: ARM Emulated Benchmark - Script Check
+    strategy:
+      fail-fast: false
+      matrix: 
+        test_script:
+          - scripts/perf/tests/filter_docker_logs/test.sh
+          - scripts/perf/tests/benchmark_results_comment/test.sh
+          - scripts/perf/tests/serialize_results/test.sh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check Script
+        run: |
+          pip3 install msgpack==1.1.0
+          ./${{ matrix.test_script }}
+
+  run_benchmark:
+    runs-on: ubuntu-24.04
+    name: ARM Emulated Benchmark ${{ matrix.image_type }} - ${{matrix.config }}
+    needs: check_scripts
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - image_type: 32b
+          image_version : |
+            main@sha256:a7801517df192acbb23fc94c4c5b332282e3470dba99e0c594bae45d80a18713
+          config : lv_conf_perf32b
+        - image_type: 64b
+          image_version: |
+            main@sha256:34af243cd07f4fe435b6643e7e8262cd1cc8f45ce8d45816e12d4dde900a037c
+          config : lv_conf_perf64b
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Generate lv_conf.h
+        run: |
+          cp lv_conf_template.h configs/ci/perf/lv_conf_perf.h
+          python scripts/generate_lv_conf.py \
+            --template lv_conf_template.h \
+            --config configs/ci/perf/lv_conf_perf.h \
+            --defaults configs/ci/perf/${{matrix.config}}.defaults
+
+      - name: Run Benchmark Demo
+        run: |
+          docker run -t --privileged \
+            --name so3-lvperf \
+            -v /dev:/dev \
+            -v $(pwd)/configs/ci/perf/lv_conf_perf.h:/so3/usr/lib/lv_conf.h \
+            -v $(pwd):/so3/usr/lib/lvgl \
+            ghcr.io/smartobjectoriented/so3-lvperf${{matrix.image_type}}:${{matrix.image_version}}
+
+      - name: Collect Logs
+        run: |
+          sudo cat $(docker inspect --format='{{.LogPath}}' so3-lvperf) | python scripts/perf/filter_docker_benchmark_logs.py results-${{matrix.image_type}}-${{matrix.config}}.json
+
+      - name: Upload Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-${{matrix.image_type}}-${{matrix.config}}.json
+          path: results-${{matrix.image_type}}-${{matrix.config}}.json
+          if-no-files-found: error
+
+
+  check_results:
+    runs-on: ubuntu-24.04
+    needs: run_benchmark
+    name: ARM Emulated Benchmark - Check Results
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+
+      - name: Collect 'master' Results
+        uses: robinraju/release-downloader@v1
+        continue-on-error: true # The release may not exist yet
+        with:
+          preRelease: true
+          tag: emulated-benchmark-latest
+          fileName: results*.mpk
+
+      - name: Prepare Comment
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          pip3 install msgpack==1.1.0
+          if ls results*.mpk 1> /dev/null 2>&1; then
+            python3 scripts/perf/benchmark_results_comment.py \
+              --previous results*.mpk \
+              --new results*.json \
+              --output comment.md
+          else
+            echo "No previous results found, generating comment without comparison."
+            python3 scripts/perf/benchmark_results_comment.py \
+              --new results*.json \
+              --output comment.md
+          fi          
+          
+      - name: Comment PR
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'comment.md';
+
+            if (!fs.existsSync(path)) {
+              throw new Error('Error: comment.md not found! Exiting.');
+            }
+
+            const commentBody = fs.readFileSync(path, 'utf8').trim();
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
+
+      - name: Serialize Results
+        if: endsWith(github.ref, 'master') == true
+        run: |
+          pip3 install msgpack==1.1.0
+          mkdir input output
+          mv results* input
+          python scripts/perf/serialize_results.py --input input --output output --commit-hash ${{ github.sha }}
+
+      - name: Store Results in Benchmark Release
+        if: endsWith(github.ref, 'master') == true
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Emulated Benchmark Latest
+          files: output/results*.mpk
+          tag_name: emulated-benchmark-latest
+          prerelease: true
