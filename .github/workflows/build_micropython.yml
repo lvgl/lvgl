@@ -59,6 +59,7 @@ jobs:
       if: matrix.port == 'stm32'
       run: |
         source tools/ci.sh && ci_stm32_setup
+        make -C ports/stm32 BOARD=STM32F7DISC USER_C_MODULES=../../user_modules/lv_binding_micropython/micropython.cmake submodules
         make -j $(nproc) -C ports/stm32 BOARD=STM32F7DISC USER_C_MODULES=../../user_modules/lv_binding_micropython/micropython.cmake
 
     # Raspberry Pi Pico port
