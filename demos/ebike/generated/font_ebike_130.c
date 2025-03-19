@@ -2724,7 +2724,7 @@ static const uint8_t kern_pair_glyph_ids[] = {
  * 4.4 format which needs to scaled with `kern_scale`*/
 static const int8_t kern_pair_values[] = {
     -20, 14, -54
-    };
+};
 
 /*Collect the kern pair's data in one place*/
 static const lv_font_fmt_txt_kern_pair_t kern_pairs = {

@@ -424,7 +424,7 @@ static void create_widget3(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
 
     lv_obj_t * play_pause_img = lv_image_create(controls);
     lv_image_set_src(play_pause_img, c->imgs[lv_subject_get_int(&c->api.subjects.music_play) ? IMG_PLAY_ICON :
-                                                                                             IMG_PLAY_ICON_1]);
+                                             IMG_PLAY_ICON_1]);
     lv_obj_set_style_image_recolor(play_pause_img, lv_color_white(), 0);
     lv_obj_set_style_image_recolor_opa(play_pause_img, LV_OPA_COVER, 0);
     lv_obj_add_flag(play_pause_img, LV_OBJ_FLAG_CLICKABLE);
