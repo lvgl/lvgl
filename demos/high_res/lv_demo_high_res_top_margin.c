@@ -117,6 +117,7 @@ lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * parent, int32_t pad_hor
     lv_obj_t * wifi = create_wifi(lv_layer_sys(), c);
     lv_obj_bind_flag_if_eq(wifi, &c->top_margin_wifi_subject, LV_OBJ_FLAG_HIDDEN, 0);
     lv_obj_add_event_cb(wifi_icon, delete_modal_cb, LV_EVENT_DELETE, wifi);
+    lv_obj_move_to_index(wifi, 0); /* move behind other lv_layer_sys objs */
 
     lv_obj_t * health_icon = create_icon(top_margin_right_cluster, &c->top_margin_health_subject, &c->imgs[IMG_HEALTH_ICON],
                                          c);
@@ -125,6 +126,7 @@ lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * parent, int32_t pad_hor
     lv_obj_t * perfmon = create_perfmon(lv_layer_sys(), c);
     lv_obj_bind_flag_if_eq(perfmon, &c->top_margin_health_subject, LV_OBJ_FLAG_HIDDEN, 0);
     lv_obj_add_event_cb(health_icon, delete_modal_cb, LV_EVENT_DELETE, perfmon);
+    lv_obj_move_to_index(perfmon, 0); /* move behind other lv_layer_sys objs */
 
     lv_obj_t * settings_icon = create_icon(top_margin_right_cluster, &c->top_margin_setting_subject,
                                            &c->imgs[IMG_SETTING_ICON], c);
@@ -133,6 +135,7 @@ lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * parent, int32_t pad_hor
     lv_obj_t * settings = create_settings(lv_layer_sys(), c);
     lv_obj_bind_flag_if_eq(settings, &c->top_margin_setting_subject, LV_OBJ_FLAG_HIDDEN, 0);
     lv_obj_add_event_cb(settings_icon, delete_modal_cb, LV_EVENT_DELETE, settings);
+    lv_obj_move_to_index(settings, 0); /* move behind other lv_layer_sys objs */
 
     lv_obj_update_layout(top_margin_right_cluster);
     lv_obj_align_to(wifi, wifi_icon, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
