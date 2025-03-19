@@ -436,7 +436,7 @@ void lv_image_set_inner_align(lv_obj_t * obj, lv_image_align_t align)
     if(align == img->align) return;
 
     /*If we're removing STRETCH, reset the scale*/
-    if(img->align == LV_IMAGE_ALIGN_STRETCH) {
+    if(img->align == LV_IMAGE_ALIGN_STRETCH || img->align == LV_IMAGE_ALIGN_AUTO_SCALE) {
         lv_image_set_scale(obj, LV_SCALE_NONE);
     }
 
@@ -650,7 +650,7 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
-        if(img->align == LV_IMAGE_ALIGN_STRETCH) {
+        if(img->align == LV_IMAGE_ALIGN_STRETCH || img->align == LV_IMAGE_ALIGN_AUTO_SCALE) {
             update_align(obj);
             if(img->rotation || img->scale_x != LV_SCALE_NONE || img->scale_y != LV_SCALE_NONE) {
                 lv_obj_refresh_ext_draw_size(obj);
@@ -786,6 +786,15 @@ static void draw_image(lv_event_t * e)
                 lv_area_align(&obj->coords, &draw_dsc.image_area, img->align, img->offset.x, img->offset.y);
                 coords = draw_dsc.image_area;
             }
+            else if(img->align == LV_IMAGE_ALIGN_AUTO_SCALE) {
+				int32_t scale = lv_image_get_scale(obj);
+				lv_point_t offset;
+				offset.x = (lv_obj_get_width(obj) - img->w * scale / LV_SCALE_NONE) / 2;
+				offset.y = (lv_obj_get_height(obj) - img->h * scale / LV_SCALE_NONE) / 2;
+				lv_area_move(&draw_dsc.image_area, offset.x, offset.y);
+				lv_area_move(&draw_dsc.image_area, img->offset.x, img->offset.y);
+				coords = draw_dsc.image_area;
+			}
             else if(img->align == LV_IMAGE_ALIGN_TILE) {
                 lv_area_intersect(&layer->_clip_area, &layer->_clip_area, &obj->coords);
                 lv_area_move(&draw_dsc.image_area, img->offset.x, img->offset.y);
@@ -870,6 +879,17 @@ static void update_align(lv_obj_t * obj)
             scale_update(obj, scale_x, scale_y);
         }
     }
+    else if(img->align == LV_IMAGE_ALIGN_AUTO_SCALE) {
+        lv_image_set_rotation(obj, 0);
+        lv_image_set_pivot(obj, 0, 0);
+        if(img->w != 0 && img->h != 0) {
+            lv_obj_update_layout(obj);
+            int32_t scale_x = lv_obj_get_width(obj) * LV_SCALE_NONE / img->w;
+            int32_t scale_y = lv_obj_get_height(obj) * LV_SCALE_NONE / img->h;
+            int32_t scale = LV_MIN(scale_x, scale_y);
+            scale_update(obj, scale, scale);
+		}
+	}
     else if(img->align == LV_IMAGE_ALIGN_TILE) {
         lv_image_set_rotation(obj, 0);
         lv_image_set_pivot(obj, 0, 0);

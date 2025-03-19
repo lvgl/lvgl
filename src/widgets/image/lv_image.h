@@ -51,8 +51,9 @@ typedef enum {
     LV_IMAGE_ALIGN_RIGHT_MID,
     LV_IMAGE_ALIGN_CENTER,
     LV_IMAGE_ALIGN_AUTO_TRANSFORM,
-    LV_IMAGE_ALIGN_STRETCH,
-    LV_IMAGE_ALIGN_TILE,
+	LV_IMAGE_ALIGN_STRETCH,	   // Set X and Y scale to fill the Widget's area
+	LV_IMAGE_ALIGN_TILE,	   // Tile image to fill Widget's area. Offset is applied to shift the tiling.
+	LV_IMAGE_ALIGN_AUTO_SCALE, // Scale the image to fit without changing its aspect ratio
 } lv_image_align_t;
 
 #if LV_USE_OBJ_PROPERTY
