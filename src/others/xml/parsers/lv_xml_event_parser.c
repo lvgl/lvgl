@@ -42,17 +42,6 @@ void * lv_xml_event_call_function_create(lv_xml_parser_state_t * state, const ch
 {
     LV_UNUSED(attrs);
 
-    const char * cb_txt = lv_xml_get_value_of(attrs, "callback");
-    if(cb_txt == NULL) {
-        LV_LOG_WARN("callback is mandatory for event-call_function");
-        return NULL;
-    }
-
-    lv_event_cb_t cb = lv_xml_get_event_cb(&state->ctx, cb_txt);
-    if(cb == NULL) {
-        LV_LOG_WARN("Couldn't add call function event because \"%s\" callback is not found.", cb_txt);
-        return NULL;
-    }
 
     const char * trigger = lv_xml_get_value_of(attrs, "trigger");
     lv_event_code_t code = LV_EVENT_CLICKED;
@@ -62,11 +51,25 @@ void * lv_xml_event_call_function_create(lv_xml_parser_state_t * state, const ch
         return NULL;
     }
 
+    const char * cb_txt = lv_xml_get_value_of(attrs, "callback");
+    if(cb_txt == NULL) {
+        LV_LOG_WARN("callback is mandatory for event-call_function");
+        return NULL;
+    }
+
+    lv_obj_t * obj = lv_xml_state_get_parent(state);
+    lv_event_cb_t cb = lv_xml_get_event_cb(&state->ctx, cb_txt);
+    if(cb == NULL) {
+        LV_LOG_WARN("Couldn't add call function event because \"%s\" callback is not found.", cb_txt);
+        /*Don't return NULL.
+         *When the component is isolated e.g. in the editor the callback is not registered */
+        return obj;
+    }
+
     const char * user_data_xml = lv_xml_get_value_of(attrs, "user_data");
     char * user_data = NULL;
     if(user_data_xml) user_data = lv_strdup(user_data_xml);
 
-    lv_obj_t * obj = lv_xml_state_get_parent(state);
     lv_obj_add_event_cb(obj, cb, code, user_data);
     if(user_data) lv_obj_add_event_cb(obj, free_user_data_event_cb, LV_EVENT_DELETE, user_data);
 
