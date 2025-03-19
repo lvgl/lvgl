@@ -300,7 +300,7 @@ static void wifi_connect_ui_textarea_apply_styles(lv_demo_high_res_ctx_t * c, lv
 {
     lv_obj_add_style(ta, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXTAREA], 0);
     lv_obj_add_style(ta, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXTAREA], LV_PART_TEXTAREA_PLACEHOLDER);
-    lv_obj_add_style(ta, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXTAREA_CURSOR], LV_PART_CURSOR);
+    lv_obj_add_style(ta, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXTAREA_CURSOR], LV_PART_CURSOR | LV_STATE_FOCUSED);
     lv_obj_add_style(ta, &c->fonts[FONT_LABEL_XS], 0);
 
     lv_obj_set_style_bg_opa(ta, 12 * 255 / 100, 0);
@@ -384,7 +384,7 @@ static lv_obj_t * create_wifi(lv_obj_t * parent, lv_demo_high_res_ctx_t * c)
     lv_obj_add_style(ssid, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_span_set_text_static(lv_spangroup_add_span(ssid), "SSID: ");
     lv_span_t * ssid_value = lv_spangroup_add_span(ssid);
-    lv_style_set_opa(&ssid_value->style, LV_OPA_40);
+    lv_style_set_text_opa(&ssid_value->style, LV_OPA_40);
     lv_subject_add_observer_obj(&c->api.subjects.wifi_ssid, wifi_ssid_ip_observer_cb, ssid, ssid_value);
 
     lv_obj_t * ip = lv_spangroup_create(cont);
@@ -392,7 +392,7 @@ static lv_obj_t * create_wifi(lv_obj_t * parent, lv_demo_high_res_ctx_t * c)
     lv_obj_add_style(ip, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
     lv_span_set_text_static(lv_spangroup_add_span(ip), "IP Address: ");
     lv_span_t * ip_value = lv_spangroup_add_span(ip);
-    lv_style_set_opa(&ip_value->style, LV_OPA_40);
+    lv_style_set_text_opa(&ip_value->style, LV_OPA_40);
     lv_subject_add_observer_obj(&c->api.subjects.wifi_ip, wifi_ssid_ip_observer_cb, ip, ip_value);
 
     lv_obj_t * btn = lv_label_create(cont);
