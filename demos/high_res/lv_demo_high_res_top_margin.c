@@ -109,7 +109,7 @@ lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * parent, int32_t pad_hor
     lv_obj_t * health_icon = create_icon(top_margin_right_cluster, &c->top_margin_health_subject, &c->imgs[IMG_HEALTH_ICON],
                                          c);
     lv_image_set_src(health_icon, c->imgs[lv_subject_get_int(&c->top_margin_health_subject) ? IMG_HEALTH_ICON_BOLD :
-                                          IMG_HEALTH_ICON]);
+                                                                                            IMG_HEALTH_ICON]);
     lv_obj_t * perfmon = create_perfmon(lv_layer_sys(), c);
     lv_obj_bind_flag_if_eq(perfmon, &c->top_margin_health_subject, LV_OBJ_FLAG_HIDDEN, 0);
     lv_obj_add_event_cb(health_icon, delete_modal_cb, LV_EVENT_DELETE, perfmon);
@@ -117,7 +117,7 @@ lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * parent, int32_t pad_hor
     lv_obj_t * settings_icon = create_icon(top_margin_right_cluster, &c->top_margin_setting_subject,
                                            &c->imgs[IMG_SETTING_ICON], c);
     lv_image_set_src(settings_icon, c->imgs[lv_subject_get_int(&c->top_margin_setting_subject) ? IMG_SETTING_ICON_BOLD :
-                                            IMG_SETTING_ICON]);
+                                                                                               IMG_SETTING_ICON]);
     lv_obj_t * settings = create_settings(lv_layer_sys(), c);
     lv_obj_bind_flag_if_eq(settings, &c->top_margin_setting_subject, LV_OBJ_FLAG_HIDDEN, 0);
     lv_obj_add_event_cb(settings_icon, delete_modal_cb, LV_EVENT_DELETE, settings);
