@@ -168,16 +168,16 @@ static void control_screen_events(lv_event_t * e)
         lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
 
         if(dir == LV_DIR_LEFT) {
-            ui_animate_y(lv_demo_smartwatch_get_control_screen(), -384, 1000, 0);
-            animate_arc(arc_cont, ARC_EXPAND_UP, 700, 300);
-            ui_anim_opa(main_arc, 255, 500, 500);
+            lv_smartwatch_animate_y(lv_demo_smartwatch_get_control_screen(), -384, 1000, 0);
+            lv_smartwatch_animate_arc(arc_cont, ARC_EXPAND_UP, 700, 300);
+            lv_smartwatch_anim_opa(main_arc, 255, 500, 500);
         }
 
     }
     if(event_code == LV_EVENT_LONG_PRESSED) {
-        ui_animate_y(lv_demo_smartwatch_get_control_screen(), -384, 1000, 0);
-        animate_arc(arc_cont, ARC_EXPAND_UP, 700, 300);
-        ui_anim_opa(main_arc, 255, 500, 500);
+        lv_smartwatch_animate_y(lv_demo_smartwatch_get_control_screen(), -384, 1000, 0);
+        lv_smartwatch_animate_arc(arc_cont, ARC_EXPAND_UP, 700, 300);
+        lv_smartwatch_anim_opa(main_arc, 255, 500, 500);
     }
 }
 

@@ -251,12 +251,12 @@ static void health_screen_events(lv_event_t * e)
         lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
 
         if(dir == LV_DIR_LEFT) {
-            ui_animate_x(lv_demo_smartwatch_get_health_screen(), -384 - TRANSITION_GAP, 1000, 0);
-            ui_animate_x_from(lv_demo_smartwatch_get_sports_screen(), 384 + TRANSITION_GAP, 0, 1000, 0);
+            lv_smartwatch_animate_x(lv_demo_smartwatch_get_health_screen(), -384 - TRANSITION_GAP, 1000, 0);
+            lv_smartwatch_animate_x_from(lv_demo_smartwatch_get_sports_screen(), 384 + TRANSITION_GAP, 0, 1000, 0);
         }
         if(dir == LV_DIR_RIGHT) {
-            ui_animate_x_from(lv_demo_smartwatch_get_weather_screen(), -384 - TRANSITION_GAP, 0, 1000, 0);
-            ui_animate_x(lv_demo_smartwatch_get_health_screen(), 384 + TRANSITION_GAP, 1000, 0);
+            lv_smartwatch_animate_x_from(lv_demo_smartwatch_get_weather_screen(), -384 - TRANSITION_GAP, 0, 1000, 0);
+            lv_smartwatch_animate_x(lv_demo_smartwatch_get_health_screen(), 384 + TRANSITION_GAP, 1000, 0);
         }
 
     }

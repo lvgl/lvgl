@@ -472,14 +472,14 @@ static void music_screen_events(lv_event_t * e)
 
 
         if(dir == LV_DIR_LEFT) {
-            ui_animate_x(lv_demo_smartwatch_get_music_screen(), -384, 1000, 0);
-            animate_arc(arc_cont, ARC_EXPAND_RIGHT, 700, 300);
-            ui_anim_opa(main_arc, 255, 500, 500);
-            ui_anim_opa(overlay, 0, 100, 0);
+            lv_smartwatch_animate_x(lv_demo_smartwatch_get_music_screen(), -384, 1000, 0);
+            lv_smartwatch_animate_arc(arc_cont, ARC_EXPAND_RIGHT, 700, 300);
+            lv_smartwatch_anim_opa(main_arc, 255, 500, 500);
+            lv_smartwatch_anim_opa(overlay, 0, 100, 0);
         }
         if(dir == LV_DIR_RIGHT) {
-            ui_animate_x_from(lv_demo_smartwatch_get_sports_screen(), -384 - TRANSITION_GAP, 0, 1000, 0);
-            ui_animate_x(lv_demo_smartwatch_get_music_screen(), 384 + TRANSITION_GAP, 1000, 0);
+            lv_smartwatch_animate_x_from(lv_demo_smartwatch_get_sports_screen(), -384 - TRANSITION_GAP, 0, 1000, 0);
+            lv_smartwatch_animate_x(lv_demo_smartwatch_get_music_screen(), 384 + TRANSITION_GAP, 1000, 0);
         }
 
     }

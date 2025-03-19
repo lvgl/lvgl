@@ -407,17 +407,17 @@ static void weather_screen_events(lv_event_t * e)
         lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
 
         if(dir == LV_DIR_RIGHT) {
-            ui_animate_x(lv_demo_smartwatch_get_weather_screen(), 384, 1000, 0);
-            animate_arc(arc_cont, ARC_EXPAND_RIGHT, 700, 300);
-            ui_anim_opa(main_arc, 255, 500, 500);
-            ui_anim_opa(overlay, 0, 100, 0);
+            lv_smartwatch_animate_x(lv_demo_smartwatch_get_weather_screen(), 384, 1000, 0);
+            lv_smartwatch_animate_arc(arc_cont, ARC_EXPAND_RIGHT, 700, 300);
+            lv_smartwatch_anim_opa(main_arc, 255, 500, 500);
+            lv_smartwatch_anim_opa(overlay, 0, 100, 0);
         }
 
         if(dir == LV_DIR_LEFT) {
 
-            ui_anim_opa(overlay, 255, 100, 0);
-            ui_animate_x(lv_demo_smartwatch_get_weather_screen(), -384 - TRANSITION_GAP, 1000, 0);
-            ui_animate_x_from(lv_demo_smartwatch_get_health_screen(), 384 + TRANSITION_GAP, 0, 1000, 0);
+            lv_smartwatch_anim_opa(overlay, 255, 100, 0);
+            lv_smartwatch_animate_x(lv_demo_smartwatch_get_weather_screen(), -384 - TRANSITION_GAP, 1000, 0);
+            lv_smartwatch_animate_x_from(lv_demo_smartwatch_get_health_screen(), 384 + TRANSITION_GAP, 0, 1000, 0);
         }
 
     }

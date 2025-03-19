@@ -95,6 +95,12 @@ void lv_demo_smartwatch(void)
 
     /*Use the simple theme to make styling simpler*/
     lv_display_t * display = lv_display_get_default();
+    int32_t hres = lv_display_get_horizontal_resolution(display);
+    int32_t vres = lv_display_get_vertical_resolution(display);
+    if(!(hres == vres && vres == SCREEN_SIZE)) {
+        LV_LOG_WARN("a display size of exactly 384x384 is recommended for the smartwatch demo");
+    }
+
     theme_original = lv_display_get_theme(display);
     lv_theme_t * theme = lv_theme_default_init(display, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED),
                                                true, LV_FONT_DEFAULT);
@@ -255,7 +261,7 @@ void lv_demo_smartwatch(void)
 }
 
 
-void animate_arc(lv_obj_t * obj, arc_animation_t animation, int32_t duration, int32_t delay)
+void lv_smartwatch_animate_arc(lv_obj_t * obj, lv_smartwatch_arc_animation_t animation, int32_t duration, int32_t delay)
 {
 
     lv_anim_t a;
@@ -282,7 +288,7 @@ void animate_arc(lv_obj_t * obj, arc_animation_t animation, int32_t duration, in
     lv_anim_start(&a);
 }
 
-void ui_animate_x(lv_obj_t * obj, int32_t x, int32_t duration, int32_t delay)
+void lv_smartwatch_animate_x(lv_obj_t * obj, int32_t x, int32_t duration, int32_t delay)
 {
     lv_anim_t a;
     lv_anim_init(&a);
@@ -294,7 +300,7 @@ void ui_animate_x(lv_obj_t * obj, int32_t x, int32_t duration, int32_t delay)
     lv_anim_start(&a);
 }
 
-void ui_animate_x_from(lv_obj_t * obj, int32_t start, int32_t x, int32_t duration, int32_t delay)
+void lv_smartwatch_animate_x_from(lv_obj_t * obj, int32_t start, int32_t x, int32_t duration, int32_t delay)
 {
     lv_anim_t a;
     lv_anim_init(&a);
@@ -306,7 +312,7 @@ void ui_animate_x_from(lv_obj_t * obj, int32_t start, int32_t x, int32_t duratio
     lv_anim_start(&a);
 }
 
-void ui_animate_y(lv_obj_t * obj, int32_t y, int32_t duration, int32_t delay)
+void lv_smartwatch_animate_y(lv_obj_t * obj, int32_t y, int32_t duration, int32_t delay)
 {
     lv_anim_t a;
     lv_anim_init(&a);
@@ -318,7 +324,7 @@ void ui_animate_y(lv_obj_t * obj, int32_t y, int32_t duration, int32_t delay)
     lv_anim_start(&a);
 }
 
-void ui_anim_opa(lv_obj_t * obj, lv_opa_t opa, int32_t duration, int32_t delay)
+void lv_smartwatch_anim_opa(lv_obj_t * obj, lv_opa_t opa, int32_t duration, int32_t delay)
 {
     lv_anim_t a;
     lv_anim_init(&a);
@@ -467,15 +473,15 @@ static void home_screen_events(lv_event_t * e)
     if(event_code == LV_EVENT_GESTURE) {
         lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
         if(dir == LV_DIR_BOTTOM) {
-            ui_animate_y(lv_demo_smartwatch_get_control_screen(), 0, 800, 200);
-            animate_arc(arc_cont, ARC_SHRINK_DOWN, 1000, 0);
-            ui_anim_opa(main_arc, 0, 700, 0);
+            lv_smartwatch_animate_y(lv_demo_smartwatch_get_control_screen(), 0, 800, 200);
+            lv_smartwatch_animate_arc(arc_cont, ARC_SHRINK_DOWN, 1000, 0);
+            lv_smartwatch_anim_opa(main_arc, 0, 700, 0);
 
         }
         if(dir == LV_DIR_LEFT) {
-            ui_animate_x_from(lv_demo_smartwatch_get_weather_screen(), 384, 0, 800, 200);
-            animate_arc(arc_cont, ARC_SHRINK_LEFT, 1000, 0);
-            ui_anim_opa(main_arc, 0, 700, 0);
+            lv_smartwatch_animate_x_from(lv_demo_smartwatch_get_weather_screen(), 384, 0, 800, 200);
+            lv_smartwatch_animate_arc(arc_cont, ARC_SHRINK_LEFT, 1000, 0);
+            lv_smartwatch_anim_opa(main_arc, 0, 700, 0);
         }
     }
 }
