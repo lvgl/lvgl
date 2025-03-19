@@ -252,6 +252,7 @@ static void wifi_connect_ui(lv_demo_high_res_ctx_t * c)
     c->wifi_connect_ui_active = true;
 
     lv_obj_t * kb = lv_keyboard_create(c->api.base_obj);
+    lv_obj_add_style(kb, &c->fonts[FONT_LABEL_SM], 0);
     lv_obj_add_event_cb(kb, wifi_connect_ui_keyboard_event_cb, LV_EVENT_READY, c);
     lv_obj_add_event_cb(kb, wifi_connect_ui_keyboard_event_cb, LV_EVENT_CANCEL, c);
 
