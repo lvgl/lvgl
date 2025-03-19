@@ -268,6 +268,34 @@ int32_t lv_image_get_scale_x(lv_obj_t * obj);
 int32_t lv_image_get_scale_y(lv_obj_t * obj);
 
 /**
+ * Get the width of an image before any transformations.
+ * @param obj Pointer to an image object.
+ * @return The width of the image.
+ */
+int32_t lv_image_get_width(lv_obj_t* obj);
+
+/**
+ * Get the height of an image before any transformations.
+ * @param obj Pointer to an image object.
+ * @return The height of the image.
+ */
+int32_t lv_image_get_height(lv_obj_t* obj);
+
+/**
+ * Get the scaled width of an image object.
+ * @param obj Pointer to an image object.
+ * @return The scaled width of the image.
+ */
+int32_t lv_image_get_scaled_width(lv_obj_t* obj);
+
+/**
+ * Get the scaled height of an image object.
+ * @param obj Pointer to an image object.
+ * @return The scaled height of the image.
+ */
+int32_t lv_image_get_scaled_height(lv_obj_t* obj);
+
+/**
  * Get the current blend mode of the image
  * @param obj       pointer to an image object
  * @return          the current blend mode

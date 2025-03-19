@@ -531,6 +531,58 @@ int32_t lv_image_get_scale_y(lv_obj_t * obj)
     return img->scale_y;
 }
 
+int32_t lv_image_get_width(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_image_t * img = (lv_image_t *)obj;
+    update_align(obj);
+    
+    return img->w;
+}
+
+int32_t lv_image_get_height(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    
+    lv_image_t * img = (lv_image_t *)obj;
+    update_align(obj);
+    
+    return img->h;
+}
+
+int32_t lv_image_get_scaled_width(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    
+    lv_image_t * img = (lv_image_t *)obj;
+    update_align(obj);
+    
+    lv_point_t pivot_px;
+    lv_image_get_pivot(obj, &pivot_px);
+
+    lv_area_t a;
+    lv_image_buf_get_transformed_area(&a, img->w, img->h, img->rotation, img->scale_x, img->scale_y, &pivot_px);
+
+    return lv_area_get_width(&a);
+}
+
+int32_t lv_image_get_scaled_height(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    
+    lv_image_t * img = (lv_image_t *)obj;
+    update_align(obj);
+
+    lv_point_t pivot_px;
+    lv_image_get_pivot(obj, &pivot_px);
+
+    lv_area_t a;
+    lv_image_buf_get_transformed_area(&a, img->w, img->h, img->rotation, img->scale_x, img->scale_y, &pivot_px);
+
+    return lv_area_get_height(&a);
+}
+
 lv_blend_mode_t lv_image_get_blend_mode(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
