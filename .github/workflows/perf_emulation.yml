@@ -10,10 +10,6 @@ concurrency:
   group: ${{ github.ref }}-${{ github.workflow }} 
   cancel-in-progress: true
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
   check_scripts:
     runs-on: ubuntu-24.04
@@ -23,8 +19,6 @@ jobs:
       matrix: 
         test_script:
           - scripts/perf/tests/filter_docker_logs/test.sh
-          - scripts/perf/tests/benchmark_results_comment/test.sh
-          - scripts/perf/tests/serialize_results/test.sh
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,7 +26,6 @@ jobs:
           fetch-depth: 0
       - name: Check Script
         run: |
-          pip3 install msgpack==1.1.0
           ./${{ matrix.test_script }}
 
   run_benchmark:
@@ -80,83 +73,22 @@ jobs:
       - name: Upload Results
         uses: actions/upload-artifact@v4
         with:
-          name: results-${{matrix.image_type}}-${{matrix.config}}.json
+          name: results-${{matrix.image_type}}-${{matrix.config}}
           path: results-${{matrix.image_type}}-${{matrix.config}}.json
           if-no-files-found: error
 
-
-  check_results:
+  save_pr_number:
     runs-on: ubuntu-24.04
+    if: ${{ github.event_name == 'pull_request' }}
+    name: ARM Emulated Benchmark - Save PR Number
     needs: run_benchmark
-    name: ARM Emulated Benchmark - Check Results
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: actions/download-artifact@v4
-        with:
-          merge-multiple: true
-
-      - name: Collect 'master' Results
-        uses: robinraju/release-downloader@v1
-        continue-on-error: true # The release may not exist yet
-        with:
-          preRelease: true
-          tag: emulated-benchmark-latest
-          fileName: results*.mpk
-
-      - name: Prepare Comment
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Save PR number 
         run: |
-          pip3 install msgpack==1.1.0
-          if ls results*.mpk 1> /dev/null 2>&1; then
-            python3 scripts/perf/benchmark_results_comment.py \
-              --previous results*.mpk \
-              --new results*.json \
-              --output comment.md
-          else
-            echo "No previous results found, generating comment without comparison."
-            python3 scripts/perf/benchmark_results_comment.py \
-              --new results*.json \
-              --output comment.md
-          fi          
-          
-      - name: Comment PR
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: actions/github-script@v7
+          echo ${{ github.event.number }} > pr_number
+
+      - name: Upload PR number as artifact
+        uses: actions/upload-artifact@v4
         with:
-          script: |
-            const fs = require('fs');
-            const path = 'comment.md';
-
-            if (!fs.existsSync(path)) {
-              throw new Error('Error: comment.md not found! Exiting.');
-            }
-
-            const commentBody = fs.readFileSync(path, 'utf8').trim();
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: commentBody
-            });
-
-      - name: Serialize Results
-        if: endsWith(github.ref, 'master') == true
-        run: |
-          pip3 install msgpack==1.1.0
-          mkdir input output
-          mv results* input
-          python scripts/perf/serialize_results.py --input input --output output --commit-hash ${{ github.sha }}
-
-      - name: Store Results in Benchmark Release
-        if: endsWith(github.ref, 'master') == true
-        uses: softprops/action-gh-release@v2
-        with:
-          name: Emulated Benchmark Latest
-          files: output/results*.mpk
-          tag_name: emulated-benchmark-latest
-          prerelease: true
+          name: pr_number
+          path: pr_number
