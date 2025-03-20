@@ -25,7 +25,8 @@ where there are no memory constraints.
 Usage
 *****
 
-The Test module can be enabled by ``LV_USE_TEST``, and it consists of the following components:
+The Test module can be enabled by configuring ``LV_USE_TEST`` to a non-zero value,
+and it consists of the following components:
 
 - Helpers
 - Display emulation
@@ -36,7 +37,7 @@ Helpers
 -------
 
 Time
-^^^^
+~~~~
 
 To emulate elapsed time, two functions can be used:
 
@@ -50,7 +51,7 @@ widget coordinates are recalculated.
 :cpp:expr:`lv_refr_now(NULL)` can also be called manually to force LVGL to refresh the emulated display.
 
 Memory Usage
-^^^^^^^^^^^^
+~~~~~~~~~~~~
 
 If ``LV_USE_STDLIB_MALLOC`` is set to ``LV_STDLIB_BUILTIN``, memory usage and memory leaks can be monitored.
 
@@ -79,13 +80,13 @@ It functions like any other normal display, but its content exists only in memor
 When creating this display, the horizontal and vertical resolutions must be passed. Internally,
 a framebuffer will be allocated for this size, and ``XRGB8888`` color format will be set.
 
-The resolution and color format can be changed at any time by calling :cpp:expr:`lv_display_set_resolution` and
-:cpp:expr:`lv_display_set_color_format`.
+The resolution and color format can be changed at any time by calling :cpp:func:`lv_display_set_resolution` and
+:cpp:func:`lv_display_set_color_format`.
 
 Input Device Emulation
 ----------------------
 
-By calling :cpp:expr:`lv_test_indev_create_all`, three test input devices will be created:
+By calling :cpp:func:`lv_test_indev_create_all`, three test input devices will be created:
 
 1. A pointer (for touch or mouse)
 2. A keypad
@@ -103,7 +104,7 @@ For example, this is how a scroll gesture can be emulated:
     lv_test_mouse_release();
     lv_test_wait(20);
 
-It is recommended to add :cpp:expr:`lv_test_wait` after user actions to ensure that
+It is recommended to add :cpp:func:`lv_test_wait` after user actions to ensure that
 the new state and coordinates are read and applied from the input device.
 
 After that, the user can check if the given widget was really scrolled
@@ -116,7 +117,7 @@ by getting the Y coordinate of a child.
     int32_t y_end = lv_obj_get_y(child);
     if(y_start + 100 != y_end) fail();
 
-Please refer to ``lv_test_indev.h`` for the list of supported input device emulation functions.
+Please refer to :ref:`lv_test_indev_h` for the list of supported input device emulation functions.
 
 Screenshot Comparison
 ---------------------
@@ -139,18 +140,20 @@ The reference PNG images should have a **32-bit color format** and match the dis
 
 The test display's content will be converted to ``XRGB8888`` to simplify comparison with the reference images.
 The conversion is supported from the following formats (i.e., the test display should have a color
-format from any of these):
+format in this list):
 
-- :cpp:expr:`LV_COLOR_FORMAT_XRGB8888`
-- :cpp:expr:`LV_COLOR_FORMAT_ARGB8888`
-- :cpp:expr:`LV_COLOR_FORMAT_RGB888`
-- :cpp:expr:`LV_COLOR_FORMAT_RGB565`
-- :cpp:expr:`LV_COLOR_FORMAT_L8`
-- :cpp:expr:`LV_COLOR_FORMAT_AL88`
-- :cpp:expr:`LV_COLOR_FORMAT_I1`
+- :cpp:enumerator:`LV_COLOR_FORMAT_XRGB8888`
+- :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888`
+- :cpp:enumerator:`LV_COLOR_FORMAT_RGB888`
+- :cpp:enumerator:`LV_COLOR_FORMAT_RGB565`
+- :cpp:enumerator:`LV_COLOR_FORMAT_L8`
+- :cpp:enumerator:`LV_COLOR_FORMAT_AL88`
+- :cpp:enumerator:`LV_COLOR_FORMAT_I1`
 
 To read and decode PNG images and to store the converted rendered image, a few MBs of RAM are dynamically allocated using the standard ``malloc``
 (not :cpp:expr:`lv_malloc`).
+
+
 
 API
 ***
