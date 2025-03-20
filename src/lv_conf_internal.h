@@ -701,7 +701,7 @@
     #endif
 #endif
 
-/** Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
+/** Use VG-Lite GPU  */
 #ifndef LV_USE_DRAW_VGLITE
     #ifdef CONFIG_LV_USE_DRAW_VGLITE
         #define LV_USE_DRAW_VGLITE CONFIG_LV_USE_DRAW_VGLITE
@@ -759,14 +759,54 @@
         #endif
     #endif
 
-    /** Enable VGLite error checks. */
-    #ifndef LV_USE_VGLITE_CHECK_ERROR
-        #ifdef CONFIG_LV_USE_VGLITE_CHECK_ERROR
-            #define LV_USE_VGLITE_CHECK_ERROR CONFIG_LV_USE_VGLITE_CHECK_ERROR
+    /** Enable VG-Lite custom external 'gpu_init()' function */
+    #ifndef LV_VGLITE_USE_GPU_INIT
+        #ifdef CONFIG_LV_VGLITE_USE_GPU_INIT
+            #define LV_VGLITE_USE_GPU_INIT CONFIG_LV_VGLITE_USE_GPU_INIT
         #else
-            #define LV_USE_VGLITE_CHECK_ERROR 0
+            #define LV_VGLITE_USE_GPU_INIT 0
         #endif
     #endif
+
+    /** VG-Lite flush commit trigger threshold. GPU will try to batch these many draw tasks. */
+    #ifndef LV_VGLITE_FLUSH_MAX_COUNT
+        #ifdef CONFIG_LV_VGLITE_FLUSH_MAX_COUNT
+            #define LV_VGLITE_FLUSH_MAX_COUNT CONFIG_LV_VGLITE_FLUSH_MAX_COUNT
+        #else
+            #define LV_VGLITE_FLUSH_MAX_COUNT 8
+        #endif
+    #endif
+
+    /** Enable border to simulate shadow.
+     *  NOTE: which usually improves performance,
+     *  but does not guarantee the same rendering quality as the software. */
+    #ifndef LV_VGLITE_USE_BOX_SHADOW
+        #ifdef CONFIG_LV_VGLITE_USE_BOX_SHADOW
+            #define LV_VGLITE_USE_BOX_SHADOW CONFIG_LV_VGLITE_USE_BOX_SHADOW
+        #else
+            #define LV_VGLITE_USE_BOX_SHADOW 0
+        #endif
+    #endif
+
+    /** VG-Lite gradient maximum cache number.
+     *  @note  The memory usage of a single gradient image is 4K bytes. */
+    #ifndef LV_VGLITE_GRAD_CACHE_CNT
+        #ifdef CONFIG_LV_VGLITE_GRAD_CACHE_CNT
+            #define LV_VGLITE_GRAD_CACHE_CNT CONFIG_LV_VGLITE_GRAD_CACHE_CNT
+        #else
+            #define LV_VGLITE_GRAD_CACHE_CNT 32
+        #endif
+    #endif
+
+    /** VG-Lite stroke maximum cache number. */
+    #ifndef LV_VGLITE_STROKE_CACHE_CNT
+        #ifdef CONFIG_LV_VGLITE_STROKE_CACHE_CNT
+            #define LV_VGLITE_STROKE_CACHE_CNT CONFIG_LV_VGLITE_STROKE_CACHE_CNT
+        #else
+            #define LV_VGLITE_STROKE_CACHE_CNT 32
+        #endif
+    #endif
+
 #endif
 
 /** Use NXP's PXP on iMX RTxxx platforms. */
@@ -886,78 +926,6 @@
         #define LV_USE_DRAW_SDL CONFIG_LV_USE_DRAW_SDL
     #else
         #define LV_USE_DRAW_SDL 0
-    #endif
-#endif
-
-/** Use VG-Lite GPU. */
-#ifndef LV_USE_DRAW_VG_LITE
-    #ifdef CONFIG_LV_USE_DRAW_VG_LITE
-        #define LV_USE_DRAW_VG_LITE CONFIG_LV_USE_DRAW_VG_LITE
-    #else
-        #define LV_USE_DRAW_VG_LITE 0
-    #endif
-#endif
-
-#if LV_USE_DRAW_VG_LITE
-    /** Enable VG-Lite custom external 'gpu_init()' function */
-    #ifndef LV_VG_LITE_USE_GPU_INIT
-        #ifdef CONFIG_LV_VG_LITE_USE_GPU_INIT
-            #define LV_VG_LITE_USE_GPU_INIT CONFIG_LV_VG_LITE_USE_GPU_INIT
-        #else
-            #define LV_VG_LITE_USE_GPU_INIT 0
-        #endif
-    #endif
-
-    /** Enable VG-Lite assert. */
-    #ifndef LV_VG_LITE_USE_ASSERT
-        #ifdef CONFIG_LV_VG_LITE_USE_ASSERT
-            #define LV_VG_LITE_USE_ASSERT CONFIG_LV_VG_LITE_USE_ASSERT
-        #else
-            #define LV_VG_LITE_USE_ASSERT 0
-        #endif
-    #endif
-
-    /** VG-Lite flush commit trigger threshold. GPU will try to batch these many draw tasks. */
-    #ifndef LV_VG_LITE_FLUSH_MAX_COUNT
-        #ifdef CONFIG_LV_VG_LITE_FLUSH_MAX_COUNT
-            #define LV_VG_LITE_FLUSH_MAX_COUNT CONFIG_LV_VG_LITE_FLUSH_MAX_COUNT
-        #else
-            #define LV_VG_LITE_FLUSH_MAX_COUNT 8
-        #endif
-    #endif
-
-    /** Enable border to simulate shadow.
-     *  NOTE: which usually improves performance,
-     *  but does not guarantee the same rendering quality as the software. */
-    #ifndef LV_VG_LITE_USE_BOX_SHADOW
-        #ifdef LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_VG_LITE_USE_BOX_SHADOW
-                #define LV_VG_LITE_USE_BOX_SHADOW CONFIG_LV_VG_LITE_USE_BOX_SHADOW
-            #else
-                #define LV_VG_LITE_USE_BOX_SHADOW 0
-            #endif
-        #else
-            #define LV_VG_LITE_USE_BOX_SHADOW 1
-        #endif
-    #endif
-
-    /** VG-Lite gradient maximum cache number.
-     *  @note  The memory usage of a single gradient image is 4K bytes. */
-    #ifndef LV_VG_LITE_GRAD_CACHE_CNT
-        #ifdef CONFIG_LV_VG_LITE_GRAD_CACHE_CNT
-            #define LV_VG_LITE_GRAD_CACHE_CNT CONFIG_LV_VG_LITE_GRAD_CACHE_CNT
-        #else
-            #define LV_VG_LITE_GRAD_CACHE_CNT 32
-        #endif
-    #endif
-
-    /** VG-Lite stroke maximum cache number. */
-    #ifndef LV_VG_LITE_STROKE_CACHE_CNT
-        #ifdef CONFIG_LV_VG_LITE_STROKE_CACHE_CNT
-            #define LV_VG_LITE_STROKE_CACHE_CNT CONFIG_LV_VG_LITE_STROKE_CACHE_CNT
-        #else
-            #define LV_VG_LITE_STROKE_CACHE_CNT 32
-        #endif
     #endif
 #endif
 
@@ -1441,70 +1409,70 @@
 
 /* Use VG-Lite Simulator.
  * - Requires: LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL */
-#ifndef LV_USE_VG_LITE_THORVG
-    #ifdef CONFIG_LV_USE_VG_LITE_THORVG
-        #define LV_USE_VG_LITE_THORVG CONFIG_LV_USE_VG_LITE_THORVG
+#ifndef LV_USE_VGLITE_THORVG
+    #ifdef CONFIG_LV_USE_VGLITE_THORVG
+        #define LV_USE_VGLITE_THORVG CONFIG_LV_USE_VGLITE_THORVG
     #else
-        #define LV_USE_VG_LITE_THORVG  0
+        #define LV_USE_VGLITE_THORVG  0
     #endif
 #endif
 
-#if LV_USE_VG_LITE_THORVG
+#if LV_USE_VGLITE_THORVG
     /** Enable LVGL's blend mode support */
-    #ifndef LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
-        #ifdef CONFIG_LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
-            #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT CONFIG_LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+    #ifndef LV_VGLITE_THORVG_LVGL_BLEND_SUPPORT
+        #ifdef CONFIG_LV_VGLITE_THORVG_LVGL_BLEND_SUPPORT
+            #define LV_VGLITE_THORVG_LVGL_BLEND_SUPPORT CONFIG_LV_VGLITE_THORVG_LVGL_BLEND_SUPPORT
         #else
-            #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT 0
+            #define LV_VGLITE_THORVG_LVGL_BLEND_SUPPORT 0
         #endif
     #endif
 
     /** Enable YUV color format support */
-    #ifndef LV_VG_LITE_THORVG_YUV_SUPPORT
-        #ifdef CONFIG_LV_VG_LITE_THORVG_YUV_SUPPORT
-            #define LV_VG_LITE_THORVG_YUV_SUPPORT CONFIG_LV_VG_LITE_THORVG_YUV_SUPPORT
+    #ifndef LV_VGLITE_THORVG_YUV_SUPPORT
+        #ifdef CONFIG_LV_VGLITE_THORVG_YUV_SUPPORT
+            #define LV_VGLITE_THORVG_YUV_SUPPORT CONFIG_LV_VGLITE_THORVG_YUV_SUPPORT
         #else
-            #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
+            #define LV_VGLITE_THORVG_YUV_SUPPORT 0
         #endif
     #endif
 
     /** Enable Linear gradient extension support */
-    #ifndef LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
-        #ifdef CONFIG_LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
-            #define LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT CONFIG_LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+    #ifndef LV_VGLITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+        #ifdef CONFIG_LV_VGLITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+            #define LV_VGLITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT CONFIG_LV_VGLITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
         #else
-            #define LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT 0
+            #define LV_VGLITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT 0
         #endif
     #endif
 
     /** Enable alignment on 16 pixels */
-    #ifndef LV_VG_LITE_THORVG_16PIXELS_ALIGN
+    #ifndef LV_VGLITE_THORVG_16PIXELS_ALIGN
         #ifdef LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_VG_LITE_THORVG_16PIXELS_ALIGN
-                #define LV_VG_LITE_THORVG_16PIXELS_ALIGN CONFIG_LV_VG_LITE_THORVG_16PIXELS_ALIGN
+            #ifdef CONFIG_LV_VGLITE_THORVG_16PIXELS_ALIGN
+                #define LV_VGLITE_THORVG_16PIXELS_ALIGN CONFIG_LV_VGLITE_THORVG_16PIXELS_ALIGN
             #else
-                #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 0
+                #define LV_VGLITE_THORVG_16PIXELS_ALIGN 0
             #endif
         #else
-            #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 1
+            #define LV_VGLITE_THORVG_16PIXELS_ALIGN 1
         #endif
     #endif
 
     /** Buffer address alignment */
-    #ifndef LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
-        #ifdef CONFIG_LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
-            #define LV_VG_LITE_THORVG_BUF_ADDR_ALIGN CONFIG_LV_VG_LITE_THORVG_BUF_ADDR_ALIGN
+    #ifndef LV_VGLITE_THORVG_BUF_ADDR_ALIGN
+        #ifdef CONFIG_LV_VGLITE_THORVG_BUF_ADDR_ALIGN
+            #define LV_VGLITE_THORVG_BUF_ADDR_ALIGN CONFIG_LV_VGLITE_THORVG_BUF_ADDR_ALIGN
         #else
-            #define LV_VG_LITE_THORVG_BUF_ADDR_ALIGN 64
+            #define LV_VGLITE_THORVG_BUF_ADDR_ALIGN 64
         #endif
     #endif
 
     /** Enable multi-thread render */
-    #ifndef LV_VG_LITE_THORVG_THREAD_RENDER
-        #ifdef CONFIG_LV_VG_LITE_THORVG_THREAD_RENDER
-            #define LV_VG_LITE_THORVG_THREAD_RENDER CONFIG_LV_VG_LITE_THORVG_THREAD_RENDER
+    #ifndef LV_VGLITE_THORVG_THREAD_RENDER
+        #ifdef CONFIG_LV_VGLITE_THORVG_THREAD_RENDER
+            #define LV_VGLITE_THORVG_THREAD_RENDER CONFIG_LV_VGLITE_THORVG_THREAD_RENDER
         #else
-            #define LV_VG_LITE_THORVG_THREAD_RENDER 0
+            #define LV_VGLITE_THORVG_THREAD_RENDER 0
         #endif
     #endif
 #endif
@@ -1559,7 +1527,7 @@
     #endif
 #endif
 
-/** Align VG_LITE buffers on this number of bytes.
+/** Align VGLITE buffers on this number of bytes.
  *  @note  vglite_src_buf_aligned() uses this value to validate alignment of passed buffer pointers. */
 #ifndef LV_ATTRIBUTE_MEM_ALIGN_SIZE
     #ifdef LV_KCONFIG_PRESENT

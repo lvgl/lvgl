@@ -49,7 +49,7 @@
     #include "draw/nema_gfx/lv_draw_nema_gfx.h"
 #endif
 #if LV_USE_DRAW_VGLITE
-    #include "draw/nxp/vglite/lv_draw_vglite.h"
+    #include "draw/vglite/lv_draw_vglite.h"
 #endif
 #if LV_USE_PXP
     #if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
@@ -64,9 +64,6 @@
 #endif
 #if LV_USE_DRAW_SDL
     #include "draw/sdl/lv_draw_sdl.h"
-#endif
-#if LV_USE_DRAW_VG_LITE
-    #include "draw/vg_lite/lv_draw_vg_lite.h"
 #endif
 #if LV_USE_DRAW_DMA2D
     #include "draw/dma2d/lv_draw_dma2d.h"
