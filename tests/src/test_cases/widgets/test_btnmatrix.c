@@ -1,7 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
 #include "../../lvgl_private.h"
-#include "lv_test_indev.h"
 #include "unity/unity.h"
 
 static lv_obj_t * active_screen = NULL;
@@ -393,7 +392,7 @@ void test_button_matrix_pressing_event_works(void)
      * This is done to increase code coverage. */
     btnmObj->btn_id_sel = 3;
     /* Send a dummy lv_indev_t object as param to avoid crashing during build. */
-    lv_obj_send_event(btnm, LV_EVENT_PRESSING, lv_test_mouse_indev);
+    lv_obj_send_event(btnm, LV_EVENT_PRESSING, lv_test_indev_get_indev(LV_INDEV_TYPE_POINTER));
     TEST_ASSERT_TRUE(event_triggered);
 }
 

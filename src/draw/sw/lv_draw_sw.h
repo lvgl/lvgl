@@ -28,6 +28,7 @@ extern "C" {
 #include "../lv_draw_line.h"
 #include "../lv_draw_arc.h"
 #include "lv_draw_sw_utils.h"
+#include "blend/lv_draw_sw_blend.h"
 
 /*********************
  *      DEFINES
@@ -154,6 +155,32 @@ void lv_draw_sw_transform(const lv_area_t * dest_area, const void * src_buf,
 void lv_draw_sw_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc);
 #endif
 
+/**
+ * Register a custom blend handler for a color format.
+ * Handler will be called when blending a color or an
+ * image to a buffer with the given color format.
+ * At most one handler can be registered for a color format.
+ * Subsequent registrations will overwrite the previous handler.
+ *
+ * @param handler pointer to a blend handler
+ * @return true if the handler was registered, false if the handler could not be registered
+ */
+bool lv_draw_sw_register_blend_handler(lv_draw_sw_custom_blend_handler_t * handler);
+
+/**
+ * Unregister a custom blend handler for a color format.
+ * @param dest_cf color format
+ * @return true if a handler was unregistered, false if no handler was registered
+ */
+bool lv_draw_sw_unregister_blend_handler(lv_color_format_t dest_cf);
+
+/**
+ * Get the blend handler for a color format.
+ * @param dest_cf color format
+ * @return pointer to the blend handler or NULL if no handler is registered
+ */
+lv_draw_sw_blend_handler_t lv_draw_sw_get_blend_handler(lv_color_format_t dest_cf);
+
 /***********************
  * GLOBAL VARIABLES
  ***********************/
@@ -161,8 +188,6 @@ void lv_draw_sw_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc
 /**********************
  *      MACROS
  **********************/
-
-#include "blend/lv_draw_sw_blend.h"
 
 #endif /*LV_USE_DRAW_SW*/
 

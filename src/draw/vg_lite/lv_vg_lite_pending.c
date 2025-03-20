@@ -31,6 +31,8 @@ struct _lv_vg_lite_pending_t {
  *  STATIC PROTOTYPES
  **********************/
 
+static inline void lv_vg_lite_pending_array_clear(lv_vg_lite_pending_t * pending, lv_array_t * arr);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -82,29 +84,36 @@ void lv_vg_lite_pending_add(lv_vg_lite_pending_t * pending, void * obj)
 void lv_vg_lite_pending_remove_all(lv_vg_lite_pending_t * pending)
 {
     LV_ASSERT_NULL(pending);
+
+    lv_vg_lite_pending_array_clear(pending, &pending->arr_1);
+    lv_vg_lite_pending_array_clear(pending, &pending->arr_2);
+}
+
+void lv_vg_lite_pending_swap(lv_vg_lite_pending_t * pending)
+{
+    pending->arr_act = (pending->arr_act == &pending->arr_1) ? &pending->arr_2 : &pending->arr_1;
+    lv_vg_lite_pending_array_clear(pending, pending->arr_act);
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static inline void lv_vg_lite_pending_array_clear(lv_vg_lite_pending_t * pending, lv_array_t * arr)
+{
     LV_ASSERT_NULL(pending->free_cb);
 
-    uint32_t size = lv_array_size(pending->arr_act);
+    uint32_t size = lv_array_size(arr);
     if(size == 0) {
         return;
     }
 
     /* remove all the pending objects */
     for(uint32_t i = 0; i < size; i++) {
-        pending->free_cb(lv_array_at(pending->arr_act, i), pending->user_data);
+        pending->free_cb(lv_array_at(arr, i), pending->user_data);
     }
 
-    lv_array_clear(pending->arr_act);
+    lv_array_clear(arr);
 }
-
-void lv_vg_lite_pending_swap(lv_vg_lite_pending_t * pending)
-{
-    lv_vg_lite_pending_remove_all(pending);
-    pending->arr_act = (pending->arr_act == &pending->arr_1) ? &pending->arr_2 : &pending->arr_1;
-}
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
 
 #endif /*LV_USE_DRAW_VG_LITE*/

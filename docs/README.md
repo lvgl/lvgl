@@ -3,15 +3,17 @@
 
 ## Building
 
-Building the documentation is pretty easy to do but it does have some requirements that have to be filled prior to building them.
-
-Here are the requirements:
+Building the documentation is easy.  Here are the requirements:
 
 * Doxygen
 * Python >= 3.10
 * C compiler (gcc, msvc, clang, etc...)
 
-There are also some Python specific libraries that need to be installed. You can either install these individually or you can use pip to read the requirements file to install everything that is needed for Python.
+Once Python is installed
+
+    pip install -r requirements.txt
+
+will install all the prerequisite packages:
 
 * Sphinx
 * breathe
@@ -32,37 +34,68 @@ There are also some Python specific libraries that need to be installed. You can
 * sphinx-reredirects
 * dirsync
 
-To install using the `requirements.txt` file use the following command:
+Now you are ready to build the documentation:
 
-    pip install -r requirements.txt
+    python build.py html
 
-Once you have all of the requirements installed you are ready to build the documentation.  Use the following command:
+or if you are on a Unix like OS:
 
-    python build.py skip_latex clean
+    python3 build.py html
 
-You may have to use the following command if you are on a Unix like OS
+Intermediate files are prepared in `./docs/intermediate/` and the final documentation will appear in `./docs/build/html/`.  (Both of these directories can be overridden using environment variables.  See documentation in `build.py` for details.)
 
-    python3 build.py skip_latex clean
+If the list of document source files has changed (names or paths):
 
-The documentation will be output into `./out_html/` in the root directory for LVGL.
+    python build.py clean html
+
+Will remove the old intermediate and build files and regenerate new ones matching the new structure.
+
+To see a list of options available:
+
+    python build.py
+
+Read the docstring for `build.py` for detailed documentation on each option.
 
 
 ## For Developers
 
-The most important thing that has to be done when contributing to LVGL is ***EVERYTHING MUST BE DOCUMENTED***.
+One of our firm policies is ***EVERYTHING MUST BE DOCUMENTED***.
 
-The below are some rules to follow when updating any of the `.rst` files located in the `./docs/` directory and any of it's subdirectories.
+The below are some rules to follow when updating any of the `.rst` files located in the `./docs/src/` directory tree.
 
 
 ### What to Name Your `.rst` File
 
-The documentation-generation logic uses the stem of the file name (i.e. "event" from file name "event.rst") and compares this with code-element names found by Doxygen.  If a match is found, then it appends hyperlinks to the API pages that contain those code elements (names of macros, enum/struct/union types, variables, namespaces, typedefs and functions).
+The directory structure under the `./docs/src/` directory, and the filenames of the `.rst` files govern the eventual URLs that are generated in the HTML output.  These directories are organized so as to reflect the nature of the content.  Example:  the `.rst` files under `./docs/src/intro` contain introductory material—detailed reference material would not go there, but instead in an appropriate subdirectory of `./docs/src/details/`.  It is expected that the content and location of any new documents added would be in alignment with this directory structure, and placed and named according to their content.  Additionally, to be linked into the eventual generated documentation, the stem of the new filename would need to appear in at least one (normally *only one*) `.. toctree::` directive, normally in an `index.rst` file in the directory where it will appear in the table of contents (TOC).
 
-If this is appropriate for the .RST file you are creating, ensure the stem of the file name matches the beginning part of the code-element name you want it to be associated with.
+Other than that, there are no restrictions on filenames.  Previous linking of filenames to generated API links has been removed and replaced by a better scheme.  For sake of illustration, let's say you are creating (or enhancing) documentation related to the `lv_scale_t` data type (one of the LVGL Widgets):  if you want the doc-build logic to generate appropriate links to LVGL API pages, place an API section at the end of your document (it must be at the end) like this:
 
-If this is *not* appropriate for the .RST file you are creating, ensure the stem of the file name DOES NOT match any code-element names found in the LVGL header files under the ./src/ directory.
+```rst
+API
+***
+```
 
-In alignment with the above, use a file name stem that is appropriate to the topic being covered.
+and then, if you want the API-link-generation logic to generate hyperlinks to API pages based on an ***exact, case-sensitive string match*** with specific C symbols, follow it with a reStructuredText comment using this syntax:
+
+```rst
+.. API equals: lv_scale_t, lv_scale_create
+```
+
+What follows the colon is a comma- or space-separated list of exact C symbols documented somewhere in the `lvgl/src/` directory.  If the list is long, it can be wrapped to subsequent lines, though continuation lines must be all indented at the same level.  The list ends with the first blank line after this pseudo-directive.
+
+If you instead want the API-link-generation logic to simply include links to code that ***starts with a specific string*** use this syntax instead.  The format of the list is the same as for `.. API equals:`:
+
+```rst
+.. API startswith: lv_scale, lv_obj_set_style
+```
+
+You can also manually link to API pages, in which case the API-link-generation logic will see that you have already added links and will not repeat them.
+
+```rst
+:ref:`lv_scale_h`
+```
+
+Note that the period before the `h` is replaced with an underscore (`_`).  The naming of this reference (`lv_scale_h`) will generate a hyperlink to the documentation extracted by Doxygen from the `lvgl/src/widgets/scale/lv_scale.h` file.
 
 
 ### Text Format
@@ -224,7 +257,7 @@ To create a bulleted list, do the following:
       lines to align with item text like this.
     - If you want to include a code block under a list item,
       it must be intended to align with the list item like this:
-
+    
       .. code-block: python
                                  <=== blank line here is important
           # this is some code
@@ -275,5 +308,4 @@ For such examples, simply use reStructuredText literal markup like this:
     ``lv_obj_set_layout((lv_obj_t *)widget, LV_LAYOUT_FLEX)``
     ``lv_obj_set_layout(&widget, LV_LAYOUT_FLEX);``
     ``lv_obj_set_layout(widget, ...)``
-
 

@@ -17,7 +17,7 @@ env:
 jobs:
   build-and-deploy:
     if: github.repository == 'lvgl/lvgl'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     concurrency: docs-build-and-deploy
     steps:
       - name: Checkout
@@ -28,7 +28,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - name: Cache Python packages
         uses: actions/cache@v4
         with:
@@ -66,30 +66,30 @@ jobs:
       - name: Build docs
         run: docs/build.py html
       - name: Remove .doctrees
-        run: rm -rf docs/output/html/.doctrees
+        run: rm -rf docs/build/html/.doctrees
       - name: Retrieve version
         run: |
           echo "::set-output name=VERSION_NAME::$(scripts/find_version.sh)"
         id: version
       - name: Deploy to subfolder
-        uses: JamesIves/github-pages-deploy-action@v4.7.2
+        uses: JamesIves/github-pages-deploy-action@v4.7.3
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
           repository-name: lvgl/docs
           branch: gh-pages # The branch the action should deploy to.
-          folder: docs/output/html  # The folder the action should deploy.
+          folder: docs/build/html  # The folder the action should deploy.
           target-folder: ${{ steps.version.outputs.VERSION_NAME }}
           git-config-name: lvgl-bot
           git-config-email: lvgl-bot@users.noreply.github.com
           single-commit: true
       - name: Deploy to master
         if: github.ref == 'refs/heads/master'
-        uses: JamesIves/github-pages-deploy-action@v4.7.2
+        uses: JamesIves/github-pages-deploy-action@v4.7.3
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
           repository-name: lvgl/docs
           branch: gh-pages # The branch the action should deploy to.
-          folder: docs/output/html  # The folder the action should deploy.
+          folder: docs/build/html  # The folder the action should deploy.
           target-folder: master
           git-config-name: lvgl-bot
           git-config-email: lvgl-bot@users.noreply.github.com

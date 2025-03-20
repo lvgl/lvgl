@@ -109,7 +109,7 @@ d2_u32 lv_draw_dave2d_lv_colour_fmt_to_d2_fmt(lv_color_format_t colour_format)
             d2_lvgl_mode = d2_mode_i4;
             break;
         case(LV_COLOR_FORMAT_I8):
-            d2_lvgl_mode = d2_mode_i4;
+            d2_lvgl_mode = d2_mode_i8;
             break;
         case(LV_COLOR_FORMAT_A8):
             d2_lvgl_mode = d2_mode_alpha8;

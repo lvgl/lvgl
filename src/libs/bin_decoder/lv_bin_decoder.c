@@ -131,7 +131,7 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
         res = lv_fs_read(&dsc->file, header, sizeof(lv_image_header_t), &rn);
 
         if(res != LV_FS_RES_OK || rn != sizeof(lv_image_header_t)) {
-            LV_LOG_WARN("Read file header failed: %d", res);
+            LV_LOG_WARN("Read file header failed: %d with len: %" LV_PRIu32 ", expected: %zu", res, rn, sizeof(lv_image_header_t));
             return LV_RESULT_INVALID;
         }
 
@@ -593,7 +593,7 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
 
         res = fs_read_file_at(f, sizeof(lv_image_header_t), (uint8_t *)palette, palette_len, &rn);
         if(res != LV_FS_RES_OK || rn != palette_len) {
-            LV_LOG_WARN("Read palette failed: %d", res);
+            LV_LOG_WARN("Read palette failed: %d, with len: %" LV_PRIu32 ", expected: %" LV_PRIu32, res, rn, palette_len);
             lv_free((void *)palette);
             return LV_RESULT_INVALID;
         }
@@ -621,7 +621,7 @@ static lv_result_t decode_indexed(lv_image_decoder_t * decoder, lv_image_decoder
         data_len -= data_offset;
         res = fs_read_file_at(f, data_offset, (uint8_t *)indexed_data, data_len, &rn);
         if(res != LV_FS_RES_OK || rn != data_len) {
-            LV_LOG_WARN("Read indexed image failed: %d", res);
+            LV_LOG_WARN("Read indexed image failed: %d, with len: %" LV_PRIu32 ", expected: %" LV_PRIu32, res, rn, data_len);
             goto exit_with_buf;
         }
 #endif
@@ -744,7 +744,7 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
         uint32_t palette_len = sizeof(lv_color32_t) * LV_COLOR_INDEXED_PALETTE_SIZE(cf);
         res = fs_read_file_at(f, sizeof(lv_image_header_t), data, palette_len, &rn);
         if(res != LV_FS_RES_OK || rn != palette_len) {
-            LV_LOG_WARN("Read palette failed: %d", res);
+            LV_LOG_WARN("Read palette failed: %d, with len: %" LV_PRIu32 ", expected: %" LV_PRIu32, res, rn, palette_len);
             lv_draw_buf_destroy(decoded);
             return LV_RESULT_INVALID;
         }
@@ -762,7 +762,7 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
         data += palette_len;
         res = fs_read_file_at(f, data_offset, data, data_len, &rn);
         if(res != LV_FS_RES_OK || rn != data_len) {
-            LV_LOG_WARN("Read indexed image failed: %d", res);
+            LV_LOG_WARN("Read indexed image failed: %d, with len: %" LV_PRIu32 ", expected: %" LV_PRIu32, res, rn, data_len);
             lv_draw_buf_destroy(decoded);
             return LV_RESULT_INVALID;
         }
@@ -803,7 +803,7 @@ static lv_result_t decode_rgb(lv_image_decoder_t * decoder, lv_image_decoder_dsc
     uint32_t rn;
     res = fs_read_file_at(f, sizeof(lv_image_header_t), img_data, len, &rn);
     if(res != LV_FS_RES_OK || rn != len) {
-        LV_LOG_WARN("Read rgb file failed: %d", res);
+        LV_LOG_WARN("Read rgb file failed: %d, with len: %" LV_PRIu32 ", expected: %" LV_PRIu32, res, rn, len);
         lv_draw_buf_destroy(decoded);
         return LV_RESULT_INVALID;
     }
@@ -866,7 +866,7 @@ static lv_result_t decode_alpha_only(lv_image_decoder_t * decoder, lv_image_deco
     else if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         res = fs_read_file_at(decoder_data->f, sizeof(lv_image_header_t), img_data, file_len, &rn);
         if(res != LV_FS_RES_OK || rn != file_len) {
-            LV_LOG_WARN("Read header failed: %d", res);
+            LV_LOG_WARN("Read header failed: %d, with len: %" LV_PRIu32 ", expected: %" LV_PRIu32, res, rn, file_len);
             lv_draw_buf_destroy(decoded);
             return LV_RESULT_INVALID;
         }
@@ -938,7 +938,7 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
         len = 12;
         fs_res = fs_read_file_at(f, sizeof(lv_image_header_t), compressed, len, &rn);
         if(fs_res != LV_FS_RES_OK || rn != len) {
-            LV_LOG_WARN("Read compressed header failed: %d", fs_res);
+            LV_LOG_WARN("Read compressed header failed: %d, with len: %" LV_PRIu32 ", expected: %" LV_PRIu32, fs_res, rn, len);
             return LV_RESULT_INVALID;
         }
 
@@ -957,7 +957,8 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
         /*Continue to read the compressed data following compression header*/
         fs_res = lv_fs_read(f, file_buf, compressed_len, &rn);
         if(fs_res != LV_FS_RES_OK || rn != compressed_len) {
-            LV_LOG_WARN("Read compressed file failed: %d", fs_res);
+            LV_LOG_WARN("Read compressed file failed: %d, with len: %" LV_PRIu32 ", expected: %" LV_PRIu32, fs_res, rn,
+                        compressed_len);
             lv_free(file_buf);
             return LV_RESULT_INVALID;
         }

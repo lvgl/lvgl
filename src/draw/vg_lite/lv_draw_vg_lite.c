@@ -79,7 +79,7 @@ void lv_draw_vg_lite_init(void)
 #endif
     lv_vg_lite_path_init(unit);
     lv_vg_lite_decoder_init();
-    lv_draw_vg_lite_label_init(&unit->base_unit);
+    lv_draw_vg_lite_label_init(unit);
 }
 
 void lv_draw_vg_lite_deinit(void)
@@ -198,7 +198,7 @@ static int32_t draw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     }
 
     /* Try to get an ready to draw. */
-    lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL, VG_LITE_DRAW_UNIT_ID);
+    lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, VG_LITE_DRAW_UNIT_ID);
 
     /* Return 0 is no selection, some tasks can be supported by other units. */
     if(!t || t->preferred_draw_unit_id != VG_LITE_DRAW_UNIT_ID) {
@@ -294,6 +294,7 @@ static int32_t draw_delete(lv_draw_unit_t * draw_unit)
 #endif
     lv_vg_lite_path_deinit(unit);
     lv_vg_lite_decoder_deinit();
+    lv_draw_vg_lite_label_deinit(unit);
     return 1;
 }
 

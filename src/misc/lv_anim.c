@@ -121,11 +121,12 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
         /*Do not let two animations for the same 'var' with the same 'exec_cb'*/
         if(a->exec_cb || a->custom_exec_cb) remove_concurrent_anims(new_anim);
 
+        new_anim->current_value = new_anim->path_cb(new_anim);
         if(new_anim->exec_cb) {
-            new_anim->exec_cb(new_anim->var, new_anim->start_value);
+            new_anim->exec_cb(new_anim->var, new_anim->current_value);
         }
         if(new_anim->custom_exec_cb) {
-            new_anim->custom_exec_cb(new_anim, new_anim->start_value);
+            new_anim->custom_exec_cb(new_anim, new_anim->current_value);
         }
     }
 
@@ -524,8 +525,8 @@ void lv_anim_resume(lv_anim_t * a)
     LV_ASSERT_NULL(a);
     a->is_paused = false;
     a->pause_duration = 0;
+    a->run_round = state.anim_run_round;
 }
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -543,7 +544,6 @@ static void anim_timer(lv_timer_t * param)
     state.anim_run_round = state.anim_run_round ? false : true;
 
     lv_anim_t * a = lv_ll_get_head(anim_ll_p);
-
     while(a != NULL) {
         uint32_t elaps = lv_tick_elaps(a->last_timer_run);
 
@@ -555,6 +555,7 @@ static void anim_timer(lv_timer_t * param)
                 const uint32_t pause_overrun = time_paused - a->pause_duration;
                 a->is_paused = false;
                 a->act_time += pause_overrun;
+                a->run_round = !state.anim_run_round;
             }
         }
         else {
@@ -570,7 +571,6 @@ static void anim_timer(lv_timer_t * param)
 
         if(!a->is_paused && a->run_round != state.anim_run_round) {
             a->run_round = state.anim_run_round; /*The list readying might be reset so need to know which anim has run already*/
-
             /*The animation will run now for the first time. Call `start_cb`*/
             if(!a->start_cb_called && a->act_time >= 0) {
 

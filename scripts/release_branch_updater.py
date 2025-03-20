@@ -47,7 +47,11 @@ def main():
     for url in urls:
         print(LOG, "working with port:", url)
 
-        subprocess.check_call(("git", "clone", url, port_clone_tmpdir))
+        if dry_run:
+            port_clone_tmpdir = url[len("https://github.com/lvgl/"): ]
+            print("port_clone_tmpdir: " + port_clone_tmpdir)
+
+        subprocess.run(("git", "clone", url, port_clone_tmpdir))
 
         port_release_branches, port_default_branch = get_release_branches(port_clone_tmpdir)
         print(LOG, "port release branches:", ", ".join(fmt_release(br) for br in port_release_branches) or "(none)")
@@ -78,7 +82,7 @@ def main():
             # the closest minor of the same major.
             if port_branch in port_release_branches:
                 print(LOG, "... this port has a matching release branch.")
-                subprocess.check_call(("git", "-C", port_clone_tmpdir, "branch", "--track",
+                subprocess.run(("git", "-C", port_clone_tmpdir, "branch", "--track",
                                        fmt_release(port_branch),
                                        f"origin/{fmt_release(port_branch)}"))
             elif port_branch != port_default_branch:
@@ -100,9 +104,11 @@ def main():
 
                 print(LOG, f"... creating the new branch {fmt_release(port_branch)} "
                                              f"from {fmt_release(create_from)}")
-                subprocess.check_call(("git", "-C", port_clone_tmpdir, "branch",
+                res = subprocess.run(("git", "-C", port_clone_tmpdir, "branch",
                                        fmt_release(port_branch),   # new branch name
                                        fmt_release(create_from)))  # start point
+
+                if res.returncode != 0: continue
 
                 port_release_branches.append(port_branch)
                 port_release_branches.sort()
@@ -112,14 +118,17 @@ def main():
             subprocess.check_call(("git", "-C", port_clone_tmpdir, "checkout", fmt_release(port_branch)))
 
             # update the submodule in the port if it exists
-            out = subprocess.check_output(("git", "-C", port_clone_tmpdir, "config", "--file",
-                                           ".gitmodules", "--get-regexp", "path"))
-            port_lvgl_submodule_path = next((
-                line.partition("lvgl.path ")[2]
-                for line
-                in out.decode().strip().splitlines()
-                if "lvgl.path " in line
-            ), None)
+            port_lvgl_submodule_path = None
+            if os.path.exists(os.path.join(port_clone_tmpdir, ".gitmodules")): 
+                out = subprocess.check_output(("git", "-C", port_clone_tmpdir, "config", "--file",
+                                               ".gitmodules", "--get-regexp", "path"))
+                port_lvgl_submodule_path = next((
+                    line.partition("lvgl.path ")[2]
+                    for line
+                    in out.decode().strip().splitlines()
+                    if "lvgl.path " in line
+                ), None)
+
             if port_lvgl_submodule_path is None:
                 print(LOG, "this port has no LVGL submodule")
             else:
@@ -186,19 +195,20 @@ def main():
                               + (" lv_conf.h." if port_lv_conf_h_was_updated else "")
                              )
                 print(LOG, f"commit message: '{commit_msg}'")
-                subprocess.check_call(("git", "-C", port_clone_tmpdir, "commit", "-m", commit_msg))
+                subprocess.check_call(("git", "-C", port_clone_tmpdir, "commit", "--allow-empty", "-m", commit_msg))
                 if dry_run:
                     print(LOG, "this is a dry run so nothing will be pushed")
                 else:
                     subprocess.check_call(("git", "-C", port_clone_tmpdir, "push",
-                                           *(("-u", "origin") if port_does_not_have_the_branch else ()),
-                                           fmt_release(port_branch),
+                                           *(("-u",) if port_does_not_have_the_branch else ()),
+                                           "origin", fmt_release(port_branch),
                                           ))
                     print(LOG, "the changes were pushed.")
             else:
                 print(LOG, "nothing to push for this release. it is up to date.")
 
-        shutil.rmtree(port_clone_tmpdir)
+        if not dry_run:
+            shutil.rmtree(port_clone_tmpdir)
 
         print(LOG, "port update complete:", url)
 

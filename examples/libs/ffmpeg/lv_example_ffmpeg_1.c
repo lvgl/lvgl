@@ -7,6 +7,9 @@
  */
 void lv_example_ffmpeg_1(void)
 {
+    /*It always uses the LVGL filesystem abstraction (not the OS filesystem)
+     *to open the image, unlike `lv_ffmpeg_player_set_src` which depends on
+     *the setting of `LV_FFMPEG_PLAYER_USE_LV_FS`.*/
     lv_obj_t * img = lv_image_create(lv_screen_active());
     lv_image_set_src(img, "./lvgl/examples/libs/ffmpeg/ffmpeg.png");
     lv_obj_center(img);

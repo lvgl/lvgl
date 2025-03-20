@@ -604,6 +604,7 @@
             #define LV_USE_DRAW_SW_COMPLEX_GRADIENTS    0
         #endif
     #endif
+
 #endif
 
 /*Use TSi's aka (Think Silicon) NemaGFX */
@@ -775,6 +776,51 @@
             #define LV_USE_PXP_ASSERT CONFIG_LV_USE_PXP_ASSERT
         #else
             #define LV_USE_PXP_ASSERT 0
+        #endif
+    #endif
+#endif
+
+/** Use NXP's G2D on MPU platforms. */
+#ifndef LV_USE_DRAW_G2D
+    #ifdef CONFIG_LV_USE_DRAW_G2D
+        #define LV_USE_DRAW_G2D CONFIG_LV_USE_DRAW_G2D
+    #else
+        #define LV_USE_DRAW_G2D 0
+    #endif
+#endif
+
+#if LV_USE_DRAW_G2D
+    /** Maximum number of buffers that can be stored for G2D draw unit.
+     *  Includes the frame buffers and assets. */
+    #ifndef LV_G2D_HASH_TABLE_SIZE
+        #ifdef CONFIG_LV_G2D_HASH_TABLE_SIZE
+            #define LV_G2D_HASH_TABLE_SIZE CONFIG_LV_G2D_HASH_TABLE_SIZE
+        #else
+            #define LV_G2D_HASH_TABLE_SIZE 50
+        #endif
+    #endif
+
+    #if LV_USE_OS
+        /** Use additional draw thread for G2D processing.*/
+        #ifndef LV_USE_G2D_DRAW_THREAD
+            #ifdef LV_KCONFIG_PRESENT
+                #ifdef CONFIG_LV_USE_G2D_DRAW_THREAD
+                    #define LV_USE_G2D_DRAW_THREAD CONFIG_LV_USE_G2D_DRAW_THREAD
+                #else
+                    #define LV_USE_G2D_DRAW_THREAD 0
+                #endif
+            #else
+                #define LV_USE_G2D_DRAW_THREAD 1
+            #endif
+        #endif
+    #endif
+
+    /** Enable G2D asserts. */
+    #ifndef LV_USE_G2D_ASSERT
+        #ifdef CONFIG_LV_USE_G2D_ASSERT
+            #define LV_USE_G2D_ASSERT CONFIG_LV_USE_G2D_ASSERT
+        #else
+            #define LV_USE_G2D_ASSERT 0
         #endif
     #endif
 #endif
@@ -1265,6 +1311,15 @@
         #define LV_USE_OBJ_ID CONFIG_LV_USE_OBJ_ID
     #else
         #define LV_USE_OBJ_ID           0
+    #endif
+#endif
+
+/**  Enable support widget names*/
+#ifndef LV_USE_OBJ_NAME
+    #ifdef CONFIG_LV_USE_OBJ_NAME
+        #define LV_USE_OBJ_NAME CONFIG_LV_USE_OBJ_NAME
+    #else
+        #define LV_USE_OBJ_NAME         0
     #endif
 #endif
 
@@ -3503,6 +3558,27 @@
 #endif
 
 #endif
+
+/** Enable emulated input devices, time emulation, and screenshot compares. */
+#ifndef LV_USE_TEST
+    #ifdef CONFIG_LV_USE_TEST
+        #define LV_USE_TEST CONFIG_LV_USE_TEST
+    #else
+        #define LV_USE_TEST 0
+    #endif
+#endif
+#if LV_USE_TEST
+
+/** Enable `lv_test_screenshot_compare`.
+ * Requires libpng and a few MB of extra RAM. */
+#ifndef LV_USE_TEST_SCREENSHOT_COMPARE
+    #ifdef CONFIG_LV_USE_TEST_SCREENSHOT_COMPARE
+        #define LV_USE_TEST_SCREENSHOT_COMPARE CONFIG_LV_USE_TEST_SCREENSHOT_COMPARE
+    #else
+        #define LV_USE_TEST_SCREENSHOT_COMPARE 0
+    #endif
+#endif
+#endif /*LV_USE_TEST*/
 
 /** Enable loading XML UIs runtime */
 #ifndef LV_USE_XML

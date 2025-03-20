@@ -69,7 +69,7 @@ const lv_obj_class_t lv_keyboard_class = {
     .instance_size = sizeof(lv_keyboard_t),
     .editable = 1,
     .base_class = &lv_buttonmatrix_class,
-    .name = "keyboard",
+    .name = "lv_keyboard",
 #if LV_USE_OBJ_PROPERTY
     .prop_index_start = LV_PROPERTY_KEYBOARD_START,
     .prop_index_end = LV_PROPERTY_KEYBOARD_END,

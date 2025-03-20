@@ -35,14 +35,14 @@ const lv_obj_class_t lv_tileview_class = {
     .constructor_cb = lv_tileview_constructor,
     .base_class = &lv_obj_class,
     .instance_size = sizeof(lv_tileview_t),
-    .name = "tileview",
+    .name = "lv_tileview",
 };
 
 const lv_obj_class_t lv_tileview_tile_class = {
     .constructor_cb = lv_tileview_tile_constructor,
     .base_class = &lv_obj_class,
     .instance_size = sizeof(lv_tileview_tile_t),
-    .name = "tile",
+    .name = "lv_tile",
 };
 
 /**********************

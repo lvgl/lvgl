@@ -78,7 +78,7 @@ const lv_obj_class_t lv_scale_class  = {
     .instance_size = sizeof(lv_scale_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .base_class = &lv_obj_class,
-    .name = "scale",
+    .name = "lv_scale",
 };
 
 /**********************
@@ -442,7 +442,7 @@ int32_t lv_scale_get_major_tick_every(lv_obj_t * obj)
     return scale->major_tick_every;
 }
 
-lv_scale_mode_t lv_scale_get_rotation(lv_obj_t * obj)
+int32_t lv_scale_get_rotation(lv_obj_t * obj)
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
     return scale->rotation;
@@ -786,6 +786,12 @@ static void scale_draw_label(lv_obj_t * obj, lv_event_t * event, lv_draw_label_d
     }
     else {
         lv_draw_label(layer, label_dsc, &label_coords);
+    }
+
+    if(label_dsc->text_local) {
+        /* clear the reference to the text buffer on the stack */
+        label_dsc->text = NULL;
+        label_dsc->text_local = false;
     }
 }
 

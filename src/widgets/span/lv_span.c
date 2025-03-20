@@ -85,7 +85,7 @@ const lv_obj_class_t lv_spangroup_class  = {
     .instance_size = sizeof(lv_spangroup_t),
     .width_def = LV_SIZE_CONTENT,
     .height_def = LV_SIZE_CONTENT,
-    .name = "span",
+    .name = "lv_span",
 };
 
 /**********************

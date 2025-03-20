@@ -157,7 +157,7 @@ const lv_obj_class_t lv_textarea_class = {
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .instance_size = sizeof(lv_textarea_t),
     .base_class = &lv_obj_class,
-    .name = "textarea",
+    .name = "lv_textarea",
 #if LV_USE_OBJ_PROPERTY
     .prop_index_start = LV_PROPERTY_TEXTAREA_START,
     .prop_index_end = LV_PROPERTY_TEXTAREA_END,

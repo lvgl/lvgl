@@ -69,10 +69,14 @@ struct lv_indev_gesture {
 
 };
 
+/* Recognizer configuration. It stores the thresholds needed to detect the gestures and
+ * consider them as recognized. Once recognized, indev start sending LV_GESTURE event
+ */
 struct lv_indev_gesture_configuration {
 
-    float pinch_up_threshold;           /* When the gesture reaches the threshold - start sending events */
-    float pinch_down_threshold;         /* When the gesture reaches the threshold - start sending events */
+    float pinch_up_threshold;           /* Threshold for the pinch up gesture to be recognized - in pixels */
+    float pinch_down_threshold;         /* Threshold for the pinch down gesture to be recognized - in pixels */
+    float rotation_angle_rad_threshold; /* Threshold for the rotation gesture to be recognized - in radians */
 
 };
 

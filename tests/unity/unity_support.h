@@ -8,10 +8,6 @@ extern "C" {
 
 #include <stdbool.h>
 #include "../../lvgl.h"
-#include "../src/lv_test_helpers.h"
-
-bool lv_test_assert_image_eq(const char * fn_ref);
-
 
 #if LV_COLOR_DEPTH != 32
 #  define TEST_ASSERT_EQUAL_SCREENSHOT(path)                TEST_IGNORE_MESSAGE("Requires LV_COLOR_DEPTH 32");
@@ -21,14 +17,14 @@ bool lv_test_assert_image_eq(const char * fn_ref);
 #  define TEST_ASSERT_EQUAL_SCREENSHOT(path)                if(LV_HOR_RES != 800 || LV_VER_RES != 480) {          \
         TEST_IGNORE_MESSAGE("Requires 800x480 resolution"); \
     } else {                                              \
-        TEST_ASSERT_MESSAGE(lv_test_assert_image_eq(path), path);            \
+        TEST_ASSERT_MESSAGE(lv_test_screenshot_compare(path), path);            \
     }
 
 #  define TEST_ASSERT_EQUAL_SCREENSHOT_MESSAGE(path, msg)    if(LV_HOR_RES != 800 || LV_VER_RES != 480) {             \
         TEST_PRINTF(msg);                                       \
         TEST_IGNORE_MESSAGE("Requires 800x480 resolution");     \
     } else {                                                  \
-        TEST_ASSERT_MESSAGE(lv_test_assert_image_eq(path), msg);  \
+        TEST_ASSERT_MESSAGE(lv_test_screenshot_compare(path), msg);  \
     }
 #endif
 

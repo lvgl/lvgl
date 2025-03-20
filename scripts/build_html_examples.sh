@@ -16,4 +16,4 @@ emcmake cmake .. -DLVGL_CHOSEN_DEMO=lv_example_noop -DCMAKE_C_COMPILER_LAUNCHER=
 emmake make -j$(nproc)
 rm -rf CMakeFiles
 cd ../..
-cp -a emscripten_builder/cmbuild docs/_static/built_lv_examples
+cp -a emscripten_builder/cmbuild docs/src/_static/built_lv_examples

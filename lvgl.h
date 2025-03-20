@@ -96,6 +96,7 @@ extern "C" {
 #include "src/others/font_manager/lv_font_manager.h"
 #include "src/others/xml/lv_xml.h"
 #include "src/others/xml/lv_xml_component.h"
+#include "src/others/test/lv_test.h"
 
 #include "src/libs/barcode/lv_barcode.h"
 #include "src/libs/bin_decoder/lv_bin_decoder.h"
