@@ -52,5 +52,5 @@ Example
 API
 ***
 
-:ref:`qrcodegen_h`
+.. API startswith:  lv_qrcode_
 
