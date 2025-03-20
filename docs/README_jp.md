@@ -12,7 +12,7 @@
   <h1 align="center">Light and Versatile Graphics Library</h1>
   <br>
 <div align="center">
-  <img src="https://github.com/kisvegabor/test/raw/master/smartwatch_demo.gif">
+  <img src="https://raw.githubusercontent.com/kisvegabor/test/master/smartwatch_demo.gif">
   &nbsp;
   <img border="1px" src="https://lvgl.io/github-assets/widgets-demo.gif">
 </div>
@@ -54,7 +54,7 @@ LVGL LLC では、グラフィックデザイン、UI実装、コンサルティ
 **フリー & 移植可能**
   - 外部依存関係がなく、完全に移植可能な Cライブラリ。(C++互換)
   - 任意の(RT)OS、任意のMCU・MPU用にコンパイル可能。
-  - 電子ペーパー、OLEDディスプレイ、TFTディスプレイ、白黒ディスプレイ、モニターに対応。 [Porting Guide](https://docs.lvgl.io/master/details/integration/adding-lvgl-to-your-project/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)
+  - 電子ペーパー、OLEDディスプレイ、TFTディスプレイ、白黒ディスプレイ、モニターに対応。 [Porting Guide](docs-lvgl-io.translate.goog/master/details/integration/adding-lvgl-to-your-project/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)
   - MITライセンスにより商用利用可能。
   - システム要件：RAM 32KB、Flash 128KB、フレームバッファ、レンダリング用に1/10以上のスクリーンサイズのバッファ。
   - OS、外部メモリ、GPUもサポート。

@@ -19,7 +19,7 @@
 </h1>
 
 <div align="center">
-  <img src="https://github.com/kisvegabor/test/raw/master/smartwatch_demo.gif">
+  <img src="https://raw.githubusercontent.com/kisvegabor/test/master/smartwatch_demo.gif">
   &nbsp;
   <img border="1px" src="https://lvgl.io/github-assets/widgets-demo.gif">
 </div>
@@ -72,7 +72,7 @@
 -  全部由C编写完成，并支持C++调用
 -  支持Micropython编程，参见：[LVGL API in Micropython](https://blog.lvgl.io/2019-02-20/micropython-bindings)
 -  支持[模拟器](https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html) 仿真，可以无硬件依托进行开发
--  丰富详实的[例程](https://github.com/lvgl/lvgl/tree/master/examples) 
+-  丰富详实的[例程](https://github.com/lvgl/lvgl/tree/master/examples)
 -  详尽的[文档](http://docs.lvgl.io/) 以及API参考手册，可线上查阅或可下载为PDF格式
 
 ### 硬件要求
@@ -124,11 +124,11 @@ LVGL本身并不依赖特定的硬件平台，任何满足LVGL硬件配置要求
 -  STM32F1, STM32F3, STM32F4, STM32F7, STM32L4, STM32L5, STM32H7
 -  Microchip dsPIC33, PIC24, PIC32MX, PIC32MZ
 -  [Linux frame buffer](https://blog.lvgl.io/2018-01-03/linux_fb) (/dev/fb)
--  [Espressif ESP32](https://github.com/lvgl/lv_port_esp32) 
--  [Infineon Aurix](https://github.com/lvgl/lv_port_aurix) 
+-  [Espressif ESP32](https://github.com/lvgl/lv_port_esp32)
+-  [Infineon Aurix](https://github.com/lvgl/lv_port_aurix)
 -  Nordic NRF52 Bluetooth modules
 -  Quectel modems
--  [SYNWIT SWM341](https://www.synwit.cn/) 
+-  [SYNWIT SWM341](https://www.synwit.cn/)
 
 LVGL也支持：
 - [Arduino library](https://docs.lvgl.io/master/details/integration/framework/arduino.html)
@@ -144,7 +144,7 @@ LVGL也支持：
 ## 如何入门
 
 请按照如下顺序来学习LVGL：
-1. 使用[网页在线例程](https://lvgl.io/demos) 来体验LVGL（3分钟） 
+1. 使用[网页在线例程](https://lvgl.io/demos) 来体验LVGL（3分钟）
 2. 阅读文档[简介](https://docs.lvgl.io/master/intro/introduction.html)章节来初步了解LVGL（5分钟）
 3. 再来阅读一下文档快速[快速概览](https://docs.lvgl.io/master/intro/getting_started.html)章节来了解LVGL的基本知识（15分钟）
 4. 学习如何使用[模拟器](https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html)来在电脑上仿真LVGL（10分钟）

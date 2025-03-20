@@ -21,7 +21,7 @@ A última versão estável está disponível na branch [release/v8.3](https://gi
   <h1 align="center">LVGL - Biblioteca gráfica leve e versátil</h1>
   <br>
 <div align="center">
-  <img src="https://github.com/kisvegabor/test/raw/master/smartwatch_demo.gif">
+  <img src="https://raw.githubusercontent.com/kisvegabor/test/master/smartwatch_demo.gif">
   &nbsp;
   <img border="1px" src="https://lvgl.io/github-assets/widgets-demo.gif">
 </div>
