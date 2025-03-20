@@ -339,7 +339,7 @@ slider.set_style_shadow_spread(2, lv.PART.KNOB)
 
 ### Textos em inglês, hebraico (LRT-RTL misto) e chinês
 
-![Textos em inglês, hebraico (LRT-RTL misto) e chinês com LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_4.png)
+![Textos em inglês, hebraico (LRT-RTL misto) e chinês com LVGL](https://raw.githubusercontent.com/kisvegabor/test/master/readme_example_5.png)
 
 <details>
   <summary>Código C</summary>
