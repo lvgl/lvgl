@@ -609,12 +609,14 @@ static bool apply_mask(const lv_draw_image_dsc_t * draw_dsc)
 
     lv_result_t decoder_res = lv_image_decoder_open(&mask_decoder_dsc, draw_dsc->bitmap_mask_src, NULL);
     if(decoder_res != LV_RESULT_OK || mask_decoder_dsc.decoded == NULL) {
+        if(decoder_res == LV_RESULT_OK) lv_image_decoder_close(&mask_decoder_dsc);
         LV_LOG_WARN("Could open the mask. The mask is not applied.");
         return true;
     }
 
     if(mask_decoder_dsc.decoded->header.cf != LV_COLOR_FORMAT_A8 &&
        mask_decoder_dsc.decoded->header.cf != LV_COLOR_FORMAT_L8) {
+        lv_image_decoder_close(&mask_decoder_dsc);
         LV_LOG_WARN("The mask image is not A8/L8 format. The mask is not applied.");
         return true;
 
@@ -635,7 +637,10 @@ static bool apply_mask(const lv_draw_image_dsc_t * draw_dsc)
     /*Only the intersection of the mask and image needs to be rendered
      *If if there is no intersection there is nothing to render as the image is out of the mask.*/
     lv_area_t masked_area;
-    if(!lv_area_intersect(&masked_area, &mask_area, &image_area)) return false;
+    if(!lv_area_intersect(&masked_area, &mask_area, &image_area)) {
+        lv_image_decoder_close(&mask_decoder_dsc);
+        return false;
+    }
 
     /*Clear the sides if any*/
     lv_area_t side_area = {0};
