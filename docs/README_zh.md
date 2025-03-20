@@ -162,7 +162,7 @@ LVGL也支持：
 
 ### Button with Click Event
 
-![Button with Click Event](https://github.com/kisvegabor/test/raw/master/readme_example_2.gif)
+![Button with Click Event](https://raw.githubusercontent.com/kisvegabor/test/master/readme_example_2.gif)
 
 <details>
   <summary>C code</summary>
@@ -214,7 +214,7 @@ label.center()
 
 
 ### Checkboxes with Layout
-![Checkboxes with layout in LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_3.gif)
+![Checkboxes with layout in LVGL](https://raw.githubusercontent.com/kisvegabor/test/master/readme_example_3.gif)
 
 <details>
   <summary>C code</summary>
@@ -291,7 +291,7 @@ cb.add_event(event_handler, lv.EVENT.ALL, None)
 
 
 ### Styling a Slider
-![Styling a slider with LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_4.gif)
+![Styling a slider with LVGL](https://raw.githubusercontent.com/kisvegabor/test/master/readme_example_4.gif)
 
 
 <details>
@@ -380,7 +380,7 @@ slider.set_style_shadow_spread(2, lv.PART.KNOB)
 
 ### English, Hebrew (mixed LRT-RTL) and Chinese texts
 
-![English, Hebrew and Chinese texts with LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_4.png)
+![English, Hebrew and Chinese texts with LVGL](https://raw.githubusercontent.com/kisvegabor/test/master/readme_example_4.gif)
 
 <details>
   <summary>C code</summary>
