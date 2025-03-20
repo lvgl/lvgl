@@ -9,7 +9,7 @@
 
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_DRAW_VG_LITE && LV_USE_VG_LITE_THORVG
+#if LV_USE_DRAW_VGLITE && LV_USE_VGLITE_THORVG
 
 #include <math.h>
 #include <string.h>
@@ -60,7 +60,7 @@ vg_lite_error_t vg_lite_identity(vg_lite_matrix_t * matrix)
     matrix->angle   = 0.0f;
 #endif /* VG_SW_BLIT_PRECISION_OPT */
 
-    return VG_LITE_SUCCESS;
+    return VGLITE_SUCCESS;
 }
 
 static void multiply(vg_lite_matrix_t * matrix, vg_lite_matrix_t * mult)
@@ -100,7 +100,7 @@ vg_lite_error_t vg_lite_translate(vg_lite_float_t x, vg_lite_float_t y, vg_lite_
     /* Multiply with current matrix. */
     multiply(matrix, &t);
 
-    return VG_LITE_SUCCESS;
+    return VGLITE_SUCCESS;
 }
 
 vg_lite_error_t vg_lite_scale(vg_lite_float_t scale_x, vg_lite_float_t scale_y, vg_lite_matrix_t * matrix)
@@ -121,7 +121,7 @@ vg_lite_error_t vg_lite_scale(vg_lite_float_t scale_x, vg_lite_float_t scale_y, 
     matrix->scaleY = matrix->scaleY * scale_y;
 #endif /* VG_SW_BLIT_PRECISION_OPT */
 
-    return VG_LITE_SUCCESS;
+    return VGLITE_SUCCESS;
 }
 
 vg_lite_error_t vg_lite_rotate(vg_lite_float_t degrees, vg_lite_matrix_t * matrix)
@@ -152,11 +152,11 @@ vg_lite_error_t vg_lite_rotate(vg_lite_float_t degrees, vg_lite_matrix_t * matri
     }
 #endif /* VG_SW_BLIT_PRECISION_OPT */
 
-    return VG_LITE_SUCCESS;
+    return VGLITE_SUCCESS;
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*LV_USE_VG_LITE_THORVG*/
+#endif /*LV_USE_VGLITE_THORVG*/

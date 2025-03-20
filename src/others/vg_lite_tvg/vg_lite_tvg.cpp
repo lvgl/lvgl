@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "../../lv_conf_internal.h"
-#if LV_USE_DRAW_VG_LITE && LV_USE_VG_LITE_THORVG
+#if LV_USE_DRAW_VGLITE && LV_USE_VGLITE_THORVG
 
 #include "vg_lite.h"
 #include "../../lvgl.h"
@@ -19,7 +19,7 @@
 #include <thread>
 #include <vector>
 
-#if LV_VG_LITE_THORVG_YUV_SUPPORT
+#if LV_VGLITE_THORVG_YUV_SUPPORT
     #include <libyuv/convert_argb.h>
 #endif
 
@@ -29,7 +29,7 @@
 
 #define TVG_CANVAS_ENGINE CanvasEngine::Sw
 #define TVG_COLOR(COLOR) B(COLOR), G(COLOR), R(COLOR), A(COLOR)
-#define TVG_IS_VG_FMT_SUPPORT(fmt) ((fmt) == VG_LITE_BGRA8888 || (fmt) == VG_LITE_BGRX8888)
+#define TVG_IS_VG_FMT_SUPPORT(fmt) ((fmt) == VGLITE_BGRA8888 || (fmt) == VGLITE_BGRX8888)
 
 #define TVG_CHECK_RETURN_VG_ERROR(FUNC)                               \
     do {                                                              \
@@ -51,10 +51,10 @@
 /* clang-format off */
 
 #define IS_INDEX_FMT(fmt)           \
-    ((fmt) == VG_LITE_INDEX_1       \
-     || (fmt) == VG_LITE_INDEX_2 \
-     || (fmt) == VG_LITE_INDEX_4 \
-     || (fmt) == VG_LITE_INDEX_8)
+    ((fmt) == VGLITE_INDEX_1       \
+     || (fmt) == VGLITE_INDEX_2 \
+     || (fmt) == VGLITE_INDEX_4 \
+     || (fmt) == VGLITE_INDEX_8)
 
 #define VLC_GET_ARG(CUR, INDEX) vlc_get_arg((cur + (INDEX) * fmt_len), path->format);
 #define VLC_GET_OP_CODE(ptr) (*((uint8_t*)ptr))
@@ -74,17 +74,17 @@
 #define CLAMP(x, min, max) (((x) < (min)) ? (min) : ((x) > (max)) ? (max) : (x))
 #define COLOR_FROM_RAMP(ColorRamp) (((vg_lite_float_t*)ColorRamp) + 1)
 
-#define VG_LITE_RETURN_ERROR(func)         \
-    if ((error = func) != VG_LITE_SUCCESS) \
+#define VGLITE_RETURN_ERROR(func)         \
+    if ((error = func) != VGLITE_SUCCESS) \
         return error
 
-#define VG_LITE_ALIGN(number, align_bytes) \
+#define VGLITE_ALIGN(number, align_bytes) \
     (((number) + ((align_bytes)-1)) & ~((align_bytes)-1))
 
-#define VG_LITE_IS_ALIGNED(num, align) (((uintptr_t)(num) & ((align)-1)) == 0)
+#define VGLITE_IS_ALIGNED(num, align) (((uintptr_t)(num) & ((align)-1)) == 0)
 
-#define VG_LITE_IS_ALPHA_FORMAT(format) \
-    ((format) == VG_LITE_A8 || (format) == VG_LITE_A4)
+#define VGLITE_IS_ALPHA_FORMAT(format) \
+    ((format) == VGLITE_A8 || (format) == VGLITE_A4)
 
 /* clang-format on */
 
@@ -163,7 +163,7 @@ class vg_lite_ctx
             : target_buffer { nullptr }
             , tvg_target_buffer { nullptr }
             , target_px_size { 0 }
-            , target_format { VG_LITE_BGRA8888 }
+            , target_format { VGLITE_BGRA8888 }
             , scissor_rect { 0, 0, 0, 0 }
             , scissor_is_set { false }
             , clut_2colors { 0 }
@@ -218,16 +218,16 @@ class vg_lite_ctx
         const vg_lite_uint32_t * get_CLUT(vg_lite_buffer_format_t format)
         {
             switch(format) {
-                case VG_LITE_INDEX_1:
+                case VGLITE_INDEX_1:
                     return clut_2colors;
 
-                case VG_LITE_INDEX_2:
+                case VGLITE_INDEX_2:
                     return clut_2colors;
 
-                case VG_LITE_INDEX_4:
+                case VGLITE_INDEX_4:
                     return clut_4colors;
 
-                case VG_LITE_INDEX_8:
+                case VGLITE_INDEX_8:
                     return clut_256colors;
 
                 default:
@@ -518,42 +518,42 @@ extern "C" {
 
     vg_lite_error_t vg_lite_allocate(vg_lite_buffer_t * buffer)
     {
-        if(buffer->format == VG_LITE_RGBA8888_ETC2_EAC && (buffer->width % 16 || buffer->height % 4)) {
-            return VG_LITE_INVALID_ARGUMENT;
+        if(buffer->format == VGLITE_RGBA8888_ETC2_EAC && (buffer->width % 16 || buffer->height % 4)) {
+            return VGLITE_INVALID_ARGUMENT;
         }
 
         /* Reset planar. */
         buffer->yuv.uv_planar = buffer->yuv.v_planar = buffer->yuv.alpha_planar = 0;
 
         /* Align height in case format is tiled. */
-        if(buffer->format >= VG_LITE_YUY2 && buffer->format <= VG_LITE_NV16) {
-            buffer->height = VG_LITE_ALIGN(buffer->height, 4);
-            buffer->yuv.swizzle = VG_LITE_SWIZZLE_UV;
+        if(buffer->format >= VGLITE_YUY2 && buffer->format <= VGLITE_NV16) {
+            buffer->height = VGLITE_ALIGN(buffer->height, 4);
+            buffer->yuv.swizzle = VGLITE_SWIZZLE_UV;
         }
 
-        if(buffer->format >= VG_LITE_YUY2_TILED && buffer->format <= VG_LITE_AYUY2_TILED) {
-            buffer->height = VG_LITE_ALIGN(buffer->height, 4);
-            buffer->tiled = VG_LITE_TILED;
-            buffer->yuv.swizzle = VG_LITE_SWIZZLE_UV;
+        if(buffer->format >= VGLITE_YUY2_TILED && buffer->format <= VGLITE_AYUY2_TILED) {
+            buffer->height = VGLITE_ALIGN(buffer->height, 4);
+            buffer->tiled = VGLITE_TILED;
+            buffer->yuv.swizzle = VGLITE_SWIZZLE_UV;
         }
 
         vg_lite_uint32_t mul, div, align;
         get_format_bytes(buffer->format, &mul, &div, &align);
-        vg_lite_uint32_t stride = VG_LITE_ALIGN((buffer->width * mul / div), align);
+        vg_lite_uint32_t stride = VGLITE_ALIGN((buffer->width * mul / div), align);
 
         buffer->stride = stride;
 
         /* Size must be multiple of align, See: https://en.cppreference.com/w/c/memory/aligned_alloc */
-        size_t size = VG_LITE_ALIGN(buffer->height * stride, LV_VG_LITE_THORVG_BUF_ADDR_ALIGN);
+        size_t size = VGLITE_ALIGN(buffer->height * stride, LV_VGLITE_THORVG_BUF_ADDR_ALIGN);
 #ifndef _WIN32
-        buffer->memory = aligned_alloc(LV_VG_LITE_THORVG_BUF_ADDR_ALIGN, size);
+        buffer->memory = aligned_alloc(LV_VGLITE_THORVG_BUF_ADDR_ALIGN, size);
 #else
-        buffer->memory = _aligned_malloc(size, LV_VG_LITE_THORVG_BUF_ADDR_ALIGN);
+        buffer->memory = _aligned_malloc(size, LV_VGLITE_THORVG_BUF_ADDR_ALIGN);
 #endif
         LV_ASSERT(buffer->memory);
         buffer->address = (vg_lite_uint32_t)(uintptr_t)buffer->memory;
         buffer->handle = buffer->memory;
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_free(vg_lite_buffer_t * buffer)
@@ -565,7 +565,7 @@ extern "C" {
         _aligned_free(buffer->memory);
 #endif
         memset(buffer, 0, sizeof(vg_lite_buffer_t));
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_upload_buffer(vg_lite_buffer_t * buffer, vg_lite_uint8_t * data[3], vg_lite_uint32_t stride[3])
@@ -573,7 +573,7 @@ extern "C" {
         LV_UNUSED(buffer);
         LV_UNUSED(data);
         LV_UNUSED(stride);
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_map(vg_lite_buffer_t * buffer, vg_lite_map_flag_t flag, int32_t fd)
@@ -581,13 +581,13 @@ extern "C" {
         LV_UNUSED(buffer);
         LV_UNUSED(flag);
         LV_UNUSED(fd);
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_unmap(vg_lite_buffer_t * buffer)
     {
         LV_UNUSED(buffer);
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_clear(vg_lite_buffer_t * target, vg_lite_rectangle_t * rectangle, vg_lite_color_t color)
@@ -601,7 +601,7 @@ extern "C" {
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(TVG_COLOR(color)));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(shape)));
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_blit(vg_lite_buffer_t * target,
@@ -622,7 +622,7 @@ extern "C" {
         TVG_CHECK_RETURN_VG_ERROR(picture->blend(blend_method_conv(blend)));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(picture)));
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_blit2(vg_lite_buffer_t * target,
@@ -634,15 +634,15 @@ extern "C" {
                                   vg_lite_filter_t filter)
     {
         if(!vg_lite_query_feature(gcFEATURE_BIT_VG_DOUBLE_IMAGE)) {
-            return VG_LITE_NOT_SUPPORT;
+            return VGLITE_NOT_SUPPORT;
         }
 
         vg_lite_error_t error;
 
-        VG_LITE_RETURN_ERROR(vg_lite_blit(target, source0, matrix0, blend, 0, filter));
-        VG_LITE_RETURN_ERROR(vg_lite_blit(target, source1, matrix1, blend, 0, filter));
+        VGLITE_RETURN_ERROR(vg_lite_blit(target, source0, matrix0, blend, 0, filter));
+        VGLITE_RETURN_ERROR(vg_lite_blit(target, source1, matrix1, blend, 0, filter));
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_blit_rect(vg_lite_buffer_t * target,
@@ -668,14 +668,14 @@ extern "C" {
         TVG_CHECK_RETURN_VG_ERROR(picture->composite(std::move(shape), CompositeMethod::ClipPath));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(picture)));
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_init(int32_t tessellation_width, int32_t tessellation_height)
     {
         LV_UNUSED(tessellation_width);
         LV_UNUSED(tessellation_height);
-#if LV_VG_LITE_THORVG_THREAD_RENDER
+#if LV_VGLITE_THORVG_THREAD_RENDER
         /* Threads Count */
         auto threads = std::thread::hardware_concurrency();
         if(threads > 0) {
@@ -685,13 +685,13 @@ extern "C" {
 
         /* Initialize ThorVG Engine */
         TVG_CHECK_RETURN_VG_ERROR(Initializer::init(TVG_CANVAS_ENGINE, 0));
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_close(void)
     {
         TVG_CHECK_RETURN_VG_ERROR(Initializer::term(TVG_CANVAS_ENGINE));
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     static void picture_bgra8888_to_bgr565(vg_color16_t * dest, const vg_color32_t * src, vg_lite_uint32_t px_size)
@@ -788,7 +788,7 @@ extern "C" {
         vg_lite_ctx * ctx = vg_lite_ctx::get_instance();
 
         if(ctx->canvas->draw() == Result::InsufficientCondition) {
-            return VG_LITE_SUCCESS;
+            return VGLITE_SUCCESS;
         }
 
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->sync());
@@ -799,53 +799,53 @@ extern "C" {
 
         /* If target_buffer is not in a format supported by thorvg, software conversion is required. */
         switch(ctx->target_format) {
-            case VG_LITE_BGR565:
+            case VGLITE_BGR565:
                 picture_bgra8888_to_bgr565(
                     (vg_color16_t *)ctx->target_buffer,
                     (const vg_color32_t *)ctx->get_temp_target_buffer(),
                     ctx->target_px_size);
                 break;
-            case VG_LITE_BGRA5658:
+            case VGLITE_BGRA5658:
                 picture_bgra8888_to_bgra5658(
                     (vg_color16_alpha_t *)ctx->target_buffer,
                     (const vg_color32_t *)ctx->get_temp_target_buffer(),
                     ctx->target_px_size);
                 break;
-            case VG_LITE_BGR888:
+            case VGLITE_BGR888:
                 picture_bgra8888_to_bgr888(
                     (vg_color24_t *)ctx->target_buffer,
                     (const vg_color32_t *)ctx->get_temp_target_buffer(),
                     ctx->target_px_size);
                 break;
-            case VG_LITE_L8:
+            case VGLITE_L8:
                 picture_bgra8888_to_l8(
                     (uint8_t *)ctx->target_buffer,
                     (const vg_color32_t *)ctx->get_temp_target_buffer(),
                     ctx->target_px_size);
                 break;
-            case VG_LITE_A8:
+            case VGLITE_A8:
                 picture_bgra8888_to_alpha8(
                     (uint8_t *)ctx->target_buffer,
                     (const vg_color32_t *)ctx->get_temp_target_buffer(),
                     ctx->target_px_size);
                 break;
-            case VG_LITE_BGRA5551:
+            case VGLITE_BGRA5551:
                 picture_bgra8888_to_bgra5551((vg_color_bgra5551_t *)ctx->target_buffer,
                                              (const vg_color32_t *)ctx->get_temp_target_buffer(),
                                              ctx->target_px_size);
                 break;
-            case VG_LITE_BGRA4444:
+            case VGLITE_BGRA4444:
                 picture_bgra8888_to_bgra4444((vg_color_bgra4444_t *)ctx->target_buffer,
                                              (const vg_color32_t *)ctx->get_temp_target_buffer(),
                                              ctx->target_px_size);
                 break;
-            case VG_LITE_BGRA2222:
+            case VGLITE_BGRA2222:
                 picture_bgra8888_to_bgra2222((vg_color_bgra2222_t *)ctx->target_buffer,
                                              (const vg_color32_t *)ctx->get_temp_target_buffer(),
                                              ctx->target_px_size);
                 break;
-            case VG_LITE_BGRA8888:
-            case VG_LITE_BGRX8888:
+            case VGLITE_BGRA8888:
+            case VGLITE_BGRX8888:
                 /* No conversion required. */
                 break;
             default:
@@ -859,7 +859,7 @@ extern "C" {
         ctx->tvg_target_buffer = nullptr;
         ctx->target_px_size = 0;
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_flush(void)
@@ -885,7 +885,7 @@ extern "C" {
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(TVG_COLOR(color)));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(shape)));
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_set_stroke(vg_lite_path_t * path,
@@ -899,7 +899,7 @@ extern "C" {
                                        vg_lite_color_t color)
     {
         if(!path || line_width <= 0) {
-            return VG_LITE_INVALID_ARGUMENT;
+            return VGLITE_INVALID_ARGUMENT;
         }
 
         if(miter_limit < 1.0f) {
@@ -910,7 +910,7 @@ extern "C" {
             path->stroke = (vg_lite_stroke_t *)lv_malloc_zeroed(sizeof(vg_lite_stroke_t));
 
             if(!path->stroke) {
-                return VG_LITE_OUT_OF_RESOURCES;
+                return VGLITE_OUT_OF_RESOURCES;
             }
         }
 
@@ -924,34 +924,34 @@ extern "C" {
         path->stroke->pattern_count = pattern_count;
         path->stroke->dash_phase = dash_phase;
         path->stroke_color = color;
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_update_stroke(vg_lite_path_t * path)
     {
         LV_UNUSED(path);
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_set_path_type(vg_lite_path_t * path, vg_lite_path_type_t path_type)
     {
         if(!path ||
-           (path_type != VG_LITE_DRAW_FILL_PATH &&
-            path_type != VG_LITE_DRAW_STROKE_PATH &&
-            path_type != VG_LITE_DRAW_FILL_STROKE_PATH)
+           (path_type != VGLITE_DRAW_FILL_PATH &&
+            path_type != VGLITE_DRAW_STROKE_PATH &&
+            path_type != VGLITE_DRAW_FILL_STROKE_PATH)
           )
-            return VG_LITE_INVALID_ARGUMENT;
+            return VGLITE_INVALID_ARGUMENT;
 
         path->path_type = path_type;
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_get_register(vg_lite_uint32_t address, vg_lite_uint32_t * result)
     {
         LV_UNUSED(address);
         LV_UNUSED(result);
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_get_info(vg_lite_info_t * info)
@@ -960,7 +960,7 @@ extern "C" {
         info->header_version = VGLITE_HEADER_VERSION;
         info->release_version = VGLITE_RELEASE_VERSION;
         info->reserved = 0;
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_uint32_t vg_lite_get_product_info(char * name, vg_lite_uint32_t * chip_id, vg_lite_uint32_t * chip_rev)
@@ -987,19 +987,19 @@ extern "C" {
             case gcFEATURE_BIT_VG_IM_REPEAT_REFLECT:
             case gcFEATURE_BIT_VG_SCISSOR:
 
-#if LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT
+#if LV_VGLITE_THORVG_LVGL_BLEND_SUPPORT
             case gcFEATURE_BIT_VG_LVGL_SUPPORT:
 #endif
 
-#if LV_VG_LITE_THORVG_YUV_SUPPORT
+#if LV_VGLITE_THORVG_YUV_SUPPORT
             case gcFEATURE_BIT_VG_YUV_INPUT:
 #endif
 
-#if LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
+#if LV_VGLITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT
             case gcFEATURE_BIT_VG_LINEAR_GRADIENT_EXT:
 #endif
 
-#if LV_VG_LITE_THORVG_16PIXELS_ALIGN
+#if LV_VGLITE_THORVG_16PIXELS_ALIGN
             case gcFEATURE_BIT_VG_16PIXELS_ALIGN:
 #endif
                 return 1;
@@ -1018,7 +1018,7 @@ extern "C" {
                                       vg_lite_float_t max_x, vg_lite_float_t max_y)
     {
         if(!path) {
-            return VG_LITE_INVALID_ARGUMENT;
+            return VGLITE_INVALID_ARGUMENT;
         }
 
         lv_memzero(path, sizeof(vg_lite_path_t));
@@ -1040,7 +1040,7 @@ extern "C" {
         path->uploaded.memory = NULL;
         path->pdata_internal = 0;
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_init_arc_path(vg_lite_path_t * path,
@@ -1060,7 +1060,7 @@ extern "C" {
         LV_UNUSED(min_y);
         LV_UNUSED(max_x);
         LV_UNUSED(max_y);
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_clear_path(vg_lite_path_t * path)
@@ -1072,7 +1072,7 @@ extern "C" {
             path->stroke = NULL;
         }
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_uint32_t vg_lite_get_path_length(vg_lite_uint8_t * opcode,
@@ -1094,26 +1094,26 @@ extern "C" {
         LV_UNUSED(cmd);
         LV_UNUSED(data);
         LV_UNUSED(seg_count);
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_upload_path(vg_lite_path_t * path)
     {
         LV_UNUSED(path);
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_set_CLUT(vg_lite_uint32_t count,
                                      vg_lite_uint32_t * colors)
     {
         if(!vg_lite_query_feature(gcFEATURE_BIT_VG_IM_INDEX_FORMAT)) {
-            return VG_LITE_NOT_SUPPORT;
+            return VGLITE_NOT_SUPPORT;
         }
         LV_ASSERT(colors);
 
         auto ctx = vg_lite_ctx::get_instance();
         ctx->set_CLUT(count, colors);
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_draw_pattern(vg_lite_buffer_t * target,
@@ -1147,18 +1147,18 @@ extern "C" {
         TVG_CHECK_RETURN_VG_ERROR(picture->composite(std::move(shape), CompositeMethod::ClipPath));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(picture)));
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_init_grad(vg_lite_linear_gradient_t * grad)
     {
-        vg_lite_error_t error = VG_LITE_SUCCESS;
+        vg_lite_error_t error = VGLITE_SUCCESS;
 
         /* Set the member values according to driver defaults. */
         grad->image.width = VLC_GRADIENT_BUFFER_WIDTH;
         grad->image.height = 1;
         grad->image.stride = 0;
-        grad->image.format = VG_LITE_BGRA8888;
+        grad->image.format = VGLITE_BGRA8888;
 
         /* Allocate the image for gradient. */
         error = vg_lite_allocate(&grad->image);
@@ -1196,7 +1196,7 @@ extern "C" {
         trg_count = 0;
 
         if((linear_gradient.X0 == linear_gradient.X1) && (linear_gradient.Y0 == linear_gradient.Y1))
-            return VG_LITE_INVALID_ARGUMENT;
+            return VGLITE_INVALID_ARGUMENT;
 
         grad->linear_grad = linear_gradient;
         grad->pre_multiplied = pre_multiplied;
@@ -1288,13 +1288,13 @@ extern "C" {
             /* Set new length. */
             grad->converted_length = trg_count;
         }
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
 
 Empty_sequence_handler:
         memcpy(grad->converted_ramp, default_ramp, sizeof(default_ramp));
         grad->converted_length = sizeof(default_ramp) / 5;
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_update_linear_grad(vg_lite_ext_linear_gradient_t * grad)
@@ -1305,7 +1305,7 @@ Empty_sequence_handler:
         vg_lite_uint32_t i, width;
         uint8_t * bits;
         vg_lite_float_t x0, y0, x1, y1, length;
-        vg_lite_error_t error = VG_LITE_SUCCESS;
+        vg_lite_error_t error = VGLITE_SUCCESS;
 
         /* Get shortcuts to the color ramp. */
         ramp_length = grad->converted_length;
@@ -1318,7 +1318,7 @@ Empty_sequence_handler:
         length = (vg_lite_float_t)sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
 
         if(length <= 0)
-            return VG_LITE_INVALID_ARGUMENT;
+            return VGLITE_INVALID_ARGUMENT;
         /* Find the common denominator of the color ramp stops. */
         if(length < 1) {
             common = 1;
@@ -1345,11 +1345,11 @@ Empty_sequence_handler:
         grad->image.width = width;
         grad->image.height = 1;
         grad->image.stride = 0;
-        grad->image.image_mode = VG_LITE_NONE_IMAGE_MODE;
-        grad->image.format = VG_LITE_ABGR8888;
+        grad->image.image_mode = VGLITE_NONE_IMAGE_MODE;
+        grad->image.format = VGLITE_ABGR8888;
 
         /* Allocate the image for gradient. */
-        VG_LITE_RETURN_ERROR(vg_lite_allocate(&grad->image));
+        VGLITE_RETURN_ERROR(vg_lite_allocate(&grad->image));
         memset(grad->image.memory, 0, grad->image.stride * grad->image.height);
         width = common + 1;
         /* Set pointer to color array. */
@@ -1389,7 +1389,7 @@ Empty_sequence_handler:
             }
             else {
                 if(stop == 0) {
-                    return VG_LITE_INVALID_ARGUMENT;
+                    return VGLITE_INVALID_ARGUMENT;
                 }
                 /* Compute weight. */
                 weight = (color_ramp[stop].stop - gradient)
@@ -1433,7 +1433,7 @@ Empty_sequence_handler:
             *bits++ = PackColorComponent(color[0]);
         }
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_draw_linear_grad(vg_lite_buffer_t * target,
@@ -1476,7 +1476,7 @@ Empty_sequence_handler:
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(std::move(linearGrad)));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(shape)));
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_set_radial_grad(vg_lite_radial_gradient_t * grad,
@@ -1507,7 +1507,7 @@ Empty_sequence_handler:
         trgCount = 0;
 
         if(radial_grad.r <= 0)
-            return VG_LITE_INVALID_ARGUMENT;
+            return VGLITE_INVALID_ARGUMENT;
 
         grad->radial_grad = radial_grad;
         grad->pre_multiplied = pre_multiplied;
@@ -1599,13 +1599,13 @@ Empty_sequence_handler:
             /* Set new length. */
             grad->converted_length = trgCount;
         }
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
 
 Empty_sequence_handler:
         memcpy(grad->converted_ramp, defaultRamp, sizeof(defaultRamp));
         grad->converted_length = sizeof(defaultRamp) / 5;
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_update_radial_grad(vg_lite_radial_gradient_t * grad)
@@ -1615,7 +1615,7 @@ Empty_sequence_handler:
         vg_lite_uint32_t common, stop;
         vg_lite_uint32_t i, width;
         uint8_t * bits;
-        vg_lite_error_t error = VG_LITE_SUCCESS;
+        vg_lite_error_t error = VGLITE_SUCCESS;
         vg_lite_uint32_t align, mul, div;
 
         /* Get shortcuts to the color ramp. */
@@ -1623,7 +1623,7 @@ Empty_sequence_handler:
         colorRamp = grad->converted_ramp;
 
         if(grad->radial_grad.r <= 0)
-            return VG_LITE_INVALID_ARGUMENT;
+            return VGLITE_INVALID_ARGUMENT;
 
         /* Find the common denominator of the color ramp stops. */
         if(grad->radial_grad.r < 1) {
@@ -1652,13 +1652,13 @@ Empty_sequence_handler:
         grad->image.width = width;
         grad->image.height = 1;
         grad->image.stride = 0;
-        grad->image.image_mode = VG_LITE_NONE_IMAGE_MODE;
-        grad->image.format = VG_LITE_ABGR8888;
+        grad->image.image_mode = VGLITE_NONE_IMAGE_MODE;
+        grad->image.format = VGLITE_ABGR8888;
 
         /* Allocate the image for gradient. */
-        VG_LITE_RETURN_ERROR(vg_lite_allocate(&grad->image));
+        VGLITE_RETURN_ERROR(vg_lite_allocate(&grad->image));
 
-        get_format_bytes(VG_LITE_ABGR8888, &mul, &div, &align);
+        get_format_bytes(VGLITE_ABGR8888, &mul, &div, &align);
         width = grad->image.stride * div / mul;
 
         /* Set pointer to color array. */
@@ -1737,7 +1737,7 @@ Empty_sequence_handler:
             *bits++ = PackColorComponent(color[0]);
         }
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_set_grad(vg_lite_linear_gradient_t * grad,
@@ -1749,7 +1749,7 @@ Empty_sequence_handler:
 
         grad->count = 0; /* Opaque B&W gradient */
         if(!count || count > VLC_MAX_GRADIENT_STOPS || colors == NULL || stops == NULL)
-            return VG_LITE_SUCCESS;
+            return VGLITE_SUCCESS;
 
         /* Check stops validity */
         for(i = 0; i < count; i++)
@@ -1766,12 +1766,12 @@ Empty_sequence_handler:
                 }
             }
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_update_grad(vg_lite_linear_gradient_t * grad)
     {
-        vg_lite_error_t error = VG_LITE_SUCCESS;
+        vg_lite_error_t error = VGLITE_SUCCESS;
         int32_t r0, g0, b0, a0;
         int32_t r1, g1, b1, a1;
         int32_t lr, lg, lb, la;
@@ -1843,7 +1843,7 @@ Empty_sequence_handler:
 
     vg_lite_error_t vg_lite_clear_linear_grad(vg_lite_ext_linear_gradient_t * grad)
     {
-        vg_lite_error_t error = VG_LITE_SUCCESS;
+        vg_lite_error_t error = VGLITE_SUCCESS;
 
         grad->count = 0;
         /* Release the image resource. */
@@ -1856,7 +1856,7 @@ Empty_sequence_handler:
 
     vg_lite_error_t vg_lite_clear_grad(vg_lite_linear_gradient_t * grad)
     {
-        vg_lite_error_t error = VG_LITE_SUCCESS;
+        vg_lite_error_t error = VGLITE_SUCCESS;
 
         grad->count = 0;
         /* Release the image resource. */
@@ -1869,7 +1869,7 @@ Empty_sequence_handler:
 
     vg_lite_error_t vg_lite_clear_radial_grad(vg_lite_radial_gradient_t * grad)
     {
-        vg_lite_error_t error = VG_LITE_SUCCESS;
+        vg_lite_error_t error = VGLITE_SUCCESS;
 
         grad->count = 0;
         /* Release the image resource. */
@@ -1951,7 +1951,7 @@ Empty_sequence_handler:
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(std::move(linearGrad)));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(shape)));
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_draw_radial_grad(vg_lite_buffer_t * target,
@@ -1993,13 +1993,13 @@ Empty_sequence_handler:
         TVG_CHECK_RETURN_VG_ERROR(shape->fill(std::move(radialGrad)));
         TVG_CHECK_RETURN_VG_ERROR(ctx->canvas->push(std::move(shape)));
 
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_set_command_buffer_size(vg_lite_uint32_t size)
     {
         LV_UNUSED(size);
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_set_scissor(vg_lite_int32_t x, vg_lite_int32_t y, vg_lite_int32_t right, vg_lite_int32_t bottom)
@@ -2009,66 +2009,66 @@ Empty_sequence_handler:
         vg_lite_int32_t height = bottom - y;
 
         if(width <= 0 || height <= 0) {
-            return VG_LITE_INVALID_ARGUMENT;
+            return VGLITE_INVALID_ARGUMENT;
         }
 
         if(ctx->scissor_rect.x == x && ctx->scissor_rect.y == y &&
            ctx->scissor_rect.width == width && ctx->scissor_rect.height == height) {
-            return VG_LITE_SUCCESS;
+            return VGLITE_SUCCESS;
         }
 
         /*Finish the previous rendering before setting the new scissor*/
         vg_lite_error_t error;
-        VG_LITE_RETURN_ERROR(vg_lite_finish());
+        VGLITE_RETURN_ERROR(vg_lite_finish());
 
         ctx->scissor_rect.x = x;
         ctx->scissor_rect.y = y;
         ctx->scissor_rect.width = width;
         ctx->scissor_rect.height = height;
         ctx->scissor_is_set = true;
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_enable_scissor(void)
     {
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_disable_scissor(void)
     {
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_get_mem_size(vg_lite_uint32_t * size)
     {
         *size = 0;
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 
     vg_lite_error_t vg_lite_source_global_alpha(vg_lite_global_alpha_t alpha_mode, uint8_t alpha_value)
     {
         LV_UNUSED(alpha_mode);
         LV_UNUSED(alpha_value);
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_dest_global_alpha(vg_lite_global_alpha_t alpha_mode, uint8_t alpha_value)
     {
         LV_UNUSED(alpha_mode);
         LV_UNUSED(alpha_value);
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_set_color_key(vg_lite_color_key4_t colorkey)
     {
         LV_UNUSED(colorkey);
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_set_flexa_stream_id(uint8_t stream_id)
     {
         LV_UNUSED(stream_id);
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_set_flexa_current_background_buffer(uint8_t stream_id,
@@ -2080,46 +2080,46 @@ Empty_sequence_handler:
         LV_UNUSED(buffer);
         LV_UNUSED(background_segment_count);
         LV_UNUSED(background_segment_size);
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_enable_flexa(void)
     {
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_disable_flexa(void)
     {
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_set_flexa_stop_frame(void)
     {
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_enable_dither(void)
     {
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_disable_dither(void)
     {
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_set_tess_buffer(vg_lite_uint32_t physical, vg_lite_uint32_t size)
     {
         LV_UNUSED(physical);
         LV_UNUSED(size);
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_set_command_buffer(vg_lite_uint32_t physical, vg_lite_uint32_t size)
     {
         LV_UNUSED(physical);
         LV_UNUSED(size);
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_get_parameter(vg_lite_param_type_t type,
@@ -2127,26 +2127,26 @@ Empty_sequence_handler:
                                           vg_lite_float_t * params)
     {
         switch(type) {
-            case VG_LITE_GPU_IDLE_STATE:
+            case VGLITE_GPU_IDLE_STATE:
                 if(count != 1 || params == NULL) {
-                    return VG_LITE_INVALID_ARGUMENT;
+                    return VGLITE_INVALID_ARGUMENT;
                 }
 
                 *(vg_lite_uint32_t *)params = 1;
-                return VG_LITE_SUCCESS;
+                return VGLITE_SUCCESS;
 
             default:
                 break;
         }
 
-        return VG_LITE_NOT_SUPPORT;
+        return VGLITE_NOT_SUPPORT;
     }
 
     vg_lite_error_t vg_lite_dump_command_buffer(void)
     {
         LV_LOG_USER("command:");
         LV_LOG_USER("@[commit]");
-        return VG_LITE_SUCCESS;
+        return VGLITE_SUCCESS;
     }
 } /* extern "C" */
 
@@ -2158,25 +2158,25 @@ static vg_lite_error_t vg_lite_error_conv(Result result)
 {
     switch(result) {
         case Result::Success:
-            return VG_LITE_SUCCESS;
+            return VGLITE_SUCCESS;
 
         case Result::InvalidArguments:
-            return VG_LITE_INVALID_ARGUMENT;
+            return VGLITE_INVALID_ARGUMENT;
 
         case Result::InsufficientCondition:
-            return VG_LITE_OUT_OF_RESOURCES;
+            return VGLITE_OUT_OF_RESOURCES;
 
         case Result::FailedAllocation:
-            return VG_LITE_OUT_OF_MEMORY;
+            return VGLITE_OUT_OF_MEMORY;
 
         case Result::NonSupport:
-            return VG_LITE_NOT_SUPPORT;
+            return VGLITE_NOT_SUPPORT;
 
         default:
             break;
     }
 
-    return VG_LITE_TIMEOUT;
+    return VGLITE_TIMEOUT;
 }
 
 static Matrix matrix_conv(const vg_lite_matrix_t * matrix)
@@ -2186,7 +2186,7 @@ static Matrix matrix_conv(const vg_lite_matrix_t * matrix)
 
 static FillRule fill_rule_conv(vg_lite_fill_t fill)
 {
-    if(fill == VG_LITE_FILL_EVEN_ODD) {
+    if(fill == VGLITE_FILL_EVEN_ODD) {
         return FillRule::EvenOdd;
     }
 
@@ -2196,22 +2196,22 @@ static FillRule fill_rule_conv(vg_lite_fill_t fill)
 static BlendMethod blend_method_conv(vg_lite_blend_t blend)
 {
     switch(blend) {
-        case VG_LITE_BLEND_NONE:
+        case VGLITE_BLEND_NONE:
             return BlendMethod::SrcOver;
 
-        case VG_LITE_BLEND_NORMAL_LVGL:
+        case VGLITE_BLEND_NORMAL_LVGL:
             return BlendMethod::Normal;
 
-        case VG_LITE_BLEND_SRC_OVER:
+        case VGLITE_BLEND_SRC_OVER:
             return BlendMethod::Normal;
 
-        case VG_LITE_BLEND_SCREEN:
+        case VGLITE_BLEND_SCREEN:
             return BlendMethod::Screen;
 
-        case VG_LITE_BLEND_ADDITIVE:
+        case VGLITE_BLEND_ADDITIVE:
             return BlendMethod::Add;
 
-        case VG_LITE_BLEND_MULTIPLY:
+        case VGLITE_BLEND_MULTIPLY:
             return BlendMethod::Multiply;
 
         default:
@@ -2224,11 +2224,11 @@ static BlendMethod blend_method_conv(vg_lite_blend_t blend)
 static StrokeCap stroke_cap_conv(vg_lite_cap_style_t cap)
 {
     switch(cap) {
-        case VG_LITE_CAP_SQUARE:
+        case VGLITE_CAP_SQUARE:
             return StrokeCap::Square;
-        case VG_LITE_CAP_ROUND:
+        case VGLITE_CAP_ROUND:
             return StrokeCap::Round;
-        case VG_LITE_CAP_BUTT:
+        case VGLITE_CAP_BUTT:
             return StrokeCap::Butt;
         default:
             break;
@@ -2240,11 +2240,11 @@ static StrokeCap stroke_cap_conv(vg_lite_cap_style_t cap)
 static StrokeJoin stroke_join_conv(vg_lite_join_style_t join)
 {
     switch(join) {
-        case VG_LITE_JOIN_BEVEL:
+        case VGLITE_JOIN_BEVEL:
             return StrokeJoin::Bevel;
-        case VG_LITE_JOIN_ROUND:
+        case VGLITE_JOIN_ROUND:
             return StrokeJoin::Round;
-        case VG_LITE_JOIN_MITER:
+        case VGLITE_JOIN_MITER:
             return StrokeJoin::Miter;
         default:
             break;
@@ -2256,11 +2256,11 @@ static StrokeJoin stroke_join_conv(vg_lite_join_style_t join)
 static FillSpread fill_spread_conv(vg_lite_gradient_spreadmode_t spread)
 {
     switch(spread) {
-        case VG_LITE_GRADIENT_SPREAD_PAD:
+        case VGLITE_GRADIENT_SPREAD_PAD:
             return FillSpread::Pad;
-        case VG_LITE_GRADIENT_SPREAD_REPEAT:
+        case VGLITE_GRADIENT_SPREAD_REPEAT:
             return FillSpread::Repeat;
-        case VG_LITE_GRADIENT_SPREAD_REFLECT:
+        case VGLITE_GRADIENT_SPREAD_REFLECT:
             return FillSpread::Reflect;
         default:
             return FillSpread::Pad;
@@ -2270,16 +2270,16 @@ static FillSpread fill_spread_conv(vg_lite_gradient_spreadmode_t spread)
 static float vlc_get_arg(const void * data, vg_lite_format_t format)
 {
     switch(format) {
-        case VG_LITE_S8:
+        case VGLITE_S8:
             return *((int8_t *)data);
 
-        case VG_LITE_S16:
+        case VGLITE_S16:
             return *((int16_t *)data);
 
-        case VG_LITE_S32:
+        case VGLITE_S32:
             return *((int32_t *)data);
 
-        case VG_LITE_FP32:
+        case VGLITE_FP32:
             return *((float *)data);
 
         default:
@@ -2293,13 +2293,13 @@ static float vlc_get_arg(const void * data, vg_lite_format_t format)
 static uint8_t vlc_format_len(vg_lite_format_t format)
 {
     switch(format) {
-        case VG_LITE_S8:
+        case VGLITE_S8:
             return 1;
-        case VG_LITE_S16:
+        case VGLITE_S16:
             return 2;
-        case VG_LITE_S32:
+        case VGLITE_S32:
             return 4;
-        case VG_LITE_FP32:
+        case VGLITE_FP32:
             return 4;
         default:
             LV_LOG_ERROR("UNKNOW_FORMAT: %d", format);
@@ -2343,13 +2343,13 @@ static uint8_t vlc_op_arg_len(uint8_t vlc_op)
 static Result shape_set_stroke(std::unique_ptr<Shape> & shape, const vg_lite_path_t * path)
 {
     switch(path->path_type) {
-        case VG_LITE_DRAW_ZERO:
-        case VG_LITE_DRAW_FILL_PATH:
+        case VGLITE_DRAW_ZERO:
+        case VGLITE_DRAW_FILL_PATH:
             /* if path is not a stroke, return */
             return Result::Success;
 
-        case VG_LITE_DRAW_STROKE_PATH:
-        case VG_LITE_DRAW_FILL_STROKE_PATH:
+        case VGLITE_DRAW_STROKE_PATH:
+        case VGLITE_DRAW_FILL_STROKE_PATH:
             break;
 
         default:
@@ -2527,12 +2527,12 @@ static Result canvas_set_target(vg_lite_ctx * ctx, vg_lite_buffer_t * target)
 static vg_lite_uint32_t width_to_stride(vg_lite_uint32_t w, vg_lite_buffer_format_t color_format)
 {
     if(vg_lite_query_feature(gcFEATURE_BIT_VG_16PIXELS_ALIGN)) {
-        w = VG_LITE_ALIGN(w, 16);
+        w = VGLITE_ALIGN(w, 16);
     }
 
     vg_lite_uint32_t mul, div, align;
     get_format_bytes(color_format, &mul, &div, &align);
-    return VG_LITE_ALIGN((w * mul / div), align);
+    return VGLITE_ALIGN((w * mul / div), align);
 }
 
 static bool decode_indexed_line(
@@ -2551,22 +2551,22 @@ static bool decode_indexed_line(
 
     int8_t shift = 0;
     switch(color_format) {
-        case VG_LITE_INDEX_1:
+        case VGLITE_INDEX_1:
             px_size = 1;
             in += x / 8; /*8pixel per byte*/
             shift = 7 - (x & 0x7);
             break;
-        case VG_LITE_INDEX_2:
+        case VGLITE_INDEX_2:
             px_size = 2;
             in += x / 4; /*4pixel per byte*/
             shift = 6 - 2 * (x & 0x3);
             break;
-        case VG_LITE_INDEX_4:
+        case VGLITE_INDEX_4:
             px_size = 4;
             in += x / 2; /*2pixel per byte*/
             shift = 4 - 4 * (x & 0x1);
             break;
-        case VG_LITE_INDEX_8:
+        case VGLITE_INDEX_8:
             px_size = 8;
             in += x;
             shift = 0;
@@ -2596,13 +2596,13 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
                            vg_lite_color_t color)
 {
     vg_lite_uint32_t * image_buffer;
-    LV_ASSERT(VG_LITE_IS_ALIGNED(source->memory, LV_VG_LITE_THORVG_BUF_ADDR_ALIGN));
+    LV_ASSERT(VGLITE_IS_ALIGNED(source->memory, LV_VGLITE_THORVG_BUF_ADDR_ALIGN));
 
-#if LV_VG_LITE_THORVG_16PIXELS_ALIGN
-    LV_ASSERT(VG_LITE_IS_ALIGNED(source->width, 16));
+#if LV_VGLITE_THORVG_16PIXELS_ALIGN
+    LV_ASSERT(VGLITE_IS_ALIGNED(source->width, 16));
 #endif
 
-    if(source->format == VG_LITE_BGRA8888 && source->image_mode == VG_LITE_NORMAL_IMAGE_MODE) {
+    if(source->format == VGLITE_BGRA8888 && source->image_mode == VGLITE_NORMAL_IMAGE_MODE) {
         image_buffer = (vg_lite_uint32_t *)source->memory;
     }
     else {
@@ -2614,16 +2614,16 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
         vg_lite_buffer_t target;
         memset(&target, 0, sizeof(target));
         target.memory = image_buffer;
-        target.format = VG_LITE_BGRA8888;
+        target.format = VGLITE_BGRA8888;
         target.width = width;
         target.height = height;
         target.stride = width_to_stride(width, target.format);
 
         switch(source->format) {
-            case VG_LITE_INDEX_1:
-            case VG_LITE_INDEX_2:
-            case VG_LITE_INDEX_4:
-            case VG_LITE_INDEX_8: {
+            case VGLITE_INDEX_1:
+            case VGLITE_INDEX_2:
+            case VGLITE_INDEX_4:
+            case VGLITE_INDEX_8: {
                     const vg_lite_uint32_t * clut_colors = ctx->get_CLUT(source->format);
                     for(vg_lite_uint32_t y = 0; y < height; y++) {
                         decode_indexed_line(source->format, clut_colors, 0, y, width, (uint8_t *)source->memory, image_buffer);
@@ -2631,58 +2631,58 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
                 }
                 break;
 
-            case VG_LITE_A4: {
+            case VGLITE_A4: {
                     conv_alpha4_to_bgra8888.convert(&target, source, color);
                 }
                 break;
 
-            case VG_LITE_A8: {
+            case VGLITE_A8: {
                     conv_alpha8_to_bgra8888.convert(&target, source, color);
                 }
                 break;
 
-            case VG_LITE_L8: {
+            case VGLITE_L8: {
                     conv_l8_to_bgra8888.convert(&target, source);
                 }
                 break;
 
-            case VG_LITE_BGRX8888: {
+            case VGLITE_BGRX8888: {
                     conv_bgrx8888_to_bgra8888.convert(&target, source);
                 }
                 break;
 
-            case VG_LITE_BGR888: {
+            case VGLITE_BGR888: {
                     conv_bgr888_to_bgra8888.convert(&target, source);
                 }
                 break;
 
-            case VG_LITE_BGRA5658: {
+            case VGLITE_BGRA5658: {
                     conv_bgra5658_to_bgra8888.convert(&target, source);
                 }
                 break;
 
-            case VG_LITE_BGR565: {
+            case VGLITE_BGR565: {
                     conv_bgr565_to_bgra8888.convert(&target, source);
                 }
                 break;
 
-            case VG_LITE_BGRA5551: {
+            case VGLITE_BGRA5551: {
                     conv_bgra5551_to_bgra8888.convert(&target, source);
                 }
                 break;
 
-            case VG_LITE_BGRA4444: {
+            case VGLITE_BGRA4444: {
                     conv_bgra4444_to_bgra8888.convert(&target, source);
                 }
                 break;
 
-            case VG_LITE_BGRA2222: {
+            case VGLITE_BGRA2222: {
                     conv_bgra2222_to_bgra8888.convert(&target, source);
                 }
                 break;
 
-#if LV_VG_LITE_THORVG_YUV_SUPPORT
-            case VG_LITE_NV12: {
+#if LV_VGLITE_THORVG_YUV_SUPPORT
+            case VGLITE_NV12: {
                     libyuv::NV12ToARGB((const uint8_t *)source->memory, source->stride, (const uint8_t *)source->yuv.uv_memory,
                                        source->yuv.uv_stride,
                                        (uint8_t *)image_buffer, source->width * sizeof(vg_lite_uint32_t), width, height);
@@ -2690,7 +2690,7 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
                 break;
 #endif
 
-            case VG_LITE_BGRA8888: {
+            case VGLITE_BGRA8888: {
                     memcpy(image_buffer, source->memory, px_size * sizeof(vg_color32_t));
                 }
                 break;
@@ -2702,7 +2702,7 @@ static Result picture_load(vg_lite_ctx * ctx, std::unique_ptr<Picture> & picture
         }
 
         /* multiply color */
-        if(source->image_mode == VG_LITE_MULTIPLY_IMAGE_MODE && !VG_LITE_IS_ALPHA_FORMAT(source->format)) {
+        if(source->image_mode == VGLITE_MULTIPLY_IMAGE_MODE && !VGLITE_IS_ALPHA_FORMAT(source->format)) {
             vg_color32_t * dest = (vg_color32_t *)image_buffer;
             while(px_size--) {
                 dest->alpha = UDIV255(dest->alpha * A(color));
@@ -2758,92 +2758,92 @@ static void get_format_bytes(vg_lite_buffer_format_t format,
     *mul = *div = 1;
     *bytes_align = 4;
     switch(format) {
-        case VG_LITE_L8:
-        case VG_LITE_A8:
-        case VG_LITE_RGBA8888_ETC2_EAC:
+        case VGLITE_L8:
+        case VGLITE_A8:
+        case VGLITE_RGBA8888_ETC2_EAC:
             break;
 
-        case VG_LITE_A4:
+        case VGLITE_A4:
             *div = 2;
             break;
 
-        case VG_LITE_ABGR1555:
-        case VG_LITE_ARGB1555:
-        case VG_LITE_BGRA5551:
-        case VG_LITE_RGBA5551:
-        case VG_LITE_RGBA4444:
-        case VG_LITE_BGRA4444:
-        case VG_LITE_ABGR4444:
-        case VG_LITE_ARGB4444:
-        case VG_LITE_RGB565:
-        case VG_LITE_BGR565:
-        case VG_LITE_YUYV:
-        case VG_LITE_YUY2:
-        case VG_LITE_YUY2_TILED:
+        case VGLITE_ABGR1555:
+        case VGLITE_ARGB1555:
+        case VGLITE_BGRA5551:
+        case VGLITE_RGBA5551:
+        case VGLITE_RGBA4444:
+        case VGLITE_BGRA4444:
+        case VGLITE_ABGR4444:
+        case VGLITE_ARGB4444:
+        case VGLITE_RGB565:
+        case VGLITE_BGR565:
+        case VGLITE_YUYV:
+        case VGLITE_YUY2:
+        case VGLITE_YUY2_TILED:
         /* AYUY2 buffer memory = YUY2 + alpha. */
-        case VG_LITE_AYUY2:
-        case VG_LITE_AYUY2_TILED:
+        case VGLITE_AYUY2:
+        case VGLITE_AYUY2_TILED:
         /* ABGR8565_PLANAR buffer memory = RGB565 + alpha. */
-        case VG_LITE_ABGR8565_PLANAR:
-        case VG_LITE_ARGB8565_PLANAR:
-        case VG_LITE_RGBA5658_PLANAR:
-        case VG_LITE_BGRA5658_PLANAR:
+        case VGLITE_ABGR8565_PLANAR:
+        case VGLITE_ARGB8565_PLANAR:
+        case VGLITE_RGBA5658_PLANAR:
+        case VGLITE_BGRA5658_PLANAR:
             *mul = 2;
             break;
 
-        case VG_LITE_RGBA8888:
-        case VG_LITE_BGRA8888:
-        case VG_LITE_ABGR8888:
-        case VG_LITE_ARGB8888:
-        case VG_LITE_RGBX8888:
-        case VG_LITE_BGRX8888:
-        case VG_LITE_XBGR8888:
-        case VG_LITE_XRGB8888:
+        case VGLITE_RGBA8888:
+        case VGLITE_BGRA8888:
+        case VGLITE_ABGR8888:
+        case VGLITE_ARGB8888:
+        case VGLITE_RGBX8888:
+        case VGLITE_BGRX8888:
+        case VGLITE_XBGR8888:
+        case VGLITE_XRGB8888:
             *mul = 4;
             break;
 
-        case VG_LITE_NV12:
-        case VG_LITE_NV12_TILED:
+        case VGLITE_NV12:
+        case VGLITE_NV12_TILED:
             *mul = 3;
             break;
 
-        case VG_LITE_ANV12:
-        case VG_LITE_ANV12_TILED:
+        case VGLITE_ANV12:
+        case VGLITE_ANV12_TILED:
             *mul = 4;
             break;
 
-        case VG_LITE_INDEX_1:
+        case VGLITE_INDEX_1:
             *div = 8;
             *bytes_align = 8;
             break;
 
-        case VG_LITE_INDEX_2:
+        case VGLITE_INDEX_2:
             *div = 4;
             *bytes_align = 8;
             break;
 
-        case VG_LITE_INDEX_4:
+        case VGLITE_INDEX_4:
             *div = 2;
             *bytes_align = 8;
             break;
 
-        case VG_LITE_INDEX_8:
+        case VGLITE_INDEX_8:
             *bytes_align = 1;
             break;
 
-        case VG_LITE_RGBA2222:
-        case VG_LITE_BGRA2222:
-        case VG_LITE_ABGR2222:
-        case VG_LITE_ARGB2222:
+        case VGLITE_RGBA2222:
+        case VGLITE_BGRA2222:
+        case VGLITE_ABGR2222:
+        case VGLITE_ARGB2222:
             *mul = 1;
             break;
 
-        case VG_LITE_RGB888:
-        case VG_LITE_BGR888:
-        case VG_LITE_ABGR8565:
-        case VG_LITE_BGRA5658:
-        case VG_LITE_ARGB8565:
-        case VG_LITE_RGBA5658:
+        case VGLITE_RGB888:
+        case VGLITE_BGR888:
+        case VGLITE_ABGR8565:
+        case VGLITE_BGRA5658:
+        case VGLITE_ARGB8565:
+        case VGLITE_RGBA5658:
             *mul = 3;
             break;
 
