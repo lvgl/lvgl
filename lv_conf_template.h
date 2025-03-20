@@ -250,7 +250,7 @@
     #endif
 #endif
 
-/** Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
+/** Use VG-Lite GPU  */
 #define LV_USE_DRAW_VGLITE 0
 
 #if LV_USE_DRAW_VGLITE
@@ -270,8 +270,24 @@
     /** Enable VGLite asserts. */
     #define LV_USE_VGLITE_ASSERT 0
 
-    /** Enable VGLite error checks. */
-    #define LV_USE_VGLITE_CHECK_ERROR 0
+    /** Enable VG-Lite custom external 'gpu_init()' function */
+    #define LV_VGLITE_USE_GPU_INIT 0
+
+    /** VG-Lite flush commit trigger threshold. GPU will try to batch these many draw tasks. */
+    #define LV_VGLITE_FLUSH_MAX_COUNT 8
+
+    /** Enable border to simulate shadow.
+     *  NOTE: which usually improves performance,
+     *  but does not guarantee the same rendering quality as the software. */
+    #define LV_VGLITE_USE_BOX_SHADOW 0
+
+    /** VG-Lite gradient maximum cache number.
+     *  @note  The memory usage of a single gradient image is 4K bytes. */
+    #define LV_VGLITE_GRAD_CACHE_CNT 32
+
+    /** VG-Lite stroke maximum cache number. */
+    #define LV_VGLITE_STROKE_CACHE_CNT 32
+
 #endif
 
 /** Use NXP's PXP on iMX RTxxx platforms. */
@@ -315,32 +331,6 @@
 
 /** Draw using cached SDL textures*/
 #define LV_USE_DRAW_SDL 0
-
-/** Use VG-Lite GPU. */
-#define LV_USE_DRAW_VG_LITE 0
-
-#if LV_USE_DRAW_VG_LITE
-    /** Enable VG-Lite custom external 'gpu_init()' function */
-    #define LV_VG_LITE_USE_GPU_INIT 0
-
-    /** Enable VG-Lite assert. */
-    #define LV_VG_LITE_USE_ASSERT 0
-
-    /** VG-Lite flush commit trigger threshold. GPU will try to batch these many draw tasks. */
-    #define LV_VG_LITE_FLUSH_MAX_COUNT 8
-
-    /** Enable border to simulate shadow.
-     *  NOTE: which usually improves performance,
-     *  but does not guarantee the same rendering quality as the software. */
-    #define LV_VG_LITE_USE_BOX_SHADOW 1
-
-    /** VG-Lite gradient maximum cache number.
-     *  @note  The memory usage of a single gradient image is 4K bytes. */
-    #define LV_VG_LITE_GRAD_CACHE_CNT 32
-
-    /** VG-Lite stroke maximum cache number. */
-    #define LV_VG_LITE_STROKE_CACHE_CNT 32
-#endif
 
 /** Accelerate blends, fills, etc. with STM32 DMA2D */
 #define LV_USE_DRAW_DMA2D 0
@@ -504,26 +494,26 @@
 
 /* Use VG-Lite Simulator.
  * - Requires: LV_USE_THORVG_INTERNAL or LV_USE_THORVG_EXTERNAL */
-#define LV_USE_VG_LITE_THORVG  0
+#define LV_USE_VGLITE_THORVG  0
 
-#if LV_USE_VG_LITE_THORVG
+#if LV_USE_VGLITE_THORVG
     /** Enable LVGL's blend mode support */
-    #define LV_VG_LITE_THORVG_LVGL_BLEND_SUPPORT 0
+    #define LV_VGLITE_THORVG_LVGL_BLEND_SUPPORT 0
 
     /** Enable YUV color format support */
-    #define LV_VG_LITE_THORVG_YUV_SUPPORT 0
+    #define LV_VGLITE_THORVG_YUV_SUPPORT 0
 
     /** Enable Linear gradient extension support */
-    #define LV_VG_LITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT 0
+    #define LV_VGLITE_THORVG_LINEAR_GRADIENT_EXT_SUPPORT 0
 
     /** Enable alignment on 16 pixels */
-    #define LV_VG_LITE_THORVG_16PIXELS_ALIGN 1
+    #define LV_VGLITE_THORVG_16PIXELS_ALIGN 1
 
     /** Buffer address alignment */
-    #define LV_VG_LITE_THORVG_BUF_ADDR_ALIGN 64
+    #define LV_VGLITE_THORVG_BUF_ADDR_ALIGN 64
 
     /** Enable multi-thread render */
-    #define LV_VG_LITE_THORVG_THREAD_RENDER 0
+    #define LV_VGLITE_THORVG_THREAD_RENDER 0
 #endif
 
 /* Enable the multi-touch gesture recognition feature */
@@ -546,7 +536,7 @@
 /** Define a custom attribute for `lv_display_flush_ready` function */
 #define LV_ATTRIBUTE_FLUSH_READY
 
-/** Align VG_LITE buffers on this number of bytes.
+/** Align VGLITE buffers on this number of bytes.
  *  @note  vglite_src_buf_aligned() uses this value to validate alignment of passed buffer pointers. */
 #define LV_ATTRIBUTE_MEM_ALIGN_SIZE 1
 
