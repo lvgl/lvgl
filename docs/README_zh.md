@@ -57,21 +57,21 @@
 
 **特性**
 
--  丰富且强大的模块化[图形组件](https://docs.lvgl.io/master/widgets/index.html)：按钮
+-  丰富且强大的模块化[图形组件](https://docs.lvgl.io/master/details/widgets/index.html)：按钮
    (buttons)、图表 (charts)、列表 (lists)、滑动条 (sliders)、图片
    (images) 等
 -  高级的图形引擎：动画、抗锯齿、透明度、平滑滚动、图层混合等效果
--  支持多种[输入设备](https://docs.lvgl.io/master/overview/indev.html)：触摸屏、键盘、编码器、按键等
--  支持[多显示设备](https://docs.lvgl.io/master/overview/display.html)
+-  支持多种[输入设备](https://docs.lvgl.io/master/details/main-modules/indev.html)：触摸屏、键盘、编码器、按键等
+-  支持[多显示设备](https://docs.lvgl.io/master/details/main-modules/display/index.html)
 -  不依赖特定的硬件平台，可以在任何显示屏上运行
 -  配置可裁剪（最低资源占用：64 kB Flash，16 kB RAM）
 -  基于UTF-8的多语种支持，例如中文、日文、韩文、阿拉伯文等
--  可以通过[类CSS](https://docs.lvgl.io/master/overview/style.html)的方式来设计、布局图形界面（例如：[Flexbox](https://docs.lvgl.io/master/layouts/flex.html)、[Grid](https://docs.lvgl.io/master/layouts/grid.html)）
+-  可以通过[类CSS](https://docs.lvgl.io/master/details/common-widget-features/styles/style.html)的方式来设计、布局图形界面（例如：[Flexbox](https://docs.lvgl.io/master/details/common-widget-features/layouts/flex.html)、[Grid](https://docs.lvgl.io/master/details/common-widget-features/layouts/grid.html)）
 -  支持操作系统、外置内存、以及硬件加速（LVGL已内建支持STM32 DMA2D、SWM341 DMA2D、NXP PXP和VGLite）
--  即便仅有[单缓冲区(frame buffer)](https://docs.lvgl.io/master/porting/display.html)的情况下，也可保证渲染如丝般顺滑
+-  即便仅有[单缓冲区(frame buffer)](https://docs.lvgl.io/master/details/main-modules/display/index.html)的情况下，也可保证渲染如丝般顺滑
 -  全部由C编写完成，并支持C++调用
 -  支持Micropython编程，参见：[LVGL API in Micropython](https://blog.lvgl.io/2019-02-20/micropython-bindings)
--  支持[模拟器](https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html) 仿真，可以无硬件依托进行开发
+-  支持[模拟器](https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html) 仿真，可以无硬件依托进行开发
 -  丰富详实的[例程](https://github.com/lvgl/lvgl/tree/master/examples) 
 -  详尽的[文档](http://docs.lvgl.io/) 以及API参考手册，可线上查阅或可下载为PDF格式
 
@@ -124,7 +124,6 @@ LVGL本身并不依赖特定的硬件平台，任何满足LVGL硬件配置要求
 -  STM32F1, STM32F3, STM32F4, STM32F7, STM32L4, STM32L5, STM32H7
 -  Microchip dsPIC33, PIC24, PIC32MX, PIC32MZ
 -  [Linux frame buffer](https://blog.lvgl.io/2018-01-03/linux_fb) (/dev/fb)
--  [Raspberry Pi](http://www.vk3erw.com/index.php/16-software/63-raspberry-pi-official-7-touchscreen-and-littlevgl)
 -  [Espressif ESP32](https://github.com/lvgl/lv_port_esp32) 
 -  [Infineon Aurix](https://github.com/lvgl/lv_port_aurix) 
 -  Nordic NRF52 Bluetooth modules
@@ -132,12 +131,12 @@ LVGL本身并不依赖特定的硬件平台，任何满足LVGL硬件配置要求
 -  [SYNWIT SWM341](https://www.synwit.cn/) 
 
 LVGL也支持：
-- [Arduino library](https://docs.lvgl.io/master/get-started/platforms/arduino.html)
+- [Arduino library](https://docs.lvgl.io/master/details/integration/framework/arduino.html)
 - [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
 - [Zephyr library](https://docs.zephyrproject.org/latest/kconfig.html#CONFIG_LVGL)
-- [ESP32 component](https://docs.lvgl.io/master/get-started/platforms/espressif.html)
+- [ESP32 component](https://docs.lvgl.io/master/details/integration/chip/espressif.html)
 - [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
-- [NuttX library](https://docs.lvgl.io/master/get-started/os/nuttx.html)
+- [NuttX library](https://docs.lvgl.io/master/details/integration/os/nuttx.html)
 - [RT-Thread RTOS](https://www.rt-thread.org/document/site/#/rt-thread-version/rt-thread-standard/packages-manual/lvgl-docs/introduction)
 
 
@@ -146,15 +145,15 @@ LVGL也支持：
 
 请按照如下顺序来学习LVGL：
 1. 使用[网页在线例程](https://lvgl.io/demos) 来体验LVGL（3分钟） 
-2. 阅读文档[简介](https://docs.lvgl.io/master/intro/index.html)章节来初步了解LVGL（5分钟）
-3. 再来阅读一下文档快速[快速概览](https://docs.lvgl.io/master/get-started/quick-overview.html)章节来了解LVGL的基本知识（15分钟）
-4. 学习如何使用[模拟器](https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html)来在电脑上仿真LVGL（10分钟）
+2. 阅读文档[简介](https://docs.lvgl.io/master/intro/introduction.html)章节来初步了解LVGL（5分钟）
+3. 再来阅读一下文档快速[快速概览](https://docs.lvgl.io/master/intro/getting_started.html)章节来了解LVGL的基本知识（15分钟）
+4. 学习如何使用[模拟器](https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html)来在电脑上仿真LVGL（10分钟）
 5. 试着动手实践一些[例程](https://github.com/lvgl/lvgl/tree/master/examples)
-6. 参考[移植指南](https://docs.lvgl.io/master/porting/index.html)尝试将LVGL移植到一块开发板上，LVGL也已经提供了一些移植好的[工程](https://github.com/lvgl?q=lv_port_)
-7. 仔细阅读文档[总览](https://docs.lvgl.io/master/overview/index.html)章节来更加深入的了解和熟悉LVGL（2-3小时）
-8. 浏览文档[组件(Widgets)](https://docs.lvgl.io/master/widgets/index.html)章节来了解如何使用它们
+6. 参考[移植指南](https://docs.lvgl.io/master/details/integration/adding-lvgl-to-your-project/index.html)尝试将LVGL移植到一块开发板上，LVGL也已经提供了一些移植好的[工程](https://github.com/lvgl?q=lv_port_)
+7. 仔细阅读文档[总览](https://docs.lvgl.io/master/details/main-modules/index.html)章节来更加深入的了解和熟悉LVGL（2-3小时）
+8. 浏览文档[组件(Widgets)](https://docs.lvgl.io/master/details/widgets/index.html)章节来了解如何使用它们
 9. 如果你有问题可以到LVGL[论坛](http://forum.lvgl.io/)提问
-10. 阅读文档[如何向社区贡献](https://docs.lvgl.io/master/CONTRIBUTING.html)章节来看看你能帮LVGL社区做些什么，以促进LVGL软件质量的不断提高（15分钟）
+10. 阅读文档[如何向社区贡献](https://docs.lvgl.io/master/contributing/index.html)章节来看看你能帮LVGL社区做些什么，以促进LVGL软件质量的不断提高（15分钟）
 
 
 ## :robot: 例程
@@ -462,4 +461,4 @@ LVGL是一个开源项目，非常欢迎您参与到社区贡献当中。您有�
 -  修改以及完善文档
 -  修复bug
 
-请参见文档[如何向社区贡献](https://docs.lvgl.io/master/CONTRIBUTING.html)章节来获取更多信息。
+请参见文档[如何向社区贡献](https://docs.lvgl.io/master/contributing/index.html)章节来获取更多信息。
