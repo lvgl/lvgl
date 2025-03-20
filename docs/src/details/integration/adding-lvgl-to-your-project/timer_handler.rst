@@ -67,7 +67,7 @@ When No Timers Are Ready
 ************************
 
 :c:func:`lv_timer_handler` will return :c:macro:`LV_NO_TIMER_READY` (``UINT32_MAX``)
-if there are no running timers. This can happen if there are no indevs, running
+if there are no running timers. This can happen if there are no indevs or they are disabled with `lv_indev_enable()`, running
 animations, or running user-created timers. :c:func:`lv_timer_handler` will continue
 to return :c:macro:`LV_NO_TIMER_READY` until there is a running timer. Display
 timers will stay paused when there is no reason to refresh.
