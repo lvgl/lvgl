@@ -12,6 +12,11 @@ import sys
 
 LOG = "[release_branch_updater.py]"
 
+def git_repository(repository: str, token: str):
+    if not token:
+        return f"https://{repository}"
+    return f"https://{token}@{repository}"
+
 def main():
 
     arg_parser = argparse.ArgumentParser()
@@ -20,6 +25,8 @@ def main():
     arg_parser.add_argument("--lvgl-path", default=os.path.join(os.path.dirname(__file__), ".."))
     arg_parser.add_argument("--dry-run", action="store_true")
     arg_parser.add_argument("--oldest-major", type=int)
+    arg_parser.add_argument("--github-token", type=str)
+
     args = arg_parser.parse_args()
 
     port_clone_tmpdir = args.port_clone_tmpdir
@@ -27,6 +34,9 @@ def main():
     lvgl_path = args.lvgl_path
     dry_run = args.dry_run
     oldest_major = args.oldest_major
+
+    if not args.github_token and not dry_run:
+        print(LOG, "Warning: No github token was provided for this production run. Continuing anyway...")
 
     lvgl_release_branches, lvgl_default_branch = get_release_branches(lvgl_path)
     print(LOG, "LVGL release branches:", ", ".join(fmt_release(br) for br in lvgl_release_branches) or "(none)")
@@ -51,7 +61,13 @@ def main():
             port_clone_tmpdir = url[len("https://github.com/lvgl/"): ]
             print("port_clone_tmpdir: " + port_clone_tmpdir)
 
-        subprocess.run(("git", "clone", url, port_clone_tmpdir))
+        # It's very important to not leak the github_token here
+        # So make sure the stdout and stderr are piped here
+        subprocess.run(("git", "clone",
+                        git_repository(url.replace("https://", ""), args.github_token),
+                        port_clone_tmpdir),
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE)
 
         port_release_branches, port_default_branch = get_release_branches(port_clone_tmpdir)
         print(LOG, "port release branches:", ", ".join(fmt_release(br) for br in port_release_branches) or "(none)")
@@ -199,10 +215,7 @@ def main():
                 if dry_run:
                     print(LOG, "this is a dry run so nothing will be pushed")
                 else:
-                    subprocess.check_call(("git", "-C", port_clone_tmpdir, "push",
-                                           *(("-u",) if port_does_not_have_the_branch else ()),
-                                           "origin", fmt_release(port_branch),
-                                          ))
+                    subprocess.check_call(("git", "-C", port_clone_tmpdir, "push", "origin", fmt_release(port_branch)))
                     print(LOG, "the changes were pushed.")
             else:
                 print(LOG, "nothing to push for this release. it is up to date.")
