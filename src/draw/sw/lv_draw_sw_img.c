@@ -681,6 +681,8 @@ static bool apply_mask(const lv_draw_image_dsc_t * draw_dsc)
         mask_start += mask_stride;
     }
 
+    lv_image_decoder_close(&mask_decoder_dsc);
+
     return true;
 }
 
