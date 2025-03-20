@@ -380,7 +380,7 @@ slider.set_style_shadow_spread(2, lv.PART.KNOB)
 
 ### English, Hebrew (mixed LRT-RTL) and Chinese texts
 
-![English, Hebrew and Chinese texts with LVGL](https://raw.githubusercontent.com/kisvegabor/test/master/readme_example_4.gif)
+![English, Hebrew and Chinese texts with LVGL](https://raw.githubusercontent.com/kisvegabor/test/master/readme_example_5.png)
 
 <details>
   <summary>C code</summary>
