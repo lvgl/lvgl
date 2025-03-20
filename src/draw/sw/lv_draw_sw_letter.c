@@ -186,6 +186,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
         img_dsc.zoom = LV_IMG_ZOOM_NONE;
         img_dsc.opa = dsc->opa;
         img_dsc.blend_mode = dsc->blend_mode;
+        lv_img_cache_invalidate_src(map_p);
         lv_draw_img(draw_ctx, &img_dsc, &fill_area, map_p);
         return;
     }
