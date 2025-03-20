@@ -427,7 +427,7 @@ This list will guide you to get started with LVGL step-by-step.
 
   4. Set up a [Simulator](https://docs.lvgl.io/master/details/integration/ide/pc-simulator.html#simulator) (10 minutes).
   5. Try out some [Examples](https://github.com/lvgl/lvgl/tree/master/examples).
-  6. Port LVGL to a board. See the [Porting](ttps://docs.lvgl.io/master/details/integration/adding-lvgl-to-your-project/index.html) guide or check out the ready-to-use [Projects](https://github.com/lvgl?q=lv_port_).
+  6. Port LVGL to a board. See the [Porting](https://docs.lvgl.io/master/details/integration/adding-lvgl-to-your-project/index.html) guide or check out the ready-to-use [Projects](https://github.com/lvgl?q=lv_port_).
 
 **Become a Pro**
 
