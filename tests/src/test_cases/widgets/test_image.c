@@ -421,6 +421,29 @@ void test_image_ignore_transformation_settings_when_tiled(void)
     TEST_ASSERT_EQUAL_INT(LV_SCALE_NONE, lv_image_get_scale_y(img));
 }
 
+void test_image_get_scaled_size(void)
+{
+    lv_obj_t * img = img_create();
+    lv_obj_set_size(img, 200, 300);
+
+    int32_t img_w = test_img_lvgl_logo_png.header.w;
+    int32_t img_h = test_img_lvgl_logo_png.header.h;
+
+    TEST_ASSERT_EQUAL_INT(img_w, lv_image_get_width(img));
+    TEST_ASSERT_EQUAL_INT(img_h, lv_image_get_height(img));
+
+    TEST_ASSERT_EQUAL_INT(img_w, lv_image_get_scaled_width(img));
+    TEST_ASSERT_EQUAL_INT(img_h, lv_image_get_scaled_height(img));
+
+    lv_image_set_rotation(img, 900);
+    TEST_ASSERT_EQUAL_INT(img_h, lv_image_get_scaled_width(img));
+    TEST_ASSERT_EQUAL_INT(img_w, lv_image_get_scaled_height(img));
+
+    lv_image_set_rotation(img, 1800);
+    TEST_ASSERT_EQUAL_INT(img_w, lv_image_get_scaled_width(img));
+    TEST_ASSERT_EQUAL_INT(img_h, lv_image_get_scaled_height(img));
+}
+
 static void create_test_images(int32_t radius, int32_t scale, int32_t angle)
 {
     LV_IMAGE_DECLARE(test_I1_NONE_align64);
