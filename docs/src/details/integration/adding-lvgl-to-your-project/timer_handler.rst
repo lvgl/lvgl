@@ -84,8 +84,7 @@ called again.
       int timeout;
 
       /* Wait forever for events upon LV_NO_TIMER_READY, because there
-       * is no reason to call lv_timer_handler sooner.
-       */
+       * is no reason to call lv_timer_handler sooner. */
       if(time_till_next == LV_NO_TIMER_READY) timeout = -1; /*infinite timeout*/
 
       /*Otherwise, wait for events at least until the timeout expires.*/
