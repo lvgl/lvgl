@@ -441,3 +441,7 @@ advancing your knowledge:
 
 
 
+API
+***
+.. API equals:  lv_screen_load, lv_obj_delete, lv_obj_add_event_cb, lv_event_get_code,
+    lv_obj_has_state, lv_style_init
