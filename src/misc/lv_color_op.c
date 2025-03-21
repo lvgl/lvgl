@@ -69,6 +69,27 @@ void lv_color_filter_dsc_init(lv_color_filter_dsc_t * dsc, lv_color_filter_cb_t 
     dsc->filter_cb = cb;
 }
 
+lv_color32_t lv_color_over32(lv_color32_t fg, lv_color32_t bg)
+{
+    if(fg.alpha >= LV_OPA_MAX || bg.alpha <= LV_OPA_MIN) {
+        return fg;
+    }
+    else if(fg.alpha <= LV_OPA_MIN) {
+        return bg;
+    }
+    else if(bg.alpha == 255) {
+        return lv_color_mix32(fg, bg);
+    }
+
+    lv_opa_t res_alpha  = 255 - LV_OPA_MIX2(255 - fg.alpha, 255 - bg.alpha);
+    lv_opa_t ratio = (uint32_t)((uint32_t)fg.alpha * 255) / res_alpha;
+    fg.alpha = ratio;
+    lv_color32_t res = lv_color_mix32(fg, bg);
+    res.alpha = res_alpha;
+
+    return res;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

@@ -1653,6 +1653,9 @@ menu "LVGL configuration"
 			depends on LV_USE_TEST
 		config LV_USE_XML
 			bool "Enable loading XML UIs runtime"
+		config LV_USE_COLOR_FILTER
+			bool "Enable color filter style"
+			default n
 		config LVGL_VERSION_MAJOR
 			int
 			default 9 # LVGL_VERSION_MAJOR

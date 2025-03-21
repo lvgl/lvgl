@@ -389,6 +389,7 @@ void lv_layer_reset(lv_layer_t * layer)
     lv_matrix_identity(&layer->matrix);
 #endif
     layer->opa = LV_OPA_COVER;
+    layer->recolor = lv_color32_make(0, 0, 0, 0);
 }
 
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
@@ -406,6 +407,7 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
     /*Inherits transparency from parent*/
     if(parent_layer) {
         new_layer->opa = parent_layer->opa;
+        new_layer->recolor = parent_layer->recolor;
     }
 
     LV_PROFILER_DRAW_END;
