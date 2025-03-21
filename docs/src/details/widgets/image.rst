@@ -179,6 +179,7 @@ the image source is aligned inside the Widget.
 - :cpp:enumerator:`LV_IMAGE_ALIGN_CENTER`
 - :cpp:enumerator:`LV_IMAGE_ALIGN_STRETCH`
 - :cpp:enumerator:`LV_IMAGE_ALIGN_TILE`
+- :cpp:enumerator:`LV_IMAGE_ALIGN_AUTO_SCALE`
 
 Any ``offset`` value is applied after the image source is aligned. For example setting
 an offset of ``y=-10`` with ``align`` == :cpp:enumerator:`LV_IMAGE_ALIGN_CENTER` will
@@ -188,6 +189,7 @@ To automatically scale or tile the image, pass one of these ``align`` values:
 
 - :cpp:enumerator:`LV_IMAGE_ALIGN_STRETCH` Set X and Y scale to fill the Widget's area
 - :cpp:enumerator:`LV_IMAGE_ALIGN_TILE` Tile image to fill Widget's area. Offset is applied to shift the tiling.
+- :cpp:enumerator:`LV_IMAGE_ALIGN_AUTO_SCALE` Set X and Y scale to fill the Widget's area without changing the aspect ratio.
 
 
 
