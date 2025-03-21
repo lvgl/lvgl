@@ -163,6 +163,11 @@ lv_result_t lv_bin_decoder_info(lv_image_decoder_t * decoder, lv_image_decoder_d
         return LV_RESULT_INVALID;
     }
 
+    if(header->cf == LV_COLOR_FORMAT_UNKNOWN) {
+        LV_LOG_WARN("Image color format is unknown");
+        return LV_RESULT_INVALID;
+    }
+
     /*For backward compatibility, all images are not premultiplied for now.*/
     if(header->magic != LV_IMAGE_HEADER_MAGIC) {
         header->flags &= ~LV_IMAGE_FLAGS_PREMULTIPLIED;
@@ -298,6 +303,7 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
             lv_draw_buf_t * decoded;
             if(image->header.flags & LV_IMAGE_FLAGS_ALLOCATED) {
                 decoded = (lv_draw_buf_t *)image;
+                res = LV_RESULT_OK;
             }
             else {
                 decoded = &decoder_data->c_array;
@@ -305,21 +311,22 @@ lv_result_t lv_bin_decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                     /*If image doesn't have stride, treat it as lvgl v8 legacy image format*/
                     lv_image_dsc_t tmp = *image;
                     tmp.header.stride = (tmp.header.w * lv_color_format_get_bpp(cf) + 7) >> 3;
-                    lv_draw_buf_from_image(decoded, &tmp);
+                    res = lv_draw_buf_from_image(decoded, &tmp);
                 }
                 else
-                    lv_draw_buf_from_image(decoded, image);
+                    res = lv_draw_buf_from_image(decoded, image);
             }
 
-            dsc->decoded = decoded;
+            if(res == LV_RESULT_OK) {
+                dsc->decoded = decoded;
 
-            if(decoded->header.stride == 0) {
-                /*Use the auto calculated value from decoder_info callback*/
-                decoded->header.stride = dsc->header.stride;
+                if(decoded->header.stride == 0) {
+                    /*Use the auto calculated value from decoder_info callback*/
+                    decoded->header.stride = dsc->header.stride;
+                }
+
+                use_directly = true; /*A variable image that can be used directly.*/
             }
-
-            res = LV_RESULT_OK;
-            use_directly = true; /*A variable image that can be used directly.*/
         }
     }
 
@@ -717,7 +724,10 @@ static lv_result_t load_indexed(lv_image_decoder_t * decoder, lv_image_decoder_d
         }
         else {
             decoded = &decoder_data->c_array;
-            lv_draw_buf_from_image(decoded, image);
+            lv_result_t result = lv_draw_buf_from_image(decoded, image);
+            if(result != LV_RESULT_OK) {
+                return result;
+            }
         }
 
         dsc->decoded = decoded;
