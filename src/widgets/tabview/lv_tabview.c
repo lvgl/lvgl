@@ -277,7 +277,8 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     cont = lv_obj_create(obj);
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
 
-    lv_obj_add_event_cb(cont, cont_scroll_end_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(cont, cont_scroll_end_event_cb, LV_EVENT_LAYOUT_CHANGED, NULL);
+    lv_obj_add_event_cb(cont, cont_scroll_end_event_cb, LV_EVENT_SCROLL_END, NULL);
     lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
     lv_tabview_set_tab_bar_position(obj, LV_DIR_TOP);
 
