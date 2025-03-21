@@ -299,6 +299,7 @@ static void lv_buttonmatrix_constructor(const lv_obj_class_t * class_p, lv_obj_t
     btnm->ctrl_bits      = NULL;
     btnm->map_p          = NULL;
     btnm->one_check      = 0;
+    btnm->auto_free_map  = 0;
 
 #if LV_WIDGETS_HAS_DEFAULT_VALUE
     lv_buttonmatrix_set_map(obj, lv_buttonmatrix_def_map);
