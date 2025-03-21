@@ -94,3 +94,10 @@ into a **frame buffer of the LCD peripheral**.
             lv_draw_sw_rotate(px_map, fb_start, src_w, src_h, src_stride, fb_stride, rotation, cf);
         }
     }
+
+
+
+API
+***
+
+.. API equals:  lv_display_set_rotation

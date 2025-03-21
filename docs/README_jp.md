@@ -61,7 +61,7 @@ LVGL LLC では、グラフィックデザイン、UI実装、コンサルティ
 
 **ウィジェット、スタイル、レイアウトなど**
   - 30以上の組み込み [ウィジェット](https://docs-lvgl-io.translate.goog/master/widgets/index.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja): ボタン、ラベル、スライダー、グラフ、キーボード、メーター、円弧、表など。
-  - ウィジェットの任意の部分を任意の状態にカスタマイズ可能な豊富なスタイルプロパティを備えた柔軟な [スタイルシステム](https://docs-lvgl-io.translate.goog/master/overview/style.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)。
+  - ウィジェットの任意の部分を任意の状態にカスタマイズ可能な豊富なスタイルプロパティを備えた柔軟な [スタイルシステム](https://docs-lvgl-io.translate.goog/master/overview/styles.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja)。
   - [Flexbox](https://docs-lvgl-io.translate.goog/master/layouts/flex.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) および [グリッド](https://docs-lvgl-io.translate.goog/master/layouts/grid.html?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja) 風のレイアウトエンジンにより、ウィジェットのサイズと位置を自動的に設定。
   - テキスト表示(UTF-8対応)は、中国語、日本語、韓国語、タイ語、ヒンディー語、アラビア語、ペルシア語をサポート。
   - ワードラッピング、カーニング、テキストスクロール、サブピクセルレンダリング、ピンイン-IME中国語入力、テキスト中の絵文字に対応。

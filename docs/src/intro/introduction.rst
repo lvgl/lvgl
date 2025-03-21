@@ -164,7 +164,8 @@ Be sure you are calling :cpp:expr:`lv_display_flush_ready(drv)` at the end of yo
 Why do I see only garbage on the screen?
 ----------------------------------------
 
-There is probably a bug in your display driver. Try the following code without using LVGL. You should see a square with red-blue gradient.
+There is probably a bug in your display driver. Try the following code without using
+LVGL.  You should see a square with red-blue gradient.
 
 .. code-block:: c
 
@@ -193,7 +194,8 @@ There is probably a bug in your display driver. Try the following code without u
 Why do I see nonsense colors on the screen?
 -------------------------------------------
 
-The configured LVGL color format is probably not compatible with your display's color format. Check :c:macro:`LV_COLOR_DEPTH` in *lv_conf.h*.
+The configured LVGL color format is probably not compatible with your display's color
+format.  Check :c:macro:`LV_COLOR_DEPTH` in *lv_conf.h*.
 
 
 How do I speed up my UI?
@@ -322,4 +324,10 @@ Starting from v8, every minor release is supported for 1 year.
 |v9.2     | 26 Aug, 2024 | 26 Aug, 2025 | Yes    |
 +---------+--------------+--------------+--------+
 
+
+
+API
+***
+.. API equals:  LV_MEM_SIZE, lv_timer_handler, lv_tick_inc, lv_display_flush_ready,
+    LV_COLOR_DEPTH
 

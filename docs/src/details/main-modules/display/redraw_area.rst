@@ -26,3 +26,11 @@ The size of the invalidated (redrawn) area can be controlled as follows:
     ...
 
     lv_display_add_event_cb(disp, rounder_event_cb, LV_EVENT_INVALIDATE_AREA, NULL);
+
+
+
+API
+***
+
+.. API equals:
+    lv_event_get_invalidated_area

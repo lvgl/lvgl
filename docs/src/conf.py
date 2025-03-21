@@ -426,7 +426,7 @@ redirects = {
     "overview/renderers/vg_lite":                 "../../details/integration/renderers/vg_lite.html"                ,
     "overview/renderers/vglite":                  "../../details/integration/renderers/nxp_vglite_gpu.html"         ,
     "overview/scroll":                            "../details/common-widget-features/scroll.html"                   ,
-    "overview/style":                             "../details/common-widget-features/styles/style.html"             ,
+    "overview/style":                             "../details/common-widget-features/styles/styles.html"            ,
     "overview/style-props":                       "../details/common-widget-features/styles/style-properties.html"  ,
     "overview/timer":                             "../details/main-modules/timer.html"                              ,
     "porting/display":                            "../details/main-modules/display.html"                            ,

@@ -641,3 +641,6 @@ following code to replace the LVGL built-in cache manager:
 
 API
 ***
+
+.. API startswith:
+    lv_image_
