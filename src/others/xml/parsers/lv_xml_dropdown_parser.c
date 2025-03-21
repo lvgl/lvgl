@@ -58,7 +58,7 @@ void lv_xml_dropdown_apply(lv_xml_parser_state_t * state, const char ** attrs)
         if(lv_streq("options", name)) lv_dropdown_set_options(item, value);
         if(lv_streq("text", name)) lv_dropdown_set_text(item, value);
         if(lv_streq("selected", name)) lv_dropdown_set_selected(item, lv_xml_atoi(value), LV_ANIM_OFF);
-        if(lv_streq("symbol", name)) lv_dropdown_set_symbol(item, lv_xml_get_image(value));
+        if(lv_streq("symbol", name)) lv_dropdown_set_symbol(item, lv_xml_get_image(&state->ctx, value));
     }
 }
 

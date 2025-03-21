@@ -663,11 +663,11 @@ void test_observer_label_text_normal(void)
     observer = lv_label_bind_text(obj, &subject_color, NULL);
     TEST_ASSERT_EQUAL_PTR(NULL, observer);
 
-    /*Cannot bind int*/
+    /*Bind it with "%d" if NULL is passed*/
     static lv_subject_t subject_int;
-    lv_subject_init_int(&subject_int, 0);
+    lv_subject_init_int(&subject_int, 10);
     observer = lv_label_bind_text(obj, &subject_int, NULL);
-    TEST_ASSERT_EQUAL_PTR(NULL, observer);
+    TEST_ASSERT_EQUAL_STRING("10", lv_label_get_text(obj));
 
     /*Bind to string*/
     static char buf[32];

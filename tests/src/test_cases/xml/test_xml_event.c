@@ -27,7 +27,7 @@ static void count_event_cb(lv_event_t * e)
 void test_xml_event_call_function_attr(void)
 {
 
-    lv_xml_register_event_cb("count_cb", count_event_cb);
+    lv_xml_register_event_cb(NULL, "count_cb", count_event_cb);
 
     lv_obj_t * scr = lv_screen_active();
 
@@ -80,7 +80,7 @@ void test_xml_event_call_function_component(void)
         "</component>"
     };
 
-    lv_xml_register_event_cb("count_cb", count_event_cb);
+    lv_xml_register_event_cb(NULL, "count_cb", count_event_cb);
     lv_xml_component_register_from_data("my_button", xml);
     lv_xml_create(lv_screen_active(), "my_button", NULL);
 

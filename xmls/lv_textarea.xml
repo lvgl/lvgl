@@ -1,0 +1,16 @@
+<!--
+Example
+<lv_textarea text="Hello"/>
+-->
+
+<widget>
+	<api>
+	    <prop name="text" type="string" help="The max range"/>
+	    <prop name="placeholder" type="string" help="The max range"/>
+	    <prop name="one_line" type="bool" help="The max range"/>
+	    <prop name="password_mode" type="bool" help="The max range"/>
+	    <prop name="password_show_time" type="int" help="The max range"/>
+	    <prop name="text_selection" type="bool" help="The max range"/>
+	    <prop name="cursor_pos" type="int" help="The max range"/>
+	</api>
+</widget>

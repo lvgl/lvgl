@@ -76,14 +76,19 @@ lv_part_t lv_xml_style_part_to_enum(const char * txt)
     return 0; /*Return 0 in lack of a better option. */
 }
 
-void lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs)
+lv_result_t lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs)
 {
     const char * style_name =  lv_xml_get_value_of(attrs, "name");
     if(style_name == NULL) {
         LV_LOG_WARN("'name' is missing from a style");
-        return;
+        return LV_RESULT_INVALID;
     }
+
+    if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
+    if(ctx == NULL) return LV_RESULT_INVALID;
+
     lv_xml_style_t * xml_style = lv_ll_ins_tail(&ctx->style_ll);
+
     lv_style_t * style = &xml_style->style;
     lv_style_init(style);
     xml_style->name = lv_strdup(style_name);
@@ -146,7 +151,7 @@ void lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs)
         else SET_STYLE_IF(bg_grad_stop, lv_xml_atoi(value));
         else SET_STYLE_IF(bg_grad, lv_xml_component_get_grad(ctx, value));
 
-        else SET_STYLE_IF(bg_image_src, lv_xml_get_image(value));
+        else SET_STYLE_IF(bg_image_src, lv_xml_get_image(ctx, value));
         else SET_STYLE_IF(bg_image_tiled, lv_xml_to_bool(value));
         else SET_STYLE_IF(bg_image_recolor, lv_xml_to_color(value));
         else SET_STYLE_IF(bg_image_recolor_opa, lv_xml_to_opa(value));
@@ -170,7 +175,7 @@ void lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs)
         else SET_STYLE_IF(shadow_opa, lv_xml_to_opa(value));
 
         else SET_STYLE_IF(text_color, lv_xml_to_color(value));
-        else SET_STYLE_IF(text_font, lv_xml_get_font(value));
+        else SET_STYLE_IF(text_font, lv_xml_get_font(ctx, value));
         else SET_STYLE_IF(text_opa, lv_xml_to_opa(value));
         else SET_STYLE_IF(text_align, lv_xml_text_align_to_enum(value));
         else SET_STYLE_IF(text_letter_space, lv_xml_atoi(value));
@@ -192,7 +197,7 @@ void lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs)
         else SET_STYLE_IF(arc_opa, lv_xml_to_opa(value));
         else SET_STYLE_IF(arc_width, lv_xml_atoi(value));
         else SET_STYLE_IF(arc_rounded, lv_xml_to_bool(value));
-        else SET_STYLE_IF(arc_image_src, lv_xml_get_image(value));
+        else SET_STYLE_IF(arc_image_src, lv_xml_get_image(ctx, value));
 
         else SET_STYLE_IF(opa, lv_xml_to_opa(value));
         else SET_STYLE_IF(opa_layered, lv_xml_to_opa(value));
@@ -210,7 +215,7 @@ void lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs)
         else SET_STYLE_IF(transform_pivot_x, lv_xml_atoi(value));
         else SET_STYLE_IF(transform_pivot_y, lv_xml_atoi(value));
         else SET_STYLE_IF(transform_skew_x, lv_xml_atoi(value));
-        else SET_STYLE_IF(bitmap_mask_src, lv_xml_get_image(value));
+        else SET_STYLE_IF(bitmap_mask_src, lv_xml_get_image(ctx, value));
         else SET_STYLE_IF(rotary_sensitivity, lv_xml_atoi(value));
 
         else SET_STYLE_IF(layout, lv_xml_layout_to_enum(value));
@@ -235,6 +240,8 @@ void lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** attrs)
             LV_LOG_WARN("%s style property is not supported", name);
         }
     }
+
+    return LV_RESULT_OK;
 }
 
 const char * lv_xml_style_string_process(char * txt, lv_style_selector_t * selector)
@@ -311,6 +318,16 @@ lv_xml_style_t * lv_xml_get_style_by_name(lv_xml_component_ctx_t * ctx, const ch
     lv_xml_style_t * xml_style;
     LV_LL_READ(&ctx->style_ll, xml_style) {
         if(lv_streq(xml_style->name, style_name)) return xml_style;
+    }
+
+    /*If not found in the component check the global space*/
+    if(!lv_streq(ctx->name, "globals")) {
+        ctx = lv_xml_component_get_ctx("globals");
+        if(ctx) {
+            LV_LL_READ(&ctx->style_ll, xml_style) {
+                if(lv_streq(xml_style->name, style_name)) return xml_style;
+            }
+        }
     }
 
     LV_LOG_WARN("No style found with %s name", style_name_raw);
