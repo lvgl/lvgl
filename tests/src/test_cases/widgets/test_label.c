@@ -663,4 +663,32 @@ void test_label_scroll_mid_update(void)
     }
 }
 
+/*
+ * For the LONG_MODE_CLIP mode, just re-use the screenshot from the initial
+ * screen of the long mode scroll
+ */
+
+void test_label_long_mode_clip(void)
+{
+    lv_obj_clean(lv_screen_active());
+
+    const char * text1 = "This is a long text that we will update while scrolling";
+
+    lv_obj_t * label1 = lv_label_create(lv_screen_active());
+    lv_label_set_long_mode(label1, LV_LABEL_LONG_MODE_CLIP);
+    lv_label_set_text(label1, text1);
+    lv_obj_set_width(label1, 150);
+    lv_obj_set_pos(label1, 10, 10);
+
+    lv_obj_t * label2 = lv_label_create(lv_screen_active());
+    lv_label_set_long_mode(label2, LV_LABEL_LONG_MODE_CLIP);
+    lv_label_set_text(label2, text1);
+    lv_obj_set_width(label2, 150);
+    lv_obj_set_pos(label2, 10, 80);
+
+    char buf[128];
+    lv_snprintf(buf, sizeof(buf), "widgets/label_scroll_0.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT(buf);
+}
+
 #endif

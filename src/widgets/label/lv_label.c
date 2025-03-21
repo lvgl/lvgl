@@ -868,7 +868,9 @@ static void draw_main(lv_event_t * e)
         lv_area_move(&txt_coords, 0, -s);
         txt_coords.y2 = obj->coords.y2;
     }
-    if(label->long_mode == LV_LABEL_LONG_MODE_SCROLL || label->long_mode == LV_LABEL_LONG_MODE_SCROLL_CIRCULAR) {
+    if(label->long_mode == LV_LABEL_LONG_MODE_SCROLL ||
+       label->long_mode == LV_LABEL_LONG_MODE_SCROLL_CIRCULAR ||
+       label->long_mode == LV_LABEL_LONG_MODE_CLIP) {
         const lv_area_t clip_area_ori = layer->_clip_area;
         layer->_clip_area = txt_clip;
         lv_draw_label(layer, &label_draw_dsc, &txt_coords);
