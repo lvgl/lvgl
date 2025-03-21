@@ -168,7 +168,7 @@ Special Events
 --------------
 
 -  :cpp:enumerator:`LV_EVENT_VALUE_CHANGED`: Widget's value has changed (i.e. slider moved)
--  :cpp:enumerator:`LV_EVENT_INSERT`: A text is inserted to Widget. The event data is ``char `*`` being inserted.
+-  :cpp:enumerator:`LV_EVENT_INSERT`: A text is inserted to Widget. The event data is ``char *`` being inserted.
 -  :cpp:enumerator:`LV_EVENT_REFRESH`: Notify Widget to refresh something on it (for the user)
 -  :cpp:enumerator:`LV_EVENT_READY`: A process has finished
 -  :cpp:enumerator:`LV_EVENT_CANCEL`: A process has been cancelled
@@ -278,3 +278,13 @@ Examples
 
 API
 ***
+
+.. API equals:  lv_obj_add_event_cb, lv_event_t, lv_obj_add_event,
+    lv_event_get_user_data, lv_display_add_event_cb, lv_indev_add_event_cb,
+    lv_obj_get_event_count, lv_obj_remove_event,
+    lv_indev_get_gesture_dir, lv_indev_get_key, lv_indev_active,
+    lv_cover_check_info_t,
+    LV_EVENT_RENDER_START,
+    lv_event_register_id, lv_obj_send_event, lv_event_get_code,
+    lv_obj_add_flag, lv_event_get_target_obj
+
