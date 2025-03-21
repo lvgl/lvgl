@@ -225,6 +225,7 @@ This pseudocode illustrates the concept of using a MUTEX:
         while(1) {
             uint32_t time_till_next;
             time_till_next = lv_timer_handler(); /* lv_lock/lv_unlock is called internally */
+            if(time_till_next == LV_NO_TIMER_READY) time_till_next = LV_DEF_REFR_PERIOD; /*try again soon because the other thread can make the timer ready*/
             thread_sleep(time_till_next); /* sleep for a while */
         }
     }
