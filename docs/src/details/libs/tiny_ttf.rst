@@ -56,7 +56,5 @@ Example
 API
 ***
 
-:ref:`stb_rect_pack_h`
-
-:ref:`stb_truetype_htcw_h`
+.. API startswith:  lv_tiny_ttf_
 

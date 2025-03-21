@@ -62,7 +62,5 @@ Example
 API
 ***
 
-:ref:`lodepng_h`
-
-:ref:`lv_lodepng_h`
+.. API startswith:  lv_lodepng_
 

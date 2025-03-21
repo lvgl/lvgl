@@ -14,10 +14,10 @@ For a detailed introduction, see:
 
 
 Usage
------
+*****
 
 Enable :c:macro:`LV_USE_FS_ARDUINO_ESP_LITTLEFS` and define a :c:macro:`LV_FS_ARDUINO_ESP_LITTLEFS_LETTER` in ``lv_conf.h``.
 
 
 API
----
+***

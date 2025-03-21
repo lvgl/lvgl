@@ -74,8 +74,5 @@ Example
 API
 ***
 
-:ref:`lv_tjpgd_h`
+.. API startswith:  lv_tjpgd_
 
-:ref:`tjpgd_h`
-
-:ref:`tjpgdcnf_h`

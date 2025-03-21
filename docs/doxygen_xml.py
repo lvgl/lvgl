@@ -249,7 +249,7 @@ The list of classes is:
   +-----------+----------------------------------------------------+
   | STRUCT    | structures  (have child STRUCT_FIELD objects)      |
   +-----------+----------------------------------------------------+
-  | UNION     | appears to be dysfunctional based on lacking input |
+  | UNION     | unions      (have child STRUCT_FIELD objects)      |
   +-----------+----------------------------------------------------+
   | TYPEDEF   | typedefs                                           |
   +-----------+----------------------------------------------------+
