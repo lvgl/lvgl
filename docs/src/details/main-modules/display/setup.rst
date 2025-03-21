@@ -190,4 +190,14 @@ However, if a Flush-Wait Callback is not set, LVGL assumes that
 :cpp:func:`lv_display_flush_ready` is called after the flush has completed.
 
 
-
+API
+***
+.. API equals:
+    lv_display_create,
+    lv_display_flush_is_last,
+    lv_display_flush_ready,
+    lv_display_set_buffers,
+    lv_display_set_default,
+    lv_display_set_flush_cb,
+    lv_display_set_flush_wait_cb
+    lv_display_t,

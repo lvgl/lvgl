@@ -55,3 +55,9 @@ there are 2 tiles, then 1/20th + 1/20th of the screen area will be rendered at o
 Tiled rendering only affects the rendering process, and the :ref:`flush_callback` is
 called once for each invalidated area. Therefore, tiling is not visible from the
 flushing point of view.
+
+
+
+API
+***
+.. API equals:  lv_display_set_tile_cnt, LV_DISPLAY_RENDER_MODE_FULL

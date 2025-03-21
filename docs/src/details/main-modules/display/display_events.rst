@@ -18,3 +18,9 @@ If you added ``user_data`` to the Display, you can retrieve it in an event like 
 The following events are sent for Display (lv_display_t) objects:
 
 .. include:: display_events_list.txt
+
+
+
+API
+***
+.. API equals:  lv_display_add_event_cb

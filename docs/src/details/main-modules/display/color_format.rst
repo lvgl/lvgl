@@ -151,3 +151,12 @@ In summary, to enable transparent screens and displays for OSD menu-like UIs:
   :cpp:expr:`lv_obj_set_style_bg_opa(lv_layer_bottom(), LV_OPA_TRANSP, LV_PART_MAIN)`
 - Set a color format with alpha channel. E.g.
   :cpp:expr:`lv_display_set_color_format(disp, LV_COLOR_FORMAT_ARGB8888)`
+
+
+
+API
+***
+.. API equals:  LV_COLOR_DEPTH, LV_COLOR_FORMAT_ARGB8888,
+    lv_display_set_color_depth, lv_draw_sw_rgb565_swap,
+    lv_display_set_color_format, lv_display_set_buffers,
+    lv_draw_sw_i1_convert_to_vtiled, lv_obj_set_style_bg_opa

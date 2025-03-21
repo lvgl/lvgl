@@ -87,3 +87,16 @@ Active Screen's background opacity is < 255.
 
     :ref:`transparent_screens`.
 
+
+
+API
+***
+.. API equals:
+    lv_screen_active,
+    lv_layer_top,
+    lv_layer_sys,
+    lv_layer_bottom,
+    lv_display_get_screen_active,
+    lv_display_get_layer_top,
+    lv_display_get_layer_sys,
+    lv_display_get_layer_bottom
