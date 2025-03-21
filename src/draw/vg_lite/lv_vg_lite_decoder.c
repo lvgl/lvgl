@@ -175,7 +175,10 @@ static lv_result_t decoder_open_variable(lv_image_decoder_t * decoder, lv_image_
     LV_UNUSED(decoder); /*Unused*/
 
     lv_draw_buf_t src_img_buf;
-    lv_draw_buf_from_image(&src_img_buf, dsc->src);
+    lv_result_t res = lv_draw_buf_from_image(&src_img_buf, dsc->src);
+    if(res != LV_RESULT_OK) {
+        return res;
+    }
 
     /* Since dsc->header.cf is uniformly set to I8,
      * the original format is obtained from src for conversion.

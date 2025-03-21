@@ -172,7 +172,7 @@ void lv_image_set_src(lv_obj_t * obj, const void * src)
 
     /*If the new source type is unknown free the memories of the old source*/
     if(src_type == LV_IMAGE_SRC_UNKNOWN) {
-        LV_LOG_WARN("unknown image type");
+        if(src) LV_LOG_WARN("unknown image type");
         if(img->src_type == LV_IMAGE_SRC_SYMBOL || img->src_type == LV_IMAGE_SRC_FILE) {
             lv_free((void *)img->src);
         }
@@ -194,6 +194,15 @@ void lv_image_set_src(lv_obj_t * obj, const void * src)
 
     /*Save the source*/
     if(src_type == LV_IMAGE_SRC_VARIABLE) {
+        if(header.flags & LV_IMAGE_FLAGS_ALLOCATED) {
+            lv_draw_buf_t * buf = (lv_draw_buf_t *)src;
+            if(!buf->unaligned_data || !buf->handlers) {
+                LV_LOG_ERROR("Invalid draw buffer, unaligned_data: %p, handlers: %p",
+                             buf->unaligned_data, (void *)buf->handlers);
+                return;
+            }
+        }
+
         /*If memory was allocated because of the previous `src_type` then free it*/
         if(img->src_type == LV_IMAGE_SRC_FILE || img->src_type == LV_IMAGE_SRC_SYMBOL) {
             lv_free((void *)img->src);
