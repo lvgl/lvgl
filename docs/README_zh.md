@@ -45,11 +45,11 @@
   - [:package: 已经支持的平台](#package-已经支持的平台)
 - [如何入门](#如何入门)
 - [:robot: 例程](#robot-例程)
-  - [Button with Click Event](#button-with-click-event)
+  - [Button with Click Event 按钮与点击事件](#button-with-click-event-按钮与点击事件)
   - [Micropython](#micropython)
-  - [Checkboxes with Layout](#checkboxes-with-layout)
-  - [Styling a Slider](#styling-a-slider)
-  - [English, Hebrew (mixed LRT-RTL) and Chinese texts](#english-hebrew-mixed-lrt-rtl-and-chinese-texts)
+  - [Checkboxes with Layout 带布局的复选框](#checkboxes-with-layout-带布局的复选框)
+  - [Styling a Slider 设置滑块的样式](#styling-a-slider-设置滑块的样式)
+  - [English, Hebrew (mixed LRT-RTL) and Chinese texts 英语、希伯来语（ 双向文本排版 ）和中文](#english-hebrew-mixed-lrt-rtl-and-chinese-texts-英语希伯来语-双向文本排版-和中文)
 - [:handshake: 服务](#handshake-服务)
 - [:star: 如何向社区贡献](#star-如何向社区贡献)
 
@@ -160,7 +160,7 @@ LVGL也支持：
 
 更多例程请参见 [examples](https://github.com/lvgl/lvgl/tree/master/examples) 文件夹。
 
-### Button with Click Event
+### Button with Click Event 按钮与点击事件
 
 ![Button with Click Event](https://raw.githubusercontent.com/kisvegabor/test/master/readme_example_2.gif)
 
@@ -213,7 +213,7 @@ label.center()
 <br>
 
 
-### Checkboxes with Layout
+### Checkboxes with Layout 带布局的复选框
 ![Checkboxes with layout in LVGL](https://raw.githubusercontent.com/kisvegabor/test/master/readme_example_3.gif)
 
 <details>
@@ -290,7 +290,7 @@ cb.add_event(event_handler, lv.EVENT.ALL, None)
 </details>
 
 
-### Styling a Slider
+### Styling a Slider 设置滑块的样式
 ![Styling a slider with LVGL](https://raw.githubusercontent.com/kisvegabor/test/master/readme_example_4.gif)
 
 
@@ -378,7 +378,7 @@ slider.set_style_shadow_spread(2, lv.PART.KNOB)
 <br>
 
 
-### English, Hebrew (mixed LRT-RTL) and Chinese texts
+### English, Hebrew (mixed LRT-RTL) and Chinese texts 英语、希伯来语（ 双向文本排版 ）和中文
 
 ![English, Hebrew and Chinese texts with LVGL](https://raw.githubusercontent.com/kisvegabor/test/master/readme_example_5.png)
 
