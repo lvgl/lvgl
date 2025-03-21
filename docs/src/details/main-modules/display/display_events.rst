@@ -23,4 +23,5 @@ The following events are sent for Display (lv_display_t) objects:
 
 API
 ***
+
 .. API equals:  lv_display_add_event_cb

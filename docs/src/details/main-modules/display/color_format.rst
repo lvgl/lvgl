@@ -156,7 +156,13 @@ In summary, to enable transparent screens and displays for OSD menu-like UIs:
 
 API
 ***
-.. API equals:  LV_COLOR_DEPTH, LV_COLOR_FORMAT_ARGB8888,
-    lv_display_set_color_depth, lv_draw_sw_rgb565_swap,
-    lv_display_set_color_format, lv_display_set_buffers,
-    lv_draw_sw_i1_convert_to_vtiled, lv_obj_set_style_bg_opa
+
+.. API equals:
+    LV_COLOR_DEPTH
+    LV_COLOR_FORMAT_ARGB8888
+    lv_display_set_buffers
+    lv_display_set_color_depth
+    lv_display_set_color_format
+    lv_draw_sw_i1_convert_to_vtiled
+    lv_draw_sw_rgb565_swap
+    lv_obj_set_style_bg_opa

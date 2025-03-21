@@ -70,6 +70,7 @@ with ``lv_display_t`` object.  This pointer can be used later, e.g. in
 
 API
 ***
+
 .. API equals:
     lv_display_set_dpi
     lv_display_set_user_data

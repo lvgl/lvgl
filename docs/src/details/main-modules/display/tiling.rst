@@ -60,4 +60,5 @@ flushing point of view.
 
 API
 ***
+
 .. API equals:  lv_display_set_tile_cnt, LV_DISPLAY_RENDER_MODE_FULL

@@ -26,4 +26,5 @@ You can manually trigger an activity using
 
 API
 ***
+
 .. API equals:  lv_display_get_inactive_time

@@ -91,6 +91,7 @@ Active Screen's background opacity is < 255.
 
 API
 ***
+
 .. API equals:
     lv_screen_active,
     lv_layer_top,

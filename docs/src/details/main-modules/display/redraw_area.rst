@@ -31,5 +31,6 @@ The size of the invalidated (redrawn) area can be controlled as follows:
 
 API
 ***
+
 .. API equals:
     lv_event_get_invalidated_area

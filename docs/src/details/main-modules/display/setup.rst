@@ -192,6 +192,7 @@ However, if a Flush-Wait Callback is not set, LVGL assumes that
 
 API
 ***
+
 .. API equals:
     lv_display_create,
     lv_display_flush_is_last,

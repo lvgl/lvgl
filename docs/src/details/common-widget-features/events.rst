@@ -41,7 +41,7 @@ In the example :cpp:enumerator:`LV_EVENT_CLICKED` means that only the click even
 call ``my_event_cb``. See the :ref:`list of event codes <events_codes>` for
 all the options. :cpp:enumerator:`LV_EVENT_ALL` can be used to receive all events.
 
-The last parameter of :cpp:func:`lv_obj_add_event` is a pointer to any custom
+The last parameter of :cpp:func:`lv_obj_add_event_cb` is a pointer to any custom
 data that will be available in the event.  NULL may be passed for this argument if
 there is no need to use that data when the event is processed.  You can retrieve the
 pointer passed when setting the callback function like this:
@@ -247,8 +247,8 @@ contains all data about the event. The following values can be gotten from it:
 - :cpp:expr:`lv_event_get_code(e)`: get the event code
 - :cpp:expr:`lv_event_get_current_target(e)`: get Widget to which an event was sent. I.e. the Widget whose event handler is being called.
 - :cpp:expr:`lv_event_get_target(e)`: get Widget that originally triggered the event (different from :cpp:func:`lv_event_get_target` if :ref:`event bubbling <event_bubbling>` is enabled)
-- :cpp:expr:`lv_event_get_user_data(e)`: get the pointer passed as the last parameter of :cpp:func:`lv_obj_add_event`.
-- :cpp:expr:`lv_event_get_param(e)`: get the parameter passed as the last parameter of :cpp:func:`lv_obj_send_event`
+- :cpp:expr:`lv_event_get_user_data(e)`: get the pointer passed as the last parameter of :cpp:func:`lv_obj_add_event_cb`.
+- :cpp:expr:`lv_event_get_param(e)`: get the parameter passed as the last parameter of :cpp:func:`lv_obj_send_event_cb`
 
 .. _event_bubbling:
 
@@ -279,12 +279,22 @@ Examples
 API
 ***
 
-.. API equals:  lv_obj_add_event_cb, lv_event_t, lv_obj_add_event,
-    lv_event_get_user_data, lv_display_add_event_cb, lv_indev_add_event_cb,
-    lv_obj_get_event_count, lv_obj_remove_event,
-    lv_indev_get_gesture_dir, lv_indev_get_key, lv_indev_active,
-    lv_cover_check_info_t,
-    LV_EVENT_RENDER_START,
-    lv_event_register_id, lv_obj_send_event, lv_event_get_code,
-    lv_obj_add_flag, lv_event_get_target_obj
+.. API equals:
+    lv_cover_check_info_t
+    lv_display_add_event_cb
+    lv_event_get_code
+    lv_event_get_target_obj
+    lv_event_get_user_data
+    lv_event_register_id
+    LV_EVENT_RENDER_START
+    lv_event_t
+    lv_indev_active
+    lv_indev_add_event_cb
+    lv_indev_get_gesture_dir
+    lv_indev_get_key
+    lv_obj_add_event_cb
+    lv_obj_add_flag
+    lv_obj_get_event_count
+    lv_obj_remove_event
+    lv_obj_send_event
 

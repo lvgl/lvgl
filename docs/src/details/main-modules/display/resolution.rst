@@ -19,6 +19,7 @@ of the active area can be set with
 
 API
 ***
+
 .. API equals:
     lv_display_set_resolution,
     lv_display_set_physical_resolution,

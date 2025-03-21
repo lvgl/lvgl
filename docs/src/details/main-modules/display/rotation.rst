@@ -99,4 +99,5 @@ into a **frame buffer of the LCD peripheral**.
 
 API
 ***
+
 .. API equals:  lv_display_set_rotation
