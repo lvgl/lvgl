@@ -17,6 +17,7 @@ extern "C" {
 #if LV_USE_TEST
 
 #include "../../misc/lv_types.h"
+#include "../../indev/lv_indev_gesture.h"
 
 /*********************
  *      DEFINES
@@ -31,7 +32,6 @@ typedef struct {
     lv_indev_t * keypad_indev;
     lv_indev_t * encoder_indev;
 
-
     lv_draw_buf_t draw_buf;
 
     int32_t x_act;
@@ -41,6 +41,12 @@ typedef struct {
     bool mouse_pressed;
     bool key_pressed;
     bool enc_pressed;
+
+#if LV_USE_GESTURE_RECOGNITION
+    lv_indev_t * gesture_indev;
+    lv_indev_touch_data_t * touch_data;
+    uint8_t max_touch_cnt;
+#endif
 } lv_test_state_t;
 
 /**********************
