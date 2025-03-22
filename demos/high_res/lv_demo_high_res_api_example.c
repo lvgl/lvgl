@@ -10,6 +10,10 @@
 #include "lv_demo_high_res.h"
 #if LV_USE_DEMO_HIGH_RES
 
+#if 0
+    #include <stdlib.h>
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -29,6 +33,7 @@ static void locked_timer_cb(lv_timer_t * t);
 static void delete_timer_cb(lv_event_t * e);
 static void clock_timer_cb(lv_timer_t * t);
 static void door_timer_cb(lv_timer_t * t);
+static void wifi_ssid_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 
 /**********************
  *  STATIC VARIABLES
@@ -54,7 +59,7 @@ void lv_demo_high_res_api_example(const char * assets_path, const char * logo_pa
     lv_subject_set_int(&api->subjects.temperature_outdoor, 16 * 10); /* 16 degrees C */
     lv_subject_set_int(&api->subjects.main_light_temperature, 4500); /* 4500 degrees K */
     lv_subject_set_int(&api->subjects.thermostat_target_temperature, 25 * 10); /* 25 degrees C */
-    lv_subject_set_pointer(&api->subjects.wifi_ssid, "my home Wi-Fi network");
+    lv_subject_set_pointer(&api->subjects.wifi_ssid, "Home Wi-Fi");
     lv_subject_set_pointer(&api->subjects.wifi_ip, "192.168.1.1");
     lv_subject_set_int(&api->subjects.door, 0); /* tell the UI the door is closed */
     lv_subject_set_int(&api->subjects.lightbulb_matter, 0); /* 0 or 1 */
@@ -93,6 +98,8 @@ void lv_demo_high_res_api_example(const char * assets_path, const char * logo_pa
     /* simulate the door opening and closing */
     lv_timer_t * door_timer = lv_timer_create(door_timer_cb, 3000, api);
     lv_obj_add_event_cb(api->base_obj, delete_timer_cb, LV_EVENT_DELETE, door_timer);
+
+    lv_subject_add_observer(&api->subjects.wifi_ssid, wifi_ssid_observer_cb, api);
 }
 
 /**********************
@@ -158,6 +165,52 @@ static void door_timer_cb(lv_timer_t * t)
 {
     lv_demo_high_res_api_t * api = lv_timer_get_user_data(t);
     lv_subject_set_int(&api->subjects.door, !lv_subject_get_int(&api->subjects.door));
+}
+
+static void wifi_ssid_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_demo_high_res_api_t * api = lv_observer_get_user_data(observer);
+    const char * ssid = lv_subject_get_pointer(subject);
+    const char * password = lv_subject_get_pointer(&api->subjects.wifi_password);
+
+    if(ssid) LV_LOG_USER("The WiFi SSID is \"%s\"", ssid);
+    else     LV_LOG_USER("The WiFi SSID is `NULL`");
+
+    if(password) LV_LOG_USER("The WiFi password is %d characters long", (int) lv_strlen(password));
+    else         LV_LOG_USER("The WiFi password is `NULL`");
+
+#if 0
+    if(ssid && password) {
+        char command[256];
+        lv_snprintf(command, sizeof(command), "nmcli device wifi connect '%s' password '%s'", ssid, password);
+        int exit_status = system(command); /* requires #include <stdlib.h> */
+
+        if(exit_status == 0) {
+            LV_LOG_USER("Successfully connected to the WiFi network.");
+
+            /* TODO: get the IP address using popen("hostname -I") or similar */
+            const char * ip = "(IP unknown)";
+            lv_subject_set_pointer(&api->subjects.wifi_ip, (void *) ip);
+
+#if 0
+            LV_LOG_USER("This functionality will now be disabled for the remainder of the demo.");
+            lv_observer_remove(observer);
+#endif
+        }
+        else {
+            LV_LOG_USER("Could not connect to the WiFi network. Exit status: %d", exit_status);
+
+            lv_subject_set_pointer(subject, NULL);
+        }
+    }
+    else if(!ssid) {
+        /* optional TODO: perform disconnect if connected */
+    }
+#else
+    if(ssid && password) {
+        lv_subject_set_pointer(&api->subjects.wifi_ip, "10.0.2.15");
+    }
+#endif
 }
 
 #endif /*LV_USE_DEMO_HIGH_RES*/

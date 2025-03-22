@@ -54,6 +54,8 @@ typedef struct {
         /* output subjects */
         /* int:     boolean 0 for music paused, 1 for music playing                                    */
         lv_subject_t music_play;
+        /* pointer: wifi network password,      the UI sets it right before it sets `wifi_ssid`        */
+        lv_subject_t wifi_password;
 
         /* input+output subjects */
         /* int:     boolean 0 for not locked, 1 for locked. When it is 1, you can set it back to 0     */
