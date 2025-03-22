@@ -32,4 +32,5 @@ void lv_example_dropdown_1(void)
     lv_obj_add_event_cb(dd, event_handler, LV_EVENT_ALL, NULL);
 }
 
+
 #endif
