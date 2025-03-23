@@ -160,4 +160,53 @@ void test_bin_decoder_image_dsc_error_handling(void)
     bin_decoder(NULL, "libs/bin_decoder_empty_image.png");
 }
 
+void test_bin_decoder_flush_cache(void)
+{
+#if LV_BIN_DECODER_RAM_LOAD == 1
+    LV_IMAGE_DECLARE(test_I1_NONE_align64);
+    LV_IMAGE_DECLARE(test_I2_NONE_align64);
+    LV_IMAGE_DECLARE(test_I4_NONE_align64);
+    LV_IMAGE_DECLARE(test_I8_NONE_align64);
+    LV_IMAGE_DECLARE(test_A1_NONE_align64);
+    LV_IMAGE_DECLARE(test_A2_NONE_align64);
+    LV_IMAGE_DECLARE(test_A4_NONE_align64);
+    LV_IMAGE_DECLARE(test_A8_NONE_align64);
+    LV_IMAGE_DECLARE(test_RGB565A8_NONE_align64);
+    LV_IMAGE_DECLARE(test_RGB565_NONE_align64);
+    LV_IMAGE_DECLARE(test_RGB888_NONE_align64);
+    LV_IMAGE_DECLARE(test_XRGB8888_NONE_align64);
+    LV_IMAGE_DECLARE(test_ARGB8888_NONE_align64);
+
+    const lv_image_dsc_t * img_dscs[] = {
+        &test_I1_NONE_align64,
+        &test_I2_NONE_align64,
+        &test_I4_NONE_align64,
+        &test_I8_NONE_align64,
+        &test_A1_NONE_align64,
+        &test_A2_NONE_align64,
+        &test_A4_NONE_align64,
+        &test_A8_NONE_align64,
+        &test_RGB565A8_NONE_align64,
+        &test_RGB565_NONE_align64,
+        &test_RGB888_NONE_align64,
+        &test_XRGB8888_NONE_align64,
+        &test_ARGB8888_NONE_align64,
+    };
+    const lv_image_decoder_args_t args = {
+        .no_cache = true,
+        .premultiply = false,
+        .stride_align = false,
+        .use_indexed = true,
+        .flush_cache = true,
+    };
+
+    for(unsigned long i = 0; i < sizeof(img_dscs) / sizeof(img_dscs[0]); i++) {
+        lv_image_decoder_dsc_t decoder_dsc;
+        lv_result_t res = lv_image_decoder_open(&decoder_dsc, img_dscs[i], &args);
+        TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
+        lv_image_decoder_close(&decoder_dsc);
+    }
+#endif
+}
+
 #endif
