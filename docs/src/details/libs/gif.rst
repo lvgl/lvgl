@@ -38,8 +38,10 @@ Example:
 Note that, a file system driver needs to be registered to open images
 from files.  To do so, follow the instructions in :ref:`file_system`.
 
+
+
 Memory Requirements
--------------------
+*******************
 
 To decode and display a GIF animation the following amount of RAM (in bytes) is
 required for each of the following color depths:
@@ -50,17 +52,21 @@ required for each of the following color depths:
 - :c:macro:`LV_COLOR_DEPTH` ``16``: 4 |times| image width |times| image height
 - :c:macro:`LV_COLOR_DEPTH` ``32``: 5 |times| image width |times| image height
 
+
+
 .. _gif_example:
 
 Example
--------
+*******
 
 .. include:: ../../examples/libs/gif/index.rst
+
+
 
 .. _gif_api:
 
 API
----
+***
 
-:ref:`gifdec_h`
+.. API startswith:  lv_gif_
 

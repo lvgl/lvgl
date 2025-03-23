@@ -69,5 +69,5 @@ Example
 API
 ***
 
-:ref:`libpng`
+.. API startswith:  lv_libpng_
 

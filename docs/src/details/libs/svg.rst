@@ -57,4 +57,6 @@ Example
 API
 ***
 
+.. API equals:  lv_svg_load_data
 
+.. API startswith:  lv_svg_parser_
