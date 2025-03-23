@@ -74,3 +74,17 @@ object in the middle, the coordinates (145,145) (154,154) should be used
 
 Exception:  for the Canvas Widget the layer is always assumed to be at the (0,0)
 coordinate, regardless of the Canvas Widget's position.
+
+
+
+API
+***
+
+.. API equals:
+    LV_EVENT_DRAW_MAIN_BEGIN
+    lv_draw_arc
+    lv_draw_image
+    lv_draw_label
+    lv_draw_line
+    lv_draw_mask_rect
+    lv_draw_triangle

@@ -63,7 +63,7 @@ Simple Initilialzation
 ----------------------
 
 Before using a draw descriptor it needs to be initialized with
-the related function. For example, ``lv_draw_label_dsc_init(&my_label_draw_dsc);``.
+the related function.  For example, :cpp:expr:`lv_draw_label_dsc_init(&my_label_draw_dsc)`.
 
 After initialization, each field of the draw descriptor can be set. The default
 values are quite sane and reasonable, so usually only a few fields need modification.
@@ -216,7 +216,7 @@ For example with 3 stops it can be set like this:
 The position of the stops are called fractions or offsets and are 8 bit values where
 0 is 0% and 255 is 100% of the whole gradient area.
 
-:cpp:expr:`lv_gradient_init_stops(grad_dsc, colors, opas, fracs, cnt)` initializes
+:cpp:expr:`lv_grad_init_stops(grad_dsc, colors, opas, fracs, cnt)` initializes
 a gradient descriptor with stops containing the color, opacity and fraction of each
 stop.
 
@@ -237,7 +237,7 @@ stop.
         255,
     };
 
-    lv_gradient_init_stops(&grad, colors, opas, fracs, sizeof(colors) / sizeof(lv_color_t));
+    lv_grad_init_stops(&grad, colors, opas, fracs, sizeof(colors) / sizeof(lv_color_t));
 
 If the opacity array is ``NULL`` 255 will be used for each stop.  If the fractions
 array is ``NULL`` the colors will be distributed evenly.  For example with 3 colors:
@@ -250,7 +250,7 @@ Horizontal and Vertical gradients
 The simplest and usually fastest gradient types are the horizontal and vertical
 gradients.
 
-After initializing the stops with :cpp:expr:`lv_gradient_init_stops` call
+After initializing the stops with :cpp:expr:`lv_grad_init_stops` call
 either :cpp:expr:`lv_grad_horizontal_init(&grad_dsc)` or
 :cpp:expr:`lv_grad_vertical_init(&grad_dsc)` to get a horizontal or vertical gradient
 descriptor.
@@ -268,7 +268,7 @@ angle of the gradient can be set.
 The linear gradient will be rendered along a line defined by 2 points.
 
 
-After initializing the stops with :cpp:func:`lv_gradient_init_stops` call either
+After initializing the stops with :cpp:func:`lv_grad_init_stops` call either
 :cpp:expr:`lv_grad_horizontal_init(&grad_dsc)` or
 :cpp:expr:`lv_grad_vertical_init(&grad_dsc)` to get a horizontal or vertical gradient
 descriptor.
@@ -634,3 +634,23 @@ There are several options to mask parts of a layer, Widget, or drawing:
 
 .. lv_example:: widgets/canvas/lv_example_roller_3
   :language: c
+
+
+
+API
+***
+
+.. API equals:
+    lv_draw_arc
+    lv_draw_dsc_base_t
+    lv_draw_image
+    lv_draw_label
+    lv_draw_label_dsc_init
+    lv_draw_line
+    lv_draw_mask_rect
+    lv_draw_rect_dsc_t
+    lv_draw_task_get_label_dsc
+    lv_draw_triangle
+    LV_EVENT_DRAW_TASK_ADDED
+    lv_grad_dsc_t
+    lv_grad_horizontal_init

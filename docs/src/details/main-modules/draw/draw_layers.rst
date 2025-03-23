@@ -129,3 +129,12 @@ The total memory available for layers at once is controlled by
 :c:macro:`LV_DRAW_LAYER_MAX_MEMORY` in ``lv_conf.h``.  If set to ``0``, there is no
 limit.
 
+
+
+API
+***
+
+.. API equals:
+    lv_draw_layer_create
+    LV_EVENT_DRAW_TASK_ADDED
+    lv_event_get_layer
