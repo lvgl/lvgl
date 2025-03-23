@@ -128,16 +128,20 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
      * */
     lv_result_t res = dsc->decoder->open_cb(dsc->decoder, dsc);
 
-    /* Flush the D-Cache if enabled and the image was successfully opened */
-    if(dsc->args.flush_cache && res == LV_RESULT_OK && dsc->decoded != NULL) {
-        lv_draw_buf_flush_cache(dsc->decoded, NULL);
-        LV_LOG_INFO("Flushed D-cache: src %p (%s) (W%d x H%d, data: %p cf: %d)",
-                    src,
-                    dsc->src_type == LV_IMAGE_SRC_FILE ? (const char *)src : "c-array",
-                    dsc->decoded->header.w,
-                    dsc->decoded->header.h,
-                    (void *)dsc->decoded->data,
-                    dsc->decoded->header.cf);
+    if(res == LV_RESULT_OK && dsc->decoded != NULL) {
+        LV_ASSERT_MSG(dsc->decoded->unaligned_data && dsc->decoded->handlers, "Invalid draw buffer");
+
+        /* Flush the D-Cache if enabled and the image was successfully opened */
+        if(dsc->args.flush_cache) {
+            lv_draw_buf_flush_cache(dsc->decoded, NULL);
+            LV_LOG_INFO("Flushed D-cache: src %p (%s) (W%d x H%d, data: %p cf: %d)",
+                        src,
+                        dsc->src_type == LV_IMAGE_SRC_FILE ? (const char *)src : "c-array",
+                        dsc->decoded->header.w,
+                        dsc->decoded->header.h,
+                        (void *)dsc->decoded->data,
+                        dsc->decoded->header.cf);
+        }
     }
 
     return res;
