@@ -592,3 +592,7 @@ Examples
 
 API
 ***
+
+.. API equals:  lv_style_init, lv_style_t, lv_obj_add_style, LV_PART_MAIN, LV_STATE_DEFAULT
+
+.. API startswith:  lv_style_set_, lv_obj_set_

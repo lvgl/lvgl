@@ -63,3 +63,15 @@ which might take longer.
 
 The parameter of :cpp:func:`lv_refr_now` is a pointer to the display to refresh.  If
 ``NULL`` is passed, all displays that have active refresh timers will be refreshed.
+
+
+
+API
+***
+
+.. API equals:
+    LV_DEF_REFR_PERIOD
+    lv_display_refr_timer
+    lv_display_set_default
+    lv_refr_now
+    lv_timer_handler

@@ -56,7 +56,7 @@
 * 不依赖特定的硬件平台，可以在任何显示屏上运行
 * 配置可裁剪（最低资源占用：64 kB Flash，16 kB RAM）
 * 基于UTF-8的多语种支持，例如中文、日文、韩文、阿拉伯文等
-* 可以通过[类CSS](https://docs.lvgl.io/master/overview/style.html)的方式来设计、布局图形界面（例如：[Flex](https://docs.lvgl.io/master/layouts/flex.html)、[Grid](https://docs.lvgl.io/master/layouts/grid.html)）
+* 可以通过[类CSS](https://docs.lvgl.io/master/overview/styles.html)的方式来设计、布局图形界面（例如：[Flex](https://docs.lvgl.io/master/layouts/flex.html)、[Grid](https://docs.lvgl.io/master/layouts/grid.html)）
 * 支持操作系统、外置内存、以及硬件加速（LVGL已内建支持STM32 DMA2D、SWM341 DMA2D、NXP PXP和VGLite）
 * 即便仅有[单缓冲区(frame buffer)](https://docs.lvgl.io/master/porting/display.html)的情况下，也可保证渲染如丝般顺滑
 * 全部由C编写完成，并支持C++调用

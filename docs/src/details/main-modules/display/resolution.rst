@@ -14,3 +14,14 @@ the active LVGL display area. So the physical resolution and the offset
 of the active area can be set with
 :cpp:expr:`lv_display_set_physical_resolution(disp, hor_res, ver_res)` and
 :cpp:expr:`lv_display_set_offset(disp, x, y)`
+
+
+
+API
+***
+
+.. API equals:
+    lv_display_set_resolution,
+    lv_display_set_physical_resolution,
+    lv_display_set_offset
+
