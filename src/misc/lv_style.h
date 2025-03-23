@@ -261,6 +261,8 @@ enum {
     LV_STYLE_BITMAP_MASK_SRC        = 115,
     LV_STYLE_ROTARY_SENSITIVITY     = 116,
     LV_STYLE_TRANSLATE_RADIAL       = 117,
+    LV_STYLE_RECOLOR                = 118,
+    LV_STYLE_RECOLOR_OPA            = 119,
 
     LV_STYLE_FLEX_FLOW              = 125,
     LV_STYLE_FLEX_MAIN_PLACE        = 126,
