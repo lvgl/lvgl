@@ -6,6 +6,7 @@
 
 static void timer_cb(lv_timer_t * timer)
 {
+    static int16_t counter = 0;
     const char * string = "lol~ I'm wavvvvvvving~>>>";
     const int16_t string_len = lv_strlen(string);
 
