@@ -556,12 +556,13 @@ static void recolor(lv_area_t relative_area, uint8_t * src_buf, uint8_t * dest_b
 
             uint16_t * buf16_src = (uint16_t *)src_buf_tmp;
             uint16_t * buf16_dest = (uint16_t *)dest_buf;
+            uint16_t color16 = lv_color_to_u16(color);
             if(mix >= LV_OPA_MAX) {
                 int32_t y;
                 for(y = 0; y < h; y++) {
                     int32_t x;
                     for(x = 0; x < w; x++) {
-                        *buf16_dest = *buf16_src;
+                        *buf16_dest = color16;
                         buf16_dest++;
                     }
                     buf16_src += img_stride_px;
