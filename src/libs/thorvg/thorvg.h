@@ -13,6 +13,7 @@
 
 
 #include <functional>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <list>
