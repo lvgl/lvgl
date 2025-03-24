@@ -9,7 +9,7 @@
 #include "lv_draw_sw_blend_to_argb8888_premultiplied.h"
 #if LV_USE_DRAW_SW
 
-#if LV_DRAW_SW_SUPPORT_ARGB8888
+#if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
 
 #include "lv_draw_sw_blend_private.h"
 #include "../../../misc/lv_math.h"
@@ -26,11 +26,27 @@
  **********************/
 
 /**********************
+*      TYPEDEFS
+**********************/
+
+typedef struct {
+    lv_color32_t fg_saved;
+    lv_color32_t bg_saved;
+    lv_color32_t res_saved;
+    lv_opa_t res_alpha_saved;
+    lv_opa_t ratio_saved;
+} lv_color_mix_alpha_cache_t;
+
+/**********************
  *  STATIC PROTOTYPES
  **********************/
 
 static inline lv_color32_t lv_color_32_32_mix_premul(lv_color32_t fg, lv_color32_t bg,
                                                      lv_color_mix_alpha_cache_t * cache);
+
+static void lv_color_mix_with_alpha_cache_init(lv_color_mix_alpha_cache_t * cache);
+
+static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * buf, uint32_t stride);
 
 /**********************
 *  STATIC VARIABLES
@@ -181,6 +197,22 @@ static inline lv_color32_t lv_color_32_32_mix_premul(lv_color32_t fg, lv_color32
     return res;
 }
 
-#endif /* LV_DRAW_SW_SUPPORT_ARGB8888 */
+void lv_color_mix_with_alpha_cache_init(lv_color_mix_alpha_cache_t * cache)
+{
+    lv_memzero(&cache->fg_saved, sizeof(lv_color32_t));
+    lv_memzero(&cache->bg_saved, sizeof(lv_color32_t));
+    lv_memzero(&cache->res_saved, sizeof(lv_color32_t));
+    cache->res_alpha_saved = 255;
+    cache->ratio_saved = 255;
+}
+
+
+static inline void * LV_ATTRIBUTE_FAST_MEM drawbuf_next_row(const void * buf, uint32_t stride)
+{
+    return (void *)((uint8_t *)buf + stride);
+}
+
+
+#endif /* LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED */
 
 #endif /* LV_USE_DRAW_SW */
