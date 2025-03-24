@@ -178,6 +178,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_argb8888_premultiplied(lv_d
 static inline lv_color32_t lv_color_32_32_mix_premul(lv_color32_t fg, lv_color32_t bg,
                                                      lv_color_mix_alpha_cache_t * cache)
 {
+    LV_UNUSED(cache);
+
     /* If foreground is fully opaque, return it directly */
     if(fg.alpha == 255) return fg;
 
