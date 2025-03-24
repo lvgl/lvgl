@@ -998,7 +998,7 @@ static lv_result_t decode_compressed(lv_image_decoder_t * decoder, lv_image_deco
 
     /*Depends on the cf, need to further decode image like an C-array image*/
     lv_image_dsc_t * image = (lv_image_dsc_t *)dsc->src;
-    if(image->data == NULL) {
+    if(dsc->src_type == LV_IMAGE_SRC_VARIABLE && image->data == NULL) {
         return LV_RESULT_INVALID;
     }
 
