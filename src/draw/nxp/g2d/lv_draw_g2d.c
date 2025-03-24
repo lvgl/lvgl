@@ -97,6 +97,7 @@ static inline bool _g2d_dest_cf_supported(lv_color_format_t cf)
 
     switch(cf) {
         case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
             is_cf_supported = true;
             break;
         default:
@@ -112,6 +113,7 @@ static inline bool _g2d_src_cf_supported(lv_draw_unit_t * drawunit, lv_color_for
 
     switch(cf) {
         case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
             is_cf_supported = true;
             break;
         case LV_COLOR_FORMAT_RGB565: {
