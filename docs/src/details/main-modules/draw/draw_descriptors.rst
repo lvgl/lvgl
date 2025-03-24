@@ -164,7 +164,7 @@ radius, opacity, and color to draw a rectangle.  If opacity is 0, no draw task w
 be created.
 
 - :cpp:expr:`lv_draw_fill_dsc_init(&dsc)` initializes a fill Draw Task.
-- :cpp:expr:`lv_draw_fill(layer, &dsc, area)` creates a Draw Task to fill an area.
+- :cpp:expr:`lv_draw_sw_fill(layer, &dsc, area)` creates a Draw Task to fill an area.
 - :cpp:expr:`lv_draw_task_get_fill_dsc(draw_task)` retrieves the fill descriptor from
   a Draw Task.
 
@@ -296,7 +296,7 @@ routine receives only simpler values.
 The following functions are used for border drawing:
 
 - :cpp:expr:`lv_draw_border_dsc_init(&dsc)` initializes a border Draw Task.
-- :cpp:expr:`lv_draw_border(layer, &dsc, area)` creates a Draw Task to draw a border
+- :cpp:expr:`lv_draw_sw_border(layer, &dsc, area)` creates a Draw Task to draw a border
   inward from its area.
 - :cpp:expr:`lv_draw_task_get_border_dsc(draw_task)` retrieves the border descriptor
   from a Draw Task.
@@ -354,9 +354,9 @@ Note: Rendering large shadows may be slow or memory-intensive.
 The following functions are used for box shadow drawing:
 
 - :cpp:expr:`lv_draw_box_shadow_dsc_init(&dsc)` initializes a box shadow Draw Task.
-- :cpp:expr:`lv_draw_box_shadow(layer, &dsc, area)` creates a Draw Task for a rectangle's
+- :cpp:expr:`lv_draw_sw_box_shadow(layer, &dsc, area)` creates a Draw Task for a rectangle's
   shadow. The shadow's size and position depend on the width, spread, and offset.
-- :cpp:expr:`lv_draw_task_get_box_shadow(draw_task)` retrieves the box shadow
+- :cpp:expr:`lv_draw_task_get_box_shadow_dsc(draw_task)` retrieves the box shadow
   descriptor from a Draw Task.
 
 .. lv_example:: styles/lv_example_style_5
