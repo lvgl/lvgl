@@ -22,6 +22,9 @@
 #if LV_DRAW_SW_SUPPORT_ARGB8888
     #include "lv_draw_sw_blend_to_argb8888.h"
 #endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+    #include "lv_draw_sw_blend_to_argb8888_premultiplied.h"
+#endif
 #if LV_DRAW_SW_SUPPORT_RGB888 || LV_DRAW_SW_SUPPORT_XRGB8888
     #include "lv_draw_sw_blend_to_rgb888.h"
 #endif
@@ -189,6 +192,11 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color(lv_color_format_
             lv_draw_sw_blend_color_to_rgb888(fill_dsc, 4);
             break;
 #endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+            lv_draw_sw_blend_color_to_argb8888_premultiplied(fill_dsc);
+            break;
+#endif
 #if LV_DRAW_SW_SUPPORT_L8
         case LV_COLOR_FORMAT_L8:
             lv_draw_sw_blend_color_to_l8(fill_dsc);
@@ -232,6 +240,11 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image(lv_color_format_
 #if LV_DRAW_SW_SUPPORT_XRGB8888
         case LV_COLOR_FORMAT_XRGB8888:
             lv_draw_sw_blend_image_to_rgb888(image_dsc, 4);
+            break;
+#endif
+#if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+            lv_draw_sw_blend_image_to_argb8888_premultiplied(image_dsc);
             break;
 #endif
 #if LV_DRAW_SW_SUPPORT_L8
