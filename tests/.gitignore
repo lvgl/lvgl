@@ -2,3 +2,7 @@
 *_Runner.c
 *.bin
 *_err.png
+build_*/
+report/
+test_images/
+wayland_protocols/
