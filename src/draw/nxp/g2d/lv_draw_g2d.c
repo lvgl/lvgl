@@ -125,6 +125,11 @@ static bool _g2d_draw_img_supported(const lv_draw_image_dsc_t * draw_dsc)
 {
     const lv_image_dsc_t * img_dsc = draw_dsc->src;
 
+    bool is_tiled = draw_dsc->tile;
+    /* Tiled image (repeat image) is currently not supported. */
+    if(is_tiled)
+        return false;
+
     bool has_recolor = (draw_dsc->recolor_opa > LV_OPA_MIN);
     bool has_rotation = (draw_dsc->rotation != 0);
 
