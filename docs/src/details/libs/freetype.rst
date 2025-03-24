@@ -140,7 +140,5 @@ Examples
 API
 ***
 
-:ref:`ftoption_h`
-
-:ref:`ftmodule_h`
+.. API startswith:  lv_freetype_
 

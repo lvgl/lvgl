@@ -170,9 +170,6 @@ struct _my_theme_t {
     bool inited;
     my_theme_styles_t styles;
 
-    lv_color_filter_dsc_t dark_filter;
-    lv_color_filter_dsc_t grey_filter;
-
 #if LV_THEME_DEFAULT_TRANSITION_TIME
     lv_style_transition_dsc_t trans_delayed;
     lv_style_transition_dsc_t trans_normal;
@@ -197,19 +194,6 @@ static void style_init_reset(lv_style_t * style);
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_color_t dark_color_filter_cb(const lv_color_filter_dsc_t * f, lv_color_t c, lv_opa_t opa)
-{
-    LV_UNUSED(f);
-    return lv_color_darken(c, opa);
-}
-
-static lv_color_t grey_filter_cb(const lv_color_filter_dsc_t * f, lv_color_t color, lv_opa_t opa)
-{
-    LV_UNUSED(f);
-    if(theme_def->base.flags & MODE_DARK) return lv_color_mix(lv_palette_darken(LV_PALETTE_GREY, 2), color, opa);
-    else return lv_color_mix(lv_palette_lighten(LV_PALETTE_GREY, 2), color, opa);
-}
-
 static void style_init(my_theme_t * theme)
 {
 #if TRANSITION_TIME
@@ -219,7 +203,7 @@ static void style_init(my_theme_t * theme)
         LV_STYLE_TRANSLATE_Y, LV_STYLE_TRANSLATE_X,
         LV_STYLE_TRANSFORM_ROTATION,
         LV_STYLE_TRANSFORM_SCALE_X, LV_STYLE_TRANSFORM_SCALE_Y,
-        LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_DSC,
+        LV_STYLE_RECOLOR_OPA, LV_STYLE_RECOLOR,
         0
     };
 #endif
@@ -308,16 +292,16 @@ static void style_init(my_theme_t * theme)
     lv_style_set_pad_column(&theme->styles.btn, LV_DPX_CALC(theme->disp_dpi, 5));
     lv_style_set_pad_row(&theme->styles.btn, LV_DPX_CALC(theme->disp_dpi, 5));
 
-    lv_color_filter_dsc_init(&theme->dark_filter, dark_color_filter_cb);
-    lv_color_filter_dsc_init(&theme->grey_filter, grey_filter_cb);
-
     style_init_reset(&theme->styles.pressed);
-    lv_style_set_color_filter_dsc(&theme->styles.pressed, &theme->dark_filter);
-    lv_style_set_color_filter_opa(&theme->styles.pressed, 35);
+    lv_style_set_recolor(&theme->styles.pressed, lv_color_black());
+    lv_style_set_recolor_opa(&theme->styles.pressed, 35);
 
     style_init_reset(&theme->styles.disabled);
-    lv_style_set_color_filter_dsc(&theme->styles.disabled, &theme->grey_filter);
-    lv_style_set_color_filter_opa(&theme->styles.disabled, LV_OPA_50);
+    if(theme_def->base.flags & MODE_DARK)
+        lv_style_set_recolor(&theme->styles.disabled, lv_palette_darken(LV_PALETTE_GREY, 2));
+    else
+        lv_style_set_recolor(&theme->styles.disabled, lv_palette_lighten(LV_PALETTE_GREY, 2));
+    lv_style_set_recolor_opa(&theme->styles.disabled, LV_OPA_50);
 
     style_init_reset(&theme->styles.clip_corner);
     lv_style_set_clip_corner(&theme->styles.clip_corner, true);
@@ -934,11 +918,9 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
         lv_obj_add_style(obj, &theme->styles.bg_color_primary, LV_PART_INDICATOR | LV_STATE_CHECKED);
         lv_obj_add_style(obj, &theme->styles.circle, LV_PART_INDICATOR);
-        lv_obj_add_style(obj, &theme->styles.disabled, LV_PART_INDICATOR | LV_STATE_DISABLED);
         lv_obj_add_style(obj, &theme->styles.knob, LV_PART_KNOB);
         lv_obj_add_style(obj, &theme->styles.bg_color_white, LV_PART_KNOB);
         lv_obj_add_style(obj, &theme->styles.switch_knob, LV_PART_KNOB);
-        lv_obj_add_style(obj, &theme->styles.disabled, LV_PART_KNOB | LV_STATE_DISABLED);
 
         lv_obj_add_style(obj, &theme->styles.transition_normal, LV_PART_INDICATOR | LV_STATE_CHECKED);
         lv_obj_add_style(obj, &theme->styles.transition_normal, LV_PART_INDICATOR);

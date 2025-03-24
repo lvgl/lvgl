@@ -14,11 +14,11 @@ For a detailed introduction, see:
 
 
 Usage
------
+*****
 
 Enable :c:macro:`LV_USE_FS_ARDUINO_SD` and define a :c:macro:`LV_FS_ARDUINO_SD_LETTER` in ``lv_conf.h``.
 You will need to initialize the SD card before LVGL can use it (i.e. :cpp:expr:`SD.begin(0, SPI, 40000000)`).
 
 
 API
----
+***

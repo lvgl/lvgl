@@ -78,7 +78,11 @@ static void * _buf_malloc(size_t size_bytes, lv_color_format_t color_format)
 
 static void _buf_free(void * buf)
 {
-    g2d_free_item(buf);
+    // make sure items are in the hash table
+    struct g2d_buf * g2d_buf = g2d_search_buf_map(buf);
+    if(g2d_buf) {
+        g2d_free_item(buf);
+    }
 }
 
 static void _invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)

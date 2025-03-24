@@ -243,7 +243,6 @@ static lv_map_item_t * _map_create_item(void * key, struct g2d_buf * value)
 static void _map_free_item(lv_map_item_t * item)
 {
     /* Also free the g2d_buf. */
-    lv_free(item->key);
     g2d_free(item->value);
     item->key = NULL;
     item->value = NULL;
