@@ -158,6 +158,7 @@ typedef enum {
     LV_COLOR_FORMAT_RGB888            = 0x0F,
     LV_COLOR_FORMAT_ARGB8888          = 0x10,
     LV_COLOR_FORMAT_XRGB8888          = 0x11,
+    LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED          = 0x1A,
 
     /*Formats not supported by software renderer but kept here so GPU can use it*/
     LV_COLOR_FORMAT_A1                = 0x0B,
