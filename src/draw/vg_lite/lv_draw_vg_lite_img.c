@@ -131,7 +131,7 @@ void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
             lv_vg_lite_path_append_rect(
                 path,
                 0, 0,
-                lv_area_get_width(coords), lv_area_get_height(coords),
+                lv_area_get_width(&dsc->image_area), lv_area_get_height(&dsc->image_area),
                 dsc->clip_radius);
             lv_vg_lite_path_set_transform(path, NULL);
         }

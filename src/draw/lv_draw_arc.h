@@ -29,14 +29,33 @@ extern "C" {
 typedef struct {
     lv_draw_dsc_base_t base;
 
+    /**The color of the arc*/
     lv_color_t color;
+
+    /**The width (thickness) of the arc */
     int32_t width;
+
+    /**The start angle in 1 degree units (if `LV_USE_FLOAT` is enabled a float number can be also used)
+     * 0° is the 3 o'clock position, 90° is the 6 o'clock, etc. */
     lv_value_precise_t start_angle;
+
+    /**The end angle, similarly to start_angle. */
     lv_value_precise_t end_angle;
+
+    /**The center point of the arc. */
     lv_point_t center;
+
+    /**The outer radius of the arc*/
     uint16_t radius;
+
+    /**An image source to be used instead of `color`. `NULL` if unused*/
     const void * img_src;
+
+    /**Opacity of the arc in 0...255 range.
+     * LV_OPA_TRANSP, LV_OPA_10, LV_OPA_20, .. LV_OPA_COVER can be used as well*/
     lv_opa_t opa;
+
+    /**1: Make the arc ends rounded*/
     uint8_t rounded : 1;
 } lv_draw_arc_dsc_t;
 
