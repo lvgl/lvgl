@@ -272,6 +272,12 @@ Events
 
 No special events are sent by Scale Widgets.
 
+In :cpp:enumerator:`LV_EVENT_DRAW_TASK_ADDED` events, a major or minor line
+draw descriptor's members ``id1`` and ``id2`` will be the tick index and
+tick value, respectively. If the part is :cpp:enumerator:`LV_PART_INDICATOR`,
+it is a major tick. If the part is :cpp:enumerator:`LV_PART_ITEMS` it is a
+minor tick.
+
 .. admonition::  Further Reading
 
     Learn more about :ref:`lv_obj_events` emitted by all Widgets.
