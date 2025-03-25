@@ -68,6 +68,7 @@ typedef struct {
     int16_t ofs_y;  /**< y offset of the bounding box*/
     lv_font_glyph_format_t format;  /**< Font format of the glyph see lv_font_glyph_format_t */
     uint8_t is_placeholder: 1;      /**< Glyph is missing. But placeholder will still be displayed*/
+    int32_t outline_stroke_width;   /**< used with freetype vector fonts - width of the letter outline */
 
     /** 0: Get bitmap should return an A8 or ARGB8888 image.
      * 1: return the bitmap as it is (Maybe A1/2/4 or any proprietary formats). */

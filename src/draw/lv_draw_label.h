@@ -100,6 +100,12 @@ typedef struct {
 
     /**Pointer to an externally stored struct where some data can be cached to speed up rendering*/
     lv_draw_label_hint_t * hint;
+
+    /* Properties of the letter outlines */
+    lv_opa_t outline_stroke_opa;
+    lv_color_t outline_stroke_color;
+    int32_t outline_stroke_width;
+
 } lv_draw_label_dsc_t;
 
 typedef struct {
@@ -119,6 +125,12 @@ typedef struct {
     lv_opa_t opa;
     lv_text_decor_t decor : 3;
     lv_blend_mode_t blend_mode : 3;
+
+    /* Properties of the letter outlines */
+    lv_opa_t outline_stroke_opa;
+    int32_t outline_stroke_width;
+    lv_color_t outline_stroke_color;
+
 } lv_draw_letter_dsc_t;
 
 /**
