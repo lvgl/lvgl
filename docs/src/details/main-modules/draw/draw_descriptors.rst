@@ -209,9 +209,9 @@ where they start relative to the whole gradient area.
 
 For example with 3 stops it can be set like this:
 
-- 10% red: 0..10% fully red
-- 60% green: 10..60% transition from red to green, 60% is fully green
-- 65% blue: fast transition from green to blue between 60%..65%. After 65% fully blue.
+- 10% red: 0--10% fully red
+- 60% green: 10--60% transition from red to green, 60% is fully green
+- 65% blue: fast transition from green to blue between 60%--65%. After 65% fully blue.
 
 The position of the stops are called fractions or offsets and are 8 bit values where
 0 is 0% and 255 is 100% of the whole gradient area.
@@ -244,31 +244,24 @@ array is ``NULL`` the colors will be distributed evenly.  For example with 3 col
 0%, 50%, 100%
 
 
-Horizontal and Vertical gradients
+Padding
+-------
+
+Linear, radial, and conic gradients are defined between two points or angles.  You
+can define how to pad the areas outside of the start and end points or angles:
+
+- :cpp:enum:`LV_GRAD_EXTEND_PAD`: Repeat the same color
+- :cpp:enum:`LV_GRAD_EXTEND_REPEAT`: Repeat the pattern
+- :cpp:enum:`LV_GRAD_EXTEND_REFLECT`: Repeat the pattern normally and mirrored alternately
+
+
+
+Horizontal and Vertical Gradients
 ---------------------------------
 
-The simplest and usually fastest gradient types are the horizontal and vertical
-gradients.
+The simplest and usually fastest gradient types are horizontal and vertical gradients.
 
-After initializing the stops with :cpp:expr:`lv_grad_init_stops` call
-either :cpp:expr:`lv_grad_horizontal_init(&grad_dsc)` or
-:cpp:expr:`lv_grad_vertical_init(&grad_dsc)` to get a horizontal or vertical gradient
-descriptor.
-
-.. lv_example:: grad/lv_example_grad_1
-  :language: c
-
-
-Linear gradients
-----------------
-
-The liniear (or skew) gradinet are similar to horizontal or vertical gradient but the
-angle of the gradient can be set.
-
-The linear gradient will be rendered along a line defined by 2 points.
-
-
-After initializing the stops with :cpp:func:`lv_grad_init_stops` call either
+After initializing the stops with :cpp:expr:`lv_grad_init_stops` call either
 :cpp:expr:`lv_grad_horizontal_init(&grad_dsc)` or
 :cpp:expr:`lv_grad_vertical_init(&grad_dsc)` to get a horizontal or vertical gradient
 descriptor.
@@ -276,7 +269,66 @@ descriptor.
 .. lv_example:: grad/lv_example_grad_1
   :language: c
 
-lv_grad_extend_t extend)
+
+Linear Gradients
+----------------
+
+The liniear (or skew) gradinet are similar to horizontal or vertical gradient but the
+angle of the gradient can be controlled.
+
+The linear gradient will be rendered along a line defined by 2 points.
+
+After initializing the stops with :cpp:func:`lv_grad_init_stops` call either
+:cpp:expr:`lv_grad_horizontal_init(&grad_dsc)` or
+:cpp:expr:`lv_grad_vertical_init(&grad_dsc)` to get a horizontal or vertical gradient
+descriptor.
+
+.. lv_example:: grad/lv_example_grad_2
+  :language: c
+
+
+Radial Gradients
+----------------
+
+The radial gradient is described by two circles: an outer circle and an inner circle
+(also called the focal point).  The gradient will be calculated between the focal
+point's circle and the edge of the outer circle.
+
+If the center of the focal point and the center of the main circle are the same, the
+gradient will spread evenly in all directions.  If the center points are not the
+same, the gradient will have an egg shape.
+
+The focal point's circle should be inside the main circle.
+
+After initializing the stops with :cpp:func:`lv_grad_init_stops`, the outer
+circle can be set by:
+:cpp:expr:`lv_grad_radial_init(&grad_dsc, center_x, center_y, edge_x, edge_y, LV_GRAD_EXTEND_PAD_...)`
+
+For both the center and edge coordinates, ``px`` or ``lv_pct()`` values can be used.
+
+The inner circle (focal point) can be set with:
+:cpp:expr:`lv_grad_radial_set_focal(&grad_dsc, center_x, center_y, radius)`
+
+.. lv_example:: grad/lv_example_grad_3
+  :language: c
+
+
+Conic Gradients
+---------------
+
+The conic gradient is defined between the angles of a circle, and colors are mapped
+to each angle.
+
+After initializing the stops with :cpp:func:`lv_grad_init_stops`, the conic gradient
+can be set up with:
+:cpp:expr:`lv_grad_conical_init(&grad, center_x, center_y, angle_start, angle_end, LV_GRAD_EXTEND_PAD_...)`
+
+For both the center and edge coordinates, ``px`` or ``lv_pct()`` values can be used.
+
+The zero angle is on the right-hand side, and 90 degrees is at the bottom.
+
+.. lv_example:: grad/lv_example_grad_4
+  :language: c
 
 
 
@@ -338,16 +390,16 @@ The :cpp:type:`lv_draw_box_shadow_dsc_t` box shadow descriptor describes a **rou
 rectangle-shaped shadow**.  It cannot generate shadows for arbitrary shapes, text, or
 images.  It includes the following fields:
 
-- ``radius``:  Radius, :cpp:expr:`LV_RADIUS_CIRCLE`.
-- ``color``:  Shadow color.
-- ``width``:  Shadow width (blur radius).
-- ``spread``:  Expands the rectangle in all directions; can be negative.
-- ``ofs_x``:  Horizontal offset.
-- ``ofs_y``:  Vertical offset.
-- ``opa``:  Opacity (0--255 range). Values like ``LV_OPA_TRANSP``, ``LV_OPA_10``,
-  etc., can also be used.
-- ``bg_cover``:  Set to 1 if the background will cover the shadow (a hint for the
-  renderer to skip masking).
+:radius:    Radius, :cpp:expr:`LV_RADIUS_CIRCLE`.
+:color:     Shadow color.
+:width:     Shadow width (blur radius).
+:spread:    Expands the rectangle in all directions; can be negative.
+:ofs_x:     Horizontal offset.
+:ofs_y:     Vertical offset.
+:opa:       Opacity (0--255 range). Values like ``LV_OPA_TRANSP``, ``LV_OPA_10``,
+            etc., can also be used.
+:bg_cover:  Set to 1 if the background will cover the shadow (a hint for the
+            renderer to skip masking).
 
 Note: Rendering large shadows may be slow or memory-intensive.
 
@@ -371,38 +423,38 @@ Image Draw Descriptor
 The :cpp:type:`lv_draw_image_dsc_t` image descriptor defines the parameters for
 image drawing.  It is a complex descriptor with the following options:
 
-- ``src``: The image source, either a pointer to `lv_image_dsc_t` or a file path.
-- ``opa``: Opacity in the 0--255 range. Options like
-  ``LV_OPA_TRANSP``, ``LV_OPA_10``, etc., can also be used.
-- ``clip_radius``: Clips the corners of the image with this radius.  Use
-  `LV_RADIUS_CIRCLE` for the maximum radius.
-- ``rotation``: Image rotation in 0.1-degree units (e.g., 234 means 23.4\ |deg|\ ).
-- ``scale_x``: Horizontal scaling (zoom) of the image.
-  256 (LV_SCALE_NONE) means no zoom, 512 doubles the size, and 128 halves it.
-- ``scale_y``: Same as ``scale_x`` but for vertical scaling.
-- ``skew_x``: Horizontal skew (parallelogram-like transformation) in 0.1-degree
-  units (e.g., 456 means 45.6\ |deg|\ ).
-- ``skew_y``: Vertical skew, similar to ``skew_x``.
-- ``pivot``: The pivot point for transformations (scaling and rotation).
-  (0,0) is the top-left corner of the image and can be set outside the image.
-- ``bitmap_mask_src``: Pointer to an A8 or L8 image descriptor used to mask the
-  image.  The mask is always center-aligned.
-- ``recolor``: Mixes this color with the image. For :cpp:enumerator:`LV_COLOR_FORMAT_A8`,
-  this will be the visible pixels' color.
-- ``recolor_opa``: Intensity of recoloring (0 means no recoloring, 255 means full cover).
-- ``blend_mode``: Defines how to blend image pixels with the background.
-  See :cpp:type:`lv_blend_mode_t` for more details.
-- ``antialias``: Set to 1 to enable anti-aliasing for transformations.
-- ``tile``: Tiles the image (repeats it both horizontally and vertically) if the
-  image is smaller than the `image_area` field in `lv_draw_image_dsc_t`.
-- ``image_area``: Indicates the original, non-clipped area where the image
-  is drawn.  This is essential for:
+:src:              The image source, either a pointer to `lv_image_dsc_t` or a file path.
+:opa:              Opacity in the 0--255 range. Options like
+                   ``LV_OPA_TRANSP``, ``LV_OPA_10``, etc., can also be used.
+:clip_radius:      Clips the corners of the image with this radius.  Use
+                   `LV_RADIUS_CIRCLE` for the maximum radius.
+:rotation:         Image rotation in 0.1-degree units (e.g., 234 means 23.4\ |deg|\ ).
+:scale_x:          Horizontal scaling (zoom) of the image.
+                   256 (LV_SCALE_NONE) means no zoom, 512 doubles the size, and 128 halves it.
+:scale_y:          Same as ``scale_x`` but for vertical scaling.
+:skew_x:           Horizontal skew (parallelogram-like transformation) in 0.1-degree
+                   units (e.g., 456 means 45.6\ |deg|\ ).
+:skew_y:           Vertical skew, similar to ``skew_x``.
+:pivot:            The pivot point for transformations (scaling and rotation).
+                   (0,0) is the top-left corner of the image and can be set outside the image.
+:bitmap_mask_src:  Pointer to an A8 or L8 image descriptor used to mask the
+                   image.  The mask is always center-aligned.
+:recolor:          Mixes this color with the image. For :cpp:enumerator:`LV_COLOR_FORMAT_A8`,
+                   this will be the visible pixels' color.
+:recolor_opa:      Intensity of recoloring (0 means no recoloring, 255 means full cover).
+:blend_mode:       Defines how to blend image pixels with the background.
+                   See :cpp:type:`lv_blend_mode_t` for more details.
+:antialias:        Set to 1 to enable anti-aliasing for transformations.
+:tile:             Tiles the image (repeats it both horizontally and vertically) if the
+                   image is smaller than the `image_area` field in `lv_draw_image_dsc_t`.
+:image_area:       Indicates the original, non-clipped area where the image
+                   is drawn.  This is essential for:
 
-  1. Layer rendering, where only part of a layer may be rendered and
-     ``clip_radius`` needs the original image dimensions.
-  2. Tiling, where the draw area is larger than the image.
+                   1. Layer rendering, where only part of a layer may be rendered and
+                      ``clip_radius`` needs the original image dimensions.
+                   2. Tiling, where the draw area is larger than the image.
 
-- ``sup``: Internal field to store information about the palette or color of A8 images.
+:sup:              Internal field to store information about the palette or color of A8 images.
 
 Functions for image drawing:
 
@@ -438,29 +490,29 @@ Label Draw Descriptor
 The :cpp:type:`lv_draw_label_dsc_t` label descriptor provides extensive options
 for controlling text rendering:
 
-- ``text``: The text to render.
-- ``font``: Font to use, with support for fallback fonts.
-- ``color``: Text color.
-- ``opa``: Text opacity.
-- ``line_space``: Additional space between lines.
-- ``letter_space``: Additional space between characters.
-- ``ofs_x``: Horizontal text offset.
-- ``ofs_y``: Vertical text offset.
-- ``sel_start``: Index of the first character for selection (not byte index).
-  ``LV_DRAW_LABEL_NO_TXT_SEL`` means no selection.
-- ``sel_end``: Index of the last character for selection.
-- ``sel_color``: Color of selected characters.
-- ``sel_bg_color``: Background color for selected characters.
-- ``align``: Text alignment. See :cpp:type:`lv_text_align_t`.
-- ``bidi_dir``: Base direction for right-to-left text rendering (e.g., Arabic).
-  See :cpp:type:`lv_base_dir_t`.
-- ``decor``: Text decoration, e.g., underline. See :cpp:type:`lv_text_decor_t`.
-- ``flag``: Flags for text rendering. See :cpp:type:`lv_text_flag_t`.
-- ``text_length``: Number of characters to render (0 means render until `\0`).
-- ``text_local``: Set to 1 to allocate a buffer and copy the text.
-- ``text_static``: Indicates ``text`` is constant and its pointer can be cached.
-- ``hint``: Pointer to externally stored data to speed up rendering.
-  See :cpp:type:`lv_draw_label_hint_t`.
+:text:          The text to render.
+:font:          Font to use, with support for fallback fonts.
+:color:         Text color.
+:opa:           Text opacity.
+:line_space:    Additional space between lines.
+:letter_space:  Additional space between characters.
+:ofs_x:         Horizontal text offset.
+:ofs_y:         Vertical text offset.
+:sel_start:     Index of the first character for selection (not byte index).
+                ``LV_DRAW_LABEL_NO_TXT_SEL`` means no selection.
+:sel_end:       Index of the last character for selection.
+:sel_color:     Color of selected characters.
+:sel_bg_color:  Background color for selected characters.
+:align:         Text alignment. See :cpp:type:`lv_text_align_t`.
+:bidi_dir:      Base direction for right-to-left text rendering (e.g., Arabic).
+                See :cpp:type:`lv_base_dir_t`.
+:decor:         Text decoration, e.g., underline. See :cpp:type:`lv_text_decor_t`.
+:flag:          Flags for text rendering. See :cpp:type:`lv_text_flag_t`.
+:text_length:   Number of characters to render (0 means render until `\0`).
+:text_local:    Set to 1 to allocate a buffer and copy the text.
+:text_static:   Indicates ``text`` is constant and its pointer can be cached.
+:hint:          Pointer to externally stored data to speed up rendering.
+                See :cpp:type:`lv_draw_label_hint_t`.
 
 Functions for text drawing:
 
@@ -490,15 +542,15 @@ Arc Draw Descriptor
 The :cpp:type:`lv_draw_arc_dsc_t` arc descriptor defines arc rendering with
 these fields:
 
-- ``color``: Arc color.
-- ``img_src``: Image source for the arc, or `NULL` if unused.
-- ``width``: Arc thickness.
-- ``start_angle``: Starting angle in degrees (e.g., 0° is 3 o'clock, 90° is 6 o'clock).
-- ``end_angle``: Ending angle.
-- ``center``: Arc center point.
-- ``radius``: Arc radius.
-- ``opa``: Arc opacity (0--255).
-- ``rounded``: Rounds the arc ends.
+:color:        Arc color.
+:img_src:      Image source for the arc, or `NULL` if unused.
+:width:        Arc thickness.
+:start_angle:  Starting angle in degrees (e.g., 0° is 3 o'clock, 90° is 6 o'clock).
+:end_angle:    Ending angle.
+:center:       Arc center point.
+:radius:       Arc radius.
+:opa:          Arc opacity (0--255).
+:rounded:      Rounds the arc ends.
 
 Functions for arc drawing:
 
@@ -520,16 +572,16 @@ Line Draw Descriptor
 The :cpp:type:`lv_draw_line_dsc_t` line descriptor defines line rendering with
 these fields:
 
-- ``p1``: First point of line (supports floating-point coordinates).
-- ``p2``: Second point of line (supports floating-point coordinates).
-- ``color``: Line color.
-- ``width``: Line thickness.
-- ``opa``: Line opacity (0--255).
-- ``dash_width``: Length of dashes (0 means no dashes).
-- ``dash_gap``: Length of gaps between dashes (0 means no dashes).
-- ``round_start``: Rounds the line start.
-- ``round_end``: Rounds the line end.
-- ``raw_end``: Set to 1 to skip end calculations if they are unnecessary.
+:p1:           First point of line (supports floating-point coordinates).
+:p2:           Second point of line (supports floating-point coordinates).
+:color:        Line color.
+:width:        Line thickness.
+:opa:          Line opacity (0--255).
+:dash_width:   Length of dashes (0 means no dashes).
+:dash_gap:     Length of gaps between dashes (0 means no dashes).
+:round_start:  Rounds the line start.
+:round_end:    Rounds the line end.
+:raw_end:      Set to 1 to skip end calculations if they are unnecessary.
 
 Functions for line drawing:
 
@@ -550,11 +602,11 @@ Triangle Draw Descriptor
 
 Triangles are defined by :cpp:type:`lv_draw_triangle_dsc_t`, which includes:
 
-- 3 points for the triangle's vertices.
-- ``color``: Triangle color.
-- ``opa``: Triangle opacity.
-- ``grad``: Gradient options. If ``grad.dir`` is not ``LV_GRAD_DIR_NONE``, the
-  ``color`` field is ignored. The ``opa`` field adjusts overall opacity.
+:p[3]:   3 points for the triangle's vertices.
+:color:  Triangle color.
+:opa:    Triangle opacity.
+:grad:   Gradient options. If ``grad.dir`` is not ``LV_GRAD_DIR_NONE``, the
+         ``color`` field is ignored. The ``opa`` field adjusts overall opacity.
 
 Functions for triangle drawing:
 - :cpp:expr:`lv_draw_triangle_dsc_init(&dsc)` initializes a triangle descriptor.
