@@ -357,26 +357,24 @@ The following functions are used for border drawing:
   :language: c
 
 
+Outlines
+********
 
-Outline Draw Descriptor
-***********************
+The outline is similar to the border but is drawn outside the object's draw area.
 
-The :cpp:type:`lv_draw_outline_dsc_t` outline descriptor has radius, opacity,
-width, color, and pad fields.  If the opacity or width is 0, no Draw Task will
-be created.
+In practice, there is no dedicated outline descriptor like
+:cpp:type:`lv_draw_outline_dsc_t`, because from the rendering perspective, the
+outline is simply another border rendered outside the object's bounds.
 
-The outline is similar to the border but is drawn outward from its draw area.
-``pad`` specifies the gap between the target area and the inner side of the
-outline.  It can be negative.  For example, if ``pad = -width``, the outline will
-resemble a border.
+The outline is used only in :cpp:type:`lv_draw_rect_dsc_t` for convenience. The two
+differences compared to borders in :cpp:type:`lv_draw_rect_dsc_t` are:
 
-The following functions are used for outline drawing:
+- There is an ``outline_pad`` property to specify the gap between the target area and
+  the inner side of the outline. It can be negative. For example, if ``outline_pad =
+  -width``, the outline will resemble a border.
 
-- :cpp:expr:`lv_draw_outline_dsc_init(&dsc)` initializes an outline Draw Task.
-- :cpp:expr:`lv_draw_outline(layer, &dsc, area)` creates a Draw Task to draw an
-  outline outward from an area.
-- :cpp:expr:`lv_draw_task_get_outline_dsc(draw_task)` retrieves the outline
-  descriptor from a Draw Task.
+- There is no ``border_side`` property for the outline. It's always rendered as a
+  full rectangle.
 
 .. lv_example:: styles/lv_example_style_4
   :language: c
