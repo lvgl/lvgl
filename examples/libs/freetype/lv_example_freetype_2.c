@@ -88,6 +88,18 @@ void lv_example_freetype_2(void)
 }
 #else
 
+void lv_example_freetype_2_vector_font(uint32_t font_size, uint32_t border_width)
+{
+    /*TODO
+     *fallback for online examples*/
+    LV_UNUSED(font_size);
+    LV_UNUSED(border_width);
+
+    lv_obj_t * label = lv_label_create(lv_screen_active());
+    lv_label_set_text(label, "FreeType is not installed");
+    lv_obj_center(label);
+}
+
 void lv_example_freetype_2(void)
 {
     /*TODO
