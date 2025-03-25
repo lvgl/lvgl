@@ -308,11 +308,11 @@ def write_c_array_file(
         stride: int,
         cf: ColorFormat,
         filename: str,
-        oname: str,
+        outputname: str,
         premultiplied: bool,
         compress: CompressMethod,
         data: bytes):
-    varname = path.basename(filename).split('.')[0].replace("-", "_").replace(".", "_") if oname is None else oname
+    varname = path.basename(filename).split('.')[0].replace("-", "_").replace(".", "_") if outputname is None else outputname
 
     flags = "0"
     if compress is not CompressMethod.NONE:
@@ -773,7 +773,7 @@ class LVGLImage:
     def to_c_array(self,
                    filename: str,
                    compress: CompressMethod = CompressMethod.NONE,
-                   oname: str = None):
+                   outputname: str = None):
         self._check_ext(filename, ".c")
         self._check_dir(filename)
 
@@ -781,7 +781,7 @@ class LVGLImage:
             data = LVGLCompressData(self.cf, compress, self.data).compressed
         else:
             data = self.data
-        write_c_array_file(self.w, self.h, self.stride, self.cf, filename, oname,
+        write_c_array_file(self.w, self.h, self.stride, self.cf, filename, outputname,
                            self.premultiplied,
                            compress, data)
 
@@ -1232,10 +1232,10 @@ class RAWImage():
 
     def to_c_array(self,
                    filename: str,
-                   oname: str = None):
+                   outputname: str = None):
         # Image size is set to zero, to let PNG or JPEG decoder to handle it
         # Stride is meaningless for RAW image
-        write_c_array_file(0, 0, 0, self.cf, filename, oname,
+        write_c_array_file(0, 0, 0, self.cf, filename, outputname,
                            False, CompressMethod.NONE, self.data)
 
     def from_file(self,
@@ -1283,30 +1283,30 @@ class PNGConverter:
         self.rgb565_dither = rgb565_dither
         self.nema_gfx = nema_gfx
 
-    def _replace_ext(self, input, ext, oname: str = None):
+    def _replace_ext(self, input, ext, outputname: str = None):
         if self.keep_folder:
             name, _ = path.splitext(input)
         else:
             name, _ = path.splitext(path.basename(input))
 
-        # change output name to 'oname', if specified
-        if oname is not None:
-            name = path.join(path.dirname(name), oname)
+        # change output name to 'outputname', if specified
+        if outputname is not None:
+            name = path.join(path.dirname(name), outputname)
 
         output = name + ext
         output = path.join(self.output, output)
         return output
 
-    def convert(self, oname: str):
-        if len(self.files) > 1 and oname is not None:
-            raise BaseException(f"Cannot specify 'oname' when converting more than one file.")
+    def convert(self, outputname: str):
+        if len(self.files) > 1 and outputname is not None:
+            raise BaseException(f"Cannot specify output nam when converting more than one file.")
 
         output = []
         for f in self.files:
             if self.cf in (ColorFormat.RAW, ColorFormat.RAW_ALPHA):
                 # Process RAW image explicitly
                 img = RAWImage().from_file(f, self.cf)
-                img.to_c_array(self._replace_ext(f, ".c", oname), oname=oname)
+                img.to_c_array(self._replace_ext(f, ".c", outputname), outputname=outputname)
             else:
                 img = LVGLImage().from_png(f, self.cf, background=self.background, rgb565_dither=self.rgb565_dither, nema_gfx=self.nema_gfx)
                 img.adjust_stride(align=self.align)
@@ -1318,9 +1318,9 @@ class PNGConverter:
                     img.to_bin(self._replace_ext(f, ".bin"),
                                compress=self.compress)
                 elif self.ofmt == OutputFormat.C_ARRAY:
-                    img.to_c_array(self._replace_ext(f, ".c", oname),
+                    img.to_c_array(self._replace_ext(f, ".c", outputname),
                                    compress=self.compress,
-                                   oname=oname)
+                                   outputname=outputname)
                 elif self.ofmt == OutputFormat.PNG_FILE:
                     img.to_png(self._replace_ext(f, ".png"))
 
