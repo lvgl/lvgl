@@ -12,7 +12,7 @@ to use in the creation of your GUI, and supports more advanced functions such as
 animations and anti-aliasing.
 
 LVGL enables graphics in our free GUI Guider UI tool. It's available for use
-with NXP’s general purpose and crossover microcontrollers, providing developers
+with NXP's general purpose and crossover microcontrollers, providing developers
 with a tool for creating complete, high quality GUI applications with LVGL.
 
 Creating new project with LVGL
