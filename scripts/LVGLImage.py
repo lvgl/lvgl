@@ -1299,7 +1299,7 @@ class PNGConverter:
 
     def convert(self, outputname: str):
         if len(self.files) > 1 and outputname is not None:
-            raise BaseException(f"Cannot specify output nam when converting more than one file.")
+            raise BaseException(f"Cannot specify output name when converting more than one file.")
 
         output = []
         for f in self.files:
