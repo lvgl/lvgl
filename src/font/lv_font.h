@@ -280,11 +280,23 @@ LV_FONT_DECLARE(lv_font_dejavu_16_persian_hebrew)
 #endif
 
 #if LV_FONT_SIMSUN_14_CJK
+#warning  "LV_FONT_SIMSUN_14_CJK is deprecated, use LV_FONT_SOURCE_HAN_SANS_SC_14_CJK instead."
+
 LV_FONT_DECLARE(lv_font_simsun_14_cjk)
 #endif
 
 #if LV_FONT_SIMSUN_16_CJK
+#warning  "LV_FONT_SIMSUN_16_CJK is deprecated, use LV_FONT_SOURCE_HAN_SANS_SC_16_CJK instead."
+
 LV_FONT_DECLARE(lv_font_simsun_16_cjk)
+#endif
+
+#if LV_FONT_SOURCE_HAN_SANS_SC_14_CJK
+LV_FONT_DECLARE(lv_font_source_han_sans_sc_14_cjk)
+#endif
+
+#if LV_FONT_SOURCE_HAN_SANS_SC_16_CJK
+LV_FONT_DECLARE(lv_font_source_han_sans_sc_16_cjk)
 #endif
 
 #if LV_FONT_UNSCII_8
