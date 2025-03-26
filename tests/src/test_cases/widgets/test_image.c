@@ -290,7 +290,7 @@ void test_image_stretch(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_stretch.png");
 }
 
-void test_image_auto_scale(void)
+void test_image_contain(void)
 {
     lv_obj_t * img;
     uint32_t i;
@@ -308,7 +308,7 @@ void test_image_auto_scale(void)
         const int32_t h = h_array[i % 3];
         lv_obj_set_size(img, w, h);
         lv_obj_set_pos(img, 30 + (i % 3) * 260, 40 + (i / 3) * 150);
-        lv_image_set_inner_align(img, LV_IMAGE_ALIGN_AUTO_SCALE);
+        lv_image_set_inner_align(img, LV_IMAGE_ALIGN_CONTAIN);
 
         const int32_t scale = lv_image_get_scale(img);
         TEST_ASSERT_EQUAL_INT(aspect_ratio, lv_image_get_transformed_width(img) / lv_image_get_transformed_height(img));
@@ -316,7 +316,36 @@ void test_image_auto_scale(void)
         TEST_ASSERT_EQUAL_INT((img_h * scale) >> 8, lv_image_get_transformed_height(img));
     }
 
-    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_auto_scale.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_contain.png");
+}
+
+void test_image_cover(void)
+{
+    lv_obj_t * img;
+    uint32_t i;
+
+    int32_t img_w = test_img_lvgl_logo_png.header.w;
+    int32_t img_h = test_img_lvgl_logo_png.header.h;
+    int32_t aspect_ratio = img_w / img_h;
+
+    int32_t w_array[] = {img_w / 2, img_w, img_w * 2};
+    int32_t h_array[] = {img_h / 2, img_h, img_h * 2};
+
+    for(i = 0; i < 9; i++) {
+        img = img_create();
+        const int32_t w = w_array[i / 3];
+        const int32_t h = h_array[i % 3];
+        lv_obj_set_size(img, w, h);
+        lv_obj_set_pos(img, 30 + (i % 3) * 260, 40 + (i / 3) * 150);
+        lv_image_set_inner_align(img, LV_IMAGE_ALIGN_COVER);
+
+        const int32_t scale = lv_image_get_scale(img);
+        TEST_ASSERT_EQUAL_INT(aspect_ratio, lv_image_get_transformed_width(img) / lv_image_get_transformed_height(img));
+        TEST_ASSERT_EQUAL_INT((img_w * scale) >> 8, lv_image_get_transformed_width(img));
+        TEST_ASSERT_EQUAL_INT((img_h * scale) >> 8, lv_image_get_transformed_height(img));
+    }
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_cover.png");
 }
 
 void test_image_tile(void)
@@ -378,11 +407,34 @@ void test_image_ignore_transformation_settings_when_stretched(void)
     TEST_ASSERT_EQUAL_INT(scale_y_original, lv_image_get_scale_y(img));
 }
 
-void test_image_ignore_transformation_settings_when_auto_scaled(void)
+void test_image_ignore_transformation_settings_when_contained(void)
 {
     lv_obj_t * img = img_create();
     lv_obj_set_size(img, 200, 300);
-    lv_image_set_inner_align(img, LV_IMAGE_ALIGN_AUTO_SCALE);
+    lv_image_set_inner_align(img, LV_IMAGE_ALIGN_CONTAIN);
+
+    lv_image_set_rotation(img, 100);
+    lv_image_set_pivot(img, 200, 300);
+    TEST_ASSERT_EQUAL_INT(0, lv_image_get_rotation(img));
+
+    lv_point_t pivot;
+    lv_image_get_pivot(img, &pivot);
+    TEST_ASSERT_EQUAL_INT(0, pivot.x);
+    TEST_ASSERT_EQUAL_INT(0, pivot.y);
+
+    int32_t scale_x_original = lv_image_get_scale_x(img);
+    int32_t scale_y_original = lv_image_get_scale_y(img);
+    lv_image_set_scale_x(img, 400);
+    lv_image_set_scale_y(img, 500);
+    TEST_ASSERT_EQUAL_INT(scale_x_original, lv_image_get_scale_x(img));
+    TEST_ASSERT_EQUAL_INT(scale_y_original, lv_image_get_scale_y(img));
+}
+
+void test_image_ignore_transformation_settings_when_covered(void)
+{
+    lv_obj_t * img = img_create();
+    lv_obj_set_size(img, 200, 300);
+    lv_image_set_inner_align(img, LV_IMAGE_ALIGN_COVER);
 
     lv_image_set_rotation(img, 100);
     lv_image_set_pivot(img, 200, 300);
