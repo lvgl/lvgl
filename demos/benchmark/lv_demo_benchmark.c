@@ -572,7 +572,7 @@ static void widgets_demo_cb(benchmark_context_t * context)
  *  STATIC VARIABLES
  **********************/
 
-static scene_dsc_t scenes[] = {
+static lv_demo_benchmark_scene_dsc_t scenes[] = {
     {.name = "Empty screen",                  .scene_time = 3000,  .create_cb = empty_screen_cb},
     {.name = "Moving wallpaper",              .scene_time = 3000,  .create_cb = moving_wallpaper_cb},
     {.name = "Single rectangle",              .scene_time = 3000,  .create_cb = single_rectangle_cb},
