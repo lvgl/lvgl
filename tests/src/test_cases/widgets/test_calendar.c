@@ -228,7 +228,7 @@ void test_calendar_chinese_calendar(void)
     lv_calendar_set_today_date(g_calendar, 2024, 03, 22);
     lv_calendar_set_month_shown(g_calendar, 2024, 03);
 
-    lv_obj_set_style_text_font(g_calendar, &lv_font_simsun_14_cjk, LV_PART_MAIN);
+    lv_obj_set_style_text_font(g_calendar, &lv_font_source_han_sans_sc_14_cjk, LV_PART_MAIN);
     lv_calendar_set_chinese_mode(g_calendar, true);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/calendar_09.png");

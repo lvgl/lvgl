@@ -124,7 +124,7 @@ Special fonts
 
 -  :c:macro:`LV_FONT_MONTSERRAT_28_COMPRESSED`: Same as normal 28 px font but stored as a :ref:`fonts_compressed` with 3 bpp
 -  :c:macro:`LV_FONT_DEJAVU_16_PERSIAN_HEBREW`: 16 px font with normal range + Hebrew, Arabic, Persian letters and all their forms
--  :c:macro:`LV_FONT_SIMSUN_16_CJK`: 16 px font with normal range plus 1000 of the most common CJK radicals
+-  :c:macro:`LV_FONT_SOURCE_HAN_SANS_SC_16_CJK`: 16 px font with normal range plus 1000 of the most common CJK radicals
 -  :c:macro:`LV_FONT_UNSCII_8`: 8 px pixel perfect font with only ASCII characters
 -  :c:macro:`LV_FONT_UNSCII_16`: 16 px pixel perfect font with only ASCII characters
 
