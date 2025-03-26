@@ -85,7 +85,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_argb8888_premultiplied(lv_d
     lv_color_mix_alpha_cache_t cache;
     lv_color_mix_with_alpha_cache_init(&cache);
 
-    int32_t x
+    int32_t x;
     int32_t y;
 
     /* Convert source color to premultiplied */
