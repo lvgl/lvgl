@@ -24,7 +24,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
- typedef struct benchmark_context {
+typedef struct benchmark_context {
     lv_font_t * freetype_font_bitmap;
     lv_font_t * freetype_font_outline;
     lv_font_t * tinyttf_font;
@@ -35,7 +35,7 @@ extern "C" {
 
 typedef struct {
     const char * name;
-    void (*create_cb)(benchmark_context_t*);
+    void (*create_cb)(benchmark_context_t *);
     uint32_t scene_time;
     uint32_t cpu_avg_usage;
     uint32_t fps_avg;
