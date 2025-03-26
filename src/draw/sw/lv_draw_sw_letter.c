@@ -328,6 +328,7 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     img_dsc.src = draw_buf;
     lv_draw_sw_image(t, &img_dsc, &letter_coords);
 
+    lv_vector_dsc_delete(vector_dsc);
     lv_draw_buf_destroy(draw_buf);
 
 }
