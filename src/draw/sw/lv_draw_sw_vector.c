@@ -464,6 +464,7 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
 void lv_draw_sw_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc)
 {
     if(dsc->task_list == NULL)
