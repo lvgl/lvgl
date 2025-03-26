@@ -419,7 +419,7 @@ static void multiple_arcs_cb(benchmark_context_t * context)
             lv_obj_set_style_bg_opa(obj, 0, LV_PART_KNOB);
             lv_obj_set_style_arc_width(obj, 10, LV_PART_INDICATOR);
             lv_obj_set_style_arc_rounded(obj, false, LV_PART_INDICATOR);
-            lv_obj_set_style_arc_color(obj, lv_color_hex3(lv_rand(0x00f, 0xff0)), LV_PART_INDICATOR);
+            lv_obj_set_style_arc_color(obj, rnd_color(), LV_PART_INDICATOR);
             arc_anim(context, obj);
         }
     }
@@ -608,8 +608,6 @@ static lv_demo_benchmark_scene_dsc_t scenes[] = {
     {.name = "", .create_cb = NULL}
 };
 
-static uint32_t scene_act;
-static uint32_t rnd_act;
 static lv_demo_benchmark_on_end_cb_t on_demo_end_cb;
 
 /**********************
@@ -955,8 +953,9 @@ static void summary_create(lv_demo_benchmark_summary_t * summary)
 static void color_anim_cb(void * var, int32_t v)
 {
     LV_UNUSED(v);
-    lv_obj_set_style_bg_color(var, lv_color_hex3(lv_rand(0x00f, 0xff0)), 0);
-    lv_obj_set_style_text_color(var, lv_color_hex3(lv_rand(0x00f, 0xff0)), 0);
+    lv_color_t c = rnd_color();
+    lv_obj_set_style_bg_color(var, c, 0);
+    lv_obj_set_style_text_color(var, rnd_color(), 0);
 }
 
 static void color_anim(lv_obj_t * obj)
@@ -1137,6 +1136,11 @@ static int32_t rnd_next(benchmark_context_t * context, int32_t min, int32_t max)
     if(context->rnd_act >= sizeof(rnd_map) / sizeof(rnd_map[0])) context->rnd_act = 0;
 
     return r;
+}
+
+static lv_color_t rnd_color(void)
+{
+    return lv_palette_main(rnd_next(0, LV_PALETTE_LAST - 1));
 }
 
 #endif
