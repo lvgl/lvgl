@@ -363,7 +363,7 @@ Outlines
 The outline is similar to the border but is drawn outside the object's draw area.
 
 In practice, there is no dedicated outline descriptor like
-:cpp:type:`lv_draw_outline_dsc_t`, because from the rendering perspective, the
+``lv_draw_outline_dsc_t``, because from the rendering perspective, the
 outline is simply another border rendered outside the object's bounds.
 
 The outline is used only in :cpp:type:`lv_draw_rect_dsc_t` for convenience. The two
