@@ -80,7 +80,7 @@ static void summary_create(lv_demo_benchmark_summary_t * summary);
 
 
 static void table_draw_task_event_cb(lv_event_t * e);
-static lv_color_t rnd_color(void);
+static lv_color_t rnd_color(benchmark_context_t * context);
 static void shake_anim_y_cb(void * var, int32_t v);
 static void fall_anim(benchmark_context_t * context, lv_obj_t * obj, int32_t y_max);
 static void scroll_anim(lv_obj_t * obj, int32_t y_max);
@@ -419,7 +419,7 @@ static void multiple_arcs_cb(benchmark_context_t * context)
             lv_obj_set_style_bg_opa(obj, 0, LV_PART_KNOB);
             lv_obj_set_style_arc_width(obj, 10, LV_PART_INDICATOR);
             lv_obj_set_style_arc_rounded(obj, false, LV_PART_INDICATOR);
-            lv_obj_set_style_arc_color(obj, rnd_color(), LV_PART_INDICATOR);
+            lv_obj_set_style_arc_color(obj, rnd_color(context), LV_PART_INDICATOR);
             arc_anim(context, obj);
         }
     }
@@ -953,9 +953,8 @@ static void summary_create(lv_demo_benchmark_summary_t * summary)
 static void color_anim_cb(void * var, int32_t v)
 {
     LV_UNUSED(v);
-    lv_color_t c = rnd_color();
-    lv_obj_set_style_bg_color(var, c, 0);
-    lv_obj_set_style_text_color(var, rnd_color(), 0);
+    lv_obj_set_style_bg_color(var, lv_color_hex3(lv_rand(0x00f, 0xff0)), 0);
+    lv_obj_set_style_text_color(var, lv_color_hex3(lv_rand(0x00f, 0xff0)), 0);
 }
 
 static void color_anim(lv_obj_t * obj)
@@ -1138,9 +1137,9 @@ static int32_t rnd_next(benchmark_context_t * context, int32_t min, int32_t max)
     return r;
 }
 
-static lv_color_t rnd_color(void)
+static lv_color_t rnd_color(benchmark_context_t * context)
 {
-    return lv_palette_main(rnd_next(0, LV_PALETTE_LAST - 1));
+    return lv_palette_main(rnd_next(context, 0, LV_PALETTE_LAST - 1));
 }
 
 #endif
