@@ -1,0 +1,275 @@
+<html>
+<meta charset="UTF-8" />
+<head>
+<title>Unscii - a bitmapped Unicode font for blocky graphics</title>
+<style>
+<!--
+@font-face{font-family:"unscii16";
+  src: url("unscii-16.woff") format("woff"),
+       url("unscii-16.ttf") format("ttf"); }
+@font-face{font-family:"unscii8";
+  src: url("unscii-8.woff") format("woff"),
+       url("unscii-8.ttf") format("ttf"); }
+a{color:#003;}
+ul{list-style-type:square;}
+h1{font-family:"unscii16",monospace;font-size:32px;text-align:center;}
+body{font-family:"unscii16",monospace; background-color:#ccc;color:#000;width:640px;}
+pre{font-family:"unscii16",monospace; font-size:16px;line-height:16px}
+-->
+</style>
+<body>
+
+<p align="center"><img src="unsciilogo.png" alt="UNSCII" /></p>
+
+<p>Unscii is a set of bitmapped Unicode fonts based on classic system fonts.
+Unscii attempts to support character cell art well while also being suitable
+for terminal and programming use.</p>
+
+<p>The two main variants are unscii-8 (8×8 pixels per glyph) and unscii-16
+(8×16). There are also several alternative styles for unscii-8, as well as
+an 8x16 "full" variant that incorporates missing Unicode glyphs from
+Fixedsys Excelsior and GNU Unifont. "unscii-16-full" falls under GPL because
+of how Unifont is licensed; the other variants are in the Public Domain.</p>
+
+<p>Unscii was created by Viznut.</p>
+
+<br />
+
+<h1>UNSCII 2.0</h1>
+
+<p>In 2020-03-10, the new <a
+href="http://www.unicode.org/versions/Unicode13.0.0/">Unicode version
+13.0</a> added 214 graphics characters for "legacy computing" (including,
+among all, the missing PETSCII characters, and a majority of missing
+Teletext/Videotex characters). Most of these were already included in Unscii
+1.x, but now I have been able to give them proper Unicode mappings as well.
+This is the main reason for the Unscii 2.0 release.</p>
+
+<p>Additionally, Unscii 2.0 fixes errors in some characters, legibility in
+some others and adds a bunch of new ones.</p>
+
+<p>A test picture representing what is currently available in Unicode (feel
+free to copy-paste it to your editor to see what it looks like in other
+fonts):</p>
+
+<pre>
+          ╎┆┊  ╱🭽▔🭾╲    🮲🮳       🮸🮀🮵🮶🮀🮁🮁🮀🮼🯁🯂🯃      ▵        ↑        ◬
+ ╶─╴╺━╸ ═ ╎┆┊ ⎹ ⎸▣⎹ ⎸  ▝▛▀▜▘ 🯲🯷🯶                   △    ▴   ╽       ◭⬘◮
+╷┌┬┐┍┯┑╒╤╕╏┇┋ 🮷 🭼▁🭿 ⎸  ▚▌█▐▞ 🯹🯵🯱 🯰     ▁▂▃▄▅▆▇█ ◃◅◁╳▷▻▹ ▲ ←╼╋╾→     ◩⬒⬔
+│├┼┤┝┿┥╞╪╡╏┇┋ ⎹╱ ╳ ╲⎸  ▗▙▄▟▖ 🯴🯳🯸      █🮆🮅🮄▀🮃🮂▔⎹    ▽ ◂◄◀🮽▶►▸╿  ⮝   ⬖◧◫◨⬗
+╵└┴┘┕┷┙╘╧╛┞╀┦  ▔▔▔▔▔   🬑🬜🬰🬪🬟      🮞🮟 ▕▉ ◞◡◯◡ ◎🭵    ▿    ▼   ↓ ⮜◈⮞   ⬕⬓◪  
+╻┎┰┒┏┳┓  ┭╆╈╅┮╍╍╌╌  🬥🬦🬍🬲🬵🬹🬱🬷🬌🬓🬙   🮝🮜 🮇▊◝◠◯◉◯◡◟🭴         ▾      ⮟   ◕ ⬙ ◔
+┃┠╂┨┣╋┫ ╺┽╊◙╉┾┅┅┄┄  🬔🬡🬖🬻🬞🬭🬏🬺🬢🬒🬧      🮈▋◍ ◠◯◠◜ 🭳  ◿◺                     
+╹┖┸┚┗┻┛ ━┵╄╇╃┶┉┉┈┈  🬃🬤🬫🬴🬠🬋🬐🬸🬛🬗🬇   🭇🬼 ▐▌ ◌🮣🮢 🮦 🭲  ◹◸ 🭯 🮀⚞⚟🮀  🯊     ◙◛◶─◵
+ ╓╥╖   ╔╦╗┢╁┪ ┟┱┲┧  🬣🬯🬈🬬🬁🬂🬀🬝🬅🬮🬘   🭢🭗 🮉▍ 🮤🮪🮫🮥🮧 🭱  🭯 🭮◙🭬╭──╮⎫🮻⎧    ◘◙│◲┼◱╭◒╮
+║╟╫╢🮐🮒🮐╠╬╣ ╹┃ ┡┹┺┩  🬳🬉🬩🬕🬊🬎🬆🬨🬚🬄🬶   🭊🬿 🮊▎ 🮩🮬🮭🮨  🭰 ◢🭫◣ 🮚 │ ▢ ⎮🏎⎪    ◙◚◷┼◴│◑╋◐
+ ╙╨╜🮔 🮓╚╩╝   🯆 🯅  🯇     🮣🮢   🯉  🯈 🭥🭚 🮋▏🮮 🮡🮠   ⎸🭮🭪◆🭨🮛🮿🭬╰─🮯─╯⎬⎯⎨       ◳─◰╰◓╯    
+  ░░🮐🮑🮐▓▓██🮗🮗▤▤▥▥▦▦▩▩▧▧🮘🮘🮙🮙▨▨🮕🮕🮖🮖 🭋🭀 █▁🭻🭺🭹🭸🭷🭶▔  ◥🭩◤ 🭭      ⎮⯊⎪ ▱▰    ▭▬
+  ░░▒🮎▒▓▓██🮗🮗▤▤▥▥▦▦▩▩▧▧🮘🮘🮙🮙▨▨🮕🮕🮖🮖 🭦🭛         🮰 🭇🬼🭭 🭊🬿 🭋🭀   ⎭⯋⎩ ▯▮  ▫◻□■◼▪⬝·
+    🮌█🮍                 ╲╱  🭇🬼🭈🬽🭉🬾◢◣🭇🭃🭎🬼🭈🭆🭂🭍🭑🬽🭉🭁🭌🬾🭈🭄🭏🬽🭅🭐 ◦○◯⬤◖◗ ⬫⬦⬨♢◊◇◆♦⬧⬥⬩⬪
+    ▒🮏▒                     🭢🭗🭣🭘🭤🭙◥◤🭢🭔🭟🭗🭣🭧🭓🭞🭜🭘🭤🭒🭝🭙🭣🭕🭠🭘🭖🭡  ∘⭘●          
+                                               🭢🭗  🭥🭚 🭦🭛    •
+</pre>
+
+<h1>EXAMPLES</h1>
+
+<p>Here are some conversions of legacy character set art into Unscii.</p>
+
+<p>Amiga ansi: Divine Stylers by Hellbeard, as rendered with unscii-16.
+<a href="http://sixteencolors.net/pack/impure54/xz-dvn.ans">Source</a></p>
+
+<img src="xz-dvn.png" />
+
+<p>PC ansi: Ansi Love by Rad Man, as rendered with unscii-16.
+<a
+href="http://sixteencolors.net/pack/blocktronics_blockalypse/rad-LOVE.ANS">Source</a></p>
+
+<img src="rad-love.png" />
+
+<p>Commodore 64 petscii pictures as rendered with unscii-8, using the
+256-color xterm palette: I Has Floppy by Redcrab; The First Ball by
+Dr.TerrorZ; Gary by Mermaid.</p>
+<p align="center">
+<img src="ihasfloppy.png" />
+<img src="thefirstball.png" />
+<img src="gary.png" />
+</p>
+
+<p>The source code package includes a generic bitmap-to-unscii converter. Here's an 
+example of a conversion to unscii-8 using the 256-color xterm
+palette, without dithering:</p>
+<p align="center">
+<img src="tta.png" />
+</p>
+
+<br />
+
+<h1>DOWNLOADS</h1>
+
+<p>HEX and PCF are the only actual bitmapped formats here. HEX is the same
+simple hexdump format as used by the Unifont project. TTF, OTF and WOFF
+are vectorized.</p>
+
+<p>NOTE: Due to format limitations, the PCF versions lack all the characters
+above U+FFFF! However, all the new graphics characters are provided in the
+good old PUA range as well. A mapping is in the file <a
+href="uns2uni.tr">uns2uni.tr</a>.</p>
+
+<table>
+
+<tr>
+<td>
+<img src="unscii16.png" alt="[Some Unscii16 glyphs]" />
+</td><td>
+<p>unscii-16: <a href="unscii-16.hex">hex</a> <a href="unscii-16.pcf">pcf</a> <a href="unscii-16.ttf">ttf</a> <a href="unscii-16.otf">otf</a> <a href="unscii-16.woff">woff</a><br />
+unscii-16-full: <a href="unscii-16-full.hex">hex</a> <a href="unscii-16-full.pcf">pcf</a> <a href="unscii-16-full.ttf">ttf</a> <a href="unscii-16-full.otf">otf</a> <a href="unscii-16-full.woff">woff</a><br />
+8x16. The latter is recommended for serious terminal use where a large
+Unicode coverage is needed. (Warning: unscii16-full files range from 2
+to 12 megabytes in size; the others range from 40 to 400 kilobytes.)</p>
+</td></tr>
+
+<tr bgcolor="#999">
+<td>
+<img src="unscii8.png" alt="[Some Unscii8 glyphs]" />
+</td><td>
+<p>unscii-8: <a href="unscii-8.hex">hex</a> <a href="unscii-8.pcf">pcf</a> <a href="unscii-8.ttf">ttf</a> <a href="unscii-8.otf">otf</a> <a href="unscii-8.woff">woff</a></p>
+</td></tr>
+
+<tr>
+<td>
+<img src="unscii8-tall.png" alt="[Ascii range in Unscii8-tall" />
+</td><td>
+<p>unscii-8-tall: <a href="unscii-8-tall.hex">hex</a> <a href="unscii-8-tall.pcf">pcf</a> <a href="unscii-8-tall.ttf">ttf</a> <a href="unscii-8-tall.otf">otf</a> <a href="unscii-8-tall.woff">woff</a><br />
+Double-height version of unscii8.</p>
+</td></tr>
+
+<tr bgcolor="#999">
+<td>
+<img src="unscii8-thin.png" alt="[Ascii range in Unscii8-tall" />
+</td><td>
+<p>unscii-8-thin: <a href="unscii-8-thin.hex">hex</a> <a href="unscii-8-thin.pcf">pcf</a> <a href="unscii-8-thin.ttf">ttf</a> <a href="unscii-8-thin.otf">otf</a> <a href="unscii-8-thin.woff">woff</a><br />
+Based on system fonts with 1-pixel-wide lines.</p>
+</td></tr>
+
+<tr>
+<td>
+<img src="unscii8-alt.png" alt="[Ascii range in Unscii8-alt" />
+</td><td>
+<p>unscii-8-alt: <a href="unscii-8-alt.hex">hex</a> <a href="unscii-8-alt.pcf">pcf</a> <a href="unscii-8-alt.ttf">ttf</a> <a href="unscii-8-alt.otf">otf</a> <a href="unscii-8-alt.woff">woff</a><br />
+Based on the more peculiar glyph forms of the reference fonts.</p>
+</td></tr>
+
+<tr bgcolor="#999">
+<td>
+<img src="unscii8-mcr.png" alt="[Ascii range in Unscii8-alt" />
+</td><td>
+<p>unscii-8-mcr: <a href="unscii-8-mcr.hex">hex</a> <a href="unscii-8-mcr.pcf">pcf</a> <a href="unscii-8-mcr.ttf">ttf</a> <a href="unscii-8-mcr.otf">otf</a> <a href="unscii-8-mcr.woff">woff</a><br />
+Based on retrofuturistic MCR-like 8×8 fonts used in various games, demos,
+etc.</p>
+</td></tr>
+
+<tr>
+<td>
+<img src="unscii8-fantasy.png" alt="[Ascii range in Unscii8-alt" />
+</td><td>
+<p>unscii-8-fantasy: <a href="unscii-8-fantasy.hex">hex</a> <a href="unscii-8-fantasy.pcf">pcf</a> <a href="unscii-8-fantasy.ttf">ttf</a> <a href="unscii-8-fantasy.otf">otf</a> <a href="unscii-8-fantasy.woff">woff</a><br />
+Based on fonts used in fantasy games.</p>
+</td></tr>
+
+<tr bgcolor="#999">
+<td>
+&nbsp;
+</td><td>
+<p><a href="unscii-2.1-src.tar.gz">Source code for current Unscii version (2.1)</a></p>
+<p><a href="unscii-2.0-src.tar.gz">Source code for Unscii 2.0</a></p>
+<p><a href="unscii-1.1-src.tar.gz">Source code for Unscii 1.1</a></p>
+</td></tr>
+
+</table>
+
+<br />
+
+<h1>BACKSTORY</h1>
+
+<p>Years ago, I noticed that Unicode had a bunch of pseudographic characters
+that could be used to enrichen Ansi art. However, no one seemed to use them.
+Even MUDs that used the 256-color Xterm palette and had no issues with
+Unicode still preferred to stick to the blocks available in the MS-DOS
+codepage 437.</p>
+
+<p>After looking into existing Unicode fonts, the reason became obvious: the
+implementation of non-CP437 graphics characters was shaky at best. Unicode
+Consortium doesn't even care how pseudographics are implemented. It was a
+kind of chicken-and-egg problem: No commonly accepted Unicode graphics font,
+no Unicode art scene; no art scene, no font support. The idea of an
+art-compatible Unicode font was born.</p>
+
+<p>For Unscii, I studied a bunch of classic system fonts and how their
+characters had been used in Ascii and "extended-Ascii" art.</p>
+
+<p>8×8 system fonts can be divided in two major categories according to
+their line thickness: 1-pixel and 2-pixel. 2-pixel-wide lines are used in
+more prominent classic systems, so I chose it. Also, 2-pixel 8×8 system
+fonts are surprisingly similar to one another which made it easier to choose
+neutral shapes.</p>
+
+<p>The basic look of the 8×8 variant of Unscii is based on the following
+systems:</p>
+<ul>
+<li>Amiga (Topaz-8)</li>
+<li>Amstrad CPC</li>
+<li>Atari 8-bit (as in 800, XL etc.)</li>
+<li>Atari Arcade (the iconic ROM font)</li>
+<li>Atari 32-bit (as in ST etc.)</li>
+<li>BBC Micro (graphics mode font)</li>
+<li>Commodore 64</li>
+<li>IBM PC (the 8×8 ROM font as in CGA, or VGA 80×50)</li>
+</ul>
+
+<p>The 8×16 variant of Unscii has been mostly derived from the 8×8 variant
+by using a set of transformation principles. When in doubt, the following
+fonts have been looked at for additional reference:</p>
+<ul>
+<li>Windows Fixedsys 8×15 (and its modern successor Fixedsys Excelsior)</li>
+<li>IBM PC VGA ROM font(s) (and their modern successor U_VGA)</li>
+<li>X Window System fonts 8x13(B) and 9x15(B)</li>
+<li>Classic Macintosh 12-point Monaco</li>
+<li>Digital VT420 10×16 font (used in the 80×24 mode)</li>
+<li>Modern monospaced vector fonts: DejaVu Sans Mono, Lucida Console,
+Inconsolata</li>
+</ul>
+
+<p>In general, neutral shapes are preferred, unless art, legibility or
+readability require otherwise: The characters /\XY are connective because of
+their connetive use in ascii art, and the serifs in iIl are longer than in
+most classic systems.</p>
+
+<p>Whenever a 8×16 shape has not been defined, Unscii falls back to
+height-doubled 8×8.</p>
+
+<p>I also studied game fonts and thin-line system fonts. This resulted in
+the variants unscii-8-thin, unscii-8-mcr and unscii-8-fantasy.</p>
+
+<p>When studying legacy character sets, I found literally hundreds of
+characters without proper Unicode codepoints. These are mapped in the PUA
+range as follows:</p>
+
+<ul>
+<li>U+E080..E0FF: Teletext/Videotex block mosaics.</li>
+<li>U+E100..: The most prominent and useful non-Unicode pseudographics:
+everything found in PETSCII, Videotex smooth mosaics, extra shades,
+round corners, X/Y doublers.</li>
+<li>U+E800..: Somewhat stranger but still potentially useful: junctions with
+border-aligned lines, diagonal line junctions, non-straight lines, weirder
+fill patterns, etc.</li>
+<li>U+EC00..: Total oddities. Mostly game-oriented bitmaps and other
+depictive characters from Sharp MZ, Aquarius, etc.</li>
+</ul>
+
+<p>Since Unicode 13.0, many of these are also available in Unicode, but
+the PUA mappings are retained for compatibility.</p>
+
+<br />
+
+</body>
+</html>
