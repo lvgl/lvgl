@@ -13,63 +13,85 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-ubuntu:
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
+      fail-fast: false
+      matrix:
+        # A valid option parameter to the cmake file.
+        # See BUILD_OPTIONS in tests/CMakeLists.txt.
+        build_option: ['OPTIONS_NORMAL_8BIT',
+                       'OPTIONS_16BIT',
+                       'OPTIONS_24BIT',
+                       'OPTIONS_FULL_32BIT',
+                       'OPTIONS_VG_LITE',
+                       'OPTIONS_SDL']
+    name: Build ${{ matrix.build_option }} - Ubuntu
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install prerequisites
+      run: scripts/install-prerequisites.sh
+    - name: Install pngquant
+      run:  scripts/install_pngquant.sh
+    - name: Building ${{ matrix.build_option }}
+      run: python tests/main.py --build-option=${{ matrix.build_option }} build --auto-clean
+
+  build-windows:
+    strategy:
+      fail-fast: false
       matrix:
         # A valid option parameter to the cmake file.
         # See BUILD_OPTIONS in tests/CMakeLists.txt.
         build_option: ['OPTIONS_16BIT',
                        'OPTIONS_24BIT',
                        'OPTIONS_FULL_32BIT',
-                       'OPTIONS_VG_LITE',
-                       'OPTIONS_SDL']
-    name: Build ${{ matrix.build_option }}
-    steps:
-    - uses: actions/checkout@v4
-    - uses: ammaraskar/gcc-problem-matcher@master
-    - name: Install prerequisites
-      run: scripts/install-prerequisites.sh
-    - name: Building ${{ matrix.build_option }}
-      run: python tests/main.py --build-option=${{ matrix.build_option }} build --auto-clean
+                       'OPTIONS_VG_LITE']
+        compiler: [gcc, cl]
 
-  build-windows-GCC:
+    name: Build ${{ matrix.build_option }} - ${{matrix.compiler }} - Windows
     runs-on: windows-2022
-    name: Build Windows GCC
     steps:
+    - name: patch freetype vcpkg URL
+      run: (Get-Content C:\vcpkg\ports\freetype\portfile.cmake) -replace 'freedesktop.org', 'com' | Out-File -encoding ASCII C:\vcpkg\ports\freetype\portfile.cmake
+
     - uses: actions/checkout@v4
-    - uses: ammaraskar/gcc-problem-matcher@master
+
     - name: Install prerequisites
       run: scripts\install-prerequisites.bat
-    - name: Build
-      run: python tests/main.py build
-      env:
-        CC: gcc
 
-  build-windows-MSVC:
-    runs-on: windows-2022
-    name: Build Windows MSVC
-    steps:
-    - uses: actions/checkout@v4
-    - name: Install prerequisites
-      run: scripts\install-prerequisites.bat
-    - uses: ilammy/msvc-dev-cmd@v1
+    - if: matrix.compiler == 'gcc'
+      uses: ammaraskar/gcc-problem-matcher@master
+
+    - if: matrix.compiler == 'cl'
+      uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: x64
-    - uses: ruby/setup-ruby@v1
+
+    - if: matrix.compiler == 'cl'
+      uses: ruby/setup-ruby@v1
       with:
         ruby-version: 'mswin'
+
     - name: Build
-      run: python tests/main.py build
+      run: python tests/main.py --build-option=${{ matrix.build_option }} build
       env:
-        CC: cl
+        CC: ${{ matrix.compiler }}
 
   build-esp32s3:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     name: Build ESP IDF ESP32S3
     container: espressif/idf:v5.3.1
     steps:
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
     - name: Clone LVGL as a Component
       uses: actions/checkout@v4
       with:
@@ -82,7 +104,7 @@ jobs:
       run: . /opt/esp/idf/export.sh && idf.py build
 
   test-native:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
      matrix:
        # A valid option parameter to the cmake file.
@@ -93,8 +115,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
+    - name: Install pngquant
+      run: scripts/install_pngquant.sh
     - name: Fix kernel mmap rnd bits
       # Asan in llvm 14 provided in ubuntu 22.04 is incompatible with
       # high-entropy ASLR in much newer kernels that GitHub runners are

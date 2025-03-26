@@ -42,7 +42,7 @@
 static void lv_refr_join_area(void);
 static void refr_invalid_areas(void);
 static void refr_sync_areas(void);
-static void refr_area(const lv_area_t * area_p);
+static void refr_area(const lv_area_t * area_p, int32_t y_offset);
 static void refr_configured_layer(lv_layer_t * layer);
 static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj);
 static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj);
@@ -600,6 +600,7 @@ static void refr_invalid_areas(void)
             lv_area_t sub_area;
             sub_area.x1 = inv_a.x1;
             sub_area.x2 = inv_a.x2;
+            int32_t y_off = 0;
             for(row = inv_a.y1; row + max_row - 1 <= inv_a.y2; row += max_row) {
                 /*Calc. the next y coordinates of draw_buf*/
                 sub_area.y1 = row;
@@ -607,7 +608,8 @@ static void refr_invalid_areas(void)
                 if(sub_area.y2 > inv_a.y2) sub_area.y2 = inv_a.y2;
                 row_last = sub_area.y2;
                 if(inv_a.y2 == row_last) disp_refr->last_part = 1;
-                refr_area(&sub_area);
+                refr_area(&sub_area, y_off);
+                y_off += lv_area_get_height(&sub_area);
                 draw_buf_flush(disp_refr);
             }
 
@@ -617,14 +619,15 @@ static void refr_invalid_areas(void)
                 sub_area.y1 = row;
                 sub_area.y2 = inv_a.y2;
                 disp_refr->last_part = 1;
-                refr_area(&sub_area);
+                refr_area(&sub_area, y_off);
+                y_off += lv_area_get_height(&sub_area);
                 draw_buf_flush(disp_refr);
             }
         }
         else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL ||
                 disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
             disp_refr->last_part = 1;
-            refr_area(&disp_refr->inv_areas[i]);
+            refr_area(&disp_refr->inv_areas[i], 0);
             draw_buf_flush(disp_refr);
         }
     }
@@ -654,13 +657,14 @@ static void layer_reshape_draw_buf(lv_layer_t * layer, uint32_t stride)
  * Refresh an area if there is Virtual Display Buffer
  * @param area_p  pointer to an area to refresh
  */
-static void refr_area(const lv_area_t * area_p)
+static void refr_area(const lv_area_t * area_p, int32_t y_offset)
 {
     LV_PROFILER_REFR_BEGIN;
     lv_layer_t * layer = disp_refr->layer_head;
     layer->draw_buf = disp_refr->buf_act;
     layer->_clip_area = *area_p;
     layer->phy_clip_area = *area_p;
+    layer->partial_y_offset = y_offset;
 
     if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
         /*In full mode the area is always the full screen, so the buffer area to it too*/
@@ -873,14 +877,19 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
     if(top_obj == NULL) return;  /*Shouldn't happen*/
 
     LV_PROFILER_REFR_BEGIN;
-    /*Refresh the top object and its children*/
-    refr_obj(layer, top_obj);
-
     /*Draw the 'younger' sibling objects because they can be on top_obj*/
     lv_obj_t * parent;
     lv_obj_t * border_p = top_obj;
 
     parent = lv_obj_get_parent(top_obj);
+
+    /*Calculate the recolor before the parent*/
+    if(parent) {
+        layer->recolor = lv_obj_get_style_recolor_recursive(parent, LV_PART_MAIN);
+    }
+
+    /*Refresh the top object and its children*/
+    refr_obj(layer, top_obj);
 
     /*Do until not reach the screen*/
     while(parent != NULL) {
@@ -1104,12 +1113,15 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
     if(opa_layered < LV_OPA_MIN) return;
 
     const lv_opa_t layer_opa_ori = layer->opa;
+    const lv_color32_t layer_recolor = layer->recolor;
 
     /*Normal `opa` (not layered) will just scale down `bg_opa`, `text_opa`, etc, in the upcoming drawings.*/
     const lv_opa_t opa_main = lv_obj_get_style_opa(obj, LV_PART_MAIN);
     if(opa_main < LV_OPA_MAX) {
         layer->opa = LV_OPA_MIX2(layer_opa_ori, opa_main);
     }
+
+    layer->recolor = lv_obj_style_apply_recolor(obj, LV_PART_MAIN, layer->recolor);
 
     lv_layer_type_t layer_type = lv_obj_get_layer_type(obj);
     if(layer_type == LV_LAYER_TYPE_NONE) {
@@ -1198,8 +1210,9 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
         }
     }
 
-    /* Restore the original layer opa */
+    /* Restore the original layer opa and recolor */
     layer->opa = layer_opa_ori;
+    layer->recolor = layer_recolor;
 }
 
 static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)
@@ -1325,8 +1338,8 @@ static void wait_for_flushing(lv_display_t * disp)
     if(disp->flush_wait_cb) {
         if(disp->flushing) {
             disp->flush_wait_cb(disp);
+            disp->flushing = 0;
         }
-        disp->flushing = 0;
     }
     else {
         while(disp->flushing);

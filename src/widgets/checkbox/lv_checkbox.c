@@ -46,7 +46,7 @@ const lv_obj_class_t lv_checkbox_class = {
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_checkbox_t),
     .base_class = &lv_obj_class,
-    .name = "checkbox",
+    .name = "lv_checkbox",
 };
 
 /**********************

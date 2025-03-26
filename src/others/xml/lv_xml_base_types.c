@@ -190,6 +190,7 @@ lv_blend_mode_t lv_xml_blend_mode_to_enum(const char * txt)
     if(lv_streq("additive", txt)) return LV_BLEND_MODE_ADDITIVE;
     if(lv_streq("subtractive", txt)) return LV_BLEND_MODE_SUBTRACTIVE;
     if(lv_streq("multiply", txt)) return LV_BLEND_MODE_MULTIPLY;
+    if(lv_streq("difference", txt)) return LV_BLEND_MODE_DIFFERENCE;
 
     LV_LOG_WARN("%s is an unknown value for blend_mode", txt);
     return 0; /*Return 0 in lack of a better option. */

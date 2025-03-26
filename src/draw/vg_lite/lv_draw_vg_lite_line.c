@@ -180,23 +180,13 @@ void lv_draw_vg_lite_line(lv_draw_task_t * t, const lv_draw_line_dsc_t * dsc)
 
     vg_lite_matrix_t matrix = u->global_matrix;
 
-    vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa, true);
-
-    vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
-
-    LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
-    LV_VG_LITE_ASSERT_PATH(vg_lite_path);
-    LV_VG_LITE_ASSERT_MATRIX(&matrix);
-
-    LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw");
-    LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
-                               &u->target_buffer,
-                               vg_lite_path,
-                               VG_LITE_FILL_EVEN_ODD,
-                               &matrix,
-                               VG_LITE_BLEND_SRC_OVER,
-                               color));
-    LV_PROFILER_DRAW_END_TAG("vg_lite_draw");
+    lv_vg_lite_draw(
+        &u->target_buffer,
+        lv_vg_lite_path_get_path(path),
+        VG_LITE_FILL_EVEN_ODD,
+        &matrix,
+        VG_LITE_BLEND_SRC_OVER,
+        lv_vg_lite_color(dsc->color, dsc->opa, true));
 
     lv_vg_lite_path_drop(u, path);
 

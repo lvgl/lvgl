@@ -21,6 +21,7 @@ extern "C" {
 #include "lv_types.h"
 #include "lv_assert.h"
 #include "lv_bidi.h"
+#include "lv_grad.h"
 #include "../layouts/lv_layout.h"
 
 /*********************
@@ -68,6 +69,16 @@ LV_EXPORT_CONST_INT(LV_SCALE_NONE);
 
 #define LV_STYLE_CONST_PROPS_END { .prop = LV_STYLE_PROP_INV, .value = { .num = 0 } }
 
+#if LV_GRADIENT_MAX_STOPS < 2
+#error LVGL needs at least 2 stops for gradients. Please increase the LV_GRADIENT_MAX_STOPS
+#endif
+
+#define LV_GRAD_LEFT    LV_PCT(0)
+#define LV_GRAD_RIGHT   LV_PCT(100)
+#define LV_GRAD_TOP     LV_PCT(0)
+#define LV_GRAD_BOTTOM  LV_PCT(100)
+#define LV_GRAD_CENTER  LV_PCT(50)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -80,6 +91,7 @@ typedef enum {
     LV_BLEND_MODE_ADDITIVE,   /**< Add the respective color channels*/
     LV_BLEND_MODE_SUBTRACTIVE,/**< Subtract the foreground from the background*/
     LV_BLEND_MODE_MULTIPLY,   /**< Multiply the foreground and background*/
+    LV_BLEND_MODE_DIFFERENCE, /**< Absolute difference between foreground and background*/
 } lv_blend_mode_t;
 
 /**
@@ -105,71 +117,6 @@ typedef enum {
     LV_BORDER_SIDE_FULL     = 0x0F,
     LV_BORDER_SIDE_INTERNAL = 0x10, /**< FOR matrix-like objects (e.g. Button matrix)*/
 } lv_border_side_t;
-
-/**
- * The direction of the gradient.
- */
-typedef enum {
-    LV_GRAD_DIR_NONE,       /**< No gradient (the `grad_color` property is ignored)*/
-    LV_GRAD_DIR_VER,        /**< Simple vertical (top to bottom) gradient*/
-    LV_GRAD_DIR_HOR,        /**< Simple horizontal (left to right) gradient*/
-    LV_GRAD_DIR_LINEAR,     /**< Linear gradient defined by start and end points. Can be at any angle.*/
-    LV_GRAD_DIR_RADIAL,     /**< Radial gradient defined by start and end circles*/
-    LV_GRAD_DIR_CONICAL,    /**< Conical gradient defined by center point, start and end angles*/
-} lv_grad_dir_t;
-
-/**
- * Gradient behavior outside the defined range.
-*/
-typedef enum {
-    LV_GRAD_EXTEND_PAD,     /**< Repeat the same color*/
-    LV_GRAD_EXTEND_REPEAT,  /**< Repeat the pattern*/
-    LV_GRAD_EXTEND_REFLECT, /**< Repeat the pattern mirrored*/
-} lv_grad_extend_t;
-
-/** A gradient stop definition.
- *  This matches a color and a position in a virtual 0-255 scale.
- */
-typedef struct {
-    lv_color_t color;   /**< The stop color */
-    lv_opa_t   opa;     /**< The opacity of the color*/
-    uint8_t    frac;    /**< The stop position in 1/255 unit */
-} lv_gradient_stop_t;
-
-/** A descriptor of a gradient. */
-typedef struct {
-    lv_gradient_stop_t   stops[LV_GRADIENT_MAX_STOPS];  /**< A gradient stop array */
-    uint8_t              stops_count;                   /**< The number of used stops in the array */
-    lv_grad_dir_t        dir : 4;                       /**< The gradient direction.
-                                                         * Any of LV_GRAD_DIR_NONE, LV_GRAD_DIR_VER, LV_GRAD_DIR_HOR,
-                                                         * LV_GRAD_TYPE_LINEAR, LV_GRAD_TYPE_RADIAL, LV_GRAD_TYPE_CONICAL */
-    lv_grad_extend_t     extend : 3;                    /**< Behaviour outside the defined range.
-                                                         * LV_GRAD_EXTEND_NONE, LV_GRAD_EXTEND_PAD, LV_GRAD_EXTEND_REPEAT, LV_GRAD_EXTEND_REFLECT */
-#if LV_USE_DRAW_SW_COMPLEX_GRADIENTS
-    union {
-        /*Linear gradient parameters*/
-        struct {
-            lv_point_t  start;                          /**< Linear gradient vector start point */
-            lv_point_t  end;                            /**< Linear gradient vector end point */
-        } linear;
-        /*Radial gradient parameters*/
-        struct {
-            lv_point_t  focal;                          /**< Center of the focal (starting) circle in local coordinates */
-            /* (can be the same as the ending circle to create concentric circles) */
-            lv_point_t  focal_extent;                   /**< Point on the circle (can be the same as the center) */
-            lv_point_t  end;                            /**< Center of the ending circle in local coordinates */
-            lv_point_t  end_extent;                     /**< Point on the circle determining the radius of the gradient */
-        } radial;
-        /*Conical gradient parameters*/
-        struct {
-            lv_point_t  center;                         /**< Conical gradient center point */
-            int16_t     start_angle;                    /**< Start angle 0..3600 */
-            int16_t     end_angle;                      /**< End angle 0..3600 */
-        } conical;
-    } params;
-    void * state;
-#endif
-} lv_grad_dsc_t;
 
 /**
  * A common type to handle all the property types in the same way.
@@ -291,48 +238,53 @@ enum {
     LV_STYLE_TEXT_LINE_SPACE        = 92,
     LV_STYLE_TEXT_DECOR             = 93,
     LV_STYLE_TEXT_ALIGN             = 94,
+    LV_STYLE_TEXT_OUTLINE_STROKE_WIDTH = 95,
+    LV_STYLE_TEXT_OUTLINE_STROKE_OPA   = 96,
+    LV_STYLE_TEXT_OUTLINE_STROKE_COLOR = 97,
 
-    LV_STYLE_OPA                    = 95,
-    LV_STYLE_OPA_LAYERED            = 96,
-    LV_STYLE_COLOR_FILTER_DSC       = 97,
-    LV_STYLE_COLOR_FILTER_OPA       = 98,
-    LV_STYLE_ANIM                   = 99,
-    LV_STYLE_ANIM_DURATION          = 100,
-    LV_STYLE_TRANSITION             = 102,
-    LV_STYLE_BLEND_MODE             = 103,
-    LV_STYLE_TRANSFORM_WIDTH        = 104,
-    LV_STYLE_TRANSFORM_HEIGHT       = 105,
-    LV_STYLE_TRANSLATE_X            = 106,
-    LV_STYLE_TRANSLATE_Y            = 107,
-    LV_STYLE_TRANSFORM_SCALE_X      = 108,
-    LV_STYLE_TRANSFORM_SCALE_Y      = 109,
-    LV_STYLE_TRANSFORM_ROTATION     = 110,
-    LV_STYLE_TRANSFORM_PIVOT_X      = 111,
-    LV_STYLE_TRANSFORM_PIVOT_Y      = 112,
-    LV_STYLE_TRANSFORM_SKEW_X       = 113,
-    LV_STYLE_TRANSFORM_SKEW_Y       = 114,
-    LV_STYLE_BITMAP_MASK_SRC        = 115,
-    LV_STYLE_ROTARY_SENSITIVITY     = 116,
-    LV_STYLE_TRANSLATE_RADIAL       = 117,
+    LV_STYLE_OPA                    = 98,
+    LV_STYLE_OPA_LAYERED            = 99,
+    LV_STYLE_COLOR_FILTER_DSC       = 100,
+    LV_STYLE_COLOR_FILTER_OPA       = 101,
+    LV_STYLE_ANIM                   = 102,
+    LV_STYLE_ANIM_DURATION          = 103,
+    LV_STYLE_TRANSITION             = 104,
+    LV_STYLE_BLEND_MODE             = 105,
+    LV_STYLE_TRANSFORM_WIDTH        = 106,
+    LV_STYLE_TRANSFORM_HEIGHT       = 107,
+    LV_STYLE_TRANSLATE_X            = 108,
+    LV_STYLE_TRANSLATE_Y            = 109,
+    LV_STYLE_TRANSFORM_SCALE_X      = 110,
+    LV_STYLE_TRANSFORM_SCALE_Y      = 111,
+    LV_STYLE_TRANSFORM_ROTATION     = 112,
+    LV_STYLE_TRANSFORM_PIVOT_X      = 113,
+    LV_STYLE_TRANSFORM_PIVOT_Y      = 114,
+    LV_STYLE_TRANSFORM_SKEW_X       = 115,
+    LV_STYLE_TRANSFORM_SKEW_Y       = 116,
+    LV_STYLE_BITMAP_MASK_SRC        = 117,
+    LV_STYLE_ROTARY_SENSITIVITY     = 118,
+    LV_STYLE_TRANSLATE_RADIAL       = 119,
+    LV_STYLE_RECOLOR                = 120,
+    LV_STYLE_RECOLOR_OPA            = 121,
 
-    LV_STYLE_FLEX_FLOW              = 125,
-    LV_STYLE_FLEX_MAIN_PLACE        = 126,
-    LV_STYLE_FLEX_CROSS_PLACE       = 127,
-    LV_STYLE_FLEX_TRACK_PLACE       = 128,
-    LV_STYLE_FLEX_GROW              = 129,
+    LV_STYLE_FLEX_FLOW              = 122,
+    LV_STYLE_FLEX_MAIN_PLACE        = 123,
+    LV_STYLE_FLEX_CROSS_PLACE       = 124,
+    LV_STYLE_FLEX_TRACK_PLACE       = 125,
+    LV_STYLE_FLEX_GROW              = 126,
 
-    LV_STYLE_GRID_COLUMN_ALIGN      = 130,
-    LV_STYLE_GRID_ROW_ALIGN         = 131,
-    LV_STYLE_GRID_ROW_DSC_ARRAY     = 132,
-    LV_STYLE_GRID_COLUMN_DSC_ARRAY  = 133,
-    LV_STYLE_GRID_CELL_COLUMN_POS   = 134,
-    LV_STYLE_GRID_CELL_COLUMN_SPAN  = 135,
-    LV_STYLE_GRID_CELL_X_ALIGN      = 136,
-    LV_STYLE_GRID_CELL_ROW_POS      = 137,
-    LV_STYLE_GRID_CELL_ROW_SPAN     = 138,
-    LV_STYLE_GRID_CELL_Y_ALIGN      = 139,
+    LV_STYLE_GRID_COLUMN_ALIGN      = 127,
+    LV_STYLE_GRID_ROW_ALIGN         = 128,
+    LV_STYLE_GRID_ROW_DSC_ARRAY     = 129,
+    LV_STYLE_GRID_COLUMN_DSC_ARRAY  = 130,
+    LV_STYLE_GRID_CELL_COLUMN_POS   = 131,
+    LV_STYLE_GRID_CELL_COLUMN_SPAN  = 132,
+    LV_STYLE_GRID_CELL_X_ALIGN      = 133,
+    LV_STYLE_GRID_CELL_ROW_POS      = 134,
+    LV_STYLE_GRID_CELL_ROW_SPAN     = 135,
+    LV_STYLE_GRID_CELL_Y_ALIGN      = 136,
 
-    LV_STYLE_LAST_BUILT_IN_PROP     = 140,
+    LV_STYLE_LAST_BUILT_IN_PROP     = 137,
 
     LV_STYLE_NUM_BUILT_IN_PROPS     = LV_STYLE_LAST_BUILT_IN_PROP + 1,
 

@@ -1,0 +1,32 @@
+..
+    display_events_list.txt
+    Note:  this is used in full in 2 places currently.  Thus, it is placed
+    here so its source is only in one place and will be fully duplicated
+    where it is used:
+    - display_events.rst
+    - event.rst
+
+- :cpp:enumerator:`LV_EVENT_INVALIDATE_AREA` An area is invalidated (marked for redraw).
+  :cpp:expr:`lv_event_get_param(e)` returns a pointer to an :cpp:struct:`lv_area_t`
+  object with the coordinates of the area to be invalidated. The area can
+  be freely modified if needed to adapt it a special requirement of the
+  display. Usually needed with monochrome displays to invalidate ``N x 8``
+  rows or columns in one pass.
+- :cpp:enumerator:`LV_EVENT_RESOLUTION_CHANGED`: Sent when the resolution changes due
+  to :cpp:func:`lv_display_set_resolution` or :cpp:func:`lv_display_set_rotation`.
+- :cpp:enumerator:`LV_EVENT_COLOR_FORMAT_CHANGED`: Sent as a result of any call to `lv_display_set_color_format()`.
+- :cpp:enumerator:`LV_EVENT_REFR_REQUEST`: Sent when something happened that requires redraw.
+- :cpp:enumerator:`LV_EVENT_REFR_START`: Sent before a refreshing cycle starts. Sent even
+  if there is nothing to redraw.
+- :cpp:enumerator:`LV_EVENT_REFR_READY`: Sent when refreshing has been completed (after
+  rendering and calling :ref:`flush_callback`). Sent even if no redraw happened.
+- :cpp:enumerator:`LV_EVENT_RENDER_START`: Sent just before rendering begins.
+- :cpp:enumerator:`LV_EVENT_RENDER_READY`: Sent after rendering has been completed (before
+  calling :ref:`flush_callback`)
+- :cpp:enumerator:`LV_EVENT_FLUSH_START`: Sent before :ref:`flush_callback` is called.
+- :cpp:enumerator:`LV_EVENT_FLUSH_FINISH`: Sent after :ref:`flush_callback` call has returned.
+- :cpp:enumerator:`LV_EVENT_FLUSH_WAIT_START`: Sent at the beginning of internal call to
+  `wait_for_flushing()` -- happens whether or not any waiting will actually occur.
+  Call returns immediately if `disp->flushing == 0`.
+- :cpp:enumerator:`LV_EVENT_FLUSH_WAIT_FINISH`: Sent when the call to `wait_for_flushing()`
+  is about to return, regardless whether any actual waiting occurred.

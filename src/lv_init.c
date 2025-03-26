@@ -41,6 +41,10 @@
 #include "others/sysmon/lv_sysmon_private.h"
 #include "others/xml/lv_xml.h"
 
+#if LV_USE_SVG
+    #include "libs/svg/lv_svg_decoder.h"
+#endif
+
 #if LV_USE_NEMA_GFX
     #include "draw/nema_gfx/lv_draw_nema_gfx.h"
 #endif
@@ -51,6 +55,9 @@
     #if LV_USE_DRAW_PXP || LV_USE_ROTATE_PXP
         #include "draw/nxp/pxp/lv_draw_pxp.h"
     #endif
+#endif
+#if LV_USE_DRAW_G2D
+    #include "draw/nxp/g2d/lv_draw_g2d.h"
 #endif
 #if LV_USE_DRAW_DAVE2D
     #include "draw/renesas/dave2d/lv_draw_dave2d.h"
@@ -233,6 +240,10 @@ void lv_init(void)
 #endif
 #endif
 
+#if LV_USE_DRAW_G2D
+    lv_draw_g2d_init();
+#endif
+
 #if LV_USE_DRAW_DAVE2D
     lv_draw_dave2d_init();
 #endif
@@ -366,6 +377,10 @@ void lv_init(void)
     lv_bmp_init();
 #endif
 
+#if LV_USE_SVG
+    lv_svg_decoder_init();
+#endif
+
     /*Make FFMPEG last because the last converter will be checked first and
      *it's superior to any other */
 #if LV_USE_FFMPEG
@@ -443,6 +458,10 @@ void lv_deinit(void)
 
 #if LV_USE_DRAW_VGLITE
     lv_draw_vglite_deinit();
+#endif
+
+#if LV_USE_DRAW_G2D
+    lv_draw_g2d_deinit();
 #endif
 
 #if LV_USE_DRAW_VG_LITE

@@ -7,19 +7,20 @@
  *      INCLUDES
  *********************/
 
-#include "../../misc/lv_area_private.h"
-#include "../../libs/freetype/lv_freetype_private.h"
-#include "../lv_draw_label_private.h"
-#include "lv_draw_vg_lite.h"
-
 #include "../../lvgl.h"
 
 #if LV_USE_DRAW_VG_LITE
 
+#include "lv_draw_vg_lite.h"
+#include "lv_draw_vg_lite_type.h"
 #include "lv_vg_lite_utils.h"
 #include "lv_vg_lite_path.h"
-#include "lv_draw_vg_lite_type.h"
-#include <float.h>
+#include "lv_vg_lite_pending.h"
+#include "../../misc/cache/lv_cache_entry_private.h"
+#include "../../misc/lv_area_private.h"
+#include "../../libs/freetype/lv_freetype_private.h"
+#include "../lv_draw_label_private.h"
+
 
 /*********************
  *      DEFINES
@@ -54,6 +55,8 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
 
 static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc);
 
+static void bitmap_cache_release_cb(void * entry, void * user_data);
+
 #if LV_USE_FREETYPE
     static void freetype_outline_event_cb(lv_event_t * e);
     static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * dsc);
@@ -70,20 +73,34 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_draw_vg_lite_label_init(lv_draw_unit_t * draw_unit)
+
+void lv_draw_vg_lite_label_init(struct _lv_draw_vg_lite_unit_t * u)
 {
+    LV_ASSERT_NULL(u);
+
 #if LV_USE_FREETYPE
     /*Set up the freetype outline event*/
-    lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, draw_unit);
-#else
-    LV_UNUSED(draw_unit);
+    lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, u);
 #endif /* LV_USE_FREETYPE */
+
+    u->bitmap_font_pending = lv_vg_lite_pending_create(sizeof(lv_font_glyph_dsc_t), 8);
+    lv_vg_lite_pending_set_free_cb(u->bitmap_font_pending, bitmap_cache_release_cb, NULL);
+}
+
+void lv_draw_vg_lite_label_deinit(struct _lv_draw_vg_lite_unit_t * u)
+{
+    LV_ASSERT_NULL(u);
+    LV_ASSERT_NULL(u->bitmap_font_pending)
+    lv_vg_lite_pending_destroy(u->bitmap_font_pending);
+    u->bitmap_font_pending = NULL;
 }
 
 void lv_draw_vg_lite_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->opa <= LV_OPA_MIN)
         return;
+
+    LV_PROFILER_DRAW_BEGIN;
 
     lv_draw_glyph_dsc_t glyph_dsc;
     lv_draw_glyph_dsc_init(&glyph_dsc);
@@ -93,17 +110,17 @@ void lv_draw_vg_lite_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc
     glyph_dsc.rotation = dsc->rotation;
     glyph_dsc.pivot = dsc->pivot;
 
-    LV_PROFILER_BEGIN;
     lv_draw_unit_draw_letter(t, &glyph_dsc, &(lv_point_t) {
         .x = coords->x1, .y = coords->y1
     },
     dsc->font, dsc->unicode, draw_letter_cb);
-    LV_PROFILER_END;
 
     if(glyph_dsc._draw_buf) {
         lv_draw_buf_destroy(glyph_dsc._draw_buf);
         glyph_dsc._draw_buf = NULL;
     }
+
+    LV_PROFILER_DRAW_END;
 }
 
 void lv_draw_vg_lite_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc,
@@ -134,6 +151,10 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
             case LV_FONT_GLYPH_FORMAT_A4_ALIGNED:
             case LV_FONT_GLYPH_FORMAT_A8_ALIGNED: {
                     glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                    if(!glyph_draw_dsc->glyph_data) {
+                        return;
+                    }
+
                     draw_letter_bitmap(t, glyph_draw_dsc);
                 }
                 break;
@@ -142,6 +163,10 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
             case LV_FONT_GLYPH_FORMAT_VECTOR: {
                     if(lv_freetype_is_outline_font(glyph_draw_dsc->g->resolved_font)) {
                         glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                        if(!glyph_draw_dsc->glyph_data) {
+                            return;
+                        }
+
                         draw_letter_outline(t, glyph_draw_dsc);
                     }
                 }
@@ -150,6 +175,10 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
 
             case LV_FONT_GLYPH_FORMAT_IMAGE: {
                     glyph_draw_dsc->glyph_data = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                    if(!glyph_draw_dsc->glyph_data) {
+                        return;
+                    }
+
                     lv_draw_image_dsc_t image_dsc;
                     lv_draw_image_dsc_init(&image_dsc);
                     image_dsc.opa = glyph_draw_dsc->opa;
@@ -161,6 +190,7 @@ static void draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_
 
 #if LV_USE_FONT_PLACEHOLDER
             case LV_FONT_GLYPH_FORMAT_NONE: {
+                    if(glyph_draw_dsc->bg_coords == NULL) break;
                     /* Draw a placeholder rectangle*/
                     lv_draw_border_dsc_t border_draw_dsc;
                     lv_draw_border_dsc_init(&border_draw_dsc);
@@ -219,9 +249,6 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
 
     const vg_lite_color_t color = lv_vg_lite_color(dsc->color, dsc->opa, true);
 
-    LV_VG_LITE_ASSERT_SRC_BUFFER(&src_buf);
-    LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
-
     /* If clipping is not required, blit directly */
     if(lv_area_is_in(&image_area, &t->clip_area, false)) {
         /* rect is used to crop the pixel-aligned padding area */
@@ -232,16 +259,14 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
             .height = lv_area_get_height(&image_area)
         };
 
-        LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_blit_rect");
-        LV_VG_LITE_CHECK_ERROR(vg_lite_blit_rect(
-                                   &u->target_buffer,
-                                   &src_buf,
-                                   &rect,
-                                   &matrix,
-                                   VG_LITE_BLEND_SRC_OVER,
-                                   color,
-                                   VG_LITE_FILTER_LINEAR));
-        LV_PROFILER_DRAW_END_TAG("vg_lite_blit_rect");
+        lv_vg_lite_blit_rect(
+            &u->target_buffer,
+            &src_buf,
+            &rect,
+            &matrix,
+            VG_LITE_BLEND_SRC_OVER,
+            color,
+            VG_LITE_FILTER_LINEAR);
     }
     else {
         lv_vg_lite_path_t * path = lv_vg_lite_path_get(u, VG_LITE_S16);
@@ -253,37 +278,44 @@ static void draw_letter_bitmap(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * d
         lv_vg_lite_path_set_bounding_box_area(path, &clip_area);
         lv_vg_lite_path_end(path);
 
-        vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(path);
-        LV_VG_LITE_ASSERT_PATH(vg_lite_path);
-
         vg_lite_matrix_t path_matrix = u->global_matrix;
         if(is_rotated) vg_lite_rotate(dsc->rotation / 10.0f, &path_matrix);
-        LV_VG_LITE_ASSERT_MATRIX(&path_matrix);
 
-        LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw_pattern");
-        LV_VG_LITE_CHECK_ERROR(vg_lite_draw_pattern(
-                                   &u->target_buffer,
-                                   vg_lite_path,
-                                   VG_LITE_FILL_EVEN_ODD,
-                                   &path_matrix,
-                                   &src_buf,
-                                   &matrix,
-                                   VG_LITE_BLEND_SRC_OVER,
-                                   VG_LITE_PATTERN_COLOR,
-                                   0,
-                                   color,
-                                   VG_LITE_FILTER_LINEAR));
-        LV_PROFILER_DRAW_END_TAG("vg_lite_draw_pattern");
+        lv_vg_lite_draw_pattern(
+            &u->target_buffer,
+            lv_vg_lite_path_get_path(path),
+            VG_LITE_FILL_EVEN_ODD,
+            &path_matrix,
+            &src_buf,
+            &matrix,
+            VG_LITE_BLEND_SRC_OVER,
+            VG_LITE_PATTERN_COLOR,
+            0,
+            color,
+            VG_LITE_FILTER_LINEAR);
 
         lv_vg_lite_path_drop(u, path);
     }
 
-    /* TODO: The temporary buffer of the built-in font is reused.
-     * You need to wait for the GPU to finish using the buffer before releasing it.
-     * Later, use the font cache for management to improve efficiency.
-     */
-    lv_vg_lite_finish(u);
+    /* Check if the data has cache and add it to the pending list */
+    if(dsc->g->entry) {
+        /* Increment the cache reference count */
+        lv_cache_entry_acquire_data(dsc->g->entry);
+        lv_vg_lite_pending_add(u->bitmap_font_pending, dsc->g);
+    }
+    else {
+        /* No caching, wait for GPU finish before releasing the data */
+        lv_vg_lite_finish(u);
+    }
+
     LV_PROFILER_DRAW_END;
+}
+
+static void bitmap_cache_release_cb(void * entry, void * user_data)
+{
+    LV_UNUSED(user_data);
+    lv_font_glyph_dsc_t * g_dsc = entry;
+    lv_font_glyph_release_draw_data(g_dsc);
 }
 
 #if LV_USE_FREETYPE
@@ -364,17 +396,13 @@ static void draw_letter_outline(lv_draw_task_t * t, const lv_draw_glyph_dsc_t * 
     vg_lite_matrix_t draw_matrix = u->global_matrix;
     lv_vg_lite_matrix_multiply(&draw_matrix, &matrix);
 
-    vg_lite_path_t * vg_lite_path = lv_vg_lite_path_get_path(outline);
-
-    LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
-    LV_VG_LITE_ASSERT_PATH(vg_lite_path);
-    LV_VG_LITE_ASSERT_MATRIX(&draw_matrix);
-
-    LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_draw");
-    LV_VG_LITE_CHECK_ERROR(vg_lite_draw(
-                               &u->target_buffer, vg_lite_path, VG_LITE_FILL_NON_ZERO,
-                               &draw_matrix, VG_LITE_BLEND_SRC_OVER, lv_vg_lite_color(dsc->color, dsc->opa, true)));
-    LV_PROFILER_DRAW_END_TAG("vg_lite_draw");
+    lv_vg_lite_draw(
+        &u->target_buffer,
+        lv_vg_lite_path_get_path(outline),
+        VG_LITE_FILL_NON_ZERO,
+        &draw_matrix,
+        VG_LITE_BLEND_SRC_OVER,
+        lv_vg_lite_color(dsc->color, dsc->opa, true));
 
     LV_PROFILER_DRAW_END;
 }

@@ -2,7 +2,6 @@
 #include "../lvgl.h"
 
 #include "unity/unity.h"
-#include "lv_test_indev.h"
 #include <stdlib.h>
 
 void setUp(void)
@@ -65,7 +64,7 @@ void test_xml_event_call_function_attr(void)
     lv_test_mouse_click_at(30, 20);
     TEST_ASSERT_EQUAL(3, cnt);
 
-    lv_test_indev_wait(100);
+    lv_test_wait(100);
     lv_test_mouse_click_at(30, 20);
     TEST_ASSERT_EQUAL(6, cnt);
 }
@@ -91,7 +90,7 @@ void test_xml_event_call_function_component(void)
     lv_test_mouse_click_at(30, 10);
     TEST_ASSERT_EQUAL(3, cnt);
 
-    lv_test_indev_wait(100);
+    lv_test_wait(100);
     lv_test_mouse_click_at(30, 10);
     TEST_ASSERT_EQUAL(6, cnt);
 }

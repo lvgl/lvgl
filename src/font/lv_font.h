@@ -68,6 +68,7 @@ typedef struct {
     int16_t ofs_y;  /**< y offset of the bounding box*/
     lv_font_glyph_format_t format;  /**< Font format of the glyph see lv_font_glyph_format_t */
     uint8_t is_placeholder: 1;      /**< Glyph is missing. But placeholder will still be displayed*/
+    int32_t outline_stroke_width;   /**< used with freetype vector fonts - width of the letter outline */
 
     /** 0: Get bitmap should return an A8 or ARGB8888 image.
      * 1: return the bitmap as it is (Maybe A1/2/4 or any proprietary formats). */
@@ -173,6 +174,12 @@ int32_t lv_font_get_line_height(const lv_font_t * font);
  * @param kerning `LV_FONT_KERNING_NORMAL` (default) or `LV_FONT_KERNING_NONE`
  */
 void lv_font_set_kerning(lv_font_t * font, lv_font_kerning_t kerning);
+
+/**
+ * Get the default font, defined by LV_FONT_DEFAULT
+ * @return  return      pointer to the default font
+ */
+const lv_font_t * lv_font_get_default(void);
 
 /**********************
  *      MACROS
@@ -294,10 +301,9 @@ LV_FONT_CUSTOM_DECLARE
 #endif
 
 /**
- * Just a wrapper around LV_FONT_DEFAULT because it might be more convenient to use a function in some cases
- * @return  pointer to LV_FONT_DEFAULT
+ * Set to LV_FONT_DEFAULT as macros might not be available in bindings or other places
  */
-const lv_font_t * lv_font_default(void);
+extern const lv_font_t * const lv_font_default;
 
 #ifdef __cplusplus
 } /*extern "C"*/

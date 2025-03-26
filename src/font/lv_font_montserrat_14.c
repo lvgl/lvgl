@@ -2187,5 +2187,4 @@ lv_font_t lv_font_montserrat_14 = {
 #endif
     .dsc = &font_dsc           /*The custom font data. Will be accessed by `get_glyph_bitmap/dsc` */
 };
-
 #endif /*#if LV_FONT_MONTSERRAT_14*/

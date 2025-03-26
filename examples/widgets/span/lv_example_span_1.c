@@ -3,7 +3,7 @@
 
 static void click_event_cb(lv_event_t * e)
 {
-    lv_obj_t * spans = lv_event_get_target(e);
+    lv_obj_t * spans = lv_event_get_target_obj(e);
     lv_indev_t * indev = lv_event_get_indev(e);
     lv_point_t point;
     lv_indev_get_point(indev, &point);

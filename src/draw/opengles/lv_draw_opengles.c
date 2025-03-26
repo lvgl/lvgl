@@ -178,7 +178,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(draw_opengles_unit->task_act) return 0;
 
     lv_draw_task_t * t = NULL;
-    t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_OPENGLES);
+    t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_OPENGLES);
     if(t == NULL) return -1;
 
     unsigned int texture = layer_get_texture(layer);

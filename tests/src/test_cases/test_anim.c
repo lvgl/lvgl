@@ -3,7 +3,7 @@
 #include "../../lvgl_private.h"
 
 #include "unity/unity.h"
-#include "lv_test_helpers.h"
+
 
 void setUp(void)
 {
@@ -13,6 +13,8 @@ void setUp(void)
 void tearDown(void)
 {
     /* Function run after every test */
+    lv_obj_clean(lv_screen_active());
+    lv_anim_delete_all();
 }
 
 static void exec_cb(void * var, int32_t v)
@@ -134,7 +136,6 @@ void test_anim_pause_for(void)
     lv_anim_t * animation = lv_anim_start(&a);
 
     lv_anim_pause_for(animation, 20);
-
     lv_test_wait(40);
 
     TEST_ASSERT_EQUAL(19, var);
@@ -145,6 +146,9 @@ void test_anim_pause_for(void)
     lv_test_wait(40);
 
     TEST_ASSERT_EQUAL(79, var);
+
+    /*Delete the animation to avoid accessing it after return*/
+    lv_anim_delete(&var, exec_cb);
 }
 
 void test_anim_pause_for_resume(void)
@@ -168,4 +172,25 @@ void test_anim_pause_for_resume(void)
     lv_test_wait(20);
     TEST_ASSERT_EQUAL(19, var);
 }
+
+static void event_cb(lv_event_t * e)
+{
+    lv_obj_t * obj = lv_event_get_target_obj(e);
+    int * var = lv_event_get_user_data(e);
+    lv_anim_delete(obj, NULL);
+    *var += 1;
+}
+
+void test_scroll_anim_delete(void)
+{
+    int var = 0;
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_add_event_cb(obj, event_cb, LV_EVENT_SCROLL_END, &var);
+    lv_obj_scroll_by(obj, 0, 100, LV_ANIM_ON);
+    lv_test_wait(20);
+    lv_obj_scroll_by(obj, 0, 100, LV_ANIM_ON);
+
+    TEST_ASSERT_EQUAL(1, var);
+}
+
 #endif

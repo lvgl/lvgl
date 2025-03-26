@@ -51,6 +51,18 @@ struct _lv_file_explorer_t {
     lv_file_explorer_sort_t sort;
 };
 
+typedef enum {
+    LV_FILE_EXPLORER_FILE_KIND_DIR,
+    LV_FILE_EXPLORER_FILE_KIND_IMAGE,
+    LV_FILE_EXPLORER_FILE_KIND_AUDIO,
+    LV_FILE_EXPLORER_FILE_KIND_VIDEO,
+    LV_FILE_EXPLORER_FILE_KIND_FILE
+} lv_file_explorer_file_kind_t;
+
+typedef struct {
+    lv_file_explorer_file_kind_t file_kind;
+} lv_file_explorer_file_table_entry_data_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -36,6 +36,7 @@
 #if LV_USE_STDLIB_SPRINTF == LV_STDLIB_BUILTIN
 
 #include "../lv_sprintf.h"
+#include "../lv_string.h"
 #include "../../misc/lv_types.h"
 
 #define PRINTF_DISABLE_SUPPORT_FLOAT    (!LV_USE_FLOAT)
@@ -141,15 +142,6 @@ static inline void _out_null(char character, void * buffer, size_t idx, size_t m
     LV_UNUSED(buffer);
     LV_UNUSED(idx);
     LV_UNUSED(maxlen);
-}
-
-// internal secure strlen
-// \return The length of the string (excluding the terminating 0) limited by 'maxsize'
-static inline unsigned int _strnlen_s(const char * str, size_t maxsize)
-{
-    const char * s;
-    for(s = str; *s && maxsize--; ++s);
-    return (unsigned int)(s - str);
 }
 
 // internal test if char is a digit (0-9)
@@ -822,7 +814,7 @@ static int lv_vsnprintf_inner(out_fct_type out, char * buffer, const size_t maxl
 
             case 's' : {
                     const char * p = va_arg(va, char *);
-                    unsigned int l = _strnlen_s(p, precision ? precision : (size_t) -1);
+                    unsigned int l = lv_strnlen(p, precision ? precision : (size_t) -1);
                     // pre padding
                     if(flags & FLAGS_PRECISION) {
                         l = (l < precision ? l : precision);

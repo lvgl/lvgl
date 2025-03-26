@@ -3,7 +3,6 @@
 #include "../../lvgl_private.h"
 
 #include "unity/unity.h"
-#include "lv_test_indev.h"
 
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * spinbox_negative_min_range = NULL;
@@ -27,7 +26,7 @@ void setUp(void)
     lv_spinbox_set_range(spinbox_zero_min_range, SPINBOX_ZERO_MIN_RANGE_VALUE, SPINBOX_NEGATIVE_MAX_RANGE_VALUE);
 
     g = lv_group_create();
-    lv_indev_set_group(lv_test_encoder_indev, g);
+    lv_indev_set_group(lv_test_indev_get_indev(LV_INDEV_TYPE_ENCODER), g);
 }
 
 void tearDown(void)

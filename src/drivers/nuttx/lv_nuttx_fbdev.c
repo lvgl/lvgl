@@ -328,19 +328,26 @@ static int fbdev_get_pinfo(int fd, FAR struct fb_planeinfo_s * pinfo)
 
 static int fbdev_init_mem2(lv_nuttx_fb_t * dsc)
 {
-    uintptr_t buf_offset;
     struct fb_planeinfo_s pinfo;
+    void * phy_mem1;
+    void * phy_mem2;
+
     int ret;
 
+    /* Get display[0] planeinfo */
     lv_memzero(&pinfo, sizeof(pinfo));
+    pinfo.display = dsc->pinfo.display;
+    if((ret = fbdev_get_pinfo(dsc->fd, &pinfo)) < 0) return ret;
+    phy_mem1 = pinfo.fbmem;
 
     /* Get display[1] planeinfo */
-
+    lv_memzero(&pinfo, sizeof(pinfo));
     pinfo.display = dsc->pinfo.display + 1;
+    if((ret = fbdev_get_pinfo(dsc->fd, &pinfo)) < 0) return ret;
+    phy_mem2 = pinfo.fbmem;
 
-    if((ret = fbdev_get_pinfo(dsc->fd, &pinfo)) < 0) {
-        return ret;
-    }
+    lv_uintptr_t offset = (lv_uintptr_t)phy_mem2 - (lv_uintptr_t)phy_mem1;
+    bool is_consecutive = offset == 0;
 
     /* Check bpp */
 
@@ -353,29 +360,33 @@ static int fbdev_init_mem2(lv_nuttx_fb_t * dsc)
      * It needs to be divisible by pinfo.stride
      */
 
-    buf_offset = pinfo.fbmem - dsc->mem;
-
-    if((buf_offset % dsc->pinfo.stride) != 0) {
+    if((offset % dsc->pinfo.stride) != 0) {
         LV_LOG_WARN("It is detected that buf_offset(%" PRIuPTR ") "
                     "and stride(%d) are not divisible, please ensure "
                     "that the driver handles the address offset by itself.",
-                    buf_offset, dsc->pinfo.stride);
+                    offset, dsc->pinfo.stride);
     }
 
     /* Calculate the address and yoffset of mem2 */
 
-    if(buf_offset == 0) {
+    if(is_consecutive) {
         dsc->mem2_yoffset = dsc->vinfo.yres;
-        dsc->mem2 = pinfo.fbmem + dsc->mem2_yoffset * pinfo.stride;
-        LV_LOG_USER("Use consecutive mem2 = %p, yoffset = %" LV_PRIu32,
-                    dsc->mem2, dsc->mem2_yoffset);
+        offset = dsc->vinfo.yres * pinfo.stride;
     }
     else {
-        dsc->mem2_yoffset = buf_offset / dsc->pinfo.stride;
-        dsc->mem2 = pinfo.fbmem;
-        LV_LOG_USER("Use non-consecutive mem2 = %p, yoffset = %" LV_PRIu32,
-                    dsc->mem2, dsc->mem2_yoffset);
+        dsc->mem2_yoffset = offset / dsc->pinfo.stride;
     }
+
+    uint32_t fblen = is_consecutive ? pinfo.fblen / 2 : pinfo.fblen;
+    void * mem2 = mmap(NULL, fblen, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FILE, dsc->fd, offset);
+    if(mem2 == MAP_FAILED) {
+        LV_LOG_ERROR("ERROR: mmap failed: %d, offset: %" PRIuPTR, errno, offset);
+        return -errno;
+    }
+    dsc->mem2 = mem2;
+
+    LV_LOG_USER("Use of %sconsecutive mem2 = %p, yoffset = %" LV_PRIu32, is_consecutive ? "" : "non-", dsc->mem2,
+                dsc->mem2_yoffset);
 
     return 0;
 }

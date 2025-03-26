@@ -32,35 +32,80 @@ extern "C" {
 typedef struct {
     lv_draw_dsc_base_t base;
 
+    /**The text to draw*/
     const char * text;
-    uint32_t text_length;
+
+    /**The font to use. Fallback fonts are also handled.*/
     const lv_font_t * font;
-    uint32_t sel_start;
-    uint32_t sel_end;
+
+    /**Color of the text*/
     lv_color_t color;
-    lv_color_t sel_color;
-    lv_color_t sel_bg_color;
+
+    /**Extra space between the lines*/
     int32_t line_space;
+
+    /**Extra space between the characters*/
     int32_t letter_space;
+
+    /**Offset the text with this value horizontally*/
     int32_t ofs_x;
+
+    /**Offset the text with this value vertically*/
     int32_t ofs_y;
+
+    /**Rotation of the letters in 0.1 degree unit*/
     int32_t rotation;
+
+    /**The first characters index for selection (not byte index). `LV_DRAW_LABEL_NO_TXT_SEL` for no selection*/
+    uint32_t sel_start;
+
+    /**The last characters's index for selection (not byte index). `LV_DRAW_LABEL_NO_TXT_SEL` for no selection*/
+    uint32_t sel_end;
+
+    /**Color of the selected characters*/
+    lv_color_t sel_color;
+
+    /**Background color of the selected characters*/
+    lv_color_t sel_bg_color;
+
+    /**The number of characters to render. 0: means render until reaching the `\0` termination.*/
+    uint32_t text_length;
+
+    /**Opacity of the text in 0...255 range.
+     * LV_OPA_TRANSP, LV_OPA_10, LV_OPA_20, .. LV_OPA_COVER can be used as well*/
     lv_opa_t opa;
-    lv_base_dir_t bidi_dir;
+
+    /**The alignment of the text `LV_TEXT_ALIGN_LEFT/RIGHT/CENTER`*/
     lv_text_align_t align;
-    lv_text_flag_t flag;
+
+    /**The base direction. Used when type setting Right-to-left (e.g. Arabic) texts*/
+    lv_base_dir_t bidi_dir;
+
+    /**Text decoration, e.g. underline*/
     lv_text_decor_t decor : 3;
-    lv_blend_mode_t blend_mode : 3;
-    /**
-     * < 1: malloc buffer and copy `text` there.
-     * 0: `text` is const and it's pointer will be valid during rendering.*/
+
+    /**Some flags to control type setting*/
+    lv_text_flag_t flag : 5;
+
+    /**1: malloc a buffer and copy `text` there.
+     * 0: `text` will be valid during rendering.*/
     uint8_t text_local : 1;
 
-    /**
-     * Indicate that the text is constant and its pointer can be safely saved e.g. in a cache.
-     */
+    /**Indicate that the text is constant and its pointer can be safely saved e.g. in a cache.*/
     uint8_t text_static : 1;
+
+    /**1: already executed lv_bidi_process_paragraph.
+     * 0: has not been executed lv_bidi_process_paragraph.*/
+    uint8_t has_bided : 1;
+
+    /**Pointer to an externally stored struct where some data can be cached to speed up rendering*/
     lv_draw_label_hint_t * hint;
+
+    /* Properties of the letter outlines */
+    lv_opa_t outline_stroke_opa;
+    lv_color_t outline_stroke_color;
+    int32_t outline_stroke_width;
+
 } lv_draw_label_dsc_t;
 
 typedef struct {
@@ -80,6 +125,12 @@ typedef struct {
     lv_opa_t opa;
     lv_text_decor_t decor : 3;
     lv_blend_mode_t blend_mode : 3;
+
+    /* Properties of the letter outlines */
+    lv_opa_t outline_stroke_opa;
+    int32_t outline_stroke_width;
+    lv_color_t outline_stroke_color;
+
 } lv_draw_letter_dsc_t;
 
 /**

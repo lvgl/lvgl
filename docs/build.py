@@ -1,309 +1,474 @@
 #!/usr/bin/env python3
-""" Generate LVGL documentation using Doxygen and Sphinx.
+""" build.py -- Generate LVGL documentation using Doxygen and Sphinx + Breathe.
 
-The first version of this file (Apr 2021) discovered the name of
-the current branch (e.g. 'master', 'release/v8.4', etc.) to support
-different versions of the documentation by establishing the base URL
-(used in `conf.py` and in [Edit on GitHub] links), and then ran:
+Synopsis
+--------
+    - $ python build.py html  [ skip_api ] [ fresh_env ]
+    - $ python build.py latex [ skip_api ] [ fresh_env ]
+    - $ python build.py intermediate  [ skip_api ]
+    - $ python build.py clean
+    - $ python build.py clean_intermediate
+    - $ python build.py clean_html
+    - $ python build.py clean_latex
 
-- Doxygen (to generate LVGL API XML), then
-- Sphinx
+    Build Arguments and Clean Arguments can be used one at a time
+    or be freely mixed and combined.
 
-to generate the LVGL document tree.  Internally, Sphinx uses `breathe`
-(a Sphinx extension) to provide a bridge between Doxygen XML output and
-Sphinx documentation.  It also supported a command-line option `clean`
-to remove generated files before starting (eliminates orphan files,
-for docs that have moved or changed).
+Description
+-----------
+    Copy source files to an intermediate directory and modify them there before
+    doc generation occurs.  If a full rebuild is being done (e.g. after a `clean`)
+    run Doxygen LVGL's source files to generate intermediate API information
+    in XML format.  Generate API documents for Breathe's consumption.  Add API
+    links to end of some documents.  Generate example documents.  From there,
+    Sphinx with Breathe extension uses the resulting set of intermediate files
+    to generate the desired output.
 
-Since then its duties have grown to include:
+    It is only during this first build that the `skip_api` option has meaning.
+    After the first build, no further actions is taken regarding API pages since
+    they are not regenerated after the first build.
 
-- Using environment variables to convey branch names to several more
-  places where they are used in the docs-generating process (instead
-  of re-writing writing `conf.py` and a `header.rst` each time docs
-  were generated).  These are documented where they generated below.
+    The intermediate directory has a fixed location (overridable by
+    `LVGL_DOC_BUILD_INTERMEDIATE_DIR` environment variable) and by default this
+    script attempts to rebuild only those documents whose path, name or
+    modification date has changed since the last build.
 
-- Supporting additional command-line options.
+    The output directory also has a fixed location (overridable by
+    `LVGL_DOC_BUILD_OUTPUT_DIR` environment variable).
 
-- Generating a temporary `./docs/lv_conf.h` for Doxygen to use
-  (config_builder.py).
+    Caution:
 
-- Supporting multiple execution platforms (which then required tokenizing
-  Doxygen's INPUT path in `Doxyfile` and re-writing portions that used
-  `sed` to generate input or modify files).
+    The document build meant for end-user consumption should ONLY be done after a
+    `clean` unless you know that no API documentation and no code examples have changed.
 
-- Adding translation and API links (requiring generating docs in a
-  temporary directory so that the links could be programmatically
-  added to each document before Sphinx was run).
+    A `sphinx-build` will do a full doc rebuild any time:
 
-- Generating EXAMPLES page + sub-examples where applicable to individual
-  documents, e.g. to widget-, style-, layout-pages, etc.
+    - the intermediate directory doesn't exist or is empty (since the new files in
+      the intermediate directory will have modification times after the generated
+      HTML or Latex files, even if nothing changed),
+    - the targeted output directory doesn't exist or is empty, or
+    - Sphinx determines that a full rebuild is necessary.  This happens when:
+        - intermediate directory (Sphinx's source-file path) has changed,
+        - any options on the `sphinx-build` command line have changed,
+        - `conf.py` modification date has changed, or
+        - `fresh_env` argument is included (runs `sphinx-build` with -E option).
 
-- Building PDF via latex (when working).
+    Typical run time:
 
+    Full build:  22.5 min
+    skip_api  :   1.9 min  (applies to first build only)
 
-Command-Line Arguments
-----------------------
-Command-line arguments have been broken down to give the user the
-ability to control each individual major variation in behavior of
-this script.  These were added to speed up long doc-development
-tasks by shortening the turn-around time between doc modification
-and seeing the final .html results in a local development environment.
-Finally, this script can now be used in a way such that Sphinx will
-only modify changed documents, and reduce an average ~22-minute
-run time to a run time that is workable for rapidly repeating doc
-generation to see Sphinx formatting results quickly.
+Options
+-------
+    help
+        Print usage note and exit with status 0.
 
+    html [ skip_api ] [ fresh_env ]
+        Build HTML output.
+        `skip_api` only has effect on first build after a `clean` or `clean_intermediate`.
 
-Normal Usage
-------------
-This is the way this script is used for normal (full) docs generation.
+    latex [ skip_api ] [ fresh_env ]
+        Build Latex/PDF output (on hold pending removal of non-ASCII characters from input files).
+        `skip_api` only has effect on first build after a `clean` or `clean_intermediate`.
 
-    $ python  build.py  skip_latex
+    intermediate [ skip_api ]
+        Generate intermediate directory contents (ready to build output formats).
+        If they already exist, they are removed and re-generated.
+        Note:  "intermediate" can be abbreviated down to "int".
 
+    skip_api (with `html` and/or `latex` and/or `intermediate` options)
+        Skip API pages and links when intermediate directory contents are being generated
+        (saving about 91% of build time).  Note: they are not thereafter regenerated unless
+        requested by `intermediate` argument or the intermediate directory does not
+        exist.  This is intended to be used only during doc development to speed up
+        turn-around time between doc modifications and seeing final results.
 
-Docs-Dev Initial Docs Generation Usage
---------------------------------------
-1.  Set `LVGL_FIXED_TEMP_DIR` environment variable to path to
-    the temporary directory you will use over and over during
-    document editing, without trailing directory separator.
-    Initially directory should not exist.
+    fresh_env (with `html` and/or `latex` options)
+        Run `sphinx-build` with -E command-line argument, which makes it regenerate its
+        "environment" (memory of what was built previously, forcing a full rebuild).
 
-2.  $ python  build.py  skip_latex  preserve  fixed_tmp_dir
+    clean
+        Remove all generated files.
 
-This takes typically ~22 minutes.
+    clean_intermediate
+        Remove intermediate directory.
+        Note:  "clean_intermediate" can be abbreviated down to "clean_int".
 
+    clean_html
+        Remove HTML output directory.
 
-Docs-Dev Update-Only Generation Usage
--------------------------------------
-After the above has been run through once, you can thereafter
-run the following until docs-development task is complete.
+    clean_latex
+        Remove Latex output directory.
 
-    $ python  build.py  skip_latex  docs_dev  update
+    Unrecognized arguments print error message, usage note, and exit with status 1.
 
-Generation time depends on the number of `.rst` files that
-have been updated:
+Python Package Requirements
+---------------------------
+    The list of Python package requirements are in `requirements.txt`.
 
-+--------------+------------+---------------------------------+
-| Docs Changed | Time       | Typical Time to Browser Refresh |
-+==============+============+=================================+
-|  0           |  6 seconds |             n/a                 |
-+--------------+------------+---------------------------------+
-|  1           | 19 seconds |          12 seconds             |
-+--------------+------------+---------------------------------+
-|  5           | 28 seconds |          21 seconds             |
-+--------------+------------+---------------------------------+
-| 20           | 59 seconds |          52 seconds             |
-+--------------+------------+---------------------------------+
+    Install them by:
 
+    $ pip install -r requirements.txt
 
-Sphinx Doc-Regeneration Criteria
---------------------------------
-Sphinx uses the following to determine what documents get updated:
+History
+-------
+    The first version of this file (Apr 2021) discovered the name of
+    the current branch (e.g. 'master', 'release/v8.4', etc.) to support
+    different versions of the documentation by establishing the base URL
+    (used in `conf.py` and in [Edit on GitHub] links), and then ran:
 
-- source-doc modification date
-  - Change the modification date and `sphinx-build` will re-build it.
+    - Doxygen (to generate LVGL API XML), then
+    - Sphinx
 
-- full (absolute) path to the source document, including its file name
-  - Change the path or filename and `sphinx-build` will re-build it.
+    to generate the LVGL document tree.  Internally, Sphinx uses `breathe`
+    (a Sphinx extension) to provide a bridge between Doxygen XML output and
+    Sphinx documentation.  It also supported a command-line option `clean`
+    to remove generated files before starting (eliminates orphan files,
+    for docs that have moved or changed).
 
-- whether the -E option is on the `sphinx-build` command line
-  - -E forces `sphinx-build` to do a full re-build.
+    Since then its duties have grown to include:
 
+    - Using environment variables to convey branch names to several more
+      places where they are used in the docs-generating process (instead
+      of re-writing writing `conf.py` and a `header.rst` each time docs
+      were generated).  These are documented where they generated below.
 
-Argument Descriptions
----------------------
-- skip_latex
-    The meaning of this argument has not changed:  it simply skips
-    attempting to generate Latex and subsequent PDF generation.
-- skip_api
-    Skips generating API pages (this saves about 70% of build time).
-    This is intended to be used only during doc development to speed up
-    turn-around time between doc modifications and seeing final results.
-- no_fresh_env
-    Excludes -E command-line argument to `sphinx-build`, which, when present,
-    forces it to generate a whole new environment (memory of what was built
-    previously, forcing a full rebuild).  "no_fresh_env" enables a rebuild
-    of only docs that got updated -- Sphinx's default behavior.
-- preserve (previously "develop")
-    Leaves temporary directory intact for docs development purposes.
-- fixed_tmp_dir
-    If (fixed_tmp_dir and 'LVGL_FIXED_TEMP_DIR' in `os.environ`),
-    then this script uses the value of that that environment variable
-    to populate `temp_directory` instead of the normal (randomly-named)
-    temporary directory.  This is important when getting `sphinx-build`
-    to ONLY rebuild updated documents, since changing the directory
-    from which they are generated (normally the randomly-named temp
-    dir) will force Sphinx to do a full-rebuild because it remembers
-    the doc paths from which the build was last performed.
-- skip_trans
-    Skips adding translation links.  This allows direct copying of
-    `.rst` files to `temp_directory` when they are updated to save time
-    during re-build.  Final build must not include this option so that
-    the translation links are added at the top of each intended page.
-- no_copy
-    Skips copying ./docs/ directory tree to `temp_directory`.
-    This is only honored if:
-    - fixed_tmp_dir == True, and
-    - the doc files were previously copied to the temporary directory
-      and thus are already present there.
-- docs_dev
-    This is a command-line shortcut to combining these command-line args:
-    - no_fresh_env
-    - preserve
-    - fixed_tmp_dir
-    - no_copy
-- update
-    When no_copy is active, check modification dates on `.rst` files
-    and re-copy the updated `./docs/` files to the temporary directory
-    that have later modification dates, thus updating what Sphinx uses
-    as input.
-    Warning:  this wipes out translation links and API-page links that
-    were added in the first pass, so should only be used for doc
-    development -- not for final doc generation.
+    - Supporting additional command-line options.
+
+    - Generating a `./docs/lv_conf.h` for Doxygen to use (config_builder.py).
+
+    - Supporting multiple execution platforms (which then required tokenizing
+      Doxygen's INPUT path in `Doxyfile` and re-writing portions that used
+      `sed` to generate input or modify files).
+
+    - Adding translation and API links (requiring generating docs in an
+      intermediate directory so that the links could be programmatically
+      added to each document before Sphinx was run).  Note:  translation link
+      are now done manually since they are only on the main landing page.
+
+    - Generating EXAMPLES page + sub-examples where applicable to individual
+      documents, e.g. to widget-, style-, layout-pages, etc.
+
+    - Building PDF via latex (when working).
+
+    - Shifting doc-generation paradigm to behave more like `make`.
+
 """
 
 # ****************************************************************************
 # IMPORTANT: If you are getting a PDF-lexer error for an example, check
 #            for extra lines at the end of the file. Only a single empty line
 #            is allowed!!! Ask me how long it took me to figure this out.
+#              -- @kdschlosser
 # ****************************************************************************
 
+# Python Library
+import sys
+import os
+import subprocess
+import shutil
+import dirsync
+from datetime import datetime
 
-def run():
-    # Python Library Imports
-    import sys
-    import os
-    import re
-    import subprocess
-    import shutil
-    import tempfile
-    import dirsync
-    from datetime import datetime
+# LVGL Custom
+import example_list
+import api_doc_builder
+import config_builder
+from src.lvgl_version import lvgl_version
+from announce import *
 
-    # LVGL Custom Imports
-    import example_list as ex
-    import doc_builder
-    import config_builder
-    import add_translation
+# Not Currently Used
+# (Code is kept in case we want to re-implement it later.)
+# import add_translation
+
+# -------------------------------------------------------------------------
+# Configuration
+# -------------------------------------------------------------------------
+# These are relative paths from the ./docs/ directory.
+cfg_project_dir = '..'
+cfg_lvgl_src_dir = 'src'
+cfg_doc_src_dir = 'src'
+cfg_examples_dir = 'examples'
+cfg_default_intermediate_dir = 'intermediate'
+cfg_default_output_dir = 'build'
+cfg_static_dir = '_static'
+cfg_downloads_dir = 'downloads'
+cfg_lv_conf_filename = 'lv_conf.h'
+cfg_lv_version_filename = 'lv_version.h'
+cfg_doxyfile_filename = 'Doxyfile'
+cfg_top_index_filename = 'index.rst'
+
+# Filename generated in `latex_output_dir` and copied to `pdf_output_dir`.
+cfg_pdf_filename = 'LVGL.pdf'
+
+
+# -------------------------------------------------------------------------
+# Print usage note.
+# -------------------------------------------------------------------------
+def print_usage_note():
+    print('Usage:')
+    print('  $ python build.py [optional_arg ...]')
+    print()
+    print('  where `optional_arg` can be any of these:')
+    print('    html  [ skip_api ] [ fresh_env ]')
+    print('    latex [ skip_api ] [ fresh_env ]')
+    print('    intermediate  [ skip_api ]')
+    print('    clean')
+    print('    clean_intermediate')
+    print('    clean_html')
+    print('    clean_latex')
+    print('    help')
+
+
+def remove_dir(tgt_dir):
+    """Remove directory `tgt_dir`."""
+    if os.path.isdir(tgt_dir):
+        announce(__file__, f'Removing {tgt_dir}...')
+        shutil.rmtree(tgt_dir)
+    else:
+        announce(__file__, f'{tgt_dir} already removed...')
+
+
+def cmd(cmd_str, start_dir=None, exit_on_error=True):
+    """Run external command and abort build on error."""
+    saved_dir = None
+
+    if start_dir is not None:
+        saved_dir = os.getcwd()
+        os.chdir(start_dir)
+
+    announce(__file__, f'Running [{cmd_str}] in [{os.getcwd()}]...')
+    return_code = os.system(cmd_str)
+
+    if saved_dir is not None:
+        os.chdir(saved_dir)
+
+    if return_code != 0 and exit_on_error:
+        announce(__file__, "Exiting build due to previous error.")
+        sys.exit(return_code)
+
+
+def intermediate_dir_contents_exists(dir):
+    """Provide answer to question:  Can we have reasonable confidence that
+    the contents of `intermediate_directory` already exists?
+    """
+    result = False
+    c1 = os.path.isdir(dir)
+
+    if c1:
+        temp_path = os.path.join(dir, 'CHANGELOG.rst')
+        c2 = os.path.exists(temp_path)
+        temp_path = os.path.join(dir, '_ext')
+        c3 = os.path.isdir(temp_path)
+        temp_path = os.path.join(dir, '_static')
+        c4 = os.path.isdir(temp_path)
+        temp_path = os.path.join(dir, 'details')
+        c5 = os.path.isdir(temp_path)
+        temp_path = os.path.join(dir, 'intro')
+        c6 = os.path.isdir(temp_path)
+        temp_path = os.path.join(dir, 'contributing')
+        c7 = os.path.isdir(temp_path)
+        temp_path = os.path.join(dir, cfg_examples_dir)
+        c8 = os.path.isdir(temp_path)
+        result = c2 and c3 and c4 and c5 and c6 and c7 and c8
+
+    return result
+
+
+def run(args):
+    """Perform doc-build function(s) requested."""
+
+    # ---------------------------------------------------------------------
+    # Set default settings.
+    # ---------------------------------------------------------------------
+    build_html = False
+    build_latex = False
+    build_intermediate = False
+    skip_api = False
+    fresh_sphinx_env = False
+    clean_all = False
+    clean_intermediate = False
+    clean_html = False
+    clean_latex = False
+
+    def print_setting(setting_name, val):
+        """Print one setting; used for debugging."""
+        announce(__file__, f'{setting_name:18} = [{val}]')
+
+    def print_settings(and_exit):
+        """Print all settings and optionally exit; used for debugging."""
+        print_setting("build_html", build_html)
+        print_setting("build_latex", build_latex)
+        print_setting("build_intermediate", build_intermediate)
+        print_setting("skip_api", skip_api)
+        print_setting("fresh_sphinx_env", fresh_sphinx_env)
+        print_setting("clean_all", clean_all)
+        print_setting("clean_intermediate", clean_intermediate)
+        print_setting("clean_html", clean_html)
+        print_setting("clean_latex", clean_latex)
+
+        if and_exit:
+            exit(0)
+
+    # ---------------------------------------------------------------------
+    # Process args.
+    # ---------------------------------------------------------------------
+
+    # No args means print usage note and exit with status 0.
+    if len(args) == 0:
+        print_usage_note()
+        exit(0)
+
+    # Some args are present.  Interpret them in loop here.
+    # Unrecognized arg means print error, print usage note, exit with status 1.
+    for arg in args:
+        # We use chained `if-elif-else` instead of `match` for those on Linux
+        # systems that will not have the required version 3.10 of Python yet.
+        if arg == 'help':
+            print_usage_note()
+            exit(0)
+        elif arg == "html":
+            build_html = True
+        elif arg == "latex":
+            build_latex = True
+        elif "intermediate".startswith(arg) and len(arg) >= 3:
+            # Accept abbreviations.
+            build_intermediate = True
+        elif arg == 'skip_api':
+            skip_api = True
+        elif arg == 'fresh_env':
+            fresh_sphinx_env = True
+        elif arg == "clean":
+            clean_all = True
+            clean_intermediate = True
+            clean_html = True
+            clean_latex = True
+        elif arg == "clean_html":
+            clean_html = True
+        elif arg == "clean_latex":
+            clean_latex = True
+        elif "clean_intermediate".startswith(arg) and len(arg) >= 9:
+            # Accept abbreviations.
+            # Needs to be after others so "cl" will not
+            clean_intermediate = True
+        else:
+            print(f'Argument [{arg}] not recognized.')
+            print()
+            print_usage_note()
+            exit(1)
+
+    # '-E' option forces Sphinx to rebuild its environment so all docs are
+    # fully regenerated, even if not changed.
+    # Note:  Sphinx runs in ./docs/, but uses `intermediate_dir` for input.
+    if fresh_sphinx_env:
+        announce(__file__, "Force-regenerating all files...")
+        env_opt = '-E'
+    else:
+        env_opt = ''
 
     # ---------------------------------------------------------------------
     # Start.
     # ---------------------------------------------------------------------
-    t1 = datetime.now()
-    print('Current time:  ' + str(t1))
-
-    # ---------------------------------------------------------------------
-    # Process args.
-    #
-    # With argument `docs_dev`, Sphinx will generate docs from a fixed
-    # temporary directory that can be then used later using the same
-    # command line to get Sphinx to ONLY rebuild changed documents.
-    # This saves a huge amount of time during long document projects.
-    # ---------------------------------------------------------------------
-    # Set defaults.
-    clean = False
-    skip_latex = False
-    skip_api = False
-    fresh_sphinx_env = True
-    preserve = False
-    fixed_tmp_dir = False
-    skip_trans = False
-    no_copy = False
-    docs_dev = False
-    update = False
-    args = sys.argv[1:]
-
-    for arg in args:
-        # We use chained `if-elif-else` instead of `match` for those on Linux
-        # systems that will not have the required version 3.10 of Python yet.
-        if arg == "clean":
-            clean = True
-        elif arg == "skip_latex":
-            skip_latex = True
-        elif arg == 'skip_api':
-            skip_api = True
-        elif arg == 'no_fresh_env':
-            fresh_sphinx_env = False
-        elif arg == 'preserve':
-            preserve = True
-        elif arg == 'fixed_tmp_dir':
-            fixed_tmp_dir = True
-        elif arg == 'skip_trans':
-            skip_trans = True
-        elif arg == 'no_copy':
-            no_copy = True
-        elif arg == 'docs_dev':
-            docs_dev = True
-        elif arg == 'update':
-            update = True
-        else:
-            print(f'Argument [{arg}] not recognized.')
-            exit(1)
-
-    # Arg ramifications:
-    # docs_dev implies no_fresh_env, preserve, fixed_tmp_dir, and no_copy.
-    if docs_dev:
-        fresh_sphinx_env = False
-        preserve = True
-        fixed_tmp_dir = True
-        no_copy = True
-
-    # ---------------------------------------------------------------------
-    # Due to the modifications that take place to the documentation files
-    # when the documentation builds it is better to copy the source files to a
-    # temporary folder and modify the copies. Not setting it up this way makes it
-    # a real headache when making alterations that need to be committed as the
-    # alterations trigger the files as changed.  Also, this keeps maintenance
-    # effort to a minimum as adding a new language translation only needs to be
-    # done in 2 places (add_translation.py and ./docs/_ext/link_roles.py) rather
-    # than once for each .rst file.
-    #
-    # The html and PDF output locations are going to remain the same as they were.
-    # it's just the source documentation files that are going to be copied.
-    # ---------------------------------------------------------------------
-    if fixed_tmp_dir and 'LVGL_FIXED_TEMP_DIR' in os.environ:
-        temp_directory = os.environ['LVGL_FIXED_TEMP_DIR']
-    else:
-        temp_directory = tempfile.mkdtemp(suffix='.lvgl_docs')
-
-    print(f'Using temp directory:  [{temp_directory}]')
+    t0 = datetime.now()
 
     # ---------------------------------------------------------------------
     # Set up paths.
+    #
+    # Variable Suffixes:
+    # _filename = filename without path
+    # _path     = path leading to a file or directory (absolute or relative)
+    # _file     = path leading to a file              (absolute or relative)
+    # _dir      = path leading to a directory         (absolute or relative)
     # ---------------------------------------------------------------------
-    base_path = os.path.abspath(os.path.dirname(__file__))
-    project_path = os.path.abspath(os.path.join(base_path, '..'))
-    examples_path = os.path.join(project_path, 'examples')
-    lvgl_src_path = os.path.join(project_path, 'src')
-    latex_output_path = os.path.join(temp_directory, 'out_latex')
-    pdf_src_file = os.path.join(latex_output_path, 'LVGL.pdf')
-    pdf_dst_file = os.path.join(temp_directory, 'LVGL.pdf')
-    html_src_path = temp_directory
-    html_dst_path = os.path.join(project_path, 'out_html')
+    base_dir = os.path.abspath(os.path.dirname(__file__))
+    project_dir = os.path.abspath(os.path.join(base_dir, cfg_project_dir))
+    examples_dir = os.path.join(project_dir, cfg_examples_dir)
+    lvgl_src_dir = os.path.join(project_dir, cfg_lvgl_src_dir)
+
+    # Establish intermediate directory.  The presence of environment variable
+    # `LVGL_DOC_BUILD_INTERMEDIATE_DIR` overrides default in `cfg_default_intermediate_dir`.
+    if 'LVGL_DOC_BUILD_INTERMEDIATE_DIR' in os.environ:
+        intermediate_dir = os.environ['LVGL_DOC_BUILD_INTERMEDIATE_DIR']
+    else:
+        intermediate_dir = os.path.join(base_dir, cfg_default_intermediate_dir)
+
+    lv_conf_file = os.path.join(intermediate_dir, cfg_lv_conf_filename)
+    version_dst_file = os.path.join(intermediate_dir, cfg_lv_version_filename)
+    top_index_file = os.path.join(intermediate_dir, cfg_top_index_filename)
+    doxyfile_src_file = os.path.join(base_dir, cfg_doxyfile_filename)
+    doxyfile_dst_file = os.path.join(intermediate_dir, cfg_doxyfile_filename)
+    pdf_intermediate_dst_dir = os.path.join(intermediate_dir, cfg_static_dir, cfg_downloads_dir)
+    pdf_intermediate_dst_file = os.path.join(pdf_intermediate_dst_dir, cfg_pdf_filename)
+    sphinx_path_sep = '/'
+    pdf_relative_file = cfg_static_dir + sphinx_path_sep + cfg_downloads_dir + sphinx_path_sep + cfg_pdf_filename
+    pdf_link_ref_str = f'PDF Version: :download:`{cfg_pdf_filename} <{pdf_relative_file}>`'
+
+    # Establish build directory.  The presence of environment variable
+    # `LVGL_DOC_BUILD_OUTPUT_DIR` overrides default in `cfg_default_output_dir`.
+    if 'LVGL_DOC_BUILD_OUTPUT_DIR' in os.environ:
+        output_dir = os.environ['LVGL_DOC_BUILD_OUTPUT_DIR']
+    else:
+        output_dir = os.path.join(base_dir, cfg_default_output_dir)
+
+    html_output_dir = os.path.join(output_dir, 'html')
+    latex_output_dir = os.path.join(output_dir, 'latex')
+    pdf_output_dir = os.path.join(output_dir, 'pdf')
+    pdf_src_file = os.path.join(latex_output_dir, cfg_pdf_filename)
+    pdf_dst_file = os.path.join(pdf_output_dir, cfg_pdf_filename)
+    version_src_file = os.path.join(project_dir, cfg_lv_version_filename)
+
+    # Special stuff for right-aligning PDF download link.
+    # Note: this needs to be embedded in a <div> tag because the
+    # Sphinx `:download:` role causes the link to appear in a <p> tag
+    # and in HTML5, <p> tags cannot be nested!
+    cfg_right_just_para_text = """.. raw:: html
+
+    <div style="text-align: right;">"""
+    cfg_end_right_just_para_text = """.. raw:: html
+
+    </div>"""
+    # Blank lines are required due to the directives.
+    cfg_pdf_link_ref_block_str = \
+        cfg_right_just_para_text + os.linesep \
+        + os.linesep \
+        + pdf_link_ref_str + os.linesep + \
+        os.linesep \
+        + cfg_end_right_just_para_text + os.linesep \
+        + os.linesep
 
     # ---------------------------------------------------------------------
-    # Change to script directory for consistency.
+    # Change to script directory for consistent run-time environment.
     # ---------------------------------------------------------------------
-    os.chdir(base_path)
+    os.chdir(base_dir)
+    announce(__file__, f'Intermediate dir:  [{intermediate_dir}]')
+    announce(__file__, f'Output dir      :  [{output_dir}]')
+    announce(__file__, f'Running from    :  [{base_dir}]')
 
     # ---------------------------------------------------------------------
-    # Provide a way to run an external command and abort build on error.
+    # Clean?  If so, clean (like `make clean`), but do not exit.
     # ---------------------------------------------------------------------
-    def cmd(s, start_dir=None):
-        if start_dir is None:
-            start_dir = os.getcwd()
+    some_cleaning_to_be_done = clean_intermediate or clean_html or clean_latex \
+        or clean_all or (os.path.isdir(intermediate_dir) and build_intermediate)
 
-        saved_dir = os.getcwd()
-        os.chdir(start_dir)
-        print("")
-        print(s)
-        print("-------------------------------------")
-        result = os.system(s)
-        os.chdir(saved_dir)
+    if some_cleaning_to_be_done:
+        announce(__file__, "****************")
+        announce(__file__, "Cleaning...")
+        announce(__file__, "****************")
 
-        if result != 0:
-            print("Exiting build due to previous error.")
-            sys.exit(result)
+        if clean_intermediate:
+            remove_dir(intermediate_dir)
+
+        if clean_html:
+            remove_dir(html_output_dir)
+
+        if clean_latex:
+            remove_dir(latex_output_dir)
+
+        if clean_all:
+            remove_dir(output_dir)
+
+        if os.path.isdir(intermediate_dir) and build_intermediate:
+            remove_dir(intermediate_dir)
 
     # ---------------------------------------------------------------------
     # Populate LVGL_URLPATH and LVGL_GITCOMMIT environment variables:
@@ -318,7 +483,7 @@ def run():
     #       - generated search window
     #       - establishing canonical page for search engines
     #   - `link_roles.py` to generate translation links
-    #   - `doc_builder.py` to generate links to API pages
+    #   - `doxygen_xml.py` to generate links to API pages
     #
     # LVGL_GITCOMMIT is used by:
     #   - `conf.py` => html_context['github_version'] for
@@ -362,304 +527,228 @@ def run():
     os.environ['LVGL_GITCOMMIT'] = branch
 
     # ---------------------------------------------------------------------
-    # Start doc-build process.
+    # Prep `intermediate_dir` to become the `sphinx-build` source dir.
     # ---------------------------------------------------------------------
-    print("")
-    print("****************")
-    print("Building")
-    print("****************")
+    # dirsync `exclude_list` = list of regex patterns to exclude.
+    intermediate_re = r'^' + cfg_default_intermediate_dir + r'.*'
+    output_re = r'^' + cfg_default_output_dir + r'.*'
+    exclude_list = [r'lv_conf\.h', r'^__pycache__.*', intermediate_re, output_re]
 
-    # Remove all previous output files if 'clean' on command line.
-    if clean:
-        print('Removing previous output files...')
-        # The below commented-out code below is being preserved
-        # for docs-generation development purposes.
+    if intermediate_dir_contents_exists(intermediate_dir):
+        # We are just doing an update of the intermediate_dir contents.
+        announce(__file__, "****************")
+        announce(__file__, "Updating intermediate directory...")
+        announce(__file__, "****************")
 
-        # api_path = os.path.join(temp_directory, 'API')
-        # xml_path = os.path.join(temp_directory, 'xml')
-        # doxy_path = os.path.join(temp_directory, 'doxygen_html')
+        exclude_list.append(r'examples.*')
+        options = {
+            'verbose': True,   # Report files copied.
+            'create': True,    # Create directories if they don't exist.
+            'twoway': False,   # False means data flow only src => tgt.
+            'purge': False,    # False means DO NOT remove orphan files/dirs in tgt dir (preserving examples/ dir).
+            'exclude': exclude_list
+        }
+        # action == 'sync' means copy files even when they do not already exist in tgt dir.
+        # action == 'update' means DO NOT copy files when they do not already exist in tgt dir.
+        dirsync.sync(cfg_doc_src_dir, intermediate_dir, 'sync', **options)
+        dirsync.sync(examples_dir, os.path.join(intermediate_dir, cfg_examples_dir), 'sync', **options)
+    elif build_intermediate or build_html or build_latex:
+        # We are having to create the intermediate_dir contents by copying.
+        announce(__file__, "****************")
+        announce(__file__, "Building intermediate directory...")
+        announce(__file__, "****************")
 
-        # if os.path.exists(api_path):
-        #     shutil.rmtree(api_path)
+        t1 = datetime.now()
+        copy_method = 1
 
-        # lang = 'en'
-        # if os.path.exists(lang):
-        #     shutil.rmtree(lang)
-
-        if os.path.exists(html_dst_path):
-            shutil.rmtree(html_dst_path)
-
-        # if os.path.exists(xml_path):
-        #     shutil.rmtree(xml_path)
-        #
-        # if os.path.exists(doxy_path):
-        #     shutil.rmtree(doxy_path)
-
-        # os.mkdir(api_path)
-        # os.mkdir(lang)
-
-    # ---------------------------------------------------------------------
-    # Build local lv_conf.h from lv_conf_template.h for this build only.
-    # ---------------------------------------------------------------------
-    config_builder.run()
-
-    # ---------------------------------------------------------------------
-    # Provide answer to question:  Can we have reasonable confidence that
-    # the contents of `temp_directory` already exists?
-    # ---------------------------------------------------------------------
-    def temp_dir_contents_exists():
-        result = False
-        c1 = os.path.exists(temp_directory)
-
-        if c1:
-            temp_path = os.path.join(temp_directory, 'CHANGELOG.rst')
-            c2 = os.path.exists(temp_path)
-            temp_path = os.path.join(temp_directory, 'CODING_STYLE.rst')
-            c3 = os.path.exists(temp_path)
-            temp_path = os.path.join(temp_directory, 'CONTRIBUTING.rst')
-            c4 = os.path.exists(temp_path)
-            temp_path = os.path.join(temp_directory, '_ext')
-            c5 = os.path.exists(temp_path)
-            temp_path = os.path.join(temp_directory, '_static')
-            c6 = os.path.exists(temp_path)
-            temp_path = os.path.join(temp_directory, 'details')
-            c7 = os.path.exists(temp_path)
-            temp_path = os.path.join(temp_directory, 'intro')
-            c8 = os.path.exists(temp_path)
-            temp_path = os.path.join(temp_directory, 'examples')
-            c9 = os.path.exists(temp_path)
-            result = c2 and c3 and c4 and c5 and c6 and c7 and c8 and c9
-
-        return result
-
-    # ---------------------------------------------------------------------
-    # Copy files to 'temp_directory' where they will be edited (translation
-    # link and API links) before being used to generate new docs.
-    # ---------------------------------------------------------------------
-    doc_files_copied = False
-    if no_copy and fixed_tmp_dir and temp_dir_contents_exists():
-        if update:
-            exclude_list = ['lv_conf.h']
+        # Both of these methods work.
+        if copy_method == 0:
+            # --------- Method 0:
+            ignore_func = shutil.ignore_patterns('tmp*', 'output*')
+            announce(__file__, 'Copying docs...')
+            shutil.copytree(cfg_doc_src_dir, intermediate_dir, ignore=ignore_func, dirs_exist_ok=True)
+            announce(__file__, 'Copying examples...')
+            shutil.copytree(examples_dir, os.path.join(intermediate_dir, cfg_examples_dir), dirs_exist_ok=True)
+        else:
+            # --------- Method 1:
             options = {
-                'verbose': True,
-                'create': True,
+                'create': True,    # Create directories if they don't exist.
                 'exclude': exclude_list
             }
-            dirsync.sync('.', temp_directory, 'update', **options)
-        else:
-            print("Skipping copying ./docs/ directory as requested.")
-    else:
-        shutil.copytree('.', temp_directory, dirs_exist_ok=True)
-        shutil.copytree(examples_path, os.path.join(temp_directory, 'examples'), dirs_exist_ok=True)
-        doc_files_copied = True
+            # action == 'sync' means copy files even when they do not already exist in tgt dir.
+            # action == 'update' means DO NOT copy files when they do not already exist in tgt dir.
+            announce(__file__, 'Copying docs...')
+            dirsync.sync(cfg_doc_src_dir, intermediate_dir, 'sync', **options)
+            announce(__file__, 'Copying examples...')
+            dirsync.sync(examples_dir, os.path.join(intermediate_dir, cfg_examples_dir), 'sync', **options)
 
-    # ---------------------------------------------------------------------
-    # Replace tokens in Doxyfile in 'temp_directory' with data from this run.
-    # ---------------------------------------------------------------------
-    if doc_files_copied:
-        with open(os.path.join(temp_directory, 'Doxyfile'), 'rb') as f:
-            data = f.read().decode('utf-8')
+        # -----------------------------------------------------------------
+        # Build <intermediate_dir>/lv_conf.h from lv_conf_template.h.
+        # -----------------------------------------------------------------
+        config_builder.run(lv_conf_file)
 
-        data = data.replace('#*#*LV_CONF_PATH*#*#', os.path.join(base_path, 'lv_conf.h'))
-        data = data.replace('*#*#SRC#*#*', '"{0}"'.format(lvgl_src_path))
-
-        with open(os.path.join(temp_directory, 'Doxyfile'), 'wb') as f:
-            f.write(data.encode('utf-8'))
+        # -----------------------------------------------------------------
+        # Copy `lv_version.h` into intermediate directory.
+        # -----------------------------------------------------------------
+        shutil.copyfile(version_src_file, version_dst_file)
 
         # -----------------------------------------------------------------
         # Generate examples pages.  Include sub-pages pages that get included
         # in individual documents where applicable.
         # -----------------------------------------------------------------
-        print("Generating examples...")
-        ex.exec(temp_directory)
+        announce(__file__, "Generating examples...")
+        example_list.exec(intermediate_dir)
 
         # -----------------------------------------------------------------
         # Add translation links.
+        # This is being skipped in favor of a manually-placed
+        # translation link at the top of `./docs/index.rst`.
         # -----------------------------------------------------------------
-        if skip_trans:
-            print("Skipping translation links as requested.")
-        else:
-            print("Adding translation links...")
-            add_translation.exec(temp_directory)
+        # Original code:
+        # if True:
+        #     announce(__file__, "Skipping adding translation links.")
+        # else:
+        #     announce(__file__, "Adding translation links...")
+        #     add_translation.exec(intermediate_dir)
 
-        # ---------------------------------------------------------------------
-        # Generate API pages and links thereto.
-        # ---------------------------------------------------------------------
         if skip_api:
-            print("Skipping API generation as requested.")
+            announce(__file__, "Skipping API generation as requested.")
         else:
-            print("Running Doxygen...")
-            cmd('doxygen Doxyfile', temp_directory)
+            # -------------------------------------------------------------
+            # Generate API pages and links thereto.
+            # -------------------------------------------------------------
+            announce(__file__, "API page and link processing...")
+            api_doc_builder.EMIT_WARNINGS = False
 
-            doc_builder.EMIT_WARNINGS = False
+            # api_doc_builder.run() => doxy_xml_parser.DoxygenXml() now:
+            # - preps and runs Doxygen generating XML,
+            # - loads generated XML.
+            # Then api_doc_builder.run():
+            # - creates .RST files for API pages, and
+            # - adds API hyperlinks to .RST files in the directories in passed array.
+            api_doc_builder.build_api_docs(lvgl_src_dir,
+                                           intermediate_dir,
+                                           doxyfile_src_file,
+                                           'details',
+                                           'intro'
+                                           )
 
-            # Create .RST files for API pages.
-            doc_builder.run(
-                project_path,
-                temp_directory,
-                os.path.join(temp_directory, 'intro'),
-                os.path.join(temp_directory, 'intro', 'add-lvgl-to-your-project'),
-                os.path.join(temp_directory, 'details'),
-                os.path.join(temp_directory, 'details', 'base-widget'),
-                os.path.join(temp_directory, 'details', 'base-widget', 'layouts'),
-                os.path.join(temp_directory, 'details', 'base-widget', 'styles'),
-                os.path.join(temp_directory, 'details', 'debugging'),
-                os.path.join(temp_directory, 'details', 'integration'),
-                os.path.join(temp_directory, 'details', 'integration', 'bindings'),
-                os.path.join(temp_directory, 'details', 'integration', 'building'),
-                os.path.join(temp_directory, 'details', 'integration', 'chip'),
-                os.path.join(temp_directory, 'details', 'integration', 'driver'),
-                os.path.join(temp_directory, 'details', 'integration', 'driver', 'display'),
-                os.path.join(temp_directory, 'details', 'integration', 'driver', 'touchpad'),
-                os.path.join(temp_directory, 'details', 'integration', 'framework'),
-                os.path.join(temp_directory, 'details', 'integration', 'ide'),
-                os.path.join(temp_directory, 'details', 'integration', 'os'),
-                os.path.join(temp_directory, 'details', 'integration', 'os', 'yocto'),
-                os.path.join(temp_directory, 'details', 'integration', 'renderers'),
-                os.path.join(temp_directory, 'details', 'libs'),
-                os.path.join(temp_directory, 'details', 'main-components'),
-                os.path.join(temp_directory, 'details', 'other-components'),
-                os.path.join(temp_directory, 'details', 'widgets')
-            )
-
-            print('Reading Doxygen output...')
+        t2 = datetime.now()
+        announce(__file__, 'Example/API run time:  ' + str(t2 - t1))
 
     # ---------------------------------------------------------------------
-    # BUILD PDF
+    # Build PDF
     # ---------------------------------------------------------------------
-    if skip_latex:
-        print("Skipping latex build as requested.")
+    if not build_latex:
+        announce(__file__, "Skipping Latex build.")
     else:
-        # Remove PDF link so PDF does not have a link to itself.
-        index_path = os.path.join(temp_directory, 'index.rst')
+        t1 = datetime.now()
+        announce(__file__, "****************")
+        announce(__file__, "Building Latex output...")
+        announce(__file__, "****************")
 
-        with open(index_path, 'rb') as f:
+        # If PDF link is present in top index.rst, remove it so PDF
+        # does not have a link to itself.
+        with open(top_index_file, 'rb') as f:
             index_data = f.read().decode('utf-8')
 
-        # Support both Windows and Linux platforms with `os.linesep`.
-        pdf_link_ref_str = 'PDF version: :download:`LVGL.pdf <LVGL.pdf>`' + os.linesep
         if pdf_link_ref_str in index_data:
             index_data = index_data.replace(pdf_link_ref_str, '')
 
-            with open(index_path, 'wb') as f:
+            with open(top_index_file, 'wb') as f:
                 f.write(index_data.encode('utf-8'))
 
-        # Silly workaround to include the more or less correct
-        # PDF download link in the PDF
-        # cmd("cp -f " + lang +"/latex/LVGL.pdf LVGL.pdf | true")
-        src = temp_directory
-        dst = latex_output_path
+        src = intermediate_dir
+        dst = output_dir
         cpu = os.cpu_count()
-        cmd_line = f'sphinx-build -b latex "{src}" "{dst}" -j {cpu}'
+        # As of 22-Feb-2025, sadly the -D version=xxx is not working as documented.
+        # So the version strings applicable to Latex/PDF/man pages/texinfo
+        # formats are assembled by `conf.py`.
+        cmd_line = f'sphinx-build -M latex "{src}" "{dst}" -j {cpu}'
         cmd(cmd_line)
 
         # Generate PDF.
+        announce(__file__, "****************")
+        announce(__file__, "Building PDF...")
+        announce(__file__, "****************")
         cmd_line = 'latexmk -pdf "LVGL.tex"'
-        cmd(cmd_line, latex_output_path)
+        cmd(cmd_line, latex_output_dir, False)
 
-        # Copy the result PDF to the main directory to make
-        # it available for the HTML build.
-        shutil.copyfile(pdf_src_file, pdf_dst_file)
+        # Move resulting PDF to its output directory.
+        if not os.path.exists(pdf_output_dir):
+            os.makedirs(pdf_output_dir)
 
-        # Add PDF link back in so HTML build will have it.
-        index_data = pdf_link_ref_str + index_data
-
-        with open(index_path, 'wb') as f:
-            f.write(index_data.encode('utf-8'))
+        shutil.move(pdf_src_file, pdf_dst_file)
+        t2 = datetime.now()
+        announce(__file__, 'PDF           :  ' + pdf_dst_file)
+        announce(__file__, 'Latex gen time:  ' + str(t2 - t1))
 
     # ---------------------------------------------------------------------
-    # BUILD HTML
+    # Build HTML
     # ---------------------------------------------------------------------
-    # This version of get_version() works correctly under both Linux and Windows.
-    # Updated to be resilient to changes in `lv_version.h` compliant with C macro syntax.
-    def get_version():
-        path = os.path.join(project_path, 'lv_version.h')
-        major = ''
-        minor = ''
-
-        with open(path, 'r') as file:
-            major_re = re.compile(r'define\s+LVGL_VERSION_MAJOR\s+(\d+)')
-            minor_re = re.compile(r'define\s+LVGL_VERSION_MINOR\s+(\d+)')
-
-            for line in file.readlines():
-                # Skip if line not long enough to match.
-                if len(line) < 28:
-                    continue
-
-                match = major_re.search(line)
-                if match is not None:
-                    major = match[1]
-                else:
-                    match = minor_re.search(line)
-                    if match is not None:
-                        minor = match[1]
-                        # Exit early if we have both values.
-                        if len(major) > 0 and len(minor) > 0:
-                            break
-
-        return f'{major}.{minor}'
-
-    # Note:  While it can be done (e.g. if one needs to set a stop point
-    # in Sphinx code for development purposes), it is NOT a good idea to
-    # run Sphinx from script as
-    #   from sphinx.cmd.build import main as sphinx_build
-    #   sphinx_args = [...]
-    #   sphinx_build(sphinx_args)
-    # because it takes ~10X longer to run than `sphinx_build` executable.
-    # Literally > 3 hours.
-
-    # '-E' option forces Sphinx to rebuild its environment so all docs are
-    # fully regenerated, even if not changed.
-    # Note:  Sphinx runs in ./docs/, but uses `temp_directory` for input.
-    if fresh_sphinx_env:
-        print("Regenerating all files...")
-        env_opt = '-E'
+    if not build_html:
+        announce(__file__, "Skipping HTML build.")
     else:
-        print("Regenerating only updated files...")
-        env_opt = ''
+        t1 = datetime.now()
+        announce(__file__, "****************")
+        announce(__file__, "Building HTML output...")
+        announce(__file__, "****************")
 
-    ver = get_version()
-    src = html_src_path
-    dst = html_dst_path
-    cpu = os.cpu_count()
-    cmd_line = f'sphinx-build -b html "{src}" "{dst}" -D version="{ver}" {env_opt} -j {cpu}'
-    t2 = datetime.now()
-    print('Current time:  ' + str(t2))
-    cmd(cmd_line)
-    t3 = datetime.now()
-    print('Current time:     ' + str(t3))
-    print('Sphinx run time:  ' + str(t3 - t2))
+        # If PDF is present in build directory, copy it to
+        # intermediate directory for use by HTML build.
+        # (Sphinx copies it to its HTML output, so it ends
+        # up on the webserver where it can be downloaded).
+        if os.path.isfile(pdf_dst_file):
+            # Create _static/download/ directory if needed.
+            if not os.path.exists(pdf_intermediate_dst_dir):
+                os.makedirs(pdf_intermediate_dst_dir)
 
-    # ---------------------------------------------------------------------
-    # Cleanup.
-    # ---------------------------------------------------------------------
-    if preserve:
-        print('Temp directory:  ', temp_directory)
-    else:
-        print('Removing temporary files...', temp_directory)
-        if os.path.exists(temp_directory):
-            shutil.rmtree(temp_directory)
+            shutil.copyfile(pdf_dst_file, pdf_intermediate_dst_file)
 
-    # ---------------------------------------------------------------------
-    # Remove temporary `lv_conf.h` created for this build.
-    # ---------------------------------------------------------------------
-    config_builder.cleanup()
+        # If PDF is present, ensure there is a link to it in the top
+        # index.rst so HTML build will have it.
+        # Support both Windows and Linux platforms with `os.linesep`.
+        if os.path.isfile(pdf_intermediate_dst_file):
+            with open(top_index_file, 'rb') as f:
+                index_data = f.read().decode('utf-8')
+
+            if pdf_link_ref_str not in index_data:
+                index_data = cfg_pdf_link_ref_block_str + index_data
+
+                with open(top_index_file, 'wb') as f:
+                    f.write(index_data.encode('utf-8'))
+
+        # Note:  While it can be done (e.g. if one needs to set a stop point
+        # in Sphinx code for development purposes), it is NOT a good idea to
+        # run Sphinx from script as
+        #   from sphinx.cmd.build import main as sphinx_build
+        #   sphinx_args = [...]
+        #   sphinx_build(sphinx_args)
+        # because it takes ~10X longer to run than `sphinx_build` executable,
+        # literally > 3 hours.
+
+        ver = lvgl_version(version_src_file)
+        src = intermediate_dir
+        dst = output_dir
+        cpu = os.cpu_count()
+        # As of 22-Feb-2025, sadly the -D version=xxx is not working as documented.
+        # So the version strings applicable to Latex/PDF/man pages/texinfo
+        # formats are assembled by `conf.py`.  The -D option in the command
+        # line may go away if it does not, in fact, create some impact on
+        # the doc-gen process.
+        cmd_line = f'sphinx-build -M html "{src}" "{dst}" -D version="{ver}" {env_opt} -j {cpu}'
+        cmd(cmd_line)
+        t2 = datetime.now()
+        announce(__file__, 'HTML gen time :  ' + str(t2 - t1))
 
     # ---------------------------------------------------------------------
     # Indicate results.
     # ---------------------------------------------------------------------
-    t4 = datetime.now()
-    print('Total run time:   ' + str(t4 - t1))
-    print('Output path:     ', html_dst_path)
-    print()
-    print('Note:  warnings about `/details/index.rst` and `/intro/index.rst`')
-    print('       "not being in any toctree" are expected and intentional.')
-    print()
-    print('Finished.')
+    t_end = datetime.now()
+    announce(__file__, 'Total run time:  ' + str(t_end - t0))
+    announce(__file__, 'Done.')
 
 
-# -------------------------------------------------------------------------
-# Make module importable as well as run-able.
-# -------------------------------------------------------------------------
 if __name__ == '__main__':
-    run()
+    """Make module importable as well as run-able."""
+    run(sys.argv[1:])

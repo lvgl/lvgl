@@ -47,7 +47,7 @@ void test_xml_table_with_attrs(void)
         "row", "2",
         "column", "0",
         "value", "hello this a long text which should be cropped",
-        "ctrl", "text_crop merge_right",
+        "ctrl", "text_crop|merge_right",
         NULL, NULL,
     };
 

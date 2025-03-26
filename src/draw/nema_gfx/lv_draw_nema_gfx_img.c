@@ -76,12 +76,12 @@ static void _draw_nema_gfx_tile(lv_draw_task_t * t, const lv_draw_image_dsc_t * 
 
     int32_t tile_x_start = tile_area.x1;
 
-    while(tile_area.y1 <= t->clip_area->y2) {
-        while(tile_area.x1 <= t->clip_area->x2) {
+    while(tile_area.y1 <= t->clip_area.y2) {
+        while(tile_area.x1 <= t->clip_area.x2) {
 
             lv_area_t clipped_img_area;
             if(lv_area_intersect(&clipped_img_area, &tile_area, &t->clip_area)) {
-                _draw_nema_gfx_img(draw_unit, dsc, &tile_area);
+                _draw_nema_gfx_img(t, dsc, &tile_area);
             }
 
             tile_area.x1 += img_w;
@@ -148,12 +148,21 @@ static void _draw_nema_gfx_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * d
     int32_t src_stride = (src_cf >= LV_COLOR_FORMAT_NEMA_TSC_START && src_cf <= LV_COLOR_FORMAT_NEMA_TSC_END)
                          || img_dsc->header.stride == 0 ? -1 : (int32_t)img_dsc->header.stride;
 
-    nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(layer->draw_buf->data), lv_area_get_width(&(layer->buf_area)),
-                      lv_area_get_height(&(layer->buf_area)), dst_nema_cf,
-                      lv_area_get_width(&(layer->buf_area))*lv_color_format_get_size(dst_cf));
+    int32_t stride = (dst_cf >= LV_COLOR_FORMAT_NEMA_TSC_START && dst_cf <= LV_COLOR_FORMAT_NEMA_TSC_END) ?
+                     -1 : lv_area_get_width(&(layer->buf_area)) * lv_color_format_get_size(dst_cf);
 
-    nema_bind_src_tex((uintptr_t)(src_buf), tex_w, tex_h, src_nema_cf, src_stride,
-                      dsc->antialias ? NEMA_FILTER_BL : NEMA_FILTER_PS);
+    nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(layer->draw_buf->data), lv_area_get_width(&(layer->buf_area)),
+                      lv_area_get_height(&(layer->buf_area)), dst_nema_cf, stride);
+
+    if(!LV_COLOR_FORMAT_IS_INDEXED(src_cf)) {
+        nema_bind_src_tex((uintptr_t)(src_buf), tex_w, tex_h, src_nema_cf, src_stride,
+                          dsc->antialias ? NEMA_FILTER_BL : NEMA_FILTER_PS);
+    }
+    else {
+        nema_bind_lut_tex((uintptr_t)((uint8_t *)src_buf + LV_COLOR_INDEXED_PALETTE_SIZE(src_cf) * 4), tex_w, tex_h,
+                          src_nema_cf, src_stride, NEMA_FILTER_PS, (uintptr_t)(src_buf), NEMA_BGRA8888);
+        blending_mode |= NEMA_BLOP_LUT;
+    }
 
     /*Guard for previous NemaGFX Version*/
 #ifdef NEMA_BLOP_RECOLOR

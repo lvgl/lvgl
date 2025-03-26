@@ -543,17 +543,17 @@ static void triangle_draw_event_cb(lv_event_t * e)
     dsc.p[2].y = p_rel[2].y + coords.y1 + 2;
 
     lv_opa_t opa = lv_obj_get_style_opa(obj, 0);
-    dsc.bg_grad.dir = lv_obj_get_style_bg_grad_dir(obj, 0);
-    dsc.bg_grad.stops[0].color = lv_obj_get_style_bg_color(obj, 0);
-    dsc.bg_grad.stops[0].frac = lv_obj_get_style_bg_main_stop(obj, 0);
-    dsc.bg_grad.stops[0].opa = LV_OPA_MIX2(lv_obj_get_style_bg_main_opa(obj, 0), opa);
-    dsc.bg_grad.stops[1].color = lv_obj_get_style_bg_grad_color(obj, 0);
-    dsc.bg_grad.stops[1].frac = lv_obj_get_style_bg_grad_stop(obj, 0);
-    dsc.bg_grad.stops[1].opa = LV_OPA_MIX2(lv_obj_get_style_bg_grad_opa(obj, 0), opa);
-    dsc.bg_grad.stops_count = 2;
+    dsc.grad.dir = lv_obj_get_style_bg_grad_dir(obj, 0);
+    dsc.grad.stops[0].color = lv_obj_get_style_bg_color(obj, 0);
+    dsc.grad.stops[0].frac = lv_obj_get_style_bg_main_stop(obj, 0);
+    dsc.grad.stops[0].opa = LV_OPA_MIX2(lv_obj_get_style_bg_main_opa(obj, 0), opa);
+    dsc.grad.stops[1].color = lv_obj_get_style_bg_grad_color(obj, 0);
+    dsc.grad.stops[1].frac = lv_obj_get_style_bg_grad_stop(obj, 0);
+    dsc.grad.stops[1].opa = LV_OPA_MIX2(lv_obj_get_style_bg_grad_opa(obj, 0), opa);
+    dsc.grad.stops_count = 2;
 
-    dsc.bg_color = dsc.bg_grad.stops[0].color;
-    dsc.bg_opa = dsc.bg_grad.stops[0].opa;
+    dsc.color = dsc.grad.stops[0].color;
+    dsc.opa = dsc.grad.stops[0].opa;
 
     lv_draw_triangle(lv_event_get_layer(e), &dsc);
 }
@@ -871,7 +871,7 @@ static lv_obj_t * create_linear_gradient_obj(lv_obj_t * parent, int32_t col, int
     };
 
     /*init gradient color map*/
-    lv_gradient_init_stops(grad, grad_color, use_opa_map ? grad_opa : NULL, NULL, sizeof(grad_color) / sizeof(lv_color_t));
+    lv_grad_init_stops(grad, grad_color, use_opa_map ? grad_opa : NULL, NULL, sizeof(grad_color) / sizeof(lv_color_t));
 
     /*init gradient parameters*/
     grad->dir = LV_GRAD_DIR_LINEAR;
@@ -947,7 +947,7 @@ static lv_obj_t * create_radial_gradient_obj(lv_obj_t * parent, int32_t col, int
     };
 
     /*init gradient color map*/
-    lv_gradient_init_stops(grad, grad_color, use_opa_map ? grad_opa : NULL, NULL, sizeof(grad_color) / sizeof(lv_color_t));
+    lv_grad_init_stops(grad, grad_color, use_opa_map ? grad_opa : NULL, NULL, sizeof(grad_color) / sizeof(lv_color_t));
 
     /*init gradient parameters*/
     grad->dir = LV_GRAD_DIR_RADIAL;
@@ -1025,7 +1025,7 @@ static lv_obj_t * create_conical_gradient_obj(lv_obj_t * parent, int32_t col, in
     };
 
     /*init gradient color map*/
-    lv_gradient_init_stops(grad, grad_color, use_opa_map ? grad_opa : NULL, NULL, sizeof(grad_color) / sizeof(lv_color_t));
+    lv_grad_init_stops(grad, grad_color, use_opa_map ? grad_opa : NULL, NULL, sizeof(grad_color) / sizeof(lv_color_t));
 
     /*init gradient parameters*/
     grad->dir = LV_GRAD_DIR_CONICAL;

@@ -17,7 +17,7 @@ void lv_example_tileview_1(void)
     lv_obj_center(label);
 
     /*Tile2: a button*/
-    lv_obj_t * tile2 = lv_tileview_add_tile(tv, 0, 1, LV_DIR_TOP | LV_DIR_RIGHT);
+    lv_obj_t * tile2 = lv_tileview_add_tile(tv, 0, 1, (lv_dir_t)(LV_DIR_TOP | LV_DIR_RIGHT));
 
     lv_obj_t * btn = lv_button_create(tile2);
 

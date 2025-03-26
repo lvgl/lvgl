@@ -57,7 +57,7 @@ const lv_obj_class_t lv_chart_class = {
     .height_def = LV_DPI_DEF * 2,
     .instance_size = sizeof(lv_chart_t),
     .base_class = &lv_obj_class,
-    .name = "chart",
+    .name = "lv_chart",
 };
 
 /**********************
@@ -1300,6 +1300,22 @@ static uint32_t get_index_from_x(lv_obj_t * obj, int32_t x)
     if(x > w) return chart->point_cnt - 1;
     if(chart->type == LV_CHART_TYPE_LINE) return (x * (chart->point_cnt - 1) + w / 2) / w;
     if(chart->type == LV_CHART_TYPE_BAR) return (x * chart->point_cnt) / w;
+    if(chart->type == LV_CHART_TYPE_SCATTER) {
+        /*For scatter charts, the nearest id could be different depending on the series. Just check the first series.*/
+        lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
+        if(ser) {
+            int32_t best_dist = INT32_MAX;
+            uint32_t best_index = 0;
+            for(uint32_t i = 0; i < chart->point_cnt; i++) {
+                int32_t dist = LV_ABS(x - lv_map(ser->x_points[i], chart->xmin[ser->x_axis_sec], chart->xmax[ser->x_axis_sec], 0, w));
+                if(dist < best_dist) {
+                    best_dist = dist;
+                    best_index = i;
+                }
+            }
+            return best_index;
+        }
+    }
 
     return 0;
 }

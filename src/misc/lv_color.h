@@ -69,10 +69,16 @@ enum {
                                             (cf) == LV_COLOR_FORMAT_A2 ? 2 :        \
                                             (cf) == LV_COLOR_FORMAT_I4 ? 4 :        \
                                             (cf) == LV_COLOR_FORMAT_A4 ? 4 :        \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC4 ? 4 : \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC6 ? 6 : \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC6A ? 6 : \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC6AP ? 6 : \
                                             (cf) == LV_COLOR_FORMAT_L8 ? 8 :        \
                                             (cf) == LV_COLOR_FORMAT_A8 ? 8 :        \
                                             (cf) == LV_COLOR_FORMAT_I8 ? 8 :        \
                                             (cf) == LV_COLOR_FORMAT_ARGB2222 ? 8 :  \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC12 ? 12 : \
+                                            (cf) == LV_COLOR_FORMAT_NEMA_TSC12A ? 12 : \
                                             (cf) == LV_COLOR_FORMAT_AL88 ? 16 :     \
                                             (cf) == LV_COLOR_FORMAT_RGB565 ? 16 :   \
                                             (cf) == LV_COLOR_FORMAT_RGB565A8 ? 16 : \
@@ -224,8 +230,8 @@ typedef enum {
 
 #define LV_COLOR_MAKE(r8, g8, b8) {b8, g8, r8}
 
-#define LV_OPA_MIX2(a1, a2) (((int32_t)(a1) * (a2)) >> 8)
-#define LV_OPA_MIX3(a1, a2, a3) (((int32_t)(a1) * (a2) * (a3)) >> 16)
+#define LV_OPA_MIX2(a1, a2) ((lv_opa_t)(((int32_t)(a1) * (a2)) >> 8))
+#define LV_OPA_MIX3(a1, a2, a3) ((lv_opa_t)(((int32_t)(a1) * (a2) * (a3)) >> 16))
 
 /**********************
  * GLOBAL PROTOTYPES

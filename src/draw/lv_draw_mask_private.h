@@ -31,8 +31,15 @@ extern "C" {
 struct _lv_draw_mask_rect_dsc_t {
     lv_draw_dsc_base_t base;
 
+    /**The area t mask.*/
     lv_area_t area;
+
+    /**The radius of masking*/
     int32_t radius;
+
+    /**0: clear the content out of the `area`.
+     * 1: don't touch the area out of `area`*/
+    uint32_t keep_outside : 1;
 };
 
 

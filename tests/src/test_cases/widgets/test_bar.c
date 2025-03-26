@@ -4,8 +4,6 @@
 
 #include "unity/unity.h"
 
-#include "lv_test_indev.h"
-
 static lv_obj_t * g_active_screen = NULL;
 static lv_obj_t * g_bar = NULL;
 
@@ -66,7 +64,7 @@ void test_bar_should_update_indicator_right_coordinate_based_on_bar_value(void)
     lv_bar_set_value(g_bar, bar_value, LV_ANIM_OFF);
 
     /* FIXME: Remove wait */
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     int32_t actual_coord = lv_area_get_width(&bar_ptr->indic_area);
 
@@ -120,7 +118,7 @@ void test_bar_rtl_should_update_indicator_left_coordinate_based_on_bar_value(voi
     lv_obj_set_style_base_dir(g_bar, LV_BASE_DIR_RTL, 0);
 
     /* FIXME: Remove wait */
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     int32_t actual_coord = bar_ptr->indic_area.x1;
 
@@ -219,7 +217,7 @@ void test_bar_indicator_area_should_get_smaller_when_padding_is_increased(void)
     int32_t original_width = 0u;
 
     lv_bar_set_value(g_bar, 50, LV_ANIM_OFF);
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     original_width = lv_area_get_width(&bar_ptr->indic_area);
     original_height = lv_area_get_height(&bar_ptr->indic_area);
@@ -235,7 +233,7 @@ void test_bar_indicator_area_should_get_smaller_when_padding_is_increased(void)
 
     /* Notify LVGL of style change */
     lv_obj_report_style_change(&bar_style);
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     new_height = lv_area_get_height(&bar_ptr->indic_area);
     new_width = lv_area_get_width(&bar_ptr->indic_area);
@@ -307,13 +305,13 @@ void test_bar_indicator_should_be_drawn_towards_the_min_range_side_after_setting
 
     /* Set bar value to 1, so it gets drawn at the middle of the bar */
     lv_bar_set_value(g_bar, 1, LV_ANIM_OFF);
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     int32_t original_pos = bar_ptr->indic_area.x1;
 
     /* Set bar to a more negative value */
     lv_bar_set_value(g_bar, -50, LV_ANIM_OFF);
-    lv_test_indev_wait(50);
+    lv_test_wait(50);
 
     int32_t final_pos = bar_ptr->indic_area.x1;
 

@@ -543,6 +543,41 @@ static const char * _parse_color(const char * str, const char * str_end, uint32_
         // make color
         *val = (r << 16) + (g << 8) + b;
     }
+    else if(len > 5 && strncmp(str, "rgba(", 5) == 0) {
+        str += 5;
+        bool valid_color = true;
+        float vals[3] = {0};
+        uint8_t alpha = 255;
+
+        for(int i = 0; i < 3; i++) {
+            str = _parse_number(str, ptr, &vals[i]);
+            if(!str) valid_color = false;
+
+            if(*str == '%') {
+                vals[i] *= 2.56f;
+            }
+        }
+
+        float a = 0.0f;
+        str = _parse_number(str, ptr, &a);
+        if(str) {
+            if(*str == '%') {
+                a *= 2.56f;
+            }
+            else if(a >= 0.0f && a <= 1.0f) {
+                a *= 255.0f;
+            }
+            alpha = (uint8_t)a;
+        }
+
+        if(valid_color) {
+            r = (uint8_t)vals[0];
+            g = (uint8_t)vals[1];
+            b = (uint8_t)vals[2];
+        }
+        // make color
+        *val = (alpha << 24) + (r << 16) + (g << 8) + b;
+    }
     else if(len > 4 && strncmp(str, "rgb(", 4) == 0) {
         str += 4;
         bool valid_color = true;

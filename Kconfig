@@ -409,6 +409,26 @@ menu "LVGL configuration"
 		config LV_USE_PXP_ASSERT
 			bool "Enable PXP asserts"
 			depends on LV_USE_DRAW_PXP
+
+		config LV_USE_DRAW_G2D
+			bool "Use NXP's G2D on MPU platforms"
+			default n
+
+		config LV_G2D_HASH_TABLE_SIZE
+			bool "Maximum number of buffers that can be stored for G2D draw unit."
+			default 50
+			depends on LV_USE_DRAW_G2D
+			help
+				Includes the frame buffers and assets.
+
+		config LV_USE_G2D_DRAW_THREAD
+			bool "Use additional draw thread for G2D processing"
+			depends on LV_USE_DRAW_G2D && LV_USE_OS > 0
+			default y
+
+		config LV_USE_G2D_ASSERT
+			bool "Enable G2D asserts"
+			depends on LV_USE_DRAW_G2D
 			default n
 
 		config LV_USE_DRAW_DAVE2D
@@ -462,7 +482,7 @@ menu "LVGL configuration"
 
 		config LV_VG_LITE_STROKE_CACHE_CNT
 			int "VG-Lite stroke maximum cache number."
-			default 32
+			default 8
 			depends on LV_USE_DRAW_VG_LITE
 
 		config LV_USE_VECTOR_GRAPHIC
@@ -694,6 +714,10 @@ menu "LVGL configuration"
 
 			config LV_USE_OBJ_ID
 				bool "Add id field to obj"
+				default n
+
+			config LV_USE_OBJ_NAME
+				bool "Enable support widget names"
 				default n
 
 			config LV_OBJ_ID_AUTO_ASSIGN
@@ -1622,8 +1646,16 @@ menu "LVGL configuration"
 			int "Font manager name max length"
 			depends on LV_USE_FONT_MANAGER
 			default 32
+		config LV_USE_TEST
+			bool "Enable emulated input devices, time emulation, and screenshot compares."
+		config LV_USE_TEST_SCREENSHOT_COMPARE
+			bool "Enable `lv_test_screenshot_compare`. Requires libpng and a few MB of extra RAM."
+			depends on LV_USE_TEST
 		config LV_USE_XML
 			bool "Enable loading XML UIs runtime"
+		config LV_USE_COLOR_FILTER
+			bool "Enable color filter style"
+			default n
 		config LVGL_VERSION_MAJOR
 			int
 			default 9 # LVGL_VERSION_MAJOR
@@ -1832,9 +1864,14 @@ menu "LVGL configuration"
 			depends on LV_USE_NUTTX
 			default n
 
+		config LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP
+			bool "Use independent image heap for default draw buffer"
+			depends on LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
+			default n
+
 		config LV_USE_NUTTX_LIBUV
 			bool "Use uv loop to replace default timer loop and other fb/indev timers"
-			depends on LV_USE_NUTTX
+			depends on LV_USE_NUTTX && LIBUV
 			default n
 
 		config LV_USE_NUTTX_CUSTOM_INIT

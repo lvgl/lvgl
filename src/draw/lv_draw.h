@@ -101,6 +101,12 @@ struct _lv_layer_t  {
     /** Opacity of the layer */
     lv_opa_t opa;
 
+    /*Recolor of the layer*/
+    lv_color32_t recolor;
+
+    /** Partial y offset */
+    int32_t partial_y_offset;
+
     /** Linked list of draw tasks */
     lv_draw_task_t * draw_task_head;
 
@@ -111,12 +117,25 @@ struct _lv_layer_t  {
 };
 
 typedef struct {
+    /**The widget for which draw descriptor was created */
     lv_obj_t * obj;
+
+    /**The widget part for which draw descriptor was created */
     lv_part_t part;
+
+    /**A widget type specific ID (e.g. table row index). See the docs of the given widget.*/
     uint32_t id1;
+
+    /**A widget type specific ID (e.g. table column index). See the docs of the given widget.*/
     uint32_t id2;
+
+    /**The target layer */
     lv_layer_t * layer;
+
+    /**Size of the specific draw descriptor into which this base descriptor is embedded*/
     size_t dsc_size;
+
+    /**Any custom user data*/
     void * user_data;
 } lv_draw_dsc_base_t;
 
@@ -196,11 +215,21 @@ void lv_draw_dispatch_request(void);
 uint32_t lv_draw_get_unit_count(void);
 
 /**
- * Find and available draw task
- * @param layer             the draw ctx to search in
+ * If there is only one draw unit check the first draw task if it's available.
+ * If there are multiple draw units call `lv_draw_get_next_available_task` to find a task.
+ * @param layer             the draw layer to search in
  * @param t_prev            continue searching from this task
  * @param draw_unit_id      check the task where `preferred_draw_unit_id` equals this value or `LV_DRAW_UNIT_NONE`
- * @return                  tan available draw task or NULL if there is no any
+ * @return                  an available draw task or NULL if there is not any
+ */
+lv_draw_task_t * lv_draw_get_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id);
+
+/**
+ * Find and available draw task
+ * @param layer             the draw layer to search in
+ * @param t_prev            continue searching from this task
+ * @param draw_unit_id      check the task where `preferred_draw_unit_id` equals this value or `LV_DRAW_UNIT_NONE`
+ * @return                  an available draw task or NULL if there is not any
  */
 lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id);
 

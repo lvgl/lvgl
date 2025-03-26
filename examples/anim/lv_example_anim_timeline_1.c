@@ -40,7 +40,7 @@ static void slider_prg_event_handler(lv_event_t * e)
     lv_obj_t * slider = lv_event_get_current_target_obj(e);
     lv_anim_timeline_t * anim_timeline = lv_event_get_user_data(e);
     int32_t progress = lv_slider_get_value(slider);
-    lv_anim_timeline_set_progress(anim_timeline, progress);
+    lv_anim_timeline_set_progress(anim_timeline, (uint16_t) progress);
 }
 
 /**

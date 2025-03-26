@@ -3,21 +3,21 @@
 
 static lv_style_t style_radio;
 static lv_style_t style_radio_chk;
-static uint32_t active_index_1 = 0;
-static uint32_t active_index_2 = 0;
+static int32_t active_index_1 = 0;
+static int32_t active_index_2 = 0;
 
 static void radio_event_handler(lv_event_t * e)
 {
-    uint32_t * active_id = lv_event_get_user_data(e);
-    lv_obj_t * cont = lv_event_get_current_target(e);
-    lv_obj_t * act_cb = lv_event_get_target(e);
+    int32_t * active_id = (int32_t *)lv_event_get_user_data(e);
+    lv_obj_t * cont = (lv_obj_t *)lv_event_get_current_target(e);
+    lv_obj_t * act_cb = lv_event_get_target_obj(e);
     lv_obj_t * old_cb = lv_obj_get_child(cont, *active_id);
 
     /*Do nothing if the container was clicked*/
     if(act_cb == cont) return;
 
     lv_obj_remove_state(old_cb, LV_STATE_CHECKED);   /*Uncheck the previous radio button*/
-    lv_obj_add_state(act_cb, LV_STATE_CHECKED);     /*Uncheck the current radio button*/
+    lv_obj_add_state(act_cb, LV_STATE_CHECKED);     /*Check the current radio button*/
 
     *active_id = lv_obj_get_index(act_cb);
 
