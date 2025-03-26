@@ -50,6 +50,51 @@
       "cacheVariables": {
         "BUILD_SHARED_LIBS": "ON"
       }
+    },
+    {
+      "name": "linux-kconfig",
+      "inherits": "linux-base",
+      "displayName": "Linux/Kconfig",
+      "description": "Setup WSL or native linux, using Kconfig",
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/build/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+          "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
+        }
+      },
+      "cacheVariables": {
+        "BUILD_SHARED_LIBS": "ON",
+        "LV_USE_KCONFIG": "ON"
+      }
+    },
+    {
+      "name": "windows-kconfig",
+      "inherits": "_base",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/build/install/${presetName}",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "cl.exe",
+        "CMAKE_CXX_COMPILER": "cl.exe",
+        "BUILD_SHARED_LIBS": "ON",
+        "LV_USE_KCONFIG": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      }
     }
   ],
   "buildPresets": [
