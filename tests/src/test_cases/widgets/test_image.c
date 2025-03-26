@@ -283,8 +283,8 @@ void test_image_stretch(void)
         lv_image_set_inner_align(img, LV_IMAGE_ALIGN_STRETCH);
 
         // Because of the integer scaling, it is possible the actual image width is 1 less than the object width
-        TEST_ASSERT_INT_WITHIN(1, w, lv_image_get_scaled_width(img));
-        TEST_ASSERT_INT_WITHIN(1, h, lv_image_get_scaled_height(img));
+        TEST_ASSERT_INT_WITHIN(1, w, lv_image_get_transformed_width(img));
+        TEST_ASSERT_INT_WITHIN(1, h, lv_image_get_transformed_height(img));
     }
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_stretch.png");
@@ -311,9 +311,9 @@ void test_image_auto_scale(void)
         lv_image_set_inner_align(img, LV_IMAGE_ALIGN_AUTO_SCALE);
 
         const int32_t scale = lv_image_get_scale(img);
-        TEST_ASSERT_EQUAL_INT(aspect_ratio, lv_image_get_scaled_width(img) / lv_image_get_scaled_height(img));
-        TEST_ASSERT_EQUAL_INT((img_w * scale) >> 8, lv_image_get_scaled_width(img));
-        TEST_ASSERT_EQUAL_INT((img_h * scale) >> 8, lv_image_get_scaled_height(img));
+        TEST_ASSERT_EQUAL_INT(aspect_ratio, lv_image_get_transformed_width(img) / lv_image_get_transformed_height(img));
+        TEST_ASSERT_EQUAL_INT((img_w * scale) >> 8, lv_image_get_transformed_width(img));
+        TEST_ASSERT_EQUAL_INT((img_h * scale) >> 8, lv_image_get_transformed_height(img));
     }
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/image_auto_scale.png");
@@ -429,19 +429,19 @@ void test_image_get_scaled_size(void)
     int32_t img_w = test_img_lvgl_logo_png.header.w;
     int32_t img_h = test_img_lvgl_logo_png.header.h;
 
-    TEST_ASSERT_EQUAL_INT(img_w, lv_image_get_width(img));
-    TEST_ASSERT_EQUAL_INT(img_h, lv_image_get_height(img));
+    TEST_ASSERT_EQUAL_INT(img_w, lv_image_get_src_width(img));
+    TEST_ASSERT_EQUAL_INT(img_h, lv_image_get_src_height(img));
 
-    TEST_ASSERT_EQUAL_INT(img_w, lv_image_get_scaled_width(img));
-    TEST_ASSERT_EQUAL_INT(img_h, lv_image_get_scaled_height(img));
+    TEST_ASSERT_EQUAL_INT(img_w, lv_image_get_transformed_width(img));
+    TEST_ASSERT_EQUAL_INT(img_h, lv_image_get_transformed_height(img));
 
     lv_image_set_rotation(img, 900);
-    TEST_ASSERT_EQUAL_INT(img_h, lv_image_get_scaled_width(img));
-    TEST_ASSERT_EQUAL_INT(img_w, lv_image_get_scaled_height(img));
+    TEST_ASSERT_EQUAL_INT(img_h, lv_image_get_transformed_width(img));
+    TEST_ASSERT_EQUAL_INT(img_w, lv_image_get_transformed_height(img));
 
     lv_image_set_rotation(img, 1800);
-    TEST_ASSERT_EQUAL_INT(img_w, lv_image_get_scaled_width(img));
-    TEST_ASSERT_EQUAL_INT(img_h, lv_image_get_scaled_height(img));
+    TEST_ASSERT_EQUAL_INT(img_w, lv_image_get_transformed_width(img));
+    TEST_ASSERT_EQUAL_INT(img_h, lv_image_get_transformed_height(img));
 }
 
 static void create_test_images(int32_t radius, int32_t scale, int32_t angle)

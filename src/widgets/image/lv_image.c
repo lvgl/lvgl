@@ -540,7 +540,7 @@ int32_t lv_image_get_scale_y(lv_obj_t * obj)
     return img->scale_y;
 }
 
-int32_t lv_image_get_width(lv_obj_t * obj)
+int32_t lv_image_get_src_width(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -550,7 +550,7 @@ int32_t lv_image_get_width(lv_obj_t * obj)
     return img->w;
 }
 
-int32_t lv_image_get_height(lv_obj_t * obj)
+int32_t lv_image_get_src_height(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -560,7 +560,7 @@ int32_t lv_image_get_height(lv_obj_t * obj)
     return img->h;
 }
 
-int32_t lv_image_get_scaled_width(lv_obj_t * obj)
+int32_t lv_image_get_transformed_width(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -576,7 +576,7 @@ int32_t lv_image_get_scaled_width(lv_obj_t * obj)
     return lv_area_get_width(&a);
 }
 
-int32_t lv_image_get_scaled_height(lv_obj_t * obj)
+int32_t lv_image_get_transformed_height(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
