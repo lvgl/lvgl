@@ -4,8 +4,6 @@
 Subjects
 ========
 
-T
-Subjects
 To connect values of the widget internally or to external data, subjects can be used. For example, an internally connected value could be a slider's value mapped to a label. Externally connected data could be the current number of users shown on a label.
 
 To handle internal connections, local subjects can be created like this:

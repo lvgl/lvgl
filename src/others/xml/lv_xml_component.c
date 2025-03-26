@@ -127,9 +127,9 @@ lv_result_t lv_xml_component_register_from_data(const char * name, const char * 
     XML_SetElementHandler(parser, start_metadata_handler, end_metadata_handler);
 
     if(XML_Parse(parser, xml_def, lv_strlen(xml_def), XML_TRUE) == XML_STATUS_ERROR) {
-        LV_LOG_WARN("XML parsing error: %s on line %lu",
-                    XML_ErrorString(XML_GetErrorCode(parser)),
-                    (unsigned long)XML_GetCurrentLineNumber(parser));
+        LV_LOG_ERROR("XML parsing error: %s on line %lu",
+                     XML_ErrorString(XML_GetErrorCode(parser)),
+                     (unsigned long)XML_GetCurrentLineNumber(parser));
         XML_ParserFree(parser);
         return LV_RESULT_INVALID;
     }
@@ -249,7 +249,7 @@ lv_result_t lv_xml_component_unregister(const char * name)
     LV_LL_READ(&ctx->font_ll, font) {
         lv_free((char *)font->name);
     }
-    lv_ll_clear(&ctx->image_ll);
+    lv_ll_clear(&ctx->font_ll);
 
     lv_xml_image_t * image;
     LV_LL_READ(&ctx->image_ll, image) {
@@ -325,7 +325,7 @@ static void process_font_element(lv_xml_parser_state_t * state, const char * typ
     }
 
     const char * as_file = lv_xml_get_value_of(attrs, "as_file");
-    if(as_file == NULL || as_file == false) {
+    if(as_file == NULL || lv_streq(as_file, "false")) {
         LV_LOG_INFO("Ignore non-file based font `%s`", name);
         return;
     }
@@ -346,9 +346,11 @@ static void process_font_element(lv_xml_parser_state_t * state, const char * typ
         lv_result_t res = lv_xml_register_font(&state->ctx, name, font);
         if(res == LV_RESULT_INVALID) {
             LV_LOG_WARN("Failed to register `%s` tiny_ttf font", name);
+            lv_tiny_ttf_destroy(font);
             return;
         }
 
+        /*Get the font which was just created and add a destroy_cb*/
         lv_xml_font_t * f = lv_ll_get_head(&state->ctx.font_ll);
         f->font_destroy_cb = lv_tiny_ttf_destroy;
 
@@ -367,9 +369,11 @@ static void process_font_element(lv_xml_parser_state_t * state, const char * typ
         lv_result_t res = lv_xml_register_font(&state->ctx, name, font);
         if(res == LV_RESULT_INVALID) {
             LV_LOG_WARN("Failed to register `%s` bin font", name);
+            lv_binfont_destroy(font);
             return;
         }
 
+        /*Get the font which was just created and add a destroy_cb*/
         lv_xml_font_t * f = lv_ll_get_head(&state->ctx.font_ll);
         f->font_destroy_cb = lv_binfont_destroy;
     }

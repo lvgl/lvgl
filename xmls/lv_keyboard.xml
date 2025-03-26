@@ -1,6 +1,6 @@
 <!--
 Example
-<lv_textarea text="Hello"/>
+<lv_keyboard mode="text_upper"/>
 -->
 
 <widget>
@@ -16,6 +16,6 @@ Example
 	        <enum name="user_4"/>
 	    </enumdef>
 
-	    <prop name="mode" type="enum:" help="The max range"/>
+	    <prop name="mode" type="enum:lv_keyboard_mode" help=""/>
 	</api>
 </widget>

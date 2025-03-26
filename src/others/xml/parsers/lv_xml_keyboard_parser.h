@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_KEYBOARD_XML_PARSER_H
-#define LV_KEYBOARD_XML_PARSER_H
+#ifndef LV_XML_KEYBOARD_PARSER_H
+#define LV_XML_KEYBOARD_PARSER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,4 +38,4 @@ void lv_xml_keyboard_apply(lv_xml_parser_state_t * state, const char ** attrs);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_KEYBOARD_XML_PARSE_H*/
+#endif /*LV_XML_KEYBOARD_PARSER_H*/
