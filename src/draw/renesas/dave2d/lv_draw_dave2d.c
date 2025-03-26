@@ -9,6 +9,7 @@
 #include "lv_draw_dave2d.h"
 #if LV_USE_DRAW_DAVE2D
 #include "../../lv_draw_buf_private.h"
+#include "../../../misc/lv_area_private.h"
 
 /*********************
  *      DEFINES
