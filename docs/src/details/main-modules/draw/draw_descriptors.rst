@@ -320,7 +320,7 @@ to each angle.
 
 After initializing the stops with :cpp:func:`lv_grad_init_stops`, the conic gradient
 can be set up with:
-:cpp:expr:`lv_grad_conical_init(&grad, center_x, center_y, angle_start, angle_end, LV_GRAD_EXTEND_PAD_...)`
+:cpp:expr:`lv_grad_conical_init(&grad, center_x, center_y, angle_start, angle_end, LV_GRAD_EXTEND_...)`
 
 For both the center and edge coordinates, ``px`` or ``lv_pct()`` values can be used.
 
