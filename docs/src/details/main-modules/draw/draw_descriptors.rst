@@ -278,10 +278,9 @@ angle of the gradient can be controlled.
 
 The linear gradient will be rendered along a line defined by 2 points.
 
-After initializing the stops with :cpp:func:`lv_grad_init_stops` call either
-:cpp:expr:`lv_grad_horizontal_init(&grad_dsc)` or
-:cpp:expr:`lv_grad_vertical_init(&grad_dsc)` to get a horizontal or vertical gradient
-descriptor.
+After initializing the stops with :cpp:func:`lv_grad_init_stops` call
+:cpp:expr:`lv_grad_linear_init(&grad_dsc, from_x, from_y, to_x, to_y, LV_GRAD_EXTEND_...)`
+with your point values and extend pattern strategy to get a linear gradient descriptor.
 
 .. lv_example:: grad/lv_example_grad_2
   :language: c
