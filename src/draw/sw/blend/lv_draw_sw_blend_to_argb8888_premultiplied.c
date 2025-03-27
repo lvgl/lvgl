@@ -271,17 +271,11 @@ static inline lv_color32_t lv_color_32_32_mix_premul(lv_color32_t fg, lv_color32
             cache->fg_saved = fg;
             cache->bg_saved = bg;
 
-            /* Premultiply foreground color */
-            lv_color32_t fg_premul = fg;
-            fg_premul.red   = (fg.red   * fg.alpha) >> 8;
-            fg_premul.green = (fg.green * fg.alpha) >> 8;
-            fg_premul.blue  = (fg.blue  * fg.alpha) >> 8;
-
             /* Blend using premultiplied alpha */
             uint32_t inv_fg_alpha = 255 - fg.alpha;
-            cache->res_saved.red   = fg_premul.red   + ((bg.red   * inv_fg_alpha) >> 8);
-            cache->res_saved.green = fg_premul.green + ((bg.green * inv_fg_alpha) >> 8);
-            cache->res_saved.blue  = fg_premul.blue  + ((bg.blue  * inv_fg_alpha) >> 8);
+            cache->res_saved.red   = fg.red   + ((bg.red   * inv_fg_alpha) >> 8);
+            cache->res_saved.green = fg.green + ((bg.green * inv_fg_alpha) >> 8);
+            cache->res_saved.blue  = fg.blue  + ((bg.blue  * inv_fg_alpha) >> 8);
             cache->res_saved.alpha = cache->res_alpha_saved;
         }
 
