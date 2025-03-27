@@ -184,7 +184,7 @@ supports:
 
 gradient types.
 
-The followings shows some example gradients.
+The following show some example gradients.
 
 .. lv_example:: styles/lv_example_style_2
   :language: c
