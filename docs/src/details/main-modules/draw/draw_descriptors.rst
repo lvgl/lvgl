@@ -301,7 +301,7 @@ The focal point's circle should be inside the main circle.
 
 After initializing the stops with :cpp:func:`lv_grad_init_stops`, the outer
 circle can be set by:
-:cpp:expr:`lv_grad_radial_init(&grad_dsc, center_x, center_y, edge_x, edge_y, LV_GRAD_EXTEND_PAD_...)`
+:cpp:expr:`lv_grad_radial_init(&grad_dsc, center_x, center_y, edge_x, edge_y, LV_GRAD_EXTEND_...)`
 
 For both the center and edge coordinates, ``px`` or ``lv_pct()`` values can be used.
 
