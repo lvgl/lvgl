@@ -41,6 +41,16 @@ extern "C" {
 
 #endif
 
+#if LV_USE_3DTEXTURE
+#if LV_USE_OPENGLES
+#define LV_3DTEXTURE_ID_NULL 0u
+#endif
+
+#ifndef LV_3DTEXTURE_ID_NULL
+#error enable LV_USE_OPENGLES to use LV_USE_3DTEXTURE
+#endif
+#endif /*LV_USE_3DTEXTURE*/
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -79,6 +89,12 @@ typedef int32_t lv_intptr_t;
 typedef float lv_value_precise_t;
 #else
 typedef int32_t lv_value_precise_t;
+#endif
+
+#if LV_USE_3DTEXTURE
+#if LV_USE_OPENGLES
+typedef unsigned int lv_3dtexture_id_t;
+#endif
 #endif
 
 /**
@@ -252,6 +268,8 @@ typedef struct _lv_tileview_t lv_tileview_t;
 typedef struct _lv_tileview_tile_t lv_tileview_tile_t;
 
 typedef struct _lv_win_t lv_win_t;
+
+typedef struct _lv_3dtexture_t lv_3dtexture_t;
 
 typedef struct _lv_observer_t lv_observer_t;
 
