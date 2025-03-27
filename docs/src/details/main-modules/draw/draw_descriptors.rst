@@ -55,8 +55,8 @@ descriptor are very useful to identify the Draw Task.  For example:
                       See the docs of the given Widget. */
     draw_dsc.id2;
 
-    draw_dsc. layer; / *The target layer.
-                        Required when a new Draw Tasks are also created */
+    draw_dsc.layer; /* The target layer.
+                       Required when a new Draw Tasks are also created */
 
 
 Simple Initilialzation
