@@ -337,7 +337,7 @@ static void freetype_outline_event_cb(lv_event_t * e)
 
     if(lv_event_get_code(e) == LV_EVENT_CREATE) {
 
-        glyph_paths = lv_malloc(sizeof(lv_draw_sw_letter_outlines_t));
+        glyph_paths = lv_malloc_zeroed(sizeof(lv_draw_sw_letter_outlines_t));
         LV_ASSERT_NULL(glyph_paths);
 
         glyph_paths->cur_path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_HIGH);
