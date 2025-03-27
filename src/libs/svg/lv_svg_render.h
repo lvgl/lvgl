@@ -29,6 +29,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
+struct _lv_svg_render_class;
 
 typedef struct _lv_svg_render_obj {
     struct _lv_svg_render_obj * next;
@@ -42,6 +43,10 @@ typedef struct _lv_svg_render_obj {
     struct _lv_svg_render_obj * head;
     char * fill_ref;
     char * stroke_ref;
+    struct _lv_svg_render_class * clz;
+} lv_svg_render_obj_t;
+
+typedef struct _lv_svg_render_class {
     void (*set_paint_ref)(struct _lv_svg_render_obj * obj, lv_vector_draw_dsc_t * dsc,
                           const struct _lv_svg_render_obj * target_obj, bool fill);
 
@@ -51,7 +56,7 @@ typedef struct _lv_svg_render_obj {
     void (*get_bounds)(const struct _lv_svg_render_obj * obj, lv_area_t * area);
     void (*get_size)(const struct _lv_svg_render_obj * obj, uint32_t * size);
     void (*destroy)(struct _lv_svg_render_obj * obj);
-} lv_svg_render_obj_t;
+} lv_svg_render_class;
 
 typedef struct _lv_svg_render_hal {
     void (*load_image)(const char * image_url, lv_draw_image_dsc_t * img_dsc);
