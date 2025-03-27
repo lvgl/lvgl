@@ -8,9 +8,19 @@ Draw Pipeline
 Overview
 ********
 
-LVGL has a flexible and extendable drawing pipeline.  You can use it to perform
-custom rendering with a GPU, or replace the built-in software renderer to any degree
-you choose.
+On modern computing hardware meant to be used with larger display panels, there are
+sometimes options for different ways drawing can be accomplished.  For example, some
+MCUs come with hardware that is very good (and fast) at certain types of drawing
+tasks.  Alternatively, you might have access to a drawing library that performs
+certain types of drawing tasks with great efficiency.  To make it possible to utilize
+such facilities in the most efficient fashion, LVGL v9 and onwards implements a
+:dfn:`Drawing Pipeline`, like an assembly line, where decisions are made as to which
+drawing tasks (:ref:`Draw Tasks`) are given to which "logic entities"
+(:ref:`Draw Units`) in order to be carried out.
+
+This Pipeline is designed so that it is both flexible and extendable.  You can use it
+to perform custom rendering with a GPU, or replace the parts of the built-in software
+rendering logic to any extent desired.
 
 Using events, it's also possible to modify :ref:`draw tasks` or insert new ones as
 LVGL renders Widgets.

@@ -250,9 +250,9 @@ Padding
 Linear, radial, and conic gradients are defined between two points or angles.  You
 can define how to pad the areas outside of the start and end points or angles:
 
-- :cpp:enum:`LV_GRAD_EXTEND_PAD`: Repeat the same color
-- :cpp:enum:`LV_GRAD_EXTEND_REPEAT`: Repeat the pattern
-- :cpp:enum:`LV_GRAD_EXTEND_REFLECT`: Repeat the pattern normally and mirrored alternately
+- :cpp:enumerator:`LV_GRAD_EXTEND_PAD`: Repeat the same color
+- :cpp:enumerator:`LV_GRAD_EXTEND_REPEAT`: Repeat the pattern
+- :cpp:enumerator:`LV_GRAD_EXTEND_REFLECT`: Repeat the pattern normally and mirrored alternately
 
 
 
