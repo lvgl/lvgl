@@ -1,10 +1,10 @@
 .. _renesas_glcdc:
 
-.. |sup2|   unicode:: U+000B2 .. SUPERSCRIPT TWO
-
 =============
 Renesas GLCDC
 =============
+
+.. |sup2|   unicode:: U+000B2 .. SUPERSCRIPT TWO
 
 Overview
 --------

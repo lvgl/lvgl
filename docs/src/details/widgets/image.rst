@@ -1,10 +1,10 @@
 .. _lv_image:
 
-.. |deg|    unicode:: U+000B0 .. DEGREE SIGN
-
 ================
 Image (lv_image)
 ================
+
+.. |deg|    unicode:: U+000B0 .. DEGREE SIGN
 
 Overview
 ********
