@@ -75,6 +75,9 @@ Ready and Reset
 :cpp:expr:`lv_timer_reset(timer)` resets the period of a Timer. It will be
 called again after its currently-set period (in milliseconds) has elapsed.
 
+See what happens when :ref:`no timers are ready <timer_handler_no_timer_ready>`
+and :cpp:func:`lv_timer_handler` is called.
+
 
 
 Setting Parameters
