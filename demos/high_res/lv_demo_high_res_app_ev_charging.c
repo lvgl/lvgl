@@ -28,7 +28,7 @@ typedef struct {
     lv_obj_t * percent_label;
     lv_obj_t * arc;
     lv_obj_t * spent_label_large;
-    lv_span_t * spent_span_small;
+    lv_obj_t * spent_spangroup_small;
     lv_obj_t * saved_label;
     lv_obj_t * charged_label;
     lv_obj_t * time_to_full_label;
@@ -182,7 +182,8 @@ static void anim_state_apply(anim_state_t * anim_state, int32_t v)
     lv_label_set_text_fmt(anim_state->spent_label_large, "$%"LV_PRId32, v_range_spent);
     char buf[32];
     lv_snprintf(buf, sizeof(buf), "$%"LV_PRId32" - ", v_range_spent);
-    lv_span_set_text(anim_state->spent_span_small, buf);
+    lv_spangroup_set_span_text(anim_state->spent_spangroup_small,
+                               lv_spangroup_get_child(anim_state->spent_spangroup_small, 0), buf);
     lv_label_set_text_fmt(anim_state->saved_label, "$%"LV_PRId32, 340 - v_range_spent);
 
     int32_t v_range_charged = lv_map(v, 0, EV_CHARGING_RANGE_END, 640, 683);
@@ -283,8 +284,8 @@ static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_obj_t * total_spent_span = lv_spangroup_create(spent_box);
     lv_obj_add_style(total_spent_span, &c->fonts[FONT_LABEL_XS], 0);
     lv_obj_add_style(total_spent_span, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    lv_span_t * total_spent_amount = lv_spangroup_add_span(total_spent_span);
-    anim_state->spent_span_small = total_spent_amount;
+    lv_spangroup_add_span(total_spent_span);
+    anim_state->spent_spangroup_small = total_spent_span;
     lv_span_t * total_spent_label = lv_spangroup_add_span(total_spent_span);
     lv_span_set_text_static(total_spent_label, "Total spent");
     lv_style_set_text_opa(&total_spent_label->style, LV_OPA_40);
@@ -318,6 +319,7 @@ static void create_widget1(lv_demo_high_res_ctx_t * c, lv_obj_t * widgets)
     lv_span_t * gas_equivalent_label = lv_spangroup_add_span(gas_equivalent_span);
     lv_span_set_text_static(gas_equivalent_label, "Gas Equivalent");
     lv_style_set_text_opa(&gas_equivalent_label->style, LV_OPA_40);
+    lv_spangroup_refresh(gas_equivalent_span);
 }
 
 static lv_obj_t * widget2_chart_label(lv_demo_high_res_ctx_t * c, lv_obj_t * parent, const char * text)
