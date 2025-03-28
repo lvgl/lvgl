@@ -30,6 +30,7 @@ sys.path.insert(0, base_path)
 from lvgl_version import lvgl_version #NoQA
 
 
+
 # *************************************************************************
 # Project Information
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -57,6 +58,7 @@ release = version
 # currently work as documented.  Sphinx documentation says of `-D setting=value`
 # "Override a configuration value set in the conf.py file.".
 # So we have to do this to get the version string into various values below.
+
 
 
 # *************************************************************************
@@ -92,7 +94,6 @@ needs_extensions = {
     'sphinxcontrib.mermaid': '0.9.2'
 }
 
-
 # -------------------------------------------------------------------------
 # Options for Highlighting
 # -------------------------------------------------------------------------
@@ -104,7 +105,6 @@ highlight_language = 'c'
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-
 # -------------------------------------------------------------------------
 # Options for Internationalisation
 # -------------------------------------------------------------------------
@@ -115,13 +115,11 @@ pygments_style = 'sphinx'
 # Usually you set "language" from the command line for these cases.
 language = 'en'
 
-
 # -------------------------------------------------------------------------
 # Options for Markup
 # -------------------------------------------------------------------------
 default_role = 'literal'
 # keep_warnings = False   # True causes Sphinx warnings to be added to documents.
-
 
 # -------------------------------------------------------------------------
 # Options for Source Files
@@ -140,7 +138,6 @@ master_doc = 'index'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-source_suffix
 source_suffix = {'.rst': 'restructuredtext'}
 
-
 # -------------------------------------------------------------------------
 # Options for Smart Quotes
 # -------------------------------------------------------------------------
@@ -155,7 +152,6 @@ smartquotes = True
 smartquotes_action = 'D'
 smartquotes_excludes = {'builders': ['man', 'text', 'json', 'xml', 'latex']}
 
-
 # -------------------------------------------------------------------------
 # Options for Templating
 # -------------------------------------------------------------------------
@@ -163,7 +159,6 @@ smartquotes_excludes = {'builders': ['man', 'text', 'json', 'xml', 'latex']}
 # builtin/theme-specific templates).  Relative paths are taken as relative
 # to the configuration directory.
 templates_path = ['_templates']
-
 
 # -------------------------------------------------------------------------
 # Options for Warning Control
@@ -299,13 +294,11 @@ StandaloneHTMLBuilder.supported_image_types = [
     'image/jpeg'
 ]
 
-
 # -------------------------------------------------------------------------
 # Options for HTMLHelp Builder
 # -------------------------------------------------------------------------
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'LVGLdoc'
-
 
 # -------------------------------------------------------------------------
 # Options for LaTeX Builder
@@ -352,7 +345,6 @@ latex_documents = [
      author, 'manual'),
 ]
 
-
 # -------------------------------------------------------------------------
 # Options for Manual Page Builder
 # -------------------------------------------------------------------------
@@ -362,7 +354,6 @@ man_pages = [
     (master_doc, 'lvgl', 'LVGL v' + version,
      [author], 3)
 ]
-
 
 # -------------------------------------------------------------------------
 # Options for Texinfo Builder
@@ -382,18 +373,15 @@ texinfo_documents = [
 # Configuration for Sphinx Extensions
 # *************************************************************************
 
-
 # -------------------------------------------------------------------------
 # Options for sphinx_rtd_dark_mode extension
 # -------------------------------------------------------------------------
 default_dark_mode = False
 
-
 # -------------------------------------------------------------------------
 # Options for lv_example extension
 # -------------------------------------------------------------------------
 repo_commit_hash = _git_commit_ref
-
 
 # -------------------------------------------------------------------------
 # Options for sphinx.ext.todo extension
@@ -402,13 +390,11 @@ repo_commit_hash = _git_commit_ref
 # See https://www.sphinx-doc.org/en/master/usage/extensions/todo.html
 todo_include_todos = True
 
-
 # -------------------------------------------------------------------------
 # Options for sphinx_sitemap extension
 # -------------------------------------------------------------------------
 # See https://sphinx-sitemap.readthedocs.io/en/latest/index.html
 sitemap_url_scheme = "{link}"
-
 
 # -------------------------------------------------------------------------
 # Options for breathe extension
@@ -417,7 +403,6 @@ sitemap_url_scheme = "{link}"
 breathe_projects = {
     "lvgl": "xml/",
 }
-
 
 # -------------------------------------------------------------------------
 # Options for sphinx_reredirects
