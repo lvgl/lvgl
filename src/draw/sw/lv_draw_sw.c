@@ -226,6 +226,8 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
                 }
             }
             break;
+        case LV_DRAW_TASK_TYPE_3D:
+            return 0;
         default:
             break;
     }

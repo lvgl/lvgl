@@ -39,6 +39,7 @@ void lv_draw_3d_dsc_init(lv_draw_3d_dsc_t * dsc)
     lv_memzero(dsc, sizeof(lv_draw_3d_dsc_t));
     dsc->base.dsc_size = sizeof(lv_draw_3d_dsc_t);
     dsc->tex_id = LV_3DTEXTURE_ID_NULL;
+    dsc->opa = LV_OPA_COVER;
 }
 
 lv_draw_3d_dsc_t * lv_draw_task_get_3d_dsc(lv_draw_task_t * task)
@@ -46,27 +47,20 @@ lv_draw_3d_dsc_t * lv_draw_task_get_3d_dsc(lv_draw_task_t * task)
     return task->type == LV_DRAW_TASK_TYPE_3D ? (lv_draw_3d_dsc_t *)task->draw_dsc : NULL;
 }
 
-void lv_draw_3d(lv_layer_t * layer, const lv_draw_3d_dsc_t * dsc)
+void lv_draw_3d(lv_layer_t * layer, const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords)
 {
-    LV_UNUSED(layer);
-    LV_UNUSED(dsc);
+    LV_PROFILER_DRAW_BEGIN;
 
-    // LV_PROFILER_DRAW_BEGIN;
-    // lv_area_t a;
-    // a.x1 = dsc->center.x - dsc->radius;
-    // a.y1 = dsc->center.y - dsc->radius;
-    // a.x2 = dsc->center.x + dsc->radius - 1;
-    // a.y2 = dsc->center.y + dsc->radius - 1;
-    // lv_draw_task_t * t = lv_draw_add_task(layer, &a);
+    lv_draw_task_t * t = lv_draw_add_task(layer, coords);
 
-    // t->draw_dsc = lv_malloc(sizeof(*dsc));
-    // LV_ASSERT_MALLOC(t->draw_dsc);
-    // lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
-    // t->type = LV_DRAW_TASK_TYPE_3D;
+    t->draw_dsc = lv_malloc(sizeof(*dsc));
+    LV_ASSERT_MALLOC(t->draw_dsc);
+    lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
+    t->type = LV_DRAW_TASK_TYPE_3D;
 
-    // lv_draw_finalize_task_creation(layer, t);
+    lv_draw_finalize_task_creation(layer, t);
 
-    // LV_PROFILER_DRAW_END;
+    LV_PROFILER_DRAW_END;
 }
 
 /**********************

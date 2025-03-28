@@ -27,6 +27,7 @@ extern "C" {
 typedef struct {
     lv_draw_dsc_base_t base;
     lv_3dtexture_id_t tex_id;
+    lv_opa_t opa;
 } lv_draw_3d_dsc_t;
 
 /**********************
@@ -35,7 +36,7 @@ typedef struct {
 
 void lv_draw_3d_dsc_init(lv_draw_3d_dsc_t * dsc);
 lv_draw_3d_dsc_t * lv_draw_task_get_3d_dsc(lv_draw_task_t * task);
-void lv_draw_3d(lv_layer_t * layer, const lv_draw_3d_dsc_t * dsc);
+void lv_draw_3d(lv_layer_t * layer, const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords);
 
 /**********************
  *      MACROS

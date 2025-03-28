@@ -40,6 +40,8 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_3dtexture_class;
  */
 lv_obj_t * lv_3dtexture_create(lv_obj_t * parent);
 
+void lv_3dtexture_set_src(lv_obj_t * obj, lv_3dtexture_id_t id);
+
 /*======================
  * Add/remove functions
  *=====================*/
