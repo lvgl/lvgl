@@ -77,6 +77,8 @@ static uint32_t get_instance_size(const lv_tree_class_t * class_p)
     while(base && base->instance_size == 0)
         base = base->base_class;
 
+    LV_ASSERT_NULL(base);
+
     return base->instance_size;
 }
 
