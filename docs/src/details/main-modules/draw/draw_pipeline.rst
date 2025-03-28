@@ -5,8 +5,22 @@ Draw Pipeline
 =============
 
 
-Overview
-********
+What is Drawing?
+****************
+
+Drawing (also known as :dfn:`rendering`) is writing pixel colors into a buffer where
+they will be delivered to a display panel as pixels.  Sometimes this is done by
+copying colors from places like background- and foreground-color properties.  Other
+times it involves computing those colors before they are written (e.g. combining them
+with other colors when an object higher on the Z axis has partial opacity).
+
+The following sections cover the LVGL drawing logic and how to use it and optionally
+tune it to fit your particular project (e.g. if you have a GPU or other resources
+that you would like to get involved).
+
+
+Draw-Pipeline Overview
+**********************
 
 On modern computing hardware meant to be used with larger display panels, there are
 sometimes options for different ways drawing can be accomplished.  For example, some
@@ -100,7 +114,6 @@ For an example of how draw-unit cration and initialization is done, see
 functions are optionally called in :cpp:func:`lv_init`.
 
 .. _lv_draw_sw.c:  https://github.com/lvgl/lvgl/blob/master/src/draw/sw/lv_draw_sw.c
-
 
 
 .. _draw task evaluation:
