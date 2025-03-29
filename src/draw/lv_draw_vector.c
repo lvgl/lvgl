@@ -790,6 +790,8 @@ void lv_vector_dsc_skew(lv_vector_dsc_t * dsc, float skew_x, float skew_y)
 
 void lv_vector_for_each_destroy_tasks(lv_ll_t * task_list, vector_draw_task_cb cb, void * data)
 {
+    if(task_list == NULL) return;
+
     lv_vector_draw_task * task = lv_ll_get_head(task_list);
     lv_vector_draw_task * next_task = NULL;
 
