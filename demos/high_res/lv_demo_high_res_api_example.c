@@ -10,6 +10,7 @@
 #include "lv_demo_high_res.h"
 #if LV_USE_DEMO_HIGH_RES
 
+/* see `wifi_ssid_observer_cb` */
 #if 0
     #include <stdlib.h>
 #endif
@@ -179,6 +180,11 @@ static void wifi_ssid_observer_cb(lv_observer_t * observer, lv_subject_t * subje
     if(password) LV_LOG_USER("The WiFi password is %d characters long", (int) lv_strlen(password));
     else         LV_LOG_USER("The WiFi password is `NULL`");
 
+    /* This block contains non-portable code which is a working example implementation
+     * of how you can programmatically connect the host device to WiFi using the
+     * SSID and password that was entered in the demo.
+     * It is for illustrative purposes. It will not be maintained. It was tested on Ubuntu 20.04.
+     */
 #if 0
     if(ssid && password) {
         char command[256];
@@ -192,6 +198,10 @@ static void wifi_ssid_observer_cb(lv_observer_t * observer, lv_subject_t * subje
             const char * ip = "(IP unknown)";
             lv_subject_set_pointer(&api->subjects.wifi_ip, (void *) ip);
 
+            /* If this is a public showroom demo, you may want to enable this block so that
+             * a network can only be connected to only once by you before real connection
+             * functionality is disabled for the remainder of the demo's operation.
+             */
 #if 0
             LV_LOG_USER("This functionality will now be disabled for the remainder of the demo.");
             lv_observer_remove(observer);
@@ -207,6 +217,7 @@ static void wifi_ssid_observer_cb(lv_observer_t * observer, lv_subject_t * subje
         /* optional TODO: perform disconnect if connected */
     }
 #else
+    /* Set an imaginary IP address. */
     if(ssid && password) {
         lv_subject_set_pointer(&api->subjects.wifi_ip, "10.0.2.15");
     }
