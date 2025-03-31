@@ -60,8 +60,6 @@ void lv_demo_high_res_api_example(const char * assets_path, const char * logo_pa
     lv_subject_set_int(&api->subjects.temperature_outdoor, 16 * 10); /* 16 degrees C */
     lv_subject_set_int(&api->subjects.main_light_temperature, 4500); /* 4500 degrees K */
     lv_subject_set_int(&api->subjects.thermostat_target_temperature, 25 * 10); /* 25 degrees C */
-    lv_subject_set_pointer(&api->subjects.wifi_ssid, "Home Wi-Fi");
-    lv_subject_set_pointer(&api->subjects.wifi_ip, "192.168.1.1");
     lv_subject_set_int(&api->subjects.door, 0); /* tell the UI the door is closed */
     lv_subject_set_int(&api->subjects.lightbulb_matter, 0); /* 0 or 1 */
     lv_subject_set_int(&api->subjects.lightbulb_zigbee, 1); /* 0 or 1 */
@@ -174,11 +172,17 @@ static void wifi_ssid_observer_cb(lv_observer_t * observer, lv_subject_t * subje
     const char * ssid = lv_subject_get_pointer(subject);
     const char * password = lv_subject_get_pointer(&api->subjects.wifi_password);
 
-    if(ssid) LV_LOG_USER("The WiFi SSID is \"%s\"", ssid);
-    else     LV_LOG_USER("The WiFi SSID is `NULL`");
+    if(ssid) {
+        LV_LOG_USER("The WiFi SSID is \"%s\"", ssid);
+        if(ssid[0] == '\0') ssid = NULL;
+    }
+    else LV_LOG_USER("The WiFi SSID is `NULL`");
 
-    if(password) LV_LOG_USER("The WiFi password is %d characters long", (int) lv_strlen(password));
-    else         LV_LOG_USER("The WiFi password is `NULL`");
+    if(password) {
+        LV_LOG_USER("The WiFi password is %d characters long", (int) lv_strlen(password));
+        if(password[0] == '\0') password = NULL;
+    }
+    else LV_LOG_USER("The WiFi password is `NULL`");
 
     /* This block contains non-portable code which is a working example implementation
      * of how you can programmatically connect the host device to WiFi using the
@@ -186,9 +190,14 @@ static void wifi_ssid_observer_cb(lv_observer_t * observer, lv_subject_t * subje
      * It is for illustrative purposes. It will not be maintained. It was tested on Ubuntu 20.04.
      */
 #if 0
-    if(ssid && password) {
+    if(ssid) {
         char command[256];
-        lv_snprintf(command, sizeof(command), "nmcli device wifi connect '%s' password '%s'", ssid, password);
+        if(password) {
+            lv_snprintf(command, sizeof(command), "nmcli device wifi connect '%s' password '%s'", ssid, password);
+        }
+        else {
+            lv_snprintf(command, sizeof(command), "nmcli device wifi connect '%s'", ssid);
+        }
         int exit_status = system(command); /* requires #include <stdlib.h> */
 
         if(exit_status == 0) {
@@ -213,12 +222,12 @@ static void wifi_ssid_observer_cb(lv_observer_t * observer, lv_subject_t * subje
             lv_subject_set_pointer(subject, NULL);
         }
     }
-    else if(!ssid) {
+    else {
         /* optional TODO: perform disconnect if connected */
     }
 #else
     /* Set an imaginary IP address. */
-    if(ssid && password) {
+    if(ssid) {
         lv_subject_set_pointer(&api->subjects.wifi_ip, "10.0.2.15");
     }
 #endif
