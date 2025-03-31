@@ -99,6 +99,13 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_argb8888_premultiplied(lv_d
     if(mask == NULL && opa >= LV_OPA_MAX) {
         uint32_t color32 = lv_color_to_u32(dsc->color);
         uint32_t * dest_buf = dsc->dest_buf;
+
+        /* Ensure dest_buf is 16-byte aligned */
+        if(((uintptr_t)dest_buf & 0xF) != 0) {
+            LV_LOG_ERROR("dest_buf is not 16-byte aligned!");
+            return;
+        }
+
         for(y = 0; y < h; y++) {
             for(x = 0; x < w - 16; x += 16) {
                 dest_buf[x + 0] = color32;
@@ -201,9 +208,10 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_argb8888_premultiplied(lv_d
 
             /* Convert from premultiplied alpha back to standard RGB */
             if(src.alpha > 0) {
-                src.red   = (src.red   * 255) / src.alpha;
-                src.green = (src.green * 255) / src.alpha;
-                src.blue  = (src.blue  * 255) / src.alpha;
+                uint16_t alpha_inv = (255 * 256) / src.alpha; /* Compute once */
+                src.red   = (src.red   * alpha_inv) >> 8;
+                src.green = (src.green * alpha_inv) >> 8;
+                src.blue  = (src.blue  * alpha_inv) >> 8;
             }
 
             /* Apply mask and opacity adjustments */
