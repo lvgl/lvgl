@@ -8,6 +8,8 @@
  *********************/
 
 #include "lv_draw_3d.h"
+#if LV_3DTEXTURE_ID_TYPE_IS_DEFINED
+
 #include "lv_draw_private.h"
 
 /*********************
@@ -66,3 +68,5 @@ void lv_draw_3d(lv_layer_t * layer, const lv_draw_3d_dsc_t * dsc, const lv_area_
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+#endif /*LV_3DTEXTURE_ID_TYPE_IS_DEFINED*/

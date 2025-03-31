@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 
 #include "lv_draw.h"
+#if LV_3DTEXTURE_ID_TYPE_IS_DEFINED
 
 /*********************
  *      DEFINES
@@ -41,6 +42,8 @@ void lv_draw_3d(lv_layer_t * layer, const lv_draw_3d_dsc_t * dsc, const lv_area_
 /**********************
  *      MACROS
  **********************/
+
+#endif /*LV_3DTEXTURE_ID_TYPE_IS_DEFINED*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
