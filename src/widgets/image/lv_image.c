@@ -673,11 +673,12 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e)
          *perform hit test on its transformed area*/
         if(img->w == lv_obj_get_width(obj) && img->h == lv_obj_get_height(obj) &&
            (img->scale_x != LV_SCALE_NONE || img->scale_y != LV_SCALE_NONE ||
-            img->rotation != 0 || img->pivot.x != img->w / 2 || img->pivot.y != img->h / 2)) {
+            img->rotation != 0)) {
 
             int32_t w = lv_obj_get_width(obj);
             int32_t h = lv_obj_get_height(obj);
             lv_area_t coords;
+            lv_obj_get_ext_draw_size(obj);
             lv_image_buf_get_transformed_area(&coords, w, h, img->rotation, img->scale_x, img->scale_y, &pivot_px);
             coords.x1 += obj->coords.x1;
             coords.y1 += obj->coords.y1;
