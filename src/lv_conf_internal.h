@@ -4221,6 +4221,19 @@
     #endif
 #endif
 
+/** Vector graphic demo */
+#ifndef LV_USE_DEMO_VECTOR_GRAPHIC
+    #ifdef CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC
+        #define LV_USE_DEMO_VECTOR_GRAPHIC CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC
+    #else
+        #define LV_USE_DEMO_VECTOR_GRAPHIC  0
+    #endif
+#endif
+
+/*---------------------------
+ * Demos from lvgl/lv_demos
+  ---------------------------*/
+
 /** Flex layout demo */
 #ifndef LV_USE_DEMO_FLEX_LAYOUT
     #ifdef CONFIG_LV_USE_DEMO_FLEX_LAYOUT
@@ -4254,15 +4267,6 @@
         #define LV_USE_DEMO_SCROLL CONFIG_LV_USE_DEMO_SCROLL
     #else
         #define LV_USE_DEMO_SCROLL          0
-    #endif
-#endif
-
-/** Vector graphic demo */
-#ifndef LV_USE_DEMO_VECTOR_GRAPHIC
-    #ifdef CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC
-        #define LV_USE_DEMO_VECTOR_GRAPHIC CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC
-    #else
-        #define LV_USE_DEMO_VECTOR_GRAPHIC  0
     #endif
 #endif
 

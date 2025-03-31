@@ -1318,6 +1318,13 @@
     #define LV_DEMO_MUSIC_AUTO_PLAY 0
 #endif
 
+/** Vector graphic demo */
+#define LV_USE_DEMO_VECTOR_GRAPHIC  0
+
+/*---------------------------
+ * Demos from lvgl/lv_demos
+  ---------------------------*/
+
 /** Flex layout demo */
 #define LV_USE_DEMO_FLEX_LAYOUT     0
 
@@ -1329,9 +1336,6 @@
 
 /** Demonstrate scroll settings */
 #define LV_USE_DEMO_SCROLL          0
-
-/** Vector graphic demo */
-#define LV_USE_DEMO_VECTOR_GRAPHIC  0
 
 /*E-bike demo with Lottie animations (if LV_USE_LOTTIE is enabled)*/
 #define LV_USE_DEMO_EBIKE           0

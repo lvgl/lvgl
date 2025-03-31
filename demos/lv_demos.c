@@ -39,9 +39,6 @@ static const demo_entry_info_t demos_entry_info[] = {
 #if LV_USE_DEMO_MUSIC
     { "music", .entry_cb = lv_demo_music },
 #endif
-#if LV_USE_DEMO_MULTILANG
-    { "multilang", .entry_cb = lv_demo_multilang },
-#endif
 
 #if LV_USE_DEMO_STRESS
     { "stress", .entry_cb = lv_demo_stress },
@@ -49,18 +46,6 @@ static const demo_entry_info_t demos_entry_info[] = {
 
 #if LV_USE_DEMO_KEYPAD_AND_ENCODER
     { "keypad_encoder", .entry_cb = lv_demo_keypad_encoder },
-#endif
-
-#if LV_USE_DEMO_FLEX_LAYOUT
-    { "flex_layout", .entry_cb = lv_demo_flex_layout },
-#endif
-
-#if LV_USE_DEMO_TRANSFORM
-    { "transform", .entry_cb = lv_demo_transform },
-#endif
-
-#if LV_USE_DEMO_SCROLL
-    { "scroll", .entry_cb = lv_demo_scroll },
 #endif
 
 #if LV_USE_DEMO_VECTOR_GRAPHIC && LV_USE_VECTOR_GRAPHIC
