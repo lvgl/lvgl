@@ -51,12 +51,12 @@ def _announce(file: str, args: tuple, start: bool, box: bool, box_char: str):
         print(msg, end='', flush=True)
     else:
         if box:
-            print(box_char * msg_len)
-
-        print(msg, flush=True)
-
-        if box:
-            print(box_char * msg_len)
+            line = box_char * msg_len
+            print(line)
+            print(msg)
+            print(line, flush=True)
+        else:
+            print(msg, flush=True)
 
 
 def announce(file: str, *args, box: bool = False, box_char: str = '*'):
