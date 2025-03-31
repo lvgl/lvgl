@@ -89,6 +89,7 @@ code.sig-name {
  *                                                           //   below from this.
  *-------------------------------------------------------------------------
  * Visible layout consists of a <section> element containing:
+ * - <h3> element with title
  * - <div> element containing live running web-assembly example of LVGL UI
  * - <div> element containing [> Show C Code]  [G View on GitHub] buttons
  *     and the C code below them.
