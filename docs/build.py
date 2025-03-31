@@ -451,9 +451,7 @@ def run(args):
         or clean_all or (os.path.isdir(intermediate_dir) and build_intermediate)
 
     if some_cleaning_to_be_done:
-        announce(__file__, "****************")
-        announce(__file__, "Cleaning...")
-        announce(__file__, "****************")
+        announce(__file__, "Cleaning...", box=True)
 
         if clean_intermediate:
             remove_dir(intermediate_dir)
@@ -536,9 +534,7 @@ def run(args):
 
     if intermediate_dir_contents_exists(intermediate_dir):
         # We are just doing an update of the intermediate_dir contents.
-        announce(__file__, "****************")
-        announce(__file__, "Updating intermediate directory...")
-        announce(__file__, "****************")
+        announce(__file__, "Updating intermediate directory...", box=True)
 
         exclude_list.append(r'examples.*')
         options = {
@@ -554,9 +550,7 @@ def run(args):
         dirsync.sync(examples_dir, os.path.join(intermediate_dir, cfg_examples_dir), 'sync', **options)
     elif build_intermediate or build_html or build_latex:
         # We are having to create the intermediate_dir contents by copying.
-        announce(__file__, "****************")
-        announce(__file__, "Building intermediate directory...")
-        announce(__file__, "****************")
+        announce(__file__, "Building intermediate directory...", box=True)
 
         t1 = datetime.now()
         copy_method = 1
@@ -643,9 +637,7 @@ def run(args):
         announce(__file__, "Skipping Latex build.")
     else:
         t1 = datetime.now()
-        announce(__file__, "****************")
-        announce(__file__, "Building Latex output...")
-        announce(__file__, "****************")
+        announce(__file__, "Building Latex output...", box=True)
 
         # If PDF link is present in top index.rst, remove it so PDF
         # does not have a link to itself.
@@ -668,9 +660,7 @@ def run(args):
         cmd(cmd_line)
 
         # Generate PDF.
-        announce(__file__, "****************")
-        announce(__file__, "Building PDF...")
-        announce(__file__, "****************")
+        announce(__file__, "Building PDF...", box=True)
         cmd_line = 'latexmk -pdf "LVGL.tex"'
         cmd(cmd_line, latex_output_dir, False)
 
@@ -690,9 +680,7 @@ def run(args):
         announce(__file__, "Skipping HTML build.")
     else:
         t1 = datetime.now()
-        announce(__file__, "****************")
-        announce(__file__, "Building HTML output...")
-        announce(__file__, "****************")
+        announce(__file__, "Building HTML output...", box=True)
 
         # If PDF is present in build directory, copy it to
         # intermediate directory for use by HTML build.
