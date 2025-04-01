@@ -2474,7 +2474,7 @@
     #ifdef CONFIG_LV_USE_3DTEXTURE
         #define LV_USE_3DTEXTURE CONFIG_LV_USE_3DTEXTURE
     #else
-        #define LV_USE_3DTEXTURE 0
+        #define LV_USE_3DTEXTURE  0
     #endif
 #endif
 
