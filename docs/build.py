@@ -202,10 +202,8 @@ cfg_top_index_filename = 'index.rst'
 cfg_pdf_filename = 'LVGL.pdf'
 
 
-# -------------------------------------------------------------------------
-# Print usage note.
-# -------------------------------------------------------------------------
 def print_usage_note():
+    """Print usage note."""
     print('Usage:')
     print('  $ python build.py [optional_arg ...]')
     print()
