@@ -12,6 +12,9 @@
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_event_private.h"
 #include "../../core/lv_obj_class_private.h"
+#include "../../core/lv_obj_class_private.h"
+#include "../../core/lv_obj_draw_private.h"
+
 #if LV_USE_IMAGE != 0
 
 #include "../../stdlib/lv_string.h"
