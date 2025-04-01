@@ -13,7 +13,10 @@
 #include "../../src/widgets/image/lv_image.h"
 #include "../../src/widgets/label/lv_label.h"
 #include "../../src/widgets/line/lv_line.h"
+#include "../../src/widgets/keyboard/lv_keyboard.h"
+#include "../../src/widgets/textarea/lv_textarea.h"
 #include "../../src/display/lv_display_private.h"
+#include "../../src/widgets/span/lv_span_private.h"
 
 /*********************
  *      DEFINES
@@ -34,6 +37,15 @@ static void delete_modal_cb(lv_event_t * e);
 static void icon_clicked_cb(lv_event_t * e);
 static void sys_layer_clicked_cb(lv_event_t * e);
 static void wifi_ssid_ip_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void wifi_button_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
+static void wifi_button_clicked_cb(lv_event_t * e);
+static void wifi_connect_ui(lv_demo_high_res_ctx_t * c);
+static void wifi_connect_ui_textarea_apply_styles(lv_demo_high_res_ctx_t * c, lv_obj_t * ta);
+static void wifi_connect_ui_join_button_clicked_cb(lv_event_t * e);
+static void wifi_connect_ui_textarea_focused_cb(lv_event_t * e);
+static void wifi_connect_ui_keyboard_event_cb(lv_event_t * e);
+static void wifi_connect_ui_save_ssid_and_password(lv_demo_high_res_ctx_t * c);
+static void wifi_connect_ui_end(lv_demo_high_res_ctx_t * c);
 static lv_obj_t * create_wifi(lv_obj_t * parent, lv_demo_high_res_ctx_t * c);
 static void wifi_icon_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
 static lv_obj_t * create_perfmon(lv_obj_t * parent, lv_demo_high_res_ctx_t * c);
@@ -105,6 +117,7 @@ lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * parent, int32_t pad_hor
     lv_obj_t * wifi = create_wifi(lv_layer_sys(), c);
     lv_obj_bind_flag_if_eq(wifi, &c->top_margin_wifi_subject, LV_OBJ_FLAG_HIDDEN, 0);
     lv_obj_add_event_cb(wifi_icon, delete_modal_cb, LV_EVENT_DELETE, wifi);
+    lv_obj_move_to_index(wifi, 0); /* move behind other lv_layer_sys objs */
 
     lv_obj_t * health_icon = create_icon(top_margin_right_cluster, &c->top_margin_health_subject, &c->imgs[IMG_HEALTH_ICON],
                                          c);
@@ -113,6 +126,7 @@ lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * parent, int32_t pad_hor
     lv_obj_t * perfmon = create_perfmon(lv_layer_sys(), c);
     lv_obj_bind_flag_if_eq(perfmon, &c->top_margin_health_subject, LV_OBJ_FLAG_HIDDEN, 0);
     lv_obj_add_event_cb(health_icon, delete_modal_cb, LV_EVENT_DELETE, perfmon);
+    lv_obj_move_to_index(perfmon, 0); /* move behind other lv_layer_sys objs */
 
     lv_obj_t * settings_icon = create_icon(top_margin_right_cluster, &c->top_margin_setting_subject,
                                            &c->imgs[IMG_SETTING_ICON], c);
@@ -121,6 +135,7 @@ lv_obj_t * lv_demo_high_res_top_margin_create(lv_obj_t * parent, int32_t pad_hor
     lv_obj_t * settings = create_settings(lv_layer_sys(), c);
     lv_obj_bind_flag_if_eq(settings, &c->top_margin_setting_subject, LV_OBJ_FLAG_HIDDEN, 0);
     lv_obj_add_event_cb(settings_icon, delete_modal_cb, LV_EVENT_DELETE, settings);
+    lv_obj_move_to_index(settings, 0); /* move behind other lv_layer_sys objs */
 
     lv_obj_update_layout(top_margin_right_cluster);
     lv_obj_align_to(wifi, wifi_icon, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
@@ -179,6 +194,7 @@ static void icon_clicked_cb(lv_event_t * e)
     };
     for(int32_t i = 0; i < (int32_t)ARRAY_LEN(icon_subjects); i++) {
         lv_subject_t * subject = icon_subjects[i];
+        if(subject == &c->top_margin_wifi_subject && c->wifi_connect_ui_active) continue;
         lv_obj_t * icon = subject->user_data;
         lv_image_dsc_t ** pair = lv_obj_get_user_data(icon);
         int32_t value = icon == clicked_icon && !lv_subject_get_int(subject);
@@ -202,15 +218,155 @@ static void sys_layer_clicked_cb(lv_event_t * e)
 
 static void wifi_ssid_ip_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
 {
-    lv_obj_t * label = lv_observer_get_target_obj(observer);
-    const char * ssid_ip = lv_observer_get_user_data(observer);
+    lv_obj_t * spangroup = lv_observer_get_target_obj(observer);
+    lv_span_t * span = lv_observer_get_user_data(observer);
     const char * ssid_ip_value = lv_subject_get_pointer(subject);
+    lv_spangroup_set_span_text(spangroup, span, ssid_ip_value ? ssid_ip_value : "(offline)");
+}
+
+static void wifi_button_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
+{
+    lv_obj_t * label = lv_observer_get_target_obj(observer);
+    const char * ssid_ip_value = lv_subject_get_pointer(subject);
+    lv_label_set_text_static(label, ssid_ip_value ? "Disconnect" : "Connect");
+}
+
+static void wifi_button_clicked_cb(lv_event_t * e)
+{
+    lv_demo_high_res_ctx_t * c = lv_event_get_user_data(e);
+    const char * ssid_ip_value = lv_subject_get_pointer(&c->api.subjects.wifi_ssid);
     if(ssid_ip_value) {
-        lv_label_set_text_fmt(label, "%s: %s", ssid_ip, ssid_ip_value);
+        lv_subject_set_pointer(&c->api.subjects.wifi_password, NULL);
+        lv_subject_set_pointer(&c->api.subjects.wifi_ssid, NULL);
+        lv_subject_set_pointer(&c->api.subjects.wifi_ip, NULL);
     }
     else {
-        lv_label_set_text_fmt(label, "%s: (offline)", ssid_ip);
+        wifi_connect_ui(c);
     }
+}
+
+static void wifi_connect_ui(lv_demo_high_res_ctx_t * c)
+{
+    if(c->wifi_connect_ui_active) return;
+
+    /* close the WiFi details */
+    lv_obj_send_event(lv_layer_sys(), LV_EVENT_CLICKED, NULL);
+
+    c->wifi_connect_ui_active = true;
+
+    lv_obj_t * kb = lv_keyboard_create(c->api.base_obj);
+    lv_obj_add_style(kb, &c->fonts[FONT_LABEL_SM], 0);
+    lv_obj_add_event_cb(kb, wifi_connect_ui_keyboard_event_cb, LV_EVENT_READY, c);
+    lv_obj_add_event_cb(kb, wifi_connect_ui_keyboard_event_cb, LV_EVENT_CANCEL, c);
+
+    lv_obj_t * popup = lv_obj_create(c->api.base_obj);
+    lv_obj_set_size(popup, c->sz->settings_panel_width, LV_SIZE_CONTENT);
+    lv_obj_set_style_pad_all(popup, c->sz->gap[7], 0);
+    lv_obj_set_flex_flow(popup, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_column(popup, c->sz->gap[4], 0);
+    lv_obj_set_style_radius(popup, c->sz->gap[3], 0);
+    lv_obj_set_style_border_width(popup, 0, 0);
+    lv_obj_add_style(popup, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_OBJ], 0);
+
+    lv_obj_t * ta_ssid = lv_textarea_create(popup);
+    lv_obj_set_width(ta_ssid, LV_PCT(100));
+    lv_textarea_set_one_line(ta_ssid, true);
+    lv_textarea_set_placeholder_text(ta_ssid, "SSID");
+    wifi_connect_ui_textarea_apply_styles(c, ta_ssid);
+    lv_obj_add_event_cb(ta_ssid, wifi_connect_ui_textarea_focused_cb, LV_EVENT_FOCUSED, kb);
+
+    lv_obj_t * ta_password = lv_textarea_create(popup);
+    lv_obj_set_width(ta_password, LV_PCT(100));
+    lv_textarea_set_one_line(ta_password, true);
+    lv_textarea_set_placeholder_text(ta_password, "Password");
+    lv_textarea_set_password_mode(ta_password, true);
+    wifi_connect_ui_textarea_apply_styles(c, ta_password);
+    lv_obj_add_event_cb(ta_password, wifi_connect_ui_textarea_focused_cb, LV_EVENT_FOCUSED, kb);
+
+    lv_obj_t * btn = lv_label_create(popup);
+    lv_obj_add_style(btn, &c->fonts[FONT_LABEL_SM], 0);
+    lv_obj_set_style_text_color(btn, lv_color_white(), 0);
+    lv_obj_set_style_text_align(btn, LV_TEXT_ALIGN_CENTER, 0);
+    lv_obj_set_width(btn, LV_PCT(100));
+    lv_obj_set_style_radius(btn, LV_COORD_MAX, 0);
+    lv_obj_set_style_pad_ver(btn, c->sz->gap[4], 0);
+    lv_obj_set_style_bg_opa(btn, LV_OPA_COVER, 0);
+    lv_obj_add_style(btn, &c->styles[STYLE_COLOR_ACCENT][STYLE_TYPE_OBJ], 0);
+    lv_label_set_text_static(btn, "Join");
+    lv_obj_add_event_cb(btn, wifi_connect_ui_join_button_clicked_cb, LV_EVENT_CLICKED, c);
+    lv_obj_add_flag(btn, LV_OBJ_FLAG_CLICKABLE);
+
+    lv_obj_t * wifi_icon = c->top_margin_wifi_subject.user_data;
+    lv_obj_align_to(popup, wifi_icon, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 0);
+}
+
+static void wifi_connect_ui_textarea_apply_styles(lv_demo_high_res_ctx_t * c, lv_obj_t * ta)
+{
+    lv_obj_add_style(ta, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXTAREA], 0);
+    lv_obj_add_style(ta, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXTAREA], LV_PART_TEXTAREA_PLACEHOLDER);
+    lv_obj_add_style(ta, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXTAREA_CURSOR], LV_PART_CURSOR | LV_STATE_FOCUSED);
+    lv_obj_add_style(ta, &c->fonts[FONT_LABEL_XS], 0);
+
+    lv_obj_set_style_bg_opa(ta, 12 * 255 / 100, 0);
+    lv_obj_set_style_bg_opa(ta, 30 * 255 / 100, LV_STATE_FOCUSED);
+    lv_obj_set_style_border_width(ta, 0, 0);
+}
+
+static void wifi_connect_ui_join_button_clicked_cb(lv_event_t * e)
+{
+    lv_demo_high_res_ctx_t * c = lv_event_get_user_data(e);
+    wifi_connect_ui_save_ssid_and_password(c);
+    wifi_connect_ui_end(c);
+}
+
+static void wifi_connect_ui_textarea_focused_cb(lv_event_t * e)
+{
+    lv_obj_t * ta = lv_event_get_target_obj(e);
+    lv_obj_t * kb = lv_event_get_user_data(e);
+    lv_keyboard_set_textarea(kb, ta);
+}
+
+static void wifi_connect_ui_keyboard_event_cb(lv_event_t * e)
+{
+    lv_demo_high_res_ctx_t * c = lv_event_get_user_data(e);
+
+    lv_event_code_t code = lv_event_get_code(e);
+    if(code == LV_EVENT_READY) {
+        wifi_connect_ui_save_ssid_and_password(c);
+    }
+
+    wifi_connect_ui_end(c);
+}
+
+static void wifi_connect_ui_save_ssid_and_password(lv_demo_high_res_ctx_t * c)
+{
+    lv_obj_t * popup = lv_obj_get_child(c->api.base_obj, -1);
+
+    lv_obj_t * ta_ssid = lv_obj_get_child(popup, 0);
+    lv_obj_t * ta_password = lv_obj_get_child(popup, 1);
+
+    /* set the SSID after the password, so the password will be ready
+     * when the user is observing the SSID to get both SSID and password.
+     */
+    lv_free(c->wifi_password_tmp);
+    c->wifi_password_tmp = lv_strdup(lv_textarea_get_text(ta_password));
+    LV_ASSERT_MALLOC(c->wifi_password_tmp);
+    lv_subject_set_pointer(&c->api.subjects.wifi_password, c->wifi_password_tmp);
+
+    lv_free(c->wifi_ssid_tmp);
+    c->wifi_ssid_tmp = lv_strdup(lv_textarea_get_text(ta_ssid));
+    LV_ASSERT_MALLOC(c->wifi_ssid_tmp);
+    lv_subject_set_pointer(&c->api.subjects.wifi_ssid, c->wifi_ssid_tmp);
+}
+
+static void wifi_connect_ui_end(lv_demo_high_res_ctx_t * c)
+{
+    lv_obj_t * kb = lv_obj_get_child(c->api.base_obj, -2);
+    lv_obj_t * popup = lv_obj_get_child(c->api.base_obj, -1);
+
+    lv_obj_delete(popup);
+    lv_obj_delete(kb);
+    c->wifi_connect_ui_active = false;
 }
 
 static lv_obj_t * create_wifi(lv_obj_t * parent, lv_demo_high_res_ctx_t * c)
@@ -227,14 +383,34 @@ static lv_obj_t * create_wifi(lv_obj_t * parent, lv_demo_high_res_ctx_t * c)
     lv_obj_t * cont = lv_demo_high_res_simple_container_create(settings, true, c->sz->gap[4], LV_FLEX_ALIGN_START);
     lv_obj_set_width(cont, LV_PCT(100));
 
-    lv_obj_t * ssid = lv_label_create(cont);
+    lv_obj_t * ssid = lv_spangroup_create(cont);
     lv_obj_add_style(ssid, &c->fonts[FONT_LABEL_XS], 0);
     lv_obj_add_style(ssid, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    lv_subject_add_observer_obj(&c->api.subjects.wifi_ssid, wifi_ssid_ip_observer_cb, ssid, (void *)"SSID");
-    lv_obj_t * ip = lv_label_create(cont);
+    lv_span_set_text_static(lv_spangroup_add_span(ssid), "SSID: ");
+    lv_span_t * ssid_value = lv_spangroup_add_span(ssid);
+    lv_style_set_text_opa(&ssid_value->style, LV_OPA_40);
+    lv_subject_add_observer_obj(&c->api.subjects.wifi_ssid, wifi_ssid_ip_observer_cb, ssid, ssid_value);
+
+    lv_obj_t * ip = lv_spangroup_create(cont);
     lv_obj_add_style(ip, &c->fonts[FONT_LABEL_XS], 0);
     lv_obj_add_style(ip, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_TEXT], 0);
-    lv_subject_add_observer_obj(&c->api.subjects.wifi_ip, wifi_ssid_ip_observer_cb, ip, (void *)"IP");
+    lv_span_set_text_static(lv_spangroup_add_span(ip), "IP Address: ");
+    lv_span_t * ip_value = lv_spangroup_add_span(ip);
+    lv_style_set_text_opa(&ip_value->style, LV_OPA_40);
+    lv_subject_add_observer_obj(&c->api.subjects.wifi_ip, wifi_ssid_ip_observer_cb, ip, ip_value);
+
+    lv_obj_t * btn = lv_label_create(cont);
+    lv_obj_add_style(btn, &c->fonts[FONT_LABEL_SM], 0);
+    lv_obj_set_style_text_color(btn, lv_color_white(), 0);
+    lv_obj_set_style_text_align(btn, LV_TEXT_ALIGN_CENTER, 0);
+    lv_obj_set_width(btn, LV_PCT(100));
+    lv_obj_set_style_radius(btn, LV_COORD_MAX, 0);
+    lv_obj_set_style_pad_ver(btn, c->sz->gap[4], 0);
+    lv_obj_set_style_bg_opa(btn, LV_OPA_COVER, 0);
+    lv_obj_add_style(btn, &c->styles[STYLE_COLOR_ACCENT][STYLE_TYPE_OBJ], 0);
+    lv_subject_add_observer_obj(&c->api.subjects.wifi_ssid, wifi_button_observer_cb, btn, NULL);
+    lv_obj_add_event_cb(btn, wifi_button_clicked_cb, LV_EVENT_CLICKED, c);
+    lv_obj_add_flag(btn, LV_OBJ_FLAG_CLICKABLE);
 
     return settings;
 }
@@ -245,7 +421,6 @@ static void wifi_icon_observer_cb(lv_observer_t * observer, lv_subject_t * subje
     lv_obj_t * wifi_icon = lv_observer_get_target_obj(observer);
     lv_demo_high_res_ctx_t * c = lv_observer_get_user_data(observer);
     lv_obj_set_style_opa(wifi_icon, lv_subject_get_pointer(&c->api.subjects.wifi_ssid)
-                         || lv_subject_get_pointer(&c->api.subjects.wifi_ip)
                          ? LV_OPA_COVER : LV_OPA_50, 0);
 }
 
@@ -256,7 +431,7 @@ static lv_obj_t * create_perfmon(lv_obj_t * parent, lv_demo_high_res_ctx_t * c)
 
     lv_obj_set_style_border_opa(perfmon, LV_OPA_TRANSP, 0);
     lv_obj_set_style_radius(perfmon, c->sz->gap[3], 0);
-    lv_obj_set_size(perfmon, c->sz->health_panel_width, LV_SIZE_CONTENT);
+    lv_obj_set_size(perfmon, c->sz->settings_panel_width, LV_SIZE_CONTENT);
     lv_obj_set_style_pad_all(perfmon, c->sz->gap[7], 0);
     lv_obj_add_style(perfmon, &c->styles[STYLE_COLOR_BASE][STYLE_TYPE_OBJ], 0);
 
