@@ -332,9 +332,9 @@ Once a gesture is recognized or ended, a ``LV_EVENT_GESTURE`` is sent. The user 
 gather more information about the gesture:
 
 - ``lv_event_get_gesture_type(lv_event_t * gesture_event)``: Get the type of the gesture. To be
-used to check which multi-touch gesture is currently reported.
+  used to check which multi-touch gesture is currently reported.
 - ``lv_indev_gesture_state_t lv_event_get_gesture_state(lv_event_t * gesture_event, lv_indev_gesture_type_t type)``: Get the
-state of the gesture. It can be one of those:
+  state of the gesture. It can be one of those:
 
   - ``LV_INDEV_GESTURE_STATE_NONE``: The gesture is not active.
   - ``LV_INDEV_GESTURE_STATE_RECOGNIZED``: The gesture is recognized and can be used.

@@ -3,29 +3,34 @@ Viewe
 =====
 
 `Viewe <https://viewedisplay.com/>`__ is a high-tech enterprise specializing
-in comprehensive display solutions, including display panels, touch interfaces, 
-and embedded smart displays. They integrate research and development, production, 
-and sales services, focusing on professionalism, dedication, innovation, 
-and ambition to lead in the display and graphical user interface (GUI) 
+in comprehensive display solutions, including display panels, touch interfaces,
+and embedded smart displays. They integrate research and development, production,
+and sales services, focusing on professionalism, dedication, innovation,
+and ambition to lead in the display and graphical user interface (GUI)
 industry.
 
 - TFT Displays
- - Standard Display
- - Sunlight Readable Display
- - Bar Display/Stretched Display
- - Square Display
- - Round Display
+
+    - Standard Display
+    - Sunlight Readable Display
+    - Bar Display/Stretched Display
+    - Square Display
+    - Round Display
+
 - Smart Display
- - Uart Smart Display
- - IOT_AIOT Smart Display
- - HDMI Display_Raspberry Pi Display
- - Arduino Display
+
+    - Uart Smart Display
+    - IOT_AIOT Smart Display
+    - HDMI Display_Raspberry Pi Display
+    - Arduino Display
+
+
 
 UART Smart Displays
 *******************
 
-The Viewe UART Smart Displays are a series of displays that use 
-ESP32 microcontrollers and have IO interface for connecting to 
+The Viewe UART Smart Displays are a series of displays that use
+ESP32 microcontrollers and have IO interface for connecting to
 peripherals.
 
 lv_port_viewe_7_espidf
