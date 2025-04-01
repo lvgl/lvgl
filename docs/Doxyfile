@@ -851,6 +851,9 @@ EXCLUDE_SYMLINKS       = NO
 # exclude all test directories for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = */libs/barcode/code*      \
+                         */libs/expat/*asciitab.h  \
+                         */libs/expat/latin1tab.h  \
+                         */libs/expat/utf8tab.h    \
                          */libs/freetype/ft*       \
                          */libs/gif/gif*           \
                          */libs/lodepng/lode*      \
