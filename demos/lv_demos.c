@@ -31,6 +31,7 @@ typedef struct  {
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 static const demo_entry_info_t demos_entry_info[] = {
 #if LV_USE_DEMO_WIDGETS
     { "widgets", .entry_cb = lv_demo_widgets },
