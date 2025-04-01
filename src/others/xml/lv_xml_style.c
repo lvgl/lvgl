@@ -87,15 +87,27 @@ lv_result_t lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** at
     if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
     if(ctx == NULL) return LV_RESULT_INVALID;
 
-    lv_xml_style_t * xml_style = lv_ll_ins_tail(&ctx->style_ll);
+
+    lv_xml_style_t * xml_style;
+    /*If a style with the same name is already created, use it */
+    bool found = false;
+    LV_LL_READ(&ctx->style_ll, xml_style) {
+        if(lv_streq(xml_style->name, style_name)) {
+            found = true;
+            break;
+        }
+    }
+
+    if(!found) {
+        xml_style = lv_ll_ins_tail(&ctx->style_ll);
+        xml_style->name = lv_strdup(style_name);
+        lv_style_init(&xml_style->style);
+        size_t long_name_len = lv_strlen(ctx->name) + 1 + lv_strlen(style_name) + 1;
+        xml_style->long_name = lv_malloc(long_name_len);
+        lv_snprintf((char *)xml_style->long_name, long_name_len, "%s.%s", ctx->name, style_name); /*E.g. my_button.style1*/
+    }
 
     lv_style_t * style = &xml_style->style;
-    lv_style_init(style);
-    xml_style->name = lv_strdup(style_name);
-
-    size_t long_name_len = lv_strlen(ctx->name) + 1 + lv_strlen(style_name) + 1;
-    xml_style->long_name = lv_malloc(long_name_len);
-    lv_snprintf((char *)xml_style->long_name, long_name_len, "%s.%s", ctx->name, style_name); /*E.g. my_button.style1*/
 
     for(int i = 0; attrs[i]; i += 2) {
         const char * name = attrs[i];
