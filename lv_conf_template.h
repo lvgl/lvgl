@@ -773,7 +773,7 @@
 
 #define LV_USE_WIN        1
 
-#define LV_USE_3DTEXTURE 0
+#define LV_USE_3DTEXTURE  0
 
 /*==================
  * THEMES
