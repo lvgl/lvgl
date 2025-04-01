@@ -4,9 +4,69 @@
 Draw Layers
 ===========
 
-A layer is a buffer with a specified area where pixel rendering occurs.  Each display
-has a "main" layer, but additional layers may be created internally during rendering
-to handle tasks such as Widget transformations.
+Not to be confused with a :ref:`Display's main 4 layers <display_screen_layers>`, a
+:dfn:`Draw Layer` is a buffer created during rendering, necessitated by certain style
+properties, so different sets of pixels are correctly combined.  Factors requiring
+such layers are:
+
+- partial opacity
+- bit-mask being applied
+- blend mode
+- clipped corners (a bit-mask application)
+- transformations
+
+    - scale
+    - skew
+    - rotation
+
+Later that layer will be merged to the screen or its parent layer at the correct
+point in the rendering sequence.
+
+
+
+Layer Types
+***********
+
+Simple Layer
+------------
+
+The following style properties trigger the creation of a "Simple Layer":
+
+- ``opa_layered``
+- ``bitmap_mask_src``
+- ``blend_mode``
+
+In this case the Widget will be sliced into ``LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE``
+sized chunks.
+
+If there is no memory for a new chunk, LVGL will try allocating the layer after
+another chunk is rendered and freed.
+
+
+Transform Layer
+---------------
+
+The following style properties trigger the creation of a "Transform Layer":
+
+- ``transform_scale_x``
+- ``transform_scale_y``
+- ``transform_skew_x``
+- ``transform_skew_y``
+- ``transform_rotate``
+
+Due to the nature of transformations, the Widget being transformed (and its children)
+must be rendered first, followed by the transformation step.  This necessitates a
+temporary drawing area (layer), often larger than the Widget proper, to provide an
+area of adequate size for the transformation.  LVGL tries to render as small area of
+the widget as possible, but due to the nature of transformations no slicing is
+possible in this case.
+
+
+Clip Corner
+-----------
+
+The ``clip_corner`` style property also causes LVGL to create a 2 layers with radius
+height for the top and bottom parts of the Widget.
 
 
 
@@ -15,8 +75,7 @@ Getting the Current Layer
 
 The first parameter of the ``lv_draw_rect/label/etc`` functions is a layer.
 
-In most of the cases a layer is not created, but an existing layer is used
-to draw there.
+In most cases a layer is not created, but an existing layer is used to draw there.
 
 The draw API can be used in these cases and the current layer can be used differently
 in each case:
@@ -104,8 +163,8 @@ Layer buffers can be large, so ensure there is sufficient heap memory or increas
 :c:macro:`LV_MEM_SIZE` in ``lv_conf.h``.
 
 
-Layer Types
------------
+Layer Type Memory Requirements
+------------------------------
 
 To save memory, LVGL can render certain types of layers in smaller chunks:
 
@@ -116,8 +175,8 @@ To save memory, LVGL can render certain types of layers in smaller chunks:
     This avoids allocating a large buffer for the entire layer. The buffer size for a
     chunk is set using :c:macro:`LV_DRAW_LAYER_SIMPLE_BUF_SIZE` in ``lv_conf.h``.
 
-2.  **Transformed Layers**:
-    Transformed Widgets cannot be rendered in chunks because transformations
+2.  **Transform Layers**:
+    Transform Widgets cannot be rendered in chunks because transformations
     often affect pixels outside the given area. For such layers, LVGL allocates
     a buffer large enough to render the entire transformed area without limits.
 

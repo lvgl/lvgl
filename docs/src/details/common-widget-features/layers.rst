@@ -11,7 +11,8 @@ things:
 2.  in the context of pixel rendering (drawing), there are :ref:`draw_layers`;
 3.  permanent :ref:`display_screen_layers` are part of each :ref:`display` object.
 
-#1 and #2 are covered below.  #3 is covered in :ref:`display_screen_layers`.
+#1 is covered below.  #2 and #3 are covered in :ref:`draw_layers` and
+:ref:`display_screen_layers` respectively.
 
 
 
@@ -52,6 +53,7 @@ its children.
    /* Delete the second label */
    lv_obj_delete(label2);
 
+
 .. _layers_order:
 
 Changing Order
@@ -71,54 +73,15 @@ There are four explicit ways to bring a Widget to the foreground:
 - When :cpp:expr:`lv_obj_set_parent(widget, new_parent)` is used, ``widget`` will be on the foreground of ``new_parent``.
 
 
-.. _draw_layers:
-
-Draw Layers
-***********
-
-Some style properties cause LVGL to allocate a buffer and render a Widget and its
-children there first.  Later that layer will be merged to the screen or its parent
-layer after applying some transformations or other modifications.
-
-Simple Layer
-------------
-
-The following style properties trigger the creation of a "Simple Layer":
-
-- ``opa_layered``
-- ``bitmap_mask_src``
-- ``blend_mode``
-
-In this case the Widget will be sliced into ``LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE``
-sized chunks.
-
-If there is no memory for a new chunk, LVGL will try allocating the layer after
-another chunk is rendered and freed.
-
-Transformed Layer
------------------
-
-When the widget is transformed a larger part of the Widget needs to rendered to
-provide enough data for transformation.  LVGL tries to render as small area of the
-widget as possible, but due to the nature of transformations no slicing is possible
-in this case.
-
-The following style properties trigger the creation of a "Transform Layer":
-
-- ``transform_scale_x``
-- ``transform_scale_y``
-- ``transform_skew_x``
-- ``transform_skew_y``
-- ``transform_rotate``
-
-Clip corner
------------
-
-The ``clip_corner`` style property also causes LVGL to create a 2 layers with radius
-height for the top and bottom parts of the Widget.
 
 
 .. _layers_api:
 
 API
 ***
+
+.. API equals:
+    lv_obj_move_foreground
+    lv_obj_move_to_index
+    lv_obj_swap
+    lv_obj_set_parent
