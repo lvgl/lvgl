@@ -74,7 +74,7 @@ static bool lv_font_manager_delete_font_single(lv_font_manager_t * manager, lv_f
 static lv_font_t * lv_font_manager_create_font_family(lv_font_manager_t * manager, const lv_font_info_t * ft_info);
 static void lv_font_manager_delete_font_family(lv_font_manager_t * manager, lv_font_t * font);
 
-static void lv_font_manager_add_src_core(lv_font_manager_t * manager, const char * name, const char * path,
+static bool lv_font_manager_add_src_core(lv_font_manager_t * manager, const char * name, const char * path,
                                          const lv_font_class_t * class_p, bool is_static);
 
 /**********************
@@ -138,20 +138,20 @@ bool lv_font_manager_delete(lv_font_manager_t * manager)
     return true;
 }
 
-void lv_font_manager_add_src(lv_font_manager_t * manager,
+bool lv_font_manager_add_src(lv_font_manager_t * manager,
                              const char * name,
                              const void * src,
                              const lv_font_class_t * class_p)
 {
-    lv_font_manager_add_src_core(manager, name, src, class_p, false);
+    return lv_font_manager_add_src_core(manager, name, src, class_p, false);
 }
 
-void lv_font_manager_add_src_static(lv_font_manager_t * manager,
+bool lv_font_manager_add_src_static(lv_font_manager_t * manager,
                                     const char * name,
                                     const void * src,
                                     const lv_font_class_t * class_p)
 {
-    lv_font_manager_add_src_core(manager, name, src, class_p, true);
+    return lv_font_manager_add_src_core(manager, name, src, class_p, true);
 }
 
 bool lv_font_manager_remove_src(lv_font_manager_t * manager, const char * name)
@@ -374,7 +374,7 @@ static void lv_font_manager_delete_font_family(lv_font_manager_t * manager, lv_f
     }
 }
 
-static void lv_font_manager_add_src_core(lv_font_manager_t * manager,
+static bool lv_font_manager_add_src_core(lv_font_manager_t * manager,
                                          const char * name,
                                          const char * src,
                                          const lv_font_class_t * class_p,
@@ -387,7 +387,7 @@ static void lv_font_manager_add_src_core(lv_font_manager_t * manager,
 
     if(lv_font_manager_get_src(manager, name)) {
         LV_LOG_WARN("name: %s already exists", name);
-        return;
+        return false;
     }
 
     lv_font_src_t * font_src = lv_ll_ins_tail(&manager->src_ll);
@@ -409,6 +409,7 @@ static void lv_font_manager_add_src_core(lv_font_manager_t * manager,
     }
 
     LV_LOG_INFO("name: %s, src: %p add success", name, src);
+    return true;
 }
 
 static lv_font_src_t * lv_font_manager_get_src(lv_font_manager_t * manager, const char * name)
