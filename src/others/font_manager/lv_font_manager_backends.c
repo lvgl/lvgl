@@ -12,6 +12,7 @@
 #if LV_USE_FONT_MANAGER
 
 #include "../../libs/freetype/lv_freetype.h"
+#include "../../libs/tiny_ttf/lv_tiny_ttf.h"
 #include "../../stdlib/lv_sprintf.h"
 
 /*********************
@@ -38,6 +39,13 @@ static void builtin_font_free_src_cb(void * src);
     static void freetype_font_free_src_cb(void * src);
 #endif /*LV_USE_FREETYPE*/
 
+#if LV_USE_TINY_TTF
+    static lv_font_t * tiny_ttf_font_create_cb(const lv_font_info_t * info, const void * src);
+    static void tiny_ttf_font_delete_cb(lv_font_t * font);
+    static void * tiny_ttf_font_dup_src_cb(const void * src);
+    static void tiny_ttf_font_free_src_cb(void * src);
+#endif /*LV_USE_TINY_TTF*/
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -50,15 +58,22 @@ const lv_font_class_t lv_builtin_font_class = {
 };
 
 #if LV_USE_FREETYPE
-
 const lv_font_class_t lv_freetype_font_class = {
     .create_cb = freetype_font_create_cb,
     .delete_cb = freetype_font_delete_cb,
     .dup_src_cb = freetype_font_dup_src_cb,
     .free_src_cb = freetype_font_free_src_cb,
 };
-
 #endif /*LV_USE_FREETYPE*/
+
+#if LV_USE_TINY_TTF
+const lv_font_class_t lv_tiny_ttf_font_class = {
+    .create_cb = tiny_ttf_font_create_cb,
+    .delete_cb = tiny_ttf_font_delete_cb,
+    .dup_src_cb = tiny_ttf_font_dup_src_cb,
+    .free_src_cb = tiny_ttf_font_free_src_cb,
+};
+#endif /*LV_USE_TINY_TTF*/
 
 /**********************
  *      MACROS
@@ -138,6 +153,64 @@ static void freetype_font_free_src_cb(void * src)
 }
 
 #endif /*LV_USE_FREETYPE*/
+
+#if LV_USE_TINY_TTF
+
+static lv_font_t * tiny_ttf_font_create_cb(const lv_font_info_t * info, const void * src)
+{
+    const lv_tiny_ttf_font_src_t * font_src = src;
+
+    if(font_src->path) {
+#if LV_TINY_TTF_FILE_SUPPORT
+        if(font_src->cache_size) {
+            return lv_tiny_ttf_create_file_ex(font_src->path, info->size, info->kerning, font_src->cache_size);
+        }
+
+        return lv_tiny_ttf_create_file(font_src->path, info->size);
+#else
+        LV_LOG_WARN("LV_TINY_TTF_FILE_SUPPORT not enabled");
+        return NULL;
+#endif
+    }
+
+    if(font_src->cache_size) {
+        return lv_tiny_ttf_create_data_ex(font_src->data, font_src->data_size, info->size, info->kerning, font_src->cache_size);
+    }
+
+    return lv_tiny_ttf_create_data(font_src->data, font_src->data_size, info->size);
+}
+
+static void tiny_ttf_font_delete_cb(lv_font_t * font)
+{
+    lv_tiny_ttf_destroy(font);
+}
+
+static void * tiny_ttf_font_dup_src_cb(const void * src)
+{
+    const lv_tiny_ttf_font_src_t * font_src = src;
+
+    lv_tiny_ttf_font_src_t * new_src = lv_malloc_zeroed(sizeof(lv_tiny_ttf_font_src_t));
+
+    if(font_src->path) {
+        new_src->path = lv_strdup(font_src->path);
+    }
+
+    *new_src = *font_src;
+    return new_src;
+}
+
+static void tiny_ttf_font_free_src_cb(void * src)
+{
+    lv_tiny_ttf_font_src_t * font_src = src;
+    if(font_src->path) {
+        lv_free((char *)font_src->path);
+        font_src->path = NULL;
+    }
+
+    lv_free(font_src);
+}
+
+#endif /*LV_USE_TINY_TTF*/
 
 /**********************
  *   STATIC FUNCTIONS
