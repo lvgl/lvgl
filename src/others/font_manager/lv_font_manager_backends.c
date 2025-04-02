@@ -119,7 +119,7 @@ static void * builtin_font_dup_src_cb(const void * src)
         return NULL;
     }
 
-    lv_builtin_font_src_t * new_src = lv_malloc(sizeof(lv_builtin_font_src_t) * len);
+    lv_builtin_font_src_t * new_src = lv_malloc_zeroed(sizeof(lv_builtin_font_src_t) * (len + 1));
     LV_ASSERT_MALLOC(new_src);
     lv_memcpy(new_src, src, sizeof(lv_builtin_font_src_t) * len);
 
