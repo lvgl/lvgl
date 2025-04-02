@@ -3,6 +3,10 @@
  *
  */
 
+/**
+ * Modified by NXP in 2025
+ */
+
 #ifndef LV_SDL_WINDOW_H
 #define LV_SDL_WINDOW_H
 
@@ -44,6 +48,8 @@ void lv_sdl_window_set_zoom(lv_display_t * disp, float zoom);
 float lv_sdl_window_get_zoom(lv_display_t * disp);
 
 void lv_sdl_window_set_title(lv_display_t * disp, const char * title);
+
+void lv_sdl_window_set_icon(lv_display_t * disp, void * icon, int32_t width, int32_t height);
 
 void * lv_sdl_window_get_renderer(lv_display_t * disp);
 

@@ -3,6 +3,10 @@
  *
  */
 
+/**
+ * Modified by NXP in 2025
+ */
+
 /*********************
  *      INCLUDES
  *********************/
@@ -187,6 +191,15 @@ void lv_sdl_window_set_title(lv_display_t * disp, const char * title)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     SDL_SetWindowTitle(dsc->window, title);
+}
+
+void lv_sdl_window_set_icon(lv_display_t * disp, void * icon, int32_t width, int32_t height)
+{
+    lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    SDL_Surface * iconSurface = SDL_CreateRGBSurfaceWithFormatFrom(icon, width, height, 32, width * 4,
+                                                                   SDL_PIXELFORMAT_ARGB8888);
+    SDL_SetWindowIcon(dsc->window, iconSurface);
+    SDL_FreeSurface(iconSurface);
 }
 
 void * lv_sdl_window_get_renderer(lv_display_t * disp)
