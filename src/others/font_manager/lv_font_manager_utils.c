@@ -36,7 +36,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-bool lv_freetype_info_is_equal(const lv_freetype_info_t * ft_info_1, const lv_freetype_info_t * ft_info_2)
+bool lv_font_info_is_equal(const lv_font_info_t * ft_info_1, const lv_font_info_t * ft_info_2)
 {
     LV_ASSERT_NULL(ft_info_1);
     LV_ASSERT_NULL(ft_info_2);
@@ -44,6 +44,7 @@ bool lv_freetype_info_is_equal(const lv_freetype_info_t * ft_info_1, const lv_fr
     bool is_equal = (ft_info_1->size == ft_info_2->size
                      && ft_info_1->style == ft_info_2->style
                      && ft_info_1->render_mode == ft_info_2->render_mode
+                     && ft_info_1->kerning == ft_info_2->kerning
                      && lv_strcmp(ft_info_1->name, ft_info_2->name) == 0);
 
     return is_equal;
