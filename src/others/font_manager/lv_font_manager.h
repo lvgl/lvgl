@@ -45,12 +45,12 @@ lv_font_manager_t * lv_font_manager_create(uint32_t recycle_cache_size);
  */
 bool lv_font_manager_delete(lv_font_manager_t * manager);
 
-void lv_font_manager_add_src(lv_font_manager_t * manager,
+bool lv_font_manager_add_src(lv_font_manager_t * manager,
                              const char * name,
                              const void * src,
                              const lv_font_class_t * class_p);
 
-void lv_font_manager_add_src_static(lv_font_manager_t * manager,
+bool lv_font_manager_add_src_static(lv_font_manager_t * manager,
                                     const char * name,
                                     const void * src,
                                     const lv_font_class_t * class_p);
@@ -65,9 +65,9 @@ bool lv_font_manager_remove_src(lv_font_manager_t * manager, const char * name);
  * @param name font name.
  * @param path font file path.
  */
-static inline void lv_font_manager_add_path(lv_font_manager_t * manager, const char * name, const char * path)
+static inline bool lv_font_manager_add_path(lv_font_manager_t * manager, const char * name, const char * path)
 {
-    lv_font_manager_add_src(manager, name, path, &lv_freetype_font_class);
+    return lv_font_manager_add_src(manager, name, path, &lv_freetype_font_class);
 }
 
 /**
@@ -76,9 +76,9 @@ static inline void lv_font_manager_add_path(lv_font_manager_t * manager, const c
  * @param name font name.
  * @param path font file path.
  */
-static inline void lv_font_manager_add_path_static(lv_font_manager_t * manager, const char * name, const char * path)
+static inline bool lv_font_manager_add_path_static(lv_font_manager_t * manager, const char * name, const char * path)
 {
-    lv_font_manager_add_src_static(manager, name, path, &lv_freetype_font_class);
+    return lv_font_manager_add_src_static(manager, name, path, &lv_freetype_font_class);
 }
 
 #endif /* LV_USE_FREETYPE */
