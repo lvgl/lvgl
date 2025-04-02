@@ -41,6 +41,16 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
+
+#if LV_DRAW_SW_SUPPORT_ARGB8888
+    static void /* LV_ATTRIBUTE_FAST_MEM */ argb8888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc);
+#endif
+
+static void /* LV_ATTRIBUTE_FAST_MEM */ argb8888_premultiplied_image_blend(lv_draw_sw_blend_image_dsc_t * dsc);
+
+static inline void /* LV_ATTRIBUTE_FAST_MEM */ blend_non_normal_pixel_premultiplied(
+    lv_color32_t * dest, lv_color32_t src, lv_blend_mode_t mode, lv_color_mix_alpha_cache_t * cache);
+
 static inline lv_color32_t lv_color_32_32_mix_premul(lv_color32_t fg, lv_color32_t bg,
                                                      lv_color_mix_alpha_cache_t * cache);
 
@@ -50,8 +60,6 @@ static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * b
 
 static void lv_color_mix_with_alpha_cache_init(lv_color_mix_alpha_cache_t * cache);
 
-static lv_color32_t lv_color_mix32_premul(lv_color32_t fg, lv_color32_t bg);
-
 /**********************
 *  STATIC VARIABLES
 **********************/
@@ -60,6 +68,37 @@ static lv_color32_t lv_color_mix32_premul(lv_color32_t fg, lv_color32_t bg);
  *      MACROS
  **********************/
 
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED
+    #define   LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED(...)             LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_WITH_OPA
+    #define   LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_WITH_OPA(...)             LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_WITH_MASK
+    #define   LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_WITH_MASK(...)             LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_MIX_MASK_OPA
+    #define   LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_MIX_MASK_OPA(...)             LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_ARGB8888_PREMULTIPLIED_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED
+    #define   LV_DRAW_SW_ARGB8888_PREMULTIPLIED_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED(...)             LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_ARGB8888_PREMULTIPLIED_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_WITH_OPA
+    #define   LV_DRAW_SW_ARGB8888_PREMULTIPLIED_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_WITH_OPA(...)             LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_ARGB8888_PREMULTIPLIED_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_WITH_MASK
+    #define   LV_DRAW_SW_ARGB8888_PREMULTIPLIED_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_WITH_MASK(...)             LV_RESULT_INVALID
+#endif
+
+#ifndef LV_DRAW_SW_ARGB8888_PREMULTIPLIED_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_MIX_MASK_OPA
+    #define   LV_DRAW_SW_ARGB8888_PREMULTIPLIED_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_MIX_MASK_OPA(...)             LV_RESULT_INVALID
+#endif
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -100,35 +139,8 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_argb8888_premultiplied(lv_d
         uint32_t color32 = lv_color_to_u32(dsc->color);
         uint32_t * dest_buf = dsc->dest_buf;
 
-        /* Ensure dest_buf is 16-byte aligned */
-        if(((uintptr_t)dest_buf & 0xF) != 0) {
-            LV_LOG_ERROR("dest_buf is not 16-byte aligned!");
-            return;
-        }
-
         for(y = 0; y < h; y++) {
-            for(x = 0; x < w - 16; x += 16) {
-                dest_buf[x + 0] = color32;
-                dest_buf[x + 1] = color32;
-                dest_buf[x + 2] = color32;
-                dest_buf[x + 3] = color32;
-
-                dest_buf[x + 4] = color32;
-                dest_buf[x + 5] = color32;
-                dest_buf[x + 6] = color32;
-                dest_buf[x + 7] = color32;
-
-                dest_buf[x + 8] = color32;
-                dest_buf[x + 9] = color32;
-                dest_buf[x + 10] = color32;
-                dest_buf[x + 11] = color32;
-
-                dest_buf[x + 12] = color32;
-                dest_buf[x + 13] = color32;
-                dest_buf[x + 14] = color32;
-                dest_buf[x + 15] = color32;
-            }
-            for(; x < w; x ++) {
+            for(x = 0; x < w; x++) {
                 dest_buf[x] = color32;
             }
             dest_buf = drawbuf_next_row(dest_buf, dest_stride);
@@ -188,6 +200,31 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_argb8888_premultiplied(lv_d
  */
 void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_argb8888_premultiplied(lv_draw_sw_blend_image_dsc_t * dsc)
 {
+
+    switch(dsc->src_color_format) {
+#if LV_DRAW_SW_SUPPORT_ARGB8888
+        case LV_COLOR_FORMAT_ARGB8888:
+            argb8888_image_blend(dsc);
+            break;
+#endif
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+            argb8888_premultiplied_image_blend(dsc);
+            break;
+
+        default:
+            LV_LOG_WARN("Not supported source color format");
+            break;
+    }
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+#if LV_DRAW_SW_SUPPORT_ARGB8888
+
+static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_dsc_t * dsc)
+{
     int32_t w = dsc->dest_w;
     int32_t h = dsc->dest_h;
     lv_opa_t opa = dsc->opa;
@@ -198,44 +235,230 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_argb8888_premultiplied(lv_d
     const lv_opa_t * mask_buf = dsc->mask_buf;
     int32_t mask_stride = dsc->mask_stride;
 
+    lv_color32_t color_argb;
     lv_color_mix_alpha_cache_t cache;
     lv_color_mix_with_alpha_cache_init(&cache);
 
-    /* Iterate over every pixel in the image */
-    for(int32_t y = 0; y < h; y++) {
-        for(int32_t x = 0; x < w; x++) {
-            lv_color32_t src = src_buf_c32[x];
+    int32_t x, y;
 
-            /* Convert from premultiplied alpha back to standard RGB */
-            if(src.alpha > 0) {
-                uint16_t alpha_inv = (255 * 256) / src.alpha; /* Compute once */
-                src.red   = (src.red   * alpha_inv) >> 8;
-                src.green = (src.green * alpha_inv) >> 8;
-                src.blue  = (src.blue  * alpha_inv) >> 8;
-            }
+    if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
+        if(mask_buf == NULL && opa >= LV_OPA_MAX) {
+            if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED(dsc)) {
+                for(y = 0; y < h; y++) {
+                    for(x = 0; x < w; x++) {
+                        color_argb = src_buf_c32[x];
 
-            /* Apply mask and opacity adjustments */
-            if(mask_buf) {
-                src.alpha = LV_OPA_MIX2(src.alpha, mask_buf[x]);
-            }
-            else if(opa < LV_OPA_MAX) {
-                src.alpha = LV_OPA_MIX2(src.alpha, opa);
-            }
+                        /* Premultiply alpha */
+                        uint8_t reciprocal = 255 / color_argb.alpha;
+                        color_argb.red   = (color_argb.red   * reciprocal) >> 8;
+                        color_argb.green = (color_argb.green * reciprocal) >> 8;
+                        color_argb.blue  = (color_argb.blue  * reciprocal) >> 8;
 
-            /* Blend the source image pixel with the destination buffer */
-            dest_buf_c32[x] = lv_color_32_32_mix_premul(src, dest_buf_c32[x], &cache);
+                        dest_buf_c32[x] = lv_color_32_32_mix_premul(color_argb, dest_buf_c32[x], &cache);
+                    }
+                    dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
+                    src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
+                }
+            }
         }
+        else if(mask_buf == NULL && opa < LV_OPA_MAX) {
+            if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_WITH_OPA(dsc)) {
+                for(y = 0; y < h; y++) {
+                    for(x = 0; x < w; x++) {
+                        color_argb = src_buf_c32[x];
 
-        /* Move to the next row in both the source and destination buffers */
-        dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
-        src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
-        if(mask_buf) mask_buf += mask_stride;
+                        /* Apply global opacity */
+                        color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, opa);
+
+                        /* Premultiply alpha */
+                        uint8_t reciprocal = 255 / color_argb.alpha;
+                        color_argb.red   = (color_argb.red   * reciprocal) >> 8;
+                        color_argb.green = (color_argb.green * reciprocal) >> 8;
+                        color_argb.blue  = (color_argb.blue  * reciprocal) >> 8;
+
+                        dest_buf_c32[x] = lv_color_32_32_mix_premul(color_argb, dest_buf_c32[x], &cache);
+                    }
+                    dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
+                    src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
+                }
+            }
+        }
+        else if(mask_buf && opa >= LV_OPA_MAX) {
+            if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_WITH_MASK(dsc)) {
+                for(y = 0; y < h; y++) {
+                    for(x = 0; x < w; x++) {
+                        color_argb = src_buf_c32[x];
+
+                        /* Apply mask opacity */
+                        color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, mask_buf[x]);
+
+                        /* Premultiply alpha */
+                        uint8_t reciprocal = 255 / color_argb.alpha;
+                        color_argb.red   = (color_argb.red   * reciprocal) >> 8;
+                        color_argb.green = (color_argb.green * reciprocal) >> 8;
+                        color_argb.blue  = (color_argb.blue  * reciprocal) >> 8;
+
+                        dest_buf_c32[x] = lv_color_32_32_mix_premul(color_argb, dest_buf_c32[x], &cache);
+                    }
+                    dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
+                    src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
+                    mask_buf += mask_stride;
+                }
+            }
+        }
+        else if(mask_buf && opa < LV_OPA_MAX) {
+            if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_MIX_MASK_OPA(dsc)) {
+                for(y = 0; y < h; y++) {
+                    for(x = 0; x < w; x++) {
+                        color_argb = src_buf_c32[x];
+
+                        /* Apply both mask and global opacity */
+                        color_argb.alpha = LV_OPA_MIX3(color_argb.alpha, opa, mask_buf[x]);
+
+                        /* Premultiply alpha */
+                        uint8_t reciprocal = 255 / color_argb.alpha;
+                        color_argb.red   = (color_argb.red   * reciprocal) >> 8;
+                        color_argb.green = (color_argb.green * reciprocal) >> 8;
+                        color_argb.blue  = (color_argb.blue  * reciprocal) >> 8;
+
+                        dest_buf_c32[x] = lv_color_32_32_mix_premul(color_argb, dest_buf_c32[x], &cache);
+                    }
+                    dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
+                    src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
+                    mask_buf += mask_stride;
+                }
+            }
+        }
+    }
+    else {
+        for(y = 0; y < h; y++) {
+            for(x = 0; x < w; x++) {
+                color_argb = src_buf_c32[x];
+
+                /* Apply mask and/or opacity */
+                if(mask_buf == NULL)
+                    color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, opa);
+                else
+                    color_argb.alpha = LV_OPA_MIX3(color_argb.alpha, mask_buf[x], opa);
+
+                /* Premultiply alpha */
+                uint8_t reciprocal = 255 / color_argb.alpha;
+                color_argb.red   = (color_argb.red   * reciprocal) >> 8;
+                color_argb.green = (color_argb.green * reciprocal) >> 8;
+                color_argb.blue  = (color_argb.blue  * reciprocal) >> 8;
+
+                blend_non_normal_pixel_premultiplied(&dest_buf_c32[x], color_argb, dsc->blend_mode, &cache);
+            }
+            if(mask_buf) mask_buf += mask_stride;
+            dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
+            src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
+        }
     }
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
+#endif
+
+static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_blend_image_dsc_t * dsc)
+{
+    int32_t w = dsc->dest_w;
+    int32_t h = dsc->dest_h;
+    lv_opa_t opa = dsc->opa;
+    lv_color32_t * dest_buf_c32 = dsc->dest_buf;
+    int32_t dest_stride = dsc->dest_stride;
+    const lv_color32_t * src_buf_c32 = dsc->src_buf;
+    int32_t src_stride = dsc->src_stride;
+    const lv_opa_t * mask_buf = dsc->mask_buf;
+    int32_t mask_stride = dsc->mask_stride;
+
+    lv_color32_t color_argb;
+    lv_color_mix_alpha_cache_t cache;
+    lv_color_mix_with_alpha_cache_init(&cache);
+
+    int32_t x, y;
+
+    if(dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
+        if(mask_buf == NULL && opa >= LV_OPA_MAX) {
+            if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_PREMULTIPLIED_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED(dsc)) {
+                for(y = 0; y < h; y++) {
+                    for(x = 0; x < w; x++) {
+                        dest_buf_c32[x] = lv_color_32_32_mix_premul(src_buf_c32[x], dest_buf_c32[x], &cache);
+                    }
+                    dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
+                    src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
+                }
+            }
+        }
+        else if(mask_buf == NULL && opa < LV_OPA_MAX) {
+            if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_PREMULTIPLIED_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_WITH_OPA(dsc)) {
+                for(y = 0; y < h; y++) {
+                    for(x = 0; x < w; x++) {
+                        color_argb = src_buf_c32[x];
+
+                        /* Adjust alpha using opacity */
+                        color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, opa);
+
+                        dest_buf_c32[x] = lv_color_32_32_mix_premul(color_argb, dest_buf_c32[x], &cache);
+                    }
+                    dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
+                    src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
+                }
+            }
+        }
+        else if(mask_buf && opa >= LV_OPA_MAX) {
+            if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_PREMULTIPLIED_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_WITH_MASK(dsc)) {
+                for(y = 0; y < h; y++) {
+                    for(x = 0; x < w; x++) {
+                        color_argb = src_buf_c32[x];
+
+                        /* Adjust alpha using mask */
+                        color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, mask_buf[x]);
+
+                        dest_buf_c32[x] = lv_color_32_32_mix_premul(color_argb, dest_buf_c32[x], &cache);
+                    }
+                    dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
+                    src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
+                    mask_buf += mask_stride;
+                }
+            }
+        }
+        else if(mask_buf && opa < LV_OPA_MAX) {
+            if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_PREMULTIPLIED_BLEND_NORMAL_TO_ARGB8888_PREMULTIPLIED_MIX_MASK_OPA(dsc)) {
+                for(y = 0; y < h; y++) {
+                    for(x = 0; x < w; x++) {
+                        color_argb = src_buf_c32[x];
+
+                        /* Adjust alpha using both mask and opacity */
+                        color_argb.alpha = LV_OPA_MIX3(color_argb.alpha, opa, mask_buf[x]);
+
+                        dest_buf_c32[x] = lv_color_32_32_mix_premul(color_argb, dest_buf_c32[x], &cache);
+                    }
+                    dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
+                    src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
+                    mask_buf += mask_stride;
+                }
+            }
+        }
+    }
+    else {
+        for(y = 0; y < h; y++) {
+            for(x = 0; x < w; x++) {
+                color_argb = src_buf_c32[x];
+
+                /* Adjust alpha if needed */
+                if(mask_buf == NULL)
+                    color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, opa);
+                else
+                    color_argb.alpha = LV_OPA_MIX3(color_argb.alpha, mask_buf[x], opa);
+
+                blend_non_normal_pixel_premultiplied(&dest_buf_c32[x], color_argb, dsc->blend_mode, &cache);
+            }
+            if(mask_buf) mask_buf += mask_stride;
+            dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
+            src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
+        }
+    }
+}
+
 
 /**
  * @brief Mix two ARGB8888 premultiplied colors.
@@ -261,7 +484,7 @@ static inline lv_color32_t lv_color_32_32_mix_premul(lv_color32_t fg, lv_color32
     }
     /* Opaque background: use simple mix */
     else if(bg.alpha == 255) {
-        return lv_color_mix32_premul(fg, bg);
+        return lv_color_mix32_premultiplied(fg, bg);
     }
     else {
         /* Check cache to avoid redundant calculations */
@@ -306,24 +529,49 @@ static inline void * LV_ATTRIBUTE_FAST_MEM drawbuf_next_row(const void * buf, ui
     return (void *)((uint8_t *)buf + stride);
 }
 
-static lv_color32_t lv_color_mix32_premul(lv_color32_t fg, lv_color32_t bg)
+
+static inline void LV_ATTRIBUTE_FAST_MEM blend_non_normal_pixel_premultiplied(
+    lv_color32_t * dest, lv_color32_t src, lv_blend_mode_t mode, lv_color_mix_alpha_cache_t * cache)
 {
-    if(fg.alpha >= LV_OPA_MAX) {
-        return fg;  /* Fully opaque foreground replaces background */
+    lv_color32_t res;
+    uint8_t src_alpha = src.alpha;  /* Premultiplied alpha of source */
+    uint8_t dest_alpha = dest->alpha;
+
+    switch(mode) {
+        case LV_BLEND_MODE_ADDITIVE:
+            /* Ensure RGB remains premultiplied */
+            res.red   = LV_MIN(dest->red + src.red, dest_alpha);
+            res.green = LV_MIN(dest->green + src.green, dest_alpha);
+            res.blue  = LV_MIN(dest->blue + src.blue, dest_alpha);
+            break;
+
+        case LV_BLEND_MODE_SUBTRACTIVE:
+            /* Ensure RGB remains non-negative and premultiplied */
+            res.red   = LV_MAX(dest->red - src.red, 0);
+            res.green = LV_MAX(dest->green - src.green, 0);
+            res.blue  = LV_MAX(dest->blue - src.blue, 0);
+            break;
+
+        case LV_BLEND_MODE_MULTIPLY:
+            /* Adjusted for premultiplied alpha: scale the result properly */
+            res.red   = ((dest->red * src.red) / LV_MAX(src_alpha, 1));
+            res.green = ((dest->green * src.green) / LV_MAX(src_alpha, 1));
+            res.blue  = ((dest->blue * src.blue) / LV_MAX(src_alpha, 1));
+            break;
+
+        case LV_BLEND_MODE_DIFFERENCE:
+            res.red   = LV_ABS(dest->red - src.red);
+            res.green = LV_ABS(dest->green - src.green);
+            res.blue  = LV_ABS(dest->blue - src.blue);
+            break;
+
+        default:
+            LV_LOG_WARN("Not supported blend mode: %d", mode);
+            return;
     }
-    if(fg.alpha <= LV_OPA_MIN) {
-        return bg;  /* Fully transparent foreground, return background */
-    }
 
-    uint32_t inv_fg_alpha = LV_OPA_MAX - fg.alpha;
-
-    /* Premultiplied blending */
-    bg.red   = fg.red   + ((bg.red   * inv_fg_alpha) >> 8);
-    bg.green = fg.green + ((bg.green * inv_fg_alpha) >> 8);
-    bg.blue  = fg.blue  + ((bg.blue  * inv_fg_alpha) >> 8);
-    bg.alpha = fg.alpha + ((bg.alpha * inv_fg_alpha) >> 8);
-
-    return bg;
+    res.alpha = src_alpha;  /* Keep the alpha from premultiplied source */
+    *dest = lv_color_32_32_mix_premul(res, *dest, cache);
 }
 
 
