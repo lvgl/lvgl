@@ -36,7 +36,7 @@ static void test_font_manager_src(add_src_cb_t add_src_cb)
     TEST_ASSERT_NOT_NULL(g_font_manager);
 
     /* Register built-in font sources */
-    lv_builtin_font_src_t builtin_font_src[3] = { 0 };
+    static lv_builtin_font_src_t builtin_font_src[3] = { 0 };
     builtin_font_src[0].font_p = &lv_font_montserrat_14;
     builtin_font_src[0].size = 14;
     builtin_font_src[1].font_p = &lv_font_montserrat_32;
