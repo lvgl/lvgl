@@ -8,6 +8,12 @@
     && LV_USE_FREETYPE \
     && LV_USE_TINY_TTF && LV_TINY_TTF_FILE_SUPPORT
 
+#ifndef NON_AMD64_BUILD
+    #define EXT_NAME ".lp64.png"
+#else
+    #define EXT_NAME ".lp32.png"
+#endif
+
 static lv_font_manager_t * g_font_manager = NULL;
 
 typedef bool (*add_src_cb_t)(lv_font_manager_t * manager,
@@ -55,53 +61,80 @@ static void test_font_manager_src(add_src_cb_t add_src_cb)
 
     /* Register FreeType font source */
     add_src_result = add_src_cb(g_font_manager,
-                                "NotoColorEmoji",
-                                PATH_PREFIX "lvgl/examples/libs/freetype/NotoColorEmoji-32.subset.ttf",
+                                "NotoSansSC-Regular",
+                                "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf",
                                 &lv_freetype_font_class);
     TEST_ASSERT_TRUE(add_src_result);
 
-
     /* Register TinyTTF font source */
-    static const lv_tiny_ttf_font_src_t tiny_ttf_font_src = {
-        .path = "A:lvgl/examples/libs/tiny_ttf/Ubuntu-Medium.ttf",
-        .data = NULL,
-        .data_size = 0,
-        .cache_size = 0,
-    };
+    extern const uint8_t test_ubuntu_font[];
+    extern size_t test_ubuntu_font_size;
+    static lv_tiny_ttf_font_src_t tiny_ttf_font_data_src = { 0 };
+    tiny_ttf_font_data_src.data = test_ubuntu_font;
+    tiny_ttf_font_data_src.data_size = test_ubuntu_font_size;
 
     add_src_result = add_src_cb(g_font_manager,
                                 "Ubuntu-Medium",
-                                &tiny_ttf_font_src,
+                                &tiny_ttf_font_data_src,
+                                &lv_tiny_ttf_font_class);
+    TEST_ASSERT_TRUE(add_src_result);
+
+    static lv_tiny_ttf_font_src_t tiny_ttf_font_file_src = { 0 };
+    tiny_ttf_font_file_src.path = "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf";
+
+    add_src_result = add_src_cb(g_font_manager,
+                                "NotoSansSC-Regular-2",
+                                &tiny_ttf_font_file_src,
                                 &lv_tiny_ttf_font_class);
     TEST_ASSERT_TRUE(add_src_result);
 
     /* Create font from font manager */
-    lv_font_t * font = lv_font_manager_create_font(g_font_manager,
-                                                   "Ubuntu-Medium,NotoColorEmoji,Montserrat,UNKNOWN_FONT",
-                                                   LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
-                                                   32,
-                                                   LV_FREETYPE_FONT_STYLE_NORMAL);
+    lv_font_t * font_14 = lv_font_manager_create_font(g_font_manager,
+                                                      "NotoSansSC-Regular,Ubuntu-Medium,Montserrat,UNKNOWN_FONT_NAME",
+                                                      LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
+                                                      14,
+                                                      LV_FREETYPE_FONT_STYLE_NORMAL);
+    TEST_ASSERT_NOT_NULL(font_14);
 
-    TEST_ASSERT_NOT_NULL(font);
+    lv_font_t * font_32 = lv_font_manager_create_font(g_font_manager,
+                                                      "Ubuntu-Medium,NotoSansSC-Regular,Montserrat",
+                                                      LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
+                                                      32,
+                                                      LV_FREETYPE_FONT_STYLE_NORMAL);
+    TEST_ASSERT_NOT_NULL(font_32);
+
+    lv_font_t * font_40 = lv_font_manager_create_font(g_font_manager,
+                                                      "Ubuntu-Medium,NotoSansSC-Regular-2,Montserrat",
+                                                      0,
+                                                      40,
+                                                      0);
+    TEST_ASSERT_NOT_NULL(font_40);
 
     /* Create label with the font */
     lv_obj_t * label = lv_label_create(lv_screen_active());
-    lv_obj_set_style_text_font(label, font, 0);
-    lv_label_set_text(label, "Hello Font Manager! 😀 " LV_SYMBOL_OK);
+    lv_label_set_text(label,
+                      "这是一段中文。\n"
+                      "This is a English text.\n"
+                      "Symbols: " LV_SYMBOL_OK LV_SYMBOL_CLOSE);
     lv_obj_center(label);
 
-#ifndef NON_AMD64_BUILD
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/font_manager_1.lp32.png")
-#else
-    TEST_ASSERT_EQUAL_SCREENSHOT("libs/font_manager_1.lp64.png")
-#endif
+    lv_obj_set_style_text_font(label, font_14, 0);
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/font_manager_1" EXT_NAME);
+
+    lv_obj_set_style_text_font(label, font_32, 0);
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/font_manager_2" EXT_NAME);
+
+    lv_obj_set_style_text_font(label, font_40, 0);
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/font_manager_3" EXT_NAME);
 
     /* Should not be deleted successfully, because it is used by the label */
     bool delete_result = lv_font_manager_delete(g_font_manager);
     TEST_ASSERT_FALSE(delete_result);
 
     lv_obj_delete(label);
-    lv_font_manager_delete_font(g_font_manager, font);
+    lv_font_manager_delete_font(g_font_manager, font_14);
+    lv_font_manager_delete_font(g_font_manager, font_32);
+    lv_font_manager_delete_font(g_font_manager, font_40);
 
     delete_result = lv_font_manager_delete(g_font_manager);
     TEST_ASSERT_TRUE(delete_result);
