@@ -40,7 +40,7 @@ static void _g2d_fill_with_opa(void * g2d_handle, struct g2d_buf * dst_buf, stru
                                struct g2d_buf * src_buf, struct g2d_surface * src_surf);
 
 static void _g2d_set_src_surf(struct g2d_surface * src_surf, struct g2d_buf * buf, const lv_area_t * area,
-                              int32_t stride, lv_color_t color, lv_opa_t opa);
+                              lv_color_t color, lv_opa_t opa);
 
 static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * buf, const lv_area_t * area,
                               int32_t stride, lv_color_t color);
@@ -98,7 +98,7 @@ void lv_draw_g2d_fill(lv_draw_task_t * t)
         G2D_ASSERT_MSG(tmp_buf, "Failed to alloc temporary buffer.");
         struct g2d_surface * src_surf = lv_malloc(sizeof(struct g2d_surface));
         G2D_ASSERT_MSG(src_surf, "Failed to alloc source surface.");
-        _g2d_set_src_surf(src_surf, tmp_buf, &blend_area, stride, dsc->color, dsc->opa);
+        _g2d_set_src_surf(src_surf, tmp_buf, &blend_area, dsc->color, dsc->opa);
         _g2d_fill_with_opa(u->g2d_handle, dst_buf, dst_surf, tmp_buf, src_surf);
         g2d_free(tmp_buf);
         lv_free(src_surf);
@@ -115,7 +115,7 @@ void lv_draw_g2d_fill(lv_draw_task_t * t)
  **********************/
 
 static void _g2d_set_src_surf(struct g2d_surface * src_surf, struct g2d_buf * buf, const lv_area_t * area,
-                              int32_t stride, lv_color_t color, lv_opa_t opa)
+                              lv_color_t color, lv_opa_t opa)
 {
     int32_t width  = lv_area_get_width(area);
     int32_t height = lv_area_get_height(area);
@@ -126,7 +126,7 @@ static void _g2d_set_src_surf(struct g2d_surface * src_surf, struct g2d_buf * bu
     src_surf->top    = 0;
     src_surf->right  = width;
     src_surf->bottom = height;
-    src_surf->stride = stride;
+    src_surf->stride = width;
     src_surf->width  = width;
     src_surf->height = height;
 
