@@ -19,5 +19,6 @@
 
 		<lv_label bind_text="local_subject" style_margin_top="32px"/>
 		<lv_slider bind_value="local_subject" range_max="#local_int"/>
+		<lv_slider bind_value="not_existing" range_max="#local_int"/>
 	</view>
 </component>
