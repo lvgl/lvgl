@@ -17,11 +17,25 @@ void lv_example_font_manager_2(void)
 #if LV_FONT_MONTSERRAT_14 && LV_FONT_MONTSERRAT_32
 
     /* Register built-in font sources */
+    static lv_builtin_font_src_t builtin_font_src[3] = { 0 };
+    builtin_font_src[0].font_p = &lv_font_montserrat_14;
+    builtin_font_src[0].size = 14;
+    builtin_font_src[1].font_p = &lv_font_montserrat_32;
+    builtin_font_src[1].size = 32;
+
+    /* IMPORTANT! Marking the end of the array */
+    builtin_font_src[2].font_p = NULL;
+    builtin_font_src[2].size = 0;
+
+    /**
+     * Or use a more concise and memory-saving way of writing,
+     * but some compilers may fail to compile.
     static const lv_builtin_font_src_t builtin_font_src[] = {
         {&lv_font_montserrat_14, 14},
         {&lv_font_montserrat_32, 32},
         LV_BUILTIN_FONT_SRC_END
     };
+    */
 
     lv_font_manager_add_src_static(g_font_manager,
                                    "Montserrat",
@@ -76,7 +90,7 @@ void lv_example_font_manager_2(void)
 void lv_example_font_manager_2(void)
 {
     lv_obj_t * label = lv_label_create(lv_screen_active());
-    lv_label_set_text(label, "FreeType or font_manager is not enabled");
+    lv_label_set_text(label, "Font Manager is not enabled");
     lv_obj_center(label);
 }
 
