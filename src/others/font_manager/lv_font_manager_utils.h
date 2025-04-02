@@ -13,11 +13,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../misc/lv_types.h"
+#include "lv_font_manager_types.h"
 
 #if LV_USE_FONT_MANAGER
-
-#include "../../libs/freetype/lv_freetype.h"
 
 /*********************
  *      DEFINES
@@ -26,13 +24,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-typedef struct {
-    const char * name;
-    lv_freetype_font_render_mode_t render_mode;
-    lv_freetype_font_style_t style;
-    uint32_t size;
-} lv_freetype_info_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -44,7 +35,7 @@ typedef struct {
  * @param ft_info_2 font information 2.
  * @return return true if the fonts are equal.
  */
-bool lv_freetype_info_is_equal(const lv_freetype_info_t * ft_info_1, const lv_freetype_info_t * ft_info_2);
+bool lv_font_info_is_equal(const lv_font_info_t * ft_info_1, const lv_font_info_t * ft_info_2);
 
 /**********************
  *      MACROS

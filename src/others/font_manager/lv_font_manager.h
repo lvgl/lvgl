@@ -13,13 +13,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../misc/lv_types.h"
+#include "lv_font_manager_backends.h"
 
 #if LV_USE_FONT_MANAGER
-
-#if !LV_USE_FREETYPE
-#error "LV_USE_FONT_MANAGER requires LV_USE_FREETYPE"
-#endif
 
 /*********************
  *      DEFINES
@@ -49,13 +45,30 @@ lv_font_manager_t * lv_font_manager_create(uint32_t recycle_cache_size);
  */
 bool lv_font_manager_delete(lv_font_manager_t * manager);
 
+void lv_font_manager_add_src(lv_font_manager_t * manager,
+                             const char * name,
+                             const void * src,
+                             const lv_font_class_t * class_p);
+
+void lv_font_manager_add_src_static(lv_font_manager_t * manager,
+                                    const char * name,
+                                    const void * src,
+                                    const lv_font_class_t * class_p);
+
+bool lv_font_manager_remove_src(lv_font_manager_t * manager, const char * name);
+
+#if LV_USE_FREETYPE
+
 /**
  * Add the font file path.
  * @param manager pointer to main font manager.
  * @param name font name.
  * @param path font file path.
  */
-void lv_font_manager_add_path(lv_font_manager_t * manager, const char * name, const char * path);
+static inline void lv_font_manager_add_path(lv_font_manager_t * manager, const char * name, const char * path)
+{
+    lv_font_manager_add_src(manager, name, path, &lv_freetype_font_class);
+}
 
 /**
  * Add the font file path with static memory.
@@ -63,7 +76,12 @@ void lv_font_manager_add_path(lv_font_manager_t * manager, const char * name, co
  * @param name font name.
  * @param path font file path.
  */
-void lv_font_manager_add_path_static(lv_font_manager_t * manager, const char * name, const char * path);
+static inline void lv_font_manager_add_path_static(lv_font_manager_t * manager, const char * name, const char * path)
+{
+    lv_font_manager_add_src_static(manager, name, path, &lv_freetype_font_class);
+}
+
+#endif /* LV_USE_FREETYPE */
 
 /**
  * Remove the font file path.
@@ -71,19 +89,25 @@ void lv_font_manager_add_path_static(lv_font_manager_t * manager, const char * n
  * @param name font name.
  * @return return true if the remove was successful.
  */
-bool lv_font_manager_remove_path(lv_font_manager_t * manager, const char * name);
+static inline bool lv_font_manager_remove_path(lv_font_manager_t * manager, const char * name)
+{
+    return lv_font_manager_remove_src(manager, name);
+}
 
 /**
  * Create font.
  * @param manager pointer to main font manager.
  * @param font_family font family name.
- * @param render_mode font render mode, see lv_freetype_font_render_mode_t.
+ * @param render_mode font render mode.
  * @param size font size.
- * @param style font style, see lv_freetype_font_style_t.
+ * @param style font style.
  * @return point to the created font
  */
-lv_font_t * lv_font_manager_create_font(lv_font_manager_t * manager, const char * font_family, uint16_t render_mode,
-                                        uint32_t size, uint16_t style);
+lv_font_t * lv_font_manager_create_font(lv_font_manager_t * manager,
+                                        const char * font_family,
+                                        uint32_t render_mode,
+                                        uint32_t size,
+                                        uint32_t style);
 
 /**
  * Delete font.
