@@ -20,7 +20,11 @@
 #ifndef __USE_ISOC11
     #define __USE_ISOC11
 #endif
-#include <stdlib.h>
+#ifndef _WIN32
+    #include <stdlib.h>
+#else
+    #include <malloc.h>
+#endif /* _WIN32 */
 
 #define SDL_MAIN_HANDLED /*To fix SDL's "undefined reference to WinMain" issue*/
 #include "lv_sdl_private.h"
