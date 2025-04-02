@@ -28,7 +28,7 @@
  **********************/
 
 static lv_font_t * builtin_font_create_cb(const lv_font_info_t * info, const void * src);
-static void builtin_font_delete_cb(lv_font_t *);
+static void builtin_font_delete_cb(lv_font_t * font);
 static void * builtin_font_dup_src_cb(const void * src);
 static void builtin_font_free_src_cb(void * src);
 
@@ -97,9 +97,10 @@ static lv_font_t * builtin_font_create_cb(const lv_font_info_t * info, const voi
     return NULL;
 }
 
-static void builtin_font_delete_cb(lv_font_t *)
+static void builtin_font_delete_cb(lv_font_t * font)
 {
     /*Nothing to delete*/
+    LV_UNUSED(font);
 }
 
 static void * builtin_font_dup_src_cb(const void * src)
