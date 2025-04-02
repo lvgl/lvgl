@@ -72,6 +72,23 @@ void lv_profiler_builtin_flush(void);
  */
 void lv_profiler_builtin_write(const char * func, char tag);
 
+/**
+ * @brief Write the profiling data for a function with the given tag and custom time
+ * @param func Name of the function being profiled
+ * @param task Name of the task being profiled
+ * @param tag Tag to associate with the profiling data for the function
+ * @param tick The tick count
+ * @param tid Thread ID of the function
+ * @param cpu CPU ID of the function
+ */
+void lv_profiler_builtin_write_custom(const char * func, const char * task, char tag, uint64_t tick, int tid, int cpu);
+
+/**
+ * @brief Get the current tick count
+ * @return The current tick count
+ */
+uint64_t lv_profiler_builtin_tick_get(void);
+
 /**********************
  *      MACROS
  **********************/
