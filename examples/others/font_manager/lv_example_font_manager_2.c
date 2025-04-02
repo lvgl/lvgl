@@ -14,22 +14,26 @@ void lv_example_font_manager_2(void)
     /* Create font manager, with 8 fonts recycling buffers */
     g_font_manager = lv_font_manager_create(8);
 
+#if LV_FONT_MONTSERRAT_14 && LV_FONT_MONTSERRAT_32
+
     /* Register built-in font sources */
     static const lv_builtin_font_src_t builtin_font_src[] = {
         {&lv_font_montserrat_14, 14},
-        {&lv_font_montserrat_24, 24},
+        {&lv_font_montserrat_32, 32},
         LV_BUILTIN_FONT_SRC_END
     };
+
     lv_font_manager_add_src_static(g_font_manager,
                                    "Montserrat",
                                    builtin_font_src,
                                    &lv_builtin_font_class);
+#endif
 
 #if LV_USE_FREETYPE
     /* Register FreeType font source */
     lv_font_manager_add_src_static(g_font_manager,
-                                   "Lato-Regular",
-                                   PATH_PREFIX "lvgl/examples/libs/freetype/Lato-Regular.ttf",
+                                   "NotoColorEmoji",
+                                   PATH_PREFIX "lvgl/examples/libs/freetype/NotoColorEmoji-32.subset.ttf",
                                    &lv_freetype_font_class);
 #endif
 
@@ -50,9 +54,9 @@ void lv_example_font_manager_2(void)
 
     /* Create font from font manager */
     lv_font_t * font = lv_font_manager_create_font(g_font_manager,
-                                                   "Montserrat,Lato-Regular,Ubuntu-Medium",
+                                                   "Ubuntu-Medium,NotoColorEmoji,Montserrat",
                                                    LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
-                                                   24,
+                                                   32,
                                                    LV_FREETYPE_FONT_STYLE_NORMAL);
 
     if(!font) {
@@ -63,7 +67,7 @@ void lv_example_font_manager_2(void)
     /* Create label with the font */
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_obj_set_style_text_font(label, font, 0);
-    lv_label_set_text(label, "Hello Font Manager!");
+    lv_label_set_text(label, "Hello Font Manager! 😀 " LV_SYMBOL_OK);
     lv_obj_center(label);
 }
 
