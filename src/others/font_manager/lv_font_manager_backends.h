@@ -22,7 +22,6 @@ extern "C" {
  *********************/
 
 #define LV_BUILTIN_FONT_SRC_END {NULL, 0}
-#define LV_TINY_TTF_FONT_SRC_END {NULL, NULL, 0, 0}
 
 /**********************
  *      TYPEDEFS
@@ -35,12 +34,13 @@ typedef struct {
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_font_class_t lv_builtin_font_class;
 
+#if LV_USE_FREETYPE
 typedef const char lv_freetype_font_src_t;
 
-#if LV_USE_FREETYPE
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_font_class_t lv_freetype_font_class;
 #endif /*LV_USE_FREETYPE*/
 
+#if LV_USE_TINY_TTF
 typedef struct {
     const char * path;
     const void * data;
@@ -48,7 +48,6 @@ typedef struct {
     size_t cache_size;
 } lv_tiny_ttf_font_src_t;
 
-#if LV_USE_TINY_TTF
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_font_class_t lv_tiny_ttf_font_class;
 #endif /*LV_USE_TINY_TTF*/
 

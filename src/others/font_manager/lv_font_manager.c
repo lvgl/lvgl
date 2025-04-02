@@ -59,7 +59,7 @@ typedef struct _lv_font_src_t {
  *  STATIC PROTOTYPES
  **********************/
 
-static const lv_font_src_t * lv_font_manager_get_src(lv_font_manager_t * manager, const char * name);
+static lv_font_src_t * lv_font_manager_get_src(lv_font_manager_t * manager, const char * name);
 
 static bool lv_font_manager_check_resource(lv_font_manager_t * manager);
 static lv_font_rec_node_t * lv_font_manager_search_rec_node(lv_font_manager_t * manager, lv_font_t * font);
@@ -411,7 +411,7 @@ static void lv_font_manager_add_src_core(lv_font_manager_t * manager,
     LV_LOG_INFO("name: %s, src: %p add success", name, src);
 }
 
-static const lv_font_src_t * lv_font_manager_get_src(lv_font_manager_t * manager, const char * name)
+static lv_font_src_t * lv_font_manager_get_src(lv_font_manager_t * manager, const char * name)
 {
     lv_font_src_t * font_src;
     LV_LL_READ(&manager->src_ll, font_src) {

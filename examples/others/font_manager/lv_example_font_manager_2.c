@@ -9,28 +9,48 @@
 
 static lv_font_manager_t * g_font_manager = NULL;
 
-void lv_example_font_manager_1(void)
+void lv_example_font_manager_2(void)
 {
     /* Create font manager, with 8 fonts recycling buffers */
     g_font_manager = lv_font_manager_create(8);
 
+    /* Register built-in font sources */
     static const lv_builtin_font_src_t builtin_font_src[] = {
+        {&lv_font_montserrat_14, 14},
         {&lv_font_montserrat_24, 24},
         LV_BUILTIN_FONT_SRC_END
     };
+    lv_font_manager_add_src_static(g_font_manager,
+                                   "Montserrat",
+                                   builtin_font_src,
+                                   &lv_builtin_font_class);
 
 #if LV_USE_FREETYPE
-    /* Add font path mapping to font manager */
-    lv_font_manager_add_path_static(g_font_manager,
-                                    "Lato-Regular",
-                                    PATH_PREFIX "lvgl/examples/libs/freetype/Lato-Regular.ttf");
+    /* Register FreeType font source */
+    lv_font_manager_add_src_static(g_font_manager,
+                                   "Lato-Regular",
+                                   PATH_PREFIX "lvgl/examples/libs/freetype/Lato-Regular.ttf",
+                                   &lv_freetype_font_class);
 #endif
 
-    lv_font_manager_add_src_static(g_font_manager, "Montserrat", builtin_font_src, &lv_builtin_font_class);
+#if LV_USE_TINY_TTF && LV_TINY_TTF_FILE_SUPPORT
+    /* Register TinyTTF font source */
+    static const lv_tiny_ttf_font_src_t tiny_ttf_font_src = {
+        .path = "A:lvgl/examples/libs/tiny_ttf/Ubuntu-Medium.ttf",
+        .data = NULL,
+        .data_size = 0,
+        .cache_size = 0,
+    };
+
+    lv_font_manager_add_src_static(g_font_manager,
+                                   "Ubuntu-Medium",
+                                   &tiny_ttf_font_src,
+                                   &lv_tiny_ttf_font_class);
+#endif
 
     /* Create font from font manager */
     lv_font_t * font = lv_font_manager_create_font(g_font_manager,
-                                                   "Montserrat,Lato-Regular,",
+                                                   "Montserrat,Lato-Regular,Ubuntu-Medium",
                                                    LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
                                                    24,
                                                    LV_FREETYPE_FONT_STYLE_NORMAL);

@@ -60,7 +60,7 @@ bool lv_font_manager_remove_src(lv_font_manager_t * manager, const char * name);
 #if LV_USE_FREETYPE
 
 /**
- * Add the font file path.
+ * Add the freetype font file path.
  * @param manager pointer to main font manager.
  * @param name font name.
  * @param path font file path.
@@ -71,7 +71,7 @@ static inline void lv_font_manager_add_path(lv_font_manager_t * manager, const c
 }
 
 /**
- * Add the font file path with static memory.
+ * Add the freetype font file path with static memory.
  * @param manager pointer to main font manager.
  * @param name font name.
  * @param path font file path.
