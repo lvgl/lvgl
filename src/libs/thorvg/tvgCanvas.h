@@ -28,6 +28,7 @@
 
 #include "tvgPaint.h"
 
+using std::list;
 
 enum Status : uint8_t {Synced = 0, Updating, Drawing, Damaged};
 
