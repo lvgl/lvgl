@@ -191,12 +191,12 @@ static void * tiny_ttf_font_dup_src_cb(const void * src)
     const lv_tiny_ttf_font_src_t * font_src = src;
 
     lv_tiny_ttf_font_src_t * new_src = lv_malloc_zeroed(sizeof(lv_tiny_ttf_font_src_t));
+    *new_src = *font_src;
 
     if(font_src->path) {
         new_src->path = lv_strdup(font_src->path);
     }
 
-    *new_src = *font_src;
     return new_src;
 }
 
