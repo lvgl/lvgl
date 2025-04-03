@@ -58,6 +58,7 @@ typedef enum {
     LV_DRAW_TASK_TYPE_MASK_RECTANGLE,
     LV_DRAW_TASK_TYPE_MASK_BITMAP,
     LV_DRAW_TASK_TYPE_VECTOR,
+    LV_DRAW_TASK_TYPE_3D,
 } lv_draw_task_type_t;
 
 typedef enum {

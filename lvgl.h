@@ -83,6 +83,7 @@ extern "C" {
 #include "src/widgets/textarea/lv_textarea.h"
 #include "src/widgets/tileview/lv_tileview.h"
 #include "src/widgets/win/lv_win.h"
+#include "src/widgets/3dtexture/lv_3dtexture.h"
 
 #include "src/others/snapshot/lv_snapshot.h"
 #include "src/others/sysmon/lv_sysmon.h"
