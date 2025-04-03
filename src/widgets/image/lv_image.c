@@ -681,7 +681,6 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e)
             int32_t w = lv_obj_get_width(obj);
             int32_t h = lv_obj_get_height(obj);
             lv_area_t coords;
-            lv_obj_get_ext_draw_size(obj);
             lv_image_buf_get_transformed_area(&coords, w, h, img->rotation, img->scale_x, img->scale_y, &pivot_px);
             coords.x1 += obj->coords.x1;
             coords.y1 += obj->coords.y1;
