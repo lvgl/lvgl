@@ -335,6 +335,7 @@ const char * lv_event_code_get_name(lv_event_code_t code)
             ENUM_CASE(EVENT_FLUSH_WAIT_FINISH);
 
             ENUM_CASE(EVENT_VSYNC);
+            ENUM_CASE(EVENT_VSYNC_REQUEST);
 
         /* Special event flags */
         case LV_EVENT_LAST:

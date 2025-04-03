@@ -155,6 +155,7 @@ struct _lv_display_t {
 
     /** The area being refreshed*/
     lv_area_t refreshed_area;
+    uint32_t vsync_count;
 
 #if LV_USE_PERF_MONITOR
     lv_obj_t * perf_label;
