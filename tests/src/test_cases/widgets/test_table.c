@@ -225,7 +225,21 @@ void test_table_rendering(void)
     int32_t merged_col_width = lv_table_get_column_width(table, 0) + lv_table_get_column_width(table, 1)
                                + lv_table_get_column_width(table, 2) + lv_table_get_column_width(table, 3)
                                + lv_table_get_column_width(table, 4);
-    TEST_ASSERT_EQUAL_INT32(merged_col_width, lv_area_get_width(&g_inv_area));
+
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    /**
+     * From `lv_obj_pos`:
+     *
+     * When using the global matrix, the vertex coordinates of clip_area lose precision after transformation,
+     * which can be solved by expanding the redrawing area.
+     * lv_area_increase(&area_tmp, 5, 5);
+     *
+     * This accomodates for this specific calculation.
+     */
+    TEST_ASSERT_EQUAL_INT32(lv_area_get_width(&g_inv_area), merged_col_width + 10);
+#else
+    TEST_ASSERT_EQUAL_INT32(lv_area_get_width(&g_inv_area), merged_col_width);
+#endif
 }
 
 /* See #3120 for context */
