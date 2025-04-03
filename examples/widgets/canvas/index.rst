@@ -1,4 +1,3 @@
-
 Drawing on the Canvas and rotate
 --------------------------------
 
@@ -62,10 +61,10 @@ Draw Fancy Letter Effects
 -------------------------
 
 .. lv_example:: widgets/canvas/lv_example_canvas_10
-:language: c
+  :language: c
 
 
 Draw Fancy Letter Effects 2
 ---------------------------
 .. lv_example:: widgets/canvas/lv_example_canvas_11
-:language: c
+  :language: c

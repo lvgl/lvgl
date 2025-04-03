@@ -1,13 +1,13 @@
 .. _lv_image:
 
-.. |deg|    unicode:: U+000B0 .. DEGREE SIGN
-
 ================
 Image (lv_image)
 ================
 
 Overview
 ********
+
+.. |deg|    unicode:: U+000B0 .. DEGREE SIGN
 
 Images are Widgets that display images from flash (as arrays) or
 from files. Images can display symbols (``LV_SYMBOL_...``) as well.
