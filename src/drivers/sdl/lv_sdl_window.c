@@ -3,6 +3,10 @@
  *
  */
 
+/**
+ * Modified by NXP in 2025
+ */
+
 /*********************
  *      INCLUDES
  *********************/
@@ -20,7 +24,11 @@
 #ifndef __USE_ISOC11
     #define __USE_ISOC11
 #endif
-#include <stdlib.h>
+#ifndef _WIN32
+    #include <stdlib.h>
+#else
+    #include <malloc.h>
+#endif /* _WIN32 */
 
 #define SDL_MAIN_HANDLED /*To fix SDL's "undefined reference to WinMain" issue*/
 #include "lv_sdl_private.h"
@@ -183,6 +191,15 @@ void lv_sdl_window_set_title(lv_display_t * disp, const char * title)
 {
     lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
     SDL_SetWindowTitle(dsc->window, title);
+}
+
+void lv_sdl_window_set_icon(lv_display_t * disp, void * icon, int32_t width, int32_t height)
+{
+    lv_sdl_window_t * dsc = lv_display_get_driver_data(disp);
+    SDL_Surface * iconSurface = SDL_CreateRGBSurfaceWithFormatFrom(icon, width, height, 32, width * 4,
+                                                                   SDL_PIXELFORMAT_ARGB8888);
+    SDL_SetWindowIcon(dsc->window, iconSurface);
+    SDL_FreeSurface(iconSurface);
 }
 
 void * lv_sdl_window_get_renderer(lv_display_t * disp)
