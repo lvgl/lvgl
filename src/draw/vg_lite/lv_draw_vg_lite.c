@@ -277,9 +277,12 @@ static int32_t draw_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
             return 0;
     }
 
-    /* The draw unit is able to draw this task. */
-    task->preference_score = 80;
-    task->preferred_draw_unit_id = VG_LITE_DRAW_UNIT_ID;
+    if(task->preference_score > 80) {
+        /* The draw unit is able to draw this task. */
+        task->preference_score = 80;
+        task->preferred_draw_unit_id = VG_LITE_DRAW_UNIT_ID;
+    }
+
     return 1;
 }
 
