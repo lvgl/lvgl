@@ -146,7 +146,7 @@ bool lv_text_is_cmd(lv_text_cmd_state_t * state, uint32_t c)
             ret = true;
         }
         /*Other start char in parameter is escaped cmd. char*/
-        else if(*state == LV_TEXT_CMD_STATE_WAIT) {
+        else if(*state == LV_TEXT_CMD_STATE_PAR) {
             *state = LV_TEXT_CMD_STATE_WAIT;
         }
         /*Command end*/
