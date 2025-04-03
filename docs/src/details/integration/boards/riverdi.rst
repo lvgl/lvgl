@@ -25,16 +25,16 @@ is well-suited to these boards.
 lv_port_riverdi_stm32u5
 -----------------------
 
-`lv_port_riverdi_stm32u5 <https://github.com/lvgl/lv_port_riverdi_stm32u5>`
+`lv_port_riverdi_stm32u5 <https://github.com/lvgl/lv_port_riverdi_stm32u5>`_
 is a port repo of LVGL which supports all 5-inch Riverdi STM32
 Embedded Displays.
 
-- `RVT50HQSNWC00-B <https://riverdi.com/product/5-inch-lcd-display-capacitive-touch-panel-optical-bonding-uxtouch-stm32u5-rvt50hqsnwc00-b>`
-- `RVT50HQSNWC00 <https://riverdi.com/product/5-inch-lcd-display-capacitive-touch-panel-air-bonding-uxtouch-stm32u5-rvt50hqsnwc00>`
-- `RVT50HQSFWCA0 <https://riverdi.com/product/5-inch-lcd-display-capacitive-touch-panel-air-bonding-atouch-frame-stm32u5-rvt50hqsfwca0>`
-- `RVT50HQSNWCA0 <https://riverdi.com/product/5-inch-lcd-display-capacitive-touch-panel-air-bonding-atouch-stm32u5-rvt50hqsnwca0>`
-- `RVT50HQSFWN00 <https://riverdi.com/product/5-inch-lcd-display-stm32u5-frame-rvt50hqsfwn00>`
-- `RVT50HQSNWN00 <https://riverdi.com/product/5-inch-lcd-display-stm32u5-rvt50hqsnwn00>`
+- `RVT50HQSNWC00-B <https://riverdi.com/product/5-inch-lcd-display-capacitive-touch-panel-optical-bonding-uxtouch-stm32u5-rvt50hqsnwc00-b>`_
+- `RVT50HQSNWC00 <https://riverdi.com/product/5-inch-lcd-display-capacitive-touch-panel-air-bonding-uxtouch-stm32u5-rvt50hqsnwc00>`_
+- `RVT50HQSFWCA0 <https://riverdi.com/product/5-inch-lcd-display-capacitive-touch-panel-air-bonding-atouch-frame-stm32u5-rvt50hqsfwca0>`_
+- `RVT50HQSNWCA0 <https://riverdi.com/product/5-inch-lcd-display-capacitive-touch-panel-air-bonding-atouch-stm32u5-rvt50hqsnwca0>`_
+- `RVT50HQSFWN00 <https://riverdi.com/product/5-inch-lcd-display-stm32u5-frame-rvt50hqsfwn00>`_
+- `RVT50HQSNWN00 <https://riverdi.com/product/5-inch-lcd-display-stm32u5-rvt50hqsnwn00>`_
 
 It natively supports the embedded NeoChrom GPU thanks to LVGL's support
 for :ref:`Nema GFX <nema_gfx>`. NemaVG --- an extension to Nema's
