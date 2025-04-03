@@ -29,7 +29,12 @@
 #include "config.h"
 #include "thorvg.h"
 
-using namespace std;
+// using namespace std;
+using std::string;
+
+using std::lock_guard;
+using std::unique_ptr;
+
 using namespace tvg;
 
 //for MSVC Compat
