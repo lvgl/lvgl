@@ -328,6 +328,7 @@ Starting from v8, every minor release is supported for 1 year.
 
 API
 ***
-.. API equals:  LV_MEM_SIZE, lv_timer_handler, lv_tick_inc, lv_display_flush_ready,
+
+.. API equals:  LV_MEM_SIZE, lv_timer_handler, lv_tick_inc, lv_display_flush_wait_cb_t,
     LV_COLOR_DEPTH
 
