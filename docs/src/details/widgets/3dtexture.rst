@@ -44,6 +44,7 @@ and display them in LVGL.
 .. code-block:: c
 
     lv_obj_t * tex = lv_3dtexture_create(parent);
+    /*Render something to the texture. You can replace it with your code.*/
     lv_3dtexture_id_t gltf_texture = render_gltf_model_to_opengl_texture(path, w, h, color);
     lv_3dtexture_set_src(tex, gltf_texture);
     lv_obj_set_size(tex, w, h);
