@@ -857,10 +857,6 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
     int32_t point_w = lv_obj_get_style_width(obj, LV_PART_INDICATOR) / 2;
     int32_t point_h = lv_obj_get_style_height(obj, LV_PART_INDICATOR) / 2;
 
-    /*Do not bother with line ending is the point will over it*/
-    if(LV_MIN(point_w, point_h) > line_dsc.width / 2) line_dsc.raw_end = 1;
-    if(line_dsc.width == 1) line_dsc.raw_end = 1;
-
     /*If there are at least as many points as pixels then draw only vertical lines*/
     bool crowded_mode = (int32_t)chart->point_cnt >= w;
 
