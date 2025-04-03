@@ -6,6 +6,10 @@
 
 static lv_obj_t * scr = NULL;
 static lv_obj_t * table = NULL;
+static lv_area_t g_inv_area;
+static int32_t g_inv_count;
+
+static void invalidate_area_event_cb(lv_event_t * e);
 
 void setUp(void)
 {
@@ -16,6 +20,7 @@ void setUp(void)
 void tearDown(void)
 {
     lv_obj_clean(lv_screen_active());
+    lv_display_remove_event_cb_with_user_data(lv_display_get_default(), invalidate_area_event_cb, NULL);
 }
 
 void test_table_should_set_row_count_to_zero(void)
@@ -169,6 +174,13 @@ static void draw_part_event_cb(lv_event_t * e)
     }
 }
 
+static void invalidate_area_event_cb(lv_event_t * e)
+{
+    lv_area_t * inv = lv_event_get_param(e);
+    lv_area_copy(&g_inv_area, inv);
+    g_inv_count++;
+}
+
 void test_table_rendering(void)
 {
     lv_obj_center(table);
@@ -203,6 +215,31 @@ void test_table_rendering(void)
     lv_table_set_cell_value_fmt(table, 4, 3, "crop crop crop crop crop crop crop crop ");
 
     TEST_ASSERT_EQUAL_SCREENSHOT("widgets/table_1.png");
+
+    lv_refr_now(NULL);
+    lv_area_set(&g_inv_area, 0, 0, 0, 0);
+    g_inv_count = 0;
+    lv_display_add_event_cb(lv_display_get_default(), invalidate_area_event_cb, LV_EVENT_INVALIDATE_AREA, NULL);
+    lv_table_set_cell_value(table, 1, 0, "changed");
+    TEST_ASSERT_EQUAL_INT32(1, g_inv_count);
+    int32_t merged_col_width = lv_table_get_column_width(table, 0) + lv_table_get_column_width(table, 1)
+                               + lv_table_get_column_width(table, 2) + lv_table_get_column_width(table, 3)
+                               + lv_table_get_column_width(table, 4);
+
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    /**
+     * From `lv_obj_pos`:
+     *
+     * When using the global matrix, the vertex coordinates of clip_area lose precision after transformation,
+     * which can be solved by expanding the redrawing area.
+     * lv_area_increase(&area_tmp, 5, 5);
+     *
+     * This accomodates for this specific calculation.
+     */
+    TEST_ASSERT_EQUAL_INT32(lv_area_get_width(&g_inv_area), merged_col_width + 10);
+#else
+    TEST_ASSERT_EQUAL_INT32(lv_area_get_width(&g_inv_area), merged_col_width);
+#endif
 }
 
 /* See #3120 for context */
