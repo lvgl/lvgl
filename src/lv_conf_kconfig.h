@@ -228,10 +228,10 @@ extern "C" {
 #  define CONFIG_LV_FONT_DEFAULT &lv_font_montserrat_28_compressed
 #elif defined(CONFIG_LV_FONT_DEFAULT_DEJAVU_16_PERSIAN_HEBREW)
 #  define CONFIG_LV_FONT_DEFAULT &lv_font_dejavu_16_persian_hebrew
-#elif defined(CONFIG_LV_FONT_DEFAULT_SIMSUN_14_CJK)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_simsun_14_cjk
-#elif defined(CONFIG_LV_FONT_DEFAULT_SIMSUN_16_CJK)
-#  define CONFIG_LV_FONT_DEFAULT &lv_font_simsun_16_cjk
+#elif defined(CONFIG_LV_FONT_SOURCE_HAN_SANS_SC_14_CJK)
+#  define CONFIG_LV_FONT_DEFAULT &lv_font_source_han_sans_sc_14_cjk
+#elif defined(CONFIG_LV_FONT_SOURCE_HAN_SANS_SC_16_CJK)
+#  define CONFIG_LV_FONT_DEFAULT &lv_font_source_han_sans_sc_16_cjk
 #elif defined(CONFIG_LV_FONT_DEFAULT_UNSCII_8)
 #  define CONFIG_LV_FONT_DEFAULT &lv_font_unscii_8
 #elif defined(CONFIG_LV_FONT_DEFAULT_UNSCII_16)
