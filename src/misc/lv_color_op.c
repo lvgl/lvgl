@@ -58,6 +58,26 @@ lv_color32_t lv_color_mix32(lv_color32_t fg, lv_color32_t bg)
     return bg;
 }
 
+lv_color32_t lv_color_mix32_premultiplied(lv_color32_t fg, lv_color32_t bg)
+{
+    if(fg.alpha >= LV_OPA_MAX) {
+        return fg;  /* Fully opaque foreground replaces background */
+    }
+    if(fg.alpha <= LV_OPA_MIN) {
+        return bg;  /* Fully transparent foreground, return background */
+    }
+
+    uint32_t inv_fg_alpha = LV_OPA_MAX - fg.alpha;
+
+    /* Premultiplied blending */
+    bg.red   = fg.red   + ((bg.red   * inv_fg_alpha) >> 8);
+    bg.green = fg.green + ((bg.green * inv_fg_alpha) >> 8);
+    bg.blue  = fg.blue  + ((bg.blue  * inv_fg_alpha) >> 8);
+    bg.alpha = fg.alpha + ((bg.alpha * inv_fg_alpha) >> 8);
+
+    return bg;
+}
+
 uint8_t lv_color_brightness(lv_color_t c)
 {
     uint16_t bright = (uint16_t)(3u * c.red + c.green + 4u * c.blue);

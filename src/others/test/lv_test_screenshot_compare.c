@@ -362,7 +362,8 @@ static void buf_to_xrgb8888(const lv_draw_buf_t * draw_buf, uint8_t * buf_out)
             buf_out += draw_buf->header.w * 4;
         }
     }
-    else if(cf_in == LV_COLOR_FORMAT_ARGB8888 || cf_in == LV_COLOR_FORMAT_XRGB8888) {
+    else if(cf_in == LV_COLOR_FORMAT_ARGB8888 || cf_in == LV_COLOR_FORMAT_XRGB8888 ||
+            cf_in == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED) {
         uint32_t y;
         for(y = 0; y < draw_buf->header.h; y++) {
             uint32_t x;

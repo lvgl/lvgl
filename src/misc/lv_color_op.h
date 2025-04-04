@@ -59,6 +59,21 @@ lv_color_t LV_ATTRIBUTE_FAST_MEM lv_color_mix(lv_color_t c1, lv_color_t c2, uint
 lv_color32_t lv_color_mix32(lv_color32_t fg, lv_color32_t bg);
 
 /**
+ * @brief Blends two premultiplied ARGB8888 colors while maintaining correct alpha compositing.
+ *
+ * This function correctly blends the foreground (fg) and background (bg) colors,
+ * ensuring that the output remains in a premultiplied alpha format.
+ *
+ * @param fg The foreground color in premultiplied ARGB8888 format.
+ * @param bg The background color in premultiplied ARGB8888 format.
+ * @return The resulting blended color in premultiplied ARGB8888 format.
+ *
+ * @note If the foreground is fully opaque, it is returned as is.
+ * @note If the foreground is fully transparent, the background is returned.
+ */
+lv_color32_t lv_color_mix32_premultiplied(lv_color32_t fg, lv_color32_t bg);
+
+/**
  * Get the brightness of a color
  * @param c   a color
  * @return brightness in range [0..255]
