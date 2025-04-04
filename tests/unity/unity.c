@@ -5,7 +5,6 @@
 ============================================================================ */
 #if LV_BUILD_TEST || LV_BUILD_PERF_TEST
 
-#warning "Compiling unity.c Ok"
 #include "unity.h"
 
 #ifndef UNITY_PROGMEM
