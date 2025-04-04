@@ -1008,10 +1008,10 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
                             color_argb.red = (color_argb.red * reciprocal_alpha) >> 8;
                             color_argb.green = (color_argb.green * reciprocal_alpha) >> 8;
                             color_argb.blue = (color_argb.blue * reciprocal_alpha) >> 8;
-                        }
 
-                        /* Blend with destination */
-                        dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);
+                            /* Blend with destination */
+                            dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);
+                        }
                     }
                     dest_buf_c32 = drawbuf_next_row(dest_buf_c32, dest_stride);
                     src_buf_c32 = drawbuf_next_row(src_buf_c32, src_stride);
@@ -1029,8 +1029,8 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
                             color_argb.red = (color_argb.red * reciprocal_alpha) >> 8;
                             color_argb.green = (color_argb.green * reciprocal_alpha) >> 8;
                             color_argb.blue = (color_argb.blue * reciprocal_alpha) >> 8;
+                            color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, opa);
                         }
-                        color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, opa);
 
                         /* Blend with destination */
                         dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);
@@ -1051,8 +1051,8 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
                             color_argb.red = (color_argb.red * reciprocal_alpha) >> 8;
                             color_argb.green = (color_argb.green * reciprocal_alpha) >> 8;
                             color_argb.blue = (color_argb.blue * reciprocal_alpha) >> 8;
+                            color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, mask_buf[x]);
                         }
-                        color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, mask_buf[x]);
 
                         /* Blend with destination */
                         dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);
@@ -1074,8 +1074,8 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
                             color_argb.red = (color_argb.red * reciprocal_alpha) >> 8;
                             color_argb.green = (color_argb.green * reciprocal_alpha) >> 8;
                             color_argb.blue = (color_argb.blue * reciprocal_alpha) >> 8;
+                            color_argb.alpha = LV_OPA_MIX3(color_argb.alpha, opa, mask_buf[x]);
                         }
-                        color_argb.alpha = LV_OPA_MIX3(color_argb.alpha, opa, mask_buf[x]);
 
                         /* Blend with destination */
                         dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);

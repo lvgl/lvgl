@@ -493,6 +493,23 @@ static void transform_argb8888(const uint8_t * src, int32_t src_w, int32_t src_h
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
 
+static lv_color32_t unpremultiply(lv_color32_t c)
+{
+    if(c.alpha == 0) {
+        c.red = 0;
+        c.green = 0;
+        c.blue = 0;
+    }
+    else {
+        uint16_t reciprocal_alpha = (255 * 256) / c.alpha;
+        c.red = (c.red * reciprocal_alpha) >> 8;
+        c.green = (c.green * reciprocal_alpha) >> 8;
+        c.blue = (c.blue  * reciprocal_alpha) >> 8;
+    }
+
+    return c;
+}
+
 static void transform_argb8888_premultiplied(const uint8_t * src, int32_t src_w, int32_t src_h, int32_t src_stride,
                                              int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                                              int32_t x_end, uint8_t * dest_buf, bool aa)
@@ -552,8 +569,15 @@ static void transform_argb8888_premultiplied(const uint8_t * src, int32_t src_w,
             lv_color32_t px_hor = src_c32[x_next];
             lv_color32_t px_ver = *(const lv_color32_t *)((uint8_t *)src_c32 + y_next * src_stride);
 
+            /*Have the non-premultipled colors first, mix them as needed,
+             *and premultiply again*/
+            dest_c32[x] = unpremultiply(dest_c32[x]);
+            px_hor = unpremultiply(px_hor);
+            px_ver = unpremultiply(px_ver);
+
             if(px_ver.alpha == 0) {
                 dest_c32[x].alpha = (dest_c32[x].alpha * (0xFF - ys_fract)) >> 8;
+
             }
             else if(!lv_color32_eq(dest_c32[x], px_ver)) {
                 if(dest_c32[x].alpha) dest_c32[x].alpha = ((px_ver.alpha * ys_fract) + (dest_c32[x].alpha * (0xFF - ys_fract))) >> 8;
@@ -569,14 +593,30 @@ static void transform_argb8888_premultiplied(const uint8_t * src, int32_t src_w,
                 px_hor.alpha = xs_fract;
                 dest_c32[x] = lv_color_mix32(px_hor, dest_c32[x]);
             }
+
+            dest_c32[x].red = (dest_c32[x].red * dest_c32[x].alpha) >> 8;
+            dest_c32[x].green = (dest_c32[x].green * dest_c32[x].alpha) >> 8;
+            dest_c32[x].blue = (dest_c32[x].blue * dest_c32[x].alpha) >> 8;
+
         }
         /*Partially out of the image*/
         else {
             if((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0))  {
-                dest_c32[x].alpha = (dest_c32[x].alpha * (0x7F - xs_fract)) >> 7;
+                dest_c32[x] = unpremultiply(dest_c32[x]);
+                lv_opa_t alpha = (dest_c32[x].alpha * (0x7F - xs_fract)) >> 7;
+                dest_c32[x].alpha = alpha;
+                dest_c32[x].red = (dest_c32[x].red * dest_c32[x].alpha) >> 8;
+                dest_c32[x].green = (dest_c32[x].green * dest_c32[x].alpha) >> 8;
+                dest_c32[x].blue = (dest_c32[x].blue * dest_c32[x].alpha) >> 8;
+
             }
             else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0))  {
-                dest_c32[x].alpha = (dest_c32[x].alpha * (0x7F - ys_fract)) >> 7;
+                dest_c32[x] = unpremultiply(dest_c32[x]);
+                lv_opa_t alpha = (dest_c32[x].alpha * (0x7F - ys_fract)) >> 7;
+                dest_c32[x].alpha = alpha;
+                dest_c32[x].red = (dest_c32[x].red * dest_c32[x].alpha) >> 8;
+                dest_c32[x].green = (dest_c32[x].green * dest_c32[x].alpha) >> 8;
+                dest_c32[x].blue = (dest_c32[x].blue * dest_c32[x].alpha) >> 8;
             }
         }
     }

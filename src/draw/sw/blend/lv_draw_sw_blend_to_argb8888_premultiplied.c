@@ -621,9 +621,6 @@ static inline void LV_ATTRIBUTE_FAST_MEM blend_non_normal_pixel_premultiplied(
     *dest = lv_color_32_32_mix_premul(res, *dest, cache);
 }
 
-
-
-
 #endif /* LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED */
 
 #endif /* LV_USE_DRAW_SW */
