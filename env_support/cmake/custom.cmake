@@ -86,7 +86,7 @@ if(NOT "${ret}" STREQUAL "0")
 endif()
 
 # This will set all CONFIG_LV_USE_* variables in cmake
-include(${CMAKE_BINARY_DIR}/lv_conf.cmake)
+include(${CMAKE_CURRENT_BINARY_DIR}/lv_conf.cmake)
 
 # Add definition of LV_CONF_PATH only if needed
 # Do not redefine it if already defined in tests/CMakeLists.txt
