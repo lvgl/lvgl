@@ -1,0 +1,408 @@
+import argparse
+from pathlib import Path
+import os
+import shutil
+import subprocess
+import os
+
+perf_test_options = {
+    "OPTIONS_TEST_PERF_32B": {
+        "description": "Perf test config ARM (so3) Emulated - 32 bit",
+        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf32b:main",
+        "config": "lv_test_perf_conf.h",
+    },
+    "OPTIONS_TEST_PERF_64B": {
+        "description": "Perf test config ARM (so3) Emulated - 64 bit",
+        "image_name": "ghcr.io/smartobjectoriented/so3-lvperf64b:main",
+        "config": "lv_test_perf_conf.h",
+    },
+}
+
+lvgl_test_dir = os.path.dirname(os.path.realpath(__file__))
+
+
+def main():
+    epilog = """This program runs LVGL perfomance tests
+    In order to provide timing consitency between host computers,
+    these runs are run in an ARM emulated environnement inside QEMU.
+    For the runtime environnement, SO3 is used which is a lightweight, ARM-based 
+    operating system.
+    Right now, this script requires a host linux computer as we depend on
+    `losetup` which is used to set up and control loop devices.
+    """
+    parser = argparse.ArgumentParser(
+        description="Run LVGL performance tests.", epilog=epilog
+    )
+    parser.add_argument(
+        "--build-options",
+        nargs=1,
+        choices=perf_test_options.keys(),
+        help="""the perf test option name to run. When
+                omitted all build configurations are used.
+             """,
+    )
+    parser.add_argument("--test-suite", default=None, help="Select test suite to run")
+    parser.add_argument(
+        "--clean",
+        action="store_true",
+        default=False,
+        help="Clean existing build artifacts before operation. Requires admin privileges",
+    )
+    parser.add_argument(
+        "--auto-clean",
+        action="store_true",
+        default=False,
+        help="Automatically clean build directories. Require admin privileges",
+    )
+
+    parser.add_argument(
+        "actions",
+        nargs="*",
+        choices=["build", "generate", "test"],
+        help="build | generate: generates run files dependencies, test: run performance tests.",
+    )
+
+    args = parser.parse_args()
+
+    print(args)
+    options = []
+    if args.build_options:
+        options = args.build_options
+    else:
+        options = perf_test_options.keys()
+
+    for option_name in options:
+        if "generate" or "build" or "test" in args.actions:
+            generate_files(option_name, args.clean, args.test_suite)
+
+        if "test" in args.actions:
+            run_tests(option_name, "lv_test_perf_conf.h")
+
+        if args.auto_clean:
+            build_dir = get_build_dir(option_name)
+            shutil.rmtree(build_dir)
+
+
+def lvgl_test_src(name):
+    return os.path.join(lvgl_test_dir, "src", name)
+
+
+LVGL_TEST_FILES = [lvgl_test_src("lv_test_init.c"), lvgl_test_src("lv_test_init.h")]
+
+
+def options_abbrev(options_name):
+    """Return an abbreviated version of the option name."""
+    prefix = "OPTIONS_"
+    assert options_name.startswith(prefix)
+    return options_name[len(prefix) :].lower()
+
+
+def get_base_build_dir(options_name):
+    """Given the build options name, return the build directory name.
+
+    Does not return the full path to the directory - just the base name."""
+    return "build_%s" % options_abbrev(options_name)
+
+
+def create_dir(build_dir):
+    created_build_dir = False
+
+    if os.path.exists(build_dir):
+        if not os.path.isdir(build_dir):
+            raise ValueError(f"{build_dir} exists but is not a directory")
+    else:
+        os.mkdir(build_dir)
+        created_build_dir = True
+
+    return created_build_dir
+
+
+def find_c_files(directory):
+    c_files = []
+
+    for root, _, files in os.walk(directory):
+        for file in files:
+            if file.endswith(".c"):
+                c_files.append(os.path.join(root, file))
+
+    return c_files
+
+
+def get_build_dir(options_name):
+    """Given the build options name, return the build directory name.
+
+    Returns absolute path to the build directory."""
+    global lvgl_test_dir
+    return os.path.join(lvgl_test_dir, get_base_build_dir(options_name))
+
+
+def generate_so3_init_commands(runners: list[tuple[str, str]], path: str):
+    """
+    Generates the `commands.ini` file that will be mounted in `usr/out/commands.ini` replacing
+    the default `commands.ini` used by so3.
+    A `commands.ini` file declares some specific commands the `init` program should run
+    sequentially. We use this feature to run every perf test.
+    An example that runs tests A and B before exiting looks like this :
+    ```
+    run test_A.elf
+    run test_B.elf
+    exit
+    ```
+    """
+
+    output = []
+    for runner, _ in runners:
+        name_without_extension = Path(runner).stem
+        delimiter = 50 * "="
+        output.append(f"echo {delimiter}")
+        output.append(f"echo Running {name_without_extension}")
+        output.append(f"echo {delimiter}")
+        output.append(f"run {name_without_extension}.elf")
+
+    output.append("exit")
+    with open(path, "w") as f:
+        f.write("\n".join(output))
+
+
+def generate_perf_test_cmakelists(runners: list[tuple[str, str]], path: str):
+    """
+    Generates the CMakeLists.txt that will be mounted in `usr/src/test_src/CMakeLists.txt`
+    This file simply declares every runner as a different executable and links the necessary
+    libraries
+    """
+    output = []
+    files_to_include = [
+        os.path.basename(file) for file in LVGL_TEST_FILES if file.endswith(".c")
+    ]
+
+    for runner, test_case in runners:
+        runner_name_without_extension = Path(runner).stem
+        runner_elf_file = f"{runner_name_without_extension}.elf"
+        output.append(
+            f"add_executable({runner_elf_file} {runner_name_without_extension}.c {test_case} {" ".join(files_to_include)})"
+        )
+        output.append(f"target_link_libraries({runner_elf_file} c lvgl unity)")
+        output.append(
+            f"target_compile_definitions({runner_elf_file} PRIVATE LV_BUILD_TEST LV_BUILD_TEST_PERF)",
+        )
+        output.append(
+            f"target_include_directories({runner_elf_file} PRIVATE ${{CMAKE_CURRENT_SOURCE_DIR}}/../unity)"
+        )
+
+    with open(path, "w") as f:
+        f.write("\n".join(output))
+
+
+def copy_unity(target_folder: str):
+    unity_src_dir = os.path.join(lvgl_test_dir, "unity")
+    shutil.copytree(unity_src_dir, target_folder, dirs_exist_ok=True)
+
+
+def copy_lvgl_test_files(target_folder):
+    for src in LVGL_TEST_FILES:
+        dst = os.path.join(target_folder, os.path.basename(src))
+        shutil.copy(src, dst)
+
+
+def generate_unity_cmakelists(path: str):
+
+    content_lines = [
+        "add_library(unity STATIC unity.c)",
+        "target_compile_definitions(unity PUBLIC LV_BUILD_TEST LV_BUILD_TEST_PERF UNITY_INCLUDE_DOUBLE UNITY_OUTPUT_COLOR)",
+    ]
+
+    with open(path, "w") as f:
+        f.write("\n".join(content_lines))
+
+
+def generate_so3_usr_cmakelists(path: str):
+    """
+    Generates the main CMakeLists.txt that will be mounted in `usr/src/CMakeLists.txt`
+    We need to keep the `init` program as it's the program that will be
+    responsible for launching every runner
+    We also add a new subdirectory `test_src` that will be the folder containing
+    every test runner, and necessary sources for building those runners
+    (except the lvgl source code)
+    """
+    content_lines = [
+        "add_subdirectory(unity)",
+        "add_executable(init.elf init.c)",
+        "target_link_libraries(init.elf c)",
+        "add_subdirectory(test_src)",
+    ]
+
+    with open(path, "w") as f:
+        f.write("\n".join(content_lines))
+
+
+def generate_test_runners(test_folder, test_suite):
+
+    runner_generator_script = os.path.join(
+        lvgl_test_dir, "unity", "generate_test_runner.rb"
+    )
+    # Get the necessary files in order to generate the runners
+    # This includes the test cases and the unity config
+    test_cases = find_c_files(os.path.join(lvgl_test_dir, "src", "test_cases", "perf"))
+    unity_config_path = os.path.join(lvgl_test_dir, "config.yml")
+
+    runners = []
+
+    print("Generating test case runners")
+
+    for src_test_case_path in test_cases:
+        current_test_suite = Path(src_test_case_path).stem
+
+        if test_suite and test_suite not in current_test_suite:
+            continue
+
+        print(f"\t{current_test_suite}")
+
+        runner_file_name = current_test_suite + "_runner.c"
+        test_case_file_name = os.path.basename(src_test_case_path)
+
+        test_case_path = os.path.join(test_folder, test_case_file_name)
+        runner_path = os.path.join(test_folder, runner_file_name)
+
+        subprocess.check_call(
+            [
+                runner_generator_script,
+                src_test_case_path,
+                runner_path,
+                unity_config_path,
+            ]
+        )
+
+        # Copy the original test case as still need them in the build process
+        shutil.copy(src_test_case_path, test_case_path)
+        # Store a tuple of runner - test case so we can generate the cmakelists later
+        runners.append((runner_file_name, test_case_file_name))
+
+    return runners
+
+
+def generate_files(options_name, clean, test_suite=None):
+    """
+    Generates every necessary file for running tests inside so3
+    Everything is built inside a docker container so we need to prepare
+    every file we need to mount before mounting and running the container
+    """
+    print()
+    print()
+    label = "Generating: %s: %s" % (
+        options_abbrev(options_name),
+        perf_test_options[options_name]["description"],
+    )
+    print("=" * len(label))
+    print(label)
+    print("=" * len(label))
+
+    options_build_dir = get_build_dir(options_name)
+    generated_unity_dir = os.path.join(options_build_dir, "unity")
+    generated_test_src_dir = os.path.join(options_build_dir, "test_src")
+
+    if clean and os.path.exists(options_build_dir):
+        shutil.rmtree(options_build_dir)
+
+    create_dir(options_build_dir)
+    create_dir(generated_test_src_dir)
+
+    # Copy Unity and generate a cmakelists for it
+    copy_unity(generated_unity_dir)
+    generate_unity_cmakelists(os.path.join(generated_unity_dir, "CMakeLists.txt"))
+
+    # Copy lvgl common test files
+    copy_lvgl_test_files(generated_test_src_dir)
+
+    runners = generate_test_runners(generated_test_src_dir, test_suite)
+    # Generate necessary cmakelists
+    generate_perf_test_cmakelists(
+        runners, os.path.join(generated_test_src_dir, "CMakeLists.txt")
+    )
+    generate_so3_usr_cmakelists(os.path.join(options_build_dir, "CMakeLists.txt"))
+    generate_so3_init_commands(runners, os.path.join(options_build_dir, "commands.ini"))
+
+
+def run_tests(options_name, config_name):
+    def volume(src, dst):
+        return ["-v", f"{src}:{dst}"]
+
+    def so3_usr_src(path):
+        return f"/so3/usr/src/{path}"
+
+    def so3_usr_lib(path):
+        return f"/so3/usr/lib/{path}"
+
+    def so3_usr_out(path):
+        return f"/so3/usr/out/{path}"
+
+    so3_usr_build = f"/so3/usr/build"
+    persistence_dir = f"/persistence"
+
+    build_dir = get_build_dir(options_name)
+
+    unity_dir = os.path.join(build_dir, "unity")
+    test_src_dir = os.path.join(build_dir, "test_src")
+    main_cmakelists = os.path.join(build_dir, "CMakeLists.txt")
+    lvgl_src_dir = os.path.join(lvgl_test_dir, "..", "src")
+    # lvgl_demos_dir = os.path.join(lvgl_test_dir, "..", "demos")
+    # lvgl_examples_dir = os.path.join(lvgl_test_dir, "..", "examples")
+    lv_conf_path = os.path.join(lvgl_test_dir, "src", config_name)
+    lvgl_h_path = os.path.join(lvgl_test_dir, "..", "lvgl.h")
+    commands_ini_path = os.path.join(build_dir, "commands.ini")
+    build_cache_dir = os.path.join(build_dir, "build")
+    virtual_disk_cache_dir = os.path.join(build_dir, "persistence")
+
+    volumes = [
+        # This is necessary in order to create a loop device
+        volume("/dev", "/dev"),
+        # Replace container's lvgl source and lv_conf
+        volume(lvgl_src_dir, so3_usr_lib("lvgl/src")),
+        volume(lv_conf_path, so3_usr_lib("lv_conf.h")),
+        # volume(lvgl_demos_dir, so3_usr_lib("lvgl/demos")),
+        # volume(lvgl_examples_dir, so3_usr_lib("lvgl/examples")),
+        volume(lvgl_h_path, "/so3/usr/lvgl.h"),
+        # Mount the test sources (test cases and runners)
+        volume(test_src_dir, so3_usr_src("test_src")),
+        # Mount the test framework
+        volume(unity_dir, so3_usr_src("unity")),
+        # Modify the default so3 CMakeLists and commands.ini
+        volume(main_cmakelists, so3_usr_src("CMakeLists.txt")),
+        volume(commands_ini_path, so3_usr_out("commands.ini")),
+        # Cache build folder so we don't regenerate everything in consecutive runs
+        volume(build_cache_dir, so3_usr_build),
+        volume(virtual_disk_cache_dir, persistence_dir),
+    ]
+
+    command = [
+        "docker",
+        "run",
+        "-it",
+        "--rm",
+        "--privileged",
+        "--name",
+        f"lv_test_{options_name}",
+    ]
+    for v in volumes:
+        command.extend(v)
+
+    # Temporary
+    command.extend(volume("/home/andre/dev/so3/usr/lib/libc", so3_usr_lib("libc")))
+    #
+
+    command.append(perf_test_options[options_name]["image_name"])
+
+    print()
+    print()
+    label = "Launching: %s: %s" % (
+        options_abbrev(options_name),
+        perf_test_options[options_name]["description"],
+    )
+    print("=" * len(label))
+    print(label)
+    print("=" * len(label))
+
+    subprocess.check_call(command)
+
+
+if __name__ == "__main__":
+    main()
