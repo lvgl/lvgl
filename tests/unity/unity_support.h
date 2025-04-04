@@ -50,9 +50,22 @@ extern "C" {
 		TEST_ASSERT_LESS_OR_EQUAL_DOUBLE((max_time_ms) / 1000.0, \
 						 time_taken);            \
 	} while (0)
+
+#define LV_PERF_ASSERT_MAX_TIME_ITER(fn, max_time_ms, iterations, ...)   \
+	do {                                                             \
+		clock_t t = clock();                                     \
+		for (size_t i = 0; i < iterations; ++i)                  \
+			fn(__VA_ARGS__);                                 \
+		t = clock() - t;                                         \
+		const double time_taken = ((double)t) / CLOCKS_PER_SEC;  \
+		TEST_ASSERT_LESS_OR_EQUAL_DOUBLE((max_time_ms) / 1000.0, \
+						 time_taken);            \
+	} while (0)
+
 #else
 
 #define LV_PERF_ASSERT_MAX_TIME(...)	  fn(__VA_ARGS__);
+#define LV_PERF_ASSERT_MAX_TIME_ITER(...) fn(__VA_ARGS__);
 
 #endif /* LV_BUILD_TEST_PERF */
 
