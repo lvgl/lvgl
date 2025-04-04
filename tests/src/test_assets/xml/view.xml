@@ -2,10 +2,12 @@
 	<consts>
 		<color name="light_blue" value="0xbbbbff"/>
 		<color name="dark_blue" value="0x000080"/>
+		<color name="dark_blue" value="0xff0000"/> <!-- Keep the first dark_blue -->
 	</consts>
 
 	<styles>
 		<style name="btn_style" bg_color="#dark_blue" bg_opa="150"/>
+		<color name="btn_style" bg_opa="64" radius="100"/>  <!-- Extend the style -->
 		<style name="btn_pr_style" bg_opa="255"/>
 	</styles>
 
