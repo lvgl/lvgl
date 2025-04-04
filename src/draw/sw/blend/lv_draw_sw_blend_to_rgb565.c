@@ -74,6 +74,7 @@ static inline uint16_t /* LV_ATTRIBUTE_FAST_MEM */ lv_color_8_16_mix(const uint8
 
 static inline uint16_t /* LV_ATTRIBUTE_FAST_MEM */ lv_color_24_16_mix(const uint8_t * c1, uint16_t c2, uint8_t mix);
 
+
 static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * buf, uint32_t stride);
 
 /**********************
@@ -1149,6 +1150,25 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
 
 #if LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
 
+static inline uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_24_16_mix_premult(const uint8_t * c1, uint16_t c2, uint8_t mix)
+{
+    if(mix == 0) {
+        return c2;
+    }
+    else if(mix == 255) {
+        return ((c1[2] & 0xF8) << 8)  + ((c1[1] & 0xFC) << 3) + ((c1[0] & 0xF8) >> 3);
+    }
+    else {
+        lv_opa_t mix_inv = 255 - mix;
+
+        uint8_t r = (c1[2] >> 3) + ((((c2 >> 11) & 0x1F) * mix_inv) >> 8);
+        uint8_t g = (c1[1] >> 2) + ((((c2 >> 5) & 0x3F) * mix_inv) >> 8);
+        uint8_t b = (c1[0] >> 3) + ((((c2 >> 0) & 0x1F) * mix_inv) >> 8);
+
+        return (r << 11) + (g << 5) + (b);
+    }
+}
+
 static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_blend_image_dsc_t * dsc)
 {
     int32_t w = dsc->dest_w;
@@ -1170,14 +1190,9 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_premultiplied_image_blend(lv_draw_sw_
             if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_PREMULTIPLIED_BLEND_NORMAL_TO_RGB565(dsc)) {
                 for(y = 0; y < h; y++) {
                     for(dest_x = 0, src_x = 0; dest_x < w; dest_x++, src_x += 4) {
-                        if(src_buf_u8[src_x + 3] > 0) {
-                            uint8_t src_buf_u8_unpremult[3];
-                            uint16_t reciprocal = (255 * 256) / src_buf_u8[src_x + 3];
-                            src_buf_u8_unpremult[0] = (src_buf_u8[src_x + 0] * reciprocal) >> 8;
-                            src_buf_u8_unpremult[1] = (src_buf_u8[src_x + 1] * reciprocal) >> 8;
-                            src_buf_u8_unpremult[2] = (src_buf_u8[src_x + 2] * reciprocal) >> 8;
-                            dest_buf_u16[dest_x] = lv_color_24_16_mix(src_buf_u8_unpremult, dest_buf_u16[dest_x], src_buf_u8[src_x + 3]);
-                        }
+                        /*For the trivial case use the premultipled image as it is.
+                         *For the other cases unpremultiply as another alpha also needs to be applied.*/
+                        dest_buf_u16[dest_x] = lv_color_24_16_mix_premult(&src_buf_u8[src_x], dest_buf_u16[dest_x], src_buf_u8[src_x + 3]);
                     }
                     dest_buf_u16 = drawbuf_next_row(dest_buf_u16, dest_stride);
                     src_buf_u8 += src_stride;
@@ -1341,6 +1356,7 @@ static inline uint16_t LV_ATTRIBUTE_FAST_MEM lv_color_24_16_mix(const uint8_t * 
                (((c1[0] >> 3) * mix + (c2 & 0x1F) * mix_inv) >> 8);
     }
 }
+
 
 #if LV_DRAW_SW_SUPPORT_I1
 
