@@ -3,7 +3,9 @@
     Copyright (c) 2007-21 Mike Karlesky, Mark VanderVoord, Greg Williams
     [Released under MIT License. Please refer to license.txt for details]
 ============================================================================ */
-#if LV_BUILD_TEST
+#if LV_BUILD_TEST || LV_BUILD_PERF_TEST
+
+#warning "Compiling unity.c Ok"
 #include "unity.h"
 
 #ifndef UNITY_PROGMEM
@@ -2486,4 +2488,3 @@ int UnityTestMatches(void)
 #endif /* UNITY_USE_COMMAND_LINE_ARGS */
 /*-----------------------------------------------*/
 #endif /*LV_BUILD_TEST*/
-
