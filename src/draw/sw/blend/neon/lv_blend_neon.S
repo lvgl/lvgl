@@ -11,7 +11,7 @@
 
 
 /*Workaround: missing .note.GNU-stack section implies executable stack*/
-#ifdef __GNUC__
+#ifdef __ELF__
 .section .note.GNU-stack,"",@progbits
 #endif
 

@@ -9,8 +9,8 @@
 
 #include "lv_blend_helium.h"
 
-/*Workaround: missing .note.GNU-stack section implies executable stack*/
-#ifdef __GNUC__
+/*GCC Workaround: missing .note.GNU-stack section implies executable stack*/
+#ifdef __ELF__
 .section .note.GNU-stack,"",@progbits
 #endif
 
