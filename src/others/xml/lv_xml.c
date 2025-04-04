@@ -169,16 +169,24 @@ void * lv_xml_create(lv_obj_t * parent, const char * name, const char ** attrs)
     return NULL;
 }
 
-
 lv_result_t lv_xml_register_font(lv_xml_component_ctx_t * ctx, const char * name, const lv_font_t * font)
 {
+
     if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
     if(ctx == NULL) {
         LV_LOG_WARN("No component found to register font `%s`", name);
         return LV_RESULT_INVALID;
     }
 
-    lv_xml_font_t * f = lv_ll_ins_head(&ctx->font_ll);
+    lv_xml_font_t * f;
+    LV_LL_READ(&ctx->font_ll, f) {
+        if(lv_streq(f->name, name)) {
+            LV_LOG_INFO("Font %s is already registered. Don't register it again.", name);
+            return LV_RESULT_OK;
+        }
+    }
+
+    f = lv_ll_ins_head(&ctx->font_ll);
     f->name = lv_strdup(name);
     f->font = font;
 
@@ -216,7 +224,16 @@ lv_result_t lv_xml_register_subject(lv_xml_component_ctx_t * ctx, const char * n
         return LV_RESULT_INVALID;
     }
 
-    lv_xml_subject_t * s = lv_ll_ins_head(&ctx->subjects_ll);
+
+    lv_xml_subject_t * s;
+    LV_LL_READ(&ctx->subjects_ll, s) {
+        if(lv_streq(s->name, name)) {
+            LV_LOG_INFO("Subject %s is already registered. Don't register it again.", name);
+            return LV_RESULT_OK;
+        }
+    }
+
+    s = lv_ll_ins_head(&ctx->subjects_ll);
     s->name = lv_strdup(name);
     s->subject = subject;
 
@@ -255,6 +272,13 @@ lv_result_t lv_xml_register_const(lv_xml_component_ctx_t * ctx, const char * nam
     }
 
     lv_xml_const_t * cnst;
+    LV_LL_READ(&ctx->const_ll, cnst) {
+        if(lv_streq(cnst->name, name)) {
+            LV_LOG_INFO("Const %s is already registered. Don't register it again.", name);
+            return LV_RESULT_OK;
+        }
+    }
+
     cnst = lv_ll_ins_head(&ctx->const_ll);
 
     cnst->name = lv_strdup(name);
@@ -286,7 +310,6 @@ const char * lv_xml_get_const(lv_xml_component_ctx_t * ctx, const char * name)
         }
     }
 
-
     LV_LOG_WARN("No constant was found with name \"%s\".", name);
     return NULL;
 }
@@ -300,7 +323,15 @@ lv_result_t lv_xml_register_image(lv_xml_component_ctx_t * ctx, const char * nam
         return LV_RESULT_INVALID;
     }
 
-    lv_xml_image_t * img = lv_ll_ins_head(&ctx->image_ll);
+    lv_xml_image_t * img;
+    LV_LL_READ(&ctx->image_ll, img) {
+        if(lv_streq(img->name, name)) {
+            LV_LOG_INFO("Image %s is already registered. Don't register it again.", name);
+            return LV_RESULT_OK;
+        }
+    }
+
+    img = lv_ll_ins_head(&ctx->image_ll);
     img->name = lv_strdup(name);
     if(lv_image_src_get_type(src) == LV_IMAGE_SRC_FILE) {
         img->src = lv_strdup(src);
@@ -346,7 +377,15 @@ lv_result_t lv_xml_register_event_cb(lv_xml_component_ctx_t * ctx, const char * 
         return LV_RESULT_INVALID;
     }
 
-    lv_xml_event_cb_t * e = lv_ll_ins_head(&ctx->event_ll);
+    lv_xml_event_cb_t * e;
+    LV_LL_READ(&ctx->event_ll, e) {
+        if(lv_streq(e->name, name)) {
+            LV_LOG_INFO("Event_cb %s is already registered. Don't register it again.", name);
+            return LV_RESULT_OK;
+        }
+    }
+
+    e = lv_ll_ins_head(&ctx->event_ll);
     e->name = lv_strdup(name);
     e->cb = cb;
 
