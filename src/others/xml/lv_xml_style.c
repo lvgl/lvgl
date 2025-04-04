@@ -94,6 +94,7 @@ lv_result_t lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** at
     LV_LL_READ(&ctx->style_ll, xml_style) {
         if(lv_streq(xml_style->name, style_name)) {
             found = true;
+            LV_LOG_INFO("Style %s is already registered. Extending it with new properties.", style_name);
             break;
         }
     }
@@ -125,7 +126,6 @@ lv_result_t lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** at
                 }
             }
         }
-
 
         SET_STYLE_IF(width, lv_xml_to_size(value));
         else SET_STYLE_IF(height, lv_xml_to_size(value));
