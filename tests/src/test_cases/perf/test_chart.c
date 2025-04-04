@@ -1,5 +1,5 @@
-#if LV_BUILD_TEST
-#include "../framework/lv_test_perf.h"
+#if LV_BUILD_TEST_PERF
+#include "unity/unity.h"
 
 static lv_obj_t *active_screen = NULL;
 static lv_obj_t *chart = NULL;
