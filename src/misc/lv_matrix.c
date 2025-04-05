@@ -180,8 +180,9 @@ bool lv_matrix_inverse(lv_matrix_t * matrix, const lv_matrix_t * m)
 lv_point_precise_t lv_matrix_transform_precise_point(const lv_matrix_t * matrix, const lv_point_precise_t * point)
 {
     lv_point_precise_t p;
-    p.x = (lv_value_precise_t)roundf(point->x * matrix->m[0][0] + point->y * matrix->m[0][1] + matrix->m[0][2]);
-    p.y = (lv_value_precise_t)roundf(point->x * matrix->m[1][0] + point->y * matrix->m[1][1] + matrix->m[1][2]);
+    lv_value_precise_t w = point->x * matrix->m[2][0] + point->y * matrix->m[2][1] + matrix->m[2][2];
+    p.x = (lv_value_precise_t)roundf((point->x * matrix->m[0][0] + point->y * matrix->m[0][1] + matrix->m[0][2]) / w);
+    p.y = (lv_value_precise_t)roundf((point->x * matrix->m[1][0] + point->y * matrix->m[1][1] + matrix->m[1][2]) / w);
     return p;
 }
 
