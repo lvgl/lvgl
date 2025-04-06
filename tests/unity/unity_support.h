@@ -36,8 +36,7 @@ extern "C" {
 
 #  define TEST_ASSERT_MEM_LEAK_LESS_THAN(prev_usage, threshold)  TEST_ASSERT_LESS_OR_EQUAL(threshold, LV_ABS((int64_t)(prev_usage) - (int64_t)lv_test_get_free_mem()));
 
-
-#if LV_BUILD_TEST_PERF
+#ifdef LV_BUILD_TEST_PERF
 
 #include <time.h>
 
