@@ -219,9 +219,10 @@ def generate_so3_init_commands(runners: list[tuple[str, str]], path: str) -> Non
     output = []
     for runner, _ in runners:
         name_without_extension = Path(runner).stem
-        delimiter = 50 * "="
+        label = f"Running {name_without_extension}"
+        delimiter = "=" * len(label)
         output.append(f"echo {delimiter}")
-        output.append(f"echo Running {name_without_extension}")
+        output.append(f"echo {label}")
         output.append(f"echo {delimiter}")
         output.append(f"run {name_without_extension}.elf")
 
