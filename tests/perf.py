@@ -7,6 +7,7 @@ import os
 import shutil
 import subprocess
 import os
+from typing import Optional
 
 perf_test_options = {
     "OPTIONS_TEST_PERF_32B": {
@@ -327,7 +328,7 @@ def generate_so3_usr_cmakelists(path: str) -> None:
 
 
 def generate_test_runners(
-    output_folder: str, test_suite: str | None
+    output_folder: str, test_suite: Optional[str]
 ) -> list[tuple[str, str]]:
     """
     Generates performance test runners by creating a runner for each `.c` file
