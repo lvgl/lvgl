@@ -356,8 +356,8 @@ def generate_test_runners(
         runner_file_name = current_test_suite + "_runner.c"
         test_case_file_name = os.path.basename(src_test_case_path)
 
-        test_case_path = os.path.join(test_folder, test_case_file_name)
-        runner_path = os.path.join(test_folder, runner_file_name)
+        test_case_path = os.path.join(output_folder, test_case_file_name)
+        runner_path = os.path.join(output_folder, runner_file_name)
 
         subprocess.check_call(
             [
