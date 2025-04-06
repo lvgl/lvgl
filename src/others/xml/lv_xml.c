@@ -69,7 +69,7 @@ void lv_xml_init(void)
 {
     lv_xml_component_init();
 
-    lv_xml_register_font(NULL, "lv_font_default", lv_font_default);
+    lv_xml_register_font(NULL, "lv_font_default", lv_font_get_default());
 
     lv_xml_widget_register("lv_obj", lv_xml_obj_create, lv_xml_obj_apply);
     lv_xml_widget_register("lv_button", lv_xml_button_create, lv_xml_button_apply);
