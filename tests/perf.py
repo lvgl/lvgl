@@ -507,7 +507,6 @@ def run_tests(options_name: str, lv_conf_name: str) -> bool:
 
     command.append(perf_test_options[options_name]["image_name"])
 
-    subprocess.check_call(["docker", "rm", "-f", CONTAINER_NAME])
 
     print()
     print()
@@ -520,7 +519,12 @@ def run_tests(options_name: str, lv_conf_name: str) -> bool:
     print("=" * len(label))
 
     subprocess.check_call(command)
-    return check_for_success(CONTAINER_NAME)
+    success = check_for_success(container_name)
+
+    # We can't use the `docker run --rm` syntax because we need access to the docker container
+    # after it exits in order to check for the success status of the run
+    subprocess.check_call(["docker", "rm", "-f", container_name])
+    return success
 
 
 if __name__ == "__main__":
