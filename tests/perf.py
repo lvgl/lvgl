@@ -507,7 +507,8 @@ def run_tests(options_name: str, lv_conf_name: str) -> bool:
         volume(get_disk_cache_volume(options_name), persistence_dir),
     ]
 
-    command = ["docker", "run", "-it", "--privileged", "--name", container_name]
+    interactive = "-it" if sys.stdout.isatty() else "-t"
+    command = ["docker", "run", "--privileged", "--name", container_name, interactive]
     for v in volumes:
         command.extend(v)
 
