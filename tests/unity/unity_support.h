@@ -40,7 +40,7 @@ extern "C" {
 
 #include <time.h>
 
-#define LV_PERF_ASSERT_MAX_TIME(fn, max_time_ms, ...)                        \
+#define TEST_ASSERT_MAX_TIME(fn, max_time_ms, ...)                           \
 	do {                                                                 \
 		clock_t t = clock();                                         \
 		fn(__VA_ARGS__);                                             \
@@ -51,7 +51,7 @@ extern "C" {
 		TEST_ASSERT_LESS_OR_EQUAL_DOUBLE((max_time_ms), time_taken); \
 	} while (0)
 
-#define LV_PERF_ASSERT_MAX_TIME_ITER(fn, max_time_ms, iterations, ...)       \
+#define TEST_ASSERT_MAX_TIME_ITER(fn, max_time_ms, iterations, ...)          \
 	do {                                                                 \
 		clock_t t = clock();                                         \
 		for (size_t i = 0; i < iterations; ++i)                      \
@@ -65,8 +65,8 @@ extern "C" {
 
 #else
 
-#define LV_PERF_ASSERT_MAX_TIME(fn, max_time_ms, ...)	   fn(__VA_ARGS__);
-#define LV_PERF_ASSERT_MAX_TIME_ITER(fn, max_time_ms, ...) fn(__VA_ARGS__);
+#define TEST_ASSERT_MAX_TIME(fn, max_time_ms, ...)	fn(__VA_ARGS__);
+#define TEST_ASSERT_MAX_TIME_ITER(fn, max_time_ms, ...) fn(__VA_ARGS__);
 
 #endif /* LV_BUILD_TEST_PERF */
 
