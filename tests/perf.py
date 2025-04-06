@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse
 import sys
 from pathlib import Path
@@ -65,7 +67,6 @@ def main():
 
     args = parser.parse_args()
 
-    print(args)
     options = []
     if args.build_options:
         options = args.build_options
@@ -84,10 +85,9 @@ def main():
             is_error = is_error or not ret
 
         if args.auto_clean:
-            build_dir = get_build_dir(option_name)
-            shutil.rmtree(build_dir)
+            clean(option_name)
 
-    return not is_error
+    return is_error
 
 
 def lvgl_test_src(name):
@@ -355,12 +355,14 @@ def clean(options_name):
 
 
 def check_for_success(container_name):
-    p = subprocess.Popen(["docker", "logs", container_name], stdout=subprocess.PIPE)
-    p.wait()
+    """
+    There's no support for return codes when running qemu so we manually check the docker
+    logs to see if any case failed
+    """
+    stdout = subprocess.getoutput(f"docker logs {container_name}")
 
-    assert p.stdout
-    for line in p.stdout.readlines():
-        if line == "FAIL":
+    for line in stdout.splitlines():
+        if "FAIL" in line.strip():
             return False
 
     return True
