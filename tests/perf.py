@@ -470,8 +470,6 @@ def run_tests(options_name: str, lv_conf_name: str) -> bool:
     test_src_dir = os.path.join(build_dir, "test_src")
     main_cmakelists = os.path.join(build_dir, "CMakeLists.txt")
     lvgl_src_dir = os.path.join(lvgl_test_dir, "..", "src")
-    # lvgl_demos_dir = os.path.join(lvgl_test_dir, "..", "demos")
-    # lvgl_examples_dir = os.path.join(lvgl_test_dir, "..", "examples")
     lv_conf_path = os.path.join(lvgl_test_dir, "src", lv_conf_name)
     lvgl_h_path = os.path.join(lvgl_test_dir, "..", "lvgl.h")
     commands_ini_path = os.path.join(build_dir, "commands.ini")
@@ -482,8 +480,6 @@ def run_tests(options_name: str, lv_conf_name: str) -> bool:
         # Replace container's lvgl source and lv_conf
         volume(lvgl_src_dir, so3_usr_lib("lvgl/src")),
         volume(lv_conf_path, so3_usr_lib("lv_conf.h")),
-        # volume(lvgl_demos_dir, so3_usr_lib("lvgl/demos")),
-        # volume(lvgl_examples_dir, so3_usr_lib("lvgl/examples")),
         volume(lvgl_h_path, "/so3/usr/lvgl.h"),
         # Mount the test sources (test cases and runners)
         volume(test_src_dir, so3_usr_src("test_src")),
