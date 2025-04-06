@@ -333,9 +333,11 @@ def generate_test_runners(
     Each generated runner, along with its corresponding `.c` file, will be saved
     in the specified `output_folder`.
     """
+
     runner_generator_script = os.path.join(
         lvgl_test_dir, "unity", "generate_test_runner.rb"
     )
+
     # Get the necessary files in order to generate the runners
     # This includes the test cases and the unity config
     test_cases = find_c_files(os.path.join(lvgl_test_dir, "src", "test_cases", "perf"))
@@ -446,6 +448,7 @@ def run_tests(options_name: str, lv_conf_name: str) -> bool:
     Runs the tests by running the docker image associated with `options_name`
     while mounting the correct volumes from the previous generated files
     """
+
     def volume(src, dst):
         return ["-v", f"{src}:{dst}"]
 
