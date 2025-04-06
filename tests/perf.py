@@ -481,6 +481,7 @@ def run_tests(options_name: str, lv_conf_name: str) -> bool:
         # Replace container's lvgl source and lv_conf
         volume(lvgl_src_dir, so3_usr_lib("lvgl/src")),
         volume(lv_conf_path, so3_usr_lib("lv_conf.h")),
+        volume(lvgl_h_path, so3_usr_lib("lvgl/lvgl.h")),
         # We also need to add the current "lvgl.h" and mount it in the correct path
         # As there's a `#include "../../lvgl.h"` in the `unity_support.h` file
         volume(lvgl_h_path, "/so3/usr/lvgl.h"),
