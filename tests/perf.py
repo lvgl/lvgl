@@ -1,4 +1,5 @@
 import argparse
+import sys
 from pathlib import Path
 import os
 import shutil
@@ -71,16 +72,20 @@ def main():
     else:
         options = perf_test_options.keys()
 
+    is_error = False
     for option_name in options:
         if "generate" or "build" or "test" in args.actions:
             generate_files(option_name, args.clean, args.test_suite)
 
         if "test" in args.actions:
-            run_tests(option_name, "lv_test_perf_conf.h")
+            ret = run_tests(option_name, "lv_test_perf_conf.h")
+            is_error = is_error or not ret
 
         if args.auto_clean:
             build_dir = get_build_dir(option_name)
             shutil.rmtree(build_dir)
+
+    return not is_error
 
 
 def lvgl_test_src(name):
@@ -322,6 +327,18 @@ def generate_files(options_name, clean, test_suite=None):
     generate_so3_init_commands(runners, os.path.join(options_build_dir, "commands.ini"))
 
 
+def check_for_success(container_name):
+    p = subprocess.Popen(["docker", "logs", container_name], stdout=subprocess.PIPE)
+    p.wait()
+
+    assert p.stdout
+    for line in p.stdout.readlines():
+        if line == "FAIL":
+            return False
+
+    return True
+
+
 def run_tests(options_name, config_name):
     def volume(src, dst):
         return ["-v", f"{src}:{dst}"]
@@ -397,7 +414,8 @@ def run_tests(options_name, config_name):
     print("=" * len(label))
 
     subprocess.check_call(command)
+    return check_for_success(CONTAINER_NAME)
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
