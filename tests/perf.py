@@ -75,7 +75,9 @@ def main():
     is_error = False
     for option_name in options:
         if "generate" or "build" or "test" in args.actions:
-            generate_files(option_name, args.clean, args.test_suite)
+            if args.clean:
+                clean(option_name)
+            generate_files(option_name, args.test_suite)
 
         if "test" in args.actions:
             ret = run_tests(option_name, "lv_test_perf_conf.h")
@@ -131,6 +133,22 @@ def find_c_files(directory):
                 c_files.append(os.path.join(root, file))
 
     return c_files
+
+
+def get_container_name(options_name):
+    return f"lv_perf_test_{options_name}"
+
+
+def get_docker_volumes(options_name):
+    return [get_build_cache_volume(options_name), get_disk_cache_volume(options_name)]
+
+
+def get_build_cache_volume(options_name):
+    return f"{get_container_name(options_name)}_build_cache"
+
+
+def get_disk_cache_volume(options_name):
+    return f"{get_container_name(options_name)}_disk_cache"
 
 
 def get_build_dir(options_name):
@@ -285,7 +303,7 @@ def generate_test_runners(test_folder, test_suite):
     return runners
 
 
-def generate_files(options_name, clean, test_suite=None):
+def generate_files(options_name, test_suite):
     """
     Generates every necessary file for running tests inside so3
     Everything is built inside a docker container so we need to prepare
@@ -305,9 +323,6 @@ def generate_files(options_name, clean, test_suite=None):
     generated_unity_dir = os.path.join(options_build_dir, "unity")
     generated_test_src_dir = os.path.join(options_build_dir, "test_src")
 
-    if clean and os.path.exists(options_build_dir):
-        shutil.rmtree(options_build_dir)
-
     create_dir(options_build_dir)
     create_dir(generated_test_src_dir)
 
@@ -325,6 +340,18 @@ def generate_files(options_name, clean, test_suite=None):
     )
     generate_so3_usr_cmakelists(os.path.join(options_build_dir, "CMakeLists.txt"))
     generate_so3_init_commands(runners, os.path.join(options_build_dir, "commands.ini"))
+
+
+def clean(options_name):
+
+    options_build_dir = get_build_dir(options_name)
+    container_name = get_container_name(options_name)
+    if os.path.exists(options_build_dir):
+        shutil.rmtree(options_build_dir)
+
+    subprocess.check_call(["docker", "rm", "-f", container_name])
+    for v in get_docker_volumes(options_name):
+        subprocess.check_call(["docker", "volume", "remove", "-f", v])
 
 
 def check_for_success(container_name):
@@ -358,6 +385,8 @@ def run_tests(options_name, config_name):
 
     build_dir = get_build_dir(options_name)
 
+    for v in get_docker_volumes(options_name):
+        subprocess.check_call(["docker", "volume", "create", v])
     unity_dir = os.path.join(build_dir, "unity")
     test_src_dir = os.path.join(build_dir, "test_src")
     main_cmakelists = os.path.join(build_dir, "CMakeLists.txt")
@@ -367,8 +396,6 @@ def run_tests(options_name, config_name):
     lv_conf_path = os.path.join(lvgl_test_dir, "src", config_name)
     lvgl_h_path = os.path.join(lvgl_test_dir, "..", "lvgl.h")
     commands_ini_path = os.path.join(build_dir, "commands.ini")
-    build_cache_dir = os.path.join(build_dir, "build")
-    virtual_disk_cache_dir = os.path.join(build_dir, "persistence")
 
     volumes = [
         # This is necessary in order to create a loop device
@@ -386,9 +413,9 @@ def run_tests(options_name, config_name):
         # Modify the default so3 CMakeLists and commands.ini
         volume(main_cmakelists, so3_usr_src("CMakeLists.txt")),
         volume(commands_ini_path, so3_usr_out("commands.ini")),
-        # Cache build folder so we don't regenerate everything in consecutive runs
-        volume(build_cache_dir, so3_usr_build),
-        volume(virtual_disk_cache_dir, persistence_dir),
+        # Cache build and disk folders so we don't regenerate everything in consecutive runs
+        volume(get_build_cache_volume(options_name), so3_usr_build),
+        volume(get_disk_cache_volume(options_name), persistence_dir),
     ]
 
     command = ["docker", "run", "-it", "--privileged", "--name", CONTAINER_NAME]
