@@ -262,6 +262,9 @@ def copy_unity(target_folder: str) -> None:
     """
     Copies the unity source files to `target_folder`
     """
+
+    print(f"Generating {target_folder}")
+
     unity_src_dir = os.path.join(lvgl_test_dir, "unity")
     shutil.copytree(unity_src_dir, target_folder, dirs_exist_ok=True)
 
@@ -270,6 +273,8 @@ def copy_lvgl_test_files(target_folder: str) -> None:
     """
     Copies the lvgl test source files `target_folder`
     """
+
+    print(f"Generating {target_folder}")
     for src in LVGL_TEST_FILES:
         dst = os.path.join(target_folder, os.path.basename(src))
         shutil.copy(src, dst)
@@ -280,6 +285,7 @@ def generate_unity_cmakelists(path: str) -> None:
     Generates a CMakeLists.txt for the unity framework
     """
 
+    print(f"Generating {path}")
     content_lines = [
         # Create a static library
         "add_library(unity STATIC unity.c)",
@@ -303,6 +309,8 @@ def generate_so3_usr_cmakelists(path: str) -> None:
     every test runner, and necessary sources for building those runners
     (except the lvgl source code)
     """
+
+    print(f"Generating {path}")
     content_lines = [
         "add_subdirectory(unity)",
         "add_executable(init.elf init.c)",
