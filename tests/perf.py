@@ -198,7 +198,6 @@ def get_build_dir(options_name: str) -> str:
     """Given the build options name, return the build directory name.
 
     Returns absolute path to the build directory."""
-    global lvgl_test_dir
     return os.path.join(lvgl_test_dir, get_base_build_dir(options_name))
 
 
