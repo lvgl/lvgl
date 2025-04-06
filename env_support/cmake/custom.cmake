@@ -49,6 +49,13 @@ if ( LV_USE_KCONFIG )
   if (LV_CONF_PATH)
     set(PCPP_ADDITIONAL_DEFS "--defs" "LV_CONF_PATH=\"${LV_CONF_PATH}\"")
   endif()
+  if (LV_LVGL_H_INCLUDE_SIMPLE)
+    list(APPEND PCPP_ADDITIONAL_DEFS "--defs" "LV_LVGL_H_INCLUDE_SIMPLE")
+  endif()
+  
+  if (LV_CONF_INCLUDE_SIMPLE)
+    list(APPEND PCPP_ADDITIONAL_DEFS "--defs" "LV_CONF_INCLUDE_SIMPLE")
+  endif()
 endif()
 
 target_compile_definitions(
