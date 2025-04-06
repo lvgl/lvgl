@@ -8,7 +8,6 @@ import os
 import platform
 from itertools import chain
 from pathlib import Path
-from perf import perf_test_options
 
 lvgl_test_dir = os.path.dirname(os.path.realpath(__file__))
 lvgl_script_path = os.path.join(lvgl_test_dir, "../scripts")
@@ -17,6 +16,7 @@ sys.path.append(lvgl_script_path)
 wayland_dir = os.path.join(lvgl_test_dir, "wayland_protocols")
 wayland_protocols_dir = os.path.realpath("/usr/share/wayland-protocols")
 
+from perf import perf_test_options
 from LVGLImage import LVGLImage, ColorFormat, CompressMethod
 
 # Key values must match variable names in CMakeLists.txt.
