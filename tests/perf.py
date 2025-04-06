@@ -399,15 +399,15 @@ def generate_files(options_name, test_suite):
     create_dir(options_build_dir)
     create_dir(generated_test_src_dir)
 
-    # Copy Unity and generate a cmakelists for it
-    copy_unity(generated_unity_dir)
-    generate_unity_cmakelists(os.path.join(generated_unity_dir, "CMakeLists.txt"))
+    runners = generate_test_runners(generated_test_src_dir, test_suite)
 
     # Copy lvgl common test files
     copy_lvgl_test_files(generated_test_src_dir)
+    # Copy Unity framework
+    copy_unity(generated_unity_dir)
 
-    runners = generate_test_runners(generated_test_src_dir, test_suite)
     # Generate necessary cmakelists
+    generate_unity_cmakelists(os.path.join(generated_unity_dir, "CMakeLists.txt"))
     generate_perf_test_cmakelists(
         runners, os.path.join(generated_test_src_dir, "CMakeLists.txt")
     )
