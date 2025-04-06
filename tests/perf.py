@@ -460,12 +460,12 @@ def run_tests(options_name: str, lv_conf_name: str) -> bool:
 
     so3_usr_build = f"/so3/usr/build"
     persistence_dir = f"/persistence"
-    CONTAINER_NAME = f"lv_perf_test_{options_name}"
-
+    container_name = get_container_name(options_name)
     build_dir = get_build_dir(options_name)
 
     for v in get_docker_volumes(options_name):
         subprocess.check_call(["docker", "volume", "create", v])
+
     unity_dir = os.path.join(build_dir, "unity")
     test_src_dir = os.path.join(build_dir, "test_src")
     main_cmakelists = os.path.join(build_dir, "CMakeLists.txt")
@@ -493,7 +493,7 @@ def run_tests(options_name: str, lv_conf_name: str) -> bool:
         volume(get_disk_cache_volume(options_name), persistence_dir),
     ]
 
-    command = ["docker", "run", "-it", "--privileged", "--name", CONTAINER_NAME]
+    command = ["docker", "run", "-it", "--privileged", "--name", container_name]
     for v in volumes:
         command.extend(v)
 
