@@ -340,7 +340,7 @@ def generate_test_runners(
 
     # Get the necessary files in order to generate the runners
     # This includes the test cases and the unity config
-    test_cases = find_c_files(os.path.join(lvgl_test_dir, "src", "test_cases", "perf"))
+    test_cases = find_c_files(os.path.join(lvgl_test_dir, "src", "test_cases_perf"))
     unity_config_path = os.path.join(lvgl_test_dir, "config.yml")
 
     runners = []
