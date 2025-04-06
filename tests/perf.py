@@ -521,7 +521,11 @@ def run_tests(options_name: str, lv_conf_name: str) -> bool:
     print(label)
     print("=" * len(label))
 
-    subprocess.check_call(command)
+    try:
+        subprocess.check_call(command)
+    except subprocess.CalledProcessError:
+        subprocess.check_call(["docker", "rm", "-f", container_name])
+        return False
     success = check_for_success(container_name)
 
     # We can't use the `docker run --rm` syntax because we need access to the docker container
