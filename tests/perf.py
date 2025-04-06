@@ -24,7 +24,7 @@ perf_test_options = {
 lvgl_test_dir = os.path.dirname(os.path.realpath(__file__))
 
 
-def main():
+def main() -> bool:
     epilog = """This program runs LVGL perfomance tests
     In order to provide timing consitency between host computers,
     these runs are run in an ARM emulated environnement inside QEMU.
@@ -90,28 +90,30 @@ def main():
     return is_error
 
 
-def lvgl_test_src(name):
+
+
+def lvgl_test_src(name: str) -> str:
     return os.path.join(lvgl_test_dir, "src", name)
 
 
 LVGL_TEST_FILES = [lvgl_test_src("lv_test_init.c"), lvgl_test_src("lv_test_init.h")]
 
 
-def options_abbrev(options_name):
+def options_abbrev(options_name: str) -> str:
     """Return an abbreviated version of the option name."""
     prefix = "OPTIONS_"
     assert options_name.startswith(prefix)
     return options_name[len(prefix) :].lower()
 
 
-def get_base_build_dir(options_name):
+def get_base_build_dir(options_name: str) -> str:
     """Given the build options name, return the build directory name.
 
     Does not return the full path to the directory - just the base name."""
     return "build_%s" % options_abbrev(options_name)
 
 
-def create_dir(build_dir):
+def create_dir(build_dir: str) -> bool:
     created_build_dir = False
 
     if os.path.exists(build_dir):
@@ -124,7 +126,7 @@ def create_dir(build_dir):
     return created_build_dir
 
 
-def find_c_files(directory):
+def find_c_files(directory: str) -> list[str]:
     c_files = []
 
     for root, _, files in os.walk(directory):
@@ -135,23 +137,23 @@ def find_c_files(directory):
     return c_files
 
 
-def get_container_name(options_name):
+def get_container_name(options_name: str) -> str:
     return f"lv_perf_test_{options_name}"
 
 
-def get_docker_volumes(options_name):
+def get_docker_volumes(options_name: str) -> list[str]:
     return [get_build_cache_volume(options_name), get_disk_cache_volume(options_name)]
 
 
-def get_build_cache_volume(options_name):
+def get_build_cache_volume(options_name: str) -> str:
     return f"{get_container_name(options_name)}_build_cache"
 
 
-def get_disk_cache_volume(options_name):
+def get_disk_cache_volume(options_name: str) -> str:
     return f"{get_container_name(options_name)}_disk_cache"
 
 
-def get_build_dir(options_name):
+def get_build_dir(options_name: str) -> str:
     """Given the build options name, return the build directory name.
 
     Returns absolute path to the build directory."""
@@ -159,7 +161,7 @@ def get_build_dir(options_name):
     return os.path.join(lvgl_test_dir, get_base_build_dir(options_name))
 
 
-def generate_so3_init_commands(runners: list[tuple[str, str]], path: str):
+def generate_so3_init_commands(runners: list[tuple[str, str]], path: str) -> None:
     """
     Generates the `commands.ini` file that will be mounted in `usr/out/commands.ini` replacing
     the default `commands.ini` used by so3.
@@ -187,7 +189,7 @@ def generate_so3_init_commands(runners: list[tuple[str, str]], path: str):
         f.write("\n".join(output))
 
 
-def generate_perf_test_cmakelists(runners: list[tuple[str, str]], path: str):
+def generate_perf_test_cmakelists(runners: list[tuple[str, str]], path: str) -> None:
     """
     Generates the CMakeLists.txt that will be mounted in `usr/src/test_src/CMakeLists.txt`
     This file simply declares every runner as a different executable and links the necessary
@@ -216,18 +218,18 @@ def generate_perf_test_cmakelists(runners: list[tuple[str, str]], path: str):
         f.write("\n".join(output))
 
 
-def copy_unity(target_folder: str):
+def copy_unity(target_folder: str) -> None:
     unity_src_dir = os.path.join(lvgl_test_dir, "unity")
     shutil.copytree(unity_src_dir, target_folder, dirs_exist_ok=True)
 
 
-def copy_lvgl_test_files(target_folder):
+def copy_lvgl_test_files(target_folder: str) -> None:
     for src in LVGL_TEST_FILES:
         dst = os.path.join(target_folder, os.path.basename(src))
         shutil.copy(src, dst)
 
 
-def generate_unity_cmakelists(path: str):
+def generate_unity_cmakelists(path: str) -> None:
 
     content_lines = [
         "add_library(unity STATIC unity.c)",
@@ -238,7 +240,7 @@ def generate_unity_cmakelists(path: str):
         f.write("\n".join(content_lines))
 
 
-def generate_so3_usr_cmakelists(path: str):
+def generate_so3_usr_cmakelists(path: str) -> None:
     """
     Generates the main CMakeLists.txt that will be mounted in `usr/src/CMakeLists.txt`
     We need to keep the `init` program as it's the program that will be
@@ -258,7 +260,9 @@ def generate_so3_usr_cmakelists(path: str):
         f.write("\n".join(content_lines))
 
 
-def generate_test_runners(test_folder, test_suite):
+def generate_test_runners(
+    output_folder: str, test_suite: str | None
+) -> list[tuple[str, str]]:
 
     runner_generator_script = os.path.join(
         lvgl_test_dir, "unity", "generate_test_runner.rb"
@@ -342,7 +346,7 @@ def generate_files(options_name, test_suite):
     generate_so3_init_commands(runners, os.path.join(options_build_dir, "commands.ini"))
 
 
-def clean(options_name):
+def clean(options_name: str) -> None:
 
     options_build_dir = get_build_dir(options_name)
     container_name = get_container_name(options_name)
@@ -368,7 +372,7 @@ def check_for_success(container_name):
     return True
 
 
-def run_tests(options_name, config_name):
+def run_tests(options_name: str, lv_conf_name: str) -> bool:
     def volume(src, dst):
         return ["-v", f"{src}:{dst}"]
 
@@ -395,7 +399,7 @@ def run_tests(options_name, config_name):
     lvgl_src_dir = os.path.join(lvgl_test_dir, "..", "src")
     # lvgl_demos_dir = os.path.join(lvgl_test_dir, "..", "demos")
     # lvgl_examples_dir = os.path.join(lvgl_test_dir, "..", "examples")
-    lv_conf_path = os.path.join(lvgl_test_dir, "src", config_name)
+    lv_conf_path = os.path.join(lvgl_test_dir, "src", lv_conf_name)
     lvgl_h_path = os.path.join(lvgl_test_dir, "..", "lvgl.h")
     commands_ini_path = os.path.join(build_dir, "commands.ini")
 
