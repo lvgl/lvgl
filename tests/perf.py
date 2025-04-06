@@ -242,15 +242,15 @@ def generate_perf_test_cmakelists(runners: list[tuple[str, str]], path: str) -> 
     libraries
     """
     output = []
-    files_to_include = [
+    files_to_include = " ".join(
         os.path.basename(file) for file in LVGL_TEST_FILES if file.endswith(".c")
-    ]
+    )
 
     for runner, test_case in runners:
         runner_name_without_extension = Path(runner).stem
         runner_elf_file = f"{runner_name_without_extension}.elf"
         output.append(
-            f"add_executable({runner_elf_file} {runner_name_without_extension}.c {test_case} {" ".join(files_to_include)})"
+            f"add_executable({runner_elf_file} {runner_name_without_extension}.c {test_case} {files_to_include})"
         )
         output.append(f"target_link_libraries({runner_elf_file} c lvgl unity)")
         output.append(
