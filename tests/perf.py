@@ -91,11 +91,17 @@ def main() -> bool:
 
 
 def write_lines_to_file(path: str, lines: list[str]) -> None:
+    """
+    Writes a list of strings to a file, each on a separate line
+    """
     with open(path, "w") as f:
         f.write("\n".join(lines))
 
 
 def lvgl_test_src(name: str) -> str:
+    """
+    Gets the absolute path of a file from the lvgl `tests/src` folder
+    """
     return os.path.join(lvgl_test_dir, "src", name)
 
 
