@@ -511,10 +511,6 @@ def run_tests(options_name: str, lv_conf_name: str) -> bool:
     for v in volumes:
         command.extend(v)
 
-    # Temporary
-    command.extend(volume("/home/andre/dev/so3/usr/lib/libc", so3_usr_lib("libc")))
-    #
-
     command.append(docker_image_name)
 
     print()
