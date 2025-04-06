@@ -65,11 +65,10 @@ To run the tests:
 - `test`: launches Docker with the appropriate volume mounts and runs the tests inside the container
 
 
-> [!INFO] Building doesn't actually build the source files because the current docker image doesn't separate the building and running. Instead, it does both
+> [!NOTE]
+> Building doesn't actually build the source files because the current docker image doesn't separate the building and running. Instead, it does both
 
 You can specify different build configurations via `--build-options`, and optionally filter tests using `--test-suite`.
-
-> [!INFO] The script generates all necessary files, then mounts them into a Docker container. Once the container starts, LVGL and the test cases are built and executed 
 
 For full usage options, run:
 
