@@ -141,18 +141,56 @@ def find_c_files(directory: str) -> list[str]:
 
 
 def get_container_name(options_name: str) -> str:
+    """
+    Returns the docker container name based on the options name
+    """
     return f"lv_perf_test_{options_name}"
 
 
 def get_docker_volumes(options_name: str) -> list[str]:
+    """
+    Returns all docker volume names that should be created in order to run the images
+    This function is useful so we can easily loop through the necessary docker volumes in order
+    to create or delete them eg:
+
+    ```python
+    for v in get_docker_volumes(options_name):
+        subprocess.check_call(["docker", "volume", "create", v])
+        subprocess.check_call(["docker", "volume", "remove", v])
+    ```
+    """
     return [get_build_cache_volume(options_name), get_disk_cache_volume(options_name)]
 
 
 def get_build_cache_volume(options_name: str) -> str:
+    """
+    Returns the docker volume name for storing cmake generated files
+
+    We use a docker volume here instead of a plain directory because the user that launches the script
+    will not own the generated files as they're generated inside the docker container
+    Using a docker volume allows us to delete it without having to run delete the volume inside this script
+    without admin permissions by removing the docker volume:
+
+    ```python
+    subprocess.check_call(["docker", "volume", "remove", get_build_cache_volume(options_name)])
+    ```
+    """
     return f"{get_container_name(options_name)}_build_cache"
 
 
 def get_disk_cache_volume(options_name: str) -> str:
+    """
+    Returns the docker volume name for storing the virtual disks generated inside the docker volume
+
+    We use a docker volume here instead of a directory because the user that launches the script
+    will not own the generated files as they're generated inside the docker container
+    Using a docker volume allows us to delete it without having to run delete the volume inside this script
+    without admin permissions by removing the docker volume:
+
+    ```python
+    subprocess.check_call(["docker", "volume", "remove", get_disk_cache_volume(options_name)])
+    ```
+    """
     return f"{get_container_name(options_name)}_disk_cache"
 
 
@@ -220,20 +258,35 @@ def generate_perf_test_cmakelists(runners: list[tuple[str, str]], path: str) -> 
 
 
 def copy_unity(target_folder: str) -> None:
+    """
+    Copies the unity source files to `target_folder`
+    """
     unity_src_dir = os.path.join(lvgl_test_dir, "unity")
     shutil.copytree(unity_src_dir, target_folder, dirs_exist_ok=True)
 
 
 def copy_lvgl_test_files(target_folder: str) -> None:
+    """
+    Copies the lvgl test source files `target_folder`
+    """
     for src in LVGL_TEST_FILES:
         dst = os.path.join(target_folder, os.path.basename(src))
         shutil.copy(src, dst)
 
 
 def generate_unity_cmakelists(path: str) -> None:
+    """
+    Generates a CMakeLists.txt for the unity framework
+    """
 
     content_lines = [
+        # Create a static library
         "add_library(unity STATIC unity.c)",
+        # Add the necessary compile definitions in order to build the library correctly
+        # Setting these to PUBLIC allows other apps that link with this library to use the same compile definitions
+        # Here we enable LV_BUILD_TEST and LV_BUILD_TEST_PERF so we enable the file contents
+        # UNITY_INCLUDE_DOUBLE enables macros like `TEST_ASSERT_LESS_OR_EQUAL_DOUBLE`
+        # UNITY_OUTPUT_COLOR enables coloring the `OK` and the `FAIL` output of the tests
         "target_compile_definitions(unity PUBLIC LV_BUILD_TEST LV_BUILD_TEST_PERF UNITY_INCLUDE_DOUBLE UNITY_OUTPUT_COLOR)",
     ]
 
@@ -262,7 +315,16 @@ def generate_so3_usr_cmakelists(path: str) -> None:
 def generate_test_runners(
     output_folder: str, test_suite: str | None
 ) -> list[tuple[str, str]]:
+    """
+    Generates performance test runners by creating a runner for each `.c` file
+    located in the `test_cases/perf` directory.
 
+    If `test_suite` is provided, only `.c` files matching the suite will be used.
+    Otherwise, all `.c` files in the directory are included.
+
+    Each generated runner, along with its corresponding `.c` file, will be saved
+    in the specified `output_folder`.
+    """
     runner_generator_script = os.path.join(
         lvgl_test_dir, "unity", "generate_test_runner.rb"
     )
@@ -372,6 +434,10 @@ def check_for_success(container_name):
 
 
 def run_tests(options_name: str, lv_conf_name: str) -> bool:
+    """
+    Runs the tests by running the docker image associated with `options_name`
+    while mounting the correct volumes from the previous generated files
+    """
     def volume(src, dst):
         return ["-v", f"{src}:{dst}"]
 
