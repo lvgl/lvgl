@@ -473,6 +473,7 @@ def run_tests(options_name: str, lv_conf_name: str) -> bool:
     lv_conf_path = os.path.join(lvgl_test_dir, "src", lv_conf_name)
     lvgl_h_path = os.path.join(lvgl_test_dir, "..", "lvgl.h")
     commands_ini_path = os.path.join(build_dir, "commands.ini")
+    docker_image_name = perf_test_options[options_name]["image_name"]
 
     volumes = [
         # This is necessary in order to create a loop device
@@ -505,8 +506,7 @@ def run_tests(options_name: str, lv_conf_name: str) -> bool:
     command.extend(volume("/home/andre/dev/so3/usr/lib/libc", so3_usr_lib("libc")))
     #
 
-    command.append(perf_test_options[options_name]["image_name"])
-
+    command.append(docker_image_name)
 
     print()
     print()
