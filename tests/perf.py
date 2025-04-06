@@ -90,6 +90,9 @@ def main() -> bool:
     return is_error
 
 
+def write_lines_to_file(path: str, lines: list[str]) -> None:
+    with open(path, "w") as f:
+        f.write("\n".join(lines))
 
 
 def lvgl_test_src(name: str) -> str:
@@ -185,8 +188,7 @@ def generate_so3_init_commands(runners: list[tuple[str, str]], path: str) -> Non
         output.append(f"run {name_without_extension}.elf")
 
     output.append("exit")
-    with open(path, "w") as f:
-        f.write("\n".join(output))
+    write_lines_to_file(path, output)
 
 
 def generate_perf_test_cmakelists(runners: list[tuple[str, str]], path: str) -> None:
@@ -214,8 +216,7 @@ def generate_perf_test_cmakelists(runners: list[tuple[str, str]], path: str) -> 
             f"target_include_directories({runner_elf_file} PRIVATE ${{CMAKE_CURRENT_SOURCE_DIR}}/../unity)"
         )
 
-    with open(path, "w") as f:
-        f.write("\n".join(output))
+    write_lines_to_file(path, output)
 
 
 def copy_unity(target_folder: str) -> None:
@@ -236,8 +237,7 @@ def generate_unity_cmakelists(path: str) -> None:
         "target_compile_definitions(unity PUBLIC LV_BUILD_TEST LV_BUILD_TEST_PERF UNITY_INCLUDE_DOUBLE UNITY_OUTPUT_COLOR)",
     ]
 
-    with open(path, "w") as f:
-        f.write("\n".join(content_lines))
+    write_lines_to_file(path, content_lines)
 
 
 def generate_so3_usr_cmakelists(path: str) -> None:
@@ -256,8 +256,7 @@ def generate_so3_usr_cmakelists(path: str) -> None:
         "add_subdirectory(test_src)",
     ]
 
-    with open(path, "w") as f:
-        f.write("\n".join(content_lines))
+    write_lines_to_file(path, content_lines)
 
 
 def generate_test_runners(
