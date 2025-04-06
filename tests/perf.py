@@ -337,6 +337,7 @@ def run_tests(options_name, config_name):
 
     so3_usr_build = f"/so3/usr/build"
     persistence_dir = f"/persistence"
+    CONTAINER_NAME = f"lv_perf_test_{options_name}"
 
     build_dir = get_build_dir(options_name)
 
@@ -373,15 +374,7 @@ def run_tests(options_name, config_name):
         volume(virtual_disk_cache_dir, persistence_dir),
     ]
 
-    command = [
-        "docker",
-        "run",
-        "-it",
-        "--rm",
-        "--privileged",
-        "--name",
-        f"lv_test_{options_name}",
-    ]
+    command = ["docker", "run", "-it", "--privileged", "--name", CONTAINER_NAME]
     for v in volumes:
         command.extend(v)
 
@@ -390,6 +383,8 @@ def run_tests(options_name, config_name):
     #
 
     command.append(perf_test_options[options_name]["image_name"])
+
+    subprocess.check_call(["docker", "rm", "-f", CONTAINER_NAME])
 
     print()
     print()
