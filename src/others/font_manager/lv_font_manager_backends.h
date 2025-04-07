@@ -28,13 +28,14 @@ extern "C" {
  **********************/
 
 typedef struct {
-    const lv_font_t * font_p;
-    uint32_t size;
+    const lv_font_t * font_p; /**< Pointer to built-in font*/
+    uint32_t size; /** < Size of the built-in font*/
 } lv_builtin_font_src_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_font_class_t lv_builtin_font_class;
 
 #if LV_USE_FREETYPE
+/* Only path string is required */
 typedef const char lv_freetype_font_src_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_font_class_t lv_freetype_font_class;
@@ -42,10 +43,10 @@ LV_ATTRIBUTE_EXTERN_DATA extern const lv_font_class_t lv_freetype_font_class;
 
 #if LV_USE_TINY_TTF
 typedef struct {
-    const char * path;
-    const void * data;
-    size_t data_size;
-    size_t cache_size;
+    const char * path; /**< Path to the font file*/
+    const void * data; /**< Pointer to the font data*/
+    size_t data_size; /**< Size of the font data*/
+    size_t cache_size; /**< Size of the font cache*/
 } lv_tiny_ttf_font_src_t;
 
 LV_ATTRIBUTE_EXTERN_DATA extern const lv_font_class_t lv_tiny_ttf_font_class;

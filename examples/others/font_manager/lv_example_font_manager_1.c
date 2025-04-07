@@ -43,7 +43,7 @@ void lv_example_font_manager_1(void)
 void lv_example_font_manager_1(void)
 {
     lv_obj_t * label = lv_label_create(lv_screen_active());
-    lv_label_set_text(label, "FreeType or font_manager is not enabled");
+    lv_label_set_text(label, "FreeType and Font Manager are not enabled");
     lv_obj_center(label);
 }
 

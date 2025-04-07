@@ -30,19 +30,19 @@ extern "C" {
 struct _lv_font_info_t;
 
 typedef struct _lv_font_class_t {
-    lv_font_t * (*create_cb)(const struct _lv_font_info_t * info, const void * src);
-    void (*delete_cb)(lv_font_t * font);
-    void * (*dup_src_cb)(const void * src);
-    void (*free_src_cb)(void * src);
+    lv_font_t * (*create_cb)(const struct _lv_font_info_t * info, const void * src); /**< Font creation callback function*/
+    void (*delete_cb)(lv_font_t * font);    /**< Font deletion callback function*/
+    void * (*dup_src_cb)(const void * src); /**< Font source duplication callback function*/
+    void (*free_src_cb)(void * src);        /**< Font source free callback function*/
 } lv_font_class_t;
 
 typedef struct _lv_font_info_t {
-    const char * name;
-    const lv_font_class_t * class_p;
-    uint32_t size;
-    uint32_t render_mode;
-    uint32_t style;
-    lv_font_kerning_t kerning;
+    const char * name;               /**< Font name*/
+    const lv_font_class_t * class_p; /**< Font class*/
+    uint32_t size;                   /**< Font size*/
+    uint32_t render_mode;            /**< Font rendering mode*/
+    uint32_t style;                  /**< Font style*/
+    lv_font_kerning_t kerning;       /**< Font kerning*/
 } lv_font_info_t;
 
 /**********************

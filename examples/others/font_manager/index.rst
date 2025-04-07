@@ -1,12 +1,12 @@
 
-Managing FreeType fonts
------------------------
+Create FreeType Font
+--------------------
 
 .. lv_example:: others/font_manager/lv_example_font_manager_1
   :language: c
 
-Managing multiple fonts
------------------------
+Create Font Family
+------------------
 
 .. lv_example:: others/font_manager/lv_example_font_manager_2
   :language: c
