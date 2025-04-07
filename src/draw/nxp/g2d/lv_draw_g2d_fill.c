@@ -160,8 +160,6 @@ static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * bu
 static void _g2d_fill_with_opa(void * g2d_handle, struct g2d_buf * dst_buf, struct g2d_surface * dst_surf,
                                struct g2d_buf * src_buf, struct g2d_surface * src_surf)
 {
-    g2d_cache_op(src_buf, G2D_CACHE_FLUSH);
-
     g2d_clear(g2d_handle, src_surf);
 
     g2d_enable(g2d_handle, G2D_BLEND);
