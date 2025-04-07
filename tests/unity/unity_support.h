@@ -47,7 +47,6 @@ extern "C" {
 		t = clock() - t;                                             \
 		const double time_taken =                                    \
 			((double)t * 1000.) / CLOCKS_PER_SEC;                \
-		printf("Time taken %.12fms\n", time_taken);                  \
 		TEST_ASSERT_LESS_OR_EQUAL_DOUBLE((max_time_ms), time_taken); \
 	} while (0)
 
@@ -59,7 +58,6 @@ extern "C" {
 		t = clock() - t;                                             \
 		const double time_taken =                                    \
 			((double)t * 1000.) / CLOCKS_PER_SEC;                \
-		printf("Time taken %.12fms\n", time_taken);                  \
 		TEST_ASSERT_LESS_OR_EQUAL_DOUBLE((max_time_ms), time_taken); \
 	} while (0)
 
