@@ -105,18 +105,13 @@ void lv_draw_g2d_img(lv_draw_task_t * t)
     int32_t dest_stride = draw_buf->header.stride / (lv_color_format_get_bpp(draw_buf->header.cf) / 8);
     lv_color_format_t dest_cf = draw_buf->header.cf;
 
-    struct g2d_surface * src_surf = lv_malloc(sizeof(struct g2d_surface));
-    G2D_ASSERT_MSG(src_surf, "Failed to alloc source surface.");
-    struct g2d_surface * dst_surf = lv_malloc(sizeof(struct g2d_surface));
-    G2D_ASSERT_MSG(dst_surf, "Failed to alloc destination surface.");
+    struct g2d_surface src_surf;
+    struct g2d_surface dst_surf;
 
-    _g2d_set_src_surf(src_surf, src_buf, &src_area, src_stride, src_cf, dsc->opa);
-    _g2d_set_dst_surf(dst_surf, dst_buf, &blend_area, dest_stride, dest_cf, dsc);
+    _g2d_set_src_surf(&src_surf, src_buf, &src_area, src_stride, src_cf, dsc->opa);
+    _g2d_set_dst_surf(&dst_surf, dst_buf, &blend_area, dest_stride, dest_cf, dsc);
 
-    _g2d_blit(u->g2d_handle, dst_buf, dst_surf, src_buf, src_surf);
-
-    lv_free(src_surf);
-    lv_free(dst_surf);
+    _g2d_blit(u->g2d_handle, dst_buf, &dst_surf, src_buf, &src_surf);
 }
 
 /**********************
