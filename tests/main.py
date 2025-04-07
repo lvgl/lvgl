@@ -261,7 +261,10 @@ if __name__ == "__main__":
         is_perf_test = options_name in perf_test_options
         if is_perf_test:
             perf_test_script = os.path.join(lvgl_test_dir, "perf.py")
-            subprocess.check_call([perf_test_script, *(sys.argv[1:])])
+            try:
+                subprocess.check_call([perf_test_script, *(sys.argv[1:])])
+            except subprocess.CalledProcessError:
+                exit(1)
             continue
 
         build_type = 'Debug'
