@@ -89,6 +89,15 @@ static void test_font_manager_src(add_src_cb_t add_src_cb)
     TEST_ASSERT_TRUE(add_src_result);
 
     /* Create font from font manager */
+
+    /* Try to create font with unknown name, should fail */
+    lv_font_t * font_unknown = lv_font_manager_create_font(g_font_manager,
+                                                           "UNKNOWN_FONT_NAME",
+                                                           0,
+                                                           10,
+                                                           0);
+    TEST_ASSERT_NULL(font_unknown);
+
     lv_font_t * font_14 = lv_font_manager_create_font(g_font_manager,
                                                       "NotoSansSC-Regular,Ubuntu-Medium,Montserrat,UNKNOWN_FONT_NAME",
                                                       LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
@@ -136,19 +145,23 @@ static void test_font_manager_src(add_src_cb_t add_src_cb)
     lv_font_manager_delete_font(g_font_manager, font_32);
     lv_font_manager_delete_font(g_font_manager, font_40);
 
+    /* Trying to delete a font that was not created by the font manager, it needs to handle this situation */
+    lv_font_manager_delete_font(g_font_manager, (lv_font_t *)LV_FONT_DEFAULT);
+    lv_font_manager_delete_font(g_font_manager, (lv_font_t *)&lv_font_montserrat_32);
+
     delete_result = lv_font_manager_delete(g_font_manager);
     TEST_ASSERT_TRUE(delete_result);
     g_font_manager = NULL;
 }
 
+void test_font_manager_src_normal(void)
+{
+    test_font_manager_src(lv_font_manager_add_src);
+}
+
 void test_font_manager_src_static(void)
 {
     test_font_manager_src(lv_font_manager_add_src_static);
-}
-
-void test_font_manager_src_not_static(void)
-{
-    test_font_manager_src(lv_font_manager_add_src);
 }
 
 #else
