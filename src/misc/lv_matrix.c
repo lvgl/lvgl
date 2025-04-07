@@ -181,8 +181,13 @@ lv_point_precise_t lv_matrix_transform_precise_point(const lv_matrix_t * matrix,
 {
     lv_point_precise_t p;
     lv_value_precise_t w = point->x * matrix->m[2][0] + point->y * matrix->m[2][1] + matrix->m[2][2];
-    p.x = (lv_value_precise_t)roundf((point->x * matrix->m[0][0] + point->y * matrix->m[0][1] + matrix->m[0][2]) / w);
-    p.y = (lv_value_precise_t)roundf((point->x * matrix->m[1][0] + point->y * matrix->m[1][1] + matrix->m[1][2]) / w);
+    if (w == 0) {
+        p.x = 0;
+        p.y = 0;
+    } else {
+        p.x = (lv_value_precise_t)roundf((point->x * matrix->m[0][0] + point->y * matrix->m[0][1] + matrix->m[0][2]) / w);
+        p.y = (lv_value_precise_t)roundf((point->x * matrix->m[1][0] + point->y * matrix->m[1][1] + matrix->m[1][2]) / w);
+    }
     return p;
 }
 
