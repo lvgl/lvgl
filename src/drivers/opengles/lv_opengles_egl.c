@@ -16,7 +16,7 @@
 #include "lv_opengles_private.h"
 #include "lv_opengles_debug.h"
 
-#include "../../core/lv_refr.h"
+#include "../../core/lv_refr_private.h"
 #include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
 #include "../../display/lv_display_private.h"
@@ -271,7 +271,14 @@ static void window_update_handler(lv_timer_t * t)
             /* if the added texture is an LVGL opengles texture display, refresh it before rendering it */
             lv_display_t * texture_disp = lv_opengles_texture_get_from_texture_id(texture->texture_id);
             if(texture_disp != NULL) {
+#if LV_USE_DRAW_OPENGLES
+                lv_display_t * default_save = lv_display_get_default();
+                lv_display_set_default(texture_disp);
+                lv_display_refr_timer(NULL);
+                lv_display_set_default(default_save);
+#else
                 lv_refr_now(texture_disp);
+#endif
             }
 
             lv_area_t clip_area = texture->area;
