@@ -263,8 +263,8 @@ if __name__ == "__main__":
             perf_test_script = os.path.join(lvgl_test_dir, "perf.py")
             try:
                 subprocess.check_call([perf_test_script, *(sys.argv[1:])])
-            except subprocess.CalledProcessError:
-                exit(1)
+            except subprocess.CalledProcessError as e:
+                sys.exit(e.returncode)
             continue
 
         build_type = 'Debug'
