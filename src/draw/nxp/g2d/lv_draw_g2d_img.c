@@ -125,7 +125,8 @@ static struct g2d_buf * _g2d_handle_src_buf(const lv_image_dsc_t * img_dsc)
     if(src_buf == NULL) {
         src_buf = g2d_alloc(img_dsc->data_size, 1);
         G2D_ASSERT_MSG(src_buf, "Failed to alloc source buffer.");
-        memcpy((int *)src_buf->buf_vaddr, img_dsc->data, img_dsc->data_size);
+        memcpy((uint8_t *)src_buf->buf_vaddr, img_dsc->data, img_dsc->data_size);
+        g2d_cache_op(src_buf, G2D_CACHE_FLUSH);
         g2d_insert_buf_map((void *)img_dsc->data, src_buf);
     }
 
@@ -205,8 +206,6 @@ static void _g2d_set_dst_surf(struct g2d_surface * dst_surf, struct g2d_buf * bu
 static void _g2d_blit(void * g2d_handle, struct g2d_buf * dst_buf, struct g2d_surface * dst_surf,
                       struct g2d_buf * src_buf, struct g2d_surface * src_surf)
 {
-    g2d_cache_op(src_buf, G2D_CACHE_FLUSH);
-
     g2d_enable(g2d_handle, G2D_BLEND);
     g2d_enable(g2d_handle, G2D_GLOBAL_ALPHA);
     g2d_blit(g2d_handle, src_surf, dst_surf);

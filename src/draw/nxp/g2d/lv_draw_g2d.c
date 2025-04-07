@@ -265,15 +265,8 @@ static void _g2d_execute_drawing(lv_draw_g2d_unit_t * u)
 
     t->draw_unit = (lv_draw_unit_t *)u;
 
-    lv_area_t draw_area;
-    if(!lv_area_intersect(&draw_area, &t->area, &t->clip_area))
-        return; /*Fully clipped, nothing to do*/
-
-    /* Make area relative to the buffer */
-    lv_area_move(&draw_area, -layer->buf_area.x1, -layer->buf_area.y1);
-
     /* Invalidate only the drawing area */
-    lv_draw_buf_invalidate_cache(draw_buf, &draw_area);
+    lv_draw_buf_invalidate_cache(draw_buf, NULL);
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
@@ -285,9 +278,6 @@ static void _g2d_execute_drawing(lv_draw_g2d_unit_t * u)
         default:
             break;
     }
-
-    /* Invalidate only the drawing area */
-    lv_draw_buf_invalidate_cache(draw_buf, &draw_area);
 }
 
 #if LV_USE_G2D_DRAW_THREAD
