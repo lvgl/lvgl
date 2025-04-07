@@ -189,9 +189,6 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(texture == 0) {
         lv_display_t * disp = lv_refr_get_disp_refreshing();
         if(layer != disp->layer_head) {
-            void * buf = lv_draw_layer_alloc_buf(layer);
-            if(buf == NULL) return -1;
-
             int32_t w = lv_area_get_width(&layer->buf_area);
             int32_t h = lv_area_get_height(&layer->buf_area);
 
