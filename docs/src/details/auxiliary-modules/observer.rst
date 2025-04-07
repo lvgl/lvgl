@@ -250,7 +250,7 @@ pointer as a ``void *`` type for any reason, but in practice, this would be rare
 Unsubscribing from a Subject
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When and Observer and its associated events are no longer needed, you can remove it
+When an Observer and its associated events are no longer needed, you can remove it
 from memory using any of the methods below, depending on the effect you want to create:
 
 - If Widget needs to be deleted, simply delete the Widget, which will automatically
