@@ -37,11 +37,11 @@ typedef struct _lv_font_class_t {
 } lv_font_class_t;
 
 typedef struct _lv_font_info_t {
-    const char * name;               /**< Font name*/
-    const lv_font_class_t * class_p; /**< Font class*/
-    uint32_t size;                   /**< Font size*/
-    uint32_t render_mode;            /**< Font rendering mode*/
-    uint32_t style;                  /**< Font style*/
+    const char * name;               /**< Font name, used to distinguish different font resources*/
+    const lv_font_class_t * class_p; /**< Font backend implementation*/
+    uint32_t size;                   /**< Font size in pixel*/
+    uint32_t render_mode;            /**< Font rendering mode, see `lv_freetype_font_render_mode_t`*/
+    uint32_t style;                  /**< Font style, see `lv_freetype_font_style_t`*/
     lv_font_kerning_t kerning;       /**< Font kerning*/
 } lv_font_info_t;
 
