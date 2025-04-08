@@ -1092,7 +1092,7 @@ static void get_cell_area(lv_obj_t * obj, uint32_t row, uint32_t col, lv_area_t 
         area->x1 += table->col_w[c];
     }
     /* Traverse the current row from the first until the penultimate column.
-     * Increment the text width if the cell has the LV_TABLE_CELL_CTRL_MERGE_RIGHT control,
+     * Increment the offset if the cell has the LV_TABLE_CELL_CTRL_MERGE_RIGHT control,
      * exit the traversal when the current cell control is not LV_TABLE_CELL_CTRL_MERGE_RIGHT */
     uint32_t col_merge = 0;
     int32_t offset = 0;
