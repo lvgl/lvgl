@@ -15,6 +15,7 @@
 #include "lv_math.h"
 #include <math.h>
 #include <float.h>
+#include "../misc/lv_log.h"
 /*********************
  *      DEFINES
  *********************/
