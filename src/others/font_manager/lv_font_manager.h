@@ -61,7 +61,7 @@ bool lv_font_manager_add_src(lv_font_manager_t * manager,
  * @param manager pointer to main font manager.
  * @param name font name. It cannot be a local variable.
  * @param src font source. Need to strictly correspond to the font class. And it cannot be a local variable.
- * @param class_p font class. eg. lv_freetype_font_class, lv_builtin_font_class.
+ * @param class_p font class. E.g. lv_freetype_font_class, lv_builtin_font_class.
  * @return return true if the add was successful.
  */
 bool lv_font_manager_add_src_static(lv_font_manager_t * manager,
