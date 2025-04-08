@@ -15,9 +15,10 @@ void lv_example_font_manager_1(void)
     g_font_manager = lv_font_manager_create(8);
 
     /* Add font path mapping to font manager */
-    lv_font_manager_add_path_static(g_font_manager,
-                                    "Lato-Regular",
-                                    PATH_PREFIX "lvgl/examples/libs/freetype/Lato-Regular.ttf");
+    lv_font_manager_add_src_static(g_font_manager,
+                                   "Lato-Regular",
+                                   PATH_PREFIX "lvgl/examples/libs/freetype/Lato-Regular.ttf",
+                                   &lv_freetype_font_class);
 
     /* Create font from font manager */
     lv_font_t * font = lv_font_manager_create_font(g_font_manager,

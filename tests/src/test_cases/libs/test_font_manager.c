@@ -174,11 +174,11 @@ void tearDown(void)
 {
 }
 
-void test_font_manager_src_static(void)
+void test_font_manager_src_normal(void)
 {
 }
 
-void test_font_manager_src_not_static(void)
+void test_font_manager_src_static(void)
 {
 }
 

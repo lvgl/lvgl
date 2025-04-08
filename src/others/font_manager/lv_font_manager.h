@@ -79,43 +79,6 @@ bool lv_font_manager_add_src_static(lv_font_manager_t * manager,
  */
 bool lv_font_manager_remove_src(lv_font_manager_t * manager, const char * name);
 
-#if LV_USE_FREETYPE
-
-/**
- * Add the freetype font file path.
- * @param manager pointer to main font manager.
- * @param name font name.
- * @param path font file path.
- */
-static inline bool lv_font_manager_add_path(lv_font_manager_t * manager, const char * name, const char * path)
-{
-    return lv_font_manager_add_src(manager, name, path, &lv_freetype_font_class);
-}
-
-/**
- * Add the freetype font file path with static memory.
- * @param manager pointer to main font manager.
- * @param name font name.
- * @param path font file path.
- */
-static inline bool lv_font_manager_add_path_static(lv_font_manager_t * manager, const char * name, const char * path)
-{
-    return lv_font_manager_add_src_static(manager, name, path, &lv_freetype_font_class);
-}
-
-#endif /* LV_USE_FREETYPE */
-
-/**
- * Remove the font file path.
- * @param manager pointer to main font manager.
- * @param name font name.
- * @return return true if the remove was successful.
- */
-static inline bool lv_font_manager_remove_path(lv_font_manager_t * manager, const char * name)
-{
-    return lv_font_manager_remove_src(manager, name);
-}
-
 /**
  * Create font.
  * @param manager pointer to main font manager.
