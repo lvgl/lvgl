@@ -754,9 +754,7 @@ void lv_draw_vector(lv_vector_dsc_t * dsc)
 
     lv_layer_t * layer = dsc->layer;
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, &(layer->_clip_area));
-    t->type = LV_DRAW_TASK_TYPE_VECTOR;
-    t->draw_dsc = lv_malloc(sizeof(lv_draw_vector_task_dsc_t));
+    lv_draw_task_t * t = lv_draw_add_task(layer, &(layer->_clip_area), LV_DRAW_TASK_TYPE_VECTOR);
     lv_memcpy(t->draw_dsc, &(dsc->tasks), sizeof(lv_draw_vector_task_dsc_t));
     lv_draw_finalize_task_creation(layer, t);
     dsc->tasks.task_list = NULL;
