@@ -28,6 +28,7 @@
 
 #include <mutex>
 #include <condition_variable>
+#include <thread>
 
 #include "tvgCommon.h"
 #include "tvgInlist.h"

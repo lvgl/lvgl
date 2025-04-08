@@ -28,6 +28,7 @@
 
 #include "config.h"
 #include "thorvg.h"
+#include <mutex>
 
 // using namespace std;
 using std::string;
