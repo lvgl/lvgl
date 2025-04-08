@@ -614,6 +614,11 @@ static int unicode_list_compare(const void * ref, const void * element)
 static lv_font_t * builtin_font_create_cb(const lv_font_info_t * info, const void * src)
 {
     const lv_builtin_font_src_t * font_src = src;
+
+    /**
+     * If a crash occurs here, please check whether the last font in
+     * the lv_builtin_font_src array is set to NULL as required to mark the end of the array.
+     */
     while(font_src->font_p) {
         if(info->size == font_src->size) {
             return (lv_font_t *)font_src->font_p;
@@ -637,6 +642,11 @@ static void * builtin_font_dup_src_cb(const void * src)
     uint32_t len = 0;
 
     /*Measure the size of the source data*/
+
+    /**
+     * If a crash occurs here, please check whether the last font in
+     * the lv_builtin_font_src array is set to NULL as required to mark the end of the array.
+     */
     while(font_src->font_p) {
         len++;
         font_src++;
