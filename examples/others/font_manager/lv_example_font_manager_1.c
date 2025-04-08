@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_FREETYPE && LV_USE_FONT_MANAGER && LV_BUILD_EXAMPLES
+#if LV_USE_FONT_MANAGER && LV_USE_FREETYPE && LV_BUILD_EXAMPLES
 
 #if LV_FREETYPE_USE_LVGL_PORT
     #define PATH_PREFIX "A:"
@@ -45,7 +45,7 @@ void lv_example_font_manager_1(void)
 void lv_example_font_manager_1(void)
 {
     lv_obj_t * label = lv_label_create(lv_screen_active());
-    lv_label_set_text(label, "FreeType or Font Manager is not enabled");
+    lv_label_set_text(label, "Font Manager or FreeType is not enabled");
     lv_obj_center(label);
 }
 
