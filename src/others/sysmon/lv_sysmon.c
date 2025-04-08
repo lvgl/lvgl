@@ -114,7 +114,15 @@ void lv_sysmon_show_performance(lv_display_t * disp)
             return;
         }
 
-        lv_subject_init_pointer(&disp->perf_sysmon_backend.subject, &disp->perf_sysmon_info);
+        disp->perf_sysmon_backend.instance = lv_sysmon_perf_create(disp, "lv_sysmon_builtin", 0, 0);
+        if(disp->perf_sysmon_backend.instance == NULL) {
+            LV_LOG_WARN("Couldn't create sysmon");
+            return;
+        }
+        lv_sysmon_perf_start(disp->perf_sysmon_backend.instance);
+
+        const lv_sysmon_perf_data_t * data = lv_sysmon_perf_get_data(disp->perf_sysmon_backend.instance);
+        lv_subject_init_pointer(&disp->perf_sysmon_backend.subject, (void *)&data->overall);
         lv_obj_align(disp->perf_label, LV_USE_PERF_MONITOR_POS, 0, 0);
         lv_subject_add_observer_obj(&disp->perf_sysmon_backend.subject, perf_observer_cb, disp->perf_label, NULL);
         disp->perf_sysmon_backend.timer = lv_timer_create(perf_update_timer_cb, LV_SYSMON_REFR_PERIOD_DEF, disp);
@@ -208,47 +216,12 @@ static void perf_monitor_disp_event_cb(lv_event_t * e)
 {
     lv_display_t * disp = lv_event_get_target(e);
     lv_event_code_t code = lv_event_get_code(e);
-    lv_sysmon_perf_info_t * info = &disp->perf_sysmon_info;
 
     switch(code) {
-        case LV_EVENT_REFR_START:
-            info->measured.refr_interval_sum += lv_tick_elaps(info->measured.refr_start);
-            info->measured.refr_start = lv_tick_get();
-            break;
-        case LV_EVENT_REFR_READY:
-            info->measured.refr_elaps_sum += lv_tick_elaps(info->measured.refr_start);
-            info->measured.refr_cnt++;
-            break;
-        case LV_EVENT_RENDER_START:
-            info->measured.render_in_progress = 1;
-            info->measured.render_start = lv_tick_get();
-            break;
-        case LV_EVENT_RENDER_READY:
-            info->measured.render_in_progress = 0;
-            info->measured.render_elaps_sum += lv_tick_elaps(info->measured.render_start);
-            info->measured.render_cnt++;
-            break;
-        case LV_EVENT_FLUSH_START:
-        case LV_EVENT_FLUSH_WAIT_START:
-            if(info->measured.render_in_progress) {
-                info->measured.flush_in_render_start = lv_tick_get();
-            }
-            else {
-                info->measured.flush_not_in_render_start = lv_tick_get();
-            }
-            break;
-        case LV_EVENT_FLUSH_FINISH:
-        case LV_EVENT_FLUSH_WAIT_FINISH:
-            if(info->measured.render_in_progress) {
-                info->measured.flush_in_render_elaps_sum += lv_tick_elaps(info->measured.flush_in_render_start);
-            }
-            else {
-                info->measured.flush_not_in_render_elaps_sum += lv_tick_elaps(info->measured.flush_not_in_render_start);
-            }
-            break;
         case LV_EVENT_DELETE:
             lv_timer_delete(disp->perf_sysmon_backend.timer);
             lv_subject_deinit(&disp->perf_sysmon_backend.subject);
+            lv_sysmon_perf_destroy(disp->perf_sysmon_backend.instance);
             break;
         default:
             break;
@@ -257,53 +230,9 @@ static void perf_monitor_disp_event_cb(lv_event_t * e)
 
 static void perf_dump_info(lv_display_t * disp)
 {
-    uint32_t LV_SYSMON_GET_IDLE(void);
-
-    lv_sysmon_perf_info_t * info = &disp->perf_sysmon_info;
-    info->calculated.run_cnt++;
-
-    uint32_t time_since_last_report = lv_tick_elaps(info->measured.last_report_timestamp);
-    lv_timer_t * disp_refr_timer = lv_display_get_refr_timer(NULL);
-    uint32_t disp_refr_period = disp_refr_timer ? disp_refr_timer->period : LV_DEF_REFR_PERIOD;
-
-    info->calculated.fps = info->measured.refr_interval_sum ? (1000 * info->measured.refr_cnt / time_since_last_report) : 0;
-    info->calculated.fps = LV_MIN(info->calculated.fps,
-                                  1000 / disp_refr_period);   /*Limit due to possible off-by-one error*/
-
-    info->calculated.cpu = 100 - LV_SYSMON_GET_IDLE();
-#if LV_SYSMON_PROC_IDLE_AVAILABLE
-    uint32_t LV_SYSMON_GET_PROC_IDLE(void);
-    info->calculated.cpu_proc = 100 - LV_SYSMON_GET_PROC_IDLE();
-#endif /*LV_SYSMON_PROC_IDLE_AVAILABLE*/
-    info->calculated.refr_avg_time = info->measured.refr_cnt ? (info->measured.refr_elaps_sum / info->measured.refr_cnt) :
-                                     0;
-
-    info->calculated.flush_avg_time = info->measured.render_cnt ?
-                                      ((info->measured.flush_in_render_elaps_sum + info->measured.flush_not_in_render_elaps_sum)
-                                       / info->measured.render_cnt) : 0;
-    /*Flush time was measured in rendering time so subtract it*/
-    info->calculated.render_avg_time = info->measured.render_cnt ? ((info->measured.render_elaps_sum -
-                                                                     info->measured.flush_in_render_elaps_sum) /
-                                                                    info->measured.render_cnt) : 0;
-
-    info->calculated.cpu_avg_total = ((info->calculated.cpu_avg_total * (info->calculated.run_cnt - 1)) +
-                                      info->calculated.cpu) / info->calculated.run_cnt;
-    info->calculated.fps_avg_total = ((info->calculated.fps_avg_total * (info->calculated.run_cnt - 1)) +
-                                      info->calculated.fps) / info->calculated.run_cnt;
-
-    lv_subject_set_pointer(&disp->perf_sysmon_backend.subject, info);
-
-    lv_sysmon_perf_info_t prev_info = *info;
-    lv_memzero(info, sizeof(lv_sysmon_perf_info_t));
-    info->measured.refr_start = prev_info.measured.refr_start;
-    info->calculated.cpu_avg_total = prev_info.calculated.cpu_avg_total;
-#if LV_SYSMON_PROC_IDLE_AVAILABLE
-    info->calculated.cpu_proc = prev_info.calculated.cpu_proc;
-#endif  /*LV_SYSMON_PROC_IDLE_AVAILABLE*/
-    info->calculated.fps_avg_total = prev_info.calculated.fps_avg_total;
-    info->calculated.run_cnt = prev_info.calculated.run_cnt;
-
-    info->measured.last_report_timestamp = lv_tick_get();
+    const lv_sysmon_perf_data_t * data = lv_sysmon_perf_get_data(disp->perf_sysmon_backend.instance);
+    lv_subject_set_pointer(&disp->perf_sysmon_backend.subject, (void *)&data->overall);
+    lv_sysmon_perf_reset_data(disp->perf_sysmon_backend.instance, LV_SYSMON_PERF_TYPE_OVERALL);
 }
 
 static void perf_update_timer_cb(lv_timer_t * t)

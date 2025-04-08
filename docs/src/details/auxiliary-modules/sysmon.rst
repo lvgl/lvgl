@@ -72,6 +72,36 @@ Where:
 - Line 1: FPS, Total CPU%
 - Line 2: Total time (Render | Flush)
 
+Custom Performance Monitor without Binding to Label
+---------------------------------------------------
+
+.. code-block:: c
+
+    /* Create a custom performance monitor */
+    lv_sysmon_perf_t * perf = lv_sysmon_perf_create(lv_display_get_default(), "your-perf", 0, 0);
+
+    /* Start the performance monitor */
+    lv_sysmon_perf_start(perf);
+
+    /* Do something */
+
+    /* Get data in the middle if you want */
+    const lv_sysmon_perf_data_t * data = lv_sysmon_perf_get_data(perf);
+
+    /* Print data (data may change later each time you call lv_sysmon_perf_get_data() or lv_sysmon_perf_stop()) */
+    printf("FPS: %d\n", data->overall.calculated.fps);
+
+    /* Do something */
+
+    /* Stop the performance monitor and get the data */
+    data = lv_sysmon_perf_stop(perf);
+
+    /* Print data */
+    printf("FPS: %d\n", data->overall.calculated.fps);
+
+    /* Destroy the performance monitor */
+    lv_sysmon_perf_destroy(perf);
+
 Pause and Resume
 ****************
 

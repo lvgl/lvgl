@@ -366,7 +366,10 @@ typedef struct _lv_property_name_t lv_property_name_t;
 typedef struct _lv_sysmon_backend_data_t lv_sysmon_backend_data_t;
 
 #if LV_USE_PERF_MONITOR
+typedef struct _lv_sysmon_perf_t lv_sysmon_perf_t;
 typedef struct _lv_sysmon_perf_info_t lv_sysmon_perf_info_t;
+typedef struct _lv_sysmon_perf_data_t lv_sysmon_perf_data_t;
+typedef struct _lv_sysmon_perf_backend_data_t lv_sysmon_perf_backend_data_t;
 #endif /*LV_USE_PERF_MONITOR*/
 
 #endif /*LV_USE_SYSMON*/

@@ -25,6 +25,7 @@
 #include "../misc/lv_types.h"
 #include "../tick/lv_tick.h"
 #include "../stdlib/lv_string.h"
+#include "../others/sysmon/lv_sysmon.h"
 #include "lv_obj_draw_private.h"
 
 /*********************
@@ -895,9 +896,19 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_SCROLL_BEGIN) {
+#if LV_USE_SYSMON && LV_USE_PERF_MONITOR
+        if(!(lv_obj_get_state(obj) & LV_STATE_SCROLLED)) {
+            lv_sysmon_perf_event(lv_obj_get_display(obj), e);
+        }
+#endif
         lv_obj_add_state(obj, LV_STATE_SCROLLED);
     }
     else if(code == LV_EVENT_SCROLL_END) {
+#if LV_USE_SYSMON && LV_USE_PERF_MONITOR
+        if(lv_obj_get_state(obj) & LV_STATE_SCROLLED) {
+            lv_sysmon_perf_event(lv_obj_get_display(obj), e);
+        }
+#endif
         lv_obj_remove_state(obj, LV_STATE_SCROLLED);
         if(lv_obj_get_scrollbar_mode(obj) == LV_SCROLLBAR_MODE_ACTIVE) {
             lv_area_t hor_area, ver_area;
