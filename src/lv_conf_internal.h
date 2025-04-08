@@ -4077,6 +4077,25 @@
             #define LV_USE_NUTTX_MOUSE_MOVE_STEP    1
         #endif
     #endif
+
+    /*NuttX trace file and its path*/
+    #ifndef LV_USE_NUTTX_TRACE_FILE
+        #ifdef CONFIG_LV_USE_NUTTX_TRACE_FILE
+            #define LV_USE_NUTTX_TRACE_FILE CONFIG_LV_USE_NUTTX_TRACE_FILE
+        #else
+            #define LV_USE_NUTTX_TRACE_FILE 0
+        #endif
+    #endif
+    #if LV_USE_NUTTX_TRACE_FILE
+        #ifndef LV_NUTTX_TRACE_FILE_PATH
+            #ifdef CONFIG_LV_NUTTX_TRACE_FILE_PATH
+                #define LV_NUTTX_TRACE_FILE_PATH CONFIG_LV_NUTTX_TRACE_FILE_PATH
+            #else
+                #define LV_NUTTX_TRACE_FILE_PATH "/data/lvgl-trace.log"
+            #endif
+        #endif
+    #endif
+
 #endif
 
 /** Driver for /dev/dri/card */
