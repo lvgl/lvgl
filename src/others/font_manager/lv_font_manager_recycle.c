@@ -11,7 +11,8 @@
 
 #if LV_USE_FONT_MANAGER
 
-#include "../../lvgl.h"
+#include "../../font/lv_font.h"
+#include "../../misc/lv_ll.h"
 
 /*********************
  *      DEFINES
@@ -124,7 +125,7 @@ void lv_font_manager_recycle_set_reuse(lv_font_manager_recycle_t * manager, lv_f
     lv_ll_t * recycle_ll = &manager->recycle_ll;
 
     /* check recycled size */
-    if(_lv_ll_get_len(recycle_ll) >= manager->max_size) {
+    if(lv_ll_get_len(recycle_ll) >= manager->max_size) {
         LV_LOG_INFO("recycle full, remove tail font...");
         lv_font_manager_recycle_remove_tail(manager);
     }

@@ -95,28 +95,32 @@ static void test_font_manager_src(add_src_cb_t add_src_cb)
                                                            "UNKNOWN_FONT_NAME",
                                                            0,
                                                            10,
-                                                           0);
+                                                           0,
+                                                           LV_FONT_KERNING_NONE);
     TEST_ASSERT_NULL(font_unknown);
 
     lv_font_t * font_14 = lv_font_manager_create_font(g_font_manager,
                                                       "NotoSansSC-Regular,Ubuntu-Medium,Montserrat,UNKNOWN_FONT_NAME",
                                                       LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
                                                       14,
-                                                      LV_FREETYPE_FONT_STYLE_NORMAL);
+                                                      LV_FREETYPE_FONT_STYLE_NORMAL,
+                                                      LV_FONT_KERNING_NONE);
     TEST_ASSERT_NOT_NULL(font_14);
 
     lv_font_t * font_32 = lv_font_manager_create_font(g_font_manager,
                                                       "Ubuntu-Medium,NotoSansSC-Regular,Montserrat",
                                                       LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
                                                       32,
-                                                      LV_FREETYPE_FONT_STYLE_NORMAL);
+                                                      LV_FREETYPE_FONT_STYLE_NORMAL,
+                                                      LV_FONT_KERNING_NONE);
     TEST_ASSERT_NOT_NULL(font_32);
 
     lv_font_t * font_40 = lv_font_manager_create_font(g_font_manager,
                                                       "Ubuntu-Medium,NotoSansSC-Regular-2,Montserrat",
                                                       0,
                                                       40,
-                                                      0);
+                                                      0,
+                                                      LV_FONT_KERNING_NONE);
     TEST_ASSERT_NOT_NULL(font_40);
 
     /* Create label with the font */

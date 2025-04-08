@@ -183,7 +183,7 @@ static lv_font_t * font_manager_font_create_cb(font_stress_ctx_t * ctx,
                                                lv_freetype_font_style_t style)
 {
     TEST_ASSERT_NOT_NULL(ctx->font_manager);
-    return lv_font_manager_create_font(ctx->font_manager, name, render_mode, size, style);
+    return lv_font_manager_create_font(ctx->font_manager, name, render_mode, size, style, LV_FONT_KERNING_NONE);
 }
 
 static void font_manager_font_delete_cb(font_stress_ctx_t * ctx, lv_font_t * font)

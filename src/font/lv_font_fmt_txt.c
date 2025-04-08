@@ -47,6 +47,11 @@ static int kern_pair_16_compare(const void * ref, const void * element);
     static inline uint8_t rle_next(void);
 #endif /*LV_USE_FONT_COMPRESSED*/
 
+static lv_font_t * builtin_font_create_cb(const lv_font_info_t * info, const void * src);
+static void builtin_font_delete_cb(lv_font_t * font);
+static void * builtin_font_dup_src_cb(const void * src);
+static void builtin_font_free_src_cb(void * src);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -62,6 +67,13 @@ static const uint8_t opa3_table[8] = {0, 36, 73, 109, 146, 182, 218, 255};
 #endif
 
 static const uint8_t opa2_table[4] = {0, 85, 170, 255};
+
+const lv_font_class_t lv_builtin_font_class = {
+    .create_cb = builtin_font_create_cb,
+    .delete_cb = builtin_font_delete_cb,
+    .dup_src_cb = builtin_font_dup_src_cb,
+    .free_src_cb = builtin_font_free_src_cb,
+};
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -597,4 +609,52 @@ static inline uint8_t rle_next(void)
 static int unicode_list_compare(const void * ref, const void * element)
 {
     return (*(uint16_t *)ref) - (*(uint16_t *)element);
+}
+
+static lv_font_t * builtin_font_create_cb(const lv_font_info_t * info, const void * src)
+{
+    const lv_builtin_font_src_t * font_src = src;
+    while(font_src->font_p) {
+        if(info->size == font_src->size) {
+            return (lv_font_t *)font_src->font_p;
+        }
+        font_src++;
+    }
+
+    LV_LOG_WARN("No built-in font found with size: %" LV_PRIu32, info->size);
+    return NULL;
+}
+
+static void builtin_font_delete_cb(lv_font_t * font)
+{
+    /*Nothing to delete*/
+    LV_UNUSED(font);
+}
+
+static void * builtin_font_dup_src_cb(const void * src)
+{
+    const lv_builtin_font_src_t * font_src = src;
+    uint32_t len = 0;
+
+    /*Measure the size of the source data*/
+    while(font_src->font_p) {
+        len++;
+        font_src++;
+    }
+
+    if(len == 0) {
+        LV_LOG_WARN("No source data found");
+        return NULL;
+    }
+
+    lv_builtin_font_src_t * new_src = lv_malloc_zeroed(sizeof(lv_builtin_font_src_t) * (len + 1));
+    LV_ASSERT_MALLOC(new_src);
+    lv_memcpy(new_src, src, sizeof(lv_builtin_font_src_t) * len);
+
+    return new_src;
+}
+
+static void builtin_font_free_src_cb(void * src)
+{
+    lv_free(src);
 }

@@ -27,16 +27,6 @@ void lv_example_font_manager_2(void)
     builtin_font_src[2].font_p = NULL;
     builtin_font_src[2].size = 0;
 
-    /**
-     * Or use a more concise and memory-saving way of writing,
-     * but some compilers may fail to compile.
-    static const lv_builtin_font_src_t builtin_font_src[] = {
-        {&lv_font_montserrat_14, 14},
-        {&lv_font_montserrat_32, 32},
-        LV_BUILTIN_FONT_SRC_END
-    };
-    */
-
     lv_font_manager_add_src_static(g_font_manager,
                                    "Montserrat",
                                    builtin_font_src,
@@ -71,7 +61,8 @@ void lv_example_font_manager_2(void)
                                                    "Ubuntu-Medium,NotoColorEmoji,Montserrat",
                                                    LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
                                                    32,
-                                                   LV_FREETYPE_FONT_STYLE_NORMAL);
+                                                   LV_FREETYPE_FONT_STYLE_NORMAL,
+                                                   LV_FONT_KERNING_NONE);
 
     if(!font) {
         LV_LOG_ERROR("Could not create font");

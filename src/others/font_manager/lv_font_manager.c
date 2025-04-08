@@ -12,8 +12,8 @@
 #if LV_USE_FONT_MANAGER
 
 #include "lv_font_manager_recycle.h"
-#include "lv_font_manager_utils.h"
-#include "../../lvgl.h"
+#include "../../misc/lv_ll.h"
+#include "../../stdlib/lv_sprintf.h"
 
 /*********************
  *      DEFINES
@@ -185,7 +185,8 @@ lv_font_t * lv_font_manager_create_font(lv_font_manager_t * manager,
                                         const char * font_family,
                                         uint32_t render_mode,
                                         uint32_t size,
-                                        uint32_t style)
+                                        uint32_t style,
+                                        lv_font_kerning_t kerning)
 {
 
     LV_ASSERT_NULL(manager);
@@ -197,6 +198,7 @@ lv_font_t * lv_font_manager_create_font(lv_font_manager_t * manager,
     ft_info.render_mode = render_mode;
     ft_info.size = size;
     ft_info.style = style;
+    ft_info.kerning = kerning;
 
     lv_font_t * ret_font;
 

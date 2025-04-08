@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_font_manager_utils.h"
+#include "../../misc/lv_types.h"
 
 #if LV_USE_FONT_MANAGER
 

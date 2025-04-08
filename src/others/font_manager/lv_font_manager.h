@@ -13,7 +13,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_font_manager_backends.h"
+#include "../../font/lv_font.h"
 
 #if LV_USE_FONT_MANAGER
 
@@ -24,8 +24,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-typedef struct _lv_font_manager_t lv_font_manager_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -61,7 +59,7 @@ bool lv_font_manager_add_src(lv_font_manager_t * manager,
 /**
  * Add font resource with static memory.
  * @param manager pointer to main font manager.
- * @param name font name.
+ * @param name font name. It cannot be a local variable.
  * @param src font source. Need to strictly correspond to the font class. And it cannot be a local variable.
  * @param class_p font class. eg. lv_freetype_font_class, lv_builtin_font_class.
  * @return return true if the add was successful.
@@ -82,17 +80,19 @@ bool lv_font_manager_remove_src(lv_font_manager_t * manager, const char * name);
 /**
  * Create font.
  * @param manager pointer to main font manager.
- * @param font_family font family name.
- * @param render_mode font render mode.
- * @param size font size.
- * @param style font style.
+ * @param font_family font family name. Matches the font resource name, using commas to separate different names. E.g. "my_font_1,my_font_2".
+ * @param render_mode font render mode. see `lv_freetype_font_render_mode_t`.
+ * @param size font size in pixel.
+ * @param style font style. see `lv_freetype_font_style_t`.
+ * @param kerning kerning mode. see `lv_font_kerning_t`.
  * @return point to the created font.
  */
 lv_font_t * lv_font_manager_create_font(lv_font_manager_t * manager,
                                         const char * font_family,
                                         uint32_t render_mode,
                                         uint32_t size,
-                                        uint32_t style);
+                                        uint32_t style,
+                                        lv_font_kerning_t kerning);
 
 /**
  * Delete font.

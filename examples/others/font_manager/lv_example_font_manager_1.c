@@ -25,7 +25,8 @@ void lv_example_font_manager_1(void)
                                                    "Lato-Regular",
                                                    LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
                                                    24,
-                                                   LV_FREETYPE_FONT_STYLE_NORMAL);
+                                                   LV_FREETYPE_FONT_STYLE_NORMAL,
+                                                   LV_FONT_KERNING_NONE);
 
     if(!font) {
         LV_LOG_ERROR("Could not create font");
