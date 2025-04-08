@@ -57,7 +57,7 @@ For currently supported font classes, please refer to the example code.
       lv_font_manager_add_src_static(g_font_manager, "Lato-Regular", "./lvgl/examples/libs/freetype/Lato-Regular.ttf", &lv_freetype_font_class);
 
       char path[] = "/path/to/myfont.ttf";
-      lv_font_manager_add_src_static(g_font_manager, "MyFont", path, &lv_freetype_font_class);
+      lv_font_manager_add_src(g_font_manager, "MyFont", path, &lv_freetype_font_class);
    }
 
 Create Font from Font Manager
