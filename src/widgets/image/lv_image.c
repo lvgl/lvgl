@@ -445,7 +445,8 @@ void lv_image_set_inner_align(lv_obj_t * obj, lv_image_align_t align)
     if(align == img->align) return;
 
     /*If we're removing STRETCH, reset the scale*/
-    if(img->align == LV_IMAGE_ALIGN_STRETCH || img->align == LV_IMAGE_ALIGN_CONTAIN) {
+    if(img->align == LV_IMAGE_ALIGN_STRETCH || img->align == LV_IMAGE_ALIGN_CONTAIN ||
+       img->align == LV_IMAGE_ALIGN_COVER) {
         lv_image_set_scale(obj, LV_SCALE_NONE);
     }
 
