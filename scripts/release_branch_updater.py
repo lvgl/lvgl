@@ -26,6 +26,7 @@ def main():
     arg_parser.add_argument("--dry-run", action="store_true")
     arg_parser.add_argument("--oldest-major", type=int)
     arg_parser.add_argument("--github-token", type=str)
+    arg_parser.add_argument("--skip-master", action="store_true")
 
     args = arg_parser.parse_args()
 
@@ -34,6 +35,7 @@ def main():
     lvgl_path = args.lvgl_path
     dry_run = args.dry_run
     oldest_major = args.oldest_major
+    skip_master = args.skip_master
 
     if not args.github_token and not dry_run:
         print(LOG, "Warning: No github token was provided for this production run. Continuing anyway...")
@@ -78,8 +80,12 @@ def main():
         # 2. update the LVGL submodule to match the LVGL's release branch version
         # 3. update the lv_conf.h based on the lv_conf.defaults
 
+        branches_to_update = lvgl_release_branches
+        if not skip_master:
+            branches_to_update += [lvgl_default_branch]
+
         # from oldest to newest release...
-        for lvgl_branch in lvgl_release_branches + [lvgl_default_branch]:
+        for lvgl_branch in branches_to_update:
             if isinstance(lvgl_branch, tuple):
                 port_branch = lvgl_branch
                 print(LOG, f"attempting to update release branch {fmt_release(port_branch)} ...")
