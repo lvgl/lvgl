@@ -198,6 +198,18 @@ void * lv_circle_buf_tail(const lv_circle_buf_t * circle_buf)
                        circle_buf->tail % lv_circle_buf_capacity(circle_buf));
 }
 
+void * lv_circle_buf_latest(const lv_circle_buf_t * circle_buf)
+{
+    LV_ASSERT_NULL(circle_buf);
+
+    if(lv_circle_buf_is_empty(circle_buf)) {
+        return NULL;
+    }
+
+    return lv_array_at(&circle_buf->array,
+                       (circle_buf->tail - 1) % lv_circle_buf_capacity(circle_buf));
+}
+
 lv_result_t lv_circle_buf_read(lv_circle_buf_t * circle_buf, void * data)
 {
     LV_ASSERT_NULL(circle_buf);
@@ -222,7 +234,9 @@ lv_result_t lv_circle_buf_write(lv_circle_buf_t * circle_buf, const void * data)
         return LV_RESULT_INVALID;
     }
 
-    lv_array_assign(&circle_buf->array, circle_buf->tail % lv_circle_buf_capacity(circle_buf), data);
+    if(data) {
+        lv_array_assign(&circle_buf->array, circle_buf->tail % lv_circle_buf_capacity(circle_buf), data);
+    }
     circle_buf->tail++;
 
     return LV_RESULT_OK;
