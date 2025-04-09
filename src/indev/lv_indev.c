@@ -1183,6 +1183,20 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
 }
 
 /**
+ * Apply time decay to a scroll throw vector, such that there is no decay
+ * initially and full decay after a short period of time.
+ * @param x scroll throw vector component
+ * @param t expired time in milliseconds
+ * @return decayed vector component
+ */
+static int32_t indev_scroll_throw_decay(int32_t x, int32_t t)
+{
+    if(t <= 0) return x;
+    if(t >= 99) return 0;
+    return x * (512 - (512 * t) / 99) / 512;
+}
+
+/**
  * Process the pressed state of LV_INDEV_TYPE_POINTER input devices
  * @param indev pointer to an input device 'proc'
  */
@@ -1291,12 +1305,21 @@ static void indev_proc_press(lv_indev_t * indev)
         }
     }
 
-    /*Calculate the vector and apply a low pass filter: new value = 0.5 * old_value + 0.5 * new_value*/
+    /*Update vector and scroll throw vector*/
     indev->pointer.vect.x = indev->pointer.act_point.x - indev->pointer.last_point.x;
     indev->pointer.vect.y = indev->pointer.act_point.y - indev->pointer.last_point.y;
 
-    indev->pointer.scroll_throw_vect.x = (indev->pointer.scroll_throw_vect.x + indev->pointer.vect.x) / 2;
-    indev->pointer.scroll_throw_vect.y = (indev->pointer.scroll_throw_vect.y + indev->pointer.vect.y) / 2;
+    indev->pointer.vect_hist[indev->pointer.vect_hist_index] = indev->pointer.vect;
+    indev->pointer.vect_hist_timestamp[indev->pointer.vect_hist_index] = lv_tick_get();
+    indev->pointer.vect_hist_index = (indev->pointer.vect_hist_index + 1) % LV_INDEV_VECT_HIST_SIZE;
+
+    indev->pointer.scroll_throw_vect.x = 0;
+    indev->pointer.scroll_throw_vect.y = 0;
+    for(int i = 0; i < LV_INDEV_VECT_HIST_SIZE; i++) {
+        int32_t t = lv_tick_elaps(indev->pointer.vect_hist_timestamp[i]);
+        indev->pointer.scroll_throw_vect.x += indev_scroll_throw_decay(indev->pointer.vect_hist[i].x, t);
+        indev->pointer.scroll_throw_vect.y += indev_scroll_throw_decay(indev->pointer.vect_hist[i].y, t);
+    }
 
     indev->pointer.scroll_throw_vect_ori = indev->pointer.scroll_throw_vect;
 
