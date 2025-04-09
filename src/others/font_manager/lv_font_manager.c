@@ -500,7 +500,7 @@ static lv_font_refer_node_t * lv_font_manager_search_refer_node(lv_font_manager_
     return NULL;
 }
 
-static lv_font_t * lv_font_manager_create_font_warpper(lv_font_manager_t * manager, const lv_font_info_t * ft_info)
+static lv_font_t * lv_font_manager_create_font_wrapper(lv_font_manager_t * manager, const lv_font_info_t * ft_info)
 {
     LV_ASSERT_NULL(manager);
     LV_ASSERT_NULL(ft_info);
@@ -556,7 +556,7 @@ static const lv_font_refer_node_t * lv_font_manager_get_font(lv_font_manager_t *
 
     /* not found refer_node, start to create font */
 
-    lv_font_t * font = lv_font_manager_create_font_warpper(manager, ft_info);
+    lv_font_t * font = lv_font_manager_create_font_wrapper(manager, ft_info);
 
     if(!font) {
         return NULL;
