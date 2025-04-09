@@ -34,6 +34,8 @@ file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp ${LVGL_R
 add_library(lvgl ${SOURCES})
 add_library(lvgl::lvgl ALIAS lvgl)
 
+set(PCPP_DEFINITIONS_LIST "")
+
 if ( LV_USE_KCONFIG )
   # kconfig.cmake will generate the .config
   # and autoconf.h, which will be used by lv_conf_kconfig.h
@@ -44,12 +46,27 @@ if ( LV_USE_KCONFIG )
   # generate_cmake_variables.py script
   set(KCONFIG_FLAG --kconfig)
   # If using Kconfig, we need to define additional definitions
-  set(PCPP_ADDITIONAL_DEFS "--defs" "LV_CONF_SKIP" "LV_CONF_KCONFIG_EXTERNAL_INCLUDE=\"${LV_CONF_KCONFIG_EXTERNAL_INCLUDE}\"")
-  else()
+  list(APPEND PCPP_DEFINITIONS_LIST "LV_CONF_SKIP" "LV_CONF_KCONFIG_EXTERNAL_INCLUDE=\"${LV_CONF_KCONFIG_EXTERNAL_INCLUDE}\"")
+else()
   if (LV_CONF_PATH)
-    set(PCPP_ADDITIONAL_DEFS "--defs" "LV_CONF_PATH=\"${LV_CONF_PATH}\"")
+    list(APPEND PCPP_DEFINITIONS_LIST "LV_CONF_PATH=\"${LV_CONF_PATH}\"")
+  endif()
+
+  if (LV_LVGL_H_INCLUDE_SIMPLE)
+    list(APPEND PCPP_DEFINITIONS_LIST "LV_LVGL_H_INCLUDE_SIMPLE")
+  endif()
+
+  if (LV_CONF_INCLUDE_SIMPLE)
+    list(APPEND PCPP_DEFINITIONS_LIST "LV_CONF_INCLUDE_SIMPLE")
   endif()
 endif()
+
+if(PCPP_DEFINITIONS_LIST)
+  set(PCPP_ADDITIONAL_DEFS "--defs" ${PCPP_DEFINITIONS_LIST})
+else()
+  set(PCPP_ADDITIONAL_DEFS "")
+endif()
+
 
 target_compile_definitions(
   lvgl PUBLIC $<$<BOOL:${LV_LVGL_H_INCLUDE_SIMPLE}>:LV_LVGL_H_INCLUDE_SIMPLE>
@@ -86,7 +103,7 @@ if(NOT "${ret}" STREQUAL "0")
 endif()
 
 # This will set all CONFIG_LV_USE_* variables in cmake
-include(${CMAKE_BINARY_DIR}/lv_conf.cmake)
+include(${CMAKE_CURRENT_BINARY_DIR}/lv_conf.cmake)
 
 # Add definition of LV_CONF_PATH only if needed
 # Do not redefine it if already defined in tests/CMakeLists.txt
