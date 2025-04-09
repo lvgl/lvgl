@@ -84,7 +84,7 @@ static void test_font_manager_src(add_src_cb_t add_src_cb)
     TEST_ASSERT_TRUE(add_src_result);
 
     static lv_tiny_ttf_font_src_t tiny_ttf_font_file_src = { 0 };
-    tiny_ttf_font_file_src.path = "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf";
+    tiny_ttf_font_file_src.path = "A:src/test_files/fonts/noto/NotoSansSC-Regular.ttf";
 
     add_src_result = add_src_cb(g_font_manager,
                                 "NotoSansSC-Regular-2",
