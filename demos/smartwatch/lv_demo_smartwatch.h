@@ -19,6 +19,10 @@ extern "C"
 
 #if LV_USE_DEMO_SMARTWATCH
 
+#if LV_USE_LOTTIE == 0
+#error "lv_demo_smartwatch requires LV_USE_LOTTIE"
+#endif
+
 /*********************
  *      DEFINES
  *********************/

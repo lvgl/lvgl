@@ -65,7 +65,7 @@ Step-by-step instructions
 #. Set Mode to Transmit Only Master, and Hardware NSS Signal to Disable.
 #. In the Configuration subwindow switch to Parameter Settings.
 #. Set Frame Format to Motorola, Data Size to 8 Bits, First Bit to MSB First.
-#. Set the Prescaler to the maximum value according to the LCD controller’s datasheet (e.g., 15 MBits/s). Set CPOL/CPHA as required (leave as default).
+#. Set the Prescaler to the maximum value according to the LCD controller's datasheet (e.g., 15 MBits/s). Set CPOL/CPHA as required (leave as default).
 #. Set NSSP Mode to Disabled and NSS Signal Type to Software.
 #. In DMA Settings add a new Request for SPI1_TX (when using SPI1).
 #. Set Priority to Medium, Data Width to Half Word.

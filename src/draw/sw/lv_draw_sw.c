@@ -96,7 +96,12 @@ void lv_draw_sw_init(void)
 #endif
 
 #if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
-    tvg_engine_init(TVG_ENGINE_SW, 0);
+    if(LV_DRAW_SW_DRAW_UNIT_CNT > 1) {
+        tvg_engine_init(TVG_ENGINE_SW, LV_DRAW_SW_DRAW_UNIT_CNT);
+    }
+    else {
+        tvg_engine_init(TVG_ENGINE_SW, 0);
+    }
 #endif
 
     lv_ll_init(&LV_GLOBAL_DEFAULT()->draw_sw_blend_handler_ll, sizeof(lv_draw_sw_custom_blend_handler_t));
