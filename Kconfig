@@ -1845,6 +1845,10 @@ menu "LVGL configuration"
 			int "Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode"
 			depends on LV_USE_WAYLAND
 			default 1
+		config LV_WAYLAND_USE_DMABUF
+			bool "Use DMA buffers for frame buffers"
+			default y if LV_WAYLAND_BUF_COUNT = 2
+			default n if LV_WAYLAND_BUF_COUNT = 1
 
 		config LV_USE_LINUX_FBDEV
 			bool "Use Linux framebuffer device"

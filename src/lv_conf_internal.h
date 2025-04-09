@@ -3816,6 +3816,27 @@
             #define LV_WAYLAND_BUF_COUNT            1    /*Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode*/
         #endif
     #endif
+    #if LV_WAYLAND_BUF_COUNT == 2
+        #ifndef LV_WAYLAND_USE_DMABUF
+            #ifdef LV_KCONFIG_PRESENT
+                #ifdef CONFIG_LV_WAYLAND_USE_DMABUF
+                    #define LV_WAYLAND_USE_DMABUF CONFIG_LV_WAYLAND_USE_DMABUF
+                #else
+                    #define LV_WAYLAND_USE_DMABUF 0
+                #endif
+            #else
+                #define LV_WAYLAND_USE_DMABUF       1    /*Use DMA buffers for frame buffers*/
+            #endif
+        #endif
+    #else
+        #ifndef LV_WAYLAND_USE_DMABUF
+            #ifdef CONFIG_LV_WAYLAND_USE_DMABUF
+                #define LV_WAYLAND_USE_DMABUF CONFIG_LV_WAYLAND_USE_DMABUF
+            #else
+                #define LV_WAYLAND_USE_DMABUF       0
+            #endif
+        #endif
+    #endif
     #ifndef LV_WAYLAND_WINDOW_DECORATIONS
         #ifdef CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
             #define LV_WAYLAND_WINDOW_DECORATIONS CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
