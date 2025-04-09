@@ -210,10 +210,10 @@ def main():
             if port_does_not_have_the_branch or port_submodule_was_updated or port_lv_conf_h_was_updated:
                 print(LOG, "changes were made. ready to push.")
                 # keep it brief for commit message 50 character limit suggestion.
-                # max length will be 50 characters in this case: "CI release edit: new branch. submodule. lv_conf.h."
-                commit_msg = ("CI release edit:"
+                # max length will be 46 characters in this case: "CI bot: new branch. LVGL submodule. lv_conf.h."
+                commit_msg = ("CI bot:"
                               + (" new branch." if port_does_not_have_the_branch else "")
-                              + (" submodule." if port_submodule_was_updated else "")
+                              + (" LVGL submodule." if port_submodule_was_updated else "")
                               + (" lv_conf.h." if port_lv_conf_h_was_updated else "")
                              )
                 print(LOG, f"commit message: '{commit_msg}'")
