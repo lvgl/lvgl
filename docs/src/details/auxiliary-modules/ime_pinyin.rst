@@ -32,7 +32,7 @@ you can disable :c:macro:`LV_IME_PINYIN_USE_DEFAULT_DICT` in ``lv_conf.h``,
 which can save a lot of memory space.
 
 The built-in thesaurus is customized based on the
-**LV_FONT_SIMSUN_16_CJK** font library, which currently has more
+**LV_FONT_SOURCE_HAN_SANS_SC_16_CJK** font library, which currently has more
 than 1,000 of the most common CJK radicals, so it is recommended to use a
 custom font and thesaurus.
 
