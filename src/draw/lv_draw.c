@@ -229,10 +229,12 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
     lv_draw_task_t * t_prev = NULL;
     lv_draw_task_t * t = layer->draw_task_head;
     lv_draw_task_t * t_next;
+    bool remove_task = false;
     while(t) {
         t_next = t->next;
         if(t->state == LV_DRAW_TASK_STATE_READY) {
             cleanup_task(t, disp);
+            remove_task = true;
             if(t_prev != NULL)
                 t_prev->next = t_next;
             else
@@ -263,7 +265,7 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
         }
     }
     /*Assign draw tasks to the draw_units*/
-    else {
+    else if(remove_task || layer->draw_task_head) {
         /*Find a draw unit which is not busy and can take at least one task*/
         /*Let all draw units to pick draw tasks*/
         lv_draw_unit_t * u = _draw_info.unit_head;

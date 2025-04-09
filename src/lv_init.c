@@ -510,6 +510,10 @@ void lv_deinit(void)
     lv_log_register_print_cb(NULL);
 #endif
 
+#ifdef LV_GC_DEINIT
+    LV_GC_DEINIT();
+#endif
+
 }
 
 /**********************

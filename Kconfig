@@ -147,17 +147,6 @@ menu "LVGL configuration"
 				bool "255: CUSTOM"
 		endchoice
 
-		config LV_USE_OS
-			int
-			default 0 if LV_OS_NONE
-			default 1 if LV_OS_PTHREAD
-			default 2 if LV_OS_FREERTOS
-			default 3 if LV_OS_CMSIS_RTOS2
-			default 4 if LV_OS_RTTHREAD
-			default 5 if LV_OS_WINDOWS
-			default 6 if LV_OS_MQX
-			default 255 if LV_OS_CUSTOM
-
 		config LV_OS_CUSTOM_INCLUDE
 			string "Custom OS include header"
 			default "stdint.h"
@@ -1077,6 +1066,34 @@ menu "LVGL configuration"
 		config LV_CALENDAR_WEEK_STARTS_MONDAY
 			bool "Calendar week starts monday"
 			depends on LV_USE_CALENDAR
+
+		menu "Days name configuration"
+			depends on LV_USE_CALENDAR
+
+		config LV_MONDAY_STR
+			string "Shortened string for Monday"
+			default "Mo"
+		config LV_TUESDAY_STR
+			string "Shortened string for Tuesday"
+			default "Tu"
+		config LV_WEDNESDAY_STR
+			string "Shortened string for Wednesday"
+			default "We"
+		config LV_THURSDAY_STR
+			string "Shortened string for Thursday"
+			default "Th"
+		config LV_FRIDAY_STR
+			string "Shortened string for Friday"
+			default "Fr"
+		config LV_SATURDAY_STR
+			string "Shortened string for Saturday"
+			default "Sa"
+		config LV_SUNDAY_STR
+			string "Shortened string for Sunday"
+			default "Su"
+
+		endmenu
+
 		config LV_USE_CALENDAR_HEADER_ARROW
 			bool "Use calendar header arrow"
 			depends on LV_USE_CALENDAR

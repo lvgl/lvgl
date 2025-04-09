@@ -170,6 +170,10 @@ if ($ENV{NON_AMD64_BUILD})
     set(CMAKE_LIBRARY_PATH "/usr/lib/i386-linux-gnu" CACHE PATH "search 32bit lib path firstly")
 endif()
 
+# Set LV_CONF_PATH so custom.cmake knows about it before compiling lvgl
+# Used to preprocess lv_conf_internal.h with the test config
+set(LV_CONF_PATH "${LVGL_TEST_DIR}/src/lv_test_conf.h")
+set(LV_BUILD_TEST ON)
 # Options lvgl and examples are compiled with.
 set(COMPILE_OPTIONS
     -DLV_CONF_PATH="${LVGL_TEST_DIR}/src/lv_test_conf.h"

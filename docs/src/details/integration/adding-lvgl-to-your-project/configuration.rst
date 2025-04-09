@@ -46,12 +46,6 @@ options. For example ``"-DLV_COLOR_DEPTH=32 -DLV_USE_BUTTON=1"``.  Unset
 options will get a default value which is the same as the content of
 ``lv_conf_template.h``.
 
-LVGL also can be used via ``Kconfig`` and ``menuconfig``. You can use
-``lv_conf.h`` together with Kconfig as well, but keep in mind that the values
-from ``lv_conf.h`` or build settings (``-D...``) override the values
-set in Kconfig. To ignore the configs from ``lv_conf.h`` simply remove
-its content, or define :c:macro:`LV_CONF_SKIP`.
-
 
 .. _configuration_settings:
 
@@ -91,5 +85,70 @@ For example:
 
 Kconfig
 *******
-TODO:  Add how to use LVGL with Kconfig.
+LVGL can also be configured using Kconfig. For now, this is only available using cmake.
+Under the hood, it uses ``kconfiglib`` Kconfig python port to be able to use it across different platforms.
+The ``kconfiglib`` offers the python API and some CLI commands. Here is a list of some useful commands:
 
+- ``menuconfig``: Opens a console menu interface to modify the configuration values.
+- ``guiconfig`` (needs ``tkinter``): Opens a graphical interface to modify the configuration values.
+- ``savedefconfig``: Saves the current .config as a defconfig, listing only non-default values.
+- ``alldefconfig``: Creates a .config with all default values.
+- ``genconfig``: Generates a C header from the config, following ``autoconf.h`` format.
+
+
+Prerequisites
+-------------
+
+Install the prerequisites using ``scripts/install_prerequisites.sh/bat``.
+
+
+Create the configuration (.config)
+----------------------------------
+
+At this point, the ``menuconfig`` command should be available:
+
+.. code-block:: shell
+
+    cd <lvgl_repo>
+    menuconfig
+
+Make changes to the config and exit using `Esc` or `Q`, and save your configuration. The ``.config`` file is
+now created and list the configuration values.
+
+
+Configuring with cmake
+----------------------
+
+Once the ``.config`` is created, run cmake with the ``-DLV_USE_KCONFIG=ON`` flag:
+
+.. code-block:: shell
+
+    cd <lvgl_repo>
+    cmake -B build -DLV_USE_KCONFIG=ON
+    cmake --build build
+
+To use a ``defconfig`` file, one can use the ``-DLV_DEFCONFIG_PATH=<path_to_defconfig>`` flag:
+
+.. code-block:: shell
+
+    cd <lvgl_repo>
+    cmake -B build -DLV_USE_KCONFIG=ON -DLV_DEFCONFIG_PATH=<path_to_defconfig>
+    cmake --build build
+
+Some defconfigs are available in ``configs/defconfigs`` folder.
+
+
+Saving a defconfig
+------------------
+
+One can save a defconfig using the ``savedefconfig`` command:
+
+.. code-block:: shell
+
+    cd <lvgl_repo>
+    menuconfig # make your changes to the default config
+    savedefconfig
+    cp defconfig configs/defconfigs/my_custom_defconfig # save it where you want
+    # Then use it to build LVGL
+    cmake -B build -DLV_USE_KCONFIG=ON -DLV_DEFCONFIG_PATH=configs/defconfigs/my_custom_defconfig
+    cmake --build build

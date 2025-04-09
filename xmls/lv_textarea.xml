@@ -1,0 +1,16 @@
+<!--
+Example
+<lv_textarea text="Hello"/>
+-->
+
+<widget>
+	<api>
+	    <prop name="text" type="string" help=""/>
+	    <prop name="placeholder" type="string" help=""/>
+	    <prop name="one_line" type="bool" help=""/>
+	    <prop name="password_mode" type="bool" help=""/>
+	    <prop name="password_show_time" type="int" help=""/>
+	    <prop name="text_selection" type="bool" help=""/>
+	    <prop name="cursor_pos" type="int" help=""/>
+	</api>
+</widget>

@@ -30,7 +30,7 @@ _announce_start_time: datetime.datetime
 _announce_silent_mode: bool = False
 
 
-def _announce(file: str, args: tuple, start=False):
+def _announce(file: str, args: tuple, start: bool, box: bool, box_char: str):
     if _announce_silent_mode:
         return
 
@@ -43,24 +43,32 @@ def _announce(file: str, args: tuple, start=False):
         else:
             _args.append(repr(arg))
 
+    msg = f'{os.path.basename(file)}: ' + ' '.join(_args)
+    msg_len = len(msg)
+
+    # `start` takes precedence over `box` argument.
     if start:
-        _end = ''
+        print(msg, end='', flush=True)
     else:
-        _end = '\n'
+        if box:
+            line = box_char * msg_len
+            print(line)
+            print(msg)
+            print(line, flush=True)
+        else:
+            print(msg, flush=True)
 
-    print(f'{os.path.basename(file)}: ', ' '.join(_args), end=_end, flush=True)
 
-
-def announce(file: str, *args, start=False, finish=False):
+def announce(file: str, *args, box: bool = False, box_char: str = '*'):
     global _announce_start_time
     _announce_start_time = None
-    _announce(file, args)
+    _announce(file, args, False, box, box_char)
 
 
-def announce_start(file: str, *args, start=False, finish=False):
+def announce_start(file: str, *args, box: bool = False, box_char: str = '*'):
     global _announce_start_time
     _announce_start_time = datetime.datetime.now()
-    _announce(file, args, start=True)
+    _announce(file, args, True, box, box_char)
 
 
 def announce_finish():

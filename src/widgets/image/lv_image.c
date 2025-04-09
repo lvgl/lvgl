@@ -12,6 +12,9 @@
 #include "../../draw/lv_draw_private.h"
 #include "../../core/lv_obj_event_private.h"
 #include "../../core/lv_obj_class_private.h"
+#include "../../core/lv_obj_class_private.h"
+#include "../../core/lv_obj_draw_private.h"
+
 #if LV_USE_IMAGE != 0
 
 #include "../../stdlib/lv_string.h"
@@ -726,8 +729,8 @@ static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e)
         /*If the object is exactly image sized (not cropped, not mosaic) and transformed
          *perform hit test on its transformed area*/
         if(img->w == lv_obj_get_width(obj) && img->h == lv_obj_get_height(obj) &&
-           (img->scale_x != LV_SCALE_NONE || img->scale_y != LV_SCALE_NONE || img->rotation != 0 ||
-            img->pivot.x != img->w / 2 || img->pivot.y != img->h / 2)) {
+           (img->scale_x != LV_SCALE_NONE || img->scale_y != LV_SCALE_NONE ||
+            img->rotation != 0)) {
 
             int32_t w = lv_obj_get_width(obj);
             int32_t h = lv_obj_get_height(obj);

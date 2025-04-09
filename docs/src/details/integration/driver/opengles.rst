@@ -71,6 +71,7 @@ Basic Usage
         while (1)
         {
             uint32_t time_until_next = lv_timer_handler();
+            if(time_until_next == LV_NO_TIMER_READY) time_until_next = LV_DEF_REFR_PERIOD; /*handle LV_NO_TIMER_READY. Another option is to `sleep` for longer*/
             lv_delay_ms(time_until_next);
         }
 

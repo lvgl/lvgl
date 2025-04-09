@@ -464,7 +464,8 @@ static void _task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_ve
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_draw_sw_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc)
+
+void lv_draw_sw_vector(lv_draw_task_t * t, lv_draw_vector_task_dsc_t * dsc)
 {
     if(dsc->task_list == NULL)
         return;
@@ -503,6 +504,7 @@ void lv_draw_sw_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc
 
     lv_ll_t * task_list = dsc->task_list;
     lv_vector_for_each_destroy_tasks(task_list, _task_draw_cb, &state);
+    dsc->task_list = NULL;
 
     if(tvg_canvas_draw(canvas) == TVG_RESULT_SUCCESS) {
         tvg_canvas_sync(canvas);

@@ -41,7 +41,7 @@
  **********************/
 void lv_draw_nema_gfx_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * dsc)
 {
-    if(dsc->bg_opa <= LV_OPA_MIN) return;
+    if(dsc->opa <= LV_OPA_MIN) return;
 
     lv_draw_nema_gfx_unit_t * draw_nema_gfx_unit = (lv_draw_nema_gfx_unit_t *)t->draw_unit;
 
@@ -76,9 +76,9 @@ void lv_draw_nema_gfx_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t 
     nema_bind_dst_tex((uintptr_t)NEMA_VIRT2PHYS(layer->draw_buf->data), lv_area_get_width(&(layer->buf_area)),
                       lv_area_get_height(&(layer->buf_area)), dst_nema_cf, stride);
 
-    if(dsc->bg_grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE) {
+    if(dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE) {
 
-        lv_color32_t col32 = lv_color_to_32(dsc->bg_color, dsc->bg_opa);
+        lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
 
         if(col32.alpha < 255U) {
             nema_set_blend_fill(NEMA_BL_SIMPLE);
@@ -106,14 +106,14 @@ void lv_draw_nema_gfx_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t 
         float stops[LV_GRADIENT_MAX_STOPS];
         color_var_t colors[LV_GRADIENT_MAX_STOPS];
 
-        uint32_t cnt = LV_MAX(dsc->bg_grad.stops_count, LV_GRADIENT_MAX_STOPS);
+        uint32_t cnt = LV_MAX(dsc->grad.stops_count, LV_GRADIENT_MAX_STOPS);
 
         for(uint8_t i = 0; i < cnt; i++) {
-            stops[i] = (float)(dsc->bg_grad.stops[i].frac) / 255.f;
-            colors[i].a = dsc->bg_grad.stops[i].opa;
-            colors[i].r = dsc->bg_grad.stops[i].color.red;
-            colors[i].g = dsc->bg_grad.stops[i].color.green;
-            colors[i].b = dsc->bg_grad.stops[i].color.blue;
+            stops[i] = (float)(dsc->grad.stops[i].frac) / 255.f;
+            colors[i].a = dsc->grad.stops[i].opa;
+            colors[i].r = dsc->grad.stops[i].color.red;
+            colors[i].g = dsc->grad.stops[i].color.green;
+            colors[i].b = dsc->grad.stops[i].color.blue;
         }
 
         nema_vg_grad_set(draw_nema_gfx_unit->gradient, cnt, stops, colors);
@@ -133,7 +133,7 @@ void lv_draw_nema_gfx_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t 
 
         float x0, x1, y0, y1;
 
-        if(dsc->bg_grad.dir == LV_GRAD_DIR_HOR) {
+        if(dsc->grad.dir == LV_GRAD_DIR_HOR) {
             x0 = min_x;
             x1 = max_x;
             y0 = min_y;

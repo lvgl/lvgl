@@ -90,6 +90,7 @@
 #define LV_USE_OBSERVER         1
 #define LV_USE_FILE_EXPLORER    1
 #define LV_USE_TINY_TTF         1
+#define LV_TINY_TTF_FILE_SUPPORT 1
 #define LV_USE_SYSMON           1
 #define LV_USE_MEM_MONITOR      1
 #define LV_USE_PERF_MONITOR     1

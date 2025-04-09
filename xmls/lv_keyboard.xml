@@ -1,0 +1,21 @@
+<!--
+Example
+<lv_keyboard mode="text_upper"/>
+-->
+
+<widget>
+	<api>
+	    <enumdef name="lv_keyboard_mode" help="">
+	        <enum name="text_upper"/>
+	        <enum name="text_lower"/>
+	        <enum name="text_arabic"/>
+	        <enum name="special"/>
+	        <enum name="user_1"/>
+	        <enum name="user_2"/>
+	        <enum name="user_3"/>
+	        <enum name="user_4"/>
+	    </enumdef>
+
+	    <prop name="mode" type="enum:lv_keyboard_mode" help=""/>
+	</api>
+</widget>
