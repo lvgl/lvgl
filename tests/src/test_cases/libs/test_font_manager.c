@@ -8,6 +8,10 @@
     && LV_USE_FREETYPE \
     && LV_USE_TINY_TTF && LV_TINY_TTF_FILE_SUPPORT
 
+/**
+ * There are some differences between the rendering of FreeType in 64-bit and 32-bit,
+ * so we compare them separately here.
+ */
 #ifndef NON_AMD64_BUILD
     #define EXT_NAME ".lp64.png"
 #else
@@ -88,6 +92,32 @@ static void test_font_manager_src(add_src_cb_t add_src_cb)
                                 &lv_tiny_ttf_font_class);
     TEST_ASSERT_TRUE(add_src_result);
 
+    /* Register binary font source */
+    static const lv_binfont_font_src_t binfont_font_file_src = {
+        .font_size = 20,
+        .path = "A:src/test_assets/test_font_3.fnt",
+        .buffer = NULL,
+        .buffer_size = 0,
+    };
+
+    add_src_result = add_src_cb(g_font_manager,
+                                "RobotoMono-Regular-file",
+                                &binfont_font_file_src,
+                                &lv_binfont_font_class);
+    TEST_ASSERT_TRUE(add_src_result);
+
+    extern uint8_t const test_font_3_buf[4892];
+    static lv_binfont_font_src_t binfont_font_buffer_src = { 0 };
+    binfont_font_buffer_src.font_size = 20;
+    binfont_font_buffer_src.buffer = test_font_3_buf;
+    binfont_font_buffer_src.buffer_size = sizeof(test_font_3_buf);
+
+    add_src_result = add_src_cb(g_font_manager,
+                                "RobotoMono-Regular-buffer",
+                                &binfont_font_buffer_src,
+                                &lv_binfont_font_class);
+    TEST_ASSERT_TRUE(add_src_result);
+
     /* Create font from font manager */
 
     /* Try to create font with unknown name, should fail */
@@ -123,6 +153,22 @@ static void test_font_manager_src(add_src_cb_t add_src_cb)
                                                       LV_FONT_KERNING_NONE);
     TEST_ASSERT_NOT_NULL(font_40);
 
+    lv_font_t * font_file_20 = lv_font_manager_create_font(g_font_manager,
+                                                           "RobotoMono-Regular-file,NotoSansSC-Regular-2",
+                                                           0,
+                                                           20,
+                                                           0,
+                                                           LV_FONT_KERNING_NONE);
+    TEST_ASSERT_NOT_NULL(font_file_20);
+
+    lv_font_t * font_buffer_20 = lv_font_manager_create_font(g_font_manager,
+                                                             "RobotoMono-Regular-buffer,NotoSansSC-Regular-2",
+                                                             0,
+                                                             20,
+                                                             0,
+                                                             LV_FONT_KERNING_NONE);
+    TEST_ASSERT_NOT_NULL(font_file_20);
+
     /* Create label with the font */
     lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_label_set_text(label,
@@ -140,6 +186,14 @@ static void test_font_manager_src(add_src_cb_t add_src_cb)
     lv_obj_set_style_text_font(label, font_40, 0);
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/font_manager_3" EXT_NAME);
 
+    /* Freetype fonts have not been tested, so there is no need to distinguish and process images */
+    lv_obj_set_style_text_font(label, font_file_20, 0);
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/font_manager_4.png");
+
+    /* Rendered images should be the same */
+    lv_obj_set_style_text_font(label, font_buffer_20, 0);
+    TEST_ASSERT_EQUAL_SCREENSHOT("libs/font_manager_4.png");
+
     /* Should not be deleted successfully, because it is used by the label */
     bool delete_result = lv_font_manager_delete(g_font_manager);
     TEST_ASSERT_FALSE(delete_result);
@@ -148,6 +202,8 @@ static void test_font_manager_src(add_src_cb_t add_src_cb)
     lv_font_manager_delete_font(g_font_manager, font_14);
     lv_font_manager_delete_font(g_font_manager, font_32);
     lv_font_manager_delete_font(g_font_manager, font_40);
+    lv_font_manager_delete_font(g_font_manager, font_file_20);
+    lv_font_manager_delete_font(g_font_manager, font_buffer_20);
 
     /* Trying to delete a font that was not created by the font manager, it needs to handle this situation */
     lv_font_manager_delete_font(g_font_manager, (lv_font_t *)LV_FONT_DEFAULT);

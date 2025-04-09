@@ -69,9 +69,25 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
 static int read_bits_signed(bit_iterator_t * it, int n_bits, lv_fs_res_t * res);
 static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res);
 
+static lv_font_t * binfont_font_create_cb(const lv_font_info_t * info, const void * src);
+static void binfont_font_delete_cb(lv_font_t * font);
+static void * binfont_font_dup_src_cb(const void * src);
+static void binfont_font_free_src_cb(void * src);
+
 /**********************
  *      MACROS
  **********************/
+
+/**********************
+ *  GLOBAL VARIABLES
+ **********************/
+
+const lv_font_class_t lv_binfont_font_class = {
+    .create_cb = binfont_font_create_cb,
+    .delete_cb = binfont_font_delete_cb,
+    .dup_src_cb = binfont_font_dup_src_cb,
+    .free_src_cb = binfont_font_free_src_cb,
+};
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -655,4 +671,54 @@ int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t f
     }
 
     return kern_length;
+}
+
+static lv_font_t * binfont_font_create_cb(const lv_font_info_t * info, const void * src)
+{
+    const lv_binfont_font_src_t * font_src = src;
+
+    if(info->size == font_src->font_size) {
+        if(font_src->path) {
+            return lv_binfont_create(font_src->path);
+        }
+#if LV_USE_FS_MEMFS
+        return lv_binfont_create_from_buffer((void *)font_src->buffer, font_src->buffer_size);
+#else
+        LV_LOG_WARN("LV_USE_FS_MEMFS not enabled");
+        return NULL;
+#endif
+    }
+
+    return NULL;
+}
+
+static void binfont_font_delete_cb(lv_font_t * font)
+{
+    lv_binfont_destroy(font);
+}
+
+static void * binfont_font_dup_src_cb(const void * src)
+{
+    const lv_binfont_font_src_t * font_src = src;
+
+    lv_binfont_font_src_t * new_src = lv_malloc_zeroed(sizeof(lv_binfont_font_src_t));
+    LV_ASSERT_MALLOC(new_src);
+    *new_src = *font_src;
+
+    if(font_src->path) {
+        new_src->path = lv_strdup(font_src->path);
+    }
+
+    return new_src;
+}
+
+static void binfont_font_free_src_cb(void * src)
+{
+    lv_binfont_font_src_t * font_src = src;
+    if(font_src->path) {
+        lv_free((char *)font_src->path);
+        font_src->path = NULL;
+    }
+
+    lv_free(font_src);
 }
