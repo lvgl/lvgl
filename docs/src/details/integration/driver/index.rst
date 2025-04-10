@@ -15,3 +15,4 @@ Drivers
     windows
     X11
     uefi
+    sdl

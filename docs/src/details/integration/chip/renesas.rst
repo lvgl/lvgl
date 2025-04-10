@@ -1,10 +1,10 @@
 .. _renesas:
 
-.. |sup2|   unicode:: U+000B2 .. SUPERSCRIPT TWO
-
 =======
 Renesas
 =======
+
+.. |sup2|   unicode:: U+000B2 .. SUPERSCRIPT TWO
 
 `Renesas <https://renesas.com/>`__ is an official partner of LVGL. Therefore, LVGL contains built-in support for
 `Dave2D <https://www.renesas.com/document/mas/tes-dave2d-driver-documentation>`__ (the GPU of Renesas) and we also maintain

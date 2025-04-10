@@ -69,12 +69,9 @@ void lv_draw_triangle(lv_layer_t * layer, const lv_draw_triangle_dsc_t * dsc)
     a.x2 = (int32_t)LV_MAX3(dsc->p[0].x, dsc->p[1].x, dsc->p[2].x);
     a.y2 = (int32_t)LV_MAX3(dsc->p[0].y, dsc->p[1].y, dsc->p[2].y);
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, &a);
+    lv_draw_task_t * t = lv_draw_add_task(layer, &a, LV_DRAW_TASK_TYPE_TRIANGLE);
 
-    t->draw_dsc = lv_malloc(sizeof(*dsc));
-    LV_ASSERT_MALLOC(t->draw_dsc);
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
-    t->type = LV_DRAW_TASK_TYPE_TRIANGLE;
 
     lv_draw_finalize_task_creation(layer, t);
     LV_PROFILER_DRAW_END;

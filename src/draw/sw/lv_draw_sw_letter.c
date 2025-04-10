@@ -11,9 +11,10 @@
 #include "../../draw/lv_draw_private.h"
 #include "lv_draw_sw.h"
 
-#if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC
+#if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
 
     #include "../../libs/freetype/lv_freetype_private.h"
+    #include "../lv_draw_vector_private.h"
 
 #endif
 
@@ -35,6 +36,15 @@
 /**********************
  *      TYPEDEFS
  **********************/
+#if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
+
+typedef struct {
+    lv_vector_path_t * inside_path;     /*The regular glyph*/
+    lv_vector_path_t * outside_path;    /*A bigger glyph that goes in the background for the letter outline*/
+    lv_vector_path_t * cur_path;
+} lv_draw_sw_letter_outlines_t;
+
+#endif /* LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG */
 
 /**********************
  *  STATIC PROTOTYPES
@@ -43,7 +53,7 @@
 static void /* LV_ATTRIBUTE_FAST_MEM */ draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_draw_dsc,
                                                        lv_draw_fill_dsc_t * fill_draw_dsc, const lv_area_t * fill_area);
 
-#if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC
+#if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
 
     static void freetype_outline_event_cb(lv_event_t * e);
     static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc);
@@ -100,7 +110,7 @@ void lv_draw_sw_label(lv_draw_task_t * t, const lv_draw_label_dsc_t * dsc, const
 
     LV_PROFILER_DRAW_BEGIN;
 
-#if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC
+#if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
     static bool is_init = false;
     if(!is_init) {
         lv_freetype_outline_add_event(freetype_outline_event_cb, LV_EVENT_ALL, t);
@@ -179,7 +189,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
                     break;
                 }
                 break;
-#if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC
+#if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
             case LV_FONT_GLYPH_FORMAT_VECTOR: {
                     draw_letter_outline(t, glyph_draw_dsc);
                 }
@@ -195,13 +205,7 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
     }
 }
 
-#if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC
-
-typedef struct {
-    lv_vector_path_t * inside_path;     /*The regular glyph*/
-    lv_vector_path_t * outside_path;    /*A bigger glyph that goes in the background for the letter outline*/
-    lv_vector_path_t * cur_path;
-} lv_draw_sw_letter_outlines_t;
+#if LV_USE_FREETYPE && LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
 
 /*
  * Renders the vectors paths representing a glyph with ThorVG
@@ -291,10 +295,21 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
     lv_memcpy(&old_area, &t->clip_area, sizeof(lv_area_t));
     lv_memcpy(&t->clip_area, &buf_area, sizeof(lv_area_t));
 
-    lv_draw_vector(vector_dsc);
-    LV_ASSERT_NULL(layer.draw_task_head);
-
-    lv_draw_sw_vector(t, (lv_draw_vector_task_dsc_t *) layer.draw_task_head->draw_dsc);
+    /*Can't call lv_draw_vector() as it would create a new draw task while
+     *the main thread also can create draw tasks. So create a dummy draw task
+     *manually to draw the outline*/
+    if(vector_dsc->tasks.task_list) {
+        vector_dsc->tasks.base.layer = vector_dsc->layer;
+        lv_draw_task_t dummy_t;
+        lv_memzero(&dummy_t, sizeof(lv_draw_task_t));
+        dummy_t.area = vector_dsc->layer->_clip_area;
+        dummy_t._real_area = vector_dsc->layer->_clip_area;
+        dummy_t.clip_area = vector_dsc->layer->_clip_area;
+        dummy_t.target_layer = vector_dsc->layer;
+        dummy_t.type = LV_DRAW_TASK_TYPE_VECTOR;
+        dummy_t.draw_dsc = &vector_dsc->tasks;
+        lv_draw_sw_vector(&dummy_t, dummy_t.draw_dsc);
+    }
 
     /*Restore previous draw area of the entire text label*/
     lv_memcpy(&t->clip_area, &old_area, sizeof(lv_area_t));
@@ -319,7 +334,7 @@ static void draw_letter_outline(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
 }
 
 /* Build the inside and outside vector paths for a glyph based
- * on the recieved outline events emitted by lv_freetype_outline.c */
+ * on the received outline events emitted by lv_freetype_outline.c */
 static void freetype_outline_event_cb(lv_event_t * e)
 {
 

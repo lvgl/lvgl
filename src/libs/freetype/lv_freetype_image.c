@@ -187,12 +187,14 @@ static bool freetype_image_create_cb(lv_freetype_image_cache_data_t * data, void
     uint32_t pitch = glyph_bitmap->bitmap.pitch;
     uint32_t stride = lv_draw_buf_width_to_stride(box_w, col_format);
     data->draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, box_w, box_h, col_format, stride);
+    lv_draw_buf_clear(data->draw_buf, NULL);
 
     for(int y = 0; y < box_h; ++y) {
         lv_memcpy((uint8_t *)(data->draw_buf->data) + y * stride, glyph_bitmap->bitmap.buffer + y * pitch,
                   pitch);
     }
 
+    lv_draw_buf_flush_cache(data->draw_buf, NULL);
     FT_Done_Glyph(glyph);
     lv_mutex_unlock(&dsc->cache_node->face_lock);
     LV_PROFILER_FONT_END;

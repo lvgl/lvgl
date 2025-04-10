@@ -71,7 +71,7 @@ struct _lv_draw_image_dsc_t {
     /**Describes how to blend the pixels of the image to the background.
      * See `lv_blend_mode_t` for more details.
      */
-    lv_blend_mode_t blend_mode : 3;
+    lv_blend_mode_t blend_mode : 4;
 
     /**1: perform the transformation with anti-alaising */
     uint16_t antialias          : 1;

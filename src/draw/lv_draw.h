@@ -57,8 +57,11 @@ typedef enum {
     LV_DRAW_TASK_TYPE_TRIANGLE,
     LV_DRAW_TASK_TYPE_MASK_RECTANGLE,
     LV_DRAW_TASK_TYPE_MASK_BITMAP,
+#if LV_USE_VECTOR_GRAPHIC
     LV_DRAW_TASK_TYPE_VECTOR,
-    LV_DRAW_TASK_TYPE_3D,
+
+#endif
+      LV_DRAW_TASK_TYPE_3D,
 } lv_draw_task_type_t;
 
 typedef enum {
@@ -168,7 +171,7 @@ void * lv_draw_create_unit(size_t size);
  * @return          the created draw task which needs to be
  *                  further configured e.g. by added a draw descriptor
  */
-lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords);
+lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, lv_draw_task_type_t type);
 
 /**
  * Needs to be called when a draw task is created and configured.

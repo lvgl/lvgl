@@ -529,7 +529,7 @@ Project setup:
    - "src/draw/nxp/g2d/lv_draw_buf_g2d.c": draw buffer callbacks
    - "src/draw/nxp/g2d/lv_draw_g2d_fill.c": fill area
    - "src/draw/nxp/g2d/lv_draw_g2d_img.c": blit image (w/ optional recolor or
-   transformation)
+     transformation)
    - "src/draw/nxp/g2d/lv_draw_g2d.c": draw unit initialization
    - "src/draw/nxp/g2d/lv_draw_g2d_buf_map.c": hash map for g2d buffers
    - "src/draw/nxp/g2d/lv_g2d_utils.c": function helpers

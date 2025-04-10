@@ -300,11 +300,6 @@ LV_FONT_DECLARE(lv_font_unscii_16)
 LV_FONT_CUSTOM_DECLARE
 #endif
 
-/**
- * Set to LV_FONT_DEFAULT as macros might not be available in bindings or other places
- */
-extern const lv_font_t * const lv_font_default;
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

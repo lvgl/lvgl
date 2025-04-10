@@ -59,7 +59,9 @@ typedef struct {
     struct fb_var_screeninfo vinfo;
     struct fb_fix_screeninfo finfo;
 #endif /* LV_LINUX_FBDEV_BSD */
+#if LV_LINUX_FBDEV_MMAP
     char * fbp;
+#endif
     uint8_t * rotated_buf;
     size_t rotated_buf_size;
     long int screensize;
@@ -182,12 +184,14 @@ void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
     /* Figure out the size of the screen in bytes*/
     dsc->screensize =  dsc->finfo.smem_len;/*finfo.line_length * vinfo.yres;*/
 
+#if LV_LINUX_FBDEV_MMAP
     /* Map the device to memory*/
     dsc->fbp = (char *)mmap(0, dsc->screensize, PROT_READ | PROT_WRITE, MAP_SHARED, dsc->fbfd, 0);
     if((intptr_t)dsc->fbp == -1) {
         perror("Error: failed to map framebuffer device to memory");
         return;
     }
+#endif
 
     /* Don't initialise the memory to retain what's currently displayed / avoid clearing the screen.
      * This is important for applications that only draw to a subsection of the full framebuffer.*/
@@ -249,14 +253,27 @@ void lv_linux_fbdev_set_force_refresh(lv_display_t * disp, bool enabled)
  *   STATIC FUNCTIONS
  **********************/
 
+static void write_to_fb(lv_linux_fb_t * dsc, uint32_t fb_pos, const void * data, size_t sz)
+{
+#if LV_LINUX_FBDEV_MMAP
+    uint8_t * fbp = (uint8_t *)dsc->fbp;
+    lv_memcpy(&fbp[fb_pos], data, sz);
+#else
+    if(pwrite(dsc->fbfd, data, sz, fb_pos) < 0)
+        LV_LOG_ERROR("write failed: %d", errno);
+#endif
+}
+
 static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
 {
     lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
 
+#if LV_LINUX_FBDEV_MMAP
     if(dsc->fbp == NULL) {
         lv_display_flush_ready(disp);
         return;
     }
+#endif
 
     int32_t w = lv_area_get_width(area);
     int32_t h = lv_area_get_height(area);
@@ -315,7 +332,6 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
         (area->x1 + dsc->vinfo.xoffset) * px_size +
         (area->y1 + dsc->vinfo.yoffset) * dsc->finfo.line_length;
 
-    uint8_t * fbp = (uint8_t *)dsc->fbp;
     int32_t y;
     if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT) {
         uint32_t color_pos =
@@ -323,7 +339,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
             area->y1 * disp->hor_res * px_size;
 
         for(y = area->y1; y <= area->y2; y++) {
-            lv_memcpy(&fbp[fb_pos], &color_p[color_pos], w * px_size);
+            write_to_fb(dsc, fb_pos, &color_p[color_pos], w * px_size);
             fb_pos += dsc->finfo.line_length;
             color_pos += disp->hor_res * px_size;
         }
@@ -331,7 +347,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
     else {
         w = lv_area_get_width(area);
         for(y = area->y1; y <= area->y2; y++) {
-            lv_memcpy(&fbp[fb_pos], color_p, w * px_size);
+            write_to_fb(dsc, fb_pos, color_p, w * px_size);
             fb_pos += dsc->finfo.line_length;
             color_p += w * px_size;
         }

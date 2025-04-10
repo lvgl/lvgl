@@ -29,6 +29,7 @@ typedef struct {
     bool polling;
     uv_poll_t fb_poll;
     uv_poll_t vsync_poll;
+    int32_t vsync_req_count;
 } lv_nuttx_uv_fb_ctx_t;
 
 typedef struct {
@@ -190,7 +191,7 @@ static void lv_nuttx_uv_vsync_poll_cb(uv_poll_t * handle, int status, int events
     lv_display_t * d;
     d = lv_display_get_next(NULL);
     while(d) {
-        lv_display_send_event(d, LV_EVENT_VSYNC, NULL);
+        lv_display_send_vsync_event(d, NULL);
         d = lv_display_get_next(d);
     }
 }
@@ -217,6 +218,27 @@ static void lv_nuttx_uv_disp_refr_req_cb(lv_event_t * e)
     uv_poll_start(&fb_ctx->fb_poll, UV_WRITABLE, lv_nuttx_uv_disp_poll_cb);
 }
 
+static void lv_nuttx_uv_disp_vsync_request_cb(lv_event_t * e)
+{
+    lv_nuttx_uv_fb_ctx_t * fb_ctx = lv_event_get_user_data(e);
+    void * param = lv_event_get_param(e);
+
+    if(param) {
+        if(fb_ctx->vsync_req_count == 0) {
+            LV_LOG_INFO("enabled");
+            uv_poll_start(&fb_ctx->vsync_poll, UV_PRIORITIZED, lv_nuttx_uv_vsync_poll_cb);
+        }
+        fb_ctx->vsync_req_count++;
+    }
+    else {
+        fb_ctx->vsync_req_count--;
+        if(fb_ctx->vsync_req_count == 0) {
+            LV_LOG_INFO("disabled");
+            uv_poll_stop(&fb_ctx->vsync_poll);
+        }
+    }
+}
+
 static int lv_nuttx_uv_fb_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_ctx_t * uv_ctx)
 {
     uv_loop_t * loop = uv_info->loop;
@@ -234,15 +256,13 @@ static int lv_nuttx_uv_fb_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_ctx_t * uv_c
         return 0;
     }
 
-    if(!disp->refr_timer) {
-        LV_LOG_ERROR("disp->refr_timer is NULL");
+    if(!lv_display_get_refr_timer(disp)) {
+        LV_LOG_ERROR("disp refr_timer is NULL");
         return -EINVAL;
     }
 
     /* Remove default refr timer. */
-
-    lv_timer_delete(disp->refr_timer);
-    disp->refr_timer = NULL;
+    lv_display_delete_refr_timer(disp);
 
     fb_ctx->fb_poll.data = uv_ctx;
     uv_poll_init(loop, &fb_ctx->fb_poll, fb_ctx->fd);
@@ -252,13 +272,12 @@ static int lv_nuttx_uv_fb_init(lv_nuttx_uv_t * uv_info, lv_nuttx_uv_ctx_t * uv_c
     fb_ctx->vsync_poll.data = uv_ctx;
     uv_poll_init(loop, &fb_ctx->vsync_poll, fb_ctx->fd);
     uv_ctx->ref_count++;
-    uv_poll_start(&fb_ctx->vsync_poll, UV_PRIORITIZED, lv_nuttx_uv_vsync_poll_cb);
+    lv_display_add_event_cb(disp, lv_nuttx_uv_disp_vsync_request_cb, LV_EVENT_VSYNC_REQUEST, fb_ctx);
 
     LV_LOG_USER("lvgl fb loop start OK");
 
     /* Register for the invalidate area event */
-
-    lv_event_add(&disp->event_list, lv_nuttx_uv_disp_refr_req_cb, LV_EVENT_REFR_REQUEST, fb_ctx);
+    lv_display_add_event_cb(disp, lv_nuttx_uv_disp_refr_req_cb, LV_EVENT_REFR_REQUEST, fb_ctx);
 
     return 0;
 }
