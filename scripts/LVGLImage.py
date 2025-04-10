@@ -121,6 +121,7 @@ class ColorFormat(Enum):
     ARGB8565 = 0x13
     RGB565A8 = 0x14
     RGB888 = 0x0F
+    ARGB8888_PREMULTIPLIED = 0x1A
 
     @property
     def bpp(self) -> int:
@@ -143,6 +144,7 @@ class ColorFormat(Enum):
             ColorFormat.RGB565A8: 16,  # 16bpp + a8 map
             ColorFormat.ARGB8565: 24,
             ColorFormat.RGB888: 24,
+            ColorFormat.ARGB8888_PREMULTIPLIED: 32,
         }
 
         return cf_map[self] if self in cf_map else 0
@@ -179,13 +181,15 @@ class ColorFormat(Enum):
             ColorFormat.ARGB8888,
             ColorFormat.XRGB8888,  # const alpha: 0xff
             ColorFormat.ARGB8565,
-            ColorFormat.RGB565A8)
+            ColorFormat.RGB565A8,
+            ColorFormat.ARGB8888_PREMULTIPLIED)
 
     @property
     def is_colormap(self) -> bool:
         return self in (ColorFormat.ARGB8888, ColorFormat.RGB888,
                         ColorFormat.XRGB8888, ColorFormat.RGB565A8,
-                        ColorFormat.ARGB8565, ColorFormat.RGB565)
+                        ColorFormat.ARGB8565, ColorFormat.RGB565,
+                        ColorFormat.ARGB8888_PREMULTIPLIED)
 
     @property
     def is_luma_only(self) -> bool:
@@ -295,8 +299,15 @@ def unpack_colors(data: bytes, cf: ColorFormat, w) -> List:
         G = data[1::4]
         R = data[2::4]
         A = data[3::4]
-        for r, g, b, a in zip(R, G, B, A):
-            ret += [r, g, b, a]
+        if cf == ColorFormat.ARGB8888_PREMULTIPLIED:
+            for r, g, b, a in zip(R, G, B, A):
+                r = (r * a // 255)
+                g = (g * a // 255)
+                b = (b * a // 255)
+                ret += [r, g, b, a]
+        else:
+            for r, g, b, a in zip(R, G, B, A):
+                ret += [r, g, b, a]
     else:
         assert 0
 
@@ -988,6 +999,16 @@ class LVGLImage:
 
             def pack(r, g, b, a):
                 return uint32_t((a << 24) | (r << 16) | (g << 8) | (b << 0))
+        elif cf == ColorFormat.ARGB8888_PREMULTIPLIED:
+
+            def pack(r, g, b, a):
+                # Premultiply RGB by Alpha
+                r = (r * a // 255)
+                g = (g * a // 255)
+                b = (b * a // 255)
+
+                # Pack into ARGB8888 format
+                return uint32_t((a << 24) | (r << 16) | (g << 8) | (b << 0))
         elif cf == ColorFormat.XRGB8888:
 
             def pack(r, g, b, a):
@@ -1343,7 +1364,7 @@ def main():
         choices=[
             "L8", "I1", "I2", "I4", "I8", "A1", "A2", "A4", "A8", "ARGB8888",
             "XRGB8888", "RGB565", "RGB565A8", "ARGB8565", "RGB888", "AUTO",
-            "RAW", "RAW_ALPHA"
+            "RAW", "RAW_ALPHA", "ARGB8888_PREMULTIPLIED"
         ])
 
     parser.add_argument('--rgb565dither', action='store_true',
