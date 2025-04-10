@@ -70,14 +70,13 @@ static void /* LV_ATTRIBUTE_FAST_MEM */ argb8888_premultiplied_image_blend(lv_dr
                                                                            uint32_t dest_px_size);
 #endif
 
-
 static inline void /* LV_ATTRIBUTE_FAST_MEM */ lv_color_8_24_mix(const uint8_t src, uint8_t * dest, uint8_t mix);
 
 static inline void /* LV_ATTRIBUTE_FAST_MEM */ lv_color_24_24_mix(const uint8_t * src, uint8_t * dest, uint8_t mix);
 
-
 static inline void /* LV_ATTRIBUTE_FAST_MEM */ blend_non_normal_pixel(uint8_t * dest, lv_color32_t src,
                                                                       lv_blend_mode_t mode);
+
 static inline void * /* LV_ATTRIBUTE_FAST_MEM */ drawbuf_next_row(const void * buf, uint32_t stride);
 
 /**********************
@@ -307,6 +306,7 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
                 for(x = 0, mask_x = 0; x < w; x += dest_px_size, mask_x++) {
                     lv_color_24_24_mix((const uint8_t *)&color32, &dest_buf[x], mask[mask_x]);
                 }
+
                 dest_buf += dest_stride;
                 mask += mask_stride;
             }
@@ -333,7 +333,6 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_color_to_rgb888(lv_draw_sw_blend_fil
 
 void LV_ATTRIBUTE_FAST_MEM lv_draw_sw_blend_image_to_rgb888(lv_draw_sw_blend_image_dsc_t * dsc, uint32_t dest_px_size)
 {
-
     switch(dsc->src_color_format) {
 #if LV_DRAW_SW_SUPPORT_RGB565
         case LV_COLOR_FORMAT_RGB565:
@@ -935,7 +934,6 @@ static void LV_ATTRIBUTE_FAST_MEM argb8888_image_blend(lv_draw_sw_blend_image_ds
 
 static inline void LV_ATTRIBUTE_FAST_MEM lv_color_24_24_mix_premult(const uint8_t * src, uint8_t * dest, uint8_t mix)
 {
-
     if(mix == 0) return;
 
     if(mix >= LV_OPA_MAX) {
@@ -1131,7 +1129,6 @@ static inline void LV_ATTRIBUTE_FAST_MEM lv_color_24_24_mix(const uint8_t * src,
     }
 }
 
-
 #if LV_DRAW_SW_SUPPORT_I1
 
 static inline uint8_t LV_ATTRIBUTE_FAST_MEM get_bit(const uint8_t * buf, int32_t bit_idx)
@@ -1140,7 +1137,6 @@ static inline uint8_t LV_ATTRIBUTE_FAST_MEM get_bit(const uint8_t * buf, int32_t
 }
 
 #endif
-
 
 static inline void * LV_ATTRIBUTE_FAST_MEM drawbuf_next_row(const void * buf, uint32_t stride)
 {
