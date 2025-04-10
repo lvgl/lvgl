@@ -1872,6 +1872,11 @@ menu "LVGL configuration"
 			depends on LV_USE_LINUX_FBDEV && LV_LINUX_FBDEV_CUSTOM_BUFFER
 			default 60
 
+		config LV_LINUX_FBDEV_MMAP
+			bool "Framebuffer device supports mmap"
+			depends on LV_USE_LINUX_FBDEV
+			default y
+
 		config LV_USE_NUTTX
 			bool "Use Nuttx to open window and handle touchscreen"
 			default n
