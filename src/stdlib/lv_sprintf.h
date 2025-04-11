@@ -45,6 +45,14 @@
 
 #include "../misc/lv_types.h"
 
+/* format specifier for floating point lv_value_precise_t */
+#if LV_USE_FLOAT
+    #define LV_PRFv32(fmt) fmt
+#else
+    #define LV_PRFv32(fmt) LV_PRId32
+#endif
+#define LV_PRFf32 LV_PRFv32("f")
+
 #ifdef __cplusplus
 extern "C" {
 #endif

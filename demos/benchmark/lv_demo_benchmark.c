@@ -698,8 +698,8 @@ static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * sub
     lv_obj_t * label = lv_observer_get_target(observer);
     lv_label_set_text_fmt(label,
                           "%s"
-                          "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU\n"
-                          "refr. %" LV_PRIu32" ms = %" LV_PRIu32 "ms render + %" LV_PRIu32" ms flush",
+                          "%" LV_PRFv32(".2f")" FPS, %" LV_PRIu32 "%% CPU\n"
+                          "refr. %" LV_PRFv32(".2f")" ms = %" LV_PRFv32(".2f") "ms render + %" LV_PRFv32(".2f")" ms flush",
                           scene_name,
                           info->calculated.fps, info->calculated.cpu,
                           info->calculated.render_avg_time + info->calculated.flush_avg_time,
@@ -711,9 +711,9 @@ static void sysmon_perf_observer_cb(lv_observer_t * observer, lv_subject_t * sub
     /*Ignore the first call as it contains data from the previous scene*/
     if(scenes[scene_act].measurement_cnt != 0) {
         scenes[scene_act].cpu_avg_usage += info->calculated.cpu;
-        scenes[scene_act].fps_avg += info->calculated.fps;
-        scenes[scene_act].render_avg_time += info->calculated.render_avg_time;
-        scenes[scene_act].flush_avg_time += info->calculated.flush_avg_time;
+        scenes[scene_act].fps_avg += (uint32_t)info->calculated.fps;
+        scenes[scene_act].render_avg_time += (uint32_t)info->calculated.render_avg_time;
+        scenes[scene_act].flush_avg_time += (uint32_t)info->calculated.flush_avg_time;
     }
     scenes[scene_act].measurement_cnt++;
 

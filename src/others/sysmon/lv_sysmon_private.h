@@ -70,19 +70,19 @@ struct _lv_sysmon_perf_info_t {
 
     struct {
         uint32_t duration;
-        uint32_t fps;
+        lv_value_precise_t fps;
         uint32_t cpu;
 #if LV_SYSMON_PROC_IDLE_AVAILABLE
-        uint32_t cpu_proc;              /** The applications idle time percentage */
+        uint32_t cpu_proc;                        /** The applications idle time percentage */
 #endif
-        uint32_t refr_avg_time;
-        uint32_t render_avg_time;       /**< Pure rendering time without flush time*/
-        uint32_t flush_avg_time;        /**< Pure flushing time without rendering time*/
+        lv_value_precise_t refr_avg_time;
+        lv_value_precise_t render_avg_time;       /**< Pure rendering time without flush time*/
+        lv_value_precise_t flush_avg_time;        /**< Pure flushing time without rendering time*/
         /**
          * Below fields are kept across start/stop/reset of the perf monitor, only valid for overall data.
          */
-        uint32_t cpu_avg_total;
-        uint32_t fps_avg_total;
+        lv_value_precise_t cpu_avg_total;
+        lv_value_precise_t fps_avg_total;
         uint32_t run_cnt;
     } calculated;
 

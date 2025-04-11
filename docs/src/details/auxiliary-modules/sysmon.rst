@@ -89,7 +89,7 @@ Custom Performance Monitor without Binding to Label
     const lv_sysmon_perf_data_t * data = lv_sysmon_perf_get_data(perf);
 
     /* Print data (data may change later each time you call lv_sysmon_perf_get_data() or lv_sysmon_perf_stop()) */
-    printf("FPS: %d\n", data->overall.calculated.fps);
+    printf("FPS: %" LV_PRFv32(".2f") "\n", data->overall.calculated.fps);
 
     /* Do something */
 
@@ -97,7 +97,7 @@ Custom Performance Monitor without Binding to Label
     data = lv_sysmon_perf_stop(perf);
 
     /* Print data */
-    printf("FPS: %d\n", data->overall.calculated.fps);
+    printf("FPS: %" LV_PRFv32(".2f") "\n", data->overall.calculated.fps);
 
     /* Destroy the performance monitor */
     lv_sysmon_perf_destroy(perf);

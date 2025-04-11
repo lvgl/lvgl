@@ -336,27 +336,28 @@ static void lv_sysmon_perf_calculate_info(lv_sysmon_perf_info_t * info, lv_displ
     uint32_t LV_SYSMON_GET_IDLE(void);
 
     lv_timer_t * disp_refr_timer = lv_display_get_refr_timer(disp);
-    uint32_t disp_refr_period = disp_refr_timer ? disp_refr_timer->period : LV_DEF_REFR_PERIOD;
+    lv_value_precise_t disp_refr_period = disp_refr_timer ? disp_refr_timer->period : LV_DEF_REFR_PERIOD;
 
     info->calculated.duration = lv_tick_elaps(info->measured.perf_start);
-    info->calculated.fps = info->calculated.duration ? (1000 * info->measured.refr_cnt / info->calculated.duration) : 0;
+    info->calculated.fps = info->calculated.duration ? ((lv_value_precise_t)1000 * info->measured.refr_cnt /
+                                                        info->calculated.duration) : 0;
     info->calculated.fps = LV_MIN(info->calculated.fps,
-                                  1000 / disp_refr_period);   /*Limit due to possible off-by-one error*/
+                                  (lv_value_precise_t)1000 / disp_refr_period);   /*Limit due to possible off-by-one error*/
 
     info->calculated.cpu = 100 - LV_SYSMON_GET_IDLE();
 #if LV_SYSMON_PROC_IDLE_AVAILABLE
     uint32_t LV_SYSMON_GET_PROC_IDLE(void);
     info->calculated.cpu_proc = 100 - LV_SYSMON_GET_PROC_IDLE();
 #endif /*LV_SYSMON_PROC_IDLE_AVAILABLE*/
-    info->calculated.refr_avg_time = info->measured.refr_cnt ? (info->measured.refr_elaps_sum / info->measured.refr_cnt) :
-                                     0;
+    info->calculated.refr_avg_time = info->measured.refr_cnt ? ((lv_value_precise_t)info->measured.refr_elaps_sum /
+                                                                info->measured.refr_cnt) : 0;
 
     info->calculated.flush_avg_time = info->measured.render_cnt ?
-                                      ((info->measured.flush_in_render_elaps_sum + info->measured.flush_not_in_render_elaps_sum)
+                                      ((lv_value_precise_t)(info->measured.flush_in_render_elaps_sum + info->measured.flush_not_in_render_elaps_sum)
                                        / info->measured.render_cnt) : 0;
     /*Flush time was measured in rendering time so subtract it*/
-    info->calculated.render_avg_time = info->measured.render_cnt ? ((info->measured.render_elaps_sum -
-                                                                     info->measured.flush_in_render_elaps_sum) /
+    info->calculated.render_avg_time = info->measured.render_cnt ? ((lv_value_precise_t)(info->measured.render_elaps_sum -
+                                                                                         info->measured.flush_in_render_elaps_sum) /
                                                                     info->measured.render_cnt) : 0;
 
     if(!overall) {
