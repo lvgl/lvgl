@@ -112,4 +112,10 @@ jobs:
               # can remove this once the issue is fixed.
               sysctl -w vm.mmap_rnd_bits=28
             fi
-            env PATH="/usr/lib/ccache:$PATH" ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
+            # env PATH="/usr/lib/ccache:$PATH" ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
+            if [[ "${{ matrix.arch }}" == "aarch64" ]]; then
+              echo "Disabling ASAN on aarch64 to avoid QEMU + LLVM segmentation faults"
+              env PATH="/usr/lib/ccache:$PATH" python3 tests/main.py test
+            else
+              env PATH="/usr/lib/ccache:$PATH" ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
+            fi
