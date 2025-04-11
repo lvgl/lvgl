@@ -47,6 +47,12 @@ def main() -> bool:
     )
     parser.add_argument("--test-suite", default=None, help="Select test suite to run")
     parser.add_argument(
+        "--pull",
+        action="store_true",
+        default=False,
+        help="Pull latest images from registry before running tests",
+    )
+    parser.add_argument(
         "--clean",
         action="store_true",
         default=False,
@@ -82,7 +88,7 @@ def main() -> bool:
             generate_files(option_name, args.test_suite)
 
         if "test" in args.actions:
-            ret = run_tests(option_name, "lv_test_perf_conf.h")
+            ret = run_tests(option_name, "lv_test_perf_conf.h", args.pull)
             is_error = is_error or not ret
 
         if args.auto_clean:
@@ -450,7 +456,7 @@ def check_for_success(container_name):
     return True
 
 
-def run_tests(options_name: str, lv_conf_name: str) -> bool:
+def run_tests(options_name: str, lv_conf_name: str, pull: bool) -> bool:
     """
     Runs the tests by running the docker image associated with `options_name`
     while mounting the correct volumes from the previous generated files
@@ -510,6 +516,10 @@ def run_tests(options_name: str, lv_conf_name: str) -> bool:
 
     interactive = "-it" if sys.stdout.isatty() else "-t"
     command = ["docker", "run", "--privileged", "--name", container_name, interactive]
+
+    if pull:
+        command.append("--pull=always")
+
     for v in volumes:
         command.extend(v)
 
