@@ -59,7 +59,8 @@ jobs:
       matrix:
         include:
           - arch: aarch64
-            distro: ubuntu22.04
+            # distro: ubuntu22.04
+            distro: bookworm
           - arch: armv6
             distro: bullseye
           - arch: armv7
