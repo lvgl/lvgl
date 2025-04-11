@@ -77,7 +77,8 @@ extern "C" {
 #define _lv_disp_refr_timer lv_disp_refr_timer
 #define _lv_disp_get_refr_timer lv_disp_get_refr_timer
 
-#define lv_obj_get_child_by_id lv_obj_find_by_id
+#define lv_obj_get_child_by_id  lv_obj_find_by_id
+#define lv_obj_update_flag      lv_obj_set_flag
 
 #define _lv_inv_area lv_inv_area
 #define lv_chart_set_all_value lv_chart_set_all_values

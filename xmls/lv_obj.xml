@@ -65,28 +65,37 @@ Example
 	    <prop name="flex_grow" type="int"/>
 	    <prop name="flex_flow" type="enum:lv_flex_flow"/>
 
-	    <prop name="hidden" type="flag:flag"/>
-	    <prop name="clickable" type="flag:flag"/>
-	    <prop name="click_focusable" type="flag:flag"/>
-	    <prop name="checkable" type="flag:flag"/>
-	    <prop name="scrollable" type="flag:flag"/>
-	    <prop name="scroll_elastic" type="flag:flag"/>
-	    <prop name="scroll_momentum" type="flag:flag"/>
-	    <prop name="scroll_one" type="flag:flag"/>
-	    <prop name="scroll_chain_hor" type="flag:flag"/>
-	    <prop name="scroll_chain_ver" type="flag:flag"/>
-	    <prop name="scroll_chain" type="flag:flag"/>
-	    <prop name="scroll_on_focus" type="flag:flag"/>
-	    <prop name="scroll_with_arrow" type="flag:flag"/>
-	    <prop name="snappable" type="flag:flag"/>
-	    <prop name="press_lock" type="flag:flag"/>
-	    <prop name="event_bubble" type="flag:flag"/>
-	    <prop name="gesture_bubble" type="flag:flag"/>
-	    <prop name="adv_hittest" type="flag:flag"/>
-	    <prop name="ignore_layout" type="flag:flag"/>
-	    <prop name="floating" type="flag:flag"/>
-	    <prop name="send_draw_task_events" type="flag:flag"/>
-	    <prop name="overflow_visible" type="flag:flag"/>
-	    <prop name="flex_in_new_track" type="flag:flag"/>
+	    <prop name="checked" 			type="flag:state lv_state"/>
+	    <prop name="focused" 			type="flag:state lv_state"/>
+	    <prop name="focus_key" 			type="flag:state lv_state"/>
+	    <prop name="edited" 			type="flag:state lv_state"/>
+	    <prop name="hovered" 			type="flag:state lv_state"/>
+	    <prop name="pressed" 			type="flag:state lv_state"/>
+	    <prop name="scrolled" 			type="flag:state lv_state"/>
+	    <prop name="disabled" 			type="flag:state lv_state"/>
+
+	    <prop name="hidden" 			type="flag:flag lv_obj_flag"/>
+	    <prop name="clickable" 			type="flag:flag lv_obj_flag"/>
+	    <prop name="click_focusable" 	type="flag:flag lv_obj_flag"/>
+	    <prop name="checkable" 			type="flag:flag lv_obj_flag"/>
+	    <prop name="scrollable" 		type="flag:flag lv_obj_flag"/>
+	    <prop name="scroll_elastic" 	type="flag:flag lv_obj_flag"/>
+	    <prop name="scroll_momentum" 	type="flag:flag lv_obj_flag"/>
+	    <prop name="scroll_one" 		type="flag:flag lv_obj_flag"/>
+	    <prop name="scroll_chain_hor" 	type="flag:flag lv_obj_flag"/>
+	    <prop name="scroll_chain_ver" 	type="flag:flag lv_obj_flag"/>
+	    <prop name="scroll_chain" 		type="flag:flag lv_obj_flag"/>
+	    <prop name="scroll_on_focus" 	type="flag:flag lv_obj_flag"/>
+	    <prop name="scroll_with_arrow" 	type="flag:flag lv_obj_flag"/>
+	    <prop name="snappable" 			type="flag:flag lv_obj_flag"/>
+	    <prop name="press_lock" 		type="flag:flag lv_obj_flag"/>
+	    <prop name="event_bubble" 		type="flag:flag lv_obj_flag"/>
+	    <prop name="gesture_bubble" 	type="flag:flag lv_obj_flag"/>
+	    <prop name="adv_hittest" 		type="flag:flag lv_obj_flag"/>
+	    <prop name="ignore_layout" 		type="flag:flag lv_obj_flag"/>
+	    <prop name="floating" 			type="flag:flag lv_obj_flag"/>
+	    <prop name="send_draw_task_events" type="flag:flag lv_obj_flag"/>
+	    <prop name="overflow_visible" 	type="flag:flag lv_obj_flag"/>
+	    <prop name="flex_in_new_track" 	type="flag:flag lv_obj_flag"/>
 	</api>
 </widget>
