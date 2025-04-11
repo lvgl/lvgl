@@ -14,9 +14,9 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
       - name: Setup Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.7
+          python-version: 3.12
       - name: Generate lv_conf_internal.h
         run: python lv_conf_internal_gen.py
         working-directory: scripts
