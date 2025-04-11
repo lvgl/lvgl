@@ -35,6 +35,8 @@
 #include "parsers/lv_xml_spangroup_parser.h"
 #include "parsers/lv_xml_textarea_parser.h"
 #include "parsers/lv_xml_keyboard_parser.h"
+#include "parsers/lv_xml_arc_parser.h"
+#include "parsers/lv_xml_checkbox_parser.h"
 #include "parsers/lv_xml_event_parser.h"
 #include "../../libs/expat/expat.h"
 #include "../../draw/lv_draw_image.h"
@@ -97,6 +99,8 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_buttonmatrix", lv_xml_buttonmatrix_create, lv_xml_buttonmatrix_apply);
     lv_xml_widget_register("lv_textarea", lv_xml_textarea_create, lv_xml_textarea_apply);
     lv_xml_widget_register("lv_keyboard", lv_xml_keyboard_create, lv_xml_keyboard_apply);
+    lv_xml_widget_register("lv_arc", lv_xml_arc_create, lv_xml_arc_apply);
+    lv_xml_widget_register("lv_checkbox", lv_xml_checkbox_create, lv_xml_checkbox_apply);
 
     lv_xml_widget_register("lv_event-call_function", lv_xml_event_call_function_create, lv_xml_event_call_function_apply);
 }
