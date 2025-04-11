@@ -1,5 +1,6 @@
 name: Build docs
 on:
+  pull_request:
   push:
     branches:
     - master
@@ -72,6 +73,7 @@ jobs:
           echo "::set-output name=VERSION_NAME::$(scripts/find_version.sh)"
         id: version
       - name: Deploy to subfolder
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         uses: JamesIves/github-pages-deploy-action@v4.7.3
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
@@ -83,7 +85,7 @@ jobs:
           git-config-email: lvgl-bot@users.noreply.github.com
           single-commit: true
       - name: Deploy to master
-        if: github.ref == 'refs/heads/master'
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         uses: JamesIves/github-pages-deploy-action@v4.7.3
         with:
           token: ${{ secrets.LVGL_BOT_TOKEN }}
