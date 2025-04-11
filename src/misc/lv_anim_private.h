@@ -27,6 +27,7 @@ extern "C" {
 typedef struct {
     bool anim_list_changed;
     bool anim_run_round;
+    bool anim_vsync_registered;
     lv_timer_t * timer;
     lv_ll_t anim_ll;
 } lv_anim_state_t;
@@ -44,6 +45,11 @@ void lv_anim_core_init(void);
  * Deinit the animation module
  */
 void lv_anim_core_deinit(void);
+
+/*
+ * Set animation use vsync mode.
+ */
+void lv_anim_set_vsync_mode(void);
 
 /**********************
  *      MACROS

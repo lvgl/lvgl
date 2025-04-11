@@ -80,6 +80,15 @@ void lv_anim_core_deinit(void)
     lv_anim_delete_all();
 }
 
+void lv_anim_set_vsync_mode(void)
+{
+    /* Remove animation timer, use vsync instead */
+    lv_timer_delete(state.timer);
+    state.timer = NULL;
+
+    anim_mark_list_change();
+}
+
 void lv_anim_init(lv_anim_t * a)
 {
     lv_memzero(a, sizeof(lv_anim_t));
@@ -682,13 +691,38 @@ static void anim_completed_handler(lv_anim_t * a)
     }
 }
 
+static void anim_vsync_event(lv_event_t * e)
+{
+    LV_UNUSED(e);
+    anim_timer(NULL);
+}
+
 static void anim_mark_list_change(void)
 {
     state.anim_list_changed = true;
-    if(lv_ll_get_head(anim_ll_p) == NULL)
-        lv_timer_pause(state.timer);
-    else
+    if(lv_ll_get_head(anim_ll_p) == NULL) {
+        if(state.timer) {
+            lv_timer_pause(state.timer);
+            return;
+        }
+
+        if(state.anim_vsync_registered) {
+            lv_display_unregister_vsync_event(NULL, anim_vsync_event, NULL);
+            state.anim_vsync_registered = false;
+        }
+
+        return;
+    }
+
+    if(state.timer) {
         lv_timer_resume(state.timer);
+        return;
+    }
+
+    if(!state.anim_vsync_registered) {
+        lv_display_register_vsync_event(NULL, anim_vsync_event, NULL);
+        state.anim_vsync_registered = true;
+    }
 }
 
 static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
