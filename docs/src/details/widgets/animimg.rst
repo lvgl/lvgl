@@ -31,7 +31,7 @@ Image sources
 -------------
 
 To set the image animation images sources, use
-:cpp:expr:`lv_animimg_set_src(animimg, dsc[], num)`.
+:cpp:expr:`lv_animimg_set_src(animimg, dsc[], num, reverse)`.
 
 Using the inner animation
 -------------------------
