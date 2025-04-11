@@ -2877,7 +2877,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
 
     lv_display_set_draw_buffers(window->lv_disp, window->body->buffers[0]->lv_draw_buf,
                                 window->body->buffers[1]->lv_draw_buf);
-    lv_display_set_render_mode(window->lv_disp, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_render_mode(window->lv_disp, LV_DISPLAY_RENDER_MODE_FULL);
 
 #endif
 
