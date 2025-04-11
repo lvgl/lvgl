@@ -13,13 +13,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../misc/lv_types.h"
+#include "../../font/lv_font.h"
 
 #if LV_USE_FONT_MANAGER
-
-#if !LV_USE_FREETYPE
-#error "LV_USE_FONT_MANAGER requires LV_USE_FREETYPE"
-#endif
 
 /*********************
  *      DEFINES
@@ -28,8 +24,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-typedef struct _lv_font_manager_t lv_font_manager_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -50,40 +44,55 @@ lv_font_manager_t * lv_font_manager_create(uint32_t recycle_cache_size);
 bool lv_font_manager_delete(lv_font_manager_t * manager);
 
 /**
- * Add the font file path.
+ * Add font resource.
  * @param manager pointer to main font manager.
  * @param name font name.
- * @param path font file path.
+ * @param src font source. Need to strictly correspond to the font class.
+ * @param class_p font class. eg. lv_freetype_font_class, lv_builtin_font_class.
+ * @return return true if the add was successful.
  */
-void lv_font_manager_add_path(lv_font_manager_t * manager, const char * name, const char * path);
+bool lv_font_manager_add_src(lv_font_manager_t * manager,
+                             const char * name,
+                             const void * src,
+                             const lv_font_class_t * class_p);
 
 /**
- * Add the font file path with static memory.
+ * Add font resource with static memory.
  * @param manager pointer to main font manager.
- * @param name font name.
- * @param path font file path.
+ * @param name font name. It cannot be a local variable.
+ * @param src font source. Need to strictly correspond to the font class. And it cannot be a local variable.
+ * @param class_p font class. E.g. lv_freetype_font_class, lv_builtin_font_class.
+ * @return return true if the add was successful.
  */
-void lv_font_manager_add_path_static(lv_font_manager_t * manager, const char * name, const char * path);
+bool lv_font_manager_add_src_static(lv_font_manager_t * manager,
+                                    const char * name,
+                                    const void * src,
+                                    const lv_font_class_t * class_p);
 
 /**
- * Remove the font file path.
+ * Remove font resource.
  * @param manager pointer to main font manager.
  * @param name font name.
  * @return return true if the remove was successful.
  */
-bool lv_font_manager_remove_path(lv_font_manager_t * manager, const char * name);
+bool lv_font_manager_remove_src(lv_font_manager_t * manager, const char * name);
 
 /**
  * Create font.
  * @param manager pointer to main font manager.
- * @param font_family font family name.
- * @param render_mode font render mode, see lv_freetype_font_render_mode_t.
- * @param size font size.
- * @param style font style, see lv_freetype_font_style_t.
- * @return point to the created font
+ * @param font_family font family name. Matches the font resource name, using commas to separate different names. E.g. "my_font_1,my_font_2".
+ * @param render_mode font render mode. see `lv_freetype_font_render_mode_t`.
+ * @param size font size in pixel.
+ * @param style font style. see `lv_freetype_font_style_t`.
+ * @param kerning kerning mode. see `lv_font_kerning_t`.
+ * @return point to the created font.
  */
-lv_font_t * lv_font_manager_create_font(lv_font_manager_t * manager, const char * font_family, uint16_t render_mode,
-                                        uint32_t size, uint16_t style);
+lv_font_t * lv_font_manager_create_font(lv_font_manager_t * manager,
+                                        const char * font_family,
+                                        uint32_t render_mode,
+                                        uint32_t size,
+                                        uint32_t style,
+                                        lv_font_kerning_t kerning);
 
 /**
  * Delete font.

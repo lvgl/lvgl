@@ -26,6 +26,8 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 void lv_example_font_manager_1(void);
+void lv_example_font_manager_2(void);
+void lv_example_font_manager_3(void);
 
 /**********************
  *      MACROS

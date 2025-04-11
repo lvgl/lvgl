@@ -22,6 +22,16 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+
+typedef struct {
+    uint32_t font_size; /**< Size of the font in pixels*/
+    const char * path; /**< Path to font file*/
+    const void * buffer; /**< Address of the font file in the memory*/
+    uint32_t buffer_size; /**< Size of the font file buffer*/
+} lv_binfont_font_src_t;
+
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_font_class_t lv_binfont_font_class;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

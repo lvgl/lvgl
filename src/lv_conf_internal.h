@@ -3550,8 +3550,7 @@
     #endif
 #endif
 
-/** 1: Enable freetype font manager
- *  - Requires: LV_USE_FREETYPE */
+/** 1: Enable Font manager */
 #ifndef LV_USE_FONT_MANAGER
     #ifdef CONFIG_LV_USE_FONT_MANAGER
         #define LV_USE_FONT_MANAGER CONFIG_LV_USE_FONT_MANAGER

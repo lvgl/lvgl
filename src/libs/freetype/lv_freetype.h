@@ -61,6 +61,11 @@ typedef enum {
     LV_FREETYPE_OUTLINE_BORDER_START,     /* When line width > 0 the border glyph is drawn after the regular glyph */
 } lv_freetype_outline_type_t;
 
+/* Only path string is required */
+typedef const char lv_freetype_font_src_t;
+
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_font_class_t lv_freetype_font_class;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

@@ -4,9 +4,9 @@
 Font Manager
 ============
 
-Font Manager is a secondary encapsulation of :ref:`freetype`, which provides
-facilities for high-level applications to manage and use vector fonts.  Currently
-provided font-management functions includes:
+The font manager is a secondary encapsulation of the LVGL font engine,
+which facilitates the use and management of fonts for applications.
+The font management functions currently provided include:
 
 - Font resource reference counting (reduces repeated creation of font resources).
 - Font resource concatenation (font fallback).
@@ -21,7 +21,7 @@ Usage
 *****
 
 Enable FreeType and Font Manager in ``lv_conf.h`` by setting the
-:c:macro:`LV_USE_FREETYPE` and :c:macro:`LV_USE_FONT_MANAGER` macros to non-zero
+:c:macro:`LV_USE_FONT_MANAGER` macros to non-zero
 values, and configure :c:macro:`LV_FONT_MANAGER_NAME_MAX_LEN` to set the maximum
 length of the font name.
 
@@ -32,13 +32,17 @@ Use :cpp:func:`lv_font_manager_create` to create a font manager, where the
 :cpp:func:`recycle_cache_size` parameter is used to set the number of font recycling
 caches, which can improve font creation efficiency.
 
-Use :cpp:func:`lv_font_manager_add_path_static` to add a mapping between the font
-file path and the custom font name, so that the application can access the font
-resources more conveniently.  It should be noted that if the file path is not static
-(assigned from a local variable), use :cpp:func:`lv_font_manager_add_path` to
-add the path.  This function will make its own copy of the string.
+Use :cpp:func:`lv_font_manager_add_src_static` to add a mapping between font names
+and font resources to tell the font manager how to access the font resources.
+Note that if the font resource description structure is not statically allocated
+(for example, allocated from a local variable), use :cpp:func:`lv_font_manager_add_src` to add the resource.
+This function will copy the contents of the structure itself.
 
-Use :cpp:func:`lv_font_manager_remove_path` to remove the font path mapping.
+Use :cpp:func:`lv_font_manager_remove_src` to remove the font resource mapping.
+
+It should be noted that the ``src`` parameter must strictly correspond to ``class_p``.
+``class_p`` will affect the way the font manager interprets src. If an incompatible parameter is passed, the program may fail.
+For currently supported font classes, please refer to the example code.
 
 .. code-block:: c
 
@@ -50,15 +54,18 @@ Use :cpp:func:`lv_font_manager_remove_path` to remove the font path mapping.
       g_font_manager = lv_font_manager_create(8);
 
       /* Add font path mapping to font manager */
-      lv_font_manager_add_path_static(g_font_manager, "Lato-Regular", "./lvgl/examples/libs/freetype/Lato-Regular.ttf");
-      lv_font_manager_add_path_static(g_font_manager, "MyFont", "./path/to/myfont.ttf");
+      lv_font_manager_add_src_static(g_font_manager, "Lato-Regular", "./lvgl/examples/libs/freetype/Lato-Regular.ttf", &lv_freetype_font_class);
+
+      char path[] = "/path/to/myfont.ttf";
+      lv_font_manager_add_src(g_font_manager, "MyFont", path, &lv_freetype_font_class);
    }
 
 Create Font from Font Manager
 -----------------------------
 
-Use :cpp:func:`lv_font_manager_create_font` to create a font.  The parameters are
-basically the same as :cpp:func:`lv_freetype_font_create`.
+The parameters will be passed to the font creation function of the font backend,
+such as :cpp:func:`lv_freetype_font_create` and :cpp:func:`lv_tiny_ttf_create_file`.
+The font backend will select the supported parameters by itself and ignore the unsupported parameters.
 
 The ``font_family`` parameter can be filled with the names of multiple fonts
 (separated by ``,``) to achieve font concatenation (when the corresponding glyph is
@@ -74,7 +81,13 @@ font).
                                                     "Lato-Regular,MyFont",
                                                     LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
                                                     24,
-                                                    LV_FREETYPE_FONT_STYLE_NORMAL);
+                                                    LV_FREETYPE_FONT_STYLE_NORMAL,
+                                                    LV_FONT_KERNING_NONE);
+
+   /* Handle error case */
+   if(g_font == NULL) {
+      g_font = (lv_font_t *)LV_FONT_DEFAULT;
+   }
 
    /* Create label with the font */
    lv_obj_t * label = lv_label_create(lv_screen_active());
