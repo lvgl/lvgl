@@ -23,7 +23,7 @@ Example
 	    <prop name="max_lines" type="int" help=""/>
 	    <prop name="indent" type="int" help=""/>
 
-		<element name="span" type="custom:span" access="add">
+		<element name="span" type="lv_span" access="add">
 			<prop name="text" type="string" help=""/>
 			<prop name="style" type="style" help=""/>
 		</element>

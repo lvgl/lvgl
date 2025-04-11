@@ -57,7 +57,15 @@ void lv_xml_label_apply(lv_xml_parser_state_t * state, const char ** attrs)
 
         if(lv_streq("text", name)) lv_label_set_text(item, value);
         if(lv_streq("long_mode", name)) lv_label_set_long_mode(item, long_mode_text_to_enum_value(value));
-        if(lv_streq("bind_text", name)) lv_label_bind_text(item, lv_xml_get_subject(&state->ctx, value), NULL);
+        if(lv_streq("bind_text", name)) {
+            lv_subject_t * subject = lv_xml_get_subject(&state->ctx, value);
+            if(subject) {
+                lv_label_bind_text(item, subject, NULL);
+            }
+            else {
+                LV_LOG_WARN("Subject \"%s\" doesn't exist in label bind_text", value);
+            }
+        }
     }
 }
 

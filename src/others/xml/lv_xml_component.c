@@ -330,6 +330,14 @@ static void process_font_element(lv_xml_parser_state_t * state, const char * typ
         return;
     }
 
+    lv_xml_font_t * f;
+    LV_LL_READ(&state->ctx.font_ll, f) {
+        if(lv_streq(f->name, name)) {
+            LV_LOG_INFO("Font %s is already registered. Don't register it again.", name);
+            return;
+        }
+    }
+
     /*E.g. <tiny_ttf name="inter_xl" src_path="fonts/Inter-SemiBold.ttf" size="22"/> */
     if(lv_streq(type, "tiny_ttf")) {
         const char * size = lv_xml_get_value_of(attrs, "size");
@@ -351,8 +359,13 @@ static void process_font_element(lv_xml_parser_state_t * state, const char * typ
         }
 
         /*Get the font which was just created and add a destroy_cb*/
-        lv_xml_font_t * f = lv_ll_get_head(&state->ctx.font_ll);
-        f->font_destroy_cb = lv_tiny_ttf_destroy;
+        lv_xml_font_t * new_font;
+        LV_LL_READ(&state->ctx.font_ll, new_font) {
+            if(lv_streq(new_font->name, name))  {
+                new_font->font_destroy_cb = lv_tiny_ttf_destroy;
+                break;
+            }
+        }
 
 #else
         LV_LOG_WARN("LV_TINY_TTF_FILE_SUPPORT is not enabled for `%s` font", name);
@@ -373,9 +386,13 @@ static void process_font_element(lv_xml_parser_state_t * state, const char * typ
             return;
         }
 
-        /*Get the font which was just created and add a destroy_cb*/
-        lv_xml_font_t * f = lv_ll_get_head(&state->ctx.font_ll);
-        f->font_destroy_cb = lv_binfont_destroy;
+        lv_xml_font_t * new_font;
+        LV_LL_READ(&state->ctx.font_ll, new_font) {
+            if(lv_streq(new_font->name, name))  {
+                new_font->font_destroy_cb = lv_binfont_destroy;
+                break;
+            }
+        }
     }
     else {
         LV_LOG_WARN("`%s` is a not supported font type", type);
