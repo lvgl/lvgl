@@ -59,7 +59,7 @@ jobs:
       matrix:
         include:
           - arch: aarch64
-            distro: bookworm
+            distro: ubuntu22.04
           - arch: armv6
             distro: bullseye
           - arch: armv7
@@ -76,7 +76,7 @@ jobs:
           key: lvgl_ci_cross_test_ccache_${{ matrix.arch }}_${{ github.sha }}
           restore-keys: |
             lvgl_ci_cross_test_ccache_${{ matrix.arch }}
-      - uses: uraimo/run-on-arch-action@v2
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Run tests
         id: build
         with:
