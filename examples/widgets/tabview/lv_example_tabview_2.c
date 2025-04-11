@@ -6,6 +6,9 @@ void lv_example_tabview_2(void)
 {
     /*Create a Tab view object*/
     lv_obj_t * tabview;
+    uint32_t tab_count = 0;
+    uint32_t i = 0;
+
     tabview = lv_tabview_create(lv_screen_active());
     lv_tabview_set_tab_bar_position(tabview, LV_DIR_LEFT);
     lv_tabview_set_tab_bar_size(tabview, 80);
@@ -15,15 +18,19 @@ void lv_example_tabview_2(void)
     lv_obj_t * tab_buttons = lv_tabview_get_tab_bar(tabview);
     lv_obj_set_style_bg_color(tab_buttons, lv_palette_darken(LV_PALETTE_GREY, 3), 0);
     lv_obj_set_style_text_color(tab_buttons, lv_palette_lighten(LV_PALETTE_GREY, 5), 0);
-    lv_obj_set_style_border_side(tab_buttons, LV_BORDER_SIDE_RIGHT, LV_PART_ITEMS | LV_STATE_CHECKED);
 
-    /*Add 3 tabs (the tabs are page (lv_page) and can be scrolled*/
+    /*Add 5 tabs (the tabs are page (lv_page) and can be scrolled*/
     lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
     lv_obj_t * tab2 = lv_tabview_add_tab(tabview, "Tab 2");
     lv_obj_t * tab3 = lv_tabview_add_tab(tabview, "Tab 3");
     lv_obj_t * tab4 = lv_tabview_add_tab(tabview, "Tab 4");
     lv_obj_t * tab5 = lv_tabview_add_tab(tabview, "Tab 5");
 
+    tab_count = lv_tabview_get_tab_count(tabview);
+    for(i = 0; i < tab_count; i++) {
+        lv_obj_t * button = lv_obj_get_child(tab_buttons, i);
+        lv_obj_set_style_border_side(button, LV_BORDER_SIDE_RIGHT, LV_PART_MAIN | LV_STATE_CHECKED);
+    }
     lv_obj_set_style_bg_color(tab2, lv_palette_lighten(LV_PALETTE_AMBER, 3), 0);
     lv_obj_set_style_bg_opa(tab2, LV_OPA_COVER, 0);
 
