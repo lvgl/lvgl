@@ -59,7 +59,9 @@ typedef enum {
     LV_DRAW_TASK_TYPE_MASK_BITMAP,
 #if LV_USE_VECTOR_GRAPHIC
     LV_DRAW_TASK_TYPE_VECTOR,
+
 #endif
+      LV_DRAW_TASK_TYPE_3D,
 } lv_draw_task_type_t;
 
 typedef enum {
