@@ -47,12 +47,9 @@ typedef int dummy_t;    /* Make GCC on windows happy, avoid empty translation un
 #endif
 
 #ifdef LV_WAYLAND_USE_DMABUF
-#include "linux-dmabuf-unstable-v1-client-protocol.h"
-#include "linux-explicit-synchronization-unstable-v1-client-protocol.h"
-
-#define fourcc_code(a, b, c, d) ((__u32)(a) | ((__u32)(b) << 8) | \
-                                 ((__u32)(c) << 16) | ((__u32)(d) << 24))
-#define DRM_FORMAT_ARGB8888 fourcc_code('A', 'R', '2', '4') /* [31:0] A:R:G:B 8:8:8:8 little endian */
+    #include "drm/drm_fourcc.h"
+    #include "linux-dmabuf-unstable-v1-client-protocol.h"
+    #include "linux-explicit-synchronization-unstable-v1-client-protocol.h"
 #endif
 
 #if !LV_WAYLAND_WL_SHELL
@@ -2037,6 +2034,8 @@ static lv_result_t create_window_buffers(struct window * window)
 
     for(int i = 0; i < LV_WAYLAND_BUF_COUNT; i++) {
         struct buffer * buffer = calloc(1, sizeof(struct buffer));
+        u_int32_t drmcf = 0;
+
         window->body->buffers[i] = buffer;
         buffer->window = window;
         buffer->lv_draw_buf = lv_draw_buf_create(
@@ -2048,6 +2047,20 @@ static lv_result_t create_window_buffers(struct window * window)
         buffer->dmabuf_fds[0] = lv_draw_buf_get_fd(buffer->lv_draw_buf);
         buffer->buf_base[0] = buffer->lv_draw_buf->data;
         params = zwp_linux_dmabuf_v1_create_params(window->application->dmabuf);
+
+        switch(lv_display_get_color_format(window->lv_disp)) {
+            case LV_COLOR_FORMAT_XRGB8888:
+                drmcf = DRM_FORMAT_XRGB8888;
+                break;
+            case LV_COLOR_FORMAT_ARGB8888:
+                drmcf = DRM_FORMAT_ARGB8888;
+                break;
+            case LV_COLOR_FORMAT_RGB565:
+                drmcf = DRM_FORMAT_RGB565;
+                break;
+            default:
+                drmcf = DRM_FORMAT_ARGB8888;
+        }
 
         zwp_linux_buffer_params_v1_add(params,
                                        buffer->dmabuf_fds[0],
@@ -2061,7 +2074,7 @@ static lv_result_t create_window_buffers(struct window * window)
         zwp_linux_buffer_params_v1_create(params,
                                           window->width,
                                           window->height,
-                                          DRM_FORMAT_ARGB8888,
+                                          drmcf,
                                           flags);
     }
 
