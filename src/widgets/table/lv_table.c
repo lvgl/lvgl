@@ -1091,18 +1091,35 @@ static void get_cell_area(lv_obj_t * obj, uint32_t row, uint32_t col, lv_area_t 
     for(c = 0; c < col; c++) {
         area->x1 += table->col_w[c];
     }
+    /* Traverse the current row from the first until the penultimate column.
+     * Increment the offset if the cell has the LV_TABLE_CELL_CTRL_MERGE_RIGHT control,
+     * exit the traversal when the current cell control is not LV_TABLE_CELL_CTRL_MERGE_RIGHT */
+    uint32_t col_merge = 0;
+    int32_t offset = 0;
+    for(col_merge = 0; col_merge + col < table->col_cnt - 1; col_merge++) {
+        lv_table_cell_t * next_cell_data = table->cell_data[row * table->col_cnt + col_merge];
 
+        if(is_cell_empty(next_cell_data)) break;
+
+        lv_table_cell_ctrl_t ctrl = (lv_table_cell_ctrl_t) next_cell_data->ctrl;
+        if(ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT) {
+            offset += table->col_w[col + col_merge + 1];
+        }
+        else {
+            break;
+        }
+    }
     bool rtl = lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL;
     if(rtl) {
         area->x1 += lv_obj_get_scroll_x(obj);
         int32_t w = lv_obj_get_width(obj);
         area->x2 = w - area->x1 - lv_obj_get_style_pad_right(obj, 0);
-        area->x1 = area->x2 - table->col_w[col];
+        area->x1 = area->x2 - (table->col_w[col] + offset);
     }
     else {
         area->x1 -= lv_obj_get_scroll_x(obj);
         area->x1 += lv_obj_get_style_pad_left(obj, 0);
-        area->x2 = area->x1 + table->col_w[col] - 1;
+        area->x2 = area->x1 + (table->col_w[col] + offset) - 1;
     }
 
     uint32_t r;
