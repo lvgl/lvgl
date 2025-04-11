@@ -80,11 +80,25 @@ void lv_anim_core_deinit(void)
     lv_anim_delete_all();
 }
 
-void lv_anim_set_vsync_mode(void)
+void lv_anim_enable_vsync_mode(bool enable)
 {
-    /* Remove animation timer, use vsync instead */
-    lv_timer_delete(state.timer);
-    state.timer = NULL;
+    if(enable) {
+        /* Remove animation timer, use vsync instead */
+        if(state.timer) {
+            lv_timer_delete(state.timer);
+            state.timer = NULL;
+        }
+    }
+    else {
+        if(!state.timer) {
+            state.timer = lv_timer_create(anim_timer, LV_DEF_REFR_PERIOD, NULL);
+
+            if(state.anim_vsync_registered) {
+                lv_display_unregister_vsync_event(NULL, anim_vsync_event, NULL);
+                state.anim_vsync_registered = false;
+            }
+        }
+    }
 
     anim_mark_list_change();
 }

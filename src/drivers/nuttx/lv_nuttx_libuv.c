@@ -99,7 +99,7 @@ void * lv_nuttx_uv_init(lv_nuttx_uv_t * uv_info)
         goto err_out;
     }
 
-    lv_anim_set_vsync_mode();
+    lv_anim_enable_vsync_mode(true);
 
     return uv_ctx;
 

@@ -48,8 +48,9 @@ void lv_anim_core_deinit(void);
 
 /*
  * Set animation use vsync mode.
+ * @param enable true: use vsync mode, false: use timer mode.
  */
-void lv_anim_set_vsync_mode(void);
+void lv_anim_enable_vsync_mode(bool enable);
 
 /**********************
  *      MACROS
