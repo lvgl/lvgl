@@ -63,7 +63,14 @@ jobs:
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1
       - name: Build examples (with cache)
-        run: scripts/build_html_examples.sh
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            REPO_URL="${{ github.event.pull_request.head.repo.clone_url }}"
+            COMMIT_REF="${{ github.event.pull_request.head.sha }}"
+            ./scripts/build_html_examples.sh "$REPO_URL" "$COMMIT_REF"
+          else
+            ./scripts/build_html_examples.sh
+          fi
       - name: Build docs
         run: docs/build.py html
       - name: Remove .doctrees
