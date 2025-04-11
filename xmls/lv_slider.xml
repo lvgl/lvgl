@@ -17,7 +17,7 @@ Example
 	    </prop>
 
 	    <prop name="value">
-	    	<param name="range_min" type="int"/>
+	    	<param name="value" type="int"/>
 	    	<param name="anim" type="bool" default="false"/>
 	    </prop>
 
