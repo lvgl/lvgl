@@ -1,6 +1,9 @@
 name: Port repo release update
 
 on:
+  schedule:
+    # Runs at 00:00 UTC on the 1st and 15th day of each month
+    - cron: '0 0 1,15 * *'
   push:
     branches:
       - master
@@ -30,7 +33,14 @@ jobs:
           git config --global user.name 'lvgl-bot'
           git config --global user.email 'lvgl-bot@users.noreply.github.com'
 
-      - name: run the script
+      - name: run the script for release branches (not master)
+        if: github.event_name != 'schedule' && github.event_name != 'workflow_dispatch'
+        env:
+          GITHUB_TOKEN: ${{ secrets.PORT_RELEASER_GITHUB_TOKEN }}
+        run: python3 lvgl/scripts/release_branch_updater.py --oldest-major 9 --github-token "$GITHUB_TOKEN" --skip-master
+
+      - name: run the script for release branches and master
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         env:
           GITHUB_TOKEN: ${{ secrets.PORT_RELEASER_GITHUB_TOKEN }}
         run: python3 lvgl/scripts/release_branch_updater.py --oldest-major 9 --github-token "$GITHUB_TOKEN"
