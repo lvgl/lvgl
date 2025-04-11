@@ -252,7 +252,7 @@ void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f);
  * @param f     OR-ed values from `lv_obj_flag_t` to update.
  * @param v     true: add the flags; false: remove the flags
  */
-void lv_obj_update_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v);
+void lv_obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v);
 
 /**
  * Add one or more states to the object. The other state bits will remain unchanged.
