@@ -27,9 +27,8 @@ void lv_example_tabview_2(void)
     lv_obj_t * tab5 = lv_tabview_add_tab(tabview, "Tab 5");
 
     tab_count = lv_tabview_get_tab_count(tabview);
-    for(i = 0; i < tab_count; i++)
-    {
-        lv_obj_t* button = lv_obj_get_child(tab_buttons, i);
+    for(i = 0; i < tab_count; i++) {
+        lv_obj_t * button = lv_obj_get_child(tab_buttons, i);
         lv_obj_set_style_border_side(button, LV_BORDER_SIDE_RIGHT, LV_PART_MAIN | LV_STATE_CHECKED);
     }
     lv_obj_set_style_bg_color(tab2, lv_palette_lighten(LV_PALETTE_AMBER, 3), 0);
