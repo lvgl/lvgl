@@ -59,7 +59,6 @@ jobs:
       matrix:
         include:
           - arch: aarch64
-            # distro: ubuntu22.04
             distro: bookworm
           - arch: armv6
             distro: bullseye
@@ -111,6 +110,6 @@ jobs:
               # runners are using leading to random crashes:
               #   https://github.com/actions/runner-images/issues/9491
               # can remove this once the issue is fixed.
-              # sysctl -w vm.mmap_rnd_bits=28
+              sysctl -w vm.mmap_rnd_bits=28
             fi
             env PATH="/usr/lib/ccache:$PATH" ASAN_OPTIONS=detect_leaks=0 python3 tests/main.py test
