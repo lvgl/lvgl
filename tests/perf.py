@@ -50,13 +50,13 @@ def main() -> bool:
         "--clean",
         action="store_true",
         default=False,
-        help="Clean existing build artifacts before operation. Requires admin privileges",
+        help="Clean existing build artifacts before operation",
     )
     parser.add_argument(
         "--auto-clean",
         action="store_true",
         default=False,
-        help="Automatically clean build directories. Require admin privileges",
+        help="Automatically clean build directories",
     )
 
     parser.add_argument(
