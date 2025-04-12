@@ -1213,8 +1213,7 @@
         #define LV_USE_ST7789        0
         #define LV_USE_ST7796        0
         #define LV_USE_ILI9341       0
-
-        #define LV_USE_GENERIC_MIPI (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
+        #define LV_USE_GENERIC_MIPI  0
 
         /** Driver for Renesas GLCD */
         #define LV_USE_RENESAS_GLCDC    0
