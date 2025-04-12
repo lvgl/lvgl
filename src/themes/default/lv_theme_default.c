@@ -1114,7 +1114,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_msgbox_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);
         lv_obj_add_style(obj, &theme->styles.pad_zero, 0);
-        lv_obj_add_style(obj, &theme->styles.clip_corner, 0);
         return;
     }
     else if(lv_obj_check_type(obj, &lv_msgbox_backdrop_class)) {
