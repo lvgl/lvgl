@@ -71,6 +71,12 @@ Detailed Results Per Scene
 </details>
 
 
+Disclaimer: These benchmarks were run in an emulated environment using QEMU with instruction counting mode.
+The timing values represent relative performance metrics within this specific virtualized setup and should
+not be interpreted as absolute real-world performance measurements. Values are deterministic and useful for
+comparing different LVGL features and configurations, but may not correlate directly with performance on
+physical hardware. The measurements are intended for comparative analysis only.
+
 
 ---
 
