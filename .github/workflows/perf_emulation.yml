@@ -63,14 +63,16 @@ jobs:
             --template lv_conf_template.h \
             --config configs/ci/perf/lv_conf_perf.h \
             --defaults configs/ci/perf/${{matrix.config}}.defaults
-
       - name: Run Benchmark Demo
         run: |
+          # Mounts the current lvgl source code into the container and runs the demo benchmark
+          # To add additional build dependencies, modify the `lvperf_dependencies.sh` script
           docker run -t --privileged \
             --name so3-lvperf \
             -v /dev:/dev \
             -v $(pwd)/configs/ci/perf/lv_conf_perf.h:/so3/usr/lib/lv_conf.h \
             -v $(pwd):/so3/usr/lib/lvgl \
+            -v $(pwd)/scripts/perf/lvperf_dependencies.sh:/so3/install_dependencies.sh \
             ghcr.io/smartobjectoriented/so3-lvperf${{matrix.image_type}}:${{matrix.image_version}}
 
       - name: Collect Logs
