@@ -65,15 +65,43 @@ jobs:
             --defaults configs/ci/perf/${{matrix.config}}.defaults
       - name: Run Benchmark Demo
         run: |
-          # Mounts the current lvgl source code into the container and runs the demo benchmark
-          # To add additional build dependencies, modify the `lvperf_dependencies.sh` script
-          docker run -t --privileged \
-            --name so3-lvperf \
-            -v /dev:/dev \
-            -v $(pwd)/configs/ci/perf/lv_conf_perf.h:/so3/usr/lib/lv_conf.h \
-            -v $(pwd):/so3/usr/lib/lvgl \
-            -v $(pwd)/scripts/perf/lvperf_dependencies.sh:/so3/install_dependencies.sh \
-            ghcr.io/smartobjectoriented/so3-lvperf${{matrix.image_type}}:${{matrix.image_version}}
+          # Retry logic is added here to work around rare loop device mount failures.
+          # Occasionally, mounting the emulated partition fails due to a timing/race condition,
+          # where the /dev/loopXpY device isn't fully initialized yet.
+          # Retrying usually succeeds on the next attempt.
+          attempts=0
+          max_attempts=3
+
+          while [ "$attempts" -lt "$max_attempts" ];
+          do
+            # Mounts the current lvgl source code into the container and runs the demo benchmark
+            # To add additional build dependencies, modify the `lvperf_dependencies.sh` script
+            docker run -t --privileged \
+              --name so3-lvperf \
+              -v /dev:/dev \
+              -v $(pwd)/configs/ci/perf/lv_conf_perf.h:/so3/usr/lib/lv_conf.h \
+              -v $(pwd):/so3/usr/lib/lvgl \
+              -v $(pwd)/scripts/perf/lvperf_dependencies.sh:/so3/install_dependencies.sh \
+              ghcr.io/smartobjectoriented/so3-lvperf${{matrix.image_type}}:${{matrix.image_version}}
+
+            if [ $? -eq 0 ]; then
+              break
+            fi
+
+            attempts=$((attempts+1))
+            echo "Docker run failed (attempt $attempts/$max_attempts)."
+
+            echo "--- dmesg output ---"
+            sudo dmesg | tail -n 50
+
+            if [ "$attempts" -lt "$max_attempts" ]; then
+              echo "Retrying in 5 seconds..."
+              sleep 5
+            else
+              echo "All attempts failed."
+              exit 1
+            fi
+          done
 
       - name: Collect Logs
         run: |
