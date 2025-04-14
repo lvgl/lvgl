@@ -77,7 +77,7 @@ static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u);
 static unsigned int create_texture(int32_t w, int32_t h, const void * data);
 
 #if LV_USE_3DTEXTURE
-static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords);
+    static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords);
 #endif
 
 /**********************
