@@ -93,6 +93,7 @@ void lv_anim_enable_vsync_mode(bool enable)
     else {
         if(!state.timer) {
             state.timer = lv_timer_create(anim_timer, LV_DEF_REFR_PERIOD, NULL);
+            LV_ASSERT_NULL(state.timer);
 
             if(state.anim_vsync_registered) {
                 lv_display_unregister_vsync_event(NULL, anim_vsync_event, NULL);
