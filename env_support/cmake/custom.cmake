@@ -81,6 +81,7 @@ execute_process(
   --input ${LVGL_ROOT_DIR}/src/lv_conf_internal.h
   --tmp_file ${CMAKE_CURRENT_BINARY_DIR}/tmp.h
   --output ${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h
+  --workfolder ${CMAKE_CURRENT_BINARY_DIR}
   ${PCPP_ADDITIONAL_DEFS}
   --include ${LVGL_ROOT_DIR} ${LVGL_ROOT_DIR}/.. ${LVGL_ROOT_DIR}/src ${LV_CONF_DIR}
   RESULT_VARIABLE ret

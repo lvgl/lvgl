@@ -8,6 +8,7 @@
 # Author: David TRUAN (david.truan@edgemtech.ch)
 #
 
+import sys
 import subprocess
 import os
 import argparse
@@ -18,6 +19,7 @@ def get_args():
     parser.add_argument("--input", help="Path to the input C header file", required=True)
     parser.add_argument("--tmp_file", help="Path to save the preprocessed output", required=True)
     parser.add_argument("--output", help="Path to save the cleaned output with removed indentation", required=True)
+    parser.add_argument("--workfolder", help="Path used to create a python environnement", required=True)
 
     parser.add_argument(
         "--defs",
@@ -36,11 +38,10 @@ def get_args():
 
     return parser.parse_args()
 
-
-def preprocess_file(input_file, tmp_file, output_file, include_dirs, defs):
+def preprocess_file(pcpp_exe, input_file, tmp_file, output_file, include_dirs, defs):
 
     try:
-        pcpp_command = ["pcpp", "-o", tmp_file, "--passthru-defines", "--line-directive=",  input_file]
+        pcpp_command = [pcpp_exe, "-o", tmp_file, "--passthru-defines", "--line-directive=",  input_file]
 
         for include_path in include_dirs:
             pcpp_command.append(f"-I{include_path}")
@@ -83,12 +84,37 @@ def remove_indentation(tmp_file, output_file):
         print(f"Error during indentation removal: {e}")
         exit(1)
 
+def install_pcpp_in_venv(workfolder:str) -> str:
+    """
+    Creates a virtual env named .venv inside `workfolder`
+    and installs every dependecy inside `dependencies`
+    Returns the path to pcpp
+    """
+    venv_path = os.path.join(workfolder, ".venv")
+    try:
+        subprocess.check_call([sys.executable, "-m", "venv", venv_path])
+        
+        if sys.platform == "win32":
+            venv_pip = os.path.join(venv_path, "Scripts", "pip.exe")
+            venv_pcpp = os.path.join(venv_path, "Scripts", "pcpp.exe")
+        else:
+            venv_pip = os.path.join(venv_path, "bin", "pip")
+            venv_pcpp = os.path.join(venv_path, "bin", "pcpp")
+        
+        subprocess.check_call([venv_pip, "install", "pcpp"])
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error setting up environnement: {e}")
+        sys.exit(1)
+
+    return venv_pcpp
 
 def main():
 
     args = get_args()
 
-    preprocess_file(args.input, args.tmp_file, args.output, args.include, args.defs)
+    pcpp_exe = install_pcpp_in_venv(args.workfolder)
+    preprocess_file(pcpp_exe, args.input, args.tmp_file, args.output, args.include, args.defs)
 
     remove_indentation(args.tmp_file, args.output)
 

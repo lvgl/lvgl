@@ -16,4 +16,3 @@ sphinx-rtd-dark-mode
 typing-extensions
 sphinx-reredirects
 dirsync
-pcpp
