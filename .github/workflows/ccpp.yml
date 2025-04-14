@@ -96,6 +96,7 @@ jobs:
           # Mount cached directories in the container for faster builds
           dockerRunArgs: |
             --volume "${HOME}/.ccache:/root/.ccache"
+            --memory="2g" --memory-swap="4g"
 
           install: |
             apt-get update -y
