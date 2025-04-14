@@ -685,8 +685,8 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
         /*In direct mode the the buffer area is always the whole screen*/
         layer->buf_area.x1 = 0;
         layer->buf_area.y1 = 0;
-        layer->buf_area.x2 = lv_display_get_horizontal_resolution(disp_refr) - 1;
-        layer->buf_area.y2 = lv_display_get_vertical_resolution(disp_refr) - 1;
+        layer->buf_area.x2 = lv_display_get_horizontal_resolution_with_matrix_rotation(disp_refr) - 1;
+        layer->buf_area.y2 = lv_display_get_vertical_resolution_with_matrix_rotation(disp_refr) - 1;
         layer_reshape_draw_buf(layer, layer->draw_buf->header.stride);
     }
 
@@ -772,37 +772,32 @@ static void refr_configured_layer(lv_layer_t * layer)
     lv_layer_reset(layer);
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
-
     if(disp_refr->matrix_rotation) {
         const lv_display_rotation_t rotation = lv_display_get_rotation(disp_refr);
         if(rotation != LV_DISPLAY_ROTATION_0) {
             lv_display_rotate_area(disp_refr, &layer->phy_clip_area);
 
-            /* Calculate midpoint coordinates using native resolution data */
-            const float pivot_x = disp_refr->hor_res / 2.0f;
-            const float pivot_y = disp_refr->ver_res / 2.0f;
-            lv_matrix_translate(&layer->matrix, pivot_x, pivot_y);
-
             /* The screen rotation direction defined by LVGL is opposite to the drawing angle */
             switch(rotation) {
                 case LV_DISPLAY_ROTATION_90:
                     lv_matrix_rotate(&layer->matrix, 270);
+                    lv_matrix_translate(&layer->matrix, -disp_refr->ver_res, 0);
                     break;
 
                 case LV_DISPLAY_ROTATION_180:
                     lv_matrix_rotate(&layer->matrix, 180);
+                    lv_matrix_translate(&layer->matrix, -disp_refr->hor_res, -disp_refr->ver_res);
                     break;
 
                 case LV_DISPLAY_ROTATION_270:
                     lv_matrix_rotate(&layer->matrix, 90);
+                    lv_matrix_translate(&layer->matrix, 0, -disp_refr->hor_res);
                     break;
 
                 default:
                     LV_LOG_WARN("Invalid rotation: %d", rotation);
                     break;
             }
-
-            lv_matrix_translate(&layer->matrix, -pivot_x, -pivot_y);
         }
     }
 #endif /* LV_DRAW_TRANSFORM_USE_MATRIX */

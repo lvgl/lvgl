@@ -187,6 +187,10 @@ int32_t lv_display_get_horizontal_resolution(const lv_display_t * disp);
  */
 int32_t lv_display_get_vertical_resolution(const lv_display_t * disp);
 
+int32_t lv_display_get_horizontal_resolution_with_matrix_rotation(const lv_display_t * disp);
+
+int32_t lv_display_get_vertical_resolution_with_matrix_rotation(const lv_display_t * disp);
+
 /**
  * Get the physical horizontal resolution of a display
  * @param disp      pointer to a display (NULL to use the default display)
