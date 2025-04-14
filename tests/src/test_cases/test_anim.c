@@ -15,6 +15,7 @@ void tearDown(void)
     /* Function run after every test */
     lv_obj_clean(lv_screen_active());
     lv_anim_delete_all();
+    lv_anim_enable_vsync_mode(false);
 }
 
 static void exec_cb(void * var, int32_t v)
@@ -191,6 +192,48 @@ void test_scroll_anim_delete(void)
     lv_obj_scroll_by(obj, 0, 100, LV_ANIM_ON);
 
     TEST_ASSERT_EQUAL(1, var);
+}
+
+void test_anim_vsync_mode(void)
+{
+    lv_anim_enable_vsync_mode(true);
+
+    /* anim timer should be NULL when vsync mode is enabled */
+    TEST_ASSERT_NULL(lv_anim_get_timer());
+
+    int32_t var;
+
+    /*Start an animation*/
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, &var);
+    lv_anim_set_values(&a, 0, 1000);
+    lv_anim_set_exec_cb(&a, exec_cb);
+    lv_anim_set_duration(&a, 1000);
+    lv_anim_start(&a);
+
+    /*Use vsync events to notify anim updates*/
+    lv_tick_inc(10);
+    lv_display_send_vsync_event(NULL, NULL);
+    TEST_ASSERT_EQUAL(9, var);
+
+    lv_tick_inc(10);
+    lv_display_send_vsync_event(NULL, NULL);
+    TEST_ASSERT_EQUAL(19, var);
+
+    lv_anim_enable_vsync_mode(false);
+    TEST_ASSERT_NOT_NULL(lv_anim_get_timer());
+
+    /* Should not update the animation with vsync events when vsync mode is disabled */
+    lv_tick_inc(20);
+    lv_display_send_vsync_event(NULL, NULL);
+    TEST_ASSERT_EQUAL(19, var);
+
+    /* Test normal timer mode */
+    lv_test_wait(20);
+    TEST_ASSERT_EQUAL(59, var);
+
+    lv_anim_delete(&var, exec_cb);
 }
 
 #endif
