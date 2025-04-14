@@ -164,4 +164,48 @@ void test_circle_buf_read_after_read_and_write(void)
     }
 }
 
+void test_circle_buf_reset(void)
+{
+    /**
+     * Reset the circle buffer, now the buffer should be empty just like lv_circle_buf_create.
+     */
+    lv_circle_buf_reset(circle_buf);
+
+    TEST_ASSERT_EQUAL_UINT32(lv_circle_buf_capacity(circle_buf), circle_buf_CAPACITY);
+    TEST_ASSERT_EQUAL_UINT32(0, lv_circle_buf_size(circle_buf));
+
+    /**
+     * Write values to the circle buffer. The max size of the buffer is circle_buf_CAPACITY.
+     * When the buffer is full, the write operation should return LV_RESULT_INVALID.
+     */
+    for(int32_t i = 0; i < circle_buf_CAPACITY * 2; i++) {
+        const lv_result_t res = lv_circle_buf_write(circle_buf, &i);
+
+        if(i < circle_buf_CAPACITY) TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
+        else TEST_ASSERT_EQUAL(LV_RESULT_INVALID, res);
+    }
+
+    /**
+     * After writing values to the buffer, the size of the buffer should be equal to the capacity.
+     */
+    TEST_ASSERT_EQUAL_UINT32(lv_circle_buf_size(circle_buf), circle_buf_CAPACITY);
+
+    /**
+     * Read values from the circle buffer. The max size of the buffer is circle_buf_CAPACITY.
+     * When the buffer is empty, the read operation should return LV_RESULT_INVALID.
+     */
+    for(int32_t i = 0; i < circle_buf_CAPACITY * 2; i++) {
+        int32_t value;
+        const lv_result_t res = lv_circle_buf_read(circle_buf, &value);
+
+        if(i < circle_buf_CAPACITY) {
+            TEST_ASSERT_EQUAL(LV_RESULT_OK, res);
+            TEST_ASSERT_EQUAL_INT32(i, value);
+        }
+        else {
+            TEST_ASSERT_EQUAL(LV_RESULT_INVALID, res);
+        }
+    }
+}
+
 #endif

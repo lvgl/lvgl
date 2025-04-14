@@ -178,7 +178,6 @@ void lv_circle_buf_reset(lv_circle_buf_t * circle_buf)
 {
     LV_ASSERT_NULL(circle_buf);
 
-    lv_array_clear(&circle_buf->array);
     circle_buf->head = 0;
     circle_buf->tail = 0;
 }
