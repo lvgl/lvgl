@@ -40,6 +40,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void anim_timer(lv_timer_t * param);
+static void anim_vsync_event(lv_event_t * e);
 static void anim_mark_list_change(void);
 static void anim_completed_handler(lv_anim_t * a);
 static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
