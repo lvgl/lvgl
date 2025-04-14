@@ -113,6 +113,7 @@ typedef enum {
     LV_EVENT_FLUSH_WAIT_FINISH,   /**< Sent after flush wait callback call has returned. */
 
     LV_EVENT_VSYNC,
+    LV_EVENT_VSYNC_REQUEST,
 
     LV_EVENT_LAST,                 /** Number of default events */
 

@@ -76,7 +76,9 @@ static unsigned int layer_get_texture(lv_layer_t * layer);
 static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u);
 static unsigned int create_texture(int32_t w, int32_t h, const void * data);
 
+#if LV_USE_3DTEXTURE
 static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -551,10 +553,12 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
         return;
     }
 
+#if LV_USE_3DTEXTURE
     if(t->type == LV_DRAW_TASK_TYPE_3D) {
         lv_draw_opengles_3d(t, t->draw_dsc, &t->area);
         return;
     }
+#endif
 
     draw_from_cached_texture(t);
 }
@@ -597,6 +601,7 @@ static unsigned int create_texture(int32_t w, int32_t h, const void * data)
     return texture;
 }
 
+#if LV_USE_3DTEXTURE
 static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords)
 {
     lv_draw_opengles_unit_t * u = (lv_draw_opengles_unit_t *) t->draw_unit;
@@ -621,7 +626,7 @@ static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc
 
     GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
-
 }
+#endif /*LV_USE_3DTEXTURE*/
 
 #endif /*LV_USE_DRAW_OPENGLES*/

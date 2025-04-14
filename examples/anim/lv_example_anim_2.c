@@ -18,6 +18,7 @@ void lv_example_anim_2(void)
 {
 
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_bg_color(obj, lv_palette_main(LV_PALETTE_RED), 0);
     lv_obj_set_style_radius(obj, LV_RADIUS_CIRCLE, 0);
 

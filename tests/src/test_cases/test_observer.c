@@ -59,6 +59,93 @@ void test_observer_add_remove(void)
     TEST_ASSERT_EQUAL_PTR(NULL, observer); /*The observer must be NULL*/
 }
 
+void test_object_observer_add_remove(void)
+{
+
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 1);
+
+    lv_observer_t * observer = lv_obj_bind_flag_if_eq(obj, &subject, LV_OBJ_FLAG_HIDDEN, 5);
+
+    TEST_ASSERT_EQUAL(false, lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN));
+    lv_subject_set_int(&subject, 5);
+    TEST_ASSERT_EQUAL(true, lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN));
+    lv_observer_remove(observer);
+    lv_subject_set_int(&subject, 1);
+
+    /* This shouldn't get updated */
+    TEST_ASSERT_EQUAL(true, lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN));
+    lv_obj_delete(obj);
+    /* We shouldn't crash here */
+}
+
+static lv_event_dsc_t * get_event_delete_from_obj(lv_obj_t * obj)
+{
+
+    /* The remove event is a event callback using the observer as the user data */
+    uint32_t event_cnt = lv_event_get_count(&obj->spec_attr->event_list);
+    for(uint32_t i = 0; i < event_cnt; i++) {
+        lv_event_dsc_t * event = lv_obj_get_event_dsc(obj, i);
+        TEST_ASSERT_NOT_NULL(event);
+        if(event->filter == LV_EVENT_DELETE) {
+            return event;
+        }
+    }
+    return NULL;
+}
+void test_obj_remove_from_subject_removes_delete_event(void)
+{
+
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 1);
+    (void)lv_subject_add_observer_obj(&subject, observer_basic, obj, NULL);
+
+    {
+        /*
+         * We expect the event delete to be added to the object allowing the observer
+         * to be deleted when the object is deleted
+         */
+        TEST_ASSERT_NOT_NULL(obj->spec_attr);
+        TEST_ASSERT_EQUAL(lv_event_get_count(&obj->spec_attr->event_list), 1);
+        lv_event_dsc_t * delete_event = get_event_delete_from_obj(obj);
+        TEST_ASSERT_NOT_NULL(delete_event);
+    }
+    {
+        /* Removing the object from the subject should remove the delete event entry */
+        lv_obj_remove_from_subject(obj, &subject);
+        lv_event_dsc_t * delete_event  = get_event_delete_from_obj(obj);
+        TEST_ASSERT_NULL(delete_event);
+    }
+
+}
+
+void test_observer_remove_removes_obj_callback(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 1);
+    lv_observer_t * observer = lv_subject_add_observer_obj(&subject, observer_basic, obj, NULL);
+
+    {
+        /*
+         * We expect the event delete to be added to the object allowing the observer
+         * to be deleted when the object is deleted
+         */
+        TEST_ASSERT_NOT_NULL(obj->spec_attr);
+        TEST_ASSERT_EQUAL(lv_event_get_count(&obj->spec_attr->event_list), 1);
+        lv_event_dsc_t * delete_event = get_event_delete_from_obj(obj);
+        TEST_ASSERT_NOT_NULL(delete_event);
+    }
+    {
+        /* Removing the observer associated with the object should remove the delete event entry */
+        lv_observer_remove(observer);
+        lv_event_dsc_t * delete_event  = get_event_delete_from_obj(obj);
+        TEST_ASSERT_NULL(delete_event);
+    }
+}
+
 void test_observer_int(void)
 {
     static lv_subject_t subject;

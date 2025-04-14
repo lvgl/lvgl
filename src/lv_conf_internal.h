@@ -450,6 +450,17 @@
             #define LV_DRAW_SW_SUPPORT_ARGB8888     1
         #endif
     #endif
+    #ifndef LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+                #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED CONFIG_LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+            #else
+                #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED 0
+            #endif
+        #else
+            #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED 1
+        #endif
+    #endif
     #ifndef LV_DRAW_SW_SUPPORT_L8
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_DRAW_SW_SUPPORT_L8
@@ -1583,10 +1594,12 @@
 
 /** Include `lvgl_private.h` in `lvgl.h` to access internal data and functions by default */
 #ifndef LV_USE_PRIVATE_API
-    #ifdef CONFIG_LV_USE_PRIVATE_API
-        #define LV_USE_PRIVATE_API CONFIG_LV_USE_PRIVATE_API
-    #else
-        #define LV_USE_PRIVATE_API      0
+    #ifndef LV_USE_PRIVATE_API
+        #ifdef CONFIG_LV_USE_PRIVATE_API
+            #define LV_USE_PRIVATE_API CONFIG_LV_USE_PRIVATE_API
+        #else
+            #define LV_USE_PRIVATE_API  0
+        #endif
     #endif
 #endif
 
@@ -3802,6 +3815,17 @@
             #define LV_LINUX_FBDEV_BUFFER_SIZE   60
         #endif
     #endif
+    #ifndef LV_LINUX_FBDEV_MMAP
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_LINUX_FBDEV_MMAP
+                #define LV_LINUX_FBDEV_MMAP CONFIG_LV_LINUX_FBDEV_MMAP
+            #else
+                #define LV_LINUX_FBDEV_MMAP 0
+            #endif
+        #else
+            #define LV_LINUX_FBDEV_MMAP          1
+        #endif
+    #endif
 #endif
 
 /** Use Nuttx to open window and handle touchscreen */
@@ -4002,11 +4026,25 @@
     #endif
 #endif
 
-#ifndef LV_USE_GENERIC_MIPI
-    #ifdef CONFIG_LV_USE_GENERIC_MIPI
-        #define LV_USE_GENERIC_MIPI CONFIG_LV_USE_GENERIC_MIPI
-    #else
-        #define LV_USE_GENERIC_MIPI (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
+#if (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
+    #ifndef LV_USE_GENERIC_MIPI
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_GENERIC_MIPI
+                #define LV_USE_GENERIC_MIPI CONFIG_LV_USE_GENERIC_MIPI
+            #else
+                #define LV_USE_GENERIC_MIPI 0
+            #endif
+        #else
+            #define LV_USE_GENERIC_MIPI 1
+        #endif
+    #endif
+#else
+    #ifndef LV_USE_GENERIC_MIPI
+        #ifdef CONFIG_LV_USE_GENERIC_MIPI
+            #define LV_USE_GENERIC_MIPI CONFIG_LV_USE_GENERIC_MIPI
+        #else
+            #define LV_USE_GENERIC_MIPI 0
+        #endif
     #endif
 #endif
 
@@ -4229,6 +4267,19 @@
     #endif
 #endif
 
+/** Vector graphic demo */
+#ifndef LV_USE_DEMO_VECTOR_GRAPHIC
+    #ifdef CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC
+        #define LV_USE_DEMO_VECTOR_GRAPHIC CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC
+    #else
+        #define LV_USE_DEMO_VECTOR_GRAPHIC  0
+    #endif
+#endif
+
+/*---------------------------
+ * Demos from lvgl/lv_demos
+  ---------------------------*/
+
 /** Flex layout demo */
 #ifndef LV_USE_DEMO_FLEX_LAYOUT
     #ifdef CONFIG_LV_USE_DEMO_FLEX_LAYOUT
@@ -4262,15 +4313,6 @@
         #define LV_USE_DEMO_SCROLL CONFIG_LV_USE_DEMO_SCROLL
     #else
         #define LV_USE_DEMO_SCROLL          0
-    #endif
-#endif
-
-/** Vector graphic demo */
-#ifndef LV_USE_DEMO_VECTOR_GRAPHIC
-    #ifdef CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC
-        #define LV_USE_DEMO_VECTOR_GRAPHIC CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC
-    #else
-        #define LV_USE_DEMO_VECTOR_GRAPHIC  0
     #endif
 #endif
 
@@ -4345,12 +4387,21 @@ LV_EXPORT_CONST_INT(LV_DRAW_BUF_ALIGN);
     #define LV_USE_MEM_MONITOR 0
 #endif /*LV_USE_SYSMON*/
 
+
 #ifndef LV_USE_LZ4
-    #define LV_USE_LZ4  (LV_USE_LZ4_INTERNAL || LV_USE_LZ4_EXTERNAL)
+    #if (LV_USE_LZ4_INTERNAL || LV_USE_LZ4_EXTERNAL)
+        #define LV_USE_LZ4 1
+    #else
+        #define LV_USE_LZ4 0
+    #endif
 #endif
 
 #ifndef LV_USE_THORVG
-    #define LV_USE_THORVG  (LV_USE_THORVG_INTERNAL || LV_USE_THORVG_EXTERNAL)
+    #if (LV_USE_THORVG_INTERNAL || LV_USE_THORVG_EXTERNAL)
+        #define LV_USE_THORVG 1
+    #else
+        #define LV_USE_THORVG 0
+    #endif
 #endif
 
 #if LV_USE_OS

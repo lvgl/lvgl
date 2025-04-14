@@ -47,6 +47,10 @@
     #define LV_DRAW_SW_RGB888_RECOLOR(...)  LV_RESULT_INVALID
 #endif
 
+#ifndef LV_DRAW_SW_ARGB8888_PREMULTIPLIED_RECOLOR
+    #define LV_DRAW_SW_ARGB8888_PREMULTIPLIED_RECOLOR(...)  LV_RESULT_INVALID
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -554,23 +558,37 @@ static void recolor(lv_area_t relative_area, uint8_t * src_buf, uint8_t * dest_b
             const uint8_t * src_buf_tmp = src_buf + src_stride * relative_area.y1 + relative_area.x1 * 2;
             int32_t img_stride_px = src_stride / 2;
 
-            uint16_t c_mult[3];
-            c_mult[0] = (color.blue >> 3) * mix;
-            c_mult[1] = (color.green >> 2) * mix;
-            c_mult[2] = (color.red >> 3) * mix;
             uint16_t * buf16_src = (uint16_t *)src_buf_tmp;
             uint16_t * buf16_dest = (uint16_t *)dest_buf;
-
-            int32_t y;
-            for(y = 0; y < h; y++) {
-                int32_t x;
-                for(x = 0; x < w; x++) {
-                    *buf16_dest = (((c_mult[2] + ((buf16_src[x] >> 11) & 0x1F) * mix_inv) << 3) & 0xF800) +
-                                  (((c_mult[1] + ((buf16_src[x] >> 5) & 0x3F) * mix_inv) >> 3) & 0x07E0) +
-                                  ((c_mult[0] + (buf16_src[x] & 0x1F) * mix_inv) >> 8);
-                    buf16_dest++;
+            uint16_t color16 = lv_color_to_u16(color);
+            if(mix >= LV_OPA_MAX) {
+                int32_t y;
+                for(y = 0; y < h; y++) {
+                    int32_t x;
+                    for(x = 0; x < w; x++) {
+                        *buf16_dest = color16;
+                        buf16_dest++;
+                    }
+                    buf16_src += img_stride_px;
                 }
-                buf16_src += img_stride_px;
+            }
+            else {
+                uint16_t c_mult[3];
+                c_mult[0] = (color.blue >> 3) * mix;
+                c_mult[1] = (color.green >> 2) * mix;
+                c_mult[2] = (color.red >> 3) * mix;
+
+                int32_t y;
+                for(y = 0; y < h; y++) {
+                    int32_t x;
+                    for(x = 0; x < w; x++) {
+                        *buf16_dest = (((c_mult[2] + ((buf16_src[x] >> 11) & 0x1F) * mix_inv) << 3) & 0xF800) +
+                                      (((c_mult[1] + ((buf16_src[x] >> 5) & 0x3F) * mix_inv) >> 3) & 0x07E0) +
+                                      ((c_mult[0] + (buf16_src[x] & 0x1F) * mix_inv) >> 8);
+                        buf16_dest++;
+                    }
+                    buf16_src += img_stride_px;
+                }
             }
         }
     }
@@ -578,18 +596,84 @@ static void recolor(lv_area_t relative_area, uint8_t * src_buf, uint8_t * dest_b
         if(LV_RESULT_INVALID == LV_DRAW_SW_RGB888_RECOLOR(dest_buf, blend_area, color, mix, cf_final)) {
             uint32_t px_size = lv_color_format_get_size(cf);
             src_buf += src_stride * relative_area.y1 + relative_area.x1 * px_size;
+            if(mix >= LV_OPA_MAX) {
+                int32_t y;
+                for(y = 0; y < h; y++) {
+                    int32_t x;
+                    for(x = 0; x < w; x++) {
+                        dest_buf[0] = color.blue;
+                        dest_buf[1] = color.green;
+                        dest_buf[2] = color.red;
+                        if(cf == LV_COLOR_FORMAT_ARGB8888) dest_buf[3] = src_buf[3];
+                        src_buf += px_size;
+                        dest_buf += px_size;
+                    }
+                    src_buf += src_stride - w * px_size;
+                }
+            }
+            else {
+                uint16_t c_mult[3];
+                c_mult[0] = color.blue * mix;
+                c_mult[1] = color.green * mix;
+                c_mult[2] = color.red * mix;
+                int32_t y;
+                for(y = 0; y < h; y++) {
+                    int32_t x;
+                    for(x = 0; x < w; x++) {
+                        dest_buf[0] = (c_mult[0] + (src_buf[0] * mix_inv)) >> 8;
+                        dest_buf[1] = (c_mult[1] + (src_buf[1] * mix_inv)) >> 8;
+                        dest_buf[2] = (c_mult[2] + (src_buf[2] * mix_inv)) >> 8;
+                        if(cf == LV_COLOR_FORMAT_ARGB8888) dest_buf[3] = src_buf[3];
+                        src_buf += px_size;
+                        dest_buf += px_size;
+                    }
+                    src_buf += src_stride - w * px_size;
+                }
+            }
+        }
+    }
+    else if(cf == LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED) {
+        if(LV_RESULT_INVALID == LV_DRAW_SW_ARGB8888_PREMULTIPLIED_RECOLOR(dest_buf, blend_area, color, mix, cf_final)) {
+            uint32_t px_size = lv_color_format_get_size(cf);
+            src_buf += src_stride * relative_area.y1 + relative_area.x1 * px_size;
+
             uint16_t c_mult[3];
             c_mult[0] = color.blue * mix;
             c_mult[1] = color.green * mix;
             c_mult[2] = color.red * mix;
+
             int32_t y;
             for(y = 0; y < h; y++) {
                 int32_t x;
                 for(x = 0; x < w; x++) {
-                    dest_buf[0] = (c_mult[0] + (src_buf[0] * mix_inv)) >> 8;
-                    dest_buf[1] = (c_mult[1] + (src_buf[1] * mix_inv)) >> 8;
-                    dest_buf[2] = (c_mult[2] + (src_buf[2] * mix_inv)) >> 8;
-                    if(cf == LV_COLOR_FORMAT_ARGB8888) dest_buf[3] = src_buf[3];
+                    uint8_t alpha = src_buf[3];
+
+                    if(alpha > 0) {
+                        /* Step 1: Unpremultiply (convert to non-premultiplied RGB) */
+                        uint16_t reciprocal = (255 * 256) / alpha;
+                        uint8_t r = (src_buf[2] * reciprocal) >> 8;
+                        uint8_t g = (src_buf[1] * reciprocal) >> 8;
+                        uint8_t b = (src_buf[0] * reciprocal) >> 8;
+
+                        /* Step 2: Apply recoloring */
+                        r = (c_mult[2] + (r * mix_inv)) >> 8;
+                        g = (c_mult[1] + (g * mix_inv)) >> 8;
+                        b = (c_mult[0] + (b * mix_inv)) >> 8;
+
+                        /* Step 3: Premultiply again */
+                        dest_buf[0] = (b * alpha) >> 8;
+                        dest_buf[1] = (g * alpha) >> 8;
+                        dest_buf[2] = (r * alpha) >> 8;
+                    }
+                    else {
+                        /* If alpha is 0, just copy the pixel as is */
+                        dest_buf[0] = src_buf[0];
+                        dest_buf[1] = src_buf[1];
+                        dest_buf[2] = src_buf[2];
+                    }
+
+                    dest_buf[3] = alpha; /* Keep original alpha*/
+
                     src_buf += px_size;
                     dest_buf += px_size;
                 }

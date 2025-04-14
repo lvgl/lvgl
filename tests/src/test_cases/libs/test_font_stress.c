@@ -218,7 +218,7 @@ void test_font_stress(void)
     static const char * font_name_arr[] = {
         "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf",
         "../src/libs/freetype/arial.ttf",
-        "../demos/multilang/assets/fonts/Montserrat-Bold.ttf",
+        "./src/test_files/fonts/Montserrat-Bold.ttf",
         "UNKNOWN_FONT_NAME"
     };
 
@@ -251,7 +251,7 @@ void test_font_manager_stress(void)
     lv_font_manager_add_path_static(g_ctx.font_manager, "NotoSansSC-Regular",
                                     "./src/test_files/fonts/noto/NotoSansSC-Regular.ttf");
     lv_font_manager_add_path_static(g_ctx.font_manager, "Arial", "../src/libs/freetype/arial.ttf");
-    lv_font_manager_add_path(g_ctx.font_manager, "Montserrat-Bold", "../demos/multilang/assets/fonts/Montserrat-Bold.ttf");
+    lv_font_manager_add_path(g_ctx.font_manager, "Montserrat-Bold", "./src/test_files/fonts/Montserrat-Bold.ttf");
     lv_font_manager_add_path(g_ctx.font_manager, "UNKNOWN", "UNKNOWN_FONT_PATH");
 
     static const char * font_name_arr[] = {

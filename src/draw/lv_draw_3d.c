@@ -8,7 +8,7 @@
  *********************/
 
 #include "lv_draw_3d.h"
-#if LV_3DTEXTURE_ID_TYPE_IS_DEFINED
+#if LV_USE_3DTEXTURE
 
 #include "lv_draw_private.h"
 
@@ -53,12 +53,9 @@ void lv_draw_3d(lv_layer_t * layer, const lv_draw_3d_dsc_t * dsc, const lv_area_
 {
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords);
+    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_3D);
 
-    t->draw_dsc = lv_malloc(sizeof(*dsc));
-    LV_ASSERT_MALLOC(t->draw_dsc);
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
-    t->type = LV_DRAW_TASK_TYPE_3D;
 
     lv_draw_finalize_task_creation(layer, t);
 
@@ -69,4 +66,4 @@ void lv_draw_3d(lv_layer_t * layer, const lv_draw_3d_dsc_t * dsc, const lv_area_
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*LV_3DTEXTURE_ID_TYPE_IS_DEFINED*/
+#endif /*LV_USE_3DTEXTURE*/

@@ -578,6 +578,8 @@ vg_lite_buffer_format_t lv_vg_lite_vg_fmt(lv_color_format_t cf)
 
         case LV_COLOR_FORMAT_ARGB8888:
             return VG_LITE_BGRA8888;
+        case LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED:
+            return VG_sBGRA_8888_PRE;
 
         case LV_COLOR_FORMAT_XRGB8888:
             return VG_LITE_BGRX8888;
@@ -640,6 +642,7 @@ void lv_vg_lite_buffer_format_bytes(
         case VG_LITE_BGRX8888:
         case VG_LITE_XBGR8888:
         case VG_LITE_XRGB8888:
+        case VG_sBGRA_8888_PRE:
             *mul = 4;
             break;
         case VG_LITE_NV12:

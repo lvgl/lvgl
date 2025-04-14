@@ -152,7 +152,7 @@ void lv_draw_sw_transform(const lv_area_t * dest_area, const void * src_buf,
  * @param t             pointer to a draw task
  * @param dsc           the draw descriptor
  */
-void lv_draw_sw_vector(lv_draw_task_t * t, const lv_draw_vector_task_dsc_t * dsc);
+void lv_draw_sw_vector(lv_draw_task_t * t, lv_draw_vector_task_dsc_t * dsc);
 #endif
 
 /**

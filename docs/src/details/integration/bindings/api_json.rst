@@ -409,7 +409,7 @@ Here is a shortened example of what the output looks like.
         ],
         "structures":[
             {
-                "name":"_lv_gradient_cache_t",
+                "name":"_lv_grad_cache_t",
                 "type":{
                     "name":"struct",
                     "json_type":"primitive_type"

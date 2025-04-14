@@ -344,7 +344,7 @@ static void rotate270_argb8888(const uint32_t * src, uint32_t * dst, int32_t src
                                int32_t src_stride,
                                int32_t dst_stride)
 {
-    if(LV_RESULT_OK == LV_DRAW_SW_ROTATE90_ARGB8888(src, dst, src_width, src_height, src_stride, dst_stride)) {
+    if(LV_RESULT_OK == LV_DRAW_SW_ROTATE270_ARGB8888(src, dst, src_width, src_height, src_stride, dst_stride)) {
         return ;
     }
 
@@ -384,7 +384,7 @@ static void rotate180_argb8888(const uint32_t * src, uint32_t * dst, int32_t wid
 static void rotate90_argb8888(const uint32_t * src, uint32_t * dst, int32_t src_width, int32_t src_height,
                               int32_t src_stride, int32_t dst_stride)
 {
-    if(LV_RESULT_OK == LV_DRAW_SW_ROTATE270_ARGB8888(src, dst, src_width, src_height, src_stride, dst_stride)) {
+    if(LV_RESULT_OK == LV_DRAW_SW_ROTATE90_ARGB8888(src, dst, src_width, src_height, src_stride, dst_stride)) {
         return ;
     }
 
@@ -468,7 +468,7 @@ static void rotate270_rgb565(const uint16_t * src, uint16_t * dst, int32_t src_w
                              int32_t src_stride,
                              int32_t dst_stride)
 {
-    if(LV_RESULT_OK == LV_DRAW_SW_ROTATE90_RGB565(src, dst, src_width, src_height, src_stride, dst_stride)) {
+    if(LV_RESULT_OK == LV_DRAW_SW_ROTATE270_RGB565(src, dst, src_width, src_height, src_stride, dst_stride)) {
         return ;
     }
 
@@ -508,7 +508,7 @@ static void rotate90_rgb565(const uint16_t * src, uint16_t * dst, int32_t src_wi
                             int32_t src_stride,
                             int32_t dst_stride)
 {
-    if(LV_RESULT_OK == LV_DRAW_SW_ROTATE270_RGB565(src, dst, src_width, src_height, src_stride, dst_stride)) {
+    if(LV_RESULT_OK == LV_DRAW_SW_ROTATE90_RGB565(src, dst, src_width, src_height, src_stride, dst_stride)) {
         return ;
     }
 
@@ -534,7 +534,7 @@ static void rotate90_l8(const uint8_t * src, uint8_t * dst, int32_t src_width, i
                         int32_t src_stride,
                         int32_t dst_stride)
 {
-    if(LV_RESULT_OK == LV_DRAW_SW_ROTATE270_L8(src, dst, src_width, src_height, src_stride, dst_stride)) {
+    if(LV_RESULT_OK == LV_DRAW_SW_ROTATE90_L8(src, dst, src_width, src_height, src_stride, dst_stride)) {
         return ;
     }
 
@@ -568,7 +568,7 @@ static void rotate270_l8(const uint8_t * src, uint8_t * dst, int32_t src_width, 
                          int32_t src_stride,
                          int32_t dst_stride)
 {
-    if(LV_RESULT_OK == LV_DRAW_SW_ROTATE90_L8(src, dst, src_width, src_height, src_stride, dst_stride)) {
+    if(LV_RESULT_OK == LV_DRAW_SW_ROTATE270_L8(src, dst, src_width, src_height, src_stride, dst_stride)) {
         return ;
     }
 
