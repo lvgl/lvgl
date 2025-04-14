@@ -211,7 +211,7 @@ def main():
                 print(LOG, "changes were made. ready to push.")
                 # keep it brief for commit message 50 character limit suggestion.
                 # max length will be 50 characters in this case: "bot: New branch. Update LVGL submodule. lv_conf.h."
-                commit_msg = ("CI bot:"
+                commit_msg = ("bot:"
                               + (" New branch." if port_does_not_have_the_branch else "")
                               + (" Update LVGL submodule." if port_submodule_was_updated else "")
                               + (" lv_conf.h." if port_lv_conf_h_was_updated else "")
