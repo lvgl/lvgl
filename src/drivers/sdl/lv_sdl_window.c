@@ -427,14 +427,15 @@ static void texture_resize(lv_display_t * disp)
     dsc->fb1 = sdl_draw_buf_realloc_aligned(dsc->fb1, stride * disp->ver_res);
     lv_memzero(dsc->fb1, stride * disp->ver_res);
 
+#if LV_SDL_BUF_COUNT == 2
+    dsc->fb2 = sdl_draw_buf_realloc_aligned(dsc->fb2, stride * disp->ver_res);
+    memset(dsc->fb2, 0x00, stride * disp->ver_res);
+#endif
+
     if(sdl_render_mode() == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         dsc->fb_act = dsc->fb1;
     }
     else {
-#if LV_SDL_BUF_COUNT == 2
-        dsc->fb2 = sdl_draw_buf_realloc_aligned(dsc->fb2, stride * disp->ver_res);
-        memset(dsc->fb2, 0x00, stride * disp->ver_res);
-#endif
         lv_display_set_buffers(disp, dsc->fb1, dsc->fb2, stride * disp->ver_res, LV_SDL_RENDER_MODE);
     }
     if(dsc->texture) SDL_DestroyTexture(dsc->texture);
