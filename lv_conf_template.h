@@ -169,6 +169,7 @@
     #define LV_DRAW_SW_SUPPORT_RGB888       1
     #define LV_DRAW_SW_SUPPORT_XRGB8888     1
     #define LV_DRAW_SW_SUPPORT_ARGB8888     1
+    #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED 1
     #define LV_DRAW_SW_SUPPORT_L8           1
     #define LV_DRAW_SW_SUPPORT_AL88         1
     #define LV_DRAW_SW_SUPPORT_A8           1
@@ -1181,6 +1182,7 @@
     #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISPLAY_RENDER_MODE_PARTIAL
     #define LV_LINUX_FBDEV_BUFFER_COUNT  0
     #define LV_LINUX_FBDEV_BUFFER_SIZE   60
+    #define LV_LINUX_FBDEV_MMAP          1
 #endif
 
 /** Use Nuttx to open window and handle touchscreen */

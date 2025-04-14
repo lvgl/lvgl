@@ -450,6 +450,17 @@
             #define LV_DRAW_SW_SUPPORT_ARGB8888     1
         #endif
     #endif
+    #ifndef LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+                #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED CONFIG_LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED
+            #else
+                #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED 0
+            #endif
+        #else
+            #define LV_DRAW_SW_SUPPORT_ARGB8888_PREMULTIPLIED 1
+        #endif
+    #endif
     #ifndef LV_DRAW_SW_SUPPORT_L8
         #ifdef LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_DRAW_SW_SUPPORT_L8
@@ -3794,6 +3805,17 @@
             #define LV_LINUX_FBDEV_BUFFER_SIZE CONFIG_LV_LINUX_FBDEV_BUFFER_SIZE
         #else
             #define LV_LINUX_FBDEV_BUFFER_SIZE   60
+        #endif
+    #endif
+    #ifndef LV_LINUX_FBDEV_MMAP
+        #ifdef LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_LINUX_FBDEV_MMAP
+                #define LV_LINUX_FBDEV_MMAP CONFIG_LV_LINUX_FBDEV_MMAP
+            #else
+                #define LV_LINUX_FBDEV_MMAP 0
+            #endif
+        #else
+            #define LV_LINUX_FBDEV_MMAP          1
         #endif
     #endif
 #endif

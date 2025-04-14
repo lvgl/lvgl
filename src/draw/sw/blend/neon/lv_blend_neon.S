@@ -12,8 +12,8 @@
 
 /*Workaround: missing .note.GNU-stack section implies executable stack*/
 #ifdef __ELF__
-.section .note.GNU-stack,"",@progbits
-#endif
+.section .note.GNU-stack,"",%progbits
+#endif /* __ELF__ */
 
 #if LV_USE_DRAW_SW_ASM == LV_DRAW_SW_ASM_NEON
 
