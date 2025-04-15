@@ -2,6 +2,7 @@
 #include "../lvgl.h"
 #include "unity/unity.h"
 
+/*Bypassing resolution check*/
 #define TEST_DISPLAY_ASSERT_EQUAL_SCREENSHOT(path) TEST_ASSERT_MESSAGE(lv_test_screenshot_compare(path), path);
 
 void setUp(void)
