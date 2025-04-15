@@ -19,3 +19,4 @@ build/
 .config*
 config.h
 defconfig
+env/*
