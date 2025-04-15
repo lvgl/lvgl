@@ -671,22 +671,17 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
     layer->phy_clip_area = *area_p;
     layer->partial_y_offset = y_offset;
 
-    if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
-        /*In full mode the area is always the full screen, so the buffer area to it too*/
-        layer->buf_area = *area_p;
-        layer_reshape_draw_buf(layer, layer->draw_buf->header.stride);
-    }
-    else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+    if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         /*In partial mode render this area to the buffer*/
         layer->buf_area = *area_p;
         layer_reshape_draw_buf(layer, LV_STRIDE_AUTO);
     }
-    else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
-        /*In direct mode the the buffer area is always the whole screen*/
+    else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT || disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
+        /*In direct mode and full mode the the buffer area is always the whole screen, not considering rotation*/
         layer->buf_area.x1 = 0;
         layer->buf_area.y1 = 0;
-        layer->buf_area.x2 = lv_display_get_horizontal_resolution_with_matrix_rotation(disp_refr) - 1;
-        layer->buf_area.y2 = lv_display_get_vertical_resolution_with_matrix_rotation(disp_refr) - 1;
+        layer->buf_area.x2 = lv_display_get_original_horizontal_resolution(disp_refr) - 1;
+        layer->buf_area.y2 = lv_display_get_original_vertical_resolution(disp_refr) - 1;
         layer_reshape_draw_buf(layer, layer->draw_buf->header.stride);
     }
 

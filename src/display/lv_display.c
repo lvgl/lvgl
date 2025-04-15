@@ -322,36 +322,24 @@ int32_t lv_display_get_vertical_resolution(const lv_display_t * disp)
     }
 }
 
-int32_t lv_display_get_horizontal_resolution_with_matrix_rotation(const lv_display_t * disp)
+int32_t lv_display_get_original_horizontal_resolution(const lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
-
     if(disp == NULL) {
         return 0;
     }
 
-    if(disp->matrix_rotation) {
-        /* When rotating the display in matrix mode, the display buffer does not need to be rotated. */
-        return disp->hor_res;
-    }
-
-    return lv_display_get_horizontal_resolution(disp);
+    return disp->hor_res;
 }
 
-int32_t lv_display_get_vertical_resolution_with_matrix_rotation(const lv_display_t * disp)
+int32_t lv_display_get_original_vertical_resolution(const lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
-
     if(disp == NULL) {
         return 0;
     }
 
-    if(disp->matrix_rotation) {
-        /* When rotating the display in matrix mode, the display buffer does not need to be rotated. */
-        return disp->ver_res;
-    }
-
-    return lv_display_get_vertical_resolution(disp);
+    return disp->ver_res;
 }
 
 int32_t lv_display_get_physical_horizontal_resolution(const lv_display_t * disp)
@@ -458,8 +446,8 @@ void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint3
 {
     LV_ASSERT_MSG(buf1 != NULL, "Null buffer");
     lv_color_format_t cf = lv_display_get_color_format(disp);
-    uint32_t w = lv_display_get_horizontal_resolution_with_matrix_rotation(disp);
-    uint32_t h = lv_display_get_vertical_resolution_with_matrix_rotation(disp);
+    uint32_t w = lv_display_get_original_horizontal_resolution(disp);
+    uint32_t h = lv_display_get_original_vertical_resolution(disp);
     LV_ASSERT_MSG(w != 0 && h != 0, "display resolution is 0");
 
     /* buf1 or buf2 is not aligned according to LV_DRAW_BUF_ALIGN */
@@ -488,8 +476,8 @@ void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void *
 {
     LV_ASSERT_MSG(buf1 != NULL, "Null buffer");
     lv_color_format_t cf = lv_display_get_color_format(disp);
-    uint32_t w = lv_display_get_horizontal_resolution_with_matrix_rotation(disp);
-    uint32_t h = lv_display_get_vertical_resolution_with_matrix_rotation(disp);
+    uint32_t w = lv_display_get_original_horizontal_resolution(disp);
+    uint32_t h = lv_display_get_original_vertical_resolution(disp);
     LV_ASSERT_MSG(w != 0 && h != 0, "display resolution is 0");
 
     if(render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
@@ -898,11 +886,24 @@ void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation
     update_resolution(disp);
 }
 
+lv_display_rotation_t lv_display_get_rotation(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return LV_DISPLAY_ROTATION_0;
+    return disp->rotation;
+}
+
 void lv_display_set_matrix_rotation(lv_display_t * disp, bool enable)
 {
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
+
+    if(!(disp->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT || disp->render_mode == LV_DISPLAY_RENDER_MODE_FULL)) {
+        LV_LOG_WARN("Unsupported rendering mode: %d", disp->render_mode);
+        return;
+    }
+
     disp->matrix_rotation = enable;
 #else
     (void)disp;
@@ -911,11 +912,11 @@ void lv_display_set_matrix_rotation(lv_display_t * disp, bool enable)
 #endif
 }
 
-lv_display_rotation_t lv_display_get_rotation(lv_display_t * disp)
+bool lv_display_get_matrix_rotation(lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
-    if(disp == NULL) return LV_DISPLAY_ROTATION_0;
-    return disp->rotation;
+    if(disp == NULL) return false;
+    return disp->matrix_rotation;
 }
 
 void lv_display_set_theme(lv_display_t * disp, lv_theme_t * th)
