@@ -2,43 +2,65 @@
 Viewe
 =====
 
-`Viewe <https://viewedisplay.com/>`__ is a high-tech enterprise specializing
-in comprehensive display solutions, including display panels, touch interfaces,
-and embedded smart displays. They integrate research and development, production,
-and sales services, focusing on professionalism, dedication, innovation,
-and ambition to lead in the display and graphical user interface (GUI)
-industry.
+`Viewe <https://viewedisplay.com/>`__ specializes in comprehensive display solutions 
+for more than 10 Years with remarkable capability of software and hardware R&D, 
+factory manufacturing and sales service. We not only offer one stop 
+`bare display and touch solutions <https://viewedisplay.com/display-solutions/>`_ 
+but also `embedded smart displays <https://viewedisplay.com/smart-solutions/>`_ 
+with standard productions and tailored customization to develop your concepts 
+to reality.
 
-- TFT Displays
-
-    - Standard Display
-    - Sunlight Readable Display
-    - Bar Display/Stretched Display
-    - Square Display
-    - Round Display
-
-- Smart Display
-
-    - Uart Smart Display
-    - IOT_AIOT Smart Display
-    - HDMI Display_Raspberry Pi Display
-    - Arduino Display
-
-
-
-UART Smart Displays
+Products Portfolio:
 *******************
 
-The Viewe UART Smart Displays are a series of displays that use
-ESP32 microcontrollers and have IO interface for connecting to
-peripherals.
+- Embedded Smart Displays
+    - `IOT_AIOT Smart Display <https://viewedisplay.com/iot_aiot-smart-display/>`_
+    - `Uart Smart Display <https://viewedisplay.com/uart-smart-display/>`_
+    - `HDMI Display_Raspberry Pi Display <https://viewedisplay.com/hdmi-display-raspberry-pi-display/>`_
+    - Arduino Display
+
+TFT | OLED Display
+
+    - `Sunlight Readable Display <https://viewedisplay.com/sunlight-readable-display/>`_
+    - `AMOLED Displays <https://viewedisplay.com/amoled-display-list/>`_
+    - `Transflective TFT Displays <https://viewedisplay.com/transflective-tft-display/>`_
+    - `Standard TFT Displays <https://viewedisplay.com/standard-display/>`_
+    - `Bar Display/Stretched TFT Display <https://viewedisplay.com/bar-display-stretched-display/>`_
+    - `Square TFT Display <https://viewedisplay.com/square-display/>`_
+    - `Round TFT Display <https://viewedisplay.com/round-display/>`_
+
+
+IOT AIOT Smart Displays
+***********************
+
+The Viewe IOT AIOT Smart Displays are a series of displays that use ESP32
+microcontrollers with integrated multi-modal interactions of GUI /voice/camera, ML/AI
+edge computing, and seamless connectivity. UART/RS232/RS485/CAN Interfaces and
+redundant IO interfaces are included to facilitate extended usage. LVGL/Arduino/ESP-IDF 
+is well-suited to these boards.
 
 lv_port_viewe_7_espidf
 ----------------------
 
 `lv_port_viewe_7_espidf <https://github.com/lvgl/lv_port_viewe_7_espidf>`_
-is a port repo of LVGL which supports Viewe ESP32 S3 Smart Display 7.0
-inch. It is based on ESP-IDF and uses the ESP32-S3 microcontroller.
+is a port repo of LVGL which supports Viewe ESP32 S3 Smart Display 7.0 inch. 
+It is based on ESP-IDF and uses the ESP32-S3 microcontroller.
+
+- `Viewe ESP32 S3 Smart Display <https://viewedisplay.com/product/esp32-7-inch-800x480-rgb-ips-tft-display-touch-screen-arduino-lvgl-uart/>`_
+
+UART Smart Displays
+*******************
+
+The Viewe UART Smart Displays are a series of displays that use ESP32 and STM32
+microcontrollers with UART/RS232/RS485/CAN Interface and have IO interface for
+connecting to peripherals. LVGL is well-suited to these boards.
+
+lv_port_viewe_7_espidf
+----------------------
+
+`lv_port_viewe_7_espidf <https://github.com/lvgl/lv_port_viewe_7_espidf>`_
+is a port repo of LVGL which supports Viewe ESP32 S3 Smart Display 7.0 inch. 
+It is based on ESP-IDF and uses the ESP32-S3 microcontroller.
 
 - `Viewe ESP32 S3 Smart Display <https://viewedisplay.com/product/esp32-7-inch-800x480-rgb-ips-tft-display-touch-screen-arduino-lvgl-uart/>`_
 
