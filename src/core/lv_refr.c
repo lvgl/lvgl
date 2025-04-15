@@ -548,7 +548,7 @@ static void refr_sync_areas(void)
          */
         lv_area_intersect(sync_area, sync_area, &disp_area);
 #if LV_DRAW_TRANSFORM_USE_MATRIX
-        if(disp_refr->matrix_rotation) {
+        if(lv_display_get_matrix_rotation(disp_refr)) {
             lv_display_rotate_area(disp_refr, sync_area);
         }
 #endif
@@ -767,7 +767,7 @@ static void refr_configured_layer(lv_layer_t * layer)
     lv_layer_reset(layer);
 
 #if LV_DRAW_TRANSFORM_USE_MATRIX
-    if(disp_refr->matrix_rotation) {
+    if(lv_display_get_matrix_rotation(disp_refr)) {
         const lv_display_rotation_t rotation = lv_display_get_rotation(disp_refr);
         if(rotation != LV_DISPLAY_ROTATION_0) {
             lv_display_rotate_area(disp_refr, &layer->phy_clip_area);
