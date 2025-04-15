@@ -16,10 +16,7 @@
 # documentation root, use os.path.abspath() to make it absolute, as shown here.
 import os
 import sys
-import re
 from sphinx.builders.html import StandaloneHTMLBuilder
-from sphinxawesome_theme.postprocess import Icons
-aaa = Icons.permalinks_icon
 
 base_path = os.path.abspath(os.path.dirname(__file__))
 # Add path to import link_roles.py and lv_example.py

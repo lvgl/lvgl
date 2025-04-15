@@ -81,6 +81,7 @@ execute_process(
   --input ${LVGL_ROOT_DIR}/src/lv_conf_internal.h
   --tmp_file ${CMAKE_CURRENT_BINARY_DIR}/tmp.h
   --output ${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h
+  --workfolder ${CMAKE_CURRENT_BINARY_DIR}
   ${PCPP_ADDITIONAL_DEFS}
   --include ${LVGL_ROOT_DIR} ${LVGL_ROOT_DIR}/.. ${LVGL_ROOT_DIR}/src ${LV_CONF_DIR}
   RESULT_VARIABLE ret
@@ -108,7 +109,7 @@ include(${CMAKE_CURRENT_BINARY_DIR}/lv_conf.cmake)
 # Add definition of LV_CONF_PATH only if needed
 # Do not redefine it if already defined in tests/CMakeLists.txt
 if(LV_CONF_PATH AND NOT LV_BUILD_TEST)
-  target_compile_definitions(lvgl PUBLIC LV_CONF_PATH=${LV_CONF_PATH})
+  target_compile_definitions(lvgl PUBLIC LV_CONF_PATH="${LV_CONF_PATH}")
 endif()
 
 # Add definition of LV_CONF_SKIP only if needed

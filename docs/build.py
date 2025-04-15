@@ -243,7 +243,7 @@ def cmd(cmd_str, start_dir=None, exit_on_error=True):
 
     if return_code != 0 and exit_on_error:
         announce(__file__, "Exiting build due to previous error.")
-        sys.exit(return_code)
+        sys.exit(1)
 
 
 def intermediate_dir_contents_exists(dir):

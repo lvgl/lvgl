@@ -1004,7 +1004,7 @@
     #define LV_FILE_EXPLORER_QUICK_ACCESS        1
 #endif
 
-/** 1: Enable freetype font manager
+/** 1: Enable Font manager
  *  - Requires: LV_USE_FREETYPE */
 #if LV_USE_FONT_MANAGER
 
