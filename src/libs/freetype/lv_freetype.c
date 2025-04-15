@@ -50,9 +50,22 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
 static void cache_node_cache_free_cb(lv_freetype_cache_node_t * node, void * user_data);
 static lv_cache_compare_res_t cache_node_cache_compare_cb(const lv_freetype_cache_node_t * lhs,
                                                           const lv_freetype_cache_node_t * rhs);
+
+static lv_font_t * freetype_font_create_cb(const lv_font_info_t * info, const void * src);
+static void freetype_font_delete_cb(lv_font_t * font);
+static void * freetype_font_dup_src_cb(const void * src);
+static void freetype_font_free_src_cb(void * src);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+const lv_font_class_t lv_freetype_font_class = {
+    .create_cb = freetype_font_create_cb,
+    .delete_cb = freetype_font_delete_cb,
+    .dup_src_cb = freetype_font_dup_src_cb,
+    .free_src_cb = freetype_font_free_src_cb,
+};
 
 /**********************
  *      MACROS
@@ -413,6 +426,26 @@ static lv_cache_compare_res_t cache_node_cache_compare_cb(const lv_freetype_cach
     }
 
     return 0;
+}
+
+static lv_font_t * freetype_font_create_cb(const lv_font_info_t * info, const void * src)
+{
+    return lv_freetype_font_create(src, info->render_mode, info->size, info->style);
+}
+
+static void freetype_font_delete_cb(lv_font_t * font)
+{
+    lv_freetype_font_delete(font);
+}
+
+static void * freetype_font_dup_src_cb(const void * src)
+{
+    return lv_strdup(src);
+}
+
+static void freetype_font_free_src_cb(void * src)
+{
+    lv_free(src);
 }
 
 #endif /*LV_USE_FREETYPE*/
