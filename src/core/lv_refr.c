@@ -676,7 +676,8 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
         layer->buf_area = *area_p;
         layer_reshape_draw_buf(layer, LV_STRIDE_AUTO);
     }
-    else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT || disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
+    else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT ||
+            disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
         /*In direct mode and full mode the the buffer area is always the whole screen, not considering rotation*/
         layer->buf_area.x1 = 0;
         layer->buf_area.y1 = 0;
