@@ -1766,7 +1766,7 @@
 
               <RTE_Components_h>
 
-/*! \brief Enable freetype font manager */
+/*! \brief Enable Font manager */
 #define LV_USE_FONT_MANAGER          1
               </RTE_Components_h>
 

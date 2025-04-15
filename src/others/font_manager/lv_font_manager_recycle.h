@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_font_manager_utils.h"
+#include "../../misc/lv_types.h"
 
 #if LV_USE_FONT_MANAGER
 
@@ -55,7 +55,7 @@ void lv_font_manager_recycle_delete(lv_font_manager_recycle_t * manager);
  * @param ft_info font info.
  * @return returns true on success.
  */
-lv_font_t * lv_font_manager_recycle_get_reuse(lv_font_manager_recycle_t * manager, const lv_freetype_info_t * ft_info);
+lv_font_t * lv_font_manager_recycle_get_reuse(lv_font_manager_recycle_t * manager, const lv_font_info_t * ft_info);
 
 /**
  * Set fonts to be reused.
@@ -63,7 +63,7 @@ lv_font_t * lv_font_manager_recycle_get_reuse(lv_font_manager_recycle_t * manage
  * @param ft_info font info.
  */
 void lv_font_manager_recycle_set_reuse(lv_font_manager_recycle_t * manager, lv_font_t * font,
-                                       const lv_freetype_info_t * ft_info);
+                                       const lv_font_info_t * ft_info);
 
 /**********************
  *      MACROS
