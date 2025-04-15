@@ -67,10 +67,11 @@ jobs:
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             REPO_URL="${{ github.event.pull_request.head.repo.clone_url }}"
             COMMIT_REF="${{ github.event.pull_request.head.sha }}"
-            ./scripts/build_html_examples.sh "$REPO_URL" "$COMMIT_REF"
           else
-            ./scripts/build_html_examples.sh
+            REPO_URL="${{ github.server_url }}/${{ github.repository }}"
+            COMMIT_REF="${{ github.sha }}"
           fi
+          ./scripts/build_html_examples.sh "$REPO_URL" "$COMMIT_REF"
       - name: Build docs
         run: docs/build.py html
       - name: Remove .doctrees
