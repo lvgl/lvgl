@@ -120,6 +120,22 @@ struct _lv_font_t {
     void * user_data;               /**< Custom user data for font.*/
 };
 
+struct _lv_font_class_t {
+    lv_font_t * (*create_cb)(const lv_font_info_t * info, const void * src); /**< Font creation callback function*/
+    void (*delete_cb)(lv_font_t * font);    /**< Font deletion callback function*/
+    void * (*dup_src_cb)(const void * src); /**< Font source duplication callback function*/
+    void (*free_src_cb)(void * src);        /**< Font source free callback function*/
+};
+
+struct _lv_font_info_t {
+    const char * name;               /**< Font name, used to distinguish different font resources*/
+    const lv_font_class_t * class_p; /**< Font backend implementation*/
+    uint32_t size;                   /**< Font size in pixel*/
+    uint32_t render_mode;            /**< Font rendering mode, see `lv_freetype_font_render_mode_t`*/
+    uint32_t style;                  /**< Font style, see `lv_freetype_font_style_t`*/
+    lv_font_kerning_t kerning;       /**< Font kerning, see `lv_font_kerning_t`*/
+};
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -180,6 +196,14 @@ void lv_font_set_kerning(lv_font_t * font, lv_font_kerning_t kerning);
  * @return  return      pointer to the default font
  */
 const lv_font_t * lv_font_get_default(void);
+
+/**
+ * Compare font information.
+ * @param ft_info_1 font information 1.
+ * @param ft_info_2 font information 2.
+ * @return return true if the fonts are equal.
+ */
+bool lv_font_info_is_equal(const lv_font_info_t * ft_info_1, const lv_font_info_t * ft_info_2);
 
 /**********************
  *      MACROS
@@ -299,11 +323,6 @@ LV_FONT_DECLARE(lv_font_unscii_16)
 #ifdef LV_FONT_CUSTOM_DECLARE
 LV_FONT_CUSTOM_DECLARE
 #endif
-
-/**
- * Set to LV_FONT_DEFAULT as macros might not be available in bindings or other places
- */
-extern const lv_font_t * const lv_font_default;
 
 #ifdef __cplusplus
 } /*extern "C"*/

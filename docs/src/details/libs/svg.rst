@@ -59,4 +59,4 @@ API
 
 .. API equals:  lv_svg_load_data
 
-.. API startswith:  lv_svg_parser_
+.. API startswith:  lv_svg_

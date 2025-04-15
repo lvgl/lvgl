@@ -15,4 +15,4 @@ Main Modules
     timer
     animation
     fs
-    draw
+    draw/index

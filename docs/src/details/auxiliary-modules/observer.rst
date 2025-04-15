@@ -182,6 +182,9 @@ changes, as long as that Observer remains attached (subscribed) to that Subject.
 Notifications are performed by calling the callback function provided when
 subscribing to the Subject.
 
+Simple Subscription
+~~~~~~~~~~~~~~~~~~~
+
 To subscribe to a Subject one of the ``lv_subject_add_observer...()`` functions are
 used.  Alternately, if you want to bind a Subject's value to a Widget's property, one
 of the ``lv_<widget_type>_bind_...()`` functions can be used.  The former are covered
@@ -244,40 +247,28 @@ opposed to the ``void *`` type returned by
 (:cpp:expr:`lv_observer_get_target(observer)` can still be used if you need that
 pointer as a ``void *`` type for any reason, but in practice, this would be rare.)
 
-**Important:**
-
-When using this method of subscribing to a Subject:
-
-- :cpp:expr:`lv_observer_remove(observer)` must *never* be called.
-
-The Observer MUST ONLY BE unsubscribed and deleted by:
-
-- If Widget needs to be deleted, simply delete the Widget, which will automatically
-  remove the Observer from the Subject.
-- If Widget does NOT need to be deleted:
-
-    - :cpp:expr:`lv_obj_remove_from_subject(widget, subject)` which will delete all
-      Observers associated with ``widget``, or
-    - :cpp:expr:`lv_subject_deinit(subject)`, which gracefully disconnects ``subject``
-      from all associated Observers and Widget events.
-
-
 Unsubscribing from a Subject
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To unsubscribe a normal Observer or one associated with a non-Widget object, use
-:cpp:expr:`lv_observer_remove(observer)`, where ``observer`` is the return value from
-either the :cpp:func:`lv_subject_add_observer()` or
-:cpp:func:`lv_subject_add_observer_with_target()` functions.
+When an Observer and its associated events are no longer needed, you can remove it
+from memory using any of the methods below, depending on the effect you want to create:
 
-To unsubscribe an Observer created through :cpp:func:`lv_subject_add_observer_obj()`,
-use :cpp:expr:`lv_obj_remove_from_subject(widget, subject)`.  ``subject`` can be NULL
-to unsubscribe the Widget from all associated Subjects.
+- If Widget needs to be deleted, simply delete the Widget, which will automatically
+  gracefully remove the Observer (and its events) from the Subject, while deleting
+  the Widget.
 
-To unsubscribe all Observers from a Subject that were subscribed using any method
-(including :ref:`observer_widget_binding` covered below), use
-:cpp:expr:`lv_subject_deinit(subject)`.
+- If Widget does NOT need to be deleted:
 
+    - :cpp:expr:`lv_obj_remove_from_subject(widget, subject)` deletes all Observers
+      associated with ``widget``.  ``subject`` can be NULL to unsubscribe the Widget
+      from all associated Subjects.
+    - :cpp:expr:`lv_subject_deinit(subject)` gracefully disconnects ``subject`` from
+      all associated Observers and Widget events.  This includes subscriptions made
+      using any of the :ref:`observer_widget_binding` functions covered below.
+    - :cpp:expr:`lv_observer_remove(observer)` deletes that specific Observer and
+      gracefully disconnects it from its ``subject`` and any associated Widgets,
+      where ``observer`` is the return value any of the above
+      ``lv_subject_add_observer_...()`` functions.
 
 
 .. _observer_subject_groups:
@@ -378,16 +369,6 @@ in that they create an Observer and associates the Widget with it.  What is diff
 is that updates to the Widget's property thus bound are handled internally -- the
 user *does not supply callback functions* for any of these subscribing methods -- the
 callback methods are supplied by the Observer subsystem.
-
-.. warning::
-
-    In all cases, the Observer is unsubscribed from the Subject and deleted from the
-    LVGL heap when the Widget is deleted.  :cpp:expr:`lv_observer_remove(observer)`
-    must *never* be called when using the ``lv_..._bind_...()`` functions, but
-    :cpp:expr:`lv_subject_deinit(subject)` and
-    :cpp:expr:`lv_obj_remove_from_subject(widget, subject)` may both be used since
-    they both gracefully de-couple the Observer from the Widget before deleting the
-    Observer.
 
 .. note::
 

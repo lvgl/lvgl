@@ -1,4 +1,19 @@
 @ECHO OFF
+rem -----------------------------------------------------------------------
+rem This file is intended only to be used after the contents of the
+rem intermediate directory have been created.  Do so by:
+rem
+rem     $ python build.py intermediate [skip_api]
+rem
+rem This is a modified version of the standard Sphinx `make.bat` file.
+rem Changes:
+rem   - uses these environment variables in the same way `build.py` does
+rem     when they are set:
+rem     - LVGL_DOC_BUILD_INTERMEDIATE_DIR
+rem     - LVGL_DOC_BUILD_OUTPUT_DIR
+rem   - Cleans up locally-created environment variables at end, so they
+rem     do not clutter environment variables.
+rem -----------------------------------------------------------------------
 
 pushd %~dp0
 
@@ -14,16 +29,20 @@ if "%LVGL_DOC_BUILD_INTERMEDIATE_DIR%" == "" (
 ) else (
 	set SOURCEDIR=%LVGL_DOC_BUILD_INTERMEDIATE_DIR%
 )
+if "%LVGL_DOC_BUILD_OUTPUT_DIR%" == "" (
+	set BUILDDIR=build
+) else (
+	set BUILDDIR=%LVGL_DOC_BUILD_OUTPUT_DIR%
+)
 if "%SPHINXOPTS%" == "" (
-    rem python ./src/lvgl_version.py >_version_temp.txt
-    rem set /p VER=<_version_temp.txt
-    rem del _version_temp.txt
-    for /F %%v in ('python lvgl_version.py') do set VER=%%v
-    echo VERSION    [!VER!]
+	rem python ./src/lvgl_version.py >_version_temp.txt
+	rem set /p VER=<_version_temp.txt
+	rem del _version_temp.txt
+	for /F %%v in ('python lvgl_version.py') do set VER=%%v
+	echo VERSION    [!VER!]
 	set SPHINXOPTS=-D version="!VER!" -j 4
 	set VER=
 )
-set BUILDDIR=build
 
 echo SOURCEDIR  [%SOURCEDIR%]
 echo BUILDDIR   [%BUILDDIR%]

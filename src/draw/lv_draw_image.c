@@ -73,13 +73,9 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
 
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords);
-
-    lv_draw_image_dsc_t * new_image_dsc = lv_malloc(sizeof(*dsc));
-    LV_ASSERT_MALLOC(new_image_dsc);
-    t->draw_dsc = new_image_dsc;
-    lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
-    t->type = LV_DRAW_TASK_TYPE_LAYER;
+    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_LAYER);
+    lv_draw_image_dsc_t * new_image_dsc = t->draw_dsc;
+    lv_memcpy(new_image_dsc, dsc, sizeof(*dsc));
     t->state = LV_DRAW_TASK_STATE_WAITING;
 
     lv_image_buf_get_transformed_area(&t->_real_area, lv_area_get_width(coords), lv_area_get_height(coords),
@@ -114,27 +110,24 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
 
     LV_PROFILER_DRAW_BEGIN;
 
-    lv_draw_image_dsc_t * new_image_dsc = lv_malloc(sizeof(*dsc));
-    LV_ASSERT_MALLOC(new_image_dsc);
-    lv_memcpy(new_image_dsc, dsc, sizeof(*dsc));
-    lv_result_t res = lv_image_decoder_get_info(new_image_dsc->src, &new_image_dsc->header);
+    lv_draw_image_dsc_t new_image_dsc;
+    lv_memcpy(&new_image_dsc, dsc, sizeof(*dsc));
+    lv_result_t res = lv_image_decoder_get_info(new_image_dsc.src, &new_image_dsc.header);
     if(res != LV_RESULT_OK) {
         LV_LOG_WARN("Couldn't get info about the image");
-        lv_free(new_image_dsc);
         LV_PROFILER_DRAW_END;
         return;
     }
 
     /*If the image_area is not set assume that it's the same as the rendering area */
-    if(new_image_dsc->image_area.x2 == LV_COORD_MIN) {
-        new_image_dsc->image_area = *image_coords;
+    if(new_image_dsc.image_area.x2 == LV_COORD_MIN) {
+        new_image_dsc.image_area = *image_coords;
     }
 
     /*Typical case, draw the image as bitmap*/
-    if(!(new_image_dsc->header.flags & LV_IMAGE_FLAGS_CUSTOM_DRAW)) {
-        lv_draw_task_t * t = lv_draw_add_task(layer, image_coords);
-        t->draw_dsc = new_image_dsc;
-        t->type = LV_DRAW_TASK_TYPE_IMAGE;
+    if(!(new_image_dsc.header.flags & LV_IMAGE_FLAGS_CUSTOM_DRAW)) {
+        lv_draw_task_t * t = lv_draw_add_task(layer, image_coords, LV_DRAW_TASK_TYPE_IMAGE);
+        lv_memcpy(t->draw_dsc, &new_image_dsc, sizeof(lv_draw_image_dsc_t));
 
         lv_image_buf_get_transformed_area(&t->_real_area, lv_area_get_width(image_coords), lv_area_get_height(image_coords),
                                           dsc->rotation, dsc->scale_x, dsc->scale_y, &dsc->pivot);
@@ -146,7 +139,7 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
     else {
 
         lv_image_decoder_dsc_t decoder_dsc;
-        res = lv_image_decoder_open(&decoder_dsc, new_image_dsc->src, NULL);
+        res = lv_image_decoder_open(&decoder_dsc, new_image_dsc.src, NULL);
         if(res != LV_RESULT_OK) {
             LV_LOG_ERROR("Failed to open image");
             LV_PROFILER_DRAW_END;
@@ -165,7 +158,7 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
 
                     lv_area_move(&coords_area, -(image_coords->x1 - xpos), -(image_coords->y1 - ypos));
                     layer->_clip_area = coords_area;
-                    decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, new_image_dsc, &coords_area);
+                    decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, &new_image_dsc, &coords_area);
                 }
             }
             else {
@@ -181,13 +174,12 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
                     lv_area_move(&clip_area, image_coords->x1, image_coords->y1);
 
                     if(lv_area_intersect(&clip_area, &clip_area, &obj_area)) {
-                        decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, new_image_dsc, &clip_area);
+                        decoder_dsc.decoder->custom_draw_cb(layer, &decoder_dsc, &coords_area, &new_image_dsc, &clip_area);
                     }
                 }
             }
 
         }
-        lv_free(new_image_dsc);
     }
 
     LV_PROFILER_DRAW_END;

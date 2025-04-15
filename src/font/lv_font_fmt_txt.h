@@ -186,6 +186,13 @@ typedef struct {
     uint16_t bitmap_format  : 2;
 } lv_font_fmt_txt_dsc_t;
 
+typedef struct {
+    const lv_font_t * font_p; /**< Pointer to built-in font*/
+    uint32_t size; /** < Size of the built-in font*/
+} lv_builtin_font_src_t;
+
+LV_ATTRIBUTE_EXTERN_DATA extern const lv_font_class_t lv_builtin_font_class;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

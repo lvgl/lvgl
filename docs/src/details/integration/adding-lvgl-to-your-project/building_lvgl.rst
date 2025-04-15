@@ -19,7 +19,7 @@ main Makefile:
     include $(LVGL_DIR)/$(LVGL_DIR_NAME)/lvgl.mk
 
 For integration with CMake take a look this section of the
-:ref:`Documentation <build_cmake>`.
+:ref:`Documentation <integrating_lvgl_cmake>`.
 
 
 Managed builds
