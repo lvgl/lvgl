@@ -141,6 +141,7 @@ void test_display_matrix_rotation(void)
 
     lv_display_t * disp = lv_obj_get_display(obj);
     lv_display_set_matrix_rotation(disp, true);
+    TEST_ASSERT_TRUE(lv_display_get_matrix_rotation(disp));
 
     lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
     lv_label_set_text(label, "Rotation: 0 degrees");
