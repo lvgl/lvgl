@@ -140,7 +140,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     }
     lv_area_t clip_coords_for_children;
     bool refr_children = true;
-    if(!lv_area_intersect(&clip_coords_for_children, &clip_area_ori, obj_coords) || layer->opa <= LV_OPA_MIN) {
+    if(!lv_area_intersect(&clip_coords_for_children, &layer->_clip_area, obj_coords) || layer->opa <= LV_OPA_MIN) {
         refr_children = false;
     }
 
@@ -149,7 +149,6 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
         uint32_t child_cnt = lv_obj_get_child_count(obj);
         if(child_cnt == 0) {
             /*If the object was visible on the clip area call the post draw events too*/
-            layer->_clip_area = clip_coords_for_obj;
             /*If all the children are redrawn make 'post draw' draw*/
             lv_obj_send_event(obj, LV_EVENT_DRAW_POST_BEGIN, layer);
             lv_obj_send_event(obj, LV_EVENT_DRAW_POST, layer);
@@ -172,7 +171,6 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                 }
 
                 /*If the object was visible on the clip area call the post draw events too*/
-                layer->_clip_area = clip_coords_for_obj;
                 /*If all the children are redrawn make 'post draw' draw*/
                 lv_obj_send_event(obj, LV_EVENT_DRAW_POST_BEGIN, layer);
                 lv_obj_send_event(obj, LV_EVENT_DRAW_POST, layer);
@@ -193,7 +191,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
 
                 lv_area_t bottom = obj->coords;
                 bottom.y1 = bottom.y2 - rout + 1;
-                if(lv_area_intersect(&bottom, &bottom, &clip_area_ori)) {
+                if(lv_area_intersect(&bottom, &bottom, &layer->_clip_area)) {
                     layer_children = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &bottom);
 
                     for(i = 0; i < child_cnt; i++) {
@@ -214,7 +212,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
 
                 lv_area_t top = obj->coords;
                 top.y2 = top.y1 + rout - 1;
-                if(lv_area_intersect(&top, &top, &clip_area_ori)) {
+                if(lv_area_intersect(&top, &top, &layer->_clip_area)) {
                     layer_children = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &top);
 
                     for(i = 0; i < child_cnt; i++) {
@@ -237,7 +235,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                 lv_area_t mid = obj->coords;
                 mid.y1 += rout;
                 mid.y2 -= rout;
-                if(lv_area_intersect(&mid, &mid, &clip_area_ori)) {
+                if(lv_area_intersect(&mid, &mid, &layer->_clip_area)) {
                     layer->_clip_area = mid;
                     for(i = 0; i < child_cnt; i++) {
                         lv_obj_t * child = obj->spec_attr->children[i];
