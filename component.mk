@@ -58,11 +58,14 @@ COMPONENT_SRCDIRS := . \
                   src/themes/simple \
                   src/widgets \
                   src/widgets/animimg \
+                  src/widgets/arc \
+                  src/widgets/bar \
                   src/widgets/button \
                   src/widgets/buttonmatrix \
                   src/widgets/calendar \
                   src/widgets/canvas \
                   src/widgets/chart \
+                  src/widgets/checkbox \
                   src/widgets/colorwheel \
                   src/widgets/dropdown \
                   src/widgets/image \
@@ -70,13 +73,19 @@ COMPONENT_SRCDIRS := . \
                   src/widgets/keyboard \
                   src/widgets/label \
                   src/widgets/led \
+                  src/widgets/line \
                   src/widgets/list \
                   src/widgets/menu \
                   src/widgets/meter \
                   src/widgets/msgbox \
+                  src/widgets/roller \
+                  src/widgets/scale \
+                  src/widgets/slider \
                   src/widgets/span \
                   src/widgets/spinbox \
                   src/widgets/spinner \
+                  src/widgets/switch \
+                  src/widgets/table \
                   src/widgets/tabview \
                   src/widgets/textarea \
                   src/widgets/tileview \
