@@ -115,6 +115,7 @@ lv_result_t lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** at
         const char * value = attrs[i + 1];
         if(lv_streq(name, "name")) continue;
         if(lv_streq(name, "help")) continue;
+        if(lv_streq(name, "figma_node_id")) continue;
 
         if(value[0] == '#') {
             const char * value_clean = &value[1];
