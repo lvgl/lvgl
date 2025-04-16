@@ -3813,7 +3813,7 @@
                 #define LV_WAYLAND_BUF_COUNT 0
             #endif
         #else
-            #define LV_WAYLAND_BUF_COUNT            1    /*Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode*/
+            #define LV_WAYLAND_BUF_COUNT            1    /**< Use 1 for single buffer with partial render mode or 2 for double buffer with full render mode*/
         #endif
     #endif
     #if LV_WAYLAND_BUF_COUNT == 2
@@ -3825,7 +3825,7 @@
                     #define LV_WAYLAND_USE_DMABUF 0
                 #endif
             #else
-                #define LV_WAYLAND_USE_DMABUF       1    /*Use DMA buffers for frame buffers*/
+                #define LV_WAYLAND_USE_DMABUF       1    /**< Use DMA buffers for frame buffers*/
             #endif
         #endif
     #else
@@ -3841,14 +3841,14 @@
         #ifdef CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
             #define LV_WAYLAND_WINDOW_DECORATIONS CONFIG_LV_WAYLAND_WINDOW_DECORATIONS
         #else
-            #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME */
+            #define LV_WAYLAND_WINDOW_DECORATIONS   0    /**< Draw client side window decorations only necessary on Mutter/GNOME*/
         #endif
     #endif
     #ifndef LV_WAYLAND_WL_SHELL
         #ifdef CONFIG_LV_WAYLAND_WL_SHELL
             #define LV_WAYLAND_WL_SHELL CONFIG_LV_WAYLAND_WL_SHELL
         #else
-            #define LV_WAYLAND_WL_SHELL             0    /**< Use the legacy wl_shell protocol instead of the default XDG shell */
+            #define LV_WAYLAND_WL_SHELL             0    /**< Use the legacy wl_shell protocol instead of the default XDG shell*/
         #endif
     #endif
 #endif
