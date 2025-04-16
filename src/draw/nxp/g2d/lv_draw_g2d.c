@@ -51,7 +51,7 @@ static int32_t _g2d_delete(lv_draw_unit_t * draw_unit);
     static void _g2d_render_thread_cb(void * ptr);
 #endif
 
-static void _g2d_execute_drawing(lv_draw_g2d_unit_t * u);
+static void _g2d_execute_drawing(lv_draw_task_t * t);
 
 /**********************
  *  STATIC VARIABLES
@@ -73,12 +73,17 @@ void lv_draw_g2d_init(void)
     draw_g2d_unit->base_unit.evaluate_cb = _g2d_evaluate;
     draw_g2d_unit->base_unit.dispatch_cb = _g2d_dispatch;
     draw_g2d_unit->base_unit.delete_cb = _g2d_delete;
+    draw_g2d_unit->base_unit.name = "G2D";
     g2d_create_buf_map();
     if(g2d_open(&draw_g2d_unit->g2d_handle)) {
         LV_LOG_ERROR("g2d_open fail.\n");
     }
 #if LV_USE_G2D_DRAW_THREAD
-    lv_thread_init(&draw_g2d_unit->thread, "g2ddraw", LV_DRAW_THREAD_PRIO, _g2d_render_thread_cb, 2 * 1024, draw_g2d_unit);
+    lv_draw_sw_thread_dsc_t * thread_dsc = &draw_g2d_unit->thread_dsc;
+    thread_dsc->idx = 0;
+    thread_dsc->draw_unit = (void *) draw_g2d_unit;
+    lv_thread_init(&thread_dsc->thread, "g2ddraw", LV_DRAW_THREAD_PRIO, _g2d_render_thread_cb, LV_DRAW_THREAD_STACK_SIZE,
+                   thread_dsc);
 #endif
 }
 
@@ -205,9 +210,17 @@ static int32_t _g2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_g2d_unit_t * draw_g2d_unit = (lv_draw_g2d_unit_t *) draw_unit;
 
+#if LV_USE_OS
+    lv_draw_sw_thread_dsc_t * thread_dsc = &draw_g2d_unit->thread_dsc;
+
+    /* Return immediately if it's busy with draw task. */
+    if(thread_dsc->task_act)
+        return 0;
+#else
     /* Return immediately if it's busy with draw task. */
     if(draw_g2d_unit->task_act)
         return 0;
+#endif
 
     /* Try to get an ready to draw. */
     lv_draw_task_t * t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_G2D);
@@ -219,14 +232,18 @@ static int32_t _g2d_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
         return LV_DRAW_UNIT_IDLE;
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    draw_g2d_unit->task_act = t;
+    t->draw_unit = draw_unit;
 
 #if LV_USE_G2D_DRAW_THREAD
+    thread_dsc->task_act = t;
+
     /* Let the render thread work. */
-    if(draw_g2d_unit->inited)
-        lv_thread_sync_signal(&draw_g2d_unit->sync);
+    if(thread_dsc->inited)
+        lv_thread_sync_signal(&thread_dsc->sync);
 #else
-    _g2d_execute_drawing(draw_g2d_unit);
+    draw_g2d_unit->task_act = t;
+
+    _g2d_execute_drawing(t);
 
     draw_g2d_unit->task_act->state = LV_DRAW_TASK_STATE_READY;
     draw_g2d_unit->task_act = NULL;
@@ -244,26 +261,24 @@ static int32_t _g2d_delete(lv_draw_unit_t * draw_unit)
     lv_result_t res = LV_RESULT_OK;
 
 #if LV_USE_G2D_DRAW_THREAD
+    lv_draw_sw_thread_dsc_t * thread_dsc = &draw_g2d_unit->thread_dsc;
     LV_LOG_INFO("Cancel G2D draw thread.");
-    draw_g2d_unit->exit_status = true;
+    thread_dsc->exit_status = true;
 
-    if(draw_g2d_unit->inited)
-        lv_thread_sync_signal(&draw_g2d_unit->sync);
+    if(thread_dsc->inited)
+        lv_thread_sync_signal(&thread_dsc->sync);
 
-    res = lv_thread_delete(&draw_g2d_unit->thread);
+    res = lv_thread_delete(&thread_dsc->thread);
 #endif
     g2d_close(draw_g2d_unit->g2d_handle);
 
     return res;
 }
 
-static void _g2d_execute_drawing(lv_draw_g2d_unit_t * u)
+static void _g2d_execute_drawing(lv_draw_task_t * t)
 {
-    lv_draw_task_t * t = u->task_act;
     lv_layer_t * layer = t->target_layer;
     lv_draw_buf_t * draw_buf = layer->draw_buf;
-
-    t->draw_unit = (lv_draw_unit_t *)u;
 
     /* Invalidate only the drawing area */
     lv_draw_buf_invalidate_cache(draw_buf, NULL);
@@ -283,39 +298,39 @@ static void _g2d_execute_drawing(lv_draw_g2d_unit_t * u)
 #if LV_USE_G2D_DRAW_THREAD
 static void _g2d_render_thread_cb(void * ptr)
 {
-    lv_draw_g2d_unit_t * u = ptr;
+    lv_draw_sw_thread_dsc_t * thread_dsc = ptr;
 
-    lv_thread_sync_init(&u->sync);
-    u->inited = true;
+    lv_thread_sync_init(&thread_dsc->sync);
+    thread_dsc->inited = true;
 
     while(1) {
         /* Wait for sync if there is no task set. */
-        while(u->task_act == NULL) {
-            if(u->exit_status)
+        while(thread_dsc->task_act == NULL) {
+            if(thread_dsc->exit_status)
                 break;
 
-            lv_thread_sync_wait(&u->sync);
+            lv_thread_sync_wait(&thread_dsc->sync);
         }
 
-        if(u->exit_status) {
+        if(thread_dsc->exit_status) {
             LV_LOG_INFO("Ready to exit G2D draw thread.");
             break;
         }
 
-        _g2d_execute_drawing(u);
+        _g2d_execute_drawing(thread_dsc->task_act);
 
         /* Signal the ready state to dispatcher. */
-        u->task_act->state = LV_DRAW_TASK_STATE_READY;
+        thread_dsc->task_act->state = LV_DRAW_TASK_STATE_READY;
 
         /* Cleanup. */
-        u->task_act = NULL;
+        thread_dsc->task_act = NULL;
 
         /* The draw unit is free now. Request a new dispatching as it can get a new task. */
         lv_draw_dispatch_request();
     }
 
-    u->inited = false;
-    lv_thread_sync_delete(&u->sync);
+    thread_dsc->inited = false;
+    lv_thread_sync_delete(&thread_dsc->sync);
     LV_LOG_INFO("Exit G2D draw thread.");
 }
 #endif
