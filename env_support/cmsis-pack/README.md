@@ -58,6 +58,8 @@ remove the misleading guide above this code segment.
    - LV_USE_DEMO_SCROLL
    - LV_USE_DEMO_VECTOR_GRAPHIC
    - LV_USE_DEMO_EBIKE
+   - LV_USE_DEMO_HIGH_RES
+   - LV_USE_DEMO_SMARTWATCH
    - LV_USE_DRAW_VGLITE
    - LV_USE_DRAW_VG_LITE
    - LV_USE_PXP
