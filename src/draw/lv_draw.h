@@ -60,6 +60,9 @@ typedef enum {
 #if LV_USE_VECTOR_GRAPHIC
     LV_DRAW_TASK_TYPE_VECTOR,
 #endif
+#if LV_USE_3DTEXTURE
+    LV_DRAW_TASK_TYPE_3D,
+#endif
 } lv_draw_task_type_t;
 
 typedef enum {
