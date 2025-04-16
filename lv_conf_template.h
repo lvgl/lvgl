@@ -1022,6 +1022,7 @@
     #if LV_USE_PROFILER_BUILTIN
         /** Default profiler trace buffer size */
         #define LV_PROFILER_BUILTIN_BUF_SIZE (16 * 1024)     /**< [bytes] */
+        #define LV_PROFILER_BUILTIN_DEFAULT_ENABLE 1
     #endif
 
     /** Header to include for profiler */
