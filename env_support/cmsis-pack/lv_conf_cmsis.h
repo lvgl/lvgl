@@ -1224,16 +1224,6 @@
  * Demos from lvgl/lv_demos
   ---------------------------*/
 
-/*E-bike demo with Lottie animations (if LV_USE_LOTTIE is enabled)*/
-#if LV_USE_DEMO_EBIKE
-    #define LV_DEMO_EBIKE_PORTRAIT  0    /*0: for 480x270..480x320, 1: for 480x800..720x1280*/
-#endif
-
-/** High-resolution demo */
-#define LV_USE_DEMO_HIGH_RES        0
-
-/* Smart watch demo */
-#define LV_USE_DEMO_SMARTWATCH      0
 
 /*--END OF LV_CONF_H--*/
 
