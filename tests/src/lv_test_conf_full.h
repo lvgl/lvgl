@@ -38,8 +38,8 @@
 #define LV_FONT_MONTSERRAT_48   1
 #define LV_FONT_MONTSERRAT_28_COMPRESSED    1
 #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW    1
-#define LV_FONT_SIMSUN_14_CJK   1
-#define LV_FONT_SIMSUN_16_CJK   1
+#define LV_FONT_SOURCE_HAN_SANS_SC_14_CJK   1
+#define LV_FONT_SOURCE_HAN_SANS_SC_16_CJK   1
 #define LV_FONT_UNSCII_8        1
 #define LV_FONT_UNSCII_16       1
 #define LV_FONT_DEFAULT         &lv_font_montserrat_14
