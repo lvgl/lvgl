@@ -175,11 +175,11 @@ static inline lv_result_t lv_draw_sw_image_helium(
                                         const lv_area_t * coords,
                                         int32_t src_stride,
                                         const lv_area_t * des_area,
-                                        lv_draw_task_t * draw_task,
+                                        lv_draw_task_t * t,
                                         const lv_draw_image_dsc_t * draw_dsc)
 {
     lv_result_t result = LV_RESULT_INVALID;
-    lv_layer_t * layer = draw_task->target_layer;
+    lv_layer_t * layer = t->target_layer;
     lv_color_format_t des_cf = layer->color_format;
     static bool arm_2d_initialized = false;
 
@@ -218,7 +218,7 @@ static inline lv_result_t lv_draw_sw_image_helium(
         /* ------------- prepare parameters for arm-2d APIs - BEGIN --------- */
 
         lv_area_t blend_area;
-        if(!lv_area_intersect(&blend_area, des_area, draw_task->clip_area)) {
+        if(!lv_area_intersect(&blend_area, des_area, &t->clip_area)) {
             break;
         }
 
@@ -268,8 +268,8 @@ static inline lv_result_t lv_draw_sw_image_helium(
 
         target_region = (arm_2d_region_t) {
             .tLocation = {
-                .iX = (int16_t)(coords->x1 - draw_task->clip_area->x1),
-                .iY = (int16_t)(coords->y1 - draw_task->clip_area->y1),
+                .iX = (int16_t)(coords->x1 - t->clip_area.x1),
+                .iY = (int16_t)(coords->y1 - t->clip_area.y1),
             },
             .tSize = src_size,
         };
@@ -289,12 +289,12 @@ static inline lv_result_t lv_draw_sw_image_helium(
 
         clip_region = (arm_2d_region_t) {
             .tLocation = {
-                .iX = (int16_t)(draw_task->clip_area->x1 - layer->buf_area.x1),
-                .iY = (int16_t)(draw_task->clip_area->y1 - layer->buf_area.y1),
+                .iX = (int16_t)(t->clip_area.x1 - layer->buf_area.x1),
+                .iY = (int16_t)(t->clip_area.y1 - layer->buf_area.y1),
             },
             .tSize = {
-                .iWidth = (int16_t)lv_area_get_width(draw_task->clip_area),
-                .iHeight = (int16_t)lv_area_get_height(draw_task->clip_area),
+                .iWidth = (int16_t)lv_area_get_width(&t->clip_area),
+                .iHeight = (int16_t)lv_area_get_height(&t->clip_area),
             },
         };
 
