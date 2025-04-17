@@ -96,6 +96,7 @@ extern "C" {
 #include "src/widgets/label/lv_label_private.h"
 #include "src/widgets/canvas/lv_canvas_private.h"
 #include "src/widgets/tabview/lv_tabview_private.h"
+#include "src/widgets/3dtexture/lv_3dtexture_private.h"
 #include "src/tick/lv_tick_private.h"
 #include "src/stdlib/builtin/lv_tlsf_private.h"
 #include "src/libs/rlottie/lv_rlottie_private.h"

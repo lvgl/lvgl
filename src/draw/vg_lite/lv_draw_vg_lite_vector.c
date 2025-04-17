@@ -245,12 +245,18 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     lv_draw_vg_lite_unit_t * u = ctx;
     LV_VG_LITE_ASSERT_DEST_BUFFER(&u->target_buffer);
 
+    vg_lite_matrix_t matrix = u->global_matrix;
+
+    const lv_area_t scissor_area = lv_matrix_is_identity_or_translation((lv_matrix_t *)&matrix)
+                                   ? dsc->scissor_area
+                                   : lv_matrix_transform_area((lv_matrix_t *)&matrix, &dsc->scissor_area);
+
     /* clear area */
     if(!path) {
         /* clear color needs to ignore fill_dsc.opa */
         vg_lite_color_t c = lv_color32_to_vg(dsc->fill_dsc.color, dsc->fill_dsc.opa);
         vg_lite_rectangle_t rect;
-        lv_vg_lite_rect(&rect, &dsc->scissor_area);
+        lv_vg_lite_rect(&rect, &scissor_area);
         LV_PROFILER_DRAW_BEGIN_TAG("vg_lite_clear");
         LV_VG_LITE_CHECK_ERROR(vg_lite_clear(&u->target_buffer, &rect, c), {
             lv_vg_lite_buffer_dump_info(&u->target_buffer);
@@ -269,8 +275,9 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
     }
 
     /* transform matrix */
-    vg_lite_matrix_t matrix;
-    lv_vg_lite_matrix(&matrix, &dsc->matrix);
+    vg_lite_matrix_t dsc_matrix;
+    lv_vg_lite_matrix(&dsc_matrix, &dsc->matrix);
+    lv_vg_lite_matrix_multiply(&matrix, &dsc_matrix);
     LV_VG_LITE_ASSERT_MATRIX(&matrix);
 
     /* convert path */
@@ -281,9 +288,9 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
 
     if(vg_lite_query_feature(gcFEATURE_BIT_VG_SCISSOR)) {
         /* set scissor area */
-        lv_vg_lite_set_scissor_area(&dsc->scissor_area);
+        lv_vg_lite_set_scissor_area(&scissor_area);
         LV_LOG_TRACE("Set scissor area: X1:%" LV_PRId32 ", Y1:%" LV_PRId32 ", X2:%" LV_PRId32 ", Y2:%" LV_PRId32,
-                     dsc->scissor_area.x1, dsc->scissor_area.y1, dsc->scissor_area.x2, dsc->scissor_area.y2);
+                     scissor_area.x1, scissor_area.y1, scissor_area.x2, scissor_area.y2);
     }
     else {
         /* calc inverse matrix */
@@ -297,11 +304,11 @@ static void task_draw_cb(void * ctx, const lv_vector_path_t * path, const lv_vec
         }
 
         /* Reverse the clip area on the source */
-        lv_point_precise_t p1 = { dsc->scissor_area.x1, dsc->scissor_area.y1 };
+        lv_point_precise_t p1 = { scissor_area.x1, scissor_area.y1 };
         lv_point_precise_t p1_res = lv_vg_lite_matrix_transform_point(&result, &p1);
 
         /* vg-lite bounding_box will crop the pixels on the edge, so +1px is needed here */
-        lv_point_precise_t p2 = { dsc->scissor_area.x2 + 1, dsc->scissor_area.y2 + 1 };
+        lv_point_precise_t p2 = { scissor_area.x2 + 1, scissor_area.y2 + 1 };
         lv_point_precise_t p2_res = lv_vg_lite_matrix_transform_point(&result, &p2);
 
         lv_vg_lite_path_set_bounding_box(lv_vg_path, p1_res.x, p1_res.y, p2_res.x, p2_res.y);

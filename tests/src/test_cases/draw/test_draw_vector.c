@@ -5,6 +5,9 @@
 
 #include "unity/unity.h"
 
+/*Bypassing resolution check*/
+#define TEST_DISPLAY_ROTATION_ASSERT_EQUAL_SCREENSHOT(path) TEST_ASSERT_MESSAGE(lv_test_screenshot_compare(path), path);
+
 void setUp(void)
 {
     /* Function run before every test */
@@ -353,6 +356,38 @@ void test_draw_during_rendering(void)
     lv_obj_add_event_cb(obj, event_cb, LV_EVENT_DRAW_MAIN, NULL);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/vector_draw_during_rendering.png");
+}
+
+void test_draw_display_matrix_rotation(void)
+{
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
+    lv_obj_center(obj);
+    lv_obj_add_event_cb(obj, event_cb, LV_EVENT_DRAW_MAIN, NULL);
+
+    lv_display_t * disp = lv_obj_get_display(obj);
+    lv_display_set_matrix_rotation(disp, true);
+    TEST_ASSERT_TRUE(lv_display_get_matrix_rotation(disp));
+
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
+    TEST_DISPLAY_ROTATION_ASSERT_EQUAL_SCREENSHOT("draw/vector_display_matrix_rotation_0.png");
+
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_90);
+    TEST_DISPLAY_ROTATION_ASSERT_EQUAL_SCREENSHOT("draw/vector_display_matrix_rotation_90.png");
+
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_180);
+    TEST_DISPLAY_ROTATION_ASSERT_EQUAL_SCREENSHOT("draw/vector_display_matrix_rotation_180.png");
+
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_270);
+    TEST_DISPLAY_ROTATION_ASSERT_EQUAL_SCREENSHOT("draw/vector_display_matrix_rotation_270.png");
+
+    lv_display_set_matrix_rotation(disp, false);
+    TEST_ASSERT_FALSE(lv_display_get_matrix_rotation(disp));
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
+    TEST_DISPLAY_ROTATION_ASSERT_EQUAL_SCREENSHOT("draw/vector_display_matrix_rotation_0.png");
+#else
+    TEST_PASS();
+#endif
 }
 
 #endif

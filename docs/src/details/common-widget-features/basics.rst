@@ -146,7 +146,7 @@ it. Therefore, all positions are relative to the parent.
    lv_obj_t * parent = lv_obj_create(lv_screen_active());  /* Create a parent Widget on current screen */
    lv_obj_set_size(parent, 100, 80);                       /* Set size of parent */
 
-   lv_obj_t * obj1 = lv_obj_create(parent);                /* Create a Widget on previously created parent Widget */
+   lv_obj_t * widget1 = lv_obj_create(parent);             /* Create a Widget on previously created parent Widget */
    lv_obj_set_pos(widget1, 10, 10);                        /* Set position of new Widget */
 
 Modify the position of the parent:

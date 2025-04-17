@@ -22,6 +22,7 @@
 #include "../../draw/lv_draw_image.h"
 #include "../../draw/lv_draw_triangle.h"
 #include "../../draw/lv_draw_line.h"
+#include "../../draw/lv_draw_3d.h"
 #include "../../core/lv_obj.h"
 #include "../../core/lv_refr_private.h"
 #include "../../display/lv_display_private.h"
@@ -74,6 +75,10 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
 static unsigned int layer_get_texture(lv_layer_t * layer);
 static unsigned int get_framebuffer(lv_draw_opengles_unit_t * u);
 static unsigned int create_texture(int32_t w, int32_t h, const void * data);
+
+#if LV_USE_3DTEXTURE
+    static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -223,7 +228,7 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
     }
 
     /*If not refreshing the display probably it's a canvas rendering
-     *which his not support in SDL as it's not a texture.*/
+     *which his not supported in OpenGL as it's not a texture.*/
     if(lv_refr_get_disp_refreshing() == NULL) return 0;
 
     if(((lv_draw_dsc_base_t *)task->draw_dsc)->user_data == NULL) {
@@ -371,7 +376,7 @@ static bool draw_to_texture(lv_draw_opengles_unit_t * u, cache_data_t * cache_da
     cache_data->texture = texture;
 
     if(obj) {
-        lv_obj_update_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS, original_send_draw_task_event);
+        lv_obj_set_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS, original_send_draw_task_event);
     }
 
     return true;
@@ -548,6 +553,13 @@ static void execute_drawing(lv_draw_opengles_unit_t * u)
         return;
     }
 
+#if LV_USE_3DTEXTURE
+    if(t->type == LV_DRAW_TASK_TYPE_3D) {
+        lv_draw_opengles_3d(t, t->draw_dsc, &t->area);
+        return;
+    }
+#endif
+
     draw_from_cached_texture(t);
 }
 
@@ -588,5 +600,33 @@ static unsigned int create_texture(int32_t w, int32_t h, const void * data)
 
     return texture;
 }
+
+#if LV_USE_3DTEXTURE
+static void lv_draw_opengles_3d(lv_draw_task_t * t, const lv_draw_3d_dsc_t * dsc, const lv_area_t * coords)
+{
+    lv_draw_opengles_unit_t * u = (lv_draw_opengles_unit_t *) t->draw_unit;
+
+    lv_layer_t * dest_layer = t->target_layer;
+    unsigned int target_texture = layer_get_texture(dest_layer);
+    LV_ASSERT(target_texture != 0);
+    int32_t targ_tex_w = lv_area_get_width(&dest_layer->buf_area);
+    int32_t targ_tex_h = lv_area_get_height(&dest_layer->buf_area);
+
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, target_texture));
+
+    unsigned int framebuffer = get_framebuffer(u);
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
+    GL_CALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, target_texture, 0));
+
+    lv_opengles_viewport(0, 0, targ_tex_w, targ_tex_h);
+    lv_area_t clip_area = t->clip_area;
+    lv_area_move(&clip_area, -dest_layer->buf_area.x1, -dest_layer->buf_area.y1);
+
+    lv_opengles_render_texture(dsc->tex_id, coords, dsc->opa, targ_tex_w, targ_tex_h, &clip_area, true);
+
+    GL_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+    GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
+}
+#endif /*LV_USE_3DTEXTURE*/
 
 #endif /*LV_USE_DRAW_OPENGLES*/
