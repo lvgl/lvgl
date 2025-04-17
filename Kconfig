@@ -1518,12 +1518,18 @@ menu "LVGL configuration"
 			default n
 
 		config LV_USE_PERF_MONITOR
-			bool "Show CPU usage and FPS count"
+			bool "Collect CPU usage and FPS count"
 			depends on LV_USE_SYSMON
+
+		config LV_PERF_MONITOR_SERVICE_ONLY
+			bool "Only provide performance data service for other components"
+			depends on LV_USE_PERF_MONITOR
+			default n
 
 		choice
 			prompt "Performance monitor position"
 			depends on LV_USE_PERF_MONITOR
+			depends on !LV_PERF_MONITOR_SERVICE_ONLY
 			default LV_PERF_MONITOR_ALIGN_BOTTOM_RIGHT
 
 			config LV_PERF_MONITOR_ALIGN_TOP_LEFT
@@ -1549,6 +1555,7 @@ menu "LVGL configuration"
 		config LV_USE_PERF_MONITOR_LOG_MODE
 			bool "Prints performance data using log"
 			depends on LV_USE_PERF_MONITOR
+			depends on !LV_PERF_MONITOR_SERVICE_ONLY
 			default n
 
 		config LV_USE_MEM_MONITOR

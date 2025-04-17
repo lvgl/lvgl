@@ -37,7 +37,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-#if LV_USE_PERF_MONITOR
+#if LV_USE_PERF_MONITOR && !LV_PERF_MONITOR_SERVICE_ONLY
     static void perf_update_timer_cb(lv_timer_t * t);
     static void perf_observer_cb(lv_observer_t * observer, lv_subject_t * subject);
     static void perf_monitor_disp_event_cb(lv_event_t * e);
@@ -97,7 +97,7 @@ lv_obj_t * lv_sysmon_create(lv_display_t * disp)
     return label;
 }
 
-#if LV_USE_PERF_MONITOR
+#if LV_USE_PERF_MONITOR && !LV_PERF_MONITOR_SERVICE_ONLY
 
 void lv_sysmon_show_performance(lv_display_t * disp)
 {
@@ -210,7 +210,7 @@ void lv_sysmon_hide_memory(lv_display_t * disp)
  *   STATIC FUNCTIONS
  **********************/
 
-#if LV_USE_PERF_MONITOR
+#if LV_USE_PERF_MONITOR && !LV_PERF_MONITOR_SERVICE_ONLY
 
 static void perf_monitor_disp_event_cb(lv_event_t * e)
 {

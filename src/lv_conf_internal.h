@@ -3259,6 +3259,15 @@
         #endif
     #endif
     #if LV_USE_PERF_MONITOR
+        #ifndef LV_PERF_MONITOR_SERVICE_ONLY
+            #ifdef CONFIG_LV_PERF_MONITOR_SERVICE_ONLY
+                #define LV_PERF_MONITOR_SERVICE_ONLY CONFIG_LV_PERF_MONITOR_SERVICE_ONLY
+            #else
+                #define LV_PERF_MONITOR_SERVICE_ONLY 0
+            #endif
+        #endif
+    #endif
+    #if LV_USE_PERF_MONITOR && !LV_PERF_MONITOR_SERVICE_ONLY
         #ifndef LV_USE_PERF_MONITOR_POS
             #ifdef CONFIG_LV_USE_PERF_MONITOR_POS
                 #define LV_USE_PERF_MONITOR_POS CONFIG_LV_USE_PERF_MONITOR_POS

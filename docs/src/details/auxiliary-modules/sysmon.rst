@@ -102,6 +102,12 @@ Custom Performance Monitor without Binding to Label
     /* Destroy the performance monitor */
     lv_sysmon_perf_destroy(perf);
 
+If you just want to totally disable the label and just use the performance monitor by yourself, enable in ``lv_conf.h``:
+
+.. code-block:: c
+
+    #define LV_PERF_MONITOR_SERVICE_ONLY 1
+
 Pause and Resume
 ****************
 

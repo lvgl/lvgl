@@ -1030,6 +1030,9 @@
      *  - Requires `LV_USE_SYSMON = 1` */
     #define LV_USE_PERF_MONITOR 0
     #if LV_USE_PERF_MONITOR
+        #define LV_PERF_MONITOR_SERVICE_ONLY 0
+    #endif
+    #if LV_USE_PERF_MONITOR && !LV_PERF_MONITOR_SERVICE_ONLY
         #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
 
         /** 0: Displays performance data on the screen; 1: Prints performance data using log. */
