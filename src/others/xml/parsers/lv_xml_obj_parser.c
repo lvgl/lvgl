@@ -107,6 +107,15 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
         else if(lv_streq("flex_in_new_track", name))    lv_obj_set_flag(item, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK,
                                                                             lv_xml_to_bool(value));
 
+        else if(lv_streq("checked", name))  lv_obj_set_state(item, LV_STATE_CHECKED, lv_xml_to_bool(value));
+        else if(lv_streq("focused", name))  lv_obj_set_state(item, LV_STATE_FOCUSED, lv_xml_to_bool(value));
+        else if(lv_streq("focus_key", name)) lv_obj_set_state(item, LV_STATE_FOCUS_KEY, lv_xml_to_bool(value));
+        else if(lv_streq("edited", name))   lv_obj_set_state(item, LV_STATE_EDITED, lv_xml_to_bool(value));
+        else if(lv_streq("hovered", name))  lv_obj_set_state(item, LV_STATE_HOVERED, lv_xml_to_bool(value));
+        else if(lv_streq("pressed", name))  lv_obj_set_state(item, LV_STATE_PRESSED, lv_xml_to_bool(value));
+        else if(lv_streq("scrolled", name)) lv_obj_set_state(item, LV_STATE_SCROLLED, lv_xml_to_bool(value));
+        else if(lv_streq("disabled", name)) lv_obj_set_state(item, LV_STATE_DISABLED, lv_xml_to_bool(value));
+
         else if(lv_streq("styles", name)) lv_xml_style_add_to_obj(state, item, value);
 
         else if(lv_strlen(name) > 6 && lv_memcmp("style_", name, 6) == 0) {
