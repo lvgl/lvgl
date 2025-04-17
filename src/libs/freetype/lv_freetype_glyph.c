@@ -117,6 +117,21 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
         g_dsc->adv_w = g_dsc->box_w + g_dsc->ofs_x;
     }
 
+    if(dsc->kerning == LV_FONT_KERNING_NORMAL && dsc->cache_node->face_has_kerning && unicode_letter_next != '\0') {
+        lv_mutex_lock(&dsc->cache_node->face_lock);
+        FT_Face face = dsc->cache_node->face;
+        FT_UInt glyph_index_next = FT_Get_Char_Index(face, unicode_letter_next);
+        FT_Vector kerning;
+        FT_Error error = FT_Get_Kerning(face, g_dsc->gid.index, glyph_index_next, FT_KERNING_DEFAULT, &kerning);
+        if(!error) {
+            g_dsc->adv_w += LV_FREETYPE_F26DOT6_TO_INT(kerning.x);
+        }
+        else {
+            FT_ERROR_MSG("FT_Get_Kerning", error);
+        }
+        lv_mutex_unlock(&dsc->cache_node->face_lock);
+    }
+
     g_dsc->entry = NULL;
 
     lv_cache_release(glyph_cache, entry, NULL);
