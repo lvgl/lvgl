@@ -70,9 +70,7 @@ void lv_xml_image_apply(lv_xml_parser_state_t * state, const char ** attrs)
             int32_t y = lv_xml_atoi_split(&value, ' ');
             lv_image_set_pivot(item, x, y);
         }
-
     }
-
 }
 
 /**********************
