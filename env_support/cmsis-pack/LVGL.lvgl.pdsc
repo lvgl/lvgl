@@ -466,6 +466,7 @@
 
                 <!-- src/draw -->
                 <file category="sourceC"            name="src/draw/lv_draw.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_3d.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_arc.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_buf.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_image.c" />
@@ -654,6 +655,7 @@
                 <file category="sourceC"            name="src/widgets/textarea/lv_textarea.c" />
                 <file category="sourceC"            name="src/widgets/tileview/lv_tileview.c" />
                 <file category="sourceC"            name="src/widgets/win/lv_win.c" />
+                <file category="sourceC"            name="src/widgets/3dtexture/lv_3dtexture.c" />
                 
                 <file category="sourceC"            name="src/widgets/property/lv_image_properties.c" />
                 <file category="sourceC"            name="src/widgets/property/lv_obj_properties.c" />
@@ -1745,10 +1747,12 @@
                 <file category="sourceC"    name="src/others/xml/lv_xml_widget.c" />
                 
                 <!-- src/others/xml/parsers -->
+                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_arc_parser.c" />
                 <file category="sourceC"    name="src/others/xml/parsers/lv_xml_bar_parser.c" />
                 <file category="sourceC"    name="src/others/xml/parsers/lv_xml_button_parser.c" />
                 <file category="sourceC"    name="src/others/xml/parsers/lv_xml_buttonmatrix_parser.c" />
                 <file category="sourceC"    name="src/others/xml/parsers/lv_xml_chart_parser.c" />
+                <file category="sourceC"    name="src/others/xml/parsers/lv_xml_checkbox_parser.c" />
                 <file category="sourceC"    name="src/others/xml/parsers/lv_xml_dropdown_parser.c" />
                 <file category="sourceC"    name="src/others/xml/parsers/lv_xml_event_parser.c" />
                 <file category="sourceC"    name="src/others/xml/parsers/lv_xml_image_parser.c" />
