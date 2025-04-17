@@ -126,11 +126,16 @@ void lv_freetype_uninit(void)
 lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_render_mode_t render_mode, uint32_t size,
                                     lv_freetype_font_style_t style)
 {
-    LV_ASSERT_NULL(pathname);
-    LV_ASSERT(size > 0);
+    size_t pathname_len = pathname ? lv_strlen(pathname) : 0;
+    if(pathname_len == 0) {
+        LV_LOG_ERROR("font pathname can't be empty");
+        return NULL;
+    }
 
-    size_t pathname_len = lv_strlen(pathname);
-    LV_ASSERT(pathname_len > 0);
+    if(size == 0) {
+        LV_LOG_ERROR("font size can't be zero");
+        return NULL;
+    }
 
     lv_freetype_context_t * ctx = lv_freetype_get_context();
 
