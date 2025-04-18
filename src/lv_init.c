@@ -357,7 +357,7 @@ void lv_init(void)
     lv_fs_uefi_init();
 #endif
 
-    /*Use the earlier initialized position of FFmpeg deocder as a fallback decoder*/
+    /*Use the earlier initialized position of FFmpeg decoder as a fallback decoder*/
 #if LV_USE_FFMPEG
     lv_ffmpeg_init();
 #endif

@@ -79,11 +79,11 @@
 #define LV_USE_BMP          1
 #define LV_USE_TJPGD        1
 #ifndef _WIN32
-    #define LV_USE_LIBJPEG_TURBO   1
+    #define LV_USE_LIBJPEG_TURBO       1
+    #define LV_USE_FFMPEG              1
+    #define LV_FFMPEG_DUMP_FORMAT      1
+    #define LV_FFMPEG_PLAYER_USE_LV_FS 1
 #endif
-#define LV_USE_FFMPEG       1
-#define LV_FFMPEG_DUMP_FORMAT 1
-#define LV_FFMPEG_PLAYER_USE_LV_FS 1
 #define LV_USE_GIF          1
 #define LV_USE_QRCODE       1
 #define LV_USE_BARCODE      1
