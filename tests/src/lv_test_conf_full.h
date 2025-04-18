@@ -81,7 +81,7 @@
 #ifndef _WIN32
     #define LV_USE_LIBJPEG_TURBO       1
 #endif
-#if !defined(NON_AMD64_BUILD) && !defined(_MSC_VER) && !defined(_WIN32)
+#if !defined(_MSC_VER) && !defined(_WIN32)
     #define LV_USE_FFMPEG              1
     #define LV_FFMPEG_DUMP_FORMAT      1
     #define LV_FFMPEG_PLAYER_USE_LV_FS 1

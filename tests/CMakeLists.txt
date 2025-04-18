@@ -358,7 +358,7 @@ endif()
 find_package(PNG REQUIRED)
 include_directories(${PNG_INCLUDE_DIR})
 
-if(NOT WIN32 AND NOT $ENV{NON_AMD64_BUILD})
+if(NOT WIN32)
     # FFmeg is required for the video test case
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(FFMPEG REQUIRED libavformat libavcodec libswscale libavutil)
