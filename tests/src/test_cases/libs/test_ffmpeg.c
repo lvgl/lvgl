@@ -43,7 +43,7 @@ static void create_images(void)
     create_image_item(screen, "A:src/test_assets/test_img_lvgl_logo_8bit_palette.png", "PNG File (8 bit palette)");
 }
 
-void test_ffmepg_image_decoder_1(void)
+void test_ffmpeg_image_decoder_1(void)
 {
     /* Temporarily remove other decoder */
 #if LV_USE_LODEPNG
@@ -83,7 +83,7 @@ void test_ffmepg_image_decoder_1(void)
     lv_obj_clean(lv_screen_active());
 }
 
-void test_ffmepg_player_1(void)
+void test_ffmpeg_player_1(void)
 {
     lv_obj_t * player = lv_ffmpeg_player_create(lv_screen_active());
     lv_ffmpeg_player_set_auto_restart(player, true);
@@ -133,11 +133,11 @@ void tearDown(void)
 {
 }
 
-void test_ffmepg_image_decoder_1(void)
+void test_ffmpeg_image_decoder_1(void)
 {
 }
 
-void test_ffmepg_player_1(void)
+void test_ffmpeg_player_1(void)
 {
 }
 
