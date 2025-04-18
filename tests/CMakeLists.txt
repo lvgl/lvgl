@@ -362,6 +362,11 @@ include_directories(${PNG_INCLUDE_DIR})
 find_package(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
 
+# FFmeg is required for the video test case
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(FFMPEG REQUIRED libavformat libavcodec libswscale libavutil)
+include_directories(${FFMPEG_INCLUDE_DIRS})
+
 if(OPTIONS_SDL)
     find_package(SDL2 REQUIRED)
     include_directories(${SDL2_INCLUDE_DIRS})
@@ -479,6 +484,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
             ${LIBDRM_LIBRARIES}
             ${LIBINPUT_LIBRARIES}
             ${JPEG_LIBRARIES}
+            ${FFMPEG_LIBRARIES}
             m
             pthread
             ${TEST_LIBS})

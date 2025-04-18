@@ -1,6 +1,6 @@
 #include "../../lv_examples.h"
 #if LV_BUILD_EXAMPLES
-#if LV_USE_FFMPEG
+#if LV_USE_FFMPEG && LV_FFMPEG_PLAYER_USE_LV_FS
 
 /**
  * Open an image from a file
@@ -11,7 +11,7 @@ void lv_example_ffmpeg_1(void)
      *to open the image, unlike `lv_ffmpeg_player_set_src` which depends on
      *the setting of `LV_FFMPEG_PLAYER_USE_LV_FS`.*/
     lv_obj_t * img = lv_image_create(lv_screen_active());
-    lv_image_set_src(img, "./lvgl/examples/libs/ffmpeg/ffmpeg.png");
+    lv_image_set_src(img, "A:lvgl/examples/libs/ffmpeg/ffmpeg.png");
     lv_obj_center(img);
 }
 
