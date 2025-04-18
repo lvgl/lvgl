@@ -336,11 +336,6 @@ if(NOT WIN32)
     find_package(JPEG REQUIRED)
     include_directories(${JPEG_INCLUDE_DIR})
 
-    # FFmeg is required for the video test case
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(FFMPEG REQUIRED libavformat libavcodec libswscale libavutil)
-    include_directories(${FFMPEG_INCLUDE_DIRS})
-
     # Wayland
     find_package(PkgConfig)
     pkg_check_modules(wayland_client wayland-client)
@@ -362,6 +357,13 @@ endif()
 # libpng is required for the png test case
 find_package(PNG REQUIRED)
 include_directories(${PNG_INCLUDE_DIR})
+
+if(NOT WIN32 AND NOT $ENV{NON_AMD64_BUILD})
+    # FFmeg is required for the video test case
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(FFMPEG REQUIRED libavformat libavcodec libswscale libavutil)
+    include_directories(${FFMPEG_INCLUDE_DIRS})
+endif()
 
 # libfreetype is required for the font test case
 find_package(Freetype REQUIRED)
