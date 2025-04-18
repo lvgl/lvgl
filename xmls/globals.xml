@@ -1,15 +1,30 @@
 <api>
-    <enumdef name="lv_style_state">
+    <enumdef name="lv_state">
         <enum name="default" help="Some help"/>
         <enum name="pressed" help="Some help"/>
         <enum name="checked" help="Some help"/>
+        <enum name="hovered" help="Some help"/>
+        <enum name="scrolled" help="Some help"/>
+        <enum name="disabled" help="Some help"/>
+        <enum name="focused" help="Some help"/>
+        <enum name="focus_key" help="Some help"/>
+        <enum name="edited" help="Some help"/>
+        <enum name="user_1" help="Some help"/>
+        <enum name="user_2" help="Some help"/>
+        <enum name="user_3" help="Some help"/>
+        <enum name="user_4" help="Some help"/>
     </enumdef>
-    <enumdef name="lv_style_part">
+
+    <enumdef name="lv_part">
         <enum name="main" help="Some help"/>
         <enum name="scrollbar" help="Some help"/>
         <enum name="indicator" help="Some help"/>
         <enum name="knob" help="Some help"/>
+        <enum name="selected" help="Some help"/>
+        <enum name="cursor" help="Some help"/>
+        <enum name="items" help="Some help"/>
     </enumdef>
+
     <enumdef name="lv_align">
         <enum name="default" help="Some help"/>
         <enum name="top_left" help="Some help"/>

@@ -5,6 +5,40 @@ Example
 
 <widget>
 	<api>
+		<enumdef name="lv_obj_flag">
+		    <enum name="hidden"       help="Make the object hidden. (Like it wasn't there at all)"/>
+		    <enum name="clickable"       help="Make the object clickable by the input devices"/>
+		    <enum name="click_focusable" help="Add focused state to the object when clicked"/>
+		    <enum name="checkable"       help="Toggle checked state when the object is clicked"/>
+		    <enum name="scrollable"      help="Make the object scrollable"/>
+		    <enum name="scroll_elastic"  help="Allow scrolling inside but with slower speed"/>
+		    <enum name="scroll_momentum" help="Make the object scroll further when 'thrown'"/>
+		    <enum name="scroll_one"      help="Allow scrolling only one snappable children"/>
+		    <enum name="scroll_chain_hor" help="Allow propagating the horizontal scroll to a parent"/>
+		    <enum name="scroll_chain_ver" help="Allow propagating the vertical scroll to a parent"/>
+		    <enum name="scroll_chain"      help="SCROLL_CHAIN_HOR and SCROLL_CHAIN_VER"/>
+		    <enum name="scroll_on_focus" help="Automatically scroll object to make it visible when focused"/>
+		    <enum name="scroll_with_arrow"  help="Allow scrolling the focused object with arrow keys"/>
+		    <enum name="snappable"       help="If scroll snap is enabled on the parent it can snap to this object"/>
+		    <enum name="press_lock"      help="Keep the object pressed even if the press slid from the object"/>
+		    <enum name="event_bubble"    help="Propagate the events to the parent too"/>
+		    <enum name="gesture_bubble"  help="Propagate the gestures to the parent"/>
+		    <enum name="adv_hittest"     help="Allow performing more accurate hit (click) test. E.g. consider rounded corners."/>
+		    <enum name="ignore_layout"   help="Make the object not positioned by the layouts"/>
+		    <enum name="floating"        help="Do not scroll the object when the parent scrolls and ignore layout"/>
+		    <enum name="send_draw_task_evenTS" help="Send `LV_EVENT_DRAW_TASK_ADDED` events"/>
+		    <enum name="overflow_visible" help="Do not clip the children to the parent's ext draw size"/>
+		    <enum name="flex_in_new_track" help="Start a new flex track on this item"/>
+		    <enum name="layout_1"        help="Custom flag, free to use by layouts"/>
+		    <enum name="layout_2"        help="Custom flag, free to use by layouts"/>
+		    <enum name="widget_1"        help="Custom flag, free to use by widget"/>
+		    <enum name="widget_2"        help="Custom flag, free to use by widget"/>
+		    <enum name="user_1"          help="Custom flag, free to use by user"/>
+		    <enum name="user_2"          help="Custom flag, free to use by user"/>
+		    <enum name="user_3"          help="Custom flag, free to use by user"/>
+		    <enum name="user_4"          help="Custom flag, free to use by user"/>
+		</enumdef>
+
 	    <prop name="name" type="string"/>
 	    <prop name="store" type="bool"/>
 	    <prop name="x" type="coords"/>
@@ -97,5 +131,67 @@ Example
 	    <prop name="send_draw_task_events" type="flag:flag lv_obj_flag"/>
 	    <prop name="overflow_visible" 	type="flag:flag lv_obj_flag"/>
 	    <prop name="flex_in_new_track" 	type="flag:flag lv_obj_flag"/>
+
+	    <prop name="bind_checked" type="subject"/>
+	    <prop name="bind_flag_if_eq">
+	    	<param name="subject" type="subject"/>
+	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="ref_value" type="int"/>
+	    </prop>
+	    <prop name="bind_flag_if_not_eq">
+	    	<param name="subject" type="subject"/>
+	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="ref_value" type="int"/>
+	    </prop>
+	    <prop name="bind_flag_if_gt">
+	    	<param name="subject" type="subject"/>
+	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="ref_value" type="int"/>
+	    </prop>
+	    <prop name="bind_flag_if_ge">
+	    	<param name="subject" type="subject"/>
+	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="ref_value" type="int"/>
+	    </prop>
+	    <prop name="bind_flag_if_lt">
+	    	<param name="subject" type="subject"/>
+	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="ref_value" type="int"/>
+	    </prop>
+	    <prop name="bind_flag_if_le">
+	    	<param name="subject" type="subject"/>
+	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="ref_value" type="int"/>
+	    </prop>
+	    <prop name="bind_state_if_eq">
+	    	<param name="subject" type="subject"/>
+	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="ref_value" type="int"/>
+	    </prop>
+	    <prop name="bind_state_if_not_eq">
+	    	<param name="subject" type="subject"/>
+	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="ref_value" type="int"/>
+	    </prop>
+	    <prop name="bind_state_if_gt">
+	    	<param name="subject" type="subject"/>
+	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="ref_value" type="int"/>
+	    </prop>
+	    <prop name="bind_state_if_ge">
+	    	<param name="subject" type="subject"/>
+	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="ref_value" type="int"/>
+	    </prop>
+	    <prop name="bind_state_if_lt">
+	    	<param name="subject" type="subject"/>
+	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="ref_value" type="int"/>
+	    </prop>
+	    <prop name="bind_state_if_le">
+	    	<param name="subject" type="subject"/>
+	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="ref_value" type="int"/>
+	    </prop>
 	</api>
 </widget>
