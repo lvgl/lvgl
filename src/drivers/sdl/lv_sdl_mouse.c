@@ -36,7 +36,7 @@ static void release_indev_cb(lv_event_t * e);
     /* A counter that needs to be incremented each time a touch event is received */
     static uint8_t touch_cnt;
 
-    static void lv_sdl_touch_gesture_queue_add(SDL_Event *event);
+    static void lv_sdl_touch_gesture_queue_add(SDL_Event * event);
     static void lv_sdl_touch_gesture_read(lv_indev_t * indev, lv_indev_data_t * data);
 
 #endif
@@ -242,7 +242,7 @@ void lv_sdl_mouse_handler(SDL_Event * event)
 
 #if LV_USE_GESTURE_RECOGNITION
 
-static void lv_sdl_touch_gesture_queue_add(SDL_Event *event)
+static void lv_sdl_touch_gesture_queue_add(SDL_Event * event)
 {
     lv_indev_touch_data_t * cur;
     lv_indev_touch_data_t * t;
