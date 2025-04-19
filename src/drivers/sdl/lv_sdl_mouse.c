@@ -12,7 +12,7 @@
 #include "../../core/lv_group.h"
 #include "../../stdlib/lv_string.h"
 #include "lv_sdl_private.h"
-#include "libs/lvgl/src/indev/lv_indev_private.h"
+#include "../../indev/lv_indev_private.h"
 
 /*********************
  *      DEFINES
