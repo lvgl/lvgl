@@ -140,7 +140,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     }
     lv_area_t clip_coords_for_children;
     bool refr_children = true;
-    if(!lv_area_intersect(&clip_coords_for_children, &clip_area_ori, obj_coords)) {
+    if(!lv_area_intersect(&clip_coords_for_children, &clip_area_ori, obj_coords) || layer->opa <= LV_OPA_MIN) {
         refr_children = false;
     }
 
