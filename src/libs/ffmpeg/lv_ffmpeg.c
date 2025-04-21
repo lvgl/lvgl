@@ -188,6 +188,7 @@ lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
     if(ffmpeg_image_allocate(player->ffmpeg_ctx) < 0) {
         LV_LOG_ERROR("ffmpeg image allocate failed");
         ffmpeg_close(player->ffmpeg_ctx);
+        player->ffmpeg_ctx = NULL;
         goto failed;
     }
 
