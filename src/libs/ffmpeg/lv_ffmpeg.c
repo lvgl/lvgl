@@ -659,7 +659,7 @@ static int ffmpeg_get_frame_refr_period(struct ffmpeg_context_s * ffmpeg_ctx)
 {
     int avg_frame_rate_num = ffmpeg_ctx->video_stream->avg_frame_rate.num;
     if(avg_frame_rate_num > 0) {
-        int period = 1000 * (int64_t)(ffmpeg_ctx->video_stream->avg_frame_rate.den + 1)
+        int period = 1000 * (int64_t)ffmpeg_ctx->video_stream->avg_frame_rate.den
                      / avg_frame_rate_num;
         return period;
     }
