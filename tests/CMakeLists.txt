@@ -359,10 +359,18 @@ find_package(PNG REQUIRED)
 include_directories(${PNG_INCLUDE_DIR})
 
 if(NOT WIN32)
-    # FFmeg is required for the video test case
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(FFMPEG REQUIRED libavformat libavcodec libswscale libavutil)
-    include_directories(${FFMPEG_INCLUDE_DIRS})
+    # FFmpeg is optional for the image and video test cases
+    find_package(PkgConfig)
+    pkg_check_modules(FFMPEG libavformat libavcodec libswscale libavutil)
+    if(FFMPEG_FOUND)
+        include_directories(${FFMPEG_INCLUDE_DIRS})
+    else()
+        message("FFmpeg not found, defaulting to 0")
+        add_definitions(-DLV_USE_FFMPEG=0)
+    endif()
+else()
+    message("Disable FFmpeg for Windows")
+    add_definitions(-DLV_USE_FFMPEG=0)
 endif()
 
 # libfreetype is required for the font test case
