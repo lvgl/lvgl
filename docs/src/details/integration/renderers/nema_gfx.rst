@@ -34,13 +34,21 @@ by right-clicking the project in the "Project Explorer" sidebar, clicking
 "Properties", navigating to "C/C++ Build", "Settings", "MCU G++ Linker", and then
 "Libraries". Add an entry under "Libraries (-l)" that is "nemagfx-float-abi-hard".
 Add an entry under "Library search path (-L)" which is a path to
-"libs/nema_gfx/lib/core/cortex_m33/gcc" e.g.
-"${workspace_loc:/${ProjName}/Middlewares/LVGL/lvgl/libs/nema_gfx/lib/core/cortex_m33/gcc}".
+"libs/nema_gfx/lib/core/cortex_m33_revC/gcc" e.g.
+"${workspace_loc:/${ProjName}/Middlewares/LVGL/lvgl/libs/nema_gfx/lib/core/cortex_m33_revC/gcc}".
 You will also want to add the "libs/nema_gfx/include" directory to your include
 search paths. Under "MCU GCC Compiler", "Include paths", add an entry to "Include paths (-I)"
 which is a path to "libs/nema_gfx/include" e.g.
 "${workspace_loc:/${ProjName}/Middlewares/LVGL/lvgl/libs/nema_gfx/include}".
 Click "Apply and Close".
+
+.. note::
+
+    ``cannot find -lnemagfx-float-abi-hard: No such file or directory``
+
+    The library version for ST was updated to ``revC`` so the path component
+    ``cortex_m33`` must be updated to ``cortex_m33_revC`` in STM32CubeIDE.
+
 
 32 and 16 bit :c:macro:`LV_COLOR_DEPTH` is supported.
 
