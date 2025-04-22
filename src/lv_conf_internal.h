@@ -3247,6 +3247,17 @@
                 #define LV_PROFILER_BUILTIN_BUF_SIZE (16 * 1024)     /**< [bytes] */
             #endif
         #endif
+        #ifndef LV_PROFILER_BUILTIN_DEFAULT_ENABLE
+            #ifdef LV_KCONFIG_PRESENT
+                #ifdef CONFIG_LV_PROFILER_BUILTIN_DEFAULT_ENABLE
+                    #define LV_PROFILER_BUILTIN_DEFAULT_ENABLE CONFIG_LV_PROFILER_BUILTIN_DEFAULT_ENABLE
+                #else
+                    #define LV_PROFILER_BUILTIN_DEFAULT_ENABLE 0
+                #endif
+            #else
+                #define LV_PROFILER_BUILTIN_DEFAULT_ENABLE 1
+            #endif
+        #endif
     #endif
 
     /** Header to include for profiler */

@@ -1556,6 +1556,10 @@ menu "LVGL configuration"
 			int "Default profiler trace buffer size in bytes"
 			depends on LV_USE_PROFILER_BUILTIN
 			default 16384
+		config LV_PROFILER_BUILTIN_DEFAULT_ENABLE
+			bool "Enable built-in profiler by default"
+			depends on LV_USE_PROFILER_BUILTIN
+			default y
 		config LV_PROFILER_INCLUDE
 			string "Header to include for the profiler"
 			default "lvgl/src/misc/lv_profiler_builtin.h"
