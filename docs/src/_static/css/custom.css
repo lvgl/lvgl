@@ -1,3 +1,23 @@
+/*-------------------------------------------------------------------------
+ * Connect FontAwesome file with FontAwesome family name.  Supplements
+ * fontawesome.min.css.  Without this, the codes like `fa-github` don't
+ # work in the Furo theme as they did with RTD theme.
+ *-------------------------------------------------------------------------*/
+@font-face {
+  font-family: FontAwesome;
+  src:
+    url("../fonts/fontawesome-webfont.woff2") format("woff2"),
+    url("../fonts/fontawesome-webfont.woff") format("woff"),
+}
+
+.fa {
+  font-family: FontAwesome, "Lato", "proxima-nova", "Helvetica Neue", Arial, sans-serif;
+  cursor: pointer;
+}
+
+/*-------------------------------------------------------------------------
+ * Routine Element Overrides
+ *-------------------------------------------------------------------------*/
 table, th, td {
   border: 1px solid #bbb;
   padding: 10px;
@@ -35,36 +55,14 @@ code.sig-name {
 }
 
 /*-------------------------------------------------------------------------
- * All `wy-...` and `rst-content` classes are classes from
- * `sphinx_rtd_theme` `layout.html` template.
- *-------------------------------------------------------------------------
- * `wy-side-nav-search` class adorns the <div> element in the upper left
- * corner of each page that contains:
- * - the LVGL logo
- * - documentation-version selector drop-down (matches LVGL release versions)
- * - search TextBox
- */
-.wy-side-nav-search {
-  background-color: #f5f5f5;
-}
-
-.wy-side-nav-search > div.version {
-  color: #333;
-  display: none;                               /*replaced by dropdown*/
-}
-
-/* `rst-content` class marks the <div> element that contains the whole
- * visible part of the right panel where the page content is shown. */
-/*Let `code` wrap*/
-.rst-content code, .rst-content tt, code {
-  white-space: normal;
-}
-
-.wy-nav-content {
-  padding: 1.618em 3.236em;
-  height: 100%;
-  max-width: 1920px;
-  margin: auto
+ * Version Dropdown Styling
+ *-------------------------------------------------------------------------*/
+#version_dropdown {
+  background-color: var(--color-sidebar-background);
+  color: var(--color-foreground-primary);
+  margin: 4px 0;
+  width: 150px;
+  border-radius: 5px;
 }
 
 /*-------------------------------------------------------------------------
@@ -200,14 +198,6 @@ code.sig-name {
 }
 
 /*-------------------------------------------------------------------------
- * This doesn't select anything at this writing (29-Mar-2025).
- *-------------------------------------------------------------------------
- */
-dl.cpp.unexpanded dd {
-  display: none;
-}
-
-/*-------------------------------------------------------------------------
  * The `lv-api-...` classes do not select anything at this writing (29-Mar-2025).
  *-------------------------------------------------------------------------
  */
@@ -230,6 +220,13 @@ dl.cpp.unexpanded dd {
 
 .expanded .lv-api-expansion-button::before {
   content: "\f0d7 \00a0";
+}
+
+/* This hides the <dd> elements that contain a code-element's documentation
+ * when it has class "unexpanded".  "expanded" and "unexpanded" classes in the
+ * <dl> elements are added and managed dynamically via code in `custom.js`. */
+dl.cpp.unexpanded dd {
+  display: none;
 }
 
 /* Selects all <div> elements with "body" class.
