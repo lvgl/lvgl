@@ -168,7 +168,11 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
             t->state = LV_DRAW_TASK_STATE_READY;
         }
         else {
+            /* Do not dispatch now if it's deferred.
+             * Dispatching will happen all draw tasks are added.*/
+#if LV_DRAW_DEFERRED_RENDER == 0
             lv_draw_dispatch();
+#endif
         }
     }
     else {
@@ -221,6 +225,7 @@ void lv_draw_dispatch(void)
                 task_dispatched = true;
             layer = layer->next;
         }
+
         if(!task_dispatched) {
             lv_draw_wait_for_finish();
             lv_draw_dispatch_request();

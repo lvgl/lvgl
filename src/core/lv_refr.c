@@ -1299,6 +1299,11 @@ static void draw_buf_flush(lv_display_t * disp)
     /*Flush the rendered content to the display*/
     lv_layer_t * layer = disp->layer_head;
 
+    /*Kick off rendering if it was deferred so far*/
+#if LV_DRAW_DEFERRED_RENDER
+    lv_draw_dispatch_request();
+#endif
+
     while(layer->draw_task_head) {
         lv_draw_dispatch_wait_for_request();
         lv_draw_dispatch();
