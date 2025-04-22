@@ -246,39 +246,89 @@ div.body {
   font-size: 75%;
 }
 
-/* These replace colors present in `pygments.css` which is used in code highlighting.
- * These are too dark to be readlable in DARK mode.  They include:
- * .highlight .nf -- function names
- * .highlight .nl -- code labels
- * .descname  .n  -- API documentation function names
- * .highlight .p  -- Punctuation
- * .highlight     -- Plain text in a `.. code-block:: none` block
- * The first 2 were created by lightening the `pygments.css` colors without changing their
- * angle on the color wheel.  The added attribute "conditional" also limits this change to
- * DARK MODE only instead of both light and dark modes.
- */
-/* Name.Function */
-html[data-theme="dark"] .highlight .nf {
-  color: #ccd285;
+/*-------------------------------------------------------------------------
+ * Custom Banners...
+ *
+ * ...are inserted between these two elements at the top of the page:
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+<div class="lv-custom-banner-list">
+  <p class="lv-custom-banner highest-priority">
+     Highest-priority announcement!
+  </p>
+  <p class="lv-custom-banner high-priority">
+     We are hiring a Front-End Developer in our Editor Team (Electron, React, Node.JS)!
+  </p>
+  <a href="specified_url" class="lv-custom-banner normal-priority">
+    <p>
+      Normal-priority announcement.
+    </p>
+  </a>
+</div>
+
+<div class="page">
+  ...page content...
+ *-------------------------------------------------------------------------*/
+.lv-custom-banner-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: auto;
+  border-top: 4px solid darkgreen;
 }
 
-/* Name.Label */
-html[data-theme="dark"] .highlight .nl {
-  color: #0043e2;
+.lv-custom-banner {
+  box-sizing: border-box;
+  padding: .5rem;
+  min-width: 100%;
+  text-align: center;
+  border-bottom: 4px solid darkgreen;
+  margin: 0;
 }
 
-/* Name */
-html[data-theme="dark"] .descname .n {
-  color: #0a44de;
+/* Hyperlinks within banners (when banner label had a hyperlink in it) */
+.lv-custom-banner a {
+  color: var(--color-announcement-text);
+  text-decoration-color: var(--color-announcement-text);
 }
 
-/* Punctuation */
-html[data-theme="dark"] .highlight .p {
-  color: #5c7c72
+.lv-custom-banner a:hover {
+  color: var(--color-announcement-text);
+  text-decoration-color: var(--color-link--hover);
 }
 
-/* Plain text. */
-html[data-theme="dark"] .highlight {
-  background: #ffffff; color: #bfbfbf
+/* Paragraphs within banner HTML (when Banners text contains <p> elements). */
+.lv-custom-banner p {
+  margin: 0;
 }
 
+/* Banner priorities */
+.lv-custom-banner.highest-priority {
+  background-image: linear-gradient(45deg, black, darkred);
+  color: white;
+  padding: 18px 3em;
+}
+
+.lv-custom-banner.high-priority {
+  background-image: linear-gradient(45deg, black, darkgreen);
+  color: white;
+  padding: 14px 3em;
+}
+
+.lv-custom-banner.normal-priority {
+  background-image: linear-gradient(45deg, black, #5e5e5e);
+  color: white;
+  padding: 10px 3em;
+}
+
+.lv-custom-banner.low-priority {
+  background-image: linear-gradient(45deg, black, darkblue);
+  color: white;
+  padding: 8px 3em;
+}
+
+.lv-custom-banner.lowest-priority {
+  background-image: linear-gradient(45deg, black, var(--color-sidebar-background));
+  color: var(--color-content-foreground);
+  padding: 8px 3em;
+}
