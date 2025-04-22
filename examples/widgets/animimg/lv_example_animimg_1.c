@@ -14,7 +14,7 @@ void lv_example_animimg_1(void)
 {
     lv_obj_t * animimg0 = lv_animimg_create(lv_screen_active());
     lv_obj_center(animimg0);
-    lv_animimg_set_src(animimg0, (const void **) anim_imgs, 3);
+    lv_animimg_set_src(animimg0, (const void **) anim_imgs, 3, false);
     lv_animimg_set_duration(animimg0, 1000);
     lv_animimg_set_repeat_count(animimg0, LV_ANIM_REPEAT_INFINITE);
     lv_animimg_start(animimg0);
