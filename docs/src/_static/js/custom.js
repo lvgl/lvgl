@@ -1,5 +1,33 @@
-/* API collapsing */
 document.addEventListener('DOMContentLoaded', (event) => {
+    /*---------------------------------------------------------------------
+     * For API pages:
+     *
+     * Documented code elements on API pages each have a structure that looks
+     * like this example for a function:
+     *
+     * <dl class="cpp function _state_>                             // container
+     *     <dt id="_function_identifier_">function signature</dt>   // code highlighting done with <span> child elements
+     *     <dd>documentation</dd>                                   // documentation, initially closed
+     *     </dl>
+     *
+     * where `_state_` is either "expanded" or "unexpanded".  When "unexpanded"
+     * class is present, the <dd> element containing the documentation is hidden
+     * by CSS in `custom.css`.  Without that class present (i.e. when "expanded"
+     * class is present instead), the <dd> element reverts to its normal state
+     * of being visible.
+     *
+     * The job of the code below is to:
+     * 1.  Add "unexpanded" class to all <dl class="cpp ..."> elements...
+     * 2.  ...except if the URL had a hash string ("...#identifier_string")
+     *     that matches the immediate <dt> child element's id attribute, in which
+     *     case the "expanded" class is added instead.  (This usually indicates
+     *     the user navigated there by clicking a hyperlinked code element in
+     *     one of the documentation pages.)
+     * 3.  Add an open/close button <span class="lv-api-expansion-button" />
+     *     element just before each code element to toggle its expanded/unexpanded
+     *     class.  (The click-able arrow icon before it is set in `custom.css`
+     *     based on the <dl> element's "expanded" or "unexpanded" class.)
+     *---------------------------------------------------------------------*/
     document.querySelectorAll("dl.cpp").forEach(cppListing => {
         const dt = cppListing.querySelector("dt");
         let shouldBeExpanded = false;
@@ -16,42 +44,158 @@ document.addEventListener('DOMContentLoaded', (event) => {
         dt.insertBefore(button, dt.firstChild);
     });
 
-    fetch('https://lvgl.io/home-banner.txt') // Replace with your URL
-  .then(response => {
-    // Check if the request was successful
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    // Read the response as text
-    return response.text();
-  })
-  .then(data => {
+    /*---------------------------------------------------------------------
+     * Display any current custom banner in `banner.json` at top of each page.
+     *---------------------------------------------------------------------
+     * Custom banners are inserted between these two elements at top of page.
+    <a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
 
-    const section = document.querySelector('.wy-nav-content-wrap');
+    <div class="lv-custom-banner-list">
+      <p class="lv-custom-banner">
+         <em>Important</em> announcement one!
+      </p>
+      <p class="lv-custom-banner">
+         <em>Important</em> announcement two!
+      </p>
+      <p class="lv-custom-banner">
+         <em>Important</em> announcement three!
+      </p>
+    </div>
 
-    //Add a div
-    const newDiv = document.createElement('div');
-    newDiv.style="background-image: linear-gradient(45deg, black, #5e5e5e); color: white; border-bottom: 4px solid #e10010; padding-inline:3em"
-    section.insertBefore(newDiv, section.firstChild);
+    <div class="page">
+      ...page content...
+     *---------------------------------------------------------------------*/
+    let bannerJsonUrl = 'https://lvgl.io/data/banner.json';
+    let bannerContainerClass = 'lv-custom-banner-list';
+    let bannerClass = 'lv-custom-banner';
+    /* Note:  banner priority property can have only one of these values:
+     * ("highest" | "high" | "normal" | "low" | "lowest").
+     * If not present, the default is "normal-priority".  This controls banner styling. */
+    let priorityPropVals = ["highest", "high", "normal", "low", "lowest"];
+    let defaultPrioPropVal = priorityPropVals[2];
+    let priorityClassSuffix = "-priority";
 
+    /* Sorting json banners in priority order.
+     * `a` and `b` are BANNER objects from incoming `banner.json`. */
+    function prio_compare(a, b) {
+        let aPrioPropStr = a.hasOwnProperty('priority') ? a.priority : defaultPrioPropVal;
+        let bPrioPropStr = b.hasOwnProperty('priority') ? b.priority : defaultPrioPropVal;
+        let aPrio = 0;
+        let bPrio = 0;
 
-    //Add a p to the div
-    const newP = document.createElement('p');
-    newP.style="padding-block:12px; margin-block:0px;align-content: center;align-items: center;"
-    newP.innerHTML = data
-    newDiv.insertBefore(newP, newDiv.firstChild);
-
-    const children = newDiv.querySelectorAll('*');
-
-    // Iterate over each child
-    children.forEach(child => {
-        // Check if the child has an id
-        if (child.id) {
-            // Prepend 'docs-' to the id
-            child.id = 'docs-' + child.id;
+        /* Establish numeric values for `a` and `b`. */
+        for (var i = 0; i < 5; i++) {
+            if (aPrioPropStr === priorityPropVals[i]) {
+                aPrio = i;
+                break;
+            }
         }
-    })
-  }) .catch(error => {
-        console.error('Fetch error: ' + error.message);
-  });
-})
+
+        for (var i = 0; i < 5; i++) {
+            if (bPrioPropStr === priorityPropVals[i]) {
+                bPrio = i;
+                break;
+            }
+        }
+
+        /* Correctness Proof
+         * -----------------
+         * < 0 = `a` should come before `b`.
+         * > 0 = `a` should come after `b`.
+         *   0 or NaN = a === b.
+         *
+         * Example:  a === "highest-priority"; b === "normal-priority".
+         *           aPrio === 0             ; bPrio === 2.
+         *           aPrio - bPrio === -2 means (`a` should come before `b`).
+         */
+        return aPrio - bPrio;
+    }
+
+    fetch(bannerJsonUrl)
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                /* Note:  per OOSC2, it is not appropriate to throw an exception for a
+                 * situation that is being checked for.  Sometimes the banner file will
+                 * not be there, in which case, we simply return an empty array object. */
+                return [];
+            }
+        })
+        /* JSON file was fetched successfully.... */
+        .then(json => {
+            if (!typeof json === "array") {
+                /* Data structure not recognized. */
+            } else {
+                /* console.log('JSON is an array.'); */
+                /* Does it contain any banners? */
+                if (json.length === 0) {
+                    console.log('JSON has no banners -- nothing to do.');
+                } else {
+                    /* Note:  `div.page` is unique to Furo theme. */
+                    const page = document.querySelector('div.page');
+                    const pgParent = page.parentElement;
+
+                    /* Create and insert banner container. */
+                    const newDiv = document.createElement('div');
+                    newDiv.classList.add(bannerContainerClass);
+                    pgParent.insertBefore(newDiv, page);
+
+                    /* Create a <p> or an <a> element for each banner.
+                     * First, sort them in priority order with "highest-priority" being
+                     * at the top.  The JSON is an ARRAY of BANNER objects.
+                     * `prio_compare()` knows how to compare them.
+                     *
+                     * If the BANNER object has a "url" property, then
+                     * encapsulate banner in an anchor element that will send
+                     * user to designated URL.
+                     */
+                    json.sort(prio_compare);
+
+                    for (var i = 0; i < json.length; i++) {
+                        let banner = json[i];
+
+                        if (banner.hasOwnProperty('label')) {
+                            let priorityClass = '';
+                            let newElement = null;
+
+                            if (banner.hasOwnProperty('url')) {
+                                newElement = document.createElement('a');
+                                newElement.setAttribute('href', banner.url)
+                            } else {
+                                newElement = document.createElement('p');
+                            }
+
+                            if (banner.hasOwnProperty('priority')) {
+                                priorityClass = banner.priority + priorityClassSuffix;
+                            } else {
+                                priorityClass = defaultPrioPropVal + priorityClassSuffix;
+                            }
+
+                            newElement.innerHTML = banner.label;
+                            newElement.classList.add(bannerClass);
+                            newElement.classList.add(priorityClass);
+                            newDiv.appendChild(newElement);
+                        }
+                    }
+
+                    /* Finally, we need to tell the page element that its `min-hight`
+                     * is 100% minus the hight of all the banners, including the one
+                     * supplied by `conf.py` in `conf.html_theme_options.announcement`
+                     * if one is present === var(--header-height).
+                     *
+                     * This extends short pages by just enough to place [PREV] and [NEXT]
+                     * buttoms and footer at bottom of page without scrolling.
+                     *
+                     * Note:  this overrides the `min-height` property set for this
+                     * element in `furo.css`, which is:  calc(100% - var(--header-height)).
+                     * It additionally subtracts height of banner list.
+                     * */
+                    let height = newDiv.offsetHeight;
+                    page.style['min-height'] = `calc(100% - var(--header-height) - ${height}px)`;
+                }
+            }
+        }) .catch(error => {
+            console.error('Fetch error: ' + error.message);
+        });
+});
