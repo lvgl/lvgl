@@ -26,9 +26,19 @@ else
   git checkout "$CURRENT_REF"
 fi
 cd ..
+
+# Generate lv_conf
+LV_CONF_PATH=lvgl/configs/ci/docs/lv_conf_docs.h
+
+cp lvgl/lv_conf_template.h $LV_CONF_PATH
+python ./lvgl/scripts/generate_lv_conf.py \
+  --template lvgl/lv_conf_template.h \
+  --config $LV_CONF_PATH \
+  --defaults lvgl/configs/ci/docs/lv_conf_docs.defaults
+
 mkdir cmbuild
 cd cmbuild
-emcmake cmake .. -DLVGL_CHOSEN_DEMO=lv_example_noop -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+emcmake cmake .. -DLV_CONF_PATH=$LV_CONF_PATH -DLVGL_CHOSEN_DEMO=lv_example_noop -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 emmake make -j$(nproc)
 rm -rf CMakeFiles
 cd ../..
