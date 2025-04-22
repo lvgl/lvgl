@@ -33,6 +33,15 @@ def run(c_path=None):
         if 'LV_USE_PROFILER' in line:
             continue
 
+        # These 2 fonts have been deprecated in favor of
+        # LV_FONT_SOURCE_HAN_SANS_SC_14_CJK and
+        # LV_FONT_SOURCE_HAN_SANS_SC_16_CJK.
+        if 'LV_FONT_SIMSUN_14_CJK' in line:
+            continue
+
+        if 'LV_FONT_SIMSUN_16_CJK' in line:
+            continue
+
         if 'LV_USE' in line or ('LV_FONT' in line and '#define' in line):
             line = [item for item in line.split(' ') if item]
 
