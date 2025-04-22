@@ -73,11 +73,11 @@ void test_ffmpeg_image_decoder_1(void)
 
     /* Re-add other decoder */
 #if LV_USE_LODEPNG
-    lv_lodepng_deinit();
+    lv_lodepng_init();
 #endif
 
 #if LV_USE_LIBPNG
-    lv_libpng_deinit();
+    lv_libpng_init();
 #endif
 
     lv_obj_clean(lv_screen_active());
