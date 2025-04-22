@@ -250,16 +250,14 @@ static void lv_sysmon_perf_update_global(lv_display_t * disp, lv_event_code_t co
 {
     switch(code) {
         case LV_EVENT_REFR_START:
-            disp->perf_sysmon_backend.last_refr_start = lv_tick_get();
-            break;
-        case LV_EVENT_REFR_READY:
-            disp->perf_sysmon_backend.last_refr_start = 0;
+            disp->perf_sysmon_backend.refr_start = lv_tick_get();
             break;
         case LV_EVENT_RENDER_START:
-            disp->perf_sysmon_backend.last_render_start = lv_tick_get();
+            disp->perf_sysmon_backend.rendering = true;
+            disp->perf_sysmon_backend.render_start = lv_tick_get();
             break;
         case LV_EVENT_RENDER_READY:
-            disp->perf_sysmon_backend.last_render_start = 0;
+            disp->perf_sysmon_backend.rendering = false;
             break;
         case LV_EVENT_SCROLL_BEGIN:
             disp->perf_sysmon_backend.scrolling = true;
@@ -285,32 +283,27 @@ static void lv_sysmon_perf_init_info(lv_sysmon_perf_info_t * info, lv_display_t 
 {
     lv_memzero(info, offsetof(lv_sysmon_perf_info_t, calculated.cpu_avg_total));
     info->measured.perf_start = lv_tick_get();
-    info->measured.refr_start = disp->perf_sysmon_backend.last_refr_start;
+    info->measured.prev_refr_start = disp->perf_sysmon_backend.refr_start;
 }
 
 static void lv_sysmon_perf_update_info(lv_sysmon_perf_info_t * info, lv_display_t * disp, lv_event_code_t code)
 {
     switch(code) {
         case LV_EVENT_REFR_START:
-            info->measured.refr_interval_sum += lv_tick_elaps(info->measured.refr_start);
-            info->measured.refr_start = disp->perf_sysmon_backend.last_refr_start;
+            info->measured.refr_interval_sum += lv_tick_elaps(info->measured.prev_refr_start);
+            info->measured.prev_refr_start = disp->perf_sysmon_backend.refr_start;
             break;
         case LV_EVENT_REFR_READY:
-            info->measured.refr_elaps_sum += lv_tick_elaps(info->measured.refr_start);
+            info->measured.refr_elaps_sum += lv_tick_elaps(disp->perf_sysmon_backend.refr_start);
             info->measured.refr_cnt++;
             break;
-        case LV_EVENT_RENDER_START:
-            info->measured.render_in_progress = 1;
-            info->measured.render_start = disp->perf_sysmon_backend.last_render_start;
-            break;
         case LV_EVENT_RENDER_READY:
-            info->measured.render_in_progress = 0;
-            info->measured.render_elaps_sum += lv_tick_elaps(info->measured.render_start);
+            info->measured.render_elaps_sum += lv_tick_elaps(disp->perf_sysmon_backend.render_start);
             info->measured.render_cnt++;
             break;
         case LV_EVENT_FLUSH_START:
         case LV_EVENT_FLUSH_WAIT_START:
-            if(info->measured.render_in_progress) {
+            if(disp->perf_sysmon_backend.rendering) {
                 info->measured.flush_in_render_start = lv_tick_get();
             }
             else {
@@ -319,7 +312,7 @@ static void lv_sysmon_perf_update_info(lv_sysmon_perf_info_t * info, lv_display_
             break;
         case LV_EVENT_FLUSH_FINISH:
         case LV_EVENT_FLUSH_WAIT_FINISH:
-            if(info->measured.render_in_progress) {
+            if(disp->perf_sysmon_backend.rendering) {
                 info->measured.flush_in_render_elaps_sum += lv_tick_elaps(info->measured.flush_in_render_start);
             }
             else {

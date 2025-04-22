@@ -44,20 +44,20 @@ struct _lv_sysmon_perf_backend_data_t {
      * For perf monitor instances.
      */
     lv_ll_t instances_ll;
-    uint32_t last_refr_start;
-    uint32_t last_render_start;
-    bool scrolling;
-    bool inited;
+    uint32_t refr_start;
+    uint32_t render_start;
+    bool scrolling : 1;
+    bool rendering : 1;
+    bool inited : 1;
 };
 
 struct _lv_sysmon_perf_info_t {
     struct {
         bool inited;
-        uint32_t refr_start;
+        uint32_t prev_refr_start;  /* Used for calculating refr_interval_sum */
         uint32_t refr_interval_sum;
         uint32_t refr_elaps_sum;
         uint32_t refr_cnt;
-        uint32_t render_start;
         uint32_t render_elaps_sum; /*Contains the flush time too*/
         uint32_t render_cnt;
         uint32_t flush_in_render_start;
@@ -65,7 +65,6 @@ struct _lv_sysmon_perf_info_t {
         uint32_t flush_not_in_render_start;
         uint32_t flush_not_in_render_elaps_sum;
         uint32_t perf_start;
-        uint32_t render_in_progress : 1;
     } measured;
 
     struct {
