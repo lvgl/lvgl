@@ -98,7 +98,7 @@ def generate_cmake_variables(path_input: str, path_output: str, kconfig: bool):
                 continue
 
             name = parts[1]
-            value = parts[2].strip()
+            value = " ".join(parts[2:]).strip()
 
             fout.write(f'set({CONFIG_PREFIX}{name} {value})\n')
 
