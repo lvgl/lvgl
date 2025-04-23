@@ -37,7 +37,7 @@ OpenGL is the first supported 3D graphics back-end. The following must be enable
 See :ref:`LVGL's OpenGLES driver docs <opengl_es_driver>` to create a window and a
 display texture.
 
-The `lv_example_3dtexture <https://github.com/lvgl/lv_example_3dtexture>` ropository is a
+The `lv_example_3dtexture <https://github.com/lvgl/lv_example_3dtexture>` repository is a
 demonstration of how to use the ``3dtexture`` widget to load glTF models with OpenGL
 and display them in LVGL.
 
