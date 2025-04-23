@@ -10,6 +10,8 @@
 /*********************
  *      INCLUDES
  *********************/
+
 #include "lv_cache_lru_rb.h"
+#include "lv_cache_lru_ll.h"
 
 #endif //LV_CACHE_CLAZZ_H
