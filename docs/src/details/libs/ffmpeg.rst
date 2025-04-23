@@ -19,7 +19,11 @@ For a detailed introduction, see:  https://www.ffmpeg.org
 Installing FFmpeg
 *****************
 
-Download the FFmpeg library from `its official download page
+.. code-block:: shell
+
+    sudo apt install libavformat-dev libavcodec-dev libswscale-dev libavutil-dev
+
+Or download the FFmpeg library from `its official download page
 <https://www.ffmpeg.org/download.html>`__, then install it:
 
 .. code-block:: shell
