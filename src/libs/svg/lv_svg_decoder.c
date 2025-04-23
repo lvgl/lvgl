@@ -110,7 +110,7 @@ static lv_result_t svg_decoder_info(lv_image_decoder_t * decoder, lv_image_decod
             res = lv_fs_seek(&src->file, 0, LV_FS_SEEK_END);
             if (res == LV_FS_RES_OK) {
                 lv_fs_tell(&src->file, &file_size);
-                lv_fs_seek(&src->file, 0, LV_FS_SEEK_SET); // Reset position to start
+                lv_fs_seek(&src->file, 0, LV_FS_SEEK_SET); /* Reset position to start */
             }
 #ifdef LV_USE_SVG_DEBUG
             LV_LOG_INFO("LVGL file_size = %d.", file_size);
