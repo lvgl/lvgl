@@ -13,13 +13,13 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_cache_entry.h"
+
 #include "../lv_types.h"
 
-#include "lv_cache_lru_rb.h"
+#include "lv_cache_entry.h"
 
-#include "lv_image_cache.h"
-#include "lv_image_header_cache.h"
+#include "clazz/lv_cache_clazz.h"
+#include "instance/lv_cache_instance.h"
 
 /*********************
  *      DEFINES
