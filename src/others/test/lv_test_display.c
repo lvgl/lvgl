@@ -75,8 +75,8 @@ static void buf_changed_event_cb(lv_event_t * e)
 {
     lv_display_t * disp = lv_event_get_target(e);
     lv_color_format_t cf = lv_display_get_color_format(disp);
-    int32_t hor_res = lv_display_get_horizontal_resolution(disp);
-    int32_t ver_res = lv_display_get_vertical_resolution(disp);
+    int32_t hor_res = lv_display_get_original_horizontal_resolution(disp);
+    int32_t ver_res = lv_display_get_original_vertical_resolution(disp);
 
     free(_state.draw_buf.unaligned_data);
 
