@@ -63,7 +63,15 @@ void lv_xml_slider_apply(lv_xml_parser_state_t * state, const char ** attrs)
             bool v2 = lv_xml_to_bool(buf_p);
             lv_bar_set_value(item, v1, v2);
         }
-        if(lv_streq("bind_value", name)) lv_slider_bind_value(item, lv_xml_get_subject(&state->ctx, value));
+        if(lv_streq("bind_value", name)) {
+            lv_subject_t * subject = lv_xml_get_subject(&state->ctx, value);
+            if(subject) {
+                lv_slider_bind_value(item, subject);
+            }
+            else {
+                LV_LOG_WARN("Subject \"%s\" doesn't exist in slider bind_value", value);
+            }
+        }
         if(lv_streq("start_value", name)) {
             char buf[64];
             lv_strlcpy(buf, value, sizeof(buf));

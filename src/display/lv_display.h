@@ -159,6 +159,13 @@ void lv_display_set_offset(lv_display_t * disp, int32_t x, int32_t y);
 void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation);
 
 /**
+ * Use matrix rotation for the display. This function is depended on `LV_DRAW_TRANSFORM_USE_MATRIX`
+ * @param disp      pointer to a display (NULL to use the default display)
+ * @param enable    true: enable matrix rotation, false: disable
+ */
+void lv_display_set_matrix_rotation(lv_display_t * disp, bool enable);
+
+/**
  * Set the DPI (dot per inch) of the display.
  * dpi = sqrt(hor_res^2 + ver_res^2) / diagonal"
  * @param disp      pointer to a display
@@ -179,6 +186,20 @@ int32_t lv_display_get_horizontal_resolution(const lv_display_t * disp);
  * @return          the vertical resolution of the display
  */
 int32_t lv_display_get_vertical_resolution(const lv_display_t * disp);
+
+/**
+ * Get the original horizontal resolution of a display without considering rotation
+ * @param disp      pointer to a display (NULL to use the default display)
+ * @return          the horizontal resolution of the display.
+ */
+int32_t lv_display_get_original_horizontal_resolution(const lv_display_t * disp);
+
+/**
+ * Get the original vertical resolution of a display without considering rotation
+ * @param disp      pointer to a display (NULL to use the default display)
+ * @return          the vertical resolution of the display
+ */
+int32_t lv_display_get_original_vertical_resolution(const lv_display_t * disp);
 
 /**
  * Get the physical horizontal resolution of a display
@@ -214,6 +235,13 @@ int32_t lv_display_get_offset_y(const lv_display_t * disp);
  * @return          the current rotation
  */
 lv_display_rotation_t lv_display_get_rotation(lv_display_t * disp);
+
+/**
+ * Get if matrix rotation is enabled for a display or not
+ * @param disp      pointer to a display (NULL to use the default display)
+ * @return          true: matrix rotation is enabled; false: disabled
+ */
+bool lv_display_get_matrix_rotation(lv_display_t * disp);
 
 /**
  * Get the DPI of the display

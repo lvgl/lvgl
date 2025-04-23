@@ -38,8 +38,8 @@
 #define LV_FONT_MONTSERRAT_48   1
 #define LV_FONT_MONTSERRAT_28_COMPRESSED    1
 #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW    1
-#define LV_FONT_SIMSUN_14_CJK   1
-#define LV_FONT_SIMSUN_16_CJK   1
+#define LV_FONT_SOURCE_HAN_SANS_SC_14_CJK   1
+#define LV_FONT_SOURCE_HAN_SANS_SC_16_CJK   1
 #define LV_FONT_UNSCII_8        1
 #define LV_FONT_UNSCII_16       1
 #define LV_FONT_DEFAULT         &lv_font_montserrat_14
@@ -79,7 +79,12 @@
 #define LV_USE_BMP          1
 #define LV_USE_TJPGD        1
 #ifndef _WIN32
-    #define LV_USE_LIBJPEG_TURBO   1
+    #define LV_USE_LIBJPEG_TURBO       1
+#endif
+#ifndef LV_USE_FFMPEG
+    #define LV_USE_FFMPEG              1
+    #define LV_FFMPEG_DUMP_FORMAT      1
+    #define LV_FFMPEG_PLAYER_USE_LV_FS 1
 #endif
 #define LV_USE_GIF          1
 #define LV_USE_QRCODE       1

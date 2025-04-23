@@ -14,6 +14,7 @@
 #include "../../display/lv_display_private.h"
 #include "../../stdlib/lv_string.h"
 #include "../../core/lv_global.h"
+#include "../../misc/lv_area_private.h"
 
 #if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
     #if LV_USE_THORVG_EXTERNAL
@@ -226,6 +227,10 @@ static int32_t evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task)
                 }
             }
             break;
+#if LV_USE_3DTEXTURE
+        case LV_DRAW_TASK_TYPE_3D:
+            return 0;
+#endif
         default:
             break;
     }

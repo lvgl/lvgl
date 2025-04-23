@@ -19,7 +19,6 @@ jobs:
   build-and-deploy:
     if: github.repository == 'lvgl/lvgl'
     runs-on: ubuntu-24.04
-    concurrency: docs-build-and-deploy
     steps:
       - name: Checkout
         uses: actions/checkout@v4

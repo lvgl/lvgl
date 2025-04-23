@@ -17,7 +17,7 @@ void lv_example_calendar_2(void)
 #endif
 
     lv_calendar_set_chinese_mode(calendar, true);
-    lv_obj_set_style_text_font(calendar, &lv_font_simsun_14_cjk, LV_PART_MAIN);
+    lv_obj_set_style_text_font(calendar, &lv_font_source_han_sans_sc_14_cjk, LV_PART_MAIN);
 }
 
 #else
