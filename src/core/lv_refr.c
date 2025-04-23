@@ -703,8 +703,20 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
         tile_h = lv_area_get_height(area_p) / tile_cnt;
     }
 
+
     if(tile_cnt == 1) {
         refr_configured_layer(layer);
+
+        /*Kick off rendering if it was deferred so far*/
+#if LV_DRAW_DEFERRED_RENDER
+        lv_draw_dispatch_request();
+#endif
+
+        /*Finish the rendering of all tiles.*/
+        while(layer->draw_task_head) {
+            lv_draw_dispatch_wait_for_request();
+            lv_draw_dispatch();
+        }
     }
     else {
         /* Don't draw to the layers buffer of the display but create smaller dummy layers which are using the
@@ -734,8 +746,12 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
             refr_configured_layer(tile_layer);
         }
 
+        /*Kick off rendering if it was deferred so far*/
+#if LV_DRAW_DEFERRED_RENDER
+        lv_draw_dispatch_request();
+#endif
 
-        /*Wait until all tiles are ready and destroy remove them*/
+        /*Finish the rendering on all tiles and destroy them*/
         for(i = 0; i < tile_cnt; i++) {
             lv_layer_t * tile_layer = &tile_layers[i];
             while(tile_layer->draw_task_head) {
@@ -1299,12 +1315,8 @@ static void draw_buf_flush(lv_display_t * disp)
     /*Flush the rendered content to the display*/
     lv_layer_t * layer = disp->layer_head;
 
-    /*Kick off rendering if it was deferred so far*/
-#if LV_DRAW_DEFERRED_RENDER
-    lv_draw_dispatch_request();
-#endif
-
     while(layer->draw_task_head) {
+        LV_LOG_ERROR("Rendering should have been finished already");
         lv_draw_dispatch_wait_for_request();
         lv_draw_dispatch();
     }
