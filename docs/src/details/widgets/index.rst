@@ -46,6 +46,7 @@ All Widgets
     textarea
     tileview
     win
+    3dtexture
     new_widget
 
 .. |hr_left_250|  raw:: html
