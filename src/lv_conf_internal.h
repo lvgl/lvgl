@@ -306,6 +306,19 @@
  * RENDERING CONFIGURATION
  *========================*/
 
+/** 0: create draw tasks and render them in parallel.
+ *  1: create all draw tasks first and start rendering them after that.
+ *     recommended if the code execution from flash is slow, as it not
+ *     mixing draw task creation and rendering improves cache locality.
+ */
+#ifndef LV_DRAW_DEFERRED_RENDER
+    #ifdef CONFIG_LV_DRAW_DEFERRED_RENDER
+        #define LV_DRAW_DEFERRED_RENDER CONFIG_LV_DRAW_DEFERRED_RENDER
+    #else
+        #define LV_DRAW_DEFERRED_RENDER                 0
+    #endif
+#endif
+
 /** Align stride of all layers and images to this bytes */
 #ifndef LV_DRAW_BUF_STRIDE_ALIGN
     #ifdef LV_KCONFIG_PRESENT
