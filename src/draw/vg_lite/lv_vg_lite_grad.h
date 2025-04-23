@@ -32,12 +32,39 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_vg_lite_grad_init(struct _lv_draw_vg_lite_unit_t * u, uint32_t cache_cnt);
+/**
+ * @brief Create a gradient context
+ * @param cache_cnt number of cache entries
+ * @param unit the draw unit
+ */
+struct _lv_vg_lite_grad_ctx_t * lv_vg_lite_grad_ctx_create(uint32_t cache_cnt, struct _lv_draw_vg_lite_unit_t * unit);
 
-void lv_vg_lite_grad_deinit(struct _lv_draw_vg_lite_unit_t * u);
+/**
+ * @brief Delete a gradient context
+ * @param ctx the gradient context to delete
+ */
+void lv_vg_lite_grad_ctx_delete(struct _lv_vg_lite_grad_ctx_t * ctx);
 
+/**
+ * @brief Get the pending list of gradient items
+ * @param ctx the gradient context
+ */
+struct _lv_vg_lite_pending_t * lv_vg_lite_grad_ctx_get_pending(struct _lv_vg_lite_grad_ctx_t * ctx);
+
+/**
+ * @brief Draw a gradient
+ * @param ctx the gradient context
+ * @param buffer the target buffer
+ * @param path the path to draw the gradient on
+ * @param grad the gradient descriptor
+ * @param grad_matrix the gradient matrix
+ * @param matrix the matrix to apply to the gradient
+ * @param fill the fill rule
+ * @param blend the blend mode
+ * @return true: success, false: failed
+ */
 bool lv_vg_lite_draw_grad(
-    struct _lv_draw_vg_lite_unit_t * u,
+    struct _lv_vg_lite_grad_ctx_t * ctx,
     vg_lite_buffer_t * buffer,
     vg_lite_path_t * path,
     const lv_vector_gradient_t * grad,
@@ -46,8 +73,20 @@ bool lv_vg_lite_draw_grad(
     vg_lite_fill_t fill,
     vg_lite_blend_t blend);
 
+/**
+ * @brief Draw a gradient helper
+ * @param ctx the gradient context
+ * @param buffer the target buffer
+ * @param path the path to draw the gradient on
+ * @param area the area to draw the gradient on
+ * @param grad_dsc the gradient descriptor
+ * @param matrix the matrix to apply to the gradient
+ * @param fill the fill rule
+ * @param blend the blend mode
+ * @return true: success, false: failed
+ */
 bool lv_vg_lite_draw_grad_helper(
-    struct _lv_draw_vg_lite_unit_t * u,
+    struct _lv_vg_lite_grad_ctx_t * ctx,
     vg_lite_buffer_t * buffer,
     vg_lite_path_t * path,
     const lv_area_t * area,
