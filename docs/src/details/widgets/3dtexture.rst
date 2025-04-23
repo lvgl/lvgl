@@ -28,7 +28,7 @@ Usage
 Requires a draw unit to be enabled which can draw the
 :cpp:enumerator:`LV_DRAW_TASK_TYPE_3D` draw task type.
 
-OpenGL is the first supported 3D graphics black-end. The following must be enabled.
+OpenGL is the first supported 3D graphics back-end. The following must be enabled.
 
 - :c:macro:`LV_USE_3DTEXTURE`
 - :c:macro:`LV_USE_OPENGLES`
