@@ -530,19 +530,13 @@ static inline lv_result_t lv_draw_sw_image_helium(
         }
     #if ARM_2D_VERSION > 10201ul
         else if(LV_COLOR_FORMAT_ARGB8888 == src_cf) {
-
             if (LV_COLOR_FORMAT_XRGB8888 == des_cf) {
-                static arm_2d_tile_t mask_tile;
-                mask_tile = source_tile;
+                source_tile.tInfo.bHasEnforcedColour = true;
+                source_tile.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_CCCA8888;
 
-                mask_tile.tInfo.bHasEnforcedColour = true;
-                mask_tile.tInfo.tColourInfo.chScheme = ARM_2D_CHANNEL_8in32;
-                mask_tile.pchBuffer = (uint8_t *)src_buf + 3;
-
-                arm_2dp_cccn888_tile_transform_xy_with_src_mask_and_opacity(
+                arm_2dp_cccn888_tile_transform_xy_only_with_opacity(
                     NULL,
                     &source_tile,
-                    &mask_tile,
                     &target_tile,
                     NULL,
                     source_center,
@@ -554,7 +548,6 @@ static inline lv_result_t lv_draw_sw_image_helium(
                     );
             }
             else if(LV_COLOR_FORMAT_RGB565 == des_cf) {
-
                 source_tile.tInfo.bHasEnforcedColour = true;
                 source_tile.tInfo.tColourInfo.chScheme = ARM_2D_COLOUR_CCCA8888;
 
@@ -570,7 +563,6 @@ static inline lv_result_t lv_draw_sw_image_helium(
                     opa,
                     &target_center
                     );
-
             }
         }
         else if(LV_COLOR_FORMAT_XRGB8888 == src_cf) {
