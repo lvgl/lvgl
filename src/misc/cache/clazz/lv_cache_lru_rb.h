@@ -13,8 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_cache_entry.h"
-#include "lv_cache_private.h"
+
+#include "../lv_cache_private.h"
 
 /*********************
  *      DEFINES
