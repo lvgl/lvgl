@@ -463,7 +463,9 @@ static void draw_indic(lv_event_t * e)
     if(reversed && !hor)
         bar->indic_area.y2 -= 2;
     else if(reversed && hor)
-        bar->indic_area.x1 += 2;
+        bar->indic_area.x1 += 1;
+    else if(hor)
+        bar->indic_area.x1 -= 1;
     if(!sym && indic_length_calc(&bar->indic_area) <= 1) {
         lv_obj_send_event(obj, LV_EVENT_DRAW_TASK_ADDED, NULL);
         return;
