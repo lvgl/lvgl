@@ -300,11 +300,6 @@ void lv_subject_deinit(lv_subject_t * subject)
     while(observer) {
         lv_observer_t * observer_next = lv_ll_get_next(&subject->subs_ll, observer);
 
-        if(observer->for_obj) {
-            lv_obj_remove_event_cb(observer->target, unsubscribe_on_delete_cb);
-            lv_obj_remove_event_cb_with_user_data(observer->target, NULL, subject);
-        }
-
         lv_observer_remove(observer);
         observer = observer_next;
     }
@@ -394,6 +389,11 @@ void lv_observer_remove(lv_observer_t * observer)
 {
     LV_ASSERT_NULL(observer);
 
+    if(observer->for_obj && observer->target) {
+        lv_obj_remove_event_cb_with_user_data(observer->target, unsubscribe_on_delete_cb, observer);
+        lv_obj_remove_event_cb_with_user_data(observer->target, NULL, observer->subject);
+    }
+
     observer->subject->notify_restart_query = 1;
 
     lv_ll_remove(&(observer->subject->subs_ll), observer);
@@ -406,6 +406,14 @@ void lv_observer_remove(lv_observer_t * observer)
 
 void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
 {
+    LV_ASSERT_NULL(obj);
+    /*
+     * Look for the `observer` that connects `obj` and `subject`
+     * Since the obj is associated with the subject,
+     *  the `obj` will have an LV_EVENT_REMOVE event with the `unsubscribe_on_delete_cb` callback
+     *  associated.
+     * From the event we can then find the observer in the event's `user_data` field
+     */
     int32_t i;
     int32_t event_cnt = (int32_t)(obj->spec_attr ? lv_event_get_count(&obj->spec_attr->event_list) : 0);
     for(i = event_cnt - 1; i >= 0; i--) {
@@ -413,8 +421,8 @@ void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
         if(event_dsc->cb == unsubscribe_on_delete_cb) {
             lv_observer_t * observer = event_dsc->user_data;
             if(subject == NULL || subject == observer->subject) {
+                /* lv_observer_remove handles the deletion of all possible event callbacks */
                 lv_observer_remove(observer);
-                lv_obj_remove_event(obj, i);
             }
         }
     }
@@ -422,6 +430,7 @@ void lv_obj_remove_from_subject(lv_obj_t * obj, lv_subject_t * subject)
      * `LV_EVENT_VALUE_CHANGED` event associated with `subject` in case
      * one of the `..._bind_value()` functions was used. */
     lv_obj_remove_event_cb_with_user_data(obj, NULL, subject);
+
 }
 
 void * lv_observer_get_target(lv_observer_t * observer)
@@ -556,7 +565,10 @@ lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const
     LV_ASSERT_NULL(obj);
 
     if(fmt == NULL) {
-        if(subject->type != LV_SUBJECT_TYPE_STRING && subject->type != LV_SUBJECT_TYPE_POINTER) {
+        if(subject->type == LV_SUBJECT_TYPE_INT) {
+            fmt = "%d";
+        }
+        else if(subject->type != LV_SUBJECT_TYPE_STRING && subject->type != LV_SUBJECT_TYPE_POINTER) {
             LV_LOG_WARN("Incompatible subject type: %d", subject->type);
             return NULL;
         }
@@ -764,6 +776,37 @@ static void obj_value_changed_event_cb(lv_event_t * e)
     lv_subject_set_int(subject, lv_obj_has_state(obj, LV_STATE_CHECKED));
 }
 
+static void lv_subject_notify_if_changed(lv_subject_t * subject)
+{
+
+    switch(subject->type) {
+        case LV_SUBJECT_TYPE_INVALID :
+        case LV_SUBJECT_TYPE_NONE :
+            return;
+        case LV_SUBJECT_TYPE_INT :
+            if(subject->value.num != subject->prev_value.num) {
+                lv_subject_notify(subject);
+            }
+            break;
+        case LV_SUBJECT_TYPE_GROUP :
+        case LV_SUBJECT_TYPE_POINTER :
+            /* Always notify as we don't know how to compare this */
+            lv_subject_notify(subject);
+            break;
+        case LV_SUBJECT_TYPE_COLOR  :
+            if(!lv_color_eq(subject->value.color, subject->prev_value.color)) {
+                lv_subject_notify(subject);
+            }
+            break;
+        case LV_SUBJECT_TYPE_STRING:
+            if(!subject->prev_value.pointer ||
+               lv_strcmp(subject->value.pointer, subject->prev_value.pointer)) {
+                lv_subject_notify(subject);
+            }
+            break;
+    }
+}
+
 #if LV_USE_LABEL
 
 static void label_text_observer_cb(lv_observer_t * observer, lv_subject_t * subject)
@@ -857,38 +900,6 @@ static void dropdown_value_observer_cb(lv_observer_t * observer, lv_subject_t * 
 {
     lv_dropdown_set_selected(observer->target, subject->value.num, LV_ANIM_OFF);
 }
-
-static void lv_subject_notify_if_changed(lv_subject_t * subject)
-{
-
-    switch(subject->type) {
-        case LV_SUBJECT_TYPE_INVALID :
-        case LV_SUBJECT_TYPE_NONE :
-            return;
-        case LV_SUBJECT_TYPE_INT :
-            if(subject->value.num != subject->prev_value.num) {
-                lv_subject_notify(subject);
-            }
-            break;
-        case LV_SUBJECT_TYPE_GROUP :
-        case LV_SUBJECT_TYPE_POINTER :
-            /* Always notify as we don't know how to compare this */
-            lv_subject_notify(subject);
-            break;
-        case LV_SUBJECT_TYPE_COLOR  :
-            if(!lv_color_eq(subject->value.color, subject->prev_value.color)) {
-                lv_subject_notify(subject);
-            }
-            break;
-        case LV_SUBJECT_TYPE_STRING:
-            if(!subject->prev_value.pointer ||
-               lv_strcmp(subject->value.pointer, subject->prev_value.pointer)) {
-                lv_subject_notify(subject);
-            }
-            break;
-    }
-}
-
 
 #endif /*LV_USE_DROPDOWN*/
 

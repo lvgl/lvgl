@@ -1,6 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
-#include "lv_test_helpers.h"
+
 #include <string.h>
 
 #include "unity/unity.h"

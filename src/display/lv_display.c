@@ -322,6 +322,26 @@ int32_t lv_display_get_vertical_resolution(const lv_display_t * disp)
     }
 }
 
+int32_t lv_display_get_original_horizontal_resolution(const lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) {
+        return 0;
+    }
+
+    return disp->hor_res;
+}
+
+int32_t lv_display_get_original_vertical_resolution(const lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) {
+        return 0;
+    }
+
+    return disp->ver_res;
+}
+
 int32_t lv_display_get_physical_horizontal_resolution(const lv_display_t * disp)
 {
     if(disp == NULL) disp = lv_display_get_default();
@@ -426,9 +446,8 @@ void lv_display_set_buffers(lv_display_t * disp, void * buf1, void * buf2, uint3
 {
     LV_ASSERT_MSG(buf1 != NULL, "Null buffer");
     lv_color_format_t cf = lv_display_get_color_format(disp);
-    uint32_t w = lv_display_get_horizontal_resolution(disp);
-    uint32_t h = lv_display_get_vertical_resolution(disp);
-
+    uint32_t w = lv_display_get_original_horizontal_resolution(disp);
+    uint32_t h = lv_display_get_original_vertical_resolution(disp);
     LV_ASSERT_MSG(w != 0 && h != 0, "display resolution is 0");
 
     /* buf1 or buf2 is not aligned according to LV_DRAW_BUF_ALIGN */
@@ -457,8 +476,8 @@ void lv_display_set_buffers_with_stride(lv_display_t * disp, void * buf1, void *
 {
     LV_ASSERT_MSG(buf1 != NULL, "Null buffer");
     lv_color_format_t cf = lv_display_get_color_format(disp);
-    uint32_t w = lv_display_get_horizontal_resolution(disp);
-    uint32_t h = lv_display_get_vertical_resolution(disp);
+    uint32_t w = lv_display_get_original_horizontal_resolution(disp);
+    uint32_t h = lv_display_get_original_vertical_resolution(disp);
     LV_ASSERT_MSG(w != 0 && h != 0, "display resolution is 0");
 
     if(render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
@@ -874,6 +893,32 @@ lv_display_rotation_t lv_display_get_rotation(lv_display_t * disp)
     return disp->rotation;
 }
 
+void lv_display_set_matrix_rotation(lv_display_t * disp, bool enable)
+{
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return;
+
+    if(!(disp->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT || disp->render_mode == LV_DISPLAY_RENDER_MODE_FULL)) {
+        LV_LOG_WARN("Unsupported rendering mode: %d", disp->render_mode);
+        return;
+    }
+
+    disp->matrix_rotation = enable;
+#else
+    (void)disp;
+    (void)enable;
+    LV_LOG_WARN("LV_DRAW_TRANSFORM_USE_MATRIX was not enabled");
+#endif
+}
+
+bool lv_display_get_matrix_rotation(lv_display_t * disp)
+{
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return false;
+    return disp->matrix_rotation;
+}
+
 void lv_display_set_theme(lv_display_t * disp, lv_theme_t * th)
 {
     if(!disp) disp = lv_display_get_default();
@@ -964,6 +1009,49 @@ void lv_display_delete_refr_timer(lv_display_t * disp)
     disp->refr_timer = NULL;
 }
 
+lv_result_t lv_display_send_vsync_event(lv_display_t * disp, void * param)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp) return LV_RESULT_INVALID;
+
+    if(disp->vsync_count > 0)
+        return lv_display_send_event(disp, LV_EVENT_VSYNC, param);
+
+    return LV_RESULT_INVALID;
+}
+
+bool lv_display_register_vsync_event(lv_display_t * disp, lv_event_cb_t event_cb, void * user_data)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp) return false;
+
+    lv_display_add_event_cb(disp, event_cb, LV_EVENT_VSYNC, user_data);
+
+    /*only send once*/
+    if(disp->vsync_count == 0)
+        lv_display_send_event(disp, LV_EVENT_VSYNC_REQUEST, disp);
+
+    disp->vsync_count++;
+    return true;
+}
+
+bool lv_display_unregister_vsync_event(lv_display_t * disp, lv_event_cb_t event_cb, void * user_data)
+{
+    if(!disp) disp = lv_display_get_default();
+    if(!disp) return false;
+
+    uint32_t removed_count = lv_display_remove_event_cb_with_user_data(disp, event_cb, user_data);
+    if(removed_count == 0)
+        return false;
+
+    disp->vsync_count -= removed_count;
+    /*only send once*/
+    if(disp->vsync_count == 0)
+        lv_display_send_event(disp, LV_EVENT_VSYNC_REQUEST, NULL);
+
+    return true;
+}
+
 void lv_display_set_user_data(lv_display_t * disp, void * user_data)
 {
     if(!disp) disp = lv_display_get_default();
@@ -1005,12 +1093,12 @@ void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area)
 {
     lv_display_rotation_t rotation = lv_display_get_rotation(disp);
 
+    if(rotation == LV_DISPLAY_ROTATION_0) return;
+
     int32_t w = lv_area_get_width(area);
     int32_t h = lv_area_get_height(area);
 
     switch(rotation) {
-        case LV_DISPLAY_ROTATION_0:
-            return;
         case LV_DISPLAY_ROTATION_90:
             area->y2 = disp->ver_res - area->x1 - 1;
             area->x1 = area->y1;
@@ -1028,6 +1116,8 @@ void lv_display_rotate_area(lv_display_t * disp, lv_area_t * area)
             area->y2 = area->x2;
             area->x2 = area->x1 + h - 1;
             area->y1 = area->y2 - w + 1;
+            break;
+        default:
             break;
     }
 }

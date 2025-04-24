@@ -151,7 +151,7 @@ int8_t lv_area_diff(lv_area_t res_p[], const lv_area_t * a1_p, const lv_area_t *
 
     /*Compute the left rectangle*/
     int32_t lw = a2_p->x1 - a1_p->x1;
-    if(lw > 0 && sh > 0) {
+    if(lw > 0 && sh >= 0) {
         n.x1 = a1_p->x1;
         n.y1 = y1;
         n.x2 = a1_p->x1 + lw - 1;
@@ -161,7 +161,7 @@ int8_t lv_area_diff(lv_area_t res_p[], const lv_area_t * a1_p, const lv_area_t *
 
     /*Compute the right rectangle*/
     int32_t rw = a1_w - (a2_p->x2 - a1_p->x1);
-    if(rw > 0) {
+    if(rw > 0 && sh >= 0) {
         n.x1 = a2_p->x2 + 1;
         n.y1 = y1;
         n.x2 = a2_p->x2 + rw;

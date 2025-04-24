@@ -29,7 +29,7 @@ static void lv_draw_dave2d_draw_letter_cb(lv_draw_task_t * t, lv_draw_glyph_dsc_
     int32_t y;
 
     letter_coords = *glyph_draw_dsc->letter_coords;
-    lv_draw_vg_lite_unit_t * unit = (lv_draw_vg_lite_unit_t *)t->draw_unit;
+    lv_draw_dave2d_unit_t * unit = (lv_draw_dave2d_unit_t *)t->draw_unit;
 
     bool is_common;
     is_common = lv_area_intersect(&clip_area, glyph_draw_dsc->letter_coords, &t->clip_area);

@@ -145,6 +145,8 @@ struct _lv_display_t {
 
     uint32_t rotation  : 3; /**< Element of  lv_display_rotation_t*/
 
+    uint32_t matrix_rotation : 1; /**< 1: Use matrix for display rotation*/
+
     lv_theme_t * theme;     /**< The theme assigned to the screen*/
 
     /** A timer which periodically checks the dirty areas and refreshes them*/
@@ -155,6 +157,7 @@ struct _lv_display_t {
 
     /** The area being refreshed*/
     lv_area_t refreshed_area;
+    uint32_t vsync_count;
 
 #if LV_USE_PERF_MONITOR
     lv_obj_t * perf_label;

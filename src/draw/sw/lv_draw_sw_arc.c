@@ -173,6 +173,8 @@ void lv_draw_sw_arc(lv_draw_task_t * t, const lv_draw_arc_dsc_t * dsc, const lv_
 
             circle_mask_tmp += width;
         }
+        lv_draw_sw_mask_free_param(&circle_mask_param);
+
         get_rounded_area(start_angle, dsc->radius, width, &round_area_1);
         lv_area_move(&round_area_1, dsc->center.x, dsc->center.y);
         get_rounded_area(end_angle, dsc->radius, width, &round_area_2);

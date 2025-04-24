@@ -357,6 +357,11 @@ void lv_init(void)
     lv_fs_uefi_init();
 #endif
 
+    /*Use the earlier initialized position of FFmpeg decoder as a fallback decoder*/
+#if LV_USE_FFMPEG
+    lv_ffmpeg_init();
+#endif
+
 #if LV_USE_LODEPNG
     lv_lodepng_init();
 #endif
@@ -379,12 +384,6 @@ void lv_init(void)
 
 #if LV_USE_SVG
     lv_svg_decoder_init();
-#endif
-
-    /*Make FFMPEG last because the last converter will be checked first and
-     *it's superior to any other */
-#if LV_USE_FFMPEG
-    lv_ffmpeg_init();
 #endif
 
 #if LV_USE_XML
@@ -508,6 +507,10 @@ void lv_deinit(void)
 
 #if LV_USE_LOG
     lv_log_register_print_cb(NULL);
+#endif
+
+#ifdef LV_GC_DEINIT
+    LV_GC_DEINIT();
 #endif
 
 }

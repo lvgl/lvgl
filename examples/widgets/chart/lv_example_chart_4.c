@@ -17,7 +17,7 @@ static void draw_event_cb(lv_event_t * e)
         int32_t * y_array = lv_chart_get_series_y_array(chart, lv_chart_get_series_next(chart, NULL));
         int32_t v = y_array[base_dsc->id2];
 
-        uint32_t ratio = v * 255 / 100;
+        uint8_t ratio = (uint8_t)(v * 255 / 100);
         fill_dsc->color = lv_color_mix(lv_palette_main(LV_PALETTE_GREEN), lv_palette_main(LV_PALETTE_RED), ratio);
     }
 }
@@ -41,7 +41,7 @@ void lv_example_chart_4(void)
 
     uint32_t i;
     for(i = 0; i < 24; i++) {
-        lv_chart_set_next_value(chart, ser, lv_rand(10, 90));
+        lv_chart_set_next_value(chart, ser, (int32_t)lv_rand(10, 90));
     }
 }
 

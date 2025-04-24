@@ -142,7 +142,7 @@ static int32_t dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     if(draw_sdl_unit->task_act) return 0;
 
     lv_draw_task_t * t = NULL;
-    t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_SDL);
+    t = lv_draw_get_available_task(layer, NULL, DRAW_UNIT_ID_SDL);
     if(t == NULL) return -1;
 
     lv_display_t * disp = lv_refr_get_disp_refreshing();
@@ -334,7 +334,7 @@ static bool draw_to_texture(lv_draw_sdl_unit_t * u, cache_data_t * cache_data)
     cache_data->texture = texture;
 
     if(obj) {
-        lv_obj_update_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS, original_send_draw_task_event);
+        lv_obj_set_flag(obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS, original_send_draw_task_event);
     }
 
     return true;

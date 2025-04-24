@@ -46,7 +46,7 @@ static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
                                          int32_t y1, int32_t x2, int32_t y2);
 static void lv_anim_pause_for_internal(lv_anim_t * a, uint32_t ms);
 static void resolve_time(lv_anim_t * a);
-static bool remove_concurrent_anims(lv_anim_t * a_current);
+static bool remove_concurrent_anims(const lv_anim_t * a_current);
 static void remove_anim(void * a);
 
 /**********************
@@ -95,6 +95,11 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
 {
     LV_TRACE_ANIM("begin");
 
+    /*Do not let two animations for the same 'var' with the same 'exec_cb'*/
+    if(a->early_apply && (a->exec_cb || a->custom_exec_cb)) {
+        remove_concurrent_anims(a);
+    }
+
     /*Add the new animation to the animation linked list*/
     lv_anim_t * new_anim = lv_ll_ins_head(anim_ll_p);
     LV_ASSERT_MALLOC(new_anim);
@@ -118,14 +123,12 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
 
         resolve_time(new_anim);
 
-        /*Do not let two animations for the same 'var' with the same 'exec_cb'*/
-        if(a->exec_cb || a->custom_exec_cb) remove_concurrent_anims(new_anim);
-
+        new_anim->current_value = new_anim->path_cb(new_anim);
         if(new_anim->exec_cb) {
-            new_anim->exec_cb(new_anim->var, new_anim->start_value);
+            new_anim->exec_cb(new_anim->var, new_anim->current_value);
         }
         if(new_anim->custom_exec_cb) {
-            new_anim->custom_exec_cb(new_anim, new_anim->start_value);
+            new_anim->custom_exec_cb(new_anim, new_anim->current_value);
         }
     }
 
@@ -524,8 +527,8 @@ void lv_anim_resume(lv_anim_t * a)
     LV_ASSERT_NULL(a);
     a->is_paused = false;
     a->pause_duration = 0;
+    a->run_round = state.anim_run_round;
 }
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -543,7 +546,6 @@ static void anim_timer(lv_timer_t * param)
     state.anim_run_round = state.anim_run_round ? false : true;
 
     lv_anim_t * a = lv_ll_get_head(anim_ll_p);
-
     while(a != NULL) {
         uint32_t elaps = lv_tick_elaps(a->last_timer_run);
 
@@ -555,6 +557,7 @@ static void anim_timer(lv_timer_t * param)
                 const uint32_t pause_overrun = time_paused - a->pause_duration;
                 a->is_paused = false;
                 a->act_time += pause_overrun;
+                a->run_round = !state.anim_run_round;
             }
         }
         else {
@@ -570,7 +573,6 @@ static void anim_timer(lv_timer_t * param)
 
         if(!a->is_paused && a->run_round != state.anim_run_round) {
             a->run_round = state.anim_run_round; /*The list readying might be reset so need to know which anim has run already*/
-
             /*The animation will run now for the first time. Call `start_cb`*/
             if(!a->start_cb_called && a->act_time >= 0) {
 
@@ -725,7 +727,7 @@ static void resolve_time(lv_anim_t * a)
  * @param a_current     the current animation, use its var and exec_cb as reference to know what to remove
  * @return              true: at least one animation was delete
  */
-static bool remove_concurrent_anims(lv_anim_t * a_current)
+static bool remove_concurrent_anims(const lv_anim_t * a_current)
 {
     if(a_current->exec_cb == NULL && a_current->custom_exec_cb == NULL) return false;
 

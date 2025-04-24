@@ -5,9 +5,6 @@
 
 #include "unity/unity.h"
 
-#include "lv_test_helpers.h"
-#include "lv_test_indev.h"
-
 static void loop_through_stress_test(void)
 {
 #if LV_USE_DEMO_STRESS

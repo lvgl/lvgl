@@ -38,8 +38,8 @@
 #define LV_FONT_MONTSERRAT_48   1
 #define LV_FONT_MONTSERRAT_28_COMPRESSED    1
 #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW    1
-#define LV_FONT_SIMSUN_14_CJK   1
-#define LV_FONT_SIMSUN_16_CJK   1
+#define LV_FONT_SOURCE_HAN_SANS_SC_14_CJK   1
+#define LV_FONT_SOURCE_HAN_SANS_SC_16_CJK   1
 #define LV_FONT_UNSCII_8        1
 #define LV_FONT_UNSCII_16       1
 #define LV_FONT_DEFAULT         &lv_font_montserrat_14
@@ -79,7 +79,12 @@
 #define LV_USE_BMP          1
 #define LV_USE_TJPGD        1
 #ifndef _WIN32
-    #define LV_USE_LIBJPEG_TURBO   1
+    #define LV_USE_LIBJPEG_TURBO       1
+#endif
+#ifndef LV_USE_FFMPEG
+    #define LV_USE_FFMPEG              1
+    #define LV_FFMPEG_DUMP_FORMAT      1
+    #define LV_FFMPEG_PLAYER_USE_LV_FS 1
 #endif
 #define LV_USE_GIF          1
 #define LV_USE_QRCODE       1
@@ -90,6 +95,7 @@
 #define LV_USE_OBSERVER         1
 #define LV_USE_FILE_EXPLORER    1
 #define LV_USE_TINY_TTF         1
+#define LV_TINY_TTF_FILE_SUPPORT 1
 #define LV_USE_SYSMON           1
 #define LV_USE_MEM_MONITOR      1
 #define LV_USE_PERF_MONITOR     1
@@ -104,6 +110,8 @@
 #define LV_PROFILER_INCLUDE     "lv_profiler_builtin.h"
 #define LV_USE_GRIDNAV          1
 #define LV_USE_XML              1
+#define LV_USE_TEST             1
+#define LV_USE_TEST_SCREENSHOT_COMPARE  1
 
 #define LV_BUILD_EXAMPLES       1
 #define LV_USE_DEMO_WIDGETS     1
@@ -124,6 +132,8 @@
 #define LV_USE_OBJ_ID           1
 #define LV_OBJ_ID_AUTO_ASSIGN    1
 #define LV_USE_OBJ_ID_BUILTIN   1
+
+#define LV_USE_OBJ_NAME         1
 
 #define LV_CACHE_DEF_SIZE       (10 * 1024 * 1024)
 
@@ -161,7 +171,7 @@
 
 #define LV_USE_FREETYPE 1
 #define LV_FREETYPE_USE_LVGL_PORT 0
-#define LV_FREETYPE_CACHE_FT_GLYPH_CNT 10
+#define LV_FREETYPE_CACHE_FT_GLYPH_CNT 64
 
 #define LV_USE_FONT_MANAGER 1
 

@@ -69,7 +69,7 @@ const lv_obj_class_t lv_bar_class = {
     .height_def = LV_DPI_DEF / 10,
     .instance_size = sizeof(lv_bar_t),
     .base_class = &lv_obj_class,
-    .name = "bar",
+    .name = "lv_bar",
 };
 
 /**********************

@@ -157,7 +157,7 @@ const lv_obj_class_t lv_textarea_class = {
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .instance_size = sizeof(lv_textarea_t),
     .base_class = &lv_obj_class,
-    .name = "textarea",
+    .name = "lv_textarea",
 #if LV_USE_OBJ_PROPERTY
     .prop_index_start = LV_PROPERTY_TEXTAREA_START,
     .prop_index_end = LV_PROPERTY_TEXTAREA_END,
@@ -948,7 +948,8 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     ta->label = lv_label_create(obj);
     lv_obj_set_width(ta->label, lv_pct(100));
     lv_label_set_text(ta->label, "");
-    lv_obj_add_event_cb(ta->label, label_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ta->label, label_event_cb, LV_EVENT_STYLE_CHANGED, NULL);
+    lv_obj_add_event_cb(ta->label, label_event_cb, LV_EVENT_SIZE_CHANGED, NULL);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_WITH_ARROW);
 

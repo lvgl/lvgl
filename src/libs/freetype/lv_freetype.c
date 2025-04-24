@@ -50,9 +50,22 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
 static void cache_node_cache_free_cb(lv_freetype_cache_node_t * node, void * user_data);
 static lv_cache_compare_res_t cache_node_cache_compare_cb(const lv_freetype_cache_node_t * lhs,
                                                           const lv_freetype_cache_node_t * rhs);
+
+static lv_font_t * freetype_font_create_cb(const lv_font_info_t * info, const void * src);
+static void freetype_font_delete_cb(lv_font_t * font);
+static void * freetype_font_dup_src_cb(const void * src);
+static void freetype_font_free_src_cb(void * src);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+const lv_font_class_t lv_freetype_font_class = {
+    .create_cb = freetype_font_create_cb,
+    .delete_cb = freetype_font_delete_cb,
+    .dup_src_cb = freetype_font_dup_src_cb,
+    .free_src_cb = freetype_font_free_src_cb,
+};
 
 /**********************
  *      MACROS
@@ -110,21 +123,38 @@ void lv_freetype_uninit(void)
     ft_ctx = NULL;
 }
 
-lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_render_mode_t render_mode, uint32_t size,
-                                    lv_freetype_font_style_t style)
+void lv_freetype_init_font_info(lv_font_info_t * font_info)
 {
-    LV_ASSERT_NULL(pathname);
-    LV_ASSERT(size > 0);
+    LV_ASSERT_NULL(font_info);
+    lv_memzero(font_info, sizeof(lv_font_info_t));
+    font_info->class_p = &lv_freetype_font_class;
+    font_info->render_mode = LV_FREETYPE_FONT_RENDER_MODE_BITMAP;
+    font_info->style = LV_FREETYPE_FONT_STYLE_NORMAL;
+    font_info->kerning = LV_FONT_KERNING_NONE;
+}
 
-    size_t pathname_len = lv_strlen(pathname);
-    LV_ASSERT(pathname_len > 0);
+lv_font_t * lv_freetype_font_create_with_info(const lv_font_info_t * font_info)
+{
+    LV_ASSERT_NULL(font_info);
+    if(font_info->size == 0) {
+        LV_LOG_ERROR("font size can't be zero");
+        return NULL;
+    }
+
+    const char * pathname = font_info->name;
+
+    size_t pathname_len = pathname ? lv_strlen(pathname) : 0;
+    if(pathname_len == 0) {
+        LV_LOG_ERROR("font pathname can't be empty");
+        return NULL;
+    }
 
     lv_freetype_context_t * ctx = lv_freetype_get_context();
 
     lv_freetype_cache_node_t search_key = {
         .pathname = lv_freetype_req_face_id(ctx, pathname),
-        .style = style,
-        .render_mode = render_mode,
+        .style = font_info->style,
+        .render_mode = font_info->render_mode,
     };
 
     bool cache_hitting = true;
@@ -143,10 +173,11 @@ lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_rend
     LV_ASSERT_MALLOC(dsc);
 
     dsc->face_id = (FTC_FaceID)search_key.pathname;
-    dsc->render_mode = render_mode;
+    dsc->render_mode = font_info->render_mode;
     dsc->context = ctx;
-    dsc->size = size;
-    dsc->style = style;
+    dsc->size = font_info->size;
+    dsc->style = font_info->style;
+    dsc->kerning = font_info->kerning;
     dsc->magic_num = LV_FREETYPE_FONT_DSC_MAGIC_NUM;
     dsc->cache_node = lv_cache_entry_get_data(cache_node_entry);
     dsc->cache_node_entry = cache_node_entry;
@@ -162,7 +193,7 @@ lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_rend
     FT_Face face = dsc->cache_node->face;
     FT_Error error;
     if(FT_IS_SCALABLE(face)) {
-        error = FT_Set_Pixel_Sizes(face, 0, size);
+        error = FT_Set_Pixel_Sizes(face, 0, font_info->size);
     }
     else {
         LV_LOG_WARN("font is not scalable, selecting available size");
@@ -171,6 +202,10 @@ lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_rend
     if(error) {
         FT_ERROR_MSG("FT_Set_Pixel_Sizes", error);
         return NULL;
+    }
+
+    if(dsc->kerning != LV_FONT_KERNING_NONE && !dsc->cache_node->face_has_kerning) {
+        LV_LOG_WARN("font: '%s' doesn't have kerning info", pathname);
     }
 
     lv_font_t * font = &dsc->font;
@@ -185,6 +220,18 @@ lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_rend
     font->underline_thickness = thickness < 1 ? 1 : thickness;
 
     return font;
+}
+
+lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_render_mode_t render_mode, uint32_t size,
+                                    lv_freetype_font_style_t style)
+{
+    lv_font_info_t font_info;
+    lv_freetype_init_font_info(&font_info);
+    font_info.name = pathname;
+    font_info.size = size;
+    font_info.render_mode = render_mode;
+    font_info.style = style;
+    return lv_freetype_font_create_with_info(&font_info);
 }
 
 void lv_freetype_font_delete(lv_font_t * font)
@@ -379,6 +426,7 @@ static bool cache_node_cache_create_cb(lv_freetype_cache_node_t * node, void * u
     }
 
     node->face = face;
+    node->face_has_kerning = FT_HAS_KERNING(face);
     lv_mutex_init(&node->face_lock);
 
     return true;
@@ -413,6 +461,28 @@ static lv_cache_compare_res_t cache_node_cache_compare_cb(const lv_freetype_cach
     }
 
     return 0;
+}
+
+static lv_font_t * freetype_font_create_cb(const lv_font_info_t * info, const void * src)
+{
+    lv_font_info_t font_info = *info;
+    font_info.name = src;
+    return lv_freetype_font_create_with_info(&font_info);
+}
+
+static void freetype_font_delete_cb(lv_font_t * font)
+{
+    lv_freetype_font_delete(font);
+}
+
+static void * freetype_font_dup_src_cb(const void * src)
+{
+    return lv_strdup(src);
+}
+
+static void freetype_font_free_src_cb(void * src)
+{
+    lv_free(src);
 }
 
 #endif /*LV_USE_FREETYPE*/

@@ -3,7 +3,6 @@
 #include "../../lvgl_private.h"
 
 #include "unity/unity.h"
-#include "lv_test_indev.h"
 
 static void event_object_deletion_cb(const lv_obj_class_t * cls, lv_event_t * e)
 {
