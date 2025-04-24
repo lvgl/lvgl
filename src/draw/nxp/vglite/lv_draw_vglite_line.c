@@ -125,8 +125,6 @@ static void _vglite_draw_line(vglite_draw_task_t * vglite_task, const lv_point_t
         stroke_dash_phase = (vg_lite_float_t)dsc->dash_width / 2;
     }
 
-    vg_lite_blend_t vgblend = vglite_get_blend_mode(dsc->blend_mode);
-
     /*** Init path ***/
     int32_t width = dsc->width;
 
@@ -151,7 +149,7 @@ static void _vglite_draw_line(vglite_draw_task_t * vglite_task, const lv_point_t
 
     VGLITE_CHECK_ERROR(vg_lite_update_stroke(path));
 
-    VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_NON_ZERO, NULL, vgblend, vgcol));
+    VGLITE_CHECK_ERROR(vg_lite_draw(dest_buf, path, VG_LITE_FILL_NON_ZERO, NULL, VG_LITE_BLEND_SRC_OVER, vgcol));
 
     vglite_run();
 }

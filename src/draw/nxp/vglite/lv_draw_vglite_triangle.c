@@ -62,7 +62,7 @@ void lv_draw_vglite_triangle(vglite_draw_task_t * vglite_task)
 {
     const lv_draw_triangle_dsc_t * dsc = vglite_task->t->draw_dsc;
 
-    if(dsc->bg_opa <= (lv_opa_t)LV_OPA_MIN)
+    if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
     lv_layer_t * layer = vglite_task->t->target_layer;
@@ -140,12 +140,12 @@ static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_are
                                          ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f));
 
     /* Init Color */
-    lv_color32_t col32 = lv_color_to_32(dsc->bg_color, dsc->bg_opa);
+    lv_color32_t col32 = lv_color_to_32(dsc->color, dsc->opa);
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
 
     vg_lite_linear_gradient_t * gradient;
 
-    bool has_gradient = (dsc->bg_grad.dir != (lv_grad_dir_t)LV_GRAD_DIR_NONE);
+    bool has_gradient = (dsc->grad.dir != (lv_grad_dir_t)LV_GRAD_DIR_NONE);
 
     /* Init Gradient*/
     if(has_gradient) {
@@ -160,14 +160,14 @@ static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_are
         lv_color32_t col32[LV_GRADIENT_MAX_STOPS];
 
         /* Gradient Setup */
-        vg_lite_uint32_t cnt = LV_MAX(dsc->bg_grad.stops_count, LV_GRADIENT_MAX_STOPS);
-        lv_opa_t bg_opa;
+        vg_lite_uint32_t cnt = LV_MAX(dsc->grad.stops_count, LV_GRADIENT_MAX_STOPS);
+        lv_opa_t opa;
 
         for(uint8_t i = 0; i < cnt; i++) {
-            stops[i] = dsc->bg_grad.stops[i].frac;
-            bg_opa = LV_OPA_MIX2(dsc->bg_grad.stops[i].opa, dsc->bg_opa);
+            stops[i] = dsc->grad.stops[i].frac;
+            opa = LV_OPA_MIX2(dsc->grad.stops[i].opa, dsc->opa);
 
-            col32[i] = lv_color_to_32(dsc->bg_grad.stops[i].color, bg_opa);
+            col32[i] = lv_color_to_32(dsc->grad.stops[i].color, opa);
             colors[i] = vglite_get_color(col32[i], true);
         }
 
@@ -181,7 +181,7 @@ static void _vglite_draw_triangle(vglite_draw_task_t * vglite_task, const lv_are
         vg_lite_identity(grad_matrix);
         vg_lite_translate((float)coords->x1, (float)coords->y1, grad_matrix);
 
-        if(dsc->bg_grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_VER) {
+        if(dsc->grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_VER) {
             vg_lite_scale(1.0f, (float)height / 256.0f, grad_matrix);
             vg_lite_rotate(90.0f, grad_matrix);
         }
