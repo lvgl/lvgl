@@ -2,6 +2,12 @@
 #if LV_BUILD_EXAMPLES
 #if LV_USE_FFMPEG
 
+#if LV_FFMPEG_PLAYER_USE_LV_FS
+    #define PATH_PREFIX "A:"
+#else
+    #define PATH_PREFIX "./"
+#endif
+
 /**
  * Open a video from a file
  */
@@ -12,7 +18,7 @@ void lv_example_ffmpeg_2(void)
     /*It will use the LVGL filesystem abstraction (not the OS filesystem)
      *if `LV_FFMPEG_PLAYER_USE_LV_FS` is set.*/
     lv_obj_t * player = lv_ffmpeg_player_create(lv_screen_active());
-    lv_ffmpeg_player_set_src(player, "./lvgl/examples/libs/ffmpeg/birds.mp4");
+    lv_ffmpeg_player_set_src(player, PATH_PREFIX "lvgl/examples/libs/ffmpeg/birds.mp4");
     lv_ffmpeg_player_set_auto_restart(player, true);
     lv_ffmpeg_player_set_cmd(player, LV_FFMPEG_PLAYER_CMD_START);
     lv_obj_center(player);

@@ -3,6 +3,10 @@
  *
  */
 
+/**
+ * Modified by NXP in 2025
+ */
+
 /*********************
  *      INCLUDES
  *********************/
@@ -103,13 +107,18 @@ lv_obj_t * lv_animimg_create(lv_obj_t * parent)
     return obj;
 }
 
-void lv_animimg_set_src(lv_obj_t * obj, const void * dsc[], size_t num)
+void lv_animimg_set_src(lv_obj_t * obj, const void * dsc[], size_t num, bool reverse)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     animimg->dsc = dsc;
     animimg->pic_count = num;
-    lv_anim_set_values(&animimg->anim, 0, (int32_t)num);
+    if(reverse) {
+        lv_anim_set_values(&animimg->anim, (int32_t)num, 0);
+    }
+    else {
+        lv_anim_set_values(&animimg->anim, 0, (int32_t)num);
+    }
 }
 
 void lv_animimg_start(lv_obj_t * obj)
@@ -117,6 +126,13 @@ void lv_animimg_start(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     lv_anim_start(&animimg->anim);
+}
+
+bool lv_animimg_delete(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_animimg_t * animimg = (lv_animimg_t *)obj;
+    return lv_anim_delete(animimg, NULL);
 }
 
 /*=====================
@@ -136,6 +152,34 @@ void lv_animimg_set_repeat_count(lv_obj_t * obj, uint32_t count)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
     lv_anim_set_repeat_count(&animimg->anim, count);
+}
+
+void lv_animimg_set_reverse_duration(lv_obj_t * obj, uint32_t duration)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_animimg_t * animimg = (lv_animimg_t *)obj;
+    lv_anim_set_reverse_duration(&animimg->anim, duration);
+}
+
+void lv_animimg_set_reverse_delay(lv_obj_t * obj, uint32_t duration)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_animimg_t * animimg = (lv_animimg_t *)obj;
+    lv_anim_set_reverse_delay(&animimg->anim, duration);
+}
+
+void lv_animimg_set_start_cb(lv_obj_t * obj, lv_anim_start_cb_t start_cb)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_animimg_t * animimg = (lv_animimg_t *)obj;
+    lv_anim_set_start_cb(&animimg->anim, start_cb);
+}
+
+void lv_animimg_set_completed_cb(lv_obj_t * obj, lv_anim_completed_cb_t completed_cb)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_animimg_t * animimg = (lv_animimg_t *)obj;
+    lv_anim_set_completed_cb(&animimg->anim, completed_cb);
 }
 
 /*=====================

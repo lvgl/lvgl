@@ -142,7 +142,7 @@ void lv_profiler_builtin_init(const lv_profiler_builtin_config_t * config)
         profiler_ctx->config.flush_cb("#\n");
     }
 
-    lv_profiler_builtin_set_enable(true);
+    lv_profiler_builtin_set_enable(LV_PROFILER_BUILTIN_DEFAULT_ENABLE);
 
     LV_LOG_INFO("init OK, item_num = %d", (int)num);
 }

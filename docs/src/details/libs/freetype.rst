@@ -69,6 +69,7 @@ save limited FLASH space.
    FT_CSRCS += freetype/src/base/ftdebug.c
    FT_CSRCS += freetype/src/base/ftglyph.c
    FT_CSRCS += freetype/src/base/ftinit.c
+   FT_CSRCS += freetype/src/base/ftstroke.c
    FT_CSRCS += freetype/src/cache/ftcache.c
    FT_CSRCS += freetype/src/gzip/ftgzip.c
    FT_CSRCS += freetype/src/sfnt/sfnt.c

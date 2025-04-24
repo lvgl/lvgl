@@ -778,6 +778,12 @@ static void process_touch_event(lv_indev_touch_data_t * touch, lv_indev_gesture_
 
             /* Mark last item as un-used */
             motion = get_motion(touch->id, g);
+
+            if(motion == NULL) {
+                LV_LOG_ERROR("Released touch not found (id=%d)", touch->id);
+                return;
+            }
+
             motion->finger = -1;
             motion->state = touch->state;
         }
@@ -808,6 +814,12 @@ static void process_touch_event(lv_indev_touch_data_t * touch, lv_indev_gesture_
     }
     else if(motion_idx >= 0) {
         motion = get_motion(touch->id, g);
+
+        if(motion == NULL) {
+            LV_LOG_ERROR("Active touch missing (id=%d state=%d)", touch->id, touch->state);
+            return;
+        }
+
         motion->point.x = touch->point.x;
         motion->point.y = touch->point.y;
         motion->state = touch->state;

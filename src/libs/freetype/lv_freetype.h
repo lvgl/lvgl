@@ -82,6 +82,19 @@ lv_result_t lv_freetype_init(uint32_t max_glyph_cnt);
 void lv_freetype_uninit(void);
 
 /**
+ * Initialize a font info structure.
+ * @param font_info font info structure to be initialized.
+ */
+void lv_freetype_init_font_info(lv_font_info_t * font_info);
+
+/**
+ * Create a freetype font with a font info structure.
+ * @param font_info font info structure.
+ * @return Created font, or NULL on failure.
+ */
+lv_font_t * lv_freetype_font_create_with_info(const lv_font_info_t * font_info);
+
+/**
  * Create a freetype font.
  * @param pathname font file path.
  * @param render_mode font render mode(see @lv_freetype_font_render_mode_t for details).
@@ -91,6 +104,7 @@ void lv_freetype_uninit(void);
  */
 lv_font_t * lv_freetype_font_create(const char * pathname, lv_freetype_font_render_mode_t render_mode, uint32_t size,
                                     lv_freetype_font_style_t style);
+
 /**
  * Delete a freetype font.
  * @param font freetype font to be deleted.
