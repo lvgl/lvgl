@@ -323,10 +323,10 @@
 
     /** VG-Lite gradient maximum cache number.
      *  @note  The memory usage of a single gradient image is 4K bytes. */
-    #define LV_VG_LITE_GRAD_CACHE_CNT 32
+    #define LV_VG_LITE_GRAD_CACHE_CNT 8
 
     /** VG-Lite stroke maximum cache number. */
-    #define LV_VG_LITE_STROKE_CACHE_CNT 32
+    #define LV_VG_LITE_STROKE_CACHE_CNT 8
 #endif
 
 /** Accelerate blends, fills, etc. with STM32 DMA2D */

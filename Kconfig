@@ -462,7 +462,7 @@ menu "LVGL configuration"
 
 		config LV_VG_LITE_GRAD_CACHE_CNT
 			int "VG-Lite gradient maximum cache number."
-			default 32
+			default 8
 			depends on LV_USE_DRAW_VG_LITE
 			help
 				The memory usage of a single gradient:
