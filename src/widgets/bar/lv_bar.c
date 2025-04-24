@@ -462,8 +462,8 @@ static void draw_indic(lv_event_t * e)
     /* small fix for reversed vertical indicator, no idea if this happens with horizontal as well */
     if(reversed && !hor)
         bar->indic_area.y2 -= 2;
-    else if (reversed && hor)
-        bar->indic_area.x2 -= 2;
+    else if(reversed && hor)
+        bar->indic_area.x1 += 2;
     if(!sym && indic_length_calc(&bar->indic_area) <= 1) {
         lv_obj_send_event(obj, LV_EVENT_DRAW_TASK_ADDED, NULL);
         return;
