@@ -122,17 +122,16 @@ static void draw_fill(lv_draw_vg_lite_unit_t * u,
                 lv_image_decoder_dsc_t decoder_dsc;
                 if(lv_vg_lite_buffer_open_image(&image_buffer, &decoder_dsc, dsc->fill_dsc.img_dsc.src, false, true)) {
                     /* Calculate pattern matrix. Should start from path bond box, and also apply fill matrix. */
-                    lv_matrix_t m = dsc->matrix;
+                    vg_lite_matrix_t pattern_matrix = *matrix;
 
                     if(dsc->fill_dsc.fill_units == LV_VECTOR_FILL_UNITS_OBJECT_BOUNDING_BOX) {
                         /* Convert to object bounding box coordinates */
-                        lv_matrix_translate(&m, offset->x, offset->y);
+                        vg_lite_translate(offset->x, offset->y, &pattern_matrix);
                     }
 
-                    lv_matrix_multiply(&m, &dsc->fill_dsc.matrix);
-
-                    vg_lite_matrix_t pattern_matrix;
-                    lv_vg_lite_matrix(&pattern_matrix, &m);
+                    vg_lite_matrix_t fill_matrix;
+                    lv_vg_lite_matrix(&fill_matrix, &dsc->fill_dsc.matrix);
+                    lv_vg_lite_matrix_multiply(&pattern_matrix, &fill_matrix);
 
                     vg_lite_color_t recolor = lv_vg_lite_image_recolor(&image_buffer, &dsc->fill_dsc.img_dsc);
 
