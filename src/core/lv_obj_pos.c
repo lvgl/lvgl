@@ -281,6 +281,8 @@ bool lv_obj_is_layout_positioned(const lv_obj_t * obj)
 
 void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
     obj->layout_inv = 1;
 
     /*Mark the screen as dirty too to mark that there is something to do on this screen*/
@@ -294,6 +296,8 @@ void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
 
 void lv_obj_update_layout(const lv_obj_t * obj)
 {
+    if(obj == NULL) return;
+
     if(update_layout_mutex) {
         LV_LOG_TRACE("Already running, returning");
         return;

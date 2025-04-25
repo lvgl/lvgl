@@ -386,7 +386,7 @@ void lv_display_refr_timer(lv_timer_t * tmr)
     /*Refresh the screen's layout if required*/
     LV_PROFILER_LAYOUT_BEGIN_TAG("layout");
     lv_obj_update_layout(disp_refr->act_scr);
-    if(disp_refr->prev_scr) lv_obj_update_layout(disp_refr->prev_scr);
+    lv_obj_update_layout(disp_refr->prev_scr);
 
     lv_obj_update_layout(disp_refr->bottom_layer);
     lv_obj_update_layout(disp_refr->top_layer);
