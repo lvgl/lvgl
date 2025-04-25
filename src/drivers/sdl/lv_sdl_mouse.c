@@ -53,6 +53,7 @@ typedef struct {
     int32_t diff;
 #endif
     bool first_mouse_input;
+    int8_t finger_id;
 } lv_sdl_mouse_t;
 static bool mouse_input_exist = false;
 
@@ -65,6 +66,11 @@ lv_indev_t * lv_sdl_mouse_create(void)
     lv_sdl_mouse_t * dsc = lv_malloc_zeroed(sizeof(lv_sdl_mouse_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
+    lv_indev_t * indev_finger_map = lv_indev_get_next(NULL);
+    while(indev_finger_map) {
+        indev_finger_map = lv_indev_get_next(indev_finger_map);
+        dsc->finger_id++;
+    }
 
     lv_indev_t * indev = lv_indev_create();
     LV_ASSERT_MALLOC(indev);
@@ -168,18 +174,22 @@ void lv_sdl_mouse_handler(SDL_Event * event)
 
     /*Find a suitable indev*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
+    lv_sdl_mouse_t * indev_dev = NULL;
     while(indev) {
         if(lv_indev_get_read_cb(indev) == sdl_mouse_read) {
             /*If disp is NULL for any reason use the first indev with the correct type*/
             /*If more than one mouse indev are created, link it to the coresponding finger id*/
-            if((disp == NULL || lv_indev_get_display(indev) == disp)  && indev_find_id <= 0) break;
-            indev_find_id--;
+            if((disp == NULL || lv_indev_get_display(indev) == disp) ){
+                indev_dev = lv_indev_get_driver_data(indev);
+                if(indev_dev == NULL)continue;
+                if(indev_find_id==indev_dev->finger_id)break;
+            }
         }
         indev = lv_indev_get_next(indev);
     }
 
     if(indev == NULL) return;
-    lv_sdl_mouse_t * indev_dev = lv_indev_get_driver_data(indev);
+    indev_dev = lv_indev_get_driver_data(indev);
     if(indev_dev == NULL) return;
 
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
