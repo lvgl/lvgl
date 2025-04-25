@@ -798,7 +798,7 @@ static void pinyin_input_proc(lv_obj_t * obj)
     }
 
 
-    pinyin_ime->cand_panel->flags &= (~LV_OBJ_FLAG_HIDDEN);
+    lv_obj_remove_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
     lv_obj_invalidate(pinyin_ime->cand_panel);
 }
 
