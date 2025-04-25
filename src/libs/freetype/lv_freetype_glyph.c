@@ -117,6 +117,21 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
         g_dsc->adv_w = g_dsc->box_w + g_dsc->ofs_x;
     }
 
+    if(dsc->kerning == LV_FONT_KERNING_NORMAL && dsc->cache_node->face_has_kerning && unicode_letter_next != '\0') {
+        lv_mutex_lock(&dsc->cache_node->face_lock);
+        FT_Face face = dsc->cache_node->face;
+        FT_UInt glyph_index_next = FT_Get_Char_Index(face, unicode_letter_next);
+        FT_Vector kerning;
+        FT_Error error = FT_Get_Kerning(face, g_dsc->gid.index, glyph_index_next, FT_KERNING_DEFAULT, &kerning);
+        if(!error) {
+            g_dsc->adv_w += LV_FREETYPE_F26DOT6_TO_INT(kerning.x);
+        }
+        else {
+            FT_ERROR_MSG("FT_Get_Kerning", error);
+        }
+        lv_mutex_unlock(&dsc->cache_node->face_lock);
+    }
+
     g_dsc->entry = NULL;
 
     lv_cache_release(glyph_cache, entry, NULL);
@@ -131,10 +146,9 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_
 static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void * user_data)
 {
     LV_PROFILER_FONT_BEGIN;
-    lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)user_data;
 
     FT_Error error;
-
+    lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)user_data;
     lv_font_glyph_dsc_t * dsc_out = &data->glyph_dsc;
 
     lv_mutex_lock(&dsc->cache_node->face_lock);
@@ -169,6 +183,7 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
     FT_GlyphSlot glyph = face->glyph;
 
     if(dsc->render_mode == LV_FREETYPE_FONT_RENDER_MODE_OUTLINE) {
+
         dsc_out->adv_w = FT_F26DOT6_TO_INT(glyph->metrics.horiAdvance);
         dsc_out->box_h = FT_F26DOT6_TO_INT(glyph->metrics.height);          /*Height of the bitmap in [px]*/
         dsc_out->box_w = FT_F26DOT6_TO_INT(glyph->metrics.width);           /*Width of the bitmap in [px]*/
@@ -177,7 +192,7 @@ static bool freetype_glyph_create_cb(lv_freetype_glyph_cache_data_t * data, void
                                            glyph->metrics.height);          /*Y offset of the bitmap measured from the as line*/
         dsc_out->format = LV_FONT_GLYPH_FORMAT_VECTOR;
 
-        /*Transform the glyph to italic if required*/
+        /*Transform the glyph to italic if required */
         if(dsc->style & LV_FREETYPE_FONT_STYLE_ITALIC) {
             dsc_out->box_w = lv_freetype_italic_transform_on_pos((lv_point_t) {
                 dsc_out->box_w, dsc_out->box_h

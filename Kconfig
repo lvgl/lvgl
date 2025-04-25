@@ -147,17 +147,6 @@ menu "LVGL configuration"
 				bool "255: CUSTOM"
 		endchoice
 
-		config LV_USE_OS
-			int
-			default 0 if LV_OS_NONE
-			default 1 if LV_OS_PTHREAD
-			default 2 if LV_OS_FREERTOS
-			default 3 if LV_OS_CMSIS_RTOS2
-			default 4 if LV_OS_RTTHREAD
-			default 5 if LV_OS_WINDOWS
-			default 6 if LV_OS_MQX
-			default 255 if LV_OS_CUSTOM
-
 		config LV_OS_CUSTOM_INCLUDE
 			string "Custom OS include header"
 			default "stdint.h"
@@ -409,6 +398,26 @@ menu "LVGL configuration"
 		config LV_USE_PXP_ASSERT
 			bool "Enable PXP asserts"
 			depends on LV_USE_DRAW_PXP
+
+		config LV_USE_DRAW_G2D
+			bool "Use NXP's G2D on MPU platforms"
+			default n
+
+		config LV_G2D_HASH_TABLE_SIZE
+			bool "Maximum number of buffers that can be stored for G2D draw unit."
+			default 50
+			depends on LV_USE_DRAW_G2D
+			help
+				Includes the frame buffers and assets.
+
+		config LV_USE_G2D_DRAW_THREAD
+			bool "Use additional draw thread for G2D processing"
+			depends on LV_USE_DRAW_G2D && LV_USE_OS > 0
+			default y
+
+		config LV_USE_G2D_ASSERT
+			bool "Enable G2D asserts"
+			depends on LV_USE_DRAW_G2D
 			default n
 
 		config LV_USE_DRAW_DAVE2D
@@ -462,7 +471,7 @@ menu "LVGL configuration"
 
 		config LV_VG_LITE_STROKE_CACHE_CNT
 			int "VG-Lite stroke maximum cache number."
-			default 32
+			default 8
 			depends on LV_USE_DRAW_VG_LITE
 
 		config LV_USE_VECTOR_GRAPHIC
@@ -696,6 +705,10 @@ menu "LVGL configuration"
 				bool "Add id field to obj"
 				default n
 
+			config LV_USE_OBJ_NAME
+				bool "Enable support widget names"
+				default n
+
 			config LV_OBJ_ID_AUTO_ASSIGN
 				bool "Automatically assign an ID when obj is created"
 				default y
@@ -845,6 +858,10 @@ menu "LVGL configuration"
 				bool "Enable Simsun 14 CJK"
 			config LV_FONT_SIMSUN_16_CJK
 				bool "Enable Simsun 16 CJK"
+			config LV_FONT_SOURCE_HAN_SANS_SC_14_CJK
+				bool "Enable SourceHanSansSC 14 CJK"
+			config LV_FONT_SOURCE_HAN_SANS_SC_16_CJK
+				bool "Enable SourceHanSansSC 16 CJK"
 
 			config LV_FONT_UNSCII_8
 				bool "Enable UNSCII 8 (Perfect monospace font)"
@@ -935,6 +952,12 @@ menu "LVGL configuration"
 			config LV_FONT_DEFAULT_SIMSUN_16_CJK
 				bool "Simsun 16 CJK"
 				select LV_FONT_SIMSUN_16_CJK
+			config LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_14_CJK
+				bool "SourceHanSansSC 14 CJK"
+				select LV_FONT_SOURCE_HAN_SANS_SC_14_CJK
+			config LV_FONT_DEFAULT_SOURCE_HAN_SANS_SC_16_CJK
+				bool "SourceHanSansSC 16 CJK"
+				select LV_FONT_SOURCE_HAN_SANS_SC_16_CJK
 			config LV_FONT_DEFAULT_UNSCII_8
 				bool "UNSCII 8 (Perfect monospace font)"
 				select LV_FONT_UNSCII_8
@@ -1053,6 +1076,34 @@ menu "LVGL configuration"
 		config LV_CALENDAR_WEEK_STARTS_MONDAY
 			bool "Calendar week starts monday"
 			depends on LV_USE_CALENDAR
+
+		menu "Days name configuration"
+			depends on LV_USE_CALENDAR
+
+		config LV_MONDAY_STR
+			string "Shortened string for Monday"
+			default "Mo"
+		config LV_TUESDAY_STR
+			string "Shortened string for Tuesday"
+			default "Tu"
+		config LV_WEDNESDAY_STR
+			string "Shortened string for Wednesday"
+			default "We"
+		config LV_THURSDAY_STR
+			string "Shortened string for Thursday"
+			default "Th"
+		config LV_FRIDAY_STR
+			string "Shortened string for Friday"
+			default "Fr"
+		config LV_SATURDAY_STR
+			string "Shortened string for Saturday"
+			default "Sa"
+		config LV_SUNDAY_STR
+			string "Shortened string for Sunday"
+			default "Su"
+
+		endmenu
+
 		config LV_USE_CALENDAR_HEADER_ARROW
 			bool "Use calendar header arrow"
 			depends on LV_USE_CALENDAR
@@ -1505,6 +1556,10 @@ menu "LVGL configuration"
 			int "Default profiler trace buffer size in bytes"
 			depends on LV_USE_PROFILER_BUILTIN
 			default 16384
+		config LV_PROFILER_BUILTIN_DEFAULT_ENABLE
+			bool "Enable built-in profiler by default"
+			depends on LV_USE_PROFILER_BUILTIN
+			default y
 		config LV_PROFILER_INCLUDE
 			string "Header to include for the profiler"
 			default "lvgl/src/misc/lv_profiler_builtin.h"
@@ -1615,15 +1670,22 @@ menu "LVGL configuration"
 				This can save some memory, but not much. After the quick access bar is created, it can be hidden by clicking the button at the top left corner of the browsing area, which is very useful for small screen devices.
 
 		config LV_USE_FONT_MANAGER
-			bool "Enable freetype font manager"
-			depends on LV_USE_FREETYPE
+			bool "Enable Font manager"
 			default n
 		config LV_FONT_MANAGER_NAME_MAX_LEN
 			int "Font manager name max length"
 			depends on LV_USE_FONT_MANAGER
 			default 32
+		config LV_USE_TEST
+			bool "Enable emulated input devices, time emulation, and screenshot compares."
+		config LV_USE_TEST_SCREENSHOT_COMPARE
+			bool "Enable `lv_test_screenshot_compare`. Requires libpng and a few MB of extra RAM."
+			depends on LV_USE_TEST
 		config LV_USE_XML
 			bool "Enable loading XML UIs runtime"
+		config LV_USE_COLOR_FILTER
+			bool "Enable color filter style"
+			default n
 		config LVGL_VERSION_MAJOR
 			int
 			default 9 # LVGL_VERSION_MAJOR
@@ -1823,6 +1885,11 @@ menu "LVGL configuration"
 			depends on LV_USE_LINUX_FBDEV && LV_LINUX_FBDEV_CUSTOM_BUFFER
 			default 60
 
+		config LV_LINUX_FBDEV_MMAP
+			bool "Framebuffer device supports mmap"
+			depends on LV_USE_LINUX_FBDEV
+			default y
+
 		config LV_USE_NUTTX
 			bool "Use Nuttx to open window and handle touchscreen"
 			default n
@@ -1830,6 +1897,11 @@ menu "LVGL configuration"
 		config LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
 			bool "Use independent image heap"
 			depends on LV_USE_NUTTX
+			default n
+
+		config LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP
+			bool "Use independent image heap for default draw buffer"
+			depends on LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
 			default n
 
 		config LV_USE_NUTTX_LIBUV

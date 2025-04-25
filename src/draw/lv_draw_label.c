@@ -108,12 +108,9 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_label(lv_layer_t * layer, const lv_draw_label
     }
 
     LV_PROFILER_DRAW_BEGIN;
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords);
+    lv_draw_task_t * t = lv_draw_add_task(layer, coords, LV_DRAW_TASK_TYPE_LABEL);
 
-    t->draw_dsc = lv_malloc(sizeof(*dsc));
-    LV_ASSERT_MALLOC(t->draw_dsc);
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
-    t->type = LV_DRAW_TASK_TYPE_LABEL;
 
     /*The text is stored in a local variable so malloc memory for it*/
     if(dsc->text_local) {
@@ -191,12 +188,9 @@ void LV_ATTRIBUTE_FAST_MEM lv_draw_letter(lv_layer_t * layer, lv_draw_letter_dsc
     dsc->pivot.x = g.adv_w / 2 ;
     dsc->pivot.y = font->line_height - font->base_line;
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, &a);
+    lv_draw_task_t * t = lv_draw_add_task(layer, &a, LV_DRAW_TASK_TYPE_LETTER);
 
-    t->draw_dsc = lv_malloc(sizeof(*dsc));
-    LV_ASSERT_MALLOC(t->draw_dsc);
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
-    t->type = LV_DRAW_TASK_TYPE_LETTER;
 
     lv_draw_finalize_task_creation(layer, t);
     LV_PROFILER_DRAW_END;
@@ -315,6 +309,11 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
     draw_letter_dsc.color = dsc->color;
     draw_letter_dsc.rotation = dsc->rotation;
 
+    /* Set letter outline stroke attributes */
+    draw_letter_dsc.outline_stroke_width = dsc->outline_stroke_width;
+    draw_letter_dsc.outline_stroke_opa = dsc->outline_stroke_opa;
+    draw_letter_dsc.outline_stroke_color = dsc->outline_stroke_color;
+
     lv_draw_fill_dsc_t fill_dsc;
     lv_draw_fill_dsc_init(&fill_dsc);
     fill_dsc.opa = dsc->opa;
@@ -336,9 +335,19 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
         recolor_cmd_state = RECOLOR_CMD_STATE_WAIT_FOR_PARAMETER;
         next_char_offset = 0;
 #if LV_USE_BIDI
-        char * bidi_txt = lv_malloc(line_end - line_start + 1);
+        size_t bidi_size = line_end - line_start;
+        char * bidi_txt = lv_malloc(bidi_size + 1);
         LV_ASSERT_MALLOC(bidi_txt);
-        lv_bidi_process_paragraph(dsc->text + line_start, bidi_txt, line_end - line_start, base_dir, NULL, 0);
+
+        /**
+          * has_bided = 1: already executed lv_bidi_process_paragraph.
+          * has_bided = 0: has not been executed lv_bidi_process_paragraph.*/
+        if(dsc->has_bided) {
+            lv_memcpy(bidi_txt, &dsc->text[line_start], bidi_size);
+        }
+        else {
+            lv_bidi_process_paragraph(dsc->text + line_start, bidi_txt, bidi_size, base_dir, NULL, 0);
+        }
 #else
         const char * bidi_txt = dsc->text + line_start;
 #endif
@@ -349,9 +358,14 @@ void lv_draw_label_iterate_characters(lv_draw_task_t * t, const lv_draw_label_ds
             /* Check if the text selection is enabled */
             if(sel_start != LV_DRAW_LABEL_NO_TXT_SEL && sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
 #if LV_USE_BIDI
-                logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start);
-                uint32_t c_idx = lv_text_encoded_get_char_id(bidi_txt, next_char_offset);
-                logical_char_pos += lv_bidi_get_logical_pos(bidi_txt, NULL, line_end - line_start, base_dir, c_idx, NULL);
+                if(dsc->has_bided) {
+                    logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start + next_char_offset);
+                }
+                else {
+                    logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start);
+                    uint32_t c_idx = lv_text_encoded_get_char_id(bidi_txt, next_char_offset);
+                    logical_char_pos += lv_bidi_get_logical_pos(bidi_txt, NULL, line_end - line_start, base_dir, c_idx, NULL);
+                }
 #else
                 logical_char_pos = lv_text_encoded_get_char_id(dsc->text, line_start + next_char_offset);
 #endif
@@ -594,6 +608,14 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
         }
 
         dsc->format = g.format;
+
+        if(g.format == LV_FONT_GLYPH_FORMAT_VECTOR) {
+
+            /*Load the outline of the glyph, even if the function says bitmap*/
+            g.outline_stroke_width = dsc->outline_stroke_width;
+            dsc->glyph_data = (void *) lv_font_get_glyph_bitmap(&g, draw_buf);
+            dsc->format = dsc->glyph_data ? g.format : LV_FONT_GLYPH_FORMAT_NONE;
+        }
     }
     else {
         dsc->format = LV_FONT_GLYPH_FORMAT_NONE;

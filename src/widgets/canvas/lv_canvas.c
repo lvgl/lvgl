@@ -45,7 +45,7 @@ const lv_obj_class_t lv_canvas_class = {
     .destructor_cb = lv_canvas_destructor,
     .instance_size = sizeof(lv_canvas_t),
     .base_class = &lv_image_class,
-    .name = "canvas",
+    .name = "lv_canvas",
 };
 
 /**********************

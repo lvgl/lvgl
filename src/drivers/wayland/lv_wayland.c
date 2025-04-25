@@ -120,7 +120,6 @@ struct input {
     lv_indev_touch_data_t touches[10];
     uint8_t touch_event_cnt;
     uint8_t primary_id;
-    lv_indev_gesture_recognizer_t recognizer;
 #endif
 };
 
@@ -2382,24 +2381,21 @@ static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
 {
 
     struct window * window = lv_display_get_user_data(lv_indev_get_display(drv));
-    lv_indev_gesture_recognizer_t * recognizer;
 
     if(!window || window->closed) {
         return;
     }
 
     /* Collect touches if there are any - send them to the gesture recognizer */
-    recognizer = &window->body->input.recognizer;
+    lv_indev_gesture_recognizers_update(drv, &window->body->input.touches[0],
+                                        window->body->input.touch_event_cnt);
 
     LV_LOG_TRACE("collected touch events: %d", window->body->input.touch_event_cnt);
-
-    lv_indev_gesture_detect_pinch(recognizer, &window->body->input.touches[0],
-                                  window->body->input.touch_event_cnt);
 
     window->body->input.touch_event_cnt = 0;
 
     /* Set the gesture information, before returning to LVGL */
-    lv_indev_set_gesture_data(data, recognizer);
+    lv_indev_gesture_recognizers_set_data(drv, data);
 
 }
 

@@ -8,6 +8,13 @@ option(LV_LVGL_H_INCLUDE_SIMPLE
 option(LV_CONF_INCLUDE_SIMPLE
        "Use #include \"lv_conf.h\" instead of #include \"../../lv_conf.h\"" ON)
 
+set(LV_KCONFIG_IGNORE "Don't use Kconfig. Kconfig is not used by default." ON)
+
+find_package(Python REQUIRED)
+
+option(LV_CONF_SKIP "Skip including lv_conf.h during configuration" OFF)
+option(LV_USE_KCONFIG "Use Kconfig to configure LVGL" OFF)
+
 # Option LV_CONF_PATH, which should be the path for lv_conf.h
 # If set parent path LV_CONF_DIR is added to includes
 if( LV_CONF_PATH )
@@ -27,13 +34,82 @@ file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp ${LVGL_R
 add_library(lvgl ${SOURCES})
 add_library(lvgl::lvgl ALIAS lvgl)
 
+set(PCPP_DEFINITIONS_LIST "")
+
+if ( LV_USE_KCONFIG )
+  # kconfig.cmake will generate the .config
+  # and autoconf.h, which will be used by lv_conf_kconfig.h
+  include(${CMAKE_CURRENT_LIST_DIR}/kconfig.cmake)
+
+  set(LV_KCONFIG_IGNORE OFF)
+  # Set the flag to specify we are using kconfig, needed for the
+  # generate_cmake_variables.py script
+  set(KCONFIG_FLAG --kconfig)
+  # If using Kconfig, we need to define additional definitions
+  list(APPEND PCPP_DEFINITIONS_LIST "LV_CONF_SKIP" "LV_CONF_KCONFIG_EXTERNAL_INCLUDE=\"${LV_CONF_KCONFIG_EXTERNAL_INCLUDE}\"")
+else()
+  if (LV_CONF_PATH)
+    list(APPEND PCPP_DEFINITIONS_LIST "LV_CONF_PATH=\"${LV_CONF_PATH}\"")
+  endif()
+
+  if (LV_LVGL_H_INCLUDE_SIMPLE)
+    list(APPEND PCPP_DEFINITIONS_LIST "LV_LVGL_H_INCLUDE_SIMPLE")
+  endif()
+
+  if (LV_CONF_INCLUDE_SIMPLE)
+    list(APPEND PCPP_DEFINITIONS_LIST "LV_CONF_INCLUDE_SIMPLE")
+  endif()
+endif()
+
+if(PCPP_DEFINITIONS_LIST)
+  set(PCPP_ADDITIONAL_DEFS "--defs" ${PCPP_DEFINITIONS_LIST})
+else()
+  set(PCPP_ADDITIONAL_DEFS "")
+endif()
+
+
 target_compile_definitions(
   lvgl PUBLIC $<$<BOOL:${LV_LVGL_H_INCLUDE_SIMPLE}>:LV_LVGL_H_INCLUDE_SIMPLE>
-              $<$<BOOL:${LV_CONF_INCLUDE_SIMPLE}>:LV_CONF_INCLUDE_SIMPLE>)
+              $<$<BOOL:${LV_CONF_INCLUDE_SIMPLE}>:LV_CONF_INCLUDE_SIMPLE>
+              $<$<BOOL:${LV_KCONFIG_IGNORE}>:LV_KCONFIG_IGNORE>
+              $<$<BOOL:${LV_CONF_SKIP}>:LV_CONF_SKIP>
+)
+
+# Use the portable pcpp to preprocess lv_conf_internal.h
+execute_process(
+  COMMAND ${Python_EXECUTABLE} ${LVGL_ROOT_DIR}/scripts/preprocess_lv_conf_internal.py
+  --input ${LVGL_ROOT_DIR}/src/lv_conf_internal.h
+  --tmp_file ${CMAKE_CURRENT_BINARY_DIR}/tmp.h
+  --output ${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h
+  --workfolder ${CMAKE_CURRENT_BINARY_DIR}
+  ${PCPP_ADDITIONAL_DEFS}
+  --include ${LVGL_ROOT_DIR} ${LVGL_ROOT_DIR}/.. ${LVGL_ROOT_DIR}/src ${LV_CONF_DIR}
+  RESULT_VARIABLE ret
+)
+if(NOT "${ret}" STREQUAL "0")
+  message(FATAL_ERROR "preprocess_lv_conf_internal.py failed with return code: ${ret}")
+endif()
+
+# Convert the expanded lv_conf_expanded.h to cmake variables
+execute_process(
+  COMMAND ${Python_EXECUTABLE}
+    ${LVGL_ROOT_DIR}/scripts/generate_cmake_variables.py
+    --input ${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h
+    --output ${CMAKE_CURRENT_BINARY_DIR}/lv_conf.cmake
+    ${KCONFIG_FLAG}
+    RESULT_VARIABLE ret
+)
+if(NOT "${ret}" STREQUAL "0")
+  message(FATAL_ERROR "generate_cmake_variables.py command failed with return code: ${ret}")
+endif()
+
+# This will set all CONFIG_LV_USE_* variables in cmake
+include(${CMAKE_CURRENT_BINARY_DIR}/lv_conf.cmake)
 
 # Add definition of LV_CONF_PATH only if needed
-if(LV_CONF_PATH)
-  target_compile_definitions(lvgl PUBLIC LV_CONF_PATH=${LV_CONF_PATH})
+# Do not redefine it if already defined in tests/CMakeLists.txt
+if(LV_CONF_PATH AND NOT LV_BUILD_TEST)
+  target_compile_definitions(lvgl PUBLIC LV_CONF_PATH="${LV_CONF_PATH}")
 endif()
 
 # Add definition of LV_CONF_SKIP only if needed

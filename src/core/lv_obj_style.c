@@ -479,12 +479,18 @@ void lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t p
 
 lv_style_value_t lv_obj_style_apply_color_filter(const lv_obj_t * obj, lv_part_t part, lv_style_value_t v)
 {
+#if LV_USE_COLOR_FILTER
     if(obj == NULL) return v;
     const lv_color_filter_dsc_t * f = lv_obj_get_style_color_filter_dsc(obj, part);
     if(f && f->filter_cb) {
         lv_opa_t f_opa = lv_obj_get_style_color_filter_opa(obj, part);
         if(f_opa != 0) v.color = f->filter_cb(f, v.color, f_opa);
     }
+#else
+    LV_UNUSED(obj);
+    LV_UNUSED(part);
+    LV_UNUSED(v);
+#endif
     return v;
 }
 
@@ -638,6 +644,41 @@ void lv_obj_update_layer_type(lv_obj_t * obj)
         lv_obj_allocate_spec_attr(obj);
         obj->spec_attr->layer_type = layer_type;
     }
+}
+
+lv_color32_t lv_obj_style_apply_recolor(const lv_obj_t * obj, lv_part_t part, lv_color32_t color)
+{
+    lv_opa_t opa = lv_obj_get_style_recolor_opa(obj, part);
+    if(opa > LV_OPA_TRANSP) {
+        lv_color_t recolor = lv_obj_get_style_recolor(obj, part);
+        color = lv_color_over32(color, lv_color_to_32(recolor, opa));
+    }
+
+    return color;
+}
+
+lv_color32_t lv_obj_get_style_recolor_recursive(const lv_obj_t * obj, lv_part_t part)
+{
+    lv_color32_t result;
+
+    lv_color_t color = lv_obj_get_style_recolor(obj, part);
+    lv_opa_t opa = lv_obj_get_style_recolor_opa(obj, part);
+
+    result = lv_color_to_32(color, opa);
+
+    if(part != LV_PART_MAIN) {
+        part = LV_PART_MAIN;
+    }
+    else {
+        obj = lv_obj_get_parent(obj);
+    }
+
+    while(obj) {
+        result = lv_obj_style_apply_recolor(obj, part, result);
+        obj = lv_obj_get_parent(obj);
+    }
+
+    return result;
 }
 
 /**********************

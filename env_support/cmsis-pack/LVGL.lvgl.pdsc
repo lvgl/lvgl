@@ -503,8 +503,8 @@
                 <file category="sourceC"            name="src/font/lv_font_montserrat_44.c" />
                 <file category="sourceC"            name="src/font/lv_font_montserrat_46.c" />
                 <file category="sourceC"            name="src/font/lv_font_montserrat_48.c" />
-                <file category="sourceC"            name="src/font/lv_font_simsun_16_cjk.c" />
-                <file category="sourceC"            name="src/font/lv_font_simsun_14_cjk.c" />
+                <file category="sourceC"            name="src/font/lv_font_source_han_sans_sc_16_cjk.c" />
+                <file category="sourceC"            name="src/font/lv_font_source_han_sans_sc_14_cjk.c" />
                 <file category="sourceC"            name="src/font/lv_font_unscii_8.c" />
                 <file category="sourceC"            name="src/font/lv_font_unscii_16.c" />
 
@@ -1766,7 +1766,7 @@
 
               <RTE_Components_h>
 
-/*! \brief Enable freetype font manager */
+/*! \brief Enable Font manager */
 #define LV_USE_FONT_MANAGER          1
               </RTE_Components_h>
 

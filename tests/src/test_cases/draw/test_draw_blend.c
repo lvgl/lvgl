@@ -1,7 +1,7 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
 #include "../../lvgl_private.h"
-#include "lv_test_helpers.h"
+
 
 #include "unity/unity.h"
 
@@ -123,9 +123,9 @@ static void canvas_draw(const char * name, lv_color_format_t large_render_cf)
 {
     lv_obj_clean(lv_screen_active());
 
-    static LV_ATTRIBUTE_MEM_ALIGN uint8_t canvas_buf[CANVAS_WIDTH_TO_STRIDE(180, 4) * 180 + LV_DRAW_BUF_ALIGN];
+    static LV_ATTRIBUTE_MEM_ALIGN uint8_t canvas_buf[LV_TEST_WIDTH_TO_STRIDE(180, 4) * 180 + LV_DRAW_BUF_ALIGN];
 
-    static uint8_t canvas2_buf[CANVAS_WIDTH_TO_STRIDE(768, 4) * 390 + LV_DRAW_BUF_ALIGN];
+    static uint8_t canvas2_buf[LV_TEST_WIDTH_TO_STRIDE(768, 4) * 390 + LV_DRAW_BUF_ALIGN];
     lv_obj_t * canvas2 = lv_canvas_create(lv_screen_active());
     lv_canvas_set_buffer(canvas2, lv_draw_buf_align(canvas2_buf, large_render_cf), 768, 390, large_render_cf);
     lv_canvas_fill_bg(canvas2, lv_palette_lighten(LV_PALETTE_BLUE_GREY, 2), LV_OPA_COVER);

@@ -33,6 +33,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+struct _lv_draw_vg_lite_unit_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -57,7 +59,9 @@ void lv_draw_vg_lite_fill(lv_draw_task_t * t, const lv_draw_fill_dsc_t * dsc,
 void lv_draw_vg_lite_img(lv_draw_task_t * t, const lv_draw_image_dsc_t * dsc,
                          const lv_area_t * coords, bool no_cache);
 
-void lv_draw_vg_lite_label_init(lv_draw_unit_t * draw_unit);
+void lv_draw_vg_lite_label_init(struct _lv_draw_vg_lite_unit_t * u);
+
+void lv_draw_vg_lite_label_deinit(struct _lv_draw_vg_lite_unit_t * u);
 
 void lv_draw_vg_lite_letter(lv_draw_task_t * t, const lv_draw_letter_dsc_t * dsc, const lv_area_t * coords);
 

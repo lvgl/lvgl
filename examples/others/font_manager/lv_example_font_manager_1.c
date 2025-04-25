@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_FREETYPE && LV_USE_FONT_MANAGER && LV_BUILD_EXAMPLES
+#if LV_USE_FONT_MANAGER && LV_USE_FREETYPE && LV_BUILD_EXAMPLES
 
 #if LV_FREETYPE_USE_LVGL_PORT
     #define PATH_PREFIX "A:"
@@ -15,16 +15,18 @@ void lv_example_font_manager_1(void)
     g_font_manager = lv_font_manager_create(8);
 
     /* Add font path mapping to font manager */
-    lv_font_manager_add_path_static(g_font_manager,
-                                    "Lato-Regular",
-                                    PATH_PREFIX "lvgl/examples/libs/freetype/Lato-Regular.ttf");
+    lv_font_manager_add_src_static(g_font_manager,
+                                   "Lato-Regular",
+                                   PATH_PREFIX "lvgl/examples/libs/freetype/Lato-Regular.ttf",
+                                   &lv_freetype_font_class);
 
     /* Create font from font manager */
     lv_font_t * font = lv_font_manager_create_font(g_font_manager,
                                                    "Lato-Regular",
                                                    LV_FREETYPE_FONT_RENDER_MODE_BITMAP,
                                                    24,
-                                                   LV_FREETYPE_FONT_STYLE_NORMAL);
+                                                   LV_FREETYPE_FONT_STYLE_NORMAL,
+                                                   LV_FONT_KERNING_NONE);
 
     if(!font) {
         LV_LOG_ERROR("Could not create font");
@@ -43,7 +45,7 @@ void lv_example_font_manager_1(void)
 void lv_example_font_manager_1(void)
 {
     lv_obj_t * label = lv_label_create(lv_screen_active());
-    lv_label_set_text(label, "FreeType or font_manager is not enabled");
+    lv_label_set_text(label, "Font Manager or FreeType is not enabled");
     lv_obj_center(label);
 }
 

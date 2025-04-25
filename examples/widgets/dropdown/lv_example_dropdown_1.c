@@ -4,7 +4,7 @@
 static void event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_target_obj(e);
     if(code == LV_EVENT_VALUE_CHANGED) {
         char buf[32];
         lv_dropdown_get_selected_str(obj, buf, sizeof(buf));
@@ -31,5 +31,6 @@ void lv_example_dropdown_1(void)
     lv_obj_align(dd, LV_ALIGN_TOP_MID, 0, 20);
     lv_obj_add_event_cb(dd, event_handler, LV_EVENT_ALL, NULL);
 }
+
 
 #endif

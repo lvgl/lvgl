@@ -25,11 +25,19 @@ extern "C" {
 typedef struct {
     lv_draw_dsc_base_t base;
 
-    lv_opa_t bg_opa;
-    lv_color_t bg_color;
-    lv_grad_dsc_t bg_grad;
-
+    /**Points of the triangle. If `LV_USE_FLOAT` is enabled floats can be used here*/
     lv_point_precise_t p[3];
+
+    /**Color of the triangle*/
+    lv_color_t color;
+
+    /**Opacity of the arc in 0...255 range.
+     * LV_OPA_TRANSP, LV_OPA_10, LV_OPA_20, .. LV_OPA_COVER can be used as well*/
+    lv_opa_t opa;
+
+    /**Describe a gradient. If `grad.dir` is not `LV_GRAD_DIR_NONE` `color` will be ignored*/
+    lv_grad_dsc_t grad;
+
 } lv_draw_triangle_dsc_t;
 
 /**********************

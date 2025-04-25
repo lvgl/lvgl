@@ -13,6 +13,9 @@
 #include "../misc/lv_area_private.h"
 #include "../misc/lv_assert.h"
 #include "lv_draw_private.h"
+#include "lv_draw_mask_private.h"
+#include "lv_draw_vector_private.h"
+#include "lv_draw_3d.h"
 #include "sw/lv_draw_sw.h"
 #include "../display/lv_display_private.h"
 #include "../core/lv_global.h"
@@ -32,7 +35,9 @@
  *  STATIC PROTOTYPES
  **********************/
 static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check);
-static void lv_cleanup_task(lv_draw_task_t * t, lv_display_t * disp);
+static void cleanup_task(lv_draw_task_t * t, lv_display_t * disp);
+static inline size_t get_draw_dsc_size(lv_draw_task_type_t type);
+static lv_draw_task_t * get_first_available_task(lv_layer_t * layer);
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
 static inline uint32_t get_layer_size_kb(uint32_t size_byte)
@@ -91,10 +96,12 @@ void * lv_draw_create_unit(size_t size)
     return new_unit;
 }
 
-lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
+lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords, lv_draw_task_type_t type)
 {
     LV_PROFILER_DRAW_BEGIN;
-    lv_draw_task_t * new_task = lv_malloc_zeroed(sizeof(lv_draw_task_t));
+    size_t dsc_size = get_draw_dsc_size(type);
+    LV_ASSERT_FORMAT_MSG(dsc_size > 0, "Draw task size is 0 for type %d", type);
+    lv_draw_task_t * new_task = lv_malloc_zeroed(LV_ALIGN_UP(sizeof(lv_draw_task_t), 8) + dsc_size);
     LV_ASSERT_MALLOC(new_task);
     new_task->area = *coords;
     new_task->_real_area = *coords;
@@ -103,6 +110,8 @@ lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)
 #if LV_DRAW_TRANSFORM_USE_MATRIX
     new_task->matrix = layer->matrix;
 #endif
+    new_task->type = type;
+    new_task->draw_dsc = (uint8_t *)new_task + LV_ALIGN_UP(sizeof(lv_draw_task_t), 8);
     new_task->state = LV_DRAW_TASK_STATE_QUEUED;
 
     /*Find the tail*/
@@ -228,10 +237,12 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
     lv_draw_task_t * t_prev = NULL;
     lv_draw_task_t * t = layer->draw_task_head;
     lv_draw_task_t * t_next;
+    bool remove_task = false;
     while(t) {
         t_next = t->next;
         if(t->state == LV_DRAW_TASK_STATE_READY) {
-            lv_cleanup_task(t, disp);
+            cleanup_task(t, disp);
+            remove_task = true;
             if(t_prev != NULL)
                 t_prev->next = t_next;
             else
@@ -262,7 +273,7 @@ bool lv_draw_dispatch_layer(lv_display_t * disp, lv_layer_t * layer)
         }
     }
     /*Assign draw tasks to the draw_units*/
-    else {
+    else if(remove_task || layer->draw_task_head) {
         /*Find a draw unit which is not busy and can take at least one task*/
         /*Let all draw units to pick draw tasks*/
         lv_draw_unit_t * u = _draw_info.unit_head;
@@ -309,37 +320,19 @@ uint32_t lv_draw_get_unit_count(void)
     return _draw_info.unit_cnt;
 }
 
+lv_draw_task_t * lv_draw_get_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id)
+{
+    if(_draw_info.unit_cnt == 1) {
+        return get_first_available_task(layer);
+    }
+    else {
+        return lv_draw_get_next_available_task(layer, t_prev, draw_unit_id);
+    }
+}
+
 lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id)
 {
     LV_PROFILER_DRAW_BEGIN;
-
-    /* If there is only 1 draw unit the task can be consumed linearly as
-     * they are added in the correct order. However, it can happen that
-     * there is a `LV_DRAW_TASK_TYPE_LAYER` which can be blended only when
-     * all its tasks are ready. As other areas might be on top of that
-     * layer-to-blend don't skip it. Instead stop there, so that the
-     * draw tasks of that layer can be consumed and can be finished.
-     * After that this layer-to-blenf will have `LV_DRAW_TASK_STATE_QUEUED`
-     * so it can be blended normally.*/
-    if(_draw_info.unit_cnt <= 1) {
-        lv_draw_task_t * t = layer->draw_task_head;
-        while(t) {
-            /*Not queued yet, leave this layer while the first task will be queued*/
-            if(t->state != LV_DRAW_TASK_STATE_QUEUED) {
-                t = NULL;
-                break;
-            }
-            /*It's a supported and queued task, process it*/
-            else {
-                break;
-            }
-            t = t->next;
-        }
-        LV_PROFILER_DRAW_END;
-        return t;
-    }
-
-    /*Handle the case of multiply draw units*/
 
     /*If the first task is screen sized, there cannot be independent areas*/
     if(layer->draw_task_head) {
@@ -405,6 +398,7 @@ void lv_layer_reset(lv_layer_t * layer)
     lv_matrix_identity(&layer->matrix);
 #endif
     layer->opa = LV_OPA_COVER;
+    layer->recolor = lv_color32_make(0, 0, 0, 0);
 }
 
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
@@ -422,6 +416,7 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
     /*Inherits transparency from parent*/
     if(parent_layer) {
         new_layer->opa = parent_layer->opa;
+        new_layer->recolor = parent_layer->recolor;
     }
 
     LV_PROFILER_DRAW_END;
@@ -454,7 +449,6 @@ void lv_draw_layer_init(lv_layer_t * layer, lv_layer_t * parent_layer, lv_color_
 
     LV_PROFILER_DRAW_END;
 }
-
 
 void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 {
@@ -550,11 +544,63 @@ static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check)
 }
 
 /**
+ * Get the size of the draw descriptor of a draw task
+ * @param type      type of the draw task
+ * @return          size of the draw descriptor in bytes
+ */
+static inline size_t get_draw_dsc_size(lv_draw_task_type_t type)
+{
+    switch(type) {
+        case LV_DRAW_TASK_TYPE_NONE:
+            return 0;
+        case LV_DRAW_TASK_TYPE_FILL:
+            return sizeof(lv_draw_fill_dsc_t);
+        case LV_DRAW_TASK_TYPE_BORDER:
+            return sizeof(lv_draw_border_dsc_t);
+        case LV_DRAW_TASK_TYPE_BOX_SHADOW:
+            return sizeof(lv_draw_box_shadow_dsc_t);
+        case LV_DRAW_TASK_TYPE_LETTER:
+            return sizeof(lv_draw_letter_dsc_t);
+        case LV_DRAW_TASK_TYPE_LABEL:
+            return sizeof(lv_draw_label_dsc_t);
+        case LV_DRAW_TASK_TYPE_IMAGE:
+            return sizeof(lv_draw_image_dsc_t);
+        case LV_DRAW_TASK_TYPE_LAYER:
+            return sizeof(lv_draw_image_dsc_t);
+        case LV_DRAW_TASK_TYPE_LINE:
+            return sizeof(lv_draw_line_dsc_t);
+        case LV_DRAW_TASK_TYPE_ARC:
+            return sizeof(lv_draw_arc_dsc_t);
+        case LV_DRAW_TASK_TYPE_TRIANGLE:
+            return sizeof(lv_draw_triangle_dsc_t);
+        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
+            return sizeof(lv_draw_mask_rect_dsc_t);
+
+        /* no struct match for LV_DRAW_TASK_TYPE_MASK_BITMAP, set it to zero now */
+        case LV_DRAW_TASK_TYPE_MASK_BITMAP:
+            return 0;
+#if LV_USE_VECTOR_GRAPHIC
+        case LV_DRAW_TASK_TYPE_VECTOR:
+            return sizeof(lv_draw_vector_task_dsc_t);
+#endif
+#if LV_USE_3DTEXTURE
+        case LV_DRAW_TASK_TYPE_3D:
+            return sizeof(lv_draw_3d_dsc_t);
+#endif
+            /* Note that default is not added here because when adding new draw task type,
+             * if forget to add case, the compiler will automatically report a warning.
+             */
+    }
+
+    return 0;
+}
+
+/**
  * Clean-up resources allocated by a finished task
  * @param t         pointer to a draw task
  * @param disp      pointer to a display on which the task was drawn
  */
-static void lv_cleanup_task(lv_draw_task_t * t, lv_display_t * disp)
+static void cleanup_task(lv_draw_task_t * t, lv_display_t * disp)
 {
     LV_PROFILER_DRAW_BEGIN;
     /*If it was layer drawing free the layer too*/
@@ -603,7 +649,35 @@ static void lv_cleanup_task(lv_draw_task_t * t, lv_display_t * disp)
         draw_label_dsc->text = NULL;
     }
 
-    lv_free(t->draw_dsc);
     lv_free(t);
     LV_PROFILER_DRAW_END;
+}
+
+static lv_draw_task_t * get_first_available_task(lv_layer_t * layer)
+{
+    LV_PROFILER_DRAW_BEGIN;
+    /* If there is only 1 draw unit the task can be consumed linearly as
+     * they are added in the correct order. However, it can happen that
+     * there is a `LV_DRAW_TASK_TYPE_LAYER` which can be blended only when
+     * all its tasks are ready. As other areas might be on top of that
+     * layer-to-blend don't skip it. Instead stop there, so that the
+     * draw tasks of that layer can be consumed and can be finished.
+     * After that this layer-to-blenf will have `LV_DRAW_TASK_STATE_QUEUED`
+     * so it can be blended normally.*/
+    lv_draw_task_t * t = layer->draw_task_head;
+    while(t) {
+        /*Not queued yet, leave this layer while the first task is queued*/
+        if(t->state != LV_DRAW_TASK_STATE_QUEUED) {
+            t = NULL;
+            break;
+        }
+        /*It's a supported and queued task, process it*/
+        else {
+            break;
+        }
+        t = t->next;
+    }
+
+    LV_PROFILER_DRAW_END;
+    return t;
 }

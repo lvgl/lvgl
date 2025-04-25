@@ -28,6 +28,8 @@
 	        <enum name="secondary_y"/>
 	    </enumdef>
 
+	    <prop name="type" type="enum:lv_chart_type" help=""/>
+
 	    <prop name="point_count" help="">
 	    	<param name="count" type="int" help=""/>
 	    </prop>

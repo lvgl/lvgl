@@ -577,6 +577,30 @@ static inline lv_text_align_t lv_obj_get_style_text_align(const lv_obj_t * obj, 
     return (lv_text_align_t)v.num;
 }
 
+static inline lv_color_t lv_obj_get_style_text_outline_stroke_color(const lv_obj_t * obj, lv_part_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TEXT_OUTLINE_STROKE_COLOR);
+    return v.color;
+}
+
+static inline lv_color_t lv_obj_get_style_text_outline_stroke_color_filtered(const lv_obj_t * obj, lv_part_t part)
+{
+    lv_style_value_t v = lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_TEXT_OUTLINE_STROKE_COLOR));
+    return v.color;
+}
+
+static inline int32_t lv_obj_get_style_text_outline_stroke_width(const lv_obj_t * obj, lv_part_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TEXT_OUTLINE_STROKE_WIDTH);
+    return (int32_t)v.num;
+}
+
+static inline lv_opa_t lv_obj_get_style_text_outline_stroke_opa(const lv_obj_t * obj, lv_part_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TEXT_OUTLINE_STROKE_OPA);
+    return (lv_opa_t)v.num;
+}
+
 static inline int32_t lv_obj_get_style_radius(const lv_obj_t * obj, lv_part_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_RADIUS);
@@ -616,6 +640,18 @@ static inline const lv_color_filter_dsc_t * lv_obj_get_style_color_filter_dsc(co
 static inline lv_opa_t lv_obj_get_style_color_filter_opa(const lv_obj_t * obj, lv_part_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_COLOR_FILTER_OPA);
+    return (lv_opa_t)v.num;
+}
+
+static inline lv_color_t lv_obj_get_style_recolor(const lv_obj_t * obj, lv_part_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_RECOLOR);
+    return v.color;
+}
+
+static inline lv_opa_t lv_obj_get_style_recolor_opa(const lv_obj_t * obj, lv_part_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_RECOLOR_OPA);
     return (lv_opa_t)v.num;
 }
 
@@ -846,6 +882,9 @@ void lv_obj_set_style_text_letter_space(lv_obj_t * obj, int32_t value, lv_style_
 void lv_obj_set_style_text_line_space(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_text_decor(lv_obj_t * obj, lv_text_decor_t value, lv_style_selector_t selector);
 void lv_obj_set_style_text_align(lv_obj_t * obj, lv_text_align_t value, lv_style_selector_t selector);
+void lv_obj_set_style_text_outline_stroke_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector);
+void lv_obj_set_style_text_outline_stroke_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
+void lv_obj_set_style_text_outline_stroke_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
 void lv_obj_set_style_radius(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_radial_offset(lv_obj_t * obj, int32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_clip_corner(lv_obj_t * obj, bool value, lv_style_selector_t selector);
@@ -853,6 +892,8 @@ void lv_obj_set_style_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t se
 void lv_obj_set_style_opa_layered(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
 void lv_obj_set_style_color_filter_dsc(lv_obj_t * obj, const lv_color_filter_dsc_t * value, lv_style_selector_t selector);
 void lv_obj_set_style_color_filter_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
+void lv_obj_set_style_recolor(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector);
+void lv_obj_set_style_recolor_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
 void lv_obj_set_style_anim(lv_obj_t * obj, const lv_anim_t * value, lv_style_selector_t selector);
 void lv_obj_set_style_anim_duration(lv_obj_t * obj, uint32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_transition(lv_obj_t * obj, const lv_style_transition_dsc_t * value, lv_style_selector_t selector);

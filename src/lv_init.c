@@ -56,6 +56,9 @@
         #include "draw/nxp/pxp/lv_draw_pxp.h"
     #endif
 #endif
+#if LV_USE_DRAW_G2D
+    #include "draw/nxp/g2d/lv_draw_g2d.h"
+#endif
 #if LV_USE_DRAW_DAVE2D
     #include "draw/renesas/dave2d/lv_draw_dave2d.h"
 #endif
@@ -237,6 +240,10 @@ void lv_init(void)
 #endif
 #endif
 
+#if LV_USE_DRAW_G2D
+    lv_draw_g2d_init();
+#endif
+
 #if LV_USE_DRAW_DAVE2D
     lv_draw_dave2d_init();
 #endif
@@ -350,6 +357,11 @@ void lv_init(void)
     lv_fs_uefi_init();
 #endif
 
+    /*Use the earlier initialized position of FFmpeg decoder as a fallback decoder*/
+#if LV_USE_FFMPEG
+    lv_ffmpeg_init();
+#endif
+
 #if LV_USE_LODEPNG
     lv_lodepng_init();
 #endif
@@ -372,12 +384,6 @@ void lv_init(void)
 
 #if LV_USE_SVG
     lv_svg_decoder_init();
-#endif
-
-    /*Make FFMPEG last because the last converter will be checked first and
-     *it's superior to any other */
-#if LV_USE_FFMPEG
-    lv_ffmpeg_init();
 #endif
 
 #if LV_USE_XML
@@ -453,6 +459,10 @@ void lv_deinit(void)
     lv_draw_vglite_deinit();
 #endif
 
+#if LV_USE_DRAW_G2D
+    lv_draw_g2d_deinit();
+#endif
+
 #if LV_USE_DRAW_VG_LITE
     lv_draw_vg_lite_deinit();
 #endif
@@ -497,6 +507,10 @@ void lv_deinit(void)
 
 #if LV_USE_LOG
     lv_log_register_print_cb(NULL);
+#endif
+
+#ifdef LV_GC_DEINIT
+    LV_GC_DEINIT();
 #endif
 
 }

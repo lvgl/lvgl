@@ -335,11 +335,13 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
     LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb565);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_rgb565a8);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_argb8888);
+    LV_IMAGE_DECLARE(img_render_lvgl_logo_argb8888_premultiplied);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_l8);
     LV_IMAGE_DECLARE(img_render_lvgl_logo_i1);
 
     const void * srcs[] = {
         &img_render_lvgl_logo_argb8888,
+        &img_render_lvgl_logo_argb8888_premultiplied,
         &img_render_lvgl_logo_xrgb8888,
         &img_render_lvgl_logo_rgb888,
         &img_render_lvgl_logo_rgb565,
@@ -350,6 +352,7 @@ static void image_core_cb(lv_obj_t * parent, bool recolor, uint32_t startAt)
 
     const void * names[] = {
         "ARGB\n8888",
+        "ARGB\n8888\nPM",
         "XRGB\n8888",
         "RGB\n888",
         "RGB\n565",
@@ -543,17 +546,17 @@ static void triangle_draw_event_cb(lv_event_t * e)
     dsc.p[2].y = p_rel[2].y + coords.y1 + 2;
 
     lv_opa_t opa = lv_obj_get_style_opa(obj, 0);
-    dsc.bg_grad.dir = lv_obj_get_style_bg_grad_dir(obj, 0);
-    dsc.bg_grad.stops[0].color = lv_obj_get_style_bg_color(obj, 0);
-    dsc.bg_grad.stops[0].frac = lv_obj_get_style_bg_main_stop(obj, 0);
-    dsc.bg_grad.stops[0].opa = LV_OPA_MIX2(lv_obj_get_style_bg_main_opa(obj, 0), opa);
-    dsc.bg_grad.stops[1].color = lv_obj_get_style_bg_grad_color(obj, 0);
-    dsc.bg_grad.stops[1].frac = lv_obj_get_style_bg_grad_stop(obj, 0);
-    dsc.bg_grad.stops[1].opa = LV_OPA_MIX2(lv_obj_get_style_bg_grad_opa(obj, 0), opa);
-    dsc.bg_grad.stops_count = 2;
+    dsc.grad.dir = lv_obj_get_style_bg_grad_dir(obj, 0);
+    dsc.grad.stops[0].color = lv_obj_get_style_bg_color(obj, 0);
+    dsc.grad.stops[0].frac = lv_obj_get_style_bg_main_stop(obj, 0);
+    dsc.grad.stops[0].opa = LV_OPA_MIX2(lv_obj_get_style_bg_main_opa(obj, 0), opa);
+    dsc.grad.stops[1].color = lv_obj_get_style_bg_grad_color(obj, 0);
+    dsc.grad.stops[1].frac = lv_obj_get_style_bg_grad_stop(obj, 0);
+    dsc.grad.stops[1].opa = LV_OPA_MIX2(lv_obj_get_style_bg_grad_opa(obj, 0), opa);
+    dsc.grad.stops_count = 2;
 
-    dsc.bg_color = dsc.bg_grad.stops[0].color;
-    dsc.bg_opa = dsc.bg_grad.stops[0].opa;
+    dsc.color = dsc.grad.stops[0].color;
+    dsc.opa = dsc.grad.stops[0].opa;
 
     lv_draw_triangle(lv_event_get_layer(e), &dsc);
 }
@@ -800,12 +803,13 @@ static void blend_mode_cb(lv_obj_t * parent)
     LV_DRAW_BUF_DEFINE_STATIC(buf_rgb888, 36, 30, LV_COLOR_FORMAT_RGB888);
     LV_DRAW_BUF_DEFINE_STATIC(buf_xrgb8888, 36, 30, LV_COLOR_FORMAT_XRGB8888);
     LV_DRAW_BUF_DEFINE_STATIC(buf_argb8888, 36, 30, LV_COLOR_FORMAT_ARGB8888);
+    LV_DRAW_BUF_DEFINE_STATIC(buf_argb8888_premul, 36, 30, LV_COLOR_FORMAT_ARGB8888_PREMULTIPLIED);
 
     /*The canvas will stay in the top left corner to show the original image*/
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
 
-    const char * cf_txt[] = {"RGB565", "RGB888.", "XRGB8888", "ARGB8888"};
-    lv_draw_buf_t * cf_bufs[] = {&buf_rgb565, &buf_rgb888, &buf_xrgb8888, &buf_argb8888};
+    const char * cf_txt[] = {"RGB565", "RGB888.", "XRGB8888", "ARGB8888", "ARGB8888_PREMUL"};
+    lv_draw_buf_t * cf_bufs[] = {&buf_rgb565, &buf_rgb888, &buf_xrgb8888, &buf_argb8888, &buf_argb8888_premul};
     static lv_draw_buf_t image_dscs[4];
 
     const char * mode_txt[] = {"Add.", "Sub.", "Mul."};

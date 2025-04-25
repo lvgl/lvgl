@@ -81,6 +81,7 @@ static void indev_gesture(lv_indev_t * indev);
 static bool indev_reset_check(lv_indev_t * indev);
 static void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data);
 static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj);
+static void indev_init_gesture_recognizers(lv_indev_t * indev);
 static lv_result_t send_event(lv_event_code_t code, void * param);
 
 static void indev_scroll_throw_anim_start(lv_indev_t * indev);
@@ -141,6 +142,9 @@ lv_indev_t * lv_indev_create(void)
     indev->gesture_limit        = LV_INDEV_DEF_GESTURE_LIMIT;
     indev->gesture_min_velocity = LV_INDEV_DEF_GESTURE_MIN_VELOCITY;
     indev->rotary_sensitivity  = LV_INDEV_DEF_ROTARY_SENSITIVITY;
+
+    indev_init_gesture_recognizers(indev);
+
     return indev;
 }
 
@@ -729,8 +733,12 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->pointer.act_point.y = data->point.y;
     i->pointer.diff = data->enc_diff;
 
-    i->gesture_type = data->gesture_type;
-    i->gesture_data = data->gesture_data;
+#if LV_USE_GESTURE_RECOGNITION
+    for(int gest = 0; gest < LV_INDEV_GESTURE_CNT; gest++) {
+        i->gesture_type[gest] = data->gesture_type[gest];
+        i->gesture_data[gest] = data->gesture_data[gest];
+    }
+#endif
 
     /*Process the diff first as scrolling will be processed in indev_proc_release*/
     indev_proc_pointer_diff(i);
@@ -1296,19 +1304,30 @@ static void indev_proc_press(lv_indev_t * indev)
         indev->pointer.press_moved = 1;
     }
 
-    /* Send a gesture event to a potential indev cb callback, even if no object was found */
-    if(indev->gesture_type != LV_INDEV_GESTURE_NONE) {
-        lv_indev_send_event(indev, LV_EVENT_GESTURE, indev_act);
+#if LV_USE_GESTURE_RECOGNITION
+    for(int i = 0; i < LV_INDEV_GESTURE_CNT; i++) {
+        /* Send a gesture event to a potential indev cb callback, even if no object was found */
+        if(indev->gesture_type[i] != LV_INDEV_GESTURE_NONE) {
+            indev->cur_gesture = (lv_indev_gesture_type_t) i;
+            lv_indev_send_event(indev, LV_EVENT_GESTURE, indev_act);
+            break;
+        }
     }
+#endif
 
     if(indev_obj_act) {
         const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
-        if(indev->gesture_type != LV_INDEV_GESTURE_NONE) {
-            /* NOTE: hardcoded to pinch for now */
-            if(send_event(LV_EVENT_GESTURE, indev_act) == LV_RESULT_INVALID) return;
-        }
+#if LV_USE_GESTURE_RECOGNITION
+        for(int i = 0; i < LV_INDEV_GESTURE_CNT; i++) {
 
+            if(indev->gesture_type[i] != LV_INDEV_GESTURE_NONE) {
+                indev->cur_gesture = (lv_indev_gesture_type_t) i;
+                if(send_event(LV_EVENT_GESTURE, indev_act) == LV_RESULT_INVALID) return;
+                break;
+            }
+        }
+#endif
         if(is_enabled) {
             if(send_event(LV_EVENT_PRESSING, indev_act) == LV_RESULT_INVALID) return;
         }
@@ -1400,20 +1419,32 @@ static void indev_proc_release(lv_indev_t * indev)
         lv_timer_pause(indev->read_timer);
     }
 
+#if LV_USE_GESTURE_RECOGNITION
     /* Send a gesture event to a potential indev cb callback, even if no object was found */
-    if(indev->gesture_type != LV_INDEV_GESTURE_NONE) {
-        lv_indev_send_event(indev, LV_EVENT_GESTURE, indev_act);
+    for(int i = 0; i < LV_INDEV_GESTURE_CNT; i++) {
+
+        if(indev->gesture_type[i] != LV_INDEV_GESTURE_NONE) {
+            indev_act->cur_gesture = (lv_indev_gesture_type_t) i;
+            lv_indev_send_event(indev, LV_EVENT_GESTURE, indev_act);
+            break;
+        }
     }
+#endif
 
     if(indev_obj_act) {
         LV_LOG_INFO("released");
 
         const bool is_enabled = !lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
-        if(is_enabled && indev->gesture_type != LV_INDEV_GESTURE_NONE) {
-            if(send_event(LV_EVENT_GESTURE, indev_act) == LV_RESULT_INVALID) return;
+#if LV_USE_GESTURE_RECOGNITION
+        for(int i = 0; i < LV_INDEV_GESTURE_CNT; i++) {
+            if(is_enabled && indev->gesture_type[i] != LV_INDEV_GESTURE_NONE) {
+                indev_act->cur_gesture = (lv_indev_gesture_type_t) i;
+                if(send_event(LV_EVENT_GESTURE, indev_act) == LV_RESULT_INVALID) return;
+                break;
+            }
         }
-
+#endif
         if(is_enabled) {
             if(send_event(LV_EVENT_RELEASED, indev_act) == LV_RESULT_INVALID) return;
         }
@@ -1756,29 +1787,29 @@ static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj)
         if(obj == NULL || indev->pointer.last_pressed == obj) {
             indev->pointer.last_pressed = NULL;
         }
-        if(obj == NULL || indev->pointer.act_obj == obj) {
-            if(indev->pointer.act_obj) {
-                /* Avoid recursive calls */
-                act_obj = indev->pointer.act_obj;
-                indev->pointer.act_obj = NULL;
-                lv_obj_send_event(act_obj, LV_EVENT_INDEV_RESET, indev);
-                lv_indev_send_event(indev, LV_EVENT_INDEV_RESET, act_obj);
-                act_obj = NULL;
-            }
+
+        if(indev->pointer.act_obj) {
+            /* Avoid recursive calls */
+            act_obj = indev->pointer.act_obj;
+            indev->pointer.act_obj = NULL;
+            lv_obj_send_event(act_obj, LV_EVENT_INDEV_RESET, indev);
+            lv_indev_send_event(indev, LV_EVENT_INDEV_RESET, act_obj);
+            act_obj = NULL;
         }
+
         if(obj == NULL || indev->pointer.last_obj == obj) {
             indev->pointer.last_obj = NULL;
         }
-        if(obj == NULL || indev->pointer.scroll_obj == obj) {
-            if(indev->pointer.scroll_obj) {
-                /* Avoid recursive calls */
-                scroll_obj = indev->pointer.scroll_obj;
-                indev->pointer.scroll_obj = NULL;
-                lv_obj_send_event(scroll_obj, LV_EVENT_INDEV_RESET, indev);
-                lv_indev_send_event(indev, LV_EVENT_INDEV_RESET, act_obj);
-                scroll_obj = NULL;
-            }
+
+        if(indev->pointer.scroll_obj) {
+            /* Avoid recursive calls */
+            scroll_obj = indev->pointer.scroll_obj;
+            indev->pointer.scroll_obj = NULL;
+            lv_obj_send_event(scroll_obj, LV_EVENT_INDEV_RESET, indev);
+            lv_indev_send_event(indev, LV_EVENT_INDEV_RESET, scroll_obj);
+            scroll_obj = NULL;
         }
+
         if(obj == NULL || indev->pointer.last_hovered == obj) {
             indev->pointer.last_hovered = NULL;
         }
@@ -1850,4 +1881,22 @@ static void indev_scroll_throw_anim_start(lv_indev_t * indev)
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
 
     indev->scroll_throw_anim = lv_anim_start(&a);
+}
+
+/**
+ * Initialize this indev's recognizers. It specify their recognizer function
+ * @param indev             pointer to the indev containing the recognizers to initialize
+ */
+static void indev_init_gesture_recognizers(lv_indev_t * indev)
+{
+#if LV_USE_GESTURE_RECOGNITION
+    indev->recognizers[LV_INDEV_GESTURE_NONE].recog_fn = NULL;
+    indev->recognizers[LV_INDEV_GESTURE_PINCH].recog_fn = lv_indev_gesture_detect_pinch;
+    indev->recognizers[LV_INDEV_GESTURE_ROTATE].recog_fn = lv_indev_gesture_detect_rotation;
+    indev->recognizers[LV_INDEV_GESTURE_TWO_FINGERS_SWIPE].recog_fn = lv_indev_gesture_detect_two_fingers_swipe;
+    indev->recognizers[LV_INDEV_GESTURE_SCROLL].recog_fn = NULL;
+    indev->recognizers[LV_INDEV_GESTURE_SWIPE].recog_fn = NULL;
+#else
+    LV_UNUSED(indev);
+#endif
 }

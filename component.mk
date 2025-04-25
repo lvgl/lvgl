@@ -3,64 +3,98 @@
 COMPONENT_SRCDIRS := . \
                   src \
                   src/core \
-                  src/draw \
                   src/extra \
                   src/font \
                   src/hal \
+                  src/tick \
+                  src/display \
+                  src/indev \
+                  src/osal \
                   src/misc \
-                  src/widgets \
+                  src/misc/cache \
+                  src/draw \
                   src/draw/arm2d \
                   src/draw/nxp \
                   src/draw/sdl \
                   src/draw/stm32_dma2d \
                   src/draw/sw \
+                  src/draw/sw/blend \
                   src/draw/swm342_dma2d \
-                  src/extra/layouts \
-                  src/extra/libs \
-                  src/extra/others \
-                  src/extra/themes \
-                  src/extra/widgets \
-                  src/extra/layouts/flex \
-                  src/extra/layouts/grid \
-                  src/extra/libs/bmp \
-                  src/extra/libs/ffmpeg \
-                  src/extra/libs/freetype \
-                  src/extra/libs/fsdrv \
-                  src/extra/libs/gif \
-                  src/extra/libs/png \
-                  src/extra/libs/qrcode \
-                  src/extra/libs/rlottie \
-                  src/extra/libs/sjgp \
-                  src/extra/others/fragment \
-                  src/extra/others/gridnav \
-                  src/extra/others/ime \
-                  src/extra/others/imgfont \
-                  src/extra/others/monkey \
-                  src/extra/others/msg \
-                  src/extra/others/snapshot \
-                  src/extra/themes/basic \
-                  src/extra/themes/default \
-                  src/extra/themes/mono \
-                  src/extra/widgets/animimg \
-                  src/extra/widgets/calendar \
-                  src/extra/widgets/chart \
-                  src/extra/widgets/colorwheel \
-                  src/extra/widgets/imgbtn \
-                  src/extra/widgets/keyboard \
-                  src/extra/widgets/led \
-                  src/extra/widgets/list \
-                  src/extra/widgets/menu \
-                  src/extra/widgets/meter \
-                  src/extra/widgets/msgbox \
-                  src/extra/widgets/span \
-                  src/extra/widgets/spinbox \
-                  src/extra/widgets/spinner \
-                  src/extra/widgets/tabview \
-                  src/extra/widgets/tileview \
-                  src/extra/widgets/win
+                  src/others \
+                  src/layouts \
+                  src/layouts/flex \
+                  src/layouts/grid \
+                  src/libs \
+                  src/libs/bin_decoder \
+                  src/libs/bmp \
+                  src/libs/ffmpeg \
+                  src/libs/freetype \
+                  src/libs/fsdrv \
+                  src/libs/gif \
+                  src/libs/libpng \
+                  src/libs/lodepng \
+                  src/libs/png \
+                  src/libs/qrcode \
+                  src/libs/rlottie \
+                  src/libs/rle \
+                  src/libs/sjgp \
+                  src/libs/tiny_ttf \
+                  src/libs/tjpgd \
+                  src/libs/libjpeg_turbo \
+                  src/others/fragment \
+                  src/others/gridnav \
+                  src/others/ime \
+                  src/others/imgfont \
+                  src/others/monkey \
+                  src/others/msg \
+                  src/others/observer   \
+                  src/others/snapshot \
+                  src/others/sysmon \
+                  src/others/test \
+                  src/themes \
+                  src/themes/basic \
+                  src/themes/default \
+                  src/themes/mono \
+                  src/themes/simple \
+                  src/widgets \
+                  src/widgets/animimg \
+                  src/widgets/arc \
+                  src/widgets/bar \
+                  src/widgets/button \
+                  src/widgets/buttonmatrix \
+                  src/widgets/calendar \
+                  src/widgets/canvas \
+                  src/widgets/chart \
+                  src/widgets/checkbox \
+                  src/widgets/colorwheel \
+                  src/widgets/dropdown \
+                  src/widgets/image \
+                  src/widgets/imgbtn \
+                  src/widgets/keyboard \
+                  src/widgets/label \
+                  src/widgets/led \
+                  src/widgets/line \
+                  src/widgets/list \
+                  src/widgets/menu \
+                  src/widgets/meter \
+                  src/widgets/msgbox \
+                  src/widgets/roller \
+                  src/widgets/scale \
+                  src/widgets/slider \
+                  src/widgets/span \
+                  src/widgets/spinbox \
+                  src/widgets/spinner \
+                  src/widgets/switch \
+                  src/widgets/table \
+                  src/widgets/tabview \
+                  src/widgets/textarea \
+                  src/widgets/tileview \
+                  src/widgets/win     \
+                  src/stdlib \
+                  src/stdlib/builtin
 
 ifeq ($(CONFIG_LV_USE_THORVG_INTERNAL),y)
-COMPONENT_SRCDIRS += src/extra/libs/thorvg 
+COMPONENT_SRCDIRS += src/libs/thorvg
 endif
 
 COMPONENT_ADD_INCLUDEDIRS := $(COMPONENT_SRCDIRS) .

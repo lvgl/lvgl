@@ -674,6 +674,30 @@ void lv_obj_set_style_text_align(lv_obj_t * obj, lv_text_align_t value, lv_style
     lv_obj_set_local_style_prop(obj, LV_STYLE_TEXT_ALIGN, v, selector);
 }
 
+void lv_obj_set_style_text_outline_stroke_color(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .color = value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TEXT_OUTLINE_STROKE_COLOR, v, selector);
+}
+
+void lv_obj_set_style_text_outline_stroke_width(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TEXT_OUTLINE_STROKE_WIDTH, v, selector);
+}
+
+void lv_obj_set_style_text_outline_stroke_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_TEXT_OUTLINE_STROKE_OPA, v, selector);
+}
+
 void lv_obj_set_style_radius(lv_obj_t * obj, int32_t value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
@@ -728,6 +752,22 @@ void lv_obj_set_style_color_filter_opa(lv_obj_t * obj, lv_opa_t value, lv_style_
         .num = (int32_t)value
     };
     lv_obj_set_local_style_prop(obj, LV_STYLE_COLOR_FILTER_OPA, v, selector);
+}
+
+void lv_obj_set_style_recolor(lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .color = value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_RECOLOR, v, selector);
+}
+
+void lv_obj_set_style_recolor_opa(lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_RECOLOR_OPA, v, selector);
 }
 
 void lv_obj_set_style_anim(lv_obj_t * obj, const lv_anim_t * value, lv_style_selector_t selector)

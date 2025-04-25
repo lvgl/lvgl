@@ -36,7 +36,7 @@ extern "C" {
 #include "src/misc/lv_iter.h"
 #include "src/misc/lv_circle_buf.h"
 #include "src/misc/lv_tree.h"
-#include "src/misc/cache/lv_image_cache.h"
+#include "src/misc/cache/lv_cache.h"
 
 #include "src/tick/lv_tick.h"
 
@@ -83,6 +83,7 @@ extern "C" {
 #include "src/widgets/textarea/lv_textarea.h"
 #include "src/widgets/tileview/lv_tileview.h"
 #include "src/widgets/win/lv_win.h"
+#include "src/widgets/3dtexture/lv_3dtexture.h"
 
 #include "src/others/snapshot/lv_snapshot.h"
 #include "src/others/sysmon/lv_sysmon.h"
@@ -96,6 +97,7 @@ extern "C" {
 #include "src/others/font_manager/lv_font_manager.h"
 #include "src/others/xml/lv_xml.h"
 #include "src/others/xml/lv_xml_component.h"
+#include "src/others/test/lv_test.h"
 
 #include "src/libs/barcode/lv_barcode.h"
 #include "src/libs/bin_decoder/lv_bin_decoder.h"

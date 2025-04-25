@@ -140,7 +140,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     }
     lv_area_t clip_coords_for_children;
     bool refr_children = true;
-    if(!lv_area_intersect(&clip_coords_for_children, &clip_area_ori, obj_coords)) {
+    if(!lv_area_intersect(&clip_coords_for_children, &clip_area_ori, obj_coords) || layer->opa <= LV_OPA_MIN) {
         refr_children = false;
     }
 
@@ -547,6 +547,11 @@ static void refr_sync_areas(void)
          * @todo Resize SDL window will trigger crash because of sync_area is larger than disp_area
          */
         lv_area_intersect(sync_area, sync_area, &disp_area);
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+        if(lv_display_get_matrix_rotation(disp_refr)) {
+            lv_display_rotate_area(disp_refr, sync_area);
+        }
+#endif
         lv_draw_buf_copy(off_screen, sync_area, on_screen, sync_area);
     }
 
@@ -666,23 +671,18 @@ static void refr_area(const lv_area_t * area_p, int32_t y_offset)
     layer->phy_clip_area = *area_p;
     layer->partial_y_offset = y_offset;
 
-    if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
-        /*In full mode the area is always the full screen, so the buffer area to it too*/
-        layer->buf_area = *area_p;
-        layer_reshape_draw_buf(layer, layer->draw_buf->header.stride);
-
-    }
-    else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
+    if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_PARTIAL) {
         /*In partial mode render this area to the buffer*/
         layer->buf_area = *area_p;
         layer_reshape_draw_buf(layer, LV_STRIDE_AUTO);
     }
-    else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT) {
-        /*In direct mode the the buffer area is always the whole screen*/
+    else if(disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_DIRECT ||
+            disp_refr->render_mode == LV_DISPLAY_RENDER_MODE_FULL) {
+        /*In direct mode and full mode the the buffer area is always the whole screen, not considering rotation*/
         layer->buf_area.x1 = 0;
         layer->buf_area.y1 = 0;
-        layer->buf_area.x2 = lv_display_get_horizontal_resolution(disp_refr) - 1;
-        layer->buf_area.y2 = lv_display_get_vertical_resolution(disp_refr) - 1;
+        layer->buf_area.x2 = lv_display_get_original_horizontal_resolution(disp_refr) - 1;
+        layer->buf_area.y2 = lv_display_get_original_vertical_resolution(disp_refr) - 1;
         layer_reshape_draw_buf(layer, layer->draw_buf->header.stride);
     }
 
@@ -766,6 +766,37 @@ static void refr_configured_layer(lv_layer_t * layer)
     LV_PROFILER_REFR_BEGIN;
 
     lv_layer_reset(layer);
+
+#if LV_DRAW_TRANSFORM_USE_MATRIX
+    if(lv_display_get_matrix_rotation(disp_refr)) {
+        const lv_display_rotation_t rotation = lv_display_get_rotation(disp_refr);
+        if(rotation != LV_DISPLAY_ROTATION_0) {
+            lv_display_rotate_area(disp_refr, &layer->phy_clip_area);
+
+            /* The screen rotation direction defined by LVGL is opposite to the drawing angle */
+            switch(rotation) {
+                case LV_DISPLAY_ROTATION_90:
+                    lv_matrix_rotate(&layer->matrix, 270);
+                    lv_matrix_translate(&layer->matrix, -disp_refr->ver_res, 0);
+                    break;
+
+                case LV_DISPLAY_ROTATION_180:
+                    lv_matrix_rotate(&layer->matrix, 180);
+                    lv_matrix_translate(&layer->matrix, -disp_refr->hor_res, -disp_refr->ver_res);
+                    break;
+
+                case LV_DISPLAY_ROTATION_270:
+                    lv_matrix_rotate(&layer->matrix, 90);
+                    lv_matrix_translate(&layer->matrix, 0, -disp_refr->hor_res);
+                    break;
+
+                default:
+                    LV_LOG_WARN("Invalid rotation: %d", rotation);
+                    break;
+            }
+        }
+    }
+#endif /* LV_DRAW_TRANSFORM_USE_MATRIX */
 
     /* In single buffered mode wait here until the buffer is freed.
      * Else we would draw into the buffer while it's still being transferred to the display*/
@@ -877,14 +908,19 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
     if(top_obj == NULL) return;  /*Shouldn't happen*/
 
     LV_PROFILER_REFR_BEGIN;
-    /*Refresh the top object and its children*/
-    refr_obj(layer, top_obj);
-
     /*Draw the 'younger' sibling objects because they can be on top_obj*/
     lv_obj_t * parent;
     lv_obj_t * border_p = top_obj;
 
     parent = lv_obj_get_parent(top_obj);
+
+    /*Calculate the recolor before the parent*/
+    if(parent) {
+        layer->recolor = lv_obj_get_style_recolor_recursive(parent, LV_PART_MAIN);
+    }
+
+    /*Refresh the top object and its children*/
+    refr_obj(layer, top_obj);
 
     /*Do until not reach the screen*/
     while(parent != NULL) {
@@ -1108,12 +1144,15 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
     if(opa_layered < LV_OPA_MIN) return;
 
     const lv_opa_t layer_opa_ori = layer->opa;
+    const lv_color32_t layer_recolor = layer->recolor;
 
     /*Normal `opa` (not layered) will just scale down `bg_opa`, `text_opa`, etc, in the upcoming drawings.*/
     const lv_opa_t opa_main = lv_obj_get_style_opa(obj, LV_PART_MAIN);
     if(opa_main < LV_OPA_MAX) {
         layer->opa = LV_OPA_MIX2(layer_opa_ori, opa_main);
     }
+
+    layer->recolor = lv_obj_style_apply_recolor(obj, LV_PART_MAIN, layer->recolor);
 
     lv_layer_type_t layer_type = lv_obj_get_layer_type(obj);
     if(layer_type == LV_LAYER_TYPE_NONE) {
@@ -1202,8 +1241,9 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
         }
     }
 
-    /* Restore the original layer opa */
+    /* Restore the original layer opa and recolor */
     layer->opa = layer_opa_ori;
+    layer->recolor = layer_recolor;
 }
 
 static uint32_t get_max_row(lv_display_t * disp, int32_t area_w, int32_t area_h)

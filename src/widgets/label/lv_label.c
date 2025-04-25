@@ -95,7 +95,7 @@ const lv_obj_class_t lv_label_class = {
     .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_label_t),
     .base_class = &lv_obj_class,
-    .name = "label",
+    .name = "lv_label",
 #if LV_USE_OBJ_PROPERTY
     .prop_index_start = LV_PROPERTY_LABEL_START,
     .prop_index_end = LV_PROPERTY_LABEL_END,
@@ -429,6 +429,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in, bool 
     const int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
     const int32_t letter_height = lv_font_get_line_height(font);
     int32_t y = 0;
+
 
     lv_text_flag_t flag = get_label_flags(label);
 
@@ -775,6 +776,7 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(label->invalid_size_cache) {
             const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
             int32_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+
             int32_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
             lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
             if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
@@ -840,6 +842,12 @@ static void draw_main(lv_event_t * e)
         label_draw_dsc.sel_bg_color = lv_obj_get_style_bg_color(obj, LV_PART_SELECTED);
     }
 
+    /* get the style attributes of a letter outline */
+    label_draw_dsc.outline_stroke_color = lv_obj_get_style_text_outline_stroke_color(obj, LV_PART_MAIN);
+    label_draw_dsc.outline_stroke_opa = lv_obj_get_style_text_outline_stroke_opa(obj, LV_PART_MAIN);
+    label_draw_dsc.outline_stroke_width = lv_obj_get_style_text_outline_stroke_width(obj, LV_PART_MAIN);
+
+
     /* In SCROLL and SCROLL_CIRCULAR mode the CENTER and RIGHT are pointless, so remove them.
      * (In addition, they will create misalignment in this situation)*/
     if((label->long_mode == LV_LABEL_LONG_MODE_SCROLL || label->long_mode == LV_LABEL_LONG_MODE_SCROLL_CIRCULAR) &&
@@ -848,7 +856,12 @@ static void draw_main(lv_event_t * e)
         lv_text_get_size(&size, label->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
                          LV_COORD_MAX, flag);
         if(size.x > lv_area_get_width(&txt_coords)) {
+#if LV_USE_BIDI
+            const lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
+            label_draw_dsc.align = base_dir == LV_BASE_DIR_RTL ? LV_TEXT_ALIGN_RIGHT : LV_TEXT_ALIGN_LEFT;
+#else
             label_draw_dsc.align = LV_TEXT_ALIGN_LEFT;
+#endif
         }
     }
 
@@ -863,7 +876,9 @@ static void draw_main(lv_event_t * e)
         lv_area_move(&txt_coords, 0, -s);
         txt_coords.y2 = obj->coords.y2;
     }
-    if(label->long_mode == LV_LABEL_LONG_MODE_SCROLL || label->long_mode == LV_LABEL_LONG_MODE_SCROLL_CIRCULAR) {
+    if(label->long_mode == LV_LABEL_LONG_MODE_SCROLL ||
+       label->long_mode == LV_LABEL_LONG_MODE_SCROLL_CIRCULAR ||
+       label->long_mode == LV_LABEL_LONG_MODE_CLIP) {
         const lv_area_t clip_area_ori = layer->_clip_area;
         layer->_clip_area = txt_clip;
         lv_draw_label(layer, &label_draw_dsc, &txt_coords);
@@ -1004,18 +1019,17 @@ static void lv_label_refr_text(lv_obj_t * obj)
 
             int32_t duration_resolved = lv_anim_resolve_speed(anim_time, start, end);
             /*To keep the old position*/
-            if(act_time < duration_resolved) {
-                a.act_time = act_time;
-                if(reverse_play_in_progress) {
-                    a.reverse_play_in_progress = 1;
-                    /*Swap the start and end values*/
-                    int32_t tmp;
-                    tmp      = a.start_value;
-                    a.start_value = a.end_value;
-                    a.end_value   = tmp;
-                }
-            }
+            if(act_time > duration_resolved) act_time = duration_resolved;
 
+            a.act_time = act_time;
+            if(reverse_play_in_progress) {
+                a.reverse_play_in_progress = 1;
+                /*Swap the start and end values*/
+                int32_t tmp;
+                tmp      = a.start_value;
+                a.start_value = a.end_value;
+                a.end_value   = tmp;
+            }
             lv_anim_set_duration(&a, anim_time);
             lv_anim_set_reverse_duration(&a, anim_time);
 
@@ -1046,16 +1060,15 @@ static void lv_label_refr_text(lv_obj_t * obj)
                 act_time = anim_cur->act_time;
                 reverse_play_in_progress = anim_cur->reverse_play_in_progress;
             }
-            if(act_time < a.duration) {
-                a.act_time = act_time;      /*To keep the old position*/
-                if(reverse_play_in_progress) {
-                    a.reverse_play_in_progress = 1;
-                    /*Swap the start and end values*/
-                    int32_t tmp;
-                    tmp      = a.start_value;
-                    a.start_value = a.end_value;
-                    a.end_value   = tmp;
-                }
+            if(act_time > a.duration) act_time = a.duration;
+            a.act_time = act_time;      /*To keep the old position*/
+            if(reverse_play_in_progress) {
+                a.reverse_play_in_progress = 1;
+                /*Swap the start and end values*/
+                int32_t tmp;
+                tmp      = a.start_value;
+                a.start_value = a.end_value;
+                a.end_value   = tmp;
             }
 
             lv_anim_set_duration(&a, anim_time);

@@ -53,6 +53,7 @@ extern "C" {
 #include "../draw/sw/lv_draw_sw_mask_private.h"
 #include "../stdlib/builtin/lv_tlsf_private.h"
 #include "../others/sysmon/lv_sysmon_private.h"
+#include "../others/test/lv_test_private.h"
 #include "../layouts/lv_layout_private.h"
 
 /*********************
@@ -126,6 +127,7 @@ typedef struct _lv_global_t {
     lv_cache_t * img_header_cache;
 
     lv_draw_global_info_t draw_info;
+    lv_ll_t draw_sw_blend_handler_ll;
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
     lv_draw_sw_shadow_cache_t sw_shadow_cache;
 #endif
@@ -220,6 +222,10 @@ typedef struct _lv_global_t {
 #if LV_USE_OBJ_ID_BUILTIN
     void * objid_array;
     uint32_t objid_count;
+#endif
+
+#if LV_USE_TEST
+    lv_test_state_t test_state;
 #endif
 
 #if LV_USE_NUTTX

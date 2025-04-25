@@ -483,7 +483,7 @@ static void _set_polyline_attr(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t *
     }
 }
 
-static void _set_polygen_attr(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t * dsc, const lv_svg_attr_t * attr)
+static void _set_polygon_attr(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t * dsc, const lv_svg_attr_t * attr)
 {
     _set_polyline_attr(obj, dsc, attr);
     lv_svg_render_poly_t * poly = (lv_svg_render_poly_t *)obj;
@@ -899,7 +899,7 @@ static void _set_solid_ref(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t * dsc
 static void _set_gradient_ref(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t * dsc,
                               const lv_svg_render_obj_t * target_obj, bool fill)
 {
-    if(!target_obj->get_bounds) {
+    if(!target_obj->clz->get_bounds) {
         return;
     }
 
@@ -921,7 +921,7 @@ static void _set_gradient_ref(lv_svg_render_obj_t * obj, lv_vector_draw_dsc_t * 
     lv_memcpy(grad_dsc, &grad->dsc, sizeof(lv_vector_gradient_t));
 
     lv_area_t bounds = {0, 0, 0, 0};
-    target_obj->get_bounds(target_obj, &bounds);
+    target_obj->clz->get_bounds(target_obj, &bounds);
 
     int32_t w = bounds.x2 - bounds.x1;
     int32_t h = bounds.y2 - bounds.y1;
@@ -998,7 +998,7 @@ static void _copy_draw_dsc_from_ref(lv_vector_dsc_t * dsc, const lv_svg_render_o
         while(list) {
             if(list->id) {
                 if(strcmp(obj->fill_ref, list->id) == 0) {
-                    list->set_paint_ref(list, dst, obj, true);
+                    list->clz->set_paint_ref(list, dst, obj, true);
                     break;
                 }
             }
@@ -1011,7 +1011,7 @@ static void _copy_draw_dsc_from_ref(lv_vector_dsc_t * dsc, const lv_svg_render_o
         while(list) {
             if(list->id) {
                 if(strcmp(obj->stroke_ref, list->id) == 0) {
-                    list->set_paint_ref(list, dst, obj, false);
+                    list->clz->set_paint_ref(list, dst, obj, false);
                     break;
                 }
             }
@@ -1027,8 +1027,8 @@ static void _set_render_attrs(lv_svg_render_obj_t * obj, const lv_svg_node_t * n
     if((node->type != LV_SVG_TAG_CONTENT) && node->xml_id) {
         obj->id = lv_strdup(node->xml_id);
     }
-    if(obj->init) {
-        obj->init(obj, node);
+    if(obj->clz->init) {
+        obj->clz->init(obj, node);
     }
     if(state->draw_dsc->fill_ref) {
         obj->fill_ref = lv_strdup(state->draw_dsc->fill_ref);
@@ -1040,7 +1040,7 @@ static void _set_render_attrs(lv_svg_render_obj_t * obj, const lv_svg_node_t * n
     uint32_t len = lv_array_size(&node->attrs);
     for(uint32_t i = 0; i < len; i++) {
         lv_svg_attr_t * attr = lv_array_at(&node->attrs, i);
-        obj->set_attr(obj, &(state->draw_dsc->dsc), attr);
+        obj->clz->set_attr(obj, &(state->draw_dsc->dsc), attr);
     }
     if(node->type == LV_SVG_TAG_G) { // only <g> need store it
         state->draw_dsc->fill_ref = obj->fill_ref;
@@ -1287,7 +1287,7 @@ static void _render_rect(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc,
     else if(rect->ry > 0 && rect->rx == 0) rect->rx = rect->ry;
 
     lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
-    lv_area_t rc = {(int32_t)rect->x, (int32_t)rect->y, (int32_t)(rect->x + rect->width), (int32_t)(rect->y + rect->height)};
+    lv_area_t rc = {(int32_t)rect->x, (int32_t)rect->y, (int32_t)(rect->x + rect->width - 1), (int32_t)(rect->y + rect->height - 1)};
     lv_vector_path_append_rect(path, &rc, rect->rx, rect->ry);
 
     _copy_draw_dsc_from_ref(dsc, obj);
@@ -1391,10 +1391,10 @@ static void _render_group(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc
     for(uint32_t i = 0; i < group->items.size; i++) {
         lv_svg_render_obj_t * list = *((lv_svg_render_obj_t **)lv_array_at(&group->items, i));
 
-        if(list->render && (list->flags & _RENDER_IN_GROUP)) {
+        if(list->clz->render && (list->flags & _RENDER_IN_GROUP)) {
             _copy_draw_dsc(&(save_dsc.dsc), &(dsc->current_dsc));
             _special_render(list, dsc);
-            list->render(list, dsc, matrix);
+            list->clz->render(list, dsc, matrix);
             _copy_draw_dsc(&(dsc->current_dsc), &(save_dsc.dsc));
         }
     }
@@ -1417,7 +1417,7 @@ static void _render_image(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc
     }
 
     lv_vector_path_t * path = lv_vector_path_create(LV_VECTOR_PATH_QUALITY_MEDIUM);
-    lv_area_t rc = {(int32_t)image->x, (int32_t)image->y, (int32_t)(image->x + image->width), (int32_t)(image->y + image->height)};
+    lv_area_t rc = {(int32_t)image->x, (int32_t)image->y, (int32_t)(image->x + image->width - 1), (int32_t)(image->y + image->height - 1)};
     lv_vector_path_append_rect(path, &rc, 0, 0);
 
     lv_matrix_t mtx;
@@ -1525,10 +1525,10 @@ static void _render_use(const lv_svg_render_obj_t * obj, lv_vector_dsc_t * dsc, 
     while(list) {
         if(list->id) {
             if(strcmp(use->xlink, list->id) == 0) {
-                if(list->render) {
+                if(list->clz->render) {
                     _prepare_render(list, dsc);
                     _special_render(obj, dsc);
-                    list->render(list, dsc, &mtx);
+                    list->clz->render(list, dsc, &mtx);
                 }
                 break;
             }
@@ -1951,6 +1951,135 @@ static void _destroy_tspan(lv_svg_render_obj_t * obj)
 
 #endif
 
+static lv_svg_render_class svg_viewport_class = {
+    .init = _init_viewport,
+    .render = _render_viewport,
+    .set_attr = _set_viewport_attr,
+    .get_bounds = _get_viewport_bounds,
+    .get_size = _get_viewport_size,
+};
+
+static lv_svg_render_class svg_rect_class = {
+    .init = _init_obj,
+    .render = _render_rect,
+    .set_attr = _set_rect_attr,
+    .get_bounds = _get_rect_bounds,
+    .get_size = _get_rect_size,
+};
+
+static lv_svg_render_class svg_circle_class = {
+    .init = _init_obj,
+    .render = _render_circle,
+    .set_attr = _set_circle_attr,
+    .get_bounds = _get_circle_bounds,
+    .get_size = _get_circle_size,
+};
+
+static lv_svg_render_class svg_ellipse_class = {
+    .init = _init_obj,
+    .render = _render_ellipse,
+    .set_attr = _set_ellipse_attr,
+    .get_bounds = _get_ellipse_bounds,
+    .get_size = _get_ellipse_size,
+};
+
+static lv_svg_render_class svg_line_class = {
+    .init = _init_obj,
+    .render = _render_line,
+    .set_attr = _set_line_attr,
+    .get_bounds = _get_line_bounds,
+    .get_size = _get_line_size,
+};
+
+static lv_svg_render_class svg_polyline_class = {
+    .init = _init_poly,
+    .render = _render_poly,
+    .set_attr = _set_polyline_attr,
+    .get_bounds = _get_poly_bounds,
+    .destroy = _destroy_poly,
+    .get_size = _get_poly_size,
+};
+
+static lv_svg_render_class svg_polygon_class = {
+    .init = _init_poly,
+    .render = _render_poly,
+    .set_attr = _set_polygon_attr,
+    .get_bounds = _get_poly_bounds,
+    .destroy = _destroy_poly,
+    .get_size = _get_poly_size,
+};
+
+static lv_svg_render_class svg_path_class = {
+    .init = _init_poly,
+    .render = _render_poly,
+    .set_attr = _set_path_attr,
+    .get_bounds = _get_poly_bounds,
+    .destroy = _destroy_poly,
+    .get_size = _get_poly_size,
+};
+
+#if LV_USE_FREETYPE
+static lv_svg_render_class svg_text_class = {
+    .init = _init_text,
+    .set_attr = _set_text_attr,
+    .render = _render_text,
+    .get_bounds = _get_text_bounds,
+    .destroy = _destroy_text,
+    .get_size = _get_txt_size,
+};
+
+static lv_svg_render_class svg_tspan_class = {
+    .init = _init_tspan,
+    .set_attr = _set_tspan_attr,
+    .get_bounds = _get_tspan_bounds,
+    .destroy = _destroy_tspan,
+    .get_size = _get_span_size,
+};
+
+static lv_svg_render_class svg_content_class = {
+    .init = _init_content,
+    .destroy = _destroy_content,
+    .get_size = _get_content_size,
+};
+#endif
+
+static lv_svg_render_class svg_image_class = {
+    .init = _init_image,
+    .render = _render_image,
+    .set_attr = _set_image_attr,
+    .get_size = _get_image_size,
+};
+
+static lv_svg_render_class svg_use_class = {
+    .init = _init_obj,
+    .set_attr = _set_use_attr,
+    .render = _render_use,
+    .destroy = _destroy_use,
+    .get_size = _get_use_size,
+};
+
+static lv_svg_render_class svg_solid_class = {
+    .init = _init_obj,
+    .set_attr = _set_solid_attr,
+    .set_paint_ref = _set_solid_ref,
+    .get_size = _get_solid_size,
+};
+
+static lv_svg_render_class svg_grad_class = {
+    .init = _init_gradient,
+    .set_attr = _set_gradient_attr,
+    .set_paint_ref = _set_gradient_ref,
+    .get_size = _get_grad_size,
+};
+
+static lv_svg_render_class svg_group_class = {
+    .init = _init_group,
+    .set_attr = _set_attr,
+    .render = _render_group,
+    .destroy = _destroy_group,
+    .get_size = _get_group_size,
+};
+
 static lv_svg_render_obj_t * _lv_svg_render_create(const lv_svg_node_t * node,
                                                    struct _lv_svg_drawing_builder_state * state)
 {
@@ -1958,91 +2087,56 @@ static lv_svg_render_obj_t * _lv_svg_render_create(const lv_svg_node_t * node,
         case LV_SVG_TAG_SVG: {
                 lv_svg_render_viewport_t * view = lv_zalloc(sizeof(lv_svg_render_viewport_t));
                 LV_ASSERT_MALLOC(view);
-                view->base.init = _init_viewport;
-                view->base.render = _render_viewport;
-                view->base.set_attr = _set_viewport_attr;
-                view->base.get_bounds = _get_viewport_bounds;
-                view->base.get_size = _get_viewport_size;
+                view->base.clz = &svg_viewport_class;
                 _set_render_attrs(LV_SVG_RENDER_OBJ(view), node, state);
                 return LV_SVG_RENDER_OBJ(view);
             }
         case LV_SVG_TAG_RECT: {
                 lv_svg_render_rect_t * rect = lv_zalloc(sizeof(lv_svg_render_rect_t));
                 LV_ASSERT_MALLOC(rect);
-                rect->base.init = _init_obj;
-                rect->base.render = _render_rect;
-                rect->base.set_attr = _set_rect_attr;
-                rect->base.get_bounds = _get_rect_bounds;
-                rect->base.get_size = _get_rect_size;
+                rect->base.clz = &svg_rect_class;
                 _set_render_attrs(LV_SVG_RENDER_OBJ(rect), node, state);
                 return LV_SVG_RENDER_OBJ(rect);
             }
         case LV_SVG_TAG_CIRCLE: {
                 lv_svg_render_circle_t * circle = lv_zalloc(sizeof(lv_svg_render_circle_t));
                 LV_ASSERT_MALLOC(circle);
-                circle->base.init = _init_obj;
-                circle->base.render = _render_circle;
-                circle->base.set_attr = _set_circle_attr;
-                circle->base.get_bounds = _get_circle_bounds;
-                circle->base.get_size = _get_circle_size;
+                circle->base.clz = &svg_circle_class;
                 _set_render_attrs(LV_SVG_RENDER_OBJ(circle), node, state);
                 return LV_SVG_RENDER_OBJ(circle);
             }
         case LV_SVG_TAG_ELLIPSE: {
                 lv_svg_render_ellipse_t * ellipse = lv_zalloc(sizeof(lv_svg_render_ellipse_t));
                 LV_ASSERT_MALLOC(ellipse);
-                ellipse->base.init = _init_obj;
-                ellipse->base.render = _render_ellipse;
-                ellipse->base.set_attr = _set_ellipse_attr;
-                ellipse->base.get_bounds = _get_ellipse_bounds;
-                ellipse->base.get_size = _get_ellipse_size;
+                ellipse->base.clz = &svg_ellipse_class;
                 _set_render_attrs(LV_SVG_RENDER_OBJ(ellipse), node, state);
                 return LV_SVG_RENDER_OBJ(ellipse);
             }
         case LV_SVG_TAG_LINE: {
                 lv_svg_render_line_t * line = lv_zalloc(sizeof(lv_svg_render_line_t));
                 LV_ASSERT_MALLOC(line);
-                line->base.init = _init_obj;
-                line->base.render = _render_line;
-                line->base.set_attr = _set_line_attr;
-                line->base.get_bounds = _get_line_bounds;
-                line->base.get_size = _get_line_size;
+                line->base.clz = &svg_line_class;
                 _set_render_attrs(LV_SVG_RENDER_OBJ(line), node, state);
                 return LV_SVG_RENDER_OBJ(line);
             }
         case LV_SVG_TAG_POLYLINE: {
                 lv_svg_render_poly_t * poly = lv_zalloc(sizeof(lv_svg_render_poly_t));
                 LV_ASSERT_MALLOC(poly);
-                poly->base.init = _init_poly;
-                poly->base.render = _render_poly;
-                poly->base.set_attr = _set_polyline_attr;
-                poly->base.get_bounds = _get_poly_bounds;
-                poly->base.destroy = _destroy_poly;
-                poly->base.get_size = _get_poly_size;
+                poly->base.clz = &svg_polyline_class;
                 _set_render_attrs(LV_SVG_RENDER_OBJ(poly), node, state);
                 return LV_SVG_RENDER_OBJ(poly);
             }
         case LV_SVG_TAG_POLYGON: {
                 lv_svg_render_poly_t * poly = lv_zalloc(sizeof(lv_svg_render_poly_t));
                 LV_ASSERT_MALLOC(poly);
-                poly->base.init = _init_poly;
-                poly->base.render = _render_poly;
-                poly->base.set_attr = _set_polygen_attr;
-                poly->base.get_bounds = _get_poly_bounds;
-                poly->base.destroy = _destroy_poly;
-                poly->base.get_size = _get_poly_size;
+                poly->base.clz = &svg_polygon_class;
                 _set_render_attrs(LV_SVG_RENDER_OBJ(poly), node, state);
                 return LV_SVG_RENDER_OBJ(poly);
             }
         case LV_SVG_TAG_PATH: {
                 lv_svg_render_poly_t * poly = lv_zalloc(sizeof(lv_svg_render_poly_t));
                 LV_ASSERT_MALLOC(poly);
-                poly->base.init = _init_poly;
-                poly->base.render = _render_poly;
-                poly->base.set_attr = _set_path_attr;
-                poly->base.get_bounds = _get_poly_bounds;
-                poly->base.destroy = _destroy_poly;
-                poly->base.get_size = _get_poly_size;
+                poly->base.clz = &svg_path_class;
                 _set_render_attrs(LV_SVG_RENDER_OBJ(poly), node, state);
                 return LV_SVG_RENDER_OBJ(poly);
             }
@@ -2050,12 +2144,7 @@ static lv_svg_render_obj_t * _lv_svg_render_create(const lv_svg_node_t * node,
         case LV_SVG_TAG_TEXT: {
                 lv_svg_render_text_t * txt = lv_zalloc(sizeof(lv_svg_render_text_t));
                 LV_ASSERT_MALLOC(txt);
-                txt->base.init = _init_text;
-                txt->base.set_attr = _set_text_attr;
-                txt->base.render = _render_text;
-                txt->base.get_bounds = _get_text_bounds;
-                txt->base.destroy = _destroy_text;
-                txt->base.get_size = _get_txt_size;
+                txt->base.clz = &svg_text_class;
                 _set_render_attrs(LV_SVG_RENDER_OBJ(txt), node, state);
                 return LV_SVG_RENDER_OBJ(txt);
             }
@@ -2064,20 +2153,14 @@ static lv_svg_render_obj_t * _lv_svg_render_create(const lv_svg_node_t * node,
                 LV_ASSERT_MALLOC(span);
                 lv_svg_render_content_t * content = (lv_svg_render_content_t *)span;
                 content->render_content = _render_span;
-                content->base.init = _init_tspan;
-                content->base.set_attr = _set_tspan_attr;
-                content->base.get_bounds = _get_tspan_bounds;
-                content->base.destroy = _destroy_tspan;
-                content->base.get_size = _get_span_size;
+                content->base.clz = &svg_tspan_class;
                 _set_render_attrs(LV_SVG_RENDER_OBJ(span), node, state);
                 return LV_SVG_RENDER_OBJ(span);
             }
         case LV_SVG_TAG_CONTENT: {
                 lv_svg_render_content_t * content = lv_zalloc(sizeof(lv_svg_render_content_t));
                 LV_ASSERT_MALLOC(content);
-                content->base.init = _init_content;
-                content->base.destroy = _destroy_content;
-                content->base.get_size = _get_content_size;
+                content->base.clz = &svg_content_class;
                 _set_render_attrs(LV_SVG_RENDER_OBJ(content), node, state);
                 return LV_SVG_RENDER_OBJ(content);
             }
@@ -2085,31 +2168,21 @@ static lv_svg_render_obj_t * _lv_svg_render_create(const lv_svg_node_t * node,
         case LV_SVG_TAG_IMAGE: {
                 lv_svg_render_image_t * image = lv_zalloc(sizeof(lv_svg_render_image_t));
                 LV_ASSERT_MALLOC(image);
-                image->base.init = _init_image;
-                image->base.render = _render_image;
-                image->base.set_attr = _set_image_attr;
-                image->base.get_size = _get_image_size;
+                image->base.clz = &svg_image_class;
                 _set_render_attrs(LV_SVG_RENDER_OBJ(image), node, state);
                 return LV_SVG_RENDER_OBJ(image);
             }
         case LV_SVG_TAG_USE: {
                 lv_svg_render_use_t * use = lv_zalloc(sizeof(lv_svg_render_use_t));
                 LV_ASSERT_MALLOC(use);
-                use->base.init = _init_obj;
-                use->base.set_attr = _set_use_attr;
-                use->base.render = _render_use;
-                use->base.destroy = _destroy_use;
-                use->base.get_size = _get_use_size;
+                use->base.clz = &svg_use_class;
                 _set_render_attrs(LV_SVG_RENDER_OBJ(use), node, state);
                 return LV_SVG_RENDER_OBJ(use);
             }
         case LV_SVG_TAG_SOLID_COLOR: {
                 lv_svg_render_solid_t * solid = lv_zalloc(sizeof(lv_svg_render_solid_t));
                 LV_ASSERT_MALLOC(solid);
-                solid->base.init = _init_obj;
-                solid->base.set_attr = _set_solid_attr;
-                solid->base.set_paint_ref = _set_solid_ref;
-                solid->base.get_size = _get_solid_size;
+                solid->base.clz = &svg_solid_class;
                 _set_render_attrs(LV_SVG_RENDER_OBJ(solid), node, state);
                 return LV_SVG_RENDER_OBJ(solid);
             }
@@ -2117,27 +2190,20 @@ static lv_svg_render_obj_t * _lv_svg_render_create(const lv_svg_node_t * node,
         case LV_SVG_TAG_LINEAR_GRADIENT: {
                 lv_svg_render_gradient_t * grad = lv_zalloc(sizeof(lv_svg_render_gradient_t));
                 LV_ASSERT_MALLOC(grad);
-                grad->base.init = _init_gradient;
-                grad->base.set_attr = _set_gradient_attr;
-                grad->base.set_paint_ref = _set_gradient_ref;
+                grad->base.clz = &svg_grad_class;
                 if(node->type == LV_SVG_TAG_LINEAR_GRADIENT) {
                     grad->dsc.style = LV_VECTOR_GRADIENT_STYLE_LINEAR;
                 }
                 else {   // radial gradient
                     grad->dsc.style = LV_VECTOR_GRADIENT_STYLE_RADIAL;
                 }
-                grad->base.get_size = _get_grad_size;
                 _set_render_attrs(LV_SVG_RENDER_OBJ(grad), node, state);
                 return LV_SVG_RENDER_OBJ(grad);
             }
         case LV_SVG_TAG_G: {
                 lv_svg_render_group_t * group = lv_zalloc(sizeof(lv_svg_render_group_t));
                 LV_ASSERT_MALLOC(group);
-                group->base.init = _init_group;
-                group->base.set_attr = _set_attr;
-                group->base.render = _render_group;
-                group->base.destroy = _destroy_group;
-                group->base.get_size = _get_group_size;
+                group->base.clz = &svg_group_class;
                 _set_render_attrs(LV_SVG_RENDER_OBJ(group), node, state);
                 return LV_SVG_RENDER_OBJ(group);
             }
@@ -2330,8 +2396,8 @@ void lv_svg_render_delete(lv_svg_render_obj_t * list)
 
         _deinit_draw_dsc(&(obj->dsc));
 
-        if(obj->destroy) {
-            obj->destroy(obj);
+        if(obj->clz->destroy) {
+            obj->clz->destroy(obj);
         }
         if(obj->id) {
             lv_free(obj->id);
@@ -2355,8 +2421,8 @@ uint32_t lv_svg_render_get_size(const lv_svg_render_obj_t * render)
     uint32_t size = 0;
     const lv_svg_render_obj_t * cur = render;
     while(cur) {
-        if(cur->get_size) {
-            cur->get_size(cur, &size);
+        if(cur->clz->get_size) {
+            cur->clz->get_size(cur, &size);
         }
         cur = cur->next;
     }
@@ -2371,9 +2437,9 @@ void lv_draw_svg_render(lv_vector_dsc_t * dsc, const lv_svg_render_obj_t * rende
 
     const lv_svg_render_obj_t * cur = render;
     while(cur) {
-        if(cur->render && ((cur->flags & 3) == _RENDER_NORMAL)) {
+        if(cur->clz->render && ((cur->flags & 3) == _RENDER_NORMAL)) {
             _prepare_render(cur, dsc);
-            cur->render(cur, dsc, NULL);
+            cur->clz->render(cur, dsc, NULL);
         }
         cur = cur->next;
     }

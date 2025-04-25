@@ -1,68 +1,51 @@
 #include "../../lv_examples.h"
 #if LV_USE_CANVAS && LV_BUILD_EXAMPLES
 
-#define CANVAS_WIDTH  300
-#define CANVAS_HEIGHT  200
 
-static void timer_cb(lv_timer_t * timer)
-{
-    static int32_t counter = 0;
-    const char * string = "lol~ I'm wavvvvvvving~>>>";
-    const int16_t string_len = lv_strlen(string);
+#define CANVAS_WIDTH  150
+#define CANVAS_HEIGHT 150
 
-    lv_obj_t * canvas = lv_timer_get_user_data(timer);
-    lv_layer_t layer;
-    lv_canvas_init_layer(canvas, &layer);
-
-    lv_canvas_fill_bg(canvas, lv_color_white(), LV_OPA_COVER);
-
-    lv_draw_letter_dsc_t letter_dsc;
-    lv_draw_letter_dsc_init(&letter_dsc);
-    letter_dsc.color = lv_color_hex(0xff0000);
-    letter_dsc.font = lv_font_get_default();
-
-    {
-#define CURVE2_X(t) (t * 2 + 10)
-#define CURVE2_Y(t) (lv_trigo_sin((t) * 5) * 40 / 32767 + CANVAS_HEIGHT / 2)
-
-        int32_t pre_x = CURVE2_X(-1);
-        int32_t pre_y = CURVE2_Y(-1);
-        for(int16_t i = 0; i < string_len; i++) {
-            const int32_t angle = i * 5;
-            const int32_t x = CURVE2_X(angle);
-            const int32_t y = CURVE2_Y(angle + counter / 2);
-
-            letter_dsc.unicode = (uint32_t)string[i % string_len];
-            letter_dsc.rotation = lv_atan2(y - pre_y, x - pre_x) * 10;
-            letter_dsc.color = lv_color_hsv_to_rgb(i * 10, 100, 100);
-            lv_draw_letter(&layer, &letter_dsc, &(lv_point_t) {
-                .x = x, .y = y
-            });
-
-            pre_x = x;
-            pre_y = y;
-        }
-    }
-
-    lv_canvas_finish_layer(canvas, &layer);
-
-    counter++;
-}
-
+/**
+ * Draw a triangle to the canvas
+ */
 void lv_example_canvas_9(void)
 {
     /*Create a buffer for the canvas*/
     LV_DRAW_BUF_DEFINE_STATIC(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);
     LV_DRAW_BUF_INIT_STATIC(draw_buf);
 
+    /*Create a canvas and initialize its palette*/
     lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
-    lv_obj_set_size(canvas, CANVAS_WIDTH, CANVAS_HEIGHT);
-
+    lv_canvas_set_draw_buf(canvas, &draw_buf);
+    lv_canvas_fill_bg(canvas, lv_color_hex3(0xccc), LV_OPA_COVER);
     lv_obj_center(canvas);
 
-    lv_canvas_set_draw_buf(canvas, &draw_buf);
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
 
-    lv_timer_create(timer_cb, 16, canvas);
+    lv_draw_triangle_dsc_t tri_dsc;
+    lv_draw_triangle_dsc_init(&tri_dsc);
+    tri_dsc.p[0].x = 10;
+    tri_dsc.p[0].y = 10;
+    tri_dsc.p[1].x = 100;
+    tri_dsc.p[1].y = 30;
+    tri_dsc.p[2].x = 50;
+    tri_dsc.p[2].y = 100;
+
+    tri_dsc.grad.stops_count = 2;
+    tri_dsc.grad.dir = LV_GRAD_DIR_VER;
+    tri_dsc.grad.stops[0].color = lv_color_hex(0xff0000);
+    tri_dsc.grad.stops[0].frac = 64;    /*Start at 25%*/
+    tri_dsc.grad.stops[0].opa = LV_OPA_COVER;
+    tri_dsc.grad.stops[1].color = lv_color_hex(0x0000ff);
+    tri_dsc.grad.stops[1].opa = LV_OPA_TRANSP;
+    tri_dsc.grad.stops[1].frac = 3 * 64;    /*End at 75%*/
+
+    tri_dsc.opa = 128;  /*Set the overall opacity to 50%*/
+
+    lv_draw_triangle(&layer, &tri_dsc);
+
+    lv_canvas_finish_layer(canvas, &layer);
 }
 
 #endif

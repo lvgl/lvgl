@@ -19,8 +19,8 @@ struct {
     lv_obj_t * p2_slider;
     lv_obj_t * p2_label;
     lv_obj_t * run_btn;
-    uint16_t p1;
-    uint16_t p2;
+    int32_t p1;
+    int32_t p2;
     lv_anim_t a;
 } ginfo;
 
@@ -64,7 +64,7 @@ void lv_example_anim_3(void)
 
 static int32_t anim_path_bezier3_cb(const lv_anim_t * a)
 {
-    uint32_t t = lv_map(a->act_time, 0, a->duration, 0, 1024);
+    int32_t t = lv_map(a->act_time, 0, a->duration, 0, 1024);
     int32_t step = lv_bezier3(t, 0, ginfo.p1, ginfo.p2, 1024);
     int32_t new_value;
     new_value = step * (a->end_value - a->start_value);
@@ -76,7 +76,7 @@ static int32_t anim_path_bezier3_cb(const lv_anim_t * a)
 static void refer_chart_cubic_bezier(void)
 {
     for(uint16_t i = 0; i <= CHART_POINTS_NUM; i ++) {
-        uint32_t t = i * (1024 / CHART_POINTS_NUM);
+        int32_t t = i * (1024 / CHART_POINTS_NUM);
         int32_t step = lv_bezier3(t, 0, ginfo.p1, ginfo.p2, 1024);
         lv_chart_set_series_value_by_id2(ginfo.chart, ginfo.ser1, i, t, step);
     }
