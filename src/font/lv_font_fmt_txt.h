@@ -159,9 +159,6 @@ typedef struct {
 
 #if LV_USE_FONT_DYNAMIC_LOAD
 typedef struct {
-    /* Pointer to the font header structure. */
-    void * header;
-
     /* Callback to get the glyph bitmap */
     uint8_t * (*get_glyph_bitmap_cb)(void * fmt_dsc, void * glyph_dsc);
 
@@ -178,7 +175,10 @@ typedef struct {
     uint32_t glyph_start;
 
     /* Length of glyph data */
-    int32_t glyph_length;
+    uint32_t glyph_length;
+
+    /* Total bits per glyph */
+    uint32_t glyph_per_bits;
 } lv_font_fmt_txt_glyph_loader_t;
 #endif
 

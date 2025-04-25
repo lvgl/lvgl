@@ -185,9 +185,6 @@ void lv_font_free(lv_font_t * font)
                 if(NULL != loader->glyph_offset) {
                     lv_mem_free((void *)loader->glyph_offset);
                 }
-                if(NULL != loader->header) {
-                    lv_mem_free(loader->fp);
-                }
                 if(NULL != loader->fp) {
                     lv_fs_close(loader->fp);
                     lv_mem_free(loader->fp);
@@ -359,7 +356,7 @@ static int32_t load_cmaps(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, u
 }
 
 static uint8_t * read_glyph_bitmap_data(lv_fs_file_t * fp, uint32_t pos, uint8_t * glyph_bmp,
-                                        uint32_t offset, int nbits, int bmp_size)
+                                        uint32_t offset, uint32_t nbits, int bmp_size)
 {
     lv_fs_res_t res = lv_fs_seek(fp, pos, LV_FS_SEEK_SET);
     if(res != LV_FS_RES_OK) {
@@ -408,17 +405,16 @@ static uint8_t * load_glyph_bitmap(void * fmt_dsc, void * glyph_dsc)
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)fmt_dsc;
     lv_font_fmt_txt_glyph_loader_t * loader = fdsc->loader;
 
-    int32_t glyph_length = loader->glyph_length;
-    font_header_bin_t * header = (font_header_bin_t *)loader->header;
+    uint32_t glyph_nbits = loader->glyph_per_bits;
+    uint32_t glyph_length = loader->glyph_length;
 
-    int offset = gdsc->bitmap_index;
-    int next_offset = (offset < loader->loca_count - 1) ?
-                      loader->glyph_offset[offset + 1] : (uint32_t)glyph_length;
-    int nbits = header->advance_width_bits + 2 * header->xy_bits + 2 * header->wh_bits;
-    int bmp_size = next_offset - loader->glyph_offset[offset] - (nbits / 8);
+    uint32_t offset = gdsc->bitmap_index;
+    uint32_t next_offset = (offset < loader->loca_count - 1) ?
+                           loader->glyph_offset[offset + 1] : glyph_length;
+    int bmp_size = next_offset - loader->glyph_offset[offset] - (glyph_nbits / 8);
 
     return read_glyph_bitmap_data(loader->fp, loader->glyph_start + loader->glyph_offset[offset],
-                                  (uint8_t *)fdsc->glyph_bitmap, 0, nbits, bmp_size);
+                                  (uint8_t *)fdsc->glyph_bitmap, 0, glyph_nbits, bmp_size);
 }
 #endif
 
@@ -646,10 +642,7 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
     loader->glyph_length = glyph_length;
     loader->glyph_offset = glyph_offset;
     loader->get_glyph_bitmap_cb = load_glyph_bitmap;
-
-    loader->header = lv_mem_alloc(sizeof(font_header_bin_t));
-    LV_ASSERT_MALLOC(loader->header);
-    memcpy(loader->header, &font_header, sizeof(font_header_bin_t));
+    loader->glyph_per_bits = font_header.advance_width_bits + 2 * font_header.xy_bits + 2 * font_header.wh_bits;
 #else
     lv_mem_free(glyph_offset);
 #endif
