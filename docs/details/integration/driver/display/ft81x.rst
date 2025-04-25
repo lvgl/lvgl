@@ -2,9 +2,11 @@
 FT81x
 =====
 
-A minimal driver for EVE FT81x smart display controllers. Works for BT81x too (untested).
+A minimal framebuffer driver for EVE FT81x smart display controllers. Works for BT81x too.
 
 Single-buffered partial render mode supported for now. It may not support DSPI or QSPI currently.
+
+Tested at 32 MHz on ft812 and at 23 MHz on bt817.
 
 Usage
 *****
@@ -102,3 +104,11 @@ Usage
 
         /* ... */
     }
+
+
+Troubleshooting
+***************
+
+If the backlight does not come on (or is too bright or dim),
+try changing the value of ``PWM_DUTY_BACKLIGHT_ON``
+in ``lv_ft81x.c``, which can vary by board.

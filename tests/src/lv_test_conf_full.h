@@ -144,7 +144,6 @@
 #define LV_USE_ST7735       1
 #define LV_USE_ST7789       1
 #define LV_USE_ST7796       1
-
 #define LV_USE_FT81X        1
 
 #ifndef LV_USE_LIBINPUT

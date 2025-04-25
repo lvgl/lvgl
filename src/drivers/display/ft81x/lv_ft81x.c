@@ -16,6 +16,7 @@
 #include "../../../stdlib/lv_sprintf.h"
 #include "../../../stdlib/lv_string.h"
 #include "../../../misc/lv_types.h"
+#include "../../../misc/lv_utils.h"
 
 /*********************
  *      DEFINES
@@ -23,6 +24,11 @@
 
 /* Increase as functionality is added if needed. */
 #define LV_FT81X_CMD_BUF_SIZE 63
+
+/* The PWM value that corresponds to the backlight being "on".
+   0x80 was found to work on at least two boards but should
+   be changed as needed. */
+#define PWM_DUTY_BACKLIGHT_ON 0x80
 
 /**********************
  *      TYPEDEFS
@@ -60,9 +66,6 @@ static void lv_ft81x_cmd_list_send(lv_display_t * disp, lv_ft81x_cmd_list_t * cm
 static void lv_ft81x_encode_read_address(void * dst_4_bytes, uint32_t address);
 static void lv_ft81x_encode_write_address(void * dst_3_bytes, uint32_t address);
 
-static inline uint32_t swap_bytes_32(uint32_t x);
-static inline uint16_t swap_bytes_16(uint16_t x);
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -74,11 +77,11 @@ static inline uint16_t swap_bytes_16(uint16_t x);
 #if LV_BIG_ENDIAN_SYSTEM
     #define BE_TO_OR_FROM_NATIVE_32(x) ((uint32_t)(x))
     #define BE_TO_OR_FROM_NATIVE_16(x) ((uint16_t)(x))
-    #define LE_TO_OR_FROM_NATIVE_32(x) swap_bytes_32(x)
-    #define LE_TO_OR_FROM_NATIVE_16(x) swap_bytes_16(x)
+    #define LE_TO_OR_FROM_NATIVE_32(x) lv_swap_bytes_32(x)
+    #define LE_TO_OR_FROM_NATIVE_16(x) lv_swap_bytes_16(x)
 #else
-    #define BE_TO_OR_FROM_NATIVE_32(x) swap_bytes_32(x)
-    #define BE_TO_OR_FROM_NATIVE_16(x) swap_bytes_16(x)
+    #define BE_TO_OR_FROM_NATIVE_32(x) lv_swap_bytes_32(x)
+    #define BE_TO_OR_FROM_NATIVE_16(x) lv_swap_bytes_16(x)
     #define LE_TO_OR_FROM_NATIVE_32(x) ((uint32_t)(x))
     #define LE_TO_OR_FROM_NATIVE_16(x) ((uint16_t)(x))
 #endif
@@ -90,6 +93,8 @@ static inline uint16_t swap_bytes_16(uint16_t x);
 lv_display_t * lv_ft81x_create(const lv_ft81x_parameters_t * params, void * partial_buf, uint32_t buf_size,
                                lv_ft81x_spi_cb_t spi_cb, void * user_data)
 {
+    LV_ASSERT_NULL(spi_cb);
+
     lv_display_t * disp = lv_display_create(params->hor_res, params->ver_res);
 
     lv_ft81x_driver_data_t * drv = lv_malloc_zeroed(sizeof(lv_ft81x_driver_data_t));
@@ -128,6 +133,7 @@ static lv_result_t initialize(lv_display_t * disp, const lv_ft81x_parameters_t *
     if(params->is_bt81x) lv_ft81x_cmd(disp, EVE_CLKSEL, 0x46);
     lv_ft81x_cmd(disp, EVE_ACTIVE, 0);
 
+    /* at least 40 ms is needed for EVE to become ready. */
     lv_delay_ms(40);
 
     uint32_t start_millis = lv_tick_get();
@@ -150,7 +156,7 @@ static lv_result_t initialize(lv_display_t * disp, const lv_ft81x_parameters_t *
 
     if(params->is_bt81x) lv_ft81x_write_32(disp, REG_FREQUENCY, 72000000);
 
-    lv_ft81x_write_8(disp, REG_PWM_DUTY, 0x80);
+    lv_ft81x_write_8(disp, REG_PWM_DUTY, PWM_DUTY_BACKLIGHT_ON);
 
     lv_ft81x_write_16(disp, REG_HSIZE,   params->hor_res);   /* active display width */
     lv_ft81x_write_16(disp, REG_HCYCLE,  params->hcycle);  /* total number of clocks per line, incl front/back porch */
@@ -228,6 +234,11 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 {
     lv_ft81x_driver_data_t * drv = lv_display_get_driver_data(disp);
 
+    if(drv->spi_cb == NULL) {
+        LV_LOG_ERROR("The SPI callback is NULL.");
+        return;
+    }
+
     int32_t hor_res = lv_display_get_horizontal_resolution(disp);
     uint32_t disp_row_bytes = hor_res * 2;
 
@@ -298,19 +309,6 @@ static uint16_t lv_ft81x_read_16(lv_display_t * disp, uint32_t address)
     val = LE_TO_OR_FROM_NATIVE_16(val);
     return val;
 }
-
-/*  static uint32_t lv_ft81x_read_32(lv_display_t * disp, uint32_t address)
-    {
-        lv_ft81x_driver_data_t * drv = lv_display_get_driver_data(disp);
-        lv_ft81x_encode_read_address(&address, address);
-        uint32_t val;
-        drv->spi_cb(disp, LV_FT81X_SPI_OPERATION_CS_ASSERT, NULL, 0);
-        drv->spi_cb(disp, LV_FT81X_SPI_OPERATION_SEND, &address, sizeof(address));
-        drv->spi_cb(disp, LV_FT81X_SPI_OPERATION_RECEIVE, &val, sizeof(val));
-        drv->spi_cb(disp, LV_FT81X_SPI_OPERATION_CS_DEASSERT, NULL, 0);
-        val = LE_TO_OR_FROM_NATIVE_32(val);
-        return val;
-    } */
 
 static void lv_ft81x_write_8(lv_display_t * disp, uint32_t address, uint8_t val)
 {
@@ -396,40 +394,6 @@ static void lv_ft81x_encode_write_address(void * dst_3_bytes, uint32_t address)
 {
     address = BE_TO_OR_FROM_NATIVE_32((address | 0x800000) << 8);
     lv_memcpy(dst_3_bytes, &address, 3);
-}
-
-static inline uint32_t swap_bytes_32(uint32_t x)
-{
-    union {
-        uint32_t u32;
-        uint8_t u8[4];
-    } y;
-    union {
-        uint32_t u32;
-        uint8_t u8[4];
-    } x2;
-    x2.u32 = x;
-    y.u8[0] = x2.u8[3];
-    y.u8[1] = x2.u8[2];
-    y.u8[2] = x2.u8[1];
-    y.u8[3] = x2.u8[0];
-    return y.u32;
-}
-
-static inline uint16_t swap_bytes_16(uint16_t x)
-{
-    union {
-        uint16_t u16;
-        uint8_t u8[2];
-    } y;
-    union {
-        uint16_t u16;
-        uint8_t u8[2];
-    } x2;
-    x2.u16 = x;
-    y.u8[0] = x2.u8[1];
-    y.u8[1] = x2.u8[0];
-    return y.u16;
 }
 
 #endif /*LV_USE_FT81X*/
