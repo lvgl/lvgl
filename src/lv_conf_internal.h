@@ -3900,6 +3900,13 @@
         #define LV_USE_ILI9341       0
     #endif
 #endif
+#ifndef LV_USE_FT81X
+    #ifdef CONFIG_LV_USE_FT81X
+        #define LV_USE_FT81X CONFIG_LV_USE_FT81X
+    #else
+        #define LV_USE_FT81X         0
+    #endif
+#endif
 
 #ifndef LV_USE_GENERIC_MIPI
     #ifdef CONFIG_LV_USE_GENERIC_MIPI
@@ -3934,14 +3941,6 @@
         #else
             #define LV_ST_LTDC_USE_DMA2D_FLUSH 0
         #endif
-    #endif
-#endif
-
-#ifndef LV_USE_FT81X
-    #ifdef CONFIG_LV_USE_FT81X
-        #define LV_USE_FT81X CONFIG_LV_USE_FT81X
-    #else
-        #define LV_USE_FT81X      0
     #endif
 #endif
 
