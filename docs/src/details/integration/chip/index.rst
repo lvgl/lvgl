@@ -9,5 +9,5 @@ Chip vendors
     arm
     espressif
     nxp
-    renesas
+    renesas/index
     stm32
