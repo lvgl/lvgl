@@ -458,7 +458,7 @@ static void draw_indic(lv_event_t * e)
         }
     }
 
-    
+
     if(reversed && !hor)
         bar->indic_area.y2 -= 2;
     /*Do not draw a zero length indicator but at least call the draw task event*/
