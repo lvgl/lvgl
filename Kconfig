@@ -207,6 +207,13 @@ menu "LVGL configuration"
 			help
 				If FreeType or ThorVG is enabled, it is recommended to set it to 32KB or more.
 
+		config LV_DRAW_THREAD_PRIO
+			int "Thread priority for the drawing thread"
+			default 2
+			depends on LV_USE_OS > 0
+			help
+				Configure the thread priority for the drawing thread. This allows customization for systems with limited priority levels.
+
 		config LV_USE_DRAW_SW
 			bool "Enable software rendering"
 			default y
@@ -2020,7 +2027,7 @@ menu "LVGL configuration"
 
 		config LV_USE_WINDOWS
 			bool "Use LVGL Windows backend"
-			depends on LV_OS_WINDOWS
+			depends onLV_OS_WINDOWS
 			default n
 
 		config LV_USE_UEFI
