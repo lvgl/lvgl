@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         })
         /* JSON file was fetched successfully.... */
         .then(json => {
-            if (!typeof json === "array") {
+            if (json.constructor !== Array) {
                 /* Data structure not recognized. */
             } else {
                 /* console.log('JSON is an array.'); */
@@ -133,13 +133,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
                     console.log('JSON has no banners -- nothing to do.');
                 } else {
                     /* Note:  `div.page` is unique to Furo theme. */
-                    const page = document.querySelector('div.page');
-                    const pgParent = page.parentElement;
 
                     /* Create and insert banner container. */
                     const newDiv = document.createElement('div');
                     newDiv.classList.add(bannerContainerClass);
-                    pgParent.insertBefore(newDiv, page);
+                    let bannerCount = 0;
 
                     /* Create a <p> or an <a> element for each banner.
                      * First, sort them in priority order with "highest-priority" being
@@ -156,6 +154,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                         let banner = json[i];
 
                         if (banner.hasOwnProperty('label')) {
+                            bannerCount++;
                             let priorityClass = '';
                             let newElement = null;
 
@@ -179,20 +178,26 @@ document.addEventListener('DOMContentLoaded', (event) => {
                         }
                     }
 
-                    /* Finally, we need to tell the page element that its `min-hight`
-                     * is 100% minus the hight of all the banners, including the one
-                     * supplied by `conf.py` in `conf.html_theme_options.announcement`
-                     * if one is present === var(--header-height).
-                     *
-                     * This extends short pages by just enough to place [PREV] and [NEXT]
-                     * buttoms and footer at bottom of page without scrolling.
-                     *
-                     * Note:  this overrides the `min-height` property set for this
-                     * element in `furo.css`, which is:  calc(100% - var(--header-height)).
-                     * It additionally subtracts height of banner list.
-                     * */
-                    let height = newDiv.offsetHeight;
-                    page.style['min-height'] = `calc(100% - var(--header-height) - ${height}px)`;
+                    if (bannerCount > 0) {
+                        const page = document.querySelector('div.page');
+                        const pgParent = page.parentElement;
+                        pgParent.insertBefore(newDiv, page);
+
+                        /* Finally, we need to tell the page element that its `min-hight`
+                         * is 100% minus the hight of all the banners, including the one
+                         * supplied by `conf.py` in `conf.html_theme_options.announcement`
+                         * if one is present === var(--header-height).
+                         *
+                         * This extends short pages by just enough to place [PREV] and [NEXT]
+                         * buttoms and footer at bottom of page without scrolling.
+                         *
+                         * Note:  this overrides the `min-height` property set for this
+                         * element in `furo.css`, which is:  calc(100% - var(--header-height)).
+                         * It additionally subtracts height of banner list.
+                         * */
+                        let height = newDiv.offsetHeight;
+                        page.style['min-height'] = `calc(100% - var(--header-height) - ${height}px)`;
+                    }
                 }
             }
         }) .catch(error => {
