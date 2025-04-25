@@ -18,7 +18,7 @@ extern "C" {
 #if LV_USE_LIST
 
 #if LV_USE_FLEX == 0
-#error "LV_LIST requires LV_USE_FLEX to be enabled"
+#error "lv_list: lv_flex is required. Enable it in lv_conf.h (LV_USE_FLEX 1)"
 #endif
 
 /*********************
