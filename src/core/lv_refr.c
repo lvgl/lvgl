@@ -1141,7 +1141,7 @@ static void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 
     /*If `opa_layered != LV_OPA_COVER` draw the widget on a new layer and blend that layer with the given opacity.*/
     const lv_opa_t opa_layered = lv_obj_get_style_opa_layered(obj, LV_PART_MAIN);
-    if(opa_layered < LV_OPA_MIN) return;
+    if(opa_layered <= LV_OPA_MIN) return;
 
     const lv_opa_t layer_opa_ori = layer->opa;
     const lv_color32_t layer_recolor = layer->recolor;
