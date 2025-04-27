@@ -220,11 +220,11 @@ menu "LVGL configuration"
 				2: LV_THREAD_PRIO_MID (default)
 				3: LV_THREAD_PRIO_HIGH
 				4: LV_THREAD_PRIO_HIGHEST
-				
+
 				Make sure to align these values with your OS-specific priority levels:
 				- For FreeRTOS: typically 0 to (configMAX_PRIORITIES-1)
 				- For POSIX threads (pthreads): typically 0-99
-				
+
 				Higher priority can improve rendering performance but might cause
 				starvation of lower priority tasks.
 
@@ -1691,7 +1691,14 @@ menu "LVGL configuration"
 				This can save some memory, but not much. After the quick access bar is created, it can be hidden by clicking the button at the top left corner of the browsing area, which is very useful for small screen devices.
 
 		config LV_USE_FONT_MANAGER
-		
+			bool "Enable Font manager"
+			default n
+		config LV_FONT_MANAGER_NAME_MAX_LEN
+			int "Font manager name max length"
+			depends on LV_USE_FONT_MANAGER
+			default 32
+		config LV_USE_TEST
+			bool "Enable emulated input devices, time emulation, and screenshot compares."
 		config LV_USE_TEST_SCREENSHOT_COMPARE
 			bool "Enable `lv_test_screenshot_compare`. Requires libpng and a few MB of extra RAM."
 			depends on LV_USE_TEST
@@ -1842,6 +1849,140 @@ menu "LVGL configuration"
 		config LV_USE_LINUX_FBDEV
 			bool "Use Linux framebuffer device"
 			default n
+		config LV_LINUX_FBDEV_BSD
+			bool "Use BSD flavored framebuffer device"
+			depends on LV_USE_LINUX_FBDEV
+			default n
+
+		choice
+			prompt "Framebuffer device render mode"
+			depends on LV_USE_LINUX_FBDEV
+			default LV_LINUX_FBDEV_RENDER_MODE_PARTIAL
+
+			config LV_LINUX_FBDEV_RENDER_MODE_PARTIAL
+				bool "Partial mode"
+				help
+					Use the buffer(s) to render the screen is smaller parts. This way the buffers can be smaller then the display to save RAM. At least 1/10 screen size buffer(s) are recommended.
+
+			config LV_LINUX_FBDEV_RENDER_MODE_DIRECT
+				bool "Direct mode"
+				help
+					The buffer(s) has to be screen sized and LVGL will render into the correct location of the buffer. This way the buffer always contain the whole image. Only the changed ares will be updated. With 2 buffers the buffers' content are kept in sync automatically and in flush_cb only address change is required.
+
+			config LV_LINUX_FBDEV_RENDER_MODE_FULL
+				bool "Full mode"
+				help
+					Always redraw the whole screen even if only one pixel has been changed. With 2 buffers in flush_cb only and address change is required.
+
+		endchoice
+
+		choice
+			prompt "Framebuffer size"
+			depends on LV_USE_LINUX_FBDEV
+			default LV_LINUX_FBDEV_SINGLE_BUFFER
+
+			config LV_LINUX_FBDEV_SINGLE_BUFFER
+				bool "One screen-sized buffer"
+
+			config LV_LINUX_FBDEV_DOUBLE_BUFFER
+				bool "Two screen-sized buffer"
+				depends on !LV_LINUX_FBDEV_RENDER_MODE_PARTIAL
+
+			config LV_LINUX_FBDEV_CUSTOM_BUFFER
+				bool "Custom-sized buffer"
+				depends on LV_LINUX_FBDEV_RENDER_MODE_PARTIAL
+
+		endchoice
+
+		config LV_LINUX_FBDEV_BUFFER_COUNT
+			int
+			depends on LV_USE_LINUX_FBDEV
+			default 0 if LV_LINUX_FBDEV_CUSTOM_BUFFER
+			default 1 if LV_LINUX_FBDEV_SINGLE_BUFFER
+			default 2 if LV_LINUX_FBDEV_DOUBLE_BUFFER
+
+		config LV_LINUX_FBDEV_BUFFER_SIZE
+			int "Custom partial buffer size (in number of rows)"
+			depends on LV_USE_LINUX_FBDEV && LV_LINUX_FBDEV_CUSTOM_BUFFER
+			default 60
+
+		config LV_LINUX_FBDEV_MMAP
+			bool "Framebuffer device supports mmap"
+			depends on LV_USE_LINUX_FBDEV
+			default y
+
+		config LV_USE_NUTTX
+			bool "Use Nuttx to open window and handle touchscreen"
+			default n
+
+		config LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
+			bool "Use independent image heap"
+			depends on LV_USE_NUTTX
+			default n
+
+		config LV_NUTTX_DEFAULT_DRAW_BUF_USE_INDEPENDENT_IMAGE_HEAP
+			bool "Use independent image heap for default draw buffer"
+			depends on LV_USE_NUTTX_INDEPENDENT_IMAGE_HEAP
+			default n
+
+		config LV_USE_NUTTX_LIBUV
+			bool "Use uv loop to replace default timer loop and other fb/indev timers"
+			depends on LV_USE_NUTTX && LIBUV
+			default n
+
+		config LV_USE_NUTTX_CUSTOM_INIT
+			bool "Use Custom Nuttx init API to open window and handle touchscreen"
+			depends on LV_USE_NUTTX
+			default n
+
+		config LV_USE_NUTTX_LCD
+			bool "Use NuttX LCD device"
+			depends on LV_USE_NUTTX
+			default n
+
+		choice
+			prompt "NuttX LCD buffer size"
+			depends on LV_USE_NUTTX_LCD
+			default LV_NUTTX_LCD_SINGLE_BUFFER
+
+			config LV_NUTTX_LCD_SINGLE_BUFFER
+				bool "One screen-sized buffer"
+
+			config LV_NUTTX_LCD_DOUBLE_BUFFER
+				bool "Two screen-sized buffer"
+
+			config LV_NUTTX_LCD_CUSTOM_BUFFER
+				bool "Custom-sized buffer"
+
+		endchoice
+
+		config LV_NUTTX_LCD_BUFFER_COUNT
+			int
+			depends on LV_USE_NUTTX_LCD
+			default 0 if LV_NUTTX_LCD_CUSTOM_BUFFER
+			default 1 if LV_NUTTX_LCD_SINGLE_BUFFER
+			default 2 if LV_NUTTX_LCD_DOUBLE_BUFFER
+
+		config LV_NUTTX_LCD_BUFFER_SIZE
+			int "Custom partial buffer size (in number of rows)"
+			depends on LV_USE_NUTTX_LCD && LV_NUTTX_LCD_CUSTOM_BUFFER
+			default 60
+
+		config LV_USE_NUTTX_TOUCHSCREEN
+			bool "Use NuttX touchscreen driver"
+			depends on LV_USE_NUTTX
+			default n
+
+		config LV_NUTTX_TOUCHSCREEN_CURSOR_SIZE
+			int "Touchscreen cursor size in pixels"
+			depends on LV_USE_NUTTX_TOUCHSCREEN
+			default 0
+			help
+				Set to 0 to disable cursor, or set to a value greater than 0 to set the cursor size in pixels.
+
+		config LV_USE_LINUX_DRM
+			bool "Use Linux DRM device"
+			default n
 
 		config LV_USE_TFT_ESPI
 			bool "Use TFT_eSPI driver"
@@ -1890,7 +2031,7 @@ menu "LVGL configuration"
 			default n
 
 		config LV_USE_ST_LTDC
-			bool "Driver forST LTDC"
+			bool "Driver for ST LTDC"
 			default n
 
 		config LV_ST_LTDC_USE_DMA2D_FLUSH
