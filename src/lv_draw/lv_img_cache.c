@@ -190,7 +190,15 @@ void lv_img_cache_invalidate_src(const void * src)
 
     uint16_t i;
     for(i = 0; i < entry_cnt; i++) {
-        if(cache[i].dec_dsc.src == src || src == NULL) {
+        bool match = false;
+        lv_img_src_t src_type = lv_img_src_get_type(cache[i].dec_dsc.src);
+        if(src_type == LV_IMG_SRC_VARIABLE) {
+            if(cache[i].dec_dsc.src == src) match = true;
+        } else if(src_type == LV_IMG_SRC_FILE) {
+            if(strcmp(cache[i].dec_dsc.src, src) == 0) match = true;
+        }
+
+        if(match || src == NULL) {
             if(cache[i].dec_dsc.src != NULL) {
                 lv_img_decoder_close(&cache[i].dec_dsc);
             }
