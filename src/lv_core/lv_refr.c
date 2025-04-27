@@ -510,7 +510,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
     obj_area.y2 += ext_size;
     union_ok = lv_area_intersect(&obj_ext_mask, mask_ori_p, &obj_area);
 
-    /*Draw the parent and its children only if they ore on 'mask_parent'*/
+    /*Draw the parent and its children only if they are on 'mask_parent'*/
     if(union_ok != false) {
 
         /* Redraw the object */
