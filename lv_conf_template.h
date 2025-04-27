@@ -156,10 +156,13 @@
  */
 #define LV_DRAW_THREAD_STACK_SIZE    (8 * 1024)         /**< [bytes]*/
 
-/**
- * Thread priority for the drawing thread.
- * This allows customization of the thread priority for systems with limited priority levels.
- */
+/** Thread priority of the drawing task.
+ *  Higher values mean higher priority.
+ *  Can use values from lv_thread_prio_t enum in lv_os.h: LV_THREAD_PRIO_LOWEST,
+ *  LV_THREAD_PRIO_LOW, LV_THREAD_PRIO_MID, LV_THREAD_PRIO_HIGH, LV_THREAD_PRIO_HIGHEST
+ *  Make sure the priority value aligns with the OS-specific priority levels.
+ *  On systems with limited priority levels (e.g., FreeRTOS), a higher value can improve
+ *  rendering performance but might cause other tasks to starve. */
 #define LV_DRAW_THREAD_PRIO LV_THREAD_PRIO_HIGH
 
 #define LV_USE_DRAW_SW 1
