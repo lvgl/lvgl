@@ -53,8 +53,8 @@ enum {
     LV_OPA_COVER  = 255,
 };
 
-#define LV_OPA_MIN 2    /**< Opacities below this will be transparent */
-#define LV_OPA_MAX 253  /**< Opacities above this will fully cover */
+#define LV_OPA_MIN 2    /**< Fully transparent if opa <= LV_OPA_MIN */
+#define LV_OPA_MAX 253  /**< Fully cover if opa >= LV_OPA_MAX */
 
 /**
  * Get the pixel size of a color format in bits, bpp
