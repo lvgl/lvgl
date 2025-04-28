@@ -58,6 +58,7 @@ void lv_draw_vg_lite_layer(lv_draw_task_t * t, const lv_draw_image_dsc_t * draw_
 
     lv_draw_image_dsc_t new_draw_dsc = *draw_dsc;
     new_draw_dsc.src = layer->draw_buf;
+    new_draw_dsc.header = layer->draw_buf->header;
     lv_draw_vg_lite_img(t, &new_draw_dsc, coords, true);
 
     /* Wait for the GPU drawing to complete here,
