@@ -77,6 +77,7 @@ struct _lv_scale_t {
     int32_t custom_label_cnt;          /**< Number of custom labels provided in `txt_src` */
     int32_t last_tick_width;           /**< Width of last tick in pixels */
     int32_t first_tick_width;          /**< Width of first tick in pixels */
+    lv_point_t bounds;                 /**< Used for LV_EVENT_GET_SELF_SIZE */
 };
 
 

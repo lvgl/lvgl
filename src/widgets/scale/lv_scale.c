@@ -505,6 +505,8 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     scale->draw_ticks_on_top = false;
     scale->custom_label_cnt = 0;
     scale->txt_src = NULL;
+    scale->bounds.x = 0;
+    scale->bounds.y = 0;
 
     lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
 
@@ -574,6 +576,11 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
     else if(event_code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         /* NOTE: Extend scale draw size so the first tick label can be shown */
         lv_event_set_ext_draw_size(event, 100);
+    }
+    else if(event_code == LV_EVENT_GET_SELF_SIZE) {
+        lv_point_t * p = lv_event_get_param(event);
+        p->x = scale->bounds.x;
+        p->y = scale->bounds.y;
     }
     else {
         /* Nothing to do. Invalid event */
