@@ -221,7 +221,7 @@ html_context = {
     'github_user': 'lvgl',
     'github_repo': 'lvgl',
     'display_github': True,
-    'conf_py_path': '/docs/'
+    'conf_py_path': '/docs/src/'
 }
 
 html_logo = '_static/images/logo_lvgl.png'
