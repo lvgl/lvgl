@@ -1254,6 +1254,7 @@
 #define LV_USE_ST7789        0
 #define LV_USE_ST7796        0
 #define LV_USE_ILI9341       0
+#define LV_USE_FT81X         0
 
 #if (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
     #define LV_USE_GENERIC_MIPI 1

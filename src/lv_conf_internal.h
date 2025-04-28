@@ -4049,6 +4049,13 @@
         #define LV_USE_ILI9341       0
     #endif
 #endif
+#ifndef LV_USE_FT81X
+    #ifdef CONFIG_LV_USE_FT81X
+        #define LV_USE_FT81X CONFIG_LV_USE_FT81X
+    #else
+        #define LV_USE_FT81X         0
+    #endif
+#endif
 
 #if (LV_USE_ST7735 | LV_USE_ST7789 | LV_USE_ST7796 | LV_USE_ILI9341)
     #ifndef LV_USE_GENERIC_MIPI
