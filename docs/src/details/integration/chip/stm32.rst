@@ -158,8 +158,8 @@ A minimal example using STM32CubeIDE, HAL, and CMSISv1 (FreeRTOS).
     #define BYTES_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /* will be 2 for RGB565 */
     /* TODO: Declare your own BUFF_SIZE appropriate to your system. */
     #define BUFF_SIZE (DISPLAY_WIDTH * 10 * BYTES_PER_PIXEL)
-    static lv_color_t buf_1[BUFF_SIZE];
-    static lv_color_t buf_2[BUFF_SIZE];
+    static uint8_t buf_1[BUFF_SIZE];
+    static uint8_t buf_2[BUFF_SIZE];
 
 - In your ``main`` function, after your peripherals (SPI, GPIOs, LCD
   etc) have been initialised, initialise LVGL using :cpp:func:`lv_init`,
