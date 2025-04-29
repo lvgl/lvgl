@@ -4,34 +4,48 @@ on:
   push:
   pull_request:
 
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+# Ensure that only one commit will be running tests at a time on each PR
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }} 
+  cancel-in-progress: true
+
 jobs:
   build:
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
     name: Build ${{ matrix.port }} port
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     continue-on-error: true
     strategy:
       matrix:
-        port: ['unix', 'esp32', 'stm32', 'rp2']
+        port: ['unix', 'stm32', 'rp2', 'esp32']
     steps:
     - uses: ammaraskar/gcc-problem-matcher@master
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
     - name: Install Dependencies
       run: |
         sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu `lsb_release -sc` main universe restricted multiverse"
         sudo apt-get update -y -qq
         sudo apt-get install libsdl2-dev parallel libfreetype-dev librlottie-dev libavformat-dev libavcodec-dev libswscale-dev libavutil-dev doxygen
         python3 -m pip install pycparser
+
     - name: Clone lv_micropython
       run: |
         git clone https://github.com/lvgl/lv_micropython.git .
         git checkout master
-    - name: Initialize lv_bindings submodule
-      run: git submodule update --init --recursive lib/lv_bindings
+
+    - name: Initialize LVGL bindings submodule
+      run: git submodule update --init --recursive user_modules/lv_binding_micropython
+
     - name: Update ${{ matrix.port }} port submodules
-      if: matrix.port != 'esp32' && matrix.port != 'rp2'
-      run: make -C ports/${{ matrix.port }} DEBUG=1 USER_C_MODULES=../../lib/lv_bindings/bindings.cmake submodules
+      if:  matrix.port != 'rp2'
+      run: make -C ports/${{ matrix.port }} DEBUG=1 USER_C_MODULES=../../user_modules/lv_binding_micropython/micropython.cmake submodules
+
     - name: Checkout LVGL submodule
-      working-directory: ./lib/lv_bindings/lvgl
+      working-directory: ./user_modules/lv_binding_micropython/lvgl
       run: |
         git fetch --force ${{ github.event.repository.html_url }} "+refs/heads/*:refs/remotes/origin/*"
         git fetch --force ${{ github.event.repository.html_url }} "+refs/pull/*:refs/remotes/origin/pr/*"
@@ -40,46 +54,49 @@ jobs:
     - name: Build mpy-cross
       run: make -j $(nproc) -C mpy-cross
 
-    # ESP32 port
-    - name: Setup ESP-IDF
-      if: matrix.port == 'esp32'
-      run: |
-        source tools/ci.sh && ci_esp32_idf44_setup
-    - name: Build ESP32 port
-      if: matrix.port == 'esp32'
-      run: |
-        source tools/ci.sh && ci_esp32_build
-
-    # STM32 & RPi Pico port
-    - name: arm-none-eabi-gcc
-      if: matrix.port == 'stm32' || matrix.port == 'rp2'
-      uses: carlosperate/arm-none-eabi-gcc-action@v1.9.0
-      with:
-        release: '9-2019-q4' # The arm-none-eabi-gcc release to use.
+    # STM32 port
     - name: Build STM32 port
       if: matrix.port == 'stm32'
-      run: make -j $(nproc) -C ports/stm32 BOARD=STM32F7DISC
+      run: |
+        source tools/ci.sh && ci_stm32_setup
+        make -C ports/stm32 BOARD=STM32F7DISC USER_C_MODULES=../../user_modules/lv_binding_micropython/micropython.cmake submodules
+        make -j $(nproc) -C ports/stm32 BOARD=STM32F7DISC USER_C_MODULES=../../user_modules/lv_binding_micropython/micropython.cmake
+
+    # Raspberry Pi Pico port
     - name: Build Raspberry Pi PICO port
       if: matrix.port == 'rp2'
       run: |
-        make -C ports/rp2 BOARD=PICO submodules
-        make -j $(nproc) -C ports/rp2 BOARD=PICO USER_C_MODULES=../../lib/lv_bindings/bindings.cmake
+        source tools/ci.sh && ci_rp2_setup
+        make -C ports/rp2 BOARD=RPI_PICO submodules
+        make -j $(nproc) -C ports/rp2 BOARD=RPI_PICO USER_C_MODULES=../../user_modules/lv_binding_micropython/micropython.cmake
+
+    # ESP32 port
+    - name: Build ESP32 port
+      if: matrix.port == 'esp32'
+      run: |
+        source tools/ci.sh && ci_esp32_idf_setup
+        source tools/ci.sh && ci_esp32_build_cmod_spiram_s2
+        source tools/ci.sh && ci_esp32_build_s3_c3
+
     # Unix port
     - name: Build Unix port
       if: matrix.port == 'unix'
-      run: make -j $(nproc) -C ports/unix DEBUG=1 LV_CFLAGS="-DMICROPY_LV_USE_LOG=0"
+      run: make -j $(nproc) -C ports/unix DEBUG=1 VARIANT=lvgl LV_CFLAGS="-DMICROPY_LV_USE_LOG=0"
+
     - name: Install requirements for the test
       run: |
         python3 -m pip install pillow
-        mkdir lib/lv_bindings/lvgl/tests/micropy_test/artifacts
+        mkdir user_modules/lv_binding_micropython/lvgl/tests/micropy_test/artifacts
+
+    # Tests
     - name: Run tests
       if: success() && matrix.port == 'unix'
       run: |
         export XDG_RUNTIME_DIR=/tmp
-        python3 lib/lv_bindings/lvgl/tests/micropy_test/__init__.py --artifact-path=lib/lv_bindings/lvgl/tests/micropy_test/artifacts --mpy-path=ports/unix/build-standard/micropython
+        python3 user_modules/lv_binding_micropython/lvgl/tests/micropy_test/__init__.py --artifact-path=user_modules/lv_binding_micropython/lvgl/tests/micropy_test/artifacts --mpy-path=ports/unix/build-lvgl/micropython
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: test-artifacts
-        path: lib/lv_bindings/lvgl/tests/micropy_test/artifacts
+        path: user_modules/lv_binding_micropython/lvgl/tests/micropy_test/artifacts
