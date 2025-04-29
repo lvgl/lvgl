@@ -61,6 +61,7 @@ Example
 	    <prop name="style_border_color" type="color"/>
 	    <prop name="style_border_width" type="int"/>
 	    <prop name="style_border_opa" type="int"/>
+	    <prop name="style_border_side" type="enum:lv_border_side"/>
 	    <prop name="style_outline_color" type="color"/>
 	    <prop name="style_outline_width" type="int"/>
 	    <prop name="style_outline_opa" type="int"/>
