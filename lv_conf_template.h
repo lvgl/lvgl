@@ -597,8 +597,8 @@
 #define LV_FONT_DEJAVU_16_PERSIAN_HEBREW    0  /**< Hebrew, Arabic, Persian letters and all their forms */
 #define LV_FONT_SIMSUN_14_CJK               0  /**< 1000 most common CJK radicals */
 #define LV_FONT_SIMSUN_16_CJK               0  /**< 1000 most common CJK radicals */
-#define LV_FONT_SOURCE_HAN_SANS_SC_14_CJK   0  /**< 1000 most common CJK radicals */
-#define LV_FONT_SOURCE_HAN_SANS_SC_16_CJK   0  /**< 1000 most common CJK radicals */
+#define LV_FONT_SOURCE_HAN_SANS_SC_14_CJK   0  /**< 1338 most common CJK radicals */
+#define LV_FONT_SOURCE_HAN_SANS_SC_16_CJK   0  /**< 1338 most common CJK radicals */
 
 /** Pixel perfect monospaced fonts */
 #define LV_FONT_UNSCII_8  0
