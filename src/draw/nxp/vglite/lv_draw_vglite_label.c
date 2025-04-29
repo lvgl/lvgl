@@ -127,12 +127,23 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
                         return;
                     lv_area_move(&blend_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
-                    const lv_draw_buf_t * draw_buf = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
-                    const void * mask_buf = draw_buf->data;
+                    const bool static_bitmap = lv_font_has_static_bitmap(glyph_draw_dsc->g->resolved_font);
+                    const void * mask_buf;
+                    const lv_draw_buf_t * draw_buf;
+                    uint32_t mask_stride;
+                    if(!static_bitmap) {
+                        draw_buf = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                        mask_buf = draw_buf->data;
+                        mask_stride = draw_buf->header.stride;
+                    }
+                    else {
+                        glyph_draw_dsc->g->req_raw_bitmap = 1;
+                        mask_buf = lv_font_get_glyph_bitmap(glyph_draw_dsc->g, glyph_draw_dsc->_draw_buf);
+                        mask_stride = lv_draw_buf_width_to_stride(glyph_draw_dsc->g->box_w, LV_COLOR_FORMAT_A8);
+                    }
 
                     uint32_t mask_width = lv_area_get_width(glyph_draw_dsc->letter_coords);
                     uint32_t mask_height = lv_area_get_height(glyph_draw_dsc->letter_coords);
-                    uint32_t mask_stride = draw_buf->header.stride;
 
                     lv_area_t mask_area;
                     mask_area.x1 = blend_area.x1 - (glyph_draw_dsc->letter_coords->x1 - layer->buf_area.x1);
@@ -146,7 +157,8 @@ static void _draw_vglite_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * glyph_
                     /* Set matrix. */
                     vglite_set_translation_matrix(&blend_area);
 
-                    lv_draw_buf_invalidate_cache(draw_buf, &mask_area);
+                    if(!static_bitmap)
+                        lv_draw_buf_invalidate_cache(draw_buf, &mask_area);
 
                     _vglite_draw_letter(&mask_area, glyph_draw_dsc->color, glyph_draw_dsc->opa);
                 }

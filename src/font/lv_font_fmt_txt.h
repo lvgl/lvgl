@@ -184,6 +184,8 @@ typedef struct {
      * from `lv_font_fmt_txt_bitmap_format_t`
      */
     uint16_t bitmap_format  : 2;
+
+    uint8_t stride;
 } lv_font_fmt_txt_dsc_t;
 
 typedef struct {
