@@ -66,6 +66,7 @@ typedef struct {
     uint16_t box_h; /**< Height of the glyph's bounding box*/
     int16_t ofs_x;  /**< x offset of the bounding box*/
     int16_t ofs_y;  /**< y offset of the bounding box*/
+    uint8_t stride;
     lv_font_glyph_format_t format;  /**< Font format of the glyph see lv_font_glyph_format_t */
     uint8_t is_placeholder: 1;      /**< Glyph is missing. But placeholder will still be displayed*/
     int32_t outline_stroke_width;   /**< used with freetype vector fonts - width of the letter outline */
@@ -111,6 +112,7 @@ struct _lv_font_t {
     int32_t base_line;           /**< Base line measured from the bottom of the line_height*/
     uint8_t subpx   : 2;            /**< An element of `lv_font_subpx_t`*/
     uint8_t kerning : 1;            /**< An element of `lv_font_kerning_t`*/
+    uint8_t static_bitmap : 1;      /**< The font will be used as static bitmap */
 
     int8_t underline_position;      /**< Distance between the top of the underline and base line (< 0 means below the base line)*/
     int8_t underline_thickness;     /**< Thickness of the underline*/
@@ -204,6 +206,13 @@ const lv_font_t * lv_font_get_default(void);
  * @return return true if the fonts are equal.
  */
 bool lv_font_info_is_equal(const lv_font_info_t * ft_info_1, const lv_font_info_t * ft_info_2);
+
+/**
+ * Checks if a font has a static rendering bitmap.
+ * @param font    pointer to a font
+ * @return return true if the font has a bitmap generated for static rendering.
+ */
+bool lv_font_has_static_bitmap(const lv_font_t * font);
 
 /**********************
  *      MACROS
