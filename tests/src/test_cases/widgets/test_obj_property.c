@@ -323,4 +323,16 @@ void test_label_properties(void)
 #endif
 }
 
+void test_obj_property_set_should_not_stomp_input_id(void)
+{
+#if LV_USE_OBJ_PROPERTY
+		lv_obj_t * test_obj = lv_obj_create(lv_screen_active());
+		lv_property_t orig_prop = { .id = LV_PROPERTY_OBJ_FLAG_HIDDEN, .enable = 1 };
+
+		lv_property_t test_property = orig_prop;
+		TEST_ASSERT_TRUE(lv_obj_set_property(test_obj, &test_property) == LV_RESULT_OK);
+		TEST_ASSERT_EQUAL_INT(orig_prop.id, test_property.id);
+#endif
+}
+
 #endif
