@@ -43,6 +43,9 @@
         <enum name="bottom" help="Some help"/>
         <enum name="left" help="Some help"/>
         <enum name="right" help="Some help"/>
+        <enum name="hor" help="Some help"/>
+        <enum name="ver" help="Some help"/>
+        <enum name="all" help="Some help"/>
     </enumdef>
     <enumdef name="lv_layout">
         <enum name="none" help="Some help"/>
