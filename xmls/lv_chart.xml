@@ -50,9 +50,8 @@
 	    <element name="cursor" type="lv_chart_cursor" access="add">
 	        <arg name="color" type="color" arg="true"/>
 	        <arg name="dir" type="enum:lv_dir" arg="true"/>
-	    	<prop name="pos" help="position of the cursor">
-	    		<param name="point" type="point" help="the point"/>
-	   		</prop>
+	    	<prop name="pos_x" type="int" help="x position of the cursor"/>
+            <prop name="pos_y" type="int" help="y position of the cursor"/>
 	    </element>
 
 	    <element name="axis" access="set">

@@ -91,6 +91,8 @@ lv_dir_t lv_xml_dir_to_enum(const char * txt)
     if(lv_streq("bottom", txt)) return LV_DIR_BOTTOM;
     if(lv_streq("left", txt)) return LV_DIR_LEFT;
     if(lv_streq("right", txt)) return LV_DIR_RIGHT;
+    if(lv_streq("hor", txt)) return LV_DIR_HOR;
+    if(lv_streq("ver", txt)) return LV_DIR_VER;
     if(lv_streq("all", txt)) return LV_DIR_ALL;
 
     LV_LOG_WARN("%s is an unknown value for dir", txt);
