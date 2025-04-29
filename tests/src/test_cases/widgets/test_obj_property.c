@@ -8,7 +8,7 @@ void test_obj_property_fail_on_invalid_id(void)
 {
 #if LV_USE_OBJ_PROPERTY
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
-    lv_property_t prop = { };
+    lv_property_t prop = { 0 };
 
     prop.id = LV_PROPERTY_ID_INVALID;
     TEST_ASSERT_EQUAL_INT(LV_RESULT_INVALID, lv_obj_set_property(obj, &prop));
@@ -33,7 +33,7 @@ void test_obj_property_set_get_should_match(void)
 #if LV_USE_OBJ_PROPERTY
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_t * root = lv_obj_create(lv_screen_active());
-    lv_property_t prop = { };
+    lv_property_t prop = { 0 };
     lv_color_t color = {.red = 0x11, .green = 0x22, .blue = 0x33};
 
     /* Style property should work */
@@ -99,7 +99,7 @@ void test_obj_property_style_selector(void)
 {
 #if LV_USE_OBJ_PROPERTY
     lv_obj_t * obj = lv_obj_create(lv_screen_active());
-    lv_property_t prop = { };
+    lv_property_t prop = { 0 };
 
     /* Style property with default selector(0) should work */
     prop.id = LV_PROPERTY_STYLE_X;
@@ -169,7 +169,7 @@ void test_obj_property_flag(void)
         lv_obj_remove_flag(obj, properties[i].flag);
         TEST_ASSERT_FALSE(lv_obj_get_property(obj, properties[i].id).num);
 
-        lv_property_t prop = { };
+        lv_property_t prop = { 0 };
         prop.id = properties[i].id;
         prop.num = 1;
         TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
@@ -217,7 +217,7 @@ void test_obj_property_state(void)
         lv_obj_remove_state(obj, states[i].state);
         TEST_ASSERT_FALSE(lv_obj_get_property(obj, states[i].id).num);
 
-        lv_property_t prop = { };
+        lv_property_t prop = { 0 };
         prop.id = states[i].id;
         prop.num = 1;
         TEST_ASSERT_TRUE(lv_obj_set_property(obj, &prop) == LV_RESULT_OK);
@@ -237,7 +237,7 @@ void test_obj_property_type_point(void)
 {
 #if LV_USE_OBJ_PROPERTY
     lv_obj_t * obj = lv_image_create(lv_screen_active());
-    lv_property_t prop = { };
+    lv_property_t prop = { 0 };
 
     prop.id = LV_PROPERTY_IMAGE_PIVOT;
     prop.point.x = 0x1234;
@@ -293,7 +293,7 @@ void test_label_properties(void)
 {
 #if LV_USE_OBJ_PROPERTY
     lv_obj_t * obj = lv_label_create(lv_screen_active());
-    lv_property_t prop = { };
+    lv_property_t prop = { 0 };
 
     prop.id = LV_PROPERTY_LABEL_TEXT;
     prop.ptr = "Hello world";
