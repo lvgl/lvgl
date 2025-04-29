@@ -61,7 +61,7 @@ void lv_xml_chart_apply(lv_xml_parser_state_t * state, const char ** attrs)
         if(lv_streq("point_count", name)) {
             int32_t cnt = lv_xml_atoi(value);
             if(cnt < 0) {
-                LV_LOG_WARN("chart's point count must can't be negative");
+                LV_LOG_WARN("chart's point count can't be negative");
                 cnt = 0;
             }
             lv_chart_set_point_count(item, cnt);
