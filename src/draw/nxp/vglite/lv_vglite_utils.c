@@ -186,6 +186,9 @@ vg_lite_buffer_format_t vglite_get_buf_format(lv_color_format_t cf)
         case LV_COLOR_FORMAT_L8:
             vg_buffer_format = VG_LITE_L8;
             break;
+        case LV_COLOR_FORMAT_A4:
+            vg_buffer_format = VG_LITE_A4;
+            break;
         case LV_COLOR_FORMAT_A8:
             vg_buffer_format = VG_LITE_A8;
             break;
@@ -233,6 +236,7 @@ uint8_t vglite_get_stride_alignment(lv_color_format_t cf)
         case LV_COLOR_FORMAT_I1:
         case LV_COLOR_FORMAT_I2:
         case LV_COLOR_FORMAT_I4:
+        case LV_COLOR_FORMAT_A4:
             align_bytes = 8;
             break;
         case LV_COLOR_FORMAT_I8:

@@ -168,6 +168,11 @@ bool lv_font_info_is_equal(const lv_font_info_t * ft_info_1, const lv_font_info_
     return is_equal;
 }
 
+bool lv_font_has_static_bitmap(const lv_font_t * font)
+{
+    return font->static_bitmap;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
