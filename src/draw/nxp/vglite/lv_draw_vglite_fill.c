@@ -101,7 +101,7 @@ void lv_draw_vglite_fill(vglite_draw_task_t * vglite_task)
  *   STATIC FUNCTIONS
  **********************/
 
-static uint32_t _vglite_set_rectangle(uint32_t * path_data, uint32_t * path_data_size, const lv_area_t * dest_area)
+static void _vglite_set_rectangle(int32_t * path_data, uint32_t * path_data_size, const lv_area_t * dest_area)
 {
     uint32_t pidx = 0;
     path_data[pidx++] = VLC_OP_MOVE;
