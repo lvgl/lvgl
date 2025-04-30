@@ -143,7 +143,7 @@ it. Therefore, all positions are relative to the parent.
 
 .. code-block:: c
 
-   lv_obj_t * parent = lv_obj_create(lv_screen_active());  /* Create a parent Widget on current screen */
+   lv_obj_t * parent = lv_obj_create(lv_screen_active());  /* Create a parent Widget on current Screen */
    lv_obj_set_size(parent, 100, 80);                       /* Set size of parent */
 
    lv_obj_t * widget1 = lv_obj_create(parent);             /* Create a Widget on previously created parent Widget */
@@ -187,14 +187,14 @@ drawn within.
         lv_event_set_ext_draw_size(e, 30); /*Set 30px extra draw area around the widget*/
     }
 
-Create and delete Widgets
--------------------------
+Creating and deleting Widgets
+-----------------------------
 
 In LVGL, Widgets can be created and deleted dynamically at run time. It
 means only the currently created (existing) Widgets consume RAM.
 
-This allows for the creation of a screen just when a button is clicked
-to open it, and for deletion of screens when a new screen is loaded.
+This allows for the creation of a Screen just when a button is clicked
+to open it, and for deletion of Screens when a new Screen is loaded.
 
 UIs can be created based on the current environment of the device. For
 example one can create meters, charts, bars and sliders based on the
