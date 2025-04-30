@@ -74,6 +74,6 @@ Supported Boards
          | Parallel RGB888 with Micro-HDMI bridge
      - .. raw:: html
 
-           <iframe width="320" height="180" src="https://www.youtube.com/embed/ZMwtBsSp-DA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+           <iframe width="320" height="180" src="https://www.youtube.com/embed/VnynDLR36Xc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
      - `Demo repository for RZ/G2UL-EVKIT <https://github.com/lvgl/lv_port_renesas_rz-g2ul-evkit>`__
