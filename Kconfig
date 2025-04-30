@@ -221,10 +221,6 @@ menu "LVGL configuration"
 				3: LV_THREAD_PRIO_HIGH
 				4: LV_THREAD_PRIO_HIGHEST
 
-				Make sure to align these values with your OS-specific priority levels:
-				- For FreeRTOS: typically 0 to (configMAX_PRIORITIES-1)
-				- For POSIX threads (pthreads): typically 0-99
-
 				Higher priority can improve rendering performance but might cause
 				starvation of lower priority tasks.
 
