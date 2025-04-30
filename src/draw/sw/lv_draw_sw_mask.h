@@ -72,8 +72,6 @@ void lv_draw_sw_mask_init(void);
 
 void lv_draw_sw_mask_deinit(void);
 
-//! @cond Doxygen_Suppress
-
 /**
  * Apply the added buffers on a line. Used internally by the library's drawing routines.
  * @param masks the masks list to apply, must be ended with NULL pointer in array.
@@ -90,8 +88,6 @@ lv_draw_sw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_mask_apply(void * m
                                                                         int32_t abs_x,
                                                                         int32_t abs_y,
                                                                         int32_t len);
-
-//! @endcond
 
 /**
  * Free the data from the parameter.
