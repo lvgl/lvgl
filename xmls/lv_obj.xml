@@ -166,32 +166,32 @@ Example
 	    </prop>
 	    <prop name="bind_state_if_eq">
 	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="flag" type="enum:lv_state"/>
 	    	<param name="ref_value" type="int"/>
 	    </prop>
 	    <prop name="bind_state_if_not_eq">
 	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="flag" type="enum:lv_state"/>
 	    	<param name="ref_value" type="int"/>
 	    </prop>
 	    <prop name="bind_state_if_gt">
 	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="flag" type="enum:lv_state"/>
 	    	<param name="ref_value" type="int"/>
 	    </prop>
 	    <prop name="bind_state_if_ge">
 	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="flag" type="enum:lv_state"/>
 	    	<param name="ref_value" type="int"/>
 	    </prop>
 	    <prop name="bind_state_if_lt">
 	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="flag" type="enum:lv_state"/>
 	    	<param name="ref_value" type="int"/>
 	    </prop>
 	    <prop name="bind_state_if_le">
 	    	<param name="subject" type="subject"/>
-	    	<param name="flag" type="enum:lv_obj_flag"/>
+	    	<param name="flag" type="enum:lv_state"/>
 	    	<param name="ref_value" type="int"/>
 	    </prop>
 	</api>
