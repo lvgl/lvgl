@@ -14,6 +14,7 @@ void lv_example_label_1(void)
     lv_obj_set_width(label1, 150);  /*Set smaller width to make the lines wrap*/
     lv_obj_set_style_text_align(label1, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_align(label1, LV_ALIGN_CENTER, 0, -40);
+    lv_obj_set_style_text_font(label1, &lv_font_montserrat_30, 0);
 
     lv_obj_t * label2 = lv_label_create(lv_screen_active());
     lv_label_set_long_mode(label2, LV_LABEL_LONG_MODE_SCROLL_CIRCULAR);     /*Circular scroll*/

@@ -592,22 +592,18 @@ void lv_draw_unit_draw_letter(lv_draw_task_t * t, lv_draw_glyph_dsc_t * dsc,  co
 
     if(g.resolved_font) {
         lv_draw_buf_t * draw_buf = NULL;
-        /*If LVGL uses static bitmaps, the buffer allocation and deallocation is not necessary*/
-        const bool static_bitmap = lv_font_has_static_bitmap(g.resolved_font);
-        if(!static_bitmap) {
-            if(LV_FONT_GLYPH_FORMAT_NONE < g.format && g.format < LV_FONT_GLYPH_FORMAT_IMAGE) {
-                /*Only check draw buf for bitmap glyph*/
-                draw_buf = lv_draw_buf_reshape(dsc->_draw_buf, 0, g.box_w, g.box_h, LV_STRIDE_AUTO);
-                if(draw_buf == NULL) {
-                    if(dsc->_draw_buf) lv_draw_buf_destroy(dsc->_draw_buf);
+        if(LV_FONT_GLYPH_FORMAT_NONE < g.format && g.format < LV_FONT_GLYPH_FORMAT_IMAGE) {
+            /*Only check draw buf for bitmap glyph*/
+            draw_buf = lv_draw_buf_reshape(dsc->_draw_buf, 0, g.box_w, g.box_h, LV_STRIDE_AUTO);
+            if(draw_buf == NULL) {
+                if(dsc->_draw_buf) lv_draw_buf_destroy(dsc->_draw_buf);
 
-                    uint32_t h = g.box_h;
-                    if(h * g.box_w < 64) h *= 2; /*Alloc a slightly larger buffer*/
-                    draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, g.box_w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
-                    LV_ASSERT_MALLOC(draw_buf);
-                    draw_buf->header.h = g.box_h;
-                    dsc->_draw_buf = draw_buf;
-                }
+                uint32_t h = g.box_h;
+                if(h * g.box_w < 64) h *= 2; /*Alloc a slightly larger buffer*/
+                draw_buf = lv_draw_buf_create_ex(font_draw_buf_handlers, g.box_w, h, LV_COLOR_FORMAT_A8, LV_STRIDE_AUTO);
+                LV_ASSERT_MALLOC(draw_buf);
+                draw_buf->header.h = g.box_h;
+                dsc->_draw_buf = draw_buf;
             }
         }
 
