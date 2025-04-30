@@ -886,10 +886,11 @@ static void draw_image(lv_event_t * e)
             label_dsc.text = img->src;
             lv_area_t * coords;
             lv_area_t aligned_coords;
-            if((img->align > LV_IMAGE_ALIGN_TOP_LEFT || img->offset.x || img->offset.y)
-               && img->align < LV_IMAGE_ALIGN_AUTO_TRANSFORM
-               && !(lv_obj_get_style_width(obj, 0) == LV_SIZE_CONTENT
-                    && lv_obj_get_style_height(obj, 0) == LV_SIZE_CONTENT)) {
+            if(((img->align > LV_IMAGE_ALIGN_TOP_LEFT
+                 && !(lv_obj_get_style_width(obj, 0) == LV_SIZE_CONTENT
+                      && lv_obj_get_style_height(obj, 0) == LV_SIZE_CONTENT))
+                || img->offset.x || img->offset.y)
+               && img->align < LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
                 lv_point_t text_size;
                 lv_text_get_size(&text_size, label_dsc.text, label_dsc.font, label_dsc.letter_space,
                                  label_dsc.line_space, LV_COORD_MAX, label_dsc.flag);
