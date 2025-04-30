@@ -88,7 +88,7 @@ void lv_draw_vglite_line(vglite_draw_task_t * vglite_task)
  *   STATIC FUNCTIONS
  **********************/
 
-static void _vglite_set_line(uint32_t * line_path, uint32_t * path_data_size, const lv_point_t * point1,
+static void _vglite_set_line(int32_t * line_path, uint32_t * path_data_size, const lv_point_t * point1,
                              const lv_point_t * point2)
 {
     uint32_t pidx = 0;
