@@ -1586,7 +1586,7 @@ class DoxygenXml(object):
         #
         #       LV_ATTRIBUTE_EXTERN_DATA extern const lv_obj_class_t lv_obj_class;
         #
-        #   which occurs in `lv_obj.h`.  When add these to the PREDEFINED list as
+        #   which occurs in `lv_obj.h`.  When these are added to the PREDEFINED list as
         #   "MACRO_NAME=" with no value, Doxygen expands the macro to an empty string
         #   allowing Doxygen to correctly parse the line.  The additional macros that
         #   are treated that way are found in the middle of `lv_conf_template.h` in a
@@ -1600,6 +1600,9 @@ class DoxygenXml(object):
             'LV_ATTRIBUTE_TICK_INC=',
             'LV_ATTRIBUTE_TIMER_HANDLER=',
             'LV_ATTRIBUTE_FLUSH_READY=',
+            'LV_ATTRIBUTE_MEM_ALIGN=',
+            'LV_ATTRIBUTE_LARGE_CONST=',
+            'LV_ATTRIBUTE_LARGE_RAM_ARRAY=',
             'LV_ATTRIBUTE_FAST_MEM=',
             'LV_ATTRIBUTE_EXTERN_DATA=',
         ]

@@ -2065,6 +2065,9 @@ PREDEFINED             = DOXYGEN                         \
                          LV_ATTRIBUTE_TICK_INC=          \
                          LV_ATTRIBUTE_TIMER_HANDLER=     \
                          LV_ATTRIBUTE_FLUSH_READY=       \
+                         LV_ATTRIBUTE_MEM_ALIGN=         \
+                         LV_ATTRIBUTE_LARGE_CONST=       \
+                         LV_ATTRIBUTE_LARGE_RAM_ARRAY=   \
                          LV_ATTRIBUTE_FAST_MEM=          \
                          LV_ATTRIBUTE_EXTERN_DATA=
 
