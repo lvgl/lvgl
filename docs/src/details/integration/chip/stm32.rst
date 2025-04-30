@@ -242,7 +242,7 @@ A minimal example using STM32CubeIDE, HAL, and CMSISv1 (FreeRTOS).
 
   .. code-block:: c
 
-   void my_flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map);
+   void my_flush_cb(lv_display_t * display, const lv_area_t * area, uint8_t * px_map)
    {
      uint16_t * color_p = (uint16_t *)px_map;
 
