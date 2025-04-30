@@ -32,7 +32,7 @@ Types
 *****
 
 All of the types can be used as API property types, but only a subset of them can be
-used as constant and Subject types.
+used as constant and :ref:`Subject <observer_subject>` types.
 
 
 Simple types
