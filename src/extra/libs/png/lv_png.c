@@ -17,9 +17,9 @@
  *      DEFINES
  *********************/
 #ifdef LODEPNG_COMPILE_ALLOCATORS
-#define lv_png_free(ptr) lv_mem_free((ptr))
+    #define lv_png_free(ptr) lv_mem_free((ptr))
 #else
-#define lv_png_free(ptr) lodepng_free((ptr))
+    #define lv_png_free(ptr) lodepng_free((ptr))
 #endif
 
 /**********************
