@@ -43,12 +43,6 @@ typedef enum {
     LV_FONT_GLYPH_FORMAT_A4     = 0x04, /**< 4 bit per pixel*/
     LV_FONT_GLYPH_FORMAT_A8     = 0x08, /**< 8 bit per pixel*/
 
-    /**< Legacy simple formats with byte padding at end of the lines*/
-    LV_FONT_GLYPH_FORMAT_A1_ALIGNED = 0x011, /**< 1 bit per pixel*/
-    LV_FONT_GLYPH_FORMAT_A2_ALIGNED = 0x012, /**< 2 bit per pixel*/
-    LV_FONT_GLYPH_FORMAT_A4_ALIGNED = 0x014, /**< 4 bit per pixel*/
-    LV_FONT_GLYPH_FORMAT_A8_ALIGNED = 0x018, /**< 8 bit per pixel*/
-
     LV_FONT_GLYPH_FORMAT_IMAGE  = 0x19, /**< Image format*/
 
     /**< Advanced formats*/
@@ -66,14 +60,10 @@ typedef struct {
     uint16_t box_h; /**< Height of the glyph's bounding box*/
     int16_t ofs_x;  /**< x offset of the bounding box*/
     int16_t ofs_y;  /**< y offset of the bounding box*/
-    uint8_t stride;
+    uint16_t stride;/**< Bytes in each line. If 0 than there is no padding at the end of the line. */
     lv_font_glyph_format_t format;  /**< Font format of the glyph see lv_font_glyph_format_t */
     uint8_t is_placeholder: 1;      /**< Glyph is missing. But placeholder will still be displayed*/
     int32_t outline_stroke_width;   /**< used with freetype vector fonts - width of the letter outline */
-
-    /** 0: Get bitmap should return an A8 or ARGB8888 image.
-     * 1: return the bitmap as it is (Maybe A1/2/4 or any proprietary formats). */
-    uint8_t req_raw_bitmap: 1;
 
     union {
         uint32_t index;       /**< Unicode code point*/
