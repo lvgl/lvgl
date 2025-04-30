@@ -89,7 +89,7 @@ void lv_draw_vglite_triangle(vglite_draw_task_t * vglite_task)
  *   STATIC FUNCTIONS
  **********************/
 
-static void _vglite_set_triangle(uint32_t * path_data, uint32_t * path_data_size, const lv_point_precise_t * p)
+static void _vglite_set_triangle(int32_t * path_data, uint32_t * path_data_size, const lv_point_precise_t * p)
 {
     uint32_t pidx = 0;
     path_data[pidx++] = VLC_OP_MOVE;

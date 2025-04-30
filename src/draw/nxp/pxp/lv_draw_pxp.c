@@ -375,7 +375,6 @@ static int32_t _pxp_delete(lv_draw_unit_t * draw_unit)
 static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
-    lv_draw_unit_t * draw_unit = (lv_draw_unit_t *)u;
     lv_layer_t * layer = t->target_layer;
     lv_draw_buf_t * draw_buf = layer->draw_buf;
 
