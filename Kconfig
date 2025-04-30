@@ -2041,7 +2041,7 @@ menu "LVGL configuration"
 
 		config LV_USE_WINDOWS
 			bool "Use LVGL Windows backend"
-			depends onLV_OS_WINDOWS
+			depends on LV_OS_WINDOWS
 			default n
 
 		config LV_USE_UEFI
