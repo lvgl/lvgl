@@ -2436,7 +2436,7 @@ lv_result_t lv_svg_render_get_viewport_size(const lv_svg_render_obj_t * render, 
         return LV_RESULT_INVALID;
     }
 
-    if(render->clz != &svg_viewport_class) {
+    if(render->clz != &svg_viewport_class){
         LV_LOG_WARN("Invalid render object type");
         return LV_RESULT_INVALID;
     }
