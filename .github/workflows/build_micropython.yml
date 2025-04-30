@@ -8,7 +8,7 @@ jobs:
   build:
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
     name: Build ${{ matrix.port }} port
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     continue-on-error: true
     strategy:
       matrix:
