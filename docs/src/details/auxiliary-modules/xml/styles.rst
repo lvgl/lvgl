@@ -64,10 +64,10 @@ The ``<style>`` tags can have ``<variant>`` child tags:
     </styles>
 
 ``<variant>`` elements allow altering styles at runtime.
-The ``variant_<name>`` subjects of the Component Library are used for each setting,
-and an observer callback is generated with all the style properties valid for that
-variant.  The observer callback first resets the style and then sets all the
-properties.
+The ``variant_<name>`` :ref:`Subjects <observer_subject>` of the Component Library
+are used for each setting, and an observer callback is generated with all the style
+properties valid for that variant.  The observer callback first resets the style and
+then sets all the properties.
 
 This feature is not supported yet.
 

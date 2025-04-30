@@ -4,12 +4,12 @@
 Subjects
 ========
 
-To connect values of the Widget internally or to external data, subjects can be used.
-For example, an internally connected value could be a slider's value mapped to a
-label. Externally connected data could be the current number of users shown on a
-label.
+To connect values of the Widget internally or to external data, :ref:`Subjects
+<observer_subject>` can be used. For example, an internally connected value could be
+a slider's value mapped to a label. Externally connected data could be the current
+number of users shown on a label.
 
-To handle internal connections, local subjects can be created like this:
+To handle internal connections, local Subjects can be created like this:
 
 .. code-block::  xml
 
@@ -19,7 +19,7 @@ To handle internal connections, local subjects can be created like this:
         <group name="a_and_b" value="a b"/>
     </subjects>
 
-These subjects can be used in Widget APIs like:
+These Subjects can be used in Widget APIs like:
 
 .. code-block::  xml
 
@@ -27,7 +27,7 @@ These subjects can be used in Widget APIs like:
         <label bind_text="a 'Progress: %d'"/>
     </view>
 
-When generating code, the subjects are saved in the Widget's data and are used like this:
+When generating code, the Subjects are saved in the Widget's data and are used like this:
 
 .. code-block::  c
 
@@ -41,7 +41,7 @@ When generating code, the subjects are saved in the Widget's data and are used l
 
 If the connection is more complex and not supported out of the box, it can be handled from code.
 
-External subjects are defined in the API of the Widget:
+External Subjects are defined in the API of the Widget:
 
 .. code-block::  xml
 
