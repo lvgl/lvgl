@@ -32,7 +32,7 @@ Types
 *****
 
 All of the types can be used as API property types, but only a subset of them can be
-used as constant and subject types.
+used as constant and Subject types.
 
 
 Simple types
@@ -105,7 +105,7 @@ can be used.  Later, a pointer to the object can be retrieved by
 :image:     Name of an image. :cpp:expr:`lv_xml_get_image(name)` returns an :cpp:expr:`const void *`,
             which can be :cpp:expr:`lv_image_dsc_t *` or a NUL-terminated string path to a file.
 :animation: Name of an animation descriptor. :cpp:expr:`lv_xml_get_anim(name)` returns an :cpp:expr:`lv_anim_t *`.
-:subject:   Name of a subject. :cpp:expr:`lv_xml_get_subject(name)` returns an :cpp:expr:`lv_subject_t *`.
+:subject:   Name of a :ref:`Subject <observer_subject>`. :cpp:expr:`lv_xml_get_subject(name)` returns an :cpp:expr:`lv_subject_t *`.
 :grad:      Name of a gradient. :cpp:expr:`lv_xml_get_grad(name)` returns an :cpp:expr:`lv_grad_dsc_t *`.
 :event_cb:  Name of an event callback. :cpp:expr:`lv_xml_get_event_cb(name)` returns an :cpp:expr:`lv_event_cb_t`.
 

@@ -107,7 +107,7 @@ in it are:
 
 :<config>:          Can specify name and help.
 :<api>:             Only for ``<enumdefs>``.
-:<subjects>:        List of subjects. Can be considered the API of a Component Library.
+:<subjects>:        List of :ref:`Subjects <observer_subject>`. Can be considered the API of a Component Library.
 :<consts>:          Globally available constants.
 :<styles>:          Globally available styles.
 :<fonts>:           Globally available fonts.
@@ -130,12 +130,12 @@ Variants
 ``<const_variant>`` can be used by constants to create variants that can be selected at compile time.
 This can be used to select a different display size, color scheme, etc.
 
-``<style_variant>`` can be used by styles only, to modify styles at runtime.
-To select the current style variant, an integer subject (i.e. a subject containing
-an integer value in the Observer Pattern implemented in ``lv_observer.c/.h``)
-``<style_variant.name>_variant`` is created.  Styles can subscribe to this, and the
-style properties can be changed according to the selected variant's integer value.
-(See `observer` for details about how to do this.)
+``<style_variant>`` can be used by styles only, to modify styles at runtime.  To
+select the current style variant, an integer :ref:`Subject <observer_subject>` (i.e.
+a Subject containing an integer value in the Observer Pattern implemented in
+``lv_observer.c/.h``) ``<style_variant.name>_variant`` is created.  Styles can
+subscribe to this, and the style properties can be changed according to the selected
+variant's integer value. (See `observer` for details about how to do this.)
 
 All possible variants should be defined in ``globals.xml``.
 

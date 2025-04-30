@@ -38,7 +38,7 @@ this ``create`` function will be called.  This means that Components do not have
 detailed set/get API but can be created with a fixed set of parameters.
 
 If the user needs to access or modify values dynamically, it is recommended to use a
-:ref:`subject  <observer>`.
+:ref:`Subject  <observer_subject>`.
 
 The user can also call these ``..._create()`` functions at any time from application code.
 
