@@ -10,6 +10,9 @@
 #
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
+# The major sections below each reflect a major section of that web page,
+# and they are ordered in the same sequence so it is clear what config
+# items go with what.
 #
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -30,7 +33,6 @@ from lvgl_version import lvgl_version #NoQA
 
 # *************************************************************************
 # Project Information
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 # *************************************************************************
 
 project = 'LVGL'
@@ -51,16 +53,15 @@ release = version
 # A short X.Y version is extracted from `lv_version.h` using a cross-platform compatible
 # Python function in lvgl_version.py, and passed in on `sphinx-build` command line.
 #
-# 22-Feb-2025 Sadly, the `-D version=...` on the command line was found to not
-# currently work as documented.  Sphinx documentation says of `-D setting=value`
-# "Override a configuration value set in the conf.py file.".
-# So we have to do this to get the version string into various values below.
+# 22-Apr-2025 while the `-D version=...` on the command line works (as long as quotes
+# are not placed around the version), having it added after `sphinx-build` has
+# executed this script is not soon enough because we need the version in some
+# strings below.  So we need to get it here from `lv_version.h` in order to do that.
 
 
 
 # *************************************************************************
 # General Configuration
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 # *************************************************************************
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -84,12 +85,27 @@ extensions = [
     'sphinx_rtd_dark_mode',
     # 'link_roles',
     'sphinxcontrib.mermaid',
-    'sphinx_reredirects'
 ]
 
 needs_extensions = {
     'sphinxcontrib.mermaid': '0.9.2'
 }
+
+# If 'SPHINX_REREDIRECTS_STANDDOWN' environment variable exists and
+# is set to a value not equal to '0', then do not add 'sphinx_reredirects'
+# to extensions.  This gives someone testing/editing/debugging documentation
+# build the possibility of skipping adding redirects in the local environment
+# if desired.
+add_redirects = True
+if 'SPHINX_REREDIRECTS_STANDDOWN' in os.environ:
+    if os.environ.get('SPHINX_REREDIRECTS_STANDDOWN') != '0':
+        print("sphinx_reredirects standing down as requested.")
+        add_redirects = False
+
+if add_redirects:
+    extensions.append('sphinx_reredirects')
+
+del add_redirects
 
 # -------------------------------------------------------------------------
 # Options for Highlighting
@@ -117,6 +133,7 @@ language = 'en'
 # -------------------------------------------------------------------------
 default_role = 'literal'
 # keep_warnings = False   # True causes Sphinx warnings to be added to documents.
+primary_domain = 'c'      # Default:  'py'
 
 # -------------------------------------------------------------------------
 # Options for Source Files
@@ -166,12 +183,10 @@ templates_path = ['_templates']
 
 # *************************************************************************
 # Builder Options
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#builder-options
 # *************************************************************************
 
 # -------------------------------------------------------------------------
 # Options for HTML Builder
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 # -------------------------------------------------------------------------
 # The theme for HTML output.  See https://www.sphinx-doc.org/en/master/usage/theming.html
 html_theme = 'sphinx_rtd_theme'
@@ -216,11 +231,15 @@ if "LVGL_GITCOMMIT" not in os.environ:
 
 _git_commit_ref = os.getenv('LVGL_GITCOMMIT')
 
+# These keys are used "bare" as template variables in:
+# - sphinx_rtd_theme theme template:  breadcrumbs.html
+# - furo             theme template:  edit-this-page.html
+# - furo             theme template:  view-this-page.html
 html_context = {
-    'github_version': _git_commit_ref,
+    'display_github': True,
     'github_user': 'lvgl',
     'github_repo': 'lvgl',
-    'display_github': True,
+    'github_version': _git_commit_ref,
     'conf_py_path': '/docs/src/'
 }
 
@@ -367,6 +386,20 @@ texinfo_documents = [
 
 
 # *************************************************************************
+# Domain Options
+# *************************************************************************
+
+# -------------------------------------------------------------------------
+# Options for the C Domain
+# -------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------
+# Options for the CPP Domain
+# -------------------------------------------------------------------------
+
+
+
+# *************************************************************************
 # Configuration for Sphinx Extensions
 # *************************************************************************
 
@@ -400,6 +433,9 @@ sitemap_url_scheme = "{link}"
 breathe_projects = {
     "lvgl": "xml/",
 }
+
+breathe_default_project = "lvgl"
+# breathe_debug_trace_directives = True
 
 # -------------------------------------------------------------------------
 # Options for sphinx_reredirects
