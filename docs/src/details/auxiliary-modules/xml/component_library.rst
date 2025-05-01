@@ -106,7 +106,7 @@ are available throughout the entire UI, Widgets, and all XML files.  The valid t
 in it are:
 
 :<config>:          Can specify name and help.
-:<api>:             Only for ``<enumdefs>``.
+:<api>:             Used with ``<enumdefs>`` to show possible values for Widget or Component attributes.
 :<subjects>:        List of :ref:`Subjects <observer_subject>`. Can be considered the API of a Component Library.
 :<consts>:          Globally available constants.
 :<styles>:          Globally available styles.
