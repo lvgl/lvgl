@@ -26,6 +26,7 @@ You need to install
 - CMake
 - Ninja (for Linux builds). Be sure to Add ninja to your PATH!
 - The prerequisites listed in ``scripts/install-prerequisites.sh/bat``
+- A python3 interpreter if you wish to use KConfig.
 
 
 How to build this project using cmake
@@ -87,7 +88,7 @@ Here is how to build using the presets:
 Build with IDE
 ~~~~~~~~~~~~~~
 
-The recommend way for consuming CMakePresets is a CMakePresets aware IDE such as
+The recommended way for consuming CMakePresets is a CMakePresets aware IDE such as
 
 - VS 2022
 - VS Code
@@ -184,3 +185,5 @@ These cmake options are available to configure LVGL:
 - ``LV_CONF_BUILD_DISABLE_EXAMPLES`` (BOOLEAN): Disable building the examples if set.
 - ``LV_CONF_BUILD_DISABLE_DEMOS`` (BOOLEAN): Disable building the demos if set.
 - ``LV_CONF_BUILD_DISABLE_THORVG_INTERNAL``: Disable the internal compilation of ThorVG.
+- ``LV_CMAKE_CREATE_CONF_VARS`` (BOOLEAN) : Disable the creation of variables from ``lv_conf_internal.h`` this feature is disabled by default.
+  It is enabled automatically if ``LV_USE_KCONFIG`` is enabled. This feature requires a python3 interpreter with support for the *pip* and *venv* modules

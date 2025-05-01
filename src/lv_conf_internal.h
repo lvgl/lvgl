@@ -1809,14 +1809,14 @@
     #ifdef CONFIG_LV_FONT_SOURCE_HAN_SANS_SC_14_CJK
         #define LV_FONT_SOURCE_HAN_SANS_SC_14_CJK CONFIG_LV_FONT_SOURCE_HAN_SANS_SC_14_CJK
     #else
-        #define LV_FONT_SOURCE_HAN_SANS_SC_14_CJK   0  /**< 1000 most common CJK radicals */
+        #define LV_FONT_SOURCE_HAN_SANS_SC_14_CJK   0  /**< 1338 most common CJK radicals */
     #endif
 #endif
 #ifndef LV_FONT_SOURCE_HAN_SANS_SC_16_CJK
     #ifdef CONFIG_LV_FONT_SOURCE_HAN_SANS_SC_16_CJK
         #define LV_FONT_SOURCE_HAN_SANS_SC_16_CJK CONFIG_LV_FONT_SOURCE_HAN_SANS_SC_16_CJK
     #else
-        #define LV_FONT_SOURCE_HAN_SANS_SC_16_CJK   0  /**< 1000 most common CJK radicals */
+        #define LV_FONT_SOURCE_HAN_SANS_SC_16_CJK   0  /**< 1338 most common CJK radicals */
     #endif
 #endif
 
@@ -4062,6 +4062,13 @@
         #define LV_USE_ILI9341 CONFIG_LV_USE_ILI9341
     #else
         #define LV_USE_ILI9341       0
+    #endif
+#endif
+#ifndef LV_USE_FT81X
+    #ifdef CONFIG_LV_USE_FT81X
+        #define LV_USE_FT81X CONFIG_LV_USE_FT81X
+    #else
+        #define LV_USE_FT81X         0
     #endif
 #endif
 

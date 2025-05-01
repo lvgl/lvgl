@@ -94,6 +94,12 @@ with the original map:
 - ``"abc"`` Load lower-case map.
 - ``"1#"`` Load number map.
 
+Key customization
+-----------------
+
+Each key can be customized by using draw events such as :cpp:enumerator:`LV_EVENT_DRAW_TASK_ADDED`.
+
+Check out the examples to see how it can be used in the practice.
 
 
 .. _lv_keyboard_events:

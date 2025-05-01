@@ -107,12 +107,14 @@
 
 #ifdef _WIN32
 #  define getpid GetCurrentProcessId
-#else
+#elif defined(__linux__)
 #  include <sys/time.h>  /* gettimeofday() */
 #  include <sys/types.h> /* getpid() */
 #  include <unistd.h>    /* getpid() */
 #  include <fcntl.h>     /* O_RDONLY */
 #  include <errno.h>
+#else
+#  define getpid() 0xAABBCCDD /* Fallback for MCUs */
 #endif
 
 #ifdef _WIN32
@@ -921,7 +923,7 @@ gather_time_entropy(void) {
   FILETIME ft;
   GetSystemTimeAsFileTime(&ft); /* never fails */
   return ft.dwHighDateTime ^ ft.dwLowDateTime;
-#  else
+#  elif defined(__linux__)
   struct timeval tv;
   int gettimeofday_res;
 
@@ -932,9 +934,10 @@ gather_time_entropy(void) {
 #    else
   assert(gettimeofday_res == 0);
 #    endif /* defined(NDEBUG) */
-
   /* Microseconds time is <20 bits entropy */
   return tv.tv_usec;
+#  else
+  return 0x12345678; /*Fallback for MCUs*/
 #  endif
 }
 
@@ -8552,13 +8555,8 @@ getDebugLevel(const char *variableName, unsigned long defaultDebugLevel) {
   }
   const char *const value = valueOrNull;
 
-  errno = 0;
   char *afterValue = NULL;
   unsigned long debugLevel = strtoul(value, &afterValue, 10);
-  if ((errno != 0) || (afterValue == value) || (afterValue[0] != '\0')) {
-    errno = 0;
-    return defaultDebugLevel;
-  }
 
   return debugLevel;
 }
