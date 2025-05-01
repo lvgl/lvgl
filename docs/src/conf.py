@@ -463,7 +463,7 @@ redirects = {
     "integration/chip/espressif":                 "../../details/integration/chip/espressif.html"                   ,
     "integration/chip/index":                     "../../details/integration/chip/index.html"                       ,
     "integration/chip/nxp":                       "../../details/integration/chip/nxp.html"                         ,
-    "integration/chip/renesas":                   "../../details/integration/chip/renesas.html"                     ,
+    "integration/chip/renesas":                   "../../details/integration/chip/renesas/index.html"               ,
     "integration/chip/stm32":                     "../../details/integration/chip/stm32.html"                       ,
     "integration/driver/X11":                     "../../details/integration/driver/X11.html"                       ,
     "integration/driver/display/fbdev":           "../../../details/integration/driver/display/fbdev.html"          ,
