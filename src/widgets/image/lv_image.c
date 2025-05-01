@@ -887,13 +887,13 @@ static void draw_image(lv_event_t * e)
             lv_area_t * coords;
             lv_area_t aligned_coords;
             if(((img->align > LV_IMAGE_ALIGN_TOP_LEFT
-                 && !(lv_obj_get_style_width(obj, 0) == LV_SIZE_CONTENT
-                      && lv_obj_get_style_height(obj, 0) == LV_SIZE_CONTENT))
+                 && !(img->w == lv_area_get_width(&obj->coords)
+                      && img->h == lv_area_get_height(&obj->coords)))
                 || img->offset.x || img->offset.y)
                && img->align < LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
                 lv_point_t text_size;
                 lv_text_get_size(&text_size, label_dsc.text, label_dsc.font, label_dsc.letter_space,
-                                 label_dsc.line_space, LV_COORD_MAX, label_dsc.flag);
+                                 label_dsc.line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
                 lv_area_set(&aligned_coords, 0, 0, text_size.x, text_size.y);
                 lv_area_align(&obj->coords, &aligned_coords, img->align, img->offset.x, img->offset.y);
                 coords = &aligned_coords;
