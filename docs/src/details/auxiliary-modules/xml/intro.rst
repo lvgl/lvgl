@@ -110,7 +110,8 @@ but rather compiled into the application. The main characteristics of Widgets ar
 Any handwritten Widget can be accessed from XML by:
 
 1. Defining its API in an XML file.
-2. Writing and registering an XML parser for it.  See some examples here.
+2. Writing and registering an XML parser for it.
+   `See some examples here. <https://github.com/lvgl/lvgl/tree/master/src/others/xml/parsers>`__
 
 
 Components
