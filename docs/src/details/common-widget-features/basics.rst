@@ -334,11 +334,16 @@ Loading Screens
 To load a new screen, use :cpp:expr:`lv_screen_load(scr1)`.  This sets ``scr1`` as
 the Active Screen.
 
-Load Screen with Animation
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Load Screen with Extended Options
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A new screen can be loaded with animation by using
-:cpp:expr:`lv_screen_load_anim(scr, transition_type, time, delay, auto_del)`. The
+There is a way to load screens that gives you 2 additional (extended) options,
+allowing the caller to specify:
+
+- an optional transition method, and
+- an option to gracefully delete the screen that was being displayed.
+
+:cpp:expr:`lv_screen_load_anim(scr, transition_type, time, delay, auto_del)`.  The
 following transition types exist:
 
 - :cpp:enumerator:`LV_SCR_LOAD_ANIM_NONE`: Switch immediately after ``delay`` milliseconds
@@ -348,7 +353,7 @@ following transition types exist:
 - :cpp:enumerator:`LV_SCR_LOAD_ANIM_FADE_IN` and :cpp:enumerator:`LV_SCR_LOAD_ANIM_FADE_OUT`: Fade the new screen over the old screen, or vice versa
 
 Setting ``auto_del`` to ``true`` will automatically delete the old
-screen when the animation is finished.
+screen when the animation (if any) is finished.
 
 The new screen will become active (returned by :cpp:func:`lv_screen_active`) when
 the animation starts after ``delay`` time. All inputs are disabled
