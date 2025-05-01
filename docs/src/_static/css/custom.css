@@ -332,3 +332,36 @@ div.body {
   color: var(--color-content-foreground);
   padding: 8px 3em;
 }
+
+/*-------------------------------------------------------------------------
+ * Field Lists
+ *-------------------------------------------------------------------------*/
+.field-list ul {
+    margin: 0;
+    padding-left: 1em;
+}
+
+.field-list p {
+    margin: 0;
+}
+
+dl.field-list {
+    display: grid;
+    grid-template-columns: auto minmax(70%,95%);
+    margin-bottom: 24px;  /* Up from 16 */
+}
+
+dl.field-list > dt {
+    font-weight: 600;
+    word-break: break-word;
+    padding-left: 1em;
+    padding-right: 1em;
+    margin-bottom: 0.15em;
+    display: inline-grid;
+    grid-template-columns: max-content auto;
+}
+
+dl.field-list > dd {
+    margin: 0;
+}
+
