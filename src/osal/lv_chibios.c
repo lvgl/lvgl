@@ -3,7 +3,6 @@
  *
  * Port of LVGL OS abstraction layer using ChibiOS.
  *
- * SPDX-License-Identifier: MIT
  */
 
 #include "lvgl/src/osal/lv_os.h"
