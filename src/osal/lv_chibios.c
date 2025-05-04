@@ -5,7 +5,6 @@
  *
  */
 
-#include "lvgl/src/osal/lv_os.h"
 #if LV_USE_OS == LV_OS_CHIBIOS
 #include "../core/lv_global.h"
 
@@ -201,8 +200,7 @@ static void prvCheckCondInit(lv_thread_sync_t * pxCond)
 #include "hal_stm32_ltdc.h"
 #include "../drivers/display/st_ltdc/lv_st_ltdc.h"
 
-uint8_t frame_buffer[600 * 1024 *
-                     2];  /**< Frame buffer for LTDC. Height * Width * Bytes_per_pixel, additional settings can be applied like section(.sdram) */
+uint8_t frame_buffer[600 * 1024 *2];  /**< Frame buffer for LTDC. Height * Width * Bytes_per_pixel, additional settings can be applied like section(.sdram) */
 
 static const ltdc_window_t ltdc_fullscreen_wincfg = {
     .hstart = 0,

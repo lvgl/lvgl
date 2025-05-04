@@ -10,6 +10,8 @@ extern "C"
 {
 #endif
 
+#include "lv_os.h"
+
 #if LV_USE_OS == LV_OS_CHIBIOS
 
 #include "ch.h"
