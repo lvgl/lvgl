@@ -14,23 +14,23 @@
 #include "../../../display/lv_display_private.h"
 #include "../../../draw/sw/lv_draw_sw.h"
 #if !defined(LV_OS_CHIBIOS)
-#include "ltdc.h"
+    #include "ltdc.h"
 #elif defined(LV_OS_CHIBIOS)
-#include "ChibiOS-Contrib/os/hal/ports/STM32/LLD/LTDCv1/hal_stm32_ltdc.h"
-#define LTDC_PIXEL_FORMAT_ARGB8888 LTDC_FMT_ARGB8888
-#define LTDC_PIXEL_FORMAT_RGB888  LTDC_FMT_RGB888
-#define LTDC_PIXEL_FORMAT_RGB565  LTDC_FMT_RGB565
-#define LTDC_PIXEL_FORMAT_L8     LTDC_FMT_L8
-#define LTDC_PIXEL_FORMAT_AL88   LTDC_FMT_AL88
-#define DMA2D_OUTPUT_ARGB8888 DMA2D_FMT_ARGB8888
-#define DMA2D_OUTPUT_RGB888  DMA2D_FMT_RGB888
-#define DMA2D_OUTPUT_RGB565  DMA2D_FMT_RGB565
-#define DMA2D_INPUT_ARGB8888 DMA2D_FMT_ARGB8888
-#define DMA2D_INPUT_RGB888  DMA2D_FMT_RGB888
-#define DMA2D_INPUT_RGB565  DMA2D_FMT_RGB565
-#define DMA2D_INPUT_L8     DMA2D_FMT_L8
-#define DMA2D_INPUT_AL88   DMA2D_FMT_AL88
-#define DMA2D_INPUT_A8 DMA2D_FMT_A8
+    #include "ChibiOS-Contrib/os/hal/ports/STM32/LLD/LTDCv1/hal_stm32_ltdc.h"
+    #define LTDC_PIXEL_FORMAT_ARGB8888 LTDC_FMT_ARGB8888
+    #define LTDC_PIXEL_FORMAT_RGB888  LTDC_FMT_RGB888
+    #define LTDC_PIXEL_FORMAT_RGB565  LTDC_FMT_RGB565
+    #define LTDC_PIXEL_FORMAT_L8     LTDC_FMT_L8
+    #define LTDC_PIXEL_FORMAT_AL88   LTDC_FMT_AL88
+    #define DMA2D_OUTPUT_ARGB8888 DMA2D_FMT_ARGB8888
+    #define DMA2D_OUTPUT_RGB888  DMA2D_FMT_RGB888
+    #define DMA2D_OUTPUT_RGB565  DMA2D_FMT_RGB565
+    #define DMA2D_INPUT_ARGB8888 DMA2D_FMT_ARGB8888
+    #define DMA2D_INPUT_RGB888  DMA2D_FMT_RGB888
+    #define DMA2D_INPUT_RGB565  DMA2D_FMT_RGB565
+    #define DMA2D_INPUT_L8     DMA2D_FMT_L8
+    #define DMA2D_INPUT_AL88   DMA2D_FMT_AL88
+    #define DMA2D_INPUT_A8 DMA2D_FMT_A8
 #endif
 
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
@@ -38,9 +38,9 @@
         #error cannot use LV_ST_LTDC_USE_DMA2D_FLUSH with LV_USE_DRAW_DMA2D
     #endif /*LV_USE_DRAW_DMA2D*/
     #if !defined(LV_OS_CHIBIOS)
-    #include "dma2d.h"
+        #include "dma2d.h"
     #elif defined(LV_OS_CHIBIOS)
-    #include "ChibiOS-Contrib/os/hal/ports/STM32/LLD/DMA2Dv1/hal_stm32_dma2d.h"
+        #include "ChibiOS-Contrib/os/hal/ports/STM32/LLD/DMA2Dv1/hal_stm32_dma2d.h"
     #endif /*LV_OS_CHIBIOS*/
 #endif /*LV_ST_LTDC_USE_DMA2D_FLUSH*/
 
@@ -68,17 +68,17 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 static void flush_wait_cb(lv_display_t * disp);
 static lv_color_format_t get_lv_cf_from_layer_cf(uint32_t cf);
 #if !defined(LV_OS_CHIBIOS)
-static void reload_event_callback(LTDC_HandleTypeDef * hltdc);
+    static void reload_event_callback(LTDC_HandleTypeDef * hltdc);
 #elif defined(LV_OS_CHIBIOS)
-static void reload_event_callback(void);
+    static void reload_event_callback(void);
 #endif
 
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
-#if !defined(LV_OS_CHIBIOS)
-    static void transfer_complete_callback(DMA2D_HandleTypeDef * hdma2d);
-#elif defined(LV_OS_CHIBIOS)
-    static void transfer_complete_callback(void);
-#endif
+    #if !defined(LV_OS_CHIBIOS)
+        static void transfer_complete_callback(DMA2D_HandleTypeDef * hdma2d);
+    #elif defined(LV_OS_CHIBIOS)
+        static void transfer_complete_callback(void);
+    #endif
     static uint32_t get_dma2d_output_cf_from_layer_cf(uint32_t cf);
     static uint32_t get_dma2d_input_cf_from_lv_cf(uint32_t cf);
 #endif
@@ -139,9 +139,9 @@ static lv_display_t * create(void * buf1, void * buf2, uint32_t buf_size, uint32
     uint32_t layer_cf = layer_cfg->PixelFormat;
 #elif defined(LV_OS_CHIBIOS)
     startLTDCChibiOS();
-    #if LV_ST_LTDC_USE_DMA2D_FLUSH || LV_USE_DRAW_DMA2D
-        startDMA2DChibiOS();
-    #endif
+#if LV_ST_LTDC_USE_DMA2D_FLUSH || LV_USE_DRAW_DMA2D
+    startDMA2DChibiOS();
+#endif
     const LTDCConfig * layer_cfg = LTDCD1.config;
     uint32_t layer_width = layer_cfg->screen_width;
     uint32_t layer_height = layer_cfg->screen_height;
@@ -217,7 +217,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
 #if !defined(LV_OS_CHIBIOS)
         uint8_t * fb = (uint8_t *) layer_cfg->FBStartAdress;
 #elif defined(LV_OS_CHIBIOS)
-        uint8_t *fb = (uint8_t *)layer_cfg->bg_laycfg->frame->bufferp;
+        uint8_t * fb = (uint8_t *)layer_cfg->bg_laycfg->frame->bufferp;
 #endif
         uint32_t px_size = lv_color_format_get_size(cf);
         uint32_t fb_stride = px_size * disp_width;
@@ -298,9 +298,9 @@ static lv_color_format_t get_lv_cf_from_layer_cf(uint32_t cf)
     }
 }
 #if !defined(LV_OS_CHIBIOS)
-static void reload_event_callback(LTDC_HandleTypeDef * hltdc)
+    static void reload_event_callback(LTDC_HandleTypeDef * hltdc)
 #elif defined(LV_OS_CHIBIOS)
-static void reload_event_callback(void)
+    static void reload_event_callback(void)
 #endif
 {
     uint32_t i;
@@ -321,9 +321,9 @@ void reload_event_callback_handler(void)
 
 #if LV_ST_LTDC_USE_DMA2D_FLUSH
 #if !defined(LV_OS_CHIBIOS)
-static void transfer_complete_callback(DMA2D_HandleTypeDef * hdma2d)
+    static void transfer_complete_callback(DMA2D_HandleTypeDef * hdma2d)
 #elif defined(LV_OS_CHIBIOS)
-static void transfer_complete_callback(void)
+    static void transfer_complete_callback(void)
 #endif
 {
     DMA2D->IFCR = 0x3FU;
