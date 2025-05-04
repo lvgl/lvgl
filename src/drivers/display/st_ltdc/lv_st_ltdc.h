@@ -53,8 +53,10 @@ lv_display_t * lv_st_ltdc_create_partial(void * render_buf_1, void * render_buf_
                                          uint32_t layer_idx);
 
 #if defined(LV_OS_CHIBIOS)
-void transfer_complete_callback_handler(void); /** ChibiOS needs the IRQ callbacks to be set inside the configuration which could be placed outside of the LTDC Driver */
-void reload_event_callback_handler(void); /** ChibiOS needs the IRQ callbacks to be set inside the configuration which could be placed outside of the LTDC Driver */
+void transfer_complete_callback_handler(
+    void); /** ChibiOS needs the IRQ callbacks to be set inside the configuration which could be placed outside of the LTDC Driver */
+void reload_event_callback_handler(
+    void); /** ChibiOS needs the IRQ callbacks to be set inside the configuration which could be placed outside of the LTDC Driver */
 #endif
 /**********************
  *      MACROS

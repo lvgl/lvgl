@@ -14,29 +14,26 @@ extern "C"
 
 #include "ch.h"
 
-    typedef struct
-    {
-        void (*pvStartRoutine)(void *);
-        void *pTaskArg;
-        thread_t *pThreadHandle; /**< ChibiOS thread handle. */
-    } lv_thread_t;
+typedef struct {
+    void (*pvStartRoutine)(void *);
+    void * pTaskArg;
+    thread_t * pThreadHandle; /**< ChibiOS thread handle. */
+} lv_thread_t;
 
-    typedef struct
-    {
-        bool is_initialized; /**< Set to true if this mutex is initialized. */
-        mutex_t mtx;         /**< ChibiOS mutex object. */
-    } lv_mutex_t;
+typedef struct {
+    bool is_initialized; /**< Set to true if this mutex is initialized. */
+    mutex_t mtx;         /**< ChibiOS mutex object. */
+} lv_mutex_t;
 
-    typedef struct
-    {
-        bool is_initialized; /**< Set to true once initialized. */
-        /* Binary semaphore to wake threads (used in place of a task-notification or
-           counting semaphore in FreeRTOS). */
-        binary_semaphore_t bsem;
-        mutex_t sync_mtx;         /**<  Mutex to protect the condition variable internal state. */
-        uint32_t waiting_threads; /**< Number of threads currently waiting. */
-        bool sync_signal;         /**< True when a signal has been issued. */
-    } lv_thread_sync_t;
+typedef struct {
+    bool is_initialized; /**< Set to true once initialized. */
+    /* Binary semaphore to wake threads (used in place of a task-notification or
+       counting semaphore in FreeRTOS). */
+    binary_semaphore_t bsem;
+    mutex_t sync_mtx;         /**<  Mutex to protect the condition variable internal state. */
+    uint32_t waiting_threads; /**< Number of threads currently waiting. */
+    bool sync_signal;         /**< True when a signal has been issued. */
+} lv_thread_sync_t;
 
 
 #if LV_USE_ST_LTDC
