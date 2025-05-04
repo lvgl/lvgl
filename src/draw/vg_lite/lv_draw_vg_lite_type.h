@@ -36,6 +36,7 @@ extern "C" {
  **********************/
 
 struct _lv_vg_lite_pending_t;
+struct _lv_vg_lite_grad_ctx_t;
 
 struct _lv_draw_vg_lite_unit_t {
     lv_draw_unit_t base_unit;
@@ -43,8 +44,7 @@ struct _lv_draw_vg_lite_unit_t {
 
     struct _lv_vg_lite_pending_t * image_dsc_pending;
 
-    lv_cache_t * grad_cache;
-    struct _lv_vg_lite_pending_t * grad_pending;
+    struct _lv_vg_lite_grad_ctx_t * grad_ctx;
 
     lv_cache_t * stroke_cache;
 

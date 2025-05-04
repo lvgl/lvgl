@@ -41,6 +41,11 @@ static void event_cb(lv_event_t * e)
                 if(pressed) fill_draw_dsc->color = lv_palette_darken(LV_PALETTE_RED, 3);
                 else fill_draw_dsc->color = lv_palette_main(LV_PALETTE_RED);
             }
+
+            lv_draw_box_shadow_dsc_t * box_shadow_draw_dsc = lv_draw_task_get_box_shadow_dsc(draw_task);
+            if(box_shadow_draw_dsc) {
+                box_shadow_draw_dsc->radius = LV_RADIUS_CIRCLE;
+            }
         }
         else if(base_dsc->id1 == 3) {
             lv_draw_label_dsc_t * label_draw_dsc = lv_draw_task_get_label_dsc(draw_task);

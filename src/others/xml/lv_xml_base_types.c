@@ -39,6 +39,26 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
+lv_state_t lv_xml_state_to_enum(const char * txt)
+{
+    if(lv_streq("default", txt)) return LV_STATE_DEFAULT;
+    if(lv_streq("pressed", txt)) return LV_STATE_PRESSED;
+    if(lv_streq("checked", txt)) return LV_STATE_CHECKED;
+    if(lv_streq("hovered", txt)) return LV_STATE_HOVERED;
+    if(lv_streq("scrolled", txt)) return LV_STATE_SCROLLED;
+    if(lv_streq("disabled", txt)) return LV_STATE_DISABLED;
+    if(lv_streq("focused", txt)) return LV_STATE_FOCUSED;
+    if(lv_streq("focus_key", txt)) return LV_STATE_FOCUS_KEY;
+    if(lv_streq("edited", txt)) return LV_STATE_EDITED;
+    if(lv_streq("user_1", txt)) return LV_STATE_USER_1;
+    if(lv_streq("user_2", txt)) return LV_STATE_USER_2;
+    if(lv_streq("user_3", txt)) return LV_STATE_USER_3;
+    if(lv_streq("user_4", txt)) return LV_STATE_USER_4;
+
+    LV_LOG_WARN("%s is an unknown value for state", txt);
+    return 0; /*Return 0 in lack of a better option. */
+}
+
 int32_t lv_xml_to_size(const char * txt)
 {
     if(lv_streq(txt, "content")) return LV_SIZE_CONTENT;
@@ -71,6 +91,8 @@ lv_dir_t lv_xml_dir_to_enum(const char * txt)
     if(lv_streq("bottom", txt)) return LV_DIR_BOTTOM;
     if(lv_streq("left", txt)) return LV_DIR_LEFT;
     if(lv_streq("right", txt)) return LV_DIR_RIGHT;
+    if(lv_streq("hor", txt)) return LV_DIR_HOR;
+    if(lv_streq("ver", txt)) return LV_DIR_VER;
     if(lv_streq("all", txt)) return LV_DIR_ALL;
 
     LV_LOG_WARN("%s is an unknown value for dir", txt);

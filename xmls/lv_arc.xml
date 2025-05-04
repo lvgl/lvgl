@@ -28,5 +28,6 @@ Example
 	    <prop name="mode" help="The mode">
 	        <param name="mode" type="enum:lv_arc_mode"/>
 	    </prop>
+	    <prop name="bind_value" type="subject" help="Connect a subject to the arc's value"/>
 	</api>
 </widget>

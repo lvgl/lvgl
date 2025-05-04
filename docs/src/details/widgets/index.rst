@@ -14,6 +14,7 @@ All Widgets
 .. toctree::
     :maxdepth: 1
 
+    3dtexture
     animimg
     arc
     bar

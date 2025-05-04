@@ -20760,6 +20760,12 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
  *  PUBLIC FONT
  *----------------*/
 
+#ifdef _MSC_VER
+    #pragma deprecated(lv_font_simsun_14_cjk)
+#else
+    #warning "LV_FONT_SIMSUN_14_CJK is deprecated, use LV_FONT_SOURCE_HAN_SANS_SC_14_CJK instead."
+#endif
+
 /*Initialize a public general font descriptor*/
 #if LVGL_VERSION_MAJOR >= 8
 const lv_font_t lv_font_simsun_14_cjk = {

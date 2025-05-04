@@ -14,6 +14,7 @@ find_package(Python REQUIRED)
 
 option(LV_CONF_SKIP "Skip including lv_conf.h during configuration" OFF)
 option(LV_USE_KCONFIG "Use Kconfig to configure LVGL" OFF)
+option(LV_CMAKE_CREATE_CONF_VARS "Create variables from the options defined in lv_conf_internal.h - required for KConfig" OFF)
 
 # Option LV_CONF_PATH, which should be the path for lv_conf.h
 # If set parent path LV_CONF_DIR is added to includes
@@ -41,10 +42,15 @@ if ( LV_USE_KCONFIG )
   # and autoconf.h, which will be used by lv_conf_kconfig.h
   include(${CMAKE_CURRENT_LIST_DIR}/kconfig.cmake)
 
-  set(LV_KCONFIG_IGNORE OFF)
+  # If KConfig is used - creating CMAKE variables from lv_conf_internal.h is required,
+  # so PCPP is used to pre-process lv_conf_internal.h
+  set(LV_CMAKE_CREATE_CONF_VARS TRUE)
+
   # Set the flag to specify we are using kconfig, needed for the
   # generate_cmake_variables.py script
+  set(LV_KCONFIG_IGNORE OFF)
   set(KCONFIG_FLAG --kconfig)
+
   # If using Kconfig, we need to define additional definitions
   list(APPEND PCPP_DEFINITIONS_LIST "LV_CONF_SKIP" "LV_CONF_KCONFIG_EXTERNAL_INCLUDE=\"${LV_CONF_KCONFIG_EXTERNAL_INCLUDE}\"")
 else()
@@ -75,36 +81,39 @@ target_compile_definitions(
               $<$<BOOL:${LV_CONF_SKIP}>:LV_CONF_SKIP>
 )
 
-# Use the portable pcpp to preprocess lv_conf_internal.h
-execute_process(
-  COMMAND ${Python_EXECUTABLE} ${LVGL_ROOT_DIR}/scripts/preprocess_lv_conf_internal.py
-  --input ${LVGL_ROOT_DIR}/src/lv_conf_internal.h
-  --tmp_file ${CMAKE_CURRENT_BINARY_DIR}/tmp.h
-  --output ${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h
-  --workfolder ${CMAKE_CURRENT_BINARY_DIR}
-  ${PCPP_ADDITIONAL_DEFS}
-  --include ${LVGL_ROOT_DIR} ${LVGL_ROOT_DIR}/.. ${LVGL_ROOT_DIR}/src ${LV_CONF_DIR}
-  RESULT_VARIABLE ret
-)
-if(NOT "${ret}" STREQUAL "0")
-  message(FATAL_ERROR "preprocess_lv_conf_internal.py failed with return code: ${ret}")
-endif()
+if ( LV_CMAKE_CREATE_CONF_VARS )
+    # Use the portable pcpp to preprocess lv_conf_internal.h
+    execute_process(
+      COMMAND ${Python_EXECUTABLE} ${LVGL_ROOT_DIR}/scripts/preprocess_lv_conf_internal.py
+      --input ${LVGL_ROOT_DIR}/src/lv_conf_internal.h
+      --tmp_file ${CMAKE_CURRENT_BINARY_DIR}/tmp.h
+      --output ${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h
+      --workfolder ${CMAKE_CURRENT_BINARY_DIR}
+      ${PCPP_ADDITIONAL_DEFS}
+      --include ${LVGL_ROOT_DIR} ${LVGL_ROOT_DIR}/.. ${LVGL_ROOT_DIR}/src ${LV_CONF_DIR}
+      RESULT_VARIABLE ret
+    )
+    if(NOT "${ret}" STREQUAL "0")
+      message(FATAL_ERROR "preprocess_lv_conf_internal.py failed with return code: ${ret}")
+    endif()
 
-# Convert the expanded lv_conf_expanded.h to cmake variables
-execute_process(
-  COMMAND ${Python_EXECUTABLE}
-    ${LVGL_ROOT_DIR}/scripts/generate_cmake_variables.py
-    --input ${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h
-    --output ${CMAKE_CURRENT_BINARY_DIR}/lv_conf.cmake
-    ${KCONFIG_FLAG}
-    RESULT_VARIABLE ret
-)
-if(NOT "${ret}" STREQUAL "0")
-  message(FATAL_ERROR "generate_cmake_variables.py command failed with return code: ${ret}")
-endif()
+    # Convert the expanded lv_conf_expanded.h to cmake variables
+    execute_process(
+      COMMAND ${Python_EXECUTABLE}
+        ${LVGL_ROOT_DIR}/scripts/generate_cmake_variables.py
+        --input ${CMAKE_CURRENT_BINARY_DIR}/lv_conf_expanded.h
+        --output ${CMAKE_CURRENT_BINARY_DIR}/lv_conf.cmake
+        --parentscope
+        ${KCONFIG_FLAG}
+        RESULT_VARIABLE ret
+    )
+    if(NOT "${ret}" STREQUAL "0")
+      message(FATAL_ERROR "generate_cmake_variables.py command failed with return code: ${ret}")
+    endif()
 
-# This will set all CONFIG_LV_USE_* variables in cmake
-include(${CMAKE_CURRENT_BINARY_DIR}/lv_conf.cmake)
+    # This will set all CONFIG_LV_USE_* variables in cmake
+    include(${CMAKE_CURRENT_BINARY_DIR}/lv_conf.cmake)
+endif()
 
 # Add definition of LV_CONF_PATH only if needed
 # Do not redefine it if already defined in tests/CMakeLists.txt

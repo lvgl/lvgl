@@ -455,6 +455,26 @@ void lv_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_po
     lv_chart_refresh(chart);
 }
 
+void lv_chart_set_cursor_pos_x(lv_obj_t * chart, lv_chart_cursor_t * cursor, int32_t x)
+{
+    LV_ASSERT_NULL(cursor);
+    LV_UNUSED(chart);
+
+    cursor->pos.x = x;
+    cursor->pos_set = 1;
+    lv_chart_refresh(chart);
+}
+
+void lv_chart_set_cursor_pos_y(lv_obj_t * chart, lv_chart_cursor_t * cursor, int32_t y)
+{
+    LV_ASSERT_NULL(cursor);
+    LV_UNUSED(chart);
+
+    cursor->pos.y = y;
+    cursor->pos_set = 1;
+    lv_chart_refresh(chart);
+}
+
 void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_chart_series_t * ser, uint32_t point_id)
 {
     LV_ASSERT_NULL(cursor);

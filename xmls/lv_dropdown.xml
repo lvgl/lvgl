@@ -14,6 +14,8 @@ Example
 	    	<param name="anim" type="bool" help="Move to the option with animation" default="false"/>
 	    </prop>
 	    <prop name="symbol" type="string" help="The symbol, usually a caret"/>
+	    <prop name="bind_value" type="subject" help=""/>
+
 	    <element name="list" access="get" type="lv_obj" help=""/>
 	</api>
 </widget>

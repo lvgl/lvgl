@@ -26,6 +26,13 @@ extern "C" {
  **********************/
 
 /**
+ * Convert an state string to enum
+ * @param txt       e.g. "pressed"
+ * @return          the related enum, e.g. `LV_STATE_PRESSED`
+ */
+lv_state_t lv_xml_state_to_enum(const char * txt);
+
+/**
  * Process inputs "content", "32", "32px", or "25%"
  * and convert them to integer
  * @param txt       the input string
@@ -68,7 +75,6 @@ lv_base_dir_t lv_xml_base_dir_to_enum(const char * txt);
  * @return          the related enum, e.g. `LV_GRAD_DIR_HOR`
  */
 lv_grad_dir_t lv_xml_grad_dir_to_enum(const char * txt);
-
 
 /**
  * Convert a text align string to enum

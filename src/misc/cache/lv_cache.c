@@ -182,6 +182,7 @@ lv_cache_entry_t * lv_cache_acquire_or_create(lv_cache_t * cache, const void * k
     bool create_res = cache->ops.create_cb(lv_cache_entry_get_data(entry), user_data);
     if(create_res == false) {
         cache->clz->remove_cb(cache, entry, user_data);
+        cache->ops.free_cb(lv_cache_entry_get_data(entry), user_data);
         lv_cache_entry_delete(entry);
         entry = NULL;
     }

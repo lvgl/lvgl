@@ -1,5 +1,5 @@
 <!--
-<lv_table column_conunt="4">
+<lv_table column_count="4">
 	<lv_table-column column="2" width="30px"/>
 	<lv_table-cell row="2" column="1" value="hello" ctrl="text_crop merge_right"/>
 	<lv_table-cell row="3" column="0" value="world"/>
@@ -17,8 +17,8 @@
 	        <enum name="custom_4"/>
 	    </enumdef>
 
-	    <prop name="row_conunt" type="int" help=""/>
-	    <prop name="column_conunt" type="int" help=""/>
+	    <prop name="row_count" type="int" help=""/>
+	    <prop name="column_count" type="int" help=""/>
 	    <prop name="selected cell" help="">
 	    	<param name="row" type="int" help=""/>
 	    	<param name="column" type="int" help=""/>

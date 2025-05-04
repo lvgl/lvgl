@@ -229,6 +229,22 @@ lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_di
 void lv_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t * pos);
 
 /**
+ * Set the X coordinate of the cursor with respect to the paddings
+ * @param chart     pointer to a chart object
+ * @param cursor    pointer to the cursor
+ * @param x         the new X coordinate of cursor relative to the chart
+ */
+void lv_chart_set_cursor_pos_x(lv_obj_t * chart, lv_chart_cursor_t * cursor, int32_t x);
+
+/**
+ * Set the coordinate of the cursor with respect to the paddings
+ * @param chart     pointer to a chart object
+ * @param cursor    pointer to the cursor
+ * @param y         the new Y coordinate of cursor relative to the chart
+ */
+void lv_chart_set_cursor_pos_y(lv_obj_t * chart, lv_chart_cursor_t * cursor, int32_t y);
+
+/**
  * Stick the cursor to a point
  * @param chart     pointer to a chart object
  * @param cursor    pointer to the cursor

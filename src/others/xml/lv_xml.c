@@ -295,7 +295,7 @@ const char * lv_xml_get_const(lv_xml_component_ctx_t * ctx, const char * name)
 {
 
     if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
-    if(ctx == NULL) return LV_RESULT_INVALID;
+    if(ctx == NULL) return NULL;
 
     lv_xml_const_t * cnst;
     if(ctx) {
@@ -350,7 +350,7 @@ lv_result_t lv_xml_register_image(lv_xml_component_ctx_t * ctx, const char * nam
 const void * lv_xml_get_image(lv_xml_component_ctx_t * ctx, const char * name)
 {
     if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
-    if(ctx == NULL) return LV_RESULT_INVALID;
+    if(ctx == NULL) return NULL;
 
     lv_xml_image_t * img;
     if(ctx) {
@@ -400,7 +400,7 @@ lv_result_t lv_xml_register_event_cb(lv_xml_component_ctx_t * ctx, const char * 
 lv_event_cb_t lv_xml_get_event_cb(lv_xml_component_ctx_t * ctx, const char * name)
 {
     if(ctx == NULL) ctx = lv_xml_component_get_ctx("globals");
-    if(ctx == NULL) return LV_RESULT_INVALID;
+    if(ctx == NULL) return NULL;
 
     lv_xml_event_cb_t * e;
     if(ctx) {

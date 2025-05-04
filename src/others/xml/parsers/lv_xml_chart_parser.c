@@ -58,7 +58,14 @@ void lv_xml_chart_apply(lv_xml_parser_state_t * state, const char ** attrs)
         const char * name = attrs[i];
         const char * value = attrs[i + 1];
 
-        if(lv_streq("point_count", name)) lv_chart_set_point_count(item, lv_xml_atoi(value));
+        if(lv_streq("point_count", name)) {
+            int32_t cnt = lv_xml_atoi(value);
+            if(cnt < 0) {
+                LV_LOG_WARN("chart's point count can't be negative");
+                cnt = 0;
+            }
+            lv_chart_set_point_count(item, cnt);
+        }
         else if(lv_streq("type", name)) lv_chart_set_type(item, chart_type_to_enum(value));
         else if(lv_streq("update_mode", name)) lv_chart_set_update_mode(item, chart_update_mode_to_enum(value));
         else if(lv_streq("div_line_count", name)) {
@@ -74,6 +81,9 @@ void * lv_xml_chart_series_create(lv_xml_parser_state_t * state, const char ** a
 {
     const char * color = lv_xml_get_value_of(attrs, "color");
     const char * axis = lv_xml_get_value_of(attrs, "axis");
+    if(color == NULL) color = "0xff0000";
+    if(axis == NULL) axis = "primary_y";
+
     void * item = lv_chart_add_series(lv_xml_state_get_parent(state), lv_color_hex(lv_xml_strtol(color, NULL, 16)),
                                       chart_axis_to_enum(axis));
     return item;
@@ -104,6 +114,9 @@ void * lv_xml_chart_cursor_create(lv_xml_parser_state_t * state, const char ** a
 {
     const char * color = lv_xml_get_value_of(attrs, "color");
     const char * dir = lv_xml_get_value_of(attrs, "dir");
+    if(color == NULL) color = "0x0000ff";
+    if(dir == NULL) dir = "all";
+
     void * item = lv_chart_add_cursor(lv_xml_state_get_parent(state), lv_color_hex(lv_xml_strtol(color, NULL, 16)),
                                       lv_xml_dir_to_enum(dir));
 
@@ -122,13 +135,8 @@ void lv_xml_chart_cursor_apply(lv_xml_parser_state_t * state, const char ** attr
         const char * name = attrs[i];
         const char * value = attrs[i + 1];
 
-
-        if(lv_streq("pos", name)) {
-            int32_t x = lv_xml_atoi_split(&value, ' ');
-            int32_t y = lv_xml_atoi_split(&value, ' ');
-            lv_point_t p = {x, y};
-            lv_chart_set_cursor_pos(chart, cursor, &p);
-        }
+        if(lv_streq("pos_x", name)) lv_chart_set_cursor_pos_x(chart, cursor, lv_xml_atoi(value));
+        if(lv_streq("pos_y", name)) lv_chart_set_cursor_pos_y(chart, cursor, lv_xml_atoi(value));
     }
 }
 
@@ -137,7 +145,7 @@ void * lv_xml_chart_axis_create(lv_xml_parser_state_t * state, const char ** att
     LV_UNUSED(attrs);
 
     /*Nothing to create*/
-    return lv_xml_state_get_parent(state);;
+    return lv_xml_state_get_parent(state);
 }
 
 void lv_xml_chart_axis_apply(lv_xml_parser_state_t * state, const char ** attrs)

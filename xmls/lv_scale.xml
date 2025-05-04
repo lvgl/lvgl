@@ -9,8 +9,8 @@
 	    <enumdef name="lv_scale_mode" help="">
 	        <enum name="horizontal_top" help=""/>
 	        <enum name="horizontal_bottom" help=""/>
-	        <enum name="vertical_top" help=""/>
-	        <enum name="vertical_bottom" help=""/>
+	        <enum name="vertical_left" help=""/>
+	        <enum name="vertical_right" help=""/>
 	        <enum name="round_inner" help=""/>
 	        <enum name="round_outer" help=""/>
 	    </enumdef>

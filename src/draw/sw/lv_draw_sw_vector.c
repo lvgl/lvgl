@@ -330,21 +330,16 @@ static void _set_paint_fill(Tvg_Paint * obj, Tvg_Canvas * canvas, const lv_vecto
         tvg_shape_set_fill_color(obj, c.r, c.g, c.b, c.a);
     }
     else if(dsc->style == LV_VECTOR_DRAW_STYLE_PATTERN) {
-        lv_matrix_t imx;
+        lv_matrix_t imx = *matrix;
 
         if(dsc->fill_units == LV_VECTOR_FILL_UNITS_OBJECT_BOUNDING_BOX) {
             /* Convert to object bounding box coordinates */
-            imx = *matrix;
-
             float x, y, w, h;
             tvg_paint_get_bounds(obj, &x, &y, &w, &h, false);
             lv_matrix_translate(&imx, x, y);
-            lv_matrix_multiply(&imx, &dsc->matrix);
         }
-        else {
-            /* Copy fill matrix directly, no need to convert */
-            imx = dsc->matrix;
-        }
+
+        lv_matrix_multiply(&imx, &dsc->matrix);
 
         _set_paint_fill_pattern(obj, canvas, &dsc->img_dsc, &imx);
     }

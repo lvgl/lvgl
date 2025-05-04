@@ -924,6 +924,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
                 else if(v < 128) value_final.ptr = tr->start_value.ptr;
                 else value_final.ptr = tr->end_value.ptr;
                 break;
+            case LV_STYLE_RECOLOR:
             case LV_STYLE_BG_COLOR:
             case LV_STYLE_BG_GRAD_COLOR:
             case LV_STYLE_BORDER_COLOR:

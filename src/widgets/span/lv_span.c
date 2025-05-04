@@ -1149,6 +1149,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
             char * bidi_txt;
             if(base_dir == LV_BASE_DIR_RTL) {
                 bidi_txt = lv_malloc(pinfo->bytes + 1);
+                LV_ASSERT_MALLOC(bidi_txt);
                 lv_memcpy(bidi_txt, pinfo->txt, (size_t)pinfo->bytes);
                 label_draw_dsc.bidi_dir = base_dir;
                 label_draw_dsc.has_bided = true;
@@ -1211,6 +1212,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
                 if(base_dir == LV_BASE_DIR_RTL) {
                     if(txt_bytes > label_draw_dsc.text_length) {
                         char * tmp_txt = lv_malloc(label_draw_dsc.text_length + 1);
+                        LV_ASSERT_MALLOC(tmp_txt);
 
                         if(lv_bidi_detect_base_dir(bidi_txt) == LV_BASE_DIR_RTL) {
                             lv_memcpy(tmp_txt, bidi_txt + (txt_bytes - label_draw_dsc.text_length), (size_t)label_draw_dsc.text_length);

@@ -520,8 +520,8 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
     int32_t hor_req_space = hor_draw ? thickness : 0;
     int32_t rem;
 
-    if(lv_obj_get_style_bg_opa(obj, LV_PART_SCROLLBAR) < LV_OPA_MIN &&
-       lv_obj_get_style_border_opa(obj, LV_PART_SCROLLBAR) < LV_OPA_MIN) {
+    if(lv_obj_get_style_bg_opa(obj, LV_PART_SCROLLBAR) <= LV_OPA_MIN &&
+       lv_obj_get_style_border_opa(obj, LV_PART_SCROLLBAR) <= LV_OPA_MIN) {
         return;
     }
 

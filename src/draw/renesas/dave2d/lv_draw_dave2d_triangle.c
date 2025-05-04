@@ -92,7 +92,7 @@ void lv_draw_dave2d_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * 
 
     current_alpha_mode = d2_getalphamode(u->d2_handle);
 
-    if(LV_GRAD_DIR_NONE != dsc->bg_grad.dir) {
+    if(LV_GRAD_DIR_NONE != dsc->grad.dir) {
         float a1;
         float a2;
 
@@ -104,9 +104,9 @@ void lv_draw_dave2d_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * 
         int32_t y0_i ;
         int32_t y3_i ;
 
-        if(LV_GRAD_DIR_VER == dsc->bg_grad.dir) {
-            a1 = dsc->bg_grad.stops[0].opa;
-            a2 = dsc->bg_grad.stops[dsc->bg_grad.stops_count - 1].opa;
+        if(LV_GRAD_DIR_VER == dsc->grad.dir) {
+            a1 = dsc->grad.stops[0].opa;
+            a2 = dsc->grad.stops[dsc->grad.stops_count - 1].opa;
 
             y1 = LV_MIN3(p[0].y, p[1].y, p[2].y);
             y2 = LV_MAX3(p[0].y, p[1].y, p[2].y);
@@ -128,18 +128,18 @@ void lv_draw_dave2d_triangle(lv_draw_task_t * t, const lv_draw_triangle_dsc_t * 
 
             d2_setalphagradient(u->d2_handle, 0, D2_FIX4(0),  D2_FIX4(y0_i), D2_FIX4(0), D2_FIX4((y3_i - y0_i)));
         }
-        else if(LV_GRAD_DIR_HOR == dsc->bg_grad.dir) {
+        else if(LV_GRAD_DIR_HOR == dsc->grad.dir) {
             /* TODO */
             LV_ASSERT(0);
         }
 
-        d2_setcolor(u->d2_handle, 0, lv_draw_dave2d_lv_colour_to_d2_colour(dsc->bg_grad.stops[0].color));
+        d2_setcolor(u->d2_handle, 0, lv_draw_dave2d_lv_colour_to_d2_colour(dsc->grad.stops[0].color));
         d2_setalphamode(u->d2_handle, d2_am_gradient1);
     }
     else {
-        d2_setalpha(u->d2_handle, dsc->bg_opa);
+        d2_setalpha(u->d2_handle, dsc->opa);
         d2_setalphamode(u->d2_handle, d2_am_constant);
-        d2_setcolor(u->d2_handle, 0, lv_draw_dave2d_lv_colour_to_d2_colour(dsc->bg_color));
+        d2_setcolor(u->d2_handle, 0, lv_draw_dave2d_lv_colour_to_d2_colour(dsc->color));
 
     }
 

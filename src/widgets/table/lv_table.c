@@ -338,6 +338,7 @@ void lv_table_set_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table
     }
 
     table->cell_data[cell]->ctrl |= ctrl;
+    refr_cell_size(obj, row, col);
 }
 
 void lv_table_clear_cell_ctrl(lv_obj_t * obj, uint32_t row, uint32_t col, lv_table_cell_ctrl_t ctrl)

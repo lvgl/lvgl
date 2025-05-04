@@ -14,8 +14,9 @@
         #define _RENESAS_RX_ 1
     #endif
     #define USE_FREE_RTOS 1
-    #define DISPLAY_HSIZE_INPUT0 LCD_CH0_IN_GR2_HSIZE
-    #define DISPLAY_VSIZE_INPUT0 LCD_CH0_IN_GR2_VSIZE
+    #define DISPLAY_HSIZE_INPUT0                LCD_CH0_IN_GR2_HSIZE
+    #define DISPLAY_VSIZE_INPUT0                LCD_CH0_IN_GR2_VSIZE
+    #define DISPLAY_BUFFER_STRIDE_BYTES_INPUT0  LCD_CH0_IN_GR2_LINEOFFSET
 #endif /*_RENESAS_RA_*/
 
 /*********************
@@ -165,7 +166,7 @@ static lv_display_t * glcdc_create(void * buf1, void * buf2, uint32_t buf_size, 
         LV_ASSERT(0);
     }
 
-    lv_display_set_buffers(display, buf1, buf2, buf_size, render_mode);
+    lv_display_set_buffers_with_stride(display, buf1, buf2, buf_size, DISPLAY_BUFFER_STRIDE_BYTES_INPUT0, render_mode);
 
     return display;
 }
