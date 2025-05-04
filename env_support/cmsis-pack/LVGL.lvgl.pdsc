@@ -36,7 +36,7 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2025-04-24" version="9.3.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.3.0.pack">
+    <release date="2025-05-05" version="9.3.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.3.0.pack">
       - LVGL 9.3.0
       - See Change Log
     </release>
@@ -587,11 +587,12 @@
                 
                 
                 <!-- src/misc/cache-->
-                <file category="sourceC"            name="src/misc/cache/lv_cache_lru_rb.c" />
+                <file category="sourceC"            name="src/misc/cache/class/lv_cache_lru_rb.c" />
+                <file category="sourceC"            name="src/misc/cache/class/lv_cache_lru_ll.c" />
                 <file category="sourceC"            name="src/misc/cache/lv_cache.c" />
                 <file category="sourceC"            name="src/misc/cache/lv_cache_entry.c" />
-                <file category="sourceC"            name="src/misc/cache/lv_image_cache.c" />
-                <file category="sourceC"            name="src/misc/cache/lv_image_header_cache.c" />
+                <file category="sourceC"            name="src/misc/cache/instance/lv_image_cache.c" />
+                <file category="sourceC"            name="src/misc/cache/instance/lv_image_header_cache.c" />
 
                 <!-- src/stdlib-->
                 <file category="sourceC"            name="src/stdlib/lv_mem.c" />
@@ -768,6 +769,19 @@
               <RTE_Components_h>
 /* use display driver for TFT_eSPI */
 #define LV_USE_TFT_ESPI    1
+
+              </RTE_Components_h>
+            </component>
+
+            <component Cgroup="Display" Cvariant="FT81X" condition="LVGL-Essential">
+              <description>Add the display driver for FT81X </description>
+              <files>
+                <file category="sourceC"            name="src/drivers/display/ft81x/lv_ft81x.c" />
+              </files>
+
+              <RTE_Components_h>
+/* use display driver for FT81X */
+#define LV_USE_FT81X	    1
 
               </RTE_Components_h>
             </component>
@@ -1168,7 +1182,7 @@
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
 
                 <!-- libs/nema_gfx/ -->
-                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33/gcc/libnemagfx-float-abi-hard-wc16.a"     condition="Armv8-M Mainline Library" />
+                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33_revC/gcc/libnemagfx-float-abi-hard-wc16.a"     condition="Armv8-M Mainline Library" />
               </files>
 
               <RTE_Components_h>
@@ -1199,7 +1213,7 @@
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
 
                 <!-- libs/nema_gfx/ -->
-                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33/gcc/libnemagfx-float-abi-hard.a"          condition="Armv8-M Mainline Library" />
+                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33_revC/gcc/libnemagfx-float-abi-hard.a"          condition="Armv8-M Mainline Library" />
               </files>
 
               <RTE_Components_h>
@@ -1229,7 +1243,7 @@
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
 
                 <!-- libs/nema_gfx/ -->
-                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33/gcc/libnemagfx-wc16.a"                    condition="Armv8-M Mainline Library" />
+                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33_revC/gcc/libnemagfx-wc16.a"                    condition="Armv8-M Mainline Library" />
               </files>
 
               <RTE_Components_h>
@@ -1258,7 +1272,7 @@
                 <file category="sourceC"      name="src/draw/nema_gfx/lv_draw_nema_gfx_utils.c" />
 
                 <!-- libs/nema_gfx/ -->
-                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33/gcc/libnemagfx.a"                         condition="Armv8-M Mainline Library" />
+                <file category="library"      name="libs/nema_gfx/lib/core/cortex_m33_revC/gcc/libnemagfx.a"                         condition="Armv8-M Mainline Library" />
               </files>
 
               <RTE_Components_h>
