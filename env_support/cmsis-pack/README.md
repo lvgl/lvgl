@@ -82,6 +82,7 @@ remove the misleading guide above this code segment.
    - LV_USE_ST7789
    - LV_USE_ST7796
    - LV_USE_ST_LTDC
+   - LV_USE_FT81X
    - LV_USE_ILI9341
    - LV_USE_RENESAS_GLCDC   
    - LV_USE_NEMA_GFX
