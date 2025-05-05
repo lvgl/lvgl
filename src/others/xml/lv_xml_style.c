@@ -166,7 +166,11 @@ lv_result_t lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** at
             }
         }
         else SET_STYLE_IF(width, lv_xml_to_size(value));
+        else SET_STYLE_IF(min_width, lv_xml_to_size(value));
+        else SET_STYLE_IF(max_width, lv_xml_to_size(value));
         else SET_STYLE_IF(height, lv_xml_to_size(value));
+        else SET_STYLE_IF(min_height, lv_xml_to_size(value));
+        else SET_STYLE_IF(max_height, lv_xml_to_size(value));
         else SET_STYLE_IF(length, lv_xml_to_size(value));
         else SET_STYLE_IF(radius, lv_xml_to_size(value));
 
@@ -267,6 +271,8 @@ lv_result_t lv_xml_style_register(lv_xml_component_ctx_t * ctx, const char ** at
         else SET_STYLE_IF(transform_skew_x, lv_xml_atoi(value));
         else SET_STYLE_IF(bitmap_mask_src, lv_xml_get_image(ctx, value));
         else SET_STYLE_IF(rotary_sensitivity, lv_xml_atoi(value));
+        else SET_STYLE_IF(recolor, lv_xml_to_color(value));
+        else SET_STYLE_IF(recolor_opa, lv_xml_to_opa(value));
 
         else SET_STYLE_IF(layout, lv_xml_layout_to_enum(value));
 
@@ -403,7 +409,11 @@ lv_grad_dsc_t * lv_xml_component_get_grad(lv_xml_component_ctx_t * ctx, const ch
 static lv_style_prop_t style_prop_text_to_enum(const char * txt)
 {
     if(lv_streq(txt, "width")) return LV_STYLE_WIDTH;
+    if(lv_streq(txt, "min_width")) return LV_STYLE_MIN_WIDTH;
+    if(lv_streq(txt, "max_width")) return LV_STYLE_MAX_WIDTH;
     else if(lv_streq(txt, "height")) return LV_STYLE_HEIGHT;
+    else if(lv_streq(txt, "min_height")) return LV_STYLE_MIN_HEIGHT;
+    else if(lv_streq(txt, "max_height")) return LV_STYLE_MAX_HEIGHT;
     else if(lv_streq(txt, "length")) return LV_STYLE_LENGTH;
     else if(lv_streq(txt, "radius")) return LV_STYLE_RADIUS;
 
@@ -497,6 +507,8 @@ static lv_style_prop_t style_prop_text_to_enum(const char * txt)
     else if(lv_streq(txt, "transform_skew_x")) return LV_STYLE_TRANSFORM_SKEW_X;
     else if(lv_streq(txt, "bitmap_mask_src")) return LV_STYLE_BITMAP_MASK_SRC;
     else if(lv_streq(txt, "rotary_sensitivity")) return LV_STYLE_ROTARY_SENSITIVITY;
+    else if(lv_streq(txt, "recolor")) return LV_STYLE_RECOLOR;
+    else if(lv_streq(txt, "recolor_opa")) return LV_STYLE_RECOLOR_OPA;
 
     else if(lv_streq(txt, "layout")) return LV_STYLE_LAYOUT;
 

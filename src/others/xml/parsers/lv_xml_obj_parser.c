@@ -266,7 +266,11 @@ static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const ch
     const char * prop_name = lv_xml_style_string_process(name_local, &selector);
 
     SET_STYLE_IF(width, lv_xml_to_size(value));
+    else SET_STYLE_IF(min_width, lv_xml_to_size(value));
+    else SET_STYLE_IF(max_width, lv_xml_to_size(value));
     else SET_STYLE_IF(height, lv_xml_to_size(value));
+    else SET_STYLE_IF(min_height, lv_xml_to_size(value));
+    else SET_STYLE_IF(max_height, lv_xml_to_size(value));
     else SET_STYLE_IF(length, lv_xml_to_size(value));
     else SET_STYLE_IF(radius, lv_xml_to_size(value));
 
@@ -367,6 +371,8 @@ static void apply_styles(lv_xml_parser_state_t * state, lv_obj_t * obj, const ch
     else SET_STYLE_IF(transform_skew_x, lv_xml_atoi(value));
     else SET_STYLE_IF(bitmap_mask_src, lv_xml_get_image(&state->ctx, value));
     else SET_STYLE_IF(rotary_sensitivity, lv_xml_atoi(value));
+    else SET_STYLE_IF(recolor, lv_xml_to_color(value));
+    else SET_STYLE_IF(recolor_opa, lv_xml_to_opa(value));
 
     else SET_STYLE_IF(layout, lv_xml_layout_to_enum(value));
 
