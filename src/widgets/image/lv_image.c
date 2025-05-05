@@ -886,11 +886,13 @@ static void draw_image(lv_event_t * e)
             label_dsc.text = img->src;
             lv_area_t * coords;
             lv_area_t aligned_coords;
-            if(((img->align > LV_IMAGE_ALIGN_TOP_LEFT
-                 && !(img->w == lv_area_get_width(&obj->coords)
-                      && img->h == lv_area_get_height(&obj->coords)))
-                || img->offset.x || img->offset.y)
-               && img->align < LV_IMAGE_ALIGN_AUTO_TRANSFORM) {
+            const bool image_area_is_same_as_coords = img->w == lv_area_get_width(&obj->coords)
+                                                      && img->h == lv_area_get_height(&obj->coords);
+            const bool needs_inner_alignment = img->align > LV_IMAGE_ALIGN_TOP_LEFT
+                                               && !image_area_is_same_as_coords;
+            const bool has_offset = img->offset.x || img->offset.y;
+            const bool inner_alignment_is_transforming = img->align >= LV_IMAGE_ALIGN_AUTO_TRANSFORM;
+            if((needs_inner_alignment || has_offset) && !inner_alignment_is_transforming) {
                 lv_point_t text_size;
                 lv_text_get_size(&text_size, label_dsc.text, label_dsc.font, label_dsc.letter_space,
                                  label_dsc.line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
