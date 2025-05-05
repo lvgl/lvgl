@@ -280,4 +280,62 @@ void startDMA2DChibiOS(void)
     dma2dStart(&DMA2DD1, &dma2d_cfg);
 }
 #endif
+#if LV_USE_SYSMON
+
+_Static_assert(CH_DBG_STATISTICS == TRUE, "CH_DBG_STATISTICS must be TRUE in chconf.h");
+_Static_assert(CH_CFG_USE_TM == TRUE, "CH_CFG_USE_TM must be TRUE in chconf.h");
+
+static volatile uint32_t last_idle_pct = 0;
+
+static THD_WORKING_AREA(waIdleStat, 128);
+static THD_FUNCTION(IdleStatThread, arg)
+{
+    (void)arg;
+    chRegSetThreadName("IdleStat");
+
+    thread_t *idle_tp = chSysGetIdleThreadX();
+    uint64_t prev_idle = idle_tp->stats.cumulative;
+    uint64_t prev_total = 0;
+
+    while (true)
+    {
+      chThdSleepMilliseconds(1000);
+      uint64_t total = 0;
+      thread_t *tp = chRegFirstThread();
+      do
+      {
+        total += tp->stats.cumulative;
+        tp = chRegNextThread(tp);
+      } while (tp);
+
+      uint64_t idle = idle_tp->stats.cumulative;
+      uint64_t delta_total = total - prev_total;
+      uint64_t delta_idle = idle - prev_idle;
+
+      last_idle_pct = (uint32_t)((delta_idle * 100UL) / delta_total);
+
+      prev_total = total;
+      prev_idle = idle;
+    }
+}
+
+void idleStatInit(void)
+{
+    static bool initialized = false;
+
+    if (initialized) {
+        return;
+    }
+
+    initialized = true;
+
+    chThdCreateStatic(waIdleStat, sizeof(waIdleStat), NORMALPRIO - 1, IdleStatThread, NULL);
+}
+
+uint32_t lv_os_get_idle_percent(void)
+{
+    idleStatInit();
+    return last_idle_pct;
+}
+#endif
 #endif /* LV_USE_OS == LV_OS_CHIBIOS */
