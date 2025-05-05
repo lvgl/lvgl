@@ -1,0 +1,35 @@
+name: Performance Tests CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+# https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#concurrency
+# Ensure that only one commit will be running tests at a time on each PR
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }} 
+  cancel-in-progress: true
+
+jobs:
+  test-perf:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        # A valid option parameter to the cmake file.
+        # See BUILD_OPTIONS in tests/perf.py.
+        build_option: ['OPTIONS_TEST_PERF_32B',
+                       'OPTIONS_TEST_PERF_64B']
+
+    name: Perf Tests ${{ matrix.build_option }} - Ubuntu
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Building ${{ matrix.build_option }}
+      run: python tests/perf.py --build-option=${{ matrix.build_option }} test
