@@ -88,26 +88,26 @@ to specify which variable a given name refers to.
 
 To create these connections, functions like
 
-- ``lv_xml_register_image(ctx, name, pointer)``
-- ``lv_xml_register_font(ctx, name, pointer)``
-- ``lv_xml_register_event_cb(ctx, name, callback)``
+- ``lv_xml_register_image(&ctx, name, pointer)``
+- ``lv_xml_register_font(&ctx, name, pointer)``
+- ``lv_xml_register_event_cb(&ctx, name, callback)``
 - etc.
 
 can be used.  Later, a pointer to the object can be retrieved by
 
-- ``lv_xml_get_image(ctx, name)``
-- ``lv_xml_get_font(ctx, name)``
-- ``lv_xml_get_event_cb(ctx, name)``
+- ``lv_xml_get_image(&ctx, name)``
+- ``lv_xml_get_font(&ctx, name)``
+- ``lv_xml_get_event_cb(&ctx, name)``
 - etc.
 
-:style:     Name of a style. :cpp:expr:`lv_xml_get_style(name)` returns an :cpp:expr:`lv_style_t *`.
-:font:      Name of a font. :cpp:expr:`lv_xml_get_font(name)` returns an :cpp:expr:`lv_font_t *`.
-:image:     Name of an image. :cpp:expr:`lv_xml_get_image(name)` returns an :cpp:expr:`const void *`,
+:style:     Name of a style. :cpp:expr:`lv_xml_get_style_by_name(&ctx, name)` returns an :cpp:expr:`lv_style_t *`.
+:font:      Name of a font. :cpp:expr:`lv_xml_get_font(&ctx, name)` returns an :cpp:expr:`lv_font_t *`.
+:image:     Name of an image. :cpp:expr:`lv_xml_get_image(&ctx, name)` returns an :cpp:expr:`const void *`,
             which can be :cpp:expr:`lv_image_dsc_t *` or a NUL-terminated string path to a file.
-:animation: Name of an animation descriptor. :cpp:expr:`lv_xml_get_anim(name)` returns an :cpp:expr:`lv_anim_t *`.
-:subject:   Name of a :ref:`Subject <observer_subject>`. :cpp:expr:`lv_xml_get_subject(name)` returns an :cpp:expr:`lv_subject_t *`.
-:grad:      Name of a gradient. :cpp:expr:`lv_xml_get_grad(name)` returns an :cpp:expr:`lv_grad_dsc_t *`.
-:event_cb:  Name of an event callback. :cpp:expr:`lv_xml_get_event_cb(name)` returns an :cpp:expr:`lv_event_cb_t`.
+:animation: Name of an animation descriptor. :cpp:expr:`lv_xml_get_anim(&ctx, name)` returns an :cpp:expr:`lv_anim_t *`.
+:subject:   Name of a :ref:`Subject <observer_subject>`. :cpp:expr:`lv_xml_get_subject(&ctx, name)` returns an :cpp:expr:`lv_subject_t *`.
+:grad:      Name of a gradient. :cpp:expr:`lv_xml_get_grad(&ctx, name)` returns an :cpp:expr:`lv_grad_dsc_t *`.
+:event_cb:  Name of an event callback. :cpp:expr:`lv_xml_get_event_cb(&ctx, name)` returns an :cpp:expr:`lv_event_cb_t`.
 
 
 Arrays
