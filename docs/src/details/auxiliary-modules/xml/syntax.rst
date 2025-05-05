@@ -95,9 +95,9 @@ To create these connections, functions like
 
 can be used.  Later, a pointer to the object can be retrieved by
 
-- ``lv_xml_get_image(name, pointer)``
-- ``lv_xml_get_font(name, pointer)``
-- ``lv_xml_get_event_cb(name, pointer)``
+- ``lv_xml_get_image(ctx, name)``
+- ``lv_xml_get_font(ctx, name)``
+- ``lv_xml_get_event_cb(ctx, name)``
 - etc.
 
 :style:     Name of a style. :cpp:expr:`lv_xml_get_style(name)` returns an :cpp:expr:`lv_style_t *`.
