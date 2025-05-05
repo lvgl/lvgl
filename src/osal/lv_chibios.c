@@ -200,7 +200,8 @@ static void prvCheckCondInit(lv_thread_sync_t * pxCond)
 #include "hal_stm32_ltdc.h"
 #include "../drivers/display/st_ltdc/lv_st_ltdc.h"
 
-uint8_t frame_buffer[600 * 1024 *2];  /**< Frame buffer for LTDC. Height * Width * Bytes_per_pixel, additional settings can be applied like section(.sdram) */
+uint8_t frame_buffer[600 * 1024 *
+                     2]; /**< Frame buffer for LTDC. Height * Width * Bytes_per_pixel, additional settings can be applied like section(.sdram) */
 
 static const ltdc_window_t ltdc_fullscreen_wincfg = {
     .hstart = 0,
@@ -293,29 +294,27 @@ static THD_FUNCTION(IdleStatThread, arg)
     (void)arg;
     chRegSetThreadName("IdleStat");
 
-    thread_t *idle_tp = chSysGetIdleThreadX();
+    thread_t * idle_tp = chSysGetIdleThreadX();
     uint64_t prev_idle = idle_tp->stats.cumulative;
     uint64_t prev_total = 0;
 
-    while (true)
-    {
-      chThdSleepMilliseconds(1000);
-      uint64_t total = 0;
-      thread_t *tp = chRegFirstThread();
-      do
-      {
-        total += tp->stats.cumulative;
-        tp = chRegNextThread(tp);
-      } while (tp);
+    while(true) {
+        chThdSleepMilliseconds(1000);
+        uint64_t total = 0;
+        thread_t * tp = chRegFirstThread();
+        do {
+            total += tp->stats.cumulative;
+            tp = chRegNextThread(tp);
+        } while(tp);
 
-      uint64_t idle = idle_tp->stats.cumulative;
-      uint64_t delta_total = total - prev_total;
-      uint64_t delta_idle = idle - prev_idle;
+        uint64_t idle = idle_tp->stats.cumulative;
+        uint64_t delta_total = total - prev_total;
+        uint64_t delta_idle = idle - prev_idle;
 
-      last_idle_pct = (uint32_t)((delta_idle * 100UL) / delta_total);
+        last_idle_pct = (uint32_t)((delta_idle * 100UL) / delta_total);
 
-      prev_total = total;
-      prev_idle = idle;
+        prev_total = total;
+        prev_idle = idle;
     }
 }
 
@@ -323,7 +322,7 @@ void idleStatInit(void)
 {
     static bool initialized = false;
 
-    if (initialized) {
+    if(initialized) {
         return;
     }
 
