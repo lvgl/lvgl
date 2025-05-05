@@ -127,7 +127,7 @@ lv_indev_t * lv_wayland_get_touchscreen(lv_display_t * disp);
  * @return true: if the cycle was completed, false if the application
  * went to sleep because the last frame wasn't completed
  */
-uint32_t lv_wayland_timer_handler(void);
+int32_t lv_wayland_timer_handler(void);
 
 /**********************
  *      MACROS

@@ -3134,7 +3134,7 @@ lv_indev_t * lv_wayland_get_touchscreen(lv_display_t * disp)
 /**
  * Wayland specific timer handler (use in place of LVGL lv_timer_handler)
  */
-uint32_t lv_wayland_timer_handler(void)
+int32_t lv_wayland_timer_handler(void)
 {
     struct window * window;
     uint32_t idle_time;
@@ -3155,7 +3155,7 @@ uint32_t lv_wayland_timer_handler(void)
             poll(&application.wayland_pfd, 1, -1);
 
             /* Resume lvgl on the next cycle */
-            return false;
+            return -1;
 
         }
         else if(window != NULL && window->body->surface_configured == false) {
@@ -3183,7 +3183,7 @@ uint32_t lv_wayland_timer_handler(void)
             /* Destroy graphical context and execute close_cb */
             _lv_wayland_handle_output();
             wayland_deinit();
-            return false;
+            return -1;
         }
     }
 
