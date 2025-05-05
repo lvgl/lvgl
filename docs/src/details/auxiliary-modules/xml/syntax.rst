@@ -88,9 +88,9 @@ to specify which variable a given name refers to.
 
 To create these connections, functions like
 
-- ``lv_xml_register_image(name, pointer)``
-- ``lv_xml_register_font(name, pointer)``
-- ``lv_xml_register_event_cb(name, pointer)``
+- ``lv_xml_register_image(ctx, name, pointer)``
+- ``lv_xml_register_font(ctx, name, pointer)``
+- ``lv_xml_register_event_cb(ctx, name, callback)``
 - etc.
 
 can be used.  Later, a pointer to the object can be retrieved by
