@@ -2187,6 +2187,8 @@ static bool resize_window(struct window * window, int width, int height)
                                                     window->body->buffers[0]->lv_draw_buf,
                                                     lv_display_get_color_format(window->lv_disp),
                                                     width, height / LVGL_DRAW_BUFFER_DIV, stride);
+
+        lv_display_set_draw_buffers(window->lv_disp, window->body->buffers[0]->lv_draw_buf, NULL);
 #else
         destroy_window_buffers(window);
         if(create_window_buffers(window) != LV_RESULT_OK) {
@@ -2864,7 +2866,7 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
 #if LV_WAYLAND_BUF_COUNT == 1
     window->body->buffers[0]->lv_draw_buf = lv_draw_buf_create(
                                                 hor_res,
-                                                ver_res,
+                                                ver_res / LVGL_DRAW_BUFFER_DIV,
                                                 lv_display_get_color_format(window->lv_disp),
                                                 stride);
     lv_display_set_draw_buffers(window->lv_disp, window->body->buffers[0]->lv_draw_buf, NULL);
