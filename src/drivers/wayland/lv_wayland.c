@@ -2182,11 +2182,13 @@ static bool resize_window(struct window * window, int width, int height)
         stride = lv_draw_buf_width_to_stride(width,
                                              lv_display_get_color_format(window->lv_disp));
 
+        lv_draw_buf_destroy(window->body->buffers[0]->lv_draw_buf);
 
-        window->body->buffers[0]->lv_draw_buf = lv_draw_buf_resize(
-                                                    window->body->buffers[0]->lv_draw_buf,
+        window->body->buffers[0]->lv_draw_buf = lv_draw_buf_create(
+                                                    width,
+                                                    height / LVGL_DRAW_BUFFER_DIV,
                                                     lv_display_get_color_format(window->lv_disp),
-                                                    width, height / LVGL_DRAW_BUFFER_DIV, stride);
+                                                    stride);
 
         lv_display_set_draw_buffers(window->lv_disp, window->body->buffers[0]->lv_draw_buf, NULL);
 #else
