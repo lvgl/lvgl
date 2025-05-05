@@ -3,10 +3,6 @@ table, th, td {
   padding: 10px;
 }
 
-td {
-  text-align:center;
-}
-
 span.pre {
   padding-right:8px;
 }
