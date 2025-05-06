@@ -9,9 +9,9 @@
 		<style name="btn_pr_style" bg_opa="255"/>
 	</styles>
 
-	<view extends="lv_obj" width="280" height="content" style_bg_color="#light_blue">
+	<view extends="lv_obj" name="main" width="280" height="content" style_bg_color="#light_blue">
 		<lv_label text="Hello"/>
-		<my_card title="Card 1"
+		<my_card title="Card 1" name="card1"
 				 y="0"
 				 btn_rel_style="btn_style"
 				 btn_pr_style="btn_pr_style"/>
