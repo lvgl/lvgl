@@ -40,6 +40,7 @@
 #include "parsers/lv_xml_canvas_parser.h"
 #include "parsers/lv_xml_calendar_parser.h"
 #include "parsers/lv_xml_event_parser.h"
+#include "parsers/lv_xml_update_parser.h"
 #include "../../libs/expat/expat.h"
 #include "../../draw/lv_draw_image.h"
 
